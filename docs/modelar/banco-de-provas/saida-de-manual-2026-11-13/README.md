@@ -1,6 +1,6 @@
 # Saída de manual: pesquisa e medidas
 
-Pasta do plano [saída de manual a partir da montagem](../../planos/2026-11-13-saida-de-manual-a-partir-da-montagem.md), ativo desde 2026-11-13. Aqui entram a pesquisa do que outras ferramentas fazem, a comparação do que o módulo gera com o manual da instalação solar feito à mão, e o custo de cada saída.
+Pasta do plano [saída de manual a partir da montagem](../../decisoes/PLANOS-ENCERRADOS.md), ativo desde 2026-11-13. Aqui entram a pesquisa do que outras ferramentas fazem, a comparação do que o módulo gera com o manual da instalação solar feito à mão, e o custo de cada saída.
 
 ## Pesquisa de 2026-11-13, pela web, só pelo resumo da busca
 

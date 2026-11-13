@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1871 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1870 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -561,7 +561,6 @@
 - `2026-11-10-rebaixo-por-contorno.md` — Rebaixo por contorno: o degrau, o sulco e a borda rebaixada num corpo
 - `2026-11-13-nucleo-para-quem-escreve-receita.md` — Núcleo para quem escreve receita: erro na hora, menos passos e rodada mais curta
 - `2026-11-13-revisao-das-verificacoes-e-dos-testes.md` — Revisão das verificações e dos testes: o que cada um pega, medido
-- `2026-11-13-saida-de-manual-a-partir-da-montagem.md` — Saída de manual a partir da montagem: lista de peças e passo a passo
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
