@@ -2348,5 +2348,44 @@
         ]
       }
     ]
+  },
+  "manual": {
+    "parametros": {
+      "agua": "água",
+      "comprimento": "comprimento",
+      "posicaoDoPrimeiroPainel": "posição do primeiro painel",
+      "posicaoDoSuporte": "posição do suporte",
+      "profundidadeDoAssento": "profundidade do assento"
+    },
+    "nomes": {
+      "instalacao-solar/grampo-intermediario": "Grampo intermediário",
+      "instalacao-solar/suporte-l": "Suporte em L"
+    },
+    "etapas": {
+      "hasteA1": {
+        "instrucao": "Cada haste assenta, pela vedação, no ponto marcado para ela no telhado.",
+        "avisos": [
+          "Conferir que a haste está sobre a crista do telhado."
+        ]
+      },
+      "hasteB1": {
+        "instrucao": "Cada haste assenta, pela vedação, no ponto marcado para ela no telhado.",
+        "avisos": [
+          "Conferir que a haste está sobre a crista do telhado."
+        ]
+      },
+      "suporteA1": {
+        "instrucao": "Cada suporte encosta na sua haste, pela porta que a haste tem para o suporte.",
+        "avisos": [
+          "Conferir que o suporte está encostado na haste, sem folga."
+        ]
+      },
+      "emendaA12": {
+        "instrucao": "A emenda entra 90 mm no fim do perfil anterior; o perfil seguinte entra nela os outros 90 mm.",
+        "avisos": [
+          "Conferir os 90 mm de emenda dentro de cada perfil."
+        ]
+      }
+    }
   }
 }

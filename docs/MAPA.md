@@ -6,6 +6,7 @@
 > algum arquivo-fonte estiver sem cabeçalho.
 
 1833 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1837 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -746,6 +747,7 @@
 
 - `lista-de-pecas.test.js` — lista-de-pecas.test.js — a lista de peças sobre uma montagem sintética: agrupamento, caixa em milímetro, determinismo e ausência de nome de peça no módulo.
 - `manual-real.test.mjs` — manual-real.test.mjs — o manual sobre uma montagem do acervo: a lista confere com a contagem independente das instâncias, a saída é igual byte a byte e a opç…
+- `passos.test.js` — passos.test.js — o agrupamento de etapas seguidas, o texto por passo e os nomes de exibição, sobre montagens mínimas.
 
 ## modulos/pesquisa/
 
@@ -2118,6 +2120,7 @@
 - `snapshot-universo-autoria.js` — snapshot-universo-autoria.js — leitura consistente do universo de autoria.
 - `solido-do-esboco.js` — solido-do-esboco.js — o sólido exato de uma forma do esboço, em milímetro, como volume que a Manifold subtrai e interseta.
 - `solido-do-esboco.test.js` — solido-do-esboco.test.js — o sólido exato de uma forma do esboço, a partir de formas escritas à mão no formato de `formasResolvidas`. Cada caso tem o volume …
+- `texto-do-manual.test.mjs` — O campo `manual` da montagem v5 é só texto opcional (nome de exibição e instrução por etapa).
 - `topologia-da-malha.js` — topologia-da-malha.js — extrudar, duplicar, apagar e criar face.
 - `topologia-da-malha.test.js` — topologia-da-malha.test.js — as operações que mudam a malha, medidas na peça de prova: quantas faces e vértices nascem, quem some, e o que fica no lugar. A p…
 - `tradutor-nivel-zero.js` — Tradutor do nível zero: lê as formas resolvidas do esboço (`mecanifica.formas-resolvidas@1`, dado puro) e gera o andaime da forma global N2 (`mecanifica.anda…
