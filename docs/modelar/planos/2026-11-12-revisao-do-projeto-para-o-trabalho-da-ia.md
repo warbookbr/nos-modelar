@@ -2,9 +2,9 @@
 
 **Estado:** ativo
 
-**Território:** `docs/modelar/banco-de-provas/revisao-do-projeto-2026-11-13/`, `tools/modelar/custo-por-peca.mjs`, `tools/modelar/custo-por-peca.test.mjs`, `tools/modelar/fluxo-do-objeto.mjs`, `tools/modelar/fluxo-do-objeto.test.mjs`, `tools/modelar/rodada-de-modelagem.mjs`, `tools/modelar/rodada-de-modelagem.test.mjs`, `tools/modelar/vistas-para-critica.mjs`, `tools/modelar/vistas-para-critica.test.mjs`, `procedural/pecas/carrinho-de-mao/`, `docs/modelar/banco-de-provas/carrinho-de-mao-2026-11-11/`, `procedural/nucleo/gaiola-varrida.js`, `procedural/nucleo/gaiola-varrida.test.mjs`, `procedural/nucleo/gaiola-por-lacos.js`, `procedural/nucleo/gaiola-por-lacos.test.ts`, `tools/modelar/capacidade.mjs`, `procedural/pecas/sedan-chassi-e-lataria/`, `docs/modelar/banco-de-provas/sedan-chassi-e-lataria-2026-11-11/`, `procedural/nucleo/paineis-por-vaos.js`, `procedural/nucleo/paineis-por-vaos.test.ts`, `tools/modelar/vao-entre-partes.mjs`, `tools/modelar/vao-entre-partes.test.mjs`, `procedural/nucleo/lamina-sobre-a-superficie.js`, `procedural/nucleo/paineis-por-vaos-superficie.test.ts`, `tools/modelar/instancia-de-familia.mjs`, `tools/modelar/instancia-de-familia.test.mjs`, `procedural/nucleo/apoio-do-vinco.js`, `procedural/nucleo/apoio-do-vinco.test.ts`, `procedural/nucleo/gaiola-por-estacoes.js` (o campo `raio` do vinco), `tools/modelar/raio-da-aresta.mjs`, `tools/modelar/raio-da-aresta.test.mjs`, `tools/modelar/entrada-de-medida.mjs`, `tools/modelar/entrada-de-medida.test.mjs` (o cache da montagem; a bandeira `--sem-cache` entra em `lasca.mjs`, `ondulacao-da-superficie.mjs`, `vistas-de-superficie.mjs` e `exportar-obj.mjs`, só nela), `procedural/nucleo/curva-da-gaiola.js`, `procedural/nucleo/operacoes/friso.js`, `procedural/nucleo/friso-refinar.test.mjs`, `procedural/nucleo/gaiola-por-estacoes.test.mjs`, `.claude/skills/criar-peca/references/operacoes-procedurais.md`, `docs/modelar/modelar-carroceria.md`, `procedural/nucleo/gaiola-aneis.js`, `procedural/nucleo/normal-da-gaiola.js`, `procedural/nucleo/normal-da-gaiola.test.ts`, `procedural/nucleo/gaiola-aneis-rebaixo.test.mjs`, `procedural/nucleo/aparar.test.ts`, `procedural/nucleo/molde-de-dentro.js`, `procedural/nucleo/operacoes/subdivisao.js`, `procedural/nucleo/catalogo.test.mjs`, `procedural/nucleo/fixtures/motor-r00-baseline.json`, `tools/mcp/procedural.test.mjs`, `src/autoria/contato-de-solidos.js`, `src/autoria/contato-de-solidos-raio-na-aresta.test.mjs`, `src/autoria/contatos-da-peca.js`, `src/autoria/descrever-partes.js`, `src/autoria/encosto-da-peca.test.mjs`, `src/autoria/contato-em-plano-inclinado.test.mjs`, `src/autoria/molduras-do-vao.js`, `src/autoria/molduras-do-vao-chapa-cortada.test.mjs`, `procedural/nucleo/operacoes/limpar-lascas.js`, `procedural/nucleo/limpar-lascas-escala.test.mjs`, `procedural/nucleo/fixtures/lasca-na-escala-da-peca.json`, `procedural/nucleo/fixtures/lasca-na-tolerancia-da-peca.json`, `procedural/nucleo/paineis-por-vaos-aba.test.mjs`, `procedural/nucleo/ponto-na-malha.js`, `procedural/nucleo/ponto-na-malha.test.mjs`, `procedural/nucleo/composicoes.js`, `procedural/nucleo/composicoes.test.mjs`, `procedural/nucleo/triangulacao-face.js`, `tools/modelar/custo-de-importar-receita.test.mjs`, `tools/modelar/medir-importar-receita.mjs`, `tools/testes-lentos.mjs`, `tools/modelar/ondulacao-da-superficie.mjs`, `tools/modelar/ondulacao-corte-e-quina.test.mjs` (a operação `aparar` e a contagem de cruzamentos do contato, da fatia 4c, e os atritos de ferramenta que o sedã em receita revelou, no `RECEITA.md` dele; o par espelhado do relato e a tabela em mm ficam no território do plano de conferência). A primeira pasta é do inventário, que não muda código nem regra. Os demais caminhos vieram do plano do núcleo para qualquer mecanismo, fechado em 2026-11-13, e servem à frente de validação; a pasta de cada objeto de prova entra aqui quando ele for escolhido. A execução do que o inventário recomendar sai em planos próprios, com território.
+**Território:** `docs/modelar/banco-de-provas/revisao-do-projeto-2026-11-13/`. É a pasta do inventário e do relatório, que não mudam código nem regra. Os caminhos de ferramenta e de núcleo que esta linha listava serviam à validação por objetos de prova, que saiu do plano em 2026-11-13; a lista está no histórico deste arquivo, no commit `bed7a128`.
 
-**Responsável:** a IA da sessão do núcleo planeja e orquestra, com agentes em paralelo, por decisão da pessoa em 2026-11-13; a sessão do furgão levanta a metade dela e revisa a outra; a decisão de cada grupo de achados é da pessoa.
+**Responsável:** a IA da sessão do furgão, sozinha desde 2026-11-13, quando a pessoa avisou que a sessão do núcleo não volta; a decisão de cada grupo de achados é da pessoa.
 
 **Repositório e base:** `warbookbr/nos-modelar`, main de 2026-11-12.
 
@@ -69,73 +69,51 @@ medidas e o relatório ficam em [`revisao-do-projeto-2026-11-13`](../banco-de-pr
 
 ## Estado em 2026-11-13, para quem retomar
 
-A pessoa encerrou a sessão que orquestrava e abre outra; esta seção é a passagem. Da fatia 1, a metade de pastas, módulos e
-núcleo está levantada em cinco arquivos na pasta do território, ligados no README dela: pastas e módulos, projetos comparáveis,
-operações e verbosidade, erros, nomes e argumentos, e tempo por operação. Três números foram conferidos por amostra contra o
-código; o resto ainda não passou pela revisão cruzada. A metade de regras, documentos e agentes é da sessão do furgão (ramo
-`claude/revisar-plano-ativo-cyj8c3`), avisada da ativação; ela não tem como enviar recado e responde pelo repositório ou pela
-pessoa. Falta: a pergunta 7, que é das duas; a fatia 2 inteira; e o primeiro ciclo da fatia 4, já decidido pela pessoa e
-descrito nela. O último envio da sessão encerrada é o que fecha o plano do núcleo e registra
-estas decisões; quem retomar confere primeiro se o CI dele fechou verde e se a main o recebeu. A modelagem dos objetos de prova é
-pesada para a máquina da nuvem, de quatro núcleos; a pessoa tentou ligar o computador dela à sessão e o recurso não estava
-disponível, então a saída é uma sessão aberta direto no computador dela para essa parte.
+O inventário das sete perguntas está na pasta do território, e o [relatório](../banco-de-provas/revisao-do-projeto-2026-11-13/RELATORIO.md) traz a classificação por grupo e a decisão da pessoa, que aprovou todas as recomendações de mudança. A revisão cruzada entre duas sessões não aconteceu: a sessão do núcleo foi encerrada, e cinco números da metade dela foram refeitos por amostra e bateram.
 
-Em 2026-11-13, mais tarde, a pessoa avisou que a sessão do núcleo não volta e que a sessão do furgão fica com o plano inteiro. Ela levantou a metade de regras, documentos e agentes e a pergunta 7, refez por amostra cinco números da outra metade, e escreveu o [relatório](../banco-de-provas/revisao-do-projeto-2026-11-13/RELATORIO.md) com a recomendação por grupo, que espera a decisão da pessoa (fatia 3). A revisão cruzada entre duas sessões não aconteceu. A fatia 4 não começou.
+A pessoa mudou o rumo do plano na mesma conversa, e as fatias abaixo já estão assim. A validação por objetos de prova saiu: "a modelagem eu vejo depois". A avaliação de cada gate e de cada teste virou plano próprio. A análise ganhou os mecanismos que tinham ficado de fora (as skills, a bancada com o crítico visual, o servidor de ferramentas, o backlog, o `comecar` e a ficha de capacidade), com a pergunta que ela deu: "se melhorássemos isso de alguma maneira, o que aconteceria?". E ganhou a organização da documentação, depois de ela notar que o projeto não tem uma página com a visão dos mecanismos: "eu fui criando essa estrutura que temos hoje no projeto mas não sei se existe alguma melhor".
 
 ## Filtro Agent-First
 
-USAR DIRETO: o histórico do CI, a saída da bateria de gates, os roteiros do `comecar`, o catálogo de capacidades, o registro
-de custo e os atritos já registrados; a análise mede com o que existe. ADIAR: qualquer ferramenta nova de medição, salvo se
-uma das sete perguntas não puder ser respondida sem ela.
+USAR DIRETO: o histórico do CI, a saída da bateria de gates, os roteiros do `comecar`, o catálogo de capacidades, os diários de atrito e o registro das conversas das sessões; a análise mede com o que existe. ADIAR: qualquer ferramenta nova de medição, salvo se uma pergunta não puder ser respondida sem ela.
 
 ## Incluído
 
-- o inventário medido das sete perguntas, com o comando que reproduz cada número;
-- a classificação de cada item e a recomendação por grupo;
-- a revisão cruzada: cada sessão levanta uma metade e tenta derrubar os achados da outra;
-- a decisão da pessoa registrada por grupo, e a abertura dos planos ou correções que ela aprovar;
-- a validação por modelagem: objetos de prova escolhidos pelo que ainda não foi provado, cada um medido pela tabela de custo
-  por peça (`npm run custo:peca`), com a melhoria geral que ele pedir entrando na ferramenta e a mesma parte refeita.
+- o inventário medido das sete perguntas, com o comando que reproduz cada número, e o relatório com a recomendação por grupo;
+- a decisão da pessoa registrada por grupo;
+- a análise dos seis mecanismos que ficaram de fora, respondida em rodadas perdidas que uma melhoria evitaria;
+- a medida do que as sessões abrem de fato, contra o que os roteiros mandam ler;
+- a pesquisa de como se organizam projetos feitos para serem operados por IA, somada à dos projetos de modelagem por código, e trazida ao relatório;
+- a proposta de organização da documentação desenhada em uma página, a árvore de hoje ao lado da proposta, com o destino de cada documento solto, para a pessoa aprovar por imagem;
+- a abertura dos planos de execução.
 
 ## Excluído
 
-- executar dentro deste plano as mudanças de regra, de gate e de organização que o inventário recomendar;
-- os planos de objeto em curso; a modelagem que entra aqui é a dos objetos de prova da frente de validação;
-- reescrever documentação antes da decisão sobre o que fica.
+- executar dentro deste plano qualquer mudança de regra, de gate, de código ou de pasta;
+- a validação por objetos de prova, que a pessoa retoma quando quiser;
+- a avaliação de cada gate e de cada teste, que é do [plano das verificações](2026-11-13-revisao-das-verificacoes-e-dos-testes.md);
+- mover ou reescrever documento antes de a pessoa aprovar o desenho da organização.
 
 ## Gate de saída
 
-1. O relatório existe, cabe em leitura de uma sentada, e cada classificação cita o número e o comando que o reproduz.
+1. O relatório cabe em leitura de uma sentada, e cada classificação cita o número e o arquivo que o reproduz.
 2. Nenhuma regra ou gate é recomendado para sair sem a lista do que ele já pegou.
 3. A decisão da pessoa está registrada por grupo.
 4. Cada mudança aprovada tem plano, item de backlog ou correção apontada, e as recusadas têm o motivo.
-5. Cada objeto de prova tem o custo medido, a lista do que melhorou na ferramenta geral e o que ficou para plano próprio.
+5. Cada um dos seis mecanismos tem a resposta à pergunta da pessoa, com a contagem que a sustenta.
+6. O desenho da organização da documentação foi mostrado à pessoa e a decisão dela está registrada.
 
 ## Fatias
 
-1. O inventário medido, dividido entre as duas sessões: regras, documentos e agentes com a sessão do furgão; pastas, módulos e
-   núcleo com a sessão do núcleo, que aceitou a divisão em 2026-11-12; a pergunta 7 é das duas.
-2. A revisão cruzada e a classificação, com a recomendação por grupo.
-3. A decisão da pessoa.
-4. A validação por objetos de prova, em ciclos curtos de escolher o objeto pelo que falta provar, modelar, medir, melhorar a
-   ferramenta geral e refazer. Corre ao lado das fatias 1 a 3. Em 2026-11-13 a pessoa respondeu "sim para as duas" às duas
-   recomendações de quem orquestrava. A primeira: esta frente absorve o que restava do
-   [plano do núcleo para qualquer mecanismo](encerrados/2026-11-10-nucleo-para-qualquer-mecanismo.md), fechado por isso, a
-   saber as juntas na montagem, a leitura de referência, a forma por classe, as famílias e os objetos de prova, com as saídas
-   que ele descreve em cada uma. A segunda: o primeiro objeto de prova é um mecanismo com juntas que se movem, porque o sedã
-   provou chapa e superfície dura e junta ainda não foi provada. A proposta para o primeiro ciclo, a ajustar por quem retomar:
-   medir assento, guia prismática e articulação com eixo e curso na empilhadeira, que já está no acervo e não pede modelagem
-   pesada, e em seguida modelar um mecanismo pequeno de cadeia fechada, como um macaco do tipo tesoura. O robô humanoide, a
-   moto e o carro esportivo do plano fechado ficam para os ciclos seguintes, cada um depois da capacidade que ele prova.
-5. A abertura dos planos de execução e o fechamento.
+1. O inventário medido das sete perguntas. Feito.
+2. O relatório e a decisão da pessoa. Feito em 2026-11-13.
+3. O que falta medir: os seis mecanismos, o que as sessões abrem de fato e a pesquisa de projetos operados por IA.
+4. O desenho da organização da documentação, e a decisão da pessoa sobre ele.
+5. A abertura dos planos de execução e o fechamento. Já abertos: as [melhorias de processo](2026-11-13-melhorias-de-processo-da-revisao.md), o [núcleo para quem escreve receita](2026-11-13-nucleo-para-quem-escreve-receita.md) e a [revisão das verificações e dos testes](2026-11-13-revisao-das-verificacoes-e-dos-testes.md). Faltam o da saída de manual, que espera a pessoa retomar a instalação solar, e o da reorganização da documentação, que espera a fatia 4.
 
 ## Riscos e parada
 
-Tirar uma regra que pega um defeito raro e caro: por isso nada sai sem a lista do que já pegou. A análise virar mais uma camada
-de documentos: o relatório tem tamanho limitado e é o único documento novo. As duas sessões mexerem nas mesmas áreas: a análise
-não muda código, e a execução sai em planos com território. Se o inventário mostrar que uma das sete perguntas pede semanas de
-medição, ela sai deste plano e vira plano próprio. A máquina tem quatro núcleos e a conta tem limite de uso: agente de leitura
-roda em paralelo, e medida pesada de modelagem roda uma de cada vez.
+Tirar uma regra que pega um defeito raro e caro: por isso nada sai sem a lista do que já pegou. A análise virar mais uma camada de documentos: o relatório tem tamanho limitado, e o que se mede a mais entra nos arquivos de pergunta. Uma sessão só levantou e conferiu: o que não foi refeito por amostra está dito no relatório como não conferido.
 
 ## Fechamento
 

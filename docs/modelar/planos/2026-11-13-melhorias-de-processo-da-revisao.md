@@ -1,0 +1,56 @@
+# Melhorias de processo da revisão: menos reenvio sem defeito e menos coisa escrita à mão
+
+**Estado:** ativo
+
+**Território:** `tools/gates/`, `tools/testes-lentos.mjs`, `tools/testes-lentos.test.mjs`, `tools/vitest-duracoes.mjs`, `tools/mapa/`, `docs/modelar/roteiros/`, `.gitattributes`, `tools/arquitetura/independencia-catalogo.mjs`, `tools/arquitetura/nucleo-sem-three.mjs`, `tools/arquitetura/nucleo-sem-three.test.mjs`, `tools/catalogo/`, `.claude/agents/implementador.md`, `.claude/agents/modelador.md`, `.claude/agents/revisor-adversarial.md`, `.claude/agents/desenhador-de-contorno.md`, `.claude/agents/desenhista-de-prancha.md`, `.claude/agents/regras-comuns.md`, `docs/modelar/MECANISMOS.md`, `.claude/skills/laco-de-modelagem/SKILL.md`, `README.md`, `docs/modelar/INDEX.md`
+
+**Responsável:** a IA da sessão do furgão; as mudanças foram aprovadas pela pessoa em 2026-11-13.
+
+**Repositório e base:** `warbookbr/nos-modelar`, main de 2026-11-13.
+
+## Problema observado
+
+A [revisão do projeto](2026-11-12-revisao-do-projeto-para-o-trabalho-da-ia.md) mediu, no [relatório](../banco-de-provas/revisao-do-projeto-2026-11-13/RELATORIO.md), que de sete reprovações lidas do CI uma era defeito de peça, três eram teto de tempo e uma era corrida de junção; que o único defeito real seria pego em 2 minutos por uma guarda que só roda no CI; que o mapa gerado conflita em toda junção; que a lista de planos ativos é escrita à mão em três arquivos; que a mesma lista de proibições foi copiada no pedido a cinco agentes; e que o projeto não tem uma página com a visão dos mecanismos.
+
+## Resultado
+
+Um envio com a peça certa não reprova por tempo nem por arquivo gerado, o defeito de peça aparece antes do envio, e o que hoje se copia à mão passa a ter uma fonte só.
+
+## Filtro Agent-First
+
+USAR DIRETO: a bateria `tools/gates.mjs` com o seletor do que mudou, o registro de durações do vitest, o gerador do mapa e o gerador dos roteiros. Nenhuma ferramenta nova fora dessas.
+
+## Incluído, em fatias pela ordem de execução
+
+1. A guarda do acervo das peças que o envio mudou roda na bateria local. Prova: um defeito de borda livre plantado numa peça de fixture para a bateria local.
+2. O teto de tempo de cada teste passa a ser relativo à mediana das durações guardadas, e o estouro isolado vira aviso. Prova: o teste das conferências da instalação solar, que reprovou a 80 s no CI e roda em 27 s sozinho, não reprova mais; um teste que dobra de tempo em três execuções seguidas reprova.
+3. Os cinco roteiros a menos de 500 bytes do teto ganham 10% de folga, com a linha de base mantida.
+4. O mapa gerado deixa de conflitar na junção, por regra de junção que o regenera ou por sair do versionamento, o que a medida mostrar mais simples; a lista de planos ativos do `README.md` e do `docs/modelar/INDEX.md` passa a ser gerada do índice de planos.
+5. A régua da fronteira do núcleo cobre arquivos `.mjs` e `.ts` e reprova import de `src/`, `tools/` e `modulos/`. As cinco extensões entram no catálogo gerado.
+6. As proibições comuns aos agentes moram em `.claude/agents/regras-comuns.md`, citado por cada definição de agente, e cada agente grava commit parcial na worktree ao fim de cada etapa. O `critico-visual.md` não muda.
+7. O diário de atritos ganha um formato com quatro campos (o que aconteceu com o comando, o custo, se o processo pegou e o destino), escrito na skill que manda registrar o atrito; os diários antigos não são reescritos.
+8. A página `docs/modelar/MECANISMOS.md`, de uma tela, com cada mecanismo, o que faz, quando é usado e onde mora, e a conferência que acusa mecanismo novo fora da lista.
+
+## Excluído
+
+- as mudanças de núcleo, que são do [plano do núcleo para quem escreve receita](2026-11-13-nucleo-para-quem-escreve-receita.md);
+- a avaliação de cada gate e teste, que é do [plano das verificações](2026-11-13-revisao-das-verificacoes-e-dos-testes.md);
+- a régua única de face degenerada, que é do [plano das costuras](2026-11-09-costuras-e-furos-limpos.md);
+- tirar as rodadas antigas do furgão, que é correção pontual dentro do [plano do furgão](2026-10-30-furgao-realista.md);
+- a reorganização das pastas de documento e a saída de manual, que terão plano próprio.
+
+## Invariantes
+
+Nenhum gate deixa de rodar no CI. O orçamento de leitura continua abaixo da linha de base. O conteúdo gerado continua conferido contra a fonte.
+
+## Gate de saída
+
+Cada fatia tem a prova dela passando e `npm run gates` verde. Ao fim, três envios seguidos com junção da main não pedem resolução manual do mapa.
+
+## Riscos e parada
+
+O teto relativo esconder uma regressão lenta de tempo: por isso três execuções seguidas acima do teto reprovam. A guarda local alongar a bateria: ela roda só as peças mudadas, e se passar de 60 s numa peça fica para o CI com aviso. Se uma fatia pedir arquivo do território de outro plano ativo, ela para e o pedido vai à pessoa.
+
+## Fechamento
+
+Preencher ao concluir ou cancelar.

@@ -4,10 +4,11 @@
 
 **Planos ativos:**
 
-1. [revisão do projeto para o trabalho da IA](2026-11-12-revisao-do-projeto-para-o-trabalho-da-ia.md). Território: `docs/modelar/banco-de-provas/revisao-do-projeto-2026-11-13/` e, para os objetos de prova, as ferramentas de fluxo e os ajudantes de núcleo que a linha de território do plano lista por arquivo. Prioridade máxima desde 2026-11-13. Em aberto: a revisão cruzada do inventário e o primeiro objeto de prova, um mecanismo com juntas.
+1. [revisão do projeto para o trabalho da IA](2026-11-12-revisao-do-projeto-para-o-trabalho-da-ia.md). Território: `docs/modelar/banco-de-provas/revisao-do-projeto-2026-11-13/`. Prioridade máxima desde 2026-11-13. Em aberto: os seis mecanismos que ficaram de fora, o que as sessões abrem de fato e o desenho da organização da documentação.
 2. [furgão realista](2026-10-30-furgao-realista.md). Território: `procedural/pecas/furgao-realista/`, `procedural/familias/roda-pneu/`, `docs/modelar/banco-de-provas/furgao-realista-2026-10-30/`. Em aberto: a etapa 8, com a frente e a lanterna traseira aprovadas e uma rodada de acabamento (moldura do arco, grade, aro da luz de canto, pé do para-brisa), os acabamentos que restam da etapa 7 e a etapa de materiais, sobre o plano dos materiais realistas.
 3. [costuras e furos limpos](2026-11-09-costuras-e-furos-limpos.md). Território: `procedural/nucleo/operacoes/booleanas.js`, `procedural/nucleo/operacoes/estruturais.js`, `procedural/nucleo/operacoes/geradores-avancados.js`, `procedural/nucleo/uso-operacoes.js`, `procedural/nucleo/nucleo.js`, `procedural/nucleo/operacoes/furo-em-aneis.js`, `procedural/nucleo/operacoes/furo-em-aneis.test.ts`, `procedural/nucleo/lados-por-desvio.test.ts`, `tools/modelar/guardas/guarda-acervo.mjs`, `tools/modelar/reguas-de-malha/`, `tools/fixtures/costuras-e-furos/`. Em aberto: a fresta junto da tampa, o aviso do `subtrair` que não corta, a régua da costura num gate e o fechamento.
 4. [instalação solar no telhado](2026-11-12-instalacao-solar-no-telhado.md). Território: `procedural/pecas/instalacao-solar/`, `docs/modelar/banco-de-provas/instalacao-solar-2026-11-12/`. Em aberto: a fatia 1, à espera da inclinação e das vigas.
+5. [melhorias de processo da revisão](2026-11-13-melhorias-de-processo-da-revisao.md). Território: o que a linha de território do plano lista, em `tools/gates/`, `tools/mapa/`, roteiros e agentes. Em aberto: tudo.
 
 A lista está em ordem de prioridade. A ordem desempata quando dois planos precisam do mesmo arquivo: o de menor prioridade espera ou pede à pessoa que mude o território.
 
@@ -24,6 +25,8 @@ receita](encerrados/2026-10-15-o-aviao-do-esboco-a-receita.md) fechou em 2026-10
 auditada e o avião aprovado pela pessoa; a picape, o braço robótico, o carrinho de mão e a empilhadeira vêm em seguida, na ordem
 que a pessoa escolher. [As famílias de desenho](encerrados/2026-10-14-familias-de-desenho.md) fecharam em 2026-10-14, e o código delas saiu em 2026-10-25.
 A [empilhadeira](encerrados/2026-11-09-empilhadeira.md) fechou em 2026-11-10, com dezenove receitas e as vinte e três etapas da montagem fixas pela pessoa; o sucessor é o plano do núcleo para qualquer mecanismo.
+
+Prontos, à espera de território: [núcleo para quem escreve receita](2026-11-13-nucleo-para-quem-escreve-receita.md), que espera o plano das costuras fechar, e [revisão das verificações e dos testes](2026-11-13-revisao-das-verificacoes-e-dos-testes.md).
 
 Em rascunho: [ferramenta de material](2026-11-08-ferramenta-de-material.md), para ver um material em segundos, compor relevos e reaproveitar materiais por nome; pode ser ativado, porque o plano dos materiais realistas fechou. [Rebaixo por contorno](2026-11-10-rebaixo-por-contorno.md), para o degrau, o sulco e a borda rebaixada sobre a superfície de um corpo, com a borda no raio pedido; espera um lugar de plano ativo.
 
