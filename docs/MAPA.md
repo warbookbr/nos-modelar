@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1844 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1846 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -338,6 +338,7 @@
 ## docs/modelar/banco-de-provas/kukri-2026-11-13/
 
 - `ALINHAMENTO.md` — Kukri: o alinhamento com a pessoa
+- `ATRITOS.md` — Kukri: custo medido e atritos
 - `README.md` — Kukri: o custo de modelar um objeto simples
 
 ## docs/modelar/banco-de-provas/leitura-por-demanda-2026-10/
@@ -1796,6 +1797,10 @@
 ## procedural/pecas/kukri/referencias/
 
 - `alvo.md` — Alvo da kukri
+
+## procedural/pecas/kukri/rodadas/
+
+- `receita-01.js` — kukri — faca de lâmina curva de desenho moderno, deitada, em duas partes: `lamina` e `cabo`. Cada parte é uma gaiola de `gaiolaPorLacos`: a lâmina em laços p…
 
 ## procedural/pecas/lava-loucas-compacta-branca/
 
