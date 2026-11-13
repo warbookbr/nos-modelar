@@ -25,15 +25,23 @@
     },
     {
       "instancia": "frente-e-traseira",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [],
-      "forma": "sha256:da94972e13c030159dcb2bce8660c808db9913df20e7476fbb56e9e51522632a"
+      "forma": "sha256:da94972e13c030159dcb2bce8660c808db9913df20e7476fbb56e9e51522632a",
+      "aceite": {
+        "por": "IA da sessão por delegação da pessoa, 2026-11-13: crítico fechou a etapa com nota 8 e sem defeito",
+        "analise": "ausente"
+      }
     },
     {
       "instancia": "rodas",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [],
-      "forma": "sha256:938a939f448ccf0e354666a20d2ef567484d19a314d04d8868d79b9a8ae56873"
+      "forma": "sha256:938a939f448ccf0e354666a20d2ef567484d19a314d04d8868d79b9a8ae56873",
+      "aceite": {
+        "por": "IA da sessão por delegação da pessoa, 2026-11-13: crítico fechou a etapa com nota 8 e sem defeito",
+        "analise": "ausente"
+      }
     },
     {
       "instancia": "acessorios",
