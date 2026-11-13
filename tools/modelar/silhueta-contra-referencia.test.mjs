@@ -2,7 +2,7 @@ import { mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { comoCLI, lerReferencia, medirSilhueta, sobreposicaoEmSvg, ErroDeReferencia } from './silhueta-contra-referencia.mjs';
+import { ajustarAlinhamento, avisoDoAjuste, comoCLI, lerReferencia, medirSilhueta, sobreposicaoEmSvg, ErroDeReferencia } from './silhueta-contra-referencia.mjs';
 
 /* triângulos em mm no plano xz (y = 0) de um polígono convexo ou em leque a partir do primeiro ponto */
 const leque = (poli, parte = 'a') => poli.slice(1, -1).map((_, i) => ({ p: [poli[0], poli[i + 1], poli[i + 2]].map(([x, z]) => [x, 0, z]), parte }));
@@ -86,6 +86,48 @@ describe('silhueta contra a referência', () => {
     const modelo = leque([[0, 0], [100, 0], [100, 30], [80, 50], [0, 50]]);
     const ref = lerReferencia(refDoRetangulo);
     expect(JSON.stringify(medirSilhueta({ tris: modelo, referencia: ref, plano: 'xz' }))).toBe(JSON.stringify(medirSilhueta({ tris: modelo, referencia: ref, plano: 'xz' })));
+  });
+});
+
+describe('o alinhamento por ajuste', () => {
+  /* o modelo: um pentágono assimétrico; a referência é o mesmo contorno, mas girado em 1,5 grau e deslocado, com o alinhamento declarado nos pontos errados */
+  const poli = [[0, 0], [120, 0], [120, 30], [60, 60], [0, 50]];
+  const modelo = leque(poli);
+  const girar = (p, g, [tx, ty]) => [p[0] * Math.cos(g) - p[1] * Math.sin(g) + tx, p[0] * Math.sin(g) + p[1] * Math.cos(g) + ty];
+  const lados = (g, t) => Object.fromEntries(poli.map((a, i) => [`lado${i}`, [a, poli[(i + 1) % poli.length]].map((q) => girar(q, g, t))]));
+  const ref = (g, t, nomes = null) => { const todos = lados(g, t); return { escala: 'mm', alinhamento: [girar([0, 0], g, t), girar([120, 0], g, t)].map((q) => [q[0] + 1, q[1] + 1]), trechos: nomes ? Object.fromEntries(nomes.map((n) => [n, todos[n]])) : todos }; };
+
+  it('recupera o giro e o deslocamento de um alinhamento errado de propósito, e o desvio de forma no ajuste fica perto de zero', () => {
+    const g = (1.5 * Math.PI) / 180;
+    const referencia = lerReferencia(ref(g, [2, -3]));
+    const m = medirSilhueta({ tris: modelo, referencia, plano: 'xz', alinhamentoMax: 8, ajustar: true });
+    expect(m.ajuste.giroGraus).toBeGreaterThan(-1.5 - 0.05);
+    expect(m.ajuste.giroGraus).toBeLessThan(-1.5 + 0.05);
+    for (const r of m.resultadoAjustado) expect(r.maximoDoModuloMm).toBeLessThan(0.1);
+    expect(Math.max(...m.resultado.map((r) => r.maximoDoModuloMm))).toBeGreaterThan(2);
+    expect(m.ajuste.custoRmsFinalMm).toBeLessThan(0.05);
+    expect(m.aviso).toMatch(/provavelmente não são o mesmo ponto físico.*mistura posição com forma/);
+    expect(JSON.stringify(m.ajuste.translacao)).toBe(JSON.stringify(medirSilhueta({ tris: modelo, referencia, plano: 'xz', alinhamentoMax: 8, ajustar: true }).ajuste.translacao));
+  });
+
+  it('não avisa quando o alinhamento declarado já é o melhor, e mantém o desvio de uma forma de fato diferente', () => {
+    const certa = lerReferencia({ ...ref(0, [0, 0]), alinhamento: [[0, 0], [120, 0]] });
+    const a = medirSilhueta({ tris: modelo, referencia: certa, plano: 'xz', ajustar: true });
+    expect(Math.abs(a.ajuste.giroGraus)).toBeLessThan(0.05);
+    expect(a.aviso).toBeNull();
+    /* o modelo tem o canto (120, 30) cortado em 20 mm; a referência o tem inteiro: a diferença de forma é de 14 mm e o ajuste não a absorve */
+    const cortado = leque([[0, 0], [120, 0], [120, 10], [100, 30], [60, 60], [0, 50]]);
+    const b = medirSilhueta({ tris: cortado, referencia: certa, plano: 'xz', ajustar: true });
+    expect(b.resultadoAjustado.find((r) => r.trecho === 'lado1').maximoDoModuloMm).toBeGreaterThan(5);
+  });
+
+  it('ajusta só os trechos pedidos', () => {
+    const g = (1.5 * Math.PI) / 180;
+    const referencia = lerReferencia(ref(g, [2, -3]));
+    const aneis = medirSilhueta({ tris: modelo, referencia, plano: 'xz', alinhamentoMax: 8 }).aneis;
+    const so = ajustarAlinhamento({ aneis, referencia, trechos: ['lado0', 'lado2', 'lado4'] });
+    expect(Math.abs(so.giroGraus + 1.5)).toBeLessThan(0.2);
+    expect(avisoDoAjuste({ giroGraus: 0.1, pontosDeAlinhamentoMm: [0.5, 0.5] })).toBeNull();
   });
 });
 

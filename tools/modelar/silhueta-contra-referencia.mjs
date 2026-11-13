@@ -214,6 +214,63 @@ export function distanciasDoAlinhamento(aneis, alinhamento) {
   return alinhamento.map((p) => ({ ponto: par(p), distanciaMm: arred(Math.abs(medir(p))) }));
 }
 
+/**
+ * O alinhamento por ajuste: com a escala fixa, a rotação (em torno do ponto médio dos dois pontos de alinhamento) e a translação rígidas, sem espelhar e
+ * sem escalar, que minimizam a distância das amostras da referência (a cada `passo` mm) ao contorno da silhueta, partindo do alinhamento de dois pontos.
+ * A distância entra limitada a `corteMm`, para que um trecho cuja forma de fato difere (o cabo, o bico) não arraste o ajuste. Busca em padrão,
+ * determinística: passos de 1 grau e 2 mm que se dividem ao meio quando nenhuma direção melhora, até 0,001.
+ */
+export function ajustarAlinhamento({ aneis, referencia, passo = 2, corteMm = 10, trechos = null }) {
+  const medir = medidorDeDesvio(aneis);
+  const nomes = trechos?.length ? trechos : Object.keys(referencia.trechos);
+  const amostras = nomes.flatMap((n) => amostrarTrecho(referencia.trechos[n], passo).map((a) => a.p));
+  const c = [(referencia.alinhamento[0][0] + referencia.alinhamento[1][0]) / 2, (referencia.alinhamento[0][1] + referencia.alinhamento[1][1]) / 2];
+  const mover = (q, [g, tx, ty]) => {
+    const [co, si] = [Math.cos(g), Math.sin(g)];
+    const u = [q[0] - c[0], q[1] - c[1]];
+    return [c[0] + co * u[0] - si * u[1] + tx, c[1] + si * u[0] + co * u[1] + ty];
+  };
+  const custo = (x) => amostras.reduce((a, q) => a + Math.min(Math.abs(medir(mover(q, x))), corteMm) ** 2, 0) / amostras.length;
+  let x = [0, 0, 0];
+  let melhor = custo(x);
+  const inicial = melhor;
+  let passos = [Math.PI / 180, 2, 2];
+  for (let it = 0; it < 2000 && passos[1] > 1e-3; it++) {
+    let escolhido = null;
+    for (let k = 0; k < 3; k++) for (const sinal of [1, -1]) {
+      const y = [...x]; y[k] += sinal * passos[k];
+      const v = custo(y);
+      if (v < melhor - 1e-12 && (!escolhido || v < escolhido.v)) escolhido = { y, v };
+    }
+    if (escolhido) { x = escolhido.y; melhor = escolhido.v; } else passos = passos.map((v) => v / 2);
+  }
+  const deslocamentoDe = (a) => { const m = mover(a, x); return Math.hypot(m[0] - a[0], m[1] - a[1]); };
+  return {
+    giroGraus: arred((x[0] * 180) / Math.PI, 3),
+    deslocamentoMm: arred(Math.hypot(x[1], x[2]), 3),
+    translacao: [arred(x[1]), arred(x[2])],
+    pontosDeAlinhamentoMm: referencia.alinhamento.map((a) => arred(deslocamentoDe(a))),
+    custoRmsInicialMm: arred(Math.sqrt(inicial)),
+    custoRmsFinalMm: arred(Math.sqrt(melhor)),
+    corteMm,
+    amostras: amostras.length,
+    transformar: (q) => mover(q, x),
+  };
+}
+
+/** A referência com cada ponto movido pelo ajuste (trechos e alinhamento). */
+export function referenciaAjustada(referencia, ajuste) {
+  const mover = (pts) => pts.map((q) => ajuste.transformar(q));
+  return { ...referencia, alinhamento: mover(referencia.alinhamento), trechos: Object.fromEntries(Object.entries(referencia.trechos).map(([n, pts]) => [n, mover(pts)])) };
+}
+
+/** O aviso de que o ajuste e os dois pontos declarados diferem demais, ou null. */
+export function avisoDoAjuste(ajuste, { giroMaxGraus = 0.5, deslocamentoMaxMm = 2 } = {}) {
+  const desloc = Math.max(...ajuste.pontosDeAlinhamentoMm);
+  if (Math.abs(ajuste.giroGraus) <= giroMaxGraus && desloc <= deslocamentoMaxMm) return null;
+  return `o melhor ajuste gira ${f2(ajuste.giroGraus)} graus e leva os pontos de alinhamento a ${ajuste.pontosDeAlinhamentoMm.map(f2).join(' e ')} mm de onde foram declarados (limites: ${giroMaxGraus} grau e ${deslocamentoMaxMm} mm). Os dois pontos de alinhamento provavelmente não são o mesmo ponto físico no modelo e na referência, e o desvio pelos dois pontos declarados mistura posição com forma; o desvio de forma é o do melhor ajuste.`;
+}
+
 const f2 = (v) => v.toFixed(2);
 const p2 = (p) => `[${f2(p[0])}; ${f2(p[1])}]`;
 
@@ -285,7 +342,7 @@ export function formatarRelatorio({ nome, plano, passo, tolerancia, alinhamento,
 }
 
 /** O cálculo inteiro sobre os triângulos já lidos (sem arquivo nenhum). */
-export function medirSilhueta({ tris, referencia, plano, partes = null, passo = 1, tolerancia = 1, alinhamentoMax = 5 }) {
+export function medirSilhueta({ tris, referencia, plano, partes = null, passo = 1, tolerancia = 1, alinhamentoMax = 5, ajustar = false, ajustarTrechos = null, giroMaxGraus = 0.5, deslocamentoMaxMm = 2 }) {
   const aneis = silhuetaDeTriangulos(tris, plano, partes);
   const alinhamento = distanciasDoAlinhamento(aneis, referencia.alinhamento);
   const longe = alinhamento.find((a) => a.distanciaMm > alinhamentoMax);
@@ -293,7 +350,11 @@ export function medirSilhueta({ tris, referencia, plano, partes = null, passo = 
     throw new ErroDeReferencia(`o ponto de alinhamento ${p2(longe.ponto)} cai a ${f2(longe.distanciaMm)} mm do contorno da silhueta no plano ${plano} (o limite é ${alinhamentoMax} mm, --alinhamento-max). Esperado: dois pontos da referência que coincidam com o modelo. Conferir se o plano é o certo (--plano), se a referência está nos eixos do modelo, ou corrigir o campo "alinhamento".`);
   }
   const resultado = desvioPorTrecho(aneis, referencia.trechos, { passo, tolerancia });
-  return { aneis, alinhamento, resultado };
+  if (!ajustar) return { aneis, alinhamento, resultado };
+  const ajuste = ajustarAlinhamento({ aneis, referencia, trechos: ajustarTrechos });
+  const ajustada = referenciaAjustada(referencia, ajuste);
+  const resultadoAjustado = desvioPorTrecho(aneis, ajustada.trechos, { passo, tolerancia });
+  return { aneis, alinhamento, resultado, ajuste, ajustada, resultadoAjustado, aviso: avisoDoAjuste(ajuste, { giroMaxGraus, deslocamentoMaxMm }) };
 }
 
 const AJUDA = `node tools/modelar/silhueta-contra-referencia.mjs <receita | esboço> --referencia=<arquivo.json> --plano=<xy|xz|yz> [opções]
@@ -309,6 +370,11 @@ plano (o primeiro eixo é a abscissa); o desvio é a distância com sinal ao con
   --passo=<mm>               espaçamento das amostras ao longo de cada trecho (1)
   --tolerancia=<mm>          módulo acima do qual o subtrecho é relatado (1)
   --alinhamento-max=<mm>     distância máxima dos pontos de alinhamento ao contorno (5)
+  --ajustar                  também mede pelo melhor ajuste: com a escala fixa, a rotação e a translação rígidas (sem espelhar nem escalar) que mais
+                             aproximam a referência da silhueta, a partir dos dois pontos de alinhamento; relata o giro e o deslocamento, o desvio por trecho
+                             nos dois alinhamentos e avisa quando diferem além de --ajuste-giro-max (0,5 grau) ou --ajuste-deslocamento-max (2 mm)
+  --ajustar-trechos=a,b      só estes trechos entram no ajuste (padrão: todos); os de forma sabidamente diferente, como o cabo, ficam de fora
+  --imagem-ajustada=<arquivo.svg>  com --ajustar, a sobreposição desenhada no alinhamento por ajuste
   --imagem=<arquivo.svg>     grava a sobreposição: silhueta cinza, referência preta, fora em vermelho, dentro em azul
   --opcao=<n>                a opção de um esboço (padrão 1)
   --json                     saída em JSON
@@ -337,8 +403,8 @@ export async function comoCLI(argv) {
   let lido;
   try {
     lido = lerArgumentos(argv, {
-      opcoes: ['referencia', 'plano', 'partes', 'passo', 'tolerancia', 'alinhamento-max', 'imagem', 'opcao'],
-      bandeiras: ['json', 'sem-cache'],
+      opcoes: ['referencia', 'plano', 'partes', 'passo', 'tolerancia', 'alinhamento-max', 'imagem', 'opcao', 'ajustar-trechos', 'imagem-ajustada', 'ajuste-giro-max', 'ajuste-deslocamento-max'],
+      bandeiras: ['json', 'sem-cache', 'ajustar'],
       posicional: { nome: 'a peça', obrigatorio: true },
     });
   } catch (erro) { return uso(erro.message); }
@@ -346,11 +412,13 @@ export async function comoCLI(argv) {
   if (!PLANOS.includes(plano)) return uso(`--plano espera um de ${PLANOS.join(', ')}, e veio '${plano ?? ''}'.`);
   const caminhoRef = lido.opcao('referencia');
   if (!caminhoRef) return uso('falta --referencia=<arquivo.json>.');
-  let passo; let tolerancia; let alinhamentoMax;
+  let passo; let tolerancia; let alinhamentoMax; let giroMaxGraus; let deslocamentoMaxMm;
   try {
     passo = numero(lido.opcao('passo'), 'passo', 1);
     tolerancia = numero(lido.opcao('tolerancia'), 'tolerancia', 1);
     alinhamentoMax = numero(lido.opcao('alinhamento-max'), 'alinhamento-max', 5);
+    giroMaxGraus = numero(lido.opcao('ajuste-giro-max'), 'ajuste-giro-max', 0.5);
+    deslocamentoMaxMm = numero(lido.opcao('ajuste-deslocamento-max'), 'ajuste-deslocamento-max', 2);
   } catch (erro) { return uso(erro.message); }
   let referencia;
   try {
@@ -376,7 +444,11 @@ export async function comoCLI(argv) {
   }
   let medida;
   try {
-    medida = medirSilhueta({ tris, referencia, plano, partes, passo, tolerancia, alinhamentoMax });
+    const ajustarTrechos = lido.opcao('ajustar-trechos') ? lido.opcao('ajustar-trechos').split(',').map((t) => t.trim()).filter(Boolean) : null;
+    const desconhecidos = (ajustarTrechos ?? []).filter((t) => !referencia.trechos[t]);
+    if (desconhecidos.length) return uso(`--ajustar-trechos cita ${desconhecidos.map((t) => `'${t}'`).join(', ')}, que a referência não tem. Trechos: ${Object.keys(referencia.trechos).join(', ')}.`);
+    if ((ajustarTrechos || lido.opcao('imagem-ajustada')) && !lido.bandeira('ajustar')) return uso('--ajustar-trechos e --imagem-ajustada precisam de --ajustar.');
+    medida = medirSilhueta({ tris, referencia, plano, partes, passo, tolerancia, alinhamentoMax, ajustar: lido.bandeira('ajustar'), ajustarTrechos, giroMaxGraus, deslocamentoMaxMm });
   } catch (erro) {
     if (erro instanceof ErroDeReferencia) return uso(erro.message);
     throw erro;
@@ -390,12 +462,23 @@ export async function comoCLI(argv) {
     mkdirSync(dirname(resolve(imagem)), { recursive: true });
     writeFileSync(resolve(imagem), sobreposicaoEmSvg({ aneis, trechos: referencia.trechos, resultado, plano, tolerancia }));
   }
+  if (medida.ajuste && lido.opcao('imagem-ajustada')) {
+    mkdirSync(dirname(resolve(lido.opcao('imagem-ajustada'))), { recursive: true });
+    writeFileSync(resolve(lido.opcao('imagem-ajustada')), sobreposicaoEmSvg({ aneis, trechos: medida.ajustada.trechos, resultado: medida.resultadoAjustado, plano, tolerancia }));
+  }
   const pior = piorTrecho(resultado);
   if (lido.bandeira('json')) {
     const limpo = resultado.map((r) => ({ ...r, acimaDaTolerancia: r.acimaDaTolerancia.map(({ pontos, ...s }) => s) }));
-    process.stdout.write(`${JSON.stringify({ peca: lido.posicional, plano, partes: partes ?? 'todas', passoMm: passo, toleranciaMm: tolerancia, referenciaConferidaPor: referencia.conferidoPelaPessoa, alinhamento, trechos: limpo, piorTrecho: { trecho: pior.trecho, maximoDoModuloMm: pior.maximoDoModuloMm }, ...(imagem ? { imagem } : {}) }, null, 2)}\n`);
+    process.stdout.write(`${JSON.stringify({ peca: lido.posicional, plano, partes: partes ?? 'todas', passoMm: passo, toleranciaMm: tolerancia, referenciaConferidaPor: referencia.conferidoPelaPessoa, alinhamento, trechos: limpo, piorTrecho: { trecho: pior.trecho, maximoDoModuloMm: pior.maximoDoModuloMm }, ...(medida.ajuste ? { ajuste: { giroGraus: medida.ajuste.giroGraus, deslocamentoMm: medida.ajuste.deslocamentoMm, translacao: medida.ajuste.translacao, pontosDeAlinhamentoMm: medida.ajuste.pontosDeAlinhamentoMm, custoRmsInicialMm: medida.ajuste.custoRmsInicialMm, custoRmsFinalMm: medida.ajuste.custoRmsFinalMm, aviso: medida.aviso, trechos: medida.resultadoAjustado.map(({ acimaDaTolerancia, ...r }) => ({ ...r, subtrechos: acimaDaTolerancia.length })), piorTrecho: { trecho: piorTrecho(medida.resultadoAjustado).trecho, maximoDoModuloMm: piorTrecho(medida.resultadoAjustado).maximoDoModuloMm } } } : {}), ...(imagem ? { imagem } : {}) }, null, 2)}\n`);
   } else {
     process.stdout.write(`${formatarRelatorio({ nome: lido.posicional, plano, passo, tolerancia, alinhamento, resultado })}\n`);
+    if (medida.ajuste) {
+      const a = medida.ajuste;
+      process.stdout.write(`\nPELO MELHOR AJUSTE (escala fixa, só giro e translação, ${a.amostras} amostras, distância limitada a ${a.corteMm} mm): giro ${f2(a.giroGraus)} graus em torno do meio dos pontos de alinhamento, translação [${a.translacao.map(f2).join('; ')}] mm (${f2(a.deslocamentoMm)} mm), pontos de alinhamento a ${a.pontosDeAlinhamentoMm.map(f2).join(' e ')} mm de onde foram declarados; rms da distância ${f2(a.custoRmsInicialMm)} para ${f2(a.custoRmsFinalMm)} mm\n`);
+      if (medida.aviso) process.stdout.write(`AVISO: ${medida.aviso}\n`);
+      process.stdout.write(`${formatarRelatorio({ nome: lido.posicional, plano, passo, tolerancia, alinhamento: distanciasDoAlinhamento(aneis, medida.ajustada.alinhamento), resultado: medida.resultadoAjustado }).split('\n').map((l, i) => (i === 0 ? `${l} [pelo melhor ajuste]` : l)).join('\n')}\n`);
+      if (lido.opcao('imagem-ajustada')) process.stdout.write(`imagem do ajuste: ${lido.opcao('imagem-ajustada')}\n`);
+    }
     if (imagem) process.stdout.write(`imagem: ${imagem}\n`);
   }
   return 0;
