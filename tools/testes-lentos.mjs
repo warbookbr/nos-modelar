@@ -17,6 +17,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { lerHistorico } from './vitest-duracoes.mjs';
 
 export const TESTES_LENTOS = [
+  /* 2026-11-13: o furo passante por subtração e limpeza de lascas, com a conferência das bocas; 21 s sozinho e 53 s na bateria do CI */
+  'procedural/nucleo/furo-passante.test.mjs',
   /* 2026-11-13: os três casos do estudo do método medidos no método atual e no protótipo; 11 a 12 s com a máquina livre, quase tudo nas receitas do método atual */
   'procedural/nucleo/forma-exata/casos-medidos.test.mjs',
   /* 2026-11-12: roda as 101 receitas do acervo num processo só, 7,7 s com a máquina livre, e no CI de 2 a 3 vezes isso */
