@@ -1,10 +1,10 @@
 #!/usr/bin/env node
 /* manual.mjs — `npm run manual -- <montagem.json>`: a lista de peças e o passo a passo de uma montagem persistida.
 
-   Resolve a montagem, escreve a lista (JSON e Markdown), e para cada etapa de `etapas`, na ordem, a lista do que entra
-   nela e UMA imagem com a peça nova em destaque e as já montadas esmaecidas, tirada por um servidor e um navegador
-   abertos uma vez. Escreve `manual.html` (CSS e imagens embutidos) e `manual.json`. O texto do passo é só o nome da
-   etapa e a lista: instrução não é inventada. */
+   Resolve a montagem, escreve a lista (JSON e Markdown), e para cada passo (etapas de `etapas` seguidas da mesma peça formam um passo, salvo --sem-agrupar), na ordem, a lista do que entra
+   nele e UMA imagem com o que entra em destaque e as já montadas esmaecidas, tirada por um servidor e um navegador
+   abertos uma vez. Escreve `manual.html` (CSS e imagens embutidos) e `manual.json`. O texto do passo é só o que a montagem declara em
+   `manual` (instrução e avisos): nada é inventado. */
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { isAbsolute, join, relative, resolve } from 'node:path';
 import { performance } from 'node:perf_hooks';
@@ -14,7 +14,7 @@ import { resolverMontagemPersistida } from '../../../src/autoria/resolver-montag
 import { receitasDaMontagem } from '../../../tools/modelar/etapas-da-montagem.mjs';
 import { carregadoresDeReceitas } from '../../../tools/modelar/peca-com-parametros.mjs';
 import { REPO } from '../../../tools/modelar/resolver-caminho-receita.mjs';
-import { listaEmJson, listaEmMarkdown, listarPecas } from './lista-de-pecas.js';
+import { comNomesExibidos, listaEmJson, listaEmMarkdown, listarPecas, nomeDeExibicao } from './lista-de-pecas.js';
 import { paginaDoManual } from './pagina.js';
 import { montagemDoPasso, passosDaMontagem } from './passos.js';
 
@@ -23,8 +23,9 @@ export const VISTAS = ['isometrica', 'frontal', 'traseira', 'direita', 'esquerda
 
 const AJUDA = `uso: npm run manual -- <montagem.json> [opções]
 
-Gera o manual de uma montagem persistida: a lista de peças e um passo por etapa, na ordem de 'etapas', cada um com a
-imagem da peça nova em destaque (laranja) e das já montadas esmaecidas.
+Gera o manual de uma montagem persistida: a lista de peças e os passos, na ordem de 'etapas' (etapas seguidas da mesma
+peça viram um passo, com a quantidade), cada um com a imagem do que entra em destaque (laranja) e das já montadas
+esmaecidas. Nomes de exibição e instruções vêm do campo 'manual' da montagem; sem ele, o nome é derivado da referência.
 
 opções (todas com =):
   --saida=<pasta>     pasta de saída, dentro do repositório (padrão: tools/bancadas/out/manual-<montagem>/)
@@ -32,20 +33,22 @@ opções (todas com =):
   --folga=<número>    folga do quadro em volta da peça nova, de 0 a 2 (padrão: 1.5)
   --largura=<pixels>  largura da imagem, de 640 a 2560 (padrão: 960)
   --sem-imagens       só a lista e a página, sem abrir o navegador
+  --sem-agrupar       um passo por etapa, em vez de um passo para etapas seguidas da mesma peça
   --ajuda             este texto
 
 saída: manual.html, manual.json, lista-de-pecas.json, lista-de-pecas.md e passo-NN.png.`;
 
 function opcoesDe(argv) {
-  const opcoes = { arquivo: null, saida: null, vista: 'isometrica', folga: 1.5, largura: 960, imagens: true, ajuda: false };
+  const opcoes = { agrupar: true, arquivo: null, saida: null, vista: 'isometrica', folga: 1.5, largura: 960, imagens: true, ajuda: false };
   for (const arg of argv) {
     if (arg === '--ajuda' || arg === '-h') opcoes.ajuda = true;
     else if (arg === '--sem-imagens') opcoes.imagens = false;
+    else if (arg === '--sem-agrupar') opcoes.agrupar = false;
     else if (arg.startsWith('--saida=')) opcoes.saida = arg.slice(8);
     else if (arg.startsWith('--vista=')) opcoes.vista = arg.slice(8);
     else if (arg.startsWith('--folga=')) opcoes.folga = Number(arg.slice(8));
     else if (arg.startsWith('--largura=')) opcoes.largura = Number(arg.slice(10));
-    else if (arg.startsWith('--')) throw new Error(`opção desconhecida '${arg}'. Esperado: --saida=, --vista=, --folga=, --largura=, --sem-imagens ou --ajuda. Rode 'npm run manual -- --ajuda'.`);
+    else if (arg.startsWith('--')) throw new Error(`opção desconhecida '${arg}'. Esperado: --saida=, --vista=, --folga=, --largura=, --sem-imagens, --sem-agrupar ou --ajuda. Rode 'npm run manual -- --ajuda'.`);
     else if (!opcoes.arquivo) opcoes.arquivo = arg;
     else throw new Error(`recebi dois arquivos ('${opcoes.arquivo}' e '${arg}'). Esperado: uma montagem só.`);
   }
@@ -74,14 +77,15 @@ function pastaDeSaida(pedida, id) {
 }
 
 export async function gerarManual(arquivo, opcoes = {}) {
-  const { saida: saidaPedida = null, vista = 'isometrica', folga = 1.5, largura = 960, imagens = true, aoAndar = () => {} } = opcoes;
+  const { saida: saidaPedida = null, vista = 'isometrica', folga = 1.5, largura = 960, imagens = true, agrupar = true, aoAndar = () => {} } = opcoes;
   const inicio = performance.now();
   const { persistida, resolvida } = await resolverArquivo(arquivo);
   if (!persistida.etapas?.length) {
     throw new Error(`a montagem '${persistida.id}' não declara 'etapas'. Esperado: a lista de ids de instância na ordem de construção (montagem v5).`);
   }
-  const lista = listarPecas(resolvida);
-  const { passos, foraDasEtapas } = passosDaMontagem(resolvida, persistida.etapas);
+  const nomes = persistida.manual?.nomes ?? {};
+  const lista = comNomesExibidos(listarPecas(resolvida), nomes);
+  const { passos, foraDasEtapas } = passosDaMontagem(resolvida, persistida.etapas, { agrupar, textos: persistida.manual?.etapas ?? {} });
   const tempos = { resolverMs: Math.round(performance.now() - inicio), imagensMs: [] };
   const pasta = pastaDeSaida(saidaPedida, persistida.id);
   mkdirSync(pasta, { recursive: true });
@@ -94,9 +98,9 @@ export async function gerarManual(arquivo, opcoes = {}) {
       for (let i = 0; i < passos.length; i += 1) {
         const t0 = performance.now();
         const captura = await capturador.capturar({
-          montagem: montagemDoPasso(resolvida, passos, i, cache), vistas: [vista], projecao: 'ortografica', largura, folga, foco: [passos[i].etapa],
+          montagem: montagemDoPasso(resolvida, passos, i, cache), vistas: [vista], projecao: 'ortografica', largura, folga, foco: passos[i].etapas,
         });
-        if (!captura.ok) throw new Error(`a imagem do passo ${i + 1} ('${passos[i].etapa}') falhou: ${captura.erro.mensagem}`);
+        if (!captura.ok) throw new Error(`a imagem do passo ${i + 1} ('${passos[i].etapas.join(', ')}') falhou: ${captura.erro.mensagem}`);
         imagemDe.set(i, captura.resultado.capturas[0].dados);
         tempos.imagensMs.push(Math.round(performance.now() - t0));
         aoAndar(i + 1, passos.length, tempos.imagensMs.at(-1));
@@ -111,7 +115,9 @@ export async function gerarManual(arquivo, opcoes = {}) {
     montagem: persistida.id,
     lista,
     passos: passos.map((passo, i) => ({
-      numero: passo.numero, etapa: passo.etapa, alvo: passo.alvo, lista: passo.lista, ...(imagemDe.has(i) ? { imagem: imagemDe.get(i) } : {}),
+      numero: passo.numero, etapas: passo.etapas, alvo: passo.alvo, nome: nomeDeExibicao(passo.alvo, nomes), quantidade: passo.quantidade,
+      lista: comNomesExibidos(passo.lista, nomes), ...(passo.instrucoes ? { instrucoes: passo.instrucoes } : {}), ...(passo.avisos ? { avisos: passo.avisos } : {}),
+      ...(imagemDe.has(i) ? { imagem: imagemDe.get(i) } : {}),
     })),
     foraDasEtapas,
   };
@@ -133,7 +139,7 @@ export async function comoCLI(argv) {
   if (opcoes.ajuda) return { codigo: 0, texto: AJUDA };
   if (!opcoes.arquivo) return { codigo: 1, texto: `diga a montagem.\n${AJUDA}` };
   const resultado = await gerarManual(resolve(opcoes.arquivo), {
-    saida: opcoes.saida, vista: opcoes.vista, folga: opcoes.folga, largura: opcoes.largura, imagens: opcoes.imagens,
+    saida: opcoes.saida, vista: opcoes.vista, folga: opcoes.folga, largura: opcoes.largura, imagens: opcoes.imagens, agrupar: opcoes.agrupar,
     aoAndar: (n, total, ms) => process.stderr.write(`  passo ${n}/${total}: ${ms} ms\n`),
   });
   const { tempos } = resultado;

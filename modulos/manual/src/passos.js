@@ -1,8 +1,8 @@
 /* passos.js — o que entra em cada etapa de uma montagem resolvida, e a montagem pintada de cada passo.
    Núcleo do passo a passo, sem navegador: recebe a montagem resolvida e a ordem das etapas (`etapas` da montagem
-   persistida) e devolve, por etapa, as instâncias novas e a lista de peças delas. A pintura (destaque das novas,
+   persistida) e devolve, por passo (uma etapa ou um grupo de etapas seguidas iguais), as instâncias novas e a lista de peças delas. A pintura (destaque das novas,
    esmaecido das já montadas) troca a cor das faces numa cópia da malha; a malha da montagem resolvida não é tocada. */
-import { listarPecas } from './lista-de-pecas.js';
+import { chaveDaPeca, instanciasDePeca, listarPecas } from './lista-de-pecas.js';
 
 export const COR_DO_DESTAQUE = '#e8590c';
 export const COR_DO_FUNDO = '#dce2df';
@@ -36,24 +36,47 @@ function neutroPintado(neutro, corDe) {
 /** O topo da instância: o id da etapa que a contém (as etapas citam instâncias da raiz). */
 const etapaDe = (instancia) => instancia.caminho[0];
 
+/** A chave de agrupamento de uma etapa: o alvo e as peças que ela traz, cada uma com os seus parâmetros. */
+const chaveDaEtapa = (instancia) => `${instancia.alvo.tipo}:${instancia.alvo.ref}\u0000${instanciasDePeca({ instancias: [instancia] }).map(chaveDaPeca).join('\u0001')}`;
+
+const unicos = (itens) => [...new Set(itens)];
+
 /**
- * Um passo por id de `etapas`, na ordem dada. Cada passo traz o id, as instâncias novas (as da raiz com esse id, que
- * podem ser uma submontagem) e a lista de peças delas. Ids de `etapas` sem instância na montagem resolvida são erro.
+ * Os passos da montagem na ordem de `etapas`. Com `agrupar` (padrão), etapas seguidas que põem a mesma peça (mesmo alvo e
+ * mesmos parâmetros) viram um passo só; a ordem nunca muda. Cada passo traz as etapas, as instâncias novas (as da raiz com
+ * esses ids, que podem ser submontagens), a lista de peças delas e, vindos de `textos.etapas` (o `manual.etapas` da montagem),
+ * as instruções e os avisos: iguais aparecem uma vez, diferentes aparecem todos, na ordem das etapas.
+ * Ids de `etapas` sem instância na montagem resolvida são erro.
  */
-export function passosDaMontagem(montagem, etapas) {
+export function passosDaMontagem(montagem, etapas, { agrupar = true, textos = {} } = {}) {
   const porId = new Map(montagem.instancias.map((instancia) => [instancia.id, instancia]));
   const ausentes = etapas.filter((id) => !porId.has(id));
   if (ausentes.length) {
     throw new Error(`etapas sem instância na montagem resolvida: ${ausentes.join(', ')}. Esperado: todo id de 'etapas' ser instância da raiz.`);
   }
-  const passos = etapas.map((id, indice) => {
+  const grupos = [];
+  for (const id of etapas) {
     const instancia = porId.get(id);
+    const ultimo = grupos.at(-1);
+    if (agrupar && ultimo && ultimo.chave === chaveDaEtapa(instancia)) {
+      ultimo.etapas.push(id);
+      ultimo.instancias.push(instancia);
+    } else {
+      grupos.push({ chave: chaveDaEtapa(instancia), etapas: [id], instancias: [instancia] });
+    }
+  }
+  const passos = grupos.map(({ etapas: ids, instancias }, indice) => {
+    const instrucoes = unicos(ids.map((id) => textos[id]?.instrucao).filter(Boolean));
+    const avisos = unicos(ids.flatMap((id) => textos[id]?.avisos ?? []));
     return {
       numero: indice + 1,
-      etapa: id,
-      alvo: instancia.alvo.ref,
-      instancia,
-      lista: listarPecas({ id: montagem.id, instancias: [instancia] }),
+      etapas: ids,
+      alvo: instancias[0].alvo.ref,
+      quantidade: instancias.length,
+      instancias,
+      lista: listarPecas({ id: montagem.id, instancias }),
+      ...(instrucoes.length ? { instrucoes } : {}),
+      ...(avisos.length ? { avisos } : {}),
     };
   });
   const foraDasEtapas = montagem.instancias.map((i) => i.id).filter((id) => !etapas.includes(id));
@@ -61,7 +84,7 @@ export function passosDaMontagem(montagem, etapas) {
 }
 
 /**
- * A montagem do passo `indice`: as instâncias das etapas até ele, as já montadas esmaecidas e a nova em destaque.
+ * A montagem do passo `indice`: as instâncias dos passos até ele, as já montadas esmaecidas e as do passo em destaque.
  * `cache` guarda a malha pintada de cada instância, para a mesma instância não ser copiada a cada passo.
  */
 export function montagemDoPasso(montagem, passos, indice, cache = new Map()) {
@@ -75,9 +98,9 @@ export function montagemDoPasso(montagem, passos, indice, cache = new Map()) {
     cache.set(chave, resultado);
     return resultado;
   };
-  const instancias = passos.slice(0, indice + 1).map((passo, i) => (i === indice
-    ? pintada(passo.instancia, 'destaque', () => COR_DO_DESTAQUE)
-    : pintada(passo.instancia, 'esmaecido', (cor) => esmaecer(cor))));
+  const instancias = passos.slice(0, indice + 1).flatMap((passo, i) => passo.instancias.map((instancia) => (i === indice
+    ? pintada(instancia, 'destaque', () => COR_DO_DESTAQUE)
+    : pintada(instancia, 'esmaecido', (cor) => esmaecer(cor)))));
   return { id: montagem.id, instancias };
 }
 

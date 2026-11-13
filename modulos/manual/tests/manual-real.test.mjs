@@ -24,10 +24,11 @@ describe('manual sobre uma montagem do acervo', () => {
     expect(lista.pecas.every((l) => l.quantidade === l.instancias.length && l.caixaMm.largura > 0)).toBe(true);
     expect(listaEmJson(listarPecas(resolvida))).toBe(listaEmJson(lista));
     const { passos, foraDasEtapas } = passosDaMontagem(resolvida, persistida.etapas);
-    expect(passos.map((p) => p.etapa)).toEqual(persistida.etapas);
+    expect(passos.flatMap((p) => p.etapas)).toEqual(persistida.etapas);
+    expect(passosDaMontagem(resolvida, persistida.etapas, { agrupar: false }).passos.map((p) => p.etapas[0])).toEqual(persistida.etapas);
     expect(foraDasEtapas).toEqual([]);
     const ultimo = montagemDoPasso(resolvida, passos, passos.length - 1);
-    expect(ultimo.instancias).toHaveLength(passos.length);
+    expect(ultimo.instancias).toHaveLength(persistida.etapas.length);
     /* a malha original não é pintada */
     const original = resolvida.instancias[0].definicao.neutro;
     expect([...original.F.values()].some((f) => f.cor === '#e8590c')).toBe(false);
