@@ -198,7 +198,7 @@ campo existe. Os achados são:
   conferência não consegue medir reprova em vez de passar, porque o campo é uma declaração da receita.
 
 AS FORMAS DO ESBOÇO SÃO DADO GUARDADO. Até 2026-11-05 o `arquivo` era o `.esboco.json`, que o módulo antigo do esboço resolvia a cada
-veredito. O módulo saiu (plano esboço pelo núcleo, histórico em [`historico/esboco-2d.md`](../historico/esboco-2d.md)), e o `arquivo` é um
+veredito. O módulo saiu (plano esboço pelo núcleo, histórico em [`historico/esboco-2d.md`](../decisoes/HISTORICO-RETIRADO.md)), e o `arquivo` é um
 `.formas.json`: as formas resolvidas da opção (`mecanifica.formas-resolvidas@1`, a saída de `formasResolvidas` gravada uma vez), com
 `origem` (o esboço, a opção e a data), `malhas` (a malha de cada forma de família, como o módulo a lia, recentrada e com as faces para
 fora), `orientacao` (o `plano.orientacao` do esboço, que o pacote do crítico usa) e `alvos` (a composta de cada unidade, o alvo do

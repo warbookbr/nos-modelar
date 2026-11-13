@@ -22,6 +22,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { caminhoRetirado } from './retirados.mjs';
 
 const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 
@@ -140,7 +141,7 @@ export function conferirCitacoes({ raiz = RAIZ } = {}) {
       /* Caminho citado dentro de uma skill pode ser relativo à própria skill
          (`references/x.md`) ou à raiz. Vale se resolver por qualquer um. */
       const daSkill = join(dirname(doc), caminho).replace(/\\/g, '/');
-      if (!existeArquivo(caminho) && !existeArquivo(daSkill)) {
+      if (!existeArquivo(caminho) && !existeArquivo(daSkill) && !caminhoRetirado(caminho, raiz)?.consta) {
         problemas.push({ doc, citacao: caminho, tipo: 'caminho' });
       }
     }

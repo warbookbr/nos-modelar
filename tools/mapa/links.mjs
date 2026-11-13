@@ -8,6 +8,8 @@
    qualquer lugar sob `docs/` — histórico é imutável por regra do repo, e
    reescrever caminho ali seria editar registro. A allowlist registra
    referências históricas a arquivos removidos, com o motivo escrito abaixo.
+   Caminho sob `docs/modelar/planos/encerrados/` ou `docs/modelar/historico/`, pastas que saíram da árvore em 2026-11-13, não
+   entra na allowlist: vale quando o nome do arquivo consta na crônica da pasta (`tools/mapa/retirados.mjs`).
    `npm run docs:links` imprime;
    `npm run docs:links:check` sai ≠0 em qualquer falha. Zero dependências (git
    ls-files + fs).
@@ -21,6 +23,7 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { caminhoRetirado, motivoRecusa } from './retirados.mjs';
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const EXTS = new Set(['.md', '.js', '.mjs', '.ts', '.html', '.json']);
@@ -52,19 +55,11 @@ const ALLOWLIST = new Map([
   ['docs/nos-herdado/DECISIONS.md:docs/HABITANTES.md', 'referência histórica preservada'],
   ['docs/nos-herdado/walkthrough_colaborador4.md:docs/COMUNICACAO.md', 'referência histórica preservada'],
   ['docs/nos-herdado/walkthrough_colaborador4.md:docs/PORTALS_PROTOCOL.md', 'referência histórica preservada'],
-  /* Registro de crítica gravado do ciclo 6. A prancha do freio virou referência
-     por peça e mudou para `docs/modelar/pecas/` em 2026-08-31; o registro
-     preserva o caminho como era no dia da crítica. Corrigir o caminho aqui
-     seria reescrever evidência encerrada, que é a linha que a reorganização se
-     proibiu de cruzar. */
-  ['docs/modelar/historico/ciclo6/criticas.json:docs/modelar/PRANCHA-FREIO-DISCO.md', 'evidência congelada preserva o caminho da época; a folha vive hoje em docs/modelar/pecas/'],
-  /* O README do esboço antigo saiu com o módulo em 2026-11-05 (docs/modelar/historico/esboco-2d.md diz o commit que o guarda). As
-     análises, a medição de tokens, a revisão de rumo e o plano encerrado que o citam são registro da época, e a medição de
-     transcrição reconhece a leitura dele nas transcrições antigas. */
+  /* O README do esboço antigo saiu com o módulo em 2026-11-05 (HISTORICO-RETIRADO.md, na linha de `esboco-2d.md`, diz o commit que o
+     guarda). As análises e a medição de tokens que o citam são registro da época, e a medição de transcrição reconhece a leitura dele
+     nas transcrições antigas. As revisões de rumo e o plano encerrado que também o citavam saíram da árvore em 2026-11-13. */
   ['docs/modelar/pesquisas/ANALISES-DE-2026-10.md:modulos/esboco/README.md', 'análise de 2026-10 sobre o esboço antigo, que saiu em 2026-11-05'],
   ['docs/modelar/banco-de-provas/MEDICAO-DE-TOKENS-2026-10.md:modulos/esboco/README.md', 'medição encerrada de 2026-10; o README do esboço antigo saiu em 2026-11-05'],
-  ['docs/modelar/historico/REVISAO-DE-RUMO-2026-10.md:modulos/esboco/README.md', 'revisão de rumo de 2026-10; o README do esboço antigo saiu em 2026-11-05'],
-  ['docs/modelar/planos/encerrados/2026-10-07-o-caminho-curto-da-ia.md:modulos/esboco/README.md', 'plano encerrado; o README do esboço antigo saiu em 2026-11-05'],
   ['tools/modelar/medir-transcricao.mjs:modulos/esboco/README.md', 'reconhece a leitura do README do esboço antigo nas transcrições de antes de 2026-11-05'],
   ['tools/modelar/medir-transcricao.test.mjs:modulos/esboco/README.md', 'o teste da medição de transcrição usa o caminho da leitura antiga'],
 ]);
@@ -115,6 +110,14 @@ for (const arquivo of rastreados) {
       const resolveExato = existsSync(path.join(REPO, citado));
       if (resolveExato) continue;
 
+      /* pasta que saiu da árvore: vale se a crônica guarda o nome do arquivo (o texto está no git); senão é recusado */
+      const retirado = caminhoRetirado(citado, REPO);
+      if (retirado) {
+        if (retirado.consta) continue;
+        falhas.push({ arquivo, linha: i + 1, citado, zona: 'retirada', retirado });
+        continue;
+      }
+
       if (ehZonaHistorica(arquivo)) {
         const nome = path.basename(citado);
         const resolvePorNome = (nomeParaCaminhos.get(nome) ?? []).length > 0;
@@ -153,7 +156,12 @@ for (const arquivo of rastreados.filter((f) => f.endsWith('.md') && !ehZonaHisto
         ? path.join(REPO, alvo)
         : path.resolve(path.dirname(path.join(REPO, arquivo)), alvo);
       if (existsSync(absoluto)) continue;
-      falhas.push({ arquivo, linha: i + 1, citado: alvo, zona: 'relativa' });
+      /* link relativo para pasta retirada (o alinhamento de uma peça cita o plano dela): vale se a crônica guarda o nome */
+      const retirado = caminhoRetirado(path.relative(REPO, absoluto), REPO);
+      if (retirado?.consta) continue;
+      falhas.push(retirado
+        ? { arquivo, linha: i + 1, citado: alvo, zona: 'retirada', retirado }
+        : { arquivo, linha: i + 1, citado: alvo, zona: 'relativa' });
     }
   }
 }
@@ -222,10 +230,12 @@ const check = process.argv.includes('--check');
 
 if (falhas.length) {
   console.error(`docs:links — ${falhas.length} referência(s) quebrada(s):`);
-  for (const { arquivo, linha, citado, zona } of falhas) {
+  for (const { arquivo, linha, citado, zona, retirado } of falhas) {
     /* a mensagem diz o que DE FATO foi tentado: na zona viva só existe a
        resolução exata, então dizer "nem por nome" ali seria mentira. */
-    const motivo = zona === 'historica'
+    const motivo = zona === 'retirada'
+      ? motivoRecusa(retirado)
+      : zona === 'historica'
       ? 'não resolve exato nem por nome sob docs/'
       : zona === 'relativa'
         ? 'link relativo não resolve a partir da pasta do arquivo'

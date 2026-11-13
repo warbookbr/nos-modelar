@@ -1,6 +1,6 @@
 # Sólido por laços — provas das fatias 1 a 3
 
-Provas do plano [sólido por laços](../../planos/encerrados/2026-11-05-solido-por-lacos.md), em 2026-11-05. O ajudante é `gaiolaPorLacos`, em
+Provas do plano [sólido por laços](../../decisoes/PLANOS-ENCERRADOS.md), em 2026-11-05. O ajudante é `gaiolaPorLacos`, em
 `procedural/nucleo/gaiola-por-lacos.js`, e as peças de teste ficam em `tools/fixtures/solido-por-lacos/`: o L de ponta-cabeça de
 190 por 220 mm (`receita.js`, com a forma em `forma.js`), que refaz o corpo do ombro do braço sem citá-lo, e a dobra em U
 (`dobra-em-u.js`). A receita dá, em cada plano x, o contorno da peça em trechos nomeados, cada um uma polilinha; o ajudante

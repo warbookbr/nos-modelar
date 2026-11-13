@@ -26,7 +26,7 @@
 | [`docs/nos-herdado/oficina-projeto.md`](./nos-herdado/oficina-projeto.md) | o racional do que já foi construído + a Ordem de construção encerrada | 7 |
 
 A referência curta de uso diário é [`docs/nos-herdado/oficina-referencia.md`](./nos-herdado/oficina-referencia.md).
-O roteiro vigente do Modelar é [`docs/modelar/historico/PLANO.md`](modelar/historico/PLANO.md).
+O roteiro vigente do Modelar é [`docs/modelar/historico/PLANO.md`](./modelar/decisoes/HISTORICO-RETIRADO.md).
 
 O roteiro herdado do NÓS e o que foi projetado e não construído saíram do
 repositório em 2026-09-07, junto com o resto da zona que não autorizava trabalho

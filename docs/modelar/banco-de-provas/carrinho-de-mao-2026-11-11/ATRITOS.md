@@ -1,7 +1,7 @@
 # Carrinho de mão: atritos do alinhamento e do rascunho (2026-11-11)
 
 O carrinho de mão é a peça de prova da fatia 1 do plano
-[`2026-11-10-nucleo-para-qualquer-mecanismo.md`](../../planos/encerrados/2026-11-10-nucleo-para-qualquer-mecanismo.md).
+[`2026-11-10-nucleo-para-qualquer-mecanismo.md`](../../decisoes/PLANOS-ENCERRADOS.md).
 Esta pasta guarda os três primeiros passos: o alinhamento
 ([`ALINHAMENTO.md`](../../../../procedural/pecas/carrinho-de-mao/ALINHAMENTO.md)), as referências em
 contornos e o rascunho com a conferência. As imagens são do rascunho:

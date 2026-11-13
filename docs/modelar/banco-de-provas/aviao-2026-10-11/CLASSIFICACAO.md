@@ -1,6 +1,6 @@
 # Avião de pequeno porte: classificação dos atritos
 
-Fatia 4 do plano [o que o avião pede](../../planos/encerrados/2026-10-11-o-que-o-aviao-pede.md).
+Fatia 4 do plano [o que o avião pede](../../decisoes/PLANOS-ENCERRADOS.md).
 Cada atrito da [referência e da prancha](ATRITOS.md) (R1 a R8) e do
 [esboço](esboco/ATRITOS.md) (E1 a E43) entra numa de quatro classes: ferramenta
 nova ou primitiva 2.0, correção de ferramenta que já existe, correção do processo
@@ -116,7 +116,7 @@ fechamento do plano. O 8 não procede: a cota da hélice na prancha é a altura
 desenhada de lado, e a medida do plano confere a mesma coisa. Ao corrigi-lo, um
 esbocista alargou a tolerância da medida para ela passar, o que o processo não
 pegou; o agente `esbocista` passou a proibir isso (ele saiu com o esboço antigo em
-2026-11-05, ver o [histórico](../../historico/esboco-2d.md)).
+2026-11-05, ver o [histórico](../../decisoes/HISTORICO-RETIRADO.md)).
 Os 38 que seguem abertos vão ao [backlog](../../planos/BACKLOG.md), por decisão da
 pessoa em 2026-10-13, com a integração como o primeiro grupo a puxar.
 

@@ -1,6 +1,6 @@
 # Sedã em alta definição, ciclo 3: o andar de cima sobre o de baixo
 
-Este é o terceiro ciclo da fatia 4c do plano [`2026-11-10-nucleo-para-qualquer-mecanismo.md`](../../../planos/encerrados/2026-11-10-nucleo-para-qualquer-mecanismo.md). Sobre o andar de baixo do [ciclo 2](CICLO-2.md), que não mudou, entra a cabine do mesmo lado do carro. Ela tem o peitoril, a lateral com as colunas A, B e C, o teto, o para-brisa e o vidro traseiro até o meio do carro, as três janelas laterais, cinco vidros e cinco molduras. Nenhuma forma daqui foi aprovada pela pessoa, e o crítico sem contexto não foi chamado.
+Este é o terceiro ciclo da fatia 4c do plano [`2026-11-10-nucleo-para-qualquer-mecanismo.md`](../../../decisoes/PLANOS-ENCERRADOS.md). Sobre o andar de baixo do [ciclo 2](CICLO-2.md), que não mudou, entra a cabine do mesmo lado do carro. Ela tem o peitoril, a lateral com as colunas A, B e C, o teto, o para-brisa e o vidro traseiro até o meio do carro, as três janelas laterais, cinco vidros e cinco molduras. Nenhuma forma daqui foi aprovada pela pessoa, e o crítico sem contexto não foi chamado.
 
 O esboço é [`andar-de-cima.esboco.mjs`](../../../../../procedural/pecas/sedan-chassi-e-lataria/alta-definicao/andar-de-cima.esboco.mjs). Ele importa o do andar de baixo e acrescenta os passos da cabine, com o alvo dela no fim de `alvo.mjs`. O caráter vem da cabine do facetado: o perfil do para-brisa, do teto em y 1523 e do vidro traseiro, a lateral que fecha 143 mm em 623 de altura, a faixa das janelas de y 1075 a 1420 e as pontas das janelas.
 

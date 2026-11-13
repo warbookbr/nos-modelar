@@ -22,48 +22,48 @@ Contratos e protocolos: [ARQUITETURA](ARQUITETURA.md), [AUTORIA-IA](../guias/AUT
 [UPSTREAM-NOS](../decisoes/UPSTREAM-NOS.md), [ATRITOS-AUTORIA](../pesquisas/ATRITOS-AUTORIA.md), [VISAO](../decisoes/VISAO.md),
 [PERFIS-DE-AUTORIA](PERFIS-DE-AUTORIA.md), [REFERENCIA-E-CRITICA-VISUAL](../usar/REFERENCIA-E-CRITICA-VISUAL.md),
 [FILETE-V2](FILETE-V2.md),
-[COORDENACAO-REPOS](COORDENACAO-REPOS.md), [PLANO](../historico/PLANO.md).
+[COORDENACAO-REPOS](COORDENACAO-REPOS.md), [PLANO](../decisoes/HISTORICO-RETIRADO.md).
 
 O contrato declarativo está em `docs/modelar/usar/AUTORIA-RECEITA-DECLARATIVA.md`.
 
-Evidência atual: [estudo de campo do conjunto dianteiro](../historico/RELATORIO-ESTUDO-CAMPO-CONJUNTO-DIANTEIRO.md).
-O [relatório de autoria geométrica](../historico/RELATORIO-EXPERIMENTO-AUTORIA-GEOMETRICA.md)
+Evidência atual: [estudo de campo do conjunto dianteiro](../decisoes/HISTORICO-RETIRADO.md).
+O [relatório de autoria geométrica](../decisoes/HISTORICO-RETIRADO.md)
 (`docs/modelar/historico/RELATORIO-EXPERIMENTO-AUTORIA-GEOMETRICA.md`) registra a
 decisão `corrigir` e a fronteira de autoria de receitas.
-O próximo experimento já tem [conjunto neutro definido](../historico/CONJUNTO-PROVA-AUTORIA-GEOMETRICA.md)
+O próximo experimento já tem [conjunto neutro definido](../decisoes/HISTORICO-RETIRADO.md)
 (`docs/modelar/historico/CONJUNTO-PROVA-AUTORIA-GEOMETRICA.md`), mas não possui plano ativo.
 
 Planejamento: [planos/README](../planos/README.md),
-[diagnóstico do motor](../planos/encerrados/2026-08-06-diagnostico-motor-procedural.md),
-[protocolo do diagnóstico](../historico/PROTOCOLO-DIAGNOSTICO-MOTOR.md),
+[diagnóstico do motor](../decisoes/PLANOS-ENCERRADOS.md),
+[protocolo do diagnóstico](../decisoes/HISTORICO-RETIRADO.md),
 [programa MCP](../planos/mcp/INDEX.md),
-[Fatia 1B visual](../planos/encerrados/2026-08-05-mcp-fatia-1b-visual.md),
-[avaliação consolidada](../planos/encerrados/2026-08-05-mcp-avaliacao-consolidada.md),
-[correção de descoberta](../planos/encerrados/2026-08-05-mcp-correcao-descoberta.md),
-[autoria controlada](../planos/encerrados/2026-08-05-mcp-autoria-controlada.md),
-[contexto de montagem para IA](../planos/encerrados/2026-08-14-contexto-de-montagem-para-ia.md),
-[separação direcional e impacto local](../planos/encerrados/2026-08-14-separacao-direcional-e-impacto-local.md),
-[contexto visual e autoria segura](../planos/encerrados/2026-08-14-contexto-visual-e-autoria-segura.md),
-[MCP — leitura e auditoria de montagens](../planos/encerrados/2026-08-14-mcp-montagens-leitura.md)
+[Fatia 1B visual](../decisoes/PLANOS-ENCERRADOS.md),
+[avaliação consolidada](../decisoes/PLANOS-ENCERRADOS.md),
+[correção de descoberta](../decisoes/PLANOS-ENCERRADOS.md),
+[autoria controlada](../decisoes/PLANOS-ENCERRADOS.md),
+[contexto de montagem para IA](../decisoes/PLANOS-ENCERRADOS.md),
+[separação direcional e impacto local](../decisoes/PLANOS-ENCERRADOS.md),
+[contexto visual e autoria segura](../decisoes/PLANOS-ENCERRADOS.md),
+[MCP — leitura e auditoria de montagens](../decisoes/PLANOS-ENCERRADOS.md)
 (`docs/modelar/planos/encerrados/2026-08-14-mcp-montagens-leitura.md`),
-[materialização e autoria segura de montagens](../planos/encerrados/2026-08-14-materializacao-autoria-segura.md),
-[abertura oblonga](../planos/encerrados/2026-08-17-abertura-oblonga.md)
+[materialização e autoria segura de montagens](../decisoes/PLANOS-ENCERRADOS.md),
+[abertura oblonga](../decisoes/PLANOS-ENCERRADOS.md)
 (`docs/modelar/planos/encerrados/2026-08-17-abertura-oblonga.md`),
-[pose de criação](../planos/encerrados/2026-08-17-pose-de-criacao.md)
+[pose de criação](../decisoes/PLANOS-ENCERRADOS.md)
 (`docs/modelar/planos/encerrados/2026-08-17-pose-de-criacao.md`),
-[nome de cópia](../planos/encerrados/2026-08-17-nome-de-copia.md)
+[nome de cópia](../decisoes/PLANOS-ENCERRADOS.md)
 (`docs/modelar/planos/encerrados/2026-08-17-nome-de-copia.md`),
-[alteração compacta](../planos/encerrados/2026-08-17-alteracao-compacta.md)
+[alteração compacta](../decisoes/PLANOS-ENCERRADOS.md)
 (`docs/modelar/planos/encerrados/2026-08-17-alteracao-compacta.md`),
-[encostar](../planos/encerrados/2026-08-17-encostar.md)
+[encostar](../decisoes/PLANOS-ENCERRADOS.md)
 (`docs/modelar/planos/encerrados/2026-08-17-encostar.md`),
-[ponto nomeado](../planos/encerrados/2026-08-17-ponto-nomeado.md)
+[ponto nomeado](../decisoes/PLANOS-ENCERRADOS.md)
 (`docs/modelar/planos/encerrados/2026-08-17-ponto-nomeado.md`),
-[histórico de revisão](../planos/encerrados/2026-08-17-historico-de-revisao.md)
+[histórico de revisão](../decisoes/PLANOS-ENCERRADOS.md)
 (`docs/modelar/planos/encerrados/2026-08-17-historico-de-revisao.md`),
-[lathe fechado](../planos/encerrados/2026-08-17-lathe-fechado.md)
+[lathe fechado](../decisoes/PLANOS-ENCERRADOS.md)
 (`docs/modelar/planos/encerrados/2026-08-17-lathe-fechado.md`),
-[estudo do conjunto dobradiça](../planos/encerrados/2026-08-17-estudo-conjunto-dobradica.md)
+[estudo do conjunto dobradiça](../decisoes/PLANOS-ENCERRADOS.md)
 (`docs/modelar/planos/encerrados/2026-08-17-estudo-conjunto-dobradica.md`),
 [encerramento da Fatia 1A](../planos/mcp/concluidos/01-fatia-1a-piloto-leitura.md),
 [BACKLOG](../planos/BACKLOG.md), [MODELO](../planos/MODELO.md) e
@@ -92,7 +92,7 @@ Nada foi perdido — o histórico do Git guarda tudo, e há uma cópia fora da
 `git log --all -- <caminho antigo>`.
 
 A zona histórica da própria Modelar é outra coisa, continua aqui e é indexada
-em [historico/README](../historico/README.md).
+em [historico/README](../decisoes/HISTORICO-RETIRADO.md).
 
 <!-- Plano concluído alcançável: docs/modelar/planos/encerrados/2026-08-14-contexto-de-montagem-para-ia.md -->
 

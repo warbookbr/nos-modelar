@@ -98,7 +98,7 @@ Abrir só quando a condição aparecer:
 
 - `docs/modelar/planos/README.md`, quando o documento é um plano.
 - `docs/modelar/usar/README.md`, quando o documento é de uso, em docs/modelar/usar/.
-- `docs/modelar/historico/README.md`, quando o documento vai para o histórico.
+- `docs/modelar/decisoes/HISTORICO-RETIRADO.md`, quando o documento sai da árvore: a crônica guarda o commit onde o texto está.
 - `docs/modelar/guias/LEITURA-POR-TAREFA.md`, quando a pergunta é por assunto e nenhum roteiro a responde.
 
 Comandos: `npm run mapa`, `npm run gates`.
@@ -114,18 +114,18 @@ Saber o que já se tentou, mediu ou pesquisou antes de propor algo.
 Ler antes de começar, num orçamento de 6.600 bytes (linha de base de 8.948 bytes em 2026-10-08):
 
 - `CLAUDE.md`
-- `docs/modelar/historico/README.md`
+- `docs/modelar/decisoes/README.md`
 
 Abrir só quando a condição aparecer:
 
-- `docs/modelar/planos/encerrados/README.md`, quando a pergunta é sobre um plano concluído ou cancelado.
+- `docs/modelar/decisoes/PLANOS-ENCERRADOS.md`, quando a pergunta é sobre um plano concluído ou cancelado.
+- `docs/modelar/decisoes/HISTORICO-RETIRADO.md`, quando a pergunta é sobre um relatório, dossiê ou diário que saiu da árvore.
 - `docs/modelar/pesquisas/PESQUISA-ABERTA-2026-10.md`, quando a pergunta é sobre ferramentas de outros projetos.
 - `docs/modelar/pesquisas/FERRAMENTAS-POR-OBJETO.md`, quando a pergunta é que ferramenta cada objeto pede.
 - `docs/modelar/banco-de-provas/BANCO-DE-PROVAS.md`, quando a pergunta é quanto custou modelar um objeto.
 - `docs/modelar/pesquisas/ANALISES-DE-2026-10.md`, quando a pergunta é sobre a avaliação da estrutura do projeto.
-- `docs/modelar/historico/CHEGADA-2026-09-11.md`, quando a pergunta é por que um documento saiu da raiz de docs/modelar/ ou onde foi parar.
 
-Passo seguinte, sem estado lido: Abra docs/modelar/historico/README.md e siga para o item da pergunta, ou para o documento sob demanda que a responde.
+Passo seguinte, sem estado lido: Abra docs/modelar/decisoes/README.md: as decisões em vigor estão nos registros, e a crônica de planos e de histórico diz o commit onde cada texto está.
 
 Conferido no fim: Nada a conferir: pesquisa não muda o repositório, e o que dela virar trabalho precisa de plano.
 

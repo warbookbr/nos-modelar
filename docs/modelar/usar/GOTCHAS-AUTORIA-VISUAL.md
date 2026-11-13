@@ -93,7 +93,7 @@ diagnóstico, nos termos da regra de `LACO-VISUAL.md` de que métrica não aprov
 ## Registro consolidado de problemas já encontrados
 
 As trinta e oito falhas medidas (V-01 a V-38) moram em
-[`../historico/REGISTRO-FALHAS-AUTORIA-V.md`](../historico/REGISTRO-FALHAS-AUTORIA-V.md).
+[`../historico/REGISTRO-FALHAS-AUTORIA-V.md`](../decisoes/HISTORICO-RETIRADO.md).
 Elas saíram daqui por pesarem 15,6 dos 35,8 KB deste documento de leitura
 obrigatória; a maior parte é o programa de carroceria N6, congelado.
 

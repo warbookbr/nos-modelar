@@ -1,6 +1,6 @@
 # Abertura em qualquer direção — a bateria de limites da operação
 
-Provas do plano [abertura em qualquer direção](../../planos/encerrados/2026-11-06-abertura-em-qualquer-direcao.md), em 2026-11-06. A operação
+Provas do plano [abertura em qualquer direção](../../decisoes/PLANOS-ENCERRADOS.md), em 2026-11-06. A operação
 `aberturaPorContorno` ganhou a vista por vetor (fatia 1), e esta bateria a mediu em nove peças de teste neutras de
 `tools/fixtures/aberturas-em-teste/`, uma por caso, cada uma com o gate de malha (nenhuma aresta sem par, vínculo não manifold,
 triângulo sem área pelo adaptador nem lasca da topologia) e a borda do vão contra o desenho (`medidas.ts`). Os testes estão ao lado das

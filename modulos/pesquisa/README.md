@@ -9,5 +9,5 @@ envelhece, e só então o leva a um plano.
   WebAssembly avaliadas para o núcleo e as ferramentas.
 
 O que já foi adotado ou indicado para uma fatia do plano ativo fica no
-[contexto do plano](../../docs/modelar/historico/CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md),
+[contexto do plano](../../docs/modelar/decisoes/HISTORICO-RETIRADO.md),
 e não aqui.

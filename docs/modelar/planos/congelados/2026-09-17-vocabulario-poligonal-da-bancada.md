@@ -4,7 +4,7 @@
 **Congelado em:** 2026-09-17, por decisão do usuário · **Base:** `73af5ec` na main
 **Nasce congelado:** este plano foi escrito para ser guardado, e não executado
 agora. Ele existe porque a fila estava registrada em prosa no fechamento de
-[topologia, mover a peça, e ler o gesto](../encerrados/2026-09-16-topologia-e-leitura-do-gesto.md),
+[topologia, mover a peça, e ler o gesto](../../decisoes/PLANOS-ENCERRADOS.md),
 e fila em prosa some.
 
 ## O que ele entregaria
