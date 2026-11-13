@@ -1,5 +1,6 @@
 /* testes-lentos.test.mjs — a lista dos lentos aponta para arquivos que existem, e a bateria dos lentos roda todos onde precisa. */
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -22,6 +23,18 @@ describe('a lista dos testes lentos', () => {
     expect(argumentosDoVitest('lentos', { ambiente: {}, remoto: () => null }).args).toEqual(['run']);
     expect(argumentosDoVitest('lentos', { ambiente: {}, remoto }).args).toEqual(['run', '--changed', 'origin/ramo', '--passWithNoTests']);
     expect(argumentosDoVitest('rapidos', { ambiente: {}, remoto }).args).toEqual(['run']);
+  });
+
+  it('a bateria local roda só a lista dos lentos ligados que cabem no teto, e o CI e o --completo rodam todos', () => {
+    const dir = mkdtempSync(join(tmpdir(), 'escolhidos-'));
+    try {
+      const lista = join(dir, 'e.json');
+      writeFileSync(lista, JSON.stringify(['tools/modelar/raio-da-aresta.test.mjs']));
+      const remoto = () => 'origin/ramo';
+      expect(argumentosDoVitest('lentos', { ambiente: { GATES_TESTES_ESCOLHIDOS: lista }, remoto }).args).toEqual(['run', 'tools/modelar/raio-da-aresta.test.mjs']);
+      expect(argumentosDoVitest('lentos', { ambiente: { GATES_TESTES_ESCOLHIDOS: lista, CI: 'true' }, remoto }).args).toEqual(['run']);
+      expect(argumentosDoVitest('lentos', { ambiente: { GATES_TESTES_ESCOLHIDOS: lista, GATES_COMPLETO: '1' }, remoto }).args).toEqual(['run']);
+    } finally { rmSync(dir, { recursive: true, force: true }); }
   });
 
   it('o teto reprova o rápido que passa dele e ignora o que já está na lista dos lentos', () => {

@@ -7,7 +7,8 @@
  * `npm run test:rapidos` roda todo o resto, sempre. `npm run test:lentos` roda só os desta lista que importam, direta ou
  * indiretamente, um arquivo mudado desde o ramo remoto (`vitest --changed`), e roda todos com `--completo` no `npm run gates`
  * (variável GATES_COMPLETO=1), no CI (variável CI) e quando não dá para saber o ramo remoto. Assim nenhum teste deixa de rodar
- * antes de chegar à main. `npm test` continua rodando a suíte inteira de uma vez. */
+ * antes de chegar à main. `npm test` continua rodando a suíte inteira de uma vez. A bateria local (`npm run gates`) roda os lentos
+ * ligados ao que o envio mudou, com teto de 8 arquivos e 5 minutos (tools/gates/lentos-ligados.mjs); o resto fica para o CI. */
 import { spawnSync } from 'node:child_process';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { availableParallelism, loadavg } from 'node:os';
@@ -222,6 +223,11 @@ function ramoRemoto() {
 export function argumentosDoVitest(modo, { ambiente = process.env, remoto = ramoRemoto } = {}) {
   /* A bateria, pelo seletor (tools/gates/seletor.mjs), passa os arquivos de código mudados desde a última rodada verde; o
      `vitest related` roda só os testes que os importam, respeitando a divisão entre rápidos e lentos da configuração. */
+  /* A bateria local, pelos lentos ligados ao que o envio mudou (tools/gates/lentos-ligados.mjs), passa a lista dos que cabem no teto. */
+  if (modo === 'lentos' && ambiente.GATES_TESTES_ESCOLHIDOS && !ambiente.CI && ambiente.GATES_COMPLETO !== '1') {
+    const arquivos = JSON.parse(readFileSync(ambiente.GATES_TESTES_ESCOLHIDOS, 'utf8'));
+    return { args: ['run', ...arquivos], motivo: `os ${arquivos.length} lentos ligados ao que o envio mudou e que cabem no teto da bateria local` };
+  }
   if (ambiente.GATES_TESTES_RELACIONADOS && !ambiente.CI && ambiente.GATES_COMPLETO !== '1') {
     const arquivos = JSON.parse(readFileSync(ambiente.GATES_TESTES_RELACIONADOS, 'utf8'));
     return { args: ['related', ...arquivos, '--run', '--passWithNoTests'], motivo: `os ${modo} ligados a ${arquivos.length} arquivo(s) mudados desde a última rodada verde` };

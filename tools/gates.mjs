@@ -27,6 +27,9 @@ import { availableParallelism } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { pecasMudadas, rodarGuardaLocal } from './gates/guarda-local.mjs';
+import { aplicarTeto, duracaoGuardada, lentosLigados, lerPesos, relatarLentosLigados } from './gates/lentos-ligados.mjs';
+import { TESTES_LENTOS, ARQUIVO_DOS_PESOS } from './testes-lentos.mjs';
+import { lerHistorico } from './vitest-duracoes.mjs';
 import { decidir, diretorioDasLeituras, fotografar, gravarVerdes, lerLeiturasDoGate, lerVerdes, registroVerde, rodouInteiro } from './gates/seletor.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -258,14 +261,19 @@ export function filtrarPorCaminho(bateria, alterados) {
   return { bateria: bateria.filter((g) => !pulados.includes(g)), pulados };
 }
 
-function arquivosAlterados() {
+function baseDoEnvio() {
   const git = (args) => spawnSync('git', args, { encoding: 'utf8' });
   /* SEM RAMO REMOTO CONFIGURADO, A BASE É A MAIN. O ramo de trabalho que envia para um ramo de outro nome não tem `@{u}`, e a bateria
      caía em "não deu para saber o que mudou": rodava tudo e deixava a guarda das peças mudadas para o CI, sem dizer por quê. Medido em
      2026-11-13, com 42 peças mudadas e nenhuma guarda rodada aqui. O que o envio muda em relação à main é a resposta que serve. */
   const remoto = git(['rev-parse', '--abbrev-ref', '@{u}']);
-  const base = remoto.status === 0 ? remoto.stdout.trim()
+  return remoto.status === 0 ? remoto.stdout.trim()
     : git(['rev-parse', '--verify', '--quiet', 'origin/main']).status === 0 ? 'origin/main' : null;
+}
+
+function arquivosAlterados() {
+  const git = (args) => spawnSync('git', args, { encoding: 'utf8' });
+  const base = baseDoEnvio();
   if (!base) return null;
   const commitados = git(['diff', '--name-only', `${base}...HEAD`]);
   const soltos = git(['status', '--porcelain', '--untracked-files=all']);
@@ -275,6 +283,15 @@ function arquivosAlterados() {
     ...soltos.stdout.split('\n').map((l) => l.slice(3).split(' -> ').pop()),
   ].map((f) => f.trim().replace(/^"|"$/g, '')).filter(Boolean);
   return [...new Set(lista)];
+}
+
+/* Dentre o que o envio mudou, o que apareceu ou sumiu: a listagem de uma pasta só muda de resposta por esses. */
+function arquivosEstruturais(alterados, foto) {
+  const git = (args) => spawnSync('git', args, { encoding: 'utf8' });
+  const base = baseDoEnvio();
+  const mudaram = base ? git(['diff', '--name-only', '--diff-filter=AD', `${base}...HEAD`]).stdout.split('\n').filter(Boolean) : [];
+  const soltos = git(['status', '--porcelain', '--untracked-files=all']).stdout.split('\n').filter((l) => /^(\?\?|A|.A|D|.D)/.test(l)).map((l) => l.slice(3).split(' -> ').pop().trim().replace(/^"|"$/g, ''));
+  return [...new Set([...mudaram, ...soltos, ...alterados.filter((c) => !foto[c])])];
 }
 
 /* OS BARATOS PRIMEIRO, E A BATERIA PARA SE UM DELES FALHAR.
@@ -333,7 +350,7 @@ const ambienteDosGates = {};
 
 /* `sinal` (opcional) cancela o gate: o grupo de processos inteiro recebe SIGTERM e o resultado volta com `cancelado`, sem deixar
    saída guardada. Quem não passa `sinal` (a bateria) tem o comportamento de sempre. */
-export function rodarGate(gate, { silencioso, testes = null, sinal = null }) {
+export function rodarGate(gate, { silencioso, testes = null, sinal = null, escolhidos = null }) {
   return new Promise((resolver) => {
     const inicio = Date.now();
     /* Os arquivos de teste que o seletor ligou ao que mudou vão por arquivo, porque a lista pode ser longa para o ambiente. */
@@ -343,6 +360,13 @@ export function rodarGate(gate, { silencioso, testes = null, sinal = null }) {
       mkdirSync(dirname(lista), { recursive: true });
       writeFileSync(lista, JSON.stringify(testes));
       ambienteDoGate.GATES_TESTES_RELACIONADOS = lista;
+    }
+    /* Os lentos que a bateria local escolheu (tools/gates/lentos-ligados.mjs) vão por arquivo, como a lista do seletor. */
+    if (escolhidos) {
+      const lista = join('tmp', 'gates', `escolhidos-${gate.split(':')[1]}.json`);
+      mkdirSync(dirname(lista), { recursive: true });
+      writeFileSync(lista, JSON.stringify(escolhidos));
+      ambienteDoGate.GATES_TESTES_ESCOLHIDOS = lista;
     }
     /* Os testes anotam o que leem (tools/gates/leituras.mjs), fora do CI, que roda tudo. */
     if (gate.startsWith('test:') && !process.env.CI) ambienteDoGate.GATES_LEITURAS_DIR = join(RAIZ, diretorioDasLeituras(gate));
@@ -370,7 +394,7 @@ export function rodarGate(gate, { silencioso, testes = null, sinal = null }) {
         process.stdout.write(codigo === 0 ? `▶ ${gate} — ok\n` : `${linhaDeFalha(gate, arquivo)}\n`);
         process.stdout.write(saida);
       }
-      resolver({ gate, codigo, duracao, arquivo, lentos });
+      resolver({ gate, codigo, duracao, arquivo, lentos, parcial: Boolean(escolhidos) });
     });
   });
 }
@@ -413,7 +437,8 @@ async function executar() {
   if (comSeletor) for (const gate of bateria) decisoes.set(gate, decidir(gate, foto, verdes, gate.startsWith('test:') ? lerLeiturasDoGate('.', gate) : null));
   const guardados = bateria.filter((g) => decisoes.get(g)?.rodar === false);
   if (guardados.length) console.log(`gates — guardados, sem rodar: ${guardados.join(', ')} (nada do que conferem mudou desde a última rodada verde).`);
-  for (const gate of ['test:rapidos', 'test:lentos']) {
+  /* o test:lentos tem a linha própria, abaixo: o que roda aqui depende dos lentos ligados ao que o envio mudou */
+  for (const gate of ['test:rapidos']) {
     const d = decisoes.get(gate);
     if (d?.rodar) console.log(`gates — ${gate}: ${d.motivo}.`);
   }
@@ -425,7 +450,18 @@ async function executar() {
     const { pecasDoAcervo } = await import('./modelar/guardas/guarda-acervo.mjs');
     guardaLocal = pecasMudadas(alterados, pecasDoAcervo());
   }
-  const paraOCi = comPesados ? [] : bateria.filter((g) => PESADOS_PARA_O_CI.includes(g) && !guardados.includes(g) && !(g === 'guarda:acervo' && guardaLocal));
+  /* Os lentos ligados ao que o envio mudou rodam aqui, com teto (tools/gates/lentos-ligados.mjs); sem saber o que mudou, ficam para o CI. */
+  let lentosLocais = null;
+  if (!comPesados && alterados && bateria.includes('test:lentos') && !guardados.includes('test:lentos')) {
+    const leituras = lerLeiturasDoGate('.', 'test:lentos');
+    const registroVazio = !Object.keys(leituras).length;
+    const ligados = lentosLigados({ lentos: TESTES_LENTOS, alterados, estruturais: arquivosEstruturais(alterados, foto ?? fotografar('.')), foto: foto ?? fotografar('.'), leituras: registroVazio ? null : leituras });
+    const historico = lerHistorico('lentos');
+    const pesos = lerPesos(ARQUIVO_DOS_PESOS);
+    lentosLocais = aplicarTeto([...ligados.keys()], (a) => duracaoGuardada(a, historico, pesos));
+    console.log(`gates — ${relatarLentosLigados(lentosLocais)}${registroVazio ? ' (sem registro de leituras: só o grafo de imports; rode --completo uma vez para completá-lo)' : ''}`);
+  }
+  const paraOCi = comPesados ? [] : bateria.filter((g) => PESADOS_PARA_O_CI.includes(g) && !guardados.includes(g) && !(g === 'guarda:acervo' && guardaLocal) && !(g === 'test:lentos' && lentosLocais));
   if (guardaLocal && !guardaLocal.length) console.log('gates — guarda:acervo: nenhuma peça de procedural/pecas/ mudou, nada roda aqui; o CI roda o acervo inteiro.');
   else if (guardaLocal) console.log(`gates — guarda:acervo: só as peças mudadas (${guardaLocal.join(', ')}); o CI roda o acervo inteiro.`);
   if (paraOCi.length) console.log(`gates — ficam para o CI, que roda tudo antes de a main andar: ${paraOCi.join(', ')} (--com-pesados os roda aqui).`);
@@ -433,6 +469,7 @@ async function executar() {
   const porGate = new Map();
   for (const gate of guardados) porGate.set(gate, { gate, codigo: 0, duracao: 0, arquivo: null, lentos: null, guardado: true });
   if (guardaLocal && !guardaLocal.length) porGate.set('guarda:acervo', { gate: 'guarda:acervo', codigo: 0, duracao: 0, arquivo: null, lentos: null, semPeca: true });
+  if (lentosLocais && !lentosLocais.rodam.length) porGate.set('test:lentos', { gate: 'test:lentos', codigo: 0, duracao: 0, arquivo: null, lentos: null, semLento: true });
   for (const gate of paraOCi) porGate.set(gate, { gate, codigo: 0, duracao: 0, arquivo: null, lentos: null, paraOCi: true });
   const duracoesDosGates = lerDuracoesDosGates();
   const estagios = separarEstagios(bateria.filter((g) => !guardados.includes(g) && !paraOCi.includes(g) && !porGate.has(g)), duracoesDosGates);
@@ -463,11 +500,13 @@ async function executar() {
       for (const recurso of recursos) ocupados.add(recurso);
       pesoEmUso += pesoDe(gate);
       try {
-        const resultado = gate === 'guarda:acervo' && guardaLocal ? await rodarGateDaGuardaLocal(guardaLocal, silencioso) : await rodarGate(gate, { silencioso, testes: decisoes.get(gate)?.testes ?? null });
+        const resultado = gate === 'guarda:acervo' && guardaLocal ? await rodarGateDaGuardaLocal(guardaLocal, silencioso)
+          : gate === 'test:lentos' && lentosLocais ? await rodarGate(gate, { silencioso, escolhidos: lentosLocais.rodam })
+            : await rodarGate(gate, { silencioso, testes: decisoes.get(gate)?.testes ?? null });
         porGate.set(gate, resultado);
         duracoesDosGates[gate] = resultado.duracao;
         /* o verde do gate é o do acervo inteiro; a rodada só das peças mudadas não o grava */
-        if (gravaVerdes && !resultado.guardaLocal && resultado.codigo === 0 && rodouInteiro(gate, decisoes.get(gate)?.testes ?? null, completo)) {
+        if (gravaVerdes && !resultado.guardaLocal && !resultado.parcial && resultado.codigo === 0 && rodouInteiro(gate, decisoes.get(gate)?.testes ?? null, completo)) {
           const r = registroVerde(gate, foto, { testes: decisoes.get(gate)?.testes ?? null, anterior: verdes[gate] });
           if (r) verdes[gate] = r;
         }
@@ -502,10 +541,12 @@ async function executar() {
   for (const { gate, codigo, duracao, arquivo, guardado } of resultados) {
     if (guardado) { console.log(`= ${gate.padEnd(24)}  guardado`); continue; }
     if (porGate.get(gate).semPeca) { console.log(`= ${gate.padEnd(24)}  nenhuma peça mudou; o CI roda o acervo inteiro`); continue; }
+    if (porGate.get(gate).semLento) { console.log(`= ${gate.padEnd(24)}  nenhum lento ligado ao que mudou; o CI roda todos`); continue; }
     if (porGate.get(gate).paraOCi) { console.log(`→ ${gate.padEnd(24)}  fica para o CI`); continue; }
     const marca = codigo === 0 ? '✓' : '✗';
     console.log(`${marca} ${gate.padEnd(24)} ${String(Math.round(duracao / 100) / 10).padStart(6)}s${arquivo ? `  saída: ${arquivo}` : ''}`);
   }
+  if (lentosLocais?.ficam.length) console.log(`test:lentos — ficam para o CI, por causa do teto: ${lentosLocais.ficam.join(', ')}`);
   const duracoes = ['test:rapidos', 'test:lentos'].flatMap((g) => porGate.get(g)?.lentos ?? []);
   if (duracoes.length) {
     console.log('─'.repeat(52));
