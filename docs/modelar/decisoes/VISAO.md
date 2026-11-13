@@ -184,6 +184,6 @@ um conjunto, selecionar o alvo e o contexto relevante, medir as relações,
 alterar a definição e descobrir com clareza quais montagens continuaram válidas
 e quais precisam de correção.
 
-A definição detalhada está em [`AUTORIA-IA.md`](../contratos/AUTORIA-IA.md),
+A definição detalhada está em [`AUTORIA-IA.md`](../guias/AUTORIA-IA.md),
 [`MONTAGENS-SEMANTICAS.md`](../usar/MONTAGENS-SEMANTICAS.md) e
 [`AGENT-FIRST.md`](AGENT-FIRST.md).

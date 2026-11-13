@@ -69,7 +69,7 @@ Estado: cancelado, em 2026-10-07. Crônica: tem linha.
 ## 2026-10-07-as-ferramentas-de-modelagem.md
 Estado: concluído, em 2026-10-11. Crônica: tem linha.
 - [A] O OCCT é kernel só da exportação STEP e não é kernel de autoria; a camada de features sobre a malha é o caminho, e a hipótese de usá-lo para modelar só reabre se surgir requisito de fabricação ou tolerância de peça mecânica, ou se a camada de features não der arredondamento ou casca aceitáveis. Porquê: a análise de agosto o rejeitou para ativo visual, e `ANALISES-DE-2026-10.md` e `PESQUISA-ABERTA-2026-10.md` ainda o tratam como hipótese aberta, sem dizer que foi decidido. Procurei: "OCCT", "OpenCascade", "kernel" em `tools/`, `procedural/`, `src/`, `.claude/`, `docs/modelar/*.md`, `docs/modelar/usar/`, `CLAUDE.md`; só acho o OCCT como dependência da exportação (`DOSSIE-EXPORTACAO-CAD-STEP.md`, `INDEX.md`) e como hipótese em `ANALISES-DE-2026-10.md` e `PESQUISA-ABERTA-2026-10.md`. Rascunho do registro: O OCCT fica só na exportação STEP. A autoria usa a camada de features sobre a malha da Manifold, porque a análise de agosto rejeitou o kernel B-Rep para ativo visual (nomeação topológica contra identidade posicional, peso do wasm). A decisão reabre se um requisito de fabricação ou de tolerância de peça mecânica aparecer, ou se a camada de features não der arredondamento e casca aceitáveis.
-- [B] O `loft` fica fora da pele exterior de carroceria. Porquê: decisão herdada da análise de agosto. Lugar: `docs/modelar/CONTRATO-DA-FAMILIA.md`, `docs/modelar/pesquisas/ANALISES-DE-2026-10.md`.
+- [B] O `loft` fica fora da pele exterior de carroceria. Porquê: decisão herdada da análise de agosto. Lugar: `docs/modelar/contratos/CONTRATO-DA-FAMILIA.md`, `docs/modelar/pesquisas/ANALISES-DE-2026-10.md`.
 - [B] O crítico reprova só depois da medida e o conjunto de calibração fica fora do repositório rastreado. Porquê: medida antes do olhar. Lugar: `docs/modelar/usar/CRITICA-VISUAL-CONTRATO-E-CASOS.md`, `CLAUDE.md` (nenhuma métrica aprova forma sozinha).
 
 ## 2026-10-07-o-caminho-curto-da-ia.md
@@ -133,7 +133,7 @@ Estado: concluído, em 2026-10-30. Crônica: tem linha.
 
 ## 2026-10-21-carroceria-por-subdivisao.md
 Estado: concluído, em 2026-10-23 (o sétimo teste; crônica tem linha na parte dos planos de agosto). Crônica: tem linha.
-- [B] A subdivisão com vincos nomeados mantém a aproximação como padrão e a interpolação só por opção declarada (`medidas`, resolvida por eliminação de Gauss, falha com os nomes se singular). Porquê: interpolar muda o sentido do dado salvo. Lugar: `docs/modelar/contratos/modelar-carroceria.md`, `procedural/nucleo/` (operação `subdivisao`), `docs/modelar/usar/GOTCHAS-POR-OPERACAO.md`.
+- [B] A subdivisão com vincos nomeados mantém a aproximação como padrão e a interpolação só por opção declarada (`medidas`, resolvida por eliminação de Gauss, falha com os nomes se singular). Porquê: interpolar muda o sentido do dado salvo. Lugar: `docs/modelar/guias/modelar-carroceria.md`, `procedural/nucleo/` (operação `subdivisao`), `docs/modelar/usar/GOTCHAS-POR-OPERACAO.md`.
 - [B] A lista de termos proibidos é embaralhada com a chave `MECANIFICA_CHAVE_TERMOS` e o histórico se confere antes de tornar o repositório público. Porquê: o repositório deve ficar público sem expor os termos. Lugar: `tools/arquitetura/termos-proibidos.mjs`, `historico-limpo.mjs`, `docs/modelar/INDEX.md`.
 
 ## 2026-10-22-leitura-por-demanda-e-limpeza.md
@@ -147,7 +147,7 @@ Estado: concluído, em 2026-10-24. Crônica: tem linha.
 
 ## 2026-10-24-carroceria-por-rede-de-curvas.md
 Estado: concluído, em 2026-10-25. Crônica: tem linha.
-- [B] O nível oficial de carroceria é a lataria lisa com os detalhes de borda como `friso` à parte, e detalhe fino de canal ou moldura com vários degraus fica como limite conhecido (cerca de 5), sem mais rodadas; passar disso pede plano. Porquê: decisão da pessoa depois do piloto cego. Lugar: `docs/modelar/contratos/modelar-carroceria.md` (seção "Nível oficial de carroceria", linha 225).
+- [B] O nível oficial de carroceria é a lataria lisa com os detalhes de borda como `friso` à parte, e detalhe fino de canal ou moldura com vários degraus fica como limite conhecido (cerca de 5), sem mais rodadas; passar disso pede plano. Porquê: decisão da pessoa depois do piloto cego. Lugar: `docs/modelar/guias/modelar-carroceria.md` (seção "Nível oficial de carroceria", linha 225).
 
 ## 2026-10-25-renomear-para-modelar.md
 Estado: concluído, em 2026-10-28. Crônica: tem linha.
@@ -168,7 +168,7 @@ Estado: cancelado, em 2026-10-30 (fundido no plano das visões). Crônica: não 
 
 ## 2026-10-30-visoes-de-conferencia-na-bancada.md
 Estado: concluído, em 2026-11-03. Crônica: tem linha.
-- [B] As visões (sólido, arame, raio X, curvatura, zebra, luz rasante) não mudam as imagens das guardas nem do pacote do crítico com o seletor em sólido, e a curvatura foi conferida contra a do Blender. Porquê: a bancada não pode alterar o que o crítico recebe. Lugar: `npm run bancada:guardas`, `src/bancada/visoes/visoes-de-superficie.test.js`, `docs/modelar/contratos/BANCADA-E-APRESENTACAO.md`.
+- [B] As visões (sólido, arame, raio X, curvatura, zebra, luz rasante) não mudam as imagens das guardas nem do pacote do crítico com o seletor em sólido, e a curvatura foi conferida contra a do Blender. Porquê: a bancada não pode alterar o que o crítico recebe. Lugar: `npm run bancada:guardas`, `src/bancada/visoes/visoes-de-superficie.test.js`, `docs/modelar/guias/BANCADA-E-APRESENTACAO.md`.
 - [C] Os temas Foco e Revisão saíram depois, por decisão da pessoa. Porquê: a linha do plano "ajustes da bancada" já o diz.
 
 ## 2026-11-03-ajustes-da-bancada.md
@@ -181,7 +181,7 @@ Estado: concluído, em 2026-11-03. Crônica: tem linha.
 
 ## 2026-11-03-regras-de-desenho-por-familia.md
 Estado: concluído, em 2026-11-03. Crônica: tem linha.
-- [B] O que a pessoa corrige vira regra em dados da família, com a pergunta no alinhamento e no crítico e, quando há medida, uma conferência da prancha que reprova; o pedido da pessoa é contado por etapa. Porquê: a correção de um objeto vai para a ferramenta geral e não para o arquivo do objeto. Lugar: `CLAUDE.md` (regra da correção), `.claude/skills/alinhar-modelagem/SKILL.md`, `docs/modelar/CONTRATO-DA-FAMILIA.md`.
+- [B] O que a pessoa corrige vira regra em dados da família, com a pergunta no alinhamento e no crítico e, quando há medida, uma conferência da prancha que reprova; o pedido da pessoa é contado por etapa. Porquê: a correção de um objeto vai para a ferramenta geral e não para o arquivo do objeto. Lugar: `CLAUDE.md` (regra da correção), `.claude/skills/alinhar-modelagem/SKILL.md`, `docs/modelar/contratos/CONTRATO-DA-FAMILIA.md`.
 
 ## 2026-11-05-abertura-de-contorno-livre.md
 Estado: concluído, em 2026-11-05. Crônica: tem linha.
@@ -219,7 +219,7 @@ Estado: concluído, em 2026-11-07. Crônica: tem linha.
 ## 2026-11-08-materiais-realistas.md
 Estado: concluído, em 2026-11-08. Crônica: não tem linha.
 - [A] Texturas, relevos e ambiente são gerados pelo projeto a partir de números, sem imagem de fora; uma exceção por material só entra se a imagem gerada não convencer, e então a origem e a licença ficam registradas. Porquê: manter o conteúdo salvo determinístico e livre de terceiros. Procurei: "imagem de fora", "licença", "exceção por material", "sem foto" em `modulos/textura/`, `src/`, `tools/`, `.claude/`, `docs/modelar/*.md`, `docs/modelar/usar/`, `CLAUDE.md`; o `CLAUDE.md` só diz que material entra por escolha por peça e módulo de textura, e `ambiente-de-reflexo.js` diz "sem imagem de fora" só para o ambiente, sem a cláusula da exceção. Rascunho do registro: Textura, relevo e ambiente de material saem de `modulos/textura/` e do ambiente gerado, calculados de números e reproduzíveis, sem imagem de fora. Uma imagem de terceiro só entra como exceção por material, quando a imagem gerada não convence a pessoa, e então a origem e a licença vão registradas. Vale para a bancada e para a exportação glTF, que mostram o mesmo material.
-- [B] O pacote do crítico e as vistas do Blender seguem neutros (sem ambiente) para a nota ser comparável entre rodadas; o material da receita passa por um normalizador único que recusa campo desconhecido. Porquê: comparabilidade e recusa de campo silencioso. Lugar: `src/autoria/material-da-receita.js`, `tools/modelar/vistas-para-critica.mjs`, `docs/modelar/contratos/BANCADA-E-APRESENTACAO.md`.
+- [B] O pacote do crítico e as vistas do Blender seguem neutros (sem ambiente) para a nota ser comparável entre rodadas; o material da receita passa por um normalizador único que recusa campo desconhecido. Porquê: comparabilidade e recusa de campo silencioso. Lugar: `src/autoria/material-da-receita.js`, `tools/modelar/vistas-para-critica.mjs`, `docs/modelar/guias/BANCADA-E-APRESENTACAO.md`.
 
 ## 2026-11-08-trecho-que-some-entre-lacos.md
 Estado: concluído, em 2026-11-08. Crônica: não tem linha.
@@ -248,7 +248,7 @@ Estado: concluído, em 2026-11-13. Crônica: tem linha.
 
 ## DESENHO-bancada-referencias-e-controles.md
 Estado: nenhum dos dois (arquivo de desenho com "Estado: pronto para revisão", de 2026-09-09; não é plano). Crônica: tem linha (apenas o link do arquivo).
-- [C] Desenho da aba de referência por imagem, dos controles persistentes e do wireframe da bancada. Porquê: especificação de interface já implementada em `src/bancada/referencias/` e descrita em `docs/modelar/contratos/BANCADA-E-APRESENTACAO.md`; não governa modelagem.
+- [C] Desenho da aba de referência por imagem, dos controles persistentes e do wireframe da bancada. Porquê: especificação de interface já implementada em `src/bancada/referencias/` e descrita em `docs/modelar/guias/BANCADA-E-APRESENTACAO.md`; não governa modelagem.
 
 # Resumo
 
@@ -260,4 +260,4 @@ Decisões A:
 - `2026-10-30-glossario-e-entrada-para-pessoas.md`: não há glossário separado, os termos são definidos no documento que os governa e a página de entrada os liga a ele.
 - `2026-11-08-materiais-realistas.md`: texturas, relevos e ambiente são gerados de números, sem imagem de fora, e a exceção por material exige origem e licença registradas.
 
-Observações: `docs/modelar/contratos/modelar-carroceria.md` (linha 227) e `docs/modelar/INDEX.md` (linha 26) citam planos de `encerrados/` e vão precisar do link corrigido quando a pasta sair. O plano `2026-10-30-interface-da-bancada.md`, `2026-11-08-materiais-realistas.md`, `2026-11-08-trecho-que-some-entre-lacos.md`, `2026-11-08-uniao-de-tubos-com-arredondamento.md`, `2026-11-09-empilhadeira.md` e `DESENHO-bancada-referencias-e-controles.md` não têm linha de crônica de plano próprio (o último só aparece como link solto). Arquivos que faltaram: nenhum.
+Observações: `docs/modelar/guias/modelar-carroceria.md` (linha 227) e `docs/modelar/INDEX.md` (linha 26) citam planos de `encerrados/` e vão precisar do link corrigido quando a pasta sair. O plano `2026-10-30-interface-da-bancada.md`, `2026-11-08-materiais-realistas.md`, `2026-11-08-trecho-que-some-entre-lacos.md`, `2026-11-08-uniao-de-tubos-com-arredondamento.md`, `2026-11-09-empilhadeira.md` e `DESENHO-bancada-referencias-e-controles.md` não têm linha de crônica de plano próprio (o último só aparece como link solto). Arquivos que faltaram: nenhum.

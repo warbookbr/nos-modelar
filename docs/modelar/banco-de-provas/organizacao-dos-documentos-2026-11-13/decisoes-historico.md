@@ -6,7 +6,7 @@ Do que trata: pacote do alvo visual do cupê N6 (direção estética aprovada em
 
 ## ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md
 Do que trata: dossiê de agosto de 2026 que escolheu cage de quads com Catmull-Clark para a pele exterior e rejeitou OCCT/B-rep, Blender headless, SDF, kernel próprio e loft como base. Citado por (vivos): nenhum.
-- [B] pele exterior com aberturas não parte de loft nem de booleana, e a chapa lisa se faz por subdivisão de gaiola por estações; B-rep só volta com requisito CAD. Porquê: o loft não abre vão envidraçado sem booleana e acopla capô, ombro e teto. Lugar: docs/modelar/contratos/modelar-carroceria.md (gaiola por estações, 'subdivisao'), docs/modelar/pesquisas/DOSSIE-EXPORTACAO-CAD-STEP.md e ANALISES-DE-2026-10.md (B-rep); a recusa do loft como base está em docs/modelar/historico/REGISTRO-FALHAS-AUTORIA-V.md (A, abaixo; ele precisa ir para decisoes/ antes de a pasta sair), V-02
+- [B] pele exterior com aberturas não parte de loft nem de booleana, e a chapa lisa se faz por subdivisão de gaiola por estações; B-rep só volta com requisito CAD. Porquê: o loft não abre vão envidraçado sem booleana e acopla capô, ombro e teto. Lugar: docs/modelar/guias/modelar-carroceria.md (gaiola por estações, 'subdivisao'), docs/modelar/pesquisas/DOSSIE-EXPORTACAO-CAD-STEP.md e ANALISES-DE-2026-10.md (B-rep); a recusa do loft como base está em docs/modelar/historico/REGISTRO-FALHAS-AUTORIA-V.md (A, abaixo; ele precisa ir para decisoes/ antes de a pasta sair), V-02
 
 ## BASELINE-MOTOR-R00.md
 Do que trata: retrato do motor procedural antes da modularização (2.683 linhas, 32 operações, 48 exportações) e comandos de baseline. Citado por (vivos): nenhum.
@@ -37,7 +37,7 @@ Do que trata: conjunto de três peças (suporte de eixo, eixo-guia, anel-tampa) 
 - [C] conjunto de prova definido e já executado. Porquê: o resultado está no relatório do experimento e o fluxo virou autoria declarativa.
 
 ## CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md
-Do que trata: complemento do plano das ferramentas de modelagem: o que já existia, referências por fatia, desenho das fatias 4, 8 e 9 e lista de sucessão. Citado por (vivos): modulos/pesquisa/bibliotecas/BIBLIOTECAS.md, modulos/pesquisa/README.md, docs/modelar/CONTRATO-DA-FAMILIA.md.
+Do que trata: complemento do plano das ferramentas de modelagem: o que já existia, referências por fatia, desenho das fatias 4, 8 e 9 e lista de sucessão. Citado por (vivos): modulos/pesquisa/bibliotecas/BIBLIOTECAS.md, modulos/pesquisa/README.md, docs/modelar/contratos/CONTRATO-DA-FAMILIA.md.
 - [C] desenho de fatias entregues e lista de candidatos (carrinho de mão, bacia em casca, dobradiça de caneco) que não está no BACKLOG. Porquê: candidato não autoriza trabalho e o plano que o carregava encerrou; se a pessoa quiser os candidatos, copiá-los para planos/BACKLOG.md antes de sair.
 
 ## DOSSIE-CABO-DE-PA.md
@@ -53,7 +53,7 @@ Do que trata: especificação do laboratório computacional para IA, incubado e 
 - [C] subsistema que saiu deste repositório. Porquê: o desenho vive onde o laboratório mora; aqui só restava o registro.
 
 ## DOSSIE-MODELADOR-POR-SELECAO.md
-Do que trata: proposta de modelador de carroceria em que a IA ordena candidatos gerados por linhas de caráter, superada em 2026-08-25. Citado por (vivos): docs/modelar/contratos/LEITURA-POR-TAREFA.md.
+Do que trata: proposta de modelador de carroceria em que a IA ordena candidatos gerados por linhas de caráter, superada em 2026-08-25. Citado por (vivos): docs/modelar/guias/LEITURA-POR-TAREFA.md.
 - [B] a premissa 'a IA compara melhor do que cria' não foi calibrada; o gerador manual limitava o espaço. Porquê: a seleção não cria o que o gerador não representa. Lugar: docs/modelar/pesquisas/DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md e V-36 em docs/modelar/historico/REGISTRO-FALHAS-AUTORIA-V.md (A, abaixo; ele precisa ir para decisoes/ antes de a pasta sair)
 
 ## DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md
@@ -213,7 +213,7 @@ Do que trata: sonda N5: busca residual de uma liberdade (bojoRelativo) com objet
 - [C] prova de mecanismo em alvo sintético. Porquê: o próprio relatório diz que não prova carroceria nem proporção.
 
 ## RELATORIO-N6-CANARIO-CASCO-VISUAL.md
-Do que trata: canário N6: casco por interseção de silhuetas binárias, reprovado e encerrado. Citado por (vivos): docs/modelar/contratos/LEITURA-POR-TAREFA.md.
+Do que trata: canário N6: casco por interseção de silhuetas binárias, reprovado e encerrado. Citado por (vivos): docs/modelar/guias/LEITURA-POR-TAREFA.md.
 - [B] silhueta binária informa ocupação, não topologia automotiva; não ajustar nem promover essa malha; o sucessor exige marcos regionais e patches contínuos. Porquê: IoU alto convive com a forma reprovada. Lugar: V-22 e V-31 em docs/modelar/historico/REGISTRO-FALHAS-AUTORIA-V.md (A, abaixo; ele precisa ir para decisoes/ antes de a pasta sair)
 
 ## RELATORIO-PLATAFORMA-PROCEDURAL-R10.md
@@ -249,8 +249,8 @@ Do que trata: revisão de rumo de 2026-10-06 com conferência da Planejadora: co
 - [C] decisão tomada e experimento encerrado. Porquê: a exportação STEP e o ANALISES-DE-2026-10.md carregam o que ficou; o link em tools/mapa/links.mjs (allowlist) precisa sair.
 
 ## VEICULOS-PRIMEIRA-LEVA-2026-10.md
-Do que trata: diagnóstico da primeira leva de veículos de referência livre e o experimento da perua pelas três vistas. Citado por (vivos): docs/modelar/contratos/modelar-veiculos.md.
-- [B] carroceria de largura constante perde a seção; a roda escondida e o perfil errado não são vistos pelo comparador de envelope; a folha comparativa na mesma escala é prova do roteiro `modelar/peca`; arco no perfil 2D e caixa de roda em vez de subtrair cilindros. Porquê: a perua reprovada tinha números melhores que o compacto aprovado. Lugar: docs/modelar/contratos/modelar-veiculos.md, .claude/skills/criar-peca/references/operacoes-procedurais.md e tools/modelar/folha-comparativa.mjs
+Do que trata: diagnóstico da primeira leva de veículos de referência livre e o experimento da perua pelas três vistas. Citado por (vivos): docs/modelar/guias/modelar-veiculos.md.
+- [B] carroceria de largura constante perde a seção; a roda escondida e o perfil errado não são vistos pelo comparador de envelope; a folha comparativa na mesma escala é prova do roteiro `modelar/peca`; arco no perfil 2D e caixa de roda em vez de subtrair cilindros. Porquê: a perua reprovada tinha números melhores que o compacto aprovado. Lugar: docs/modelar/guias/modelar-veiculos.md, .claude/skills/criar-peca/references/operacoes-procedurais.md e tools/modelar/folha-comparativa.mjs
 
 ## esboco-2d.md
 Do que trata: o esboço 2D antigo (modulos/esboco/, 117 arquivos), que saiu em 2026-11-05, o que ensinou e como recriar. Citado por (vivos): src/autoria/refinamento-global.js, modulos/esboco-nucleo/README.md, README.md, tools/mapa/links.mjs, docs/modelar/banco-de-provas/aviao-2026-10-11/CLASSIFICACAO.md, docs/modelar/banco-de-provas/esboco-pelo-nucleo-2026-11-05/gravar-o-que-o-modulo-resolvia.mjs, docs/modelar/contratos/CONTRATO-FORMA-GLOBAL-N2.md.
@@ -275,8 +275,8 @@ Arquivos com citante vivo (24; tmp/gates/verdes.json foi desconsiderado por ser 
 - BICICLETA-REALISTA-ATRITOS.md: docs/modelar/pesquisas/ATRITOS-AUTORIA.md
 - CHEGADA-2026-09-11.md: docs/modelar/roteiros/roteiros.json, docs/modelar/roteiros/ROTEIROS.md
 - CONJUNTO-PROVA-AUTORIA-GEOMETRICA.md: docs/modelar/contratos/INVENTARIO.md
-- CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md: modulos/pesquisa/bibliotecas/BIBLIOTECAS.md, modulos/pesquisa/README.md, docs/modelar/CONTRATO-DA-FAMILIA.md
-- DOSSIE-MODELADOR-POR-SELECAO.md: docs/modelar/contratos/LEITURA-POR-TAREFA.md
+- CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md: modulos/pesquisa/bibliotecas/BIBLIOTECAS.md, modulos/pesquisa/README.md, docs/modelar/contratos/CONTRATO-DA-FAMILIA.md
+- DOSSIE-MODELADOR-POR-SELECAO.md: docs/modelar/guias/LEITURA-POR-TAREFA.md
 - EXPERIMENTO-AB-FLUXO-IA.md: docs/modelar/contratos/INVENTARIO.md
 - EXPERIMENTO-RODA-REALISTA.md: docs/modelar/contratos/PERFIS-DE-AUTORIA.md, docs/modelar/contratos/INVENTARIO.md
 - LEVANTAMENTO-DESENHO-SEM-REFERENCIA.md: docs/modelar/pesquisas/PESQUISA-ABERTA-2026-10.md, docs/modelar/planos/BACKLOG.md
@@ -290,10 +290,10 @@ Arquivos com citante vivo (24; tmp/gates/verdes.json foi desconsiderado por ser 
 - RELATORIO-EXPERIMENTO-AUTORIA-GEOMETRICA.md: docs/modelar/contratos/INVENTARIO.md
 - RELATORIO-EXPORTACAO-CAD-STEP-R00.md: docs/modelar/INDEX.md
 - RELATORIO-MODELADOR-INVERSO-P0.md: docs/modelar/planos/congelados/2026-08-25-modelador-inverso-priors-familia-p0.md
-- RELATORIO-N6-CANARIO-CASCO-VISUAL.md: docs/modelar/contratos/LEITURA-POR-TAREFA.md
+- RELATORIO-N6-CANARIO-CASCO-VISUAL.md: docs/modelar/guias/LEITURA-POR-TAREFA.md
 - RELATORIO-PONTE-THREE.md: docs/modelar/contratos/INVENTARIO.md
 - REVISAO-DE-RUMO-2026-10.md: tools/mapa/links.mjs
-- VEICULOS-PRIMEIRA-LEVA-2026-10.md: docs/modelar/contratos/modelar-veiculos.md
+- VEICULOS-PRIMEIRA-LEVA-2026-10.md: docs/modelar/guias/modelar-veiculos.md
 - esboco-2d.md: src/autoria/refinamento-global.js, modulos/esboco-nucleo/README.md, README.md, tools/mapa/links.mjs, docs/modelar/banco-de-provas/aviao-2026-10-11/CLASSIFICACAO.md, docs/modelar/banco-de-provas/esboco-pelo-nucleo-2026-11-05/gravar-o-que-o-modulo-resolvia.mjs, docs/modelar/contratos/CONTRATO-FORMA-GLOBAL-N2.md
 
 Referências ao diretório inteiro, fora de qualquer arquivo: tools/mapa/estrutura-docs.mjs (allowlist com REGISTRO-FALHAS), tools/mapa/links.mjs (allowlist com ciclo6/criticas.json, esboco-2d, REVISAO-DE-RUMO) e docs/modelar/roteiros/roteiros.json (id `historico`). Citam também por caminho, em comentário de código: procedural/nucleo/operacoes/atributos.js, procedural/nucleo/nucleo.js, procedural/nucleo/operacoes/transformacoes.js, tools/oficina/oficina.test.ts, src/autoria/refinamento-global.js.

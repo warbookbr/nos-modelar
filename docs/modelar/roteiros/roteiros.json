@@ -136,7 +136,7 @@
           "quando": "a mudança é geral e pode voltar ao NÓS, e então fica isolada e registrada nele"
         },
         {
-          "arquivo": "docs/modelar/contratos/LEITURA-POR-TAREFA.md",
+          "arquivo": "docs/modelar/guias/LEITURA-POR-TAREFA.md",
           "quando": "a pergunta é por assunto e nenhum roteiro a responde"
         }
       ],
@@ -209,7 +209,7 @@
           "quando": "o documento vai para o histórico"
         },
         {
-          "arquivo": "docs/modelar/contratos/LEITURA-POR-TAREFA.md",
+          "arquivo": "docs/modelar/guias/LEITURA-POR-TAREFA.md",
           "quando": "a pergunta é por assunto e nenhum roteiro a responde"
         }
       ],
@@ -365,11 +365,11 @@
           "quando": "há foto de referência e não há prancha, para medir a borda em milímetro"
         },
         {
-          "arquivo": "docs/modelar/contratos/modelar-carroceria.md",
+          "arquivo": "docs/modelar/guias/modelar-carroceria.md",
           "quando": "a peça é uma chapa contínua de superfície lisa, com dobras vivas, raio de borda, arcos e vãos, modelada por subdivisão"
         },
         {
-          "arquivo": "docs/modelar/contratos/modelar-veiculo-em-chassi-e-lataria.md",
+          "arquivo": "docs/modelar/guias/modelar-veiculo-em-chassi-e-lataria.md",
           "quando": "o objeto é um veículo com chassi por baixo e lataria em painéis separados por vãos"
         },
         {
@@ -485,11 +485,11 @@
           "quando": "há foto de referência e não há prancha, para medir a borda em milímetro"
         },
         {
-          "arquivo": "docs/modelar/contratos/modelar-carroceria.md",
+          "arquivo": "docs/modelar/guias/modelar-carroceria.md",
           "quando": "a peça é uma chapa contínua de superfície lisa, com dobras vivas, raio de borda, arcos e vãos, modelada por subdivisão"
         },
         {
-          "arquivo": "docs/modelar/contratos/modelar-veiculo-em-chassi-e-lataria.md",
+          "arquivo": "docs/modelar/guias/modelar-veiculo-em-chassi-e-lataria.md",
           "quando": "o objeto é um veículo com chassi por baixo e lataria em painéis separados por vãos"
         },
         {
@@ -605,11 +605,11 @@
           "quando": "há foto de referência e não há prancha, para medir a borda em milímetro"
         },
         {
-          "arquivo": "docs/modelar/contratos/modelar-carroceria.md",
+          "arquivo": "docs/modelar/guias/modelar-carroceria.md",
           "quando": "a peça é uma chapa contínua de superfície lisa, com dobras vivas, raio de borda, arcos e vãos, modelada por subdivisão"
         },
         {
-          "arquivo": "docs/modelar/contratos/modelar-veiculo-em-chassi-e-lataria.md",
+          "arquivo": "docs/modelar/guias/modelar-veiculo-em-chassi-e-lataria.md",
           "quando": "o objeto é um veículo com chassi por baixo e lataria em painéis separados por vãos"
         },
         {

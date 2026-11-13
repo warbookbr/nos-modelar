@@ -24,3 +24,4 @@ O que existe no projeto além do código que constrói formas, o que cada coisa 
 | Servidor de ferramentas | A porta por onde a IA chama as ferramentas sem digitar comando | Em sessão com MCP | `tools/mcp/` |
 | Banco de provas | As medidas, imagens e atritos de cada objeto modelado | Ao pesquisar o que já se tentou | `docs/modelar/banco-de-provas/` |
 | Mapa e índices | As listas geradas de tudo que existe | Para achar um arquivo | [`MAPA.md`](../MAPA.md), [`INDEX.md`](INDEX.md) |
+| Documentos por finalidade | Fazer em `usar/` e `guias/`, consultar em `contratos/`, entender em `decisoes/` e `pesquisas/` | Ao procurar um documento | `docs/modelar/` |

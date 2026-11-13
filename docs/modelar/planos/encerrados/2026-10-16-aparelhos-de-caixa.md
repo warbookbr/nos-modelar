@@ -31,7 +31,7 @@ de cada etapa medido e um processo leve de modelagem escrito para objeto simples
 - **`movel-de-caixa`:** REFATORAR ou ENVOLVER, decidido na fatia 1. Se a frente de aparelho (visor, botões, painel de comando, puxador
   de barra) couber como opção declarada dele sem torná-lo confuso, ele ganha a opção; senão a família nova reaproveita a geometria dele
   e declara só o que é de aparelho. A correção geral vai para a ferramenta, e o que é só de aparelho entra como opção declarada.
-- **Contrato da família e `familias:check`:** USAR DIRETO, como estão ([contrato](../../CONTRATO-DA-FAMILIA.md)).
+- **Contrato da família e `familias:check`:** USAR DIRETO, como estão ([contrato](../../contratos/CONTRATO-DA-FAMILIA.md)).
 - **Laço de modelagem completo:** ADIAR para objeto complexo. O processo leve usa um modelador, a família e uma ou duas rodadas do
   crítico visual sobre os perfis, sem esboço unidade por unidade, e para na terceira rodada como o laço completo.
 - **Referência:** USAR DIRETO o que existe para imagem de referência (contorno, prancha) só se a pessoa trouxer foto; sem foto, as

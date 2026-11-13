@@ -37,7 +37,7 @@ há mais comandos `oficina`, `servir`, `guardar:salvar`, `jogar`, `criar`, `exec
 
 ## Contratos
 
-- [`docs/modelar/contratos/FLUXO-MODELAGEM-IA.md`](./modelar/contratos/FLUXO-MODELAGEM-IA.md):
+- [`docs/modelar/guias/FLUXO-MODELAGEM-IA.md`](./modelar/guias/FLUXO-MODELAGEM-IA.md):
   contrato v4 de autoria e revisão.
 - [`docs/nos-herdado/oficina-contrato.md`](./nos-herdado/oficina-contrato.md): vocabulário procedural
   herdado do NÓS.

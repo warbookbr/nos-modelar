@@ -289,7 +289,7 @@ exata dessas ferramentas ainda não estão decididos.
 
 ## Relação com os demais documentos
 
-- [`ARQUITETURA.md`](ARQUITETURA.md) descreve as fronteiras técnicas atuais.
+- [`ARQUITETURA.md`](../contratos/ARQUITETURA.md) descreve as fronteiras técnicas atuais.
 - [`MONTAGENS-SEMANTICAS.md`](../usar/MONTAGENS-SEMANTICAS.md) registra o estado atual e
   os níveis de maturidade das montagens.
 - [`BANCADA-E-APRESENTACAO.md`](BANCADA-E-APRESENTACAO.md) define a superfície

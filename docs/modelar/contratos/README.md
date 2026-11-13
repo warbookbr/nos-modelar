@@ -6,7 +6,7 @@ detalhe e não para quem vai executar uma tarefa do começo ao fim.
 
 Não moram aqui:
 
-- guias de como fazer uma tarefa, que ficam em `../usar/`;
+- guias de como fazer uma tarefa, que ficam em `../usar/` e em `../guias/`;
 - visão, critério e o porquê de uma escolha, que ficam em `../decisoes/`;
 - pesquisa, análise e levantamento com data, que ficam em `../pesquisas/`;
 - plano, que fica em `../planos/`.

@@ -5,7 +5,7 @@ modelagem compatível com o resultado pedido. O perfil muda prioridades,
 iterações e critérios de revisão; ele **não** cria outro núcleo de autoria nem
 torna Three.js ou o domínio automotivo dependências da Oficina.
 
-O contrato geral continua em [`AUTORIA-IA.md`](AUTORIA-IA.md). Este documento
+O contrato geral continua em [`AUTORIA-IA.md`](../guias/AUTORIA-IA.md). Este documento
 especializa o método visual.
 
 ## Por que um único nível de realismo não basta

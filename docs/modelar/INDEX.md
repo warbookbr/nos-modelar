@@ -81,13 +81,18 @@ o núcleo nem define o modelo de autoria.
 | `tools/bancadas/` | porteiro e harness de render das fixtures |
 | `tools/modelar/` | gates da bancada, revisão e contratos |
 | `tools/mcp/` | adaptador MCP sobre serviços existentes; hoje principalmente leitura |
+| `docs/modelar/usar/` | [guias de uso](usar/README.md) que as skills aplicam |
+| `docs/modelar/guias/` | [guias de tarefa](guias/README.md) que ainda citam plano ou desenvolvimento |
+| `docs/modelar/contratos/` | [formatos e regras](contratos/README.md) para consulta |
+| `docs/modelar/decisoes/` | [visão e o porquê](decisoes/README.md) das escolhas |
+| `docs/modelar/pesquisas/` | [análises e pesquisas](pesquisas/README.md) com data |
 | `docs/modelar/planos/` | contrato de planos, programas e backlog aberto |
 | `docs/modelar/historico/` | evidências encerradas, sem autoridade nova |
 | `docs/modelar/blender/` | [Blender](blender/README.md) externo e opcional, com fluxo de modelagem |
 
 Montagem persistida v1 tem contrato e resolvedor em `src/autoria/` e provas em
 `tools/modelar/fixtures/montagens-persistidas/`; o mapa global de dependências
-tem contrato em `MAPA-CANONICO-DEPENDENCIAS.md` e serviços em `src/autoria/`. Não
+tem contrato em `contratos/MAPA-CANONICO-DEPENDENCIAS.md` e serviços em `src/autoria/`. Não
 invente uma localização por implicação.
 
 Qual documento manda em cada assunto está na lista de fontes de verdade, em
@@ -96,9 +101,9 @@ fontes é inventário, não porta de entrada.
 
 ## Leitura por tarefa
 
-A leitura por assunto saiu desta página para [`LEITURA-POR-TAREFA.md`](contratos/LEITURA-POR-TAREFA.md). Cada roteiro de [`roteiros/ROTEIROS.md`](roteiros/ROTEIROS.md) já diz o que ler antes de começar; a página nova serve quando nenhum deles cobre a pergunta.
+A leitura por assunto saiu desta página para [`LEITURA-POR-TAREFA.md`](guias/LEITURA-POR-TAREFA.md). Cada roteiro de [`roteiros/ROTEIROS.md`](roteiros/ROTEIROS.md) já diz o que ler antes de começar; a página nova serve quando nenhum deles cobre a pergunta.
 
-Carroceria: [`modelar-veiculos.md`](contratos/modelar-veiculos.md), [`modelar-carroceria.md`](contratos/modelar-carroceria.md) e, para chassi com lataria em painéis, [`modelar-veiculo-em-chassi-e-lataria.md`](contratos/modelar-veiculo-em-chassi-e-lataria.md).
+Carroceria: [`modelar-veiculos.md`](guias/modelar-veiculos.md), [`modelar-carroceria.md`](guias/modelar-carroceria.md) e, para chassi com lataria em painéis, [`modelar-veiculo-em-chassi-e-lataria.md`](guias/modelar-veiculo-em-chassi-e-lataria.md).
 
 ## Comandos principais
 

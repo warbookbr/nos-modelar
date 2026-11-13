@@ -223,7 +223,7 @@ valendo, enquanto a fatia 8 não calibra o crítico; e a pessoa assina a prancha
 dos três pontos.
 
 O contrato, o validador e a chamada (tarefas 1 e 2) estão descritos em [contrato da
-família](../CONTRATO-DA-FAMILIA.md). As tarefas, cada uma com a sua prova: (1) contrato e validador; (2) o `chamar`
+família](../contratos/CONTRATO-DA-FAMILIA.md). As tarefas, cada uma com a sua prova: (1) contrato e validador; (2) o `chamar`
 com faixa, restrição, `derivar` e registro explícito; (3) a varredura e o
 `descrever` enxergando o registro de composições; (4) a aprovação mecânica e o
 `familias:check`; (5) a conferência com o esboço pelo `REFINA`; (6) roda e pneu
@@ -233,7 +233,7 @@ o roupeiro, depois de conferir que a montagem v5 aceita parâmetro por instânci
 (11) o fechamento do item 7 do gate.
 
 As tarefas 1 a 5 entraram em 2026-10-11, com o contrato em
-[`CONTRATO-DA-FAMILIA.md`](../CONTRATO-DA-FAMILIA.md) e o gate `familias:check`; a
+[`CONTRATO-DA-FAMILIA.md`](../contratos/CONTRATO-DA-FAMILIA.md) e o gate `familias:check`; a
 aprovação mecânica limita a parede da casca a 1,5 vez a espessura pedida e deixa
 o curso da articulação para as famílias que geram montagem.
 
@@ -258,14 +258,14 @@ O roupeiro (tarefa 10) entrou em 2026-10-11 e a pessoa o aprovou no mesmo dia. A
 2.0 aos móveis de caixa da lista (guarda-roupa, armário de cozinha, cômoda, criado-mudo, estante com portas e gaveteiro): a família
 passou a se chamar `movel-de-caixa`, com o roupeiro como o perfil `roupeiro`, e ganhou gavetas com trilho e articulação prismática,
 portas sobrepostas e de correr, pés, vão aberto e nove perfis prontos. A aprovação ganhou os perfis e a conferência das aberturas
-simultâneas; o contrato está em [`CONTRATO-DA-FAMILIA.md`](../CONTRATO-DA-FAMILIA.md#o-móvel-de-caixa), e o crítico e a pessoa precisam
+simultâneas; o contrato está em [`CONTRATO-DA-FAMILIA.md`](../contratos/CONTRATO-DA-FAMILIA.md#o-móvel-de-caixa), e o crítico e a pessoa precisam
 julgar a geometria nova.
 
 A `roda-pneu` ganhou a versão 2 (2026-10-11): de 50 a 2000 mm de diâmetro, com as medidas em proporção do diâmetro, quatro bandas
 (pneumática, maciça, sem pneu com friso e com relevo), a raiada de duas flanges e sete perfis prontos (carro, bicicleta, carrinho de
 mão, rodízio, trator, trem e carroça). O contrato da família ganhou o campo `perfis`, a chamada `{ perfil }`, a unidade `razao` e o
 produto de dois parâmetros no mapa do esboço, e a aprovação mecânica passou a medir cada perfil e a varrer a escala dele. O crítico e
-a pessoa precisam julgar de novo, e a descrição está em [CONTRATO-DA-FAMILIA.md](../CONTRATO-DA-FAMILIA.md#a-família-roda-pneu).
+a pessoa precisam julgar de novo, e a descrição está em [CONTRATO-DA-FAMILIA.md](../contratos/CONTRATO-DA-FAMILIA.md#a-família-roda-pneu).
 
 ## Pendências da camada de features
 

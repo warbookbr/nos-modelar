@@ -533,7 +533,7 @@ ponto ao longo do eixo. O ponto se chama `estacao_coluna`, e o ajudante devolve
 e `passo`, que se espalha no passo. Em `PARAMS` os pontos ficariam fixos desde a
 carga do módulo, e mudar a `TABELA` não moveria a gaiola; o exemplo completo é
 `procedural/pecas/carenagem-de-prova/`, e o fluxo está em
-`docs/modelar/contratos/modelar-carroceria.md`:
+`docs/modelar/guias/modelar-carroceria.md`:
 
 ```js
 const coluna = (nome, u, v) => ({ nome, em: [u, v] });
@@ -691,7 +691,7 @@ entre as arestas da grade (`relevoEmGradeLarga`, com a razão medida) a faixa de
 2 mm. `lente: { folga, sobra, espessura }` (só com recuo e relevo negativo na volta 1) devolve em `aneis[nome].lente` a chapa
 do rebaixo, a caixa da abertura mais `sobra` mm de cada lado, `folga` mm atrás do plano da abertura (`pontos` em metro,
 `passo` com a grade de 3 por 3 e as pontas vivas, `espessuraMm`); a receita da lente e a regra do espaçamento estão no guia
-`docs/modelar/contratos/modelar-carroceria.md`, na seção do rebaixo por relevo. Os pontos se chamam `<anel>_a<volta>_<ponto da borda do vão>`, com
+`docs/modelar/guias/modelar-carroceria.md`, na seção do rebaixo por relevo. Os pontos se chamam `<anel>_a<volta>_<ponto da borda do vão>`, com
 `_arco<j>` nos pontos do arco de cada canto, e a gaiola devolve `aneis[nome]` com os
 nomes de cada volta. Vincos, cantos e medidas os citam por nome:
 
@@ -880,7 +880,7 @@ gaiola sai acusada mesmo com a superfície sobre a forma; alargue a feição ou
 adense as colunas ao redor dela. A zebra serve ao reflexo
 (a continuidade entre painéis), e não ao defeito; para o amassado largo e raso use
 a luz rasante e a curvatura da lataria (`tools/blender/luz-rasante.py` e
-`curvatura-da-lataria.py`, em `docs/modelar/contratos/modelar-carroceria.md`). A peça com
+`curvatura-da-lataria.py`, em `docs/modelar/guias/modelar-carroceria.md`). A peça com
 passo `subdivisao` é de lataria, e o pacote do crítico dela leva as duas vistas
 (`npm run vistas:critica` com `MODELAR_BLENDER`); a peça de subdivisão que não é
 chapa declara `PLANO.lataria: { dispensa: '<motivo>' }`, que o `descrever` mostra
@@ -1098,7 +1098,7 @@ largura do perfil); `[inicio, fim]` escolhe cada ponta, e a volta não tem ponta
 Sem `superficie`, a linha é uma polilinha de pontos nomeados de `PARAMS` ou
 `[x,y,z]`, com `normal` declarada. O perfil de um detalhe de borda que um pacote
 cego mostra em corte se lê em milímetro, nesta convenção, com `ler-perfil`
-(`docs/modelar/contratos/modelar-carroceria.md`), em vez de se desenhar à mão.
+(`docs/modelar/guias/modelar-carroceria.md`), em vez de se desenhar à mão.
 
 O friso é um sólido próprio que entra na chapa, e não uma fusão: a booleana sobre
 a superfície subdividida ficou de fora do plano que criou a operação, e o friso
@@ -1582,7 +1582,7 @@ está no catálogo gerado (`descrever_capacidade`).
 
 `inflate` continua blocky; o `filete` tem os limites declarados no catálogo;
 JS puro não tem replay canônico. Superfície lisa de chapa é a `subdivisao`, com a
-técnica de `docs/modelar/contratos/modelar-carroceria.md`. Não declare uma forma coberta sem evidência visual e estrutural.
+técnica de `docs/modelar/guias/modelar-carroceria.md`. Não declare uma forma coberta sem evidência visual e estrutural.
 
 ## Histórico
 

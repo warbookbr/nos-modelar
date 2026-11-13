@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2067 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2068 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -84,7 +84,6 @@
 
 ## docs/modelar/
 
-- `CONTRATO-DA-FAMILIA.md` — Contrato da família
 - `INDEX.md` — Modelar — entrada atual
 - `MECANISMOS.md` — Mecanismos do Modelar: a visão em uma tela
 
@@ -463,30 +462,24 @@
 
 - `ARQUITETURA-SESSAO-E-SEGURANCA.md` — Arquitetura de Sessão Ativa, Hospedagem Estática e Segurança Corporativa
 - `ARQUITETURA.md` — Arquitetura atual
-- `AUTORIA-IA.md` — Autoria assistida por IA
-- `BANCADA-E-APRESENTACAO.md` — Bancada e apresentação
 - `COMPOSICAO-PROCEDURAL-V1.md` — Composição procedural v1
 - `CONTEXTO-MONTAGEM-IA.md` — Contexto de montagem para IA
 - `CONTEXTO-VISUAL-REVALIDACAO.md` — Contexto visual, revalidação e catálogo de montagem
 - `CONTRATO-ACEITE-VISUAL.md` — Contrato de aceite visual
+- `CONTRATO-DA-FAMILIA.md` — Contrato da família
 - `CONTRATO-FORMA-GLOBAL-N2.md` — Contrato de forma global N2
 - `COORDENACAO-REPOS.md` — Coordenação entre os repositórios Modelar
 - `ESCRITA-TRANSACIONAL-MONTAGEM.md` — Escrita transacional de montagem
 - `EXTENSOES-NATIVAS-V1.md` — Extensões nativas v1
 - `FILETE-V2.md` — Filete v2 — Escopos A e B implementados
-- `FLUXO-MODELAGEM-IA.md` — Fluxo de modelagem assistida por IA v4
 - `INVENTARIO.md` — Inventário e fontes de verdade
 - `LACUNAS-DE-CAPACIDADE-V1.md` — Lacunas de capacidade v1
-- `LEITURA-POR-TAREFA.md` — Leitura por tarefa
 - `MAPA-CANONICO-DEPENDENCIAS.md` — Mapa canônico de dependências
 - `MATRIZ-TESTES-ACOPLADOS.md` — Matriz de testes acoplados ao acervo
 - `MONTAGEM-PERSISTIDA.md` — Montagem persistida
 - `PERFIS-DE-AUTORIA.md` — Perfis de autoria
 - `README.md` — Contratos
 - `SERVICOS-PROCEDURAL-V1.md` — Serviços procedurais v1
-- `modelar-carroceria.md` — Modelar carroceria de chapa contínua
-- `modelar-veiculo-em-chassi-e-lataria.md` — Modelar um veículo em chassi e lataria
-- `modelar-veiculos.md` — Modelar veículos a partir de uma fonte de referência
 
 ## docs/modelar/decisoes/
 
@@ -501,6 +494,17 @@
 
 - `CATALOGO-CAPACIDADES.md` — Catálogo de capacidades procedural
 - `INDEX.md` — Artefatos gerados do catálogo procedural
+
+## docs/modelar/guias/
+
+- `AUTORIA-IA.md` — Autoria assistida por IA
+- `BANCADA-E-APRESENTACAO.md` — Bancada e apresentação
+- `FLUXO-MODELAGEM-IA.md` — Fluxo de modelagem assistida por IA v4
+- `LEITURA-POR-TAREFA.md` — Leitura por tarefa
+- `README.md` — Guias
+- `modelar-carroceria.md` — Modelar carroceria de chapa contínua
+- `modelar-veiculo-em-chassi-e-lataria.md` — Modelar um veículo em chassi e lataria
+- `modelar-veiculos.md` — Modelar veículos a partir de uma fonte de referência
 
 ## docs/modelar/historico/
 

@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/pecas/furgao-realista/`, `procedural/familias/roda-pneu/`, `docs/modelar/banco-de-provas/furgao-realista-2026-10-30/`, `tools/modelar/familia-com-esboco.andaimes.json`, `docs/modelar/CONTRATO-DA-FAMILIA.md`, `src/autoria/corte-de-plano.js`
+**Território:** `procedural/pecas/furgao-realista/`, `procedural/familias/roda-pneu/`, `docs/modelar/banco-de-provas/furgao-realista-2026-10-30/`, `tools/modelar/familia-com-esboco.andaimes.json`, `docs/modelar/contratos/CONTRATO-DA-FAMILIA.md`, `src/autoria/corte-de-plano.js`
 
 Em 2026-11-09 `src/autoria/plano-de-modelagem.js` e `tools/modelar/olhar-bancada.mjs`, com os testes deles, passaram ao plano das [ferramentas de conferência e de vista](encerrados/2026-11-09-ferramentas-de-conferencia-e-vista.md), que os muda para todas as peças.
 

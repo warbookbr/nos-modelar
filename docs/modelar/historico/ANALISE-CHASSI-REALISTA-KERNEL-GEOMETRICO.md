@@ -62,7 +62,7 @@ validação de fabricação e exportação CAD. Essa exclusão não é provisór
 
 - [`../INDEX.md`](../INDEX.md): estado atual e gates.
 - [`../ARQUITETURA.md`](../contratos/ARQUITETURA.md): núcleo neutro, peças e montagens.
-- [`../AUTORIA-IA.md`](../contratos/AUTORIA-IA.md): autoria por IA e validação em camadas.
+- [`../AUTORIA-IA.md`](../guias/AUTORIA-IA.md): autoria por IA e validação em camadas.
 - [`../AGENT-FIRST.md`](../decisoes/AGENT-FIRST.md): intenção, contexto, determinismo,
   diagnóstico, composição e identidade.
 - [`../PERFIS-DE-AUTORIA.md`](../contratos/PERFIS-DE-AUTORIA.md): distinção entre F2, F3 e

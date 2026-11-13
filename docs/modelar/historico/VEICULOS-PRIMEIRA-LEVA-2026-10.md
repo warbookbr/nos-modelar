@@ -1,6 +1,6 @@
 # Veículos de referência livre: o diagnóstico da primeira leva
 
-Evidência encerrada do plano [veículos de referência livre](../planos/encerrados/2026-10-20-veiculos-de-referencia-livre.md), de 2026-10-20, tirada de [`modelar-veiculos.md`](../contratos/modelar-veiculos.md) em 2026-10-25: o diagnóstico das nove peças da primeira leva, a decisão por peça, as lacunas do núcleo e das ferramentas naquele dia, o experimento da perua pelas três vistas e o que virou gate. As seções citadas no texto são as do documento original, em que a 4 eram as instruções e a 5 os grupos, hoje as seções 1 e 2 de `modelar-veiculos.md`. Não governa trabalho novo; as lacunas que ficaram abertas estão no plano de ajustes no núcleo dos veículos.
+Evidência encerrada do plano [veículos de referência livre](../planos/encerrados/2026-10-20-veiculos-de-referencia-livre.md), de 2026-10-20, tirada de [`modelar-veiculos.md`](../guias/modelar-veiculos.md) em 2026-10-25: o diagnóstico das nove peças da primeira leva, a decisão por peça, as lacunas do núcleo e das ferramentas naquele dia, o experimento da perua pelas três vistas e o que virou gate. As seções citadas no texto são as do documento original, em que a 4 eram as instruções e a 5 os grupos, hoje as seções 1 e 2 de `modelar-veiculos.md`. Não governa trabalho novo; as lacunas que ficaram abertas estão no plano de ajustes no núcleo dos veículos.
 
 ## Diagnóstico da primeira leva
 
