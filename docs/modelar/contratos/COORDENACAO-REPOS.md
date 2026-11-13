@@ -82,7 +82,7 @@ identidade de quem a registrou.
 4. O Ciclo 6 importado foi comparado com `arredondarAresta`: a F1/A-30 foi aceita;
    o restante foi cancelado porque daria a `filete` um segundo significado. Os
    candidatos válidos foram separados no
-   [`BACKLOG.md`](planos/BACKLOG.md), sem plano ativo automático.
+   [`BACKLOG.md`](../planos/BACKLOG.md), sem plano ativo automático.
 
 Decisão consolidada não elimina coordenação operacional: antes de alterar
 `procedural/nucleo/oficina.js`, o registro de atritos ou o índice de planos em

@@ -35,7 +35,7 @@ encerrado vive em
   sessão; o estado é local e não versionado. Procedimento em
   [`ATIVACAO-BANCADA-SESSAO-ATIVA.md`](./usar/ATIVACAO-BANCADA-SESSAO-ATIVA.md);
   hospedagem estática e isolamento de rede em
-  [`ARQUITETURA-SESSAO-E-SEGURANCA.md`](ARQUITETURA-SESSAO-E-SEGURANCA.md).
+  [`ARQUITETURA-SESSAO-E-SEGURANCA.md`](contratos/ARQUITETURA-SESSAO-E-SEGURANCA.md).
 - Os invariantes e os roteiros de leitura por intenção são dados em
   [`roteiros/roteiros.json`](roteiros/roteiros.json). Dele saem as regras e a
   lista de roteiros do `CLAUDE.md` (entre marcadores) e a página
@@ -91,7 +91,7 @@ tem contrato em `MAPA-CANONICO-DEPENDENCIAS.md` e serviços em `src/autoria/`. N
 invente uma localização por implicação.
 
 Qual documento manda em cada assunto está na lista de fontes de verdade, em
-[`INVENTARIO.md`](INVENTARIO.md) (`docs/modelar/INVENTARIO.md`): listar 21
+[`INVENTARIO.md`](contratos/INVENTARIO.md) (`docs/modelar/contratos/INVENTARIO.md`): listar 21
 fontes é inventário, não porta de entrada.
 
 ## Leitura por tarefa
@@ -179,5 +179,5 @@ planos fechados em [`planos/encerrados/README.md`](planos/encerrados/README.md) 
 as decisões do NÓS em `docs/nos-herdado/`. Nenhuma delas autoriza trabalho novo.
 
 A lista comentada de documentos e as fontes de verdade estão em
-[`INVENTARIO.md`](INVENTARIO.md); o inventário mecânico é gerado em
+[`INVENTARIO.md`](contratos/INVENTARIO.md); o inventário mecânico é gerado em
 [`../MAPA.md`](../MAPA.md), nunca à mão.

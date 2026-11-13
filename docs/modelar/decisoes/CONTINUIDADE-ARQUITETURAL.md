@@ -13,7 +13,7 @@ A tese central é:
 
 Este arquivo registra como interpretar decisões, trade-offs, evidências e
 heurísticas. Ele não substitui [`VISAO.md`](VISAO.md),
-[`ARQUITETURA.md`](../ARQUITETURA.md), [`AGENT-FIRST.md`](AGENT-FIRST.md), planos,
+[`ARQUITETURA.md`](../contratos/ARQUITETURA.md), [`AGENT-FIRST.md`](AGENT-FIRST.md), planos,
 issues ou o estado executável do repositório.
 
 Deliberadamente, este documento **não registra rodada atual, branch ativa,

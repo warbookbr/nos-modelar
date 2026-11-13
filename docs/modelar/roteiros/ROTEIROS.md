@@ -55,7 +55,7 @@ Ler antes de começar, num orçamento de 29.700 bytes (linha de base de 59.061 b
 Abrir só quando a condição aparecer:
 
 - `comunicacao.md`, quando o trabalho é dividido com a outra IA, e então passa por ele, com uma tarefa por seção.
-- `docs/modelar/ARQUITETURA.md`, quando a mudança atravessa camadas.
+- `docs/modelar/contratos/ARQUITETURA.md`, quando a mudança atravessa camadas.
 - `docs/modelar/decisoes/UPSTREAM-NOS.md`, quando a mudança é geral e pode voltar ao NÓS, e então fica isolada e registrada nele.
 - `docs/modelar/LEITURA-POR-TAREFA.md`, quando a pergunta é por assunto e nenhum roteiro a responde.
 
@@ -76,7 +76,7 @@ Ler antes de começar, num orçamento de 6.000 bytes (linha de base de 17.443 by
 
 Abrir só quando a condição aparecer:
 
-- `docs/modelar/ARQUITETURA.md`, quando a correção atravessa camadas.
+- `docs/modelar/contratos/ARQUITETURA.md`, quando a correção atravessa camadas.
 - `docs/modelar/planos/README.md`, quando a correção vira plano.
 
 Comandos: `npm run test -- <arquivo de teste>`, `npm run gates -- --completo`.

@@ -64,7 +64,7 @@ export const NOMES_REMOVIDOS = [
 const DIZ_QUE_SAIU = /\bsa(?:iu|íram|iram|em)\b|removid|retirad|apagad|deixou de existir|deixaram de existir|não existe/i;
 /* Os documentos vivos que a árvore entrega ou que coordenam o trabalho, além das portas e das pastas acima. */
 const VIVOS = ['docs/modelar/INDEX.md', 'docs/modelar/planos/README.md', 'docs/modelar/decisoes/UPSTREAM-NOS.md',
-  'docs/modelar/ARQUITETURA.md', 'docs/modelar/modelar-veiculos.md', 'docs/modelar/modelar-carroceria.md'];
+  'docs/modelar/contratos/ARQUITETURA.md', 'docs/modelar/modelar-veiculos.md', 'docs/modelar/modelar-carroceria.md'];
 const PASTAS_VIVAS = ['.claude/agents'];
 
 export function nomesRemovidosCitados(texto, nomes = NOMES_REMOVIDOS) {

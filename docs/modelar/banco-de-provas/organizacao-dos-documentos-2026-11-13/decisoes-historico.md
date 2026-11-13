@@ -33,7 +33,7 @@ Do que trata: registro de como 18 documentos soltos de docs/modelar/ vieram para
 - [C] nenhuma. Porquê: é a crônica de uma mudança de pasta já feita; a pasta inteira sai.
 
 ## CONJUNTO-PROVA-AUTORIA-GEOMETRICA.md
-Do que trata: conjunto de três peças (suporte de eixo, eixo-guia, anel-tampa) que provou autoria do zero com relações de montagem. Citado por (vivos): docs/modelar/INVENTARIO.md.
+Do que trata: conjunto de três peças (suporte de eixo, eixo-guia, anel-tampa) que provou autoria do zero com relações de montagem. Citado por (vivos): docs/modelar/contratos/INVENTARIO.md.
 - [C] conjunto de prova definido e já executado. Porquê: o resultado está no relatório do experimento e o fluxo virou autoria declarativa.
 
 ## CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md
@@ -65,7 +65,7 @@ Do que trata: arquitetura vinculante do plano mestre de 2026-08-23 (ativos a pre
 - [C] arquitetura de plano encerrado. Porquê: as garantias (determinismo, falha fechada, diagnóstico com causa) estão nos contratos vivos.
 
 ## EXPERIMENTO-AB-FLUXO-IA.md
-Do que trata: experimento cego de duas condições (com e sem pacote de modelagem assistida) sobre uma dobradiça: empate em 14/16. Citado por (vivos): docs/modelar/INVENTARIO.md.
+Do que trata: experimento cego de duas condições (com e sem pacote de modelagem assistida) sobre uma dobradiça: empate em 14/16. Citado por (vivos): docs/modelar/contratos/INVENTARIO.md.
 - [C] o fluxo assistido empatou; a causa dominante das falhas era a câmera, corrigida pela revisão visual econômica. Porquê: evidência de etapa vencida; a correção já está na ferramenta.
 
 ## EXPERIMENTO-CARRO-SEM-APOIO.md
@@ -73,7 +73,7 @@ Do que trata: carro feito por outra IA sem o núcleo (estações digitadas), rep
 - [B] código commitado que nenhuma régua executa apodrece em silêncio e não se guarda como acervo; a saída da IA sem apoio não é editável nem verificável. Porquê: gerador e receita estavam em versões diferentes e ninguém percebeu. Lugar: CLAUDE.md (conteúdo salvo reexecutável e validável; todo achado responde se o processo o pegaria) e gates de execução de peças
 
 ## EXPERIMENTO-RODA-REALISTA.md
-Do que trata: contrato do experimento da roda realista (restrições, perfil pedido, entregáveis); resultado em RELATO-RODA-REALISTA. Citado por (vivos): docs/modelar/PERFIS-DE-AUTORIA.md, docs/modelar/INVENTARIO.md.
+Do que trata: contrato do experimento da roda realista (restrições, perfil pedido, entregáveis); resultado em RELATO-RODA-REALISTA. Citado por (vivos): docs/modelar/contratos/PERFIS-DE-AUTORIA.md, docs/modelar/contratos/INVENTARIO.md.
 - [C] roda não integrada; variante isolada. Porquê: o fluxo que o experimento justificou está em PERFIS-DE-AUTORIA.md.
 
 ## FLUXO-AUTORIA-N1.md
@@ -109,7 +109,7 @@ Do que trata: matriz RT-01 a RT-xx que ligava objetivo, capacidade, teste e gate
 - [C] matriz de plano encerrado. Porquê: 'proposto' não se descreve como existente é regra geral já praticada nos contratos.
 
 ## OFICINA-OTIMIZACOES.md
-Do que trata: análise de dependências e backlog R1 a R9 (O-0 a O-14) da linguagem de autoria da Oficina, com a lista 'o que deliberadamente não fazer'. Citado por (vivos): procedural/nucleo/operacoes/atributos.js, procedural/nucleo/nucleo.js, tools/oficina/oficina.test.ts, docs/modelar/INVENTARIO.md.
+Do que trata: análise de dependências e backlog R1 a R9 (O-0 a O-14) da linguagem de autoria da Oficina, com a lista 'o que deliberadamente não fazer'. Citado por (vivos): procedural/nucleo/operacoes/atributos.js, procedural/nucleo/nucleo.js, tools/oficina/oficina.test.ts, docs/modelar/contratos/INVENTARIO.md.
 - [B] sem eval para expressão (lista branca), sem remover id cru de peça legada, sem mais primitivas antes de endereçamento, sem arranjo antes de origem universal. Porquê: artefato reproduzível não executa string arbitrária e repetir sem identidade gera face anônima em escala. Lugar: CLAUDE.md (conteúdo salvo determinístico), procedural/nucleo/expressoes.js (sem eval) e o gate de id cru; as rodadas R1 a R4 estão entregues. Os comentários de procedural/nucleo/operacoes/atributos.js (linha 63), procedural/nucleo/nucleo.js (2013) e tools/oficina/oficina.test.ts (3676) citam este arquivo pelo caminho e precisam ser reescritos
 
 ## PLANO-ESTADO-DA-ARTE-ESBOCO.md
@@ -117,15 +117,15 @@ Do que trata: plano de 2026-09-28 para de/para, âncoras, polígono e espelho no
 - [C] plano substituído, de módulo que saiu em 2026-11-05. Porquê: o esboço antigo já não existe.
 
 ## PLANO.md
-Do que trata: plano mestre da Mecanifica aposentado em 2026-08-02, que só remete ao commit 41f0c50 e ao encerramento. Citado por (vivos): docs/modelar/INVENTARIO.md, docs/oficina.md.
+Do que trata: plano mestre da Mecanifica aposentado em 2026-08-02, que só remete ao commit 41f0c50 e ao encerramento. Citado por (vivos): docs/modelar/contratos/INVENTARIO.md, docs/oficina.md.
 - [C] plano mestre encerrado (F1 do Ciclo 6 aceita, resto cancelado porque filete é chanfro e arredondamento é arredondarAresta). Porquê: o contrato de filete e arredondarAresta está em FILETE-V2.md e nas referências de operações; o commit 41f0c50 fica na crônica.
 
 ## PROTOCOLO-DIAGNOSTICO-MOTOR.md
-Do que trata: protocolo de método do diagnóstico do motor procedural (distinções capacidade implementada, contratada, provada). Citado por (vivos): docs/modelar/INVENTARIO.md.
+Do que trata: protocolo de método do diagnóstico do motor procedural (distinções capacidade implementada, contratada, provada). Citado por (vivos): docs/modelar/contratos/INVENTARIO.md.
 - [C] método de uma auditoria já feita. Porquê: a lição geral (teste verde não prova contrato não testado) está no contrato e nas skills de auditoria.
 
 ## README.md
-Do que trata: índice de historico/ (tabela do que cada arquivo prova) e remissão para CHEGADA-2026-09-11. Citado por (vivos): docs/nos-herdado/README.md, docs/modelar/roteiros/roteiros.json, docs/modelar/roteiros/ROTEIROS.md, docs/modelar/INDEX.md, docs/modelar/INVENTARIO.md, (e, por caminho de pasta, tools/mapa/estrutura-docs.mjs e tools/mapa/links.mjs).
+Do que trata: índice de historico/ (tabela do que cada arquivo prova) e remissão para CHEGADA-2026-09-11. Citado por (vivos): docs/nos-herdado/README.md, docs/modelar/roteiros/roteiros.json, docs/modelar/roteiros/ROTEIROS.md, docs/modelar/INDEX.md, docs/modelar/contratos/INVENTARIO.md, (e, por caminho de pasta, tools/mapa/estrutura-docs.mjs e tools/mapa/links.mjs).
 - [C] nenhuma. Porquê: índice da própria pasta que sai; a frase 'consultar para contexto, não autoriza' vai para o README de decisoes/.
 
 ## REGISTRO-FALHAS-AUTORIA-V.md
@@ -133,7 +133,7 @@ Do que trata: registro das 38 falhas medidas da autoria (V-01 a V-38), a maioria
 - [A] hipóteses de forma já reprovadas que não voltam como base: V-01 números de seções à mão (loft, envelopes, cage direta); V-02 loft como pele exterior; V-04 mais polígonos como estratégia; V-09 suavização pós-modelagem; V-17 e V-22 interseção de silhuetas binárias; V-28 três vistas não determinam a seção; V-30 trocar 80 coordenadas por 12 parâmetros chutados; V-36 esperar que a busca ache forma que o gerador não representa. Regras de processo: V-31 varrer o registro antes de abrir experimento e V-32 não contornar por redação a condição de encerramento escrita antes. Porquê: GOTCHAS-AUTORIA-VISUAL.md manda consultar este arquivo pelo roteiro `pesquisar` antes de abrir experimento de forma, e tools/mapa/estrutura-docs.mjs o tem na allowlist; sem ele a V-31 se repete. Procurei: V-28, '82%', 'prova-secoes-por-medida', 'pele exterior', 'cápsula', 'silhueta binária' em tools/, procedural/, src/, .claude/, docs/modelar/usar, docs/modelar/*.md (só aparecem a menção à V-31 em GOTCHAS-AUTORIA-VISUAL.md e o dossiê do modelador inverso); Rascunho do registro: Um registro por recusa, sem a tabela inteira: 'não se parte de seções à mão, de loft para pele exterior com aberturas, de densidade, de suavização posterior nem de silhueta binária; a seção transversal não sai de três vistas (82% das estações ficam escondidas e duas famílias de vistas idênticas diferem 28 mm no flanco; blueprint dá esqueleto, nunca seção); parâmetro com nome bonito chutado continua chute; busca não cria o que o gerador não representa'. Os ids V-xx e o commit do arquivo ficam no registro. Os abertos (V-03, V-14, V-16, V-19, V-23, V-37) entram como pendência no BACKLOG, não como decisão.
 
 ## RELATO-RODA-REALISTA.md
-Do que trata: relato do experimento da roda realista (rodadas de pneu, raios, arranja), concluído sem integração. Citado por (vivos): procedural/nucleo/operacoes/transformacoes.js, docs/modelar/PERFIS-DE-AUTORIA.md, docs/modelar/INVENTARIO.md.
+Do que trata: relato do experimento da roda realista (rodadas de pneu, raios, arranja), concluído sem integração. Citado por (vivos): procedural/nucleo/operacoes/transformacoes.js, docs/modelar/contratos/PERFIS-DE-AUTORIA.md, docs/modelar/contratos/INVENTARIO.md.
 - [C] a variante ficou isolada e a conclusão (faltam relações autorais de alto nível: repetição radial, orientação de seção, filetes) virou capacidades do núcleo. Porquê: evidência encerrada; o comentário de procedural/nucleo/operacoes/transformacoes.js que o cita precisa ser reescrito.
 
 ## RELATORIO-ANALISE-GRANDES-MELHORIAS.md
@@ -157,11 +157,11 @@ Do que trata: ensaio ponta a ponta da dobradiça 1.0 (três receitas, montagem v
 - [C] sonda aprovada e suas correções generalizadas já estão no código. Porquê: composições pelas portas oficiais e uso-operacao@1 existem; as medidas de bytes eram de então.
 
 ## RELATORIO-ESTUDO-CAMPO-CONJUNTO-DIANTEIRO.md
-Do que trata: estudo de campo de 2026-08-14 do conjunto dianteiro (seis peças, relação direcional disco-pinça). Citado por (vivos): docs/modelar/INVENTARIO.md.
+Do que trata: estudo de campo de 2026-08-14 do conjunto dianteiro (seis peças, relação direcional disco-pinça). Citado por (vivos): docs/modelar/contratos/INVENTARIO.md.
 - [C] gargalo (contexto de conjunto) tratado pelo mapa canônico e pela revalidação. Porquê: evidência de etapa entregue.
 
 ## RELATORIO-EXPERIMENTO-AUTORIA-GEOMETRICA.md
-Do que trata: relatório de 2026-08-14 do experimento de autoria do zero: aprovado após o recorte da receita declarativa. Citado por (vivos): docs/modelar/INVENTARIO.md.
+Do que trata: relatório de 2026-08-14 do experimento de autoria do zero: aprovado após o recorte da receita declarativa. Citado por (vivos): docs/modelar/contratos/INVENTARIO.md.
 - [B] a porta de autoria de montagem não aplica mudança de PARAMS/PASSOS; autoria de receita exige proposta de bytes, execução isolada, confirmação e revalidação, sem atalho no MCP de montagem. Porquê: publicar montagem já corrigida seria prova falsa de autoria. Lugar: docs/modelar/usar/AUTORIA-RECEITA-DECLARATIVA.md e tools/mcp/perfis/
 
 ## RELATORIO-EXPORTACAO-CAD-STEP-R00.md
@@ -221,7 +221,7 @@ Do que trata: encerramento R10 do plano de plataforma procedural extensível (32
 - [C] plano entregue. Porquê: registroOperacoes e composições estão no código.
 
 ## RELATORIO-PONTE-THREE.md
-Do que trata: prova da ponte Three.js (23 partes expostas, 317 testes, build aprovado). Citado por (vivos): docs/modelar/INVENTARIO.md.
+Do que trata: prova da ponte Three.js (23 partes expostas, 317 testes, build aprovado). Citado por (vivos): docs/modelar/contratos/INVENTARIO.md.
 - [C] ponte provada em 2026-08. Porquê: face.parte é a semântica que a ponte consome, hoje em src/autoria/adaptar-three.js.
 
 ## RELATORIO-R05-REVALIDACAO-CAMPO.md
@@ -253,7 +253,7 @@ Do que trata: diagnóstico da primeira leva de veículos de referência livre e 
 - [B] carroceria de largura constante perde a seção; a roda escondida e o perfil errado não são vistos pelo comparador de envelope; a folha comparativa na mesma escala é prova do roteiro `modelar/peca`; arco no perfil 2D e caixa de roda em vez de subtrair cilindros. Porquê: a perua reprovada tinha números melhores que o compacto aprovado. Lugar: docs/modelar/modelar-veiculos.md, .claude/skills/criar-peca/references/operacoes-procedurais.md e tools/modelar/folha-comparativa.mjs
 
 ## esboco-2d.md
-Do que trata: o esboço 2D antigo (modulos/esboco/, 117 arquivos), que saiu em 2026-11-05, o que ensinou e como recriar. Citado por (vivos): src/autoria/refinamento-global.js, modulos/esboco-nucleo/README.md, README.md, tools/mapa/links.mjs, docs/modelar/banco-de-provas/aviao-2026-10-11/CLASSIFICACAO.md, docs/modelar/banco-de-provas/esboco-pelo-nucleo-2026-11-05/gravar-o-que-o-modulo-resolvia.mjs, docs/modelar/CONTRATO-FORMA-GLOBAL-N2.md.
+Do que trata: o esboço 2D antigo (modulos/esboco/, 117 arquivos), que saiu em 2026-11-05, o que ensinou e como recriar. Citado por (vivos): src/autoria/refinamento-global.js, modulos/esboco-nucleo/README.md, README.md, tools/mapa/links.mjs, docs/modelar/banco-de-provas/aviao-2026-10-11/CLASSIFICACAO.md, docs/modelar/banco-de-provas/esboco-pelo-nucleo-2026-11-05/gravar-o-que-o-modulo-resolvia.mjs, docs/modelar/contratos/CONTRATO-FORMA-GLOBAL-N2.md.
 - [A] o esboço antigo só se recria se voltar a haver objeto sem forma de referência e sem peça da qual variar, e mesmo então as opções se escrevem pelo núcleo; o código está no commit f9bfad3a (com a migração e os scripts de gravação) e a fatia 3 do plano em 77f2fe1b. Porquê: a lição de fundo (a opção de forma sai das mesmas operações da peça) está em modulos/esboco-nucleo/README.md, mas o commit, a condição de recriar e a lista do que saiu sem substituto só moram aqui e no plano encerrado. Procurei: f9bfad3a, 77f2fe1b e 'sem substituto' em modulos/esboco-nucleo/README.md, README.md da raiz, docs/modelar/*.md e usar/ (só o plano encerrado do esboço pelo núcleo repete o hash); Rascunho do registro: Decisão de 2026-11-05: o esboço 2D (modulos/esboco) saiu; no lugar, esboço 2.0 em modulos/esboco-nucleo e variantes de receita. Última árvore com o módulo: commit f9bfad3a (`git checkout f9bfad3a -- modulos/esboco`); linha de comando em tools/modelar/esboco.mjs naquele commit. Saíram sem substituto: redesenho do conjunto de calibração do crítico, Envelope do Condutor, receita planejada, expansão de componentes para parâmetros novos e conferência contra .esboco.json qualquer. O desenho promete formas que a peça pode não dar (farol do furgão, 2026-11-05).
 
 ## Resumo
@@ -274,27 +274,27 @@ Arquivos com citante vivo (24; tmp/gates/verdes.json foi desconsiderado por ser 
 - ALVO-N6-CUPE-ESPORTIVO.md: docs/modelar/planos/congelados/2026-08-25-modelador-inverso-priors-familia-p0.md
 - BICICLETA-REALISTA-ATRITOS.md: docs/modelar/pesquisas/ATRITOS-AUTORIA.md
 - CHEGADA-2026-09-11.md: docs/modelar/roteiros/roteiros.json, docs/modelar/roteiros/ROTEIROS.md
-- CONJUNTO-PROVA-AUTORIA-GEOMETRICA.md: docs/modelar/INVENTARIO.md
+- CONJUNTO-PROVA-AUTORIA-GEOMETRICA.md: docs/modelar/contratos/INVENTARIO.md
 - CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md: modulos/pesquisa/bibliotecas/BIBLIOTECAS.md, modulos/pesquisa/README.md, docs/modelar/CONTRATO-DA-FAMILIA.md
 - DOSSIE-MODELADOR-POR-SELECAO.md: docs/modelar/LEITURA-POR-TAREFA.md
-- EXPERIMENTO-AB-FLUXO-IA.md: docs/modelar/INVENTARIO.md
-- EXPERIMENTO-RODA-REALISTA.md: docs/modelar/PERFIS-DE-AUTORIA.md, docs/modelar/INVENTARIO.md
+- EXPERIMENTO-AB-FLUXO-IA.md: docs/modelar/contratos/INVENTARIO.md
+- EXPERIMENTO-RODA-REALISTA.md: docs/modelar/contratos/PERFIS-DE-AUTORIA.md, docs/modelar/contratos/INVENTARIO.md
 - LEVANTAMENTO-DESENHO-SEM-REFERENCIA.md: docs/modelar/pesquisas/PESQUISA-ABERTA-2026-10.md, docs/modelar/planos/BACKLOG.md
-- OFICINA-OTIMIZACOES.md: procedural/nucleo/operacoes/atributos.js, procedural/nucleo/nucleo.js, tools/oficina/oficina.test.ts, docs/modelar/INVENTARIO.md
-- PLANO.md: docs/modelar/INVENTARIO.md, docs/oficina.md
-- PROTOCOLO-DIAGNOSTICO-MOTOR.md: docs/modelar/INVENTARIO.md
-- README.md: docs/nos-herdado/README.md, docs/modelar/roteiros/roteiros.json, docs/modelar/roteiros/ROTEIROS.md, docs/modelar/INDEX.md, docs/modelar/INVENTARIO.md, (e, por caminho de pasta, tools/mapa/estrutura-docs.mjs e tools/mapa/links.mjs)
+- OFICINA-OTIMIZACOES.md: procedural/nucleo/operacoes/atributos.js, procedural/nucleo/nucleo.js, tools/oficina/oficina.test.ts, docs/modelar/contratos/INVENTARIO.md
+- PLANO.md: docs/modelar/contratos/INVENTARIO.md, docs/oficina.md
+- PROTOCOLO-DIAGNOSTICO-MOTOR.md: docs/modelar/contratos/INVENTARIO.md
+- README.md: docs/nos-herdado/README.md, docs/modelar/roteiros/roteiros.json, docs/modelar/roteiros/ROTEIROS.md, docs/modelar/INDEX.md, docs/modelar/contratos/INVENTARIO.md, (e, por caminho de pasta, tools/mapa/estrutura-docs.mjs e tools/mapa/links.mjs)
 - REGISTRO-FALHAS-AUTORIA-V.md: tools/mapa/estrutura-docs.mjs, docs/modelar/usar/GOTCHAS-AUTORIA-VISUAL.md
-- RELATO-RODA-REALISTA.md: procedural/nucleo/operacoes/transformacoes.js, docs/modelar/PERFIS-DE-AUTORIA.md, docs/modelar/INVENTARIO.md
-- RELATORIO-ESTUDO-CAMPO-CONJUNTO-DIANTEIRO.md: docs/modelar/INVENTARIO.md
-- RELATORIO-EXPERIMENTO-AUTORIA-GEOMETRICA.md: docs/modelar/INVENTARIO.md
+- RELATO-RODA-REALISTA.md: procedural/nucleo/operacoes/transformacoes.js, docs/modelar/contratos/PERFIS-DE-AUTORIA.md, docs/modelar/contratos/INVENTARIO.md
+- RELATORIO-ESTUDO-CAMPO-CONJUNTO-DIANTEIRO.md: docs/modelar/contratos/INVENTARIO.md
+- RELATORIO-EXPERIMENTO-AUTORIA-GEOMETRICA.md: docs/modelar/contratos/INVENTARIO.md
 - RELATORIO-EXPORTACAO-CAD-STEP-R00.md: docs/modelar/INDEX.md
 - RELATORIO-MODELADOR-INVERSO-P0.md: docs/modelar/planos/congelados/2026-08-25-modelador-inverso-priors-familia-p0.md
 - RELATORIO-N6-CANARIO-CASCO-VISUAL.md: docs/modelar/LEITURA-POR-TAREFA.md
-- RELATORIO-PONTE-THREE.md: docs/modelar/INVENTARIO.md
+- RELATORIO-PONTE-THREE.md: docs/modelar/contratos/INVENTARIO.md
 - REVISAO-DE-RUMO-2026-10.md: tools/mapa/links.mjs
 - VEICULOS-PRIMEIRA-LEVA-2026-10.md: docs/modelar/modelar-veiculos.md
-- esboco-2d.md: src/autoria/refinamento-global.js, modulos/esboco-nucleo/README.md, README.md, tools/mapa/links.mjs, docs/modelar/banco-de-provas/aviao-2026-10-11/CLASSIFICACAO.md, docs/modelar/banco-de-provas/esboco-pelo-nucleo-2026-11-05/gravar-o-que-o-modulo-resolvia.mjs, docs/modelar/CONTRATO-FORMA-GLOBAL-N2.md
+- esboco-2d.md: src/autoria/refinamento-global.js, modulos/esboco-nucleo/README.md, README.md, tools/mapa/links.mjs, docs/modelar/banco-de-provas/aviao-2026-10-11/CLASSIFICACAO.md, docs/modelar/banco-de-provas/esboco-pelo-nucleo-2026-11-05/gravar-o-que-o-modulo-resolvia.mjs, docs/modelar/contratos/CONTRATO-FORMA-GLOBAL-N2.md
 
 Referências ao diretório inteiro, fora de qualquer arquivo: tools/mapa/estrutura-docs.mjs (allowlist com REGISTRO-FALHAS), tools/mapa/links.mjs (allowlist com ciclo6/criticas.json, esboco-2d, REVISAO-DE-RUMO) e docs/modelar/roteiros/roteiros.json (id `historico`). Citam também por caminho, em comentário de código: procedural/nucleo/operacoes/atributos.js, procedural/nucleo/nucleo.js, procedural/nucleo/operacoes/transformacoes.js, tools/oficina/oficina.test.ts, src/autoria/refinamento-global.js.
 

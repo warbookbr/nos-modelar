@@ -82,4 +82,4 @@ perfil `realista-apresentacao`. Ela permanece como prova e não substitui
 O resultado, as tentativas e as limitações estão em
 [`RELATO-RODA-REALISTA.md`](RELATO-RODA-REALISTA.md). A avaliação comparável e o
 fluxo que ela passou a justificar estão em
-[`PERFIS-DE-AUTORIA.md`](../PERFIS-DE-AUTORIA.md).
+[`PERFIS-DE-AUTORIA.md`](../contratos/PERFIS-DE-AUTORIA.md).

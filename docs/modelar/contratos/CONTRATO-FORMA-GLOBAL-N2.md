@@ -198,14 +198,14 @@ campo existe. Os achados são:
   conferência não consegue medir reprova em vez de passar, porque o campo é uma declaração da receita.
 
 AS FORMAS DO ESBOÇO SÃO DADO GUARDADO. Até 2026-11-05 o `arquivo` era o `.esboco.json`, que o módulo antigo do esboço resolvia a cada
-veredito. O módulo saiu (plano esboço pelo núcleo, histórico em [`historico/esboco-2d.md`](historico/esboco-2d.md)), e o `arquivo` é um
+veredito. O módulo saiu (plano esboço pelo núcleo, histórico em [`historico/esboco-2d.md`](../historico/esboco-2d.md)), e o `arquivo` é um
 `.formas.json`: as formas resolvidas da opção (`mecanifica.formas-resolvidas@1`, a saída de `formasResolvidas` gravada uma vez), com
 `origem` (o esboço, a opção e a data), `malhas` (a malha de cada forma de família, como o módulo a lia, recentrada e com as faces para
 fora), `orientacao` (o `plano.orientacao` do esboço, que o pacote do crítico usa) e `alvos` (a composta de cada unidade, o alvo do
 crítico, com o caminho relativo ao arquivo). `lerFormasGuardadas` de `tools/modelar/refinamento-global.mjs` confere o formato e que a
 opção declarada é a guardada, e a declaração que ainda aponta um `.esboco.json` é recusada dizendo isso. As sete partes do avião com
 `REFINA.esboco` leem `procedural/pecas/aviao/esboco-r2.formas.json`, e a conferência delas deu, antes e depois da troca, as mesmas
-razões, bit a bit, e o mesmo veredito ([prova](banco-de-provas/esboco-pelo-nucleo-2026-11-05/README.md)).
+razões, bit a bit, e o mesmo veredito ([prova](../banco-de-provas/esboco-pelo-nucleo-2026-11-05/README.md)).
 
 `src/autoria/solido-do-esboco.js` monta o sólido de cada forma de `formasResolvidas` (`mecanifica.formas-resolvidas@1`), sem importar o
 módulo do esboço. A geometria do tipo vem do tradutor do nível zero, no quadro local da forma (`volumeLocalDaForma`, que dá o volume da

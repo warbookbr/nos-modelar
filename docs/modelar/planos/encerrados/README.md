@@ -261,10 +261,10 @@ com narrativa de coisa já encerrada. Está aqui inteiro, sem reescrita.
   `docs/modelar/historico/RELATORIO-R2-CAGE-DIRETA-R3.md` e
   `docs/modelar/planos/encerrados/2026-08-23-redesenho-cage-r2b-controle-vertical.md`.
   A R0 já isolou o contrato `mecanifica.aceite-visual` v1 em
-  [`CONTRATO-ACEITE-VISUAL.md`](../../CONTRATO-ACEITE-VISUAL.md): alvo, sobreposição,
+  [`CONTRATO-ACEITE-VISUAL.md`](../../contratos/CONTRATO-ACEITE-VISUAL.md): alvo, sobreposição,
   quatro vistas, rejeições e crítica tornam-se dados verificáveis antes de R1
   ligar o porteiro à revisão privada.
-  Registro: `docs/modelar/CONTRATO-ACEITE-VISUAL.md`.
+  Registro: `docs/modelar/contratos/CONTRATO-ACEITE-VISUAL.md`.
 - O único plano **ativo** é o [modelador inverso com priors por família](../congelados/2026-08-25-modelador-inverso-priors-familia.md). O plano por
   seleção foi cancelado: sua capacidade de comparação não tinha calibração
   repetida, o gerador restringia o espaço alcançável e o alvo N6 é direção
@@ -283,7 +283,7 @@ com narrativa de coisa já encerrada. Está aqui inteiro, sem reescrita.
   [fluxo multifamília](../../historico/DOSSIE-FLUXO-IA-VALIDACAO-MULTIFAMILIA.md),
   [matriz de rastreabilidade](../../historico/MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md),
   [contrato N1](../../historico/FLUXO-AUTORIA-N1.md), [relatório N1](../../historico/RELATORIO-N1-FLUXO-AUTORIA.md),
-  [contrato N2](../../CONTRATO-FORMA-GLOBAL-N2.md), [relatório N2](../../historico/RELATORIO-N2-FORMA-GLOBAL.md),
+  [contrato N2](../../contratos/CONTRATO-FORMA-GLOBAL-N2.md), [relatório N2](../../historico/RELATORIO-N2-FORMA-GLOBAL.md),
   [relatório N3](../../historico/RELATORIO-N3-CANAL-PERCEPCAO.md),
   [relatório N4](../../historico/RELATORIO-N4-RESTRICOES.md) e [relatório N5](../../historico/RELATORIO-N5-BUSCA.md).
   Caminhos alcançáveis: `docs/modelar/pesquisas/DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md`,
@@ -295,7 +295,7 @@ com narrativa de coisa já encerrada. Está aqui inteiro, sem reescrita.
   `docs/modelar/historico/MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md`,
   `docs/modelar/historico/FLUXO-AUTORIA-N1.md`,
   `docs/modelar/historico/RELATORIO-N1-FLUXO-AUTORIA.md`,
-  `docs/modelar/CONTRATO-FORMA-GLOBAL-N2.md`,
+  `docs/modelar/contratos/CONTRATO-FORMA-GLOBAL-N2.md`,
   `docs/modelar/historico/RELATORIO-N2-FORMA-GLOBAL.md`,
   `docs/modelar/historico/RELATORIO-N3-CANAL-PERCEPCAO.md`,
   `docs/modelar/historico/RELATORIO-N4-RESTRICOES.md` e
@@ -312,8 +312,8 @@ com narrativa de coisa já encerrada. Está aqui inteiro, sem reescrita.
 - O contrato de montagem v4 em [`MONTAGEM-PERSISTIDA-V4.md`](../../MONTAGEM-PERSISTIDA-V4.md)
   registra expectativas de interseção sem suprimi-las. `revisar_montagem` já
   transporta a auditoria; `descrever_montagem` continua sem executá-la.
-- A [matriz de testes acoplados ao acervo](../../MATRIZ-TESTES-ACOPLADOS.md)
-  (`docs/modelar/MATRIZ-TESTES-ACOPLADOS.md`) registra o
+- A [matriz de testes acoplados ao acervo](../../contratos/MATRIZ-TESTES-ACOPLADOS.md)
+  (`docs/modelar/contratos/MATRIZ-TESTES-ACOPLADOS.md`) registra o
   que é contrato genérico, integração, publicação ou conteúdo específico após
   a remoção das receitas.
 - O plano de [autoria segura de receitas declarativas](./2026-08-14-autoria-segura-receitas.md)

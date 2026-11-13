@@ -128,7 +128,7 @@
           "quando": "o trabalho é dividido com a outra IA, e então passa por ele, com uma tarefa por seção"
         },
         {
-          "arquivo": "docs/modelar/ARQUITETURA.md",
+          "arquivo": "docs/modelar/contratos/ARQUITETURA.md",
           "quando": "a mudança atravessa camadas"
         },
         {
@@ -165,7 +165,7 @@
       ],
       "sobDemanda": [
         {
-          "arquivo": "docs/modelar/ARQUITETURA.md",
+          "arquivo": "docs/modelar/contratos/ARQUITETURA.md",
           "quando": "a correção atravessa camadas"
         },
         {

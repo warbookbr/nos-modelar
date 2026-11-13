@@ -21,7 +21,7 @@ importarem a bancada. Sem essa régua, o motor procedural passaria a exigir
 Three.js, `document` e `window`, e o CLI, o MCP e os testes headless parariam por
 causa de uma interface. Quando um módulo da bancada for preciso dos dois lados, a
 saída é tirá-lo de lá, e não abrir exceção. Detalhe em
-[`BANCADA-E-APRESENTACAO.md`](BANCADA-E-APRESENTACAO.md).
+[`BANCADA-E-APRESENTACAO.md`](../BANCADA-E-APRESENTACAO.md).
 
 ## Camadas que existem hoje
 
@@ -126,7 +126,7 @@ em JSON consultável, sem malha ou identidade de runtime; veja
 
 O MCP tem leitura e auditoria, e a autoria de montagem fica em perfil MCP
 opt-in, com repositório e catálogo autorizados pelo host. Receita e outras
-portas exigem plano próprio e as garantias de [`AUTORIA-IA.md`](AUTORIA-IA.md).
+portas exigem plano próprio e as garantias de [`AUTORIA-IA.md`](../AUTORIA-IA.md).
 
 ## Limites que permanecem
 
@@ -137,7 +137,7 @@ universo, correção ou promoção automática de dependentes, solver geral de
 encaixe, espaço varrido contínuo ou material PBR. A articulação amostra o curso
 em poses discretas, e as portas de interface têm cinco formas (cilindro, anel,
 plano, padrão de furos e trilho), descritas em
-[`usar/MONTAGENS-SEMANTICAS.md`](usar/MONTAGENS-SEMANTICAS.md). Esses limites não devem ser simulados por posições de câmera, UUIDs
+[`usar/MONTAGENS-SEMANTICAS.md`](../usar/MONTAGENS-SEMANTICAS.md). Esses limites não devem ser simulados por posições de câmera, UUIDs
 do Three.js, arquivos gigantes ou documentação manual.
 
 ## Fora desta arquitetura
@@ -152,6 +152,6 @@ Ficam fora:
 - qualquer recurso que não melhore criação, inspeção, validação ou manutenção
   pela IA.
 
-A definição completa de autoria está em [`AUTORIA-IA.md`](AUTORIA-IA.md). O
+A definição completa de autoria está em [`AUTORIA-IA.md`](../AUTORIA-IA.md). O
 estado e a direção das montagens estão em
-[`MONTAGENS-SEMANTICAS.md`](./usar/MONTAGENS-SEMANTICAS.md).
+[`MONTAGENS-SEMANTICAS.md`](../usar/MONTAGENS-SEMANTICAS.md).

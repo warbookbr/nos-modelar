@@ -6,7 +6,7 @@ Não leia todo o histórico por padrão.
 
 O trabalho dividido entre duas IAs neste repositório passa por
 `comunicacao.md`. Decisões duráveis com `brigsd/nos-mecanifica` seguem
-`docs/modelar/COORDENACAO-REPOS.md`.
+`docs/modelar/contratos/COORDENACAO-REPOS.md`.
 
 ## Fonte de verdade
 

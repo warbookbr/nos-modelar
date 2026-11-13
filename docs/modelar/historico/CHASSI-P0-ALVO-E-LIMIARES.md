@@ -33,7 +33,7 @@ P0 fecha essa lacuna. Se P0 estiver certo, P2 é decidível por medição.
 ## 2. Perfil de autoria declarado
 
 Declarado **antes** de qualquer modelagem, como exige
-[`PERFIS-DE-AUTORIA.md`](../PERFIS-DE-AUTORIA.md):
+[`PERFIS-DE-AUTORIA.md`](../contratos/PERFIS-DE-AUTORIA.md):
 
 ```js
 export const PERFIL_AUTORIA = {

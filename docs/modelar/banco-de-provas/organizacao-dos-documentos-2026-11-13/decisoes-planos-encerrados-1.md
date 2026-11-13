@@ -9,7 +9,7 @@ Estado: concluído, em 2026-08-04. Crônica: não tem linha.
 
 ## 2026-08-05-mcp-autoria-controlada.md
 Estado: concluído (decisão `interromper`), em 2026-08-05. Crônica: tem linha.
-- [B] Publicar um diretório de pacote com transição única e sem sobrescrita não é garantido pela API portátil de `fs` do Node; a autoria controlada foi interrompida e só retoma com primitivo `no-replace` ou protocolo de commit revisado. Porquê: `mkdir` exclusivo seguido de dois `rename` deixa janela observável. Lugar: `docs/modelar/ESCRITA-TRANSACIONAL-MONTAGEM.md` (o experimento do PR #25 e a solução por revisões imutáveis) e `docs/modelar/FLUXO-MODELAGEM-IA.md`.
+- [B] Publicar um diretório de pacote com transição única e sem sobrescrita não é garantido pela API portátil de `fs` do Node; a autoria controlada foi interrompida e só retoma com primitivo `no-replace` ou protocolo de commit revisado. Porquê: `mkdir` exclusivo seguido de dois `rename` deixa janela observável. Lugar: `docs/modelar/contratos/ESCRITA-TRANSACIONAL-MONTAGEM.md` (o experimento do PR #25 e a solução por revisões imutáveis) e `docs/modelar/FLUXO-MODELAGEM-IA.md`.
 
 ## 2026-08-05-mcp-avaliacao-consolidada.md
 Estado: concluído (decisão `corrigir`), em 2026-08-05. Crônica: tem linha.
@@ -41,15 +41,15 @@ Estado: concluído (decisão `aprovar`), em 2026-08-14. Crônica: tem linha.
 
 ## 2026-08-14-contexto-de-montagem-para-ia.md
 Estado: concluído (decisão aprovar), em 2026-08-14. Crônica: tem linha.
-- [B] O contexto de montagem para IA não transporta malha nem identidade de runtime, e a cobertura declara `colisaoGlobalVerificada:false`: caixa não é colisão nem folga. Porquê: impedir que satisfação local seja lida como validade global. Lugar: `docs/modelar/CONTEXTO-MONTAGEM-IA.md` e `src/autoria/descrever-montagem-resolvida.js`.
+- [B] O contexto de montagem para IA não transporta malha nem identidade de runtime, e a cobertura declara `colisaoGlobalVerificada:false`: caixa não é colisão nem folga. Porquê: impedir que satisfação local seja lida como validade global. Lugar: `docs/modelar/contratos/CONTEXTO-MONTAGEM-IA.md` e `src/autoria/descrever-montagem-resolvida.js`.
 
 ## 2026-08-14-contexto-visual-e-autoria-segura.md
 Estado: concluído, em 2026-08-14. Crônica: não tem linha.
-- [B] Vista visual é evidência e nunca prova colisão, folga ou validade global; impacto e catálogo declaram fronteiras e não inventam dependência por proximidade; o writer só publica com todas as precondições e deixa o estado anterior intacto no erro. Porquê: honestidade da cobertura. Lugar: `docs/modelar/CONTEXTO-VISUAL-REVALIDACAO.md` e `docs/modelar/ESCRITA-TRANSACIONAL-MONTAGEM.md`.
+- [B] Vista visual é evidência e nunca prova colisão, folga ou validade global; impacto e catálogo declaram fronteiras e não inventam dependência por proximidade; o writer só publica com todas as precondições e deixa o estado anterior intacto no erro. Porquê: honestidade da cobertura. Lugar: `docs/modelar/contratos/CONTEXTO-VISUAL-REVALIDACAO.md` e `docs/modelar/contratos/ESCRITA-TRANSACIONAL-MONTAGEM.md`.
 
 ## 2026-08-14-continuidade-autoria-ativa.md
 Estado: concluído (decisão aprovar), em 2026-08-14. Crônica: tem linha.
-- [B] A revisão ativa autorizada sobrepõe só a fonte estática do mesmo ID; ausência usa o estático, revisão ativa inválida falha fechada e nunca cai em fallback; leitura e autoria usam os mesmos carregadores. Porquê: evitar estado divergente e correção sobre base obsoleta. Lugar: `docs/modelar/usar/AUTORIA-RECEITA-DECLARATIVA.md` (seção Perfil MCP) e `docs/modelar/ESCRITA-TRANSACIONAL-MONTAGEM.md`.
+- [B] A revisão ativa autorizada sobrepõe só a fonte estática do mesmo ID; ausência usa o estático, revisão ativa inválida falha fechada e nunca cai em fallback; leitura e autoria usam os mesmos carregadores. Porquê: evitar estado divergente e correção sobre base obsoleta. Lugar: `docs/modelar/usar/AUTORIA-RECEITA-DECLARATIVA.md` (seção Perfil MCP) e `docs/modelar/contratos/ESCRITA-TRANSACIONAL-MONTAGEM.md`.
 
 ## 2026-08-14-experimento-autoria-geometrica.md
 Estado: concluído (decisão corrigir), em 2026-08-14. Crônica: tem linha.
@@ -57,23 +57,23 @@ Estado: concluído (decisão corrigir), em 2026-08-14. Crônica: tem linha.
 
 ## 2026-08-14-mapa-canonico-dependencias.md
 Estado: concluído (decisão aprovar), em 2026-08-14. Crônica: tem linha.
-- [B] "Global" significa completo dentro de um universo explícito declarado pelo host, nunca varredura de disco; o mapa é derivado da autoria e nunca editado à mão; mudança concorrente recusa snapshot misto. Porquê: cobertura honesta. Lugar: `docs/modelar/MAPA-CANONICO-DEPENDENCIAS.md` (Universo de autoria v1).
+- [B] "Global" significa completo dentro de um universo explícito declarado pelo host, nunca varredura de disco; o mapa é derivado da autoria e nunca editado à mão; mudança concorrente recusa snapshot misto. Porquê: cobertura honesta. Lugar: `docs/modelar/contratos/MAPA-CANONICO-DEPENDENCIAS.md` (Universo de autoria v1).
 
 ## 2026-08-14-materializacao-autoria-segura.md
 Estado: concluído (decisão aprovar), em 2026-08-14. Crônica: tem linha.
-- [B] Publicação por snapshots imutáveis e transição por hard link exclusivo (um vencedor por pai, base velha recusada, nenhum leitor vê parcial); se o filesystem não garantir link atômico, para e não reduz a garantia em silêncio. Porquê: sem primitivo `no-replace` para diretório. Lugar: `docs/modelar/ESCRITA-TRANSACIONAL-MONTAGEM.md`.
+- [B] Publicação por snapshots imutáveis e transição por hard link exclusivo (um vencedor por pai, base velha recusada, nenhum leitor vê parcial); se o filesystem não garantir link atômico, para e não reduz a garantia em silêncio. Porquê: sem primitivo `no-replace` para diretório. Lugar: `docs/modelar/contratos/ESCRITA-TRANSACIONAL-MONTAGEM.md`.
 
 ## 2026-08-14-mcp-montagens-leitura.md
 Estado: concluído, em 2026-08-14. Crônica: tem linha.
-- [B] O cliente MCP usa só IDs semânticos e nunca envia nem recebe caminho; o catálogo contém só raízes declaradas pelo host, sem varredura implícita; a ausência de escrita é limite temporal e não proibição. Porquê: confinamento da porta. Lugar: `docs/modelar/CONTEXTO-VISUAL-REVALIDACAO.md`, `tools/mcp/catalogo-montagens.mjs` e `tools/mcp/mcp.test.mjs`.
+- [B] O cliente MCP usa só IDs semânticos e nunca envia nem recebe caminho; o catálogo contém só raízes declaradas pelo host, sem varredura implícita; a ausência de escrita é limite temporal e não proibição. Porquê: confinamento da porta. Lugar: `docs/modelar/contratos/CONTEXTO-VISUAL-REVALIDACAO.md`, `tools/mcp/catalogo-montagens.mjs` e `tools/mcp/mcp.test.mjs`.
 
 ## 2026-08-14-revalidacao-cascata-persistida.md
 Estado: concluído (decisão aprovar), em 2026-08-14. Crônica: tem linha.
-- [B] A campanha de revalidação é derivada da causa e do snapshot completo; a aprovação vale só para a revisão exata observada, revisão diferente só conclui em `obsoleto`, e a campanha não corrige nem promove dependentes. Porquê: impedir aprovação herdada em silêncio. Lugar: `docs/modelar/CONTEXTO-VISUAL-REVALIDACAO.md` e `src/autoria/protocolo-revalidacao.js`.
+- [B] A campanha de revalidação é derivada da causa e do snapshot completo; a aprovação vale só para a revisão exata observada, revisão diferente só conclui em `obsoleto`, e a campanha não corrige nem promove dependentes. Porquê: impedir aprovação herdada em silêncio. Lugar: `docs/modelar/contratos/CONTEXTO-VISUAL-REVALIDACAO.md` e `src/autoria/protocolo-revalidacao.js`.
 
 ## 2026-08-14-separacao-direcional-e-impacto-local.md
 Estado: concluído, em 2026-08-14. Crônica: não tem linha.
-- [B] A separação direcional medida por projeção não é colisão nem folga euclidiana, e o impacto local separa direto, indireto e limitação global sem inferir dependência por proximidade. Porquê: não alegar colisão geral. Lugar: `docs/modelar/CONTEXTO-MONTAGEM-IA.md` e `docs/modelar/MONTAGEM-PERSISTIDA-V3.md`.
+- [B] A separação direcional medida por projeção não é colisão nem folga euclidiana, e o impacto local separa direto, indireto e limitação global sem inferir dependência por proximidade. Porquê: não alegar colisão geral. Lugar: `docs/modelar/contratos/CONTEXTO-MONTAGEM-IA.md` e `docs/modelar/MONTAGEM-PERSISTIDA-V3.md`.
 
 ## 2026-08-17-abertura-oblonga.md
 Estado: concluído (decisão aprovar), em 2026-08-17. Crônica: tem linha.
@@ -89,7 +89,7 @@ Estado: concluído (decisão aprovar), em 2026-08-17. Crônica: tem linha.
 
 ## 2026-08-17-desacoplamento-catalogo-validacao.md
 Estado: concluído, em 2026-08-17. Crônica: tem linha.
-- [B] O catálogo homologado pode estar vazio ou ser trocado sem quebrar núcleo, validadores, bancada e consumidor; núcleo e serviço puro não importam peças nem conhecem disco; fixtures usam nome de capacidade e nunca de produto. Porquê: o acervo não pode virar contrato acidental. Lugar: gate `tools/arquitetura/independencia-catalogo.mjs`, `docs/modelar/MATRIZ-TESTES-ACOPLADOS.md` e `.claude/skills/auditar-peca/SKILL.md`.
+- [B] O catálogo homologado pode estar vazio ou ser trocado sem quebrar núcleo, validadores, bancada e consumidor; núcleo e serviço puro não importam peças nem conhecem disco; fixtures usam nome de capacidade e nunca de produto. Porquê: o acervo não pode virar contrato acidental. Lugar: gate `tools/arquitetura/independencia-catalogo.mjs`, `docs/modelar/contratos/MATRIZ-TESTES-ACOPLADOS.md` e `.claude/skills/auditar-peca/SKILL.md`.
 
 ## 2026-08-17-encostar.md
 Estado: concluído (decisão aprovar), em 2026-08-17. Crônica: não tem linha.
@@ -112,7 +112,7 @@ Estado: concluído (decisão aprovar), em 2026-08-17. Crônica: não tem linha.
 
 ## 2026-08-17-migracao-fps-para-procedural.md
 Estado: concluído (decisão aprovar), em 2026-08-17. Crônica: tem linha.
-- [B] A árvore canônica é `procedural/`; mover e nunca copiar, sem symlink nem alias permanente, sem regravar hash para passar, e evidência imutável não é reescrita. Porquê: uma só fonte de receitas e o gabarito byte-idêntico. Lugar: `tools/modelar/caminho-procedural.test.ts` (guarda de caminho) e `docs/modelar/ARQUITETURA.md`; o que sobra é história da migração.
+- [B] A árvore canônica é `procedural/`; mover e nunca copiar, sem symlink nem alias permanente, sem regravar hash para passar, e evidência imutável não é reescrita. Porquê: uma só fonte de receitas e o gabarito byte-idêntico. Lugar: `tools/modelar/caminho-procedural.test.ts` (guarda de caminho) e `docs/modelar/contratos/ARQUITETURA.md`; o que sobra é história da migração.
 
 ## 2026-08-17-nome-de-copia.md
 Estado: concluído (decisão aprovar), em 2026-08-17. Crônica: não tem linha.
@@ -142,8 +142,8 @@ Estado: concluído (decisão aprovar), em 2026-08-18. Crônica: tem linha.
 
 ## 2026-08-18-plataforma-procedural-extensivel.md
 Estado: concluído (decisão aprovar), em 2026-08-18. Crônica: tem linha.
-- [B] O motor tem registro explícito de módulos e operações (sem autorregistro por `import` nem mutação global), receitas continuam dados sem JavaScript, extensão nativa é código versionado do repositório com contexto limitado, e código movido sai da origem na mesma mudança (sem cópia `legacy` nem segundo executor). Porquê: descobrir e estender o motor sem ler um monólito e sem duas fontes. Lugar: `docs/modelar/EXTENSOES-NATIVAS-V1.md`, `docs/modelar/SERVICOS-PROCEDURAL-V1.md`, `docs/modelar/COMPOSICAO-PROCEDURAL-V1.md`, `procedural/nucleo/registro.js` e o gate `tools/arquitetura/independencia-catalogo.mjs`.
-- [B] Lacuna de capacidade é registrada e persistível (`mecanifica.lacuna-capacidade`), classificada sem promoção automática, e remover extensão gera diagnóstico e nunca sucesso parcial. Porquê: não esconder o que falta. Lugar: `docs/modelar/LACUNAS-DE-CAPACIDADE-V1.md`.
+- [B] O motor tem registro explícito de módulos e operações (sem autorregistro por `import` nem mutação global), receitas continuam dados sem JavaScript, extensão nativa é código versionado do repositório com contexto limitado, e código movido sai da origem na mesma mudança (sem cópia `legacy` nem segundo executor). Porquê: descobrir e estender o motor sem ler um monólito e sem duas fontes. Lugar: `docs/modelar/contratos/EXTENSOES-NATIVAS-V1.md`, `docs/modelar/contratos/SERVICOS-PROCEDURAL-V1.md`, `docs/modelar/contratos/COMPOSICAO-PROCEDURAL-V1.md`, `procedural/nucleo/registro.js` e o gate `tools/arquitetura/independencia-catalogo.mjs`.
+- [B] Lacuna de capacidade é registrada e persistível (`mecanifica.lacuna-capacidade`), classificada sem promoção automática, e remover extensão gera diagnóstico e nunca sucesso parcial. Porquê: não esconder o que falta. Lugar: `docs/modelar/contratos/LACUNAS-DE-CAPACIDADE-V1.md`.
 
 ## 2026-08-18-sonda-armadura-humanoide-1-0.md
 Estado: concluído (decisão aprovar), em 2026-08-18. Crônica: tem linha.
@@ -152,7 +152,7 @@ Estado: concluído (decisão aprovar), em 2026-08-18. Crônica: tem linha.
 
 ## 2026-08-18-sonda-supercarro-1-0.md
 Estado: concluído (decisão aprovar), em 2026-08-18. Crônica: tem linha.
-- [B] Não esconder limitação para completar a silhueta: registrar a lacuna, implementar o menor contrato genérico com ganho comprovado ou declarar a aproximação; nenhuma melhoria especializa núcleo ou ferramenta para o carro. Porquê: a peça não justifica lógica de domínio no núcleo. Lugar: `CLAUDE.md` (regra "a correção que um objeto revela vai para a ferramenta geral") e `docs/modelar/LACUNAS-DE-CAPACIDADE-V1.md`.
+- [B] Não esconder limitação para completar a silhueta: registrar a lacuna, implementar o menor contrato genérico com ganho comprovado ou declarar a aproximação; nenhuma melhoria especializa núcleo ou ferramenta para o carro. Porquê: a peça não justifica lógica de domínio no núcleo. Lugar: `CLAUDE.md` (regra "a correção que um objeto revela vai para a ferramenta geral") e `docs/modelar/contratos/LACUNAS-DE-CAPACIDADE-V1.md`.
 - [C] Fixture do supercarro (12 definições, 27 peças-folha, 351/351 pares) e melhorias neutras de vista e auditoria já entregues em código. Porquê: sem decisão além da linha da crônica.
 
 ## 2026-08-19-chassi-p2-prova-do-quarto.md
@@ -174,12 +174,12 @@ Estado: concluído, em 2026-08-19. Crônica: tem linha.
 
 ## 2026-08-20-aceite-visual-e-prova-de-superficie.md
 Estado: concluído (decisão redesenhar), em 2026-08-20. Crônica: tem linha.
-- [B] O aceite visual exige pacote completo e reproduzível (alvo, sobreposição, vistas isoladas, uma condição de rejeição por resultado, crítico independente), o veredito é derivado e nunca fornecido pelo autor, silêncio do crítico não aprova, imagem composta não substitui vista isolada, seção mede a cage e nunca a gera, e cage crua não se passa por superfície final. Porquê: o P2 foi encerrado por evidência estrutural sem prova visual. Lugar: `docs/modelar/CONTRATO-ACEITE-VISUAL.md`, `tools/modelagem/aceite-visual.mjs` e `.claude/skills/laco-de-modelagem/SKILL.md`.
+- [B] O aceite visual exige pacote completo e reproduzível (alvo, sobreposição, vistas isoladas, uma condição de rejeição por resultado, crítico independente), o veredito é derivado e nunca fornecido pelo autor, silêncio do crítico não aprova, imagem composta não substitui vista isolada, seção mede a cage e nunca a gera, e cage crua não se passa por superfície final. Porquê: o P2 foi encerrado por evidência estrutural sem prova visual. Lugar: `docs/modelar/contratos/CONTRATO-ACEITE-VISUAL.md`, `tools/modelagem/aceite-visual.mjs` e `.claude/skills/laco-de-modelagem/SKILL.md`.
 - [C] O sucessor da prova (redesenho da cage R2b) segue no plano `2026-08-23-redesenho-cage-r2b-controle-vertical.md`. Porquê: a decisão `redesenhar` se resolve lá.
 
 ## 2026-08-20-auditoria-praticas-autoria-3d.md
 Estado: concluído (decisão corrigir), em 2026-08-20. Crônica: tem linha.
-- [B] O ciclo de autoria de superfície não fecha por métricas estruturais sem evidência visual vinculante; a base semântica, determinística e de composição é mantida. Porquê: foi a causa das reprovações da carroceria. Lugar: `docs/modelar/CONTRATO-ACEITE-VISUAL.md` e `CLAUDE.md` ("nenhuma métrica aprova forma sozinha").
+- [B] O ciclo de autoria de superfície não fecha por métricas estruturais sem evidência visual vinculante; a base semântica, determinística e de composição é mantida. Porquê: foi a causa das reprovações da carroceria. Lugar: `docs/modelar/contratos/CONTRATO-ACEITE-VISUAL.md` e `CLAUDE.md` ("nenhuma métrica aprova forma sozinha").
 - [C] A régua de nove práticas públicas (decompor, separar planejador, autor e crítico, variantes, inspeção visual, etc.) como perguntas e não como autoridade. Porquê: as práticas viraram as skills `alinhar-modelagem`, `laco-de-modelagem` e `esbocar-opcoes`, e o relatório está em `historico/`.
 
 ## 2026-08-20-motor-de-prancha-autonomia.md

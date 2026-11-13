@@ -9,7 +9,7 @@ orçamento do roteiro `mudar`.
 ## O que já existe e o plano reaproveita
 
 A forma global N2 (`src/autoria/forma-global.js`,
-[contrato](../CONTRATO-FORMA-GLOBAL-N2.md)) já é um nível de blocagem: a IA
+[contrato](../contratos/CONTRATO-FORMA-GLOBAL-N2.md)) já é um nível de blocagem: a IA
 declara um alvo e um andaime de volumes com nome, o andaime vira uma blocagem
 neutra, e o gate G01 compara envelope, pontos de referência e silhueta em três
 vistas contra o alvo. Ela aceita caixa, cilindro, prisma convexo, casco por
@@ -19,14 +19,14 @@ partes dentro do envelope dos volumes e as portas do andaime. O encaixe já tem
 contrato no núcleo e na montagem: portas publicadas, a porta conferida contra a forma (`porta-confere-forma.js`),
 vínculos de medida e posição derivada da porta na montagem v5; as portas só
 conhecem cilindro e anel. Ferramenta nova já tem formato de entrada, a [extensão
-nativa](../EXTENSOES-NATIVAS-V1.md), com manifesto, teste e registro, e o exemplo
+nativa](../contratos/EXTENSOES-NATIVAS-V1.md), com manifesto, teste e registro, e o exemplo
 `procedural/extensoes/prisma-triangular`. Subgrafo reutilizável de operações já
-tem formato, a [composição procedural](../COMPOSICAO-PROCEDURAL-V1.md) em
+tem formato, a [composição procedural](../contratos/COMPOSICAO-PROCEDURAL-V1.md) em
 `procedural/nucleo/composicoes.js`. A varredura de parâmetros
 (`src/autoria/varrer-parametros.js`) já mede uma peça em lote dentro das faixas
 declaradas. A conferência contra foto (`npm run conferir:referencia`), o
 contorno por parte em milímetro (`modulos/contorno-da-imagem/`), o [fluxo do
-objeto](../usar/FLUXO-DO-OBJETO.md), o [aceite visual](../CONTRATO-ACEITE-VISUAL.md)
+objeto](../usar/FLUXO-DO-OBJETO.md), o [aceite visual](../contratos/CONTRATO-ACEITE-VISUAL.md)
 e o [filtro agent-first](../decisoes/AGENT-FIRST.md) já existem e governam como uma
 capacidade nova é aceita. O plano estende essas peças em vez de criar outras.
 
