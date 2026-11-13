@@ -8,7 +8,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { carregarRoteiros, CAMINHO_JSON, partesDaLeitura, RAIZ, textoDaLeitura } from '../mapa/roteiros.mjs';
-import { buscarTopico, comecar, listaDeFamilias, listaDePecas, planosAtivos, resolverRoteiro, tarefasAbertas } from './comecar.mjs';
+import { buscarNome, buscarTopico, comecar, listaDeFamilias, listaDePecas, planosAtivos, resolverRoteiro, tarefasAbertas } from './comecar.mjs';
 import { comecarEntrada, criarFerramentasComecar } from '../mcp/perfis/comecar.mjs';
 
 const CLI = fileURLToPath(new URL('./comecar.mjs', import.meta.url));
@@ -111,7 +111,7 @@ describe('comecar <roteiro>', () => {
   it('um nome que não é nó nem título sai com código 1, o erro e a lista', () => {
     const r = comecar({ roteiro: 'xqzw' });
     expect(r).toMatchObject({ ok: false, codigo: 1, erro: { codigo: 'roteiro_desconhecido' } });
-    expect(r.texto).toContain('"xqzw" não é um ramo nem um título de documento.');
+    expect(r.texto).toContain('"xqzw" não é um ramo nem um título de documento');
     expect(r.texto).toContain('modelar/opcoes');
   });
 });
@@ -186,5 +186,44 @@ describe('a linha de comando e o MCP', () => {
     expect(r).toEqual(comecar({ roteiro: 'modelar/peca' }));
     expect(ferramenta.outputSchema.parse(r)).toEqual(r);
     expect(ferramenta.conteudo(r)).toEqual([{ type: 'text', text: r.texto }]);
+  });
+});
+
+describe('comecar com o nome de uma operação, ficha, extensão ou comando', () => {
+  it('uma operação do núcleo manda para npm run capacidade', () => {
+    const r = comecar({ roteiro: 'aparar' });
+    expect(r.ok).toBe(true);
+    expect(r.codigo).toBe(0);
+    expect(r.texto).toContain('é uma operação do núcleo: rode `npm run capacidade -- aparar`');
+    expect(r.resultado.nome).toEqual({ tipo: 'operacao', nome: 'aparar', comando: 'npm run capacidade -- aparar' });
+  });
+
+  it('uma ficha de capacidade e uma extensão mandam para o mesmo comando', () => {
+    expect(comecar({ roteiro: 'gaiolaPorRede' }).texto).toContain('é uma ficha de capacidade: rode `npm run capacidade -- gaiolaPorRede`');
+    const e = comecar({ roteiro: 'casca' });
+    expect(e.texto).toContain('é uma extensão (só existe no registro com extensões): rode `npm run capacidade -- casca`');
+  });
+
+  it('um script de package.json que responde a --ajuda manda para ela; o que não responde, só o comando', () => {
+    expect(comecar({ roteiro: 'comecar' }).texto).toContain('é um comando: rode `npm run comecar -- --ajuda`');
+    expect(buscarNome('mapa')).toMatchObject({ tipo: 'comando', comando: 'npm run mapa' });
+    expect(buscarNome('mapa').frase).not.toContain('--ajuda');
+  });
+
+  it('um tópico que não existe em lugar nenhum continua saindo com erro e a lista de ramos', () => {
+    const r = comecar({ roteiro: 'xyzzyqq' });
+    expect(r.ok).toBe(false);
+    expect(r.codigo).toBe(1);
+    expect(r.erro.codigo).toBe('roteiro_desconhecido');
+    expect(r.texto).toContain('Ramos');
+    expect(buscarNome('xyzzyqq')).toBeNull();
+  });
+
+  it('um nome que casa com roteiro mantém a resposta do roteiro, e a ferramenta MCP responde igual', async () => {
+    expect(comecar({ roteiro: 'mudar/plano' }).resultado.roteiro).toBe('mudar/plano');
+    const [ferramenta] = criarFerramentasComecar();
+    for (const roteiro of ['aparar', 'xyzzyqq']) {
+      expect(await ferramenta.executar(comecarEntrada.parse({ roteiro }))).toEqual(comecar({ roteiro }));
+    }
   });
 });
