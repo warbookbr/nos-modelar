@@ -75,7 +75,8 @@ operações e verbosidade, erros, nomes e argumentos, e tempo por operação. Tr
 código; o resto ainda não passou pela revisão cruzada. A metade de regras, documentos e agentes é da sessão do furgão (ramo
 `claude/revisar-plano-ativo-cyj8c3`), avisada da ativação; ela não tem como enviar recado e responde pelo repositório ou pela
 pessoa. Falta: a pergunta 7, que é das duas; a fatia 2 inteira; e o primeiro ciclo da fatia 4, já decidido pela pessoa e
-descrito nela. A modelagem dos objetos de prova é
+descrito nela. O último envio da sessão encerrada é o que fecha o plano do núcleo e registra
+estas decisões; quem retomar confere primeiro se o CI dele fechou verde e se a main o recebeu. A modelagem dos objetos de prova é
 pesada para a máquina da nuvem, de quatro núcleos; a pessoa tentou ligar o computador dela à sessão e o recurso não estava
 disponível, então a saída é uma sessão aberta direto no computador dela para essa parte.
 
