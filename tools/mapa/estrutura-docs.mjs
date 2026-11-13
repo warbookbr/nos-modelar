@@ -55,8 +55,18 @@ export const ALLOWLIST_G1 = new Map([
     + 'existe para isso — redescobrir o que a tabela já mediu é a própria falha V-31',
   ],
   [
+    'docs/modelar/usar/GOTCHAS-AUTORIA-VISUAL.md:docs/modelar/decisoes/HISTORICO-RETIRADO.md',
+    'o ponteiro das 38 falhas medidas aponta a crônica, porque o arquivo `REGISTRO-FALHAS-AUTORIA-V.md` saiu da árvore em 2026-11-13 e '
+    + 'o texto está no git, no commit que a crônica nomeia; a decisão que ele sustenta está em `decisoes/registros/`',
+  ],
+  [
     'docs/modelar/usar/METODO-DIAGNOSTICO-E-SEU-LIMITE.md:docs/modelar/planos/encerrados/2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md',
     'cita plano encerrado como registro do caso que originou o método; plano encerrado não governa',
+  ],
+  [
+    'docs/modelar/usar/METODO-DIAGNOSTICO-E-SEU-LIMITE.md:docs/modelar/decisoes/PLANOS-ENCERRADOS.md',
+    'cita a crônica dos planos encerrados como registro do caso que originou o método; o plano saiu da árvore em 2026-11-13 e plano '
+    + 'encerrado não governa',
   ],
   [
     'docs/modelar/usar/README.md:docs/modelar/INDEX.md',
@@ -75,7 +85,7 @@ export const ALLOWLIST_G1 = new Map([
 /* Porta é porta: se cresce, vira o catálogo que a reorganização veio desfazer.
    O INDEX já chegou a 665 linhas apontando para 158 documentos, e mais da
    metade era crônica de plano encerrado — que hoje mora em
-   `planos/encerrados/README.md`. O teto entrou como catraca no tamanho de
+   `decisoes/PLANOS-ENCERRADOS.md`. O teto entrou como catraca no tamanho de
    então e caiu para a meta assim que o conteúdo saiu, em vez de o número ser
    afrouxado para o gate ficar verde. */
 export const TETO_PORTAS = new Map([

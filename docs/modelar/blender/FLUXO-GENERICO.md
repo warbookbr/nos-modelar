@@ -1,6 +1,6 @@
 # Fluxo genérico de modelagem com Blender
 
-O fluxo abaixo serve de norte para a IA e para a pessoa criarem um objeto novo. Ele é o mesmo que recriou 27 veículos a partir de malhas de licença livre sem exigência de crédito no plano [Veículos de referência livre](../planos/encerrados/2026-10-20-veiculos-de-referencia-livre.md), escrito sem depender de veículo. O Blender aparece só na etapa b e em usos opcionais descritos em [`USOS-E-LIMITES.md`](USOS-E-LIMITES.md). O produto de todas as etapas é a receita.
+O fluxo abaixo serve de norte para a IA e para a pessoa criarem um objeto novo. Ele é o mesmo que recriou 27 veículos a partir de malhas de licença livre sem exigência de crédito no plano [Veículos de referência livre](../decisoes/PLANOS-ENCERRADOS.md), escrito sem depender de veículo. O Blender aparece só na etapa b e em usos opcionais descritos em [`USOS-E-LIMITES.md`](USOS-E-LIMITES.md). O produto de todas as etapas é a receita.
 
 ## Com forma de referência
 

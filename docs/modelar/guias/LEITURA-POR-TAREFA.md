@@ -22,12 +22,12 @@ Consulta por assunto, para quando nenhum roteiro de `roteiros/ROTEIROS.md` cobre
   método: decidir forma, proporção e caráter não é problema diagnóstico, e
   eliminação ali rende consertos certos num objeto que continua ruim.
 - **Como a autoria de forma passa a funcionar:** o [dossiê do modelador inverso com priors por família](../pesquisas/DOSSIE-MODELADOR-INVERSO-PRIORS-FAMILIA.md).
-  O antigo [modelador por seleção](../historico/DOSSIE-MODELADOR-POR-SELECAO.md) é só histórico.
+  O antigo [modelador por seleção](../decisoes/HISTORICO-RETIRADO.md) é só histórico.
 - **Antes de abrir experimento novo:**
   [`GOTCHAS-AUTORIA-VISUAL.md`](../usar/GOTCHAS-AUTORIA-VISUAL.md)
   (`docs/modelar/usar/GOTCHAS-AUTORIA-VISUAL.md`), registro único e vivo do
   que já falhou — o de modelagem procedural foi fundido nele, e o
-  [canário de casco](../historico/RELATORIO-N6-CANARIO-CASCO-VISUAL.md), a
+  [canário de casco](../decisoes/HISTORICO-RETIRADO.md), a
   evidência negativa mais recente. Rodada gasta redescobrindo algo já medido é
   falha V-31.
 - Peças versus montagens, composição e dependências:

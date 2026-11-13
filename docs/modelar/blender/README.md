@@ -1,6 +1,6 @@
 # Blender com o Modelar
 
-Esta pasta explica como usar o Blender como ferramenta externa de apoio à modelagem no Modelar e dá um fluxo genérico para a IA e para a pessoa modelarem objetos novos. Os documentos descrevem o que já foi provado e marcam o que ainda é hipótese, e nada aqui autoriza código novo sem plano. As ferramentas de `tools/blender/` (régua, pacote cego, olhar da candidata, leituras do pacote e oráculo da subdivisão) vieram do plano [carroceria por subdivisão](../planos/encerrados/2026-10-21-carroceria-por-subdivisao.md).
+Esta pasta explica como usar o Blender como ferramenta externa de apoio à modelagem no Modelar e dá um fluxo genérico para a IA e para a pessoa modelarem objetos novos. Os documentos descrevem o que já foi provado e marcam o que ainda é hipótese, e nada aqui autoriza código novo sem plano. As ferramentas de `tools/blender/` (régua, pacote cego, olhar da candidata, leituras do pacote e oráculo da subdivisão) vieram do plano [carroceria por subdivisão](../decisoes/PLANOS-ENCERRADOS.md).
 
 O Blender é opcional. A receita do Modelar continua sendo o produto, porque o conteúdo salvo é determinístico, versionado e reexecutável a partir dela, e uma malha feita no Blender é um arquivo opaco que muda entre versões do programa. Por isso o Blender fica fora do núcleo, fora do CI e fora do `--completo`, e nunca é versionado.
 
@@ -22,4 +22,4 @@ Estão provados a instalação do Blender 4.2 LTS a partir do tarball oficial, a
 
 ## Onde isto se liga ao resto
 
-O fluxo de referência que o Blender alimenta é o do plano encerrado [Veículos de referência livre](../planos/encerrados/2026-10-20-veiculos-de-referencia-livre.md), que recriou 27 veículos a partir de malhas de licença livre sem exigência de crédito. As ferramentas são `modelo-de-referencia.mjs`, `medidas-da-fonte.mjs`, `folha-comparativa.mjs` e `comparar-silhueta.mjs`, todas em `tools/modelar/`. As regras gerais estão em `CLAUDE.md`.
+O fluxo de referência que o Blender alimenta é o do plano encerrado [Veículos de referência livre](../decisoes/PLANOS-ENCERRADOS.md), que recriou 27 veículos a partir de malhas de licença livre sem exigência de crédito. As ferramentas são `modelo-de-referencia.mjs`, `medidas-da-fonte.mjs`, `folha-comparativa.mjs` e `comparar-silhueta.mjs`, todas em `tools/modelar/`. As regras gerais estão em `CLAUDE.md`.

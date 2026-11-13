@@ -142,10 +142,10 @@ suposição. Essa escolha é reversível e não altera identidade nem medidas.
 ## Evidência: roda dianteira
 
 O contrato de
-[`historico/EXPERIMENTO-RODA-REALISTA.md`](../historico/EXPERIMENTO-RODA-REALISTA.md) pediu
+[`historico/EXPERIMENTO-RODA-REALISTA.md`](../decisoes/HISTORICO-RETIRADO.md) pediu
 `realistaApresentacao`, `F3`, precisão mecânica e montagem usando a linguagem
 procedural atual. O resultado e os contornos estão em
-[`historico/RELATO-RODA-REALISTA.md`](../historico/RELATO-RODA-REALISTA.md).
+[`historico/RELATO-RODA-REALISTA.md`](../decisoes/HISTORICO-RETIRADO.md).
 
 Avaliação do agente principal, em que 10 é o melhor resultado:
 

@@ -11,7 +11,7 @@ peça continua sendo dela.
 **Repositório e base:** `warbookbr/nos-modelar`, main de 2026-11-09, com o braço robótico inteiro fixo.
 
 Em 2026-11-09 a pessoa passou a este plano `booleanas.js`, `geradores-avancados.js` e `guarda-acervo.mjs`, que eram do plano
-do [braço](encerrados/2026-09-26-as-partes-do-braco.md); eles voltam a ele quando este fechar, se o braço ainda precisar.
+do [braço](../decisoes/PLANOS-ENCERRADOS.md); eles voltam a ele quando este fechar, se o braço ainda precisar.
 
 A fatia 1 (2026-11-09) pôs as três réguas em `tools/modelar/reguas-de-malha/` e uma peça de prova por defeito em
 `tools/fixtures/costuras-e-furos/`. Números de hoje: dentes no fim que afina, 24 pontas em 18 trechos (a peça limpa da união de
@@ -31,7 +31,7 @@ O braço robótico saiu inteiro em 2026-11-09 e, exportado e aberto no Blender, 
 nenhuma medição do projeto pegou, e as rodadas do furgão e do braço deixaram outros no backlog:
 
 - onde o `arredondarCostura` afina até sumir junto a uma face plana (o aviso `faceLimite`, da fatia 2 da
-  [união de tubos](encerrados/2026-11-08-uniao-de-tubos-com-arredondamento.md)), a costura termina em dentes de serra, no braço
+  [união de tubos](../decisoes/PLANOS-ENCERRADOS.md)), a costura termina em dentes de serra, no braço
   superior, no antebraço e nos elos do punho;
 - o `unir` e o `arredondarCostura` de dois `lathe` deixam faces de três cantos colineares, que o `descrever` e o `guarda:acervo`
   aceitam e a bancada recusa (`adaptarThree: face ... é degenerada`), e por elas 30 dos 66 pares do braço montado saem

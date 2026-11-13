@@ -30,7 +30,6 @@ const NOME = /mecanifica/gi;
 
 /* Exceção por caminho: `caminho` casa o caminho relativo (com `/`) do arquivo, que fica dispensado por inteiro. */
 export const EXCECOES_POR_CAMINHO = [
-  { categoria: 'histórico', caminho: /^docs\/modelar\/historico\//, motivo: 'o histórico guarda o texto da época, com o nome da época; reescrevê-lo seria falsificar o registro' },
   { categoria: 'histórico', caminho: /^docs\/modelar\/planos\/(?:encerrados|concluidos|congelados)\//, motivo: 'planos encerrados, concluídos ou congelados guardam evidência com hash e já não governam trabalho novo' },
   { categoria: 'histórico', caminho: /^docs\/modelar\/banco-de-provas\//, motivo: 'o banco de provas guarda rodadas medidas, com caminhos absolutos e impressões de hash gravados; mudar o texto invalida a prova' },
   { categoria: 'aviso de leitura', caminho: /^tools\/ambiente\.(?:mjs|test\.mjs)$/, motivo: 'lê a variável MECANIFICA_* de propósito, com aviso, para o CI e o ambiente da pessoa mudarem sem quebrar' },

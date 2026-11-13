@@ -205,8 +205,8 @@
           "quando": "o documento é de uso, em docs/modelar/usar/"
         },
         {
-          "arquivo": "docs/modelar/historico/README.md",
-          "quando": "o documento vai para o histórico"
+          "arquivo": "docs/modelar/decisoes/HISTORICO-RETIRADO.md",
+          "quando": "o documento sai da árvore: a crônica guarda o commit onde o texto está"
         },
         {
           "arquivo": "docs/modelar/guias/LEITURA-POR-TAREFA.md",
@@ -233,12 +233,16 @@
       "quando": "Saber o que já se tentou, mediu ou pesquisou antes de propor algo.",
       "ler": [
         "CLAUDE.md",
-        "docs/modelar/historico/README.md"
+        "docs/modelar/decisoes/README.md"
       ],
       "sobDemanda": [
         {
-          "arquivo": "docs/modelar/planos/encerrados/README.md",
+          "arquivo": "docs/modelar/decisoes/PLANOS-ENCERRADOS.md",
           "quando": "a pergunta é sobre um plano concluído ou cancelado"
+        },
+        {
+          "arquivo": "docs/modelar/decisoes/HISTORICO-RETIRADO.md",
+          "quando": "a pergunta é sobre um relatório, dossiê ou diário que saiu da árvore"
         },
         {
           "arquivo": "docs/modelar/pesquisas/PESQUISA-ABERTA-2026-10.md",
@@ -255,15 +259,11 @@
         {
           "arquivo": "docs/modelar/pesquisas/ANALISES-DE-2026-10.md",
           "quando": "a pergunta é sobre a avaliação da estrutura do projeto"
-        },
-        {
-          "arquivo": "docs/modelar/historico/CHEGADA-2026-09-11.md",
-          "quando": "a pergunta é por que um documento saiu da raiz de docs/modelar/ ou onde foi parar"
         }
       ],
       "skill": null,
       "comandos": [],
-      "passo": "Abra docs/modelar/historico/README.md e siga para o item da pergunta, ou para o documento sob demanda que a responde.",
+      "passo": "Abra docs/modelar/decisoes/README.md: as decisões em vigor estão nos registros, e a crônica de planos e de histórico diz o commit onde cada texto está.",
       "conferido": "Nada a conferir: pesquisa não muda o repositório, e o que dela virar trabalho precisa de plano.",
       "orcamentoBytes": 6600,
       "linhaDeBase": {

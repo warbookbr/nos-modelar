@@ -32,7 +32,7 @@ ele. A definição completa está em
   (`npm run esboco:nucleo`); numa peça que já existe, as variantes de valores da
   `TABELA` saem do mesmo jeito (`npm run variantes`). O esboço antigo, com
   desenhista próprio, saiu em 2026-11-05
-  ([histórico](docs/modelar/historico/esboco-2d.md)).
+  ([histórico](./docs/modelar/decisoes/HISTORICO-RETIRADO.md)).
 - **motor de prancha** (`tools/modelar/prancha/prancha.mjs`, skill
   `desenhar-prancha`): desenha em 2D o contorno de referência de um invólucro
   antes de existir geometria 3D, e `prancha-referencia.mjs` compara a silhueta
@@ -76,14 +76,14 @@ divergem.
 
 Planos ativos: <!-- planos-ativos:inicio -->[revisão do projeto para o trabalho da IA](docs/modelar/planos/2026-11-12-revisao-do-projeto-para-o-trabalho-da-ia.md), [furgão realista](docs/modelar/planos/2026-10-30-furgao-realista.md), [costuras e furos limpos](docs/modelar/planos/2026-11-09-costuras-e-furos-limpos.md), [instalação solar no telhado](docs/modelar/planos/2026-11-12-instalacao-solar-no-telhado.md), [melhorias de processo da revisão](docs/modelar/planos/2026-11-13-melhorias-de-processo-da-revisao.md) e [organização dos documentos](docs/modelar/planos/2026-11-13-organizacao-dos-documentos.md).<!-- planos-ativos:fim -->
 
-Já fecharam [ajustes no núcleo dos veículos](docs/modelar/planos/encerrados/2026-10-21-ajustes-no-nucleo-dos-veiculos.md) em 2026-10-30;
-Já fecharam [veículos de referência livre](docs/modelar/planos/encerrados/2026-10-20-veiculos-de-referencia-livre.md) em 2026-10-20; [objetos externos
-como famílias](docs/modelar/planos/encerrados/2026-10-19-objetos-externos-como-familias.md) em 2026-10-20; [receitas com material e
-textura](docs/modelar/planos/encerrados/2026-10-19-receitas-com-material-e-textura.md) em 2026-10-19; [aparelhos de
-caixa](docs/modelar/planos/encerrados/2026-10-16-aparelhos-de-caixa.md) em 2026-10-19; [importar objeto de
-código](docs/modelar/planos/encerrados/2026-10-15-importar-objeto-de-codigo.md) e [gates em poucos
-minutos](docs/modelar/planos/encerrados/2026-10-16-gates-em-poucos-minutos.md) em 2026-10-16; o anterior, [o avião do esboço à
-receita](docs/modelar/planos/encerrados/2026-10-15-o-aviao-do-esboco-a-receita.md), fechou em
+Já fecharam [ajustes no núcleo dos veículos](./docs/modelar/decisoes/PLANOS-ENCERRADOS.md) em 2026-10-30;
+Já fecharam [veículos de referência livre](./docs/modelar/decisoes/PLANOS-ENCERRADOS.md) em 2026-10-20; [objetos externos
+como famílias](./docs/modelar/decisoes/PLANOS-ENCERRADOS.md) em 2026-10-20; [receitas com material e
+textura](./docs/modelar/decisoes/PLANOS-ENCERRADOS.md) em 2026-10-19; [aparelhos de
+caixa](./docs/modelar/decisoes/PLANOS-ENCERRADOS.md) em 2026-10-19; [importar objeto de
+código](./docs/modelar/decisoes/PLANOS-ENCERRADOS.md) e [gates em poucos
+minutos](./docs/modelar/decisoes/PLANOS-ENCERRADOS.md) em 2026-10-16; o anterior, [o avião do esboço à
+receita](./docs/modelar/decisoes/PLANOS-ENCERRADOS.md), fechou em
 2026-10-16 com o avião aprovado pela pessoa.
 
 ## Peças são exemplos

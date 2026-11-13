@@ -2,9 +2,9 @@
 
 **Estado:** rascunho
 
-**Território:** a declarar ao ativar; o plano dos [materiais realistas](encerrados/2026-11-08-materiais-realistas.md), que dividia
+**Território:** a declarar ao ativar; o plano dos [materiais realistas](../decisoes/PLANOS-ENCERRADOS.md), que dividia
 com este `src/autoria/material-da-receita.js`, `modulos/textura/` e `src/bancada/`, fechou em 2026-11-08; o `--ambiente` da captura já existe, e a câmera
-por ponto e o nome curto passaram ao plano das [ferramentas de conferência e de vista](encerrados/2026-11-09-ferramentas-de-conferencia-e-vista.md).
+por ponto e o nome curto passaram ao plano das [ferramentas de conferência e de vista](../decisoes/PLANOS-ENCERRADOS.md).
 
 **Responsável:** Tiago (aprovação por imagem) e a IA da sessão (implementação)
 

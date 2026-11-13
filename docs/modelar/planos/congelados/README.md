@@ -8,7 +8,7 @@ Isto é diferente das outras duas situações já usadas no repositório:
 
 | situação | onde fica | o que significa |
 | --- | --- | --- |
-| concluído | `../encerrados/` | executou até a decisão registrada |
+| concluído | `../../decisoes/PLANOS-ENCERRADOS.md` | executou até a decisão registrada; o texto está no git |
 | cancelado | permanece em `../` com `**Estado:** cancelado` | a premissa caiu; não volta como estava |
 | congelado | aqui | a premissa continua de pé, mas outra rota foi escolhida |
 

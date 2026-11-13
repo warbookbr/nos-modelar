@@ -44,5 +44,6 @@ há mais comandos `oficina`, `servir`, `guardar:salvar`, `jogar`, `criar`, `exec
 - [`docs/nos-herdado/oficina-referencia.md`](./nos-herdado/oficina-referencia.md): aviso de
   compatibilidade da interface removida.
 
-Evidências encerradas ficam em [`docs/modelar/historico/`](./modelar/historico/)
-e não governam trabalho novo.
+Evidências encerradas saíram da árvore em 2026-11-13: a crônica em
+[`docs/modelar/decisoes/HISTORICO-RETIRADO.md`](./modelar/decisoes/HISTORICO-RETIRADO.md)
+diz o commit onde estão, e elas não governam trabalho novo.

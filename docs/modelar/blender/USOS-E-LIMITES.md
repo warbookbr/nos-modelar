@@ -11,7 +11,7 @@ Cada uso abaixo diz o ganho esperado e o custo, e vem marcado como provado ou po
 | Oráculo de booleana e arredondamento | por provar | comparar o que o núcleo gera com o que o Blender gera nos mesmos casos e achar as falhas listadas em "Ajustes no núcleo" do plano de veículos | casos mínimos reproduzíveis nos dois lados e leitura da diferença |
 | Malha suave como alvo visual de forma curva | por provar | dar à pessoa um alvo mais liso que as primitivas facetadas do núcleo | risco de a malha virar fonte de forma que a receita não reproduz |
 
-As falhas do núcleo a que o oráculo se aplicaria são a face fina deixada por subtrair cilindros em carroceria, os pontos alinhados em perfil de extrusão recusados pelo exportador, o `arredondarAresta` que deixa vértice solto, a parte de contorno com ponto repetido que some sem erro e a revolução de perfil que não toca o eixo. Estão descritas em "Ajustes no núcleo" de [`2026-10-20-veiculos-de-referencia-livre.md`](../planos/encerrados/2026-10-20-veiculos-de-referencia-livre.md) e dependem de plano próprio.
+As falhas do núcleo a que o oráculo se aplicaria são a face fina deixada por subtrair cilindros em carroceria, os pontos alinhados em perfil de extrusão recusados pelo exportador, o `arredondarAresta` que deixa vértice solto, a parte de contorno com ponto repetido que some sem erro e a revolução de perfil que não toca o eixo. Estão descritas em "Ajustes no núcleo" de [`2026-10-20-veiculos-de-referencia-livre.md`](../decisoes/PLANOS-ENCERRADOS.md) e dependem de plano próprio.
 
 ## Limites e regras
 

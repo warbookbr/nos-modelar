@@ -16,21 +16,21 @@ A entrada de qualquer tarefa é o `CLAUDE.md`, o contrato mínimo, e
 `npm run comecar -- <roteiro>`, que diz o que ler. Este índice é a leitura do
 roteiro `mudar/plano`; criar, inspecionar, corrigir ou auditar uma peça segue o
 roteiro de modelar e a porta [`usar/README.md`](usar/README.md). O que está
-encerrado vive em
-[`historico/README.md`](historico/README.md)
-(`docs/modelar/historico/README.md`) e não governa trabalho novo.
+encerrado saiu da árvore, e a crônica em
+[`decisoes/HISTORICO-RETIRADO.md`](./decisoes/HISTORICO-RETIRADO.md)
+diz o commit onde está; não governa trabalho novo.
 
 ## Estado atual
 
 - Planos ativos: <!-- planos-ativos:inicio -->[revisão do projeto para o trabalho da IA](planos/2026-11-12-revisao-do-projeto-para-o-trabalho-da-ia.md), [furgão realista](planos/2026-10-30-furgao-realista.md), [costuras e furos limpos](planos/2026-11-09-costuras-e-furos-limpos.md), [instalação solar no telhado](planos/2026-11-12-instalacao-solar-no-telhado.md), [melhorias de processo da revisão](planos/2026-11-13-melhorias-de-processo-da-revisao.md) e [organização dos documentos](planos/2026-11-13-organizacao-dos-documentos.md).<!-- planos-ativos:fim -->
-- Encerrados recentes: [abertura em qualquer direção](planos/encerrados/2026-11-06-abertura-em-qualquer-direcao.md), [limites do sólido por laços](planos/encerrados/2026-11-05-limites-do-solido-por-lacos.md), [esboço pelo núcleo](planos/encerrados/2026-11-05-esboco-pelo-nucleo.md) e [sólido por laços](planos/encerrados/2026-11-05-solido-por-lacos.md); os outros na [crônica](planos/encerrados/README.md).
-- A [exportação CAD/STEP modular](./planos/encerrados/2026-08-28-exportacao-cad-step.md)
+- Encerrados recentes: [abertura em qualquer direção](./decisoes/PLANOS-ENCERRADOS.md), [limites do sólido por laços](./decisoes/PLANOS-ENCERRADOS.md), [esboço pelo núcleo](./decisoes/PLANOS-ENCERRADOS.md) e [sólido por laços](./decisoes/PLANOS-ENCERRADOS.md); os outros na [crônica](./decisoes/PLANOS-ENCERRADOS.md).
+- A [exportação CAD/STEP modular](./decisoes/PLANOS-ENCERRADOS.md)
   entregou `modulos/exportador-cad/`, `modulos/exportador-obj/` e as CLIs
   `npm run exportar:step` e `npm run exportar:obj`. O STEP sai por
   `occt-wasm@4.3.2`, MIT/Apache-2.0 com `.wasm` LGPL-2.1 consumido como pacote
   separado, o que não muda a licença deste repositório. Detalhe em
   [`DOSSIE-EXPORTACAO-CAD-STEP.md`](pesquisas/DOSSIE-EXPORTACAO-CAD-STEP.md) e prova em
-  [`RELATORIO-EXPORTACAO-CAD-STEP-R00.md`](./historico/RELATORIO-EXPORTACAO-CAD-STEP-R00.md).
+  [`RELATORIO-EXPORTACAO-CAD-STEP-R00.md`](./decisoes/HISTORICO-RETIRADO.md).
 - `npm run ativar:bancada` carrega peça ou montagem na bancada e sincroniza a
   sessão; o estado é local e não versionado. Procedimento em
   [`ATIVACAO-BANCADA-SESSAO-ATIVA.md`](./usar/ATIVACAO-BANCADA-SESSAO-ATIVA.md);
@@ -46,10 +46,12 @@ encerrado vive em
 - O banco de provas versionado e o registro de custo do plano de modelagem vivem em
   [`banco-de-provas/BANCO-DE-PROVAS.md`](banco-de-provas/BANCO-DE-PROVAS.md)
   (`docs/modelar/banco-de-provas/BANCO-DE-PROVAS.md`).
+  As pastas de rodada, com a evidência de cada plano, estão listadas em
+  [`banco-de-provas/README.md`](banco-de-provas/README.md).
 
 A crônica dos planos concluídos e cancelados está em
-[`planos/encerrados/README.md`](planos/encerrados/README.md)
-(`docs/modelar/planos/encerrados/README.md`): evidência consultável, não
+[`decisoes/PLANOS-ENCERRADOS.md`](./decisoes/PLANOS-ENCERRADOS.md),
+com o commit onde o texto de cada um está: evidência consultável, não
 governa trabalho novo.
 
 ## Direção estabelecida
@@ -179,8 +181,8 @@ Nenhuma pendência desta lista autoriza implementação automática.
 
 ## Histórico e inventário
 
-Resultados encerrados ficam em [`historico/README.md`](historico/README.md), os
-planos fechados em [`planos/encerrados/README.md`](planos/encerrados/README.md) e
+Resultados encerrados ficam em [`historico/README.md`](./decisoes/HISTORICO-RETIRADO.md), os
+planos fechados em [`planos/encerrados/README.md`](./decisoes/PLANOS-ENCERRADOS.md) e
 as decisões do NÓS em `docs/nos-herdado/`. Nenhuma delas autoriza trabalho novo.
 
 A lista comentada de documentos e as fontes de verdade estão em

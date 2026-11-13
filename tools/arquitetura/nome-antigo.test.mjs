@@ -197,7 +197,6 @@ describe('as exceções reais, num repositório de ensaio', () => {
       'tools/arquitetura/termos-proibidos.mjs': `const c = '~/.config/${m}/chave-termos';\nconst t = '${m}:termos-proibidos:verificador';\n`,
       [`procedural${B}pecas/roda/rodada-1/nota.md`]: `/home/user/nos-${m}/procedural\n`,
       'AGENTS.md': `Decisões com \`brigsd/nos-${m}\`.\n`,
-      [`docs${B}modelar/historico/RELATORIO.md`]: `${capitalizado} ${A}_X\n`,
       [`docs${B}modelar/planos/encerrados/2026-01-01-velho.md`]: `${capitalizado}\n`,
       [`docs${B}modelar/banco-de-provas/rodada/nota.md`]: `/home/user/nos-${m}\n`,
       'tools/ambiente.mjs': `export const nomeAntigo = (s) => \`${A}_\${s}\`;\n`,

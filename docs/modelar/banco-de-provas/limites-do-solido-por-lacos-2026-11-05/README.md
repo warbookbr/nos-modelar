@@ -1,6 +1,6 @@
 # Limites do sólido por laços — provas das fatias 1 a 3
 
-Provas do plano [limites do sólido por laços](../../planos/encerrados/2026-11-05-limites-do-solido-por-lacos.md), em 2026-11-05. A peça de teste é a
+Provas do plano [limites do sólido por laços](../../decisoes/PLANOS-ENCERRADOS.md), em 2026-11-05. A peça de teste é a
 coluna sobre disco, em `tools/fixtures/solido-por-lacos/coluna.js` (a forma e os laços em `coluna-forma.js`, as medidas em
 `coluna-medir.mjs`, o teste em `coluna.test.ts`, o alvo em `referencias/alvo-da-coluna.md`): um disco de eixo z (raio 78 mm, espessura
 156 mm) e um cilindro de 156 mm de diâmetro e eixo y que sobe dele, tangente às duas faces, com o topo plano a 477 mm do fundo do disco,

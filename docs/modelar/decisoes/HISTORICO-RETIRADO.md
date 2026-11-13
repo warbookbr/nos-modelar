@@ -1,6 +1,6 @@
 # Histórico retirado: do que trata cada arquivo
 
-O texto inteiro de cada arquivo está no git, no commit `<C>`, em `docs/modelar/historico/<arquivo>`, e se lê com `git show <C>:docs/modelar/historico/<arquivo>`. A pasta saiu da árvore em 2026-11-13, com o plano de organização dos documentos; o que segue é uma linha por arquivo, em ordem alfabética.
+O texto inteiro de cada arquivo está no git, no commit `a60c067b`, em `docs/modelar/historico/<arquivo>`, e se lê com `git show a60c067b:docs/modelar/historico/<arquivo>`. A pasta saiu da árvore em 2026-11-13, com o plano de organização dos documentos; o que segue é uma linha por arquivo, em ordem alfabética.
 
 Histórico não governa trabalho novo: é registro do que se fez e se mediu. As decisões que continuam valendo estão em `registros/`, nesta pasta.
 
@@ -69,7 +69,7 @@ Histórico não governa trabalho novo: é registro do que se fez e se mediu. As 
 - `VEICULOS-PRIMEIRA-LEVA-2026-10.md`: diagnóstico da primeira leva de veículos de referência livre e o experimento da perua pelas três vistas.
 - `esboco-2d.md`: o esboço 2D antigo (modulos/esboco/, 117 arquivos), que saiu em 2026-11-05, o que ensinou e como recriar.
 
-Pastas de dados, lidas só por ferramenta:
+Pastas de dados (nenhum teste nem gate as lê, e o gerador que `CHEGADA-2026-09-11.md` cita já não existe, então saíram com a pasta e o git as guarda):
 
 - `ciclo6/`: 14 arquivos JSON do ciclo 6, a rodada de agosto em que quatro atritos do motor (A-30, A-34, A-36 e A-37) foram atacados em paralelo, com duas propostas independentes cada, o cruzamento, o mapa, as críticas e os vereditos; evidência congelada da época.
 - `evidencias-n2-forma-global/`: 10 arquivos JSON, as evidências do N2 de forma global (alvo, andaime, blocagem, avaliações G00 e G01, pacotes do crítico e o manifesto).

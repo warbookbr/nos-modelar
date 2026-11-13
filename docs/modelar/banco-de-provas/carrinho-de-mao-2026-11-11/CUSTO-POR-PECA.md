@@ -1,6 +1,6 @@
 # Custo por peça do carrinho de mão
 
-Tabela gerada em 2026-11-11 pelo comando `npm run -s custo:peca -- procedural/pecas/carrinho-de-mao`, que lê os registros de rodada em `procedural/pecas/carrinho-de-mao/partes/*/rodadas/`. O carrinho de mão é a peça de prova da fatia 1 do plano [Núcleo para qualquer mecanismo](../../planos/encerrados/2026-11-10-nucleo-para-qualquer-mecanismo.md), e a linha de base é a [tabela da empilhadeira](../empilhadeira-2026-11-09/CUSTO-POR-PECA.md).
+Tabela gerada em 2026-11-11 pelo comando `npm run -s custo:peca -- procedural/pecas/carrinho-de-mao`, que lê os registros de rodada em `procedural/pecas/carrinho-de-mao/partes/*/rodadas/`. O carrinho de mão é a peça de prova da fatia 1 do plano [Núcleo para qualquer mecanismo](../../decisoes/PLANOS-ENCERRADOS.md), e a linha de base é a [tabela da empilhadeira](../empilhadeira-2026-11-09/CUSTO-POR-PECA.md).
 
 ```text
 custo por peça: carrinho-de-mao

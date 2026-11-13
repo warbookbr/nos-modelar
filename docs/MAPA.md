@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2085 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1904 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -91,6 +91,7 @@
 
 - `BANCO-DE-PROVAS.md` — Banco de provas e registro de custo
 - `MEDICAO-DE-TOKENS-2026-10.md` — Onde vão os tokens do esbocista (2026-10-07)
+- `README.md` — Banco de provas: as pastas de rodada
 
 ## docs/modelar/banco-de-provas/abertura-de-contorno-2026-11-05/
 
@@ -522,73 +523,6 @@
 - `modelar-veiculo-em-chassi-e-lataria.md` — Modelar um veículo em chassi e lataria
 - `modelar-veiculos.md` — Modelar veículos a partir de uma fonte de referência
 
-## docs/modelar/historico/
-
-- `ALVO-N6-CUPE-ESPORTIVO.md` — Alvo N6 — cupê esportivo aprovado
-- `ANALISE-CHASSI-REALISTA-KERNEL-GEOMETRICO.md` — Análise — chassi realista e escolha de representação geométrica
-- `BASELINE-MOTOR-R00.md` — Baseline do motor procedural — R00
-- `BICICLETA-REALISTA-ATRITOS.md` — Bicicleta realista: diário de atrito da rodada
-- `CADEIRA-REALISTA-NOTAS.md` — Cadeira Realista — Notas de Projeto, Problemas e Limitações
-- `CHASSI-P0-ALVO-E-LIMIARES.md` — Chassi P0 — alvo, referência e limiares
-- `CHASSI-P1-CONTRATO-DA-CAGE.md` — Chassi P1 — contrato da malha de controle
-- `CHEGADA-2026-09-11.md` — O que chegou aqui em 2026-09-11
-- `CONJUNTO-PROVA-AUTORIA-GEOMETRICA.md` — Conjunto de prova — autoria geométrica do zero
-- `CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md` — Contexto das ferramentas de modelagem
-- `DOSSIE-CABO-DE-PA.md` — Cabo de pá: alternativas ao eucalipto — dossiê técnico
-- `DOSSIE-FLUXO-IA-VALIDACAO-MULTIFAMILIA.md` — Dossiê — fluxo de IA e validação multifamília
-- `DOSSIE-LABORATORIO-IA.md` — Laboratório computacional para investigação por IA
-- `DOSSIE-MODELADOR-POR-SELECAO.md` — Dossiê histórico — modelador por seleção
-- `DOSSIE-MOTOR-SUPERFICIES-NATIVAS.md` — Dossiê — motor nativo de superfícies semânticas
-- `DOSSIE-PLATAFORMA-AUTORIA-3D-NATIVA.md` — Dossiê — plataforma nativa de autoria 3D para IA
-- `EXPERIMENTO-AB-FLUXO-IA.md` — Experimento A/B — o fluxo ajuda a IA a modelar?
-- `EXPERIMENTO-CARRO-SEM-APOIO.md` — Carro modelado do zero, sem o motor da Mecanifica
-- `EXPERIMENTO-RODA-REALISTA.md` — Experimento de autoria — roda realista
-- `FLUXO-AUTORIA-N1.md` — Fluxo de autoria 3D — contratos executáveis da N1
-- `GRAFO-DE-CAPACIDADES-COMO-RECRIAR.md` — Grafo de capacidades: o que era e como recriar
-- `IMPORTADORES-COMO-RECRIAR.md` — Importadores de objeto de código: como recriar
-- `LABORATORIO-IA-PROGRESSO.md` — Laboratório computacional para IA — progresso por fatia
-- `LEVANTAMENTO-DESENHO-SEM-REFERENCIA.md` — Levantamento: desenho sem referência
-- `LEVANTAMENTO-IA-3D-2026-10.md` — Levantamento: IAs que geram 3D e o lugar do Mecanifica (2026-10-05)
-- `MALHA-OTIMIZADA-PROGRESSO.md` — Malha otimizada e prova por objeto — progresso
-- `MATRIZ-RASTREABILIDADE-AUTORIA-3D-NATIVA.md` — Matriz de rastreabilidade — autoria 3D nativa para IA
-- `OFICINA-OTIMIZACOES.md` — Otimizações da Oficina para autoria por IA
-- `PLANO-ESTADO-DA-ARTE-ESBOCO.md` — Plano de Implementação: Estado da Arte e Ergonomia para IA no `@modelar/esboco`
-- `PLANO.md` — Plano mestre da Mecanifica — aposentado
-- `PROTOCOLO-DIAGNOSTICO-MOTOR.md` — Protocolo detalhado — diagnóstico do motor procedural
-- `README.md` — Histórico da Mecanifica
-- `REGISTRO-FALHAS-AUTORIA-V.md` — Registro de falhas da autoria — V-01 a V-38
-- `RELATO-RODA-REALISTA.md` — Relato do experimento — roda realista
-- `RELATORIO-ANALISE-GRANDES-MELHORIAS.md` — Análise — estado e grandes melhorias
-- `RELATORIO-AUDITORIA-PRATICAS-AUTORIA-3D.md` — Auditoria das práticas de autoria 3D
-- `RELATORIO-CHASSI-P2-PROVA-DO-QUARTO.md` — Chassi P2 — relatório da prova do quarto dianteiro
-- `RELATORIO-DIAGNOSTICO-MOTOR.md` — Relatório — diagnóstico do motor procedural
-- `RELATORIO-ENSAIO-DOBRADICA-1-0.md` — Relatório — ensaio ponta a ponta da dobradiça 1.0
-- `RELATORIO-ESTUDO-CAMPO-CONJUNTO-DIANTEIRO.md` — Relatório — estudo de campo do conjunto dianteiro
-- `RELATORIO-EXPERIMENTO-AUTORIA-GEOMETRICA.md` — Relatório — experimento de autoria geométrica do zero
-- `RELATORIO-EXPORTACAO-CAD-STEP-R00.md` — Relatório R00 — exportação CAD/STEP
-- `RELATORIO-MODELADOR-INVERSO-P0.md` — Relatório P0 — confiança antes de geometria
-- `RELATORIO-MOTOR-DE-PRANCHA-R0.md` — Motor de Prancha — R0: linha de base e corpus adversarial
-- `RELATORIO-MOTOR-DE-PRANCHA-R1.md` — Motor de Prancha — R1: comparação externa controlada
-- `RELATORIO-MOTOR-DE-PRANCHA-R2.md` — Motor de Prancha — R2: contrato de autoria confiável
-- `RELATORIO-MOTOR-DE-PRANCHA-R3.md` — Motor de Prancha — R3: implementação e replay do corpus
-- `RELATORIO-MOTOR-DE-PRANCHA-R4.md` — Motor de Prancha — R4: autoria fria, revisão e limite de impacto
-- `RELATORIO-N1-FLUXO-AUTORIA.md` — Relatório N1 — contratos e orquestração da autoria 3D
-- `RELATORIO-N2-FORMA-GLOBAL.md` — Relatório N2 — forma global
-- `RELATORIO-N3-CANAL-PERCEPCAO.md` — Relatório N3 — canal de percepção
-- `RELATORIO-N4-RESTRICOES.md` — Relatório N4 — sonda de autoria por restrição
-- `RELATORIO-N5-BUSCA.md` — Relatório N5 — busca residual controlada
-- `RELATORIO-N6-CANARIO-CASCO-VISUAL.md` — Relatório N6 — canário de casco por silhuetas
-- `RELATORIO-PLATAFORMA-PROCEDURAL-R10.md` — Relatório R10 — plataforma procedural
-- `RELATORIO-PONTE-THREE.md` — Relatório da ponte Three.js
-- `RELATORIO-R05-REVALIDACAO-CAMPO.md` — Relatório R05 — estudo de campo da revalidação persistida
-- `RELATORIO-R2-CAGE-DIRETA-R3.md` — R2 — relatório de decisão da cage direta
-- `RELATORIO-SONDA-ARMADURA-HUMANOIDE-1-0.md` — Relatório da sonda — armadura humanoide tecnológica 1.0
-- `RELATORIO-SONDA-SUPERCARRO-1-0.md` — Relatório da sonda de escala — supercarro exterior 1.0
-- `REORGANIZACAO-POR-USO-PROGRESSO.md` — Reorganização por uso — progresso
-- `REVISAO-DE-RUMO-2026-10.md` — Revisão de rumo do Mecanifica (2026-10-06)
-- `VEICULOS-PRIMEIRA-LEVA-2026-10.md` — Veículos de referência livre: o diagnóstico da primeira leva
-- `esboco-2d.md` — Esboço 2D: o que era, o que ensinou e como recriar
-
 ## docs/modelar/pesquisas/
 
 - `ANALISES-DE-2026-10.md` — Análises de 2026-10
@@ -646,127 +580,6 @@
 - `2026-09-10-carroceria-por-casca-deformavel.md` — Carroceria por casca deformável ajustada contra referência
 - `2026-09-17-vocabulario-poligonal-da-bancada.md` — Vocabulário poligonal da bancada
 - `README.md` — Planos congelados
-
-## docs/modelar/planos/encerrados/
-
-- `2026-08-04-mcp-para-agentes.md` — MCP para agentes — reduzir contexto sem perder rastreabilidade
-- `2026-08-05-mcp-autoria-controlada.md` — MCP — autoria controlada de pacotes
-- `2026-08-05-mcp-avaliacao-consolidada.md` — MCP — avaliação consolidada por agente consumidor
-- `2026-08-05-mcp-correcao-descoberta.md` — MCP — correção de descoberta de pacotes e revisões
-- `2026-08-05-mcp-fatia-1b-visual.md` — MCP — Fatia 1B visual somente leitura
-- `2026-08-06-diagnostico-motor-procedural.md` — Diagnóstico do motor procedural atual
-- `2026-08-07-montagem-minima-persistida-v1.md` — Montagem Mínima Persistida v1
-- `2026-08-09-montagem-persistida-v2-relacoes-locais.md` — Montagem Persistida v2 — Relações Locais
-- `2026-08-14-autoria-segura-receitas.md` — Autoria segura de receitas declarativas
-- `2026-08-14-contexto-de-montagem-para-ia.md` — Contexto de montagem persistida para IA
-- `2026-08-14-contexto-visual-e-autoria-segura.md` — Contexto visual e autoria segura de montagem
-- `2026-08-14-continuidade-autoria-ativa.md` — Continuidade de autoria ativa
-- `2026-08-14-experimento-autoria-geometrica.md` — Experimento de autoria geométrica do zero
-- `2026-08-14-mapa-canonico-dependencias.md` — Mapa canônico de dependências v1
-- `2026-08-14-materializacao-autoria-segura.md` — Materialização e autoria segura de montagens
-- `2026-08-14-mcp-montagens-leitura.md` — MCP — leitura e auditoria de montagens
-- `2026-08-14-revalidacao-cascata-persistida.md` — Revalidação em cascata persistida v1
-- `2026-08-14-separacao-direcional-e-impacto-local.md` — Separação direcional e impacto local de montagem
-- `2026-08-17-abertura-oblonga.md` — Abertura oblonga — rasgo como forma de primeira classe
-- `2026-08-17-alteracao-compacta.md` — Alteração semântica compacta de montagem
-- `2026-08-17-correcoes-fluxo-dobradica.md` — Correções do fluxo encontradas no estudo de dobradiça
-- `2026-08-17-desacoplamento-catalogo-validacao.md` — Independência entre núcleo, validação e catálogo
-- `2026-08-17-encostar.md` — Encostar — contato derivado no lugar de coordenada digitada
-- `2026-08-17-estudo-conjunto-dobradica.md` — Estudo de campo — autoria de um conjunto simples de três peças
-- `2026-08-17-historico-de-revisao.md` — Histórico de revisão — olhar para trás e voltar
-- `2026-08-17-lathe-fechado.md` — Perfil fechado no `lathe` — e a limpeza da lista de pendências
-- `2026-08-17-migracao-fps-para-procedural.md` — Migração estrutural de `fps` para `procedural`
-- `2026-08-17-nome-de-copia.md` — Nome de cópia no `arranja` — endereço de autor para o grupo linear
-- `2026-08-17-ponto-nomeado.md` — Ponto nomeado — e a revisão dos atritos vizinhos
-- `2026-08-17-pose-de-criacao.md` — Pose de criação — `em` e `eixo` nos geradores
-- `2026-08-18-auditoria-intersecoes-montagem.md` — Auditoria de interseções em montagens
-- `2026-08-18-chassi-realista-kernel-geometrico.md` — Chassi realista — representação de superfície para carroceria
-- `2026-08-18-ensaio-ponta-a-ponta-dobradica.md` — Ensaio ponta a ponta — dobradiça de porta
-- `2026-08-18-plataforma-procedural-extensivel.md` — Plataforma procedural extensível e descobrível
-- `2026-08-18-sonda-armadura-humanoide-1-0.md` — Sonda de sistema — armadura humanoide tecnológica 1.0
-- `2026-08-18-sonda-supercarro-1-0.md` — Sonda de escala — supercarro exterior 1.0
-- `2026-08-19-chassi-p2-prova-do-quarto.md` — Chassi P2 — prova descartável do quarto dianteiro
-- `2026-08-19-coerencia-entre-vistas.md` — Coerência entre vistas na prancha
-- `2026-08-19-leitura-de-referencia-medida.md` — Leitura de referência rasterizada
-- `2026-08-19-motor-de-prancha-medida.md` — Motor de prancha com filete e medida
-- `2026-08-20-aceite-visual-e-prova-de-superficie.md` — Aceite visual vinculante e prova de superfície
-- `2026-08-20-auditoria-praticas-autoria-3d.md` — Auditoria das práticas de autoria 3D da Mecanifica
-- `2026-08-20-motor-de-prancha-autonomia.md` — Motor de Prancha — autonomia verificável
-- `2026-08-20-validacao-integrada-modelar.md` — Validação integrada do Modelar — valor Agent-First
-- `2026-08-23-arquitetura-hibrida-familias-modelagem-ia.md` — Histórico cancelado — modelador por seleção
-- `2026-08-23-redesenho-cage-r2b-controle-vertical.md` — Redesenho R2B — controle vertical da cage direta
-- `2026-08-28-exportacao-cad-step.md` — Exportação CAD/STEP modular
-- `2026-08-31-malha-otimizada-e-prova-por-objeto.md` — Malha otimizada e prova por objeto
-- `2026-08-31-reorganizacao-por-uso.md` — Reorganização da documentação por uso
-- `2026-09-01-laboratorio-computacional-ia.md` — Laboratório computacional para investigação por IA
-- `2026-09-07-atrito-achado-modelando.md` — Atrito achado modelando
-- `2026-09-07-esteira-confiavel-para-ia.md` — Esteira confiável para a IA
-- `2026-09-07-o-que-nenhuma-vista-mostra.md` — O que nenhuma vista mostra
-- `2026-09-07-parametro-que-move-a-peca.md` — Parâmetro que move a peça
-- `2026-09-08-esquecer-precisa-falhar.md` — Esquecer precisa falhar
-- `2026-09-09-bancada-referencias-e-controles.md` — 2026-09-09 — referências visuais e controles da bancada
-- `2026-09-10-ponte-do-gesto-ao-parametro.md` — Ponte do gesto ao parâmetro nomeado
-- `2026-09-11-a-peca-mora-num-lugar-so.md` — A peça mora num lugar só
-- `2026-09-11-orquestracao-de-modelagem.md` — Orquestração de modelagem — alinhamento, despacho e veredito
-- `2026-09-12-a-seta-move-de-verdade.md` — A seta move de verdade
-- `2026-09-14-ajuste-da-bancada-volta-como-receita.md` — Ajuste da bancada volta como receita — o caminho de volta existe
-- `2026-09-15-modo-de-edicao-de-malha.md` — Modo de edição de malha — vértice, aresta e face
-- `2026-09-16-topologia-e-leitura-do-gesto.md` — Topologia, mover a peça, e ler o gesto
-- `2026-09-17-nada-depende-da-bicicleta.md` — Nada depende da bicicleta
-- `2026-09-21-o-que-o-braco-robotico-achou.md` — O que o braço robótico achou
-- `2026-09-22-a-peca-nasce-encaixada.md` — A peça nasce encaixada
-- `2026-09-22-o-motor-mora-num-lugar-so.md` — O núcleo mora num lugar só, e se chama núcleo
-- `2026-09-22-o-teste-carrega-o-que-ele-prova.md` — O teste carrega o que ele prova
-- `2026-09-23-o-laco-constroi-parte-por-parte.md` — O laço constrói parte por parte
-- `2026-09-25-o-braco-inteiro.md` — O braço inteiro
-- `2026-09-26-as-partes-do-braco.md` — As partes do braço
-- `2026-09-28-uniao-de-solidos.md` — União de sólidos — dois sólidos viram uma peça só
-- `2026-09-29-o-esboco-sem-conta-a-mao.md` — O esboço sem conta à mão
-- `2026-10-01-o-esboco-detalhado-coerente.md` — O esboço detalhado coerente
-- `2026-10-06-o-catalogo-de-familias.md` — O catálogo de famílias
-- `2026-10-07-as-ferramentas-de-modelagem.md` — As ferramentas de modelagem
-- `2026-10-07-o-caminho-curto-da-ia.md` — O caminho curto da IA
-- `2026-10-08-perguntas-do-critico-por-objeto.md` — Perguntas do crítico por componente e por família de objeto
-- `2026-10-11-o-que-o-aviao-pede.md` — O que o avião pede
-- `2026-10-13-desenho-sem-referencia.md` — Desenho sem referência
-- `2026-10-14-familias-de-desenho.md` — As famílias de desenho
-- `2026-10-15-importar-objeto-de-codigo.md` — Importar objeto de código — um objeto descrito em OpenSCAD chega ao esboço e à receita por importação
-- `2026-10-15-o-aviao-do-esboco-a-receita.md` — O avião do esboço à receita
-- `2026-10-16-aparelhos-de-caixa.md` — Aparelhos de caixa — uma família gera eletrodomésticos e eletrônicos de caixa, provada no forninho elétrico
-- `2026-10-16-gates-em-poucos-minutos.md` — Gates em poucos minutos — a bateria completa volta a caber no trabalho sem tirar nenhuma conferência
-- `2026-10-19-objetos-externos-como-familias.md` — Objetos externos como famílias do Mecanifica — da receita traduzida ao perfil aprovado
-- `2026-10-19-receitas-com-material-e-textura.md` — Receitas com material e textura — tradução sem perdas do projeto externo da pessoa e geração de textura em Node
-- `2026-10-20-veiculos-de-referencia-livre.md` — Veículos de referência livre — 27 peças do acervo recriadas a partir de malhas de licença livre sem exigência de crédito
-- `2026-10-21-ajustes-no-nucleo-dos-veiculos.md` — Ajustes no núcleo dos veículos — o que as 27 receitas revelaram vai para o núcleo e para as ferramentas gerais
-- `2026-10-21-carroceria-por-subdivisao.md` — Carroceria por subdivisão — superfície contínua com vincos nomeados no núcleo
-- `2026-10-22-leitura-por-demanda-e-limpeza.md` — Leitura por demanda e limpeza — a IA lê só o que a tarefa pede e o repositório perde o que ninguém usa
-- `2026-10-23-gaiola-que-segue-as-feicoes.md` — Gaiola que segue as feições — anéis de gaiola em volta de vãos e arcos para a carroceria ter moldura, calha e lábio
-- `2026-10-24-carroceria-por-rede-de-curvas.md` — Carroceria por rede de curvas — a superfície preenchida entre curvas de feição nomeadas, com o detalhe lido em cortes ampliados
-- `2026-10-25-renomear-para-modelar.md` — Renomear para Modelar — o projeto e o repositório passam a ter um nome só
-- `2026-10-27-bateria-rapida-e-retorno-cedo.md` — Bateria rápida e retorno cedo — a bateria local abaixo de um minuto e a completa abaixo de cinco no CI
-- `2026-10-30-glossario-e-entrada-para-pessoas.md` — Glossário e entrada para pessoas — uma página que explica o projeto a quem chega de fora, com os termos que ela usa definidos nela
-- `2026-10-30-interface-da-bancada.md` — Interface da bancada — a tela organizada em torno da peça, sobre um sistema visual único, com a forma escolhida pela pessoa por imagem
-- `2026-10-30-visoes-de-conferencia-na-bancada.md` — Visões de conferência e interface da bancada — arame, raio X, curvatura, zebra e luz rasante em tempo real, num seletor, e a tela reorganizada em torno da pe…
-- `2026-11-03-ajustes-da-bancada.md` — Ajustes da bancada — o objeto abre inteiro e a tela perde o que a pessoa não usa
-- `2026-11-03-descrever-rapido.md` — Descrever rápido — o mesmo resultado em uma fração do tempo
-- `2026-11-03-regras-de-desenho-por-familia.md` — Regras de desenho por família — o que a pessoa corrige vira regra que o próximo objeto lê
-- `2026-11-05-abertura-de-contorno-livre.md` — Abertura de contorno livre — a chapa ganha um vão pela curva que a receita desenha, sem depender das linhas da gaiola
-- `2026-11-05-esboco-pelo-nucleo.md` — Esboço pelo núcleo — as opções de forma saem das mesmas operações da peça e se comparam lado a lado na bancada
-- `2026-11-05-limites-do-solido-por-lacos.md` — Limites do sólido por laços — a coluna do braço sai pelos laços sem contorno à mão
-- `2026-11-05-navegacao-de-receitas.md` — Navegação de receitas — o agente acha o trecho da receita que precisa sem lê-la inteira
-- `2026-11-05-porta-de-entrada-dos-agentes.md` — A porta de entrada dos agentes — o modelador acha como usar uma capacidade numa ficha curta, sem garimpar o código
-- `2026-11-05-solido-por-lacos.md` — Sólido por laços — a receita dá o contorno da peça em cada plano, e o núcleo monta a gaiola fechada e a subdivide numa malha só
-- `2026-11-06-abertura-em-qualquer-direcao.md` — Abertura de contorno em qualquer direção — o vão que dobra a quina sai inteiro, e os limites da operação ficam medidos
-- `2026-11-06-abertura-so-na-vizinhanca.md` — Abertura só na vizinhança do vão — o corte de um vão na chapa sem refazer a chapa inteira
-- `2026-11-08-materiais-realistas.md` — Materiais realistas e exportação glTF
-- `2026-11-08-trecho-que-some-entre-lacos.md` — Trecho e vinco que somem aos poucos entre laços no gaiolaPorLacos
-- `2026-11-08-uniao-de-tubos-com-arredondamento.md` — União de dois tubos com arredondamento: o tubo em pé redondo até a base, cruzado por um tubo deitado afastado
-- `2026-11-09-abertura-na-vizinhanca-de-todo-vao.md` — Abertura na vizinhança de todo vão: o vão grande e o vão junto de outro também recortam só o trecho dele
-- `2026-11-09-empilhadeira.md` — Empilhadeira inteira, da carcaça aos garfos, por partes plugadas numa montagem
-- `2026-11-09-ferramentas-de-conferencia-e-vista.md` — Ferramentas de conferência e de vista: o agente mede e vê sozinho o que hoje só a pessoa acha
-- `2026-11-10-nucleo-para-qualquer-mecanismo.md` — Núcleo para qualquer mecanismo: do fluxo da empilhadeira às juntas, à leitura de referência e à dupla curvatura
-- `DESENHO-bancada-referencias-e-controles.md` — Referências visuais e controles persistentes da bancada
-- `README.md` — Planos encerrados
 
 ## docs/modelar/planos/mcp/
 
@@ -3290,7 +3103,7 @@
 - `ondulacao-gota.test.mjs` — ondulacao-gota.test.mjs — a leitura de ondulação das chapas com anel no vão real: a gota estreita e o vão aberto pelas colunas que terminam e começam
 - `ondulacao-leitura.test.mjs` — ondulacao-leitura.test.mjs — o dado lido com peso, o aviso de estações próximas e a face virada na ferramenta de ondulação
 - `ondulacao-rede.test.mjs` — ondulacao-rede.test.mjs — a leitura de ondulação da chapa lateral montada por rede de curvas
-- `origem-das-fontes.test.mjs` — A tabela fonte -> pacote das 27 referências de veículos (docs/modelar/veiculos-referencias.json) é conferida contra três coisas que a pessoa ou o agente escr…
+- `origem-das-fontes.test.mjs` — A tabela fonte -> pacote das 27 referências de veículos (docs/modelar/veiculos-referencias.json) é conferida contra duas coisas que a pessoa ou o agente escr…
 - `origens-check.mjs` — origens-check.mjs — quem declara de onde vieram os números, declara todos.
 - `papeis-do-laco.test.mjs` — papeis-do-laco.test.mjs — os papéis do laço continuam separados e genéricos.
 - `parametros-peca.mjs` — parametros-peca.mjs — responde o que dá para mexer numa receita.

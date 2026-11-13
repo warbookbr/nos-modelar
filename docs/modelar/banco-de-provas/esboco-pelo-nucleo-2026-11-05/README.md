@@ -1,6 +1,6 @@
 # Esboço pelo núcleo — inventário da fatia 1 e provas das fatias 2, 3 e 5
 
-Inventário do plano [esboço pelo núcleo](../../planos/encerrados/2026-11-05-esboco-pelo-nucleo.md), em 2026-11-05, sobre a main em `c1933085`.
+Inventário do plano [esboço pelo núcleo](../../decisoes/PLANOS-ENCERRADOS.md), em 2026-11-05, sobre a main em `c1933085`.
 Ele responde quem usa o módulo `modulos/esboco/` hoje, quais recursos do esboço os arquivos guardados usam de fato, se alguma peça
 aceita depende dele para reproduzir a forma, qual operação do núcleo faria cada tipo de forma e o que o esboço 2.0 precisa ter.
 Nada fora desta pasta mudou. O módulo tem 117 arquivos de código com 32.125 linhas, das quais 15.054 em `src/` e `componentes/`, e um
