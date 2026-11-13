@@ -49,6 +49,9 @@ export const CAPACIDADES = Object.freeze({
   raioDaAresta: { arquivo: 'tools/modelar/raio-da-aresta.mjs', funcao: 'medirPerfil', de: 'tools/modelar/raio-da-aresta.mjs' },
   ondulacaoDaSuperficie: { arquivo: 'tools/modelar/ondulacao-da-superficie.mjs', funcao: 'ondulacaoDaReceita', de: 'tools/modelar/ondulacao-da-superficie.mjs' },
   apoioDoVinco: { arquivo: 'procedural/nucleo/apoio-do-vinco.js', funcao: 'apoioDoVinco', de: 'procedural/nucleo/apoio-do-vinco.js' },
+  chapaDeContorno: { arquivo: 'procedural/nucleo/chapa-de-contorno.js', funcao: 'chapaDeContorno', de: 'procedural/nucleo/chapa-de-contorno.js' },
+  corpoDeSecaoVariavel: { arquivo: 'procedural/nucleo/corpo-de-secao-variavel.js', funcao: 'corpoDeSecaoVariavel', de: 'procedural/nucleo/corpo-de-secao-variavel.js' },
+  furoPassante: { arquivo: 'procedural/nucleo/furo-passante.js', funcao: 'furoPassante', de: 'procedural/nucleo/furo-passante.js' },
   contornoComArcos: { arquivo: 'procedural/nucleo/arcos-do-contorno.js', funcao: 'contornoComArcos', de: 'procedural/nucleo/arcos-do-contorno.js' },
 });
 
