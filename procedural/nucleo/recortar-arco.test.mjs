@@ -170,3 +170,34 @@ describe('recusas', () => {
     expect(() => recortarArcoNoPerfil(corpo)).toThrow(/"centro"|"perfil"/);
   });
 });
+
+describe('recortarArcoNoPerfil: a fase do polígono do arco', () => {
+  const perfil = [[0, 0], [100, 0], [100, 40], [0, 40]];
+  const arco = { centro: [50, 0], raio: 15, lados: 16, base: 0 };
+  const doArco = (c) => c.filter((p) => p[1] > 1e-9 && p[1] < 30);
+
+  it('o padrão é faceEmCima, igual a pedi-la, com os vértices a meio passo do eixo vertical', () => {
+    const padrao = recortarArcoNoPerfil(perfil, arco);
+    expect(padrao).toEqual(recortarArcoNoPerfil(perfil, { ...arco, fase: 'faceEmCima' }));
+    const passo = (2 * Math.PI) / 16;
+    const esperados = Array.from({ length: 8 }, (_, k) => { const a = Math.PI - passo / 2 - k * passo; return [50 + 15 * Math.cos(a), 15 * Math.sin(a)]; }).filter((p) => p[1] > 1e-9);
+    expect(doArco(padrao)).toHaveLength(esperados.length);
+    esperados.forEach((e, i) => expect(dist(doArco(padrao).find((p) => dist(p, e) < 1e-6) ?? [1e9, 1e9], e), `vértice ${i}`).toBeLessThan(1e-6));
+    expect(doArco(padrao).some((p) => Math.abs(p[0] - 50) < 1e-6)).toBe(false);
+  });
+
+  it('verticeEmCima põe um vértice no topo do arco, nos ângulos múltiplos do passo', () => {
+    const c = recortarArcoNoPerfil(perfil, { ...arco, fase: 'verticeEmCima' });
+    const arcoPts = doArco(c);
+    expect(arcoPts.some((p) => dist(p, [50, 15]) < 1e-6)).toBe(true);
+    const passo = (2 * Math.PI) / 16;
+    const esperados = Array.from({ length: 8 }, (_, k) => [50 + 15 * Math.cos(Math.PI - k * passo), 15 * Math.sin(Math.PI - k * passo)]).filter((p) => p[1] > 1e-9);
+    expect(arcoPts).toHaveLength(esperados.length);
+    for (const e of esperados) expect(arcoPts.some((p) => dist(p, e) < 1e-6)).toBe(true);
+    expect(areaDoContorno(c)).toBeGreaterThan(0);
+  });
+
+  it('recusa fase desconhecida dizendo o valor e os aceitos', () => {
+    expect(() => recortarArcoNoPerfil(perfil, { ...arco, fase: 'topo' })).toThrow(/"fase".*faceEmCima.*verticeEmCima.*topo/);
+  });
+});

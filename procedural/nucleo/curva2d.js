@@ -42,19 +42,22 @@
    quando: o perfil lateral de um corpo (carroceria, calço, casca) tem a borda de baixo reta e o vão redondo sai dela; no lugar de escrever o
      círculo, a ordem e a fusão do corte em cada receita. Para o contorno que já vem de trechos com arco declarado use contornoComArcos, e
      para o furo no meio do perfil, e não na borda, a extrusão com furo; para dois arcos na mesma borda, chame a função duas vezes.
-   unidades: as de quem chama (mm ou m), as mesmas em todos os campos; o polígono do arco tem a face plana em cima, como o cilindro de eixo horizontal.
+   unidades: as de quem chama (mm ou m), as mesmas em todos os campos; a fase do polígono é a de `fase`.
    campos:
      perfil: lista de pontos [x, y] do contorno, 3 ou mais, em qualquer sentido; precisa ter uma aresta horizontal em y = base que contenha o corte.
      centro: [x, y] do centro do arco.
      raio: o raio do polígono do arco, maior que zero.
      lados: o número de lados do polígono inteiro, inteiro de 3 para cima (16 a 32 numa roda); o arco tem os que ficam acima da base.
      base: o y da aresta de baixo; o arco precisa cruzá-la (parte acima, parte abaixo), ou a função recusa e diz o intervalo de y do arco.
+     fase: 'faceEmCima' (padrão: face plana em cima, vértices a meio passo do eixo vertical) ou 'verticeEmCima' (vértice em cima e em
+       baixo, ângulos de π menos k passos, a fase do círculo que as receitas de veículo escrevem à mão).
      fundirAbaixoDe: o corte ou o vértice do arco que cai a menos disso do vizinho funde com ele (padrão 0, só o que coincide); a forma muda no máximo isso.
-   limites: o resultado precisa ser polígono simples, e a função recusa com o diagnóstico de diagnosticarContorno se o arco atravessa outra parte do
+   limites: só serve o arco que cruza a base e fica dentro do perfil (o arco que também atravessa a borda de cima, como o trecho lateral de um
+     chassi ou uma capa acima de um nível, não é recorte da borda de baixo); o resultado precisa ser polígono simples, e a função recusa com o diagnóstico de diagnosticarContorno se o arco atravessa outra parte do
      contorno; recusa também a aresta de base que não contém o trecho cortado, dizendo as que existem.
    devolve: a lista de pontos [x, y] anti-horária, começando onde o perfil começava, com o arco entre os dois cortes.
    exemplo:
-     recortarArcoNoPerfil([[0, 0], [100, 0], [100, 40], [0, 40]], { centro: [50, 0], raio: 15, lados: 16, base: 0 })
+     recortarArcoNoPerfil([[0, 0], [100, 0], [100, 40], [0, 40]], { centro: [50, 0], raio: 15, lados: 16, base: 0, fase: 'verticeEmCima' })
    peça: procedural/pecas/carro-taxi/receita.js (escreve o mesmo recorte à mão; nenhuma receita chama a função hoje).
    FIM DA FICHA */
 
@@ -370,13 +373,14 @@ export function contornoPorTrechos(contorno, { campo = 'contorno', num = (x) => 
    `fundirAbaixoDe` ali, e é a receita que escolhe quanto (padrão 0: só funde o que coincide a 1e-9). Para dois arcos na mesma
    borda, chama-se a função duas vezes, e a segunda acha a aresta de base que sobrou. O resultado precisa ser polígono simples; se o
    arco atravessa outra parte do contorno, a função recusa com o diagnóstico de `diagnosticarContorno`. */
-export function recortarArcoNoPerfil(perfil, { centro, raio, lados, base, fundirAbaixoDe = 0 } = {}) {
+export function recortarArcoNoPerfil(perfil, { centro, raio, lados, base, fundirAbaixoDe = 0, fase = 'faceEmCima' } = {}) {
   const campo = 'recortarArcoNoPerfil';
   const par = (p) => Array.isArray(p) && p.length >= 2 && ehNumero(p[0]) && ehNumero(p[1]);
   if (!Array.isArray(perfil) || perfil.length < 3 || !perfil.every(par)) throw new ErroDeCurva(campo, `"perfil" precisa ser uma lista de 3 pontos [x, y] ou mais, com números finitos (veio ${texto(perfil)})`);
   if (!par(centro) || centro.length !== 2) throw new ErroDeCurva(campo, `"centro" precisa ser [x, y] com números finitos (veio ${texto(centro)})`);
   if (!ehNumero(raio) || !(raio > 0)) throw new ErroDeCurva(campo, `"raio" precisa ser um número maior que zero (veio ${texto(raio)})`);
   if (!Number.isInteger(lados) || lados < 3) throw new ErroDeCurva(campo, `"lados" precisa ser um inteiro >= 3 (veio ${texto(lados)})`);
+  if (fase !== 'faceEmCima' && fase !== 'verticeEmCima') throw new ErroDeCurva(campo, `"fase" precisa ser 'faceEmCima' ou 'verticeEmCima' (veio ${texto(fase)})`);
   if (!ehNumero(base)) throw new ErroDeCurva(campo, `"base" precisa ser o y da aresta de baixo, um número finito (veio ${texto(base)})`);
   if (!ehNumero(fundirAbaixoDe) || fundirAbaixoDe < 0) throw new ErroDeCurva(campo, `"fundirAbaixoDe" precisa ser um número finito maior ou igual a zero (veio ${texto(fundirAbaixoDe)})`);
 
@@ -387,7 +391,7 @@ export function recortarArcoNoPerfil(perfil, { centro, raio, lados, base, fundir
 
   /* o polígono do arco, do vértice de cima à esquerda para a direita por cima (ângulo decrescente), e a cadeia dele acima da base */
   const passo = VOLTA / lados;
-  const W = Array.from({ length: lados }, (_, k) => { const a = Math.PI - passo / 2 - k * passo; return [centro[0] + raio * Math.cos(a), centro[1] + raio * Math.sin(a)]; });
+  const W = Array.from({ length: lados }, (_, k) => { const a = Math.PI - (fase === 'faceEmCima' ? passo / 2 : 0) - k * passo; return [centro[0] + raio * Math.cos(a), centro[1] + raio * Math.sin(a)]; });
   const acima = W.map((q) => q[1] > base);
   const nAcima = acima.filter(Boolean).length;
   if (nAcima === 0 || nAcima === lados) {
