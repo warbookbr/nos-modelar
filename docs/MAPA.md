@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2081 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2083 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -486,6 +486,8 @@
 - `AGENT-FIRST.md` — Filtro Agent-First
 - `CONTINUIDADE-ARQUITETURAL.md` — Continuidade arquitetural do Modelar
 - `FAMILIAS-DE-OBJETOS.md` — Famílias de objetos que o Modelar deve cobrir
+- `HISTORICO-RETIRADO.md` — Histórico retirado: do que trata cada arquivo
+- `PLANOS-ENCERRADOS.md` — Planos encerrados: o que cada um entregou ou decidiu
 - `README.md` — Decisões
 - `UPSTREAM-NOS.md` — Capacidades candidatas ao NÓS
 - `VISAO.md` — Visão do Modelar

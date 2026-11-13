@@ -34,6 +34,11 @@ Decisões em vigor, por data:
 - 2026-11-13: [As hipóteses de forma reprovadas em 38 falhas de autoria não voltam como base, e duas regras de processo valem antes de abrir experimento](registros/2026-11-13-hipoteses-de-forma-reprovadas-e-regras-de-processo.md)
 <!-- decisoes:fim -->
 
+## Crônicas do que saiu da árvore
+
+- [`PLANOS-ENCERRADOS.md`](PLANOS-ENCERRADOS.md): uma linha por plano encerrado, com o commit onde o texto inteiro está.
+- [`HISTORICO-RETIRADO.md`](HISTORICO-RETIRADO.md): uma linha por arquivo do histórico retirado, com o mesmo commit.
+
 Não moram aqui:
 
 - formato e regra de consulta, que ficam em `../contratos/`;
