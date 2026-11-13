@@ -5,3 +5,4 @@ Pasta do plano [revisão do projeto para o trabalho da IA](../../planos/2026-11-
 ## Inventário, por pergunta do plano
 
 - Pergunta 4: [projetos comparáveis](pergunta-4-projetos-comparaveis.md), pesquisa externa com a fonte de cada afirmação.
+- Pergunta 4: [pastas e módulos](pergunta-4-pastas-e-modulos.md), o mapa de quem importa quem, as subidas de camada e a composição de `tools/`.
