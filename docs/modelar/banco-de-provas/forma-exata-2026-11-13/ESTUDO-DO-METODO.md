@@ -66,7 +66,7 @@ O que o método cobre em parte é o encontro de dois tubos em ângulo reto no me
 
 | Peça e método | Faces | Degeneradas | Abaixo de 1e-9 m² | Finos pela régua | Razão acima de 10, toda a malha | Pior razão, toda a malha | Menor face (mm²) | Volume (mm³) | Tempo |
 |---|---|---|---|---|---|---|---|---|---|
-| Peça de prova da agulha, atual | 6.540 | 0 | 40 | 1.440 | 4.478 | 920.348.223 | 0,0000105 | 18.758.289,0 | 3,9 s |
+| Peça de prova da agulha, atual, depois da correção da agulha na costura | 6.532 | 0 | 30 | 1.441 | 4.475 | 948.396.307 | 0,000419 | 18.758.289,0 | 3,6 s |
 | Substituto da peça de prova no protótipo: só o T 95/95 sobre um tronco de 190 mm, sem a carcaça nem o chanfro de 2 mm | recusa | | | | | | | | |
 | T 95/60, atual (`unir` e `arredondarCostura`) | 4.326 | 0 | 0 | 1.352 | 2.768 | 19.806 | 0,00415 | 13.151.039,8 | 1,0 s |
 | T 95/60, protótipo | 8.828 | 0 | 0 | 0 | 184 | 42 | 4,32 | 13.150.580,0 | 38 ms |

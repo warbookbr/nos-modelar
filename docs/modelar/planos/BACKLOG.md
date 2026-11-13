@@ -246,3 +246,7 @@ por decisão da pessoa em 2026-11-12: lá as proporções foram mudadas de prop�
 referência à risca. Ficam junto os dois achados herdados do rascunho do braço: a medida de junta do `conferir-pontos`, que toma
 o centro da sobreposição das caixas e erra quando uma parte entra pelo flanco da outra, e a conferência de que a técnica escrita
 no `PLANO` de cada parte foi a usada.
+
+A bateria local rodar os testes lentos que o envio acrescenta ou que leem uma fixture mudada por outro ramo juntado no mesmo
+envio: em 2026-11-13 o teste do estudo da forma exata fixava os números da peça de prova da agulha de antes da correção da
+costura, os dois ramos foram juntados no mesmo envio, o teste ficou para o CI pelo teto dos lentos e reprovou lá.

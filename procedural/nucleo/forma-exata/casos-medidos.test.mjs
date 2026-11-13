@@ -102,8 +102,10 @@ const T_ATUAL = (Rr) => receita([
 const T_EXATO = (Rr, tronco = 400) => juncaoDeTubos({ raioDoTronco: m(95), comprimentoDoTronco: m(tronco), raioDoRamo: m(Rr), alturaDoRamo: m(250), raio: m(10), lados: 144 });
 
 describe('caso B: tubo que encontra tubo, com arredondamento na costura', () => {
-  it('método atual, peça de prova da agulha: fecha, com 40 faces de menos de 1e-9 m² e a menor com 1e-11 m²', () => {
-    expect(atual('B', 'atual: peça de prova da agulha (3 tubos rentes)', receitaDaAgulha)).toMatchObject({ faces: 6540, degeneradas: 0, abaixoDe1e9: 40, fechada: true });
+  /* medido depois da correção da agulha na costura (2026-11-13), que tirou a agulha e levou a peça de 6.540 a 6.532 faces e de 40 a 30
+     faces de menos de 1e-9 m² */
+  it('método atual, peça de prova da agulha: fecha, com 30 faces de menos de 1e-9 m² e a menor com 4e-10 m²', () => {
+    expect(atual('B', 'atual: peça de prova da agulha (3 tubos rentes)', receitaDaAgulha)).toMatchObject({ faces: 6532, degeneradas: 0, abaixoDe1e9: 30, fechada: true });
   });
 
   it('protótipo, substituto da peça de prova da agulha (só o T 95/95 sobre um tronco de 190 mm, sem a carcaça nem o chanfro de 2 mm): NÃO COBRE, e recusa', () => {
