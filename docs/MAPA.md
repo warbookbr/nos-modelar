@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1840 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1844 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -3118,6 +3118,8 @@
 - `rodadas-com-critico.mjs` — rodadas-com-critico.mjs — as rodadas entre quem produz e o crítico gravadas em disco, com a regra do módulo `contorno-da-imagem`: nota 9 fecha, abaixo volta,…
 - `rodadas-com-critico.test.mjs` — rodadas-com-critico.test.mjs — o aceite humano grava quem, quando, a última nota, os defeitos abertos e as pendências, fecha a série, recusa aceite sem autor…
 - `separacao-direcional.test.ts` — Prova separação direcional genérica em peça, parte e montagem recursiva.
+- `silhueta-contra-referencia.mjs` — silhueta-contra-referencia.mjs — o desvio da silhueta de uma peça contra um contorno de referência, em milímetro, por trecho.
+- `silhueta-contra-referencia.test.mjs` — triângulos em mm no plano xz (y = 0) de um polígono convexo ou em leque a partir do primeiro ponto
 - `silhueta-da-superficie.mjs` — silhueta-da-superficie.mjs — extensão de uma malha de triângulos em fatias ao longo de um eixo, medida na SUPERFÍCIE e não nos vértices.
 - `silhueta-da-superficie.test.mjs` — Teto grande: uma placa y = 1 de z = 0 a z = 10 em dois triângulos, só com vértices nas pontas.
 - `silhueta-pedida.mjs` — silhueta-pedida.mjs — quanto a malha de uma parte se afasta do corpo pedido a `lacosPelasVistas`, faixa por faixa de altura.
