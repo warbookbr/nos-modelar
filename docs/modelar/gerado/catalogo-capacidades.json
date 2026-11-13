@@ -2537,5 +2537,198 @@
         "obrigatorios": []
       }
     }
+  ],
+  "assinaturaComExtensoes": "sha256:00913d0c0e9eb4adfa34bf60fba87275457e50957c5dd90026bc41ac421d085d",
+  "extensoes": [
+    {
+      "id": "mecanifica.operacao.articulacao",
+      "nome": "articulacao",
+      "versao": "1.0.0",
+      "categoria": "extensao",
+      "artefatos": {
+        "entra": [
+          "mecanifica.porta@1"
+        ],
+        "sai": [
+          "mecanifica.articulacao@1"
+        ]
+      },
+      "interfaces": {
+        "entra": [],
+        "sai": []
+      },
+      "requisitos": [],
+      "custo": 1,
+      "efeitos": [
+        "confere-movimento",
+        "declara-relacao"
+      ],
+      "identidade": "nao-cria",
+      "uso": {
+        "intencao": "Declarar entre duas peças uma articulação de revolução (graus) ou prismática (mm), presa a uma porta com eixo de cada peça, e conferir que nada colide ao longo do curso.",
+        "schema": "mecanifica.argumentos.articulacao@1",
+        "obrigatorios": [
+          "id",
+          "tipo",
+          "fixo",
+          "movel",
+          "unidade",
+          "curso",
+          "passos",
+          "folga"
+        ]
+      },
+      "extensao": true,
+      "ligacao": {
+        "como": "registro com extensões: criarRegistroComExtensoes({ registroBase: REGISTRO_OPERACOES, extensoes: [{ manifesto, implementacao }] }); a operação não existe em REGISTRO_OPERACOES",
+        "modulo": "mecanifica.extensao.articulacao",
+        "manifesto": "procedural/extensoes/articulacao/manifesto.js"
+      }
+    },
+    {
+      "id": "mecanifica.operacao.casca",
+      "nome": "casca",
+      "versao": "1.0.0",
+      "categoria": "extensao",
+      "artefatos": {
+        "entra": [
+          "mecanifica.malha-poligonal@1"
+        ],
+        "sai": [
+          "mecanifica.malha-poligonal@1"
+        ]
+      },
+      "interfaces": {
+        "entra": [],
+        "sai": []
+      },
+      "requisitos": [],
+      "custo": 1,
+      "efeitos": [
+        "transforma-malha"
+      ],
+      "identidade": "preserva-ou-deriva",
+      "uso": {
+        "intencao": "Esvaziar um sólido fechado por dentro, deixando parede de espessura constante, com as faces abertas escolhidas por seleção.",
+        "schema": "mecanifica.argumentos.casca@1",
+        "obrigatorios": [
+          "origemId",
+          "solido",
+          "espessura"
+        ]
+      },
+      "extensao": true,
+      "ligacao": {
+        "como": "registro com extensões: criarRegistroComExtensoes({ registroBase: REGISTRO_OPERACOES, extensoes: [{ manifesto, implementacao }] }); a operação não existe em REGISTRO_OPERACOES",
+        "modulo": "mecanifica.extensao.casca",
+        "manifesto": "procedural/extensoes/casca/manifesto.js"
+      }
+    },
+    {
+      "id": "mecanifica.operacao.chapaDobrada",
+      "nome": "chapaDobrada",
+      "versao": "1.0.0",
+      "categoria": "extensao",
+      "artefatos": {
+        "entra": [],
+        "sai": [
+          "mecanifica.malha-poligonal@1"
+        ]
+      },
+      "interfaces": {
+        "entra": [],
+        "sai": []
+      },
+      "requisitos": [],
+      "custo": 1,
+      "efeitos": [
+        "cria-geometria"
+      ],
+      "identidade": "cria-por-passo",
+      "uso": {
+        "intencao": "Criar uma chapa dobrada de espessura constante: uma sequência de abas retas unidas por dobras de raio interno declarado, extrudada numa largura.",
+        "schema": "mecanifica.argumentos.chapaDobrada@1",
+        "obrigatorios": [
+          "espessura",
+          "raioInterno",
+          "largura"
+        ]
+      },
+      "extensao": true,
+      "ligacao": {
+        "como": "registro com extensões: criarRegistroComExtensoes({ registroBase: REGISTRO_OPERACOES, extensoes: [{ manifesto, implementacao }] }); a operação não existe em REGISTRO_OPERACOES",
+        "modulo": "mecanifica.extensao.chapa-dobrada",
+        "manifesto": "procedural/extensoes/chapa-dobrada/manifesto.js"
+      }
+    },
+    {
+      "id": "mecanifica.operacao.estruturaDeBarras",
+      "nome": "estruturaDeBarras",
+      "versao": "1.0.0",
+      "categoria": "extensao",
+      "artefatos": {
+        "entra": [],
+        "sai": [
+          "mecanifica.malha-poligonal@1"
+        ]
+      },
+      "interfaces": {
+        "entra": [],
+        "sai": []
+      },
+      "requisitos": [],
+      "custo": 1,
+      "efeitos": [
+        "cria-geometria"
+      ],
+      "identidade": "cria-por-passo",
+      "uso": {
+        "intencao": "Criar uma estrutura de barras: nós com nome e posição, barras entre pares de nós com um perfil (tubo redondo, quadrado, retangular ou cantoneira), cortadas ou encaixadas em cada nó e unidas num sólido só.",
+        "schema": "mecanifica.argumentos.estruturaDeBarras@1",
+        "obrigatorios": [
+          "nos",
+          "barras"
+        ]
+      },
+      "extensao": true,
+      "ligacao": {
+        "como": "registro com extensões: criarRegistroComExtensoes({ registroBase: REGISTRO_OPERACOES, extensoes: [{ manifesto, implementacao }] }); a operação não existe em REGISTRO_OPERACOES",
+        "modulo": "mecanifica.extensao.estrutura-de-barras",
+        "manifesto": "procedural/extensoes/estrutura-de-barras/manifesto.js"
+      }
+    },
+    {
+      "id": "mecanifica.operacao.prismaTriangular",
+      "nome": "prismaTriangular",
+      "versao": "1.0.0",
+      "categoria": "extensao",
+      "artefatos": {
+        "entra": [],
+        "sai": [
+          "mecanifica.malha-poligonal@1"
+        ]
+      },
+      "interfaces": {
+        "entra": [],
+        "sai": []
+      },
+      "requisitos": [],
+      "custo": 1,
+      "efeitos": [
+        "cria-geometria"
+      ],
+      "identidade": "cria-por-passo",
+      "uso": {
+        "intencao": "Criar prisma reto de seção triangular equilátera, apoiado em y=0.",
+        "schema": "mecanifica.argumentos.prismaTriangular@1",
+        "obrigatorios": []
+      },
+      "extensao": true,
+      "ligacao": {
+        "como": "registro com extensões: criarRegistroComExtensoes({ registroBase: REGISTRO_OPERACOES, extensoes: [{ manifesto, implementacao }] }); a operação não existe em REGISTRO_OPERACOES",
+        "modulo": "mecanifica.extensao.prisma-triangular",
+        "manifesto": "procedural/extensoes/prisma-triangular/manifesto.js"
+      }
+    }
   ]
 }

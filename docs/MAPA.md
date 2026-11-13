@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2059 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2060 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2599,6 +2599,7 @@
 
 ## tools/catalogo/
 
+- `catalogo-extensoes.test.mjs` — catalogo-extensoes.test.mjs — o catálogo gerado traz as cinco extensões de procedural/extensoes/, marcadas como extensão e com a ligação, e o schema do catál…
 - `gerar-catalogo-capacidades.mjs` — Gera projeções publicáveis. O motor permanece puro; somente esta borda lê e escreve disco.
 
 ## tools/fixtures/

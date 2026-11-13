@@ -5122,5 +5122,99 @@
         "diagnosticos": []
       }
     }
+  ],
+  "assinaturaComExtensoes": "sha256:00913d0c0e9eb4adfa34bf60fba87275457e50957c5dd90026bc41ac421d085d",
+  "totalExtensoes": 5,
+  "extensoes": [
+    {
+      "id": "mecanifica.operacao.articulacao",
+      "nome": "articulacao",
+      "uso": {
+        "intencao": "Declarar entre duas peças uma articulação de revolução (graus) ou prismática (mm), presa a uma porta com eixo de cada peça, e conferir que nada colide ao longo do curso.",
+        "schema": "mecanifica.argumentos.articulacao@1",
+        "obrigatorios": [
+          "id",
+          "tipo",
+          "fixo",
+          "movel",
+          "unidade",
+          "curso",
+          "passos",
+          "folga"
+        ]
+      },
+      "ligacao": {
+        "como": "registro com extensões: criarRegistroComExtensoes({ registroBase: REGISTRO_OPERACOES, extensoes: [{ manifesto, implementacao }] }); a operação não existe em REGISTRO_OPERACOES",
+        "modulo": "mecanifica.extensao.articulacao",
+        "manifesto": "procedural/extensoes/articulacao/manifesto.js"
+      }
+    },
+    {
+      "id": "mecanifica.operacao.casca",
+      "nome": "casca",
+      "uso": {
+        "intencao": "Esvaziar um sólido fechado por dentro, deixando parede de espessura constante, com as faces abertas escolhidas por seleção.",
+        "schema": "mecanifica.argumentos.casca@1",
+        "obrigatorios": [
+          "origemId",
+          "solido",
+          "espessura"
+        ]
+      },
+      "ligacao": {
+        "como": "registro com extensões: criarRegistroComExtensoes({ registroBase: REGISTRO_OPERACOES, extensoes: [{ manifesto, implementacao }] }); a operação não existe em REGISTRO_OPERACOES",
+        "modulo": "mecanifica.extensao.casca",
+        "manifesto": "procedural/extensoes/casca/manifesto.js"
+      }
+    },
+    {
+      "id": "mecanifica.operacao.chapaDobrada",
+      "nome": "chapaDobrada",
+      "uso": {
+        "intencao": "Criar uma chapa dobrada de espessura constante: uma sequência de abas retas unidas por dobras de raio interno declarado, extrudada numa largura.",
+        "schema": "mecanifica.argumentos.chapaDobrada@1",
+        "obrigatorios": [
+          "espessura",
+          "raioInterno",
+          "largura"
+        ]
+      },
+      "ligacao": {
+        "como": "registro com extensões: criarRegistroComExtensoes({ registroBase: REGISTRO_OPERACOES, extensoes: [{ manifesto, implementacao }] }); a operação não existe em REGISTRO_OPERACOES",
+        "modulo": "mecanifica.extensao.chapa-dobrada",
+        "manifesto": "procedural/extensoes/chapa-dobrada/manifesto.js"
+      }
+    },
+    {
+      "id": "mecanifica.operacao.estruturaDeBarras",
+      "nome": "estruturaDeBarras",
+      "uso": {
+        "intencao": "Criar uma estrutura de barras: nós com nome e posição, barras entre pares de nós com um perfil (tubo redondo, quadrado, retangular ou cantoneira), cortadas ou encaixadas em cada nó e unidas num sólido só.",
+        "schema": "mecanifica.argumentos.estruturaDeBarras@1",
+        "obrigatorios": [
+          "nos",
+          "barras"
+        ]
+      },
+      "ligacao": {
+        "como": "registro com extensões: criarRegistroComExtensoes({ registroBase: REGISTRO_OPERACOES, extensoes: [{ manifesto, implementacao }] }); a operação não existe em REGISTRO_OPERACOES",
+        "modulo": "mecanifica.extensao.estrutura-de-barras",
+        "manifesto": "procedural/extensoes/estrutura-de-barras/manifesto.js"
+      }
+    },
+    {
+      "id": "mecanifica.operacao.prismaTriangular",
+      "nome": "prismaTriangular",
+      "uso": {
+        "intencao": "Criar prisma reto de seção triangular equilátera, apoiado em y=0.",
+        "schema": "mecanifica.argumentos.prismaTriangular@1",
+        "obrigatorios": []
+      },
+      "ligacao": {
+        "como": "registro com extensões: criarRegistroComExtensoes({ registroBase: REGISTRO_OPERACOES, extensoes: [{ manifesto, implementacao }] }); a operação não existe em REGISTRO_OPERACOES",
+        "modulo": "mecanifica.extensao.prisma-triangular",
+        "manifesto": "procedural/extensoes/prisma-triangular/manifesto.js"
+      }
+    }
   ]
 }

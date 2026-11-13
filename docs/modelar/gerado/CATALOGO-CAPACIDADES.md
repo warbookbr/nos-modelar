@@ -1,6 +1,6 @@
 # Catálogo de capacidades procedural
 
-> Gerado por `npm run catalogo:gerar`; não edite à mão. A fonte é o registro explícito do motor.
+> Gerado por `npm run catalogo:gerar`; não edite à mão. A fonte é o registro explícito do motor e as cinco extensões nativas.
 
 Assinatura do registro: `sha256:b53e7767622505e74488d005889b8b782becfe1bdfb2a82ab924cf18127841aa`.
 
@@ -50,6 +50,18 @@ Há 42 operações em 1 módulo(s).
 | `transladar` | Transladar malha inteira ou seleção semântica. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.transladar@1` |
 | `unir` | Fundir dois ou mais sólidos fechados numa superfície fechada só, sem face interna. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.unir@1` |
 | `vira` | Inverter o winding de uma ou mais faces, por seleção ou por ID posicional. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.vira@1` |
+
+## Extensões
+
+Há 5 extensões nativas em `procedural/extensoes/`. Elas não estão em `REGISTRO_OPERACOES`: só existem num registro montado por `criarRegistroComExtensoes({ registroBase, extensoes })`, e a receita que as usa precisa ser executada com esse registro. Assinatura do registro com extensões: `sha256:00913d0c0e9eb4adfa34bf60fba87275457e50957c5dd90026bc41ac421d085d`.
+
+| extensão | intenção | entra/sai | interfaces | custo | schema | liga-se por |
+|---|---|---|---|---:|---|---|
+| `articulacao` | Declarar entre duas peças uma articulação de revolução (graus) ou prismática (mm), presa a uma porta com eixo de cada peça, e conferir que nada colide ao longo do curso. | `mecanifica.porta@1` → `mecanifica.articulacao@1` | — → — | 1 | `mecanifica.argumentos.articulacao@1` | `procedural/extensoes/articulacao/manifesto.js` |
+| `casca` | Esvaziar um sólido fechado por dentro, deixando parede de espessura constante, com as faces abertas escolhidas por seleção. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.casca@1` | `procedural/extensoes/casca/manifesto.js` |
+| `chapaDobrada` | Criar uma chapa dobrada de espessura constante: uma sequência de abas retas unidas por dobras de raio interno declarado, extrudada numa largura. | — → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.chapaDobrada@1` | `procedural/extensoes/chapa-dobrada/manifesto.js` |
+| `estruturaDeBarras` | Criar uma estrutura de barras: nós com nome e posição, barras entre pares de nós com um perfil (tubo redondo, quadrado, retangular ou cantoneira), cortadas ou encaixadas em cada nó e unidas num sólido só. | — → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.estruturaDeBarras@1` | `procedural/extensoes/estrutura-de-barras/manifesto.js` |
+| `prismaTriangular` | Criar prisma reto de seção triangular equilátera, apoiado em y=0. | — → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.prismaTriangular@1` | `procedural/extensoes/prisma-triangular/manifesto.js` |
 
 ## Como usar
 
