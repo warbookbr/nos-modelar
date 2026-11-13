@@ -1,0 +1,336 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "sedan-chassi-e-lataria/carroceria",
+  "numero": 3,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "sem alvo: o pedido não traz imagem de referência nem esboço aprovado",
+    "nota": 8,
+    "defeitos": [],
+    "observacao": "Sem alvo, julguei só pela descrição do pedido; não achei defeito estrutural, só uma mancha de relevo no encontro do para-lama dianteiro com a porta, na rasante de lado, e abri 8 das 55 partes."
+  },
+  "partes": [
+    {
+      "nome": "capo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "paraLamaDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "portaDianteiraDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "portaTraseiraDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lateralTraseiraDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "soleiraDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "paraLamaEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "portaDianteiraEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "portaTraseiraEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "lateralTraseiraEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "soleiraEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "tampaDoPortaMalas",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "labioTraseiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "labioDianteiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "teto",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "molduraVidroDianteiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "molduraVidroTraseiroDaPorta",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "molduraVigia",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "molduraParaBrisa",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "molduraVidroTraseiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "assoalho",
+      "confere": true,
+      "observacao": "rampa da longarina alinhada ao degrau: entrada de 25,35 mm para 0,0004 mm"
+    },
+    {
+      "nome": "tunel",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "longarinaDir",
+      "confere": true,
+      "observacao": "rampa de trás derivada do degrau do assoalho"
+    },
+    {
+      "nome": "longarinaEsq",
+      "confere": true,
+      "observacao": "rampa de trás derivada do degrau do assoalho"
+    },
+    {
+      "nome": "travessaDianteira",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "travessaCentral",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "travessaTraseira",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "paredeCortaFogo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteDoRadiador",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "anteparoTraseiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "travessaDoPainel",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "travessaDaCabine",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "soleiraDoChassiDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "montanteADir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "montanteBDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "montanteCDir",
+      "confere": true,
+      "observacao": "pé estreito de 14 por 102 mm retirado; acaba em y 560"
+    },
+    {
+      "nome": "reforcoDaCinturaDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "longarinaSuperiorDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "caixaDeRodaDianteiraDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "caixaDeRodaTraseiraDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteDoParaChoqueDianteiroDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteDoParaChoqueTraseiroDir",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "soleiraDoChassiEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "montanteAEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "montanteBEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "montanteCEsq",
+      "confere": true,
+      "observacao": "pé estreito de 14 por 102 mm retirado; acaba em y 560"
+    },
+    {
+      "nome": "reforcoDaCinturaEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "longarinaSuperiorEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "caixaDeRodaDianteiraEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "caixaDeRodaTraseiraEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteDoParaChoqueDianteiroEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "suporteDoParaChoqueTraseiroEsq",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoDianteiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoTraseiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "forroDosVaos",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "não há comando de desvio entre duas malhas por parte; usei script fora do repositório",
+    "vistas:critica da carroceria leva 38 min",
+    "a tira do montante C era pé declarado do rascunho, e o pedido a chamava de sobra do aparo",
+    "cobertura de onze partes do chassi, fora do veredito (nota 6): topo em cunha dos montantes B e C e borda em degraus na travessa da cabine, iguais às da rodada 2, onde passaram. É do aparar, que entrega a face do molde.",
+    "o processo não decide: dois críticos julgaram a mesma parte de modos opostos. A promessa do membro aparado não diz o que o aparo deixa (cunha, face facetada), e o aparar não alisa a face do molde. Fica como pendência da ferramenta.",
+    "assoalho, longarinas e pé dos montantes C, que eram o motivo da rodada, saíram sem apontamento na cobertura e no veredito."
+  ],
+  "notaDePassagem": "Rampa da longarina derivada do degrau do assoalho (não o inverso: alongar o degrau entra no arco de trás); estações do assoalho de volta a 4+4. Pé do montante C tirado a pedido, com as duas declarações que dependiam dele. Aba do montante A é a pele no canto da quina; deixada.",
+  "receita": {
+    "sha256": "sha256:0b6143b600fb1c8457d161081082503c534581e126c876c12031e5501f20300c",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 0,
+      "acrescentadas": 0,
+      "linhas": [],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes capo, lateralTraseiraDir, lateralTraseiraEsq, paraLamaDir, paraLamaEsq, portaDianteiraDir, portaDianteiraEsq, portaTraseiraDir, portaTraseiraEsq, soleiraDir, soleiraEsq, tampaDoPortaMalas, teto",
+    "imagens": [
+      "peca-frente-rasante-az0.png",
+      "peca-frente-rasante-az90.png",
+      "peca-lado-rasante-az290.png",
+      "peca-lado-rasante-az20.png",
+      "peca-topo-rasante-az20.png",
+      "peca-topo-rasante-az110.png",
+      "peca-tresquartos-rasante-az0.png",
+      "peca-tresquartos-rasante-az90.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  },
+  "registradaEm": "2026-11-13T00:34:54.323Z",
+  "facesFinas": {
+    "total": 0,
+    "porParte": {}
+  }
+}
