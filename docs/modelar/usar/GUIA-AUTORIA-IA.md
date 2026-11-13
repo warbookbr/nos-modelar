@@ -6,6 +6,8 @@ Este guia orienta a autoria, a validação e a inspeção de peças e montagens 
 
 Ao receber um pedido de criação ou modificação geométrica, siga a skill `criar-peca` (um objeto de várias partes é construído parte por parte pelo laço de modelagem) e os documentos do roteiro `modelar/peca`, em especial [`AUTORIA-DE-PECA.md`](AUTORIA-DE-PECA.md) e [`GOTCHAS-AUTORIA-VISUAL.md`](GOTCHAS-AUTORIA-VISUAL.md) antes de definir a geometria.
 
+Antes de escrever à mão o arco de roda, o retângulo de cantos arredondados, a área com sinal ou o recuo de um contorno, rode `npm run capacidade -- <nome>` com `recortarArcoNoPerfil`, `retanguloArredondado`, `areaDoContorno` ou `deslocarContorno`: cada um tem ficha com os limites e um exemplo.
+
 
 ## 2. Anatomia Canônica de uma Receita Procedural
 

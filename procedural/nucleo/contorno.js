@@ -15,7 +15,57 @@
    dois dão os mesmos vértices na esquadria de um polígono convexo.
    ehSimples: polígono simples (convexo ou côncavo), sem ponto repetido, área nula nem arestas que se cruzem ou se toquem.
    diagnosticarContorno: o irmão de `ehSimples` que diz qual ponto se repete ou quais arestas se cruzam, para a mensagem de recusa.
-   limparContorno: tira ponto repetido (e, se pedido, ponto colinear) e devolve lista nova; o núcleo não a chama, a receita sim. */
+   limparContorno: tira ponto repetido (e, se pedido, ponto colinear) e devolve lista nova; o núcleo não a chama, a receita sim.
+
+   FICHA retanguloArredondado
+   serve: o contorno de um retângulo centrado na origem com cada canto arredondado por um quarto de elipse, em pontos [u, v] anti-horários, sem
+     escrever o seno e o cosseno do canto na receita.
+   quando: placa, bloco, porta de eletrodoméstico, painel ou aba de contorno retangular de canto redondo, seja o mesmo raio nos quatro cantos, seja
+     um raio por canto; o arco inteiro num lado (frente em D) sai com raio igual à meia-medida nos dois cantos. Para contorno não retangular ou
+     com trechos de arco e reta quaisquer use a curva2d (inicio e trechos), e para recuar o resultado, deslocarContorno.
+   unidades: as de quem chama (mm ou m); a função não converte nada.
+   campos:
+     largura: a medida em u, maior que zero.
+     profundidade: a medida em v, maior que zero.
+     cantos: um número (o mesmo raio nos quatro) ou uma lista de quatro cantos na ordem [+u+v, -u+v, -u-v, +u-v], cada um número ou [ru, rv] (padrão 0, canto vivo).
+     segmentosPorCanto: segmentos de cada quarto de elipse, inteiro de 1 para cima (padrão 4).
+   limites: a soma dos raios de cada lado não passa da medida do lado, e raio negativo recusa; raio 0 em um eixo dá canto vivo; pontos coincidentes saem uma vez.
+   devolve: a lista de pontos [u, v], anti-horária a partir do canto +u+v, arredondada à grade de 1e-9.
+   exemplo:
+     retanguloArredondado({ largura: 600, profundidade: 400, cantos: 40, segmentosPorCanto: 6 })
+   peça: procedural/pecas/micro-ondas-branco/receita.js (escreve o mesmo contorno em uma função local).
+   FIM DA FICHA
+
+   FICHA areaDoContorno
+   serve: a área com sinal de um polígono 2D pela fórmula do cadarço: positiva se os pontos vão no sentido anti-horário, negativa no horário.
+   quando: a receita precisa saber o sentido de um contorno antes de passá-lo a uma extrusão ou a deslocarContorno, ou a área dele (a
+     massa, a razão de duas seções); no lugar de reescrever `area` e `antihorario` em cada arquivo. Para saber se o polígono é convexo, ehConvexo;
+     se é simples (sem cruzamento), ehSimples.
+   unidades: a área sai no quadrado da unidade dos pontos (mm2 para pontos em mm).
+   campos:
+     poligono: lista de 3 pontos [u, v] ou mais, números finitos; o último não repete o primeiro.
+   limites: recusa lista com menos de 3 pontos e ponto que não é [u, v] numérico; não confere cruzamento: num polígono que se cruza o valor é a soma das áreas com sinal.
+   devolve: um número; maior que zero é anti-horário, menor que zero é horário, zero é degenerado.
+   exemplo:
+     areaDoContorno([[0, 0], [10, 0], [10, 5], [0, 5]])
+   peça: procedural/pecas/aviao/partes/asas/receita.js (escreve o sinal da área em uma função local, para orientar o contorno).
+   FIM DA FICHA
+
+   FICHA deslocarContorno
+   serve: recua ou expande um polígono convexo anti-horário por meia-esquadria: cada vértice anda pela bissetriz e cada aresta fica paralela à
+     original, a `distancia` dela, com o mesmo número de vértices na mesma ordem.
+   quando: a parede de uma casca, a folga de um encaixe, o contorno interno de uma seção que acompanha o externo ponto a ponto (o `loft` com casca precisa
+     da correspondência vértice a vértice). Para polígono côncavo ou com furo use perfil2d.js (CrossSection), que não guarda um ponto por vértice.
+   unidades: as de quem chama; a distância é medida perpendicular à aresta, na mesma unidade dos pontos.
+   campos:
+     poligono: lista de 3 pontos [u, v] ou mais, convexo, anti-horário e de área positiva (use areaDoContorno para conferir o sentido).
+     distancia: número finito; maior que zero recua para dentro, menor que zero expande para fora.
+   limites: recusa polígono horário, côncavo, com aresta de comprimento zero, e o recuo que faça uma aresta sumir ou o polígono inverter; a mensagem diz o recuo máximo aproximado.
+   devolve: a lista de pontos [u, v], um por vértice, na mesma ordem da entrada.
+   exemplo:
+     deslocarContorno([[0, 0], [100, 0], [100, 60], [0, 60]], 8)
+   peça: procedural/pecas/aviao/partes/asas/receita.js (escreve o mesmo recuo em uma função local, para a fresta do contorno).
+   FIM DA FICHA */
 
 const EPS = 1e-9;
 const SEGMENTOS_PADRAO = 4;

@@ -52,6 +52,10 @@ export const CAPACIDADES = Object.freeze({
   chapaDeContorno: { arquivo: 'procedural/nucleo/chapa-de-contorno.js', funcao: 'chapaDeContorno', de: 'procedural/nucleo/chapa-de-contorno.js' },
   corpoDeSecaoVariavel: { arquivo: 'procedural/nucleo/corpo-de-secao-variavel.js', funcao: 'corpoDeSecaoVariavel', de: 'procedural/nucleo/corpo-de-secao-variavel.js' },
   furoPassante: { arquivo: 'procedural/nucleo/furo-passante.js', funcao: 'furoPassante', de: 'procedural/nucleo/furo-passante.js' },
+  recortarArcoNoPerfil: { arquivo: 'procedural/nucleo/curva2d.js', funcao: 'recortarArcoNoPerfil', de: 'procedural/nucleo/curva2d.js' },
+  retanguloArredondado: { arquivo: 'procedural/nucleo/contorno.js', funcao: 'retanguloArredondado', de: 'procedural/nucleo/contorno.js' },
+  areaDoContorno: { arquivo: 'procedural/nucleo/contorno.js', funcao: 'areaDoContorno', de: 'procedural/nucleo/contorno.js' },
+  deslocarContorno: { arquivo: 'procedural/nucleo/contorno.js', funcao: 'deslocarContorno', de: 'procedural/nucleo/contorno.js' },
   contornoComArcos: { arquivo: 'procedural/nucleo/arcos-do-contorno.js', funcao: 'contornoComArcos', de: 'procedural/nucleo/arcos-do-contorno.js' },
 });
 
@@ -152,10 +156,14 @@ function cabecalho(fonte) {
   return { linhas: m[1].split('\n').map((l) => l.replace(/^\s*\* ?/, '')), fim: m.index + m[0].length };
 }
 
-/** lerFicha(fonte) -> { nome, linhas, serve, campos, codigo } ou null; `codigo` é o arquivo sem o comentário de cabeçalho. */
-export function lerFicha(fonte) {
-  const { linhas, fim } = cabecalho(fonte);
-  const de = linhas.findIndex((l) => /^FICHA \S+\s*$/.test(l));
+/** lerFicha(fonte, nome?) -> { nome, linhas, serve, campos, codigo } ou null; `codigo` é o arquivo sem o comentário de cabeçalho.
+ *  Um cabeçalho pode ter várias fichas (contorno.js): com `nome`, vale a que se chama assim; sem ele, a primeira. */
+export function lerFicha(fonte, nome) {
+  const { linhas: cruas, fim } = cabecalho(fonte);
+  /* um cabeçalho sem `*` à esquerda (contorno.js, curva2d.js) recuou a ficha: o recuo da linha FICHA sai de todas */
+  const recuo = (l) => /^ */.exec(l)[0].length;
+  const de = cruas.findIndex((l) => (nome ? l.trim() === `FICHA ${nome}` : /^ *FICHA \S+\s*$/.test(l)));
+  const linhas = de < 0 ? cruas : cruas.map((l) => (recuo(l) >= recuo(cruas[de]) ? l.slice(recuo(cruas[de])) : l));
   const ate = linhas.findIndex((l, i) => i > de && /^FIM DA FICHA\s*$/.test(l));
   if (de < 0 || ate < 0) return null;
   const corpo = linhas.slice(de + 1, ate);
@@ -173,7 +181,7 @@ export function lerFicha(fonte) {
 }
 
 function fichaDe(nome) {
-  return lerFicha(readFileSync(resolve(REPO, CAPACIDADES[nome].arquivo), 'utf8'));
+  return lerFicha(readFileSync(resolve(REPO, CAPACIDADES[nome].arquivo), 'utf8'), nome);
 }
 
 const semAcento = (t) => t.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
