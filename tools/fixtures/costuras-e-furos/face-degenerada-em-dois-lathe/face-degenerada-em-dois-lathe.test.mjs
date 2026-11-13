@@ -14,7 +14,7 @@ describe('face degenerada no unir com arredondarCostura de dois lathe', () => {
   it('com o deitado de 195 mm a malha fecha sem face de três cantos colineares', () => {
     expect(m.orfaos).toEqual([]);
     expect(m.arestasSoltas).toBe(0);
-    expect(m.faces).toBe(3504);
+    expect(m.faces).toBe(3500);
     expect(m.facesDegeneradas).toBe(0);
     expect(m.avisos).toEqual([]);
   });
