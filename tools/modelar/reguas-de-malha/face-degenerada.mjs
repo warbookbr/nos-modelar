@@ -4,8 +4,7 @@
    degenerada": a normal de Newell do polígono, sem normalizar, tem módulo (o dobro da área, em m²) de no máximo 1e-12, ou algum canto não existe. E o da
    auditoria de interseções (`prepararSolido`, `src/autoria/contato-de-solidos.js`), que mede cada triângulo da triangulação com piso relativo ao tamanho do
    sólido: módulo do produto vetorial de no máximo min(1e-6, 2e-9 vezes o quadrado da meia diagonal da caixa dos vértices). A auditoria da montagem mede a peça
-   inteira (todos os vértices do `neutro`) e a dos contatos da peça mede cada parte; a régua usa, em cada face, o piso mais alto entre o da parte dela (as faces sem parte, ou de
-   parte `''`, formam uma parte só) e o da peça inteira, de modo que o que ela aprova não sai inconclusivo em nenhuma das duas. Face de três cantos é o próprio
+   inteira (todos os vértices do `neutro`) e a dos contatos da peça mede cada parte; a régua tem dois níveis: a face abaixo do piso da própria parte (as faces sem parte, ou de parte `''`, formam uma parte só) entra em `faces`, a recusa; a que passa nele e fica abaixo do piso da peça inteira entra em `soNaPecaInteira`, que a peça sozinha tolera e a auditoria da montagem acusa. A soma dos dois grupos é o que a montagem acusa. Face de três cantos é o próprio
    triângulo; face de mais cantos é recusada se a normal de Newell passa desse piso a menos, ou se, depois de tirar da triangulação do earcut os triângulos
    que não passam do piso (o canto colinear que a união deixa no meio de uma aresta), não sobra nenhum. A régua devolve toda face recusada, na ordem em que
    o adaptador as visita, e não só a primeira. Lê só `neutro.V` e `neutro.F`. */
@@ -60,27 +59,37 @@ function maiorTriangulo(pontos, normal, limite) {
   return maior;
 }
 
-/** { total, faces: [{ id, cantos, normal, parte }] } com cada face que o `adaptarThree` recusaria como degenerada ou que a auditoria de interseções acharia sem área. */
+/** { total, faces, soNaPecaInteira }: `faces` são as que o `adaptarThree` recusaria ou cujo triângulo a auditoria dos contatos (piso da própria parte) acharia sem área; `soNaPecaInteira` são as que passam nisso e ficam abaixo do piso da peça inteira, que a auditoria da montagem acusa. `total` conta só `faces`. Cada item: { id, cantos, normal, parte, piso } (`piso` é o da parte, ou o da peça inteira em `soNaPecaInteira`). */
 export function medirFaceDegenerada(neutro) {
   const faces = [];
+  const soNaPecaInteira = [];
   const limites = new Map();
-  const daPeca = limiteRelativo(neutro);
-  /* o mais alto entre o piso da parte e o da peça inteira: a auditoria da montagem mede a peça, a dos contatos mede a parte */
-  const limiteDa = (parte) => {
-    if (!limites.has(parte)) limites.set(parte, Math.max(LIMITE_DA_NORMAL, limiteRelativo(neutro, parte), daPeca));
+  const daPeca = Math.max(LIMITE_DA_NORMAL, limiteRelativo(neutro));
+  const limiteDaParte = (parte) => {
+    if (!limites.has(parte)) limites.set(parte, Math.max(LIMITE_DA_NORMAL, limiteRelativo(neutro, parte)));
     return limites.get(parte);
   };
-  for (const face of neutro.F.values()) {
-    /* com menos de 3 cantos (ou sem lista) o adaptador também recusa ("precisa de pelo menos 3 vértices"): entra na régua, com a normal indefinida */
-    if (!Array.isArray(face.vs) || face.vs.length < 3) { faces.push({ id: face.id, cantos: Array.isArray(face.vs) ? face.vs.length : 0, normal: null, parte: nomeDaParte(face.parte) }); continue; }
-    const limite = limiteDa(nomeDaParte(face.parte));
-    const pontos = face.vs.map((v) => neutro.V.get(v));
+  /* null se a face passa no limite; senão { cantos, normal } */
+  const recusa = (face, pontos, limite) => {
     const modulo = normalDeNewell(pontos);
-    if (modulo == null || !(modulo > limite)) { faces.push({ id: face.id, cantos: face.vs.length, normal: modulo, parte: nomeDaParte(face.parte) }); continue; }
-    if (face.vs.length === 3) continue;
+    if (modulo == null || !(modulo > limite)) return { cantos: face.vs.length, normal: modulo };
+    if (face.vs.length === 3) return null;
     const normal = [0, 0, 0];
     for (let k = 0; k < pontos.length; k++) { const a = pontos[k], b = pontos[(k + 1) % pontos.length]; normal[0] += (a[1] - b[1]) * (a[2] + b[2]); normal[1] += (a[2] - b[2]) * (a[0] + b[0]); normal[2] += (a[0] - b[0]) * (a[1] + b[1]); }
-    if (!(maiorTriangulo(pontos, normal, limite) > 0)) faces.push({ id: face.id, cantos: face.vs.length, normal: modulo, parte: nomeDaParte(face.parte) });
+    return maiorTriangulo(pontos, normal, limite) > 0 ? null : { cantos: face.vs.length, normal: modulo };
+  };
+  for (const face of neutro.F.values()) {
+    const parte = nomeDaParte(face.parte);
+    /* com menos de 3 cantos (ou sem lista) o adaptador também recusa ("precisa de pelo menos 3 vértices"): entra na régua, com a normal indefinida */
+    if (!Array.isArray(face.vs) || face.vs.length < 3) { faces.push({ id: face.id, cantos: Array.isArray(face.vs) ? face.vs.length : 0, normal: null, parte, piso: null }); continue; }
+    const pontos = face.vs.map((v) => neutro.V.get(v));
+    const daParte = limiteDaParte(parte);
+    const propria = recusa(face, pontos, daParte);
+    if (propria) { faces.push({ id: face.id, ...propria, parte, piso: daParte }); continue; }
+    if (daPeca > daParte) {
+      const inteira = recusa(face, pontos, daPeca);
+      if (inteira) soNaPecaInteira.push({ id: face.id, ...inteira, parte, piso: daPeca });
+    }
   }
-  return { total: faces.length, faces };
+  return { total: faces.length, faces, soNaPecaInteira };
 }
