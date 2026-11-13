@@ -1,6 +1,6 @@
 # Melhorias de processo da revisão: menos reenvio sem defeito e menos coisa escrita à mão
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `tools/gates/`, `tools/testes-lentos.mjs`, `tools/testes-lentos.test.mjs`, `tools/vitest-duracoes.mjs`, `tools/mapa/`, `docs/modelar/roteiros/`, `.gitattributes`, `tools/arquitetura/independencia-catalogo.mjs`, `tools/arquitetura/nucleo-sem-three.mjs`, `tools/arquitetura/nucleo-sem-three.test.mjs`, `tools/catalogo/`, `.claude/agents/implementador.md`, `.claude/agents/modelador.md`, `.claude/agents/revisor-adversarial.md`, `.claude/agents/desenhador-de-contorno.md`, `.claude/agents/desenhista-de-prancha.md`, `.claude/REGRAS-DOS-AGENTES.md`, `docs/modelar/MECANISMOS.md`, `docs/modelar/banco-de-provas/README.md`, `tools/modelar/rodada-de-modelagem.mjs`, `tools/modelar/rodada-de-modelagem.test.mjs`, `tools/modelar/capacidade.mjs`, `tools/modelar/capacidade.test.mjs`, `tools/modelar/comecar.mjs`, `tools/modelar/comecar.test.mjs`, `tools/modelar/exportar.mjs`, `tools/gates.mjs`, `README.md`, `docs/modelar/INDEX.md`
 
@@ -64,4 +64,6 @@ O teto relativo esconder uma regressão lenta de tempo: por isso três execuçõ
 
 ## Fechamento
 
-Preencher ao concluir ou cancelar.
+Concluído em 2026-11-13, com as treze fatias feitas e na main. O que mudou para quem trabalha: a bateria local roda a guarda das peças mudadas e os testes lentos ligados ao que o envio mudou, e conta o que mudou contra a main quando o ramo não tem remoto; o teto de tempo de cada teste é relativo à mediana do histórico, que circula no CI pelo cache; o mapa junta sem conflito; as linhas de planos ativos, o índice de decisões e o índice do banco de provas são gerados; a fronteira do núcleo tem régua; as cinco extensões estão no catálogo; a ficha de capacidade cobre as 42 operações e o `comecar` acha nome de operação e de comando; as regras dos agentes e o formato do atrito moram num arquivo; a página dos mecanismos tem conferência; a ferramenta de rodadas guarda só a última cópia da receita; e a publicação de peças em pasta, que nunca teve peça, saiu.
+
+Do gate de saída, as provas de cada fatia passam e `npm run gates` está verde. O item dos três envios seguidos com junção da main sem resolução manual do mapa não foi medido, porque não houve outra sessão enviando no período; a regra de junção foi provada num clone de teste. O teto relativo só passa a valer no CI depois de três execuções com histórico, e isso se confere nos próximos envios. Ficou no backlog, dos atritos dos agentes: a captura de várias montagens numa sessão só, e o destaque por instância no visor da montagem.

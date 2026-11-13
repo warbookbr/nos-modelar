@@ -74,7 +74,7 @@ robótico, e `npm run comecar -- modelar/peca/corrigir` lista as peças. Os gate
 vez por `npm run gates`, e `reguas:check` reprova quando a lista local e a do CI
 divergem.
 
-Planos ativos: <!-- planos-ativos:inicio -->[melhorias de processo da revisão](docs/modelar/planos/2026-11-13-melhorias-de-processo-da-revisao.md), [organização dos documentos](docs/modelar/planos/2026-11-13-organizacao-dos-documentos.md), [furgão realista](docs/modelar/planos/2026-10-30-furgao-realista.md), [costuras e furos limpos](docs/modelar/planos/2026-11-09-costuras-e-furos-limpos.md), [revisão das verificações e dos testes](docs/modelar/planos/2026-11-13-revisao-das-verificacoes-e-dos-testes.md) e [saída de manual a partir da montagem](docs/modelar/planos/2026-11-13-saida-de-manual-a-partir-da-montagem.md).<!-- planos-ativos:fim -->
+Planos ativos: <!-- planos-ativos:inicio -->[organização dos documentos](docs/modelar/planos/2026-11-13-organizacao-dos-documentos.md), [furgão realista](docs/modelar/planos/2026-10-30-furgao-realista.md), [costuras e furos limpos](docs/modelar/planos/2026-11-09-costuras-e-furos-limpos.md), [revisão das verificações e dos testes](docs/modelar/planos/2026-11-13-revisao-das-verificacoes-e-dos-testes.md) e [saída de manual a partir da montagem](docs/modelar/planos/2026-11-13-saida-de-manual-a-partir-da-montagem.md).<!-- planos-ativos:fim -->
 
 Já fecharam [ajustes no núcleo dos veículos](./docs/modelar/decisoes/PLANOS-ENCERRADOS.md) em 2026-10-30;
 Já fecharam [veículos de referência livre](./docs/modelar/decisoes/PLANOS-ENCERRADOS.md) em 2026-10-20; [objetos externos
