@@ -92,18 +92,25 @@ export function nomeDeExibicao(ref, nomes = {}) {
   return ultimo.charAt(0).toUpperCase() + ultimo.slice(1);
 }
 
-/** Os parâmetros em texto legível: "posicao do suporte 151 mm", com o nome do parâmetro separado nas maiúsculas e o valor em milímetro. */
-export function parametrosEmTexto(parametros) {
+/** Os parâmetros em texto legível (o nome declarado em `nomes`, por identificador, ou o derivado): "posicao do suporte 151 mm", com o nome do parâmetro separado nas maiúsculas e o valor em milímetro. */
+export function parametrosEmTexto(parametros, nomes = {}) {
   return Object.entries(parametros).map(([nome, valor]) => {
-    const legivel = nome.replace(/([a-z0-9])([A-Z])/g, '$1 $2').toLowerCase();
+    const legivel = nomes[nome] ?? nome.replace(/([a-z0-9])([A-Z])/g, '$1 $2').toLowerCase();
     const numero = typeof valor === 'number' ? `${String(valor).replace('.', ',')} mm` : String(valor);
     return `${legivel} ${numero}`;
   }).join(', ');
 }
 
 /** A lista com `nomeExibido` em cada peça: o nome declarado em `nomes` (por referência) ou o derivado da referência. */
-export function comNomesExibidos(lista, nomes = {}) {
-  return { ...lista, pecas: lista.pecas.map((peca) => ({ ...peca, nomeExibido: nomeDeExibicao(peca.nome, nomes) })) };
+export function comNomesExibidos(lista, nomes = {}, nomesDeParametros = {}) {
+  return {
+    ...lista,
+    pecas: lista.pecas.map((peca) => ({
+      ...peca,
+      nomeExibido: nomeDeExibicao(peca.nome, nomes),
+      ...(peca.parametros ? { parametrosExibidos: parametrosEmTexto(peca.parametros, nomesDeParametros) } : {}),
+    })),
+  };
 }
 
 /** A lista em Markdown: uma tabela, uma linha por peça distinta, mais a linha do total. */
@@ -116,7 +123,7 @@ export function listaEmMarkdown(lista) {
   ];
   for (const peca of lista.pecas) {
     const rotulo = peca.nomeExibido ?? peca.nome;
-    const nome = peca.parametros ? `${rotulo} (${parametrosEmTexto(peca.parametros)})` : rotulo;
+    const nome = peca.parametros ? `${rotulo} (${peca.parametrosExibidos ?? parametrosEmTexto(peca.parametros)})` : rotulo;
     const { largura, altura, profundidade } = peca.caixaMm;
     linhas.push(`| ${nome} | ${peca.quantidade} | ${largura} | ${altura} | ${profundidade} | ${peca.materiais.join(', ') || '—'} |`);
   }

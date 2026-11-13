@@ -89,7 +89,7 @@ export function passosDaMontagem(montagem, etapas, { agrupar = true, textos = {}
  * A montagem do passo `indice`: as instâncias dos passos até ele, as já montadas esmaecidas e as do passo em destaque.
  * `cache` guarda a malha pintada de cada instância, para a mesma instância não ser copiada a cada passo.
  */
-export function montagemDoPasso(montagem, passos, indice, cache = new Map()) {
+export function montagemDoPasso(montagem, passos, indice, cache = new Map(), { detalhe = false } = {}) {
   const pintada = (instancia, modo, corDe) => {
     const chave = `${instancia.id}\u0000${modo}`;
     if (cache.has(chave)) return cache.get(chave);
@@ -103,7 +103,8 @@ export function montagemDoPasso(montagem, passos, indice, cache = new Map()) {
     cache.set(chave, resultado);
     return resultado;
   };
-  const instancias = passos.slice(0, indice + 1).flatMap((passo, i) => passo.instancias.map((instancia) => (i === indice
+  /* No detalhe, só a primeira instância do passo fica em destaque (e é a que a captura enquadra); as outras do grupo ficam esmaecidas. */
+  const instancias = passos.slice(0, indice + 1).flatMap((passo, i) => passo.instancias.map((instancia, k) => (i === indice && (!detalhe || k === 0)
     ? pintada(instancia, 'destaque', () => COR_DO_DESTAQUE)
     : pintada(instancia, 'esmaecido', (cor) => esmaecer(cor)))));
   return { id: montagem.id, instancias };

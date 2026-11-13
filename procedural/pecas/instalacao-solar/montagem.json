@@ -2350,6 +2350,13 @@
     ]
   },
   "manual": {
+    "parametros": {
+      "agua": "água",
+      "comprimento": "comprimento",
+      "posicaoDoPrimeiroPainel": "posição do primeiro painel",
+      "posicaoDoSuporte": "posição do suporte",
+      "profundidadeDoAssento": "profundidade do assento"
+    },
     "nomes": {
       "instalacao-solar/grampo-intermediario": "Grampo intermediário",
       "instalacao-solar/suporte-l": "Suporte em L"

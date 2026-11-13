@@ -36,7 +36,7 @@ opções (todas com =):
   --sem-agrupar       um passo por etapa, em vez de um passo para etapas seguidas da mesma peça
   --ajuda             este texto
 
-saída: manual.html, manual.json, lista-de-pecas.json, lista-de-pecas.md e passo-NN.png.`;
+saída: manual.html, manual.json, lista-de-pecas.json, lista-de-pecas.md, passo-NN.png e, nos passos agrupados, passo-NN-detalhe.png.`;
 
 function opcoesDe(argv) {
   const opcoes = { agrupar: true, arquivo: null, saida: null, vista: 'isometrica', folga: 1.5, largura: 960, imagens: true, ajuda: false };
@@ -84,12 +84,14 @@ export async function gerarManual(arquivo, opcoes = {}) {
     throw new Error(`a montagem '${persistida.id}' não declara 'etapas'. Esperado: a lista de ids de instância na ordem de construção (montagem v5).`);
   }
   const nomes = persistida.manual?.nomes ?? {};
-  const lista = comNomesExibidos(listarPecas(resolvida), nomes);
+  const nomesDeParametros = persistida.manual?.parametros ?? {};
+  const lista = comNomesExibidos(listarPecas(resolvida), nomes, nomesDeParametros);
   const { passos, foraDasEtapas } = passosDaMontagem(resolvida, persistida.etapas, { agrupar, textos: persistida.manual?.etapas ?? {} });
   const tempos = { resolverMs: Math.round(performance.now() - inicio), imagensMs: [] };
   const pasta = pastaDeSaida(saidaPedida, persistida.id);
   mkdirSync(pasta, { recursive: true });
   const imagemDe = new Map();
+  const detalheDe = new Map();
   if (imagens) {
     const { abrirCapturador } = await import('./capturador.mjs');
     const capturador = await abrirCapturador();
@@ -102,6 +104,13 @@ export async function gerarManual(arquivo, opcoes = {}) {
         });
         if (!captura.ok) throw new Error(`a imagem do passo ${i + 1} ('${passos[i].etapas.join(', ')}') falhou: ${captura.erro.mensagem}`);
         imagemDe.set(i, captura.resultado.capturas[0].dados);
+        if (passos[i].quantidade > 1) {
+          const detalhe = await capturador.capturar({
+            montagem: montagemDoPasso(resolvida, passos, i, cache, { detalhe: true }), vistas: [vista], projecao: 'ortografica', largura, folga, foco: [FOCO_DO_PASSO],
+          });
+          if (!detalhe.ok) throw new Error(`o detalhe do passo ${i + 1} ('${passos[i].etapas[0]}') falhou: ${detalhe.erro.mensagem}`);
+          detalheDe.set(i, detalhe.resultado.capturas[0].dados);
+        }
         tempos.imagensMs.push(Math.round(performance.now() - t0));
         aoAndar(i + 1, passos.length, tempos.imagensMs.at(-1));
       }
@@ -110,20 +119,25 @@ export async function gerarManual(arquivo, opcoes = {}) {
     }
   }
   const arquivosDeImagem = (i) => `passo-${String(i + 1).padStart(2, '0')}.png`;
+  const arquivoDeDetalhe = (i) => arquivosDeImagem(i).replace('.png', '-detalhe.png');
   for (const [i, dados] of imagemDe) writeFileSync(join(pasta, arquivosDeImagem(i)), dados);
+  for (const [i, dados] of detalheDe) writeFileSync(join(pasta, arquivoDeDetalhe(i)), dados);
   const manual = {
     montagem: persistida.id,
     lista,
     passos: passos.map((passo, i) => ({
       numero: passo.numero, etapas: passo.etapas, alvo: passo.alvo, nome: nomeDeExibicao(passo.alvo, nomes), quantidade: passo.quantidade,
-      lista: comNomesExibidos(passo.lista, nomes), ...(passo.instrucoes ? { instrucoes: passo.instrucoes } : {}), ...(passo.avisos ? { avisos: passo.avisos } : {}),
+      lista: comNomesExibidos(passo.lista, nomes, nomesDeParametros), ...(passo.instrucoes ? { instrucoes: passo.instrucoes } : {}), ...(passo.avisos ? { avisos: passo.avisos } : {}),
       ...(imagemDe.has(i) ? { imagem: imagemDe.get(i) } : {}),
+      ...(detalheDe.has(i) ? { imagemDetalhe: detalheDe.get(i) } : {}),
     })),
     foraDasEtapas,
   };
   const dadosJson = {
     formato: 'mecanifica.manual', versao: 1, montagem: persistida.id, vista, lista,
-    passos: manual.passos.map(({ imagem, ...resto }, i) => ({ ...resto, ...(imagem ? { imagem: arquivosDeImagem(i) } : {}) })),
+    passos: manual.passos.map(({ imagem, imagemDetalhe, ...resto }, i) => ({
+      ...resto, ...(imagem ? { imagem: arquivosDeImagem(i) } : {}), ...(imagemDetalhe ? { imagemDetalhe: arquivoDeDetalhe(i) } : {}),
+    })),
     foraDasEtapas,
   };
   writeFileSync(join(pasta, 'lista-de-pecas.json'), listaEmJson(lista));

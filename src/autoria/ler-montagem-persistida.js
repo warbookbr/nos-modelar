@@ -341,11 +341,11 @@ function lerV4(dado) {
 }
 
 /* `manual`: texto opcional que só o módulo de manual lê. `nomes` dá o nome de exibição por referência de alvo (a `ref` de
-   uma instância); `etapas` dá, por id de instância, uma instrução curta e avisos. Nenhum campo muda a geometria. */
+   uma instância); `parametros` dá o nome de exibição por identificador de parâmetro; `etapas` dá, por id de instância, uma instrução curta e avisos. Nenhum campo muda a geometria. */
 function lerManual(valor, instancias) {
   const caminho = 'manual';
   if (!ehObjetoSimples(valor)) falhar('estrutura-invalida', caminho, 'precisa ser objeto simples.');
-  chavesExatas(valor, ['nomes', 'etapas'], caminho);
+  chavesExatas(valor, ['nomes', 'parametros', 'etapas'], caminho);
   const refs = new Set(instancias.map((instancia) => instancia.alvo.ref));
   const ids = new Set(instancias.map((instancia) => instancia.id));
   const saida = {};
@@ -355,6 +355,13 @@ function lerManual(valor, instancias) {
     for (const ref of Object.keys(valor.nomes).sort(compararTexto)) {
       if (!refs.has(ref)) falhar('manual-invalido', `${caminho}.nomes.${ref}`, `'${ref}' não é o alvo de nenhuma instância da montagem.`);
       saida.nomes[ref] = textoNaoVazio(valor.nomes[ref], 'manual-invalido', `${caminho}.nomes.${ref}`);
+    }
+  }
+  if (valor.parametros !== undefined) {
+    if (!ehObjetoSimples(valor.parametros)) falhar('estrutura-invalida', `${caminho}.parametros`, 'precisa ser objeto simples.');
+    saida.parametros = {};
+    for (const nome of Object.keys(valor.parametros).sort(compararTexto)) {
+      saida.parametros[nome] = textoNaoVazio(valor.parametros[nome], 'manual-invalido', `${caminho}.parametros.${nome}`);
     }
   }
   if (valor.etapas !== undefined) {

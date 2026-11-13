@@ -18,6 +18,8 @@ th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--linh
 th.n, td.n { text-align: right; font-variant-numeric: tabular-nums; }
 section.passo { background: #fff; border: 1px solid var(--linha); border-radius: 8px; padding: 16px; margin: 20px 0; break-inside: avoid; }
 section.passo h2 span { color: var(--destaque); }
+section.passo figure { margin: 8px 0 0; }
+section.passo figcaption { color: var(--suave); font-size: 0.85rem; margin-top: 4px; }
 section.passo img { display: block; width: 100%; height: auto; border-radius: 4px; margin-top: 8px; }
 .instrucao { margin: 0 0 8px; }
 .avisos { margin: 0 0 8px; padding-left: 20px; color: var(--suave); }
@@ -32,7 +34,7 @@ section.passo img { display: block; width: 100%; height: auto; border-radius: 4p
 function tabela(lista) {
   const linhas = lista.pecas.map((peca) => {
     const rotulo = escapar(peca.nomeExibido ?? peca.nome);
-    const nome = peca.parametros ? `${rotulo} <span class="ids">(${escapar(parametrosEmTexto(peca.parametros))})</span>` : rotulo;
+    const nome = peca.parametros ? `${rotulo} <span class="ids">(${escapar(peca.parametrosExibidos ?? parametrosEmTexto(peca.parametros))})</span>` : rotulo;
     const { largura, altura, profundidade } = peca.caixaMm;
     return `<tr><td>${nome}</td><td class="n">${peca.quantidade}</td><td class="n">${largura} × ${altura} × ${profundidade}</td><td>${escapar(peca.materiais.join(', ') || '—')}</td></tr>`;
   }).join('\n');
@@ -40,13 +42,18 @@ function tabela(lista) {
 }
 
 /**
- * `manual` traz { montagem, lista, passos: [{ numero, nome, quantidade, lista, instrucoes?, avisos?, imagem?: Buffer }], foraDasEtapas }; a lista e os passos já trazem os nomes de exibição.
+ * `manual` traz { montagem, lista, passos: [{ numero, nome, quantidade, lista, instrucoes?, avisos?, imagem?: Buffer, imagemDetalhe?: Buffer }], foraDasEtapas }; a lista e os passos já trazem os nomes de exibição.
  */
 export function paginaDoManual(manual) {
   const passos = manual.passos.map((passo) => {
     const titulo = passo.quantidade > 1 ? `${passo.quantidade} × ${passo.nome}` : passo.nome;
-    const imagem = passo.imagem
-      ? `<img alt="Passo ${passo.numero}: ${escapar(titulo)}, em laranja o que entra neste passo" src="data:image/png;base64,${Buffer.from(passo.imagem).toString('base64')}">` : '';
+    const alt = `Passo ${passo.numero}: ${escapar(titulo)}, em laranja o que entra neste passo`;
+    const figura = (dados, legenda, texto) => `<figure><img alt="${alt}${texto ? ', ' + texto : ''}" src="data:image/png;base64,${Buffer.from(dados).toString('base64')}">${legenda ? `<figcaption>${legenda}</figcaption>` : ''}</figure>`;
+    const comDetalhe = Boolean(passo.imagem && passo.imagemDetalhe);
+    const imagem = [
+      passo.imagem ? figura(passo.imagem, comDetalhe ? 'Onde vão' : '', '') : '',
+      comDetalhe ? figura(passo.imagemDetalhe, 'Detalhe de uma delas', 'detalhe da primeira') : '',
+    ].join('');
     const instrucoes = (passo.instrucoes ?? []).map((texto) => `<p class="instrucao">${escapar(texto)}</p>`).join('\n');
     const avisos = passo.avisos?.length ? `<ul class="avisos">${passo.avisos.map((texto) => `<li>${escapar(texto)}</li>`).join('')}</ul>` : '';
     return `<section class="passo" id="passo-${passo.numero}">

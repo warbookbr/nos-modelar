@@ -25,7 +25,7 @@ describe('a leitura de manual na montagem v5', () => {
   it('a montagem sem o campo é lida sem ele, e com ele só acrescenta o campo', () => {
     const sem = lerMontagemPersistida(base());
     expect(Object.hasOwn(sem, 'manual')).toBe(false);
-    const manual = { nomes: { 'carro/roda': 'Roda' }, etapas: { roda: { instrucao: 'Encaixe no eixo.', avisos: ['Confira o aperto.'] } } };
+    const manual = { nomes: { 'carro/roda': 'Roda' }, parametros: { posicaoDoEixo: 'posição do eixo' }, etapas: { roda: { instrucao: 'Encaixe no eixo.', avisos: ['Confira o aperto.'] } } };
     const { manual: lido, ...resto } = lerMontagemPersistida(comManual(manual));
     expect(resto).toEqual(sem);
     expect(lido).toEqual(manual);
@@ -33,6 +33,8 @@ describe('a leitura de manual na montagem v5', () => {
   it('recusa chave desconhecida, alvo e etapa que não existem, e texto vazio', () => {
     recusa(comManual({ extra: 1 }), 'chave-desconhecida', 'manual');
     recusa(comManual({ nomes: { 'carro/volante': 'Volante' } }), 'manual-invalido', 'manual.nomes.carro/volante');
+    recusa(comManual({ parametros: { posicaoDoEixo: '' } }), 'manual-invalido', 'manual.parametros.posicaoDoEixo');
+    recusa(comManual({ parametros: [] }), 'estrutura-invalida', 'manual.parametros');
     recusa(comManual({ nomes: { 'carro/roda': '' } }), 'manual-invalido', 'manual.nomes.carro/roda');
     recusa(comManual({ etapas: { volante: { instrucao: 'x' } } }), 'manual-invalido', 'manual.etapas.volante');
     recusa(comManual({ etapas: { roda: { instrucao: 'x', tom: 1 } } }), 'chave-desconhecida', 'manual.etapas.roda');

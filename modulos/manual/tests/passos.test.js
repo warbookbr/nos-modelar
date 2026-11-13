@@ -55,3 +55,17 @@ describe('nomes de exibição', () => {
     expect(parametrosEmTexto({ comprimento: 500, posicaoDoSuporte: 151.5 })).toBe('comprimento 500 mm, posicao do suporte 151,5 mm');
   });
 });
+
+describe('detalhe do passo agrupado', () => {
+  it('só a primeira instância do grupo fica em destaque no detalhe', () => {
+    const { passos } = passosDaMontagem(m, ids);
+    const cor = (mont) => mont.instancias.map((i) => [...i.definicao.neutro.F.values()][0].cor);
+    const detalhe = montagemDoPasso(m, passos, 0, new Map(), { detalhe: true });
+    expect(cor(detalhe)[0]).toBe('#e8590c');
+    expect(cor(detalhe)[1]).not.toBe('#e8590c');
+    expect(detalhe.instancias[0].caminho[0]).toBe('passo-em-destaque');
+  });
+  it('o nome de parâmetro declarado vale sobre o derivado', () => {
+    expect(parametrosEmTexto({ posicaoDoSuporte: 151 }, { posicaoDoSuporte: 'posição do suporte' })).toBe('posição do suporte 151 mm');
+  });
+});
