@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1838 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1840 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -301,6 +301,10 @@
 
 - `NOTAS.md` — A carcaça da descrição pela família de desenho
 
+## docs/modelar/banco-de-provas/forma-exata-2026-11-13/
+
+- `README.md` — Forma exata antes da malha: medidas e estudo
+
 ## docs/modelar/banco-de-provas/furgao-realista-2026-10-30/
 
 - `ALINHAMENTO.md` — Furgão realista: alinhamento
@@ -554,6 +558,7 @@
 - `2026-11-08-ferramenta-de-material.md` — Ferramenta de material para o agente: ver, compor e reaproveitar materiais sem rodar a peça inteira
 - `2026-11-09-costuras-e-furos-limpos.md` — Costuras e furos limpos no núcleo: a união, o arredondamento e o furo sem dente, fresta, lasca nem face degenerada
 - `2026-11-10-rebaixo-por-contorno.md` — Rebaixo por contorno: o degrau, o sulco e a borda rebaixada num corpo
+- `2026-11-13-forma-exata-antes-da-malha.md` — Forma exata antes da malha, vocabulário alto e retorno em milímetro
 - `2026-11-13-kukri.md` — Kukri: uma faca detalhada, para medir quanto custa modelar um objeto simples
 - `2026-11-13-nucleo-para-quem-escreve-receita.md` — Núcleo para quem escreve receita: erro na hora, menos passos e rodada mais curta
 - `2026-11-13-revisao-das-verificacoes-e-dos-testes.md` — Revisão das verificações e dos testes: o que cada um pega, medido

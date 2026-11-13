@@ -9,6 +9,7 @@
 3. [revisão das verificações e dos testes](2026-11-13-revisao-das-verificacoes-e-dos-testes.md). Território: `docs/modelar/banco-de-provas/revisao-das-verificacoes-2026-11-13/`. Em aberto: tudo.
 4. [saída de manual a partir da montagem](2026-11-13-saida-de-manual-a-partir-da-montagem.md). Território: `modulos/manual/` e `docs/modelar/banco-de-provas/saida-de-manual-2026-11-13/`. Em aberto: tudo.
 5. [kukri](2026-11-13-kukri.md). Território: `procedural/pecas/kukri/` e `docs/modelar/banco-de-provas/kukri-2026-11-13/`. Em aberto: o alinhamento com a pessoa.
+6. [forma exata antes da malha](2026-11-13-forma-exata-antes-da-malha.md). Território: `procedural/nucleo/forma-exata/`, `tools/modelar/silhueta-contra-referencia.mjs` e a pasta dele no banco de provas. Em aberto: tudo.
 
 A lista está em ordem de prioridade. A ordem desempata quando dois planos precisam do mesmo arquivo: o de menor prioridade espera ou pede à pessoa que mude o território.
 

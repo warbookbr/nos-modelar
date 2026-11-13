@@ -22,7 +22,7 @@ diz o commit onde está; não governa trabalho novo.
 
 ## Estado atual
 
-- Planos ativos: <!-- planos-ativos:inicio -->[furgão realista](planos/2026-10-30-furgao-realista.md), [costuras e furos limpos](planos/2026-11-09-costuras-e-furos-limpos.md), [revisão das verificações e dos testes](planos/2026-11-13-revisao-das-verificacoes-e-dos-testes.md), [saída de manual a partir da montagem](planos/2026-11-13-saida-de-manual-a-partir-da-montagem.md) e [kukri](planos/2026-11-13-kukri.md).<!-- planos-ativos:fim -->
+- Planos ativos: <!-- planos-ativos:inicio -->[furgão realista](planos/2026-10-30-furgao-realista.md), [costuras e furos limpos](planos/2026-11-09-costuras-e-furos-limpos.md), [revisão das verificações e dos testes](planos/2026-11-13-revisao-das-verificacoes-e-dos-testes.md), [saída de manual a partir da montagem](planos/2026-11-13-saida-de-manual-a-partir-da-montagem.md), [kukri](planos/2026-11-13-kukri.md) e [forma exata antes da malha](planos/2026-11-13-forma-exata-antes-da-malha.md).<!-- planos-ativos:fim -->
 - Encerrados recentes: [abertura em qualquer direção](./decisoes/PLANOS-ENCERRADOS.md), [limites do sólido por laços](./decisoes/PLANOS-ENCERRADOS.md), [esboço pelo núcleo](./decisoes/PLANOS-ENCERRADOS.md) e [sólido por laços](./decisoes/PLANOS-ENCERRADOS.md); os outros na [crônica](./decisoes/PLANOS-ENCERRADOS.md).
 - A [exportação CAD/STEP modular](./decisoes/PLANOS-ENCERRADOS.md)
   entregou `modulos/exportador-cad/`, `modulos/exportador-obj/` e as CLIs
