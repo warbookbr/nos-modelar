@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1825 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1827 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2768,6 +2768,8 @@
 - `gates-lentos.test.mjs` — gates-lentos.test.mjs — depois do gate `test`, o resumo lista os cinco arquivos de teste mais lentos e avisa o que passa do teto, lendo a duração que o repór…
 - `gates-ordem.test.mjs` — gates-ordem.test.mjs — os gates baratos rodam antes e os caros do mais longo para o mais curto (tools/gates.mjs).
 - `gates-saida-guardada.test.mjs` — gates-saida-guardada.test.mjs — a saída inteira de um gate que falha vai para `tmp/gates/`, ignorado pelo git, e a linha de falha diz o caminho. Gate que pas…
+- `indice-do-banco.mjs` — indice-do-banco.mjs — gera o índice de `docs/modelar/banco-de-provas/README.md` das pastas, e confere que ele está em dia.
+- `indice-do-banco.test.mjs` — indice-do-banco.test.mjs — o índice do banco de provas sai das pastas, e o repositório está em dia com ele.
 - `leitura-obrigatoria.mjs` — leitura-obrigatoria.mjs — quanto cada intenção precisa LER antes de começar.
 - `links.mjs` — links.mjs — o gate de referência: varre todo arquivo rastreado por menções a `<pasta>/<...>.md` sob docs/, procedural/, modulos/, tools/ ou src/ (caminho com…
 - `mapa.mjs` — mapa.mjs — gera docs/MAPA.md: o inventário do repositório com o resumo de cada arquivo. O resumo NÃO mora aqui: mora no PRÓPRIO arquivo (primeiro comentário …

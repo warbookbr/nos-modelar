@@ -9,6 +9,7 @@
    senão o check nunca bateria. Zero dependências (git ls-files + fs). */
 
 import { execFileSync } from 'node:child_process';
+import { conferirIndice } from './indice-do-banco.mjs';
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -172,6 +173,11 @@ if (process.argv.includes('--check')) {
         break;
       }
     }
+  }
+  /* O índice do banco de provas é gerado das pastas (tools/mapa/indice-do-banco.mjs) e conferido aqui, junto do mapa. */
+  for (const problema of conferirIndice()) {
+    falhou = true;
+    console.error(`mapa:check FALHOU — ${problema}`);
   }
   if (falhou) process.exit(1);
   console.log(`mapa:check ok — ${rastreados.length} arquivos, mapa em dia, todos com cabeçalho.`);
