@@ -13,6 +13,7 @@
 import { criarResolverNumerico, distanciaDeEdicao, ErroDeResolucao, nomesProximos } from './expressoes.js';
 import { TIPO_MALHA_POLIGONAL, artefatoDaMalha, criarEstadoDeProcedencia, procedenciaCanonica, registrarProcedencia } from './artefatos.js';
 import { criarRegistroOperacoes } from './registro.js';
+import { chavesDosPrefixos, copiarEstado } from './memoria-de-execucao.js';
 import { essenciaisDaOperacao, recusasDeEssenciais, usoDaOperacao } from './uso-operacoes.js';
 import { criarOperacoesSubdivisao } from './operacoes/subdivisao.js';
 import { criarOperacoesFriso } from './operacoes/friso.js';
@@ -3603,6 +3604,14 @@ export function rastrearEntradas(mapa, anterior, nivel, alvos) {
 }
 const compararIds = (a, b) => typeof a === 'number' ? a - b : a < b ? -1 : a > b ? 1 : 0;
 
+/* O que a memória de execução guarda do estado: tudo o que um passo escreve em `st`. Ficam de fora o que o início da execução refaz igual
+   (o dicionário, os materiais, o esqueleto, os aliases, as declarações de origem, a lista de passos e as funções de leitura). */
+const CAMPOS_FORA_DA_MEMORIA = new Set(['dict', 'materiais', 'esqueleto', 'ossoSet', 'aliases', 'declaracoesOrigem', 'passos']);
+/* As operações que dominam o tempo de uma receita grande (medido: aparar 5 s, o subtrair de 13 chapas 35 s) e as que também são caras o bastante para valer um ponto. */
+const OPERACOES_PESADAS = new Set(['aparar', 'subtrair', 'aberturaPorContorno', 'arredondarCostura']);
+const OPERACOES_CARAS = new Set([...OPERACOES_PESADAS, 'intersectar', 'unir']);
+const PONTOS_NO_FIM = 2;
+
 /* ----------------------------------------------------------------------------
    NÚCLEO: roda a lista e devolve o NEUTRO em números. Não sabe desenhar.
    `dict` funde PARAMS e TOPO — os passos citam o NOME (raio: 'troncoR'), então
@@ -3680,7 +3689,39 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
 
   const modoRetrato = OPCOES.retrato ?? 'rapido';
   let retrato = null;
+  /* MEMÓRIA DE EXECUÇÃO (opcional, `OPCOES.memoria`, de `criarMemoriaDeExecucao`): o estado depois de uma operação cara é guardado sob
+     a chave do prefixo de passos (e do que o rodeia), e uma execução cujo prefixo é o mesmo recomeça dali. Só vale com o registro do
+     próprio núcleo, e nunca muda o resultado: a prova é o neutro bit a bit contra a execução sem memória. */
+  const memoria = OPCOES.memoria && !OPCOES.registroOperacoes ? OPCOES.memoria : null;
+  const chavesDoPrefixo = memoria ? chavesDosPrefixos({ dict, MATERIAIS, ESQUELETO, ALIASES, declaracoes: [...declaracoesOrigem], modoRetrato, registro: REGISTRO_OPERACOES.assinatura }, PASSOS) : null;
+  /* Quais passos viram ponto: guardar o estado inteiro custa uma cópia (5 s com 174 mil faces), então não é todo passo. Entram os
+     últimos `PONTOS_NO_FIM` passos das operações pesadas, para o ajuste depois da última delas recomeçar dali, e o último passo
+     de operação cara antes do ponto onde esta execução diverge da anterior, para a execução seguinte recomeçar dali. */
+  const pontosDeMemoria = new Set();
+  if (chavesDoPrefixo) {
+    const pesados = [];
+    PASSOS.forEach((passo, i) => { if (OPERACOES_PESADAS.has(passo?.[0])) pesados.push(i); });
+    for (const i of pesados.slice(-PONTOS_NO_FIM)) pontosDeMemoria.add(i);
+    const anterior = memoria.ultimaCadeia;
+    if (anterior) {
+      let divergencia = 0;
+      while (divergencia < chavesDoPrefixo.length && divergencia < anterior.length && chavesDoPrefixo[divergencia] === anterior[divergencia]) divergencia += 1;
+      if (divergencia < chavesDoPrefixo.length) for (let i = divergencia - 1; i >= 0; i -= 1) if (OPERACOES_CARAS.has(PASSOS[i]?.[0])) { pontosDeMemoria.add(i); break; }
+    }
+    memoria.ultimaCadeia = chavesDoPrefixo;
+  }
+  let inicio = 0;
+  if (chavesDoPrefixo) {
+    for (let k = PASSOS.length - 1; k >= 0; k -= 1) {
+      const ponto = memoria.buscar(chavesDoPrefixo[k]);
+      if (!ponto) continue;
+      const estado = copiarEstado(ponto.estado);
+      if (estado) { Object.assign(st, estado); inicio = k + 1; memoria.estatisticas.restaurados += 1; }
+      break;
+    }
+  }
   PASSOS.forEach((passo, i) => {
+    if (i < inicio) return;
     const [op, args = {}] = passo;
     const registro = OPCOES.registroOperacoes ?? REGISTRO_OPERACOES;
     if (!registro || typeof registro.resolver !== 'function') throw new Error('oficina: registro de operações inválido');
@@ -3753,6 +3794,10 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
         partes: Object.keys(st.partes).filter((id) => !antesPartes.has(id)).sort(),
       },
     });
+    if (chavesDoPrefixo && pontosDeMemoria.has(i)) {
+      const estado = copiarEstado(Object.fromEntries(Object.entries(st).filter(([campo, valor]) => !CAMPOS_FORA_DA_MEMORIA.has(campo) && typeof valor !== 'function')));
+      if (estado) memoria.guardar(chavesDoPrefixo[i], i, estado); else memoria.estatisticas.recusados += 1;
+    }
   });
   aplicarHierarquiaDasPartes(st);
   /* a cópia no lugar que nenhum passo consumiu nem mexeu é uma casca dupla em cima da fonte */

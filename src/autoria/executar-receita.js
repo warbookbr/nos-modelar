@@ -77,8 +77,12 @@ export function entradaDaReceita(modulo, opcoes = {}) {
 
 export function executarReceita(modulo, opcoes = {}) {
   const { entrada, expansao } = prepararReceita(modulo, opcoes);
-  const opcoesDoNucleo = opcoes.registroOperacoes
-    ? { registroOperacoes: opcoes.registroOperacoes }
+  /* `memoria`, de `criarMemoriaDeExecucao`, faz a receita cujo prefixo de passos não mudou recomeçar do estado guardado. */
+  const opcoesDoNucleo = opcoes.registroOperacoes || opcoes.memoria
+    ? {
+      ...(opcoes.registroOperacoes ? { registroOperacoes: opcoes.registroOperacoes } : {}),
+      ...(opcoes.memoria ? { memoria: opcoes.memoria } : {}),
+    }
     : undefined;
   const neutro = nucleo(
     entrada.PASSOS,

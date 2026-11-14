@@ -17,4 +17,5 @@ export { antiHorario, areaComSinal, espelharMeia, milimetroParaMetro, pontosEmMe
 export { adaptarV3 } from './adaptador.js';
 export { avaliarChaves, bindPoseOssos, montarAnimar } from './animacao.js';
 export { colisaoDe, executar } from './executor.js';
+export { criarMemoriaDeExecucao } from './memoria-de-execucao.js';
 export { carregarManifold, manifoldCarregada } from './manifold.js';

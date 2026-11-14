@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1875 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1878 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -357,6 +357,10 @@
 
 - `README.md` — Navegação de receitas, 2026-11-05
 - `hash-da-malha.mjs` — hash-da-malha.mjs — o hash da malha canônica de uma receita, para provar que a divisão em arquivos não muda nada.
+
+## docs/modelar/banco-de-provas/nucleo-para-receita-2026-11-14/
+
+- `prova-memoria-do-sedan.mjs` — prova-memoria-do-sedan.mjs — a memória de execução na carroceria do sedã: o tempo e o neutro bit a bit. Uso, da raiz do repositório (cada modo leva de 3 a 4 …
 
 ## docs/modelar/banco-de-provas/organizacao-dos-documentos-2026-11-13/
 
@@ -1006,6 +1010,8 @@
 - `loft-aresta.test.js` — loft-aresta.test.js — a ponta do loft fecha numa linha, com malha fechada e sem leque nem triângulo dobrado.
 - `manifold.js` — manifold.js — o ÚNICO ponto onde o núcleo toca a biblioteca Manifold (`manifold-3d`, WebAssembly). As booleanas (`unir`, `subtrair`, `intersectar`) ENVOLVEM …
 - `medidas-com-peso.test.mjs` — medidas-com-peso.test.mjs — a medida com peso da subdivisão (fatia 11 do plano de carroceria por subdivisão).
+- `memoria-de-execucao.js` — memoria-de-execucao.js — guarda o estado do núcleo depois de certos passos, para a receita que muda só um passo adiante não refazer os que vêm antes.
+- `memoria-de-execucao.test.mjs` — memoria-de-execucao.test.mjs — a memória de execução nunca muda o resultado: o neutro com memória é igual, bit a bit, ao sem memória.
 - `memoria-de-pura.js` — memoria-de-pura.js — guarda o resultado das últimas chamadas de uma função pura, para a mesma chamada não ser refeita.
 - `memoria-de-pura.test.mjs` — memoria-de-pura.test.mjs — a memória das últimas chamadas de uma função pura devolve o que a função devolveria, sem refazer a conta.
 - `molde-de-dentro.js` — molde-de-dentro.js — o volume que fica por dentro de uma chapa, a `folga` da pele de dentro dela: o molde com que `aparar` corta um sólido.
