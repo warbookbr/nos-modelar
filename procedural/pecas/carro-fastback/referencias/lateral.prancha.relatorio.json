@@ -31,11 +31,11 @@
     "porCamada": {
       "nariz": {
         "vista": "lateral",
-        "comprimento": 1393.9,
-        "retidao": 0.588,
-        "concentracao": 0.206,
-        "inversoes": 4,
-        "raioMin": 10
+        "comprimento": 1412.13,
+        "retidao": 0.573,
+        "concentracao": 0.171,
+        "inversoes": 2,
+        "raioMin": 8
       },
       "capo": {
         "vista": "lateral",
@@ -55,19 +55,19 @@
       },
       "quedaDoFastback": {
         "vista": "lateral",
-        "comprimento": 1498.56,
-        "retidao": 0.729,
-        "concentracao": 0.216,
+        "comprimento": 1545.06,
+        "retidao": 0.724,
+        "concentracao": 0.211,
         "inversoes": 1,
         "raioMin": 300
       },
       "traseira": {
         "vista": "lateral",
-        "comprimento": 1385.81,
-        "retidao": 0.382,
-        "concentracao": 0.382,
-        "inversoes": 6,
-        "raioMin": 6
+        "comprimento": 1387.18,
+        "retidao": 0.362,
+        "concentracao": 0.372,
+        "inversoes": 4,
+        "raioMin": 4
       },
       "arcoTraseiro": {
         "vista": "lateral",
@@ -103,11 +103,11 @@
       },
       "paraBrisaDeLado": {
         "vista": "lateral",
-        "comprimento": 1430.35,
-        "retidao": 0.799,
-        "concentracao": 0.08,
-        "inversoes": 2,
-        "raioMin": 63
+        "comprimento": 1554.89,
+        "retidao": 0.638,
+        "concentracao": 0.095,
+        "inversoes": 4,
+        "raioMin": 4
       },
       "vidroTraseiroLateral": {
         "vista": "lateral",
@@ -132,14 +132,6 @@
         "concentracao": 0,
         "inversoes": 0,
         "raioMin": null
-      },
-      "parachoqueTraseiroDeLado": {
-        "vista": "lateral",
-        "comprimento": 622,
-        "retidao": 0.859,
-        "concentracao": 0.106,
-        "inversoes": 0,
-        "raioMin": 120
       },
       "cintura": {
         "vista": "lateral",
@@ -172,70 +164,6 @@
         "concentracao": 0.221,
         "inversoes": 1,
         "raioMin": 500
-      },
-      "farol": {
-        "vista": "lateral",
-        "comprimento": 1080.77,
-        "retidao": 0.779,
-        "concentracao": 0.111,
-        "inversoes": 0,
-        "raioMin": 10
-      },
-      "lanterna": {
-        "vista": "lateral",
-        "comprimento": 454.63,
-        "retidao": 0.427,
-        "concentracao": 0.327,
-        "inversoes": 2,
-        "raioMin": 6
-      },
-      "macaneta": {
-        "vista": "lateral",
-        "comprimento": 592.98,
-        "retidao": 0.688,
-        "concentracao": 0.206,
-        "inversoes": 0,
-        "raioMin": 18
-      },
-      "retrovisor": {
-        "vista": "lateral",
-        "comprimento": 665.63,
-        "retidao": 0.618,
-        "concentracao": 0.261,
-        "inversoes": 0,
-        "raioMin": 20
-      },
-      "luzDeCanto": {
-        "vista": "lateral",
-        "comprimento": 328.84,
-        "retidao": 0.779,
-        "concentracao": 0.136,
-        "inversoes": 0,
-        "raioMin": 5
-      },
-      "entradaDeNeblina": {
-        "vista": "lateral",
-        "comprimento": 552.11,
-        "retidao": 0.804,
-        "concentracao": 0.121,
-        "inversoes": 0,
-        "raioMin": 6
-      },
-      "refletorTraseiro": {
-        "vista": "lateral",
-        "comprimento": 384.61,
-        "retidao": 0.739,
-        "concentracao": 0.161,
-        "inversoes": 0,
-        "raioMin": 8
-      },
-      "recorteDoDifusor": {
-        "vista": "lateral",
-        "comprimento": 532.17,
-        "retidao": 0.819,
-        "concentracao": 0.141,
-        "inversoes": 0,
-        "raioMin": 30
       },
       "pneuDianteiro": {
         "vista": "lateral",

@@ -14,6 +14,10 @@
  * altura total. Pela escala do entre-eixos a imagem tem 4.367 mm de comprimento (8% abaixo da tabela), 1.471 de altura
  * (7% acima) e pneu de 705 mm (4% acima); a tabela prevalece nas três.
  *
+ * A prancha guarda só o esqueleto: medidas, silhueta, vidros, porta, saia, arcos e curvas de caráter. Farol, lanterna,
+ * retrovisor, maçaneta e recortes de baixo são decididos sobre a chapa, no 3D lido contra a referência (decisão da pessoa
+ * em 2026-11-14, no plano do carro).
+ *
  * Referencial: y para cima com o chão em y = 0, a frente em +z (à direita no desenho), centrado no comprimento total.
  *
  * Calibração, escrita antes do traçado (skill, passo 1):
@@ -58,7 +62,7 @@ if (zD + M.arcoRaio >= zFrente || zT - M.arcoRaio <= zTras) throw new Error('arc
 
 /* ------------------------------------------------------------ pontos de caráter, em [z, y] */
 const P = {
-  labio: [zFrente, 212],
+  labio: [zFrente, 202],
   nariz: [2200, 797],
   basePB: [790, 1005],
   topoPB: [125, 1331],
@@ -66,9 +70,7 @@ const P = {
   quedaMeio: [-728, 1341.4],
   quedaJoelho: [-1000, 1305],
   baseTampa: [-1945, 1045],
-  spoiler: [-2190, 1053],
-  lanternaTopo: [-2170, 920],
-  lanternaBase: [-2300, 790],
+  spoiler: [-2236, 1070],
 };
 const mil = (v) => Math.round(v).toLocaleString('pt-BR');
 
@@ -128,38 +130,27 @@ export const ESPEC = {
   },
   camadas: [
     /* 1. silhueta, no sentido horário a partir da ponta da frente do arco dianteiro */
-    { vista: 'lateral', contorno: true, nome: 'nariz', tipo: 'filete', pts: [[zD + dz(M.soleira), M.soleira], [2000, M.soleira, 300], P.labio, [2372, 234], [2335, 262, 10], [2330, 380, 60], [2362, 440, 80], [2345, 572, 300], [2366, 705, 40], P.nariz] },
+    { vista: 'lateral', contorno: true, nome: 'nariz', tipo: 'filete', pts: [[zD + dz(M.soleira), M.soleira], [2000, M.soleira, 300], P.labio, [2296, 226, 8], [2310, 300, 60], [2332, 450, 600], [2338, 640, 400], [2300, 760, 120], P.nariz] },
     { vista: 'lateral', contorno: true, nome: 'capo', tipo: 'filete', pts: [P.nariz, [1700, 950, 3000], [1100, 1000, 4000], P.basePB], esperado: { inversoesMax: 1 } },
     { vista: 'lateral', contorno: true, nome: 'paraBrisaETeto', tipo: 'filete', pts: [P.basePB, [...P.topoPB, 600], [...P.pico, 2500], P.quedaMeio], esperado: { inversoesMax: 0, raioMinMin: 400 } },
     { vista: 'lateral', contorno: true, nome: 'quedaDoFastback', tipo: 'filete', pts: [P.quedaMeio, [...P.quedaJoelho, 2500], [...P.baseTampa, 300], P.spoiler], esperado: { inversoesMax: 1, raioMinMin: 300 } },
-    { vista: 'lateral', contorno: true, nome: 'traseira', tipo: 'filete', pts: [P.spoiler, [-2214, 1036, 6], [-2228, 960, 30], [-2245, 861, 150], [-2310, 762, 80], [zTras, 712, 40], [zTras, 668, 30], [-2340, 580, 150], [zTras, 500, 40], [zTras, 455, 30], [-2331, 410, 20], [-2273, 299, 60], [-2114, 266, 200], [-1900, 245, 80], [zT - dz(M.fundoTraseiro), M.fundoTraseiro]] },
+    { vista: 'lateral', contorno: true, nome: 'traseira', tipo: 'filete', pts: [P.spoiler, [-2230, 1052, 4], [-2200, 1036, 8], [-2224, 960, 40], [-2245, 861, 150], [-2330, 750, 200], [zTras, 620, 300], [zTras, 500, 200], [-2345, 400, 120], [-2302, 332, 40], [-2282, 304, 10], [-2150, 270, 300], [-1960, 256, 80], [zT - dz(M.fundoTraseiro), M.fundoTraseiro]] },
     { vista: 'lateral', contorno: true, nome: 'arcoTraseiro', tipo: 'poli', pts: arco(zT, M.fundoTraseiro, M.soleira) },
     { vista: 'lateral', contorno: true, nome: 'soleira', tipo: 'poli', pts: [[zT + dz(M.soleira), M.soleira], [zD - dz(M.soleira), M.soleira]], esperado: { inversoesMax: 0 } },
     { vista: 'lateral', contorno: true, nome: 'arcoDianteiro', tipo: 'poli', pts: arco(zD, M.soleira, M.soleira) },
     /* 2. aberturas: os vidros */
     { vista: 'lateral', classe: 'vidro', nome: 'vidroDaPorta', tipo: 'filete', fechado: true, pts: [[510, 972, 6], [497, 1008, 10], [189, 1192, 400], [0, 1262, 300], [-300, 1303, 1500], [-680, 1268, 20], [-672, 996, 15]] },
     /* a faixa do para-brisa que se vê de lado, entre a silhueta e a coluna A: sem ela a coluna se lia com 120 mm */
-    { vista: 'lateral', classe: 'vidro', nome: 'paraBrisaDeLado', tipo: 'poli', fechado: true, pts: [[760, 1010], [660, 975], [404, 1121], [228, 1218], [120, 1272], [175, 1292], [420, 1178]] },
+    { vista: 'lateral', classe: 'vidro', nome: 'paraBrisaDeLado', tipo: 'filete', fechado: true, pts: [[778, 1008, 6], [520, 1124, 800], [300, 1228, 800], [150, 1296, 600], [40, 1316, 4], [120, 1262, 600], [300, 1166, 800], [500, 1068, 800], [625, 1004, 20]] },
     { vista: 'lateral', classe: 'vidro', nome: 'vidroTraseiroLateral', tipo: 'filete', fechado: true, pts: [[-692, 1000, 10], [-702, 1262, 15], [-960, 1208, 1200], [-1235, 1108, 18], [-1110, 1034, 120], [-900, 1012, 800]] },
     /* 3. cortes de painel */
     { vista: 'lateral', classe: 'painel', nome: 'porta', tipo: 'filete', fechado: true, pts: [[615, 955], [690, 850, 200], [660, 420, 400], [590, 250, 90], [-545, 250, 110], [-640, 470, 500], [-722, 850, 300], [-682, 997]] },
     { vista: 'lateral', classe: 'painel', nome: 'saia', tipo: 'poli', pts: [[zT + dz(203), 203], [zD - dz(203), 203]] },
-    { vista: 'lateral', classe: 'painel', nome: 'parachoqueTraseiroDeLado', tipo: 'filete', pts: [[zT - dz(640), 640], [-2021, 668, 120], [-2190, 793]] },
     /* 4. curvas de caráter */
     { vista: 'lateral', classe: 'carater', nome: 'cintura', tipo: 'filete', pts: [[900, 940], [615, 955, 3000], [-657, 996]], esperado: { inversoesMax: 0 } },
     { vista: 'lateral', classe: 'carater', nome: 'ombroDoParaLama', tipo: 'filete', pts: [[-820, 930], [-1000, 970, 500], [-1300, 996, 1500], [-2000, 1008]], esperado: { inversoesMax: 0 } },
     { vista: 'lateral', classe: 'carater', nome: 'rebaixoTopo', tipo: 'filete', pts: [[1760, 740], [-724, 811, 1500], [-1023, 836]], esperado: { inversoesMax: 0 } },
     { vista: 'lateral', classe: 'carater', nome: 'rebaixoBase', tipo: 'filete', pts: [[845, 345], [-618, 420, 800], [-1000, 640, 500], [-1250, 715]], esperado: { inversoesMax: 1 } },
-    /* 5. detalhe */
-    { vista: 'lateral', classe: 'painel', nome: 'farol', tipo: 'filete', fechado: true, pts: [[2249, 699, 10], [1764, 729], [1895, 630, 60], [2025, 613, 200], [2240, 604, 15]] },
-    { vista: 'lateral', classe: 'painel', nome: 'lanterna', tipo: 'filete', fechado: true, pts: [[-2180, 927, 8], [-2216, 927, 8], [-2232, 861, 120], [-2290, 764, 6], [-2262, 754, 10], [-2201, 795, 60], [-2160, 850, 80]] },
-    { vista: 'lateral', classe: 'painel', nome: 'macaneta', tipo: 'filete', fechado: true, pts: [[-389, 874, 18], [-645, 874, 18], [-645, 818, 18], [-389, 818, 18]] },
-    { vista: 'lateral', classe: 'painel', nome: 'retrovisor', tipo: 'filete', fechado: true, pts: [[450, 1095, 30], [195, 1095, 30], [195, 985, 30], [400, 955, 20]] },
-    /* recortes de baixo, lidos na imagem: aberturas na chapa com a peça por trás (fatia 5); a frontal e a traseira também os mostram */
-    { vista: 'lateral', classe: 'painel', nome: 'luzDeCanto', tipo: 'filete', fechado: true, pts: [[2250, 420, 5], [2140, 420, 5], [2105, 382, 5], [2250, 382, 5]] },
-    { vista: 'lateral', classe: 'painel', nome: 'entradaDeNeblina', tipo: 'filete', fechado: true, pts: [[2223, 376, 6], [2112, 376, 6], [2006, 272, 6], [2215, 272, 6]] },
-    { vista: 'lateral', classe: 'painel', nome: 'refletorTraseiro', tipo: 'filete', fechado: true, pts: [[-2001, 450, 8], [-2186, 458, 8], [-2160, 420, 8], [-2020, 416, 8]] },
-    { vista: 'lateral', classe: 'painel', nome: 'recorteDoDifusor', tipo: 'filete', pts: [[-2362, 452], [-2295, 398, 30], [-2114, 290, 150], [-1880, 258]] },
     /* rodas */
     { vista: 'lateral', classe: 'roda', nome: 'pneuDianteiro', tipo: 'circulo', centro: [zD, R], raio: R, foraDoContorno: true, motivoForaDoContorno: motivoRoda },
     { vista: 'lateral', classe: 'roda', nome: 'pneuTraseiro', tipo: 'circulo', centro: [zT, R], raio: R, foraDoContorno: true, motivoForaDoContorno: motivoRoda },
@@ -181,7 +172,7 @@ export const ESPEC = {
   legenda: {
     x: 110, y: 730,
     itens: [
-      ['#1c2733', 'contorno da lataria, cortes de painel (porta, saia, para-choque de trás) e recortes de baixo (neblina, luz de canto, refletor, difusor)'],
+      ['#1c2733', 'contorno da lataria e cortes de painel (porta e saia)'],
       ['#3d6b86', 'vidros, pela borda de fora da moldura: porta, lateral traseiro e a faixa do para-brisa vista de lado'],
       ['#b3593d', 'tracejado laranja: curvas de caráter (cintura, ombro do para-lama, topo do rebaixo em cunha desde o farol, base dele subindo à anca traseira) e cotas em mm'],
       ['#1f6f5c', 'landmarks, em [z, y]'],
