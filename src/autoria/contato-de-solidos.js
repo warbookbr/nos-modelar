@@ -940,6 +940,8 @@ export function profundidadeDeInterpenetracao(a, b, tolerancia) {
 
 /* Quantos pontos de cada aresta entram na medida da profundidade de invasão. */
 const AMOSTRAS_POR_ARESTA = 8;
+/* Quantos dos pontos que estão dentro entram na conta da profundidade de invasão. */
+const MAXIMO_DE_PONTOS_DENTRO = 64;
 
 /* As arestas de um sólido preparado, cada uma uma vez: o canto repetido é o mesmo objeto (a posição do vértice no sólido), então a aresta se identifica pelo par de cantos. */
 function arestasDoSolido(solido) {
@@ -986,17 +988,23 @@ export function profundidadeDeInvasao(a, b, tolerancia) {
   if (caixasSeparadas(a.caixa, b.caixa, tolerancia)) return null;
   const lo = [0, 1, 2].map((e) => Math.max(a.caixa.min[e], b.caixa.min[e]));
   const hi = [0, 1, 2].map((e) => Math.min(a.caixa.max[e], b.caixa.max[e]));
-  const dasArestas = (de, em) => {
-    const pontos = [];
+  /* Os pontos de `de` que a contenção acusa dentro de `em`: os vértices e centroides da amostragem do par, e os pontos ao longo das arestas. A distância de cada um
+     à superfície de `em` percorre todos os triângulos, e uma parte de milhares de triângulos com milhares de pontos dentro custava minutos; a profundidade é um piso
+     de qualquer modo, e as `MAXIMO_DE_PONTOS_DENTRO` amostras, tiradas em passo regular entre as que estão dentro, bastam para dizer o quanto afunda. */
+  const dasAmostras = (de, em) => {
+    const candidatos = [...pontosDeAmostragem(de)];
     for (const [p, q] of arestasDoSolido(de)) {
       const trecho = segmentoNaCaixa(p, q, lo, hi);
       if (!trecho) continue;
       for (let k = 0; k < AMOSTRAS_POR_ARESTA; k += 1) {
         const t = trecho[0] + ((k + 0.5) / AMOSTRAS_POR_ARESTA) * (trecho[1] - trecho[0]);
-        pontos.push([p[0] + t * (q[0] - p[0]), p[1] + t * (q[1] - p[1]), p[2] + t * (q[2] - p[2])]);
+        candidatos.push([p[0] + t * (q[0] - p[0]), p[1] + t * (q[1] - p[1]), p[2] + t * (q[2] - p[2])]);
       }
     }
-    return maiorAfundamento(pontos, pontos.map((ponto) => pontoDentroMalha(ponto, em, tolerancia)), em);
+    const dentro = candidatos.filter((ponto) => pontoDentroMalha(ponto, em, tolerancia) === true);
+    const passo = Math.max(1, Math.ceil(dentro.length / MAXIMO_DE_PONTOS_DENTRO));
+    const escolhidos = dentro.filter((_, k) => k % passo === 0);
+    return maiorAfundamento(escolhidos, escolhidos.map(() => true), em);
   };
-  return maiorDosDois(maiorDosDois(profundidadeDeInterpenetracao(a, b, tolerancia), dasArestas(a, b)), dasArestas(b, a));
+  return maiorDosDois(dasAmostras(a, b), dasAmostras(b, a));
 }
