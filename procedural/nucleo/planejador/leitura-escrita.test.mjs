@@ -1,3 +1,4 @@
+/* leitura-escrita.test.mjs — prova o grafo de leitura e escrita, as sequências de subtrair e o perfil de tempo do planejador (fatia 1). */
 import { describe, expect, it } from 'vitest';
 import { REGISTRO_OPERACOES } from '../entrada.js';
 import {

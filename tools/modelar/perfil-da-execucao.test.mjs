@@ -1,3 +1,4 @@
+/* perfil-da-execucao.test.mjs — prova a ferramenta de perfil: mede sem mudar a malha, analisa o acervo e recusa argumento desconhecido. */
 import { describe, expect, it } from 'vitest';
 import { analiseDoAcervo, analiseEstatica, medirExecucao, perfilarReceita, principal } from './perfil-da-execucao.mjs';
 
