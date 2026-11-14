@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1889 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1901 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1960,6 +1960,54 @@
 ## procedural/pecas/prato-fundo/referencias/
 
 - `alvo.md` — Alvo do prato fundo
+
+## procedural/pecas/robo-humanoide/
+
+- `ALINHAMENTO.md` — Robô humanoide, braço direito: rodada de alinhamento
+
+## procedural/pecas/robo-humanoide/partes/antebraco/
+
+- `receita.js` — robo-humanoide/antebraco — antebraço direito: casca com duas hastes expostas por baixo, do cotovelo ao punho.
+
+## procedural/pecas/robo-humanoide/partes/braco/
+
+- `receita.js` — robo-humanoide/braco — braço direito: casca cinza com painel escuro, do centro do ombro ao centro do cotovelo.
+
+## procedural/pecas/robo-humanoide/partes/cotovelo/
+
+- `receita.js` — robo-humanoide/cotovelo — cotovelo direito: dobradiça com cilindro, de eixo paralelo ao de flexão do ombro.
+
+## procedural/pecas/robo-humanoide/partes/falange-distal/
+
+- `receita.js` — robo-humanoide/falange-distal — terceira falange, a da ponta do dedo, com a ponta arredondada; a mesma receita serve aos quatro dedos e ao polegar.
+
+## procedural/pecas/robo-humanoide/partes/falange-media/
+
+- `receita.js` — robo-humanoide/falange-media — segunda falange, entre a proximal e a distal; a mesma receita serve aos quatro dedos.
+
+## procedural/pecas/robo-humanoide/partes/falange-proximal/
+
+- `receita.js` — robo-humanoide/falange-proximal — primeira falange, a que gira no nó da palma; a mesma receita serve aos quatro dedos e ao polegar.
+
+## procedural/pecas/robo-humanoide/partes/ombro/
+
+- `receita.js` — robo-humanoide/ombro — disco de junta do ombro direito, preso ao tronco, com os dois eixos perpendiculares de flexão e de abdução.
+
+## procedural/pecas/robo-humanoide/partes/palma/
+
+- `receita.js` — robo-humanoide/palma — palma da mão direita: placa de 90 mm de largura com os nós dos quatro dedos e a saída inclinada do polegar.
+
+## procedural/pecas/robo-humanoide/partes/polegar-base/
+
+- `receita.js` — robo-humanoide/polegar-base — base do polegar direito: elo que gira no eixo inclinado da palma e leva as duas falanges do polegar para fora do plano dos dedos.
+
+## procedural/pecas/robo-humanoide/partes/punho/
+
+- `receita.js` — robo-humanoide/punho — punho direito: anel que gira em torno do antebraço e carrega o eixo de flexão da mão.
+
+## procedural/pecas/robo-humanoide/referencias/
+
+- `alvo.md` — Alvo do braço direito do robô humanoide
 
 ## procedural/pecas/sedan-chassi-e-lataria/
 

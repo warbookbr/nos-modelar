@@ -1,20 +1,22 @@
 # Modelagem de carro de passeio: o que já serve, onde a carroceria travou antes e por onde começar
 
-**Estado:** rascunho
+**Estado:** ativo
 
-**Território:** nenhum (aguarda aprovação)
+**Território:** `procedural/pecas/carro-fastback/`, `docs/modelar/banco-de-provas/carro-fastback-2026-11-14/`, `tools/modelar/ondulacao-da-superficie.mjs`, `procedural/criterios/veiculo.json`
 
-Ao ativar, a proposta é `procedural/pecas/carro-fastback/` e `docs/modelar/banco-de-provas/carro-fastback-2026-11-14/`. O `tools/modelar/ondulacao-da-superficie.mjs` e o `procedural/criterios/veiculo.json` entram só com as fatias de ferramenta aprovadas. A família `procedural/familias/roda-pneu/` é território do plano do furgão realista, e o perfil de roda esportiva passa por ele ou por mudança de território decidida pela pessoa.
+Ativo só para as fatias 1 e 2; as seguintes dependem do ponto de decisão da fatia 3. A pessoa decidiu em 2026-11-14 que `procedural/familias/roda-pneu/` entra neste território, porque o plano do furgão realista foi encerrado na main. Este branch está 41 commits atrás da main e ainda lista o furgão como ativo com essa pasta, e o `planos:check` recusa a sobreposição; a pasta entra na linha acima quando o branch receber a main.
 
-**Responsável:** a definir; proposta: a IA da sessão conduz e mede, e a pessoa julga a forma por imagem.
+**Responsável:** a IA da sessão conduz e mede, e a pessoa julga a forma por imagem, como crítica de cada rodada. Ativado pela pessoa em 2026-11-14, como quinto na ordem de prioridade.
 
 **Repositório e base:** `warbookbr/nos-modelar`, main de 2026-11-14.
 
 ## Problema observado
 
-A pessoa quer modelar um carro de passeio inteiro e saber se o caminho é núcleo, ferramenta geral ou família. As quatro imagens de referência (lateral, frontal, traseira e superior) foram geradas por IA, valem como caráter da forma e ficam fora do repositório; em 2026-11-14 a pasta `tmp/carro/` ainda não existia, e este estudo foi feito pela descrição. O objeto é um cupê fastback de duas portas: capô longo com duas tomadas de ar rebaixadas e vincos, grade grande e escura, faróis afilados, para-choque com entradas e faróis de neblina, para-brisa inclinado, coluna traseira longa que cai até uma tampa curta com spoiler, para-lama traseiro largo e saliente, lanternas em painel escuro, difusor com duas saídas de escape, retrovisores, maçanetas e rodas de dez raios em pares com disco e pinça à vista.
+A pessoa quer modelar um carro de passeio inteiro e saber se o caminho é núcleo, ferramenta geral ou família. As quatro imagens de referência (lateral, frontal, traseira e superior) foram geradas por IA, valem como caráter da forma e ficam fora do repositório; o estudo foi feito pela descrição e conferido contra as imagens quando elas chegaram a `tmp/carro/`, em 2026-11-14, com as correções no parágrafo seguinte. O objeto é um cupê fastback de duas portas: capô longo com duas tomadas de ar rebaixadas e vincos, grade grande e escura, faróis afilados, para-choque com entradas e faróis de neblina, para-brisa inclinado, coluna traseira longa que cai até uma tampa curta com spoiler, para-lama traseiro largo e saliente, lanternas em painel escuro, difusor com duas saídas de escape, retrovisores, maçanetas e rodas de dez raios em pares com disco e pinça à vista.
 
 A forma descrita lembra um modelo comercial conhecido. O alvo deste plano é um fastback genérico: a proporção e a classe ficam, e os traços que identificam um fabricante (o desenho da lanterna, o contorno da grade, o desenho das tomadas do capô e qualquer emblema) são trocados por opções desenhadas que a pessoa escolhe no alinhamento. O nome do modelo e do fabricante não entra em arquivo nenhum.
+
+As imagens corrigem a descrição em oito pontos. A grade é um hexágono largo, mais larga à meia altura, com um miolo retangular de lâminas finas, e não um trapézio. As duas tomadas do capô ficam no terço da frente, e entre elas o capô tem um ressalto central largo, limitado por dois vincos que correm do para-brisa à ponta. A lateral tem um rebaixo côncavo em cunha, que nasce atrás do arco dianteiro, atravessa a porta e morre antes do arco traseiro, sob um vinco de ombro que sobe sobre a roda de trás; é uma segunda feição de dupla curvatura, côncava, além do para-lama saliente. O spoiler é um lábio baixo sobre a borda da tampa, de um lado ao outro. As três barras de cada lanterna ficam nas pontas de um painel escuro que atravessa a traseira inteira. O difusor é uma moldura escura com um miolo na cor da lataria e uma saída redonda de cada lado. Há saia lateral e lábio dianteiro em plástico escuro, e o vidro lateral traseiro é um triângulo pequeno atrás da porta. Vista de cima, a saliência do para-lama traseiro é moderada, da ordem de 40 mm sobre a linha da porta, medida que a imagem de IA não fixa e que a prancha declara.
 
 ### O que já existe
 
@@ -71,7 +73,7 @@ O custo, pela história medida: o sedã em alta definição levou perto de 11 ho
 | Parte | Com que se faz hoje | Qualidade medida | Lacuna |
 |---|---|---|---|
 | Lataria contínua (capô, para-lamas, portas, teto, coluna, tampa) | gaiolas com `simetria` por andar (corpo de baixo e cabine), ou `gaiolaPorRede` pelas curvas de caráter; `subdivisao` com vinco de `raio` | sedã: 9 falhas de ondulação, raio em 25 de 29 arestas; furgão: nota 8 na chapa | a união sem degrau da coluna traseira com o para-lama, que o sedã resolve com quina no ombro; a saliência declarada na ondulação |
-| Para-lama traseiro saliente | colunas da gaiola deslocadas por estação, com perfil sem quina no pé | prova desta pesquisa: forma sai, régua acusa 3,57 mm | a declaração de saliência; densidade de estações na região |
+| Para-lama traseiro saliente e rebaixo côncavo da lateral | colunas da gaiola deslocadas por estação, com perfil sem quina no pé | prova desta pesquisa: a saliência sai e a régua acusa 3,57 mm; o rebaixo côncavo não foi medido | a declaração de saliência e de rebaixo na régua; densidade de estações na região |
 | Vincos do capô e da lateral | vinco por coluna ou estação com `de` e `ate`; rede de curvas para o vinco em diagonal | F1 de vincos 0,36 por estações; a rede deu a primeira nota 7 | o vinco que segue curva livre está no backlog; onde a quina morre, o sedã mediu 15,4 mm de emenda |
 | Vãos de porta, capô e tampa | `paineisPorVaos` com `curvaDaGaiola` | 4,00 a 4,07 mm, lados iguais | aba de borda e porta com quadro pendentes; mensagem de recusa sem a linha nem o ponto |
 | Vidros embutidos | chapa própria por gaiola no vão, borracha por `friso` | sedã e furgão aprovados, nota 8 | nenhuma de forma; regra `vidro-com-interior` pede o interior |
@@ -127,7 +129,7 @@ O núcleo não conhece veículo. O acervo sai com a mesma malha. A ondulação s
 ## Fatias
 
 1. Alinhamento, traços e prancha. A pessoa fixa as medidas de classe, o nível, as partes e escolhe por `esbocar-opcoes` a lanterna, a grade e as tomadas do capô que deixam o carro genérico. A pergunta de traço de fabricante entra em `veiculo.json`. A prancha cotada das quatro vistas passa pelo crítico e pela pessoa. Saída: `ALINHAMENTO.md`, a prancha e o `andaime.json` com os pontos duros.
-2. Quarto traseiro como piloto, do meio da porta para trás, meio carro: para-lama saliente, coluna caindo até a tampa, vão do vidro lateral e arco da roda, numa chapa contínua pelas curvas da prancha. Antes do crítico entra a saliência declarada na ondulação, com fixture neutra e teste. Validações: ondulação sem falha fora da saliência declarada, `raio:aresta` dentro de 20%, luz rasante e curvatura, silhueta contra a prancha na tolerância do alinhamento e crítico cego. Saída: a região com nota 7 ou mais, ou a parada.
+2. Quarto traseiro como piloto, do meio da porta para trás, meio carro: para-lama saliente, coluna caindo até a tampa, vão do vidro lateral e arco da roda, numa chapa contínua pelas curvas da prancha. O rebaixo côncavo da lateral entra no piloto do arco traseiro até o meio da porta. Antes do crítico entra a saliência declarada na ondulação, para fora e para dentro, com fixture neutra e teste. Validações: ondulação sem falha fora da saliência declarada, `raio:aresta` dentro de 20%, luz rasante e curvatura, silhueta contra a prancha na tolerância do alinhamento, crítico cego e, depois dele, a pessoa como crítica da rodada. Saída: a região com nota 7 ou mais e o sim da pessoa, ou a parada.
 3. Ponto de decisão. A pessoa vê o piloto e decide se a lataria segue numa chapa só ou em dois andares, com a recomendação do relatório.
 4. Lataria inteira com simetria e painéis por `paineisPorVaos`, medida por etapa.
 5. Frente e traseira: para-choques, grade, faróis, lanternas, difusor, escapes, spoiler e tomadas.
@@ -152,9 +154,11 @@ Se o quarto traseiro não chegar a 7 em três rodadas, o plano para e volta à p
 
 Decidido em 2026-11-14, com as sete recomendações aprovadas. A lanterna, o contorno da grade e o desenho das tomadas do capô são trocados por opções desenhadas que a pessoa escolhe no alinhamento, e a proporção de fastback fica. As medidas de classe são 4.750 mm de comprimento, 1.900 de largura, 1.380 de altura, 2.720 de entre-eixos e pneu de 680 mm. O nível é o oficial de carroceria, com interior em volumes simples, sem chassi e sem porta que abre. As rodas usam o perfil `carro` da família `roda-pneu` até a roda esportiva fechar. As tomadas do capô e a maçaneta saem como abertura com peça por trás, sem esperar o plano do rebaixo. O retrovisor é extraído como família no fim, o freio depois da roda esportiva, a maçaneta só depois do rebaixo, e farol e lanterna ficam como ajudante geral de luz embutida.
 
-A ativação está aprovada com uma condição: o plano passa a ativo, como quinto na ordem de prioridade e só com as fatias 1 e 2, quando as quatro imagens de referência estiverem em `tmp/carro/`. Em 2026-11-14 a pasta não existe, e o estado segue rascunho. Ao ativar, o território declarado é o proposto no alto deste plano, e o restante das fatias depende do ponto de decisão da fatia 3.
+A condição da ativação, que eram as quatro imagens em `tmp/carro/`, cumpriu-se em 2026-11-14, e o plano passou a ativo no mesmo dia, como quinto na ordem de prioridade e só com as fatias 1 e 2. A pasta `procedural/familias/roda-pneu/` entra no território por decisão da pessoa, porque o plano do furgão realista foi encerrado na main.
 
-Uma decisão continua pendente: o território da família `procedural/familias/roda-pneu/`, que pertence ao plano do furgão realista. A pessoa vai decidir se o perfil de roda esportiva passa por aquele plano ou se o território muda. Até a resposta, este plano não toca a família.
+Decidido também em 2026-11-14, para este plano e para o do robô humanoide: a própria pessoa atua como crítica de forma em cada rodada. Quem conduz entrega a ela, na hora da rodada, a imagem e a lista do que analisar nela, tirada dos critérios de reprovação e das perguntas de forma da família. O crítico cego continua como primeiro filtro, e a imagem só vai à pessoa depois de as medidas passarem e de o crítico não apontar defeito que a rodada possa corrigir sozinha.
+
+O processo de hoje não registra esse veredito como rodada. A `rodada-de-modelagem` guarda o relato do modelador e o veredito do crítico, e o que a pessoa diz entra só como pedido de alteração em `pedidos.json`, que exige o id de uma regra que faltou e conta por etapa, sem nota nem defeito no vocabulário do veredito. O processo não pegaria sozinho a rodada fechada sem o olhar da pessoa. Até a ferramenta mudar, o veredito dela fica escrito no `ALINHAMENTO.md` da peça, por rodada, e os pedidos em `pedidos.json`; o campo de veredito da pessoa no registro da rodada, com a recusa de fechar a rodada sem ele nas peças que o declararem, vai ao backlog por este plano, porque a ferramenta está fora do território.
 
 ## Fechamento
 

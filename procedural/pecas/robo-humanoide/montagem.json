@@ -1,0 +1,458 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 5,
+  "id": "robo-humanoide",
+  "instancias": [
+    {
+      "id": "antebraco",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "robo-humanoide/antebraco"
+      }
+    },
+    {
+      "id": "braco",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "robo-humanoide/braco"
+      }
+    },
+    {
+      "id": "cotovelo",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "robo-humanoide/cotovelo"
+      }
+    },
+    {
+      "id": "distalAnelar",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "robo-humanoide/falange-distal"
+      }
+    },
+    {
+      "id": "distalIndicador",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "robo-humanoide/falange-distal"
+      }
+    },
+    {
+      "id": "distalMedio",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "robo-humanoide/falange-distal"
+      }
+    },
+    {
+      "id": "distalMinimo",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "robo-humanoide/falange-distal"
+      }
+    },
+    {
+      "id": "mediaAnelar",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "robo-humanoide/falange-media"
+      }
+    },
+    {
+      "id": "mediaIndicador",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "robo-humanoide/falange-media"
+      }
+    },
+    {
+      "id": "mediaMedio",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "robo-humanoide/falange-media"
+      }
+    },
+    {
+      "id": "mediaMinimo",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "robo-humanoide/falange-media"
+      }
+    },
+    {
+      "id": "ombro",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "robo-humanoide/ombro"
+      }
+    },
+    {
+      "id": "palma",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "robo-humanoide/palma"
+      }
+    },
+    {
+      "id": "polegarBase",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "robo-humanoide/polegar-base"
+      }
+    },
+    {
+      "id": "polegarDistal",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "robo-humanoide/falange-distal"
+      }
+    },
+    {
+      "id": "polegarProximal",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "robo-humanoide/falange-proximal"
+      }
+    },
+    {
+      "id": "proximalAnelar",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "robo-humanoide/falange-proximal"
+      }
+    },
+    {
+      "id": "proximalIndicador",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "robo-humanoide/falange-proximal"
+      }
+    },
+    {
+      "id": "proximalMedio",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "robo-humanoide/falange-proximal"
+      }
+    },
+    {
+      "id": "proximalMinimo",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "robo-humanoide/falange-proximal"
+      }
+    },
+    {
+      "id": "punho",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "robo-humanoide/punho"
+      }
+    }
+  ],
+  "relacoes": [],
+  "etapas": [
+    "ombro",
+    "braco",
+    "cotovelo",
+    "antebraco",
+    "punho",
+    "palma",
+    "polegarBase",
+    "polegarProximal",
+    "polegarDistal",
+    "proximalIndicador",
+    "mediaIndicador",
+    "distalIndicador",
+    "proximalMedio",
+    "mediaMedio",
+    "distalMedio",
+    "proximalAnelar",
+    "mediaAnelar",
+    "distalAnelar",
+    "proximalMinimo",
+    "mediaMinimo",
+    "distalMinimo"
+  ],
+  "vinculos": [
+    {
+      "id": "furoDoBracoComOEixoDeAbducao",
+      "alvo": {
+        "instancia": "braco",
+        "param": "raioDoFuroDeAbducao"
+      },
+      "de": {
+        "instancia": "ombro",
+        "porta": "abducao",
+        "medida": "raio"
+      },
+      "unidade": "mm",
+      "acrescimo": 0
+    },
+    {
+      "id": "pinoDoCotoveloComOFuroDoBraco",
+      "alvo": {
+        "instancia": "cotovelo",
+        "param": "raioDoPino"
+      },
+      "de": {
+        "instancia": "braco",
+        "porta": "cotovelo",
+        "medida": "raio"
+      },
+      "unidade": "mm",
+      "acrescimo": 0
+    },
+    {
+      "id": "assentoDoAntebracoComASaidaDoCotovelo",
+      "alvo": {
+        "instancia": "antebraco",
+        "param": "raioDoAssentoDoCotovelo"
+      },
+      "de": {
+        "instancia": "cotovelo",
+        "porta": "saida",
+        "medida": "raioExterno"
+      },
+      "unidade": "mm",
+      "acrescimo": 0
+    },
+    {
+      "id": "furoDoPunhoComOAntebraco",
+      "alvo": {
+        "instancia": "punho",
+        "param": "raioDoFuro"
+      },
+      "de": {
+        "instancia": "antebraco",
+        "porta": "punho",
+        "medida": "raio"
+      },
+      "unidade": "mm",
+      "acrescimo": 0
+    }
+  ],
+  "posicoes": [
+    {
+      "id": "bracoNoOmbro",
+      "instancia": "braco",
+      "porta": "ombro",
+      "em": {
+        "instancia": "ombro",
+        "porta": "abducao"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "cotoveloNoBraco",
+      "instancia": "cotovelo",
+      "porta": "pino",
+      "em": {
+        "instancia": "braco",
+        "porta": "cotovelo"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "antebracoNoCotovelo",
+      "instancia": "antebraco",
+      "porta": "cotovelo",
+      "em": {
+        "instancia": "cotovelo",
+        "porta": "saida"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "punhoNoAntebraco",
+      "instancia": "punho",
+      "porta": "antebraco",
+      "em": {
+        "instancia": "antebraco",
+        "porta": "punho"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "palmaNoPunho",
+      "instancia": "palma",
+      "porta": "punho",
+      "em": {
+        "instancia": "punho",
+        "porta": "flexao"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "polegarBaseNaPalma",
+      "instancia": "polegarBase",
+      "porta": "raiz",
+      "em": {
+        "instancia": "palma",
+        "porta": "noPolegar"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "polegarProximalNaBase",
+      "instancia": "polegarProximal",
+      "porta": "raiz",
+      "em": {
+        "instancia": "polegarBase",
+        "porta": "ponta"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "polegarDistalNaProximal",
+      "instancia": "polegarDistal",
+      "porta": "raiz",
+      "em": {
+        "instancia": "polegarProximal",
+        "porta": "ponta"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "proximalIndicadorNaPalma",
+      "instancia": "proximalIndicador",
+      "porta": "raiz",
+      "em": {
+        "instancia": "palma",
+        "porta": "noIndicador"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "mediaIndicadorNaProximal",
+      "instancia": "mediaIndicador",
+      "porta": "raiz",
+      "em": {
+        "instancia": "proximalIndicador",
+        "porta": "ponta"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "distalIndicadorNaMedia",
+      "instancia": "distalIndicador",
+      "porta": "raiz",
+      "em": {
+        "instancia": "mediaIndicador",
+        "porta": "ponta"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "proximalMedioNaPalma",
+      "instancia": "proximalMedio",
+      "porta": "raiz",
+      "em": {
+        "instancia": "palma",
+        "porta": "noMedio"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "mediaMedioNaProximal",
+      "instancia": "mediaMedio",
+      "porta": "raiz",
+      "em": {
+        "instancia": "proximalMedio",
+        "porta": "ponta"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "distalMedioNaMedia",
+      "instancia": "distalMedio",
+      "porta": "raiz",
+      "em": {
+        "instancia": "mediaMedio",
+        "porta": "ponta"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "proximalAnelarNaPalma",
+      "instancia": "proximalAnelar",
+      "porta": "raiz",
+      "em": {
+        "instancia": "palma",
+        "porta": "noAnelar"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "mediaAnelarNaProximal",
+      "instancia": "mediaAnelar",
+      "porta": "raiz",
+      "em": {
+        "instancia": "proximalAnelar",
+        "porta": "ponta"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "distalAnelarNaMedia",
+      "instancia": "distalAnelar",
+      "porta": "raiz",
+      "em": {
+        "instancia": "mediaAnelar",
+        "porta": "ponta"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "proximalMinimoNaPalma",
+      "instancia": "proximalMinimo",
+      "porta": "raiz",
+      "em": {
+        "instancia": "palma",
+        "porta": "noMinimo"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "mediaMinimoNaProximal",
+      "instancia": "mediaMinimo",
+      "porta": "raiz",
+      "em": {
+        "instancia": "proximalMinimo",
+        "porta": "ponta"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "distalMinimoNaMedia",
+      "instancia": "distalMinimo",
+      "porta": "raiz",
+      "em": {
+        "instancia": "mediaMinimo",
+        "porta": "ponta"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    }
+  ]
+}

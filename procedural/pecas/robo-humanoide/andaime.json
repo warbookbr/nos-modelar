@@ -1,0 +1,871 @@
+{
+  "formato": "mecanifica.andaime-global@2",
+  "id": "esqueleto-braco-direito",
+  "objetivo": "esqueleto-do-braco-direito",
+  "alvo": "alvo-braco-direito",
+  "familia": "humanoide",
+  "intencao": "Esqueleto do braço direito de um robô humanoide de 1.750 mm na pose zero (braço pendente, palma voltada para o corpo): uma caixa ou cilindro planejado por instância da montagem e uma porta por eixo de junta.",
+  "unidade": "mm",
+  "eixos": {
+    "direita": "+x",
+    "cima": "+y",
+    "frente": "+z"
+  },
+  "envelope": {
+    "min": [
+      190,
+      680,
+      -70
+    ],
+    "max": [
+      310,
+      1495,
+      90
+    ]
+  },
+  "landmarks": [
+    {
+      "id": "centro-do-conjunto",
+      "posicao": [
+        250,
+        1087.5,
+        0
+      ]
+    },
+    {
+      "id": "centro-do-ombro",
+      "posicao": [
+        250,
+        1435,
+        0
+      ]
+    },
+    {
+      "id": "centro-do-cotovelo",
+      "posicao": [
+        250,
+        1135,
+        0
+      ]
+    },
+    {
+      "id": "centro-do-punho",
+      "posicao": [
+        250,
+        875,
+        0
+      ]
+    },
+    {
+      "id": "linha-dos-nos",
+      "posicao": [
+        250,
+        760,
+        0
+      ]
+    },
+    {
+      "id": "ponta-do-dedo-medio",
+      "posicao": [
+        250,
+        685,
+        11
+      ]
+    }
+  ],
+  "volumes": [
+    {
+      "id": "ombro",
+      "regioes": [
+        "braco-direito",
+        "ombro"
+      ],
+      "tipo": "cilindro",
+      "centro": [
+        250,
+        1435,
+        0
+      ],
+      "eixo": "x",
+      "raio": 55,
+      "comprimento": 50,
+      "segmentos": 24
+    },
+    {
+      "id": "braco",
+      "regioes": [
+        "braco-direito",
+        "braco"
+      ],
+      "tipo": "caixa",
+      "centro": [
+        250,
+        1290,
+        0
+      ],
+      "dimensoes": [
+        100,
+        250,
+        115
+      ]
+    },
+    {
+      "id": "cotovelo",
+      "regioes": [
+        "braco-direito",
+        "cotovelo"
+      ],
+      "tipo": "cilindro",
+      "centro": [
+        250,
+        1135,
+        0
+      ],
+      "eixo": "x",
+      "raio": 38,
+      "comprimento": 90,
+      "segmentos": 24
+    },
+    {
+      "id": "antebraco",
+      "regioes": [
+        "braco-direito",
+        "antebraco"
+      ],
+      "tipo": "caixa",
+      "centro": [
+        250,
+        1005,
+        0
+      ],
+      "dimensoes": [
+        85,
+        210,
+        95
+      ]
+    },
+    {
+      "id": "punho",
+      "regioes": [
+        "braco-direito",
+        "punho"
+      ],
+      "tipo": "anel",
+      "centro": [
+        250,
+        875,
+        0
+      ],
+      "eixo": "y",
+      "raioExterno": 32,
+      "raioInterno": 20,
+      "espessura": 30,
+      "segmentos": 24
+    },
+    {
+      "id": "palma",
+      "regioes": [
+        "braco-direito",
+        "mao"
+      ],
+      "tipo": "caixa",
+      "centro": [
+        250,
+        810,
+        0
+      ],
+      "dimensoes": [
+        28,
+        100,
+        90
+      ]
+    },
+    {
+      "id": "polegar-base",
+      "regioes": [
+        "braco-direito",
+        "mao",
+        "polegar"
+      ],
+      "tipo": "caixa",
+      "centro": [
+        244,
+        832,
+        56
+      ],
+      "dimensoes": [
+        26,
+        46,
+        30
+      ]
+    },
+    {
+      "id": "polegar-proximal",
+      "regioes": [
+        "braco-direito",
+        "mao",
+        "polegar"
+      ],
+      "tipo": "caixa",
+      "centro": [
+        244,
+        792,
+        66
+      ],
+      "dimensoes": [
+        22,
+        36,
+        24
+      ]
+    },
+    {
+      "id": "polegar-distal",
+      "regioes": [
+        "braco-direito",
+        "mao",
+        "polegar"
+      ],
+      "tipo": "caixa",
+      "centro": [
+        244,
+        760,
+        70
+      ],
+      "dimensoes": [
+        20,
+        30,
+        22
+      ]
+    },
+    {
+      "id": "proximal-indicador",
+      "regioes": [
+        "braco-direito",
+        "mao",
+        "dedo-indicador"
+      ],
+      "tipo": "caixa",
+      "centro": [
+        250,
+        744,
+        33
+      ],
+      "dimensoes": [
+        18,
+        32,
+        20
+      ]
+    },
+    {
+      "id": "media-indicador",
+      "regioes": [
+        "braco-direito",
+        "mao",
+        "dedo-indicador"
+      ],
+      "tipo": "caixa",
+      "centro": [
+        250,
+        716,
+        33
+      ],
+      "dimensoes": [
+        17,
+        24,
+        19
+      ]
+    },
+    {
+      "id": "distal-indicador",
+      "regioes": [
+        "braco-direito",
+        "mao",
+        "dedo-indicador"
+      ],
+      "tipo": "caixa",
+      "centro": [
+        250,
+        694.5,
+        33
+      ],
+      "dimensoes": [
+        16,
+        19,
+        18
+      ]
+    },
+    {
+      "id": "proximal-medio",
+      "regioes": [
+        "braco-direito",
+        "mao",
+        "dedo-medio"
+      ],
+      "tipo": "caixa",
+      "centro": [
+        250,
+        744,
+        11
+      ],
+      "dimensoes": [
+        18,
+        32,
+        20
+      ]
+    },
+    {
+      "id": "media-medio",
+      "regioes": [
+        "braco-direito",
+        "mao",
+        "dedo-medio"
+      ],
+      "tipo": "caixa",
+      "centro": [
+        250,
+        716,
+        11
+      ],
+      "dimensoes": [
+        17,
+        24,
+        19
+      ]
+    },
+    {
+      "id": "distal-medio",
+      "regioes": [
+        "braco-direito",
+        "mao",
+        "dedo-medio"
+      ],
+      "tipo": "caixa",
+      "centro": [
+        250,
+        694.5,
+        11
+      ],
+      "dimensoes": [
+        16,
+        19,
+        18
+      ]
+    },
+    {
+      "id": "proximal-anelar",
+      "regioes": [
+        "braco-direito",
+        "mao",
+        "dedo-anelar"
+      ],
+      "tipo": "caixa",
+      "centro": [
+        250,
+        744,
+        -11
+      ],
+      "dimensoes": [
+        18,
+        32,
+        20
+      ]
+    },
+    {
+      "id": "media-anelar",
+      "regioes": [
+        "braco-direito",
+        "mao",
+        "dedo-anelar"
+      ],
+      "tipo": "caixa",
+      "centro": [
+        250,
+        716,
+        -11
+      ],
+      "dimensoes": [
+        17,
+        24,
+        19
+      ]
+    },
+    {
+      "id": "distal-anelar",
+      "regioes": [
+        "braco-direito",
+        "mao",
+        "dedo-anelar"
+      ],
+      "tipo": "caixa",
+      "centro": [
+        250,
+        694.5,
+        -11
+      ],
+      "dimensoes": [
+        16,
+        19,
+        18
+      ]
+    },
+    {
+      "id": "proximal-minimo",
+      "regioes": [
+        "braco-direito",
+        "mao",
+        "dedo-minimo"
+      ],
+      "tipo": "caixa",
+      "centro": [
+        250,
+        744,
+        -33
+      ],
+      "dimensoes": [
+        18,
+        32,
+        20
+      ]
+    },
+    {
+      "id": "media-minimo",
+      "regioes": [
+        "braco-direito",
+        "mao",
+        "dedo-minimo"
+      ],
+      "tipo": "caixa",
+      "centro": [
+        250,
+        716,
+        -33
+      ],
+      "dimensoes": [
+        17,
+        24,
+        19
+      ]
+    },
+    {
+      "id": "distal-minimo",
+      "regioes": [
+        "braco-direito",
+        "mao",
+        "dedo-minimo"
+      ],
+      "tipo": "caixa",
+      "centro": [
+        250,
+        694.5,
+        -33
+      ],
+      "dimensoes": [
+        16,
+        19,
+        18
+      ]
+    }
+  ],
+  "portas": [
+    {
+      "id": "ombro-flexao",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          1,
+          0,
+          0
+        ],
+        "centro": [
+          250,
+          1435,
+          0
+        ],
+        "raio": 14,
+        "inicio": -25,
+        "fim": 25
+      }
+    },
+    {
+      "id": "ombro-abducao",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          0,
+          0,
+          1
+        ],
+        "centro": [
+          250,
+          1435,
+          0
+        ],
+        "raio": 14,
+        "inicio": -30,
+        "fim": 30
+      }
+    },
+    {
+      "id": "cotovelo",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          1,
+          0,
+          0
+        ],
+        "centro": [
+          250,
+          1135,
+          0
+        ],
+        "raio": 12,
+        "inicio": -45,
+        "fim": 45
+      }
+    },
+    {
+      "id": "punho-rotacao",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          0,
+          1,
+          0
+        ],
+        "centro": [
+          250,
+          875,
+          0
+        ],
+        "raio": 20,
+        "inicio": -15,
+        "fim": 15
+      }
+    },
+    {
+      "id": "punho-flexao",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          1,
+          0,
+          0
+        ],
+        "centro": [
+          250,
+          860,
+          0
+        ],
+        "raio": 6,
+        "inicio": -20,
+        "fim": 20
+      }
+    },
+    {
+      "id": "polegar-raiz",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          0,
+          0.7071067811865476,
+          0.7071067811865476
+        ],
+        "centro": [
+          244,
+          850,
+          45
+        ],
+        "raio": 3,
+        "inicio": -12,
+        "fim": 12
+      }
+    },
+    {
+      "id": "polegar-proximal",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          1,
+          0,
+          0
+        ],
+        "centro": [
+          244,
+          810,
+          62
+        ],
+        "raio": 3,
+        "inicio": -11,
+        "fim": 11
+      }
+    },
+    {
+      "id": "polegar-distal",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          1,
+          0,
+          0
+        ],
+        "centro": [
+          244,
+          775,
+          68
+        ],
+        "raio": 3,
+        "inicio": -10,
+        "fim": 10
+      }
+    },
+    {
+      "id": "indicador-proximal",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          0,
+          0,
+          1
+        ],
+        "centro": [
+          250,
+          760,
+          33
+        ],
+        "raio": 3,
+        "inicio": -10,
+        "fim": 10
+      }
+    },
+    {
+      "id": "indicador-media",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          0,
+          0,
+          1
+        ],
+        "centro": [
+          250,
+          728,
+          33
+        ],
+        "raio": 3,
+        "inicio": -9.5,
+        "fim": 9.5
+      }
+    },
+    {
+      "id": "indicador-distal",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          0,
+          0,
+          1
+        ],
+        "centro": [
+          250,
+          704,
+          33
+        ],
+        "raio": 3,
+        "inicio": -9,
+        "fim": 9
+      }
+    },
+    {
+      "id": "medio-proximal",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          0,
+          0,
+          1
+        ],
+        "centro": [
+          250,
+          760,
+          11
+        ],
+        "raio": 3,
+        "inicio": -10,
+        "fim": 10
+      }
+    },
+    {
+      "id": "medio-media",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          0,
+          0,
+          1
+        ],
+        "centro": [
+          250,
+          728,
+          11
+        ],
+        "raio": 3,
+        "inicio": -9.5,
+        "fim": 9.5
+      }
+    },
+    {
+      "id": "medio-distal",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          0,
+          0,
+          1
+        ],
+        "centro": [
+          250,
+          704,
+          11
+        ],
+        "raio": 3,
+        "inicio": -9,
+        "fim": 9
+      }
+    },
+    {
+      "id": "anelar-proximal",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          0,
+          0,
+          1
+        ],
+        "centro": [
+          250,
+          760,
+          -11
+        ],
+        "raio": 3,
+        "inicio": -10,
+        "fim": 10
+      }
+    },
+    {
+      "id": "anelar-media",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          0,
+          0,
+          1
+        ],
+        "centro": [
+          250,
+          728,
+          -11
+        ],
+        "raio": 3,
+        "inicio": -9.5,
+        "fim": 9.5
+      }
+    },
+    {
+      "id": "anelar-distal",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          0,
+          0,
+          1
+        ],
+        "centro": [
+          250,
+          704,
+          -11
+        ],
+        "raio": 3,
+        "inicio": -9,
+        "fim": 9
+      }
+    },
+    {
+      "id": "minimo-proximal",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          0,
+          0,
+          1
+        ],
+        "centro": [
+          250,
+          760,
+          -33
+        ],
+        "raio": 3,
+        "inicio": -10,
+        "fim": 10
+      }
+    },
+    {
+      "id": "minimo-media",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          0,
+          0,
+          1
+        ],
+        "centro": [
+          250,
+          728,
+          -33
+        ],
+        "raio": 3,
+        "inicio": -9.5,
+        "fim": 9.5
+      }
+    },
+    {
+      "id": "minimo-distal",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          0,
+          0,
+          1
+        ],
+        "centro": [
+          250,
+          704,
+          -33
+        ],
+        "raio": 3,
+        "inicio": -9,
+        "fim": 9
+      }
+    }
+  ]
+}
