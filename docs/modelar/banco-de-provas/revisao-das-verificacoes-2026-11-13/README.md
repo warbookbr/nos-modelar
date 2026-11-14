@@ -6,5 +6,7 @@ Pasta do plano [revisão das verificações e dos testes](../../planos/2026-11-1
 - [O mapa dos gates e dos testes](MAPA.md): os 30 gates de `tools/gates.mjs` com o passo do CI e os 549 arquivos de teste, um por linha, com os títulos de `describe` e `it` lidos do arquivo, agrupados pelas áreas do plano (passo 1).
 - [Os sinais de fragilidade](FRAGILIDADE.md): 6 pisos ou contagens ligados ao tamanho do acervo, 187 contagens exatas fora dele, 199 tetos de tempo fixos e 4 por relógio, 194 citações de 27 peças do acervo e 7 testes que só conferem que não lançou erro, cada um com arquivo e linha (passo 3).
 - [O histórico](HISTORICO.md): de 2026-08-14 a 2026-11-14, 216 alterações de teste que só acompanharam número ou texto do código, e, pelo texto dos commits, 13 defeitos reais pegos e 12 falsos alarmes, 8 deles de teto de tempo (passo 4).
+- [A medida por estrago, ampliada](ESTRAGOS.md): 179 estragos em 8 arquivos, 90 percebidos e 85 não percebidos reais, com a lista dos trechos sem proteção (passo 2).
+- [Os vereditos](VEREDITOS.md): por gate e por grupo de testes, com o número que sustenta cada um e a recomendação.
 
-Estado em 2026-11-14: passos 1, 3 e 4 feitos. Falta o passo 2 ampliado (a medida por estrago além do piloto), o veredito por grupo e a decisão da pessoa.
+Estado em 2026-11-14: passos 1 a 4 feitos e vereditos escritos. Falta a decisão da pessoa por grupo.
