@@ -31,11 +31,11 @@
     "porCamada": {
       "nariz": {
         "vista": "lateral",
-        "comprimento": 1419.43,
-        "retidao": 0.563,
-        "concentracao": 0.181,
+        "comprimento": 1412.13,
+        "retidao": 0.573,
+        "concentracao": 0.171,
         "inversoes": 2,
-        "raioMin": 6
+        "raioMin": 8
       },
       "capo": {
         "vista": "lateral",
@@ -55,19 +55,19 @@
       },
       "quedaDoFastback": {
         "vista": "lateral",
-        "comprimento": 1498.56,
-        "retidao": 0.729,
-        "concentracao": 0.216,
+        "comprimento": 1545.06,
+        "retidao": 0.724,
+        "concentracao": 0.211,
         "inversoes": 1,
         "raioMin": 300
       },
       "traseira": {
         "vista": "lateral",
-        "comprimento": 1351.62,
-        "retidao": 0.412,
-        "concentracao": 0.357,
+        "comprimento": 1387.18,
+        "retidao": 0.362,
+        "concentracao": 0.372,
         "inversoes": 4,
-        "raioMin": 6
+        "raioMin": 4
       },
       "arcoTraseiro": {
         "vista": "lateral",
@@ -135,11 +135,11 @@
       },
       "parachoqueTraseiroDeLado": {
         "vista": "lateral",
-        "comprimento": 622,
-        "retidao": 0.859,
-        "concentracao": 0.106,
+        "comprimento": 625.39,
+        "retidao": 0.508,
+        "concentracao": 0.402,
         "inversoes": 0,
-        "raioMin": 120
+        "raioMin": 291
       },
       "cintura": {
         "vista": "lateral",
@@ -175,19 +175,19 @@
       },
       "farol": {
         "vista": "lateral",
-        "comprimento": 1120.4,
-        "retidao": 0.784,
-        "concentracao": 0.085,
+        "comprimento": 962.71,
+        "retidao": 0.688,
+        "concentracao": 0.121,
         "inversoes": 0,
         "raioMin": 15
       },
       "lanterna": {
         "vista": "lateral",
-        "comprimento": 454.63,
-        "retidao": 0.427,
-        "concentracao": 0.327,
+        "comprimento": 561.72,
+        "retidao": 0.372,
+        "concentracao": 0.281,
         "inversoes": 2,
-        "raioMin": 6
+        "raioMin": 8
       },
       "macaneta": {
         "vista": "lateral",
@@ -231,11 +231,11 @@
       },
       "recorteDoDifusor": {
         "vista": "lateral",
-        "comprimento": 418.75,
-        "retidao": 0.794,
-        "concentracao": 0.116,
-        "inversoes": 1,
-        "raioMin": 40
+        "comprimento": 350.19,
+        "retidao": 1,
+        "concentracao": 0.03,
+        "inversoes": 0,
+        "raioMin": 500
       },
       "divisaParachoqueDianteiro": {
         "vista": "lateral",
@@ -244,6 +244,14 @@
         "concentracao": 0.302,
         "inversoes": 0,
         "raioMin": 395
+      },
+      "labioDianteiro": {
+        "vista": "lateral",
+        "comprimento": 331.76,
+        "retidao": 0.975,
+        "concentracao": 0.035,
+        "inversoes": 0,
+        "raioMin": 400
       },
       "pneuDianteiro": {
         "vista": "lateral",
