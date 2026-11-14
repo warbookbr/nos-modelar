@@ -88,20 +88,32 @@ describe('lathe com espessura: a casca de revolução', () => {
 });
 
 describe('a régua de espessura de parede', () => {
-  it('acusa a parede fina da peça feita para isso, com a parte e a medida', () => {
+  it('sem mínimo declarado só informa: a espessura por parte sai como número e nenhum aviso', () => {
     const fina = copo(0.0004);
-    const achados = partesComParedeFina(fina, { limite: 0.001 });
-    expect(achados).toHaveLength(1);
-    expect(achados[0].parte).toBe('copo');
-    expect(achados[0].minima).toBeCloseTo(0.0004, 5);
     const { linhas, medidas } = avisosDasReguasDeMalha(fina);
-    expect(linhas.some((l) => l.startsWith('parede fina na parte copo: espessura mínima de 0,4 mm'))).toBe(true);
+    expect(linhas.filter((l) => l.startsWith('parede fina'))).toEqual([]);
+    expect(medidas.paredesDaPeca).toHaveLength(1);
+    expect(medidas.paredesDaPeca[0].parte).toBe('copo');
+    expect(medidas.paredesDaPeca[0].minima).toBeCloseTo(0.0004, 5);
+    expect(medidas.paredesFinas).toEqual([]);
+  });
+
+  it('com o mínimo declarado de 1 mm, a peça de 0,4 mm avisa com a parte e a medida', () => {
+    const { linhas, medidas } = avisosDasReguasDeMalha(copo(0.0004), { espessuraMinima: { mm: 1 } });
+    expect(linhas.some((l) => l.startsWith('parede fina na parte copo: espessura mínima de 0,4 mm, abaixo dos 1 mm que o PLANO declara'))).toBe(true);
     expect(medidas.paredesFinas[0]).toMatchObject({ parte: 'copo' });
   });
 
-  it('não acusa o copo de parede boa', () => {
+  it('o mínimo só vale para as partes listadas, e não avisa o que está acima dele', () => {
+    expect(avisosDasReguasDeMalha(copo(0.0004), { espessuraMinima: { mm: 1, partes: ['outra'] } }).linhas.filter((l) => l.startsWith('parede fina'))).toEqual([]);
+    expect(avisosDasReguasDeMalha(copo(0.0004), { espessuraMinima: { mm: 1, partes: ['copo'] } }).medidas.paredesFinas).toHaveLength(1);
+    expect(avisosDasReguasDeMalha(copo(0.003), { espessuraMinima: { mm: 1 } }).medidas.paredesFinas).toEqual([]);
+    expect(avisosDasReguasDeMalha(copo(0.0004), { espessuraMinima: { mm: 0.3 } }).medidas.paredesFinas).toEqual([]);
+  });
+
+  it('partesComParedeFina lista as partes abaixo do limite', () => {
+    expect(partesComParedeFina(copo(0.0004), { limite: 0.001 })).toHaveLength(1);
     expect(partesComParedeFina(copo(0.003))).toEqual([]);
-    expect(avisosDasReguasDeMalha(copo(0.003)).linhas.filter((l) => l.startsWith('parede fina'))).toEqual([]);
   });
 
   it('a parte de uma superfície aberta, sem parede do outro lado, não é medida', () => {
