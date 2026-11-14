@@ -53,6 +53,8 @@ export function limparNoEstado(st, faces, { tolerancia, limite = LIMITE_DE_FACE_
   if (relatorio.finasAntes === 0) return undefined;
 
   for (const [v, p] of res.vertices) st.V.set(v, p);
+  /* o rastreio declarado do retrato: as faces cujo `vs` e `quebras` se reescrevem no lugar abaixo; o que se apaga o despacho vê pelo mapa */
+  if (st.tocadosF) for (const fid of res.faces.keys()) st.tocadosF.add(fid);
   const remapear = (v) => res.fusoes.get(v) ?? v;
   for (const [fid, vs] of res.faces) {
     const f = st.F.get(fid);

@@ -214,6 +214,8 @@ describe('receitas reais do acervo: o atalho devolve a procedência da conta com
   const PECAS = [
     'ambulancia', 'braco-robotico/ombro-tambor', 'caminhao-entrega', 'carro-policia', 'carro-sedan-compacto',
     'furgao', 'micro-ondas-branco', 'onibus-urbano', 'picape-compacta', 'suporte-tubo', 'trator-pa',
+    /* limparLascas que funde vértices e reescreve faces no lugar (as rodas do sedã, que o fazem em 4 passos, ficam para a conferência do acervo) */
+    'kukri',
   ];
   it.each(PECAS)('%s', async (nome) => {
     const receita = receitaDoModulo(await importarReceita(resolverCaminhoReceita(nome)));
