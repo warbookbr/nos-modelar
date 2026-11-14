@@ -5,8 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1923 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
-1925 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1928 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2020,6 +2019,7 @@
 ## procedural/pecas/robo-humanoide/referencias/
 
 - `alvo.md` — Alvo do braço direito do robô humanoide
+- `braco-proporcao.esboco.mjs` — braco-proporcao.esboco.mjs — as opções de proporção do braço direito do robô humanoide, em blocos sobre o esqueleto.
 
 ## procedural/pecas/sedan-chassi-e-lataria/
 
