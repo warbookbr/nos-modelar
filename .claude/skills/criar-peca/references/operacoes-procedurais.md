@@ -49,7 +49,7 @@ produzir alteração parcial.
 `sel:{onde:{...}}` escolhe face ou aresta pelo que ela é, sem id. É a única chave
 de `sel` que filtra em vez de unir: com `origem`, `grupo`, `regiao`, `alias` ou
 `porta` na mesma seleção, escolhe dentro do que elas juntaram; sozinha, escolhe
-em toda a malha. Os critérios se aplicam nesta ordem, e `extremo` mede entre os
+em toda a malha. Os critérios se aplicam nesta ordem (`radial` depois de `normal`), e `extremo` mede entre os
 que sobraram dos anteriores:
 
 - `alvo`: `'face'` (padrão) ou `'aresta'`. Se `tipo` só existe para um alvo, ele
@@ -63,6 +63,13 @@ que sobraram dos anteriores:
   (`dir` não precisa de comprimento 1, e vale nome de PARAM). Numa aresta vale se
   alguma das faces vizinhas passa: `normal` para cima com `alvo:'aresta'` são as
   arestas da face de cima.
+- `radial:{eixo:'x'|'y'|'z', por?:[x,y,z], min?, max?}`: o elemento cujo centro
+  (média dos cantos da face, ponto médio da aresta) fica a uma distância do eixo
+  (a reta de direção `eixo` que passa por `por`, a origem se faltar) de pelo menos
+  `min` e de no máximo `max`, um dos dois ao menos. É o recorte por raio de uma peça
+  de revolução (a parede de um aro contra os raios que a união juntou a ela), que
+  `normal` e `extremo` não dizem; `por`, `min` e `max` são medidas (o conversor de
+  mm do esboço as converte).
 - `extremo:{eixo:'x'|'y'|'z', lado:'max'|'min', tol?}`: o elemento cujo centro
   (média dos cantos da face, ponto médio da aresta) está no maior ou menor valor
   do eixo, e os que ficam a até `tol` dele (padrão 1e-6, em unidades do mundo).

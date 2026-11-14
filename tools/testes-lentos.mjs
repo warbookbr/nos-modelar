@@ -17,6 +17,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { lerHistorico } from './vitest-duracoes.mjs';
 
 export const TESTES_LENTOS = [
+  /* 2026-11-14: a receita de uma roda de liga leve pela costura dos raios com o aro, 14 s e 9 s com a máquina livre (a costura de raio 8 em quatro avanços de parede, e a parte do aro com a face da borda estreita) */
+  'tools/fixtures/roda-costura/roda-costura.test.ts',
   /* 2026-11-13: o furo passante por subtração e limpeza de lascas, com a conferência das bocas; 21 s sozinho e 53 s na bateria do CI */
   'procedural/nucleo/furo-passante.test.mjs',
   /* 2026-11-13: os três casos do estudo do método medidos no método atual e no protótipo; 11 a 12 s com a máquina livre, quase tudo nas receitas do método atual */
