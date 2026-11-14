@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1875 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1878 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2050,6 +2050,7 @@
 - `arvore-de-caixas.js` — arvore-de-caixas — a fase ampla do contato de sólidos: uma árvore binária de caixas alinhadas aos eixos sobre uma lista de caixas (uma por triângulo). Serviç…
 - `assinatura-da-forma.js` — assinatura-da-forma.js — a impressão do que uma receita gera, para a etapa fixa saber se a peça que a pessoa aceitou continua a mesma.
 - `assinatura-geometria.js` — Compatibilidade da autoria: a implementação portátil vive junto ao núcleo.
+- `atravessamento-de-solidos.test.mjs` — atravessamento-de-solidos.test.mjs — tocar não é atravessar.
 - `auditar-intersecoes-montagem.js` — auditoria de interseções de montagem — serviço neutro, sem Three.js.
 - `auditar-intersecoes-montagem.test.mjs` — A expectativa da montagem passou a JULGAR: par que se toque fora da lista sai em `naoDeclarados`. Estes testes montam uma montagem sintética de dois cubos, p…
 - `base-forma-global.js` — Base comum da forma global N2: o erro com código e caminho, e as duas verificações de estrutura que todo normalizador usa. Fica à parte para que o contrato (…
@@ -3234,8 +3235,10 @@
 
 ## tools/modelar/fixtures/contatos/
 
+- `fixture-contato-atravessa.js` — O tubo fino entra pela tampa do cilindro e sai pela base: o contato está declarado e a parte atravessa a outra. Reprova pela profundidade.
 - `fixture-contato-declarado.js` — Duas partes que se encostam, e a receita DIZ que se encostam. Passa. É a metade do gate que impede a medida de condenar peça correta.
 - `fixture-contato-nao-declarado.js` — A MESMA geometria da fixture declarada, sem a declaração. Reprova. O par é idêntico: o que muda é só a receita ter dito ou não.
+- `fixture-contato-so-encosta.js` — O mesmo tubo apenas assentado na face de cima do cilindro. Passa: só encosta.
 - `fixture-forma-anel-cumprida.js` — A receita promete um ANEL e entrega um anel. Passa. `lathe` revolve um perfil fechado: o resultado tem furo passante.
 - `fixture-forma-anel-quebrada.js` — A MESMA promessa de anel da fixture cumprida, entregue como sólido SEM furo passante. Reprova por forma, e só por forma.
 - `fixture-parte-engolida.js` — O caso da roda, em miniatura: uma parte inteiramente dentro da outra. Nenhuma superfície aparece de fora, e por isso nenhuma vista mostra.

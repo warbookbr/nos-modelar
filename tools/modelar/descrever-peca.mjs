@@ -670,6 +670,17 @@ export async function descreverPecaReutilizavel({
         + '\n  com o motivo. Se não é, a geometria está errada.\n';
       falhou = true;
     }
+    if (contatos.atravessados.length) {
+      const unidade = (v) => (v >= 1e-3 ? v.toFixed(4) : v.toExponential(2));
+      stderr += `\n${contatos.atravessados.length} CONTATO(S) DECLARADO(S) EM QUE UMA PARTE ATRAVESSA A OUTRA`
+        + '\n  O par está declarado, mas uma parte entra na outra além do limite (profundidade medida triângulo contra triângulo, e não pela caixa):\n'
+        + contatos.atravessados
+          .map(({ par, penetracao: p }) => `    ${par[0]} ↔ ${par[1]}: entra ${unidade(p.profundidade)} contra o limite de ${unidade(p.limite)}${p.limiteDeclarado ? ' (penetracaoMaxima declarada)' : ' (padrão: 0,5% da diagonal da menor parte)'}; cruzamento de ${unidade(p.comprimento)} de comprimento`)
+          .join('\n')
+        + '\n  Se a parte deve só encostar, a geometria está errada (a alça, o pino ou o tubo passa da face). Se ela entra de propósito (puxador cravado na porta),'
+        + '\n  declare `penetracaoMaxima` no contato, na unidade da peça, com o motivo dizendo quanto entra e por quê.\n';
+      falhou = true;
+    }
     /* PARTE SOLTA. Contato não declarado e declarado que não acontece só olham
        pares que se tocam; um grupo de partes que não toca nenhuma das outras
        passava limpo, flutuando no ar. Os grupos saem dos pares em contato e dos
