@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1875 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1892 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1136,6 +1136,10 @@
 
 - `CLAUDE.md` — Peças: o que só vale nesta pasta
 
+## procedural/pecas/alternador/referencias/
+
+- `alvo.md` — Alvo do alternador
+
 ## procedural/pecas/ambulancia/
 
 - `receita.js` — ambulancia — ambulância estilizada: cabine de picape na frente e baú alto, mais largo e mais alto, atrás. O baú é branco com faixa vermelha e faixa cinza, te…
@@ -1143,6 +1147,14 @@
 ## procedural/pecas/ambulancia/referencias/
 
 - `alvo.md` — Alvo: ambulancia
+
+## procedural/pecas/amortecedor-dianteiro/
+
+- `receita.js` — amortecedor-dianteiro — conjunto McPherson de uma peça só, com oito partes: corpo, suporteInferior, pratoInferior, haste, coifa, mola, pratoSuperior e coxim.…
+
+## procedural/pecas/amortecedor-dianteiro/referencias/
+
+- `alvo.md` — Alvo do amortecedor dianteiro
 
 ## procedural/pecas/aviao/
 
@@ -1243,6 +1255,14 @@
 ## procedural/pecas/balcao-liso/referencias/
 
 - `alvo.md` — Alvo do balcão liso
+
+## procedural/pecas/biela-de-motor/
+
+- `receita.js` — biela-de-motor — biela de motor com bucha, capa e dois parafusos, peça inteira.
+
+## procedural/pecas/biela-de-motor/referencias/
+
+- `alvo.md` — Alvo da biela de motor
 
 ## procedural/pecas/braco-robotico/
 
@@ -1521,6 +1541,18 @@
 
 - `alvo.md` — Alvo: carro-taxi
 
+## procedural/pecas/disco-de-embreagem/referencias/
+
+- `alvo.md` — Alvo do disco de embreagem
+
+## procedural/pecas/disco-de-freio-ventilado/
+
+- `receita.js` — disco-de-freio-ventilado: disco de freio de uma parte só (`disco`). Eixo da roda em Y, chão em y = 0, pista de y 0 a 24 e chapéu para cima até y 48. Tabela e…
+
+## procedural/pecas/disco-de-freio-ventilado/referencias/
+
+- `alvo.md` — Alvo do disco de freio ventilado
+
 ## procedural/pecas/empilhadeira/
 
 - `ALINHAMENTO.md` — Empilhadeira — alinhamento
@@ -1697,6 +1729,14 @@
 
 - `roteiro.md` — Roteiro da análise
 
+## procedural/pecas/filtro-de-oleo/
+
+- `receita.js` — filtro-de-oleo: filtro de óleo de rosca de 76 x 80 mm, de pé sobre a junta. Referencial do acervo: Y para cima, chão em y 0 (a face de baixo da junta), eixo …
+
+## procedural/pecas/filtro-de-oleo/referencias/
+
+- `alvo.md` — Alvo do filtro de óleo
+
 ## procedural/pecas/freezer-horizontal/
 
 - `receita.js` — freezer-horizontal — freezer horizontal de tampo: corpo branco sobre o chão, junta escura que cobre o topo do corpo, tampo arredondado assentado sobre a junt…
@@ -1811,6 +1851,14 @@
 
 - `alvo.md` — Alvo do jipe-aberto
 
+## procedural/pecas/junta-do-cabecote/
+
+- `receita.js` — junta-do-cabecote — junta de cabeçote multicamada de aço para motor de quatro cilindros em linha, peça inteira.
+
+## procedural/pecas/junta-do-cabecote/referencias/
+
+- `alvo.md` — Alvo da junta do cabeçote
+
 ## procedural/pecas/kukri/
 
 - `receita.js` — kukri — faca de lâmina curva de desenho moderno, deitada, em duas partes: `lamina` e `cabo`. A lâmina é uma `chapaDeContorno` (o contorno da foto, o chanfro …
@@ -1895,6 +1943,14 @@
 
 - `alvo.md` — Alvo: picape-plataforma
 
+## procedural/pecas/pistao-de-motor/
+
+- `receita.js` — pistao-de-motor — pistão de motor com pino e três anéis: cabeça com dois rebaixos de válvula, três canaletas de anel, saia lisa oca, cubos do pino nas latera…
+
+## procedural/pecas/pistao-de-motor/referencias/
+
+- `alvo.md` — Alvo do pistão de motor
+
 ## procedural/pecas/poltrona-moderna-branca/
 
 - `receita.js` — poltrona-moderna-branca — poltrona de estofado com dois braços, assento e encosto sobre uma base, com quatro pés de madeira.
@@ -1918,6 +1974,10 @@
 ## procedural/pecas/poltrona-vime-roxa/referencias/
 
 - `alvo.md` — Alvo da poltrona de vime
+
+## procedural/pecas/radiador/referencias/
+
+- `alvo.md` — Alvo do radiador
 
 ## procedural/pecas/sedan-chassi-e-lataria/
 
@@ -2027,6 +2087,14 @@
 ## procedural/pecas/trator/referencias/
 
 - `alvo.md` — trator — alvo
+
+## procedural/pecas/vela-de-ignicao/
+
+- `receita.js` — vela-de-ignicao — vela de ignição de 85 mm, M14 x 1,25, em seis partes empilhadas no mesmo eixo: terminal, isolador, sextavado, arruela, rosca e eletrodos.
+
+## procedural/pecas/vela-de-ignicao/referencias/
+
+- `alvo.md` — Alvo da vela de ignição
 
 ## procedural/servicos/
 
