@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1955 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1956 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1503,6 +1503,7 @@
 
 ## procedural/pecas/carro-fastback/referencias/
 
+- `frontal.prancha.mjs` — frontal.prancha.mjs — a vista frontal cotada do carro-fastback, segunda das quatro vistas da prancha alvo (skill desenhar-prancha, contrato docs/modelar/usar…
 - `lateral.prancha.mjs` — lateral.prancha.mjs — a vista lateral cotada do carro-fastback, primeira das quatro vistas da prancha alvo (skill desenhar-prancha, contrato docs/modelar/usa…
 
 ## procedural/pecas/carro-perua/
