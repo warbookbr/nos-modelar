@@ -8,6 +8,8 @@ import { formatarNome } from '../formatar.js';
 import { ROTULOS_DE_SESSAO } from '../componentes/menu-estado.js';
 import { criarSincronizadorSessao } from './sincronizador.js';
 import { abrirMontagemDoAcervo } from './montagem-em-dados.js';
+import { processarReceitaSessao } from './carregar-sessao.js';
+import { textoDaExecucao } from '../cache-da-execucao.js';
 
 export const DEMO_RECEITA = {
   meta: { nome: 'Engrenagem Cônica de Demonstração' },
@@ -59,11 +61,29 @@ export const PAYLOAD_DE_DEMONSTRACAO = {
   },
 };
 
+/* O aviso de peça pedida em `?peca=` que não existe: o nome recebido, onde se procurou e os nomes parecidos. */
+export function textoDePecaNaoEncontrada(pecaPedida, { acervo = [], catalogo = [] } = {}) {
+  const parecidas = acervo.map((entrada) => entrada.id)
+    .filter((id) => id.includes(pecaPedida) || pecaPedida.includes(id) || id.slice(0, 5) === pecaPedida.slice(0, 5))
+    .slice(0, 8);
+  return [
+    `Peça '${pecaPedida}' não encontrada (pedida em ?peca=${pecaPedida}).`,
+    'Procurei em:',
+    `  1. acervo de receitas (procedural/pecas e tools/fixtures/acervo): ${acervo.length} entradas`,
+    `  2. catálogo homologado: ${catalogo.length} entradas`,
+    ...(parecidas.length ? [`Nomes parecidos no acervo: ${parecidas.join(', ')}.`] : []),
+    'Abra uma peça pelo menu Abrir, ou corrija o nome no endereço.',
+  ].join('\n');
+}
+
 export function criarSessaoDaBancada({
   estado, cena, edicao, imagemNaCena, anotacoes3D, registroDeEventos, avisar, mostrarErro, arquivoDaSessao,
   criarSincronizador = criarSincronizadorSessao,
   /* A lista do acervo, de onde a montagem em dados tira as receitas das peças que cita. */
   acervo = () => [],
+  /* `(entrada, receita) => Promise<{ neutro, origem, ms }>`: executa a receita do acervo pelo cache da malha. Sem ele, a receita executa na
+     hora, dentro do processamento do payload, como sempre. */
+  executarDoAcervo = null,
 }) {
   /* Quem escolheu a peça manda. A bancada relê `sessao-ativa.json` a cada
      segundo e meio, e até aqui qualquer leitura trocava o modelo em cena. Quem
@@ -128,6 +148,14 @@ export function criarSessaoDaBancada({
     },
   });
 
+  /* De onde veio a malha e quanto custou: o aviso passageiro, o registro de eventos e o estado, que a barra de baixo lê. */
+  function mostrarExecucao(id, { origem, ms }) {
+    const texto = textoDaExecucao({ origem, ms });
+    estado.definir({ execucao: { id, origem, ms, texto } });
+    registroDeEventos.registrar('informacao', `${id}: ${texto}`);
+    avisar(`${id}: ${texto}`);
+  }
+
   async function abrirDoAcervo(entrada) {
     try {
       avisar(`Abrindo ${entrada.id}…`);
@@ -153,7 +181,12 @@ export function criarSessaoDaBancada({
         avisar(`${entrada.id} abriu sem: ${nomes}. A janela Estado traz o motivo.`);
       }
       if (modeloDaMontagem) sincronizador.definirPayload({ alvo: { nome: entrada.id, tipo: 'montagem' }, montagem: carregado }, { modelo: modeloDaMontagem });
-      else sincronizador.definirPayload({ alvo: { nome: entrada.id }, receita });
+      else if (receita && executarDoAcervo) {
+        const execucao = await executarDoAcervo(entrada, receita);
+        const modelo = processarReceitaSessao(receita, { nome: entrada.id, neutro: execucao.neutro });
+        mostrarExecucao(entrada.id, execucao);
+        sincronizador.definirPayload({ alvo: { nome: entrada.id }, receita }, { modelo });
+      } else sincronizador.definirPayload({ alvo: { nome: entrada.id }, receita });
       if (cena.controlador) cena.salvarEstadoNaUrl(cena.controlador.estado());
       if (receita) await imagemNaCena.oferecerSobreposicaoDaPeca(entrada.id, receita);
     } catch (erro) {
@@ -184,7 +217,14 @@ export function criarSessaoDaBancada({
       const noAcervo = pecaPedida ? acervo.find((entrada) => entrada.id === pecaPedida) : null;
       if (noAcervo) {
         await abrirDoAcervo(noAcervo);
-      } else if (pecaPedida && catalogo.length > 0) {
+      } else if (pecaPedida && !catalogo.some((entrada) => entrada.id === pecaPedida)) {
+        /* Peça pedida que não existe em lugar nenhum: diz o nome recebido e onde procurou, em vez de abrir vazia. */
+        const texto = textoDePecaNaoEncontrada(pecaPedida, { acervo, catalogo });
+        registroDeEventos.registrar('erro', `Peça '${pecaPedida}' não encontrada`, texto);
+        mostrarErro(texto);
+        estado.definir({ aguardandoModelo: true, catalogoVazio: true });
+        sincronizador.iniciarPolling();
+      } else if (pecaPedida) {
         try {
           const inicialConvertido = await carregarPeca(pecaPedida, { catalogo });
           escolhaManual = true;

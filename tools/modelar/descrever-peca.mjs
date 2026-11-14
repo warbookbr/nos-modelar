@@ -26,11 +26,11 @@ import {
 } from '../../src/autoria/plano-de-modelagem.js';
 import { formasDaPeca } from '../../src/autoria/forma-da-parte.js';
 import { nomesDaSubarvore } from '../../src/autoria/hierarquia-partes.js';
-import { executarReceita } from '../../src/autoria/executar-receita.js';
-import { REGISTRO_OPERACOES } from '../../procedural/nucleo/entrada.js';
+import { REGISTRO_DA_RECEITA, executarReceita } from '../../src/autoria/executar-receita.js';
 import { FACES_MINIMAS_PARA_RECORTAR } from '../../procedural/nucleo/operacoes/abertura-por-contorno.js';
 import { avisosDasComposicoes } from './avisos-de-composicao.mjs';
 import { medirFaceDegenerada, medirTrianguloFino, medirSerrilhadoDaCostura } from './reguas-de-malha/reguas-de-malha.mjs';
+import { medirEspessuraDaParede } from './reguas-de-malha/espessura-de-parede.mjs';
 import { dobraDaReceita, textoDaDobra } from './dobra-da-superficie.mjs';
 import { textoDoAchado, vincoOcultoDaReceita } from './vinco-oculto.mjs';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
@@ -221,7 +221,7 @@ const REGUAS_LISTADAS = 8;
    regiões, uns 50 µs por face, e o `guarda:tempo` não tem essa folga. Acima deste número de faces a régua não roda, e `trianguloFinoPulado` diz quantas faces a peça tem. */
 export const FACES_MAXIMAS_DO_TRIANGULO_FINO = 50000;
 
-export function avisosDasReguasDeMalha(neutro, { limite = REGUAS_LISTADAS, facesMaximasDoFino = FACES_MAXIMAS_DO_TRIANGULO_FINO } = {}) {
+export function avisosDasReguasDeMalha(neutro, { limite = REGUAS_LISTADAS, facesMaximasDoFino = FACES_MAXIMAS_DO_TRIANGULO_FINO, espessuraMinima = null } = {}) {
   const degenerada = medirFaceDegenerada(neutro);
   let pulado = neutro.F.size > facesMaximasDoFino ? `a peça tem ${neutro.F.size} faces, acima de ${facesMaximasDoFino}` : null;
   let fino = { finos: 0, regioes: 0, pior: 0 };
@@ -230,6 +230,15 @@ export function avisosDasReguasDeMalha(neutro, { limite = REGUAS_LISTADAS, faces
     try { fino = medirTrianguloFino(neutro); } catch (erro) { pulado = `a régua não rodou: ${String(erro.message).split('\n')[0]}`; }
   }
   const serrilhado = medirSerrilhadoDaCostura(neutro);
+  /* a espessura de parede por parte, pelo mesmo teto de faces do triângulo fino: o raio de cada face contra a parte inteira custa mais que a leitura de cada face */
+  let paredes = [];
+  if (neutro.F.size <= facesMaximasDoFino) {
+    try { paredes = medirEspessuraDaParede(neutro).partes.sort((a, b) => a.minima - b.minima || (a.parte < b.parte ? -1 : 1)); } catch { paredes = []; }
+  }
+  /* A espessura por parte é informação. O aviso só sai quando a peça declara o mínimo em `PLANO.espessuraMinima: { mm, partes? }`. */
+  const paredesFinas = espessuraMinima
+    ? paredes.filter((p) => p.minima < espessuraMinima.mm / 1000 && (!espessuraMinima.partes || espessuraMinima.partes.includes(p.parte)))
+    : [];
   const mm = (n) => String(Math.round(n * 10000) / 10).replace('.', ',');
   const onde = (f) => {
     const cantos = (neutro.F.get(f.id)?.vs ?? []).map((v) => neutro.V.get(v)).filter(Boolean);
@@ -245,6 +254,8 @@ export function avisosDasReguasDeMalha(neutro, { limite = REGUAS_LISTADAS, faces
     facesDeCostura: serrilhado.faces,
     pontasDeSerra: serrilhado.pontas,
     trechosDeSerrilhado: serrilhado.trechos,
+    paredesDaPeca: paredes.map((p) => ({ parte: p.parte, minima: p.minima, face: p.face, amostras: p.amostras, faces: p.faces })),
+    paredesFinas: paredesFinas.map((p) => ({ parte: p.parte, minima: p.minima, face: p.face, centro: p.centro, amostras: p.amostras, faces: p.faces })),
     facesDegeneradasListadas: degenerada.faces.map((f) => ({ id: f.id, parte: f.parte, cantos: f.cantos })),
   };
   const linhas = [];
@@ -258,6 +269,10 @@ export function avisosDasReguasDeMalha(neutro, { limite = REGUAS_LISTADAS, faces
   if (serrilhado.pontas) {
     linhas.push(`${serrilhado.pontas} ponta(s) de serra em ${serrilhado.trechos} trecho(s) da linha da costura do arredondamento (${serrilhado.faces} faces de costura)`);
   }
+  for (const p of paredesFinas.slice(0, limite)) {
+    linhas.push(`parede fina na parte ${p.parte}: espessura mínima de ${mm(p.minima).replace(/,0$/, '')} mm, abaixo dos ${mm(espessuraMinima.mm / 1000).replace(/,0$/, '')} mm que o PLANO declara, medida na face ${p.face} em [${p.centro.map((c) => mm(c)).join(', ')}] mm (${p.amostras} de ${p.faces} faces medidas)`);
+  }
+  if (paredesFinas.length > limite) linhas.push(`e mais ${paredesFinas.length - limite} parte(s) com parede fina`);
   return { medidas, linhas };
 }
 
@@ -447,7 +462,7 @@ export async function descreverPecaReutilizavel({
   const tempos = new Map();
   const totalDePassos = Array.isArray(receita.PASSOS) ? receita.PASSOS.length : null;
   progresso(`executando a receita${totalDePassos == null ? '' : ` (${totalDePassos} passos)`}`);
-  const cronometro = registroCronometrado(execucao.registroOperacoes ?? REGISTRO_OPERACOES, {
+  const cronometro = registroCronometrado(execucao.registroOperacoes ?? REGISTRO_DA_RECEITA, {
     total: totalDePassos, tempos,
     aoPasso: (i, total, op) => {
       if (aoProgredir && intervaloDoProgressoMs > 0 && performance.now() - ultimaLinha >= intervaloDoProgressoMs) {
@@ -523,7 +538,15 @@ export async function descreverPecaReutilizavel({
     stdout += `\n${deComposicao.total} AVISO(S) DE OPERAÇÃO DE COMPOSIÇÃO (aviso; não reprova)\n${deComposicao.linhas.map((t) => `  ${t}`).join('\n')}\n`;
     stderr += `\nAVISO: ${deComposicao.total} aviso(s) de operação de composição; o texto está na seção AVISO(S) DE OPERAÇÃO DE COMPOSIÇÃO acima\n`;
   }
-  const malha = avisosDasReguasDeMalha(neutro);
+  let espessuraMinima = null;
+  try { espessuraMinima = normalizarPlanoDeModelagem(entrada?.PLANO ?? receita.PLANO)?.espessuraMinima ?? null; } catch { espessuraMinima = null; }
+  const malha = avisosDasReguasDeMalha(neutro, { espessuraMinima });
+  if (malha.medidas.paredesDaPeca.length) {
+    const mmDe = (n) => String(Math.round(n * 10000) / 10).replace('.', ',');
+    const lista = malha.medidas.paredesDaPeca;
+    stdout += `\nESPESSURA DE PAREDE POR PARTE (informação; a menor medida em cada parte, em mm)\n${lista.slice(0, 12).map((p) => `  ${p.parte}: ${mmDe(p.minima)} mm`).join('\n')}${lista.length > 12 ? `\n  ... e mais ${lista.length - 12} parte(s)` : ''}\n`
+      + '  Para ser avisado de parede fina, declare `PLANO.espessuraMinima: { mm, partes? }`.\n';
+  }
   if (malha.linhas.length) {
     stdout += `\n${malha.linhas.length} RÉGUA(S) DE MALHA COM ACHADO (aviso; não reprova)\n${malha.linhas.map((t) => `  ${t}`).join('\n')}\n`
       + '  Defeito de malha da operação que fez a costura ou o furo, e não da receita: a correção vai para a operação.\n';
@@ -670,6 +693,21 @@ export async function descreverPecaReutilizavel({
         + '\n  com o motivo. Se não é, a geometria está errada.\n';
       falhou = true;
     }
+    if (contatos.atravessados.length) {
+      const unidade = (v) => (v >= 1e-3 ? v.toFixed(4) : v.toExponential(2));
+      stderr += `\n${contatos.atravessados.length} CONTATO(S) DECLARADO(S) EM QUE UMA PARTE ATRAVESSA A OUTRA`
+        + '\n  O par está declarado, mas uma parte entra na outra além do limite (profundidade medida triângulo contra triângulo, e não pela caixa):\n'
+        + contatos.atravessados
+          .map(({ par, penetracao: p }) => `    ${par[0]} ↔ ${par[1]}: entra ${unidade(p.profundidade)} contra o limite de ${unidade(p.limite)}${p.limiteDeclarado ? ' (penetracaoMaxima declarada)' : ' (padrão: 0,5% da diagonal da menor parte)'}; cruzamento de ${unidade(p.comprimento)} de comprimento`)
+          .join('\n')
+        + '\n  Se a parte deve só encostar, a geometria está errada (a alça, o pino ou o tubo passa da face). Se ela entra de propósito (puxador cravado na porta),'
+        + '\n  declare `penetracaoMaxima` no contato, na unidade da peça, com o motivo dizendo quanto entra e por quê.\n';
+      /* Reprova só o que passa do `penetracaoMaxima` declarado. Pelo padrão relativo é aviso: no acervo de 2026-11-14 ele
+         acusava uns 300 encaixes embutidos de propósito em 27 peças (eixos de dobradiça, suportes, puxadores), que o guia de
+         modelagem recomenda; o aviso põe a profundidade na frente de quem modela, e a declaração passa a cobrá-la. */
+      if (contatos.atravessados.some(({ penetracao: p }) => p.limiteDeclarado)) falhou = true;
+      else stderr += '  (aviso: nenhum destes pares declara `penetracaoMaxima`; o padrão relativo não reprova)\n';
+    }
     /* PARTE SOLTA. Contato não declarado e declarado que não acontece só olham
        pares que se tocam; um grupo de partes que não toca nenhuma das outras
        passava limpo, flutuando no ar. Os grupos saem dos pares em contato e dos
@@ -740,7 +778,8 @@ export async function descreverPecaReutilizavel({
       stderr += `\n${contatos.declaradosSemContato.length} CONTATO(S) DECLARADO(S) QUE NÃO ACONTECEM`
         + '\n  A receita disse que estas partes se tocam, e elas não se tocam:\n'
         + contatos.declaradosSemContato
-          .map(({ par, motivo, fechaComTolerancia, distancia, maisLongeQue, toleranciaDoPar }) => `    ${par[0]} ↔ ${par[1]}: ${motivo}`
+          .map(({ par, motivo, fechaComTolerancia, distancia, maisLongeQue, toleranciaDoPar, malhaAberta }) => `    ${par[0]} ↔ ${par[1]}: ${motivo}`
+            + (malhaAberta ? `\n      CAUSA PROVÁVEL: ${malhaAberta.map((m) => `a parte '${m.parte}' não é um sólido fechado (${m.causa})`).join('; ')}; sem sólido fechado a medida não decide o contato. Feche a parte (por exemplo, a seleção do \`parte\` de um cilindro precisa das tampas: \`tampa: 'fundo'\` e \`tampa: 'topo'\`) antes de mover a geometria.` : '')
             + (distancia !== undefined ? `\n      as malhas ficam a ${(distancia * 1000).toFixed(6).replace('.', ',')} mm uma da outra (a tolerância de encosto é ${String(Number((toleranciaDoPar * 1000).toPrecision(6))).replace('.', ',')} mm).` : maisLongeQue !== undefined ? `\n      as malhas ficam a mais de ${(maisLongeQue * 1000).toFixed(1).replace('.', ',')} mm uma da outra.` : '')
             + (fechaComTolerancia === undefined ? '' : `\n      fecharia com tolerância de ${fechaComTolerancia}: o vão é menor que isso, do tamanho da grade de 1e-8 do perfil (\`GRADE\` de perfil2d.js), e não uma folga de forma.`))
           .join('\n')

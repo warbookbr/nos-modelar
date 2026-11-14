@@ -287,20 +287,20 @@ export const CONTATOS = [
   { par: ['barraTravessa', 'barraMontanteEsq'], motivo: 'o montante esquerdo sobe até a face de baixo da travessa, em y 1765' },
   { par: ['barraTravessa', 'barraEscoraDir'], motivo: 'a escora direita parte da face de trás da travessa, em z -673' },
   { par: ['barraTravessa', 'barraEscoraEsq'], motivo: 'a escora esquerda parte da face de trás da travessa, em z -673' },
-  { par: ['barraMontanteDir', 'cacamba'], motivo: 'o montante direito entra cerca de 46 mm no fundo da caçamba, como na fonte' },
-  { par: ['barraMontanteEsq', 'cacamba'], motivo: 'o montante esquerdo entra cerca de 46 mm no fundo da caçamba, como na fonte' },
-  { par: ['barraEscoraDir', 'cacamba'], motivo: 'a escora direita desce até dentro do fundo da caçamba, onde a fonte a esconde' },
-  { par: ['barraEscoraEsq', 'cacamba'], motivo: 'a escora esquerda desce até dentro do fundo da caçamba, onde a fonte a esconde' },
+  { par: ['barraMontanteDir', 'cacamba'], motivo: 'o montante direito entra cerca de 46 mm no fundo da caçamba, como na fonte', penetracaoMaxima: 0.05 }, // embutido de propósito, medido em 2026-11-14
+  { par: ['barraMontanteEsq', 'cacamba'], motivo: 'o montante esquerdo entra cerca de 46 mm no fundo da caçamba, como na fonte', penetracaoMaxima: 0.05 }, // embutido de propósito, medido em 2026-11-14
+  { par: ['barraEscoraDir', 'cacamba'], motivo: 'a escora direita desce até dentro do fundo da caçamba, onde a fonte a esconde', penetracaoMaxima: 0.2 }, // a escora desce escondida dentro do fundo da caçamba, aceito pela pessoa em 2026-11-14
+  { par: ['barraEscoraEsq', 'cacamba'], motivo: 'a escora esquerda desce até dentro do fundo da caçamba, onde a fonte a esconde', penetracaoMaxima: 0.2 }, // a escora desce escondida dentro do fundo da caçamba, aceito pela pessoa em 2026-11-14
   { par: ['barraEscoraDir', 'barraMontanteDir'], motivo: 'a escora direita e o montante direito dividem a aresta da face de trás da travessa, em z -673 e y 1765' },
   { par: ['barraEscoraEsq', 'barraMontanteEsq'], motivo: 'a escora esquerda e o montante esquerdo dividem a aresta da face de trás da travessa, em z -673 e y 1765' },
   { par: ['cabine', 'cacamba'], motivo: 'a traseira do miolo da cabine toca a borda da frente da caçamba, na aresta de z -494 e y 1370' },
-  { par: ['paraChoqueTras', 'cacamba'], motivo: 'o para-choque traseiro entra no fundo da caçamba pela face de trás, como na fonte' },
-  { par: ['protetorDir', 'carroceria'], motivo: 'a barra vertical direita do protetor entra no nariz do corpo, como na fonte' },
-  { par: ['protetorEsq', 'carroceria'], motivo: 'a barra vertical esquerda do protetor entra no nariz do corpo, como na fonte' },
-  { par: ['paraChoqueFrente', 'carroceria'], motivo: 'o para-choque dianteiro entra no corpo pela face da frente, abaixo do nariz, como na fonte' },
-  { par: ['paraChoqueTras', 'tampaTraseira'], motivo: 'o para-choque traseiro entra na base da tampa traseira, pela face de trás, como na fonte' },
-  { par: ['protetorDir', 'paraChoqueFrente'], motivo: 'a barra vertical direita do protetor nasce dentro do para-choque dianteiro, em y 398' },
-  { par: ['protetorEsq', 'paraChoqueFrente'], motivo: 'a barra vertical esquerda do protetor nasce dentro do para-choque dianteiro, em y 398' },
+  { par: ['paraChoqueTras', 'cacamba'], motivo: 'o para-choque traseiro entra no fundo da caçamba pela face de trás, como na fonte', penetracaoMaxima: 0.2 }, // embutido de propósito, medido em 2026-11-14
+  { par: ['protetorDir', 'carroceria'], motivo: 'a barra vertical direita do protetor entra no nariz do corpo, como na fonte', penetracaoMaxima: 0.08 }, // embutido de propósito, medido em 2026-11-14
+  { par: ['protetorEsq', 'carroceria'], motivo: 'a barra vertical esquerda do protetor entra no nariz do corpo, como na fonte', penetracaoMaxima: 0.08 }, // embutido de propósito, medido em 2026-11-14
+  { par: ['paraChoqueFrente', 'carroceria'], motivo: 'o para-choque dianteiro entra no corpo pela face da frente, abaixo do nariz, como na fonte', penetracaoMaxima: 0.2 }, // embutido de propósito, medido em 2026-11-14
+  { par: ['paraChoqueTras', 'tampaTraseira'], motivo: 'o para-choque traseiro entra na base da tampa traseira, pela face de trás, como na fonte', penetracaoMaxima: 0.06 }, // embutido de propósito, medido em 2026-11-14
+  { par: ['protetorDir', 'paraChoqueFrente'], motivo: 'a barra vertical direita do protetor nasce dentro do para-choque dianteiro, em y 398', penetracaoMaxima: 0.1 }, // embutido de propósito, medido em 2026-11-14
+  { par: ['protetorEsq', 'paraChoqueFrente'], motivo: 'a barra vertical esquerda do protetor nasce dentro do para-choque dianteiro, em y 398', penetracaoMaxima: 0.1 }, // embutido de propósito, medido em 2026-11-14
   { par: ['farolDir', 'carroceria'], motivo: 'o farol direito é uma placa que assenta na face inclinada do nariz' },
   { par: ['farolEsq', 'carroceria'], motivo: 'o farol esquerdo é uma placa que assenta na face inclinada do nariz' },
   { par: ['lanternaDir', 'tampaTraseira'], motivo: 'a lanterna direita é uma placa que assenta na face inclinada de trás da tampa' },

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1901 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1921 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -358,6 +358,10 @@
 - `README.md` — Navegação de receitas, 2026-11-05
 - `hash-da-malha.mjs` — hash-da-malha.mjs — o hash da malha canônica de uma receita, para provar que a divisão em arquivos não muda nada.
 
+## docs/modelar/banco-de-provas/nucleo-para-receita-2026-11-14/
+
+- `prova-memoria-do-sedan.mjs` — prova-memoria-do-sedan.mjs — a memória de execução na carroceria do sedã: o tempo e o neutro bit a bit. Uso, da raiz do repositório (cada modo leva de 3 a 4 …
+
 ## docs/modelar/banco-de-provas/organizacao-dos-documentos-2026-11-13/
 
 - `README.md` — Organização dos documentos: o levantamento das decisões em vigor
@@ -556,13 +560,12 @@
 
 ## docs/modelar/planos/
 
-- `2026-10-30-furgao-realista.md` — Furgão realista — uma cópia do furgão do acervo levada a proporções e lataria de veículo real pelo fluxo de modelagem inteiro
 - `2026-11-08-ferramenta-de-material.md` — Ferramenta de material para o agente: ver, compor e reaproveitar materiais sem rodar a peça inteira
 - `2026-11-10-rebaixo-por-contorno.md` — Rebaixo por contorno: o degrau, o sulco e a borda rebaixada num corpo
-- `2026-11-13-nucleo-para-quem-escreve-receita.md` — Núcleo para quem escreve receita: erro na hora, menos passos e rodada mais curta
 - `2026-11-13-revisao-das-verificacoes-e-dos-testes.md` — Revisão das verificações e dos testes: o que cada um pega, medido
 - `2026-11-14-modelagem-de-carro.md` — Modelagem de carro de passeio: o que já serve, onde a carroceria travou antes e por onde começar
 - `2026-11-14-modelagem-de-robo.md` — Modelagem de robô humanoide: o que já serve, o que falta na montagem e por onde começar
+- `2026-11-14-planejador-de-execucao.md` — Planejador de execução da receita
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
@@ -1008,6 +1011,8 @@
 - `loft-aresta.test.js` — loft-aresta.test.js — a ponta do loft fecha numa linha, com malha fechada e sem leque nem triângulo dobrado.
 - `manifold.js` — manifold.js — o ÚNICO ponto onde o núcleo toca a biblioteca Manifold (`manifold-3d`, WebAssembly). As booleanas (`unir`, `subtrair`, `intersectar`) ENVOLVEM …
 - `medidas-com-peso.test.mjs` — medidas-com-peso.test.mjs — a medida com peso da subdivisão (fatia 11 do plano de carroceria por subdivisão).
+- `memoria-de-execucao.js` — memoria-de-execucao.js — guarda o estado do núcleo depois de certos passos, para a receita que muda só um passo adiante não refazer os que vêm antes.
+- `memoria-de-execucao.test.mjs` — memoria-de-execucao.test.mjs — a memória de execução nunca muda o resultado: o neutro com memória é igual, bit a bit, ao sem memória.
 - `memoria-de-pura.js` — memoria-de-pura.js — guarda o resultado das últimas chamadas de uma função pura, para a mesma chamada não ser refeita.
 - `memoria-de-pura.test.mjs` — memoria-de-pura.test.mjs — a memória das últimas chamadas de uma função pura devolve o que a função devolveria, sem refazer a conta.
 - `molde-de-dentro.js` — molde-de-dentro.js — o volume que fica por dentro de uma chapa, a `folga` da pele de dentro dela: o molde com que `aparar` corta um sólido.
@@ -1052,6 +1057,11 @@
 - `triangulacao-colinear.test.mjs` — triangulacao-colinear.test.mjs — face com canto colinear não sai em triângulo de área nula. O polígono com um canto no meio de uma aresta é válido (a boolean…
 - `triangulacao-face.js` — triangulacao-face.js — triangulação dos triângulos de UMA face plana. O leque a partir do canto 0 põe dezenas de triângulos longos e finos num único vértice …
 - `uso-operacoes.js` — uso-operacoes.js — contratos Agent-First executáveis das operações nativas. A tabela descreve como chamar a capacidade; o executor continua decidindo a geome…
+
+## procedural/nucleo/auxiliares/
+
+- `auxiliares.test.mjs` — auxiliares.test.mjs — cada auxiliar dá o mesmo número, bit a bit, que a cópia que as receitas fazem hoje.
+- `index.js` — auxiliares — as contas que quase toda receita reescreve: milímetro para metro, área com sinal, sentido anti-horário e espelho de meia seção. Medido em 2026-1…
 
 ## procedural/nucleo/fixtures/
 
@@ -1125,6 +1135,7 @@
 - `limpar-lascas.js` — limpar-lascas.js (operação) — `limparLascas`: tira de uma seleção as faces finas que uma booleana deixou, sem criar vértice nem face e sem mover a superfície…
 - `loft-fechado.test.ts` — loft-fechado.test.ts — caminho que volta em si e fecha de verdade.
 - `nome-de-copia.test.ts` — nome-de-copia.test.ts — endereço de autor para as cópias do `arranja`.
+- `parte-com-material.test.mjs` — parte-com-material.test.mjs — `parte` aceita `material` no mesmo passo, e a peça sai bit a bit igual à dos dois passos.
 - `perfis.js` — perfis.js — `extrusao`: um perfil 2D com furos e deslocamento de contorno vira um sólido prismático.
 - `ponto-repetido.test.ts` — ponto-repetido.test.ts — a recusa do contorno que não é polígono simples diz qual ponto se repete ou quais arestas se cruzam.
 - `primitivas-basicas.js` — primitivas-basicas.js — geradores fundamentais registrados pelo núcleo, sem estado global.
@@ -2148,6 +2159,7 @@
 - `arvore-de-caixas.js` — arvore-de-caixas — a fase ampla do contato de sólidos: uma árvore binária de caixas alinhadas aos eixos sobre uma lista de caixas (uma por triângulo). Serviç…
 - `assinatura-da-forma.js` — assinatura-da-forma.js — a impressão do que uma receita gera, para a etapa fixa saber se a peça que a pessoa aceitou continua a mesma.
 - `assinatura-geometria.js` — Compatibilidade da autoria: a implementação portátil vive junto ao núcleo.
+- `atravessamento-de-solidos.test.mjs` — atravessamento-de-solidos.test.mjs — tocar não é atravessar.
 - `auditar-intersecoes-montagem.js` — auditoria de interseções de montagem — serviço neutro, sem Three.js.
 - `auditar-intersecoes-montagem.test.mjs` — A expectativa da montagem passou a JULGAR: par que se toque fora da lista sai em `naoDeclarados`. Estes testes montam uma montagem sintética de dois cubos, p…
 - `base-forma-global.js` — Base comum da forma global N2: o erro com código e caminho, e as duas verificações de estrutura que todo normalizador usa. Fica à parte para que o contrato (…
@@ -2193,6 +2205,7 @@
 - `dobras-aceitas.test.js` — dobras-aceitas.test.js — `PLANO.dobrasAceitas`: o normalizador recusa o que o campo não admite, o plano sem o campo mantém a forma canônica de antes, e a ace…
 - `encosto-da-peca.test.mjs` — encosto-da-peca.test.mjs — uma tolerância de "encosta" só para a peça, e a distância do par declarado que não acontece (atrito 5 do RECEITA.md do sedã).
 - `etapas-de-construcao.js` — etapas-de-construcao.js — o registro de cada etapa de uma montagem v5: a parte que entrou, as juntas que passaram a existir com ela e o resultado da medida d…
+- `executar-receita-barras.test.mjs` — executar-receita-barras.test.mjs — a estruturaDeBarras na receita de peça: o tubo entre dois pontos, com as pontas fechadas pela operação.
 - `executar-receita.js` — executar-receita.js — fronteira pura para executar uma receita já carregada.
 - `familia-esboco.js` — familia-esboco.js — a conferência entre a família e o componente do esboço de mesmo nome (núcleo, sem disco).
 - `familia-esboco.test.js` — familia-esboco.test.js — a parte pura da conferência da família com o esboço: a dispensa, os três pontos, o esboço mínimo, o mapa de parâmetros e os achados …
@@ -2279,6 +2292,8 @@
 
 - `acervo-receitas.js` — acervo-receitas.js — lista as receitas do acervo para a bancada abrir.
 - `acervo-receitas.test.js` — acervo-receitas.test.js — a lista que a bancada abre vem do acervo inteiro.
+- `cache-da-execucao.js` — cache-da-execucao.js — a malha que a receita produz, guardada no navegador para a próxima abertura da mesma peça.
+- `cache-da-execucao.test.js` — hash FNV das posições da malha do Three, na ordem de saída
 - `caixa-do-visivel.js` — caixa-do-visivel.js — a caixa do que a câmera de fato mostra.
 - `caixa-do-visivel.test.js` — caixa-do-visivel.test.js — o enquadramento mede só o que aparece.
 - `carregar-peca.js` — carregar-peca.js — resolve somente uma entrada explícita do catálogo.
@@ -2484,6 +2499,7 @@
 - `avisos-de-terceiros.mjs` — avisos-de-terceiros.mjs — o pacote da bancada leva o texto das licenças das bibliotecas que empacota.
 - `harness-entry.js` — harness-entry.js — catálogo privado dos gates visuais. Este módulo só é carregado por harness.html; não participa da entrada publicada da bancada. /
 - `harness.html` — harness.html — bancada privada dos gates; nunca é entrada de Pages.
+- `impressao-das-fontes.mjs` — impressao-das-fontes.mjs — a impressão digital do que uma receita executa, para o cache da malha da bancada.
 - `porteiro.mjs` — porteiro.mjs — GATE explícito de render do harness privado. Ele não descobre nem publica o acervo de `pecas/`: a lista abaixo é a seleção de capacidades que …
 - `sem-sessao-no-pacote.mjs` — sem-sessao-no-pacote.mjs — a sessão ativa não vai para `dist/`.
 - `sem-sessao-no-pacote.test.mjs` — sem-sessao-no-pacote.test.mjs — o pacote sai sem a sessão de quem construiu.
@@ -2581,6 +2597,11 @@
 
 - `receita.js` — materiais-de-prova/receita.js — a peça de prova dos materiais realistas (plano 2026-11-08-materiais-realistas).
 - `receita.test.mjs` — receita.test.mjs — a peça de prova dos materiais declara os seis materiais do plano, passa pelo normalizador e abre na bancada.
+
+## tools/fixtures/acervo/materiais-do-furgao-opcoes/
+
+- `receita.js` — materiais-do-furgao-opcoes/receita.js — peça de prova das opções de material dos grupos do furgão ainda em cor chapada (plano de materiais realistas, etapa d…
+- `receita.test.mjs` — receita.test.mjs — a peça de prova das opções de material do furgão passa pelo normalizador, entrega as partes de cada grupo e opção e abre na bancada como e…
 
 ## tools/fixtures/acervo/peca-de-prova/
 
@@ -2914,6 +2935,8 @@
 
 ## tools/gates/
 
+- `argumentos-essenciais.mjs` — argumentos-essenciais.mjs — confere que toda operação do núcleo diz quais argumentos são essenciais, e que a recusa existe.
+- `argumentos-essenciais.test.mjs` — argumentos-essenciais.test.mjs — o gate dos essenciais e a recusa na hora: cada receita mínima errada do inventário de erros (docs/modelar/banco-de-provas/re…
 - `guarda-local.mjs` — guarda-local.mjs — a guarda do acervo, só das peças que o envio mudou, dentro da bateria local.
 - `guarda-local.test.mjs` — guarda-local.test.mjs — a bateria local roda a guarda do acervo só das peças que o envio mudou.
 - `leituras-do-teste.mjs` — leituras-do-teste.mjs — setupFile do vitest: abre o registro do arquivo de teste deste processo e liga a anotação de tools/gates/leituras.mjs. Só entra na co…
@@ -3332,8 +3355,12 @@
 
 ## tools/modelar/fixtures/contatos/
 
+- `fixture-contato-atravessa-declarado.js` — O tubo fino entra pela tampa do cilindro e sai pela base: o contato está declarado e a parte atravessa a outra. Com o limite declarado, reprova pela profundi…
+- `fixture-contato-atravessa.js` — O tubo fino entra pela tampa do cilindro e sai pela base: o contato está declarado e a parte atravessa a outra. Reprova pela profundidade.
 - `fixture-contato-declarado.js` — Duas partes que se encostam, e a receita DIZ que se encostam. Passa. É a metade do gate que impede a medida de condenar peça correta.
 - `fixture-contato-nao-declarado.js` — A MESMA geometria da fixture declarada, sem a declaração. Reprova. O par é idêntico: o que muda é só a receita ter dito ou não.
+- `fixture-contato-parte-aberta.js` — O `parte` pega só a lateral dos dois cilindros (sem `tampa: 'fundo'` e `tampa: 'topo'`): as partes saem de malha aberta e o contato declarado nunca se confir…
+- `fixture-contato-so-encosta.js` — O mesmo tubo apenas assentado na face de cima do cilindro. Passa: só encosta.
 - `fixture-forma-anel-cumprida.js` — A receita promete um ANEL e entrega um anel. Passa. `lathe` revolve um perfil fechado: o resultado tem furo passante.
 - `fixture-forma-anel-quebrada.js` — A MESMA promessa de anel da fixture cumprida, entregue como sólido SEM furo passante. Reprova por forma, e só por forma.
 - `fixture-parte-engolida.js` — O caso da roda, em miniatura: uma parte inteiramente dentro da outra. Nenhuma superfície aparece de fora, e por isso nenhuma vista mostra.
@@ -3394,6 +3421,8 @@
 - `costura-em-oito.test.mjs` — costura-em-oito.test.mjs — a costura de dois tubos tangentes é um oito, com um nó de grau 4 em cada ponto de tangência (o elo do punho 5). O construtor de li…
 - `costura-registrada.mjs` — costura-registrada.mjs — régua: a costura que o `unir` registra (`arestas` do registro de origem) contra a costura geométrica da malha que ele entregou (plan…
 - `costura-registrada.test.mjs` — costura-registrada.test.mjs — a costura que o `unir` registra tem de ser a costura geométrica da malha que ele entrega (plano "costuras e furos limpos"). Ant…
+- `espessura-de-parede.mjs` — espessura-de-parede.mjs — régua de malha: a menor espessura de parede de cada parte (plano "núcleo para quem escreve receita", fatia 6).
+- `espessura-de-parede.test.mjs` — espessura-de-parede.test.mjs — a casca de revolução (`lathe` com `espessura`) e a régua de espessura de parede: o copo de prova sai fechado, com a espessura …
 - `face-degenerada.mjs` — face-degenerada.mjs — régua de malha: a face de três ou mais cantos que não define plano (plano "costuras e furos limpos", fatia 1).
 - `face-degenerada.test.mjs` — face-degenerada.test.mjs — a régua acha tudo o que o `adaptarThree` recusa como "é degenerada" e o que a auditoria de interseções acha sem área (piso relativ…
 - `face-torcida.mjs` — face-torcida.mjs — régua de malha: a face que se cruza e o triângulo virado (plano "costuras e furos limpos", refeitura do `furo` em anéis).

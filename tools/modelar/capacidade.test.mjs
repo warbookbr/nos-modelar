@@ -63,6 +63,13 @@ describe('capacidade: a ficha é recortada do cabeçalho do código', () => {
     }
   });
 
+  it('a estruturaDeBarras diz que está disponível na receita de peça', () => {
+    const r = executar(['estruturaDeBarras']);
+    expect(r.codigo).toBe(0);
+    expect(r.stdout).toContain('disponível na receita de peça');
+    expect(r.stdout).toContain('REGISTRO_DA_RECEITA');
+  });
+
   it('uma palavra que não é nome acha as capacidades que a citam em serve ou quando', () => {
     for (const busca of [['painel'], ['linha de vão'], ['capô'], ['porta']]) {
       const r = executar(busca);

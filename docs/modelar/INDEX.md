@@ -22,7 +22,7 @@ diz o commit onde está; não governa trabalho novo.
 
 ## Estado atual
 
-- Planos ativos: <!-- planos-ativos:inicio -->[furgão realista](planos/2026-10-30-furgao-realista.md), [núcleo para quem escreve receita](planos/2026-11-13-nucleo-para-quem-escreve-receita.md), [revisão das verificações e dos testes](planos/2026-11-13-revisao-das-verificacoes-e-dos-testes.md), [modelagem de robô humanoide](planos/2026-11-14-modelagem-de-robo.md) e [modelagem de carro de passeio](planos/2026-11-14-modelagem-de-carro.md).<!-- planos-ativos:fim -->
+- Planos ativos: <!-- planos-ativos:inicio -->[planejador de execução da receita](planos/2026-11-14-planejador-de-execucao.md), [revisão das verificações e dos testes](planos/2026-11-13-revisao-das-verificacoes-e-dos-testes.md), [modelagem de robô humanoide](planos/2026-11-14-modelagem-de-robo.md) e [modelagem de carro de passeio](planos/2026-11-14-modelagem-de-carro.md).<!-- planos-ativos:fim -->
 - Encerrados recentes: [abertura em qualquer direção](./decisoes/PLANOS-ENCERRADOS.md), [limites do sólido por laços](./decisoes/PLANOS-ENCERRADOS.md), [esboço pelo núcleo](./decisoes/PLANOS-ENCERRADOS.md) e [sólido por laços](./decisoes/PLANOS-ENCERRADOS.md); os outros na [crônica](./decisoes/PLANOS-ENCERRADOS.md).
 - A [exportação CAD/STEP modular](./decisoes/PLANOS-ENCERRADOS.md)
   entregou `modulos/exportador-cad/`, `modulos/exportador-obj/` e as CLIs

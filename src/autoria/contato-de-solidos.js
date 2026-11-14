@@ -937,3 +937,141 @@ export function profundidadeDeInterpenetracao(a, b, tolerancia) {
   if (deBemA === null) return deAemB;
   return Math.max(deAemB, deBemA);
 }
+
+/* O ATRAVESSAMENTO DE DOIS SÓLIDOS, E NÃO SÓ O CONTATO. `auditarParDeSolidos` diz que o par `interpenetram` (as superfícies se cruzam, ou há ponto de um dentro do outro), e um par
+   que se atravessa por inteiro (um tubo fino que entra pela tampa de um cilindro) sai com o mesmo estado do aro que abraça o cilindro com folga zero: a malha facetada do aro cruza a
+   do cilindro em lascas de décimos de milímetro. O contato declarado precisava distinguir os dois, e a amostragem de vértices não distingue: o tubo fino só tem vértices nas pontas.
+   Esta medida cruza triângulo contra triângulo (a mesma fase ampla da árvore de caixas), recorta o segmento em que o plano de um triângulo corta o outro e guarda, de cada
+   cruzamento transversal, o comprimento e os pontos. A profundidade é o maior afundamento, na superfície do vizinho, dos pontos desses segmentos (pontas e pontos médios entre as pontas
+   do mesmo triângulo, que pegam o tubo que sai pelo outro lado) e dos vértices dos triângulos cruzados, quando estão estritamente dentro do vizinho. Dois triângulos coplanares na
+   tolerância, ou que só se tocam por um lado do plano, não são cruzamento: é o encosto. É um piso da penetração, como a profundidade de `profundidadeDeInterpenetracao`. */
+const MAXIMO_DE_PONTOS_POR_TRIANGULO = 10;
+
+/* O segmento em que o plano de `t` corta o triângulo `u`, recortado dentro de `t`; `null` quando `u` não atravessa o plano dos dois lados além da tolerância. */
+function segmentoDoCruzamento(u, t, tolerancia) {
+  const n = cross(sub(t[1], t[0]), sub(t[2], t[0]));
+  const nn = Math.sqrt(comprimento2(n));
+  if (!(nn > 0)) return null;
+  const nu = mult(n, 1 / nn);
+  const d = u.map((p) => dot(nu, sub(p, t[0])));
+  if (!(Math.max(...d) > tolerancia && Math.min(...d) < -tolerancia)) return null;
+  const pontos = [];
+  for (let i = 0; i < 3; i += 1) {
+    const j = (i + 1) % 3;
+    if (d[i] * d[j] < 0) pontos.push(add(u[i], mult(sub(u[j], u[i]), d[i] / (d[i] - d[j]))));
+    if (d[i] === 0) pontos.push(u[i]);
+  }
+  if (pontos.length < 2) return null;
+  let p = pontos[0]; let q = pontos[1];
+  if (pontos.length > 2) {
+    let maior = -1;
+    for (let i = 0; i < pontos.length; i += 1) for (let j = i + 1; j < pontos.length; j += 1) {
+      const l = comprimento2(sub(pontos[i], pontos[j]));
+      if (l > maior) { maior = l; p = pontos[i]; q = pontos[j]; }
+    }
+  }
+  /* recorte contra as três arestas de `t`, no plano dele (Cyrus-Beck): o lado de dentro é o do terceiro vértice */
+  let t0 = 0; let t1 = 1;
+  const dir = sub(q, p);
+  for (let i = 0; i < 3; i += 1) {
+    const a = t[i]; const b = t[(i + 1) % 3]; const c = t[(i + 2) % 3];
+    let m = cross(nu, sub(b, a));
+    if (dot(m, sub(c, a)) < 0) m = mult(m, -1);
+    const mn = Math.sqrt(comprimento2(m));
+    if (!(mn > 0)) return null;
+    m = mult(m, 1 / mn);
+    const s0 = dot(m, sub(p, a)); const ds = dot(m, dir);
+    if (Math.abs(ds) < 1e-300) { if (s0 < 0) return null; continue; }
+    const tt = -s0 / ds;
+    if (ds > 0) t0 = Math.max(t0, tt); else t1 = Math.min(t1, tt);
+    if (t0 >= t1) return null;
+  }
+  const a1 = add(p, mult(dir, t0)); const b1 = add(p, mult(dir, t1));
+  return { a: a1, b: b1 };
+}
+
+/* a menor distância do ponto à superfície, com a caixa de cada triângulo descartando o que já está mais longe que o melhor achado */
+function distanciaDoPontoAMalha(ponto, malha) {
+  const indice = indiceDaMalha(malha);
+  const { caixas, quantidade, arvore } = indice;
+  let melhor2 = Infinity;
+  const medir = (k) => {
+    let longe2 = 0;
+    for (let e = 0; e < 3; e += 1) {
+      const x = ponto[e]; const baixo = caixas[k * 6 + e]; const alto = caixas[k * 6 + 3 + e];
+      const dd = x < baixo ? baixo - x : x > alto ? x - alto : 0;
+      longe2 += dd * dd;
+    }
+    if (longe2 >= melhor2) return false;
+    const d2 = distancia2PontoTriangulo(ponto, malha.triangulos[k]);
+    if (d2 < melhor2) melhor2 = d2;
+    return false;
+  };
+  if (arvore === null) { for (let k = 0; k < quantidade; k += 1) medir(k); return Math.sqrt(melhor2); }
+  /* Pela árvore, numa caixa em volta do ponto que dobra até achar triângulo; depois, uma última com o raio do melhor achado,
+     que contém todo triângulo mais perto que ele. Percorrer a malha inteira por ponto levava o contato do furgão realista
+     de 7 s a 87 s (2026-11-14). */
+  const [px, py, pz] = ponto;
+  let r = 1e-4;
+  for (let volta = 0; volta < 60 && melhor2 === Infinity; volta += 1, r *= 2) visitarPorCaixa(arvore, px - r, py - r, pz - r, px + r, py + r, pz + r, medir);
+  if (melhor2 === Infinity) { for (let k = 0; k < quantidade; k += 1) medir(k); return Math.sqrt(melhor2); }
+  const raio = Math.sqrt(melhor2);
+  visitarPorCaixa(arvore, px - raio, py - raio, pz - raio, px + raio, py + raio, pz + raio, medir);
+  return Math.sqrt(melhor2);
+}
+
+/**
+ * Quanto dois sólidos preparados se atravessam: `{ profundidade, comprimento, segmentos }`. `comprimento` soma os cruzamentos transversais de triângulo contra triângulo (zero
+ * quando o par só encosta); `profundidade` é o maior afundamento, na superfície do vizinho, dos pontos do cruzamento que caem estritamente dentro dele (zero quando nenhum cai).
+ * Devolve `null` quando algum sólido é inconclusivo ou de malha aberta: sem sólido não há dentro.
+ */
+export function atravessamentoDeSolidos(a, b, tolerancia) {
+  if (a.inconclusivo || b.inconclusivo || !a.fechada || !b.fechada || !a.triangulos || !b.triangulos) return null;
+  const vazio = { profundidade: 0, comprimento: 0, segmentos: 0 };
+  if (caixasSeparadas(a.caixa, b.caixa, tolerancia)) return vazio;
+  const iA = indiceDaMalha(a); const iB = indiceDaMalha(b);
+  const pontosDeA = new Map(); const pontosDeB = new Map();
+  let comprimento = 0; let segmentos = 0;
+  const guardar = (mapa, i, ...pontos) => { if (!mapa.has(i)) mapa.set(i, []); mapa.get(i).push(...pontos); };
+  const margem = tolerancia + FOLGA_RELATIVA_DE_PARES * Math.max(iA.escala, iB.escala);
+  const cruzar = (i, j) => {
+    const tA = a.triangulos[i]; const tB = b.triangulos[j];
+    const sA = segmentoDoCruzamento(tA, tB, tolerancia);
+    if (!sA) return false;
+    const sB = segmentoDoCruzamento(tB, tA, tolerancia);
+    if (!sB) return false;
+    /* o trecho comum aos dois recortes, sobre a reta em que os dois planos se cortam */
+    const dir = sub(sA.b, sA.a); const l2 = comprimento2(dir);
+    if (!(l2 > 0)) return false;
+    const param = (p) => dot(sub(p, sA.a), dir) / l2;
+    const lo = Math.max(0, Math.min(param(sB.a), param(sB.b))); const hi = Math.min(1, Math.max(param(sB.a), param(sB.b)));
+    if (!(hi > lo)) return false;
+    const p = add(sA.a, mult(dir, lo)); const q = add(sA.a, mult(dir, hi));
+    comprimento += Math.sqrt(l2) * (hi - lo); segmentos += 1;
+    guardar(pontosDeA, i, p, q); guardar(pontosDeB, j, p, q);
+    return false;
+  };
+  for (let i = 0; i < iA.quantidade; i += 1) {
+    const k = i * 6;
+    if (iB.arvore === null) { for (let j = 0; j < iB.quantidade; j += 1) cruzar(i, j); continue; }
+    visitarPorCaixa(iB.arvore, iA.caixas[k] - margem, iA.caixas[k + 1] - margem, iA.caixas[k + 2] - margem,
+      iA.caixas[k + 3] + margem, iA.caixas[k + 4] + margem, iA.caixas[k + 5] + margem, (j) => cruzar(i, j));
+  }
+  /* sem cruzamento a parte pode estar inteira dentro da outra: a profundidade sai da contenção dos vértices */
+  if (segmentos === 0) return { ...vazio, profundidade: profundidadeDeInterpenetracao(a, b, tolerancia) ?? 0 };
+  const afundamento = (pontosPorTriangulo, malhaDe, malhaEm) => {
+    let maior = 0;
+    for (const [i, pontos] of pontosPorTriangulo) {
+      const base = pontos.slice(0, MAXIMO_DE_PONTOS_POR_TRIANGULO);
+      const candidatos = [...malhaDe.triangulos[i], ...base];
+      for (let x = 0; x < base.length; x += 1) for (let y = x + 1; y < base.length; y += 1) candidatos.push(mult(add(base[x], base[y]), 0.5));
+      for (const ponto of candidatos) {
+        if (pontoDentroMalha(ponto, malhaEm, tolerancia) !== true) continue;
+        const dist = distanciaDoPontoAMalha(ponto, malhaEm);
+        if (dist > maior) maior = dist;
+      }
+    }
+    return maior;
+  };
+  return { profundidade: Math.max(afundamento(pontosDeA, a, b), afundamento(pontosDeB, b, a)), comprimento, segmentos };
+}

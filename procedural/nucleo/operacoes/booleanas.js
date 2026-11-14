@@ -72,6 +72,7 @@
    passo inteiro aborta com 0 V/0 F. */
 import { areaDe, fundir, fundirCoplanares, melhorInicio, pedacosConvexos } from '../pedacos-convexos.js';
 import { moldeDeDentro, ErroDoMolde } from '../molde-de-dentro.js';
+import { memoizarPura } from '../memoria-de-pura.js';
 import { areaMinimaDe, limparNoEstado } from './limpar-lascas.js';
 
 /* Fusão dos pedaços coplanares da booleana comum: o quanto, em fração do tamanho da peça, o polígono fundido pode sair do
@@ -2396,6 +2397,23 @@ export function criarOperacoesBooleanas(servicos) {
      somem. A chapa é lida do que a `subdivisao` guardou (`st.chapas[].pele`), e não das faces vivas, porque uma booleana já pode tê-la cortado
      (as portas, os vãos). */
   const DESLOCAMENTO_DO_MOLDE = BLOCO + (FAIXA_ESTENDIDA >> 1);
+  let wasmDoMolde = null;   // a Manifold do passo que pede o molde: o argumento da memória só leva dados
+  const moldeDoAparar = memoizarPura((dadosDasChapas) => {
+    const moldes = [];
+    for (let k = 0; k < dadosDasChapas.length; k += 1) {
+      try { moldes.push(moldeDeDentro(dadosDasChapas[k])); } catch (e) {
+        if (e instanceof ErroDoMolde) return { erroDaChapa: { k, mensagem: e.message.replace(/^aparar: /, '') } };
+        throw e;
+      }
+    }
+    let molde = moldes[0];
+    if (moldes.length > 1 || molde.corte) {
+      const unido = unirMoldes(wasmDoMolde, moldes);
+      if (unido.erro) return { erro: unido.erro };
+      molde = unido;
+    }
+    return { molde };
+  }, { tamanho: 4, copiar: false });
   function aparar(st, a, i) {
     const wasm = abertura(st, a, i, 'aparar');
     if (!wasm) return;
@@ -2418,23 +2436,17 @@ export function criarOperacoesBooleanas(servicos) {
     if (st.orfaos.length > antes) return;
     const faces = [...r.faces].sort((x, y) => x - y);
     if (!faces.length) return grita(st, i, 'aparar', 'solido', 'a seleção do sólido não tem face nenhuma');
-    const moldes = [];
-    for (let k = 0; k < chapas.length; k += 1) {
-      try { moldes.push(moldeDeDentro({ vertices: guardadas[k].pele.vertices, faces: guardadas[k].pele.faces, espessura: guardadas[k].espessura ?? 0, lado: guardadas[k].lado, folga, fecha: { eixo: fechas[k].eixo, em: fechas[k].em } })); } catch (e) {
-        if (e instanceof ErroDoMolde) return grita(st, i, 'aparar', 'chapa', `${chapas.length > 1 ? `chapa subdivisao:${chapas[k].id}: ` : ''}${e.message.replace(/^aparar: /, '')}`);
-        throw e;
-      }
-    }
-    let molde = moldes[0];
-    if (moldes.length > 1 || molde.corte) {
-      const unido = unirMoldes(wasm, moldes);
-      if (unido.erro) return grita(st, i, 'aparar', 'chapa', unido.erro);
-      molde = unido;
-    }
+    /* O molde depende só das peles, da espessura, do lado, da folga e dos planos de fecho, e não do sólido: os 15 aparos da carroceria do sedã
+       refaziam o mesmo molde. A memória (`memoria-de-pura.js`) o guarda pela chave exata desses dados. */
+    wasmDoMolde = wasm;
+    const feito = moldeDoAparar(chapas.map((_, k) => ({ vertices: guardadas[k].pele.vertices, faces: guardadas[k].pele.faces, espessura: guardadas[k].espessura ?? 0, lado: guardadas[k].lado, folga, fecha: { eixo: fechas[k].eixo, em: fechas[k].em } })));
+    if (feito.erroDaChapa) return grita(st, i, 'aparar', 'chapa', `${chapas.length > 1 ? `chapa subdivisao:${chapas[feito.erroDaChapa.k].id}: ` : ''}${feito.erroDaChapa.mensagem}`);
+    if (feito.erro) return grita(st, i, 'aparar', 'chapa', feito.erro);
+    const molde = feito.molde;
     if (molde.vertices.length >= FAIXA_ESTENDIDA >> 1 || molde.triangulos.length >= FAIXA_ESTENDIDA >> 1) return grita(st, i, 'aparar', 'chapa', `o molde tem ${molde.vertices.length} vértices e ${molde.triangulos.length} faces, acima do que o passo comporta (${FAIXA_ESTENDIDA >> 1})`);
     const idsV = molde.vertices.map((_, k) => idDoPasso(i, DESLOCAMENTO_DO_MOLDE + k));
     const idsF = molde.triangulos.map((_, k) => idDoPasso(i, DESLOCAMENTO_DO_MOLDE + k));
-    molde.vertices.forEach((p, k) => addV(st, idsV[k], p));
+    molde.vertices.forEach((p, k) => addV(st, idsV[k], [...p]));
     molde.triangulos.forEach((t, k) => addF(st, idsF[k], t.map((v) => idsV[v])));
     const usadas = (st.facesDeOperando ??= new Set());
     for (const f of faces) usadas.add(f);

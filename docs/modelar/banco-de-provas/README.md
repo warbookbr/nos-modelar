@@ -44,6 +44,7 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
 - [Resultado da medida de leitura](leitura-por-demanda-2026-10/RESULTADO.md) — `leitura-por-demanda-2026-10`
 - [Limites do sólido por laços — provas das fatias 1 a 3](limites-do-solido-por-lacos-2026-11-05/README.md) — `limites-do-solido-por-lacos-2026-11-05`
 - [Navegação de receitas, 2026-11-05](navegacao-de-receitas-2026-11-05/README.md) — `navegacao-de-receitas-2026-11-05`
+- `nucleo-para-receita-2026-11-14`
 - [Organização dos documentos: o levantamento das decisões em vigor](organizacao-dos-documentos-2026-11-13/README.md) — `organizacao-dos-documentos-2026-11-13`
 - [Linha de base da porta de entrada dos agentes, 2026-11-05](porta-de-entrada-2026-11-05/README.md) — `porta-de-entrada-2026-11-05`
 - [Receitas do projeto externo da pessoa no esboço do Mecanifica (2026-10-19)](receitas-externas-2026-10-19/README.md) — `receitas-externas-2026-10-19`

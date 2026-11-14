@@ -68,6 +68,75 @@ describe('contatosDaPeca', () => {
   });
 });
 
+describe('contato declarado: tocar não é atravessar', () => {
+  /* O defeito do abajur: as alças da armação atravessaram o topo do soquete e o contato declarado passou, porque a medida só dizia `interpenetram` para o aro que abraça e
+     para o tubo que fura. As duas fixtures são o mesmo tubo fino e o mesmo cilindro, uma com o tubo atravessando a tampa e outra com o tubo assentado nela. */
+  async function receitaDe(nome, contatos) {
+    const mod = await import(`${RAIZ_FIXTURES}/${nome}.js`);
+    const receita = { meta: mod.meta, PASSOS: mod.PASSOS, ALIASES: mod.ALIASES, contatos: contatos ?? mod.contatos };
+    const { neutro } = executarReceita(receita);
+    return { receita, neutro, mod };
+  }
+
+  it('o tubo que atravessa a tampa reprova mesmo declarado, com a profundidade medida', async () => {
+    const { receita, neutro } = await receitaDe('fixture-contato-atravessa');
+    const r = contatosDaPeca(neutro, receita);
+    expect(r.naoDeclarados).toEqual([]);
+    expect(r.atravessados).toHaveLength(1);
+    expect(r.atravessados[0].par).toEqual(['tampa', 'tubo']);
+    expect(r.atravessados[0].penetracao.profundidade).toBeGreaterThan(0.9);
+    expect(r.atravessados[0].penetracao.profundidade).toBeGreaterThan(r.atravessados[0].penetracao.limite);
+  });
+
+  it('o mesmo tubo apenas assentado na tampa passa', async () => {
+    const { receita, neutro } = await receitaDe('fixture-contato-so-encosta');
+    const r = contatosDaPeca(neutro, receita);
+    expect(r.paresEmContato[0].estado).toBe('encostam');
+    expect(r.atravessados).toEqual([]);
+  });
+
+  it('`penetracaoMaxima` declarada libera o encaixe que entra de propósito, e só até o que ela diz', async () => {
+    const motivo = 'o tubo atravessa a tampa de propósito neste teste de limite';
+    const largo = await receitaDe('fixture-contato-atravessa', [{ par: ['tampa', 'tubo'], motivo, penetracaoMaxima: 1.5 }]);
+    expect(contatosDaPeca(largo.neutro, largo.receita).atravessados).toEqual([]);
+    const justo = await receitaDe('fixture-contato-atravessa', [{ par: ['tampa', 'tubo'], motivo, penetracaoMaxima: 0.5 }]);
+    const r = contatosDaPeca(justo.neutro, justo.receita);
+    expect(r.atravessados).toHaveLength(1);
+    expect(r.atravessados[0].penetracao.limiteDeclarado).toBe(true);
+  });
+
+  it('o contato declarado de uma parte de malha aberta diz a causa, e não só que não se tocam', async () => {
+    const { receita, neutro } = await receitaDe('fixture-contato-parte-aberta');
+    const r = contatosDaPeca(neutro, receita);
+    expect(r.declaradosSemContato).toHaveLength(1);
+    expect(r.declaradosSemContato[0].malhaAberta.map((m) => m.parte)).toEqual(['tampa', 'tubo']);
+    const { descreverPecaReutilizavel } = await import('../../tools/modelar/descrever-peca.mjs');
+    const d = await descreverPecaReutilizavel({ peca: 'fixture-contato-parte-aberta', modulo: await import(`${RAIZ_FIXTURES}/fixture-contato-parte-aberta.js`) });
+    expect(d.codigo).toBe(1);
+    expect(d.stderr).toMatch(/CAUSA PROVÁVEL: a parte 'tampa' não é um sólido fechado/);
+  });
+
+  it('recusa `penetracaoMaxima` que não é número positivo', () => {
+    const motivo = 'motivo suficientemente longo';
+    for (const penetracaoMaxima of [0, -1, '2', Infinity]) {
+      expect(() => lerContatosDeclarados({ contatos: [{ par: ['a', 'b'], motivo, penetracaoMaxima }] }, ['a', 'b'])).toThrow(/penetracaoMaxima/);
+    }
+  });
+
+  it('o descrever avisa o tubo que atravessa sem limite declarado, reprova o que passa do limite declarado e cala o que só encosta', async () => {
+    const { descreverPecaReutilizavel } = await import('../../tools/modelar/descrever-peca.mjs');
+    const aviso = await descreverPecaReutilizavel({ peca: 'fixture-contato-atravessa', modulo: await import(`${RAIZ_FIXTURES}/fixture-contato-atravessa.js`) });
+    expect(aviso.codigo).toBe(0);
+    expect(aviso.stderr).toMatch(/UMA PARTE ATRAVESSA A OUTRA/);
+    expect(aviso.stderr).toMatch(/o padrão relativo não reprova/);
+    const mal = await descreverPecaReutilizavel({ peca: 'fixture-contato-atravessa-declarado', modulo: await import(`${RAIZ_FIXTURES}/fixture-contato-atravessa-declarado.js`) });
+    expect(mal.codigo).toBe(1);
+    expect(mal.stderr).toMatch(/penetracaoMaxima declarada/);
+    const bem = await descreverPecaReutilizavel({ peca: 'fixture-contato-so-encosta', modulo: await import(`${RAIZ_FIXTURES}/fixture-contato-so-encosta.js`) });
+    expect(bem.codigo).toBe(0);
+  });
+});
+
 describe('lerContatosDeclarados', () => {
   const partes = ['a', 'b'];
 

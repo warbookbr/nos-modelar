@@ -2,9 +2,10 @@
 import { describe, expect, it, vi } from 'vitest';
 import { criarEstadoCentral, estadoInicialDaBancada } from '../estado/estado-central.js';
 import { criarRegistroDeEventos } from './registro-de-eventos.js';
+import { executarReceita } from '../../autoria/executar-receita.js';
 import { PAYLOAD_DE_DEMONSTRACAO, criarSessaoDaBancada } from './sessao-da-bancada.js';
 
-function montar() {
+function montar(extras = {}) {
   const estado = criarEstadoCentral(estadoInicialDaBancada({ visao: 'solida' }));
   let ganchos = null;
   const sincronizador = { definirPayload: vi.fn(), iniciarPolling: vi.fn() };
@@ -17,6 +18,7 @@ function montar() {
     trocarDePeca: vi.fn(), restaurarDaPeca: vi.fn(async () => {}), oferecerSobreposicaoDaPeca: vi.fn(async () => {}),
     painel: { renderizar: vi.fn() }, gerenciador: { sincronizarComSessao: vi.fn() },
   };
+  const mostrarErro = vi.fn();
   const sessao = criarSessaoDaBancada({
     estado,
     cena,
@@ -25,11 +27,12 @@ function montar() {
     anotacoes3D: { sincronizarAnotacoes: vi.fn() },
     registroDeEventos: criarRegistroDeEventos(),
     avisar: vi.fn(),
-    mostrarErro: vi.fn(),
+    mostrarErro,
     arquivoDaSessao: null,
     criarSincronizador: (opcoes) => { ganchos = opcoes; return sincronizador; },
+    ...extras,
   });
-  return { estado, sessao, sincronizador, cena, imagemNaCena, ganchos: () => ganchos };
+  return { mostrarErro, estado, sessao, sincronizador, cena, imagemNaCena, ganchos: () => ganchos };
 }
 
 const MODELO = { nome: 'peca-da-sessao', rotulo: 'peça-da-sessão' };
@@ -74,5 +77,25 @@ describe('sessão da bancada', () => {
     expect(sincronizador.iniciarPolling).toHaveBeenCalledTimes(1);
     sessao.carregarDemonstracao();
     expect(sincronizador.definirPayload).toHaveBeenCalledWith(PAYLOAD_DE_DEMONSTRACAO);
+  });
+
+  it('peça pedida que não existe diz o nome recebido e onde procurou, em vez de abrir vazia', async () => {
+    const { sessao, mostrarErro } = montar();
+    await sessao.abrirInicial({ pecaPedida: 'empilhadera', catalogo: [], acervo: [{ id: 'empilhadeira' }, { id: 'trator' }] });
+    const texto = mostrarErro.mock.calls[0][0];
+    expect(texto).toContain("'empilhadera'");
+    expect(texto).toContain('acervo de receitas');
+    expect(texto).toContain('2 entradas');
+    expect(texto).toContain('catálogo homologado: 0 entradas');
+    expect(texto).toContain('empilhadeira');
+  });
+
+  it('a peça do acervo abre pelo cache da execução e a tela diz de onde veio e quanto custou', async () => {
+    const RECEITA = { PASSOS: [['cilindro', { origemId: 10, raio: 1, altura: 1, lados: 16 }], ['parte', { nome: 'corpo', sel: { origem: { op: 'cilindro', id: 10 } } }]] };
+    const executarDoAcervo = vi.fn(async () => ({ neutro: executarReceita(RECEITA).neutro, origem: 'cache', ms: 42 }));
+    const { sessao, estado } = montar({ executarDoAcervo });
+    await sessao.abrirDoAcervo({ id: 'p', caminho: '../../procedural/pecas/p.js', carregar: async () => RECEITA });
+    expect(executarDoAcervo).toHaveBeenCalledTimes(1);
+    expect(estado.obter('execucao')).toMatchObject({ id: 'p', origem: 'cache', texto: 'do cache, 42 ms' });
   });
 });

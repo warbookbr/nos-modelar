@@ -1,6 +1,60 @@
 /* geradores-avancados.js — operações do grupo, isoladas por serviços explícitos do núcleo. */
 import { ErroDePerfil, montarPerfil } from '../perfil2d.js';
 
+/* A seção de uma casca de revolução: o perfil de fora (polilinha [raio, y]) seguido da parede de dentro, que é o mesmo perfil deslocado por
+   `espessura` na ordem inversa. O lado do deslocamento é o do volume que o perfil e o eixo fecham (o perfil, o eixo na altura do último ponto
+   e o eixo na altura do primeiro): se esse polígono é anti-horário em [raio, y] o volume está à esquerda de quem anda pelo perfil, senão à
+   direita. Nas quinas o deslocamento é por esquadria (a bissetriz, com o comprimento que mantém a espessura medida na perpendicular). */
+function paredeDeDentro(perfil, espessura, { expandido = false } = {}) {
+  const p = perfil.filter((q, k) => k === 0 || q[0] !== perfil[k - 1][0] || q[1] !== perfil[k - 1][1]);
+  const quem = (k) => `ponto ${k} do perfil${expandido ? ' expandido (as concordâncias entram como pontos)' : ''} [raio ${p[k][0]}, y ${p[k][1]}]`;
+  const trecho = (k) => `trecho entre o ${quem(k)} e o ${quem(k + 1)}`;
+  if (p.length < 2) return { erro: 'perfil com espessura precisa de ao menos 2 pontos diferentes' };
+  const fecho = [...p, [0, p[p.length - 1][1]], [0, p[0][1]]];
+  let area = 0;
+  for (let k = 0; k < fecho.length; k++) { const [a, b] = fecho[k]; const [c, d] = fecho[(k + 1) % fecho.length]; area += a * d - c * b; }
+  const negativo = p.findIndex((q) => q[0] < 0);
+  if (negativo >= 0) return { erro: `raio negativo no ${quem(negativo)}: a casca de revolução precisa de raio maior ou igual a zero` };
+  if (area === 0) return { erro: 'o perfil e o eixo não fecham volume nenhum, então não há lado de dentro para a espessura' };
+  const lado = area > 0 ? 1 : -1;   // 1: o volume fica à esquerda de quem anda pelo perfil
+  const normal = (a, b) => { const dx = b[0] - a[0], dy = b[1] - a[1], n = Math.hypot(dx, dy); return [-lado * dy / n, lado * dx / n]; };
+  const normais = p.slice(1).map((q, k) => normal(p[k], q));
+  let erro = null;
+  const dentro = p.map((q, k) => {
+    const n1 = normais[Math.max(0, k - 1)], n2 = normais[Math.min(normais.length - 1, k)];
+    const soma = 1 + n1[0] * n2[0] + n1[1] * n2[1];
+    if (soma < 1e-6) { erro ??= `o perfil volta sobre si mesmo no ${quem(k)} (ângulo de 180 graus), então a parede de dentro não se define`; return null; }
+    const o = [q[0] + espessura * (n1[0] + n2[0]) / soma, q[1] + espessura * (n1[1] + n2[1]) / soma];
+    /* a ponta do perfil sobre o eixo (raio 0) fica no eixo: a parede de dentro começa onde a reta deslocada do trecho encontra o eixo */
+    if (q[0] === 0 && (k === 0 || k === p.length - 1)) {
+      const n = k === 0 ? n2 : n1;
+      const seg = k === 0 ? [p[1][0] - p[0][0], p[1][1] - p[0][1]] : [p[k][0] - p[k - 1][0], p[k][1] - p[k - 1][1]];
+      const base = [q[0] + espessura * n[0], q[1] + espessura * n[1]];
+      if (Math.abs(seg[0]) < 1e-12 * Math.hypot(seg[0], seg[1])) { erro ??= `o ${trecho(k === 0 ? 0 : k - 1)} corre ao longo do eixo, então a parede de dentro não tem onde encontrá-lo`; return null; }
+      const t = -base[0] / seg[0];
+      return [0, base[1] + t * seg[1]];
+    }
+    return o;
+  });
+  if (erro) return { erro };
+  /* a espessura que não cabe: a parede de dentro passa do eixo ou chega perto demais de um trecho que não é vizinho dela */
+  for (let k = 0; k < dentro.length; k++) {
+    if (dentro[k][0] < -1e-12) return { erro: p[k][0] === 0 ? `o perfil toca o eixo no ${quem(k)}, no meio do percurso: a parede de dentro de espessura ${espessura} passaria do eixo ali` : `a espessura ${espessura} é maior que o raio no ${quem(k)}: a parede de dentro passaria do eixo` };
+  }
+  const distSeg = (pt, a, b) => {
+    const dx = b[0] - a[0], dy = b[1] - a[1], q = Math.max(0, Math.min(1, ((pt[0] - a[0]) * dx + (pt[1] - a[1]) * dy) / (dx * dx + dy * dy)));
+    return Math.hypot(pt[0] - a[0] - q * dx, pt[1] - a[1] - q * dy);
+  };
+  for (let k = 0; k < dentro.length; k++) {
+    for (let j = 0; j < p.length - 1; j++) {
+      if (Math.abs(j - k) <= 1 || j + 1 === k) continue;
+      const folga = distSeg(dentro[k], p[j], p[j + 1]);
+      if (folga < espessura * 0.999) return { erro: `a espessura ${espessura} não cabe entre o ${quem(k)} e o ${trecho(j)}: a folga ali é ${folga}, menor que a espessura` };
+    }
+  }
+  return { contorno: [...p, ...dentro.reverse()] };
+}
+
 export function criarOperacoesGeradoresAvancados(servicos) {
   const { BLOCO, FAIXA_ESTENDIDA, idDoPasso, norm3, cross3, addV, addF, grita, registraOrigem, contratoFaixaLado, confereId, quadroLoft, transportaLoft, expandirConcordancias } = servicos;
   return {
@@ -42,7 +96,19 @@ export function criarOperacoesGeradoresAvancados(servicos) {
        furos horários em [raio, y], o que dá a normal para fora do material nos dois. O laço que encosta no eixo perde a
        aresta sobre o eixo e termina em dois polos; os outros fecham sobre si. Os laços saem na ordem canônica de
        `montarPerfil` e suas faixas se enfileiram nessa ordem. Sem `furos` nem `deslocar`, o caminho é o de sempre. */
-    const modoSecao = a.furos != null || a.deslocar != null;
+    /* CASCA DE REVOLUÇÃO. Com `espessura` o `perfil` é a parede de FORA, uma polilinha aberta (copo, garrafa, vaso, prato, abajur), e a
+       operação gera a parede de dentro: a polilinha deslocada por `espessura` para o lado do volume que ela e o eixo fecham, nas
+       quinas por esquadria. O sentido sai da conta e não da receita (quatro de cinco peças de revolução escreveram o deslocamento à
+       mão e duas erraram o sentido). A seção que sai, a parede fora e a parede dentro unidas por duas pontas, segue pelo caminho da
+       seção, que a fecha e a revoluciona. */
+    const comEspessura = a.espessura != null;
+    let espessura = null;
+    if (comEspessura) {
+      espessura = st.num(a.espessura);
+      if (!(espessura > 0) || !Number.isFinite(espessura)) return grita(st, i, 'lathe', 'espessura', `passo ${i} ('lathe'): 'espessura' vale ${JSON.stringify(a.espessura)}${typeof a.espessura === 'number' ? '' : ` (= ${espessura})`}, e precisa ser maior que 0`);
+      if (a.furos != null || a.deslocar != null) return grita(st, i, 'lathe', 'espessura', 'espessura gera a parede de dentro sozinha e não vale com furos nem deslocar; tire um dos dois');
+    }
+    const modoSecao = a.furos != null || a.deslocar != null || comEspessura;
     let lacos;
     if (!modoSecao) {
       // classifica polo/anel SOBRE O EXPANDIDO (um arco pode expor raio<0 se a concordância vaza o eixo)
@@ -55,9 +121,14 @@ export function criarOperacoesGeradoresAvancados(servicos) {
       if (pontoInvalido2) return;
       lacos = [pontos];
     } else {
-      const contorno = exp.pontos.map((p) => [p[0], p[1]]);
+      let contorno = exp.pontos.map((p) => [p[0], p[1]]);
+      if (comEspessura) {
+        const parede = paredeDeDentro(contorno, espessura, { expandido: contorno.length !== perfil.length });
+        if (parede.erro) return grita(st, i, 'lathe', 'perfil', parede.erro);
+        contorno = parede.contorno;
+      }
       const ini = contorno[0], fim = contorno[contorno.length - 1];
-      if (contorno.length > 3 && ini[0] === fim[0] && ini[1] === fim[1]) contorno.pop();   // escrito fechado: o ponto repetido sai
+      if (!comEspessura && contorno.length > 3 && ini[0] === fim[0] && ini[1] === fim[1]) contorno.pop();   // escrito fechado: o ponto repetido sai
       let secao;
       try {
         secao = montarPerfil(
@@ -65,7 +136,7 @@ export function criarOperacoesGeradoresAvancados(servicos) {
           { num: (x) => st.num(x), nomes: { externo: 'perfil' }, semiPlano: true },
         );
       } catch (e) {
-        if (e instanceof ErroDePerfil) return grita(st, i, 'lathe', e.campo, e.message);
+        if (e instanceof ErroDePerfil) return grita(st, i, 'lathe', comEspessura ? 'perfil' : e.campo, comEspessura ? `a seção da casca com espessura ${espessura} não fecha (${e.message.replace(/\b(externo|perfil)\[?\d*\]?/g, 'contorno da seção')}); confira se o perfil se cruza ou se a espessura passa do raio ou da folga entre trechos do perfil` : e.message);
         throw e;
       }
       lacos = [];

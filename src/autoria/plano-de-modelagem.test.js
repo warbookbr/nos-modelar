@@ -139,3 +139,25 @@ describe('plano de modelagem', () => {
       .toEqual({ faltando: [], naoPrometidas: [], prometidas: [] });
   });
 });
+
+describe('espessuraMinima do plano', () => {
+  const com = (espessuraMinima) => normalizarPlanoDeModelagem({ ...PLANO, espessuraMinima });
+  it('é opcional: sem ela o plano sai como antes', () => {
+    expect(normalizarPlanoDeModelagem(PLANO)).not.toHaveProperty('espessuraMinima');
+  });
+  it('aceita { mm } e { mm, partes }, com as partes em ordem', () => {
+    expect(com({ mm: 1 }).espessuraMinima).toEqual({ mm: 1 });
+    expect(com({ mm: 0.8, partes: ['tuboSelim', 'tuboInferior'] }).espessuraMinima).toEqual({ mm: 0.8, partes: ['tuboInferior', 'tuboSelim'] });
+  });
+  it('recusa mm ausente, não positivo ou enorme, parte que não existe, lista vazia ou repetida e campo alheio', () => {
+    expect(() => com({})).toThrow(/precisa declarar: mm/);
+    expect(() => com({ mm: 0 })).toThrow(/maior que zero/);
+    expect(() => com({ mm: -1 })).toThrow(/maior que zero/);
+    expect(() => com({ mm: 5000 })).toThrow(/até 1000/);
+    expect(() => com({ mm: 1, partes: ['inexistente'] })).toThrow(/não está em 'partes'/);
+    expect(() => com({ mm: 1, partes: [] })).toThrow(/lista não vazia/);
+    expect(() => com({ mm: 1, partes: ['tuboSelim', 'tuboSelim'] })).toThrow(/repetir/);
+    expect(() => com({ mm: 1, cor: 1 })).toThrow(/não é permitido/);
+    expect(() => com('1')).toThrow(/objeto/);
+  });
+});

@@ -23,21 +23,59 @@ const FUNCOES = {
   max: { aridade: 2, variadica: true, calcular: (...xs) => Math.max(...xs) },
 };
 
-function erro(texto) { throw new Error(`oficina: expressão inválida: ${texto}`); }
+/** Distância de edição, para sugerir o nome certo diante de um erro de digitação. */
+export function distanciaDeEdicao(a, b) {
+  const linha = Array.from({ length: b.length + 1 }, (_, j) => j);
+  for (let i = 1; i <= a.length; i++) {
+    let diagonal = linha[0];
+    linha[0] = i;
+    for (let j = 1; j <= b.length; j++) {
+      const anterior = linha[j];
+      linha[j] = Math.min(linha[j] + 1, linha[j - 1] + 1, diagonal + (a[i - 1] === b[j - 1] ? 0 : 1));
+      diagonal = anterior;
+    }
+  }
+  return linha[b.length];
+}
+
+/** Os nomes de `candidatos` a até duas edições de `nome`, do mais próximo ao mais distante, e em ordem alfabética no empate. A distância vale no máximo metade do menor dos dois nomes: '2' não sugere 'k'. */
+export function nomesProximos(nome, candidatos, quantos = 3) {
+  return candidatos
+    .map((candidato) => ({ candidato, d: distanciaDeEdicao(String(nome), candidato) }))
+    .filter(({ d, candidato }) => d <= 2 && d * 2 <= Math.min(String(nome).length, candidato.length))
+    .sort((x, y) => x.d - y.d || (x.candidato < y.candidato ? -1 : 1))
+    .slice(0, quantos)
+    .map(({ candidato }) => candidato);
+}
+
+/** O erro do resolvedor numérico, com o que faltou para o despacho dizer onde: `nome` (parâmetro que não existe) ou `valor` (o que não é número). */
+export class ErroDeResolucao extends Error {
+  constructor(mensagem, detalhes) {
+    super(mensagem);
+    this.name = 'ErroDeResolucao';
+    Object.assign(this, detalhes);
+  }
+}
+
+function erro(texto) { throw new ErroDeResolucao(`oficina: expressão inválida: ${texto}`, { tipo: 'expressao' }); }
 
 export function criarResolverNumerico(dict) {
   const cache = new Map();
   const resolvendo = [];
   const finito = (valor) => {
-    if (!Number.isFinite(valor)) throw new Error(`oficina: valor numérico não-finito: ${valor}`);
+    if (!Number.isFinite(valor)) throw new ErroDeResolucao(`oficina: valor numérico não-finito: ${valor}`, { tipo: 'valor', valor });
     return valor;
   };
 
   function nome(nomeParam) {
     if (cache.has(nomeParam)) return cache.get(nomeParam);
-    if (!Object.hasOwn(dict, nomeParam)) throw new Error(`oficina: parâmetro '${nomeParam}' não existe em PARAMS/TOPO`);
+    if (!Object.hasOwn(dict, nomeParam)) {
+      const proximos = nomesProximos(nomeParam, Object.keys(dict));
+      const dica = proximos.length ? `; você quis dizer ${proximos.map((p) => `'${p}'`).join(' ou ')}?` : '';
+      throw new ErroDeResolucao(`oficina: parâmetro '${nomeParam}' não existe em PARAMS/TOPO${dica}`, { tipo: 'nome', nome: nomeParam, proximos });
+    }
     const inicioCiclo = resolvendo.indexOf(nomeParam);
-    if (inicioCiclo >= 0) throw new Error(`oficina: ciclo de parâmetros: ${[...resolvendo.slice(inicioCiclo), nomeParam].join(' -> ')}`);
+    if (inicioCiclo >= 0) throw new ErroDeResolucao(`oficina: ciclo de parâmetros: ${[...resolvendo.slice(inicioCiclo), nomeParam].join(' -> ')}`, { tipo: 'ciclo' });
     resolvendo.push(nomeParam);
     try {
       const valor = num(dict[nomeParam]);
@@ -112,7 +150,7 @@ export function criarResolverNumerico(dict) {
   function num(valor) {
     if (typeof valor === 'number') return finito(valor);
     if (typeof valor === 'string') return valor.startsWith('=') ? expressao(valor) : nome(valor);
-    throw new Error(`oficina: valor numérico inválido: ${JSON.stringify(valor)}`);
+    throw new ErroDeResolucao(`oficina: valor numérico inválido: ${JSON.stringify(valor) ?? String(valor)}`, { tipo: 'valor', valor });
   }
 
   return { num };

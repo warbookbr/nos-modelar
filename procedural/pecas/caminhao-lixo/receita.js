@@ -104,10 +104,10 @@ export const TABELA = {
   vidro_lateral_topo_y: 2100,
   vidro_lateral_espessura: 12,
 
-  // retrovisores: caixas que saem da lateral da cabine até x 1324
+  // retrovisores: caixas que saem da lateral da cabine até x 1324; o topo para em y 1413, a quina de baixo do vidro lateral (acima disso a caixa entraria 12 mm na placa de vidro)
   retrovisor_x1: 1324,
   retrovisor_y0: 1240,
-  retrovisor_y1: 1590,
+  retrovisor_y1: 1413,
   retrovisor_z0: 1496,
   retrovisor_z1: 1675,
 
@@ -394,7 +394,7 @@ export function derivar(T) {
     formas.push({
       nome: `retrovisor${l}`, forma: 'cubo', material: 'cinzaAzulado', larg, alt: T.retrovisor_y1 - T.retrovisor_y0,
       prof: T.retrovisor_z1 - T.retrovisor_z0, em: [s * (M + larg / 2), T.retrovisor_y0, (T.retrovisor_z0 + T.retrovisor_z1) / 2],
-      txt: `caixa cinza azulada de 353 por 350 por 179 mm, da lateral da cabine a x ${s > 0 ? '' : '-'}1324, de y 1240 a 1590`,
+      txt: `caixa cinza azulada de 353 por 173 por 179 mm, da lateral da cabine a x ${s > 0 ? '' : '-'}1324, de y 1240 a 1413`,
       tec: 'cubo encostado na lateral da cabine',
     });
   }
@@ -635,8 +635,8 @@ export const CONTATOS = [
     { par: ['cabineAlta', `vidroLateral${l}`], motivo: 'a face de dentro do vidro lateral é o mesmo plano da lateral da cabine alta' },
     { par: ['cabineBaixa', `vidroLateral${l}`], motivo: 'a aresta de baixo do vidro lateral, em y 1413, toca o canto da lateral da cabine baixa, só pela aresta' },
     { par: ['cabineBaixa', `retrovisor${l}`], motivo: 'a face de dentro do retrovisor encosta na lateral da cabine baixa, em x 971 ou -971, de y 1240 a 1413' },
-    { par: ['cabineAlta', `retrovisor${l}`], motivo: 'a face de dentro do retrovisor encosta na lateral vertical da cabine alta, em x 971 ou -971, de y 1413 a 1590' },
-    { par: [`retrovisor${l}`, `vidroLateral${l}`], motivo: 'o retrovisor toca a quina de baixo do vidro lateral, em y 1413, só pela aresta' },
+    { par: ['cabineAlta', `retrovisor${l}`], motivo: 'a aresta de cima da face de dentro do retrovisor, em y 1413 e x 971 ou -971, toca o canto de baixo da cabine alta, só pela aresta' },
+    { par: [`retrovisor${l}`, `vidroLateral${l}`], motivo: 'a face de cima do retrovisor, em y 1413, toca a quina de baixo do vidro lateral, na faixa de 12 mm de x 971 a 983, sem entrar na placa' },
   ]),
   // caçamba
   { par: ['miolo', 'chassiCentro'], motivo: 'a face de baixo do miolo, em y 529,5, assenta na face de cima do chassi central' },

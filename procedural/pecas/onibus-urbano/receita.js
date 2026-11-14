@@ -325,10 +325,10 @@ export const CONTATOS = [
   { par: ['parabrisa', 'janelasLateraisDir'], motivo: 'o canto direito da cabine encosta no parabrisa no plano x 1386' },
   { par: ['carroceria', 'caixaRodaFrente'], motivo: 'a caixa de roda da frente preenche o arco recortado no perfil, e as faces do arco são as mesmas das duas partes' },
   { par: ['carroceria', 'caixaRodaTras'], motivo: 'a caixa de roda de trás preenche o arco recortado no perfil, e as faces do arco são as mesmas das duas partes' },
-  { par: ['retrovisorEsq', 'janelasLateraisEsq'], motivo: 'a ponta de dentro do retrovisor esquerdo entra 46 mm no canto de vidro da cabine, sem deixar fresta' },
-  { par: ['retrovisorDir', 'janelasLateraisDir'], motivo: 'a ponta de dentro do retrovisor direito entra 46 mm no canto de vidro da cabine, sem deixar fresta' },
-  { par: ['retrovisorEsq', 'parabrisa'], motivo: 'a ponta de cima do braço esquerdo entra no vidro da frente, em x -1325 a -1386, sem deixar fresta' },
-  { par: ['retrovisorDir', 'parabrisa'], motivo: 'a ponta de cima do braço direito entra no vidro da frente, em x 1325 a 1386, sem deixar fresta' },
+  { par: ['retrovisorEsq', 'janelasLateraisEsq'], motivo: 'a ponta de dentro do retrovisor esquerdo entra 46 mm no canto de vidro da cabine, sem deixar fresta', penetracaoMaxima: 0.05 }, // embutido de propósito, medido em 2026-11-14
+  { par: ['retrovisorDir', 'janelasLateraisDir'], motivo: 'a ponta de dentro do retrovisor direito entra 46 mm no canto de vidro da cabine, sem deixar fresta', penetracaoMaxima: 0.05 }, // embutido de propósito, medido em 2026-11-14
+  { par: ['retrovisorEsq', 'parabrisa'], motivo: 'a ponta de cima do braço esquerdo entra no vidro da frente, em x -1325 a -1386, sem deixar fresta', penetracaoMaxima: 0.03 }, // embutido de propósito, medido em 2026-11-14
+  { par: ['retrovisorDir', 'parabrisa'], motivo: 'a ponta de cima do braço direito entra no vidro da frente, em x 1325 a 1386, sem deixar fresta', penetracaoMaxima: 0.03 }, // embutido de propósito, medido em 2026-11-14
   { par: ['retrovisorEsq', 'teto'], motivo: 'o topo do braço esquerdo, em y 3260, encosta na face de baixo da tampa do teto' },
   { par: ['retrovisorDir', 'teto'], motivo: 'o topo do braço direito, em y 3260, encosta na face de baixo da tampa do teto' },
   ...rodasDeContato(),

@@ -2,9 +2,9 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/pecas/carro-fastback/`, `docs/modelar/banco-de-provas/carro-fastback-2026-11-14/`, `tools/modelar/ondulacao-da-superficie.mjs`, `procedural/criterios/veiculo.json`
+**Território:** `procedural/pecas/carro-fastback/`, `docs/modelar/banco-de-provas/carro-fastback-2026-11-14/`, `tools/modelar/ondulacao-da-superficie.mjs`, `procedural/criterios/veiculo.json`, `procedural/familias/roda-pneu/`
 
-Ativo só para as fatias 1 e 2; as seguintes dependem do ponto de decisão da fatia 3. A pessoa decidiu em 2026-11-14 que `procedural/familias/roda-pneu/` entra neste território, porque o plano do furgão realista foi encerrado na main. Este branch está 41 commits atrás da main e ainda lista o furgão como ativo com essa pasta, e o `planos:check` recusa a sobreposição; a pasta entra na linha acima quando o branch receber a main.
+Ativo só para as fatias 1 e 2; as seguintes dependem do ponto de decisão da fatia 3. A pessoa decidiu em 2026-11-14 que `procedural/familias/roda-pneu/` entra neste território, porque o plano do furgão realista foi encerrado na main.
 
 **Responsável:** a IA da sessão conduz e mede, e a pessoa julga a forma por imagem, como crítica de cada rodada. Ativado pela pessoa em 2026-11-14, como quinto na ordem de prioridade.
 

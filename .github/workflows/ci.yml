@@ -183,6 +183,9 @@ jobs:
       - name: Catálogo de capacidades em dia com o motor
         if: ${{ !cancelled() }}
         run: npm run catalogo:check
+      - name: Argumentos essenciais declarados e núcleo sempre com registro
+        if: ${{ !cancelled() }}
+        run: npm run essenciais:check
 
       # A tabela de ferramentas por objeto é gerada do JSON e cobre a lista de
       # famílias objeto por objeto; sem conferência, documento e dados divergem.

@@ -10,10 +10,11 @@
    renumera e os passos pendurados viram órfãos que GRITAM, nunca corrompem.
    O modo explícito `lados:{desvio}` põe o raio na derivação da contagem: nele,
    mudar raio PODE renumerar, por contrato, para conservar a tolerância. */
-import { criarResolverNumerico } from './expressoes.js';
+import { criarResolverNumerico, distanciaDeEdicao, ErroDeResolucao, nomesProximos } from './expressoes.js';
 import { TIPO_MALHA_POLIGONAL, artefatoDaMalha, criarEstadoDeProcedencia, procedenciaCanonica, registrarProcedencia } from './artefatos.js';
 import { criarRegistroOperacoes } from './registro.js';
-import { usoDaOperacao } from './uso-operacoes.js';
+import { chavesDosPrefixos, copiarEstado, registroServeAMemoria } from './memoria-de-execucao.js';
+import { essenciaisDaOperacao, recusasDeEssenciais, usoDaOperacao } from './uso-operacoes.js';
 import { criarOperacoesSubdivisao } from './operacoes/subdivisao.js';
 import { criarOperacoesFriso } from './operacoes/friso.js';
 import { criarOperacoesPrimitivasBasicas } from './operacoes/primitivas-basicas.js';
@@ -466,21 +467,6 @@ function addF(st, id, vs) {
 }
 function grita(st, i, op, ref, motivo) { st.orfaos.push({ passo: i, op, ref, motivo }); }
 
-/** Distância de edição, só para sugerir o nome certo num typo de argumento. */
-function distanciaDeEdicao(a, b) {
-  const linha = Array.from({ length: b.length + 1 }, (_, j) => j);
-  for (let i = 1; i <= a.length; i++) {
-    let diagonal = linha[0];
-    linha[0] = i;
-    for (let j = 1; j <= b.length; j++) {
-      const anterior = linha[j];
-      linha[j] = Math.min(linha[j] + 1, linha[j - 1] + 1, diagonal + (a[i - 1] === b[j - 1] ? 0 : 1));
-      diagonal = anterior;
-    }
-  }
-  return linha[b.length];
-}
-
 /**
  * Argumento fora do contrato da operação GRITA, e o passo não roda.
  *
@@ -527,6 +513,53 @@ function argumentoDesconhecido(st, i, op, args, registrada = null) {
   }
   return gritou;
 }
+/**
+ * Argumento numérico que VEM com valor não positivo GRITA, e o passo não roda: `cilindro` com raio -1 gerava malha invertida
+ * sem uma linha. A ausência não é recusada, porque as primitivas têm padrão travado em teste. A tabela é a de
+ * `uso-operacoes.js` e só vale para a operação nativa do núcleo: operação trocada no registro responde pelo contrato dela.
+ */
+function argumentosEssenciais(st, i, op, args, registrada) {
+  if (!args || typeof args !== 'object' || Array.isArray(args)) return false;
+  if (registrada.executar !== OPS[registrada.nome]) return false;
+  const contrato = essenciaisDaOperacao(registrada.nome);
+  if (!contrato) return false;
+  const recusas = comPassoNoErro(i, op, args, () => recusasDeEssenciais(op, args, contrato, st.num, i));
+  for (const { campo, motivo } of recusas) grita(st, i, op, campo, motivo);
+  return recusas.length > 0;
+}
+
+/** O caminho (`raio`, `secoes[1].raio`) do primeiro valor de `args` que satisfaz `serve`, ou null. */
+function caminhoDoArgumento(args, serve, caminho = '') {
+  if (serve(args)) return caminho || null;
+  if (Array.isArray(args)) {
+    for (let k = 0; k < args.length; k++) { const achado = caminhoDoArgumento(args[k], serve, `${caminho}[${k}]`); if (achado) return achado; }
+  } else if (args && typeof args === 'object') {
+    for (const [k, v] of Object.entries(args)) { const achado = caminhoDoArgumento(v, serve, caminho ? `${caminho}.${k}` : k); if (achado) return achado; }
+  }
+  return null;
+}
+
+/**
+ * Roda `corpo` e, se o resolvedor numérico lançar, relança o erro com o passo, a operação e a chave do argumento que o
+ * causou. O resolvedor não sabe de passo: `oficina: parâmetro 'x' não existe em PARAMS/TOPO` deixava quem escreve a receita
+ * procurando o texto por todos os passos. A mensagem original continua dentro da nova.
+ */
+function comPassoNoErro(i, op, args, corpo) {
+  try { return corpo(); } catch (erro) {
+    if (!(erro instanceof ErroDeResolucao)) throw erro;
+    const cita = (v) => (typeof v === 'string' && (erro.tipo === 'nome' ? new RegExp(`(^|[^A-Za-z0-9_])${erro.nome}([^A-Za-z0-9_]|$)`).test(v) : false));
+    let chave = null;
+    if (erro.tipo === 'nome') chave = caminhoDoArgumento(args, cita);
+    else if (erro.tipo === 'valor' && erro.valor !== undefined) chave = caminhoDoArgumento(args, (v) => Object.is(v, erro.valor));
+    else if (erro.tipo === 'valor' && args && typeof args === 'object') chave = Object.keys(args).find((k) => args[k] === undefined) ?? null;
+    const onde = `passo ${i} (${op})${chave ? `, argumento '${chave}'` : ''}`;
+    const ausente = erro.tipo === 'valor' && erro.valor === undefined && !chave ? `; um argumento numérico de '${op}' ficou sem valor, confira a ortografia das chaves e se nenhuma falta` : '';
+    const novo = new Error(`${erro.message.replace(/^oficina: /, `oficina: ${onde}: `)}${ausente}`, { cause: erro });
+    Object.assign(novo, { passo: i, op, chave });
+    throw novo;
+  }
+}
+
 /* Contexto da extensão nativa. Toda extensão escreve só no que emite (vértices e faces locais do bloco do passo,
    publicados juntos no fim). A extensão cujo manifesto declara malha em `artefatos.entra` recebe também a LEITURA de um
    sólido: `selecionar` copia vértices e faces de uma seleção (a mesma gramática de `sel` das operações do núcleo, nunca
@@ -3571,6 +3604,14 @@ export function rastrearEntradas(mapa, anterior, nivel, alvos) {
 }
 const compararIds = (a, b) => typeof a === 'number' ? a - b : a < b ? -1 : a > b ? 1 : 0;
 
+/* O que a memória de execução guarda do estado: tudo o que um passo escreve em `st`. Ficam de fora o que o início da execução refaz igual
+   (o dicionário, os materiais, o esqueleto, os aliases, as declarações de origem, a lista de passos e as funções de leitura). */
+const CAMPOS_FORA_DA_MEMORIA = new Set(['dict', 'materiais', 'esqueleto', 'ossoSet', 'aliases', 'declaracoesOrigem', 'passos']);
+/* As operações que dominam o tempo de uma receita grande (medido: aparar 5 s, o subtrair de 13 chapas 35 s) e as que também são caras o bastante para valer um ponto. */
+const OPERACOES_PESADAS = new Set(['aparar', 'subtrair', 'aberturaPorContorno', 'arredondarCostura']);
+const OPERACOES_CARAS = new Set([...OPERACOES_PESADAS, 'intersectar', 'unir']);
+const PONTOS_NO_FIM = 2;
+
 /* ----------------------------------------------------------------------------
    NÚCLEO: roda a lista e devolve o NEUTRO em números. Não sabe desenhar.
    `dict` funde PARAMS e TOPO — os passos citam o NOME (raio: 'troncoR'), então
@@ -3598,7 +3639,8 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
   const vec = (a) => {
     if (typeof a === 'string') {
       if (!Object.hasOwn(dict, a)) {
-        throw new Error(`oficina: ponto '${a}' não está em PARAMS nem em TOPO; um ponto nomeado precisa existir no dicionário da peça`);
+        const proximos = nomesProximos(a, Object.keys(dict));
+        throw new ErroDeResolucao(`oficina: ponto '${a}' não está em PARAMS nem em TOPO${proximos.length ? `; você quis dizer ${proximos.map((p) => `'${p}'`).join(' ou ')}?` : ''}; um ponto nomeado precisa existir no dicionário da peça`, { tipo: 'nome', nome: a, proximos });
       }
       const valor = dict[a];
       if (!Array.isArray(valor) || valor.length !== 3) {
@@ -3648,13 +3690,52 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
 
   const modoRetrato = OPCOES.retrato ?? 'rapido';
   let retrato = null;
+  /* MEMÓRIA DE EXECUÇÃO (opcional, `OPCOES.memoria`, de `criarMemoriaDeExecucao`): o estado depois de uma operação cara é guardado sob
+     a chave do prefixo de passos (e do que o rodeia), e uma execução cujo prefixo é o mesmo recomeça dali. Só vale com o registro do
+     próprio núcleo ou o que o host marcou (`confiarNaMemoriaDoRegistro`), e nunca muda o resultado: a prova é o neutro bit a bit contra a execução sem memória. */
+  const memoria = OPCOES.memoria && registroServeAMemoria(OPCOES.registroOperacoes) ? OPCOES.memoria : null;
+  const chavesDoPrefixo = memoria ? chavesDosPrefixos({ dict, MATERIAIS, ESQUELETO, ALIASES, declaracoes: [...declaracoesOrigem], modoRetrato, registro: (OPCOES.registroOperacoes ?? REGISTRO_OPERACOES).assinatura }, PASSOS) : null;
+  /* Quais passos viram ponto: guardar o estado inteiro custa uma cópia (5 s com 174 mil faces), então não é todo passo. Entram os
+     últimos `PONTOS_NO_FIM` passos das operações pesadas, para o ajuste depois da última delas recomeçar dali, e o último passo
+     de operação cara antes do ponto onde esta execução diverge da anterior, para a execução seguinte recomeçar dali. */
+  const pontosDeMemoria = new Set();
+  if (chavesDoPrefixo) {
+    const pesados = [];
+    PASSOS.forEach((passo, i) => { if (OPERACOES_PESADAS.has(passo?.[0])) pesados.push(i); });
+    for (const i of pesados.slice(-PONTOS_NO_FIM)) pontosDeMemoria.add(i);
+    const anterior = memoria.ultimaCadeia;
+    if (anterior) {
+      let divergencia = 0;
+      while (divergencia < chavesDoPrefixo.length && divergencia < anterior.length && chavesDoPrefixo[divergencia] === anterior[divergencia]) divergencia += 1;
+      if (divergencia < chavesDoPrefixo.length) for (let i = divergencia - 1; i >= 0; i -= 1) if (OPERACOES_CARAS.has(PASSOS[i]?.[0])) { pontosDeMemoria.add(i); break; }
+    }
+    memoria.ultimaCadeia = chavesDoPrefixo;
+  }
+  let inicio = 0;
+  if (chavesDoPrefixo) {
+    for (let k = PASSOS.length - 1; k >= 0; k -= 1) {
+      const ponto = memoria.buscar(chavesDoPrefixo[k]);
+      if (!ponto) continue;
+      const estado = copiarEstado(ponto.estado);
+      if (estado) { Object.assign(st, estado); inicio = k + 1; memoria.estatisticas.restaurados += 1; }
+      break;
+    }
+  }
   PASSOS.forEach((passo, i) => {
+    if (i < inicio) return;
     const [op, args = {}] = passo;
     const registro = OPCOES.registroOperacoes ?? REGISTRO_OPERACOES;
     if (!registro || typeof registro.resolver !== 'function') throw new Error('oficina: registro de operações inválido');
     const registrada = registro.resolver(op);
-    if (!registrada) { grita(st, i, op, null, `operação desconhecida '${op}'`); return; }
+    if (!registrada) {
+      const nomes = registro.listar().map((o) => o.nome);
+      const proximos = nomesProximos(String(op), nomes);
+      const dica = proximos.length ? ` Você quis dizer ${proximos.map((n) => `'${n}'`).join(' ou ')}?` : '';
+      grita(st, i, op, null, `operação desconhecida '${op}'.${dica} O registro tem: ${nomes.join(', ')}`);
+      return;
+    }
     if (argumentoDesconhecido(st, i, op, args, registrada)) return;
+    if (argumentosEssenciais(st, i, op, args, registrada)) return;
     const fn = registrada.executar;
     /* POSE DE CRIAÇÃO (A-4/O-7): `em` e `eixo` são lidos AQUI, no despacho, e
        não dentro de cada gerador. Oito geradores implementando a mesma
@@ -3668,7 +3749,7 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
     let antesF = retrato?.F ?? retratarEntradas(st.F, null);
     retrato = null;
     const antesPortas = new Set(st.portas.keys()), antesPartes = new Set(Object.keys(st.partes));
-    const pose = lerPoseDeCriacao(st, i, op, args);
+    const pose = comPassoNoErro(i, op, args, () => lerPoseDeCriacao(st, i, op, args));
     if (pose === undefined) return;          // inválida: já gritou, nada construído
     const antes = pose ? new Set(st.V.keys()) : null;
     const escrita = modoRetrato === 'completo' || registrada.executar !== OPS[registrada.nome] ? undefined : ESCRITA_DAS_OPERACOES[registrada.nome];
@@ -3676,7 +3757,7 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
     st.novosV = escrita?.V === 'acrescenta' ? [] : null;
     st.novosF = escrita?.F === 'acrescenta' ? [] : null;
     if (fn.nativaModelar) { try { const contexto = contextoNativo(st, i, { leitura: (registrada.artefatos?.entra ?? []).length > 0, op: registrada.nome }); fn(contexto, args); contexto.publicar(); } catch (erro) { grita(st, i, op, null, `extensão nativa recusou: ${erro.message}`); return; } }
-    else fn(st, args, i);
+    else comPassoNoErro(i, op, args, () => fn(st, args, i));
     if (pose) aplicarPoseDeCriacao(st, antes, pose);
     const { alvosF, novosV, novosF } = st;
     st.alvosF = st.novosV = st.novosF = null;
@@ -3714,6 +3795,10 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
         partes: Object.keys(st.partes).filter((id) => !antesPartes.has(id)).sort(),
       },
     });
+    if (chavesDoPrefixo && pontosDeMemoria.has(i)) {
+      const estado = copiarEstado(Object.fromEntries(Object.entries(st).filter(([campo, valor]) => !CAMPOS_FORA_DA_MEMORIA.has(campo) && typeof valor !== 'function')));
+      if (estado) memoria.guardar(chavesDoPrefixo[i], i, estado); else memoria.estatisticas.recusados += 1;
+    }
   });
   aplicarHierarquiaDasPartes(st);
   /* a cópia no lugar que nenhum passo consumiu nem mexeu é uma casca dupla em cima da fonte */

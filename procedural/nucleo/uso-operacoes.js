@@ -94,6 +94,39 @@ export function criarContratoUsoOperacao(nome, {
   });
 }
 
+/* Confere os argumentos de um passo contra os essenciais do contrato. Devolve a lista de recusas `{ campo, motivo }`, cada uma
+   com o passo, o valor e o limite; `resolver` resolve o número do jeito do núcleo (nome de PARAMS, expressão) e pode lançar. */
+export function recusasDeEssenciais(nome, args, contrato, resolver, passo = null) {
+  const onde = passo === null ? `'${nome}'` : `passo ${passo} ('${nome}')`;
+  const presente = (campo) => args[campo] !== undefined && args[campo] !== null;
+  const recusas = [];
+  for (const entrada of contrato?.essenciais ?? []) {
+    if (entrada.some(presente)) continue;
+    const campo = entrada[0];
+    const quais = entrada.length > 1 ? `um destes: ${entrada.map((c) => `'${c}'`).join(', ')}` : `'${campo}'`;
+    recusas.push({ campo, motivo: `${onde}: falta o argumento essencial ${quais}; sem ele a forma não existe, e a operação não assume um padrão` });
+  }
+  for (const campo of contrato?.positivos ?? []) {
+    if (!presente(campo)) continue;
+    let valor;
+    try { valor = resolver(args[campo]); } catch { continue; } /* o resolvedor recusa com a própria mensagem, adiante */
+    if (!(valor > 0)) recusas.push({ campo, motivo: `${onde}: '${campo}' vale ${JSON.stringify(args[campo])}${typeof args[campo] === 'number' ? '' : ` (= ${valor})`}, e precisa ser maior que 0` });
+  }
+  for (const campo of contrato?.diferentesDeZero ?? []) {
+    if (!presente(campo)) continue;
+    let valor;
+    try { valor = resolver(args[campo]); } catch { continue; }
+    if (valor === 0) recusas.push({ campo, motivo: `${onde}: '${campo}' vale ${JSON.stringify(args[campo])}${typeof args[campo] === 'number' ? '' : ` (= ${valor})`}, e precisa ser diferente de 0 (negativo vale, e espelha a forma no eixo)` });
+  }
+  for (const [campo, minimo] of Object.entries(contrato?.minimos ?? {})) {
+    if (!presente(campo)) continue;
+    let valor;
+    try { valor = resolver(args[campo]); } catch { continue; }
+    if (!(valor >= minimo)) recusas.push({ campo, motivo: `${onde}: '${campo}' vale ${JSON.stringify(args[campo])}${typeof args[campo] === 'number' ? '' : ` (= ${valor})`}, abaixo do mínimo de '${nome}', que é ${minimo}` });
+  }
+  return recusas;
+}
+
 const idLegado = ['id', 'idLegado', 'Base de IDs do passo para compatibilidade; prefira origemId.'];
 const origemId = ['origemId', 'origemId', 'Identidade estrutural publicada pela operação.'];
 const em = ['em', 'vetor3', 'Translação aplicada somente ao que este gerador criou.'];
@@ -106,7 +139,7 @@ const origemTopo = { op: 'cubo', id: 1, face: 'topo' };
 const definicoes = {
   cubo: {
     intencao: 'Criar uma caixa retangular apoiada em y=0.',
-    campos: { [idLegado[0]]: idLegado.slice(1), [origemId[0]]: origemId.slice(1), lado: ['escalar', 'Atalho para largura, altura e profundidade.'], larg: ['escalar', 'Largura em x.'], alt: ['escalar', 'Altura em y.'], prof: ['escalar', 'Profundidade em z.'], [em[0]]: em.slice(1) },
+    campos: { [idLegado[0]]: idLegado.slice(1), [origemId[0]]: origemId.slice(1), lado: ['escalar', 'Atalho para largura, altura e profundidade.'], larg: ['escalar', 'Largura em x.'], alt: ['escalar', 'Altura em y.'], prof: ['escalar', 'Profundidade em z. Negativa espelha o cubo em z (as faces ficam para dentro); zero é recusado.'], [em[0]]: em.slice(1) },
     passos: [['cubo', { lado: 1 }]], limites: ['Produz seis faces nominais; dimensões não devem ser degeneradas.'],
   },
   cilindro: {
@@ -140,7 +173,7 @@ const definicoes = {
   },
   lathe: {
     intencao: 'Revolucionar perfil [raio,y] em torno de um eixo.',
-    campos: { [idLegado[0]]: idLegado.slice(1), [origemId[0]]: origemId.slice(1), perfil: ['lista', 'Ao menos dois pontos [raio,y] ou [raio,y,concordancia]. Com furos ou deslocar, o contorno externo da seção.'], lados: ['inteiro', 'Resolução da revolução.'], segmentosCurva: ['inteiro', 'Discretização das concordâncias.'], furos: ['lista', 'Furos da seção: cada um é uma lista de pontos [raio,y], {retangulo: {largura, profundidade, centro?, cantos?}} ou {circulo: {raio, centro?}}, com o centro em [raio,y]. Inteiros dentro da seção.'], deslocar: ['objeto', "Desloca o contorno da seção: {para: 'dentro'|'fora', distancia, canto: 'redondo'|'reto'|'esquadria', limite?}. Dentro recua o externo e aumenta os furos."], segmentosArco: ['inteiro', 'Segmentos por quarto de volta nos círculos e nos cantos redondos (padrão 4).'], segmentosSpline: ['inteiro', 'Segmentos por vão de spline de um furo escrito como {contorno} (padrão 8).'], superficie: ['booleano', 'true declara a casca aberta de propósito: sem ele, a polilinha que não toca o eixo nas duas pontas nem volta ao primeiro ponto é recusada.'], [em[0]]: em.slice(1), [eixoCriacao[0]]: eixoCriacao.slice(1) },
+    campos: { [idLegado[0]]: idLegado.slice(1), [origemId[0]]: origemId.slice(1), perfil: ['lista', 'Ao menos dois pontos [raio,y] ou [raio,y,concordancia]. Com furos ou deslocar, o contorno externo da seção. Com espessura, a parede de fora.'], espessura: ['escalar', 'Casca de revolução: o perfil é a parede de FORA (polilinha aberta) e a operação gera a de dentro, deslocada por esta espessura para o lado do volume que o perfil e o eixo fecham, com o sentido decidido por ela. Maior que zero; não vale com furos, deslocar nem superficie.'], lados: ['inteiro', 'Resolução da revolução.'], segmentosCurva: ['inteiro', 'Discretização das concordâncias.'], furos: ['lista', 'Furos da seção: cada um é uma lista de pontos [raio,y], {retangulo: {largura, profundidade, centro?, cantos?}} ou {circulo: {raio, centro?}}, com o centro em [raio,y]. Inteiros dentro da seção.'], deslocar: ['objeto', "Desloca o contorno da seção: {para: 'dentro'|'fora', distancia, canto: 'redondo'|'reto'|'esquadria', limite?}. Dentro recua o externo e aumenta os furos."], segmentosArco: ['inteiro', 'Segmentos por quarto de volta nos círculos e nos cantos redondos (padrão 4).'], segmentosSpline: ['inteiro', 'Segmentos por vão de spline de um furo escrito como {contorno} (padrão 8).'], superficie: ['booleano', 'true declara a casca aberta de propósito: sem ele, a polilinha que não toca o eixo nas duas pontas nem volta ao primeiro ponto é recusada.'], [em[0]]: em.slice(1), [eixoCriacao[0]]: eixoCriacao.slice(1) },
     obrigatorios: ['perfil'], passos: [['lathe', { perfil: [[0.3, 0], [0.3, 1]], lados: 8, superficie: true }]],
     precondicoes: ['Perfil precisa ter ao menos dois pontos e raios não negativos.', 'A polilinha precisa tocar o eixo (raio 0) nas duas pontas ou voltar ao primeiro ponto; senão é recusada, a menos de furos: [] (seção fechada pelo eixo) ou superficie: true (casca aberta declarada).'],
     limites: ['Com furos ou deslocar o perfil é o contorno externo de uma SEÇÃO fechada (o fecho pelo eixo é implícito) e cada contorno do resultado vira um laço; as faixas se enfileiram: o externo e depois os furos, na ordem canônica de perfil2d.js. Raio negativo, furo que encosta na borda e deslocamento que apaga a seção são recusados com campo e valor.'],
@@ -220,7 +253,7 @@ const definicoes = {
   solido: { intencao: 'Marcar faces para renderização sólida.', campos: { [selecao[0]]: selecao.slice(1), [faces[0]]: faces.slice(1) }, passos: cuboBase([['solido', { faces: [1] }]]) },
   liso: { intencao: 'Marcar faces para sombreamento liso.', campos: { [selecao[0]]: selecao.slice(1), [faces[0]]: faces.slice(1), angulo: ['escalar', 'Ângulo limite em graus: quina mais fechada que ele fica nítida, como o smooth by angle do Blender. Sem ele, suaviza tudo o que toca o vértice.'] }, passos: cuboBase([['liso', { faces: [1] }]]) },
   material: { intencao: 'Associar faces a um material declarado em MATERIAIS.', campos: { [selecao[0]]: selecao.slice(1), [faces[0]]: faces.slice(1), usa: ['texto', 'Nome exato em MATERIAIS.'] }, obrigatorios: ['usa'], passos: cuboBase([['material', { faces: [1], usa: 'teste' }]]), materiais: { teste: { cor: '#ffffff' } }, precondicoes: ['O material precisa existir em MATERIAIS.'] },
-  parte: { intencao: 'Nomear faces como parte semântica e declarar hierarquia opcional.', campos: { [selecao[0]]: selecao.slice(1), [faces[0]]: faces.slice(1), nome: ['texto', 'Identidade persistida da parte.'], pai: ['texto', 'Parte-pai já declarada.'], pivo: ['vetor3', 'Pivô explícito.'], substituir: ['booleano', 'Literal true permite reatribuição intencional.'] }, obrigatorios: ['nome'], passos: cuboBase([['parte', { faces: [1], nome: 'corpo' }]]), precondicoes: ['Uma face pertence a no máximo uma parte, salvo substituir:true explícito.'] },
+  parte: { intencao: 'Nomear faces como parte semântica e declarar hierarquia opcional.', campos: { [selecao[0]]: selecao.slice(1), [faces[0]]: faces.slice(1), nome: ['texto', 'Identidade persistida da parte.'], pai: ['texto', 'Parte-pai já declarada.'], pivo: ['vetor3', 'Pivô explícito.'], substituir: ['booleano', 'Literal true permite reatribuição intencional.'], material: ['texto', 'Material declarado em MATERIAIS, aplicado às mesmas faces; equivale a um passo material com a mesma seleção.'] }, obrigatorios: ['nome'], passos: cuboBase([['parte', { faces: [1], nome: 'corpo' }]]), precondicoes: ['Uma face pertence a no máximo uma parte, salvo substituir:true explícito.'] },
   friso: {
     intencao: 'Desenhar nervura, tubo ou friso de perfil declarado ao longo de uma linha nomeada da chapa ou de uma polilinha, ou a aba que dobra a borda livre de um vão.',
     campos: { [origemId[0]]: origemId.slice(1), linha: ['objeto', "Linha nomeada {nome, pontos}. Com superficie, pontos são nomes de ponto da gaiola em sequência ao longo das arestas, como no vinco; sem ela, nomes de ponto de PARAMS/TOPO ou [x,y,z]. Repita o primeiro ponto no fim para fechar a volta. Numa gaiola por gaiolaPorRede, linha(curva, de, ate) dá os nomes ao longo de uma curva nomeada (a fechada inteira, com o primeiro repetido no fim)."], superficie: ['origem', "Origem {op:'subdivisao', id} de um passo anterior: a linha segue os vértices da malha dele sobre as arestas da gaiola (no ponto limite quando ele tem medidas), e v segue a normal da face de fora da chapa. Ou {op:'aberturaPorContorno', id}: a linha é a borda de fora do vão inteira, com linha só { nome }, e v segue a normal da pele em volta."], normal: ['vetor3', 'Só na polilinha, sem superficie: a direção para onde v aponta em todos os pontos.'], perfil: ['forma2d', 'Perfil [u, v] em metros: v pela normal, com v = 0 na linha, e u para a esquerda de quem segue a linha; lista de pontos, {retangulo: {largura, profundidade, centro?, cantos?}}, {circulo: {raio, centro?}} ou {contorno}. Na chapa com espessura, a parte de v negativo entra nela, menos que a espessura.'], refinar: ['inteiro', "Só sobre a superficie de um passo subdivisao: níveis a mais, de 0 (padrão) a 4, em que a linha segue a curva da borda livre da superfície limite. A linha de hoje passa pelos vértices da malha da chapa, e o canto arredondado de um vão sai em poucos segmentos retos (a 2 níveis, cerca de 25 graus entre trechos num canto de janela); com `refinar: 2` a linha é a B-spline da borda refinada mais 2 níveis, com os mesmos pontos e normais interpolados pela mesma regra (os cantos declarados e as pontas da linha aberta ficam fixos). Só serve à borda livre de um vão ou do contorno, pelos nomes da gaiola (bordaDoVao), e a linha segue a malha que o passo entregou, pose incluída."], aba: ['objeto', "Em vez de perfil, só sobre a superficie: a aba que dobra a borda livre da chapa para dentro, {largura, angulo, raio} em metros e graus, os três obrigatórios. A linha é a borda de um vão ou do contorno, pelos nomes da gaiola (bordaDoVao da gaiolaPorEstacoes dá a de um vão, e a abertura dele quando o vão tem anéis), em qualquer sentido: o passo acha o lado da chapa. largura é a perna reta depois da dobra, angulo quanto a chapa gira (90 deixa a aba perpendicular) e raio o da face de dentro da dobra, com raio + espessura na de fora; na chapa sem espessura a aba sai PELE, uma superfície aberta sem tampas e sem espessura própria, e raio é o da própria pele. A dobra começa na linha e se estende raio + espessura para o lado do vão. As faces saem lisas a 30 graus, e a dobra, a ponta e a espessura ficam vivas."], ponta: ['textoOuLista', "'aberta' (padrão: tampa plana), 'fechada' (o perfil encolhe em quarto de elipse até um ponto da linha) ou [inicio, fim]; a volta fechada não tem ponta."], fechamento: ['escalar', "Com ponta 'fechada': o comprimento ao longo da linha em que o perfil encolhe; o padrão é a largura do perfil."], segmentosArco: ['inteiro', 'Segmentos por quarto de volta no círculo e nos cantos arredondados do perfil (padrão 4).'], variacao: ['objeto', "A largura (e o ângulo da aba) como função da posição ao longo da linha, por pontos nomeados dela: {largura: [{ponto, valor}, {ponto, antes, depois}], angulo: [...]}, em metros e graus. Entre dois pontos citados o valor anda em reta pelo comprimento de arco; antes do primeiro e depois do último fica o do ponto, e na volta fechada a função dá a volta. Com perfil, largura é a extensão em u do perfil, que escala em u; com aba, largura é a perna reta e angulo o giro da dobra, e os dois mudam por rampa. antes e depois (o degrau de largura entre dois trechos) só valem num canto vivo da linha, a partir de 10 graus de giro, e só com perfil: as duas faixas se cortam no plano que passa pelo ponto, pela normal e pelo encontro das duas bordas de fora (a meia-esquadria), e a junta é um anel só, soldado, sem entalhe nem furo. Sem variacao a malha é a mesma de sempre."] },
@@ -326,6 +359,60 @@ const definicoes = {
       'gaiolaVarrida (procedural/nucleo/gaiola-varrida.js) monta a gaiola de uma seção [u, v], em mm, varrida ao longo de um trilho de segmentos de reta e arco (ou polilinha): as estações são cortes por distância, por fração, por altura ou por cilindro, a ponta pode ser cortada numa altura, o alargamento combina pelo máximo uma segunda superfície em volta de um cilindro, a borda de baixo pode ser rolada, o topo fica aberto e remover tira células pelo nome; devolve vertices, faces, vincos, cantos e pontos (em metro) no formato do passo, e dado ruim grita com o campo.',
       'gaiolaPorRede (procedural/nucleo/gaiola-por-rede.js) monta a gaiola de curvas de feição nomeadas, em mm, e dos retalhos de três a oito lados que elas fecham: as arestas seguem as curvas, o interior é Coons alisado pela normal, os retalhos de três e cinco lados têm um centro extraordinário declarado, a curva vinco vira vinco nomeado e linha(curva) dá a linha nomeada do friso; a curva precisa passar por nós declarados, e a densidade sai de um passo e das divisões que o retalho declara.', 'Vinco e canto por índice gritam com a forma nomeada; par de pontos do vinco que não é aresta da gaiola, ponto inexistente e nome de vinco repetido gritam com os nomes.', 'As faces saem lisas a 30 graus com quebra de sombra nos vincos vivos (face.quebras, que a bancada respeita); o rasterizador das vistas da receita desenha toda face chapada.', 'Com espessura, a espessura que passa do raio de curvatura local do lado do material grita com os pontos nomeados mais perto; no vinco vivo esse raio é a largura da faixa de faces ao lado dele e cai pela metade a cada nível. Partes distantes da chapa a menos de uma espessura uma da outra não são conferidas.'] },
 };
+
+/* ARGUMENTOS ESSENCIAIS por operação, em tabela fora do contrato de uso (o contrato entra na assinatura do registro e no
+   catálogo gerado). `essenciais`: cada entrada é um campo, ou uma lista de campos dos quais ao menos um precisa vir; a recusa
+   de ausência só vale para argumento SEM padrão. As primitivas têm padrão travado em teste (`raio` 0,5, `altura` 1, `lado` 1,
+   `lados` 8...), então declaram em `comPadrao` o que tem padrão e não recusam a ausência. `positivos`: campos numéricos que,
+   quando VÊM, precisam ser maiores que zero; é o que o despacho recusa. `semEssenciais`: o motivo de a operação não ter nenhum.
+   `prof` do cubo é `diferentesDeZero`, e não positivo, porque o passo 21 de `carro-esportivo-sedan` escreve `prof` negativo (cubo
+   espelhado em z, que não dá o mesmo neutro com `prof` positivo). `minimos`: o menor valor que o campo aceita quando vem (`lados` 3). `tools/gates/argumentos-essenciais.mjs` confere que toda operação do núcleo
+   sem argumento obrigatório de schema aparece aqui. */
+const ESSENCIAIS = {
+  cubo: { comPadrao: { lado: 1, larg: 1, alt: 1, prof: 1 }, positivos: ['lado', 'larg', 'alt'], diferentesDeZero: ['prof'] },
+  cilindro: { comPadrao: { raio: 0.5, altura: 1, lados: 8 }, positivos: ['raio', 'altura'], minimos: { lados: 3 } },
+  esfera: { comPadrao: { raio: 0.5, aneis: 6, lados: 8 }, positivos: ['raio'], minimos: { aneis: 2, lados: 3 } },
+  cone: { comPadrao: { raio: 0.5, altura: 1, lados: 8 }, positivos: ['raio', 'altura'], minimos: { lados: 3 } },
+  plano: { comPadrao: { largura: 1, profundidade: 1, seg: 1 }, positivos: ['largura', 'profundidade'], minimos: { seg: 1 } },
+  chamferBox: { comPadrao: { lado: 1, larg: 1, alt: 1, prof: 1, chanfro: 0.1 }, positivos: ['lado', 'larg', 'alt', 'prof', 'chanfro'] },
+  moveV: { semEssenciais: 'o vértice ausente é recusado pela própria operação; `d` ausente é deslocamento zero, lei do moveV/moveF/moveA travada em tools/oficina/oficina.test.ts' },
+  extruda: { semEssenciais: 'a face ausente é recusada pela própria operação; `dist` ausente vale 0, padrão antigo que as receitas podem usar' },
+  mescla: { semEssenciais: 'o destino ausente é recusado pela própria operação (destino inexistente), e sem origens a mescla não faz nada' },
+  moveF: { semEssenciais: 'a face ausente é recusada pela própria operação; `d` ausente é deslocamento zero, lei do moveV/moveF/moveA' },
+  moveA: { semEssenciais: 'a aresta ausente é recusada pela própria operação; `d` ausente é deslocamento zero, lei do moveV/moveF/moveA' },
+  vira: { semEssenciais: 'a face ausente é recusada pela própria operação (face inexistente)' },
+  apagaFace: { semEssenciais: 'a face ausente é recusada pela própria operação (face inexistente)' },
+  displace: { semEssenciais: 'amplitude, frequencia e semente têm padrão documentado (0,1; 1; 0)' },
+  transladar: { semEssenciais: '`d` ausente é translação zero, lei do transladar travada em tools/oficina/oficina.test.ts; `por` e outras chaves erradas já são recusadas como argumento desconhecido' },
+  pincel: { semEssenciais: 'sem sel pinta tudo, e sem cor limpa a cor; ambos são usos válidos' },
+  solido: { semEssenciais: 'sem sel marca todas as faces, que é o uso comum' },
+  liso: { semEssenciais: 'sem sel e sem angulo liga o sombreamento liso em todas as faces, que é o uso comum' },
+};
+
+for (const [nome, { essenciais = [], positivos = [], comPadrao = {}, diferentesDeZero = [], minimos = {}, semEssenciais = null }] of Object.entries(ESSENCIAIS)) {
+  const campos = definicoes[nome]?.campos ?? {};
+  for (const campo of [...essenciais.flat(), ...positivos, ...diferentesDeZero, ...Object.keys(minimos), ...Object.keys(comPadrao)]) {
+    if (!Object.hasOwn(campos, campo)) throw new TypeError(`essenciais de '${nome}' cita o campo '${campo}', que não está nos campos`);
+  }
+  if (semEssenciais && (essenciais.length || positivos.length)) throw new TypeError(`'${nome}' declara essenciais e diz que não tem`);
+}
+
+/** Os essenciais de uma operação do núcleo, ou null quando a tabela não a conhece. A forma é `{ essenciais, positivos, comPadrao, semEssenciais }`, com as entradas de `essenciais` sempre em lista. */
+export function essenciaisDaOperacao(nome) {
+  const bruto = Object.hasOwn(ESSENCIAIS, nome) ? ESSENCIAIS[nome] : null;
+  if (!bruto) return null;
+  return congelar({
+    essenciais: (bruto.essenciais ?? []).map((entrada) => (Array.isArray(entrada) ? [...entrada] : [entrada])),
+    positivos: [...(bruto.positivos ?? [])],
+    comPadrao: { ...(bruto.comPadrao ?? {}) },
+    diferentesDeZero: [...(bruto.diferentesDeZero ?? [])],
+    minimos: { ...(bruto.minimos ?? {}) },
+    semEssenciais: bruto.semEssenciais ?? null,
+  });
+}
+
+/** Os nomes das operações que a tabela cobre, para o gate. */
+export function operacoesComEssenciais() { return Object.keys(ESSENCIAIS); }
 
 const contratos = Object.fromEntries(Object.entries(definicoes).map(([nome, definicao]) => [
   nome,

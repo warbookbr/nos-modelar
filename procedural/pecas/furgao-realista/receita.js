@@ -898,6 +898,7 @@ export function gerarPassos(T) {
    A continuação escura do alargamento é parte da saia e dos para-choques, na mesma malha: eles vão até a boca do arco, cobrem a aba (4 mm de altura) e
    sobem no alargamento, e a moldura da cor da lataria assenta no topo deles. A moldura passa 2 mm ou mais acima da aba; só a parede dela na boca,
    de 0 a 3 mm do arco, encosta na raiz da aba. Nenhuma peça toca o pneu. */
+/* Os contatos com `penetracaoMaxima` são embutidos de propósito, medidos em 2026-11-14: o valor é o quanto a parte entra no vizinho, em metro, arredondado para cima em uma casa significativa. */
 export const CONTATOS = [
   ...ABAS_DOS_VAOS.map((a) => ({ par: ['carroceria', a], motivo: 'a aba nasce na parede da borda do vão e continua a chapa dobrada para dentro; as malhas se cruzam por décimos de milímetro na costura' })),
   ...ABAS_DOS_ARCOS.map((a) => ({ par: ['carroceria', a], motivo: 'a aba do arco assenta na lateral em volta do arco da roda e entra meia espessura na chapa, que é o contato dela' })),
@@ -905,8 +906,8 @@ export const CONTATOS = [
   ...BASES_DO_RETROVISOR.map((b) => ({ par: ['carroceria', b], motivo: 'a base do retrovisor é uma placa de plástico preto sobre a lateral, 3 mm para fora, que entra 1 mm na chapa e cobre a fresta da porta onde ela passa por baixo' })),
   ...BASES_DO_RETROVISOR.map((b, k) => ({ par: [b, BORRACHAS[1 + k]], motivo: 'a base cobre 6 mm da borracha da janela, na vertical de trás dela, e o preto continua da moldura para a base sem chapa no meio' })),
   ...RETROVISORES.flatMap((r, k) => [
-    { par: [r.estrutura, BASES_DO_RETROVISOR[k]], motivo: 'o relevo abaulado da estrutura assenta na face de fora da base preta e entra 4 mm nela, sem fresta' },
-    { par: ['carroceria', r.estrutura], motivo: 'o relevo da estrutura passa da base preta (3 mm de altura) e entra 1 mm na chapa, sem fresta, onde ela é mais estreita' },
+    { par: [r.estrutura, BASES_DO_RETROVISOR[k]], motivo: 'o relevo abaulado da estrutura assenta na face de fora da base preta e entra 4 mm nela, sem fresta', penetracaoMaxima: 0.009 },
+    { par: ['carroceria', r.estrutura], motivo: 'o relevo da estrutura passa da base preta (3 mm de altura) e entra 1 mm na chapa, sem fresta, onde ela é mais estreita', penetracaoMaxima: 0.006 },
     { par: [r.estrutura, r.pisca], motivo: 'a lente do pisca é o pedaço da carcaça cortado no canto de baixo de fora, e a estrutura a envolve' },
     { par: [r.estrutura, r.plano], motivo: 'o espelho plano assenta no rebaixo da frente da carcaça, 5 mm abaixo da borda' },
     { par: [r.estrutura, r.convexo], motivo: 'o espelho convexo assenta no rebaixo da frente da carcaça, 5 mm abaixo da borda' },
@@ -938,18 +939,18 @@ export const CONTATOS = [
      as conchas ficam a 16 mm do lado de dentro do vão e as duas se afastam 8 mm uma da outra, e por isso o aro e as conchas não se tocam */
   ...FAROL_POR_DENTRO.flatMap(([luz, conchas, [lampadas, copo, carcaca]]) => [
     ...conchas.map((concha) => ({ par: [luz, concha], motivo: 'a borda da concha entra 1 mm na lente de 2 mm, no ponto dela mais à frente do plano de ajuste; o resto da borda fica a até uns 6 mm atrás da lente, que cai como um arco na quina' })),
-    { par: [luz, copo], motivo: 'a borda do copinho da lâmpada de posição entra 1 mm na lente, como a das conchas' },
-    ...conchas.map((concha) => ({ par: [concha, lampadas], motivo: 'o soquete da lâmpada sai 6 mm atrás do fundo da concha, passa por ele e leva o bulbo 12 mm à frente do fundo' })),
+    { par: [luz, copo], motivo: 'a borda do copinho da lâmpada de posição entra 1 mm na lente, como a das conchas', penetracaoMaxima: 0.001 },
+    ...conchas.map((concha) => ({ par: [concha, lampadas], motivo: 'o soquete da lâmpada sai 6 mm atrás do fundo da concha, passa por ele e leva o bulbo 12 mm à frente do fundo', penetracaoMaxima: concha.includes('Alto') ? 0.003 : 0.002 })),
     { par: [luz, carcaca], motivo: 'o topo das paredes da carcaça entra 0,5 mm na lente de 2 mm, pela face de trás, em toda a volta do contorno encolhido 8,1 mm: a caixa fecha o farol por trás da lente' },
-    { par: [carcaca, lampadas], motivo: 'o topo da carcaça entra 1 mm na ponta de trás do soquete que mais fundo vai: é onde a placa se apoia nas lâmpadas' },
+    { par: [carcaca, lampadas], motivo: 'o topo da carcaça entra 1 mm na ponta de trás do soquete que mais fundo vai: é onde a placa se apoia nas lâmpadas', penetracaoMaxima: 0.003 },
   ].filter((c) => c.par[0] !== c.par[1])),
   ...LUZES_POR_DENTRO.flatMap(([luz, refletor, lampadas]) => [
-    { par: [luz, refletor], motivo: 'a borda do refletor assenta 4,8 mm atrás da superfície da chapa, 0,2 mm dentro da face de trás da lente, que é a luz' },
-    ...lampadas.map((lampada) => ({ par: [refletor, lampada], motivo: 'a flange da lâmpada assenta atrás do furo do soquete da capa e o bulbo passa por ele; a de posição assenta no fundo da segunda concavidade' })),
+    { par: [luz, refletor], motivo: 'a borda do refletor assenta 4,8 mm atrás da superfície da chapa, 0,2 mm dentro da face de trás da lente, que é a luz', penetracaoMaxima: 0.002 },
+    ...lampadas.map((lampada) => ({ par: [refletor, lampada], motivo: 'a flange da lâmpada assenta atrás do furo do soquete da capa e o bulbo passa por ele; a de posição assenta no fundo da segunda concavidade', penetracaoMaxima: lampada.includes('LuzDeCanto') ? 0.003 : 0.002 })),
   ]),
   ...LANTERNAS_POR_DENTRO.flatMap(([lentes, refletor, lampadas]) => [
     ...lentes.map((lente) => ({ par: [lente, refletor], motivo: 'a borda de cada concha assenta 4,8 mm atrás da superfície da chapa, 0,2 mm dentro da face de trás da lente da faixa dela; a parede entre duas conchas fica atrás da linha de chapa entre as lentes' })),
-    ...lampadas.map((lampada) => ({ par: [refletor, lampada], motivo: 'a flange da lâmpada assenta atrás do furo do soquete da concha da faixa dela e o bulbo passa por ele' })),
+    ...lampadas.map((lampada) => ({ par: [refletor, lampada], motivo: 'a flange da lâmpada assenta atrás do furo do soquete da concha da faixa dela e o bulbo passa por ele', penetracaoMaxima: 0.002 })),
   ]),
   { par: ['pisoInterior', 'divisoria'], motivo: 'a divisória assenta no piso e entra 1 mm nele' },
   ...BANCOS.map((b) => ({ par: ['pisoInterior', b], motivo: 'o banco assenta no piso e entra 1 mm nele' })),
@@ -957,15 +958,15 @@ export const CONTATOS = [
   ...FORROS.map((forro) => ({ par: ['pisoInterior', forro], motivo: 'o piso assenta no topo do túnel do forro do arco e entra 1 mm nele (a altura do piso é `piso_y` e a do túnel sai de `forro_folga_tunel`, na TABELA); são o único apoio dele, afastado da chapa dos dois lados' })),
   ...FORROS.map((forro) => ({ par: ['carroceria', forro], motivo: 'a aba do forro assenta na face de dentro da chapa em volta do arco, passando 8 mm da boca, e entra 1 mm na parede' })),
   /* os detalhes pequenos (2026-11-09): cada um assenta na peça que o carrega, entrando uma fração de milímetro nela */
-  { par: ['carroceria', ANTENA[0]], motivo: 'o pé da antena assenta no teto da frente, 60 mm atrás da borda do vão do para-brisa, com a base inclinada como o teto e entrando 1,7 mm na chapa de 2 mm, sem passar por ela' },
-  { par: [ANTENA[0], ANTENA[1]], motivo: 'a haste nasce 10 mm dentro do pé, na seção mais alta dele, e sai dele inclinada 10 graus para trás da vertical' },
-  ...MACANETAS.map((alca) => ({ par: ['carroceria', alca], motivo: 'os dois pés da alça assentam na chapa da porta, dentro da placa em anel, e entram 1,5 mm nela' })),
-  ...PLACAS_DAS_MACANETAS.map((placa) => ({ par: ['carroceria', placa], motivo: 'a placa rasa em anel, que faz de conta o rebaixo, assenta na chapa da porta em volta da alça e entra 1,5 mm nela' })),
+  { par: ['carroceria', ANTENA[0]], motivo: 'o pé da antena assenta no teto da frente, 60 mm atrás da borda do vão do para-brisa, com a base inclinada como o teto e entrando 1,7 mm na chapa de 2 mm, sem passar por ela', penetracaoMaxima: 0.002 },
+  { par: [ANTENA[0], ANTENA[1]], motivo: 'a haste nasce 10 mm dentro do pé, na seção mais alta dele, e sai dele inclinada 10 graus para trás da vertical', penetracaoMaxima: 0.01 },
+  ...MACANETAS.map((alca) => ({ par: ['carroceria', alca], motivo: 'os dois pés da alça assentam na chapa da porta, dentro da placa em anel, e entram 1,5 mm nela', penetracaoMaxima: alca.includes('Cabine') ? 0.003 : 0.002 })),
+  ...PLACAS_DAS_MACANETAS.map((placa) => ({ par: ['carroceria', placa], motivo: 'a placa rasa em anel, que faz de conta o rebaixo, assenta na chapa da porta em volta da alça e entra 1,5 mm nela', penetracaoMaxima: placa.includes('Cabine') ? 0.004 : 0.002 })),
   { par: ['parachoqueTraseiro', PONTEIRA], motivo: 'o topo do tubo da ponteira encosta no fundo do para-choque traseiro, onde ele sai da chapa, e entra 1 mm nele; a frente do tubo acaba 5 mm atrás da linha da chapa da traseira e a boca fica 50 mm atrás da face do para-choque' },
   ...SUFIXOS_DAS_RODAS.flatMap((sufixo) => [
     { par: [`pneu${sufixo}`, `aro${sufixo}`], motivo: 'o assento do pneu abraça o barril do aro: a borda de dentro da banda é o raio do assento do aro' },
     { par: [`aro${sufixo}`, `disco${sufixo}`], motivo: 'a chapa da roda sobrepõe o meio da parede do aro' },
-    { par: [`disco${sufixo}`, `cubo${sufixo}`], motivo: 'a chapa da roda sobrepõe o meio da parede do cubo' },
+    { par: [`disco${sufixo}`, `cubo${sufixo}`], motivo: 'a chapa da roda sobrepõe o meio da parede do cubo', penetracaoMaxima: 0.01 },
   ]),
 ];
 
@@ -1068,7 +1069,10 @@ export function pontosDeclarados(T = TABELA) {
 /* Os materiais (plano de materiais realistas, 2026-11-08), com os valores que a pessoa aprovou na peça de prova `tools/fixtures/acervo/materiais-de-prova`. A lataria
    é tinta sólida com verniz no azul de sempre; os vidros claros da frente têm leve tom verde e passam a luz (transmissão); os das portas traseiras são escurecidos; a
    roda é aço pintado de prata acetinado; o pneu tem a banda com o desenho de costelas e o flanco com as marcações, os dois em borracha preta fosca, no eixo x da roda;
-   as lentes levam prismas nas cores de antes; o refletor é espelhado; a saia, os para-choques e as molduras dos arcos são plástico preto acetinado e granulado. */
+   as lentes levam prismas nas cores de antes; o refletor é espelhado; a saia, os para-choques e as molduras dos arcos são plástico preto acetinado e granulado.
+   Em 2026-11-14 a pessoa escolheu, na peça `tools/fixtures/acervo/materiais-do-furgao-opcoes`: borracha de vão fosca com granulado fino (C); grade em plástico acetinado como a saia (B);
+   aro cinza em metal pintado claro (C); lâmpada em vidro leitoso (B); interior em tecido e fosco com granulado (B); espelhos como estavam (A); e a antena e as alças das maçanetas
+   em preto brilhante envernizado (C, o `plasticoBrilhante`). Só materiais mudaram: a malha de cada parte segue idêntica. */
 const LENTE_DE_PRISMAS = { tipo: 'prismas', escala: 6, intensidade: 0.5 };
 /* a aba de uma faixa da lanterna na cor da própria lente, opaca e sem relevo (a lente é translúcida, e a aba é a moldura em volta dela) */
 const abaDaLente = (lente) => ({ tipo: 'liso', cor: lente.cor, aspereza: lente.aspereza, metalicidade: 0 });
@@ -1085,18 +1089,21 @@ const LENTES = {
   lenteLeitosa: { tipo: 'liso', cor: '#e9eceb', mistura: 'transparente', opacidade: 0.7, aspereza: 0.65, metalicidade: 0, relevo: LENTE_DE_PRISMAS },
   lenteVermelha: { tipo: 'liso', cor: '#c4161c', mistura: 'transparente', opacidade: 0.6, aspereza: 0.1, metalicidade: 0.1, relevo: LENTE_DE_PRISMAS },
 };
+const PLASTICO_PRETO = { tipo: 'liso', cor: '#141416', aspereza: 0.5, metalicidade: 0, verniz: 0.6, asperezaDoVerniz: 0.35, relevo: { tipo: 'granulado', escala: 0.4, intensidade: 0.35 } };
 export const MATERIAIS_DO_FURGAO = {
   // tinta sólida com verniz: base de aspereza média e verniz por cima; verniz 0,8 e asperezaDoVerniz 0,12 foram a escolha da pessoa em 2026-11-09, a versão B entre três versões
   azul: { tipo: 'liso', cor: '#3350b0', aspereza: 0.5, metalicidade: 0.05, verniz: 0.8, asperezaDoVerniz: 0.12 },
   // a borracha de vão em volta dos cristais; o pneu tem os seus (`pneuBanda` e `pneuFlanco`)
-  borracha: { tipo: 'liso', cor: '#26262b' },
+  // 2026-11-14, escolha da pessoa na peça `materiais-do-furgao-opcoes` (opção C): fosca com granulado fino
+  borracha: { tipo: 'liso', cor: '#26262b', aspereza: 0.92, metalicidade: 0, relevo: { tipo: 'granulado', escala: 0.8, intensidade: 0.5 } },
   // aço pintado de prata acetinado: metal sob tinta, com um verniz fosco por cima; é o `aco` que a família roda-pneu dá ao aro, ao cubo e ao disco
   aco: { tipo: 'metal', acabamento: 'pintado', cor: '#6f737b', aspereza: 0.32, metalicidade: 0.85, verniz: 0.5, asperezaDoVerniz: 0.35 },
   // a tampinha da lâmpada do farol: o aço escovado de antes
   tampinha: { tipo: 'metal', cor: '#a9adb3', acabamento: 'escovado' },
   // plástico preto acetinado, entre o fosco e o brilhante, com granulado fino: a saia, os para-choques e as molduras dos arcos
-  plastico: { tipo: 'liso', cor: '#141416', aspereza: 0.5, metalicidade: 0, verniz: 0.6, asperezaDoVerniz: 0.35, relevo: { tipo: 'granulado', escala: 0.4, intensidade: 0.35 } },
-  forro: { tipo: 'liso', cor: '#1b1c1f' },
+  plastico: PLASTICO_PRETO,
+  // o interior (2026-11-14, opção B da peça de opções): tecido fosco com granulado no forro e no banco; piso, divisória e painel foscos com granulado fino
+  forro: { tipo: 'tecido', cor: '#1b1c1f', aspereza: 0.95, metalicidade: 0, relevo: { tipo: 'granulado', escala: 1, intensidade: 0.5 } },
   // o para-brisa e os vidros da cabine: claros, com leve tom verde, por transmissão
   vidro: { tipo: 'liso', cor: '#e4f0ee', mistura: 'transparente', opacidade: 0.25, aspereza: 0.03, metalicidade: 0, transmissao: 1, indiceDeRefracao: 1.5, tomDoVidro: '#a8cdbd' },
   // os vidros das portas de trás: escuros como insulfilm: opacos, com verniz para o reflexo (com transmissão, mesmo baixa, o fundo claro da bancada aparecia através deles)
@@ -1104,19 +1111,24 @@ export const MATERIAIS_DO_FURGAO = {
   // o pneu, borracha preta fosca: a banda com o desenho de costelas e o flanco com as marcações em relevo (sem nome de fabricante), a medida principal com 18 mm de altura; o eixo da roda é x
   pneuBanda: { tipo: 'liso', cor: '#1f1f23', aspereza: 0.92, metalicidade: 0, relevo: { tipo: 'bandaDeRodagem', escala: 15, intensidade: 0.8, desenho: 'costelas', eixo: 'x' } },
   pneuFlanco: { tipo: 'liso', cor: '#1f1f23', aspereza: 0.9, metalicidade: 0, relevo: { tipo: 'flanco', escala: 18, intensidade: 1, eixo: 'x' } },
-  piso: { tipo: 'liso', cor: '#2c2d31' },
-  divisoria: { tipo: 'liso', cor: '#5a5d66' },
-  banco: { tipo: 'liso', cor: '#3d4048' },
-  painelEscuro: { tipo: 'liso', cor: '#26272b' },
+  piso: { tipo: 'liso', cor: '#2c2d31', aspereza: 0.9, metalicidade: 0, relevo: { tipo: 'granulado', escala: 0.6, intensidade: 0.45 } },
+  divisoria: { tipo: 'liso', cor: '#5a5d66', aspereza: 0.85, metalicidade: 0, relevo: { tipo: 'granulado', escala: 0.5, intensidade: 0.35 } },
+  banco: { tipo: 'tecido', cor: '#3d4048', aspereza: 0.95, metalicidade: 0, relevo: { tipo: 'granulado', escala: 1.2, intensidade: 0.7 } },
+  painelEscuro: { tipo: 'liso', cor: '#26272b', aspereza: 0.85, metalicidade: 0, relevo: { tipo: 'granulado', escala: 0.5, intensidade: 0.35 } },
   ...LENTES,
   abaLenteVermelha: abaDaLente(LENTES.lenteVermelha),
   abaLenteLeitosa: abaDaLente(LENTES.lenteLeitosa),
   abaLenteAmbar: abaDaLente(LENTES.lenteAmbar),
-  aroCinza: { tipo: 'liso', cor: '#4a4c52', aspereza: 0.6 },
+  // o aro cinza do farol (2026-11-14, opção C): metal pintado cinza claro, com verniz acetinado, a receita do `aco` mais clara
+  aroCinza: { tipo: 'metal', acabamento: 'pintado', cor: '#7b7f87', aspereza: 0.3, metalicidade: 0.85, verniz: 0.5, asperezaDoVerniz: 0.35 },
   // o refletor, cromo claro: com aspereza 0,02 e metalicidade 1 o metal só mostra o que reflete, e na bancada, de frente, não há o que refletir: saía preto
   refletor: { tipo: 'metal', acabamento: 'pintado', cor: '#e8eaed', aspereza: 0.22, metalicidade: 0.75 },
-  lampada: { tipo: 'liso', cor: '#f6f1da', aspereza: 0.35 },
-  grade: { tipo: 'liso', cor: '#1d1e21', aspereza: 0.7 },
+  // a lâmpada do farol (2026-11-14, opção B): vidro leitoso translúcido
+  lampada: { tipo: 'liso', cor: '#f6f1da', mistura: 'transparente', opacidade: 0.55, aspereza: 0.6, metalicidade: 0, verniz: 0.6, asperezaDoVerniz: 0.1 },
+  // a grade (2026-11-14, opção B): plástico preto acetinado e granulado igual ao da saia, na cor da grade
+  grade: { ...PLASTICO_PRETO, cor: '#1d1e21' },
+  // a antena e as alças das maçanetas (2026-11-14, opção C): preto brilhante envernizado; o `plasticoLiso` segue nas outras partes
+  plasticoBrilhante: { tipo: 'liso', cor: '#141416', aspereza: 0.3, metalicidade: 0, verniz: 1, asperezaDoVerniz: 0.05 },
   // os detalhes pequenos (2026-11-09): o plástico preto da saia sem o granulado, que numa haste de 4 mm e numa alça de 40 mm só faria ruído; e o aço do escapamento, o `aco` mais escuro
   plasticoLiso: { tipo: 'liso', cor: '#141416', aspereza: 0.5, metalicidade: 0, verniz: 0.6, asperezaDoVerniz: 0.35 },
   acoEscuro: { tipo: 'metal', acabamento: 'pintado', cor: '#34363b', aspereza: 0.35, metalicidade: 0.85, verniz: 0.5, asperezaDoVerniz: 0.35 },

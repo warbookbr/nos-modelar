@@ -3,10 +3,12 @@
    vive em warbookbr/mecanica e se constrói de lá. */
 import { defineConfig } from 'vite';
 import { resolve } from 'node:path';
+import { realpathSync } from 'node:fs';
 import { execSync } from 'node:child_process';
 import { descreverVersao, lerVersaoPublicada } from './tools/bancadas/versao-publicada.mjs';
 import { semSessaoNoPacote } from './tools/bancadas/sem-sessao-no-pacote.mjs';
 import { avisosDeTerceiros } from './tools/bancadas/avisos-de-terceiros.mjs';
+import { impressaoDasFontes } from './tools/bancadas/impressao-das-fontes.mjs';
 
 /* A versão entra como texto fixo no pacote: a página publicada não tem git para
    consultar, e sem isto quem abre a bancada não sabe se está vendo a construção
@@ -24,11 +26,19 @@ export default defineConfig({
     semSessaoNoPacote({ saida: resolve(import.meta.dirname, 'dist') }),
     /* o pacote leva o texto das licenças das bibliotecas que empacota */
     avisosDeTerceiros({ raiz: import.meta.dirname, saida: resolve(import.meta.dirname, 'dist') }),
+    /* a chave do cache da malha da bancada: hash da receita, do que ela importa e do motor */
+    impressaoDasFontes({ raiz: import.meta.dirname }),
   ],
   /* As cópias de trabalho dos agentes moram em `.claude/worktrees/`, cada uma com
      o repositório inteiro e às vezes com as dependências; sem isto o servidor que
      as capturas sobem varre e observa todas elas, e a partida passa de um minuto. */
-  server: { watch: { ignored: ['**/.claude/**', '**/dist/**'] } },
+  /* Na cópia de trabalho de um agente, `node_modules` é um atalho para o da pasta principal, e o
+     servidor recusava servir o `manifold.wasm` de lá por estar fora da pasta permitida: a captura
+     esperava 90 s e desistia sem dizer a causa. A pasta real das dependências entra na lista. */
+  server: {
+    watch: { ignored: ['**/.claude/**', '**/dist/**'] },
+    fs: { allow: [import.meta.dirname, realpathSync(resolve(import.meta.dirname, 'node_modules'))] },
+  },
   optimizeDeps: { entries: ['**/*.html', '!.claude/**', '!dist/**', '!node_modules/**'] },
   build: {
     outDir: 'dist',

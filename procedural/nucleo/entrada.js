@@ -13,7 +13,9 @@ export { FORMATO_CATALOGO, buscarCapacidades, catalogoDeCapacidades, explicarCap
 export { ErroComposicaoProcedural, FORMATO_COMPOSICAO_PROCEDURAL, FORMATO_EXPANSAO, criarRegistroComposicoes, expandirChamadasDeComposicao, expandirComposicao } from './composicoes.js';
 export { ErroExtensaoNativa, FORMATO_EXTENSAO_NATIVA, criarOperacaoNativa, criarRegistroComExtensoes, diagnosticarExtensaoAusente } from './extensoes.js';
 export { ErroLacunaCapacidade, FORMATO_CLASSIFICACAO_LACUNA, FORMATO_LACUNA_CAPACIDADE, FORMATO_PLANO_CAPACIDADES, classificarLacunaCapacidade, criarLacunaCapacidade, planejarCapacidades, schemaDaLacunaCapacidade } from './lacunas.js';
+export { antiHorario, areaComSinal, espelharMeia, milimetroParaMetro, pontosEmMetro } from './auxiliares/index.js';
 export { adaptarV3 } from './adaptador.js';
 export { avaliarChaves, bindPoseOssos, montarAnimar } from './animacao.js';
 export { colisaoDe, executar } from './executor.js';
+export { criarMemoriaDeExecucao } from './memoria-de-execucao.js';
 export { carregarManifold, manifoldCarregada } from './manifold.js';
