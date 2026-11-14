@@ -32,6 +32,9 @@ export const TABELA = {
   cubo_flange_x: 34,
   cubo_flange_espessura: 5,
   eixo_raio: 6,
+  porca_raio: 10,
+  porca_espessura: 7,
+  ponteira_raio: 16,
   eixo_dianteiro_largura: 100,
   eixo_traseiro_largura: 130,
   raio_diametro: 2.8,
@@ -63,7 +66,7 @@ export const TABELA = {
   tubo_inferior_na_direcao: 405,
   lados_tubo: 24,
   tampa_conica: 0.6,
-  selim_tampa: 4,
+  selim_tampa: 7,
   /* garfo */
   garfo_offset: 45,
   garfo_eixo_a_coroa: 375,
@@ -82,7 +85,7 @@ export const TABELA = {
   mesa_fixacao_comprimento: 48,
   mesa_fixacao_diametro: 40,
   mesa_braco_comprimento: 88,
-  mesa_braco_diametro: 28,
+  mesa_braco_diametro: 36,
   mesa_angulo: 38,
   guidao_largura: 680,
   guidao_diametro: 22,
@@ -105,6 +108,7 @@ export const TABELA = {
   selim_largura: 140,
   selim_espessura: 44,
   selim_cupula: 4,
+  selim_afundamento: 4,
   selim_trilho_curva: 5,
   selim_presilha_a_frente: 22,
   selim_braco_raio: 8,
@@ -125,7 +129,7 @@ export const TABELA = {
   catraca_altura_dente: 3.5,
   corrente_elo_largura: 6,
   corrente_elo_altura: 7.5,
-  corrente_sobreposicao: -3,
+  corrente_sobreposicao: 0.6,
   /* pedivela */
   pedivela_comprimento: 165,
   pedivela_angulo: -8,
@@ -135,8 +139,13 @@ export const TABELA = {
   protetor_raio: 106,
   protetor_x: 52.5,
   protetor_espessura: 4,
-  protetor_raio_interno: 10,
+  protetor_anel_largura: 16,
+  protetor_cubo_raio: 30,
   coroa_aro_radial: 16,
+  coroa_dente_fundo: 3,
+  coroa_dente_largura: 5.5,
+  protetor_janelas: 5,
+  protetor_raio_braco: 7,
   aranha_bracos: 5,
   aranha_braco_raio: 9,
   aranha_cubo_raio: 26,
@@ -242,7 +251,7 @@ export function derivar(T) {
   const centroFixa = naDirecao(fixaCima - 14);
   const mesaA = rad(T.mesa_angulo);
   const guidaoCentro = soma(centroFixa, [0, Math.sin(mesaA) * T.mesa_braco_comprimento, Math.cos(mesaA) * T.mesa_braco_comprimento]);
-  tubo('mesa', 'preto', [centroFixa, soma(centroFixa, esc(menos(guidaoCentro, centroFixa), 0.5)), guidaoCentro], [raioQ(T.mesa_fixacao_diametro) - 2, raioQ(T.mesa_braco_diametro) + 1, raioQ(T.guidao_diametro) + 6], 32);
+  tubo('mesa', 'preto', [centroFixa, soma(centroFixa, esc(menos(guidaoCentro, centroFixa), 0.5)), guidaoCentro], [raioQ(T.mesa_fixacao_diametro) - 2, raioQ(T.mesa_braco_diametro) + 1, raioQ(T.guidao_diametro) + 9], 32);
 
   /* GUIDÃO: caminho riser; x medido do centro, o trecho reto no meio, depois sobe e recua para as pontas */
   const meia = T.guidao_largura / 2 - T.guidao_recuo_da_ponta;
@@ -275,10 +284,11 @@ export function derivar(T) {
     let larg = t < 0.2 ? T.selim_largura * (tr + (1 - tr) * Math.sin((t / 0.2) * Math.PI / 2)) : T.selim_largura * ((1 - T.selim_largura_bico) * (1 - ((t - 0.2) / 0.8) ** 1.4) + T.selim_largura_bico);
     let esp = T.selim_espessura * (1 - 0.35 * t ** 1.3);
     const fecha = (u) => Math.sqrt(Math.max(0.02, 1 - u * u));
-    if (t > 0.9) { const f = fecha((t - 0.9) / 0.1 * 0.97); larg *= f; esp *= f; }
+    if (t > 0.84) { const f = fecha((t - 0.8) / 0.2 * 0.72); larg *= f; esp *= f; }
     if (t < 0.06) { const f = fecha((0.06 - t) / 0.06 * 0.9); larg *= f; esp *= f; }
     const yrel = -esp / 2 + T.selim_cupula * (1 - t) ** 2; /* o topo fica na mesma altura; a barriga sobe para o nariz */
-    return { larg, esp, yrel };
+    const afunda = T.selim_afundamento * Math.sin(Math.PI * Math.min(1, Math.max(0, (t - 0.08) / 0.7))) ** 1.5;
+    return { larg, esp, yrel, afunda };
   };
   for (let i = 0; i <= nSel; i++) {
     const t = i / nSel;
@@ -319,6 +329,13 @@ export function derivar(T) {
     const f = T.cubo_flange_x;
     const e = T.cubo_flange_espessura;
     torno(parte, 'aco', [[0, -xe], [T.eixo_raio, -xe], [T.eixo_raio, -f - e], [T.cubo_flange_raio, -f - e], [T.cubo_flange_raio, -f], [T.cubo_corpo_raio, -f], [T.cubo_corpo_raio, f], [T.cubo_flange_raio, f], [T.cubo_flange_raio, f + e], [T.eixo_raio, f + e], [T.eixo_raio, xe], [0, xe]], em, { lados: 24, liso: 40 });
+    /* porca de cada ponta do eixo, por fora da ponteira, e a ponteira (pé) que o quadro ou o garfo oferece ao eixo */
+    const rPonta = parte === 'rodaDianteira' ? T.garfo_perna_diametro_ponta / 2 : T.base_diametro / 2;
+    const parteDe = parte === 'rodaDianteira' ? 'garfo' : 'quadro';
+    torno(parte, 'aco', [[0, -xe - rPonta - T.porca_espessura], [T.porca_raio, -xe - rPonta - T.porca_espessura], [T.porca_raio, -xe - rPonta], [T.eixo_raio, -xe - rPonta], [T.eixo_raio, -xe], [0, -xe]], em, { lados: 6, liso: 20 });
+    torno(parte, 'aco', [[0, xe + rPonta + T.porca_espessura], [T.porca_raio, xe + rPonta + T.porca_espessura], [T.porca_raio, xe + rPonta], [T.eixo_raio, xe + rPonta], [T.eixo_raio, xe], [0, xe]], em, { lados: 6, liso: 20 });
+    torno(parteDe, 'aluminio', [[0, -xe - 4], [T.ponteira_raio, -xe - 4], [T.ponteira_raio, -xe + 4], [0, -xe + 4]], em, { lados: 32, liso: 40 });
+    torno(parteDe, 'aluminio', [[0, xe - 4], [T.ponteira_raio, xe - 4], [T.ponteira_raio, xe + 4], [0, xe + 4]], em, { lados: 32, liso: 40 });
     torno(parte, 'aroMetal', [[raioAroInterno, -meiaAro], [raioAssento, -meiaAro], [raioAssento, meiaAro], [raioAroInterno, meiaAro], [raioAroInterno, -meiaAro]], em, { liso: 30 });
     const topoPneu = raioPneu;
     const ombro = T.pneu_altura * 0.45;
@@ -366,7 +383,10 @@ export function derivar(T) {
   /* coroa em aranha: aro dentado, cubo e cinco braços; o protetor é um anel solto no lado de fora, preso por pinos nos braços */
   const eW = T.corrente_elo_largura / 2 + 0.5;
   const rAroIn = rc - T.coroa_aro_radial;
-  torno('pedivela', 'preto', noLado([[rAroIn, xc - eW], [rc + T.coroa_altura_dente, xc - eW], [rc + T.coroa_altura_dente, xc + eW], [rAroIn, xc + eW], [rAroIn, xc - eW]]), bb, { lados: T.dentes_coroa, liso: 25 });
+  const rRaiz = rc - T.coroa_dente_fundo;
+  torno('pedivela', 'preto', noLado([[rAroIn, xc - eW], [rRaiz, xc - eW], [rRaiz, xc + eW], [rAroIn, xc + eW], [rAroIn, xc - eW]]), bb, { lados: T.dentes_coroa * 2, liso: 25 });
+  /* um dente por cubo, repetido em arranja radial em volta do movimento central */
+  itens.push({ k: 'dentes', parte: 'pedivela', material: 'preto', xc: S * xc, larg: 2 * eW, alt: rc + T.coroa_altura_dente - rRaiz, prof: T.coroa_dente_largura, y: yBB + rRaiz - 0.3, z: 0, total: T.dentes_coroa, graus: 360 / T.dentes_coroa, pivo: [S * xc, yBB, 0] });
   torno('pedivela', 'preto', noLado([[0, xc - 3], [T.aranha_cubo_raio, xc - 3], [T.aranha_cubo_raio, xc + 3], [0, xc + 3]]), bb, { lados: 20, liso: 40 });
   const ponto2 = (x, r, fi) => [x, yBB + r * Math.sin(fi), r * Math.cos(fi)];
   for (let k = 0; k < T.aranha_bracos; k++) {
@@ -374,7 +394,16 @@ export function derivar(T) {
     tubo('pedivela', 'preto', [ponto2(S * xc, T.aranha_cubo_raio - 6, fi), ponto2(S * xc, rAroIn + 3, fi)], [raioQ(T.aranha_braco_raio * 2), raioQ(T.aranha_braco_raio * 1.5)], 12);
     tubo('pedivela', 'preto', [ponto2(S * xc, rAroIn + 1, fi), ponto2(S * T.protetor_x, rAroIn + 1, fi)], raioQ(T.aranha_poste_raio * 2), 8);
   }
-  torno('pedivela', 'preto', noLado([[T.protetor_raio_interno, T.protetor_x - T.protetor_espessura / 2], [T.protetor_raio, T.protetor_x - T.protetor_espessura / 2], [T.protetor_raio, T.protetor_x + T.protetor_espessura / 2 + 3], [T.protetor_raio - 6, T.protetor_x + T.protetor_espessura / 2 + 3], [T.protetor_raio - 6, T.protetor_x + T.protetor_espessura / 2], [T.protetor_raio_interno, T.protetor_x + T.protetor_espessura / 2], [T.protetor_raio_interno, T.protetor_x - T.protetor_espessura / 2]]), bb, { lados: 96, liso: 30 });
+  /* protetor com janelas: anel externo com borda, cubo central e braços entre eles; os pinos dos braços da aranha chegam aos braços do protetor */
+  const pa0 = T.protetor_x - T.protetor_espessura / 2;
+  const pa1 = T.protetor_x + T.protetor_espessura / 2;
+  const rIntAnel = T.protetor_raio - T.protetor_anel_largura;
+  torno('pedivela', 'preto', noLado([[rIntAnel, pa0], [T.protetor_raio, pa0], [T.protetor_raio, pa1 + 3], [T.protetor_raio - 5, pa1 + 3], [T.protetor_raio - 5, pa1], [rIntAnel, pa1], [rIntAnel, pa0]]), bb, { lados: 96, liso: 30 });
+  torno('pedivela', 'preto', noLado([[0, pa0], [T.protetor_cubo_raio, pa0], [T.protetor_cubo_raio, pa1 + 2], [0, pa1 + 2]]), bb, { lados: 32, liso: 40 });
+  for (let k = 0; k < T.protetor_janelas; k++) {
+    const fi = rad(T.pedivela_angulo) + (2 * Math.PI * k) / T.protetor_janelas;
+    tubo('pedivela', 'preto', [ponto2(S * T.protetor_x, T.protetor_cubo_raio - 2, fi), ponto2(S * T.protetor_x, rIntAnel + 2, fi)], T.protetor_raio_braco, 12);
+  }
   torno('pedivela', 'aco', noLado([[0, -T.pedivela_braco_x - 8], [T.pedivela_eixo_raio, -T.pedivela_braco_x - 8], [T.pedivela_eixo_raio, T.protetor_x + T.protetor_espessura / 2 + 4], [0, T.protetor_x + T.protetor_espessura / 2 + 4]]), bb, { lados: 16, liso: 40 });
   const pa = rad(T.pedivela_angulo);
   const pedalPts = {};
@@ -432,7 +461,8 @@ export function gerarPassos(T) {
           const th = (2 * Math.PI * i) / n;
           const c = Math.cos(th); const sn = Math.sin(th);
           /* superelipse: acolchoado cheio e de cantos redondos */
-          pts.push([m(Math.sign(c) * Math.abs(c) ** 0.8 * meia), m(Math.sign(sn) * Math.abs(sn) ** 0.8 * (s.esp / 2))]);
+          const xn = Math.sign(c) * Math.abs(c) ** 0.8; /* afundamento do topo: só na metade de cima, mais fundo no eixo do assento */
+          pts.push([m(xn * meia), m(Math.sign(sn) * Math.abs(sn) ** 0.8 * (s.esp / 2) - (sn > 0 ? s.afunda * (1 - xn * xn) * Math.abs(sn) : 0))]);
         }
         return { pos: [0, m(s.y), m(s.z)], contorno: pts };
       });
@@ -495,6 +525,14 @@ export function gerarPassos(T) {
           }
         }
       }
+    } else if (it.k === 'dentes') {
+      const oid = proximo();
+      passos.push(['cubo', { origemId: oid, larg: m(it.larg), alt: m(it.alt), prof: m(it.prof), em: [m(it.xc), m(it.y), m(it.z)] }]);
+      const sel = { origem: { op: 'cubo', id: oid } };
+      marca(it.parte, it.material, sel);
+      const copias = proximo();
+      passos.push(['arranja', { modo: 'radial', total: it.total, graus: it.graus, eixo: 'x', pivo: v(it.pivo), origemId: copias, derivaDe: { op: 'cubo', id: oid }, sel }]);
+      marca(it.parte, it.material, { origem: { op: 'arranja', id: copias, de: { op: 'cubo', id: oid } } });
     } else if (it.k === 'pedal') {
       /* pedal de plataforma: placa maciça com borda levantada e seis pinos, igual nos dois lados */
       const larg = it.x1 - it.x0;
@@ -548,7 +586,7 @@ const receita = {
     aluminioEscuro: { cor: '#2b2e33', metalicidade: 0.6, aspereza: 0.45 },
     aroMetal: { cor: '#3a3d42', metalicidade: 0.7, aspereza: 0.4 },
     preto: { cor: '#1c1d20', metalicidade: 0.1, aspereza: 0.6 },
-    borracha: { cor: '#151618', metalicidade: 0, aspereza: 0.85 },
+    borracha: { cor: '#161616', metalicidade: 0, aspereza: 0.9 },
     aco: { cor: '#9aa0a6', metalicidade: 0.85, aspereza: 0.35 },
   },
   TOPO: { origem: 'chão sob o eixo do movimento central; y para cima, a frente da bicicleta em +z, o lado da corrente (direita da bicicleta) em -x' },
@@ -588,8 +626,8 @@ const receita = {
     return [
       { nome: 'eixo traseiro', parte: 'rodaTraseira', medida: 'centro', em: [0, g.yEixo, g.zEixoTras], toleranciaMm: 1 },
       { nome: 'eixo dianteiro', parte: 'rodaDianteira', medida: 'centro', em: [0, g.yEixo, g.zEixoFrente], toleranciaMm: 1 },
-      { nome: 'topo do pneu dianteiro', parte: 'rodaDianteira', medida: 'maximo', em: [T.eixo_dianteiro_largura / 2, topo, g.zEixoFrente + g.raioPneu], toleranciaMm: 1 },
-      { nome: 'chão sob o pneu traseiro', parte: 'rodaTraseira', medida: 'minimo', em: [-T.eixo_traseiro_largura / 2, topo - 2 * g.raioPneu, g.zEixoTras - g.raioPneu], toleranciaMm: 1 },
+      { nome: 'topo do pneu dianteiro', parte: 'rodaDianteira', medida: 'maximo', em: [T.eixo_dianteiro_largura / 2 + T.garfo_perna_diametro_ponta / 2 + T.porca_espessura, topo, g.zEixoFrente + g.raioPneu], toleranciaMm: 1 },
+      { nome: 'chão sob o pneu traseiro', parte: 'rodaTraseira', medida: 'minimo', em: [-(T.eixo_traseiro_largura / 2 + T.base_diametro / 2 + T.porca_espessura), topo - 2 * g.raioPneu, g.zEixoTras - g.raioPneu], toleranciaMm: 1 },
     ];
   },
   get PASSOS() { return gerarPassos(this.PARAMS); },
