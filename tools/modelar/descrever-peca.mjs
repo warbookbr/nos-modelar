@@ -679,7 +679,11 @@ export async function descreverPecaReutilizavel({
           .join('\n')
         + '\n  Se a parte deve só encostar, a geometria está errada (a alça, o pino ou o tubo passa da face). Se ela entra de propósito (puxador cravado na porta),'
         + '\n  declare `penetracaoMaxima` no contato, na unidade da peça, com o motivo dizendo quanto entra e por quê.\n';
-      falhou = true;
+      /* Reprova só o que passa do `penetracaoMaxima` declarado. Pelo padrão relativo é aviso: no acervo de 2026-11-14 ele
+         acusava uns 300 encaixes embutidos de propósito em 27 peças (eixos de dobradiça, suportes, puxadores), que o guia de
+         modelagem recomenda; o aviso põe a profundidade na frente de quem modela, e a declaração passa a cobrá-la. */
+      if (contatos.atravessados.some(({ penetracao: p }) => p.limiteDeclarado)) falhou = true;
+      else stderr += '  (aviso: nenhum destes pares declara `penetracaoMaxima`; o padrão relativo não reprova)\n';
     }
     /* PARTE SOLTA. Contato não declarado e declarado que não acontece só olham
        pares que se tocam; um grupo de partes que não toca nenhuma das outras

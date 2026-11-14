@@ -123,11 +123,15 @@ describe('contato declarado: tocar não é atravessar', () => {
     }
   });
 
-  it('o descrever sai com código 1 para o tubo que atravessa e 0 para o que só encosta', async () => {
+  it('o descrever avisa o tubo que atravessa sem limite declarado, reprova o que passa do limite declarado e cala o que só encosta', async () => {
     const { descreverPecaReutilizavel } = await import('../../tools/modelar/descrever-peca.mjs');
-    const mal = await descreverPecaReutilizavel({ peca: 'fixture-contato-atravessa', modulo: await import(`${RAIZ_FIXTURES}/fixture-contato-atravessa.js`) });
+    const aviso = await descreverPecaReutilizavel({ peca: 'fixture-contato-atravessa', modulo: await import(`${RAIZ_FIXTURES}/fixture-contato-atravessa.js`) });
+    expect(aviso.codigo).toBe(0);
+    expect(aviso.stderr).toMatch(/UMA PARTE ATRAVESSA A OUTRA/);
+    expect(aviso.stderr).toMatch(/o padrão relativo não reprova/);
+    const mal = await descreverPecaReutilizavel({ peca: 'fixture-contato-atravessa-declarado', modulo: await import(`${RAIZ_FIXTURES}/fixture-contato-atravessa-declarado.js`) });
     expect(mal.codigo).toBe(1);
-    expect(mal.stderr).toMatch(/UMA PARTE ATRAVESSA A OUTRA/);
+    expect(mal.stderr).toMatch(/penetracaoMaxima declarada/);
     const bem = await descreverPecaReutilizavel({ peca: 'fixture-contato-so-encosta', modulo: await import(`${RAIZ_FIXTURES}/fixture-contato-so-encosta.js`) });
     expect(bem.codigo).toBe(0);
   });
