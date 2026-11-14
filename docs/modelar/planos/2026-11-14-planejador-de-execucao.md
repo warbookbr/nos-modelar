@@ -218,7 +218,7 @@ Com a opção `aoRastrear` do núcleo (desligada por padrão, passada por `execu
 
 ### Tempo do furgão realista
 
-Execução de `executarReceita` sozinha, processo novo, três execuções, máquina sem outra carga pesada (nenhum processo de vitest, gates, descrever ou blender de outro agente; carga de um minuto entre 0,85 e 1,45): 66,1 s, 65,6 s e 64,4 s, mediana 65,6 s, contra 118,1 s antes (queda de 44,5%). A meta de menos de 85 s foi cumprida. Os 52 s que sobram de diferença se explicam pelo que a hipótese previa: os rastreios de `rotaciona`, `transladar` e `arranja` (61 s) saíram quase todos. O que resta de rastreio está em `subtrair`, `unir`, `intersectar`, `aberturaPorContorno` (7,3 s no passo todo de 32,9 s), `limparLascas` e `subdivisao`, que pedem uma declaração diferente (criam e apagam faces) e ficam como candidatas de uma fatia seguinte, com a mesma prova.
+Execução de `executarReceita` sozinha, processo novo, três execuções, máquina sem outra carga pesada (nenhum processo de vitest, gates, descrever ou blender de outro agente; carga de um minuto entre 0,85 e 1,45): 66,1 s, 65,6 s e 64,4 s, mediana 65,6 s, contra 118,1 s antes (queda de 44,5%). A meta de menos de 85 s foi cumprida. A economia de 52,5 s é compatível com o que a hipótese previa: os rastreios de `rotaciona`, `transladar` e `arranja` somavam 61 s na execução cronometrada, e saíram quase todos. O que resta de rastreio está em `subtrair`, `unir`, `intersectar`, `aberturaPorContorno` (7,3 s no passo todo de 32,9 s), `limparLascas` e `subdivisao`, que pedem uma declaração diferente (criam e apagam faces) e ficam como candidatas de uma fatia seguinte, com a mesma prova.
 
 ## Riscos e parada
 
