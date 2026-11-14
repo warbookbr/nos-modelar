@@ -15,8 +15,13 @@
  * pega.
  */
 
+/* `referencias/locais/` é ignorada pelo git: a imagem de estudo ali existe só na máquina de quem a trouxe. O glob a encontra quando está
+   no disco e não acha nada no CI; a bancada então oferece o que houver e avisa uma vez da que falta (`imagem-na-cena.js`). */
 const IMAGENS = import.meta.glob(
-  '../../../procedural/pecas/**/referencias/*.{png,jpg,jpeg,webp,svg}',
+  [
+    '../../../procedural/pecas/**/referencias/*.{png,jpg,jpeg,webp,svg}',
+    '../../../procedural/pecas/**/referencias/locais/*.{png,jpg,jpeg,webp,svg}',
+  ],
   { query: '?url', import: 'default', eager: true },
 );
 

@@ -6,6 +6,7 @@
 > algum arquivo-fonte estiver sem cabeçalho.
 
 1872 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1873 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -3133,12 +3134,15 @@
 - `procedencia-check.test.mjs` — Provas do gate N3 para procedência de valores estruturais.
 - `raio-da-aresta.mjs` — raio-da-aresta.mjs — mede o raio de cada aresta de caráter de uma peça, sobre a malha final.
 - `raio-da-aresta.test.mjs` — raio-da-aresta.test.mjs — a medida do raio de uma aresta sobre a malha final, com a verdade conhecida: o cilindro de raio dado entre dois planos (a 90 e a 12…
+- `receita-esqueleto.mjs` — receita-esqueleto.mjs — o esqueleto da receita de uma peça que ainda vai ser alinhada.
+- `receita-esqueleto.test.mjs` — receita-esqueleto.test.mjs — `npm run receita:esqueleto` cria a receita que o alinhamento vai preencher, e o `PLANO` vazio é recusado pelo normalizador até e…
 - `receita-externa.mjs` — Tradutor da receita do externo (repositório externo da pessoa, `externo/receitas/<id>.json`, já expandida pelo `receita.py`) para o esboço do Modelar, e o ca…
 - `receita-externa.test.mjs` — O tradutor da receita do externo: nove receitas reais (as do repositório externo da pessoa, já expandidas), sete sem giro e duas com peças giradas. Cada uma …
 - `reduzir-em-paralelo.mjs` — reduzir-em-paralelo.mjs — `reduzirPorMedia` numa thread à parte, para a captura seguinte não esperar a redução da anterior.
 - `referencia-de-silhueta.mjs` — referencia-de-silhueta.mjs — do contorno de uma imagem ao arquivo de trechos que `silhueta:desvio` lê, em milímetro e nos eixos do modelo.
 - `referencia-de-silhueta.test.mjs` — Um corte cai no vértice do contorno mais perto do pedido, e a ponta de uma quina sai arredondada pelo alisamento do módulo, daí os 3 px nos cortes. A forma c…
 - `referencia-do-plano.test.mjs` — referencia-do-plano.test.mjs — `descrever-peca` confere logo no começo que cada caminho de `PLANO.referencias` existe.
+- `referencia-local.test.mjs` — referencia-local.test.mjs — a imagem de estudo mora em `referencias/locais/`, que o git ignora. Quando ela falta (outra máquina, CI) as ferramentas avisam um…
 - `referencias-do-plano.mjs` — referencias-do-plano.mjs — o que `PLANO.referencias` cita, resolvido em disco.
 - `refinamento-global.mjs` — refinamento-global.mjs — o adaptador de disco do refinamento da forma global.
 - `refinamento-global.test.mjs` — refinamento-global.test.mjs — de ponta a ponta: a receita que declara REFINA passa pelo veredito da peça e pela guarda do acervo. A mesma receita passa intei…

@@ -18,6 +18,7 @@ import { criarPunhoDaImagem } from './punho-da-imagem.js';
 import { criarArmazenamentoImagem } from './armazenamento-imagem.js';
 import { criarAlinhamentoInicial, imagemAoTrocarDePeca, normalizarImagemReferencia } from './imagem-referencia.js';
 import { urlDaReferencia } from './imagens-da-peca.js';
+import { ehReferenciaLocal } from '../../autoria/plano-de-modelagem.js';
 
 function carregarTexturaDoNavegador(url) {
   return new Promise((resolver, rejeitar) => new THREE.TextureLoader().load(url, resolver, undefined, rejeitar));
@@ -35,6 +36,7 @@ export function criarImagemNaCena({
      está na cena; as outras esperam na aba com o último ajuste delas. */
   const imagens = new Map();
   const urlsLocais = new Map();
+  const locaisAvisadas = new Set();
 
   const naCenaId = () => gerenciadorReferencias3D.obterImagemReferencia()?.id ?? null;
 
@@ -177,7 +179,13 @@ export function criarImagemNaCena({
     );
     for (const referencia of ordenadas) {
       const url = urlDaImagemDaPeca(peca, referencia);
-      if (!url) continue;
+      if (!url) {
+        if (ehReferenciaLocal(referencia) && !locaisAvisadas.has(referencia)) {
+          locaisAvisadas.add(referencia);
+          console.warn(`referência local ausente nesta máquina: ${referencia}`);
+        }
+        continue;
+      }
       const id = `${peca}:${referencia}`;
       imagens.set(id, { ...(imagens.get(id) ?? {}), fonte: 'url', id, url, rotulo: referencia, declarada: true });
       refletirImagens();
