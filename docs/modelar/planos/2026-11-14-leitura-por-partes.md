@@ -1,12 +1,14 @@
 # Leitura por partes: a prancha e o esboço conferidos contra a referência, parte por parte
 
-**Estado:** rascunho
+**Estado:** ativo
 
-**Território:** nenhum (aguarda aprovação). Ao ativar: `tools/modelar/leitura-por-regioes.mjs`, `tools/modelar/leitura-por-regioes.test.mjs`, `.claude/skills/desenhar-prancha/SKILL.md`, `.claude/skills/prancha-dos-contornos/SKILL.md`, `.claude/skills/esbocar-opcoes/SKILL.md`, `docs/modelar/usar/CONFERIR-CONTRA-REFERENCIA.md`.
+**Território:** `tools/modelar/leitura-por-regioes.mjs`, `tools/modelar/leitura-por-regioes.test.mjs`, `.claude/skills/desenhar-prancha/SKILL.md`, `.claude/skills/prancha-dos-contornos/SKILL.md`, `.claude/skills/esbocar-opcoes/SKILL.md`, `docs/modelar/usar/CONFERIR-CONTRA-REFERENCIA.md`.
 
 **Responsável:** a IA da sessão do carro conduz e mede, e a pessoa julga se a leitura acha o que ela acharia.
 
 **Repositório e base:** `warbookbr/nos-modelar`, main de 2026-11-14 com o ramo do carro.
+
+Ativado pela pessoa em 2026-11-14, como quarto na ordem de prioridade, depois do carro.
 
 ## Problema observado
 
