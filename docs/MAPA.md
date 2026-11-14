@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1927 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1929 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1039,6 +1039,7 @@
 - `ponto-na-malha.test.mjs` — ponto-na-malha.test.mjs — o ponto mais próximo de uma malha, com a grade, dá o mesmo que a varredura de todos os triângulos.
 - `ponto-nomeado.test.ts` — ponto-nomeado.test.ts — um nome pode guardar um ponto inteiro (A-8 e A-29).
 - `pose-de-criacao.test.ts` — pose-de-criacao.test.ts — a prova de `em` e `eixo` nos geradores (A-4 / O-7).
+- `rastreio-ataque.test.ts` — rastreio-ataque.test.ts — casos de ataque ao rastreio declarado do retrato ('tocados'), trazidos da revisão adversarial de 2026-11-14: booleanas coincidentes…
 - `rastreio-do-retrato.test.ts` — rastreio-do-retrato.test.ts — o atalho do retrato da procedência devolve exatamente a procedência da conta completa.
 - `recortar-arco.test.mjs` — recortar-arco.test.mjs — `recortarArcoNoPerfil`: o arco poligonal recortado na borda de baixo do contorno, com a fusão do corte que cai perto de um vértice.
 - `referencia-posicional.js` — referencia-posicional.js — A REGRA ÚNICA de "isto é referência por id posicional?", para o formato salvo da Oficina.
@@ -1050,6 +1051,7 @@
 - `selecao-geometrica.test.mjs` — selecao-geometrica.test.mjs — `sel.onde`: face e aresta por propriedade geométrica, sem identificador numérico. As expectativas vêm de contas sobre as coorde…
 - `selecao-nas-edicoes.test.mjs` — selecao-nas-edicoes.test.mjs — `sel` no lugar do id em moveV, moveF, moveA, vira, mescla, pesar e filete.
 - `sha256.js` — sha256.js — SHA-256 síncrono, portátil e sem dependência de Node.
+- `somas-do-rastreio.js` — somas-do-rastreio.js — a soma que uma operação faz ao conjunto de ids "tocados" do passo, para o rastreio declarado do retrato (nível 'tocados' em `ESCRITA_D…
 - `subdivisao-grupos.test.ts` — subdivisao-grupos.test.ts — os grupos de faces da gaiola do passo `subdivisao` (campo `grupos`): cada grupo é uma lista de nomes de ponto, as faces dele são …
 - `subdivisao-ponto-repetido.test.mjs` — subdivisao-ponto-repetido.test.mjs — a recusa geral do ponto que dois passos `subdivisao` gravam sem declaração (ciclo 5 do sedã, atrito 2). O nome de ponto …
 - `subdivisao.js` — subdivisao.js — superfície de subdivisão Catmull-Clark com vincos
