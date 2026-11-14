@@ -751,7 +751,8 @@ export async function descreverPecaReutilizavel({
       stderr += `\n${contatos.declaradosSemContato.length} CONTATO(S) DECLARADO(S) QUE NÃO ACONTECEM`
         + '\n  A receita disse que estas partes se tocam, e elas não se tocam:\n'
         + contatos.declaradosSemContato
-          .map(({ par, motivo, fechaComTolerancia, distancia, maisLongeQue, toleranciaDoPar }) => `    ${par[0]} ↔ ${par[1]}: ${motivo}`
+          .map(({ par, motivo, fechaComTolerancia, distancia, maisLongeQue, toleranciaDoPar, malhaAberta }) => `    ${par[0]} ↔ ${par[1]}: ${motivo}`
+            + (malhaAberta ? `\n      CAUSA PROVÁVEL: ${malhaAberta.map((m) => `a parte '${m.parte}' não é um sólido fechado (${m.causa})`).join('; ')}; sem sólido fechado a medida não decide o contato. Feche a parte (por exemplo, a seleção do \`parte\` de um cilindro precisa das tampas: \`tampa: 'fundo'\` e \`tampa: 'topo'\`) antes de mover a geometria.` : '')
             + (distancia !== undefined ? `\n      as malhas ficam a ${(distancia * 1000).toFixed(6).replace('.', ',')} mm uma da outra (a tolerância de encosto é ${String(Number((toleranciaDoPar * 1000).toPrecision(6))).replace('.', ',')} mm).` : maisLongeQue !== undefined ? `\n      as malhas ficam a mais de ${(maisLongeQue * 1000).toFixed(1).replace('.', ',')} mm uma da outra.` : '')
             + (fechaComTolerancia === undefined ? '' : `\n      fecharia com tolerância de ${fechaComTolerancia}: o vão é menor que isso, do tamanho da grade de 1e-8 do perfil (\`GRADE\` de perfil2d.js), e não uma folga de forma.`))
           .join('\n')

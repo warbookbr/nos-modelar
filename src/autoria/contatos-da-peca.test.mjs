@@ -105,6 +105,17 @@ describe('contato declarado: tocar não é atravessar', () => {
     expect(r.atravessados[0].penetracao.limiteDeclarado).toBe(true);
   });
 
+  it('o contato declarado de uma parte de malha aberta diz a causa, e não só que não se tocam', async () => {
+    const { receita, neutro } = await receitaDe('fixture-contato-parte-aberta');
+    const r = contatosDaPeca(neutro, receita);
+    expect(r.declaradosSemContato).toHaveLength(1);
+    expect(r.declaradosSemContato[0].malhaAberta.map((m) => m.parte)).toEqual(['tampa', 'tubo']);
+    const { descreverPecaReutilizavel } = await import('../../tools/modelar/descrever-peca.mjs');
+    const d = await descreverPecaReutilizavel({ peca: 'fixture-contato-parte-aberta', modulo: await import(`${RAIZ_FIXTURES}/fixture-contato-parte-aberta.js`) });
+    expect(d.codigo).toBe(1);
+    expect(d.stderr).toMatch(/CAUSA PROVÁVEL: a parte 'tampa' não é um sólido fechado/);
+  });
+
   it('recusa `penetracaoMaxima` que não é número positivo', () => {
     const motivo = 'motivo suficientemente longo';
     for (const penetracaoMaxima of [0, -1, '2', Infinity]) {
