@@ -1,6 +1,6 @@
 # Planejador de execução da receita
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `procedural/nucleo/planejador/`, `procedural/nucleo/memoria-de-execucao.js`, a opção `planejar` em `src/autoria/executar-receita.js`, o rastreio de escrita das operações em `procedural/nucleo/nucleo.js` (`ESCRITA_DAS_OPERACOES`), os manifestos de `procedural/nucleo/operacoes/` onde o planejador exigir a declaração de leitura e escrita, e a ligação no `descrever` e na bancada.
 
@@ -264,4 +264,4 @@ o acordo. A parte da bancada (`src/bancada/cache-da-execucao.js`) já está feit
 
 ## Fechamento
 
-Preencher somente ao concluir ou cancelar.
+Concluído em 2026-11-14 por decisão da pessoa, com a meta de tempo passada. A fatia 1 mediu que o agrupamento de subtrações alcançava no máximo 2,2% do tempo do furgão realista e que o custo estava no rastreio do retrato da malha inteira depois de cada passo; o plano foi redirecionado com o sim da pessoa. O rastreio declarado entrou em `rotaciona`, `transladar` e `arranja` (nível 'alvos' estendido a vértices) e depois, pelo nível 'tocados', em `subtrair`, `unir`, `intersectar`, `limparLascas` e `aberturaPorContorno`. A execução do furgão realista foi de 118,1 s para 46,8 s (mediana de três, mesma máquina), com a malha idêntica bit a bit nas 110 receitas do acervo pelo modo conferido, e duas passadas do revisor adversarial, cujas ressalvas entraram (hash da conferência com `chaveExata` e portas, chave da origem no grafo, restauração em `finally`, casos de ataque e teste de injeção das somas). O agrupamento de subtrações saiu do plano. O cache por passo, a execução paralela das partes independentes e a leitura declarada nos manifestos foram para o BACKLOG.
