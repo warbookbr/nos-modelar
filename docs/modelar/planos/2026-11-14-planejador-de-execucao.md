@@ -202,6 +202,24 @@ O plano diz que, se a fatia 1 mostrar o tempo fora das booleanas, ele para e o a
 
 Recomendação: não executar a fatia 2 como agrupamento de subtrações para o furgão. Se a pessoa decidir fazê-la mesmo assim, a meta honesta é a execução do furgão realista cair pelo menos 1 s (0,8%) com a malha idêntica, e a do agrupamento na junta do cabeçote só medir quando a peça entrar no acervo. Se a pessoa decidir redirecionar, a fatia 2 passa a ser a declaração do rastreio rápido (`ESCRITA_DAS_OPERACOES`) para `rotaciona`, `transladar`, `arranja` e `limparLascas`, com a malha idêntica provada pelo modo `conferido` do retrato, e a meta é a execução do furgão cair de 118 s para menos de 85 s, o que corresponde a recuperar metade dos 62,8 s dessas quatro operações; essa meta só vale depois de medir a hipótese do retrato numa execução com `retrato: 'completo'` contra a rápida, e o arquivo a mudar (`procedural/nucleo/nucleo.js`) está fora do território deste plano.
 
+## Andamento — fatia 2 (redirecionada)
+
+### A hipótese, medida
+
+Com a opção `aoRastrear` do núcleo (desligada por padrão, passada por `executarReceita`), uma execução cronometrada do furgão realista deu 137,4 s de parede, e o tempo que cada operação gasta só no rastreio do retrato da malha (comparar as 260 mil entradas a cada passo) foi: `rotaciona` 35,4 s de 35,5 s do passo todo (75 passos), `transladar` 19,0 s de 19,1 s (35), `arranja` 6,8 s de 6,8 s (12) e `limparLascas` 2,1 s de 4,2 s (4). O rastreio soma 89,3 s, 65% da execução; nas quatro operações é praticamente o custo inteiro. Também pagam muito rastreio `subtrair` (10,8 s de 16,8 s), `unir` (3,1 s de 4,3 s) e `intersectar` (2,1 s de 2,7 s), que criam e apagam faces e ficaram de fora. A hipótese se confirmou. Comando: `node tools/modelar/perfil-da-execucao.mjs furgao-realista --perfil` (a seção "rastreio do retrato por operação").
+
+### O que mudou
+
+`ESCRITA_DAS_OPERACOES` ganhou `rotaciona` e `transladar` (vértices: só os que o passo pôs em `st.alvosV`; faces: nada) e `arranja` (vértices e faces: só acrescenta). O nível 'alvos' passou a valer também para vértices, o que `nucleo.js` não permitia, e as duas operações de transformação registram em `st.alvosV` cada vértice que movem. `limparLascas` ficou de fora: apaga faces e vértices, e o rastreio dele é metade do passo (2 s no furgão). `executarReceita` passou a repassar `retrato` e `aoRastrear` ao núcleo quando vierem; a assinatura não mudou e, sem eles, tudo é como antes.
+
+### Prova de malha idêntica
+
+`node tools/modelar/conferir-retrato-do-acervo.mjs --acervo` executa cada receita de passos do acervo, uma por processo (lotes de um, para a memória de uma peça não somar com a da seguinte), em `retrato: 'rapido'` e em `'conferido'`. O modo conferido roda o atalho e a conta completa a cada passo e recusa qualquer divergência dos ids mudados e das serializações; além disso, a saída inteira (vértices, faces com a identidade, partes, órfãos, fusões, pesos, portas, procedência e artefato) das duas execuções vira um hash SHA-256, e os dois têm de ser iguais. Resultado: 110 receitas (as peças e as partes das montagens), 9.444 passos, 110 com os dois hashes iguais, 0 divergências, nenhuma recusa do modo conferido. O teste `rastreio-do-retrato.test.ts` ganhou um caso de `rotaciona`, `transladar` e `arranja` com giro nulo, translação nula, vértice inexistente e duas cópias de `arranja`, nos três caminhos (completo, rápido, conferido).
+
+### Tempo do furgão realista
+
+Execução de `executarReceita` sozinha, processo novo, três execuções, máquina sem outra carga pesada (nenhum processo de vitest, gates, descrever ou blender de outro agente; carga de um minuto entre 0,85 e 1,45): 66,1 s, 65,6 s e 64,4 s, mediana 65,6 s, contra 118,1 s antes (queda de 44,5%). A meta de menos de 85 s foi cumprida. Os 52 s que sobram de diferença se explicam pelo que a hipótese previa: os rastreios de `rotaciona`, `transladar` e `arranja` (61 s) saíram quase todos. O que resta de rastreio está em `subtrair`, `unir`, `intersectar`, `aberturaPorContorno` (7,3 s no passo todo de 32,9 s), `limparLascas` e `subdivisao`, que pedem uma declaração diferente (criam e apagam faces) e ficam como candidatas de uma fatia seguinte, com a mesma prova.
+
 ## Riscos e parada
 
 A identidade de face é o risco central: unir as ferramentas de uma subtração pode mudar quais faces o núcleo nomeia como criadas por

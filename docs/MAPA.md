@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1911 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1913 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -3069,6 +3069,8 @@
 - `conferir-juntas.test.ts` — conferir-juntas.test.ts — testes para a ferramenta de medição e diagnóstico de juntas.
 - `conferir-malha.mjs` — conferir-malha.mjs — a topologia da malha de uma receita, com os gritos do motor: casca aberta, não-manifold, orientação, face de área nula, face fina, face …
 - `conferir-pontos.mjs` — conferir-pontos.mjs — mede os PONTOS DECLARADOS de uma peça contra a malha que a receita produz, e devolve o desvio de cada um em milímetro.
+- `conferir-retrato-do-acervo.mjs` — conferir-retrato-do-acervo.mjs — prova que o rastreio declarado do retrato (`ESCRITA_DAS_OPERACOES`) não muda nada na malha.
+- `conferir-retrato-do-acervo.test.mjs` — conferir-retrato-do-acervo.test.mjs — prova que a conferência do retrato acha igual a receita mínima e a peça pequena, e que o hash distingue malhas.
 - `conferir-vistas.mjs` — conferir-vistas.mjs — a rodada inteira de conferência de um rascunho contra as imagens de referência num comando só: o esboço é montado uma vez, e para cada …
 - `conferir-vistas.test.mjs` — conferir-vistas.test.mjs — a rodada de conferência sobre uma cena sintética, sem navegador: dois cubos de cores diferentes lado a lado, uma referência em PNG…
 - `configuracao-composicoes.mjs` — configuracao-composicoes.mjs — o registro de composições que um comando recebe.
