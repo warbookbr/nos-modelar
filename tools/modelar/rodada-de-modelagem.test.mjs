@@ -270,7 +270,9 @@ describe('a medição da receita atual trava o laço', () => {
     const [peca] = pecasDoAcervo();
     const r = spawnSync(process.execPath, ['tools/modelar/rodada-de-modelagem.mjs', peca, '--acao'], { encoding: 'utf8' });
     expect(r.status).toBe(0);
-    expect(r.stdout).toMatch(/medição da receita atual \(sha256:[0-9a-f]{8}\): (passou|reprovou)\npróxima ação: (modelar|revisar|parar-[a-z-]+) — /);
+    /* A peça é a primeira do acervo, que muda quando entra peça nova: entre a medição e a ação cabem os avisos de malha que a
+       ferramenta imprime para aquela peça. */
+    expect(r.stdout).toMatch(/medição da receita atual \(sha256:[0-9a-f]{8}\): (passou|reprovou)\n(aviso: [^\n]*\n)*próxima ação: (modelar|revisar|parar-[a-z-]+) — /);
   }, 60000);
 
   it('a peça sem receita não tem medição, e a rodada não se registra', async () => {

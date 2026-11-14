@@ -6,6 +6,7 @@
 > algum arquivo-fonte estiver sem cabeçalho.
 
 1880 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1887 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1136,6 +1137,14 @@
 
 - `CLAUDE.md` — Peças: o que só vale nesta pasta
 
+## procedural/pecas/abajur-de-mesa/
+
+- `receita.js` — Abajur de mesa: base, haste, soquete e cúpula são revoluções (perfil [raio, altura] em mm girado pelo `lathe`); a armação é arame de cilindros finos (aro de …
+
+## procedural/pecas/abajur-de-mesa/referencias/
+
+- `alvo.md` — Alvo do abajur de mesa
+
 ## procedural/pecas/ambulancia/
 
 - `receita.js` — ambulancia — ambulância estilizada: cabine de picape na frente e baú alto, mais largo e mais alto, atrás. O baú é branco com faixa vermelha e faixa cinza, te…
@@ -1243,6 +1252,14 @@
 ## procedural/pecas/balcao-liso/referencias/
 
 - `alvo.md` — Alvo do balcão liso
+
+## procedural/pecas/bicicleta-urbana/
+
+- `receita.js` — bicicleta-urbana — bicicleta urbana de marcha única, peça inteira, de quadro médio e rodas 700c.
+
+## procedural/pecas/bicicleta-urbana/referencias/
+
+- `alvo.md` — Alvo da bicicleta urbana
 
 ## procedural/pecas/braco-robotico/
 
@@ -1521,6 +1538,14 @@
 
 - `alvo.md` — Alvo: carro-taxi
 
+## procedural/pecas/copo-de-vidro/
+
+- `receita.js` — Copo baixo de vidro: uma parte de revolução. Perfil (raio, altura) em mm na `derivar`, girado por `lathe`.
+
+## procedural/pecas/copo-de-vidro/referencias/
+
+- `alvo.md` — Alvo do copo de vidro
+
 ## procedural/pecas/empilhadeira/
 
 - `ALINHAMENTO.md` — Empilhadeira — alinhamento
@@ -1742,6 +1767,14 @@
 
 - `alvo.md` — Alvo: furgao
 
+## procedural/pecas/garrafa-de-vidro/
+
+- `receita.js` — garrafa-de-vidro — garrafa de boca larga, sem tampa, uma parte (`garrafa`). O alvo está em referencias/alvo.md. O perfil de revolução (raio, altura) é uma li…
+
+## procedural/pecas/garrafa-de-vidro/referencias/
+
+- `alvo.md` — Alvo da garrafa de vidro
+
 ## procedural/pecas/geladeira-compacta-branca/
 
 - `receita.js` — geladeira-compacta-branca — frigobar alto de uma porta, todo branco: gabinete de cantos levemente arredondados, porta de placa com as bordas arredondadas, um…
@@ -1919,6 +1952,14 @@
 
 - `alvo.md` — Alvo da poltrona de vime
 
+## procedural/pecas/prato-fundo/
+
+- `receita.js` — Prato fundo de cerâmica branca: uma parte só (`prato`), uma revolução em y de um perfil de seção fechada (casca de 5 mm).
+
+## procedural/pecas/prato-fundo/referencias/
+
+- `alvo.md` — Alvo do prato fundo
+
 ## procedural/pecas/sedan-chassi-e-lataria/
 
 - `ALINHAMENTO.md` — Sedã em chassi e lataria: alinhamento
@@ -2027,6 +2068,14 @@
 ## procedural/pecas/trator/referencias/
 
 - `alvo.md` — trator — alvo
+
+## procedural/pecas/vaso-de-ceramica/
+
+- `receita.js` — vaso-de-ceramica — vaso de cerâmica terracota de uma parte (`vaso`). O combinado está em `referencias/alvo.md`.
+
+## procedural/pecas/vaso-de-ceramica/referencias/
+
+- `alvo.md` — Alvo do vaso de cerâmica
 
 ## procedural/servicos/
 
