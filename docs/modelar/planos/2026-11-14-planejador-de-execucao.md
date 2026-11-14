@@ -129,6 +129,75 @@ A pessoa exige malha idêntica antes e depois. Por isso o gate 1 vale sem toler�
 3. Cache por passo com a impressão digital das entradas, e a prova de que mudar um passo recomputa só os dependentes.
 4. Execução paralela das partes independentes, se ainda valer; a decisão sai dos números das fatias 2 e 3.
 
+## Andamento — fatia 1
+
+Medida em 2026-11-14, nesta cópia, em Linux com 4 núcleos e Node 22. Todas as medidas de tempo rodaram em processo novo, uma de cada vez, e só começaram com nenhum processo de vitest, gates, descrever ou blender de outro agente em execução; a carga média de um minuto antes de cada medida ficou entre 0,82 e 0,96 (a do próprio processo anterior), sem outra carga pesada. A medição foi esperada por cerca de 49 minutos até a máquina ficar livre. O comando que reproduz a execução sozinha é `node tools/modelar/perfil-da-execucao.mjs <peça> --executar` e o do `descrever` é `node tools/modelar/descrever-peca.mjs <peça>`; as ferramentas ficaram no repositório e não ligam nada por padrão.
+
+### Linha de base no Linux
+
+Três execuções cada, com a mediana entre parênteses depois dos três valores. A coluna da execução é `executarReceita` sozinha, sem importar nada no tempo medido.
+
+| Peça | Faces | Execução da receita (s) | `descrever` (s) |
+|---|---|---|---|
+| `furgao-realista` | 262.947 | 116,1 / 123,5 / 118,1 (mediana 118,1) | 162,0 / 168,3 / 170,0 (mediana 168,3) |
+| `carenagem-de-prova` | 34.176 | 1,61 / 1,71 / 1,45 (mediana 1,61) | 7,02 / 7,08 / 6,85 (mediana 7,02) |
+| `kukri` | 12.179 | 1,94 / 1,93 / 1,74 (mediana 1,93) | 4,59 / 4,89 / 4,94 (mediana 4,89) |
+
+O furgão realista leva 118 s na execução aqui, contra os 72 s da tabela acima, que era de outra máquina; as duas peças pequenas pesam quase o mesmo nas duas. A diferença entre o `descrever` e a execução (50 s no furgão, 5 s na carenagem, 3 s no kukri) é a medição das partes e dos contatos, que este plano não toca.
+
+### Perfil da execução do furgão
+
+Uma execução cronometrada passo a passo, com o cronometrador do `descrever` (um registro que só embrulha `resolver`, de modo que o caminho rápido do núcleo continua valendo): 131,0 s de parede, 130,0 s dentro dos passos, 739 passos. Comando: `node tools/modelar/perfil-da-execucao.mjs furgao-realista --perfil`.
+
+Soma por operação:
+
+| Operação | Passos | Tempo (s) | Parte | Maior passo (ms) |
+|---|---|---|---|---|
+| `rotaciona` | 75 | 33,9 | 26,1% | 695 |
+| `aberturaPorContorno` | 17 | 30,0 | 23,1% | 2.631 |
+| `transladar` | 35 | 18,2 | 14,0% | 659 |
+| `subtrair` | 18 | 15,4 | 11,8% | 1.978 |
+| `arranja` | 12 | 6,2 | 4,7% | 643 |
+| `unir` | 6 | 5,1 | 3,9% | 1.171 |
+| `limparLascas` | 4 | 4,5 | 3,5% | 1.219 |
+| `lathe` | 63 | 3,4 | 2,6% | 94 |
+| `subdivisao` | 34 | 2,7 | 2,1% | 1.481 |
+| `intersectar` | 4 | 2,7 | 2,1% | 725 |
+| `extrusao` | 35 | 2,1 | 1,6% | 117 |
+| `material` | 188 | 2,0 | 1,5% | 757 |
+| `friso` | 32 | 1,9 | 1,5% | 91 |
+| `parte` | 164 | 1,3 | 1,0% | 707 |
+| `cubo`, `liso`, `loft`, `solido` | 51 | 0,6 | 0,4% | 58 |
+
+Os 20 passos mais caros, em ms: passo 91 `aberturaPorContorno` 2.631; 92 `aberturaPorContorno` 2.363; 112 `aberturaPorContorno` 2.121; 384 `aberturaPorContorno` 2.032; 438 `subtrair` 1.978; 396 `aberturaPorContorno` 1.935; 372 `aberturaPorContorno` 1.851; 338 `aberturaPorContorno` 1.845; 360 `aberturaPorContorno` 1.834; 111 `aberturaPorContorno` 1.793; 378 `aberturaPorContorno` 1.789; 354 `aberturaPorContorno` 1.624; 114 `aberturaPorContorno` 1.565; 390 `aberturaPorContorno` 1.535; 0 `subdivisao` 1.481; 366 `aberturaPorContorno` 1.398; 113 `aberturaPorContorno` 1.385; 477 `subtrair` 1.346; 559 `subtrair` 1.271; 109 `aberturaPorContorno` 1.266. Dezessete deles são `aberturaPorContorno` e três são `subtrair`; nenhum passa de 2,7 s, e o tempo está espalhado: os 20 mais caros somam 35 s, 27% do total.
+
+As booleanas (`aberturaPorContorno`, `subtrair`, `unir`, `intersectar`) somam 53,2 s, 40,9%. Os passos que não são booleana e pagam o tamanho da malha (`rotaciona`, `transladar`, `arranja`, `limparLascas`) somam 62,8 s, 48,3%. `rotaciona` e `transladar` mexem numa parte pequena e custam em média 450 e 520 ms por passo. A hipótese, ainda não medida, é que o rastreio do retrato da malha inteira, que o núcleo refaz depois de cada passo cuja escrita não está declarada em `ESCRITA_DAS_OPERACOES` (só as primitivas, `parte`, `material`, `liso`, `solido`, `publicarPorta` e `pesar` estão), é o que esses passos pagam.
+
+### O grafo de leitura e escrita, só leitura
+
+Extraído de `REGISTRO_DA_RECEITA.manifesto` (`procedural/nucleo/planejador/leitura-escrita.js`, `--acervo` para o acervo). O manifesto traz só `artefatos.entra` e `artefatos.sai` por operação: dizer que a operação lê a malha, sem dizer que seleções. Nenhuma operação declara leitura por seleção, então nenhum passo tem leitura declarada e todo passo que lê a malha é barreira pela regra do plano. A leitura que se enxerga é a dos argumentos (`sel`, `de`, `solidos`, `chapa` e os outros campos de referência, por `origem`, `alias` ou id), contada à parte como extraível.
+
+Furgão realista (739 passos): 179 criadores (`artefatos.entra` vazio: `lathe` 63, `extrusao` 35, `subdivisao` 34, `friso` 32, `cubo` 8, `loft` 7), 560 que leem a malha, 0 com leitura declarada, 560 barreiras, 560 com leitura extraível dos argumentos e 0 dinâmicos. Por operação, todos os passos que leem viram barreira: `material` 188, `parte` 164, `rotaciona` 75, `transladar` 35, `liso` 21, `subtrair` 18, `aberturaPorContorno` 17, `solido` 16, `arranja` 12, `unir` 6, `intersectar` 4, `limparLascas` 4.
+
+Acervo (110 receitas de passos: as peças e as partes das montagens): 9.444 passos, 6.611 leem a malha, 0 com leitura declarada, 6.611 barreiras, 6.363 com leitura extraível dos argumentos e 248 dinâmicos (seleção por `onde` ou forma não enumerável: `arredondarAresta` 100, `moveV` 53, `limparLascas` 36, `parte` 23, `publicarPorta` 21). Duas observações para o planejador: `friso` e `subdivisao` constam no manifesto sem leitura (`artefatos.entra` vazio) embora `friso` receba `linha` e `superficie`, e `parte` e `material` são 4.694 passos, 71% dos que leem, de modo que o planejador só ajuda se tratar esses dois como leitura declarada e não como barreira.
+
+### Sequências de `subtrair` sobre o mesmo alvo
+
+O acervo tem 91 `subtrair`, e a quase totalidade já usa `solidos` com várias ferramentas. Sequências de dois ou mais cortes seguidos, em que o primeiro sólido do corte é o resultado do anterior ou o mesmo alvo:
+
+- estritas (cortes vizinhos na receita): 1, em `aviao/empenagem-vertical`, passos 7 e 8, com 2 cortes e 2 ferramentas;
+- relaxadas (aceitam no meio passos que só criam geometria e não leem o alvo): 8, todas de 2 cortes: `aviao/empenagem-vertical` 7-8; `empilhadeira/protetor` 7-9 e 17-19; `furgao-realista` 654-657 e 703-706; `instalacao-solar/grampo-ponta-30` e `-40`, 2-4 (8 ferramentas cada).
+
+Nenhuma sequência tem ferramenta que dependa do corte anterior. A junta do cabeçote (60 furos em 60 `subtrair`) não está nesta cópia, então o caso que motivou o plano não existe no acervo. No perfil do furgão as duas sequências somam 2,85 s (1,31 s e 1,55 s), 2,2% da execução; unir as ferramentas pode poupar uma fração disso.
+
+### Critério de parada
+
+O plano diz que, se a fatia 1 mostrar o tempo fora das booleanas, ele para e o achado vai ao dono dessa medição. A medição mostra isso pela metade: 41% do tempo do furgão está em booleanas, mas só 2,2% está em sequências agrupáveis de `subtrair`, e 48% está em `rotaciona`, `transladar`, `arranja` e `limparLascas`, que não são booleanas. Com o agrupamento sozinho, a meta de partida (a execução do furgão cair pela metade) é inalcançável: o limite superior dele é 2,2% do tempo. A fatia 2 como está escrita não paga; a decisão de redirecioná-la é da pessoa.
+
+### Meta de tempo proposta para a fatia 2
+
+Recomendação: não executar a fatia 2 como agrupamento de subtrações para o furgão. Se a pessoa decidir fazê-la mesmo assim, a meta honesta é a execução do furgão realista cair pelo menos 1 s (0,8%) com a malha idêntica, e a do agrupamento na junta do cabeçote só medir quando a peça entrar no acervo. Se a pessoa decidir redirecionar, a fatia 2 passa a ser a declaração do rastreio rápido (`ESCRITA_DAS_OPERACOES`) para `rotaciona`, `transladar`, `arranja` e `limparLascas`, com a malha idêntica provada pelo modo `conferido` do retrato, e a meta é a execução do furgão cair de 118 s para menos de 85 s, o que corresponde a recuperar metade dos 62,8 s dessas quatro operações; essa meta só vale depois de medir a hipótese do retrato numa execução com `retrato: 'completo'` contra a rápida, e o arquivo a mudar (`procedural/nucleo/nucleo.js`) está fora do território deste plano.
+
 ## Riscos e parada
 
 A identidade de face é o risco central: unir as ferramentas de uma subtração pode mudar quais faces o núcleo nomeia como criadas por
