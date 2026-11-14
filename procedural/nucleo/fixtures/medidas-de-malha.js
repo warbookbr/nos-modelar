@@ -35,14 +35,21 @@ function grade(tris, celula) {
   return { em: (i, j, k) => g.get(ch(i, j, k)) ?? [] };
 }
 
+/** O número de anéis de células que `distancias` abre por ponto antes de desistir. */
+export const LIMITE_DE_VOLTAS = 30;
+
 /** distancias(pontos, tris, celula) -> a distância de cada ponto ao triângulo mais próximo (tris em posições); a busca
  *  abre anéis de células até que a menor distância achada caiba no raio já varrido. */
 export function distancias(pontos, tris, celula = 0.02) {
+  if (!tris.length) throw new Error('distancias: sem triângulos para medir; a malha medida saiu vazia');
   const g = grade(tris, celula);
   return pontos.map((p) => {
     const c = p.map((x) => Math.floor(x / celula));
     let melhor = Infinity;
     for (let r = 1; melhor > r * celula - celula; r++) {
+      /* sem o limite, o ponto sem triângulo a menos de LIMITE_DE_VOLTAS células abria anéis para sempre (a operação estragada que
+         recusa o friso inteiro deixava o teste da fatia 13 em laço sem fim, e o prazo do vitest não interrompe laço síncrono) */
+      if (r > LIMITE_DE_VOLTAS) throw new Error(`distancias: nenhum triângulo a ${Number((LIMITE_DE_VOLTAS * celula).toPrecision(3))} do ponto [${p.join(', ')}], depois de ${LIMITE_DE_VOLTAS} voltas de células`);
       const vistos = new Set();
       for (let i = -r; i <= r; i++) for (let j = -r; j <= r; j++) for (let k = -r; k <= r; k++) {
         for (const n of g.em(c[0] + i, c[1] + j, c[2] + k)) { if (vistos.has(n)) continue; vistos.add(n); const d = pontoTriangulo(p, tris[n]); if (d < melhor) melhor = d; }

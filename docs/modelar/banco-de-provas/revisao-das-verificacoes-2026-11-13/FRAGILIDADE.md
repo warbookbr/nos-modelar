@@ -1,0 +1,649 @@
+# Os sinais de fragilidade, por busca
+
+Passo 3 do plano. Medido em 2026-11-14 sobre o ramo `revisao-testes`, por script de rascunho fora do repositório (`frag.mjs` no scratchpad da sessão), que lê os 549 arquivos de `git ls-files '*.test.*'` linha a linha, pulando linhas de comentário. Cada sinal diz onde olhar e não condena o teste: um número exato pode ser a conferência certa de uma malha determinística, e um teto de tempo pode ser a guarda contra travamento que o comentário declara. A contagem é de linhas e de arquivos; as listas inteiras estão no fim.
+
+## Os números
+
+| Sinal | Linhas | Arquivos | Regra da busca |
+|---|---|---|---|
+| contagem ou piso ligado ao tamanho do acervo | 6 de 14 achadas | 3 | número de dois dígitos ou mais em `toHaveLength`, `.length).toBe` ou `toBeGreaterThan` num arquivo que varre o acervo (`pecasDoAcervo`, `ACERVO`, leitura de `procedural/pecas`); lidas uma a uma |
+| contagem exata de dez ou mais fora do acervo | 187 | 75 | `toHaveLength(N)`, `.length).toBe(N)` ou `.size).toBe(N)` com N de 10 para cima, em arquivo que não varre o acervo |
+| teto de tempo fixo no `it` | 199 | 63 | prazo escrito à mão no fim do `it` (`}, 60_000)` ou `timeout:`) |
+| teto de tempo medido por relógio | 4 | 3 | `expect(ms).toBeLessThan(N)` em arquivo que lê `performance.now`, `Date.now` ou `hrtime` |
+| dependência de uma peça específica do acervo | 194 | 60 | o nome de uma pasta de `procedural/pecas/` entre aspas ou em caminho; 27 peças distintas |
+| só confere que não lançou erro | 7 | 7 | bloco de `it` cujas conferências são todas `not.toThrow`, `toBeDefined` ou `toBeTruthy`; lidos um a um |
+
+Contagem ligada ao acervo, lida uma a uma. Das 14 linhas que a busca achou, seis dependem do tamanho do acervo: `src/autoria/material-da-receita.acervo.test.js:83`, `:122` e `:123` (pisos de 90, 200 e 500 materiais, o mesmo arquivo que reprovou no CI em 2026-11-13 com 492), `tools/modelar/custo-de-importar-receita.test.mjs:33` (mais de 50 receitas) e `tools/modelar/origem-das-fontes.test.mjs:39` e `:40` (a tabela tem exatamente 27 peças de veículo, que muda a cada peça de veículo que entra ou sai). As outras oito são medidas de geometria (`src/autoria/molduras-do-vao.test.mjs`, comprimento de volta em milímetro), tamanho de texto (`tools/arquitetura/nucleo-sem-three.test.mjs:26`) e a lista dos campos da aparência (`tools/modelar/descrever-partes-materiais.test.mjs:41` e `:58`), e não dependem do acervo. `src/bancada/acervo-receitas.test.js:69` compara com `pecasDoAcervo().length`, que acompanha o acervo, e não é frágil.
+
+Tetos de tempo, pelo valor: 1 de 15 s, 4 de 20 s, 12 de 30 s, 61 de 60 s, 7 de 90 s, 46 de 120 s, 10 de 180 s, 2 de 240 s, 30 de 300 s, 1 de 420 s, 18 de 600 s, 7 de 900 s. A maioria fica entre 60 s e 300 s e é guarda contra travamento; os de 15 s a 30 s são os que podem reprovar peça certa numa máquina dividida, e os quatro por relógio (`procedural/nucleo/limpar-lascas.test.ts:318` com 3 s, `procedural/nucleo/triangulacao-colinear.test.mjs:126` com 2 s, `procedural/nucleo/limpar-lascas.test.ts:338` com 15 s e `modulos/manual/tests/desenho.test.js:108` com 30 s) são os que medem desempenho de verdade. O histórico (ver [HISTORICO.md](HISTORICO.md)) traz oito commits que mexeram em teto ou na forma de medir o tempo porque ele reprovou sem defeito, e dois em que o teto pegou lentidão real do código.
+
+Peças citadas, por número de linhas: furgao 33, aviao 28, braco-robotico 27, carrinho-de-mao 19, trator 18, suporte-tubo 11, furgao-realista 11, carenagem-de-prova 10, empilhadeira 6, kukri 5, instalacao-solar 5, carro-perua 3, ambulancia 2, caminhao-entrega 2, carro-policia 2, mesa-quadrada-escura 1, sedan-chassi-e-lataria 1, caminhao-bombeiro 1, carro-suv-luxo 1, trator-sirene 1, carro-sedan-compacto 1, micro-ondas-branco 1, onibus-urbano 1, picape-compacta 1, trator-pa 1, geladeira-compacta-branca 1, poltrona-moderna-branca 1. `carenagem-de-prova` é peça de ensaio e não do produto; o furgão, o avião, o braço robótico, o carrinho de mão e o trator concentram 125 das 194 linhas, e o teste que cita um deles reprova quando a peça é refeita ou sai, como aconteceu com a bicicleta em `73ee0a73` (oito arquivos de teste dependiam dela).
+
+Só não lançou erro, lidos um a um. A busca achou 11 blocos; os quatro de `procedural/nucleo/corpo-por-fatias.test.mjs` (linhas 518, 536, 551 e 559) conferem por um auxiliar `recusa` e ficam fora. Dos sete que sobram, três têm o não lançar como a afirmação certa (`tools/modelar/diario.test.mjs:83`, o diário não derruba quem é medido; `tools/modelar/caminho-confinado.test.ts:25`; `tools/modelar/guardas/rodar-guardas.test.mjs:136`), dois conferem presença por `toBeDefined` ou `toBeTruthy` com motivo (`tools/bancadas/skill-criar-peca.test.ts:156`, `src/bancada/referencias/imagens-da-peca.test.js:47`) e dois só provam que a entrada foi aceita, com o resultado conferido no `it` seguinte do mesmo arquivo (`tools/fixtures/acervo/materiais-do-furgao-opcoes/receita.test.mjs:10`, `tools/fixtures/costuras-e-furos/face-degenerada-em-dois-lathe/face-degenerada-em-dois-lathe.test.mjs:24`). Nenhum é teste vazio.
+
+Incerteza. A busca é por texto: conferência feita por auxiliar, laço ou `it.each` escapa das regras, e a contagem exata fora do acervo mistura conferência certa de malha com número que acompanha refator; separar as duas pede a medida por estrago do passo 2 e o histórico.
+
+## As listas
+
+### Contagem ou piso em arquivo que varre o acervo (busca bruta)
+
+- `src/autoria/material-da-receita.acervo.test.js:83` `toBeGreaterThan(90)`
+- `src/autoria/material-da-receita.acervo.test.js:122` `toBeGreaterThan(200)`
+- `src/autoria/material-da-receita.acervo.test.js:123` `toBeGreaterThan(500)`
+- `src/autoria/molduras-do-vao.test.mjs:35` `toBeGreaterThan(1600)`
+- `src/autoria/molduras-do-vao.test.mjs:73` `toBeGreaterThan(85)`
+- `src/autoria/molduras-do-vao.test.mjs:104` `toBeGreaterThan(90)`
+- `src/autoria/molduras-do-vao.test.mjs:328` `toBeGreaterThan(790)`
+- `src/autoria/molduras-do-vao.test.mjs:342` `toBeGreaterThan(185)`
+- `tools/arquitetura/nucleo-sem-three.test.mjs:26` `toBeGreaterThan(10)`
+- `tools/modelar/custo-de-importar-receita.test.mjs:33` `toBeGreaterThan(50)`
+- `tools/modelar/descrever-partes-materiais.test.mjs:41` `toHaveLength(15)`
+- `tools/modelar/descrever-partes-materiais.test.mjs:58` `toBeGreaterThan(40)`
+- `tools/modelar/origem-das-fontes.test.mjs:39` `toHaveLength(27)`
+- `tools/modelar/origem-das-fontes.test.mjs:40` `.size).toBe(27)`
+
+### Contagem exata de dez ou mais fora do acervo
+
+- `modulos/contorno-da-imagem/tests/contorno.test.js:140` `toHaveLength(14)`
+- `modulos/contorno-da-imagem/tests/contorno.test.js:262` `toHaveLength(38)`
+- `modulos/exportador-cad/tests/exportador-cad.test.js:180` `.length).toBe(12)`
+- `modulos/exportador-cad/tests/exportador-cad.test.js:181` `.length).toBe(12)`
+- `modulos/exportador-obj/tests/canto-colinear.test.js:25` `toHaveLength(16)`
+- `modulos/manual/tests/desenho.test.js:154` `.length).toBe(401)`
+- `procedural/familias/dobradica/dobradica.test.mjs:102` `toHaveLength(24)`
+- `procedural/nucleo/apoio-do-vinco.test.ts:105` `toHaveLength(14)`
+- `procedural/nucleo/casca.test.mjs:81` `.size).toBe(16)`
+- `procedural/nucleo/casca.test.mjs:82` `.size).toBe(14)`
+- `procedural/nucleo/casca.test.mjs:94` `.length).toBe(10)`
+- `procedural/nucleo/casca.test.mjs:124` `.size).toBe(12)`
+- `procedural/nucleo/casca.test.mjs:211` `toHaveLength(11)`
+- `procedural/nucleo/casca.test.mjs:234` `toHaveLength(10)`
+- `procedural/nucleo/chapa-de-contorno.test.mjs:247` `.length).toBe(10)`
+- `procedural/nucleo/concordancia-por-ponto.test.ts:36` `.size).toBe(42)`
+- `procedural/nucleo/concordancia-por-ponto.test.ts:37` `.size).toBe(44)`
+- `procedural/nucleo/concordancia-por-ponto.test.ts:52` `.size).toBe(12)`
+- `procedural/nucleo/contorno.test.mjs:132` `toHaveLength(20)`
+- `procedural/nucleo/corpo-por-fatias.test.mjs:166` `.length).toBe(16)`
+- `procedural/nucleo/extensao-chapa-dobrada-origem.test.mjs:44` `toHaveLength(12)`
+- `procedural/nucleo/extensao-chapa-dobrada-origem.test.mjs:87` `toHaveLength(12)`
+- `procedural/nucleo/extensao-chapa-dobrada.test.mjs:224` `toHaveLength(28)`
+- `procedural/nucleo/extensao-chapa-dobrada.test.mjs:244` `toHaveLength(28)`
+- `procedural/nucleo/extensao-chapa-dobrada.test.mjs:262` `.size).toBe(56)`
+- `procedural/nucleo/extensao-estrutura-de-barras.test.mjs:217` `toHaveLength(12)`
+- `procedural/nucleo/extensao-estrutura-de-barras.test.mjs:329` `.size).toBe(112)`
+- `procedural/nucleo/forma-exata/casos-medidos.test.mjs:171` `.length).toBe(16)`
+- `procedural/nucleo/friso-aba.test.mjs:75` `toHaveLength(12)`
+- `procedural/nucleo/friso-largura-variavel.test.mjs:80` `toHaveLength(16)`
+- `procedural/nucleo/friso-largura-variavel.test.mjs:81` `toHaveLength(16)`
+- `procedural/nucleo/friso-largura-variavel.test.mjs:153` `toHaveLength(256)`
+- `procedural/nucleo/friso-largura-variavel.test.mjs:154` `toHaveLength(256)`
+- `procedural/nucleo/friso-largura-variavel.test.mjs:163` `toHaveLength(30)`
+- `procedural/nucleo/friso-largura-variavel.test.mjs:164` `toHaveLength(30)`
+- `procedural/nucleo/friso-refinar.test.mjs:46` `toHaveLength(64)`
+- `procedural/nucleo/gaiola-aneis.test.mjs:63` `toHaveLength(20)`
+- `procedural/nucleo/gaiola-aneis.test.mjs:64` `toHaveLength(10)`
+- `procedural/nucleo/gaiola-aneis.test.mjs:66` `toHaveLength(12)`
+- `procedural/nucleo/gaiola-aneis.test.mjs:165` `toHaveLength(55)`
+- `procedural/nucleo/gaiola-aneis.test.mjs:170` `toHaveLength(39)`
+- `procedural/nucleo/gaiola-interpolada.test.mjs:52` `toHaveLength(20)`
+- `procedural/nucleo/gaiola-local.test.mjs:244` `toHaveLength(55)`
+- `procedural/nucleo/gaiola-local.test.mjs:245` `toHaveLength(117)`
+- `procedural/nucleo/gaiola-local.test.mjs:246` `toHaveLength(129)`
+- `procedural/nucleo/gaiola-local.test.mjs:247` `toHaveLength(62)`
+- `procedural/nucleo/gaiola-local.test.mjs:275` `toHaveLength(697)`
+- `procedural/nucleo/gaiola-local.test.mjs:276` `toHaveLength(1561)`
+- `procedural/nucleo/gaiola-local.test.mjs:277` `toHaveLength(1745)`
+- `procedural/nucleo/gaiola-local.test.mjs:279` `toHaveLength(1095)`
+- `procedural/nucleo/gaiola-por-estacoes.test.mjs:181` `toHaveLength(472)`
+- `procedural/nucleo/gaiola-por-estacoes.test.mjs:182` `toHaveLength(1596)`
+- `procedural/nucleo/gaiola-por-estacoes.test.mjs:183` `.size).toBe(13603)`
+- `procedural/nucleo/gaiola-por-estacoes.test.mjs:184` `.size).toBe(48671)`
+- `procedural/nucleo/gaiola-por-lacos.test.ts:432` `toHaveLength(18)`
+- `procedural/nucleo/gaiola-por-rede-prova.test.mjs:77` `toHaveLength(10)`
+- `procedural/nucleo/gaiola-por-rede.test.mjs:58` `toHaveLength(52)`
+- `procedural/nucleo/gaiola-por-rede.test.mjs:59` `toHaveLength(24)`
+- `procedural/nucleo/gaiola-varrida.test.mjs:41` `toHaveLength(11)`
+- `procedural/nucleo/gaiola-varrida.test.mjs:42` `toHaveLength(33)`
+- `procedural/nucleo/gaiola-varrida.test.mjs:43` `toHaveLength(20)`
+- `procedural/nucleo/gaiola-varrida.test.mjs:102` `toHaveLength(13)`
+- `procedural/nucleo/gaiola-varrida.test.mjs:201` `toHaveLength(16)`
+- `procedural/nucleo/limpar-lascas.test.ts:415` `.length).toBe(17)`
+- `procedural/nucleo/operacoes/arranja-contrato.test.ts:79` `.size).toBe(18)`
+- `procedural/nucleo/operacoes/arranja-contrato.test.ts:90` `.length).toBe(18)`
+- `procedural/nucleo/operacoes/arranja-contrato.test.ts:106` `.length).toBe(12)`
+- `procedural/nucleo/operacoes/arredondar-tampa-partida.test.ts:130` `.length).toBe(12)`
+- `procedural/nucleo/operacoes/booleana-faces-fundidas.test.ts:70` `.size).toBe(30)`
+- `procedural/nucleo/operacoes/booleanas.test.ts:251` `.size).toBe(12)`
+- `procedural/nucleo/operacoes/estouro-de-bloco.test.ts:17` `.size).toBe(12)`
+- `procedural/nucleo/operacoes/estouro-de-bloco.test.ts:18` `.size).toBe(16)`
+- `procedural/nucleo/operacoes/estouro-de-bloco.test.ts:25` `.size).toBe(12)`
+- `procedural/nucleo/operacoes/extrusao-de-perfil.test.ts:74` `.length).toBe(20)`
+- `procedural/nucleo/operacoes/extrusao-de-perfil.test.ts:153` `toHaveLength(20)`
+- `procedural/nucleo/operacoes/extrusao-de-perfil.test.ts:174` `toHaveLength(16)`
+- `procedural/nucleo/operacoes/extrusao-de-perfil.test.ts:176` `toHaveLength(16)`
+- `procedural/nucleo/operacoes/furo-em-aneis.test.ts:135` `toHaveLength(96)`
+- `procedural/nucleo/operacoes/furo-em-aneis.test.ts:147` `.size).toBe(128)`
+- `procedural/nucleo/operacoes/furo-em-aneis.test.ts:148` `.size).toBe(204)`
+- `procedural/nucleo/operacoes/nome-de-copia.test.ts:160` `.length).toBe(18)`
+- `procedural/nucleo/operacoes/triangulacao-sem-leque.test.ts:75` `.length).toBe(46)`
+- `procedural/nucleo/perfil2d.test.mjs:20` `toHaveLength(16)`
+- `procedural/nucleo/perfil2d.test.mjs:89` `toHaveLength(20)`
+- `procedural/nucleo/perfil2d.test.mjs:94` `toHaveLength(36)`
+- `procedural/nucleo/perfil2d.test.mjs:183` `toHaveLength(16)`
+- `procedural/nucleo/perfil2d.test.mjs:190` `toHaveLength(20)`
+- `procedural/nucleo/selecao-geometrica.test.mjs:99` `toHaveLength(10)`
+- `procedural/nucleo/selecao-geometrica.test.mjs:115` `toHaveLength(12)`
+- `procedural/nucleo/selecao-geometrica.test.mjs:122` `toHaveLength(12)`
+- `procedural/nucleo/selecao-geometrica.test.mjs:124` `toHaveLength(12)`
+- `procedural/nucleo/selecao-geometrica.test.mjs:160` `toHaveLength(16)`
+- `procedural/nucleo/selecao-geometrica.test.mjs:165` `toHaveLength(24)`
+- `procedural/nucleo/selecao-geometrica.test.mjs:173` `toHaveLength(12)`
+- `procedural/nucleo/selecao-geometrica.test.mjs:209` `toHaveLength(24)`
+- `procedural/nucleo/selecao-geometrica.test.mjs:213` `toHaveLength(12)`
+- `procedural/nucleo/selecao-geometrica.test.mjs:307` `.size).toBe(12)`
+- `procedural/nucleo/subdivisao-grupos.test.ts:25` `.size).toBe(64)`
+- `procedural/nucleo/subdivisao-grupos.test.ts:26` `toHaveLength(16)`
+- `procedural/nucleo/subdivisao.test.mjs:82` `.size).toBe(98)`
+- `procedural/nucleo/subdivisao.test.mjs:83` `.size).toBe(96)`
+- `procedural/nucleo/subdivisao.test.mjs:427` `.size).toBe(48)`
+- `procedural/nucleo/subdivisao.test.mjs:437` `.size).toBe(32)`
+- `procedural/nucleo/subdivisao.test.mjs:448` `.size).toBe(16)`
+- `procedural/nucleo/subdivisao.test.mjs:457` `.length).toBe(72)`
+- `procedural/nucleo/topologia.test.js:206` `toHaveLength(40)`
+- `procedural/nucleo/triangulacao-colinear.test.mjs:77` `toHaveLength(38)`
+- `procedural/nucleo/triangulacao-colinear.test.mjs:79` `toHaveLength(36)`
+- `procedural/nucleo/triangulacao-colinear.test.mjs:133` `toHaveLength(302)`
+- `procedural/nucleo/triangulacao-colinear.test.mjs:134` `toHaveLength(300)`
+- `procedural/pecas/carenagem-de-prova/receita.test.mjs:38` `toHaveLength(583)`
+- `procedural/pecas/carenagem-de-prova/receita.test.mjs:41` `toHaveLength(34174)`
+- `src/autoria/calibracao-do-critico.test.js:29` `toHaveLength(12)`
+- `src/autoria/conferir-articulacao.test.mjs:59` `toHaveLength(19)`
+- `src/autoria/diferenca-de-texto.test.js:14` `toHaveLength(10)`
+- `src/autoria/plano-de-modelagem.test.js:74` `toHaveLength(240)`
+- `src/autoria/plano-de-modelagem.test.js:79` `toHaveLength(128)`
+- `src/autoria/tradutor-nivel-zero.test.js:398` `toHaveLength(36)`
+- `src/bancada/cena/cenario-do-tema.test.js:61` `toHaveLength(12)`
+- `tools/blender/leitura-do-pacote.test.mjs:43` `.length).toBe(17)`
+- `tools/fixtures/aberturas-em-teste/vizinhanca.test.ts:212` `toHaveLength(16)`
+- `tools/fixtures/costuras-e-furos/agulha-na-faceta-do-tubo/agulha-na-faceta-do-tubo.test.mjs:24` `.length).toBe(30)`
+- `tools/fixtures/solido-por-lacos/tubos.test.ts:71` `toHaveLength(37)`
+- `tools/mcp/mcp.test.mjs:235` `toHaveLength(22)`
+- `tools/mcp/procedural.test.mjs:98` `.size).toBe(42)`
+- `tools/modelar/alisar-rede.test.mjs:105` `.length).toBe(240)`
+- `tools/modelar/analise-da-peca.test.mjs:40` `toHaveLength(24)`
+- `tools/modelar/aprovacao-da-familia.test.mjs:160` `toHaveLength(12)`
+- `tools/modelar/booleana-colinear.test.mjs:56` `.size).toBe(49)`
+- `tools/modelar/casamento-da-vista.test.mjs:45` `toHaveLength(12)`
+- `tools/modelar/composicao-na-varredura.test.mjs:35` `toHaveLength(12)`
+- `tools/modelar/conferir-vistas.test.mjs:66` `toHaveLength(12)`
+- `tools/modelar/cor-auditoria.test.ts:25` `.size).toBe(12)`
+- `tools/modelar/esboco-para-passos.test.mjs:21` `toHaveLength(11)`
+- `tools/modelar/exportar-gltf-braco.test.mjs:30` `toHaveLength(12)`
+- `tools/modelar/exportar-gltf-braco.test.mjs:40` `toHaveLength(12)`
+- `tools/modelar/instancia-de-familia.test.mjs:123` `.size).toBe(16)`
+- `tools/modelar/instancia-de-familia.test.mjs:127` `toHaveLength(12)`
+- `tools/modelar/instancia-de-familia.test.mjs:151` `toHaveLength(16)`
+- `tools/modelar/modelo-aberto.test.mjs:33` `.size).toBe(236)`
+- `tools/modelar/modelo-aberto.test.mjs:34` `.size).toBe(236)`
+- `tools/modelar/olhar-bancada.test.mjs:409` `toHaveLength(24)`
+- `tools/modelar/repositorio-autoria.test.ts:89` `toHaveLength(99)`
+- `tools/modelar/uso.test.mjs:67` `.length).toBe(300)`
+- `tools/modelar/vinco-na-imagem.test.mjs:180` `.size).toBe(256)`
+- `tools/modelar/vincos-da-rede.test.mjs:154` `toHaveLength(11)`
+- `tools/modelar/vincos-da-rede.test.mjs:169` `toHaveLength(12)`
+- `tools/modelar/vistas-para-critica.test.mjs:208` `toHaveLength(16)`
+- `tools/oficina/furo-ordens-de-ponte.test.ts:96` `.size).toBe(128)`
+- `tools/oficina/furo-ordens-de-ponte.test.ts:97` `.size).toBe(204)`
+- `tools/oficina/oficina.test.ts:165` `.length).toBe(16)`
+- `tools/oficina/oficina.test.ts:166` `.length).toBe(24)`
+- `tools/oficina/oficina.test.ts:180` `.size).toBe(16)`
+- `tools/oficina/oficina.test.ts:229` `.length).toBe(288)`
+- `tools/oficina/oficina.test.ts:509` `.length).toBe(96)`
+- `tools/oficina/oficina.test.ts:510` `.length).toBe(48)`
+- `tools/oficina/oficina.test.ts:511` `.length).toBe(144)`
+- `tools/oficina/oficina.test.ts:512` `.length).toBe(288)`
+- `tools/oficina/oficina.test.ts:521` `.length).toBe(288)`
+- `tools/oficina/oficina.test.ts:893` `.length).toBe(32)`
+- `tools/oficina/oficina.test.ts:933` `.size).toBe(42)`
+- `tools/oficina/oficina.test.ts:934` `.size).toBe(48)`
+- `tools/oficina/oficina.test.ts:1036` `.size).toBe(42)`
+- `tools/oficina/oficina.test.ts:1059` `.size).toBe(42)`
+- `tools/oficina/oficina.test.ts:1060` `.size).toBe(52)`
+- `tools/oficina/oficina.test.ts:1105` `.size).toBe(10)`
+- `tools/oficina/oficina.test.ts:1106` `.size).toBe(12)`
+- `tools/oficina/oficina.test.ts:1217` `.size).toBe(14)`
+- `tools/oficina/oficina.test.ts:1219` `.size).toBe(20)`
+- `tools/oficina/oficina.test.ts:1451` `.size).toBe(10)`
+- `tools/oficina/oficina.test.ts:1536` `.length).toBe(1000)`
+- `tools/oficina/oficina.test.ts:1858` `.size).toBe(10)`
+- `tools/oficina/oficina.test.ts:2104` `.size).toBe(26)`
+- `tools/oficina/oficina.test.ts:2105` `.size).toBe(24)`
+- `tools/oficina/oficina.test.ts:2127` `.size).toBe(42)`
+- `tools/oficina/oficina.test.ts:2128` `.size).toBe(48)`
+- `tools/oficina/oficina.test.ts:3200` `.size).toBe(24)`
+- `tools/oficina/oficina.test.ts:3201` `.size).toBe(26)`
+- `tools/oficina/oficina.test.ts:3236` `.size).toBe(24)`
+- `tools/oficina/oficina.test.ts:3250` `.size).toBe(24)`
+- `tools/oficina/oficina.test.ts:4307` `toHaveLength(24)`
+- `tools/oficina/oficina.test.ts:4443` `toHaveLength(18)`
+- `tools/oficina/oficina.test.ts:4694` `toHaveLength(30)`
+- `tools/oficina/oficina.test.ts:4766` `toHaveLength(18)`
+- `tools/oficina/oficina.test.ts:4782` `toHaveLength(18)`
+- `tools/oficina/oficina.test.ts:4903` `toHaveLength(12)`
+- `tools/oficina/oficina.test.ts:4910` `toHaveLength(13)`
+
+### Teto de tempo fixo no it
+
+- `modulos/manual/tests/manual-real.test.mjs:35` 60000 ms
+- `procedural/familias/cilindro-hidraulico/cilindro-hidraulico.test.js:431` 120_000 ms
+- `procedural/familias/cilindro-hidraulico/cilindro-hidraulico.test.js:440` 120_000 ms
+- `procedural/familias/cilindro-hidraulico/cilindro-hidraulico.test.js:452` 120_000 ms
+- `procedural/familias/movel-de-caixa/movel-de-caixa.test.mjs:376` 120_000 ms
+- `procedural/familias/movel-de-caixa/movel-de-caixa.test.mjs:610` 120_000 ms
+- `procedural/familias/movel-de-caixa/movel-de-caixa.test.mjs:641` 600_000 ms
+- `procedural/familias/movel-de-caixa/movel-de-caixa.test.mjs:655` 600_000 ms
+- `procedural/familias/movel-de-caixa/movel-de-caixa.test.mjs:671` 300_000 ms
+- `procedural/familias/movel-de-caixa/movel-de-caixa.test.mjs:694` 300_000 ms
+- `procedural/familias/movel-de-caixa/movel-de-caixa.test.mjs:712` 600_000 ms
+- `procedural/familias/movel-de-caixa/movel-de-caixa.test.mjs:718` 120_000 ms
+- `procedural/familias/movel-de-caixa/movel-de-caixa.test.mjs:729` 120_000 ms
+- `procedural/familias/roda-pneu/roda-pneu.test.js:960` 180_000 ms
+- `procedural/familias/roda-pneu/roda-pneu.test.js:974` 300_000 ms
+- `procedural/familias/superficie-aerodinamica/superficie-aerodinamica.test.js:566` 120_000 ms
+- `procedural/familias/superficie-aerodinamica/superficie-aerodinamica.test.js:892` 120_000 ms
+- `procedural/familias/superficie-aerodinamica/superficie-aerodinamica.test.js:930` 600_000 ms
+- `procedural/familias/superficie-aerodinamica/superficie-aerodinamica.test.js:1065` 180_000 ms
+- `procedural/familias/superficie-aerodinamica/superficie-aerodinamica.test.js:1079` 300_000 ms
+- `procedural/nucleo/friso-contato.test.mjs:22` 120_000 ms
+- `procedural/nucleo/friso-contato.test.mjs:32` 120_000 ms
+- `procedural/nucleo/friso-contato.test.mjs:44` 120_000 ms
+- `procedural/nucleo/gaiola-por-rede-contato.test.mjs:21` 120_000 ms
+- `procedural/nucleo/operacoes/arredondar-costura-tubos-altos.test.ts:32` 60000 ms
+- `procedural/nucleo/operacoes/booleana-casca-raspada.test.ts:153` 60_000 ms
+- `procedural/nucleo/paineis-por-vaos-grande.test.ts:22` 600_000 ms
+- `procedural/nucleo/rastreio-do-retrato.test.ts:134` 60_000 ms
+- `procedural/pecas/carenagem-de-prova/receita.test.mjs:116` 120_000 ms
+- `procedural/pecas/instalacao-solar/conferencias.test.mjs:83` 300000 ms
+- `src/autoria/material-da-receita.acervo.test.js:124` 120000 ms
+- `tools/blender/blender.test.mjs:106` 180000 ms
+- `tools/blender/blender.test.mjs:114` 120000 ms
+- `tools/blender/blender.test.mjs:120` 600000 ms
+- `tools/blender/blender.test.mjs:150` 600000 ms
+- `tools/blender/blender.test.mjs:238` 600000 ms
+- `tools/blender/blender.test.mjs:240` 600000 ms
+- `tools/blender/comparar-vincos.test.mjs:28` 120000 ms
+- `tools/blender/conferir-refino.test.mjs:82` 300000 ms
+- `tools/blender/conferir-refino.test.mjs:125` 300000 ms
+- `tools/blender/conferir-refino.test.mjs:136` 300000 ms
+- `tools/blender/conferir-refino.test.mjs:149` 300000 ms
+- `tools/blender/conferir-refino.test.mjs:161` 300000 ms
+- `tools/blender/conferir-refino.test.mjs:174` 300000 ms
+- `tools/blender/conferir-refino.test.mjs:194` 300000 ms
+- `tools/blender/conferir-refino.test.mjs:226` 300000 ms
+- `tools/blender/conferir-refino.test.mjs:239` 300000 ms
+- `tools/blender/conferir-refino.test.mjs:248` 300000 ms
+- `tools/blender/conferir-refino.test.mjs:267` 300000 ms
+- `tools/blender/conferir-refino.test.mjs:280` 300000 ms
+- `tools/blender/conferir-refino.test.mjs:299` 120000 ms
+- `tools/blender/cortes-de-detalhe.test.mjs:66` 240000 ms
+- `tools/blender/cotas-dos-cortes.test.mjs:58` 60000 ms
+- `tools/blender/gabarito-booleana.test.mjs:73` 120000 ms
+- `tools/blender/gabarito-booleana.test.mjs:82` 120000 ms
+- `tools/blender/leitura-blender.test.mjs:63` 600000 ms
+- `tools/blender/leitura-blender.test.mjs:175` 600000 ms
+- `tools/blender/leitura-blender.test.mjs:206` 900000 ms
+- `tools/blender/leitura-do-pacote.test.mjs:30` 120000 ms
+- `tools/blender/ler-perfil.test.mjs:93` 180000 ms
+- `tools/blender/limiar-de-dobra.test.mjs:76` 600000 ms
+- `tools/blender/limiar-de-dobra.test.mjs:89` 600000 ms
+- `tools/blender/limiar-de-dobra.test.mjs:120` 600000 ms
+- `tools/blender/linhas-pelos-cortes.test.mjs:48` 120000 ms
+- `tools/blender/regua-sinal-curvatura-cortes.test.mjs:69` 300000 ms
+- `tools/blender/regua-sinal-curvatura-cortes.test.mjs:87` 300000 ms
+- `tools/blender/regua-sinal-curvatura-cortes.test.mjs:102` 300000 ms
+- `tools/blender/regua-sinal-curvatura-cortes.test.mjs:119` 300000 ms
+- `tools/blender/regua-sinal-curvatura-cortes.test.mjs:146` 300000 ms
+- `tools/blender/regua-sinal-curvatura-cortes.test.mjs:155` 300000 ms
+- `tools/blender/superficie.test.mjs:321` 60000 ms
+- `tools/blender/superficie.test.mjs:328` 300000 ms
+- `tools/blender/superficie.test.mjs:360` 300000 ms
+- `tools/blender/superficie.test.mjs:388` 300000 ms
+- `tools/blender/superficie.test.mjs:396` 120000 ms
+- `tools/fixtures/aberturas-em-teste/chapa-grande.test.ts:30` 900000 ms
+- `tools/mcp/ensaio-ponta-a-ponta.test.mjs:164` 120_000 ms
+- `tools/mcp/ensaio-ponta-a-ponta.test.mjs:201` 120_000 ms
+- `tools/mcp/ensaio-ponta-a-ponta.test.mjs:232` 120_000 ms
+- `tools/mcp/ensaio-ponta-a-ponta.test.mjs:261` 120_000 ms
+- `tools/mcp/mcp.test.mjs:117` 30_000 ms
+- `tools/mcp/mcp.test.mjs:157` 30_000 ms
+- `tools/mcp/mcp.test.mjs:261` 120_000 ms
+- `tools/mcp/mcp.test.mjs:679` 180_000 ms
+- `tools/mcp/mcp.test.mjs:833` 180_000 ms
+- `tools/mcp/mcp.test.mjs:903` 180_000 ms
+- `tools/mcp/mcp.test.mjs:1384` 180_000 ms
+- `tools/mcp/mcp.test.mjs:1423` 120_000 ms
+- `tools/mcp/perfis/autoria-execucao.test.mjs:119` 30000 ms
+- `tools/mcp/perfis/autoria-execucao.test.mjs:140` 30000 ms
+- `tools/mcp/perfis/parametros.test.mjs:167` 60_000 ms
+- `tools/mcp/perfis/parametros.test.mjs:176` 90_000 ms
+- `tools/mcp/perfis/parametros.test.mjs:188` 120_000 ms
+- `tools/mcp/perfis/parametros.test.mjs:202` 60_000 ms
+- `tools/mcp/perfis/parametros.test.mjs:224` 90_000 ms
+- `tools/mcp/perfis/parametros.test.mjs:233` 90_000 ms
+- `tools/mcp/perfis/parametros.test.mjs:244` 90_000 ms
+- `tools/mcp/procedural.test.mjs:74` 30_000 ms
+- `tools/mcp/procedural.test.mjs:101` 30_000 ms
+- `tools/mcp/procedural.test.mjs:112` 30_000 ms
+- `tools/modelar/acervo-real.test.mjs:97` 900_000 ms
+- `tools/modelar/alisar-a-superficie.test.mjs:73` 240000 ms
+- `tools/modelar/alisar-a-superficie.test.mjs:280` 120000 ms
+- `tools/modelar/alisar-a-superficie.test.mjs:290` 180000 ms
+- `tools/modelar/alisar-rede.test.mjs:78` 900000 ms
+- `tools/modelar/aprovacao-da-familia.test.mjs:72` 120_000 ms
+- `tools/modelar/aprovacao-da-familia.test.mjs:81` 120_000 ms
+- `tools/modelar/aprovacao-da-familia.test.mjs:89` 120_000 ms
+- `tools/modelar/aprovacao-da-familia.test.mjs:93` 120_000 ms
+- `tools/modelar/aprovacao-da-familia.test.mjs:183` 60_000 ms
+- `tools/modelar/aprovacao-da-familia.test.mjs:199` 60_000 ms
+- `tools/modelar/calibracao-do-critico.test.mjs:32` 120_000 ms
+- `tools/modelar/calibracao-do-critico.test.mjs:201` 120_000 ms
+- `tools/modelar/calibracao-do-critico.test.mjs:454` 120_000 ms
+- `tools/modelar/calibracao-do-critico.test.mjs:470` 180_000 ms
+- `tools/modelar/cilindro-hidraulico-aprovacao.test.mjs:105` 120_000 ms
+- `tools/modelar/conferir-contra-referencia.test.mjs:155` 60_000 ms
+- `tools/modelar/contorno-da-imagem.test.mjs:21` 60000 ms
+- `tools/modelar/contorno-da-imagem.test.mjs:26` 60000 ms
+- `tools/modelar/contorno-da-imagem.test.mjs:39` 60000 ms
+- `tools/modelar/contorno-da-imagem.test.mjs:47` 60000 ms
+- `tools/modelar/contorno-da-imagem.test.mjs:83` 60000 ms
+- `tools/modelar/custo-de-importar-receita.test.mjs:46` 300_000 ms
+- `tools/modelar/descrever-partes-materiais.test.mjs:64` 120000 ms
+- `tools/modelar/estudo-campo-revalidacao.test.ts:185` 30_000 ms
+- `tools/modelar/exportar-gltf-braco.test.mjs:47` 90_000 ms
+- `tools/modelar/familia.test.mjs:74` 420000 ms
+- `tools/modelar/folha-comparativa.test.mjs:101` 60000 ms
+- `tools/modelar/guardas/abre-na-bancada.test.mjs:42` 900_000 ms
+- `tools/modelar/guardas/abre-na-bancada.test.mjs:56` 900_000 ms
+- `tools/modelar/guardas/etapas-do-acervo.test.mjs:36` 900_000 ms
+- `tools/modelar/guardas/guarda-acervo.test.mjs:237` 120000 ms
+- `tools/modelar/guardas/guarda-acervo.test.mjs:257` 600000 ms
+- `tools/modelar/guardas/guarda-acervo.test.mjs:283` 20000 ms
+- `tools/modelar/olhar-bancada.test.mjs:304` 60_000 ms
+- `tools/modelar/parametros-peca.test.mjs:229` 120_000 ms
+- `tools/modelar/parametros-peca.test.mjs:295` 30_000 ms
+- `tools/modelar/parametros-peca.test.mjs:328` 60_000 ms
+- `tools/modelar/parametros-peca.test.mjs:342` 20_000 ms
+- `tools/modelar/referencia-de-silhueta.test.mjs:88` 60000 ms
+- `tools/modelar/referencia-de-silhueta.test.mjs:98` 60000 ms
+- `tools/modelar/referencia-de-silhueta.test.mjs:109` 60000 ms
+- `tools/modelar/referencia-de-silhueta.test.mjs:182` 60000 ms
+- `tools/modelar/reguas-de-malha/costura-registrada.test.mjs:48` 60_000 ms
+- `tools/modelar/rodada-de-modelagem.test.mjs:276` 60000 ms
+- `tools/modelar/rodada-de-modelagem.test.mjs:387` 60000 ms
+- `tools/modelar/rodada-de-modelagem.test.mjs:408` 60000 ms
+- `tools/modelar/sobreposicao-de-cortes.test.mjs:187` 60_000 ms
+- `tools/modelar/sobreposicao-de-cortes.test.mjs:193` 60_000 ms
+- `tools/modelar/sobreposicao-de-cortes.test.mjs:199` 60_000 ms
+- `tools/modelar/sobreposicao-de-cortes.test.mjs:224` 60_000 ms
+- `tools/modelar/varrer-peca.test.mjs:203` 60_000 ms
+- `tools/modelar/varrer-peca.test.mjs:213` 60_000 ms
+- `tools/modelar/varrer-peca.test.mjs:218` 30_000 ms
+- `tools/modelar/varrer-peca.test.mjs:226` 60_000 ms
+- `tools/modelar/varrer-peca.test.mjs:244` 60_000 ms
+- `tools/modelar/varrer-peca.test.mjs:253` 60_000 ms
+- `tools/modelar/varrer-peca.test.mjs:261` 30_000 ms
+- `tools/modelar/varrer-peca.test.mjs:281` 90_000 ms
+- `tools/modelar/varrer-peca.test.mjs:286` 60_000 ms
+- `tools/modelar/varrer-peca.test.mjs:294` 30_000 ms
+- `tools/modelar/varrer-peca.test.mjs:309` 60_000 ms
+- `tools/modelar/varrer-peca.test.mjs:330` 90_000 ms
+- `tools/modelar/varrer-peca.test.mjs:365` 120_000 ms
+- `tools/modelar/vincos-da-rede.test.mjs:66` 300000 ms
+- `tools/modelar/vincos-da-rede.test.mjs:123` 120000 ms
+- `tools/modelar/vincos-da-rede.test.mjs:197` 300000 ms
+- `tools/modelar/vincos-da-rede.test.mjs:208` 300000 ms
+- `tools/modelar/vistas-da-receita.test.mjs:33` 60000 ms
+- `tools/modelar/vistas-de-superficie.test.mjs:115` 60_000 ms
+- `tools/modelar/vistas-de-superficie.test.mjs:132` 60_000 ms
+- `tools/modelar/vistas-de-superficie.test.mjs:153` 60_000 ms
+- `tools/modelar/vistas-de-superficie.test.mjs:319` 60_000 ms
+- `tools/modelar/vistas-de-superficie.test.mjs:355` 120_000 ms
+- `tools/modelar/vistas-de-superficie.test.mjs:400` 60_000 ms
+- `tools/modelar/vistas-de-superficie.test.mjs:421` 120_000 ms
+- `tools/modelar/vistas-de-superficie.test.mjs:466` 600_000 ms
+- `tools/modelar/vistas-de-superficie.test.mjs:483` 600_000 ms
+- `tools/modelar/vistas-de-superficie.test.mjs:493` 600_000 ms
+- `tools/modelar/vistas-para-critica.test.mjs:326` 60_000 ms
+- `tools/modelar/vistas-para-critica.test.mjs:334` 60_000 ms
+- `tools/modelar/vistas-para-critica.test.mjs:340` 60_000 ms
+- `tools/modelar/vistas-para-critica.test.mjs:360` 60_000 ms
+- `tools/modelar/vistas-para-critica.test.mjs:370` 60_000 ms
+- `tools/modelar/vistas-para-critica.test.mjs:395` 60_000 ms
+- `tools/modelar/vistas-para-critica.test.mjs:405` 60_000 ms
+- `tools/modelar/vistas-para-critica.test.mjs:420` 60_000 ms
+- `tools/modelar/vistas-para-critica.test.mjs:436` 60_000 ms
+- `tools/modelar/vistas-para-critica.test.mjs:492` 60_000 ms
+- `tools/modelar/vistas-para-critica.test.mjs:500` 60_000 ms
+- `tools/modelar/vistas-para-critica.test.mjs:508` 60_000 ms
+- `tools/modelar/vistas-para-critica.test.mjs:512` 60_000 ms
+- `tools/modelar/vistas-para-critica.test.mjs:921` 20_000 ms
+- `tools/modelar/vistas-para-critica.test.mjs:958` 60_000 ms
+- `tools/modelar/vistas-para-critica.test.mjs:1018` 60_000 ms
+- `tools/modelar/vistas-para-critica.test.mjs:1030` 60_000 ms
+- `tools/oficina/argumento-desconhecido.test.mjs:156` 60_000 ms
+- `tools/oficina/oficina.test.ts:1543` 20_000 ms
+- `tools/oficina/oficina.test.ts:5493` 15_000 ms
+
+### Teto de tempo por relógio
+
+- `modulos/manual/tests/desenho.test.js:108` `expect(ms).toBeLessThan(30000); // guarda contra travamento; o tempo real sai em r.tempos`
+- `procedural/nucleo/limpar-lascas.test.ts:318` `expect(ms).toBeLessThan(3000);`
+- `procedural/nucleo/limpar-lascas.test.ts:338` `expect(ms).toBeLessThan(15000); /* 0,7 s aqui, 5,2 s no CI com a máquina dividida: o teto `
+- `procedural/nucleo/triangulacao-colinear.test.mjs:126` `expect(ms).toBeLessThan(2000);`
+
+### Citação de peça específica do acervo
+
+- `modulos/esboco-nucleo/tests/variantes.test.js:8` mesa-quadrada-escura
+- `modulos/manual/tests/desenho.test.js:10` kukri
+- `modulos/manual/tests/desenho.test.js:11` suporte-tubo
+- `modulos/manual/tests/desenho.test.js:99` suporte-tubo
+- `modulos/manual/tests/desenho.test.js:99` kukri
+- `modulos/manual/tests/desenho.test.js:124` suporte-tubo
+- `modulos/manual/tests/desenho.test.js:124` kukri
+- `modulos/manual/tests/desenho.test.js:139` suporte-tubo
+- `modulos/manual/tests/desenho.test.js:139` kukri
+- `modulos/manual/tests/desenho.test.js:163` kukri
+- `modulos/manual/tests/desenho.test.js:163` suporte-tubo
+- `modulos/manual/tests/lista-de-pecas.test.js:58` instalacao-solar
+- `modulos/manual/tests/lista-de-pecas.test.js:58` braco-robotico
+- `modulos/manual/tests/lista-de-pecas.test.js:58` empilhadeira
+- `modulos/manual/tests/lista-de-pecas.test.js:58` aviao
+- `modulos/manual/tests/lista-de-pecas.test.js:58` furgao
+- `modulos/manual/tests/manual-real.test.mjs:11` aviao
+- `modulos/manual/tests/passos.test.js:49` instalacao-solar
+- `modulos/manual/tests/passos.test.js:50` instalacao-solar
+- `modulos/manual/tests/passos.test.js:51` instalacao-solar
+- `modulos/manual/tests/passos.test.js:51` instalacao-solar
+- `procedural/familias/roda-pneu/roda-pneu.test.js:34` carrinho-de-mao
+- `procedural/familias/roda-pneu/roda-pneu.test.js:34` trator
+- `procedural/familias/roda-pneu/roda-pneu.test.js:157` carrinho-de-mao
+- `procedural/familias/roda-pneu/roda-pneu.test.js:157` trator
+- `procedural/familias/roda-pneu/roda-pneu.test.js:202` trator
+- `procedural/familias/roda-pneu/roda-pneu.test.js:271` trator
+- `procedural/familias/roda-pneu/roda-pneu.test.js:273` trator
+- `procedural/familias/roda-pneu/roda-pneu.test.js:294` trator
+- `procedural/familias/roda-pneu/roda-pneu.test.js:295` trator
+- `procedural/familias/roda-pneu/roda-pneu.test.js:333` trator
+- `procedural/familias/roda-pneu/roda-pneu.test.js:349` trator
+- `procedural/familias/roda-pneu/roda-pneu.test.js:383` trator
+- `procedural/familias/roda-pneu/roda-pneu.test.js:384` trator
+- `procedural/familias/roda-pneu/roda-pneu.test.js:497` carrinho-de-mao
+- `procedural/familias/roda-pneu/roda-pneu.test.js:497` carrinho-de-mao
+- `procedural/familias/roda-pneu/roda-pneu.test.js:498` carrinho-de-mao
+- `procedural/familias/roda-pneu/roda-pneu.test.js:506` trator
+- `procedural/familias/roda-pneu/roda-pneu.test.js:507` trator
+- `procedural/familias/roda-pneu/roda-pneu.test.js:605` trator
+- `procedural/familias/roda-pneu/roda-pneu.test.js:875` trator
+- `procedural/familias/roda-pneu/roda-pneu.test.js:876` trator
+- `procedural/familias/roda-pneu/roda-pneu.test.js:913` carrinho-de-mao
+- `procedural/nucleo/apoio-do-vinco.test.ts:375` sedan-chassi-e-lataria
+- `procedural/nucleo/limpar-contorno.test.mjs:3` ambulancia
+- `procedural/nucleo/limpar-contorno.test.mjs:3` caminhao-bombeiro
+- `procedural/nucleo/limpar-contorno.test.mjs:3` caminhao-entrega
+- `procedural/nucleo/limpar-contorno.test.mjs:3` carro-policia
+- `procedural/nucleo/limpar-contorno.test.mjs:3` carro-suv-luxo
+- `procedural/nucleo/limpar-contorno.test.mjs:3` trator-sirene
+- `procedural/nucleo/operacoes/booleana-casca-raspada.test.ts:130` aviao
+- `procedural/nucleo/operacoes/booleana-casca-raspada.test.ts:130` aviao
+- `procedural/nucleo/operacoes/booleana-casca-raspada.test.ts:131` aviao
+- `procedural/nucleo/operacoes/booleana-casca-raspada.test.ts:131` aviao
+- `procedural/nucleo/rastreio-do-retrato.test.ts:126` ambulancia
+- `procedural/nucleo/rastreio-do-retrato.test.ts:126` braco-robotico
+- `procedural/nucleo/rastreio-do-retrato.test.ts:126` caminhao-entrega
+- `procedural/nucleo/rastreio-do-retrato.test.ts:126` carro-policia
+- `procedural/nucleo/rastreio-do-retrato.test.ts:126` carro-sedan-compacto
+- `procedural/nucleo/rastreio-do-retrato.test.ts:127` furgao
+- `procedural/nucleo/rastreio-do-retrato.test.ts:127` micro-ondas-branco
+- `procedural/nucleo/rastreio-do-retrato.test.ts:127` onibus-urbano
+- `procedural/nucleo/rastreio-do-retrato.test.ts:127` picape-compacta
+- `procedural/nucleo/rastreio-do-retrato.test.ts:127` suporte-tubo
+- `procedural/nucleo/rastreio-do-retrato.test.ts:127` trator-pa
+- `src/autoria/apoio-no-chao.test.mjs:234` aviao
+- `src/autoria/contato-de-solidos-arvore.test.mjs:156` furgao
+- `src/autoria/contato-de-solidos-arvore.test.mjs:221` furgao
+- `src/autoria/contato-em-plano-inclinado.test.mjs:27` trator
+- `src/autoria/curvatura-da-lataria.test.mjs:223` carenagem-de-prova
+- `src/autoria/molduras-do-vao-casos-reais.test.mjs:19` carro-perua
+- `src/autoria/molduras-do-vao.test.mjs:467` carenagem-de-prova
+- `src/autoria/porta-confere-forma.test.js:68` braco-robotico
+- `src/autoria/regras-de-desenho.test.js:146` furgao-realista
+- `src/bancada/cena/edicao-da-peca.test.js:101` furgao
+- `src/bancada/cena/edicao-da-peca.test.js:114` furgao
+- `src/bancada/componentes/barra-superior.test.js:55` furgao
+- `src/bancada/componentes/barra-superior.test.js:82` furgao
+- `src/bancada/componentes/barra-superior.test.js:88` furgao
+- `src/bancada/componentes/barra-superior.test.js:125` furgao
+- `src/bancada/componentes/endereco.test.js:11` furgao
+- `src/bancada/componentes/ponte-da-captura.test.js:9` furgao
+- `src/bancada/edicao-de-malha.test.js:9` carenagem-de-prova
+- `src/bancada/estado/estado-central.test.js:51` furgao
+- `src/bancada/estado/estado-central.test.js:52` furgao
+- `src/bancada/estado/estado-central.test.js:52` furgao
+- `src/bancada/referencias/imagem-na-cena.test.js:4` furgao
+- `src/bancada/referencias/imagem-na-cena.test.js:6` carenagem-de-prova
+- `src/bancada/referencias/imagem-na-cena.test.js:12` furgao
+- `src/bancada/referencias/imagem-na-cena.test.js:107` carenagem-de-prova
+- `src/bancada/referencias/imagem-referencia.test.js:10` furgao
+- `src/bancada/referencias/imagem-referencia.test.js:10` furgao
+- `src/bancada/referencias/imagem-referencia.test.js:17` furgao
+- `src/bancada/referencias/imagem-referencia.test.js:18` furgao
+- `src/bancada/referencias/imagem-referencia.test.js:20` furgao
+- `src/bancada/referencias/imagem-referencia.test.js:20` furgao
+- `src/bancada/referencias/imagem-referencia.test.js:21` furgao
+- `src/bancada/referencias/imagem-referencia.test.js:22` furgao
+- `src/bancada/sessao/montagem-em-dados-acervo.test.js:23` aviao
+- `src/bancada/sessao/montagem-em-dados-acervo.test.js:23` braco-robotico
+- `src/bancada/sessao/montagem-em-dados-acervo.test.js:29` aviao
+- `src/bancada/sessao/montagem-em-dados-acervo.test.js:30` aviao
+- `src/bancada/sessao/montagem-em-dados-acervo.test.js:47` aviao
+- `src/bancada/sessao/montagem-em-dados-acervo.test.js:66` aviao
+- `src/bancada/sessao/montagem-em-dados-acervo.test.js:68` aviao
+- `src/bancada/sessao/montagem-em-dados-acervo.test.js:81` braco-robotico
+- `src/bancada/sessao/montagem-em-dados-acervo.test.js:104` aviao
+- `src/bancada/sessao/montagem-em-dados-acervo.test.js:112` aviao
+- `src/bancada/sessao/montagem-em-dados-acervo.test.js:113` aviao
+- `src/bancada/sessao/montagem-em-dados-acervo.test.js:114` aviao
+- `src/bancada/sessao/sessao-da-bancada.test.js:47` furgao
+- `src/bancada/sessao/sessao-da-bancada.test.js:48` furgao
+- `src/bancada/sessao/sessao-da-bancada.test.js:49` furgao
+- `tools/fixtures/solido-por-lacos/solido-por-lacos.test.ts:29` braco-robotico
+- `tools/gates/guarda-local.test.mjs:8` braco-robotico
+- `tools/gates/guarda-local.test.mjs:8` furgao
+- `tools/gates/guarda-local.test.mjs:17` braco-robotico
+- `tools/gates/guarda-local.test.mjs:17` braco-robotico
+- `tools/gates/guarda-local.test.mjs:26` furgao-realista
+- `tools/gates/guarda-local.test.mjs:47` furgao
+- `tools/gates/guarda-local.test.mjs:49` furgao
+- `tools/gates/guarda-local.test.mjs:51` furgao
+- `tools/gates/guarda-local.test.mjs:52` furgao
+- `tools/gates/lentos-ligados.test.mjs:22` furgao-realista
+- `tools/gates/seletor.test.mjs:26` trator
+- `tools/mapa/gates-bateria-curta.test.mjs:14` braco-robotico
+- `tools/mapa/gates-bateria-curta.test.mjs:31` aviao
+- `tools/modelar/acervo-real.test.mjs:64` furgao-realista
+- `tools/modelar/assinatura-da-malha.test.mjs:95` suporte-tubo
+- `tools/modelar/assinatura-da-malha.test.mjs:101` suporte-tubo
+- `tools/modelar/assinatura-da-malha.test.mjs:109` suporte-tubo
+- `tools/modelar/comecar.test.mjs:86` aviao
+- `tools/modelar/descrever-partes.test.ts:246` braco-robotico
+- `tools/modelar/descrever-partes.test.ts:247` braco-robotico
+- `tools/modelar/descrever-partes.test.ts:248` braco-robotico
+- `tools/modelar/descrever-partes.test.ts:249` braco-robotico
+- `tools/modelar/descrever-partes.test.ts:253` braco-robotico
+- `tools/modelar/entrada-de-medida.test.mjs:50` carenagem-de-prova
+- `tools/modelar/entrada-de-medida.test.mjs:54` carenagem-de-prova
+- `tools/modelar/exportar-gltf-braco.test.mjs:14` braco-robotico
+- `tools/modelar/exportar-obj.test.mjs:190` geladeira-compacta-branca
+- `tools/modelar/exportar-obj.test.mjs:209` poltrona-moderna-branca
+- `tools/modelar/fluxo-do-objeto.test.mjs:182` carrinho-de-mao
+- `tools/modelar/forma-da-peca-no-veredito.test.mjs:29` braco-robotico
+- `tools/modelar/forma-do-esboco.test.mjs:73` braco-robotico
+- `tools/modelar/instancia-de-familia.test.mjs:9` carrinho-de-mao
+- `tools/modelar/instancia-de-familia.test.mjs:10` carrinho-de-mao
+- `tools/modelar/instancia-de-familia.test.mjs:55` carrinho-de-mao
+- `tools/modelar/instancia-de-familia.test.mjs:56` carrinho-de-mao
+- `tools/modelar/instancia-de-familia.test.mjs:58` carrinho-de-mao
+- `tools/modelar/instancia-de-familia.test.mjs:61` carrinho-de-mao
+- `tools/modelar/instancia-de-familia.test.mjs:62` carrinho-de-mao
+- `tools/modelar/instancia-de-familia.test.mjs:77` carrinho-de-mao
+- `tools/modelar/instancia-de-familia.test.mjs:78` carrinho-de-mao
+- `tools/modelar/instancia-de-familia.test.mjs:168` carrinho-de-mao
+- `tools/modelar/instancia-de-familia.test.mjs:169` carrinho-de-mao
+- `tools/modelar/origem-das-fontes.test.mjs:75` carro-perua
+- `tools/modelar/origem-das-fontes.test.mjs:81` carro-perua
+- `tools/modelar/parametros-peca.test.mjs:31` carenagem-de-prova
+- `tools/modelar/partes-de-objeto.test.mjs:88` braco-robotico
+- `tools/modelar/perguntas-do-alinhamento.test.mjs:19` furgao-realista
+- `tools/modelar/perguntas-do-alinhamento.test.mjs:49` furgao-realista
+- `tools/modelar/perguntas-do-alinhamento.test.mjs:56` furgao-realista
+- `tools/modelar/perguntas-do-alinhamento.test.mjs:58` furgao-realista
+- `tools/modelar/prancha/prancha-dos-contornos.test.mjs:8` braco-robotico
+- `tools/modelar/prancha/prancha-dos-contornos.test.mjs:9` braco-robotico
+- `tools/modelar/prancha/prancha-regras.test.mjs:8` furgao-realista
+- `tools/modelar/refinamento-global.test.mjs:76` braco-robotico
+- `tools/modelar/reguas-de-malha/costura-em-oito.test.mjs:5` braco-robotico
+- `tools/modelar/reguas-de-malha/costura-registrada.test.mjs:43` braco-robotico
+- `tools/modelar/regularidade-da-crista.test.mjs:151` furgao-realista
+- `tools/modelar/regularidade-da-crista.test.mjs:152` furgao-realista
+- `tools/modelar/retrato-do-acervo.test.mjs:122` suporte-tubo
+- `tools/modelar/retrato-do-acervo.test.mjs:130` suporte-tubo
+- `tools/modelar/rodada-de-modelagem.test.mjs:390` aviao
+- `tools/modelar/rodada-de-modelagem.test.mjs:391` aviao
+- `tools/modelar/rodada-de-modelagem.test.mjs:452` empilhadeira
+- `tools/modelar/rodada-de-modelagem.test.mjs:453` empilhadeira
+- `tools/modelar/rodada-de-modelagem.test.mjs:460` empilhadeira
+- `tools/modelar/rodada-de-modelagem.test.mjs:478` empilhadeira
+- `tools/modelar/rodada-de-modelagem.test.mjs:481` empilhadeira
+- `tools/modelar/vao-entre-partes.test.mjs:294` carrinho-de-mao
+- `tools/modelar/vinco-na-imagem.test.mjs:17` carenagem-de-prova
+- `tools/modelar/vistas-de-superficie.test.mjs:486` carenagem-de-prova
+- `tools/modelar/vistas-para-critica.test.mjs:24` braco-robotico
+- `tools/modelar/vistas-para-critica.test.mjs:25` braco-robotico
+- `tools/modelar/vistas-para-critica.test.mjs:26` braco-robotico
+- `tools/modelar/vistas-para-critica.test.mjs:30` aviao
+- `tools/modelar/vistas-para-critica.test.mjs:93` aviao
+- `tools/modelar/vistas-para-critica.test.mjs:125` aviao
+- `tools/modelar/vistas-para-critica.test.mjs:126` aviao
+- `tools/modelar/vistas-para-critica.test.mjs:127` aviao
+- `tools/modelar/vistas-para-critica.test.mjs:440` aviao
+- `tools/modelar/vistas-para-critica.test.mjs:499` aviao
+
+### Só não lançou erro (depois da leitura)
+
+- `src/bancada/referencias/imagens-da-peca.test.js:47` `it('a referência da peça de prova é publicada de verdade', () => {`
+- `tools/bancadas/skill-criar-peca.test.ts:156` `it('cita somente scripts npm existentes', () => {`
+- `tools/fixtures/acervo/materiais-do-furgao-opcoes/receita.test.mjs:10` `it('todos os materiais passam pelo normalizador', () => {`
+- `tools/fixtures/costuras-e-furos/face-degenerada-em-dois-lathe/face-degenerada-em-dois-lathe.test.mjs:24` `it('o adaptador aceita a malha', () => {`
+- `tools/modelar/caminho-confinado.test.ts:25` `it('aceita ancestral novo sem tentar realpath do destino inexistente', () => {`
+- `tools/modelar/diario.test.mjs:83` `it('falha ao gravar não derruba quem está sendo medido', () => {`
+- `tools/modelar/guardas/rodar-guardas.test.mjs:136` `it('sem sessão local não faz nada', () => {`

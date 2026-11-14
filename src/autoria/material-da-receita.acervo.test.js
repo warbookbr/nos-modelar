@@ -5,7 +5,7 @@
  * normalizador): cada material declarado, mais a face sem declaração, a face que cita nome que a receita não declara e a face
  * com cor própria. O material de cena sai igual (cor, aspereza, metalicidade, emissivo, transparência, opacidade e a chave que
  * agrupa as malhas), então a cena também. Receitas do acervo, peças de ensaio e toda receita com `MATERIAIS` em `tools/fixtures/` entram todas. */
-import { readdirSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { describe, expect, it } from 'vitest';
@@ -80,7 +80,12 @@ async function receitasComMateriais() {
 describe('o normalizador sobre o acervo', () => {
   it('aceita todas as receitas e traduz cada material como antes', async () => {
     const receitas = await receitasComMateriais();
-    expect(receitas.length).toBeGreaterThan(90);
+    /* O tamanho do acervo é o que a varredura leu do disco: os arquivos de receita que citam `MATERIAIS` no texto. Os pisos abaixo seguem esse
+       número, e não um número escrito à mão que o acervo ultrapassa ou deixa para trás (era 90 de receitas, 200 de materiais e 500 de
+       comparações, e o último reprovou o CI em 2026-11-13 com 492 sem defeito nenhum). */
+    const citamMateriais = ['procedural/pecas', 'tools/fixtures'].flatMap((raiz) => arquivosJs(join(REPO, raiz))).filter((arquivo) => readFileSync(arquivo, 'utf8').includes('MATERIAIS'));
+    expect(receitas.length).toBeGreaterThan(0);
+    expect(receitas.length).toBeGreaterThanOrEqual(Math.ceil(0.9 * citamMateriais.length));
     let materiais = 0;
     let comparacoes = 0;
     for (const { arquivo, materiais: declarados } of receitas) {
@@ -117,9 +122,10 @@ describe('o normalizador sobre o acervo', () => {
       }
       materiais += nomes.length;
     }
-    /* Piso de sanidade: a varredura achou receitas e comparou materiais. Não é contagem do acervo. Era 500 e reprovou em 2026-11-13
-       com 492, quando as cópias antigas de receita das rodadas saíram: o número caía com arquivo repetido, e não com defeito. */
-    expect(materiais).toBeGreaterThan(200);
-    expect(comparacoes).toBeGreaterThan(500);
+    /* Pisos de sanidade ligados ao tamanho lido: a varredura achou as receitas que o disco tem e comparou todos os materiais delas. */
+    /* Em média a receita declara pelo menos um material, e cada receita rende as três faces fixas mais duas por material, mais uma textura por
+       material: a conta sai do que foi lido, e uma comparação pulada a derruba. */
+    expect(materiais).toBeGreaterThanOrEqual(receitas.length);
+    expect(comparacoes).toBe(3 * receitas.length + 3 * materiais);
   }, 120000);
 });
