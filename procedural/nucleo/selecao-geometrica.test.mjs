@@ -93,6 +93,56 @@ describe('faces por posição extrema', () => {
   });
 });
 
+describe('faces por distância ao eixo (radial)', () => {
+  /* o cilindro de raio 1 e 8 lados tem eixo y: as duas tampas têm o centro no eixo, e as oito laterais a cos(22,5°) = 0,924 dele */
+  const LATERAL = Math.cos(Math.PI / 8);
+  it('min separa as laterais das tampas, e max as tampas das laterais', () => {
+    const laterais = facesDe(CILINDRO, { onde: { radial: { eixo: 'y', min: 0.5 } } });
+    expect(laterais.n.orfaos).toEqual([]);
+    expect(laterais.ids).toHaveLength(8);
+    const tampas = facesDe(CILINDRO, { onde: { radial: { eixo: 'y', max: 0.5 } } });
+    expect(tampas.ids).toHaveLength(2);
+    expect(laterais.ids.filter((id) => tampas.ids.includes(id))).toEqual([]);
+  });
+
+  it('a faixa vale nos dois sentidos e a distância é ao eixo, e não à origem', () => {
+    expect(facesDe(CILINDRO, { onde: { radial: { eixo: 'y', min: LATERAL - 1e-3, max: LATERAL + 1e-3 } } }).ids).toHaveLength(8);
+    expect(facesDe(CILINDRO, { onde: { radial: { eixo: 'y', min: LATERAL + 0.01 } } }).n.orfaos.some((o) => o.ref === 'sel.onde')).toBe(true);
+    // o eixo x passa longe do centro das tampas (a 1 de altura): só as laterais baixas e a tampa de baixo ficam perto dele
+    const doEixoX = facesDe(CILINDRO, { onde: { radial: { eixo: 'x', max: 0.5 } } });
+    expect(doEixoX.n.orfaos).toEqual([]);
+    expect(doEixoX.ids.length).toBeGreaterThan(0);
+    expect(doEixoX.ids.length).toBeLessThan(10);
+  });
+
+  it('`por` desloca o eixo: com o eixo a 3 do cilindro nenhuma face fica a menos de 1', () => {
+    expect(facesDe(CILINDRO, { onde: { radial: { eixo: 'y', por: [3, 0, 0], max: 1 } } }).n.orfaos.some((o) => o.ref === 'sel.onde')).toBe(true);
+    expect(facesDe(CILINDRO, { onde: { radial: { eixo: 'y', por: [3, 0, 0], max: 2.5 } } }).ids.length).toBeGreaterThan(0);
+  });
+
+  it('combina com a normal e a origem, e escolhe arestas pelo ponto médio', () => {
+    const topo = facesDe(CILINDRO, { onde: { normal: { dir: [0, 1, 0], ate: 5 }, radial: { eixo: 'y', max: 0.5 } } });
+    expect(topo.ids).toHaveLength(1);
+    const arestas = onde(CILINDRO, { alvo: 'aresta', tipo: 'viva', angulo: 60, radial: { eixo: 'y', min: LATERAL - 1e-3 } });
+    expect(arestas.erro).toBeUndefined();
+    expect(arestas.arestas).toHaveLength(16);
+  });
+
+  it('recusa o que não é uma faixa de distância', () => {
+    for (const [radial, mensagem] of [
+      [{ eixo: 'y' }, /radial pede min, max ou os dois/],
+      [{ eixo: 'w', min: 1 }, /radial.eixo só aceita/],
+      [{ eixo: 'y', min: -1 }, /radial.min é uma distância e não pode ser negativa/],
+      [{ eixo: 'y', min: 2, max: 1 }, /radial.min \(2\) passa de radial.max \(1\)/],
+      [{ eixo: 'y', min: 1, cor: 1 }, /radial precisa ser/],
+      [{ eixo: 'y', min: 1, por: [0, 0] }, /radial.por precisa ser \[x,y,z\] finito/],
+    ]) {
+      const n = rodar(CILINDRO);
+      expect(lerOnde(leitor(n), { radial }).erro, JSON.stringify(radial)).toMatch(mensagem);
+    }
+  });
+});
+
 describe('face plana', () => {
   it('todas as faces de uma caixa e de um cilindro facetado são planas', () => {
     expect(onde(CAIXA, { tipo: 'plana' }).faces).toHaveLength(6);

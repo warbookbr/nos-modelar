@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:6673ac26fb8b53d840f0c0bc2c8b8867946ced9adff3c4145afa9e885c15212c",
+  "assinatura": "sha256:160b9c8d10d6e0777db893427e5ccdab0e43f9865e0f2a4aa3a066714f238742",
   "total": 42,
   "operacoes": [
     {
@@ -963,6 +963,20 @@
                 }
               ],
               "description": "Comprimento em que o raio cai até sumir na ponta solta de um trecho (modo curvo): o fim da regiao ou o ponto em que o encontro fica plano."
+            },
+            "limpar": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "true ou a tolerância (padrão: não limpa): as faces finas que o arredondamento deixa no sólido (as do tubo e os pedaços das faces que ele cortou) saem por limparLascas dentro do passo; true usa 0,005 do raio."
             }
           }
         },
@@ -1036,7 +1050,8 @@
           "Costura entre faces planas: prismas em meia-esquadria. Costura sobre superfície curva facetada: arredondamento por fatias, que termina onde o encontro fica plano e recusa quina da própria costura nas classes novas.",
           "Onde três arestas do mesmo tipo se encontram a ponta fica reta.",
           "Arredondamento côncavo (modo curvo) que chega à borda de uma face plana que limita o sólido (a tampa de um tubo rente à parede de outro, com o plano deixando o sólido todo de um lado): o raio cai de forma contínua até o maior que cabe antes da borda, ignorando raioMinimo, e o arredondamento some nela, sem aresta aguda nem fatia no plano da face; abaixo de 5% do raio a estação sai. O resultado traz o aviso faceLimite em neutro.avisos.",
-          "Costura em oito (dois tubos tangentes, com nós de grau 4 nos pontos de tangência), no modo curvo: cada nó é atravessado pelo par de arestas mais reto e cada laço é percorrido inteiro, começando no nó; sem isso o tubo saía partido no meio de um laço, com tampa reta nas duas pontas. Vale só com nós de grau 2 e 4 e laços sem vértice repetido."
+          "Costura em oito (dois tubos tangentes, com nós de grau 4 nos pontos de tangência), no modo curvo: cada nó é atravessado pelo par de arestas mais reto e cada laço é percorrido inteiro, começando no nó; sem isso o tubo saía partido no meio de um laço, com tampa reta nas duas pontas. Vale só com nós de grau 2 e 4 e laços sem vértice repetido.",
+          "O tubo se afunda no sólido até metade da espessura que mede atrás do canto (no máximo um raio): numa parede mais fina que o raio ele não atravessa a pele do outro lado. Se o resultado sai não-manifold, o passo refaz o tubo com o mergulho do arco dobrado, pela metade e quadruplicado antes de recusar."
         ],
         "diagnosticos": []
       }
@@ -5142,7 +5157,7 @@
       }
     }
   ],
-  "assinaturaComExtensoes": "sha256:8d16851b25da7e0729a67dc173c831da02367ba64db45d4ec272098423735d2f",
+  "assinaturaComExtensoes": "sha256:7121e73f8c62d43fa5902df82384b684c1585e75381880ba09f299c5ae8a9d98",
   "totalExtensoes": 5,
   "extensoes": [
     {

@@ -49,7 +49,7 @@ export const TABELA_DE_MEDIDAS = Object.freeze({
   moveV: ['d'], moveF: ['d'], moveA: ['d'], extruda: ['dist'],
   subdivisao: ['vertices', 'espessura'],
   aberturaPorContorno: ['contorno', 'recuoDaLente'],
-  arredondarCostura: ['raio', 'raioMinimo', 'afinarPontas', 'regiao', 'aparar'],
+  arredondarCostura: ['raio', 'raioMinimo', 'afinarPontas', 'regiao', 'aparar', 'limpar'],
   friso: ['perfil', 'fechamento', 'aba'],
   limparLascas: ['tolerancia', 'areaMinima'],
   aparar: ['folga', 'fecha', 'limpar'],
@@ -73,14 +73,23 @@ function selecao(v, onde) {
   if (!v || typeof v !== 'object' || Array.isArray(v)) return v;
   return Object.fromEntries(Object.entries(v).map(([k, x]) => {
     if (k === 'regiao') return [k, medida(x, `${onde}.regiao`)];
-    if (k === 'onde' && x && typeof x === 'object' && x.conexo != null) {
-      /* conexo: `de` e `ate` são medidas e `dir` é só direção; o resto de `onde`, com número, segue recusado */
-      const { conexo, ...resto } = x;
+    if (k === 'onde' && x && typeof x === 'object' && (x.conexo != null || x.radial != null)) {
+      /* conexo: `de` e `ate` são medidas e `dir` é só direção; radial: `por`, `min` e `max` são medidas e `eixo` é só nome; o resto de `onde`, com número, segue recusado */
+      const { conexo, radial, ...resto } = x;
       if (temNumero(resto)) throw new RecusaDoEsboco('o filtro "onde" com número não é convertido para metro; selecione por grupo, origem ou região', `${onde}.onde`);
-      const c = { ...conexo };
-      if (c.de != null) c.de = medida(c.de, `${onde}.onde.conexo.de`);
-      if (c.ate != null) c.ate = medida(c.ate, `${onde}.onde.conexo.ate`);
-      return [k, { ...resto, conexo: c }];
+      const saida = { ...resto };
+      if (conexo != null) {
+        const c = { ...conexo };
+        if (c.de != null) c.de = medida(c.de, `${onde}.onde.conexo.de`);
+        if (c.ate != null) c.ate = medida(c.ate, `${onde}.onde.conexo.ate`);
+        saida.conexo = c;
+      }
+      if (radial != null) {
+        const r = { ...radial };
+        for (const campo of ['por', 'min', 'max']) if (r[campo] != null) r[campo] = medida(r[campo], `${onde}.onde.radial.${campo}`);
+        saida.radial = r;
+      }
+      return [k, saida];
     }
     if (k === 'onde' && temNumero(x)) throw new RecusaDoEsboco('o filtro "onde" com número não é convertido para metro; selecione por grupo, origem ou região', `${onde}.onde`);
     return [k, x];

@@ -6,6 +6,7 @@
 > algum arquivo-fonte estiver sem cabeçalho.
 
 1907 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1910 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1101,6 +1102,7 @@
 - `arredondar-canto.test.ts` — arredondar-canto.test.ts — o vértice onde duas ou três arestas arredondadas (ou chanfradas) se encontram.
 - `arredondar-chapa-furada.test.ts` — arredondar-chapa-furada.test.ts — as três recusas que sobravam ao arredondar as arestas de uma chapa de 6 mm com furos oblongos.
 - `arredondar-costura-convexa.test.ts` — arredondar-costura-convexa.test.ts — fatia 7b do plano "União de sólidos": o `arredondarCostura` arredonda também a borda CONVEXA de uma booleana (a beira do…
+- `arredondar-costura-placa-e-barril.test.ts` — arredondar-costura-placa-e-barril.test.ts — a costura de uma placa de janelas unida à parede de um barril, o caso que uma roda de liga leve revelou.
 - `arredondar-costura-pontas.test.ts` — arredondar-costura-pontas.test.ts — a ponta solta do arredondamento por fatias. A fixture é a coluna do braço robótico reduzida ao essencial: um disco de eix…
 - `arredondar-costura-tubos-altos.test.ts` — arredondar-costura-tubos-altos.test.ts — dois tubos de mesmo diâmetro em T, o vertical mais alto que o raio, unidos e arredondados. Com 144 lados as geratriz…
 - `arredondar-costura.test.ts` — arredondar-costura.test.ts — fatia 4 do plano "União de sólidos": o encontro côncavo de uma união é arredondado com raio declarado, e o `liso` com ângulo não…
@@ -2827,6 +2829,15 @@
 ## tools/fixtures/refina-forma-global/sapata-deslocada/
 
 - `receita.js` — O suporte com a sapata 1 mm para +x: outra malha, ainda dentro do envelope de 2 mm do volume da sapata.
+
+## tools/fixtures/roda-costura/
+
+- `receita.js` — roda-esportiva — roda de liga leve de 19 polegadas com pneu 245/40 R19, etapa 1 (aro, raios, tampa central, parafusos, válvula e pneu), nas duas variantes do…
+- `roda-costura.test.ts` — roda-costura.test.ts — a receita de uma roda de liga leve (cópia de dado de teste, sem a pasta de referências da peça) como prova das três coisas que a costu…
+
+## tools/fixtures/roda-costura/referencias/
+
+- `alvo.md` — alvo de prova (sem imagem)
 
 ## tools/fixtures/solido-por-lacos/
 
