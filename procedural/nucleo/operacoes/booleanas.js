@@ -971,7 +971,7 @@ export function criarOperacoesBooleanas(servicos) {
        (o piso do `conferirMalha`, com o tamanho da caixa no lugar do maior |v|) cintila na tela. O portão
        de cima só pega a face inteira sem área; aqui a lasca dentro de uma face
        com área também grita. */
-    if (extra?.estrito) {
+    if (extra?.estrito && !extra.deixaLasca) {   // com `limpar` o passo funde as lascas depois: o portão só grita sem a limpeza
       const escala = escalaDaPeca;   // o tamanho da peça, e não a distância à origem: a peça deslocada tem as mesmas lascas
       const lasca = [...cortadas, ...pedacosNovos].filter(([, P]) => { for (let k = 1; k < P.length - 1; k++) if (areaDe(pos, [P[0], P[k], P[k + 1]]) < 1e-9 * escala * escala) return true; return false; });
       if (lasca.length) return grita(st, i, op, extra.ref, `o arredondamento deixaria ${lasca.length} face(s) com triângulo sem área (lasca que cintila na tela), a primeira vinda da face ${lasca[0][0]}: o raio não combina com o tamanho das faces deste encaixe; tente um raio diferente, começando por um menor (raioMinimo e regiao não mudam a tampa que gera a lasca); nada foi alterado`);
@@ -1123,6 +1123,20 @@ export function criarOperacoesBooleanas(servicos) {
       faces.push(id);
       if (aux) facesAux.push(id); else pedacosDeEntrada.push(id);
     });
+    /* IDENTIDADE DOS PEDAÇOS: a face que o passo corta deixa o maior pedaço com o id e dá id novo aos outros. Quem citava a face por uma origem (o aro, a placa: o
+       operando da união) continua citando os pedaços dela, e não só o que ficou com o id; sem isso a parte ou o material que nomeia essa origem perdia a parede
+       que a emenda refez. Vale para o pedaço de face de entrada (o material novo do tubo não tem pai). */
+    {
+      const pais = new Map();
+      pedacosNovos.forEach(([fid, , aux], k) => { if (!aux) pais.set(idDoPasso(i, k), fid); });
+      if (pais.size) {
+        const quemCita = new Map();
+        for (const regs of st.origens.values()) for (const r of regs) if (Array.isArray(r.faces)) for (const f of r.faces) { if (!quemCita.has(f)) quemCita.set(f, new Set()); quemCita.get(f).add(r); }
+        const aAdicionar = new Map();
+        for (const [id, pai] of pais) for (const r of quemCita.get(pai) ?? []) { if (!aAdicionar.has(r)) aAdicionar.set(r, []); aAdicionar.get(r).push(id); }
+        for (const [r, ids] of aAdicionar) r.faces = [...new Set([...r.faces, ...ids])].sort((x, y) => x - y);
+      }
+    }
     for (const fid of consumidas) { st.F.delete(fid); st.consumidas.set(fid, { passo: i, op }); }
     const usados = new Set();
     for (const f of st.F.values()) for (const v of f.vs) usados.add(v);
@@ -1398,6 +1412,10 @@ export function criarOperacoesBooleanas(servicos) {
       try { lim = st.num(a.limpar); } catch (e) { return grita(st, i, op, 'limpar', e.message); }
       if (!(Number.isFinite(lim) && lim > 0)) return grita(st, i, op, 'limpar', `limpar é true, false ou a tolerância, um número maior que zero na unidade da peça, e veio ${JSON.stringify(a.limpar)}`);
     }
+    /* pularOQueNaoCabe: a estação em que nenhum raio (nem o raioMinimo) cabe deixa de ser recusa: o tubo se parte ali, as pontas soltas fecham como as de uma regiao
+       (e afinam com afinarPontas), a aresta fica viva naquele trecho e o passo DECLARA onde (aviso naoCabe). Sem a opção a recusa é a de sempre. */
+    if (a.pularOQueNaoCabe != null && typeof a.pularOQueNaoCabe !== 'boolean') return grita(st, i, op, 'pularOQueNaoCabe', `pularOQueNaoCabe é true ou false, e veio ${JSON.stringify(a.pularOQueNaoCabe)}`);
+    const pularOQueNaoCabe = a.pularOQueNaoCabe === true;
     let afinarPontas = null;
     if (a.afinarPontas != null) {
       try { afinarPontas = st.num(a.afinarPontas); } catch (e) { return grita(st, i, op, 'afinarPontas', e.message); }
@@ -1861,6 +1879,7 @@ export function criarOperacoesBooleanas(servicos) {
          cai em passos de 3/4 até o mínimo, e o tubo afina naquele trecho; sem
          ele a recusa é a de sempre. */
       const reducoes = [];   // as estações em que o raio caiu, para o aviso do passo
+      const puladas = [];   // as estações em que nada coube e o tubo se partiu (pularOQueNaoCabe)
       const aoLimite = [];   // as estações em que o raio caiu até caber antes da borda de uma face plana que limita o sólido
       const secaoEm = (P, u, onde) => {
         const primeira = secaoComRaio(P, u, onde, raio);
@@ -2154,6 +2173,10 @@ export function criarOperacoesBooleanas(servicos) {
           }
           if (!(tamanho(e.u) > 0)) { todas = false; pendente = null; fecharCadeia(false); continue; }
           const sec = secaoEm(e.P, e.u.map((c) => c / tamanho(e.u)), e.onde);
+          if (sec.erro && pularOQueNaoCabe) {   // a estação sem raio possível parte o tubo, e as duas pontas afinam como as de uma regiao
+            puladas.push({ onde: e.onde, motivo: sec.erro });
+            todas = false; pendente = null; fecharCadeia(false, true); antesForaDaRegiao = true; antesDaPrimeira = []; continue;
+          }
           if (sec.erro) return sec;
           if (sec.pula) { todas = false; pendente = null; fecharCadeia(false); antesForaDaRegiao = false; antesDaPrimeira = []; continue; }
           if (pendente && !atual.length) {
@@ -2179,7 +2202,7 @@ export function criarOperacoesBooleanas(servicos) {
         }
       }
       if (!cadeias.length) return { vazio: `a costura de ${de.op}:${de.id} não tem aresta ${classes.map((c) => (c === 'concavas' ? 'côncava' : c === 'convexas' ? 'convexa' : 'interna')).join(' nem ')} a arredondar dentro da regiao pedida ou com o raio pedido; confira arestas, regiao e raio` };
-      return { cadeias, centro: centroT, grade: gradeT, reducoes, aoLimite };
+      return { cadeias, centro: centroT, grade: gradeT, reducoes, aoLimite, puladas };
     };
 
     /* O RAIO PRECISA CABER: nas duas tampas de cada prisma (já cortadas em
@@ -2252,7 +2275,7 @@ export function criarOperacoesBooleanas(servicos) {
       }
       const cheias = partes.filter((p) => !p.vazio);
       if (!cheias.length) return { erro: partes[0].vazio };
-      return { cadeias: cheias.flatMap((p) => p.cadeias), centro: cheias[0].centro, grade: cheias[0].grade, reducoes: cheias.flatMap((p) => p.reducoes), aoLimite: cheias.flatMap((p) => p.aoLimite ?? []) };
+      return { cadeias: cheias.flatMap((p) => p.cadeias), centro: cheias[0].centro, grade: cheias[0].grade, reducoes: cheias.flatMap((p) => p.reducoes), aoLimite: cheias.flatMap((p) => p.aoLimite ?? []), puladas: cheias.flatMap((p) => p.puladas ?? []) };
     };
     let curvo = null;
     if (modo === 'curvo') {
@@ -2378,7 +2401,7 @@ export function criarOperacoesBooleanas(servicos) {
        união não deixam pedaço sem nome nem gritam pela face coberta. */
     const aoAplicar = ({ pedacosDeEntrada, consumidas }) => {
       const fora = new Set(consumidas);
-      registro.faces = [...registro.faces.filter((f) => !fora.has(f)), ...pedacosDeEntrada].sort((x, y) => x - y);
+      registro.faces = [...new Set([...registro.faces.filter((f) => !fora.has(f)), ...pedacosDeEntrada])].sort((x, y) => x - y);
       registro.costura = registro.costura.filter((f) => !fora.has(f));
       /* A face que o tubo cobriu inteira também sai das listas das OUTRAS origens que a citavam (o operando da união, a peça de um subtrair): quem cita a origem inteira
          ("o aro", "a placa") continua valendo sem a face coberta, como no `limparLascas`, em vez de a parte inteira gritar porque uma face da parede sumiu sob o raio.
@@ -2394,7 +2417,7 @@ export function criarOperacoesBooleanas(servicos) {
         }
       }
     };
-    const rodar = (tentativa, soCasca = false) => nucleoBooleano(st, i, op, wasm, a.origemId, facesDoMolde ? [faces, facesDoMolde] : [faces], { calcular, herdaDe, liso: 45, ref: 'de', aoAplicar, estrito: restrito, centro: curvo?.centro, grade: curvo?.grade, tentativa, soCasca, registroExtra: curvo ? { eixos: curvo.cadeias.map((c) => c.centros) } : {} });
+    const rodar = (tentativa, soCasca = false) => nucleoBooleano(st, i, op, wasm, a.origemId, facesDoMolde ? [faces, facesDoMolde] : [faces], { calcular, herdaDe, liso: 45, ref: 'de', aoAplicar, estrito: restrito, deixaLasca: a.limpar != null && a.limpar !== false, centro: curvo?.centro, grade: curvo?.grade, tentativa, soCasca, registroExtra: curvo ? { eixos: curvo.cadeias.map((c) => c.centros) } : {} });
     /* Os prismas em meia-esquadria são exatos no canto reto, mas no canto
        torto as tampas vizinhas não coincidem e podem deixar a casca aberta
        (o braço inclinado a 20° com raio 0,01). O portão de casca fechada
@@ -2426,6 +2449,10 @@ export function criarOperacoesBooleanas(servicos) {
         const menor = Math.min(...curvo.aoLimite.map((q) => q.raio));
         st.avisos.push({ passo: i, op, ref: 'faceLimite', raioPedido: raio, raioMenor: menor, estacoes: curvo.aoLimite.length,
           motivo: `o raio ${raio} passaria da borda de uma face plana que limita o sólido em ${curvo.aoLimite.length} estação(ões) da costura; o raio caiu até o maior que cabe antes da borda (no mínimo ${menor}) e o arredondamento afina até sumir nela` });
+      }
+      if (curvo?.puladas?.length) {
+        st.avisos.push({ passo: i, op, ref: 'naoCabe', estacoes: curvo.puladas.length,
+          motivo: `o raio ${raio} não coube em ${curvo.puladas.length} estação(ões) da costura (pularOQueNaoCabe): o tubo se partiu ali e a aresta ficou viva nesse trecho; a primeira, ${curvo.puladas[0].onde}: ${curvo.puladas[0].motivo}` });
       }
       if (curvo?.reducoes?.length) {
         const menor = Math.min(...curvo.reducoes.map((q) => q.raio));

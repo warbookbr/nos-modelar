@@ -73,9 +73,9 @@ function selecao(v, onde) {
   if (!v || typeof v !== 'object' || Array.isArray(v)) return v;
   return Object.fromEntries(Object.entries(v).map(([k, x]) => {
     if (k === 'regiao') return [k, medida(x, `${onde}.regiao`)];
-    if (k === 'onde' && x && typeof x === 'object' && (x.conexo != null || x.radial != null)) {
+    if (k === 'onde' && x && typeof x === 'object' && (x.conexo != null || x.radial != null || x.setor != null)) {
       /* conexo: `de` e `ate` são medidas e `dir` é só direção; radial: `por`, `min` e `max` são medidas e `eixo` é só nome; o resto de `onde`, com número, segue recusado */
-      const { conexo, radial, ...resto } = x;
+      const { conexo, radial, setor, ...resto } = x;
       if (temNumero(resto)) throw new RecusaDoEsboco('o filtro "onde" com número não é convertido para metro; selecione por grupo, origem ou região', `${onde}.onde`);
       const saida = { ...resto };
       if (conexo != null) {
@@ -88,6 +88,11 @@ function selecao(v, onde) {
         const r = { ...radial };
         for (const campo of ['por', 'min', 'max']) if (r[campo] != null) r[campo] = medida(r[campo], `${onde}.onde.radial.${campo}`);
         saida.radial = r;
+      }
+      if (setor != null) {
+        const q = { ...setor };
+        if (q.por != null) q.por = medida(q.por, `${onde}.onde.setor.por`);   // de e ate são graus, e eixo é só nome
+        saida.setor = q;
       }
       return [k, saida];
     }

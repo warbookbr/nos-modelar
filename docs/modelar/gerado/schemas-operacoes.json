@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:160b9c8d10d6e0777db893427e5ccdab0e43f9865e0f2a4aa3a066714f238742",
+  "assinatura": "sha256:2874880d4f0141081847d7ba64c503770c53f8fc8cbf178b962a91bc2350602d",
   "total": 42,
   "operacoes": [
     {
@@ -963,6 +963,10 @@
                 }
               ],
               "description": "Comprimento em que o raio cai até sumir na ponta solta de um trecho (modo curvo): o fim da regiao ou o ponto em que o encontro fica plano."
+            },
+            "pularOQueNaoCabe": {
+              "type": "boolean",
+              "description": "true: onde nenhum raio (nem o raioMinimo) cabe, o tubo se parte e a aresta fica viva ali, em vez de o passo recusar; o aviso naoCabe diz onde (modo curvo)."
             },
             "limpar": {
               "anyOf": [
@@ -5157,7 +5161,7 @@
       }
     }
   ],
-  "assinaturaComExtensoes": "sha256:7121e73f8c62d43fa5902df82384b684c1585e75381880ba09f299c5ae8a9d98",
+  "assinaturaComExtensoes": "sha256:8fcbaae5350b7dbfcf4ae95e3adfe4867f2201cb1fc65fef06a86da2285dd236",
   "totalExtensoes": 5,
   "extensoes": [
     {

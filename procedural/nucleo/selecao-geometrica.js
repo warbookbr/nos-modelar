@@ -16,6 +16,11 @@
      radial   {eixo:'x'|'y'|'z', por?:[x,y,z], min?, max?}: o elemento cujo CENTRO fica a uma distância do eixo (a reta de direção `eixo` que passa
               por `por`, a origem se faltar) de pelo menos `min` e de no máximo `max`, um dos dois ao menos. É o recorte por raio de uma peça de
               revolução (as faces de um aro, de um cubo, de uma coroa), que `normal` e `extremo` não dizem. `por`, `min` e `max` são medidas.
+     setor    {eixo:'x'|'y'|'z', por?:[x,y,z], de, ate}: o elemento cujo CENTRO fica, em torno do eixo (a mesma reta do radial), num ângulo entre `de` e `ate`, em graus. O
+              ângulo é medido no plano perpendicular ao eixo a partir do primeiro eixo do plano, no sentido do segundo (eixo x: de +y para +z; eixo y: de +z para +x;
+              eixo z: de +x para +y), de 0 a 360. O setor vai de `de` até `ate` no sentido crescente e passa por 360 quando `de` é maior que `ate` (de 350 a 10 é o
+              setor de 20° em torno de 0); a largura não passa de 360, e o centro de uma face sobre o próprio eixo não tem ângulo e não passa. Combina com radial
+              (o raio e a parede de UM raio da roda: radial para o aro, setor para o raio) e com grupo, origem e os demais critérios. `por` é medida; `de` e `ate`, graus.
      extremo  {eixo:'x'|'y'|'z', lado:'max'|'min', tol?}: o elemento cujo CENTRO (média dos cantos da face, ponto médio
               da aresta) está no maior ou menor valor do eixo entre os candidatos, e os que ficam a até `tol` dele
               (padrão 1e-6, em unidades do mundo).
@@ -38,7 +43,7 @@ import { triangularFace } from './triangulacao-face.js';
 export const ALVOS_DE_SELECAO = Object.freeze(['face', 'aresta']);
 export const TIPOS_DE_FACE = Object.freeze(['plana', 'empenada']);
 export const TIPOS_DE_ARESTA = Object.freeze(['viva', 'lisa', 'borda']);
-const CHAVES_ONDE = ['alvo', 'tipo', 'angulo', 'normal', 'radial', 'extremo', 'conexo'];
+const CHAVES_ONDE = ['alvo', 'tipo', 'angulo', 'normal', 'radial', 'setor', 'extremo', 'conexo'];
 const EIXOS = { x: 0, y: 1, z: 2 };
 const FOLGA_ANGULO = 1e-6;
 const TOL_PADRAO = 1e-6;
@@ -74,7 +79,7 @@ export function lerOnde(st, onde) {
 
   let alvo = onde.alvo;
   if (alvo != null && !ALVOS_DE_SELECAO.includes(alvo)) return { erro: `alvo só aceita ${ALVOS_DE_SELECAO.map((a) => `'${a}'`).join(' ou ')}; recebido ${JSON.stringify(alvo)}` };
-  const r = { alvo: null, tipo: null, angulo: null, normal: null, radial: null, extremo: null, conexo: null };
+  const r = { alvo: null, tipo: null, angulo: null, normal: null, radial: null, setor: null, extremo: null, conexo: null };
 
   if (onde.tipo != null) {
     const daFace = TIPOS_DE_FACE.includes(onde.tipo), daAresta = TIPOS_DE_ARESTA.includes(onde.tipo);
@@ -133,6 +138,24 @@ export function lerOnde(st, onde) {
     r.radial = { eixo: q.eixo, por, min: lim.min, max: lim.max };
   }
 
+  if (onde.setor != null) {
+    const q = onde.setor;
+    if (!ehObjeto(q) || Object.keys(q).some((k) => !['eixo', 'por', 'de', 'ate'].includes(k))) return { erro: `setor precisa ser {eixo:'x'|'y'|'z', por?:[x,y,z], de, ate} (graus em torno do eixo)` };
+    if (!Object.hasOwn(EIXOS, q.eixo)) return { erro: `setor.eixo só aceita 'x', 'y' ou 'z'; recebido ${JSON.stringify(q.eixo)}` };
+    if (q.de == null || q.ate == null) return { erro: `setor pede de e ate, os dois ângulos em graus em torno do eixo` };
+    let por = [0, 0, 0];
+    if (q.por != null) {
+      try { por = st.vec(q.por); } catch (e) { return { erro: `setor.por não resolve: ${String(e.message).replace(/^oficina: /, '')}` }; }
+      if (!Array.isArray(por) || por.length !== 3 || por.some((x) => typeof x !== 'number' || !Number.isFinite(x))) return { erro: `setor.por precisa ser [x,y,z] finito` };
+    }
+    const de = lerNumero(st, q.de, 'setor.de'); if (de.erro) return de;
+    const ate = lerNumero(st, q.ate, 'setor.ate'); if (ate.erro) return ate;
+    const volta = (x) => ((x % 360) + 360) % 360;
+    const largura = ate.valor >= de.valor ? ate.valor - de.valor : ate.valor + 360 - de.valor;
+    if (ate.valor - de.valor > 360) return { erro: `setor de ${de.valor} a ${ate.valor} passa de 360 graus de largura` };
+    r.setor = { eixo: q.eixo, por, de: volta(de.valor), largura };
+  }
+
   if (onde.extremo != null) {
     const e = onde.extremo;
     if (!ehObjeto(e) || Object.keys(e).some((k) => k !== 'eixo' && k !== 'lado' && k !== 'tol')) return { erro: `extremo precisa ser {eixo:'x'|'y'|'z', lado:'max'|'min', tol?}` };
@@ -173,7 +196,7 @@ export function lerOnde(st, onde) {
     }
   }
 
-  if (!r.tipo && !r.normal && !r.radial && !r.extremo && !r.conexo) return { erro: `informe ao menos um critério entre tipo, normal, radial, extremo e conexo (alvo e angulo sozinhos não escolhem nada)` };
+  if (!r.tipo && !r.normal && !r.radial && !r.setor && !r.extremo && !r.conexo) return { erro: `informe ao menos um critério entre tipo, normal, radial, setor, extremo e conexo (alvo e angulo sozinhos não escolhem nada)` };
   return { onde: r };
 }
 
@@ -198,6 +221,7 @@ function descreve(onde) {
   if (onde.tipo) partes.push(`tipo ${onde.tipo}${onde.angulo != null ? ` (angulo ${onde.angulo})` : ''}`);
   if (onde.normal) partes.push(`normal a ate ${onde.normal.ate}° de [${onde.normal.pedido.dir.join(', ')}]`);
   if (onde.radial) partes.push(`a ${onde.radial.min > -Infinity ? `${onde.radial.min} a ` : 'até '}${onde.radial.max < Infinity ? onde.radial.max : 'mais'} do eixo ${onde.radial.eixo} por [${onde.radial.por.join(', ')}]`);
+  if (onde.setor) partes.push(`setor de ${onde.setor.de}° por ${onde.setor.largura}° em torno do eixo ${onde.setor.eixo} por [${onde.setor.por.join(', ')}]`);
   if (onde.extremo) partes.push(`${onde.extremo.lado} em ${onde.extremo.eixo} (tol ${onde.extremo.tol})`);
   if (onde.conexo) partes.push(`pedaço conexo tocado pelo raio de [${onde.conexo.de.join(', ')}] na direção [${onde.conexo.dir.map((x) => Math.round(x * 1e6) / 1e6).join(', ')}]`);
   return partes.join(' + ');
@@ -226,6 +250,17 @@ export function resolverOnde(st, onde, base, normalDaFace) {
     return d >= onde.radial.min - TOL_PADRAO && d <= onde.radial.max + TOL_PADRAO;
   };
 
+  /* o ângulo do centro em torno do eixo, no plano perpendicular a ele (ver o cabeçalho); sobre o próprio eixo não há ângulo */
+  const passaSetor = (c) => {
+    const e = EIXOS[onde.setor.eixo], u = (e + 1) % 3, v = (e + 2) % 3;
+    const du = c[u] - onde.setor.por[u], dv = c[v] - onde.setor.por[v];
+    if (Math.hypot(du, dv) <= TOL_PADRAO) return false;
+    let ang = graus(Math.atan2(dv, du)) - onde.setor.de;
+    ang = ((ang % 360) + 360) % 360;
+    const folga = 1e-9;
+    return onde.setor.largura >= 360 || ang <= onde.setor.largura + folga || ang >= 360 - folga;
+  };
+
   let itens;     // faces: ids; arestas: { a, b, faces }
   let centro;    // item -> [x,y,z]
   if (onde.alvo === 'face') {
@@ -243,6 +278,7 @@ export function resolverOnde(st, onde, base, normalDaFace) {
     if (onde.normal) { itens = itens.filter(passaNormal); funil.push(`${itens.length} após normal`); }
     centro = (id) => { const vs = F.get(id).vs; return [0, 1, 2].map((e) => vs.reduce((s, v) => s + V.get(v)[e], 0) / vs.length); };
     if (onde.radial) { itens = itens.filter((id) => passaRadial(centro(id))); funil.push(`${itens.length} após radial`); }
+    if (onde.setor) { itens = itens.filter((id) => passaSetor(centro(id))); funil.push(`${itens.length} após setor`); }
   } else {
     itens = arestasDaMalha(F).filter((e) => e.faces.some((id) => !base || base.faces.has(id)));
     funil.push(`${itens.length} aresta(s) candidata(s)`);
@@ -258,6 +294,7 @@ export function resolverOnde(st, onde, base, normalDaFace) {
     if (onde.normal) { itens = itens.filter((e) => e.faces.some(passaNormal)); funil.push(`${itens.length} após normal`); }
     centro = (e) => { const p = V.get(e.a), q = V.get(e.b); return [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2, (p[2] + q[2]) / 2]; };
     if (onde.radial) { itens = itens.filter((e) => passaRadial(centro(e))); funil.push(`${itens.length} após radial`); }
+    if (onde.setor) { itens = itens.filter((e) => passaSetor(centro(e))); funil.push(`${itens.length} após setor`); }
   }
 
   if (onde.extremo && itens.length) {

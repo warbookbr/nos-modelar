@@ -22,15 +22,15 @@ export const TABELA = {
   /* aro (barril) */
   alturaDoFlange: 9, espessuraDoFlange: 9, raioDaBorda: 3.5,
   /* borda vista de frente (medida em variante-a.jpg: face 12 mm = 0,024 do diâmetro externo da borda; parede inclinada de uns 30 graus) */
-  larguraDaFaceDaBorda: 12, raioDaQuinaDaBorda: 2, raioDaDobra: 2, raioDoBarrilNaFrente: 222, avancoAxialDaParede: 31, espessuraDaParede: 7,
-  profundidadeDaCanaleta: 14, canaletaTras: -76, canaletaFrente: 14, rampaDaCanaleta: 14,
+  larguraDaFaceDaBorda: 12, raioDaQuinaDaBorda: 2, raioDaDobra: 2, raioDoBarrilNaFrente: 222, avancoAxialDaParede: 31, espessuraDaParede: 12,
+  profundidadeDaCanaleta: 19, canaletaTras: -76, canaletaFrente: 14, rampaDaCanaleta: 22,
   /* prato dos raios: concavidade */
-  desvioET: 40, espessuraDoCubo: 14, raioDoCubo: 74, avancoDoPratoNoAro: 106, recuoDoPratoTras: 50, expoenteDoPrato: 1.8,
+  desvioET: 24, espessuraDoCubo: 14, raioDoCubo: 74, avancoDoPratoNoAro: 106, recuoDoPratoTras: 60, expoenteDoPrato: 1.6, expoenteDoPratoTras: 1.5,
   /* raios: janelas */
-  raioDaRaizDasJanelas: 84, raioDoCentroDoRaioNaRaiz: 88, raioDoCentroDoRaioNoAro: 232, folgaDaJanelaNaParede: 2,
-  larguraNaRaizA: 24, larguraNoAroA: 31, aberturaNaRaizA: 7, aberturaNoAroA: 8.5, arredondaJanelaA: 8,
+  raioDaRaizDasJanelas: 76, raioDoCentroDoRaioNaRaiz: 80, raioDoCentroDoRaioNoAro: 232, folgaDaJanelaNaParede: 2,
+  larguraNaRaizA: 20, larguraNoAroA: 20, aberturaNaRaizA: 5, aberturaNoAroA: 8.5, arredondaJanelaA: 4,
   larguraNaRaizB: 38, larguraNoAroB: 50, aberturaNaRaizB: 7, aberturaNoAroB: 11, arredondaJanelaB: 8,
-  paineisDaCostura: 13, raioDaQuinaDosRaios: 0, raioMinimoDaQuina: 3.72, raioDaCosturaDoAro: 8, raioMinimoDaCostura: 1.5, afinarPontasDaCostura: 10,
+  paineisDaCostura: 13, raioDaQuinaDosRaios: 0, raioMinimoDaQuina: 3.72, raioDaCosturaDoAro: 5, raioMinimoDaCostura: 1.5, afinarPontasDaCostura: 10, limparCostura: true,
   /* centro: furo, assento da tampa, parafusos */
   raioDoFuroCentral: 33.3, raioDoAssentoDaTampa: 38, fundoDoAssentoDaTampa: 6, salienciaDaTampa: 2,
   furos: 5, circuloDosParafusos: 112, raioDoAssentoDoParafuso: 11.5, fundoDoAssentoDoParafuso: 7, salienciaDoParafuso: 4,
@@ -55,7 +55,7 @@ const POR = (t, nome) => t[`${nome}${t.variante}`];
 export const CONTATOS = [];
 
 export const MATERIAIS = {
-  grafite: { cor: '#3b3d41', metalicidade: 0.6, aspereza: 0.45 },
+  grafite: { cor: '#5b5e64', metalicidade: 0.6, aspereza: 0.45 },
   usinado: { cor: '#c4c8cd', metalicidade: 0.9, aspereza: 0.25 },
   borracha: { cor: '#171718', metalicidade: 0, aspereza: 0.9 },
   metal: { cor: '#a9adb3', metalicidade: 0.9, aspereza: 0.3 },
@@ -195,7 +195,7 @@ export function derivar(t = TABELA) {
   const costas = [], frente = [];
   for (let i = 0; i <= N; i++) {
     const s = i / N, r = t.raioDoCubo + s * (ro - t.raioDoCubo);
-    costas.push([r, xb0 + (t.recuoDoPratoTras - xb0) * s]);
+    costas.push([r, xb0 + (t.recuoDoPratoTras - xb0) * s ** t.expoenteDoPratoTras]);
     frente.push([r, xf0 + (t.avancoDoPratoNoAro - xf0) * s ** t.expoenteDoPrato]);
   }
   const prato = [[0, xb0], ...costas, ...frente.reverse(), [0, xf0]];
@@ -239,7 +239,7 @@ export function gerarPassos(t = TABELA) {
   }]);
   passos.push(['lathe', { origemId: 30, lados: t.ladosDoPrato, eixo: 'x', em, perfil: mp(d.prato) }]);
   passos.push(['intersectar', { origemId: 40, solidos: [o('extrusao', 20), o('lathe', 30)] }]);
-  if (t.raioDaQuinaDosRaios > 0) passos.push(['arredondarCostura', { origemId: 41, de: { op: 'intersectar', id: 40 }, raio: m(t.raioDaQuinaDosRaios), arestas: 'convexas', raioMinimo: m(t.raioMinimoDaQuina), afinarPontas: m(6) }]);
+  if (t.raioDaQuinaDosRaios > 0) passos.push(['arredondarCostura', { origemId: 41, de: { op: 'intersectar', id: 40 }, raio: m(t.raioDaQuinaDosRaios), arestas: 'convexas', raioMinimo: m(t.raioMinimoDaQuina), afinarPontas: m(6), pularOQueNaoCabe: true, limpar: true }]);
 
   passos.push(disco(50, t.raioDoFuroCentral, 30, 60, 48, em));
   passos.push(disco(51, t.raioDoAssentoDaTampa, d.xf0 - t.fundoDoAssentoDaTampa, d.xf0 + 10, 48, em));
@@ -249,7 +249,7 @@ export function gerarPassos(t = TABELA) {
 
   passos.push(['limparLascas', { sel: o('subtrair', 60), tolerancia: m(0.01) }]);
   passos.push(['unir', { origemId: 70, solidos: [o('subtrair', 12), o('subtrair', 60)] }]);
-  passos.push(['arredondarCostura', { origemId: 71, de: { op: 'unir', id: 70 }, raio: m(t.raioDaCosturaDoAro), paineis: t.paineisDaCostura, raioMinimo: m(t.raioMinimoDaCostura), afinarPontas: m(t.afinarPontasDaCostura), limpar: true }]);
+  passos.push(['arredondarCostura', { origemId: 71, de: { op: 'unir', id: 70 }, raio: m(t.raioDaCosturaDoAro), paineis: t.paineisDaCostura, limpar: t.limparCostura, raioMinimo: m(t.raioMinimoDaCostura), afinarPontas: m(t.afinarPontasDaCostura) }]);
 
   const xTampa = d.xf0 - t.fundoDoAssentoDaTampa;
   passos.push(['lathe', { origemId: 80, lados: 48, eixo: 'x', em, segmentosCurva: 4, perfil: mp([[0, xTampa], [t.raioDoAssentoDaTampa, xTampa], [t.raioDoAssentoDaTampa, d.xf0 + t.salienciaDaTampa, 2.5], [0, d.xf0 + t.salienciaDaTampa]]) }]);
