@@ -5,7 +5,8 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1932 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1923 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1925 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -231,13 +232,6 @@
 ## docs/modelar/banco-de-provas/carrinho-refeito-2026-10-08/
 
 - `ATRITOS.md` — Atritos
-
-## docs/modelar/banco-de-provas/carro-fastback-2026-11-14/
-
-- `grade-dianteira.esboco.mjs` — grade-dianteira.esboco.mjs — três contornos de grade para a frente do fastback genérico (2026-11-14), vistos de frente. Em disputa: o contorno da grade de ci…
-- `lanterna-traseira.esboco.mjs` — lanterna-traseira.esboco.mjs — três lanternas para a traseira do fastback genérico (2026-11-14), vistas de trás, para a pessoa escolher o traço que troca o d…
-- `tomadas-do-capo.esboco.mjs` — tomadas-do-capo.esboco.mjs — três desenhos de capô para o fastback genérico (2026-11-14), vistos de cima com a frente do carro para baixo: x é a largura e y …
-- `tracos-comum.mjs` — tracos-comum.mjs — o que os três esboços de traços do fastback genérico dividem: a placa por contorno e as cores. Tudo em mm, [x, y] na vista em que a placa …
 
 ## docs/modelar/banco-de-provas/desenho-braco-2026-10-14/
 
@@ -2026,7 +2020,6 @@
 ## procedural/pecas/robo-humanoide/referencias/
 
 - `alvo.md` — Alvo do braço direito do robô humanoide
-- `braco-proporcao.esboco.mjs` — braco-proporcao.esboco.mjs — as opções de proporção do braço direito do robô humanoide, em blocos sobre o esqueleto.
 
 ## procedural/pecas/sedan-chassi-e-lataria/
 

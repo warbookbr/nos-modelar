@@ -288,24 +288,6 @@
         ]
       },
       "origem": "Critérios de reprovação de docs/modelar/banco-de-provas/furgao-realista-2026-10-30/ALINHAMENTO.md."
-    },
-    {
-      "id": "sem-traco-de-fabricante",
-      "texto": "Nenhum traço do veículo (grade, luzes, tomadas de ar, emblema) reproduz o desenho que identifica um fabricante ou um modelo comercial.",
-      "perguntaDoAlinhamento": "Que traços da referência identificam um fabricante mesmo sem marca escrita, e por qual opção desenhada cada um foi trocado?",
-      "perguntaDeForma": "Que desenho têm a grade, as luzes e as tomadas de ar, e algum repete o traço da referência que o alinhamento mandou trocar?",
-      "condicao": {
-        "forma": [
-          "*carroceria*",
-          "*lataria*",
-          "*grade*",
-          "*farol*",
-          "*lanterna*",
-          "*capo*",
-          "*capô*"
-        ]
-      },
-      "origem": "Estudo do carro fastback de 2026-11-14, em docs/modelar/planos/2026-11-14-modelagem-de-carro.md."
     }
   ]
 }
