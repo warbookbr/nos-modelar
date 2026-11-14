@@ -6,6 +6,8 @@ import { REGISTRO_OPERACOES } from '../../procedural/nucleo/entrada.js';
 import { conferirAcervo } from './guardas/guarda-acervo.mjs';
 import orfao from '../fixtures/descrever-sem-calar/orfao/receita.js';
 import chapaInteira from '../fixtures/descrever-sem-calar/chapa-inteira/receita.js';
+import casca from '../fixtures/descrever-sem-calar/casca-aberta/receita.js';
+import { spawnSync } from 'node:child_process';
 
 const PASTA = 'tools/fixtures/descrever-sem-calar';
 
@@ -111,5 +113,21 @@ describe('o cronômetro dos passos não tira o passo do caminho rápido do núcl
     expect(batidas).toEqual([[0, 2, 'cubo'], [1, 2, 'parte']]);
     fechar([['cubo', {}]]);
     expect(tempos.size).toBe(0);
+  });
+});
+
+describe('a parte de casca aberta', () => {
+  it('o descrever nomeia a parte e liga o par inconclusivo a ela, antes da linha dos pares', async () => {
+    const r = await descreverPecaReutilizavel({ peca: `${PASTA}/casca-aberta/receita`, modulo: casca });
+    expect(r.stderr).toMatch(/parte tubo tem casca aberta \(8 arestas soltas\)/);
+    expect(r.stderr).toMatch(/caixa ↔ tubo: parte tubo com casca aberta/);
+    expect(r.stderr).not.toMatch(/parte caixa tem casca aberta/);
+    expect(r.stderr.indexOf('tem casca aberta')).toBeLessThan(r.stderr.indexOf('NÃO conseguiu decidir'));
+  });
+
+  it('o malha:conferir nomeia a parte e a face de cada alerta', () => {
+    const saida = spawnSync('node', ['tools/modelar/conferir-malha.mjs', `${PASTA}/casca-aberta/receita.js`], { encoding: 'utf8' }).stdout;
+    expect(saida).toMatch(/casca-aberta ×8 .*\[face \d+, parte tubo\] — partes: tubo \(8\)/);
+    expect(saida).toMatch(/parte tubo tem casca aberta \(8 arestas soltas\)/);
   });
 });

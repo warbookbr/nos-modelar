@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1870 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1872 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2582,6 +2582,10 @@
 
 - `plano.js` — plano.js — o PLANO mínimo das peças de prova de `descrever-sem-calar.test.mjs`: uma chapa de uma parte só.
 
+## tools/fixtures/descrever-sem-calar/casca-aberta/
+
+- `receita.js` — receita.js — peça de prova do aviso de casca aberta do `descrever` e do `malha:conferir`: um loft de duas seções sem polo, que sai como tubo aberto (parte `t…
+
 ## tools/fixtures/descrever-sem-calar/chapa-inteira/
 
 - `receita.js` — receita.js — peça de prova do aviso do `descrever` para a abertura que cai na booleana da chapa inteira: uma chapa de 5.616 faces com um vão que toma mais da…
@@ -2974,6 +2978,7 @@
 - `capturar-montagem.test.ts` — @ts-expect-error — resolvedor JavaScript público, exercitado pelo contrato.
 - `casamento-da-vista.mjs` — casamento-da-vista.mjs — duas medidas do modelo contra a imagem de referência numa vista, as duas tiradas da malha e não de uma captura com luz: quanto de ca…
 - `casamento-da-vista.test.mjs` — casamento-da-vista.test.mjs — o casamento do modelo com a referência numa vista, sobre uma cena sintética: duas partes lado a lado, uma laranja e uma cinza, …
+- `casca-aberta-por-parte.mjs` — casca-aberta-por-parte.mjs — qual parte da peça tem casca aberta, e com quantas arestas soltas. A topologia diz "aresta X pertence a uma face só" sobre a mal…
 - `catalogo-pecas.test.ts` — catalogo-pecas.test.ts — catálogo vazio é estado válido; IDs e carregadores continuam sendo contratos explícitos quando uma peça voltar a ser publicada. /
 - `cilindro-hidraulico-aprovacao.test.mjs` — cilindro-hidraulico-aprovacao.test.mjs — a aprovação mecânica de uma família que gera montagem: o curso da articulação é conferido contra as malhas da camisa…
 - `comecar.mjs` — comecar.mjs — a entrada por intenção: `npm run comecar -- [roteiro]`.

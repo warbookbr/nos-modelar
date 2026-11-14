@@ -38,6 +38,7 @@ import { mensagemDeReferenciasAusentes, referenciasDoPlano } from './referencias
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 import { iniciarRegistro } from './diario.mjs';
 import { conferirFormaDoEsbocoDaReceita, conferirG01DaReceita, conferirRefinamentoDaReceita } from './refinamento-global.mjs';
+import { partesComCascaAberta } from './casca-aberta-por-parte.mjs';
 import { conferirContornosDaPeca, contornosDaPeca } from './contorno-da-peca.mjs';
 import { afastamentoDaParte, textoDoAfastamento } from '../../src/autoria/refinamento-global.js';
 import { conferirRazoesDaPeca, normalizarRazoesDaPeca, textoDaRazao } from '../../src/autoria/razoes-da-peca.js';
@@ -759,11 +760,21 @@ export async function descreverPecaReutilizavel({
     }
 
     if (contatos.cobertura.inconclusivos.length) {
+      /* Antes da contagem, a causa mais comum: a parte de casca aberta (um loft sem polo, por exemplo), com as arestas soltas, e a ligação de cada par à parte. */
+      const abertas = partesComCascaAberta(neutro);
+      const nomesAbertos = new Set(abertas.map((a) => a.parte));
+      if (abertas.length) {
+        stderr += abertas.map(({ parte, arestas }) => `\nparte ${parte} tem casca aberta (${arestas} arestas soltas)`).join('')
+          + '\n  a malha aberta impede a medida de decidir contato com ela; feche a parte (por exemplo, polo nas pontas do loft).\n';
+      }
       /* Não reprova: malha aberta é estilo que o motor aceita, e reprovar aqui
          puniria peça legítima. Mas também não vira "livre" — a medida diz que
          não conseguiu decidir, em vez de inventar garantia. */
       stderr += `\n${contatos.cobertura.inconclusivos.length} par(es) que a medida NÃO conseguiu decidir`
-        + ' — malha aberta ou não-manifold; não são pares livres.\n';
+        + ' — malha aberta ou não-manifold; não são pares livres.\n'
+        + contatos.cobertura.inconclusivos
+          .map(({ par }) => { const abertos = par.filter((p) => nomesAbertos.has(p)); return abertos.length ? `  ${par[0]} ↔ ${par[1]}: parte ${abertos.join(' e ')} com casca aberta\n` : null; })
+          .filter(Boolean).join('');
     }
 
     /* A FORMA CONTRA A REFERÊNCIA, DEPOIS DE TUDO O QUE JÁ RODA. Contato, plano e refinamento dizem que as partes existem e se
