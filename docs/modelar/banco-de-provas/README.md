@@ -43,6 +43,7 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
 - [Kukri: o custo de modelar um objeto simples](kukri-2026-11-13/README.md) — `kukri-2026-11-13`
 - [Resultado da medida de leitura](leitura-por-demanda-2026-10/RESULTADO.md) — `leitura-por-demanda-2026-10`
 - [Limites do sólido por laços — provas das fatias 1 a 3](limites-do-solido-por-lacos-2026-11-05/README.md) — `limites-do-solido-por-lacos-2026-11-05`
+- [Melhorias de ferramenta tiradas de 17 peças modeladas por subagentes](melhorias-de-ferramenta-2026-11-14/README.md) — `melhorias-de-ferramenta-2026-11-14`
 - [Navegação de receitas, 2026-11-05](navegacao-de-receitas-2026-11-05/README.md) — `navegacao-de-receitas-2026-11-05`
 - [Organização dos documentos: o levantamento das decisões em vigor](organizacao-dos-documentos-2026-11-13/README.md) — `organizacao-dos-documentos-2026-11-13`
 - [Linha de base da porta de entrada dos agentes, 2026-11-05](porta-de-entrada-2026-11-05/README.md) — `porta-de-entrada-2026-11-05`

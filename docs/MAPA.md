@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1875 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1885 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -352,6 +352,11 @@
 ## docs/modelar/banco-de-provas/limites-do-solido-por-lacos-2026-11-05/
 
 - `README.md` — Limites do sólido por laços — provas das fatias 1 a 3
+
+## docs/modelar/banco-de-provas/melhorias-de-ferramenta-2026-11-14/
+
+- `OPERACOES-QUE-FALTARAM.md` — Operações do motor que faltaram, como proposta para o plano do núcleo
+- `README.md` — Melhorias de ferramenta tiradas de 17 peças modeladas por subagentes
 
 ## docs/modelar/banco-de-provas/navegacao-de-receitas-2026-11-05/
 
@@ -2112,6 +2117,8 @@
 - `hierarquia-partes.js` — hierarquia-partes.js — consultas puras e determinísticas da árvore semântica. Não conhece Three.js, geometria ou domínio mecânico.
 - `intencao-peca.js` — intencao-peca.js — contrato opcional, semântico e neutro de uma receita.
 - `interfaces-montagem.js` — interfaces-montagem.js — resolve portas declaradas por peças, mede relações mecânicas e deriva poses sem Three.js, hierarquia ou solver. É o contrato mínimo …
+- `invasao-de-contato.js` — invasao-de-contato — quanto uma parte invade a outra, medido CORPO A CORPO.
+- `invasao-de-contato.test.mjs` — invasao-de-contato.test.mjs — o contato declarado autoriza o toque, não a invasão.
 - `laco-de-modelagem.js` — laco-de-modelagem.js — quem decide se a modelagem continua, e por quê.
 - `laco-de-modelagem.test.js` — laco-de-modelagem.test.js — a decisão de parar sai dos números, não de quem modelou.
 - `lataria.js` — lataria.js — se uma peça é de lataria, e quais partes dela são a chapa.
@@ -2134,6 +2141,8 @@
 - `molduras-do-vao-chapa-cortada.test.mjs` — molduras-do-vao-chapa-cortada.test.mjs — a abertura de uma chapa que um corte em painéis atravessou (atrito 2 do RECEITA.md do sedã).
 - `molduras-do-vao.js` — molduras-do-vao.js — os vãos das chapas da peça: cada abertura declarada, e a moldura em volta de cada uma medida sobre a malha.
 - `molduras-do-vao.test.mjs` — molduras-do-vao.test.mjs — a moldura em volta do vão, medida sobre a malha varrida de verdade (fatia 12 do plano de ajustes no núcleo).
+- `movimentos-da-peca.js` — movimentos-da-peca — o curso de um movimento declarado na receita, medido contra as outras partes da MESMA peça.
+- `movimentos-da-peca.test.mjs` — movimentos-da-peca.test.mjs — o curso declarado em `MOVIMENTOS` é medido posição a posição contra as outras partes.
 - `origem-de-parametro.js` — origem-de-parametro.js — de onde veio cada número da tabela.
 - `origem-de-parametro.test.js` — origem-de-parametro.test.js — a regra que impede a rodada de absorção de inventar número para fechar a conta.
 - `parametros-declarados.js` — parametros-declarados.js — a pergunta única: quais números desta receita alguém pode mexer, e qual é o valor de cada um agora.
@@ -2488,6 +2497,10 @@
 
 - `receita.js` — peca-de-prova/receita.js — a peça que as guardas de navegador usam.
 - `receita.test.mjs` — receita.test.mjs — a peça de prova cumpre o que as guardas exigem dela.
+
+## tools/fixtures/acervo/rodada-de-medicao/
+
+- `receita.js` — Peça fixa para o teste da linha de comando da rodada de modelagem: dois cubos que se encostam, com o contato declarado. O teste media "a primeira peça do ace…
 
 ## tools/fixtures/composicao-parametrica/
 
@@ -3243,6 +3256,12 @@
 ## tools/modelar/fixtures/contorno-da-imagem/
 
 - `braco-sintetico.mjs` — braco-sintetico.mjs — as duas imagens sintéticas, desenhadas por código, com que o teste do contorno da imagem prova a ferramenta: uma vista lateral de um br…
+
+## tools/modelar/fixtures/invasao/
+
+- `aresta-sobre-a-face.js` — Uma barra girada 45 graus que apoia só uma ARESTA na tampa do cilindro, e uma face coplanar ao lado: encosta, e passa.
+- `haste-atravessa.js` — Uma haste fina que ATRAVESSA o cilindro de lado a lado: nenhum vértice dela fica dentro, só as superfícies se cruzam. O contato está declarado e mesmo assim …
+- `haste-tangente.js` — A mesma haste pousada sobre a tampa do cilindro (face contra face, sem entrar): encosta e passa.
 
 ## tools/modelar/fixtures/lasca/
 
