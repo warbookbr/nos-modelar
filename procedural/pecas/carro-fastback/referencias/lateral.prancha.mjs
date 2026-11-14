@@ -139,7 +139,7 @@ export const ESPEC = {
     /* 2. aberturas: os vidros */
     { vista: 'lateral', classe: 'vidro', nome: 'vidroDaPorta', tipo: 'filete', fechado: true, pts: [[510, 972, 6], [497, 1008, 10], [189, 1192, 400], [0, 1262, 300], [-300, 1303, 1500], [-680, 1268, 20], [-672, 996, 15]] },
     /* a faixa do para-brisa que se vê de lado, entre a silhueta e a coluna A: sem ela a coluna se lia com 120 mm */
-    { vista: 'lateral', classe: 'vidro', nome: 'paraBrisaDeLado', tipo: 'poli', fechado: true, pts: [[770, 1010], [690, 998], [500, 1062], [300, 1158], [190, 1222], [165, 1276], [300, 1230], [500, 1133]] },
+    { vista: 'lateral', classe: 'vidro', nome: 'paraBrisaDeLado', tipo: 'filete', fechado: true, pts: [[778, 1008, 6], [520, 1124, 800], [300, 1228, 800], [150, 1296, 600], [40, 1316, 4], [120, 1262, 600], [300, 1166, 800], [500, 1068, 800], [625, 1004, 20]] },
     { vista: 'lateral', classe: 'vidro', nome: 'vidroTraseiroLateral', tipo: 'filete', fechado: true, pts: [[-692, 1000, 10], [-702, 1262, 15], [-960, 1208, 1200], [-1235, 1108, 18], [-1110, 1034, 120], [-900, 1012, 800]] },
     /* 3. cortes de painel */
     { vista: 'lateral', classe: 'painel', nome: 'porta', tipo: 'filete', fechado: true, pts: [[615, 955], [690, 850, 200], [660, 420, 400], [590, 250, 90], [-545, 250, 110], [-640, 470, 500], [-722, 850, 300], [-682, 997]] },

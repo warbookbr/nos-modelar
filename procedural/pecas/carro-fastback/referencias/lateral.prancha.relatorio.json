@@ -103,11 +103,11 @@
       },
       "paraBrisaDeLado": {
         "vista": "lateral",
-        "comprimento": 1351.6,
-        "retidao": 0.744,
-        "concentracao": 0.106,
-        "inversoes": 1,
-        "raioMin": 76
+        "comprimento": 1554.89,
+        "retidao": 0.638,
+        "concentracao": 0.095,
+        "inversoes": 4,
+        "raioMin": 4
       },
       "vidroTraseiroLateral": {
         "vista": "lateral",
