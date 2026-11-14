@@ -1,0 +1,4 @@
+{
+  "volumes": {},
+  "portas": { "pino-da-base": "base.pino", "furo-do-topo": "topo.furo" }
+}

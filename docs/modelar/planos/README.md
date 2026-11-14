@@ -5,6 +5,8 @@
 **Planos ativos:**
 
 1. [planejador de execução da receita](2026-11-14-planejador-de-execucao.md). Território: `procedural/nucleo/planejador/`, `procedural/nucleo/memoria-de-execucao.js`, a opção `planejar` em `src/autoria/executar-receita.js`. Em aberto: tudo, a começar pela fatia 1 (medir sem mudar nada).
+2. [modelagem de robô humanoide](2026-11-14-modelagem-de-robo.md). Território: `procedural/pecas/robo-humanoide/`, `docs/modelar/banco-de-provas/robo-humanoide-2026-11-14/`, `tools/modelar/planejado-contra-executado.mjs`. Em aberto: tudo, com duas decisões da pessoa pendentes (a régua do planejado contra o executado na fatia 2 e o dedo como família).
+3. [modelagem de carro de passeio](2026-11-14-modelagem-de-carro.md). Território: `procedural/pecas/carro-fastback/`, `docs/modelar/banco-de-provas/carro-fastback-2026-11-14/`, `tools/modelar/ondulacao-da-superficie.mjs`, `procedural/criterios/veiculo.json`, `procedural/familias/roda-pneu/`. Em aberto: as fatias 1 e 2 (alinhamento com a prancha e o quarto traseiro como piloto).
 
 A lista está em ordem de prioridade. A ordem desempata quando dois planos precisam do mesmo arquivo: o de menor prioridade espera ou pede à pessoa que mude o território.
 
