@@ -58,7 +58,7 @@ if (zD + M.arcoRaio >= zFrente || zT - M.arcoRaio <= zTras) throw new Error('arc
 
 /* ------------------------------------------------------------ pontos de caráter, em [z, y] */
 const P = {
-  labio: [zFrente, 212],
+  labio: [zFrente, 214],
   nariz: [2200, 797],
   basePB: [790, 1005],
   topoPB: [125, 1331],
@@ -128,18 +128,18 @@ export const ESPEC = {
   },
   camadas: [
     /* 1. silhueta, no sentido horário a partir da ponta da frente do arco dianteiro */
-    { vista: 'lateral', contorno: true, nome: 'nariz', tipo: 'filete', pts: [[zD + dz(M.soleira), M.soleira], [2000, M.soleira, 300], P.labio, [2372, 234], [2335, 262, 10], [2330, 380, 60], [2362, 440, 80], [2345, 572, 300], [2366, 705, 40], P.nariz] },
+    { vista: 'lateral', contorno: true, nome: 'nariz', tipo: 'filete', pts: [[zD + dz(M.soleira), M.soleira], [2000, M.soleira, 300], [zFrente, 196, 6], P.labio, [2296, 232, 8], [2310, 300, 60], [2332, 450, 600], [2338, 640, 400], [2300, 760, 120], P.nariz] },
     { vista: 'lateral', contorno: true, nome: 'capo', tipo: 'filete', pts: [P.nariz, [1700, 950, 3000], [1100, 1000, 4000], P.basePB], esperado: { inversoesMax: 1 } },
     { vista: 'lateral', contorno: true, nome: 'paraBrisaETeto', tipo: 'filete', pts: [P.basePB, [...P.topoPB, 600], [...P.pico, 2500], P.quedaMeio], esperado: { inversoesMax: 0, raioMinMin: 400 } },
     { vista: 'lateral', contorno: true, nome: 'quedaDoFastback', tipo: 'filete', pts: [P.quedaMeio, [...P.quedaJoelho, 2500], [...P.baseTampa, 300], P.spoiler], esperado: { inversoesMax: 1, raioMinMin: 300 } },
-    { vista: 'lateral', contorno: true, nome: 'traseira', tipo: 'filete', pts: [P.spoiler, [-2214, 1036, 6], [-2228, 960, 30], [-2245, 861, 150], [-2310, 762, 80], [zTras, 712, 40], [zTras, 668, 30], [-2340, 580, 150], [zTras, 500, 40], [zTras, 455, 30], [-2331, 410, 20], [-2273, 299, 60], [-2114, 266, 200], [-1900, 245, 80], [zT - dz(M.fundoTraseiro), M.fundoTraseiro]] },
+    { vista: 'lateral', contorno: true, nome: 'traseira', tipo: 'filete', pts: [P.spoiler, [-2214, 1036, 6], [-2228, 960, 30], [-2245, 861, 150], [-2330, 750, 200], [zTras, 620, 300], [zTras, 500, 200], [-2345, 400, 120], [-2290, 318, 60], [-2150, 296, 300], [-1960, 262, 80], [zT - dz(M.fundoTraseiro), M.fundoTraseiro]] },
     { vista: 'lateral', contorno: true, nome: 'arcoTraseiro', tipo: 'poli', pts: arco(zT, M.fundoTraseiro, M.soleira) },
     { vista: 'lateral', contorno: true, nome: 'soleira', tipo: 'poli', pts: [[zT + dz(M.soleira), M.soleira], [zD - dz(M.soleira), M.soleira]], esperado: { inversoesMax: 0 } },
     { vista: 'lateral', contorno: true, nome: 'arcoDianteiro', tipo: 'poli', pts: arco(zD, M.soleira, M.soleira) },
     /* 2. aberturas: os vidros */
     { vista: 'lateral', classe: 'vidro', nome: 'vidroDaPorta', tipo: 'filete', fechado: true, pts: [[510, 972, 6], [497, 1008, 10], [189, 1192, 400], [0, 1262, 300], [-300, 1303, 1500], [-680, 1268, 20], [-672, 996, 15]] },
     /* a faixa do para-brisa que se vê de lado, entre a silhueta e a coluna A: sem ela a coluna se lia com 120 mm */
-    { vista: 'lateral', classe: 'vidro', nome: 'paraBrisaDeLado', tipo: 'poli', fechado: true, pts: [[760, 1010], [660, 975], [404, 1121], [228, 1218], [120, 1272], [175, 1292], [420, 1178]] },
+    { vista: 'lateral', classe: 'vidro', nome: 'paraBrisaDeLado', tipo: 'poli', fechado: true, pts: [[770, 1010], [690, 998], [500, 1062], [300, 1158], [190, 1222], [165, 1276], [300, 1230], [500, 1133]] },
     { vista: 'lateral', classe: 'vidro', nome: 'vidroTraseiroLateral', tipo: 'filete', fechado: true, pts: [[-692, 1000, 10], [-702, 1262, 15], [-960, 1208, 1200], [-1235, 1108, 18], [-1110, 1034, 120], [-900, 1012, 800]] },
     /* 3. cortes de painel */
     { vista: 'lateral', classe: 'painel', nome: 'porta', tipo: 'filete', fechado: true, pts: [[615, 955], [690, 850, 200], [660, 420, 400], [590, 250, 90], [-545, 250, 110], [-640, 470, 500], [-722, 850, 300], [-682, 997]] },
@@ -151,15 +151,16 @@ export const ESPEC = {
     { vista: 'lateral', classe: 'carater', nome: 'rebaixoTopo', tipo: 'filete', pts: [[1760, 740], [-724, 811, 1500], [-1023, 836]], esperado: { inversoesMax: 0 } },
     { vista: 'lateral', classe: 'carater', nome: 'rebaixoBase', tipo: 'filete', pts: [[845, 345], [-618, 420, 800], [-1000, 640, 500], [-1250, 715]], esperado: { inversoesMax: 1 } },
     /* 5. detalhe */
-    { vista: 'lateral', classe: 'painel', nome: 'farol', tipo: 'filete', fechado: true, pts: [[2249, 699, 10], [1764, 729], [1895, 630, 60], [2025, 613, 200], [2240, 604, 15]] },
+    { vista: 'lateral', classe: 'painel', nome: 'farol', tipo: 'filete', fechado: true, pts: [[2262, 748, 15], [1780, 712], [1960, 655, 200], [2150, 610, 60], [2270, 600, 15]] },
     { vista: 'lateral', classe: 'painel', nome: 'lanterna', tipo: 'filete', fechado: true, pts: [[-2180, 927, 8], [-2216, 927, 8], [-2232, 861, 120], [-2290, 764, 6], [-2262, 754, 10], [-2201, 795, 60], [-2160, 850, 80]] },
     { vista: 'lateral', classe: 'painel', nome: 'macaneta', tipo: 'filete', fechado: true, pts: [[-389, 874, 18], [-645, 874, 18], [-645, 818, 18], [-389, 818, 18]] },
-    { vista: 'lateral', classe: 'painel', nome: 'retrovisor', tipo: 'filete', fechado: true, pts: [[450, 1095, 30], [195, 1095, 30], [195, 985, 30], [400, 955, 20]] },
+    { vista: 'lateral', classe: 'painel', nome: 'retrovisor', tipo: 'filete', fechado: true, pts: [[500, 1015, 20], [320, 1045, 30], [300, 972, 20], [420, 945, 10], [500, 962, 15]] },
     /* recortes de baixo, lidos na imagem: aberturas na chapa com a peça por trás (fatia 5); a frontal e a traseira também os mostram */
     { vista: 'lateral', classe: 'painel', nome: 'luzDeCanto', tipo: 'filete', fechado: true, pts: [[2250, 420, 5], [2140, 420, 5], [2105, 382, 5], [2250, 382, 5]] },
-    { vista: 'lateral', classe: 'painel', nome: 'entradaDeNeblina', tipo: 'filete', fechado: true, pts: [[2223, 376, 6], [2112, 376, 6], [2006, 272, 6], [2215, 272, 6]] },
+    { vista: 'lateral', classe: 'painel', nome: 'entradaDeNeblina', tipo: 'filete', fechado: true, pts: [[2290, 372, 8], [2110, 372, 8], [1990, 252, 10], [2296, 248, 8]] },
     { vista: 'lateral', classe: 'painel', nome: 'refletorTraseiro', tipo: 'filete', fechado: true, pts: [[-2001, 450, 8], [-2186, 458, 8], [-2160, 420, 8], [-2020, 416, 8]] },
-    { vista: 'lateral', classe: 'painel', nome: 'recorteDoDifusor', tipo: 'filete', pts: [[-2362, 452], [-2295, 398, 30], [-2114, 290, 150], [-1880, 258]] },
+    { vista: 'lateral', classe: 'painel', nome: 'recorteDoDifusor', tipo: 'filete', pts: [[-2325, 420], [-2280, 360, 40], [-2120, 340, 400], [-1940, 300]] },
+    { vista: 'lateral', classe: 'painel', nome: 'divisaParachoqueDianteiro', tipo: 'filete', pts: [[1795, 700], [1700, 640, 400], [zD + dz(610), 610]] },
     /* rodas */
     { vista: 'lateral', classe: 'roda', nome: 'pneuDianteiro', tipo: 'circulo', centro: [zD, R], raio: R, foraDoContorno: true, motivoForaDoContorno: motivoRoda },
     { vista: 'lateral', classe: 'roda', nome: 'pneuTraseiro', tipo: 'circulo', centro: [zT, R], raio: R, foraDoContorno: true, motivoForaDoContorno: motivoRoda },
