@@ -89,6 +89,13 @@ export function criarOperacoesAtributos(servicos) {
       grita(st, i, 'parte', 'nome', `nome de parte inválido: ${erroNome} — a identidade da parte é FORMATO SALVO (o canon a anexa, sel:{grupo} a cita, a régua mede por ela)`);
       return;
     }
+    /* `material` no mesmo passo equivale a um `material` com a mesma seleção logo depois: o seletor era escrito duas vezes em
+       52% dos passos do acervo. O nome é conferido antes de qualquer face ser tocada, como o nome da parte. */
+    const material = a.material ?? null;
+    if (material !== null && (typeof material !== 'string' || !Object.hasOwn(st.materiais, material))) {
+      grita(st, i, 'parte', 'material', `material '${material}' não existe em MATERIAIS (${Object.keys(st.materiais).map((n) => `'${n}'`).join(', ') || 'nenhum declarado'})`);
+      return;
+    }
     const declaraPai = Object.hasOwn(a, 'pai');
     const pai = a.pai;
     if (declaraPai) {
@@ -117,6 +124,7 @@ export function criarOperacoesAtributos(servicos) {
     const alvos = resolverAlvosF(st, a, 'parte', i);
     if (!alvos.size) return;
     const pivo = a.pivo != null ? st.vec(a.pivo) : null;   // avaliado ANTES de atribuir: ponto malformado segue estourando alto, como antes
+    if (material !== null) for (const fid of alvos) st.F.get(fid).material = material;
     let atribuiu = false;
     for (const fid of alvos) {
       const f = st.F.get(fid);

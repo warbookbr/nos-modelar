@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1872 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1873 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1123,6 +1123,7 @@
 - `limpar-lascas.js` — limpar-lascas.js (operação) — `limparLascas`: tira de uma seleção as faces finas que uma booleana deixou, sem criar vértice nem face e sem mover a superfície…
 - `loft-fechado.test.ts` — loft-fechado.test.ts — caminho que volta em si e fecha de verdade.
 - `nome-de-copia.test.ts` — nome-de-copia.test.ts — endereço de autor para as cópias do `arranja`.
+- `parte-com-material.test.mjs` — parte-com-material.test.mjs — `parte` aceita `material` no mesmo passo, e a peça sai bit a bit igual à dos dois passos.
 - `perfis.js` — perfis.js — `extrusao`: um perfil 2D com furos e deslocamento de contorno vira um sólido prismático.
 - `ponto-repetido.test.ts` — ponto-repetido.test.ts — a recusa do contorno que não é polígono simples diz qual ponto se repete ou quais arestas se cruzam.
 - `primitivas-basicas.js` — primitivas-basicas.js — geradores fundamentais registrados pelo núcleo, sem estado global.
