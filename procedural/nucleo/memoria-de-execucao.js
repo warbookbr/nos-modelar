@@ -15,6 +15,12 @@
 import { sha256Hex } from './sha256.js';
 import { chaveExata } from './memoria-de-pura.js';
 
+/* Os registros de operações cuja identidade a memória aceita: o do núcleo e os que o host declara. A assinatura do registro vem dos manifestos, e uma
+   implementação trocada sob o mesmo manifesto passaria despercebida; por isso a memória só vale para registro que o host marcou. */
+const registrosConfiaveis = new WeakSet();
+export const confiarNaMemoriaDoRegistro = (registro) => { registrosConfiaveis.add(registro); return registro; };
+export const registroServeAMemoria = (registro) => registro === undefined || registro === null || registrosConfiaveis.has(registro);
+
 /** A memória de uma ou mais execuções: no máximo `maximo` pontos, os mais recentemente guardados ou usados. */
 export function criarMemoriaDeExecucao({ maximo = 4 } = {}) {
   const pontos = new Map();   // chave do prefixo -> { passo, estado }

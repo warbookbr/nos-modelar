@@ -13,7 +13,7 @@
 import { criarResolverNumerico, distanciaDeEdicao, ErroDeResolucao, nomesProximos } from './expressoes.js';
 import { TIPO_MALHA_POLIGONAL, artefatoDaMalha, criarEstadoDeProcedencia, procedenciaCanonica, registrarProcedencia } from './artefatos.js';
 import { criarRegistroOperacoes } from './registro.js';
-import { chavesDosPrefixos, copiarEstado } from './memoria-de-execucao.js';
+import { chavesDosPrefixos, copiarEstado, registroServeAMemoria } from './memoria-de-execucao.js';
 import { essenciaisDaOperacao, recusasDeEssenciais, usoDaOperacao } from './uso-operacoes.js';
 import { criarOperacoesSubdivisao } from './operacoes/subdivisao.js';
 import { criarOperacoesFriso } from './operacoes/friso.js';
@@ -3692,9 +3692,9 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
   let retrato = null;
   /* MEMÓRIA DE EXECUÇÃO (opcional, `OPCOES.memoria`, de `criarMemoriaDeExecucao`): o estado depois de uma operação cara é guardado sob
      a chave do prefixo de passos (e do que o rodeia), e uma execução cujo prefixo é o mesmo recomeça dali. Só vale com o registro do
-     próprio núcleo, e nunca muda o resultado: a prova é o neutro bit a bit contra a execução sem memória. */
-  const memoria = OPCOES.memoria && !OPCOES.registroOperacoes ? OPCOES.memoria : null;
-  const chavesDoPrefixo = memoria ? chavesDosPrefixos({ dict, MATERIAIS, ESQUELETO, ALIASES, declaracoes: [...declaracoesOrigem], modoRetrato, registro: REGISTRO_OPERACOES.assinatura }, PASSOS) : null;
+     próprio núcleo ou o que o host marcou (`confiarNaMemoriaDoRegistro`), e nunca muda o resultado: a prova é o neutro bit a bit contra a execução sem memória. */
+  const memoria = OPCOES.memoria && registroServeAMemoria(OPCOES.registroOperacoes) ? OPCOES.memoria : null;
+  const chavesDoPrefixo = memoria ? chavesDosPrefixos({ dict, MATERIAIS, ESQUELETO, ALIASES, declaracoes: [...declaracoesOrigem], modoRetrato, registro: (OPCOES.registroOperacoes ?? REGISTRO_OPERACOES).assinatura }, PASSOS) : null;
   /* Quais passos viram ponto: guardar o estado inteiro custa uma cópia (5 s com 174 mil faces), então não é todo passo. Entram os
      últimos `PONTOS_NO_FIM` passos das operações pesadas, para o ajuste depois da última delas recomeçar dali, e o último passo
      de operação cara antes do ponto onde esta execução diverge da anterior, para a execução seguinte recomeçar dali. */

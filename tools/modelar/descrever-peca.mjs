@@ -26,8 +26,7 @@ import {
 } from '../../src/autoria/plano-de-modelagem.js';
 import { formasDaPeca } from '../../src/autoria/forma-da-parte.js';
 import { nomesDaSubarvore } from '../../src/autoria/hierarquia-partes.js';
-import { executarReceita } from '../../src/autoria/executar-receita.js';
-import { REGISTRO_OPERACOES } from '../../procedural/nucleo/entrada.js';
+import { REGISTRO_DA_RECEITA, executarReceita } from '../../src/autoria/executar-receita.js';
 import { FACES_MINIMAS_PARA_RECORTAR } from '../../procedural/nucleo/operacoes/abertura-por-contorno.js';
 import { avisosDasComposicoes } from './avisos-de-composicao.mjs';
 import { medirFaceDegenerada, medirTrianguloFino, medirSerrilhadoDaCostura } from './reguas-de-malha/reguas-de-malha.mjs';
@@ -445,7 +444,7 @@ export async function descreverPecaReutilizavel({
   const tempos = new Map();
   const totalDePassos = Array.isArray(receita.PASSOS) ? receita.PASSOS.length : null;
   progresso(`executando a receita${totalDePassos == null ? '' : ` (${totalDePassos} passos)`}`);
-  const cronometro = registroCronometrado(execucao.registroOperacoes ?? REGISTRO_OPERACOES, {
+  const cronometro = registroCronometrado(execucao.registroOperacoes ?? REGISTRO_DA_RECEITA, {
     total: totalDePassos, tempos,
     aoPasso: (i, total, op) => {
       if (aoProgredir && intervaloDoProgressoMs > 0 && performance.now() - ultimaLinha >= intervaloDoProgressoMs) {
