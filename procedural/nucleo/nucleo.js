@@ -3573,6 +3573,7 @@ export const ESCRITA_DAS_OPERACOES = Object.freeze({
   /* mexem só na posição dos vértices que citam (`st.alvosV`), sem criar nem apagar entrada; `arranja` só acrescenta cópias */
   subtrair: { V: 'tocados', F: 'tocados' },
   unir: { V: 'tocados', F: 'tocados' },
+  intersectar: { V: 'tocados', F: 'tocados' },
   rotaciona: { V: 'alvos', F: 'nada' },
   transladar: { V: 'alvos', F: 'nada' },
   arranja: { V: 'acrescenta', F: 'acrescenta' },

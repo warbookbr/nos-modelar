@@ -194,6 +194,22 @@ describe('unir declara o rastreio', () => {
   });
 });
 
+describe('intersectar declara o rastreio', () => {
+  it('interseção de sobreposição, depois atributos e corte sobre o resultado', () => {
+    const passos: Passo[] = [
+      ...BASE,
+      corte('intersectar', 10, [o('cubo', 1), o('cubo', 2)]),
+      ['material', { usa: 'a', sel: o('intersectar', 10) }],
+      corte('subtrair', 11, [o('intersectar', 10), o('cubo', 3)]),
+      ['liso', { angulo: 40, sel: o('subtrair', 11) }],
+    ];
+    const n = igualNosTresCaminhos({ PASSOS: passos, MATERIAIS });
+    expect(n.orfaos.map((x: any) => x.motivo)).toEqual([]);
+    const doPasso = (k: number) => n.procedencia.passos.find((p: any) => p.passo === k)?.saidas;
+    expect(doPasso(3)?.faces.length).toBeGreaterThan(0);
+  });
+});
+
 describe('receitas reais do acervo: o atalho devolve a procedência da conta completa', () => {
   const PECAS = [
     'ambulancia', 'braco-robotico/ombro-tambor', 'caminhao-entrega', 'carro-policia', 'carro-sedan-compacto',
