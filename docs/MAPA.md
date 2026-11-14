@@ -5,8 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1903 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
-1906 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1907 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
