@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { pecasDoAcervo } from './guardas/guarda-acervo.mjs';
 
 /* A tabela fonte -> pacote das 27 referências de veículos (docs/modelar/veiculos-referencias.json) é conferida contra duas coisas que a pessoa ou o agente escrevem à mão:
    o campo `arquivo` de cada `referencias/fonte-partes.json` e a linha de origem de cada `referencias/alvo.md`. A perua chegou a declarar origem autor A
@@ -35,9 +36,13 @@ function problemasDoCabecalho(cabecalho, p, pacote) {
 }
 
 describe('origem das fontes de veículo', () => {
-  it('a tabela tem as 27 peças, cada uma com pacote conhecido', () => {
-    expect(TABELA.pecas).toHaveLength(27);
-    expect(new Set(TABELA.pecas.map((p) => p.peca)).size).toBe(27);
+  it('a tabela tem toda peça do acervo que traz fonte-partes.json, sem repetir, cada uma com pacote conhecido', () => {
+    /* O número de peças é o que o acervo tem: a peça de veículo que entra com `referencias/fonte-partes.json` e não entra na tabela reprova aqui, e a que sai
+       do acervo e fica na tabela reprova no teste seguinte. Era a contagem escrita à mão (27), que mudava a cada peça que entrava ou saía. */
+    const comFonte = pecasDoAcervo().filter((peca) => existsSync(join(REPO, pasta(peca), 'fonte-partes.json')));
+    expect(TABELA.pecas.map((p) => p.peca).sort()).toEqual(comFonte);
+    expect(TABELA.pecas.length).toBeGreaterThan(0);
+    expect(new Set(TABELA.pecas.map((p) => p.peca)).size).toBe(TABELA.pecas.length);
     for (const p of TABELA.pecas) expect(TABELA.pacotes[p.pacote], p.peca).toBeTruthy();
   });
 

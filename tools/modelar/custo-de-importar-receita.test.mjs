@@ -15,6 +15,7 @@ import { readdirSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { REPO } from './resolver-caminho-receita.mjs';
+import { pecasDoAcervo } from './guardas/guarda-acervo.mjs';
 
 export const TETO_EM_SEGUNDOS = 12;
 
@@ -30,7 +31,10 @@ function receitasDoAcervo(pasta = join(REPO, 'procedural/pecas'), achadas = []) 
 describe('custo de importar a receita e gerar os passos', () => {
   it(`nenhuma receita do acervo passa de ${TETO_EM_SEGUNDOS} s`, () => {
     const receitas = receitasDoAcervo();
-    expect(receitas.length).toBeGreaterThan(50);
+    /* O piso segue o tamanho lido do acervo (`pecasDoAcervo`, as pastas com `receita.js`, `montagem.js` ou `index.js`), e não um número escrito à mão que o
+       acervo ultrapassa ou deixa para trás: a varredura achou ao menos quatro de cada cinco peças, e não zero. */
+    expect(receitas.length).toBeGreaterThan(0);
+    expect(receitas.length).toBeGreaterThanOrEqual(Math.ceil(0.8 * pecasDoAcervo().length));
     const r = spawnSync(process.execPath, [join(REPO, 'tools/modelar/medir-importar-receita.mjs'), ...receitas], { encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, cwd: REPO });
     expect(r.status, r.stderr).toBe(0);
     const medidas = r.stdout.split('\n').filter(Boolean).map((l) => JSON.parse(l));
