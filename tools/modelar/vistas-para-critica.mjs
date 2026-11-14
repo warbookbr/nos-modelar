@@ -364,7 +364,7 @@ export function contornosDasReferencias({ imagens = [], citadas = [], existe = e
  * encaixes com as vizinhas (`cortesDosEncaixes`); `anteriores` os pontos de rodadas anteriores que quem conduz atribuiu ao plano, às
  * ferramentas ou ao crítico (`pontosJaAtribuidos`).
  */
-export function montarPedido({ peca, plano = null, orientacao = null, alvo = null, afastamentos = [], referencias = [], modelo = [], arame = [], montado = null, sobreposicao = null, partes = [], perguntas = [], superficie = null, contornos = [], encaixes = [], anteriores = [], medicao = null }) {
+export function montarPedido({ peca, plano = null, orientacao = null, alvo = null, afastamentos = [], referencias = [], naoConstruidas = [], modelo = [], arame = [], montado = null, sobreposicao = null, partes = [], perguntas = [], superficie = null, contornos = [], encaixes = [], anteriores = [], medicao = null }) {
   const imagem = ({ arquivo, vista, tipo }) => `${vista}${tipo ? `, ${tipo}` : ''}: ${arquivo}`;
   /* O lado de cada vista é dito uma vez, em Modelo, e vale pelo nome para o modelo, o montado e as partes: dito junto de cada imagem,
      o mesmo texto longo se repetia mais de vinte vezes na peça de onze partes. */
@@ -426,6 +426,12 @@ export function montarPedido({ peca, plano = null, orientacao = null, alvo = nul
     );
   } else {
     L.push('O plano não cita imagem de referência.');
+  }
+  if (naoConstruidas.length) {
+    L.push(
+      '', 'Referências que a receita NÃO constrói (outra variante ou alternativa descartada; o plano as declara em `referenciasNaoConstruidas`). Não compare o modelo com elas e não cobre defeito por diferir delas:', '',
+      ...lista(naoConstruidas.map((c) => `${basename(c)}: não construída`)),
+    );
   }
   L.push('');
   if (referencias.length || contornos.length) {
@@ -1587,6 +1593,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
       ...referencias.imagens.map((c) => ({ caminho: c, ...(critica.referencias[basename(c)] ? { lado: critica.referencias[basename(c)] } : {}) })),
       ...externas.filter((e) => !referencias.imagens.includes(e.caminho)),
     ],
+    naoConstruidas: referencias.naoConstruidas ?? [],
     contornos: contornosDasReferencias({ imagens: referencias.imagens, citadas: citadasQueNaoSaoImagem(plano, dirname(caminho)) }),
     encaixes,
     anteriores: pontosJaAtribuidos((dep.rodadasAnteriores ?? rodadasDaPasta)(pastaDasRodadas(peca, caminho))),
