@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/nucleo/uso-operacoes.js`, `procedural/nucleo/nucleo.js`, `procedural/nucleo/operacoes/`, `procedural/nucleo/expressoes*`, `procedural/nucleo/auxiliares/`, `src/autoria/executar-receita.js`, `tools/gates/argumentos-essenciais.mjs`, `docs/modelar/banco-de-provas/nucleo-para-receita-2026-11-14/`
+**Território:** `procedural/nucleo/uso-operacoes.js`, `procedural/nucleo/nucleo.js`, `procedural/nucleo/operacoes/`, `procedural/nucleo/expressoes*`, `procedural/nucleo/auxiliares/`, `src/autoria/executar-receita.js`, `tools/gates/argumentos-essenciais.mjs`, `docs/modelar/banco-de-provas/nucleo-para-receita-2026-11-14/`, `tools/gates.mjs`, `package.json`, `procedural/nucleo/entrada.js`, `docs/modelar/gerado/` e `docs/MAPA.md` (gerados)
 
 **Responsável:** a IA da sessão do furgão; as mudanças foram aprovadas pela pessoa em 2026-11-13, e ativado por ela em 2026-11-14 ("pode ir fazendo em paralelo o plano do nucleo, ativar ele e fazer"), depois de o plano das costuras fechar.
 
