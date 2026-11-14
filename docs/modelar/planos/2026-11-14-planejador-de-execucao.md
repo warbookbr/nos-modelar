@@ -123,6 +123,10 @@ A pessoa exige malha idêntica antes e depois. Por isso o gate 1 vale sem toler�
 
 A fatia 1 acionou o critério de parada: o agrupamento de subtrações alcança no máximo 2,2% do tempo do furgão, e 48% do tempo está em `rotaciona`, `transladar`, `arranja` e `limparLascas`. A pessoa aprovou trocar o rumo. A fatia 2 deixa de ser o agrupamento, que sai do plano, e passa a ser: medir primeiro se essas operações fazem o núcleo refazer o rastreio da malha inteira (execução com `retrato: 'completo'` contra a rápida); se a hipótese se confirmar, declarar a escrita delas em `ESCRITA_DAS_OPERACOES`, com a malha idêntica bit a bit provada pelo modo `conferido` no acervo inteiro, e a meta de levar a execução do furgão de 118 s para menos de 85 s, mediana de três. Se a hipótese não se confirmar, o plano para de novo com o número. O cache por passo (fatia 3) segue para depois, e o paralelismo (fatia 4) continua adiado.
 
+## Segunda decisão (pessoa, 2026-11-14)
+
+Com a fatia 2 redirecionada no ar (furgão de 118,1 s para 65,6 s, malha idêntica), a pessoa aprovou estender o rastreio declarado a `subtrair`, `unir`, `intersectar`, `aberturaPorContorno` e `limparLascas`, que ainda somam cerca de 28 s de rastreio no furgão. Meta: a execução do furgão abaixo de 50 s, mediana de três, com a mesma prova de malha idêntica bit a bit no acervo inteiro. Essas operações criam e apagam faces, então a declaração cobre as faces criadas, as apagadas e os vértices tocados, e cada uma passa pelo modo `conferido` antes de entrar. Operação em que a prova não fechar fica sem declaração. O cache por passo segue para depois.
+
 ## Fatias
 
 1. Medir sem mudar nada: perfil da execução das peças da linha de base (que passos e que operações consomem o tempo), o grafo de
