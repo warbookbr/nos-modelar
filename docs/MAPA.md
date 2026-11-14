@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1921 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1923 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -3248,6 +3248,8 @@
 - `perguntas-da-peca.test.mjs` — perguntas-da-peca.test.mjs — o bloco de perguntas de forma que o brief do crítico da peça traz, lido do PLANO da receita.
 - `perguntas-do-alinhamento.mjs` — perguntas-do-alinhamento.mjs — as perguntas do alinhamento da família declarada, filtradas pelas partes.
 - `perguntas-do-alinhamento.test.mjs` — perguntas-do-alinhamento.test.mjs — o comando do alinhamento por família e o registro dos pedidos da pessoa, sobre o furgão realista: a prova retroativa de q…
+- `planejado-contra-executado.mjs` — planejado-contra-executado.mjs — a régua que cruza o andaime N2 com a montagem v5 executada.
+- `planejado-contra-executado.test.mjs` — planejado-contra-executado.test.mjs — a régua do planejado contra o executado, sobre a fixture neutra de três blocos empilhados (`tools/fixtures/planejado-co…
 - `pngjs.d.ts` — pngjs.d.ts — a declaração mínima do `pngjs` para o typecheck dos testes em TypeScript: o pacote não traz tipos, e `capturar-montagem.test.ts` o usa para mont…
 - `portas-espelho-arranja.test.ts` — portas-espelho-arranja.test.ts — prova adversarial de AUT-2026-15: uma interface não pode permanecer no espaço da fonte quando a sua geometria foi copiada. C…
 - `procedencia-check.mjs` — Gate N3: contrato reduzido e explícito de procedência da fonte de restrições.

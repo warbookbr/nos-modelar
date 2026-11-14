@@ -1,0 +1,21 @@
+{
+  "formato": "mecanifica.andaime-global@2",
+  "id": "andaime-tres-blocos",
+  "objetivo": "tres-blocos-empilhados",
+  "alvo": "alvo-tres-blocos",
+  "familia": "peca-mecanica",
+  "intencao": "Andaime neutro de prova da régua do planejado contra o executado: um volume por bloco da fixture tres-blocos-vinculados, e duas portas de encaixe.",
+  "unidade": "mm",
+  "eixos": { "direita": "+x", "cima": "+y", "frente": "+z" },
+  "envelope": { "min": [-30, 0, -30], "max": [30, 60, 30] },
+  "landmarks": [{ "id": "base-do-conjunto", "posicao": [0, 0, 0] }],
+  "volumes": [
+    { "id": "base", "regioes": ["blocos"], "tipo": "caixa", "centro": [0, 17.5, 0], "dimensoes": [60, 35, 60] },
+    { "id": "meio", "regioes": ["blocos"], "tipo": "caixa", "centro": [0, 37.5, 0], "dimensoes": [60, 35, 60] },
+    { "id": "topo", "regioes": ["blocos"], "tipo": "caixa", "centro": [0, 50, 0], "dimensoes": [60, 20, 60] }
+  ],
+  "portas": [
+    { "id": "pino-da-base", "interface": { "forma": "cilindro", "papel": "externa", "eixo": [0, 1, 0], "centro": [0, 20, 0], "raio": 10, "inicio": 0, "fim": 15 } },
+    { "id": "furo-do-topo", "interface": { "forma": "cilindro", "papel": "interna", "eixo": [0, 1, 0], "centro": [0, 40, 0], "raio": 8, "inicio": 0, "fim": 20 } }
+  ]
+}
