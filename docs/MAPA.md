@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1873 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1875 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1050,6 +1050,11 @@
 - `triangulacao-colinear.test.mjs` — triangulacao-colinear.test.mjs — face com canto colinear não sai em triângulo de área nula. O polígono com um canto no meio de uma aresta é válido (a boolean…
 - `triangulacao-face.js` — triangulacao-face.js — triangulação dos triângulos de UMA face plana. O leque a partir do canto 0 põe dezenas de triângulos longos e finos num único vértice …
 - `uso-operacoes.js` — uso-operacoes.js — contratos Agent-First executáveis das operações nativas. A tabela descreve como chamar a capacidade; o executor continua decidindo a geome…
+
+## procedural/nucleo/auxiliares/
+
+- `auxiliares.test.mjs` — auxiliares.test.mjs — cada auxiliar dá o mesmo número, bit a bit, que a cópia que as receitas fazem hoje.
+- `index.js` — auxiliares — as contas que quase toda receita reescreve: milímetro para metro, área com sinal, sentido anti-horário e espelho de meia seção. Medido em 2026-1…
 
 ## procedural/nucleo/fixtures/
 
