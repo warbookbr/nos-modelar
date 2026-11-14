@@ -52,6 +52,21 @@ describe('analisarPeca', () => {
     expect(semPrazo.every((c) => !('prazoDeCargaMs' in c))).toBe(true);
   });
 
+  it('numa --saida escolhida grava numa subpasta por peça, e duas peças na mesma pasta não se misturam', async () => {
+    const saida = 'tools/bancadas/out/teste-saida-por-peca';
+    const chamadas = [];
+    await analisarPeca({ peca: PECA, saida, olhar: olharFalso(chamadas) });
+    await analisarPeca({ peca: 'outra-peca', saida, olhar: olharFalso([]) });
+    expect(chamadas.every((c) => c.saida.replaceAll('\\', '/') === `${saida}/analise-${PECA}`)).toBe(true);
+    const manifestoDaPrimeira = join(REPO, saida, `analise-${PECA}`, 'manifesto.json');
+    const arquivos = JSON.parse(readFileSync(manifestoDaPrimeira, 'utf8')).arquivos;
+    expect(arquivos.length).toBeGreaterThan(0);
+    /* a segunda peça, na mesma --saida, não apagou nem sobrescreveu nada da primeira */
+    expect(arquivos.every((a) => existsSync(join(REPO, a)))).toBe(true);
+    expect(existsSync(join(REPO, saida, 'analise-outra-peca', 'manifesto.json'))).toBe(true);
+    rmSync(join(REPO, saida), { recursive: true, force: true });
+  });
+
   it('recorta o zoom 3x e compõe o par antes/depois; repetir a rodada não colide', async () => {
     const area = mkdtempSync(join(tmpdir(), 'antes-'));
     const antes = join(area, 'antes.png');

@@ -147,7 +147,9 @@ export async function analisarPeca({ peca, parte = null, zoom = null, zoomAntes 
   if (!peca) throw new Error('--analise exige a peça (--peca=<nome>).');
   if (zoomAntes && !zoom) throw new Error('--zoom-antes exige --zoom.');
   const pedidoDeZoom = zoom ? lerZoom(zoom) : null;
-  const pasta = saida ?? pastaDaAnalise(peca);
+  /* Numa `--saida` escolhida as imagens vão para uma SUBPASTA da peça (`<saida>/analise-<peça>`): vários modeladores na mesma cópia, cada um com a sua peça, usavam a
+     mesma pasta e as imagens se misturavam e sumiam, porque a limpeza do manifesto anterior apagava o que era de outro. */
+  const pasta = saida ? join(saida, `analise-${apelido(peca)}`) : pastaDaAnalise(peca);
   const pastaAbs = resolve(REPO, pasta);
   if (relative(REPO, pastaAbs).startsWith('..')) throw new Error('--saida precisa ficar dentro do repositório.');
   /* A pasta padrão é da análise e é refeita inteira; numa --saida escolhida
