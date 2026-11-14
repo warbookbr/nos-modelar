@@ -5,8 +5,7 @@
 **Planos ativos:**
 
 1. [furgão realista](2026-10-30-furgao-realista.md). Território: `procedural/pecas/furgao-realista/`, `procedural/familias/roda-pneu/`, `docs/modelar/banco-de-provas/furgao-realista-2026-10-30/`. Em aberto: a etapa 8, com a frente e a lanterna traseira aprovadas e uma rodada de acabamento (moldura do arco, grade, aro da luz de canto, pé do para-brisa), os acabamentos que restam da etapa 7 e a etapa de materiais, sobre o plano dos materiais realistas.
-2. [núcleo para quem escreve receita](2026-11-13-nucleo-para-quem-escreve-receita.md). Território: os arquivos do núcleo listados no plano. Em aberto: tudo.
-3. [revisão das verificações e dos testes](2026-11-13-revisao-das-verificacoes-e-dos-testes.md). Território: `docs/modelar/banco-de-provas/revisao-das-verificacoes-2026-11-13/`. Em aberto: tudo.
+2. [revisão das verificações e dos testes](2026-11-13-revisao-das-verificacoes-e-dos-testes.md). Território: `docs/modelar/banco-de-provas/revisao-das-verificacoes-2026-11-13/`. Em aberto: tudo.
 
 A lista está em ordem de prioridade. A ordem desempata quando dois planos precisam do mesmo arquivo: o de menor prioridade espera ou pede à pessoa que mude o território.
 
