@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1892 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1897 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1136,6 +1136,10 @@
 
 - `CLAUDE.md` — Peças: o que só vale nesta pasta
 
+## procedural/pecas/alternador/
+
+- `receita.js` — alternador: alternador automotivo de 12 V, peça inteira. Referencial do acervo: Y para cima, chão em y 0 (o fundo da bucha do pé de baixo), eixo do rotor em …
+
 ## procedural/pecas/alternador/referencias/
 
 - `alvo.md` — Alvo do alternador
@@ -1540,6 +1544,10 @@
 ## procedural/pecas/carro-taxi/referencias/
 
 - `alvo.md` — Alvo: carro-taxi
+
+## procedural/pecas/disco-de-embreagem/
+
+- `receita.js` — disco-de-embreagem: disco de embreagem com amortecedor de torção, peça inteira de cinco partes (revestimento, chapaDeArraste, cubo, molas, placas). REFERENCI…
 
 ## procedural/pecas/disco-de-embreagem/referencias/
 
@@ -1975,6 +1983,10 @@
 
 - `alvo.md` — Alvo da poltrona de vime
 
+## procedural/pecas/radiador/
+
+- `receita.js` — radiador: radiador de alumínio de fluxo cruzado, núcleo de 600 x 400 x 40 mm entre dois tanques de 50 mm, peça inteira. Referencial do acervo: Y para cima, c…
+
 ## procedural/pecas/radiador/referencias/
 
 - `alvo.md` — Alvo do radiador
@@ -2087,6 +2099,14 @@
 ## procedural/pecas/trator/referencias/
 
 - `alvo.md` — trator — alvo
+
+## procedural/pecas/turbocompressor/
+
+- `receita.js` — turbocompressor — turbocompressor de carro de passeio de uma peça só, com seis partes: carcacaCompressor, rotorCompressor, miolo, carcacaTurbina, linhas e ab…
+
+## procedural/pecas/turbocompressor/referencias/
+
+- `alvo.md` — Alvo do turbocompressor
 
 ## procedural/pecas/vela-de-ignicao/
 
