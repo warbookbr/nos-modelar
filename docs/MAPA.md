@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1921 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1925 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2271,6 +2271,8 @@
 - `regua-de-portas.js` — regua-de-portas.js — a conta das portas, pura e sem nenhum import.
 - `regua-de-portas.test.js` — regua-de-portas.test.js — a conta das portas que o núcleo e o gate de contato do esboço dividem.
 - `resolver-montagem-persistida.js` — resolver-montagem-persistida.js — resolve instâncias de peças sem acesso a arquivo.
+- `saliencias-declaradas.js` — saliencias-declaradas.js — a saliência ou o rebaixo de dupla curvatura que a peça desenha de propósito, com a região, a amplitude e o motivo.
+- `saliencias-declaradas.test.js` — saliencias-declaradas.test.js — `PLANO.saliencias`: o normalizador recusa o que o campo não admite, dizendo o que recebeu, o que esperava e o comando que mos…
 - `separacao-direcional.js` — separacao-direcional.js — mede intervalos projetados sem alegar colisão geral.
 - `snapshot-universo-autoria.js` — snapshot-universo-autoria.js — leitura consistente do universo de autoria.
 - `solido-do-esboco.js` — solido-do-esboco.js — o sólido exato de uma forma do esboço, em milímetro, como volume que a Manifold subtrai e interseta.
@@ -2878,6 +2880,10 @@
 
 - `receita.js` — O suporte com a sapata 1 mm para +x: outra malha, ainda dentro do envelope de 2 mm do volume da sapata.
 
+## tools/fixtures/saliencia-declarada/
+
+- `receita.js` — saliencia-declarada — chapa neutra com uma saliência (ou um rebaixo) de dupla curvatura desenhada de propósito, para provar a declaração `PLANO.saliencias` d…
+
 ## tools/fixtures/solido-por-lacos/
 
 - `aresta-arredondada.js` — aresta-arredondada.js — a peça de comparação do terceiro limite da peça de teste: uma caixa da mesma seção da parte deitada (190 mm de largura, de y = 20 a 2…
@@ -3233,6 +3239,7 @@
 - `ondulacao-gota.test.mjs` — ondulacao-gota.test.mjs — a leitura de ondulação das chapas com anel no vão real: a gota estreita e o vão aberto pelas colunas que terminam e começam
 - `ondulacao-leitura.test.mjs` — ondulacao-leitura.test.mjs — o dado lido com peso, o aviso de estações próximas e a face virada na ferramenta de ondulação
 - `ondulacao-rede.test.mjs` — ondulacao-rede.test.mjs — a leitura de ondulação da chapa lateral montada por rede de curvas
+- `ondulacao-saliencia-declarada.test.mjs` — ondulacao-saliencia-declarada.test.mjs — `PLANO.saliencias` na régua de ondulação, sobre a chapa neutra de `tools/fixtures/saliencia-declarada/`: a lombada d…
 - `origem-das-fontes.test.mjs` — A tabela fonte -> pacote das 27 referências de veículos (docs/modelar/veiculos-referencias.json) é conferida contra duas coisas que a pessoa ou o agente escr…
 - `origens-check.mjs` — origens-check.mjs — quem declara de onde vieram os números, declara todos.
 - `papeis-do-laco.test.mjs` — papeis-do-laco.test.mjs — os papéis do laço continuam separados e genéricos.
