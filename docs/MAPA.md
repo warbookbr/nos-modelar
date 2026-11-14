@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1870 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1876 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1697,6 +1697,14 @@
 
 - `roteiro.md` — Roteiro da análise
 
+## procedural/pecas/escrivaninha-com-gaveta/
+
+- `receita.js` — escrivaninha-com-gaveta — escrivaninha de carvalho de 1200 por 600 mm de tampo e 750 mm de altura, com quatro pés retos, uma saia de quatro travessas, tampo …
+
+## procedural/pecas/escrivaninha-com-gaveta/referencias/
+
+- `alvo.md` — Alvo da escrivaninha com gaveta
+
 ## procedural/pecas/freezer-horizontal/
 
 - `receita.js` — freezer-horizontal — freezer horizontal de tampo: corpo branco sobre o chão, junta escura que cobre o topo do corpo, tampo arredondado assentado sobre a junt…
@@ -1838,6 +1846,22 @@
 ## procedural/pecas/lavadora-secadora-branca/referencias/
 
 - `alvo.md` — Alvo: lavadora e secadora branca de porta frontal
+
+## procedural/pecas/mesa-de-centro-oval/
+
+- `receita.js` — mesa-de-centro-oval — mesa de centro de luxo: tampo de mármore oval de pista (1200 por 600 mm), quatro pés de latão com capitel e sapata em degrau, aro infer…
+
+## procedural/pecas/mesa-de-centro-oval/referencias/
+
+- `alvo.md` — Alvo da mesa de centro oval
+
+## procedural/pecas/mesa-de-jantar/
+
+- `receita.js` — mesa-de-jantar — mesa de jantar retangular de carvalho maciço: tampo de 1800 por 900 mm com 30 mm de espessura, quatro pés de 70 mm que afinam até 45 mm no c…
+
+## procedural/pecas/mesa-de-jantar/referencias/
+
+- `alvo.md` — Alvo da mesa de jantar
 
 ## procedural/pecas/mesa-quadrada-escura/
 
