@@ -67,6 +67,8 @@ const colapsar = (t) => t.replace(/\s+/g, ' ');
  * O aceite da pessoa e as decisões pendentes de um `ALINHAMENTO.md`. O aceite é a linha `alinhamento:`, `rascunho:` ou `delegação:` com data
  * na seção "Aceite" (`origem: 'registrado'`); sem ela vale o registro anterior ao formato (`origem: 'anterior'`): a delegação da pessoa, o
  * combinado ou aprovado com ela. As decisões pendentes são os parágrafos da seção "Decisões que dependem da pessoa" (ou "pendentes").
+ * O alinhamento que tem essa seção já está no formato novo, e o registro anterior não vale para ele: a frase "aceita pela pessoa" sobre a
+ * prancha do carro fastback (2026-11-14) passava por aceite do alinhamento inteiro.
  */
 export function lerAceites(texto) {
   const linhas = texto.split(/\r?\n/);
@@ -83,7 +85,8 @@ export function lerAceites(texto) {
     if (quem.includes('rascunho') || quem.some((x) => x.startsWith('delega'))) aceites.rascunho ??= aceite;
   }
   const plano = colapsar(texto);
-  const anterior = (re) => { const m = re.exec(plano); return m ? { origem: 'anterior', texto: m[0].trim() } : null; };
+  const formatoNovo = linhas.some((l) => /^#+.*\b(dependem da pessoa|decis[õo]es pendentes|pendentes? da pessoa|aguardando a pessoa)/i.test(l));
+  const anterior = (re) => { const m = formatoNovo ? null : re.exec(plano); return m ? { origem: 'anterior', texto: m[0].trim() } : null; };
   const delegacao = anterior(/[^.]*(?:\bdeleg\p{L}+ d[ao] pessoa|\bpessoa (?:\p{L}+ ){0,3}deixou (?:a )?condu\p{L}+)[^.]*\./iu);
   const combinado = anterior(/[^.]*\b(?:combinad\w+|conduzid\w+|aprovad\w+|aceit\w+) (?:com a pessoa|pela pessoa|por ela)\b[^.]*\./i);
   aceites.alinhamento ??= delegacao ?? combinado;

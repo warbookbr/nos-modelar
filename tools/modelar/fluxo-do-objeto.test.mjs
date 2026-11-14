@@ -291,6 +291,9 @@ describe('o aceite da pessoa', () => {
     expect(lerAceites('# X\n\nDecidido pela IA que conduz, por delegação da pessoa em 2026-11-09; o resto.\n').alinhamento.origem).toBe('anterior');
     expect(lerAceites('# X\n\nNo mesmo dia a pessoa deixou a condução do carrinho e o aceite da forma com a IA.\n').rascunho.origem).toBe('anterior');
     expect(lerAceites('# X\n\nO objeto e as partes foram combinados com a pessoa no alinhamento.\n').alinhamento.origem).toBe('anterior');
+    /* Com a seção de decisões pendentes o arquivo está no formato novo, e a frase solta sobre a prancha não vale como aceite. */
+    expect(lerAceites('# X\n\nA prancha foi aceita pela pessoa.\n\n## Decisões que dependem da pessoa\n\nA largura da coluna.\n'))
+      .toMatchObject({ alinhamento: null, rascunho: null, decisoes: ['A largura da coluna.'] });
     expect(lerAceites(PENDENTES)).toMatchObject({ alinhamento: null, rascunho: null, decisoes: [expect.stringMatching(/^A referência tem duas janelas/), expect.stringMatching(/^A chapa tem 1 mm e o vão 4 mm\. A recomendação/)] });
   });
 

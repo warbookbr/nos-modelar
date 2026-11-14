@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1959 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1960 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1501,6 +1501,10 @@
 ## procedural/pecas/carro-esportivo-sedan/referencias/
 
 - `alvo.md` — Alvo: carro-esportivo-sedan
+
+## procedural/pecas/carro-fastback/
+
+- `ALINHAMENTO.md` — Carro fastback: alinhamento
 
 ## procedural/pecas/carro-fastback/referencias/
 
