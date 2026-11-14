@@ -8,6 +8,7 @@ import { execSync } from 'node:child_process';
 import { descreverVersao, lerVersaoPublicada } from './tools/bancadas/versao-publicada.mjs';
 import { semSessaoNoPacote } from './tools/bancadas/sem-sessao-no-pacote.mjs';
 import { avisosDeTerceiros } from './tools/bancadas/avisos-de-terceiros.mjs';
+import { impressaoDasFontes } from './tools/bancadas/impressao-das-fontes.mjs';
 
 /* A versão entra como texto fixo no pacote: a página publicada não tem git para
    consultar, e sem isto quem abre a bancada não sabe se está vendo a construção
@@ -25,6 +26,8 @@ export default defineConfig({
     semSessaoNoPacote({ saida: resolve(import.meta.dirname, 'dist') }),
     /* o pacote leva o texto das licenças das bibliotecas que empacota */
     avisosDeTerceiros({ raiz: import.meta.dirname, saida: resolve(import.meta.dirname, 'dist') }),
+    /* a chave do cache da malha da bancada: hash da receita, do que ela importa e do motor */
+    impressaoDasFontes({ raiz: import.meta.dirname }),
   ],
   /* As cópias de trabalho dos agentes moram em `.claude/worktrees/`, cada uma com
      o repositório inteiro e às vezes com as dependências; sem isto o servidor que

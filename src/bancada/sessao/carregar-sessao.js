@@ -5,12 +5,13 @@ import { caixasPorParte, portasPublicadas } from '../../autoria/descrever-partes
 import { executarReceita } from '../../autoria/executar-receita.js';
 import { resolverMontagemPersistida } from '../../autoria/resolver-montagem-persistida.js';
 
-export function processarReceitaSessao(receita, { nome = 'Sessão Ativa' } = {}) {
+/* `neutro` é o resultado de uma execução já feita (o cache da bancada, `cache-da-execucao.js`); sem ele, a receita executa aqui. */
+export function processarReceitaSessao(receita, { nome = 'Sessão Ativa', neutro: neutroPronto = null } = {}) {
   if (!receita || !Array.isArray(receita.PASSOS)) {
     throw new Error('sessão: receita precisa expor PASSOS procedurais.');
   }
   const materiais = receita.MATERIAIS ?? {};
-  const { neutro } = executarReceita(receita);
+  const neutro = neutroPronto ?? executarReceita(receita).neutro;
   const { caixas, facesSemParte } = caixasPorParte(neutro);
   const portas = portasPublicadas(neutro);
   const rotulo = receita.meta?.nome ?? nome;
