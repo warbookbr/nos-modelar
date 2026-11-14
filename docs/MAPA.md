@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1885 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1886 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2119,6 +2119,7 @@
 - `interfaces-montagem.js` — interfaces-montagem.js — resolve portas declaradas por peças, mede relações mecânicas e deriva poses sem Three.js, hierarquia ou solver. É o contrato mínimo …
 - `invasao-de-contato.js` — invasao-de-contato — quanto uma parte invade a outra, medido CORPO A CORPO.
 - `invasao-de-contato.test.mjs` — invasao-de-contato.test.mjs — o contato declarado autoriza o toque, não a invasão.
+- `invasao-tolerada.test.mjs` — invasao-tolerada.test.mjs — a lista das peças antigas toleradas só encolhe.
 - `laco-de-modelagem.js` — laco-de-modelagem.js — quem decide se a modelagem continua, e por quê.
 - `laco-de-modelagem.test.js` — laco-de-modelagem.test.js — a decisão de parar sai dos números, não de quem modelou.
 - `lataria.js` — lataria.js — se uma peça é de lataria, e quais partes dela são a chapa.

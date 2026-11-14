@@ -18,6 +18,7 @@ import {
 } from './configuracao-composicoes.mjs';
 import { descreverPeca as medirPeca, formatarDescricao } from '../../src/autoria/descrever-partes.js';
 import { contatosDaPeca } from '../../src/autoria/contatos-da-peca.js';
+import { pecasToleradas } from '../../src/autoria/invasao-de-contato.js';
 import { medirMovimentos } from '../../src/autoria/movimentos-da-peca.js';
 import { criarMemoriaDeAuditoria } from '../../src/autoria/contato-de-solidos.js';
 import { conferirVaosDaPeca, formatarVaos } from '../../src/autoria/molduras-do-vao.js';
@@ -732,20 +733,22 @@ export async function descreverPecaReutilizavel({
     /* DECLARADO QUE INVADE. Declarar o contato autoriza o toque, não a invasão: o par declarado cujas partes se afundam além do que o contato admite reprova,
        com o par de corpos (índice, faces e caixa de cada um) e a profundidade medida corpo a corpo (`src/autoria/invasao-de-contato.js`). */
     if (contatos.invasoes.length) {
+      const desdeToleranciaAntiga = pecasToleradas().get(peca);
       const mm = (n) => String(Number((n * 1000).toPrecision(4))).replace('.', ',');
       const corpo = (c) => `corpo ${c.indice} (${c.faces} faces, de [${c.caixa.min.join(', ')}] a [${c.caixa.max.join(', ')}])`;
       const linhas = contatos.invasoes.map(({ par, profundidade, limite, corpos }) => [
         `    ${par[0]} ↔ ${par[1]}: afunda ${mm(profundidade)} mm (admite ${mm(limite)} mm)`,
         ...(corpos ? [`      ${par[0]}: ${corpo(corpos[0])}`, `      ${par[1]}: ${corpo(corpos[1])}`] : []),
       ].join('\n'));
-      stderr += `
-${contatos.invasoes.length} CONTATO(S) DECLARADO(S) EM QUE UMA PARTE INVADE A OUTRA`
+      const texto = `
+${contatos.invasoes.length} CONTATO(S) DECLARADO(S) EM QUE UMA PARTE INVADE A OUTRA${desdeToleranciaAntiga ? ` (aviso: peça antiga tolerada desde ${desdeToleranciaAntiga} em src/autoria/invasao-tolerada.json)` : ''}`
         + '\n  A receita disse que estas partes se tocam, e elas se atravessam:\n'
         + linhas.join('\n')
         + '\n  Recebi a profundidade acima e esperava no máximo o limite; afaste os corpos até só se encostarem,'
         + '\n  ou, se a junta afunda de propósito (solda, pino num furo), declare `invasaoMaxima` no contato, com o motivo.'
-        + '\n  Para ver o par: npm run descrever -- <peça> --partes=<a>,<b>\n';
-      falhou = true;
+        + '\n  Para ver o par: npm run descrever -- <peça> --partes=<a>,<b>\n'
+        + (desdeToleranciaAntiga ? ['', '  Esta peça está na lista das antigas toleradas e só avisa. O conserto é declarar `invasaoMaxima` em cada contato acima, com o motivo, e tirar a peça da lista.', ''].join('\n') : '');
+      if (desdeToleranciaAntiga) stdout += texto; else { stderr += texto; falhou = true; }
     }
     /* MOVIMENTOS DECLARADOS. A receita que exporta MOVIMENTOS (gaveta que corre, tampa que abre) tem o curso medido posição a posição contra as outras partes,
        com a mesma medida de invasão do contato declarado (src/autoria/movimentos-da-peca.js); a posição em que uma parte afunda em outra além do limite reprova. */

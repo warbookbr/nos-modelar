@@ -1,0 +1,130 @@
+{
+  "desde": "2026-11-14",
+  "motivo": "Pecas do acervo anteriores a regua de invasao do contato declarado; a invasao delas sai como aviso. A lista so encolhe: peca que deixa de invadir sai dela (invasao-tolerada.test.mjs), e peca nova nunca entra.",
+  "pecas": [
+    {
+      "peca": "aviao/asas",
+      "desde": "2026-11-14"
+    },
+    {
+      "peca": "aviao/empenagem-horizontal",
+      "desde": "2026-11-14"
+    },
+    {
+      "peca": "aviao/empenagem-vertical",
+      "desde": "2026-11-14"
+    },
+    {
+      "peca": "aviao/fuselagem",
+      "desde": "2026-11-14"
+    },
+    {
+      "peca": "aviao/helice",
+      "desde": "2026-11-14"
+    },
+    {
+      "peca": "aviao/motor",
+      "desde": "2026-11-14"
+    },
+    {
+      "peca": "aviao/trem-do-nariz",
+      "desde": "2026-11-14"
+    },
+    {
+      "peca": "aviao/trens-principais",
+      "desde": "2026-11-14"
+    },
+    {
+      "peca": "balcao-de-bar",
+      "desde": "2026-11-14"
+    },
+    {
+      "peca": "braco-robotico/base",
+      "desde": "2026-11-14"
+    },
+    {
+      "peca": "caminhao-lixo",
+      "desde": "2026-11-14"
+    },
+    {
+      "peca": "carrinho-de-mao/cacamba",
+      "desde": "2026-11-14"
+    },
+    {
+      "peca": "carrinho-de-mao/chassi",
+      "desde": "2026-11-14"
+    },
+    {
+      "peca": "carrinho-de-mao/pes",
+      "desde": "2026-11-14"
+    },
+    {
+      "peca": "carrinho-de-mao/roda",
+      "desde": "2026-11-14"
+    },
+    {
+      "peca": "empilhadeira/banco",
+      "desde": "2026-11-14"
+    },
+    {
+      "peca": "empilhadeira/carcaca",
+      "desde": "2026-11-14"
+    },
+    {
+      "peca": "empilhadeira/glp",
+      "desde": "2026-11-14"
+    },
+    {
+      "peca": "empilhadeira/protetor",
+      "desde": "2026-11-14"
+    },
+    {
+      "peca": "empilhadeira/roda-dianteira",
+      "desde": "2026-11-14"
+    },
+    {
+      "peca": "empilhadeira/roda-traseira",
+      "desde": "2026-11-14"
+    },
+    {
+      "peca": "freezer-horizontal",
+      "desde": "2026-11-14"
+    },
+    {
+      "peca": "furgao-realista",
+      "desde": "2026-11-14"
+    },
+    {
+      "peca": "onibus-urbano",
+      "desde": "2026-11-14"
+    },
+    {
+      "peca": "picape-angular",
+      "desde": "2026-11-14"
+    },
+    {
+      "peca": "poltrona-vime-azul",
+      "desde": "2026-11-14"
+    },
+    {
+      "peca": "poltrona-vime-roxa",
+      "desde": "2026-11-14"
+    },
+    {
+      "peca": "sedan-chassi-e-lataria/carroceria",
+      "desde": "2026-11-14"
+    },
+    {
+      "peca": "sedan-chassi-e-lataria/frente-e-traseira",
+      "desde": "2026-11-14"
+    },
+    {
+      "peca": "sedan-chassi-e-lataria/rodas",
+      "desde": "2026-11-14"
+    },
+    {
+      "peca": "trator",
+      "desde": "2026-11-14"
+    }
+  ]
+}

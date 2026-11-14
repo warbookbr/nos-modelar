@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import {
   TOLERANCIA_DE_ENCOSTO_DA_PECA,
   auditarParDeSolidos,
@@ -79,4 +80,12 @@ export function invasaoEntreCorpos(corposA, corposB, tolerancia = TOLERANCIA_DE_
   }
   const estado = melhor.profundidade > TOLERANCIA_DE_INVASAO ? 'interpenetram' : paresInconclusivos ? 'inconclusivo' : encostou ? 'encostam' : 'separadas';
   return { estado, profundidade: melhor.profundidade, corpos: melhor.corpos, paresInconclusivos };
+}
+
+/* AS PEÇAS ANTIGAS TOLERADAS. A régua nasceu com 31 peças do acervo que já afundavam em contatos declarados (solda, pino, perna dentro de caixa). Elas ficam numa lista
+   versionada e explícita, invasao-tolerada.json, e a invasão delas sai como AVISO; a peça fora da lista reprova. A lista só encolhe. */
+export const CAMINHO_DA_LISTA_TOLERADA = new URL('./invasao-tolerada.json', import.meta.url);
+export function pecasToleradas() {
+  const lista = JSON.parse(readFileSync(CAMINHO_DA_LISTA_TOLERADA, 'utf8'));
+  return new Map(lista.pecas.map((p) => [p.peca, p.desde]));
 }
