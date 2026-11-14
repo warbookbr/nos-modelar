@@ -1,0 +1,269 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "roda-esportiva",
+  "numero": 4,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "C:\\Users\\micro\\Desktop\\nos-modelar\\.claude\\worktrees\\roda-esportiva\\procedural\\pecas\\roda-esportiva\\referencias\\locais\\variante-b.jpg",
+    "nota": 4,
+    "defeitos": [
+      {
+        "parte": "aro",
+        "tipo": "ausencia",
+        "onde": "canaleta funda por dentro, atrás dos raios",
+        "sentido": "faltando",
+        "evidencia": "Isométrica isolada do aro: barril liso quase cilíndrico, sem canaleta funda legível; raio X traseiro mostra o barril como caixa reta."
+      },
+      {
+        "parte": "aro",
+        "tipo": "superficie",
+        "onde": "parede do barril junto às janelas dos raios, face interna",
+        "sentido": "segmentado",
+        "evidencia": "Isométrica isolada do aro: cortes dentados e furos brancos na parede, de onde os raios foram subtraídos; superfície do barril rasgada em vez de contínua."
+      },
+      {
+        "parte": "raios",
+        "tipo": "superficie",
+        "onde": "face da frente dos raios",
+        "sentido": "anguloso",
+        "evidencia": "Isométrica isolada dos raios: placas quase chatas, sem a concavidade do centro recuado que a referência mostra; cantos das pontas viram lascas vivas."
+      },
+      {
+        "parte": "raios",
+        "tipo": "superficie",
+        "onde": "face usinada da frente, variante B",
+        "sentido": "anguloso",
+        "evidencia": "Vistas direita montada e isométrica isolada: raios inteiros pretos, sem face clara usinada como na variante B da referência; é critério de reprovação."
+      },
+      {
+        "parte": "raios",
+        "tipo": "uniao",
+        "onde": "pontas externas dos cinco raios, onde encontram o aro",
+        "sentido": "afastado",
+        "evidencia": "Vistas direita e isométrica dos raios isolados e a direita montada: franja de triângulos soltos nas pontas, com vazio entre raio e aro. Emenda aberta, critério de reprovação."
+      }
+    ],
+    "observacao": "Pneu, tampa, parafusos e válvula estão fiéis; o miolo (aro com raios) tem malha rasgada nas emendas e frente toda preta, e é por isso que a nota fica em 4."
+  },
+  "partes": [
+    {
+      "nome": "aro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "raios",
+      "confere": false,
+      "observacao": "dez raios finos em cinco pares em V, concavos e fundidos ao aro; costura ainda deixa 179 faces finas, e a face segue lisa com liso 60"
+    },
+    {
+      "nome": "tampaCentral",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "parafusos",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "valvula",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pneu",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "o seletor de parte nao tem criterio radial: nao da para reatribuir ao aro as faces de parede que o unir junta em raios",
+    "arredondarCostura e caprichoso com a geometria: mudar avancoAxialDaParede de 28 para 29 faz o passo recusar o raio 8 e 31 passa, entao so a varredura acha o ponto",
+    "ro e Rwin perto de rFace fazem o arredondarCostura consumir faces do aro e a parte aro some; so aparece pela recusa do passo parte",
+    "a medicao nao checa por medida a ponta do raio na parede nem a base da valvula; ficam por construcao",
+    "CONTATOS vazio: aro e raios sao casca aberta e 8 pares seguem sem decisao",
+    "quem conduz: o critico comparou com a variante B porque o pacote traz as duas referencias sem dizer qual a receita constroi; falta campo de variante ativa no pedido",
+    "a pessoa julgou os raios: o par em V tem de abrir desde o centro, cada raio ~3% do diametro, miolo pouco alem dos parafusos; a largura do raio nao esta no PLANO"
+  ],
+  "notaDePassagem": "O afinamento dos raios e decisao da pessoa. Medi em variante-a.jpg (aro 790 px = 500 mm): raio 0,047 do diametro do aro na raiz (24 mm) e 0,06 na ponta (31 mm), fresta do par 23 mm, cada par cobre ~28% do setor de 72 graus e a janela ~70%. Face da borda 12 mm = 0,024 do diametro externo; parede inclinada ~27,7 graus (222 mm no barril, avanco axial 31). Lábio usinado, resto grafite, so paleta existente. Janela e prato terminam em rFace para a ponta fundir na parede rente a dobra. avancoAxial 31 e dobra 2 escolhidos por varredura (179 faces finas).",
+  "receita": {
+    "sha256": "sha256:a5e16c20c9c7522115a6826a03d053239b503f5fa894837a01248be9c127dc86",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 11,
+      "acrescentadas": 20,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 23,
+          "texto": "  alturaDoFlange: 17, espessuraDoFlange: 9, raioDaBorda: 3.5, espessuraDaParede: 7,"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": "  alturaDoFlange: 9, espessuraDoFlange: 9, raioDaBorda: 3.5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": "  /* borda vista de frente (medida em variante-a.jpg: face 12 mm = 0,024 do diâmetro externo da borda; parede inclinada de uns 30 graus) */"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": "  larguraDaFaceDaBorda: 12, raioDaQuinaDaBorda: 2, raioDaDobra: 2, raioDoBarrilNaFrente: 222, avancoAxialDaParede: 31, espessuraDaParede: 7,"
+        },
+        {
+          "tipo": "-",
+          "linha": 26,
+          "texto": "  desvioET: 40, espessuraDoCubo: 14, raioDoCubo: 74, avancoDoPratoNoAro: 105, recuoDoPratoTras: 50, expoenteDoPrato: 1.3,"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": "  desvioET: 40, espessuraDoCubo: 14, raioDoCubo: 74, avancoDoPratoNoAro: 106, recuoDoPratoTras: 50, expoenteDoPrato: 1.8,"
+        },
+        {
+          "tipo": "-",
+          "linha": 29,
+          "texto": "  larguraNaRaizA: 36, larguraNoAroA: 50, aberturaNaRaizA: 4, aberturaNoAroA: 15, arredondaJanelaA: 8,"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "  larguraNaRaizA: 24, larguraNoAroA: 31, aberturaNaRaizA: 7, aberturaNoAroA: 8.5, arredondaJanelaA: 8,"
+        },
+        {
+          "tipo": "-",
+          "linha": 184,
+          "texto": "  const ro = Rin + t.espessuraDaParede / 2, Rwin = Rin + t.folgaDaJanelaNaParede, dC = t.profundidadeDaCanaleta;"
+        },
+        {
+          "tipo": "+",
+          "linha": 186,
+          "texto": "  const rFace = Rfl - t.larguraDaFaceDaBorda, ro = rFace, Rwin = rFace - 0.5, dC = t.profundidadeDaCanaleta;"
+        },
+        {
+          "tipo": "-",
+          "linha": 188,
+          "texto": "    [Rs, hw - t.espessuraDoFlange], [Rfl, hw - t.espessuraDoFlange, 1.5], [Rfl, hw, t.raioDaBorda], [Rin, hw],"
+        },
+        {
+          "tipo": "-",
+          "linha": 189,
+          "texto": "    [Rin, t.canaletaFrente + t.rampaDaCanaleta + 2], [Rin - dC, t.canaletaFrente + 2], [Rin - dC, t.canaletaTras - 2],"
+        },
+        {
+          "tipo": "+",
+          "linha": 190,
+          "texto": "    [Rs, hw - t.espessuraDoFlange], [Rfl, hw - t.espessuraDoFlange, 1.5], [Rfl, hw, t.raioDaQuinaDaBorda], [rFace, hw, t.raioDaDobra], [t.raioDoBarrilNaFrente, hw - t.avancoAxialDaParede],"
+        },
+        {
+          "tipo": "+",
+          "linha": 191,
+          "texto": "    [t.raioDoBarrilNaFrente, t.canaletaFrente + t.rampaDaCanaleta + 2], [Rin - dC, t.canaletaFrente + 2], [Rin - dC, t.canaletaTras - 2],"
+        },
+        {
+          "tipo": "-",
+          "linha": 200,
+          "texto": "  const d = { Rs, Rfl, Rin, hw, ro, Rwin, aro, prato, xf0, xb0, Rt: Rs + t.alturaDoFlanco };"
+        },
+        {
+          "tipo": "+",
+          "linha": 202,
+          "texto": "  const d = { Rs, Rfl, Rin, rFace, hw, ro, Rwin, aro, prato, xf0, xb0, Rt: Rs + t.alturaDoFlanco };"
+        },
+        {
+          "tipo": "-",
+          "linha": 223,
+          "texto": "  const rValvula = (d.Rin + d.Rfl) / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 225,
+          "texto": "  /* a válvula sai da parede inclinada, embaixo, com o eixo perpendicular a ela (para dentro do vão e para a frente) */"
+        },
+        {
+          "tipo": "+",
+          "linha": 226,
+          "texto": "  const rV = (d.rFace + t.raioDoBarrilNaFrente) / 2, xV = hw - t.avancoAxialDaParede / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 227,
+          "texto": "  const angV = (Math.atan2(t.avancoAxialDaParede, d.rFace - t.raioDoBarrilNaFrente) * 180) / Math.PI;"
+        },
+        {
+          "tipo": "+",
+          "linha": 228,
+          "texto": "  const emV = [m(xV), Rc - m(rV), 0];"
+        },
+        {
+          "tipo": "-",
+          "linha": 225,
+          "texto": "  passos.push(disco(11, t.raioDoFuroDaValvula, hw - t.profundidadeDoFuroDaValvula, hw + 2, 24, [0, Rc - m(rValvula), 0]));"
+        },
+        {
+          "tipo": "+",
+          "linha": 230,
+          "texto": "  passos.push(['lathe', { origemId: 11, lados: 24, eixo: 'x', em: emV, perfil: mp([[0, -9], [t.raioDoFuroDaValvula, -9], [t.raioDoFuroDaValvula, 3], [0, 3]]) }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 231,
+          "texto": "  passos.push(['rotaciona', { eixo: 'z', graus: angV, pivo: emV, sel: o('lathe', 11) }]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 229,
+          "texto": "    origemId: 20, eixo: 'x', em: [m(30), Rc, 0], altura: m(90), segmentosArco: 8,"
+        },
+        {
+          "tipo": "+",
+          "linha": 235,
+          "texto": "    origemId: 20, eixo: 'x', em: [m(22), Rc, 0], altura: m(98), segmentosArco: 8,"
+        },
+        {
+          "tipo": "-",
+          "linha": 255,
+          "texto": "  passos.push(['lathe', { origemId: 95, lados: 24, eixo: 'x', em: [0, Rc - m(rValvula), 0], perfil: mp([[0, hw - t.profundidadeDoFuroDaValvula], [t.raioDoFuroDaValvula, hw - t.profundidadeDoFuroDaValvula], [t.raioDoFuroDaValvula, hw + 5], [3.2, hw + 5], [3.2, hw + t.comprimentoDaValvula - 2], [2.4, hw + t.comprimentoDaValvula], [0, hw + t.comprimentoDaValvula]]) }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 261,
+          "texto": "  passos.push(['lathe', { origemId: 95, lados: 24, eixo: 'x', em: emV, perfil: mp([[0, -9], [t.raioDoFuroDaValvula, -9], [t.raioDoFuroDaValvula, 5], [3.2, 5], [3.2, t.comprimentoDaValvula - 2], [2.4, t.comprimentoDaValvula], [0, t.comprimentoDaValvula]]) }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 262,
+          "texto": "  passos.push(['rotaciona', { eixo: 'z', graus: angV, pivo: emV, sel: o('lathe', 95) }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 291,
+          "texto": "  /* o lábio da borda externa do aro (face da frente do flange) em usinado claro, para separar aro, raios e pneu */"
+        },
+        {
+          "tipo": "+",
+          "linha": 292,
+          "texto": "  passos.push(['material', { usa: 'usinado', sel: { grupo: 'aro', onde: { normal: { dir: [1, 0, 0], ate: 20 } } } }]);"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "registradaEm": "2026-11-14T16:14:31.753Z",
+  "facesFinas": {
+    "total": 179,
+    "porParte": {
+      "raios": 179
+    }
+  }
+}

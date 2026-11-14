@@ -1,0 +1,196 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "roda-esportiva",
+  "numero": 5,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "C:\\Users\\micro\\Desktop\\nos-modelar\\.claude\\worktrees\\roda-esportiva\\procedural\\pecas\\roda-esportiva\\referencias\\locais\\variante-a.jpg",
+    "nota": 5,
+    "defeitos": [
+      {
+        "parte": "aro",
+        "tipo": "espessura",
+        "onde": "barril visto atrás dos raios",
+        "sentido": "menor",
+        "evidencia": "isometrica do aro: parede de casca fina; o alvo mostra barril fundo e encorpado atrás dos raios"
+      },
+      {
+        "parte": "aro",
+        "tipo": "superficie",
+        "onde": "parede interna do barril",
+        "sentido": "anguloso",
+        "evidencia": "direita e isometrica do aro: dez abas retangulares de aresta viva soltas; a canaleta funda prometida não se lê"
+      },
+      {
+        "parte": "raios",
+        "tipo": "espessura",
+        "onde": "corpo dos dez raios, do miolo ao aro",
+        "sentido": "menor",
+        "evidencia": "direita-orto e isometrica dos raios: lâminas finas e retas; o alvo tem raios largos e encorpados"
+      },
+      {
+        "parte": "raios",
+        "tipo": "superficie",
+        "onde": "face e concavidade dos raios",
+        "sentido": "anguloso",
+        "evidencia": "isometrica isolada: face quase plana, concavidade discreta, arestas vivas; o alvo mostra face rebaixada e contínua"
+      },
+      {
+        "parte": "raios",
+        "tipo": "uniao",
+        "onde": "pontas externas, na emenda com o aro",
+        "sentido": "afastado",
+        "evidencia": "isometrica isolada dos raios: pontas serrilhadas e cortadas tortas; na direita-orto não há emenda arredondada com o aro"
+      }
+    ],
+    "observacao": "Pneu, tampa, parafusos e válvula estão fiéis à promessa; o conjunto perde na estrutura dos raios e na emenda deles com o aro."
+  },
+  "partes": [
+    {
+      "nome": "aro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "raios",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "tampaCentral",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "parafusos",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "valvula",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pneu",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "onde.radial junto com origem de arredondarCostura nao selecionou nada; so sel grupo raios + onde.radial devolveu a parede ao aro",
+    "bancada --sem-cache devolveu a imagem antiga na selecao isolada; so --analise regenerou as vistas",
+    "CONTATOS vazio: 8 pares seguem sem decisao por casca aberta de aro e raios, que sao uma superficie so",
+    "nao ha medida do ponto onde a fresta do par comeca; a posicao (r~100 mm) so saiu de conta e de vista",
+    "quem conduz: o critico pede raios largos, contra o julgamento da pessoa (raio ~3% do diametro); a largura agora esta no PLANO como criterio, mas o critico nao a recebe como medida",
+    "ferramenta: as dez abas no aro sao as faces de parede devolvidas por onde.radial; a reatribuicao por raio corta a parede em blocos visiveis na vista isolada"
+  ],
+  "notaDePassagem": "Pares em V pelo pedido da pessoa: raio 15-16 mm (~3% do aro), miolo 76 mm, centros em 5 graus a r=80 e 8,5 graus no aro, janela estreita com canto 4. Concavidade: desvioET 24, expoente 2, tras 60 (espessura do prato >= 9 mm). Canaleta 24 mm com folga de uns 5 mm sobre a pinca de 205 mm. Costura 5 com limpar:true; parede de r>=212 volta ao aro por onde.radial em sel grupo raios (por origem nao pegou). Grafite #5b5e64.",
+  "receita": {
+    "sha256": "sha256:d5c44f4132dea61342bc91335662eadf0b14dfed299edd86ce8135e4406c0c69",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 7,
+      "acrescentadas": 10,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 26,
+          "texto": "  profundidadeDaCanaleta: 14, canaletaTras: -76, canaletaFrente: 14, rampaDaCanaleta: 14,"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": "  profundidadeDaCanaleta: 24, canaletaTras: -76, canaletaFrente: 14, rampaDaCanaleta: 22,"
+        },
+        {
+          "tipo": "-",
+          "linha": 28,
+          "texto": "  desvioET: 40, espessuraDoCubo: 14, raioDoCubo: 74, avancoDoPratoNoAro: 106, recuoDoPratoTras: 50, expoenteDoPrato: 1.8,"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": "  desvioET: 24, espessuraDoCubo: 14, raioDoCubo: 74, avancoDoPratoNoAro: 106, recuoDoPratoTras: 60, expoenteDoPrato: 2,"
+        },
+        {
+          "tipo": "-",
+          "linha": 30,
+          "texto": "  raioDaRaizDasJanelas: 84, raioDoCentroDoRaioNaRaiz: 88, raioDoCentroDoRaioNoAro: 232, folgaDaJanelaNaParede: 2,"
+        },
+        {
+          "tipo": "-",
+          "linha": 31,
+          "texto": "  larguraNaRaizA: 24, larguraNoAroA: 31, aberturaNaRaizA: 7, aberturaNoAroA: 8.5, arredondaJanelaA: 8,"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "  raioDaRaizDasJanelas: 76, raioDoCentroDoRaioNaRaiz: 80, raioDoCentroDoRaioNoAro: 232, folgaDaJanelaNaParede: 2,"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "  larguraNaRaizA: 15, larguraNoAroA: 16, aberturaNaRaizA: 5, aberturaNoAroA: 8.5, arredondaJanelaA: 4,"
+        },
+        {
+          "tipo": "-",
+          "linha": 33,
+          "texto": "  paineisDaCostura: 13, raioDaQuinaDosRaios: 0, raioMinimoDaQuina: 3.72, raioDaCosturaDoAro: 8, raioMinimoDaCostura: 1.5, afinarPontasDaCostura: 10,"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "  paineisDaCostura: 13, raioDaQuinaDosRaios: 0, raioMinimoDaQuina: 3.72, raioDaCosturaDoAro: 5, raioDaParedeDoAro: 212, raioMinimoDaCostura: 1.5, afinarPontasDaCostura: 10, limparCostura: true,"
+        },
+        {
+          "tipo": "-",
+          "linha": 58,
+          "texto": "  grafite: { cor: '#3b3d41', metalicidade: 0.6, aspereza: 0.45 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "  grafite: { cor: '#5b5e64', metalicidade: 0.6, aspereza: 0.45 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "  referenciasNaoConstruidas: ['referencias/locais/variante-b.jpg'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "    'variante A com os dois raios do par grudados alem do primeiro quarto do comprimento: o par se abre desde o centro, cada raio com cerca de 3% do diametro do aro, e o miolo vai pouco alem do circulo dos parafusos',"
+        },
+        {
+          "tipo": "-",
+          "linha": 252,
+          "texto": "  passos.push(['arredondarCostura', { origemId: 71, de: { op: 'unir', id: 70 }, raio: m(t.raioDaCosturaDoAro), paineis: t.paineisDaCostura, raioMinimo: m(t.raioMinimoDaCostura), afinarPontas: m(t.afinarPontasDaCostura) }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 254,
+          "texto": "  passos.push(['arredondarCostura', { origemId: 71, de: { op: 'unir', id: 70 }, raio: m(t.raioDaCosturaDoAro), paineis: t.paineisDaCostura, limpar: t.limparCostura, raioMinimo: m(t.raioMinimoDaCostura), afinarPontas: m(t.afinarPontasDaCostura) }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 286,
+          "texto": "  passos.push(['parte', { nome: 'aro', sel: { grupo: 'raios', onde: { radial: { eixo: 'x', por: [0, Rc, 0], min: m(t.raioDaParedeDoAro) } } }, substituir: true }]);"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "registradaEm": "2026-11-14T16:57:25.298Z",
+  "facesFinas": {
+    "total": 0,
+    "porParte": {}
+  }
+}

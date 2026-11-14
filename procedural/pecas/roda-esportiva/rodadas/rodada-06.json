@@ -1,0 +1,189 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "roda-esportiva",
+  "numero": 6,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "C:\\Users\\micro\\Desktop\\nos-modelar\\.claude\\worktrees\\roda-esportiva\\procedural\\pecas\\roda-esportiva\\referencias\\locais\\variante-a.jpg",
+    "nota": 5,
+    "defeitos": [
+      {
+        "parte": "aro",
+        "tipo": "superficie",
+        "onde": "parede interna do barril, onde os raios encostam",
+        "sentido": "anguloso",
+        "evidencia": "aro isolado (isométrica e direita): recortes e furos irregulares com quina viva na face interna, sem a continuidade da referência."
+      },
+      {
+        "parte": "raios",
+        "tipo": "angulo",
+        "onde": "origem dos pares em V, junto ao miolo",
+        "sentido": "menor",
+        "evidencia": "raios direita: as duas lâminas do par ficam coladas por cerca de um terço do comprimento. Na referência o par se abre desde o centro."
+      },
+      {
+        "parte": "raios",
+        "tipo": "comprimento",
+        "onde": "miolo central, que se estende além do círculo dos parafusos",
+        "sentido": "maior",
+        "evidencia": "raios direita: disco central grande, cerca de 140 px contra 430 do aro. Na referência o miolo termina pouco além dos parafusos."
+      },
+      {
+        "parte": "raios",
+        "tipo": "espessura",
+        "onde": "corpo de cada raio, do miolo ao aro",
+        "sentido": "menor",
+        "evidencia": "raios direita e isométrica: lâminas finas tipo chapa. Na referência cada raio é largo, com laterais fundas e corpo."
+      },
+      {
+        "parte": "raios",
+        "tipo": "uniao",
+        "onde": "extremidades externas dos raios, emenda com o aro",
+        "sentido": "afastado",
+        "evidencia": "raios isolado (direita e isométrica): pontas com cacos e lascas pontiagudas; montagem direita: lingueta solta no aro. Referência tem emenda contínua."
+      }
+    ],
+    "observacao": "Pneu, tampa, parafusos e válvula batem com o alvo; o conjunto fica comprometido pela emenda estilhaçada dos raios com o aro e pelos raios finos demais."
+  },
+  "partes": [
+    {
+      "nome": "aro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "raios",
+      "confere": false,
+      "observacao": "dez raios de 20 mm e laterais mais fundas, mas face quase plana de aresta viva e pés da emenda irregulares na vista isolada; o plano promete concavidade e fusão contínua"
+    },
+    {
+      "nome": "tampaCentral",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "parafusos",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "valvula",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pneu",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "PLANO.criteriosDeReprovacao[0] da decisao da pessoa chegou com 247 caracteres e o descrever recusou o plano; cortei 7 caracteres sem mudar o sentido",
+    "raioDaQuinaDosRaios 3,8 e 4: arredondarCostura de arestas convexas deixa 2899 faces sem identidade e a parte raios some",
+    "a parte de origem nao atravessa arredondarCostura: faces da parede refeitas pela costura nao voltam ao aro por origem",
+    "onde.normal nao separa parede de lateral de raio: a lateral de um raio aponta para a parede do raio vizinho a 90 graus",
+    "sem seletor angular ou de setor: so radial ao eixo, normal global e extremo; nao se isola o retalho da parede de cada raio",
+    "limparLascas nao remove a face fina do arredondarCostura 71 (sliver de 10 mm por 0,03 mm) nem com tolerancia 0,5 mm; a lasca so cedeu a mudar a abertura dos raios",
+    "o numero de lascas do arredondarCostura oscila de 0 a 8 com qualquer variacao de paineis, raio da costura ou abertura dos raios",
+    "ferramenta: sem seletor por setor e sem arredondar aresta convexa dos raios sem perder identidade; a emenda isolada e a face dos raios ficam fora do alcance do motor",
+    "o critico estima o par colado por um terco e o miolo grande; o modelador calcula a fresta em r~100; falta medida da abertura do par para decidir"
+  ],
+  "notaDePassagem": "Largura 20 mm constante (decisao da pessoa), aro com parede 12 e canaleta 19 para manter o fundo em r=210,3 e a folga da pinca. Prato mais grosso por expoentes 1,6 (frente) e 1,5 (costas); costas nao desce abaixo de x=24 (plano do disco). Removi o devolver-parede-ao-aro por r>=212: ele criava as abas. Raio de costura 5 e abertura no aro 8,5 por serem a combinacao que da 0 lascas. Pendente: face rebaixada e aresta quebrada dos raios, e pes da emenda irregulares nas vistas isoladas.",
+  "receita": {
+    "sha256": "sha256:52d838e43ed3af9406ac35791fd07229a18959b418c1c14727d24f2141cf07d9",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 8,
+      "acrescentadas": 7,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 25,
+          "texto": "  larguraDaFaceDaBorda: 12, raioDaQuinaDaBorda: 2, raioDaDobra: 2, raioDoBarrilNaFrente: 222, avancoAxialDaParede: 31, espessuraDaParede: 7,"
+        },
+        {
+          "tipo": "-",
+          "linha": 26,
+          "texto": "  profundidadeDaCanaleta: 24, canaletaTras: -76, canaletaFrente: 14, rampaDaCanaleta: 22,"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": "  larguraDaFaceDaBorda: 12, raioDaQuinaDaBorda: 2, raioDaDobra: 2, raioDoBarrilNaFrente: 222, avancoAxialDaParede: 31, espessuraDaParede: 12,"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": "  profundidadeDaCanaleta: 19, canaletaTras: -76, canaletaFrente: 14, rampaDaCanaleta: 22,"
+        },
+        {
+          "tipo": "-",
+          "linha": 28,
+          "texto": "  desvioET: 24, espessuraDoCubo: 14, raioDoCubo: 74, avancoDoPratoNoAro: 106, recuoDoPratoTras: 60, expoenteDoPrato: 2,"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": "  desvioET: 24, espessuraDoCubo: 14, raioDoCubo: 74, avancoDoPratoNoAro: 106, recuoDoPratoTras: 60, expoenteDoPrato: 1.6, expoenteDoPratoTras: 1.5,"
+        },
+        {
+          "tipo": "-",
+          "linha": 31,
+          "texto": "  larguraNaRaizA: 15, larguraNoAroA: 16, aberturaNaRaizA: 5, aberturaNoAroA: 8.5, arredondaJanelaA: 4,"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "  larguraNaRaizA: 20, larguraNoAroA: 20, aberturaNaRaizA: 5, aberturaNoAroA: 8.5, arredondaJanelaA: 4,"
+        },
+        {
+          "tipo": "-",
+          "linha": 33,
+          "texto": "  paineisDaCostura: 13, raioDaQuinaDosRaios: 0, raioMinimoDaQuina: 3.72, raioDaCosturaDoAro: 5, raioDaParedeDoAro: 212, raioMinimoDaCostura: 1.5, afinarPontasDaCostura: 10, limparCostura: true,"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "  paineisDaCostura: 13, raioDaQuinaDosRaios: 0, raioMinimoDaQuina: 3.72, raioDaCosturaDoAro: 5, raioMinimoDaCostura: 1.5, afinarPontasDaCostura: 10, limparCostura: true,"
+        },
+        {
+          "tipo": "-",
+          "linha": 78,
+          "texto": "    'variante A com os dois raios do par grudados alem do primeiro quarto do comprimento: o par se abre desde o centro, cada raio com cerca de 3% do diametro do aro, e o miolo vai pouco alem do circulo dos parafusos',"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "    'variante A com os dois raios do par grudados alem do primeiro quarto do comprimento: o par se abre desde o centro, cada raio com cerca de 20 mm (4% do diametro do aro) e laterais fundas, com corpo, e o miolo pouco alem dos parafusos',"
+        },
+        {
+          "tipo": "-",
+          "linha": 200,
+          "texto": "    costas.push([r, xb0 + (t.recuoDoPratoTras - xb0) * s]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 200,
+          "texto": "    costas.push([r, xb0 + (t.recuoDoPratoTras - xb0) * s ** t.expoenteDoPratoTras]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 286,
+          "texto": "  passos.push(['parte', { nome: 'aro', sel: { grupo: 'raios', onde: { radial: { eixo: 'x', por: [0, Rc, 0], min: m(t.raioDaParedeDoAro) } } }, substituir: true }]);"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "registradaEm": "2026-11-14T17:25:41.897Z",
+  "facesFinas": {
+    "total": 0,
+    "porParte": {}
+  }
+}
