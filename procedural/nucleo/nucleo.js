@@ -3639,7 +3639,8 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
   const vec = (a) => {
     if (typeof a === 'string') {
       if (!Object.hasOwn(dict, a)) {
-        throw new Error(`oficina: ponto '${a}' não está em PARAMS nem em TOPO; um ponto nomeado precisa existir no dicionário da peça`);
+        const proximos = nomesProximos(a, Object.keys(dict));
+        throw new ErroDeResolucao(`oficina: ponto '${a}' não está em PARAMS nem em TOPO${proximos.length ? `; você quis dizer ${proximos.map((p) => `'${p}'`).join(' ou ')}?` : ''}; um ponto nomeado precisa existir no dicionário da peça`, { tipo: 'nome', nome: a, proximos });
       }
       const valor = dict[a];
       if (!Array.isArray(valor) || valor.length !== 3) {

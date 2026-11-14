@@ -28,7 +28,7 @@ export function conferirArgumentosEssenciais() {
   for (const nome of tabela) if (!Object.hasOwn(OPS, nome)) falhas.push(`${nome}: ESSENCIAIS cita uma operação que o núcleo não tem`);
   for (const nome of tabela) {
     const contrato = essenciaisDaOperacao(nome);
-    if (!Object.hasOwn(OPS, nome) || (!contrato.essenciais.length && !contrato.positivos.length)) continue;
+    if (!Object.hasOwn(OPS, nome) || (!contrato.essenciais.length && !contrato.positivos.length && !contrato.diferentesDeZero.length && !Object.keys(contrato.minimos).length)) continue;
     const exemplo = usoDaOperacao(nome).exemplo;
     const indice = exemplo.PASSOS.findIndex(([op]) => op === nome);
     const [, args = {}] = exemplo.PASSOS[indice];
@@ -41,6 +41,12 @@ export function conferirArgumentosEssenciais() {
       for (const ruim of [0, -1]) {
         if (!recusasDeEssenciais(nome, { ...args, [campo]: ruim }, contrato, numero, indice).some((r) => r.campo === campo && r.motivo.includes(String(ruim)))) falhas.push(`${nome}: '${campo}' valendo ${ruim} não foi recusado citando o valor`);
       }
+    }
+    for (const campo of contrato.diferentesDeZero) {
+      for (const zero of [0, -0]) if (!recusasDeEssenciais(nome, { ...args, [campo]: zero }, contrato, numero, indice).some((r) => r.campo === campo)) falhas.push(`${nome}: '${campo}' valendo 0 não foi recusado`);
+    }
+    for (const [campo, minimo] of Object.entries(contrato.minimos)) {
+      if (!recusasDeEssenciais(nome, { ...args, [campo]: minimo - 1 }, contrato, numero, indice).some((r) => r.campo === campo && r.motivo.includes(`é ${minimo}`))) falhas.push(`${nome}: '${campo}' valendo ${minimo - 1} não foi recusado dizendo o mínimo ${minimo}`);
     }
   }
   return falhas;

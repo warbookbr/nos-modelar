@@ -11,7 +11,7 @@
  * A memória nunca muda o resultado: o estado guardado é uma CÓPIA (`structuredClone`, que preserva a ordem dos Maps, o zero
  * negativo e o NaN) e sai copiado de novo na restauração, de modo que o passo seguinte não altera o guardado. A prova é a
  * comparação bit a bit do neutro de uma execução com memória contra a de uma sem memória. Estado que a cópia não aguenta
- * (função, símbolo) também desliga a memória para aquela execução. Um passo que gritou não vira ponto. */
+ * (função, símbolo) também desliga a memória para aquela execução. Um passo que sai antes do fim (a recusa do despacho, por exemplo) não vira ponto: só o passo que termina entra. */
 import { sha256Hex } from './sha256.js';
 import { chaveExata } from './memoria-de-pura.js';
 

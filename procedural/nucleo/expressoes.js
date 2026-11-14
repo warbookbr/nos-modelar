@@ -38,11 +38,11 @@ export function distanciaDeEdicao(a, b) {
   return linha[b.length];
 }
 
-/** Os nomes de `candidatos` a até duas edições de `nome`, do mais próximo ao mais distante, e em ordem alfabética no empate. */
+/** Os nomes de `candidatos` a até duas edições de `nome`, do mais próximo ao mais distante, e em ordem alfabética no empate. A distância vale no máximo metade do menor dos dois nomes: '2' não sugere 'k'. */
 export function nomesProximos(nome, candidatos, quantos = 3) {
   return candidatos
     .map((candidato) => ({ candidato, d: distanciaDeEdicao(String(nome), candidato) }))
-    .filter(({ d }) => d <= 2)
+    .filter(({ d, candidato }) => d <= 2 && d * 2 <= Math.min(String(nome).length, candidato.length))
     .sort((x, y) => x.d - y.d || (x.candidato < y.candidato ? -1 : 1))
     .slice(0, quantos)
     .map(({ candidato }) => candidato);

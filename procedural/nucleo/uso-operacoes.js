@@ -112,6 +112,18 @@ export function recusasDeEssenciais(nome, args, contrato, resolver, passo = null
     try { valor = resolver(args[campo]); } catch { continue; } /* o resolvedor recusa com a própria mensagem, adiante */
     if (!(valor > 0)) recusas.push({ campo, motivo: `${onde}: '${campo}' vale ${JSON.stringify(args[campo])}${typeof args[campo] === 'number' ? '' : ` (= ${valor})`}, e precisa ser maior que 0` });
   }
+  for (const campo of contrato?.diferentesDeZero ?? []) {
+    if (!presente(campo)) continue;
+    let valor;
+    try { valor = resolver(args[campo]); } catch { continue; }
+    if (valor === 0) recusas.push({ campo, motivo: `${onde}: '${campo}' vale ${JSON.stringify(args[campo])}${typeof args[campo] === 'number' ? '' : ` (= ${valor})`}, e precisa ser diferente de 0 (negativo vale, e espelha a forma no eixo)` });
+  }
+  for (const [campo, minimo] of Object.entries(contrato?.minimos ?? {})) {
+    if (!presente(campo)) continue;
+    let valor;
+    try { valor = resolver(args[campo]); } catch { continue; }
+    if (!(valor >= minimo)) recusas.push({ campo, motivo: `${onde}: '${campo}' vale ${JSON.stringify(args[campo])}${typeof args[campo] === 'number' ? '' : ` (= ${valor})`}, abaixo do mínimo de '${nome}', que é ${minimo}` });
+  }
   return recusas;
 }
 
@@ -127,7 +139,7 @@ const origemTopo = { op: 'cubo', id: 1, face: 'topo' };
 const definicoes = {
   cubo: {
     intencao: 'Criar uma caixa retangular apoiada em y=0.',
-    campos: { [idLegado[0]]: idLegado.slice(1), [origemId[0]]: origemId.slice(1), lado: ['escalar', 'Atalho para largura, altura e profundidade.'], larg: ['escalar', 'Largura em x.'], alt: ['escalar', 'Altura em y.'], prof: ['escalar', 'Profundidade em z.'], [em[0]]: em.slice(1) },
+    campos: { [idLegado[0]]: idLegado.slice(1), [origemId[0]]: origemId.slice(1), lado: ['escalar', 'Atalho para largura, altura e profundidade.'], larg: ['escalar', 'Largura em x.'], alt: ['escalar', 'Altura em y.'], prof: ['escalar', 'Profundidade em z. Negativa espelha o cubo em z (as faces ficam para dentro); zero é recusado.'], [em[0]]: em.slice(1) },
     passos: [['cubo', { lado: 1 }]], limites: ['Produz seis faces nominais; dimensões não devem ser degeneradas.'],
   },
   cilindro: {
@@ -353,15 +365,15 @@ const definicoes = {
    de ausência só vale para argumento SEM padrão. As primitivas têm padrão travado em teste (`raio` 0,5, `altura` 1, `lado` 1,
    `lados` 8...), então declaram em `comPadrao` o que tem padrão e não recusam a ausência. `positivos`: campos numéricos que,
    quando VÊM, precisam ser maiores que zero; é o que o despacho recusa. `semEssenciais`: o motivo de a operação não ter nenhum.
-   `prof` do cubo fica fora de `positivos` porque o passo 21 de `carro-esportivo-sedan` escreve `prof` negativo (cubo espelhado em
-   z, que não dá o mesmo neutro com `prof` positivo). `tools/gates/argumentos-essenciais.mjs` confere que toda operação do núcleo
+   `prof` do cubo é `diferentesDeZero`, e não positivo, porque o passo 21 de `carro-esportivo-sedan` escreve `prof` negativo (cubo
+   espelhado em z, que não dá o mesmo neutro com `prof` positivo). `minimos`: o menor valor que o campo aceita quando vem (`lados` 3). `tools/gates/argumentos-essenciais.mjs` confere que toda operação do núcleo
    sem argumento obrigatório de schema aparece aqui. */
 const ESSENCIAIS = {
-  cubo: { comPadrao: { lado: 1, larg: 1, alt: 1, prof: 1 }, positivos: ['lado', 'larg', 'alt'] },
-  cilindro: { comPadrao: { raio: 0.5, altura: 1, lados: 8 }, positivos: ['raio', 'altura'] },
-  esfera: { comPadrao: { raio: 0.5, aneis: 6, lados: 8 }, positivos: ['raio'] },
-  cone: { comPadrao: { raio: 0.5, altura: 1, lados: 8 }, positivos: ['raio', 'altura'] },
-  plano: { comPadrao: { largura: 1, profundidade: 1, seg: 1 }, positivos: ['largura', 'profundidade'] },
+  cubo: { comPadrao: { lado: 1, larg: 1, alt: 1, prof: 1 }, positivos: ['lado', 'larg', 'alt'], diferentesDeZero: ['prof'] },
+  cilindro: { comPadrao: { raio: 0.5, altura: 1, lados: 8 }, positivos: ['raio', 'altura'], minimos: { lados: 3 } },
+  esfera: { comPadrao: { raio: 0.5, aneis: 6, lados: 8 }, positivos: ['raio'], minimos: { aneis: 2, lados: 3 } },
+  cone: { comPadrao: { raio: 0.5, altura: 1, lados: 8 }, positivos: ['raio', 'altura'], minimos: { lados: 3 } },
+  plano: { comPadrao: { largura: 1, profundidade: 1, seg: 1 }, positivos: ['largura', 'profundidade'], minimos: { seg: 1 } },
   chamferBox: { comPadrao: { lado: 1, larg: 1, alt: 1, prof: 1, chanfro: 0.1 }, positivos: ['lado', 'larg', 'alt', 'prof', 'chanfro'] },
   moveV: { semEssenciais: 'o vértice ausente é recusado pela própria operação; `d` ausente é deslocamento zero, lei do moveV/moveF/moveA travada em tools/oficina/oficina.test.ts' },
   extruda: { semEssenciais: 'a face ausente é recusada pela própria operação; `dist` ausente vale 0, padrão antigo que as receitas podem usar' },
@@ -377,9 +389,9 @@ const ESSENCIAIS = {
   liso: { semEssenciais: 'sem sel e sem angulo liga o sombreamento liso em todas as faces, que é o uso comum' },
 };
 
-for (const [nome, { essenciais = [], positivos = [], comPadrao = {}, semEssenciais = null }] of Object.entries(ESSENCIAIS)) {
+for (const [nome, { essenciais = [], positivos = [], comPadrao = {}, diferentesDeZero = [], minimos = {}, semEssenciais = null }] of Object.entries(ESSENCIAIS)) {
   const campos = definicoes[nome]?.campos ?? {};
-  for (const campo of [...essenciais.flat(), ...positivos, ...Object.keys(comPadrao)]) {
+  for (const campo of [...essenciais.flat(), ...positivos, ...diferentesDeZero, ...Object.keys(minimos), ...Object.keys(comPadrao)]) {
     if (!Object.hasOwn(campos, campo)) throw new TypeError(`essenciais de '${nome}' cita o campo '${campo}', que não está nos campos`);
   }
   if (semEssenciais && (essenciais.length || positivos.length)) throw new TypeError(`'${nome}' declara essenciais e diz que não tem`);
@@ -393,6 +405,8 @@ export function essenciaisDaOperacao(nome) {
     essenciais: (bruto.essenciais ?? []).map((entrada) => (Array.isArray(entrada) ? [...entrada] : [entrada])),
     positivos: [...(bruto.positivos ?? [])],
     comPadrao: { ...(bruto.comPadrao ?? {}) },
+    diferentesDeZero: [...(bruto.diferentesDeZero ?? [])],
+    minimos: { ...(bruto.minimos ?? {}) },
     semEssenciais: bruto.semEssenciais ?? null,
   });
 }

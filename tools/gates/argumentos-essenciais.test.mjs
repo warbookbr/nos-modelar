@@ -52,8 +52,27 @@ describe('o valor não positivo que vem declarado', () => {
     expect(neutro.orfaos[0].motivo).toContain("'raio' vale \"r\" (= -3)");
   });
 
-  it('o cubo com prof negativo da receita do sedã continua passando', () => {
+  it('o cubo com prof negativo da receita do sedã continua passando, e prof zero (inclusive -0) é recusado', () => {
     expect(nucleo([['cubo', { larg: 1, alt: 1, prof: -1 }]], {}, {}).orfaos).toEqual([]);
+    for (const zero of [0, -0]) {
+      const neutro = nucleo([['cubo', { larg: 1, alt: 1, prof: zero }]], {}, {});
+      expect(neutro.orfaos[0]).toMatchObject({ op: 'cubo', ref: 'prof' });
+      expect(neutro.orfaos[0].motivo).toContain('diferente de 0');
+      expect(neutro.V.size).toBe(0);
+    }
+  });
+
+  it('lados, aneis e seg abaixo do mínimo são recusados dizendo o mínimo', () => {
+    const casos = [['cilindro', { raio: 1, altura: 1, lados: 2 }, 'lados', 3], ['cone', { raio: 1, altura: 1, lados: 1 }, 'lados', 3],
+      ['esfera', { raio: 1, aneis: 1 }, 'aneis', 2], ['esfera', { raio: 1, lados: 2 }, 'lados', 3], ['plano', { largura: 1, profundidade: 1, seg: 0 }, 'seg', 1]];
+    for (const [op, args, campo, minimo] of casos) {
+      const neutro = nucleo([[op, args]], {}, {});
+      expect(neutro.orfaos[0], `${op} ${campo}`).toMatchObject({ op, ref: campo });
+      expect(neutro.orfaos[0].motivo).toContain(`mínimo de '${op}', que é ${minimo}`);
+      expect(neutro.V.size).toBe(0);
+    }
+    expect(nucleo([['cilindro', { raio: 1, altura: 1, lados: 3 }], ['esfera', { aneis: 2, lados: 3 }], ['plano', { seg: 1 }]], {}, {}).orfaos).toEqual([]);
+    expect(nucleo([['cilindro', { raio: 1, altura: 1, lados: { desvio: 0.01 } }]], {}, {}).orfaos).toEqual([]);
   });
 
   it('o contrato próprio com positivos recusa zero e deixa passar o positivo', () => {
@@ -71,6 +90,22 @@ describe('nome de operação e de parâmetro errados', () => {
     expect(o.passo).toBe(1);
     expect(o.motivo).toContain("operação desconhecida 'transladr'");
     expect(o.motivo).toContain("Você quis dizer 'transladar'?");
+  });
+
+  it('a sugestão de nome tem distância proporcional ao tamanho do nome', () => {
+    let erro;
+    try { nucleo([['cilindro', { raio: '2', altura: 1 }]], { k: 1 }, {}); } catch (e) { erro = e; }
+    expect(erro.message).toContain("parâmetro '2' não existe");
+    expect(erro.message).not.toContain('você quis dizer');
+  });
+
+  it('ponto nomeado inexistente em `em` lança com o passo e a sugestão', () => {
+    let erro;
+    try { nucleo([['cubo', { lado: 1 }], ['cubo', { lado: 1, em: 'apoioo' }]], { apoio: [0, 0, 0] }, {}); } catch (e) { erro = e; }
+    expect(erro.message).toContain('passo 1 (cubo)');
+    expect(erro.message).toContain("ponto 'apoioo' não está em PARAMS nem em TOPO");
+    expect(erro.message).toContain("você quis dizer 'apoio'?");
+    expect(erro.passo).toBe(1);
   });
 
   it('parâmetro inexistente lança com passo, operação, argumento e nomes próximos', () => {
