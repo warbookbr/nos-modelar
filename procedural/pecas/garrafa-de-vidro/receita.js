@@ -1,8 +1,10 @@
 /* garrafa-de-vidro — garrafa de boca larga, sem tampa, uma parte (`garrafa`).
- * O alvo está em referencias/alvo.md. O perfil de revolução (raio, altura) é uma
- * lista de pontos escrita na `derivar`, separada da operação que o gira (`lathe`);
- * a rosca não é revolução pura e entra como um tubo helicoidal (`loft`) unido ao corpo.
+ * O alvo está em referencias/alvo.md. O corpo de revolução vem da família `peca-de-revolucao` (perfil `garrafa`): contorno de fora,
+ * parede de dentro deslocada por ela e colar saliente. A rosca não é revolução pura e fica aqui, como um tubo helicoidal (`loft`)
+ * unido ao corpo; a parte e o liso valem para a união, e não para o corpo sozinho.
  */
+import { chamar, criarRegistroDeFamilias } from '../../familias/index.js';
+import { expandirChamadasDeComposicao } from '../../nucleo/composicoes.js';
 
 export const TABELA = {
   /* Corpo e proporções, em mm. */
@@ -35,78 +37,19 @@ export const TABELA = {
   angulo_liso: 50,
 };
 
+let registro = null;
+const familias = () => { registro ??= criarRegistroDeFamilias(); return registro; };
 const m = (mm) => mm / 1000;
 
-/* Deslocamento de uma polilinha [r, y, concordancia?] para a esquerda do sentido,
-   por meia-esquadria; a concordância encolhe com a distância. */
-function deslocarPerfil(pts, d) {
-  const out = [];
-  for (let i = 0; i < pts.length; i++) {
-    const a = pts[Math.max(i - 1, 0)];
-    const b = pts[i];
-    const c = pts[Math.min(i + 1, pts.length - 1)];
-    const norm = (p, q) => {
-      const dx = q[0] - p[0];
-      const dy = q[1] - p[1];
-      const L = Math.hypot(dx, dy) || 1;
-      return [-dy / L, dx / L];
-    };
-    const n1 = i === 0 ? norm(b, c) : norm(a, b);
-    const n2 = i === pts.length - 1 ? norm(a, b) : norm(b, c);
-    let nx = n1[0] + n2[0];
-    let ny = n1[1] + n2[1];
-    const L = Math.hypot(nx, ny) || 1;
-    nx /= L;
-    ny /= L;
-    const k = Math.min(1 / Math.max(nx * n1[0] + ny * n1[1], 0.5), 2);
-    const r = b[2] ? Math.max(b[2] - d, 0) : 0;
-    out.push([b[0] + nx * d * k, b[1] + ny * d * k, ...(r > 0.05 ? [r] : [])]);
-  }
-  return out;
-}
-
-/** Perfil externo (raio, altura) em mm, do eixo no fundo até a borda da boca. */
-export function perfilExterno(T) {
-  const p = [];
-  /* Cúpula: do centro (y = cupula) descendo ao anel de apoio, curva suave. */
-  const nC = 6;
-  for (let i = 0; i <= nC; i++) {
-    const t = i / nC;
-    p.push([T.raio_apoio_interno * t, T.cupula * (1 - t * t * (3 - 2 * t))]);
-  }
-  p.push([T.raio_apoio_externo - T.raio_canto, 0]);
-  p.push([T.raio_corpo, T.raio_canto * 2, 0]);
-  p.push([T.raio_corpo, T.altura_corpo]);
-  /* Ombro: quarto de elipse de (raio_corpo, altura_corpo) a (raio_gargalo, altura_gargalo), tangente vertical nas pontas. */
-  const a = T.raio_corpo - T.raio_gargalo;
-  const b = T.altura_gargalo - T.altura_corpo;
-  const nO = 10;
-  for (let i = 1; i <= nO; i++) {
-    const t = (i / nO) * (Math.PI / 2);
-    p.push([T.raio_gargalo + a * Math.cos(t), T.altura_corpo + b * Math.sin(t)]);
-  }
-  p.push([T.raio_gargalo, T.altura]);
-  return p;
-}
-
-/** Perfil fechado da seção: parede externa subindo, borda da boca, parede interna descendo ao eixo. */
-export function perfilSecao(T) {
-  const ext = perfilExterno(T);
-  const interno = deslocarPerfil(ext, T.parede);
-  const topoExt = ext[ext.length - 1];
-  /* O colar é um ressalto só da face externa; a parede interna segue lisa. */
-  const subida = ext.slice(0, -1);
-  subida.push(
-    [T.raio_gargalo, T.colar_y],
-    [T.colar_raio, T.colar_y, 1],
-    [T.colar_raio, T.colar_y + T.colar_altura, 1],
-    [T.raio_gargalo, T.colar_y + T.colar_altura + 2],
-    [topoExt[0], topoExt[1], T.raio_boca],
-  );
-  const descendo = interno.slice().reverse();
-  descendo[0] = [descendo[0][0], T.altura, T.raio_boca];
-  descendo[descendo.length - 1] = [0, descendo[descendo.length - 1][1]];
-  return [...subida, ...descendo];
+/* O corpo de revolução é da família `peca-de-revolucao` (perfil `garrafa`): contorno de fora, parede de dentro deslocada, colar só por fora. */
+export function parametrosDoCorpo(T) {
+  return {
+    perfil: 'garrafa', garrafaAltura: T.altura, garrafaRaioCorpo: T.raio_corpo, parede: T.parede, garrafaRaioGargalo: T.raio_gargalo,
+    garrafaAlturaCorpo: T.altura_corpo, garrafaAlturaGargalo: T.altura_gargalo, garrafaCupula: T.cupula,
+    garrafaRaioApoioInterno: T.raio_apoio_interno, garrafaRaioApoioExterno: T.raio_apoio_externo,
+    garrafaColarY: T.colar_y, garrafaColarAltura: T.colar_altura, garrafaColarRaio: T.colar_raio,
+    raioCanto: T.raio_canto, raioBoca: T.raio_boca, lados: T.lados, segmentosCurva: T.segmentos_curva, anguloLiso: T.angulo_liso,
+  };
 }
 
 /** Eixo da rosca: seções {pos, raio} de um tubo que dá voltas no gargalo, em mm. */
@@ -127,7 +70,7 @@ export function secoesDaRosca(T) {
 }
 
 export function derivar(T = TABELA) {
-  return { perfil: perfilSecao(T), rosca: secoesDaRosca(T) };
+  return { corpo: chamar(familias().obter('peca-de-revolucao'), 'corpo', parametrosDoCorpo(T)), rosca: secoesDaRosca(T) };
 }
 
 const ID = { corpo: 1, rosca: 2, garrafa: 3 };
@@ -135,12 +78,9 @@ const ID = { corpo: 1, rosca: 2, garrafa: 3 };
 export function gerarPassos(T = TABELA) {
   const D = derivar(T);
   const passos = [];
-  passos.push(['lathe', {
-    origemId: ID.corpo,
-    lados: T.lados,
-    segmentosCurva: T.segmentos_curva,
-    perfil: D.perfil.map(([r, y, c]) => (c ? [m(r), m(y), m(c)] : [m(r), m(y)])),
-  }]);
+  /* a família publica o lathe, a parte e o liso do corpo; a parte e o liso passam a valer para a união com a rosca */
+  const { passos: doCorpo } = expandirChamadasDeComposicao(familias().registroComposicoes, [D.corpo]);
+  passos.push(doCorpo.find(([op]) => op === 'lathe'));
   passos.push(['loft', {
     origemId: ID.rosca,
     lados: 8,
@@ -170,11 +110,12 @@ const receita = {
     objeto: 'garrafa de vidro de boca larga sem tampa, 160 mm de altura, corpo de 75 mm de diâmetro, gargalo curto com rosca e colar, parede de 2,5 mm',
     referencias: ['referencias/alvo.md'],
     escala: { medida: 'altura total da garrafa', milimetros: 160 },
+    familiaProcedural: 'peca-de-revolucao',
     partes: [
       {
         nome: 'garrafa',
         forma: 'casca oca de revolução: corpo cilíndrico, ombro em curva até o gargalo, boca de 40 mm, colar saliente, duas voltas de rosca helicoidal, fundo com cúpula de 10 mm e anel de apoio',
-        tecnica: 'lathe com o perfil da seção fechada (parede 2,5), unido por unir a um loft helicoidal da rosca; liso com ângulo',
+        tecnica: 'família peca-de-revolucao, perfil garrafa: lathe da seção fechada (parede 2,5 deslocada do contorno de fora, colar só por fora), unido por unir a um loft helicoidal da rosca; liso com ângulo',
         dePerto: [
           { ponto: [0, 140, 24], oQue: 'rosca helicoidal e colar no gargalo' },
           { ponto: [0, 5, 20], oQue: 'cúpula do fundo e anel de apoio' },

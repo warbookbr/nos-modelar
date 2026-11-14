@@ -1,11 +1,12 @@
 /**
- * Prato fundo de cerâmica branca: uma parte só (`prato`), uma revolução em y de um perfil de seção fechada (casca de 5 mm).
- *
- * O perfil é uma lista de pontos [raio, altura] em milímetro, montada em `derivar` e separada da operação: `gerarPassos` só o
- * converte para metro e o entrega ao `lathe`. A seção percorre a face de dentro do eixo para fora (fundo plano, arco côncavo, parede,
- * ombro convexo, aba inclinada, borda de fora em meia-volta) e volta pela face de baixo, que é a de dentro deslocada em `espessura`
- * (arcos concêntricos com raio somado ou subtraído da espessura), com o anel de apoio descendo abaixo do fundo.
+ * Prato fundo de cerâmica branca: uma parte só (`prato`), uma revolução em y de um perfil de seção fechada (casca de 5 mm), gerada pela
+ * família `peca-de-revolucao` (perfil `prato`): a família percorre a face de cima do eixo à borda (fundo plano, arco côncavo, parede,
+ * ombro convexo, aba inclinada, borda em meia-volta), desloca a de baixo em `espessura` e acrescenta o anel de apoio por baixo.
+ * A receita só traz a TABELA em mm e o material. `poco_diametro` é nota do alvo: o poço sai da aba e dos raios, e a família não o pede.
  */
+import { chamar, criarRegistroDeFamilias } from '../../familias/index.js';
+import { expandirChamadasDeComposicao } from '../../nucleo/composicoes.js';
+
 export const TABELA = {
   diametro: 230,
   altura: 45,
@@ -23,65 +24,22 @@ export const TABELA = {
   lados: 72,
 };
 
-const rad = (g) => (g * Math.PI) / 180;
-
-/** Perfil [raio, altura] em milímetro, do eixo no fundo de dentro, dando a volta pela face de baixo até o eixo. */
-export function derivar(T) {
-  const e = T.espessura;
-  const a = rad(T.aba_inclinacao_graus);
-  const rb = e / 2;
-  const R = T.diametro / 2;
-  const yf = T.altura - T.poco_profundidade;
-  /* Borda de fora: centro da meia-volta, com o ponto mais alto na altura total e o mais afastado no raio total. */
-  const bx = R - rb;
-  const by = T.altura - rb;
-  const topo = [bx - rb * Math.sin(a), by + rb * Math.cos(a)];
-  /* Fim do ombro, onde a aba começa, a aba_largura de distância do raio de fora (descontado o raio da borda). */
-  const sx = R - rb - T.aba_largura;
-  const sy = topo[1] - (topo[0] - sx) * Math.tan(a);
-  /* Ombro convexo: centro abaixo e à direita do ponto S. */
-  const cx = sx + T.raio_ombro * Math.sin(a);
-  const cy = sy - T.raio_ombro * Math.cos(a);
-  const paredeX = cx - T.raio_ombro;
-  /* Arco côncavo do fundo: centro em (x0, yf + raio_fundo), tangente ao fundo plano e à parede. */
-  const x0 = paredeX - T.raio_fundo;
-  const yc = yf + T.raio_fundo;
-  const N = T.passos_arco;
-  const arco = (cxx, cyy, r, g0, g1) => Array.from({ length: N + 1 }, (_, i) => {
-    const g = g0 + ((g1 - g0) * i) / N;
-    return [cxx + r * Math.cos(g), cyy + r * Math.sin(g)];
-  });
-  const dentro = [
-    [0, yf],
-    ...arco(x0, yc, T.raio_fundo, -Math.PI / 2, 0),
-    ...arco(cx, cy, T.raio_ombro, Math.PI, Math.PI / 2 + a),
-    topo,
-    ...arco(bx, by, rb, Math.PI / 2 + a, a - Math.PI / 2),
-  ];
-  const embaixo = [
-    ...arco(cx, cy, T.raio_ombro - e, Math.PI / 2 + a, Math.PI),
-    ...arco(x0, yc, T.raio_fundo + e, 0, -Math.PI / 2),
-  ];
-  const re = T.anel_diametro / 2;
-  const anel = [[re, yf - e], [re, yf - e - T.anel_altura], [re - T.anel_largura, yf - e - T.anel_altura], [re - T.anel_largura, yf - e], [0, yf - e]];
-  const todos = [...dentro, ...embaixo, ...anel];
-  /* Sem pontos repetidos em sequência (as juntas dos arcos coincidem). */
-  const perfil = todos.filter((p, i) => i === 0 || Math.hypot(p[0] - todos[i - 1][0], p[1] - todos[i - 1][1]) > 1e-6);
-  return { perfil, topo: R, altura: T.altura };
-}
-
-const m = (mm) => mm / 1000;
+let registro = null;
+const familias = () => { registro ??= criarRegistroDeFamilias(); return registro; };
 const ANGULO_LISO = 40;
 
+export function derivar(T) {
+  return chamar(familias().obter('peca-de-revolucao'), 'prato', {
+    perfil: 'prato', pratoDiametro: T.diametro, pratoAltura: T.altura, pratoAbaLargura: T.aba_largura, pratoPocoProfundidade: T.poco_profundidade,
+    pratoAnelDiametro: T.anel_diametro, pratoAnelAltura: T.anel_altura, pratoAnelLargura: T.anel_largura, parede: T.espessura,
+    pratoAbaInclinacao: T.aba_inclinacao_graus, pratoRaioFundo: T.raio_fundo, pratoRaioOmbro: T.raio_ombro, pratoPassosArco: T.passos_arco,
+    lados: T.lados, anguloLiso: ANGULO_LISO,
+  });
+}
+
 export function gerarPassos(T) {
-  const { perfil } = derivar(T);
-  const sel = { origem: { op: 'lathe', id: 1 } };
-  return [
-    ['lathe', { origemId: 1, eixo: 'y', lados: T.lados, perfil: perfil.map(([r, y]) => [m(r), m(y)]) }],
-    ['parte', { nome: 'prato', sel }],
-    ['material', { usa: 'ceramica', sel }],
-    ['liso', { angulo: ANGULO_LISO, sel }],
-  ];
+  const { passos } = expandirChamadasDeComposicao(familias().registroComposicoes, [derivar(T)]);
+  return passos.flatMap((passo) => (passo[0] === 'parte' ? [passo, ['material', { sel: passo[1].sel, usa: 'ceramica' }]] : [passo]));
 }
 
 export const CONTATOS = [];
@@ -95,11 +53,12 @@ const receita = {
     objeto: 'prato fundo de cerâmica branca de 230 mm de diâmetro e 45 mm de altura, aba de 35 mm, poço de 155 mm e anel de apoio de 95 mm',
     referencias: ['referencias/alvo.md'],
     escala: { medida: 'diâmetro total da peça', milimetros: 230 },
+    familiaProcedural: 'peca-de-revolucao',
     partes: [
       {
         nome: 'prato',
         forma: 'casca de 5 mm de revolução: aba de 35 mm inclinada para cima com borda de fora redonda, poço de 155 mm e 35 mm de fundo, fundo plano, transição em curva, anel de apoio de 95 mm e 5 mm de altura por baixo',
-        tecnica: 'lathe de perfil fechado (lista [raio, altura] em derivar, arcos concêntricos para a espessura) com liso',
+        tecnica: 'família peca-de-revolucao, perfil prato: lathe de perfil fechado (face de cima, face de baixo deslocada pela espessura e anel de apoio) com liso',
       },
     ],
     criteriosDeReprovacao: [

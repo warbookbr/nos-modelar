@@ -1,0 +1,801 @@
+{
+  "formato": "mecanifica.familia@1",
+  "id": "peca-de-revolucao",
+  "versao": "1.0.0",
+  "nivel": "componente",
+  "parametros": {
+    "forma": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 0,
+      "minimo": 0,
+      "maximo": 7,
+      "medio": 2
+    },
+    "origem": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 1,
+      "minimo": 1,
+      "maximo": 999,
+      "medio": 1
+    },
+    "lados": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 64,
+      "minimo": 12,
+      "maximo": 96,
+      "medio": 48
+    },
+    "segmentosCurva": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 8,
+      "minimo": 1,
+      "maximo": 12,
+      "medio": 3
+    },
+    "anguloLiso": {
+      "tipo": "numero",
+      "unidade": "graus",
+      "padrao": 40,
+      "minimo": 15,
+      "maximo": 75,
+      "medio": 40
+    },
+    "parede": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 3,
+      "minimo": 1,
+      "maximo": 9,
+      "medio": 6
+    },
+    "raioBoca": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 1.4,
+      "minimo": 0.2,
+      "maximo": 3,
+      "medio": 0.8
+    },
+    "raioCanto": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 2,
+      "minimo": 1,
+      "maximo": 6,
+      "medio": 3
+    },
+    "copoAltura": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 90,
+      "minimo": 50,
+      "maximo": 150,
+      "medio": 90
+    },
+    "copoDiametroBoca": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 80,
+      "minimo": 50,
+      "maximo": 120,
+      "medio": 80
+    },
+    "copoDiametroBase": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 70,
+      "minimo": 40,
+      "maximo": 110,
+      "medio": 70
+    },
+    "copoFundo": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 12,
+      "minimo": 4,
+      "maximo": 30,
+      "medio": 12
+    },
+    "copoRaioCantoFundoDentro": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 6,
+      "minimo": 2,
+      "maximo": 15,
+      "medio": 6
+    },
+    "garrafaAltura": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 160,
+      "minimo": 110,
+      "maximo": 220,
+      "medio": 160
+    },
+    "garrafaRaioCorpo": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 37.5,
+      "minimo": 25,
+      "maximo": 55,
+      "medio": 37.5
+    },
+    "garrafaRaioGargalo": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 22.5,
+      "minimo": 12,
+      "maximo": 35,
+      "medio": 22.5
+    },
+    "garrafaAlturaCorpo": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 100,
+      "minimo": 50,
+      "maximo": 140,
+      "medio": 100
+    },
+    "garrafaAlturaGargalo": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 122,
+      "minimo": 80,
+      "maximo": 190,
+      "medio": 122
+    },
+    "garrafaCupula": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 10,
+      "minimo": 2,
+      "maximo": 20,
+      "medio": 10
+    },
+    "garrafaRaioApoioInterno": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 30,
+      "minimo": 15,
+      "maximo": 45,
+      "medio": 30
+    },
+    "garrafaRaioApoioExterno": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 37.5,
+      "minimo": 25,
+      "maximo": 55,
+      "medio": 37.5
+    },
+    "garrafaColarY": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 128,
+      "minimo": 100,
+      "maximo": 170,
+      "medio": 128
+    },
+    "garrafaColarAltura": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 5,
+      "minimo": 3,
+      "maximo": 10,
+      "medio": 5
+    },
+    "garrafaColarRaio": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 26.5,
+      "minimo": 20,
+      "maximo": 40,
+      "medio": 26.5
+    },
+    "vasoAltura": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 200,
+      "minimo": 120,
+      "maximo": 300,
+      "medio": 200
+    },
+    "vasoBarrigaDiametro": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 190,
+      "minimo": 120,
+      "maximo": 260,
+      "medio": 190
+    },
+    "vasoBarrigaAltura": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 95,
+      "minimo": 60,
+      "maximo": 150,
+      "medio": 95
+    },
+    "vasoPescocoDiametro": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 55,
+      "minimo": 35,
+      "maximo": 100,
+      "medio": 55
+    },
+    "vasoBocaDiametro": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 75,
+      "minimo": 50,
+      "maximo": 130,
+      "medio": 75
+    },
+    "vasoPeDiametro": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 110,
+      "minimo": 70,
+      "maximo": 160,
+      "medio": 110
+    },
+    "vasoPeAltura": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 30,
+      "minimo": 15,
+      "maximo": 50,
+      "medio": 30
+    },
+    "vasoPescocoAltura": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 170,
+      "minimo": 100,
+      "maximo": 270,
+      "medio": 170
+    },
+    "vasoLabioAltura": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 6,
+      "minimo": 3,
+      "maximo": 12,
+      "medio": 6
+    },
+    "vasoRebaixoDoPe": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 26,
+      "minimo": 10,
+      "maximo": 40,
+      "medio": 26
+    },
+    "vasoBarrigaSemieixoY": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 63,
+      "minimo": 40,
+      "maximo": 100,
+      "medio": 63
+    },
+    "vasoAnguloInicioBarriga": {
+      "tipo": "numero",
+      "unidade": "graus",
+      "padrao": 34,
+      "minimo": 10,
+      "maximo": 60,
+      "medio": 34
+    },
+    "vasoAnguloFimBarriga": {
+      "tipo": "numero",
+      "unidade": "graus",
+      "padrao": 146,
+      "minimo": 120,
+      "maximo": 170,
+      "medio": 146
+    },
+    "vasoPassosBarriga": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 14,
+      "minimo": 6,
+      "maximo": 18,
+      "medio": 14
+    },
+    "pratoDiametro": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 230,
+      "minimo": 160,
+      "maximo": 320,
+      "medio": 230
+    },
+    "pratoAltura": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 45,
+      "minimo": 25,
+      "maximo": 80,
+      "medio": 45
+    },
+    "pratoAbaLargura": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 35,
+      "minimo": 15,
+      "maximo": 60,
+      "medio": 35
+    },
+    "pratoPocoProfundidade": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 35,
+      "minimo": 15,
+      "maximo": 60,
+      "medio": 35
+    },
+    "pratoAnelDiametro": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 95,
+      "minimo": 60,
+      "maximo": 160,
+      "medio": 95
+    },
+    "pratoAnelAltura": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 5,
+      "minimo": 2,
+      "maximo": 10,
+      "medio": 5
+    },
+    "pratoAnelLargura": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 7.5,
+      "minimo": 4,
+      "maximo": 15,
+      "medio": 7.5
+    },
+    "pratoAbaInclinacao": {
+      "tipo": "numero",
+      "unidade": "graus",
+      "padrao": 8,
+      "minimo": 0,
+      "maximo": 20,
+      "medio": 8
+    },
+    "pratoRaioFundo": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 15,
+      "minimo": 6,
+      "maximo": 30,
+      "medio": 15
+    },
+    "pratoRaioOmbro": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 12,
+      "minimo": 6,
+      "maximo": 25,
+      "medio": 12
+    },
+    "pratoPassosArco": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 8,
+      "minimo": 4,
+      "maximo": 10,
+      "medio": 8
+    },
+    "baseRaio": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 75,
+      "minimo": 40,
+      "maximo": 120,
+      "medio": 75
+    },
+    "baseAltura": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 30,
+      "minimo": 15,
+      "maximo": 60,
+      "medio": 30
+    },
+    "baseDegrauRaio": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 58,
+      "minimo": 25,
+      "maximo": 100,
+      "medio": 58
+    },
+    "baseDegrauAltura": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 12,
+      "minimo": 5,
+      "maximo": 40,
+      "medio": 12
+    },
+    "baseRaioBorda": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 4,
+      "minimo": 1,
+      "maximo": 8,
+      "medio": 4
+    },
+    "cilindroRaio": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 6,
+      "minimo": 3,
+      "maximo": 40,
+      "medio": 6
+    },
+    "cilindroY0": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 30,
+      "minimo": 0,
+      "maximo": 500,
+      "medio": 30
+    },
+    "cilindroAltura": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 300,
+      "minimo": 5,
+      "maximo": 500,
+      "medio": 300
+    },
+    "cupulaRaioBaixo": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 140,
+      "minimo": 60,
+      "maximo": 200,
+      "medio": 140
+    },
+    "cupulaRaioCima": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 115,
+      "minimo": 40,
+      "maximo": 200,
+      "medio": 115
+    },
+    "cupulaAltura": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 190,
+      "minimo": 60,
+      "maximo": 300,
+      "medio": 190
+    },
+    "cupulaY": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 255,
+      "minimo": 100,
+      "maximo": 400,
+      "medio": 255
+    }
+  },
+  "restricoes": [
+    {
+      "id": "copo-fundo-de-dentro-cabe-na-base",
+      "expressao": "max(0, 1 - abs(forma - 0)) * (parede + 6) <= max(0, 1 - abs(forma - 0)) * (copoDiametroBase / 2)",
+      "motivo": "o copo: a base precisa ter raio de ao menos a parede mais 6 mm para o fundo de dentro existir; use base maior ou parede mais fina"
+    },
+    {
+      "id": "copo-fundo-nao-menor-que-a-parede",
+      "expressao": "max(0, 1 - abs(forma - 0)) * (parede) <= max(0, 1 - abs(forma - 0)) * (copoFundo)",
+      "motivo": "o copo: o fundo maciço não pode ser mais fino que a parede"
+    },
+    {
+      "id": "copo-fundo-deixa-altura-livre",
+      "expressao": "max(0, 1 - abs(forma - 0)) * (copoFundo + 10) <= max(0, 1 - abs(forma - 0)) * (copoAltura)",
+      "motivo": "o copo: o fundo de dentro precisa deixar ao menos 10 mm de altura livre; use fundo mais fino ou copo mais alto"
+    },
+    {
+      "id": "copo-boca-nao-menor-que-a-base",
+      "expressao": "max(0, 1 - abs(forma - 0)) * (copoDiametroBase) <= max(0, 1 - abs(forma - 0)) * (copoDiametroBoca)",
+      "motivo": "o copo afina da boca para a base; a boca menor que a base fecha o copo"
+    },
+    {
+      "id": "copo-borda-cabe-na-parede",
+      "expressao": "max(0, 1 - abs(forma - 0)) * (raioBoca) <= max(0, 1 - abs(forma - 0)) * (parede * 0.49)",
+      "motivo": "o copo: os dois cantos da borda concordam em meia-cana, e o raio não passa de meia parede"
+    },
+    {
+      "id": "copo-canto-de-baixo-cabe",
+      "expressao": "max(0, 1 - abs(forma - 0)) * (raioCanto * 2) <= max(0, 1 - abs(forma - 0)) * (copoAltura / 2)",
+      "motivo": "o copo: o raio do canto de baixo de fora não passa de um quarto da altura"
+    },
+    {
+      "id": "copo-canto-do-fundo-de-dentro-cabe",
+      "expressao": "max(0, 1 - abs(forma - 0)) * (copoRaioCantoFundoDentro * 1.5) <= max(0, 1 - abs(forma - 0)) * (copoDiametroBase / 2 - parede)",
+      "motivo": "o copo: o raio do canto de dentro do fundo precisa caber no fundo plano"
+    },
+    {
+      "id": "copo-canto-do-fundo-cabe-na-altura",
+      "expressao": "max(0, 1 - abs(forma - 0)) * (2 * copoRaioCantoFundoDentro) <= max(0, 1 - abs(forma - 0)) * (copoAltura - copoFundo)",
+      "motivo": "o copo: o canto de dentro do fundo precisa caber na parede acima do fundo"
+    },
+    {
+      "id": "garrafa-gargalo-menor-que-o-corpo",
+      "expressao": "max(0, 1 - abs(forma - 1)) * (garrafaRaioGargalo + 3) <= max(0, 1 - abs(forma - 1)) * (garrafaRaioCorpo)",
+      "motivo": "a garrafa: o gargalo é mais estreito que o corpo; sem 3 mm de diferença o ombro some"
+    },
+    {
+      "id": "garrafa-ombro-sobe",
+      "expressao": "max(0, 1 - abs(forma - 1)) * (garrafaAlturaCorpo + 5) <= max(0, 1 - abs(forma - 1)) * (garrafaAlturaGargalo)",
+      "motivo": "a garrafa: o ombro precisa subir ao menos 5 mm do corpo ao gargalo"
+    },
+    {
+      "id": "garrafa-colar-acima-do-ombro",
+      "expressao": "max(0, 1 - abs(forma - 1)) * (garrafaAlturaGargalo + 3) <= max(0, 1 - abs(forma - 1)) * (garrafaColarY)",
+      "motivo": "a garrafa: o colar fica no gargalo, ao menos 3 mm acima do fim do ombro"
+    },
+    {
+      "id": "garrafa-colar-abaixo-da-boca",
+      "expressao": "max(0, 1 - abs(forma - 1)) * (garrafaColarY + garrafaColarAltura + 7) <= max(0, 1 - abs(forma - 1)) * (garrafaAltura)",
+      "motivo": "a garrafa: o colar, com o afinamento de 2 mm, termina ao menos 5 mm abaixo da boca"
+    },
+    {
+      "id": "garrafa-colar-mais-largo-que-o-gargalo",
+      "expressao": "max(0, 1 - abs(forma - 1)) * (garrafaRaioGargalo + 3) <= max(0, 1 - abs(forma - 1)) * (garrafaColarRaio)",
+      "motivo": "a garrafa: o colar sai do gargalo ao menos 3 mm"
+    },
+    {
+      "id": "garrafa-parede-cabe-no-gargalo",
+      "expressao": "max(0, 1 - abs(forma - 1)) * (parede + 5) <= max(0, 1 - abs(forma - 1)) * (garrafaRaioGargalo)",
+      "motivo": "a garrafa: o furo da boca precisa ter ao menos 5 mm de raio"
+    },
+    {
+      "id": "garrafa-apoio-dentro-do-anel",
+      "expressao": "max(0, 1 - abs(forma - 1)) * (garrafaRaioApoioInterno + raioCanto + 1) <= max(0, 1 - abs(forma - 1)) * (garrafaRaioApoioExterno)",
+      "motivo": "a garrafa: o anel de apoio precisa ter largura, e a cúpula do fundo acaba onde ele começa"
+    },
+    {
+      "id": "garrafa-apoio-dentro-do-corpo",
+      "expressao": "max(0, 1 - abs(forma - 1)) * (garrafaRaioApoioExterno) <= max(0, 1 - abs(forma - 1)) * (garrafaRaioCorpo)",
+      "motivo": "a garrafa: o anel de apoio não passa do raio do corpo"
+    },
+    {
+      "id": "garrafa-canto-de-baixo-cabe",
+      "expressao": "max(0, 1 - abs(forma - 1)) * (raioCanto * 2 + 10) <= max(0, 1 - abs(forma - 1)) * (garrafaAlturaCorpo)",
+      "motivo": "a garrafa: o canto de baixo do corpo precisa caber abaixo do ombro"
+    },
+    {
+      "id": "garrafa-cupula-cabe-no-corpo",
+      "expressao": "max(0, 1 - abs(forma - 1)) * (garrafaCupula + parede + 2) <= max(0, 1 - abs(forma - 1)) * (garrafaAlturaCorpo)",
+      "motivo": "a garrafa: a cúpula do fundo precisa caber abaixo do ombro"
+    },
+    {
+      "id": "garrafa-borda-cabe-na-parede",
+      "expressao": "max(0, 1 - abs(forma - 1)) * (raioBoca) <= max(0, 1 - abs(forma - 1)) * (parede * 0.49)",
+      "motivo": "a garrafa: os dois cantos da borda concordam, e o raio não passa de meia parede"
+    },
+    {
+      "id": "vaso-boca-nao-menor-que-o-pescoco",
+      "expressao": "max(0, 1 - abs(forma - 2)) * (vasoPescocoDiametro) <= max(0, 1 - abs(forma - 2)) * (vasoBocaDiametro)",
+      "motivo": "o vaso: o lábio vira para fora, então a boca não é menor que o pescoço"
+    },
+    {
+      "id": "vaso-pescoco-mais-estreito-que-a-barriga",
+      "expressao": "max(0, 1 - abs(forma - 2)) * (vasoPescocoDiametro + 20) <= max(0, 1 - abs(forma - 2)) * (vasoBarrigaDiametro)",
+      "motivo": "o vaso: o pescoço é ao menos 20 mm mais estreito que a barriga"
+    },
+    {
+      "id": "vaso-pe-dentro-da-barriga",
+      "expressao": "max(0, 1 - abs(forma - 2)) * (vasoPeDiametro + 10) <= max(0, 1 - abs(forma - 2)) * (vasoBarrigaDiametro)",
+      "motivo": "o vaso: a barriga é a parte mais larga, e o pé fica 10 mm dentro dela"
+    },
+    {
+      "id": "vaso-barriga-acima-do-pe",
+      "expressao": "max(0, 1 - abs(forma - 2)) * (vasoPeAltura + 4) <= max(0, 1 - abs(forma - 2)) * (vasoBarrigaAltura - vasoBarrigaSemieixoY * cos(vasoAnguloInicioBarriga))",
+      "motivo": "o vaso: a elipse da barriga começa acima da saia do pé"
+    },
+    {
+      "id": "vaso-barriga-abaixo-do-pescoco",
+      "expressao": "max(0, 1 - abs(forma - 2)) * (vasoBarrigaAltura - vasoBarrigaSemieixoY * cos(vasoAnguloFimBarriga) + 16) <= max(0, 1 - abs(forma - 2)) * (vasoPescocoAltura)",
+      "motivo": "o vaso: a barriga termina ao menos 16 mm abaixo do ponto mais estreito do pescoço"
+    },
+    {
+      "id": "vaso-labio-acima-do-pescoco",
+      "expressao": "max(0, 1 - abs(forma - 2)) * (vasoPescocoAltura + vasoLabioAltura + 14) <= max(0, 1 - abs(forma - 2)) * (vasoAltura)",
+      "motivo": "o vaso: o pescoço sobe ao menos 14 mm antes do lábio"
+    },
+    {
+      "id": "vaso-rebaixo-dentro-da-saia",
+      "expressao": "max(0, 1 - abs(forma - 2)) * (vasoRebaixoDoPe + 2) <= max(0, 1 - abs(forma - 2)) * (vasoPeAltura)",
+      "motivo": "o vaso: o teto do rebaixo sob o fundo fica ao menos 2 mm abaixo do topo da saia"
+    },
+    {
+      "id": "vaso-parede-cabe-no-pescoco",
+      "expressao": "max(0, 1 - abs(forma - 2)) * (parede + 6) <= max(0, 1 - abs(forma - 2)) * (vasoPescocoDiametro / 2)",
+      "motivo": "o vaso: o furo do pescoço precisa ter ao menos 6 mm de raio"
+    },
+    {
+      "id": "vaso-parede-cabe-no-pe",
+      "expressao": "max(0, 1 - abs(forma - 2)) * (parede + 5) <= max(0, 1 - abs(forma - 2)) * (vasoPeDiametro / 2)",
+      "motivo": "o vaso: o rebaixo do pé precisa ter ao menos 5 mm de raio"
+    },
+    {
+      "id": "vaso-barriga-abre-o-arco",
+      "expressao": "max(0, 1 - abs(forma - 2)) * (vasoAnguloInicioBarriga + 60) <= max(0, 1 - abs(forma - 2)) * (vasoAnguloFimBarriga)",
+      "motivo": "o vaso: a elipse da barriga cobre ao menos 60 graus"
+    },
+    {
+      "id": "prato-poco-cabe-na-altura",
+      "expressao": "max(0, 1 - abs(forma - 3)) * (pratoPocoProfundidade + parede + pratoAnelAltura) <= max(0, 1 - abs(forma - 3)) * (pratoAltura)",
+      "motivo": "o prato: o fundo de baixo do anel não pode passar do chão (altura menos poço, parede e anel)"
+    },
+    {
+      "id": "prato-fundo-cabe-no-anel",
+      "expressao": "max(0, 1 - abs(forma - 3)) * (pratoAnelDiametro / 2 + 2) <= max(0, 1 - abs(forma - 3)) * (pratoDiametro / 2 - parede / 2 - pratoAbaLargura - pratoRaioOmbro - pratoRaioFundo + pratoRaioOmbro * sin(pratoAbaInclinacao))",
+      "motivo": "o prato: o fundo plano do poço precisa passar do anel de apoio, e para isso o diâmetro, a aba e os raios não podem comer o fundo"
+    },
+    {
+      "id": "prato-ombro-maior-que-a-parede",
+      "expressao": "max(0, 1 - abs(forma - 3)) * (parede + 2) <= max(0, 1 - abs(forma - 3)) * (pratoRaioOmbro)",
+      "motivo": "o prato: o raio do ombro, descontada a parede, precisa continuar positivo"
+    },
+    {
+      "id": "prato-parede-cabe-entre-os-arcos",
+      "expressao": "max(0, 1 - abs(forma - 3)) * (pratoAltura - pratoPocoProfundidade + pratoRaioFundo + pratoRaioOmbro * cos(pratoAbaInclinacao) + 3) <= max(0, 1 - abs(forma - 3)) * (pratoAltura - pratoAbaLargura * tan(pratoAbaInclinacao))",
+      "motivo": "o prato: entre o arco do fundo e o do ombro a parede reta precisa ter ao menos 3 mm"
+    },
+    {
+      "id": "prato-anel-tem-largura",
+      "expressao": "max(0, 1 - abs(forma - 3)) * (pratoAnelLargura + 2) <= max(0, 1 - abs(forma - 3)) * (pratoAnelDiametro / 2)",
+      "motivo": "o prato: o anel de apoio precisa caber em torno do eixo"
+    },
+    {
+      "id": "base-degrau-cabe-na-borda",
+      "expressao": "max(0, 1 - abs(forma - 4)) * (baseDegrauRaio + 2 * baseRaioBorda + 1) <= max(0, 1 - abs(forma - 4)) * (baseRaio)",
+      "motivo": "a base: o degrau de cima é mais estreito que o de baixo, com a folga dos chanfros"
+    },
+    {
+      "id": "base-degrau-de-baixo-cabe",
+      "expressao": "max(0, 1 - abs(forma - 4)) * (baseRaioBorda * 1.5 + 1) <= max(0, 1 - abs(forma - 4)) * (baseDegrauAltura)",
+      "motivo": "a base: o chanfro do degrau de baixo precisa caber na altura dele"
+    },
+    {
+      "id": "base-degrau-de-cima-cabe",
+      "expressao": "max(0, 1 - abs(forma - 4)) * (baseDegrauAltura + baseRaioBorda * 1.5 + 1) <= max(0, 1 - abs(forma - 4)) * (baseAltura)",
+      "motivo": "a base: o chanfro do degrau de cima precisa caber na altura que sobra"
+    },
+    {
+      "id": "base-topo-cabe-no-eixo",
+      "expressao": "max(0, 1 - abs(forma - 4)) * (baseRaioBorda + 2) <= max(0, 1 - abs(forma - 4)) * (baseDegrauRaio)",
+      "motivo": "a base: o chanfro do topo precisa deixar ao menos 2 mm de topo plano"
+    },
+    {
+      "id": "cupula-mais-larga-embaixo",
+      "expressao": "max(0, 1 - abs(forma - 7)) * (cupulaRaioCima) <= max(0, 1 - abs(forma - 7)) * (cupulaRaioBaixo)",
+      "motivo": "a cúpula é um tronco de cone mais largo embaixo; a boca de cima não passa da de baixo"
+    },
+    {
+      "id": "cupula-parede-cabe",
+      "expressao": "max(0, 1 - abs(forma - 7)) * (parede + 5) <= max(0, 1 - abs(forma - 7)) * (cupulaRaioCima)",
+      "motivo": "a cúpula: o vão de cima precisa ter ao menos 5 mm de raio"
+    }
+  ],
+  "portas": [],
+  "ferramentas": [
+    "arredonda",
+    "casca"
+  ],
+  "perguntas": {
+    "secao": [
+      "A parede tem a mesma espessura em toda a volta do perfil, e a face de dentro fica do lado do eixo, sem atravessar a de fora?",
+      "A seção abre onde o objeto abre (boca do copo, da garrafa e do vaso, aro da cúpula) e fecha no fundo, sem tampa que o objeto real não tem?"
+    ],
+    "superficie": [
+      "A superfície é redonda e lisa, sem facetas visíveis nem quinas vivas na borda e nos cantos que o objeto tem arredondados?"
+    ]
+  },
+  "perfis": {
+    "copo": {
+      "descricao": "copo baixo de vidro liso, 90 mm de altura, boca de 80 e base de 70, parede de 3 mm e fundo maciço de 12 mm",
+      "parametros": {
+        "forma": 0,
+        "lados": 64,
+        "segmentosCurva": 8,
+        "anguloLiso": 40,
+        "parede": 3,
+        "raioBoca": 1.4,
+        "raioCanto": 2
+      }
+    },
+    "garrafa": {
+      "descricao": "garrafa de vidro de boca larga, 160 mm, corpo de 75 mm, ombro em quarto de elipse, colar e cúpula no fundo, parede de 2,5 mm (a rosca é da receita)",
+      "parametros": {
+        "forma": 1,
+        "lados": 48,
+        "segmentosCurva": 4,
+        "anguloLiso": 50,
+        "parede": 2.5,
+        "raioBoca": 0.8,
+        "raioCanto": 3
+      }
+    },
+    "vaso": {
+      "descricao": "vaso de cerâmica oco de 200 mm, barriga elíptica, pescoço, lábio virado e saia no pé, parede de 6 mm (os arcos do pé são da receita)",
+      "parametros": {
+        "forma": 2,
+        "lados": 48,
+        "segmentosCurva": 3,
+        "anguloLiso": 40,
+        "parede": 6
+      }
+    },
+    "prato": {
+      "descricao": "prato fundo de cerâmica de 230 mm e 45 mm de altura, casca de 5 mm com aba inclinada, poço e anel de apoio",
+      "parametros": {
+        "forma": 3,
+        "lados": 72,
+        "segmentosCurva": 8,
+        "anguloLiso": 40,
+        "parede": 5
+      }
+    },
+    "abajur-base": {
+      "descricao": "base de abajur de 150 mm e 30 mm de altura em dois degraus de bordas chanfradas",
+      "parametros": {
+        "forma": 4,
+        "lados": 48,
+        "segmentosCurva": 8,
+        "anguloLiso": 30
+      }
+    },
+    "abajur-haste": {
+      "descricao": "haste de abajur: cilindro maciço de 12 mm de diâmetro, de y 30 a y 330",
+      "parametros": {
+        "forma": 5,
+        "lados": 48,
+        "segmentosCurva": 8,
+        "anguloLiso": 30,
+        "cilindroRaio": 6,
+        "cilindroY0": 30,
+        "cilindroAltura": 300
+      }
+    },
+    "abajur-soquete": {
+      "descricao": "soquete de abajur: cilindro maciço de 30 mm de diâmetro e 50 mm, de y 330 a y 380",
+      "parametros": {
+        "forma": 6,
+        "lados": 48,
+        "segmentosCurva": 8,
+        "anguloLiso": 30,
+        "cilindroRaio": 15,
+        "cilindroY0": 330,
+        "cilindroAltura": 50
+      }
+    },
+    "abajur-cupula": {
+      "descricao": "cúpula de abajur: tronco de cone aberto nas duas pontas, 280 mm embaixo, 230 em cima, 190 de altura, parede de 2 mm",
+      "parametros": {
+        "forma": 7,
+        "lados": 48,
+        "segmentosCurva": 8,
+        "anguloLiso": 30,
+        "parede": 2
+      }
+    }
+  }
+}

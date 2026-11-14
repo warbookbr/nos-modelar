@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1882 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1887 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -895,6 +895,14 @@
 - `montagem.js` — montagem.js — a montagem v5 que a família gera: o corpo, as portas, as gavetas e os guias e as duas metades de cada dobradiça como peças soltas, com uma arti…
 - `movel-de-caixa.test.mjs` — movel-de-caixa.test.mjs — a família `movel-de-caixa`: contrato, recusas, os perfis, o roupeiro como antes, a malha medida contra as contas (zonas, frentes em…
 
+## procedural/familias/peca-de-revolucao/
+
+- `composicoes.js` — composicoes.js — as composições procedurais da família `peca-de-revolucao`.
+- `derivar.js` — derivar.js — dos parâmetros da família `peca-de-revolucao` (milímetro, graus e contagem) à chamada de composição (metro).
+- `index.js` — index.js — a família `peca-de-revolucao` carregada: o contrato `familia.json`, as composições e o `derivar`. O registro do produto (`procedural/familias/inde…
+- `peca-de-revolucao.test.js` — peca-de-revolucao.test.js — a família `peca-de-revolucao` medida na malha e no perfil: o sentido do deslocamento da parede, o perfil de cada objeto contra a …
+- `perfis.js` — perfis.js — os perfis [raio, altura, concordância] em milímetro da família `peca-de-revolucao`, e a casca que os fecha.
+
 ## procedural/familias/roda-pneu/
 
 - `composicoes.js` — composicoes.js — as composições da família `roda-pneu`: a roda de disco e as duas raiadas, cada uma com a banda lisa ou com relevo.
@@ -1138,7 +1146,7 @@
 
 ## procedural/pecas/abajur-de-mesa/
 
-- `receita.js` — Abajur de mesa: base, haste, soquete e cúpula são revoluções (perfil [raio, altura] em mm girado pelo `lathe`); a armação é arame de cilindros finos (aro de …
+- `receita.js` — Abajur de mesa: base, haste, soquete e cúpula são revoluções geradas pela família `peca-de-revolucao` (perfis abajur-base, abajur-haste, abajur-soquete e aba…
 
 ## procedural/pecas/abajur-de-mesa/referencias/
 
@@ -1539,7 +1547,7 @@
 
 ## procedural/pecas/copo-de-vidro/
 
-- `receita.js` — Copo baixo de vidro: uma parte de revolução. Perfil (raio, altura) em mm na `derivar`, girado por `lathe`.
+- `receita.js` — Copo baixo de vidro: uma parte de revolução, gerada pela família `peca-de-revolucao` (perfil `copo`): a família dá o perfil (raio, altura) com a parede de de…
 
 ## procedural/pecas/copo-de-vidro/referencias/
 
@@ -1768,7 +1776,7 @@
 
 ## procedural/pecas/garrafa-de-vidro/
 
-- `receita.js` — garrafa-de-vidro — garrafa de boca larga, sem tampa, uma parte (`garrafa`). O alvo está em referencias/alvo.md. O perfil de revolução (raio, altura) é uma li…
+- `receita.js` — garrafa-de-vidro — garrafa de boca larga, sem tampa, uma parte (`garrafa`). O alvo está em referencias/alvo.md. O corpo de revolução vem da família `peca-de-…
 
 ## procedural/pecas/garrafa-de-vidro/referencias/
 
@@ -1953,7 +1961,7 @@
 
 ## procedural/pecas/prato-fundo/
 
-- `receita.js` — Prato fundo de cerâmica branca: uma parte só (`prato`), uma revolução em y de um perfil de seção fechada (casca de 5 mm).
+- `receita.js` — Prato fundo de cerâmica branca: uma parte só (`prato`), uma revolução em y de um perfil de seção fechada (casca de 5 mm), gerada pela família `peca-de-revolu…
 
 ## procedural/pecas/prato-fundo/referencias/
 

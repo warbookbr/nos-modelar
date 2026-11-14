@@ -1,12 +1,12 @@
 /* vaso-de-ceramica — vaso de cerâmica terracota de uma parte (`vaso`).
  * O combinado está em `referencias/alvo.md`.
  *
- * O perfil (raio, altura) é uma lista de pontos escrita na `derivar`, separada
- * da operação: `lathe` só o gira. O corpo é a seção da parede inteira (6 mm),
- * fechada no eixo nas duas pontas, de modo que o vaso sai oco até a boca e com
- * o fundo do pé rebaixado. Os quatro arcos do pé não são revolução e saem de
+ * O corpo de revolução vem da família `peca-de-revolucao` (perfil `vaso`): a parede inteira (6 mm), com a de dentro deslocada da de fora
+ * e o fundo do pé rebaixado, de modo que o vaso sai oco até a boca. Os quatro arcos do pé não são revolução e ficam aqui, saídos de
  * `subtrair`: dois cilindros em z e dois em x, cada um furando dois lados.
  */
+import { chamar, criarRegistroDeFamilias } from '../../familias/index.js';
+import { expandirChamadasDeComposicao } from '../../nucleo/composicoes.js';
 
 export const TABELA = {
   /* Medidas do alvo, em mm. */
@@ -34,63 +34,30 @@ export const TABELA = {
 
 export const MATERIAIS = { terracota: { cor: '#b9683f', aspereza: 0.85 } };
 
+let registro = null;
+const familias = () => { registro ??= criarRegistroDeFamilias(); return registro; };
 const m = (mm) => mm / 1000;
 const ID = { vaso: 100, cilZ: 101, cilX: 102, baixoZ: 103, baixoX: 104, cortado: 105 };
 
-/* Desloca uma polilinha aberta (raio, altura) em `d` mm para o lado esquerdo de quem a percorre, por esquadria nos vértices. */
-function deslocar(pts, d) {
-  const n = (a, b) => { const dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy); return [-dy / L, dx / L]; };
-  return pts.map((p, i) => {
-    const a = n(pts[Math.max(i - 1, 0)], p), b = n(p, pts[Math.min(i + 1, pts.length - 1)]);
-    let [nx, ny] = i === 0 ? b : i === pts.length - 1 ? a : [a[0] + b[0], a[1] + b[1]];
-    const L = Math.hypot(nx, ny); nx /= L; ny /= L;
-    const k = i === 0 || i === pts.length - 1 ? 1 : 1 / Math.max(0.5, nx * a[0] + ny * a[1]);
-    return [p[0] + nx * d * k, p[1] + ny * d * k];
-  });
-}
-
-/** Perfil e cortes em mm. `externo` sobe do fundo do pé até o topo do lábio; `interno` desce do topo até o piso da barriga. */
+/** O corpo de revolução (família) e os cortes do pé (receita), em mm. */
 export function derivar(T = TABELA) {
-  const Rb = T.barrigaDiametro / 2, Rp = T.peDiametro / 2, Rn = T.pescocoDiametro / 2, Rl = T.bocaDiametro / 2;
-  const yb = T.barrigaAltura, Hy = T.barrigaSemieixoY;
-  const ang = (g) => (g * Math.PI) / 180;
-  const elipse = [];
-  for (let i = 0; i <= T.passosBarriga; i++) {
-    const t = ang(T.tInicio + ((T.tFim - T.tInicio) * i) / T.passosBarriga);
-    elipse.push([Rb * Math.sin(t), yb - Hy * Math.cos(t)]);
-  }
-  const yPesc = T.pescocoAltura, yTopo = T.altura, yLab = yTopo - T.labioAltura;
-  /* o pé é uma saia levemente aberta para baixo (raio Rp na borda de baixo) */
-  const saia = [[Rp, 0], [Rp - 3, T.peAltura * 0.55], [elipse[0][0], T.peAltura + 2]];
-  const externo = [
-    ...saia, ...elipse,
-    [Rn + 3, yPesc - 12], [Rn, yPesc], [Rn, yLab - 12],
-    [Rn + (Rl - Rn) * 0.45, yLab - 5], [Rl, yLab], [Rl, yTopo],
-  ];
-  /* interno: a parede paralela à do corpo, de cima para baixo, do topo do lábio ao piso */
-  const baixo = externo.slice(saia.length - 1, externo.length - 1).reverse(); /* da boca ao fim da saia, sem o ponto do topo */
-  const ponta = [Rl - T.parede, yTopo];
-  const parede = deslocar([[Rl, yTopo], ...baixo], -T.parede).slice(1);
-  const interno = [ponta, ...parede];
-  const pisoY = interno[interno.length - 1][1];
-  const raioInternoPe = Rp - T.parede;
-  const perfil = [
-    [0, T.rebaixoDoPe], [raioInternoPe, T.rebaixoDoPe], [raioInternoPe, 0],
-    ...externo, ...interno, [0, pisoY],
-  ];
+  const corpo = chamar(familias().obter('peca-de-revolucao'), 'corpo', {
+    perfil: 'vaso', vasoAltura: T.altura, vasoBarrigaDiametro: T.barrigaDiametro, vasoBarrigaAltura: T.barrigaAltura, vasoPescocoDiametro: T.pescocoDiametro,
+    vasoBocaDiametro: T.bocaDiametro, vasoPeDiametro: T.peDiametro, vasoPeAltura: T.peAltura, parede: T.parede, vasoPescocoAltura: T.pescocoAltura,
+    vasoLabioAltura: T.labioAltura, vasoRebaixoDoPe: T.rebaixoDoPe, vasoBarrigaSemieixoY: T.barrigaSemieixoY, vasoAnguloInicioBarriga: T.tInicio,
+    vasoAnguloFimBarriga: T.tFim, vasoPassosBarriga: T.passosBarriga, lados: T.lados, origem: ID.vaso,
+  });
   /* arcos do pé: cilindro de raio arcoLargura/2 com o topo em arcoAltura, mais a caixa abaixo do centro dele */
   const raioArco = T.arcoLargura / 2;
   const centroArco = T.arcoAltura - raioArco;
-  return { perfil, externo, interno, pisoY, raioArco, centroArco, comprimento: T.peDiametro + 40 };
+  return { corpo, raioArco, centroArco, comprimento: T.peDiametro + 40 };
 }
 
 export function gerarPassos(T = TABELA) {
   const D = derivar(T);
   const passos = [];
-  passos.push(['lathe', {
-    origemId: ID.vaso, lados: T.lados, segmentosCurva: 3,
-    perfil: D.perfil.map(([r, y]) => [m(r), m(y)]),
-  }]);
+  const { passos: doCorpo } = expandirChamadasDeComposicao(familias().registroComposicoes, [D.corpo]);
+  passos.push(doCorpo.find(([op]) => op === 'lathe'));
   const L = D.comprimento, r = D.raioArco, c = D.centroArco;
   const larg = r * 2, baixoAlt = c + 10;
   /* cortadores: eixo em z (arcos a +/-x) e em x (arcos a +/-z); `em` dá o ponto de partida, e o cilindro é centrado pela altura. */
@@ -123,8 +90,9 @@ const receita = {
     objeto: 'vaso de cerâmica rústica de uma parte: barriga quase esférica, pescoço estreito, boca de lábio virado e pé em saia com quatro arcos',
     referencias: ['referencias/alvo.md'],
     escala: { medida: 'altura total do vaso', milimetros: 200 },
+    familiaProcedural: 'peca-de-revolucao',
     partes: [
-      { nome: 'vaso', forma: 'revolução oca de 200 mm de altura e parede de 6 mm: barriga de 190 mm a 95 mm do chão, pescoço de 55 mm, boca de 75 mm com lábio virado para fora, pé em saia de 110 mm e 30 mm de altura com quatro arcos de 25 por 18 mm a 90 graus', tecnica: 'lathe do perfil da parede inteira (oco, fundo do pé rebaixado), subtrair de quatro cortadores em arco para o pé, liso com ângulo' },
+      { nome: 'vaso', forma: 'revolução oca de 200 mm de altura e parede de 6 mm: barriga de 190 mm a 95 mm do chão, pescoço de 55 mm, boca de 75 mm com lábio virado para fora, pé em saia de 110 mm e 30 mm de altura com quatro arcos de 25 por 18 mm a 90 graus', tecnica: 'família peca-de-revolucao, perfil vaso: lathe do perfil da parede inteira (oco, fundo do pé rebaixado), subtrair de quatro cortadores em arco para o pé, liso com ângulo' },
     ],
     criteriosDeReprovacao: [
       'vaso maciço, sem o oco por dentro até a boca',

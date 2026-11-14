@@ -1,5 +1,9 @@
-/* Abajur de mesa: base, haste, soquete e cúpula são revoluções (perfil [raio, altura] em mm girado pelo `lathe`); a armação é arame
-   de cilindros finos (aro de revolução, duas alças, três raios em Y e o botão). Y para cima, chão em y 0, eixo do abajur em x 0 e z 0. */
+/* Abajur de mesa: base, haste, soquete e cúpula são revoluções geradas pela família `peca-de-revolucao` (perfis abajur-base, abajur-haste,
+   abajur-soquete e abajur-cupula); a armação é arame de cilindros finos (aro de revolução, duas alças, três raios em Y e o botão), que
+   não é parte de revolução e fica aqui. Y para cima, chão em y 0, eixo do abajur em x 0 e z 0. */
+import { chamar, criarRegistroDeFamilias } from '../../familias/index.js';
+import { expandirChamadasDeComposicao } from '../../nucleo/composicoes.js';
+
 export const TABELA = {
   base_raio: 75, base_altura: 30, base_degrau_raio: 58, base_degrau_y: 12, base_raio_borda: 4,
   haste_raio: 6,
@@ -11,24 +15,21 @@ export const TABELA = {
 
 const GRAUS = Math.PI / 180;
 
-/* Perfis das revoluções, listas de pontos [raio, altura] em mm. */
-export function perfilBase(T) {
-  const r = T.base_raio_borda;
-  return [[0, 0], [T.base_raio - r, 0], [T.base_raio, r / 2], [T.base_raio, T.base_degrau_y - r], [T.base_raio - r, T.base_degrau_y],
-    [T.base_degrau_raio + r, T.base_degrau_y], [T.base_degrau_raio, T.base_degrau_y + r / 2], [T.base_degrau_raio, T.base_altura - r],
-    [T.base_degrau_raio - r, T.base_altura], [0, T.base_altura]];
+let registro = null;
+const familias = () => { registro ??= criarRegistroDeFamilias(); return registro; };
+
+/* As quatro partes de revolução: a família dá o perfil de cada uma; a TABELA em mm vira os parâmetros dela. */
+export function chamadasDeRevolucao(T) {
+  const f = familias().obter('peca-de-revolucao');
+  const comum = { lados: T.lados, anguloLiso: ANGULO_LISO };
+  return [
+    chamar(f, 'base', { perfil: 'abajur-base', ...comum, origem: ID.base, baseRaio: T.base_raio, baseAltura: T.base_altura, baseDegrauRaio: T.base_degrau_raio, baseDegrauAltura: T.base_degrau_y, baseRaioBorda: T.base_raio_borda }),
+    chamar(f, 'haste', { perfil: 'abajur-haste', ...comum, origem: ID.haste, cilindroRaio: T.haste_raio, cilindroY0: T.base_altura, cilindroAltura: T.soquete_y - T.base_altura }),
+    chamar(f, 'soquete', { perfil: 'abajur-soquete', ...comum, origem: ID.soquete, cilindroRaio: T.soquete_raio, cilindroY0: T.soquete_y, cilindroAltura: T.soquete_altura }),
+    chamar(f, 'cupula', { perfil: 'abajur-cupula', ...comum, origem: ID.cupula, cupulaRaioBaixo: T.cupula_raio_baixo, cupulaRaioCima: T.cupula_raio_cima, cupulaAltura: T.cupula_altura, cupulaY: T.cupula_y, parede: T.cupula_parede }),
+  ];
 }
-export function perfilHaste(T) { return [[0, T.base_altura], [T.haste_raio, T.base_altura], [T.haste_raio, T.soquete_y], [0, T.soquete_y]]; }
-export function perfilSoquete(T) {
-  const y1 = T.soquete_y + T.soquete_altura;
-  return [[0, T.soquete_y], [T.soquete_raio, T.soquete_y], [T.soquete_raio, y1], [0, y1]];
-}
-/* Casca aberta em cima e embaixo: o contorno externo sobe, o interno desce, e volta ao primeiro ponto. */
-export function perfilCupula(T) {
-  const y1 = T.cupula_y + T.cupula_altura;
-  return [[T.cupula_raio_baixo, T.cupula_y], [T.cupula_raio_cima, y1], [T.cupula_raio_cima - T.cupula_parede, y1],
-    [T.cupula_raio_baixo - T.cupula_parede, T.cupula_y]];
-}
+const MATERIAL_DA_PARTE = { base: 'metal', haste: 'metal', soquete: 'metal', cupula: 'linho' };
 
 /* A armação: aro, botão (revoluções de seção pequena) e hastes retas entre dois pontos [x, y, z]. */
 export function derivar(T) {
@@ -66,15 +67,8 @@ export function gerarPassos(T) {
   const D = derivar(T);
   const P = [];
   const perfilM = (perfil) => perfil.map(([r, y]) => [m(r), m(y)]);
-  const rev = (nome, id, perfil, material, secaoAnel = false) => {
-    const sel = { origem: { op: 'lathe', id } };
-    P.push(['lathe', { origemId: id, lados: T.lados, perfil: perfilM(perfil), ...(secaoAnel ? { furos: [] } : {}) }]);
-    P.push(['parte', { nome, sel }], ['material', { sel, usa: material }], ['liso', { angulo: ANGULO_LISO, sel }]);
-  };
-  rev('base', ID.base, perfilBase(T), 'metal');
-  rev('haste', ID.haste, perfilHaste(T), 'metal');
-  rev('soquete', ID.soquete, perfilSoquete(T), 'metal');
-  rev('cupula', ID.cupula, perfilCupula(T), 'linho', true);
+  const { passos: revolucoes } = expandirChamadasDeComposicao(familias().registroComposicoes, chamadasDeRevolucao(T));
+  P.push(...revolucoes.flatMap((passo) => (passo[0] === 'parte' ? [passo, ['material', { sel: passo[1].sel, usa: MATERIAL_DA_PARTE[passo[1].nome] }]] : [passo])));
 
   /* Armação: o aro e o botão giram; alças e raios são cilindros finos girados até a direção. Uma parte, vários passos. */
   const arm = [];
@@ -124,12 +118,13 @@ const receita = {
     objeto: 'abajur de mesa de 450 mm: base de metal de dois degraus, haste fina, soquete, armação de arame e cúpula cônica de linho aberta em cima e embaixo',
     referencias: ['referencias/alvo.md'],
     escala: { medida: 'altura total da peça', milimetros: 450 },
+    familiaProcedural: 'peca-de-revolucao',
     partes: [
-      { nome: 'base', forma: 'disco de 150 mm de diâmetro e 30 mm de altura em dois degraus de bordas arredondadas', tecnica: 'lathe de perfil [raio, altura] com cantos chanfrados e liso' },
-      { nome: 'haste', forma: 'tubo de 12 mm de diâmetro do centro da base, de y 30 a y 330', tecnica: 'lathe de perfil retangular' },
-      { nome: 'soquete', forma: 'cilindro de 30 mm de diâmetro e 50 mm de altura, de y 330 a y 380', tecnica: 'lathe de perfil retangular' },
+      { nome: 'base', forma: 'disco de 150 mm de diâmetro e 30 mm de altura em dois degraus de bordas arredondadas', tecnica: 'família peca-de-revolucao, perfil abajur-base: lathe com cantos chanfrados e liso' },
+      { nome: 'haste', forma: 'tubo de 12 mm de diâmetro do centro da base, de y 30 a y 330', tecnica: 'família peca-de-revolucao, perfil abajur-haste: lathe de perfil retangular' },
+      { nome: 'soquete', forma: 'cilindro de 30 mm de diâmetro e 50 mm de altura, de y 330 a y 380', tecnica: 'família peca-de-revolucao, perfil abajur-soquete: lathe de perfil retangular' },
       { nome: 'armacao', forma: 'arame de 3 mm: aro em volta do soquete, duas alças até o botão de 15 mm, três raios em Y a 120 graus até o aro de cima da cúpula', tecnica: 'lathe para aro e botão, cilindros finos girados para alças e raios' },
-      { nome: 'cupula', forma: 'tronco de cone aberto, 280 mm embaixo, 230 mm em cima, 190 mm de altura, parede de 2 mm, borda de baixo em y 255', tecnica: 'lathe de perfil de casca (contorno externo e interno) com liso' },
+      { nome: 'cupula', forma: 'tronco de cone aberto, 280 mm embaixo, 230 mm em cima, 190 mm de altura, parede de 2 mm, borda de baixo em y 255', tecnica: 'família peca-de-revolucao, perfil abajur-cupula: lathe da casca (contorno de fora, o de dentro deslocado pela parede) com liso' },
     ],
     criteriosDeReprovacao: ['cúpula maciça ou fechada', 'armação ausente ou com raios soltos da cúpula', 'haste fora do eixo', 'cúpula sem a conicidade (mais larga embaixo)'],
   },

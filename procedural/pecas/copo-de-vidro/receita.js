@@ -1,4 +1,8 @@
-/* Copo baixo de vidro: uma parte de revolução. Perfil (raio, altura) em mm na `derivar`, girado por `lathe`. */
+/* Copo baixo de vidro: uma parte de revolução, gerada pela família `peca-de-revolucao` (perfil `copo`): a família dá o perfil (raio, altura) com a
+   parede de dentro deslocada da de fora e o gira por `lathe`; a receita só traz a TABELA em mm e o material. */
+import { chamar, criarRegistroDeFamilias } from '../../familias/index.js';
+import { expandirChamadasDeComposicao } from '../../nucleo/composicoes.js';
+
 export const TABELA = {
   altura: 90,
   diametro_boca: 80,
@@ -13,36 +17,21 @@ export const TABELA = {
   angulo_liso: 40,
 };
 
-/* Perfil da seção, de baixo para cima pelo lado de fora e de volta pelo de dentro; terceiro número = raio de concordância no canto. */
+let registro = null;
+const familias = () => { registro ??= criarRegistroDeFamilias(); return registro; };
+
+/* A TABELA em mm vira a chamada da família; o perfil e a parede de dentro são da família. */
 export function derivar(T) {
-  const rBoca = T.diametro_boca / 2;
-  const rBase = T.diametro_base / 2;
-  const inclina = (y) => rBase + ((rBoca - rBase) * y) / T.altura;
-  const rDentroBoca = rBoca - T.parede;
-  const rDentroFundo = rDentroBoca - ((rBoca - rBase) * (T.altura - T.fundo)) / T.altura;
-  const perfil = [
-    [0, 0],
-    [rBase, 0, T.raio_canto_fundo_fora],
-    [rBoca, T.altura, T.raio_borda],
-    [rDentroBoca, T.altura, T.raio_borda],
-    [rDentroFundo, T.fundo, T.raio_canto_fundo_dentro],
-    [0, T.fundo],
-  ];
-  return { perfil, rBoca, rBase, rDentroBoca, rDentroFundo, inclina };
+  return chamar(familias().obter('peca-de-revolucao'), 'copo', {
+    perfil: 'copo', copoAltura: T.altura, copoDiametroBoca: T.diametro_boca, copoDiametroBase: T.diametro_base, parede: T.parede, copoFundo: T.fundo,
+    copoRaioCantoFundoDentro: T.raio_canto_fundo_dentro, raioCanto: T.raio_canto_fundo_fora, raioBoca: T.raio_borda,
+    lados: T.lados, segmentosCurva: T.segmentos_curva, anguloLiso: T.angulo_liso,
+  });
 }
 
-const m = (mm) => mm / 1000;
-
 export function gerarPassos(T) {
-  const { perfil } = derivar(T);
-  const perfilM = perfil.map(([r, y, c]) => (c === undefined ? [m(r), m(y)] : [m(r), m(y), m(c)]));
-  const sel = { origem: { op: 'lathe', id: 1 } };
-  return [
-    ['lathe', { origemId: 1, perfil: perfilM, lados: T.lados, segmentosCurva: T.segmentos_curva }],
-    ['parte', { nome: 'copo', sel }],
-    ['material', { sel, usa: 'vidro' }],
-    ['liso', { angulo: T.angulo_liso, sel }],
-  ];
+  const { passos } = expandirChamadasDeComposicao(familias().registroComposicoes, [derivar(T)]);
+  return passos.flatMap((passo) => (passo[0] === 'parte' ? [passo, ['material', { sel: passo[1].sel, usa: 'vidro' }]] : [passo]));
 }
 
 export const CONTATOS = [];
@@ -56,11 +45,12 @@ const receita = {
     objeto: 'copo baixo de vidro liso, 90 mm de altura, 80 mm de boca e 70 mm de base, parede de 3 mm, fundo maciço de 12 mm',
     referencias: ['referencias/alvo.md'],
     escala: { medida: 'altura total da peça', milimetros: 90 },
+    familiaProcedural: 'peca-de-revolucao',
     partes: [
       {
         nome: 'copo',
         forma: 'corpo de revolução afinando em reta da boca (80) à base (70), parede de 3 mm, fundo de dentro plano em y 12 com canto raio 6, borda em meia-cana, canto de baixo de fora raio 2',
-        tecnica: 'lathe de um perfil (raio, altura) com concordâncias nos cantos, seguido de liso por ângulo',
+        tecnica: 'família peca-de-revolucao, perfil copo: lathe de um perfil (raio, altura) com concordâncias nos cantos, seguido de liso por ângulo',
       },
     ],
     criteriosDeReprovacao: [
