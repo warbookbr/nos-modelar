@@ -18,6 +18,7 @@ import {
 } from './configuracao-composicoes.mjs';
 import { descreverPeca as medirPeca, formatarDescricao } from '../../src/autoria/descrever-partes.js';
 import { contatosDaPeca } from '../../src/autoria/contatos-da-peca.js';
+import { medirMovimentos } from '../../src/autoria/movimentos-da-peca.js';
 import { criarMemoriaDeAuditoria } from '../../src/autoria/contato-de-solidos.js';
 import { conferirVaosDaPeca, formatarVaos } from '../../src/autoria/molduras-do-vao.js';
 import { avisoDaDispensa } from '../../src/autoria/lataria.js';
@@ -745,6 +746,31 @@ ${contatos.invasoes.length} CONTATO(S) DECLARADO(S) EM QUE UMA PARTE INVADE A OU
         + '\n  ou, se a junta afunda de propósito (solda, pino num furo), declare `invasaoMaxima` no contato, com o motivo.'
         + '\n  Para ver o par: npm run descrever -- <peça> --partes=<a>,<b>\n';
       falhou = true;
+    }
+    /* MOVIMENTOS DECLARADOS. A receita que exporta MOVIMENTOS (gaveta que corre, tampa que abre) tem o curso medido posição a posição contra as outras partes,
+       com a mesma medida de invasão do contato declarado (src/autoria/movimentos-da-peca.js); a posição em que uma parte afunda em outra além do limite reprova. */
+    if (Array.isArray(receita.MOVIMENTOS) && receita.MOVIMENTOS.length) {
+      progresso('medindo o curso dos movimentos');
+      let medidos;
+      try {
+        medidos = medirMovimentos(neutro, receita);
+      } catch (erro) {
+        return falhaDepois(`NÃO CONSEGUI MEDIR OS MOVIMENTOS
+  ${erro.message}`);
+      }
+      stdout += '\nMOVIMENTOS (curso medido em ' + medidos.movimentos.map((m) => m.posicoes.length).join(', ') + ' posições)\n'
+        + medidos.movimentos.map((m) => `  ${m.partes.join(', ')}: ${m.tipo} de ${m.de} a ${m.ate}, afunda no máximo ${m.profundidadeMaxima === 0 ? '0' : Number((m.profundidadeMaxima * 1000).toPrecision(4)) + ' mm'}`).join('\n') + '\n';
+      if (medidos.invasoes.length) {
+        const mm = (n) => String(Number((n * 1000).toPrecision(4))).replace('.', ',');
+        stderr += `
+${medidos.invasoes.length} POSIÇÃO(ÕES) DO CURSO EM QUE UMA PARTE INVADE A OUTRA`
+          + '\n' + medidos.invasoes.slice(0, 12).map((i) => `    movimento ${i.movimento}, na posição ${i.posicao}: ${i.par[0]} ↔ ${i.par[1]} afunda ${mm(i.profundidade)} mm (admite ${mm(i.limite)} mm)`).join('\n')
+          + (medidos.invasoes.length > 12 ? `
+    … e mais ${medidos.invasoes.length - 12} posição(ões)` : '')
+          + '\n  Recebi a profundidade acima e esperava no máximo o limite; encurte o curso (`ate`) ou afaste a parte que está no caminho,'
+          + '\n  ou, se o afundamento é de propósito, declare `invasaoMaxima` no movimento, com o motivo.\n';
+        falhou = true;
+      }
     }
     /* DECLARADO QUE NÃO ENCOSTA TAMBÉM REPROVA, e esta é a metade que faltava.
        A medida já apurava o par declarado sem contato, e só o exibia, com o
