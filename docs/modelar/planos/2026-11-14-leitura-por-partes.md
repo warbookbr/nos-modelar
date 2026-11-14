@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `tools/modelar/leitura-por-regioes.mjs`, `tools/modelar/leitura-por-regioes.test.mjs`, `.claude/skills/desenhar-prancha/SKILL.md`, `.claude/skills/prancha-dos-contornos/SKILL.md`, `.claude/skills/esbocar-opcoes/SKILL.md`, `docs/modelar/usar/CONFERIR-CONTRA-REFERENCIA.md`.
+**Território:** `tools/modelar/leitura-por-regioes.mjs`, `tools/modelar/leitura-por-regioes.test.mjs`, `tools/fixtures/leitura-por-partes/`, `.claude/skills/desenhar-prancha/SKILL.md`, `.claude/skills/prancha-dos-contornos/SKILL.md`, `.claude/skills/esbocar-opcoes/SKILL.md`, `docs/modelar/usar/CONFERIR-CONTRA-REFERENCIA.md`.
 
 **Responsável:** a IA da sessão do carro conduz e mede, e a pessoa julga se a leitura acha o que ela acharia.
 
@@ -77,3 +77,26 @@ Resultado por defeito, contando só o que o crítico disse na cópia e não diss
 O que a fatia mostrou além disso. O controle teve diferenças em 8 das 12 regiões (19 no total, contra 27 na cópia): o crítico acusa a prancha atual de lanterna afastada da quina, coluna entre os vidros fina, retrovisor alto e solto, para-brisa em faixa solta e janela traseira grande. Parte disso pode ser defeito real da prancha atual, e a pessoa decide; parte é a diferença entre um desenho de linhas e uma foto. Sem o controle, o defeito plantado e o ruído não se separam, e é isso que `aceitas` e a contradição entre rodadas da ferramenta tratam a partir da segunda rodada. A grade cortou a lanterna e a coluna B na divisa entre regiões, e o pedido chama o lado da prancha de "rascunho 3D", o que não serve à prancha. Os dois vão à fatia 2: o corte por partes nomeadas e o texto do pedido para `--prancha`.
 
 O processo não pegaria sozinho a imagem espelhada nem a razão de aspecto acima de 10%: a ferramenta mede a razão e não recusa nem avisa acima de um limite. A fatia 2 acrescenta o aviso e o `--espelhar`.
+
+## Andamento — fatia 2
+
+A leitura ganhou quatro opções, com cinco testes novos em `leitura-por-regioes.test.mjs` e a prancha neutra em `tools/fixtures/leitura-por-partes/`. `--partes=<partes.json>` troca a grade por uma região por parte declarada em mm, com o nome dela na folha, no pedido e no registro, e o painel de cada parte com o maior lado em 1.200 px; a rodada recusa a parte sem resposta pelo nome. `--prancha=<arquivo.prancha.mjs>` desenha a vista só com contorno, linhas e rodas, rasteriza no navegador (cerca de 30 s com a leitura inteira, no carro) e chama aquele lado de PRANCHA, com o pedido explicando ao crítico que ali há um desenho de linhas; com ela, a parte pode citar camadas da prancha (`{ "camadas": ["lanterna"] }`) e o arquivo resolvido em mm fica em `partes.json` na pasta da leitura, para ser reusado no esboço e na peça. `--espelhar` vira a referência, com a caixa dada na imagem original. A diferença de altura sobre largura acima de 10% sai como aviso.
+
+A prova repetiu a da fatia 1 com três críticos sem contexto em cada modo, sobre a mesma cópia com os cinco defeitos e as mesmas 13 partes (frente, capô, para-brisa, teto, vidros, queda, porta, ombro, rebaixo, traseira, os dois arcos e a saia). Defeitos achados por crítico, contando meio quando a diferença é dita sem a natureza do defeito:
+
+| Defeito | Grade (3 críticos) | Partes (3 críticos) |
+|---|---|---|
+| frente sem bico | 3 | 3 |
+| recortes de baixo | 3 | 1 |
+| teto recuado | 0,5 | 2,5 |
+| ombro reto | 2 | 2 |
+| lanterna longe da quina | 3, mas o controle também a acusa | 1 |
+| por crítico, sem a lanterna | 3,5 / 3 / 2,5 | 2 / 2,5 / 4 |
+
+As partes acham melhor o que é grande e ocupa a parte inteira (o teto), e a grade acha melhor o detalhe pequeno (os recortes, que na parte da frente dividem o painel com o farol e o nariz). A soma empata, e a variação de um crítico para outro (de 2 a 4 na mesma folha) é maior que a diferença entre os modos. O controle da fatia 1 acusou diferenças em 8 de 12 regiões, e o das partes em 12 de 13. A mediana das partes, 2,5 sem a lanterna, fica abaixo do mínimo de três do critério de parada, e a da grade, 3, fica no limite. O que a prova diz é que nenhum corte, sozinho, faz um crítico achar o que a pessoa achou; o que acha é a soma de críticos e de cortes: a união dos seis acha os cinco defeitos.
+
+O processo não pegaria sozinho a variação do crítico, porque a leitura pede uma resposta por rodada. A decisão sobre o rumo é da pessoa (ver "Decisão depois da fatia 2").
+
+## Decisão depois da fatia 2
+
+Pendente. Recomendação: seguir com a leitura combinada, em que a mesma rodada roda a grade e as partes, cada uma com três críticos, e a diferença conta quando aparece em pelo menos dois dos seis e não aparece na mesma região do controle (a prancha anterior). Isso cabe na ferramenta como um registro de várias respostas por rodada e na skill como o passo de despachar os críticos; o custo é de seis críticos por vista, cerca de 30 s cada, em paralelo.

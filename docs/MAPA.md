@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1954 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1955 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2836,6 +2836,10 @@
 ## tools/fixtures/lataria-de-prova/referencias/
 
 - `alvo.md` — Alvo da lataria de prova
+
+## tools/fixtures/leitura-por-partes/
+
+- `caixa.prancha.mjs` — caixa.prancha.mjs — prancha neutra para a leitura por partes: um bloco de 1000 x 400 mm visto de lado, com uma janela e um recorte embaixo, e uma roda fora d…
 
 ## tools/fixtures/nivel-zero/
 
