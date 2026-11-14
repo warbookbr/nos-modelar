@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1902 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1903 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -560,7 +560,6 @@
 
 ## docs/modelar/planos/
 
-- `2026-10-30-furgao-realista.md` — Furgão realista — uma cópia do furgão do acervo levada a proporções e lataria de veículo real pelo fluxo de modelagem inteiro
 - `2026-11-08-ferramenta-de-material.md` — Ferramenta de material para o agente: ver, compor e reaproveitar materiais sem rodar a peça inteira
 - `2026-11-10-rebaixo-por-contorno.md` — Rebaixo por contorno: o degrau, o sulco e a borda rebaixada num corpo
 - `2026-11-13-revisao-das-verificacoes-e-dos-testes.md` — Revisão das verificações e dos testes: o que cada um pega, medido
@@ -2544,6 +2543,11 @@
 
 - `receita.js` — materiais-de-prova/receita.js — a peça de prova dos materiais realistas (plano 2026-11-08-materiais-realistas).
 - `receita.test.mjs` — receita.test.mjs — a peça de prova dos materiais declara os seis materiais do plano, passa pelo normalizador e abre na bancada.
+
+## tools/fixtures/acervo/materiais-do-furgao-opcoes/
+
+- `receita.js` — materiais-do-furgao-opcoes/receita.js — peça de prova das opções de material dos grupos do furgão ainda em cor chapada (plano de materiais realistas, etapa d…
+- `receita.test.mjs` — receita.test.mjs — a peça de prova das opções de material do furgão passa pelo normalizador, entrega as partes de cada grupo e opção e abre na bancada como e…
 
 ## tools/fixtures/acervo/peca-de-prova/
 

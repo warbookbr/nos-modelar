@@ -1,6 +1,6 @@
 # Furgão realista: atritos
 
-Cada atrito do plano do [furgão realista](../../planos/2026-10-30-furgao-realista.md), com o comando que o reproduz e o destino dado. A classificação final (corrigido no plano, gate ou instrução nova, ou devolvido ao backlog) é da fatia de fechamento.
+Cada atrito do plano do [furgão realista](../../decisoes/PLANOS-ENCERRADOS.md), com o comando que o reproduz e o destino dado. A classificação final (corrigido no plano, gate ou instrução nova, ou devolvido ao backlog) é da fatia de fechamento.
 
 ## 1. A cópia levou a tabela de medidas da fonte
 
