@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/nucleo/planejador/`, `procedural/nucleo/memoria-de-execucao.js`, a opção `planejar` em `src/autoria/executar-receita.js`, os manifestos de `procedural/nucleo/operacoes/` onde o planejador exigir a declaração de leitura e escrita, e a ligação no `descrever` e na bancada.
+**Território:** `procedural/nucleo/planejador/`, `procedural/nucleo/memoria-de-execucao.js`, a opção `planejar` em `src/autoria/executar-receita.js`, o rastreio de escrita das operações em `procedural/nucleo/nucleo.js` (`ESCRITA_DAS_OPERACOES`), os manifestos de `procedural/nucleo/operacoes/` onde o planejador exigir a declaração de leitura e escrita, e a ligação no `descrever` e na bancada.
 
 **Responsável:** a IA da sessão do furgão. A pessoa pediu a ativação em 2026-11-14; o plano do núcleo para quem escreve receita já fechou, então o território está livre.
 
@@ -118,6 +118,10 @@ que a bancada e o `descrever` ligam por escolha), com quatro partes:
 ## Decisão na ativação
 
 A pessoa exige malha idêntica antes e depois. Por isso o gate 1 vale sem tolerância: o agrupamento de subtrações só fica ligado nos casos em que a malha sai bit a bit igual, com a mesma identidade de face e as mesmas partes, e nos outros fica desligado. Nenhuma tolerância se declara neste plano sem nova decisão da pessoa. A fatia 1 roda em processo novo, uma peça por vez, sem outra carga pesada na máquina, e mede de novo a linha de base aqui (Linux), porque a tabela acima é de outra máquina.
+
+## Redirecionamento depois da fatia 1 (decisão da pessoa, 2026-11-14)
+
+A fatia 1 acionou o critério de parada: o agrupamento de subtrações alcança no máximo 2,2% do tempo do furgão, e 48% do tempo está em `rotaciona`, `transladar`, `arranja` e `limparLascas`. A pessoa aprovou trocar o rumo. A fatia 2 deixa de ser o agrupamento, que sai do plano, e passa a ser: medir primeiro se essas operações fazem o núcleo refazer o rastreio da malha inteira (execução com `retrato: 'completo'` contra a rápida); se a hipótese se confirmar, declarar a escrita delas em `ESCRITA_DAS_OPERACOES`, com a malha idêntica bit a bit provada pelo modo `conferido` no acervo inteiro, e a meta de levar a execução do furgão de 118 s para menos de 85 s, mediana de três. Se a hipótese não se confirmar, o plano para de novo com o número. O cache por passo (fatia 3) segue para depois, e o paralelismo (fatia 4) continua adiado.
 
 ## Fatias
 

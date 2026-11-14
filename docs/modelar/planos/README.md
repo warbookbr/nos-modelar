@@ -4,7 +4,7 @@
 
 **Planos ativos:**
 
-1. [planejador de execução da receita](2026-11-14-planejador-de-execucao.md). Território: `procedural/nucleo/planejador/`, `procedural/nucleo/memoria-de-execucao.js`, a opção `planejar` em `src/autoria/executar-receita.js`. Em aberto: tudo, a começar pela fatia 1 (medir sem mudar nada).
+1. [planejador de execução da receita](2026-11-14-planejador-de-execucao.md). Território: `procedural/nucleo/planejador/`, `procedural/nucleo/memoria-de-execucao.js`, o rastreio de escrita em `procedural/nucleo/nucleo.js`, a opção `planejar` em `src/autoria/executar-receita.js`. Em aberto: tudo, a começar pela fatia 1 (medir sem mudar nada).
 2. [revisão das verificações e dos testes](2026-11-13-revisao-das-verificacoes-e-dos-testes.md). Território: `docs/modelar/banco-de-provas/revisao-das-verificacoes-2026-11-13/`. Em aberto: tudo.
 
 A lista está em ordem de prioridade. A ordem desempata quando dois planos precisam do mesmo arquivo: o de menor prioridade espera ou pede à pessoa que mude o território.
