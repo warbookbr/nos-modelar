@@ -38,8 +38,10 @@ export const CAMPOS_PLANO = Object.freeze([
    crítico lê as `perguntas` por componente. `lataria` diz se a peça é de chapa de superfície livre e quais partes são a chapa, ou a
    dispensa com o motivo (`lataria.js`): o pacote do crítico de peça de lataria leva a luz rasante e a curvatura da lataria. Plano sem
    eles produz a mesma forma canônica de antes. `dobrasAceitas` lista a dobra, o vinco e o chanfro que a peça aceita de propósito, com o motivo
-   (`dobras-aceitas.js`): as réguas de superfície não os contam e os listam como aceitos. */
-export const CAMPOS_OPCIONAIS_DO_PLANO = Object.freeze(['familia', 'familiaProcedural', 'lataria', 'dobrasAceitas']);
+   (`dobras-aceitas.js`): as réguas de superfície não os contam e os listam como aceitos. `espessuraMinima: { mm, partes? }` declara a parede mais fina que a
+   peça aceita, em milímetro, para todas as partes ou só para as listadas: sem ele o `descrever` mostra a espessura por parte só como informação, e com ele
+   avisa a parte que passa abaixo. */
+export const CAMPOS_OPCIONAIS_DO_PLANO = Object.freeze(['familia', 'familiaProcedural', 'lataria', 'dobrasAceitas', 'espessuraMinima']);
 export const CAMPOS_ESCALA = Object.freeze(['medida', 'milimetros']);
 export const CAMPOS_PARTE = Object.freeze(['nome', 'forma', 'tecnica']);
 /* `dePerto` da parte: onde o pedido ao crítico mostra a feição pequena que o plano promete (raio de 6 mm, rebaixo, friso), numa vista
@@ -148,6 +150,25 @@ function umaParte(valor, quem, campo) {
   };
 }
 
+const LIMITE_DA_ESPESSURA_MM = 1000;
+function normalizarEspessuraMinima(valor, nomes, quem) {
+  const campo = 'espessuraMinima';
+  if (!valor || typeof valor !== 'object' || Array.isArray(valor)) falhar(quem, `'${campo}' precisa ser objeto { mm, partes? }.`);
+  chavesExatas(valor, ['mm'], quem, campo, ['partes']);
+  if (typeof valor.mm !== 'number' || !Number.isFinite(valor.mm) || valor.mm <= 0 || valor.mm > LIMITE_DA_ESPESSURA_MM) {
+    falhar(quem, `'${campo}.mm' precisa ser número em milímetros maior que zero e até ${LIMITE_DA_ESPESSURA_MM}; veio ${JSON.stringify(valor.mm)}.`);
+  }
+  const saida = { mm: valor.mm };
+  if (valor.partes !== undefined) {
+    if (!Array.isArray(valor.partes) || valor.partes.length === 0) falhar(quem, `'${campo}.partes' precisa ser lista não vazia de nomes de 'partes' do plano.`);
+    const ruim = valor.partes.find((n) => typeof n !== 'string' || !nomes.includes(n));
+    if (ruim !== undefined) falhar(quem, `'${campo}.partes' cita ${JSON.stringify(ruim)}, que não está em 'partes' do plano (${nomes.join(', ')}).`);
+    if (new Set(valor.partes).size !== valor.partes.length) falhar(quem, `'${campo}.partes' não pode repetir parte.`);
+    saida.partes = [...valor.partes].sort(compararTexto);
+  }
+  return saida;
+}
+
 /**
  * Valida e canonicaliza o plano de modelagem de uma receita.
  * `undefined` e `null` significam plano ausente e retornam `null`; quem exige
@@ -192,6 +213,7 @@ export function normalizarPlanoDeModelagem(valor, { quem = 'PLANO' } = {}) {
     ...(valor.familiaProcedural === undefined ? {} : { familiaProcedural: valor.familiaProcedural }),
     ...(valor.lataria === undefined ? {} : { lataria: normalizarLataria(valor.lataria, nomes, { quem }) }),
     ...(valor.dobrasAceitas === undefined ? {} : { dobrasAceitas: normalizarDobrasAceitas(valor.dobrasAceitas, nomes, { quem }) }),
+    ...(valor.espessuraMinima === undefined ? {} : { espessuraMinima: normalizarEspessuraMinima(valor.espessuraMinima, nomes, quem) }),
   };
 }
 

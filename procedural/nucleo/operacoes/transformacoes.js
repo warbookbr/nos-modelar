@@ -151,7 +151,7 @@ export function criarOperacoesTransformacoes(servicos) {
   rotaciona(st, a, i) {
     const eixo = a.eixo;
     const ax = indiceDeAxi(eixo);
-    if (ax < 0) return grita(st, i, 'rotaciona', eixo, `eixo '${eixo}' desconhecido (só 'x'/'y'/'z')`);
+    if (ax < 0) return grita(st, i, 'rotaciona', eixo ?? 'eixo', eixo === undefined || eixo === null ? "falta o argumento 'eixo' ('x', 'y' ou 'z')" : `eixo '${eixo}' desconhecido (só 'x'/'y'/'z')`);
     const graus = st.num(a.graus ?? 0);
 
     // seleção -> conjunto de ids de vértice afetados (AUSENTE = malha inteira) — resolverAlvosV, P8
@@ -231,7 +231,7 @@ export function criarOperacoesTransformacoes(servicos) {
   espelha(st, a, i) {
     const eixo = a.eixo;
     const ax = indiceDeAxi(eixo);
-    if (ax < 0) return grita(st, i, 'espelha', eixo, `eixo '${eixo}' desconhecido (só 'x'/'y'/'z')`);
+    if (ax < 0) return grita(st, i, 'espelha', eixo ?? 'eixo', eixo === undefined || eixo === null ? "falta o argumento 'eixo' ('x', 'y' ou 'z'), o eixo da normal do plano do espelho" : `eixo '${eixo}' desconhecido (só 'x'/'y'/'z')`);
     const pos = st.num(a.pos ?? 0);
     const estrutural = a.origemId != null || a.derivaDe != null;
     let derivaDe = null;

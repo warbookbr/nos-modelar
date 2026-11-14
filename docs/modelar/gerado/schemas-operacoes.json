@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:b53e7767622505e74488d005889b8b782becfe1bdfb2a82ab924cf18127841aa",
+  "assinatura": "sha256:6673ac26fb8b53d840f0c0bc2c8b8867946ced9adff3c4145afa9e885c15212c",
   "total": 42,
   "operacoes": [
     {
@@ -1477,7 +1477,7 @@
                   "type": "array"
                 }
               ],
-              "description": "Profundidade em z."
+              "description": "Profundidade em z. Negativa espelha o cubo em z (as faces ficam para dentro); zero é recusado."
             },
             "em": {
               "anyOf": [
@@ -3022,7 +3022,21 @@
             },
             "perfil": {
               "type": "array",
-              "description": "Ao menos dois pontos [raio,y] ou [raio,y,concordancia]. Com furos ou deslocar, o contorno externo da seção."
+              "description": "Ao menos dois pontos [raio,y] ou [raio,y,concordancia]. Com furos ou deslocar, o contorno externo da seção. Com espessura, a parede de fora."
+            },
+            "espessura": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "Casca de revolução: o perfil é a parede de FORA (polilinha aberta) e a operação gera a de dentro, deslocada por esta espessura para o lado do volume que o perfil e o eixo fecham, com o sentido decidido por ela. Maior que zero; não vale com furos, deslocar nem superficie."
             },
             "lados": {
               "anyOf": [
@@ -4012,6 +4026,11 @@
             "substituir": {
               "type": "boolean",
               "description": "Literal true permite reatribuição intencional."
+            },
+            "material": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Material declarado em MATERIAIS, aplicado às mesmas faces; equivale a um passo material com a mesma seleção."
             }
           }
         },
@@ -5123,7 +5142,7 @@
       }
     }
   ],
-  "assinaturaComExtensoes": "sha256:00913d0c0e9eb4adfa34bf60fba87275457e50957c5dd90026bc41ac421d085d",
+  "assinaturaComExtensoes": "sha256:8d16851b25da7e0729a67dc173c831da02367ba64db45d4ec272098423735d2f",
   "totalExtensoes": 5,
   "extensoes": [
     {

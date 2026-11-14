@@ -6,6 +6,7 @@
 > algum arquivo-fonte estiver sem cabeçalho.
 
 1892 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1886 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -357,6 +358,10 @@
 
 - `README.md` — Navegação de receitas, 2026-11-05
 - `hash-da-malha.mjs` — hash-da-malha.mjs — o hash da malha canônica de uma receita, para provar que a divisão em arquivos não muda nada.
+
+## docs/modelar/banco-de-provas/nucleo-para-receita-2026-11-14/
+
+- `prova-memoria-do-sedan.mjs` — prova-memoria-do-sedan.mjs — a memória de execução na carroceria do sedã: o tempo e o neutro bit a bit. Uso, da raiz do repositório (cada modo leva de 3 a 4 …
 
 ## docs/modelar/banco-de-provas/organizacao-dos-documentos-2026-11-13/
 
@@ -1006,6 +1011,8 @@
 - `loft-aresta.test.js` — loft-aresta.test.js — a ponta do loft fecha numa linha, com malha fechada e sem leque nem triângulo dobrado.
 - `manifold.js` — manifold.js — o ÚNICO ponto onde o núcleo toca a biblioteca Manifold (`manifold-3d`, WebAssembly). As booleanas (`unir`, `subtrair`, `intersectar`) ENVOLVEM …
 - `medidas-com-peso.test.mjs` — medidas-com-peso.test.mjs — a medida com peso da subdivisão (fatia 11 do plano de carroceria por subdivisão).
+- `memoria-de-execucao.js` — memoria-de-execucao.js — guarda o estado do núcleo depois de certos passos, para a receita que muda só um passo adiante não refazer os que vêm antes.
+- `memoria-de-execucao.test.mjs` — memoria-de-execucao.test.mjs — a memória de execução nunca muda o resultado: o neutro com memória é igual, bit a bit, ao sem memória.
 - `memoria-de-pura.js` — memoria-de-pura.js — guarda o resultado das últimas chamadas de uma função pura, para a mesma chamada não ser refeita.
 - `memoria-de-pura.test.mjs` — memoria-de-pura.test.mjs — a memória das últimas chamadas de uma função pura devolve o que a função devolveria, sem refazer a conta.
 - `molde-de-dentro.js` — molde-de-dentro.js — o volume que fica por dentro de uma chapa, a `folga` da pele de dentro dela: o molde com que `aparar` corta um sólido.
@@ -1050,6 +1057,11 @@
 - `triangulacao-colinear.test.mjs` — triangulacao-colinear.test.mjs — face com canto colinear não sai em triângulo de área nula. O polígono com um canto no meio de uma aresta é válido (a boolean…
 - `triangulacao-face.js` — triangulacao-face.js — triangulação dos triângulos de UMA face plana. O leque a partir do canto 0 põe dezenas de triângulos longos e finos num único vértice …
 - `uso-operacoes.js` — uso-operacoes.js — contratos Agent-First executáveis das operações nativas. A tabela descreve como chamar a capacidade; o executor continua decidindo a geome…
+
+## procedural/nucleo/auxiliares/
+
+- `auxiliares.test.mjs` — auxiliares.test.mjs — cada auxiliar dá o mesmo número, bit a bit, que a cópia que as receitas fazem hoje.
+- `index.js` — auxiliares — as contas que quase toda receita reescreve: milímetro para metro, área com sinal, sentido anti-horário e espelho de meia seção. Medido em 2026-1…
 
 ## procedural/nucleo/fixtures/
 
@@ -1123,6 +1135,7 @@
 - `limpar-lascas.js` — limpar-lascas.js (operação) — `limparLascas`: tira de uma seleção as faces finas que uma booleana deixou, sem criar vértice nem face e sem mover a superfície…
 - `loft-fechado.test.ts` — loft-fechado.test.ts — caminho que volta em si e fecha de verdade.
 - `nome-de-copia.test.ts` — nome-de-copia.test.ts — endereço de autor para as cópias do `arranja`.
+- `parte-com-material.test.mjs` — parte-com-material.test.mjs — `parte` aceita `material` no mesmo passo, e a peça sai bit a bit igual à dos dois passos.
 - `perfis.js` — perfis.js — `extrusao`: um perfil 2D com furos e deslocamento de contorno vira um sólido prismático.
 - `ponto-repetido.test.ts` — ponto-repetido.test.ts — a recusa do contorno que não é polígono simples diz qual ponto se repete ou quais arestas se cruzam.
 - `primitivas-basicas.js` — primitivas-basicas.js — geradores fundamentais registrados pelo núcleo, sem estado global.
@@ -2144,6 +2157,7 @@
 - `dobras-aceitas.test.js` — dobras-aceitas.test.js — `PLANO.dobrasAceitas`: o normalizador recusa o que o campo não admite, o plano sem o campo mantém a forma canônica de antes, e a ace…
 - `encosto-da-peca.test.mjs` — encosto-da-peca.test.mjs — uma tolerância de "encosta" só para a peça, e a distância do par declarado que não acontece (atrito 5 do RECEITA.md do sedã).
 - `etapas-de-construcao.js` — etapas-de-construcao.js — o registro de cada etapa de uma montagem v5: a parte que entrou, as juntas que passaram a existir com ela e o resultado da medida d…
+- `executar-receita-barras.test.mjs` — executar-receita-barras.test.mjs — a estruturaDeBarras na receita de peça: o tubo entre dois pontos, com as pontas fechadas pela operação.
 - `executar-receita.js` — executar-receita.js — fronteira pura para executar uma receita já carregada.
 - `familia-esboco.js` — familia-esboco.js — a conferência entre a família e o componente do esboço de mesmo nome (núcleo, sem disco).
 - `familia-esboco.test.js` — familia-esboco.test.js — a parte pura da conferência da família com o esboço: a dispensa, os três pontos, o esboço mínimo, o mapa de parâmetros e os achados …
@@ -2865,6 +2879,8 @@
 
 ## tools/gates/
 
+- `argumentos-essenciais.mjs` — argumentos-essenciais.mjs — confere que toda operação do núcleo diz quais argumentos são essenciais, e que a recusa existe.
+- `argumentos-essenciais.test.mjs` — argumentos-essenciais.test.mjs — o gate dos essenciais e a recusa na hora: cada receita mínima errada do inventário de erros (docs/modelar/banco-de-provas/re…
 - `guarda-local.mjs` — guarda-local.mjs — a guarda do acervo, só das peças que o envio mudou, dentro da bateria local.
 - `guarda-local.test.mjs` — guarda-local.test.mjs — a bateria local roda a guarda do acervo só das peças que o envio mudou.
 - `leituras-do-teste.mjs` — leituras-do-teste.mjs — setupFile do vitest: abre o registro do arquivo de teste deste processo e liga a anotação de tools/gates/leituras.mjs. Só entra na co…
@@ -3349,6 +3365,8 @@
 - `costura-em-oito.test.mjs` — costura-em-oito.test.mjs — a costura de dois tubos tangentes é um oito, com um nó de grau 4 em cada ponto de tangência (o elo do punho 5). O construtor de li…
 - `costura-registrada.mjs` — costura-registrada.mjs — régua: a costura que o `unir` registra (`arestas` do registro de origem) contra a costura geométrica da malha que ele entregou (plan…
 - `costura-registrada.test.mjs` — costura-registrada.test.mjs — a costura que o `unir` registra tem de ser a costura geométrica da malha que ele entrega (plano "costuras e furos limpos"). Ant…
+- `espessura-de-parede.mjs` — espessura-de-parede.mjs — régua de malha: a menor espessura de parede de cada parte (plano "núcleo para quem escreve receita", fatia 6).
+- `espessura-de-parede.test.mjs` — espessura-de-parede.test.mjs — a casca de revolução (`lathe` com `espessura`) e a régua de espessura de parede: o copo de prova sai fechado, com a espessura …
 - `face-degenerada.mjs` — face-degenerada.mjs — régua de malha: a face de três ou mais cantos que não define plano (plano "costuras e furos limpos", fatia 1).
 - `face-degenerada.test.mjs` — face-degenerada.test.mjs — a régua acha tudo o que o `adaptarThree` recusa como "é degenerada" e o que a auditoria de interseções acha sem área (piso relativ…
 - `face-torcida.mjs` — face-torcida.mjs — régua de malha: a face que se cruza e o triângulo virado (plano "costuras e furos limpos", refeitura do `furo` em anéis).

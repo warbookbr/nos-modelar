@@ -12,7 +12,7 @@
 
 const NAO_SERIALIZAVEL = Symbol('nao-serializavel');
 
-function chaveExata(argumentos) {
+export function chaveExata(argumentos) {
   try {
     return JSON.stringify(argumentos, function substituir(chave, valor) {
       if (valor === undefined) return '\u0000u';

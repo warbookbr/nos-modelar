@@ -6,10 +6,24 @@
  * explícitos e não transforma o catálogo em contrato de execução.
  */
 import {
+  REGISTRO_OPERACOES,
+  criarRegistroComExtensoes,
   expandirChamadasDeComposicao,
   nucleo,
 } from '../../procedural/nucleo/entrada.js';
+import { confiarNaMemoriaDoRegistro } from '../../procedural/nucleo/memoria-de-execucao.js';
+import { MANIFESTO as MANIFESTO_BARRAS } from '../../procedural/extensoes/estrutura-de-barras/manifesto.js';
+import { implementar as implementarBarras } from '../../procedural/extensoes/estrutura-de-barras/implementacao.js';
 import { normalizarIntencaoPeca } from './intencao-peca.js';
+
+/* O registro de operações da receita de peça: as operações do núcleo e a `estruturaDeBarras`, o tubo entre dois pontos. A estrutura de
+   barras só carregava no registro com extensões das famílias, e a receita comum montava cada tubo como um loft de duas seções com o polo
+   escrito à mão. A operação fecha as pontas do tubo por conta própria. Quem passa `registroOperacoes` escolhe o seu. */
+export const REGISTRO_DA_RECEITA = criarRegistroComExtensoes({
+  registroBase: REGISTRO_OPERACOES,
+  extensoes: [Object.freeze({ manifesto: MANIFESTO_BARRAS, implementacao: implementarBarras })],
+});
+confiarNaMemoriaDoRegistro(REGISTRO_DA_RECEITA);
 
 export function validarReceita(modulo) {
   if (!modulo || typeof modulo !== 'object' || Array.isArray(modulo)) {
@@ -77,9 +91,11 @@ export function entradaDaReceita(modulo, opcoes = {}) {
 
 export function executarReceita(modulo, opcoes = {}) {
   const { entrada, expansao } = prepararReceita(modulo, opcoes);
-  const opcoesDoNucleo = opcoes.registroOperacoes
-    ? { registroOperacoes: opcoes.registroOperacoes }
-    : undefined;
+  /* `memoria`, de `criarMemoriaDeExecucao`, faz a receita cujo prefixo de passos não mudou recomeçar do estado guardado. */
+  const opcoesDoNucleo = {
+    registroOperacoes: opcoes.registroOperacoes ?? REGISTRO_DA_RECEITA,
+    ...(opcoes.memoria ? { memoria: opcoes.memoria } : {}),
+  };
   const neutro = nucleo(
     entrada.PASSOS,
     entrada.PARAMS,
