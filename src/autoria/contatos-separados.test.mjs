@@ -101,3 +101,16 @@ describe('contatosDaPeca: separados medidos pela malha', () => {
     expect(r.naoDeclarados).toHaveLength(1);
   });
 });
+
+describe('separados: aresta contra aresta', () => {
+  it('duas barras cruzadas, sem vértice próximo, reprovam abaixo da folga', () => {
+    /* barra fina em x e barra fina em z, uma 2 mm acima da outra no cruzamento: os vértices ficam a mais de 2 cm uma da outra, só as arestas se aproximam */
+    const barra = (id, nome, lado, em) => cubo(id, nome, lado, em);
+    const neutro = neutroDe([barra(1, 'a', [100, 1, 1], [-50, 0, 0]), barra(2, 'b', [1, 1, 100], [-50, 3, 0])]);
+    const r = contatosDaPeca(neutro, sep(5));
+    expect(r.separadosReprovados).toHaveLength(1);
+    expect(r.separadosReprovados[0].estado).toBe('folga-curta');
+    expect(r.separadosReprovados[0].distancia).toBeCloseTo(2, 6);
+    expect(contatosDaPeca(neutro, sep(1.5)).separadosReprovados).toEqual([]);
+  });
+});
