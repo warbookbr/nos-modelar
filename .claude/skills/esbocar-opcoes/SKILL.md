@@ -60,12 +60,9 @@ diferença em disputa, que a câmera é a mesma (a ferramenta imprime onde a cai
 comum caiu em cada captura) e que nada foi cortado pelo quadro. Quando a
 escolha é de medida, meça a malha (`--so-montar` dá a caixa; `npm run descrever`
 dá o resto) em vez de confiar na imagem.
-Rascunho que segue imagem de referência: antes de mostrar, rode
-`npm run conferir:vistas` e leve cada `pedido.md` a um crítico.
-Quando a peça já tem prancha com `partes.json`, a leitura combinada de
-[`CONFERIR-CONTRA-REFERENCIA.md`](../../../docs/modelar/usar/CONFERIR-CONTRA-REFERENCIA.md)
-vale também para o rascunho, com `--modelo` e as mesmas partes, para que a
-prancha e o esboço sejam lidos no mesmo quadro.
+Rascunho que segue referência: antes de mostrar, rode `npm run conferir:vistas`
+(com prancha, a leitura combinada com
+`--modelo`) e leve cada `pedido.md` a um crítico.
 
 ## Como mostrar
 
