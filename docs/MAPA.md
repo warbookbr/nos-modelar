@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1870 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1872 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2812,6 +2812,8 @@
 
 ## tools/gates/
 
+- `argumentos-essenciais.mjs` — argumentos-essenciais.mjs — confere que toda operação do núcleo diz quais argumentos são essenciais, e que a recusa existe.
+- `argumentos-essenciais.test.mjs` — argumentos-essenciais.test.mjs — o gate dos essenciais e a recusa na hora: cada receita mínima errada do inventário de erros (docs/modelar/banco-de-provas/re…
 - `guarda-local.mjs` — guarda-local.mjs — a guarda do acervo, só das peças que o envio mudou, dentro da bateria local.
 - `guarda-local.test.mjs` — guarda-local.test.mjs — a bateria local roda a guarda do acervo só das peças que o envio mudou.
 - `leituras-do-teste.mjs` — leituras-do-teste.mjs — setupFile do vitest: abre o registro do arquivo de teste deste processo e liga a anotação de tools/gates/leituras.mjs. Só entra na co…

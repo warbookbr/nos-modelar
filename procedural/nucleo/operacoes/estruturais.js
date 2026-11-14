@@ -167,6 +167,7 @@ export function criarOperacoesEstruturais(servicos) {
 
   arranja(st, a, i) {
     const modo = a.modo;
+    if (modo === undefined || modo === null) return grita(st, i, 'arranja', 'modo', "falta o argumento 'modo' ('radial' ou 'linear')");
     if (modo !== 'radial' && modo !== 'linear') return grita(st, i, 'arranja', modo, `modo '${modo}' desconhecido (só 'radial' e 'linear')`);
 
     const total = st.num(a.total ?? 0);

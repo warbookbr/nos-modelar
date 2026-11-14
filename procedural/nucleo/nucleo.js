@@ -10,7 +10,7 @@
    renumera e os passos pendurados viram órfãos que GRITAM, nunca corrompem.
    O modo explícito `lados:{desvio}` põe o raio na derivação da contagem: nele,
    mudar raio PODE renumerar, por contrato, para conservar a tolerância. */
-import { criarResolverNumerico } from './expressoes.js';
+import { criarResolverNumerico, distanciaDeEdicao, ErroDeResolucao, nomesProximos } from './expressoes.js';
 import { TIPO_MALHA_POLIGONAL, artefatoDaMalha, criarEstadoDeProcedencia, procedenciaCanonica, registrarProcedencia } from './artefatos.js';
 import { criarRegistroOperacoes } from './registro.js';
 import { usoDaOperacao } from './uso-operacoes.js';
@@ -466,21 +466,6 @@ function addF(st, id, vs) {
 }
 function grita(st, i, op, ref, motivo) { st.orfaos.push({ passo: i, op, ref, motivo }); }
 
-/** Distância de edição, só para sugerir o nome certo num typo de argumento. */
-function distanciaDeEdicao(a, b) {
-  const linha = Array.from({ length: b.length + 1 }, (_, j) => j);
-  for (let i = 1; i <= a.length; i++) {
-    let diagonal = linha[0];
-    linha[0] = i;
-    for (let j = 1; j <= b.length; j++) {
-      const anterior = linha[j];
-      linha[j] = Math.min(linha[j] + 1, linha[j - 1] + 1, diagonal + (a[i - 1] === b[j - 1] ? 0 : 1));
-      diagonal = anterior;
-    }
-  }
-  return linha[b.length];
-}
-
 /**
  * Argumento fora do contrato da operação GRITA, e o passo não roda.
  *
@@ -527,6 +512,38 @@ function argumentoDesconhecido(st, i, op, args, registrada = null) {
   }
   return gritou;
 }
+/** O caminho (`raio`, `secoes[1].raio`) do primeiro valor de `args` que satisfaz `serve`, ou null. */
+function caminhoDoArgumento(args, serve, caminho = '') {
+  if (serve(args)) return caminho || null;
+  if (Array.isArray(args)) {
+    for (let k = 0; k < args.length; k++) { const achado = caminhoDoArgumento(args[k], serve, `${caminho}[${k}]`); if (achado) return achado; }
+  } else if (args && typeof args === 'object') {
+    for (const [k, v] of Object.entries(args)) { const achado = caminhoDoArgumento(v, serve, caminho ? `${caminho}.${k}` : k); if (achado) return achado; }
+  }
+  return null;
+}
+
+/**
+ * Roda `corpo` e, se o resolvedor numérico lançar, relança o erro com o passo, a operação e a chave do argumento que o
+ * causou. O resolvedor não sabe de passo: `oficina: parâmetro 'x' não existe em PARAMS/TOPO` deixava quem escreve a receita
+ * procurando o texto por todos os passos. A mensagem original continua dentro da nova.
+ */
+function comPassoNoErro(i, op, args, corpo) {
+  try { return corpo(); } catch (erro) {
+    if (!(erro instanceof ErroDeResolucao)) throw erro;
+    const cita = (v) => (typeof v === 'string' && (erro.tipo === 'nome' ? new RegExp(`(^|[^A-Za-z0-9_])${erro.nome}([^A-Za-z0-9_]|$)`).test(v) : false));
+    let chave = null;
+    if (erro.tipo === 'nome') chave = caminhoDoArgumento(args, cita);
+    else if (erro.tipo === 'valor' && erro.valor !== undefined) chave = caminhoDoArgumento(args, (v) => Object.is(v, erro.valor));
+    else if (erro.tipo === 'valor' && args && typeof args === 'object') chave = Object.keys(args).find((k) => args[k] === undefined) ?? null;
+    const onde = `passo ${i} (${op})${chave ? `, argumento '${chave}'` : ''}`;
+    const ausente = erro.tipo === 'valor' && erro.valor === undefined && !chave ? `; um argumento numérico de '${op}' ficou sem valor, confira a ortografia das chaves e se nenhuma falta` : '';
+    const novo = new Error(`${erro.message.replace(/^oficina: /, `oficina: ${onde}: `)}${ausente}`, { cause: erro });
+    Object.assign(novo, { passo: i, op, chave });
+    throw novo;
+  }
+}
+
 /* Contexto da extensão nativa. Toda extensão escreve só no que emite (vértices e faces locais do bloco do passo,
    publicados juntos no fim). A extensão cujo manifesto declara malha em `artefatos.entra` recebe também a LEITURA de um
    sólido: `selecionar` copia vértices e faces de uma seleção (a mesma gramática de `sel` das operações do núcleo, nunca
@@ -3653,7 +3670,13 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
     const registro = OPCOES.registroOperacoes ?? REGISTRO_OPERACOES;
     if (!registro || typeof registro.resolver !== 'function') throw new Error('oficina: registro de operações inválido');
     const registrada = registro.resolver(op);
-    if (!registrada) { grita(st, i, op, null, `operação desconhecida '${op}'`); return; }
+    if (!registrada) {
+      const nomes = registro.listar().map((o) => o.nome);
+      const proximos = nomesProximos(String(op), nomes);
+      const dica = proximos.length ? ` Você quis dizer ${proximos.map((n) => `'${n}'`).join(' ou ')}?` : '';
+      grita(st, i, op, null, `operação desconhecida '${op}'.${dica} O registro tem: ${nomes.join(', ')}`);
+      return;
+    }
     if (argumentoDesconhecido(st, i, op, args, registrada)) return;
     const fn = registrada.executar;
     /* POSE DE CRIAÇÃO (A-4/O-7): `em` e `eixo` são lidos AQUI, no despacho, e
@@ -3668,7 +3691,7 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
     let antesF = retrato?.F ?? retratarEntradas(st.F, null);
     retrato = null;
     const antesPortas = new Set(st.portas.keys()), antesPartes = new Set(Object.keys(st.partes));
-    const pose = lerPoseDeCriacao(st, i, op, args);
+    const pose = comPassoNoErro(i, op, args, () => lerPoseDeCriacao(st, i, op, args));
     if (pose === undefined) return;          // inválida: já gritou, nada construído
     const antes = pose ? new Set(st.V.keys()) : null;
     const escrita = modoRetrato === 'completo' || registrada.executar !== OPS[registrada.nome] ? undefined : ESCRITA_DAS_OPERACOES[registrada.nome];
@@ -3676,7 +3699,7 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
     st.novosV = escrita?.V === 'acrescenta' ? [] : null;
     st.novosF = escrita?.F === 'acrescenta' ? [] : null;
     if (fn.nativaModelar) { try { const contexto = contextoNativo(st, i, { leitura: (registrada.artefatos?.entra ?? []).length > 0, op: registrada.nome }); fn(contexto, args); contexto.publicar(); } catch (erro) { grita(st, i, op, null, `extensão nativa recusou: ${erro.message}`); return; } }
-    else fn(st, args, i);
+    else comPassoNoErro(i, op, args, () => fn(st, args, i));
     if (pose) aplicarPoseDeCriacao(st, antes, pose);
     const { alvosF, novosV, novosF } = st;
     st.alvosF = st.novosV = st.novosF = null;

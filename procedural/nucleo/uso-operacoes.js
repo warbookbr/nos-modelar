@@ -94,6 +94,27 @@ export function criarContratoUsoOperacao(nome, {
   });
 }
 
+/* Confere os argumentos de um passo contra os essenciais do contrato. Devolve a lista de recusas `{ campo, motivo }`, cada uma
+   com o passo, o valor e o limite; `resolver` resolve o número do jeito do núcleo (nome de PARAMS, expressão) e pode lançar. */
+export function recusasDeEssenciais(nome, args, contrato, resolver, passo = null) {
+  const onde = passo === null ? `'${nome}'` : `passo ${passo} ('${nome}')`;
+  const presente = (campo) => args[campo] !== undefined && args[campo] !== null;
+  const recusas = [];
+  for (const entrada of contrato?.essenciais ?? []) {
+    if (entrada.some(presente)) continue;
+    const campo = entrada[0];
+    const quais = entrada.length > 1 ? `um destes: ${entrada.map((c) => `'${c}'`).join(', ')}` : `'${campo}'`;
+    recusas.push({ campo, motivo: `${onde}: falta o argumento essencial ${quais}; sem ele a forma não existe, e a operação não assume um padrão` });
+  }
+  for (const campo of contrato?.positivos ?? []) {
+    if (!presente(campo)) continue;
+    let valor;
+    try { valor = resolver(args[campo]); } catch { continue; } /* o resolvedor recusa com a própria mensagem, adiante */
+    if (!(valor > 0)) recusas.push({ campo, motivo: `${onde}: '${campo}' vale ${JSON.stringify(args[campo])}${typeof args[campo] === 'number' ? '' : ` (= ${valor})`}, e precisa ser maior que 0` });
+  }
+  return recusas;
+}
+
 const idLegado = ['id', 'idLegado', 'Base de IDs do passo para compatibilidade; prefira origemId.'];
 const origemId = ['origemId', 'origemId', 'Identidade estrutural publicada pela operação.'];
 const em = ['em', 'vetor3', 'Translação aplicada somente ao que este gerador criou.'];
@@ -326,6 +347,57 @@ const definicoes = {
       'gaiolaVarrida (procedural/nucleo/gaiola-varrida.js) monta a gaiola de uma seção [u, v], em mm, varrida ao longo de um trilho de segmentos de reta e arco (ou polilinha): as estações são cortes por distância, por fração, por altura ou por cilindro, a ponta pode ser cortada numa altura, o alargamento combina pelo máximo uma segunda superfície em volta de um cilindro, a borda de baixo pode ser rolada, o topo fica aberto e remover tira células pelo nome; devolve vertices, faces, vincos, cantos e pontos (em metro) no formato do passo, e dado ruim grita com o campo.',
       'gaiolaPorRede (procedural/nucleo/gaiola-por-rede.js) monta a gaiola de curvas de feição nomeadas, em mm, e dos retalhos de três a oito lados que elas fecham: as arestas seguem as curvas, o interior é Coons alisado pela normal, os retalhos de três e cinco lados têm um centro extraordinário declarado, a curva vinco vira vinco nomeado e linha(curva) dá a linha nomeada do friso; a curva precisa passar por nós declarados, e a densidade sai de um passo e das divisões que o retalho declara.', 'Vinco e canto por índice gritam com a forma nomeada; par de pontos do vinco que não é aresta da gaiola, ponto inexistente e nome de vinco repetido gritam com os nomes.', 'As faces saem lisas a 30 graus com quebra de sombra nos vincos vivos (face.quebras, que a bancada respeita); o rasterizador das vistas da receita desenha toda face chapada.', 'Com espessura, a espessura que passa do raio de curvatura local do lado do material grita com os pontos nomeados mais perto; no vinco vivo esse raio é a largura da faixa de faces ao lado dele e cai pela metade a cada nível. Partes distantes da chapa a menos de uma espessura uma da outra não são conferidas.'] },
 };
+
+/* ARGUMENTOS ESSENCIAIS: os que a operação não substitui por padrão sem mudar a forma que a pessoa quis. Cada entrada de
+   `essenciais` é um campo, ou uma lista de campos dos quais ao menos um precisa vir (`lado` ou `larg` no cubo). `positivos`
+   são os campos numéricos que, vindos, precisam ser maiores que zero: a recusa existe em `recusasDeEssenciais`, mas nenhuma
+   operação a declara ainda, porque o cubo da receita `carro-esportivo-sedan` (passo 21) escreve `prof` negativo e a decisão de
+   afrouxar ou corrigir a receita não é desta fatia. A operação que não
+   tem argumento essencial diz isso em `semEssenciais`, com o motivo. A tabela fica fora do contrato de uso porque o contrato
+   entra na assinatura do registro e no catálogo gerado. `tools/gates/argumentos-essenciais.mjs` confere que toda operação do
+   núcleo sem argumento obrigatório de schema aparece aqui. */
+const ESSENCIAIS = {
+  cubo: { essenciais: [['lado', 'larg'], ['lado', 'alt'], ['lado', 'prof']] },
+  cilindro: { essenciais: ['raio', 'altura'] },
+  esfera: { essenciais: ['raio'] },
+  cone: { essenciais: ['raio', 'altura'] },
+  plano: { essenciais: ['largura', 'profundidade'] },
+  chamferBox: { essenciais: [['lado', 'larg'], ['lado', 'alt'], ['lado', 'prof']] },
+  moveV: { semEssenciais: 'o vértice ausente é recusado pela própria operação; `d` ausente é deslocamento zero, lei do moveV/moveF/moveA travada em tools/oficina/oficina.test.ts' },
+  extruda: { semEssenciais: 'a face ausente é recusada pela própria operação; `dist` ausente vale 0, padrão antigo que as receitas podem usar' },
+  mescla: { semEssenciais: 'o destino ausente é recusado pela própria operação (destino inexistente), e sem origens a mescla não faz nada' },
+  moveF: { semEssenciais: 'a face ausente é recusada pela própria operação; `d` ausente é deslocamento zero, lei do moveV/moveF/moveA' },
+  moveA: { semEssenciais: 'a aresta ausente é recusada pela própria operação; `d` ausente é deslocamento zero, lei do moveV/moveF/moveA' },
+  vira: { semEssenciais: 'a face ausente é recusada pela própria operação (face inexistente)' },
+  apagaFace: { semEssenciais: 'a face ausente é recusada pela própria operação (face inexistente)' },
+  displace: { semEssenciais: 'amplitude, frequencia e semente têm padrão documentado (0,1; 1; 0)' },
+  transladar: { semEssenciais: '`d` ausente é translação zero, lei do transladar travada em tools/oficina/oficina.test.ts; `por` e outras chaves erradas já são recusadas como argumento desconhecido' },
+  pincel: { semEssenciais: 'sem sel pinta tudo, e sem cor limpa a cor; ambos são usos válidos' },
+  solido: { semEssenciais: 'sem sel marca todas as faces, que é o uso comum' },
+  liso: { semEssenciais: 'sem sel e sem angulo liga o sombreamento liso em todas as faces, que é o uso comum' },
+};
+
+for (const [nome, { essenciais = [], positivos = [], semEssenciais = null }] of Object.entries(ESSENCIAIS)) {
+  const campos = definicoes[nome]?.campos ?? {};
+  for (const campo of [...essenciais.flat(), ...positivos]) {
+    if (!Object.hasOwn(campos, campo)) throw new TypeError(`essenciais de '${nome}' cita o campo '${campo}', que não está nos campos`);
+  }
+  if (semEssenciais && (essenciais.length || positivos.length)) throw new TypeError(`'${nome}' declara essenciais e diz que não tem`);
+}
+
+/** Os essenciais de uma operação do núcleo, ou null quando a tabela não a conhece. A forma é `{ essenciais, positivos, semEssenciais }`, com as entradas de `essenciais` sempre em lista. */
+export function essenciaisDaOperacao(nome) {
+  const bruto = Object.hasOwn(ESSENCIAIS, nome) ? ESSENCIAIS[nome] : null;
+  if (!bruto) return null;
+  return congelar({
+    essenciais: (bruto.essenciais ?? []).map((entrada) => (Array.isArray(entrada) ? [...entrada] : [entrada])),
+    positivos: [...(bruto.positivos ?? [])],
+    semEssenciais: bruto.semEssenciais ?? null,
+  });
+}
+
+/** Os nomes das operações que a tabela cobre, para o gate. */
+export function operacoesComEssenciais() { return Object.keys(ESSENCIAIS); }
 
 const contratos = Object.fromEntries(Object.entries(definicoes).map(([nome, definicao]) => [
   nome,

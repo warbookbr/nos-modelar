@@ -47,6 +47,7 @@ export function criarOperacoesAtributos(servicos) {
      como 'toString' não passar pela cadeia de protótipos. */
   material(st, a, i) {
     const usa = a.usa;
+    if (usa === undefined || usa === null) return grita(st, i, 'material', 'usa', `falta o argumento 'usa', o nome de um material de MATERIAIS (${Object.keys(st.materiais).map((n) => `'${n}'`).join(', ') || 'nenhum declarado'})`);
     if (!Object.hasOwn(st.materiais, usa)) return grita(st, i, 'material', usa, `material '${usa}' não existe em MATERIAIS`);
     for (const fid of resolverAlvosF(st, a, 'material', i)) st.F.get(fid).material = usa;
   },
@@ -145,6 +146,7 @@ export function criarOperacoesAtributos(servicos) {
      peso do vértice (replay determinístico); vértice sem peso => canon intacta. */
   pesar(st, a, i) {
     const osso = a.osso;
+    if (osso === undefined || osso === null) return grita(st, i, 'pesar', 'osso', "falta o argumento 'osso', o nome de um osso do ESQUELETO");
     if (!st.ossoSet || !st.ossoSet.has(osso)) return grita(st, i, 'pesar', osso, st.ossoSet ? `osso '${osso}' não existe em ESQUELETO` : 'peça sem ESQUELETO (nenhum osso pra pesar)');
     const peso = st.num(a.peso ?? 0);
     const alvos = new Set();
