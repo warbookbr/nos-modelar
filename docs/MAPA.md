@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1956 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1958 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -571,6 +571,7 @@
 - `2026-11-14-modelagem-de-carro.md` — Modelagem de carro de passeio: o que já serve, onde a carroceria travou antes e por onde começar
 - `2026-11-14-modelagem-de-robo.md` — Modelagem de robô humanoide: o que já serve, o que falta na montagem e por onde começar
 - `2026-11-14-planejador-de-execucao.md` — Planejador de execução da receita
+- `2026-11-14-prancha-menos-manual.md` — Prancha menos manual: desvio medido, leitura combinada de um comando e o que ficou de fora declarado
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
@@ -1505,6 +1506,7 @@
 
 - `frontal.prancha.mjs` — frontal.prancha.mjs — a vista frontal cotada do carro-fastback, segunda das quatro vistas da prancha alvo (skill desenhar-prancha, contrato docs/modelar/usar…
 - `lateral.prancha.mjs` — lateral.prancha.mjs — a vista lateral cotada do carro-fastback, primeira das quatro vistas da prancha alvo (skill desenhar-prancha, contrato docs/modelar/usa…
+- `traseira.prancha.mjs` — traseira.prancha.mjs — a vista traseira cotada do carro-fastback, terceira das quatro vistas da prancha alvo (skill desenhar-prancha, contrato docs/modelar/u…
 
 ## procedural/pecas/carro-perua/
 

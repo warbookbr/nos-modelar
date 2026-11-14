@@ -183,7 +183,11 @@ O script deve imprimir `imprimirRelatorio(relatorio)`. Ordem:
 4. com imagem de referência, não compare de olho: rode a leitura combinada
    (grade e partes, três críticos cada, e `--consolidar`) de
    [`CONFERIR-CONTRA-REFERENCIA.md`](../../../docs/modelar/usar/CONFERIR-CONTRA-REFERENCIA.md)
-   e leve o `consolidado.md` à pessoa junto com a prancha.
+   e leve o `consolidado.md` à pessoa junto com a prancha. Passe em `--fora` o
+   detalhe que a prancha deixa de fora de propósito (no esqueleto, faróis,
+   lanternas, grade, retrovisores), senão os críticos o citam como ausente e
+   enchem a consolidação de ruído; a parte pode vir como `{ "camadas": [...] }`
+   da prancha, sem caixa em mm escrita à mão.
 
 ## 8. Comparar com a referência por número
 
