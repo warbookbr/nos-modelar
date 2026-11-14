@@ -55,3 +55,5 @@ Nenhuma além da já dada.
 Se a reflexão fora da origem estiver errada de fato, a correção muda malha de peça que use espelho fora da origem: para e leva à pessoa.
 
 ## Andamento
+
+- 2026-11-14, fatia 1: testes de recusa de `subdivisao` (10 casos mais o do limite de vértices, em `TESTES_LENTOS`), `friso` (16 casos) e `contatos-da-peca` (15 casos). Refeitos os estragos que nenhum teste percebia: 6 de 7 em `subdivisao` (o 7º, a linha 389, não tem entrada que o alcance: a validação de `subdividirCatmullClark` recusa antes), 9 de 11 em `friso` (as linhas 479 e 521 não têm entrada que as alcance: 2238 perfis de aba válidos varridos, nenhum se cruza) e 12 de 13 em `contatos-da-peca` (a linha 223 é equivalente). O laço dos estragos 405 e 422 do `friso` estava em `distancias`, do `fixtures/medidas-de-malha.js` do teste da fatia 13, e não na operação: sem triângulo a medir, o anel de células crescia para sempre. `distancias` agora recusa a malha vazia e para com erro depois de 30 voltas; com os dois estragos o teste termina em 4 s com recusa.
