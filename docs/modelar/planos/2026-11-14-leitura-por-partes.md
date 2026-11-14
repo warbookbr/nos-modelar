@@ -1,0 +1,67 @@
+# Leitura por partes: a prancha e o esboço conferidos contra a referência, parte por parte
+
+**Estado:** rascunho
+
+**Território:** nenhum (aguarda aprovação). Ao ativar: `tools/modelar/leitura-por-regioes.mjs`, `tools/modelar/leitura-por-regioes.test.mjs`, `.claude/skills/desenhar-prancha/SKILL.md`, `.claude/skills/prancha-dos-contornos/SKILL.md`, `.claude/skills/esbocar-opcoes/SKILL.md`, `docs/modelar/usar/CONFERIR-CONTRA-REFERENCIA.md`.
+
+**Responsável:** a IA da sessão do carro conduz e mede, e a pessoa julga se a leitura acha o que ela acharia.
+
+**Repositório e base:** `warbookbr/nos-modelar`, main de 2026-11-14 com o ramo do carro.
+
+## Problema observado
+
+Na prancha lateral do carro fastback (`procedural/pecas/carro-fastback/referencias/lateral.prancha.mjs`, ramo `claude/baixa-att-repo-web-750f57`), a pessoa achou olhando a prancha ao lado da imagem o ombro traseiro reto onde a referência tem curva, a frente sem bico, as colunas e o teto fora do lugar, a lanterna longe da quina e os recortes de baixo ausentes. Cada vez que ela apontou um trecho e pediu que o agente olhasse, o agente viu a diferença e acertou a correção. O agente sabia ler o trecho; o que faltou foi olhar cada trecho sem que alguém apontasse. O próprio arquivo da prancha registra que as linhas foram lidas a olho, com erro da ordem de 25 mm.
+
+A ferramenta para isso existe e não foi usada. `npm run leitura:regioes` nasceu do mesmo caso na traseira da empilhadeira (2026-11-09): corta a referência e o rascunho na mesma grade, amplia as regiões lado a lado, pede ao crítico uma resposta por região e recusa a rodada com região sem resposta. Ela aceita uma captura qualquer com `--painel`, mas três coisas a afastam da prancha. A skill `desenhar-prancha` manda comparar com a referência de olho (seção 7) e não a cita, e a `prancha-dos-contornos` também não. A prancha rasterizada traz cotas, rótulos e legenda, que entram no painel e deslocam a caixa do objeto. E a grade corta o objeto em retângulos iguais, de modo que uma região pega metade de uma coluna e metade de um vidro, e a resposta não se liga à parte da prancha que precisa mudar.
+
+O processo não pegaria sozinho: nenhuma skill de prancha manda conferir região por região, e nada recusa levar a prancha à pessoa sem essa leitura.
+
+## Resultado
+
+Com um comando, a prancha de uma vista, o esboço ou a peça são lidos contra a imagem de referência parte por parte, com as partes declaradas por nome e em milímetro, a mesma calibração para os três, e a rodada só vale com todas as partes respondidas; as skills de prancha e de esboço a pedem antes de levar a imagem à pessoa.
+
+## Filtro Agent-First
+
+- `leitura:regioes`, com o pedido, o registro das rodadas, as diferenças em campos e a contradição entre rodadas: USAR DIRETO e ESTENDER. A leitura por partes é outra forma de cortar as regiões, e o resto da ferramenta vale igual.
+- Prancha (`tools/modelar/prancha/prancha.mjs`): ENVOLVER. A leitura pede à prancha só as camadas de contorno e de linha da vista, sem cotas nem rótulos, desenhadas no quadro da caixa do objeto em mm; a prancha não muda.
+- Partes declaradas: USAR DIRETO o que a peça já tem. Uma parte é um nome e uma caixa em mm no referencial da peça; a lista vem de um arquivo `partes.json` da vista, ou dos marcos e camadas da prancha, ou do `andaime.json`. Nenhum formato novo de peça.
+- Calibração: USAR DIRETO a `--caixa-ref` e o relato da razão entre altura e largura que a ferramenta já dá, que mostra a deformação da imagem de IA (8% mais curta que a tabela, no carro). Âncoras por ponto ficam ADIADAS até a fatia 1 mostrar que a caixa não basta.
+- Leitura passo a passo do objeto antes de modelar (a skill de leitura que a pessoa citou): ADIAR. Se a lista de partes sair pobre ou errada na fatia 1, vira plano à parte, com o achado.
+
+## Incluído
+
+- `--prancha=<arquivo.prancha.mjs> --vista=<vista>` como lado do rascunho na leitura, só com contorno e linhas;
+- `--partes=<partes.json>` como alternativa à grade: uma região por parte declarada, com o nome da parte no pedido, nas folhas e no registro, e a grade como padrão quando não vier;
+- a mesma lista de partes e a mesma `--caixa-ref` valendo para `--prancha` e para `--modelo`, de modo que prancha, esboço e peça são lidos no mesmo quadro;
+- o passo nas skills `desenhar-prancha`, `prancha-dos-contornos` e `esbocar-opcoes`: rodar a leitura por partes e levar o pedido ao crítico antes de levar a imagem à pessoa;
+- testes com fixture neutra (uma prancha de caixa com dois recortes e uma imagem sintética) e a prova na prancha lateral do carro.
+
+## Excluído
+
+- julgar forma pela ferramenta: ela entrega os lugares e cobra as respostas, e quem aprova continua sendo a pessoa;
+- medir em milímetro a prancha contra a imagem: a imagem de IA vale como caráter, e o desvio em mm fica com `silhueta:desvio` quando houver contorno conferido;
+- a skill de leitura passo a passo do objeto;
+- mudar a prancha do carro além do que a pessoa decidir depois da prova.
+
+## Gate de saída
+
+1. Na fixture neutra, a leitura por partes gera uma folha por parte declarada, com o nome dela, e recusa a rodada com parte sem resposta; sem `--partes`, a grade sai como hoje (o teste atual passa sem mudança).
+2. Com `--prancha`, o painel não contém cota, rótulo nem legenda, e a caixa do objeto na prancha coincide com a do contorno em mm.
+3. Numa cópia da prancha lateral do carro com os cinco defeitos que a pessoa achou reintroduzidos de propósito (ombro reto, frente sem bico, colunas e teto deslocados, lanterna longe da quina, recortes de baixo ausentes), um crítico sem contexto lendo as folhas por partes acha pelo menos quatro dos cinco. A versão anterior às correções não foi guardada no histórico, por isso a cópia é refeita a partir da atual, fica fora do repositório como as imagens, e a lista dos cinco defeitos é escrita antes de o crítico ler. É a prova de que a ferramenta faz o que a pessoa fez apontando; se ele achar menos de três, o plano para.
+4. As três skills citam o passo, e o `npm run gates` fica verde.
+5. Decisão Agent-First registrada para cada interface tocada.
+
+## Fatias
+
+1. Prova sem código novo: montar a cópia com os cinco defeitos do gate 3, rodar `leitura:regioes` com ela rasterizada à mão e `--painel` recortando as cotas, em grade, e levar ao crítico. Anotar quantos dos cinco defeitos ele acha e quais regiões a grade cortou mal. Isso diz se o ganho está no corte por partes ou só em usar a ferramenta.
+2. `--prancha` e `--partes`, com a fixture neutra e os testes.
+3. A prova do gate 3 na prancha do carro, a leitura da versão atual levada à pessoa, e o passo nas skills.
+4. Fechamento, com os achados e o que vai ao backlog.
+
+## Riscos e parada
+
+Se a fatia 1 mostrar que a grade já acha os defeitos, o plano encolhe para o passo nas skills e o recorte das cotas, sem `--partes`. Se a imagem de IA estiver tão deformada que as partes da prancha caiam fora das da referência na mesma caixa (razão de aspecto fora de 10%), as âncoras por ponto entram antes de seguir. Se o crítico achar menos de três dos cinco defeitos, o plano para e volta à pessoa com as folhas.
+
+## Fechamento
+
+Preencher somente ao concluir ou cancelar.

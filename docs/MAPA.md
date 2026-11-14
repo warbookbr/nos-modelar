@@ -5,8 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1946 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
-1927 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1954 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -568,6 +567,7 @@
 
 - `2026-11-08-ferramenta-de-material.md` — Ferramenta de material para o agente: ver, compor e reaproveitar materiais sem rodar a peça inteira
 - `2026-11-10-rebaixo-por-contorno.md` — Rebaixo por contorno: o degrau, o sulco e a borda rebaixada num corpo
+- `2026-11-14-leitura-por-partes.md` — Leitura por partes: a prancha e o esboço conferidos contra a referência, parte por parte
 - `2026-11-14-modelagem-de-carro.md` — Modelagem de carro de passeio: o que já serve, onde a carroceria travou antes e por onde começar
 - `2026-11-14-modelagem-de-robo.md` — Modelagem de robô humanoide: o que já serve, o que falta na montagem e por onde começar
 - `2026-11-14-planejador-de-execucao.md` — Planejador de execução da receita
@@ -1500,6 +1500,10 @@
 ## procedural/pecas/carro-esportivo-sedan/referencias/
 
 - `alvo.md` — Alvo: carro-esportivo-sedan
+
+## procedural/pecas/carro-fastback/referencias/
+
+- `lateral.prancha.mjs` — lateral.prancha.mjs — a vista lateral cotada do carro-fastback, primeira das quatro vistas da prancha alvo (skill desenhar-prancha, contrato docs/modelar/usa…
 
 ## procedural/pecas/carro-perua/
 
