@@ -7,7 +7,7 @@
  *
  * Nada liga por padrão: o perfil usa o mesmo cronometrador do `descrever` (um registro que só embrulha `resolver`, de modo que o
  * caminho rápido do núcleo continua valendo) e a análise do grafo vem de `procedural/nucleo/planejador/leitura-escrita.js`. */
-import { readdirSync } from 'node:fs';
+import { existsSync, readdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { lerArgumentos } from './argumentos.mjs';
@@ -74,7 +74,14 @@ export async function perfilarReceita(receita, { topo = 20 } = {}) {
 }
 
 export async function analiseDoAcervo({ raiz = REPO } = {}) {
-  const pecas = readdirSync(resolve(raiz, 'procedural/pecas')).filter((f) => !f.startsWith('.') && !f.endsWith('.md')).sort();
+  const base = resolve(raiz, 'procedural/pecas');
+  const pecas = [];
+  for (const f of readdirSync(base).filter((n) => !n.startsWith('.') && !n.endsWith('.md')).sort()) {
+    /* a montagem é uma pasta sem receita própria, com cada parte em `partes/<parte>/receita.js` */
+    if (!existsSync(resolve(base, f, 'receita.js')) && existsSync(resolve(base, f, 'partes'))) {
+      for (const parte of readdirSync(resolve(base, f, 'partes')).sort()) if (existsSync(resolve(base, f, 'partes', parte, 'receita.js'))) pecas.push(`${f}/${parte}`);
+    } else pecas.push(f);
+  }
   const saida = [];
   for (const peca of pecas) {
     let receita;
