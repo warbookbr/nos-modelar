@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1902 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1906 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -564,6 +564,7 @@
 - `2026-11-08-ferramenta-de-material.md` — Ferramenta de material para o agente: ver, compor e reaproveitar materiais sem rodar a peça inteira
 - `2026-11-10-rebaixo-por-contorno.md` — Rebaixo por contorno: o degrau, o sulco e a borda rebaixada num corpo
 - `2026-11-13-revisao-das-verificacoes-e-dos-testes.md` — Revisão das verificações e dos testes: o que cada um pega, medido
+- `2026-11-14-planejador-de-execucao.md` — Planejador de execução da receita
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
@@ -2242,6 +2243,8 @@
 
 - `acervo-receitas.js` — acervo-receitas.js — lista as receitas do acervo para a bancada abrir.
 - `acervo-receitas.test.js` — acervo-receitas.test.js — a lista que a bancada abre vem do acervo inteiro.
+- `cache-da-execucao.js` — cache-da-execucao.js — a malha que a receita produz, guardada no navegador para a próxima abertura da mesma peça.
+- `cache-da-execucao.test.js` — hash FNV das posições da malha do Three, na ordem de saída
 - `caixa-do-visivel.js` — caixa-do-visivel.js — a caixa do que a câmera de fato mostra.
 - `caixa-do-visivel.test.js` — caixa-do-visivel.test.js — o enquadramento mede só o que aparece.
 - `carregar-peca.js` — carregar-peca.js — resolve somente uma entrada explícita do catálogo.
@@ -2447,6 +2450,7 @@
 - `avisos-de-terceiros.mjs` — avisos-de-terceiros.mjs — o pacote da bancada leva o texto das licenças das bibliotecas que empacota.
 - `harness-entry.js` — harness-entry.js — catálogo privado dos gates visuais. Este módulo só é carregado por harness.html; não participa da entrada publicada da bancada. /
 - `harness.html` — harness.html — bancada privada dos gates; nunca é entrada de Pages.
+- `impressao-das-fontes.mjs` — impressao-das-fontes.mjs — a impressão digital do que uma receita executa, para o cache da malha da bancada.
 - `porteiro.mjs` — porteiro.mjs — GATE explícito de render do harness privado. Ele não descobre nem publica o acervo de `pecas/`: a lista abaixo é a seleção de capacidades que …
 - `sem-sessao-no-pacote.mjs` — sem-sessao-no-pacote.mjs — a sessão ativa não vai para `dist/`.
 - `sem-sessao-no-pacote.test.mjs` — sem-sessao-no-pacote.test.mjs — o pacote sai sem a sessão de quem construiu.
