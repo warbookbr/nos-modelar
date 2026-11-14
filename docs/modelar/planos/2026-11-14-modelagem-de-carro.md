@@ -164,3 +164,7 @@ O processo de hoje não registra esse veredito como rodada. A `rodada-de-modelag
 ## Fechamento
 
 Preencher somente ao concluir ou cancelar.
+
+## Andamento
+
+Em 2026-11-14 a prancha lateral cotada está em `procedural/pecas/carro-fastback/referencias/lateral.prancha.mjs`, com as correções da pessoa (ombro traseiro em curva, frente em bico, colunas e teto medidos na imagem, lanterna colada à quina e recortes de baixo), e espera o aceite dela; a última versão não voltou ao crítico (notas 8 e 7 nas anteriores). Depois do aceite vêm as pranchas frontal, traseira e superior. A pasta da peça ainda não tem `receita.js`.
