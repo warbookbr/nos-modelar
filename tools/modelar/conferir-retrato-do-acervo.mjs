@@ -15,17 +15,23 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
+import { chaveExata } from '../../procedural/nucleo/memoria-de-pura.js';
 import { pecasDoAcervo } from './perfil-da-execucao.mjs';
 
 const AQUI = fileURLToPath(import.meta.url);
 const REPO = resolve(dirname(AQUI), '../..');
 
-/** O hash da saída inteira do núcleo: o que a malha, a identidade das faces, as partes e a procedência dizem. */
+/** O hash da saída inteira do núcleo: o que a malha, a identidade das faces, as partes, as portas e a procedência dizem. A serialização é
+ *  a exata de `chaveExata` (o zero negativo, o NaN e o indefinido saem distintos, o que o JSON comum funde), e os mapas entram como listas
+ *  de pares (um `Map` no JSON comum vira `{}` e apagaria a diferença). Dado que não se serializa recusa em vez de calar. */
 export function hashDoNeutro(neutro) {
-  const texto = JSON.stringify({
+  const pares = (m) => (m instanceof Map ? [...m] : m);
+  const texto = chaveExata({
     V: [...neutro.V], F: [...neutro.F], orfaos: neutro.orfaos, merges: neutro.merges, partes: neutro.partes,
-    pesos: [...neutro.pesos].map(([v, m]) => [v, [...m]]), portas: neutro.portas, procedencia: neutro.procedencia, artefato: neutro.artefato,
+    pesos: [...neutro.pesos].map(([v, m]) => [v, [...m]]), portas: pares(neutro.portas),
+    procedencia: neutro.procedencia, artefato: neutro.artefato,
   });
+  if (texto === null || texto === undefined) throw new Error('hashDoNeutro: a saída do núcleo tem dado que não se serializa (função, Map aninhado ou classe); a conferência não pode afirmar igualdade');
   return createHash('sha256').update(texto).digest('hex');
 }
 

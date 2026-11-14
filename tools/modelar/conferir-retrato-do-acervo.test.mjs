@@ -20,4 +20,19 @@ describe('conferência do retrato', () => {
   it('o hash muda quando a malha muda', () => {
     expect(hashDoNeutro(executarReceita(receita(30)).neutro)).not.toBe(hashDoNeutro(executarReceita(receita(31)).neutro));
   });
+
+  it('o hash vê só a porta que difere, o zero negativo e o NaN', () => {
+    const base = executarReceita(receita(30)).neutro;
+    const com = (extra) => ({ ...base, ...extra });
+    const porta = (v) => new Map([['p', { nome: 'p', de: 1, valor: v }]]);
+    expect(hashDoNeutro(com({ portas: porta(1) }))).not.toBe(hashDoNeutro(com({ portas: new Map() })));
+    expect(hashDoNeutro(com({ portas: porta(1) }))).not.toBe(hashDoNeutro(com({ portas: porta(2) })));
+    expect(hashDoNeutro(com({ portas: porta(0) }))).not.toBe(hashDoNeutro(com({ portas: porta(-0) })));
+    expect(hashDoNeutro(com({ portas: porta(NaN) }))).not.toBe(hashDoNeutro(com({ portas: porta(null) })));
+    expect(hashDoNeutro(com({ portas: porta(1) }))).toBe(hashDoNeutro(com({ portas: porta(1) })));
+  });
+  it('recusa saída que não se serializa em vez de calar', () => {
+    const base = executarReceita(receita(30)).neutro;
+    expect(() => hashDoNeutro({ ...base, merges: [() => 1] })).toThrow(/não se serializa/);
+  });
 });
