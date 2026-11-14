@@ -82,6 +82,7 @@
 import { CAMPOS_DA_APARENCIA, normalizarMaterial } from './material-da-receita.js';
 import { sha256Hex } from './assinatura-geometria.js';
 import { auditarParDeSolidos, exigirMemoriaDoNeutro, prepararSolido, solidoEmMemoria } from './contato-de-solidos.js';
+import { invasaoEntreCorpos, solidosDosCorpos } from './invasao-de-contato.js';
 
 /** Vão abaixo do qual duas caixas são consideradas encostadas (erro de ponto flutuante). */
 export const TOLERANCIA_CONTATO = 1e-9;
@@ -552,6 +553,12 @@ function solidosSobDemanda(neutro, memoria = null) {
     }
     return prontos.get(nome);
   };
+  /* os corpos da parte, cada um um sólido, para a medida corpo a corpo que corrige o estado da parte inteira */
+  const corposPorParte = new Map();
+  solidoDe.corpos = (nome) => {
+    if (!corposPorParte.has(nome)) corposPorParte.set(nome, solidosDosCorpos(nome, facesPorParte.get(nome) ?? [], neutro.V));
+    return corposPorParte.get(nome);
+  };
   /* o motivo de a parte não ter virado sólido, para o relato dizer qual face e por que em vez de só "inconclusivo" */
   solidoDe.motivo = (nome) => {
     const s = solidoDe(nome);
@@ -570,6 +577,15 @@ function relacaoConfirmadaPorSolido(relacao, solidoDe, tolerancia, memoria = nul
   let estado = 'inconclusivo';
   if (sa && sb) {
     try { estado = auditarParDeSolidos(sa, sb, tolerancia, { memoria }).estado; } catch { estado = 'inconclusivo'; }
+  }
+  /* A PARTE INTEIRA É UMA MALHA SÓ, e a contenção de ponto conta as passagens do raio por todos os corpos dela: dois corpos da mesma parte que se sobrepõem entre
+     si anulam a paridade, e a parte de malha aberta sai inconclusiva por um corpo que nem toca o outro. O par que a parte inteira acusa ou não decide é medido de
+     novo corpo a corpo, e a resposta dos corpos vale no lugar. */
+  if ((estado === 'interpenetram' || estado === 'inconclusivo') && solidoDe.corpos) {
+    try {
+      const porCorpos = invasaoEntreCorpos(solidoDe.corpos(relacao.a), solidoDe.corpos(relacao.b), tolerancia);
+      if (porCorpos.estado !== 'inconclusivo' || estado === 'inconclusivo') estado = porCorpos.estado;
+    } catch { /* fica a resposta da parte inteira */ }
   }
   if (estado === 'encostam') return { ...relacao, tipo: 'encosta', distancia: 0, caixa, solido: estado };
   if (estado === 'separadas') return { ...relacao, tipo: 'folga', distancia: null, porEixo, caixa, solido: estado };

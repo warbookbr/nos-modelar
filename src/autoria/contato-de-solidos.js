@@ -937,3 +937,66 @@ export function profundidadeDeInterpenetracao(a, b, tolerancia) {
   if (deBemA === null) return deAemB;
   return Math.max(deAemB, deBemA);
 }
+
+/* Quantos pontos de cada aresta entram na medida da profundidade de invasão. */
+const AMOSTRAS_POR_ARESTA = 8;
+
+/* As arestas de um sólido preparado, cada uma uma vez: o canto repetido é o mesmo objeto (a posição do vértice no sólido), então a aresta se identifica pelo par de cantos. */
+function arestasDoSolido(solido) {
+  const ids = new Map();
+  const idDe = (canto) => { if (!ids.has(canto)) ids.set(canto, ids.size); return ids.get(canto); };
+  const vistas = new Set();
+  const arestas = [];
+  for (const t of solido.triangulos) {
+    for (let k = 0; k < 3; k += 1) {
+      const p = t[k]; const q = t[(k + 1) % 3];
+      const i = idDe(p); const j = idDe(q);
+      const chave = i < j ? `${i} ${j}` : `${j} ${i}`;
+      if (vistas.has(chave)) continue;
+      vistas.add(chave);
+      arestas.push([p, q]);
+    }
+  }
+  return arestas;
+}
+
+/* O pedaço do segmento p-q que fica dentro da caixa [lo, hi] (método das lajes), ou `null` quando o segmento a evita. */
+function segmentoNaCaixa(p, q, lo, hi) {
+  let t0 = 0; let t1 = 1;
+  for (let e = 0; e < 3; e += 1) {
+    const d = q[e] - p[e];
+    if (Math.abs(d) < 1e-15) { if (p[e] < lo[e] || p[e] > hi[e]) return null; continue; }
+    let a = (lo[e] - p[e]) / d; let b = (hi[e] - p[e]) / d;
+    if (a > b) [a, b] = [b, a];
+    t0 = Math.max(t0, a); t1 = Math.min(t1, b);
+    if (t0 > t1) return null;
+  }
+  return [t0, t1];
+}
+
+/**
+ * A profundidade com que dois sólidos fechados se invadem: o maior afundamento, na superfície de um, de um ponto da superfície do outro que a contenção acusa
+ * estritamente dentro. Aos vértices e centroides de `profundidadeDeInterpenetracao` soma pontos ao longo das ARESTAS, dentro da região comum das duas caixas: a
+ * haste que atravessa um cilindro de lado a lado não tem vértice dentro dele (só as arestas e as faces o cruzam), e aquela função dá `null` para ela. Continua um
+ * piso da penetração real, porque só amostra pontos (oito por aresta). Encostar não conta: o ponto sobre a superfície (face coplanar, aresta sobre a face) não está
+ * estritamente dentro, e o par que só se toca devolve `null`, como o que não se toca. `null` também quando algum sólido é inconclusivo ou aberto.
+ */
+export function profundidadeDeInvasao(a, b, tolerancia) {
+  if (a.inconclusivo || b.inconclusivo || !a.fechada || !b.fechada) return null;
+  if (caixasSeparadas(a.caixa, b.caixa, tolerancia)) return null;
+  const lo = [0, 1, 2].map((e) => Math.max(a.caixa.min[e], b.caixa.min[e]));
+  const hi = [0, 1, 2].map((e) => Math.min(a.caixa.max[e], b.caixa.max[e]));
+  const dasArestas = (de, em) => {
+    const pontos = [];
+    for (const [p, q] of arestasDoSolido(de)) {
+      const trecho = segmentoNaCaixa(p, q, lo, hi);
+      if (!trecho) continue;
+      for (let k = 0; k < AMOSTRAS_POR_ARESTA; k += 1) {
+        const t = trecho[0] + ((k + 0.5) / AMOSTRAS_POR_ARESTA) * (trecho[1] - trecho[0]);
+        pontos.push([p[0] + t * (q[0] - p[0]), p[1] + t * (q[1] - p[1]), p[2] + t * (q[2] - p[2])]);
+      }
+    }
+    return maiorAfundamento(pontos, pontos.map((ponto) => pontoDentroMalha(ponto, em, tolerancia)), em);
+  };
+  return maiorDosDois(maiorDosDois(profundidadeDeInterpenetracao(a, b, tolerancia), dasArestas(a, b)), dasArestas(b, a));
+}

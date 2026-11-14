@@ -728,6 +728,24 @@ export async function descreverPecaReutilizavel({
         + ' — furo passante só é contável em malha fechada.\n';
     }
 
+    /* DECLARADO QUE INVADE. Declarar o contato autoriza o toque, não a invasão: o par declarado cujas partes se afundam além do que o contato admite reprova,
+       com o par de corpos (índice, faces e caixa de cada um) e a profundidade medida corpo a corpo (`src/autoria/invasao-de-contato.js`). */
+    if (contatos.invasoes.length) {
+      const mm = (n) => String(Number((n * 1000).toPrecision(4))).replace('.', ',');
+      const corpo = (c) => `corpo ${c.indice} (${c.faces} faces, de [${c.caixa.min.join(', ')}] a [${c.caixa.max.join(', ')}])`;
+      const linhas = contatos.invasoes.map(({ par, profundidade, limite, corpos }) => [
+        `    ${par[0]} ↔ ${par[1]}: afunda ${mm(profundidade)} mm (admite ${mm(limite)} mm)`,
+        ...(corpos ? [`      ${par[0]}: ${corpo(corpos[0])}`, `      ${par[1]}: ${corpo(corpos[1])}`] : []),
+      ].join('\n'));
+      stderr += `
+${contatos.invasoes.length} CONTATO(S) DECLARADO(S) EM QUE UMA PARTE INVADE A OUTRA`
+        + '\n  A receita disse que estas partes se tocam, e elas se atravessam:\n'
+        + linhas.join('\n')
+        + '\n  Recebi a profundidade acima e esperava no máximo o limite; afaste os corpos até só se encostarem,'
+        + '\n  ou, se a junta afunda de propósito (solda, pino num furo), declare `invasaoMaxima` no contato, com o motivo.'
+        + '\n  Para ver o par: npm run descrever -- <peça> --partes=<a>,<b>\n';
+      falhou = true;
+    }
     /* DECLARADO QUE NÃO ENCOSTA TAMBÉM REPROVA, e esta é a metade que faltava.
        A medida já apurava o par declarado sem contato, e só o exibia, com o
        argumento de que podia ser folga que a receita pretendia fechar. O efeito
