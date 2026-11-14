@@ -248,7 +248,7 @@ export function criarOperacoesBooleanas(servicos) {
        mesmos oito representantes, e é isso que permite à política de face
        coplanar (abaixo) devolver a face do primeiro com os cantos dele. */
     const idsDasEntradas = [...new Set(operandos.flat().flatMap((f) => st.F.get(f).vs))].sort((x, y) => x - y);
-    /* o rastreio declarado do retrato: a booleana reescreve no lugar só as faces e os vértices dos operandos (os cantos e as quebras das cortadas e das mantidas); o que ela cria ou apaga o despacho vê pelo mapa */
+    /* o rastreio declarado do retrato: a booleana reescreve no lugar só o `vs` e as `quebras` das faces dos operandos (as cortadas e as mantidas); o que ela cria ou apaga o despacho vê pelo mapa. Ela não reescreve vértice no lugar (só cria, com `addV`, e apaga): a soma dos vértices dos operandos abaixo é defesa declarada, para o dia em que uma variante o fizer. */
     if (st.tocadosF) for (const f of operandos.flat()) st.tocadosF.add(f);
     if (st.tocadosV) for (const v of idsDasEntradas) st.tocadosV.add(v);
     const repPorChave = new Map(), repDe = new Map();
