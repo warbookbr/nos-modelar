@@ -1,6 +1,6 @@
 # Carro fastback: alinhamento
 
-Registro da fatia 1 do plano [modelagem de carro](../../../docs/modelar/planos/2026-11-14-modelagem-de-carro.md). As decisões de objeto, medida, nível e partes foram tomadas pela pessoa em 2026-11-14 e estão no plano; este arquivo as junta com a prancha aceita e o `andaime.json`, e deixa na seção de decisões o que a família `veiculo` pergunta e a pessoa ainda não respondeu.
+Registro da fatia 1 do plano [modelagem de carro](../../../docs/modelar/planos/2026-11-14-modelagem-de-carro.md). As decisões de objeto, medida, nível e partes foram tomadas pela pessoa em 2026-11-14 e estão no plano; este arquivo as junta com a prancha aceita e o `andaime.json`, com as quatro respostas da pessoa às perguntas da família `veiculo`.
 
 ## O objeto e as referências
 
@@ -56,17 +56,23 @@ As rodas assentam no chão com o centro nos eixos do andaime, a 340 mm, e o pneu
 4. Vão de painel fora de 0,2 mm do declarado, ou diferente entre os lados.
 5. Pneu que toca ou atravessa o forro do arco.
 6. Vidro que deixa ver o oco do carro, sem interior atrás.
-7. Coluna dianteira ou faixa de teto acima da porta reduzida a uma lasca, vista de lado.
+7. Coluna dianteira ou faixa de chapa acima da porta com menos de 50 mm, vista de lado.
 8. Os dois lados diferentes fora de uma exceção declarada.
 9. Linhas vizinhas de fresta, emenda ou borda a menos de 30 mm uma da outra.
 10. Nome de modelo ou de fabricante, logotipo, emblema ou imagem de referência no repositório.
 
-## Decisões que dependem da pessoa
+## Decisões aprovadas pela pessoa
 
-A largura da coluna dianteira vista de lado e da faixa de chapa acima da porta. A prancha lateral as dá com uns 70 mm e 60 mm; recomendo fixá-las assim, com 50 mm como mínimo da régua.
+As quatro perguntas da família `veiculo` foram aceitas como recomendadas, em 2026-11-14.
 
-A seção do plástico escuro de baixo (lábio dianteiro, saia e difusor): quanto sai da lataria e como dobra embaixo. A referência mostra o lábio dianteiro saindo uns 30 mm e a saia rente; recomendo lábio e difusor como peças com seção própria de 30 mm de saída e a saia como faixa de 10 mm, dobrando para dentro embaixo.
+A coluna dianteira vista de lado tem cerca de 70 mm e a faixa de chapa acima da porta cerca de 60 mm, como na prancha lateral, e nenhuma fica abaixo de 50 mm.
 
-O para-lama traseiro saliente: a família pergunta pelo alargamento do arco de veículo de trabalho, que este carro não tem. Recomendo declará-lo como saliência da chapa na ondulação, sem moldura de arco, e dispensar as regras de moldura e de pontas assentadas para este objeto.
+O lábio dianteiro e o difusor são peças com seção própria, saindo 30 mm da lataria; a saia é uma faixa de 10 mm que dobra para dentro embaixo.
 
-As exceções à simetria: a referência não mostra nenhuma (o bocal de combustível não aparece). Recomendo declarar o carro simétrico, sem exceção.
+O para-lama traseiro saliente é declarado como saliência da chapa na régua de ondulação, sem moldura de arco, e as regras `arco-com-alargamento`, `alargamento-ao-pneu` e `pontas-da-moldura-assentadas`, de veículo de trabalho, não valem para este objeto.
+
+O carro é simétrico, sem exceção declarada.
+
+## Aceite
+
+- alinhamento: aceito pela pessoa em 2026-11-14, "Aceito as quatro", depois de ver as quatro recomendações; as medidas, o nível e as partes vêm das decisões dela no plano.
