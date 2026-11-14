@@ -266,9 +266,8 @@ describe('a medição da receita atual trava o laço', () => {
     expect(rodada.medidas.relatorio).toBe('descrever (veredito), guarda:acervo, guarda:referencial: ok');
   });
 
-  it.skipIf(pecasDoAcervo().length === 0)('a linha de comando mede a receita atual da peça do acervo e diz o hash e o resultado antes da ação', () => {
-    const [peca] = pecasDoAcervo();
-    const r = spawnSync(process.execPath, ['tools/modelar/rodada-de-modelagem.mjs', peca, '--acao'], { encoding: 'utf8' });
+  it('a linha de comando mede a receita atual da peça fixa (tools/fixtures/acervo/rodada-de-medicao, que não muda quando entra peça nova) e diz o hash e o resultado antes da ação', () => {
+    const r = spawnSync(process.execPath, ['tools/modelar/rodada-de-modelagem.mjs', 'rodada-de-medicao', '--acao'], { encoding: 'utf8' });
     expect(r.status).toBe(0);
     expect(r.stdout).toMatch(/medição da receita atual \(sha256:[0-9a-f]{8}\): (passou|reprovou)\npróxima ação: (modelar|revisar|parar-[a-z-]+) — /);
   }, 60000);
