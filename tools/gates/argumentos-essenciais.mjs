@@ -6,8 +6,8 @@
  *   1. uma operação do núcleo não tem argumento obrigatório de schema, não está na tabela e portanto não disse nada;
  *   2. a tabela cita uma operação que o núcleo não tem;
  *   3. o exemplo oficial de uma operação com essenciais é recusado por eles;
- *   4. tirar do exemplo um essencial (todas as alternativas dele) não é recusado, citando o campo.
- * A recusa roda em `recusasDeEssenciais`; o despacho do núcleo ainda não a chama (ver o relatório da fatia 1 do plano).
+ *   4. tirar do exemplo um essencial (todas as alternativas dele) não é recusado, citando o campo, ou um campo positivo valendo 0 ou -1
+ *      não é recusado citando o valor.
  * Uso: `node tools/gates/argumentos-essenciais.mjs`; sai com 1 e lista cada falha. */
 import { pathToFileURL } from 'node:url';
 import { OPS } from '../../procedural/nucleo/nucleo.js';
@@ -28,15 +28,19 @@ export function conferirArgumentosEssenciais() {
   for (const nome of tabela) if (!Object.hasOwn(OPS, nome)) falhas.push(`${nome}: ESSENCIAIS cita uma operação que o núcleo não tem`);
   for (const nome of tabela) {
     const contrato = essenciaisDaOperacao(nome);
-    if (!contrato?.essenciais.length || !Object.hasOwn(OPS, nome)) continue;
+    if (!Object.hasOwn(OPS, nome) || (!contrato.essenciais.length && !contrato.positivos.length)) continue;
     const exemplo = usoDaOperacao(nome).exemplo;
     const indice = exemplo.PASSOS.findIndex(([op]) => op === nome);
     const [, args = {}] = exemplo.PASSOS[indice];
-    if (recusasDeEssenciais(nome, args, contrato, numero, indice).length) { falhas.push(`${nome}: o exemplo oficial é recusado pelos essenciais`); continue; }
+    if (recusasDeEssenciais(nome, args, contrato, numero, indice).length) { falhas.push(`${nome}: o exemplo oficial é recusado pela tabela`); continue; }
     for (const entrada of contrato.essenciais) {
       const sem = Object.fromEntries(Object.entries(args).filter(([campo]) => !entrada.includes(campo)));
-      const recusas = recusasDeEssenciais(nome, sem, contrato, numero, indice);
-      if (!recusas.some((r) => r.campo === entrada[0])) falhas.push(`${nome}: sem ${entrada.map((c) => `'${c}'`).join(' nem ')} no exemplo, o passo não foi recusado citando '${entrada[0]}'`);
+      if (!recusasDeEssenciais(nome, sem, contrato, numero, indice).some((r) => r.campo === entrada[0])) falhas.push(`${nome}: sem ${entrada.map((c) => `'${c}'`).join(' nem ')} no exemplo, o passo não foi recusado citando '${entrada[0]}'`);
+    }
+    for (const campo of contrato.positivos) {
+      for (const ruim of [0, -1]) {
+        if (!recusasDeEssenciais(nome, { ...args, [campo]: ruim }, contrato, numero, indice).some((r) => r.campo === campo && r.motivo.includes(String(ruim)))) falhas.push(`${nome}: '${campo}' valendo ${ruim} não foi recusado citando o valor`);
+      }
     }
   }
   return falhas;

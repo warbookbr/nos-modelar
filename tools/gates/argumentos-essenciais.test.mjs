@@ -13,31 +13,10 @@ describe('o gate dos argumentos essenciais', () => {
   });
 });
 
-describe('argumento essencial ausente', () => {
-  const casos = [
-    ['cilindro sem raio', 'cilindro', { altura: 1 }, 'raio'],
-    ['cilindro sem argumentos', 'cilindro', {}, 'raio'],
-    ['cone sem altura', 'cone', { raio: 1 }, 'altura'],
-    ['esfera vazia', 'esfera', {}, 'raio'],
-    ['plano sem profundidade', 'plano', { largura: 1 }, 'profundidade'],
-    ['cubo sem dimensão', 'cubo', {}, 'lado'],
-    ['cubo só com larg', 'cubo', { larg: 1 }, 'lado'],
-    ['chamferBox sem altura', 'chamferBox', { larg: 1, prof: 1, chanfro: 0.1 }, 'lado'],
-  ];
-  for (const [nome, op, args, campo] of casos) {
-    it(`${nome} é recusada citando o passo e '${campo}'`, () => {
-      const recusas = recusasDeEssenciais(op, args, essenciaisDaOperacao(op), (v) => v, 7);
-      expect(recusas.length).toBeGreaterThan(0);
-      expect(recusas[0].campo).toBe(campo);
-      expect(recusas[0].motivo).toContain('passo 7');
-      expect(recusas[0].motivo).toContain(`'${campo}'`);
-    });
-  }
-
-  it('as receitas certas não são recusadas', () => {
-    expect(recusasDeEssenciais('cilindro', { raio: 0.5, altura: 1, lados: 8 }, essenciaisDaOperacao('cilindro'), (v) => v)).toEqual([]);
-    expect(recusasDeEssenciais('cubo', { lado: 1 }, essenciaisDaOperacao('cubo'), (v) => v)).toEqual([]);
-    expect(recusasDeEssenciais('cubo', { larg: 1, alt: 2, prof: 3 }, essenciaisDaOperacao('cubo'), (v) => v)).toEqual([]);
+describe('a tabela das primitivas', () => {
+  it('diz o padrão de cada argumento que tem padrão, e a ausência não é recusada', () => {
+    expect(essenciaisDaOperacao('cilindro').comPadrao).toEqual({ raio: 0.5, altura: 1, lados: 8 });
+    expect(nucleo([['cilindro', {}], ['cone', {}], ['esfera', {}], ['plano', {}], ['cubo', {}]], {}, {}).orfaos).toEqual([]);
   });
 
   it('a operação que diz não ter essenciais declara o motivo', () => {
@@ -45,23 +24,43 @@ describe('argumento essencial ausente', () => {
   });
 });
 
-describe('o valor não positivo', () => {
-  const contrato = { essenciais: [['raio']], positivos: ['raio'] };
-  const resolver = (v) => v;
-  it('cita o passo, o valor e o limite', () => {
-    const [recusa] = recusasDeEssenciais('cilindro', { raio: -1 }, contrato, resolver, 4);
-    expect(recusa.campo).toBe('raio');
-    expect(recusa.motivo).toContain('passo 4');
-    expect(recusa.motivo).toContain('-1');
-    expect(recusa.motivo).toContain('maior que 0');
+describe('o valor não positivo que vem declarado', () => {
+  const casos = [
+    ['cilindro', { raio: -1, altura: 1 }, 'raio', '-1'],
+    ['cilindro', { raio: 0.5, altura: 0 }, 'altura', '0'],
+    ['esfera', { raio: 0 }, 'raio', '0'],
+    ['cone', { raio: 1, altura: -2 }, 'altura', '-2'],
+    ['plano', { largura: -1, profundidade: 1 }, 'largura', '-1'],
+    ['cubo', { lado: -1 }, 'lado', '-1'],
+    ['cubo', { larg: 1, alt: 0, prof: 1 }, 'alt', '0'],
+  ];
+  for (const [op, args, campo, valor] of casos) {
+    it(`${op} com ${campo} ${valor} é recusado no passo, com valor e limite, e não deixa geometria`, () => {
+      const neutro = nucleo([['cubo', { lado: 1 }], [op, args]], {}, {});
+      const achado = neutro.orfaos.find((o) => o.ref === campo);
+      expect(achado, motivos(neutro).join('\n')).toBeTruthy();
+      expect(achado.passo).toBe(1);
+      expect(achado.motivo).toContain('passo 1');
+      expect(achado.motivo).toContain(`'${campo}' vale ${valor}`);
+      expect(achado.motivo).toContain('maior que 0');
+      expect(neutro.V.size).toBe(8);
+    });
+  }
+
+  it('nome de parâmetro que resolve para valor não positivo cita o valor resolvido', () => {
+    const neutro = nucleo([['cilindro', { raio: 'r', altura: 1 }]], { r: -3 }, {});
+    expect(neutro.orfaos[0].motivo).toContain("'raio' vale \"r\" (= -3)");
   });
-  it('recusa zero e deixa passar o positivo', () => {
-    expect(recusasDeEssenciais('cilindro', { raio: 0 }, contrato, resolver)).toHaveLength(1);
-    expect(recusasDeEssenciais('cilindro', { raio: 0.1 }, contrato, resolver)).toEqual([]);
+
+  it('o cubo com prof negativo da receita do sedã continua passando', () => {
+    expect(nucleo([['cubo', { larg: 1, alt: 1, prof: -1 }]], {}, {}).orfaos).toEqual([]);
   });
-  it('a tabela de hoje não a liga em nenhuma operação (ver a fatia 1 do plano)', () => {
-    expect(essenciaisDaOperacao('cubo').positivos).toEqual([]);
-    expect(essenciaisDaOperacao('cilindro').positivos).toEqual([]);
+
+  it('o contrato próprio com positivos recusa zero e deixa passar o positivo', () => {
+    const contrato = { essenciais: [['raio']], positivos: ['raio'] };
+    expect(recusasDeEssenciais('x', { raio: 0 }, contrato, (v) => v)).toHaveLength(1);
+    expect(recusasDeEssenciais('x', { raio: 0.1 }, contrato, (v) => v)).toEqual([]);
+    expect(recusasDeEssenciais('x', {}, contrato, (v) => v)[0].motivo).toContain("falta o argumento essencial 'raio'");
   });
 });
 

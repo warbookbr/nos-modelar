@@ -348,21 +348,21 @@ const definicoes = {
       'gaiolaPorRede (procedural/nucleo/gaiola-por-rede.js) monta a gaiola de curvas de feição nomeadas, em mm, e dos retalhos de três a oito lados que elas fecham: as arestas seguem as curvas, o interior é Coons alisado pela normal, os retalhos de três e cinco lados têm um centro extraordinário declarado, a curva vinco vira vinco nomeado e linha(curva) dá a linha nomeada do friso; a curva precisa passar por nós declarados, e a densidade sai de um passo e das divisões que o retalho declara.', 'Vinco e canto por índice gritam com a forma nomeada; par de pontos do vinco que não é aresta da gaiola, ponto inexistente e nome de vinco repetido gritam com os nomes.', 'As faces saem lisas a 30 graus com quebra de sombra nos vincos vivos (face.quebras, que a bancada respeita); o rasterizador das vistas da receita desenha toda face chapada.', 'Com espessura, a espessura que passa do raio de curvatura local do lado do material grita com os pontos nomeados mais perto; no vinco vivo esse raio é a largura da faixa de faces ao lado dele e cai pela metade a cada nível. Partes distantes da chapa a menos de uma espessura uma da outra não são conferidas.'] },
 };
 
-/* ARGUMENTOS ESSENCIAIS: os que a operação não substitui por padrão sem mudar a forma que a pessoa quis. Cada entrada de
-   `essenciais` é um campo, ou uma lista de campos dos quais ao menos um precisa vir (`lado` ou `larg` no cubo). `positivos`
-   são os campos numéricos que, vindos, precisam ser maiores que zero: a recusa existe em `recusasDeEssenciais`, mas nenhuma
-   operação a declara ainda, porque o cubo da receita `carro-esportivo-sedan` (passo 21) escreve `prof` negativo e a decisão de
-   afrouxar ou corrigir a receita não é desta fatia. A operação que não
-   tem argumento essencial diz isso em `semEssenciais`, com o motivo. A tabela fica fora do contrato de uso porque o contrato
-   entra na assinatura do registro e no catálogo gerado. `tools/gates/argumentos-essenciais.mjs` confere que toda operação do
-   núcleo sem argumento obrigatório de schema aparece aqui. */
+/* ARGUMENTOS ESSENCIAIS por operação, em tabela fora do contrato de uso (o contrato entra na assinatura do registro e no
+   catálogo gerado). `essenciais`: cada entrada é um campo, ou uma lista de campos dos quais ao menos um precisa vir; a recusa
+   de ausência só vale para argumento SEM padrão. As primitivas têm padrão travado em teste (`raio` 0,5, `altura` 1, `lado` 1,
+   `lados` 8...), então declaram em `comPadrao` o que tem padrão e não recusam a ausência. `positivos`: campos numéricos que,
+   quando VÊM, precisam ser maiores que zero; é o que o despacho recusa. `semEssenciais`: o motivo de a operação não ter nenhum.
+   `prof` do cubo fica fora de `positivos` porque o passo 21 de `carro-esportivo-sedan` escreve `prof` negativo (cubo espelhado em
+   z, que não dá o mesmo neutro com `prof` positivo). `tools/gates/argumentos-essenciais.mjs` confere que toda operação do núcleo
+   sem argumento obrigatório de schema aparece aqui. */
 const ESSENCIAIS = {
-  cubo: { essenciais: [['lado', 'larg'], ['lado', 'alt'], ['lado', 'prof']] },
-  cilindro: { essenciais: ['raio', 'altura'] },
-  esfera: { essenciais: ['raio'] },
-  cone: { essenciais: ['raio', 'altura'] },
-  plano: { essenciais: ['largura', 'profundidade'] },
-  chamferBox: { essenciais: [['lado', 'larg'], ['lado', 'alt'], ['lado', 'prof']] },
+  cubo: { comPadrao: { lado: 1, larg: 1, alt: 1, prof: 1 }, positivos: ['lado', 'larg', 'alt'] },
+  cilindro: { comPadrao: { raio: 0.5, altura: 1, lados: 8 }, positivos: ['raio', 'altura'] },
+  esfera: { comPadrao: { raio: 0.5, aneis: 6, lados: 8 }, positivos: ['raio'] },
+  cone: { comPadrao: { raio: 0.5, altura: 1, lados: 8 }, positivos: ['raio', 'altura'] },
+  plano: { comPadrao: { largura: 1, profundidade: 1, seg: 1 }, positivos: ['largura', 'profundidade'] },
+  chamferBox: { comPadrao: { lado: 1, larg: 1, alt: 1, prof: 1, chanfro: 0.1 }, positivos: ['lado', 'larg', 'alt', 'prof', 'chanfro'] },
   moveV: { semEssenciais: 'o vértice ausente é recusado pela própria operação; `d` ausente é deslocamento zero, lei do moveV/moveF/moveA travada em tools/oficina/oficina.test.ts' },
   extruda: { semEssenciais: 'a face ausente é recusada pela própria operação; `dist` ausente vale 0, padrão antigo que as receitas podem usar' },
   mescla: { semEssenciais: 'o destino ausente é recusado pela própria operação (destino inexistente), e sem origens a mescla não faz nada' },
@@ -377,21 +377,22 @@ const ESSENCIAIS = {
   liso: { semEssenciais: 'sem sel e sem angulo liga o sombreamento liso em todas as faces, que é o uso comum' },
 };
 
-for (const [nome, { essenciais = [], positivos = [], semEssenciais = null }] of Object.entries(ESSENCIAIS)) {
+for (const [nome, { essenciais = [], positivos = [], comPadrao = {}, semEssenciais = null }] of Object.entries(ESSENCIAIS)) {
   const campos = definicoes[nome]?.campos ?? {};
-  for (const campo of [...essenciais.flat(), ...positivos]) {
+  for (const campo of [...essenciais.flat(), ...positivos, ...Object.keys(comPadrao)]) {
     if (!Object.hasOwn(campos, campo)) throw new TypeError(`essenciais de '${nome}' cita o campo '${campo}', que não está nos campos`);
   }
   if (semEssenciais && (essenciais.length || positivos.length)) throw new TypeError(`'${nome}' declara essenciais e diz que não tem`);
 }
 
-/** Os essenciais de uma operação do núcleo, ou null quando a tabela não a conhece. A forma é `{ essenciais, positivos, semEssenciais }`, com as entradas de `essenciais` sempre em lista. */
+/** Os essenciais de uma operação do núcleo, ou null quando a tabela não a conhece. A forma é `{ essenciais, positivos, comPadrao, semEssenciais }`, com as entradas de `essenciais` sempre em lista. */
 export function essenciaisDaOperacao(nome) {
   const bruto = Object.hasOwn(ESSENCIAIS, nome) ? ESSENCIAIS[nome] : null;
   if (!bruto) return null;
   return congelar({
     essenciais: (bruto.essenciais ?? []).map((entrada) => (Array.isArray(entrada) ? [...entrada] : [entrada])),
     positivos: [...(bruto.positivos ?? [])],
+    comPadrao: { ...(bruto.comPadrao ?? {}) },
     semEssenciais: bruto.semEssenciais ?? null,
   });
 }

@@ -13,7 +13,7 @@
 import { criarResolverNumerico, distanciaDeEdicao, ErroDeResolucao, nomesProximos } from './expressoes.js';
 import { TIPO_MALHA_POLIGONAL, artefatoDaMalha, criarEstadoDeProcedencia, procedenciaCanonica, registrarProcedencia } from './artefatos.js';
 import { criarRegistroOperacoes } from './registro.js';
-import { usoDaOperacao } from './uso-operacoes.js';
+import { essenciaisDaOperacao, recusasDeEssenciais, usoDaOperacao } from './uso-operacoes.js';
 import { criarOperacoesSubdivisao } from './operacoes/subdivisao.js';
 import { criarOperacoesFriso } from './operacoes/friso.js';
 import { criarOperacoesPrimitivasBasicas } from './operacoes/primitivas-basicas.js';
@@ -512,6 +512,21 @@ function argumentoDesconhecido(st, i, op, args, registrada = null) {
   }
   return gritou;
 }
+/**
+ * Argumento numérico que VEM com valor não positivo GRITA, e o passo não roda: `cilindro` com raio -1 gerava malha invertida
+ * sem uma linha. A ausência não é recusada, porque as primitivas têm padrão travado em teste. A tabela é a de
+ * `uso-operacoes.js` e só vale para a operação nativa do núcleo: operação trocada no registro responde pelo contrato dela.
+ */
+function argumentosEssenciais(st, i, op, args, registrada) {
+  if (!args || typeof args !== 'object' || Array.isArray(args)) return false;
+  if (registrada.executar !== OPS[registrada.nome]) return false;
+  const contrato = essenciaisDaOperacao(registrada.nome);
+  if (!contrato) return false;
+  const recusas = comPassoNoErro(i, op, args, () => recusasDeEssenciais(op, args, contrato, st.num, i));
+  for (const { campo, motivo } of recusas) grita(st, i, op, campo, motivo);
+  return recusas.length > 0;
+}
+
 /** O caminho (`raio`, `secoes[1].raio`) do primeiro valor de `args` que satisfaz `serve`, ou null. */
 function caminhoDoArgumento(args, serve, caminho = '') {
   if (serve(args)) return caminho || null;
@@ -3678,6 +3693,7 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
       return;
     }
     if (argumentoDesconhecido(st, i, op, args, registrada)) return;
+    if (argumentosEssenciais(st, i, op, args, registrada)) return;
     const fn = registrada.executar;
     /* POSE DE CRIAÇÃO (A-4/O-7): `em` e `eixo` são lidos AQUI, no despacho, e
        não dentro de cada gerador. Oito geradores implementando a mesma
