@@ -73,3 +73,8 @@ importados/
 # Saída da conferência do rascunho de um objeto (`npm run conferir:vistas -- ... --saida=<objeto>/conferencia/<esboço>`),
 # que `fluxo:objeto` lê pelo resumo.json; regenerável e pesada, nunca versionada.
 procedural/pecas/*/conferencia/
+
+# Imagem de estudo (foto, catálogo, com marca) que a pessoa guarda só na própria máquina; a receita a declara em PLANO.referencias
+# como `referencias/locais/<arquivo>`. Só derivados (coordenadas, prancha própria) entram versionados.
+procedural/pecas/*/referencias/locais/
+tools/fixtures/acervo/*/referencias/locais/

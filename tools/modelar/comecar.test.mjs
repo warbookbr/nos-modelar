@@ -227,3 +227,12 @@ describe('comecar com o nome de uma operação, ficha, extensão ou comando', ()
     }
   });
 });
+
+import { comecar as comecarDireto } from './comecar.mjs';
+import { test as testeAtalho, expect as esperaAtalho } from 'vitest';
+testeAtalho('a pergunta inicial lista os roteiros completos, para ir direto num passo só', () => {
+  const r = comecarDireto({});
+  esperaAtalho(r.resultado.atalhos).toContain('modelar/peca/nova');
+  esperaAtalho(r.texto).toContain('modelar/peca/nova');
+  esperaAtalho(comecarDireto({ roteiro: 'modelar/peca/nova' }).ok).toBe(true);
+});

@@ -203,6 +203,12 @@ export function normalizarPlanoDeModelagem(valor, { quem = 'PLANO' } = {}) {
  * aqui só se diz quais caminhos são legítimos, para que a regra exista num
  * lugar só e não seja reescrita por cada comando.
  */
+/** A referência declarada em `referencias/locais/`: imagem de estudo que mora só na máquina de quem a trouxe (a pasta é ignorada pelo git).
+ *  Quando falta, as ferramentas avisam e seguem; fora dessa pasta, a falta reprova. */
+export function ehReferenciaLocal(referencia) {
+  return /(^|\/)referencias\/locais\//.test(String(referencia ?? '').trim().replaceAll('\\', '/'));
+}
+
 export function caminhosDaReferencia(referencia, pastaDaPeca) {
   const limpo = String(referencia ?? '').trim();
   if (limpo === '') return [];

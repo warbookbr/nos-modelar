@@ -143,12 +143,14 @@ export function passosDoRetrovisor(T, s, onde, inclinacao, base) {
     ['unir', { origemId: id(18), solidos: [O('unir', 17), O('unir', 24)] }],
   ];
   const finais = [O('unir', 18), O('intersectar', 8), O('extrusao', 15), O('extrusao', 16)];
+  /* as booleanas e a extrusão do colchete deixam faces finas (lascas) nas costuras: a limpeza tira as que cabem em 10 µm de desvio, sem criar vértice nem mover a superfície além disso */
+  const limpezas = [O('unir', 18), O('intersectar', 8)].map((sel) => ['limparLascas', { sel, tolerancia: 0.00001 }]);
   /* a colocação: a face do relevo (x 40 do esboço) passa a x 0, o conjunto gira com a lateral e vai ao ponto do mundo */
   const colocar = finais.flatMap((sel) => [
     ['transladar', { d: [-s * X_FACE, 0, 0], sel }],
     ['rotaciona', { eixo: 'z', graus: s * inclinacao, pivo: [0, 0, 0], sel }],
     ['transladar', { d: [onde[0], onde[1] - CENTRO_RELEVO[0], onde[2] - CENTRO_RELEVO[1]], sel }],
   ]);
-  const todos = [...passos, ...colocar];
+  const todos = [...passos, ...limpezas, ...colocar];
   return { passos: todos.map(([op, arg]) => [op, emMetros(arg)]), finais };
 }

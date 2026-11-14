@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/nucleo/uso-operacoes.js`, `procedural/nucleo/nucleo.js`, `procedural/nucleo/operacoes/`, `procedural/nucleo/expressoes*`, `procedural/nucleo/auxiliares/`, `src/autoria/executar-receita.js`, `tools/gates/argumentos-essenciais.mjs`, `docs/modelar/banco-de-provas/nucleo-para-receita-2026-11-14/`
+**Território:** `procedural/nucleo/uso-operacoes.js`, `procedural/nucleo/nucleo.js`, `procedural/nucleo/operacoes/`, `procedural/nucleo/expressoes*`, `procedural/nucleo/auxiliares/`, `src/autoria/executar-receita.js`, `tools/gates/argumentos-essenciais.mjs`, `docs/modelar/banco-de-provas/nucleo-para-receita-2026-11-14/`, `tools/gates.mjs`, `package.json`, `procedural/nucleo/entrada.js`, `docs/modelar/gerado/` e `docs/MAPA.md` (gerados), `tools/modelar/reguas-de-malha/` e `tools/modelar/descrever-peca.mjs` (a régua de espessura)
 
 **Responsável:** a IA da sessão do furgão; as mudanças foram aprovadas pela pessoa em 2026-11-13, e ativado por ela em 2026-11-14 ("pode ir fazendo em paralelo o plano do nucleo, ativar ele e fazer"), depois de o plano das costuras fechar.
 
@@ -26,6 +26,9 @@ Os arquivos `procedural/nucleo/uso-operacoes.js`, `procedural/nucleo/nucleo.js`,
 2. `parte` aceita `material`. Os dois passos separados continuam valendo, e nenhuma receita do acervo é reescrita por este plano. Prova: a mesma peça escrita dos dois jeitos dá o mesmo neutro, bit a bit.
 3. Os auxiliares que as receitas copiam (milímetro para metro, área com sinal, sentido anti-horário, espelhar) saem de um módulo do núcleo, com teste. As receitas existentes não mudam.
 4. A execução guarda o estado do prefixo de passos que não mudou e o molde do aparar por chapa, folga e plano. Prova: a carroceria do sedã, com um passo mudado depois do último aparar, reexecuta em menos de um terço dos 171 s e dá o mesmo neutro, bit a bit, que a execução sem memória.
+5. Tubo entre dois pontos na receita de peça. A `estruturaDeBarras` só carrega no registro com extensões, e a receita comum monta cada tubo como loft de duas seções com polos escritos à mão (uns 25 numa bicicleta de prova, relatado por uma sessão local em 2026-11-14). A operação passa a estar disponível na receita de peça, com a tampa fechada pela própria operação, sem mudar o resultado das famílias que já a usam. Prova: um quadro de prova escrito com a operação sai fechado, sem polo à mão, e as famílias que a usam dão o mesmo neutro. Acrescentada com o sim da pessoa em 2026-11-14.
+
+6. Casca de revolução e espessura de parede. Em cinco peças de revolução feitas numa sessão local em 2026-11-14 (copo, garrafa, vaso, prato, abajur), quatro escreveram à mão o deslocamento da parede de dentro e duas erraram o sentido. Entra uma operação que recebe o perfil de fora e a espessura e gera a parede de dentro, com o sentido decidido por ela, e uma régua de espessura de parede na malha, rodada pelo `descrever` como aviso, que mede a menor espessura por parte. Prova: um copo de prova pela operação sai fechado com a espessura pedida medida pela régua, e a régua acusa a parede fina de uma peça de prova feita para isso. Acrescentada com o sim da pessoa em 2026-11-14.
 
 ## Excluído
 
@@ -37,7 +40,7 @@ O núcleo não conhece veículo. Toda receita do acervo dá o mesmo neutro de an
 
 ## Gate de saída
 
-As quatro provas passam, o retrato do acervo não muda e `npm run gates` fica verde. O revisor adversarial tenta quebrar as fatias 1 e 4 antes da integração.
+As seis provas passam, o retrato do acervo não muda e `npm run gates` fica verde. O revisor adversarial tenta quebrar as fatias 1 e 4 antes da integração.
 
 ## Riscos e parada
 
