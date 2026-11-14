@@ -52,8 +52,8 @@ export const TABELA = {
   caixa_direcao_comprimento: 150,
   estai_diametro: 22,
   base_diametro: 24,
-  estai_x_topo: 18,
-  base_x_inicio: 26,
+  estai_x_topo: 24,
+  base_x_inicio: 30,
   movimento_central_raio: 20,
   movimento_central_largura: 68,
   tubo_selim_comprimento: 560,
@@ -74,6 +74,7 @@ export const TABELA = {
   garfo_coluna_diametro: 28,
   garfo_coluna_alem_da_caixa: 50,
   garfo_x: 50,
+  garfo_folga_pneu: 6,
   /* mesa e guidão */
   mesa_espacador: 10,
   mesa_folga_acima_caixa: 0,
@@ -202,16 +203,24 @@ export function derivar(T) {
   torno('quadro', 'aluminio', [[0, -T.movimento_central_largura / 2], [T.movimento_central_raio, -T.movimento_central_largura / 2], [T.movimento_central_raio, T.movimento_central_largura / 2], [0, T.movimento_central_largura / 2]], bb, { lados: 24, liso: 40 });
 
   /* GARFO: coroa encostada na base da caixa, ombros que nascem dela, lâminas levemente curvas para a frente, coluna coaxial */
-  const nUp = 8;
+  const nUp = 16;
+  /* as lâminas abrem só o necessário para passar a folga mínima do pneu em toda a altura dele: largas junto da coroa só onde o pneu ainda não chega */
+  const raioPneuG = T.aro_assento_diametro / 2 + T.pneu_altura;
+  const rLaminaMm = (i) => raioQ(T.garfo_perna_diametro + 8 + (T.garfo_perna_diametro_ponta - T.garfo_perna_diametro - 8) * (i / nUp));
+  const laminaBase = Array.from({ length: nUp + 1 }, (_, i) => {
+    const u = i / nUp; // 0 = coroa, 1 = ponta
+    const p = soma(naDirecao(T.garfo_eixo_a_coroa * (1 - u)), esc(nFrente, T.garfo_offset * u ** 1.3));
+    const rw = Math.hypot(p[1] - yEixo, p[2] - zEixoFrente);
+    const exige = rw - rLaminaMm(i) < raioPneuG + T.garfo_folga_pneu ? T.pneu_largura / 2 + T.garfo_folga_pneu + rLaminaMm(i) + 0.3 : 0;
+    return { p, exige, x: Math.max(T.garfo_coroa_meia_largura + (T.garfo_x - T.garfo_coroa_meia_largura) * u, exige) };
+  });
+  for (let k = 0; k < 3; k++) {
+    const xs = laminaBase.map((q) => q.x);
+    laminaBase.forEach((q, i) => { if (i > 0 && i < nUp) q.x = Math.max(q.exige, (xs[i - 1] + 2 * xs[i] + xs[i + 1]) / 4); });
+  }
   for (const lado of [-1, 1]) {
-    const lamina = Array.from({ length: nUp + 1 }, (_, i) => {
-      const u = i / nUp; // 0 = coroa, 1 = ponta
-      const t = T.garfo_eixo_a_coroa * (1 - u);
-      const p = soma(naDirecao(t), esc(nFrente, T.garfo_offset * u ** 1.3));
-      p[0] = lado * (T.garfo_coroa_meia_largura + (T.garfo_x - T.garfo_coroa_meia_largura) * u);
-      return p;
-    });
-    const rLamina = lamina.map((_, i) => raioQ(T.garfo_perna_diametro + 8 + (T.garfo_perna_diametro_ponta - T.garfo_perna_diametro - 8) * (i / nUp)));
+    const lamina = laminaBase.map((q) => { const p = [...q.p]; p[0] = lado * q.x; return p; });
+    const rLamina = lamina.map((_, i) => rLaminaMm(i));
     tubo('garfo', 'aluminio', lamina, rLamina, 32);
   }
   /* coroa: arco em torno da coluna, com ombros arredondados nas duas pontas e o cubo central encostado na caixa */
