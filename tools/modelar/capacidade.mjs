@@ -100,7 +100,8 @@ export function fichaDaOperacao(item, { extensao = null } = {}) {
   const obrigatorios = new Set(schema.required ?? []);
   const campos = Object.entries(schema.properties ?? {});
   const linhas = [`${item.nome}  (${extensao ? 'extensão' : 'operação do núcleo'}, ${item.id})`];
-  if (extensao) linhas.push(`ligação: só existe no registro com extensões: criarRegistroComExtensoes({ registroBase: REGISTRO_OPERACOES, extensoes: [{ manifesto, implementacao }] }); manifesto em procedural/extensoes/${extensao.pasta}/manifesto.js`);
+  const naReceita = extensao?.pasta === 'estrutura-de-barras' ? 'disponível na receita de peça (executarReceita usa REGISTRO_DA_RECEITA, em src/autoria/executar-receita.js, quando ninguém passa registro); fora dela ' : '';
+  if (extensao) linhas.push(`ligação: ${naReceita}só existe no registro com extensões: criarRegistroComExtensoes({ registroBase: REGISTRO_OPERACOES, extensoes: [{ manifesto, implementacao }] }); manifesto em procedural/extensoes/${extensao.pasta}/manifesto.js`);
   linhas.push(`serve: ${uso.intencao}`, `campos${campos.length ? ' (nome, tipo, obrigatório ou opcional, descrição):' : ': nenhum'}`);
   for (const [nome, c] of campos) linhas.push(`  ${nome}: ${tipoDoCampo(c)}, ${obrigatorios.has(nome) ? 'obrigatório' : 'opcional'}${c?.description ? `, ${c.description}` : ''}`);
   if (uso.exemplo?.PASSOS?.length) {
