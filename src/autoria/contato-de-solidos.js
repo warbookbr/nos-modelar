@@ -992,21 +992,31 @@ function segmentoDoCruzamento(u, t, tolerancia) {
 
 /* a menor distância do ponto à superfície, com a caixa de cada triângulo descartando o que já está mais longe que o melhor achado */
 function distanciaDoPontoAMalha(ponto, malha) {
-  const { caixas, quantidade } = indiceDaMalha(malha);
+  const indice = indiceDaMalha(malha);
+  const { caixas, quantidade, arvore } = indice;
   let melhor2 = Infinity;
-  for (let k = 0; k < quantidade; k += 1) {
-    if (melhor2 < Infinity) {
-      let longe2 = 0;
-      for (let e = 0; e < 3; e += 1) {
-        const x = ponto[e]; const baixo = caixas[k * 6 + e]; const alto = caixas[k * 6 + 3 + e];
-        const dd = x < baixo ? baixo - x : x > alto ? x - alto : 0;
-        longe2 += dd * dd;
-      }
-      if (longe2 >= melhor2) continue;
+  const medir = (k) => {
+    let longe2 = 0;
+    for (let e = 0; e < 3; e += 1) {
+      const x = ponto[e]; const baixo = caixas[k * 6 + e]; const alto = caixas[k * 6 + 3 + e];
+      const dd = x < baixo ? baixo - x : x > alto ? x - alto : 0;
+      longe2 += dd * dd;
     }
+    if (longe2 >= melhor2) return false;
     const d2 = distancia2PontoTriangulo(ponto, malha.triangulos[k]);
     if (d2 < melhor2) melhor2 = d2;
-  }
+    return false;
+  };
+  if (arvore === null) { for (let k = 0; k < quantidade; k += 1) medir(k); return Math.sqrt(melhor2); }
+  /* Pela árvore, numa caixa em volta do ponto que dobra até achar triângulo; depois, uma última com o raio do melhor achado,
+     que contém todo triângulo mais perto que ele. Percorrer a malha inteira por ponto levava o contato do furgão realista
+     de 7 s a 87 s (2026-11-14). */
+  const [px, py, pz] = ponto;
+  let r = 1e-4;
+  for (let volta = 0; volta < 60 && melhor2 === Infinity; volta += 1, r *= 2) visitarPorCaixa(arvore, px - r, py - r, pz - r, px + r, py + r, pz + r, medir);
+  if (melhor2 === Infinity) { for (let k = 0; k < quantidade; k += 1) medir(k); return Math.sqrt(melhor2); }
+  const raio = Math.sqrt(melhor2);
+  visitarPorCaixa(arvore, px - raio, py - raio, pz - raio, px + raio, py + raio, pz + raio, medir);
   return Math.sqrt(melhor2);
 }
 
