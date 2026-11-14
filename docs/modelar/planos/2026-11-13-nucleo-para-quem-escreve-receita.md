@@ -1,6 +1,6 @@
 # Núcleo para quem escreve receita: erro na hora, menos passos e rodada mais curta
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `procedural/nucleo/uso-operacoes.js`, `procedural/nucleo/nucleo.js`, `procedural/nucleo/operacoes/`, `procedural/nucleo/expressoes*`, `procedural/nucleo/auxiliares/`, `src/autoria/executar-receita.js`, `tools/gates/argumentos-essenciais.mjs`, `docs/modelar/banco-de-provas/nucleo-para-receita-2026-11-14/`, `tools/gates.mjs`, `package.json`, `procedural/nucleo/entrada.js`, `docs/modelar/gerado/` e `docs/MAPA.md` (gerados), `tools/modelar/reguas-de-malha/` e `tools/modelar/descrever-peca.mjs` (a régua de espessura)
 
@@ -48,4 +48,4 @@ A recusa nova reprovar receita do acervo que hoje passa com valor degenerado: ca
 
 ## Fechamento
 
-Preencher ao concluir ou cancelar.
+Concluído em 2026-11-14, com duas passadas do revisor adversarial, cujas ressalvas entraram. Entregou a recusa na hora (valor declarado não positivo ou abaixo do mínimo nas primitivas, com passo, valor e limite; erro de expressão com passo e nome próximo; sugestão de operação; o gate `essenciais:check`, que também recusa `nucleo(` sem registro fora de `executarReceita`); `parte` com `material` no mesmo passo, bit a bit igual aos dois passos; os auxiliares de milímetro, área, sentido e espelho no núcleo; a memória de execução opt-in e o molde do aparar guardado, com a carroceria do sedã de 188 s para 45 s com um passo mudado e o mesmo neutro; a `estruturaDeBarras` na receita de peça; o `lathe` com `espessura`, que faz a parede de dentro, inclusive na tigela; e a espessura de parede por parte no `descrever`, com aviso só quando o `PLANO` declara `espessuraMinima`. O cubo aceita `prof` negativo por contrato (espelha em z), porque o sedã o usa e trocar o sinal muda a peça. O retrato do acervo não mudou pelo plano. Fica de fora a ausência de argumento com padrão, que é contrato travado em teste.
