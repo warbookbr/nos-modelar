@@ -1,6 +1,6 @@
 # Furgão realista — uma cópia do furgão do acervo levada a proporções e lataria de veículo real pelo fluxo de modelagem inteiro
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `procedural/pecas/furgao-realista/`, `procedural/familias/roda-pneu/`, `docs/modelar/banco-de-provas/furgao-realista-2026-10-30/`, `tools/modelar/familia-com-esboco.andaimes.json`, `docs/modelar/contratos/CONTRATO-DA-FAMILIA.md`, `src/autoria/corte-de-plano.js`
 
@@ -178,3 +178,7 @@ Em 2026-11-13 a guarda do acervo passou a avisar duas faces abaixo do piso da pe
 Etapa 8, rodada de acabamento (2026-11-14), aprovada pela pessoa por imagem de antes e depois: o aro da luz de canto com 18 segmentos, as barras da grade embutidas 6 mm na aba, `limparLascas` de 10 µm nos retrovisores (faces finas de 53 e 47 para 0, e as duas faces abaixo do piso da peça inteira saíram) e `p_folga_d` 90 na chapa, que tirou o calombo das colunas do pé do para-brisa e a emenda de 3,5 mm do canto do teto. Ficam como estão, por decisão da pessoa, a emenda de 2,3 mm onde o vão do para-brisa termina, que pediria outra divisão da gaiola, e o canto de uns 45° na ponta das molduras dos arcos, que é forma. Faces finas da peça de 285 para 185; 117 de 127 partes com a malha igual. Segue a etapa de materiais das partes ainda em cor chapada.
 
 Etapa de materiais (2026-11-14), aprovada pela pessoa por imagem do furgão inteiro: entre opções lado a lado na peça de prova `tools/fixtures/acervo/materiais-do-furgao-opcoes`, a borracha fosca com granulado fino, a grade no plástico acetinado da saia, o aro e a aba do farol em metal pintado claro, a lâmpada de vidro leitoso, o interior em tecido e plástico foscos com granulado, o espelho como estava e a antena e as alças das maçanetas em preto brilhante. A malha saiu idêntica, parte por parte. Seguem o crítico do objeto inteiro, a aprovação final ao lado do `furgao` e o fechamento.
+
+## Fechamento
+
+Concluído em 2026-11-14 com a aprovação final da pessoa, por imagens do `furgao-realista` ao lado do `furgao` e pela frente em luz rasante, e com nota 8 do crítico cego do objeto inteiro. Dos quatro pontos do crítico, o rebaixo da placa traseira já existia com 8 mm de fundo e some no plástico preto, a ponteira está presa ao para-choque com 1 mm de penetração e as nervuras do teto são os sulcos aprovados na etapa 2. A ponta das barras da grade sai 8 mm além da parede do vão e, em luz rasante lateral, faz faixas de sombra; reduzir a saliência de 14 para 5,5 mm encolheu as faixas sem tirá-las e achatou a grade, e a pessoa escolheu manter os 14 mm. O defeito foi para o BACKLOG, junto com três achados de ferramenta que o processo não pegou sozinho: o pacote do crítico deste objeto tem 276 imagens e o crítico abriu 19; `vistas:critica` levou cerca de 25 minutos no furgão e numa rodada parou mais de 25 minutos na conferência contra a referência; e nada avisa o modelador de que `MODELAR_BLENDER` está vazio antes de ele tentar reproduzir um defeito da luz rasante.
