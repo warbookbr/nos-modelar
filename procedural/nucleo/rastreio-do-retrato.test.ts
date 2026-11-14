@@ -42,7 +42,6 @@ describe('declaração de escrita por operação', () => {
       expect(Object.keys(OPS), nome).toContain(nome);
       expect(['nada', 'alvos', 'acrescenta']).toContain(V);
       expect(['nada', 'alvos', 'acrescenta']).toContain(F);
-      expect(V, `${nome}: 'alvos' só vale para faces`).not.toBe('alvos');
     }
   });
 
@@ -118,6 +117,28 @@ describe('casos sintéticos: o atalho devolve a procedência da conta completa',
     const registro = { resolver: (nome: string) => (nome === 'material' ? material : REGISTRO_OPERACOES.resolver(nome)) };
     const n = igualNosTresCaminhos({ PASSOS: [['cubo', {}], ['material', { usa: 'a', sel: TUDO }]], MATERIAIS }, registro);
     expect(n.procedencia.passos.find((p: any) => p.passo === 1).saidas.vertices).toEqual([0]);
+  });
+});
+
+describe('rotaciona, transladar e arranja declaram a escrita', () => {
+  it('movem vértice no lugar e copiam sem o retrato inteiro, com a procedência da conta completa', () => {
+    const o = (op: string, id: number) => ({ origem: { op, id } });
+    const passos: Passo[] = [
+      ['cubo', { origemId: 1, lado: 1 }], ['cubo', { origemId: 2, lado: 0.5, em: [2, 0, 0] }],
+      ['rotaciona', { eixo: 'y', graus: 30, sel: o('cubo', 1) }], ['rotaciona', { eixo: 'x', graus: 0, sel: o('cubo', 1) }],
+      ['transladar', { d: [0, 1, 0], sel: { v: [0, 1] } }], ['transladar', { d: [0, 0, 0], sel: o('cubo', 2) }],
+      ['rotaciona', { eixo: 'z', graus: 10 }], ['transladar', { d: [1, 0, 0], sel: { v: [9999] } }],
+      ['arranja', { modo: 'linear', total: 3, d: [0, 0, 3], origemId: 10, derivaDe: o('cubo', 2).origem, sel: o('cubo', 2) }],
+      ['arranja', { modo: 'radial', total: 3, eixo: 'y', volta: 360, origemId: 11, derivaDe: o('cubo', 1).origem, sel: o('cubo', 1) }],
+      ['transladar', { d: [0, 0, 1], sel: o('arranja', 10) }],
+    ];
+    const n = igualNosTresCaminhos({ PASSOS: passos });
+    const doPasso = (k: number) => n.procedencia.passos.find((p: any) => p.passo === k)?.saidas;
+    expect(doPasso(3)?.vertices).toEqual([]);          // girar 0 grau não muda nada
+    expect(doPasso(4)?.vertices.length).toBe(2);
+    expect(doPasso(5)?.vertices).toEqual([]);          // translação nula
+    expect(doPasso(8)?.faces.length).toBe(12);         // duas cópias de um cubo de 6 faces
+    expect(n.orfaos).toEqual([]);
   });
 });
 

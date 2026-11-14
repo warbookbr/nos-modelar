@@ -113,6 +113,7 @@ export function criarOperacoesTransformacoes(servicos) {
       const p = st.V.get(v);
       if (!p) continue;   // defensivo (nunca deveria faltar — veio de st.V.keys() ou de um canto de face já validado)
       st.V.set(v, [p[0] + d[0], p[1] + d[1], p[2] + d[2]]);   // in-place — NUNCA cria vértice novo
+      if (st.alvosV) st.alvosV.add(v);   // o despacho só confere no retrato o que o passo declara ter escrito
     }
   },
 
@@ -172,6 +173,7 @@ export function criarOperacoesTransformacoes(servicos) {
       const p = st.V.get(v);
       if (!p) continue;   // defensivo (nunca deveria faltar — veio de st.V.keys() ou de um canto de face já validado)
       st.V.set(v, giraPonto(p, pivo, ax, c, s));   // in-place — NUNCA cria vértice novo
+      if (st.alvosV) st.alvosV.add(v);
     }
   },
 

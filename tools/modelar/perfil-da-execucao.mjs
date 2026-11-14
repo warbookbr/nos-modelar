@@ -79,7 +79,8 @@ export async function perfilarReceita(receita, { topo = 20 } = {}) {
   };
 }
 
-export async function analiseDoAcervo({ raiz = REPO } = {}) {
+/** Os nomes das receitas de passos do acervo, as partes das montagens como `<objeto>/<parte>`. */
+export function pecasDoAcervo({ raiz = REPO } = {}) {
   const base = resolve(raiz, 'procedural/pecas');
   const pecas = [];
   for (const f of readdirSync(base).filter((n) => !n.startsWith('.') && !n.endsWith('.md')).sort()) {
@@ -88,6 +89,11 @@ export async function analiseDoAcervo({ raiz = REPO } = {}) {
       for (const parte of readdirSync(resolve(base, f, 'partes')).sort()) if (existsSync(resolve(base, f, 'partes', parte, 'receita.js'))) pecas.push(`${f}/${parte}`);
     } else pecas.push(f);
   }
+  return pecas;
+}
+
+export async function analiseDoAcervo({ raiz = REPO } = {}) {
+  const pecas = pecasDoAcervo({ raiz });
   const saida = [];
   for (const peca of pecas) {
     let receita;

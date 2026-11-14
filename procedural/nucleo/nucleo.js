@@ -3555,7 +3555,7 @@ export function idsMudados(antes, depois) {
    (79 passos, 22 milhões de comparações, quase todas para constatar que nada mudou). Uma operação do próprio núcleo pode declarar,
    por mapa, o que escreve nas entradas que já existiam antes do passo:
      'nada'       nenhuma entrada é tocada (só o tamanho do mapa é conferido);
-     'alvos'      só as entradas que `resolverAlvosF` devolveu no passo (as operações de atributo escrevem a face pelo alvo);
+     'alvos'      só as entradas que `resolverAlvosF` devolveu no passo (as operações de atributo escrevem a face pelo alvo) e, nos vértices, as que a operação pôs em `st.alvosV` (`rotaciona` e `transladar` movem o vértice no lugar);
      'acrescenta' as entradas antigas ficam como estavam e o passo só cria (e não apaga) entradas.
    Mapa que não tem declaração, ou cujo tamanho contradiz a declaração, segue o caminho completo de `retratarEntradas`. A
    declaração vale só para a função do próprio núcleo (`executar === OPS[nome]`): operação de extensão ou de outro registro nunca
@@ -3568,6 +3568,10 @@ export const ESCRITA_DAS_OPERACOES = Object.freeze({
   material: { V: 'nada', F: 'alvos' },
   liso: { V: 'nada', F: 'alvos' },
   solido: { V: 'nada', F: 'alvos' },
+  /* mexem só na posição dos vértices que citam (`st.alvosV`), sem criar nem apagar entrada; `arranja` só acrescenta cópias */
+  rotaciona: { V: 'alvos', F: 'nada' },
+  transladar: { V: 'alvos', F: 'nada' },
+  arranja: { V: 'acrescenta', F: 'acrescenta' },
   publicarPorta: { V: 'nada', F: 'nada' },
   pesar: { V: 'nada', F: 'nada' },
 });
@@ -3686,7 +3690,7 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
   /* parteAtribuidaEm: face -> índice do passo que a nomeou. É PROCEDÊNCIA de
      diagnóstico (não sai no neutro, não vira formato salvo): serve pro `parte`
      dizer QUEM nomeou a face antes, quando uma segunda seleção tenta roubá-la. */
-  const st = { V: new Map(), F: new Map(), orfaos: orfaosIniciais, avisos: [], merges: [], partes: {}, paisDasPartes: new Map(), origens: new Map(), portas: new Map(), declaracoesOrigem, aliases, dict, num, vec, materiais: MATERIAIS, esqueleto, ossoSet, pesos: new Map(), parteAtribuidaEm: new Map(), consumidas: new Map(), pedacosDe: new Map(), alvosF: null, novosV: null, novosF: null, procedencia: criarEstadoDeProcedencia(), passos: PASSOS };
+  const st = { V: new Map(), F: new Map(), orfaos: orfaosIniciais, avisos: [], merges: [], partes: {}, paisDasPartes: new Map(), origens: new Map(), portas: new Map(), declaracoesOrigem, aliases, dict, num, vec, materiais: MATERIAIS, esqueleto, ossoSet, pesos: new Map(), parteAtribuidaEm: new Map(), consumidas: new Map(), pedacosDe: new Map(), alvosF: null, alvosV: null, novosV: null, novosF: null, procedencia: criarEstadoDeProcedencia(), passos: PASSOS };
 
   const modoRetrato = OPCOES.retrato ?? 'rapido';
   let retrato = null;
@@ -3760,13 +3764,14 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
     const antes = pose ? new Set(st.V.keys()) : null;
     const escrita = modoRetrato === 'completo' || registrada.executar !== OPS[registrada.nome] ? undefined : ESCRITA_DAS_OPERACOES[registrada.nome];
     st.alvosF = escrita?.F === 'alvos' ? new Set() : null;
+    st.alvosV = escrita?.V === 'alvos' ? new Set() : null;
     st.novosV = escrita?.V === 'acrescenta' ? [] : null;
     st.novosF = escrita?.F === 'acrescenta' ? [] : null;
     if (fn.nativaModelar) { try { const contexto = contextoNativo(st, i, { leitura: (registrada.artefatos?.entra ?? []).length > 0, op: registrada.nome }); fn(contexto, args); contexto.publicar(); } catch (erro) { grita(st, i, op, null, `extensão nativa recusou: ${erro.message}`); return; } }
     else comPassoNoErro(i, op, args, () => fn(st, args, i));
     if (pose) aplicarPoseDeCriacao(st, antes, pose);
-    const { alvosF, novosV, novosF } = st;
-    st.alvosF = st.novosV = st.novosF = null;
+    const { alvosF, alvosV, novosV, novosF } = st;
+    st.alvosF = st.alvosV = st.novosV = st.novosF = null;
     /* o caminho completo calcula antes do atalho, que atualiza o retrato de antes no lugar */
     let depoisV = null, depoisF = null, mudadosV = null, mudadosF = null;
     const t0Depois = medirRastreio ? performance.now() : 0;
@@ -3777,7 +3782,7 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
       mudadosF = idsMudados(antesF, depoisF);
     }
     if (escrita !== undefined) {
-      const rapidoV = rastrearEntradas(st.V, antesV, escrita.V, novosV);
+      const rapidoV = rastrearEntradas(st.V, antesV, escrita.V, escrita.V === 'acrescenta' ? novosV : alvosV);
       const rapidoF = rastrearEntradas(st.F, antesF, escrita.F, escrita.F === 'acrescenta' ? novosF : alvosF);
       if (modoRetrato === 'conferido') {
         const confere = (mapa, completo, mudados, rapido) => rapido === null
