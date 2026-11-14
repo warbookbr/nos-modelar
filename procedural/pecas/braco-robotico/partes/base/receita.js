@@ -158,7 +158,7 @@ const receita = {
   },
   contatos: [
     { par: ['corpo', 'pe'], motivo: 'o corpo nasce no centro do pé' },
-    { par: ['caixaLateral', 'corpo'], motivo: 'a caixa encosta no corpo sem fresta' },
+    { par: ['caixaLateral', 'corpo'], motivo: 'a caixa de face plana entra até 11 mm no corpo redondo para não deixar fresta nas bordas da curva', penetracaoMaxima: 0.011 }, // embutido de propósito, medido em 2026-11-14 (10,4 mm)
     { par: ['caixaLateral', 'pe'], motivo: 'a caixa se apoia no pé' },
   ],
   get PASSOS() { return gerarPassos(this.PARAMS); },
