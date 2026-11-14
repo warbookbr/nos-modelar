@@ -53,6 +53,24 @@ export const PLANO = {
   criteriosDeReprovacao: [],
 };
 
+/* A forma mínima do que as receitas do acervo usam e o esqueleto não traz. O exemplo vivo de cada uma está na receita citada; copie dali.
+ *
+ * MATERIAL: declare em MATERIAIS na receita (\`MATERIAIS: { aco: { cor: '#6b737b', metalicidade: 0.8, aspereza: 0.4 } }\`) e aplique por
+ * passo, depois da \`parte\`: \`['material', { usa: 'aco', sel: { alias: 'abaParede' } }]\`. Exemplo: procedural/pecas/suporte-tubo/receita.js.
+ *
+ * PARTE COM VÁRIOS CORPOS: a \`sel\` da \`parte\` é um alias cuja definição é \`{ unir: [{ origem: { op, id } }, ...] }\`, em ALIASES: o
+ * cilindro inteiro é \`unir\` da lateral e das tampas (\`{ origem: { op: 'cilindro', id }, tampa: 'fundo' }\` e \`tampa: 'topo'\`). Sem as
+ * tampas a seleção deixa faces sem parte. Exemplos: ALIASES de procedural/pecas/suporte-tubo/receita.js e \`cilindroInteiro\` de
+ * procedural/pecas/trator-pa/receita.js.
+ *
+ * ALIASES: \`export const ALIASES = [['nome', { unir: [...] }]]\` e a receita o devolve em \`ALIASES\`; o passo cita \`sel: { alias: 'nome' }\`.
+ *
+ * PONTOS: \`export const PONTOS = [{ nome: 'o que o ponto é', parte: 'carenagem', medida: 'maximo' | 'minimo' | 'centro', em: [x, y, z], toleranciaMm: 1 }]\`
+ * e a receita o devolve em \`PONTOS\`; o \`descrever\` e a medição da rodada o conferem. Exemplo: procedural/pecas/carenagem-de-prova/receita.js.
+ *
+ * FUROS: vão no PERFIL da extrusão, \`['extrusao', { origemId, altura, perfil, furos: [contorno, ...] }]\`, e as paredes deles se selecionam
+ * por \`{ op: 'extrusao', id, parede: 'furos' }\`. Exemplo (dois furos oblongos): procedural/pecas/suporte-tubo/receita.js. */
+
 const receita = {
   meta: { nome: ${literal(peca)}, desc: '' },
   PARAMS: TABELA,

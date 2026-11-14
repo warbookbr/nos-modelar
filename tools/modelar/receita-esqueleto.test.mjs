@@ -26,6 +26,16 @@ describe('receita:esqueleto', () => {
     expect(() => normalizarPlanoDeModelagem(modulo.PLANO)).toThrow(/PLANO/);
   });
 
+  it('o esqueleto traz a forma mínima de material, parte com vários corpos, ALIASES, PONTOS e furos, apontando a receita do acervo que é exemplo vivo', () => {
+    executar(['pedal'], { raiz });
+    const texto = readFileSync(caminho('pedal'), 'utf8');
+    for (const assunto of ['MATERIAL:', 'PARTE COM VÁRIOS CORPOS:', 'ALIASES:', 'PONTOS:', 'FUROS:']) expect(texto).toContain(assunto);
+    for (const exemplo of ['procedural/pecas/suporte-tubo/receita.js', 'procedural/pecas/trator-pa/receita.js', 'procedural/pecas/carenagem-de-prova/receita.js']) {
+      expect(texto).toContain(exemplo);
+      expect(existsSync(join(process.cwd(), exemplo))).toBe(true);
+    }
+  });
+
   it('--objeto, --escala e --partes adiantam o dito, e o plano segue recusado enquanto forma, técnica e critérios faltam', async () => {
     const r = executar(['pedal', '--objeto=pedal de bicicleta, o conjunto inteiro', '--escala=comprimento total:100', '--partes=corpo,eixoDoPedal'], { raiz });
     expect(r.codigo).toBe(0);
