@@ -224,6 +224,28 @@ Com a opção `aoRastrear` do núcleo (desligada por padrão, passada por `execu
 
 Execução de `executarReceita` sozinha, processo novo, três execuções, máquina sem outra carga pesada (nenhum processo de vitest, gates, descrever ou blender de outro agente; carga de um minuto entre 0,85 e 1,45): 66,1 s, 65,6 s e 64,4 s, mediana 65,6 s, contra 118,1 s antes (queda de 44,5%). A meta de menos de 85 s foi cumprida. A economia de 52,5 s é compatível com o que a hipótese previa: os rastreios de `rotaciona`, `transladar` e `arranja` somavam 61 s na execução cronometrada, e saíram quase todos. O que resta de rastreio está em `subtrair`, `unir`, `intersectar`, `aberturaPorContorno` (7,3 s no passo todo de 32,9 s), `limparLascas` e `subdivisao`, que pedem uma declaração diferente (criam e apagam faces) e ficam como candidatas de uma fatia seguinte, com a mesma prova.
 
+## Andamento — fatia 2, extensão às booleanas e à abertura
+
+### O mecanismo
+
+As cinco operações criam, apagam e alteram entradas, então o nível 'alvos' e o 'acrescenta' não bastam. O núcleo ganhou o nível `'tocados'` em `ESCRITA_DAS_OPERACOES`: durante o passo, o despacho instala em `st.V` e `st.F` um `set`, um `delete` e um `clear` que registram o id (e restaura o mapa ao fim do passo), e a operação soma em `st.tocadosV` e `st.tocadosF` o que altera no lugar sem passar pelo mapa. Só as entradas desse conjunto são conferidas no retrato, e o tamanho do mapa tem de fechar com as criadas e as apagadas, antes de qualquer escrita no retrato; se não fechar, ou se houver `clear`, o passo volta para a conta completa. Por isso uma declaração incompleta de criação ou de apagamento não dá resultado errado, só perde o ganho. O que dá resultado errado é a alteração no lugar que a operação não soma, e é essa que o teste e o modo conferido discriminam.
+
+### O que cada operação soma, e a prova
+
+Uma operação por commit, cada uma com caso em `rastreio-do-retrato.test.ts` que roda o completo, o rápido e o conferido e compara procedência, artefato, vértices, faces, órfãos e partes.
+
+- `subtrair`, `unir`, `intersectar` (`nucleoBooleano`): somam as faces dos operandos e os vértices que elas usam, porque a booleana reescreve no lugar o `vs` e as `quebras` das faces cortadas e mantidas. Estrago feito: tirando a soma dos operandos, 4 casos reprovam ("o rastreio declarado de 'subtrair' divergiu da conta completa no passo 3"). Casos: corte de canto seguido de atributos e de outro corte sobre o resultado, corte que não toca o alvo, ferramenta já consumida (recusa), união por sobreposição, por contato e por ferramenta disjunta, interseção seguida de corte.
+- `limparLascas`: soma as faces cujo `vs` e `quebras` reescreve (`res.faces`). Estrago feito: tirando a soma, o kukri e as rodas do sedã reprovam. Caso no teste: o kukri (a limpeza funde vértices e reescreve faces); as rodas do sedã (4 passos, 6 vértices e 26 faces por passo) ficam só na conferência do acervo, porque o caso leva 9 s.
+- `aberturaPorContorno`: soma as faces de `valencia.faces`, que ela reescreve no lugar, e herda a soma da booleana de dentro. Esta declaração não ficou discriminada pelo teste: nem tirando a soma da própria abertura nem a das booleanas a chapa de prova reprova, porque as faces reescritas são criadas no mesmo passo (já registradas pelo mapa) ou voltam para a conta completa pela conferência de tamanho. A prova da abertura é o modo conferido no furgão realista, o único do acervo que a usa (17 passos), que passou.
+
+Sem declaração ficam `aparar` e `arredondarCostura`, que chamam as mesmas funções mas não foram pedidas, e o `unir` lateral e os demais caminhos que o conferido não exerce no acervo seguem protegidos só pela conferência de tamanho e pelos casos acima.
+
+### Resultado
+
+- `node tools/modelar/conferir-retrato-do-acervo.mjs --acervo` (uma receita por processo, `rapido` contra `conferido`, hash SHA-256 da saída inteira): 110 receitas, 9.444 passos, 110 iguais, 0 divergências, nenhuma recusa do modo conferido. O hash passou a usar `chaveExata` depois da revisão, então não se compara com o da rodada anterior; a comparação é entre o rápido e o conferido da mesma rodada.
+- Furgão realista, `executarReceita` sozinha, processo novo, máquina sem outra carga pesada (nenhum vitest, gates, descrever ou blender; carga de um minuto entre 0,85 e 1,07): 46,4 s, 48,6 s e 46,8 s, mediana 46,8 s. Antes desta extensão, 65,6 s; antes da fatia 2, 118,1 s. A meta de menos de 50 s foi cumprida. Uma execução de sonda contou, nos 49 passos das cinco operações, 98 usos do atalho (vértices e faces) e 0 recuos para a conta completa.
+- Tempo do rápido contra o conferido no acervo (ms): furgão realista 45.618 contra 469.563; carroceria do sedã 128.357 contra 206.395.
+
 ## Riscos e parada
 
 A identidade de face é o risco central: unir as ferramentas de uma subtração pode mudar quais faces o núcleo nomeia como criadas por
