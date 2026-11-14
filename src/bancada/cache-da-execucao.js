@@ -23,9 +23,43 @@ export function chaveDaExecucao({ motor, receita, extras = {} }) {
   return `v${VERSAO_DO_FORMATO}|motor:${motor}|receita:${receita}|${fixos}`;
 }
 
-/** O IndexedDB como armazém de uma vaga por receita. Toda falha vira `null`/`false`, nunca exceção. */
+/* O Chrome recusa valor de IndexedDB acima de uns 128 MiB, e o neutro do furgão realista passa disso (146 MB). O registro vai em
+   pedaços: cada campo do neutro é um pedaço, e as tabelas grandes (`Map`) se partem em fatias de `ENTRADAS_POR_PEDACO`. */
+export const ENTRADAS_POR_PEDACO = 20_000;
+
+/** `{ chave, neutro }` -> `{ meta, pedacos }`. Reversível por `juntarRegistro`. */
+export function fatiarRegistro({ chave, neutro }) {
+  const pedacos = [];
+  for (const [nome, valor] of Object.entries(neutro)) {
+    if (valor instanceof Map && valor.size > ENTRADAS_POR_PEDACO) {
+      const entradas = [...valor];
+      for (let inicio = 0; inicio < entradas.length; inicio += ENTRADAS_POR_PEDACO) {
+        pedacos.push({ tipo: 'tabela', nome, entradas: entradas.slice(inicio, inicio + ENTRADAS_POR_PEDACO) });
+      }
+    } else {
+      pedacos.push({ tipo: 'campo', nome, valor });
+    }
+  }
+  return { meta: { chave, pedacos: pedacos.length }, pedacos };
+}
+
+export function juntarRegistro({ meta, pedacos }) {
+  const neutro = {};
+  for (const pedaco of pedacos) {
+    if (pedaco.tipo === 'campo') neutro[pedaco.nome] = pedaco.valor;
+    else {
+      neutro[pedaco.nome] ??= new Map();
+      for (const [k, v] of pedaco.entradas) neutro[pedaco.nome].set(k, v);
+    }
+  }
+  return { chave: meta.chave, neutro };
+}
+
+/** O IndexedDB como armazém de uma vaga por receita (meta em `vaga`, pedaços em `vaga#i`). Toda falha vira `null`/`false`, nunca exceção. */
 export function criarArmazemIndexedDB({ indexedDB: fabrica = globalThis.indexedDB } = {}) {
   let abertura = null;
+  /* o cache é opcional, mas falha muda precisa deixar rastro: um aviso no console por falha */
+  const avisarFalha = (erro) => console.warn('cache da execução: o IndexedDB recusou a operação:', erro?.name ?? '', erro?.message ?? erro);
 
   function abrir() {
     if (!fabrica) return Promise.resolve(null);
@@ -43,26 +77,55 @@ export function criarArmazemIndexedDB({ indexedDB: fabrica = globalThis.indexedD
     return abertura;
   }
 
-  function transacao(modo, usar) {
-    return abrir().then((banco) => {
+  const chaveDoPedaco = (vaga, i) => `${vaga}#${i}`;
+
+  return {
+    async ler(vaga) {
+      const banco = await abrir();
+      if (!banco) return null;
+      try {
+        const tx = banco.transaction(LOJA, 'readonly');
+        const loja = tx.objectStore(LOJA);
+        const pedir = (chave) => new Promise((resolver, rejeitar) => {
+          const pedido = loja.get(chave);
+          pedido.onsuccess = () => resolver(pedido.result ?? null);
+          pedido.onerror = () => rejeitar(pedido.error);
+        });
+        const meta = await pedir(vaga);
+        if (!meta?.chave || !Number.isInteger(meta.pedacos)) return null;
+        const pedacos = [];
+        for (let i = 0; i < meta.pedacos; i += 1) {
+          const pedaco = await pedir(chaveDoPedaco(vaga, i));
+          if (!pedaco) return null;
+          pedacos.push(pedaco);
+        }
+        return juntarRegistro({ meta, pedacos });
+      } catch (erro) {
+        avisarFalha(erro);
+        return null;
+      }
+    },
+    async gravar(vaga, registro) {
+      const banco = await abrir();
       if (!banco) return null;
       return new Promise((resolver) => {
         try {
-          const tx = banco.transaction(LOJA, modo);
-          const pedido = usar(tx.objectStore(LOJA));
-          tx.oncomplete = () => resolver(modo === 'readonly' ? (pedido.result ?? null) : true);
-          tx.onerror = () => resolver(modo === 'readonly' ? null : false);
-          tx.onabort = () => resolver(modo === 'readonly' ? null : false);
-        } catch {
-          resolver(modo === 'readonly' ? null : false);
+          const { meta, pedacos } = fatiarRegistro(registro);
+          const tx = banco.transaction(LOJA, 'readwrite');
+          const loja = tx.objectStore(LOJA);
+          loja.delete(IDBKeyRange.bound(`${vaga}#`, `${vaga}#￿`));
+          pedacos.forEach((pedaco, i) => loja.put(pedaco, chaveDoPedaco(vaga, i)));
+          loja.put(meta, vaga);
+          tx.oncomplete = () => resolver(true);
+          const falhou = () => { avisarFalha(tx.error); resolver(false); };
+          tx.onerror = falhou;
+          tx.onabort = falhou;
+        } catch (erro) {
+          avisarFalha(erro);
+          resolver(false);
         }
       });
-    });
-  }
-
-  return {
-    ler: (vaga) => transacao('readonly', (loja) => loja.get(vaga)),
-    gravar: (vaga, registro) => transacao('readwrite', (loja) => loja.put(registro, vaga)),
+    },
   };
 }
 

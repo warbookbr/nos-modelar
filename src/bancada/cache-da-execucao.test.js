@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { executarReceita } from '../autoria/executar-receita.js';
 import { adaptarThree } from '../autoria/adaptar-three.js';
 import {
-  chaveDaExecucao, criarArmazemEmMemoria, neutroComCache, textoDaExecucao, lerImpressaoDoServidor, criarArmazemIndexedDB,
+  chaveDaExecucao, criarArmazemEmMemoria, fatiarRegistro, juntarRegistro, ENTRADAS_POR_PEDACO, neutroComCache, textoDaExecucao, lerImpressaoDoServidor, criarArmazemIndexedDB,
 } from './cache-da-execucao.js';
 import { impressaoDaReceita, impressaoDoMotor, fechoDeImports } from '../../tools/bancadas/impressao-das-fontes.mjs';
 
@@ -159,6 +159,17 @@ describe('cache da execução: reaproveitamento e fidelidade', () => {
     expect(await lerImpressaoDoServidor('x.js', { buscar: async () => ({ ok: false }) })).toBeNull();
     expect(await lerImpressaoDoServidor('x.js', { buscar: async () => ({ ok: true, json: async () => ({ motor: 'm', receitas: { 'x.js': 'r' } }) }) }))
       .toEqual({ motor: 'm', receita: 'r' });
+  });
+
+  it('o registro grande se parte em pedaços (o IndexedDB recusa valor acima de uns 128 MiB) e se junta idêntico', () => {
+    const V = new Map(Array.from({ length: ENTRADAS_POR_PEDACO * 2 + 5 }, (_, i) => [i, [i, i + 1, i + 2]]));
+    const neutro = { V, F: new Map([[1, [1, 2, 3]]]), orfaos: [], procedencia: { a: 1 } };
+    const fatiado = fatiarRegistro({ chave: 'k', neutro });
+    expect(fatiado.pedacos.length).toBe(3 + 3);
+    const junto = juntarRegistro(structuredClone(fatiado));
+    expect(junto.chave).toBe('k');
+    expect(isDeepStrictEqual(junto.neutro, neutro)).toBe(true);
+    expect([...junto.neutro.V.keys()].slice(0, 3)).toEqual([0, 1, 2]);
   });
 
   it('o texto mostrado diz a origem e o tempo', () => {

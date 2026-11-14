@@ -392,10 +392,12 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
   const executarDoAcervoComCache = async (entrada, receita) => {
     const caminho = String(entrada.caminho ?? '').replace(/^(\.\.\/)+/, '');
     const impressao = caminho ? await lerImpressaoDoServidor(caminho, { base: import.meta.env?.BASE_URL ?? '/' }) : null;
-    return neutroComCache({
+    const execucao = await neutroComCache({
       vaga: caminho || entrada.id, impressao, armazem: armazemDaExecucao,
       executar: () => executarReceita(receita).neutro,
     });
+    execucao.gravacao.then((gravou) => { if (execucao.origem === 'executada' && impressao) console.info(`cache da execução: ${entrada.id} ${gravou ? 'gravada' : 'não gravada'}`); });
+    return execucao;
   };
   sessao = criarSessaoDaBancada({
     estado, cena, edicao, imagemNaCena, anotacoes3D, registroDeEventos, avisar, mostrarErro, arquivoDaSessao,
