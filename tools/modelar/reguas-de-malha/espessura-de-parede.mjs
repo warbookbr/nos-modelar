@@ -1,13 +1,16 @@
 /* espessura-de-parede.mjs — régua de malha: a menor espessura de parede de cada parte (plano "núcleo para quem escreve receita", fatia 6).
  *
- * Do centro de uma face, um raio entra pelo material, no sentido contrário ao da normal, e a distância até a primeira face da MESMA parte que ele
- * cruza é a espessura da parede naquele ponto: numa casca fechada é a parede oposta (o fundo do copo, a lateral), e numa face sem parede do outro lado
- * (superfície aberta) o raio não acha nada e a face não conta. A espessura da parte é a menor das medidas; a face que a deu fica registrada, para
- * o aviso dizer onde olhar. Lê só `neutro.V` e `neutro.F`.
+ * Do centro de uma face, um raio entra pelo material, no sentido contrário ao da normal. A espessura da parede naquele ponto é a distância até a
+ * primeira face da MESMA parte em que o raio SAI do material, isto é, cuja normal aponta no sentido do raio: numa casca fechada é a parede oposta (o
+ * fundo do copo, a lateral). Numa face sem parede do outro lado (superfície aberta) o raio não acha saída e a face não conta. A face enterrada num corpo
+ * que se sobrepõe a outro (o raio para fora cruza um número ímpar de faces da parte) também não conta: não é parede, é junção. A espessura da parte é a
+ * menor das medidas; a face que a deu fica registrada, para o aviso dizer onde olhar. Lê só `neutro.V` e `neutro.F`.
  *
- * O CUSTO É LIMITADO, para o `descrever` não passar do teto de tempo: cada parte gasta no máximo `orcamento` testes (a peça, `ORCAMENTO_DA_PECA` dividido entre as partes) de raio contra triângulo, e a parte
- * grande mede só uma amostra das faces, em passo fixo e na ordem dos ids (a conta é determinística). A régua acha parede fina que atravessa muitas faces
- * (um copo, um tubo, uma chapa); a parede fina de uma face só numa parte grande pode escapar da amostra, e `amostras` diz quantas faces foram medidas. */
+ * O CUSTO É LIMITADO, para o `descrever` não passar do teto de tempo. Cada face medida custa um raio contra todos os triângulos da parte, e a amostra de
+ * cada parte tem faces em passo fixo (na ordem dos ids, de modo que a conta é determinística) escolhido para faces × triângulos ficar em torno de
+ * `orcamento`; o orçamento da peça, `ORCAMENTO_DA_PECA`, é dividido entre as partes, com no mínimo 1 milhão para cada uma, e por isso a soma das partes pode passar
+ * dele. A régua acha parede fina que atravessa muitas faces (um copo, um tubo, uma chapa); a parede fina de uma face só numa parte grande pode escapar da
+ * amostra, e `amostras` diz quantas faces foram medidas. */
 
 /** O orçamento de testes de raio contra triângulo da peça inteira, dividido entre as partes (no mínimo 1 milhão para cada uma). */
 export const ORCAMENTO_DA_PECA = 1.5e7;
@@ -52,25 +55,35 @@ export function medirEspessuraDaParede(neutro, { orcamento } = {}) {
       if (!n || !faixa[f]) continue;
       const pontos = faces[f].vs.map((v) => neutro.V.get(v));
       const o = [0, 1, 2].map((c) => pontos.reduce((s, p) => s + p[c], 0) / pontos.length);
+      /* o centro de um quadrilátero cai sobre a diagonal do leque das faces vizinhas, e o raio que acerta a aresta de dois triângulos conta duas vezes; um deslocamento de 0,3 µm no plano da face, fixo, tira o raio da aresta */
+      const w = [n[1] * 0.7571 - n[2] * 0.3011, n[2] * 0.5773 - n[0] * 0.7571, n[0] * 0.3011 - n[1] * 0.5773];
+      const nw = Math.hypot(...w) || 1;
+      for (let c = 0; c < 3; c += 1) o[c] += (w[c] / nw) * 3e-7;
       const d = [-n[0], -n[1], -n[2]];
-      amostras += 1;
-      let melhor = Infinity;
+      let melhor = Infinity, fora = 0;
       for (let t = 0; t < triangulos.length; t += 1) {
         if (t >= faixa[f][0] && t < faixa[f][1]) continue;
         const T = triangulos[t];
         const e1 = [T[3] - T[0], T[4] - T[1], T[5] - T[2]], e2 = [T[6] - T[0], T[7] - T[1], T[8] - T[2]];
-        const h = [d[1] * e2[2] - d[2] * e2[1], d[2] * e2[0] - d[0] * e2[2], d[0] * e2[1] - d[1] * e2[0]];
+        const h = [n[1] * e2[2] - n[2] * e2[1], n[2] * e2[0] - n[0] * e2[2], n[0] * e2[1] - n[1] * e2[0]];
         const det = e1[0] * h[0] + e1[1] * h[1] + e1[2] * h[2];
         if (Math.abs(det) < 1e-18) continue;
         const s = [o[0] - T[0], o[1] - T[1], o[2] - T[2]];
         const u = (s[0] * h[0] + s[1] * h[1] + s[2] * h[2]) / det;
         if (u < 0 || u > 1) continue;
         const q = [s[1] * e1[2] - s[2] * e1[1], s[2] * e1[0] - s[0] * e1[2], s[0] * e1[1] - s[1] * e1[0]];
-        const v = (d[0] * q[0] + d[1] * q[1] + d[2] * q[2]) / det;
+        const v = (n[0] * q[0] + n[1] * q[1] + n[2] * q[2]) / det;
         if (v < 0 || u + v > 1) continue;
-        const dist = (e2[0] * q[0] + e2[1] * q[1] + e2[2] * q[2]) / det;
-        if (dist > ANTES_DE_ZERO && dist < melhor) melhor = dist;
+        const dist = (e2[0] * q[0] + e2[1] * q[1] + e2[2] * q[2]) / det;   // com sinal, ao longo da normal da face
+        if (dist > ANTES_DE_ZERO) { fora += 1; continue; }
+        if (dist >= -ANTES_DE_ZERO) continue;
+        /* o raio vai para dentro (contra a normal): só conta o cruzamento em que ele SAI do material, o da face atingida cuja normal aponta no sentido do raio */
+        const nt = [e1[1] * e2[2] - e1[2] * e2[1], e1[2] * e2[0] - e1[0] * e2[2], e1[0] * e2[1] - e1[1] * e2[0]];
+        if (nt[0] * n[0] + nt[1] * n[1] + nt[2] * n[2] < 0 && -dist < melhor) melhor = -dist;
       }
+      /* um número ímpar de cruzamentos para fora diz que o centro da face está dentro de outro corpo da parte (face enterrada, de corpos que se sobrepõem): não é parede */
+      if (fora % 2 === 1) continue;
+      amostras += 1;
       if (melhor < minima) { minima = melhor; faceDaMinima = faces[f].id; centroDaMinima = o; }
     }
     if (Number.isFinite(minima)) partes.push({ parte, minima, face: faceDaMinima, centro: centroDaMinima, amostras, faces: faces.length });

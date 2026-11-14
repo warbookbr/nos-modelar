@@ -1,8 +1,9 @@
 /* argumentos-essenciais.test.mjs — o gate dos essenciais e a recusa na hora: cada receita mínima errada do inventário de erros
    (docs/modelar/banco-de-provas/revisao-do-projeto-2026-11-13) é recusada no passo certo, com a causa e o que fazer. */
 import { describe, expect, it } from 'vitest';
-import { conferirArgumentosEssenciais } from './argumentos-essenciais.mjs';
+import { chamadasDeNucleoSemRegistro, conferirArgumentosEssenciais } from './argumentos-essenciais.mjs';
 import { nucleo } from '../../procedural/nucleo/nucleo.js';
+import { REGISTRO_DA_RECEITA } from '../../src/autoria/executar-receita.js';
 import { essenciaisDaOperacao, recusasDeEssenciais } from '../../procedural/nucleo/uso-operacoes.js';
 
 const motivos = (neutro) => neutro.orfaos.map((o) => `passo ${o.passo} (${o.op}) ${o.ref}: ${o.motivo}`);
@@ -158,5 +159,38 @@ describe('as recusas que diziam undefined', () => {
     const neutro = nucleo([...base, ['pesar', { peso: 1 }]], {}, {}, {}, { ossos: [{ nome: 'raiz' }] });
     const achado = neutro.orfaos.find((o) => o.ref === 'osso');
     expect(achado.motivo).toContain("falta o argumento 'osso'");
+  });
+});
+
+describe('o registro da receita nas ferramentas', () => {
+  const barras = [['estruturaDeBarras', { nos: [{ nome: 'a', posicao: [0, 0, 0] }, { nome: 'b', posicao: [0, 200, 0] }], barras: [{ nome: 't', de: 'a', para: 'b' }], perfil: { tipo: 'tubo-redondo', diametro: 30, lados: 12 } }],
+    ['parte', { nome: 'tubo', sel: { tudo: true } }]];
+
+  it('o gate acha a chamada de nucleo( sem registro e deixa passar a que passa o registro', async () => {
+    const { mkdtempSync, mkdirSync, rmSync, writeFileSync } = await import('node:fs');
+    const { tmpdir } = await import('node:os');
+    const { join } = await import('node:path');
+    const raiz = mkdtempSync(join(tmpdir(), 'nucleo-sem-registro-'));
+    try {
+      mkdirSync(join(raiz, 'tools/modelar'), { recursive: true }); mkdirSync(join(raiz, 'src/autoria'), { recursive: true });
+      writeFileSync(join(raiz, 'tools/modelar/ruim.mjs'), "const a = nucleo(passos, {}, {}, {}, null, []);\n");
+      writeFileSync(join(raiz, 'tools/modelar/boa.mjs'), "// nucleo(passos) em comentário\nconst a = nucleo(passos, {}, {}, {}, null, [], { registroOperacoes: REGISTRO_DA_RECEITA });\nconst b = nucleo();\n");
+      writeFileSync(join(raiz, 'src/autoria/executar-receita.js'), "const n = nucleo(a, b, c);\n");
+      expect(chamadasDeNucleoSemRegistro(raiz)).toEqual(['tools/modelar/ruim.mjs:1']);
+    } finally { rmSync(raiz, { recursive: true, force: true }); }
+  });
+
+  it('o repositório não tem chamada de nucleo( sem registro em tools/modelar e src', () => {
+    expect(chamadasDeNucleoSemRegistro()).toEqual([]);
+  });
+
+  it('uma peça de barras passa na guarda de casca aberta e na autoria declarativa', async () => {
+    const { motivoDeCascaAberta } = await import('./../modelar/guardas/guarda-acervo.mjs');
+    const forma = nucleo(barras, {}, {}, {}, null, [], { registroOperacoes: REGISTRO_DA_RECEITA });
+    expect(forma.orfaos).toEqual([]);
+    expect(motivoDeCascaAberta(forma, barras)).toBeNull();
+    const { executarReceitaDeclarativa } = await import('./../modelar/autoria-receita.mjs');
+    const peca = executarReceitaDeclarativa({ formato: 'mecanifica.receita-declarativa', versao: 1, id: 'tubo-guia', params: {}, topo: {}, passos: barras, materiais: {}, aliases: [], meta: { nome: 'tubo-guia' } });
+    expect(JSON.stringify(peca)).toContain('tubo');
   });
 });

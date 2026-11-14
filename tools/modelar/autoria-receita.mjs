@@ -1,5 +1,6 @@
 /* autoria-receita.mjs — autoria declarativa de receitas, sem avaliar JavaScript. */
 import { nucleo, neutroCanonico } from '../../procedural/nucleo/entrada.js';
+import { REGISTRO_DA_RECEITA } from '../../src/autoria/executar-receita.js';
 import { FORMATO, VERSAO, lerPecaResolvida, parteDaFace } from '../../src/autoria/ler-peca-resolvida.js';
 import { capturarMontagem } from './capturar-montagem.mjs';
 import { lerRevisaoAtivaAutoria, materializarRevisaoAutoria, planejarRevisaoAutoria } from './repositorio-autoria.mjs';
@@ -52,7 +53,7 @@ function validarReceita(receita) {
 export function executarReceitaDeclarativa(receita) {
   const validada = validarReceita(receita);
   let bruto;
-  try { bruto = nucleo(validada.passos, validada.params, validada.topo, validada.materiais, null, validada.aliases); }
+  try { bruto = nucleo(validada.passos, validada.params, validada.topo, validada.materiais, null, validada.aliases, { registroOperacoes: REGISTRO_DA_RECEITA }); }
   catch (erro) { falhar('execucao-recusada', '$receita.passos', erro instanceof Error ? erro.message : String(erro), 'Corrija os passos e execute novamente.', erro); }
   if (bruto.orfaos.length) falhar('execucao-recusada', '$receita.passos', `o núcleo produziu ${bruto.orfaos.length} órfão(s).`, 'Corrija operações, seleções, interfaces e identidades antes de confirmar.');
   const neutro = neutroCanonico(bruto);

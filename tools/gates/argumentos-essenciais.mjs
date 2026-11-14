@@ -9,9 +9,59 @@
  *   4. tirar do exemplo um essencial (todas as alternativas dele) não é recusado, citando o campo, ou um campo positivo valendo 0 ou -1
  *      não é recusado citando o valor.
  * Uso: `node tools/gates/argumentos-essenciais.mjs`; sai com 1 e lista cada falha. */
-import { pathToFileURL } from 'node:url';
+import { readdirSync, readFileSync } from 'node:fs';
+import { dirname, join, relative } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { OPS } from '../../procedural/nucleo/nucleo.js';
 import { essenciaisDaOperacao, operacoesComEssenciais, recusasDeEssenciais, usoDaOperacao } from '../../procedural/nucleo/uso-operacoes.js';
+
+const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
+
+/* O REGISTRO DA RECEITA. A receita de peça usa `REGISTRO_DA_RECEITA` (o núcleo e a estruturaDeBarras); a chamada de `nucleo(` sem registro, em ferramenta
+   ou em `src/`, vê só o núcleo e recusa a barras como operação desconhecida, e a guarda do acervo e a autoria de receita fizeram isso. Fora de
+   `executarReceita`, que escolhe o registro, toda chamada com argumentos precisa passar `registroOperacoes`. */
+const PASTAS_DAS_CHAMADAS = ['tools/modelar', 'src'];
+const EXCECOES_DAS_CHAMADAS = new Set(['src/autoria/executar-receita.js']);
+
+function arquivosDe(pasta, achados = []) {
+  for (const e of readdirSync(pasta, { withFileTypes: true })) {
+    const caminho = join(pasta, e.name);
+    if (e.isDirectory()) { if (e.name !== 'node_modules' && e.name !== 'fixtures') arquivosDe(caminho, achados); }
+    else if (/\.(m?js)$/.test(e.name) && !/\.test\.m?js$/.test(e.name)) achados.push(caminho);
+  }
+  return achados;
+}
+
+/** O texto entre os parênteses que abrem em `abre`, ou null se não fecham. */
+function argumentosDaChamada(texto, abre) {
+  let nivel = 0;
+  for (let k = abre; k < texto.length; k += 1) {
+    if (texto[k] === '(') nivel += 1;
+    else if (texto[k] === ')') { nivel -= 1; if (nivel === 0) return texto.slice(abre + 1, k); }
+  }
+  return null;
+}
+
+/** As chamadas `nucleo(...)` com argumentos e sem `registroOperacoes`, fora de `executarReceita`: `arquivo:linha`. */
+export function chamadasDeNucleoSemRegistro(raiz = RAIZ) {
+  const achados = [];
+  for (const pasta of PASTAS_DAS_CHAMADAS) {
+    for (const arquivo of arquivosDe(join(raiz, pasta))) {
+      const rel = relative(raiz, arquivo).replaceAll('\\', '/');
+      if (EXCECOES_DAS_CHAMADAS.has(rel)) continue;
+      const texto = readFileSync(arquivo, 'utf8');
+      for (const m of texto.matchAll(/(?<![\w.$])nucleo\(/g)) {
+        const linhaDoInicio = texto.lastIndexOf('\n', m.index) + 1;
+        if (/^\s*(\/\*|\*|\/\/)/.test(texto.slice(linhaDoInicio, m.index + 1))) continue;
+        if (/^\s*function\s/.test(texto.slice(linhaDoInicio, m.index))) continue;
+        const args = argumentosDaChamada(texto, m.index + m[0].length - 1);
+        if (args === null || !args.trim()) continue;
+        if (!args.includes('registroOperacoes')) achados.push(`${rel}:${texto.slice(0, m.index).split('\n').length}`);
+      }
+    }
+  }
+  return achados;
+}
 
 const numero = (valor) => (typeof valor === 'number' ? valor : Number.NaN);
 
@@ -49,6 +99,7 @@ export function conferirArgumentosEssenciais() {
       if (!recusasDeEssenciais(nome, { ...args, [campo]: minimo - 1 }, contrato, numero, indice).some((r) => r.campo === campo && r.motivo.includes(`é ${minimo}`))) falhas.push(`${nome}: '${campo}' valendo ${minimo - 1} não foi recusado dizendo o mínimo ${minimo}`);
     }
   }
+  for (const onde of chamadasDeNucleoSemRegistro()) falhas.push(`${onde}: chama nucleo( sem registroOperacoes; passe REGISTRO_DA_RECEITA (src/autoria/executar-receita.js) ou chame executarReceita`);
   return falhas;
 }
 

@@ -29,6 +29,7 @@ import { caminhosDaReferencia, ehReferenciaLocal } from '../../../src/autoria/pl
 import { resolverCaminhoReceita } from '../resolver-caminho-receita.mjs';
 import { ocorrenciasPosicionais, rotularOcorrencias } from '../../../procedural/nucleo/referencia-posicional.js';
 import { nucleo } from '../../../procedural/nucleo/nucleo.js';
+import { REGISTRO_DA_RECEITA } from '../../../src/autoria/executar-receita.js';
 import { conferirPortasNaForma } from '../../../src/autoria/porta-confere-forma.js';
 import { limiteRelativo, medirFaceDegenerada } from '../reguas-de-malha/face-degenerada.mjs';
 import { analisarTopologia } from '../../../procedural/nucleo/topologia.js';
@@ -200,7 +201,7 @@ export function avisoDeFaceSoNaPecaInteira(forma) {
     família (`analisarTopologia`: `casca-aberta` e `aresta-nao-manifold`), ou null. Dispensa só a aresta que já era borda livre na saída do próprio passo que declarou
     superfície aberta (`lathe` com `superficie: true`, `subdivisao` sem `espessura`), medida no estado logo depois daquele passo (`executar` roda o prefixo dos passos): a fresta
     que um passo posterior abre, ou a de uma gaiola fechada que perde uma face, não é dispensada, e a `subdivisao` de gaiola fechada não tem borda nenhuma. A receita não leva campo novo. */
-export function motivoDeCascaAberta(forma, passos = [], executar = (prefixo) => nucleo(prefixo, {}, {}, {}, null, [])) {
+export function motivoDeCascaAberta(forma, passos = [], executar = (prefixo) => nucleo(prefixo, {}, {}, {}, null, [], { registroOperacoes: REGISTRO_DA_RECEITA })) {
   const CODIGOS = ['casca-aberta', 'aresta-nao-manifold'];
   const achadosDe = (f) => analisarTopologia({ vertices: f.V, faces: f.F }).achados.filter((a) => CODIGOS.includes(a.codigo));
   const finais = achadosDe(forma);
@@ -295,7 +296,7 @@ export async function conferirPeca(peca) {
   }
   /* A porta declarada precisa estar na forma: o resolvedor encaixa pela
      porta e nunca olha a malha. */
-  const forma = nucleo(receita.PASSOS, receita.PARAMS ?? {}, {}, {}, null, []);
+  const forma = nucleo(receita.PASSOS, receita.PARAMS ?? {}, {}, {}, null, [], { registroOperacoes: REGISTRO_DA_RECEITA });
   const portas = conferirPortasNaForma(forma);
   if (portas.length) {
     reprovadas.push({ peca, motivo: `PORTA FORA DA FORMA\n${portas.map((a) => `  ${a.mensagem}`).join('\n')}` });
@@ -305,7 +306,7 @@ export async function conferirPeca(peca) {
   const degenerada = motivoDeFaceDegenerada(forma);
   if (degenerada) reprovadas.push({ peca, motivo: degenerada });
   const aviso = avisoDeFaceSoNaPecaInteira(forma);
-  const aberta = motivoDeCascaAberta(forma, receita.PASSOS, (prefixo) => nucleo(prefixo, receita.PARAMS ?? {}, {}, {}, null, []));
+  const aberta = motivoDeCascaAberta(forma, receita.PASSOS, (prefixo) => nucleo(prefixo, receita.PARAMS ?? {}, {}, {}, null, [], { registroOperacoes: REGISTRO_DA_RECEITA }));
   if (aberta) reprovadas.push({ peca, motivo: aberta });
   return { reprovadas, esperando, avisos: aviso ? [{ peca, motivo: aviso }] : [] };
 }

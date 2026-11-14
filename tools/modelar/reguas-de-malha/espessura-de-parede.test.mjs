@@ -129,3 +129,51 @@ describe('a régua de espessura de parede', () => {
     expect(JSON.stringify(medirEspessuraDaParede(n, { orcamento: 2000 }))).toBe(JSON.stringify(medirEspessuraDaParede(n, { orcamento: 2000 })));
   });
 });
+
+describe('a régua conta só a saída do material', () => {
+  function caixa(n, x0, y0, z0, x1, y1, z1, parte) {
+    const b = n.V.size;
+    [[x0, y0, z0], [x1, y0, z0], [x1, y1, z0], [x0, y1, z0], [x0, y0, z1], [x1, y0, z1], [x1, y1, z1], [x0, y1, z1]].forEach((p, k) => n.V.set(b + k, p));
+    [[0, 3, 2, 1], [4, 5, 6, 7], [0, 1, 5, 4], [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7]].forEach((f) => { const id = n.F.size; n.F.set(id, { id, vs: f.map((k) => k + b), parte }); });
+  }
+  it('duas caixas sobrepostas em 0,3 mm não dão parede de 0,3 mm', () => {
+    const n = { V: new Map(), F: new Map() };
+    caixa(n, 0, 0, 0, 0.1, 0.1, 0.1, 'a'); caixa(n, 0.0997, 0, 0, 0.2, 0.1, 0.1, 'a');
+    const [p] = medirEspessuraDaParede(n).partes;
+    expect(p.minima).toBeGreaterThan(0.09);
+  });
+  it('uma caixa sozinha mede a sua espessura menor', () => {
+    const n = { V: new Map(), F: new Map() };
+    caixa(n, 0, 0, 0, 0.1, 0.02, 0.1, 'a');
+    expect(medirEspessuraDaParede(n).partes[0].minima).toBeCloseTo(0.02, 9);
+  });
+});
+
+describe('a casca de revolução de uma tigela e as recusas que citam o perfil', () => {
+  const TIGELA = [[0, -50], [19, -46], [35, -35], [46, -19], [50, 0]].map(([r, y]) => [r / 1000, y / 1000]);
+  it('a tigela, com a ponta do perfil no eixo e o trecho inclinado, sai fechada, com a espessura de 2 mm', () => {
+    const n = nucleo([['lathe', { origemId: 1, perfil: TIGELA, espessura: 0.002, lados: 32 }], ['parte', { nome: 'tigela', sel: { tudo: true } }]], {}, {});
+    expect(n.orfaos).toEqual([]);
+    expect(arestasAbertas(n)).toBe(0);
+    expect(volume(n)).toBeGreaterThan(0);
+    const eixo = [...n.V.values()].filter((p) => Math.hypot(p[0], p[2]) < 1e-9).map((p) => p[1]);
+    expect(eixo.length).toBe(2);   // o fundo de fora e o de dentro, os dois no eixo
+    expect(Math.abs(medirEspessuraDaParede(n).partes[0].minima - 0.002) / 0.002).toBeLessThan(0.02);
+  });
+  const motivo = (perfil, espessura) => nucleo([['lathe', { perfil, espessura }]], {}, {}).orfaos[0].motivo;
+  it('a espessura maior que o raio cita o ponto do perfil escrito e a causa', () => {
+    const m = motivo([[0, 0], [0.01, 0], [0.01, 0.1]], 0.015);
+    expect(m).toContain('ponto 1 do perfil');
+    expect(m).toContain('maior que o raio');
+    expect(m).not.toMatch(/contorno da seção|externo\[/);
+  });
+  it('a folga que não cabe entre trechos cita os dois trechos', () => {
+    const m = motivo([[0, 0], [0.04, 0], [0.04, 0.1], [0.03, 0.1], [0.03, 0.01]], 0.008);
+    expect(m).toMatch(/não cabe entre o ponto \d do perfil .* e o trecho entre o ponto \d/);
+    expect(m).toContain('a folga ali é');
+  });
+  it('o perfil que toca o eixo no meio e o de raio negativo dizem a causa', () => {
+    expect(motivo([[0.03, 0], [0, 0.05], [0.03, 0.1]], 0.002)).toContain('toca o eixo no ponto 1');
+    expect(motivo([[0, 0], [-0.04, 0], [-0.04, 0.1]], 0.002)).toContain('raio negativo no ponto 1');
+  });
+});
