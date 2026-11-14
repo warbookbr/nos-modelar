@@ -199,7 +199,7 @@ export function gerarPassos(T) {
 
 /* Os contatos entre as partes. Cada par se toca pela face indicada no motivo, ou embute o que o motivo diz. */
 export const CONTATOS = [
-  { par: ['corpo', 'junta'], motivo: 'a junta começa em y 655, 13 mm abaixo do topo do corpo em y 668, e embute esses 13 mm para cobri-lo' },
+  { par: ['corpo', 'junta'], motivo: 'a junta começa em y 655, 13 mm abaixo do topo do corpo em y 668, e embute esses 13 mm para cobri-lo', penetracaoMaxima: 0.02 }, // embutido de propósito, medido em 2026-11-14
   { par: ['junta', 'tampo'], motivo: 'a face de cima da junta, em y 680, encosta na face de baixo do tampo, que assenta sobre ela' },
   { par: ['puxador', 'tampo'], motivo: 'a face de trás do puxador, em z 237, encosta na face de frente do tampo, e o puxador sai 20 mm à frente' },
   { par: ['dobradicaDir', 'junta'], motivo: 'a face de trás da junta, em z -500, encosta na face de frente da dobradica, que sai 30 mm para trás' },

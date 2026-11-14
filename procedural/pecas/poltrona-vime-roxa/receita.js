@@ -157,13 +157,13 @@ const PES = ['pesFrenteEsq', 'pesFrenteDir', 'pesTrasEsq', 'pesTrasDir'];
 const BRACOS = ['bracoEsq', 'bracoDir'];
 export const CONTATOS = [
   ...PES.map((p) => ({ par: [p, 'baseVime'], motivo: 'o topo do pé encosta na face de baixo da base, que começa a 90 mm do chão' })),
-  ...BRACOS.map((b) => ({ par: [b, 'baseVime'], motivo: 'o braço desce 60 mm sobre a base de vime, com as faces externas rentes à da base' })),
-  { par: ['encostoVime', 'baseVime'], motivo: 'o encosto nasce 40 mm dentro da base de vime, e as faces traseiras ficam rentes' },
-  { par: ['almofadaAssento', 'baseVime'], motivo: 'a almofada do assento assenta sobre a base, com 40 mm embutidos e a frente rente à da base' },
+  ...BRACOS.map((b) => ({ par: [b, 'baseVime'], motivo: 'o braço desce 60 mm sobre a base de vime, com as faces externas rentes à da base', penetracaoMaxima: 0.03 })), // embutido de propósito, medido em 2026-11-14
+  { par: ['encostoVime', 'baseVime'], motivo: 'o encosto nasce 40 mm dentro da base de vime, e as faces traseiras ficam rentes', penetracaoMaxima: 0.04 }, // embutido de propósito, medido em 2026-11-14
+  { par: ['almofadaAssento', 'baseVime'], motivo: 'a almofada do assento assenta sobre a base, com 40 mm embutidos e a frente rente à da base', penetracaoMaxima: 0.04 }, // embutido de propósito, medido em 2026-11-14
   ...BRACOS.map((b) => ({ par: [b, 'encostoVime'], motivo: 'o encosto para na face interna de cada braço e não o atravessa' })),
   ...BRACOS.map((b) => ({ par: [b, 'almofadaAssento'], motivo: 'a almofada do assento para na face interna de cada braço' })),
   { par: ['encostoVime', 'almofadaAssento'], motivo: 'a almofada do assento encosta na face de trás do encosto de vime' },
-  { par: ['almofadaAssento', 'almofadaEncosto'], motivo: 'a almofada do encosto fica atrás do assento e embute o canto de baixo na almofada do assento' },
+  { par: ['almofadaAssento', 'almofadaEncosto'], motivo: 'a almofada do encosto fica atrás do assento e embute o canto de baixo na almofada do assento', penetracaoMaxima: 0.04 }, // embutido de propósito, medido em 2026-11-14
 ];
 
 const receita = {

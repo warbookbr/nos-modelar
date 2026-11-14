@@ -180,13 +180,13 @@ const PES = ['peFrenteEsq', 'peFrenteDir', 'peTrasEsq', 'peTrasDir'];
 const BRACOS = ['bracoEsq', 'bracoDir'];
 export const CONTATOS = [
   ...PES.map((p) => ({ par: [p, 'baseVime'], motivo: 'o topo do pé encosta na face de baixo da base, em y 90' })),
-  ...BRACOS.map((b) => ({ par: [b, 'baseVime'], motivo: 'o braço começa em y 300 e entra 60 mm na base de vime, como na forma de origem' })),
-  { par: ['encostoVime', 'baseVime'], motivo: 'o encosto começa em y 320 e embute 40 mm na base; base e encosto são um bloco de vime' },
-  { par: ['almofadaAssento', 'baseVime'], motivo: 'a almofada do assento assenta na base de vime e embute 40 mm nela, como na forma de origem' },
-  ...BRACOS.map((b) => ({ par: [b, 'encostoVime'], motivo: 'o encosto de vime atravessa a faixa x ±345 a ±440 por dentro dos braços' })),
+  ...BRACOS.map((b) => ({ par: [b, 'baseVime'], motivo: 'o braço começa em y 300 e entra 60 mm na base de vime, como na forma de origem', penetracaoMaxima: 0.03 })), // embutido de propósito, medido em 2026-11-14
+  { par: ['encostoVime', 'baseVime'], motivo: 'o encosto começa em y 320 e embute 40 mm na base; base e encosto são um bloco de vime', penetracaoMaxima: 0.03 }, // embutido de propósito, medido em 2026-11-14
+  { par: ['almofadaAssento', 'baseVime'], motivo: 'a almofada do assento assenta na base de vime e embute 40 mm nela, como na forma de origem', penetracaoMaxima: 0.04 }, // embutido de propósito, medido em 2026-11-14
+  ...BRACOS.map((b) => ({ par: [b, 'encostoVime'], motivo: 'o encosto de vime atravessa a faixa x ±345 a ±440 por dentro dos braços', penetracaoMaxima: 0.05 })), // embutido de propósito, medido em 2026-11-14
   ...BRACOS.map((b) => ({ par: [b, 'almofadaAssento'], motivo: 'a almofada do assento encosta na face interna de cada braço, em x ±345' })),
   { par: ['almofadaAssento', 'encostoVime'], motivo: 'a almofada do assento encosta na face da frente do encosto de vime, em z -280' },
-  { par: ['almofadaEncosto', 'almofadaAssento'], motivo: 'a almofada do encosto girada tem a base embutida na almofada do assento, como na forma de origem' },
+  { par: ['almofadaEncosto', 'almofadaAssento'], motivo: 'a almofada do encosto girada tem a base embutida na almofada do assento, como na forma de origem', penetracaoMaxima: 0.06 }, // embutido de propósito, medido em 2026-11-14
 ];
 
 const receita = {

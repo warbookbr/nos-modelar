@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1878 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1879 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -3238,6 +3238,7 @@
 - `fixture-contato-atravessa.js` — O tubo fino entra pela tampa do cilindro e sai pela base: o contato está declarado e a parte atravessa a outra. Reprova pela profundidade.
 - `fixture-contato-declarado.js` — Duas partes que se encostam, e a receita DIZ que se encostam. Passa. É a metade do gate que impede a medida de condenar peça correta.
 - `fixture-contato-nao-declarado.js` — A MESMA geometria da fixture declarada, sem a declaração. Reprova. O par é idêntico: o que muda é só a receita ter dito ou não.
+- `fixture-contato-parte-aberta.js` — O `parte` pega só a lateral dos dois cilindros (sem `tampa: 'fundo'` e `tampa: 'topo'`): as partes saem de malha aberta e o contato declarado nunca se confir…
 - `fixture-contato-so-encosta.js` — O mesmo tubo apenas assentado na face de cima do cilindro. Passa: só encosta.
 - `fixture-forma-anel-cumprida.js` — A receita promete um ANEL e entrega um anel. Passa. `lathe` revolve um perfil fechado: o resultado tem furo passante.
 - `fixture-forma-anel-quebrada.js` — A MESMA promessa de anel da fixture cumprida, entregue como sólido SEM furo passante. Reprova por forma, e só por forma.

@@ -898,6 +898,7 @@ export function gerarPassos(T) {
    A continuação escura do alargamento é parte da saia e dos para-choques, na mesma malha: eles vão até a boca do arco, cobrem a aba (4 mm de altura) e
    sobem no alargamento, e a moldura da cor da lataria assenta no topo deles. A moldura passa 2 mm ou mais acima da aba; só a parede dela na boca,
    de 0 a 3 mm do arco, encosta na raiz da aba. Nenhuma peça toca o pneu. */
+/* Os contatos com `penetracaoMaxima` são embutidos de propósito, medidos em 2026-11-14: o valor é o quanto a parte entra no vizinho, em metro, arredondado para cima em uma casa significativa. */
 export const CONTATOS = [
   ...ABAS_DOS_VAOS.map((a) => ({ par: ['carroceria', a], motivo: 'a aba nasce na parede da borda do vão e continua a chapa dobrada para dentro; as malhas se cruzam por décimos de milímetro na costura' })),
   ...ABAS_DOS_ARCOS.map((a) => ({ par: ['carroceria', a], motivo: 'a aba do arco assenta na lateral em volta do arco da roda e entra meia espessura na chapa, que é o contato dela' })),
@@ -905,8 +906,8 @@ export const CONTATOS = [
   ...BASES_DO_RETROVISOR.map((b) => ({ par: ['carroceria', b], motivo: 'a base do retrovisor é uma placa de plástico preto sobre a lateral, 3 mm para fora, que entra 1 mm na chapa e cobre a fresta da porta onde ela passa por baixo' })),
   ...BASES_DO_RETROVISOR.map((b, k) => ({ par: [b, BORRACHAS[1 + k]], motivo: 'a base cobre 6 mm da borracha da janela, na vertical de trás dela, e o preto continua da moldura para a base sem chapa no meio' })),
   ...RETROVISORES.flatMap((r, k) => [
-    { par: [r.estrutura, BASES_DO_RETROVISOR[k]], motivo: 'o relevo abaulado da estrutura assenta na face de fora da base preta e entra 4 mm nela, sem fresta' },
-    { par: ['carroceria', r.estrutura], motivo: 'o relevo da estrutura passa da base preta (3 mm de altura) e entra 1 mm na chapa, sem fresta, onde ela é mais estreita' },
+    { par: [r.estrutura, BASES_DO_RETROVISOR[k]], motivo: 'o relevo abaulado da estrutura assenta na face de fora da base preta e entra 4 mm nela, sem fresta', penetracaoMaxima: 0.009 },
+    { par: ['carroceria', r.estrutura], motivo: 'o relevo da estrutura passa da base preta (3 mm de altura) e entra 1 mm na chapa, sem fresta, onde ela é mais estreita', penetracaoMaxima: 0.006 },
     { par: [r.estrutura, r.pisca], motivo: 'a lente do pisca é o pedaço da carcaça cortado no canto de baixo de fora, e a estrutura a envolve' },
     { par: [r.estrutura, r.plano], motivo: 'o espelho plano assenta no rebaixo da frente da carcaça, 5 mm abaixo da borda' },
     { par: [r.estrutura, r.convexo], motivo: 'o espelho convexo assenta no rebaixo da frente da carcaça, 5 mm abaixo da borda' },
@@ -938,18 +939,18 @@ export const CONTATOS = [
      as conchas ficam a 16 mm do lado de dentro do vão e as duas se afastam 8 mm uma da outra, e por isso o aro e as conchas não se tocam */
   ...FAROL_POR_DENTRO.flatMap(([luz, conchas, [lampadas, copo, carcaca]]) => [
     ...conchas.map((concha) => ({ par: [luz, concha], motivo: 'a borda da concha entra 1 mm na lente de 2 mm, no ponto dela mais à frente do plano de ajuste; o resto da borda fica a até uns 6 mm atrás da lente, que cai como um arco na quina' })),
-    { par: [luz, copo], motivo: 'a borda do copinho da lâmpada de posição entra 1 mm na lente, como a das conchas' },
-    ...conchas.map((concha) => ({ par: [concha, lampadas], motivo: 'o soquete da lâmpada sai 6 mm atrás do fundo da concha, passa por ele e leva o bulbo 12 mm à frente do fundo' })),
+    { par: [luz, copo], motivo: 'a borda do copinho da lâmpada de posição entra 1 mm na lente, como a das conchas', penetracaoMaxima: 0.001 },
+    ...conchas.map((concha) => ({ par: [concha, lampadas], motivo: 'o soquete da lâmpada sai 6 mm atrás do fundo da concha, passa por ele e leva o bulbo 12 mm à frente do fundo', penetracaoMaxima: concha.includes('Alto') ? 0.003 : 0.002 })),
     { par: [luz, carcaca], motivo: 'o topo das paredes da carcaça entra 0,5 mm na lente de 2 mm, pela face de trás, em toda a volta do contorno encolhido 8,1 mm: a caixa fecha o farol por trás da lente' },
-    { par: [carcaca, lampadas], motivo: 'o topo da carcaça entra 1 mm na ponta de trás do soquete que mais fundo vai: é onde a placa se apoia nas lâmpadas' },
+    { par: [carcaca, lampadas], motivo: 'o topo da carcaça entra 1 mm na ponta de trás do soquete que mais fundo vai: é onde a placa se apoia nas lâmpadas', penetracaoMaxima: 0.003 },
   ].filter((c) => c.par[0] !== c.par[1])),
   ...LUZES_POR_DENTRO.flatMap(([luz, refletor, lampadas]) => [
-    { par: [luz, refletor], motivo: 'a borda do refletor assenta 4,8 mm atrás da superfície da chapa, 0,2 mm dentro da face de trás da lente, que é a luz' },
-    ...lampadas.map((lampada) => ({ par: [refletor, lampada], motivo: 'a flange da lâmpada assenta atrás do furo do soquete da capa e o bulbo passa por ele; a de posição assenta no fundo da segunda concavidade' })),
+    { par: [luz, refletor], motivo: 'a borda do refletor assenta 4,8 mm atrás da superfície da chapa, 0,2 mm dentro da face de trás da lente, que é a luz', penetracaoMaxima: 0.002 },
+    ...lampadas.map((lampada) => ({ par: [refletor, lampada], motivo: 'a flange da lâmpada assenta atrás do furo do soquete da capa e o bulbo passa por ele; a de posição assenta no fundo da segunda concavidade', penetracaoMaxima: lampada.includes('LuzDeCanto') ? 0.003 : 0.002 })),
   ]),
   ...LANTERNAS_POR_DENTRO.flatMap(([lentes, refletor, lampadas]) => [
     ...lentes.map((lente) => ({ par: [lente, refletor], motivo: 'a borda de cada concha assenta 4,8 mm atrás da superfície da chapa, 0,2 mm dentro da face de trás da lente da faixa dela; a parede entre duas conchas fica atrás da linha de chapa entre as lentes' })),
-    ...lampadas.map((lampada) => ({ par: [refletor, lampada], motivo: 'a flange da lâmpada assenta atrás do furo do soquete da concha da faixa dela e o bulbo passa por ele' })),
+    ...lampadas.map((lampada) => ({ par: [refletor, lampada], motivo: 'a flange da lâmpada assenta atrás do furo do soquete da concha da faixa dela e o bulbo passa por ele', penetracaoMaxima: 0.002 })),
   ]),
   { par: ['pisoInterior', 'divisoria'], motivo: 'a divisória assenta no piso e entra 1 mm nele' },
   ...BANCOS.map((b) => ({ par: ['pisoInterior', b], motivo: 'o banco assenta no piso e entra 1 mm nele' })),
@@ -957,15 +958,15 @@ export const CONTATOS = [
   ...FORROS.map((forro) => ({ par: ['pisoInterior', forro], motivo: 'o piso assenta no topo do túnel do forro do arco e entra 1 mm nele (a altura do piso é `piso_y` e a do túnel sai de `forro_folga_tunel`, na TABELA); são o único apoio dele, afastado da chapa dos dois lados' })),
   ...FORROS.map((forro) => ({ par: ['carroceria', forro], motivo: 'a aba do forro assenta na face de dentro da chapa em volta do arco, passando 8 mm da boca, e entra 1 mm na parede' })),
   /* os detalhes pequenos (2026-11-09): cada um assenta na peça que o carrega, entrando uma fração de milímetro nela */
-  { par: ['carroceria', ANTENA[0]], motivo: 'o pé da antena assenta no teto da frente, 60 mm atrás da borda do vão do para-brisa, com a base inclinada como o teto e entrando 1,7 mm na chapa de 2 mm, sem passar por ela' },
-  { par: [ANTENA[0], ANTENA[1]], motivo: 'a haste nasce 10 mm dentro do pé, na seção mais alta dele, e sai dele inclinada 10 graus para trás da vertical' },
-  ...MACANETAS.map((alca) => ({ par: ['carroceria', alca], motivo: 'os dois pés da alça assentam na chapa da porta, dentro da placa em anel, e entram 1,5 mm nela' })),
-  ...PLACAS_DAS_MACANETAS.map((placa) => ({ par: ['carroceria', placa], motivo: 'a placa rasa em anel, que faz de conta o rebaixo, assenta na chapa da porta em volta da alça e entra 1,5 mm nela' })),
+  { par: ['carroceria', ANTENA[0]], motivo: 'o pé da antena assenta no teto da frente, 60 mm atrás da borda do vão do para-brisa, com a base inclinada como o teto e entrando 1,7 mm na chapa de 2 mm, sem passar por ela', penetracaoMaxima: 0.002 },
+  { par: [ANTENA[0], ANTENA[1]], motivo: 'a haste nasce 10 mm dentro do pé, na seção mais alta dele, e sai dele inclinada 10 graus para trás da vertical', penetracaoMaxima: 0.01 },
+  ...MACANETAS.map((alca) => ({ par: ['carroceria', alca], motivo: 'os dois pés da alça assentam na chapa da porta, dentro da placa em anel, e entram 1,5 mm nela', penetracaoMaxima: alca.includes('Cabine') ? 0.003 : 0.002 })),
+  ...PLACAS_DAS_MACANETAS.map((placa) => ({ par: ['carroceria', placa], motivo: 'a placa rasa em anel, que faz de conta o rebaixo, assenta na chapa da porta em volta da alça e entra 1,5 mm nela', penetracaoMaxima: placa.includes('Cabine') ? 0.004 : 0.002 })),
   { par: ['parachoqueTraseiro', PONTEIRA], motivo: 'o topo do tubo da ponteira encosta no fundo do para-choque traseiro, onde ele sai da chapa, e entra 1 mm nele; a frente do tubo acaba 5 mm atrás da linha da chapa da traseira e a boca fica 50 mm atrás da face do para-choque' },
   ...SUFIXOS_DAS_RODAS.flatMap((sufixo) => [
     { par: [`pneu${sufixo}`, `aro${sufixo}`], motivo: 'o assento do pneu abraça o barril do aro: a borda de dentro da banda é o raio do assento do aro' },
     { par: [`aro${sufixo}`, `disco${sufixo}`], motivo: 'a chapa da roda sobrepõe o meio da parede do aro' },
-    { par: [`disco${sufixo}`, `cubo${sufixo}`], motivo: 'a chapa da roda sobrepõe o meio da parede do cubo' },
+    { par: [`disco${sufixo}`, `cubo${sufixo}`], motivo: 'a chapa da roda sobrepõe o meio da parede do cubo', penetracaoMaxima: 0.01 },
   ]),
 ];
 

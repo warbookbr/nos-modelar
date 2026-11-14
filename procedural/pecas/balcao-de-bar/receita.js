@@ -176,15 +176,15 @@ export const CONTATOS = [
   { par: ['portaDir', 'corpo'], motivo: 'a face de trás da porta direita encosta na face de frente do corpo, na metade direita' },
   ...PORTAS.map((p) => ({ par: [p, 'tampo'], motivo: 'a face de cima da porta encosta na face de baixo do tampo, sem atravessá-lo' })),
   ...PORTAS.map((p) => ({ par: [p, 'rodape'], motivo: 'a face de baixo da porta assenta na face de cima do rodapé' })),
-  ...MOLDURAS.map((nome) => ({ par: [nome, nome.includes('PortaEsq') ? 'portaEsq' : 'portaDir'], motivo: 'a moldura embute 6 mm na face de frente da porta, sem atravessar a folha' })),
+  ...MOLDURAS.map((nome) => ({ par: [nome, nome.includes('PortaEsq') ? 'portaEsq' : 'portaDir'], motivo: 'a moldura embute 6 mm na face de frente da porta, sem atravessar a folha', penetracaoMaxima: 0.006 })), // embutido de propósito, medido em 2026-11-14
   ...['Esq', 'Dir'].flatMap((lado) => [
     { par: [`molduraPorta${lado}Base`, `molduraPorta${lado}LadoEsq`], motivo: 'a travessa de baixo encosta na face interna da barra lateral esquerda, sem atravessá-la' },
     { par: [`molduraPorta${lado}Base`, `molduraPorta${lado}LadoDir`], motivo: 'a travessa de baixo encosta na face interna da barra lateral direita, sem atravessá-la' },
     { par: [`molduraPorta${lado}Topo`, `molduraPorta${lado}LadoEsq`], motivo: 'a travessa de cima encosta na face interna da barra lateral esquerda, sem atravessá-la' },
     { par: [`molduraPorta${lado}Topo`, `molduraPorta${lado}LadoDir`], motivo: 'a travessa de cima encosta na face interna da barra lateral direita, sem atravessá-la' },
   ]),
-  { par: ['puxadorEsq', 'portaEsq'], motivo: 'o puxador embute 7 mm na face de frente da porta esquerda e sai 15 mm à frente' },
-  { par: ['puxadorDir', 'portaDir'], motivo: 'o puxador embute 7 mm na face de frente da porta direita e sai 15 mm à frente' },
+  { par: ['puxadorEsq', 'portaEsq'], motivo: 'o puxador embute 7 mm na face de frente da porta esquerda e sai 15 mm à frente', penetracaoMaxima: 0.007 }, // embutido de propósito, medido em 2026-11-14
+  { par: ['puxadorDir', 'portaDir'], motivo: 'o puxador embute 7 mm na face de frente da porta direita e sai 15 mm à frente', penetracaoMaxima: 0.007 }, // embutido de propósito, medido em 2026-11-14
 ];
 
 const receita = {
