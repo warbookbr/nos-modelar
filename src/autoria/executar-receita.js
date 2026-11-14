@@ -95,6 +95,9 @@ export function executarReceita(modulo, opcoes = {}) {
   const opcoesDoNucleo = {
     registroOperacoes: opcoes.registroOperacoes ?? REGISTRO_DA_RECEITA,
     ...(opcoes.memoria ? { memoria: opcoes.memoria } : {}),
+    /* `retrato` ('rapido', 'completo' ou 'conferido') e `aoRastrear` são do núcleo e valem só quando passados: medição e prova, desligadas por padrão. */
+    ...(opcoes.retrato ? { retrato: opcoes.retrato } : {}),
+    ...(typeof opcoes.aoRastrear === 'function' ? { aoRastrear: opcoes.aoRastrear } : {}),
   };
   const neutro = nucleo(
     entrada.PASSOS,

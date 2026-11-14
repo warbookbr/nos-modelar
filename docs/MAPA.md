@@ -6,6 +6,7 @@
 > algum arquivo-fonte estiver sem cabeçalho.
 
 1946 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1927 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1153,6 +1154,11 @@
 - `transformacoes.js` — transformacoes.js — operações do grupo, isoladas por serviços explícitos do núcleo.
 - `triangulacao-sem-leque.test.ts` — triangulacao-sem-leque.test.ts — face plana grande (tampa de superelipse, pedaço de união) não sai em leque: grau máximo por canto e ângulo mínimo dos triâng…
 - `uniao-lateral-rente.test.ts` — uniao-lateral-rente.test.ts — `unir` com laterais coplanares (rentes). Caso do ombro do braço robótico: coluna e braço com a MESMA meia largura. A saída tem …
+
+## procedural/nucleo/planejador/
+
+- `leitura-escrita.js` — leitura-escrita.js — o grafo de leitura e escrita de uma receita, extraído em modo só-leitura (fatia 1 do plano do planejador de execução). Nada aqui executa…
+- `leitura-escrita.test.mjs` — leitura-escrita.test.mjs — prova o grafo de leitura e escrita, as sequências de subtrair e o perfil de tempo do planejador (fatia 1).
 
 ## procedural/pecas/
 
@@ -3143,6 +3149,8 @@
 - `conferir-juntas.test.ts` — conferir-juntas.test.ts — testes para a ferramenta de medição e diagnóstico de juntas.
 - `conferir-malha.mjs` — conferir-malha.mjs — a topologia da malha de uma receita, com os gritos do motor: casca aberta, não-manifold, orientação, face de área nula, face fina, face …
 - `conferir-pontos.mjs` — conferir-pontos.mjs — mede os PONTOS DECLARADOS de uma peça contra a malha que a receita produz, e devolve o desvio de cada um em milímetro.
+- `conferir-retrato-do-acervo.mjs` — conferir-retrato-do-acervo.mjs — prova que o rastreio declarado do retrato (`ESCRITA_DAS_OPERACOES`) não muda nada na malha.
+- `conferir-retrato-do-acervo.test.mjs` — conferir-retrato-do-acervo.test.mjs — prova que a conferência do retrato acha igual a receita mínima e a peça pequena, e que o hash distingue malhas.
 - `conferir-vistas.mjs` — conferir-vistas.mjs — a rodada inteira de conferência de um rascunho contra as imagens de referência num comando só: o esboço é montado uma vez, e para cada …
 - `conferir-vistas.test.mjs` — conferir-vistas.test.mjs — a rodada de conferência sobre uma cena sintética, sem navegador: dois cubos de cores diferentes lado a lado, uma referência em PNG…
 - `configuracao-composicoes.mjs` — configuracao-composicoes.mjs — o registro de composições que um comando recebe.
@@ -3272,6 +3280,8 @@
 - `pasta-da-peca.test.mjs` — pasta-da-peca.test.mjs — a peça passa a poder ser uma pasta.
 - `peca-com-parametros.mjs` — peca-com-parametros.mjs — executa uma receita com parâmetros trocados e devolve a peça resolvida que o resolvedor de montagem lê.
 - `pedidos-da-pessoa.mjs` — pedidos-da-pessoa.mjs — registra os pedidos de alteração da pessoa e conta quantos foram por etapa.
+- `perfil-da-execucao.mjs` — perfil-da-execucao.mjs — mede a execução de uma receita sem mudar nada nela (fatia 1 do plano do planejador de execução).
+- `perfil-da-execucao.test.mjs` — perfil-da-execucao.test.mjs — prova a ferramenta de perfil: mede sem mudar a malha, analisa o acervo e recusa argumento desconhecido.
 - `perfil-por-cor.mjs` — perfil-por-cor.mjs — os pixels de uma vista classificados pela cor do material e, linha a linha, os trechos de cada cor e a meia largura de cada uma em cada …
 - `perfil-por-cor.test.mjs` — perfil-por-cor.test.mjs — o perfil por cor: os trechos de cada classe numa linha, a meia largura de uma classe em cada altura, a classificação que aguenta a …
 - `perguntas-da-peca.mjs` — perguntas-da-peca.mjs — as perguntas de forma que o brief do crítico de uma peça traz depois do pacote de imagens.
