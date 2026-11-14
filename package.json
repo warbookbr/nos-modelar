@@ -126,6 +126,7 @@
     "bancada:fronteira:check": "node tools/arquitetura/fronteira-da-bancada.mjs",
     "nome:check": "node tools/arquitetura/nome-antigo.mjs",
     "essenciais:check": "node tools/gates/argumentos-essenciais.mjs",
+    "recusas:check": "node tools/gates/recusas-exercitadas.mjs",
     "contorno": "node tools/modelar/contorno-da-imagem.mjs",
     "leitura:regioes": "node tools/modelar/leitura-por-regioes.mjs",
     "linhas:modelo": "node tools/modelar/linhas-do-modelo.mjs",

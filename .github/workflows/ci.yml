@@ -186,6 +186,9 @@ jobs:
       - name: Argumentos essenciais declarados e núcleo sempre com registro
         if: ${{ !cancelled() }}
         run: npm run essenciais:check
+      - name: Toda recusa de entrada das fontes vigiadas tem teste que a exercite
+        if: ${{ !cancelled() }}
+        run: npm run recusas:check
 
       # A tabela de ferramentas por objeto é gerada do JSON e cobre a lista de
       # famílias objeto por objeto; sem conferência, documento e dados divergem.

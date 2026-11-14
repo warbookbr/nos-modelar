@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1907 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1923 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -425,7 +425,12 @@
 
 ## docs/modelar/banco-de-provas/revisao-das-verificacoes-2026-11-13/
 
+- `ESTRAGOS.md` — A medida por estrago de código, ampliada (passo 2)
+- `FRAGILIDADE.md` — Os sinais de fragilidade, por busca
+- `HISTORICO.md` — O histórico: quanto os testes custaram e o que pegaram
+- `MAPA.md` — O mapa dos gates e dos testes
 - `README.md` — Revisão das verificações e dos testes: medidas e veredito
+- `VEREDITOS.md` — Vereditos por gate e por grupo de testes
 - `mapa-e-piloto.md` — O mapa dos testes e o piloto da medida por estrago
 
 ## docs/modelar/banco-de-provas/revisao-do-projeto-2026-11-13/
@@ -564,6 +569,7 @@
 - `2026-11-10-rebaixo-por-contorno.md` — Rebaixo por contorno: o degrau, o sulco e a borda rebaixada num corpo
 - `2026-11-13-revisao-das-verificacoes-e-dos-testes.md` — Revisão das verificações e dos testes: o que cada um pega, medido
 - `2026-11-14-planejador-de-execucao.md` — Planejador de execução da receita
+- `2026-11-14-testes-das-recusas.md` — Testes das recusas e dos pontos sem proteção
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
@@ -1074,6 +1080,7 @@
 - `gaiola-por-estacoes-prova.js` — gaiola-por-estacoes-prova.js — a forma de prova da gaiola por estações, desenhada só por código
 - `gaiola-por-rede-prova.js` — gaiola-por-rede-prova.js — a chapa lateral desenhada por código para a prova da gaiola por rede de curvas
 - `medidas-de-malha.js` — medidas-de-malha.js — medidas de teste sobre malha poligonal por índice, sem Three.js: área, volume com sinal, distância de pontos a triângulos e cruzamento …
+- `medidas-de-malha.test.mjs` — medidas-de-malha.test.mjs — `distancias` para com erro quando não há triângulo a medir, em vez de abrir anéis de células para sempre.
 - `moldura-prova.js` — moldura-prova.js — a chapa curva com vão de `friso-prova.js` e as molduras em volta da borda dele, desenhadas por código para a conferência da moldura (`mold…
 - `varredura-prova.js` — varredura-prova.js — as três peças varridas de prova da `gaiolaVarrida`, desenhadas por código
 
@@ -1118,10 +1125,12 @@
 - `cantos-arredondados.js` — cantos-arredondados.js — o remate do vértice onde duas ou três arestas arredondadas (ou chanfradas) se encontram.
 - `edicao-direta.js` — edicao-direta.js — edições locais por identidade, via serviços explícitos do núcleo.
 - `encostar.test.ts` — encostar.test.ts — contato derivado no lugar de coordenada digitada (A-6).
+- `espelha.test.ts` — espelha.test.ts — o passo `espelha` medido por número: a reflexão por plano fora da origem nos três eixos, a ordem e a numeração dos ids novos, a soldagem do…
 - `estouro-de-bloco.test.ts` — estouro-de-bloco.test.ts — nenhum passo que passa de BLOCO ids lança erro: espelha, arranja, furo e os geradores com lados:{desvio} continuam na faixa estend…
 - `estruturais.js` — estruturais.js — operações do grupo, isoladas por serviços explícitos do núcleo.
 - `extrusao-de-perfil.test.ts` — extrusao-de-perfil.test.ts — `extrusao` e o `lathe` com `furos` e `deslocar`: perfil 2D com furo e deslocamento de contorno, levantado ou revolucionado em só…
 - `face-plana.js` — face-plana.js — a face continua plana depois de mover os cantos? A operação que move cantos compartilhados (arredondarAresta) altera faces que ela não declar…
+- `friso-recusas.test.ts` — friso-recusas.test.ts — cada recusa de entrada do passo `friso` com a entrada ruim e o campo que a recusa cita. A revisão das verificações (2026-11-13) tirou…
 - `friso.js` — friso.js (operação) — nervura, tubo ou friso que segue uma linha nomeada, com perfil declarado. A linha é uma sequência de pontos nomeados da gaiola de um pa…
 - `furo-em-aneis.js` — furo-em-aneis.js — a face furada refeita em anéis (plano "costuras e furos limpos", fatia 4), e a região plana de várias faces como face de entrada.
 - `furo-em-aneis.test.ts` — furo-em-aneis.test.ts — a fatia 4 do plano "costuras e furos limpos": o `furo` lê uma região plana de várias faces (a tampa em leque do `lathe`) como face de…
@@ -1138,6 +1147,8 @@
 - `ponto-repetido.test.ts` — ponto-repetido.test.ts — a recusa do contorno que não é polígono simples diz qual ponto se repete ou quais arestas se cruzam.
 - `primitivas-basicas.js` — primitivas-basicas.js — geradores fundamentais registrados pelo núcleo, sem estado global.
 - `primitivas-superficie.js` — primitivas-superficie.js — primitivas fechadas que recebem serviços explícitos do núcleo.
+- `subdivisao-limite.test.ts` — subdivisao-limite.test.ts — a recusa do passo `subdivisao` que gera mais vértices ou faces que o limite do passo. Precisa de uma gaiola de 576 quadros no nív…
+- `subdivisao-recusas.test.ts` — subdivisao-recusas.test.ts — cada recusa de entrada do passo `subdivisao` com a entrada ruim e o campo que a recusa cita. A revisão das verificações (2026-11…
 - `subdivisao.js` — subdivisao.js (operação) — gera uma superfície Catmull-Clark com vincos a partir de uma gaiola declarada. A geometria sai de `procedural/nucleo/subdivisao.js…
 - `transformacoes.js` — transformacoes.js — operações do grupo, isoladas por serviços explícitos do núcleo.
 - `triangulacao-sem-leque.test.ts` — triangulacao-sem-leque.test.ts — face plana grande (tampa de superelipse, pedaço de união) não sai em leque: grau máximo por canto e ângulo mínimo dos triâng…
@@ -2131,6 +2142,7 @@
 - `contato-de-solidos-raio-na-aresta.test.mjs` — contato-de-solidos-raio-na-aresta.test.mjs — o ponto fora do sólido não vira "dentro" porque o raio da contagem passa por uma aresta. A contagem de cruzament…
 - `contato-de-solidos.js` — contato-de-solidos — o núcleo geométrico que decide se dois sólidos se separam, se encostam ou se invadem. Serviço neutro, sem Three.js.
 - `contato-em-plano-inclinado.test.mjs` — contato-em-plano-inclinado.test.mjs — o vidro sobre face inclinada fecha por vértice novo de booleana ou de interseção de perfis, e esse vértice volta a pouc…
+- `contatos-da-peca-recusas.test.mjs` — contatos-da-peca-recusas.test.mjs — cada `throw` de entrada de contatos-da-peca.js com a entrada ruim, e os campos da saída que nenhum outro teste lia. A rev…
 - `contatos-da-peca.js` — contatos-da-peca — quais partes de uma peça se tocam, e quais delas a receita disse que DEVIAM se tocar.
 - `contatos-da-peca.test.mjs` — contatos-da-peca.test.mjs — a medida só vale se ela REPROVAR alguma coisa.
 - `contrato-autoria-3d.js` — Contratos neutros da N1. Este módulo valida intenção, fonte e provedores; não executa geometria, não lê disco e não conhece Three.js ou MCP.
@@ -2894,6 +2906,8 @@
 - `leituras.test.mjs` — leituras.test.mjs — o registro do que cada arquivo de teste lê, observado pelo fs e pelos processos filhos.
 - `lentos-ligados.mjs` — lentos-ligados.mjs — quais testes lentos o envio liga ao que mudou, e quantos deles cabem na bateria local.
 - `lentos-ligados.test.mjs` — lentos-ligados.test.mjs — que lentos o envio liga ao que mudou, e o teto da bateria local.
+- `recusas-exercitadas.mjs` — recusas-exercitadas.mjs — confere que cada recusa de entrada das fontes vigiadas tem um teste que a exercita.
+- `recusas-exercitadas.test.mjs` — recusas-exercitadas.test.mjs — o gate que recusa recusa de entrada sem teste: acha a mensagem de cada `grita`, `throw`, `erro:` e `erroAcionavel`, reprova a …
 - `seletor.mjs` — seletor.mjs — decide o que cada gate precisa rodar, comparando o repositório de agora com o da última vez que o gate passou.
 - `seletor.test.mjs` — seletor.test.mjs — o gate roda só se algo do que ele lê mudou desde a última rodada verde, e os testes vão pelo grafo de imports só quando tudo o que mudou é…
 - `vigia.mjs` — vigia.mjs — o vigia contínuo: um processo em segundo plano que roda os gates que a edição afeta enquanto o trabalho acontece.
@@ -2972,8 +2986,10 @@
 - `comecar.mjs` — comecar.mjs — a entrada por intenção no MCP.
 - `impacto-global.mjs` — impacto-global.mjs — adaptador MCP reduzido sobre o mapa canônico.
 - `montagens.mjs` — montagens.mjs — adaptador MCP fino para leitura e auditoria de montagens.
+- `parametros-contrato.test.mjs` — parametros-contrato.test.mjs — o schema de entrada, os códigos de saída, os padrões e a estrutura que as duas ferramentas MCP da varredura paramétrica devolv…
 - `parametros.mjs` — parametros.mjs — ferramentas MCP da varredura paramétrica.
 - `parametros.test.mjs` — As duas ferramentas da varredura vistas pela porta MCP.
+- `procedural-paginacao.test.mjs` — procedural-paginacao.test.mjs — os códigos de saída, a projeção em resumo ou completo, o controle de paginação e o limite padrão das ferramentas MCP procedur…
 - `procedural.mjs` — procedural.mjs — adaptador MCP fino sobre o serviço puro de descoberta.
 - `revalidacao.mjs` — revalidacao.mjs — porta MCP Agent-First sobre campanhas persistidas.
 - `revalidacao.test.mjs` — Prova R04: consumidor caixa-preta, nova sessão e escrita segura por IDs.
