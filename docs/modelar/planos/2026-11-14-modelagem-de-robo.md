@@ -107,6 +107,7 @@ O número de instâncias pode tornar a auditoria de interseções lenta demais; 
 
 ## Decisões da pessoa
 
+Em 2026-11-14 a pessoa redefiniu o foco: este plano é de estudo, e o produto principal é o esquema que facilita modelagens futuras (ferramentas gerais, réguas, esqueleto, famílias e instruções), e não o objeto pronto. Cada fatia de modelagem serve para medir o que falta e é cortada quando já respondeu à pergunta dela; o objeto completo só segue com nova decisão da pessoa.
 Decidido em 2026-11-14, com as seis recomendações aprovadas. O robô tem 1.750 mm de altura, e as proporções saem de uma tabela declarada em milímetro. O rosto é máscara lisa com olhos e linhas de painel, e o rosto humano fica fora deste plano. A pose de repouso é a de braços levemente abertos, como na referência. As mãos entram com os cinco dedos articulados já no primeiro braço. O painel escuro fica em material liso até o plano da ferramenta de material. O plano foi ativado agora.
 
 Duas decisões continuam pendentes, e a pessoa ainda não as viu. A primeira é se a régua do planejado contra o executado entra já na fatia 2 ou se o braço usa só a conferência de caixa que existe; a recomendação é entrar já, porque é ela que acusa a parte pequena demais e a parte esquecida. A segunda é se o dedo de falanges vira família no fim do braço; a recomendação é que sim, porque o braço dá cinco ocorrências medidas. Até a resposta, a fatia 2 começa pelas partes e não escreve a régua nem a família.
