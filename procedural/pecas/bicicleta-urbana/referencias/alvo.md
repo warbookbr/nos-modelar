@@ -10,7 +10,7 @@ A escala vem do pneu 700c: aro de assento 622 mm, pneu de uns 32 mm, diâmetro e
 
 1. `quadro`: tubo superior, tubo inferior, tubo do selim, caixa de direção, duas gancheiras superiores, duas inferiores e o movimento central. Alumínio cinza azulado.
 2. `garfo`: garfo reto de duas pernas, a coluna dentro da caixa de direção, coaxial a ela.
-3. `roda_dianteira` e `roda_traseira`: cubo, 32 raios, aro, pneu. O eixo dianteiro fica nas pontas do garfo, o traseiro nas pontas das gancheiras, os dois centrados entre as pernas.
+3. `roda_dianteira` e `roda_traseira`: cubo, 36 raios, aro, pneu. O eixo dianteiro fica nas pontas do garfo, o traseiro nas pontas das gancheiras, os dois centrados entre as pernas.
 4. `mesa` e `guidao` com `manoplas`: a mesa sai do topo da coluna do garfo e segura o guidão pelo centro.
 5. `canote` dentro do tubo do selim, coaxial, e `selim` no topo dele.
 6. `pedivela`: coroa com protetor, dois braços opostos e dois `pedais`, girando no eixo do movimento central.
