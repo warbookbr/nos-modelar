@@ -130,7 +130,7 @@ describe('rotaciona, transladar e arranja declaram a escrita', () => {
       ['rotaciona', { eixo: 'z', graus: 10 }], ['transladar', { d: [1, 0, 0], sel: { v: [9999] } }],
       ['arranja', { modo: 'linear', total: 3, d: [0, 0, 3], origemId: 10, derivaDe: o('cubo', 2).origem, sel: o('cubo', 2) }],
       ['arranja', { modo: 'radial', total: 3, eixo: 'y', volta: 360, origemId: 11, derivaDe: o('cubo', 1).origem, sel: o('cubo', 1) }],
-      ['transladar', { d: [0, 0, 1], sel: o('arranja', 10) }],
+      ['transladar', { d: [0, 0, 1], sel: { f: [1] } }],
     ];
     const n = igualNosTresCaminhos({ PASSOS: passos });
     const doPasso = (k: number) => n.procedencia.passos.find((p: any) => p.passo === k)?.saidas;
@@ -138,7 +138,7 @@ describe('rotaciona, transladar e arranja declaram a escrita', () => {
     expect(doPasso(4)?.vertices.length).toBe(2);
     expect(doPasso(5)?.vertices).toEqual([]);          // translação nula
     expect(doPasso(8)?.faces.length).toBe(12);         // duas cópias de um cubo de 6 faces
-    expect(n.orfaos).toEqual([]);
+    expect(n.orfaos.map((x: any) => x.passo)).toEqual([7]);   // só o vértice inexistente do passo 7, e nenhuma recusa do arranja
   });
 });
 
