@@ -20,6 +20,20 @@ describe('grafo de leitura e escrita (só leitura)', () => {
     expect(referenciasDoValor([4, 5], aliases)).toEqual({ chaves: ['id#4', 'id#5'], dinamica: false });
   });
 
+  it('a origem distingue copia, nome e face, e {v} e {f} com ids são leitura estática', () => {
+    const base = { op: 'arranja', id: 5 };
+    const chave = (origem) => referenciasDoValor({ origem }).chaves[0];
+    expect(chave({ ...base, copia: 0 })).not.toBe(chave({ ...base, copia: 1 }));
+    expect(chave({ ...base, nome: 'a' })).not.toBe(chave({ ...base, nome: 'b' }));
+    expect(chave({ ...base, face: 2 })).not.toBe(chave({ ...base, face: 3 }));
+    expect(chave(base)).not.toBe(chave({ ...base, copia: 0 }));
+    expect(referenciasDoValor({ v: [1, 2] })).toEqual({ chaves: ['v#1', 'v#2'], dinamica: false });
+    expect(referenciasDoValor({ f: 7, v: [3] })).toEqual({ chaves: ['f#7', 'v#3'], dinamica: false });
+    expect(referenciasDoValor({ v: 'x' }).dinamica).toBe(true);
+    expect(chave({ op: 'x', id: 1, tampa: 'topo' })).not.toBe(chave({ op: 'x', id: 1, tampa: 'base' }));
+    expect(chave({ op: 'x', id: 1, parte: 'lente' })).not.toBe(chave({ op: 'x', id: 1 }));
+  });
+
   it('o manifesto de hoje não declara leitura por seleção: todo passo que lê a malha é barreira', () => {
     const passos = [cubo(1), cubo(2), sub(3, o('cubo', 1), o('cubo', 2)), ['material', { sel: o('subtrair', 3), usa: 'x' }]];
     const a = analisarPassos(passos, { manifesto });

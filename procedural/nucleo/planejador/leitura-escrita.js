@@ -14,11 +14,14 @@ export const CAMPOS_DE_REFERENCIA = Object.freeze(['sel', 'de', 'solidos', 'chap
 
 const ehObjeto = (x) => x !== null && typeof x === 'object' && !Array.isArray(x);
 
-/** A chave estável de uma origem `{ op, id, de? }`. */
+/** A chave estável de uma origem `{ op, id, de?, ... }`. Todo campo além de `op`, `id` e `de` (`copia`, `nome`, `face`, `tampa`, `parte`, `faixa`,
+ *  `parede`...) entra na chave, em ordem alfabética: duas origens que diferem em qualquer um deles citam coisas diferentes. */
 function chaveDaOrigem(origem) {
   if (!ehObjeto(origem) || typeof origem.op !== 'string' || origem.id === undefined) return null;
   const de = ehObjeto(origem.de) ? `<${chaveDaOrigem(origem.de) ?? '?'}` : '';
-  return `${origem.op}#${origem.id}${de}`;
+  const extra = Object.keys(origem).filter((k) => k !== 'op' && k !== 'id' && k !== 'de' && origem[k] !== undefined).sort()
+    .map((k) => `/${k}=${JSON.stringify(origem[k])}`).join('');
+  return `${origem.op}#${origem.id}${de}${extra}`;
 }
 
 /** Os aliases como mapa nome -> definição, ignorando entrada malformada (o núcleo é quem a recusa). */
@@ -30,7 +33,7 @@ function mapaDeAliases(aliases) {
 
 /**
  * As chaves de leitura de um valor de referência: `{ chaves, dinamica }`. Uma seleção `{ origem }`, um `{ alias }` (resolvido pelos
- * aliases, que valem uma origem ou a união de origens) e um id numérico são estáticos; qualquer outra forma (`onde`, `faces` com
+ * aliases, que valem uma origem ou a união de origens), um id numérico e as listas `{ v }` e `{ f }` de ids literais são estáticos; qualquer outra forma (`onde`, `faces` com
  * critério, expressão) lê a malha pelo que ela contém e é dinâmica.
  */
 export function referenciasDoValor(valor, aliases = new Map()) {
@@ -50,7 +53,11 @@ export function referenciasDoValor(valor, aliases = new Map()) {
       chaves.push(`alias:${v.alias}`);
       if (ehObjeto(def) && Array.isArray(def.unir)) def.unir.forEach((o) => visitar(o));
       else visitar(def);
-    } else if (chaveros.length === 2 && chaveros.includes('op') && chaveros.includes('id')) {
+    } else if (chaveros.length >= 1 && chaveros.every((k) => k === 'v' || k === 'f')
+      && chaveros.every((k) => (Number.isSafeInteger(v[k]) || (Array.isArray(v[k]) && v[k].every(Number.isSafeInteger))))) {
+      /* `{ v: [ids] }` e `{ f: [ids] }`: vértices e faces por id literal, leitura estática */
+      for (const k of chaveros) for (const n of [].concat(v[k])) chaves.push(`${k}#${n}`);
+    } else if (chaveros.includes('op') && chaveros.includes('id')) {
       const c = chaveDaOrigem(v);
       if (c === null) dinamica = true; else chaves.push(c);
     } else dinamica = true;
