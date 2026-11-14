@@ -43,3 +43,7 @@ Os tetos de tempo e os pisos de acervo continuam o maior custo em falso alarme (
 O processo não teria pego sozinho a falta de teste de recusa: nenhum gate confere que uma recusa é exercitada. Se a pessoa quiser, o script de estragos pode virar uma régua por amostra rodada fora do CI, que é o que o plano adia até a medida se repetir.
 
 A decisão da pessoa por grupo ainda não está registrada.
+
+## Decisão da pessoa (2026-11-14)
+
+A pessoa seguiu a recomendação para todos os grupos: nenhum teste sai, os grupos que protegem e os que protegem mas são frágeis ficam como estão, e o que falta vira o plano [testes das recusas e dos pontos sem proteção](../../planos/2026-11-14-testes-das-recusas.md), com o teste de cada recusa de entrada, o modo estrutural e o plano fora da origem do `espelha`, o schema de `parametros`, a paginação de `procedural.mjs`, os pisos do acervo lidos do tamanho do acervo, o limite de voltas no `friso` e um gate que confere que cada recusa é exercitada.
