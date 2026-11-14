@@ -14,6 +14,10 @@
  * altura total. Pela escala do entre-eixos a imagem tem 4.367 mm de comprimento (8% abaixo da tabela), 1.471 de altura
  * (7% acima) e pneu de 705 mm (4% acima); a tabela prevalece nas três.
  *
+ * A prancha guarda só o esqueleto: medidas, silhueta, vidros, porta, saia, arcos e curvas de caráter. Farol, lanterna,
+ * retrovisor, maçaneta e recortes de baixo são decididos sobre a chapa, no 3D lido contra a referência (decisão da pessoa
+ * em 2026-11-14, no plano do carro).
+ *
  * Referencial: y para cima com o chão em y = 0, a frente em +z (à direita no desenho), centrado no comprimento total.
  *
  * Calibração, escrita antes do traçado (skill, passo 1):
@@ -67,8 +71,6 @@ const P = {
   quedaJoelho: [-1000, 1305],
   baseTampa: [-1945, 1045],
   spoiler: [-2236, 1070],
-  lanternaTopo: [-2170, 920],
-  lanternaBase: [-2300, 790],
 };
 const mil = (v) => Math.round(v).toLocaleString('pt-BR');
 
@@ -144,24 +146,11 @@ export const ESPEC = {
     /* 3. cortes de painel */
     { vista: 'lateral', classe: 'painel', nome: 'porta', tipo: 'filete', fechado: true, pts: [[615, 955], [690, 850, 200], [660, 420, 400], [590, 250, 90], [-545, 250, 110], [-640, 470, 500], [-722, 850, 300], [-682, 997]] },
     { vista: 'lateral', classe: 'painel', nome: 'saia', tipo: 'poli', pts: [[zT + dz(203), 203], [zD - dz(203), 203]] },
-    { vista: 'lateral', classe: 'painel', nome: 'parachoqueTraseiroDeLado', tipo: 'filete', pts: [[zT - dz(640), 640], [-1960, 652, 600], [-2120, 720, 300], [-2195, 790]] },
     /* 4. curvas de caráter */
     { vista: 'lateral', classe: 'carater', nome: 'cintura', tipo: 'filete', pts: [[900, 940], [615, 955, 3000], [-657, 996]], esperado: { inversoesMax: 0 } },
     { vista: 'lateral', classe: 'carater', nome: 'ombroDoParaLama', tipo: 'filete', pts: [[-820, 930], [-1000, 970, 500], [-1300, 996, 1500], [-2000, 1008]], esperado: { inversoesMax: 0 } },
     { vista: 'lateral', classe: 'carater', nome: 'rebaixoTopo', tipo: 'filete', pts: [[1760, 740], [-724, 811, 1500], [-1023, 836]], esperado: { inversoesMax: 0 } },
     { vista: 'lateral', classe: 'carater', nome: 'rebaixoBase', tipo: 'filete', pts: [[845, 345], [-618, 420, 800], [-1000, 640, 500], [-1250, 715]], esperado: { inversoesMax: 1 } },
-    /* 5. detalhe */
-    { vista: 'lateral', classe: 'painel', nome: 'farol', tipo: 'filete', fechado: true, pts: [[2258, 722, 15], [1840, 716], [1950, 650, 250], [2120, 612, 150], [2266, 612, 15]] },
-    { vista: 'lateral', classe: 'painel', nome: 'lanterna', tipo: 'filete', fechado: true, pts: [[-2206, 1010, 8], [-2218, 940, 200], [-2238, 852, 200], [-2288, 778, 8], [-2252, 772, 8], [-2198, 846, 200], [-2176, 940, 200], [-2166, 1004, 8]] },
-    { vista: 'lateral', classe: 'painel', nome: 'macaneta', tipo: 'filete', fechado: true, pts: [[-389, 874, 18], [-645, 874, 18], [-645, 818, 18], [-389, 818, 18]] },
-    { vista: 'lateral', classe: 'painel', nome: 'retrovisor', tipo: 'filete', fechado: true, pts: [[500, 1015, 20], [320, 1045, 30], [300, 972, 20], [420, 945, 10], [500, 962, 15]] },
-    /* recortes de baixo, lidos na imagem: aberturas na chapa com a peça por trás (fatia 5); a frontal e a traseira também os mostram */
-    { vista: 'lateral', classe: 'painel', nome: 'luzDeCanto', tipo: 'filete', fechado: true, pts: [[2250, 420, 5], [2140, 420, 5], [2105, 382, 5], [2250, 382, 5]] },
-    { vista: 'lateral', classe: 'painel', nome: 'entradaDeNeblina', tipo: 'filete', fechado: true, pts: [[2290, 372, 8], [2110, 372, 8], [1990, 252, 10], [2296, 248, 8]] },
-    { vista: 'lateral', classe: 'painel', nome: 'refletorTraseiro', tipo: 'filete', fechado: true, pts: [[-2001, 450, 8], [-2186, 458, 8], [-2160, 420, 8], [-2020, 416, 8]] },
-    { vista: 'lateral', classe: 'painel', nome: 'recorteDoDifusor', tipo: 'filete', pts: [[-2296, 334], [-2120, 306, 500], [-1950, 280]] },
-    { vista: 'lateral', classe: 'painel', nome: 'divisaParachoqueDianteiro', tipo: 'filete', pts: [[1795, 700], [1700, 640, 400], [zD + dz(610), 610]] },
-    { vista: 'lateral', classe: 'painel', nome: 'labioDianteiro', tipo: 'filete', pts: [[2290, 220], [2120, 204, 400], [1960, 186]] },
     /* rodas */
     { vista: 'lateral', classe: 'roda', nome: 'pneuDianteiro', tipo: 'circulo', centro: [zD, R], raio: R, foraDoContorno: true, motivoForaDoContorno: motivoRoda },
     { vista: 'lateral', classe: 'roda', nome: 'pneuTraseiro', tipo: 'circulo', centro: [zT, R], raio: R, foraDoContorno: true, motivoForaDoContorno: motivoRoda },
@@ -183,7 +172,7 @@ export const ESPEC = {
   legenda: {
     x: 110, y: 730,
     itens: [
-      ['#1c2733', 'contorno da lataria, cortes de painel (porta, saia, para-choque de trás) e recortes de baixo (neblina, luz de canto, refletor, difusor)'],
+      ['#1c2733', 'contorno da lataria e cortes de painel (porta e saia)'],
       ['#3d6b86', 'vidros, pela borda de fora da moldura: porta, lateral traseiro e a faixa do para-brisa vista de lado'],
       ['#b3593d', 'tracejado laranja: curvas de caráter (cintura, ombro do para-lama, topo do rebaixo em cunha desde o farol, base dele subindo à anca traseira) e cotas em mm'],
       ['#1f6f5c', 'landmarks, em [z, y]'],

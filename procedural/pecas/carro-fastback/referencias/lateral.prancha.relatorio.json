@@ -133,14 +133,6 @@
         "inversoes": 0,
         "raioMin": null
       },
-      "parachoqueTraseiroDeLado": {
-        "vista": "lateral",
-        "comprimento": 625.39,
-        "retidao": 0.508,
-        "concentracao": 0.402,
-        "inversoes": 0,
-        "raioMin": 291
-      },
       "cintura": {
         "vista": "lateral",
         "comprimento": 1558.05,
@@ -172,86 +164,6 @@
         "concentracao": 0.221,
         "inversoes": 1,
         "raioMin": 500
-      },
-      "farol": {
-        "vista": "lateral",
-        "comprimento": 962.71,
-        "retidao": 0.688,
-        "concentracao": 0.121,
-        "inversoes": 0,
-        "raioMin": 15
-      },
-      "lanterna": {
-        "vista": "lateral",
-        "comprimento": 561.72,
-        "retidao": 0.372,
-        "concentracao": 0.281,
-        "inversoes": 2,
-        "raioMin": 8
-      },
-      "macaneta": {
-        "vista": "lateral",
-        "comprimento": 592.98,
-        "retidao": 0.688,
-        "concentracao": 0.206,
-        "inversoes": 0,
-        "raioMin": 18
-      },
-      "retrovisor": {
-        "vista": "lateral",
-        "comprimento": 486.48,
-        "retidao": 0.573,
-        "concentracao": 0.286,
-        "inversoes": 0,
-        "raioMin": 10
-      },
-      "luzDeCanto": {
-        "vista": "lateral",
-        "comprimento": 328.84,
-        "retidao": 0.779,
-        "concentracao": 0.136,
-        "inversoes": 0,
-        "raioMin": 5
-      },
-      "entradaDeNeblina": {
-        "vista": "lateral",
-        "comprimento": 748.46,
-        "retidao": 0.799,
-        "concentracao": 0.121,
-        "inversoes": 0,
-        "raioMin": 8
-      },
-      "refletorTraseiro": {
-        "vista": "lateral",
-        "comprimento": 384.61,
-        "retidao": 0.739,
-        "concentracao": 0.161,
-        "inversoes": 0,
-        "raioMin": 8
-      },
-      "recorteDoDifusor": {
-        "vista": "lateral",
-        "comprimento": 350.19,
-        "retidao": 1,
-        "concentracao": 0.03,
-        "inversoes": 0,
-        "raioMin": 500
-      },
-      "divisaParachoqueDianteiro": {
-        "vista": "lateral",
-        "comprimento": 204.54,
-        "retidao": 0.693,
-        "concentracao": 0.302,
-        "inversoes": 0,
-        "raioMin": 395
-      },
-      "labioDianteiro": {
-        "vista": "lateral",
-        "comprimento": 331.76,
-        "retidao": 0.975,
-        "concentracao": 0.035,
-        "inversoes": 0,
-        "raioMin": 400
       },
       "pneuDianteiro": {
         "vista": "lateral",
