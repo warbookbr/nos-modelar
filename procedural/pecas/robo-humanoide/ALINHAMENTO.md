@@ -18,12 +18,12 @@ A ordem das etapas em `montagem.json` é a ordem de montagem dita pela pessoa: `
 |---|---|
 | altura do robô | 1.750 mm |
 | diâmetro do disco do ombro | 110 mm |
-| braço, do centro do ombro ao centro do cotovelo | 300 mm |
-| antebraço, do centro do cotovelo ao centro do punho | 260 mm |
+| braço, do centro do ombro ao centro do cotovelo | 330 mm |
+| antebraço, do centro do cotovelo ao centro do punho | 230 mm |
 | mão, do centro do punho à ponta do dedo médio | 190 mm |
 | largura da palma | 90 mm |
 
-A escala de cada receita é a medida fixada da parte, quando há uma, e a medida proposta quando não há.
+O braço e o antebraço eram 300 e 260 mm na rodada de alinhamento e passaram a 330 e 230 mm em 2026-11-14, quando a pessoa escolheu a opção B do esboço de proporção; o alcance de 750 mm do ombro à ponta do dedo médio não mudou. A escala de cada receita é a medida fixada da parte, quando há uma, e a medida proposta quando não há.
 
 ## Juntas e cursos
 
@@ -64,7 +64,7 @@ Cada parte nasce na porta da anterior, pelas `posicoes` de `montagem.json`: o br
 
 ## Esqueleto
 
-`andaime.json` é o esqueleto do braço, no formato do andaime da forma global N2, em milímetro, no quadro do robô inteiro: y para cima com o chão em y = 0, x para a direita do robô e z para a frente. Ele está na pose zero, com o braço pendente na vertical e a palma voltada para o corpo, porque o volume do andaime é alinhado aos eixos. Traz um volume por instância da montagem, com o id da instância em minúsculas e hífen (`polegarBase` é `polegar-base`), uma porta por eixo de junta e seis marcos: o centro do conjunto, os centros do ombro, do cotovelo e do punho, a linha dos nós e a ponta do dedo médio. O centro do ombro está em x 250 e y 1.435, o do cotovelo em y 1.135, o do punho em y 875, a linha dos nós em y 760 e a ponta do dedo médio em y 685.
+`andaime.json` é o esqueleto do braço, no formato do andaime da forma global N2, em milímetro, no quadro do robô inteiro: y para cima com o chão em y = 0, x para a direita do robô e z para a frente. Ele está na pose zero, com o braço pendente na vertical e a palma voltada para o corpo, porque o volume do andaime é alinhado aos eixos. Traz um volume por instância da montagem, com o id da instância em minúsculas e hífen (`polegarBase` é `polegar-base`), uma porta por eixo de junta e seis marcos: o centro do conjunto, os centros do ombro, do cotovelo e do punho, a linha dos nós e a ponta do dedo médio. O centro do ombro está em x 250 e y 1.435, o do cotovelo em y 1.105, o do punho em y 875, a linha dos nós em y 760 e a ponta do dedo médio em y 685.
 
 As receitas ainda não declaram `REFINA`. Elas são escritas no quadro local de cada parte e postas no lugar pela montagem, e a conferência que existe compara a parte com o volume no mesmo quadro. A comparação do planejado com o executado na montagem é a régua que o plano deixa pendente da decisão da pessoa.
 
@@ -83,7 +83,13 @@ Todos os corpos com a aresta trabalhada, como decidido no plano. As cascas são 
 
 Cada receita repete, nos `criteriosDeReprovacao` dela, os que valem para a parte.
 
-## Decisões que dependem da pessoa
+## Esboço de proporção, 2026-11-14
+
+`referencias/braco-proporcao.esboco.mjs` põe três opções de proporção do braço em blocos sobre o esqueleto, com o mesmo alcance de 750 mm do centro do ombro à ponta do dedo médio: a A com as medidas da rodada de alinhamento (disco 110, braço 300, antebraço 260, mão 190), a B com o braço mais longo (330 e 230) e a C com o disco maior e a mão menor (disco 135, antebraço 275, mão 175). As imagens são `referencias/braco-proporcao-lado-a-lado.png`, com as três opções vistas de lado, e `referencias/braco-proporcao.png`, com a vista frontal e a de lado de cada opção. A conferência do esboço deu 21 partes por opção, nenhuma travessia e a mesma câmera nas capturas. A pessoa escolheu a opção B em 2026-11-14, segundo a sessão que coordena o plano, e as tabelas do braço e do antebraço e o esqueleto passaram a ela; o punho e a mão ficaram onde estavam, porque o alcance é o mesmo.
+
+## Decisões aprovadas pela pessoa
+
+As nove decisões abaixo foram propostas sem a pessoa na escrita deste arquivo e aprovadas por ela em 2026-11-14, segundo a sessão que coordena o plano, que as levou a ela e relatou que ela mandou seguir as recomendações. A linha de aceite com as palavras dela cabe a essa sessão, e por isso este arquivo continua sem a seção de aceite. São elas: o polegar com base e duas falanges, os dedos iguais, a divisão da mão, a posição provisória do ombro, as medidas propostas da tabela, os eixos do ombro, o esqueleto na pose zero, a folga zero e a divisão em dez receitas, que está na seção das partes.
 
 O polegar ficou com duas falanges mais a base articulada, três juntas ao todo. A frase da pessoa, "polegar e quatro dedos de três falanges", deixa em aberto se o polegar também tem três. A recomendação é manter duas falanges e a base, que é a anatomia da mão e o que a referência sugere.
 

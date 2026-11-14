@@ -4,13 +4,13 @@
  * planejada e as juntas desta parte estão no esqueleto `../../andaime.json`. A receita só tem o PLANO: nenhum passo de forma foi
  * escrito, e a guarda do acervo avisa disso sem reprovar enquanto a etapa não está fixa.
  *
- * Portas que a receita vai publicar: ombro (cilindro fêmea, eixo z, no alto), que encaixa no eixo de abdução do ombro; cotovelo (cilindro, eixo x, 300 mm abaixo), onde o cotovelo gira.
+ * Portas que a receita vai publicar: ombro (cilindro fêmea, eixo z, no alto), que encaixa no eixo de abdução do ombro; cotovelo (cilindro, eixo x, 330 mm abaixo), onde o cotovelo gira.
  *
  * A TABELA está em milímetro e em grau. O valor marcado como proposta não foi fixado pela pessoa e está na lista de decisões do
  * alinhamento; o marcado como vindo por vínculo só vale para ver a parte sozinha. */
 
 export const TABELA = {
-  comprimentoEntreCentros: 300,
+  comprimentoEntreCentros: 330,
   larguraDaCasca: 100, // proposta
   profundidadeDaCasca: 115, // proposta
   parede: 3, // proposta
@@ -37,7 +37,7 @@ export const CONTATOS = [
 ];
 
 export const PLANO = {
-  "objeto": "braço direito do robô humanoide de 1.750 mm: segmento de 300 mm do centro do ombro ao centro do cotovelo, em casca cinza de parede fina com um painel escuro separado por costura",
+  "objeto": "braço direito do robô humanoide de 1.750 mm: segmento de 330 mm do centro do ombro ao centro do cotovelo, em casca cinza de parede fina com um painel escuro separado por costura",
   "referencias": [
     "../../referencias/alvo.md",
     "../../referencias/locais/frontal.jpg",
@@ -45,7 +45,7 @@ export const PLANO = {
   ],
   "escala": {
     "medida": "distância do centro do ombro ao centro do cotovelo",
-    "milimetros": 300
+    "milimetros": 330
   },
   "partes": [
     {

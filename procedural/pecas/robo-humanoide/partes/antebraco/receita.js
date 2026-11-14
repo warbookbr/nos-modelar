@@ -4,13 +4,13 @@
  * planejada e as juntas desta parte estão no esqueleto `../../andaime.json`. A receita só tem o PLANO: nenhum passo de forma foi
  * escrito, e a guarda do acervo avisa disso sem reprovar enquanto a etapa não está fixa.
  *
- * Portas que a receita vai publicar: cotovelo (anel, eixo y, no alto), que assenta na saída do cotovelo; punho (cilindro macho, eixo y, 260 mm abaixo), onde o anel do punho gira.
+ * Portas que a receita vai publicar: cotovelo (anel, eixo y, no alto), que assenta na saída do cotovelo; punho (cilindro macho, eixo y, 230 mm abaixo), onde o anel do punho gira.
  *
  * A TABELA está em milímetro e em grau. O valor marcado como proposta não foi fixado pela pessoa e está na lista de decisões do
  * alinhamento; o marcado como vindo por vínculo só vale para ver a parte sozinha. */
 
 export const TABELA = {
-  comprimentoEntreCentros: 260,
+  comprimentoEntreCentros: 230,
   larguraDaCasca: 85, // proposta
   profundidadeDaCasca: 95, // proposta
   parede: 3, // proposta
@@ -45,7 +45,7 @@ export const CONTATOS = [
 ];
 
 export const PLANO = {
-  "objeto": "antebraço direito do robô humanoide de 1.750 mm: segmento de 260 mm do centro do cotovelo ao centro do punho, em casca cinza de parede fina aberta por baixo, com duas hastes paralelas expostas",
+  "objeto": "antebraço direito do robô humanoide de 1.750 mm: segmento de 230 mm do centro do cotovelo ao centro do punho, em casca cinza de parede fina aberta por baixo, com duas hastes paralelas expostas",
   "referencias": [
     "../../referencias/alvo.md",
     "../../referencias/locais/frontal.jpg",
@@ -53,7 +53,7 @@ export const PLANO = {
   ],
   "escala": {
     "medida": "distância do centro do cotovelo ao centro do punho",
-    "milimetros": 260
+    "milimetros": 230
   },
   "partes": [
     {
