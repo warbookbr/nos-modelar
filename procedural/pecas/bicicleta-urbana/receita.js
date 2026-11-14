@@ -23,7 +23,7 @@ export const TABELA = {
   angulo_direcao: 71,
   /* roda 700c */
   aro_assento_diametro: 622,
-  pneu_largura: 32,
+  pneu_largura: 35,
   pneu_altura: 24,
   aro_altura: 15,
   aro_largura: 22,
@@ -34,7 +34,7 @@ export const TABELA = {
   eixo_raio: 6,
   eixo_dianteiro_largura: 100,
   eixo_traseiro_largura: 130,
-  raio_diametro: 2,
+  raio_diametro: 2.8,
   raios_total: 36,
   raios_cruzamentos: 3,
   raio_encaixe_no_aro: 2,
@@ -49,7 +49,7 @@ export const TABELA = {
   caixa_sobre_coroa: 14,
   abracadeira_selim_diametro: 44,
   abracadeira_selim_comprimento: 24,
-  caixa_direcao_comprimento: 165,
+  caixa_direcao_comprimento: 150,
   estai_diametro: 22,
   base_diametro: 24,
   estai_x_topo: 18,
@@ -58,31 +58,30 @@ export const TABELA = {
   movimento_central_largura: 68,
   tubo_selim_comprimento: 560,
   tubo_superior_no_selim: 750,
-  tubo_superior_na_direcao: 500,
+  tubo_superior_na_direcao: 525,
   tubo_inferior_na_direcao: 405,
   lados_tubo: 24,
   tampa_conica: 0.6,
-  selim_tampa: 20,
+  selim_tampa: 4,
   /* garfo */
   garfo_offset: 45,
   garfo_eixo_a_coroa: 375,
   garfo_perna_diametro: 22,
   garfo_coroa_diametro: 26,
-  garfo_coroa_meia_largura: 62,
-  garfo_coroa_arqueio: 8,
+  garfo_coroa_meia_largura: 32,
+  garfo_coroa_arqueio: 6,
   garfo_perna_diametro_ponta: 18,
   garfo_coluna_diametro: 28,
-  garfo_coluna_alem_da_caixa: 40,
+  garfo_coluna_alem_da_caixa: 50,
   garfo_x: 50,
   /* mesa e guidão */
-  mesa_folga_acima_caixa: 22,
+  mesa_espacador: 10,
+  mesa_folga_acima_caixa: 0,
   mesa_fixacao_comprimento: 48,
-  mesa_fixacao_diametro: 36,
+  mesa_fixacao_diametro: 40,
   mesa_braco_comprimento: 62,
   mesa_braco_diametro: 28,
   mesa_angulo: 38,
-  mesa_cabeca_raio: 22,
-  mesa_cabeca_largura: 44,
   guidao_largura: 680,
   guidao_diametro: 22,
   /* a largura de 680 é a total, com as manoplas: o caminho termina antes, pelo raio da manopla inclinada */
@@ -92,8 +91,8 @@ export const TABELA = {
   guidao_subida_comprimento: 100,
   guidao_subida: 48,
   guidao_recuo: 75,
-  guidao_caida_na_ponta: 14,
-  guidao_secoes_por_lado: 20,
+  guidao_erguida_na_ponta: 8,
+  guidao_secoes_por_lado: 40,
   manopla_diametro: 31,
   manopla_comprimento: 130,
   /* canote e selim */
@@ -102,15 +101,17 @@ export const TABELA = {
   canote_total: 250,
   selim_comprimento: 270,
   selim_largura: 140,
-  selim_espessura: 56,
+  selim_espessura: 60,
+  selim_traseira_elevada: 16,
+  selim_nariz_baixo: 6,
+  selim_braco_raio: 8,
   selim_trilho_diametro: 6,
   selim_trilho_x: 28,
   selim_largura_bico: 0.24,
   selim_largura_traseira: 0.92,
-  selim_secoes: 16,
+  selim_secoes: 22,
   selim_lados: 28,
-  selim_altura_sobre_canote: 8,
-  /* transmissão */
+    /* transmissão */
   dentes_coroa: 44,
   dentes_catraca: 16,
   passo_corrente: 12.7,
@@ -128,10 +129,10 @@ export const TABELA = {
   pedivela_braco_x: 60,
   pedivela_braco_diametro: 18,
   pedivela_eixo_raio: 7,
-  protetor_raio: 99,
+  protetor_raio: 106,
   protetor_x: 52.5,
-  protetor_espessura: 3,
-  protetor_raio_interno: 70,
+  protetor_espessura: 4,
+  protetor_raio_interno: 10,
   coroa_aro_radial: 16,
   aranha_bracos: 5,
   aranha_braco_raio: 9,
@@ -206,12 +207,12 @@ export function derivar(T) {
     const lamina = Array.from({ length: nUp + 1 }, (_, i) => {
       const u = i / nUp; // 0 = coroa, 1 = ponta
       const t = T.garfo_eixo_a_coroa * (1 - u);
-      const p = soma(naDirecao(t), esc(nFrente, T.garfo_offset * u ** 2.2));
-      p[0] = lado * (T.garfo_coroa_meia_largura + (T.garfo_x - T.garfo_coroa_meia_largura) * Math.min(1, u * 1.6));
+      const p = soma(naDirecao(t), esc(nFrente, T.garfo_offset * u ** 1.3));
+      p[0] = lado * (T.garfo_coroa_meia_largura + (T.garfo_x - T.garfo_coroa_meia_largura) * u);
       return p;
     });
-    const rLamina = lamina.map((_, i) => raioQ(T.garfo_perna_diametro + 6 + (T.garfo_perna_diametro_ponta - T.garfo_perna_diametro - 6) * (i / nUp) ** 0.8));
-    tubo('garfo', 'aluminio', lamina, rLamina, 24);
+    const rLamina = lamina.map((_, i) => raioQ(T.garfo_perna_diametro + 8 + (T.garfo_perna_diametro_ponta - T.garfo_perna_diametro - 8) * (i / nUp)));
+    tubo('garfo', 'aluminio', lamina, rLamina, 32);
   }
   /* coroa: arco em torno da coluna, com ombros arredondados nas duas pontas e o cubo central encostado na caixa */
   const arcoCoroa = Array.from({ length: 17 }, (_, i) => {
@@ -220,21 +221,21 @@ export function derivar(T) {
     p[0] = w * T.garfo_coroa_meia_largura;
     return p;
   });
-  tubo('garfo', 'aluminio', arcoCoroa, arcoCoroa.map((_, i) => { const w = (i / 16) * 2 - 1; return raioQ(T.garfo_perna_diametro + 6) + (raioQ(T.garfo_coroa_diametro + 12) - raioQ(T.garfo_perna_diametro + 6)) * (1 - Math.abs(w)) ** 0.7; }), 24);
+  tubo('garfo', 'aluminio', arcoCoroa, arcoCoroa.map((_, i) => { const w = (i / 16) * 2 - 1; return raioQ(T.garfo_perna_diametro + 8) + (raioQ(T.garfo_coroa_diametro + 14) - raioQ(T.garfo_perna_diametro + 8)) * (1 - Math.abs(w)) ** 0.5; }), 32);
   tubo('garfo', 'aluminio', [naDirecao(T.garfo_eixo_a_coroa - 6), naDirecao(baseCaixa + 2)], raioQ(T.caixa_direcao_diametro_baixo - 4), 32);
   const topoDaColuna = baseCaixa + T.caixa_direcao_comprimento + T.garfo_coluna_alem_da_caixa;
   tubo('garfo', 'aluminio', [naDirecao(T.garfo_eixo_a_coroa), naDirecao(topoDaColuna)], raioQ(T.garfo_coluna_diametro), 24);
 
-  /* MESA: braçadeira na coluna e pescoço curto inclinado para a frente e para cima, terminando na braçadeira do guidão */
-  const fixaBaixo = baseCaixa + T.caixa_direcao_comprimento + T.mesa_folga_acima_caixa;
+  /* MESA: espaçador e braçadeira do diâmetro da caixa no topo da coluna, e uma só extensão que sobe para a frente até o guidão */
+  const topoCaixa = baseCaixa + T.caixa_direcao_comprimento;
+  tubo('garfo', 'aluminio', [naDirecao(topoCaixa), naDirecao(topoCaixa + T.mesa_espacador)], raioQ(T.caixa_direcao_diametro - 8), 32);
+  const fixaBaixo = topoCaixa + T.mesa_espacador + T.mesa_folga_acima_caixa;
   const fixaCima = fixaBaixo + T.mesa_fixacao_comprimento;
   tubo('mesa', 'preto', [naDirecao(fixaBaixo), naDirecao(fixaCima)], raioQ(T.mesa_fixacao_diametro), 32);
-  const centroFixa = naDirecao(fixaCima - 8);
+  const centroFixa = naDirecao(fixaCima - 14);
   const mesaA = rad(T.mesa_angulo);
   const guidaoCentro = soma(centroFixa, [0, Math.sin(mesaA) * T.mesa_braco_comprimento, Math.cos(mesaA) * T.mesa_braco_comprimento]);
-  tubo('mesa', 'preto', [centroFixa, guidaoCentro], [raioQ(T.mesa_braco_diametro) + 3, raioQ(T.mesa_braco_diametro) - 2], 24);
-  const mb = T.mesa_cabeca_largura / 2;
-  tubo('mesa', 'preto', [-mb, -mb * 0.55, mb * 0.55, mb].map((x) => soma(guidaoCentro, [x, 0, 0])), [T.mesa_cabeca_raio * 0.7, T.mesa_cabeca_raio * 0.85, T.mesa_cabeca_raio * 0.85, T.mesa_cabeca_raio * 0.7], 32);
+  tubo('mesa', 'preto', [centroFixa, soma(centroFixa, esc(menos(guidaoCentro, centroFixa), 0.5)), guidaoCentro], [raioQ(T.mesa_fixacao_diametro) - 2, raioQ(T.mesa_braco_diametro) + 1, raioQ(T.guidao_diametro) + 6], 32);
 
   /* GUIDÃO: caminho riser; x medido do centro, o trecho reto no meio, depois sobe e recua para as pontas */
   const meia = T.guidao_largura / 2 - T.guidao_recuo_da_ponta;
@@ -244,40 +245,55 @@ export function derivar(T) {
     const us = Math.min(1, Math.max(0, (ax - T.guidao_reto_meio) / T.guidao_subida_comprimento));
     const ur = Math.max(0, (ax - T.guidao_reto_meio) / (meia - T.guidao_reto_meio));
     const uc = Math.max(0, (ax - T.guidao_reto_meio - T.guidao_subida_comprimento) / (meia - T.guidao_reto_meio - T.guidao_subida_comprimento));
-    return soma(guidaoCentro, [x, T.guidao_subida * us * us * (3 - 2 * us) - T.guidao_caida_na_ponta * uc, -T.guidao_recuo * ur]);
+    return soma(guidaoCentro, [x, T.guidao_subida * us * us * (3 - 2 * us) + T.guidao_erguida_na_ponta * uc, -T.guidao_recuo * ur]);
   });
   const pedaco = (de, ate) => caminho(de, ate, T.guidao_secoes_por_lado * 2);
   tubo('guidao', 'preto', pedaco(-meia + 5, meia - 5), raioQ(T.guidao_diametro), 28);
   const manoplaInicio = meia - T.manopla_comprimento;
-  tubo('manoplas', 'borracha', caminho(-meia, -manoplaInicio, 4), raioQ(T.manopla_diametro), 32);
-  tubo('manoplas', 'borracha', caminho(manoplaInicio, meia, 4), raioQ(T.manopla_diametro), 32);
+  tubo('manoplas', 'borracha', caminho(-meia, -manoplaInicio, 10), raioQ(T.manopla_diametro), 32);
+  tubo('manoplas', 'borracha', caminho(manoplaInicio, meia, 10), raioQ(T.manopla_diametro), 32);
 
   /* CANOTE e SELIM */
   const baseCanote = T.tubo_selim_comprimento - T.canote_dentro;
   const topoCanote = baseCanote + T.canote_total;
   tubo('canote', 'preto', [noSelim(baseCanote), noSelim(topoCanote)], raioQ(T.canote_diametro), 16);
   const apoio = noSelim(topoCanote);
-  const centroSelim = soma(apoio, [0, T.selim_altura_sobre_canote + T.selim_espessura / 2, 25]);
+  const centroSelim = soma(apoio, [0, 0, 25]);
   const secoes = [];
   const nSel = T.selim_secoes;
+  /* perfil de lado: traseira elevada e espessa, queda suave até o nariz; as pontas fecham em arco, sem ponta cônica */
   const perfilSelim = (t) => {
-    // t de 0 (traseira) a 1 (bico): largura cai e a espessura afina para o bico
     const tr = T.selim_largura_traseira;
-    const larg = t < 0.2 ? T.selim_largura * (tr + (1 - tr) * Math.sin((t / 0.2) * Math.PI / 2)) : T.selim_largura * ((1 - T.selim_largura_bico) * (1 - ((t - 0.2) / 0.8) ** 1.4) + T.selim_largura_bico);
-    const esp = T.selim_espessura * (1 - 0.4 * t ** 1.5);
-    return { larg, esp };
+    let larg = t < 0.2 ? T.selim_largura * (tr + (1 - tr) * Math.sin((t / 0.2) * Math.PI / 2)) : T.selim_largura * ((1 - T.selim_largura_bico) * (1 - ((t - 0.2) / 0.8) ** 1.4) + T.selim_largura_bico);
+    let esp = T.selim_espessura * (1 - 0.42 * t ** 1.3);
+    const yrel = T.selim_traseira_elevada * (1 - t) ** 1.6 - T.selim_nariz_baixo * t * t;
+    const fecha = (u) => Math.sqrt(Math.max(0.02, 1 - u * u));
+    if (t > 0.9) { const f = fecha((t - 0.9) / 0.1 * 0.97); larg *= f; esp *= f; }
+    if (t < 0.06) { const f = fecha((0.06 - t) / 0.06 * 0.9); larg *= f; esp *= f; }
+    return { larg, esp, yrel };
   };
   for (let i = 0; i <= nSel; i++) {
     const t = i / nSel;
     secoes.push({ t, z: centroSelim[2] - T.selim_comprimento / 2 + 25 + T.selim_comprimento * t * 0.92, ...perfilSelim(t) });
   }
+  /* trilhos: seguem a barriga do assento, por fora dela, de modo que aparecem de lado */
+  const trilhoRel = (q) => {
+    const x = Math.min(T.selim_trilho_x, 0.7 * q.larg / 2);
+    const barriga = (q.esp / 2) * (1 - (x / (q.larg / 2)) ** 2.5) ** 0.4;
+    return { x, y: q.yrel - barriga - 1 };
+  };
+  const doCanote = secoes.reduce((a, q) => (Math.abs(q.z - apoio[2]) < Math.abs(a.z - apoio[2]) ? q : a));
+  const rBraco = T.selim_braco_raio;
+  const yBase = apoio[1] + rBraco - 2 - trilhoRel(doCanote).y - doCanote.esp / 2;
+  for (const q of secoes) q.y = yBase + q.yrel + q.esp / 2;
+  centroSelim[1] = yBase;
   itens.push({ k: 'selim', parte: 'selim', material: 'preto', secoes, base: centroSelim, apoioY: apoio[1] });
   for (const lado of [-1, 1]) {
-    /* os trilhos acompanham a barriga do assento, meio embutidos, sem se soltar dele */
-    const trilho = secoes.slice(1, nSel - 1).map((q) => [lado * Math.min(T.selim_trilho_x, 0.62 * q.larg / 2), centroSelim[1] - 0.85 * q.esp / 2, q.z]);
-    tubo('selim', 'aco', trilho, trilho.map(() => raioQ(T.selim_trilho_diametro)), 8);
+    const trilho = secoes.slice(2, nSel - 1).map((q) => { const r = trilhoRel(q); return [lado * r.x, yBase + r.y + q.esp / 2, q.z]; });
+    tubo('selim', 'aco', trilho, trilho.map(() => raioQ(T.selim_trilho_diametro)), 12);
   }
-  torno('selim', 'aco', [[0, -T.selim_trilho_x - 6], [12, -T.selim_trilho_x - 6], [12, T.selim_trilho_x + 6], [0, T.selim_trilho_x + 6]], [0, apoio[1] + 4, apoio[2]], { lados: 16, liso: 40 });
+  /* braçadeira pequena e escura sob o assento, sobre o topo do canote */
+  torno('selim', 'preto', [[0, -T.selim_trilho_x - 4], [rBraco, -T.selim_trilho_x - 4], [rBraco, T.selim_trilho_x + 4], [0, T.selim_trilho_x + 4]], [0, apoio[1] + rBraco - 2, apoio[2]], { lados: 20, liso: 40 });
 
   /* RODAS: cubo, aro, pneu e raios no mesmo corpo */
   const rodas = [['rodaDianteira', zEixoFrente, T.eixo_dianteiro_largura], ['rodaTraseira', zEixoTras, T.eixo_traseiro_largura]];
@@ -350,7 +366,7 @@ export function derivar(T) {
     tubo('pedivela', 'preto', [ponto2(S * xc, T.aranha_cubo_raio - 6, fi), ponto2(S * xc, rAroIn + 3, fi)], [raioQ(T.aranha_braco_raio * 2), raioQ(T.aranha_braco_raio * 1.5)], 12);
     tubo('pedivela', 'preto', [ponto2(S * xc, rAroIn + 1, fi), ponto2(S * T.protetor_x, rAroIn + 1, fi)], raioQ(T.aranha_poste_raio * 2), 8);
   }
-  torno('pedivela', 'preto', noLado([[T.protetor_raio_interno, T.protetor_x - T.protetor_espessura / 2], [T.protetor_raio, T.protetor_x - T.protetor_espessura / 2], [T.protetor_raio, T.protetor_x + T.protetor_espessura / 2], [T.protetor_raio_interno, T.protetor_x + T.protetor_espessura / 2], [T.protetor_raio_interno, T.protetor_x - T.protetor_espessura / 2]]), bb, { lados: 72, liso: 30 });
+  torno('pedivela', 'preto', noLado([[T.protetor_raio_interno, T.protetor_x - T.protetor_espessura / 2], [T.protetor_raio, T.protetor_x - T.protetor_espessura / 2], [T.protetor_raio, T.protetor_x + T.protetor_espessura / 2 + 3], [T.protetor_raio - 6, T.protetor_x + T.protetor_espessura / 2 + 3], [T.protetor_raio - 6, T.protetor_x + T.protetor_espessura / 2], [T.protetor_raio_interno, T.protetor_x + T.protetor_espessura / 2], [T.protetor_raio_interno, T.protetor_x - T.protetor_espessura / 2]]), bb, { lados: 96, liso: 30 });
   torno('pedivela', 'aco', noLado([[0, -T.pedivela_braco_x - 8], [T.pedivela_eixo_raio, -T.pedivela_braco_x - 8], [T.pedivela_eixo_raio, T.protetor_x + T.protetor_espessura / 2 + 4], [0, T.protetor_x + T.protetor_espessura / 2 + 4]]), bb, { lados: 16, liso: 40 });
   const pa = rad(T.pedivela_angulo);
   const pedalPts = {};
@@ -410,12 +426,12 @@ export function gerarPassos(T) {
           /* superelipse: acolchoado cheio e de cantos redondos */
           pts.push([m(Math.sign(c) * Math.abs(c) ** 0.8 * meia), m(Math.sign(sn) * Math.abs(sn) ** 0.8 * (s.esp / 2))]);
         }
-        return { pos: [0, m(it.base[1]), m(s.z)], contorno: pts };
+        return { pos: [0, m(s.y), m(s.z)], contorno: pts };
       });
-      const polo = (z) => ({ pos: [0, m(it.base[1]), m(z)], raio: 0 });
-      passos.push(['loft', { origemId: oid, lados: T.selim_lados, secoes: [polo(sx[0].z - T.selim_tampa), ...secoes, polo(sx[sx.length - 1].z + T.selim_tampa)] }]);
+      const polo = (z, y) => ({ pos: [0, m(y), m(z)], raio: 0 });
+      passos.push(['loft', { origemId: oid, lados: T.selim_lados, secoes: [polo(sx[0].z - T.selim_tampa, sx[0].y), ...secoes, polo(sx[sx.length - 1].z + T.selim_tampa, sx[sx.length - 1].y)] }]);
       marca(it.parte, it.material, { origem: { op: 'loft', id: oid } });
-      passos.push(['liso', { angulo: 40, sel: { origem: { op: 'loft', id: oid } } }]);
+      passos.push(['liso', { angulo: 50, sel: { origem: { op: 'loft', id: oid } } }]);
     } else if (it.k === 'raios') {
       const [, yc, zc] = it.em;
       const pivo = v(it.em);
@@ -472,14 +488,15 @@ export function gerarPassos(T) {
         }
       }
     } else if (it.k === 'pedal') {
-      /* pedal de plataforma: moldura de quatro barras com vão no meio, igual nos dois lados */
+      /* pedal de plataforma: placa maciça com borda levantada nos quatro lados (leve recorte no meio), igual nos dois lados */
       const larg = it.x1 - it.x0;
       const bar = 14;
-      const barra = (cx, cz, lx, lz) => {
+      const barra = (cx, cz, lx, lz, alt = it.alt) => {
         const oid = proximo();
-        passos.push(['cubo', { origemId: oid, larg: m(lx), alt: m(it.alt), prof: m(lz), em: [m(cx), m(it.y - it.alt / 2), m(cz)] }]);
+        passos.push(['cubo', { origemId: oid, larg: m(lx), alt: m(alt), prof: m(lz), em: [m(cx), m(it.y - it.alt / 2), m(cz)] }]);
         marca('pedais', it.material, { origem: { op: 'cubo', id: oid } });
       };
+      barra((it.x0 + it.x1) / 2, it.z, larg, it.prof, it.alt * 0.55);
       barra(it.x0 + bar / 2, it.z, bar, it.prof);
       barra(it.x1 - bar / 2, it.z, bar, it.prof);
       barra((it.x0 + it.x1) / 2, it.z - it.prof / 2 + bar / 2, larg - 2 * bar, bar);
@@ -540,8 +557,8 @@ const receita = {
       { nome: 'manoplas', forma: 'duas manoplas cilíndricas nas pontas do guidão', tecnica: 'loft circular sobre o mesmo caminho das pontas' },
       { nome: 'canote', forma: 'tubo fino dentro do tubo do selim, coaxial, saindo acima dele', tecnica: 'loft circular coaxial ao tubo do selim' },
       { nome: 'selim', forma: 'assento acolchoado arredondado, bico estreito e traseira larga, dois trilhos e braçadeira', tecnica: 'loft de seções elípticas; trilhos em loft; lathe da braçadeira' },
-      { nome: 'pedivela', forma: 'coroa de 44 dentes em aranha de cinco braços com protetor anelar, eixo e dois braços opostos no movimento central', tecnica: 'lathe com lados iguais aos dentes; braços em loft' },
-      { nome: 'pedais', forma: 'dois pedais de plataforma iguais, moldura de quatro barras com vão no meio, cada um num eixo na ponta do braço', tecnica: 'quatro cubos por pedal e lathe do eixo' },
+      { nome: 'pedivela', forma: 'coroa de 44 dentes em aranha de cinco braços com protetor em disco, eixo e dois braços opostos no movimento central', tecnica: 'lathe com lados iguais aos dentes; braços em loft' },
+      { nome: 'pedais', forma: 'dois pedais de plataforma iguais, corpo cheio com borda levantada (leve recorte no meio), cada um num eixo na ponta do braço', tecnica: 'cubos (placa e borda) por pedal e lathe do eixo' },
       { nome: 'catraca', forma: 'pinhão de 16 dentes no cubo traseiro, no plano da coroa', tecnica: 'lathe com 16 lados' },
       { nome: 'corrente', forma: 'corrente de elos simples ligando a coroa à catraca por dois trechos retos e dois enrolamentos', tecnica: 'cubo de elo repetido por arranja linear e radial' },
     ],
