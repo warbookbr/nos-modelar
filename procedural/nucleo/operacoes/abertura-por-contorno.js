@@ -1416,7 +1416,7 @@ export function criarOperacoesAberturaPorContorno(servicos) {
     /* na fusão de lascas fica a face de antes do passo, que guarda a identidade; entre duas do mesmo tipo, a vizinha */
     const lascas = fundirLascas({ pos: posDaPeca, faces: limpa.faces, costura, parede, piso, preferir: (outra, lasca) => (localDe(i, outra) != null && localDe(i, lasca) == null ? lasca : outra) });
     const valencia = tirarValenciaDois(lascas.faces, new Set(recortada ? viz.voltas.flat() : []));
-    /* o rastreio declarado do retrato: abaixo só as faces de `valencia.faces` (e as que se dividem a partir delas) têm o `vs` reescrito no lugar; o que se cria, apaga ou renumera o despacho vê pelo mapa, e a booleana de dentro soma os operandos dela */
+    /* o rastreio declarado do retrato: abaixo só as faces de `valencia.faces` (e as que se dividem a partir delas) têm o `vs` reescrito no lugar; o que se cria, apaga ou renumera o despacho vê pelo mapa. Esta soma e a da booleana de dentro (`nucleoBooleano`, que soma os operandos dela) se COBREM: as faces reescritas aqui são operando da booleana ou criadas neste passo, então tirar só uma das duas não muda o resultado e tirar as duas faz a chapa de prova reprovar (teste de injeção em `rastreio-injecao.test.ts`). */
     if (st.tocadosF) for (const f of valencia.faces.keys()) st.tocadosF.add(f);
     const tocados = new Set([...limpa.faces.values(), ...facesDoCorte.map((f) => st.F.get(f).vs)].flat());
     for (const f of [...limpa.removidas, ...lascas.removidas, ...valencia.removidas]) {
