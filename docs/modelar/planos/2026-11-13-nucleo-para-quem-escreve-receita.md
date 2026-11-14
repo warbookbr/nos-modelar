@@ -1,10 +1,10 @@
 # Núcleo para quem escreve receita: erro na hora, menos passos e rodada mais curta
 
-**Estado:** pronto
+**Estado:** ativo
 
-**Território:** nenhum (aguarda aprovação)
+**Território:** `procedural/nucleo/uso-operacoes.js`, `procedural/nucleo/nucleo.js`, `procedural/nucleo/operacoes/`, `procedural/nucleo/expressoes*`, `procedural/nucleo/auxiliares/`, `src/autoria/executar-receita.js`, `tools/gates/argumentos-essenciais.mjs`, `docs/modelar/banco-de-provas/nucleo-para-receita-2026-11-14/`
 
-**Responsável:** a IA da sessão do furgão; as mudanças foram aprovadas pela pessoa em 2026-11-13, e o plano espera o território.
+**Responsável:** a IA da sessão do furgão; as mudanças foram aprovadas pela pessoa em 2026-11-13, e ativado por ela em 2026-11-14 ("pode ir fazendo em paralelo o plano do nucleo, ativar ele e fazer"), depois de o plano das costuras fechar.
 
 **Repositório e base:** `warbookbr/nos-modelar`, main de 2026-11-13.
 
