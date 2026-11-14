@@ -74,8 +74,24 @@ describe('subdivisao: recusas de entrada', () => {
     expect(recusa({ grupos: { g: 3 } }).ref).toBe('grupos');
   });
 
+  it('vincos: cada vinco precisa de nome e de dois pontos ou mais, em texto', () => {
+    const semNome = recusa({ vincos: [{ pontos: ['a', 'b'], nitidez: 1 }] });
+    expect(semNome.ref).toBe('vincos');
+    expect(semNome.motivo).toMatch(/^cada vinco precisa de nome, como /);
+    const poucos = recusa({ vincos: [{ nome: 'v', pontos: ['a'], nitidez: 1 }] });
+    expect(poucos.ref).toBe('vincos');
+    expect(poucos.motivo).toMatch(/^o vinco 'v' precisa de pontos: lista de dois ou mais nomes de ponto da gaiola, em sequência ao longo das arestas/);
+  });
+
+  it('grupos: cada grupo precisa de nome', () => {
+    const r = recusa({ grupos: [{ pontos: ['a'] }] });
+    expect(r.ref).toBe('grupos');
+    expect(r.motivo).toMatch(/^cada grupo precisa de nome, como /);
+  });
+
   it('liso: ângulo de 0 a 180 ou false', () => {
     for (const ruim of [-1, 181]) expect(recusa({ liso: ruim }).ref).toBe('liso');
+    expect(recusa({ liso: 181 }).motivo).toMatch(/^liso precisa ser ângulo em graus entre 0 e 180 \(padrão /);
     expect(roda({ liso: false }).orfaos).toEqual([]);
     expect(roda({ liso: 30 }).orfaos).toEqual([]);
   });

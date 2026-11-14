@@ -58,8 +58,8 @@ describe('lerContatosDeclarados: recusas', () => {
   });
 
   it('item que não é objeto recusa nomeando o índice', () => {
-    for (const ruim of [null, 'x', 3, [['a', 'b']]]) expect(() => ler([ruim])).toThrow(/contatos\[0\] precisa ser objeto/);
-    expect(() => ler([{ par: PARTES, motivo: MOTIVO }, null])).toThrow(/contatos\[1\] precisa ser objeto/);
+    for (const ruim of [null, 'x', 3, [['a', 'b']]]) expect(() => ler([ruim])).toThrow('contatos[0] precisa ser objeto.');
+    expect(() => ler([{ par: PARTES, motivo: MOTIVO }, null])).toThrow('contatos[1] precisa ser objeto.');
   });
 
   it("'par' precisa ser dois nomes de parte não vazios", () => {
@@ -86,6 +86,11 @@ describe('lerContatosDeclarados: recusas', () => {
     expect(unico(com(TOLERANCIA_PROPRIA_MAXIMA)).toleranciaNumerica).toBe(TOLERANCIA_PROPRIA_MAXIMA);
   });
 
+  it("o par com o mesmo nome duas vezes e o par repetido recusam nomeando o contato", () => {
+    expect(() => ler([{ par: ['a', 'a'], motivo: MOTIVO }])).toThrow("contatos[0]: 'par' cita 'a' duas vezes; contato é entre partes diferentes.");
+    expect(() => ler([{ par: ['a', 'b'], motivo: MOTIVO }, { par: ['b', 'a'], motivo: MOTIVO }])).toThrow("contatos[1]: o par 'b' ↔ 'a' já foi declarado.");
+  });
+
   it('a saída ordena o par e guarda o motivo aparado, e os campos opcionais só aparecem quando declarados', () => {
     const d = unico(ler([{ par: ['b', 'a'], motivo: `  ${MOTIVO} ` }]));
     expect(d).toEqual({ par: ['a', 'b'], motivo: MOTIVO });
@@ -99,7 +104,7 @@ describe('contatosDaPeca: recusas de opção e campos da saída', () => {
   it('opções que não são objeto recusam com TypeError, e a opção desconhecida recusa nomeando-a', () => {
     for (const ruim of [null, 'x', 3, [], [{ toleranciaNumerica: 0 }]]) {
       expect(() => contatosDaPeca(neutro, {}, ruim)).toThrow(TypeError);
-      expect(() => contatosDaPeca(neutro, {}, ruim)).toThrow(/opções inválidas/);
+      expect(() => contatosDaPeca(neutro, {}, ruim)).toThrow('contatos da peça: opções inválidas.');
     }
     expect(() => contatosDaPeca(neutro, {}, { folga: 1 })).toThrow(/opção desconhecida 'folga'/);
     expect(() => contatosDaPeca(neutro, {}, { toleranciaNumerica: 0, folga: 1 })).toThrow(/opção desconhecida 'folga'/);

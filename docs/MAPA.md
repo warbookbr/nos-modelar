@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1915 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1920 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1125,6 +1125,7 @@
 - `cantos-arredondados.js` — cantos-arredondados.js — o remate do vértice onde duas ou três arestas arredondadas (ou chanfradas) se encontram.
 - `edicao-direta.js` — edicao-direta.js — edições locais por identidade, via serviços explícitos do núcleo.
 - `encostar.test.ts` — encostar.test.ts — contato derivado no lugar de coordenada digitada (A-6).
+- `espelha.test.ts` — espelha.test.ts — o passo `espelha` medido por número: a reflexão por plano fora da origem nos três eixos, a ordem e a numeração dos ids novos, a soldagem do…
 - `estouro-de-bloco.test.ts` — estouro-de-bloco.test.ts — nenhum passo que passa de BLOCO ids lança erro: espelha, arranja, furo e os geradores com lados:{desvio} continuam na faixa estend…
 - `estruturais.js` — estruturais.js — operações do grupo, isoladas por serviços explícitos do núcleo.
 - `extrusao-de-perfil.test.ts` — extrusao-de-perfil.test.ts — `extrusao` e o `lathe` com `furos` e `deslocar`: perfil 2D com furo e deslocamento de contorno, levantado ou revolucionado em só…
@@ -2902,6 +2903,8 @@
 - `leituras.test.mjs` — leituras.test.mjs — o registro do que cada arquivo de teste lê, observado pelo fs e pelos processos filhos.
 - `lentos-ligados.mjs` — lentos-ligados.mjs — quais testes lentos o envio liga ao que mudou, e quantos deles cabem na bateria local.
 - `lentos-ligados.test.mjs` — lentos-ligados.test.mjs — que lentos o envio liga ao que mudou, e o teto da bateria local.
+- `recusas-exercitadas.mjs` — recusas-exercitadas.mjs — confere que cada recusa de entrada das fontes vigiadas tem um teste que a exercita.
+- `recusas-exercitadas.test.mjs` — recusas-exercitadas.test.mjs — o gate que recusa recusa de entrada sem teste: acha a mensagem de cada `grita`, `throw`, `erro:` e `erroAcionavel`, reprova a …
 - `seletor.mjs` — seletor.mjs — decide o que cada gate precisa rodar, comparando o repositório de agora com o da última vez que o gate passou.
 - `seletor.test.mjs` — seletor.test.mjs — o gate roda só se algo do que ele lê mudou desde a última rodada verde, e os testes vão pelo grafo de imports só quando tudo o que mudou é…
 - `vigia.mjs` — vigia.mjs — o vigia contínuo: um processo em segundo plano que roda os gates que a edição afeta enquanto o trabalho acontece.
@@ -2980,8 +2983,10 @@
 - `comecar.mjs` — comecar.mjs — a entrada por intenção no MCP.
 - `impacto-global.mjs` — impacto-global.mjs — adaptador MCP reduzido sobre o mapa canônico.
 - `montagens.mjs` — montagens.mjs — adaptador MCP fino para leitura e auditoria de montagens.
+- `parametros-contrato.test.mjs` — parametros-contrato.test.mjs — o schema de entrada, os códigos de saída, os padrões e a estrutura que as duas ferramentas MCP da varredura paramétrica devolv…
 - `parametros.mjs` — parametros.mjs — ferramentas MCP da varredura paramétrica.
 - `parametros.test.mjs` — As duas ferramentas da varredura vistas pela porta MCP.
+- `procedural-paginacao.test.mjs` — procedural-paginacao.test.mjs — os códigos de saída, a projeção em resumo ou completo, o controle de paginação e o limite padrão das ferramentas MCP procedur…
 - `procedural.mjs` — procedural.mjs — adaptador MCP fino sobre o serviço puro de descoberta.
 - `revalidacao.mjs` — revalidacao.mjs — porta MCP Agent-First sobre campanhas persistidas.
 - `revalidacao.test.mjs` — Prova R04: consumidor caixa-preta, nova sessão e escrita segura por IDs.

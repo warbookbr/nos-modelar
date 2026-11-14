@@ -40,12 +40,16 @@ describe('friso: recusas de entrada na polilinha', () => {
   });
 
   it('linha: objeto com nome e pontos, sem campo estranho', () => {
-    for (const ruim of [null, 'l', [RETA]]) expect(recusa({ linha: ruim }).ref).toBe('linha');
+    for (const ruim of [null, 'l', [RETA]]) {
+      const r = recusa({ linha: ruim });
+      expect(r.ref).toBe('linha');
+      expect(r.motivo).toMatch(/^linha precisa ser a linha nomeada, como /);
+    }
     expect(recusa({ linha: { nome: 'l', pontos: RETA, cor: 1 } }).motivo).toMatch(/campo desconhecido 'cor'/);
     expect(recusa({ linha: { pontos: RETA } }).motivo).toMatch(/precisa de nome/);
     expect(recusa({ linha: { nome: '', pontos: RETA } }).motivo).toMatch(/precisa de nome/);
     expect(recusa({ linha: { nome: 7, pontos: RETA } }).motivo).toMatch(/precisa de nome/);
-    expect(recusa({ linha: { nome: 'l', pontos: [[0, 0, 0]] } }).motivo).toMatch(/dois pontos ou mais/);
+    expect(recusa({ linha: { nome: 'l', pontos: [[0, 0, 0]] } }).motivo).toMatch(/precisa de dois pontos ou mais; repita o primeiro no fim para fechar a volta/);
     expect(recusa({ linha: { nome: 'l' } }).motivo).toMatch(/dois pontos ou mais/);
   });
 
@@ -78,7 +82,9 @@ describe('friso: recusas de entrada na polilinha', () => {
   });
 
   it('fechamento: só com ponta fechada, e maior que zero', () => {
-    expect(recusa({ fechamento: 0.1 }).ref).toBe('fechamento');
+    const r = recusa({ fechamento: 0.1 });
+    expect(r.ref).toBe('fechamento');
+    expect(r.motivo).toBe("fechamento só vale com ponta 'fechada'");
     expect(recusa({ ponta: 'fechada', fechamento: 0 }).motivo).toMatch(/maior que zero, e veio 0/);
     expect(recusa({ ponta: 'fechada', fechamento: -1 }).ref).toBe('fechamento');
   });
@@ -107,7 +113,7 @@ describe('friso: recusas de entrada na polilinha', () => {
     expect(r.motivo).toMatch(/^a aba dobra a borda da chapa/);
   });
 
-  it('variacao: cita pontos nomeados da linha', () => {
+  it('variacao: cita pontos nomeados da linha, e a polilinha de pontos soltos não os tem', () => {
     expect(recusa({ variacao: 3 }).ref).toBe('variacao');
   });
 });
@@ -132,6 +138,37 @@ describe('friso: recusas de entrada sobre a chapa de prova', () => {
     const P0 = { retangulo: { largura: 0.008, profundidade: 0.004, centro: [0, 0.002] } };
     expect(naChapa({ aba: undefined, perfil: P0 })[0].ref).toBe('perfil');
     expect(naChapa({ aba: undefined, perfil: P0, normal: [0, 1, 0] })[0].ref).toBe('normal');
+  });
+
+  it('a linha sobre a superfície cita os pontos da gaiola por nome', () => {
+    const L = prova.linhaDaNervura();
+    const r = naChapa({ aba: undefined, perfil: { retangulo: { largura: 0.008, profundidade: 0.005, centro: [0, 0.002] } }, linha: { nome: 'nervura', pontos: [L[0], L[1], [0, 0, 0]] } });
+    expect(r).toHaveLength(1);
+    expect(r[0].ref).toBe('linha');
+    expect(r[0].motivo).toMatch(/sobre a superfície cita pontos da gaiola por nome; veio \[0,0,0\]/);
+  });
+
+  it('a chapa mudada depois do passo da superfície recusa o friso citando a superfície', () => {
+    /* o passo `subdivisao` de nível 0 da chapa de prova gera 160 faces; apagá-las todas deixa a linha sem a face que o friso lê */
+    const base = prova.passos({ niveis: 0 }).slice(0, 3);
+    const apaga = [...nucleo([base[0]] as never, P).F.keys()].map((id: number) => ['apagaFace', { face: id }]);
+    expect(apaga).toHaveLength(160);
+    const st = nucleo([base[0], ...apaga, base[2]] as never, P);
+    const o = st.orfaos.filter((x: { op: string }) => x.op === 'friso');
+    expect(o).toHaveLength(1);
+    expect(o[0].ref).toBe('superficie');
+    expect(o[0].motivo).toMatch(/mudou depois do passo 0; o friso lê a superfície como o passo a gerou/);
+  });
+
+  it('cada item da variacao é { ponto, valor } com o ponto em texto, a lista não é vazia, e ela precisa de largura ou de angulo', () => {
+    const L = prova.linhaDaNervura();
+    const nervura = { aba: undefined, perfil: { retangulo: { largura: 0.008, profundidade: 0.005, centro: [0, 0.002] } }, linha: { nome: 'nervura', pontos: L } };
+    const com = (variacao: unknown) => naChapa({ ...nervura, variacao });
+    expect(com({ largura: [3] })[0]).toMatchObject({ ref: 'variacao' });
+    expect(com({ largura: [3] })[0].motivo).toMatch(/precisa ser \{ ponto, valor \} ou \{ ponto, antes, depois \}/);
+    expect(com({ largura: [{ valor: 0.01 }] })[0].motivo).toMatch(/precisa citar o ponto da linha pelo nome, em ponto/);
+    expect(com({ largura: [] })[0].motivo).toMatch(/precisa ser a lista dos pontos com o valor de cada um/);
+    expect(com({})[0].motivo).toMatch(/^variacao precisa de largura ou de angulo/);
   });
 
   it('variacao sobre a aba cita o ponto, e a variação de largura que passa de zero recusa', () => {
