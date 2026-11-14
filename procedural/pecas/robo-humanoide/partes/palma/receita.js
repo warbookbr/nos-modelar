@@ -10,11 +10,11 @@
  * alinhamento; o marcado como vindo por vínculo só vale para ver a parte sozinha. */
 
 export const TABELA = {
-  largura: 90,
-  comprimentoDoPunhoAosNos: 115, // proposta: dos 190 mm da mão, 115 para a palma e 75 para o dedo médio
-  espessura: 28, // proposta
-  passoEntreDedos: 22, // proposta
-  raioDoPino: 3, // proposta
+  largura: 90, // @proporcao larguraDaPalma
+  comprimentoDoPunhoAosNos: 115, // @proporcao comprimentoDaPalma — proposta: dos 190 mm da mão, 115 para a palma e 75 para o dedo médio
+  espessura: 28, // @proporcao espessuraDaPalma — proposta
+  passoEntreDedos: 22, // @proporcao passoEntreDedos — proposta
+  raioDoPino: 3, // @proporcao raioDoPinoDosDedos — proposta
   inclinacaoDoEixoDoPolegar: 45, // proposta: a pessoa disse inclinado, sem o ângulo
 };
 

@@ -10,10 +10,10 @@
  * alinhamento; o marcado como vindo por vínculo só vale para ver a parte sozinha. */
 
 export const TABELA = {
-  diametroExterno: 64, // proposta, a pessoa não fixou
-  alturaDoAnel: 30, // proposta
-  raioDoFuro: 20, // vem do antebraço por vínculo
-  raioDoEixoDeFlexao: 6, // proposta
+  diametroExterno: 64, // @proporcao diametroDoPunho — proposta, a pessoa não fixou
+  alturaDoAnel: 30, // @proporcao alturaDoPunho — proposta
+  raioDoFuro: 20, // @proporcao raioDoFuroDoPunho — vem do antebraço por vínculo
+  raioDoEixoDeFlexao: 6, // @proporcao raioDoEixoDeFlexaoDoPunho — proposta
   rotacaoMinima: -90,
   rotacaoMaxima: 90,
   flexaoMinima: -60,

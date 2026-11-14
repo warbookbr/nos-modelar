@@ -10,14 +10,14 @@
  * alinhamento; o marcado como vindo por vínculo só vale para ver a parte sozinha. */
 
 export const TABELA = {
-  comprimentoEntreCentros: 230,
-  larguraDaCasca: 85, // proposta
-  profundidadeDaCasca: 95, // proposta
+  comprimentoEntreCentros: 230, // @proporcao comprimentoDoAntebraco
+  larguraDaCasca: 85, // @proporcao larguraDoAntebraco — proposta
+  profundidadeDaCasca: 95, // @proporcao profundidadeDoAntebraco — proposta
   parede: 3, // proposta
   diametroDaHaste: 12, // proposta
   distanciaEntreHastes: 30, // proposta
   raioDoAssentoDoCotovelo: 30, // vem do cotovelo por vínculo
-  raioDoPunho: 20, // proposta
+  raioDoPunho: 20, // @proporcao raioDoFuroDoPunho — proposta
 };
 
 export const CONTATOS = [
@@ -53,7 +53,7 @@ export const PLANO = {
   ],
   "escala": {
     "medida": "distância do centro do cotovelo ao centro do punho",
-    "milimetros": 230
+    "milimetros": 230 // @proporcao comprimentoDoAntebraco
   },
   "partes": [
     {

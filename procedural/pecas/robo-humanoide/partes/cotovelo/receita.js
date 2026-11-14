@@ -10,9 +10,9 @@
  * alinhamento; o marcado como vindo por vínculo só vale para ver a parte sozinha. */
 
 export const TABELA = {
-  diametroDoCilindro: 76, // proposta, a pessoa não fixou
-  larguraDoCilindro: 90, // proposta
-  raioDoPino: 12, // vem do braço por vínculo; o valor daqui só vale para ver a parte sozinha
+  diametroDoCilindro: 76, // @proporcao diametroDoCotovelo — proposta, a pessoa não fixou
+  larguraDoCilindro: 90, // @proporcao larguraDoCotovelo — proposta
+  raioDoPino: 12, // @proporcao raioDoPinoDoCotovelo — vem do braço por vínculo; o valor daqui só vale para ver a parte sozinha
   cursoMinimo: 0,
   cursoMaximo: 140,
 };

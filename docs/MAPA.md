@@ -5,8 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1921 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
-1928 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1946 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -568,7 +567,6 @@
 
 - `2026-11-08-ferramenta-de-material.md` — Ferramenta de material para o agente: ver, compor e reaproveitar materiais sem rodar a peça inteira
 - `2026-11-10-rebaixo-por-contorno.md` — Rebaixo por contorno: o degrau, o sulco e a borda rebaixada num corpo
-- `2026-11-13-revisao-das-verificacoes-e-dos-testes.md` — Revisão das verificações e dos testes: o que cada um pega, medido
 - `2026-11-14-modelagem-de-carro.md` — Modelagem de carro de passeio: o que já serve, onde a carroceria travou antes e por onde começar
 - `2026-11-14-modelagem-de-robo.md` — Modelagem de robô humanoide: o que já serve, o que falta na montagem e por onde começar
 - `2026-11-14-planejador-de-execucao.md` — Planejador de execução da receita
@@ -2833,6 +2831,14 @@
 
 - `medir-blocagem.js` — Suporte de prova do tradutor do nível zero. A medida da blocagem mora em `src/autoria/medir-blocagem-nivel-zero.js`, porque o próprio tradutor a usa para o r…
 
+## tools/fixtures/proporcoes/estante/pecas/montante/
+
+- `receita.js` — montante da estante de prova: fixture neutra da conferência de proporções.
+
+## tools/fixtures/proporcoes/estante/pecas/prateleira/
+
+- `receita.js` — prateleira da estante de prova: fixture neutra da conferência de proporções.
+
 ## tools/fixtures/referencia-do-plano/ausente/
 
 - `receita.js` — Peça de ensaio: o plano cita referencias/alvo.md e a pasta não tem o arquivo.
@@ -3278,6 +3284,8 @@
 - `portas-espelho-arranja.test.ts` — portas-espelho-arranja.test.ts — prova adversarial de AUT-2026-15: uma interface não pode permanecer no espaço da fonte quando a sua geometria foi copiada. C…
 - `procedencia-check.mjs` — Gate N3: contrato reduzido e explícito de procedência da fonte de restrições.
 - `procedencia-check.test.mjs` — Provas do gate N3 para procedência de valores estruturais.
+- `proporcoes.mjs` — proporcoes.mjs — a fonte única das medidas de uma montagem, e a conferência de que os outros lugares a seguem.
+- `proporcoes.test.mjs` — proporcoes.test.mjs — a fonte única de proporção: fórmula, medidas, o andaime gerado, as TABELAs marcadas, a conferência que acusa a edição feita só num luga…
 - `raio-da-aresta.mjs` — raio-da-aresta.mjs — mede o raio de cada aresta de caráter de uma peça, sobre a malha final.
 - `raio-da-aresta.test.mjs` — raio-da-aresta.test.mjs — a medida do raio de uma aresta sobre a malha final, com a verdade conhecida: o cilindro de raio dado entre dois planos (a 90 e a 12…
 - `receita-esqueleto.mjs` — receita-esqueleto.mjs — o esqueleto da receita de uma peça que ainda vai ser alinhada.

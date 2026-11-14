@@ -10,10 +10,10 @@
  * alinhamento; o marcado como vindo por vínculo só vale para ver a parte sozinha. */
 
 export const TABELA = {
-  comprimento: 24, // proposta: 32, 24 e 19 mm somam os 75 mm do dedo médio
-  largura: 19, // proposta
-  espessura: 17, // proposta
-  raioDoPino: 3, // proposta
+  comprimento: 24, // @proporcao falangeMedia — proposta: 32, 24 e 19 mm somam os 75 mm do dedo médio
+  largura: 19, // @proporcao larguraMedia — proposta
+  espessura: 17, // @proporcao espessuraMedia — proposta
+  raioDoPino: 3, // @proporcao raioDoPinoDosDedos — proposta
   cursoMinimo: 0,
   cursoMaximo: 90,
 };

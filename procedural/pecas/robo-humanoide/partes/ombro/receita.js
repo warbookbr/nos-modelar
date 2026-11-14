@@ -10,9 +10,9 @@
  * alinhamento; o marcado como vindo por vínculo só vale para ver a parte sozinha. */
 
 export const TABELA = {
-  diametroDoDisco: 110,
-  espessuraDoDisco: 50, // proposta, a pessoa não fixou
-  raioDoEixoDeAbducao: 14, // proposta, a pessoa não fixou
+  diametroDoDisco: 110, // @proporcao diametroDoDisco
+  espessuraDoDisco: 50, // @proporcao espessuraDoDisco — proposta, a pessoa não fixou
+  raioDoEixoDeAbducao: 14, // @proporcao raioDoEixoDeAbducao — proposta, a pessoa não fixou
   flexaoMinima: -60,
   flexaoMaxima: 180,
   abducaoMinima: 0,
@@ -38,7 +38,7 @@ export const PLANO = {
   ],
   "escala": {
     "medida": "diâmetro do disco do ombro",
-    "milimetros": 110
+    "milimetros": 110 // @proporcao diametroDoDisco
   },
   "partes": [
     {

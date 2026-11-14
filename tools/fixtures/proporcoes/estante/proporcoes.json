@@ -1,0 +1,30 @@
+{
+  "formato": "mecanifica.proporcoes@1",
+  "id": "estante-de-prova",
+  "unidade": "mm",
+  "medidas": {
+    "alturaDaEstante": 1800,
+    "larguraDaEstante": 800,
+    "profundidade": 300,
+    "espessuraDaTabua": 18,
+    "alturaDoVao": 350,
+    "alturaDaPrateleira": "=alturaDoVao + espessuraDaTabua",
+    "alturaDoTopo": "=alturaDaEstante - espessuraDaTabua / 2"
+  },
+  "andaime": {
+    "arquivo": "andaime.json",
+    "modelo": {
+      "formato": "mecanifica.andaime-global@2",
+      "id": "estante-de-prova",
+      "unidade": "mm",
+      "envelope": { "min": [0, 0, 0], "max": ["=larguraDaEstante", "=alturaDaEstante", "=profundidade"] },
+      "volumes": [
+        { "id": "prateleira-baixa", "tipo": "caixa", "centro": ["=larguraDaEstante / 2", "=alturaDoVao + espessuraDaTabua / 2", "=profundidade / 2"], "dimensoes": ["=larguraDaEstante", "=espessuraDaTabua", "=profundidade"] },
+        { "id": "prateleira-alta", "tipo": "caixa", "centro": ["=larguraDaEstante / 2", "=2 * alturaDaPrateleira - espessuraDaTabua / 2", "=profundidade / 2"], "dimensoes": ["=larguraDaEstante", "=espessuraDaTabua", "=profundidade"] },
+        { "id": "topo", "tipo": "caixa", "centro": ["=larguraDaEstante / 2", "=alturaDoTopo", "=profundidade / 2"], "dimensoes": ["=larguraDaEstante", "=espessuraDaTabua", "=profundidade"] }
+      ],
+      "portas": []
+    }
+  },
+  "receitas": ["pecas"]
+}
