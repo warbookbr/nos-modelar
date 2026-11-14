@@ -217,8 +217,9 @@ export function comecar({ roteiro: consulta = null, raiz = RAIZ } = {}) {
   if (consulta === null || String(consulta).trim() === '') {
     const filhos = filhosDoNo(dados.roteiros, '');
     const passo = 'Escolha o ramo da tarefa e rode npm run comecar -- <ramo>; para outra coisa, npm run comecar -- <tópico>.';
-    const texto = ['Qual é a tarefa? (npm run comecar -- <ramo>)', ...linhasDosFilhos(filhos, dados.perguntas), '', 'Estado:', ...estado.linhas.map((l) => `  ${l}`), '', `Passo seguinte: ${passo}`].join('\n');
-    return { ok: true, codigo: 0, texto: `${texto}\n`, resultado: { roteiros: resumoDosFilhos(filhos, dados.perguntas), estado: estado.linhas, passo } };
+    const folhas = dados.roteiros.map((r) => r.id).sort();
+    const texto = ['Qual é a tarefa? (npm run comecar -- <ramo>)', ...linhasDosFilhos(filhos, dados.perguntas), '', `Quem já sabe o caminho vai direto: npm run comecar -- <roteiro>, com o roteiro entre ${folhas.join(', ')}.`, '', 'Estado:', ...estado.linhas.map((l) => `  ${l}`), '', `Passo seguinte: ${passo}`].join('\n');
+    return { ok: true, codigo: 0, texto: `${texto}\n`, resultado: { roteiros: resumoDosFilhos(filhos, dados.perguntas), atalhos: folhas, estado: estado.linhas, passo } };
   }
   const q = String(consulta).trim();
   if (q.includes('#')) {
