@@ -56,8 +56,12 @@ export async function perfilarReceita(receita, { topo = 20 } = {}) {
   const { registroCronometrado } = await import('./descrever-peca.mjs');
   const tempos = new Map();
   const cronometro = registroCronometrado(REGISTRO_DA_RECEITA, { total: receita.PASSOS.length, tempos, aoPasso: null });
+  const rastreio = new Map();
   const t0 = performance.now();
-  const { entrada, neutro } = executarReceita(receita, { registroOperacoes: cronometro.registro });
+  const { entrada, neutro } = executarReceita(receita, {
+    registroOperacoes: cronometro.registro,
+    aoRastrear: (i, op, ms) => rastreio.set(i, { op, ms }),
+  });
   cronometro.fechar(entrada.PASSOS);
   const totalMs = performance.now() - t0;
   const estatica = analiseEstatica(receita);
@@ -67,6 +71,8 @@ export async function perfilarReceita(receita, { topo = 20 } = {}) {
     totalMs,
     cronometrado: tempos.size > 0,
     perfil: resumirPerfil(tempos, { maisCaros: topo }),
+    /* o que cada operação gasta só no rastreio do retrato (`aoRastrear` do núcleo), contra o que gasta no passo todo */
+    rastreio: resumirPerfil(rastreio, { maisCaros: 0 }).porOperacao,
     grafo: estatica,
     estritas: soma(estatica.estritas),
     relaxadas: soma(estatica.relaxadas),
@@ -101,6 +107,8 @@ function textoDoPerfil(peca, r) {
   for (const o of r.perfil.porOperacao) L.push(`  ${o.op.padEnd(22)} ${String(Math.round(o.ms)).padStart(8)} ms  ${String(o.passos).padStart(4)} passos  ${pct(o.parte).padStart(7)}  maior ${Math.round(o.maiorMs)} ms`);
   L.push('', `os ${r.perfil.maisCaros.length} passos mais caros`);
   for (const p of r.perfil.maisCaros) L.push(`  passo ${String(p.i).padStart(4)}  ${p.op.padEnd(22)} ${String(Math.round(p.ms)).padStart(8)} ms`);
+  L.push('', `rastreio do retrato por operação (ms no rastreio de ${Math.round(r.rastreio.reduce((x, o) => x + o.ms, 0))} ms ao todo)`);
+  for (const o of r.rastreio) L.push(`  ${o.op.padEnd(22)} ${String(Math.round(o.ms)).padStart(8)} ms  ${String(o.passos).padStart(4)} passos`);
   const t = r.grafo.totais;
   L.push('', `grafo: ${t.passos} passos, ${t.criadoras} criadores, ${t.leMalha} leem a malha, ${t.leituraDeclarada} com leitura declarada, ${t.barreiras} barreiras, ${t.leituraExtraivel} com leitura extraível dos argumentos, ${t.leituraDinamica} dinâmicos`);
   L.push(`sequências de subtrair: ${r.estritas.length} estritas, ${r.relaxadas.length} relaxadas`);

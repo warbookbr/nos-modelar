@@ -3745,8 +3745,14 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
     /* O RETRATO DE ANTES É O DE DEPOIS DO PASSO ANTERIOR. Nada muda `st.V` e `st.F` entre dois passos, então o retrato
        que a procedência tirou ao fim de um passo vale como o de antes do seguinte, e a malha deixa de ser serializada duas
        vezes por passo (era o quadrado do tamanho da peça). Passo que sai antes do fim zera o retrato e o seguinte refaz. */
+    /* `OPCOES.aoRastrear(i, op, ms)` é medição, desligada por padrão: o tempo que o passo gasta no rastreio do retrato (o de antes, se
+       faltava, e o de depois), para separar esse custo do custo da operação. Não muda nada do que o núcleo devolve. */
+    const medirRastreio = typeof OPCOES.aoRastrear === 'function';
+    let msRastreio = 0;
+    const t0Antes = medirRastreio ? performance.now() : 0;
     let antesV = retrato?.V ?? retratarEntradas(st.V, null);
     let antesF = retrato?.F ?? retratarEntradas(st.F, null);
+    if (medirRastreio) msRastreio += performance.now() - t0Antes;
     retrato = null;
     const antesPortas = new Set(st.portas.keys()), antesPartes = new Set(Object.keys(st.partes));
     const pose = comPassoNoErro(i, op, args, () => lerPoseDeCriacao(st, i, op, args));
@@ -3763,6 +3769,7 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
     st.alvosF = st.novosV = st.novosF = null;
     /* o caminho completo calcula antes do atalho, que atualiza o retrato de antes no lugar */
     let depoisV = null, depoisF = null, mudadosV = null, mudadosF = null;
+    const t0Depois = medirRastreio ? performance.now() : 0;
     if (escrita === undefined || modoRetrato === 'conferido') {
       depoisV = retratarEntradas(st.V, antesV);
       depoisF = retratarEntradas(st.F, antesF);
@@ -3787,6 +3794,7 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
       }
     }
     retrato = { V: depoisV, F: depoisF };
+    if (medirRastreio) { msRastreio += performance.now() - t0Depois; OPCOES.aoRastrear(i, op, msRastreio); }
     registrarProcedencia(st.procedencia, {
       passo: i, operacao: registrada.id,
       saidas: {
