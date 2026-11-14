@@ -209,7 +209,7 @@ export const TABELA = {
   p_inicio_y: 1330, // a partir daqui, e até o ombro, a quina ganha colunas entre E e D: p1 onde a D antiga ficava e as outras a passo_p
   passo_p: 30, // distância entre as colunas p
   p1_folga_d: 1, // 2026-11-12: a p1 (a crista da coluna) fica até a D chegar a 1 mm dela, e não some a 30: ao sumir de uma vez a crista dava um gancho no canto do teto
-  p_folga_d: 30, // 2026-11-09: a última coluna p fica a pelo menos isto da D, e as p ficam a passo_p da p1 (antes dividiam o vão até a D, e todas trocavam de lugar quando uma sumia): as p de 2 em diante somem com a D a 30 mm delas (a p1, que carrega a crista, tem `p1_folga_d`)
+  p_folga_d: 90, // 2026-11-14: de 30 a 90 (a 120 dá o mesmo): a última p fica a 90 mm da D, e o calombo de 1 mm das colunas p2 no pé do para-brisa e a emenda de 3,5 mm no canto do teto somem na medida de ondulação; 2026-11-09: : a última coluna p fica a pelo menos isto da D, e as p ficam a passo_p da p1 (antes dividiam o vão até a D, e todas trocavam de lugar quando uma sumia): as p de 2 em diante somem com a D a 30 mm delas (a p1, que carrega a crista, tem `p1_folga_d`)
   retorno_d_y: 2216, // até onde a coluna D, acima do topo da porta, acaba de voltar para a quina (2280, o ombro, até 2026-11-09: o fim do retorno junto com a morte da p1 deixava o nó da crista em y 2200 a 2230, e agora o nó cai mais baixo, na lateral, onde não corta a crista); as colunas p somem uma por anel pelo caminho, e não de uma vez
   para_brisa_topo_y: 2075, // o anel do topo do vão do para-brisa, que era o do topo da porta antes de ela descer
   coluna_do_meio: 182, // 110 até 2026-11-11, quando a traseira da porta da cabine avançou 72 mm (`porta_cabine_tras_z`): a frente da porta de correr fica onde estava
@@ -363,7 +363,7 @@ export const TABELA = {
   luz_canto_base_razao: 0.62, // a base é curta: 62% do topo
   luz_canto_barriga: 22, // o lado de fora é curvo: no meio ele sai 22 mm além da corda
   luz_canto_raios: [55, 140, 60], // as concordâncias dos três cantos do lado de fora, de baixo para cima
-  luz_canto_segmentos: 6, // segmentos de cada concordância do contorno da luz de canto (o padrão é 4): o aro lia como polígono nos cantos de raio 55 e 140
+  luz_canto_segmentos: 18, // segmentos de cada concordância do contorno da luz de canto (o padrão é 4; com 6 o aro ainda lia como polígono nos cantos de raio 55 e 140, a 15 graus por lado; com 18 são 5 graus). O corte do vão da direita é frágil: com 7, 8, 9, 12, 14, 16 e 24 a borda não fecha e a cadeia de vãos inteira cai; 10, 11, 13, 15, 18 e 20 fecham
   luz_canto_profundidade: 38,
   luz_canto_lampada_y: 0.45,
   pisca_lateral_z: [1680, 1830], // atrás da roda dianteira, no paralama, rente à fresta da porta (z 1660) e sobre o arco (a boca dele acaba em y 925)
@@ -382,7 +382,8 @@ export const TABELA = {
   grade_lente_recuo: 3, // a lente da grade entra 3 mm no vão, como a do farol
   grade_recuo: 18, // a lente escura da grade recua 18 mm para dentro do vão, dentro da perna de 20 mm da aba
   grade_barras_y: [850, 928, 1006], // as três barras horizontais
-  grade_barra_largura: 838, // as barras vão de parede a parede do vão (meia largura menos 1), com as pontas dentro da perna da aba: ponta solta a 20 mm da parede deixava sombras em degrau na luz rasante
+  grade_barra_largura: 832, // as barras acabam a 416 mm do meio: dentro da parede de 2 mm da aba (x 415 a 417), e não além da borda dela, onde a ponta aparecia em tiras claras na luz de frente; ponta solta a 20 mm da parede deixava sombras em degrau na luz rasante
+  grade_barra_embute: 6, // quanto a barra entra para trás da face da lente: ela passa a ter parte dentro da parede da aba (que acaba 1,2 mm atrás da barra), para a ponta ficar enterrada e não solta ao lado dela
   grade_barra_altura: 28,
   grade_barra_saliencia: 14, // quanto a barra sai da lente para a frente (sempre atrás da superfície da chapa)
   lanterna_base_y: 760, // as lanternas de trás (2026-11-06, opção 1 do esboço): vãos pelo contorno, vistos pela diagonal da quina; de 760 (2026-11-07: eram 720, mas o piso do interior vai de 735,5 a 755,5 e o refletor de 100 mm não passa por ele) a 1240 mm, 480 de altura para cerca de 300 de largura pela chapa
@@ -792,7 +793,7 @@ export function gerarPassos(T) {
   grade.barras.forEach((b, k) => {
     const sel = { origem: { op: 'extrusao', id: 130 + k } };
     passos.push(['extrusao', {
-      origemId: 130 + k, eixo: 'z', altura: m(T.grade_barra_saliencia + 2), em: [0, 0, m(zFaceDaLente - 2)],
+      origemId: 130 + k, eixo: 'z', altura: m(T.grade_barra_saliencia + T.grade_barra_embute), em: [0, 0, m(zFaceDaLente - T.grade_barra_embute)],
       perfil: { retangulo: { largura: m(T.grade_barra_largura), profundidade: m(T.grade_barra_altura), centro: [0, -m(b.y)] } },
     }]);
     passos.push(['parte', { nome: 'grade', sel }]);

@@ -22,7 +22,9 @@ Depois de mudar silhueta, encontro, corte, união ou arredondamento, faça o pas
    [`../alinhar-modelagem/SKILL.md`](../alinhar-modelagem/SKILL.md), e só então
    tem `PLANO`.
 2. A peça é uma pasta: `procedural/pecas/<peça>/receita.js`, com `referencias/`
-   e `rodadas/` ao lado. A parte de um objeto de várias partes mora em
+   e `rodadas/` ao lado (a imagem de estudo, com marca, fica em
+   `referencias/locais/`, ignorada pelo git, e só os derivados entram
+   versionados). A parte de um objeto de várias partes mora em
    `procedural/pecas/<objeto>/partes/<parte>/`, com a montagem na pasta do
    objeto, e os comandos a chamam por `<objeto>/<parte>`.
 3. A receita segue a cadeia do contrato

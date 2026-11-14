@@ -24,7 +24,8 @@ import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { normalizarPlanoDeModelagem } from '../../../src/autoria/plano-de-modelagem.js';
 import { descreverPecaReutilizavel } from '../descrever-peca.mjs';
-import { caminhosDaReferencia } from '../../../src/autoria/plano-de-modelagem.js';
+import { avisarReferenciasLocaisAusentes } from '../referencias-do-plano.mjs';
+import { caminhosDaReferencia, ehReferenciaLocal } from '../../../src/autoria/plano-de-modelagem.js';
 import { resolverCaminhoReceita } from '../resolver-caminho-receita.mjs';
 import { ocorrenciasPosicionais, rotularOcorrencias } from '../../../procedural/nucleo/referencia-posicional.js';
 import { nucleo } from '../../../procedural/nucleo/nucleo.js';
@@ -74,7 +75,7 @@ export function pecasDoAcervo(pasta = ACERVO, { base = pasta } = {}) {
    Dentro da pasta da peça elas saem desse alcance, e trocar uma conferência por
    nenhuma seria piorar com aparência de arrumação. Aqui a referência declarada
    que não existe no disco reprova, com o caminho na mensagem. */
-export function referenciasAusentes(peca, plano, { raiz = REPO } = {}) {
+export function referenciasAusentes(peca, plano, { raiz = REPO, locais = false } = {}) {
   if (!plano?.referencias?.length) return [];
   let pastaDaPeca = null;
   try {
@@ -82,8 +83,15 @@ export function referenciasAusentes(peca, plano, { raiz = REPO } = {}) {
   } catch {
     pastaDaPeca = null;
   }
-  return plano.referencias.filter((referencia) => !caminhosDaReferencia(referencia, pastaDaPeca)
+  return plano.referencias.filter((referencia) => ehReferenciaLocal(referencia) === locais)
+    .filter((referencia) => !caminhosDaReferencia(referencia, pastaDaPeca)
     .some((candidato) => existsSync(join(raiz, candidato))));
+}
+
+/* A referência em `referencias/locais/` é imagem de estudo que não se versiona: `locais: true` devolve as que faltam nesta máquina, que a
+   guarda só avisa. `referenciasAusentes` sem a opção ignora as locais e reprova o resto, como sempre. */
+export function avisarLocaisAusentes(peca, plano, opcoes = {}) {
+  avisarReferenciasLocaisAusentes(referenciasAusentes(peca, plano, { ...opcoes, locais: true }));
 }
 
 /* A FORMA ANTIGA DEIXA DE SER ACEITA. Enquanto o acervo aceitava peça em
@@ -222,6 +230,7 @@ export async function conferirPeca(peca) {
       if (!plano) throw new Error('a receita não exporta `PLANO`.');
       const faltando = referenciasAusentes(peca, plano);
       if (faltando.length) throw new Error(`referência(s) declarada(s) e ausente(s): ${faltando.join(', ')}.`);
+      avisarLocaisAusentes(peca, plano);
     } catch (erro) {
       reprovadas.push({ peca, motivo: `PARTE PLANEJADA COM PLANO INVÁLIDO\n  ${erro.message}` });
       return { reprovadas, esperando };
@@ -246,6 +255,7 @@ export async function conferirPeca(peca) {
      receita não exporta nenhum. Revalidar aqui rejeitaria o próprio resultado
      canônico, que carrega `formato` e `versao`. */
   const faltando = referenciasAusentes(peca, medida.resultado.plano);
+  avisarLocaisAusentes(peca, medida.resultado.plano);
   if (faltando.length) {
     reprovadas.push({
       peca,

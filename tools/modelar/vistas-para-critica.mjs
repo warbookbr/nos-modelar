@@ -77,7 +77,7 @@ import { linhaDaVista } from './lados-das-vistas.mjs';
 import { paraPng } from './leitura-por-regioes.mjs';
 import { prepararSolido } from '../../src/autoria/contato-de-solidos.js';
 import { doAmbiente } from '../ambiente.mjs';
-import { mensagemDeReferenciasAusentes, referenciasDoPlano } from './referencias-do-plano.mjs';
+import { avisarReferenciasLocaisAusentes, mensagemDeReferenciasAusentes, referenciasDoPlano } from './referencias-do-plano.mjs';
 import { vistaDoMesmoOlho } from './comparar-contornos.mjs';
 import { normalizarPlanoDeModelagem } from '../../src/autoria/plano-de-modelagem.js';
 import { lerPergunta } from '../../src/autoria/perguntas-do-critico.js';
@@ -1418,6 +1418,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   if (referencias.ausentes.length) {
     throw new Error(mensagemDeReferenciasAusentes(referencias.ausentes));
   }
+  avisarReferenciasLocaisAusentes(referencias.locaisAusentes);
   const externas = lerReferenciasExternas(referenciasExternas, { existe: dependencias.existe ?? existsSync, orientacoes: orientacoesDasReferencias });
   /* a peça de lataria leva a luz rasante e a curvatura da lataria, que saem do Blender: sem ele, recusa antes de gastar captura */
   const lataria = superficieDaPeca(peca, receita, plano);

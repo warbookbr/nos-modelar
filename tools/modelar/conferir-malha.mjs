@@ -13,6 +13,7 @@ import { existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
+import { parteDaFace, partesComCascaAberta } from './casca-aberta-por-parte.mjs';
 
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 
@@ -60,7 +61,7 @@ const gritos = neutro.orfaos ?? [];
 const topologia = analisarTopologia(malha, { triangulacao: true });
 
 if (json) {
-  console.log(JSON.stringify({ receita: alvo, gritos, topologia }, null, 2));
+  console.log(JSON.stringify({ receita: alvo, gritos, topologia, partesComCascaAberta: partesComCascaAberta(neutro) }, null, 2));
   process.exit(gritos.length || topologia.veredito === 'reprova' ? 1 : 0);
 }
 
@@ -76,12 +77,27 @@ if (gritos.length) {
 }
 
 console.log(`\n${simbolo[topologia.veredito]} topologia: ${topologia.veredito}`);
+/* Cada alerta nomeia a parte (e a face): o exemplo do código sai com a parte da primeira face, e a lista de partes afetadas fecha a linha. A casca aberta
+   sai ainda com as arestas soltas de cada parte. */
+const facesDoAchado = (a) => (a.onde?.faces ?? (a.onde?.face === undefined ? [] : [a.onde.face]));
 const porCodigo = new Map();
 for (const a of topologia.achados) {
-  if (!porCodigo.has(a.codigo)) porCodigo.set(a.codigo, { n: 0, sev: a.severidade, ex: a.mensagem });
-  porCodigo.get(a.codigo).n++;
+  if (!porCodigo.has(a.codigo)) porCodigo.set(a.codigo, { n: 0, sev: a.severidade, ex: a.mensagem, face: facesDoAchado(a)[0], partes: new Map() });
+  const d = porCodigo.get(a.codigo);
+  d.n++;
+  for (const f of facesDoAchado(a)) {
+    const p = parteDaFace(neutro, f) ?? 'sem parte';
+    d.partes.set(p, (d.partes.get(p) ?? 0) + 1);
+  }
 }
-for (const [codigo, d] of porCodigo) console.log(`    ${d.sev === 'reprova' ? '✗' : '!'} ${codigo} ×${d.n} — ${d.ex}`);
+const abertas = new Map(partesComCascaAberta(neutro).map((a) => [a.parte, a.arestas]));
+for (const [codigo, d] of porCodigo) {
+  const parteDoExemplo = d.face === undefined ? null : (parteDaFace(neutro, d.face) ?? 'sem parte');
+  const onde = d.face === undefined ? '' : ` [face ${d.face}, parte ${parteDoExemplo}]`;
+  const partes = d.partes.size ? ` — partes: ${[...d.partes].map(([p, n]) => `${p} (${n})`).join(', ')}` : '';
+  console.log(`    ${d.sev === 'reprova' ? '✗' : '!'} ${codigo} ×${d.n} — ${d.ex}${onde}${partes}`);
+  if (codigo === 'casca-aberta') for (const [p, n] of abertas) console.log(`        parte ${p} tem casca aberta (${n} arestas soltas)`);
+}
 if (!porCodigo.size) console.log('    sem achados');
 
 console.log('');
