@@ -708,6 +708,18 @@ export async function descreverPecaReutilizavel({
       if (contatos.atravessados.some(({ penetracao: p }) => p.limiteDeclarado)) falhou = true;
       else stderr += '  (aviso: nenhum destes pares declara `penetracaoMaxima`; o padrão relativo não reprova)\n';
     }
+    if (contatos.separadosReprovados.length) {
+      const mm = (v) => `${(v * 1000).toFixed(2)} mm`;
+      stderr += `\n${contatos.separadosReprovados.length} PAR(ES) DE \`separados\` SEM A FOLGA MÍNIMA\n`
+        + contatos.separadosReprovados
+          .map(({ par, estado, distancia, folgaMinima, motivo }) => `    ${par[0]} ↔ ${par[1]}: ${estado === 'inconclusivo'
+            ? `a medida não decidiu a distância (folga pedida ${mm(folgaMinima)})`
+            : `${estado === 'tocam' ? 'se tocam' : estado === 'atravessam' ? 'se atravessam' : `distância medida ${mm(distancia)}`}, folga pedida ${mm(folgaMinima)}`} (${motivo})`)
+          .join('\n')
+        + '\n  A menor distância entre as duas malhas (triângulo contra triângulo, e não pela caixa) ficou abaixo da folga que a receita declarou em `separados`:'
+        + '\n  afaste as partes, ou a folga pedida não é a que o objeto precisa.\n';
+      falhou = true;
+    }
     /* PARTE SOLTA. Contato não declarado e declarado que não acontece só olham
        pares que se tocam; um grupo de partes que não toca nenhuma das outras
        passava limpo, flutuando no ar. Os grupos saem dos pares em contato e dos

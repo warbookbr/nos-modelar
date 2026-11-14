@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1928 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1930 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2149,6 +2149,7 @@
 - `contatos-da-peca-recusas.test.mjs` — contatos-da-peca-recusas.test.mjs — cada `throw` de entrada de contatos-da-peca.js com a entrada ruim, e os campos da saída que nenhum outro teste lia. A rev…
 - `contatos-da-peca.js` — contatos-da-peca — quais partes de uma peça se tocam, e quais delas a receita disse que DEVIAM se tocar.
 - `contatos-da-peca.test.mjs` — contatos-da-peca.test.mjs — a medida só vale se ela REPROVAR alguma coisa.
+- `contatos-separados.test.mjs` — contatos-separados.test.mjs — `separados` da receita: pares de partes que NÃO podem se tocar, com folga mínima cobrada pela malha. Cada recusa de lerSeparado…
 - `contrato-autoria-3d.js` — Contratos neutros da N1. Este módulo valida intenção, fonte e provedores; não executa geometria, não lê disco e não conhece Three.js ou MCP.
 - `coordenada-de-textura.js` — coordenada-de-textura.js — a coordenada de textura (uv) de um relevo, calculada da malha neutra. Função pura, sem Three.js, sem disco, relógio nem acaso: a m…
 - `coordenada-de-textura.test.js` — Testes da coordenada de textura: faixa contínua num cilindro, grade regular numa placa, caixa num cubo inclinado e determinismo.
@@ -3112,6 +3113,7 @@
 - `descrever-peca.mjs` — descrever-peca.mjs — serviço headless de medição e sua CLI fina.
 - `descrever-reguas-de-malha.test.mjs` — descrever-reguas-de-malha.test.mjs — as três réguas de malha no `descrever` como aviso (plano "costuras e furos limpos", fatia 3): cada defeito das peças de …
 - `descrever-sem-calar.test.mjs` — descrever-sem-calar.test.mjs — o `descrever` e a `guarda:acervo` dizendo o que calavam (fatia 5 do plano de ferramentas de conferência e de vista): o órfão d…
+- `descrever-separados.test.mjs` — descrever-separados.test.mjs — `separados` da receita no `descrever`: a peça com a folga pedida passa, e a que fica abaixo dela, ou se toca, reprova citando …
 - `diario.mjs` — diario.mjs — registra o que as ferramentas do laço fizeram, sem pedir nada a quem as usa.
 - `diario.test.mjs` — diario.test.mjs — o instrumento não pode mudar o que ele mede.
 - `dobra-aceita-pela-cadeia.test.mjs` — dobra-aceita-pela-cadeia.test.mjs — a região de `PLANO.dobrasAceitas` vale pela cadeia inteira, e a ruga na ponta dela não some junto (plano de conferência, …

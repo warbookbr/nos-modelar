@@ -77,7 +77,7 @@ natural.
 6. **A forma e a técnica de cada parte**, dizendo se é revolução ou perfil
    varrido, onde a seção varia e onde a aresta é quebrada. Corpo que se repete
    é família, dita uma vez com o número de instâncias.
-7. **Os pares que se tocam, e por quê** viram `contatos`, cobrados por medida.
+7. **Os pares que se tocam, e por quê** viram `contatos`, cobrados por medida. Pergunte também o que NÃO pode se tocar (a roda e o garfo, a porta e o batente que ela precisa varrer): cada par vira um item de `separados`, com `folgaMinima` em metros e o motivo, e o `descrever` reprova abaixo da folga.
 8. **O que reprova este objeto** vira `criteriosDeReprovacao`, cada um uma
    frase verificável.
 
