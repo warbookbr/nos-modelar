@@ -30,6 +30,7 @@ import { REGISTRO_DA_RECEITA, executarReceita } from '../../src/autoria/executar
 import { FACES_MINIMAS_PARA_RECORTAR } from '../../procedural/nucleo/operacoes/abertura-por-contorno.js';
 import { avisosDasComposicoes } from './avisos-de-composicao.mjs';
 import { medirFaceDegenerada, medirTrianguloFino, medirSerrilhadoDaCostura } from './reguas-de-malha/reguas-de-malha.mjs';
+import { partesComParedeFina } from './reguas-de-malha/espessura-de-parede.mjs';
 import { dobraDaReceita, textoDaDobra } from './dobra-da-superficie.mjs';
 import { textoDoAchado, vincoOcultoDaReceita } from './vinco-oculto.mjs';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
@@ -219,6 +220,8 @@ const REGUAS_LISTADAS = 8;
 /* O triângulo fino triangula a peça inteira pelo adaptador e agrupa as regiões planas: no furgão (254 mil faces) levou 12,7 s, dos quais 8,2 do adaptador e 3,3 das
    regiões, uns 50 µs por face, e o `guarda:tempo` não tem essa folga. Acima deste número de faces a régua não roda, e `trianguloFinoPulado` diz quantas faces a peça tem. */
 export const FACES_MAXIMAS_DO_TRIANGULO_FINO = 50000;
+/* A espessura de parede abaixo da qual a régua avisa, em metro (1 mm). Aviso e não reprovação: a chapa fina de propósito é decisão da peça. */
+export const LIMITE_DA_PAREDE_FINA = 0.001;
 
 export function avisosDasReguasDeMalha(neutro, { limite = REGUAS_LISTADAS, facesMaximasDoFino = FACES_MAXIMAS_DO_TRIANGULO_FINO } = {}) {
   const degenerada = medirFaceDegenerada(neutro);
@@ -229,6 +232,11 @@ export function avisosDasReguasDeMalha(neutro, { limite = REGUAS_LISTADAS, faces
     try { fino = medirTrianguloFino(neutro); } catch (erro) { pulado = `a régua não rodou: ${String(erro.message).split('\n')[0]}`; }
   }
   const serrilhado = medirSerrilhadoDaCostura(neutro);
+  /* a espessura de parede por parte, pelo mesmo teto de faces do triângulo fino: o raio de cada face contra a parte inteira custa mais que a leitura de cada face */
+  let paredesFinas = [];
+  if (neutro.F.size <= facesMaximasDoFino) {
+    try { paredesFinas = partesComParedeFina(neutro, { limite: LIMITE_DA_PAREDE_FINA }); } catch { paredesFinas = []; }
+  }
   const mm = (n) => String(Math.round(n * 10000) / 10).replace('.', ',');
   const onde = (f) => {
     const cantos = (neutro.F.get(f.id)?.vs ?? []).map((v) => neutro.V.get(v)).filter(Boolean);
@@ -244,6 +252,7 @@ export function avisosDasReguasDeMalha(neutro, { limite = REGUAS_LISTADAS, faces
     facesDeCostura: serrilhado.faces,
     pontasDeSerra: serrilhado.pontas,
     trechosDeSerrilhado: serrilhado.trechos,
+    paredesFinas: paredesFinas.map((p) => ({ parte: p.parte, minima: p.minima, face: p.face, centro: p.centro, amostras: p.amostras, faces: p.faces })),
     facesDegeneradasListadas: degenerada.faces.map((f) => ({ id: f.id, parte: f.parte, cantos: f.cantos })),
   };
   const linhas = [];
@@ -257,6 +266,10 @@ export function avisosDasReguasDeMalha(neutro, { limite = REGUAS_LISTADAS, faces
   if (serrilhado.pontas) {
     linhas.push(`${serrilhado.pontas} ponta(s) de serra em ${serrilhado.trechos} trecho(s) da linha da costura do arredondamento (${serrilhado.faces} faces de costura)`);
   }
+  for (const p of paredesFinas.slice(0, limite)) {
+    linhas.push(`parede fina na parte ${p.parte}: espessura mínima de ${mm(p.minima).replace(/,0$/, '')} mm, abaixo de ${mm(LIMITE_DA_PAREDE_FINA).replace(/,0$/, '')} mm, medida na face ${p.face} em [${p.centro.map((c) => mm(c)).join(', ')}] mm (${p.amostras} de ${p.faces} faces medidas)`);
+  }
+  if (paredesFinas.length > limite) linhas.push(`e mais ${paredesFinas.length - limite} parte(s) com parede fina`);
   return { medidas, linhas };
 }
 
