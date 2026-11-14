@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1879 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1880 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -3235,6 +3235,7 @@
 
 ## tools/modelar/fixtures/contatos/
 
+- `fixture-contato-atravessa-declarado.js` — O tubo fino entra pela tampa do cilindro e sai pela base: o contato está declarado e a parte atravessa a outra. Com o limite declarado, reprova pela profundi…
 - `fixture-contato-atravessa.js` — O tubo fino entra pela tampa do cilindro e sai pela base: o contato está declarado e a parte atravessa a outra. Reprova pela profundidade.
 - `fixture-contato-declarado.js` — Duas partes que se encostam, e a receita DIZ que se encostam. Passa. É a metade do gate que impede a medida de condenar peça correta.
 - `fixture-contato-nao-declarado.js` — A MESMA geometria da fixture declarada, sem a declaração. Reprova. O par é idêntico: o que muda é só a receita ter dito ou não.
