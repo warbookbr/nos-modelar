@@ -55,6 +55,14 @@ describe('o conversor de mm para metro e o radial', () => {
   });
 });
 
+describe('o conversor de mm para metro e o setor', () => {
+  it('converte só o por: de e ate são graus, e o eixo é um nome', () => {
+    const setor = { eixo: 'x', por: [0, 339.5, 0], de: 10, ate: 80 };
+    const [, a] = passoEmMetro(['parte', { nome: 'p', sel: { grupo: 'raios', onde: { setor } } }]);
+    expect(a.sel.onde.setor).toEqual({ eixo: 'x', por: [0, 0.3395, 0], de: 10, ate: 80 });
+  });
+});
+
 describe('o conversor e o passo arredondarCostura', () => {
   it('converte limpar quando é tolerância e deixa o booleano como está', () => {
     const base = { origemId: 2, de: { op: 'unir', id: 1 }, raio: 8 };

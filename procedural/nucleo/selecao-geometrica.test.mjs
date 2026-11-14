@@ -143,6 +143,67 @@ describe('faces por distância ao eixo (radial)', () => {
   });
 });
 
+describe('faces por setor angular em torno do eixo (setor)', () => {
+  /* o ângulo do centro da face, medido como o setor o mede (eixo y: de +z para +x), para a conta do teste não repetir o seletor */
+  const angulo = (n, id) => {
+    const vs = n.F.get(id).vs.map((v) => n.V.get(v));
+    const cx = vs.reduce((t, p) => t + p[0], 0) / vs.length, cz = vs.reduce((t, p) => t + p[2], 0) / vs.length;
+    return (((Math.atan2(cx, cz) * 180) / Math.PI) + 360) % 360;
+  };
+  const laterais = (n) => [...n.F.values()].filter((f) => Math.abs(n.V.get(f.vs[0])[1] - n.V.get(f.vs[1])[1]) < 1e-9 || f.vs.length === 4).map((f) => f.id);
+  const dentro = (a, de, largura) => ((a - de + 360) % 360) <= largura;
+
+  it('dois setores de meia volta repartem as oito laterais, e o que sai é o que a conta dos ângulos diz', () => {
+    const a = facesDe(CILINDRO, { onde: { radial: { eixo: 'y', min: 0.5 }, setor: { eixo: 'y', de: 10, ate: 190 } } });
+    const b = facesDe(CILINDRO, { onde: { radial: { eixo: 'y', min: 0.5 }, setor: { eixo: 'y', de: 190, ate: 370 } } });
+    expect(a.n.orfaos).toEqual([]);
+    expect(a.ids).toHaveLength(4);
+    expect(b.ids).toHaveLength(4);
+    expect(a.ids.filter((id) => b.ids.includes(id))).toEqual([]);
+    for (const id of a.ids) expect(dentro(angulo(a.n, id), 10, 180)).toBe(true);
+    for (const id of b.ids) expect(dentro(angulo(b.n, id), 190, 180)).toBe(true);
+  });
+
+  it('o setor que passa por 360 pega os dois lados do zero', () => {
+    const n = rodar(CILINDRO);
+    const esperado = laterais(n).filter((id) => n.F.get(id).vs.length === 4 && dentro(angulo(n, id), 340, 50));
+    const r = facesDe(CILINDRO, { onde: { radial: { eixo: 'y', min: 0.5 }, setor: { eixo: 'y', de: 340, ate: 30 } } });
+    expect(r.ids.length).toBeGreaterThan(0);
+    expect(r.ids).toEqual(esperado.sort((x, y) => x - y));
+  });
+
+  it('o setor de 0 a 360 pega tudo que tem ângulo, e a tampa sobre o eixo não tem', () => {
+    expect(facesDe(CILINDRO, { onde: { setor: { eixo: 'y', de: 0, ate: 360 } } }).ids).toHaveLength(8);
+  });
+
+  it('combina com grupo e origem: o setor escolhe dentro da origem citada', () => {
+    const r = facesDe(DUAS_CAIXAS, { origem: ORIGEM_1, onde: { setor: { eixo: 'y', por: [0, 0, 0], de: 0, ate: 359 } } });
+    expect(r.n.orfaos).toEqual([]);
+    expect(r.ids.length).toBeGreaterThan(0);
+    expect(r.ids.length).toBeLessThanOrEqual(6);
+  });
+
+  it('serve também para a aresta, pelo ponto médio', () => {
+    const r = onde(CILINDRO, { alvo: 'aresta', tipo: 'viva', angulo: 60, radial: { eixo: 'y', min: 0.9 }, setor: { eixo: 'y', de: 0, ate: 180 } });
+    expect(r.erro).toBeUndefined();
+    expect(r.arestas.length).toBeGreaterThan(0);
+    expect(r.arestas.length).toBeLessThan(16);
+  });
+
+  it('recusa o que não é um setor, dizendo o campo', () => {
+    for (const [setor, mensagem] of [
+      [{ eixo: 'y' }, /setor pede de e ate/],
+      [{ eixo: 'w', de: 0, ate: 10 }, /setor.eixo só aceita/],
+      [{ eixo: 'y', de: 0, ate: 400 }, /passa de 360 graus de largura/],
+      [{ eixo: 'y', de: 0, ate: 10, cor: 1 }, /setor precisa ser/],
+      [{ eixo: 'y', de: 0, ate: 10, por: [0, 0] }, /setor.por precisa ser \[x,y,z\] finito/],
+    ]) {
+      const n = rodar(CILINDRO);
+      expect(lerOnde(leitor(n), { setor }).erro, JSON.stringify(setor)).toMatch(mensagem);
+    }
+  });
+});
+
 describe('face plana', () => {
   it('todas as faces de uma caixa e de um cilindro facetado são planas', () => {
     expect(onde(CAIXA, { tipo: 'plana' }).faces).toHaveLength(6);

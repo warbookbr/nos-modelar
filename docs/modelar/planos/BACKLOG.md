@@ -17,6 +17,10 @@ Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 | Endereço único para grupo linear | capacidade semântica aberta |
 | Abertura oblonga | ainda não expressável; não simular com pintura |
 | Contrato genérico de materiais | coberto em 2026-10-19 pelo plano [receitas com material e textura](../decisoes/PLANOS-ENCERRADOS.md), na forma de escolha de material por peça e textura gerada; o brilho por material entrou no plano dos objetos externos (fatia 5), e PBR completo e paleta nova seguem fora |
+| Ponta das barras da grade do `furgao-realista` | a ponta sai 8 mm além da parede do vão e faz faixas de sombra na luz rasante; cobrir a ponta sem baixar a saliência de 14 mm, que a pessoa escolheu manter |
+| Pacote do crítico grande demais | o pedido do `furgao-realista` tem 276 imagens e o crítico abriu 19; dividir o pacote ou limitar as imagens por pergunta, e cobrar que cada imagem listada foi aberta |
+| `vistas:critica` lento e preso no furgão | cerca de 25 min por rodada e, numa delas, mais de 25 min parado em "conferindo a malha contra a referência"; medir a etapa e pôr prazo que avise |
+| Blender ausente sem aviso | o modelador tentou reproduzir defeito da luz rasante sem `MODELAR_BLENDER`; avisar no brief e no comando quando a variável está vazia e dizer onde achar o binário |
 | Movimento e espaço varrido | exige montagem, pose e relações persistidas antes de solver ou cinemática geral |
 | A-4, A-6, A-7, A-8, A-16 e A-29 | capacidades abertas comprovadas, sem inventar IDs novos |
 | Fechamento de tampas em anel (sólidos ocos) | evidência em `cabo-de-pa-bambu`: dois lofts concêntricos geram tubo aberto nas extremidades, e o motor não tem primitiva para costurar o anel entre as bordas de dois perfis coaxiais. Malha não-manifold, volume incalculável, STEP falha em sólido. Afeta qualquer peça oca. Sem contorno hoje |

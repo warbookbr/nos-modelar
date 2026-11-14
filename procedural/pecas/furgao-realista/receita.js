@@ -1069,7 +1069,10 @@ export function pontosDeclarados(T = TABELA) {
 /* Os materiais (plano de materiais realistas, 2026-11-08), com os valores que a pessoa aprovou na peça de prova `tools/fixtures/acervo/materiais-de-prova`. A lataria
    é tinta sólida com verniz no azul de sempre; os vidros claros da frente têm leve tom verde e passam a luz (transmissão); os das portas traseiras são escurecidos; a
    roda é aço pintado de prata acetinado; o pneu tem a banda com o desenho de costelas e o flanco com as marcações, os dois em borracha preta fosca, no eixo x da roda;
-   as lentes levam prismas nas cores de antes; o refletor é espelhado; a saia, os para-choques e as molduras dos arcos são plástico preto acetinado e granulado. */
+   as lentes levam prismas nas cores de antes; o refletor é espelhado; a saia, os para-choques e as molduras dos arcos são plástico preto acetinado e granulado.
+   Em 2026-11-14 a pessoa escolheu, na peça `tools/fixtures/acervo/materiais-do-furgao-opcoes`: borracha de vão fosca com granulado fino (C); grade em plástico acetinado como a saia (B);
+   aro cinza em metal pintado claro (C); lâmpada em vidro leitoso (B); interior em tecido e fosco com granulado (B); espelhos como estavam (A); e a antena e as alças das maçanetas
+   em preto brilhante envernizado (C, o `plasticoBrilhante`). Só materiais mudaram: a malha de cada parte segue idêntica. */
 const LENTE_DE_PRISMAS = { tipo: 'prismas', escala: 6, intensidade: 0.5 };
 /* a aba de uma faixa da lanterna na cor da própria lente, opaca e sem relevo (a lente é translúcida, e a aba é a moldura em volta dela) */
 const abaDaLente = (lente) => ({ tipo: 'liso', cor: lente.cor, aspereza: lente.aspereza, metalicidade: 0 });
@@ -1086,18 +1089,21 @@ const LENTES = {
   lenteLeitosa: { tipo: 'liso', cor: '#e9eceb', mistura: 'transparente', opacidade: 0.7, aspereza: 0.65, metalicidade: 0, relevo: LENTE_DE_PRISMAS },
   lenteVermelha: { tipo: 'liso', cor: '#c4161c', mistura: 'transparente', opacidade: 0.6, aspereza: 0.1, metalicidade: 0.1, relevo: LENTE_DE_PRISMAS },
 };
+const PLASTICO_PRETO = { tipo: 'liso', cor: '#141416', aspereza: 0.5, metalicidade: 0, verniz: 0.6, asperezaDoVerniz: 0.35, relevo: { tipo: 'granulado', escala: 0.4, intensidade: 0.35 } };
 export const MATERIAIS_DO_FURGAO = {
   // tinta sólida com verniz: base de aspereza média e verniz por cima; verniz 0,8 e asperezaDoVerniz 0,12 foram a escolha da pessoa em 2026-11-09, a versão B entre três versões
   azul: { tipo: 'liso', cor: '#3350b0', aspereza: 0.5, metalicidade: 0.05, verniz: 0.8, asperezaDoVerniz: 0.12 },
   // a borracha de vão em volta dos cristais; o pneu tem os seus (`pneuBanda` e `pneuFlanco`)
-  borracha: { tipo: 'liso', cor: '#26262b' },
+  // 2026-11-14, escolha da pessoa na peça `materiais-do-furgao-opcoes` (opção C): fosca com granulado fino
+  borracha: { tipo: 'liso', cor: '#26262b', aspereza: 0.92, metalicidade: 0, relevo: { tipo: 'granulado', escala: 0.8, intensidade: 0.5 } },
   // aço pintado de prata acetinado: metal sob tinta, com um verniz fosco por cima; é o `aco` que a família roda-pneu dá ao aro, ao cubo e ao disco
   aco: { tipo: 'metal', acabamento: 'pintado', cor: '#6f737b', aspereza: 0.32, metalicidade: 0.85, verniz: 0.5, asperezaDoVerniz: 0.35 },
   // a tampinha da lâmpada do farol: o aço escovado de antes
   tampinha: { tipo: 'metal', cor: '#a9adb3', acabamento: 'escovado' },
   // plástico preto acetinado, entre o fosco e o brilhante, com granulado fino: a saia, os para-choques e as molduras dos arcos
-  plastico: { tipo: 'liso', cor: '#141416', aspereza: 0.5, metalicidade: 0, verniz: 0.6, asperezaDoVerniz: 0.35, relevo: { tipo: 'granulado', escala: 0.4, intensidade: 0.35 } },
-  forro: { tipo: 'liso', cor: '#1b1c1f' },
+  plastico: PLASTICO_PRETO,
+  // o interior (2026-11-14, opção B da peça de opções): tecido fosco com granulado no forro e no banco; piso, divisória e painel foscos com granulado fino
+  forro: { tipo: 'tecido', cor: '#1b1c1f', aspereza: 0.95, metalicidade: 0, relevo: { tipo: 'granulado', escala: 1, intensidade: 0.5 } },
   // o para-brisa e os vidros da cabine: claros, com leve tom verde, por transmissão
   vidro: { tipo: 'liso', cor: '#e4f0ee', mistura: 'transparente', opacidade: 0.25, aspereza: 0.03, metalicidade: 0, transmissao: 1, indiceDeRefracao: 1.5, tomDoVidro: '#a8cdbd' },
   // os vidros das portas de trás: escuros como insulfilm: opacos, com verniz para o reflexo (com transmissão, mesmo baixa, o fundo claro da bancada aparecia através deles)
@@ -1105,19 +1111,24 @@ export const MATERIAIS_DO_FURGAO = {
   // o pneu, borracha preta fosca: a banda com o desenho de costelas e o flanco com as marcações em relevo (sem nome de fabricante), a medida principal com 18 mm de altura; o eixo da roda é x
   pneuBanda: { tipo: 'liso', cor: '#1f1f23', aspereza: 0.92, metalicidade: 0, relevo: { tipo: 'bandaDeRodagem', escala: 15, intensidade: 0.8, desenho: 'costelas', eixo: 'x' } },
   pneuFlanco: { tipo: 'liso', cor: '#1f1f23', aspereza: 0.9, metalicidade: 0, relevo: { tipo: 'flanco', escala: 18, intensidade: 1, eixo: 'x' } },
-  piso: { tipo: 'liso', cor: '#2c2d31' },
-  divisoria: { tipo: 'liso', cor: '#5a5d66' },
-  banco: { tipo: 'liso', cor: '#3d4048' },
-  painelEscuro: { tipo: 'liso', cor: '#26272b' },
+  piso: { tipo: 'liso', cor: '#2c2d31', aspereza: 0.9, metalicidade: 0, relevo: { tipo: 'granulado', escala: 0.6, intensidade: 0.45 } },
+  divisoria: { tipo: 'liso', cor: '#5a5d66', aspereza: 0.85, metalicidade: 0, relevo: { tipo: 'granulado', escala: 0.5, intensidade: 0.35 } },
+  banco: { tipo: 'tecido', cor: '#3d4048', aspereza: 0.95, metalicidade: 0, relevo: { tipo: 'granulado', escala: 1.2, intensidade: 0.7 } },
+  painelEscuro: { tipo: 'liso', cor: '#26272b', aspereza: 0.85, metalicidade: 0, relevo: { tipo: 'granulado', escala: 0.5, intensidade: 0.35 } },
   ...LENTES,
   abaLenteVermelha: abaDaLente(LENTES.lenteVermelha),
   abaLenteLeitosa: abaDaLente(LENTES.lenteLeitosa),
   abaLenteAmbar: abaDaLente(LENTES.lenteAmbar),
-  aroCinza: { tipo: 'liso', cor: '#4a4c52', aspereza: 0.6 },
+  // o aro cinza do farol (2026-11-14, opção C): metal pintado cinza claro, com verniz acetinado, a receita do `aco` mais clara
+  aroCinza: { tipo: 'metal', acabamento: 'pintado', cor: '#7b7f87', aspereza: 0.3, metalicidade: 0.85, verniz: 0.5, asperezaDoVerniz: 0.35 },
   // o refletor, cromo claro: com aspereza 0,02 e metalicidade 1 o metal só mostra o que reflete, e na bancada, de frente, não há o que refletir: saía preto
   refletor: { tipo: 'metal', acabamento: 'pintado', cor: '#e8eaed', aspereza: 0.22, metalicidade: 0.75 },
-  lampada: { tipo: 'liso', cor: '#f6f1da', aspereza: 0.35 },
-  grade: { tipo: 'liso', cor: '#1d1e21', aspereza: 0.7 },
+  // a lâmpada do farol (2026-11-14, opção B): vidro leitoso translúcido
+  lampada: { tipo: 'liso', cor: '#f6f1da', mistura: 'transparente', opacidade: 0.55, aspereza: 0.6, metalicidade: 0, verniz: 0.6, asperezaDoVerniz: 0.1 },
+  // a grade (2026-11-14, opção B): plástico preto acetinado e granulado igual ao da saia, na cor da grade
+  grade: { ...PLASTICO_PRETO, cor: '#1d1e21' },
+  // a antena e as alças das maçanetas (2026-11-14, opção C): preto brilhante envernizado; o `plasticoLiso` segue nas outras partes
+  plasticoBrilhante: { tipo: 'liso', cor: '#141416', aspereza: 0.3, metalicidade: 0, verniz: 1, asperezaDoVerniz: 0.05 },
   // os detalhes pequenos (2026-11-09): o plástico preto da saia sem o granulado, que numa haste de 4 mm e numa alça de 40 mm só faria ruído; e o aço do escapamento, o `aco` mais escuro
   plasticoLiso: { tipo: 'liso', cor: '#141416', aspereza: 0.5, metalicidade: 0, verniz: 0.6, asperezaDoVerniz: 0.35 },
   acoEscuro: { tipo: 'metal', acabamento: 'pintado', cor: '#34363b', aspereza: 0.35, metalicidade: 0.85, verniz: 0.5, asperezaDoVerniz: 0.35 },

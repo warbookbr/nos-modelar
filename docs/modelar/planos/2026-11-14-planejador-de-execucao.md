@@ -1,10 +1,10 @@
 # Planejador de execução da receita
 
-**Estado:** rascunho
+**Estado:** ativo
 
-**Território:** nenhum (aguarda aprovação)
+**Território:** `procedural/nucleo/planejador/`, `procedural/nucleo/memoria-de-execucao.js`, a opção `planejar` em `src/autoria/executar-receita.js`, os manifestos de `procedural/nucleo/operacoes/` onde o planejador exigir a declaração de leitura e escrita, e a ligação no `descrever` e na bancada.
 
-**Responsável:** a definir; proposta: a sessão que conduz o núcleo, depois do plano ativo dele.
+**Responsável:** a IA da sessão do furgão. A pessoa pediu a ativação em 2026-11-14; o plano do núcleo para quem escreve receita já fechou, então o território está livre.
 
 **Repositório e base:** `warbookbr/nos-modelar`, main de 2026-11-14.
 
@@ -114,6 +114,10 @@ que a bancada e o `descrever` ligam por escolha), com quatro partes:
 3. Mudar um passo no meio de uma receita refaz só os passos que dependem dele, com o número de passos recomputados contado em teste.
 4. A mesma receita dá o mesmo resultado em duas execuções e com cache frio e cache quente; a opção desligada deixa tudo como hoje.
 5. Testes e `npm run gates` verdes.
+
+## Decisão na ativação
+
+A pessoa exige malha idêntica antes e depois. Por isso o gate 1 vale sem tolerância: o agrupamento de subtrações só fica ligado nos casos em que a malha sai bit a bit igual, com a mesma identidade de face e as mesmas partes, e nos outros fica desligado. Nenhuma tolerância se declara neste plano sem nova decisão da pessoa. A fatia 1 roda em processo novo, uma peça por vez, sem outra carga pesada na máquina, e mede de novo a linha de base aqui (Linux), porque a tabela acima é de outra máquina.
 
 ## Fatias
 

@@ -137,7 +137,7 @@ export function passosDosDetalhes(T, f) {
   }]);
   passos.push(['rotaciona', { eixo: 'x', graus: antena.alfa, pivo: [0, 0, 0], sel: selPe }]);
   passos.push(['transladar', { d: [0, m(antena.origem[0]), m(antena.origem[1])], sel: selPe }]);
-  peca(ANTENA[0], 'loft', IDS.pe, 'plasticoLiso', T.antena_liso_angulo);
+  peca(ANTENA[0], 'loft', IDS.pe, 'plasticoBrilhante', T.antena_liso_angulo);
   const selHaste = { origem: { op: 'lathe', id: IDS.haste } };
   passos.push(['lathe', {
     origemId: IDS.haste, eixo: 'y', lados: antena.haste.lados,
@@ -145,7 +145,7 @@ export function passosDosDetalhes(T, f) {
   }]);
   passos.push(['rotaciona', { eixo: 'x', graus: -antena.haste.inclinacao, pivo: [0, 0, 0], sel: selHaste }]);
   passos.push(['transladar', { d: [0, m(antena.base[0]), m(antena.base[1])], sel: selHaste }]);
-  peca(ANTENA[1], 'lathe', IDS.haste, 'plasticoLiso', T.antena_liso_angulo);
+  peca(ANTENA[1], 'lathe', IDS.haste, 'plasticoBrilhante', T.antena_liso_angulo);
 
   /* as maçanetas: a alça em U e a placa em anel */
   const ret = (largura, profundidade, centro, cantos) => ({ retangulo: { largura: m(largura), profundidade: m(profundidade), centro: centro.map(m), cantos: m(cantos) } });
@@ -174,7 +174,7 @@ export function passosDosDetalhes(T, f) {
         em: [0, 0, m(h.zs - h.placaAltura)],
       }]);
     }
-    peca(MACANETAS[h.id], 'extrusao', idAlca, 'plasticoLiso');
+    peca(MACANETAS[h.id], 'extrusao', idAlca, 'plasticoBrilhante');
     peca(PLACAS_DAS_MACANETAS[h.id], 'extrusao', idPlaca, 'azul');
   }
 

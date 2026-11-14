@@ -1,6 +1,6 @@
 # Furgão realista: alinhamento
 
-**Estado:** em andamento desde 2026-10-30, pelo plano do [furgão realista](../../planos/2026-10-30-furgao-realista.md), adiantado pela exceção que a pessoa abriu no plano ativo. O que fica decidido aqui vai para o `PLANO` da receita quando a cópia do `furgao` nascer.
+**Estado:** em andamento desde 2026-10-30, pelo plano do [furgão realista](../../decisoes/PLANOS-ENCERRADOS.md), adiantado pela exceção que a pessoa abriu no plano ativo. O que fica decidido aqui vai para o `PLANO` da receita quando a cópia do `furgao` nascer.
 
 ## O objeto
 

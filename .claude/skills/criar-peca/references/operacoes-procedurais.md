@@ -49,7 +49,7 @@ produzir alteração parcial.
 `sel:{onde:{...}}` escolhe face ou aresta pelo que ela é, sem id. É a única chave
 de `sel` que filtra em vez de unir: com `origem`, `grupo`, `regiao`, `alias` ou
 `porta` na mesma seleção, escolhe dentro do que elas juntaram; sozinha, escolhe
-em toda a malha. Os critérios se aplicam nesta ordem (`radial` depois de `normal`), e `extremo` mede entre os
+em toda a malha. Os critérios se aplicam nesta ordem (`radial` e `setor` depois de `normal`), e `extremo` mede entre os
 que sobraram dos anteriores:
 
 - `alvo`: `'face'` (padrão) ou `'aresta'`. Se `tipo` só existe para um alvo, ele
@@ -70,6 +70,16 @@ que sobraram dos anteriores:
   de revolução (a parede de um aro contra os raios que a união juntou a ela), que
   `normal` e `extremo` não dizem; `por`, `min` e `max` são medidas (o conversor de
   mm do esboço as converte).
+- `setor:{eixo:'x'|'y'|'z', por?:[x,y,z], de, ate}`: o elemento cujo centro fica,
+  em torno do eixo (a mesma reta do `radial`), num ângulo entre `de` e `ate`, em
+  graus. O ângulo é medido no plano perpendicular ao eixo, de 0 a 360, do primeiro
+  eixo do plano para o segundo (eixo x: de +y para +z; eixo y: de +z para +x; eixo z:
+  de +x para +y). O setor vai de `de` até `ate` no sentido crescente e passa por 360
+  quando `de` é maior que `ate`; a largura não passa de 360, e o centro sobre o
+  próprio eixo não tem ângulo e não passa. Combina com `radial` e com `grupo` e
+  `origem`: `radial` escolhe o aro e `setor` escolhe a parede de um raio só, o que
+  `normal` não separa (a lateral de um raio aponta para a parede do vizinho). `por`
+  é medida; `de` e `ate` são graus e o conversor de mm do esboço não os toca.
 - `extremo:{eixo:'x'|'y'|'z', lado:'max'|'min', tol?}`: o elemento cujo centro
   (média dos cantos da face, ponto médio da aresta) está no maior ou menor valor
   do eixo, e os que ficam a até `tol` dele (padrão 1e-6, em unidades do mundo).
