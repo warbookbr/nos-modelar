@@ -171,6 +171,10 @@ O script deve imprimir `imprimirRelatorio(relatorio)`. Ordem:
    `node -e "…chromium…"` com `deviceScaleFactor: 2`.
 3. compare com a referência e anote **diferenças, não impressões**: "a linha do
    teto está abaulada", não "está estranho".
+4. com imagem de referência, não compare de olho: rode a leitura combinada
+   (grade e partes, três críticos cada, e `--consolidar`) de
+   [`CONFERIR-CONTRA-REFERENCIA.md`](../../../docs/modelar/usar/CONFERIR-CONTRA-REFERENCIA.md)
+   e leve o `consolidado.md` à pessoa junto com a prancha.
 
 ## 8. Comparar com a referência por número
 

@@ -82,7 +82,7 @@
  * da captura que contém a peça; sem ele vale o da `<captura>.rapida.json`, se existir, ou o painel da folha do `esboco:nucleo`, achado pela cor de fundo
  * dele, ou a imagem inteira. */
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PNG } from 'pngjs';
 
@@ -533,6 +533,87 @@ export function acharContradicoes(respostas, anteriores) {
   return contradicoes;
 }
 
+/* --- a consolidação de vários críticos ------------------------------------------------------------------------------------------- */
+/* palavras de atributo que não nomeiam uma coisa do objeto: duas diferenças só se juntam por uma palavra fora desta lista */
+export const GENERICAS = Object.freeze(new Set(['linha', 'borda', 'contorno', 'forma', 'canto', 'curva', 'divisa', 'perfil', 'base', 'face', 'parte',
+  'lado', 'superior', 'inferior', 'traseiro', 'traseira', 'dianteiro', 'dianteira', 'frontal', 'lateral', 'ponta', 'topo', 'saida', 'entrada',
+  'altura', 'largura', 'posicao', 'tamanho', 'regiao', 'centro', 'meio', 'baixo', 'alto', 'cima']));
+const raiz = (w) => (w.length > 3 && w.endsWith('s') ? w.slice(0, -1) : w);
+/** As palavras de um atributo que nomeiam a coisa: as significativas, no singular, sem as de `GENERICAS`. */
+export const palavrasDaCoisa = (texto) => new Set([...palavras(texto)].map(raiz).filter((w) => !GENERICAS.has(w)));
+
+/** O ponto que `onde` aponta dentro de uma caixa [x0, y0, x1, y1]: um sexto da borda para cada lado dito, o meio no resto. */
+export function pontoDoOnde(onde, [x0, y0, x1, y1]) {
+  const p = palavras(onde);
+  const fx = p.has('esquerda') ? 1 / 6 : p.has('direita') ? 5 / 6 : 0.5;
+  const fy = (p.has('cima') || p.has('alto') || p.has('topo')) ? 1 / 6 : (p.has('embaixo') || p.has('baixo')) ? 5 / 6 : 0.5;
+  return [x0 + fx * (x1 - x0), y0 + fy * (y1 - y0)];
+}
+/** A parte da diferença: na leitura por partes, a da região; na grade, a menor parte cuja caixa contém o ponto do `onde`, ou a mais próxima. */
+export function parteDoPonto([x, y], partes) {
+  const dentro = partes.filter(({ caixaRef: [a, b, c, d] }) => x >= a && x <= c && y >= b && y <= d);
+  const area = ({ caixaRef: [a, b, c, d] }) => (c - a) * (d - b);
+  if (dentro.length) return dentro.reduce((m, p) => (area(p) < area(m) ? p : m)).nome;
+  const dist = ({ caixaRef: [a, b, c, d] }) => Math.hypot(Math.max(a - x, 0, x - c), Math.max(b - y, 0, y - d));
+  return partes.reduce((m, p) => (dist(p) < dist(m) ? p : m)).nome;
+}
+
+/**
+ * Junta as respostas de vários críticos, de leituras em grade e por partes da mesma referência, por parte e pela coisa nomeada.
+ * Cada diferença em campos vai à parte do lugar dela; na mesma parte, duas diferenças cujos atributos dividem uma palavra que nomeia a
+ * coisa (`palavrasDaCoisa`) ficam no mesmo grupo. O apoio de um grupo é quantos críticos do alvo o disseram; o controle, quantos
+ * críticos do controle disseram, na mesma parte, um atributo que divide uma dessas palavras. A frase antiga, sem campos, não entra.
+ * @param {{ partes: { nome: string, caixaRef: number[] }[], alvo: Leitura[], controle?: Leitura[] }} o
+ *   Leitura = { regioes: { nome, caixaRef }[], porParte: boolean, criticos: { id: string, respostas: object }[] }
+ * @returns {{ grupos: object[], criticos: { alvo: number, controle: number } }}
+ */
+export function consolidar({ partes, alvo, controle = [] }) {
+  const diferencasDe = (leituras) => leituras.flatMap((l) => l.criticos.flatMap(({ id, respostas }) => Object.entries(respostas.regioes ?? {}).flatMap(([regiao, r]) => {
+    const caixa = l.regioes.find((x) => x.nome === regiao)?.caixaRef;
+    return (r.diferencas ?? []).filter(ehObjeto).map((d) => ({
+      critico: id, regiao, ...d,
+      parte: l.porParte ? regiao : parteDoPonto(pontoDoOnde(d.onde, caixa), partes),
+      coisas: palavrasDaCoisa(d.atributo),
+    }));
+  })));
+  const doAlvo = diferencasDe(alvo); const doControle = diferencasDe(controle);
+  /* os grupos: união por parte e palavra em comum */
+  const pai = doAlvo.map((_, i) => i);
+  const achar = (i) => (pai[i] === i ? i : (pai[i] = achar(pai[i])));
+  for (let i = 0; i < doAlvo.length; i += 1) for (let j = i + 1; j < doAlvo.length; j += 1) {
+    if (doAlvo[i].parte === doAlvo[j].parte && [...doAlvo[i].coisas].some((w) => doAlvo[j].coisas.has(w))) pai[achar(j)] = achar(i);
+  }
+  const porRaiz = new Map();
+  doAlvo.forEach((d, i) => { const k = achar(i); if (!porRaiz.has(k)) porRaiz.set(k, []); porRaiz.get(k).push(d); });
+  const total = (ls) => ls.reduce((s, l) => s + l.criticos.length, 0);
+  const grupos = [...porRaiz.values()].map((ds) => {
+    const contagem = new Map();
+    for (const d of ds) for (const w of d.coisas) contagem.set(w, (contagem.get(w) ?? 0) + 1);
+    const coisas = [...contagem.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([w]) => w);
+    const nomes = new Set(coisas);
+    const doControleAqui = doControle.filter((c) => c.parte === ds[0].parte && [...c.coisas].some((w) => nomes.has(w)));
+    return {
+      parte: ds[0].parte, coisas: coisas.slice(0, 4),
+      apoio: new Set(ds.map((d) => d.critico)).size, controle: new Set(doControleAqui.map((d) => d.critico)).size,
+      tipos: [...new Set(ds.map((d) => d.tipo))],
+      ditos: ds.map((d) => ({ critico: d.critico, regiao: d.regiao, atributo: d.atributo, referencia: d.referencia, modelo: d.modelo })),
+      noControle: doControleAqui.map((d) => ({ critico: d.critico, regiao: d.regiao, atributo: d.atributo, referencia: d.referencia, modelo: d.modelo })),
+    };
+  }).sort((a, b) => (b.apoio - b.controle) - (a.apoio - a.controle) || b.apoio - a.apoio || a.parte.localeCompare(b.parte) || a.coisas.join().localeCompare(b.coisas.join()));
+  return { grupos, criticos: { alvo: total(alvo), controle: total(controle) } };
+}
+
+/** O relato da consolidação em texto: os grupos com apoio de pelo menos `minimo` críticos primeiro, depois o resto numa linha cada. */
+export function relatoDaConsolidacao({ grupos, criticos }, minimo = 2) {
+  const linha = (g) => `${g.parte} — ${g.coisas.join(', ') || '(sem nome)'}: ${g.apoio} de ${criticos.alvo} críticos${criticos.controle ? `, ${g.controle} de ${criticos.controle} no controle` : ''}`;
+  const fortes = grupos.filter((g) => g.apoio >= minimo);
+  const fracos = grupos.filter((g) => g.apoio < minimo);
+  const exemplo = (d) => `    - ${d.atributo}: ${d.referencia} na referência, ${d.modelo} no desenho`;
+  return `# Leitura consolidada\n\n${criticos.alvo} críticos no alvo${criticos.controle ? ` e ${criticos.controle} no controle` : ''}. ${fortes.length} grupos com pelo menos ${minimo} críticos, ${fracos.length} com menos.\n\n`
+    + `## Ditos por pelo menos ${minimo} críticos\n\n${fortes.map((g) => `- ${linha(g)}\n${g.ditos.slice(0, 3).map(exemplo).join('\n')}`).join('\n') || '(nenhum)'}\n\n`
+    + `## Ditos por menos\n\n${fracos.map((g) => `- ${linha(g)}`).join('\n') || '(nenhum)'}\n`;
+}
+
 /* --- linha de comando ------------------------------------------------------------------------------------------------------------ */
 const AJUDA = `npm run leitura:regioes -- --referencia=<png> --caixa-ref=x0,y0,x1,y1 --captura=<png> --saida=<pasta>
     [--painel=x0,y0,x1,y1] [--fundo=#rrggbb] [--grade=4x3] [--margem=12] [--objeto="<o que é e de onde é visto>"]
@@ -542,6 +623,13 @@ npm run leitura:regioes -- --referencia=<png> --caixa-ref=x0,y0,x1,y1 --modelo=<
 npm run leitura:regioes -- --referencia=<png> --caixa-ref=x0,y0,x1,y1 --prancha=<arquivo.prancha.mjs> --saida=<pasta>
     [--vista=<vista>] [--partes=<partes.json>] [--folga=0.15] [--espelhar] [--objeto=...] [--fora=...]
 npm run leitura:regioes -- --saida=<pasta> --registrar=<respostas.json>
+npm run leitura:regioes -- --consolidar=<config.json> --saida=<pasta>
+
+--consolidar junta as respostas de vários críticos, de leituras em grade e por partes da mesma referência no mesmo quadro: cada
+diferença vai à parte do lugar dela, e as que dividem a coisa nomeada no atributo formam um grupo, com quantos críticos o disseram
+e quantos do controle (a prancha anterior, por exemplo) disseram o mesmo na mesma parte. config: { "partes": "<pasta da leitura
+por partes>", "alvo": [{ "leitura": "<pasta>", "respostas": ["<r.json>", ...] }], "controle": [...], "minimo": 2 }, com os
+caminhos a partir da pasta da config. Grava consolidado.json e consolidado.md.
 
 Com --partes=<partes.json>, { "caixa": [a0, b0, a1, b1], "partes": { "<nome>": [a0, b0, a1, b1] } } em mm (a para a direita, b para
 cima, a caixa é a do objeto inteiro), cada parte vira uma região com o nome dela, no lugar da grade; com --prancha a caixa é a da
@@ -584,6 +672,49 @@ export function gravarLeitura(pasta, r, { referencia, captura, caixaRef, grade, 
   return join(pasta, 'pedido.md');
 }
 
+/**
+ * `--consolidar=<config.json>`: lê as leituras e as respostas de cada crítico, confere cada resposta contra a leitura dela e grava
+ * `consolidado.json` e `consolidado.md` na pasta de saída. Os caminhos da config valem a partir da pasta dela.
+ * config: { "partes": "<pasta da leitura por partes>", "alvo": [{ "leitura": "<pasta>", "respostas": ["<r.json>", ...] }], "controle"?: [...], "minimo"?: 2 }
+ */
+function consolidarPeloComando(arquivo, pasta) {
+  const cfg = JSON.parse(readFileSync(arquivo, 'utf8'));
+  const aqui = (p) => resolve(dirname(arquivo), p);
+  const lerLeitura = (p) => JSON.parse(readFileSync(join(aqui(p), 'leitura.json'), 'utf8'));
+  if (typeof cfg.partes !== 'string' || !Array.isArray(cfg.alvo) || !cfg.alvo.length) {
+    throw new ErroDaLeitura(`--consolidar: a config precisa de "partes" (a pasta da leitura por partes) e de "alvo": [{ "leitura": "<pasta>", "respostas": ["<r.json>", ...] }]; veio ${Object.keys(cfg).join(', ') || 'nada'}`);
+  }
+  const partes = lerLeitura(cfg.partes);
+  if (partes.grade !== 'partes') throw new ErroDaLeitura(`--consolidar: "partes" aponta ${cfg.partes}, que é uma leitura em grade; rode a leitura com --partes e aponte a pasta dela`);
+  const recusas = [];
+  const montar = (lista, papel) => (lista ?? []).map((item, i) => {
+    if (typeof item?.leitura !== 'string' || !Array.isArray(item.respostas) || !item.respostas.length) {
+      recusas.push(`${papel} ${i + 1}: precisa de "leitura" e de "respostas" com pelo menos um arquivo`);
+      return { regioes: [], porParte: false, criticos: [] };
+    }
+    const l = lerLeitura(item.leitura);
+    if (JSON.stringify(l.caixaRef) !== JSON.stringify(partes.caixaRef) || Boolean(l.espelhar) !== Boolean(partes.espelhar)) {
+      recusas.push(`${papel} ${item.leitura}: a leitura tem --caixa-ref ${l.caixaRef} e espelhar ${Boolean(l.espelhar)}, e a das partes ${partes.caixaRef} e ${Boolean(partes.espelhar)}; as duas precisam ser da mesma referência no mesmo quadro`);
+    }
+    const criticos = item.respostas.map((r) => {
+      const respostas = JSON.parse(readFileSync(aqui(r), 'utf8'));
+      const c = conferirRespostas(l.regioes, respostas);
+      recusas.push(...c.recusas.map((x) => `${papel} ${r}: ${x}`));
+      return { id: r, respostas };
+    });
+    return { regioes: l.regioes, porParte: l.grade === 'partes', criticos };
+  });
+  const alvo = montar(cfg.alvo, 'alvo'); const controle = montar(cfg.controle, 'controle');
+  if (recusas.length) return { codigo: 1, stdout: '', stderr: `consolidação recusada:\n${recusas.map((x) => `- ${x}`).join('\n')}\n` };
+  const r = consolidar({ partes: partes.regioes, alvo, controle });
+  const minimo = cfg.minimo ?? 2;
+  mkdirSync(pasta, { recursive: true });
+  writeFileSync(join(pasta, 'consolidado.json'), `${JSON.stringify({ formato: 'modelar.leitura-consolidada@1', minimo, ...r }, null, 1)}\n`);
+  const md = relatoDaConsolidacao(r, minimo);
+  writeFileSync(join(pasta, 'consolidado.md'), md);
+  return { codigo: 0, stdout: `${md}\n${join(pasta, 'consolidado.md')}\n`, stderr: '' };
+}
+
 export function executar(argv) {
   const valor = (nome) => { const a = argv.find((x) => x.startsWith(`--${nome}=`)); return a === undefined ? null : a.slice(nome.length + 3); };
   if (argv.includes('--ajuda') || argv.includes('--help') || argv.length === 0) return { codigo: 0, stdout: `${AJUDA}\n`, stderr: '' };
@@ -591,6 +722,7 @@ export function executar(argv) {
     const saida = valor('saida');
     if (!saida) throw new ErroDaLeitura('falta --saida=<pasta>');
     const pasta = resolve(saida);
+    if (valor('consolidar')) return consolidarPeloComando(resolve(valor('consolidar')), pasta);
     if (valor('registrar')) {
       const leitura = JSON.parse(readFileSync(join(pasta, 'leitura.json'), 'utf8'));
       const respostas = JSON.parse(readFileSync(resolve(valor('registrar')), 'utf8'));

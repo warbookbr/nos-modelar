@@ -62,6 +62,10 @@ escolha é de medida, meça a malha (`--so-montar` dá a caixa; `npm run descrev
 dá o resto) em vez de confiar na imagem.
 Rascunho que segue imagem de referência: antes de mostrar, rode
 `npm run conferir:vistas` e leve cada `pedido.md` a um crítico.
+Quando a peça já tem prancha com `partes.json`, a leitura combinada de
+[`CONFERIR-CONTRA-REFERENCIA.md`](../../../docs/modelar/usar/CONFERIR-CONTRA-REFERENCIA.md)
+vale também para o rascunho, com `--modelo` e as mesmas partes, para que a
+prancha e o esboço sejam lidos no mesmo quadro.
 
 ## Como mostrar
 

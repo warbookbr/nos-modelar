@@ -99,4 +99,10 @@ O processo não pegaria sozinho a variação do crítico, porque a leitura pede 
 
 ## Decisão depois da fatia 2
 
-Pendente. Recomendação: seguir com a leitura combinada, em que a mesma rodada roda a grade e as partes, cada uma com três críticos, e a diferença conta quando aparece em pelo menos dois dos seis e não aparece na mesma região do controle (a prancha anterior). Isso cabe na ferramenta como um registro de várias respostas por rodada e na skill como o passo de despachar os críticos; o custo é de seis críticos por vista, cerca de 30 s cada, em paralelo.
+A pessoa escolheu seguir com a leitura combinada em 2026-11-14.
+
+## Andamento — leitura combinada
+
+A ferramenta ganhou `--consolidar=<config.json>`, que lê as respostas de vários críticos do alvo e do controle, agrupa as diferenças pela parte onde caem e pela palavra da coisa nomeada, e conta quantos críticos do alvo disseram cada grupo e quantos do controle disseram o mesmo na mesma parte. O resultado sai em `consolidado.json` e `consolidado.md`. As skills desenhar-prancha, prancha-dos-contornos e esbocar-opcoes e o guia CONFERIR-CONTRA-REFERENCIA passaram a mandar a leitura combinada antes de levar a prancha ou o esboço à pessoa.
+
+Com as seis respostas da fatia 2 sobre a cópia com defeitos e um crítico por modo na prancha correta como controle, os cinco defeitos plantados aparecem entre os 26 grupos que pelo menos dois críticos disseram. O ruído é grande: a maioria desses grupos são diferenças que a prancha atual já tem contra a referência (lanterna, coluna B, retrovisor, para-brisa, vidro traseiro, frente ondulada, farol), e o controle com um crítico por modo desconta pouco delas. A palavra "farol" junta o farol de neblina com o dianteiro no mesmo grupo. O processo não teria pego sozinho o desequilíbrio do controle; a instrução no guia passa a pedir o mesmo número de críticos no controle e no alvo quando houver controle. O gate 3 segue aberto até a prancha lateral do carro ser aceita pela pessoa.

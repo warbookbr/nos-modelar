@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   FUNDO_DO_PAINEL, LADO_DO_PAINEL_DA_PARTE, acharPainel, caixaDoObjeto, conferirRespostas, espelhada, executar, imagem, mesmoTexto, montarLeitura, palavras,
-  paraPng, partesDaPrancha, partesEmFracao, pedido, pranchaSoDesenho, regioesDaGrade,
+  paraPng, parteDoPonto, partesDaPrancha, partesEmFracao, palavrasDaCoisa, pedido, pontoDoOnde, pranchaSoDesenho, regioesDaGrade, consolidar, relatoDaConsolidacao,
 } from './leitura-por-regioes.mjs';
 import { ESPEC as BLOCO } from '../fixtures/leitura-por-partes/caixa.prancha.mjs';
 import { prancha } from './prancha/prancha.mjs';
@@ -335,5 +335,58 @@ describe('leitura por partes e a prancha', () => {
     const torto = executar([...base, `--captura=${join(pasta, 'largo.png')}`, '--painel=0,0,480,400', `--saida=${join(pasta, 'm')}`, '--grade=2x2']);
     expect(torto.stdout).toContain('AVISO: a altura sobre a largura difere 16.7%, acima de 10%');
     expect(executar([...base, `--captura=${join(pasta, 'cap.png')}`, `--saida=${join(pasta, 'l')}`, '--rotulo=FOTO']).stderr).toContain('--rotulo espera RASCUNHO ou PRANCHA');
+  });
+});
+
+describe('a consolidação de vários críticos', () => {
+  const PARTES = [{ nome: 'tras', caixaRef: [0, 0, 50, 50] }, { nome: 'frente', caixaRef: [50, 0, 100, 50] }, { nome: 'luz', caixaRef: [0, 0, 20, 20] }];
+  const dif = (atributo, onde = 'no centro', modelo = 'outro') => ({ tipo: 'forma', onde, atributo, referencia: 'como é', modelo });
+
+  it('o onde aponta um ponto da caixa, e o ponto vai à menor parte que o contém ou à mais próxima', () => {
+    expect(pontoDoOnde('em cima, à esquerda', [0, 0, 60, 60])).toEqual([10, 10]);
+    expect(pontoDoOnde('embaixo, à direita', [0, 0, 60, 60])).toEqual([50, 50]);
+    expect(pontoDoOnde('no centro', [0, 0, 60, 60])).toEqual([30, 30]);
+    expect(parteDoPonto([10, 10], PARTES)).toBe('luz');
+    expect(parteDoPonto([30, 30], PARTES)).toBe('tras');
+    expect(parteDoPonto([200, 10], PARTES)).toBe('frente');
+    expect([...palavrasDaCoisa('Bordas das lanternas traseiras')]).toEqual(['lanterna']);
+  });
+
+  it('junta por parte e pela coisa nomeada, conta o apoio por crítico e o controle na mesma parte', () => {
+    const grade = { regioes: [{ nome: 'A1', caixaRef: [0, 0, 100, 50] }], porParte: false, criticos: [
+      { id: 'g1', respostas: { regioes: { A1: { diferencas: [dif('lanterna traseira', 'à esquerda'), dif('farol', 'à direita'), 'forma: frase antiga'] } } } }] };
+    const partes = { regioes: PARTES, porParte: true, criticos: [
+      { id: 'p1', respostas: { regioes: { tras: { diferencas: [dif('borda da lanterna'), dif('lanterna')] }, frente: { igual: true }, luz: { igual: true } } } }] };
+    const controle = [{ regioes: PARTES, porParte: true, criticos: [{ id: 'c1', respostas: { regioes: { tras: { diferencas: [dif('lanternas')] }, frente: { diferencas: [dif('para-choque')] } } } }] }];
+    const r = consolidar({ partes: PARTES, alvo: [grade, partes], controle });
+    expect(r.criticos).toEqual({ alvo: 2, controle: 1 });
+    expect(r.grupos.map((g) => [g.parte, g.coisas, g.apoio, g.controle])).toEqual([
+      ['tras', ['lanterna'], 2, 1], ['frente', ['farol'], 1, 0]]);
+    expect(r.grupos[0].ditos).toHaveLength(3);
+    const md = relatoDaConsolidacao(r);
+    expect(md).toContain('- tras — lanterna: 2 de 2 críticos, 1 de 1 no controle');
+    expect(md).toContain('## Ditos por menos\n\n- frente — farol: 1 de 2 críticos, 0 de 1 no controle');
+  });
+
+  it('o comando confere cada resposta contra a leitura dela e recusa a config sem a leitura por partes', () => {
+    const pasta = mkdtempSync(join(tmpdir(), 'leitura-consolidar-'));
+    writeFileSync(join(pasta, 'ref.png'), paraPng(referencia())); writeFileSync(join(pasta, 'cap.png'), paraPng(captura()));
+    writeFileSync(join(pasta, 'partes.json'), JSON.stringify({ caixa: [0, 0, 100, 60], partes: { quadrado: [80, 40, 100, 60], base: [0, 0, 50, 30] } }));
+    const base = [`--referencia=${join(pasta, 'ref.png')}`, '--caixa-ref=30,20,130,80', `--captura=${join(pasta, 'cap.png')}`];
+    expect(executar([...base, `--saida=${join(pasta, 'p')}`, `--partes=${join(pasta, 'partes.json')}`]).codigo).toBe(0);
+    expect(executar([...base, `--saida=${join(pasta, 'g')}`, '--grade=2x2']).codigo).toBe(0);
+    writeFileSync(join(pasta, 'rp.json'), JSON.stringify({ regioes: { quadrado: { diferencas: [dif('quadrado cinza')] }, base: { igual: true } } }));
+    writeFileSync(join(pasta, 'rg.json'), JSON.stringify({ regioes: { A1: { igual: true }, A2: { diferencas: [dif('quadrado', 'em cima, à direita')] }, B1: { igual: true }, B2: { igual: true } } }));
+    writeFileSync(join(pasta, 'ruim.json'), JSON.stringify({ regioes: { A1: { igual: true } } }));
+    const cfg = (o) => { writeFileSync(join(pasta, 'c.json'), JSON.stringify(o)); return executar([`--consolidar=${join(pasta, 'c.json')}`, `--saida=${join(pasta, 'saida')}`]); };
+    const ok = cfg({ partes: 'p', alvo: [{ leitura: 'g', respostas: ['rg.json'] }, { leitura: 'p', respostas: ['rp.json'] }] });
+    expect(ok.codigo, ok.stderr).toBe(0);
+    expect(ok.stdout).toContain('- quadrado — quadrado, cinza: 2 de 2 críticos');
+    expect(JSON.parse(readFileSync(join(pasta, 'saida', 'consolidado.json'), 'utf8'))).toMatchObject({ formato: 'modelar.leitura-consolidada@1', minimo: 2 });
+    const recusa = cfg({ partes: 'p', alvo: [{ leitura: 'g', respostas: ['ruim.json'] }] });
+    expect(recusa.codigo).toBe(1);
+    expect(recusa.stderr).toContain('alvo ruim.json: a região A2 ficou sem resposta');
+    expect(cfg({ partes: 'g', alvo: [{ leitura: 'g', respostas: ['rg.json'] }] }).stderr).toContain('que é uma leitura em grade');
+    expect(cfg({ alvo: [] }).stderr).toContain('a config precisa de "partes"');
   });
 });
