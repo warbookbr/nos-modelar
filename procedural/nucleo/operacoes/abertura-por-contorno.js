@@ -1416,6 +1416,8 @@ export function criarOperacoesAberturaPorContorno(servicos) {
     /* na fusão de lascas fica a face de antes do passo, que guarda a identidade; entre duas do mesmo tipo, a vizinha */
     const lascas = fundirLascas({ pos: posDaPeca, faces: limpa.faces, costura, parede, piso, preferir: (outra, lasca) => (localDe(i, outra) != null && localDe(i, lasca) == null ? lasca : outra) });
     const valencia = tirarValenciaDois(lascas.faces, new Set(recortada ? viz.voltas.flat() : []));
+    /* o rastreio declarado do retrato: abaixo só as faces de `valencia.faces` (e as que se dividem a partir delas) têm o `vs` reescrito no lugar; o que se cria, apaga ou renumera o despacho vê pelo mapa, e a booleana de dentro soma os operandos dela */
+    if (st.tocadosF) for (const f of valencia.faces.keys()) st.tocadosF.add(f);
     const tocados = new Set([...limpa.faces.values(), ...facesDoCorte.map((f) => st.F.get(f).vs)].flat());
     for (const f of [...limpa.removidas, ...lascas.removidas, ...valencia.removidas]) {
       st.F.delete(f); parede.delete(f); st.pedacosDe.delete(f);

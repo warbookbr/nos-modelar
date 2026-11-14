@@ -9,6 +9,8 @@ import { ESCRITA_DAS_OPERACOES, OPS, REGISTRO_OPERACOES, nucleo, rastrearEntrada
 import { entradaDaReceita } from '../../src/autoria/executar-receita.js';
 import { importarReceita, receitaDoModulo } from '../../tools/modelar/importar-receita.mjs';
 import { resolverCaminhoReceita } from '../../tools/modelar/resolver-caminho-receita.mjs';
+// @ts-expect-error — peça de teste em JavaScript.
+import receitaDaAbertura from '../../tools/fixtures/abertura-de-prova/receita.js';
 
 type Passo = [string, Record<string, unknown>?];
 type Entrada = { PASSOS: Passo[]; PARAMS?: object; TOPO?: object; MATERIAIS?: object; ESQUELETO?: unknown; ALIASES?: unknown[] };
@@ -208,6 +210,17 @@ describe('intersectar declara o rastreio', () => {
     const doPasso = (k: number) => n.procedencia.passos.find((p: any) => p.passo === k)?.saidas;
     expect(doPasso(3)?.faces.length).toBeGreaterThan(0);
   });
+});
+
+describe('aberturaPorContorno declara o rastreio', () => {
+  it('a chapa de prova, com a abertura, a lente e a aba (booleana de dentro, limpeza da costura e renumeração das paredes)', () => {
+    const entrada = entradaDaReceita(receitaDaAbertura) as unknown as Entrada;
+    const completo = igualNosTresCaminhos(entrada);
+    const passo = entrada.PASSOS.findIndex((p) => p[0] === 'aberturaPorContorno');
+    expect(passo).toBeGreaterThan(0);
+    const saidas = completo.procedencia.passos.find((p: any) => p.passo === passo).saidas;
+    expect(saidas.faces.length).toBeGreaterThan(10);
+  }, 120_000);
 });
 
 describe('receitas reais do acervo: o atalho devolve a procedência da conta completa', () => {

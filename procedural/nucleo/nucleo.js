@@ -3575,6 +3575,7 @@ export const ESCRITA_DAS_OPERACOES = Object.freeze({
   unir: { V: 'tocados', F: 'tocados' },
   intersectar: { V: 'tocados', F: 'tocados' },
   limparLascas: { V: 'tocados', F: 'tocados' },
+  aberturaPorContorno: { V: 'tocados', F: 'tocados' },
   rotaciona: { V: 'alvos', F: 'nada' },
   transladar: { V: 'alvos', F: 'nada' },
   arranja: { V: 'acrescenta', F: 'acrescenta' },
