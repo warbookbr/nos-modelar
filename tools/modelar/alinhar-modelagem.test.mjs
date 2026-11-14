@@ -37,6 +37,13 @@ describe('rodada de alinhamento', () => {
     expect(SKILL).toMatch(/reprova em `npm run guarda:acervo`/);
   });
 
+  it('manda criar o esqueleto da receita no começo e a imagem de estudo para referencias/locais/', () => {
+    expect(SKILL).toContain('npm run receita:esqueleto');
+    expect(SKILL).toMatch(/direto no\s+`PLANO`/);
+    expect(SKILL).toContain('referencias/locais/');
+    expect(SKILL).toMatch(/só os derivados/);
+  });
+
   it('diz que o produto é arquivo e que quem conduz não aprova', () => {
     expect(SKILL).toMatch(/guarda:acervo/);
     expect(SKILL).toMatch(/não é você quem aprova/);

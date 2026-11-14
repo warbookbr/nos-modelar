@@ -11,6 +11,16 @@ exportado pela receita, validado por
 cobrado por `npm run guarda:acervo`. Uma rodada inteira respondida está em
 [`RODADA-DE-ALINHAMENTO-EXEMPLO.md`](../../../docs/modelar/usar/RODADA-DE-ALINHAMENTO-EXEMPLO.md).
 
+Comece criando a receita que vai receber o combinado:
+
+```
+npm run receita:esqueleto -- <peça> [--objeto=<texto>] [--escala=<medida>:<mm>] [--partes=a,b,c]
+```
+
+Ela cria `procedural/pecas/<peça>/receita.js` com o `PLANO` vazio (o normalizador o recusa até estar preenchido), `contatos`
+vazio, `TABELA` vazia e nenhum passo, e se recusa a sobrescrever uma receita que já existe. Escreva cada coisa decidida direto no
+`PLANO`, na hora em que a pessoa a decide, e não numa anotação à parte.
+
 Pergunte uma coisa por vez e escreva o que for decidido. Resposta vaga não
 avança: se a pessoa não souber, ofereça duas opções concretas. Quando a escolha
 for de forma, mostre as opções lado a lado com a skill
@@ -124,7 +134,13 @@ procedural/pecas/<peça>/
   receita.js
   referencias/
     sobreposicao.jpg     ← a que a bancada põe sobre o modelo
+    locais/              ← imagem de estudo que não se versiona (ignorada pelo git)
 ```
+
+Imagem de estudo (foto, catálogo, a que tem marca) vai em `referencias/locais/` e é declarada no `PLANO` como
+`referencias/locais/<arquivo>`; só os derivados dela entram versionados, como as coordenadas tiradas ou uma prancha própria. As
+ferramentas usam a imagem local quando o arquivo está na máquina e, quando falta (outra máquina, CI), avisam uma vez "referência
+local ausente nesta máquina: <caminho>" e seguem. A referência declarada fora de `locais/` que faltar continua reprovando.
 
 Peça em arquivo solto reprova em `npm run guarda:acervo`.
 

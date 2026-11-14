@@ -34,7 +34,7 @@ import { medirFaceDegenerada, medirTrianguloFino, medirSerrilhadoDaCostura } fro
 import { dobraDaReceita, textoDaDobra } from './dobra-da-superficie.mjs';
 import { textoDoAchado, vincoOcultoDaReceita } from './vinco-oculto.mjs';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
-import { mensagemDeReferenciasAusentes, referenciasDoPlano } from './referencias-do-plano.mjs';
+import { avisarReferenciasLocaisAusentes, mensagemDeReferenciasAusentes, referenciasDoPlano } from './referencias-do-plano.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 import { iniciarRegistro } from './diario.mjs';
 import { conferirFormaDoEsbocoDaReceita, conferirG01DaReceita, conferirRefinamentoDaReceita } from './refinamento-global.mjs';
@@ -423,7 +423,8 @@ export async function descreverPecaReutilizavel({
   if (!semVeredito && caminhoReceita) {
     let planoDeReferencias = null;
     try { planoDeReferencias = normalizarPlanoDeModelagem(receita.PLANO); } catch { planoDeReferencias = null; }
-    const { ausentes } = referenciasDoPlano(planoDeReferencias, { pastaDaReceita: dirname(caminhoReceita) });
+    const { ausentes, locaisAusentes } = referenciasDoPlano(planoDeReferencias, { pastaDaReceita: dirname(caminhoReceita) });
+    avisarReferenciasLocaisAusentes(locaisAusentes);
     if (ausentes.length) return falha(`REFERÊNCIA DO PLANO AUSENTE\n  ${peca}: ${mensagemDeReferenciasAusentes(ausentes)}`);
   }
 

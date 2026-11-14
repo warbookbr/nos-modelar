@@ -64,6 +64,7 @@
     "material": "node tools/modelar/material-da-peca.mjs",
     "descrever": "node tools/modelar/descrever-peca.mjs",
     "receita:mapa": "node tools/modelar/mapa-da-receita.mjs",
+    "receita:esqueleto": "node tools/modelar/receita-esqueleto.mjs",
     "forma:esboco": "node tools/modelar/forma-do-esboco.mjs",
     "parametros": "node tools/modelar/parametros-peca.mjs",
     "varrer": "node tools/modelar/varrer-peca.mjs",

@@ -106,17 +106,17 @@ describe('as referências do plano', () => {
   it('guarda só as imagens, com o caminho absoluto, e diz as que não são imagem e as que faltam', () => {
     const plano = { referencias: ['docs/ref/lateral.png', 'docs/ref/andaime.json', 'docs/mapa.JPG', 'docs/ref/some.png'] };
     expect(referenciasDoPlano(plano, { raiz: '/repo', pastaDaReceita: '/receita', existe })).toEqual({
-      imagens: ['/repo/docs/ref/lateral.png', '/repo/docs/mapa.JPG'], ignoradas: ['docs/ref/andaime.json'], ausentes: ['docs/ref/some.png'],
+      imagens: ['/repo/docs/ref/lateral.png', '/repo/docs/mapa.JPG'], ignoradas: ['docs/ref/andaime.json'], ausentes: ['docs/ref/some.png'], locaisAusentes: [],
     });
   });
 
   it('o caminho que não existe a partir da raiz vale a partir da pasta da receita', () => {
     const r = referenciasDoPlano({ referencias: ['../andaime.json', '../x.png'] }, { raiz: '/repo', pastaDaReceita: '/receita-pai/filha', existe: (c) => c === '/receita-pai/andaime.json' || c === '/receita-pai/x.png' });
-    expect(r).toEqual({ imagens: ['/receita-pai/x.png'], ignoradas: ['../andaime.json'], ausentes: [] });
+    expect(r).toEqual({ imagens: ['/receita-pai/x.png'], ignoradas: ['../andaime.json'], ausentes: [], locaisAusentes: [] });
   });
 
   it('plano ausente não tem referência', () => {
-    expect(referenciasDoPlano(null)).toEqual({ imagens: [], ignoradas: [], ausentes: [] });
+    expect(referenciasDoPlano(null)).toEqual({ imagens: [], ignoradas: [], ausentes: [], locaisAusentes: [] });
   });
 });
 
