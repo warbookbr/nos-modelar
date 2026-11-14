@@ -92,8 +92,8 @@ export function pecasDoAcervo({ raiz = REPO } = {}) {
   return pecas;
 }
 
-export async function analiseDoAcervo({ raiz = REPO } = {}) {
-  const pecas = pecasDoAcervo({ raiz });
+/** `pecas` limita a análise a uma amostra (a lista inteira por padrão). */
+export async function analiseDoAcervo({ raiz = REPO, pecas = pecasDoAcervo({ raiz }) } = {}) {
   const saida = [];
   for (const peca of pecas) {
     let receita;

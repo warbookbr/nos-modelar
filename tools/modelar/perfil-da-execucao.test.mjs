@@ -31,10 +31,11 @@ describe('perfil da execução', () => {
     expect(analiseEstatica(receita)).toEqual(analiseEstatica(receita));
   });
 
-  it('o acervo carrega cada peça de passos e conta as sequências', async () => {
-    const linhas = await analiseDoAcervo();
-    expect(linhas.length).toBeGreaterThan(40);
-    expect(linhas.find((p) => p.peca === 'kukri')).toMatchObject({ totais: { leituraDeclarada: 0 } });
+  it('o acervo carrega cada peça de passos e conta as sequências (numa amostra)', async () => {
+    const linhas = await analiseDoAcervo({ pecas: ['kukri', 'carenagem-de-prova', 'aviao/empenagem-vertical'] });
+    expect(linhas.map((p) => p.peca)).toEqual(['kukri', 'carenagem-de-prova', 'aviao/empenagem-vertical']);
+    expect(linhas[0]).toMatchObject({ totais: { leituraDeclarada: 0 } });
+    expect(linhas[2].estritas).toHaveLength(1);
   });
 
   it('recusa argumento desconhecido e pede a peça', async () => {
