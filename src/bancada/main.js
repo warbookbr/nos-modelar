@@ -11,6 +11,8 @@ import { CATALOGO_HOMOLOGADO, idsDoCatalogo } from '../autoria/catalogo-pecas.js
 import { listarParaBancada } from './acervo-receitas.js';
 import { criarAmbienteBancada } from './criar-ambiente.js';
 import { arquivoDaSessaoNaUrl } from './sessao/sincronizador.js';
+import { executarReceita } from '../autoria/executar-receita.js';
+import { criarArmazemIndexedDB, lerImpressaoDoServidor, neutroComCache } from './cache-da-execucao.js';
 import { criarSessaoDaBancada } from './sessao/sessao-da-bancada.js';
 import { criarRegistroDeEventos } from './sessao/registro-de-eventos.js';
 import { criarPreferenciaDeAmbiente, criarPreferenciaDeTema, criarPreferenciaDeVisao, criarPreferenciasBancada } from './preferencias/estado-local.js';
@@ -384,9 +386,23 @@ export async function iniciar({ catalogo = CATALOGO_HOMOLOGADO, sessaoPorUrl = f
     }),
   });
 
+  /* A receita do acervo executa uma vez por versão dela: o neutro fica no IndexedDB, com a chave que o servidor calcula (receita,
+     o que ela importa e o motor), e a abertura seguinte da mesma peça pula a execução. Sem impressão ou sem IndexedDB, executa. */
+  const armazemDaExecucao = criarArmazemIndexedDB();
+  const executarDoAcervoComCache = async (entrada, receita) => {
+    const caminho = String(entrada.caminho ?? '').replace(/^(\.\.\/)+/, '');
+    const impressao = caminho ? await lerImpressaoDoServidor(caminho, { base: import.meta.env?.BASE_URL ?? '/' }) : null;
+    const execucao = await neutroComCache({
+      vaga: caminho || entrada.id, impressao, armazem: armazemDaExecucao,
+      executar: () => executarReceita(receita).neutro,
+    });
+    execucao.gravacao.then((gravou) => { if (execucao.origem === 'executada' && impressao) console.info(`cache da execução: ${entrada.id} ${gravou ? 'gravada' : 'não gravada'}`); });
+    return execucao;
+  };
   sessao = criarSessaoDaBancada({
     estado, cena, edicao, imagemNaCena, anotacoes3D, registroDeEventos, avisar, mostrarErro, arquivoDaSessao,
     acervo: () => acervoDaBancada,
+    executarDoAcervo: executarDoAcervoComCache,
   });
   montarSessaoAtiva({
     elementos: elementos.sessaoAtiva,

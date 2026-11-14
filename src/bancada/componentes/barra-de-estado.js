@@ -8,12 +8,14 @@ export function montarBarraDeEstado({ elementos, estado, medidasDaPeca, acoes })
   const { barra, selecao: textoSelecao, peca, btnGrade, btnChao, btnAmbiente, btnAtalhos } = elementos;
   if (!barra) return;
 
-  estado.assinar(['selecao', 'partes', 'juntas', 'malhaEmEdicao', 'preferenciasCena', 'atalhos'], (valores, mudadas) => {
+  estado.assinar(['selecao', 'partes', 'juntas', 'malhaEmEdicao', 'preferenciasCena', 'atalhos', 'execucao'], (valores, mudadas) => {
     const total = valores.partes?.length ?? 0;
     if (textoSelecao) textoSelecao.textContent = `Seleção ${valores.selecao?.selecionadas.length ?? 0} de ${total}`;
-    if (peca && mudadas.includes('partes')) {
+    if (peca && (mudadas.includes('partes') || mudadas.includes('execucao'))) {
       const medidas = medidasDaPeca();
-      peca.textContent = medidas ? `${total} partes · ${textoDasMedidas(medidas).split(' · ').reverse().join(' · ')}` : '';
+      const medida = medidas ? `${total} partes · ${textoDasMedidas(medidas).split(' · ').reverse().join(' · ')}` : '';
+      /* de onde veio a malha e quanto custou, ao lado das medidas da peça */
+      peca.textContent = valores.execucao && medida ? `${medida} · ${valores.execucao.texto}` : medida;
     }
     if (valores.preferenciasCena) {
       btnGrade?.setAttribute('aria-pressed', String(valores.preferenciasCena.grade));

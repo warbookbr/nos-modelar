@@ -75,6 +75,8 @@ export function estadoInicialDaBancada({ pecaPedida = null, visao, tema = 'banca
     nomePeca: pecaPedida ?? 'sessao-ativa',
     idNaUrl: pecaPedida ?? null,
     rotuloPeca: null,
+    /* de onde veio a malha da peça aberta do acervo (`do cache` ou `executada`) e quanto custou: `{ id, origem, ms, texto }` */
+    execucao: null,
     aguardandoModelo: false,
     catalogoVazio: false,
     sessao: 'desconectado',
