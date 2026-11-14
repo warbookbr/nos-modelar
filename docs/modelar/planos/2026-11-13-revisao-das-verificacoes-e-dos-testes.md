@@ -1,6 +1,6 @@
 # Revisão das verificações e dos testes: o que cada um pega, medido
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `docs/modelar/banco-de-provas/revisao-das-verificacoes-2026-11-13/`
 
@@ -52,4 +52,4 @@ A medida por estrago é cara: cada estrago roda testes. Por isso é por amostra,
 
 ## Fechamento
 
-Preencher ao concluir ou cancelar.
+Concluído em 2026-11-14. Entregou o mapa dos gates e testes, a medida por estrago (273 estragos, 147 percebidos, somado o piloto), os sinais de fragilidade, o histórico e o veredito por gate e grupo, em [`revisao-das-verificacoes-2026-11-13`](../banco-de-provas/revisao-das-verificacoes-2026-11-13/VEREDITOS.md). A pessoa seguiu a recomendação para todos os grupos: nenhum teste sai, e o que faltava virou o plano dos testes das recusas, concluído no mesmo dia.
