@@ -3556,7 +3556,9 @@ export function idsMudados(antes, depois) {
    por mapa, o que escreve nas entradas que já existiam antes do passo:
      'nada'       nenhuma entrada é tocada (só o tamanho do mapa é conferido);
      'alvos'      só as entradas que `resolverAlvosF` devolveu no passo (as operações de atributo escrevem a face pelo alvo) e, nos vértices, as que a operação pôs em `st.alvosV` (`rotaciona` e `transladar` movem o vértice no lugar);
-     'acrescenta' as entradas antigas ficam como estavam e o passo só cria (e não apaga) entradas.
+     'acrescenta' as entradas antigas ficam como estavam e o passo só cria (e não apaga) entradas;
+     'tocados'    o passo cria, apaga e altera: vale o conjunto de ids que o mapa registrou (`set`, `delete`) mais o que a operação soma em
+                  `st.tocadosV` e `st.tocadosF` por alterar no lugar. Só as entradas desse conjunto são conferidas, e o tamanho do mapa tem de fechar.
    Mapa que não tem declaração, ou cujo tamanho contradiz a declaração, segue o caminho completo de `retratarEntradas`. A
    declaração vale só para a função do próprio núcleo (`executar === OPS[nome]`): operação de extensão ou de outro registro nunca
    a herda. `OPCOES.retrato` escolhe o caminho: 'completo' ignora as declarações (a conta de antes, referência dos testes) e
@@ -3569,6 +3571,7 @@ export const ESCRITA_DAS_OPERACOES = Object.freeze({
   liso: { V: 'nada', F: 'alvos' },
   solido: { V: 'nada', F: 'alvos' },
   /* mexem só na posição dos vértices que citam (`st.alvosV`), sem criar nem apagar entrada; `arranja` só acrescenta cópias */
+  subtrair: { V: 'tocados', F: 'tocados' },
   rotaciona: { V: 'alvos', F: 'nada' },
   transladar: { V: 'alvos', F: 'nada' },
   arranja: { V: 'acrescenta', F: 'acrescenta' },
@@ -3581,7 +3584,23 @@ export const ESCRITA_DAS_OPERACOES = Object.freeze({
 export function rastrearEntradas(mapa, anterior, nivel, alvos) {
   if (nivel === 'nada') return mapa.size === anterior.size ? { retrato: anterior, mudados: [] } : null;
   const mudados = [];
-  if (nivel === 'alvos') {
+  if (nivel === 'tocados') {
+    /* `alvos` é o conjunto de ids que o passo criou, apagou ou alterou (null se o passo desistiu do atalho). A conta de tamanho vem antes de
+       qualquer escrita em `anterior`: se não fechar, o retrato de antes segue intacto para a conta completa. */
+    if (alvos == null) return null;
+    let tamanho = anterior.size;
+    for (const id of alvos) { const antes = anterior.has(id), agora = mapa.has(id); if (agora && !antes) tamanho += 1; else if (!agora && antes) tamanho -= 1; }
+    if (tamanho !== mapa.size) return null;
+    for (const id of alvos) {
+      const antigo = anterior.get(id);
+      if (!mapa.has(id)) { anterior.delete(id); continue; }
+      const valor = mapa.get(id);
+      if (antigo !== undefined && antigo.copia !== NAO_COPIAVEL && igualASimples(antigo.copia, valor)) continue;
+      const entrada = { copia: copiaSimples(valor), json: JSON.stringify(valor) };
+      anterior.set(id, entrada);
+      if (antigo === undefined || entrada.json !== antigo.json) mudados.push(id);
+    }
+  } else if (nivel === 'alvos') {
     if (mapa.size !== anterior.size) return null;
     for (const id of alvos) if (!mapa.has(id) || !anterior.has(id)) return null;
     for (const id of alvos) {
@@ -3690,7 +3709,7 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
   /* parteAtribuidaEm: face -> índice do passo que a nomeou. É PROCEDÊNCIA de
      diagnóstico (não sai no neutro, não vira formato salvo): serve pro `parte`
      dizer QUEM nomeou a face antes, quando uma segunda seleção tenta roubá-la. */
-  const st = { V: new Map(), F: new Map(), orfaos: orfaosIniciais, avisos: [], merges: [], partes: {}, paisDasPartes: new Map(), origens: new Map(), portas: new Map(), declaracoesOrigem, aliases, dict, num, vec, materiais: MATERIAIS, esqueleto, ossoSet, pesos: new Map(), parteAtribuidaEm: new Map(), consumidas: new Map(), pedacosDe: new Map(), alvosF: null, alvosV: null, novosV: null, novosF: null, procedencia: criarEstadoDeProcedencia(), passos: PASSOS };
+  const st = { V: new Map(), F: new Map(), orfaos: orfaosIniciais, avisos: [], merges: [], partes: {}, paisDasPartes: new Map(), origens: new Map(), portas: new Map(), declaracoesOrigem, aliases, dict, num, vec, materiais: MATERIAIS, esqueleto, ossoSet, pesos: new Map(), parteAtribuidaEm: new Map(), consumidas: new Map(), pedacosDe: new Map(), alvosF: null, alvosV: null, tocadosV: null, tocadosF: null, novosV: null, novosF: null, procedencia: criarEstadoDeProcedencia(), passos: PASSOS };
 
   const modoRetrato = OPCOES.retrato ?? 'rapido';
   let retrato = null;
@@ -3765,13 +3784,29 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
     const escrita = modoRetrato === 'completo' || registrada.executar !== OPS[registrada.nome] ? undefined : ESCRITA_DAS_OPERACOES[registrada.nome];
     st.alvosF = escrita?.F === 'alvos' ? new Set() : null;
     st.alvosV = escrita?.V === 'alvos' ? new Set() : null;
+    /* 'tocados': a operação cria, apaga e altera entradas de qualquer jeito (as booleanas, a abertura por contorno, a limpeza de lascas). O despacho
+       registra por si todo `set`, `delete` e `clear` do mapa durante o passo, e a operação acrescenta em `st.tocadosV` e `st.tocadosF` o que ela
+       altera no lugar sem passar pelo mapa (a face de operando cujo `vs` ela reescreve). Um `clear` desiste do atalho do passo. */
+    const rastreados = [];
+    if (escrita?.V === 'tocados' || escrita?.F === 'tocados') {
+      st.tocadosV = new Set(); st.tocadosF = new Set();
+      const instalar = (mapa, tocados) => {
+        const set = Map.prototype.set, del = Map.prototype.delete;
+        mapa.set = function setRastreado(id, valor) { tocados.add(id); return set.call(this, id, valor); };
+        mapa.delete = function deleteRastreado(id) { tocados.add(id); return del.call(this, id); };
+        mapa.clear = function clearRastreado() { st.tocadosV = st.tocadosF = null; return Map.prototype.clear.call(this); };
+        rastreados.push(mapa);
+      };
+      instalar(st.V, st.tocadosV); instalar(st.F, st.tocadosF);
+    }
     st.novosV = escrita?.V === 'acrescenta' ? [] : null;
     st.novosF = escrita?.F === 'acrescenta' ? [] : null;
     if (fn.nativaModelar) { try { const contexto = contextoNativo(st, i, { leitura: (registrada.artefatos?.entra ?? []).length > 0, op: registrada.nome }); fn(contexto, args); contexto.publicar(); } catch (erro) { grita(st, i, op, null, `extensão nativa recusou: ${erro.message}`); return; } }
     else comPassoNoErro(i, op, args, () => fn(st, args, i));
     if (pose) aplicarPoseDeCriacao(st, antes, pose);
-    const { alvosF, alvosV, novosV, novosF } = st;
-    st.alvosF = st.alvosV = st.novosV = st.novosF = null;
+    for (const mapa of rastreados) { delete mapa.set; delete mapa.delete; delete mapa.clear; }
+    const { alvosF, alvosV, tocadosV, tocadosF, novosV, novosF } = st;
+    st.alvosF = st.alvosV = st.tocadosV = st.tocadosF = st.novosV = st.novosF = null;
     /* o caminho completo calcula antes do atalho, que atualiza o retrato de antes no lugar */
     let depoisV = null, depoisF = null, mudadosV = null, mudadosF = null;
     const t0Depois = medirRastreio ? performance.now() : 0;
@@ -3782,8 +3817,8 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
       mudadosF = idsMudados(antesF, depoisF);
     }
     if (escrita !== undefined) {
-      const rapidoV = rastrearEntradas(st.V, antesV, escrita.V, escrita.V === 'acrescenta' ? novosV : alvosV);
-      const rapidoF = rastrearEntradas(st.F, antesF, escrita.F, escrita.F === 'acrescenta' ? novosF : alvosF);
+      const rapidoV = rastrearEntradas(st.V, antesV, escrita.V, escrita.V === 'acrescenta' ? novosV : escrita.V === 'tocados' ? tocadosV : alvosV);
+      const rapidoF = rastrearEntradas(st.F, antesF, escrita.F, escrita.F === 'acrescenta' ? novosF : escrita.F === 'tocados' ? tocadosF : alvosF);
       if (modoRetrato === 'conferido') {
         const confere = (mapa, completo, mudados, rapido) => rapido === null
           || (JSON.stringify(rapido.mudados) === JSON.stringify(mudados) && rapido.retrato.size === completo.size

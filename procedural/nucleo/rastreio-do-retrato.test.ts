@@ -40,8 +40,8 @@ describe('declaração de escrita por operação', () => {
   it('só nomeia operações do próprio núcleo e níveis conhecidos', () => {
     for (const [nome, { V, F }] of Object.entries(ESCRITA_DAS_OPERACOES)) {
       expect(Object.keys(OPS), nome).toContain(nome);
-      expect(['nada', 'alvos', 'acrescenta']).toContain(V);
-      expect(['nada', 'alvos', 'acrescenta']).toContain(F);
+      expect(['nada', 'alvos', 'acrescenta', 'tocados']).toContain(V);
+      expect(['nada', 'alvos', 'acrescenta', 'tocados']).toContain(F);
     }
   });
 
@@ -139,6 +139,41 @@ describe('rotaciona, transladar e arranja declaram a escrita', () => {
     expect(doPasso(5)?.vertices).toEqual([]);          // translação nula
     expect(doPasso(8)?.faces.length).toBe(12);         // duas cópias de um cubo de 6 faces
     expect(n.orfaos.map((x: any) => x.passo)).toEqual([7]);   // só o vértice inexistente do passo 7, e nenhuma recusa do arranja
+  });
+});
+
+/** Um corte que muda faces de operando no lugar (as cortadas), cria pedaços, apaga faces e vértices, e passos declarados depois dele, que só leem um retrato certo. */
+const corte = (op: string, id: number, solidos: unknown[]): Passo => [op, { origemId: id, solidos }];
+const o = (op: string, id: number) => ({ origem: { op, id } });
+const BASE: Passo[] = [
+  ['cubo', { origemId: 1, lado: 1 }], ['cubo', { origemId: 2, lado: 0.6, em: [0.5, 0.5, 0.5] }], ['cubo', { origemId: 3, lado: 0.3, em: [-0.5, 0, 0] }],
+];
+
+describe('booleanas declaram o rastreio (faces criadas, apagadas e cortadas no lugar)', () => {
+  it('subtrair: corte de canto, depois atributos e outro corte sobre o resultado', () => {
+    const passos: Passo[] = [
+      ...BASE,
+      corte('subtrair', 10, [o('cubo', 1), o('cubo', 2)]),
+      ['material', { usa: 'a', sel: o('subtrair', 10) }], ['parte', { nome: 'corpo', sel: o('subtrair', 10) }],
+      ['rotaciona', { eixo: 'y', graus: 15, sel: o('cubo', 3) }],
+      corte('subtrair', 11, [o('subtrair', 10), o('cubo', 3)]),
+      ['liso', { angulo: 30, sel: o('subtrair', 11) }], ['transladar', { d: [0, 0, 1], sel: o('subtrair', 11) }],
+    ];
+    const n = igualNosTresCaminhos({ PASSOS: passos, MATERIAIS });
+    expect(n.orfaos).toEqual([]);
+    const doPasso = (k: number) => n.procedencia.passos.find((p: any) => p.passo === k)?.saidas;
+    expect(doPasso(3)?.faces.length).toBeGreaterThan(6);                        // faces criadas e faces cortadas no lugar
+    expect(doPasso(3)?.vertices.length).toBeGreaterThan(0);
+  });
+
+  it('subtrair que não toca no alvo, ferramenta no lugar e corte recusado também fecham', () => {
+    const passos: Passo[] = [
+      ...BASE, ['cubo', { origemId: 4, lado: 0.2, em: [5, 5, 5] }],
+      corte('subtrair', 10, [o('cubo', 1), o('cubo', 4)]),
+      corte('subtrair', 11, [o('subtrair', 10), o('cubo', 1)]),   // ferramenta já consumida: recusa
+      corte('subtrair', 12, [o('subtrair', 10), o('cubo', 2), o('cubo', 3)]),
+    ];
+    igualNosTresCaminhos({ PASSOS: passos, MATERIAIS });
   });
 });
 
