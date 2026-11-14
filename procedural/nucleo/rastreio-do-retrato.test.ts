@@ -177,6 +177,23 @@ describe('booleanas declaram o rastreio (faces criadas, apagadas e cortadas no l
   });
 });
 
+describe('unir declara o rastreio', () => {
+  it('união de sobreposição, de contato por face e de ferramentas disjuntas, com atributos depois', () => {
+    const passos: Passo[] = [
+      ...BASE, ['cubo', { origemId: 4, lado: 1, em: [1, 0, 0] }], ['cubo', { origemId: 5, lado: 0.2, em: [9, 9, 9] }],
+      corte('unir', 10, [o('cubo', 1), o('cubo', 2)]),
+      ['material', { usa: 'b', sel: o('unir', 10) }],
+      corte('unir', 11, [o('unir', 10), o('cubo', 4)]),
+      corte('unir', 12, [o('unir', 11), o('cubo', 5)]),
+      ['parte', { nome: 'corpo', sel: o('unir', 12) }], ['rotaciona', { eixo: 'x', graus: 20, sel: o('unir', 12) }],
+    ];
+    const n = igualNosTresCaminhos({ PASSOS: passos, MATERIAIS });
+    const doPasso = (k: number) => n.procedencia.passos.find((p: any) => p.passo === k)?.saidas;
+    expect(n.orfaos.map((x: any) => x.motivo)).toEqual([]);
+    expect(doPasso(5)?.faces.length).toBeGreaterThan(0);
+  });
+});
+
 describe('receitas reais do acervo: o atalho devolve a procedência da conta completa', () => {
   const PECAS = [
     'ambulancia', 'braco-robotico/ombro-tambor', 'caminhao-entrega', 'carro-policia', 'carro-sedan-compacto',
