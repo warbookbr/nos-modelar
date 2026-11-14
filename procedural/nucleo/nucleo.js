@@ -3805,10 +3805,14 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
     }
     st.novosV = escrita?.V === 'acrescenta' ? [] : null;
     st.novosF = escrita?.F === 'acrescenta' ? [] : null;
-    if (fn.nativaModelar) { try { const contexto = contextoNativo(st, i, { leitura: (registrada.artefatos?.entra ?? []).length > 0, op: registrada.nome }); fn(contexto, args); contexto.publicar(); } catch (erro) { grita(st, i, op, null, `extensão nativa recusou: ${erro.message}`); return; } }
-    else comPassoNoErro(i, op, args, () => fn(st, args, i));
-    if (pose) aplicarPoseDeCriacao(st, antes, pose);
-    for (const mapa of rastreados) { delete mapa.set; delete mapa.delete; delete mapa.clear; }
+    /* a restauração dos mapas é num `finally`: a operação que lança ou a nativa que recusa não deixa `set`, `delete` e `clear` remendados no estado */
+    try {
+      if (fn.nativaModelar) { try { const contexto = contextoNativo(st, i, { leitura: (registrada.artefatos?.entra ?? []).length > 0, op: registrada.nome }); fn(contexto, args); contexto.publicar(); } catch (erro) { grita(st, i, op, null, `extensão nativa recusou: ${erro.message}`); return; } }
+      else comPassoNoErro(i, op, args, () => fn(st, args, i));
+      if (pose) aplicarPoseDeCriacao(st, antes, pose);
+    } finally {
+      for (const mapa of rastreados) { delete mapa.set; delete mapa.delete; delete mapa.clear; }
+    }
     const { alvosF, alvosV, tocadosV, tocadosF, novosV, novosF } = st;
     st.alvosF = st.alvosV = st.tocadosV = st.tocadosF = st.novosV = st.novosF = null;
     /* o caminho completo calcula antes do atalho, que atualiza o retrato de antes no lugar */
