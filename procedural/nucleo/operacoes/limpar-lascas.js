@@ -15,6 +15,7 @@
    O QUE FICA. A lasca que já vinha da entrada (a tira de 0,2 mm de uma concordância de raio 3 na chapa) e a que só sairia movendo a
    superfície mais que a tolerância. Elas ficam como estão, e o passo avisa quantas e o motivo (`lascasRestantes` em `st.avisos`). */
 
+import { somarFacesTocadas } from '../somas-do-rastreio.js';
 import { LIMITE_DE_FACE_FINA } from '../topologia.js';
 import { limparLascas } from '../limpar-lascas.js';
 
@@ -53,6 +54,8 @@ export function limparNoEstado(st, faces, { tolerancia, limite = LIMITE_DE_FACE_
   if (relatorio.finasAntes === 0) return undefined;
 
   for (const [v, p] of res.vertices) st.V.set(v, p);
+  /* o rastreio declarado do retrato: as faces cujo `vs` e `quebras` se reescrevem no lugar abaixo; o que se apaga o despacho vê pelo mapa */
+  somarFacesTocadas(st, 'limparLascas', res.faces.keys());
   const remapear = (v) => res.fusoes.get(v) ?? v;
   for (const [fid, vs] of res.faces) {
     const f = st.F.get(fid);

@@ -17,6 +17,10 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { lerHistorico } from './vitest-duracoes.mjs';
 
 export const TESTES_LENTOS = [
+  /* 2026-11-14: o rastreio declarado do retrato contra a conta completa em onze receitas do acervo, a chapa de prova e o kukri, três caminhos cada; 11 a 13 s com a máquina livre */
+  'procedural/nucleo/rastreio-do-retrato.test.ts',
+  /* 2026-11-14: os casos de ataque ao rastreio (booleanas coincidentes, três aberturas na mesma chapa, vãos colados) mais a injeção de falha; 14 s com a máquina livre */
+  'procedural/nucleo/rastreio-ataque.test.ts',
   /* 2026-11-14: a recusa do limite de vértices e faces do passo subdivisao, com uma gaiola de 576 quadros no nível 5 e espessura; 11 s com a máquina livre */
   'procedural/nucleo/operacoes/subdivisao-limite.test.ts',
   /* 2026-11-13: o furo passante por subtração e limpeza de lascas, com a conferência das bocas; 21 s sozinho e 53 s na bateria do CI */

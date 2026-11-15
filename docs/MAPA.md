@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1960 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1963 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -570,7 +570,6 @@
 - `2026-11-14-leitura-por-partes.md` — Leitura por partes: a prancha e o esboço conferidos contra a referência, parte por parte
 - `2026-11-14-modelagem-de-carro.md` — Modelagem de carro de passeio: o que já serve, onde a carroceria travou antes e por onde começar
 - `2026-11-14-modelagem-de-robo.md` — Modelagem de robô humanoide: o que já serve, o que falta na montagem e por onde começar
-- `2026-11-14-planejador-de-execucao.md` — Planejador de execução da receita
 - `2026-11-14-prancha-menos-manual.md` — Prancha menos manual: desvio medido, leitura combinada de um comando e o que ficou de fora declarado
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
@@ -1043,6 +1042,7 @@
 - `ponto-na-malha.test.mjs` — ponto-na-malha.test.mjs — o ponto mais próximo de uma malha, com a grade, dá o mesmo que a varredura de todos os triângulos.
 - `ponto-nomeado.test.ts` — ponto-nomeado.test.ts — um nome pode guardar um ponto inteiro (A-8 e A-29).
 - `pose-de-criacao.test.ts` — pose-de-criacao.test.ts — a prova de `em` e `eixo` nos geradores (A-4 / O-7).
+- `rastreio-ataque.test.ts` — rastreio-ataque.test.ts — casos de ataque ao rastreio declarado do retrato ('tocados'), trazidos da revisão adversarial de 2026-11-14: booleanas coincidentes…
 - `rastreio-do-retrato.test.ts` — rastreio-do-retrato.test.ts — o atalho do retrato da procedência devolve exatamente a procedência da conta completa.
 - `recortar-arco.test.mjs` — recortar-arco.test.mjs — `recortarArcoNoPerfil`: o arco poligonal recortado na borda de baixo do contorno, com a fusão do corte que cai perto de um vértice.
 - `referencia-posicional.js` — referencia-posicional.js — A REGRA ÚNICA de "isto é referência por id posicional?", para o formato salvo da Oficina.
@@ -1054,6 +1054,7 @@
 - `selecao-geometrica.test.mjs` — selecao-geometrica.test.mjs — `sel.onde`: face e aresta por propriedade geométrica, sem identificador numérico. As expectativas vêm de contas sobre as coorde…
 - `selecao-nas-edicoes.test.mjs` — selecao-nas-edicoes.test.mjs — `sel` no lugar do id em moveV, moveF, moveA, vira, mescla, pesar e filete.
 - `sha256.js` — sha256.js — SHA-256 síncrono, portátil e sem dependência de Node.
+- `somas-do-rastreio.js` — somas-do-rastreio.js — a soma que uma operação faz ao conjunto de ids "tocados" do passo, para o rastreio declarado do retrato (nível 'tocados' em `ESCRITA_D…
 - `subdivisao-grupos.test.ts` — subdivisao-grupos.test.ts — os grupos de faces da gaiola do passo `subdivisao` (campo `grupos`): cada grupo é uma lista de nomes de ponto, as faces dele são …
 - `subdivisao-ponto-repetido.test.mjs` — subdivisao-ponto-repetido.test.mjs — a recusa geral do ponto que dois passos `subdivisao` gravam sem declaração (ciclo 5 do sedã, atrito 2). O nome de ponto …
 - `subdivisao.js` — subdivisao.js — superfície de subdivisão Catmull-Clark com vincos
@@ -2212,6 +2213,7 @@
 - `contatos-da-peca-recusas.test.mjs` — contatos-da-peca-recusas.test.mjs — cada `throw` de entrada de contatos-da-peca.js com a entrada ruim, e os campos da saída que nenhum outro teste lia. A rev…
 - `contatos-da-peca.js` — contatos-da-peca — quais partes de uma peça se tocam, e quais delas a receita disse que DEVIAM se tocar.
 - `contatos-da-peca.test.mjs` — contatos-da-peca.test.mjs — a medida só vale se ela REPROVAR alguma coisa.
+- `contatos-separados.test.mjs` — contatos-separados.test.mjs — `separados` da receita: pares de partes que NÃO podem se tocar, com folga mínima cobrada pela malha. Cada recusa de lerSeparado…
 - `contrato-autoria-3d.js` — Contratos neutros da N1. Este módulo valida intenção, fonte e provedores; não executa geometria, não lê disco e não conhece Three.js ou MCP.
 - `coordenada-de-textura.js` — coordenada-de-textura.js — a coordenada de textura (uv) de um relevo, calculada da malha neutra. Função pura, sem Three.js, sem disco, relógio nem acaso: a m…
 - `coordenada-de-textura.test.js` — Testes da coordenada de textura: faixa contínua num cilindro, grade regular numa placa, caixa num cubo inclinado e determinismo.
@@ -3193,6 +3195,7 @@
 - `descrever-peca.mjs` — descrever-peca.mjs — serviço headless de medição e sua CLI fina.
 - `descrever-reguas-de-malha.test.mjs` — descrever-reguas-de-malha.test.mjs — as três réguas de malha no `descrever` como aviso (plano "costuras e furos limpos", fatia 3): cada defeito das peças de …
 - `descrever-sem-calar.test.mjs` — descrever-sem-calar.test.mjs — o `descrever` e a `guarda:acervo` dizendo o que calavam (fatia 5 do plano de ferramentas de conferência e de vista): o órfão d…
+- `descrever-separados.test.mjs` — descrever-separados.test.mjs — `separados` da receita no `descrever`: a peça com a folga pedida passa, e a que fica abaixo dela, ou se toca, reprova citando …
 - `diario.mjs` — diario.mjs — registra o que as ferramentas do laço fizeram, sem pedir nada a quem as usa.
 - `diario.test.mjs` — diario.test.mjs — o instrumento não pode mudar o que ele mede.
 - `dobra-aceita-pela-cadeia.test.mjs` — dobra-aceita-pela-cadeia.test.mjs — a região de `PLANO.dobrasAceitas` vale pela cadeia inteira, e a ruga na ponta dela não some junto (plano de conferência, …

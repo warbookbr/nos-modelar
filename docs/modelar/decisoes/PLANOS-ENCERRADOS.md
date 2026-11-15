@@ -4,6 +4,7 @@ O texto inteiro de cada plano está no git, no commit `a60c067b`, em `docs/model
 
 Plano encerrado não governa trabalho novo: não abre implementação, não reabre escopo e não autoriza nada por analogia. As decisões que continuam valendo estão em `registros/`, nesta pasta; o plano em jogo mora em `../planos/README.md`, e o que saiu de cena por mudança de rota e pode voltar, em `../planos/congelados/README.md`.
 
+- `2026-11-14-planejador-de-execucao.md`: Planejador de execução da receita: rastreio declarado nas transformações, booleanas e vãos; furgão realista de 118 s para 47 s com malha idêntica. O texto está no commit `08a16bc2`, em `docs/modelar/planos/2026-11-14-planejador-de-execucao.md`.
 - `2026-11-14-testes-das-recusas.md`: Testes das recusas: recusas do núcleo e dos contatos, espelho, servidor e pisos do acervo testados, e o gate recusas:check. O texto está no commit `25008243`, em `docs/modelar/planos/2026-11-14-testes-das-recusas.md`.
 - `2026-11-13-revisao-das-verificacoes-e-dos-testes.md`: Revisão das verificações e dos testes: medida por estrago e veredito por grupo; nenhum teste sai, e a falta de teste de recusa virou plano próprio. O texto está no commit `25008243`, em `docs/modelar/planos/2026-11-13-revisao-das-verificacoes-e-dos-testes.md`.
 - `2026-10-30-furgao-realista.md`: Furgão realista: cópia do furgão levada a proporções e lataria de veículo real, aprovada pela pessoa com materiais escolhidos; a ponta das barras da grade ficou no backlog. O texto está no commit `f952523d`, em `docs/modelar/planos/2026-10-30-furgao-realista.md`.

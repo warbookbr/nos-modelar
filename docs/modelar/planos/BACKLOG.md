@@ -23,6 +23,10 @@ Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 | Blender ausente sem aviso | o modelador tentou reproduzir defeito da luz rasante sem `MODELAR_BLENDER`; avisar no brief e no comando quando a variável está vazia e dizer onde achar o binário |
 | Recusas do `friso` sem teste | as recusas das linhas 120 e 377 de `friso.js` estão em `SEM_ENTRADA_QUE_ALCANCE` do `recusas:check` por falta de fixture; escrever a fixture e tirar as exceções |
 | Retrato do acervo contra a base | `retrato-do-acervo --comparar` exige referência gravada à mão; uma opção `--base=<commit>` que meça numa worktree limpa prova malha idêntica sem 23 min de passos manuais |
+| Cache por passo da receita | refazer só os passos que dependem do que mudou, com a impressão digital das entradas; precisa da leitura declarada nos manifestos (hoje 0 de 6.611 passos que leem a malha), medida em `procedural/nucleo/planejador/leitura-escrita.js` |
+| Execução paralela de partes independentes | só depois do cache por passo; medir o custo de clonar o estado contra o ganho |
+| Conferência do retrato do acervo no CI | `conferir-retrato-do-acervo --acervo` leva cerca de 20 min e só roda por comando; decidir se vira gate do CI ou roda quando se mexe em `nucleoBooleano` ou no rastreio |
+| `etapas-do-acervo.test.mjs` acima de 120 s | 175 a 207 s nos gates, dominado pelo sedã; medir por etapa e dividir |
 | Movimento e espaço varrido | exige montagem, pose e relações persistidas antes de solver ou cinemática geral |
 | A-4, A-6, A-7, A-8, A-16 e A-29 | capacidades abertas comprovadas, sem inventar IDs novos |
 | Fechamento de tampas em anel (sólidos ocos) | evidência em `cabo-de-pa-bambu`: dois lofts concêntricos geram tubo aberto nas extremidades, e o motor não tem primitiva para costurar o anel entre as bordas de dois perfis coaxiais. Malha não-manifold, volume incalculável, STEP falha em sólido. Afeta qualquer peça oca. Sem contorno hoje |

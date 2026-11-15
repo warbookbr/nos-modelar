@@ -70,6 +70,7 @@
    reservar um id. Manifold não carregada, seleção vazia, sólido aberto,
    seleções que dividem face, resultado vazio e estouro do bloco GRITAM, e o
    passo inteiro aborta com 0 V/0 F. */
+import { somarFacesTocadas, somarVerticesTocados } from '../somas-do-rastreio.js';
 import { areaDe, fundir, fundirCoplanares, melhorInicio, pedacosConvexos } from '../pedacos-convexos.js';
 import { moldeDeDentro, ErroDoMolde } from '../molde-de-dentro.js';
 import { memoizarPura } from '../memoria-de-pura.js';
@@ -248,6 +249,9 @@ export function criarOperacoesBooleanas(servicos) {
        mesmos oito representantes, e é isso que permite à política de face
        coplanar (abaixo) devolver a face do primeiro com os cantos dele. */
     const idsDasEntradas = [...new Set(operandos.flat().flatMap((f) => st.F.get(f).vs))].sort((x, y) => x - y);
+    /* o rastreio declarado do retrato: a booleana reescreve no lugar só o `vs` e as `quebras` das faces dos operandos (as cortadas e as mantidas); o que ela cria ou apaga o despacho vê pelo mapa. Ela não reescreve vértice no lugar (só cria, com `addV`, e apaga): a soma dos vértices dos operandos abaixo é defesa declarada, para o dia em que uma variante o fizer. */
+    somarFacesTocadas(st, 'booleana', operandos.flat());
+    somarVerticesTocados(st, 'booleana', idsDasEntradas);
     const repPorChave = new Map(), repDe = new Map();
     for (const v of idsDasEntradas) {
       const chave = chaveDoPonto(st.V.get(v));

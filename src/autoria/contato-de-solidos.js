@@ -871,11 +871,29 @@ function distancia2PontoTriangulo(p, [a, b, c]) {
   return comprimento2(sub(p, add(a, add(mult(ab, vb * soma), mult(ac, vc * soma)))));
 }
 
+/* Quadrado da menor distância entre os segmentos p1-q1 e p2-q2 (Ericson, "Real-Time Collision Detection", 5.1.9). */
+function distancia2SegmentoSegmento(p1, q1, p2, q2) {
+  const d1 = sub(q1, p1); const d2 = sub(q2, p2); const r = sub(p1, p2);
+  const a = dot(d1, d1); const e = dot(d2, d2); const f = dot(d2, r);
+  const limita = (x) => Math.min(1, Math.max(0, x));
+  let s; let t;
+  if (a <= 1e-30 && e <= 1e-30) return comprimento2(r);
+  if (a <= 1e-30) { s = 0; t = limita(f / e); } else {
+    const c = dot(d1, r);
+    if (e <= 1e-30) { t = 0; s = limita(-c / a); } else {
+      const b = dot(d1, d2); const den = a * e - b * b;
+      s = den > 1e-30 ? limita((b * f - c * e) / den) : 0;
+      t = (b * s + f) / e;
+      if (t < 0) { t = 0; s = limita(-c / a); } else if (t > 1) { t = 1; s = limita((b - c) / a); }
+    }
+  }
+  return comprimento2(sub(add(p1, mult(d1, s)), add(p2, mult(d2, t))));
+}
+
 const LIMITE_DE_PARES_DA_DISTANCIA = 4e8;
 
 /**
- * A menor distância entre as malhas de dois sólidos preparados, em unidade de mundo, olhando só até `limite`: dos vértices de cada um aos triângulos do outro (o
- * par de arestas que se afasta mais que os vértices não entra, e numa junta quase plana, que é o caso de quem pergunta, o vértice dá a distância). Só entram os triângulos que tocam
+ * A menor distância entre as malhas de dois sólidos preparados, em unidade de mundo, olhando só até `limite`: dos vértices de cada um aos triângulos do outro e de cada aresta às arestas do outro, o que pega duas arestas cruzadas sem vértice próximo. Só entram os triângulos que tocam
  * a região comum das duas caixas, e o par de malhas com mais de 4e8 pares de triângulo nela fica sem medida. Devolve `null` quando nenhum par fica a menos de `limite`, e `undefined` quando não mediu (sólido inconclusivo ou pares demais). É a distância que a
  * mensagem do contato declarado que não acontece diz.
  */
@@ -909,6 +927,18 @@ export function distanciaEntreSolidos(a, b, limite) {
   const antes = menor2;
   olha(ta, tb, cb);
   olha(tb, ta, ta.map(caixaDe));
+  /* aresta contra aresta: duas arestas cruzadas passam mais perto uma da outra que qualquer vértice do triângulo vizinho; só os pares de triângulos cujas caixas ficam a menos da menor distância achada */
+  for (const t of ta) {
+    const c = caixaDe(t); const r = Math.sqrt(menor2);
+    for (let k = 0; k < tb.length; k += 1) {
+      const o = cb[k];
+      if (c[0][0] > o[0][1] + r || c[0][1] < o[0][0] - r || c[1][0] > o[1][1] + r || c[1][1] < o[1][0] - r || c[2][0] > o[2][1] + r || c[2][1] < o[2][0] - r) continue;
+      for (let i = 0; i < 3; i += 1) for (let j = 0; j < 3; j += 1) {
+        const d2 = distancia2SegmentoSegmento(t[i], t[(i + 1) % 3], tb[k][j], tb[k][(j + 1) % 3]);
+        if (d2 < menor2) menor2 = d2;
+      }
+    }
+  }
   return menor2 < antes ? Math.sqrt(menor2) : null;
 }
 

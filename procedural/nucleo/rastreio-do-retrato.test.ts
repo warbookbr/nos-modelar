@@ -9,6 +9,8 @@ import { ESCRITA_DAS_OPERACOES, OPS, REGISTRO_OPERACOES, nucleo, rastrearEntrada
 import { entradaDaReceita } from '../../src/autoria/executar-receita.js';
 import { importarReceita, receitaDoModulo } from '../../tools/modelar/importar-receita.mjs';
 import { resolverCaminhoReceita } from '../../tools/modelar/resolver-caminho-receita.mjs';
+// @ts-expect-error — peça de teste em JavaScript.
+import receitaDaAbertura from '../../tools/fixtures/abertura-de-prova/receita.js';
 
 type Passo = [string, Record<string, unknown>?];
 type Entrada = { PASSOS: Passo[]; PARAMS?: object; TOPO?: object; MATERIAIS?: object; ESQUELETO?: unknown; ALIASES?: unknown[] };
@@ -40,8 +42,8 @@ describe('declaração de escrita por operação', () => {
   it('só nomeia operações do próprio núcleo e níveis conhecidos', () => {
     for (const [nome, { V, F }] of Object.entries(ESCRITA_DAS_OPERACOES)) {
       expect(Object.keys(OPS), nome).toContain(nome);
-      expect(['nada', 'alvos', 'acrescenta']).toContain(V);
-      expect(['nada', 'alvos', 'acrescenta']).toContain(F);
+      expect(['nada', 'alvos', 'acrescenta', 'tocados']).toContain(V);
+      expect(['nada', 'alvos', 'acrescenta', 'tocados']).toContain(F);
     }
   });
 
@@ -142,10 +144,91 @@ describe('rotaciona, transladar e arranja declaram a escrita', () => {
   });
 });
 
+/** Um corte que muda faces de operando no lugar (as cortadas), cria pedaços, apaga faces e vértices, e passos declarados depois dele, que só leem um retrato certo. */
+const corte = (op: string, id: number, solidos: unknown[]): Passo => [op, { origemId: id, solidos }];
+const o = (op: string, id: number) => ({ origem: { op, id } });
+const BASE: Passo[] = [
+  ['cubo', { origemId: 1, lado: 1 }], ['cubo', { origemId: 2, lado: 0.6, em: [0.5, 0.5, 0.5] }], ['cubo', { origemId: 3, lado: 0.3, em: [-0.5, 0, 0] }],
+];
+
+describe('booleanas declaram o rastreio (faces criadas, apagadas e cortadas no lugar)', () => {
+  it('subtrair: corte de canto, depois atributos e outro corte sobre o resultado', () => {
+    const passos: Passo[] = [
+      ...BASE,
+      corte('subtrair', 10, [o('cubo', 1), o('cubo', 2)]),
+      ['material', { usa: 'a', sel: o('subtrair', 10) }], ['parte', { nome: 'corpo', sel: o('subtrair', 10) }],
+      ['rotaciona', { eixo: 'y', graus: 15, sel: o('cubo', 3) }],
+      corte('subtrair', 11, [o('subtrair', 10), o('cubo', 3)]),
+      ['liso', { angulo: 30, sel: o('subtrair', 11) }], ['transladar', { d: [0, 0, 1], sel: o('subtrair', 11) }],
+    ];
+    const n = igualNosTresCaminhos({ PASSOS: passos, MATERIAIS });
+    expect(n.orfaos).toEqual([]);
+    const doPasso = (k: number) => n.procedencia.passos.find((p: any) => p.passo === k)?.saidas;
+    expect(doPasso(3)?.faces.length).toBeGreaterThan(6);                        // faces criadas e faces cortadas no lugar
+    expect(doPasso(3)?.vertices.length).toBeGreaterThan(0);
+  });
+
+  it('subtrair que não toca no alvo, ferramenta no lugar e corte recusado também fecham', () => {
+    const passos: Passo[] = [
+      ...BASE, ['cubo', { origemId: 4, lado: 0.2, em: [5, 5, 5] }],
+      corte('subtrair', 10, [o('cubo', 1), o('cubo', 4)]),
+      corte('subtrair', 11, [o('subtrair', 10), o('cubo', 1)]),   // ferramenta já consumida: recusa
+      corte('subtrair', 12, [o('subtrair', 10), o('cubo', 2), o('cubo', 3)]),
+    ];
+    igualNosTresCaminhos({ PASSOS: passos, MATERIAIS });
+  });
+});
+
+describe('unir declara o rastreio', () => {
+  it('união de sobreposição, de contato por face e de ferramentas disjuntas, com atributos depois', () => {
+    const passos: Passo[] = [
+      ...BASE, ['cubo', { origemId: 4, lado: 1, em: [1, 0, 0] }], ['cubo', { origemId: 5, lado: 0.2, em: [9, 9, 9] }],
+      corte('unir', 10, [o('cubo', 1), o('cubo', 2)]),
+      ['material', { usa: 'b', sel: o('unir', 10) }],
+      corte('unir', 11, [o('unir', 10), o('cubo', 4)]),
+      corte('unir', 12, [o('unir', 11), o('cubo', 5)]),
+      ['parte', { nome: 'corpo', sel: o('unir', 12) }], ['rotaciona', { eixo: 'x', graus: 20, sel: o('unir', 12) }],
+    ];
+    const n = igualNosTresCaminhos({ PASSOS: passos, MATERIAIS });
+    const doPasso = (k: number) => n.procedencia.passos.find((p: any) => p.passo === k)?.saidas;
+    expect(n.orfaos.map((x: any) => x.motivo)).toEqual([]);
+    expect(doPasso(5)?.faces.length).toBeGreaterThan(0);
+  });
+});
+
+describe('intersectar declara o rastreio', () => {
+  it('interseção de sobreposição, depois atributos e corte sobre o resultado', () => {
+    const passos: Passo[] = [
+      ...BASE,
+      corte('intersectar', 10, [o('cubo', 1), o('cubo', 2)]),
+      ['material', { usa: 'a', sel: o('intersectar', 10) }],
+      corte('subtrair', 11, [o('intersectar', 10), o('cubo', 3)]),
+      ['liso', { angulo: 40, sel: o('subtrair', 11) }],
+    ];
+    const n = igualNosTresCaminhos({ PASSOS: passos, MATERIAIS });
+    expect(n.orfaos.map((x: any) => x.motivo)).toEqual([]);
+    const doPasso = (k: number) => n.procedencia.passos.find((p: any) => p.passo === k)?.saidas;
+    expect(doPasso(3)?.faces.length).toBeGreaterThan(0);
+  });
+});
+
+describe('aberturaPorContorno declara o rastreio', () => {
+  it('a chapa de prova, com a abertura, a lente e a aba (booleana de dentro, limpeza da costura e renumeração das paredes)', () => {
+    const entrada = entradaDaReceita(receitaDaAbertura) as unknown as Entrada;
+    const completo = igualNosTresCaminhos(entrada);
+    const passo = entrada.PASSOS.findIndex((p) => p[0] === 'aberturaPorContorno');
+    expect(passo).toBeGreaterThan(0);
+    const saidas = completo.procedencia.passos.find((p: any) => p.passo === passo).saidas;
+    expect(saidas.faces.length).toBeGreaterThan(10);
+  }, 120_000);
+});
+
 describe('receitas reais do acervo: o atalho devolve a procedência da conta completa', () => {
   const PECAS = [
     'ambulancia', 'braco-robotico/ombro-tambor', 'caminhao-entrega', 'carro-policia', 'carro-sedan-compacto',
     'furgao', 'micro-ondas-branco', 'onibus-urbano', 'picape-compacta', 'suporte-tubo', 'trator-pa',
+    /* limparLascas que funde vértices e reescreve faces no lugar (as rodas do sedã, que o fazem em 4 passos, ficam para a conferência do acervo) */
+    'kukri',
   ];
   it.each(PECAS)('%s', async (nome) => {
     const receita = receitaDoModulo(await importarReceita(resolverCaminhoReceita(nome)));
