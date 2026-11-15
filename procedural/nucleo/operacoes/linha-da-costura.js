@@ -44,7 +44,16 @@ const PONTOS_POR_LADO = 8;
 const AFUNDA = 0.03;
 const FUNDO = 0.3;
 /* o quanto a frente de cada escama se curva para trás nas bordas do cordão, em fração do passo (a escama em meia-lua) */
-const CURVA_DA_ESCAMA = 0.35;
+const CURVA_DA_ESCAMA = 0.9;
+/* a forma de cada escama ao longo da linha, de -1 a 1 por passo: um patamar quase plano que desce devagar e sobe de uma vez
+   na frente da escama seguinte (o degrau raso da solda TIG), e não a onda redonda do cosseno */
+const FRENTE_DA_ESCAMA = 0.15;
+const degrau = (fase) => {
+  const f = fase - Math.floor(fase);
+  if (f < FRENTE_DA_ESCAMA) { const u = f / FRENTE_DA_ESCAMA; return -1 + 2 * (3 * u * u - 2 * u * u * u); }
+  const u = (f - FRENTE_DA_ESCAMA) / (1 - FRENTE_DA_ESCAMA);
+  return 1 - 2 * u * u;
+};
 
 /** reamostrar(pontos, fechada, passo) -> pontos a distâncias iguais ao longo da polilinha, o mais perto de `passo` que
  *  divide o comprimento; a volta não repete o primeiro ponto. */
@@ -311,7 +320,7 @@ export function perfilDoCordao({ peA, nPeA, peB, nPeB, altura, largura, s = 0, e
     const t = k / N, x = 2 * t - 1;
     let h = (altura + afunda) * Math.sin(Math.PI * t);
     /* as escamas: a altura ondula ao longo da linha, com a frente de cada escama curvada para trás nas bordas */
-    if (escamas) h += escamas.altura * Math.sin(Math.PI * t) * Math.cos((2 * Math.PI * (s + CURVA_DA_ESCAMA * escamas.passo * x * x)) / escamas.passo);
+    if (escamas) h += escamas.altura * Math.sin(Math.PI * t) * degrau((s + CURVA_DA_ESCAMA * escamas.passo * x * x) / escamas.passo);
     pts.push(s2(s2(afundA, m2(d2(afundB, afundA), t)), m2(sobe, h)));
   }
   /* o fundo: abaixo de cada pé e abaixo do meio, por dentro do material */
