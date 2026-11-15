@@ -111,6 +111,10 @@ function semTrechoCurto(pontos, fechada, minimo) {
    disso, e a curva suave, que gira menos que ele entre um ponto e o seguinte, não se corta */
 const ANGULO_DO_CANTO = 35;
 
+/* o canto em que o cordão não cabe: as normais das duas superfícies a menos disto uma da outra (quase tangentes) ou a menos
+   disto de opostas (fechadas quase por inteiro) */
+const LIMITE_DO_CANTO = 15;
+
 const comprimentoDe = (pontos) => { let L = 0; for (let k = 1; k < pontos.length; k++) L += tam(sub(pontos[k], pontos[k - 1])); return L; };
 
 /** cortarNosCantos(pontos, fechada) -> [{ pontos, fechada }]: a linha inteira, se nenhum ponto vira mais de ANGULO_DO_CANTO;
@@ -297,6 +301,22 @@ export function linhaDaCostura(st, costura, { passo, passoFino = passo, alcance,
     const lados = pontos.map((q) => ({ nA: superficieA(q)?.n ?? null, nB: superficieB(q)?.n ?? null }));
     const sem = lados.findIndex((l) => !l.nA || !l.nB);
     if (sem >= 0) return { erro: ['costura', `no ponto [${pontos[sem].map((x) => Number(x.toPrecision(6))).join(', ')}] da costura do unir:${de.id} um dos sólidos não tem superfície perto`] };
+    /* o canto da costura entre as duas superfícies: onde elas ficam quase tangentes (o tubo fino que encontra outro quase no
+       mesmo plano, na ponta de uma gancheira) ou se fecham quase por inteiro, o chanfro não tem lugar, e o cordão termina; a
+       linha se divide nos trechos em que o canto cabe */
+    const cabe = lados.map(({ nA, nB }) => { const c = dot(nA, nB); return c < Math.cos((LIMITE_DO_CANTO * Math.PI) / 180) && c > -Math.cos((LIMITE_DO_CANTO * Math.PI) / 180); });
+    if (!cabe.every(Boolean)) {
+      const runs = [];
+      let atual = [];
+      const ordem = fechada ? [...pontos.keys(), ...pontos.keys()].slice(cabe.indexOf(false), cabe.indexOf(false) + pontos.length) : [...pontos.keys()];
+      for (const j of ordem) { if (cabe[j]) atual.push(j); else { if (atual.length) runs.push(atual); atual = []; } }
+      if (atual.length) runs.push(atual);
+      for (const r of runs) if (r.length >= 3 && comprimentoDe(r.map((j) => pontos[j])) >= 2 * passo) {
+        const erro = cadeiaDe(r.map((j) => pontos[j]), false, e0);
+        if (erro) return erro;
+      }
+      return null;
+    }
     const normais = lados.map(({ nA, nB }) => unit(soma(nA, nB)) ?? nA);
     cadeias.push({
       pontos, normais, fechada, espelhada: false, passo: 1, lados,
