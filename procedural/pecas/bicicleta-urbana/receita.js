@@ -51,8 +51,7 @@ export const TABELA = {
   tubo_inferior_diametro: 48,
   tubo_selim_diametro: 42,
   caixa_direcao_diametro: 54,
-  caixa_direcao_diametro_baixo: 64,
-  caixa_direcao_diametro_meio: 50,
+  caixa_direcao_diametro_baixo: 60,
   caixa_sobre_coroa: 14,
   abracadeira_selim_diametro: 48,
   abracadeira_selim_comprimento: 10,
@@ -79,9 +78,8 @@ export const TABELA = {
   garfo_eixo_a_coroa: 375,
   garfo_perna_diametro: 22,
   garfo_coroa_diametro: 26,
-  garfo_coroa_meia_largura: 52,
-  garfo_perna_abertura: 10,
-  garfo_coroa_arqueio: 40,
+  garfo_coroa_meia_largura: 40,
+  garfo_coroa_arqueio: 24,
   garfo_perna_diametro_ponta: 18,
   garfo_coluna_diametro: 28,
   garfo_coluna_alem_da_caixa: 50,
@@ -234,11 +232,10 @@ export function derivar(T) {
   const baseCaixa = T.garfo_eixo_a_coroa + T.caixa_sobre_coroa;
   const cabecaBaixo = naDirecao(baseCaixa);
   const cabecaCima = naDirecao(baseCaixa + T.caixa_direcao_comprimento);
-  /* a caixa de direção como na foto frontal: alargada na base, onde se funde à coroa do garfo, fina no meio e um pouco mais
-     larga no topo, sob o espaçador */
+  /* a caixa de direção como na foto frontal: um cilindro reto, com um anel um pouco mais largo na base, sobre a coroa */
   const naCaixa = (f) => naDirecao(baseCaixa + T.caixa_direcao_comprimento * f);
-  const fsCaixa = [0, 0.08, 0.18, 0.3, 0.6, 1];
-  const rsCaixa = [T.caixa_direcao_diametro_baixo, (T.caixa_direcao_diametro_baixo + T.caixa_direcao_diametro_meio) / 2 + 2, T.caixa_direcao_diametro_meio + 1, T.caixa_direcao_diametro_meio, (T.caixa_direcao_diametro_meio + T.caixa_direcao_diametro) / 2, T.caixa_direcao_diametro].map(raioQ);
+  const fsCaixa = [0, 0.06, 0.1, 1];
+  const rsCaixa = [T.caixa_direcao_diametro_baixo, T.caixa_direcao_diametro_baixo, T.caixa_direcao_diametro, T.caixa_direcao_diametro].map(raioQ);
   itens.push({ k: 'tubo', parte: 'quadro', material: 'aluminio', pts: fsCaixa.map(naCaixa), raios: rsCaixa, lados: 48, junta: 'quadro' });
   soldado([baseDoTuboSuperior, naDirecao(baseCaixa + T.tubo_superior_na_direcao - 400)], raioQ(T.tubo_superior_diametro), T.lados_tubo, 'selimTopo', 'cabeca', T.solda_trecho);
   soldado([bb, naDirecao(baseCaixa + T.tubo_inferior_na_direcao)], raioQ(T.tubo_inferior_diametro), T.lados_tubo, 'mc', 'cabeca', T.solda_trecho + 20);
@@ -277,8 +274,8 @@ export function derivar(T) {
   const pernaBase = [];
   for (let j = 0; j <= nOmbro; j++) {
     const th = (j / nOmbro) * (Math.PI / 2);
-    /* a coroa em arco, como na foto frontal: o centro, sob a caixa de direção, é o alto, e a perna desce dele num quarto de
-       elipse de `garfo_coroa_meia_largura` de largo por `garfo_coroa_arqueio` de alto (a coroa de ombro curto parecia uma barra) */
+    /* a coroa compacta da foto frontal: o centro, sob a caixa de direção, é o alto, e a perna sai dele num ombro redondo e curto,
+       um quarto de elipse de `garfo_coroa_meia_largura` de largo por `garfo_coroa_arqueio` de alto, e desce reta */
     const p = naDirecao(T.garfo_eixo_a_coroa - T.garfo_coroa_arqueio * (1 - Math.cos(th)));
     pernaBase.push({ p, r: rTopo, exige: exigeX(p, rTopo), x: T.garfo_coroa_meia_largura * Math.sin(th) });
   }
@@ -286,9 +283,8 @@ export function derivar(T) {
     const u = i / nUp; // 0 = coroa, 1 = ponta
     const p = soma(naDirecao((T.garfo_eixo_a_coroa - T.garfo_coroa_arqueio) * (1 - u)), esc(nFrente, T.garfo_offset * u ** 1.3));
     const r = rLaminaMm(u);
-    /* a perna abre para fora logo abaixo da coroa (até `garfo_perna_abertura` a mais, no primeiro terço) e volta ao eixo, como
-       o arco das lâminas na foto frontal */
-    pernaBase.push({ p, r, exige: exigeX(p, r), x: T.garfo_coroa_meia_largura + (T.garfo_x - T.garfo_coroa_meia_largura) * u + T.garfo_perna_abertura * Math.sin(Math.PI * Math.min(1, u / 0.9)) });
+    /* a perna desce reta, quase paralela à outra, como na foto frontal */
+    pernaBase.push({ p, r, exige: exigeX(p, r), x: T.garfo_coroa_meia_largura + (T.garfo_x - T.garfo_coroa_meia_largura) * u });
   }
   for (const q of pernaBase) q.x = Math.max(q.x, q.exige);
   for (const lado of [-1, 1]) {
