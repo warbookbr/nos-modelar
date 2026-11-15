@@ -59,8 +59,7 @@ export const TABELA = {
   estai_diametro: 20,
   estai_folga_pneu: 6.5,
   estai_abaixo_da_abracadeira: 40,
-  solda_cordao: 4.5,
-  solda_faixa: 26,
+  solda_largura: 8,
   solda_trecho: 70,
   base_diametro: 18,
   estai_x_topo: 17,
@@ -177,12 +176,10 @@ export function derivar(T) {
   const itens = [];
   const tubo = (parte, material, pts, raios, lados = T.lados_tubo) => itens.push({ k: 'tubo', parte, material, pts, raios: Array.isArray(raios) ? raios : pts.map(() => raios), lados });
   /* Tubo do quadro com as pontas marcadas para a solda: o trecho de cada ponta (de comprimento `trecho`) entra na união da junta
-     que o recebe, e o meio fica um tubo só. A união (`unir`) funde os tubos num sólido só, sem face interna. O cordão de solda é o
-     alargamento da ponta: a seção cresce `solda_cordao` mm, com perfil de cosseno, na faixa de `solda_faixa` mm que começa onde o
-     tubo sai da superfície do tubo que o recebe (`raioReceptor`, o raio dele), e some no corpo do tubo. O arredondamento de
-     costura do núcleo (`arredondarCostura`) não fecha a malha nestas uniões de lofts oblíquos (ver o relato da rodada 7), e por isso
-     a concordância é geral, calculada aqui, e não um contorno por junta. */
-  const soldado = (pts, raios, lados, inicio, fim, trecho = T.solda_trecho, { receptorInicio = 0, receptorFim = 0 } = {}) => {
+     que o recebe, e o meio fica um tubo só. A união (`unir`) funde os tubos de cada junta num sólido só, sem face interna, e o
+     cordão de solda é o `friso` na costura dessa união (`costura` com perfil `cordao`), um chanfro de `solda_largura` mm em cada
+     par de tubos que se toca, fundido aos tubos por outra união com a costura vincada (ver o passo das juntas). */
+  const soldado = (pts, raios, lados, inicio, fim, trecho = T.solda_trecho) => {
     const r = Array.isArray(raios) ? raios : pts.map(() => raios);
     const acum = [0];
     for (let i = 1; i < pts.length; i++) acum.push(acum[i - 1] + norma(menos(pts[i], pts[i - 1])));
@@ -193,26 +190,20 @@ export function derivar(T) {
       const u = (d - acum[i - 1]) / (acum[i] - acum[i - 1]);
       return { p: pts[i - 1].map((v, k) => v + (pts[i][k] - v) * u), r: r[i - 1] + (r[i] - r[i - 1]) * u };
     };
-    const cordao = (dist, receptor) => {
-      if (!receptor) return 0;
-      const t = Math.min(1, Math.max(0, (dist - receptor) / T.solda_faixa));
-      return T.solda_cordao * (0.5 + 0.5 * Math.cos(Math.PI * t));
-    };
-    /* a, b: comprimentos de arco do trecho; `daPonta` diz a que ponta o cordão pertence */
-    const pedaco = (a, b, junta, daPonta, receptor) => {
-      const ss = new Set([a, b]);
-      for (let k = 0; k <= 8; k++) ss.add(a + ((b - a) * k) / 8);
-      if (junta && receptor) for (let k = 0; k <= 6; k++) ss.add(daPonta === 'inicio' ? receptor + (T.solda_faixa * k) / 6 : total - receptor - (T.solda_faixa * k) / 6);
-      pts.forEach((_, i) => ss.add(acum[i]));
-      const lista = [...ss].filter((x) => x >= a - 1e-9 && x <= b + 1e-9).sort((x, y) => x - y).filter((x, i, arr) => i === 0 || x - arr[i - 1] > 1e-6);
-      const amostras = lista.map((x) => { const q = em(Math.min(total, Math.max(0, x))); const dist = daPonta === 'inicio' ? x : total - x; return { p: q.p, r: q.r + (junta ? cordao(dist, receptor) : 0) }; });
-      itens.push({ k: 'tubo', parte: 'quadro', material: 'aluminio', pts: amostras.map((q) => q.p), raios: amostras.map((q) => q.r), lados, junta });
-    };
+    /* o tubo é um corpo só, da ponta à ponta: o trecho de cada ponta soldada ganha anéis a cada 4 mm (deslocados 0,37 do passo,
+       para não coincidirem com a costura de outro tubo), para a união com o cordão não deixar triângulos longos que riscam o
+       sombreado, e o meio fica com oito; o tubo entra inteiro na união do quadro */
+    const ss = new Set([0, total]);
+    const faixa = (a, b) => { const partes = Math.max(8, Math.round((b - a) / 4)); for (let k = 1; k < partes; k++) ss.add(a + ((b - a) * (k + 0.37)) / partes); };
     const a = inicio ? trecho : 0;
     const b = fim ? total - trecho : total;
-    if (inicio) pedaco(0, a, inicio, 'inicio', receptorInicio);
-    pedaco(a, b, null);
-    if (fim) pedaco(b, total, fim, 'fim', receptorFim);
+    if (inicio) faixa(0, a);
+    if (fim) faixa(b, total);
+    for (let k = 0; k <= 8; k++) ss.add(a + ((b - a) * k) / 8);
+    pts.forEach((_, i) => ss.add(acum[i]));
+    const lista = [...ss].sort((x, y) => x - y).filter((x, i, arr) => i === 0 || x - arr[i - 1] > 1e-6);
+    const amostras = lista.map((x) => em(Math.min(total, Math.max(0, x))));
+    itens.push({ k: 'tubo', parte: 'quadro', material: 'aluminio', pts: amostras.map((q) => q.p), raios: amostras.map((q) => q.r), lados, junta: inicio || fim ? 'quadro' : null });
   };
   const torno = (parte, material, perfil, em, { lados = T.lados_roda, liso = 35, eixo = 'x', junta = null } = {}) => itens.push({ k: 'torno', parte, material, perfil, em, lados, liso, eixo, junta });
 
@@ -242,10 +233,10 @@ export function derivar(T) {
   const cabecaBaixo = naDirecao(baseCaixa);
   const cabecaCima = naDirecao(baseCaixa + T.caixa_direcao_comprimento);
   const cabecaMeio = naDirecao(baseCaixa + T.caixa_direcao_comprimento * 0.35);
-  itens.push({ k: 'tubo', parte: 'quadro', material: 'aluminio', pts: [cabecaBaixo, cabecaMeio, cabecaCima], raios: [raioQ(T.caixa_direcao_diametro_baixo), raioQ((T.caixa_direcao_diametro_baixo + T.caixa_direcao_diametro) / 2), raioQ(T.caixa_direcao_diametro)], lados: 48, junta: 'cabeca' });
-  soldado([baseDoTuboSuperior, naDirecao(baseCaixa + T.tubo_superior_na_direcao - 400)], raioQ(T.tubo_superior_diametro), T.lados_tubo, 'selimTopo', 'cabeca', T.solda_trecho, { receptorInicio: raioQ(T.tubo_selim_diametro), receptorFim: raioQ(T.caixa_direcao_diametro) * 0.95 });
-  soldado([bb, naDirecao(baseCaixa + T.tubo_inferior_na_direcao)], raioQ(T.tubo_inferior_diametro), T.lados_tubo, 'mc', 'cabeca', T.solda_trecho + 20, { receptorInicio: T.movimento_central_raio, receptorFim: raioQ(T.caixa_direcao_diametro_baixo) * 1.1 });
-  soldado([bb, noSelim(T.tubo_selim_comprimento)], raioQ(T.tubo_selim_diametro), T.lados_tubo, 'mc', 'selimTopo', T.solda_trecho + 40, { receptorInicio: T.movimento_central_raio, receptorFim: 0 });
+  itens.push({ k: 'tubo', parte: 'quadro', material: 'aluminio', pts: [cabecaBaixo, cabecaMeio, cabecaCima], raios: [raioQ(T.caixa_direcao_diametro_baixo), raioQ((T.caixa_direcao_diametro_baixo + T.caixa_direcao_diametro) / 2), raioQ(T.caixa_direcao_diametro)], lados: 48, junta: 'quadro' });
+  soldado([baseDoTuboSuperior, naDirecao(baseCaixa + T.tubo_superior_na_direcao - 400)], raioQ(T.tubo_superior_diametro), T.lados_tubo, 'selimTopo', 'cabeca', T.solda_trecho);
+  soldado([bb, naDirecao(baseCaixa + T.tubo_inferior_na_direcao)], raioQ(T.tubo_inferior_diametro), T.lados_tubo, 'mc', 'cabeca', T.solda_trecho + 20);
+  soldado([bb, noSelim(T.tubo_selim_comprimento)], raioQ(T.tubo_selim_diametro), T.lados_tubo, 'mc', 'selimTopo', T.solda_trecho + 40);
   /* abraçadeira do canote: anel grosso no topo do tubo do selim */
   tubo('quadro', 'preto', [noSelim(T.tubo_selim_comprimento - T.abracadeira_selim_comprimento), noSelim(T.tubo_selim_comprimento - 2)], raioQ(T.abracadeira_selim_diametro), 32);
   for (const lado of [-1, 1]) {
@@ -254,10 +245,13 @@ export function derivar(T) {
     const topoEstai = noSelim(T.tubo_selim_comprimento - T.estai_abaixo_da_abracadeira);
     const xMeio = T.pneu_largura / 2 + T.estai_folga_pneu + raioQ(T.estai_diametro) + 0.5;
     const ao = (f, x) => [lado * x, topoEstai[1] + (dropout[1] - topoEstai[1]) * f, topoEstai[2] + (dropout[2] - topoEstai[2]) * f];
-    soldado([ao(0, T.estai_x_topo), ao(0.08, T.estai_x_topo + 5), ao(0.22, xMeio), ao(0.55, xMeio + 4), ao(1, T.eixo_traseiro_largura / 2)], raioQ(T.estai_diametro), T.lados_tubo, 'selimTopo', `gancheira${lado}`, T.solda_trecho, { receptorInicio: raioQ(T.tubo_selim_diametro) * 0.8, receptorFim: 0 });
-    soldado([[lado * T.base_x_inicio, yBB, 0], dropout], raioQ(T.base_diametro), T.lados_tubo, 'mc', `gancheira${lado}`, T.solda_trecho, { receptorInicio: T.movimento_central_raio * 0.5, receptorFim: 0 });
+    /* a ponta do estai fica enterrada no tubo do selim: o primeiro ponto, um pouco acima do topo, fica a menos do raio do tubo do
+       selim menos o do estai do eixo dele, e a tampa da ponta não aparece por fora (a ponta a 17 mm do eixo saía 6 mm para fora) */
+    const xEnterrado = raioQ(T.tubo_selim_diametro) - raioQ(T.estai_diametro) - 2;
+    soldado([ao(-0.02, xEnterrado), ao(0, T.estai_x_topo), ao(0.08, T.estai_x_topo + 5), ao(0.22, xMeio), ao(0.55, xMeio + 4), ao(1, T.eixo_traseiro_largura / 2)], raioQ(T.estai_diametro), T.lados_tubo, 'selimTopo', `gancheira${lado}`, T.solda_trecho);
+    soldado([[lado * T.base_x_inicio, yBB, 0], dropout], raioQ(T.base_diametro), T.lados_tubo, 'mc', `gancheira${lado}`, T.solda_trecho);
   }
-  torno('quadro', 'aluminio', [[0, -T.movimento_central_largura / 2], [T.movimento_central_raio, -T.movimento_central_largura / 2], [T.movimento_central_raio, T.movimento_central_largura / 2], [0, T.movimento_central_largura / 2]], bb, { lados: 24, liso: 40, junta: 'mc' });
+  torno('quadro', 'aluminio', [[0, -T.movimento_central_largura / 2], [T.movimento_central_raio, -T.movimento_central_largura / 2], [T.movimento_central_raio, T.movimento_central_largura / 2], [0, T.movimento_central_largura / 2]], bb, { lados: 24, liso: 40, junta: 'quadro' });
 
   /* GARFO: coroa encostada na base da caixa, ombros que nascem dela, lâminas levemente curvas para a frente, coluna coaxial */
   const nUp = 16;
@@ -606,9 +600,11 @@ export function gerarPassos(T) {
       marca('pedais', 'aco', { origem: { op: 'lathe', id: eid } });
     }
   }
-  for (const solidos of juntas.values()) {
-    const idUniao = proximo();
-    passos.push(['unir', { origemId: idUniao, solidos }]);
+  for (const [junta, solidos] of juntas) {
+    const idTubos = proximo(), idCordao = proximo(), idUniao = proximo();
+    passos.push(['unir', { origemId: idTubos, solidos }]);
+    passos.push(['friso', { origemId: idCordao, linha: { nome: `solda-${junta}` }, costura: { de: { op: 'unir', id: idTubos } }, perfil: { cordao: { largura: m(T.solda_largura) } } }]);
+    passos.push(['unir', { origemId: idUniao, vincarCostura: true, solidos: [{ origem: { op: 'unir', id: idTubos } }, { origem: { op: 'friso', id: idCordao } }] }]);
     const selUniao = { origem: { op: 'unir', id: idUniao } };
     passos.push(['liso', { angulo: 40, sel: selUniao }]);
     marca('quadro', 'aluminio', selUniao);
