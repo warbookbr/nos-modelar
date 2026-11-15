@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1934 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1935 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -234,6 +234,7 @@
 
 ## docs/modelar/banco-de-provas/costura-em-no-de-tubos-2026-11-15/
 
+- `CORDAO.md` — Protótipo do cordão de solda, 2026-11-15
 - `SONDA.md` — Sonda da costura arredondada em nó de tubos, 2026-11-15
 
 ## docs/modelar/banco-de-provas/desenho-braco-2026-10-14/
@@ -571,7 +572,7 @@
 
 - `2026-11-08-ferramenta-de-material.md` — Ferramenta de material para o agente: ver, compor e reaproveitar materiais sem rodar a peça inteira
 - `2026-11-10-rebaixo-por-contorno.md` — Rebaixo por contorno: o degrau, o sulco e a borda rebaixada num corpo
-- `2026-11-15-costura-em-no-de-tubos.md` — Costura arredondada em nó de tubos: o cordão de solda onde três ou mais tubos se encontram
+- `2026-11-15-costura-em-no-de-tubos.md` — Cordão de solda na costura de tubos: o friso que segue a costura de uma união, e a costura em nó de tubos
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar

@@ -1,0 +1,9 @@
+# Protótipo do cordão de solda, 2026-11-15
+
+O protótipo foi feito na junção oblíqua a 60° da fixture (`obliquo 60 17/16` em `procedural/nucleo/fixtures/no-de-tubos.js`): um tubo receptor de raio 17 mm e um ramo de raio 16 mm. A linha da costura foi calculada por fora da receita, marchando cada geratriz do ramo até a superfície do receptor, com 96 pontos, e o cordão é um `friso` por essa polilinha fechada, com a normal no eixo do ramo, unido aos dois tubos num `unir`. As imagens foram feitas no Blender e ficaram fora do repositório.
+
+A pessoa comparou primeiro a concordância lisa do `arredondarCostura` com raio de 5 mm e de 8 mm e um cordão de seção elíptica de 10 por 3,2 mm girada a 45°. Ela lê a concordância lisa como solda, mas pediu o volume do cordão, e achou a elipse feia: a borda dela termina em quina contra os tubos. Um cordão de seção circular de 7 mm ficou com cara de mangueira e foi descartado antes de chegar a ela.
+
+Na segunda rodada o perfil virou uma lente, mais alta no meio e afinando a zero nas bordas, girada a 45°. Larguras acima de 11 mm são recusadas pelo `friso` porque a curva da costura fica fechada demais para a largura do perfil. A pessoa escolheu a lente de 9 mm de largura e 2,4 mm de altura de cada lado, com expoente 1 (C1), e notou que as lentes de 10 e 11 mm deixavam uma marca no tubo vertical. Ela pediu que a borda da lente, que ainda aparece como divisa arredondada, ficasse quase imperceptível.
+
+Com o `arredondarCostura` sobre o `unir` dos tubos e do cordão, a borda recusou com raios de 0,6, 1, 2, 4 e 6 mm, sempre no mesmo vértice da costura, dizendo que entre o canto e a tangência a superfície dobra mais de 45°. O `friso` por polilinha tem um perfil fixo e uma normal só, e o ângulo entre os dois tubos varia ao longo da costura, então nenhum perfil fixo fica tangente aos dois tubos em todo ponto. Essas duas medidas são a razão da fatia do perfil `cordao` no plano.

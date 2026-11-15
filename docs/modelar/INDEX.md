@@ -22,7 +22,7 @@ diz o commit onde está; não governa trabalho novo.
 
 ## Estado atual
 
-- Planos ativos: <!-- planos-ativos:inicio -->[costura arredondada em nó de tubos](planos/2026-11-15-costura-em-no-de-tubos.md).<!-- planos-ativos:fim -->
+- Planos ativos: <!-- planos-ativos:inicio -->[cordão de solda na costura de tubos](planos/2026-11-15-costura-em-no-de-tubos.md).<!-- planos-ativos:fim -->
 - Encerrados recentes: [abertura em qualquer direção](./decisoes/PLANOS-ENCERRADOS.md), [limites do sólido por laços](./decisoes/PLANOS-ENCERRADOS.md), [esboço pelo núcleo](./decisoes/PLANOS-ENCERRADOS.md) e [sólido por laços](./decisoes/PLANOS-ENCERRADOS.md); os outros na [crônica](./decisoes/PLANOS-ENCERRADOS.md).
 - A [exportação CAD/STEP modular](./decisoes/PLANOS-ENCERRADOS.md)
   entregou `modulos/exportador-cad/`, `modulos/exportador-obj/` e as CLIs
