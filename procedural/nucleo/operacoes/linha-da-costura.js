@@ -11,8 +11,8 @@
    O CORDÃO. O perfil `cordao: { largura, altura }` não é fixo: em cada estação ele é desenhado no plano perpendicular à
    linha, a partir das duas superfícies. Cada borda (o pé do cordão) fica sobre a superfície de um operando, a metade da
    largura do canto, achada na própria malha do operando (o ponto mais próximo) para a superfície curva não deixar o pé
-   no ar, e afundada uma fração da largura para o cordão cruzar a superfície com ângulo franco. De um pé ao outro o
-   contorno é um arco que sobe como o seno até a `altura` no meio, sem crista, e a borda sai nítida, como a de uma solda.
+   no ar, e afundada uma fração da largura. De um pé ao outro o contorno é quase reto: sai de cada pé deitado sobre a
+   superfície e se endireita até passar, no meio, à `altura` acima da reta entre os pés.
    Com `escamas: { passo, altura }`, a altura ondula ao longo da linha com esse passo, e a frente de cada escama se
    curva para trás nas bordas, em meia-lua. Por baixo, o perfil fecha por dentro do material. O número de pontos é o mesmo em
    toda estação, como a varredura pede. */
@@ -45,8 +45,9 @@ const AFUNDA = 0.03;
 const FUNDO = 0.3;
 /* o quanto a frente de cada escama se curva para trás nas bordas do cordão, em fração do passo (a escama em meia-lua) */
 const CURVA_DA_ESCAMA = 0.9;
-/* o expoente do seno do arco: abaixo de 1 o topo achata e a borda fica mais íngreme, e o cordão deixa de ser um tubo redondo */
-const EXPOENTE_DO_ARCO = 0.35;
+/* o ângulo com que o cordão sai da superfície em cada pé, e o teto da altura num canto aberto, em vezes a declarada */
+const ANGULO_DO_PE = (15 * Math.PI) / 180;
+const TETO_DA_ALTURA = 1.2;
 /* a forma de cada escama ao longo da linha, de -1 a 1 por passo: um patamar quase plano que desce devagar e sobe de uma vez
    na frente da escama seguinte (o degrau raso da solda TIG), e não a onda redonda do cosseno */
 const FRENTE_DA_ESCAMA = 0.15;
@@ -314,22 +315,44 @@ export function perfilDoCordao({ peA, nPeA, peB, nPeB, altura, largura, s = 0, e
   const corda = n2(d2(afundB, afundA));
   let sobe = [-corda[1], corda[0]];
   if (p2(sobe, bis) < 0) sobe = m2(sobe, -1);
-  /* o arco de pé a pé: a altura cresce como o seno, sem crista no meio, e sai dos pés com ângulo franco, que dá a borda
-     nítida da solda; a altura conta o afundamento, para o meio ficar à `altura` acima da reta entre os pés na superfície */
   /* a altura acompanha a abertura do canto (o ângulo entre os dois pés, visto da costura, que é a origem do plano): é a
-     declarada num canto de 90°, maior num canto aberto, e cai a zero num canto de 60° ou mais fechado, onde o cordão é uma
-     face reta de pé a pé, um chanfro, como a solda que enche um canto fechado (escolha da pessoa por imagem, 2026-11-15) */
+     declarada num canto de 90°, um pouco maior num canto aberto (até TETO_DA_ALTURA vezes), e cai a zero num canto de 60° ou
+     mais fechado, onde o cordão é a reta de pé a pé, um chanfro */
   const cosCanto = p2(n2(peA), n2(peB));
-  altura *= Math.max(0, 1 - 2 * cosCanto);
+  altura *= Math.min(TETO_DA_ALTURA, Math.max(0, 1 - 2 * cosCanto));
+  /* o contorno de pé a pé, quase reto: uma curva de grau 5 que sai de cada pé deitada sobre a superfície, inclinada
+     ANGULO_DO_PE na direção do outro pé, e se endireita até a reta entre os pés, passando no meio à `altura` acima dela. A
+     borda fica suave sem encostar tangente no tubo, o que deixaria lascas na união (escolha da pessoa por imagem,
+     2026-11-15: "mais achatado, a ponto das bordas ficarem mais suaves, quase como se fosse reto") */
+  const comp = Math.hypot(...d2(afundB, afundA));
+  const saida = (nPe, de, para) => {
+    let t = [-nPe[1], nPe[0]];
+    if (p2(t, d2(para, de)) < 0) t = m2(t, -1);
+    const c = n2(d2(para, de));
+    const alfa = Math.acos(Math.max(-1, Math.min(1, p2(t, c))));
+    const giro = Math.min(alfa, ANGULO_DO_PE);
+    const lado = Math.sign(t[0] * c[1] - t[1] * c[0]) || 1;
+    const cs = Math.cos(giro * lado), sn = Math.sin(giro * lado);
+    return [t[0] * cs - t[1] * sn, t[0] * sn + t[1] * cs];
+  };
+  const q1 = s2(afundA, m2(saida(nPeA, afundA, afundB), comp / 3));
+  const q4 = s2(afundB, m2(saida(nPeB, afundB, afundA), comp / 3));
+  const base2 = s2(m2(q1, 2 / 3), m2(q4, 1 / 3)), base3 = s2(m2(q1, 1 / 3), m2(q4, 2 / 3));
+  const ctl = [afundA, q1, base2, base3, q4, afundB];
+  const pesos = [1, 5, 10, 10, 5, 1];
+  const ponto = (c, t) => { let r = [0, 0]; for (let k = 0; k < 6; k++) r = s2(r, m2(c[k], pesos[k] * (1 - t) ** (5 - k) * t ** k)); return r; };
+  const meioDaCorda = m2(s2(afundA, afundB), 0.5);
+  const subidaDaBase = p2(d2(ponto(ctl, 0.5), meioDaCorda), sobe);
+  const ergue = m2(sobe, (altura + afunda - subidaDaBase) / (20 / 32));
+  ctl[2] = s2(base2, ergue); ctl[3] = s2(base3, ergue);
   const pts = [];
   const N = 2 * PONTOS_POR_LADO;
   for (let k = 0; k <= N; k++) {
     const t = k / N, x = 2 * t - 1;
-    const arco = Math.sin(Math.PI * t) ** EXPOENTE_DO_ARCO;
-    let h = (altura + afunda) * arco;
+    let q = ponto(ctl, t);
     /* as escamas: a altura ondula ao longo da linha, com a frente de cada escama curvada para trás nas bordas */
-    if (escamas) h += escamas.altura * arco * degrau((s + CURVA_DA_ESCAMA * escamas.passo * x * x) / escamas.passo);
-    pts.push(s2(s2(afundA, m2(d2(afundB, afundA), t)), m2(sobe, h)));
+    if (escamas) q = s2(q, m2(sobe, escamas.altura * Math.sin(Math.PI * t) * degrau((s + CURVA_DA_ESCAMA * escamas.passo * x * x) / escamas.passo)));
+    pts.push(q);
   }
   /* o fundo: abaixo de cada pé e abaixo do meio, por dentro do material */
   const fundo = FUNDO * largura;
