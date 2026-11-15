@@ -44,7 +44,9 @@ describe('mapa da receita: toda receita do acervo', () => {
       for (const linha of linhas) expect(linha.length, linha).toBeLessThanOrEqual(LARGURA);
       expect(mapa.tabela, 'a TABELA tem seções').not.toBeNull();
       expect(mapa.plano, 'o PLANO foi achado').not.toBeNull();
-      expect(mapa.passos.linha, 'gerarPassos foi achada').toBeGreaterThan(0);
+      /* A receita que só tem o PLANO (`PASSOS: []`, como as partes do robô antes da primeira rodada) não tem passo a achar; a guarda
+         do acervo avisa dela sem reprovar enquanto a etapa não está fixa. */
+      if (mapa.passos.total > 0) expect(mapa.passos.linha, 'gerarPassos foi achada').toBeGreaterThan(0);
       const textos = new Map(mapa.arquivos.map((a) => [a.rel, readFileSync(a.caminho, 'utf8').split('\n')]));
       for (const { arquivo, linha, nome } of mapa.citacoes) {
         expect(nome, `${arquivo}:${linha} sem nome`).toBeTruthy();
