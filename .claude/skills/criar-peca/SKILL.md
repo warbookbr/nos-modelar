@@ -104,6 +104,8 @@ npm run descrever -- <peça>
 npm run bancada -- <peça> --vistas=isometrica,frontal,direita,superior --cores
 ```
 
+O que o `descrever` cobra de contato vem da receita: `contatos` lista os pares que devem se tocar e `separados` os que NÃO podem, com `folgaMinima` em metros e o motivo (o pneu e as lâminas do garfo); a pergunta "o que não pode se tocar" é do alinhamento, e o par declarado reprova abaixo da folga, no toque e no atravessamento.
+
 Cada imagem responde uma pergunta: `--modo=isolar` para a superfície,
 `--modo=contexto` para caber e encaixar, `--par a,b` para uma junta, e todas as
 partes para a leitura geral. A bancada serve para
