@@ -16,6 +16,7 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
 - [Carrinho de mão: atritos do alinhamento e do rascunho (2026-11-11)](carrinho-de-mao-2026-11-11/ATRITOS.md) — `carrinho-de-mao-2026-11-11`
   - [Custo por peça do carrinho de mão](carrinho-de-mao-2026-11-11/CUSTO-POR-PECA.md) — `carrinho-de-mao-2026-11-11`
 - [Atritos](carrinho-refeito-2026-10-08/ATRITOS.md) — `carrinho-refeito-2026-10-08`
+- [Sonda da costura arredondada em nó de tubos, 2026-11-15](costura-em-no-de-tubos-2026-11-15/SONDA.md) — `costura-em-no-de-tubos-2026-11-15`
 - [Braço robótico, vista lateral: a descrição](desenho-braco-2026-10-14/DESCRICAO.md) — `desenho-braco-2026-10-14`
   - [Braço robótico, vista lateral: o resultado da prova](desenho-braco-2026-10-14/RESULTADO.md) — `desenho-braco-2026-10-14`
 - [Carcaça da empilhadeira, vista lateral: a descrição](desenho-carcaca-2026-10-14/DESCRICAO.md) — `desenho-carcaca-2026-10-14`
