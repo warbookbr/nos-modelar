@@ -11,9 +11,9 @@
    O CORDÃO. O perfil `cordao: { largura, altura }` não é fixo: em cada estação ele é desenhado no plano perpendicular à
    linha, a partir das duas superfícies. Cada borda (o pé do cordão) fica sobre a superfície de um operando, a metade da
    largura do canto, achada na própria malha do operando (o ponto mais próximo) para a superfície curva não deixar o pé
-   no ar, e afundada uma fração da altura para o cordão cruzar a superfície em vez de encostar nela. Do pé ao topo o
-   contorno é uma curva de Bézier que sai tangente à superfície e chega ao topo, à `altura` acima do meio da reta entre
-   os dois pés, na bissetriz das duas superfícies, com a tangente deitada; por baixo, o perfil fecha por dentro do material. O número de pontos é o mesmo em
+   no ar, e afundada uma fração da altura para o cordão cruzar a superfície em vez de encostar nela. De um pé ao outro o
+   contorno é uma curva de Bézier só, que sai tangente às duas superfícies e passa, no meio, à `altura` acima da reta
+   entre os pés; por baixo, o perfil fecha por dentro do material. O número de pontos é o mesmo em
    toda estação, como a varredura pede. */
 
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
@@ -37,15 +37,13 @@ const chave = (x, y) => (x < y ? `${x}-${y}` : `${y}-${x}`);
 export const EXEMPLO_DE_COSTURA = "costura: { de: { op: 'unir', id: 3 }, entre: [0, 1] }";
 export const EXEMPLO_DE_CORDAO = 'perfil: { cordao: { largura: 0.009, altura: 0.0024 } }';
 
-/* quantos pontos de cada curva do pé ao topo; o perfil tem 2 * PONTOS_POR_LADO + 3 pontos */
+/* a curva de pé a pé tem 2 * PONTOS_POR_LADO + 1 pontos, e o perfil, mais os 3 do fundo */
 const PONTOS_POR_LADO = 8;
 /* o quanto o pé afunda na superfície, em fração da altura, e o fundo do perfil abaixo do pé, em fração da largura */
 const AFUNDA = 0.04;
 const FUNDO = 0.3;
-/* os braços de cada Bézier, em fração da distância do pé ao topo: longo no pé, para o cordão sair raso da superfície, e
-   curto no topo, para a coroa ficar quase reta, chanfrada (escolha da pessoa por imagem, 2026-11-15) */
-const BRACO_DO_PE = 0.6;
-const BRACO_DO_TOPO = 0.15;
+/* o braço da tangente em cada pé, em fração de um terço da reta entre os pés: longo, para o cordão sair raso da superfície */
+const BRACO_DO_PE = 1;
 
 /** reamostrar(pontos, fechada, passo) -> pontos a distâncias iguais ao longo da polilinha, o mais perto de `passo` que
  *  divide o comprimento; a volta não repete o primeiro ponto. */
@@ -268,10 +266,6 @@ export function superficieDoOperando(st, faces, pontosDaLinha, raio, suave) {
   };
 }
 
-const bezier = (p0, p1, p2, p3, t) => {
-  const s = 1 - t;
-  return [0, 1].map((k) => s * s * s * p0[k] + 3 * s * s * t * p1[k] + 3 * s * t * t * p2[k] + t * t * t * p3[k]);
-};
 const d2 = (a, b) => [a[0] - b[0], a[1] - b[1]];
 const n2 = (a) => { const l = Math.hypot(a[0], a[1]); return [a[0] / l, a[1] / l]; };
 const m2 = (a, k) => [a[0] * k, a[1] * k];
@@ -282,29 +276,32 @@ const p2 = (a, b) => a[0] * b[0] + a[1] * b[1];
  *  (já no plano, em u e v) e das normais da superfície em cada pé (também no plano). A ordem é pé A, curva até o topo,
  *  curva até o pé B, e o fundo por dentro do material. */
 export function perfilDoCordao({ peA, nPeA, peB, nPeB, altura, largura }) {
-  const meio = m2(s2(peA, peB), 0.5);
   const bis = n2(s2(nPeA, nPeB));
-  /* o topo fica à `altura` acima do meio da corda dos dois pés, na bissetriz: é o reforço do cordão sobre a reta entre os pés */
-  const topo = s2(meio, m2(bis, altura));
-  const deitado = [-bis[1], bis[0]];
-  const ladoDe = (pe, nPe) => {
-    const afundado = s2(pe, m2(nPe, -AFUNDA * altura));
-    let t = [-nPe[1], nPe[0]];
-    if (p2(t, d2(topo, afundado)) < 0) t = m2(t, -1);
-    let tc = deitado;
-    if (p2(tc, d2(afundado, topo)) < 0) tc = m2(tc, -1);
-    const dist = Math.hypot(...d2(topo, afundado));
-    return { afundado, p1: s2(afundado, m2(t, BRACO_DO_PE * dist)), p2: s2(topo, m2(tc, BRACO_DO_TOPO * dist)) };
-  };
-  const A = ladoDe(peA, nPeA), B = ladoDe(peB, nPeB);
+  const afundA = s2(peA, m2(nPeA, -AFUNDA * altura)), afundB = s2(peB, m2(nPeB, -AFUNDA * altura));
+  const corda = Math.hypot(...d2(afundB, afundA));
+  /* a tangente da superfície em cada pé, apontando para o outro pé */
+  const tangente = (nPe, de, para) => { let t = [-nPe[1], nPe[0]]; if (p2(t, d2(para, de)) < 0) t = m2(t, -1); return t; };
+  const q1 = s2(afundA, m2(tangente(nPeA, afundA, afundB), BRACO_DO_PE * corda / 3));
+  const q4 = s2(afundB, m2(tangente(nPeB, afundB, afundA), BRACO_DO_PE * corda / 3));
+  /* uma curva só, de grau 5, do pé A ao pé B: os dois primeiros e os dois últimos pontos de controle dão a tangente nos pés,
+     e os dois do meio sobem na bissetriz o que falta para o meio da curva ficar à `altura` acima da reta entre os pés. A
+     curvatura se espalha pela largura, sem a linha de virada que duas curvas emendadas no topo desenham. */
+  const meioDaCorda = m2(s2(afundA, afundB), 0.5);
+  const base2 = s2(m2(q1, 2 / 3), m2(q4, 1 / 3)), base3 = s2(m2(q1, 1 / 3), m2(q4, 2 / 3));
+  const ctl = [afundA, q1, base2, base3, q4, afundB];
+  const pesos = [1, 5, 10, 10, 5, 1];
+  const ponto = (c, t) => { let r = [0, 0]; for (let k = 0; k < 6; k++) r = s2(r, m2(c[k], pesos[k] * (1 - t) ** (5 - k) * t ** k)); return r; };
+  const subidaDaBase = p2(d2(ponto(ctl, 0.5), meioDaCorda), bis);
+  const sobe = m2(bis, (altura - subidaDaBase) / (20 / 32));
+  ctl[2] = s2(base2, sobe); ctl[3] = s2(base3, sobe);
   const pts = [];
-  for (let k = 0; k <= PONTOS_POR_LADO; k++) pts.push(bezier(A.afundado, A.p1, A.p2, topo, k / PONTOS_POR_LADO));
-  for (let k = PONTOS_POR_LADO - 1; k >= 0; k--) pts.push(bezier(B.afundado, B.p1, B.p2, topo, k / PONTOS_POR_LADO));
+  const N = 2 * PONTOS_POR_LADO;
+  for (let k = 0; k <= N; k++) pts.push(ponto(ctl, k / N));
   /* o fundo: abaixo de cada pé e abaixo do meio, por dentro do material */
   const fundo = FUNDO * largura;
-  pts.push(s2(B.afundado, m2(nPeB, -fundo)));
-  pts.push(s2(meio, m2(bis, -fundo)));
-  pts.push(s2(A.afundado, m2(nPeA, -fundo)));
+  pts.push(s2(afundB, m2(nPeB, -fundo)));
+  pts.push(s2(meioDaCorda, m2(bis, -fundo)));
+  pts.push(s2(afundA, m2(nPeA, -fundo)));
   return pts;
 }
 
