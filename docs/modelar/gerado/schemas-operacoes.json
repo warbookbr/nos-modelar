@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:6673ac26fb8b53d840f0c0bc2c8b8867946ced9adff3c4145afa9e885c15212c",
+  "assinatura": "sha256:96c7058aac1a4bd41ef2867e85d8a56dbdd6a73f812a590c920cf5d31aa0c7c7",
   "total": 42,
   "operacoes": [
     {
@@ -2321,6 +2321,10 @@
             "linha": {
               "type": "object",
               "description": "Linha nomeada {nome, pontos}. Com superficie, pontos são nomes de ponto da gaiola em sequência ao longo das arestas, como no vinco; sem ela, nomes de ponto de PARAMS/TOPO ou [x,y,z]. Repita o primeiro ponto no fim para fechar a volta. Numa gaiola por gaiolaPorRede, linha(curva, de, ate) dá os nomes ao longo de uma curva nomeada (a fechada inteira, com o primeiro repetido no fim)."
+            },
+            "costura": {
+              "type": "object",
+              "description": "A costura de um unir anterior como linha: {de:{op:'unir', id}, entre:[a, b]}, com entre os índices dos dois sólidos (sem entre, a costura inteira, se ela junta só dois). A linha é só { nome }, e v segue a bissetriz das duas superfícies em cada ponto. Com perfil {cordao:{largura}}, o perfil é um chanfro desenhado em cada ponto no canto entre as duas superfícies, com um pé em cada uma a meia largura do canto: o cordão de solda, com o sombreado próprio a 12°."
             },
             "superficie": {
               "type": "object",
@@ -5003,6 +5007,10 @@
             "solidos": {
               "type": "array",
               "description": "Duas ou mais seleções, uma por sólido."
+            },
+            "vincarCostura": {
+              "type": "boolean",
+              "description": "Literal true: as arestas da costura viram quebra de sombra nas faces dos dois lados, e o sombreado liso não atravessa a costura qualquer que seja o ângulo (o cordão de solda, cuja borda encontra o tubo a menos do ângulo do liso dele)."
             }
           }
         },
@@ -5142,7 +5150,7 @@
       }
     }
   ],
-  "assinaturaComExtensoes": "sha256:8d16851b25da7e0729a67dc173c831da02367ba64db45d4ec272098423735d2f",
+  "assinaturaComExtensoes": "sha256:bec3279a8f9c16994aadf70d26a12f0e3a160fd081ccb8aee9a9cea68ea10f5d",
   "totalExtensoes": 5,
   "extensoes": [
     {

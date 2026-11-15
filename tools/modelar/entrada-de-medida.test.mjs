@@ -195,7 +195,7 @@ describe('as quatro ferramentas leem o esboço direto', () => {
   it('vistas:superficie gera as vistas do esboço, com a faixa dos vincos, sem montar a peça de novo a cada passo', async () => {
     const chamadas = [];
     const executar = (_blender, argv) => {
-      const script = argv[3].split('/').pop(); const args = argv.slice(5);
+      const script = argv[argv.indexOf('--python') + 1].split(/[\\/]/).pop(); const args = argv.slice(argv.indexOf('--') + 1);
       const opcao = (n) => { const i = args.indexOf(n); return i < 0 ? null : args[i + 1]; };
       const prefixo = opcao('--saida'); chamadas.push({ script, args });
       const gravarArq = (n) => { writeFileSync(`${prefixo}${n}`, n); return `${prefixo}${n}`; };

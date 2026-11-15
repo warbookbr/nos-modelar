@@ -46,9 +46,13 @@ import { espelharGaiolaEmX } from '../subdivisao.js';
 import { formaParaContorno, ErroDePerfil, SEGMENTOS_ARCO_PADRAO } from '../perfil2d.js';
 import { ehSimples } from '../contorno.js';
 import { bordaDaAbertura } from './abertura-por-contorno.js';
+import { EXEMPLO_DE_CORDAO, cordaoNoQuadro, linhaDaCostura, perfilDoCordao } from './linha-da-costura.js';
 
 /** A aba sai com as faces lisas até este ângulo, como as da superfície: a dobra arredonda a sombra e a ponta e a espessura ficam vivas. */
 const LISO_DA_ABA = valorDoLiso(30);
+/* o cordão na costura suaviza o sombreado entre as faces dele, que viram uns 15° de uma estação para a outra em volta de um
+   tubo fino, e o separa do tubo, que o chanfro encontra a uns 45°: o limite fica entre os dois */
+const LISO_DO_CORDAO = valorDoLiso(30);
 const EXEMPLO_DE_ABA = "aba: { largura: 0.02, angulo: 90, raio: 0.003 }";
 const EXEMPLO_DE_LINHA = "{ nome: 'frisoDaPorta', pontos: ['a', 'b', 'c'] }";
 const EXEMPLO_DE_VARIACAO = "variacao: { largura: [{ ponto: 'a', valor: 0.02 }, { ponto: 'b', antes: 0.02, depois: 0.01 }] }";
@@ -407,13 +411,23 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
     if (typeof linha.nome !== 'string' || !linha.nome) return grita(st, i, 'friso', 'linha', `a linha precisa de nome, como ${EXEMPLO_DE_LINHA}`);
     /* sobre a borda de uma abertura por contorno, a linha é a borda de fora do vão inteira: só o nome */
     const daAbertura = !!a.superficie && typeof a.superficie === 'object' && a.superficie.op === 'aberturaPorContorno';
-    if (daAbertura) {
+    /* sobre a costura de uma união, a linha é a costura: só o nome */
+    const daCostura = a.costura != null;
+    const comCordao = !!a.perfil && typeof a.perfil === 'object' && !Array.isArray(a.perfil) && a.perfil.cordao != null;
+    if (comCordao && !daCostura) return grita(st, i, 'friso', 'perfil', `o perfil cordao se põe no canto entre dois sólidos e só vale com a linha numa costura: ${EXEMPLO_DE_CORDAO}, com costura: { de: { op: 'unir', id } }`);
+    if (daCostura) {
+      if (a.superficie != null) return grita(st, i, 'friso', 'costura', 'costura e superficie são duas fontes de linha: escolha uma');
+      if (a.normal != null) return grita(st, i, 'friso', 'normal', 'sobre a costura a normal é a bissetriz das duas superfícies em cada ponto; tire normal');
+      if (linha.pontos != null) return grita(st, i, 'friso', 'linha', `sobre a costura a linha ${citar(linha.nome)} é a costura inteira, e não leva pontos; escreva só { nome: ${citar(linha.nome)} }`);
+      if (a.variacao != null) return grita(st, i, 'friso', 'variacao', 'a variacao cita pontos nomeados da linha, e a costura não tem nomes; tire variacao');
+      if (a.ponta != null) return grita(st, i, 'friso', 'ponta', 'sobre a costura as pontas do friso são as da costura; tire ponta');
+    } else if (daAbertura) {
       if (linha.pontos != null) return grita(st, i, 'friso', 'linha', `sobre a abertura ${a.superficie.id} a linha ${citar(linha.nome)} é a borda de fora do vão inteira, e não leva pontos; escreva só { nome: ${citar(linha.nome)} }`);
       if (a.variacao != null) return grita(st, i, 'friso', 'variacao', 'a variacao cita pontos nomeados da linha, e a borda de uma abertura por contorno não tem nomes; tire variacao');
     } else if (!Array.isArray(linha.pontos) || linha.pontos.length < 2) return grita(st, i, 'friso', 'linha', `a linha ${citar(linha.nome)} precisa de dois pontos ou mais; repita o primeiro no fim para fechar a volta`);
     if (a.refinar != null && (daAbertura || !a.superficie || a.superficie.op !== 'subdivisao')) return grita(st, i, 'friso', 'refinar', 'refinar segue a curva da borda livre da superfície limite de um passo subdivisao: cite superficie: { op: \'subdivisao\', id } e a borda de um vão pelos nomes da gaiola');
-    const fechada = daAbertura || (linha.pontos.length > 2 && iguais(linha.pontos[0], linha.pontos[linha.pontos.length - 1]));
-    if (!daAbertura && fechada && linha.pontos.length < 4) return grita(st, i, 'friso', 'linha', `a volta ${citar(linha.nome)} precisa de três pontos distintos ou mais`);
+    const fechada = daAbertura || daCostura || (linha.pontos.length > 2 && iguais(linha.pontos[0], linha.pontos[linha.pontos.length - 1]));
+    if (!daAbertura && !daCostura && fechada && linha.pontos.length < 4) return grita(st, i, 'friso', 'linha', `a volta ${citar(linha.nome)} precisa de três pontos distintos ou mais`);
     /* pontas: 'aberta' tampa o perfil plano, 'fechada' encolhe o perfil até um ponto; a volta não tem ponta */
     let pontas = ['aberta', 'aberta'];
     if (a.ponta != null) {
@@ -434,11 +448,24 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
     } catch (e) { return grita(st, i, 'friso', 'segmentosArco', String(e.message)); }
     if (!Number.isInteger(segmentosArco) || segmentosArco < 1) return grita(st, i, 'friso', 'segmentosArco', `segmentosArco precisa ser inteiro de 1 para cima, e veio ${segmentosArco}`);
     const comAba = a.aba != null;
-    let daPele = false; let perfil = null; let vMin = null; let vMax = null; let medidasDaAba = null;
+    let daPele = false; let perfil = null; let vMin = null; let vMax = null; let medidasDaAba = null; let medidasDoCordao = null;
     if (comAba) {
       const lida = lerAba(st, a);
       if (lida.erro) return grita(st, i, 'friso', lida.erro[0], lida.erro[1]);
       medidasDaAba = lida;
+    } else if (comCordao) {
+      const c = a.perfil.cordao;
+      const extraC = Object.keys(a.perfil).filter((k) => k !== 'cordao');
+      if (extraC.length) return grita(st, i, 'friso', 'perfil', `o perfil cordao não se mistura com outra forma: tire ${extraC.map(citar).join(', ')}`);
+      if (!c || typeof c !== 'object' || Array.isArray(c) || Object.keys(c).some((k) => k !== 'largura')) return grita(st, i, 'friso', 'perfil', `o cordao é um chanfro e leva só a largura, como ${EXEMPLO_DE_CORDAO}; recebido ${JSON.stringify(c)}`);
+      let largura;
+      try { largura = st.num(c.largura); } catch (e) { return grita(st, i, 'friso', 'perfil', String(e.message)); }
+      if (!(largura > 0)) return grita(st, i, 'friso', 'perfil', `a largura do cordao precisa ser maior que zero, e veio ${largura}`);
+      medidasDoCordao = { largura };
+      /* o perfil de referência, num canto de 90°: dá o número de pontos e a orientação; cada estação desenha o seu */
+      const h = largura / 2 / Math.SQRT2;
+      perfil = perfilDoCordao({ peA: [h, h], nPeA: [-Math.SQRT1_2, Math.SQRT1_2], peB: [-h, h], nPeB: [Math.SQRT1_2, Math.SQRT1_2], largura });
+      vMin = Math.min(...perfil.map((p) => p[1])); vMax = Math.max(...perfil.map((p) => p[1]));
     } else {
       try {
         perfil = formaParaContorno(a.perfil, 'perfil', { num: st.num, segmentosArco });
@@ -481,6 +508,12 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
         if (!(vMin < 0)) return grita(st, i, 'friso', 'perfil', `o perfil não entra na chapa (v vai de ${vMin} a ${vMax}): sem uma parte abaixo de v = 0 o friso só encostaria numa linha da superfície; desça o perfil para dentro da chapa, de menos que a espessura ${r.espessura}`);
         if (!(-vMin < r.espessura)) return grita(st, i, 'friso', 'perfil', `o perfil entra ${-vMin} na chapa, e a espessura é ${r.espessura}: ele atravessaria a face de dentro; suba o perfil para entrar menos que a espessura`);
       }
+      cadeias = r.cadeias;
+    } else if (daCostura) {
+      if (comAba) return grita(st, i, 'friso', 'aba', 'a aba dobra a borda de uma chapa, e a costura não é borda: tire aba');
+      const largo = medidasDoCordao ? medidasDoCordao.largura : Math.max(...perfil.map((q) => Math.abs(q[0]))) * 2;
+      const r = linhaDaCostura(st, a.costura, { passo: largo / 5, alcance: 3 * largo, suave: largo / 2 });
+      if (r.erro) return grita(st, i, 'friso', r.erro[0], r.erro[1]);
       cadeias = r.cadeias;
     } else {
       if (comAba) return grita(st, i, 'friso', 'aba', "a aba dobra a borda da chapa: cite a superfície por superficie: { op: 'subdivisao', id } e a borda de um vão pelos nomes da gaiola");
@@ -534,7 +567,25 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
       let s;
       try {
         let doPerfil = comAba ? perfil.map(([w, v]) => [c.lado * w, v]) : perfil; let aVariacao = null; let trechoMaximo = null;
-        if (variacao) {
+        if (medidasDoCordao) {
+          const { largura } = medidasDoCordao;
+          const { superficieA, superficieB } = c;
+          aVariacao = (_s, entrada, _lado, quadro) => {
+            if (entrada == null) throw new ErroDoFriso('a estação do cordão precisa ser um ponto da costura');
+            const r = cordaoNoQuadro({ p: c.pontos[entrada], quadro, nA: c.lados[entrada].nA, nB: c.lados[entrada].nB, largura, superficieA, superficieB });
+            if (r.erro) throw new ErroDoFriso(r.erro, entrada);
+            if (!ehSimples(r.perfil)) throw new ErroDoFriso(`o perfil do cordão se cruza neste ponto: o canto entre as duas superfícies é aberto ou fechado demais para a largura ${largura}; estreite o cordão`, entrada);
+            /* o perfil sai no sentido anti-horário em (u, v), como o de referência: o referencial da varredura é contínuo ao longo
+               da costura, e o lado de cada sólido não troca de mão; se trocasse, o cordão se torceria e o portão de casca fechada
+               da união que o funde aos sólidos gritaria */
+            let area = 0;
+            for (let k = 0; k < r.perfil.length; k++) { const q = r.perfil[k], w = r.perfil[(k + 1) % r.perfil.length]; area += q[0] * w[1] - w[0] * q[1]; }
+            const P = area > 0 ? r.perfil : [...r.perfil].reverse();
+            return { escalaU: 1, perfil: P };
+          };
+          /* só as estações dos pontos da costura, que são as que têm as duas superfícies medidas */
+          trechoMaximo = Infinity;
+        } else if (variacao) {
           const v = variacaoDaCadeia(c);
           if (v.erro) return grita(st, i, 'friso', 'variacao', v.erro);
           doPerfil = v.referencia; aVariacao = v.funcao; trechoMaximo = v.trechoMaximo;
@@ -542,7 +593,9 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
         s = varrerPerfil({ pontos: c.pontos, normais: c.normais, perfil: doPerfil, fechada: c.fechada, pontas, fechamento, trechoMaximo, tampa: comAba && !daPele ? tampaDaAba(doPerfil) : null, aberto: daPele, variacao: aVariacao });
       } catch (e) {
         if (!(e instanceof ErroDoFriso)) return grita(st, i, 'friso', 'linha', String(e.message));
-        return grita(st, i, 'friso', 'linha', `na linha ${citar(linha.nome)}${e.indice != null ? `, perto de ${c.nomeDoIndice(e.indice)}${c.espelhada ? ' (na cópia espelhada)' : ''}` : ''}: ${e.motivo}`);
+        /* na costura a curva é a do encontro dos sólidos e não se abre: a saída que sobra é estreitar o perfil */
+        const motivo = daCostura ? e.motivo.replace('abra a curva ou estreite o perfil', `a curva é a do encontro dos sólidos e não se abre; mude a largura do perfil${medidasDoCordao ? ` (o cordao tem largura ${medidasDoCordao.largura})` : ''}, que muda também o passo com que a costura é seguida`) : e.motivo;
+        return grita(st, i, 'friso', 'linha', `na linha ${citar(linha.nome)}${e.indice != null ? `, perto de ${c.nomeDoIndice(e.indice)}${c.espelhada ? ' (na cópia espelhada)' : ''}` : ''}: ${motivo}`);
       }
       const base = vertices.length;
       for (const p of s.vertices) vertices.push(c.espelhada ? [-p[0], p[1], p[2]] : p);
@@ -555,7 +608,7 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
     const limite = BLOCO + FAIXA_ESTENDIDA;
     if (vertices.length > limite || faces.length > limite) return grita(st, i, 'friso', 'linha', `o friso gera ${vertices.length} vértices e ${faces.length} faces, acima do limite do passo (${limite})`);
     vertices.forEach((p, k) => addV(st, idDoPasso(i, k), p));
-    const facesSaida = faces.map((f, k) => { const id = idDoPasso(i, k); addF(st, id, f.map((v) => idDoPasso(i, v))); if (comAba) st.F.get(id).liso = LISO_DA_ABA; return id; });
+    const facesSaida = faces.map((f, k) => { const id = idDoPasso(i, k); addF(st, id, f.map((v) => idDoPasso(i, v))); if (comAba) st.F.get(id).liso = LISO_DA_ABA; if (medidasDoCordao) st.F.get(id).liso = LISO_DO_CORDAO; return id; });
     if (a.origemId != null) registraOrigem(st, i, 'friso', a.origemId, { faces: facesSaida, lateral: lateral.map((k) => facesSaida[k]), pontas: tampas.map((k) => facesSaida[k]) });
   },
   };

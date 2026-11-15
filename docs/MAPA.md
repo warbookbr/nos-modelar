@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1930 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1973 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -231,6 +231,11 @@
 ## docs/modelar/banco-de-provas/carrinho-refeito-2026-10-08/
 
 - `ATRITOS.md` — Atritos
+
+## docs/modelar/banco-de-provas/costura-em-no-de-tubos-2026-11-15/
+
+- `CORDAO.md` — Protótipo do cordão de solda, 2026-11-15
+- `SONDA.md` — Sonda da costura arredondada em nó de tubos, 2026-11-15
 
 ## docs/modelar/banco-de-provas/desenho-braco-2026-10-14/
 
@@ -567,6 +572,12 @@
 
 - `2026-11-08-ferramenta-de-material.md` — Ferramenta de material para o agente: ver, compor e reaproveitar materiais sem rodar a peça inteira
 - `2026-11-10-rebaixo-por-contorno.md` — Rebaixo por contorno: o degrau, o sulco e a borda rebaixada num corpo
+- `2026-11-14-leitura-por-partes.md` — Leitura por partes: a prancha e o esboço conferidos contra a referência, parte por parte
+- `2026-11-14-modelagem-de-carro.md` — Modelagem de carro de passeio: o que já serve, onde a carroceria travou antes e por onde começar
+- `2026-11-14-modelagem-de-robo.md` — Modelagem de robô humanoide: o que já serve, o que falta na montagem e por onde começar
+- `2026-11-14-prancha-menos-manual.md` — Prancha menos manual: desvio medido, leitura combinada de um comando e o que ficou de fora declarado
+- `2026-11-15-costura-em-no-de-tubos.md` — Cordão de solda na costura de tubos: o friso que segue a costura de uma união, e a costura em nó de tubos
+- `2026-11-15-reflexo-na-bancada.md` — Reflexo na bancada: a superfície de lataria julgada sem o Blender
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
@@ -1081,6 +1092,7 @@
 - `medidas-de-malha.js` — medidas-de-malha.js — medidas de teste sobre malha poligonal por índice, sem Three.js: área, volume com sinal, distância de pontos a triângulos e cruzamento …
 - `medidas-de-malha.test.mjs` — medidas-de-malha.test.mjs — `distancias` para com erro quando não há triângulo a medir, em vez de abrir anéis de células para sempre.
 - `moldura-prova.js` — moldura-prova.js — a chapa curva com vão de `friso-prova.js` e as molduras em volta da borda dele, desenhadas por código para a conferência da moldura (`mold…
+- `no-de-tubos.js` — no-de-tubos.js — a fixture geral do nó de tubos: tubos de seção circular, fechados nas pontas por um polo, que saem de um ponto comum ou nascem na lateral de…
 - `varredura-prova.js` — varredura-prova.js — as três peças varridas de prova da `gaiolaVarrida`, desenhadas por código
 
 ## procedural/nucleo/forma-exata/
@@ -1107,6 +1119,7 @@
 - `arredondar-canto.test.ts` — arredondar-canto.test.ts — o vértice onde duas ou três arestas arredondadas (ou chanfradas) se encontram.
 - `arredondar-chapa-furada.test.ts` — arredondar-chapa-furada.test.ts — as três recusas que sobravam ao arredondar as arestas de uma chapa de 6 mm com furos oblongos.
 - `arredondar-costura-convexa.test.ts` — arredondar-costura-convexa.test.ts — fatia 7b do plano "União de sólidos": o `arredondarCostura` arredonda também a borda CONVEXA de uma booleana (a beira do…
+- `arredondar-costura-no.test.ts` — arredondar-costura-no.test.ts — o `arredondarCostura` no nó de tubos (plano da costura em nó de tubos, 2026-11-15). Medido na fatia 1: a malha fecha com dois…
 - `arredondar-costura-pontas.test.ts` — arredondar-costura-pontas.test.ts — a ponta solta do arredondamento por fatias. A fixture é a coluna do braço robótico reduzida ao essencial: um disco de eix…
 - `arredondar-costura-tubos-altos.test.ts` — arredondar-costura-tubos-altos.test.ts — dois tubos de mesmo diâmetro em T, o vertical mais alto que o raio, unidos e arredondados. Com 144 lados as geratriz…
 - `arredondar-costura.test.ts` — arredondar-costura.test.ts — fatia 4 do plano "União de sólidos": o encontro côncavo de uma união é arredondado com raio declarado, e o `liso` com ângulo não…
@@ -1129,6 +1142,7 @@
 - `estruturais.js` — estruturais.js — operações do grupo, isoladas por serviços explícitos do núcleo.
 - `extrusao-de-perfil.test.ts` — extrusao-de-perfil.test.ts — `extrusao` e o `lathe` com `furos` e `deslocar`: perfil 2D com furo e deslocamento de contorno, levantado ou revolucionado em só…
 - `face-plana.js` — face-plana.js — a face continua plana depois de mover os cantos? A operação que move cantos compartilhados (arredondarAresta) altera faces que ela não declar…
+- `friso-na-costura.test.ts` — friso-na-costura.test.ts — o `friso` que segue a costura de uma união e o perfil `cordao`, o chanfro de solda posto a cada ponto no canto entre os dois sólid…
 - `friso-recusas.test.ts` — friso-recusas.test.ts — cada recusa de entrada do passo `friso` com a entrada ruim e o campo que a recusa cita. A revisão das verificações (2026-11-13) tirou…
 - `friso.js` — friso.js (operação) — nervura, tubo ou friso que segue uma linha nomeada, com perfil declarado. A linha é uma sequência de pontos nomeados da gaiola de um pa…
 - `furo-em-aneis.js` — furo-em-aneis.js — a face furada refeita em anéis (plano "costuras e furos limpos", fatia 4), e a região plana de várias faces como face de entrada.
@@ -1139,6 +1153,7 @@
 - `lathe-aberto.test.ts` — lathe-aberto.test.ts — o `lathe` em modo polilinha cujo perfil não toca o eixo nas duas pontas nem volta ao primeiro ponto.
 - `lathe-fechado.test.ts` — lathe-fechado.test.ts — perfil que dá a volta e fecha de verdade.
 - `limpar-lascas.js` — limpar-lascas.js (operação) — `limparLascas`: tira de uma seleção as faces finas que uma booleana deixou, sem criar vértice nem face e sem mover a superfície…
+- `linha-da-costura.js` — linha-da-costura.js — a costura de uma união como linha do `friso`, e o perfil `cordao` posto no canto a cada ponto dela (plano do cordão de solda na costura…
 - `loft-fechado.test.ts` — loft-fechado.test.ts — caminho que volta em si e fecha de verdade.
 - `nome-de-copia.test.ts` — nome-de-copia.test.ts — endereço de autor para as cópias do `arranja`.
 - `parte-com-material.test.mjs` — parte-com-material.test.mjs — `parte` aceita `material` no mesmo passo, e a peça sai bit a bit igual à dos dois passos.
@@ -1498,6 +1513,25 @@
 ## procedural/pecas/carro-esportivo-sedan/referencias/
 
 - `alvo.md` — Alvo: carro-esportivo-sedan
+
+## procedural/pecas/carro-fastback/
+
+- `ALINHAMENTO.md` — Carro fastback: alinhamento
+
+## procedural/pecas/carro-fastback/partes/lataria/
+
+- `receita.js` — carro-fastback/lataria — o piloto do quarto traseiro: a chapa contínua de lataria do meio da porta (z 0) para trás, lado +x, com o para-lama traseiro salient…
+
+## procedural/pecas/carro-fastback/partes/lataria/rodadas/
+
+- `receita-01.js` — carro-fastback/lataria — o piloto do quarto traseiro: a chapa contínua de lataria do meio da porta (z 0) para trás, lado +x, com o para-lama traseiro salient…
+
+## procedural/pecas/carro-fastback/referencias/
+
+- `frontal.prancha.mjs` — frontal.prancha.mjs — a vista frontal cotada do carro-fastback, segunda das quatro vistas da prancha alvo (skill desenhar-prancha, contrato docs/modelar/usar…
+- `lateral.prancha.mjs` — lateral.prancha.mjs — a vista lateral cotada do carro-fastback, primeira das quatro vistas da prancha alvo (skill desenhar-prancha, contrato docs/modelar/usa…
+- `superior.prancha.mjs` — superior.prancha.mjs — a vista de cima cotada do carro-fastback, quarta das quatro vistas da prancha alvo (skill desenhar-prancha, contrato docs/modelar/usar…
+- `traseira.prancha.mjs` — traseira.prancha.mjs — a vista traseira cotada do carro-fastback, terceira das quatro vistas da prancha alvo (skill desenhar-prancha, contrato docs/modelar/u…
 
 ## procedural/pecas/carro-perua/
 
@@ -1985,6 +2019,55 @@
 
 - `alvo.md` — Alvo do prato fundo
 
+## procedural/pecas/robo-humanoide/
+
+- `ALINHAMENTO.md` — Robô humanoide, braço direito: rodada de alinhamento
+
+## procedural/pecas/robo-humanoide/partes/antebraco/
+
+- `receita.js` — robo-humanoide/antebraco — antebraço direito: casca com duas hastes expostas por baixo, do cotovelo ao punho.
+
+## procedural/pecas/robo-humanoide/partes/braco/
+
+- `receita.js` — robo-humanoide/braco — braço direito: casca cinza com painel escuro, do centro do ombro ao centro do cotovelo.
+
+## procedural/pecas/robo-humanoide/partes/cotovelo/
+
+- `receita.js` — robo-humanoide/cotovelo — cotovelo direito: dobradiça com cilindro, de eixo paralelo ao de flexão do ombro.
+
+## procedural/pecas/robo-humanoide/partes/falange-distal/
+
+- `receita.js` — robo-humanoide/falange-distal — terceira falange, a da ponta do dedo, com a ponta arredondada; a mesma receita serve aos quatro dedos e ao polegar.
+
+## procedural/pecas/robo-humanoide/partes/falange-media/
+
+- `receita.js` — robo-humanoide/falange-media — segunda falange, entre a proximal e a distal; a mesma receita serve aos quatro dedos.
+
+## procedural/pecas/robo-humanoide/partes/falange-proximal/
+
+- `receita.js` — robo-humanoide/falange-proximal — primeira falange, a que gira no nó da palma; a mesma receita serve aos quatro dedos e ao polegar.
+
+## procedural/pecas/robo-humanoide/partes/ombro/
+
+- `receita.js` — robo-humanoide/ombro — disco de junta do ombro direito, preso ao tronco, com os dois eixos perpendiculares de flexão e de abdução.
+
+## procedural/pecas/robo-humanoide/partes/palma/
+
+- `receita.js` — robo-humanoide/palma — palma da mão direita: placa de 90 mm de largura com os nós dos quatro dedos e a saída inclinada do polegar.
+
+## procedural/pecas/robo-humanoide/partes/polegar-base/
+
+- `receita.js` — robo-humanoide/polegar-base — base do polegar direito: elo que gira no eixo inclinado da palma e leva as duas falanges do polegar para fora do plano dos dedos.
+
+## procedural/pecas/robo-humanoide/partes/punho/
+
+- `receita.js` — robo-humanoide/punho — punho direito: anel que gira em torno do antebraço e carrega o eixo de flexão da mão.
+
+## procedural/pecas/robo-humanoide/referencias/
+
+- `alvo.md` — Alvo do braço direito do robô humanoide
+- `braco-proporcao.esboco.mjs` — braco-proporcao.esboco.mjs — as opções de proporção do braço direito do robô humanoide, em blocos sobre o esqueleto.
+
 ## procedural/pecas/sedan-chassi-e-lataria/
 
 - `ALINHAMENTO.md` — Sedã em chassi e lataria: alinhamento
@@ -2238,6 +2321,8 @@
 - `regua-de-portas.js` — regua-de-portas.js — a conta das portas, pura e sem nenhum import.
 - `regua-de-portas.test.js` — regua-de-portas.test.js — a conta das portas que o núcleo e o gate de contato do esboço dividem.
 - `resolver-montagem-persistida.js` — resolver-montagem-persistida.js — resolve instâncias de peças sem acesso a arquivo.
+- `saliencias-declaradas.js` — saliencias-declaradas.js — a saliência ou o rebaixo de dupla curvatura que a peça desenha de propósito, com a região, a amplitude e o motivo.
+- `saliencias-declaradas.test.js` — saliencias-declaradas.test.js — `PLANO.saliencias`: o normalizador recusa o que o campo não admite, dizendo o que recebeu, o que esperava e o comando que mos…
 - `separacao-direcional.js` — separacao-direcional.js — mede intervalos projetados sem alegar colisão geral.
 - `snapshot-universo-autoria.js` — snapshot-universo-autoria.js — leitura consistente do universo de autoria.
 - `solido-do-esboco.js` — solido-do-esboco.js — o sólido exato de uma forma do esboço, em milímetro, como volume que a Manifold subtrai e interseta.
@@ -2781,9 +2866,21 @@
 
 - `alvo.md` — Alvo da lataria de prova
 
+## tools/fixtures/leitura-por-partes/
+
+- `caixa.prancha.mjs` — caixa.prancha.mjs — prancha neutra para a leitura por partes: um bloco de 1000 x 400 mm visto de lado, com uma janela e um recorte embaixo, e uma roda fora d…
+
 ## tools/fixtures/nivel-zero/
 
 - `medir-blocagem.js` — Suporte de prova do tradutor do nível zero. A medida da blocagem mora em `src/autoria/medir-blocagem-nivel-zero.js`, porque o próprio tradutor a usa para o r…
+
+## tools/fixtures/proporcoes/estante/pecas/montante/
+
+- `receita.js` — montante da estante de prova: fixture neutra da conferência de proporções.
+
+## tools/fixtures/proporcoes/estante/pecas/prateleira/
+
+- `receita.js` — prateleira da estante de prova: fixture neutra da conferência de proporções.
 
 ## tools/fixtures/referencia-do-plano/ausente/
 
@@ -2844,6 +2941,10 @@
 ## tools/fixtures/refina-forma-global/sapata-deslocada/
 
 - `receita.js` — O suporte com a sapata 1 mm para +x: outra malha, ainda dentro do envelope de 2 mm do volume da sapata.
+
+## tools/fixtures/saliencia-declarada/
+
+- `receita.js` — saliencia-declarada — chapa neutra com uma saliência (ou um rebaixo) de dupla curvatura desenhada de propósito, para provar a declaração `PLANO.saliencias` d…
 
 ## tools/fixtures/solido-por-lacos/
 
@@ -3207,6 +3308,7 @@
 - `ondulacao-gota.test.mjs` — ondulacao-gota.test.mjs — a leitura de ondulação das chapas com anel no vão real: a gota estreita e o vão aberto pelas colunas que terminam e começam
 - `ondulacao-leitura.test.mjs` — ondulacao-leitura.test.mjs — o dado lido com peso, o aviso de estações próximas e a face virada na ferramenta de ondulação
 - `ondulacao-rede.test.mjs` — ondulacao-rede.test.mjs — a leitura de ondulação da chapa lateral montada por rede de curvas
+- `ondulacao-saliencia-declarada.test.mjs` — ondulacao-saliencia-declarada.test.mjs — `PLANO.saliencias` na régua de ondulação, sobre a chapa neutra de `tools/fixtures/saliencia-declarada/`: a lombada d…
 - `origem-das-fontes.test.mjs` — A tabela fonte -> pacote das 27 referências de veículos (docs/modelar/veiculos-referencias.json) é conferida contra duas coisas que a pessoa ou o agente escr…
 - `origens-check.mjs` — origens-check.mjs — quem declara de onde vieram os números, declara todos.
 - `papeis-do-laco.test.mjs` — papeis-do-laco.test.mjs — os papéis do laço continuam separados e genéricos.
@@ -3224,10 +3326,14 @@
 - `perguntas-da-peca.test.mjs` — perguntas-da-peca.test.mjs — o bloco de perguntas de forma que o brief do crítico da peça traz, lido do PLANO da receita.
 - `perguntas-do-alinhamento.mjs` — perguntas-do-alinhamento.mjs — as perguntas do alinhamento da família declarada, filtradas pelas partes.
 - `perguntas-do-alinhamento.test.mjs` — perguntas-do-alinhamento.test.mjs — o comando do alinhamento por família e o registro dos pedidos da pessoa, sobre o furgão realista: a prova retroativa de q…
+- `planejado-contra-executado.mjs` — planejado-contra-executado.mjs — a régua que cruza o andaime N2 com a montagem v5 executada.
+- `planejado-contra-executado.test.mjs` — planejado-contra-executado.test.mjs — a régua do planejado contra o executado, sobre a fixture neutra de três blocos empilhados (`tools/fixtures/planejado-co…
 - `pngjs.d.ts` — pngjs.d.ts — a declaração mínima do `pngjs` para o typecheck dos testes em TypeScript: o pacote não traz tipos, e `capturar-montagem.test.ts` o usa para mont…
 - `portas-espelho-arranja.test.ts` — portas-espelho-arranja.test.ts — prova adversarial de AUT-2026-15: uma interface não pode permanecer no espaço da fonte quando a sua geometria foi copiada. C…
 - `procedencia-check.mjs` — Gate N3: contrato reduzido e explícito de procedência da fonte de restrições.
 - `procedencia-check.test.mjs` — Provas do gate N3 para procedência de valores estruturais.
+- `proporcoes.mjs` — proporcoes.mjs — a fonte única das medidas de uma montagem, e a conferência de que os outros lugares a seguem.
+- `proporcoes.test.mjs` — proporcoes.test.mjs — a fonte única de proporção: fórmula, medidas, o andaime gerado, as TABELAs marcadas, a conferência que acusa a edição feita só num luga…
 - `raio-da-aresta.mjs` — raio-da-aresta.mjs — mede o raio de cada aresta de caráter de uma peça, sobre a malha final.
 - `raio-da-aresta.test.mjs` — raio-da-aresta.test.mjs — a medida do raio de uma aresta sobre a malha final, com a verdade conhecida: o cilindro de raio dado entre dois planos (a 90 e a 12…
 - `receita-esqueleto.mjs` — receita-esqueleto.mjs — o esqueleto da receita de uma peça que ainda vai ser alinhada.

@@ -26,6 +26,7 @@
 import { criteriosDe, FAMILIAS_DE_OBJETO } from '../../procedural/criterios/index.js';
 import { normalizarLataria } from './lataria.js';
 import { normalizarDobrasAceitas } from './dobras-aceitas.js';
+import { normalizarSaliencias } from './saliencias-declaradas.js';
 
 export const FORMATO_PLANO_DE_MODELAGEM = 'mecanifica.plano-de-modelagem';
 export const VERSAO_PLANO_DE_MODELAGEM = 1;
@@ -38,10 +39,11 @@ export const CAMPOS_PLANO = Object.freeze([
    crítico lê as `perguntas` por componente. `lataria` diz se a peça é de chapa de superfície livre e quais partes são a chapa, ou a
    dispensa com o motivo (`lataria.js`): o pacote do crítico de peça de lataria leva a luz rasante e a curvatura da lataria. Plano sem
    eles produz a mesma forma canônica de antes. `dobrasAceitas` lista a dobra, o vinco e o chanfro que a peça aceita de propósito, com o motivo
-   (`dobras-aceitas.js`): as réguas de superfície não os contam e os listam como aceitos. `espessuraMinima: { mm, partes? }` declara a parede mais fina que a
+   (`dobras-aceitas.js`): as réguas de superfície não os contam e os listam como aceitos. `saliencias` lista a saliência e o rebaixo de dupla curvatura que a peça desenha de
+   propósito, com região, sentido e amplitude (`saliencias-declaradas.js`): a régua de ondulação mede o desvio contra eles. `espessuraMinima: { mm, partes? }` declara a parede mais fina que a
    peça aceita, em milímetro, para todas as partes ou só para as listadas: sem ele o `descrever` mostra a espessura por parte só como informação, e com ele
    avisa a parte que passa abaixo. */
-export const CAMPOS_OPCIONAIS_DO_PLANO = Object.freeze(['familia', 'familiaProcedural', 'lataria', 'dobrasAceitas', 'espessuraMinima']);
+export const CAMPOS_OPCIONAIS_DO_PLANO = Object.freeze(['familia', 'familiaProcedural', 'lataria', 'dobrasAceitas', 'saliencias', 'espessuraMinima']);
 export const CAMPOS_ESCALA = Object.freeze(['medida', 'milimetros']);
 export const CAMPOS_PARTE = Object.freeze(['nome', 'forma', 'tecnica']);
 /* `dePerto` da parte: onde o pedido ao crítico mostra a feição pequena que o plano promete (raio de 6 mm, rebaixo, friso), numa vista
@@ -213,6 +215,7 @@ export function normalizarPlanoDeModelagem(valor, { quem = 'PLANO' } = {}) {
     ...(valor.familiaProcedural === undefined ? {} : { familiaProcedural: valor.familiaProcedural }),
     ...(valor.lataria === undefined ? {} : { lataria: normalizarLataria(valor.lataria, nomes, { quem }) }),
     ...(valor.dobrasAceitas === undefined ? {} : { dobrasAceitas: normalizarDobrasAceitas(valor.dobrasAceitas, nomes, { quem }) }),
+    ...(valor.saliencias === undefined ? {} : { saliencias: normalizarSaliencias(valor.saliencias, { quem }) }),
     ...(valor.espessuraMinima === undefined ? {} : { espessuraMinima: normalizarEspessuraMinima(valor.espessuraMinima, nomes, quem) }),
   };
 }

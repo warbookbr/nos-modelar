@@ -1,0 +1,62 @@
+{
+  "formato": "mecanifica.andaime-global@2",
+  "id": "estante-de-prova",
+  "unidade": "mm",
+  "envelope": {
+    "min": [
+      0,
+      0,
+      0
+    ],
+    "max": [
+      800,
+      1800,
+      300
+    ]
+  },
+  "volumes": [
+    {
+      "id": "prateleira-baixa",
+      "tipo": "caixa",
+      "centro": [
+        400,
+        359,
+        150
+      ],
+      "dimensoes": [
+        800,
+        18,
+        300
+      ]
+    },
+    {
+      "id": "prateleira-alta",
+      "tipo": "caixa",
+      "centro": [
+        400,
+        727,
+        150
+      ],
+      "dimensoes": [
+        800,
+        18,
+        300
+      ]
+    },
+    {
+      "id": "topo",
+      "tipo": "caixa",
+      "centro": [
+        400,
+        1791,
+        150
+      ],
+      "dimensoes": [
+        800,
+        18,
+        300
+      ]
+    }
+  ],
+  "portas": []
+}

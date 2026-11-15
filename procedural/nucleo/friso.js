@@ -273,11 +273,12 @@ function estacoesDaLinha({ pontos, normais, fechada, pontas, fechamento, trechoM
  *   aberto: o perfil é uma polilinha aberta, e o resultado é uma pele sem espessura, só com as faces laterais (sem tampas
  *   e com `pontas` sem efeito de tampa). A normal da pele no começo do perfil é a normal N da linha, qualquer que seja o
  *   sentido de u em que o perfil anda, e então a pele continua a chapa que a linha acompanha com a mesma orientação.
- *   variacao: (s, entrada, lado) -> { escalaU, perfil }, o perfil como função da posição s (comprimento de arco ao longo da
+ *   variacao: (s, entrada, lado, quadro) -> { escalaU, perfil }, o perfil como função da posição s (comprimento de arco ao longo da
  *   linha). `escalaU` multiplica o u do perfil de entrada (1 é o perfil como veio) e `perfil`, se não for nulo, o troca
  *   por outro com o mesmo número de pontos e a mesma orientação. `entrada` é o índice do ponto de entrada quando a estação
  *   é um deles (e nulo nas estações que a varredura acrescenta), e `lado` ('antes' ou 'depois') diz de que trecho se
- *   fala; nas estações acrescentadas o valor é um só. Duas escalas diferentes dos dois lados de um ponto de entrada são um
+ *   fala; nas estações acrescentadas o valor é um só. `quadro` é o referencial da estação ({ T, N, B }), para o perfil que
+ *   se desenha a partir da geometria em volta da linha (o cordão na costura). Duas escalas diferentes dos dois lados de um ponto de entrada são um
  *   DEGRAU de largura, e a junta é a meia-esquadria de duas faixas de larguras diferentes: as duas faixas se cortam num
  *   mesmo plano, o que passa pelo ponto da linha, pela normal e pelo encontro das duas bordas de fora, e os pontos do
  *   perfil de cada faixa caem nesse plano nos mesmos lugares, de modo que a junta tem um anel só, soldado, sem entalhe
@@ -328,7 +329,7 @@ export function varrerPerfil({ pontos, normais, perfil, fechada = false, pontas 
   const orientar = (p) => (area > 0 ? p.map((q) => [...q]) : [...p].reverse().map((q) => [...q]));
   const porEstacao = variacao ? estacoes.map((e, j) => {
     const consulta = (lado) => {
-      try { return variacao(e.s, e.entrada, lado); } catch (erro) { if (erro instanceof ErroDoFriso && erro.indice == null) erro.indice = e.origem; throw erro; }
+      try { return variacao(e.s, e.entrada, lado, quadros[j]); } catch (erro) { if (erro instanceof ErroDoFriso && erro.indice == null) erro.indice = e.origem; throw erro; }
     };
     const temAntes = fechada || j > 0; const temDepois = fechada || j < m - 1;
     const antes = temAntes ? consulta(e.entrada == null ? 'depois' : 'antes') : null;

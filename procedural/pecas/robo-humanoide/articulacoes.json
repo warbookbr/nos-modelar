@@ -1,0 +1,781 @@
+{
+  "nota": "Declarações no formato da extensão de articulação (mecanifica.articulacao@1), para conferirArticulacao ler quando as partes tiverem geometria. A flexão do ombro, de -60 a 180 graus, gira o ombro inteiro em relação ao tronco, que ainda não existe na montagem, e entra quando o tronco entrar. Pose de repouso: abducaoDoOmbro 10 graus e flexaoDoCotovelo 10 graus.",
+  "articulacoes": [
+    {
+      "id": "abducaoDoOmbro",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "ombro"
+        ],
+        "porta": "abducao"
+      },
+      "movel": {
+        "caminho": [
+          "braco"
+        ],
+        "porta": "ombro"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": 0,
+        "maximo": 90
+      },
+      "passos": 18,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": [
+        [
+          "cotovelo"
+        ],
+        [
+          "antebraco"
+        ],
+        [
+          "punho"
+        ],
+        [
+          "palma"
+        ],
+        [
+          "polegarBase"
+        ],
+        [
+          "polegarProximal"
+        ],
+        [
+          "polegarDistal"
+        ],
+        [
+          "proximalIndicador"
+        ],
+        [
+          "mediaIndicador"
+        ],
+        [
+          "distalIndicador"
+        ],
+        [
+          "proximalMedio"
+        ],
+        [
+          "mediaMedio"
+        ],
+        [
+          "distalMedio"
+        ],
+        [
+          "proximalAnelar"
+        ],
+        [
+          "mediaAnelar"
+        ],
+        [
+          "distalAnelar"
+        ],
+        [
+          "proximalMinimo"
+        ],
+        [
+          "mediaMinimo"
+        ],
+        [
+          "distalMinimo"
+        ]
+      ]
+    },
+    {
+      "id": "flexaoDoCotovelo",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "braco"
+        ],
+        "porta": "cotovelo"
+      },
+      "movel": {
+        "caminho": [
+          "cotovelo"
+        ],
+        "porta": "pino"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": 0,
+        "maximo": 140
+      },
+      "passos": 28,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": [
+        [
+          "antebraco"
+        ],
+        [
+          "punho"
+        ],
+        [
+          "palma"
+        ],
+        [
+          "polegarBase"
+        ],
+        [
+          "polegarProximal"
+        ],
+        [
+          "polegarDistal"
+        ],
+        [
+          "proximalIndicador"
+        ],
+        [
+          "mediaIndicador"
+        ],
+        [
+          "distalIndicador"
+        ],
+        [
+          "proximalMedio"
+        ],
+        [
+          "mediaMedio"
+        ],
+        [
+          "distalMedio"
+        ],
+        [
+          "proximalAnelar"
+        ],
+        [
+          "mediaAnelar"
+        ],
+        [
+          "distalAnelar"
+        ],
+        [
+          "proximalMinimo"
+        ],
+        [
+          "mediaMinimo"
+        ],
+        [
+          "distalMinimo"
+        ]
+      ]
+    },
+    {
+      "id": "rotacaoDoPunho",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "antebraco"
+        ],
+        "porta": "punho"
+      },
+      "movel": {
+        "caminho": [
+          "punho"
+        ],
+        "porta": "antebraco"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": -90,
+        "maximo": 90
+      },
+      "passos": 36,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": [
+        [
+          "palma"
+        ],
+        [
+          "polegarBase"
+        ],
+        [
+          "polegarProximal"
+        ],
+        [
+          "polegarDistal"
+        ],
+        [
+          "proximalIndicador"
+        ],
+        [
+          "mediaIndicador"
+        ],
+        [
+          "distalIndicador"
+        ],
+        [
+          "proximalMedio"
+        ],
+        [
+          "mediaMedio"
+        ],
+        [
+          "distalMedio"
+        ],
+        [
+          "proximalAnelar"
+        ],
+        [
+          "mediaAnelar"
+        ],
+        [
+          "distalAnelar"
+        ],
+        [
+          "proximalMinimo"
+        ],
+        [
+          "mediaMinimo"
+        ],
+        [
+          "distalMinimo"
+        ]
+      ]
+    },
+    {
+      "id": "flexaoDoPunho",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "punho"
+        ],
+        "porta": "flexao"
+      },
+      "movel": {
+        "caminho": [
+          "palma"
+        ],
+        "porta": "punho"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": -60,
+        "maximo": 60
+      },
+      "passos": 24,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": [
+        [
+          "polegarBase"
+        ],
+        [
+          "polegarProximal"
+        ],
+        [
+          "polegarDistal"
+        ],
+        [
+          "proximalIndicador"
+        ],
+        [
+          "mediaIndicador"
+        ],
+        [
+          "distalIndicador"
+        ],
+        [
+          "proximalMedio"
+        ],
+        [
+          "mediaMedio"
+        ],
+        [
+          "distalMedio"
+        ],
+        [
+          "proximalAnelar"
+        ],
+        [
+          "mediaAnelar"
+        ],
+        [
+          "distalAnelar"
+        ],
+        [
+          "proximalMinimo"
+        ],
+        [
+          "mediaMinimo"
+        ],
+        [
+          "distalMinimo"
+        ]
+      ]
+    },
+    {
+      "id": "polegarNaPalma",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "palma"
+        ],
+        "porta": "noPolegar"
+      },
+      "movel": {
+        "caminho": [
+          "polegarBase"
+        ],
+        "porta": "raiz"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": 0,
+        "maximo": 90
+      },
+      "passos": 18,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": [
+        [
+          "polegarProximal"
+        ],
+        [
+          "polegarDistal"
+        ]
+      ]
+    },
+    {
+      "id": "polegarProximal",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "polegarBase"
+        ],
+        "porta": "ponta"
+      },
+      "movel": {
+        "caminho": [
+          "polegarProximal"
+        ],
+        "porta": "raiz"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": 0,
+        "maximo": 90
+      },
+      "passos": 18,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": [
+        [
+          "polegarDistal"
+        ]
+      ]
+    },
+    {
+      "id": "polegarDistal",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "polegarProximal"
+        ],
+        "porta": "ponta"
+      },
+      "movel": {
+        "caminho": [
+          "polegarDistal"
+        ],
+        "porta": "raiz"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": 0,
+        "maximo": 90
+      },
+      "passos": 18,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": []
+    },
+    {
+      "id": "noIndicador",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "palma"
+        ],
+        "porta": "noIndicador"
+      },
+      "movel": {
+        "caminho": [
+          "proximalIndicador"
+        ],
+        "porta": "raiz"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": 0,
+        "maximo": 90
+      },
+      "passos": 18,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": [
+        [
+          "mediaIndicador"
+        ],
+        [
+          "distalIndicador"
+        ]
+      ]
+    },
+    {
+      "id": "junta2Indicador",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "proximalIndicador"
+        ],
+        "porta": "ponta"
+      },
+      "movel": {
+        "caminho": [
+          "mediaIndicador"
+        ],
+        "porta": "raiz"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": 0,
+        "maximo": 90
+      },
+      "passos": 18,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": [
+        [
+          "distalIndicador"
+        ]
+      ]
+    },
+    {
+      "id": "junta3Indicador",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "mediaIndicador"
+        ],
+        "porta": "ponta"
+      },
+      "movel": {
+        "caminho": [
+          "distalIndicador"
+        ],
+        "porta": "raiz"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": 0,
+        "maximo": 90
+      },
+      "passos": 18,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": []
+    },
+    {
+      "id": "noMedio",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "palma"
+        ],
+        "porta": "noMedio"
+      },
+      "movel": {
+        "caminho": [
+          "proximalMedio"
+        ],
+        "porta": "raiz"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": 0,
+        "maximo": 90
+      },
+      "passos": 18,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": [
+        [
+          "mediaMedio"
+        ],
+        [
+          "distalMedio"
+        ]
+      ]
+    },
+    {
+      "id": "junta2Medio",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "proximalMedio"
+        ],
+        "porta": "ponta"
+      },
+      "movel": {
+        "caminho": [
+          "mediaMedio"
+        ],
+        "porta": "raiz"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": 0,
+        "maximo": 90
+      },
+      "passos": 18,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": [
+        [
+          "distalMedio"
+        ]
+      ]
+    },
+    {
+      "id": "junta3Medio",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "mediaMedio"
+        ],
+        "porta": "ponta"
+      },
+      "movel": {
+        "caminho": [
+          "distalMedio"
+        ],
+        "porta": "raiz"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": 0,
+        "maximo": 90
+      },
+      "passos": 18,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": []
+    },
+    {
+      "id": "noAnelar",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "palma"
+        ],
+        "porta": "noAnelar"
+      },
+      "movel": {
+        "caminho": [
+          "proximalAnelar"
+        ],
+        "porta": "raiz"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": 0,
+        "maximo": 90
+      },
+      "passos": 18,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": [
+        [
+          "mediaAnelar"
+        ],
+        [
+          "distalAnelar"
+        ]
+      ]
+    },
+    {
+      "id": "junta2Anelar",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "proximalAnelar"
+        ],
+        "porta": "ponta"
+      },
+      "movel": {
+        "caminho": [
+          "mediaAnelar"
+        ],
+        "porta": "raiz"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": 0,
+        "maximo": 90
+      },
+      "passos": 18,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": [
+        [
+          "distalAnelar"
+        ]
+      ]
+    },
+    {
+      "id": "junta3Anelar",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "mediaAnelar"
+        ],
+        "porta": "ponta"
+      },
+      "movel": {
+        "caminho": [
+          "distalAnelar"
+        ],
+        "porta": "raiz"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": 0,
+        "maximo": 90
+      },
+      "passos": 18,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": []
+    },
+    {
+      "id": "noMinimo",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "palma"
+        ],
+        "porta": "noMinimo"
+      },
+      "movel": {
+        "caminho": [
+          "proximalMinimo"
+        ],
+        "porta": "raiz"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": 0,
+        "maximo": 90
+      },
+      "passos": 18,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": [
+        [
+          "mediaMinimo"
+        ],
+        [
+          "distalMinimo"
+        ]
+      ]
+    },
+    {
+      "id": "junta2Minimo",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "proximalMinimo"
+        ],
+        "porta": "ponta"
+      },
+      "movel": {
+        "caminho": [
+          "mediaMinimo"
+        ],
+        "porta": "raiz"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": 0,
+        "maximo": 90
+      },
+      "passos": 18,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": [
+        [
+          "distalMinimo"
+        ]
+      ]
+    },
+    {
+      "id": "junta3Minimo",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "mediaMinimo"
+        ],
+        "porta": "ponta"
+      },
+      "movel": {
+        "caminho": [
+          "distalMinimo"
+        ],
+        "porta": "raiz"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": 0,
+        "maximo": 90
+      },
+      "passos": 18,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": []
+    }
+  ]
+}

@@ -281,14 +281,14 @@ function vereditoDasFacesFinas({ total, porParte }, { base, anteriores, lataria,
 }
 
 /* O que do PLANO entra no pedido do crítico: o objeto, a escala, as referências, a forma de cada parte, os critérios e a família que escolhe
-   critérios e perguntas. `lataria` e `dobrasAceitas` são do texto e das réguas, e trocá-los não muda o que o crítico lê. O PLANO inválido
+   critérios e perguntas. `lataria`, `dobrasAceitas` e `saliencias` são do texto e das réguas, e trocá-los não muda o que o crítico lê. O PLANO inválido
    entra inteiro, como era. */
 export function planoQueOCriticoLe(plano) {
   let normal;
   try { normal = normalizarPlanoDeModelagem(plano); } catch { return plano ?? null; }
   if (normal === null) return null;
-  const { lataria: _lataria, dobrasAceitas: _dobras, ...lido } = normal;
-  void _lataria; void _dobras;
+  const { lataria: _lataria, dobrasAceitas: _dobras, saliencias: _saliencias, ...lido } = normal;
+  void _lataria; void _dobras; void _saliencias;
   return lido;
 }
 

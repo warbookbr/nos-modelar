@@ -168,7 +168,9 @@ export function mensagemSemBlender(peca, lataria) {
 export { vincosDaMalha };
 
 function rodarBlender(blender, script, args, executar) {
-  const r = executar(blender, ['-b', '--factory-startup', '--python', join(BLENDER_TOOLS, script), '--', ...args], { encoding: 'utf8', maxBuffer: 256 << 20 });
+  /* `--python-exit-code 1`: sem ele o Blender sai com 0 depois de um erro do script, e a falha aparecia como o JSON que faltava (2026-11-14,
+     o `python3` que não existe no Windows) */
+  const r = executar(blender, ['-b', '--factory-startup', '--python-exit-code', '1', '--python', join(BLENDER_TOOLS, script), '--', ...args], { encoding: 'utf8', maxBuffer: 256 << 20 });
   if (r.error) throw new Error(`o Blender (${blender}) não rodou ${script}: ${r.error.message}`);
   if (r.status !== 0) {
     const saida = `${r.stdout ?? ''}\n${r.stderr ?? ''}`.trim().split('\n').slice(-12).join('\n');

@@ -234,7 +234,11 @@ export function criarOperacoesBooleanas(servicos) {
     /* as faces que uma booleana recebeu como operando: o aviso da cópia no lugar que ninguém usou lê este conjunto */
     const usadas = (st.facesDeOperando ??= new Set());
     for (const faces of operandos) for (const f of faces) usadas.add(f);
-    return nucleoBooleano(st, i, op, wasm, a.origemId, operandos, null);
+    /* vincarCostura: as arestas da costura viram quebra de sombra nas faces dos dois lados, e o sombreado liso não atravessa
+       a costura qualquer que seja o ângulo (o cordão na costura de dois tubos, que encontra o tubo a menos do ângulo do liso dele
+       onde o canto é aberto, e mancharia o tubo com a direção do chanfro) */
+    if (a.vincarCostura != null && a.vincarCostura !== true) return grita(st, i, op, 'vincarCostura', `vincarCostura só aceita o literal true, e veio ${JSON.stringify(a.vincarCostura)}`);
+    return nucleoBooleano(st, i, op, wasm, a.origemId, operandos, null, { vincarCostura: a.vincarCostura === true });
   }
 
   /* O CAMINHO COMUM: sólidos do núcleo entram na Manifold, o resultado volta
@@ -242,7 +246,7 @@ export function criarOperacoesBooleanas(servicos) {
      o resultado a partir dos sólidos já convertidos e devolve junto um sólido
      AUXILIAR (o material do arredondamento), cujas faces não vêm de face
      nenhuma do núcleo e por isso nascem todas com id novo. */
-  function nucleoBooleano(st, i, op, wasm, origemId, operandos, extra) {
+  function nucleoBooleano(st, i, op, wasm, origemId, operandos, extra, { vincarCostura = false } = {}) {
 
     // ---- solda dos cantos coincidentes (representante = menor id) ----
     /* A solda vale ENTRE operandos também: dois cubos idênticos entram com os
@@ -1145,6 +1149,13 @@ export function criarOperacoesBooleanas(servicos) {
       const vs = st.F.get(fid).vs;
       return vs.some((v, k) => { const w = vs[(k + 1) % vs.length]; return costuraFinal.has(v < w ? `${v}-${w}` : `${w}-${v}`); });
     });
+    if (vincarCostura) for (const fid of facesDaCostura) {
+      const f = st.F.get(fid), vs = f.vs;
+      const ja = new Set((f.quebras ?? []).map(([x, y]) => (x < y ? `${x}-${y}` : `${y}-${x}`)));
+      const novas = [];
+      vs.forEach((v, k) => { const w = vs[(k + 1) % vs.length]; const c = v < w ? `${v}-${w}` : `${w}-${v}`; if (costuraFinal.has(c) && !ja.has(c)) { ja.add(c); novas.push([v, w]); } });
+      if (novas.length) f.quebras = [...(f.quebras ?? []), ...novas];
+    }
     if (extra?.aoAplicar) extra.aoAplicar({ pedacosDeEntrada, consumidas: [...consumidas] });
     const MOTIVOS_DO_SEM_EFEITO = {
       longe: (q) => `${q} não toca a peça ou só encosta nela: nenhuma face da peça foi cortada nem consumida e nenhum pedaço novo entrou; confira a posição e o tamanho da ferramenta`,

@@ -17,6 +17,11 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { lerHistorico } from './vitest-duracoes.mjs';
 
 export const TESTES_LENTOS = [
+  /* 2026-11-15: o cordão de solda na costura de tubos, com três junções da fixture do nó de tubos em tubos de anéis de 4 mm e as
+     recusas; 29 s com a máquina livre */
+  'procedural/nucleo/operacoes/friso-na-costura.test.ts',
+  /* 2026-11-15: o arredondarCostura em sete casos da fixture do nó de tubos, dois raios cada; 32 s com a máquina livre */
+  'procedural/nucleo/operacoes/arredondar-costura-no.test.ts',
   /* 2026-11-14: o rastreio declarado do retrato contra a conta completa em onze receitas do acervo, a chapa de prova e o kukri, três caminhos cada; 11 a 13 s com a máquina livre */
   'procedural/nucleo/rastreio-do-retrato.test.ts',
   /* 2026-11-14: os casos de ataque ao rastreio (booleanas coincidentes, três aberturas na mesma chapa, vãos colados) mais a injeção de falha; 14 s com a máquina livre */

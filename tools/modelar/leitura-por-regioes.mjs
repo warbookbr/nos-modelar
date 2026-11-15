@@ -62,6 +62,14 @@
  * quadro, e monta a leitura sobre elas num comando só; `--recorte=x0,y0,z0,x1,y1,z1` (mm do referencial da peça) enquadra a caixa e a
  * `--caixa-ref` é a região da referência que corresponde a ela. Vale para a receita de peça (nome ou caminho) e para o esboço.
  *
+ * POR PARTE E A PRANCHA. Na prancha lateral do carro (2026-11-14), a pessoa achou cinco diferenças apontando um trecho de cada vez, e o
+ * agente acertava cada uma quando o trecho era apontado; a grade cortava a lanterna e a coluna na divisa entre regiões. Com
+ * `--partes=<partes.json>` cada parte declarada em mm vira uma região com o nome dela, ampliada no centro do recorte com um entorno
+ * (`--folga`), e a rodada só vale com toda parte respondida. Com `--prancha=<arquivo.prancha.mjs>` o lado do rascunho é a vista da
+ * prancha só com o desenho (sem cotas, rótulos nem legenda), rasterizada no navegador, e a parte pode citar camadas da prancha; o
+ * pedido diz ao crítico que ali há um desenho de linhas. `--espelhar` vira a referência vista do outro lado. A diferença de
+ * altura sobre largura acima de `LIMITE_DA_PROPORCAO` sai como aviso, porque cada eixo é esticado em separado e esconde a deformação.
+ *
  * USO
  *   npm run leitura:regioes -- --referencia=<png> --caixa-ref=x0,y0,x1,y1 --captura=<png> --saida=<pasta>
  *     [--painel=x0,y0,x1,y1] [--fundo=#rrggbb] [--grade=4x3] [--margem=12] [--objeto="a traseira de uma máquina, vista de trás"]
@@ -74,7 +82,7 @@
  * da captura que contém a peça; sem ele vale o da `<captura>.rapida.json`, se existir, ou o painel da folha do `esboco:nucleo`, achado pela cor de fundo
  * dele, ou a imagem inteira. */
 import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PNG } from 'pngjs';
 
@@ -162,6 +170,15 @@ export function colar(destino, origem, x0, y0) {
     }
   }
 }
+/** A imagem virada na horizontal: a referência vista do lado oposto ao do rascunho. */
+export function espelhada(im) {
+  const sai = imagem(im.largura, im.altura);
+  for (let y = 0; y < im.altura; y += 1) for (let x = 0; x < im.largura; x += 1) {
+    const o = (y * im.largura + x) * 3; const i = (y * im.largura + im.largura - 1 - x) * 3;
+    sai.dados[o] = im.dados[i]; sai.dados[o + 1] = im.dados[i + 1]; sai.dados[o + 2] = im.dados[i + 2];
+  }
+  return sai;
+}
 function ponto(im, x, y, cor) {
   if (x < 0 || y < 0 || x >= im.largura || y >= im.altura) return;
   const o = (y * im.largura + x) * 3; im.dados[o] = cor[0]; im.dados[o + 1] = cor[1]; im.dados[o + 2] = cor[2];
@@ -180,6 +197,10 @@ const GLIFOS = {
   J: '00111 00010 00010 00010 00010 10010 01100', K: '10001 10010 10100 11000 10100 10010 10001', L: '10000 10000 10000 10000 10000 10000 11111',
   N: '10001 11001 10101 10011 10001 10001 10001', O: '01110 10001 10001 10001 10001 10001 01110', R: '11110 10001 10001 11110 10100 10010 10001',
   S: '01111 10000 10000 01110 00001 00001 11110', U: '10001 10001 10001 10001 10001 10001 01110',
+  M: '10001 11011 10101 10101 10001 10001 10001', P: '11110 10001 10001 11110 10000 10000 10000', Q: '01110 10001 10001 10001 10101 10010 01101',
+  T: '11111 00100 00100 00100 00100 00100 00100', V: '10001 10001 10001 10001 10001 01010 00100', W: '10001 10001 10001 10101 10101 10101 01010',
+  X: '10001 10001 01010 00100 01010 10001 10001', Y: '10001 10001 01010 00100 00100 00100 00100', Z: '11111 00001 00010 00100 01000 10000 11111',
+  '-': '00000 00000 00000 11111 00000 00000 00000',
   0: '01110 10001 10011 10101 11001 10001 01110', 1: '00100 01100 00100 00100 00100 00100 01110', 2: '01110 10001 00001 00010 00100 01000 11111',
   3: '11110 00001 00001 01110 00001 00001 11110', 4: '00010 00110 01010 10010 11111 00010 00010', 5: '11111 10000 11110 00001 00001 10001 01110',
   6: '00110 01000 10000 11110 10001 10001 01110', 7: '11111 00001 00010 00100 01000 01000 01000', 8: '01110 10001 10001 01110 10001 10001 01110',
@@ -231,16 +252,60 @@ export function regioesDaGrade(largura, altura, [colunas, linhas] = GRADE_PADRAO
   return regioes;
 }
 
+/* --- as partes declaradas ------------------------------------------------------------------------------------------------------- */
+export const FOLGA_DA_PARTE = 0.15;          // contexto em volta de cada parte, em fração do maior lado dela
+export const FOLGA_MINIMA = 0.03;            // e no mínimo esta fração do objeto
+export const LADO_DO_PAINEL_DA_PARTE = 1200; // px do maior lado do painel de uma parte na folha
+export const LIMITE_DA_PROPORCAO = 0.1;      // acima disto a diferença de altura sobre largura sai como aviso
+const NOME_DA_PARTE = /^[A-Za-z][A-Za-z0-9-]*$/;
+
 /**
- * Monta a leitura: as duas vistas na mesma grade.
- * @param {{ referencia, captura, caixaRef: number[], painel?: number[], fundo?: number[], grade?: number[], margem?: number, linhas? }} o  as imagens no formato de `dePng`; `linhas` é o desenho de `linhas:modelo`
+ * As partes de uma declaração em mm levadas a fração da caixa do objeto, com y para baixo como na imagem.
+ * @param {{ caixa: number[], partes: Record<string, number[]> }} d  `caixa` e cada parte são [a0, b0, a1, b1] em mm, a para a direita e b para cima
+ * @returns {{ nome: string, fracao: number[] }[]}
+ */
+export function partesEmFracao(d, origem = '--partes') {
+  const caixaOk = (c) => Array.isArray(c) && c.length === 4 && c.every(Number.isFinite) && c[2] > c[0] && c[3] > c[1];
+  if (!caixaOk(d?.caixa)) throw new ErroDaLeitura(`${origem}: "caixa" precisa ser [a0, b0, a1, b1] em mm, com a1 > a0 e b1 > b0; veio ${JSON.stringify(d?.caixa)}`);
+  const entradas = Object.entries(d.partes ?? {});
+  if (!entradas.length) throw new ErroDaLeitura(`${origem}: "partes" precisa de pelo menos uma parte { "<nome>": [a0, b0, a1, b1] }`);
+  const [A0, B0, A1, B1] = d.caixa;
+  return entradas.map(([nome, c]) => {
+    if (!NOME_DA_PARTE.test(nome)) throw new ErroDaLeitura(`${origem}: o nome "${nome}" precisa começar por letra e ter só letras sem acento, dígitos e hífen, porque sai escrito na folha`);
+    if (!caixaOk(c)) throw new ErroDaLeitura(`${origem}: a parte "${nome}" precisa ser [a0, b0, a1, b1] em mm, com a1 > a0 e b1 > b0; veio ${JSON.stringify(c)}`);
+    if (c[2] <= A0 || c[0] >= A1 || c[3] <= B0 || c[1] >= B1) throw new ErroDaLeitura(`${origem}: a parte "${nome}" ${JSON.stringify(c)} fica fora da caixa do objeto ${JSON.stringify(d.caixa)}`);
+    return { nome, fracao: [(c[0] - A0) / (A1 - A0), (B1 - c[3]) / (B1 - B0), (c[2] - A0) / (A1 - A0), (B1 - c[1]) / (B1 - B0)] };
+  });
+}
+
+/** As regiões das partes sobre uma imagem de largura x altura com a caixa do objeto a `m` px da borda: [{ nome, x, y, largura, altura }]. */
+export function regioesDasPartes(partes, largura, altura, m, folga = FOLGA_DA_PARTE) {
+  const lw = largura - 2 * m; const lh = altura - 2 * m;
+  return partes.map(({ nome, fracao: [f0, g0, f1, g1] }) => {
+    const px = Math.max(folga * Math.max((f1 - f0) * lw, (g1 - g0) * lh), FOLGA_MINIMA * Math.max(lw, lh));
+    const x0 = Math.max(0, Math.round(m + f0 * lw - px)); const y0 = Math.max(0, Math.round(m + g0 * lh - px));
+    const x1 = Math.min(largura, Math.round(m + f1 * lw + px)); const y1 = Math.min(altura, Math.round(m + g1 * lh + px));
+    return { nome, x: x0, y: y0, largura: x1 - x0, altura: y1 - y0 };
+  });
+}
+
+/**
+ * Monta a leitura: as duas vistas na mesma grade, ou uma região por parte declarada (`partes`, de `partesEmFracao`).
+ * @param {{ referencia, captura, caixaRef: number[], painel?: number[], fundo?: number[], grade?: number[], margem?: number, linhas?, partes?: object[], folga?: number, espelhar?: boolean, rotulo?: string }} o
+ *   as imagens no formato de `dePng`; `linhas` é o desenho de `linhas:modelo`; `espelhar` vira a referência na horizontal, com
+ *   `caixaRef` dada na imagem original; `rotulo` é o nome do lado do rascunho nas imagens (RASCUNHO, ou PRANCHA)
  * @returns {{ indice, folhas: object[], regioes: object[], proporcao: { referencia: number, rascunho: number }, caixaDaCaptura: number[], painel: number[] }}
  */
 export function montarLeitura(o) {
-  const [rx0, ry0, rx1, ry1] = o.caixaRef;
-  if (!(rx1 > rx0 && ry1 > ry0) || rx0 < 0 || ry0 < 0 || rx1 > o.referencia.largura || ry1 > o.referencia.altura) {
+  if (o.caixaRef[0] < 0 || o.caixaRef[2] > o.referencia.largura || !(o.caixaRef[2] > o.caixaRef[0])) {
     throw new ErroDaLeitura(`--caixa-ref ${o.caixaRef.join(',')} não cabe na referência de ${o.referencia.largura} x ${o.referencia.altura} px`);
   }
+  const referencia = o.espelhar ? espelhada(o.referencia) : o.referencia;
+  const [rx0, ry0, rx1, ry1] = o.espelhar ? [o.referencia.largura - o.caixaRef[2], o.caixaRef[1], o.referencia.largura - o.caixaRef[0], o.caixaRef[3]] : o.caixaRef;
+  if (!(rx1 > rx0 && ry1 > ry0) || rx0 < 0 || ry0 < 0 || rx1 > referencia.largura || ry1 > referencia.altura) {
+    throw new ErroDaLeitura(`--caixa-ref ${o.caixaRef.join(',')} não cabe na referência de ${referencia.largura} x ${referencia.altura} px`);
+  }
+  const rotulo = o.rotulo ?? 'RASCUNHO';
   const achado = o.painel ? null : acharPainel(o.captura, o.fundo ?? FUNDO_DO_PAINEL);
   const painel = o.painel ?? achado ?? [0, 0, o.captura.largura, o.captura.altura];
   const fundo = o.fundo ?? (achado ? FUNDO_DO_PAINEL : pixel(o.captura, painel[0], painel[1]));
@@ -248,7 +313,7 @@ export function montarLeitura(o) {
   const margem = o.margem ?? 12;
   const fx = (caixa[2] - caixa[0]) / (rx1 - rx0); const fy = (caixa[3] - caixa[1]) / (ry1 - ry0);
   const L = (rx1 - rx0 + 2 * margem) * AMPLIACAO; const A = (ry1 - ry0 + 2 * margem) * AMPLIACAO;
-  const ref = reamostrar(o.referencia, [rx0 - margem, ry0 - margem, rx1 + margem, ry1 + margem], L, A);
+  const ref = reamostrar(referencia, [rx0 - margem, ry0 - margem, rx1 + margem, ry1 + margem], L, A);
   const ras = reamostrar(o.captura, [caixa[0] - margem * fx, caixa[1] - margem * fy, caixa[2] + margem * fx, caixa[3] + margem * fy], L, A, fundo);
   /* as linhas do modelo, que ocupam a caixa do objeto inteira, sobre a referência clareada */
   let lin = null;
@@ -262,11 +327,19 @@ export function montarLeitura(o) {
     }
   }
   const vistas = lin ? [ref, ras, lin] : [ref, ras];
-  const regioes = regioesDaGrade(L, A, o.grade ?? GRADE_PADRAO).map((r, i) => ({ ...r, folha: Math.floor(i / REGIOES_POR_FOLHA) + 1 }));
-  /* o índice: as duas vistas pela metade, com a grade */
+  const porParte = Boolean(o.partes?.length);
+  const cortes = porParte ? regioesDasPartes(o.partes, L, A, margem * AMPLIACAO, o.folga ?? FOLGA_DA_PARTE) : regioesDaGrade(L, A, o.grade ?? GRADE_PADRAO);
+  const regioes = cortes.map((r, i) => ({ ...r, folha: Math.floor(i / REGIOES_POR_FOLHA) + 1 }));
+  /* o painel de cada região na folha: na grade, do tamanho do corte; por parte, com o maior lado em LADO_DO_PAINEL_DA_PARTE */
+  const tamanho = (r) => {
+    if (!porParte) return [r.largura, r.altura];
+    const s = LADO_DO_PAINEL_DA_PARTE / Math.max(r.largura, r.altura);
+    return [Math.max(1, Math.round(r.largura * s)), Math.max(1, Math.round(r.altura * s))];
+  };
+  /* o índice: as duas vistas pela metade, com a grade ou as partes */
   const e = 0.5; const iw = Math.round(L * e); const ih = Math.round(A * e); const faixa = 40;
   const indice = imagem(vistas.length * (iw + 30) - 30, ih + faixa);
-  escrever(indice, 'REF', 6, 9); escrever(indice, 'RASCUNHO', iw + 36, 9);
+  escrever(indice, 'REF', 6, 9); escrever(indice, rotulo, iw + 36, 9);
   if (lin) escrever(indice, 'LINHAS', 2 * (iw + 30) + 6, 9);
   vistas.forEach((im, k) => {
     const pequena = reamostrar(im, [0, 0, L, A], iw, ih);
@@ -280,40 +353,59 @@ export function montarLeitura(o) {
   const folhas = [];
   for (let k = 0; k < regioes.length; k += REGIOES_POR_FOLHA) {
     const grupo = regioes.slice(k, k + REGIOES_POR_FOLHA);
-    const pw = grupo[0].largura; const ph = grupo[0].altura;
-    const folha = imagem(vistas.length * (pw + 30) - 10, grupo.length * (ph + faixa + 10) + 10);
-    grupo.forEach((r, j) => {
-      const y = j * (ph + faixa + 10) + 10;
-      escrever(folha, r.nome, 10, y + 6, AZUL, 4); escrever(folha, 'REF', 110, y + 9); escrever(folha, 'RASCUNHO', pw + 40, y + 9);
+    const pw = Math.max(...grupo.map((r) => tamanho(r)[0]));
+    const alturas = grupo.map((r) => tamanho(r)[1]);
+    const folha = imagem(vistas.length * (pw + 30) - 10, alturas.reduce((s, h) => s + h + faixa + 10, 0) + 10);
+    let y = 10;
+    grupo.forEach((r) => {
+      const [w, h] = tamanho(r);
+      /* o nome da parte pode ser longo: REF vai depois dele */
+      escrever(folha, r.nome, 10, y + 6, AZUL, 4); escrever(folha, 'REF', Math.max(110, 10 + 24 * (r.nome.length + 1)), y + 9); escrever(folha, rotulo, pw + 40, y + 9);
       if (lin) escrever(folha, 'LINHAS', 2 * pw + 70, y + 9);
-      vistas.forEach((im, lado) => colar(folha, reamostrar(im, [r.x, r.y, r.x + r.largura, r.y + r.altura], pw, ph), 10 + lado * (pw + 30), y + faixa));
+      vistas.forEach((im, lado) => colar(folha, reamostrar(im, [r.x, r.y, r.x + r.largura, r.y + r.altura], w, h), 10 + lado * (pw + 30), y + faixa));
+      y += h + faixa + 10;
     });
     folhas.push(folha);
   }
   const paraRef = (r) => [rx0 - margem + r.x / AMPLIACAO, ry0 - margem + r.y / AMPLIACAO, rx0 - margem + (r.x + r.largura) / AMPLIACAO, ry0 - margem + (r.y + r.altura) / AMPLIACAO].map((v) => Math.round(v));
   return {
-    indice, folhas, painel, caixaDaCaptura: caixa, comLinhas: Boolean(lin),
+    indice, folhas, painel, caixaDaCaptura: caixa, comLinhas: Boolean(lin), porParte, rotulo,
     regioes: regioes.map((r) => ({ nome: r.nome, folha: r.folha, caixaRef: paraRef(r) })),
     proporcao: { referencia: (ry1 - ry0) / (rx1 - rx0), rascunho: (caixa[3] - caixa[1]) / (caixa[2] - caixa[0]) },
   };
 }
 
+/* como o pedido chama o lado do rascunho, por rótulo das imagens */
+const LADOS = {
+  RASCUNHO: { nome: 'um RASCUNHO 3D', curto: 'o rascunho', extra: '' },
+  PRANCHA: {
+    nome: 'uma PRANCHA (um desenho de linhas, sem cor, sem luz e sem volume)', curto: 'a prancha',
+    extra: `\nA prancha só tem linhas: o contorno, as divisas de painel, os vidros, as luzes e as curvas de caráter tracejadas. Compare a
+posição, o tamanho e a forma de cada linha com a borda ou a divisa que a referência mostra no mesmo lugar; cor, reflexo e volume não
+contam, e a falta de cor na prancha não é diferença.`,
+  },
+};
+
 /** O pedido ao crítico: as folhas, as perguntas de cada região e o formato da resposta. */
-export function pedido({ pasta, regioes, folhas, objeto, aceitas = {}, linhas = false, fora = null }) {
+export function pedido({ pasta, regioes, folhas, objeto, aceitas = {}, linhas = false, fora = null, porParte = false, rotulo = 'RASCUNHO' }) {
   const nomes = regioes.map((r) => r.nome);
   const jaAceitas = Object.entries(aceitas).filter(([, v]) => v.length);
-  return `# Leitura por regiões
+  const lado = LADOS[rotulo] ?? LADOS.RASCUNHO;
+  const lista = porParte ? nomes.join(', ') : `${nomes[0]} a ${nomes[nomes.length - 1]}`;
+  return `# Leitura por ${porParte ? 'partes' : 'regiões'}
 
-Você compara um RASCUNHO 3D com a IMAGEM DE REFERÊNCIA do mesmo objeto${objeto ? ` (${objeto})` : ''}, região por região. Você não
-conhece a história da construção e não supõe nada além do que vê.
+Você compara ${lado.nome} com a IMAGEM DE REFERÊNCIA do mesmo objeto${objeto ? ` (${objeto})` : ''}, ${porParte ? 'parte por parte' : 'região por região'}. Você não
+conhece a história da construção e não supõe nada além do que vê.${lado.extra}
 
-Abra com Read, nesta ordem: \`${join(pasta, 'indice.png')}\` (as duas vistas inteiras com a grade; a referência à esquerda e o
-rascunho à direita) e depois ${Array.from({ length: folhas }, (_, i) => `\`${join(pasta, `folha-${String(i + 1).padStart(2, '0')}.png`)}\``).join(', ')}.
-Cada folha traz ${REGIOES_POR_FOLHA} regiões ampliadas, a referência à esquerda e o rascunho à direita, no mesmo recorte e na mesma escala.${linhas ? `
+Abra com Read, nesta ordem: \`${join(pasta, 'indice.png')}\` (as duas vistas inteiras com ${porParte ? 'o quadro de cada parte' : 'a grade'}; a referência à esquerda e
+${lado.curto} à direita) e depois ${Array.from({ length: folhas }, (_, i) => `\`${join(pasta, `folha-${String(i + 1).padStart(2, '0')}.png`)}\``).join(', ')}.
+Cada folha traz até ${REGIOES_POR_FOLHA} ${porParte ? 'partes' : 'regiões'} ampliadas, a referência à esquerda e ${lado.curto} à direita, no mesmo recorte e na mesma escala.${porParte ? `
+Cada região é uma parte do objeto, com o nome dela escrito em maiúsculas na folha e, na resposta, como está na lista abaixo. A parte fica
+no centro do recorte, com um pouco do entorno; diga também se ela está no lugar e no tamanho da referência.` : ''}${linhas ? `
 O terceiro painel, LINHAS, é a referência clareada com as linhas que o MODELO tem, tiradas da geometria dele e não da luz: em
 vermelho o contorno e a divisa entre partes, em azul a quina e o degrau, em verde a dobra fechada da superfície.` : ''}
 
-Para CADA região (${nomes[0]} a ${nomes[nomes.length - 1]}), olhando só a forma (ignore brilho, sombra, textura e acabamento):${fora ? `
+Para CADA ${porParte ? 'parte' : 'região'} (${lista}), olhando só a forma (ignore brilho, sombra, textura e acabamento):${fora ? `
 Não é do corpo modelado, e você não cita: ${fora}.` : ''}
 
 1. Onde é cada cor ou material na referência e onde é no rascunho: as divisas estão no mesmo lugar e têm a mesma forma?
@@ -441,13 +533,109 @@ export function acharContradicoes(respostas, anteriores) {
   return contradicoes;
 }
 
+/* --- a consolidação de vários críticos ------------------------------------------------------------------------------------------- */
+/* palavras de atributo que não nomeiam uma coisa do objeto: duas diferenças só se juntam por uma palavra fora desta lista */
+export const GENERICAS = Object.freeze(new Set(['linha', 'borda', 'contorno', 'forma', 'canto', 'curva', 'divisa', 'perfil', 'base', 'face', 'parte',
+  'lado', 'superior', 'inferior', 'traseiro', 'traseira', 'dianteiro', 'dianteira', 'frontal', 'lateral', 'ponta', 'topo', 'saida', 'entrada',
+  'altura', 'largura', 'posicao', 'tamanho', 'regiao', 'centro', 'meio', 'baixo', 'alto', 'cima']));
+const raiz = (w) => (w.length > 3 && w.endsWith('s') ? w.slice(0, -1) : w);
+/** As palavras de um atributo que nomeiam a coisa: as significativas, no singular, sem as de `GENERICAS`. */
+export const palavrasDaCoisa = (texto) => new Set([...palavras(texto)].map(raiz).filter((w) => !GENERICAS.has(w)));
+
+/** O ponto que `onde` aponta dentro de uma caixa [x0, y0, x1, y1]: um sexto da borda para cada lado dito, o meio no resto. */
+export function pontoDoOnde(onde, [x0, y0, x1, y1]) {
+  const p = palavras(onde);
+  const fx = p.has('esquerda') ? 1 / 6 : p.has('direita') ? 5 / 6 : 0.5;
+  const fy = (p.has('cima') || p.has('alto') || p.has('topo')) ? 1 / 6 : (p.has('embaixo') || p.has('baixo')) ? 5 / 6 : 0.5;
+  return [x0 + fx * (x1 - x0), y0 + fy * (y1 - y0)];
+}
+/** A parte da diferença: na leitura por partes, a da região; na grade, a menor parte cuja caixa contém o ponto do `onde`, ou a mais próxima. */
+export function parteDoPonto([x, y], partes) {
+  const dentro = partes.filter(({ caixaRef: [a, b, c, d] }) => x >= a && x <= c && y >= b && y <= d);
+  const area = ({ caixaRef: [a, b, c, d] }) => (c - a) * (d - b);
+  if (dentro.length) return dentro.reduce((m, p) => (area(p) < area(m) ? p : m)).nome;
+  const dist = ({ caixaRef: [a, b, c, d] }) => Math.hypot(Math.max(a - x, 0, x - c), Math.max(b - y, 0, y - d));
+  return partes.reduce((m, p) => (dist(p) < dist(m) ? p : m)).nome;
+}
+
+/**
+ * Junta as respostas de vários críticos, de leituras em grade e por partes da mesma referência, por parte e pela coisa nomeada.
+ * Cada diferença em campos vai à parte do lugar dela; na mesma parte, duas diferenças cujos atributos dividem uma palavra que nomeia a
+ * coisa (`palavrasDaCoisa`) ficam no mesmo grupo. O apoio de um grupo é quantos críticos do alvo o disseram; o controle, quantos
+ * críticos do controle disseram, na mesma parte, um atributo que divide uma dessas palavras. A frase antiga, sem campos, não entra.
+ * @param {{ partes: { nome: string, caixaRef: number[] }[], alvo: Leitura[], controle?: Leitura[] }} o
+ *   Leitura = { regioes: { nome, caixaRef }[], porParte: boolean, criticos: { id: string, respostas: object }[] }
+ * @returns {{ grupos: object[], criticos: { alvo: number, controle: number } }}
+ */
+export function consolidar({ partes, alvo, controle = [] }) {
+  const diferencasDe = (leituras) => leituras.flatMap((l) => l.criticos.flatMap(({ id, respostas }) => Object.entries(respostas.regioes ?? {}).flatMap(([regiao, r]) => {
+    const caixa = l.regioes.find((x) => x.nome === regiao)?.caixaRef;
+    return (r.diferencas ?? []).filter(ehObjeto).map((d) => ({
+      critico: id, regiao, ...d,
+      parte: l.porParte ? regiao : parteDoPonto(pontoDoOnde(d.onde, caixa), partes),
+      coisas: palavrasDaCoisa(d.atributo),
+    }));
+  })));
+  const doAlvo = diferencasDe(alvo); const doControle = diferencasDe(controle);
+  /* os grupos: união por parte e palavra em comum */
+  const pai = doAlvo.map((_, i) => i);
+  const achar = (i) => (pai[i] === i ? i : (pai[i] = achar(pai[i])));
+  for (let i = 0; i < doAlvo.length; i += 1) for (let j = i + 1; j < doAlvo.length; j += 1) {
+    if (doAlvo[i].parte === doAlvo[j].parte && [...doAlvo[i].coisas].some((w) => doAlvo[j].coisas.has(w))) pai[achar(j)] = achar(i);
+  }
+  const porRaiz = new Map();
+  doAlvo.forEach((d, i) => { const k = achar(i); if (!porRaiz.has(k)) porRaiz.set(k, []); porRaiz.get(k).push(d); });
+  const total = (ls) => ls.reduce((s, l) => s + l.criticos.length, 0);
+  const grupos = [...porRaiz.values()].map((ds) => {
+    const contagem = new Map();
+    for (const d of ds) for (const w of d.coisas) contagem.set(w, (contagem.get(w) ?? 0) + 1);
+    const coisas = [...contagem.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([w]) => w);
+    const nomes = new Set(coisas);
+    const doControleAqui = doControle.filter((c) => c.parte === ds[0].parte && [...c.coisas].some((w) => nomes.has(w)));
+    return {
+      parte: ds[0].parte, coisas: coisas.slice(0, 4),
+      apoio: new Set(ds.map((d) => d.critico)).size, controle: new Set(doControleAqui.map((d) => d.critico)).size,
+      tipos: [...new Set(ds.map((d) => d.tipo))],
+      ditos: ds.map((d) => ({ critico: d.critico, regiao: d.regiao, atributo: d.atributo, referencia: d.referencia, modelo: d.modelo })),
+      noControle: doControleAqui.map((d) => ({ critico: d.critico, regiao: d.regiao, atributo: d.atributo, referencia: d.referencia, modelo: d.modelo })),
+    };
+  }).sort((a, b) => (b.apoio - b.controle) - (a.apoio - a.controle) || b.apoio - a.apoio || a.parte.localeCompare(b.parte) || a.coisas.join().localeCompare(b.coisas.join()));
+  return { grupos, criticos: { alvo: total(alvo), controle: total(controle) } };
+}
+
+/** O relato da consolidação em texto: os grupos com apoio de pelo menos `minimo` críticos primeiro, depois o resto numa linha cada. */
+export function relatoDaConsolidacao({ grupos, criticos }, minimo = 2) {
+  const linha = (g) => `${g.parte} — ${g.coisas.join(', ') || '(sem nome)'}: ${g.apoio} de ${criticos.alvo} críticos${criticos.controle ? `, ${g.controle} de ${criticos.controle} no controle` : ''}`;
+  const fortes = grupos.filter((g) => g.apoio >= minimo);
+  const fracos = grupos.filter((g) => g.apoio < minimo);
+  const exemplo = (d) => `    - ${d.atributo}: ${d.referencia} na referência, ${d.modelo} no desenho`;
+  return `# Leitura consolidada\n\n${criticos.alvo} críticos no alvo${criticos.controle ? ` e ${criticos.controle} no controle` : ''}. ${fortes.length} grupos com pelo menos ${minimo} críticos, ${fracos.length} com menos.\n\n`
+    + `## Ditos por pelo menos ${minimo} críticos\n\n${fortes.map((g) => `- ${linha(g)}\n${g.ditos.slice(0, 3).map(exemplo).join('\n')}`).join('\n') || '(nenhum)'}\n\n`
+    + `## Ditos por menos\n\n${fracos.map((g) => `- ${linha(g)}`).join('\n') || '(nenhum)'}\n`;
+}
+
 /* --- linha de comando ------------------------------------------------------------------------------------------------------------ */
 const AJUDA = `npm run leitura:regioes -- --referencia=<png> --caixa-ref=x0,y0,x1,y1 --captura=<png> --saida=<pasta>
     [--painel=x0,y0,x1,y1] [--fundo=#rrggbb] [--grade=4x3] [--margem=12] [--objeto="<o que é e de onde é visto>"]
     [--linhas=<png de linhas:modelo>] [--fora="<o que aparece na referência e não é da peça>"]
 npm run leitura:regioes -- --referencia=<png> --caixa-ref=x0,y0,x1,y1 --modelo=<esboço ou peça> --vista=<vista> --saida=<pasta>
     [--recorte=x0,y0,z0,x1,y1,z1] [--ate-passo=N] [--opcao=1] [--largura=900] [--composicoes=<módulo>] [--grade=4x3] [--objeto=...] [--fora=...]
+npm run leitura:regioes -- --referencia=<png> --caixa-ref=x0,y0,x1,y1 --prancha=<arquivo.prancha.mjs> --saida=<pasta>
+    [--vista=<vista>] [--partes=<partes.json>] [--folga=0.15] [--espelhar] [--objeto=...] [--fora=...]
 npm run leitura:regioes -- --saida=<pasta> --registrar=<respostas.json>
+npm run leitura:regioes -- --consolidar=<config.json> --saida=<pasta>
+
+--consolidar junta as respostas de vários críticos, de leituras em grade e por partes da mesma referência no mesmo quadro: cada
+diferença vai à parte do lugar dela, e as que dividem a coisa nomeada no atributo formam um grupo, com quantos críticos o disseram
+e quantos do controle (a prancha anterior, por exemplo) disseram o mesmo na mesma parte. config: { "partes": "<pasta da leitura
+por partes>", "alvo": [{ "leitura": "<pasta>", "respostas": ["<r.json>", ...] }], "controle": [...], "minimo": 2 }, com os
+caminhos a partir da pasta da config. Grava consolidado.json e consolidado.md.
+
+Com --partes=<partes.json>, { "caixa": [a0, b0, a1, b1], "partes": { "<nome>": [a0, b0, a1, b1] } } em mm (a para a direita, b para
+cima, a caixa é a do objeto inteiro), cada parte vira uma região com o nome dela, no lugar da grade; com --prancha a caixa é a da
+prancha e a parte pode ser { "camadas": ["<nome da camada>", ...] }. --folga é o entorno de cada parte, em fração do maior lado dela.
+Com --prancha, o lado do rascunho é a vista da prancha só com as linhas, sem cotas, rótulos nem legenda.
+--espelhar vira a referência na horizontal (vista do lado oposto); a --caixa-ref continua dada na imagem original.
 
 Corta a referência e a captura do rascunho na mesma grade e grava indice.png, folha-NN.png, pedido.md e leitura.json.
 Com --modelo, a captura (a vista rápida) e as linhas saem da própria malha do esboço ou da receita de peça, no mesmo quadro, e
@@ -474,14 +662,57 @@ const rodadasAnteriores = (dir) => (existsSync(dir) ? readdirSync(dir).filter((f
  * Grava a leitura montada por `montarLeitura` na pasta: `indice.png`, `folha-NN.png`, `pedido.md` (com as aceitas da última rodada
  * da pasta) e `leitura.json`. `referencia` e `captura` são os caminhos como vão no JSON. Devolve o caminho do pedido.
  */
-export function gravarLeitura(pasta, r, { referencia, captura, caixaRef, grade, objeto = null, fora = null }) {
+export function gravarLeitura(pasta, r, { referencia, captura, caixaRef, grade, objeto = null, fora = null, espelhar = false }) {
   mkdirSync(pasta, { recursive: true });
   writeFileSync(join(pasta, 'indice.png'), paraPng(r.indice));
   r.folhas.forEach((f, i) => writeFileSync(join(pasta, `folha-${String(i + 1).padStart(2, '0')}.png`), paraPng(f)));
   const { ultima } = ultimaRodada(pasta);
-  writeFileSync(join(pasta, 'pedido.md'), pedido({ pasta, regioes: r.regioes, folhas: r.folhas.length, objeto, aceitas: ultima?.aceitas ?? {}, linhas: r.comLinhas, fora }));
-  writeFileSync(join(pasta, 'leitura.json'), `${JSON.stringify({ formato: 'modelar.leitura-por-regioes@1', referencia, captura, caixaRef, painel: r.painel, caixaDaCaptura: r.caixaDaCaptura, grade, proporcao: { referencia: Number(r.proporcao.referencia.toFixed(4)), rascunho: Number(r.proporcao.rascunho.toFixed(4)) }, regioes: r.regioes }, null, 1)}\n`);
+  writeFileSync(join(pasta, 'pedido.md'), pedido({ pasta, regioes: r.regioes, folhas: r.folhas.length, objeto, aceitas: ultima?.aceitas ?? {}, linhas: r.comLinhas, fora, porParte: r.porParte, rotulo: r.rotulo }));
+  writeFileSync(join(pasta, 'leitura.json'), `${JSON.stringify({ formato: 'modelar.leitura-por-regioes@1', referencia, captura, caixaRef, ...(espelhar ? { espelhar: true } : {}), painel: r.painel, caixaDaCaptura: r.caixaDaCaptura, grade: r.porParte ? 'partes' : grade, proporcao: { referencia: Number(r.proporcao.referencia.toFixed(4)), rascunho: Number(r.proporcao.rascunho.toFixed(4)) }, regioes: r.regioes }, null, 1)}\n`);
   return join(pasta, 'pedido.md');
+}
+
+/**
+ * `--consolidar=<config.json>`: lê as leituras e as respostas de cada crítico, confere cada resposta contra a leitura dela e grava
+ * `consolidado.json` e `consolidado.md` na pasta de saída. Os caminhos da config valem a partir da pasta dela.
+ * config: { "partes": "<pasta da leitura por partes>", "alvo": [{ "leitura": "<pasta>", "respostas": ["<r.json>", ...] }], "controle"?: [...], "minimo"?: 2 }
+ */
+function consolidarPeloComando(arquivo, pasta) {
+  const cfg = JSON.parse(readFileSync(arquivo, 'utf8'));
+  const aqui = (p) => resolve(dirname(arquivo), p);
+  const lerLeitura = (p) => JSON.parse(readFileSync(join(aqui(p), 'leitura.json'), 'utf8'));
+  if (typeof cfg.partes !== 'string' || !Array.isArray(cfg.alvo) || !cfg.alvo.length) {
+    throw new ErroDaLeitura(`--consolidar: a config precisa de "partes" (a pasta da leitura por partes) e de "alvo": [{ "leitura": "<pasta>", "respostas": ["<r.json>", ...] }]; veio ${Object.keys(cfg).join(', ') || 'nada'}`);
+  }
+  const partes = lerLeitura(cfg.partes);
+  if (partes.grade !== 'partes') throw new ErroDaLeitura(`--consolidar: "partes" aponta ${cfg.partes}, que é uma leitura em grade; rode a leitura com --partes e aponte a pasta dela`);
+  const recusas = [];
+  const montar = (lista, papel) => (lista ?? []).map((item, i) => {
+    if (typeof item?.leitura !== 'string' || !Array.isArray(item.respostas) || !item.respostas.length) {
+      recusas.push(`${papel} ${i + 1}: precisa de "leitura" e de "respostas" com pelo menos um arquivo`);
+      return { regioes: [], porParte: false, criticos: [] };
+    }
+    const l = lerLeitura(item.leitura);
+    if (JSON.stringify(l.caixaRef) !== JSON.stringify(partes.caixaRef) || Boolean(l.espelhar) !== Boolean(partes.espelhar)) {
+      recusas.push(`${papel} ${item.leitura}: a leitura tem --caixa-ref ${l.caixaRef} e espelhar ${Boolean(l.espelhar)}, e a das partes ${partes.caixaRef} e ${Boolean(partes.espelhar)}; as duas precisam ser da mesma referência no mesmo quadro`);
+    }
+    const criticos = item.respostas.map((r) => {
+      const respostas = JSON.parse(readFileSync(aqui(r), 'utf8'));
+      const c = conferirRespostas(l.regioes, respostas);
+      recusas.push(...c.recusas.map((x) => `${papel} ${r}: ${x}`));
+      return { id: r, respostas };
+    });
+    return { regioes: l.regioes, porParte: l.grade === 'partes', criticos };
+  });
+  const alvo = montar(cfg.alvo, 'alvo'); const controle = montar(cfg.controle, 'controle');
+  if (recusas.length) return { codigo: 1, stdout: '', stderr: `consolidação recusada:\n${recusas.map((x) => `- ${x}`).join('\n')}\n` };
+  const r = consolidar({ partes: partes.regioes, alvo, controle });
+  const minimo = cfg.minimo ?? 2;
+  mkdirSync(pasta, { recursive: true });
+  writeFileSync(join(pasta, 'consolidado.json'), `${JSON.stringify({ formato: 'modelar.leitura-consolidada@1', minimo, ...r }, null, 1)}\n`);
+  const md = relatoDaConsolidacao(r, minimo);
+  writeFileSync(join(pasta, 'consolidado.md'), md);
+  return { codigo: 0, stdout: `${md}\n${join(pasta, 'consolidado.md')}\n`, stderr: '' };
 }
 
 export function executar(argv) {
@@ -491,6 +722,7 @@ export function executar(argv) {
     const saida = valor('saida');
     if (!saida) throw new ErroDaLeitura('falta --saida=<pasta>');
     const pasta = resolve(saida);
+    if (valor('consolidar')) return consolidarPeloComando(resolve(valor('consolidar')), pasta);
     if (valor('registrar')) {
       const leitura = JSON.parse(readFileSync(join(pasta, 'leitura.json'), 'utf8'));
       const respostas = JSON.parse(readFileSync(resolve(valor('registrar')), 'utf8'));
@@ -522,15 +754,25 @@ export function executar(argv) {
     let lado = null;
     const arquivoDoLado = `${resolve(valor('captura'))}.rapida.json`;
     if (!valor('painel') && !cor && existsSync(arquivoDoLado)) { try { lado = JSON.parse(readFileSync(arquivoDoLado, 'utf8')); } catch { lado = null; } }
+    if (valor('partes') && valor('grade')) throw new ErroDaLeitura('--partes e --grade se excluem: a região é a parte declarada ou a célula da grade');
+    const partes = valor('partes') ? partesEmFracao(JSON.parse(readFileSync(resolve(valor('partes')), 'utf8')), `--partes=${valor('partes')}`) : undefined;
+    const folga = valor('folga') === null ? undefined : Number(valor('folga'));
+    if (folga !== undefined && !(folga >= 0 && folga <= 2)) throw new ErroDaLeitura(`--folga espera uma fração entre 0 e 2 do maior lado da parte; veio ${valor('folga')}`);
+    const rotulo = valor('rotulo') ?? undefined;
+    if (rotulo !== undefined && !LADOS[rotulo]) throw new ErroDaLeitura(`--rotulo espera ${Object.keys(LADOS).join(' ou ')}; veio ${rotulo}`);
+    const espelhar = argv.includes('--espelhar');
     const r = montarLeitura({
       referencia: dePng(readFileSync(resolve(valor('referencia')))), captura: dePng(readFileSync(resolve(valor('captura')))),
       caixaRef: numeros(valor('caixa-ref'), 4, '--caixa-ref'), painel: valor('painel') ? numeros(valor('painel'), 4, '--painel') : lado?.painel,
       fundo: cor ? [1, 3, 5].map((i) => parseInt(cor.slice(i, i + 2), 16)) : lado?.fundo, grade, margem: valor('margem') ? Number(valor('margem')) : undefined,
-      linhas: valor('linhas') ? dePng(readFileSync(resolve(valor('linhas')))) : undefined,
+      linhas: valor('linhas') ? dePng(readFileSync(resolve(valor('linhas')))) : undefined, partes, folga, espelhar, rotulo,
     });
-    gravarLeitura(pasta, r, { referencia: valor('referencia'), captura: valor('captura'), caixaRef: numeros(valor('caixa-ref'), 4, '--caixa-ref'), grade, objeto: valor('objeto'), fora: valor('fora') });
+    gravarLeitura(pasta, r, { referencia: valor('referencia'), captura: valor('captura'), caixaRef: numeros(valor('caixa-ref'), 4, '--caixa-ref'), grade, objeto: valor('objeto'), fora: valor('fora'), espelhar });
     const desvio = (r.proporcao.rascunho / r.proporcao.referencia - 1) * 100;
-    return { codigo: 0, stdout: `${lado ? `painel e fundo da vista rápida, de ${arquivoDoLado}\n` : ''}${r.regioes.length} regiões em ${r.folhas.length} folhas, em ${pasta}\naltura sobre largura: referência ${r.proporcao.referencia.toFixed(3)}, rascunho ${r.proporcao.rascunho.toFixed(3)} (${desvio >= 0 ? '+' : ''}${desvio.toFixed(1)}%)\npedido ao crítico: ${join(pasta, 'pedido.md')}\n`, stderr: '' };
+    const aviso = Math.abs(desvio) > LIMITE_DA_PROPORCAO * 100
+      ? `AVISO: a altura sobre a largura difere ${Math.abs(desvio).toFixed(1)}%, acima de ${LIMITE_DA_PROPORCAO * 100}%: cada eixo é esticado em separado, então confira no índice se as partes caem umas sobre as outras; se não caem, a --caixa-ref está errada ou a referência é deformada, e a leitura engana\n`
+      : '';
+    return { codigo: 0, stdout: `${lado ? `painel e fundo da vista rápida, de ${arquivoDoLado}\n` : ''}${r.regioes.length} ${partes ? 'partes' : 'regiões'} em ${r.folhas.length} folhas, em ${pasta}\naltura sobre largura: referência ${r.proporcao.referencia.toFixed(3)}, ${(r.rotulo ?? 'rascunho').toLowerCase()} ${r.proporcao.rascunho.toFixed(3)} (${desvio >= 0 ? '+' : ''}${desvio.toFixed(1)}%)\n${aviso}pedido ao crítico: ${join(pasta, 'pedido.md')}\n`, stderr: '' };
   } catch (erro) {
     if (erro instanceof ErroDaLeitura || erro?.code === 'ENOENT' || erro instanceof SyntaxError) return { codigo: 2, stdout: '', stderr: `leitura:regioes: ${erro.message}\n` };
     throw erro;
@@ -544,6 +786,7 @@ export function executar(argv) {
  */
 export async function executarComModelo(argv) {
   const valor = (nome) => { const a = argv.find((x) => x.startsWith(`--${nome}=`)); return a === undefined ? null : a.slice(nome.length + 3); };
+  if (valor('prancha') !== null && !valor('registrar')) return executarComPrancha(argv);
   if (valor('modelo') === null || valor('registrar')) return executar(argv);
   try {
     for (const n of ['vista', 'saida', 'referencia', 'caixa-ref']) if (!valor(n)) throw new ErroDaLeitura(`falta --${n}`);
@@ -578,6 +821,113 @@ export async function executarComModelo(argv) {
     return { ...r, stdout: `${abertura ? `${abertura}\n` : ''}captura e linhas da malha de ${valor('modelo')}, vista ${valor('vista')}${recorte ? `, recorte ${recorte.min.join(', ')} a ${recorte.max.join(', ')} mm` : ''}, ${cap.mmPorPx.toFixed(2)} mm por px\n${r.stdout}` };
   } catch (erro) {
     if (erro instanceof ErroDaLeitura) return { codigo: 2, stdout: '', stderr: `leitura:regioes: ${erro.message}\n` };
+    throw erro;
+  }
+}
+
+/* --- a prancha como lado do rascunho --------------------------------------------------------------------------------------------- */
+export const FUNDO_DA_PRANCHA = Object.freeze([0xfb, 0xfb, 0xfa]);
+
+const caixaDosPontos = (pts) => {
+  const as = pts.map((p) => p[0]); const bs = pts.map((p) => p[1]);
+  return [Math.min(...as), Math.min(...bs), Math.max(...as), Math.max(...bs)];
+};
+/** A caixa [a0, b0, a1, b1] em mm de uma camada da prancha: os pontos, ou o círculo inteiro. */
+export function caixaDaCamada(c) {
+  if (c.tipo === 'circulo') return [c.centro[0] - c.raio, c.centro[1] - c.raio, c.centro[0] + c.raio, c.centro[1] + c.raio];
+  if (!Array.isArray(c.pts) || !c.pts.length) return null;
+  return caixaDosPontos(c.pts);
+}
+const uniao = (a, b) => (a ? [Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.max(a[2], b[2]), Math.max(a[3], b[3])] : b);
+
+/**
+ * A prancha de uma vista só com o desenho (contorno, painéis, vidros, luzes, curvas de caráter e rodas), sem título, rótulos, cotas,
+ * marcos nem legenda, e a caixa em mm do que ela desenha: a do contorno no relatório da prancha somada às camadas fora dele (as rodas).
+ * @param {object} espec  a especificação que `prancha()` recebe (o `ESPEC` do arquivo da prancha)
+ * @param {(espec: object) => { svg: string, relatorio: object }} desenhar  `prancha` de tools/modelar/prancha/prancha.mjs
+ * @returns {{ vista: string, svg: string, caixa: number[], camadas: Record<string, number[]> }}
+ */
+export function pranchaSoDesenho(espec, desenhar, vista = null) {
+  const vistas = Object.keys(espec?.vistas ?? {});
+  if (!vistas.length || !Array.isArray(espec.camadas)) throw new ErroDaLeitura('--prancha: o arquivo precisa exportar ESPEC com "vistas" e "camadas", como o que prancha() recebe');
+  const v = vista ?? (vistas.length === 1 ? vistas[0] : null);
+  if (!v) throw new ErroDaLeitura(`--prancha tem as vistas ${vistas.join(', ')}: diga qual com --vista=<vista>`);
+  if (!vistas.includes(v)) throw new ErroDaLeitura(`--vista=${v} não é da prancha, que tem ${vistas.join(', ')}`);
+  const e = { ...espec, titulo: '', subtitulo: '', vistas: { [v]: { ...espec.vistas[v], rotulo: '' } }, camadas: espec.camadas.filter((c) => c.vista === v), cotas: [], landmarks: [] };
+  delete e.legenda; delete e.familia;
+  const { svg, relatorio } = desenhar(e);
+  const contorno = relatorio?.porVista?.[v]?.caixa;
+  let caixa = contorno ? [contorno.xMin, contorno.yMin, contorno.xMax, contorno.yMax] : null;
+  const camadas = {};
+  for (const c of e.camadas) {
+    const k = caixaDaCamada(c);
+    if (!k) continue;
+    camadas[c.nome] = k;
+    if (c.foraDoContorno || !contorno) caixa = uniao(caixa, k);
+  }
+  if (!caixa) throw new ErroDaLeitura(`--prancha: a vista ${v} não desenha nada`);
+  return { vista: v, svg, caixa, camadas };
+}
+
+/**
+ * As partes de um `--partes` para a prancha: cada parte é [a0, b0, a1, b1] em mm ou { "camadas": ["<nome>", ...] }, a caixa das camadas
+ * da prancha somadas; a caixa do objeto é a da prancha quando o arquivo não a traz.
+ */
+export function partesDaPrancha(d, desenho, origem = '--partes') {
+  const partes = {};
+  for (const [nome, p] of Object.entries(d?.partes ?? {})) {
+    if (Array.isArray(p)) { partes[nome] = p; continue; }
+    const lista = p?.camadas;
+    if (!Array.isArray(lista) || !lista.length) throw new ErroDaLeitura(`${origem}: a parte "${nome}" precisa ser [a0, b0, a1, b1] em mm ou { "camadas": ["<nome>", ...] }`);
+    const faltam = lista.filter((n) => !desenho.camadas[n]);
+    if (faltam.length) throw new ErroDaLeitura(`${origem}: a parte "${nome}" cita camadas que a vista ${desenho.vista} da prancha não tem: ${faltam.join(', ')}; as que ela tem: ${Object.keys(desenho.camadas).join(', ')}`);
+    partes[nome] = lista.reduce((k, n) => uniao(k, desenho.camadas[n]), null);
+  }
+  return { caixa: d?.caixa ?? desenho.caixa, partes };
+}
+
+/** O SVG rasterizado no navegador, com o dobro da resolução, como o `olhar.mjs` faz. */
+async function rasterizarSvg(svg) {
+  const { chromium } = await import('playwright');
+  const { lancarChromium } = await import('./navegador.mjs');
+  const navegador = await lancarChromium(chromium);
+  try {
+    const pagina = await navegador.newPage({ viewport: { width: 1600, height: 900 }, deviceScaleFactor: 2 });
+    await pagina.setContent(`<!doctype html><meta charset="utf-8"><style>body{margin:0}svg{display:block}</style>${svg}`, { waitUntil: 'load' });
+    return await pagina.locator('svg').first().screenshot();
+  } finally { await navegador.close(); }
+}
+
+/**
+ * `executar` com `--prancha`: desenha a vista da prancha só com as linhas, rasteriza, grava `prancha.svg` e `prancha.png` na pasta da
+ * leitura e monta a leitura sobre elas, com o lado do rascunho chamado PRANCHA. Com `--partes`, as partes podem citar camadas da
+ * prancha, e o arquivo resolvido em mm vai para `partes.json` na pasta.
+ */
+export async function executarComPrancha(argv) {
+  const valor = (nome) => { const a = argv.find((x) => x.startsWith(`--${nome}=`)); return a === undefined ? null : a.slice(nome.length + 3); };
+  try {
+    for (const n of ['saida', 'referencia', 'caixa-ref']) if (!valor(n)) throw new ErroDaLeitura(`falta --${n}`);
+    if (valor('captura') || valor('modelo')) throw new ErroDaLeitura('--prancha não se combina com --captura nem com --modelo: o lado do rascunho é a prancha');
+    const { pathToFileURL } = await import('node:url');
+    const { prancha } = await import('./prancha/prancha.mjs');
+    const modulo = await import(pathToFileURL(resolve(valor('prancha'))).href);
+    const desenho = pranchaSoDesenho(modulo.ESPEC ?? modulo.default, prancha, valor('vista'));
+    const pasta = resolve(valor('saida')); mkdirSync(pasta, { recursive: true });
+    writeFileSync(join(pasta, 'prancha.svg'), desenho.svg);
+    const png = await rasterizarSvg(desenho.svg);
+    writeFileSync(join(pasta, 'prancha.png'), png);
+    const im = dePng(png);
+    const extra = [`--captura=${join(pasta, 'prancha.png')}`, `--painel=0,0,${im.largura},${im.altura}`, `--fundo=#${FUNDO_DA_PRANCHA.map((c) => c.toString(16).padStart(2, '0')).join('')}`, '--rotulo=PRANCHA'];
+    if (valor('partes')) {
+      const resolvidas = partesDaPrancha(JSON.parse(readFileSync(resolve(valor('partes')), 'utf8')), desenho, `--partes=${valor('partes')}`);
+      writeFileSync(join(pasta, 'partes.json'), `${JSON.stringify(resolvidas, null, 1)}\n`);
+      extra.push(`--partes=${join(pasta, 'partes.json')}`);
+    }
+    const repasse = argv.filter((a) => !/^--(prancha|vista|partes)=/.test(a));
+    const r = executar([...repasse, ...extra]);
+    return { ...r, stdout: `prancha ${valor('prancha')}, vista ${desenho.vista}, caixa ${desenho.caixa.map((v) => Math.round(v)).join(', ')} mm\n${r.stdout}` };
+  } catch (erro) {
+    if (erro instanceof ErroDaLeitura || erro?.code === 'ENOENT' || erro instanceof SyntaxError) return { codigo: 2, stdout: '', stderr: `leitura:regioes: ${erro.message}\n` };
     throw erro;
   }
 }

@@ -253,8 +253,10 @@ function malhaDaPeca(receita) {
 function blenderFalso() {
   const chamadas = [];
   const executar = (_blender, argv) => {
-    const script = argv[3].split('/').pop();
-    const args = argv.slice(5);
+    /* o script vem depois de `--python` e os argumentos dele depois de `--`, onde quer que as opções do Blender os ponham */
+    const script = argv[argv.indexOf('--python') + 1].split(/[\\/]/).pop();
+    const args = argv.slice(argv.indexOf('--') + 1);
+    expect(argv.slice(0, argv.indexOf('--'))).toContain('--python-exit-code');
     const opcao = (nome) => { const i = args.indexOf(nome); return i < 0 ? null : args[i + 1]; };
     chamadas.push({ script, args });
     const prefixo = opcao('--saida');

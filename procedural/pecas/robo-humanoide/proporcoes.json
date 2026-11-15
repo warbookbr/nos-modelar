@@ -1,0 +1,928 @@
+{
+  "formato": "mecanifica.proporcoes@1",
+  "id": "robo-humanoide-braco-direito",
+  "unidade": "mm",
+  "nota": "Fonte única das medidas do braço direito (opção B de 2026-11-14). A escala de referência é alturaDoRobo. O andaime.json é gerado daqui e os números marcados com \"// @proporcao nome\" nas TABELAs das receitas são escritos daqui: `npm run proporcoes -- --proporcoes=procedural/pecas/robo-humanoide/proporcoes.json --escrever`. Sem --escrever, o mesmo comando confere.",
+  "medidas": {
+    "alturaDoRobo": 1750,
+    "eixoDoBraco": 250,
+    "alturaDoOmbro": 1435,
+    "diametroDoDisco": 110,
+    "espessuraDoDisco": 50,
+    "comprimentoDoBraco": 330,
+    "comprimentoDoAntebraco": 230,
+    "comprimentoDaMao": 190,
+    "larguraDoBraco": 100,
+    "profundidadeDoBraco": 115,
+    "larguraDoAntebraco": 85,
+    "profundidadeDoAntebraco": 95,
+    "diametroDoCotovelo": 76,
+    "larguraDoCotovelo": 90,
+    "diametroDoPunho": 64,
+    "alturaDoPunho": 30,
+    "raioDoFuroDoPunho": 20,
+    "larguraDaPalma": 90,
+    "espessuraDaPalma": 28,
+    "comprimentoDaPalma": 115,
+    "passoEntreDedos": 22,
+    "falangeProximal": 32,
+    "falangeMedia": 24,
+    "falangeDistal": "=comprimentoDaMao - comprimentoDaPalma - falangeProximal - falangeMedia",
+    "larguraProximal": 20,
+    "espessuraProximal": 18,
+    "larguraMedia": 19,
+    "espessuraMedia": 17,
+    "larguraDistal": 18,
+    "espessuraDistal": 16,
+    "raioDoEixoDeAbducao": 14,
+    "raioDoPinoDoCotovelo": 12,
+    "raioDoEixoDeFlexaoDoPunho": 6,
+    "raioDoPinoDosDedos": 3,
+    "recuoDoBracoNoOmbro": 20,
+    "recuoDoBracoNoCotovelo": 30,
+    "recuoDoAntebracoNasJuntas": 25,
+    "yDoCotovelo": "=alturaDoOmbro - comprimentoDoBraco",
+    "yDoPunho": "=yDoCotovelo - comprimentoDoAntebraco",
+    "yDosNos": "=yDoPunho - comprimentoDaPalma",
+    "yDaPonta": "=yDoPunho - comprimentoDaMao",
+    "baseDoEnvelope": "=yDaPonta - 5",
+    "topoDoEnvelope": "=alturaDoOmbro + 60"
+  },
+  "andaime": {
+    "arquivo": "andaime.json",
+    "modelo": {
+      "formato": "mecanifica.andaime-global@2",
+      "id": "esqueleto-braco-direito",
+      "objetivo": "esqueleto-do-braco-direito",
+      "alvo": "alvo-braco-direito",
+      "familia": "humanoide",
+      "intencao": "Esqueleto do braço direito de um robô humanoide de 1.750 mm na pose zero (braço pendente, palma voltada para o corpo): uma caixa ou cilindro planejado por instância da montagem e uma porta por eixo de junta.",
+      "unidade": "mm",
+      "eixos": {
+        "direita": "+x",
+        "cima": "+y",
+        "frente": "+z"
+      },
+      "envelope": {
+        "min": [
+          190,
+          "=baseDoEnvelope",
+          -70
+        ],
+        "max": [
+          310,
+          "=topoDoEnvelope",
+          90
+        ]
+      },
+      "landmarks": [
+        {
+          "id": "centro-do-conjunto",
+          "posicao": [
+            250,
+            "=(baseDoEnvelope + topoDoEnvelope) / 2",
+            0
+          ]
+        },
+        {
+          "id": "centro-do-ombro",
+          "posicao": [
+            "=eixoDoBraco",
+            "=alturaDoOmbro",
+            0
+          ]
+        },
+        {
+          "id": "centro-do-cotovelo",
+          "posicao": [
+            "=eixoDoBraco",
+            "=yDoCotovelo",
+            0
+          ]
+        },
+        {
+          "id": "centro-do-punho",
+          "posicao": [
+            "=eixoDoBraco",
+            "=yDoPunho",
+            0
+          ]
+        },
+        {
+          "id": "linha-dos-nos",
+          "posicao": [
+            "=eixoDoBraco",
+            "=yDosNos",
+            0
+          ]
+        },
+        {
+          "id": "ponta-do-dedo-medio",
+          "posicao": [
+            "=eixoDoBraco",
+            "=yDaPonta",
+            "=passoEntreDedos / 2"
+          ]
+        }
+      ],
+      "volumes": [
+        {
+          "id": "ombro",
+          "regioes": [
+            "braco-direito",
+            "ombro"
+          ],
+          "tipo": "cilindro",
+          "centro": [
+            "=eixoDoBraco",
+            "=alturaDoOmbro",
+            0
+          ],
+          "eixo": "x",
+          "raio": "=diametroDoDisco / 2",
+          "comprimento": "=espessuraDoDisco",
+          "segmentos": 24
+        },
+        {
+          "id": "braco",
+          "regioes": [
+            "braco-direito",
+            "braco"
+          ],
+          "tipo": "caixa",
+          "centro": [
+            "=eixoDoBraco",
+            "=(alturaDoOmbro - recuoDoBracoNoOmbro + yDoCotovelo + recuoDoBracoNoCotovelo) / 2",
+            0
+          ],
+          "dimensoes": [
+            "=larguraDoBraco",
+            "=alturaDoOmbro - recuoDoBracoNoOmbro - yDoCotovelo - recuoDoBracoNoCotovelo",
+            "=profundidadeDoBraco"
+          ]
+        },
+        {
+          "id": "cotovelo",
+          "regioes": [
+            "braco-direito",
+            "cotovelo"
+          ],
+          "tipo": "cilindro",
+          "centro": [
+            "=eixoDoBraco",
+            "=yDoCotovelo",
+            0
+          ],
+          "eixo": "x",
+          "raio": "=diametroDoCotovelo / 2",
+          "comprimento": "=larguraDoCotovelo",
+          "segmentos": 24
+        },
+        {
+          "id": "antebraco",
+          "regioes": [
+            "braco-direito",
+            "antebraco"
+          ],
+          "tipo": "caixa",
+          "centro": [
+            "=eixoDoBraco",
+            "=(yDoCotovelo + yDoPunho) / 2",
+            0
+          ],
+          "dimensoes": [
+            "=larguraDoAntebraco",
+            "=yDoCotovelo - yDoPunho - 2 * recuoDoAntebracoNasJuntas",
+            "=profundidadeDoAntebraco"
+          ]
+        },
+        {
+          "id": "punho",
+          "regioes": [
+            "braco-direito",
+            "punho"
+          ],
+          "tipo": "anel",
+          "centro": [
+            "=eixoDoBraco",
+            "=yDoPunho",
+            0
+          ],
+          "eixo": "y",
+          "raioExterno": "=diametroDoPunho / 2",
+          "raioInterno": "=raioDoFuroDoPunho",
+          "espessura": "=alturaDoPunho",
+          "segmentos": 24
+        },
+        {
+          "id": "palma",
+          "regioes": [
+            "braco-direito",
+            "mao"
+          ],
+          "tipo": "caixa",
+          "centro": [
+            "=eixoDoBraco",
+            "=(yDoPunho - alturaDoPunho / 2 + yDosNos) / 2",
+            0
+          ],
+          "dimensoes": [
+            "=espessuraDaPalma",
+            "=comprimentoDaPalma - alturaDoPunho / 2",
+            "=larguraDaPalma"
+          ]
+        },
+        {
+          "id": "polegar-base",
+          "regioes": [
+            "braco-direito",
+            "mao",
+            "polegar"
+          ],
+          "tipo": "caixa",
+          "centro": [
+            "=eixoDoBraco - 6",
+            "=yDoPunho - 43",
+            56
+          ],
+          "dimensoes": [
+            26,
+            46,
+            30
+          ]
+        },
+        {
+          "id": "polegar-proximal",
+          "regioes": [
+            "braco-direito",
+            "mao",
+            "polegar"
+          ],
+          "tipo": "caixa",
+          "centro": [
+            "=eixoDoBraco - 6",
+            "=yDoPunho - 83",
+            66
+          ],
+          "dimensoes": [
+            22,
+            36,
+            24
+          ]
+        },
+        {
+          "id": "polegar-distal",
+          "regioes": [
+            "braco-direito",
+            "mao",
+            "polegar"
+          ],
+          "tipo": "caixa",
+          "centro": [
+            "=eixoDoBraco - 6",
+            "=yDoPunho - 115",
+            70
+          ],
+          "dimensoes": [
+            20,
+            30,
+            22
+          ]
+        },
+        {
+          "id": "proximal-indicador",
+          "regioes": [
+            "braco-direito",
+            "mao",
+            "dedo-indicador"
+          ],
+          "tipo": "caixa",
+          "centro": [
+            "=eixoDoBraco",
+            "=yDosNos - falangeProximal / 2",
+            "=3 * passoEntreDedos / 2"
+          ],
+          "dimensoes": [
+            "=espessuraProximal",
+            "=falangeProximal",
+            "=larguraProximal"
+          ]
+        },
+        {
+          "id": "media-indicador",
+          "regioes": [
+            "braco-direito",
+            "mao",
+            "dedo-indicador"
+          ],
+          "tipo": "caixa",
+          "centro": [
+            "=eixoDoBraco",
+            "=yDosNos - (falangeProximal) - falangeMedia / 2",
+            "=3 * passoEntreDedos / 2"
+          ],
+          "dimensoes": [
+            "=espessuraMedia",
+            "=falangeMedia",
+            "=larguraMedia"
+          ]
+        },
+        {
+          "id": "distal-indicador",
+          "regioes": [
+            "braco-direito",
+            "mao",
+            "dedo-indicador"
+          ],
+          "tipo": "caixa",
+          "centro": [
+            "=eixoDoBraco",
+            "=yDosNos - (falangeProximal + falangeMedia) - falangeDistal / 2",
+            "=3 * passoEntreDedos / 2"
+          ],
+          "dimensoes": [
+            "=espessuraDistal",
+            "=falangeDistal",
+            "=larguraDistal"
+          ]
+        },
+        {
+          "id": "proximal-medio",
+          "regioes": [
+            "braco-direito",
+            "mao",
+            "dedo-medio"
+          ],
+          "tipo": "caixa",
+          "centro": [
+            "=eixoDoBraco",
+            "=yDosNos - falangeProximal / 2",
+            "=1 * passoEntreDedos / 2"
+          ],
+          "dimensoes": [
+            "=espessuraProximal",
+            "=falangeProximal",
+            "=larguraProximal"
+          ]
+        },
+        {
+          "id": "media-medio",
+          "regioes": [
+            "braco-direito",
+            "mao",
+            "dedo-medio"
+          ],
+          "tipo": "caixa",
+          "centro": [
+            "=eixoDoBraco",
+            "=yDosNos - (falangeProximal) - falangeMedia / 2",
+            "=1 * passoEntreDedos / 2"
+          ],
+          "dimensoes": [
+            "=espessuraMedia",
+            "=falangeMedia",
+            "=larguraMedia"
+          ]
+        },
+        {
+          "id": "distal-medio",
+          "regioes": [
+            "braco-direito",
+            "mao",
+            "dedo-medio"
+          ],
+          "tipo": "caixa",
+          "centro": [
+            "=eixoDoBraco",
+            "=yDosNos - (falangeProximal + falangeMedia) - falangeDistal / 2",
+            "=1 * passoEntreDedos / 2"
+          ],
+          "dimensoes": [
+            "=espessuraDistal",
+            "=falangeDistal",
+            "=larguraDistal"
+          ]
+        },
+        {
+          "id": "proximal-anelar",
+          "regioes": [
+            "braco-direito",
+            "mao",
+            "dedo-anelar"
+          ],
+          "tipo": "caixa",
+          "centro": [
+            "=eixoDoBraco",
+            "=yDosNos - falangeProximal / 2",
+            "=-1 * passoEntreDedos / 2"
+          ],
+          "dimensoes": [
+            "=espessuraProximal",
+            "=falangeProximal",
+            "=larguraProximal"
+          ]
+        },
+        {
+          "id": "media-anelar",
+          "regioes": [
+            "braco-direito",
+            "mao",
+            "dedo-anelar"
+          ],
+          "tipo": "caixa",
+          "centro": [
+            "=eixoDoBraco",
+            "=yDosNos - (falangeProximal) - falangeMedia / 2",
+            "=-1 * passoEntreDedos / 2"
+          ],
+          "dimensoes": [
+            "=espessuraMedia",
+            "=falangeMedia",
+            "=larguraMedia"
+          ]
+        },
+        {
+          "id": "distal-anelar",
+          "regioes": [
+            "braco-direito",
+            "mao",
+            "dedo-anelar"
+          ],
+          "tipo": "caixa",
+          "centro": [
+            "=eixoDoBraco",
+            "=yDosNos - (falangeProximal + falangeMedia) - falangeDistal / 2",
+            "=-1 * passoEntreDedos / 2"
+          ],
+          "dimensoes": [
+            "=espessuraDistal",
+            "=falangeDistal",
+            "=larguraDistal"
+          ]
+        },
+        {
+          "id": "proximal-minimo",
+          "regioes": [
+            "braco-direito",
+            "mao",
+            "dedo-minimo"
+          ],
+          "tipo": "caixa",
+          "centro": [
+            "=eixoDoBraco",
+            "=yDosNos - falangeProximal / 2",
+            "=-3 * passoEntreDedos / 2"
+          ],
+          "dimensoes": [
+            "=espessuraProximal",
+            "=falangeProximal",
+            "=larguraProximal"
+          ]
+        },
+        {
+          "id": "media-minimo",
+          "regioes": [
+            "braco-direito",
+            "mao",
+            "dedo-minimo"
+          ],
+          "tipo": "caixa",
+          "centro": [
+            "=eixoDoBraco",
+            "=yDosNos - (falangeProximal) - falangeMedia / 2",
+            "=-3 * passoEntreDedos / 2"
+          ],
+          "dimensoes": [
+            "=espessuraMedia",
+            "=falangeMedia",
+            "=larguraMedia"
+          ]
+        },
+        {
+          "id": "distal-minimo",
+          "regioes": [
+            "braco-direito",
+            "mao",
+            "dedo-minimo"
+          ],
+          "tipo": "caixa",
+          "centro": [
+            "=eixoDoBraco",
+            "=yDosNos - (falangeProximal + falangeMedia) - falangeDistal / 2",
+            "=-3 * passoEntreDedos / 2"
+          ],
+          "dimensoes": [
+            "=espessuraDistal",
+            "=falangeDistal",
+            "=larguraDistal"
+          ]
+        }
+      ],
+      "portas": [
+        {
+          "id": "ombro-flexao",
+          "interface": {
+            "forma": "cilindro",
+            "papel": "macho",
+            "eixo": [
+              1,
+              0,
+              0
+            ],
+            "centro": [
+              "=eixoDoBraco",
+              "=alturaDoOmbro",
+              0
+            ],
+            "raio": "=raioDoEixoDeAbducao",
+            "inicio": "=-espessuraDoDisco / 2",
+            "fim": "=espessuraDoDisco / 2"
+          }
+        },
+        {
+          "id": "ombro-abducao",
+          "interface": {
+            "forma": "cilindro",
+            "papel": "macho",
+            "eixo": [
+              0,
+              0,
+              1
+            ],
+            "centro": [
+              "=eixoDoBraco",
+              "=alturaDoOmbro",
+              0
+            ],
+            "raio": "=raioDoEixoDeAbducao",
+            "inicio": -30,
+            "fim": 30
+          }
+        },
+        {
+          "id": "cotovelo",
+          "interface": {
+            "forma": "cilindro",
+            "papel": "macho",
+            "eixo": [
+              1,
+              0,
+              0
+            ],
+            "centro": [
+              "=eixoDoBraco",
+              "=yDoCotovelo",
+              0
+            ],
+            "raio": "=raioDoPinoDoCotovelo",
+            "inicio": "=-larguraDoCotovelo / 2",
+            "fim": "=larguraDoCotovelo / 2"
+          }
+        },
+        {
+          "id": "punho-rotacao",
+          "interface": {
+            "forma": "cilindro",
+            "papel": "macho",
+            "eixo": [
+              0,
+              1,
+              0
+            ],
+            "centro": [
+              "=eixoDoBraco",
+              "=yDoPunho",
+              0
+            ],
+            "raio": "=raioDoFuroDoPunho",
+            "inicio": "=-alturaDoPunho / 2",
+            "fim": "=alturaDoPunho / 2"
+          }
+        },
+        {
+          "id": "punho-flexao",
+          "interface": {
+            "forma": "cilindro",
+            "papel": "macho",
+            "eixo": [
+              1,
+              0,
+              0
+            ],
+            "centro": [
+              "=eixoDoBraco",
+              "=yDoPunho - alturaDoPunho / 2",
+              0
+            ],
+            "raio": "=raioDoEixoDeFlexaoDoPunho",
+            "inicio": -20,
+            "fim": 20
+          }
+        },
+        {
+          "id": "polegar-raiz",
+          "interface": {
+            "forma": "cilindro",
+            "papel": "macho",
+            "eixo": [
+              0,
+              0.7071067811865476,
+              0.7071067811865476
+            ],
+            "centro": [
+              "=eixoDoBraco - 6",
+              "=yDoPunho - 25",
+              45
+            ],
+            "raio": "=raioDoPinoDosDedos",
+            "inicio": -12,
+            "fim": 12
+          }
+        },
+        {
+          "id": "polegar-proximal",
+          "interface": {
+            "forma": "cilindro",
+            "papel": "macho",
+            "eixo": [
+              1,
+              0,
+              0
+            ],
+            "centro": [
+              "=eixoDoBraco - 6",
+              "=yDoPunho - 65",
+              62
+            ],
+            "raio": "=raioDoPinoDosDedos",
+            "inicio": -11,
+            "fim": 11
+          }
+        },
+        {
+          "id": "polegar-distal",
+          "interface": {
+            "forma": "cilindro",
+            "papel": "macho",
+            "eixo": [
+              1,
+              0,
+              0
+            ],
+            "centro": [
+              "=eixoDoBraco - 6",
+              "=yDoPunho - 100",
+              68
+            ],
+            "raio": "=raioDoPinoDosDedos",
+            "inicio": -10,
+            "fim": 10
+          }
+        },
+        {
+          "id": "indicador-proximal",
+          "interface": {
+            "forma": "cilindro",
+            "papel": "macho",
+            "eixo": [
+              0,
+              0,
+              1
+            ],
+            "centro": [
+              "=eixoDoBraco",
+              "=yDosNos",
+              "=3 * passoEntreDedos / 2"
+            ],
+            "raio": "=raioDoPinoDosDedos",
+            "inicio": "=-larguraProximal / 2",
+            "fim": "=larguraProximal / 2"
+          }
+        },
+        {
+          "id": "indicador-media",
+          "interface": {
+            "forma": "cilindro",
+            "papel": "macho",
+            "eixo": [
+              0,
+              0,
+              1
+            ],
+            "centro": [
+              "=eixoDoBraco",
+              "=yDosNos - (falangeProximal)",
+              "=3 * passoEntreDedos / 2"
+            ],
+            "raio": "=raioDoPinoDosDedos",
+            "inicio": "=-larguraMedia / 2",
+            "fim": "=larguraMedia / 2"
+          }
+        },
+        {
+          "id": "indicador-distal",
+          "interface": {
+            "forma": "cilindro",
+            "papel": "macho",
+            "eixo": [
+              0,
+              0,
+              1
+            ],
+            "centro": [
+              "=eixoDoBraco",
+              "=yDosNos - (falangeProximal + falangeMedia)",
+              "=3 * passoEntreDedos / 2"
+            ],
+            "raio": "=raioDoPinoDosDedos",
+            "inicio": "=-larguraDistal / 2",
+            "fim": "=larguraDistal / 2"
+          }
+        },
+        {
+          "id": "medio-proximal",
+          "interface": {
+            "forma": "cilindro",
+            "papel": "macho",
+            "eixo": [
+              0,
+              0,
+              1
+            ],
+            "centro": [
+              "=eixoDoBraco",
+              "=yDosNos",
+              "=1 * passoEntreDedos / 2"
+            ],
+            "raio": "=raioDoPinoDosDedos",
+            "inicio": "=-larguraProximal / 2",
+            "fim": "=larguraProximal / 2"
+          }
+        },
+        {
+          "id": "medio-media",
+          "interface": {
+            "forma": "cilindro",
+            "papel": "macho",
+            "eixo": [
+              0,
+              0,
+              1
+            ],
+            "centro": [
+              "=eixoDoBraco",
+              "=yDosNos - (falangeProximal)",
+              "=1 * passoEntreDedos / 2"
+            ],
+            "raio": "=raioDoPinoDosDedos",
+            "inicio": "=-larguraMedia / 2",
+            "fim": "=larguraMedia / 2"
+          }
+        },
+        {
+          "id": "medio-distal",
+          "interface": {
+            "forma": "cilindro",
+            "papel": "macho",
+            "eixo": [
+              0,
+              0,
+              1
+            ],
+            "centro": [
+              "=eixoDoBraco",
+              "=yDosNos - (falangeProximal + falangeMedia)",
+              "=1 * passoEntreDedos / 2"
+            ],
+            "raio": "=raioDoPinoDosDedos",
+            "inicio": "=-larguraDistal / 2",
+            "fim": "=larguraDistal / 2"
+          }
+        },
+        {
+          "id": "anelar-proximal",
+          "interface": {
+            "forma": "cilindro",
+            "papel": "macho",
+            "eixo": [
+              0,
+              0,
+              1
+            ],
+            "centro": [
+              "=eixoDoBraco",
+              "=yDosNos",
+              "=-1 * passoEntreDedos / 2"
+            ],
+            "raio": "=raioDoPinoDosDedos",
+            "inicio": "=-larguraProximal / 2",
+            "fim": "=larguraProximal / 2"
+          }
+        },
+        {
+          "id": "anelar-media",
+          "interface": {
+            "forma": "cilindro",
+            "papel": "macho",
+            "eixo": [
+              0,
+              0,
+              1
+            ],
+            "centro": [
+              "=eixoDoBraco",
+              "=yDosNos - (falangeProximal)",
+              "=-1 * passoEntreDedos / 2"
+            ],
+            "raio": "=raioDoPinoDosDedos",
+            "inicio": "=-larguraMedia / 2",
+            "fim": "=larguraMedia / 2"
+          }
+        },
+        {
+          "id": "anelar-distal",
+          "interface": {
+            "forma": "cilindro",
+            "papel": "macho",
+            "eixo": [
+              0,
+              0,
+              1
+            ],
+            "centro": [
+              "=eixoDoBraco",
+              "=yDosNos - (falangeProximal + falangeMedia)",
+              "=-1 * passoEntreDedos / 2"
+            ],
+            "raio": "=raioDoPinoDosDedos",
+            "inicio": "=-larguraDistal / 2",
+            "fim": "=larguraDistal / 2"
+          }
+        },
+        {
+          "id": "minimo-proximal",
+          "interface": {
+            "forma": "cilindro",
+            "papel": "macho",
+            "eixo": [
+              0,
+              0,
+              1
+            ],
+            "centro": [
+              "=eixoDoBraco",
+              "=yDosNos",
+              "=-3 * passoEntreDedos / 2"
+            ],
+            "raio": "=raioDoPinoDosDedos",
+            "inicio": "=-larguraProximal / 2",
+            "fim": "=larguraProximal / 2"
+          }
+        },
+        {
+          "id": "minimo-media",
+          "interface": {
+            "forma": "cilindro",
+            "papel": "macho",
+            "eixo": [
+              0,
+              0,
+              1
+            ],
+            "centro": [
+              "=eixoDoBraco",
+              "=yDosNos - (falangeProximal)",
+              "=-3 * passoEntreDedos / 2"
+            ],
+            "raio": "=raioDoPinoDosDedos",
+            "inicio": "=-larguraMedia / 2",
+            "fim": "=larguraMedia / 2"
+          }
+        },
+        {
+          "id": "minimo-distal",
+          "interface": {
+            "forma": "cilindro",
+            "papel": "macho",
+            "eixo": [
+              0,
+              0,
+              1
+            ],
+            "centro": [
+              "=eixoDoBraco",
+              "=yDosNos - (falangeProximal + falangeMedia)",
+              "=-3 * passoEntreDedos / 2"
+            ],
+            "raio": "=raioDoPinoDosDedos",
+            "inicio": "=-larguraDistal / 2",
+            "fim": "=larguraDistal / 2"
+          }
+        }
+      ]
+    }
+  },
+  "receitas": [
+    "partes"
+  ]
+}

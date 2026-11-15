@@ -97,11 +97,20 @@ Uma de cada vez, medindo entre elas. Não desenhe tudo de uma vez.
 1. **silhueta** de cada vista, fechada nas pontas;
 2. **aberturas** — arcos de roda, vãos envidraçados — como loops;
 3. **cortes de painel** — portas, capô, tampa;
-4. **detalhe** — cromo, faróis, lanternas, louvers;
-5. **cotas, landmarks e legenda**.
+4. **cotas, landmarks e legenda**.
 
-Detalhe adicionado antes de a silhueta fechar vira ruído que esconde o erro
-estrutural embaixo.
+Com imagem de referência, a prancha guarda só o esqueleto (medidas, silhueta,
+vidros, cortes de painel, arcos e curvas de caráter). Farol, lanterna,
+retrovisor, maçaneta, cromo e recortes de baixo ficam fora dela e são decididos
+sobre a chapa, no 3D lido contra a referência: o detalhe desenhado em plano é
+redecidido na superfície, e o erro dele passaria pelas medidas do 3D, que
+comparam com a prancha. Sem imagem, o detalhe entra por último, depois de a
+silhueta fechar, porque antes disso vira ruído que esconde o erro estrutural.
+
+A diferença que a leitura combinada acusa em duas rodadas seguidas deixa de
+ser corrigida a olho: o contorno daquela parte sai da imagem em milímetro pela
+skill `contorno-da-imagem`, com a mesma calibração, e é sobreposto ao traçado
+antes do aceite.
 
 ## 5. Declarar a leitura de cada vista
 
@@ -171,6 +180,14 @@ O script deve imprimir `imprimirRelatorio(relatorio)`. Ordem:
    `node -e "…chromium…"` com `deviceScaleFactor: 2`.
 3. compare com a referência e anote **diferenças, não impressões**: "a linha do
    teto está abaulada", não "está estranho".
+4. com imagem de referência, não compare de olho: rode a leitura combinada
+   (grade e partes, três críticos cada, e `--consolidar`) de
+   [`CONFERIR-CONTRA-REFERENCIA.md`](../../../docs/modelar/usar/CONFERIR-CONTRA-REFERENCIA.md)
+   e leve o `consolidado.md` à pessoa junto com a prancha. Passe em `--fora` o
+   detalhe que a prancha deixa de fora de propósito (no esqueleto, faróis,
+   lanternas, grade, retrovisores), senão os críticos o citam como ausente e
+   enchem a consolidação de ruído; a parte pode vir como `{ "camadas": [...] }`
+   da prancha, sem caixa em mm escrita à mão.
 
 ## 8. Comparar com a referência por número
 
