@@ -241,14 +241,21 @@ export function derivar(T) {
   tubo('quadro', 'preto', [noSelim(T.tubo_selim_comprimento - T.abracadeira_selim_comprimento), noSelim(T.tubo_selim_comprimento - 2)], raioQ(T.abracadeira_selim_diametro), 32);
   for (const lado of [-1, 1]) {
     const dropout = [lado * T.eixo_traseiro_largura / 2, yEixo, zEixoTras];
-    /* estais superiores: nascem dentro do tubo do selim, logo abaixo da braçadeira, e saem dele por baixo, simétricos, unidos a ele pela solda; o meio do trajeto abre o suficiente para a folga do pneu */
+    /* estais superiores: como na foto lateral, os dois sobem juntos e se soldam na face de trás do tubo do selim, logo abaixo da
+       braçadeira, um ao lado do outro (a pessoa reprovou, em 2026-11-15, os estais soldados nos lados do tubo); a ponta de cada
+       um fica enterrada no tubo, e o meio do trajeto abre o suficiente para a folga do pneu */
     const topoEstai = noSelim(T.tubo_selim_comprimento - T.estai_abaixo_da_abracadeira);
-    const xMeio = T.pneu_largura / 2 + T.estai_folga_pneu + raioQ(T.estai_diametro) + 0.5;
-    const ao = (f, x) => [lado * x, topoEstai[1] + (dropout[1] - topoEstai[1]) * f, topoEstai[2] + (dropout[2] - topoEstai[2]) * f];
-    /* a ponta do estai fica enterrada no tubo do selim: o primeiro ponto, um pouco acima do topo, fica a menos do raio do tubo do
-       selim menos o do estai do eixo dele, e a tampa da ponta não aparece por fora (a ponta a 17 mm do eixo saía 6 mm para fora) */
-    const xEnterrado = raioQ(T.tubo_selim_diametro) - raioQ(T.estai_diametro) - 2;
-    soldado([ao(-0.02, xEnterrado), ao(0, T.estai_x_topo), ao(0.08, T.estai_x_topo + 5), ao(0.22, xMeio), ao(0.55, xMeio + 4), ao(1, T.eixo_traseiro_largura / 2)], raioQ(T.estai_diametro), T.lados_tubo, 'selimTopo', `gancheira${lado}`, T.solda_trecho);
+    const tras = [0, -Math.cos(s), -Math.sin(s)]; // perpendicular ao tubo do selim, para trás
+    const rS = raioQ(T.tubo_selim_diametro), rE = raioQ(T.estai_diametro);
+    const xLado = rE * 0.9; // os dois estais quase se tocam atrás do tubo
+    /* o ponto de solda na face de trás do tubo do selim, e a linha dele até a gancheira: o estai sai do tubo já nessa linha, e a
+       ponta entra no tubo pela mesma linha, para trás do ponto de solda */
+    const solda = soma(topoEstai, esc(tras, rS));
+    const xMeio = T.pneu_largura / 2 + T.estai_folga_pneu + rE + 0.5;
+    const rumo = unit(menos(dropout, solda));
+    const ao = (f, x) => [lado * x, solda[1] + (dropout[1] - solda[1]) * f, solda[2] + (dropout[2] - solda[2]) * f];
+    const dentro = soma(solda, esc(rumo, -(rE + 6)));
+    soldado([[lado * xLado, dentro[1], dentro[2]], ao(0, xLado), ao(0.12, xLado + 4), ao(0.25, xMeio), ao(0.55, xMeio + 4), ao(1, T.eixo_traseiro_largura / 2)], rE, T.lados_tubo, 'selimTopo', `gancheira${lado}`, T.solda_trecho);
     soldado([[lado * T.base_x_inicio, yBB, 0], dropout], raioQ(T.base_diametro), T.lados_tubo, 'mc', `gancheira${lado}`, T.solda_trecho);
   }
   torno('quadro', 'aluminio', [[0, -T.movimento_central_largura / 2], [T.movimento_central_raio, -T.movimento_central_largura / 2], [T.movimento_central_raio, T.movimento_central_largura / 2], [0, T.movimento_central_largura / 2]], bb, { lados: 24, liso: 40, junta: 'quadro' });
