@@ -2,7 +2,7 @@
 
 > Gerado por `npm run catalogo:gerar`; não edite à mão. A fonte é o registro explícito do motor e as cinco extensões nativas.
 
-Assinatura do registro: `sha256:6673ac26fb8b53d840f0c0bc2c8b8867946ced9adff3c4145afa9e885c15212c`.
+Assinatura do registro: `sha256:96c7058aac1a4bd41ef2867e85d8a56dbdd6a73f812a590c920cf5d31aa0c7c7`.
 
 Há 42 operações em 1 módulo(s).
 
@@ -53,7 +53,7 @@ Há 42 operações em 1 módulo(s).
 
 ## Extensões
 
-Há 5 extensões nativas em `procedural/extensoes/`. Elas não estão em `REGISTRO_OPERACOES`: só existem num registro montado por `criarRegistroComExtensoes({ registroBase, extensoes })`, e a receita que as usa precisa ser executada com esse registro. Assinatura do registro com extensões: `sha256:8d16851b25da7e0729a67dc173c831da02367ba64db45d4ec272098423735d2f`.
+Há 5 extensões nativas em `procedural/extensoes/`. Elas não estão em `REGISTRO_OPERACOES`: só existem num registro montado por `criarRegistroComExtensoes({ registroBase, extensoes })`, e a receita que as usa precisa ser executada com esse registro. Assinatura do registro com extensões: `sha256:bec3279a8f9c16994aadf70d26a12f0e3a160fd081ccb8aee9a9cea68ea10f5d`.
 
 | extensão | intenção | entra/sai | interfaces | custo | schema | liga-se por |
 |---|---|---|---|---:|---|---|

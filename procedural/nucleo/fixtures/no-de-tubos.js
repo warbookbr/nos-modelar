@@ -46,3 +46,15 @@ export function passosDoNo(caso, raioMm, extra = {}, { lados = 48, passoDoAnel =
     ['arredondarCostura', { origemId: 101, de: { op: 'unir', id: 100 }, raio: m(raioMm), ...extra }],
   ];
 }
+
+/** passosDoCordao(caso, larguraMm, { passoDoAnel, vincar, entre }) -> os tubos, o `unir` deles (id 100), o cordão de solda na
+ *  costura (`friso` 200 com `costura` e perfil `cordao`) e o `unir` dos tubos com o cordão (id 201). */
+export function passosDoCordao(caso, larguraMm, { lados = 48, passoDoAnel = 0.004, vincar = true, entre = null } = {}) {
+  const tubos = CASOS[caso].map(([a, b, r], k) => tubo(k + 1, a.map(m), b.map(m), m(r), lados, passoDoAnel));
+  return [
+    ...tubos,
+    ['unir', { origemId: 100, solidos: tubos.map((_, k) => ({ origem: { op: 'loft', id: k + 1 } })) }],
+    ['friso', { origemId: 200, linha: { nome: 'solda' }, costura: { de: { op: 'unir', id: 100 }, ...(entre ? { entre } : {}) }, perfil: { cordao: { largura: m(larguraMm) } } }],
+    ['unir', { origemId: 201, solidos: [{ origem: { op: 'unir', id: 100 } }, { origem: { op: 'friso', id: 200 } }], ...(vincar ? { vincarCostura: true } : {}) }],
+  ];
+}

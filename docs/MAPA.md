@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1971 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1973 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1142,6 +1142,7 @@
 - `estruturais.js` — estruturais.js — operações do grupo, isoladas por serviços explícitos do núcleo.
 - `extrusao-de-perfil.test.ts` — extrusao-de-perfil.test.ts — `extrusao` e o `lathe` com `furos` e `deslocar`: perfil 2D com furo e deslocamento de contorno, levantado ou revolucionado em só…
 - `face-plana.js` — face-plana.js — a face continua plana depois de mover os cantos? A operação que move cantos compartilhados (arredondarAresta) altera faces que ela não declar…
+- `friso-na-costura.test.ts` — friso-na-costura.test.ts — o `friso` que segue a costura de uma união e o perfil `cordao`, o chanfro de solda posto a cada ponto no canto entre os dois sólid…
 - `friso-recusas.test.ts` — friso-recusas.test.ts — cada recusa de entrada do passo `friso` com a entrada ruim e o campo que a recusa cita. A revisão das verificações (2026-11-13) tirou…
 - `friso.js` — friso.js (operação) — nervura, tubo ou friso que segue uma linha nomeada, com perfil declarado. A linha é uma sequência de pontos nomeados da gaiola de um pa…
 - `furo-em-aneis.js` — furo-em-aneis.js — a face furada refeita em anéis (plano "costuras e furos limpos", fatia 4), e a região plana de várias faces como face de entrada.
@@ -1152,6 +1153,7 @@
 - `lathe-aberto.test.ts` — lathe-aberto.test.ts — o `lathe` em modo polilinha cujo perfil não toca o eixo nas duas pontas nem volta ao primeiro ponto.
 - `lathe-fechado.test.ts` — lathe-fechado.test.ts — perfil que dá a volta e fecha de verdade.
 - `limpar-lascas.js` — limpar-lascas.js (operação) — `limparLascas`: tira de uma seleção as faces finas que uma booleana deixou, sem criar vértice nem face e sem mover a superfície…
+- `linha-da-costura.js` — linha-da-costura.js — a costura de uma união como linha do `friso`, e o perfil `cordao` posto no canto a cada ponto dela (plano do cordão de solda na costura…
 - `loft-fechado.test.ts` — loft-fechado.test.ts — caminho que volta em si e fecha de verdade.
 - `nome-de-copia.test.ts` — nome-de-copia.test.ts — endereço de autor para as cópias do `arranja`.
 - `parte-com-material.test.mjs` — parte-com-material.test.mjs — `parte` aceita `material` no mesmo passo, e a peça sai bit a bit igual à dos dois passos.

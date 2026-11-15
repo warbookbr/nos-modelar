@@ -570,18 +570,17 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
         if (medidasDoCordao) {
           const { largura } = medidasDoCordao;
           const { superficieA, superficieB } = c;
-          let lado = null;
           aVariacao = (_s, entrada, _lado, quadro) => {
             if (entrada == null) throw new ErroDoFriso('a estação do cordão precisa ser um ponto da costura');
             const r = cordaoNoQuadro({ p: c.pontos[entrada], quadro, nA: c.lados[entrada].nA, nB: c.lados[entrada].nB, largura, superficieA, superficieB });
             if (r.erro) throw new ErroDoFriso(r.erro, entrada);
             if (!ehSimples(r.perfil)) throw new ErroDoFriso(`o perfil do cordão se cruza neste ponto: o canto entre as duas superfícies é aberto ou fechado demais para a largura ${largura}; estreite o cordão`, entrada);
-            /* o perfil sai no sentido anti-horário em (u, v), como o de referência; o sentido não pode trocar ao longo da linha */
+            /* o perfil sai no sentido anti-horário em (u, v), como o de referência: o referencial da varredura é contínuo ao longo
+               da costura, e o lado de cada sólido não troca de mão; se trocasse, o cordão se torceria e o portão de casca fechada
+               da união que o funde aos sólidos gritaria */
             let area = 0;
             for (let k = 0; k < r.perfil.length; k++) { const q = r.perfil[k], w = r.perfil[(k + 1) % r.perfil.length]; area += q[0] * w[1] - w[0] * q[1]; }
-            lado ??= area > 0;
-            if ((area > 0) !== lado) throw new ErroDoFriso('o lado de cada sólido troca de mão ao longo da costura, e o cordão se torceria', entrada);
-            const P = lado ? r.perfil : [...r.perfil].reverse();
+            const P = area > 0 ? r.perfil : [...r.perfil].reverse();
             return { escalaU: 1, perfil: P };
           };
           /* só as estações dos pontos da costura, que são as que têm as duas superfícies medidas */
