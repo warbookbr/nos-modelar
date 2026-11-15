@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1967 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1969 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -234,6 +234,7 @@
 
 ## docs/modelar/banco-de-provas/costura-em-no-de-tubos-2026-11-15/
 
+- `CORDAO.md` — Protótipo do cordão de solda, 2026-11-15
 - `SONDA.md` — Sonda da costura arredondada em nó de tubos, 2026-11-15
 
 ## docs/modelar/banco-de-provas/desenho-braco-2026-10-14/
@@ -575,7 +576,7 @@
 - `2026-11-14-modelagem-de-carro.md` — Modelagem de carro de passeio: o que já serve, onde a carroceria travou antes e por onde começar
 - `2026-11-14-modelagem-de-robo.md` — Modelagem de robô humanoide: o que já serve, o que falta na montagem e por onde começar
 - `2026-11-14-prancha-menos-manual.md` — Prancha menos manual: desvio medido, leitura combinada de um comando e o que ficou de fora declarado
-- `2026-11-15-costura-em-no-de-tubos.md` — Costura arredondada em nó de tubos: o cordão de solda onde três ou mais tubos se encontram
+- `2026-11-15-costura-em-no-de-tubos.md` — Cordão de solda na costura de tubos: o friso que segue a costura de uma união, e a costura em nó de tubos
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
@@ -1513,6 +1514,10 @@
 ## procedural/pecas/carro-fastback/
 
 - `ALINHAMENTO.md` — Carro fastback: alinhamento
+
+## procedural/pecas/carro-fastback/partes/lataria/
+
+- `receita.js` — carro-fastback/lataria — o piloto do quarto traseiro: a chapa contínua de lataria do meio da porta (z 0) para trás, lado +x, com o para-lama traseiro salient…
 
 ## procedural/pecas/carro-fastback/referencias/
 
