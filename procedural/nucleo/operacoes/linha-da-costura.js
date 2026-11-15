@@ -106,6 +106,47 @@ function semTrechoCurto(pontos, fechada, minimo) {
   return saida;
 }
 
+/* o canto vivo da costura, em que a linha se corta. A varredura dobra o perfil numa esquadria, e com o passo de um quinto da
+   largura a esquadria do lado de dentro recua mais que o passo quando o giro passa de 2·atan(0,4), uns 44°; o corte fica abaixo
+   disso, e a curva suave, que gira menos que ele entre um ponto e o seguinte, não se corta */
+const ANGULO_DO_CANTO = 35;
+
+const comprimentoDe = (pontos) => { let L = 0; for (let k = 1; k < pontos.length; k++) L += tam(sub(pontos[k], pontos[k - 1])); return L; };
+
+/** cortarNosCantos(pontos, fechada) -> [{ pontos, fechada }]: a linha inteira, se nenhum ponto vira mais de ANGULO_DO_CANTO;
+ *  senão os trechos abertos entre os cantos, e na volta fechada o primeiro trecho começa num canto. */
+function cortarNosCantos(pontos, fechada) {
+  const n = pontos.length;
+  const giro = (j) => {
+    const a = pontos[(j - 1 + n) % n], p = pontos[j], c = pontos[(j + 1) % n];
+    const u = unit(sub(p, a)), w = unit(sub(c, p));
+    return u && w ? (Math.acos(Math.max(-1, Math.min(1, dot(u, w)))) * 180) / Math.PI : 0;
+  };
+  const cantos = [];
+  for (let j = fechada ? 0 : 1; j < (fechada ? n : n - 1); j++) if (giro(j) > ANGULO_DO_CANTO) cantos.push(j);
+  if (!cantos.length) return [{ pontos, fechada }];
+  const trechos = [];
+  if (fechada) {
+    for (let k = 0; k < cantos.length; k++) {
+      const de = cantos[k], ate = cantos[(k + 1) % cantos.length];
+      const lista = [];
+      for (let j = de; ; j = (j + 1) % n) { lista.push(pontos[j]); if (j === ate && lista.length > 1) break; }
+      trechos.push({ pontos: lista, fechada: false });
+    }
+  } else {
+    let de = 0;
+    for (const c of [...cantos, n - 1]) { trechos.push({ pontos: pontos.slice(de, c + 1), fechada: false }); de = c; }
+  }
+  return trechos;
+}
+
+/** prolongar(pontos, d) -> a linha aberta com um ponto a mais em cada ponta, a `d` além dela na direção do último trecho */
+function prolongar(pontos, d) {
+  const n = pontos.length;
+  const ini = unit(sub(pontos[0], pontos[1])), fim = unit(sub(pontos[n - 1], pontos[n - 2]));
+  return [soma(pontos[0], mult(ini, d)), ...pontos, soma(pontos[n - 1], mult(fim, d))];
+}
+
 /** lerCostura(st, costura) -> { registro, de, entre } | { erro: [campo, mensagem] } */
 function lerCostura(st, costura) {
   if (!costura || typeof costura !== 'object' || Array.isArray(costura)) return { erro: ['costura', `costura precisa ser a costura de um unir, como ${EXEMPLO_DE_COSTURA}`] };
@@ -229,12 +270,28 @@ export function linhaDaCostura(st, costura, { passo, passoFino = passo, alcance,
     if (b.fechada) comprimento += tam(sub(P0[0], P0[P0.length - 1]));
     if (comprimento < 3 * passo) continue;
     /* a costura da booleana tem trechos de frações de milímetro ao lado de trechos longos, e a varredura dobraria nos curtos:
-       a linha é reamostrada em passos iguais e suavizada, e as normais saem da superfície de cada sólido em cada ponto */
-    const grossos = suavizar(reamostrar(b.vs.map((v) => [...st.V.get(v)]), b.fechada, passo), b.fechada);
-    /* a suavização puxa as pontas de um trecho aberto curto para perto uma da outra: o ponto a menos de um quarto do passo do
-       anterior sai, e a varredura não recebe trecho degenerado (os estais a 22°, revisão de 2026-11-15) */
-    const pontos = semTrechoCurto(passoFino < passo ? refinar(grossos, b.fechada, passoFino) : grossos, b.fechada, passoFino / 4);
-    const e0 = escolhidas[b.ks[0]];
+       a linha é reamostrada em passos iguais e suavizada, e as normais saem da superfície de cada sólido em cada ponto. No canto
+       vivo da costura (o ponto em que um terceiro sólido entra, a ponta de um tubo fino) a linha vira de uma vez, e o perfil não
+       dobra ali: a linha se corta em trechos abertos nos cantos de mais de ANGULO_DO_CANTO, e cada trecho se prolonga além do
+       canto, para os cordões dos dois lados se cruzarem (a união do cordão com os sólidos separa as cascas que se cruzam) */
+    const reamostrada = reamostrar(b.vs.map((v) => [...st.V.get(v)]), b.fechada, passo);
+    for (const trecho of cortarNosCantos(reamostrada, b.fechada)) {
+      const grossos = suavizar(trecho.pontos, trecho.fechada);
+      /* a suavização puxa as pontas de um trecho aberto curto para perto uma da outra: o ponto a menos de um quarto do passo do
+         anterior sai, e a varredura não recebe trecho degenerado (os estais a 22°, revisão de 2026-11-15) */
+      let pontos = semTrechoCurto(passoFino < passo ? refinar(grossos, trecho.fechada, passoFino) : grossos, trecho.fechada, passoFino / 4);
+      if (!trecho.fechada) {
+        if (pontos.length < 2 || comprimentoDe(pontos) < 2 * passo) continue;
+        pontos = prolongar(pontos, suave);
+      }
+      const erro = cadeiaDe(pontos, trecho.fechada, escolhidas[b.ks[0]]);
+      if (erro) return erro;
+    }
+  }
+  if (!cadeias.length) return { erro: ['costura', `a costura do unir:${de.id} não forma linha de dois pontos ou mais`] };
+  return { cadeias };
+
+  function cadeiaDe(pontos, fechada, e0) {
     const superficieA = superficieDoOperando(st, facesDoOperando.get(e0.oA) ?? [], pontos, alcance, suave);
     const superficieB = superficieDoOperando(st, facesDoOperando.get(e0.oB) ?? [], pontos, alcance, suave);
     const lados = pontos.map((q) => ({ nA: superficieA(q)?.n ?? null, nB: superficieB(q)?.n ?? null }));
@@ -242,14 +299,13 @@ export function linhaDaCostura(st, costura, { passo, passoFino = passo, alcance,
     if (sem >= 0) return { erro: ['costura', `no ponto [${pontos[sem].map((x) => Number(x.toPrecision(6))).join(', ')}] da costura do unir:${de.id} um dos sólidos não tem superfície perto`] };
     const normais = lados.map(({ nA, nB }) => unit(soma(nA, nB)) ?? nA);
     cadeias.push({
-      pontos, normais, fechada: b.fechada, espelhada: false, passo: 1, lados,
+      pontos, normais, fechada, espelhada: false, passo: 1, lados,
       operandos: [e0.oA, e0.oB], superficieA, superficieB,
       nomeDoIndice: (j) => `o ponto ${j} da costura [${pontos[j].map((x) => Number(x.toPrecision(6))).join(', ')}]`,
       nomes: pontos.map(() => ({ nome: null, inverte: false, noPlano: false })),
     });
+    return null;
   }
-  if (!cadeias.length) return { erro: ['costura', `a costura do unir:${de.id} não forma linha de dois pontos ou mais`] };
-  return { cadeias };
 }
 
 /** o ponto mais próximo de p num triângulo (Ericson, Real-Time Collision Detection, 5.1.5) */
