@@ -50,9 +50,9 @@ import { EXEMPLO_DE_CORDAO, cordaoNoQuadro, linhaDaCostura, perfilDoCordao } fro
 
 /** A aba sai com as faces lisas até este ângulo, como as da superfície: a dobra arredonda a sombra e a ponta e a espessura ficam vivas. */
 const LISO_DA_ABA = valorDoLiso(30);
-/* o cordão na costura separa o sombreado dele do da superfície a partir de 12°: a borda sai deitada no tubo, e com o ângulo
-   maior o sombreado liso misturava as duas direções ao longo dos triângulos longos que a união deixa, e riscava o tubo */
-const LISO_DO_CORDAO = valorDoLiso(12);
+/* o cordão na costura suaviza o sombreado entre as faces dele, que viram uns 15° de uma estação para a outra em volta de um
+   tubo fino, e o separa do tubo, que o chanfro encontra a uns 45°: o limite fica entre os dois */
+const LISO_DO_CORDAO = valorDoLiso(30);
 const EXEMPLO_DE_ABA = "aba: { largura: 0.02, angulo: 90, raio: 0.003 }";
 const EXEMPLO_DE_LINHA = "{ nome: 'frisoDaPorta', pontos: ['a', 'b', 'c'] }";
 const EXEMPLO_DE_VARIACAO = "variacao: { largura: [{ ponto: 'a', valor: 0.02 }, { ponto: 'b', antes: 0.02, depois: 0.01 }] }";
@@ -457,25 +457,14 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
       const c = a.perfil.cordao;
       const extraC = Object.keys(a.perfil).filter((k) => k !== 'cordao');
       if (extraC.length) return grita(st, i, 'friso', 'perfil', `o perfil cordao não se mistura com outra forma: tire ${extraC.map(citar).join(', ')}`);
-      if (!c || typeof c !== 'object' || Array.isArray(c) || Object.keys(c).some((k) => !['largura', 'altura', 'escamas'].includes(k))) return grita(st, i, 'friso', 'perfil', `o cordao precisa de largura e altura, e aceita escamas, como ${EXEMPLO_DE_CORDAO}`);
-      let largura, altura;
-      try { largura = st.num(c.largura); altura = st.num(c.altura); } catch (e) { return grita(st, i, 'friso', 'perfil', String(e.message)); }
-      if (!(largura > 0) || !(altura > 0)) return grita(st, i, 'friso', 'perfil', `a largura e a altura do cordao precisam ser maiores que zero, e vieram ${largura} e ${altura}`);
-      if (!(altura < largura)) return grita(st, i, 'friso', 'perfil', `a altura do cordao (${altura}) precisa ser menor que a largura (${largura}): o cordão é deitado no canto`);
-      let escamas = null;
-      if (c.escamas != null) {
-        const e = c.escamas;
-        if (!e || typeof e !== 'object' || Array.isArray(e) || Object.keys(e).some((k) => k !== 'passo' && k !== 'altura')) return grita(st, i, 'friso', 'perfil', `as escamas do cordao precisam de passo e altura, como ${EXEMPLO_DE_CORDAO}`);
-        let passoE, alturaE;
-        try { passoE = st.num(e.passo); alturaE = st.num(e.altura); } catch (erro) { return grita(st, i, 'friso', 'perfil', String(erro.message)); }
-        if (!(passoE > 0) || !(alturaE > 0)) return grita(st, i, 'friso', 'perfil', `o passo e a altura das escamas precisam ser maiores que zero, e vieram ${passoE} e ${alturaE}`);
-        if (!(alturaE < altura)) return grita(st, i, 'friso', 'perfil', `a altura das escamas (${alturaE}) precisa ser menor que a do cordao (${altura})`);
-        escamas = { passo: passoE, altura: alturaE };
-      }
-      medidasDoCordao = { largura, altura, escamas };
+      if (!c || typeof c !== 'object' || Array.isArray(c) || Object.keys(c).some((k) => k !== 'largura')) return grita(st, i, 'friso', 'perfil', `o cordao é um chanfro e leva só a largura, como ${EXEMPLO_DE_CORDAO}; recebido ${JSON.stringify(c)}`);
+      let largura;
+      try { largura = st.num(c.largura); } catch (e) { return grita(st, i, 'friso', 'perfil', String(e.message)); }
+      if (!(largura > 0)) return grita(st, i, 'friso', 'perfil', `a largura do cordao precisa ser maior que zero, e veio ${largura}`);
+      medidasDoCordao = { largura };
       /* o perfil de referência, num canto de 90°: dá o número de pontos e a orientação; cada estação desenha o seu */
       const h = largura / 2 / Math.SQRT2;
-      perfil = perfilDoCordao({ peA: [h, h], nPeA: [-Math.SQRT1_2, Math.SQRT1_2], peB: [-h, h], nPeB: [Math.SQRT1_2, Math.SQRT1_2], altura, largura });
+      perfil = perfilDoCordao({ peA: [h, h], nPeA: [-Math.SQRT1_2, Math.SQRT1_2], peB: [-h, h], nPeB: [Math.SQRT1_2, Math.SQRT1_2], largura });
       vMin = Math.min(...perfil.map((p) => p[1])); vMax = Math.max(...perfil.map((p) => p[1]));
     } else {
       try {
@@ -523,7 +512,7 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
     } else if (daCostura) {
       if (comAba) return grita(st, i, 'friso', 'aba', 'a aba dobra a borda de uma chapa, e a costura não é borda: tire aba');
       const largo = medidasDoCordao ? medidasDoCordao.largura : Math.max(...perfil.map((q) => Math.abs(q[0]))) * 2;
-      const r = linhaDaCostura(st, a.costura, { passo: largo / 3, passoFino: medidasDoCordao?.escamas ? Math.min(largo / 3, medidasDoCordao.escamas.passo / 5) : largo / 3, alcance: 3 * largo, suave: largo / 2 });
+      const r = linhaDaCostura(st, a.costura, { passo: largo / 3, alcance: 3 * largo, suave: largo / 2 });
       if (r.erro) return grita(st, i, 'friso', r.erro[0], r.erro[1]);
       cadeias = r.cadeias;
     } else {
@@ -579,14 +568,14 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
       try {
         let doPerfil = comAba ? perfil.map(([w, v]) => [c.lado * w, v]) : perfil; let aVariacao = null; let trechoMaximo = null;
         if (medidasDoCordao) {
-          const { largura, altura } = medidasDoCordao;
+          const { largura } = medidasDoCordao;
           const { superficieA, superficieB } = c;
           let lado = null;
-          aVariacao = (s, entrada, _lado, quadro) => {
+          aVariacao = (_s, entrada, _lado, quadro) => {
             if (entrada == null) throw new ErroDoFriso('a estação do cordão precisa ser um ponto da costura');
-            const r = cordaoNoQuadro({ p: c.pontos[entrada], quadro, nA: c.lados[entrada].nA, nB: c.lados[entrada].nB, largura, altura, superficieA, superficieB, s, escamas: medidasDoCordao.escamas });
+            const r = cordaoNoQuadro({ p: c.pontos[entrada], quadro, nA: c.lados[entrada].nA, nB: c.lados[entrada].nB, largura, superficieA, superficieB });
             if (r.erro) throw new ErroDoFriso(r.erro, entrada);
-            if (!ehSimples(r.perfil)) throw new ErroDoFriso(`o perfil do cordão se cruza neste ponto: o canto entre as duas superfícies é aberto ou fechado demais para largura ${largura} e altura ${altura}`, entrada);
+            if (!ehSimples(r.perfil)) throw new ErroDoFriso(`o perfil do cordão se cruza neste ponto: o canto entre as duas superfícies é aberto ou fechado demais para a largura ${largura}; estreite o cordão`, entrada);
             /* o perfil sai no sentido anti-horário em (u, v), como o de referência; o sentido não pode trocar ao longo da linha */
             let area = 0;
             for (let k = 0; k < r.perfil.length; k++) { const q = r.perfil[k], w = r.perfil[(k + 1) % r.perfil.length]; area += q[0] * w[1] - w[0] * q[1]; }

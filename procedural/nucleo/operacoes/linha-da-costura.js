@@ -8,14 +8,12 @@
    com b encontra a de a com c). Em cada ponto ficam as normais dos dois lados (a média das faces de cada operando que
    tocam as arestas da linha naquele vértice), e a normal da linha é a bissetriz delas, que aponta para o vão do canto.
 
-   O CORDÃO. O perfil `cordao: { largura, altura }` não é fixo: em cada estação ele é desenhado no plano perpendicular à
-   linha, a partir das duas superfícies. Cada borda (o pé do cordão) fica sobre a superfície de um operando, a metade da
-   largura do canto, achada na própria malha do operando (o ponto mais próximo) para a superfície curva não deixar o pé
-   no ar, e afundada uma fração da largura. De um pé ao outro o contorno é quase reto: sai de cada pé deitado sobre a
-   superfície e se endireita até passar, no meio, à `altura` acima da reta entre os pés.
-   Com `escamas: { passo, altura }`, a altura ondula ao longo da linha com esse passo, e a frente de cada escama se
-   curva para trás nas bordas, em meia-lua. Por baixo, o perfil fecha por dentro do material. O número de pontos é o mesmo em
-   toda estação, como a varredura pede. */
+   O CORDÃO. O perfil `cordao: { largura }` não é fixo: em cada estação ele é desenhado no plano perpendicular à linha, a
+   partir das duas superfícies. Cada pé fica sobre a superfície de um operando, a metade da largura do canto, achado na
+   própria malha do operando (o ponto mais próximo) para a superfície curva não deixar o pé no ar, e afundado uma fração da
+   largura para o cordão cruzar a superfície com ângulo franco. De um pé ao outro o contorno é reto: um chanfro, a forma que
+   a pessoa escolheu por imagem em 2026-11-15, depois do arco, da borda tangente e das escamas na malha (o registro está no
+   banco de provas da costura em nó de tubos). Por baixo, o perfil fecha por dentro do material. */
 
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 const soma = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
@@ -36,27 +34,11 @@ const normalDe = (st, vs) => {
 const chave = (x, y) => (x < y ? `${x}-${y}` : `${y}-${x}`);
 
 export const EXEMPLO_DE_COSTURA = "costura: { de: { op: 'unir', id: 3 }, entre: [0, 1] }";
-export const EXEMPLO_DE_CORDAO = 'perfil: { cordao: { largura: 0.0055, altura: 0.0015, escamas: { passo: 0.0014, altura: 0.0002 } } }';
+export const EXEMPLO_DE_CORDAO = 'perfil: { cordao: { largura: 0.007 } }';
 
-/* a curva de pé a pé tem 2 * PONTOS_POR_LADO + 1 pontos, e o perfil, mais os 3 do fundo */
-const PONTOS_POR_LADO = 8;
 /* o quanto o pé afunda na superfície e o fundo do perfil abaixo do pé, em fração da largura */
 const AFUNDA = 0.03;
 const FUNDO = 0.3;
-/* o quanto a frente de cada escama se curva para trás nas bordas do cordão, em fração do passo (a escama em meia-lua) */
-const CURVA_DA_ESCAMA = 0.9;
-/* o ângulo com que o cordão sai da superfície em cada pé, e o teto da altura num canto aberto, em vezes a declarada */
-const ANGULO_DO_PE = (15 * Math.PI) / 180;
-const TETO_DA_ALTURA = 1.2;
-/* a forma de cada escama ao longo da linha, de -1 a 1 por passo: um patamar quase plano que desce devagar e sobe de uma vez
-   na frente da escama seguinte (o degrau raso da solda TIG), e não a onda redonda do cosseno */
-const FRENTE_DA_ESCAMA = 0.15;
-const degrau = (fase) => {
-  const f = fase - Math.floor(fase);
-  if (f < FRENTE_DA_ESCAMA) { const u = f / FRENTE_DA_ESCAMA; return -1 + 2 * (3 * u * u - 2 * u * u * u); }
-  const u = (f - FRENTE_DA_ESCAMA) / (1 - FRENTE_DA_ESCAMA);
-  return 1 - 2 * u * u;
-};
 
 /** reamostrar(pontos, fechada, passo) -> pontos a distâncias iguais ao longo da polilinha, o mais perto de `passo` que
  *  divide o comprimento; a volta não repete o primeiro ponto. */
@@ -305,67 +287,22 @@ const m2 = (a, k) => [a[0] * k, a[1] * k];
 const s2 = (a, b) => [a[0] + b[0], a[1] + b[1]];
 const p2 = (a, b) => a[0] * b[0] + a[1] * b[1];
 
-/** perfilDoCordao({ peA, nPeA, peB, nPeB, largura, altura }) -> [[u, v], ...] no plano da estação, a partir dos dois pés
+/** perfilDoCordao({ peA, nPeA, peB, nPeB, largura }) -> [[u, v], ...] no plano da estação, a partir dos dois pés
  *  (já no plano, em u e v) e das normais da superfície em cada pé (também no plano). A ordem é pé A, curva até o topo,
  *  curva até o pé B, e o fundo por dentro do material. */
-export function perfilDoCordao({ peA, nPeA, peB, nPeB, altura, largura, s = 0, escamas = null }) {
+export function perfilDoCordao({ peA, nPeA, peB, nPeB, largura }) {
   const bis = n2(s2(nPeA, nPeB));
   const afunda = AFUNDA * largura;
   const afundA = s2(peA, m2(nPeA, -afunda)), afundB = s2(peB, m2(nPeB, -afunda));
-  const corda = n2(d2(afundB, afundA));
-  let sobe = [-corda[1], corda[0]];
-  if (p2(sobe, bis) < 0) sobe = m2(sobe, -1);
-  /* a altura acompanha a abertura do canto (o ângulo entre os dois pés, visto da costura, que é a origem do plano): é a
-     declarada num canto de 90°, um pouco maior num canto aberto (até TETO_DA_ALTURA vezes), e cai a zero num canto de 60° ou
-     mais fechado, onde o cordão é a reta de pé a pé, um chanfro */
-  const cosCanto = p2(n2(peA), n2(peB));
-  altura *= Math.min(TETO_DA_ALTURA, Math.max(0, 1 - 2 * cosCanto));
-  /* o contorno de pé a pé, quase reto: uma curva de grau 5 que sai de cada pé deitada sobre a superfície, inclinada
-     ANGULO_DO_PE na direção do outro pé, e se endireita até a reta entre os pés, passando no meio à `altura` acima dela. A
-     borda fica suave sem encostar tangente no tubo, o que deixaria lascas na união (escolha da pessoa por imagem,
-     2026-11-15: "mais achatado, a ponto das bordas ficarem mais suaves, quase como se fosse reto") */
-  const comp = Math.hypot(...d2(afundB, afundA));
-  const saida = (nPe, de, para) => {
-    let t = [-nPe[1], nPe[0]];
-    if (p2(t, d2(para, de)) < 0) t = m2(t, -1);
-    const c = n2(d2(para, de));
-    const alfa = Math.acos(Math.max(-1, Math.min(1, p2(t, c))));
-    const giro = Math.min(alfa, ANGULO_DO_PE);
-    const lado = Math.sign(t[0] * c[1] - t[1] * c[0]) || 1;
-    const cs = Math.cos(giro * lado), sn = Math.sin(giro * lado);
-    return [t[0] * cs - t[1] * sn, t[0] * sn + t[1] * cs];
-  };
-  const q1 = s2(afundA, m2(saida(nPeA, afundA, afundB), comp / 3));
-  const q4 = s2(afundB, m2(saida(nPeB, afundB, afundA), comp / 3));
-  const base2 = s2(m2(q1, 2 / 3), m2(q4, 1 / 3)), base3 = s2(m2(q1, 1 / 3), m2(q4, 2 / 3));
-  const ctl = [afundA, q1, base2, base3, q4, afundB];
-  const pesos = [1, 5, 10, 10, 5, 1];
-  const ponto = (c, t) => { let r = [0, 0]; for (let k = 0; k < 6; k++) r = s2(r, m2(c[k], pesos[k] * (1 - t) ** (5 - k) * t ** k)); return r; };
-  const meioDaCorda = m2(s2(afundA, afundB), 0.5);
-  const subidaDaBase = p2(d2(ponto(ctl, 0.5), meioDaCorda), sobe);
-  const ergue = m2(sobe, (altura + afunda - subidaDaBase) / (20 / 32));
-  ctl[2] = s2(base2, ergue); ctl[3] = s2(base3, ergue);
-  const pts = [];
-  const N = 2 * PONTOS_POR_LADO;
-  for (let k = 0; k <= N; k++) {
-    const t = k / N, x = 2 * t - 1;
-    let q = ponto(ctl, t);
-    /* as escamas: a altura ondula ao longo da linha, com a frente de cada escama curvada para trás nas bordas */
-    if (escamas) q = s2(q, m2(sobe, escamas.altura * Math.sin(Math.PI * t) * degrau((s + CURVA_DA_ESCAMA * escamas.passo * x * x) / escamas.passo)));
-    pts.push(q);
-  }
-  /* o fundo: abaixo de cada pé e abaixo do meio, por dentro do material */
+  /* o chanfro: a face reta de pé a pé; o fundo fecha abaixo de cada pé e abaixo do meio, por dentro do material */
   const fundo = FUNDO * largura;
   const meio = m2(s2(afundA, afundB), 0.5);
-  pts.push(s2(afundB, m2(nPeB, -fundo)));
-  pts.push(s2(meio, m2(bis, -fundo)));
-  pts.push(s2(afundA, m2(nPeA, -fundo)));
-  return pts;
+  return [afundA, afundB, s2(afundB, m2(nPeB, -fundo)), s2(meio, m2(bis, -fundo)), s2(afundA, m2(nPeA, -fundo))];
 }
 
-/** cordaoNoQuadro({ p, quadro, nA, nB, largura, altura, superficieA, superficieB }) -> o perfil da estação, em u (eixo B
+/** cordaoNoQuadro({ p, quadro, nA, nB, largura, superficieA, superficieB }) -> o perfil da estação, em u (eixo B
  *  do quadro) e v (eixo N). */
-export function cordaoNoQuadro({ p, quadro, nA, nB, largura, altura, superficieA, superficieB, s = 0, escamas = null }) {
+export function cordaoNoQuadro({ p, quadro, nA, nB, largura, superficieA, superficieB }) {
   const { T, B, N } = quadro;
   const noPlano = (d) => { const q = sub(d, mult(T, dot(d, T))); return unit(q); };
   const a = noPlano(nA), b = noPlano(nB);
@@ -383,6 +320,6 @@ export function cordaoNoQuadro({ p, quadro, nA, nB, largura, altura, superficieA
   };
   const pA = pe(dA, superficieA), pB = pe(dB, superficieB);
   if (!pA || !pB) return { erro: 'o pé do cordão não achou a superfície de um dos sólidos perto da costura' };
-  const perfil = perfilDoCordao({ peA: pA.pe, nPeA: n2(pA.n), peB: pB.pe, nPeB: n2(pB.n), altura, largura, s, escamas });
+  const perfil = perfilDoCordao({ peA: pA.pe, nPeA: n2(pA.n), peB: pB.pe, nPeB: n2(pB.n), largura });
   return { perfil };
 }
