@@ -234,29 +234,11 @@ export function criarOperacoesBooleanas(servicos) {
     /* as faces que uma booleana recebeu como operando: o aviso da cópia no lugar que ninguém usou lê este conjunto */
     const usadas = (st.facesDeOperando ??= new Set());
     for (const faces of operandos) for (const f of faces) usadas.add(f);
-    /* NOVA TENTATIVA COM A FERRAMENTA DESLOCADA NA GRADE. Dois sólidos que se cruzam quase tangentes (o cordão de solda na
-       costura de dois tubos, 2026-11-15) às vezes cortam a superfície do outro exatamente sobre um vértice dele, e o resultado
-       volta com uma aresta de quatro faces, que o portão da casca reprova: um caso em cerca de dez, ao acaso das coincidências,
-       e a mesma coincidência em qualquer grade. Quando o portão reprova, o cálculo se repete com os sólidos depois do primeiro
-       deslocados na entrada da Manifold por um e por dois passos da grade (2^-20 do tamanho), em direções que não são de eixo:
-       os cantos que já existiam voltam com a posição em double, só os pontos novos do corte saem deslocados por essa fração,
-       e o resultado continua determinístico. A peça que passa sem deslocamento sai igual, bit a bit; a que reprova nas três
-       tentativas grita como antes, e a que tem canto coincidente entre sólidos não tenta de novo. */
     /* vincarCostura: as arestas da costura viram quebra de sombra nas faces dos dois lados, e o sombreado liso não atravessa
        a costura qualquer que seja o ângulo (o cordão na costura de dois tubos, que encontra o tubo a menos do ângulo do liso dele
        onde o canto é aberto, e mancharia o tubo com a direção do chanfro) */
     if (a.vincarCostura != null && a.vincarCostura !== true) return grita(st, i, op, 'vincarCostura', `vincarCostura só aceita o literal true, e veio ${JSON.stringify(a.vincarCostura)}`);
-    /* a nova tentativa só vale quando os sólidos não têm canto coincidente entre si: com canto compartilhado o contato é
-       declarado pela geometria (dois cubos que só se tocam num canto ou numa aresta), e o deslocamento separaria ou sobreporia
-       os sólidos e esconderia a recusa certa do portão */
-    const cantosPorOperando = operandos.map((faces) => new Set(faces.flatMap((f) => st.F.get(f).vs.map((v) => chaveDoPonto(st.V.get(v))))));
-    const compartilham = cantosPorOperando.some((cs, k) => k > 0 && [...cs].some((c) => cantosPorOperando.slice(0, k).some((anterior) => anterior.has(c))));
-    const DESLOCAMENTOS = compartilham ? [null] : [null, [1, 2, 3], [-2, 1, -3]];
-    for (let t = 0; t < DESLOCAMENTOS.length; t++) {
-      const ultima = t === DESLOCAMENTOS.length - 1;
-      const r = nucleoBooleano(st, i, op, wasm, a.origemId, operandos, null, { deslocamento: DESLOCAMENTOS[t], devolverFalhaDaCasca: !ultima, vincarCostura: a.vincarCostura === true });
-      if (!r?.falhouCasca) return r;
-    }
+    return nucleoBooleano(st, i, op, wasm, a.origemId, operandos, null, { vincarCostura: a.vincarCostura === true });
   }
 
   /* O CAMINHO COMUM: sólidos do núcleo entram na Manifold, o resultado volta
@@ -264,7 +246,7 @@ export function criarOperacoesBooleanas(servicos) {
      o resultado a partir dos sólidos já convertidos e devolve junto um sólido
      AUXILIAR (o material do arredondamento), cujas faces não vêm de face
      nenhuma do núcleo e por isso nascem todas com id novo. */
-  function nucleoBooleano(st, i, op, wasm, origemId, operandos, extra, { deslocamento = null, devolverFalhaDaCasca = false, vincarCostura = false } = {}) {
+  function nucleoBooleano(st, i, op, wasm, origemId, operandos, extra, { vincarCostura = false } = {}) {
 
     // ---- solda dos cantos coincidentes (representante = menor id) ----
     /* A solda vale ENTRE operandos também: dois cubos idênticos entram com os
@@ -350,8 +332,7 @@ export function criarOperacoesBooleanas(servicos) {
       const locais = [...new Set(tris)].sort((x, y) => x - y);
       const indice = new Map(locais.map((v, t) => [v, t]));
       const props = new Float32Array(locais.length * 4);
-      const desvio = deslocamento && k > 0 ? deslocamento.map((d) => d * passoDaGrade) : null;
-      locais.forEach((v, t) => { const q = local(st.V.get(v)); props.set([...(desvio ? q.map((x, c) => x + desvio[c]) : q), indiceDoRep.get(v)], t * 4); });
+      locais.forEach((v, t) => { props.set([...local(st.V.get(v)), indiceDoRep.get(v)], t * 4); });
       const mesh = new wasm.Mesh({ numProp: 4, vertProperties: props, triVerts: Uint32Array.from(tris, (v) => indice.get(v)), faceID: Uint32Array.from(idsFace) });
       try { manifolds.push(new wasm.Manifold(mesh)); }
       catch (e) { liberar(); return grita(st, i, op, `solidos[${k}]`, `a Manifold recusou o sólido ${k}: ${e?.message ?? e}`); }
@@ -1067,7 +1048,7 @@ export function criarOperacoesBooleanas(servicos) {
       const porIdEscrito = [...mantidas.map((fid) => vsDaMantida.get(fid) ?? st.F.get(fid).vs), ...depois].filter((P) => new Set(P).size >= 3);
       const casca = porRepresentante;
       const falha = cascaAberta(porRepresentante) ?? cascaAberta(porIdEscrito);
-      if (falha && (extra?.tentativa || devolverFalhaDaCasca)) return { falhouCasca: falha };
+      if (falha && extra?.tentativa) return { falhouCasca: falha };
       /* na tentativa (os prismas em meia-esquadria), pedaço sem área também
          reprova: é o sinal de tampas vizinhas que não coincidem, e o modo por
          fatias não tem tampa no meio da costura */

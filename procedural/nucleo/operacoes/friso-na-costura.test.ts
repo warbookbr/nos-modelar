@@ -34,6 +34,17 @@ describe('friso na costura de uma união', () => {
     });
   }
 
+  it('os dois estais a 22° que nascem do mesmo ponto: o cordão fecha, sem o laço curto da costura perto do ponto', () => {
+    const n = nucleo(passosDoCordao('estais sozinhos 22', 5));
+    expect(n.orfaos).toEqual([]);
+    expect(arestasSemPar(n)).toEqual([]);
+  });
+
+  it('a curva da costura fechada demais para o cordão recusa dizendo que ela não se abre e qual é a largura', () => {
+    const n = nucleo(passosDoCordao('estais sozinhos 22', 4));
+    expect(n.orfaos[0].motivo).toMatch(/a curva é a do encontro dos sólidos e não se abre; mude a largura do perfil \(o cordao tem largura 0.004\)/);
+  });
+
   it('vincarCostura põe as arestas da costura como quebra de sombra nas faces dos dois lados', () => {
     const n = nucleo(passosDoCordao('T reto 17/8', 7));
     const costura = n.origens.get(201)[0].arestas.map(([x, y]: number[]) => `${x}-${y}`);

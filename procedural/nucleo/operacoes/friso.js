@@ -593,7 +593,9 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
         s = varrerPerfil({ pontos: c.pontos, normais: c.normais, perfil: doPerfil, fechada: c.fechada, pontas, fechamento, trechoMaximo, tampa: comAba && !daPele ? tampaDaAba(doPerfil) : null, aberto: daPele, variacao: aVariacao });
       } catch (e) {
         if (!(e instanceof ErroDoFriso)) return grita(st, i, 'friso', 'linha', String(e.message));
-        return grita(st, i, 'friso', 'linha', `na linha ${citar(linha.nome)}${e.indice != null ? `, perto de ${c.nomeDoIndice(e.indice)}${c.espelhada ? ' (na cópia espelhada)' : ''}` : ''}: ${e.motivo}`);
+        /* na costura a curva é a do encontro dos sólidos e não se abre: a saída que sobra é estreitar o perfil */
+        const motivo = daCostura ? e.motivo.replace('abra a curva ou estreite o perfil', `a curva é a do encontro dos sólidos e não se abre; mude a largura do perfil${medidasDoCordao ? ` (o cordao tem largura ${medidasDoCordao.largura})` : ''}, que muda também o passo com que a costura é seguida`) : e.motivo;
+        return grita(st, i, 'friso', 'linha', `na linha ${citar(linha.nome)}${e.indice != null ? `, perto de ${c.nomeDoIndice(e.indice)}${c.espelhada ? ' (na cópia espelhada)' : ''}` : ''}: ${motivo}`);
       }
       const base = vertices.length;
       for (const p of s.vertices) vertices.push(c.espelhada ? [-p[0], p[1], p[2]] : p);

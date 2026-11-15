@@ -93,6 +93,19 @@ function refinar(pontos, fechada, passoFino) {
   return saida;
 }
 
+/** semTrechoCurto(pontos, fechada, minimo) -> os pontos sem os que ficam a menos de `minimo` do anterior mantido; na linha
+ *  aberta a última ponta fica, e sai a penúltima no lugar dela. */
+function semTrechoCurto(pontos, fechada, minimo) {
+  const saida = [pontos[0]];
+  for (let j = 1; j < pontos.length; j++) {
+    const ultimo = !fechada && j === pontos.length - 1;
+    if (tam(sub(pontos[j], saida[saida.length - 1])) >= minimo) saida.push(pontos[j]);
+    else if (ultimo && saida.length > 1) saida[saida.length - 1] = pontos[j];
+  }
+  while (fechada && saida.length > 3 && tam(sub(saida[0], saida[saida.length - 1])) < minimo) saida.pop();
+  return saida;
+}
+
 /** lerCostura(st, costura) -> { registro, de, entre } | { erro: [campo, mensagem] } */
 function lerCostura(st, costura) {
   if (!costura || typeof costura !== 'object' || Array.isArray(costura)) return { erro: ['costura', `costura precisa ser a costura de um unir, como ${EXEMPLO_DE_COSTURA}`] };
@@ -207,10 +220,19 @@ export function linhaDaCostura(st, costura, { passo, passoFino = passo, alcance,
   const cadeias = [];
   for (const b of brutas) {
     if (b.fechada ? b.vs.length < 3 : b.vs.length < 2) continue;
+    /* o trecho da costura mais curto que três passos (a costura de dois sólidos que nascem do mesmo ponto deixa laços de
+       frações de milímetro perto dele) não leva perfil nenhum: ele fica de fora, e o perfil das cadeias vizinhas o cobre */
+    const P0 = b.vs.map((v) => st.V.get(v));
+    let comprimento = 0;
+    for (let k = 1; k < P0.length; k++) comprimento += tam(sub(P0[k], P0[k - 1]));
+    if (b.fechada) comprimento += tam(sub(P0[0], P0[P0.length - 1]));
+    if (comprimento < 3 * passo) continue;
     /* a costura da booleana tem trechos de frações de milímetro ao lado de trechos longos, e a varredura dobraria nos curtos:
        a linha é reamostrada em passos iguais e suavizada, e as normais saem da superfície de cada sólido em cada ponto */
     const grossos = suavizar(reamostrar(b.vs.map((v) => [...st.V.get(v)]), b.fechada, passo), b.fechada);
-    const pontos = passoFino < passo ? refinar(grossos, b.fechada, passoFino) : grossos;
+    /* a suavização puxa as pontas de um trecho aberto curto para perto uma da outra: o ponto a menos de um quarto do passo do
+       anterior sai, e a varredura não recebe trecho degenerado (os estais a 22°, revisão de 2026-11-15) */
+    const pontos = semTrechoCurto(passoFino < passo ? refinar(grossos, b.fechada, passoFino) : grossos, b.fechada, passoFino / 4);
     const e0 = escolhidas[b.ks[0]];
     const superficieA = superficieDoOperando(st, facesDoOperando.get(e0.oA) ?? [], pontos, alcance, suave);
     const superficieB = superficieDoOperando(st, facesDoOperando.get(e0.oB) ?? [], pontos, alcance, suave);
