@@ -11,9 +11,10 @@
    O CORDÃO. O perfil `cordao: { largura, altura }` não é fixo: em cada estação ele é desenhado no plano perpendicular à
    linha, a partir das duas superfícies. Cada borda (o pé do cordão) fica sobre a superfície de um operando, a metade da
    largura do canto, achada na própria malha do operando (o ponto mais próximo) para a superfície curva não deixar o pé
-   no ar, e afundada uma fração da altura para o cordão cruzar a superfície em vez de encostar nela. De um pé ao outro o
-   contorno é uma curva de Bézier só, que sai tangente às duas superfícies e passa, no meio, à `altura` acima da reta
-   entre os pés; por baixo, o perfil fecha por dentro do material. O número de pontos é o mesmo em
+   no ar, e afundada uma fração da largura para o cordão cruzar a superfície com ângulo franco. De um pé ao outro o
+   contorno é um arco que sobe como o seno até a `altura` no meio, sem crista, e a borda sai nítida, como a de uma solda.
+   Com `escamas: { passo, altura }`, a altura ondula ao longo da linha com esse passo, e a frente de cada escama se
+   curva para trás nas bordas, em meia-lua. Por baixo, o perfil fecha por dentro do material. O número de pontos é o mesmo em
    toda estação, como a varredura pede. */
 
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
@@ -35,15 +36,15 @@ const normalDe = (st, vs) => {
 const chave = (x, y) => (x < y ? `${x}-${y}` : `${y}-${x}`);
 
 export const EXEMPLO_DE_COSTURA = "costura: { de: { op: 'unir', id: 3 }, entre: [0, 1] }";
-export const EXEMPLO_DE_CORDAO = 'perfil: { cordao: { largura: 0.009, altura: 0.0024 } }';
+export const EXEMPLO_DE_CORDAO = 'perfil: { cordao: { largura: 0.0055, altura: 0.0015, escamas: { passo: 0.0014, altura: 0.0002 } } }';
 
 /* a curva de pé a pé tem 2 * PONTOS_POR_LADO + 1 pontos, e o perfil, mais os 3 do fundo */
 const PONTOS_POR_LADO = 8;
-/* o quanto o pé afunda na superfície, em fração da altura, e o fundo do perfil abaixo do pé, em fração da largura */
-const AFUNDA = 0.04;
+/* o quanto o pé afunda na superfície e o fundo do perfil abaixo do pé, em fração da largura */
+const AFUNDA = 0.03;
 const FUNDO = 0.3;
-/* o braço da tangente em cada pé, em fração de um terço da reta entre os pés: longo, para o cordão sair raso da superfície */
-const BRACO_DO_PE = 1;
+/* o quanto a frente de cada escama se curva para trás nas bordas do cordão, em fração do passo (a escama em meia-lua) */
+const CURVA_DA_ESCAMA = 0.35;
 
 /** reamostrar(pontos, fechada, passo) -> pontos a distâncias iguais ao longo da polilinha, o mais perto de `passo` que
  *  divide o comprimento; a volta não repete o primeiro ponto. */
@@ -79,6 +80,25 @@ function suavizar(pontos, fechada) {
   return P;
 }
 
+/** refinar(pontos, fechada, passoFino) -> a curva de Catmull-Rom que passa pelos pontos, amostrada a cada `passoFino`
+ *  mais ou menos: a linha fina segue a suavizada sem os cantos que a interpolação reta deixaria em cada ponto dela. */
+function refinar(pontos, fechada, passoFino) {
+  const n = pontos.length;
+  const em = (j) => (fechada ? pontos[(j + n) % n] : pontos[Math.max(0, Math.min(n - 1, j))]);
+  const saida = [];
+  const trechos = fechada ? n : n - 1;
+  for (let j = 0; j < trechos; j++) {
+    const p0 = em(j - 1), p1 = em(j), p2_ = em(j + 1), p3 = em(j + 2);
+    const partes = Math.max(1, Math.round(tam(sub(p2_, p1)) / passoFino));
+    for (let k = 0; k < partes; k++) {
+      const t = k / partes, t2 = t * t, t3 = t2 * t;
+      saida.push([0, 1, 2].map((c) => 0.5 * ((2 * p1[c]) + (-p0[c] + p2_[c]) * t + (2 * p0[c] - 5 * p1[c] + 4 * p2_[c] - p3[c]) * t2 + (-p0[c] + 3 * p1[c] - 3 * p2_[c] + p3[c]) * t3)));
+    }
+  }
+  if (!fechada) saida.push(pontos[n - 1]);
+  return saida;
+}
+
 /** lerCostura(st, costura) -> { registro, de, entre } | { erro: [campo, mensagem] } */
 function lerCostura(st, costura) {
   if (!costura || typeof costura !== 'object' || Array.isArray(costura)) return { erro: ['costura', `costura precisa ser a costura de um unir, como ${EXEMPLO_DE_COSTURA}`] };
@@ -105,7 +125,7 @@ function lerCostura(st, costura) {
 /** linhaDaCostura(st, costura, nome) -> { cadeias } | { erro: [campo, mensagem] }
  *  Cada cadeia é a que o `friso` varre ({ pontos, normais, fechada, espelhada, nomeDoIndice, nomes, passo }) com, a
  *  mais, `lados`: por ponto, as normais dos dois operandos ({ nA, nB }), e `operandos`: [a, b] e as faces de cada um. */
-export function linhaDaCostura(st, costura, { passo, alcance, suave }) {
+export function linhaDaCostura(st, costura, { passo, passoFino = passo, alcance, suave }) {
   const lida = lerCostura(st, costura);
   if (lida.erro) return lida;
   const { registro, de, entre } = lida;
@@ -195,7 +215,8 @@ export function linhaDaCostura(st, costura, { passo, alcance, suave }) {
     if (b.fechada ? b.vs.length < 3 : b.vs.length < 2) continue;
     /* a costura da booleana tem trechos de frações de milímetro ao lado de trechos longos, e a varredura dobraria nos curtos:
        a linha é reamostrada em passos iguais e suavizada, e as normais saem da superfície de cada sólido em cada ponto */
-    const pontos = suavizar(reamostrar(b.vs.map((v) => [...st.V.get(v)]), b.fechada, passo), b.fechada);
+    const grossos = suavizar(reamostrar(b.vs.map((v) => [...st.V.get(v)]), b.fechada, passo), b.fechada);
+    const pontos = passoFino < passo ? refinar(grossos, b.fechada, passoFino) : grossos;
     const e0 = escolhidas[b.ks[0]];
     const superficieA = superficieDoOperando(st, facesDoOperando.get(e0.oA) ?? [], pontos, alcance, suave);
     const superficieB = superficieDoOperando(st, facesDoOperando.get(e0.oB) ?? [], pontos, alcance, suave);
@@ -275,39 +296,36 @@ const p2 = (a, b) => a[0] * b[0] + a[1] * b[1];
 /** perfilDoCordao({ peA, nPeA, peB, nPeB, largura, altura }) -> [[u, v], ...] no plano da estação, a partir dos dois pés
  *  (já no plano, em u e v) e das normais da superfície em cada pé (também no plano). A ordem é pé A, curva até o topo,
  *  curva até o pé B, e o fundo por dentro do material. */
-export function perfilDoCordao({ peA, nPeA, peB, nPeB, altura, largura }) {
+export function perfilDoCordao({ peA, nPeA, peB, nPeB, altura, largura, s = 0, escamas = null }) {
   const bis = n2(s2(nPeA, nPeB));
-  const afundA = s2(peA, m2(nPeA, -AFUNDA * altura)), afundB = s2(peB, m2(nPeB, -AFUNDA * altura));
-  const corda = Math.hypot(...d2(afundB, afundA));
-  /* a tangente da superfície em cada pé, apontando para o outro pé */
-  const tangente = (nPe, de, para) => { let t = [-nPe[1], nPe[0]]; if (p2(t, d2(para, de)) < 0) t = m2(t, -1); return t; };
-  const q1 = s2(afundA, m2(tangente(nPeA, afundA, afundB), BRACO_DO_PE * corda / 3));
-  const q4 = s2(afundB, m2(tangente(nPeB, afundB, afundA), BRACO_DO_PE * corda / 3));
-  /* uma curva só, de grau 5, do pé A ao pé B: os dois primeiros e os dois últimos pontos de controle dão a tangente nos pés,
-     e os dois do meio sobem na bissetriz o que falta para o meio da curva ficar à `altura` acima da reta entre os pés. A
-     curvatura se espalha pela largura, sem a linha de virada que duas curvas emendadas no topo desenham. */
-  const meioDaCorda = m2(s2(afundA, afundB), 0.5);
-  const base2 = s2(m2(q1, 2 / 3), m2(q4, 1 / 3)), base3 = s2(m2(q1, 1 / 3), m2(q4, 2 / 3));
-  const ctl = [afundA, q1, base2, base3, q4, afundB];
-  const pesos = [1, 5, 10, 10, 5, 1];
-  const ponto = (c, t) => { let r = [0, 0]; for (let k = 0; k < 6; k++) r = s2(r, m2(c[k], pesos[k] * (1 - t) ** (5 - k) * t ** k)); return r; };
-  const subidaDaBase = p2(d2(ponto(ctl, 0.5), meioDaCorda), bis);
-  const sobe = m2(bis, (altura - subidaDaBase) / (20 / 32));
-  ctl[2] = s2(base2, sobe); ctl[3] = s2(base3, sobe);
+  const afunda = AFUNDA * largura;
+  const afundA = s2(peA, m2(nPeA, -afunda)), afundB = s2(peB, m2(nPeB, -afunda));
+  const corda = n2(d2(afundB, afundA));
+  let sobe = [-corda[1], corda[0]];
+  if (p2(sobe, bis) < 0) sobe = m2(sobe, -1);
+  /* o arco de pé a pé: a altura cresce como o seno, sem crista no meio, e sai dos pés com ângulo franco, que dá a borda
+     nítida da solda; a altura conta o afundamento, para o meio ficar à `altura` acima da reta entre os pés na superfície */
   const pts = [];
   const N = 2 * PONTOS_POR_LADO;
-  for (let k = 0; k <= N; k++) pts.push(ponto(ctl, k / N));
+  for (let k = 0; k <= N; k++) {
+    const t = k / N, x = 2 * t - 1;
+    let h = (altura + afunda) * Math.sin(Math.PI * t);
+    /* as escamas: a altura ondula ao longo da linha, com a frente de cada escama curvada para trás nas bordas */
+    if (escamas) h += escamas.altura * Math.sin(Math.PI * t) * Math.cos((2 * Math.PI * (s + CURVA_DA_ESCAMA * escamas.passo * x * x)) / escamas.passo);
+    pts.push(s2(s2(afundA, m2(d2(afundB, afundA), t)), m2(sobe, h)));
+  }
   /* o fundo: abaixo de cada pé e abaixo do meio, por dentro do material */
   const fundo = FUNDO * largura;
+  const meio = m2(s2(afundA, afundB), 0.5);
   pts.push(s2(afundB, m2(nPeB, -fundo)));
-  pts.push(s2(meioDaCorda, m2(bis, -fundo)));
+  pts.push(s2(meio, m2(bis, -fundo)));
   pts.push(s2(afundA, m2(nPeA, -fundo)));
   return pts;
 }
 
 /** cordaoNoQuadro({ p, quadro, nA, nB, largura, altura, superficieA, superficieB }) -> o perfil da estação, em u (eixo B
  *  do quadro) e v (eixo N). */
-export function cordaoNoQuadro({ p, quadro, nA, nB, largura, altura, superficieA, superficieB }) {
+export function cordaoNoQuadro({ p, quadro, nA, nB, largura, altura, superficieA, superficieB, s = 0, escamas = null }) {
   const { T, B, N } = quadro;
   const noPlano = (d) => { const q = sub(d, mult(T, dot(d, T))); return unit(q); };
   const a = noPlano(nA), b = noPlano(nB);
@@ -325,6 +343,6 @@ export function cordaoNoQuadro({ p, quadro, nA, nB, largura, altura, superficieA
   };
   const pA = pe(dA, superficieA), pB = pe(dB, superficieB);
   if (!pA || !pB) return { erro: 'o pé do cordão não achou a superfície de um dos sólidos perto da costura' };
-  const perfil = perfilDoCordao({ peA: pA.pe, nPeA: n2(pA.n), peB: pB.pe, nPeB: n2(pB.n), altura, largura });
+  const perfil = perfilDoCordao({ peA: pA.pe, nPeA: n2(pA.n), peB: pB.pe, nPeB: n2(pB.n), altura, largura, s, escamas });
   return { perfil };
 }
