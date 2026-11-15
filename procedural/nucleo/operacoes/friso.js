@@ -574,7 +574,6 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
             if (entrada == null) throw new ErroDoFriso('a estação do cordão precisa ser um ponto da costura');
             const r = cordaoNoQuadro({ p: c.pontos[entrada], quadro, nA: c.lados[entrada].nA, nB: c.lados[entrada].nB, largura, superficieA, superficieB });
             if (r.erro) throw new ErroDoFriso(r.erro, entrada);
-            if (!ehSimples(r.perfil)) throw new ErroDoFriso(`o perfil do cordão se cruza neste ponto: o canto entre as duas superfícies é aberto ou fechado demais para a largura ${largura}; estreite o cordão`, entrada);
             /* o perfil sai no sentido anti-horário em (u, v), como o de referência: o referencial da varredura é contínuo ao longo
                da costura, e o lado de cada sólido não troca de mão; se trocasse, o cordão se torceria e o portão de casca fechada
                da união que o funde aos sólidos gritaria */

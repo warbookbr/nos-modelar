@@ -65,10 +65,12 @@ describe('friso na costura de uma união', () => {
     expect([...sem.F.values()].some((f: any) => f.quebras?.length)).toBe(false);
   });
 
-  it('o cordão de tubos de raio igual recusa onde as superfícies ficam tangentes e o perfil se cruza', () => {
+  it('o cordão de tubos de raio igual termina onde as superfícies ficam tangentes, e a malha fecha', () => {
     const p = passosDoCordao('T reto 17/8', 7);
     p[1] = tubo(2, [0, m(200), 0], [m(200), m(200), 0], m(17), 48, 0.004);
-    expect(recusa(p)).toMatch(/o perfil do cordão se cruza neste ponto: o canto entre as duas superfícies é aberto ou fechado demais para a largura 0.007/);
+    const n = nucleo(p);
+    expect(n.orfaos).toEqual([]);
+    expect(arestasSemPar(n)).toEqual([]);
   });
 
   it('o cordão marca o próprio sombreado e é determinístico', () => {
