@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1968 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1971 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -577,6 +577,7 @@
 - `2026-11-14-modelagem-de-robo.md` — Modelagem de robô humanoide: o que já serve, o que falta na montagem e por onde começar
 - `2026-11-14-prancha-menos-manual.md` — Prancha menos manual: desvio medido, leitura combinada de um comando e o que ficou de fora declarado
 - `2026-11-15-costura-em-no-de-tubos.md` — Cordão de solda na costura de tubos: o friso que segue a costura de uma união, e a costura em nó de tubos
+- `2026-11-15-reflexo-na-bancada.md` — Reflexo na bancada: a superfície de lataria julgada sem o Blender
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
@@ -1514,6 +1515,14 @@
 ## procedural/pecas/carro-fastback/
 
 - `ALINHAMENTO.md` — Carro fastback: alinhamento
+
+## procedural/pecas/carro-fastback/partes/lataria/
+
+- `receita.js` — carro-fastback/lataria — o piloto do quarto traseiro: a chapa contínua de lataria do meio da porta (z 0) para trás, lado +x, com o para-lama traseiro salient…
+
+## procedural/pecas/carro-fastback/partes/lataria/rodadas/
+
+- `receita-01.js` — carro-fastback/lataria — o piloto do quarto traseiro: a chapa contínua de lataria do meio da porta (z 0) para trás, lado +x, com o para-lama traseiro salient…
 
 ## procedural/pecas/carro-fastback/referencias/
 
