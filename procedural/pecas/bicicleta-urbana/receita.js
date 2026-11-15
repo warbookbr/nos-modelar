@@ -42,6 +42,8 @@ export const TABELA = {
   raios_cruzamentos: 3,
   raio_encaixe_no_aro: 2,
   raio_aro_x: 3,
+  pneu_encaixe_no_aro: 0.6,
+  folga_minima: 5,
   lados_roda: 72,
   lados_pneu_secao: 4,
   /* tubos do quadro (diâmetro externo) */
@@ -383,9 +385,11 @@ export function derivar(T) {
     torno(parte, 'aroMetal', [[raioAroInterno, -meiaAro], [raioAssento, -meiaAro], [raioAssento, meiaAro], [raioAroInterno, meiaAro], [raioAroInterno, -meiaAro]], em, { liso: 30 });
     const topoPneu = raioPneu;
     const ombro = T.pneu_altura * 0.45;
-    torno(parte, 'borracha', [
-      [raioAssento, -meiaPneu + 2], [raioAssento + ombro * 0.5, -meiaPneu], [raioAssento + ombro * 1.2, -meiaPneu + 0.8], [topoPneu - 4, -meiaPneu * 0.7], [topoPneu, -meiaPneu * 0.5], [topoPneu, -meiaPneu * 0.3], [topoPneu - 1.4, -meiaPneu * 0.26], [topoPneu - 1.4, -meiaPneu * 0.14], [topoPneu, -meiaPneu * 0.1],
-      [topoPneu, meiaPneu * 0.1], [topoPneu - 1.4, meiaPneu * 0.14], [topoPneu - 1.4, meiaPneu * 0.26], [topoPneu, meiaPneu * 0.3], [topoPneu, meiaPneu * 0.5], [topoPneu - 4, meiaPneu * 0.7], [raioAssento + ombro * 1.2, meiaPneu - 0.8], [raioAssento + ombro * 0.5, meiaPneu], [raioAssento, meiaPneu - 2], [raioAssento, -meiaPneu + 2],
+    const parteDoPneu = parte === 'rodaDianteira' ? 'pneuDianteiro' : 'pneuTraseiro';
+    const encaixe = T.pneu_encaixe_no_aro; /* o pneu assenta no aro com este tanto de sobreposição, para as duas superfícies se encostarem apesar do número de lados diferente */
+    torno(parteDoPneu, 'borracha', [
+      [raioAssento - encaixe, -meiaPneu + 2], [raioAssento + ombro * 0.5, -meiaPneu], [raioAssento + ombro * 1.2, -meiaPneu + 0.8], [topoPneu - 4, -meiaPneu * 0.7], [topoPneu, -meiaPneu * 0.5], [topoPneu, -meiaPneu * 0.3], [topoPneu - 1.4, -meiaPneu * 0.26], [topoPneu - 1.4, -meiaPneu * 0.14], [topoPneu, -meiaPneu * 0.1],
+      [topoPneu, meiaPneu * 0.1], [topoPneu - 1.4, meiaPneu * 0.14], [topoPneu - 1.4, meiaPneu * 0.26], [topoPneu, meiaPneu * 0.3], [topoPneu, meiaPneu * 0.5], [topoPneu - 4, meiaPneu * 0.7], [raioAssento + ombro * 1.2, meiaPneu - 0.8], [raioAssento + ombro * 0.5, meiaPneu], [raioAssento - encaixe, meiaPneu - 2], [raioAssento - encaixe, -meiaPneu + 2],
     ], em, { lados: T.lados_roda * 2, liso: 40 });
     itens.push({ k: 'raios', parte, material: 'aco', em, flange: { r: T.cubo_flange_raio - 3, x: f + e / 2 }, aro: raioAroInterno + T.raio_encaixe_no_aro, delta, passo: passoRaios, quantos: nRaiosLado / 2, diametro: T.raio_diametro, xAro: T.raio_aro_x });
   }
@@ -618,6 +622,15 @@ export function gerarPassos(T) {
   return passos;
 }
 
+/* O que não pode se tocar: o pneu e o quadro ou o garfo (folga de 5 mm medida pela malha), e a corrente e a roda traseira. */
+export const SEPARADOS = [
+  { par: ['pneuDianteiro', 'garfo'], folgaMinima: 0.005, motivo: 'o pneu dianteiro passa entre as lâminas do garfo e sob a coroa dele sem encostar' },
+  { par: ['pneuDianteiro', 'quadro'], folgaMinima: 0.005, motivo: 'o pneu dianteiro passa abaixo da caixa de direção e do tubo inferior sem encostar' },
+  { par: ['pneuTraseiro', 'quadro'], folgaMinima: 0.005, motivo: 'o pneu traseiro passa entre os estais e na frente do tubo do selim sem encostar' },
+  { par: ['rodaTraseira', 'corrente'], folgaMinima: 0.005, motivo: 'a corrente passa por dentro das gancheiras, ao lado da roda traseira, sem encostar no cubo, nos raios ou nas porcas' },
+  { par: ['pneuTraseiro', 'corrente'], folgaMinima: 0.005, motivo: 'a corrente passa por dentro das gancheiras, ao lado do pneu traseiro, sem encostar nele' },
+];
+
 export const CONTATOS = [
   { par: ['quadro', 'garfo'], motivo: 'a coluna do garfo atravessa a caixa de direção, coaxial a ela, e se apoia nela' },
   { par: ['garfo', 'rodaDianteira'], motivo: 'as pontas das pernas do garfo seguram as extremidades do eixo dianteiro' },
@@ -628,6 +641,8 @@ export const CONTATOS = [
   { par: ['quadro', 'canote'], motivo: 'o canote entra no tubo do selim, coaxial a ele' },
   { par: ['canote', 'selim'], motivo: 'a braçadeira dos trilhos do selim assenta no topo do canote' },
   { par: ['quadro', 'pedivela'], motivo: 'o eixo do pedivela atravessa o movimento central e os braços ficam ao lado dele' },
+  { par: ['rodaDianteira', 'pneuDianteiro'], motivo: 'o pneu assenta no aro da roda dianteira, com 0,6 mm de sobreposição na base do pneu', penetracaoMaxima: 0.0015 },
+  { par: ['rodaTraseira', 'pneuTraseiro'], motivo: 'o pneu assenta no aro da roda traseira, com 0,6 mm de sobreposição na base do pneu', penetracaoMaxima: 0.0015 },
   { par: ['pedivela', 'pedais'], motivo: 'cada pedal gira no eixo na ponta do braço do pedivela' },
   { par: ['rodaTraseira', 'catraca'], motivo: 'a catraca assenta na face externa da flange direita do cubo traseiro' },
   { par: ['pedivela', 'corrente'], motivo: 'a corrente enrola os dentes da coroa, no mesmo plano x da coroa' },
@@ -653,8 +668,10 @@ const receita = {
     partes: [
       { nome: 'quadro', forma: 'tubos redondos: superior, inferior (mais grosso), do selim, caixa de direção grossa, 2 gancheiras superiores que chegam à luva do tubo do selim logo abaixo da braçadeira, 2 inferiores, abraçadeira do canote, movimento central', tecnica: 'loft de seções circulares entre nós derivados; lathe no movimento central' },
       { nome: 'garfo', forma: 'garfo reto: cabeça larga e arredondada, duas pernas que afinam e convergem até as pontas do eixo, e coluna coaxial à caixa de direção', tecnica: 'loft circular por perna, ponte e coluna' },
-      { nome: 'rodaDianteira', forma: 'cubo, 36 raios cruzados, aro e pneu de 48 mm de largura e 42 mm de altura, com sulcos, centrados entre as pernas do garfo', tecnica: 'lathe de pneu, aro e cubo; raios por loft e arranja radial' },
-      { nome: 'rodaTraseira', forma: 'cubo, 36 raios cruzados, aro e pneu de 48 mm de largura e 42 mm de altura, com sulcos, centrados entre as gancheiras', tecnica: 'lathe de pneu, aro e cubo; raios por loft e arranja radial' },
+      { nome: 'rodaDianteira', forma: 'cubo com porcas, 36 raios cruzados e aro, centrados entre as pernas do garfo', tecnica: 'lathe de aro e cubo; raios por loft e arranja radial' },
+      { nome: 'pneuDianteiro', forma: 'pneu de 48 mm de largura e 42 mm de altura, com sulcos, assentado no aro da roda dianteira', tecnica: 'lathe do perfil do pneu' },
+      { nome: 'pneuTraseiro', forma: 'pneu de 48 mm de largura e 42 mm de altura, com sulcos, assentado no aro da roda traseira', tecnica: 'lathe do perfil do pneu' },
+      { nome: 'rodaTraseira', forma: 'cubo com porcas, 36 raios cruzados e aro, centrados entre as gancheiras', tecnica: 'lathe de aro e cubo; raios por loft e arranja radial' },
       { nome: 'mesa', forma: 'braçadeira na coluna, pescoço curto inclinado para a frente e para cima e braçadeira que segura o guidão pelo centro', tecnica: 'loft circular' },
       { nome: 'guidao', forma: 'guidão riser de 680 mm: centro reto, subida suave junto da mesa, pontas quase horizontais recuando levemente', tecnica: 'loft circular ao longo de caminho calculado' },
       { nome: 'manoplas', forma: 'duas manoplas cilíndricas nas pontas do guidão', tecnica: 'loft circular sobre o mesmo caminho das pontas' },
@@ -675,6 +692,7 @@ const receita = {
     ],
   },
   contatos: CONTATOS,
+  separados: SEPARADOS,
   get PONTOS() {
     const T = this.PARAMS;
     const { g } = derivar(T);
@@ -682,8 +700,8 @@ const receita = {
     return [
       { nome: 'eixo traseiro', parte: 'rodaTraseira', medida: 'centro', em: [0, g.yEixo, g.zEixoTras], toleranciaMm: 1 },
       { nome: 'eixo dianteiro', parte: 'rodaDianteira', medida: 'centro', em: [0, g.yEixo, g.zEixoFrente], toleranciaMm: 1 },
-      { nome: 'topo do pneu dianteiro', parte: 'rodaDianteira', medida: 'maximo', em: [T.eixo_dianteiro_largura / 2 + T.garfo_perna_diametro_ponta / 2 + T.porca_espessura, topo, g.zEixoFrente + g.raioPneu], toleranciaMm: 1 },
-      { nome: 'chão sob o pneu traseiro', parte: 'rodaTraseira', medida: 'minimo', em: [-(T.eixo_traseiro_largura / 2 + T.base_diametro / 2 + T.porca_espessura), topo - 2 * g.raioPneu, g.zEixoTras - g.raioPneu], toleranciaMm: 1 },
+      { nome: 'topo do pneu dianteiro', parte: 'pneuDianteiro', medida: 'maximo', em: [T.pneu_largura / 2, topo, g.zEixoFrente + g.raioPneu], toleranciaMm: 1 },
+      { nome: 'chão sob o pneu traseiro', parte: 'pneuTraseiro', medida: 'minimo', em: [-T.pneu_largura / 2, topo - 2 * g.raioPneu, g.zEixoTras - g.raioPneu], toleranciaMm: 1 },
     ];
   },
   get PASSOS() { return gerarPassos(this.PARAMS); },
