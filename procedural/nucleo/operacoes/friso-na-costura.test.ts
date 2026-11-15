@@ -34,15 +34,15 @@ describe('friso na costura de uma união', () => {
     });
   }
 
-  it('os dois estais a 22° que nascem do mesmo ponto: o cordão fecha, sem o laço curto da costura perto do ponto', () => {
-    const n = nucleo(passosDoCordao('estais sozinhos 22', 5));
+  it('os dois estais a 22° que nascem do mesmo ponto: o cordão fecha, cortado no canto e sem o laço curto da costura perto do ponto', () => {
+    const n = nucleo(passosDoCordao('estais sozinhos 22', 4));
     expect(n.orfaos).toEqual([]);
     expect(arestasSemPar(n)).toEqual([]);
   });
 
   it('a curva da costura fechada demais para o cordão recusa dizendo que ela não se abre e qual é a largura', () => {
-    const n = nucleo(passosDoCordao('estais sozinhos 22', 4));
-    expect(n.orfaos[0].motivo).toMatch(/a curva é a do encontro dos sólidos e não se abre; mude a largura do perfil \(o cordao tem largura 0.004\)/);
+    const n = nucleo(passosDoCordao('T reto 17/8', 20));
+    expect(n.orfaos[0].motivo).toMatch(/a curva é a do encontro dos sólidos e não se abre; mude a largura do perfil \(o cordao tem largura 0.02\)/);
   });
 
   it('sem entre, a costura de três tubos e do nó de quatro tubos leva um cordão por par, e a união das cascas sobrepostas fecha', () => {
@@ -63,6 +63,12 @@ describe('friso na costura de uma união', () => {
     expect(costura.every((c: string) => quebras.has(c))).toBe(true);
     const sem = nucleo(passosDoCordao('T reto 17/8', 7, { vincar: false }));
     expect([...sem.F.values()].some((f: any) => f.quebras?.length)).toBe(false);
+  });
+
+  it('o cordão de tubos de raio igual recusa onde as superfícies ficam tangentes e o perfil se cruza', () => {
+    const p = passosDoCordao('T reto 17/8', 7);
+    p[1] = tubo(2, [0, m(200), 0], [m(200), m(200), 0], m(17), 48, 0.004);
+    expect(recusa(p)).toMatch(/o perfil do cordão se cruza neste ponto: o canto entre as duas superfícies é aberto ou fechado demais para a largura 0.007/);
   });
 
   it('o cordão marca o próprio sombreado e é determinístico', () => {
