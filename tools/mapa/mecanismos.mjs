@@ -9,6 +9,7 @@
  *
  *   node tools/mapa/mecanismos.mjs --check
  *   node tools/mapa/mecanismos.mjs --ajuda */
+import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -49,7 +50,10 @@ export function conferirMecanismos({ raiz = REPO, dispensas = DISPENSAS, teto = 
       else if (md && e.isFile() && e.name.endsWith('.md')) itens.push(`${pasta}/${e.name}`);
     }
   }
+  /* o que o git ignora (a pasta local de uma worktree, `tmp/`) não está no repositório e não é mecanismo: a conferência no CI não o vê */
+  const ignorados = ignoradosPeloGit(raiz, itens);
   for (const item of itens) {
+    if (ignorados.has(item)) continue;
     if (dispensas[item] || texto.includes(item)) continue;
     problemas.push(`${item} não está em ${PAGINA}. Ponha uma linha na tabela com o caminho dele, ou, se não é mecanismo, uma entrada em DISPENSAS de tools/mapa/mecanismos.mjs com o motivo.`);
   }
@@ -58,6 +62,18 @@ export function conferirMecanismos({ raiz = REPO, dispensas = DISPENSAS, teto = 
     else if (texto.includes(dispensado)) problemas.push(`a dispensa ${dispensado} já está citada em ${PAGINA}: tire-a de DISPENSAS em tools/mapa/mecanismos.mjs.`);
   }
   return { problemas, itens, linhas };
+}
+
+/** ignoradosPeloGit(raiz, itens) -> os itens que o `.gitignore` cobre; fora de um repositório git, nenhum. */
+function ignoradosPeloGit(raiz, itens) {
+  if (!itens.length) return new Set();
+  try {
+    const saida = execFileSync('git', ['check-ignore', '--stdin'], { cwd: raiz, input: itens.join('\n'), encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'] });
+    return new Set(saida.split('\n').filter(Boolean));
+  } catch (e) {
+    /* sai com 1 quando nenhum item é ignorado, e com 128 fora de um repositório */
+    return new Set(String(e.stdout ?? '').split('\n').filter(Boolean));
+  }
 }
 
 const executadoDireto = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
