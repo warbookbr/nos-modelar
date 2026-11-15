@@ -46,7 +46,7 @@ const FUNDO = 0.3;
 /* o quanto a frente de cada escama se curva para trás nas bordas do cordão, em fração do passo (a escama em meia-lua) */
 const CURVA_DA_ESCAMA = 0.9;
 /* o expoente do seno do arco: abaixo de 1 o topo achata e a borda fica mais íngreme, e o cordão deixa de ser um tubo redondo */
-const EXPOENTE_DO_ARCO = 0.5;
+const EXPOENTE_DO_ARCO = 0.35;
 /* a forma de cada escama ao longo da linha, de -1 a 1 por passo: um patamar quase plano que desce devagar e sobe de uma vez
    na frente da escama seguinte (o degrau raso da solda TIG), e não a onda redonda do cosseno */
 const FRENTE_DA_ESCAMA = 0.15;
@@ -316,6 +316,11 @@ export function perfilDoCordao({ peA, nPeA, peB, nPeB, altura, largura, s = 0, e
   if (p2(sobe, bis) < 0) sobe = m2(sobe, -1);
   /* o arco de pé a pé: a altura cresce como o seno, sem crista no meio, e sai dos pés com ângulo franco, que dá a borda
      nítida da solda; a altura conta o afundamento, para o meio ficar à `altura` acima da reta entre os pés na superfície */
+  /* a altura acompanha a abertura do canto (o ângulo entre os dois pés, visto da costura, que é a origem do plano): é a
+     declarada num canto de 90°, maior num canto aberto, e cai a zero num canto de 60° ou mais fechado, onde o cordão é uma
+     face reta de pé a pé, um chanfro, como a solda que enche um canto fechado (escolha da pessoa por imagem, 2026-11-15) */
+  const cosCanto = p2(n2(peA), n2(peB));
+  altura *= Math.max(0, 1 - 2 * cosCanto);
   const pts = [];
   const N = 2 * PONTOS_POR_LADO;
   for (let k = 0; k <= N; k++) {
