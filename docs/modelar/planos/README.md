@@ -2,7 +2,8 @@
 
 ## Estado
 
-**Planos ativos:** nenhum.
+**Planos ativos:**
+1. [costura arredondada em nó de tubos](2026-11-15-costura-em-no-de-tubos.md). Território: `procedural/nucleo/operacoes/booleanas.js`, `procedural/nucleo/operacoes/arredondar-costura-no.test.ts`, `procedural/nucleo/fixtures/no-de-tubos.js`, `procedural/pecas/bicicleta-urbana/`, `docs/modelar/banco-de-provas/costura-em-no-de-tubos-2026-11-15/`. Em aberto: tudo, a começar pela fatia 1 (a fixture do nó e a imagem do caso de dois tubos).
 
 A lista está em ordem de prioridade. A ordem desempata quando dois planos precisam do mesmo arquivo: o de menor prioridade espera ou pede à pessoa que mude o território.
 
