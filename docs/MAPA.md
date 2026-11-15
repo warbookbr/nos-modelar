@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1969 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1968 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1514,10 +1514,6 @@
 ## procedural/pecas/carro-fastback/
 
 - `ALINHAMENTO.md` — Carro fastback: alinhamento
-
-## procedural/pecas/carro-fastback/partes/lataria/
-
-- `receita.js` — carro-fastback/lataria — o piloto do quarto traseiro: a chapa contínua de lataria do meio da porta (z 0) para trás, lado +x, com o para-lama traseiro salient…
 
 ## procedural/pecas/carro-fastback/referencias/
 
