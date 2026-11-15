@@ -512,7 +512,7 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
     } else if (daCostura) {
       if (comAba) return grita(st, i, 'friso', 'aba', 'a aba dobra a borda de uma chapa, e a costura não é borda: tire aba');
       const largo = medidasDoCordao ? medidasDoCordao.largura : Math.max(...perfil.map((q) => Math.abs(q[0]))) * 2;
-      const r = linhaDaCostura(st, a.costura, { passo: largo / 3, alcance: 3 * largo, suave: largo / 2 });
+      const r = linhaDaCostura(st, a.costura, { passo: largo / 5, alcance: 3 * largo, suave: largo / 2 });
       if (r.erro) return grita(st, i, 'friso', r.erro[0], r.erro[1]);
       cadeias = r.cadeias;
     } else {

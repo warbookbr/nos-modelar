@@ -294,10 +294,11 @@ export function perfilDoCordao({ peA, nPeA, peB, nPeB, largura }) {
   const bis = n2(s2(nPeA, nPeB));
   const afunda = AFUNDA * largura;
   const afundA = s2(peA, m2(nPeA, -afunda)), afundB = s2(peB, m2(nPeB, -afunda));
-  /* o chanfro: a face reta de pé a pé; o fundo fecha abaixo de cada pé e abaixo do meio, por dentro do material */
+  /* o chanfro: a face reta de pé a pé; o fundo fecha abaixo de cada pé e além do canto, que é a origem do plano (o ponto da
+     costura), por dentro do material: o fundo que parava no meio da corda ficava, num canto fechado, ainda no vão entre os
+     sólidos, e a face de baixo passava rente à costura deles, o que a união não fechava (2026-11-15) */
   const fundo = FUNDO * largura;
-  const meio = m2(s2(afundA, afundB), 0.5);
-  return [afundA, afundB, s2(afundB, m2(nPeB, -fundo)), s2(meio, m2(bis, -fundo)), s2(afundA, m2(nPeA, -fundo))];
+  return [afundA, afundB, s2(afundB, m2(nPeB, -fundo)), m2(bis, -fundo), s2(afundA, m2(nPeA, -fundo))];
 }
 
 /** cordaoNoQuadro({ p, quadro, nA, nB, largura, superficieA, superficieB }) -> o perfil da estação, em u (eixo B
