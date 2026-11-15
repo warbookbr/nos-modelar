@@ -23,7 +23,7 @@ export const TABELA = {
   angulo_direcao: 71,
   /* roda 700c */
   aro_assento_diametro: 622,
-  pneu_largura: 38,
+  pneu_largura: 48,
   pneu_altura: 24,
   aro_altura: 15,
   aro_largura: 22,
@@ -36,7 +36,7 @@ export const TABELA = {
   porca_espessura: 7,
   ponteira_raio: 16,
   eixo_dianteiro_largura: 100,
-  eixo_traseiro_largura: 130,
+  eixo_traseiro_largura: 140,
   raio_diametro: 2.8,
   raios_total: 36,
   raios_cruzamentos: 3,
@@ -54,10 +54,13 @@ export const TABELA = {
   abracadeira_selim_diametro: 40,
   abracadeira_selim_comprimento: 10,
   caixa_direcao_comprimento: 150,
-  estai_diametro: 22,
-  base_diametro: 24,
-  estai_x_topo: 24,
-  base_x_inicio: 30,
+  estai_diametro: 20,
+  estai_folga_pneu: 6.5,
+  junta_estais_diametro: 46,
+  junta_estais_comprimento: 30,
+  base_diametro: 18,
+  estai_x_topo: 10,
+  base_x_inicio: 32,
   movimento_central_raio: 20,
   movimento_central_largura: 68,
   tubo_selim_comprimento: 560,
@@ -105,24 +108,24 @@ export const TABELA = {
   canote_dentro: 120,
   canote_total: 250,
   selim_comprimento: 270,
-  selim_largura: 140,
+  selim_largura: 150,
   selim_espessura: 44,
   selim_cupula: 4,
   selim_afundamento: 4,
   selim_trilho_curva: 5,
-  selim_presilha_a_frente: 22,
+  selim_presilha_a_frente: 5,
   selim_braco_raio: 8,
   selim_trilho_diametro: 6,
   selim_trilho_x: 28,
-  selim_largura_bico: 0.24,
-  selim_largura_traseira: 0.92,
+  selim_largura_bico: 0.15,
+  selim_largura_traseira: 1,
   selim_secoes: 22,
   selim_lados: 28,
     /* transmissão */
   dentes_coroa: 44,
   dentes_catraca: 16,
   passo_corrente: 12.7,
-  linha_da_corrente_x: 44,
+  linha_da_corrente_x: 52,
   /* a direita da bicicleta, com a frente em +z, fica em -x: o lado da corrente */
   lado_da_corrente: -1,
   coroa_altura_dente: 4.1,
@@ -133,19 +136,16 @@ export const TABELA = {
   /* pedivela */
   pedivela_comprimento: 165,
   pedivela_angulo: -8,
-  pedivela_braco_x: 60,
+  pedivela_braco_x: 80,
   pedivela_braco_diametro: 18,
   pedivela_eixo_raio: 7,
   protetor_raio: 106,
-  protetor_x: 52.5,
+  protetor_x: 62,
   protetor_espessura: 4,
-  protetor_anel_largura: 16,
   protetor_cubo_raio: 30,
   coroa_aro_radial: 16,
   coroa_dente_fundo: 3,
   coroa_dente_largura: 5.5,
-  protetor_janelas: 5,
-  protetor_raio_braco: 7,
   aranha_bracos: 5,
   aranha_braco_raio: 9,
   aranha_cubo_raio: 26,
@@ -153,7 +153,7 @@ export const TABELA = {
   pedal_largura: 78,
   pedal_altura: 16,
   pedal_profundidade: 68,
-  pedal_afastamento: 74,
+  pedal_afastamento: 96,
 };
 
 const rad = (g) => (g * Math.PI) / 180;
@@ -205,10 +205,16 @@ export function derivar(T) {
   tubo('quadro', 'aluminio', [bb, naDirecao(baseCaixa + 18)], raioQ(T.tubo_inferior_diametro), 18);
   tubo('quadro', 'aluminio', [bb, noSelim(T.tubo_selim_comprimento)], raioQ(T.tubo_selim_diametro));
   /* abraçadeira do canote: anel grosso no topo do tubo do selim */
+  /* junta limpa dos estais: luva do tubo do selim logo abaixo da braçadeira */
+  tubo('quadro', 'aluminio', [noSelim(T.tubo_selim_comprimento - T.junta_estais_comprimento - 12), noSelim(T.tubo_selim_comprimento - 12)], raioQ(T.junta_estais_diametro), 40);
   tubo('quadro', 'preto', [noSelim(T.tubo_selim_comprimento - T.abracadeira_selim_comprimento), noSelim(T.tubo_selim_comprimento - 2)], raioQ(T.abracadeira_selim_diametro), 32);
   for (const lado of [-1, 1]) {
     const dropout = [lado * T.eixo_traseiro_largura / 2, yEixo, zEixoTras];
-    tubo('quadro', 'aluminio', [[lado * T.estai_x_topo, ...noSelim((T.tubo_superior_no_selim - yBB) / Math.sin(s) - 22).slice(1)], dropout], raioQ(T.estai_diametro));
+    /* estais superiores: nascem dentro da junta do tubo do selim, logo abaixo da braçadeira, e saem dela por baixo, simétricos; o meio do trajeto abre o suficiente para a folga do pneu */
+    const topoEstai = noSelim(T.tubo_selim_comprimento - T.junta_estais_comprimento / 2 - 12);
+    const xMeio = T.pneu_largura / 2 + T.estai_folga_pneu + raioQ(T.estai_diametro) + 0.5;
+    const ao = (f, x) => [lado * x, topoEstai[1] + (dropout[1] - topoEstai[1]) * f, topoEstai[2] + (dropout[2] - topoEstai[2]) * f];
+    tubo('quadro', 'aluminio', [ao(0, T.estai_x_topo), ao(0.08, T.estai_x_topo + 5), ao(0.22, xMeio), ao(0.55, xMeio + 4), ao(1, T.eixo_traseiro_largura / 2)], raioQ(T.estai_diametro), 24);
     tubo('quadro', 'aluminio', [[lado * T.base_x_inicio, yBB, 0], dropout], raioQ(T.base_diametro));
   }
   torno('quadro', 'aluminio', [[0, -T.movimento_central_largura / 2], [T.movimento_central_raio, -T.movimento_central_largura / 2], [T.movimento_central_raio, T.movimento_central_largura / 2], [0, T.movimento_central_largura / 2]], bb, { lados: 24, liso: 40 });
@@ -281,7 +287,7 @@ export function derivar(T) {
   /* perfil de lado: topo nivelado, casca fina que afina para o nariz; as pontas fecham em arco, sem ponta cônica */
   const perfilSelim = (t) => {
     const tr = T.selim_largura_traseira;
-    let larg = t < 0.2 ? T.selim_largura * (tr + (1 - tr) * Math.sin((t / 0.2) * Math.PI / 2)) : T.selim_largura * ((1 - T.selim_largura_bico) * (1 - ((t - 0.2) / 0.8) ** 1.4) + T.selim_largura_bico);
+    let larg = t < 0.2 ? T.selim_largura * (tr + (1 - tr) * Math.sin((t / 0.2) * Math.PI / 2)) : T.selim_largura * ((1 - T.selim_largura_bico) * (1 - ((t - 0.2) / 0.8) ** 1.1) + T.selim_largura_bico);
     let esp = T.selim_espessura * (1 - 0.35 * t ** 1.3);
     const fecha = (u) => Math.sqrt(Math.max(0.02, 1 - u * u));
     if (t > 0.84) { const f = fecha((t - 0.8) / 0.2 * 0.72); larg *= f; esp *= f; }
@@ -397,13 +403,8 @@ export function derivar(T) {
   /* protetor com janelas: anel externo com borda, cubo central e braços entre eles; os pinos dos braços da aranha chegam aos braços do protetor */
   const pa0 = T.protetor_x - T.protetor_espessura / 2;
   const pa1 = T.protetor_x + T.protetor_espessura / 2;
-  const rIntAnel = T.protetor_raio - T.protetor_anel_largura;
-  torno('pedivela', 'preto', noLado([[rIntAnel, pa0], [T.protetor_raio, pa0], [T.protetor_raio, pa1 + 3], [T.protetor_raio - 5, pa1 + 3], [T.protetor_raio - 5, pa1], [rIntAnel, pa1], [rIntAnel, pa0]]), bb, { lados: 96, liso: 30 });
-  torno('pedivela', 'preto', noLado([[0, pa0], [T.protetor_cubo_raio, pa0], [T.protetor_cubo_raio, pa1 + 2], [0, pa1 + 2]]), bb, { lados: 32, liso: 40 });
-  for (let k = 0; k < T.protetor_janelas; k++) {
-    const fi = rad(T.pedivela_angulo) + (2 * Math.PI * k) / T.protetor_janelas;
-    tubo('pedivela', 'preto', [ponto2(S * T.protetor_x, T.protetor_cubo_raio - 2, fi), ponto2(S * T.protetor_x, rIntAnel + 2, fi)], T.protetor_raio_braco, 12);
-  }
+  /* protetor: disco preto quase fechado sobre a coroa, com borda levantada e uma janela pequena entre cada par de pinos */
+  torno('pedivela', 'preto', noLado([[0, pa0], [T.protetor_raio, pa0], [T.protetor_raio, pa1 + 3], [T.protetor_raio - 5, pa1 + 3], [T.protetor_raio - 5, pa1], [T.protetor_cubo_raio, pa1], [T.protetor_cubo_raio, pa1 + 2], [0, pa1 + 2]]), bb, { lados: 96, liso: 30 });
   torno('pedivela', 'aco', noLado([[0, -T.pedivela_braco_x - 8], [T.pedivela_eixo_raio, -T.pedivela_braco_x - 8], [T.pedivela_eixo_raio, T.protetor_x + T.protetor_espessura / 2 + 4], [0, T.protetor_x + T.protetor_espessura / 2 + 4]]), bb, { lados: 16, liso: 40 });
   const pa = rad(T.pedivela_angulo);
   const pedalPts = {};
@@ -595,16 +596,16 @@ const receita = {
     referencias: ['referencias/alvo.md'],
     escala: { medida: 'diâmetro externo do pneu 700c', milimetros: 670 },
     partes: [
-      { nome: 'quadro', forma: 'tubos redondos: superior, inferior (mais grosso), do selim, caixa de direção grossa, 2 gancheiras superiores e 2 inferiores, abraçadeira do canote, movimento central', tecnica: 'loft de seções circulares entre nós derivados; lathe no movimento central' },
+      { nome: 'quadro', forma: 'tubos redondos: superior, inferior (mais grosso), do selim, caixa de direção grossa, 2 gancheiras superiores que chegam à luva do tubo do selim logo abaixo da braçadeira, 2 inferiores, abraçadeira do canote, movimento central', tecnica: 'loft de seções circulares entre nós derivados; lathe no movimento central' },
       { nome: 'garfo', forma: 'garfo reto: cabeça larga e arredondada, duas pernas que afinam e convergem até as pontas do eixo, e coluna coaxial à caixa de direção', tecnica: 'loft circular por perna, ponte e coluna' },
-      { nome: 'rodaDianteira', forma: 'cubo, 36 raios cruzados, aro e pneu 700c centrados entre as pernas do garfo', tecnica: 'lathe de pneu, aro e cubo; raios por loft e arranja radial' },
-      { nome: 'rodaTraseira', forma: 'cubo, 36 raios cruzados, aro e pneu 700c centrados entre as gancheiras', tecnica: 'lathe de pneu, aro e cubo; raios por loft e arranja radial' },
+      { nome: 'rodaDianteira', forma: 'cubo, 36 raios cruzados, aro e pneu 700c de 48 mm de seção, com sulcos, centrados entre as pernas do garfo', tecnica: 'lathe de pneu, aro e cubo; raios por loft e arranja radial' },
+      { nome: 'rodaTraseira', forma: 'cubo, 36 raios cruzados, aro e pneu 700c de 48 mm de seção, com sulcos, centrados entre as gancheiras', tecnica: 'lathe de pneu, aro e cubo; raios por loft e arranja radial' },
       { nome: 'mesa', forma: 'braçadeira na coluna, pescoço curto inclinado para a frente e para cima e braçadeira que segura o guidão pelo centro', tecnica: 'loft circular' },
       { nome: 'guidao', forma: 'guidão riser de 680 mm: centro reto, subida suave junto da mesa, pontas quase horizontais recuando levemente', tecnica: 'loft circular ao longo de caminho calculado' },
       { nome: 'manoplas', forma: 'duas manoplas cilíndricas nas pontas do guidão', tecnica: 'loft circular sobre o mesmo caminho das pontas' },
       { nome: 'canote', forma: 'tubo fino dentro do tubo do selim, coaxial, saindo acima dele', tecnica: 'loft circular coaxial ao tubo do selim' },
       { nome: 'selim', forma: 'assento acolchoado arredondado, bico estreito e traseira larga, dois trilhos e braçadeira', tecnica: 'loft de seções elípticas; trilhos em loft; lathe da braçadeira' },
-      { nome: 'pedivela', forma: 'coroa de 44 dentes em aranha de cinco braços com protetor em disco, eixo e dois braços opostos no movimento central', tecnica: 'lathe com lados iguais aos dentes; braços em loft' },
+      { nome: 'pedivela', forma: 'coroa de 44 dentes (um cubo por dente) sobre aro, aranha de cinco braços e protetor em disco preto quase fechado sobre a coroa, eixo e dois braços opostos no movimento central', tecnica: 'dentes por cubo e arranja radial; aro, cubo e protetor em lathe; braços em loft' },
       { nome: 'pedais', forma: 'dois pedais de plataforma iguais, corpo cheio com borda levantada e pinos, cada um num eixo na ponta do braço', tecnica: 'cubos (placa e borda) por pedal e lathe do eixo' },
       { nome: 'catraca', forma: 'pinhão de 16 dentes no cubo traseiro, no plano da coroa', tecnica: 'lathe com 16 lados' },
       { nome: 'corrente', forma: 'corrente de elos simples ligando a coroa à catraca por dois trechos retos e dois enrolamentos', tecnica: 'cubo de elo repetido por arranja linear e radial' },
