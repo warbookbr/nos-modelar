@@ -45,6 +45,15 @@ describe('friso na costura de uma união', () => {
     expect(n.orfaos[0].motivo).toMatch(/a curva é a do encontro dos sólidos e não se abre; mude a largura do perfil \(o cordao tem largura 0.004\)/);
   });
 
+  it('sem entre, a costura de três tubos e do nó de quatro tubos leva um cordão por par, e a união das cascas sobrepostas fecha', () => {
+    for (const caso of ['tubo e dois estais', 'no de 4 tubos']) {
+      const n = nucleo(passosDoCordao(caso, 5));
+      expect(n.orfaos).toEqual([]);
+      expect(arestasSemPar(n)).toEqual([]);
+      expect(vinculosNaoManifold(n)).toEqual([]);
+    }
+  });
+
   it('vincarCostura põe as arestas da costura como quebra de sombra nas faces dos dois lados', () => {
     const n = nucleo(passosDoCordao('T reto 17/8', 7));
     const costura = n.origens.get(201)[0].arestas.map(([x, y]: number[]) => `${x}-${y}`);
@@ -86,10 +95,6 @@ describe('recusas do friso na costura e do cordão', () => {
   ];
   for (const [nome, passos, motivo] of casos) it(nome, () => { expect(recusa(passos)).toMatch(motivo); });
 
-  it('três sólidos sem entre', () => {
-    const p = passosDoCordao('no de 3 tubos afastados', 7);
-    expect(recusa(p.slice(0, -1))).toMatch(/junta mais de dois sólidos .*escolha um par com entre/);
-  });
 
   it('costura cortada por um passo depois do unir', () => {
     const p = [...doisTubos(), ['cubo', { origemId: 50, lado: 0.06, em: [0, 0.27, 0] }],
