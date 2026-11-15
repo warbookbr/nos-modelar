@@ -1,4 +1,4 @@
-/* bicicleta-urbana — bicicleta urbana de marcha única, peça inteira, de quadro médio e rodas 700c.
+/* bicicleta-urbana — bicicleta urbana de marcha única, peça inteira, de quadro médio e rodas de 670 mm.
  *
  * Referencial do acervo: y para cima, o chão da peça em y = 0 (embaixo dos dois pneus), a frente da bicicleta em +z e o
  * plano de simetria em x = 0 (a direita da bicicleta, o lado da corrente, em -x). A origem em z é o eixo do movimento central.
@@ -21,10 +21,10 @@ export const TABELA = {
   altura_movimento_central: 270,
   angulo_tubo_selim: 73,
   angulo_direcao: 71,
-  /* roda 700c */
-  aro_assento_diametro: 622,
+  /* roda: pneu alto, de 48 x 42 mm, sobre um aro menor, para o diâmetro externo de 670 mm */
+  aro_assento_diametro: 586,
   pneu_largura: 48,
-  pneu_altura: 24,
+  pneu_altura: 42,
   aro_altura: 15,
   aro_largura: 22,
   cubo_corpo_raio: 14,
@@ -45,29 +45,31 @@ export const TABELA = {
   lados_roda: 72,
   lados_pneu_secao: 4,
   /* tubos do quadro (diâmetro externo) */
-  tubo_superior_diametro: 40,
-  tubo_inferior_diametro: 52,
-  tubo_selim_diametro: 36,
-  caixa_direcao_diametro: 58,
-  caixa_direcao_diametro_baixo: 46,
+  tubo_superior_diametro: 38,
+  tubo_inferior_diametro: 48,
+  tubo_selim_diametro: 42,
+  caixa_direcao_diametro: 62,
+  caixa_direcao_diametro_baixo: 54,
   caixa_sobre_coroa: 14,
-  abracadeira_selim_diametro: 40,
+  abracadeira_selim_diametro: 48,
   abracadeira_selim_comprimento: 10,
-  caixa_direcao_comprimento: 150,
+  caixa_direcao_comprimento: 160,
   estai_diametro: 20,
   estai_folga_pneu: 6.5,
-  junta_estais_diametro: 46,
-  junta_estais_comprimento: 30,
+  estai_abaixo_da_abracadeira: 40,
+  solda_cordao: 4.5,
+  solda_faixa: 26,
+  solda_trecho: 70,
   base_diametro: 18,
-  estai_x_topo: 10,
+  estai_x_topo: 15,
   base_x_inicio: 32,
   movimento_central_raio: 20,
   movimento_central_largura: 68,
   tubo_selim_comprimento: 560,
   tubo_superior_no_selim: 750,
   tubo_superior_na_direcao: 525,
-  tubo_inferior_na_direcao: 405,
-  lados_tubo: 24,
+  tubo_inferior_na_direcao: 62,
+  lados_tubo: 48,
   tampa_conica: 0.6,
   selim_tampa: 7,
   /* garfo */
@@ -122,7 +124,7 @@ export const TABELA = {
   selim_secoes: 22,
   selim_lados: 28,
     /* transmissão */
-  dentes_coroa: 44,
+  dentes_coroa: 40,
   dentes_catraca: 16,
   passo_corrente: 12.7,
   linha_da_corrente_x: 52,
@@ -139,10 +141,10 @@ export const TABELA = {
   pedivela_braco_x: 80,
   pedivela_braco_diametro: 18,
   pedivela_eixo_raio: 7,
-  protetor_raio: 106,
+  protetor_raio: 91,
   protetor_x: 62,
   protetor_espessura: 4,
-  protetor_cubo_raio: 30,
+  protetor_anel_largura: 13,
   coroa_aro_radial: 16,
   coroa_dente_fundo: 3,
   coroa_dente_largura: 5.5,
@@ -172,7 +174,45 @@ const unit = (a) => esc(a, 1 / norma(a));
 export function derivar(T) {
   const itens = [];
   const tubo = (parte, material, pts, raios, lados = T.lados_tubo) => itens.push({ k: 'tubo', parte, material, pts, raios: Array.isArray(raios) ? raios : pts.map(() => raios), lados });
-  const torno = (parte, material, perfil, em, { lados = T.lados_roda, liso = 35, eixo = 'x' } = {}) => itens.push({ k: 'torno', parte, material, perfil, em, lados, liso, eixo });
+  /* Tubo do quadro com as pontas marcadas para a solda: o trecho de cada ponta (de comprimento `trecho`) entra na união da junta
+     que o recebe, e o meio fica um tubo só. A união (`unir`) funde os tubos num sólido só, sem face interna. O cordão de solda é o
+     alargamento da ponta: a seção cresce `solda_cordao` mm, com perfil de cosseno, na faixa de `solda_faixa` mm que começa onde o
+     tubo sai da superfície do tubo que o recebe (`raioReceptor`, o raio dele), e some no corpo do tubo. O arredondamento de
+     costura do núcleo (`arredondarCostura`) não fecha a malha nestas uniões de lofts oblíquos (ver o relato da rodada 7), e por isso
+     a concordância é geral, calculada aqui, e não um contorno por junta. */
+  const soldado = (pts, raios, lados, inicio, fim, trecho = T.solda_trecho, { receptorInicio = 0, receptorFim = 0 } = {}) => {
+    const r = Array.isArray(raios) ? raios : pts.map(() => raios);
+    const acum = [0];
+    for (let i = 1; i < pts.length; i++) acum.push(acum[i - 1] + norma(menos(pts[i], pts[i - 1])));
+    const total = acum[acum.length - 1];
+    const em = (d) => {
+      let i = 1;
+      while (i < pts.length - 1 && acum[i] < d) i++;
+      const u = (d - acum[i - 1]) / (acum[i] - acum[i - 1]);
+      return { p: pts[i - 1].map((v, k) => v + (pts[i][k] - v) * u), r: r[i - 1] + (r[i] - r[i - 1]) * u };
+    };
+    const cordao = (dist, receptor) => {
+      if (!receptor) return 0;
+      const t = Math.min(1, Math.max(0, (dist - receptor) / T.solda_faixa));
+      return T.solda_cordao * (0.5 + 0.5 * Math.cos(Math.PI * t));
+    };
+    /* a, b: comprimentos de arco do trecho; `daPonta` diz a que ponta o cordão pertence */
+    const pedaco = (a, b, junta, daPonta, receptor) => {
+      const ss = new Set([a, b]);
+      for (let k = 0; k <= 8; k++) ss.add(a + ((b - a) * k) / 8);
+      if (junta && receptor) for (let k = 0; k <= 6; k++) ss.add(daPonta === 'inicio' ? receptor + (T.solda_faixa * k) / 6 : total - receptor - (T.solda_faixa * k) / 6);
+      pts.forEach((_, i) => ss.add(acum[i]));
+      const lista = [...ss].filter((x) => x >= a - 1e-9 && x <= b + 1e-9).sort((x, y) => x - y).filter((x, i, arr) => i === 0 || x - arr[i - 1] > 1e-6);
+      const amostras = lista.map((x) => { const q = em(Math.min(total, Math.max(0, x))); const dist = daPonta === 'inicio' ? x : total - x; return { p: q.p, r: q.r + (junta ? cordao(dist, receptor) : 0) }; });
+      itens.push({ k: 'tubo', parte: 'quadro', material: 'aluminio', pts: amostras.map((q) => q.p), raios: amostras.map((q) => q.r), lados, junta });
+    };
+    const a = inicio ? trecho : 0;
+    const b = fim ? total - trecho : total;
+    if (inicio) pedaco(0, a, inicio, 'inicio', receptorInicio);
+    pedaco(a, b, null);
+    if (fim) pedaco(b, total, fim, 'fim', receptorFim);
+  };
+  const torno = (parte, material, perfil, em, { lados = T.lados_roda, liso = 35, eixo = 'x', junta = null } = {}) => itens.push({ k: 'torno', parte, material, perfil, em, lados, liso, eixo, junta });
 
   const zEixoTras = -T.chainstay;
   const zEixoFrente = T.entre_eixos - T.chainstay;
@@ -200,24 +240,22 @@ export function derivar(T) {
   const cabecaBaixo = naDirecao(baseCaixa);
   const cabecaCima = naDirecao(baseCaixa + T.caixa_direcao_comprimento);
   const cabecaMeio = naDirecao(baseCaixa + T.caixa_direcao_comprimento * 0.35);
-  tubo('quadro', 'aluminio', [cabecaBaixo, cabecaMeio, cabecaCima], [raioQ(T.caixa_direcao_diametro_baixo), raioQ((T.caixa_direcao_diametro_baixo + T.caixa_direcao_diametro) / 2), raioQ(T.caixa_direcao_diametro)], 48);
-  tubo('quadro', 'aluminio', [baseDoTuboSuperior, naDirecao(baseCaixa + T.tubo_superior_na_direcao - 400)], raioQ(T.tubo_superior_diametro));
-  tubo('quadro', 'aluminio', [bb, naDirecao(baseCaixa + 18)], raioQ(T.tubo_inferior_diametro), 18);
-  tubo('quadro', 'aluminio', [bb, noSelim(T.tubo_selim_comprimento)], raioQ(T.tubo_selim_diametro));
+  itens.push({ k: 'tubo', parte: 'quadro', material: 'aluminio', pts: [cabecaBaixo, cabecaMeio, cabecaCima], raios: [raioQ(T.caixa_direcao_diametro_baixo), raioQ((T.caixa_direcao_diametro_baixo + T.caixa_direcao_diametro) / 2), raioQ(T.caixa_direcao_diametro)], lados: 48, junta: 'cabeca' });
+  soldado([baseDoTuboSuperior, naDirecao(baseCaixa + T.tubo_superior_na_direcao - 400)], raioQ(T.tubo_superior_diametro), T.lados_tubo, 'selimTopo', 'cabeca', T.solda_trecho, { receptorInicio: raioQ(T.tubo_selim_diametro), receptorFim: raioQ(T.caixa_direcao_diametro) * 0.95 });
+  soldado([bb, naDirecao(baseCaixa + T.tubo_inferior_na_direcao)], raioQ(T.tubo_inferior_diametro), T.lados_tubo, 'mc', 'cabeca', T.solda_trecho + 20, { receptorInicio: T.movimento_central_raio, receptorFim: raioQ(T.caixa_direcao_diametro_baixo) * 1.1 });
+  soldado([bb, noSelim(T.tubo_selim_comprimento)], raioQ(T.tubo_selim_diametro), T.lados_tubo, 'mc', 'selimTopo', T.solda_trecho + 40, { receptorInicio: T.movimento_central_raio, receptorFim: 0 });
   /* abraçadeira do canote: anel grosso no topo do tubo do selim */
-  /* junta limpa dos estais: luva do tubo do selim logo abaixo da braçadeira */
-  tubo('quadro', 'aluminio', [noSelim(T.tubo_selim_comprimento - T.junta_estais_comprimento - 12), noSelim(T.tubo_selim_comprimento - 12)], raioQ(T.junta_estais_diametro), 40);
   tubo('quadro', 'preto', [noSelim(T.tubo_selim_comprimento - T.abracadeira_selim_comprimento), noSelim(T.tubo_selim_comprimento - 2)], raioQ(T.abracadeira_selim_diametro), 32);
   for (const lado of [-1, 1]) {
     const dropout = [lado * T.eixo_traseiro_largura / 2, yEixo, zEixoTras];
-    /* estais superiores: nascem dentro da junta do tubo do selim, logo abaixo da braçadeira, e saem dela por baixo, simétricos; o meio do trajeto abre o suficiente para a folga do pneu */
-    const topoEstai = noSelim(T.tubo_selim_comprimento - T.junta_estais_comprimento / 2 - 12);
+    /* estais superiores: nascem dentro do tubo do selim, logo abaixo da braçadeira, e saem dele por baixo, simétricos, unidos a ele pela solda; o meio do trajeto abre o suficiente para a folga do pneu */
+    const topoEstai = noSelim(T.tubo_selim_comprimento - T.estai_abaixo_da_abracadeira);
     const xMeio = T.pneu_largura / 2 + T.estai_folga_pneu + raioQ(T.estai_diametro) + 0.5;
     const ao = (f, x) => [lado * x, topoEstai[1] + (dropout[1] - topoEstai[1]) * f, topoEstai[2] + (dropout[2] - topoEstai[2]) * f];
-    tubo('quadro', 'aluminio', [ao(0, T.estai_x_topo), ao(0.08, T.estai_x_topo + 5), ao(0.22, xMeio), ao(0.55, xMeio + 4), ao(1, T.eixo_traseiro_largura / 2)], raioQ(T.estai_diametro), 24);
-    tubo('quadro', 'aluminio', [[lado * T.base_x_inicio, yBB, 0], dropout], raioQ(T.base_diametro));
+    soldado([ao(0, T.estai_x_topo), ao(0.08, T.estai_x_topo + 5), ao(0.22, xMeio), ao(0.55, xMeio + 4), ao(1, T.eixo_traseiro_largura / 2)], raioQ(T.estai_diametro), T.lados_tubo, 'selimTopo', `gancheira${lado}`, T.solda_trecho, { receptorInicio: raioQ(T.tubo_selim_diametro) * 0.8, receptorFim: 0 });
+    soldado([[lado * T.base_x_inicio, yBB, 0], dropout], raioQ(T.base_diametro), T.lados_tubo, 'mc', `gancheira${lado}`, T.solda_trecho, { receptorInicio: T.movimento_central_raio * 0.5, receptorFim: 0 });
   }
-  torno('quadro', 'aluminio', [[0, -T.movimento_central_largura / 2], [T.movimento_central_raio, -T.movimento_central_largura / 2], [T.movimento_central_raio, T.movimento_central_largura / 2], [0, T.movimento_central_largura / 2]], bb, { lados: 24, liso: 40 });
+  torno('quadro', 'aluminio', [[0, -T.movimento_central_largura / 2], [T.movimento_central_raio, -T.movimento_central_largura / 2], [T.movimento_central_raio, T.movimento_central_largura / 2], [0, T.movimento_central_largura / 2]], bb, { lados: 24, liso: 40, junta: 'mc' });
 
   /* GARFO: coroa encostada na base da caixa, ombros que nascem dela, lâminas levemente curvas para a frente, coluna coaxial */
   const nUp = 16;
@@ -394,17 +432,18 @@ export function derivar(T) {
   /* um dente por cubo, repetido em arranja radial em volta do movimento central */
   itens.push({ k: 'dentes', parte: 'pedivela', material: 'preto', xc: S * xc, larg: 2 * eW, alt: rc + T.coroa_altura_dente - rRaiz, prof: T.coroa_dente_largura, y: yBB + rRaiz - 0.3, z: 0, total: T.dentes_coroa, graus: 360 / T.dentes_coroa, pivo: [S * xc, yBB, 0] });
   torno('pedivela', 'preto', noLado([[0, xc - 3], [T.aranha_cubo_raio, xc - 3], [T.aranha_cubo_raio, xc + 3], [0, xc + 3]]), bb, { lados: 20, liso: 40 });
+  const rIntAnel = T.protetor_raio - T.protetor_anel_largura;
   const ponto2 = (x, r, fi) => [x, yBB + r * Math.sin(fi), r * Math.cos(fi)];
   for (let k = 0; k < T.aranha_bracos; k++) {
     const fi = rad(T.pedivela_angulo) + (2 * Math.PI * k) / T.aranha_bracos;
     tubo('pedivela', 'preto', [ponto2(S * xc, T.aranha_cubo_raio - 6, fi), ponto2(S * xc, rAroIn + 3, fi)], [raioQ(T.aranha_braco_raio * 2), raioQ(T.aranha_braco_raio * 1.5)], 12);
-    tubo('pedivela', 'preto', [ponto2(S * xc, rAroIn + 1, fi), ponto2(S * T.protetor_x, rAroIn + 1, fi)], raioQ(T.aranha_poste_raio * 2), 8);
+    tubo('pedivela', 'preto', [ponto2(S * xc, rIntAnel + 1.5, fi), ponto2(S * T.protetor_x, rIntAnel + 1.5, fi)], raioQ(T.aranha_poste_raio * 2), 8);
   }
   /* protetor com janelas: anel externo com borda, cubo central e braços entre eles; os pinos dos braços da aranha chegam aos braços do protetor */
   const pa0 = T.protetor_x - T.protetor_espessura / 2;
   const pa1 = T.protetor_x + T.protetor_espessura / 2;
-  /* protetor: disco preto quase fechado sobre a coroa, com borda levantada e uma janela pequena entre cada par de pinos */
-  torno('pedivela', 'preto', noLado([[0, pa0], [T.protetor_raio, pa0], [T.protetor_raio, pa1 + 3], [T.protetor_raio - 5, pa1 + 3], [T.protetor_raio - 5, pa1], [T.protetor_cubo_raio, pa1], [T.protetor_cubo_raio, pa1 + 2], [0, pa1 + 2]]), bb, { lados: 96, liso: 30 });
+  /* protetor: anel escuro por fora da coroa, preso por pinos às pontas dos braços da aranha, que ficam à vista dentro dele */
+  torno('pedivela', 'preto', noLado([[rIntAnel, pa0], [T.protetor_raio, pa0], [T.protetor_raio, pa1 + 3], [T.protetor_raio - 4, pa1 + 3], [T.protetor_raio - 4, pa1], [rIntAnel, pa1], [rIntAnel, pa0]]), bb, { lados: 96, liso: 30 });
   torno('pedivela', 'aco', noLado([[0, -T.pedivela_braco_x - 8], [T.pedivela_eixo_raio, -T.pedivela_braco_x - 8], [T.pedivela_eixo_raio, T.protetor_x + T.protetor_espessura / 2 + 4], [0, T.protetor_x + T.protetor_espessura / 2 + 4]]), bb, { lados: 16, liso: 40 });
   const pa = rad(T.pedivela_angulo);
   const pedalPts = {};
@@ -438,19 +477,28 @@ export function gerarPassos(T) {
   };
   const v = (p) => p.map(m);
 
+  /* os tubos e as peças de alumínio do quadro são unidos num sólido só e as costuras ganham o cordão arredondado da solda */
+  const juntas = new Map(); /* junta -> sólidos que a compõem */
+  const soldar = (it) => Boolean(it.junta);
   for (const it of itens) {
     if (it.k === 'tubo') {
       const oid = proximo();
       const n = it.pts.length;
       const polo = (fim, vizinho) => ({ pos: v(soma(fim, esc(unit(menos(fim, vizinho)), T.tampa_conica))), raio: 0 });
       passos.push(['loft', { origemId: oid, lados: it.lados, secoes: [polo(it.pts[0], it.pts[1]), ...it.pts.map((p, i) => ({ pos: v(p), raio: m(it.raios[i]) })), polo(it.pts[n - 1], it.pts[n - 2])] }]);
-      marca(it.parte, it.material, { origem: { op: 'loft', id: oid } });
-      if (it.lados >= 16) passos.push(['liso', { angulo: 40, sel: { origem: { op: 'loft', id: oid } } }]);
+      if (soldar(it)) (juntas.get(it.junta) ?? juntas.set(it.junta, []).get(it.junta)).push({ origem: { op: 'loft', id: oid } });
+      else {
+        marca(it.parte, it.material, { origem: { op: 'loft', id: oid } });
+        if (it.lados >= 16) passos.push(['liso', { angulo: 40, sel: { origem: { op: 'loft', id: oid } } }]);
+      }
     } else if (it.k === 'torno') {
       const oid = proximo();
       passos.push(['lathe', { origemId: oid, eixo: it.eixo, lados: it.lados, perfil: it.perfil.map(([r, a]) => [m(r), m(a)]), em: v(it.em) }]);
-      marca(it.parte, it.material, { origem: { op: 'lathe', id: oid } });
-      passos.push(['liso', { angulo: it.liso, sel: { origem: { op: 'lathe', id: oid } } }]);
+      if (soldar(it)) (juntas.get(it.junta) ?? juntas.set(it.junta, []).get(it.junta)).push({ origem: { op: 'lathe', id: oid } });
+      else {
+        marca(it.parte, it.material, { origem: { op: 'lathe', id: oid } });
+        passos.push(['liso', { angulo: it.liso, sel: { origem: { op: 'lathe', id: oid } } }]);
+      }
     } else if (it.k === 'selim') {
       const oid = proximo();
       const sx = it.secoes;
@@ -554,6 +602,13 @@ export function gerarPassos(T) {
       marca('pedais', 'aco', { origem: { op: 'lathe', id: eid } });
     }
   }
+  for (const solidos of juntas.values()) {
+    const idUniao = proximo();
+    passos.push(['unir', { origemId: idUniao, solidos }]);
+    const selUniao = { origem: { op: 'unir', id: idUniao } };
+    passos.push(['liso', { angulo: 40, sel: selUniao }]);
+    marca('quadro', 'aluminio', selUniao);
+  }
   for (const [nome, lista] of partes) {
     for (const { sel, material } of lista) {
       passos.push(['parte', { nome, sel }]);
@@ -580,7 +635,7 @@ export const CONTATOS = [
 ];
 
 const receita = {
-  meta: { nome: 'bicicleta-urbana', desc: 'bicicleta urbana de marcha única, rodas 700c com 36 raios, quadro de tubos redondos, guidão riser e corrente de elos' },
+  meta: { nome: 'bicicleta-urbana', desc: 'bicicleta urbana de marcha única, rodas de 670 mm com 36 raios, quadro de tubos redondos, guidão riser e corrente de elos' },
   PARAMS: TABELA,
   MATERIAIS: {
     aluminio: { cor: '#5b6a7a', metalicidade: 0.7, aspereza: 0.4 },
@@ -592,20 +647,20 @@ const receita = {
   },
   TOPO: { origem: 'chão sob o eixo do movimento central; y para cima, a frente da bicicleta em +z, o lado da corrente (direita da bicicleta) em -x' },
   PLANO: {
-    objeto: 'bicicleta urbana de marcha única, rodas 700c, entre-eixos de 1000 mm, quadro médio de alumínio, guidão riser de 680 mm',
+    objeto: 'bicicleta urbana de marcha única, rodas de 670 mm, entre-eixos de 1000 mm, quadro médio de alumínio, guidão riser de 680 mm',
     referencias: ['referencias/alvo.md'],
-    escala: { medida: 'diâmetro externo do pneu 700c', milimetros: 670 },
+    escala: { medida: 'diâmetro externo do pneu', milimetros: 670 },
     partes: [
       { nome: 'quadro', forma: 'tubos redondos: superior, inferior (mais grosso), do selim, caixa de direção grossa, 2 gancheiras superiores que chegam à luva do tubo do selim logo abaixo da braçadeira, 2 inferiores, abraçadeira do canote, movimento central', tecnica: 'loft de seções circulares entre nós derivados; lathe no movimento central' },
       { nome: 'garfo', forma: 'garfo reto: cabeça larga e arredondada, duas pernas que afinam e convergem até as pontas do eixo, e coluna coaxial à caixa de direção', tecnica: 'loft circular por perna, ponte e coluna' },
-      { nome: 'rodaDianteira', forma: 'cubo, 36 raios cruzados, aro e pneu 700c de 48 mm de seção, com sulcos, centrados entre as pernas do garfo', tecnica: 'lathe de pneu, aro e cubo; raios por loft e arranja radial' },
-      { nome: 'rodaTraseira', forma: 'cubo, 36 raios cruzados, aro e pneu 700c de 48 mm de seção, com sulcos, centrados entre as gancheiras', tecnica: 'lathe de pneu, aro e cubo; raios por loft e arranja radial' },
+      { nome: 'rodaDianteira', forma: 'cubo, 36 raios cruzados, aro e pneu de 48 mm de largura e 42 mm de altura, com sulcos, centrados entre as pernas do garfo', tecnica: 'lathe de pneu, aro e cubo; raios por loft e arranja radial' },
+      { nome: 'rodaTraseira', forma: 'cubo, 36 raios cruzados, aro e pneu de 48 mm de largura e 42 mm de altura, com sulcos, centrados entre as gancheiras', tecnica: 'lathe de pneu, aro e cubo; raios por loft e arranja radial' },
       { nome: 'mesa', forma: 'braçadeira na coluna, pescoço curto inclinado para a frente e para cima e braçadeira que segura o guidão pelo centro', tecnica: 'loft circular' },
       { nome: 'guidao', forma: 'guidão riser de 680 mm: centro reto, subida suave junto da mesa, pontas quase horizontais recuando levemente', tecnica: 'loft circular ao longo de caminho calculado' },
       { nome: 'manoplas', forma: 'duas manoplas cilíndricas nas pontas do guidão', tecnica: 'loft circular sobre o mesmo caminho das pontas' },
       { nome: 'canote', forma: 'tubo fino dentro do tubo do selim, coaxial, saindo acima dele', tecnica: 'loft circular coaxial ao tubo do selim' },
       { nome: 'selim', forma: 'assento acolchoado arredondado, bico estreito e traseira larga, dois trilhos e braçadeira', tecnica: 'loft de seções elípticas; trilhos em loft; lathe da braçadeira' },
-      { nome: 'pedivela', forma: 'coroa de 44 dentes (um cubo por dente) sobre aro, aranha de cinco braços e protetor em disco preto quase fechado sobre a coroa, eixo e dois braços opostos no movimento central', tecnica: 'dentes por cubo e arranja radial; aro, cubo e protetor em lathe; braços em loft' },
+      { nome: 'pedivela', forma: 'coroa de 40 dentes (um cubo por dente) sobre aro, aranha de cinco braços à vista dentro de um anel protetor escuro, eixo e dois braços opostos no movimento central', tecnica: 'dentes por cubo e arranja radial; aro, cubo e anel do protetor em lathe; braços em loft' },
       { nome: 'pedais', forma: 'dois pedais de plataforma iguais, corpo cheio com borda levantada e pinos, cada um num eixo na ponta do braço', tecnica: 'cubos (placa e borda) por pedal e lathe do eixo' },
       { nome: 'catraca', forma: 'pinhão de 16 dentes no cubo traseiro, no plano da coroa', tecnica: 'lathe com 16 lados' },
       { nome: 'corrente', forma: 'corrente de elos simples ligando a coroa à catraca por dois trechos retos e dois enrolamentos', tecnica: 'cubo de elo repetido por arranja linear e radial' },
