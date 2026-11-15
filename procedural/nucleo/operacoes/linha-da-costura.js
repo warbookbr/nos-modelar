@@ -42,10 +42,10 @@ const PONTOS_POR_LADO = 8;
 /* o quanto o pé afunda na superfície, em fração da altura, e o fundo do perfil abaixo do pé, em fração da largura */
 const AFUNDA = 0.04;
 const FUNDO = 0.3;
-/* os braços de cada Bézier, em fração da distância do pé ao topo: curto no pé, para a curva não descer abaixo da reta dos
-   pés antes de subir, e longo no topo, para a coroa ser larga */
-const BRACO_DO_PE = 0.3;
-const BRACO_DO_TOPO = 0.5;
+/* os braços de cada Bézier, em fração da distância do pé ao topo: longo no pé, para o cordão sair raso da superfície, e
+   curto no topo, para a coroa ficar quase reta, chanfrada (escolha da pessoa por imagem, 2026-11-15) */
+const BRACO_DO_PE = 0.6;
+const BRACO_DO_TOPO = 0.15;
 
 /** reamostrar(pontos, fechada, passo) -> pontos a distâncias iguais ao longo da polilinha, o mais perto de `passo` que
  *  divide o comprimento; a volta não repete o primeiro ponto. */
@@ -107,7 +107,7 @@ function lerCostura(st, costura) {
 /** linhaDaCostura(st, costura, nome) -> { cadeias } | { erro: [campo, mensagem] }
  *  Cada cadeia é a que o `friso` varre ({ pontos, normais, fechada, espelhada, nomeDoIndice, nomes, passo }) com, a
  *  mais, `lados`: por ponto, as normais dos dois operandos ({ nA, nB }), e `operandos`: [a, b] e as faces de cada um. */
-export function linhaDaCostura(st, costura, { passo, alcance }) {
+export function linhaDaCostura(st, costura, { passo, alcance, suave }) {
   const lida = lerCostura(st, costura);
   if (lida.erro) return lida;
   const { registro, de, entre } = lida;
@@ -199,8 +199,8 @@ export function linhaDaCostura(st, costura, { passo, alcance }) {
        a linha é reamostrada em passos iguais e suavizada, e as normais saem da superfície de cada sólido em cada ponto */
     const pontos = suavizar(reamostrar(b.vs.map((v) => [...st.V.get(v)]), b.fechada, passo), b.fechada);
     const e0 = escolhidas[b.ks[0]];
-    const superficieA = superficieDoOperando(st, facesDoOperando.get(e0.oA) ?? [], pontos, alcance);
-    const superficieB = superficieDoOperando(st, facesDoOperando.get(e0.oB) ?? [], pontos, alcance);
+    const superficieA = superficieDoOperando(st, facesDoOperando.get(e0.oA) ?? [], pontos, alcance, suave);
+    const superficieB = superficieDoOperando(st, facesDoOperando.get(e0.oB) ?? [], pontos, alcance, suave);
     const lados = pontos.map((q) => ({ nA: superficieA(q)?.n ?? null, nB: superficieB(q)?.n ?? null }));
     const sem = lados.findIndex((l) => !l.nA || !l.nB);
     if (sem >= 0) return { erro: ['costura', `no ponto [${pontos[sem].map((x) => Number(x.toPrecision(6))).join(', ')}] da costura do unir:${de.id} um dos sólidos não tem superfície perto`] };
@@ -235,25 +235,36 @@ function maisProximoNoTriangulo(p, a, b, c) {
   return soma(a, soma(mult(ab, vb * den), mult(ac, vc * den)));
 }
 
-/** superficieDoOperando(st, faces, centro, raio) -> (q) => { p, n }: o ponto da superfície mais perto de q e a normal da
- *  face dele, só entre as faces que têm vértice a menos de `raio` de `centro` (a vizinhança da linha). */
-export function superficieDoOperando(st, faces, pontosDaLinha, raio) {
+/** superficieDoOperando(st, faces, pontosDaLinha, raio, suave) -> (q) => { p, n }: o ponto da superfície mais perto de q e a
+ *  normal ali, só entre as faces que têm vértice a menos de `raio` de algum ponto da linha (a vizinhança da costura). A
+ *  normal é a média das normais dos triângulos a menos de `suave` do ponto achado, pesada pela área e pela distância: a
+ *  normal de uma face só muda em degrau de uma face para a vizinha numa superfície facetada, e o cordão andaria em degraus. */
+export function superficieDoOperando(st, faces, pontosDaLinha, raio, suave) {
   const tris = [];
   const perto = (q) => pontosDaLinha.some((p) => tam(sub(q, p)) < raio);
   for (const fid of faces) {
     const vs = st.F.get(fid).vs.map((v) => st.V.get(v));
     if (!vs.some(perto)) continue;
     const n = normalDe(st, st.F.get(fid).vs);
-    for (let k = 1; k + 1 < vs.length; k++) tris.push({ a: vs[0], b: vs[k], c: vs[k + 1], n });
+    for (let k = 1; k + 1 < vs.length; k++) {
+      const a = vs[0], b = vs[k], c = vs[k + 1];
+      tris.push({ a, b, c, n, area: tam(cruz(sub(b, a), sub(c, a))) / 2 });
+    }
   }
   return (q) => {
     let melhor = null, dist = Infinity;
     for (const t of tris) {
       const r = maisProximoNoTriangulo(q, t.a, t.b, t.c);
       const d = tam(sub(r, q));
-      if (d < dist) { dist = d; melhor = { p: r, n: t.n }; }
+      if (d < dist) { dist = d; melhor = r; }
     }
-    return melhor;
+    if (!melhor) return null;
+    let n = [0, 0, 0];
+    for (const t of tris) {
+      const d = tam(sub(maisProximoNoTriangulo(melhor, t.a, t.b, t.c), melhor));
+      if (d < suave) n = soma(n, mult(t.n, t.area * (1 - d / suave)));
+    }
+    return { p: melhor, n: unit(n) ?? [0, 1, 0] };
   };
 }
 

@@ -7,13 +7,13 @@ const m = (v) => v / 1000;
 /** tubo(id, a, b, raio, lados) -> o passo `loft` de um tubo de raio constante de `a` a `b`, com polo de 1 mm em cada ponta e
  *  um anel a cada 10 mm, mais ou menos: sem os anéis, a booleana corta as faces de comprimento inteiro em triângulos longos e finos, e o
  *  sombreado liso risca o tubo ao longo deles. */
-export function tubo(id, a, b, raio, lados = 48) {
+export function tubo(id, a, b, raio, lados = 48, passoDoAnel = 0.01) {
   const polo = (f, v) => {
     const d = f.map((x, i) => x - v[i]);
     const l = Math.hypot(...d);
     return { pos: f.map((x, i) => x + (d[i] / l) * 0.001), raio: 0 };
   };
-  const n = Math.max(1, Math.round(Math.hypot(...b.map((x, i) => x - a[i])) / 0.01));
+  const n = Math.max(1, Math.round(Math.hypot(...b.map((x, i) => x - a[i])) / passoDoAnel));
   /* os anéis do meio ficam a 0,37 de um passo das posições redondas, para não coincidirem com a junção de outro tubo */
   const em = (t) => ({ pos: a.map((x, i) => x + (b[i] - x) * t), raio });
   const aneis = Array.from({ length: n }, (_, k) => em((k + 0.37) / n));
@@ -38,8 +38,8 @@ export const CASOS = {
 };
 
 /** passosDoNo(caso, raioMm, extra) -> os tubos, o `unir` deles (id 100) e o `arredondarCostura` (id 101) com o raio em mm. */
-export function passosDoNo(caso, raioMm, extra = {}) {
-  const tubos = CASOS[caso].map(([a, b, r], k) => tubo(k + 1, a.map(m), b.map(m), m(r)));
+export function passosDoNo(caso, raioMm, extra = {}, { lados = 48, passoDoAnel = 0.01 } = {}) {
+  const tubos = CASOS[caso].map(([a, b, r], k) => tubo(k + 1, a.map(m), b.map(m), m(r), lados, passoDoAnel));
   return [
     ...tubos,
     ['unir', { origemId: 100, solidos: tubos.map((_, k) => ({ origem: { op: 'loft', id: k + 1 } })) }],
