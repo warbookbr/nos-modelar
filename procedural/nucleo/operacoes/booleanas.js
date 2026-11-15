@@ -241,12 +241,17 @@ export function criarOperacoesBooleanas(servicos) {
        deslocados na entrada da Manifold por um e por dois passos da grade (2^-20 do tamanho), em direções que não são de eixo:
        os cantos que já existiam voltam com a posição em double, só os pontos novos do corte saem deslocados por essa fração,
        e o resultado continua determinístico. A peça que passa sem deslocamento sai igual, bit a bit; a que reprova nas três
-       tentativas grita como antes. */
+       tentativas grita como antes, e a que tem canto coincidente entre sólidos não tenta de novo. */
     /* vincarCostura: as arestas da costura viram quebra de sombra nas faces dos dois lados, e o sombreado liso não atravessa
        a costura qualquer que seja o ângulo (o cordão na costura de dois tubos, que encontra o tubo a menos do ângulo do liso dele
        onde o canto é aberto, e mancharia o tubo com a direção do chanfro) */
     if (a.vincarCostura != null && a.vincarCostura !== true) return grita(st, i, op, 'vincarCostura', `vincarCostura só aceita o literal true, e veio ${JSON.stringify(a.vincarCostura)}`);
-    const DESLOCAMENTOS = [null, [1, 2, 3], [-2, 1, -3]];
+    /* a nova tentativa só vale quando os sólidos não têm canto coincidente entre si: com canto compartilhado o contato é
+       declarado pela geometria (dois cubos que só se tocam num canto ou numa aresta), e o deslocamento separaria ou sobreporia
+       os sólidos e esconderia a recusa certa do portão */
+    const cantosPorOperando = operandos.map((faces) => new Set(faces.flatMap((f) => st.F.get(f).vs.map((v) => chaveDoPonto(st.V.get(v))))));
+    const compartilham = cantosPorOperando.some((cs, k) => k > 0 && [...cs].some((c) => cantosPorOperando.slice(0, k).some((anterior) => anterior.has(c))));
+    const DESLOCAMENTOS = compartilham ? [null] : [null, [1, 2, 3], [-2, 1, -3]];
     for (let t = 0; t < DESLOCAMENTOS.length; t++) {
       const ultima = t === DESLOCAMENTOS.length - 1;
       const r = nucleoBooleano(st, i, op, wasm, a.origemId, operandos, null, { deslocamento: DESLOCAMENTOS[t], devolverFalhaDaCasca: !ultima, vincarCostura: a.vincarCostura === true });
