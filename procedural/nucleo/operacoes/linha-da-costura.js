@@ -45,6 +45,8 @@ const AFUNDA = 0.03;
 const FUNDO = 0.3;
 /* o quanto a frente de cada escama se curva para trás nas bordas do cordão, em fração do passo (a escama em meia-lua) */
 const CURVA_DA_ESCAMA = 0.9;
+/* o expoente do seno do arco: abaixo de 1 o topo achata e a borda fica mais íngreme, e o cordão deixa de ser um tubo redondo */
+const EXPOENTE_DO_ARCO = 0.5;
 /* a forma de cada escama ao longo da linha, de -1 a 1 por passo: um patamar quase plano que desce devagar e sobe de uma vez
    na frente da escama seguinte (o degrau raso da solda TIG), e não a onda redonda do cosseno */
 const FRENTE_DA_ESCAMA = 0.15;
@@ -318,9 +320,10 @@ export function perfilDoCordao({ peA, nPeA, peB, nPeB, altura, largura, s = 0, e
   const N = 2 * PONTOS_POR_LADO;
   for (let k = 0; k <= N; k++) {
     const t = k / N, x = 2 * t - 1;
-    let h = (altura + afunda) * Math.sin(Math.PI * t);
+    const arco = Math.sin(Math.PI * t) ** EXPOENTE_DO_ARCO;
+    let h = (altura + afunda) * arco;
     /* as escamas: a altura ondula ao longo da linha, com a frente de cada escama curvada para trás nas bordas */
-    if (escamas) h += escamas.altura * Math.sin(Math.PI * t) * degrau((s + CURVA_DA_ESCAMA * escamas.passo * x * x) / escamas.passo);
+    if (escamas) h += escamas.altura * arco * degrau((s + CURVA_DA_ESCAMA * escamas.passo * x * x) / escamas.passo);
     pts.push(s2(s2(afundA, m2(d2(afundB, afundA), t)), m2(sobe, h)));
   }
   /* o fundo: abaixo de cada pé e abaixo do meio, por dentro do material */
