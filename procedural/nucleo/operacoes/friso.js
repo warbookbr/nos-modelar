@@ -50,6 +50,9 @@ import { EXEMPLO_DE_CORDAO, cordaoNoQuadro, linhaDaCostura, perfilDoCordao } fro
 
 /** A aba sai com as faces lisas até este ângulo, como as da superfície: a dobra arredonda a sombra e a ponta e a espessura ficam vivas. */
 const LISO_DA_ABA = valorDoLiso(30);
+/* o cordão na costura separa o sombreado dele do da superfície a partir de 12°: a borda sai deitada no tubo, e com o ângulo
+   maior o sombreado liso misturava as duas direções ao longo dos triângulos longos que a união deixa, e riscava o tubo */
+const LISO_DO_CORDAO = valorDoLiso(12);
 const EXEMPLO_DE_ABA = "aba: { largura: 0.02, angulo: 90, raio: 0.003 }";
 const EXEMPLO_DE_LINHA = "{ nome: 'frisoDaPorta', pontos: ['a', 'b', 'c'] }";
 const EXEMPLO_DE_VARIACAO = "variacao: { largura: [{ ponto: 'a', valor: 0.02 }, { ponto: 'b', antes: 0.02, depois: 0.01 }] }";
@@ -615,7 +618,7 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
     const limite = BLOCO + FAIXA_ESTENDIDA;
     if (vertices.length > limite || faces.length > limite) return grita(st, i, 'friso', 'linha', `o friso gera ${vertices.length} vértices e ${faces.length} faces, acima do limite do passo (${limite})`);
     vertices.forEach((p, k) => addV(st, idDoPasso(i, k), p));
-    const facesSaida = faces.map((f, k) => { const id = idDoPasso(i, k); addF(st, id, f.map((v) => idDoPasso(i, v))); if (comAba) st.F.get(id).liso = LISO_DA_ABA; return id; });
+    const facesSaida = faces.map((f, k) => { const id = idDoPasso(i, k); addF(st, id, f.map((v) => idDoPasso(i, v))); if (comAba) st.F.get(id).liso = LISO_DA_ABA; if (medidasDoCordao) st.F.get(id).liso = LISO_DO_CORDAO; return id; });
     if (a.origemId != null) registraOrigem(st, i, 'friso', a.origemId, { faces: facesSaida, lateral: lateral.map((k) => facesSaida[k]), pontas: tampas.map((k) => facesSaida[k]) });
   },
   };
