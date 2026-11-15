@@ -130,7 +130,7 @@ function lerCostura(st, costura) {
 }
 
 /** linhaDaCostura(st, costura, nome) -> { cadeias } | { erro: [campo, mensagem] }
- *  Cada cadeia é a que o `friso` varre ({ pontos, normais, fechada, espelhada, nomeDoIndice, nomes, passo }) com, a
+ *  Sem `entre`, cada par de sólidos que se toca dá as suas cadeias. Cada cadeia é a que o `friso` varre ({ pontos, normais, fechada, espelhada, nomeDoIndice, nomes, passo }) com, a
  *  mais, `lados`: por ponto, as normais dos dois operandos ({ nA, nB }), e `operandos`: [a, b] e as faces de cada um. */
 export function linhaDaCostura(st, costura, { passo, passoFino = passo, alcance, suave }) {
   const lida = lerCostura(st, costura);
@@ -169,16 +169,17 @@ export function linhaDaCostura(st, costura, { passo, passoFino = passo, alcance,
       ? `a costura do unir:${de.id} não tem aresta entre os sólidos ${entre[0]} e ${entre[1]}; os pares que se tocam são ${existentes || 'nenhum'}`
       : `a costura do unir:${de.id} não tem aresta entre dois sólidos diferentes`] };
   }
-  const operandos = new Set(escolhidas.flatMap((e) => [e.oA, e.oB]));
-  if (!entre && operandos.size > 2) {
-    return { erro: ['costura', `a costura do unir:${de.id} junta mais de dois sólidos (os pares ${[...pares].sort().map((p) => `[${p.replace('-', ', ')}]`).join(', ')}); escolha um par com entre, como ${EXEMPLO_DE_COSTURA}`] };
-  }
 
-  /* o encadeamento: vizinhança por vértice; corta nos vértices que não têm exatamente duas arestas */
+  /* o encadeamento: vizinhança por vértice dentro de cada par de sólidos (sem `entre`, a costura de três sólidos ou mais vira
+     uma cadeia por par, e cada uma leva o perfil no canto do seu par); corta nos vértices que não têm exatamente duas arestas
+     do mesmo par */
+  const par = (e) => `${e.oA}-${e.oB}`;
+  const chaveV = (e, v) => `${par(e)}|${v}`;
   const porVertice = new Map();
   for (const [k, e] of escolhidas.entries()) for (const v of [e.x, e.y]) {
-    if (!porVertice.has(v)) porVertice.set(v, []);
-    porVertice.get(v).push(k);
+    const c = chaveV(e, v);
+    if (!porVertice.has(c)) porVertice.set(c, []);
+    porVertice.get(c).push(k);
   }
   const usada = new Array(escolhidas.length).fill(false);
   const seguir = (v0, k0) => {
@@ -189,7 +190,7 @@ export function linhaDaCostura(st, costura, { passo, passoFino = passo, alcance,
       const e = escolhidas[k];
       v = e.x === v ? e.y : e.x;
       vs.push(v);
-      const viz = porVertice.get(v);
+      const viz = porVertice.get(chaveV(e, v));
       if (viz.length !== 2) break;
       k = viz[0] === k ? viz[1] : viz[0];
     }
@@ -197,8 +198,8 @@ export function linhaDaCostura(st, costura, { passo, passoFino = passo, alcance,
   };
   const brutas = [];
   /* primeiro os trechos abertos, a partir das pontas (vértices com uma aresta ou com três e mais), em ordem de id */
-  const pontas = [...porVertice.entries()].filter(([, ks]) => ks.length !== 2).map(([v]) => v).sort((p, q) => p - q);
-  for (const v of pontas) for (const k of porVertice.get(v)) if (!usada[k]) brutas.push({ ...seguir(v, k), fechada: false });
+  const pontas = [...porVertice.entries()].filter(([, ks]) => ks.length !== 2).map(([c, ks]) => ({ c, v: Number(c.split('|')[1]), ks })).sort((p, q) => p.v - q.v || (p.c < q.c ? -1 : 1));
+  for (const { v, ks } of pontas) for (const k of ks) if (!usada[k]) brutas.push({ ...seguir(v, k), fechada: false });
   /* depois as voltas, a partir do menor vértice livre */
   for (;;) {
     let menor = null, kMenor = null;

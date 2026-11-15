@@ -169,6 +169,37 @@ export function criarOperacoesBooleanas(servicos) {
     return [...grupos.values()];
   }
 
+  /* cascasQueSeCruzam(st, faces) -> as faces divididas em cascas (componentes ligados por aresta, com os cantos soldados pela
+     posição), se alguma caixa de casca cruza a de outra; senão, as faces inteiras numa lista só. A ordem é a do menor id de face
+     de cada casca, e as faces de cada casca ficam em ordem crescente. */
+  function cascasQueSeCruzam(st, faces) {
+    const pai = new Map(faces.map((f) => [f, f]));
+    const acha = (f) => { while (pai.get(f) !== f) { pai.set(f, pai.get(pai.get(f))); f = pai.get(f); } return f; };
+    const porAresta = new Map();
+    for (const f of faces) {
+      const vs = st.F.get(f).vs.map((v) => chaveDoPonto(st.V.get(v)));
+      vs.forEach((x, k) => {
+        const y = vs[(k + 1) % vs.length];
+        const c = x < y ? `${x}|${y}` : `${y}|${x}`;
+        const outra = porAresta.get(c);
+        if (outra == null) porAresta.set(c, f);
+        else { const a = acha(f), b = acha(outra); if (a !== b) pai.set(Math.max(a, b), Math.min(a, b)); }
+      });
+    }
+    const grupos = new Map();
+    for (const f of faces) { const r = acha(f); if (!grupos.has(r)) grupos.set(r, []); grupos.get(r).push(f); }
+    if (grupos.size < 2) return [faces];
+    const lista = [...grupos.values()].map((g) => g.sort((x, y) => x - y)).sort((g, h) => g[0] - h[0]);
+    const caixas = lista.map((g) => {
+      const min = [Infinity, Infinity, Infinity], max = [-Infinity, -Infinity, -Infinity];
+      for (const f of g) for (const v of st.F.get(f).vs) { const p = st.V.get(v); for (let c = 0; c < 3; c++) { min[c] = Math.min(min[c], p[c]); max[c] = Math.max(max[c], p[c]); } }
+      return { min, max };
+    });
+    const cruzam = (a, b) => [0, 1, 2].every((c) => a.min[c] < b.max[c] && b.min[c] < a.max[c]);
+    const algum = caixas.some((a, k) => caixas.some((b, j) => j > k && cruzam(a, b)));
+    return algum ? lista : [faces];
+  }
+
   /* casca fechada e manifold, sobre polígonos de ids: devolve null ou o texto
      do defeito */
   function cascaAberta(poligonos) {
@@ -238,7 +269,17 @@ export function criarOperacoesBooleanas(servicos) {
        a costura qualquer que seja o ângulo (o cordão na costura de dois tubos, que encontra o tubo a menos do ângulo do liso dele
        onde o canto é aberto, e mancharia o tubo com a direção do chanfro) */
     if (a.vincarCostura != null && a.vincarCostura !== true) return grita(st, i, op, 'vincarCostura', `vincarCostura só aceita o literal true, e veio ${JSON.stringify(a.vincarCostura)}`);
-    return nucleoBooleano(st, i, op, wasm, a.origemId, operandos, null, { vincarCostura: a.vincarCostura === true });
+    /* CASCAS SOBREPOSTAS NUM SÓLIDO SÓ. No unir, a seleção de um sólido pode trazer várias cascas fechadas (o cordão de solda na
+       costura de três tubos ou mais, uma por par de tubos, que se sobrepõem onde os pares se encontram). Duas cascas que se
+       cruzam dentro de um sólido só não são um sólido que a Manifold aceite, e a união saía aberta; elas entram como sólidos
+       separados, e o registro da costura continua dizendo o sólido declarado (`donos`). Só se separam as cascas cujas caixas
+       se cruzam; o sólido de cascas afastadas, ou de uma casca só, entra como sempre. */
+    const operandosDoCalculo = [], origemDoOperando = [];
+    operandos.forEach((faces, k) => {
+      const partes = op === 'unir' ? cascasQueSeCruzam(st, faces) : [faces];
+      for (const f of partes) { operandosDoCalculo.push(f); origemDoOperando.push(k); }
+    });
+    return nucleoBooleano(st, i, op, wasm, a.origemId, operandosDoCalculo, null, { vincarCostura: a.vincarCostura === true, origemDoOperando });
   }
 
   /* O CAMINHO COMUM: sólidos do núcleo entram na Manifold, o resultado volta
@@ -246,7 +287,7 @@ export function criarOperacoesBooleanas(servicos) {
      o resultado a partir dos sólidos já convertidos e devolve junto um sólido
      AUXILIAR (o material do arredondamento), cujas faces não vêm de face
      nenhuma do núcleo e por isso nascem todas com id novo. */
-  function nucleoBooleano(st, i, op, wasm, origemId, operandos, extra, { vincarCostura = false } = {}) {
+  function nucleoBooleano(st, i, op, wasm, origemId, operandos, extra, { vincarCostura = false, origemDoOperando = null } = {}) {
 
     // ---- solda dos cantos coincidentes (representante = menor id) ----
     /* A solda vale ENTRE operandos também: dois cubos idênticos entram com os
@@ -1115,7 +1156,7 @@ export function criarOperacoesBooleanas(servicos) {
        `arredondarCostura` com `arestas:'internas'` precisa saber que duas
        faces são da MESMA ferramenta. Vale só para a booleana; o registro do
        arredondamento não tem operandos. */
-    const operandoDaFace = new Map(entradas.map((fid, e) => [fid, operandoDaEntrada[e]]));
+    const operandoDaFace = new Map(entradas.map((fid, e) => [fid, origemDoOperando ? origemDoOperando[operandoDaEntrada[e]] : operandoDaEntrada[e]]));
     const donos = {};
     if (!extra) for (const fid of [...mantidas, ...cortadas.map((c) => c[0])]) donos[fid] = operandoDaFace.get(fid);
     pedacosNovos.forEach(([fid, P, aux], k) => {
