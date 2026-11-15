@@ -51,6 +51,7 @@ const receita = {
   meta: { nome: 'robo-humanoide/falange-proximal', desc: "primeira falange, a que gira no nó da palma; a mesma receita serve aos quatro dedos e ao polegar" },
   PARAMS: TABELA,
   PLANO,
+  TOPO: { origem: 'o encaixe desta parte na de baixo, como diz a montagem; y para cima, a direita em +x e a frente em +z, como no andaime.json' },
   contatos: CONTATOS,
   PASSOS: [],
 };

@@ -49,6 +49,7 @@ const receita = {
   meta: { nome: 'robo-humanoide/polegar-base', desc: "base do polegar direito: elo que gira no eixo inclinado da palma e leva as duas falanges do polegar para fora do plano dos dedos" },
   PARAMS: TABELA,
   PLANO,
+  TOPO: { origem: 'o encaixe desta parte na de baixo, como diz a montagem; y para cima, a direita em +x e a frente em +z, como no andaime.json' },
   contatos: CONTATOS,
   PASSOS: [],
 };

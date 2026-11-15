@@ -78,6 +78,7 @@ const receita = {
   meta: { nome: 'robo-humanoide/braco', desc: "braço direito: casca cinza com painel escuro, do centro do ombro ao centro do cotovelo" },
   PARAMS: TABELA,
   PLANO,
+  TOPO: { origem: 'o encaixe desta parte na de baixo, como diz a montagem; y para cima, a direita em +x e a frente em +z, como no andaime.json' },
   contatos: CONTATOS,
   PASSOS: [],
 };

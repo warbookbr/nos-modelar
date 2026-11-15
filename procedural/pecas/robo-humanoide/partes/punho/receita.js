@@ -52,6 +52,7 @@ const receita = {
   meta: { nome: 'robo-humanoide/punho', desc: "punho direito: anel que gira em torno do antebraço e carrega o eixo de flexão da mão" },
   PARAMS: TABELA,
   PLANO,
+  TOPO: { origem: 'o encaixe desta parte na de baixo, como diz a montagem; y para cima, a direita em +x e a frente em +z, como no andaime.json' },
   contatos: CONTATOS,
   PASSOS: [],
 };

@@ -57,6 +57,8 @@ const receita = {
   meta: { nome: ${literal(peca)}, desc: '' },
   PARAMS: TABELA,
   PLANO,
+  /* A PREENCHER: onde fica a origem. O acervo inteiro usa y para cima, e \`guarda:referencial\` cobra a declaração já sem passo. */
+  TOPO: { origem: 'a preencher no alinhamento; y para cima' },
   contatos: CONTATOS,
   PASSOS: [],
 };

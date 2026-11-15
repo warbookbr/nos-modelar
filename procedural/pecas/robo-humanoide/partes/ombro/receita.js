@@ -64,6 +64,7 @@ const receita = {
   meta: { nome: 'robo-humanoide/ombro', desc: "disco de junta do ombro direito, preso ao tronco, com os dois eixos perpendiculares de flexão e de abdução" },
   PARAMS: TABELA,
   PLANO,
+  TOPO: { origem: 'o encaixe desta parte na de baixo, como diz a montagem; y para cima, a direita em +x e a frente em +z, como no andaime.json' },
   contatos: CONTATOS,
   PASSOS: [],
 };
