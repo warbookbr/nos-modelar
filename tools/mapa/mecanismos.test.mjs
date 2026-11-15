@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 /* mecanismos.test.mjs — a página dos mecanismos cita toda pasta de primeiro nível, ou ela consta nas dispensas com motivo. */
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -43,6 +44,14 @@ describe('conferência da página dos mecanismos', () => {
     expect(conferirMecanismos({ raiz, dispensas: { 'tools/fixtures/': 'dado de teste', 'tools/sumiu/': 'x' } }).problemas[0]).toContain('já não existe');
     const citada = repositorio({ pagina: '| `tools/fixtures/` |\n', pastas: ['tools/fixtures'] });
     expect(conferirMecanismos({ raiz: citada, dispensas: { 'tools/fixtures/': 'dado de teste' } }).problemas[0]).toContain('já está citada');
+  });
+
+  it('a pasta que o git ignora (a de uma worktree local) não reprova, e a mesma pasta fora do .gitignore reprova', () => {
+    const raiz = repositorio({ pagina: '| A |\n', pastas: ['.claude/worktrees/b'], arquivos: ['.gitignore'] });
+    execFileSync('git', ['init', '-q'], { cwd: raiz });
+    expect(conferirMecanismos({ raiz, dispensas: {} }).problemas[0]).toContain('.claude/worktrees/ não está em');
+    writeFileSync(join(raiz, '.gitignore'), '.claude/worktrees/\n');
+    expect(conferirMecanismos({ raiz, dispensas: {} }).problemas).toEqual([]);
   });
 
   it('a página acima do teto de linhas reprova', () => {

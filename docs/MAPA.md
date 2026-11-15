@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1963 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1967 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -231,6 +231,10 @@
 ## docs/modelar/banco-de-provas/carrinho-refeito-2026-10-08/
 
 - `ATRITOS.md` — Atritos
+
+## docs/modelar/banco-de-provas/costura-em-no-de-tubos-2026-11-15/
+
+- `SONDA.md` — Sonda da costura arredondada em nó de tubos, 2026-11-15
 
 ## docs/modelar/banco-de-provas/desenho-braco-2026-10-14/
 
@@ -571,6 +575,7 @@
 - `2026-11-14-modelagem-de-carro.md` — Modelagem de carro de passeio: o que já serve, onde a carroceria travou antes e por onde começar
 - `2026-11-14-modelagem-de-robo.md` — Modelagem de robô humanoide: o que já serve, o que falta na montagem e por onde começar
 - `2026-11-14-prancha-menos-manual.md` — Prancha menos manual: desvio medido, leitura combinada de um comando e o que ficou de fora declarado
+- `2026-11-15-costura-em-no-de-tubos.md` — Costura arredondada em nó de tubos: o cordão de solda onde três ou mais tubos se encontram
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
@@ -1085,6 +1090,7 @@
 - `medidas-de-malha.js` — medidas-de-malha.js — medidas de teste sobre malha poligonal por índice, sem Three.js: área, volume com sinal, distância de pontos a triângulos e cruzamento …
 - `medidas-de-malha.test.mjs` — medidas-de-malha.test.mjs — `distancias` para com erro quando não há triângulo a medir, em vez de abrir anéis de células para sempre.
 - `moldura-prova.js` — moldura-prova.js — a chapa curva com vão de `friso-prova.js` e as molduras em volta da borda dele, desenhadas por código para a conferência da moldura (`mold…
+- `no-de-tubos.js` — no-de-tubos.js — a fixture geral do nó de tubos: tubos de seção circular, fechados nas pontas por um polo, que saem de um ponto comum ou nascem na lateral de…
 - `varredura-prova.js` — varredura-prova.js — as três peças varridas de prova da `gaiolaVarrida`, desenhadas por código
 
 ## procedural/nucleo/forma-exata/
@@ -1111,6 +1117,7 @@
 - `arredondar-canto.test.ts` — arredondar-canto.test.ts — o vértice onde duas ou três arestas arredondadas (ou chanfradas) se encontram.
 - `arredondar-chapa-furada.test.ts` — arredondar-chapa-furada.test.ts — as três recusas que sobravam ao arredondar as arestas de uma chapa de 6 mm com furos oblongos.
 - `arredondar-costura-convexa.test.ts` — arredondar-costura-convexa.test.ts — fatia 7b do plano "União de sólidos": o `arredondarCostura` arredonda também a borda CONVEXA de uma booleana (a beira do…
+- `arredondar-costura-no.test.ts` — arredondar-costura-no.test.ts — o `arredondarCostura` no nó de tubos (plano da costura em nó de tubos, 2026-11-15). Medido na fatia 1: a malha fecha com dois…
 - `arredondar-costura-pontas.test.ts` — arredondar-costura-pontas.test.ts — a ponta solta do arredondamento por fatias. A fixture é a coluna do braço robótico reduzida ao essencial: um disco de eix…
 - `arredondar-costura-tubos-altos.test.ts` — arredondar-costura-tubos-altos.test.ts — dois tubos de mesmo diâmetro em T, o vertical mais alto que o raio, unidos e arredondados. Com 144 lados as geratriz…
 - `arredondar-costura.test.ts` — arredondar-costura.test.ts — fatia 4 do plano "União de sólidos": o encontro côncavo de uma união é arredondado com raio declarado, e o `liso` com ângulo não…
