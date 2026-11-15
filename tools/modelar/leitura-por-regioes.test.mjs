@@ -5,8 +5,11 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
-  FUNDO_DO_PAINEL, acharPainel, caixaDoObjeto, conferirRespostas, executar, imagem, mesmoTexto, montarLeitura, palavras, paraPng, pedido, regioesDaGrade,
+  FUNDO_DO_PAINEL, LADO_DO_PAINEL_DA_PARTE, acharPainel, caixaDoObjeto, conferirRespostas, espelhada, executar, imagem, mesmoTexto, montarLeitura, palavras,
+  paraPng, parteDoPonto, partesDaPrancha, partesEmFracao, palavrasDaCoisa, pedido, pontoDoOnde, pranchaSoDesenho, regioesDaGrade, consolidar, relatoDaConsolidacao,
 } from './leitura-por-regioes.mjs';
+import { ESPEC as BLOCO } from '../fixtures/leitura-por-partes/caixa.prancha.mjs';
+import { prancha } from './prancha/prancha.mjs';
 
 const LARANJA = [226, 100, 30]; const CINZA = [90, 95, 100];
 function retangulo(im, [x0, y0, x1, y1], cor) {
@@ -253,5 +256,137 @@ describe('leitura por regiões', () => {
       expect(p).toContain('`referencia` e `modelo` vão separados porque a referência não muda de uma rodada para a outra');
       expect(p).toContain('cada um com até 80 caracteres');
     });
+  });
+});
+
+describe('leitura por partes e a prancha', () => {
+  /* na referência, o quadrado cinza ocupa x 80 a 100 e y 40 a 60 do corpo de 100 x 60 mm (b para cima, a origem no canto de baixo à esquerda) */
+  const CAIXA = [0, 0, 100, 60];
+  const QUADRADO = [80, 40, 100, 60];
+
+  it('leva cada parte em mm à fração da caixa do objeto, com y para baixo, e recusa nome, caixa e parte fora', () => {
+    expect(partesEmFracao({ caixa: CAIXA, partes: { quadrado: QUADRADO, base: [0, 0, 50, 30] } })).toEqual([
+      { nome: 'quadrado', fracao: [0.8, 0, 1, 1 / 3] }, { nome: 'base', fracao: [0, 0.5, 0.5, 1] }]);
+    expect(() => partesEmFracao({ caixa: [0, 0, 0, 60], partes: { a: QUADRADO } })).toThrow('"caixa" precisa ser [a0, b0, a1, b1]');
+    expect(() => partesEmFracao({ caixa: CAIXA, partes: {} })).toThrow('pelo menos uma parte');
+    expect(() => partesEmFracao({ caixa: CAIXA, partes: { 'lâmpada': QUADRADO } })).toThrow('o nome "lâmpada" precisa começar por letra');
+    expect(() => partesEmFracao({ caixa: CAIXA, partes: { longe: [200, 0, 300, 10] } })).toThrow('fica fora da caixa do objeto');
+  });
+
+  it('cada parte vira uma região com o nome dela, e a parte cai no centro do painel dos dois lados', () => {
+    const partes = partesEmFracao({ caixa: CAIXA, partes: { quadrado: QUADRADO, base: [0, 0, 50, 30] } });
+    const r = montarLeitura({ referencia: referencia(), captura: captura(), caixaRef: [30, 20, 130, 80], margem: 5, partes });
+    expect(r.porParte).toBe(true);
+    expect(r.regioes.map((x) => x.nome)).toEqual(['quadrado', 'base']);
+    /* o painel do quadrado é quadrado (a folga é a mesma nos dois eixos), com LADO_DO_PAINEL_DA_PARTE px de lado */
+    const meio = LADO_DO_PAINEL_DA_PARTE / 2; const c = 50 + meio; const direita = 10 + LADO_DO_PAINEL_DA_PARTE + 30 + meio;
+    expect(corEm(r.folhas[0], 10 + meio, c)).toEqual(CINZA);
+    expect(corEm(r.folhas[0], direita, c)).toEqual(CINZA);
+    /* com o quadrado no lugar errado no rascunho, o centro do painel do rascunho fica laranja */
+    const errado = montarLeitura({ referencia: referencia(), captura: captura([120, 180, 160, 220]), caixaRef: [30, 20, 130, 80], margem: 5, partes }).folhas[0];
+    expect(corEm(errado, direita, c)).toEqual(LARANJA);
+    /* a rodada recusa a parte sem resposta pelo nome */
+    expect(conferirRespostas(r.regioes, { regioes: { quadrado: { igual: true } } }).recusas).toEqual(['a região base ficou sem resposta']);
+    const p = pedido({ pasta: '/p', regioes: r.regioes, folhas: 1, porParte: true, rotulo: 'PRANCHA' });
+    expect(p).toContain('# Leitura por partes');
+    expect(p).toContain('Para CADA parte (quadrado, base)');
+    expect(p).toContain('uma PRANCHA (um desenho de linhas, sem cor, sem luz e sem volume)');
+    expect(pedido({ pasta: '/p', regioes: r.regioes, folhas: 1 })).toContain('um RASCUNHO 3D');
+  });
+
+  it('a referência espelhada, com a caixa dada na imagem original, dá a mesma leitura que a referência já virada', () => {
+    const direita = referencia();
+    const virada = espelhada(direita);
+    expect(espelhada(virada).dados).toEqual(direita.dados);
+    const a = montarLeitura({ referencia: direita, captura: captura(), caixaRef: [30, 20, 130, 80], grade: [2, 2], margem: 5 });
+    const b = montarLeitura({ referencia: virada, captura: captura(), caixaRef: [160 - 130, 20, 160 - 30, 80], grade: [2, 2], margem: 5, espelhar: true });
+    expect(b.folhas[0].dados).toEqual(a.folhas[0].dados);
+  });
+
+  it('a prancha sai só com o desenho, com a caixa em mm somada às camadas fora do contorno, e as partes podem citar camadas', () => {
+    const d = pranchaSoDesenho(BLOCO, prancha);
+    expect(d.vista).toBe('lateral');
+    expect(d.caixa).toEqual([-500, 0, 500, 400]);
+    expect(d.camadas.janela).toEqual([100, 250, 400, 370]);
+    expect(d.svg).not.toMatch(/bloco de prova|LATERAL|1\.000|LEGENDA|canto/);
+    expect(prancha(BLOCO).svg).toMatch(/bloco de prova/);
+    expect(() => pranchaSoDesenho(BLOCO, prancha, 'topo')).toThrow('--vista=topo não é da prancha, que tem lateral');
+    expect(() => pranchaSoDesenho({}, prancha)).toThrow('precisa exportar ESPEC');
+    expect(partesDaPrancha({ partes: { vidro: { camadas: ['janela', 'recorte'] }, fixa: [0, 0, 10, 10] } }, d))
+      .toEqual({ caixa: [-500, 0, 500, 400], partes: { vidro: [-400, 130, 400, 370], fixa: [0, 0, 10, 10] } });
+    expect(() => partesDaPrancha({ partes: { x: { camadas: ['porta'] } } }, d)).toThrow('cita camadas que a vista lateral da prancha não tem: porta');
+    expect(() => partesDaPrancha({ partes: { x: {} } }, d)).toThrow('precisa ser [a0, b0, a1, b1] em mm ou { "camadas"');
+  });
+
+  it('o comando lê --partes, recusa --partes com --grade e avisa a proporção acima do limite', () => {
+    const pasta = mkdtempSync(join(tmpdir(), 'leitura-partes-'));
+    const largo = imagem(480, 400, FUNDO_DO_PAINEL);
+    retangulo(largo, [100, 100, 340, 220], LARANJA);
+    writeFileSync(join(pasta, 'ref.png'), paraPng(referencia())); writeFileSync(join(pasta, 'cap.png'), paraPng(captura())); writeFileSync(join(pasta, 'largo.png'), paraPng(largo));
+    writeFileSync(join(pasta, 'partes.json'), JSON.stringify({ caixa: CAIXA, partes: { quadrado: QUADRADO } }));
+    const base = [`--referencia=${join(pasta, 'ref.png')}`, '--caixa-ref=30,20,130,80'];
+    const comPartes = [...base, `--captura=${join(pasta, 'cap.png')}`, `--saida=${join(pasta, 'l')}`, `--partes=${join(pasta, 'partes.json')}`];
+    const ok = executar(comPartes);
+    expect(ok.codigo, ok.stderr).toBe(0);
+    expect(ok.stdout).toContain('1 partes em 1 folhas');
+    expect(ok.stdout).not.toContain('AVISO');
+    expect(JSON.parse(readFileSync(join(pasta, 'l', 'leitura.json'), 'utf8'))).toMatchObject({ grade: 'partes', regioes: [{ nome: 'quadrado', folha: 1 }] });
+    expect(executar([...comPartes, '--grade=2x2']).stderr).toContain('--partes e --grade se excluem');
+    const torto = executar([...base, `--captura=${join(pasta, 'largo.png')}`, '--painel=0,0,480,400', `--saida=${join(pasta, 'm')}`, '--grade=2x2']);
+    expect(torto.stdout).toContain('AVISO: a altura sobre a largura difere 16.7%, acima de 10%');
+    expect(executar([...base, `--captura=${join(pasta, 'cap.png')}`, `--saida=${join(pasta, 'l')}`, '--rotulo=FOTO']).stderr).toContain('--rotulo espera RASCUNHO ou PRANCHA');
+  });
+});
+
+describe('a consolidação de vários críticos', () => {
+  const PARTES = [{ nome: 'tras', caixaRef: [0, 0, 50, 50] }, { nome: 'frente', caixaRef: [50, 0, 100, 50] }, { nome: 'luz', caixaRef: [0, 0, 20, 20] }];
+  const dif = (atributo, onde = 'no centro', modelo = 'outro') => ({ tipo: 'forma', onde, atributo, referencia: 'como é', modelo });
+
+  it('o onde aponta um ponto da caixa, e o ponto vai à menor parte que o contém ou à mais próxima', () => {
+    expect(pontoDoOnde('em cima, à esquerda', [0, 0, 60, 60])).toEqual([10, 10]);
+    expect(pontoDoOnde('embaixo, à direita', [0, 0, 60, 60])).toEqual([50, 50]);
+    expect(pontoDoOnde('no centro', [0, 0, 60, 60])).toEqual([30, 30]);
+    expect(parteDoPonto([10, 10], PARTES)).toBe('luz');
+    expect(parteDoPonto([30, 30], PARTES)).toBe('tras');
+    expect(parteDoPonto([200, 10], PARTES)).toBe('frente');
+    expect([...palavrasDaCoisa('Bordas das lanternas traseiras')]).toEqual(['lanterna']);
+  });
+
+  it('junta por parte e pela coisa nomeada, conta o apoio por crítico e o controle na mesma parte', () => {
+    const grade = { regioes: [{ nome: 'A1', caixaRef: [0, 0, 100, 50] }], porParte: false, criticos: [
+      { id: 'g1', respostas: { regioes: { A1: { diferencas: [dif('lanterna traseira', 'à esquerda'), dif('farol', 'à direita'), 'forma: frase antiga'] } } } }] };
+    const partes = { regioes: PARTES, porParte: true, criticos: [
+      { id: 'p1', respostas: { regioes: { tras: { diferencas: [dif('borda da lanterna'), dif('lanterna')] }, frente: { igual: true }, luz: { igual: true } } } }] };
+    const controle = [{ regioes: PARTES, porParte: true, criticos: [{ id: 'c1', respostas: { regioes: { tras: { diferencas: [dif('lanternas')] }, frente: { diferencas: [dif('para-choque')] } } } }] }];
+    const r = consolidar({ partes: PARTES, alvo: [grade, partes], controle });
+    expect(r.criticos).toEqual({ alvo: 2, controle: 1 });
+    expect(r.grupos.map((g) => [g.parte, g.coisas, g.apoio, g.controle])).toEqual([
+      ['tras', ['lanterna'], 2, 1], ['frente', ['farol'], 1, 0]]);
+    expect(r.grupos[0].ditos).toHaveLength(3);
+    const md = relatoDaConsolidacao(r);
+    expect(md).toContain('- tras — lanterna: 2 de 2 críticos, 1 de 1 no controle');
+    expect(md).toContain('## Ditos por menos\n\n- frente — farol: 1 de 2 críticos, 0 de 1 no controle');
+  });
+
+  it('o comando confere cada resposta contra a leitura dela e recusa a config sem a leitura por partes', () => {
+    const pasta = mkdtempSync(join(tmpdir(), 'leitura-consolidar-'));
+    writeFileSync(join(pasta, 'ref.png'), paraPng(referencia())); writeFileSync(join(pasta, 'cap.png'), paraPng(captura()));
+    writeFileSync(join(pasta, 'partes.json'), JSON.stringify({ caixa: [0, 0, 100, 60], partes: { quadrado: [80, 40, 100, 60], base: [0, 0, 50, 30] } }));
+    const base = [`--referencia=${join(pasta, 'ref.png')}`, '--caixa-ref=30,20,130,80', `--captura=${join(pasta, 'cap.png')}`];
+    expect(executar([...base, `--saida=${join(pasta, 'p')}`, `--partes=${join(pasta, 'partes.json')}`]).codigo).toBe(0);
+    expect(executar([...base, `--saida=${join(pasta, 'g')}`, '--grade=2x2']).codigo).toBe(0);
+    writeFileSync(join(pasta, 'rp.json'), JSON.stringify({ regioes: { quadrado: { diferencas: [dif('quadrado cinza')] }, base: { igual: true } } }));
+    writeFileSync(join(pasta, 'rg.json'), JSON.stringify({ regioes: { A1: { igual: true }, A2: { diferencas: [dif('quadrado', 'em cima, à direita')] }, B1: { igual: true }, B2: { igual: true } } }));
+    writeFileSync(join(pasta, 'ruim.json'), JSON.stringify({ regioes: { A1: { igual: true } } }));
+    const cfg = (o) => { writeFileSync(join(pasta, 'c.json'), JSON.stringify(o)); return executar([`--consolidar=${join(pasta, 'c.json')}`, `--saida=${join(pasta, 'saida')}`]); };
+    const ok = cfg({ partes: 'p', alvo: [{ leitura: 'g', respostas: ['rg.json'] }, { leitura: 'p', respostas: ['rp.json'] }] });
+    expect(ok.codigo, ok.stderr).toBe(0);
+    expect(ok.stdout).toContain('- quadrado — quadrado, cinza: 2 de 2 críticos');
+    expect(JSON.parse(readFileSync(join(pasta, 'saida', 'consolidado.json'), 'utf8'))).toMatchObject({ formato: 'modelar.leitura-consolidada@1', minimo: 2 });
+    const recusa = cfg({ partes: 'p', alvo: [{ leitura: 'g', respostas: ['ruim.json'] }] });
+    expect(recusa.codigo).toBe(1);
+    expect(recusa.stderr).toContain('alvo ruim.json: a região A2 ficou sem resposta');
+    expect(cfg({ partes: 'g', alvo: [{ leitura: 'g', respostas: ['rg.json'] }] }).stderr).toContain('que é uma leitura em grade');
+    expect(cfg({ alvo: [] }).stderr).toContain('a config precisa de "partes"');
   });
 });

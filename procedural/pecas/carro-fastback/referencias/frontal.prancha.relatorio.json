@@ -1,0 +1,115 @@
+{
+  "medidas": {
+    "comprimento": 4750,
+    "largura": 1900,
+    "altura": 1380,
+    "pneuDiametro": 680,
+    "pneuLargura": 270,
+    "bitola": 1620,
+    "labio": 190,
+    "basePB": 985
+  },
+  "relatorio": {
+    "porVista": {
+      "frontal": {
+        "caixa": {
+          "xMin": -952,
+          "xMax": 952,
+          "yMin": 190,
+          "yMax": 1380.700007499625
+        },
+        "contornoFechado": true,
+        "trechosSoltos": 0,
+        "autoIntersecoes": 0,
+        "pontosForaDoContorno": 0,
+        "camadasQueEscaparam": []
+      }
+    },
+    "porCamada": {
+      "silhuetaFrontal": {
+        "vista": "frontal",
+        "comprimento": 5434.64,
+        "retidao": 0.322,
+        "concentracao": 0.377,
+        "inversoes": 4,
+        "raioMin": 40
+      },
+      "paraBrisa": {
+        "vista": "frontal",
+        "comprimento": 3101.91,
+        "retidao": 0.668,
+        "concentracao": 0.121,
+        "inversoes": 0,
+        "raioMin": 20
+      },
+      "bordaDoCapo": {
+        "vista": "frontal",
+        "comprimento": 1283.97,
+        "retidao": 0.744,
+        "concentracao": 0.302,
+        "inversoes": 0,
+        "raioMin": 3000
+      },
+      "pneuEsq": {
+        "vista": "frontal",
+        "comprimento": 601.07,
+        "retidao": 0.508,
+        "concentracao": 0.387,
+        "inversoes": 0,
+        "raioMin": 80
+      },
+      "pneuDir": {
+        "vista": "frontal",
+        "comprimento": 601.07,
+        "retidao": 0.508,
+        "concentracao": 0.387,
+        "inversoes": 0,
+        "raioMin": 80
+      }
+    },
+    "porLandmark": {
+      "largura": {
+        "sobre": "silhuetaFrontal",
+        "desvio": 1.5
+      },
+      "teto": {
+        "sobre": "silhuetaFrontal",
+        "desvio": 0.7
+      }
+    },
+    "coerencia": {
+      "porEixo": {},
+      "envelope": {
+        "largura": {
+          "medido": 1904,
+          "declarado": 1900,
+          "desvio": 4
+        },
+        "altura": {
+          "medido": 1380.7,
+          "declarado": 1380,
+          "desvio": 0.7
+        }
+      },
+      "simetria": {
+        "frontal": 0
+      }
+    },
+    "alertas": [],
+    "autoria": {
+      "estado": "pronta",
+      "confianca": "media",
+      "bloqueada": false,
+      "procedencias": [
+        "tabela",
+        "carater"
+      ],
+      "incertezas": [
+        "bitola",
+        "estufa"
+      ]
+    }
+  },
+  "colisoes": [],
+  "avisos": []
+}

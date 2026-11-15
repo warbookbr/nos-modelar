@@ -1,0 +1,262 @@
+{
+  "formato": "mecanifica.andaime-global@2",
+  "id": "andaime-carro-fastback",
+  "objetivo": "esqueleto-da-carroceria",
+  "alvo": "alvo-carro-fastback",
+  "familia": "veiculo",
+  "intencao": "Pontos duros do cupê fastback tirados das quatro pranchas aceitas em 2026-11-14 (lateral, frontal, traseira e superior): envelope de 4750 por 1900 por 1380, eixos, rodas, base e topo do para-brisa, pico do teto, base da tampa, spoiler e quadril, com o corpo de baixo, a cabine e as quatro rodas como volumes para a régua do planejado contra o executado. A forma vem das curvas das pranchas, e os volumes só limitam a caixa de cada região.",
+  "unidade": "mm",
+  "eixos": {
+    "direita": "+x",
+    "cima": "+y",
+    "frente": "+z"
+  },
+  "envelope": {
+    "min": [
+      -950,
+      0,
+      -2375
+    ],
+    "max": [
+      950,
+      1380,
+      2375
+    ]
+  },
+  "landmarks": [
+    {
+      "id": "labio-dianteiro",
+      "posicao": [
+        0,
+        202,
+        2375
+      ]
+    },
+    {
+      "id": "nariz",
+      "posicao": [
+        0,
+        797,
+        2200
+      ]
+    },
+    {
+      "id": "eixo-dianteiro",
+      "posicao": [
+        0,
+        340,
+        1345
+      ]
+    },
+    {
+      "id": "eixo-traseiro",
+      "posicao": [
+        0,
+        340,
+        -1375
+      ]
+    },
+    {
+      "id": "base-do-para-brisa",
+      "posicao": [
+        0,
+        1005,
+        790
+      ]
+    },
+    {
+      "id": "topo-do-para-brisa",
+      "posicao": [
+        0,
+        1331,
+        125
+      ]
+    },
+    {
+      "id": "pico-do-teto",
+      "posicao": [
+        0,
+        1380,
+        -320
+      ]
+    },
+    {
+      "id": "base-da-tampa",
+      "posicao": [
+        0,
+        1045,
+        -1945
+      ]
+    },
+    {
+      "id": "ponta-do-spoiler",
+      "posicao": [
+        0,
+        1070,
+        -2236
+      ]
+    },
+    {
+      "id": "base-traseira",
+      "posicao": [
+        0,
+        210,
+        -2375
+      ]
+    },
+    {
+      "id": "quadril-esquerdo",
+      "posicao": [
+        -950,
+        600,
+        -1300
+      ]
+    },
+    {
+      "id": "quadril-direito",
+      "posicao": [
+        950,
+        600,
+        -1300
+      ]
+    },
+    {
+      "id": "ombro-dianteiro-esquerdo",
+      "posicao": [
+        -950,
+        600,
+        1300
+      ]
+    },
+    {
+      "id": "ombro-dianteiro-direito",
+      "posicao": [
+        950,
+        600,
+        1300
+      ]
+    },
+    {
+      "id": "soleira-esquerda",
+      "posicao": [
+        -950,
+        170,
+        0
+      ]
+    },
+    {
+      "id": "soleira-direita",
+      "posicao": [
+        950,
+        170,
+        0
+      ]
+    }
+  ],
+  "volumes": [
+    {
+      "id": "corpo-de-baixo",
+      "regioes": [
+        "lataria",
+        "corpo-de-baixo"
+      ],
+      "tipo": "caixa",
+      "centro": [
+        0,
+        595,
+        0
+      ],
+      "dimensoes": [
+        1900,
+        810,
+        4750
+      ]
+    },
+    {
+      "id": "cabine",
+      "regioes": [
+        "lataria",
+        "cabine"
+      ],
+      "tipo": "caixa",
+      "centro": [
+        0,
+        1190,
+        -577.5
+      ],
+      "dimensoes": [
+        1450,
+        380,
+        2735
+      ]
+    },
+    {
+      "id": "roda-dianteira-esquerda",
+      "regioes": [
+        "rodas",
+        "roda-dianteira-esquerda"
+      ],
+      "tipo": "cilindro",
+      "centro": [
+        -810,
+        340,
+        1345
+      ],
+      "eixo": "x",
+      "raio": 340,
+      "comprimento": 270,
+      "segmentos": 32
+    },
+    {
+      "id": "roda-dianteira-direita",
+      "regioes": [
+        "rodas",
+        "roda-dianteira-direita"
+      ],
+      "tipo": "cilindro",
+      "centro": [
+        810,
+        340,
+        1345
+      ],
+      "eixo": "x",
+      "raio": 340,
+      "comprimento": 270,
+      "segmentos": 32
+    },
+    {
+      "id": "roda-traseira-esquerda",
+      "regioes": [
+        "rodas",
+        "roda-traseira-esquerda"
+      ],
+      "tipo": "cilindro",
+      "centro": [
+        -810,
+        340,
+        -1375
+      ],
+      "eixo": "x",
+      "raio": 340,
+      "comprimento": 270,
+      "segmentos": 32
+    },
+    {
+      "id": "roda-traseira-direita",
+      "regioes": [
+        "rodas",
+        "roda-traseira-direita"
+      ],
+      "tipo": "cilindro",
+      "centro": [
+        810,
+        340,
+        -1375
+      ],
+      "eixo": "x",
+      "raio": 340,
+      "comprimento": 270,
+      "segmentos": 32
+    }
+  ]
+}

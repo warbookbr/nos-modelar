@@ -1,0 +1,108 @@
+{
+  "medidas": {
+    "comprimento": 4750,
+    "largura": 1900
+  },
+  "relatorio": {
+    "porVista": {
+      "planta": {
+        "caixa": {
+          "xMin": -2377.248513812232,
+          "xMax": 2377.2000799840043,
+          "yMin": -949.2933355476116,
+          "yMax": 949.2933355476116
+        },
+        "contornoFechado": true,
+        "trechosSoltos": 0,
+        "autoIntersecoes": 0,
+        "pontosForaDoContorno": 0,
+        "camadasQueEscaparam": []
+      }
+    },
+    "porCamada": {
+      "silhuetaSuperior": {
+        "vista": "planta",
+        "comprimento": 12020.53,
+        "retidao": 0.216,
+        "concentracao": 0.543,
+        "inversoes": 4,
+        "raioMin": 30
+      },
+      "paraBrisa": {
+        "vista": "planta",
+        "comprimento": 3961.44,
+        "retidao": 0.322,
+        "concentracao": 0.271,
+        "inversoes": 2,
+        "raioMin": 40
+      },
+      "vidroTraseiro": {
+        "vista": "planta",
+        "comprimento": 3344.36,
+        "retidao": 0.312,
+        "concentracao": 0.352,
+        "inversoes": 1,
+        "raioMin": 60
+      },
+      "vidroLateralEsq": {
+        "vista": "planta",
+        "comprimento": 3604.18,
+        "retidao": 0.508,
+        "concentracao": 0.116,
+        "inversoes": 0,
+        "raioMin": 12
+      },
+      "vidroLateralDir": {
+        "vista": "planta",
+        "comprimento": 3604.18,
+        "retidao": 0.508,
+        "concentracao": 0.116,
+        "inversoes": 0,
+        "raioMin": 12
+      }
+    },
+    "porLandmark": {
+      "ponta": {
+        "sobre": "silhuetaSuperior",
+        "desvio": 2.2
+      },
+      "quadril": {
+        "sobre": "silhuetaSuperior",
+        "desvio": 1.54
+      }
+    },
+    "coerencia": {
+      "porEixo": {},
+      "envelope": {
+        "comprimento": {
+          "medido": 4754.45,
+          "declarado": 4750,
+          "desvio": 4.45
+        },
+        "largura": {
+          "medido": 1898.59,
+          "declarado": 1900,
+          "desvio": -1.41
+        }
+      },
+      "simetria": {
+        "planta": 0
+      }
+    },
+    "alertas": [],
+    "autoria": {
+      "estado": "pronta",
+      "confianca": "media",
+      "bloqueada": false,
+      "procedencias": [
+        "tabela",
+        "carater"
+      ],
+      "incertezas": [
+        "vidros"
+      ]
+    }
+  },
+  "colisoes": [],
+  "avisos": []
+}

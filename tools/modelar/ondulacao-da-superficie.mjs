@@ -15,6 +15,8 @@
  *   emendaGraus: o ângulo, em graus, a partir do qual a aresta fora de vinco é emenda (2).
  *   viradaGraus: o ângulo, em graus, entre as normais de duas faces vizinhas a partir do qual a face é virada (90).
  *   passo: o passo da receita em que a superfície é lida (padrão: o último que ainda tem a gaiola, dito em `leitura`).
+ *   PLANO.saliencias: a saliência ou o rebaixo de dupla curvatura desenhado de propósito, `[{ regiao: { min, max } em mm, sentido: 'fora' | 'dentro', amplitudeMm, motivo }]`
+ *     (`src/autoria/saliencias-declaradas.js`); a régua mede o desvio contra a feição e tolera na região só o resíduo esperado dela.
  * exemplo:
  *   ondulacaoDaReceita({ PARAMS: {}, TOPO: Object.fromEntries(Array.from({ length: 16 }, (_, k) => [`p${k}`, [(k % 4) * 0.1, 0, Math.floor(k / 4) * 0.1]])), PASSOS: [['subdivisao', { vertices: Array.from({ length: 16 }, (_, k) => `p${k}`), faces: Array.from({ length: 9 }, (_, k) => { const i = (k % 3) + 4 * Math.floor(k / 3); return [`p${i}`, `p${i + 4}`, `p${i + 5}`, `p${i + 1}`]; }), niveis: 2 }]] }).falhas === 0
  * peça: procedural/pecas/sedan-chassi-e-lataria/alta-definicao/caminho-a-gaiola-da-casca.esboco.mjs
@@ -52,6 +54,15 @@
  * gaiola se dobra quase como um vinco. A falha cujo pico fica a menos de `zonaDeclarada` espaçamentos de um vinco, de uma
  * borda ou de um canto declarados vai para `junto`, e não para `falhas`: ali o desvio é da feição que a receita pediu, e
  * a ferramenta não separa um defeito colado a ela. Na simetria em x, só a metade declarada é relatada.
+ *
+ * A SALIÊNCIA DECLARADA. O ajuste local de uma superfície de dupla curvatura deixa resíduo na feição desenhada: a lombada cos² de 60 mm e seis espaçamentos de
+ * largura sai como calombo de 4,2 mm no pico (7% da amplitude), ondulação de 2,2 mm no pé e 0,8 mm além da caixa. `PLANO.saliencias` declara a feição (região,
+ * sentido, amplitude, motivo), como `PLANO.dobrasAceitas` declara as dobras. Não há perfil da feição para medir contra, e por isso a régua tira de cada vértice o
+ * resíduo esperado, proporcional à amplitude declarada (`FRACAO_DA_SALIENCIA` 7,5% no sinal da feição, 4% no contrário, 1,5% no entorno de `raio` espaçamentos
+ * fora da caixa) e semeia a falha com o que sobra: a ondulação somada à feição (3 mm sobre os 60 mm sai com 2,4 mm; 1 mm sai com 0,57 mm), o desvio fora da
+ * caixa e a feição de sentido ou amplitude errados continuam falhas. A saída traz por superfície `saliencias` com o desvio medido e o tolerado, e a `leitura` o
+ * diz. A ondulação menor que a folga entre o resíduo e a fração (da ordem de 0,3 mm) passa, e a fração vale para feição de uns seis espaçamentos de
+ * largura: mais estreita deixa resíduo maior, e a amplitude declarada precisa ser a que a malha tem. A ferramenta `alisar` lê o desvio já descontado e não achata a feição declarada.
  *
  * OS PONTOS. A malha entregue é linear na gaiola (subdividida e, com medidas, levada ao ponto limite), e o peso de cada
  * ponto da gaiola num vértice sai do próprio núcleo, rodando `subdividirCatmullClark` sobre um recorte da gaiola em volta
@@ -106,6 +117,7 @@ import { idDoPasso } from '../../procedural/nucleo/nucleo.js';
 import { gaiolaDoPasso } from '../../procedural/nucleo/operacoes/subdivisao.js';
 import { capturarGaiolas } from '../../procedural/nucleo/gaiola-por-estacoes.js';
 import { subdividirCatmullClark } from '../../procedural/nucleo/subdivisao.js';
+import { FRACAO_CONTRARIA_DA_SALIENCIA, FRACAO_DA_SALIENCIA, FRACAO_DO_ENTORNO_DA_SALIENCIA, salienciasDaReceita } from '../../src/autoria/saliencias-declaradas.js';
 import { ErroDeEntrada, avisoDeCache, lerEntradaDeMedida, opcaoDaLinha } from './entrada-de-medida.mjs';
 
 export const PADROES = Object.freeze({ limiarMm: 0.3, raio: 3, zonaDeclarada: 1, emendaGraus: 2, viradaGraus: 90 });
@@ -572,6 +584,30 @@ export function ondulacaoDaSuperficie(sup, opcoes = {}) {
     if (melhor) { melhor.phi = null; melhor.pts = null; melhor.usados = null; }
   }
 
+  /* A SALIÊNCIA DECLARADA. Na região de `PLANO.saliencias` o ajuste local deixa um resíduo da própria feição (a lombada de dupla curvatura se lê como calombo no
+     pico e como ondulação fraca no pé), proporcional à amplitude pedida, e o ajuste alcança `raio` espaçamentos para fora da caixa. O que a régua mede ali é o
+     desvio que passa desse resíduo esperado: o do sinal da feição acima de `FRACAO_DA_SALIENCIA` da amplitude, o do sinal contrário acima de
+     `FRACAO_CONTRARIA_DA_SALIENCIA`, e o do entorno (fora da caixa, dentro do alcance do ajuste) acima de `FRACAO_DO_ENTORNO_DA_SALIENCIA`. A ondulação que se soma
+     à feição passa do esperado e é acusada, com a amplitude que sobra; além do entorno nada muda. */
+  const declaradas = (o.saliencias ?? []).map((d) => ({ ...d, vertices: 0, desvioMaximoMm: 0, toleradoMm: arred(d.amplitudeMm * FRACAO_DA_SALIENCIA) }));
+  if (declaradas.length) {
+    for (let v = 0; v < nV; v++) {
+      const d = desvio[v]; if (d === 0) continue;
+      const p = V[v]; let esperado = 0; let dona = null; let dentro = false;
+      for (const sd of declaradas) {
+        const fora = Math.hypot(...[0, 1, 2].map((k) => Math.max(sd.regiao.min[k] - p[k] * MM, 0, p[k] * MM - sd.regiao.max[k])));
+        if (fora > o.raio * h[v] * MM) continue;
+        const mesmo = (d > 0) === (sd.sentido === 'fora');
+        const tol = sd.amplitudeMm * (fora > 0 ? FRACAO_DO_ENTORNO_DA_SALIENCIA : mesmo ? FRACAO_DA_SALIENCIA : FRACAO_CONTRARIA_DA_SALIENCIA) / MM;
+        if (tol > esperado) { esperado = tol; dona = sd; dentro = fora === 0 && mesmo; }
+      }
+      if (!dona) continue;
+      dona.vertices++;
+      if (dentro && Math.abs(d) * MM > dona.desvioMaximoMm) dona.desvioMaximoMm = arred(Math.abs(d) * MM);
+      desvio[v] = Math.sign(d) * Math.max(0, Math.abs(d) - esperado);
+    }
+  }
+
   /* regiões: sementes acima do limiar, crescendo pelos vizinhos de mesmo sinal acima da metade dele */
   const regiaoDe = new Int32Array(nV).fill(-1); const regioes = [];
   const maior = (a, b) => { const da = Math.abs(desvio[a]), db = Math.abs(desvio[b]); if (Math.abs(da - db) > 1e-12) return da > db ? a : b; return V[a][0] !== V[b][0] ? (V[a][0] > V[b][0] ? a : b) : Math.min(a, b); };
@@ -767,7 +803,7 @@ export function ondulacaoDaSuperficie(sup, opcoes = {}) {
   const fora = []; for (let v = 0; v < nV; v++) if (metadeDeclarada(v) && distFeicao(v) > o.zonaDeclarada * h[v]) fora.push(Math.abs(desvio[v]) * MM);
   fora.sort((x, y) => x - y);
   const q = (p) => (fora.length ? arred(fora[Math.min(fora.length - 1, Math.floor(p * fora.length))]) : 0);
-  const resumo = { falhas, junto, desvioMm: { p50: q(0.5), p95: q(0.95), maximo: fora.length ? arred(fora[fora.length - 1]) : 0, vertices: fora.length } };
+  const resumo = { falhas, junto, ...(declaradas.length ? { saliencias: declaradas.map(({ regiao, sentido, amplitudeMm, toleradoMm, vertices, desvioMaximoMm }) => ({ regiao, sentido, amplitudeMm, toleradoMm, vertices, desvioMaximoMm })) } : {}), desvioMm: { p50: q(0.5), p95: q(0.95), maximo: fora.length ? arred(fora[fora.length - 1]) : 0, vertices: fora.length } };
   return opcoes.devolverDesvios || operador ? { ...resumo, desvios: desvio, ...(operador ? { operador, espacamentos: h, amostra, foraDaZona: (v) => metadeDeclarada(v) && distFeicao(v) > o.zonaDeclarada * h[v] } : {}) } : resumo;
 }
 
@@ -776,10 +812,11 @@ export function ondulacaoDaSuperficie(sup, opcoes = {}) {
 export function ondulacaoDaReceita(receita, opcoes = {}) {
   const { passo = null, executada = null, ...limiares } = opcoes;
   const o = { ...PADROES, ...limiares };
+  const saliencias = salienciasDaReceita(receita);
   const lidas = superficiesDaReceita(receita, { passo, executada });
   const puladas = lidas.puladas ?? [];
   const superficies = lidas.map((sup) => {
-    const r = ondulacaoDaSuperficie(sup, o);
+    const r = ondulacaoDaSuperficie(sup, { ...o, saliencias });
     const hs = []; const G = sup.gaiola;
     for (const f of G.faces) { let s = 0; for (let k = 0; k < f.length; k++) s += dist(G.vertices[f[k]], G.vertices[f[(k + 1) % f.length]]); hs.push(s / f.length); }
     hs.sort((x, y) => x - y);
@@ -800,6 +837,7 @@ export function ondulacaoDaReceita(receita, opcoes = {}) {
     ...superficies.map((x) => `superfície do passo ${x.passo}, lida no passo ${x.medidoNoPasso}${x.escolhaDoPasso === 'padrão' ? ` (o último passo que ainda tem a gaiola${x.tiradoPeloPasso ? `; o passo ${x.tiradoPeloPasso.passo}, ${x.tiradoPeloPasso.op}, tira vértices dela` : ''}; escolha outro com --passo=<n>)` : x.escolhaDoPasso === 'explícita' ? ' (escolha explícita)' : ' (a malha entregue)'}`
       + `${x.arestasDeQuinaDeclarada ? `; ${x.arestasDeQuinaDeclarada} aresta(s) de quina por colunas de apoio (vinco de nitidez 0) tratadas como feição` : ''}`),
     ...(puladas.length ? [`fora da leitura: ${puladas.map((x) => `passo ${x.passo} (${x.motivo})`).join('; ')}`] : []),
+    ...superficies.flatMap((x) => (x.saliencias ?? []).map((d) => `saliência declarada de ${d.amplitudeMm} mm ${d.sentido === 'fora' ? 'para fora' : 'para dentro'} (tolera ${d.toleradoMm} mm de desvio da própria feição): ${d.vertices} vértice(s) na região, desvio medido de até ${d.desvioMaximoMm} mm`)),
     `${foraDasFeicoes} falha(s) fora das feições e ${juntoDasFeicoes} junto delas`,
   ];
   return { opcoes: o, superficies, ...(puladas.length ? { puladas } : {}), falhas: foraDasFeicoes, foraDasFeicoes, juntoDasFeicoes, leitura };

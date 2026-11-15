@@ -1,0 +1,131 @@
+{
+  "medidas": {
+    "comprimento": 4750,
+    "largura": 1900,
+    "altura": 1380,
+    "pneuDiametro": 680,
+    "pneuLargura": 270,
+    "bitola": 1620,
+    "baseTraseira": 210,
+    "baseVidro": 1074
+  },
+  "relatorio": {
+    "porVista": {
+      "traseira": {
+        "caixa": {
+          "xMin": -952,
+          "xMax": 952,
+          "yMin": 210,
+          "yMax": 1380.700007499625
+        },
+        "contornoFechado": true,
+        "trechosSoltos": 0,
+        "autoIntersecoes": 0,
+        "pontosForaDoContorno": 0,
+        "camadasQueEscaparam": []
+      }
+    },
+    "porCamada": {
+      "silhuetaTraseira": {
+        "vista": "traseira",
+        "comprimento": 5495.91,
+        "retidao": 0.342,
+        "concentracao": 0.362,
+        "inversoes": 4,
+        "raioMin": 5
+      },
+      "vidroTraseiro": {
+        "vista": "traseira",
+        "comprimento": 2436.89,
+        "retidao": 0.784,
+        "concentracao": 0.136,
+        "inversoes": 0,
+        "raioMin": 20
+      },
+      "bordaDaTampa": {
+        "vista": "traseira",
+        "comprimento": 1580.17,
+        "retidao": 0.945,
+        "concentracao": 0.08,
+        "inversoes": 0,
+        "raioMin": 4000
+      },
+      "vidroLateralEsq": {
+        "vista": "traseira",
+        "comprimento": 496.92,
+        "retidao": 0.879,
+        "concentracao": 0.08,
+        "inversoes": 0,
+        "raioMin": 115
+      },
+      "vidroLateralDir": {
+        "vista": "traseira",
+        "comprimento": 496.92,
+        "retidao": 0.879,
+        "concentracao": 0.08,
+        "inversoes": 0,
+        "raioMin": 115
+      },
+      "pneuEsq": {
+        "vista": "traseira",
+        "comprimento": 601.07,
+        "retidao": 0.508,
+        "concentracao": 0.387,
+        "inversoes": 0,
+        "raioMin": 80
+      },
+      "pneuDir": {
+        "vista": "traseira",
+        "comprimento": 601.07,
+        "retidao": 0.508,
+        "concentracao": 0.387,
+        "inversoes": 0,
+        "raioMin": 80
+      }
+    },
+    "porLandmark": {
+      "largura": {
+        "sobre": "silhuetaTraseira",
+        "desvio": 1.5
+      },
+      "teto": {
+        "sobre": "silhuetaTraseira",
+        "desvio": 0.7
+      }
+    },
+    "coerencia": {
+      "porEixo": {},
+      "envelope": {
+        "largura": {
+          "medido": 1904,
+          "declarado": 1900,
+          "desvio": 4
+        },
+        "altura": {
+          "medido": 1380.7,
+          "declarado": 1380,
+          "desvio": 0.7
+        }
+      },
+      "simetria": {
+        "traseira": 0
+      }
+    },
+    "alertas": [],
+    "autoria": {
+      "estado": "pronta",
+      "confianca": "media",
+      "bloqueada": false,
+      "procedencias": [
+        "tabela",
+        "carater"
+      ],
+      "incertezas": [
+        "bitola",
+        "estufa"
+      ]
+    }
+  },
+  "colisoes": [],
+  "avisos": []
+}

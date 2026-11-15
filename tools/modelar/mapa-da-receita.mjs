@@ -389,7 +389,8 @@ const casador = (padroes) => {
 function entradasDoPlano(arquivos, planoCarregado) {
   for (const arquivo of arquivos) {
     const { itens } = arquivo;
-    const kPlano = itens.findIndex((it, k) => ehId(it, 'PLANO') && ehP(itens[proximo(itens, k + 1)], ':')
+    /* `PLANO: { ... }` dentro da receita, ou `const PLANO = { ... }` citado pela forma curta (`PLANO,`), como nas partes do robô */
+    const kPlano = itens.findIndex((it, k) => ehId(it, 'PLANO') && (ehP(itens[proximo(itens, k + 1)], ':') || ehP(itens[proximo(itens, k + 1)], '='))
       && ehP(itens[proximo(itens, proximo(itens, k + 1) + 1)], '{'));
     if (kPlano < 0) continue;
     const aPlano = proximo(itens, proximo(itens, kPlano + 1) + 1);

@@ -1045,7 +1045,8 @@ def fracao_de_avesso(arquivo, avesso):
 
 
 def python_do_sistema():
-    return do_ambiente('PYTHON', 'python3')
+    # no Windows o `python3` é o atalho da loja, que sai com 9009 sem rodar nada; lá o nome do Python instalado é `python`
+    return do_ambiente('PYTHON', 'python' if os.name == 'nt' else 'python3')
 
 
 def imagens(*args):

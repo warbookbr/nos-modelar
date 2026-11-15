@@ -108,6 +108,11 @@ prancha seguem a imagem, se as cotas estão nas partes que o modelador precisa
 e se alguma medida contradiz o alinhamento. Nunca mande as escolhas do agente
 nem o que mudou.
 
+Antes de levar a prancha à pessoa, rode também a leitura combinada da prancha
+contra a imagem (grade e partes, três críticos cada, e `--consolidar`), descrita
+em [`CONFERIR-CONTRA-REFERENCIA.md`](../../../docs/modelar/usar/CONFERIR-CONTRA-REFERENCIA.md),
+e leve o `consolidado.md` junto.
+
 **Registre** o veredito sem editar:
 
 ```bash

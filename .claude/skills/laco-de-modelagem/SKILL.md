@@ -103,6 +103,17 @@ com as folhas de divisa. `npm run objeto -- <objeto>` lista o caminho de cada
 uma, e `docs/modelar/usar/FLUXO-DO-OBJETO.md` diz por que as três vão ao
 crítico sem contar como a peça foi feita.
 
+**A referência, além da prancha.** As medidas do 3D (`silhueta:desvio`,
+`conferir:vistas`, `PONTOS`) comparam com a prancha, e um modelo fiel a uma
+prancha errada passa em todas. Por isso a rodada de peça com imagem de
+referência passa também pela leitura combinada do modelo contra a imagem
+(`npm run leitura:regioes -- --modelo=<peça> ...`, grade e partes, três
+críticos cada e `--consolidar`, como em
+[`CONFERIR-CONTRA-REFERENCIA.md`](../../../docs/modelar/usar/CONFERIR-CONTRA-REFERENCIA.md)).
+Quando o modelo bate com a prancha e pelo menos dois críticos acusam a mesma
+parte contra a referência, o defeito é da prancha: corrija-a primeiro e só
+depois a receita.
+
 **revisar** — a ferramenta mediu a receita atual e ela passou. Rode `npm run vistas:critica -- <peça>`, que mede a receita antes de capturar e recusa a que reprova (`--sem-medir` só para quem quer as imagens sem o crítico), e grava as
 imagens e, na pasta da rodada (`tools/bancadas/out/critica-<peça>/`, ou a de `--saida=<pasta>`), o `pedido.md` pronto, tirado
 da receita: o texto do despacho do `critico-visual`. Não escreva o pedido à mão, nem copie caminho, promessa de parte ou critério
