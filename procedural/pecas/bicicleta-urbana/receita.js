@@ -111,7 +111,8 @@ export const TABELA = {
      acima do centro na mesa], em mm. O tubo fica plano e baixo até x = 45 (ponto mais baixo, junto da mesa), sobe em rampa de uns 30 graus
      entre x = 60 e x = 130 (13 mm de subida até x = 90 e 33 mm até x = 132) e dali segue subindo suave, uns 6 graus, até a ponta (57 mm em x = 341),
      que a manopla acompanha; de x = 341 à ponta a foto acaba na manopla e vale a mesma inclinação suave */
-  guidao_perfil: [[0, 0], [45, 0], [60, 1.5], [75, 5.9], [90, 13], [111, 24.5], [132, 33.4], [153, 38.6], [173, 40.7], [194, 42.8], [236, 47.5], [278, 53.8], [299, 55.3], [320, 55.3], [341, 56.9], [361, 58.5]],
+  guidao_perfil: [[0, 0], [45, 0], [60, 1.5], [75, 5.9], [90, 13], [111, 24.5], [132, 33.4], [153, 38.6], [173, 40.7], [194, 42.8], [361, 58.5]],
+  /* de x = 194 à ponta, onde fica a manopla, o perfil é uma reta só (a média dos pontos medidos, uns 5 graus): a manopla é reta e não pode dobrar */
   /* o recuo para trás cresce em reta de guidao_recuo_inicio (o fim do trecho plano) até a ponta */
   guidao_recuo_inicio: 45,
   guidao_recuo: 75,
@@ -159,6 +160,16 @@ export const TABELA = {
   pedivela_angulo: -8,
   pedivela_braco_x: 80,
   pedivela_braco_diametro: 18,
+  /* braço achatado e afunilado, medido no recorte ampliado da foto lateral (ref-pedal-lado.png, 2,93 px/mm pela régua do pneu): ponta redonda
+     de uns 40 mm no eixo, afinando a uns 22 mm na ponta do pedal; de frente (ref-pedal-frente.png) é chato, uns 10 mm em x, e dobra para fora
+     perto do pedal em S suave */
+  pedivela_hub_raio: 20,
+  pedivela_ponta_raio: 11,
+  pedivela_espessura: 10,
+  pedivela_degrau: 6,
+  pedivela_meio: 0.55,
+  pedivela_tampa_raio: 9,
+  pedivela_tampa_altura: 2.5,
   pedivela_eixo_raio: 7,
   protetor_raio: 91,
   protetor_x: 62,
@@ -171,9 +182,16 @@ export const TABELA = {
   aranha_braco_raio: 9,
   aranha_cubo_raio: 26,
   aranha_poste_raio: 3.5,
+  /* pedal medido na foto lateral: uns 90 mm de comprimento (z) por uns 20 de altura, com corpo cilíndrico no meio sobre o eixo,
+     duas barras laterais com janela retangular e fileira de pinos na borda de cima */
   pedal_largura: 78,
-  pedal_altura: 16,
-  pedal_profundidade: 68,
+  pedal_altura: 20,
+  pedal_profundidade: 90,
+  pedal_barra: 24,
+  pedal_janela_margem: 7,
+  pedal_pino: 3.5,
+  pedal_corpo_raio: 14,
+  pedal_tampa: 3,
   pedal_afastamento: 96,
 };
 
@@ -583,17 +601,37 @@ export function derivar(T) {
   const pa1 = T.protetor_x + T.protetor_espessura / 2;
   /* protetor: anel escuro por fora da coroa, preso por pinos às pontas dos braços da aranha, que ficam à vista dentro dele */
   torno('pedivela', 'preto', noLado([[rIntAnel, pa0], [T.protetor_raio, pa0], [T.protetor_raio, pa1 + 3], [T.protetor_raio - 4, pa1 + 3], [T.protetor_raio - 4, pa1], [rIntAnel, pa1], [rIntAnel, pa0]]), bb, { lados: 96, liso: 30 });
-  torno('pedivela', 'aco', noLado([[0, -T.pedivela_braco_x - 8], [T.pedivela_eixo_raio, -T.pedivela_braco_x - 8], [T.pedivela_eixo_raio, T.protetor_x + T.protetor_espessura / 2 + 4], [0, T.protetor_x + T.protetor_espessura / 2 + 4]]), bb, { lados: 16, liso: 40 });
+  const bxT = T.pedivela_braco_x + T.pedivela_espessura;
+  torno('pedivela', 'aco', noLado([[0, -bxT - 1], [T.pedivela_eixo_raio, -bxT - 1], [T.pedivela_eixo_raio, bxT + 1], [0, bxT + 1]]), bb, { lados: 16, liso: 40 });
+  /* tampa do eixo no centro de cada braço, por fora */
+  for (const lado of [1, -1]) {
+    const xa = lado * bxT;
+    const xb = lado * (bxT + T.pedivela_tampa_altura);
+    torno('pedivela', 'aco', [[0, Math.min(xa, xb)], [T.pedivela_tampa_raio, Math.min(xa, xb)], [T.pedivela_tampa_raio, Math.max(xa, xb)], [0, Math.max(xa, xb)]], bb, { lados: 20, liso: 40 });
+  }
   const pa = rad(T.pedivela_angulo);
   const pedalPts = {};
+  /* contorno do braço visto de lado: fecho convexo de dois círculos (borda reta em cima e embaixo, pontas redondas) */
+  const contornoBraco = (d0, r0, d1, r1, fase) => {
+    const pts = [];
+    for (const [d, r] of [[d0, r0], [d1, r1]]) for (let k = 0; k < 24; k++) { const f = (2 * Math.PI * k) / 24; pts.push([Math.cos(fase) * d + Math.cos(f) * r, yBB + Math.sin(fase) * d + Math.sin(f) * r]); }
+    return fechoConvexo(pts);
+  };
   for (const lado of [1, -1]) {
     const fase = lado === S ? pa : pa + Math.PI;
-    const ponta = [lado * T.pedivela_braco_x, yBB + Math.sin(fase) * T.pedivela_comprimento, Math.cos(fase) * T.pedivela_comprimento];
-    tubo('pedivela', 'aluminioEscuro', [[lado * T.pedivela_braco_x, yBB + Math.sin(fase) * 12, Math.cos(fase) * 12], ponta], [raioQ(T.pedivela_braco_diametro) * 1.25, raioQ(T.pedivela_braco_diametro) * 0.85], 16);
+    const L = T.pedivela_comprimento;
+    const ponta = [lado * T.pedivela_braco_x, yBB + Math.sin(fase) * L, Math.cos(fase) * L];
+    const rMeio = T.pedivela_hub_raio + (T.pedivela_ponta_raio - T.pedivela_hub_raio) * T.pedivela_meio;
+    const e = T.pedivela_espessura;
+    const bx = T.pedivela_braco_x;
+    const xa = lado > 0 ? bx : -(bx + e);
+    const xd = lado > 0 ? bx + T.pedivela_degrau : -(bx + T.pedivela_degrau + e);
+    placa('pedivela', 'aluminioEscuro', contornoBraco(0, T.pedivela_hub_raio, L * (T.pedivela_meio + 0.1), rMeio * 0.95, fase), xa, e);
+    placa('pedivela', 'aluminioEscuro', contornoBraco(L * T.pedivela_meio, rMeio, L, T.pedivela_ponta_raio, fase), xd, e);
     pedalPts[lado] = ponta;
     const x0 = lado * (T.pedal_afastamento);
     const x1 = lado * (T.pedal_afastamento + T.pedal_largura);
-    itens.push({ k: 'pedal', parte: 'pedais', material: 'preto', x0: Math.min(x0, x1), x1: Math.max(x0, x1), y: ponta[1], z: ponta[2], lado, eixoRaio: 5, eixoDe: lado * (T.pedivela_braco_x), eixoAte: lado * (T.pedal_afastamento + 10), alt: T.pedal_altura, prof: T.pedal_profundidade });
+    itens.push({ k: 'pedal', parte: 'pedais', material: 'preto', x0: Math.min(x0, x1), x1: Math.max(x0, x1), y: ponta[1], z: ponta[2], lado, eixoRaio: 5, eixoDe: lado * (bx + T.pedivela_degrau + e - 2), eixoAte: lado * (T.pedal_afastamento + T.pedal_largura - 6), alt: T.pedal_altura, prof: T.pedal_profundidade });
   }
 
   /* CATRACA */
@@ -733,20 +771,29 @@ export function gerarPassos(T) {
         passos.push(['liso', { angulo: 30, sel: { origem: { op: 'extrusao', id: oid } } }]);
       }
     } else if (it.k === 'pedal') {
-      /* pedal de plataforma: placa maciça com borda levantada e seis pinos, igual nos dois lados */
-      const larg = it.x1 - it.x0;
-      const bar = 14;
-      const barra = (cx, cz, lx, lz, alt = it.alt, dy = 0) => {
+      /* pedal de plataforma: duas barras laterais com janela retangular (extrusão com furo), corpo cilíndrico no meio sobre o eixo e uma fileira de pinos na borda de cima */
+      const bw = T.pedal_barra;
+      const xm = (it.x0 + it.x1) / 2;
+      for (const cx of [it.x0 + bw / 2, it.x1 - bw / 2]) {
         const oid = proximo();
-        passos.push(['cubo', { origemId: oid, larg: m(lx), alt: m(alt), prof: m(lz), em: [m(cx), m(it.y - it.alt / 2 + dy), m(cz)] }]);
-        marca('pedais', it.material, { origem: { op: 'cubo', id: oid } });
-      };
-      barra((it.x0 + it.x1) / 2, it.z, larg, it.prof, it.alt * 0.55);
-      barra(it.x0 + bar / 2, it.z, bar, it.prof);
-      barra(it.x1 - bar / 2, it.z, bar, it.prof);
-      barra((it.x0 + it.x1) / 2, it.z - it.prof / 2 + bar / 2, larg - 2 * bar, bar);
-      barra((it.x0 + it.x1) / 2, it.z + it.prof / 2 - bar / 2, larg - 2 * bar, bar);
-      for (const px of [it.x0 + bar / 2, it.x1 - bar / 2]) for (const pz of [-0.32, 0, 0.32]) barra(px, it.z + pz * it.prof, 4, 4, 4, it.alt - 0.5);
+        passos.push(['extrusao', { origemId: oid, eixo: 'y', altura: m(it.alt), perfil: { retangulo: { largura: m(bw), profundidade: m(it.prof), cantos: m(3) } }, furos: [{ retangulo: { largura: m(bw - 2 * T.pedal_janela_margem), profundidade: m(it.prof * 0.55), cantos: m(1.5) } }], segmentosArco: 3, em: [m(cx), m(it.y - it.alt / 2), m(it.z)] }]);
+        marca('pedais', it.material, { origem: { op: 'extrusao', id: oid } });
+        const sx = cx + (cx < xm ? -1 : 1) * (bw / 2 - 3);
+        for (let k = 0; k < 5; k++) {
+          const pid = proximo();
+          passos.push(['cubo', { origemId: pid, larg: m(T.pedal_pino), alt: m(T.pedal_pino), prof: m(T.pedal_pino), em: [m(sx), m(it.y + it.alt / 2 + T.pedal_pino / 2 - 0.5), m(it.z + (k - 2) * it.prof * 0.21)] }]);
+          marca('pedais', it.material, { origem: { op: 'cubo', id: pid } });
+        }
+      }
+      const cid = proximo();
+      const rc2 = T.pedal_corpo_raio;
+      passos.push(['lathe', { origemId: cid, eixo: 'x', lados: 20, perfil: [[0, m(it.x0 + bw - 1)], [m(rc2), m(it.x0 + bw - 1)], [m(rc2), m(it.x1 - bw + 1)], [0, m(it.x1 - bw + 1)]], em: [0, m(it.y), m(it.z)] }]);
+      marca('pedais', it.material, { origem: { op: 'lathe', id: cid } });
+      /* tampa redonda na face de fora, como na foto frontal */
+      const xo = it.lado > 0 ? it.x1 : it.x0;
+      const tid = proximo();
+      passos.push(['lathe', { origemId: tid, eixo: 'x', lados: 20, perfil: [[0, m(Math.min(xo, xo + it.lado * T.pedal_tampa))], [m(rc2 - 1.5), m(Math.min(xo, xo + it.lado * T.pedal_tampa))], [m(rc2 - 1.5), m(Math.max(xo, xo + it.lado * T.pedal_tampa))], [0, m(Math.max(xo, xo + it.lado * T.pedal_tampa))]], em: [0, m(it.y), m(it.z)] }]);
+      marca('pedais', it.material, { origem: { op: 'lathe', id: tid } });
       const eid = proximo();
       passos.push(['lathe', { origemId: eid, eixo: 'x', lados: 12, perfil: [[0, m(Math.min(it.eixoDe, it.eixoAte))], [m(it.eixoRaio), m(Math.min(it.eixoDe, it.eixoAte))], [m(it.eixoRaio), m(Math.max(it.eixoDe, it.eixoAte))], [0, m(Math.max(it.eixoDe, it.eixoAte))]], em: [0, m(it.y), m(it.z)] }]);
       marca('pedais', 'aco', { origem: { op: 'lathe', id: eid } });
@@ -825,8 +872,8 @@ const receita = {
       { nome: 'manoplas', forma: 'duas manoplas cilíndricas nas pontas do guidão', tecnica: 'loft circular sobre o mesmo caminho das pontas' },
       { nome: 'canote', forma: 'tubo fino dentro do tubo do selim, coaxial, saindo acima dele', tecnica: 'loft circular coaxial ao tubo do selim' },
       { nome: 'selim', forma: 'assento acolchoado arredondado, bico estreito e traseira larga, dois trilhos e braçadeira', tecnica: 'loft de seções elípticas; trilhos em loft; lathe da braçadeira' },
-      { nome: 'pedivela', forma: 'coroa de 40 dentes (um cubo por dente) sobre aro, aranha de cinco braços à vista dentro de um anel protetor escuro, eixo e dois braços opostos no movimento central', tecnica: 'dentes por cubo e arranja radial; aro, cubo e anel do protetor em lathe; braços em loft' },
-      { nome: 'pedais', forma: 'dois pedais de plataforma iguais, corpo cheio com borda levantada e pinos, cada um num eixo na ponta do braço', tecnica: 'cubos (placa e borda) por pedal e lathe do eixo' },
+      { nome: 'pedivela', forma: 'coroa de 40 dentes (um cubo por dente) sobre aro, aranha de cinco braços à vista dentro de um anel protetor escuro, eixo com tampa e dois braços opostos, achatados e afunilados, no movimento central', tecnica: 'dentes por cubo e arranja radial; aro, cubo e anel do protetor em lathe; braços em extrusão do contorno de lado, em dois degraus' },
+      { nome: 'pedais', forma: 'dois pedais de plataforma iguais, duas barras laterais com janela retangular, corpo cilíndrico no meio e fileira de pinos, cada um num eixo na ponta do braço', tecnica: 'extrusão com furo das barras, cubos dos pinos, lathe do corpo e do eixo' },
       { nome: 'catraca', forma: 'pinhão de 16 dentes no cubo traseiro, no plano da coroa', tecnica: 'lathe com 16 lados' },
       { nome: 'corrente', forma: 'corrente de elos simples ligando a coroa à catraca por dois trechos retos e dois enrolamentos', tecnica: 'cubo de elo repetido por arranja linear e radial' },
     ],
