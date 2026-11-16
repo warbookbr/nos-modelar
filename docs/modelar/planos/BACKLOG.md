@@ -153,6 +153,7 @@ travando alguém, não quando é plausível**.
 | `alinhar` (centragem derivada) | 3 de 95 `transladar` têm cara de centragem, e os três já usam parâmetro nomeado (`centroBuchaY`), não conta na mão | recusado |
 | `loft` fechado | 0 de 22 — **medida inválida**, ver abaixo | **implementado** |
 | variantes nomeadas de revisão | nenhuma ramificação ocorreu; a cadeia de autoria é linear e a escrita concorrente é recusada, não ramificada | recusado |
+| Booleana que aceita forma errada sem recusa | a revisão adversarial da fatia 6 do cordão (2026-11-16) achou, já na base anterior: o `subtrair` que deixa parede abaixo de ~15 µm devolve uma pirâmide com 1/3 do volume, 12 de 1500 contatos quase coincidentes no `intersectar` saem aceitos com erro de volume acima de 1%, e o contato por aresta parcial (ou aresta deitada numa face) passa como dois sólidos separados. Nenhum teste confere volume do que a booleana aceita; falta um gate de volume contra a Manifold direta na booleana |
 
 A comparação que decide: `em`/`eixo` entrou com **128 de 853 passos** (15%) em
 transporte puro, e o ponto nomeado com **18 de 61 parâmetros** do freio
