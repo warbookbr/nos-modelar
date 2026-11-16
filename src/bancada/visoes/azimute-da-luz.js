@@ -181,6 +181,38 @@ export function escolherLuz(normais, vista, {
   return melhor ?? { azimute: preferido, elevacao: elevacoes[0], nota: 0, legivel: 0, estourada: 0, sombra: 0 };
 }
 
+/**
+ * A segunda luz de uma vista: com a luz escolhida (`luz`, `{ azimute, elevacao }`, a de `escolherLuz`), a de mesma elevação a
+ * `separacao` graus de azimute dela, para um lado ou para o outro, a de maior nota pela mesma conta de `escolherLuz` (no empate, a de
+ * azimute maior). É o par de direções do Blender (`escolherAzimutes`, a 90 graus) com a elevação da bancada: o relevo comprido que
+ * corre ao longo de uma luz some nela e aparece na outra. Pedido pelo pacote do crítico, que captura as duas imagens de cada vista
+ * sem o Blender (plano do reflexo, fatia 6): com o azimute do Blender e a elevação de 50 graus que a bancada escolhe na chapa de
+ * prova vista de três quartos, a luz de 30 graus chegava quase de frente à chapa e o amassado sumia (a imagem saía igual à da chapa
+ * lisa, pixel a pixel). Devolve `{ azimute, elevacao, nota, legivel, estourada, sombra }`.
+ */
+export function segundaLuz(normais, vista, luz, { pesos = null, separacao = 90, rasanteGraus = RASANTE_GRAUS, alvo = BRILHO_RASANTE } = {}) {
+  const N = voltadasParaACamera(normais, vista.zCam);
+  const n = Math.floor(N.length / 3);
+  let total = 0;
+  for (let i = 0; i < n; i++) total += pesos ? pesos[i] : 1;
+  const saturacao = Math.sin(rasanteGraus * RAD) / alvo;
+  const fracao = (x) => (total > 0 ? arredondar4(x / total) : 0);
+  const nota = (azimute) => {
+    const d = direcaoDaLuz(vista, luz.elevacao, azimute);
+    let legivel = 0; let estourada = 0; let sombra = 0;
+    for (let i = 0; i < n; i++) {
+      const c = -(N[3 * i] * d[0] + N[3 * i + 1] * d[1] + N[3 * i + 2] * d[2]);
+      const p = pesos ? pesos[i] : 1;
+      if (c <= 0) sombra += p;
+      else if (c >= saturacao) estourada += p;
+      else legivel += p * legibilidadeDaLuz(c, rasanteGraus, alvo);
+    }
+    return { azimute, elevacao: luz.elevacao, nota: fracao(legivel - estourada), legivel: fracao(legivel), estourada: fracao(estourada), sombra: fracao(sombra) };
+  };
+  const [a, b] = [modulo360(luz.azimute + separacao), modulo360(luz.azimute - separacao)].map(nota);
+  return a.nota > b.nota || (a.nota === b.nota && a.azimute > b.azimute) ? a : b;
+}
+
 /** O brilho linear, depois da exposição, que a superfície mais clara da peça vista (o percentil `PERCENTIL_DA_EXPOSICAO` das amostras) não passa. */
 export const BRILHO_MAXIMO_DA_LUZ = 0.7;
 export const PERCENTIL_DA_EXPOSICAO = 0.99;

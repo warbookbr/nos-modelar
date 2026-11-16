@@ -15,6 +15,10 @@
  *
  * Uso: MODELAR_BLENDER=<blender> node docs/modelar/banco-de-provas/reflexo-na-bancada-2026-11-15/medir-paridade.mjs <peça>
  *        --vista-blender=frente --vista-bancada=frontal --rotulo=chapa [--lisa=<peça lisa>] [--amassado=u,v] [--figura=<png>]
+ * A vista de três quartos (fatia 6) se mede com `--vista-blender=tresquartos --vista-bancada=tresquartos`, que a bancada faz na mesma
+ * direção do Blender; o Blender roda só a vista medida, e `bancada.elevacao` diz a altura da luz que a bancada escolheu. Com
+ * `--luz-da-bancada`, a bancada usa as duas direções que ela escolhe (as do pacote do crítico sem o Blender) no lugar dos azimutes do
+ * Blender, e a comparação fica na fração iluminada e na posição do amassado.
  * `--saida` (padrão `tmp/paridade-reflexo`, dentro do repositório, porque a bancada só grava nele). */
 import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join, relative, resolve } from 'node:path';
@@ -150,6 +154,10 @@ function compararCurvaturas(a, caixaA, escalaA, b, caixaB, escalaB) {
 }
 
 let capturas = 0;
+/* a altura da luz rasante que a bancada escolheu, em graus sobre o plano da imagem, lida do relato da captura */
+let ultimaElevacao = null;
+let ultimoAzimute = null;
+let ultimaSegunda = null;
 async function capturar(peca, saida, args) {
   const pasta = join(saida, `c-${String(++capturas).padStart(2, "0")}`);
   mkdirSync(pasta, { recursive: true });
@@ -157,6 +165,12 @@ async function capturar(peca, saida, args) {
   if (r.codigo !== 0) throw new Error(`a bancada falhou em ${peca} ${args.join(' ')}:\n${r.stdout}\n${r.stderr}`);
   const arquivos = readdirSync(pasta).filter((a) => a.endsWith('.png'));
   if (arquivos.length !== 1) throw new Error(`a bancada deu ${arquivos.length} imagens em ${pasta}`);
+  const alta = /e (\d+(?:\.\d+)?) graus do plano da imagem/.exec(r.stdout);
+  ultimaElevacao = alta ? Number(alta[1]) : null;
+  const luz = /luz a (\d+(?:\.\d+)?) graus/.exec(r.stdout);
+  ultimoAzimute = luz ? Number(luz[1]) : null;
+  const outra = /a outra direção boa desta vista: (\d+(?:\.\d+)?) graus/.exec(r.stdout);
+  ultimaSegunda = outra ? Number(outra[1]) : null;
   return join(pasta, arquivos[0]);
 }
 
@@ -167,10 +181,10 @@ async function escalaDaBancada(peca) {
   return criarCalculadoraDaCurvatura()({ vincos: fonte.vincos, lataria: fonte.lataria, neutro }).escala;
 }
 
-async function blenderDe(peca, saida) {
+async function blenderDe(peca, saida, vistas) {
   const pasta = join(saida, `blender-${peca.replace(/[^A-Za-z0-9]+/g, '-')}`);
   const lataria = await latariaDaPeca(peca);
-  const feitas = await vistasDeSuperficie(peca, { pasta, lataria });
+  const feitas = await vistasDeSuperficie(peca, { pasta, lataria, ...(vistas ? { vistas } : {}) });
   const sup = join(pasta, 'superficie');
   return { feitas, rasante: JSON.parse(readFileSync(join(sup, 'peca-rasante.json'), 'utf8')), curvatura: JSON.parse(readFileSync(join(sup, 'peca-curvatura.json'), 'utf8')), sup };
 }
@@ -200,7 +214,7 @@ function figura(paineis, arquivo, altura = 160) {
 }
 
 async function principal(argv) {
-  const lido = lerArgumentos(argv.slice(2), { opcoes: ['vista-blender', 'vista-bancada', 'rotulo', 'lisa', 'amassado', 'figura', 'saida'], bandeiras: [], posicional: { nome: 'a peça', obrigatorio: true } });
+  const lido = lerArgumentos(argv.slice(2), { opcoes: ['vista-blender', 'vista-bancada', 'rotulo', 'lisa', 'amassado', 'figura', 'saida'], bandeiras: ['luz-da-bancada'], posicional: { nome: 'a peça', obrigatorio: true } });
   const peca = lido.posicional;
   const vistaB = lido.opcao('vista-blender'); const vistaN = lido.opcao('vista-bancada'); const rotulo = lido.opcao('rotulo') ?? 'peca';
   const saida = resolve(REPO, lido.opcao('saida') ?? 'tmp/paridade-reflexo', rotulo);
@@ -209,8 +223,9 @@ async function principal(argv) {
   const lisa = lido.opcao('lisa');
   const amassado = lido.opcao('amassado')?.split(',').map(Number) ?? null;
 
-  const bl = await blenderDe(peca, saida);
-  const blLisa = lisa ? await blenderDe(lisa, saida) : null;
+  /* o Blender roda só a vista medida (a fatia 6 mediu a de três quartos assim, sem pagar as outras três) */
+  const bl = await blenderDe(peca, saida, [vistaB]);
+  const blLisa = lisa ? await blenderDe(lisa, saida, [vistaB]) : null;
   const curvB = bl.curvatura.imagens.find((i) => i.vista === vistaB);
   const imgCB = lerPng(curvB.arquivo);
   const caixaB = caixaDoBlender(imgCB);
@@ -218,22 +233,34 @@ async function principal(argv) {
   const resultado = { peca, rotulo, vistaBlender: vistaB, vistaBancada: vistaN, caixaBlenderPx: caixaB.caixa, rasante: [], curvatura: null };
   const paineis = [];
 
-  for (const r of rasantes) {
+  /* com `--luz-da-bancada`, a bancada usa as duas direções dela (a que ela escolhe pela vista e a outra boa a 90 graus, `segundaLuz`),
+     como o pacote do crítico sem o Blender, e não os azimutes do Blender: as duas ferramentas são comparadas pela fração iluminada e pela
+     posição do amassado, e não pela luminância, que com luzes diferentes não se compara */
+  const daBancada = lido.bandeira('luz-da-bancada');
+  let azimutesDaBancada = null;
+  let primeiraDaBancada = null;
+  if (daBancada) {
+    primeiraDaBancada = await capturar(peca, saida, ['--visao=luz-rasante', `--vistas=${vistaN}`]);
+    azimutesDaBancada = [ultimoAzimute, ultimaSegunda];
+    resultado.azimutesDaBancada = azimutesDaBancada;
+  }
+  for (const [k, r] of rasantes.entries()) {
     const imgB = lerPng(r.arquivos.malha);
-    const arqN = await capturar(peca, saida, ['--visao=luz-rasante', `--azimute=${r.azimute}`, `--vistas=${vistaN}`]);
+    const azN = daBancada ? azimutesDaBancada[k] : r.azimute;
+    const arqN = daBancada && k === 0 ? primeiraDaBancada : await capturar(peca, saida, ['--visao=luz-rasante', `--azimute=${azN}`, `--vistas=${vistaN}`]);
     const imgN = lerPng(arqN);
     const caixaN = caixaDaBancada(imgN);
     const linha = {
       azimute: r.azimute,
       blender: { fracao: r.iluminacao.fracao, fracaoRemedida: +fracaoIluminada(imgB, caixaB.mascara).toFixed(4) },
-      bancada: { fracao: +fracaoIluminada(imgN, caixaN.mascara).toFixed(4), arquivo: relative(REPO, arqN), caixaPx: caixaN.caixa },
-      luminancia: compararLuminancias(imgB, caixaB.caixa, caixaB.mascara, imgN, caixaN.caixa, caixaN.mascara),
+      bancada: { azimute: azN, fracao: +fracaoIluminada(imgN, caixaN.mascara).toFixed(4), elevacao: ultimaElevacao, arquivo: relative(REPO, arqN), caixaPx: caixaN.caixa },
+      ...(daBancada ? {} : { luminancia: compararLuminancias(imgB, caixaB.caixa, caixaB.mascara, imgN, caixaN.caixa, caixaN.mascara) }),
     };
     if (lisa) {
       const rl = blLisa.rasante.imagens.find((i) => i.vista === vistaB && i.azimute === r.azimute);
       if (rl) linha.blender.amassado = centroideDaDiferenca(imgB, lerPng(rl.arquivos.malha), caixaB.caixa, lumEm);
       else linha.blender.amassado = `a chapa lisa não tem a luz de ${r.azimute} graus na vista ${vistaB} (azimutes ${blLisa.rasante.imagens.filter((i) => i.vista === vistaB).map((i) => i.azimute).join(', ')})`;
-      const imgNL = lerPng(await capturar(lisa, saida, ['--visao=luz-rasante', `--azimute=${r.azimute}`, `--vistas=${vistaN}`]));
+      const imgNL = lerPng(await capturar(lisa, saida, ['--visao=luz-rasante', `--azimute=${azN}`, `--vistas=${vistaN}`]));
       linha.bancada.amassado = centroideDaDiferenca(imgN, imgNL, caixaN.caixa, lumEm);
     }
     resultado.rasante.push(linha);
@@ -248,14 +275,16 @@ async function principal(argv) {
   if (amassado) {
     resultado.amassadoDeclarado = amassado;
     resultado.curvatura.noAmassado = { blender: +(tNoPonto(imgCB, caixaB.caixa, ...amassado) * escalaB).toFixed(4), bancada: +(tNoPonto(imgCN, caixaCN, ...amassado) * escalaN).toFixed(4) };
-    if (lisa) {
-      const curvL = blLisa.curvatura.imagens.find((i) => i.vista === vistaB);
-      const arqCNL = await capturar(lisa, saida, ['--visao=curvatura', `--vistas=${vistaN}`]);
-      resultado.curvatura.amassado = {
-        blender: centroideDaDiferenca(imgCB, lerPng(curvL.arquivo), caixaB.caixa, tEm),
-        bancada: centroideDaDiferenca(imgCN, lerPng(arqCNL), caixaCN, tEm),
-      };
-    }
+  }
+  /* a posição do amassado pela diferença para a chapa lisa não depende da posição declarada, que só vale na vista de frente: na de três
+     quartos as duas ferramentas são comparadas entre si */
+  if (lisa) {
+    const curvL = blLisa.curvatura.imagens.find((i) => i.vista === vistaB);
+    const arqCNL = await capturar(lisa, saida, ['--visao=curvatura', `--vistas=${vistaN}`]);
+    resultado.curvatura.amassado = {
+      blender: centroideDaDiferenca(imgCB, lerPng(curvL.arquivo), caixaB.caixa, tEm),
+      bancada: centroideDaDiferenca(imgCN, lerPng(arqCNL), caixaCN, tEm),
+    };
   }
   paineis.push({ img: imgCB, caixa: caixaB.caixa }, { img: imgCN, caixa: caixaCN });
   writeFileSync(join(saida, `paridade-${rotulo}.json`), `${JSON.stringify(resultado, null, 2)}\n`);

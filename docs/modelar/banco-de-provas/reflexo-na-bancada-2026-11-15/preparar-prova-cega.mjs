@@ -1,0 +1,85 @@
+#!/usr/bin/env node
+/* preparar-prova-cega.mjs — os pedidos da prova cega da leitura do reflexo (plano do reflexo na bancada, fatia 7).
+ *
+ * Para cada chapa de calibração (`tools/fixtures/reflexo-calibracao/chapas.mjs`), girada 45 graus no próprio plano (a zebra da bancada
+ * não vê a emenda vertical; ver `estudo-de-leitura.mjs`), gera uma receita de nome neutro, com o PLANO dizendo só "chapa abaulada de
+ * prova", captura a zebra e a pintura enquadradas nas vistas frontal, isometrica e tresquartos, copia as imagens com nomes neutros e
+ * escreve um `pedido.md` com a seção Reflexo que o pedido de lataria de `vistas:critica` traz (`secaoDoReflexo`). O nome da chapa e o
+ * defeito ficam só no gabarito, fora das pastas dos pedidos.
+ *
+ * Uso: node docs/modelar/banco-de-provas/reflexo-na-bancada-2026-11-15/preparar-prova-cega.mjs
+ *   Saída em tmp/prova-cega/: pedidos/chapa-<letra>/pedido.md e as imagens, e gabarito.json. */
+import { copyFileSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { join, relative, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { comoCLI } from '../../../../tools/modelar/olhar-bancada.mjs';
+import { CHAPAS } from '../../../../tools/fixtures/reflexo-calibracao/chapas.mjs';
+import { secaoDoReflexo } from '../../../../tools/modelar/vistas-para-critica.mjs';
+
+const REPO = resolve(fileURLToPath(new URL('../../../..', import.meta.url)));
+const BASE = join(REPO, 'tmp/prova-cega');
+const VISTAS = ['frontal', 'isometrica', 'tresquartos'];
+const GIRO = 45;
+/* a ordem das letras é fixa e não segue a de CHAPAS, para a letra não dizer a chapa */
+const LETRAS = { 'ondulada-050': 'a', vinco: 'b', lisa: 'c', 'ondulada-100': 'd', 'quebra-de-curvatura': 'e', degrau: 'f', 'ondulada-025': 'g' };
+
+/* onde fica a emenda, nas imagens, para o gabarito: a linha do meio da chapa, perpendicular ao arco */
+const LUGAR_DA_EMENDA = 'a linha reta pelo centro da chapa que liga o meio dos dois lados maiores: na vista frontal, a diagonal que desce da esquerda para a direita, de perto de (0,3; 0,3) a (0,7; 0,7) do quadro (a emenda em x = 300 mm da chapa girada 45 graus)';
+const lugar = (d) => (d.tipo === 'nenhum' ? 'nenhum' : d.tipo === 'ondulacao'
+  ? `a chapa inteira: ${Math.round(600 / d.comprimentoDeOndaMm)} ondas de ${d.comprimentoDeOndaMm} mm de comprimento e ${String(d.amplitudeMm).replace('.', ',')} mm de amplitude, com as cristas paralelas à diagonal do centro`
+  : LUGAR_DA_EMENDA);
+
+/* o que o estudo mediu e o crítico pode ler diferente do declarado */
+const NOTAS = {
+  lisa: 'as duas folhas não são soldadas, e a faixa faz um dente de poucos pixels colado à linha do meio mesmo na lisa (a normal da borda de cada folha); isso não conta como defeito achado',
+  degrau: 'a zebra não muda contra a lisa (1 a 2 em 10 mil pixels de frente); o que aparece é o traço do degrau na linha do meio nas vistas oblíquas e o mesmo dente da lisa: ler "traço fino na linha do meio, sem salto da faixa" é o acerto',
+};
+rmSync(BASE, { recursive: true, force: true });
+const gabarito = { giroGraus: GIRO, vistas: VISTAS, chapas: {} };
+for (const [nome, letra] of Object.entries(LETRAS)) {
+  const pasta = join(BASE, 'receitas', `chapa-${letra}`);
+  mkdirSync(pasta, { recursive: true });
+  writeFileSync(join(pasta, 'receita.js'), [
+    "import { chapaDeCalibracao } from '../../../../tools/fixtures/reflexo-calibracao/chapas.mjs';",
+    `const base = chapaDeCalibracao('${nome}', { giroGraus: ${GIRO} });`,
+    'export default {',
+    '  ...base,',
+    `  meta: { nome: 'chapa-${letra}', desc: 'chapa abaulada de prova' },`,
+    "  TOPO: { ...base.TOPO, origem: 'canto da chapa, z para fora da pele' },",
+    "  PLANO: { objeto: 'chapa abaulada de prova', referencias: [], escala: { medida: 'lado maior da chapa', milimetros: 600 }, partes: base.PLANO.partes.map((p) => ({ nome: p.nome, forma: 'chapa abaulada', tecnica: 'subdivisao' })), criteriosDeReprovacao: [] },",
+    '};', '',
+  ].join('\n'));
+  const saida = join(BASE, 'capturas', `chapa-${letra}`);
+  const imagens = {};
+  for (const visao of ['zebra', 'pintura']) {
+    const r = await comoCLI([relative(REPO, pasta), `--vistas=${VISTAS.join(',')}`, '--enquadrar', '--sem-contatos', '--res=900x900', `--visao=${visao}`, `--saida=${relative(REPO, join(saida, visao))}`]);
+    if (r.codigo !== 0) throw new Error(`${letra} ${visao}: ${r.stderr}`);
+    const destino = join(BASE, 'pedidos', `chapa-${letra}`);
+    mkdirSync(destino, { recursive: true });
+    imagens[visao] = VISTAS.map((vista) => {
+      const origem = readdirSync(join(saida, visao)).find((f) => f.includes(`-${vista}-`) && f.endsWith('.png'));
+      const arquivo = join(destino, `${visao}-${vista}.png`);
+      copyFileSync(join(saida, visao, origem), arquivo);
+      return { arquivo, vista };
+    });
+  }
+  const pedido = [
+    `# Pedido ao crítico visual: chapa-${letra}`, '',
+    'Abra com `Read` cada imagem citada abaixo e olhe; não leia nenhum outro arquivo. Todos os caminhos são absolutos.', '',
+    '## Objeto', '', 'chapa abaulada de prova', '', 'Escala: lado maior da chapa, 600 mm.', '',
+    '## Modelo', '',
+    'As vistas olham destes lados: frontal, de frente para a pele de fora da chapa; isometrica, de cima, da direita e da frente; '
+    + 'tresquartos, de três quartos pela frente, um pouco de cima.', '',
+    ...secaoDoReflexo({ zebra: { imagens: imagens.zebra, fora: [] }, pintura: { imagens: imagens.pintura, fora: [] } }),
+    '## O que responder', '',
+    'Diga se a chapa tem defeito de superfície. Para cada defeito: o tipo (degrau, vinco, quebra de curvatura, ondulação, amassado ou '
+    + 'outro, dito com as suas palavras), o lugar na chapa (em fração da imagem ou pela forma da chapa: centro, canto, diagonal, borda), '
+    + 'a vista e a imagem em que o viu e o que a faixa faz ali. Se não achar defeito, diga isso.', '',
+  ];
+  writeFileSync(join(BASE, 'pedidos', `chapa-${letra}`, 'pedido.md'), `${pedido.join('\n')}\n`);
+  gabarito.chapas[`chapa-${letra}`] = { chapa: nome, defeito: CHAPAS[nome].defeito, lugar: lugar(CHAPAS[nome].defeito), ...(NOTAS[nome] ? { nota: NOTAS[nome] } : {}) };
+  process.stderr.write(`pedido chapa-${letra}\n`);
+}
+writeFileSync(join(BASE, 'gabarito.json'), `${JSON.stringify(gabarito, null, 2)}\n`);
+for (const letra of Object.values(LETRAS).sort()) process.stdout.write(`${join(BASE, 'pedidos', `chapa-${letra}`, 'pedido.md')}\n`);
+process.stdout.write(`gabarito: ${join(BASE, 'gabarito.json')}\n`);

@@ -140,9 +140,9 @@ a solda é `unir`, `friso` com `costura` e `cordao` e `unir` com `vincarCostura`
 recusa do friso por curva fechada demais volta ao modelador como limite de geometria, que se resolve pela largura do cordão.
 
 Na peça de lataria (a receita tem passo `subdivisao` ou declara `PLANO.lataria`), o pacote leva também a luz rasante e a curvatura
-da lataria, que mostram o amassado largo e raso que nenhuma medida e nenhuma vista comum mostram, e elas saem do Blender: rode
-`MODELAR_BLENDER=<caminho do Blender> npm run vistas:critica -- <peça>`. O brief do modelador de peça de lataria leva o mesmo
-caminho, porque sem ele o modelador não confere a correção de superfície pelas vistas que o crítico vai olhar. Sem o Blender o comando recusa o pacote, e o `--registrar`
+da lataria, que mostram o amassado largo e raso que nenhuma medida e nenhuma vista comum mostram, e elas saem da bancada, junto com a zebra e a pintura: rode
+`npm run vistas:critica -- <peça>` (o Blender, com `--com-blender`, é só conferência opcional). O brief do modelador de peça de lataria leva o mesmo
+comando, porque sem ele o modelador não confere a correção de superfície pelas vistas que o crítico vai olhar. O `--registrar`
 recusa o veredito do crítico de peça de lataria cujo pacote (o `pacote.json` da pasta da rodada, ou a de `--pacote <pasta>` quando
 você usou `--saida`) não trouxe as duas vistas da versão medida. Não contorne a recusa com a dispensa: `PLANO.lataria.dispensa` é da
 pessoa, para a superfície que não é chapa, e não para a falta do Blender.

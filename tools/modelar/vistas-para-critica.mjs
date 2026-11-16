@@ -40,20 +40,23 @@
  *    ou ao crítico, para o crítico não os repetir sem evidência nova;
  *  - a luz rasante e a curvatura da lataria, quando a peça é de lataria (`src/autoria/lataria.js`): o amassado largo e raso e a quina
  *    que ondula passam por todas as medidas e pela vista comum, e por decisão da pessoa em 2026-10-30 a peça de lataria não fecha a
- *    rodada de forma sem as duas no pacote. Elas saem do Blender (`vistas-de-superficie.mjs`), e sem `MODELAR_BLENDER` o pacote de
- *    peça de lataria é recusado antes de qualquer captura, com o comando. A imagem de luz rasante com menos de 25 % da peça iluminada
- *    (`LIMIAR_DA_LUZ_RASANTE`) também o recusa, dizendo a imagem e a fração: a luz que vinha de um lado que a câmera não via já chegou
- *    ao crítico como uma imagem preta com traços de borda.
+ *    rodada de forma sem as duas no pacote. Desde 2026-11-16 (plano do reflexo, fatia 6, decidido pela pessoa pela paridade medida) elas
+ *    saem da bancada (`superficieDaBancada`, de `vistas-de-superficie.mjs`), nas vistas de frente, de lado, de cima e de três quartos do
+ *    Blender, sem a vista em que a chapa aparece de quina, e `MODELAR_BLENDER` não é mais exigido; com `--com-blender` o Blender roda
+ *    também, como conferência para quem conduz, fora do pedido. A imagem de luz rasante com menos de 25 % da peça iluminada
+ *    (`LIMIAR_DA_LUZ_RASANTE`, medida no PNG pela regra do Blender) sai do pedido, dita nele com a vista, o azimute e a fração, e sem
+ *    nenhuma que passe o pacote é recusado: a luz que vinha de um lado que a câmera não via já chegou ao crítico como uma imagem preta
+ *    com traços de borda.
  *  - a zebra e a pintura da bancada, também na peça de lataria (plano do reflexo, 2026-11-16): capturadas com `--visao` e `--enquadrar`
- *    nas quatro vistas do conjunto, sem a vista em que a chapa aparece de quina, com a frase que diz como se lê a faixa refletida
- *    (`LEITURA_DA_FAIXA`). Vão ao lado da luz rasante e da curvatura do Blender, que continuam exigidas até a pessoa decidir pela paridade;
+ *    nas quatro vistas do conjunto, sem a vista em que a chapa aparece de quina, com a leitura curta da faixa refletida
+ *    (`LEITURA_DO_REFLEXO`, a versão do guia de leitura em `PARE-E-ANALISE.md` que cabe no pedido);
  *
  * A pasta traz ainda o `pacote.json`, com a impressão do texto da receita que o pacote mostra e as imagens de superfície: é por ele
  * que o registro da rodada sabe se o crítico de peça de lataria recebeu as duas vistas da versão medida.
  *
- * A luz rasante que não alcança a peça (cuba aberta em cima vista de cima) não derruba o pacote: a vista é refeita com a luz mais alta (20,
- * 30 e 45 graus sobre o plano da imagem) e fica a primeira que passa do limiar, com o ângulo dito no pedido; a que nenhuma salva sai do
- * pedido com uma frase, e só sem nenhuma imagem de luz rasante o pacote é recusado. A vista montada em que as outras peças tapam a peça em
+ * A luz rasante que não alcança a peça (cuba aberta em cima vista de cima) não derruba o pacote: a da bancada já sobe sozinha do plano da
+ * imagem quando a vista pede, e a imagem que fica abaixo do limiar sai do pedido com uma frase (na conferência do Blender, a vista é
+ * refeita com a luz mais alta, 20, 30 e 45 graus); só sem nenhuma imagem de luz rasante o pacote é recusado. A vista montada em que as outras peças tapam a peça em
  * foco (menos de 5 % da silhueta dela visível, medido pela malha) também sai do pedido, dita nele.
  *
  * `--referencia=<caminho absoluto da imagem>[@<vista>]`, repetível, traz uma imagem de fora do repositório (foto de terceiro não entra nele)
@@ -65,7 +68,7 @@
  * diz isso, com o hash medido, no relatório e no `pedido.md`. `--sem-medir` monta o pacote mesmo assim, para quem só quer as imagens, e o
  * diz nos dois. A medição entra em `dependencias.medirReceita`.
  *
- * Uso: node tools/modelar/vistas-para-critica.mjs <peça> [--saida=<pasta da rodada>] [--prazo=<segundos de carga por captura>] [--sem-medir]
+ * Uso: node tools/modelar/vistas-para-critica.mjs <peça> [--saida=<pasta da rodada>] [--prazo=<segundos de carga por captura>] [--sem-medir] [--com-blender]
  *      [--referencia=<caminho absoluto da imagem>[@<vista>] [--orientacao-da-referencia=<texto>]]... [--ajuda]
  *
  * `--orientacao-da-referencia=<texto>` diz em palavras como a imagem da `--referencia` anterior está girada ou espelhada (foto em
@@ -85,15 +88,14 @@ import { vistaDoMesmoOlho } from './comparar-contornos.mjs';
 import { normalizarPlanoDeModelagem } from '../../src/autoria/plano-de-modelagem.js';
 import { lerPergunta } from '../../src/autoria/perguntas-do-critico.js';
 import { textoDoAfastamento } from '../../src/autoria/refinamento-global.js';
-import { MINIMO_DO_MOTIVO_DA_DISPENSA } from '../../src/autoria/lataria.js';
 import { lerArgumentos } from './argumentos.mjs';
 import { abrirCapturaCompartilhada, olharBancada } from './olhar-bancada.mjs';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { blocoDasPerguntas, perguntasDaPecaArquivo } from './perguntas-da-peca.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 import {
-  LADO_DA_VISTA_DE_SUPERFICIE, LIMIAR_DA_LUZ_RASANTE, MANIFESTO_DO_PACOTE, PASTA_DA_SUPERFICIE, SAIDA_PADRAO, exigirLuzNaSuperficie, gravarManifesto, imagensEscuras, impressaoDoTexto, mensagemSemBlender, pastaDaRodada,
-  superficieDaPeca, vistasDeSuperficie,
+  LADO_DA_VISTA_DE_SUPERFICIE, LIMIAR_DA_LUZ_RASANTE, MANIFESTO_DO_PACOTE, MINIMO_DE_QUINA, PASTA_DA_SUPERFICIE, SAIDA_PADRAO, comandoDasVistasDoBlender, exigirLuzNaSuperficie, gravarManifesto, imagensEscuras,
+  impressaoDoTexto, pastaDaRodada, superficieDaBancada, superficieDaPeca, vistasDeSuperficie,
 } from './vistas-de-superficie.mjs';
 
 const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
@@ -118,12 +120,14 @@ export const VISTAS_DO_ARAME = 'isometrica,traseira';
 /* O REFLEXO DA BANCADA NA PEÇA DE LATARIA (plano do reflexo, fatia 5): a zebra e a pintura (`src/bancada/visoes/`), capturadas com
    `--visao` e `--enquadrar`, nas quatro vistas do conjunto. A chapa vista de quina sai como um traço (a chapa de prova de frente para
    +z ocupa 3 % da largura na vista direita e 2 % da altura na superior, depois de enquadrada), e a imagem em que a peça ocupa menos de
-   `MINIMO_DO_REFLEXO` do quadro em um dos lados sai do pedido, dita nele. Vão ao lado das vistas do Blender, que seguem exigidas
-   enquanto a pessoa não decidir pela paridade medida. */
+   `MINIMO_DO_REFLEXO` do quadro em um dos lados sai do pedido, dita nele; a mesma regra vale para a luz rasante e a curvatura
+   (`MINIMO_DE_QUINA`), que também saem da bancada. */
 export const VISOES_DO_REFLEXO = Object.freeze(['zebra', 'pintura']);
 export const VISTAS_DO_REFLEXO = VISTAS_DO_CONJUNTO;
 export const RES_DO_REFLEXO = '900x900';
-export const MINIMO_DO_REFLEXO = 0.2;
+export const MINIMO_DO_REFLEXO = MINIMO_DE_QUINA;
+/* A pasta da conferência do Blender (`--com-blender`), dentro da pasta da rodada. */
+export const PASTA_DA_CONFERENCIA_DO_BLENDER = 'conferencia-do-blender';
 /* As vistas do conjunto montado, com o quadro na peça: as seis que o conjunto da peça sozinha tem, mais a de baixo, em quadro mais
    quadrado que o da bancada, porque o quadro fecha na caixa da peça e a folga da forma dela é que decide o que sobra. A de baixo
    entrou porque o alojamento do trem do nariz, que abre para baixo, só se confirmava nos cortes. */
@@ -182,6 +186,7 @@ function limparPastaDaRodada(pasta) {
   rmSync(join(pasta, MANIFESTO_DO_PACOTE), { force: true });
   rmSync(join(pasta, 'alvo'), { recursive: true, force: true });
   rmSync(join(pasta, PASTA_DA_SUPERFICIE), { recursive: true, force: true });
+  rmSync(join(pasta, PASTA_DA_CONFERENCIA_DO_BLENDER), { recursive: true, force: true });
   for (const nome of readdirSync(pasta)) {
     if (/^(etapas|sobreposicao|corte)-.*\.png$/.test(nome)) rmSync(join(pasta, nome));
   }
@@ -511,9 +516,10 @@ export function montarPedido({ peca, plano = null, orientacao = null, alvo = nul
   return `${L.join('\n')}`;
 }
 
-/* A seção da superfície da peça de lataria. As vistas do Blender têm nomes e lados próprios (`vistas_padrao` de `tools/blender/comum.py`),
-   ditos aqui pelos eixos, e não pelos da bancada. */
-function secaoDaSuperficie({ rasante, curvatura, faixa = null, semLuz = [] }) {
+/* A seção da superfície da peça de lataria. As vistas têm os nomes e os lados das do Blender (`vistas_padrao` de `tools/blender/comum.py`),
+   ditos aqui pelos eixos, e não pelos da bancada; desde a fatia 6 do plano do reflexo as imagens saem da bancada (`fonte: 'bancada'`),
+   com a altura da luz que ela escolhe em cada vista. */
+function secaoDaSuperficie({ rasante, curvatura, faixa = null, semLuz = [], fonte = null, fora = [] }) {
   const vistas = Object.keys(LADO_DA_VISTA_DE_SUPERFICIE).filter((v) => [...rasante, ...curvatura].some((i) => i.vista === v));
   const grau = (n) => `${String(n).replace('.', ',')} graus`;
   /* a faixa dos vincos que a forma desenha sai em ocre e fora da escala (`curvatura-da-lataria.py --vincos`): o crítico precisa saber
@@ -522,12 +528,25 @@ function secaoDaSuperficie({ rasante, curvatura, faixa = null, semLuz = [] }) {
     ? ` Em ocre, a faixa de ${String(faixa.larguraMm).replace('.', ',')} mm de cada lado dos vincos que a forma desenha (${faixa.vincos.join(', ')}): `
       + 'é a dobra pedida, fica fora da escala e não é defeito; a escala é a do resto da chapa.'
     : '';
+  const daBancada = fonte === 'bancada';
+  const altura = (elevacao) => {
+    if (!elevacao) return '';
+    return daBancada ? `, com a luz a ${grau(elevacao)} do plano da imagem`
+      : `, com a luz a ${grau(elevacao)} do plano da imagem, mais alta que nas outras, porque a luz mais baixa não alcançava a peça nesta vista`;
+  };
+  const deQuina = fora.length
+    ? [`Ficaram de fora desta seção, porque a peça aparece de quina e ocupa menos de ${String(Math.round(MINIMO_DE_QUINA * 100))} % do quadro num dos lados: ${fora.map((f) => f.vista).join(', ')}.`, '']
+    : [];
   const luz = [
-    'A luz rasante: a peça em material fosco, sem luz de ambiente, sob um sol a poucos graus do plano da imagem, de duas direções, '
-    + 'escolhidas em cada vista para a luz cair no lado da peça que a câmera vê. O painel '
+    (daBancada
+      ? 'A luz rasante: a peça em material fosco, sem luz de ambiente, sob um sol baixo sobre o plano da imagem, de duas direções a 90 graus '
+        + 'uma da outra, escolhidas em cada vista para a luz cair no lado da peça que a câmera vê; a luz sobe do plano da imagem só o que a '
+        + 'vista pede para alcançar a chapa sem estourar, e a altura vai dita em cada imagem. O painel '
+      : 'A luz rasante: a peça em material fosco, sem luz de ambiente, sob um sol a poucos graus do plano da imagem, de duas direções, '
+        + 'escolhidas em cada vista para a luz cair no lado da peça que a câmera vê. O painel ')
     + 'liso sai com brilho que muda devagar, e um relevo de um ou dois milímetros sai como mancha clara de um lado e escura do outro. '
     + 'A faixa preta atrás de uma peça saliente é a sombra dela, e o painel visto de lado sai escuro.', '',
-    ...lista(rasante.map(({ arquivo, vista, azimute, elevacao }) => `${vista}, a luz correndo na direção de ${grau(azimute)} da imagem (0 para a direita, 90 para cima)${elevacao ? `, com a luz a ${grau(elevacao)} do plano da imagem, mais alta que nas outras, porque a luz mais baixa não alcançava a peça nesta vista` : ''}: ${arquivo}`)), '',
+    ...lista(rasante.map(({ arquivo, vista, azimute, elevacao }) => `${vista}, a luz correndo na direção de ${grau(azimute)} da imagem (0 para a direita, 90 para cima)${altura(elevacao)}: ${arquivo}`)), '',
     ...semLuz.flatMap(({ texto }) => [`Sem imagem: ${texto}`, '']),
   ];
   /* A peça de emenda sombreada leva só a luz rasante: o que ela mostra é a sombra suave que sobe sobre o encontro de dois sólidos
@@ -540,6 +559,7 @@ function secaoDaSuperficie({ rasante, curvatura, faixa = null, semLuz = [] }) {
       + 'desenha uma aresta que a forma não pede. As vistas desta seção olham destes lados, no quadro da peça:', '',
       ...lista(vistas.map((v) => `${v}: ${LADO_DA_VISTA_DE_SUPERFICIE[v]}`)), '',
       ...luz,
+      ...deQuina,
     ];
   }
   return [
@@ -553,13 +573,29 @@ function secaoDaSuperficie({ rasante, curvatura, faixa = null, semLuz = [] }) {
     + 'imagem; cinza claro são as peças que não são a chapa, e cinza escuro a faixa junto da borda e das dobras vivas, sem dado. Uma mancha '
     + `azul cercada de vermelho num painel que devia ser liso é um afundamento.${textoDaFaixa}`, '',
     ...lista(curvatura.map(({ arquivo, vista }) => `${vista}: ${arquivo}`)), '',
+    ...deQuina,
   ];
 }
 
-/* A seção do reflexo da peça de lataria: a zebra e a pintura da bancada, com a frase que diz como se lê a faixa. As vistas têm os nomes
-   e os lados da bancada, os de Modelo. */
+/* A seção do reflexo da peça de lataria: a zebra e a pintura da bancada, com a leitura curta da faixa. As vistas têm os nomes e os lados
+   da bancada, os de Modelo. A leitura curta (`LEITURA_DO_REFLEXO`) é a do guia `docs/modelar/usar/PARE-E-ANALISE.md#ler-o-reflexo`,
+   medida nas chapas de calibração (`tools/fixtures/reflexo-calibracao/`, estudo em
+   `docs/modelar/banco-de-provas/reflexo-na-bancada-2026-11-15/`): o que cada defeito faz com a faixa e o que a zebra não vê. */
 export const LEITURA_DA_FAIXA = 'Faixa reta e contínua é chapa boa; faixa torta, amontoada ou quebrada é defeito.';
-function secaoDoReflexo(reflexo) {
+export const LEITURA_DO_REFLEXO = Object.freeze([
+  'A faixa refletida lê a direção da chapa, e não a altura: ela anda onde a superfície inclina, e passa reta onde a chapa só sobe ou desce sem inclinar.',
+  `${LEITURA_DA_FAIXA} Num painel liso o espaçamento das faixas muda devagar, sem degrau.`,
+  'Degrau, com as duas folhas paralelas e uma mais alta: a faixa atravessa a linha sem salto, e o que aparece é só um traço fino ao longo dela.',
+  'Vinco, a chapa dobrando numa linha: a faixa se parte nessa linha e continua deslocada do outro lado, como dentes ou um X. Com listra fina o salto pode passar de uma listra inteira e parecer pequeno; a listra larga diz o tamanho.',
+  'Quebra de curvatura, o raio mudando numa linha sem dobra: a faixa não se parte; ela faz um cotovelo na linha e fica mais apertada de um lado que do outro.',
+  'Ondulação: a faixa serpenteia em ondas regulares por toda a área; quanto maior a onda, mais a faixa entorta, até se dobrar em ziguezague e as listras se multiplicarem.',
+  'Amassado: a faixa se curva em volta de um disco, ou o disco aparece com a cor invertida.',
+  'A zebra tem listras horizontais e só vê a superfície inclinar para cima ou para baixo: uma linha de defeito em pé, ou uma onda de cristas em pé, pode não mudar a faixa em vista nenhuma. A faixa reta não prova que a chapa está lisa nessa direção.',
+  'A pintura mostra o mesmo pela borda clara da caixa de luz; de frente ela serrilha na ondulação e dobra no vinco, mas de três quartos e de cima quase não mostra a ondulação.',
+  'Para cada defeito, diga o tipo, a linha ou a área na chapa (centro, diagonal, borda, canto) e as imagens em que o viu.',
+]);
+/** A seção Reflexo do pedido; exportada para a prova cega da leitura (`docs/modelar/banco-de-provas/reflexo-na-bancada-2026-11-15/`). */
+export function secaoDoReflexo(reflexo) {
   const imagem = ({ arquivo, vista }) => `${vista}: ${arquivo}`;
   const fora = (r) => (r?.fora?.length
     ? [`Ficaram de fora, porque a peça aparece de quina e ocupa menos de ${String(Math.round(MINIMO_DO_REFLEXO * 100))} % do quadro num dos lados: ${r.fora.map((f) => f.vista).join(', ')}.`, '']
@@ -567,12 +603,13 @@ function secaoDoReflexo(reflexo) {
   const L = [
     '## Reflexo', '',
     'A peça é de chapa, e estas vistas da bancada a mostram por reflexo, com a peça enchendo o quadro e olhando dos lados descritos em '
-    + `Modelo. ${LEITURA_DA_FAIXA} Diga onde a faixa se desvia e o que isso diz da chapa.`, '',
+    + 'Modelo. Como ler:', '',
+    ...lista(LEITURA_DO_REFLEXO), '',
   ];
   if (reflexo.zebra?.imagens?.length) {
     L.push('A zebra: listras pretas e brancas de um ambiente distante refletidas na chapa, sem sombra. Num painel liso a listra corre reta '
       + 'ou em curva suave e com a largura parelha; onde ela entorta, se estreita em leque, se amontoa ou se parte, a chapa afunda, ondula ou '
-      + 'dobra ali. A listra que se parte numa linha mostra uma quina ou um degrau.', '', ...lista(reflexo.zebra.imagens.map(imagem)), '', ...fora(reflexo.zebra));
+      + 'dobra ali.', '', ...lista(reflexo.zebra.imagens.map(imagem)), '', ...fora(reflexo.zebra));
   }
   if (reflexo.pintura?.imagens?.length) {
     L.push('A pintura: verniz brilhante sobre base escura, sob caixas de luz de estúdio, como a foto de um carro. O reflexo claro das caixas '
@@ -1424,7 +1461,7 @@ export class ReceitaReprovada extends Error {
 
    `saida` é a pasta da rodada, onde saem o pedido, o alvo, as vistas montadas e a sobreposição; as capturas da bancada continuam em
    `tools/bancadas/out`, com os nomes de sempre. `dependencias` troca o que o teste não quer pagar. */
-export async function vistasParaCritica(peca, { logger = null, saida = null, referenciasExternas = [], orientacoesDasReferencias = [], prazoDeCargaMs = null, pastaDasCapturas = SAIDA_PADRAO, semMedir = false, dependencias = {} } = {}) {
+export async function vistasParaCritica(peca, { logger = null, saida = null, referenciasExternas = [], orientacoesDasReferencias = [], prazoDeCargaMs = null, pastaDasCapturas = SAIDA_PADRAO, semMedir = false, comBlender = false, dependencias = {} } = {}) {
   const dep = {
     /* a medição é a de `rodada-de-modelagem.mjs` (a que o registro e `--acao` usam), importada na hora para não criar ciclo de carga */
     medirReceita: async (p) => (await import('./rodada-de-modelagem.mjs')).medirReceita(p),
@@ -1436,6 +1473,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
     sobreposicaoDeCortes: async (opcoes) => (await import('./sobreposicao-de-cortes.mjs')).sobreposicaoDeCortes(opcoes),
     cortesDosEncaixes,
     vistasDeSuperficie,
+    superficieDaBancada,
     caixasDasPartes: async (arquivo, rec) => caixasDasPartes((await import('./entrada-de-medida.mjs')).executarReceitaGuardada(arquivo, rec).executada.neutro),
     ...dependencias,
   };
@@ -1459,9 +1497,10 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   }
   avisarReferenciasLocaisAusentes(referencias.locaisAusentes);
   const externas = lerReferenciasExternas(referenciasExternas, { existe: dependencias.existe ?? existsSync, orientacoes: orientacoesDasReferencias });
-  /* a peça de lataria leva a luz rasante e a curvatura da lataria, que saem do Blender: sem ele, recusa antes de gastar captura */
+  /* a peça de lataria leva a luz rasante e a curvatura da lataria, que saem da bancada; o Blender só roda pedido, como conferência, e
+     sem ele o pedido é recusado antes de gastar captura */
   const lataria = superficieDaPeca(peca, receita, plano);
-  if (lataria.luzRasante && !blender) throw new Error(mensagemDaLatariaSemBlender(peca, lataria));
+  if (comBlender && !blender) throw new Error(`--com-blender roda o Blender como conferência e pede MODELAR_BLENDER apontando o executável: \`${comandoDasVistasDoBlender(peca)}\`; sem a conferência, o pacote sai só com a bancada.`);
   const declarado = await dep.esbocoDeclarado(peca);
   /* as formas do esboço que a receita refina e o alvo guardado com elas, conferidos antes de gastar captura */
   let dados = null;
@@ -1493,7 +1532,9 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   const total = VISTAS_DO_CONJUNTO.split(',').length + 1 + 1 + VISTAS_DO_ARAME.split(',').length + 1
     + VISTAS_DA_PARTE.split(',').length * partes.length
     + (plano?.partes ?? []).reduce((soma, p) => soma + (p.dePerto?.length ?? 0), 0)
-    + (lataria.lataria ? VISOES_DO_REFLEXO.length * VISTAS_DO_REFLEXO.split(',').length : 0);
+    + (lataria.lataria ? VISOES_DO_REFLEXO.length * VISTAS_DO_REFLEXO.split(',').length : 0)
+    /* a curvatura numa captura de quatro vistas e duas luzes rasantes por vista, no máximo */
+    + (lataria.luzRasante ? (lataria.lataria ? 4 : 0) + 8 : 0);
   let feitas = 0;
   const capturar = async (quem, opcoes) => {
     const resposta = await dep.olharBancada({ ...opcoes, logger, ...(prazoDeCargaMs ? { prazoDeCargaMs } : {}), ...(compartilhada ? { compartilhada } : {}) });
@@ -1510,6 +1551,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   const porParte = [];
   const dePerto = [];
   const reflexo = {};
+  let geradas = null;
   try {
     conjunto = await capturar('conjunto', { peca, revisar: true, res: RES_CONJUNTO });
     exigirVistasDiferentes(conjunto, 'do conjunto');
@@ -1562,6 +1604,8 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
         reflexo[visao] = imagensDoReflexo(feita, peca);
       }
     }
+    /* a luz rasante e a curvatura da lataria, da bancada, na mesma abertura do navegador */
+    if (lataria.luzRasante) geradas = await dep.superficieDaBancada(peca, { pasta, lataria, capturar });
   } finally {
     await compartilhada?.fechar();
   }
@@ -1591,15 +1635,27 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   }
 
   const sobreposicao = declarado ? await dep.sobreposicaoDeCortes({ peca, saida: pasta }) : null;
-  const geradas = lataria.luzRasante ? await dep.vistasDeSuperficie(peca, { pasta, blender, lataria }) : null;
-  /* a imagem de luz rasante quase toda escura não chega ao crítico, mas não derruba o pacote: a vista é tentada de novo com a luz mais
-     alta, e a que nenhuma elevação salva sai do pedido com a frase que diz por quê; só sem nenhuma imagem de luz rasante o pacote é recusado */
+  /* a imagem de luz rasante quase toda escura não chega ao crítico, mas não derruba o pacote: a da bancada já tem a luz que ela escolheu
+     pela vista e sai do pedido com a frase que diz por quê; só sem nenhuma imagem de luz rasante o pacote é recusado */
   let superficie = geradas;
   if (geradas) {
-    const tentar = dep.luzMaisAlta ?? ((opcoes) => luzMaisAltaDaVista({ ...opcoes, obj: geradas.obj, pasta, blender }));
-    const decidida = await luzRasanteDoPacote(peca, geradas, { tentar });
+    const decidida = await luzRasanteDoPacote(peca, geradas, { tentar: null, elevacoes: [] });
     superficie = decidida.superficie;
     for (const { texto } of superficie.semLuz ?? []) avisos.push(texto);
+  }
+  /* A CONFERÊNCIA DO BLENDER (`--com-blender`): as duas vistas do Blender, como eram antes da fatia 6, em `conferencia-do-blender/`, para
+     quem conduz pôr ao lado das da bancada; não vão ao pedido, e a luz que não alcança a peça é refeita mais alta como antes. */
+  let conferenciaDoBlender = null;
+  if (comBlender && lataria.luzRasante) {
+    const pastaDoBlender = join(pasta, PASTA_DA_CONFERENCIA_DO_BLENDER);
+    const feitas = await dep.vistasDeSuperficie(peca, { pasta: pastaDoBlender, blender, lataria });
+    const tentar = dep.luzMaisAlta ?? ((opcoes) => luzMaisAltaDaVista({ ...opcoes, obj: feitas.obj, pasta: pastaDoBlender, blender }));
+    try {
+      conferenciaDoBlender = (await luzRasanteDoPacote(peca, feitas, { tentar })).superficie;
+    } catch (erro) {
+      conferenciaDoBlender = feitas;
+      avisos.push(`a conferência do Blender saiu com a luz rasante quase toda escura: ${erro.message}`);
+    }
   }
 
   /* a vista montada em que as outras peças tapam a peça em foco não entra: o crítico julgaria a caçamba onde devia ver o pé */
@@ -1653,7 +1709,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   });
   const arquivoDoPedido = join(pasta, 'pedido.md');
   writeFileSync(arquivoDoPedido, pedido, 'utf8');
-  const manifesto = gravarManifesto(pasta, { peca, receita: impressao, lataria, superficie });
+  const manifesto = gravarManifesto(pasta, { peca, receita: impressao, lataria, superficie, conferenciaDoBlender });
   const temReflexo = Object.keys(reflexo).length > 0;
   if (dePerto.length || temReflexo) {
     /* aditivo: sem `dePerto` e sem reflexo o pacote.json sai como sempre saiu */
@@ -1665,7 +1721,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   }
 
   return {
-    peca, partes, conjunto, traseira, esquerda, arame, raioX, porParte, dePerto, reflexo: temReflexo ? reflexo : null, pasta, pedido: arquivoDoPedido, manifesto, alvo, montada, sobreposicao, superficie, lataria, referencias, encaixes, avisos, medicao: medicaoDoPacote,
+    peca, partes, conjunto, traseira, esquerda, arame, raioX, porParte, dePerto, reflexo: temReflexo ? reflexo : null, pasta, pedido: arquivoDoPedido, manifesto, alvo, montada, sobreposicao, superficie, conferenciaDoBlender, lataria, referencias, encaixes, avisos, medicao: medicaoDoPacote,
   };
 }
 
@@ -1687,15 +1743,6 @@ export function imagensDoReflexo(resposta, peca, minimo = MINIMO_DO_REFLEXO) {
   if (!entram.length && todas.length) entram = [todas.reduce((a, b) => ((b.area ?? 0) > (a.area ?? 0) ? b : a))];
   const fora = todas.filter((i) => !entram.includes(i)).map(({ vista, arquivo, largura, altura }) => ({ vista, arquivo, largura, altura }));
   return { imagens: entram.map(({ arquivo, vista }) => ({ arquivo, vista })), fora };
-}
-
-/** A recusa de lataria sem Blender, com o caminho da dispensa para a peça que tem subdivisão e não é chapa. */
-export function mensagemDaLatariaSemBlender(peca, lataria) {
-  const base = mensagemSemBlender(peca, lataria);
-  if (!lataria.lataria) return base;
-  return `${base} Se a peça tem passo \`subdivisao\` e não é chapa de superfície livre (um cabo maciço, um estofado, uma peça orgânica), a receita pode declarar `
-    + `\`PLANO.lataria = { dispensa: '<motivo, com ao menos ${MINIMO_DO_MOTIVO_DA_DISPENSA} caracteres>' }\`; a dispensa é decisão da pessoa, e quem conduz não a escreve sozinho. `
-    + `Com ela gravada, rode de novo \`npm run vistas:critica -- ${peca}\`, que passa a montar o pacote sem o Blender.`;
 }
 
 /* ---------- a referência externa, trazida por quem conduz ---------- */
@@ -1787,12 +1834,14 @@ export async function luzRasanteDoPacote(peca, superficie, { tentar, limiar = LI
     }
   }
   const semLuz = escuras.filter((i) => !trocas.has(i)).map((i) => {
-    const antes = typeof i.iluminada === 'number' ? `${pct(i.iluminada)} da peça iluminada a ${ELEVACAO_PADRAO_DA_LUZ} graus de elevação` : `sem fração iluminada medida a ${ELEVACAO_PADRAO_DA_LUZ} graus de elevação`;
-    const depois = melhor.has(i) ? `${pct(melhor.get(i))} no melhor de ${elevacoes.join(', ')} graus` : `sem medida em ${elevacoes.join(', ')} graus`;
+    const elevacao = i.elevacao ?? ELEVACAO_PADRAO_DA_LUZ;
+    const antes = typeof i.iluminada === 'number' ? `${pct(i.iluminada)} da peça iluminada a ${elevacao} graus de elevação` : `sem fração iluminada medida a ${elevacao} graus de elevação`;
+    /* a luz da bancada já é a que ela escolheu pela vista, e não se refaz mais alta */
+    const depois = !elevacoes.length ? null : melhor.has(i) ? `${pct(melhor.get(i))} no melhor de ${elevacoes.join(', ')} graus` : `sem medida em ${elevacoes.join(', ')} graus`;
     return {
       vista: i.vista,
       azimute: i.azimute,
-      texto: `a vista ${i.vista} ficou sem a luz rasante a ${String(i.azimute).replace('.', ',')} graus de azimute: a luz não alcança a peça por esse lado (${antes}; ${depois}, abaixo do limiar de ${pct(limiar)}), o que é próprio de uma forma côncava ou aberta para a câmera, e a imagem saiu do pedido.`,
+      texto: `a vista ${i.vista} ficou sem a luz rasante a ${String(i.azimute).replace('.', ',')} graus de azimute: a luz não alcança a peça por esse lado (${antes}${depois ? `; ${depois}` : ''}, abaixo do limiar de ${pct(limiar)}), o que é próprio de uma forma côncava ou aberta para a câmera, e a imagem saiu do pedido.`,
     };
   });
   const rasante = superficie.rasante.filter((i) => !semLuz.some((s) => s.vista === i.vista && s.azimute === i.azimute)).map((i) => trocas.get(i) ?? i);
@@ -1928,8 +1977,14 @@ export function imprimir(resultado) {
     linhas.push('', resultado.lataria.lataria
       ? `SUPERFÍCIE (peça de lataria: ${resultado.lataria.porque}; chapa na curvatura: ${superficie.partes?.length ? superficie.partes.join(', ') : 'a malha inteira'}):`
       : `SUPERFÍCIE (luz rasante: ${resultado.lataria.porque}):`);
-    for (const { arquivo } of superficie.rasante) linhas.push(`  ${arquivo} (luz rasante)`);
+    for (const { arquivo, iluminada, elevacao } of superficie.rasante) linhas.push(`  ${arquivo} (luz rasante${typeof iluminada === 'number' ? `, ${porcento(iluminada)} da peça iluminada` : ''}${elevacao != null ? `, luz a ${elevacao} graus do plano da imagem` : ''})`);
     for (const { arquivo } of superficie.curvatura) linhas.push(`  ${arquivo} (curvatura da lataria)`);
+    for (const f of superficie.fora ?? []) linhas.push(`  fora do pedido: ${f.vista}, de quina (${porcento(f.largura ?? 0)} da largura e ${porcento(f.altura ?? 0)} da altura do quadro)`);
+  }
+  if (resultado.conferenciaDoBlender) {
+    linhas.push('', 'CONFERÊNCIA DO BLENDER (--com-blender; fora do pedido, para pôr ao lado das da bancada):');
+    for (const { arquivo, iluminada } of resultado.conferenciaDoBlender.rasante) linhas.push(`  ${arquivo} (luz rasante${typeof iluminada === 'number' ? `, ${porcento(iluminada)} da peça iluminada` : ''})`);
+    for (const { arquivo } of resultado.conferenciaDoBlender.curvatura) linhas.push(`  ${arquivo} (curvatura da lataria)`);
   }
   if (resultado.reflexo) {
     linhas.push('', `REFLEXO DA BANCADA (peça de lataria; ${LEITURA_DA_FAIXA.charAt(0).toLowerCase()}${LEITURA_DA_FAIXA.slice(1)}):`);
@@ -1952,12 +2007,14 @@ Monta o pacote do crítico visual da peça: mede a receita, captura as vistas e 
   --saida=<pasta da rodada>                 onde o pacote é gravado
   --prazo=<segundos>                        prazo de carga de cada captura, para peça pesada
   --sem-medir                               monta o pacote sem medir a receita (o pedido diz que saiu sem medição)
+  --com-blender                             roda também as vistas de superfície do Blender (pede MODELAR_BLENDER), como conferência das
+                                            da bancada, em <pasta da rodada>/conferencia-do-blender/; elas não vão ao pedido
   --referencia=<caminho absoluto>[@<vista>] imagem de fora do repositório (frontal, direita, esquerda, traseira, superior, inferior, isometrica); repetível
   --orientacao-da-referencia=<texto>        como a imagem da --referencia anterior está girada ou espelhada, em palavras (até ${LIMITE_DA_ORIENTACAO} caracteres);
                                             vale para a última --referencia dada antes dela, e o pedido a escreve no lugar da frase dos eixos
   --ajuda                                   esta mensagem
 
-Código de saída: 0 pacote montado, 1 recusa (receita reprovada, Blender ausente, captura sem imagem), 2 uso errado.
+Código de saída: 0 pacote montado, 1 recusa (receita reprovada, luz rasante toda escura, --com-blender sem o Blender, captura sem imagem), 2 uso errado.
 `;
 
 async function principal(argv) {
@@ -1977,15 +2034,15 @@ async function principal(argv) {
         orientacoes[externas.length - 1] = lerOrientacaoDaReferencia(texto);
       } else resto.push(a);
     }
-    lido = lerArgumentos(resto, { opcoes: ['saida', 'prazo'], bandeiras: ['sem-medir'], posicional: { nome: 'a peça', obrigatorio: true } });
+    lido = lerArgumentos(resto, { opcoes: ['saida', 'prazo'], bandeiras: ['sem-medir', 'com-blender'], posicional: { nome: 'a peça', obrigatorio: true } });
     if (lido.opcao('prazo') !== null && !(Number(lido.opcao('prazo')) > 0)) throw new Error(`--prazo pede segundos maiores que zero; veio "${lido.opcao('prazo')}".`);
   } catch (erro) {
-    process.stderr.write(`uso: node tools/modelar/vistas-para-critica.mjs <peça> [--saida=<pasta da rodada>] [--prazo=<segundos>] [--sem-medir] [--referencia=<caminho absoluto da imagem>[@<vista>] [--orientacao-da-referencia=<texto>]]... (--ajuda diz mais)\n${erro.message}\n`);
+    process.stderr.write(`uso: node tools/modelar/vistas-para-critica.mjs <peça> [--saida=<pasta da rodada>] [--prazo=<segundos>] [--sem-medir] [--com-blender] [--referencia=<caminho absoluto da imagem>[@<vista>] [--orientacao-da-referencia=<texto>]]... (--ajuda diz mais)\n${erro.message}\n`);
     return 2;
   }
   /* --prazo: a peça pesada (o furgão realista, em 2026-11-06) não entra na cena nos 90 s de cada captura. */
   const prazo = lido.opcao('prazo');
-  const resultado = await vistasParaCritica(lido.posicional, { saida: lido.opcao('saida'), referenciasExternas: externas, orientacoesDasReferencias: orientacoes, semMedir: lido.bandeira('sem-medir'), ...(prazo !== null ? { prazoDeCargaMs: Number(prazo) * 1000 } : {}) });
+  const resultado = await vistasParaCritica(lido.posicional, { saida: lido.opcao('saida'), referenciasExternas: externas, orientacoesDasReferencias: orientacoes, semMedir: lido.bandeira('sem-medir'), comBlender: lido.bandeira('com-blender'), ...(prazo !== null ? { prazoDeCargaMs: Number(prazo) * 1000 } : {}) });
   process.stdout.write(imprimir(resultado));
   return 0;
 }

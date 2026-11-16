@@ -1,0 +1,65 @@
+{
+  "peca": "carro-fastback/lataria",
+  "rotulo": "quarto-traseiro-tresquartos-luz-da-bancada",
+  "vistaBlender": "tresquartos",
+  "vistaBancada": "tresquartos",
+  "caixaBlenderPx": [
+    133,
+    243,
+    1170,
+    996
+  ],
+  "rasante": [
+    {
+      "azimute": 350,
+      "blender": {
+        "fracao": 0.3272,
+        "fracaoRemedida": 0.3283
+      },
+      "bancada": {
+        "azimute": 10,
+        "fracao": 0.9292,
+        "elevacao": 60,
+        "arquivo": "tmp/paridade-reflexo/quarto-traseiro-tresquartos-luz-da-bancada/c-01/bancada-carro-fastback-lataria-tresquartos-orto-visao-luz-rasante-enquadrado.png",
+        "caixaPx": [
+          56,
+          57,
+          1344,
+          993
+        ]
+      }
+    },
+    {
+      "azimute": 80,
+      "blender": {
+        "fracao": 0.3471,
+        "fracaoRemedida": 0.3486
+      },
+      "bancada": {
+        "azimute": 280,
+        "fracao": 0.975,
+        "elevacao": 60,
+        "arquivo": "tmp/paridade-reflexo/quarto-traseiro-tresquartos-luz-da-bancada/c-02/bancada-carro-fastback-lataria-tresquartos-orto-visao-luz-rasante-az280-enquadrado.png",
+        "caixaPx": [
+          56,
+          57,
+          1344,
+          993
+        ]
+      }
+    }
+  ],
+  "curvatura": {
+    "escalaBlender": 3.77573,
+    "escalaBancada": 3.77574,
+    "arquivoBancada": "tmp/paridade-reflexo/quarto-traseiro-tresquartos-luz-da-bancada/c-03/bancada-carro-fastback-lataria-tresquartos-orto-visao-curvatura-enquadrado.png",
+    "pontos": 844,
+    "correlacao": 0.9536051339903249,
+    "diferencaMediana": 0.047179953759038815,
+    "diferencaP90": 0.19684427231307233
+  },
+  "azimutesDaBancada": [
+    10,
+    280
+  ]
+}

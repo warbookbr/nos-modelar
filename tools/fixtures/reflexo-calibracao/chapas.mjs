@@ -59,9 +59,19 @@ export function pontoDaChapa(nome, folha, x, y) {
 
 const m = (mm) => Math.round(mm * 1e6) / 1e9;
 
+/** O ponto [x, y, z] girado `giroGraus` em torno do eixo z que passa pelo centro da chapa (300, 200), no sentido de x para y. */
+export function girarNoPlano([x, y, z], giroGraus) {
+  if (!giroGraus) return [x, y, z];
+  const a = (giroGraus * Math.PI) / 180; const dx = x - LARGURA_MM / 2; const dy = y - ALTURA_MM / 2;
+  return [LARGURA_MM / 2 + dx * Math.cos(a) - dy * Math.sin(a), ALTURA_MM / 2 + dx * Math.sin(a) + dy * Math.cos(a), z];
+}
+
 /** A receita da chapa `nome`: duas `subdivisao` de nível 0 (uma por folha) com espessura, e uma parte por folha. `passoMm` muda a grade
- * (o teste do índice de suavidade mede a mesma chapa em duas densidades); as receitas da pasta usam o padrão de 10 mm. */
-export function chapaDeCalibracao(nome, { passoMm = PASSO_MM } = {}) {
+ * (o teste do índice de suavidade mede a mesma chapa em duas densidades); as receitas da pasta usam o padrão de 10 mm. `giroGraus`
+ * gira a chapa no próprio plano, em torno do centro dela: a zebra da bancada é de listras horizontais e lê só a inclinação da normal
+ * para cima e para baixo, e a chapa sem giro, com a emenda e a onda variando só em x, não muda a zebra em vista nenhuma (estudo de
+ * leitura do plano do reflexo, fatia 7); girada a 45 graus, a emenda corre na diagonal e o defeito aparece na faixa. */
+export function chapaDeCalibracao(nome, { passoMm = PASSO_MM, giroGraus = 0 } = {}) {
   const defeito = CHAPAS[nome]?.defeito;
   if (!defeito) throw new Error(`chapa de calibração '${nome}' não existe; use ${Object.keys(CHAPAS).join(', ')}`);
   const TOPO = {};
@@ -70,7 +80,7 @@ export function chapaDeCalibracao(nome, { passoMm = PASSO_MM } = {}) {
     const nomeDe = (i, j) => `${folha[0]}${i}_${j}`;
     const vertices = []; const faces = [];
     for (let i = 0; i <= nx; i++) for (let j = 0; j <= ny; j++) {
-      TOPO[nomeDe(i, j)] = pontoDaChapa(nome, folha, x0 + i * passoMm, j * passoMm).map(m);
+      TOPO[nomeDe(i, j)] = girarNoPlano(pontoDaChapa(nome, folha, x0 + i * passoMm, j * passoMm), giroGraus).map(m);
       vertices.push(nomeDe(i, j));
     }
     for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) faces.push([nomeDe(i, j), nomeDe(i + 1, j), nomeDe(i + 1, j + 1), nomeDe(i, j + 1)]);

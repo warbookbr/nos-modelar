@@ -29,7 +29,7 @@
  * A visão não toca a página: o relógio de quadros e o controle da direção vêm da caixa da visão (`contexto.pagina`,
  * `componentes/caixa-da-visao.js`). */
 import * as THREE from 'three';
-import { AZIMUTE_PREFERIDO, BRILHO_RASANTE, RASANTE_GRAUS, amostrasDaVista, direcaoDaLuz, escolherLuz, exposicaoDaLuz } from './azimute-da-luz.js';
+import { AZIMUTE_PREFERIDO, BRILHO_RASANTE, RASANTE_GRAUS, amostrasDaVista, direcaoDaLuz, escolherLuz, exposicaoDaLuz, segundaLuz } from './azimute-da-luz.js';
 import { restaurarMateriais, superficiesDe, trocarMateriais } from './materiais-da-visao.js';
 
 const ID = 'luz-rasante';
@@ -43,7 +43,7 @@ const estados = new WeakMap();
 const SEM_AMBIENTE = {};
 function estadoDe(ambiente) {
   const chave = ambiente ?? SEM_AMBIENTE;
-  if (!estados.has(chave)) estados.set(chave, { ativa: false, luz: null, apagadas: [], pararQuadro: null, contexto: null, azimute: null, elevacao: null, exposicao: 1, amostras: null, peca: undefined });
+  if (!estados.has(chave)) estados.set(chave, { ativa: false, luz: null, apagadas: [], pararQuadro: null, contexto: null, azimute: null, elevacao: null, segunda: null, exposicao: 1, amostras: null, peca: undefined });
   return estados.get(chave);
 }
 
@@ -63,8 +63,9 @@ function eixosDaCamera(camera) {
   return { xCam: unit(e[0], e[1], e[2]), yCam: unit(e[4], e[5], e[6]), zCam: unit(e[8], e[9], e[10]) };
 }
 
-/** A luz de partida para a vista da `camera`, `{ azimute, elevacao, nota, legivel, estourada, sombra, exposicao, amostras }`: a que `escolherLuz` dá sobre
- * as normais da peça que ela vê, com as `opcoes` dela por cima das da visão. */
+/** A luz de partida para a vista da `camera`, `{ azimute, elevacao, nota, legivel, estourada, sombra, exposicao, amostras, segunda }`: a que
+ * `escolherLuz` dá sobre as normais da peça que ela vê, com as `opcoes` dela por cima das da visão, e em `segunda` o azimute da outra
+ * direção boa da mesma vista (`segundaLuz`), que a caixa da visão publica para a captura do pacote do crítico. */
 export function luzDaVista(grupo, camera, opcoes = {}) {
   const vista = eixosDaCamera(camera);
   const triangulos = [];
@@ -85,7 +86,8 @@ export function luzDaVista(grupo, camera, opcoes = {}) {
   const { normais, pesos } = amostrasDaVista(triangulos, vista.zCam);
   const luz = escolherLuz(normais, vista, { pesos, rasanteGraus: RASANTE_GRAUS, alvo: ALVO_LINEAR, ...opcoes });
   /* as amostras seguem com a luz: quem troca o azimute refaz a exposição sobre elas */
-  return { ...luz, exposicao: exposicaoDaLuz(normais, vista, luz.elevacao, luz.azimute, { pesos }), amostras: { normais, pesos, vista } };
+  const segunda = segundaLuz(normais, vista, luz, { pesos, rasanteGraus: RASANTE_GRAUS, alvo: ALVO_LINEAR, ...opcoes }).azimute;
+  return { ...luz, segunda, exposicao: exposicaoDaLuz(normais, vista, luz.elevacao, luz.azimute, { pesos }), amostras: { normais, pesos, vista } };
 }
 
 /* A exposição da luz em vigor: refeita sobre as amostras da vista quando o azimute ou a elevação mudam. */
@@ -178,7 +180,7 @@ function desenharControle(e) {
       aoClicar: () => escolherPelaVista(e),
     },
     linhas: [{ texto: `Sol a ${elevacao}° do plano da imagem, com sombra${e.exposicao < 1 ? `, com a luz a ${Math.round(e.exposicao * 100)} % para a peça não estourar` : ''}; o resto da luz apagado. A direção conta a partir da direita da tela, no sentido de quem sobe.` }],
-    dados: { azimute, elevacao },
+    dados: { azimute, elevacao, ...(e.segunda != null ? { segundoAzimute: e.segunda } : {}) },
   });
 }
 
@@ -188,6 +190,7 @@ function escolherPelaVista(e) {
   const luz = luzDaVista(e.contexto.grupo, camera);
   e.azimute = luz.azimute;
   e.elevacao = luz.elevacao;
+  e.segunda = luz.segunda;
   e.amostras = luz.amostras;
   e.exposicao = luz.exposicao;
   desenharControle(e);
