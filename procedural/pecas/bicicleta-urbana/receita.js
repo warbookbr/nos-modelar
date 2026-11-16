@@ -166,7 +166,10 @@ export const TABELA = {
   pedivela_hub_raio: 20,
   pedivela_ponta_raio: 11,
   pedivela_espessura: 10,
-  pedivela_degrau: 6,
+  pedivela_degrau: 12, /* quanto o braço se afasta para fora do plano do eixo até o pedal (dobra suave vista de frente, ref-pedal-frente.png) */
+  pedivela_dobra_ini: 0.1, /* fração do comprimento onde a dobra começa */
+  pedivela_dobra_fim: 0.65, /* fração onde ela termina; dali até o pedal o braço é reto */
+  pedivela_canto: 4.5, /* raio dos cantos da seção achatada, mm (a seção tem 10 mm de espessura) */
   pedivela_meio: 0.55,
   pedivela_tampa_raio: 9,
   pedivela_tampa_altura: 2.5,
@@ -186,13 +189,16 @@ export const TABELA = {
      duas barras laterais com janela retangular e fileira de pinos na borda de cima */
   pedal_largura: 78,
   pedal_altura: 20,
-  pedal_profundidade: 90,
+  pedal_profundidade: 100, /* quadro de lado, ref-pedal-lado.png: uns 100 x 20 mm, cantos redondos */
   pedal_barra: 24,
-  pedal_janela_margem: 7,
-  pedal_pino: 3.5,
+  pedal_janela_margem: 4, /* quanto sobra de quadro em y em volta da janela de lado, mm */
+  pedal_janela_comp: 26, /* comprimento (z) de cada janela de lado, mm */
+  pedal_janela_centro: 0.27, /* centro de cada janela, fração do comprimento a partir do meio */
+  pedal_canto: 5, /* raio dos cantos do quadro de lado, mm */
+  pedal_pino_altura: 2.5,
+  pedal_pino: 1.6, /* raio dos pinos, mm */
   pedal_corpo_raio: 14,
   pedal_tampa: 3,
-  pedal_afastamento: 96,
 };
 
 /* fecho convexo de pontos 2D (cadeia monótona), no sentido anti-horário */
@@ -611,27 +617,23 @@ export function derivar(T) {
   }
   const pa = rad(T.pedivela_angulo);
   const pedalPts = {};
-  /* contorno do braço visto de lado: fecho convexo de dois círculos (borda reta em cima e embaixo, pontas redondas) */
-  const contornoBraco = (d0, r0, d1, r1, fase) => {
-    const pts = [];
-    for (const [d, r] of [[d0, r0], [d1, r1]]) for (let k = 0; k < 24; k++) { const f = (2 * Math.PI * k) / 24; pts.push([Math.cos(fase) * d + Math.cos(f) * r, yBB + Math.sin(fase) * d + Math.sin(f) * r]); }
-    return fechoConvexo(pts);
-  };
   for (const lado of [1, -1]) {
     const fase = lado === S ? pa : pa + Math.PI;
     const L = T.pedivela_comprimento;
     const ponta = [lado * T.pedivela_braco_x, yBB + Math.sin(fase) * L, Math.cos(fase) * L];
-    const rMeio = T.pedivela_hub_raio + (T.pedivela_ponta_raio - T.pedivela_hub_raio) * T.pedivela_meio;
     const e = T.pedivela_espessura;
     const bx = T.pedivela_braco_x;
-    const xa = lado > 0 ? bx : -(bx + e);
-    const xd = lado > 0 ? bx + T.pedivela_degrau : -(bx + T.pedivela_degrau + e);
-    placa('pedivela', 'aluminioEscuro', contornoBraco(0, T.pedivela_hub_raio, L * (T.pedivela_meio + 0.1), rMeio * 0.95, fase), xa, e);
-    placa('pedivela', 'aluminioEscuro', contornoBraco(L * T.pedivela_meio, rMeio, L, T.pedivela_ponta_raio, fase), xd, e);
+    /* braço único: caminho do eixo à ponta, reto de lado e com a dobra para fora de frente; a seção afina do eixo à ponta */
+    const dobra = (t) => { const u = Math.min(1, Math.max(0, (t - T.pedivela_dobra_ini) / (T.pedivela_dobra_fim - T.pedivela_dobra_ini))); return T.pedivela_degrau * u * u * (3 - 2 * u); };
+    const nT = 10;
+    const caminho = [];
+    for (let k = 0; k <= nT; k++) { const t = k / nT; caminho.push({ t, p: [lado * (bx + e / 2 + dobra(t)), yBB + Math.sin(fase) * L * t, Math.cos(fase) * L * t], semi: T.pedivela_hub_raio + (T.pedivela_ponta_raio - T.pedivela_hub_raio) * t }); }
+    itens.push({ k: 'braco', parte: 'pedivela', material: 'aluminioEscuro', caminho, a: e / 2, canto: T.pedivela_canto });
     pedalPts[lado] = ponta;
-    const x0 = lado * (T.pedal_afastamento);
-    const x1 = lado * (T.pedal_afastamento + T.pedal_largura);
-    itens.push({ k: 'pedal', parte: 'pedais', material: 'preto', x0: Math.min(x0, x1), x1: Math.max(x0, x1), y: ponta[1], z: ponta[2], lado, eixoRaio: 5, eixoDe: lado * (bx + T.pedivela_degrau + e - 2), eixoAte: lado * (T.pedal_afastamento + T.pedal_largura - 6), alt: T.pedal_altura, prof: T.pedal_profundidade });
+    const xFora = bx + e + T.pedivela_degrau; /* face de fora do braço na ponta */
+    const x0 = lado * xFora;
+    const x1 = lado * (xFora + T.pedal_largura);
+    itens.push({ k: 'pedal', parte: 'pedais', material: 'preto', x0: Math.min(x0, x1), x1: Math.max(x0, x1), y: ponta[1], z: ponta[2], lado, eixoRaio: 5, eixoDe: lado * (xFora - 2), eixoAte: lado * (xFora + T.pedal_largura - 6), alt: T.pedal_altura, prof: T.pedal_profundidade });
   }
 
   /* CATRACA */
@@ -770,19 +772,48 @@ export function gerarPassos(T) {
         marca(it.parte, it.material, { origem: { op: 'extrusao', id: oid } });
         passos.push(['liso', { angulo: 30, sel: { origem: { op: 'extrusao', id: oid } } }]);
       }
+    } else if (it.k === 'braco') {
+      /* loft do eixo à ponta: seção achatada de cantos redondos (u = espessura em x, w = largura no plano do braço), orientada pelo eixo x;
+         as pontas fecham em calotas elípticas, de modo que de lado o braço termina redondo nas duas extremidades */
+      const oid = proximo();
+      const cp = it.caminho;
+      const rr = (a, b, r) => { /* retângulo de cantos redondos, anti-horário em [u, w] */
+        const pts = [];
+        for (const [cu, cw, a0] of [[a - r, b - r, 0], [-(a - r), b - r, 90], [-(a - r), -(b - r), 180], [a - r, -(b - r), 270]]) for (let j = 0; j <= 4; j++) { const f = rad(a0 + (90 * j) / 4); pts.push([m(cu + r * Math.cos(f)), m(cw + r * Math.sin(f))]); }
+        return pts;
+      };
+      const rcanto = Math.min(it.canto, it.a - 0.01);
+      const sec = (q) => ({ pos: v(q.p), contorno: rr(it.a, q.semi, rcanto) });
+      const dirP = (i0, i1) => unit(menos(cp[i1].p, cp[i0].p));
+      const calota = (q, dir, sinal) => { /* calota elíptica: a seção encolhe com cos e recua com sin, de profundidade igual à semi-largura */
+        const out = [];
+        for (const th of [30, 60, 82]) { const c = Math.cos(rad(th)), sn = Math.sin(rad(th)); out.push({ pos: v(soma(q.p, esc(dir, sinal * q.semi * sn))), contorno: rr(it.a * c, q.semi * c, rcanto * c) }); }
+        return out;
+      };
+      const d0 = dirP(0, 1), d1 = dirP(cp.length - 2, cp.length - 1);
+      const poloI = { pos: v(soma(cp[0].p, esc(d0, -cp[0].semi))), raio: 0 };
+      const poloF = { pos: v(soma(cp[cp.length - 1].p, esc(d1, cp[cp.length - 1].semi))), raio: 0 };
+      const secoes = [poloI, ...calota(cp[0], d0, -1).reverse(), ...cp.map(sec), ...calota(cp[cp.length - 1], d1, 1), poloF];
+      passos.push(['loft', { origemId: oid, lados: 20, orientacao: [1, 0, 0], secoes }]);
+      marca(it.parte, it.material, { origem: { op: 'loft', id: oid } });
+      passos.push(['liso', { angulo: 35, sel: { origem: { op: 'loft', id: oid } } }]);
     } else if (it.k === 'pedal') {
-      /* pedal de plataforma: duas barras laterais com janela retangular (extrusão com furo), corpo cilíndrico no meio sobre o eixo e uma fileira de pinos na borda de cima */
+      /* pedal de plataforma: duas barras laterais, cada uma uma extrusão em x do contorno de lado (quadro de cantos redondos) com duas janelas
+         furadas de lado, corpo cilíndrico redondo no meio, um pouco mais alto que o quadro, e pinos pequenos nas bordas de cima e de baixo */
       const bw = T.pedal_barra;
-      const xm = (it.x0 + it.x1) / 2;
-      for (const cx of [it.x0 + bw / 2, it.x1 - bw / 2]) {
+      const jan = T.pedal_janela_comp;
+      for (const [xa, cx] of [[it.x0, it.x0 + bw / 2], [it.x1 - bw, it.x1 - bw / 2]]) {
         const oid = proximo();
-        passos.push(['extrusao', { origemId: oid, eixo: 'y', altura: m(it.alt), perfil: { retangulo: { largura: m(bw), profundidade: m(it.prof), cantos: m(3) } }, furos: [{ retangulo: { largura: m(bw - 2 * T.pedal_janela_margem), profundidade: m(it.prof * 0.55), cantos: m(1.5) } }], segmentosArco: 3, em: [m(cx), m(it.y - it.alt / 2), m(it.z)] }]);
+        const furo = (dz) => ({ retangulo: { largura: m(it.alt - 2 * T.pedal_janela_margem), profundidade: m(jan), centro: [0, m(dz)], cantos: m(2) } });
+        passos.push(['extrusao', { origemId: oid, eixo: 'x', altura: m(bw), perfil: { retangulo: { largura: m(it.alt), profundidade: m(it.prof), cantos: m(T.pedal_canto) } }, furos: [furo(it.prof * T.pedal_janela_centro), furo(-it.prof * T.pedal_janela_centro)], segmentosArco: 4, em: [m(xa), m(it.y), m(it.z)] }]);
         marca('pedais', it.material, { origem: { op: 'extrusao', id: oid } });
-        const sx = cx + (cx < xm ? -1 : 1) * (bw / 2 - 3);
-        for (let k = 0; k < 5; k++) {
+        passos.push(['liso', { angulo: 30, sel: { origem: { op: 'extrusao', id: oid } } }]);
+        for (const sy of [1, -1]) for (const fz of [-0.4, -0.15, 0.15, 0.4]) {
           const pid = proximo();
-          passos.push(['cubo', { origemId: pid, larg: m(T.pedal_pino), alt: m(T.pedal_pino), prof: m(T.pedal_pino), em: [m(sx), m(it.y + it.alt / 2 + T.pedal_pino / 2 - 0.5), m(it.z + (k - 2) * it.prof * 0.21)] }]);
-          marca('pedais', it.material, { origem: { op: 'cubo', id: pid } });
+          const y0 = it.y + sy * it.alt / 2;
+          const ya = Math.min(y0 - sy * 0.5, y0 + sy * T.pedal_pino_altura), yb = Math.max(y0 - sy * 0.5, y0 + sy * T.pedal_pino_altura);
+          passos.push(['lathe', { origemId: pid, eixo: 'y', lados: 8, perfil: [[0, m(ya)], [m(T.pedal_pino), m(ya)], [m(T.pedal_pino), m(yb)], [0, m(yb)]], em: [m(cx), 0, m(it.z + fz * it.prof)] }]);
+          marca('pedais', it.material, { origem: { op: 'lathe', id: pid } });
         }
       }
       const cid = proximo();
