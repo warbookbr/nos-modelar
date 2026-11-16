@@ -8,7 +8,8 @@
  * (`secaoDoReflexo`). O nome da chapa e o defeito ficam só no gabarito, fora das pastas dos pedidos.
  *
  * Segunda rodada (2026-11-16): as chapas numa malha só, sem a borda livre na linha do meio, a zebra nas duas direções e as letras
- * embaralhadas de novo.
+ * embaralhadas de novo. Terceira rodada (2026-11-16): a leitura curta diz que linhas paralelas e igualmente espaçadas são
+ * uma onda e separa o degrau do vinco pela direção da faixa dos dois lados, e as letras embaralhadas outra vez.
  *
  * Uso: node docs/modelar/banco-de-provas/reflexo-na-bancada-2026-11-15/preparar-prova-cega.mjs
  *   Saída em tmp/prova-cega/: pedidos/chapa-<letra>/pedido.md e as imagens, e gabarito.json. */
@@ -24,7 +25,7 @@ const BASE = join(REPO, 'tmp/prova-cega');
 const VISTAS = ['frontal', 'isometrica', 'tresquartos'];
 const GIRO = 45;
 /* a ordem das letras é fixa e não segue a de CHAPAS, para a letra não dizer a chapa */
-const LETRAS = { degrau: 'a', 'ondulada-025': 'b', 'quebra-de-curvatura': 'c', lisa: 'd', 'ondulada-050': 'e', 'ondulada-100': 'f', vinco: 'g' };
+const LETRAS = { 'ondulada-050': 'a', vinco: 'b', degrau: 'c', 'ondulada-100': 'd', lisa: 'e', 'quebra-de-curvatura': 'f', 'ondulada-025': 'g' };
 
 /* onde fica a linha do defeito, nas imagens, para o gabarito: a linha do meio da chapa, perpendicular ao arco */
 const LUGAR_DA_EMENDA = 'a linha reta pelo centro da chapa que liga o meio dos dois lados maiores: na vista frontal, a diagonal que desce da esquerda para a direita, de perto de (0,3; 0,3) a (0,7; 0,7) do quadro (a linha x = 300 mm da chapa girada 45 graus)';

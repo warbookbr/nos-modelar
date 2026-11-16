@@ -594,10 +594,10 @@ export const LEITURA_DA_FAIXA = 'Faixa reta e contínua é chapa boa; faixa tort
 export const LEITURA_DO_REFLEXO = Object.freeze([
   'A faixa refletida lê a direção da chapa, e não a altura: ela anda onde a superfície inclina, e passa reta onde a chapa só sobe ou desce sem inclinar.',
   `${LEITURA_DA_FAIXA} Num painel liso o espaçamento das faixas muda devagar, sem degrau.`,
-  'Degrau, com as duas folhas paralelas e uma mais alta: a faixa atravessa a linha sem salto, e o que aparece é só um traço fino ao longo dela.',
+  'Degrau, com as duas folhas paralelas e uma mais alta: na linha a faixa pode dar um passo curto para o lado, mas dos dois lados ela segue na mesma direção e com o mesmo espaçamento, e um traço fino corre ao longo da linha. Se dos dois lados a faixa muda de direção ou de espaçamento, é vinco, e não degrau.',
   'Vinco, a chapa dobrando numa linha: a faixa se parte nessa linha e continua deslocada do outro lado, como dentes ou um X. Com listra fina o salto pode passar de uma listra inteira e parecer pequeno; a listra larga diz o tamanho.',
   'Quebra de curvatura, o raio mudando numa linha sem dobra: a faixa não se parte; ela faz um cotovelo na linha e fica mais apertada de um lado que do outro.',
-  'Ondulação: a faixa serpenteia em ondas regulares por toda a área; quanto maior a onda, mais a faixa entorta, até se dobrar em ziguezague e as listras se multiplicarem.',
+  'Ondulação: a faixa serpenteia em ondas regulares por toda a área; quanto maior a onda, mais a faixa entorta, até se dobrar em ziguezague e as listras se multiplicarem. Duas ou mais linhas de cotovelo ou de salto, paralelas e com o mesmo espaçamento entre si, são as cristas de uma onda, e não vários vincos ou quebras; vinco e quebra são uma linha só.',
   'Amassado: a faixa se curva em volta de um disco, ou o disco aparece com a cor invertida.',
   'A zebra vem em duas direções, e uma vê o que a outra não vê: a listra deitada (0 grau) lê a chapa inclinar para cima e para baixo, e a em pé (90 graus), para os lados. Uma linha de defeito ou uma onda que corre na mesma direção da listra quase não muda a faixa; na outra direção aparece. Leia as duas antes de dizer que a chapa está lisa.',
   'A pintura mostra o mesmo pela borda clara da caixa de luz; de frente ela serrilha na ondulação e dobra no vinco, mas de três quartos e de cima quase não mostra a ondulação.',
