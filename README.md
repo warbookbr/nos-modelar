@@ -74,7 +74,7 @@ robótico, e `npm run comecar -- modelar/peca/corrigir` lista as peças. Os gate
 vez por `npm run gates`, e `reguas:check` reprova quando a lista local e a do CI
 divergem.
 
-Planos ativos: <!-- planos-ativos:inicio -->[modelagem de robô humanoide](docs/modelar/planos/2026-11-14-modelagem-de-robo.md), [modelagem de carro de passeio](docs/modelar/planos/2026-11-14-modelagem-de-carro.md), [leitura por partes](docs/modelar/planos/2026-11-14-leitura-por-partes.md), [cordão de solda na costura de tubos](docs/modelar/planos/2026-11-15-costura-em-no-de-tubos.md) e [reflexo na bancada](docs/modelar/planos/2026-11-15-reflexo-na-bancada.md).<!-- planos-ativos:fim -->
+Planos ativos: <!-- planos-ativos:inicio -->[modelagem de robô humanoide](docs/modelar/planos/2026-11-14-modelagem-de-robo.md), [modelagem de carro de passeio](docs/modelar/planos/2026-11-14-modelagem-de-carro.md), [leitura por partes](docs/modelar/planos/2026-11-14-leitura-por-partes.md), [cordão de solda na costura de tubos](docs/modelar/planos/2026-11-15-costura-em-no-de-tubos.md), [reflexo na bancada](docs/modelar/planos/2026-11-15-reflexo-na-bancada.md) e [família de componentes eletrônicos](docs/modelar/planos/2026-11-16-familia-componentes-eletronicos.md).<!-- planos-ativos:fim -->
 
 Já fecharam [ajustes no núcleo dos veículos](./docs/modelar/decisoes/PLANOS-ENCERRADOS.md) em 2026-10-30;
 Já fecharam [veículos de referência livre](./docs/modelar/decisoes/PLANOS-ENCERRADOS.md) em 2026-10-20; [objetos externos

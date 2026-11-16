@@ -1,8 +1,10 @@
 # Família de componentes eletrônicos: as peças por encapsulamento e a placa declarada, provadas no braço robótico
 
-**Estado:** rascunho
+**Estado:** ativo
 
-**Território:** a declarar ao ativar; deve ficar em `procedural/familias/componente-eletronico/`, `procedural/familias/index.js` (o registro da família), `procedural/pecas/braco-robotico/partes/base/` (a caixa lateral e a placa dentro dela) e `docs/modelar/banco-de-provas/componentes-eletronicos-<data>/`.
+**Território:** `procedural/familias/componente-eletronico/`, `procedural/familias/index.js`, `procedural/pecas/braco-robotico/partes/base/`, `docs/modelar/banco-de-provas/componentes-eletronicos-2026-11-16/`
+
+Ativado pela pessoa em 2026-11-16, ao ver as pranchas da placa do Eletrifica, como o caminho para a placa em 3D com os componentes.
 
 **Responsável:** a IA da sessão implementa; Tiago aprova por imagem.
 
