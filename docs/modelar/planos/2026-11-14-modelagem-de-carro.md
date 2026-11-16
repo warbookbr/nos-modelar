@@ -161,6 +161,8 @@ Decidido também em 2026-11-14, para este plano e para o do robô humanoide: a p
 
 O processo de hoje não registra esse veredito como rodada. A `rodada-de-modelagem` guarda o relato do modelador e o veredito do crítico, e o que a pessoa diz entra só como pedido de alteração em `pedidos.json`, que exige o id de uma regra que faltou e conta por etapa, sem nota nem defeito no vocabulário do veredito. O processo não pegaria sozinho a rodada fechada sem o olhar da pessoa. Até a ferramenta mudar, o veredito dela fica escrito no `ALINHAMENTO.md` da peça, por rodada, e os pedidos em `pedidos.json`; o campo de veredito da pessoa no registro da rodada, com a recusa de fechar a rodada sem ele nas peças que o declararem, vai ao backlog por este plano, porque a ferramenta está fora do território.
 
+Decidido pela pessoa em 2026-11-16: a meta da lataria é superfície de qualidade de produção, com continuidade de curvatura (G2) e inspeção por reflexo, e o projeto não aceita a subdivisão como teto, mesmo que isso peça um módulo de superfície novo. O limite medido da subdivisão Catmull-Clark (G1 e curvatura divergente nos vértices extraordinários, pela pesquisa em `modulos/pesquisa/novidades-2026-11/alisamento-de-superficie.md`) é um problema a resolver, não uma ressalva a escrever. O plano das ferramentas de correção, que sai da rodada 2 do quarto traseiro, mede o G2 que a subdivisão alcança com o alisamento e as emendas, e, onde ela não alcançar, propõe o caminho para chegar lá (vértice extraordinário tratado, subdivisão guiada, ou superfície NURBS própria no núcleo), com a medida que decide entre eles.
+
 ## Fechamento
 
 Preencher somente ao concluir ou cancelar.
