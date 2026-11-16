@@ -8,7 +8,7 @@
 
 **Repositório e base:** `warbookbr/nos-modelar`, main na ativação.
 
-Gerado pelo plano-raiz [eletrônica no Modelar](2026-11-16-eletronica-no-modelar.md), fatia 1. Objeto-alvo escolhido pela pessoa em 2026-11-16: o braço robótico.
+Gerado pelo plano-raiz [o lado Modelar da mecatrônica](2026-11-16-eletronica-no-modelar.md), fatia 1. Objeto-alvo escolhido pela pessoa em 2026-11-16: o braço robótico.
 
 ## Problema observado
 
@@ -24,11 +24,11 @@ Uma família `componente-eletronico` gera, por parâmetros, as peças eletrônic
 
 Família de encapsulamentos: CRIAR em `procedural/familias/componente-eletronico/`, com o mesmo formato das famílias que existem (`familia.json`, `derivar.js`, `composicoes.js`, `aprovacao.json`, teste), um tipo por encapsulamento e as medidas típicas como parâmetros com faixa. A intenção do autor é "um capacitor eletrolítico de 10 mm por 16 mm aqui", sem desenhar o cilindro.
 
-Placa: ENVOLVER a família numa composição de placa (ou num ajudante declarado na família) que recebe o contorno, a espessura, os furos e a lista `{ tipo, parametros, posicao: [x, y], giro, lado }` e devolve a placa com as peças, cada peça na própria parte para a montagem poder citá-la depois (é o que o plano 2 vai ligar).
+Placa: ENVOLVER a família numa composição de placa (ou num ajudante declarado na família) que recebe o contorno, a espessura, os furos e a lista `{ tipo, parametros, posicao: [x, y], giro, lado }` e devolve a placa com as peças, cada peça na própria parte para a montagem poder citá-la depois (é o que a ficha do [plano da ponte](2026-11-16-ponte-com-a-mecatronica.md) vai citar).
 
 Núcleo: USAR DIRETO o que existe (`extrusao` com furos para a placa, `lathe`, `loft`, `cubo`, `arranja` para pinos repetidos). Se faltar uma capacidade, ela entra com nome geral e plano próprio; este plano não muda o núcleo.
 
-Leitor de Gerber: fora, no plano 5 opcional do plano-raiz.
+Leitor de Gerber: fora, no nos-mecatronica.
 
 ## Incluído
 
@@ -41,9 +41,9 @@ Leitor de Gerber: fora, no plano 5 opcional do plano-raiz.
 
 ## Excluído
 
-- ligações elétricas, fios e verificação de circuito, que são do plano 2;
+- portas elétricas e a ficha do objeto, que são do plano da ponte, e ligações elétricas, fios e verificação de circuito, que são do nos-mecatronica;
 - trilhas de cobre desenhadas como caminho, que ficam como textura ou relevo simples da face, sem significado elétrico;
-- o leitor de Gerber e a reconstrução de placa existente (plano 5);
+- o leitor de Gerber e a reconstrução de placa existente, que são do nos-mecatronica;
 - foto de componente com marca no repositório.
 
 ## Gate de saída
@@ -61,7 +61,7 @@ Leitor de Gerber: fora, no plano 5 opcional do plano-raiz.
 2. Os encapsulamentos restantes e o dissipador.
 3. A placa declarada, com a placa de prova.
 4. A placa de controle do braço robótico na caixa lateral da base, com imagem para a pessoa.
-5. Documentação, banco de provas e fechamento; e, no plano-raiz, a fatia 2 (escrever o plano das ligações elétricas).
+5. Documentação, banco de provas e fechamento.
 
 ## Riscos e parada
 
