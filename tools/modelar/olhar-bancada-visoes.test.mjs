@@ -266,11 +266,12 @@ const LIMITE_DE_PIXELS_SATURADOS = 0.01;
 
 describe('olhar-bancada: a luz rasante não estoura a peça', () => {
   it('no quarto traseiro do carro, a fração de pixels saturados fica abaixo do limite declarado', async () => {
-    const r = await capturar('carro-fastback/lataria', ['--visao=luz-rasante', '--enquadrar'], 'isometrica-traseira');
+    /* A lataria da rodada 2 leva uns 130 s só para gerar no CI (a subdivisão da rede ficou mais densa), acima do prazo padrão de 90 s da bancada. */
+    const r = await capturar('carro-fastback/lataria', ['--visao=luz-rasante', '--enquadrar', '--prazo=600'], 'isometrica-traseira');
     const m = medir(r.arquivo);
     expect(m.ocupacao).toBeGreaterThan(0.2);
     expect(m.saturados).toBeLessThan(LIMITE_DE_PIXELS_SATURADOS);
-  }, 400_000);
+  }, 900_000);
 });
 
 describe('olhar-bancada: a pintura', () => {
