@@ -53,6 +53,8 @@ Todo plano curto deve declarar:
 6. limites e itens explicitamente fora;
 7. resultado, decisão e caminho de encerramento.
 
+Um plano-raiz declara `**Tipo:** raiz` abaixo do Estado: ele só gera outros planos, não tem implementação e não passa a `pronto` nem a `ativo`, o que `npm run planos:check` recusa.
+
 Estados aceitos nos planos executivos datados: `rascunho`, `pronto`, `ativo`,
 `concluído` e `cancelado`. Até 6 planos podem estar `ativo` ao mesmo tempo, cada um com território declarado (seção abaixo); eram 5 até 2026-11-10, quando duas sessões em paralelo abriram cada uma um plano sobre a mesma base e a pessoa deixou a decisão com quem conduzia.
 

@@ -143,6 +143,15 @@ export function conferirPlanos({
       problemas.push(`${nome}: ${linhas} linhas; o limite é ${TETO_DE_LINHAS}`);
     }
     if (!estado || !ESTADOS.has(estado)) problemas.push(`${nome}: estado ausente ou inválido`);
+    /* Plano-raiz (`**Tipo:** raiz`) só gera outros planos e não se ativa: ele não tem implementação nem gate de código,
+       e ativá-lo daria um lugar de plano ativo a quem não muda nada. */
+    const tipo = texto.match(/^\*\*Tipo:\*\*\s*(.+?)\s*$/mi)?.[1]?.toLowerCase();
+    if (tipo === 'raiz' && (estado === 'ativo' || estado === 'pronto')) {
+      problemas.push(
+        `${nome}: é plano-raiz (**Tipo:** raiz) e está '${estado}'; plano-raiz não se ativa. ` +
+        'Volte o estado a rascunho e ative um dos planos que ele gera.',
+      );
+    }
     if (!naRaiz && estado && ESTADOS_EM_JOGO.has(estado)) {
       problemas.push(
         `${nome}: está em subpasta com estado '${estado}'. Plano em jogo mora na raiz de planos/; ` +

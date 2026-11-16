@@ -31,6 +31,16 @@ describe('gate dos planos curtos', () => {
     expect(conferirPlanos({ pasta: ambiente() }).problemas).toEqual([]);
   });
 
+  it('recusa ativar plano-raiz e aceita o plano-raiz em rascunho', () => {
+    const nome = '2026-11-16-raiz.md';
+    const pasta = ambiente(`**Planos ativos:**\n\n1. [Raiz](${nome}), nada.\n`);
+    writeFileSync(join(pasta, nome), ['# Raiz', '', '**Estado:** ativo', '**Território:** nenhum (aguarda aprovação)', '**Tipo:** raiz'].join('\n'));
+    expect(conferirPlanos({ pasta }).problemas.join('\n')).toMatch(/plano-raiz não se ativa/);
+    const pasta2 = ambiente();
+    writeFileSync(join(pasta2, nome), ['# Raiz', '', '**Estado:** rascunho', '**Tipo:** raiz'].join('\n'));
+    expect(conferirPlanos({ pasta: pasta2 }).problemas.filter((p) => /plano-raiz/.test(p))).toEqual([]);
+  });
+
   const lista = (...nomes) => `**Planos ativos:**\n\n${nomes.map((n, i) => `${i + 1}. [Plano](${n}), território, fatia 1.`).join('\n')}\n`;
 
   it('aceita um único plano ativo apontado pelo índice', () => {
