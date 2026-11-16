@@ -158,6 +158,7 @@ travando alguém, não quando é plausível**.
 | `alinhar` (centragem derivada) | 3 de 95 `transladar` têm cara de centragem, e os três já usam parâmetro nomeado (`centroBuchaY`), não conta na mão | recusado |
 | `loft` fechado | 0 de 22 — **medida inválida**, ver abaixo | **implementado** |
 | variantes nomeadas de revisão | nenhuma ramificação ocorreu; a cadeia de autoria é linear e a escrita concorrente é recusada, não ramificada | recusado |
+| Casca aberta por face sem parte | no pedal da `bicicleta-urbana` (2026-11-16), as paredes que um `subtrair` cria nasceram sem parte, a troca de um grupo provisório anterior ao corte não as alcançou, e a guarda disse só "parte pedais tem casca aberta (136 arestas soltas)"; o modelador achou a causa com script próprio. A guarda poderia dizer quantas faces sem parte encostam na borda aberta, ou o `subtrair` herdar a parte das faces que o corte cria |
 
 A comparação que decide: `em`/`eixo` entrou com **128 de 853 passos** (15%) em
 transporte puro, e o ponto nomeado com **18 de 61 parâmetros** do freio

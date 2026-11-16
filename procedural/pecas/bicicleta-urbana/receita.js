@@ -958,6 +958,8 @@ export function gerarPassos(T) {
       passos.push(['subtrair', { origemId: sid, solidos: [molduraSel, { origem: { op: 'extrusao', id: cid } }] }]);
       /* o grupo provisório vira `pedais` já aqui (a marcação em lote vem no fim e não troca parte de face já nomeada) */
       passos.push(['parte', { nome: 'pedais', sel: molduraSel, substituir: true }]);
+      /* as paredes que o corte cria (o fundo e os lados da abertura) nascem sem parte e não estão no grupo; sem elas na parte a casca fica aberta */
+      passos.push(['parte', { nome: 'pedais', sel: { origem: { op: 'subtrair', id: sid } } }]);
       passos.push(['material', { sel: { origem: { op: 'subtrair', id: sid } }, usa: it.material }]);
       for (const idA of idsArredonda) passos.push(['material', { sel: { origem: { op: 'arredondarAresta', id: idA } }, usa: it.material }]);
       passos.push(['material', { sel: { origem: { op: 'extrusao', id: oid } }, usa: it.material }]);
