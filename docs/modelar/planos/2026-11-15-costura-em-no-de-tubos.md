@@ -68,8 +68,8 @@ Escamas da solda: ADIAR para o plano da ferramenta de material, como relevo que 
 2. Feita: a linha da costura como fonte do `friso`, reamostrada e suavizada, com a normal média da superfície de cada sólido.
 3. Feita: o perfil `cordao` como chanfro enxuto, com o sombreado próprio, o defeito do alto da junção oblíqua corrigido e a união robusta nos casos de dois tubos; a forma já foi escolhida pela pessoa.
 4. Feita: o ponto triplo, revisado pelo revisor adversarial por ser mudança de núcleo.
-5. Em andamento: a bicicleta, com as juntas com o cordão, a medição da peça e as imagens para a pessoa; espera a aprovação da forma.
-6. A fusão do canto quase coincidente na união, com a tolerância declarada e medida contra o retrato do acervo, e a varredura do gate 8; revisada pelo revisor adversarial por ser mudança de núcleo. Vem logo depois da aprovação da bicicleta, por ser a correção que mais custa a quem escreve receita.
+5. Feita: a bicicleta, com as juntas do quadro e do garfo com o cordão, aprovada pela pessoa por imagem em 2026-11-16 ("a solda atual ficou muito boa"; a bicicleta inteira, de lado, de frente e em perspectiva, ao lado da foto).
+6. Feita (b1dd71ba, revisada pelo revisor adversarial): a fusão do canto quase coincidente na união, com a tolerância declarada e medida contra o retrato do acervo, e a varredura do gate 8; revisada pelo revisor adversarial por ser mudança de núcleo. Vem logo depois da aprovação da bicicleta, por ser a correção que mais custa a quem escreve receita.
 7. O refinamento perto da costura feito pela ferramenta, e a bicicleta sem os anéis próprios (gate 9).
 8. Documentação e fechamento.
 
