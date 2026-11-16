@@ -23,13 +23,13 @@ function pecaDeUmaParte() {
 const camadaDeLinhas = (malha) => malha.children.filter((filho) => filho.isLineSegments);
 
 describe('registro de visões', () => {
-  it('tem as seis visões na ordem do seletor, com tecla própria cada uma', () => {
-    expect(VISOES.map((v) => v.id)).toEqual(['solida', 'arame', 'raio-x', 'curvatura', 'zebra', 'luz-rasante']);
+  it('tem as sete visões na ordem do seletor, com tecla própria cada uma', () => {
+    expect(VISOES.map((v) => v.id)).toEqual(['solida', 'arame', 'raio-x', 'curvatura', 'zebra', 'luz-rasante', 'pintura']);
     const teclas = VISOES.map((v) => v.atalho);
     expect(new Set(teclas).size).toBe(teclas.length);
   });
 
-  it('as seis funcionam, cada uma com o que aplica e o que desfaz', () => {
+  it('as sete funcionam, cada uma com o que aplica e o que desfaz', () => {
     expect(VISOES.filter(visaoDisponivel).map((v) => v.id)).toEqual(VISOES.map((v) => v.id));
   });
 });
@@ -145,6 +145,6 @@ describe('seletor de visão: a visão forçada pela captura', () => {
   });
 
   it('declara que controle da captura cada visão aceita', () => {
-    expect(Object.fromEntries(VISOES.filter((v) => v.controlesDaCaptura).map((v) => [v.id, v.controlesDaCaptura]))).toEqual({ zebra: ['larguraDaZebra'], 'luz-rasante': ['azimute'] });
+    expect(Object.fromEntries(VISOES.filter((v) => v.controlesDaCaptura).map((v) => [v.id, v.controlesDaCaptura]))).toEqual({ zebra: ['larguraDaZebra'], 'luz-rasante': ['azimute'], pintura: ['larguraDaPintura'] });
   });
 });

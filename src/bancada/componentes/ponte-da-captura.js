@@ -5,6 +5,7 @@
  * estes nomes de fora do repositório da página, e uma chave perdida só aparece quando um deles quebra. */
 
 import { definirLarguraDaZebra } from '../visoes/visao-zebra.js';
+import { definirLarguraDaPintura } from '../visoes/visao-pintura.js';
 import { definirAzimuteDaLuzRasante } from '../visoes/visao-luz-rasante.js';
 import { estadoDaCurvatura } from '../visoes/visao-curvatura.js';
 
@@ -82,14 +83,15 @@ export function criarPonteDaCaptura({
        medir a silhueta projetada; faltava publicar isso na ponte. */
     enquadramento: () => ambiente.medirEnquadramento(),
     /* A VISÃO DO REGISTRO NA CAPTURA (`--visao`): liga a visão pedida sobre a peça com o seletor suspenso da auditoria e aplica os
-       controles dela (`larguraDaZebra`, em graus, da zebra; `azimute`, em graus, da luz rasante). Devolve { ok, visao } ou { ok: false,
+       controles dela (`larguraDaZebra`, em graus, da zebra; `azimute`, em graus, da luz rasante; `larguraDaPintura`, em graus, das faixas da pintura). Devolve { ok, visao } ou { ok: false,
        motivo }. `semAuditoria` a desfaz. */
-    visao: (id, { larguraDaZebra = null, azimute = null } = {}) => {
+    visao: (id, { larguraDaZebra = null, azimute = null, larguraDaPintura = null } = {}) => {
       const resultado = seletorDeVisao.forcar(id);
       if (!resultado.ok) return resultado;
       const feito = { ...resultado };
       if (id === 'zebra' && larguraDaZebra !== null) feito.larguraDaZebra = definirLarguraDaZebra(larguraDaZebra);
       if (id === 'luz-rasante' && azimute !== null) feito.azimute = definirAzimuteDaLuzRasante(ambiente, azimute);
+      if (id === 'pintura' && larguraDaPintura !== null) feito.larguraDaPintura = definirLarguraDaPintura(larguraDaPintura);
       return feito;
     },
     /* Resolve quando a visão ligada terminou de pintar: a curvatura calcula num worker e não está pronta ao ligar; as outras estão. */

@@ -18,6 +18,10 @@
  * contra 0,0080 a 30). O que estourava a lateral da carenagem de prova era a direção, e não o brilho, a intensidade, o espaço de
  * cor ou a falta de luz de ambiente, que o Blender também não tem.
  *
+ * A EXPOSIÇÃO: a luz mais alta que a vista de três quartos pede leva a face voltada para ela ao branco (a traseira do quarto
+ * traseiro do carro saiu estourada em 2026-11-16); a força da luz é então reduzida pelo fator que põe o percentil 99 do brilho da
+ * peça vista em 0,7 (`exposicaoDaLuz`), e fica a de sempre quando nada passa disso.
+ *
  * DESFAZER NÃO DEIXA RESTO: a luz e o mapa de sombra dela saem da cena e são descartados, as luzes do estúdio voltam a como
  * estavam, e os materiais do autor voltam à peça. Uma peça nova que chega com a visão ligada (`aplicar` sem `desfazer`) reaproveita
  * a mesma luz.
@@ -25,7 +29,7 @@
  * A visão não toca a página: o relógio de quadros e o controle da direção vêm da caixa da visão (`contexto.pagina`,
  * `componentes/caixa-da-visao.js`). */
 import * as THREE from 'three';
-import { AZIMUTE_PREFERIDO, BRILHO_RASANTE, RASANTE_GRAUS, amostrasDaVista, direcaoDaLuz, escolherLuz } from './azimute-da-luz.js';
+import { AZIMUTE_PREFERIDO, BRILHO_RASANTE, RASANTE_GRAUS, amostrasDaVista, direcaoDaLuz, escolherLuz, exposicaoDaLuz } from './azimute-da-luz.js';
 import { restaurarMateriais, superficiesDe, trocarMateriais } from './materiais-da-visao.js';
 
 const ID = 'luz-rasante';
@@ -39,7 +43,7 @@ const estados = new WeakMap();
 const SEM_AMBIENTE = {};
 function estadoDe(ambiente) {
   const chave = ambiente ?? SEM_AMBIENTE;
-  if (!estados.has(chave)) estados.set(chave, { ativa: false, luz: null, apagadas: [], pararQuadro: null, contexto: null, azimute: null, elevacao: null, peca: undefined });
+  if (!estados.has(chave)) estados.set(chave, { ativa: false, luz: null, apagadas: [], pararQuadro: null, contexto: null, azimute: null, elevacao: null, exposicao: 1, amostras: null, peca: undefined });
   return estados.get(chave);
 }
 
@@ -59,7 +63,7 @@ function eixosDaCamera(camera) {
   return { xCam: unit(e[0], e[1], e[2]), yCam: unit(e[4], e[5], e[6]), zCam: unit(e[8], e[9], e[10]) };
 }
 
-/** A luz de partida para a vista da `camera`, `{ azimute, elevacao, nota, legivel, estourada, sombra }`: a que `escolherLuz` dá sobre
+/** A luz de partida para a vista da `camera`, `{ azimute, elevacao, nota, legivel, estourada, sombra, exposicao, amostras }`: a que `escolherLuz` dá sobre
  * as normais da peça que ela vê, com as `opcoes` dela por cima das da visão. */
 export function luzDaVista(grupo, camera, opcoes = {}) {
   const vista = eixosDaCamera(camera);
@@ -79,7 +83,15 @@ export function luzDaVista(grupo, camera, opcoes = {}) {
     }
   }
   const { normais, pesos } = amostrasDaVista(triangulos, vista.zCam);
-  return escolherLuz(normais, vista, { pesos, rasanteGraus: RASANTE_GRAUS, alvo: ALVO_LINEAR, ...opcoes });
+  const luz = escolherLuz(normais, vista, { pesos, rasanteGraus: RASANTE_GRAUS, alvo: ALVO_LINEAR, ...opcoes });
+  /* as amostras seguem com a luz: quem troca o azimute refaz a exposição sobre elas */
+  return { ...luz, exposicao: exposicaoDaLuz(normais, vista, luz.elevacao, luz.azimute, { pesos }), amostras: { normais, pesos, vista } };
+}
+
+/* A exposição da luz em vigor: refeita sobre as amostras da vista quando o azimute ou a elevação mudam. */
+function refazerExposicao(e) {
+  const a = e.amostras;
+  e.exposicao = a ? exposicaoDaLuz(a.normais, a.vista, e.elevacao ?? RASANTE_GRAUS, e.azimute ?? AZIMUTE_PREFERIDO, { pesos: a.pesos }) : 1;
 }
 
 const caixa = new THREE.Box3();
@@ -95,6 +107,7 @@ function reporLuz(e) {
   caixa.getBoundingSphere(esfera);
   const r = Math.max(esfera.radius, 1e-3);
   const d = direcaoDaLuz(eixosDaCamera(camera), e.elevacao ?? RASANTE_GRAUS, e.azimute ?? AZIMUTE_PREFERIDO);
+  luz.intensity = INTENSIDADE_DA_LUZ * (e.exposicao ?? 1);
   luz.target.position.copy(esfera.center);
   luz.position.set(esfera.center.x - d[0] * 2 * r, esfera.center.y - d[1] * 2 * r, esfera.center.z - d[2] * 2 * r);
   luz.target.updateMatrixWorld();
@@ -157,14 +170,14 @@ function desenharControle(e) {
       passo: 5,
       valor: azimute,
       formatar: (a) => `${a}°`,
-      aoMudar: (a) => { e.azimute = a; reporLuz(e); desenharControle(e); },
+      aoMudar: (a) => { e.azimute = a; refazerExposicao(e); reporLuz(e); desenharControle(e); },
     },
     botao: {
       rotulo: 'Escolher pela vista',
       titulo: 'A direção e a altura em que a luz deixa ler melhor o relevo do que a câmera vê, sem estourar nem deixar na sombra.',
       aoClicar: () => escolherPelaVista(e),
     },
-    linhas: [{ texto: `Sol a ${elevacao}° do plano da imagem, com sombra; o resto da luz apagado. A direção conta a partir da direita da tela, no sentido de quem sobe.` }],
+    linhas: [{ texto: `Sol a ${elevacao}° do plano da imagem, com sombra${e.exposicao < 1 ? `, com a luz a ${Math.round(e.exposicao * 100)} % para a peça não estourar` : ''}; o resto da luz apagado. A direção conta a partir da direita da tela, no sentido de quem sobe.` }],
     dados: { azimute, elevacao },
   });
 }
@@ -175,6 +188,8 @@ function escolherPelaVista(e) {
   const luz = luzDaVista(e.contexto.grupo, camera);
   e.azimute = luz.azimute;
   e.elevacao = luz.elevacao;
+  e.amostras = luz.amostras;
+  e.exposicao = luz.exposicao;
   desenharControle(e);
   reporLuz(e);
   return e.azimute;
@@ -215,10 +230,13 @@ export function desfazerLuzRasante(contexto) {
  * sem `elevacao`, a troca mantém a que estava. */
 export const azimuteDaLuzRasante = (ambiente) => estadoDe(ambiente).azimute;
 export const elevacaoDaLuzRasante = (ambiente) => estadoDe(ambiente).elevacao;
+/** A exposição em vigor (fator sobre a força da luz, de 0 a 1). */
+export const exposicaoDaLuzRasante = (ambiente) => estadoDe(ambiente).exposicao;
 export function definirAzimuteDaLuzRasante(ambiente, azimute, elevacao = undefined) {
   const e = estadoDe(ambiente);
   e.azimute = ((Number(azimute) % 360) + 360) % 360;
   if (elevacao !== undefined) e.elevacao = Math.min(90, Math.max(0, Number(elevacao)));
+  refazerExposicao(e);
   if (e.ativa) { desenharControle(e); reporLuz(e); }
   return e.azimute;
 }

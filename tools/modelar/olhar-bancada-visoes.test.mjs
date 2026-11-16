@@ -22,9 +22,9 @@ const AMASSADA = 'chapa-de-reflexo-de-prova';
 const LISA = 'chapa-lisa-de-reflexo-de-prova';
 const FUNDO = [242, 244, 243];
 
-async function capturar(peca, opcoes) {
+async function capturar(peca, opcoes, vista = 'isometrica') {
   const saida = relative(REPO, mkdtempSync(join(PASTA, 'c-')));
-  const r = await comoCLI([peca, '--vistas=isometrica', '--sem-contatos', `--saida=${saida}`, ...opcoes]);
+  const r = await comoCLI([peca, `--vistas=${vista}`, '--sem-contatos', `--saida=${saida}`, ...opcoes]);
   expect(r.codigo, `${r.stdout}\n${r.stderr}`).toBe(0);
   const arquivos = readdirSync(join(REPO, saida)).filter((a) => a.endsWith('.png'));
   expect(arquivos).toHaveLength(1);
@@ -50,6 +50,9 @@ function medir(arquivo) {
     }
   }
   const media = soma / Math.max(1, pixels);
+  let saturados = 0;
+  for (let i = 0; i < W * H; i++) if (mascara[i] && d[4 * i] >= 250 && d[4 * i + 1] >= 250 && d[4 * i + 2] >= 250) saturados++;
+  const orientacoes = [];
   const R = 5;
   let arestas = 0; let tortas = 0; let maiorDesvio = 0;
   for (let y = R + 1; y < H - R - 1; y++) {
@@ -61,12 +64,21 @@ function medir(arquivo) {
       const gy = -lum(x - 1, y - 1) - 2 * lum(x, y - 1) - lum(x + 1, y - 1) + lum(x - 1, y + 1) + 2 * lum(x, y + 1) + lum(x + 1, y + 1);
       if (Math.hypot(gx, gy) < 200) continue;
       arestas++;
+      orientacoes.push((Math.atan2(gy, gx) * 180) / Math.PI);
       const desvio = (Math.atan2(Math.abs(gx), Math.abs(gy)) * 180) / Math.PI;
       if (desvio > 12) tortas++;
       maiorDesvio = Math.max(maiorDesvio, desvio);
     }
   }
+  /* a direção das bordas: o ângulo da normal da borda módulo 180, e quantas ficam a mais de 15 graus da direção mais comum (bins de 5 graus) */
+  const bins = new Array(36).fill(0);
+  const modulo = (a) => ((a % 180) + 180) % 180;
+  for (const o of orientacoes) bins[Math.floor(modulo(o) / 5) % 36]++;
+  const dominante = bins.indexOf(Math.max(...bins)) * 5 + 2.5;
+  const distancia = (a) => { const x = Math.abs(modulo(a) - dominante); return Math.min(x, 180 - x); };
+  const foraDaDirecao = orientacoes.filter((o) => distancia(o) > 15).length;
   return {
+    saturados: saturados / Math.max(1, pixels), foraDaDirecao, fracaoForaDaDirecao: foraDaDirecao / Math.max(1, orientacoes.length), dominante,
     ocupacao: pixels / (W * H), largura: (x1 - x0 + 1) / W, altura: (y1 - y0 + 1) / H,
     cromaMax, desvioPadrao: Math.sqrt(Math.max(0, soma2 / Math.max(1, pixels) - media ** 2)),
     arestas, tortas, fracaoTorta: tortas / Math.max(1, arestas), maiorDesvio,
@@ -78,7 +90,7 @@ describe('olhar-bancada: as visões de reflexo por comando', () => {
     const desconhecida = await comoCLI([AMASSADA, '--visao=espelho']);
     expect(desconhecida.codigo).toBe(2);
     expect(desconhecida.stderr).toMatch(/espelho/);
-    expect(desconhecida.stderr).toMatch(/solida, arame, raio-x, curvatura, zebra, luz-rasante/);
+    expect(desconhecida.stderr).toMatch(/solida, arame, raio-x, curvatura, zebra, luz-rasante, pintura/);
 
     const larguraSemZebra = await comoCLI([AMASSADA, '--visao=luz-rasante', '--largura-da-zebra=3']);
     expect(larguraSemZebra.codigo).toBe(2);
@@ -92,6 +104,10 @@ describe('olhar-bancada: as visões de reflexo por comando', () => {
     expect(fora.codigo).toBe(2);
     expect(fora.stderr).toMatch(/1,5 a 15|1.5 a 15/);
 
+    const faixasSemPintura = await comoCLI([AMASSADA, '--visao=zebra', '--largura-das-faixas=3']);
+    expect(faixasSemPintura.codigo).toBe(2);
+    expect(faixasSemPintura.stderr).toMatch(/--largura-das-faixas só vale com --visao=pintura.*"zebra"/);
+
     const misturada = await comoCLI([AMASSADA, '--visao=zebra', '--arame']);
     expect(misturada.codigo).toBe(2);
     const analise = await comoCLI([AMASSADA, '--analise', '--enquadrar']);
@@ -99,9 +115,9 @@ describe('olhar-bancada: as visões de reflexo por comando', () => {
     expect(analise.stderr).toMatch(/--analise/);
   });
 
-  it('a ajuda lista as quatro opções', async () => {
+  it('a ajuda lista as cinco opções', async () => {
     const r = await comoCLI(['--ajuda']);
-    for (const opcao of ['--visao=', '--largura-da-zebra=', '--azimute=', '--enquadrar']) expect(r.stdout).toContain(opcao);
+    for (const opcao of ['--visao=', '--largura-da-zebra=', '--azimute=', '--largura-das-faixas=', '--enquadrar']) expect(r.stdout).toContain(opcao);
   });
 
   it('a zebra com --enquadrar ocupa o quadro; na chapa lisa as faixas saem paralelas e no amassado se entortam', async () => {
@@ -133,5 +149,39 @@ describe('olhar-bancada: as visões de reflexo por comando', () => {
     const c = medir(curvatura.arquivo);
     expect(c.ocupacao).toBeGreaterThan(0.2);
     expect(c.cromaMax).toBeGreaterThan(40);
+  }, 120_000);
+});
+
+/** O limite declarado da fração de pixels da peça no branco (os três canais em 250 ou mais) na luz rasante. Antes da exposição, o quarto traseiro do carro saía com 18 %. */
+const LIMITE_DE_PIXELS_SATURADOS = 0.01;
+
+describe('olhar-bancada: a luz rasante não estoura a peça', () => {
+  it('no quarto traseiro do carro, a fração de pixels saturados fica abaixo do limite declarado', async () => {
+    const r = await capturar('carro-fastback/lataria', ['--visao=luz-rasante', '--enquadrar'], 'isometrica-traseira');
+    const m = medir(r.arquivo);
+    expect(m.ocupacao).toBeGreaterThan(0.2);
+    expect(m.saturados).toBeLessThan(LIMITE_DE_PIXELS_SATURADOS);
+  }, 400_000);
+});
+
+describe('olhar-bancada: a pintura', () => {
+  it('a pintura é visão de inspeção: o nome da imagem diz a largura, o controle fora dela é recusado', async () => {
+    const r = await capturar(LISA, ['--visao=pintura', '--largura-das-faixas=12', '--enquadrar']);
+    expect(r.nome).toMatch(/visao-pintura-faixas12graus-enquadrado/);
+    expect(r.stdout).toMatch(/faixas de 1[12](\.\d+)? graus/);
+  }, 120_000);
+
+  it('na chapa lisa as faixas refletidas saem retas e paralelas; no amassado elas se entortam', async () => {
+    const amassada = await capturar(AMASSADA, ['--visao=pintura', '--largura-das-faixas=4', '--enquadrar']);
+    const lisa = await capturar(LISA, ['--visao=pintura', '--largura-das-faixas=4', '--enquadrar']);
+    const a = medir(amassada.arquivo);
+    const l = medir(lisa.arquivo);
+    /* a peça enche o quadro, a pintura tem a luz das faixas sem estourar e as bordas das faixas são muitas */
+    expect(Math.max(a.largura, a.altura)).toBeGreaterThan(0.85);
+    expect(l.arestas).toBeGreaterThan(2000);
+    expect(l.saturados).toBeLessThan(0.01);
+    /* lisa: toda borda de faixa na direção mais comum (a menos de 15 graus); amassada: o amassado tira da direção mais de 2 % delas (medido: 0 e 6,2 %) */
+    expect(l.foraDaDirecao).toBe(0);
+    expect(a.fracaoForaDaDirecao).toBeGreaterThan(0.02);
   }, 120_000);
 });

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1976 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1977 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2511,6 +2511,7 @@
 - `registro-de-visoes.test.js` — registro-de-visoes.test.js — o seletor de visão sobre o controlador das partes.
 - `visao-curvatura.js` — visao-curvatura.js — a visão Curvatura da bancada: a curvatura média pintada nos vértices da peça, com a escala, as cores e a faixa ocre dos vincos das vista…
 - `visao-luz-rasante.js` — visao-luz-rasante.js — a visão Luz rasante da bancada: uma luz de sol baixa sobre o plano da imagem, com sombra, sobre a peça em material fosco, com o resto …
+- `visao-pintura.js` — visao-pintura.js — a visão Pintura da bancada: a peça vista como verniz brilhante sobre base escura, que reflete um ambiente de faixas de luz paralelas ao co…
 - `visao-zebra.js` — visao-zebra.js — a visão Zebra da bancada: listras pelo vetor refletido, como a zebra das vistas do Blender (`_material` de `tools/blender/comum.py`, tipo 'z…
 - `visoes-de-superficie.test.js` — visoes-de-superficie.test.js — a curvatura, a zebra e a luz rasante da bancada sobre a peça na cena, sem navegador.
 

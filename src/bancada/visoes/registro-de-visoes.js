@@ -18,6 +18,7 @@
  * (`visao-curvatura.js`, `visao-zebra.js`, `visao-luz-rasante.js`). */
 import { aplicarCurvatura, desfazerCurvatura } from './visao-curvatura.js';
 import { aplicarLuzRasante, desfazerLuzRasante } from './visao-luz-rasante.js';
+import { aplicarPintura, desfazerPintura } from './visao-pintura.js';
 import { aplicarZebra, desfazerZebra } from './visao-zebra.js';
 
 export const VISAO_PADRAO = 'solida';
@@ -75,6 +76,15 @@ export const VISOES = Object.freeze([
     aplicar: aplicarLuzRasante,
     desfazer: desfazerLuzRasante,
     controlesDaCaptura: ['azimute'],
+  },
+  {
+    id: 'pintura',
+    rotulo: 'Pintura',
+    atalho: 'p',
+    /* Verniz sobre base escura refletindo faixas de luz paralelas ao comprimento da peça, com a largura das faixas no controle da visão. */
+    aplicar: aplicarPintura,
+    desfazer: desfazerPintura,
+    controlesDaCaptura: ['larguraDaPintura'],
   },
 ]);
 
