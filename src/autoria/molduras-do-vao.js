@@ -24,7 +24,9 @@
  * de fora que o passo registra em `neutro.aberturas` (a mesma que o friso segue), e o vão se declara pela origem do passo, sem
  * `borda`. Os frisos declarados precisam seguir essa abertura (`superficie: { op: 'aberturaPorContorno', id }` no friso), e a
  * cobertura se mede como a de um vão de gaiola. Toda abertura por contorno também precisa de declaração: a que nenhum vão cita
- * reprova, com a origem e o tamanho da borda.
+ * reprova, com a origem e o tamanho da borda. O passo com `simetria: 'x'` abre dois vãos, e `neutro.aberturas` tem a entrada do
+ * espelhado (`espelho: true`), listada à parte: a declaração do vão do passo cobre os dois, cada borda conferida contra a cópia do
+ * friso que a segue, e o vão espelhado sem friso nenhum reprova.
  *
  * A borda sobre uma chapa com `simetria: 'x'` segue a regra do friso: a borda que não toca o plano de simetria se confere nas duas
  * metades (a cópia espelhada dos frisos contra a imagem da borda); a que toca o plano numa ponta continua pela imagem espelhada, a que
@@ -264,7 +266,8 @@ export function conferirVaosDaPeca(neutro, receita = {}) {
   for (const a of porContorno) {
     const pontos = a.borda.fora.map((v) => neutro.V.get(v)).filter(Boolean);
     const centro = [0, 1, 2].map((c) => pontos.reduce((s, p) => s + p[c], 0) / Math.max(1, pontos.length));
-    aberturas.push({ chapa: `aberturaPorContorno:${a.origemId}`, passo: a.passo, pontos: [], comprimento: comprimentoDa({ pontos: pontos.map((p) => ({ p })), fechada: true }), centro, cosseno: null, coerencia: null, vao: declaradaPorContorno.get(a.passo) ?? null, porContorno: { origemId: a.origemId, pontos: a.borda.fora.length } });
+    /* o vão espelhado pela simetria do passo sai rotulado à parte, e a declaração do vão do passo cobre os dois */
+    aberturas.push({ chapa: `aberturaPorContorno:${a.origemId}${a.espelho ? ' (vão espelhado)' : ''}`, passo: a.passo, pontos: [], comprimento: comprimentoDa({ pontos: pontos.map((p) => ({ p })), fechada: true }), centro, cosseno: null, coerencia: null, vao: declaradaPorContorno.get(a.passo) ?? null, porContorno: { origemId: a.origemId, pontos: a.borda.fora.length, espelho: !!a.espelho } });
   }
   const problemas = [
     ...vaos.flatMap((v) => v.problemas.map((t) => `${citar(v.nome)}: ${t}`)),
@@ -274,35 +277,51 @@ export function conferirVaosDaPeca(neutro, receita = {}) {
 }
 
 /* O vão de uma abertura por contorno: a borda é a volta de fora que o passo registrou em `neutro.aberturas`, e os frisos declarados
-   precisam segui-la. -> a saída do vão, como a de um vão de gaiola, com o passo da abertura. */
+   precisam segui-la. Com a simetria do passo, `neutro.aberturas` tem também a entrada `espelho: true`, o vão do outro lado do plano,
+   e a declaração cobre os dois: cada borda se confere contra os frisos que a seguem (o friso da abertura segue as duas, e a cópia do
+   vão espelhado leva `espelhoDaAbertura`). -> a saída do vão, como a de um vão de gaiola, com o passo da abertura. */
 function vaoDaAbertura(d, dele, porContorno, registros, neutro, onde) {
-  const abertura = porContorno.find((a) => a.origemId === d.superficie.id);
+  const abertura = porContorno.find((a) => a.origemId === d.superficie.id && !a.espelho);
   if (!abertura) {
-    const existentes = porContorno.map((a) => `aberturaPorContorno:${a.origemId}`);
+    const existentes = [...new Set(porContorno.map((a) => `aberturaPorContorno:${a.origemId}`))];
     throw new Error(`${onde}: 'superficie' diz aberturaPorContorno:${d.superficie.id}, que não é abertura da peça (o passo não existe ou gritou). Aberturas: ${existentes.length ? existentes.join(', ') : '(nenhuma)'}.`);
   }
+  const espelho = porContorno.find((a) => a.origemId === d.superficie.id && a.espelho && a.passo === abertura.passo) ?? null;
   const fora = dele.find((r) => r.gaiola != null || r.superficie !== abertura.passo);
   if (fora) throw new Error(`${onde}: o friso ${citar(fora.nome)} não segue a borda da abertura aberturaPorContorno:${abertura.origemId}; o friso do vão dela leva superficie: { op: 'aberturaPorContorno', id: ${abertura.origemId} }.`);
-  const borda = abertura.borda.fora.map((v) => {
+  const bordaDe = (a) => a.borda.fora.map((v) => {
     const p = neutro.V.get(v);
-    if (!p) throw new Error(`${onde}: o vértice ${v} da borda da abertura aberturaPorContorno:${abertura.origemId} não existe mais na malha; a moldura se confere sobre a borda que o passo deixou.`);
+    if (!p) throw new Error(`${onde}: o vértice ${v} da borda ${a.espelho ? 'do vão espelhado ' : ''}da abertura aberturaPorContorno:${abertura.origemId} não existe mais na malha; a moldura se confere sobre a borda que o passo deixou.`);
     return { nome: null, p };
   });
+  /* cada vão com a borda dele e os frisos que a seguem: o declarado com a cópia sem `espelhoDaAbertura`, o espelhado com a outra */
+  const lados = [{ borda: bordaDe(abertura), espelhada: false }, ...(espelho ? [{ borda: bordaDe(espelho), espelhada: true }] : [])];
+  const doLado = (lista, espelhada) => lista.filter((r) => !!r.espelhoDaAbertura === espelhada);
   const saida = { nome: d.nome, frisos: d.frisos, parcial: d.parcial, semMoldura: d.semMoldura, tolerancia: d.tolerancia, problemas: [], descobertos: [], emendas: [], comprimento: 0, amostras: 0, cobertas: 0, passo: abertura.passo };
   if (d.semMoldura) {
-    saida.comprimento = comprimentoDa({ pontos: borda, fechada: true });
     const seguem = registros.filter((r) => r.gaiola == null && r.superficie === abertura.passo);
-    if (seguem.length) {
-      const r = conferirMoldura({ borda, fechada: true, frisos: seguem, tolerancia: d.tolerancia });
-      if (r.cobertas > 0) saida.problemas.push(`declarado sem moldura (${d.semMoldura.motivo}) e ${((100 * r.cobertas) / r.amostras).toFixed(1).replace('.', ',')}% da borda fica sob a faixa de um friso que segue a abertura (${lista([...new Set(seguem.map((f) => f.nome))])}): declare os frisos do vão em \`frisos\` no lugar de \`semMoldura\`.`);
+    for (const { borda, espelhada } of lados) {
+      saida.comprimento += comprimentoDa({ pontos: borda, fechada: true });
+      const deste = doLado(seguem, espelhada);
+      if (!deste.length) continue;
+      const r = conferirMoldura({ borda, fechada: true, frisos: deste, tolerancia: d.tolerancia });
+      if (r.cobertas > 0) saida.problemas.push(`declarado sem moldura (${d.semMoldura.motivo}) e ${((100 * r.cobertas) / r.amostras).toFixed(1).replace('.', ',')}% da borda${espelhada ? ' do vão espelhado' : ''} fica sob a faixa de um friso que segue a abertura (${lista([...new Set(deste.map((f) => f.nome))])}): declare os frisos do vão em \`frisos\` no lugar de \`semMoldura\`.`);
     }
     return saida;
   }
-  const r = conferirMoldura({ borda, fechada: true, frisos: dele, tolerancia: d.tolerancia });
-  saida.comprimento = r.comprimento; saida.amostras = r.amostras; saida.cobertas = r.cobertas;
-  saida.descobertos = r.descobertos.map((t) => ({ ...t, espelhada: false }));
-  saida.emendas = r.emendas.map((t) => ({ ...t, espelhada: false }));
-  saida.problemas = problemasDoVao(saida);
+  for (const { borda, espelhada } of lados) {
+    const deste = doLado(dele, espelhada);
+    if (espelhada && !deste.length) {
+      saida.problemas.push(`o vão espelhado de aberturaPorContorno:${abertura.origemId} não tem moldura: o passo abriu o vão também do outro lado do plano x = 0 (simetria: 'x'), e nenhum dos frisos ${lista(d.frisos)} segue a borda dele, de ${mm(comprimentoDa({ pontos: borda, fechada: true }))} mm. O friso que segue a abertura com simetria contorna os dois vãos; declare o friso no vão ou, se o vão espelhado fica sem moldura de propósito, tire a simetria do passo e abra-o num passo próprio com ${EXEMPLO_SEM_MOLDURA}.`);
+      saida.comprimento += comprimentoDa({ pontos: borda, fechada: true });
+      continue;
+    }
+    const r = conferirMoldura({ borda, fechada: true, frisos: deste, tolerancia: d.tolerancia });
+    saida.comprimento += r.comprimento; saida.amostras += r.amostras; saida.cobertas += r.cobertas;
+    saida.descobertos.push(...r.descobertos.map((t) => ({ ...t, espelhada })));
+    saida.emendas.push(...r.emendas.map((t) => ({ ...t, espelhada })));
+  }
+  saida.problemas.push(...problemasDoVao(saida));
   return saida;
 }
 

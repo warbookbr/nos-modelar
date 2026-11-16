@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/nucleo/gaiola-por-rede.js`, `procedural/nucleo/gaiola-por-rede-liso.js`, `procedural/nucleo/curva-da-gaiola.js`, `procedural/nucleo/operacoes/abertura-por-contorno.js`, `procedural/nucleo/subdivisao.js`, `procedural/nucleo/operacoes/subdivisao.js`, `procedural/nucleo/uso-operacoes.js`, `procedural/nucleo/operacoes/abertura-por-contorno-simetria.test.ts`, `procedural/nucleo/alisar-curvas.js`, `tools/fixtures/correcao-de-superficie/`, `docs/modelar/banco-de-provas/correcao-de-superficie-2026-11-16/`, e os testes desses arquivos.
+**Território:** `procedural/nucleo/gaiola-por-rede.js`, `procedural/nucleo/gaiola-por-rede-liso.js`, `procedural/nucleo/curva-da-gaiola.js`, `procedural/nucleo/operacoes/abertura-por-contorno.js`, `procedural/nucleo/subdivisao.js`, `procedural/nucleo/operacoes/subdivisao.js`, `procedural/nucleo/uso-operacoes.js`, `src/autoria/molduras-do-vao.js`, `procedural/nucleo/operacoes/friso.js`, `procedural/nucleo/operacoes/abertura-por-contorno-simetria.test.ts`, `procedural/nucleo/alisar-curvas.js`, `tools/fixtures/correcao-de-superficie/`, `docs/modelar/banco-de-provas/correcao-de-superficie-2026-11-16/`, e os testes desses arquivos.
 
 Ativado pela pessoa em 2026-11-16, no lugar do plano do robô humanoide, que foi congelado. A lataria do carro não entra: ela é do plano do carro, que roda a rodada 3 com as ferramentas novas.
 

@@ -11,6 +11,8 @@ import { espelhoDoContorno, quadroDaVista } from './abertura-por-contorno.js';
 // @ts-expect-error — núcleo em JavaScript.
 import { manifoldCarregada } from '../manifold.js';
 import { arestasSemPar, vinculosNaoManifold } from '../../../tools/oficina/conferir-malha';
+// @ts-expect-error — serviço de autoria em JavaScript.
+import { conferirVaosDaPeca } from '../../../src/autoria/molduras-do-vao.js';
 
 const TOPO: Record<string, number[]> = {}; const FACES: string[][] = [];
 for (let i = 0; i < 4; i++) for (let k = 0; k < 4; k++) { const x = i * 0.1, z = k * 0.1 - 0.15; TOPO[`g${i}${k}`] = [x, 0.2 - x * x - z * z, z]; }
@@ -76,13 +78,93 @@ describe.skipIf(!manifoldCarregada())('aberturaPorContorno com simetria: o vão 
   it('recusa o vão que toca o plano, a simetria desconhecida e a vista x sem sentido', () => {
     const cruza = rodar({ vista: 'y', sentido: '+', contorno: retangulo(-0.02, -0.04, 0.05, 0.04) }, { simetria: true });
     expect(cruza.orfaos[0]).toMatchObject({ op: 'aberturaPorContorno', ref: 'simetria' });
-    expect(cruza.orfaos[0].motivo).toMatch(/de um lado só do plano x = 0, a mais de 0\.1 mm dele, e o contorno vai de x -20 a 50 mm/);
+    expect(cruza.orfaos[0].motivo).toMatch(/de um lado só do plano x = 0, a mais de 2[.\d]* mm dele \(a maior entre 1 mm e a espessura da chapa.*a borda prevista na chapa vai de x -20 a 50 mm/);
     const outra = rodar({ ...VAOS.y, simetria: 'z' });
     expect(outra.orfaos[0]).toMatchObject({ op: 'aberturaPorContorno', ref: 'simetria' });
     expect(outra.orfaos[0].motivo).toMatch(/simetria só aceita 'x'.*veio "z"/);
     const semSentido = rodar({ vista: 'x', contorno: VAOS.x.contorno }, { simetria: true });
     expect(semSentido.orfaos[0]).toMatchObject({ op: 'aberturaPorContorno', ref: 'sentido' });
     expect(semSentido.orfaos[0].motivo).toMatch(/na vista 'x'.*declare sentido/);
+  });
+});
+
+describe.skipIf(!manifoldCarregada())('aberturaPorContorno com simetria: a folga do plano e os dois vãos no mesmo eixo', () => {
+  it('o vão a menos da folga do plano recusa antes do corte, em toda vista, e dizendo a distância', () => {
+    /* a 0,2 mm do plano a limpeza fundia os dois vãos e o grito era o genérico das bordas; de 0,3 a 1,5 mm o corte passava */
+    for (const [d, texto] of [[0.0002, '0.2'], [0.0004, '0.4'], [0.0015, '1.5']] as const) {
+      const n = rodar({ vista: 'y', sentido: '+', contorno: retangulo(d, -0.04, 0.08, 0.04) }, { simetria: true });
+      expect(n.orfaos[0]).toMatchObject({ op: 'aberturaPorContorno', ref: 'simetria' });
+      expect(n.orfaos[0].motivo).toMatch(new RegExp(`a mais de 2 mm dele .*a limpeza da costura funde as bordas dos dois vãos.*a borda prevista na chapa vai de x ${texto.replace('.', '\\.')} a 80 mm`));
+    }
+    expect(rodar({ vista: 'y', sentido: '+', contorno: retangulo(0.0025, -0.04, 0.08, 0.04) }, { simetria: true }).orfaos).toEqual([]);
+    /* na vista por vetor a borda prevista é a da reta do vetor na chapa, e não o u do desenho */
+    const vetor = rodar({ vista: [0.3, 1, 0], sentido: '+', contorno: retangulo(-0.03, 0.0145, 0.03, 0.0545) }, { simetria: true });
+    expect(vetor.orfaos[0]).toMatchObject({ op: 'aberturaPorContorno', ref: 'simetria' });
+    expect(vetor.orfaos[0].motivo).toMatch(/a mais de 2 mm dele .*a borda prevista na chapa vai de x 0\.3\d* a 42\.\d+ mm/);
+    /* na vista 'x' a camada que o vão corta é a do lado +x, e a borda prevista é onde a reta do eixo a cruza */
+    const x = rodar(VAOS.x, { simetria: true });
+    expect(x.orfaos).toEqual([]);
+  });
+
+  it("o vetor só em x com simetria: os dois prismas param no mesmo plano, recuados, e a malha fecha", () => {
+    /* antes, mesmoEixo comparava o objeto do quadro, as tampas dividiam o plano e a booleana recusava o sólido não fechado */
+    const n = rodar({ vista: [1, 0, 0], sentido: '+', contorno: retangulo(-0.03, 0.15, 0.03, 0.17) }, { simetria: true });
+    expect(n.orfaos).toEqual([]);
+    expect(n.aberturas.map((a: any) => [lado(n, a), !!a.espelho])).toEqual([['+x', false], ['-x', true]]);
+    expect(arestasSemPar(n)).toHaveLength(0);
+    expect(vinculosNaoManifold(n)).toHaveLength(0);
+  });
+
+  it('a chapa sem o outro lado do plano recusa a simetria no mesmo eixo, na vista x e no vetor só em x', () => {
+    for (const vao of [{ vista: 'x', sentido: '+' }, { vista: [1, 0, 0] }]) {
+      const n = rodar({ ...vao, contorno: retangulo(-0.03, 0.15, 0.03, 0.17) }, { simetria: true, chapa: { simetria: undefined } });
+      expect(n.orfaos[0]).toMatchObject({ op: 'aberturaPorContorno', ref: 'simetria' });
+      expect(n.orfaos[0].motivo).toMatch(/o vão espelhado é visto do mesmo eixo que o declarado, do lado oposto, e a reta do eixo atravessa a chapa uma vez só.*a chapa não tem o outro lado do plano x = 0.*tire a simetria do passo/);
+    }
+  });
+});
+
+describe.skipIf(!manifoldCarregada())('o friso e a moldura do vão espelhado pela simetria', () => {
+  const FRISO = ['friso', { origemId: 3, superficie: { op: 'aberturaPorContorno', id: 2 }, linha: { nome: 'volta' }, perfil: { retangulo: { largura: 0.006, profundidade: 0.003 } } }];
+  const comFriso = (simetria: boolean) => executarReceita({ meta: { nome: 'vao-com-simetria' }, PARAMS: {}, TOPO, PASSOS: [
+    ['subdivisao', { origemId: 1, vertices: Object.keys(TOPO), faces: FACES, niveis: 2, espessura: 0.002, simetria: 'x' }],
+    ['aberturaPorContorno', { origemId: 2, chapa: { origem: { op: 'subdivisao', id: 1 } }, ...VAOS.y, ...(simetria ? { simetria: 'x' } : {}) }],
+    FRISO,
+  ] }).neutro;
+  const VAO = { nome: 'janela', superficie: { op: 'aberturaPorContorno', id: 2 }, frisos: ['volta'] };
+  /* o neutro sem a cópia do friso que segue o vão espelhado: o que a guarda via antes, com o friso só no vão declarado */
+  const semACopia = (n: any) => Object.create(n, { frisos: { value: n.frisos.filter((f: any) => !f.espelhoDaAbertura) } });
+
+  it('o friso segue a borda dos dois vãos, e cada cópia fica sobre a borda do seu', () => {
+    const n = comFriso(true);
+    expect(n.orfaos).toEqual([]);
+    expect(n.frisos.map((f: any) => [f.nome, !!f.espelhoDaAbertura])).toEqual([['volta', false], ['volta', true]]);
+    for (const [k, f] of n.frisos.entries()) expect(Math.sign(f.secoes[0].p[0])).toBe(k === 0 ? 1 : -1);
+    expect(comFriso(false).frisos.map((f: any) => !!f.espelhoDaAbertura)).toEqual([false]);
+  });
+
+  it('a guarda confere a borda do vão espelhado e grita quando nenhum friso a cobre', () => {
+    const n = comFriso(true);
+    const r = conferirVaosDaPeca(n, { vaos: [VAO] });
+    expect(r.problemas).toEqual([]);
+    const so = conferirVaosDaPeca(comFriso(false), { vaos: [VAO] });
+    expect(r.vaos[0].amostras).toBe(2 * so.vaos[0].amostras);
+    expect(r.vaos[0].cobertas).toBe(r.vaos[0].amostras);
+    expect(r.aberturas.map((a: any) => [a.chapa, a.vao])).toEqual([['aberturaPorContorno:2', 'janela'], ['aberturaPorContorno:2 (vão espelhado)', 'janela']]);
+    /* antes da correção, a mesma declaração dava ok com o vão -x sem moldura */
+    const sem = conferirVaosDaPeca(semACopia(n), { vaos: [VAO] });
+    expect(sem.ok).toBe(false);
+    expect(sem.problemas).toEqual([expect.stringMatching(/'janela': o vão espelhado de aberturaPorContorno:2 não tem moldura: .*nenhum dos frisos 'volta' segue a borda dele/)]);
+    /* sem moldura declarada, o friso que cobre qualquer dos dois vãos reprova, cada um com o seu texto */
+    const semMoldura = conferirVaosDaPeca(n, { vaos: [{ nome: 'janela', superficie: VAO.superficie, semMoldura: { motivo: 'a janela de prova fica aberta nesta conferência, para medir a declaração' } }] });
+    expect(semMoldura.problemas).toEqual([expect.stringMatching(/100,0% da borda fica sob/), expect.stringMatching(/100,0% da borda do vão espelhado fica sob/)]);
+  });
+
+  it('sem declaração, os dois vãos reprovam, o espelhado rotulado à parte', () => {
+    expect(conferirVaosDaPeca(comFriso(true), {}).problemas).toEqual([
+      expect.stringMatching(/^a abertura aberturaPorContorno:2 não tem declaração/),
+      expect.stringMatching(/^a abertura aberturaPorContorno:2 \(vão espelhado\) não tem declaração/),
+    ]);
   });
 });
 

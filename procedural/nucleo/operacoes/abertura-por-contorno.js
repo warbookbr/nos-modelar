@@ -134,9 +134,9 @@ const SEGMENTOS_ARCO_PADRAO = 4;
 export const RECUO_PADRAO_DA_LENTE = 2.5;
 /** Distância, em metro, até a qual um vértice da costura é o ponto do polígono desenhado (a Manifold devolve Float32). */
 const NO_POLIGONO = 2e-6;
-/** Distância mínima, em metro, da borda do vão declarado ao plano x = 0 para a simetria espelhá-lo: abaixo dela as duas bordas se
- *  tocariam no plano. */
-export const FOLGA_DO_PLANO = 1e-4;
+/** Piso, em metro, da distância da borda do vão declarado ao plano x = 0 para a simetria espelhá-lo; a folga é a maior entre ele e a
+ *  espessura da chapa. Na cúpula da prova (2 mm, 2026-11-16) a limpeza da costura fundia os dois vãos a 0,2 mm do plano. */
+export const FOLGA_DO_PLANO = 1e-3;
 
 /** espelhoDoContorno(vista, quadro, poligono, sentido, num) -> { quadro, poligono, sentido, vista }
  *  O mesmo vão espelhado no plano x = 0, como o passo o corta: nas vistas 'y' e 'z' o u do desenho é x e troca de sinal; na 'x' o
@@ -261,7 +261,9 @@ function distanciaAoTriangulo(p, a, b, c) {
 /* ---- a projeção: a chapa vista do eixo ---- */
 
 /** A chapa vista do eixo da vista: quantas vezes a reta do eixo por cada ponto do contorno atravessa a casca, e se algum lado do
- *  contorno cruza a borda dela (a aresta entre uma face virada para o eixo e outra que não está). Devolve null ou a recusa. */
+ *  contorno cruza a borda dela (a aresta entre uma face virada para o eixo e outra que não está). Devolve a recusa, ou o plano do
+ *  corte da camada, quem está nela e `prevista`: onde a reta de cada ponto do contorno (e do meio de cada lado) cruza a camada que o
+ *  vão corta, [u, v, profundidade] no quadro, a borda antes do corte. */
 function conferirProjecao(Vmundo, faces, poligono, q, sentido = null) {
   const V = noQuadro(Vmundo, q);
   const { eixo, u: iu, v: iv } = q; const vista = q.nome;
@@ -304,9 +306,11 @@ function conferirProjecao(Vmundo, faces, poligono, q, sentido = null) {
   const doContorno = [];
   for (let k = 0; k < n; k++) doContorno.push(poligono[k], [(poligono[k][0] + poligono[(k + 1) % n][0]) / 2, (poligono[k][1] + poligono[(k + 1) % n][1]) / 2]);
   let corte = null;
+  const prevista = [];
   if (!sentido) {
     for (const p of doContorno) {
-      const c = camadas(p).length;
+      const ws = camadas(p); const c = ws.length;
+      for (const w of ws) prevista.push([p[0], p[1], w]);
       if (c === 0) return { recusa: `o ponto ${texto2(p)} do contorno fica fora da chapa vista ${vista}: o vão precisa caber inteiro dentro dela; traga o contorno para dentro ou troque a vista` };
       if (c > 2) return { recusa: `no ponto ${texto2(p)} do contorno a reta ${vista} atravessa a chapa ${Math.floor(c / 2)} vezes: a chapa se dobra sobre si nesta vista e o corte abriria mais de uma camada; desenhe o contorno numa vista em que a chapa passa uma vez só, ou declare sentido ('+' ou '-') para cortar só a camada vista desse lado do eixo` };
     }
@@ -322,6 +326,7 @@ function conferirProjecao(Vmundo, faces, poligono, q, sentido = null) {
         continue;
       }
       const dentro = ds[Math.min(1, ds.length - 1)];
+      if (medidos.indexOf(p) < doContorno.length) for (const d of [ds[0], dentro]) prevista.push([p[0], p[1], sinal * d]);
       if (dentro < dentroMaisFundo) { dentroMaisFundo = dentro; ondeDentro = p; }
       if (ds.length > 2 && ds[2] > seguinteMaisPerto) { seguinteMaisPerto = ds[2]; ondeSeguinte = p; }
     }
@@ -352,7 +357,7 @@ function conferirProjecao(Vmundo, faces, poligono, q, sentido = null) {
       }
     }
   }
-  return { recusa: null, corte, naCamada };
+  return { recusa: null, corte, naCamada, prevista };
 }
 
 /** Uma grade de pontos de dentro do polígono, 12 por 12 na caixa dele, para a medida da camada ver o meio do vão e não só a borda. */
@@ -1202,8 +1207,7 @@ export function criarOperacoesAberturaPorContorno(servicos) {
   };
   const proximoLocal = (ids, i, exceto = null) => { let m = -1; for (const id of ids) { if (exceto?.has(id)) continue; const k = localDe(i, id); if (k != null && k > m) m = k; } return m + 1; };
 
-  /* `chapaInteiraPor` é só da rede: o motivo com que o vão, recusado no trecho recortado, é refeito na chapa inteira. A operação
-     publicada tem a assinatura de todas, `(st, a, i)`. */
+  /* A operação publicada tem a assinatura de todas, `(st, a, i)`; o corte é de `cortar`. */
   function abrir(st, a, i) {
     if (a.origemId == null) return grita(st, i, OP, 'origemId', `${OP} é sempre estrutural: origemId é obrigatório (a chapa cortada, a parede e a borda do vão são citadas por ele)`);
     if (!Number.isSafeInteger(a.origemId) || a.origemId < 0) return grita(st, i, OP, 'origemId', 'origemId precisa ser inteiro não-negativo');
@@ -1276,20 +1280,15 @@ export function criarOperacoesAberturaPorContorno(servicos) {
     const idsDaChapa = [...selecao.faces].sort((x, y) => x - y);
     if (!idsDaChapa.length) return grita(st, i, OP, 'chapa', 'a seleção da chapa não tem face nenhuma');
     const vaos = [{ quadro, poligono, sentido, vista: a.vista }];
-    if (simetria) {
-      /* nas vistas 'y' e 'z' o u do desenho é x: o contorno que chega perto do plano recusa antes do corte */
-      if (a.vista === 'y' || a.vista === 'z') {
-        const us = poligono.map((p) => p[0]); const uMin = Math.min(...us), uMax = Math.max(...us);
-        if (!(uMin > FOLGA_DO_PLANO || uMax < -FOLGA_DO_PLANO)) return grita(st, i, OP, 'simetria', `com simetria: 'x', o vão declarado precisa ficar de um lado só do plano x = 0, a mais de ${mm(FOLGA_DO_PLANO)} mm dele, e o contorno vai de x ${mm(uMin)} a ${mm(uMax)} mm; o vão que toca ou cruza o plano sai inteiro do contorno desenhado sem simetria`);
-      }
-      vaos.push(espelhoDoContorno(a.vista, quadro, poligono, sentido, (x) => st.num(x)));
-    }
+    /* o vão que chega perto do plano recusa antes do corte, em `cortar`, pela borda prevista na chapa */
+    if (simetria) vaos.push(espelhoDoContorno(a.vista, quadro, poligono, sentido, (x) => st.num(x)));
     const corte = cortar(st, a, i, { wasm, limpezaFina, recuoDeclarado, idsDaChapa, vaos });
     if (corte?.ok) registraOrigem(st, i, OP, a.origemId, corte.registro);
   }
 
   /* O corte de um vão: o prisma do polígono na vista, a booleana sobre a chapa (ou o trecho dela em volta), a limpeza da costura e as
-     bordas. Devolve { ok, registro } para o passo registrar a origem, ou o grito. */
+     bordas. Devolve { ok, registro } para o passo registrar a origem, ou o grito. `chapaInteiraPor` é só da rede: o motivo com que o
+     vão, recusado no trecho recortado, é refeito na chapa inteira. */
   function cortar(st, a, i, { wasm, limpezaFina, recuoDeclarado, idsDaChapa, vaos }, chapaInteiraPor = null) {
     /* `vaos` é o vão desenhado e, com a simetria, o espelhado: { quadro, poligono, sentido, vista } cada um. Os dois prismas vão juntos
        à mesma booleana, porque os ids dos vértices novos são os do bloco do passo, e as bordas se separam pelo lado do plano. */
@@ -1297,7 +1296,11 @@ export function criarOperacoesAberturaPorContorno(servicos) {
     const { eixo, u: iu, v: iv } = quadro;
     const minDaChapa = [Infinity, Infinity, Infinity], maxDaChapa = [-Infinity, -Infinity, -Infinity];
     const lidos = [];
-    const mesmoEixo = vaos.length > 1 && vaos[1].quadro === vaos[0].quadro && vaos[0].sentido !== vaos[1].sentido;
+    /* os dois vãos vistos do mesmo eixo, de lados opostos (a vista 'x', ou o vetor só em x): a direção de onde cada um olha, com o
+       sentido, é oposta à do outro, e os dois prismas cobrem a mesma região do desenho */
+    const deOndeOlha = (vao) => { const l = [0, 0, 0]; l[vao.quadro.eixo] = vao.sentido === '-' ? -1 : 1; return vao.quadro.mundo(l); };
+    const mesmoEixo = vaos.length > 1 && ponto(deOndeOlha(vaos[0]), deOndeOlha(vaos[1])) < -1 + 1e-9;
+    let distanciaAoPlano = null; let ladoDoDeclarado = 1;
     for (const [k, vao] of vaos.entries()) {
       const q = vao.quadro; const P = vao.poligono;
       const { eixo: e, u: qu, v: qv } = q;
@@ -1320,6 +1323,17 @@ export function criarOperacoesAberturaPorContorno(servicos) {
       }
       const projecao = conferirProjecao(st.V, proximas, P, q, vao.sentido);
       if (projecao.recusa) return grita(st, i, OP, 'contorno', k === 0 ? projecao.recusa : `no vão espelhado pela simetria: ${projecao.recusa}`);
+      if (mesmoEixo && projecao.corte == null) return grita(st, i, OP, 'simetria', `com simetria: 'x' na vista ${q.nome}, o vão espelhado é visto do mesmo eixo que o declarado, do lado oposto, e a reta do eixo atravessa a chapa uma vez só nos pontos do contorno: a chapa não tem o outro lado do plano x = 0, e o prisma espelhado seria o mesmo do declarado; tire a simetria do passo (o vão declarado já é o único desta chapa nesta vista)`);
+      if (k === 0 && vaos.length > 1) {
+        /* A FOLGA DO PLANO. A borda prevista (onde a reta de cada ponto do contorno cruza a camada que o vão corta) fica a mais da maior
+           entre 1 mm e a espessura da chapa do plano x = 0: mais perto, a limpeza da costura funde as bordas dos dois vãos (medido na
+           cúpula da prova, 2026-11-16: a 0,2 mm do plano os dois vãos se fundiam, de 0,3 mm em diante saíam separados) */
+        const xs = projecao.prevista.map(([pu, pv, w]) => { const l = [0, 0, 0]; l[qu] = pu; l[qv] = pv; l[e] = w; return q.mundo(l)[0]; });
+        const xMin = Math.min(...xs), xMax = Math.max(...xs);
+        const folgaDoPlano = Math.max(FOLGA_DO_PLANO, espessuraVistaDoEixo(st.V, projecao.corte == null ? proximas : new Map([...proximas].filter(([, vs]) => projecao.naCamada(vs))), P, q) ?? 0);
+        distanciaAoPlano = xMin > 0 ? xMin : xMax < 0 ? -xMax : 0; ladoDoDeclarado = xMin > 0 ? 1 : -1;
+        if (!(xMin > folgaDoPlano || xMax < -folgaDoPlano)) return grita(st, i, OP, 'simetria', `com simetria: 'x', o vão declarado precisa ficar de um lado só do plano x = 0, a mais de ${mm(folgaDoPlano)} mm dele (a maior entre ${mm(FOLGA_DO_PLANO)} mm e a espessura da chapa: mais perto, a limpeza da costura funde as bordas dos dois vãos), e a borda prevista na chapa vai de x ${mm(xMin)} a ${mm(xMax)} mm; afaste o contorno do plano, ou, se o vão toca ou cruza o plano, desenhe-o inteiro sem simetria`);
+      }
       const margem = 0.25 * (wMax - wMin) + 1e-3;
       /* com a camada, o prisma vai de fora da chapa, do lado de quem olha, até o plano entre a primeira camada e a seguinte */
       let de = projecao.corte != null && vao.sentido === '+' ? projecao.corte : wMin - margem;
@@ -1551,20 +1565,22 @@ export function criarOperacoesAberturaPorContorno(servicos) {
     const casca = new Map(facesPerto.map((f) => [f, st.F.get(f).vs]));
     const voltas = voltasDaBorda(casca, parede);
     const nVoltas = 2 * lidos.length;
-    if (!voltas || voltas.length !== nVoltas) return grita(st, i, OP, 'chapa', `o corte deixou ${voltas ? voltas.length : 'uma'} borda${voltas?.length === 1 ? '' : 's'} ${voltas ? '' : 'que não fecha '}em vez ${lidos.length === 1 ? 'das duas de uma chapa (a de fora e a de dentro)' : 'das quatro dos dois vãos (a de fora e a de dentro de cada um)'}; confira que a chapa é uma chapa com espessura que o contorno atravessa uma vez`);
+    if (lidos.length > 1 && (!voltas || voltas.length !== nVoltas)) return grita(st, i, OP, 'simetria', `com simetria: 'x', o corte deixou ${voltas ? `${voltas.length} borda${voltas.length === 1 ? '' : 's'}` : 'uma borda que não fecha'} em vez das quatro dos dois vãos: a borda prevista do vão declarado fica a ${mm(distanciaAoPlano ?? 0)} mm do plano x = 0, e a limpeza da costura juntou as bordas dele às do vão espelhado; afaste o contorno do plano, ou desenhe o vão inteiro sem simetria`);
+    if (!voltas || voltas.length !== nVoltas) return grita(st, i, OP, 'chapa', `o corte deixou ${voltas ? `${voltas.length} borda${voltas.length === 1 ? '' : 's'}` : 'uma borda que não fecha'} em vez das duas de uma chapa (a de fora e a de dentro); confira que a chapa é uma chapa com espessura que o contorno atravessa uma vez`);
     const externas = new Set();
     for (const regs of st.origens.values()) for (const r of regs) if (r.op === 'subdivisao' && Array.isArray(r.externa)) for (const f of r.externa) externas.add(f);
     const raizDe = (f) => { let x = f; while (st.pedacosDe.has(x)) x = st.pedacosDe.get(x); return x; };
     const facesDaVolta = (volta) => { const s = new Set(volta); return facesPerto.filter((f) => !parede.has(f) && st.F.get(f).vs.some((v) => s.has(v))); };
     const naExterna = (volta) => facesDaVolta(volta).some((f) => externas.has(raizDe(f)));
-    /* com a simetria, cada volta é do vão cujo desenho ela segue (na vista 'x' os dois desenhos coincidem, e decide o lado do plano) */
+    /* com a simetria, cada volta é do vão cujo desenho ela segue (na vista 'x' e no vetor só em x os dois desenhos coincidem, e decide
+       o lado do plano, o da borda prevista do declarado) */
     const voltasDe = lidos.map(() => []);
     if (lidos.length === 1) voltasDe[0].push(...voltas);
     else {
       for (const volta of voltas) {
         const xm = volta.reduce((t, v) => t + st.V.get(v)[0], 0) / volta.length;
         const conta = noDesenhoDe.map((f) => volta.filter((v) => f(st.V.get(v))).length);
-        const k = conta[0] !== conta[1] ? (conta[0] > conta[1] ? 0 : 1) : lidos.findIndex((l) => (l.sentido === '+') === (xm > 0));
+        const k = conta[0] !== conta[1] ? (conta[0] > conta[1] ? 0 : 1) : ((xm > 0) === (ladoDoDeclarado > 0) ? 0 : 1);
         voltasDe[k].push(volta);
       }
       const torta = voltasDe.findIndex((vs) => vs.length !== 2);
@@ -1656,18 +1672,20 @@ export function criarOperacoesAberturaPorContorno(servicos) {
   };
 }
 
-/** bordaDaAbertura(st, origem) -> { pontos, normais, faces, cadeia, espessura, passo } | { erro }
+/** bordaDaAbertura(st, origem, { espelho }) -> { pontos, normais, faces, cadeia, espessura, passo, temEspelho } | { erro }
  *  A borda de fora do vão que o passo `aberturaPorContorno` da origem abriu, como o `friso` a lê: os pontos da volta na posição
  *  de agora, a normal de cada um (a soma das normais das faces de pele em volta), as faces de pele que tocam a volta (para o lado
- *  da chapa) e a volta de ids, com o primeiro repetido no fim. */
-export function bordaDaAbertura(st, origem) {
+ *  da chapa) e a volta de ids, com o primeiro repetido no fim. Com `espelho: true`, a do vão espelhado do passo com simetria
+ *  (`registro.espelho`); `temEspelho` diz se o passo tem esse vão. */
+export function bordaDaAbertura(st, origem, { espelho = false } = {}) {
   if (!origem || typeof origem !== 'object' || Object.keys(origem).some((k) => k !== 'op' && k !== 'id')) return { erro: "a superfície de uma abertura é { op: 'aberturaPorContorno', id }, sem parte: a aba segue a borda de fora do vão" };
   const declaracoes = st.declaracoesOrigem.get(origem.id) ?? [];
   if (declaracoes.length !== 1 || declaracoes[0].op !== 'aberturaPorContorno') return { erro: `nenhum passo aberturaPorContorno declara a origem ${origem.id}${declaracoes.length > 1 ? ' sozinho' : ''}` };
   const registro = (st.origens.get(origem.id) ?? []).find((r) => r.op === 'aberturaPorContorno');
   if (!registro) return { erro: `o passo aberturaPorContorno da origem ${origem.id} ainda não foi executado ou gritou; ele precisa vir antes do friso` };
+  if (espelho && !registro.espelho) return { erro: `o passo aberturaPorContorno da origem ${origem.id} não tem vão espelhado (simetria: 'x')` };
   const parede = new Set(registro.parede);
-  const volta = registro.borda.fora;
+  const volta = espelho ? registro.espelho.borda.fora : registro.borda.fora;
   const naVolta = new Set(volta);
   const pele = registro.faces.filter((f) => st.F.has(f) && !parede.has(f) && st.F.get(f).vs.some((v) => naVolta.has(v)));
   const pontos = []; const normais = [];
@@ -1677,7 +1695,7 @@ export function bordaDaAbertura(st, origem) {
     const n = pele.filter((f) => st.F.get(f).vs.includes(v)).reduce((s, f) => soma(s, newell(st.F.get(f).vs.map((x) => st.V.get(x)))), [0, 0, 0]);
     pontos.push(p); normais.push(n);
   }
-  return { pontos, normais, faces: pele.map((f) => st.F.get(f).vs), cadeia: [...volta, volta[0]], espessura: registro.espessura, passo: registro.passo };
+  return { pontos, normais, faces: pele.map((f) => st.F.get(f).vs), cadeia: [...volta, volta[0]], espessura: espelho ? registro.espelho.espessura : registro.espessura, passo: registro.passo, temEspelho: !!registro.espelho };
 }
 
 /** alturaDaMalha(vertices, faces) -> (x, z) => y: a altura da malha onde a vertical por (x, z) a cruza, pela face que contém o

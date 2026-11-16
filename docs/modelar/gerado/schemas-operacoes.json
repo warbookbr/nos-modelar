@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:0f2c8be1452cf603336a47a80376f2593fdc84f984b0966f5cd431c20affaf6f",
+  "assinatura": "sha256:6f992f21716894f6b52d476a044534c63265cdf29e74dc1150b083a5dcbf724e",
   "total": 42,
   "operacoes": [
     {
@@ -267,7 +267,7 @@
           "Com sentido, a camada cortada é a que fica de um lado do plano que passa entre as duas, medido nos pontos do contorno e numa grade dentro dele; a outra camada que passe desse plano fora do contorno recusa o vão pela borda, e a recusa diz o plano. A camada do meio de um corpo de três não se alcança.",
           "A limpeza da costura deixa a lasca que não acha como desfazer (na sela de flanco forte, uma face da parede ou da lente com quatro pontos alinhados) e a conta em limpeza.finasRestantes do registro, das faces que a booleana devolveu (limpeza.escopoDasFinas diz se foi o trecho recortado da vizinhança ou a chapa inteira); o gate de malha a acusa. O registro vizinhanca diz se o vão recortou o trecho e por qual caminho (via: direto, paredes soltas ou tubo absorvido, com facesDeTubo), ou o motivo de a booleana ter visto a chapa inteira.",
           "Vão que atravessa a emenda de duas chapas e contorno em três dimensões livre ficam de fora.",
-          "Com simetria: 'x', o vão espelhado corta a chapa que o vão declarado deixou, no mesmo passo: a origem sem parte é a chapa com os dois vãos, parede e lente juntam os dois, borda é a do vão declarado (a que o friso segue) e espelho.borda a do outro. O vão declarado que toca ou cruza o plano x = 0 (a borda a menos de 0,1 mm dele) recusa."
+          "Com simetria: 'x', o vão espelhado corta a chapa que o vão declarado deixou, no mesmo passo: a origem sem parte é a chapa com os dois vãos, parede e lente juntam os dois, borda é a do vão declarado e espelho.borda a do outro, e o friso da abertura segue as duas. O vão declarado cuja borda prevista na chapa fica a menos de 1 mm do plano x = 0, ou da espessura da chapa se ela for maior, recusa; na vista 'x' (ou no vetor só em x) a chapa sem o outro lado do plano também recusa, e a simetria sai."
         ],
         "diagnosticos": []
       }
@@ -5160,7 +5160,7 @@
       }
     }
   ],
-  "assinaturaComExtensoes": "sha256:3394aef18cbc4b86b79bbfc48c18ae6e3266d2f5d71a4621d31ac5d5af044d0f",
+  "assinaturaComExtensoes": "sha256:1d33253c0fd89acfaa4460317cd99d13b2b8806f86bc77a96471b6c82f791792",
   "totalExtensoes": 5,
   "extensoes": [
     {
