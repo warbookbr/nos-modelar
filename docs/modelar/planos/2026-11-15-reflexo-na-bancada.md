@@ -67,8 +67,8 @@ O modelador, o crítico e a pessoa veem a superfície de uma peça de lataria po
 1. Feita (b14d782e): captura das visões que existem: `--visao`, `--enquadrar`, `--largura-da-zebra` e `--azimute` em `olhar-bancada.mjs`, com teste. Saída: a zebra, a luz rasante e a curvatura da bancada do quarto traseiro em arquivo, mostradas à pessoa.
 2. Feita (82f30228): visão `pintura`: material de verniz e ambiente de faixas, no registro, com teste na chapa de prova. Saída: a imagem do quarto traseiro ao lado da foto de referência, e o sim da pessoa de que dá para julgar.
 3. Feita (0a7f465d): pente de curvatura e mapa de desvio, provados nas chapas de calibração e no quarto traseiro, com as imagens ao lado da zebra e da pintura para a pessoa dizer qual leitura serve.
-4. Continuidade nas emendas e índice de suavidade, com a extração de `imagem-de-medida.mjs`, provados nas chapas de calibração e no quarto traseiro antes e depois da rodada 2 do carro.
-5. Pacote e paridade: a zebra e a pintura no `pedido.md`; a luz rasante e a curvatura da bancada medidas contra as do Blender (fração iluminada, posição do amassado, escala de cor). Saída: o relatório e a decisão da pessoa sobre exigir o Blender.
+4. Feita (e081ceb8): continuidade nas emendas e índice de suavidade, com a extração de `imagem-de-medida.mjs`, provados nas chapas de calibração e no quarto traseiro antes e depois da rodada 2 do carro.
+5. Feita: pacote e paridade: a zebra e a pintura no `pedido.md`; a luz rasante e a curvatura da bancada medidas contra as do Blender (fração iluminada, posição do amassado, escala de cor). Saída: o relatório e a decisão da pessoa sobre exigir o Blender.
 6. Instrução: o estudo de leitura da zebra nas chapas de calibração, a instrução de como ler a zebra, a pintura, o pente e o mapa de desvio no guia, provada pelo crítico cego, e o fechamento.
 
 ## Sucessor

@@ -26,16 +26,20 @@ export function chapaDeReflexo({ amassado, nomeDaPeca, desc }) {
   return {
     meta: { nome: nomeDaPeca, desc },
     PARAMS: {},
-    TOPO: { origem: 'canto da chapa em x = 0 e y = 0, z para fora da pele', ...TOPO },
+    TOPO: { origem: 'canto da chapa em x = 0 e y = 0, com y para cima, x ao longo da chapa e z para fora da pele', ...TOPO },
     PASSOS: [
       ['subdivisao', { origemId: 1, vertices, faces, cantos: [nome(0, 0), nome(nx, 0), nome(nx, ny), nome(0, ny)], borda: 'cantos', espessura: 0.002, niveis: 1 }],
       ['parte', { nome: 'chapa', sel: { origem: { op: 'subdivisao', id: 1 } } }],
     ],
+    /* O PLANO não fala do amassado: o pedido do crítico sai dele, e o crítico cego da chapa de prova precisa achar o amassado pelas
+       imagens, sem que o pedido o anuncie (gate do plano do reflexo). */
     PLANO: {
-      objeto: 'chapa abaulada de 1000 por 600 mm e 2 mm de espessura, com um amassado raso de 80 mm de raio',
-      referencias: [],
+      objeto: 'chapa abaulada de 1000 por 600 mm e 2 mm de espessura, lisa',
+      /* a altura declarada é a referência da chapa: o plano exige uma, e esta é o arquivo que a define (o pacote do crítico a lista
+         entre as que não são imagem) */
+      referencias: ['tools/blender/chapa-com-amassado-de-prova.mjs'],
       escala: { medida: 'largura da chapa em x', milimetros: 1000 },
-      partes: [{ nome: 'chapa', forma: 'chapa abaulada em x, com o amassado declarado quando há', tecnica: 'subdivisao sobre a altura declarada' }],
+      partes: [{ nome: 'chapa', forma: 'chapa abaulada em x, lisa, com raio de 6 m', tecnica: 'subdivisao sobre a altura declarada' }],
       criteriosDeReprovacao: ['a chapa tem ondulação que a altura declarada não tem'],
     },
   };
