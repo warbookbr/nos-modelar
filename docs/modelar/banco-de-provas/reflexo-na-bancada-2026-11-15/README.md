@@ -103,3 +103,49 @@ A bancada sobe a luz a 50 graus nessa vista, porque a chapa se inclina 45 graus 
 No carro, a luz de 10 graus do Blender deixa dois terços da peça no escuro nessa vista, e as duas imagens dele mal passam do limiar de 25 %; a da bancada ilumina de 69 a 98 %. A curvatura tem a mesma escala, e a correlação de 0,954 é menor que a de 0,984 da vista de lado; a diferença passa de 0,2 1/m, 5 % da escala, só num décimo dos pontos da grade. A vista de três quartos entrou no pacote: a curvatura diz o mesmo que a do Blender, o amassado sai no mesmo lugar, e a luz da bancada alcança mais da peça que a do Blender.
 
 O que mudou no pacote: `npm run vistas:critica` captura a luz rasante e a curvatura pela bancada nas vistas de frente, de lado, de cima e de três quartos, com a fração iluminada medida em cada PNG pela regra do Blender e a curvatura com a escala e a barra de cor escritas em cima da imagem; a vista em que a peça ocupa menos de 20 % do quadro num dos lados sai também destas, como já saía da zebra e da pintura, o que resolve o primeiro atrito do crítico cego (a curvatura de lado da chapa com 76 px de largura); a imagem abaixo de 25 % sai do pedido com a vista, o azimute, a altura da luz e a fração, e sem nenhuma acima o pacote é recusado; `MODELAR_BLENDER` deixou de ser exigido, e `--com-blender` roda as vistas do Blender como conferência, em `conferencia-do-blender/` da pasta da rodada, fora do pedido. O mesmo vale para `npm run vistas:superficie`. Na chapa de prova, sem `MODELAR_BLENDER`, o pacote levou 1 minuto e 54 segundos, contra 2 minutos e 48 com o Blender; o pedido lista 21 imagens, todas existentes, contra 27 antes, e as 6 a menos são a luz rasante e a curvatura de lado e de cima, de quina. O pedido não cita o amassado da chapa; a palavra aparece só na frase geral da seção de superfície ("o amassado largo e raso"), a mesma que o pedido do crítico cego já tinha.
+
+## O estudo de leitura (fatia 7, 2026-11-16)
+
+A pergunta é o que cada defeito faz com a faixa refletida, medido na imagem, para escrever a instrução de leitura e prová-la num crítico cego. As chapas são as de calibração (`tools/fixtures/reflexo-calibracao/chapas.mjs`): 600 por 400 mm, abauladas em arco de 1,5 m, em duas folhas que se encontram no meio, com degrau de 1,5 mm, vinco de 6 graus, quebra de curvatura de razão 3 ou ondulação de 100 mm de onda com 0,25, 0,5 e 1 mm, e a lisa como controle. O script [`estudo-de-leitura.mjs`](estudo-de-leitura.mjs) captura a zebra com listras de 3 e de 9 graus, a pintura e uma cor por parte (que dá onde fica a emenda na imagem) nas vistas frontal, isometrica e tresquartos, enquadradas, com a chapa como está e girada 45 graus no próprio plano (`giroGraus`, acrescentado à fábrica das chapas), e mede cada imagem contra a da lisa na mesma vista: a fração da imagem que muda, a direção das listras de cada lado da emenda e a dobra entre elas, o espaçamento das listras de cada lado e o deslocamento de cada borda de listra em relação à borda da lisa, procurada ao longo da normal das listras da lisa até meio período. Os números estão em [`estudo-de-leitura.json`](estudo-de-leitura.json) e [`estudo-de-leitura-ferramentas.json`](estudo-de-leitura-ferramentas.json), e se refazem com `node docs/modelar/banco-de-provas/reflexo-na-bancada-2026-11-15/estudo-de-leitura.mjs` (perto de 15 minutos, quase todo de captura) e `--ferramentas` (30 segundos).
+
+A primeira medida mudou o estudo. A zebra da bancada pinta a listra pelo componente vertical do olhar refletido (`visao-zebra.js`), e nas chapas como estão a emenda e a onda correm em pé, de modo que a normal só inclina para os lados. Ali a listra não andou: de frente o deslocamento ficou em 1 a 2 pixels em todas as chapas, como na lisa, e a ondulação de 1 mm não moveu a listra mais que 1 pixel em vista nenhuma; o que muda na imagem do vinco e da quebra é o contorno da chapa. A pintura também quase não vê a ondulação em pé (até 40 em 10 mil pixels). A figura abaixo é a isométrica dessas chapas: em cada linha, da lisa à ondulada de 1 mm, a zebra de 3 graus, a de 9 e a pintura.
+
+![As chapas de calibração com a emenda em pé, na isométrica: a zebra de 3 e de 9 graus e a pintura](estudo-g0-isometrica.jpg)
+
+Girada 45 graus, a emenda e as cristas da onda correm na diagonal, e o defeito aparece. A figura é a vista frontal, na mesma ordem.
+
+![As chapas de calibração giradas 45 graus, de frente: a zebra de 3 e de 9 graus e a pintura](estudo-g45-frontal.jpg)
+
+Na isométrica, na [figura à parte](estudo-g45-isometrica.jpg), a leitura é a mesma, e a pintura já quase não mostra a ondulação.
+
+| chapa girada, zebra | muda contra a lisa, 3 e 9 graus, de frente | dobra da listra na emenda (frontal, isometrica, tresquartos) | o que a faixa faz |
+| --- | --- | --- | --- |
+| lisa | 0 | -0,3; 0,7; 0,3 graus | corre reta; um dente de poucos pixels colado à emenda, da normal da borda de cada folha não soldada |
+| degrau 1,5 mm | 0,0002 e 0,0001 | -0,1; 1,1; 0,8 graus | igual à lisa: deslocamento de 1 px a 12 px da emenda ou mais; nas vistas oblíquas aparece o traço da quina (0,011 a 0,024 da imagem) |
+| vinco 6 graus | 0,30 e 0,43 | -0,7; 2,7; 1,9 graus | parte na emenda e continua deslocada: 0,45 do período com a listra de 9 graus (127 px) e 0,38 com a de 3 (36 px); a inclinação vertical da normal de uns 4,2 graus dá 0,47 e 1,4 período, e a listra fina mostra só a sobra de 0,4 |
+| quebra de curvatura, razão 3 | 0,29 e 0,21 | -10,3; -11,5; -11,3 graus | não parte; faz cotovelo e o espaçamento é 2,0 a 2,2 vezes mais apertado do lado de raio 0,5 m de frente, 1,7 a 3,9 nas outras vistas |
+| ondulada 0,25 mm | 0,24 e 0,08 | | serpenteia; deslocamento de 17 px no percentil 95 em todas as vistas (0,06 do período de 9 graus) |
+| ondulada 0,5 mm | 0,47 e 0,16 | | serpenteia e começa a dobrar sobre si; o deslocamento bate no meio período (0,46), e a medida satura |
+| ondulada 1 mm | 0,64 e 0,31 | | ziguezague: as listras se multiplicam (o espaçamento cai de 94 para 36 px com a de 3 graus) |
+
+A fração que muda na ondulada, com a listra de 9 graus, é 0,081, 0,159 e 0,314 de frente, 0,057, 0,108 e 0,217 na isométrica e 0,060, 0,118 e 0,232 de três quartos: cresce com a amplitude, quase em proporção, nas três vistas. A pintura girada muda 0,024, 0,049 e 0,087 da imagem de frente na ondulada, 0,0002 a 0,0015 nas outras duas vistas, 0,08 a 0,11 no vinco, 0,04 a 0,16 na quebra e até 0,01 no degrau.
+
+As leituras por número, nas chapas como estão (elas não dependem da direção), estão na figura abaixo, uma linha por chapa: o mapa de desvio, o pente na seção y = 200 mm e a continuidade nas emendas com a cor do ângulo.
+
+![O mapa de desvio, o pente de curvatura e a continuidade nas emendas das sete chapas de calibração](estudo-ferramentas.jpg)
+
+| chapa | mapa de desvio (mm, para fora e para dentro) | pente (1/m, por folha) | emendas, raio 50 mm | suavidade (1/m², por folha) |
+| --- | --- | --- | --- | --- |
+| lisa | +0,004 e -0,013 | 0,59 a 0,67, sem salto | nada | 0,001 e 0,001 |
+| degrau | +0,90 e -0,85, na emenda | igual à lisa | fresta 1,5 mm | 0,001 e 0,001 |
+| vinco | +2,78 na emenda | igual à lisa | ângulo 6,00 graus | 0,001 e 0,001 |
+| quebra de curvatura | +0,59 e -0,72 | 1,77 a 2,03 numa folha e 0,59 a 0,67 na outra | razão 3,007 | 0,039 e 0,001 |
+| ondulada 0,25 | +0,27 e -0,28 | 5 saltos e 5 trocas de sinal, maior salto 0,97 | razão 11,1 acusada em 41 de 41 pontos | 28,0 e 28,0 |
+| ondulada 0,5 | +0,54 e -0,53 | idem, maior salto 1,93 | razão 2,44 acusada em 41 | 52,9 e 52,9 |
+| ondulada 1 | +1,08 e -1,06 | idem, maior salto 3,87 | razão 1,54 acusada em 41 | 102,2 e 102,4 |
+
+A ondulação acusada nas emendas não é quebra de curvatura: a chapa ondulada é contínua na emenda, mas a crista da onda fica a 25 mm dela, e o ajuste de um lado só, de raio 50 mm, mede meia onda de cada lado. Com raio de 25 mm ela ainda acusa em 37 pontos (razão 11,7, 3,9 e 1,9), e com 15 mm, abaixo de dois passos da malha de 10 mm, nenhum ponto tem ajuste. É a mesma armadilha que a fatia 4 mediu com o vinco: o raio tem de ser menor que a distância à feição mais perto. O pente, por sua vez, trata as duas folhas não soldadas como duas curvas e não vê o degrau nem o vinco entre elas, e o mapa de desvio, cujo ajuste atravessa a emenda, reparte o degrau entre os dois lados.
+
+O que isso diz da leitura, escrito em [Ler o reflexo](../../usar/PARE-E-ANALISE.md#ler-o-reflexo) e, na versão curta, no pedido do crítico de lataria (`LEITURA_DO_REFLEXO`): a faixa é uma ordem menos contínua que a chapa, e por isso o degrau não aparece na zebra, o vinco a parte e a quebra a dobra; a listra larga mede o salto que a fina engana; a zebra não vê o que inclina a normal só para os lados; e a medida em milímetro sai do mapa de desvio, a da emenda sai da continuidade nas emendas com o raio menor que a distância à feição, e a comparação entre rodadas sai do índice de suavidade.
+
+A prova cega usa as chapas giradas 45 graus. O script [`preparar-prova-cega.mjs`](preparar-prova-cega.mjs) gera, para cada chapa, uma receita de nome neutro (`chapa-a` a `chapa-g`, em ordem que não segue a das chapas) com o PLANO dizendo só "chapa abaulada de prova", captura a zebra e a pintura nas três vistas, copia as imagens com nomes neutros e escreve o pedido com a seção Reflexo do pedido de lataria (`secaoDoReflexo`); o gabarito fica fora das pastas dos pedidos, em `tmp/prova-cega/gabarito.json`.

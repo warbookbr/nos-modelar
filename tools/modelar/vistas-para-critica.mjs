@@ -48,8 +48,8 @@
  *    nenhuma que passe o pacote é recusado: a luz que vinha de um lado que a câmera não via já chegou ao crítico como uma imagem preta
  *    com traços de borda.
  *  - a zebra e a pintura da bancada, também na peça de lataria (plano do reflexo, 2026-11-16): capturadas com `--visao` e `--enquadrar`
- *    nas quatro vistas do conjunto, sem a vista em que a chapa aparece de quina, com a frase que diz como se lê a faixa refletida
- *    (`LEITURA_DA_FAIXA`);
+ *    nas quatro vistas do conjunto, sem a vista em que a chapa aparece de quina, com a leitura curta da faixa refletida
+ *    (`LEITURA_DO_REFLEXO`, a versão do guia de leitura em `PARE-E-ANALISE.md` que cabe no pedido);
  *
  * A pasta traz ainda o `pacote.json`, com a impressão do texto da receita que o pacote mostra e as imagens de superfície: é por ele
  * que o registro da rodada sabe se o crítico de peça de lataria recebeu as duas vistas da versão medida.
@@ -577,10 +577,25 @@ function secaoDaSuperficie({ rasante, curvatura, faixa = null, semLuz = [], font
   ];
 }
 
-/* A seção do reflexo da peça de lataria: a zebra e a pintura da bancada, com a frase que diz como se lê a faixa. As vistas têm os nomes
-   e os lados da bancada, os de Modelo. */
+/* A seção do reflexo da peça de lataria: a zebra e a pintura da bancada, com a leitura curta da faixa. As vistas têm os nomes e os lados
+   da bancada, os de Modelo. A leitura curta (`LEITURA_DO_REFLEXO`) é a do guia `docs/modelar/usar/PARE-E-ANALISE.md#ler-o-reflexo`,
+   medida nas chapas de calibração (`tools/fixtures/reflexo-calibracao/`, estudo em
+   `docs/modelar/banco-de-provas/reflexo-na-bancada-2026-11-15/`): o que cada defeito faz com a faixa e o que a zebra não vê. */
 export const LEITURA_DA_FAIXA = 'Faixa reta e contínua é chapa boa; faixa torta, amontoada ou quebrada é defeito.';
-function secaoDoReflexo(reflexo) {
+export const LEITURA_DO_REFLEXO = Object.freeze([
+  'A faixa refletida lê a direção da chapa, e não a altura: ela anda onde a superfície inclina, e passa reta onde a chapa só sobe ou desce sem inclinar.',
+  `${LEITURA_DA_FAIXA} Num painel liso o espaçamento das faixas muda devagar, sem degrau.`,
+  'Degrau, com as duas folhas paralelas e uma mais alta: a faixa atravessa a linha sem salto, e o que aparece é só um traço fino ao longo dela.',
+  'Vinco, a chapa dobrando numa linha: a faixa se parte nessa linha e continua deslocada do outro lado, como dentes ou um X. Com listra fina o salto pode passar de uma listra inteira e parecer pequeno; a listra larga diz o tamanho.',
+  'Quebra de curvatura, o raio mudando numa linha sem dobra: a faixa não se parte; ela faz um cotovelo na linha e fica mais apertada de um lado que do outro.',
+  'Ondulação: a faixa serpenteia em ondas regulares por toda a área; quanto maior a onda, mais a faixa entorta, até se dobrar em ziguezague e as listras se multiplicarem.',
+  'Amassado: a faixa se curva em volta de um disco, ou o disco aparece com a cor invertida.',
+  'A zebra tem listras horizontais e só vê a superfície inclinar para cima ou para baixo: uma linha de defeito em pé, ou uma onda de cristas em pé, pode não mudar a faixa em vista nenhuma. A faixa reta não prova que a chapa está lisa nessa direção.',
+  'A pintura mostra o mesmo pela borda clara da caixa de luz; de frente ela serrilha na ondulação e dobra no vinco, mas de três quartos e de cima quase não mostra a ondulação.',
+  'Para cada defeito, diga o tipo, a linha ou a área na chapa (centro, diagonal, borda, canto) e as imagens em que o viu.',
+]);
+/** A seção Reflexo do pedido; exportada para a prova cega da leitura (`docs/modelar/banco-de-provas/reflexo-na-bancada-2026-11-15/`). */
+export function secaoDoReflexo(reflexo) {
   const imagem = ({ arquivo, vista }) => `${vista}: ${arquivo}`;
   const fora = (r) => (r?.fora?.length
     ? [`Ficaram de fora, porque a peça aparece de quina e ocupa menos de ${String(Math.round(MINIMO_DO_REFLEXO * 100))} % do quadro num dos lados: ${r.fora.map((f) => f.vista).join(', ')}.`, '']
@@ -588,12 +603,13 @@ function secaoDoReflexo(reflexo) {
   const L = [
     '## Reflexo', '',
     'A peça é de chapa, e estas vistas da bancada a mostram por reflexo, com a peça enchendo o quadro e olhando dos lados descritos em '
-    + `Modelo. ${LEITURA_DA_FAIXA} Diga onde a faixa se desvia e o que isso diz da chapa.`, '',
+    + 'Modelo. Como ler:', '',
+    ...lista(LEITURA_DO_REFLEXO), '',
   ];
   if (reflexo.zebra?.imagens?.length) {
     L.push('A zebra: listras pretas e brancas de um ambiente distante refletidas na chapa, sem sombra. Num painel liso a listra corre reta '
       + 'ou em curva suave e com a largura parelha; onde ela entorta, se estreita em leque, se amontoa ou se parte, a chapa afunda, ondula ou '
-      + 'dobra ali. A listra que se parte numa linha mostra uma quina ou um degrau.', '', ...lista(reflexo.zebra.imagens.map(imagem)), '', ...fora(reflexo.zebra));
+      + 'dobra ali.', '', ...lista(reflexo.zebra.imagens.map(imagem)), '', ...fora(reflexo.zebra));
   }
   if (reflexo.pintura?.imagens?.length) {
     L.push('A pintura: verniz brilhante sobre base escura, sob caixas de luz de estúdio, como a foto de um carro. O reflexo claro das caixas '

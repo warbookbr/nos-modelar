@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2003 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2005 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -432,7 +432,9 @@
 ## docs/modelar/banco-de-provas/reflexo-na-bancada-2026-11-15/
 
 - `README.md` — Reflexo na bancada: a paridade da luz rasante e da curvatura com o Blender
+- `estudo-de-leitura.mjs` — estudo-de-leitura.mjs — o estudo de leitura da zebra e da pintura nas chapas de calibração (plano do reflexo na bancada, fatia 7).
 - `medir-paridade.mjs` — medir-paridade.mjs — a luz rasante e a curvatura da bancada medidas contra as do Blender na mesma peça e na mesma vista (fatia 5 do plano do reflexo na banca…
+- `preparar-prova-cega.mjs` — preparar-prova-cega.mjs — os pedidos da prova cega da leitura do reflexo (plano do reflexo na bancada, fatia 7).
 
 ## docs/modelar/banco-de-provas/revisao-das-verificacoes-2026-11-13/
 

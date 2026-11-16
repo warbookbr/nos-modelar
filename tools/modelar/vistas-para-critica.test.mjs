@@ -11,7 +11,7 @@ import { afterAll, describe, expect, it } from 'vitest';
 import { lerPergunta } from '../../src/autoria/perguntas-do-critico.js';
 import {
   ELEVACOES_DA_LUZ_RASANTE, LIMITE_DO_VEREDITO, PERGUNTA_DO_ALVO, PRAZO_DA_CAPTURA_MONTADA_MS, VISTAS_MONTADAS, ladoDaVista, montagemDaPeca, montarPedido, pastaDaRodada, prefixoDaPeca, referenciasDoPlano,
-  DISTANCIA_DE_PERTO_MM, campoDePertoMm, MOTIVO_SEM_MEDIR, ReceitaReprovada, decidirLuzRasante, imprimir, fracaoVisivelDaPeca, lerReferenciasExternas, lerOrientacaoDaReferencia, LIMITE_DA_ORIENTACAO, AJUDA, imagensDoReflexo, LEITURA_DA_FAIXA, MINIMO_DO_REFLEXO, luzRasanteDoPacote, primeiraQuePassa, unidadeDoAlvo, vistaDoArquivo, vistasMontadasVisiveis, vistasParaCritica, vistasRepetidas,
+  DISTANCIA_DE_PERTO_MM, campoDePertoMm, MOTIVO_SEM_MEDIR, ReceitaReprovada, decidirLuzRasante, imprimir, fracaoVisivelDaPeca, lerReferenciasExternas, lerOrientacaoDaReferencia, LIMITE_DA_ORIENTACAO, AJUDA, imagensDoReflexo, LEITURA_DA_FAIXA, LEITURA_DO_REFLEXO, secaoDoReflexo, MINIMO_DO_REFLEXO, luzRasanteDoPacote, primeiraQuePassa, unidadeDoAlvo, vistaDoArquivo, vistasMontadasVisiveis, vistasParaCritica, vistasRepetidas,
 } from './vistas-para-critica.mjs';
 
 const area = mkdtempSync(join(tmpdir(), 'vistas-critica-'));
@@ -1104,6 +1104,8 @@ describe('o reflexo da bancada no pacote da peça de lataria', () => {
     expect(titulos(pedido).indexOf('Reflexo')).toBe(titulos(pedido).indexOf('Superfície') + 1);
     const secao = pedido.slice(pedido.indexOf('## Reflexo'), pedido.indexOf('## Partes'));
     expect(secao).toContain(LEITURA_DA_FAIXA);
+    /* a leitura curta do guia vai inteira, item a item, e cabe num pedido */
+    for (const linha of LEITURA_DO_REFLEXO) expect(secao).toContain(`- ${linha}`);
     for (const visao of ['zebra', 'pintura']) {
       for (const vista of ['isometrica', 'frontal']) expect(secao).toContain(`- ${vista}: ${join(resultado.pasta, '..', `${prefixoDaPeca(PECA)}${vista}-visao-${visao}-enquadrado.png`)}`);
       expect(secao).not.toContain(`direita-visao-${visao}`);
@@ -1133,5 +1135,18 @@ describe('o reflexo da bancada no pacote da peça de lataria', () => {
     expect(quina.imagens.map((i) => i.vista)).toEqual(['superior']);
     expect(quina.fora.map((f) => f.vista)).toEqual(['direita']);
     expect(MINIMO_DO_REFLEXO).toBe(0.2);
+  });
+});
+
+describe('a leitura curta do reflexo no pedido', () => {
+  it('cabe em até 12 linhas, diz o que cada defeito faz com a faixa e o que a zebra não vê, e a seção a traz antes das imagens', () => {
+    expect(LEITURA_DO_REFLEXO.length).toBeLessThanOrEqual(12);
+    const texto = LEITURA_DO_REFLEXO.join(' ');
+    for (const termo of ['Degrau', 'Vinco', 'Quebra de curvatura', 'Ondulação', 'Amassado', 'listras horizontais', 'pintura']) expect(texto).toContain(termo);
+    expect(texto).toContain(LEITURA_DA_FAIXA);
+    const secao = secaoDoReflexo({ zebra: { imagens: [{ arquivo: '/z.png', vista: 'frontal' }], fora: [] }, pintura: { imagens: [], fora: [] } });
+    expect(secao[0]).toBe('## Reflexo');
+    expect(secao.indexOf(`- ${LEITURA_DO_REFLEXO[0]}`)).toBeLessThan(secao.indexOf('- frontal: /z.png'));
+    expect(secao.join('\n')).not.toMatch(/se parte numa linha mostra uma quina ou um degrau/);
   });
 });
