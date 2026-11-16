@@ -23,7 +23,7 @@ export const TABELA = {
   angulo_direcao: 71,
   /* roda: pneu alto, de 48 x 42 mm, sobre um aro menor, para o diâmetro externo de 670 mm */
   aro_assento_diametro: 586,
-  pneu_largura: 48,
+  pneu_largura: 40,
   pneu_altura: 42,
   aro_altura: 15,
   aro_largura: 22,
@@ -76,10 +76,11 @@ export const TABELA = {
   /* garfo */
   garfo_offset: 45,
   garfo_eixo_a_coroa: 375,
-  garfo_perna_diametro: 22,
-  garfo_coroa_diametro: 26,
-  garfo_coroa_meia_largura: 40,
-  garfo_coroa_arqueio: 24,
+  garfo_perna_diametro: 26,
+  garfo_coroa_diametro: 46,
+  garfo_coroa_altura: 30,
+  garfo_ombro_largura: 27,
+  garfo_ombro_altura: 22,
   garfo_perna_diametro_ponta: 18,
   garfo_coluna_diametro: 28,
   garfo_coluna_alem_da_caixa: 50,
@@ -270,28 +271,33 @@ export function derivar(T) {
   const rTopo = raioQ(T.garfo_perna_diametro + 8);
   const rLaminaMm = (u) => rTopo + (raioQ(T.garfo_perna_diametro_ponta) - rTopo) * u;
   const exigeX = (p, r) => (Math.hypot(p[1] - yEixo, p[2] - zEixoFrente) - r < raioPneuG + T.garfo_folga_pneu ? T.pneu_largura / 2 + T.garfo_folga_pneu + r + 0.3 : 0);
+  /* a coroa da foto frontal: um corpo cilíndrico no eixo de direção, entre o anel da caixa e as pernas; cada perna nasce na
+     lateral dele, com a curva concentrada no alto (o ombro, um quarto de elipse de `garfo_ombro_largura` por
+     `garfo_ombro_altura`), e desce reta, inclinada até a ponteira (a pessoa apontou as pernas em arco e a coroa sem corpo) */
+  const H = T.garfo_eixo_a_coroa;
+  const rCoroa = raioQ(T.garfo_coroa_diametro);
+  const x0 = rCoroa - rTopo * 0.4;
+  const h0 = H - T.garfo_coroa_altura * 0.45;
   const nOmbro = 6;
   const pernaBase = [];
   for (let j = 0; j <= nOmbro; j++) {
     const th = (j / nOmbro) * (Math.PI / 2);
-    /* a coroa compacta da foto frontal: o centro, sob a caixa de direção, é o alto, e a perna sai dele num ombro redondo e curto,
-       um quarto de elipse de `garfo_coroa_meia_largura` de largo por `garfo_coroa_arqueio` de alto, e desce reta */
-    const p = naDirecao(T.garfo_eixo_a_coroa - T.garfo_coroa_arqueio * (1 - Math.cos(th)));
-    pernaBase.push({ p, r: rTopo, exige: exigeX(p, rTopo), x: T.garfo_coroa_meia_largura * Math.sin(th) });
+    const p = naDirecao(h0 - T.garfo_ombro_altura * (1 - Math.cos(th)));
+    pernaBase.push({ p, r: rTopo, exige: 0, x: x0 + T.garfo_ombro_largura * Math.sin(th) });
   }
+  const hReta = h0 - T.garfo_ombro_altura, xReta = x0 + T.garfo_ombro_largura;
   for (let i = 1; i <= nUp; i++) {
-    const u = i / nUp; // 0 = coroa, 1 = ponta
-    const p = soma(naDirecao((T.garfo_eixo_a_coroa - T.garfo_coroa_arqueio) * (1 - u)), esc(nFrente, T.garfo_offset * u ** 1.3));
+    const u = i / nUp; // 0 = fim do ombro, 1 = ponta
+    const p = soma(naDirecao(hReta * (1 - u)), esc(nFrente, T.garfo_offset * u ** 1.3));
     const r = rLaminaMm(u);
-    /* a perna desce reta, quase paralela à outra, como na foto frontal */
-    pernaBase.push({ p, r, exige: exigeX(p, r), x: T.garfo_coroa_meia_largura + (T.garfo_x - T.garfo_coroa_meia_largura) * u });
+    pernaBase.push({ p, r, exige: exigeX(p, r), x: xReta + (T.garfo_x - xReta) * u });
   }
   for (const q of pernaBase) q.x = Math.max(q.x, q.exige);
   for (const lado of [-1, 1]) {
     const perna = pernaBase.map((q) => { const p = [...q.p]; p[0] = lado * q.x; return p; });
     tubo('garfo', 'aluminio', perna, pernaBase.map((q) => q.r), 32);
   }
-  tubo('garfo', 'aluminio', [naDirecao(T.garfo_eixo_a_coroa - 6), naDirecao(baseCaixa + 2)], raioQ(T.caixa_direcao_diametro_baixo) - 0.5, 32);
+  tubo('garfo', 'aluminio', [naDirecao(H - T.garfo_coroa_altura), naDirecao(H), naDirecao(baseCaixa + 2)], [rCoroa, rCoroa, raioQ(T.caixa_direcao_diametro_baixo) - 0.5], 32);
   const topoDaColuna = baseCaixa + T.caixa_direcao_comprimento + T.garfo_coluna_alem_da_caixa;
   tubo('garfo', 'aluminio', [naDirecao(T.garfo_eixo_a_coroa), naDirecao(topoDaColuna)], raioQ(T.garfo_coluna_diametro), 24);
 
