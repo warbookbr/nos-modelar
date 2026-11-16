@@ -22,7 +22,7 @@ diz o commit onde está; não governa trabalho novo.
 
 ## Estado atual
 
-- Planos ativos: <!-- planos-ativos:inicio -->[ferramentas de correção de superfície](planos/2026-11-16-ferramentas-de-correcao-de-superficie.md), [modelagem de carro de passeio](planos/2026-11-14-modelagem-de-carro.md), [leitura por partes](planos/2026-11-14-leitura-por-partes.md), [cache por passo da receita](planos/2026-11-16-cache-por-passo.md), [reflexo na bancada](planos/2026-11-15-reflexo-na-bancada.md) e [família de componentes eletrônicos](planos/2026-11-16-familia-componentes-eletronicos.md).<!-- planos-ativos:fim -->
+- Planos ativos: <!-- planos-ativos:inicio -->[ferramentas de correção de superfície](planos/2026-11-16-ferramentas-de-correcao-de-superficie.md), [modelagem de carro de passeio](planos/2026-11-14-modelagem-de-carro.md), [leitura por partes](planos/2026-11-14-leitura-por-partes.md), [cache por passo da receita](planos/2026-11-16-cache-por-passo.md), [comparar com a referência sem script](planos/2026-11-16-comparar-com-a-referencia.md) e [família de componentes eletrônicos](planos/2026-11-16-familia-componentes-eletronicos.md).<!-- planos-ativos:fim -->
 - Encerrados recentes: [abertura em qualquer direção](./decisoes/PLANOS-ENCERRADOS.md), [limites do sólido por laços](./decisoes/PLANOS-ENCERRADOS.md), [esboço pelo núcleo](./decisoes/PLANOS-ENCERRADOS.md) e [sólido por laços](./decisoes/PLANOS-ENCERRADOS.md); os outros na [crônica](./decisoes/PLANOS-ENCERRADOS.md).
 - A [exportação CAD/STEP modular](./decisoes/PLANOS-ENCERRADOS.md)
   entregou `modulos/exportador-cad/`, `modulos/exportador-obj/` e as CLIs

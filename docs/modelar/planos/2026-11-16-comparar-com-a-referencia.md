@@ -1,14 +1,16 @@
 # Comparar com a referência sem script: a prancha modelo e foto, a conferência da receita, a saída da bancada e o pacote do crítico
 
-**Estado:** rascunho
+**Estado:** ativo
 
-**Território:** a declarar ao ativar; deve ficar em `tools/modelar/` (a bancada de linha de comando e um comando novo de prancha), `tools/bancadas/` se a prancha for montada no navegador, e as skills `criar-peca`, `laco-de-modelagem` e o agente `modelador` na parte que diz como comparar. O plano do [cordão de solda](../decisoes/PLANOS-ENCERRADOS.md) usa a bicicleta e não toca nessas pastas.
+**Território:** `tools/modelar/olhar-bancada.mjs`, `tools/modelar/vistas-para-critica.mjs`, `tools/modelar/vistas-para-critica.test.mjs`, `tools/modelar/prancha-de-referencia.mjs`, `tools/modelar/prancha-de-referencia.test.mjs`, `tools/bancadas/`, `.claude/skills/criar-peca/`, `.claude/agents/modelador.md`, `docs/modelar/banco-de-provas/comparar-com-a-referencia-2026-11-16/`
+
+Ativado em 2026-11-16 no fechamento do reflexo na bancada, como a pessoa decidiu. Duas partes esperam outro plano: `--recusas` em `descrever` mexe em `tools/modelar/descrever-peca.mjs`, que é do cache por passo enquanto ele estiver ativo, e a nota na skill `laco-de-modelagem` é do plano da leitura por partes; as duas entram quando o dono fechar, ou com a pessoa decidindo emprestar o arquivo.
 
 **Responsável:** a IA da sessão implementa; Tiago aprova por imagem.
 
 **Repositório e base:** `warbookbr/nos-modelar`, main na ativação.
 
-Sucessor do plano [reflexo na bancada](2026-11-15-reflexo-na-bancada.md), decidido pela pessoa em 2026-11-16: é ativado no fechamento dele.
+Sucessor do plano [reflexo na bancada](../decisoes/PLANOS-ENCERRADOS.md), decidido pela pessoa em 2026-11-16: é ativado no fechamento dele.
 
 ## Problema observado
 
