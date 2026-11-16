@@ -121,12 +121,17 @@ export const TABELA = {
   canote_dentro: 120,
   canote_total: 250,
   selim_braco_raio: 7,
-  /* a presilha: um bloco compacto sobre o canote, com o berço dos trilhos em cima e o parafuso embaixo, à frente */
-  presilha_largura: 30,
-  presilha_profundidade: 26,
-  presilha_altura: 13,
-  presilha_parafuso_raio: 3,
-  presilha_parafuso_comprimento: 10,
+  /* a presilha, medida na foto lateral (3 px/mm): um conjunto compacto e arredondado sobre a cabeça do canote, de uns 32 mm de
+     comprimento e 20 de altura; o berço (cilindro de raio selim_braco_raio, de ponta chanfrada) abraça os dois trilhos sem passar
+     da face de fora deles, o cubo (corpo de revolução vertical) o prende ao canote, e o parafuso pequeno sai por baixo, à frente */
+  presilha_cubo_raio: 12,
+  presilha_cubo_altura: 15,
+  presilha_cubo_desce: 9,
+  presilha_berco_chanfro: 2.5,
+  presilha_folga_trilho: 3,
+  presilha_parafuso_raio: 2,
+  presilha_parafuso_comprimento: 8,
+  presilha_parafuso_avanco: 7,
   /* cabeça do canote que segura a presilha, como na foto lateral */
   canote_cabeca_comprimento: 16,
   canote_cabeca_sobra: 2.5,
@@ -202,8 +207,11 @@ const SELIM_MEDIDO = {
      pouco, e a rampa até o nariz; só a dobra da frente é arredondada (raio trilhoRaio). A primeira e a última ponta entram na casca. */
   trilhoCantos: [[60, -40], [74, -54], [150, -50], [186, -25]],
   trilhoRaio: 14,
-  abaCima: [[0, 0], [0.6, 0], [0.64, -0.021], [0.72, -0.045], [0.8, -0.089], [0.89, -0.179], [0.97, -0.334], [1, -0.62]],
-  abaBaixo: [[0, -0.74], [0.3, -0.8], [0.45, -0.92], [0.55, -0.97], [0.64, -1], [0.72, -0.99], [0.8, -0.96], [0.89, -0.9], [0.97, -0.8], [1, -0.66]],
+  /* aba de trás de frente, medida na foto frontal (régua: a caixa de direção, 44 px = 46 mm): meia largura 221 px, altura 132 px.
+     Por coluna (u = distância ao eixo / meia largura): topo quase plano até u 0,65 e descendo em arco até a ponta; base com o ponto
+     mais baixo em u 0,84 (-1) e subindo até a ponta; a borda externa é grossa (0,26 da altura em u 0,97) e redonda como uma pá. */
+  abaCima: [[0, 0], [0.5, 0], [0.65, -0.015], [0.72, -0.053], [0.79, -0.098], [0.864, -0.17], [0.9, -0.227], [0.937, -0.31], [0.973, -0.46], [0.995, -0.56], [1, -0.62]],
+  abaBaixo: [[0, -0.74], [0.3, -0.8], [0.5, -0.82], [0.575, -0.89], [0.647, -0.94], [0.72, -0.97], [0.79, -0.99], [0.84, -1], [0.9, -0.98], [0.937, -0.92], [0.973, -0.76], [0.995, -0.68], [1, -0.64]],
   planta: [[0, 8], [4, 30], [10, 48], [18, 62], [26, 70], [35, 74], [95, 74], [110, 66], [125, 48], [140, 32], [155, 24], [170, 22], [232, 19], [242, 17.5], [248, 15], [252, 12], [255, 8.5], [256, 6]],
   larguraAba: 74,
   larguraNariz: 22,
@@ -450,13 +458,16 @@ export function derivar(T) {
     const trilho = SM.caminhoDoTrilho.map(([sMm, y]) => [lado * Math.min(interp(SM.trilhoX, sMm), 0.7 * meiaLargura(sMm)), yRef + y, zDoSelim(sMm)]);
     tubo('selim', 'preto', trilho, trilho.map(() => raioQ(T.selim_trilho_diametro)), 12);
   }
-  /* braçadeira pequena e escura sob o assento, sobre o topo do canote */
-  /* a presilha, como na foto: o berço só abraça os dois trilhos, sobre um bloco compacto no topo do canote, com o parafuso embaixo */
-  const xPresilha = interp(SELIM_MEDIDO.trilhoX, SELIM_MEDIDO.presilha) + T.selim_trilho_diametro / 2 + 3;
+  /* a presilha, como na foto: o berço abraça só os dois trilhos (de fora a fora deles mais a folga), sobre um cubo arredondado
+     que desce sobre a cabeça do canote, com o parafuso pequeno embaixo, à frente */
+  const xPresilha = interp(SELIM_MEDIDO.trilhoX, SELIM_MEDIDO.presilha) + T.selim_trilho_diametro / 2 + T.presilha_folga_trilho;
   const yBerco = apoio[1] + rBraco - 2;
-  torno('selim', 'preto', [[0, -xPresilha], [rBraco, -xPresilha], [rBraco, xPresilha], [0, xPresilha]], [0, yBerco, apoio[2]], { lados: 20, liso: 40 });
-  itens.push({ k: 'bloco', parte: 'selim', material: 'preto', larg: T.presilha_largura, alt: T.presilha_altura, prof: T.presilha_profundidade, em: [0, yBerco - T.presilha_altura, apoio[2]] });
-  tubo('selim', 'aco', [[0, yBerco - T.presilha_altura + 1, apoio[2] + T.presilha_profundidade / 4], [0, yBerco - T.presilha_altura - T.presilha_parafuso_comprimento, apoio[2] + T.presilha_profundidade / 4]], raioQ(2 * T.presilha_parafuso_raio), 12);
+  const ch = T.presilha_berco_chanfro;
+  torno('selim', 'preto', [[0, -xPresilha], [rBraco - ch, -xPresilha], [rBraco, -xPresilha + ch], [rBraco, xPresilha - ch], [rBraco - ch, xPresilha], [0, xPresilha]], [0, yBerco, apoio[2]], { lados: 24, liso: 60 });
+  const rCubo = T.presilha_cubo_raio, hc = T.presilha_cubo_altura, yc = yBerco - T.presilha_cubo_desce;
+  torno('selim', 'preto', [[0, 0], [rCubo - 3, 0], [rCubo, 3], [rCubo, hc - 5], [rCubo - 3, hc - 1], [rCubo - 6, hc], [0, hc]], [0, yc, apoio[2]], { eixo: 'y', lados: 28, liso: 60 });
+  const zPar = apoio[2] + T.presilha_parafuso_avanco;
+  tubo('selim', 'aco', [[0, yc + 1, zPar], [0, yc - T.presilha_parafuso_comprimento, zPar]], raioQ(2 * T.presilha_parafuso_raio), 12);
 
   /* RODAS: cubo, aro, pneu e raios no mesmo corpo */
   const rodas = [['rodaDianteira', zEixoFrente, T.eixo_dianteiro_largura], ['rodaTraseira', zEixoTras, T.eixo_traseiro_largura]];
