@@ -145,7 +145,9 @@ export const TABELA = {
   selim_cintura_inicio: 0.32,
   selim_cintura_fim: 0.62,
   /* as abas de trás caem para os lados, como na foto frontal */
-  selim_caimento: 12,
+  selim_caimento: 32,
+  /* o nariz, de lado: o topo desce em curva no último quarto, a base fica reta e a ponta termina num corte reto */
+  selim_nariz_queda: 0.38,
   /* onde os trilhos saem da casca, em fração do comprimento a partir da traseira */
   selim_trilho_tras: 0.2,
   selim_trilho_frente: 0.78,
@@ -402,13 +404,18 @@ export function derivar(T) {
     let esp = T.selim_espessura * (1 - 0.45 * t ** 1.3);
     /* o centro da seção segue a espessura antes do fecho das pontas: sem isso a ponta sobe até o topo e vira um lábio */
     const espCheia = esp;
+    /* o topo desce no nariz e também arredonda para baixo no fim da traseira, sem bico */
+    const queda = T.selim_nariz_queda * suave((t - 0.72) / 0.28) + 0.3 * suave((0.14 - t) / 0.14);
+    esp *= 1 - queda;
     const fecha = (u) => Math.sqrt(Math.max(0.02, 1 - u * u));
-    if (t > 0.9) { const f = fecha((t - 0.9) / 0.1 * 0.95); larg *= f; esp *= 0.55 + 0.45 * f; }
-    if (t < 0.06) { const f = fecha((0.06 - t) / 0.06 * 0.9); larg *= f; esp *= f; }
+    if (t > 0.9) { const f = fecha((t - 0.9) / 0.1 * 0.95); larg *= f; }
+    if (t < 0.12) { const f = fecha((0.12 - t) / 0.12 * 0.93); larg *= f; esp *= 0.3 + 0.7 * f; }
     const sela = T.selim_traseira_alta * (1 - Math.min(1, t / 0.45)) ** 2 - T.selim_cela * Math.sin(Math.PI * Math.min(1, Math.max(0, (t - 0.15) / 0.75))) ** 2;
-    const yrel = -espCheia / 2 + T.selim_cupula * (1 - t) ** 2 + sela; /* a barriga sobe para o nariz; o topo segue a sela */
+    const yrel = -espCheia / 2 + T.selim_cupula * (1 - t) ** 2 + sela - (espCheia * queda) / 2; /* a barriga sobe para o nariz; o topo segue a sela */
     const afunda = T.selim_afundamento * Math.sin(Math.PI * Math.min(1, Math.max(0, (t - 0.08) / 0.7))) ** 1.5;
-    const cai = T.selim_caimento * Math.max(0, 1 - t / 0.55);
+    /* as orelhas de trás caem para os lados e para baixo, mais na traseira */
+    /* a queda acompanha a largura: onde a traseira já fechou, a orelha não cai, e o fim do selim fica redondo */
+    const cai = T.selim_caimento * Math.max(0, 1 - t / 0.5) ** 1.3 * Math.min(1, larg / T.selim_largura) ** 3;
     return { larg, esp, yrel, afunda, cai };
   };
   const zDoSelim = (t) => centroSelim[2] - 0.46 * T.selim_comprimento + T.selim_comprimento * t * 0.92;
@@ -607,7 +614,7 @@ export function gerarPassos(T) {
           /* superelipse: acolchoado cheio e de cantos redondos */
           const xn = Math.sign(c) * Math.abs(c) ** 0.8; /* afundamento do topo: só na metade de cima, mais fundo no eixo do assento */
           /* o caimento curva a seção para baixo só nas abas, fora do terço do meio, sem afinar a borda */
-          pts.push([m(xn * meia), m(Math.sign(sn) * Math.abs(sn) ** 0.8 * (s.esp / 2) - (sn > 0 ? s.afunda * (1 - xn * xn) * Math.abs(sn) : 0) - s.cai * Math.max(0, (Math.abs(xn) - 0.35) / 0.65) ** 2)]);
+          pts.push([m(xn * meia), m(Math.sign(sn) * Math.abs(sn) ** 0.8 * (s.esp / 2) - (sn > 0 ? s.afunda * (1 - xn * xn) * Math.abs(sn) : 0) - s.cai * Math.max(0, (Math.abs(xn) - 0.25) / 0.75) ** 1.6)]);
         }
         return { pos: [0, m(s.y), m(s.z)], contorno: pts };
       });
