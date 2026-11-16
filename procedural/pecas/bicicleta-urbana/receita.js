@@ -121,20 +121,20 @@ export const TABELA = {
   canote_dentro: 120,
   canote_total: 250,
   selim_braco_raio: 7,
-  /* a presilha, medida na foto lateral (3 px/mm): um conjunto compacto e arredondado sobre a cabeça do canote, de uns 32 mm de
-     comprimento e 20 de altura; o berço (cilindro de raio selim_braco_raio, de ponta chanfrada) abraça os dois trilhos sem passar
-     da face de fora deles, o cubo (corpo de revolução vertical) o prende ao canote, e o parafuso pequeno sai por baixo, à frente */
-  presilha_cubo_raio: 12,
-  presilha_cubo_altura: 15,
-  presilha_cubo_desce: 9,
-  presilha_berco_chanfro: 2.5,
-  presilha_folga_trilho: 3,
-  presilha_parafuso_raio: 2,
-  presilha_parafuso_comprimento: 8,
-  presilha_parafuso_avanco: 7,
-  /* cabeça do canote que segura a presilha, como na foto lateral */
-  canote_cabeca_comprimento: 16,
-  canote_cabeca_sobra: 2.5,
+  /* a presilha, medida no recorte ampliado da foto lateral (ref-presilha.png, 4,2 px/mm pelo trilho de 6 mm): um TAMBOR deitado de
+     eixo transversal, de uns 34 mm de altura (aqui 29, raio 14,5, para caber sob o estofado) e com o centro 3 mm abaixo do eixo
+     dos trilhos, que o atravessam a ±21 mm; faces laterais redondas com anéis rasos. Sob ele sobe o pescoço do canote, mais
+     inclinado para trás que o canote (cerca de 33 graus da vertical contra 17), e o parafuso curto de aço sai por baixo, à frente */
+  presilha_tambor_raio: 14.5,
+  presilha_tambor_meia_largura: 25,
+  presilha_tambor_abaixo_do_trilho: 3,
+  presilha_tambor_borda: 3,
+  presilha_tambor_anel_fundo: 0.9,
+  presilha_pescoco_comprimento: 34,
+  presilha_pescoco_raio: 12.5,
+  presilha_parafuso_raio: 2.2,
+  presilha_parafuso_comprimento: 9,
+  presilha_parafuso_avanco: 13,
   selim_trilho_diametro: 6,
   selim_lados: 48,
     /* transmissão */
@@ -212,9 +212,11 @@ const SELIM_MEDIDO = {
      mais baixo em u 0,84 (-1) e subindo até a ponta; a borda externa é grossa (0,26 da altura em u 0,97) e redonda como uma pá. */
   abaCima: [[0, 0], [0.5, 0], [0.65, -0.015], [0.72, -0.053], [0.79, -0.098], [0.864, -0.17], [0.9, -0.227], [0.937, -0.31], [0.973, -0.46], [0.995, -0.56], [1, -0.62]],
   abaBaixo: [[0, -0.74], [0.3, -0.8], [0.5, -0.82], [0.575, -0.89], [0.647, -0.94], [0.72, -0.97], [0.79, -0.99], [0.84, -1], [0.9, -0.98], [0.937, -0.92], [0.973, -0.76], [0.995, -0.68], [1, -0.64]],
-  planta: [[0, 8], [4, 30], [10, 48], [18, 62], [26, 70], [35, 74], [95, 74], [110, 66], [125, 48], [140, 32], [155, 24], [170, 22], [232, 19], [242, 17.5], [248, 15], [252, 12], [255, 8.5], [256, 6]],
+  /* planta SUPOSTA (sem foto de cima): traseira redonda e larga, afinando de modo gradual até um nariz de meia largura 24 a 26
+     no meio dele, que fecha redondo na ponta */
+  planta: [[0, 8], [4, 30], [10, 48], [18, 62], [26, 70], [35, 74], [95, 74], [110, 67], [125, 55], [140, 45], [155, 37], [170, 31], [190, 27.5], [215, 26], [232, 25], [242, 23], [248, 19.5], [252, 15], [255, 10], [256, 6]],
   larguraAba: 74,
-  larguraNariz: 22,
+  larguraNariz: 26,
 };
 
 /* o caminho do trilho: as retas entre os cantos, com o canto de índice 2 trocado por um arco de Bézier que começa e termina a
@@ -416,11 +418,18 @@ export function derivar(T) {
   tubo('manoplas', 'borracha', caminho(manoplaInicio, meia, 10), raioQ(T.manopla_diametro), 32);
 
   /* CANOTE e SELIM */
+  const rBracoCanote = T.selim_braco_raio - 2;
   const baseCanote = T.tubo_selim_comprimento - T.canote_dentro;
   const topoCanote = baseCanote + T.canote_total;
-  tubo('canote', 'preto', [noSelim(baseCanote), noSelim(topoCanote)], raioQ(T.canote_diametro), 16);
-  tubo('canote', 'preto', [noSelim(topoCanote - T.canote_cabeca_comprimento), noSelim(topoCanote - T.canote_cabeca_comprimento / 2), noSelim(topoCanote)], [raioQ(T.canote_diametro) + 0.5, raioQ(T.canote_diametro) + T.canote_cabeca_sobra, raioQ(T.canote_diametro) + T.canote_cabeca_sobra], 24);
   const apoio = noSelim(topoCanote);
+  /* o canote termina um pescoço abaixo do apoio e daí curva até o tambor da presilha, que fica acima do ponto de apoio */
+  const yTambor = apoio[1] + rBracoCanote - T.presilha_tambor_abaixo_do_trilho;
+  const centroTambor = [0, yTambor, apoio[2]];
+  const baseDoPescoco = noSelim(topoCanote - T.presilha_pescoco_comprimento);
+  const meioDoPescoco = noSelim(topoCanote - T.presilha_pescoco_comprimento * 0.7);
+  const rCanote = raioQ(T.canote_diametro);
+  tubo('canote', 'preto', [noSelim(baseCanote), baseDoPescoco], rCanote, 16);
+  tubo('canote', 'preto', [baseDoPescoco, meioDoPescoco, [0, (meioDoPescoco[1] + centroTambor[1]) / 2 - 2, (meioDoPescoco[2] + centroTambor[2]) / 2 + 1], [0, centroTambor[1] - 3, centroTambor[2]]], [rCanote + 0.5, raioQ(2 * T.presilha_pescoco_raio) + 0.5, raioQ(2 * T.presilha_pescoco_raio), raioQ(2 * T.presilha_pescoco_raio) - 1], 24);
   /* SELIM pelas medidas das fotos (SELIM_MEDIDO): o comprimento s vai da traseira (0) ao nariz, e a altura y é relativa ao topo
      da traseira; a presilha do canote fica em s = SELIM_MEDIDO.presilha */
   const SM = SELIM_MEDIDO;
@@ -458,16 +467,15 @@ export function derivar(T) {
     const trilho = SM.caminhoDoTrilho.map(([sMm, y]) => [lado * Math.min(interp(SM.trilhoX, sMm), 0.7 * meiaLargura(sMm)), yRef + y, zDoSelim(sMm)]);
     tubo('selim', 'preto', trilho, trilho.map(() => raioQ(T.selim_trilho_diametro)), 12);
   }
-  /* a presilha, como na foto: o berço abraça só os dois trilhos (de fora a fora deles mais a folga), sobre um cubo arredondado
-     que desce sobre a cabeça do canote, com o parafuso pequeno embaixo, à frente */
-  const xPresilha = interp(SELIM_MEDIDO.trilhoX, SELIM_MEDIDO.presilha) + T.selim_trilho_diametro / 2 + T.presilha_folga_trilho;
-  const yBerco = apoio[1] + rBraco - 2;
-  const ch = T.presilha_berco_chanfro;
-  torno('selim', 'preto', [[0, -xPresilha], [rBraco - ch, -xPresilha], [rBraco, -xPresilha + ch], [rBraco, xPresilha - ch], [rBraco - ch, xPresilha], [0, xPresilha]], [0, yBerco, apoio[2]], { lados: 24, liso: 60 });
-  const rCubo = T.presilha_cubo_raio, hc = T.presilha_cubo_altura, yc = yBerco - T.presilha_cubo_desce;
-  torno('selim', 'preto', [[0, 0], [rCubo - 3, 0], [rCubo, 3], [rCubo, hc - 5], [rCubo - 3, hc - 1], [rCubo - 6, hc], [0, hc]], [0, yc, apoio[2]], { eixo: 'y', lados: 28, liso: 60 });
+  /* a presilha, como na foto: um tambor deitado (eixo x) com a borda arredondada e anéis rasos em cada face, cujo centro está
+     abaixo dos trilhos, que passam por dentro dele; o pescoço do canote o segura por baixo, e o parafuso sai por baixo, à frente */
+  const rT = T.presilha_tambor_raio, wT = T.presilha_tambor_meia_largura, bT = T.presilha_tambor_borda, fT = T.presilha_tambor_anel_fundo;
+  const metade = [[0, wT - fT], [rT - 11, wT - fT], [rT - 10.5, wT], [rT - 9.5, wT], [rT - 9, wT - fT], [rT - 7.4, wT - fT], [rT - 6.9, wT], [rT - 5.9, wT], [rT - 5.4, wT - fT], [rT - bT, wT - fT], [rT - bT * 0.55, wT - bT * 0.15], [rT - bT * 0.15, wT - bT * 0.55], [rT, wT - bT]];
+  const perfilTambor = [...metade.map(([r, x]) => [r, -x]), ...[...metade].reverse().map(([r, x]) => [r, x])];
+  torno('selim', 'preto', perfilTambor, centroTambor, { lados: 36, liso: 60 });
   const zPar = apoio[2] + T.presilha_parafuso_avanco;
-  tubo('selim', 'aco', [[0, yc + 1, zPar], [0, yc - T.presilha_parafuso_comprimento, zPar]], raioQ(2 * T.presilha_parafuso_raio), 12);
+  const yPar = centroTambor[1] - 12;
+  tubo('selim', 'aco', [[0, yPar + 3, zPar], [0, yPar - T.presilha_parafuso_comprimento, zPar]], raioQ(2 * T.presilha_parafuso_raio), 12);
 
   /* RODAS: cubo, aro, pneu e raios no mesmo corpo */
   const rodas = [['rodaDianteira', zEixoFrente, T.eixo_dianteiro_largura], ['rodaTraseira', zEixoTras, T.eixo_traseiro_largura]];
