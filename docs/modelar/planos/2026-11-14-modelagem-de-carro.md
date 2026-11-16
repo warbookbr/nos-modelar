@@ -163,6 +163,8 @@ O processo de hoje não registra esse veredito como rodada. A `rodada-de-modelag
 
 Decidido pela pessoa em 2026-11-16: a meta da lataria é superfície de qualidade de produção, com continuidade de curvatura (G2) e inspeção por reflexo, e o projeto não aceita a subdivisão como teto, mesmo que isso peça um módulo de superfície novo. O limite medido da subdivisão Catmull-Clark (G1 e curvatura divergente nos vértices extraordinários, pela pesquisa em `modulos/pesquisa/novidades-2026-11/alisamento-de-superficie.md`) é um problema a resolver, não uma ressalva a escrever. O plano das ferramentas de correção, que sai da rodada 2 do quarto traseiro, mede o G2 que a subdivisão alcança com o alisamento e as emendas, e, onde ela não alcançar, propõe o caminho para chegar lá (vértice extraordinário tratado, subdivisão guiada, ou superfície NURBS própria no núcleo), com a medida que decide entre eles.
 
+Decidido pela pessoa em 2026-11-16, ao ver o alisamento das curvas (fatia 3 das ferramentas de correção) numa cópia da lataria: na rodada 3, as curvas do para-lama traseiro e do rebaixo lateral podem se afastar até 3 mm da prancha pelo alisamento (`alisarCurvas` com tolerância de 3 mm nessas curvas), e as demais até 1 mm. Com 3 mm o índice do para-lama caiu de 879 para 256 e o do rebaixo de 43 para 28; a chapa principal quase não muda (349 para 333), porque a ondulação dela vem do degrau do ombro e dos cantos da tampa, que as próximas fatias das ferramentas tratam. A rodada 3 também usa o corte com simetria (`aberturaPorContorno` com `simetria: 'x'` e a subdivisão com `costuraExata`) para os vãos saírem nos dois lados.
+
 ## Fechamento
 
 Preencher somente ao concluir ou cancelar.
