@@ -7,7 +7,7 @@ export const CONTROLES_DA_CAPTURA = Object.freeze({
   arame: Object.freeze([]),
   'raio-x': Object.freeze([]),
   curvatura: Object.freeze([]),
-  zebra: Object.freeze(['larguraDaZebra']),
+  zebra: Object.freeze(['larguraDaZebra', 'anguloDaZebra']),
   'luz-rasante': Object.freeze(['azimute']),
   pintura: Object.freeze(['caixasDaPintura']),
 });

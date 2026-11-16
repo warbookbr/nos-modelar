@@ -1,32 +1,48 @@
 /* continuidade-nas-emendas.test.mjs — a continuidade nas emendas nas chapas de calibração do reflexo (`tools/fixtures/reflexo-calibracao/`):
- * acha o degrau (G0), o vinco (G1) e a quebra de curvatura (G2) na emenda declarada (x = 300 mm), com a fresta, o ângulo e a razão de
- * curvatura dentro de 10% do declarado em `CHAPAS[nome].defeito`, e não acusa nada na chapa lisa, que tem a mesma emenda sem defeito. */
+ * acha o degrau (G0), o vinco (G1) e a quebra de curvatura (G2) na linha declarada (x = 300 mm), a fronteira das duas partes sobre a malha
+ * soldada, com a fresta, o ângulo e a razão de curvatura dentro de 10% do declarado em `CHAPAS[nome].defeito`, e não acha emenda nenhuma
+ * na chapa lisa nem nas onduladas, que são uma parte só. */
 import { PNG } from 'pngjs';
 import { describe, expect, it } from 'vitest';
-import { CHAPAS } from '../fixtures/reflexo-calibracao/chapas.mjs';
+import { executarReceita } from '../../src/autoria/executar-receita.js';
+import { CHAPAS, chapaDeCalibracao } from '../fixtures/reflexo-calibracao/chapas.mjs';
 import { continuidadeNasEmendas } from './continuidade-nas-emendas.mjs';
 import { lerEntradaDeMedida } from './entrada-de-medida.mjs';
 
 const neutroDe = async (nome) => (await lerEntradaDeMedida(`tools/fixtures/reflexo-calibracao/${nome}`, { montagem: false })).executar().neutro;
 const medir = async (nome, opcoes = {}) => continuidadeNasEmendas(await neutroDe(nome), { nome, lado: '+z', vista: 'frontal', ...opcoes });
+/* a lisa em duas partes, `esquerda` e `direita`, separadas em x = 300 mm sobre a mesma malha, como as chapas de emenda */
+function chapaComDuasPartesIguais() {
+  const lisa = chapaDeCalibracao('lisa');
+  const caixa = (x0, x1) => ({ regiao: { min: [x0, -1, -1], max: [x1, 1, 1] } });
+  return { ...lisa, PASSOS: [lisa.PASSOS[0], ['parte', { nome: 'esquerda', sel: caixa(-1, 0.305) }], ['parte', { nome: 'direita', sel: caixa(0.295, 1) }]] };
+}
 const dentro10 = (medido, declarado) => expect(Math.abs(medido - declarado) / declarado).toBeLessThanOrEqual(0.1);
 
-/** A única emenda da chapa: as folhas `direita` e `esquerda`, ao longo de toda a linha x = 300. */
+/** A única emenda da chapa: as partes `direita` e `esquerda`, ao longo de toda a linha x = 300. */
 function aEmenda(json) {
   expect(json.emendas).toHaveLength(1);
   const [e] = json.emendas;
   expect(e.lados).toEqual(['direita', 'esquerda']);
   expect(e.comprimentoMm).toBeCloseTo(400, 0);
-  expect(e.amostras.every((a) => Math.abs(a[1] - CHAPAS.lisa.defeito.emendaXMm) < 1)).toBe(true);
+  expect(e.amostras.every((a) => Math.abs(a[1] - CHAPAS.degrau.defeito.emendaXMm) < 1)).toBe(true);
   return e;
 }
 
 describe('continuidade nas emendas', () => {
-  it('na chapa lisa a emenda existe e não acusa nada: fresta 0, ângulo 0, razão 1', async () => {
-    const { json } = await medir('lisa');
+  it('a chapa lisa e as onduladas são uma malha só, de uma parte, e não têm emenda nenhuma', async () => {
+    for (const nome of ['lisa', 'ondulada-100']) {
+      const { json } = await medir(nome);
+      expect(json.emendas).toEqual([]);
+      expect(json.resumo.acusam).toBe(0);
+    }
+  });
+
+  it('a linha soldada sem defeito, separada em duas partes, não acusa nada: fresta 0, ângulo 0, razão 1', async () => {
+    /* a quebra de curvatura com os dois raios iguais é a lisa em duas partes sobre a mesma malha */
+    const { json } = continuidadeNasEmendas(executarReceita(chapaComDuasPartesIguais()).neutro, { lado: '+z', vista: 'frontal' });
     const e = aEmenda(json);
     expect(e.acusa).toEqual({ fresta: 0, angulo: 0, curvatura: 0 });
-    expect(json.resumo.acusam).toBe(0);
     expect(e.maximos.frestaMm.valor).toBeLessThan(0.01);
     expect(e.maximos.anguloGraus.valor).toBeLessThan(0.1);
     expect(e.maximos.razaoDeCurvatura.valor).toBeLessThan(1.05);

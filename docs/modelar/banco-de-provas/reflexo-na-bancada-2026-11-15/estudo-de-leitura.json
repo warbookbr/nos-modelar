@@ -12,10 +12,15 @@
   3,
   9
  ],
+ "angulosDaZebraEmPe": {
+  "0": [
+   90
+  ],
+  "45": []
+ },
  "defeitos": {
   "lisa": {
-   "tipo": "nenhum",
-   "emendaXMm": 300
+   "tipo": "nenhum"
   },
   "degrau": {
    "tipo": "degrau",
@@ -85,7 +90,16 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": 0,
-     "inclinacaoDireitaPor100Px": 0
+     "inclinacaoDireitaPor100Px": 0,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 104.5,
@@ -103,15 +117,78 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": 0,
-     "inclinacaoDireitaPor100Px": 0
+     "inclinacaoDireitaPor100Px": 0,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-3-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0,
+     "periodoDaLisaPx": 74,
+     "direcaoEsquerda": 89.83,
+     "direcaoDireita": 89.85,
+     "dobraGraus": 0.02,
+     "periodoEsquerdaPx": 74,
+     "periodoDireitaPx": 74,
+     "razaoDoPeriodo": 1,
+     "deslocamentoP95Px": 1,
+     "deslocamentoP95EmPeriodos": 0.01,
+     "bordasSemPar": 0,
+     "saltoNaEmendaPx": 0,
+     "saltoNaEmendaEmPeriodos": 0,
+     "inclinacaoEsquerdaPor100Px": -0.04,
+     "inclinacaoDireitaPor100Px": 0.03,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-9-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0,
+     "periodoDaLisaPx": 220,
+     "direcaoEsquerda": -45,
+     "direcaoDireita": 90,
+     "dobraGraus": -45,
+     "periodoEsquerdaPx": 312,
+     "periodoDireitaPx": 220,
+     "razaoDoPeriodo": 1.42,
+     "deslocamentoP95Px": 1,
+     "deslocamentoP95EmPeriodos": 0,
+     "bordasSemPar": 0,
+     "saltoNaEmendaPx": null,
+     "saltoNaEmendaEmPeriodos": null,
+     "inclinacaoEsquerdaPor100Px": -0.19,
+     "inclinacaoDireitaPor100Px": 0.18,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 134.5,
      "mudouContraALisa": 0,
      "periodoDaLisaPx": null,
-     "direcaoEsquerda": -0.34,
-     "direcaoDireita": 0.36,
-     "dobraGraus": 0.7,
+     "direcaoEsquerda": 0.06,
+     "direcaoDireita": -0.05,
+     "dobraGraus": -0.1,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -121,7 +198,16 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    },
    "isometrica": {
@@ -145,7 +231,16 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": -0.02,
-     "inclinacaoDireitaPor100Px": 0.02
+     "inclinacaoDireitaPor100Px": 0.02,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
@@ -163,15 +258,78 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": 0.15,
-     "inclinacaoDireitaPor100Px": 0.03
+     "inclinacaoDireitaPor100Px": 0.03,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-3-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0,
+     "periodoDaLisaPx": 222,
+     "direcaoEsquerda": 34.52,
+     "direcaoDireita": 0.04,
+     "dobraGraus": -34.48,
+     "periodoEsquerdaPx": 170,
+     "periodoDireitaPx": 454,
+     "razaoDoPeriodo": 2.67,
+     "deslocamentoP95Px": 2,
+     "deslocamentoP95EmPeriodos": 0.01,
+     "bordasSemPar": 0.01,
+     "saltoNaEmendaPx": 0,
+     "saltoNaEmendaEmPeriodos": 0,
+     "inclinacaoEsquerdaPor100Px": -0.02,
+     "inclinacaoDireitaPor100Px": 0.06,
+     "bordaTortaNaLinha": {
+      "naLinha": 0.367,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-9-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0,
+     "periodoDaLisaPx": 1028,
+     "direcaoEsquerda": 41.5,
+     "direcaoDireita": 1.04,
+     "dobraGraus": -40.46,
+     "periodoEsquerdaPx": null,
+     "periodoDireitaPx": null,
+     "razaoDoPeriodo": null,
+     "deslocamentoP95Px": 2,
+     "deslocamentoP95EmPeriodos": 0,
+     "bordasSemPar": 0.01,
+     "saltoNaEmendaPx": 1,
+     "saltoNaEmendaEmPeriodos": 0,
+     "inclinacaoEsquerdaPor100Px": -0.03,
+     "inclinacaoDireitaPor100Px": -0.13,
+     "bordaTortaNaLinha": {
+      "naLinha": 0.098,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 29.5,
      "mudouContraALisa": 0,
      "periodoDaLisaPx": null,
-     "direcaoEsquerda": -17.81,
-     "direcaoDireita": -10.95,
-     "dobraGraus": 6.86,
+     "direcaoEsquerda": -17.97,
+     "direcaoDireita": -11.3,
+     "dobraGraus": 6.67,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -181,7 +339,16 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    },
    "tresquartos": {
@@ -205,7 +372,16 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": 0.01,
-     "inclinacaoDireitaPor100Px": -0.03
+     "inclinacaoDireitaPor100Px": -0.03,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
@@ -223,15 +399,78 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": 0.08,
-     "inclinacaoDireitaPor100Px": -0.06
+     "inclinacaoDireitaPor100Px": -0.06,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-3-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0,
+     "periodoDaLisaPx": 174,
+     "direcaoEsquerda": -48.93,
+     "direcaoDireita": -60.68,
+     "dobraGraus": -11.75,
+     "periodoEsquerdaPx": 208,
+     "periodoDireitaPx": 182,
+     "razaoDoPeriodo": 1.14,
+     "deslocamentoP95Px": 1,
+     "deslocamentoP95EmPeriodos": 0.01,
+     "bordasSemPar": 0.01,
+     "saltoNaEmendaPx": 0,
+     "saltoNaEmendaEmPeriodos": 0,
+     "inclinacaoEsquerdaPor100Px": 0.03,
+     "inclinacaoDireitaPor100Px": 0.02,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0.689
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-9-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0,
+     "periodoDaLisaPx": 442,
+     "direcaoEsquerda": 90,
+     "direcaoDireita": 90,
+     "dobraGraus": 0,
+     "periodoEsquerdaPx": 194,
+     "periodoDireitaPx": null,
+     "razaoDoPeriodo": null,
+     "deslocamentoP95Px": 1,
+     "deslocamentoP95EmPeriodos": 0,
+     "bordasSemPar": 0.01,
+     "saltoNaEmendaPx": null,
+     "saltoNaEmendaEmPeriodos": null,
+     "inclinacaoEsquerdaPor100Px": 0.1,
+     "inclinacaoDireitaPor100Px": 0.1,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": 0.531
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 29.5,
      "mudouContraALisa": 0,
-     "periodoDaLisaPx": 32,
-     "direcaoEsquerda": -6.45,
-     "direcaoDireita": -3.92,
-     "dobraGraus": 2.52,
+     "periodoDaLisaPx": null,
+     "direcaoEsquerda": -6.76,
+     "direcaoDireita": -4.12,
+     "dobraGraus": 2.64,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -241,7 +480,16 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    }
   },
@@ -267,7 +515,16 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": 0,
-     "inclinacaoDireitaPor100Px": 0.01
+     "inclinacaoDireitaPor100Px": 0.01,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 104.5,
@@ -285,7 +542,70 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": 0,
-     "inclinacaoDireitaPor100Px": 0
+     "inclinacaoDireitaPor100Px": 0,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-3-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.0003,
+     "periodoDaLisaPx": 74,
+     "direcaoEsquerda": 89.82,
+     "direcaoDireita": 89.84,
+     "dobraGraus": 0.02,
+     "periodoEsquerdaPx": 74,
+     "periodoDireitaPx": 74,
+     "razaoDoPeriodo": 1,
+     "deslocamentoP95Px": 1,
+     "deslocamentoP95EmPeriodos": 0.01,
+     "bordasSemPar": 0,
+     "saltoNaEmendaPx": 0,
+     "saltoNaEmendaEmPeriodos": 0,
+     "inclinacaoEsquerdaPor100Px": -0.16,
+     "inclinacaoDireitaPor100Px": 0.05,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-9-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.0003,
+     "periodoDaLisaPx": 220,
+     "direcaoEsquerda": -45,
+     "direcaoDireita": 90,
+     "dobraGraus": -45,
+     "periodoEsquerdaPx": 312,
+     "periodoDireitaPx": 222,
+     "razaoDoPeriodo": 1.41,
+     "deslocamentoP95Px": 1,
+     "deslocamentoP95EmPeriodos": 0,
+     "bordasSemPar": 0,
+     "saltoNaEmendaPx": null,
+     "saltoNaEmendaEmPeriodos": null,
+     "inclinacaoEsquerdaPor100Px": -0.2,
+     "inclinacaoDireitaPor100Px": 0.22,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 134.5,
@@ -303,21 +623,30 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    },
    "isometrica": {
     "emenda": {
-     "angulo": 88.89,
+     "angulo": 88.87,
      "pixels": 552
     },
     "zebra-3": {
      "limiar": 163.5,
      "mudouContraALisa": 0.0067,
      "periodoDaLisaPx": 246,
-     "direcaoEsquerda": -1.27,
-     "direcaoDireita": -0.71,
-     "dobraGraus": 0.56,
+     "direcaoEsquerda": -1.29,
+     "direcaoDireita": -0.73,
+     "dobraGraus": 0.55,
      "periodoEsquerdaPx": 242,
      "periodoDireitaPx": 246,
      "razaoDoPeriodo": 1.02,
@@ -327,15 +656,24 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": 0.05,
-     "inclinacaoDireitaPor100Px": 0.05
+     "inclinacaoDireitaPor100Px": 0.05,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
      "mudouContraALisa": 0.006,
      "periodoDaLisaPx": 730,
-     "direcaoEsquerda": -1.34,
-     "direcaoDireita": -0.73,
-     "dobraGraus": 0.61,
+     "direcaoEsquerda": -1.33,
+     "direcaoDireita": -0.76,
+     "dobraGraus": 0.57,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -345,15 +683,78 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": 0.07,
-     "inclinacaoDireitaPor100Px": 0.02
+     "inclinacaoDireitaPor100Px": 0.02,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-3-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.0218,
+     "periodoDaLisaPx": 222,
+     "direcaoEsquerda": 33.82,
+     "direcaoDireita": 0.1,
+     "dobraGraus": -33.72,
+     "periodoEsquerdaPx": 170,
+     "periodoDireitaPx": 444,
+     "razaoDoPeriodo": 2.61,
+     "deslocamentoP95Px": 2,
+     "deslocamentoP95EmPeriodos": 0.01,
+     "bordasSemPar": 0.01,
+     "saltoNaEmendaPx": 0,
+     "saltoNaEmendaEmPeriodos": 0,
+     "inclinacaoEsquerdaPor100Px": -0.02,
+     "inclinacaoDireitaPor100Px": 0.18,
+     "bordaTortaNaLinha": {
+      "naLinha": 0.044,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0.4821,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-9-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.0136,
+     "periodoDaLisaPx": 1028,
+     "direcaoEsquerda": 40.64,
+     "direcaoDireita": 1.92,
+     "dobraGraus": -38.72,
+     "periodoEsquerdaPx": null,
+     "periodoDireitaPx": null,
+     "razaoDoPeriodo": null,
+     "deslocamentoP95Px": 2,
+     "deslocamentoP95EmPeriodos": 0,
+     "bordasSemPar": 0,
+     "saltoNaEmendaPx": 2,
+     "saltoNaEmendaEmPeriodos": 0,
+     "inclinacaoEsquerdaPor100Px": -0.19,
+     "inclinacaoDireitaPor100Px": -0.97,
+     "bordaTortaNaLinha": {
+      "naLinha": 0.016,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0.4886,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 29.5,
      "mudouContraALisa": 0.0099,
      "periodoDaLisaPx": null,
-     "direcaoEsquerda": -17.15,
-     "direcaoDireita": -10.85,
-     "dobraGraus": 6.3,
+     "direcaoEsquerda": -17.68,
+     "direcaoDireita": -10.93,
+     "dobraGraus": 6.75,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -363,21 +764,30 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    },
    "tresquartos": {
     "emenda": {
-     "angulo": 88.98,
-     "pixels": 577
+     "angulo": 88.96,
+     "pixels": 578
     },
     "zebra-3": {
      "limiar": 163.5,
      "mudouContraALisa": 0.0069,
      "periodoDaLisaPx": 258,
-     "direcaoEsquerda": -1.23,
-     "direcaoDireita": -0.68,
-     "dobraGraus": 0.55,
+     "direcaoEsquerda": -1.25,
+     "direcaoDireita": -0.7,
+     "dobraGraus": 0.56,
      "periodoEsquerdaPx": 258,
      "periodoDireitaPx": 256,
      "razaoDoPeriodo": 1.01,
@@ -387,15 +797,24 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": 0.08,
-     "inclinacaoDireitaPor100Px": -0.04
+     "inclinacaoDireitaPor100Px": -0.03,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
      "mudouContraALisa": 0.0056,
      "periodoDaLisaPx": 764,
-     "direcaoEsquerda": -1.29,
-     "direcaoDireita": -0.63,
-     "dobraGraus": 0.66,
+     "direcaoEsquerda": -1.34,
+     "direcaoDireita": -0.67,
+     "dobraGraus": 0.67,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -405,15 +824,78 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": 0.01,
-     "inclinacaoDireitaPor100Px": -0.1
+     "inclinacaoDireitaPor100Px": -0.06,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-3-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.0218,
+     "periodoDaLisaPx": 174,
+     "direcaoEsquerda": -47.49,
+     "direcaoDireita": -58.95,
+     "dobraGraus": -11.46,
+     "periodoEsquerdaPx": 170,
+     "periodoDireitaPx": 184,
+     "razaoDoPeriodo": 1.08,
+     "deslocamentoP95Px": 2,
+     "deslocamentoP95EmPeriodos": 0.01,
+     "bordasSemPar": 0.01,
+     "saltoNaEmendaPx": 0,
+     "saltoNaEmendaEmPeriodos": 0,
+     "inclinacaoEsquerdaPor100Px": -0.23,
+     "inclinacaoDireitaPor100Px": -0.01,
+     "bordaTortaNaLinha": {
+      "naLinha": 0.043,
+      "maiorLonge": 0.727
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0.4682,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-9-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.0126,
+     "periodoDaLisaPx": 442,
+     "direcaoEsquerda": 90,
+     "direcaoDireita": 90,
+     "dobraGraus": 0,
+     "periodoEsquerdaPx": 192,
+     "periodoDireitaPx": null,
+     "razaoDoPeriodo": null,
+     "deslocamentoP95Px": 2,
+     "deslocamentoP95EmPeriodos": 0,
+     "bordasSemPar": 0,
+     "saltoNaEmendaPx": null,
+     "saltoNaEmendaEmPeriodos": null,
+     "inclinacaoEsquerdaPor100Px": 0.09,
+     "inclinacaoDireitaPor100Px": 0.12,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0.857
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0.4979,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 29.5,
      "mudouContraALisa": 0.0089,
-     "periodoDaLisaPx": 32,
-     "direcaoEsquerda": -6.5,
-     "direcaoDireita": -3.88,
-     "dobraGraus": 2.62,
+     "periodoDaLisaPx": null,
+     "direcaoEsquerda": -6.6,
+     "direcaoDireita": -3.96,
+     "dobraGraus": 2.64,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -423,7 +905,16 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    }
   },
@@ -449,7 +940,16 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": 0.11,
-     "inclinacaoDireitaPor100Px": -0.08
+     "inclinacaoDireitaPor100Px": -0.08,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 104.5,
@@ -467,15 +967,78 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": 0,
-     "inclinacaoDireitaPor100Px": 0
+     "inclinacaoDireitaPor100Px": 0,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-3-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.3196,
+     "periodoDaLisaPx": 74,
+     "direcaoEsquerda": 89.88,
+     "direcaoDireita": 89.86,
+     "dobraGraus": -0.02,
+     "periodoEsquerdaPx": 74,
+     "periodoDireitaPx": 78,
+     "razaoDoPeriodo": 1.05,
+     "deslocamentoP95Px": 30,
+     "deslocamentoP95EmPeriodos": 0.41,
+     "bordasSemPar": 0,
+     "saltoNaEmendaPx": -5,
+     "saltoNaEmendaEmPeriodos": -0.07,
+     "inclinacaoEsquerdaPor100Px": 0.7,
+     "inclinacaoDireitaPor100Px": -3.77,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0.0036,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-9-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.4344,
+     "periodoDaLisaPx": 220,
+     "direcaoEsquerda": 89.91,
+     "direcaoDireita": 89.95,
+     "dobraGraus": 0.05,
+     "periodoEsquerdaPx": 224,
+     "periodoDireitaPx": 234,
+     "razaoDoPeriodo": 1.04,
+     "deslocamentoP95Px": 105,
+     "deslocamentoP95EmPeriodos": 0.48,
+     "bordasSemPar": 0,
+     "saltoNaEmendaPx": null,
+     "saltoNaEmendaEmPeriodos": null,
+     "inclinacaoEsquerdaPor100Px": 2.54,
+     "inclinacaoDireitaPor100Px": -7.5,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 135.5,
      "mudouContraALisa": 0.0081,
      "periodoDaLisaPx": null,
-     "direcaoEsquerda": -0.36,
-     "direcaoDireita": -0.09,
-     "dobraGraus": 0.28,
+     "direcaoEsquerda": 7.2,
+     "direcaoDireita": -8.35,
+     "dobraGraus": -15.56,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -485,7 +1048,16 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    },
    "isometrica": {
@@ -498,7 +1070,7 @@
      "mudouContraALisa": 0.0781,
      "periodoDaLisaPx": 246,
      "direcaoEsquerda": -1.5,
-     "direcaoDireita": -0.86,
+     "direcaoDireita": -0.87,
      "dobraGraus": 0.63,
      "periodoEsquerdaPx": 246,
      "periodoDireitaPx": 250,
@@ -509,15 +1081,24 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": 1.6,
-     "inclinacaoDireitaPor100Px": 0.64
+     "inclinacaoDireitaPor100Px": 0.64,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
      "mudouContraALisa": 0.0506,
      "periodoDaLisaPx": 730,
-     "direcaoEsquerda": -1.58,
+     "direcaoEsquerda": -1.59,
      "direcaoDireita": -0.88,
-     "dobraGraus": 0.71,
+     "dobraGraus": 0.72,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -527,15 +1108,78 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": -1.86,
-     "inclinacaoDireitaPor100Px": 0
+     "inclinacaoDireitaPor100Px": 0,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-3-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.418,
+     "periodoDaLisaPx": 222,
+     "direcaoEsquerda": 39.49,
+     "direcaoDireita": -66.41,
+     "dobraGraus": 74.1,
+     "periodoEsquerdaPx": 158,
+     "periodoDireitaPx": 182,
+     "razaoDoPeriodo": 1.15,
+     "deslocamentoP95Px": 86,
+     "deslocamentoP95EmPeriodos": 0.39,
+     "bordasSemPar": 0.31,
+     "saltoNaEmendaPx": 96,
+     "saltoNaEmendaEmPeriodos": 0.43,
+     "inclinacaoEsquerdaPor100Px": -1.78,
+     "inclinacaoDireitaPor100Px": -78.26,
+     "bordaTortaNaLinha": {
+      "naLinha": 0.348,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-9-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.2708,
+     "periodoDaLisaPx": 1028,
+     "direcaoEsquerda": 50.92,
+     "direcaoDireita": 90,
+     "dobraGraus": 39.08,
+     "periodoEsquerdaPx": null,
+     "periodoDireitaPx": null,
+     "razaoDoPeriodo": null,
+     "deslocamentoP95Px": 147,
+     "deslocamentoP95EmPeriodos": 0.14,
+     "bordasSemPar": 0.3,
+     "saltoNaEmendaPx": null,
+     "saltoNaEmendaEmPeriodos": null,
+     "inclinacaoEsquerdaPor100Px": -4.92,
+     "inclinacaoDireitaPor100Px": 18.21,
+     "bordaTortaNaLinha": {
+      "naLinha": 0.919,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 29.5,
      "mudouContraALisa": 0.1038,
      "periodoDaLisaPx": null,
-     "direcaoEsquerda": -18.83,
-     "direcaoDireita": -4.97,
-     "dobraGraus": 13.87,
+     "direcaoEsquerda": -22.1,
+     "direcaoDireita": -8.26,
+     "dobraGraus": 13.83,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -545,12 +1189,21 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    },
    "tresquartos": {
     "emenda": {
-     "angulo": 88.81,
+     "angulo": 88.82,
      "pixels": 585
     },
     "zebra-3": {
@@ -569,7 +1222,16 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": 0.18,
-     "inclinacaoDireitaPor100Px": 0.06
+     "inclinacaoDireitaPor100Px": 0.06,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
@@ -587,15 +1249,78 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": -0.2,
-     "inclinacaoDireitaPor100Px": 0.01
+     "inclinacaoDireitaPor100Px": 0.01,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-3-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.3001,
+     "periodoDaLisaPx": 174,
+     "direcaoEsquerda": -62.01,
+     "direcaoDireita": -81.84,
+     "dobraGraus": -19.83,
+     "periodoEsquerdaPx": 236,
+     "periodoDireitaPx": 146,
+     "razaoDoPeriodo": 1.62,
+     "deslocamentoP95Px": 68,
+     "deslocamentoP95EmPeriodos": 0.39,
+     "bordasSemPar": 0.18,
+     "saltoNaEmendaPx": null,
+     "saltoNaEmendaEmPeriodos": null,
+     "inclinacaoEsquerdaPor100Px": -5.32,
+     "inclinacaoDireitaPor100Px": 46.12,
+     "bordaTortaNaLinha": {
+      "naLinha": 0.041,
+      "maiorLonge": 0.879
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-9-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.4312,
+     "periodoDaLisaPx": 442,
+     "direcaoEsquerda": 90,
+     "direcaoDireita": -80.18,
+     "dobraGraus": 9.82,
+     "periodoEsquerdaPx": null,
+     "periodoDireitaPx": 414,
+     "razaoDoPeriodo": null,
+     "deslocamentoP95Px": 159,
+     "deslocamentoP95EmPeriodos": 0.36,
+     "bordasSemPar": 0.32,
+     "saltoNaEmendaPx": null,
+     "saltoNaEmendaEmPeriodos": null,
+     "inclinacaoEsquerdaPor100Px": -7.25,
+     "inclinacaoDireitaPor100Px": 3.8,
+     "bordaTortaNaLinha": {
+      "naLinha": 0.089,
+      "maiorLonge": 0.914
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 28.5,
      "mudouContraALisa": 0.0755,
-     "periodoDaLisaPx": 32,
-     "direcaoEsquerda": -7.19,
-     "direcaoDireita": -2.08,
-     "dobraGraus": 5.11,
+     "periodoDaLisaPx": null,
+     "direcaoEsquerda": -9.76,
+     "direcaoDireita": -3.39,
+     "dobraGraus": 6.37,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -605,7 +1330,16 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    }
   },
@@ -631,7 +1365,16 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": 0.03,
-     "inclinacaoDireitaPor100Px": -0.06
+     "inclinacaoDireitaPor100Px": -0.06,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 104.5,
@@ -649,15 +1392,78 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": 0,
-     "inclinacaoDireitaPor100Px": 0
+     "inclinacaoDireitaPor100Px": 0,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-3-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.2668,
+     "periodoDaLisaPx": 74,
+     "direcaoEsquerda": 89.78,
+     "direcaoDireita": 89.92,
+     "dobraGraus": 0.14,
+     "periodoEsquerdaPx": 36,
+     "periodoDireitaPx": 74,
+     "razaoDoPeriodo": 2.06,
+     "deslocamentoP95Px": 33,
+     "deslocamentoP95EmPeriodos": 0.45,
+     "bordasSemPar": 0,
+     "saltoNaEmendaPx": 16,
+     "saltoNaEmendaEmPeriodos": 0.22,
+     "inclinacaoEsquerdaPor100Px": -6.73,
+     "inclinacaoDireitaPor100Px": -1.81,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-9-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.29,
+     "periodoDaLisaPx": 220,
+     "direcaoEsquerda": -45,
+     "direcaoDireita": 89.92,
+     "dobraGraus": -45.08,
+     "periodoEsquerdaPx": 154,
+     "periodoDireitaPx": 224,
+     "razaoDoPeriodo": 1.45,
+     "deslocamentoP95Px": 106,
+     "deslocamentoP95EmPeriodos": 0.48,
+     "bordasSemPar": 0.12,
+     "saltoNaEmendaPx": null,
+     "saltoNaEmendaEmPeriodos": null,
+     "inclinacaoEsquerdaPor100Px": -11.79,
+     "inclinacaoDireitaPor100Px": -1.67,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 134.5,
      "mudouContraALisa": 0.0804,
      "periodoDaLisaPx": null,
-     "direcaoEsquerda": -0.81,
-     "direcaoDireita": 0.37,
-     "dobraGraus": 1.18,
+     "direcaoEsquerda": 0,
+     "direcaoDireita": -0.46,
+     "dobraGraus": -0.46,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -667,7 +1473,16 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    },
    "isometrica": {
@@ -691,7 +1506,16 @@
      "saltoNaEmendaPx": 1,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": -4.06,
-     "inclinacaoDireitaPor100Px": -1.16
+     "inclinacaoDireitaPor100Px": -1.17,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
@@ -709,15 +1533,78 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": 5.7,
-     "inclinacaoDireitaPor100Px": 0.03
+     "inclinacaoDireitaPor100Px": 0.03,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-3-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.2916,
+     "periodoDaLisaPx": 222,
+     "direcaoEsquerda": 73.78,
+     "direcaoDireita": 8.21,
+     "dobraGraus": -65.56,
+     "periodoEsquerdaPx": 26,
+     "periodoDireitaPx": 494,
+     "razaoDoPeriodo": 19,
+     "deslocamentoP95Px": 85,
+     "deslocamentoP95EmPeriodos": 0.38,
+     "bordasSemPar": 0.03,
+     "saltoNaEmendaPx": 64,
+     "saltoNaEmendaEmPeriodos": 0.29,
+     "inclinacaoEsquerdaPor100Px": -45.07,
+     "inclinacaoDireitaPor100Px": 2.37,
+     "bordaTortaNaLinha": {
+      "naLinha": 0.756,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0.0038,
+      "maiorLonge": 0.0151
+     }
+    },
+    "zebra-9-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.2069,
+     "periodoDaLisaPx": 1028,
+     "direcaoEsquerda": 90,
+     "direcaoDireita": 12.22,
+     "dobraGraus": -77.78,
+     "periodoEsquerdaPx": 68,
+     "periodoDireitaPx": null,
+     "razaoDoPeriodo": null,
+     "deslocamentoP95Px": 484,
+     "deslocamentoP95EmPeriodos": 0.47,
+     "bordasSemPar": 0.36,
+     "saltoNaEmendaPx": null,
+     "saltoNaEmendaEmPeriodos": null,
+     "inclinacaoEsquerdaPor100Px": -288.78,
+     "inclinacaoDireitaPor100Px": -180.99,
+     "bordaTortaNaLinha": {
+      "naLinha": 1,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 30.5,
      "mudouContraALisa": 0.2159,
      "periodoDaLisaPx": null,
-     "direcaoEsquerda": -49.24,
-     "direcaoDireita": -13.46,
-     "dobraGraus": 35.79,
+     "direcaoEsquerda": -49.55,
+     "direcaoDireita": -14.18,
+     "dobraGraus": 35.37,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -727,12 +1614,21 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    },
    "tresquartos": {
     "emenda": {
-     "angulo": 88.47,
+     "angulo": 88.48,
      "pixels": 561
     },
     "zebra-3": {
@@ -750,8 +1646,17 @@
      "bordasSemPar": 0.02,
      "saltoNaEmendaPx": -1,
      "saltoNaEmendaEmPeriodos": 0,
-     "inclinacaoEsquerdaPor100Px": -4.02,
-     "inclinacaoDireitaPor100Px": -1.08
+     "inclinacaoEsquerdaPor100Px": -4.03,
+     "inclinacaoDireitaPor100Px": -1.09,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
@@ -769,15 +1674,78 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": 5.77,
-     "inclinacaoDireitaPor100Px": -0.06
+     "inclinacaoDireitaPor100Px": -0.06,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-3-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.3661,
+     "periodoDaLisaPx": 174,
+     "direcaoEsquerda": -54.92,
+     "direcaoDireita": -59.62,
+     "dobraGraus": -4.71,
+     "periodoEsquerdaPx": 38,
+     "periodoDireitaPx": 176,
+     "razaoDoPeriodo": 4.63,
+     "deslocamentoP95Px": 72,
+     "deslocamentoP95EmPeriodos": 0.41,
+     "bordasSemPar": 0.41,
+     "saltoNaEmendaPx": 32,
+     "saltoNaEmendaEmPeriodos": 0.18,
+     "inclinacaoEsquerdaPor100Px": -3.03,
+     "inclinacaoDireitaPor100Px": 3.78,
+     "bordaTortaNaLinha": {
+      "naLinha": 0.014,
+      "maiorLonge": 0.288
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-9-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.1772,
+     "periodoDaLisaPx": 442,
+     "direcaoEsquerda": -57.91,
+     "direcaoDireita": 90,
+     "dobraGraus": -32.09,
+     "periodoEsquerdaPx": 80,
+     "periodoDireitaPx": 492,
+     "razaoDoPeriodo": 6.15,
+     "deslocamentoP95Px": 138,
+     "deslocamentoP95EmPeriodos": 0.31,
+     "bordasSemPar": 0.51,
+     "saltoNaEmendaPx": null,
+     "saltoNaEmendaEmPeriodos": null,
+     "inclinacaoEsquerdaPor100Px": -112.64,
+     "inclinacaoDireitaPor100Px": 1.22,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 30.5,
      "mudouContraALisa": 0.1928,
-     "periodoDaLisaPx": 32,
-     "direcaoEsquerda": -20.37,
-     "direcaoDireita": -5.12,
-     "dobraGraus": 15.25,
+     "periodoDaLisaPx": null,
+     "direcaoEsquerda": -20.83,
+     "direcaoDireita": -5.51,
+     "dobraGraus": 15.32,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -787,7 +1755,16 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    }
   },
@@ -813,7 +1790,16 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": 0,
-     "inclinacaoDireitaPor100Px": 0
+     "inclinacaoDireitaPor100Px": 0,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 104.5,
@@ -831,15 +1817,78 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": 0,
-     "inclinacaoDireitaPor100Px": 0
+     "inclinacaoDireitaPor100Px": 0,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-3-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.3144,
+     "periodoDaLisaPx": 74,
+     "direcaoEsquerda": -89.98,
+     "direcaoDireita": 89.82,
+     "dobraGraus": -0.21,
+     "periodoEsquerdaPx": 50,
+     "periodoDireitaPx": 46,
+     "razaoDoPeriodo": 1.09,
+     "deslocamentoP95Px": 18,
+     "deslocamentoP95EmPeriodos": 0.24,
+     "bordasSemPar": 0.05,
+     "saltoNaEmendaPx": -4,
+     "saltoNaEmendaEmPeriodos": -0.05,
+     "inclinacaoEsquerdaPor100Px": -1.61,
+     "inclinacaoDireitaPor100Px": 5.18,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": 0.001
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-9-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.104,
+     "periodoDaLisaPx": 220,
+     "direcaoEsquerda": -45,
+     "direcaoDireita": 89.83,
+     "dobraGraus": -45.17,
+     "periodoEsquerdaPx": 348,
+     "periodoDireitaPx": 168,
+     "razaoDoPeriodo": 2.07,
+     "deslocamentoP95Px": 18,
+     "deslocamentoP95EmPeriodos": 0.08,
+     "bordasSemPar": 0,
+     "saltoNaEmendaPx": null,
+     "saltoNaEmendaEmPeriodos": null,
+     "inclinacaoEsquerdaPor100Px": -9.98,
+     "inclinacaoDireitaPor100Px": 16.76,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 134.5,
      "mudouContraALisa": 0,
      "periodoDaLisaPx": null,
-     "direcaoEsquerda": 0.05,
-     "direcaoDireita": 1.18,
-     "dobraGraus": 1.12,
+     "direcaoEsquerda": 0.49,
+     "direcaoDireita": 0.73,
+     "dobraGraus": 0.24,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -849,12 +1898,21 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    },
    "isometrica": {
     "emenda": {
-     "angulo": 88.89,
+     "angulo": 88.9,
      "pixels": 552
     },
     "zebra-3": {
@@ -873,7 +1931,16 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": -0.02,
-     "inclinacaoDireitaPor100Px": 0.02
+     "inclinacaoDireitaPor100Px": 0.02,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
@@ -891,15 +1958,78 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": 0.15,
-     "inclinacaoDireitaPor100Px": 0.03
+     "inclinacaoDireitaPor100Px": 0.03,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-3-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.0906,
+     "periodoDaLisaPx": 222,
+     "direcaoEsquerda": 5.57,
+     "direcaoDireita": 3.3,
+     "dobraGraus": -2.27,
+     "periodoEsquerdaPx": 342,
+     "periodoDireitaPx": 458,
+     "razaoDoPeriodo": 1.34,
+     "deslocamentoP95Px": 19,
+     "deslocamentoP95EmPeriodos": 0.09,
+     "bordasSemPar": 0.03,
+     "saltoNaEmendaPx": -55,
+     "saltoNaEmendaEmPeriodos": -0.25,
+     "inclinacaoEsquerdaPor100Px": 1.86,
+     "inclinacaoDireitaPor100Px": -1,
+     "bordaTortaNaLinha": {
+      "naLinha": 0.455,
+      "maiorLonge": 0.851
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-9-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.0306,
+     "periodoDaLisaPx": 1028,
+     "direcaoEsquerda": 7.88,
+     "direcaoDireita": 8.45,
+     "dobraGraus": 0.57,
+     "periodoEsquerdaPx": null,
+     "periodoDireitaPx": null,
+     "razaoDoPeriodo": null,
+     "deslocamentoP95Px": 24,
+     "deslocamentoP95EmPeriodos": 0.02,
+     "bordasSemPar": 0.1,
+     "saltoNaEmendaPx": -74,
+     "saltoNaEmendaEmPeriodos": -0.07,
+     "inclinacaoEsquerdaPor100Px": 27.89,
+     "inclinacaoDireitaPor100Px": -3.74,
+     "bordaTortaNaLinha": {
+      "naLinha": 0.41,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 29.5,
      "mudouContraALisa": 0.0009,
      "periodoDaLisaPx": null,
-     "direcaoEsquerda": -6.73,
-     "direcaoDireita": -17.98,
-     "dobraGraus": -11.25,
+     "direcaoEsquerda": -6.94,
+     "direcaoDireita": -18.33,
+     "dobraGraus": -11.39,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -909,12 +2039,21 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    },
    "tresquartos": {
     "emenda": {
-     "angulo": 88.97,
+     "angulo": 88.98,
      "pixels": 577
     },
     "zebra-3": {
@@ -933,7 +2072,16 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": 0.01,
-     "inclinacaoDireitaPor100Px": -0.03
+     "inclinacaoDireitaPor100Px": -0.03,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
@@ -951,15 +2099,78 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": 0.08,
-     "inclinacaoDireitaPor100Px": -0.06
+     "inclinacaoDireitaPor100Px": -0.06,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-3-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.1143,
+     "periodoDaLisaPx": 174,
+     "direcaoEsquerda": -12.81,
+     "direcaoDireita": -72.04,
+     "dobraGraus": -59.23,
+     "periodoEsquerdaPx": 426,
+     "periodoDireitaPx": 208,
+     "razaoDoPeriodo": 2.05,
+     "deslocamentoP95Px": 21,
+     "deslocamentoP95EmPeriodos": 0.12,
+     "bordasSemPar": 0.05,
+     "saltoNaEmendaPx": -2,
+     "saltoNaEmendaEmPeriodos": -0.01,
+     "inclinacaoEsquerdaPor100Px": 3.84,
+     "inclinacaoDireitaPor100Px": 2.81,
+     "bordaTortaNaLinha": {
+      "naLinha": 0.485,
+      "maiorLonge": 0.148
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-9-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.0413,
+     "periodoDaLisaPx": 442,
+     "direcaoEsquerda": 90,
+     "direcaoDireita": 90,
+     "dobraGraus": 0,
+     "periodoEsquerdaPx": 204,
+     "periodoDireitaPx": 426,
+     "razaoDoPeriodo": 2.09,
+     "deslocamentoP95Px": 21,
+     "deslocamentoP95EmPeriodos": 0.05,
+     "bordasSemPar": 0.03,
+     "saltoNaEmendaPx": null,
+     "saltoNaEmendaEmPeriodos": null,
+     "inclinacaoEsquerdaPor100Px": 3.18,
+     "inclinacaoDireitaPor100Px": 14.22,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": 0.395
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 29.5,
      "mudouContraALisa": 0.0007,
-     "periodoDaLisaPx": 32,
-     "direcaoEsquerda": -3.18,
-     "direcaoDireita": -6.47,
-     "dobraGraus": -3.29,
+     "periodoDaLisaPx": null,
+     "direcaoEsquerda": -3.32,
+     "direcaoDireita": -6.64,
+     "dobraGraus": -3.31,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -969,7 +2180,16 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    }
   },
@@ -995,7 +2215,16 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": 0,
-     "inclinacaoDireitaPor100Px": 0
+     "inclinacaoDireitaPor100Px": 0,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 104.5,
@@ -1013,15 +2242,78 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": 0,
-     "inclinacaoDireitaPor100Px": 0
+     "inclinacaoDireitaPor100Px": 0,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-3-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.6751,
+     "periodoDaLisaPx": 74,
+     "direcaoEsquerda": 89.74,
+     "direcaoDireita": 89.79,
+     "dobraGraus": 0.05,
+     "periodoEsquerdaPx": 38,
+     "periodoDireitaPx": 36,
+     "razaoDoPeriodo": 1.06,
+     "deslocamentoP95Px": 35,
+     "deslocamentoP95EmPeriodos": 0.47,
+     "bordasSemPar": 0.07,
+     "saltoNaEmendaPx": -34,
+     "saltoNaEmendaEmPeriodos": -0.46,
+     "inclinacaoEsquerdaPor100Px": -2.39,
+     "inclinacaoDireitaPor100Px": 10.59,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-9-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.22,
+     "periodoDaLisaPx": 220,
+     "direcaoEsquerda": -45,
+     "direcaoDireita": 89.79,
+     "dobraGraus": -45.21,
+     "periodoEsquerdaPx": 364,
+     "periodoDireitaPx": 94,
+     "razaoDoPeriodo": 3.87,
+     "deslocamentoP95Px": 102,
+     "deslocamentoP95EmPeriodos": 0.46,
+     "bordasSemPar": 0,
+     "saltoNaEmendaPx": null,
+     "saltoNaEmendaEmPeriodos": null,
+     "inclinacaoEsquerdaPor100Px": -13.6,
+     "inclinacaoDireitaPor100Px": 8.05,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 134.5,
      "mudouContraALisa": 0,
      "periodoDaLisaPx": null,
-     "direcaoEsquerda": -0.59,
-     "direcaoDireita": 1.97,
-     "dobraGraus": 2.56,
+     "direcaoEsquerda": -0.47,
+     "direcaoDireita": 1.5,
+     "dobraGraus": 1.96,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -1031,12 +2323,21 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    },
    "isometrica": {
     "emenda": {
-     "angulo": 88.89,
+     "angulo": 88.91,
      "pixels": 552
     },
     "zebra-3": {
@@ -1055,7 +2356,16 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": -0.02,
-     "inclinacaoDireitaPor100Px": 0.03
+     "inclinacaoDireitaPor100Px": 0.03,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
@@ -1073,15 +2383,78 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": 0.14,
-     "inclinacaoDireitaPor100Px": 0.03
+     "inclinacaoDireitaPor100Px": 0.03,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-3-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.1786,
+     "periodoDaLisaPx": 222,
+     "direcaoEsquerda": -29.44,
+     "direcaoDireita": 14.92,
+     "dobraGraus": 44.36,
+     "periodoEsquerdaPx": 134,
+     "periodoDireitaPx": 82,
+     "razaoDoPeriodo": 1.63,
+     "deslocamentoP95Px": 95,
+     "deslocamentoP95EmPeriodos": 0.43,
+     "bordasSemPar": 0.07,
+     "saltoNaEmendaPx": -67,
+     "saltoNaEmendaEmPeriodos": -0.3,
+     "inclinacaoEsquerdaPor100Px": -16.96,
+     "inclinacaoDireitaPor100Px": 16.23,
+     "bordaTortaNaLinha": {
+      "naLinha": 1,
+      "maiorLonge": 1
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0.0002,
+      "maiorLonge": 0.0007
+     }
+    },
+    "zebra-9-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.062,
+     "periodoDaLisaPx": 1028,
+     "direcaoEsquerda": -38.56,
+     "direcaoDireita": 41.95,
+     "dobraGraus": 80.5,
+     "periodoEsquerdaPx": 86,
+     "periodoDireitaPx": 182,
+     "razaoDoPeriodo": 2.12,
+     "deslocamentoP95Px": 82,
+     "deslocamentoP95EmPeriodos": 0.08,
+     "bordasSemPar": 0.26,
+     "saltoNaEmendaPx": -73,
+     "saltoNaEmendaEmPeriodos": -0.07,
+     "inclinacaoEsquerdaPor100Px": 39.86,
+     "inclinacaoDireitaPor100Px": -6.28,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 29.5,
      "mudouContraALisa": 0.0025,
      "periodoDaLisaPx": null,
-     "direcaoEsquerda": 3.06,
-     "direcaoDireita": -25.05,
-     "dobraGraus": -28.1,
+     "direcaoEsquerda": 2.95,
+     "direcaoDireita": -25.4,
+     "dobraGraus": -28.35,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -1091,12 +2464,21 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    },
    "tresquartos": {
     "emenda": {
-     "angulo": 88.98,
+     "angulo": 88.99,
      "pixels": 577
     },
     "zebra-3": {
@@ -1115,7 +2497,16 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": 0.02,
-     "inclinacaoDireitaPor100Px": -0.03
+     "inclinacaoDireitaPor100Px": -0.03,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
@@ -1133,15 +2524,78 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": 0.08,
-     "inclinacaoDireitaPor100Px": -0.06
+     "inclinacaoDireitaPor100Px": -0.06,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-3-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.2209,
+     "periodoDaLisaPx": 174,
+     "direcaoEsquerda": 29.18,
+     "direcaoDireita": -77.13,
+     "dobraGraus": 73.69,
+     "periodoEsquerdaPx": 278,
+     "periodoDireitaPx": 88,
+     "razaoDoPeriodo": 3.16,
+     "deslocamentoP95Px": 65,
+     "deslocamentoP95EmPeriodos": 0.37,
+     "bordasSemPar": 0.12,
+     "saltoNaEmendaPx": -18,
+     "saltoNaEmendaEmPeriodos": -0.1,
+     "inclinacaoEsquerdaPor100Px": 15.65,
+     "inclinacaoDireitaPor100Px": 0.34,
+     "bordaTortaNaLinha": {
+      "naLinha": 0.522,
+      "maiorLonge": 0.933
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-9-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.087,
+     "periodoDaLisaPx": 442,
+     "direcaoEsquerda": 90,
+     "direcaoDireita": 90,
+     "dobraGraus": 0,
+     "periodoEsquerdaPx": 206,
+     "periodoDireitaPx": 90,
+     "razaoDoPeriodo": 2.29,
+     "deslocamentoP95Px": 201,
+     "deslocamentoP95EmPeriodos": 0.45,
+     "bordasSemPar": 0.12,
+     "saltoNaEmendaPx": null,
+     "saltoNaEmendaEmPeriodos": null,
+     "inclinacaoEsquerdaPor100Px": -1.52,
+     "inclinacaoDireitaPor100Px": 22.23,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": 1
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 29.5,
      "mudouContraALisa": 0.0022,
-     "periodoDaLisaPx": 32,
-     "direcaoEsquerda": 0.43,
-     "direcaoDireita": -9.04,
-     "dobraGraus": -9.47,
+     "periodoDaLisaPx": null,
+     "direcaoEsquerda": 0.06,
+     "direcaoDireita": -9.15,
+     "dobraGraus": -9.2,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -1151,7 +2605,16 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    }
   },
@@ -1177,7 +2640,16 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": 0,
-     "inclinacaoDireitaPor100Px": 0
+     "inclinacaoDireitaPor100Px": 0,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 104.5,
@@ -1195,15 +2667,78 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": 0,
-     "inclinacaoDireitaPor100Px": 0
+     "inclinacaoDireitaPor100Px": 0,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-3-a90": {
+     "limiar": 164.5,
+     "mudouContraALisa": 0.4513,
+     "periodoDaLisaPx": 74,
+     "direcaoEsquerda": 89.75,
+     "direcaoDireita": 89.76,
+     "dobraGraus": 0.02,
+     "periodoEsquerdaPx": 28,
+     "periodoDireitaPx": 26,
+     "razaoDoPeriodo": 1.08,
+     "deslocamentoP95Px": 34,
+     "deslocamentoP95EmPeriodos": 0.46,
+     "bordasSemPar": 0.04,
+     "saltoNaEmendaPx": 3,
+     "saltoNaEmendaEmPeriodos": 0.04,
+     "inclinacaoEsquerdaPor100Px": 3.2,
+     "inclinacaoDireitaPor100Px": -4.38,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0.001
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-9-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.4362,
+     "periodoDaLisaPx": 220,
+     "direcaoEsquerda": -45,
+     "direcaoDireita": 89.74,
+     "dobraGraus": -45.26,
+     "periodoEsquerdaPx": 88,
+     "periodoDireitaPx": 104,
+     "razaoDoPeriodo": 1.18,
+     "deslocamentoP95Px": 103,
+     "deslocamentoP95EmPeriodos": 0.47,
+     "bordasSemPar": 0.05,
+     "saltoNaEmendaPx": 30,
+     "saltoNaEmendaEmPeriodos": 0.14,
+     "inclinacaoEsquerdaPor100Px": -18.85,
+     "inclinacaoDireitaPor100Px": 1.94,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 134.5,
      "mudouContraALisa": 0.0002,
      "periodoDaLisaPx": null,
-     "direcaoEsquerda": -3.01,
-     "direcaoDireita": 3.69,
-     "dobraGraus": 6.7,
+     "direcaoEsquerda": -3.06,
+     "direcaoDireita": 3.26,
+     "dobraGraus": 6.32,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -1213,12 +2748,21 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    },
    "isometrica": {
     "emenda": {
-     "angulo": 88.88,
+     "angulo": 88.89,
      "pixels": 552
     },
     "zebra-3": {
@@ -1237,7 +2781,16 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": -0.01,
-     "inclinacaoDireitaPor100Px": 0.03
+     "inclinacaoDireitaPor100Px": 0.03,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
@@ -1255,15 +2808,78 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": 0.14,
-     "inclinacaoDireitaPor100Px": 0.03
+     "inclinacaoDireitaPor100Px": 0.03,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-3-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.3511,
+     "periodoDaLisaPx": 222,
+     "direcaoEsquerda": -63.81,
+     "direcaoDireita": 84.36,
+     "dobraGraus": -31.83,
+     "periodoEsquerdaPx": 50,
+     "periodoDireitaPx": 100,
+     "razaoDoPeriodo": 2,
+     "deslocamentoP95Px": 98,
+     "deslocamentoP95EmPeriodos": 0.44,
+     "bordasSemPar": 0.12,
+     "saltoNaEmendaPx": -69,
+     "saltoNaEmendaEmPeriodos": -0.31,
+     "inclinacaoEsquerdaPor100Px": -38.73,
+     "inclinacaoDireitaPor100Px": 16.24,
+     "bordaTortaNaLinha": {
+      "naLinha": 1,
+      "maiorLonge": 0.893
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0.0026,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-9-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.1183,
+     "periodoDaLisaPx": 1028,
+     "direcaoEsquerda": -66.47,
+     "direcaoDireita": 80.24,
+     "dobraGraus": -33.3,
+     "periodoEsquerdaPx": 54,
+     "periodoDireitaPx": 92,
+     "razaoDoPeriodo": 1.7,
+     "deslocamentoP95Px": 483,
+     "deslocamentoP95EmPeriodos": 0.47,
+     "bordasSemPar": 0.36,
+     "saltoNaEmendaPx": -105,
+     "saltoNaEmendaEmPeriodos": -0.1,
+     "inclinacaoEsquerdaPor100Px": 70.78,
+     "inclinacaoDireitaPor100Px": -10.9,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": 0.397
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 29.5,
      "mudouContraALisa": 0.004,
      "periodoDaLisaPx": null,
-     "direcaoEsquerda": 23.78,
-     "direcaoDireita": -38.16,
-     "dobraGraus": -61.95,
+     "direcaoEsquerda": 23.65,
+     "direcaoDireita": -38.4,
+     "dobraGraus": -62.05,
      "periodoEsquerdaPx": 80,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -1273,12 +2889,21 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    },
    "tresquartos": {
     "emenda": {
-     "angulo": 88.96,
+     "angulo": 88.97,
      "pixels": 577
     },
     "zebra-3": {
@@ -1297,7 +2922,16 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": 0.03,
-     "inclinacaoDireitaPor100Px": -0.02
+     "inclinacaoDireitaPor100Px": -0.02,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
@@ -1315,15 +2949,78 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": 0.08,
-     "inclinacaoDireitaPor100Px": -0.07
+     "inclinacaoDireitaPor100Px": -0.07,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
+    },
+    "zebra-3-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.406,
+     "periodoDaLisaPx": 174,
+     "direcaoEsquerda": 63.97,
+     "direcaoDireita": -81.86,
+     "dobraGraus": 34.17,
+     "periodoEsquerdaPx": 74,
+     "periodoDireitaPx": 68,
+     "razaoDoPeriodo": 1.09,
+     "deslocamentoP95Px": 75,
+     "deslocamentoP95EmPeriodos": 0.43,
+     "bordasSemPar": 0.15,
+     "saltoNaEmendaPx": -30,
+     "saltoNaEmendaEmPeriodos": -0.17,
+     "inclinacaoEsquerdaPor100Px": 44.44,
+     "inclinacaoDireitaPor100Px": 0.29,
+     "bordaTortaNaLinha": {
+      "naLinha": 0.864,
+      "maiorLonge": 0.784
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0.0002,
+      "maiorLonge": 0.0006
+     }
+    },
+    "zebra-9-a90": {
+     "limiar": 163.5,
+     "mudouContraALisa": 0.1795,
+     "periodoDaLisaPx": 442,
+     "direcaoEsquerda": 43.06,
+     "direcaoDireita": -86.8,
+     "dobraGraus": 50.13,
+     "periodoEsquerdaPx": 56,
+     "periodoDireitaPx": 122,
+     "razaoDoPeriodo": 2.18,
+     "deslocamentoP95Px": 203,
+     "deslocamentoP95EmPeriodos": 0.46,
+     "bordasSemPar": 0.2,
+     "saltoNaEmendaPx": 262,
+     "saltoNaEmendaEmPeriodos": 0.59,
+     "inclinacaoEsquerdaPor100Px": -45.32,
+     "inclinacaoDireitaPor100Px": -7.78,
+     "bordaTortaNaLinha": {
+      "naLinha": 1,
+      "maiorLonge": 1
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0.0002,
+      "maiorLonge": 0.0006
+     }
     },
     "pintura": {
      "limiar": 29.5,
      "mudouContraALisa": 0.0037,
-     "periodoDaLisaPx": 32,
-     "direcaoEsquerda": 7.45,
-     "direcaoDireita": -15.2,
-     "dobraGraus": -22.65,
+     "periodoDaLisaPx": null,
+     "direcaoEsquerda": 7.26,
+     "direcaoDireita": -15.58,
+     "dobraGraus": -22.84,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -1333,7 +3030,16 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    }
   },
@@ -1347,9 +3053,9 @@
      "limiar": 163.5,
      "mudouContraALisa": 0,
      "periodoDaLisaPx": 94,
-     "direcaoEsquerda": 27.41,
-     "direcaoDireita": 27.09,
-     "dobraGraus": -0.32,
+     "direcaoEsquerda": 28.04,
+     "direcaoDireita": 28.05,
+     "dobraGraus": 0.01,
      "periodoEsquerdaPx": 94,
      "periodoDireitaPx": 94,
      "razaoDoPeriodo": 1,
@@ -1359,33 +3065,51 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": 0,
-     "inclinacaoDireitaPor100Px": 0
+     "inclinacaoDireitaPor100Px": 0,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
      "mudouContraALisa": 0,
      "periodoDaLisaPx": 280,
-     "direcaoEsquerda": 27.6,
-     "direcaoDireita": 27.4,
-     "dobraGraus": -0.2,
-     "periodoEsquerdaPx": 284,
+     "direcaoEsquerda": 28.18,
+     "direcaoDireita": 28.18,
+     "dobraGraus": 0,
+     "periodoEsquerdaPx": 282,
      "periodoDireitaPx": 282,
-     "razaoDoPeriodo": 1.01,
+     "razaoDoPeriodo": 1,
      "deslocamentoP95Px": 1,
      "deslocamentoP95EmPeriodos": 0,
      "bordasSemPar": 0,
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": 0.02,
-     "inclinacaoDireitaPor100Px": -0.03
+     "inclinacaoDireitaPor100Px": -0.03,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 132.5,
      "mudouContraALisa": 0,
      "periodoDaLisaPx": null,
-     "direcaoEsquerda": 61.28,
-     "direcaoDireita": 61.39,
-     "dobraGraus": 0.11,
+     "direcaoEsquerda": 60.84,
+     "direcaoDireita": 60.86,
+     "dobraGraus": 0.02,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -1395,7 +3119,16 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    },
    "isometrica": {
@@ -1406,10 +3139,10 @@
     "zebra-3": {
      "limiar": 163.5,
      "mudouContraALisa": 0,
-     "periodoDaLisaPx": 120,
-     "direcaoEsquerda": 39.79,
-     "direcaoDireita": 40.47,
-     "dobraGraus": 0.68,
+     "periodoDaLisaPx": 118,
+     "direcaoEsquerda": 39.84,
+     "direcaoDireita": 40.79,
+     "dobraGraus": 0.96,
      "periodoEsquerdaPx": 142,
      "periodoDireitaPx": 114,
      "razaoDoPeriodo": 1.25,
@@ -1419,15 +3152,24 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": -0.01,
-     "inclinacaoDireitaPor100Px": 0.01
+     "inclinacaoDireitaPor100Px": 0.01,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
      "mudouContraALisa": 0,
      "periodoDaLisaPx": 352,
-     "direcaoEsquerda": 39.68,
-     "direcaoDireita": 40.81,
-     "dobraGraus": 1.13,
+     "direcaoEsquerda": 39.71,
+     "direcaoDireita": 41.14,
+     "dobraGraus": 1.43,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": 344,
      "razaoDoPeriodo": null,
@@ -1437,15 +3179,24 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": -0.02,
-     "inclinacaoDireitaPor100Px": 0.17
+     "inclinacaoDireitaPor100Px": 0.17,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 25.5,
      "mudouContraALisa": 0,
-     "periodoDaLisaPx": 270,
+     "periodoDaLisaPx": null,
      "direcaoEsquerda": 62.94,
-     "direcaoDireita": 81.79,
-     "dobraGraus": 18.85,
+     "direcaoDireita": 81.5,
+     "dobraGraus": 18.55,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -1455,21 +3206,30 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    },
    "tresquartos": {
     "emenda": {
-     "angulo": 56.27,
+     "angulo": 56.26,
      "pixels": 471
     },
     "zebra-3": {
      "limiar": 163.5,
      "mudouContraALisa": 0,
      "periodoDaLisaPx": 116,
-     "direcaoEsquerda": 36.94,
-     "direcaoDireita": 37.29,
-     "dobraGraus": 0.34,
+     "direcaoEsquerda": 37.17,
+     "direcaoDireita": 37.86,
+     "dobraGraus": 0.69,
      "periodoEsquerdaPx": 134,
      "periodoDireitaPx": 112,
      "razaoDoPeriodo": 1.2,
@@ -1479,17 +3239,26 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": -0.01,
-     "inclinacaoDireitaPor100Px": 0
+     "inclinacaoDireitaPor100Px": 0,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
      "mudouContraALisa": 0,
-     "periodoDaLisaPx": 340,
-     "direcaoEsquerda": 36.92,
-     "direcaoDireita": 37.78,
-     "dobraGraus": 0.86,
+     "periodoDaLisaPx": 344,
+     "direcaoEsquerda": 37.09,
+     "direcaoDireita": 38.33,
+     "dobraGraus": 1.24,
      "periodoEsquerdaPx": null,
-     "periodoDireitaPx": 336,
+     "periodoDireitaPx": 338,
      "razaoDoPeriodo": null,
      "deslocamentoP95Px": 1,
      "deslocamentoP95EmPeriodos": 0,
@@ -1497,15 +3266,24 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": 0,
-     "inclinacaoDireitaPor100Px": -0.04
+     "inclinacaoDireitaPor100Px": -0.04,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 29.5,
      "mudouContraALisa": 0,
-     "periodoDaLisaPx": 150,
-     "direcaoEsquerda": 76.78,
-     "direcaoDireita": 75.09,
-     "dobraGraus": -1.68,
+     "periodoDaLisaPx": null,
+     "direcaoEsquerda": 76.49,
+     "direcaoDireita": 74.75,
+     "dobraGraus": -1.74,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -1515,7 +3293,16 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    }
   },
@@ -1527,7 +3314,7 @@
     },
     "zebra-3": {
      "limiar": 163.5,
-     "mudouContraALisa": 0.0002,
+     "mudouContraALisa": 0.002,
      "periodoDaLisaPx": 94,
      "direcaoEsquerda": 27.31,
      "direcaoDireita": 27.22,
@@ -1541,11 +3328,20 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": -0.03,
-     "inclinacaoDireitaPor100Px": 0.03
+     "inclinacaoDireitaPor100Px": 0.03,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
-     "mudouContraALisa": 0.0001,
+     "mudouContraALisa": 0.0007,
      "periodoDaLisaPx": 280,
      "direcaoEsquerda": 27.52,
      "direcaoDireita": 27.52,
@@ -1559,7 +3355,16 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": 0.01,
-     "inclinacaoDireitaPor100Px": -0.02
+     "inclinacaoDireitaPor100Px": -0.02,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 132.5,
@@ -1577,41 +3382,59 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    },
    "isometrica": {
     "emenda": {
-     "angulo": 59.99,
-     "pixels": 493
+     "angulo": 60,
+     "pixels": 492
     },
     "zebra-3": {
      "limiar": 163.5,
-     "mudouContraALisa": 0.0235,
-     "periodoDaLisaPx": 120,
-     "direcaoEsquerda": 39.37,
-     "direcaoDireita": 40.5,
-     "dobraGraus": 1.13,
-     "periodoEsquerdaPx": 140,
+     "mudouContraALisa": 0.0241,
+     "periodoDaLisaPx": 118,
+     "direcaoEsquerda": 39.75,
+     "direcaoDireita": 40.18,
+     "dobraGraus": 0.43,
+     "periodoEsquerdaPx": 142,
      "periodoDireitaPx": 116,
-     "razaoDoPeriodo": 1.21,
+     "razaoDoPeriodo": 1.22,
      "deslocamentoP95Px": 1,
      "deslocamentoP95EmPeriodos": 0.01,
      "bordasSemPar": 0.02,
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": -0.02,
-     "inclinacaoDireitaPor100Px": 0.08
+     "inclinacaoDireitaPor100Px": 0.08,
+     "bordaTortaNaLinha": {
+      "naLinha": 0.172,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0.2946,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
-     "mudouContraALisa": 0.0125,
+     "mudouContraALisa": 0.0126,
      "periodoDaLisaPx": 352,
-     "direcaoEsquerda": 39.37,
-     "direcaoDireita": 40.83,
-     "dobraGraus": 1.46,
+     "direcaoEsquerda": 39.66,
+     "direcaoDireita": 40.46,
+     "dobraGraus": 0.8,
      "periodoEsquerdaPx": null,
-     "periodoDireitaPx": 342,
+     "periodoDireitaPx": 344,
      "razaoDoPeriodo": null,
      "deslocamentoP95Px": 1,
      "deslocamentoP95EmPeriodos": 0,
@@ -1619,15 +3442,24 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": -0.02,
-     "inclinacaoDireitaPor100Px": 0.29
+     "inclinacaoDireitaPor100Px": 0.29,
+     "bordaTortaNaLinha": {
+      "naLinha": 0.082,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0.4279,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
-     "limiar": 100.5,
+     "limiar": 99.5,
      "mudouContraALisa": 0.0103,
-     "periodoDaLisaPx": 270,
-     "direcaoEsquerda": 62.93,
-     "direcaoDireita": 81.79,
-     "dobraGraus": 18.86,
+     "periodoDaLisaPx": null,
+     "direcaoEsquerda": 62.92,
+     "direcaoDireita": 82.21,
+     "dobraGraus": 19.29,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -1637,21 +3469,30 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": 0.023,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0.4539,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    },
    "tresquartos": {
     "emenda": {
      "angulo": 56.27,
-     "pixels": 471
+     "pixels": 469
     },
     "zebra-3": {
      "limiar": 163.5,
-     "mudouContraALisa": 0.0183,
+     "mudouContraALisa": 0.0191,
      "periodoDaLisaPx": 116,
-     "direcaoEsquerda": 36.5,
-     "direcaoDireita": 37.3,
-     "dobraGraus": 0.79,
+     "direcaoEsquerda": 36.78,
+     "direcaoDireita": 36.95,
+     "dobraGraus": 0.17,
      "periodoEsquerdaPx": 134,
      "periodoDireitaPx": 112,
      "razaoDoPeriodo": 1.2,
@@ -1661,15 +3502,24 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": 0.04,
-     "inclinacaoDireitaPor100Px": 0.04
+     "inclinacaoDireitaPor100Px": 0.04,
+     "bordaTortaNaLinha": {
+      "naLinha": 0.222,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0.0903,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
      "mudouContraALisa": 0.0114,
-     "periodoDaLisaPx": 340,
-     "direcaoEsquerda": 36.51,
-     "direcaoDireita": 37.76,
-     "dobraGraus": 1.26,
+     "periodoDaLisaPx": 344,
+     "direcaoEsquerda": 36.77,
+     "direcaoDireita": 37.43,
+     "dobraGraus": 0.66,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": 338,
      "razaoDoPeriodo": null,
@@ -1679,15 +3529,24 @@
      "saltoNaEmendaPx": 0,
      "saltoNaEmendaEmPeriodos": 0,
      "inclinacaoEsquerdaPor100Px": 0.04,
-     "inclinacaoDireitaPor100Px": 0.04
+     "inclinacaoDireitaPor100Px": 0.04,
+     "bordaTortaNaLinha": {
+      "naLinha": 0.051,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0.2512,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 30.5,
-     "mudouContraALisa": 0.0093,
-     "periodoDaLisaPx": 150,
-     "direcaoEsquerda": 77.23,
-     "direcaoDireita": 75.12,
-     "dobraGraus": -2.11,
+     "mudouContraALisa": 0.0092,
+     "periodoDaLisaPx": null,
+     "direcaoEsquerda": 76.96,
+     "direcaoDireita": 75.45,
+     "dobraGraus": -1.51,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -1697,7 +3556,16 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0.5103,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    }
   },
@@ -1709,47 +3577,65 @@
     },
     "zebra-3": {
      "limiar": 163.5,
-     "mudouContraALisa": 0.301,
+     "mudouContraALisa": 0.302,
      "periodoDaLisaPx": 94,
-     "direcaoEsquerda": 27.26,
-     "direcaoDireita": 26.57,
-     "dobraGraus": -0.68,
+     "direcaoEsquerda": 33.99,
+     "direcaoDireita": 34.93,
+     "dobraGraus": 0.94,
      "periodoEsquerdaPx": 94,
      "periodoDireitaPx": 100,
      "razaoDoPeriodo": 1.06,
      "deslocamentoP95Px": 29,
      "deslocamentoP95EmPeriodos": 0.31,
      "bordasSemPar": 0.05,
-     "saltoNaEmendaPx": 36,
-     "saltoNaEmendaEmPeriodos": 0.38,
-     "inclinacaoEsquerdaPor100Px": -1.11,
-     "inclinacaoDireitaPor100Px": -4.85
+     "saltoNaEmendaPx": 35,
+     "saltoNaEmendaEmPeriodos": 0.37,
+     "inclinacaoEsquerdaPor100Px": -1.1,
+     "inclinacaoDireitaPor100Px": -4.57,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0.0393,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
-     "mudouContraALisa": 0.4285,
+     "mudouContraALisa": 0.4268,
      "periodoDaLisaPx": 280,
-     "direcaoEsquerda": 27.44,
-     "direcaoDireita": 26.71,
-     "dobraGraus": -0.72,
+     "direcaoEsquerda": 33.88,
+     "direcaoDireita": 35.14,
+     "dobraGraus": 1.26,
      "periodoEsquerdaPx": 286,
-     "periodoDireitaPx": 296,
-     "razaoDoPeriodo": 1.03,
+     "periodoDireitaPx": 306,
+     "razaoDoPeriodo": 1.07,
      "deslocamentoP95Px": 123,
      "deslocamentoP95EmPeriodos": 0.44,
      "bordasSemPar": 0.18,
      "saltoNaEmendaPx": 127,
      "saltoNaEmendaEmPeriodos": 0.45,
-     "inclinacaoEsquerdaPor100Px": -1.03,
-     "inclinacaoDireitaPor100Px": -1.24
+     "inclinacaoEsquerdaPor100Px": -0.99,
+     "inclinacaoDireitaPor100Px": -0.9,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 133.5,
-     "mudouContraALisa": 0.1089,
+     "mudouContraALisa": 0.1059,
      "periodoDaLisaPx": null,
-     "direcaoEsquerda": 28.57,
-     "direcaoDireita": 26.56,
-     "dobraGraus": -2.01,
+     "direcaoEsquerda": 39.51,
+     "direcaoDireita": 35.74,
+     "dobraGraus": -3.76,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -1759,57 +3645,84 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    },
    "isometrica": {
     "emenda": {
-     "angulo": 60.04,
+     "angulo": 60.03,
      "pixels": 490
     },
     "zebra-3": {
      "limiar": 163.5,
-     "mudouContraALisa": 0.2978,
-     "periodoDaLisaPx": 120,
-     "direcaoEsquerda": 39.68,
-     "direcaoDireita": 42.42,
-     "dobraGraus": 2.74,
+     "mudouContraALisa": 0.3113,
+     "periodoDaLisaPx": 118,
+     "direcaoEsquerda": 40.2,
+     "direcaoDireita": 48.45,
+     "dobraGraus": 8.25,
      "periodoEsquerdaPx": 138,
      "periodoDireitaPx": 108,
      "razaoDoPeriodo": 1.28,
      "deslocamentoP95Px": 28,
-     "deslocamentoP95EmPeriodos": 0.23,
+     "deslocamentoP95EmPeriodos": 0.24,
      "bordasSemPar": 0.1,
      "saltoNaEmendaPx": -1,
      "saltoNaEmendaEmPeriodos": -0.01,
      "inclinacaoEsquerdaPor100Px": 1.51,
-     "inclinacaoDireitaPor100Px": 8.34
+     "inclinacaoDireitaPor100Px": 8.27,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
-     "mudouContraALisa": 0.546,
+     "mudouContraALisa": 0.5453,
      "periodoDaLisaPx": 352,
-     "direcaoEsquerda": 39.51,
-     "direcaoDireita": 42.19,
-     "dobraGraus": 2.68,
+     "direcaoEsquerda": 39.89,
+     "direcaoDireita": 48.12,
+     "dobraGraus": 8.23,
      "periodoEsquerdaPx": null,
-     "periodoDireitaPx": 320,
+     "periodoDireitaPx": 322,
      "razaoDoPeriodo": null,
      "deslocamentoP95Px": 135,
      "deslocamentoP95EmPeriodos": 0.38,
-     "bordasSemPar": 0.35,
+     "bordasSemPar": 0.37,
      "saltoNaEmendaPx": 115,
      "saltoNaEmendaEmPeriodos": 0.33,
      "inclinacaoEsquerdaPor100Px": 3.08,
-     "inclinacaoDireitaPor100Px": 6.51
+     "inclinacaoDireitaPor100Px": 6.56,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 106.5,
-     "mudouContraALisa": 0.0839,
-     "periodoDaLisaPx": 270,
-     "direcaoEsquerda": 34.32,
-     "direcaoDireita": 41.63,
-     "dobraGraus": 7.31,
+     "mudouContraALisa": 0.0834,
+     "periodoDaLisaPx": null,
+     "direcaoEsquerda": 35.49,
+     "direcaoDireita": 50.84,
+     "dobraGraus": 15.35,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -1819,7 +3732,16 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    },
    "tresquartos": {
@@ -1829,47 +3751,65 @@
     },
     "zebra-3": {
      "limiar": 163.5,
-     "mudouContraALisa": 0.3653,
+     "mudouContraALisa": 0.3755,
      "periodoDaLisaPx": 116,
-     "direcaoEsquerda": 36.83,
-     "direcaoDireita": 38.72,
-     "dobraGraus": 1.89,
-     "periodoEsquerdaPx": 134,
+     "direcaoEsquerda": 39.7,
+     "direcaoDireita": 46.17,
+     "dobraGraus": 6.47,
+     "periodoEsquerdaPx": 132,
      "periodoDireitaPx": 106,
-     "razaoDoPeriodo": 1.26,
+     "razaoDoPeriodo": 1.25,
      "deslocamentoP95Px": 34,
      "deslocamentoP95EmPeriodos": 0.29,
      "bordasSemPar": 0.12,
      "saltoNaEmendaPx": 10,
      "saltoNaEmendaEmPeriodos": 0.09,
      "inclinacaoEsquerdaPor100Px": 1.3,
-     "inclinacaoDireitaPor100Px": 7.09
+     "inclinacaoDireitaPor100Px": 7.05,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0.0025,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
-     "mudouContraALisa": 0.5509,
-     "periodoDaLisaPx": 340,
-     "direcaoEsquerda": 36.73,
-     "direcaoDireita": 38.75,
-     "dobraGraus": 2.02,
+     "mudouContraALisa": 0.5505,
+     "periodoDaLisaPx": 344,
+     "direcaoEsquerda": 39.24,
+     "direcaoDireita": 45.79,
+     "dobraGraus": 6.55,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": 318,
      "razaoDoPeriodo": null,
      "deslocamentoP95Px": 141,
      "deslocamentoP95EmPeriodos": 0.41,
-     "bordasSemPar": 0.32,
-     "saltoNaEmendaPx": 123,
-     "saltoNaEmendaEmPeriodos": 0.36,
+     "bordasSemPar": 0.33,
+     "saltoNaEmendaPx": 122,
+     "saltoNaEmendaEmPeriodos": 0.35,
      "inclinacaoEsquerdaPor100Px": 2.1,
-     "inclinacaoDireitaPor100Px": 6.29
+     "inclinacaoDireitaPor100Px": 6.4,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 112.5,
-     "mudouContraALisa": 0.0878,
-     "periodoDaLisaPx": 150,
-     "direcaoEsquerda": 35.27,
-     "direcaoDireita": 38.86,
-     "dobraGraus": 3.59,
+     "mudouContraALisa": 0.0874,
+     "periodoDaLisaPx": null,
+     "direcaoEsquerda": 40.18,
+     "direcaoDireita": 48.8,
+     "dobraGraus": 8.62,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -1879,7 +3819,16 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    }
   },
@@ -1891,47 +3840,65 @@
     },
     "zebra-3": {
      "limiar": 163.5,
-     "mudouContraALisa": 0.2851,
+     "mudouContraALisa": 0.2825,
      "periodoDaLisaPx": 94,
-     "direcaoEsquerda": 37.31,
-     "direcaoDireita": 26.97,
-     "dobraGraus": -10.33,
+     "direcaoEsquerda": 37.56,
+     "direcaoDireita": 28.74,
+     "dobraGraus": -8.82,
      "periodoEsquerdaPx": 46,
      "periodoDireitaPx": 94,
      "razaoDoPeriodo": 2.04,
      "deslocamentoP95Px": 42,
      "deslocamentoP95EmPeriodos": 0.45,
      "bordasSemPar": 0.04,
-     "saltoNaEmendaPx": 27,
-     "saltoNaEmendaEmPeriodos": 0.29,
-     "inclinacaoEsquerdaPor100Px": -7.84,
-     "inclinacaoDireitaPor100Px": -1.4
+     "saltoNaEmendaPx": 26,
+     "saltoNaEmendaEmPeriodos": 0.28,
+     "inclinacaoEsquerdaPor100Px": -7.25,
+     "inclinacaoDireitaPor100Px": -1.44,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
-     "mudouContraALisa": 0.2132,
+     "mudouContraALisa": 0.2123,
      "periodoDaLisaPx": 280,
-     "direcaoEsquerda": 36.99,
-     "direcaoDireita": 27.26,
-     "dobraGraus": -9.73,
+     "direcaoEsquerda": 37.33,
+     "direcaoDireita": 28.77,
+     "dobraGraus": -8.57,
      "periodoEsquerdaPx": 132,
-     "periodoDireitaPx": 286,
-     "razaoDoPeriodo": 2.17,
-     "deslocamentoP95Px": 129,
+     "periodoDireitaPx": 284,
+     "razaoDoPeriodo": 2.15,
+     "deslocamentoP95Px": 128,
      "deslocamentoP95EmPeriodos": 0.46,
      "bordasSemPar": 0.06,
      "saltoNaEmendaPx": 45,
      "saltoNaEmendaEmPeriodos": 0.16,
-     "inclinacaoEsquerdaPor100Px": -60.13,
-     "inclinacaoDireitaPor100Px": -1.55
+     "inclinacaoEsquerdaPor100Px": -60.16,
+     "inclinacaoDireitaPor100Px": -1.59,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 124.5,
-     "mudouContraALisa": 0.0351,
+     "mudouContraALisa": 0.0332,
      "periodoDaLisaPx": null,
-     "direcaoEsquerda": 51.92,
-     "direcaoDireita": 61.54,
-     "dobraGraus": 9.62,
+     "direcaoEsquerda": 51.73,
+     "direcaoDireita": 60.2,
+     "dobraGraus": 8.47,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -1941,7 +3908,16 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    },
    "isometrica": {
@@ -1951,47 +3927,65 @@
     },
     "zebra-3": {
      "limiar": 163.5,
-     "mudouContraALisa": 0.4861,
-     "periodoDaLisaPx": 120,
-     "direcaoEsquerda": 51.96,
-     "direcaoDireita": 40.45,
-     "dobraGraus": -11.51,
+     "mudouContraALisa": 0.486,
+     "periodoDaLisaPx": 118,
+     "direcaoEsquerda": 52,
+     "direcaoDireita": 41.23,
+     "dobraGraus": -10.77,
      "periodoEsquerdaPx": 68,
      "periodoDireitaPx": 120,
      "razaoDoPeriodo": 1.76,
-     "deslocamentoP95Px": 47,
+     "deslocamentoP95Px": 46,
      "deslocamentoP95EmPeriodos": 0.39,
      "bordasSemPar": 0.09,
      "saltoNaEmendaPx": 41,
-     "saltoNaEmendaEmPeriodos": 0.34,
-     "inclinacaoEsquerdaPor100Px": -31.92,
-     "inclinacaoDireitaPor100Px": -4.54
+     "saltoNaEmendaEmPeriodos": 0.35,
+     "inclinacaoEsquerdaPor100Px": -32.28,
+     "inclinacaoDireitaPor100Px": -4.68,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0.015
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
      "mudouContraALisa": 0.1978,
      "periodoDaLisaPx": 352,
-     "direcaoEsquerda": 51.55,
-     "direcaoDireita": 40.48,
-     "dobraGraus": -11.07,
+     "direcaoEsquerda": 51.57,
+     "direcaoDireita": 41.36,
+     "dobraGraus": -10.21,
      "periodoEsquerdaPx": 94,
-     "periodoDireitaPx": 362,
-     "razaoDoPeriodo": 3.85,
-     "deslocamentoP95Px": 61,
+     "periodoDireitaPx": 360,
+     "razaoDoPeriodo": 3.83,
+     "deslocamentoP95Px": 60,
      "deslocamentoP95EmPeriodos": 0.17,
      "bordasSemPar": 0.1,
      "saltoNaEmendaPx": 40,
      "saltoNaEmendaEmPeriodos": 0.11,
-     "inclinacaoEsquerdaPor100Px": -97.9,
-     "inclinacaoDireitaPor100Px": -4.75
+     "inclinacaoEsquerdaPor100Px": -94.15,
+     "inclinacaoDireitaPor100Px": -4.93,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0.009
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 25.5,
      "mudouContraALisa": 0.1612,
-     "periodoDaLisaPx": 270,
-     "direcaoEsquerda": 61.83,
-     "direcaoDireita": 83.49,
-     "dobraGraus": 21.66,
+     "periodoDaLisaPx": null,
+     "direcaoEsquerda": 61.82,
+     "direcaoDireita": 82.94,
+     "dobraGraus": 21.12,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -2001,21 +3995,30 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    },
    "tresquartos": {
     "emenda": {
-     "angulo": 56.34,
+     "angulo": 56.33,
      "pixels": 497
     },
     "zebra-3": {
      "limiar": 163.5,
-     "mudouContraALisa": 0.5044,
+     "mudouContraALisa": 0.5043,
      "periodoDaLisaPx": 116,
-     "direcaoEsquerda": 48.5,
-     "direcaoDireita": 37.22,
-     "dobraGraus": -11.27,
+     "direcaoEsquerda": 48.6,
+     "direcaoDireita": 38.52,
+     "dobraGraus": -10.08,
      "periodoEsquerdaPx": 70,
      "periodoDireitaPx": 120,
      "razaoDoPeriodo": 1.71,
@@ -2024,34 +4027,52 @@
      "bordasSemPar": 0.15,
      "saltoNaEmendaPx": 38,
      "saltoNaEmendaEmPeriodos": 0.33,
-     "inclinacaoEsquerdaPor100Px": -40.37,
-     "inclinacaoDireitaPor100Px": -4.93
+     "inclinacaoEsquerdaPor100Px": -40.09,
+     "inclinacaoDireitaPor100Px": -5.1,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0.99
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
      "mudouContraALisa": 0.2281,
-     "periodoDaLisaPx": 340,
-     "direcaoEsquerda": 48.09,
-     "direcaoDireita": 37.44,
-     "dobraGraus": -10.65,
+     "periodoDaLisaPx": 344,
+     "direcaoEsquerda": 48.2,
+     "direcaoDireita": 38.68,
+     "dobraGraus": -9.52,
      "periodoEsquerdaPx": 100,
      "periodoDireitaPx": 356,
      "razaoDoPeriodo": 3.56,
-     "deslocamentoP95Px": 132,
-     "deslocamentoP95EmPeriodos": 0.39,
+     "deslocamentoP95Px": 136,
+     "deslocamentoP95EmPeriodos": 0.4,
      "bordasSemPar": 0.16,
      "saltoNaEmendaPx": 38,
      "saltoNaEmendaEmPeriodos": 0.11,
-     "inclinacaoEsquerdaPor100Px": -108.06,
-     "inclinacaoDireitaPor100Px": -5.25
+     "inclinacaoEsquerdaPor100Px": -113.09,
+     "inclinacaoDireitaPor100Px": -5.45,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 1
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 29.5,
-     "mudouContraALisa": 0.1412,
-     "periodoDaLisaPx": 150,
-     "direcaoEsquerda": 66.44,
-     "direcaoDireita": 75.83,
-     "dobraGraus": 9.39,
+     "mudouContraALisa": 0.1411,
+     "periodoDaLisaPx": null,
+     "direcaoEsquerda": 66.13,
+     "direcaoDireita": 74.82,
+     "dobraGraus": 8.68,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -2061,7 +4082,16 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    }
   },
@@ -2073,29 +4103,38 @@
     },
     "zebra-3": {
      "limiar": 163.5,
-     "mudouContraALisa": 0.2424,
+     "mudouContraALisa": 0.2426,
      "periodoDaLisaPx": 94,
-     "direcaoEsquerda": -14.39,
-     "direcaoDireita": 34.87,
-     "dobraGraus": 49.26,
-     "periodoEsquerdaPx": 96,
-     "periodoDireitaPx": 70,
-     "razaoDoPeriodo": 1.37,
+     "direcaoEsquerda": -10.24,
+     "direcaoDireita": 35.18,
+     "dobraGraus": 45.42,
+     "periodoEsquerdaPx": 92,
+     "periodoDireitaPx": 72,
+     "razaoDoPeriodo": 1.28,
      "deslocamentoP95Px": 17,
      "deslocamentoP95EmPeriodos": 0.18,
      "bordasSemPar": 0.04,
      "saltoNaEmendaPx": -6,
      "saltoNaEmendaEmPeriodos": -0.06,
-     "inclinacaoEsquerdaPor100Px": 5.8,
-     "inclinacaoDireitaPor100Px": -2.27
+     "inclinacaoEsquerdaPor100Px": 5.81,
+     "inclinacaoDireitaPor100Px": -2.41,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
      "mudouContraALisa": 0.0811,
      "periodoDaLisaPx": 280,
-     "direcaoEsquerda": -14.95,
-     "direcaoDireita": 35.06,
-     "dobraGraus": 50.01,
+     "direcaoEsquerda": -10.15,
+     "direcaoDireita": 35.35,
+     "dobraGraus": 45.49,
      "periodoEsquerdaPx": 344,
      "periodoDireitaPx": 266,
      "razaoDoPeriodo": 1.29,
@@ -2104,16 +4143,25 @@
      "bordasSemPar": 0.04,
      "saltoNaEmendaPx": -5,
      "saltoNaEmendaEmPeriodos": -0.02,
-     "inclinacaoEsquerdaPor100Px": 4.61,
-     "inclinacaoDireitaPor100Px": 0.52
+     "inclinacaoEsquerdaPor100Px": 4.64,
+     "inclinacaoDireitaPor100Px": 0.28,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 132.5,
      "mudouContraALisa": 0.024,
      "periodoDaLisaPx": null,
-     "direcaoEsquerda": -76.04,
-     "direcaoDireita": 53.91,
-     "dobraGraus": -50.06,
+     "direcaoEsquerda": -87.18,
+     "direcaoDireita": 53.83,
+     "dobraGraus": -38.99,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -2123,7 +4171,16 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    },
    "isometrica": {
@@ -2134,10 +4191,10 @@
     "zebra-3": {
      "limiar": 163.5,
      "mudouContraALisa": 0.1692,
-     "periodoDaLisaPx": 120,
-     "direcaoEsquerda": -2.86,
-     "direcaoDireita": 49.7,
-     "dobraGraus": 52.56,
+     "periodoDaLisaPx": 118,
+     "direcaoEsquerda": -2.55,
+     "direcaoDireita": 49.78,
+     "dobraGraus": 52.32,
      "periodoEsquerdaPx": 210,
      "periodoDireitaPx": 142,
      "razaoDoPeriodo": 1.48,
@@ -2147,15 +4204,24 @@
      "saltoNaEmendaPx": -5,
      "saltoNaEmendaEmPeriodos": -0.04,
      "inclinacaoEsquerdaPor100Px": 1.95,
-     "inclinacaoDireitaPor100Px": -2.66
+     "inclinacaoDireitaPor100Px": -2.77,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0.732
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
      "mudouContraALisa": 0.0568,
      "periodoDaLisaPx": 352,
-     "direcaoEsquerda": -2.33,
-     "direcaoDireita": 49.96,
-     "dobraGraus": 52.29,
+     "direcaoEsquerda": -2.23,
+     "direcaoDireita": 50.03,
+     "dobraGraus": 52.26,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": 310,
      "razaoDoPeriodo": null,
@@ -2165,15 +4231,24 @@
      "saltoNaEmendaPx": -5,
      "saltoNaEmendaEmPeriodos": -0.01,
      "inclinacaoEsquerdaPor100Px": 2.03,
-     "inclinacaoDireitaPor100Px": -2.07
+     "inclinacaoDireitaPor100Px": -2.2,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0.634
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 25.5,
      "mudouContraALisa": 0.0002,
-     "periodoDaLisaPx": 270,
-     "direcaoEsquerda": 68.79,
+     "periodoDaLisaPx": null,
+     "direcaoEsquerda": 68.76,
      "direcaoDireita": 71.7,
-     "dobraGraus": 2.91,
+     "dobraGraus": 2.94,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -2183,57 +4258,84 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    },
    "tresquartos": {
     "emenda": {
-     "angulo": 56.26,
+     "angulo": 56.25,
      "pixels": 471
     },
     "zebra-3": {
      "limiar": 163.5,
      "mudouContraALisa": 0.1817,
      "periodoDaLisaPx": 116,
-     "direcaoEsquerda": -12.92,
-     "direcaoDireita": 46.43,
-     "dobraGraus": 59.35,
-     "periodoEsquerdaPx": 188,
-     "periodoDireitaPx": 148,
-     "razaoDoPeriodo": 1.27,
+     "direcaoEsquerda": -11.52,
+     "direcaoDireita": 46.57,
+     "dobraGraus": 58.1,
+     "periodoEsquerdaPx": 186,
+     "periodoDireitaPx": 150,
+     "razaoDoPeriodo": 1.24,
      "deslocamentoP95Px": 18,
      "deslocamentoP95EmPeriodos": 0.16,
      "bordasSemPar": 0.04,
      "saltoNaEmendaPx": -6,
      "saltoNaEmendaEmPeriodos": -0.05,
      "inclinacaoEsquerdaPor100Px": 0.46,
-     "inclinacaoDireitaPor100Px": -5.44
+     "inclinacaoDireitaPor100Px": -5.61,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0.395
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
      "mudouContraALisa": 0.0602,
-     "periodoDaLisaPx": 340,
-     "direcaoEsquerda": -12.41,
-     "direcaoDireita": 46.75,
-     "dobraGraus": 59.15,
+     "periodoDaLisaPx": 344,
+     "direcaoEsquerda": -11.49,
+     "direcaoDireita": 46.86,
+     "dobraGraus": 58.36,
      "periodoEsquerdaPx": null,
-     "periodoDireitaPx": 310,
+     "periodoDireitaPx": 316,
      "razaoDoPeriodo": null,
      "deslocamentoP95Px": 18,
      "deslocamentoP95EmPeriodos": 0.05,
      "bordasSemPar": 0.04,
-     "saltoNaEmendaPx": -9,
-     "saltoNaEmendaEmPeriodos": -0.03,
+     "saltoNaEmendaPx": -8,
+     "saltoNaEmendaEmPeriodos": -0.02,
      "inclinacaoEsquerdaPor100Px": 2.05,
-     "inclinacaoDireitaPor100Px": -5.52
+     "inclinacaoDireitaPor100Px": -5.67,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0.415
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 29.5,
      "mudouContraALisa": 0.0001,
-     "periodoDaLisaPx": 150,
-     "direcaoEsquerda": -51.25,
-     "direcaoDireita": 66.48,
-     "dobraGraus": -62.27,
+     "periodoDaLisaPx": null,
+     "direcaoEsquerda": -53.49,
+     "direcaoDireita": 66.43,
+     "dobraGraus": -60.08,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -2243,7 +4345,16 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    }
   },
@@ -2255,47 +4366,65 @@
     },
     "zebra-3": {
      "limiar": 163.5,
-     "mudouContraALisa": 0.469,
+     "mudouContraALisa": 0.4689,
      "periodoDaLisaPx": 94,
-     "direcaoEsquerda": 67.93,
-     "direcaoDireita": 38.15,
-     "dobraGraus": -29.78,
+     "direcaoEsquerda": 65.93,
+     "direcaoDireita": 38.26,
+     "dobraGraus": -27.68,
      "periodoEsquerdaPx": 52,
      "periodoDireitaPx": 46,
      "razaoDoPeriodo": 1.13,
      "deslocamentoP95Px": 38,
      "deslocamentoP95EmPeriodos": 0.4,
      "bordasSemPar": 0.06,
-     "saltoNaEmendaPx": -20,
-     "saltoNaEmendaEmPeriodos": -0.21,
-     "inclinacaoEsquerdaPor100Px": 7.94,
-     "inclinacaoDireitaPor100Px": -2.61
+     "saltoNaEmendaPx": -23,
+     "saltoNaEmendaEmPeriodos": -0.24,
+     "inclinacaoEsquerdaPor100Px": 8.14,
+     "inclinacaoDireitaPor100Px": -2.55,
+     "bordaTortaNaLinha": {
+      "naLinha": 0.311,
+      "maiorLonge": 0.404
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
      "mudouContraALisa": 0.1589,
      "periodoDaLisaPx": 280,
-     "direcaoEsquerda": 67.82,
-     "direcaoDireita": 38.15,
-     "dobraGraus": -29.68,
-     "periodoEsquerdaPx": 106,
+     "direcaoEsquerda": 66.28,
+     "direcaoDireita": 38.3,
+     "dobraGraus": -27.98,
+     "periodoEsquerdaPx": 110,
      "periodoDireitaPx": 254,
-     "razaoDoPeriodo": 2.4,
+     "razaoDoPeriodo": 2.31,
      "deslocamentoP95Px": 129,
      "deslocamentoP95EmPeriodos": 0.46,
      "bordasSemPar": 0.09,
      "saltoNaEmendaPx": -34,
      "saltoNaEmendaEmPeriodos": -0.12,
-     "inclinacaoEsquerdaPor100Px": 8.84,
-     "inclinacaoDireitaPor100Px": 10.71
+     "inclinacaoEsquerdaPor100Px": 8.72,
+     "inclinacaoDireitaPor100Px": 10.71,
+     "bordaTortaNaLinha": {
+      "naLinha": 0.252,
+      "maiorLonge": 0.415
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 132.5,
      "mudouContraALisa": 0.0494,
      "periodoDaLisaPx": null,
-     "direcaoEsquerda": 24.42,
-     "direcaoDireita": 51.05,
-     "dobraGraus": 26.63,
+     "direcaoEsquerda": 25.45,
+     "direcaoDireita": 51.03,
+     "dobraGraus": 25.58,
      "periodoEsquerdaPx": 72,
      "periodoDireitaPx": null,
      "razaoDoPeriodo": null,
@@ -2305,21 +4434,30 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    },
    "isometrica": {
     "emenda": {
-     "angulo": 59.99,
+     "angulo": 60,
      "pixels": 492
     },
     "zebra-3": {
      "limiar": 163.5,
-     "mudouContraALisa": 0.3246,
-     "periodoDaLisaPx": 120,
-     "direcaoEsquerda": 78.87,
+     "mudouContraALisa": 0.3245,
+     "periodoDaLisaPx": 118,
+     "direcaoEsquerda": 78.71,
      "direcaoDireita": 53.29,
-     "dobraGraus": -25.59,
+     "dobraGraus": -25.42,
      "periodoEsquerdaPx": 72,
      "periodoDireitaPx": 62,
      "razaoDoPeriodo": 1.16,
@@ -2328,34 +4466,52 @@
      "bordasSemPar": 0.08,
      "saltoNaEmendaPx": -14,
      "saltoNaEmendaEmPeriodos": -0.12,
-     "inclinacaoEsquerdaPor100Px": 2.2,
-     "inclinacaoDireitaPor100Px": -3.33
+     "inclinacaoEsquerdaPor100Px": 2.34,
+     "inclinacaoDireitaPor100Px": -3.49,
+     "bordaTortaNaLinha": {
+      "naLinha": 0.27,
+      "maiorLonge": 0.939
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
      "mudouContraALisa": 0.1081,
      "periodoDaLisaPx": 352,
-     "direcaoEsquerda": 79.31,
-     "direcaoDireita": 53.5,
-     "dobraGraus": -25.81,
-     "periodoEsquerdaPx": 64,
+     "direcaoEsquerda": 79.28,
+     "direcaoDireita": 53.55,
+     "dobraGraus": -25.73,
+     "periodoEsquerdaPx": 70,
      "periodoDireitaPx": 272,
-     "razaoDoPeriodo": 4.25,
-     "deslocamentoP95Px": 163,
+     "razaoDoPeriodo": 3.89,
+     "deslocamentoP95Px": 162,
      "deslocamentoP95EmPeriodos": 0.46,
      "bordasSemPar": 0.12,
      "saltoNaEmendaPx": -14,
      "saltoNaEmendaEmPeriodos": -0.04,
-     "inclinacaoEsquerdaPor100Px": 29.47,
-     "inclinacaoDireitaPor100Px": -12.5
+     "inclinacaoEsquerdaPor100Px": 29.46,
+     "inclinacaoDireitaPor100Px": -12.38,
+     "bordaTortaNaLinha": {
+      "naLinha": 0.289,
+      "maiorLonge": 0.946
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 25.5,
      "mudouContraALisa": 0.0006,
-     "periodoDaLisaPx": 270,
-     "direcaoEsquerda": 57.18,
+     "periodoDaLisaPx": null,
+     "direcaoEsquerda": 57.22,
      "direcaoDireita": 68.16,
-     "dobraGraus": 10.98,
+     "dobraGraus": 10.94,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": 70,
      "razaoDoPeriodo": null,
@@ -2365,7 +4521,16 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    },
    "tresquartos": {
@@ -2375,11 +4540,11 @@
     },
     "zebra-3": {
      "limiar": 163.5,
-     "mudouContraALisa": 0.3596,
+     "mudouContraALisa": 0.3597,
      "periodoDaLisaPx": 116,
-     "direcaoEsquerda": 76.25,
-     "direcaoDireita": 49.83,
-     "dobraGraus": -26.43,
+     "direcaoEsquerda": 76.26,
+     "direcaoDireita": 49.86,
+     "dobraGraus": -26.39,
      "periodoEsquerdaPx": 70,
      "periodoDireitaPx": 54,
      "razaoDoPeriodo": 1.3,
@@ -2388,34 +4553,52 @@
      "bordasSemPar": 0.1,
      "saltoNaEmendaPx": -19,
      "saltoNaEmendaEmPeriodos": -0.16,
-     "inclinacaoEsquerdaPor100Px": -0.76,
-     "inclinacaoDireitaPor100Px": -8.88
+     "inclinacaoEsquerdaPor100Px": -0.63,
+     "inclinacaoDireitaPor100Px": -8.95,
+     "bordaTortaNaLinha": {
+      "naLinha": 0.277,
+      "maiorLonge": 1
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0.0039,
+      "maiorLonge": 0.0096
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
      "mudouContraALisa": 0.1181,
-     "periodoDaLisaPx": 340,
-     "direcaoEsquerda": 77.07,
-     "direcaoDireita": 50.02,
-     "dobraGraus": -27.05,
+     "periodoDaLisaPx": 344,
+     "direcaoEsquerda": 77.21,
+     "direcaoDireita": 50.08,
+     "dobraGraus": -27.13,
      "periodoEsquerdaPx": 60,
-     "periodoDireitaPx": 278,
-     "razaoDoPeriodo": 4.63,
-     "deslocamentoP95Px": 157,
-     "deslocamentoP95EmPeriodos": 0.46,
-     "bordasSemPar": 0.13,
-     "saltoNaEmendaPx": -23,
-     "saltoNaEmendaEmPeriodos": -0.07,
-     "inclinacaoEsquerdaPor100Px": 25.94,
-     "inclinacaoDireitaPor100Px": -15.54
+     "periodoDireitaPx": 274,
+     "razaoDoPeriodo": 4.57,
+     "deslocamentoP95Px": 160,
+     "deslocamentoP95EmPeriodos": 0.47,
+     "bordasSemPar": 0.12,
+     "saltoNaEmendaPx": -147,
+     "saltoNaEmendaEmPeriodos": -0.43,
+     "inclinacaoEsquerdaPor100Px": 29.35,
+     "inclinacaoDireitaPor100Px": -16.74,
+     "bordaTortaNaLinha": {
+      "naLinha": 0.273,
+      "maiorLonge": 0.037
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 29.5,
      "mudouContraALisa": 0.0004,
-     "periodoDaLisaPx": 150,
-     "direcaoEsquerda": 35.27,
-     "direcaoDireita": 63.22,
-     "dobraGraus": 27.95,
+     "periodoDaLisaPx": null,
+     "direcaoEsquerda": 35.44,
+     "direcaoDireita": 63.2,
+     "dobraGraus": 27.76,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": 66,
      "razaoDoPeriodo": null,
@@ -2425,7 +4608,16 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    }
   },
@@ -2437,11 +4629,11 @@
     },
     "zebra-3": {
      "limiar": 163.5,
-     "mudouContraALisa": 0.6351,
+     "mudouContraALisa": 0.635,
      "periodoDaLisaPx": 94,
-     "direcaoEsquerda": 52.2,
-     "direcaoDireita": 40.58,
-     "dobraGraus": -11.61,
+     "direcaoEsquerda": 52.19,
+     "direcaoDireita": 40.65,
+     "dobraGraus": -11.54,
      "periodoEsquerdaPx": 36,
      "periodoDireitaPx": 36,
      "razaoDoPeriodo": 1,
@@ -2450,16 +4642,25 @@
      "bordasSemPar": 0.08,
      "saltoNaEmendaPx": -2,
      "saltoNaEmendaEmPeriodos": -0.02,
-     "inclinacaoEsquerdaPor100Px": -0.78,
-     "inclinacaoDireitaPor100Px": 5.74
+     "inclinacaoEsquerdaPor100Px": -0.79,
+     "inclinacaoDireitaPor100Px": 5.39,
+     "bordaTortaNaLinha": {
+      "naLinha": 0.168,
+      "maiorLonge": 0.276
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0.0092,
+      "longe": 0.0098,
+      "maiorLonge": 0.019
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
      "mudouContraALisa": 0.3136,
      "periodoDaLisaPx": 280,
      "direcaoEsquerda": 51.61,
-     "direcaoDireita": 40.66,
-     "dobraGraus": -10.95,
+     "direcaoDireita": 40.73,
+     "dobraGraus": -10.88,
      "periodoEsquerdaPx": 88,
      "periodoDireitaPx": 92,
      "razaoDoPeriodo": 1.05,
@@ -2468,16 +4669,25 @@
      "bordasSemPar": 0.13,
      "saltoNaEmendaPx": 83,
      "saltoNaEmendaEmPeriodos": 0.3,
-     "inclinacaoEsquerdaPor100Px": 3.33,
-     "inclinacaoDireitaPor100Px": 8.76
+     "inclinacaoEsquerdaPor100Px": 3.25,
+     "inclinacaoDireitaPor100Px": 8.86,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0.298
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0.0032,
+      "maiorLonge": 0.0063
+     }
     },
     "pintura": {
      "limiar": 132.5,
-     "mudouContraALisa": 0.0873,
+     "mudouContraALisa": 0.0875,
      "periodoDaLisaPx": null,
-     "direcaoEsquerda": 38.39,
+     "direcaoEsquerda": 38.42,
      "direcaoDireita": 48.7,
-     "dobraGraus": 10.32,
+     "dobraGraus": 10.27,
      "periodoEsquerdaPx": 90,
      "periodoDireitaPx": 36,
      "razaoDoPeriodo": 2.5,
@@ -2486,32 +4696,50 @@
      "bordasSemPar": 0.01,
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
-     "inclinacaoEsquerdaPor100Px": 326.67,
-     "inclinacaoDireitaPor100Px": 331.96
+     "inclinacaoEsquerdaPor100Px": 325.9,
+     "inclinacaoDireitaPor100Px": 331.94,
+     "bordaTortaNaLinha": {
+      "naLinha": 0,
+      "maiorLonge": 0.036
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    },
    "isometrica": {
     "emenda": {
-     "angulo": 59.99,
+     "angulo": 60,
      "pixels": 492
     },
     "zebra-3": {
      "limiar": 163.5,
      "mudouContraALisa": 0.5759,
-     "periodoDaLisaPx": 120,
-     "direcaoEsquerda": 69.46,
-     "direcaoDireita": 56.16,
-     "dobraGraus": -13.31,
+     "periodoDaLisaPx": 118,
+     "direcaoEsquerda": 69.47,
+     "direcaoDireita": 56.17,
+     "dobraGraus": -13.3,
      "periodoEsquerdaPx": 48,
      "periodoDireitaPx": 44,
      "razaoDoPeriodo": 1.09,
      "deslocamentoP95Px": 55,
-     "deslocamentoP95EmPeriodos": 0.46,
-     "bordasSemPar": 0.11,
-     "saltoNaEmendaPx": -26,
-     "saltoNaEmendaEmPeriodos": -0.22,
-     "inclinacaoEsquerdaPor100Px": -5.33,
-     "inclinacaoDireitaPor100Px": 1.07
+     "deslocamentoP95EmPeriodos": 0.47,
+     "bordasSemPar": 0.1,
+     "saltoNaEmendaPx": -24,
+     "saltoNaEmendaEmPeriodos": -0.2,
+     "inclinacaoEsquerdaPor100Px": -5.35,
+     "inclinacaoDireitaPor100Px": 1.06,
+     "bordaTortaNaLinha": {
+      "naLinha": 0.231,
+      "maiorLonge": 0.047
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0.0132,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
@@ -2523,21 +4751,30 @@
      "periodoEsquerdaPx": 54,
      "periodoDireitaPx": 98,
      "razaoDoPeriodo": 1.81,
-     "deslocamentoP95Px": 164,
-     "deslocamentoP95EmPeriodos": 0.47,
+     "deslocamentoP95Px": 163,
+     "deslocamentoP95EmPeriodos": 0.46,
      "bordasSemPar": 0.21,
      "saltoNaEmendaPx": -38,
      "saltoNaEmendaEmPeriodos": -0.11,
-     "inclinacaoEsquerdaPor100Px": 32.59,
-     "inclinacaoDireitaPor100Px": -8.85
+     "inclinacaoEsquerdaPor100Px": 31.87,
+     "inclinacaoDireitaPor100Px": -8.88,
+     "bordaTortaNaLinha": {
+      "naLinha": 0.234,
+      "maiorLonge": 0.05
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0.0044,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 26.5,
      "mudouContraALisa": 0.0015,
-     "periodoDaLisaPx": 270,
+     "periodoDaLisaPx": null,
      "direcaoEsquerda": 58.97,
-     "direcaoDireita": 64.11,
-     "dobraGraus": 5.14,
+     "direcaoDireita": 64.1,
+     "dobraGraus": 5.13,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": 96,
      "razaoDoPeriodo": null,
@@ -2547,7 +4784,16 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    },
    "tresquartos": {
@@ -2560,44 +4806,62 @@
      "mudouContraALisa": 0.6023,
      "periodoDaLisaPx": 116,
      "direcaoEsquerda": 64.81,
-     "direcaoDireita": 52.49,
-     "dobraGraus": -12.32,
+     "direcaoDireita": 52.51,
+     "dobraGraus": -12.29,
      "periodoEsquerdaPx": 56,
      "periodoDireitaPx": 42,
      "razaoDoPeriodo": 1.33,
      "deslocamentoP95Px": 54,
      "deslocamentoP95EmPeriodos": 0.47,
      "bordasSemPar": 0.12,
-     "saltoNaEmendaPx": 12,
-     "saltoNaEmendaEmPeriodos": 0.1,
-     "inclinacaoEsquerdaPor100Px": -5.37,
-     "inclinacaoDireitaPor100Px": -1.68
+     "saltoNaEmendaPx": 13,
+     "saltoNaEmendaEmPeriodos": 0.11,
+     "inclinacaoEsquerdaPor100Px": -5.85,
+     "inclinacaoDireitaPor100Px": -1.76,
+     "bordaTortaNaLinha": {
+      "naLinha": 0.214,
+      "maiorLonge": 0.204
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0.0139,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "zebra-9": {
      "limiar": 163.5,
      "mudouContraALisa": 0.2324,
-     "periodoDaLisaPx": 340,
+     "periodoDaLisaPx": 344,
      "direcaoEsquerda": 64.94,
-     "direcaoDireita": 52.51,
-     "dobraGraus": -12.42,
+     "direcaoDireita": 52.54,
+     "dobraGraus": -12.4,
      "periodoEsquerdaPx": 64,
      "periodoDireitaPx": 100,
      "razaoDoPeriodo": 1.56,
-     "deslocamentoP95Px": 160,
+     "deslocamentoP95Px": 162,
      "deslocamentoP95EmPeriodos": 0.47,
-     "bordasSemPar": 0.18,
+     "bordasSemPar": 0.17,
      "saltoNaEmendaPx": -46,
-     "saltoNaEmendaEmPeriodos": -0.14,
-     "inclinacaoEsquerdaPor100Px": 6.16,
-     "inclinacaoDireitaPor100Px": -13.15
+     "saltoNaEmendaEmPeriodos": -0.13,
+     "inclinacaoEsquerdaPor100Px": 4.87,
+     "inclinacaoDireitaPor100Px": -14.13,
+     "bordaTortaNaLinha": {
+      "naLinha": 0.209,
+      "maiorLonge": 0.216
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0.0038,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     },
     "pintura": {
      "limiar": 30.5,
      "mudouContraALisa": 0.0012,
-     "periodoDaLisaPx": 150,
-     "direcaoEsquerda": 48.36,
+     "periodoDaLisaPx": null,
+     "direcaoEsquerda": 48.34,
      "direcaoDireita": 60.4,
-     "dobraGraus": 12.04,
+     "dobraGraus": 12.06,
      "periodoEsquerdaPx": null,
      "periodoDireitaPx": 94,
      "razaoDoPeriodo": null,
@@ -2607,7 +4871,16 @@
      "saltoNaEmendaPx": null,
      "saltoNaEmendaEmPeriodos": null,
      "inclinacaoEsquerdaPor100Px": null,
-     "inclinacaoDireitaPor100Px": null
+     "inclinacaoDireitaPor100Px": null,
+     "bordaTortaNaLinha": {
+      "naLinha": null,
+      "maiorLonge": null
+     },
+     "linhaNaEmenda": {
+      "naLinha": 0,
+      "longe": 0,
+      "maiorLonge": 0
+     }
     }
    }
   }

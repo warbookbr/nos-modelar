@@ -66,7 +66,7 @@ export const VISOES = Object.freeze([
     /* Listras pelo vetor refletido, que andam com a câmera, com a largura no controle da visão. */
     aplicar: aplicarZebra,
     desfazer: desfazerZebra,
-    /* O que a captura por comando pode regular nesta visão (`--largura-da-zebra`), além de ligá-la. */
+    /* O que a captura por comando pode regular nesta visão (`--largura-da-zebra`, `--angulo-da-zebra`), além de ligá-la. */
     controlesDaCaptura: CONTROLES_DA_CAPTURA.zebra,
   },
   {

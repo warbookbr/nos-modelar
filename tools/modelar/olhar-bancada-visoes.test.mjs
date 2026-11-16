@@ -1,10 +1,12 @@
-/* olhar-bancada-visoes.test.mjs — a captura por comando das visões de reflexo (`--visao`, `--largura-da-zebra`, `--azimute`, `--enquadrar`).
+/* olhar-bancada-visoes.test.mjs — a captura por comando das visões de reflexo (`--visao`, `--largura-da-zebra`, `--angulo-da-zebra`,
+ * `--azimute`, `--enquadrar`).
  *
  * A fixture é neutra: a chapa abaulada de `tools/blender/chapa-com-amassado-de-prova.mjs` como peça da bancada
  * (`tools/fixtures/acervo/chapa-de-reflexo-de-prova`, com o amassado declarado, e `chapa-lisa-de-reflexo-de-prova`, sem ele). O que se
  * mede está na imagem: a máscara do fundo (a cor do fundo da bancada em auditoria é uma só) dá o quanto do quadro a peça ocupa, e o
  * gradiente das bordas das listras da zebra dá a direção delas, que na chapa lisa fica a menos de 12 graus da horizontal e no amassado
- * entorta. Cada captura abre navegador e carrega a peça, e por isso o arquivo está em `tools/testes-lentos.mjs`. */
+ * entorta. A direção da listra se prova na chapa de calibração do vinco em pé (`tools/fixtures/reflexo-calibracao/vinco`): a listra
+ * deitada corre parelha sobre ele, e a em pé se aperta numa listra estreita na linha do vinco. Cada captura abre navegador e carrega a peça, e por isso o arquivo está em `tools/testes-lentos.mjs`. */
 import { mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -85,6 +87,30 @@ function medir(arquivo, { canal = 0, limiar = 200 } = {}) {
   };
 }
 
+/** As corridas de tom ao longo de linhas (`eixo` 'x') ou colunas ('y') a 35, 50 e 65 % do quadro, sem a primeira de cada trecho de peça
+ *  (cortada pela borda): o número delas, a menor e a mediana, em pixels. A listra apertada na linha de um defeito dá a menor bem abaixo
+ *  da mediana. */
+function corridas(arquivo, eixo) {
+  const { width: W, height: H, data: d } = PNG.sync.read(readFileSync(arquivo));
+  const fundo = (i) => d[4 * i] === FUNDO[0] && d[4 * i + 1] === FUNDO[1] && d[4 * i + 2] === FUNDO[2];
+  const todas = [];
+  for (const f of [0.35, 0.5, 0.65]) {
+    const n = eixo === 'x' ? W : H; const fixo = Math.round(f * (eixo === 'x' ? H : W));
+    const trecho = []; let antes = null; let comp = 0;
+    const fechar = () => { todas.push(...trecho.slice(1)); trecho.length = 0; };
+    for (let k = 0; k < n; k++) {
+      const i = eixo === 'x' ? fixo * W + k : k * W + fixo;
+      if (fundo(i)) { fechar(); antes = null; comp = 0; continue; }
+      const claro = d[4 * i] > 128;
+      if (antes === null || claro === antes) comp++; else { trecho.push(comp); comp = 1; }
+      antes = claro;
+    }
+    fechar();
+  }
+  const ord = [...todas].sort((a, b) => a - b);
+  return { n: ord.length, menor: ord[0] ?? null, mediana: ord[Math.floor(ord.length / 2)] ?? null };
+}
+
 /** A borda do reflexo da janela de luz: em cada coluna do interior da peça, a linha onde o canal verde mais sobe (a luz branca contra a
  *  tinta vermelha). A amplitude é o quanto essa linha se afasta, em pixels, entre o 5º e o 95º percentil das colunas. */
 function medirBorda(arquivo) {
@@ -125,6 +151,13 @@ describe('olhar-bancada: as visões de reflexo por comando', () => {
     expect(fora.codigo).toBe(2);
     expect(fora.stderr).toMatch(/1,5 a 15|1.5 a 15/);
 
+    const anguloSemZebra = await comoCLI([AMASSADA, '--visao=pintura', '--angulo-da-zebra=90']);
+    expect(anguloSemZebra.codigo).toBe(2);
+    expect(anguloSemZebra.stderr).toMatch(/--angulo-da-zebra só vale com --visao=zebra.*"pintura"/);
+    const anguloFora = await comoCLI([AMASSADA, '--visao=zebra', '--angulo-da-zebra=200']);
+    expect(anguloFora.codigo).toBe(2);
+    expect(anguloFora.stderr).toMatch(/-180 a 180/);
+
     const faixasSemPintura = await comoCLI([AMASSADA, '--visao=zebra', '--caixas-de-luz=3']);
     expect(faixasSemPintura.codigo).toBe(2);
     expect(faixasSemPintura.stderr).toMatch(/--caixas-de-luz só vale com --visao=pintura.*"zebra"/);
@@ -136,9 +169,9 @@ describe('olhar-bancada: as visões de reflexo por comando', () => {
     expect(analise.stderr).toMatch(/--analise/);
   });
 
-  it('a ajuda lista as cinco opções', async () => {
+  it('a ajuda lista as seis opções', async () => {
     const r = await comoCLI(['--ajuda']);
-    for (const opcao of ['--visao=', '--largura-da-zebra=', '--azimute=', '--caixas-de-luz=', '--enquadrar']) expect(r.stdout).toContain(opcao);
+    for (const opcao of ['--visao=', '--largura-da-zebra=', '--angulo-da-zebra=', '--azimute=', '--caixas-de-luz=', '--enquadrar']) expect(r.stdout).toContain(opcao);
   });
 
   it('a zebra com --enquadrar ocupa o quadro; na chapa lisa as faixas saem paralelas e no amassado se entortam', async () => {
@@ -156,6 +189,24 @@ describe('olhar-bancada: as visões de reflexo por comando', () => {
     expect(l.maiorDesvio).toBeLessThan(12);
     expect(a.fracaoTorta).toBeGreaterThan(0.01);
     expect(a.maiorDesvio).toBeGreaterThan(30);
+  }, 120_000);
+
+  it('a listra em pé vê o vinco em pé que a deitada não vê', async () => {
+    const VINCO = 'tools/fixtures/reflexo-calibracao/vinco';
+    const deitada = await capturar(VINCO, ['--visao=zebra', '--enquadrar'], 'frontal');
+    const emPe = await capturar(VINCO, ['--visao=zebra', '--angulo-da-zebra=90', '--enquadrar'], 'frontal');
+    expect(emPe.nome).toMatch(/visao-zebra-a90-enquadrado/);
+    expect(emPe.stdout).toMatch(/listra a 90 graus da horizontal/);
+    /* deitada: as listras correm na horizontal (quase nenhuma troca de tom ao longo das linhas, só onde a borda curva da chapa as corta)
+       e têm a mesma largura ao longo das colunas */
+    expect(corridas(deitada.arquivo, 'x').n).toBeLessThanOrEqual(4);
+    const d = corridas(deitada.arquivo, 'y');
+    expect(d.menor / d.mediana).toBeGreaterThan(0.6);
+    /* em pé: as listras correm na vertical e uma delas se aperta na linha do vinco (medido em 900x900: 9 px contra a mediana de 57) */
+    expect(corridas(emPe.arquivo, 'y').n).toBeLessThanOrEqual(4);
+    const p = corridas(emPe.arquivo, 'x');
+    expect(p.n).toBeGreaterThan(20);
+    expect(p.menor / p.mediana).toBeLessThan(0.3);
   }, 120_000);
 
   it('a luz rasante e a curvatura gravam a imagem da peça, com cor e contraste', async () => {

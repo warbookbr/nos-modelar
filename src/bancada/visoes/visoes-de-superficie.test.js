@@ -19,6 +19,7 @@ import { criarSeletorDeVisao } from './registro-de-visoes.js';
 import { estadoDaCurvatura, legendaDaCurvatura } from './visao-curvatura.js';
 import { azimuteDaLuzRasante, elevacaoDaLuzRasante, INTENSIDADE_DA_LUZ } from './visao-luz-rasante.js';
 import { superficiesDe } from './materiais-da-visao.js';
+import { anguloDaZebra, definirAnguloDaZebra } from './visao-zebra.js';
 
 function pecaNaCena(receita, { nome, neutro = executarReceita(receita).neutro, comReceita = true } = {}) {
   const adaptado = adaptarThree(neutro, { nome });
@@ -167,6 +168,15 @@ describe('zebra e luz rasante na bancada', () => {
     expect(shader.fragmentShader).toMatch(/reflect\(zebraOlhar, zebraNormal\)/);
     expect(shader.vertexShader).toMatch(/vZebraNormal = normalize/);
     expect(shader.uniforms.uZebraFrequencia.value).toBe(40);
+    /* a direção da listra: 0 grau, a de partida, lê só o y do reflexo, como o Blender; o ângulo gira a direção lida para a direita
+       da câmera deitada, e fica de -180 a 180 */
+    expect(anguloDaZebra()).toBe(0);
+    expect(shader.uniforms.uZebraAngulo.value).toBe(0);
+    expect(shader.fragmentShader).toMatch(/uZebraAngulo == 0\.0 \? zebraReflexo\.y/);
+    expect(definirAnguloDaZebra(90)).toBe(90);
+    expect(shader.uniforms.uZebraAngulo.value).toBeCloseTo(Math.PI / 2, 12);
+    expect(definirAnguloDaZebra(200)).toBe(180);
+    expect(definirAnguloDaZebra(0)).toBe(0);
 
     peca.controlador.selecionar('chapa');
     peca.controlador.definirModo('isolar');

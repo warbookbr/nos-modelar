@@ -146,7 +146,7 @@ describe('seletor de visão: a visão forçada pela captura', () => {
   });
 
   it('declara que controle da captura cada visão aceita', () => {
-    expect(Object.fromEntries(VISOES.filter((v) => v.controlesDaCaptura).map((v) => [v.id, v.controlesDaCaptura]))).toEqual({ zebra: ['larguraDaZebra'], 'luz-rasante': ['azimute'], pintura: ['caixasDaPintura'] });
+    expect(Object.fromEntries(VISOES.filter((v) => v.controlesDaCaptura).map((v) => [v.id, v.controlesDaCaptura]))).toEqual({ zebra: ['larguraDaZebra', 'anguloDaZebra'], 'luz-rasante': ['azimute'], pintura: ['caixasDaPintura'] });
   });
 });
 

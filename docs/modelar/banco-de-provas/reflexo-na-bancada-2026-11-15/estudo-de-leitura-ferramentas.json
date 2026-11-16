@@ -3,17 +3,8 @@
   "pente": {
    "curvas": [
     {
-     "comprimentoMm": 302,
-     "minimo": 0.593,
-     "maximo": 0.667,
-     "mediana": 0.667,
-     "maiorSalto": 0,
-     "saltos": 0,
-     "mudancasDeSinal": 0
-    },
-    {
-     "comprimentoMm": 302,
-     "minimo": 0.593,
+     "comprimentoMm": 604.1,
+     "minimo": 0.591,
      "maximo": 0.667,
      "mediana": 0.667,
      "maiorSalto": 0,
@@ -26,13 +17,13 @@
    "paraForaMm": 0.004,
    "pontoParaFora": [
     520,
-    300,
+    150,
     -16.2
    ],
-   "paraDentroMm": -0.013,
+   "paraDentroMm": -0.016,
    "pontoParaDentro": [
-    340,
-    400,
+    260,
+    0,
     -0.5
    ],
    "rmsMm": 0.006,
@@ -41,112 +32,60 @@
   },
   "emendas": {
    "15": {
-    "emendas": 1,
+    "emendas": 0,
     "acusam": 0,
     "frestaMaximaMm": 0,
     "anguloMaximoGraus": 0,
-    "razaoMaxima": 0,
-    "acusa": {
-     "fresta": 0,
-     "angulo": 0,
-     "curvatura": 0
-    },
-    "medianas": {
-     "frestaMm": 0,
-     "desnivelMm": 0,
-     "anguloGraus": null,
-     "curvaturaA": null,
-     "curvaturaB": null,
-     "razaoDeCurvatura": null
-    },
-    "semAjuste": 41
+    "razaoMaxima": 0
    },
    "25": {
-    "emendas": 1,
+    "emendas": 0,
     "acusam": 0,
     "frestaMaximaMm": 0,
     "anguloMaximoGraus": 0,
-    "razaoMaxima": 1,
-    "acusa": {
-     "fresta": 0,
-     "angulo": 0,
-     "curvatura": 0
-    },
-    "medianas": {
-     "frestaMm": 0,
-     "desnivelMm": 0,
-     "anguloGraus": 0,
-     "curvaturaA": 0.667,
-     "curvaturaB": 0.667,
-     "razaoDeCurvatura": 1
-    },
-    "semAjuste": 4
+    "razaoMaxima": 0
    },
    "50": {
-    "emendas": 1,
+    "emendas": 0,
     "acusam": 0,
     "frestaMaximaMm": 0,
     "anguloMaximoGraus": 0,
-    "razaoMaxima": 1,
-    "acusa": {
-     "fresta": 0,
-     "angulo": 0,
-     "curvatura": 0
-    },
-    "medianas": {
-     "frestaMm": 0,
-     "desnivelMm": 0,
-     "anguloGraus": 0,
-     "curvaturaA": 0.667,
-     "curvaturaB": 0.667,
-     "razaoDeCurvatura": 1
-    },
-    "semAjuste": 0
+    "razaoMaxima": 0
    }
   },
   "suavidade": {
-   "direita": 0.001,
-   "esquerda": 0.001
+   "chapa": 0.001
   }
  },
  "degrau": {
   "pente": {
    "curvas": [
     {
-     "comprimentoMm": 302,
-     "minimo": 0.593,
-     "maximo": 0.667,
+     "comprimentoMm": 605.6,
+     "minimo": -4.246,
+     "maximo": 5.534,
      "mediana": 0.667,
-     "maiorSalto": 0,
-     "saltos": 0,
-     "mudancasDeSinal": 0
-    },
-    {
-     "comprimentoMm": 302,
-     "minimo": 0.593,
-     "maximo": 0.667,
-     "mediana": 0.667,
-     "maiorSalto": 0,
-     "saltos": 0,
-     "mudancasDeSinal": 0
+     "maiorSalto": 9.104,
+     "saltos": 3,
+     "mudancasDeSinal": 2
     }
    ]
   },
   "desvio": {
-   "paraForaMm": 0.896,
+   "paraForaMm": 0.893,
    "pontoParaFora": [
     290,
     0,
     0
    ],
-   "paraDentroMm": -0.845,
+   "paraDentroMm": -0.869,
    "pontoParaDentro": [
     300,
-    400,
+    370,
     -1.5
    ],
-   "rmsMm": 0.273,
-   "p98Mm": 0.753,
+   "rmsMm": 0.279,
+   "p98Mm": 0.764,
    "escalaDaCorMm": 1
   },
   "emendas": {
@@ -169,6 +108,9 @@
      "curvaturaB": null,
      "razaoDeCurvatura": null
     },
+    "maximos": {
+     "frestaMm": 1.5
+    },
     "semAjuste": 41
    },
    "25": {
@@ -188,6 +130,11 @@
      "anguloGraus": 0,
      "curvaturaA": 0.667,
      "curvaturaB": 0.667,
+     "razaoDeCurvatura": 1
+    },
+    "maximos": {
+     "frestaMm": 1.5,
+     "anguloGraus": 0,
      "razaoDeCurvatura": 1
     },
     "semAjuste": 4
@@ -211,53 +158,50 @@
      "curvaturaB": 0.667,
      "razaoDeCurvatura": 1
     },
+    "maximos": {
+     "frestaMm": 1.5,
+     "anguloGraus": 0,
+     "razaoDeCurvatura": 1
+    },
     "semAjuste": 0
    }
   },
   "suavidade": {
    "direita": 0.001,
-   "esquerda": 0.001
+   "esquerda": 0.001,
+   "parede": null
   }
  },
  "vinco": {
   "pente": {
    "curvas": [
     {
-     "comprimentoMm": 302,
-     "minimo": 0.593,
-     "maximo": 0.667,
+     "comprimentoMm": 604.1,
+     "minimo": 0.591,
+     "maximo": 5.079,
      "mediana": 0.667,
-     "maiorSalto": 0,
-     "saltos": 0,
-     "mudancasDeSinal": 0
-    },
-    {
-     "comprimentoMm": 302,
-     "minimo": 0.593,
-     "maximo": 0.667,
-     "mediana": 0.667,
-     "maiorSalto": 0,
-     "saltos": 0,
+     "maiorSalto": 4.198,
+     "saltos": 2,
      "mudancasDeSinal": 0
     }
    ]
   },
   "desvio": {
-   "paraForaMm": 2.783,
+   "paraForaMm": 2.931,
    "pontoParaFora": [
     300,
     0,
     0
    ],
-   "paraDentroMm": -0.433,
+   "paraDentroMm": -0.399,
    "pontoParaDentro": [
     399.1,
-    120,
+    370,
     -13.8
    ],
-   "rmsMm": 0.571,
-   "p98Mm": 2.263,
-   "escalaDaCorMm": 2.5
+   "rmsMm": 0.525,
+   "p98Mm": 1.555,
+   "escalaDaCorMm": 2
   },
   "emendas": {
    "15": {
@@ -279,6 +223,9 @@
      "curvaturaB": null,
      "razaoDeCurvatura": null
     },
+    "maximos": {
+     "frestaMm": 0
+    },
     "semAjuste": 41
    },
    "25": {
@@ -298,6 +245,11 @@
      "anguloGraus": 6,
      "curvaturaA": 0.667,
      "curvaturaB": 0.667,
+     "razaoDeCurvatura": 1
+    },
+    "maximos": {
+     "frestaMm": 0,
+     "anguloGraus": 6,
      "razaoDeCurvatura": 1
     },
     "semAjuste": 4
@@ -321,6 +273,11 @@
      "curvaturaB": 0.667,
      "razaoDeCurvatura": 1
     },
+    "maximos": {
+     "frestaMm": 0,
+     "anguloGraus": 6,
+     "razaoDeCurvatura": 1
+    },
     "semAjuste": 0
    }
   },
@@ -333,36 +290,27 @@
   "pente": {
    "curvas": [
     {
-     "comprimentoMm": 321.7,
-     "minimo": 1.773,
-     "maximo": 2.029,
-     "mediana": 1.999,
-     "maiorSalto": 0,
-     "saltos": 0,
-     "mudancasDeSinal": 0
-    },
-    {
-     "comprimentoMm": 302,
-     "minimo": 0.593,
-     "maximo": 0.667,
-     "mediana": 0.667,
-     "maiorSalto": 0,
-     "saltos": 0,
+     "comprimentoMm": 623.8,
+     "minimo": 0.591,
+     "maximo": 2.039,
+     "mediana": 1.773,
+     "maiorSalto": 0.885,
+     "saltos": 1,
      "mudancasDeSinal": 0
     }
    ]
   },
   "desvio": {
-   "paraForaMm": 0.588,
+   "paraForaMm": 0.567,
    "pontoParaFora": [
     250,
     400,
     -2.5
    ],
-   "paraDentroMm": -0.717,
+   "paraDentroMm": -0.694,
    "pontoParaDentro": [
     340,
-    400,
+    0,
     -0.5
    ],
    "rmsMm": 0.298,
@@ -389,6 +337,9 @@
      "curvaturaB": null,
      "razaoDeCurvatura": null
     },
+    "maximos": {
+     "frestaMm": 0
+    },
     "semAjuste": 41
    },
    "25": {
@@ -408,6 +359,11 @@
      "anguloGraus": 0,
      "curvaturaA": 0.667,
      "curvaturaB": 2.001,
+     "razaoDeCurvatura": 3.002
+    },
+    "maximos": {
+     "frestaMm": 0,
+     "anguloGraus": 0,
      "razaoDeCurvatura": 3.002
     },
     "semAjuste": 4
@@ -431,6 +387,11 @@
      "curvaturaB": 2.005,
      "razaoDeCurvatura": 3.007
     },
+    "maximos": {
+     "frestaMm": 0,
+     "anguloGraus": 0.003,
+     "razaoDeCurvatura": 3.007
+    },
     "semAjuste": 0
    }
   },
@@ -443,330 +404,174 @@
   "pente": {
    "curvas": [
     {
-     "comprimentoMm": 302.1,
-     "minimo": -0.155,
-     "maximo": 1.481,
-     "mediana": 0.685,
-     "maiorSalto": 0.966,
-     "saltos": 5,
-     "mudancasDeSinal": 5
-    },
-    {
-     "comprimentoMm": 302.1,
-     "minimo": -0.148,
-     "maximo": 1.474,
-     "mediana": 0.649,
-     "maiorSalto": 0.964,
-     "saltos": 5,
-     "mudancasDeSinal": 5
+     "comprimentoMm": 604.1,
+     "minimo": -0.135,
+     "maximo": 1.468,
+     "mediana": 0.713,
+     "maiorSalto": 0.941,
+     "saltos": 11,
+     "mudancasDeSinal": 11
     }
    ]
   },
   "desvio": {
-   "paraForaMm": 0.27,
+   "paraForaMm": 0.267,
    "pontoParaFora": [
     120,
-    0,
+    150,
     -10.6
    ],
-   "paraDentroMm": -0.275,
+   "paraDentroMm": -0.265,
    "pontoParaDentro": [
     370,
-    0,
+    400,
     -1.9
    ],
-   "rmsMm": 0.169,
-   "p98Mm": 0.263,
+   "rmsMm": 0.17,
+   "p98Mm": 0.261,
    "escalaDaCorMm": 0.5
   },
   "emendas": {
    "15": {
-    "emendas": 1,
+    "emendas": 0,
     "acusam": 0,
     "frestaMaximaMm": 0,
     "anguloMaximoGraus": 0,
-    "razaoMaxima": 0,
-    "acusa": {
-     "fresta": 0,
-     "angulo": 0,
-     "curvatura": 0
-    },
-    "medianas": {
-     "frestaMm": 0,
-     "desnivelMm": 0,
-     "anguloGraus": null,
-     "curvaturaA": null,
-     "curvaturaB": null,
-     "razaoDeCurvatura": null
-    },
-    "semAjuste": 41
+    "razaoMaxima": 0
    },
    "25": {
-    "emendas": 1,
-    "acusam": 1,
+    "emendas": 0,
+    "acusam": 0,
     "frestaMaximaMm": 0,
     "anguloMaximoGraus": 0,
-    "razaoMaxima": 11.656,
-    "acusa": {
-     "fresta": 0,
-     "angulo": 0,
-     "curvatura": 37
-    },
-    "medianas": {
-     "frestaMm": 0,
-     "desnivelMm": 0,
-     "anguloGraus": 0,
-     "curvaturaA": 1.228,
-     "curvaturaB": 0.105,
-     "razaoDeCurvatura": 11.656
-    },
-    "semAjuste": 4
+    "razaoMaxima": 0
    },
    "50": {
-    "emendas": 1,
-    "acusam": 1,
+    "emendas": 0,
+    "acusam": 0,
     "frestaMaximaMm": 0,
-    "anguloMaximoGraus": 0.013,
-    "razaoMaxima": 11.084,
-    "acusa": {
-     "fresta": 0,
-     "angulo": 0,
-     "curvatura": 41
-    },
-    "medianas": {
-     "frestaMm": 0,
-     "desnivelMm": 0,
-     "anguloGraus": 0.001,
-     "curvaturaA": 1.468,
-     "curvaturaB": -0.133,
-     "razaoDeCurvatura": 11.046
-    },
-    "semAjuste": 0
+    "anguloMaximoGraus": 0,
+    "razaoMaxima": 0
    }
   },
   "suavidade": {
-   "direita": 28.003,
-   "esquerda": 28.039
+   "chapa": 29.322
   }
  },
  "ondulada-050": {
   "pente": {
    "curvas": [
     {
-     "comprimentoMm": 302.1,
-     "minimo": -0.952,
-     "maximo": 2.294,
-     "mediana": 0.704,
-     "maiorSalto": 1.934,
-     "saltos": 5,
-     "mudancasDeSinal": 5
-    },
-    {
-     "comprimentoMm": 302.1,
-     "minimo": -0.963,
-     "maximo": 2.28,
-     "mediana": 0.631,
-     "maiorSalto": 1.926,
-     "saltos": 5,
-     "mudancasDeSinal": 5
+     "comprimentoMm": 604.2,
+     "minimo": -0.936,
+     "maximo": 2.268,
+     "mediana": 0.761,
+     "maiorSalto": 1.882,
+     "saltos": 11,
+     "mudancasDeSinal": 11
     }
    ]
   },
   "desvio": {
-   "paraForaMm": 0.539,
+   "paraForaMm": 0.54,
    "pontoParaFora": [
     120,
     0,
     -10.4
    ],
-   "paraDentroMm": -0.528,
+   "paraDentroMm": -0.563,
    "pontoParaDentro": [
     370,
-    400,
+    0,
     -2.1
    ],
-   "rmsMm": 0.338,
-   "p98Mm": 0.523,
+   "rmsMm": 0.34,
+   "p98Mm": 0.522,
    "escalaDaCorMm": 1
   },
   "emendas": {
    "15": {
-    "emendas": 1,
+    "emendas": 0,
     "acusam": 0,
     "frestaMaximaMm": 0,
     "anguloMaximoGraus": 0,
-    "razaoMaxima": 0,
-    "acusa": {
-     "fresta": 0,
-     "angulo": 0,
-     "curvatura": 0
-    },
-    "medianas": {
-     "frestaMm": 0,
-     "desnivelMm": 0,
-     "anguloGraus": null,
-     "curvaturaA": null,
-     "curvaturaB": null,
-     "razaoDeCurvatura": null
-    },
-    "semAjuste": 41
+    "razaoMaxima": 0
    },
    "25": {
-    "emendas": 1,
-    "acusam": 1,
+    "emendas": 0,
+    "acusam": 0,
     "frestaMaximaMm": 0,
-    "anguloMaximoGraus": 0.001,
-    "razaoMaxima": 3.931,
-    "acusa": {
-     "fresta": 0,
-     "angulo": 0,
-     "curvatura": 37
-    },
-    "medianas": {
-     "frestaMm": 0,
-     "desnivelMm": 0,
-     "anguloGraus": 0.001,
-     "curvaturaA": 1.789,
-     "curvaturaB": -0.455,
-     "razaoDeCurvatura": 3.931
-    },
-    "semAjuste": 4
+    "anguloMaximoGraus": 0,
+    "razaoMaxima": 0
    },
    "50": {
-    "emendas": 1,
-    "acusam": 1,
+    "emendas": 0,
+    "acusam": 0,
     "frestaMaximaMm": 0,
-    "anguloMaximoGraus": 0.026,
-    "razaoMaxima": 2.439,
-    "acusa": {
-     "fresta": 0,
-     "angulo": 0,
-     "curvatura": 41
-    },
-    "medianas": {
-     "frestaMm": 0,
-     "desnivelMm": 0,
-     "anguloGraus": 0.004,
-     "curvaturaA": 2.273,
-     "curvaturaB": -0.933,
-     "razaoDeCurvatura": 2.437
-    },
-    "semAjuste": 0
+    "anguloMaximoGraus": 0,
+    "razaoMaxima": 0
    }
   },
   "suavidade": {
-   "direita": 52.897,
-   "esquerda": 52.948
+   "chapa": 55.36
   }
  },
  "ondulada-100": {
   "pente": {
    "curvas": [
     {
-     "comprimentoMm": 302.3,
-     "minimo": -2.566,
-     "maximo": 3.916,
-     "mediana": 0.744,
-     "maiorSalto": 3.868,
-     "saltos": 5,
-     "mudancasDeSinal": 5
-    },
-    {
-     "comprimentoMm": 302.3,
-     "minimo": -2.592,
-     "maximo": 3.888,
-     "mediana": 0.598,
-     "maiorSalto": 3.851,
-     "saltos": 5,
-     "mudancasDeSinal": 5
+     "comprimentoMm": 604.6,
+     "minimo": -2.538,
+     "maximo": 3.866,
+     "mediana": 0.861,
+     "maiorSalto": 3.765,
+     "saltos": 11,
+     "mudancasDeSinal": 11
     }
    ]
   },
   "desvio": {
-   "paraForaMm": 1.082,
+   "paraForaMm": 1.081,
    "pontoParaFora": [
     120,
     0,
     -9.9
    ],
-   "paraDentroMm": -1.058,
+   "paraDentroMm": -1.054,
    "pontoParaDentro": [
-    470,
+    370,
     400,
-    -10.6
+    -2.6
    ],
-   "rmsMm": 0.675,
-   "p98Mm": 1.043,
+   "rmsMm": 0.681,
+   "p98Mm": 1.041,
    "escalaDaCorMm": 2
   },
   "emendas": {
    "15": {
-    "emendas": 1,
+    "emendas": 0,
     "acusam": 0,
     "frestaMaximaMm": 0,
     "anguloMaximoGraus": 0,
-    "razaoMaxima": 0,
-    "acusa": {
-     "fresta": 0,
-     "angulo": 0,
-     "curvatura": 0
-    },
-    "medianas": {
-     "frestaMm": 0,
-     "desnivelMm": 0,
-     "anguloGraus": null,
-     "curvaturaA": null,
-     "curvaturaB": null,
-     "razaoDeCurvatura": null
-    },
-    "semAjuste": 41
+    "razaoMaxima": 0
    },
    "25": {
-    "emendas": 1,
-    "acusam": 1,
+    "emendas": 0,
+    "acusam": 0,
     "frestaMaximaMm": 0,
-    "anguloMaximoGraus": 0.002,
-    "razaoMaxima": 1.85,
-    "acusa": {
-     "fresta": 0,
-     "angulo": 0,
-     "curvatura": 37
-    },
-    "medianas": {
-     "frestaMm": 0,
-     "desnivelMm": 0,
-     "anguloGraus": 0.002,
-     "curvaturaA": 2.908,
-     "curvaturaB": -1.572,
-     "razaoDeCurvatura": 1.85
-    },
-    "semAjuste": 4
+    "anguloMaximoGraus": 0,
+    "razaoMaxima": 0
    },
    "50": {
-    "emendas": 1,
-    "acusam": 1,
+    "emendas": 0,
+    "acusam": 0,
     "frestaMaximaMm": 0,
-    "anguloMaximoGraus": 0.054,
-    "razaoMaxima": 1.537,
-    "acusa": {
-     "fresta": 0,
-     "angulo": 0,
-     "curvatura": 41
-    },
-    "medianas": {
-     "frestaMm": 0,
-     "desnivelMm": 0,
-     "anguloGraus": 0.016,
-     "curvaturaA": 3.899,
-     "curvaturaB": -2.538,
-     "razaoDeCurvatura": 1.536
-    },
-    "semAjuste": 0
+    "anguloMaximoGraus": 0,
+    "razaoMaxima": 0
    }
   },
   "suavidade": {
-   "direita": 102.185,
-   "esquerda": 102.394
+   "chapa": 107.007
   }
  }
 }
