@@ -8,6 +8,8 @@
 
 **Repositório e base:** `warbookbr/nos-modelar`, main na ativação.
 
+Sucessor do plano [reflexo na bancada](2026-11-15-reflexo-na-bancada.md), decidido pela pessoa em 2026-11-16: é ativado no fechamento dele.
+
 ## Problema observado
 
 Na sessão de 2026-11-13 a 2026-11-16 (furgão, cordão de solda e bicicleta), os 67 registros de agente (a sessão principal e 66 subagentes) somam 3.945 comandos de shell: 1.488 do implementador, 1.144 da sessão principal, 518 do modelador, 458 do revisor e 337 do agente geral; o crítico visual não roda shell, só abre imagens. A contagem, por padrão de comando, está na análise guardada fora do repositório, no scratchpad da sessão, e se refaz pelos registros com `npm run medir:transcricao` e um filtro por padrão.

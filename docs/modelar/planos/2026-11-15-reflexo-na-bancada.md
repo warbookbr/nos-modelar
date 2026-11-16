@@ -71,6 +71,10 @@ O modelador, o crítico e a pessoa veem a superfície de uma peça de lataria po
 5. Pacote e paridade: a zebra e a pintura no `pedido.md`; a luz rasante e a curvatura da bancada medidas contra as do Blender (fração iluminada, posição do amassado, escala de cor). Saída: o relatório e a decisão da pessoa sobre exigir o Blender.
 6. Instrução: o estudo de leitura da zebra nas chapas de calibração, a instrução de como ler a zebra, a pintura, o pente e o mapa de desvio no guia, provada pelo crítico cego, e o fechamento.
 
+## Sucessor
+
+Decidido pela pessoa em 2026-11-16: ao fechar este plano, a mesma sessão ativa o plano [comparar com a referência sem script](2026-11-16-comparar-com-a-referencia.md), que espera este porque os dois mudam `tools/modelar/olhar-bancada.mjs` e o pacote do crítico. O fechamento deste só está completo com o sucessor ativado (território declarado, estado `ativo` e o índice de planos atualizado) ou com a decisão da pessoa de adiá-lo escrita aqui. O que este plano entregar e servir a ele (a captura por `--visao`, as ferramentas de medida e o pacote com zebra e pintura) entra como base do sucessor, sem refazer.
+
 ## Riscos e parada
 
 A captura roda num navegador sem placa de vídeo, e o material de verniz com ambiente pode sair lento ou diferente do que a pessoa vê na página; se a imagem capturada divergir da página, a fatia 2 para e volta à pessoa. Se a curvatura da bancada divergir da do Blender além do que a escala de cor mostra, o Blender continua exigido e o plano fecha com a zebra e a pintura como acréscimo. Se a zebra por comando já bastar para a pessoa julgar, a fatia 2 volta a ela antes de começar.
