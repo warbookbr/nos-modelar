@@ -290,8 +290,8 @@ export function criarOperacoesBooleanas(servicos) {
      o resultado a partir dos sólidos já convertidos e devolve junto um sólido
      AUXILIAR (o material do arredondamento), cujas faces não vêm de face
      nenhuma do núcleo e por isso nascem todas com id novo. */
-  function nucleoBooleano(st, i, op, wasm, origemId, operandos, extra, { vincarCostura = false, origemDoOperando = null, reforco = false } = {}) {
-    /* SEGUNDA TENTATIVA (`reforco`). Quando o portão de casca fechada recusa o resultado da booleana comum, o cálculo roda de novo, uma vez, com três reforços
+  function nucleoBooleano(st, i, op, wasm, origemId, operandos, extra, { vincarCostura = false, origemDoOperando = null, reforco = false, semGatilhoDaAresta = false } = {}) {
+    /* SEGUNDA TENTATIVA (`reforco`). Quando o portão de casca fechada recusa o resultado da união (só dela: o reforço não vale para subtrair, intersectar nem aparar), o cálculo roda de novo, uma vez, com três reforços
        que a primeira tentativa não tem: (1) a solda dos cantos novos volta a tentar os que a regra dos dois vizinhos em comum barrou, até nenhum mais sair (na união, a segunda tentativa também começa quando sobra uma aresta de menos de 2^-19 da meia-caixa depois da primeira solda; cinco cantos
        novos colados num canto antigo se barravam um ao outro); (2) a partição de um pedaço pela diagonal não escolhe um canto que já tem aresta com o canto de saída,
        o que deixaria quatro faces nessa aresta; (3) um canto antigo que a fusão de lascas deixou com duas faces sai das duas, como o canto novo. A primeira tentativa
@@ -651,14 +651,6 @@ export function criarOperacoesBooleanas(servicos) {
       }
     }
 
-    const pisoDePrecisao = Math.max(meiaCaixa, 1e-9) * 2 ** -19;   // o dobro do piso que a razão de precisão recusa (2^-20 da meia-caixa)
-    /* aresta de menos de 2^-19 da meia-caixa (o dobro do piso da razão de precisão) que a regra dos dois vizinhos em comum não deixou fundir: a casca passa no portão, mas a aresta (0,15 µm numa peça de 0,86 m) estoura a
-       razão de precisão da booleana seguinte; a segunda tentativa a funde */
-    if (!reforco && !extra && op === 'unir' && barrados.some((v) => !apelido.has(v) && [...(vizinhos.get(v) ?? [])].some((w) => tamanho(sub(pos(w), pos(v))) <= pisoDePrecisao))) {
-      liberar();
-      return nucleoBooleano(st, i, op, wasm, origemId, operandos, extra, { vincarCostura, origemDoOperando, reforco: true });
-    }
-
     /* ---- LASCA: triângulo sem área ----
        Onde duas superfícies quase coplanares se encontram (a tampa de um
        prisma do `arredondarCostura` sobre a face do sólido, arredondada em
@@ -958,7 +950,7 @@ export function criarOperacoesBooleanas(servicos) {
         if (j >= 0) { cortadas[k] = [fid, pedacosNovos[j][1]]; pedacosNovos.splice(j, 1); }
         else { cortadas.splice(k, 1); consumidas.push(fid); }
       }
-      levantarArestas();
+      if (reforco) levantarArestas();
       for (let k = 0; k < cortadas.length; k++) {
         const partes = semColinear(cortadas[k][1]).map((P) => melhorInicio(pos, P));
         if (partes.length > 1) mudou = true;
@@ -967,7 +959,7 @@ export function criarOperacoesBooleanas(servicos) {
         cortadas[k][1] = partes[maior];
         partes.forEach((P, j) => { if (j !== maior) pedacosNovos.push([cortadas[k][0], P, false]); });
       }
-      levantarArestas();
+      if (reforco) levantarArestas();
       for (let k = pedacosNovos.length - 1; k >= 0; k--) {
         const [fid, P, aux] = pedacosNovos[k];
         const partes = semColinear(P).map((Q) => melhorInicio(pos, Q));
@@ -1007,6 +999,12 @@ export function criarOperacoesBooleanas(servicos) {
         if (v >= 0 && (!reforco || !cantoSoDoResultado(v))) continue;
         const vizinhos = donos.map(([, P]) => { const k = P.indexOf(v); return new Set([P[(k + P.length - 1) % P.length], P[(k + 1) % P.length]]); });
         if (![...vizinhos[0]].every((w) => vizinhos[1].has(w))) continue;
+        /* o canto antigo só sai se estiver na reta dos dois vizinhos, a até 4 vezes a tolerância de solda: um canto verdadeiro de uma lâmina fina (o desvio é a espessura) fica */
+        if (v >= 0) {
+          const [a, b] = [...vizinhos[0]].map((w) => pos(w));
+          const ab = sub(b, a), comp = tamanho(ab);
+          if (!(comp > 0) || tamanho(cruz(ab, sub(pos(v), a))) / comp > 4 * tolSolda) continue;
+        }
         religaCostura(v, donos.map((item) => item[1]));
         for (const item of donos) item[1] = item[1].filter((w) => w !== v);
         tirou = true;
@@ -1132,6 +1130,23 @@ export function criarOperacoesBooleanas(servicos) {
         }
       }
     }
+    /* Só na união: aresta de menos de 2^-19 da meia-caixa (o dobro do piso da razão de precisão) entre um canto novo e outro canto dos polígonos que o passo escreve. A casca
+       passa no portão, mas a aresta (0,15 µm numa peça de 0,86 m) estoura a razão de precisão da booleana seguinte, e a segunda tentativa a funde. Se a segunda tentativa
+       recusar, vale a primeira, que já era aceitável. */
+    if (!reforco && !extra && op === 'unir' && !semGatilhoDaAresta) {
+      const pisoDePrecisao = Math.max(meiaCaixa, 1e-9) * 2 ** -19;
+      const curta = [...cortadas, ...pedacosNovos].some(([, P]) => P.some((v, k) => {
+        const w = P[(k + 1) % P.length];
+        return v !== w && (v < 0 || w < 0) && tamanho(sub(pos(w), pos(v))) <= pisoDePrecisao;
+      }));
+      if (curta) {
+        const recusas = st.orfaos.length;
+        const r = nucleoBooleano(st, i, op, wasm, origemId, operandos, extra, { vincarCostura, origemDoOperando, reforco: true });
+        if (st.orfaos.length === recusas) return r;
+        st.orfaos.length = recusas;
+        return nucleoBooleano(st, i, op, wasm, origemId, operandos, extra, { vincarCostura, origemDoOperando, semGatilhoDaAresta: true });
+      }
+    }
     /* ---- PORTÃO DE CASCA FECHADA ----
        O resultado (faces mantidas, cortadas e pedaços) tem de ser uma casca
        fechada e manifold: toda aresta dirigida com exatamente uma oposta, e o
@@ -1148,7 +1163,7 @@ export function criarOperacoesBooleanas(servicos) {
       const casca = porRepresentante;
       const falha = cascaAberta(porRepresentante, pos) ?? cascaAberta(porIdEscrito, pos);
       if (falha && extra?.tentativa) return { falhouCasca: falha };
-      if (falha && !extra && !reforco) return nucleoBooleano(st, i, op, wasm, origemId, operandos, extra, { vincarCostura, origemDoOperando, reforco: true });
+      if (falha && !extra && !reforco && op === 'unir') return nucleoBooleano(st, i, op, wasm, origemId, operandos, extra, { vincarCostura, origemDoOperando, reforco: true });
       /* na tentativa (os prismas em meia-esquadria), pedaço sem área também
          reprova: é o sinal de tampas vizinhas que não coincidem, e o modo por
          fatias não tem tampa no meio da costura */

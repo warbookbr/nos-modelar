@@ -1,11 +1,11 @@
-/* booleana-cantos-quase-coincidentes.test.ts — a união de dois sólidos cujos cantos ficam a menos da tolerância de fusão
-   (2^-15 da meia-caixa dos operandos) um do outro fecha a malha: cada canto novo a poucos micrômetros de um canto de operando
-   vira esse canto, em qualquer ordem, e a recusa do contato real não-manifold continua (troca-de-canto.test.mjs).
+/* booleana-cantos-quase-coincidentes.test.ts — a segunda tentativa reforçada da união (`reforco` em booleanas.js) e o que ela não pode fazer.
 
-   A segunda tentativa da booleana (reforco em booleanas.js) só roda quando a primeira recusaria ou deixa aresta abaixo do piso de precisão; o caso das juntas da bicicleta, que a exercita, está em tools/modelar/juntas-vizinhas-da-bicicleta.test.mjs. O defeito que motivou o teste (varredura das juntas soldadas da bicicleta, plano da costura em nó de tubos, fatia 6): cinco cantos
-   novos a menos de 0,5 µm de um canto antigo, cada um barrado pela regra "dois vizinhos em comum" enquanto os outros ainda existiam;
-   a diagonal da partição de um pedaço sobre uma aresta que já existe na casca, que dava quatro faces numa aresta; e um canto antigo
-   que a fusão de lascas deixava com duas faces. O caso das juntas está em tools/modelar/juntas-vizinhas-da-bicicleta.test.mjs. */
+   Os casos são cubos de lado 1 cujos cantos ficam a poucos micrômetros de uma aresta ou de um canto um do outro, e cada um foi conferido contra a versão anterior à
+   segunda tentativa: (1) a união com o segundo cubo em [2e-7, 0, 0,0192806], que a versão anterior recusava e agora fecha, com o volume de 1,0192806; (2) o contato por
+   aresta inteira (em [1, 1, 0]), que continua recusado, porque é contato não-manifold real; (3) a lâmina fina do `intersectar` (espessura de 10 µm), que continua recusada:
+   o reforço vale só na união, e ali a tentativa reforçada apagava o canto antigo verdadeiro da lâmina e devolvia um tetraedro com um sexto do volume, sem aviso; (4) o canto
+   antigo só sai na fusão de lascas quando está na reta dos vizinhos (até 4 vezes a tolerância de solda). O caso das juntas da bicicleta está em
+   tools/modelar/juntas-vizinhas-da-bicicleta.test.mjs. */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo herdado em JavaScript.
 import { nucleo } from '../nucleo.js';
@@ -32,23 +32,32 @@ function topologia(n: any) {
 }
 const fechada = { arestasSemPar: 0, naoManifold: 0, orfaos: 0 };
 
-/* os cubos de lado 1 têm meia-caixa de uns 0,9: a tolerância de fusão é de uns 27 µm */
-describe('união com cantos a menos da tolerância de fusão', () => {
-  for (const e of [2e-6, 8e-6, 2e-5, 2.6e-5]) {
-    it(`o canto do segundo cubo ${(e * 1e6).toFixed(0)} µm para dentro do canto do primeiro: a malha fecha`, () => {
-      const n = executa([['cubo', { origemId: 1, lado: 1 }], ['cubo', { origemId: 2, lado: 0.6, em: [1.3 - e, 1.3 - e, 1.3 - e] }],
-        ['unir', { origemId: 9, solidos: [sel('cubo', 1), sel('cubo', 2)] }]]);
-      expect(topologia(n)).toEqual(fechada);
-    });
+const volume = (n: any) => {
+  let v = 0;
+  for (const f of n.F.values()) {
+    const P = f.vs.map((k: number) => n.V.get(k));
+    for (let t = 1; t < P.length - 1; t++) {
+      const [a, b, c] = [P[0], P[t], P[t + 1]];
+      v += (a[0] * (b[1] * c[2] - b[2] * c[1]) - a[1] * (b[0] * c[2] - b[2] * c[0]) + a[2] * (b[0] * c[1] - b[1] * c[0])) / 6;
+    }
   }
-  it('o canto do segundo cubo a 8 µm de uma aresta e de uma face do primeiro, em dois eixos: a malha fecha', () => {
-    const n = executa([['cubo', { origemId: 1, lado: 1 }], ['cubo', { origemId: 2, lado: 0.6, em: [1.3 - 8e-6, 1.3, 0.2 + 8e-6] }],
-      ['unir', { origemId: 9, solidos: [sel('cubo', 1), sel('cubo', 2)] }]]);
+  return v;
+};
+const dois = (op: string, em: number[]) => executa([['cubo', { origemId: 1, lado: 1 }], ['cubo', { origemId: 2, lado: 1, em }],
+  [op, { origemId: 9, solidos: [sel('cubo', 1), sel('cubo', 2)] }]]);
+
+describe('segunda tentativa reforçada da booleana', () => {
+  it('união com o segundo cubo a 0,2 µm de uma face e deslocado em z: fecha, com o volume da união', () => {
+    const n = dois('unir', [2e-7, 0, 0.0192806]);
     expect(topologia(n)).toEqual(fechada);
+    expect(Math.abs(volume(n) - 1.0192806)).toBeLessThan(1e-5);
   });
-  it('o contato real num canto continua recusado (dois cubos que só se tocam num canto)', () => {
-    const n = executa([['cubo', { origemId: 1, lado: 1 }], ['cubo', { origemId: 2, lado: 1, em: [1, 1, 1] }],
-      ['unir', { origemId: 9, solidos: [sel('cubo', 1), sel('cubo', 2)] }]]);
+  it('o contato por aresta inteira (dois cubos que só se tocam numa aresta) continua recusado', () => {
+    const n = dois('unir', [1, 1, 0]);
     expect(n.orfaos.some((o: any) => o.op === 'unir')).toBe(true);
+  });
+  it('a lâmina de 10 µm do intersectar recusa, em vez de devolver um tetraedro sem aviso', () => {
+    const n = dois('intersectar', [-1 + 1e-5, 1e-7, 0.0141191]);
+    expect(n.orfaos.some((o: any) => o.op === 'intersectar')).toBe(true);
   });
 });
