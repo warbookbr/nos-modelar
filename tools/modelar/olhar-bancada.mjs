@@ -389,6 +389,40 @@ function erroDeUso(mensagem) {
   throw new ErroDeUso(mensagem);
 }
 
+/* A SAÍDA QUE A BANCADA CRIOU. A bancada não sobrescreve imagem de revisão, e quem refazia a rodada apagava a pasta à mão antes:
+   86 `rm -rf` numa sessão, com rodadas perdidas porque a pasta já existia. `--sobrescrever` apaga a pasta de `--saida` e a refaz, mas só
+   quando ela tem o marcador que a bancada grava ao criá-la, para a opção não virar um `rm -rf` de qualquer caminho do repositório. */
+export const MARCADOR_DA_SAIDA = '.saida-da-bancada';
+
+/** Prepara a pasta de saída: cria a que falta e, se foi `declarada` e nasceu agora (ou foi refeita), grava o marcador nela. Com
+    `sobrescrever`, apaga antes a pasta que já existe, se ela tiver o marcador; sem ele, recusa dizendo o caminho. Nunca apaga a pasta
+    padrão nem uma que contenha a pasta das sessões da bancada. Devolve `{ existia, apagada, marcada }`. */
+export function prepararSaida({ saida, declarada, sobrescrever = false, raiz = REPO, protegidas = [OUT] }) {
+  const relativa = relative(raiz, saida) || '.';
+  if (sobrescrever && !declarada) {
+    erroDeUso('--sobrescrever exige --saida: a pasta padrão é de todas as capturas e não é apagada.');
+  }
+  if (sobrescrever && protegidas.some((p) => !relative(saida, p).startsWith('..'))) {
+    erroDeUso(`--sobrescrever recusou '${relativa}': a pasta contém a saída padrão da bancada; escolha uma pasta só desta rodada.`);
+  }
+  const existia = existsSync(saida);
+  let apagada = false;
+  if (sobrescrever && existia) {
+    verificarCaminhoConfinado(saida, { raiz });
+    if (!existsSync(join(saida, MARCADOR_DA_SAIDA))) {
+      erroDeUso(`--sobrescrever recusou '${relativa}': a pasta não tem o marcador ${MARCADOR_DA_SAIDA}, então não foi criada pela bancada. Apague-a você, se for o caso, ou escolha outra --saida.`);
+    }
+    rmSync(saida, { recursive: true });
+    apagada = true;
+  }
+  criarDiretorioConfinado(saida, { raiz });
+  const marcada = Boolean(declarada) && (!existia || apagada);
+  if (marcada) {
+    writeFileSync(join(saida, MARCADOR_DA_SAIDA), 'pasta criada pela bancada (olhar-bancada --saida); --sobrescrever pode apagá-la e refazê-la.\n', 'utf8');
+  }
+  return { existia, apagada, marcada };
+}
+
 function normalizarLista(valor) {
   if (valor === null || valor === undefined) return [];
   if (Array.isArray(valor)) return valor.map((item) => String(item).trim()).filter(Boolean);
@@ -572,6 +606,8 @@ export async function olharBancada({
   res: resDeclarada = 1280,
   espera: esperaDeclarada = 1200,
   saida: saidaDeclarada = null,
+  /* `--sobrescrever`: apaga e refaz a pasta de `--saida` se ela foi criada pela bancada (o marcador `MARCADOR_DA_SAIDA` dentro dela). */
+  sobrescrever = false,
   relatorio: relatorioDeclarado = null,
   listar = false,
   estrito = false,
@@ -843,13 +879,14 @@ export async function olharBancada({
       enquadrarNaPeca ? 'enquadrado' : null,
     ].filter(Boolean);
     const sufixo = sufixoPartes.length ? `-${sufixoPartes.join('-')}` : '';
-    if (!capturarEmMemoria) criarDiretorioConfinado(saida, { raiz: REPO });
+    if (!capturarEmMemoria) prepararSaida({ saida, declarada: Boolean(saidaDeclarada), sobrescrever });
+    else if (sobrescrever) erroDeUso('--sobrescrever não vale para a captura em memória, que não grava pasta.');
     const arquivosPlanejados = !capturarEmMemoria && peca
       ? vistas.map((vista) => join(saida, `bancada-${apelidoDeArquivo(peca)}-${vista}${sufixo}.png`))
       : [];
     for (const arquivo of arquivosPlanejados) verificarCaminhoConfinado(arquivo, { raiz: REPO });
     if (saidaDeclarada && arquivosPlanejados.some((arquivo) => existsSync(arquivo))) {
-      erroDeUso('--saida já contém uma ou mais imagens desta rodada; a bancada não sobrescreve artefato de revisão.');
+      erroDeUso(`--saida '${relative(REPO, saida)}' já contém uma ou mais imagens desta rodada; a bancada não sobrescreve artefato de revisão sem pedido. Use --sobrescrever para apagar e refazer a pasta (só vale numa pasta criada pela bancada) ou escolha outra --saida.`);
     }
 
     /* OS PARES ACUSADOS SÃO MEDIDOS EM NODE, não perguntados à bancada: é a
@@ -1484,7 +1521,7 @@ export async function olharBancada({
 /* A AJUDA. Em 2026-11-03 um modelador gastou chamadas para descobrir o que o comando oferecia: ele recusava `--ajuda` e
    listava só os nomes das opções. Cada linha diz o que a opção faz; o detalhe da análise mora em PARE-E-ANALISE.md. */
 export const OPCOES_DA_CLI = ['peca', 'vistas', 'selecionadas', 'par', 'modo', 'projecao', 'explosao', 'res', 'espera', 'prazo', 'saida', 'relatorio', 'parte', 'zoom', 'zoom-antes', 'corte', 'corte-lado', 'ambiente', 'mirar', 'distancia', 'visao', 'largura-da-zebra', 'angulo-da-zebra', 'azimute', 'caixas-de-luz'];
-export const BANDEIRAS_DA_CLI = ['analise', 'listar', 'estrito', 'focar', 'revisar', 'auditoria', 'tela', 'cores', 'arame', 'wireframe', 'raio-x', 'sem-contatos', 'sem-cache', 'enquadrar'];
+export const BANDEIRAS_DA_CLI = ['analise', 'listar', 'estrito', 'focar', 'revisar', 'auditoria', 'tela', 'cores', 'arame', 'wireframe', 'raio-x', 'sem-contatos', 'sem-cache', 'enquadrar', 'sobrescrever'];
 export const AJUDA = `npm run bancada -- <peça> [opções]  (node tools/modelar/olhar-bancada.mjs)
 Captura a peça ou montagem na bancada, sem interface.
 
@@ -1520,6 +1557,7 @@ Captura a peça ou montagem na bancada, sem interface.
   --espera=<ms>          espera depois de carregar (padrão 1200)
   --prazo=<s>            prazo de carga da peça por tentativa, também na --analise (padrão 90; peça pesada pede mais)
   --saida=<pasta>        pasta relativa dentro do repositório (padrão tools/bancadas/out/)
+  --sobrescrever         com --saida: apaga a pasta e a refaz, se ela foi criada pela bancada (o arquivo ${MARCADOR_DA_SAIDA} dentro dela); recusa, dizendo o caminho, a pasta que a bancada não criou; sem ele, imagem já existente na --saida é recusada
   --relatorio=<arquivo>  grava o relatório da rodada em JSON
   --revisar              o conjunto de vistas da revisão
   --tela                 mostra a interface da bancada (não se mistura com --cores, --arame)
@@ -1587,6 +1625,9 @@ export function comoCLI(argv, { aoProgredir = null } = {}) {
   if (lido.bandeira('analise') && (lido.opcao('visao') || lido.bandeira('enquadrar') || lido.opcao('largura-da-zebra') || lido.opcao('angulo-da-zebra') || lido.opcao('azimute') || lido.opcao('caixas-de-luz'))) {
     return Promise.resolve(erroEstruturado({ relato: novoRelato(), erro: new ErroDeUso('--visao, --largura-da-zebra, --angulo-da-zebra, --azimute, --caixas-de-luz e --enquadrar não se misturam com --analise: a análise tira as próprias vistas; use `npm run bancada -- <peça> --visao=<id>`.') }));
   }
+  if (lido.bandeira('analise') && lido.bandeira('sobrescrever')) {
+    return Promise.resolve(erroEstruturado({ relato: novoRelato(), erro: new ErroDeUso('--sobrescrever não se mistura com --analise: a análise já refaz a pasta dela a cada rodada (a padrão inteira, a de --saida pelo manifesto anterior).') }));
+  }
   if (lido.bandeira('analise')) {
     const peca = lido.opcao('peca') ?? lido.posicional;
     const contatos = { medirContatos: !lido.bandeira('sem-contatos'), cacheDeContatos: !lido.bandeira('sem-cache') };
@@ -1603,7 +1644,7 @@ export function comoCLI(argv, { aoProgredir = null } = {}) {
     ...(prazo !== undefined && prazo !== null ? { prazoDeCargaMs: Number(prazo) * 1000 } : {}),
     vistas: lido.opcao('vistas'), selecionadas: lido.opcao('selecionadas'), par: lido.opcao('par'),
     modo: lido.opcao('modo'), projecao: lido.opcao('projecao'), explosao: lido.opcao('explosao', '0'), ambiente: lido.opcao('ambiente') ?? null,
-    res: lido.opcao('res', '1280'), espera: lido.opcao('espera', '1200'), saida: lido.opcao('saida'),
+    res: lido.opcao('res', '1280'), espera: lido.opcao('espera', '1200'), saida: lido.opcao('saida'), sobrescrever: lido.bandeira('sobrescrever'),
     relatorio: lido.opcao('relatorio'), listar: lido.bandeira('listar'), estrito: lido.bandeira('estrito'),
     focar: lido.bandeira('focar'), revisar: lido.bandeira('revisar'),
     mirar: lido.opcao('mirar') ?? null, distancia: lido.opcao('distancia') ?? null, aoProgredir,

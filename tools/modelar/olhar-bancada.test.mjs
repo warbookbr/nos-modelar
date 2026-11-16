@@ -7,7 +7,7 @@ import { PNG } from 'pngjs';
 import { describe, expect, it } from 'vitest';
 import { FATOR_DE_AMOSTRAGEM } from './capturar-montagem.mjs';
 import * as THREE from 'three';
-import { PRAZO_DE_CARGA_MS, abrirCapturaCompartilhada, agendarEncerramento, ajustarCamera, comoCLI, criarDicas, medirParesAcusados, olharBancada, projetarPontos } from './olhar-bancada.mjs';
+import { MARCADOR_DA_SAIDA, PRAZO_DE_CARGA_MS, abrirCapturaCompartilhada, prepararSaida, agendarEncerramento, ajustarCamera, comoCLI, criarDicas, medirParesAcusados, olharBancada, projetarPontos } from './olhar-bancada.mjs';
 import { analisarPeca } from './analise-da-peca.mjs';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -535,6 +535,51 @@ describe('o zoom da análise pela linha de comando', () => {
     expect(r.stderr).toMatch(/Escreva --zoom=frontal:mm:900,1200,-300,1100,1500,300/);
     const curta = await comoCLI(['--analise', 'peca-de-prova', '--zoom=frontal:mm:1,2,3,4']);
     expect(curta.stderr).toMatch(/escreva sem o mm/);
+  });
+});
+
+describe('a saída que a bancada criou e --sobrescrever', () => {
+  const comRaiz = (fazer) => {
+    const raiz = mkdtempSync(join(tmpdir(), 'saida-da-bancada-'));
+    try { return fazer(raiz); } finally { rmSync(raiz, { recursive: true, force: true }); }
+  };
+  const preparar = (raiz, rel, opcoes = {}) => prepararSaida({ saida: join(raiz, rel), declarada: true, raiz, protegidas: [join(raiz, 'tools/bancadas/out')], ...opcoes });
+
+  it('a pasta de --saida que nasce na captura leva o marcador, e --sobrescrever a apaga e refaz com ele', () => comRaiz((raiz) => {
+    expect(preparar(raiz, 'tmp/rodada')).toEqual({ existia: false, apagada: false, marcada: true });
+    expect(existsSync(join(raiz, 'tmp/rodada', MARCADOR_DA_SAIDA))).toBe(true);
+    writeFileSync(join(raiz, 'tmp/rodada/bancada-peca-direita.png'), 'velha');
+    expect(preparar(raiz, 'tmp/rodada', { sobrescrever: true })).toEqual({ existia: true, apagada: true, marcada: true });
+    expect(readdirSync(join(raiz, 'tmp/rodada'))).toEqual([MARCADOR_DA_SAIDA]);
+  }));
+
+  it('recusa, dizendo o caminho, a pasta que a bancada não criou, e não apaga nada dela', () => comRaiz((raiz) => {
+    mkdirSync(join(raiz, 'tmp/minha'), { recursive: true });
+    writeFileSync(join(raiz, 'tmp/minha/nota.txt'), 'da pessoa');
+    expect(() => preparar(raiz, 'tmp/minha', { sobrescrever: true })).toThrow(/--sobrescrever recusou 'tmp\/minha': a pasta não tem o marcador \.saida-da-bancada/);
+    expect(readFileSync(join(raiz, 'tmp/minha/nota.txt'), 'utf8')).toBe('da pessoa');
+    /* sem --sobrescrever a captura grava na pasta que já existia, sem marcá-la como da bancada */
+    expect(preparar(raiz, 'tmp/minha')).toEqual({ existia: true, apagada: false, marcada: false });
+    expect(existsSync(join(raiz, 'tmp/minha', MARCADOR_DA_SAIDA))).toBe(false);
+  }));
+
+  it('nunca apaga a pasta padrão, nem pasta que a contenha, nem sem --saida declarada', () => comRaiz((raiz) => {
+    const padrao = join(raiz, 'tools/bancadas/out');
+    mkdirSync(padrao, { recursive: true });
+    writeFileSync(join(padrao, MARCADOR_DA_SAIDA), '');
+    expect(() => preparar(raiz, 'tools/bancadas/out', { sobrescrever: true })).toThrow(/contém a saída padrão/);
+    expect(() => preparar(raiz, 'tools', { sobrescrever: true })).toThrow(/contém a saída padrão/);
+    expect(() => preparar(raiz, 'tmp/x', { sobrescrever: true, declarada: false })).toThrow(/--sobrescrever exige --saida/);
+    expect(existsSync(padrao)).toBe(true);
+  }));
+
+  it('pela linha de comando, recusa a mistura com --analise e o uso sem --saida antes de abrir servidor ou navegador', async () => {
+    const comAnalise = await comoCLI(['--analise', 'peca-de-prova', '--sobrescrever']);
+    expect(comAnalise.codigo).toBe(2);
+    expect(comAnalise.stderr).toMatch(/--sobrescrever não se mistura com --analise/);
+    const semSaida = await comoCLI(['peca-de-prova', '--sobrescrever', '--vistas=direita']);
+    expect(semSaida.codigo).toBe(2);
+    expect(semSaida.stderr).toMatch(/--sobrescrever exige --saida/);
   });
 });
 
