@@ -1,6 +1,6 @@
 /* adaptar-three.js — adaptador neutro do núcleo da Oficina para Three.js; não altera o formato persistido. */
 import * as THREE from 'three';
-import { anguloDoCanto, chaveDoCantoLiso, normalLisaDoCanto } from '../../procedural/nucleo/liso-por-angulo.js';
+import { anguloDoCanto, chaveDoCantoLiso, fatorDaFaceLisa, normalLisaDoCanto } from '../../procedural/nucleo/liso-por-angulo.js';
 import { normalizarMaterial, normalizarMateriais } from './material-da-receita.js';
 import { coordenadasDeTextura, caixaDaParte, medidasDaProjecao } from './coordenada-de-textura.js';
 import { gerarMapaDeFlocos, gerarMapasDoRelevo, metrosPorTileDoRelevo, METROS_POR_TILE_DOS_FLOCOS } from '../../modulos/textura/src/mapas.js';
@@ -355,7 +355,8 @@ function prepararFaces(neutro) {
 
 /**
  * O mapa de normais SUAVES: uma normal por VÉRTICE do núcleo, somada sobre as
- * faces marcadas `liso` com o peso do ângulo do canto (`anguloDoCanto`), que não
+ * faces marcadas `liso` com o peso do ângulo do canto (`anguloDoCanto`) vezes o
+ * fator que apaga a lasca (`fatorDaFaceLisa`); o ângulo não
  * muda quando uma face plana vizinha está partida em mais triângulos.
  *
  * A regra tem duas metades e as duas importam. A primeira: `liso` é a única
@@ -382,12 +383,18 @@ function normaisSuaves(neutro, preparo) {
     if (!face.liso) continue;
     const { pontos, tris, normal: uFace } = preparo.get(face.id);
     const somaDaFace = new Map();
+    /* o fator da lasca é da face inteira (liso-por-angulo.js), e não de cada triângulo */
+    const fator = fatorDaFaceLisa(pontos);
     for (const [ia, ib, ic] of tris) {
-      const u = normalizar(normalDoTriangulo(pontos[ia], pontos[ib], pontos[ic]));
+      let u = normalizar(normalDoTriangulo(pontos[ia], pontos[ib], pontos[ic]));
       if (!u) continue;
+      /* o triângulo virado contra o plano da face (a face em gravata, que se cruza, ou o leque de uma côncava) entra com a normal
+         do plano: o ângulo dele, entre 0 e pi, somava a normal invertida no canto, onde o núcleo soma a normal do polígono */
+      if (u[0] * uFace[0] + u[1] * uFace[1] + u[2] * uFace[2] <= 0) u = uFace;
       for (const [k, antes, depois] of [[ia, ic, ib], [ib, ia, ic], [ic, ib, ia]]) {
-        /* o peso é o ângulo do canto do triângulo: os triângulos de uma face plana somam no vértice o ângulo da face inteira */
-        const w = anguloDoCanto(pontos[antes], pontos[k], pontos[depois]);
+        /* o peso é o ângulo do canto do triângulo vezes o fator da lasca: os triângulos de uma face plana somam no vértice o ângulo
+           da face inteira */
+        const w = anguloDoCanto(pontos[antes], pontos[k], pontos[depois]) * fator;
         const n = [u[0] * w, u[1] * w, u[2] * w];
         const id = chave(face, face.vs[k]);
         const acc = soma.get(id);

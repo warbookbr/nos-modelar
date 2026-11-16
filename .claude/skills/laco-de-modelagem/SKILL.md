@@ -134,6 +134,11 @@ Na peça com sombreamento suave sobre a emenda de uma fusão (um `liso` cuja sel
 `intersectar` ou `arredondarCostura`), o pacote leva a luz rasante, sem a curvatura, e o `--registrar` cobra essa vista como cobra
 da lataria; a etapa já fixa pela pessoa fica fora da regra até voltar ao laço.
 
+Na peça com junta de tubos soldada, o brief do modelador cita a nota de
+[`GOTCHAS-POR-OPERACAO.md`](../../../docs/modelar/usar/GOTCHAS-POR-OPERACAO.md#junta-de-tubos-soldada-unir-friso-na-costura-com-cordao-e-unir-com-vincarcostura):
+a solda é `unir`, `friso` com `costura` e `cordao` e `unir` com `vincarCostura`, sem anéis da receita nas pontas dos tubos, e a
+recusa do friso por curva fechada demais volta ao modelador como limite de geometria, que se resolve pela largura do cordão.
+
 Na peça de lataria (a receita tem passo `subdivisao` ou declara `PLANO.lataria`), o pacote leva também a luz rasante e a curvatura
 da lataria, que mostram o amassado largo e raso que nenhuma medida e nenhuma vista comum mostram, e elas saem do Blender: rode
 `MODELAR_BLENDER=<caminho do Blender> npm run vistas:critica -- <peça>`. O brief do modelador de peça de lataria leva o mesmo

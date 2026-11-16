@@ -324,17 +324,19 @@ describe('a soma das normais lisas é pesada pelo ÂNGULO do canto de cada triâ
     for (const v of n) expect(Math.abs(v[1])).toBeLessThan(1e-9);
   });
 
-  it('partir as faces do barril em leques não muda a normal do anel', () => {
+  /* os pedaços do leque ficam acima do dobro do limite de face fina (razão perto de 0,009): a lasca, abaixo do limite, não pesa
+     (`fatorDaFaceLisa`), e partir a face em lascas mudaria a normal */
+  it('partir as faces do barril em leques que não são lascas não muda a normal do anel', () => {
     const partida = { ...casca, V: new Map(casca.V), F: new Map() };
     let novo = 1e9;
     for (const f of casca.F.values()) {
       const P = f.vs.map((v: number) => casca.V.get(v));
       const alto = P.some((p: number[]) => p[1] < 1);
       if (!alto || f.vs.length !== 4) { partida.F.set(f.id, f); continue; }
-      /* 5 pontos na aresta de baixo (y = 0) e o leque a partir do canto de cima que vem depois dela */
+      /* 2 pontos na aresta de baixo (y = 0) e o leque a partir do canto de cima que vem depois dela */
       const k = P.findIndex((p: number[], i: number) => p[1] < 1 && P[(i + 1) % 4][1] < 1);
       const a = f.vs[k], b = f.vs[(k + 1) % 4];
-      const meio = [1, 2, 3, 4, 5].map((j) => { const id = novo++; partida.V.set(id, casca.V.get(a).map((x: number, i: number) => x + (casca.V.get(b)[i] - x) * (j / 6))); return id; });
+      const meio = [1, 2].map((j) => { const id = novo++; partida.V.set(id, casca.V.get(a).map((x: number, i: number) => x + (casca.V.get(b)[i] - x) * (j / 3))); return id; });
       const cadeia = [a, ...meio, b, f.vs[(k + 2) % 4], f.vs[(k + 3) % 4]];
       const topo = (k + 2) % 4;
       const centro = f.vs[topo];

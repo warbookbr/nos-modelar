@@ -6,6 +6,7 @@
 > algum arquivo-fonte estiver sem cabeçalho.
 
 2018 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1988 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -236,6 +237,7 @@
 ## docs/modelar/banco-de-provas/costura-em-no-de-tubos-2026-11-15/
 
 - `CORDAO.md` — Protótipo do cordão de solda, 2026-11-15
+- `README.md` — Cordão de solda na costura de tubos: rodadas de forma e medidas
 - `SONDA.md` — Sonda da costura arredondada em nó de tubos, 2026-11-15
 
 ## docs/modelar/banco-de-provas/desenho-braco-2026-10-14/

@@ -1,6 +1,6 @@
 # Cordão de solda na costura de tubos: o friso que segue a costura de uma união, e a costura em nó de tubos
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `procedural/nucleo/operacoes/friso.js`, `procedural/nucleo/operacoes/friso-na-costura.test.ts`, `procedural/nucleo/operacoes/booleanas.js`, `procedural/nucleo/operacoes/arredondar-costura-no.test.ts`, `procedural/nucleo/fixtures/no-de-tubos.js`, `procedural/pecas/bicicleta-urbana/`, `docs/modelar/banco-de-provas/costura-em-no-de-tubos-2026-11-15/`, `procedural/nucleo/operacoes/refino-da-costura.js`, `procedural/nucleo/adaptador.js`, `procedural/nucleo/liso-por-angulo.js`, `procedural/nucleo/liso-por-angulo.test.js`, `src/autoria/adaptar-three.js`, `src/autoria/normal-lisa-por-angulo.test.js`, `modulos/exportador-gltf/src/gerar-gltf.js`, `tools/modelar/vista-rapida.mjs`, `tools/modelar/normais-lisas.test.ts`
 
@@ -72,8 +72,8 @@ Escamas da solda: ADIAR para o plano da ferramenta de material, como relevo que 
 4. Feita: o ponto triplo, revisado pelo revisor adversarial por ser mudança de núcleo.
 5. Feita: a bicicleta, com as juntas do quadro e do garfo com o cordão, aprovada pela pessoa por imagem em 2026-11-16 ("a solda atual ficou muito boa"; a bicicleta inteira, de lado, de frente e em perspectiva, ao lado da foto).
 6. Feita (b1dd71ba, revisada pelo revisor adversarial): a fusão do canto quase coincidente na união, com a tolerância declarada e medida contra o retrato do acervo, e a varredura do gate 8; revisada pelo revisor adversarial por ser mudança de núcleo. Vem logo depois da aprovação da bicicleta, por ser a correção que mais custa a quem escreve receita.
-7. O refinamento perto da costura feito pela ferramenta, e a bicicleta sem os anéis próprios (gate 9).
-8. Documentação e fechamento.
+7. Feita (990e0f6b, corrigida em 37ceb55e): o refinamento perto da costura feito pela ferramenta, e a bicicleta sem os anéis próprios (gate 9).
+8. Feita (9cf528c1): documentação e fechamento.
 
 ## Sucessor
 
@@ -85,4 +85,28 @@ Se o chanfro na bicicleta inteira não convencer a pessoa, o plano para e a form
 
 ## Fechamento
 
-A preencher.
+Concluído em 2026-11-16, medido no ramo `bicicleta` contra a base e911b02d, depois da revisão adversarial da fatia 7 e das correções dela (37ceb55e).
+
+O `friso` com `costura` e o perfil `cordao` põe o chanfro de solda no canto entre dois sólidos de um `unir`, e o `unir` com `vincarCostura` o funde aos tubos e refina sozinho a faixa em volta da costura. A bicicleta declara as juntas do quadro e do garfo assim, sem anéis próprios, e a pessoa aprovou a forma por imagem nas fatias 5 e 7.
+
+Gate 1 cumprido em parte. Nos casos de dois tubos da fixture (T reto 17/8, oblíquo a 35° 17/8, oblíquo a 60° 17/16 e T de raios iguais 17/17) a malha fecha sem órfão, sem aresta sem par e sem vínculo não manifold (`npx vitest run procedural/nucleo/operacoes/friso-na-costura.test.ts`). A dobra acima de 150° fora da borda do chanfro aparece em 1 aresta no oblíquo a 60° e em 2 no T de raios iguais, sempre com uma lasca de 1 a 4 µm de largura e normal virada; a base tem as mesmas, e nenhum teste confere a dobra. O caso de 90° com raios diferentes é o T reto; não há caso oblíquo a 90° de raios iguais além do T 17/17.
+
+Gate 2 cumprido em parte. `tubo e dois estais` e `no de 4 tubos` fecham do mesmo modo, no mesmo teste, e cada um tem 2 dobras acima de 150° em lasca de cerca de 1,5 µm junto do ponto triplo, iguais à base.
+
+Gate 3 cumprido pela contagem do teste: o par de 32 mm (oblíquo a 60° 17/16) acrescenta 506 faces entre cordão e cortes da união. Com o refino da faixa, que o teste conta à parte desde a fatia 7, são 680.
+
+Gate 4 cumprido: o retrato do acervo gravado em e911b02d e comparado em 990e0f6b dá 120 peças iguais, entre elas o braço robótico, e só a bicicleta mudada (`node tools/modelar/retrato-do-acervo.mjs --comparar <retrato da base>`). Os testes do `friso`, de `arredondar-costura-no` e dos cantos quase coincidentes passam (39 de 39).
+
+Gate 5 cumprido: `npm run recusas:check` passa com o `friso.js` vigiado; a união reforçada e o refino não trouxeram recusa nova.
+
+Gate 6 cumprido: a pessoa aprovou as juntas do selim, da caixa de direção e da coroa, de perto e na bicicleta inteira ao lado da foto, em 2026-11-16, e de novo na fatia 7.
+
+Gate 7 cumprido: a nota de uso está em `docs/modelar/usar/GOTCHAS-POR-OPERACAO.md`, na referência de operações do `criar-peca` e no `laco-de-modelagem`; o registro das rodadas e das medidas, com as pranchas da fatia 7, está em `docs/modelar/banco-de-provas/costura-em-no-de-tubos-2026-11-15/README.md`.
+
+Gate 8 cumprido: `node tmp/varredura/juntas.mjs garfo_eixo_a_coroa 395 405` fecha os 11 valores, e `estai_abaixo_da_abracadeira 40 56` fecha de 40 a 49 e recusa de 50 a 56 só pelo `friso` com curva fechada demais, o limite de geometria; nenhum valor recusa por casca aberta ou precisão, contra 12 da linha de base. A recusa de geometria passou a começar em 50 mm, e não em 51, desde que os anéis saíram. O teste dos cantos quase coincidentes é `procedural/nucleo/operacoes/booleana-cantos-quase-coincidentes.test.ts`.
+
+Gate 9 cumprido. A receita declara a solda só com `unir`, `friso` com `costura` e `cordao` e `unir` com `vincarCostura`, sem anéis próprios. A régua, que não tinha ficado gravada na fatia 3, virou teste em `friso-na-costura.test.ts`: todo triângulo da malha que toca o pé do cordão, com razão de aspecto acima de 8 e lado acima de 4,5 mm, com os limites da base com anéis. A primeira versão do refino (990e0f6b) passava pela imagem e falhava nela (1.161 triângulos acima de 40 mm contra 128 da base), o que a revisão adversarial achou; depois das correções são 54, com o maior lado de 110,5 mm, e a pessoa aprovou de novo a bicicleta por imagem. A revisão também corrigiu a normal lisa (peso pelo ângulo vezes um fator que apaga a lasca, e o triângulo virado contra o plano com a normal do plano, nas quatro implementações) e o refino que entrava em juntas sem cordão.
+
+Commits: fixture e linha de base 10cf0c9f; friso na costura 6a4ed37f; forma do chanfro 7719ff8b, b83a7574, 3f5a5604; ponto triplo e pares 84554d9f, 7807486d, a69099ae; bicicleta 3d68455d a d49c1c9f; fusão do canto quase coincidente 4b5cc745 e b1dd71ba; refino e normal pelo ângulo 990e0f6b; documentação da fatia 8 9cf528c1; correções da revisão 37ceb55e.
+
+Candidatos ao backlog: a lasca de 1 a 4 µm com normal virada que a união deixa junto da costura (gates 1 e 2), sem teste de dobra que a pegue; o catálogo gerado de `uso-operacoes.js` sem limite que fale de `vincarCostura` e do refino automático; as faces finas da bicicleta, de 594 com anéis para 1.918, que já não pesam na normal mas pesam na malha.

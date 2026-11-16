@@ -7,6 +7,10 @@ import { nucleo, neutroCanonico } from '../entrada.js';
 // @ts-expect-error — fixture em JavaScript.
 import { passosDoCordao, passosDoNo, tubo } from '../fixtures/no-de-tubos.js';
 import { arestasSemPar, vinculosNaoManifold } from '../../../tools/oficina/conferir-malha';
+// @ts-expect-error — núcleo herdado em JavaScript.
+import { triangularFace } from '../triangulacao-face.js';
+// @ts-expect-error — receita em JavaScript.
+import { TABELA, gerarPassos } from '../../pecas/bicicleta-urbana/receita.js';
 
 const m = (v: number) => v / 1000;
 const recusa = (passos: any[]) => { const n = nucleo(passos); return n.orfaos.map((o: any) => o.motivo).join(' | '); };
@@ -67,51 +71,91 @@ describe('friso na costura de uma união', () => {
     expect([...sem.F.values()].some((f: any) => f.quebras?.length)).toBe(false);
   });
 
-  it('o refino da faixa: com anéis de 10 mm nos tubos, nenhuma aresta de dobra em volta da costura passa de 1,5 passo (0,4 da largura), nenhum ponto novo cai dentro de uma faceta, a malha fecha e o resultado é o mesmo duas vezes', () => {
+  it('o refino da faixa: com anéis de 10 mm nos tubos, o refino acrescenta faces, nenhum ponto novo cai dentro de uma faceta, a malha fecha e o resultado é o mesmo duas vezes', () => {
     const p = passosDoCordao('obliquo 60 17/16', 7, { passoDoAnel: 0.01 });
     const n = nucleo(p);
     expect(n.orfaos).toEqual([]);
     expect(arestasSemPar(n)).toEqual([]);
     expect(vinculosNaoManifold(n)).toEqual([]);
+    expect(n.avisos.filter((a: any) => a.ref === 'refinoDaCostura')).toEqual([]);
     const refino = n.origens.get(201)[0].refinoDaCostura;
     expect(refino.faces).toBeGreaterThan(0);
     const costura = [...new Set(n.origens.get(201)[0].arestas.flat())].map((v: any) => n.V.get(v));
     const perto = (q: number[]) => costura.some((c: number[]) => Math.hypot(q[0] - c[0], q[1] - c[1], q[2] - c[2]) < m(7));
     const normal = new Map<number, number[]>();
-    const facesDaAresta = new Map<string, number[]>();
     const facesDoVertice = new Map<number, number[]>();
-    const lasca = new Set<number>();
     for (const f of n.F.values()) {
       const P = f.vs.map((v: number) => n.V.get(v));
       const s = [0, 0, 0];
       P.forEach((a: number[], k: number) => { const b = P[(k + 1) % P.length]; s[0] += (a[1] - b[1]) * (a[2] + b[2]); s[1] += (a[2] - b[2]) * (a[0] + b[0]); s[2] += (a[0] - b[0]) * (a[1] + b[1]); });
       const t = Math.hypot(s[0], s[1], s[2]);
       normal.set(f.id, s.map((x) => x / t));
-      let per = 0;
-      P.forEach((a: number[], k: number) => { const b = P[(k + 1) % P.length]; per += Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]); });
-      if (t / per < (m(7) * 0.4) / 10) lasca.add(f.id);
-      f.vs.forEach((v: number, k: number) => {
-        const w = f.vs[(k + 1) % f.vs.length]; const c = v < w ? `${v}-${w}` : `${w}-${v}`;
-        facesDaAresta.set(c, [...(facesDaAresta.get(c) ?? []), f.id]);
-        facesDoVertice.set(v, [...(facesDoVertice.get(v) ?? []), f.id]);
-      });
+      for (const v of f.vs) facesDoVertice.set(v, [...(facesDoVertice.get(v) ?? []), f.id]);
     }
     const mesmoPlano = (fs: number[]) => fs.every((g) => { const a = normal.get(fs[0])!, b = normal.get(g)!; return a[0] * b[0] + a[1] * b[1] + a[2] * b[2] > Math.cos((0.01 * Math.PI) / 180); });
-    /* a aresta de dobra entre facetas (o tubo de 48 lados dobra 7,5° em cada uma; acima de 30° é a quina do cordão) é a que o refino
-       divide; a de dentro de uma faceta e a de uma lasca (largura abaixo de um décimo do passo, normal sem precisão) ficam inteiras,
-       porque o ponto novo nelas teria a normal chapada da faceta ou a da lasca */
-    const diedro = (fs: number[]) => { const a = normal.get(fs[0])!, b = normal.get(fs[1])!; return (Math.acos(Math.min(1, a[0] * b[0] + a[1] * b[1] + a[2] * b[2])) * 180) / Math.PI; };
-    let maior = 0;
-    for (const [c, fs] of facesDaAresta) {
-      if (fs.length !== 2 || fs.some((f) => lasca.has(f)) || diedro(fs) < 5 || diedro(fs) > 30) continue;
-      const [a, b] = c.split('-').map((v) => n.V.get(Number(v)));
-      if (perto(a.map((x: number, i: number) => (x + b[i]) / 2))) maior = Math.max(maior, Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]));
-    }
-    expect(maior).toBeLessThanOrEqual(m(7) * 0.4 * 1.5 * 1.001);
     const dentroDaFaceta = [...facesDoVertice].filter(([v, fs]) => perto(n.V.get(v)) && mesmoPlano(fs));
     expect(dentroDaFaceta).toEqual([]);
     expect(JSON.stringify(neutroCanonico(nucleo(p)))).toBe(JSON.stringify(neutroCanonico(n)));
   });
+
+  it('o refino sai só do pé do cordão: o terceiro tubo da mesma união, sem cordão, fica como numa união à parte', () => {
+    const t1 = tubo(1, [0, 0, 0], [0, m(400), 0], m(17), 48, 0.01);
+    const t2 = tubo(2, [0, m(300), 0], [m(250), m(320), 0], m(16), 48, 0.01);
+    const t3 = tubo(3, [0, m(100), 0], [m(-200), m(60), 0], m(8), 48, 0.01);
+    const base = [t1, t2, t3, ['unir', { origemId: 100, solidos: [{ origem: { op: 'loft', id: 1 } }, { origem: { op: 'loft', id: 2 } }] }], friso({})];
+    const junto = nucleo([...base, ['unir', { origemId: 201, solidos: [{ origem: { op: 'unir', id: 100 } }, { origem: { op: 'friso', id: 200 } }, { origem: { op: 'loft', id: 3 } }], vincarCostura: true }]]);
+    const aParte = nucleo([...base, ['unir', { origemId: 201, solidos: [{ origem: { op: 'unir', id: 100 } }, { origem: { op: 'friso', id: 200 } }], vincarCostura: true }], ['unir', { origemId: 202, solidos: [{ origem: { op: 'unir', id: 201 } }, { origem: { op: 'loft', id: 3 } }] }]]);
+    /* as arestas a menos de 25 mm da junta do terceiro tubo: com a faixa saindo de toda a costura da união, eram 2067 contra 510 */
+    const perto = (n: any) => {
+      const c = [m(-15), m(97), 0]; const vistas = new Set<string>(); let conta = 0; let maior = 0;
+      for (const f of n.F.values()) f.vs.forEach((v: number, k: number) => {
+        const w = f.vs[(k + 1) % f.vs.length]; const ch = v < w ? `${v}-${w}` : `${w}-${v}`; if (vistas.has(ch)) return; vistas.add(ch);
+        const a = n.V.get(v), b = n.V.get(w); if (Math.hypot((a[0] + b[0]) / 2 - c[0], (a[1] + b[1]) / 2 - c[1], (a[2] + b[2]) / 2 - c[2]) >= m(25)) return;
+        conta++; maior = Math.max(maior, Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]));
+      });
+      return { conta, maior };
+    };
+    for (const n of [junto, aParte]) { expect(n.orfaos).toEqual([]); expect(arestasSemPar(n)).toEqual([]); }
+    expect(perto(junto)).toEqual(perto(aParte));
+  });
+
+  /* GATE 9 DO PLANO: a bicicleta sem os anéis próprios nas pontas dos tubos, com o refino da união do cordão, contra a régua da fatia 3
+     sobre todo triângulo que toca o pé do cordão (o polígono que fica entra pela triangulação do núcleo). A base é a receita com os
+     anéis de 4 mm, medida em 2026-11-16 com o mesmo cálculo: 145 triângulos longos (razão acima de 8) de mais de 40 mm, 1223 de mais de
+     15 mm, 5281 longos de mais de 4,5 mm e o maior lado de 144 mm. O commit anterior do refino deixava 1161 acima de 40 mm. */
+  it('gate 9: nas juntas soldadas da bicicleta, nenhum triângulo do pé do cordão fica pior que na base com anéis', () => {
+    const p = gerarPassos(TABELA);
+    const ini = p.findIndex((s: any, i: number) => s[0] === 'unir' && p[i + 1]?.[0] === 'friso' && p[i + 1][1].costura);
+    const passos: any[] = [];
+    for (let i = ini; i < p.length; i++) if (['unir', 'friso'].includes(p[i][0])) passos.push(p[i]); else if (p[i][0] !== 'liso') break;
+    const ids = new Set(passos.filter((s) => s[0] === 'unir' && !s[1].vincarCostura).flatMap((s) => s[1].solidos.map((x: any) => `${x.origem.op}:${x.origem.id}`)));
+    const todos = [...p.filter((s: any) => ids.has(`${s[0]}:${s[1].origemId}`)), ...passos];
+    const n = nucleo(todos);
+    expect(n.orfaos).toEqual([]);
+    expect(arestasSemPar(n)).toEqual([]);
+    expect(n.avisos.filter((a: any) => a.ref === 'refinoDaCostura')).toEqual([]);
+    const pe = new Set<number>();
+    for (const s of passos) if (s[0] === 'unir' && s[1].vincarCostura) for (const r of n.origens.get(s[1].origemId) ?? []) for (const a of r.arestas ?? []) for (const v of a) pe.add(v);
+    const sub = (a: number[], b: number[]) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+    let maior = 0; let longos = 0; let acima15 = 0; let acima40 = 0;
+    for (const f of n.F.values()) {
+      if (!f.vs.some((v: number) => pe.has(v))) continue;
+      const P = f.vs.map((v: number) => n.V.get(v));
+      for (const t of P.length === 3 ? [[0, 1, 2]] : triangularFace(P)) {
+        if (!t.some((i: number) => pe.has(f.vs[i]))) continue;
+        const Q = t.map((i: number) => P[i]);
+        const L = Math.max(...[0, 1, 2].map((k) => Math.hypot(...sub(Q[(k + 1) % 3], Q[k]))));
+        const u = sub(Q[1], Q[0]), w = sub(Q[2], Q[0]);
+        const A = Math.hypot(u[1] * w[2] - u[2] * w[1], u[2] * w[0] - u[0] * w[2], u[0] * w[1] - u[1] * w[0]);
+        maior = Math.max(maior, L);
+        if (L > m(4.5) && (L * L) / A > 8) { longos++; if (L > m(15)) acima15++; if (L > m(40)) acima40++; }
+      }
+    }
+    expect(acima40).toBeLessThanOrEqual(145);
+    expect(acima15).toBeLessThanOrEqual(1223);
+    expect(longos).toBeLessThanOrEqual(5281);
+    expect(maior).toBeLessThanOrEqual(m(144));
+  }, 120000);
 
   it('o cordão de tubos de raio igual termina onde as superfícies ficam tangentes, e a malha fecha', () => {
     const p = passosDoCordao('T reto 17/8', 7);

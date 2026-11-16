@@ -5,13 +5,19 @@
    pé de um lado: a triangulação dele é um leque de triângulos finos e longos, e o sombreado liso risca o tubo ao longo deles.
    Antes isto era contornado pela receita, que punha anéis a cada 4 mm nas pontas do tubo; aqui o refino é da ferramenta.
 
-   O CÁLCULO. Entre as faces do resultado, as que tocam a costura e têm aresta mais longa que `LIMITE_DO_LADO` passos são as
-   da faixa. Cada aresta longa delas (fora as da costura, que o cordão desenhou) ganha pontos a `passo` de distância, e o
-   mesmo conjunto de pontos entra na face do outro lado da aresta, para a malha continuar sem junção em T. Cada face da faixa é
-   então triangulada de novo, pela triangulação do polígono que deixa menor a pior razão de aspecto (o maior lado ao quadrado
-   sobre o dobro da área), e os triângulos herdam a cor, o material, a parte, o liso e as quebras de sombra da face. Onde
-   nenhuma triangulação serve (polígono não simples ou com mais de `MAXIMO_DE_CANTOS` cantos) a face guarda os pontos novos e
-   continua um polígono só.
+   O CÁLCULO. A faixa é a das faces que têm um canto no pé do cordão (as arestas da costura com uma face do cordão de um lado),
+   cada uma inteira, até o anel seguinte; a costura de outro sólido da mesma união não conta. Antes de tudo, os pedaços do mesmo
+   plano que vêm da mesma face de origem se juntam num polígono (o contorno deles). Cada aresta de dobra de uma face da faixa cuja
+   outra face também é da faixa ganha pontos: a `passo` de distância no trecho a menos de `faixa` do pé e, dali até as pontas, com
+   o passo crescendo 1,5 vez a cada ponto; a mesma lista de pontos entra nas duas faces, e nenhuma face fora da faixa ganha ponto.
+   Cada polígono da faixa é então triangulado pela triangulação que deixa menor a pior razão de aspecto (o maior lado ao quadrado
+   sobre o dobro da área), e os triângulos herdam a cor, o material, a parte, o liso e as quebras de sombra da face.
+
+   A RECUSA. O triângulo novo de lado acima de `LIMITE_DO_LADO` passos não pode sair mais que FOLGA_DA_RECUSA vezes pior que o
+   pedaço de que saiu (a pior razão da melhor triangulação do pedaço, ou RAZAO_ACEITA, a que for maior). O polígono recusado deixa
+   inteira a aresta dividida sem a qual ele passa, ou todas, e os vizinhos dela são refeitos, até nada mais mudar; o polígono do
+   pé que não se triangula fica como a união o deixou. A conta de faces novas tem teto (TETO_POR_PONTO_DO_PE por ponto do pé), e
+   a malha tem de fechar; se não, nada se escreve e a união avisa.
 
    O PASSO vem da largura do cordão (`passoDoRefino`), e o friso o declara no registro da origem dele; a união que recebe o cordão como
    operando é que aplica o refino. Determinístico: a ordem das arestas e das faces é a dos ids. */
@@ -28,10 +34,11 @@ const PISO_DO_DIEDRO = Math.PI / 180;
 /* o diedro acima deste é dobra de verdade (a quina, o pé do cordão), e não o facetado de uma superfície lisa */
 const LIMITE_DO_DIEDRO = (30 * Math.PI) / 180;
 
-/** o passo do refino pela largura do cordão: 0,4 da largura (2,8 mm num cordão de 7 mm, e nenhum lado da faixa passa de 1,5 passo), medido contra os anéis de 4 mm que a receita da bicicleta punha */
+/** o passo do refino pela largura do cordão: 0,4 da largura (2,8 mm num cordão de 7 mm), medido contra os anéis de 4 mm que a receita da bicicleta punha */
 export const passoDoRefino = (largura) => 0.4 * largura;
-/** a largura da faixa em volta da costura, medida da costura à aresta: duas larguras do cordão */
-export const faixaDoRefino = (largura) => 2 * largura;
+/** o trecho de passo constante em volta do pé, medido do pé à aresta: uma largura do cordão (com duas, a bicicleta ganha 5 mil faces
+    e a régua do pé não melhora); dali ao anel seguinte o passo cresce */
+export const faixaDoRefino = (largura) => largura;
 
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 const tam = (a) => Math.hypot(a[0], a[1], a[2]);
@@ -141,22 +148,49 @@ function triangular(P3, normal, proibida = () => false, areaMinima = 0) {
   return tris;
 }
 
+/* a razão (maior lado ao quadrado sobre o dobro da área) até a qual o triângulo novo passa mesmo pior que o pedaço de que saiu: a
+   da régua do cordão (fatia 3), que conta como longo o triângulo de razão acima de 8 */
+const RAZAO_ACEITA = 8;
+/* a folga da recusa: os pontos das duas arestas de uma tira fina caem em frações diferentes do comprimento, e a tira refeita sai
+   até duas vezes mais fina que a inteira; com folga 1, as tiras finas que a união deixa recusavam o refino e devolviam as arestas
+   delas, e a bicicleta ficava com 868 triângulos de mais de 40 mm no pé (a base com anéis tinha 128; com 2, 51) */
+const FOLGA_DA_RECUSA = 2;
+/* as rodadas da conferência: o polígono recusado devolve as arestas divididas dele, e os vizinhos são refeitos */
+const RODADAS = 12;
+/* o teto de faces novas por ponto do pé (a bicicleta fica perto de 3) */
+const TETO_POR_PONTO_DO_PE = 8;
+
+/* a pior razão da triangulação dos triângulos (listas de 3 pontos) */
+function piorRazao(tris, curto = 0) {
+  let pior = 0;
+  for (const [a, b, c] of tris) {
+    const ab = tam(sub(b, a)), bc = tam(sub(c, b)), ca = tam(sub(a, c));
+    const A = tam(cruz3(sub(b, a), sub(c, a)));
+    const maior = Math.max(ab, bc, ca);
+    if (maior <= curto) continue;
+    pior = Math.max(pior, A > 0 ? (maior * maior) / A : Infinity);
+  }
+  return pior;
+}
+
 /**
- * refinarFaixaDaCostura(st, { faces, costura, arestasDaCostura, passo, idV, idF, donos }) -> { novas, tocadas } ou null
+ * refinarFaixaDaCostura(st, { faces, costura, arestasDaCostura, arestasDoPe, cordoes, passo, faixa, idV, idF, donos }) -> { novas, tocadas } ou null
  *  `faces` (lista) e `costura` (as faces que tocam a costura) são do registro da união; `arestasDaCostura` é o conjunto de chaves
- *  "a-b" (a < b) das arestas da costura; `idV(k)` e `idF(k)` dão o k-ésimo id novo de vértice e de face do passo. Escreve em `st`,
- *  põe em `faces` e em `costura` os triângulos novos e em `donos` o dono deles, e devolve a contagem. Se algo não confere (a malha
+ *  "a-b" (a < b) das arestas da costura, que nunca se dividem, e `arestasDoPe` o das que ficam entre o cordão e um sólido (o pé do
+ *  cordão, de onde a faixa se mede); `cordoes` é o conjunto dos índices de operando que são cordão (`donos` diz o de cada face), e
+ *  a face do cordão não é refeita. `idV(k)` e `idF(k)` dão o k-ésimo id novo de vértice e de face do passo. Escreve em `st`, põe em
+ *  `faces` e em `costura` os triângulos novos e em `donos` o dono deles, e devolve a contagem. Se algo não confere (a malha
  *  deixaria de fechar, o passo acabaria os ids) não escreve nada e devolve null.
  */
-export function refinarFaixaDaCostura(st, { faces, costura, arestasDaCostura, passo, faixa, idV, idF, primeiroV, primeiroF, limiteDeIds, donos }) {
+export function refinarFaixaDaCostura(st, { faces, costura, arestasDaCostura, arestasDoPe = arestasDaCostura, cordoes = null, passo, faixa, idV, idF, primeiroV, primeiroF, limiteDeIds, donos }) {
   const limite = LIMITE_DO_LADO * passo;
   const posDe = (v) => st.V.get(v);
-  /* os pontos da costura, numa grade de células do tamanho da faixa, para achar a distância de uma aresta à costura */
-  const noDaCostura = new Set();
-  for (const c of arestasDaCostura) for (const v of c.split('-')) noDaCostura.add(Number(v));
+  /* os pontos do pé do cordão, numa grade de células do tamanho da faixa, para achar a distância de uma aresta ao pé */
+  const doPe = new Set();
+  for (const c of arestasDoPe) for (const v of c.split('-')) doPe.add(Number(v));
   const grade = new Map();
   const celula = (p) => p.map((x) => Math.floor(x / faixa));
-  for (const v of [...noDaCostura].sort((x, y) => x - y)) {
+  for (const v of [...doPe].sort((x, y) => x - y)) {
     const p = posDe(v);
     if (!p) continue;
     const k = celula(p).join(',');
@@ -181,7 +215,8 @@ export function refinarFaixaDaCostura(st, { faces, costura, arestasDaCostura, pa
     return t0 === null ? null : [Math.max(0, t0 - 1 / m), Math.min(1, t1 + 1 / m)];
   };
   /* os pontos da aresta, em fração do comprimento: a passo no trecho da faixa e, daí até cada ponta, com o passo crescendo de 1,5 em 1,5
-     vez (a malha engrossa aos poucos, e o sombreado não vê o degrau); o que sobra menos que o passo seguinte fica sem ponto */
+     vez (a malha engrossa aos poucos até o anel seguinte, e o sombreado não vê o degrau); o que sobra menos que o passo seguinte fica sem
+     ponto. A aresta é de uma face que o pé toca, e por isso o ponto não passa da faixa (as faces do pé até o anel seguinte). */
   const pontosDaAresta = (t0, t1, l) => {
     const n = Math.max(1, Math.ceil(((t1 - t0) * l) / passo));
     const ts = [];
@@ -197,7 +232,10 @@ export function refinarFaixaDaCostura(st, { faces, costura, arestasDaCostura, pa
     }
     return ts.filter((t) => t > 1e-9 && t < 1 - 1e-9).sort((x, y) => x - y);
   };
-  const doResultado = [...new Set(faces)].filter((f) => st.F.has(f)).sort((x, y) => x - y);
+  const doCordao = (fid) => donos != null && cordoes != null && cordoes.has(donos[fid]);
+  /* as faces que o refino pode refazer: as do resultado que não são do cordão */
+  const doResultado = [...new Set(faces)].filter((f) => st.F.has(f) && !doCordao(f)).sort((x, y) => x - y);
+  const noResultado = new Set(doResultado);
   const normalUnitaria = new Map();
   const normalDaFaceDe = (fid) => {
     if (!normalUnitaria.has(fid)) { const n = normalDe(st.F.get(fid).vs.map(posDe)); const t = tam(n); normalUnitaria.set(fid, t > 0 ? n.map((x) => x / t) : null); }
@@ -223,54 +261,99 @@ export function refinarFaixaDaCostura(st, { faces, costura, arestasDaCostura, pa
      faceta aproxima: a normal lisa dele é a do plano da faceta, e não a que o sombreado interpola entre as arestas, e a faceta
      aparece como faixa. Ela fica inteira quando o diedro dela é menor que um quarto do maior diedro das outras arestas das duas
      faces dela (as da costura e as de dobra de verdade, acima de LIMITE_DO_DIEDRO, não contam). */
+  const memoDentro = new Map();
   const deDentroDaFaceta = (c) => {
+    if (memoDentro.has(c)) return memoDentro.get(c);
     const cd = cossenoDoDiedro(c);
-    if (cd === null) return false;
-    const proprio = Math.acos(Math.min(1, cd));
-    if (proprio < PISO_DO_DIEDRO) return true;
-    let maior = 0;
-    for (const fid of facesDaAresta.get(c)) {
-      const vs = st.F.get(fid).vs;
-      for (let k = 0; k < vs.length; k++) {
-        const o = chave(vs[k], vs[(k + 1) % vs.length]);
-        if (o === c || arestasDaCostura.has(o)) continue;
-        const co = cossenoDoDiedro(o);
-        if (co === null) continue;
-        const d = Math.acos(Math.max(-1, Math.min(1, co)));
-        if (d < LIMITE_DO_DIEDRO && d > maior) maior = d;
+    let r = false;
+    if (cd !== null) {
+      const proprio = Math.acos(Math.min(1, cd));
+      if (proprio < PISO_DO_DIEDRO) r = true;
+      else {
+        let maior = 0;
+        for (const fid of facesDaAresta.get(c)) {
+          const vs = st.F.get(fid).vs;
+          for (let k = 0; k < vs.length; k++) {
+            const o = chave(vs[k], vs[(k + 1) % vs.length]);
+            if (o === c || arestasDaCostura.has(o)) continue;
+            const co = cossenoDoDiedro(o);
+            if (co === null) continue;
+            const d = Math.acos(Math.max(-1, Math.min(1, co)));
+            if (d < LIMITE_DO_DIEDRO && d > maior) maior = d;
+          }
+        }
+        r = proprio < maior / 4;
       }
     }
-    return proprio < maior / 4;
+    memoDentro.set(c, r);
+    return r;
   };
-  /* OS PEDAÇOS DE UMA FACETA SE JUNTAM. A união parte a faceta cortada pelo pé do cordão em pedaços convexos, e cada pedaço
-     triangulado sozinho liga o ponto do pé (que fica dentro da faceta, com a normal lisa puxada pelo cordão) ao canto mais
-     longe do pedaço, num triângulo longo que leva essa normal tubo afora: o risco claro ao longo do tubo. Os pedaços do mesmo
-     plano que vêm da mesma face de entrada, com a mesma aparência, se juntam pela aresta comum que não é quebra de sombra
-     (`fundir`, que só junta dois polígonos com exatamente uma aresta em comum) num polígono só, e a triangulação dele escolhe
-     entre todos os pontos da borda da faceta (os do pé e os que o refino põe nas arestas dela). A junção só fica quando o
-     polígono junto é refeito (tem aresta dividida ou toca a costura). */
-  const aparencia = (f) => JSON.stringify([f.parte ?? null, f.material ?? null, f.cor ?? null, f.liso ?? null, f.solido ?? null, st.pedacosDe?.get(f.id) ?? f.id]);
-  const noResultado = new Set(doResultado);
+
+  /* OS PEDAÇOS DE UMA FACETA SE JUNTAM. As uniões partem a faceta cortada pelo pé do cordão em pedaços convexos, e cada pedaço
+     triangulado sozinho liga o ponto do pé ao canto mais longe do pedaço, num triângulo longo que leva a normal do pé tubo afora: o
+     risco claro ao longo do tubo. Os pedaços do mesmo plano que vêm da mesma face de origem (`pedacosDe` seguido em cadeia, por
+     cima da união dos tubos e da do cordão), com a mesma aparência, se juntam pelas arestas comuns que não são costura nem quebra
+     de sombra num polígono só, o contorno dos pedaços, e a triangulação dele escolhe entre todos os pontos da borda da faceta (os
+     do pé e os que o refino põe nas arestas dela). Quando o contorno não é um laço simples, os pedaços se juntam dois a dois pela
+     aresta comum (`fundir`). A junção só fica quando o polígono junto é refeito. */
+  const raizDoPedaco = (fid) => { let r = fid; for (let g = st.pedacosDe?.get(r); g != null && g !== r; g = st.pedacosDe?.get(r)) r = g; return r; };
+  const aparencia = (f) => JSON.stringify([f.parte ?? null, f.material ?? null, f.cor ?? null, f.liso ?? null, f.solido ?? null, raizDoPedaco(f.id)]);
+  const ehQuebra = (f, c) => (f.quebras ?? []).some(([x, y]) => chave(x, y) === c);
   const paiDaFace = new Map(doResultado.map((f) => [f, f]));
   const raizDaFace = (x) => { while (paiDaFace.get(x) !== x) { paiDaFace.set(x, paiDaFace.get(paiDaFace.get(x))); x = paiDaFace.get(x); } return x; };
+  const juntavel = new Set();
   for (const [c, fs] of [...facesDaAresta.entries()].sort((x, y) => (x[0] < y[0] ? -1 : x[0] > y[0] ? 1 : 0))) {
     if (fs.length !== 2 || !fs.every((g) => noResultado.has(g)) || arestasDaCostura.has(c)) continue;
     const [f1, f2] = fs.map((g) => st.F.get(g));
-    if (f1.tinta?.length || f2.tinta?.length || aparencia(f1) !== aparencia(f2)) continue;
-    if ([f1, f2].some((g) => (g.quebras ?? []).some(([x, y]) => chave(x, y) === c))) continue;
+    if (f1.tinta?.length || f2.tinta?.length) continue;
+    if (aparencia(f1) !== aparencia(f2)) continue;
+    if (ehQuebra(f1, c) || ehQuebra(f2, c)) continue;
     if (!deDentroDaFaceta(c)) continue;
+    juntavel.add(c);
     const r1 = raizDaFace(f1.id), r2 = raizDaFace(f2.id);
     if (r1 !== r2) paiDaFace.set(Math.max(r1, r2), Math.min(r1, r2));
   }
   const grupos = new Map();
   for (const f of doResultado) { const r = raizDaFace(f); if (!grupos.has(r)) grupos.set(r, []); grupos.get(r).push(f); }
-  /* quantas faces usam cada canto: a junção tira uma face de cada ponta da aresta comum, e o canto que ficaria com menos de três
-     (um vínculo que não fecha laço) a impede */
+  /* o contorno do grupo: as arestas dirigidas sem a oposta no grupo, num laço só e simples; as arestas internas são todas juntáveis,
+     e nenhum canto fica só dentro do grupo */
+  const contornoDoGrupo = (membros) => {
+    const dirigidas = new Map();
+    const usos = new Map();
+    for (const g of membros) {
+      const vs = st.F.get(g).vs;
+      if (new Set(vs).size !== vs.length) return null;
+      for (let k = 0; k < vs.length; k++) {
+        const a = vs[k], b = vs[(k + 1) % vs.length];
+        if (dirigidas.has(`${a}>${b}`)) return null;
+        dirigidas.set(`${a}>${b}`, [a, b]);
+        usos.set(a, (usos.get(a) ?? 0) + 1);
+      }
+    }
+    const seguinte = new Map();
+    for (const [k, [a, b]] of dirigidas) {
+      if (dirigidas.has(`${b}>${a}`)) { if (!juntavel.has(chave(a, b))) return null; continue; }
+      if (seguinte.has(a)) return null;
+      seguinte.set(a, b);
+    }
+    if (!seguinte.size) return null;
+    const inicio = Math.min(...seguinte.keys());
+    const laco = [inicio];
+    for (let v = seguinte.get(inicio); v !== inicio; v = seguinte.get(v)) { if (v === undefined || laco.length > seguinte.size) return null; laco.push(v); }
+    if (laco.length !== seguinte.size) return null;
+    const noLaco = new Set(laco);
+    for (const v of usos.keys()) if (!noLaco.has(v)) return null;
+    return laco;
+  };
+  /* quantas faces usam cada canto: a junção dois a dois tira uma face de cada ponta da aresta comum, e o canto que ficaria com menos
+     de três (um vínculo que não fecha laço) a impede */
   const valencia = new Map();
   for (const f of st.F.values()) for (const v of f.vs) valencia.set(v, (valencia.get(v) ?? 0) + 1);
   const juntas = new Map();   // sobrevivente -> { vs, absorvidas }
   for (const [r, membros] of grupos) {
     if (membros.length < 2) continue;
+    const laco = contornoDoGrupo(membros);
+    if (laco) { juntas.set(r, { vs: laco, absorvidas: membros.filter((g) => g !== r) }); continue; }
     let P = st.F.get(r).vs.slice();
     const absorvidas = [];
     const resto = membros.filter((g) => g !== r);
@@ -289,121 +372,162 @@ export function refinarFaixaDaCostura(st, { faces, costura, arestasDaCostura, pa
     if (absorvidas.length) juntas.set(r, { vs: P, absorvidas });
   }
   const absorvida = new Set([...juntas.values()].flatMap((j) => j.absorvidas));
+  const sobrevivente = new Map();
+  for (const [r, j] of juntas) for (const g of j.absorvidas) sobrevivente.set(g, r);
   const poligonoDe = (fid) => juntas.get(fid)?.vs ?? st.F.get(fid).vs;
+  const membrosDe = (fid) => [fid, ...(juntas.get(fid)?.absorvidas ?? [])];
   const vivas = doResultado.filter((f) => !absorvida.has(f));
   const tocaACostura = new Set(costura);
   for (const [r, j] of juntas) if (j.absorvidas.some((g) => tocaACostura.has(g))) tocaACostura.add(r);
+  /* as faces do pé: as que têm um canto no pé do cordão, até o anel seguinte (a face inteira) */
+  const doPeDoCordao = vivas.filter((fid) => poligonoDe(fid).some((v) => doPe.has(v)));
+  const ehDoPe = new Set(doPeDoCordao);
 
-  /* a aresta de uma face lasca (largura, 2 vezes a área sobre o perímetro, abaixo de 1/10 do passo) fica inteira (medida depois da junção dos pedaços, que absorve a lasca da faceta): a normal da lasca não
-     tem precisão (o diedro dela não diz se a aresta é dobra ou fica dentro de uma faceta), e o ponto novo entraria na média lisa com o
-     ângulo inteiro do canto dela */
-  const larguraMinima = passo / 10;
-  const arestaDeLasca = new Set();
-  for (const f of st.F.values()) {
-    if (absorvida.has(f.id)) continue;
-    const vs = poligonoDe(f.id);
-    if (vs.length < 3) continue;
-    const P = vs.map(posDe);
-    const N = normalDe(P);
-    let per = 0;
-    for (let k = 0; k < P.length; k++) per += tam(sub(P[(k + 1) % P.length], P[k]));
-    if (per > 0 && (tam(N) / per) < larguraMinima) for (let k = 0; k < vs.length; k++) arestaDeLasca.add(chave(vs[k], vs[(k + 1) % vs.length]));
-  }
-  const divisoes = new Map();   // chave da aresta -> { a, b, n } com a < b
-  for (const fid of vivas) {
+  /* as arestas que podem ganhar pontos: de uma face do pé, fora da costura, longas, de dobra (não de dentro de uma faceta), com
+     duas faces no resultado fora do cordão; os pontos de cada uma, em fração do comprimento, de a (o menor id) a b */
+  const candidatas = new Map();
+  for (const fid of doPeDoCordao) {
     const vs = poligonoDe(fid);
     if (new Set(vs).size !== vs.length) continue;
     for (let k = 0; k < vs.length; k++) {
       const a = vs[k], b = vs[(k + 1) % vs.length], c = chave(a, b);
-      if (arestasDaCostura.has(c) || divisoes.has(c) || arestaDeLasca.has(c) || deDentroDaFaceta(c)) continue;
+      const fs = facesDaAresta.get(c) ?? [];
+      if (candidatas.has(c) || arestasDaCostura.has(c)) continue;
+      if (deDentroDaFaceta(c)) continue;
+      if (fs.length !== 2 || !fs.every((g) => noResultado.has(g) && ehDoPe.has(sobrevivente.get(g) ?? g))) continue;
       const l = tam(sub(posDe(b), posDe(a)));
       if (l <= limite) continue;
       const lo = Math.min(a, b), hi = Math.max(a, b), A = posDe(lo), B = posDe(hi);
       const tr = trechoNaFaixa(A, B, l);
-      if (tr && (tr[1] - tr[0]) * l > limite) divisoes.set(c, { a: lo, b: hi, ts: pontosDaAresta(tr[0], tr[1], l) });
+      if (tr) candidatas.set(c, { a: lo, b: hi, ts: pontosDaAresta(tr[0], tr[1], l) });
     }
   }
-  if (!divisoes.size) return { novas: 0, tocadas: 0 };
-  /* a junção que não ganhou ponto nem toca a costura volta aos pedaços */
-  for (const [r, j] of [...juntas]) {
-    const P = j.vs;
-    let tem = tocaACostura.has(r);
-    for (let k = 0; k < P.length && !tem; k++) tem = divisoes.has(chave(P[k], P[(k + 1) % P.length]));
-    if (!tem) { juntas.delete(r); for (const g of j.absorvidas) absorvida.delete(g); }
-  }
-
-  /* os pontos de cada aresta dividida, do menor id ao maior */
-  const ordem = [...divisoes.entries()].sort((x, y) => x[1].a - y[1].a || x[1].b - y[1].b);
-  const pontos = new Map();   // chave -> [{ id, pos }] de a para b
-  const posNovas = new Map();
-  let kv = 0;
-  for (const [c, { a, b, ts }] of ordem) {
-    const A = posDe(a), B = posDe(b), lista = [];
-    for (const u of ts) {
-      const id = idV(primeiroV + kv++);
-      const p = [A[0] + (B[0] - A[0]) * u, A[1] + (B[1] - A[1]) * u, A[2] + (B[2] - A[2]) * u];
-      posNovas.set(id, p); lista.push(id);
-    }
-    pontos.set(c, lista);
-  }
-  const posicao = (v) => posNovas.get(v) ?? posDe(v);
-  if (primeiroV + kv > limiteDeIds) return null;
-
-  /* os polígonos depois de dividir as arestas: toda face que tem uma aresta dividida (a da faixa e a do outro lado) */
-  const poligono = new Map();
-  const quebrasNovas = new Map();
-  const comPontos = (vs) => {
-    const saida = [];
-    vs.forEach((v, k) => {
-      const w = vs[(k + 1) % vs.length];
-      saida.push(v);
-      const lista = pontos.get(chave(v, w));
-      if (lista) saida.push(...(v < w ? lista : [...lista].reverse()));
-    });
-    return saida;
-  };
-  for (const fid of doResultado) {
-    if (absorvida.has(fid)) continue;
-    const f = st.F.get(fid);
-    const vs = poligonoDe(fid);
-    let tem = juntas.has(fid);
-    for (let k = 0; k < vs.length && !tem; k++) tem = pontos.has(chave(vs[k], vs[(k + 1) % vs.length]));
-    if (!tem) continue;
-    poligono.set(f.id, comPontos(vs));
-    const quebrasDaFace = [f, ...(juntas.get(fid)?.absorvidas ?? []).map((g) => st.F.get(g))].flatMap((g) => g.quebras ?? []);
-    if (quebrasDaFace.length) {
-      const q = [];
-      for (const [x, y] of quebrasDaFace) {
-        const lista = pontos.get(chave(x, y));
-        if (!lista) { q.push([x, y]); continue; }
-        const cadeia = x < y ? [x, ...lista, y] : [x, ...[...lista].reverse(), y];
-        for (let k = 0; k + 1 < cadeia.length; k++) q.push([cadeia[k], cadeia[k + 1]]);
-      }
-      quebrasNovas.set(f.id, q);
-    }
-  }
-
-  /* a triangulação das faces da faixa */
-  const triangulos = new Map();   // fid -> lista de [a, b, c] em ids
   /* o triângulo quase sem área (o dobro da área até 4e-9 vezes o quadrado da meia-diagonal da caixa da malha; a medida de contato
      recusa a partir de 2e-9 vezes o da parte, que é menor) deixaria a parte inconclusiva na auditoria de contato */
   const caixa = [Infinity, Infinity, Infinity, -Infinity, -Infinity, -Infinity];
   for (const p of st.V.values()) for (let i = 0; i < 3; i++) { if (p[i] < caixa[i]) caixa[i] = p[i]; if (p[i] > caixa[i + 3]) caixa[i + 3] = p[i]; }
   const meia = Math.hypot(caixa[3] - caixa[0], caixa[4] - caixa[1], caixa[5] - caixa[2]) / 2;
   const areaMinima = 4e-9 * meia * meia;
-  const diagonaisUsadas = new Set();
-  for (const fid of poligono.keys()) {
-    const vs = poligono.get(fid);
-    const P = vs.map(posicao);
-    const normal = normalDe(P);
-    /* a diagonal que já é aresta de outra face, ou que a triangulação de outro polígono já usou (dois cantos que uma dobra fora do
-       plano liga), deixaria a aresta em mais de duas faces */
-    const t = triangular(P, normal, (i, k) => facesDaAresta.has(chave(vs[i], vs[k])) || diagonaisUsadas.has(chave(vs[i], vs[k])), areaMinima);
-    if (t) {
-      const tris = t.map(([i, j, k]) => [vs[i], vs[j], vs[k]]);
-      triangulos.set(fid, tris);
-      for (const T of tris) for (let k = 0; k < 3; k++) diagonaisUsadas.add(chave(T[k], T[(k + 1) % 3]));
+  /* a pior razão de cada pedaço como ele é, pela mesma triangulação (a que a recusa compara) */
+  const piorDoPedaco = new Map();
+  const piorOriginal = (fid) => {
+    let pior = 0;
+    for (const g of membrosDe(fid)) {
+      if (!piorDoPedaco.has(g)) {
+        const vs = st.F.get(g).vs, P = vs.map(posDe);
+        const t = vs.length === 3 ? [[0, 1, 2]] : triangular(P, normalDe(P));
+        piorDoPedaco.set(g, t ? piorRazao(t.map((T) => T.map((i) => P[i]))) : Infinity);
+      }
+      pior = Math.max(pior, piorDoPedaco.get(g));
     }
+    return pior;
+  };
+
+  /* A CONFERÊNCIA DE CADA POLÍGONO REFEITO. Todo polígono que ganha ponto (o do pé e o do outro lado da aresta dividida) e todo
+     polígono do pé (o pedaço junto ou o polígono que a união deixou) é triangulado de novo; o triângulo não pode sair pior que o
+     pedaço de que veio (a pior razão dele, ou RAZAO_ACEITA, a que for maior). O polígono recusado devolve as arestas divididas
+     dele, que ficam inteiras, e os vizinhos delas são refeitos na rodada seguinte; o polígono do pé recusado sem aresta dividida
+     fica como estava (e o pedaço junto volta aos pedaços). */
+  const bloqueadas = new Set();
+  const recusados = new Set();
+  let divisoes = new Map(), triangulos = new Map(), poligono = new Map(), posNovas = new Map(), pontos = new Map();
+  const memoTri = new Map();
+  for (let rodada = 0; rodada < RODADAS; rodada++) {
+    divisoes = new Map([...candidatas].filter(([c]) => !bloqueadas.has(c)));
+    const ordem = [...divisoes.entries()].sort((x, y) => x[1].a - y[1].a || x[1].b - y[1].b);
+    pontos = new Map(); posNovas = new Map();
+    let kv = 0;
+    for (const [c, { a, b, ts }] of ordem) {
+      const A = posDe(a), B = posDe(b), lista = [];
+      for (const u of ts) {
+        const id = idV(primeiroV + kv++);
+        posNovas.set(id, [A[0] + (B[0] - A[0]) * u, A[1] + (B[1] - A[1]) * u, A[2] + (B[2] - A[2]) * u]);
+        lista.push(id);
+      }
+      pontos.set(c, lista);
+    }
+    const posicao = (v) => posNovas.get(v) ?? posDe(v);
+    /* o polígono com os pontos só das arestas de `usar` */
+    const comPontos = (vs, usar) => {
+      const saida = [];
+      vs.forEach((v, k) => {
+        const w = vs[(k + 1) % vs.length];
+        saida.push(v);
+        const c = chave(v, w);
+        const lista = usar.has(c) ? pontos.get(c) : null;
+        if (lista) saida.push(...(v < w ? lista : [...lista].reverse()));
+      });
+      return saida;
+    };
+    /* a triangulação do polígono com os pontos das arestas `usar`, ou null quando não há ou quando ela sai pior que o pedaço */
+    const tentar = (fid, vs, usar) => {
+      const P3 = comPontos(vs, usar);
+      const assinatura = `${fid}|${[...usar].sort().join(',')}`;
+      let t = memoTri.get(assinatura);
+      if (t === undefined) {
+        const P = P3.map(posicao);
+        /* a diagonal que já é aresta de outra face deixaria a aresta em mais de duas faces (as arestas entre os pedaços juntos somem) */
+        const proprias = new Set(membrosDe(fid));
+        const tt = triangular(P, normalDe(P), (i, k) => (facesDaAresta.get(chave(P3[i], P3[k])) ?? []).some((g) => !proprias.has(g)), areaMinima);
+        t = tt && piorRazao(tt.map((T) => T.map((i) => P[i])), limite) <= Math.max(RAZAO_ACEITA, piorOriginal(fid)) * FOLGA_DA_RECUSA ? tt : null;
+        memoTri.set(assinatura, t);
+      }
+      if (!t) return null;
+      const tris = t.map(([i, j, k]) => [P3[i], P3[j], P3[k]]);
+      /* as diagonais (os lados dos triângulos que não são da borda do polígono) que a triangulação de outro polígono já usou
+         (dois cantos que uma dobra fora do plano liga) */
+      const borda = new Set(P3.map((v, k) => chave(v, P3[(k + 1) % P3.length])));
+      const diagonais = tris.flatMap((T) => T.map((v, q) => chave(v, T[(q + 1) % 3]))).filter((c) => !borda.has(c));
+      if (diagonais.some((c) => diagonaisUsadas.has(c))) return null;
+      return { P3, tris, diagonais };
+    };
+    poligono = new Map(); triangulos = new Map();
+    const alvo = new Set(doPeDoCordao.filter((f) => !recusados.has(f)));
+    for (const c of divisoes.keys()) for (const g of facesDaAresta.get(c)) alvo.add(sobrevivente.get(g) ?? g);
+    const diagonaisUsadas = new Set();
+    let mudou = false;
+    for (const fid of [...alvo].sort((x, y) => x - y)) {
+      const vs = poligonoDe(fid);
+      const divididas = [];
+      for (let k = 0; k < vs.length; k++) { const c = chave(vs[k], vs[(k + 1) % vs.length]); if (divisoes.has(c)) divididas.push(c); }
+      if (!divididas.length && !juntas.has(fid) && vs.length === 3) continue;
+      let r = tentar(fid, vs, new Set(divididas));
+      if (!r) {
+        /* recusado: a aresta dividida que, inteira, deixa o polígono passar fica inteira (a primeira, na ordem das chaves); se
+           nenhuma basta, ficam todas */
+        const fica = divididas.length > 1 ? [...divididas].sort().find((c) => tentar(fid, vs, new Set(divididas.filter((d) => d !== c)))) : null;
+        const inteiras = fica ? [fica] : divididas;
+        if (inteiras.length) { for (const c of inteiras) bloqueadas.add(c); mudou = true; }
+        if (!divididas.length) recusados.add(fid);
+        continue;
+      }
+      poligono.set(fid, r.P3);
+      triangulos.set(fid, r.tris);
+      for (const c of r.diagonais) diagonaisUsadas.add(c);
+    }
+    if (!mudou) break;
+    if (rodada === RODADAS - 1) return null;
+  }
+  if (!poligono.size) return { novas: 0, tocadas: 0 };
+  /* a junção que não foi refeita volta aos pedaços */
+  for (const [r, j] of [...juntas]) if (!poligono.has(r)) { juntas.delete(r); for (const g of j.absorvidas) absorvida.delete(g); }
+  const posicao = (v) => posNovas.get(v) ?? posDe(v);
+  /* só entram os pontos das arestas divididas, todos usados */
+  if (primeiroV + posNovas.size > limiteDeIds) return null;
+
+  /* as quebras de sombra dos polígonos refeitos, com as arestas divididas em pedaços */
+  const quebrasNovas = new Map();
+  for (const fid of poligono.keys()) {
+    const quebrasDaFace = membrosDe(fid).map((g) => st.F.get(g)).flatMap((g) => g.quebras ?? []);
+    if (!quebrasDaFace.length) continue;
+    const q = [];
+    for (const [x, y] of quebrasDaFace) {
+      const lista = pontos.get(chave(x, y));
+      if (!lista) { q.push([x, y]); continue; }
+      const cadeia = x < y ? [x, ...lista, y] : [x, ...[...lista].reverse(), y];
+      for (let k = 0; k + 1 < cadeia.length; k++) q.push([cadeia[k], cadeia[k + 1]]);
+    }
+    quebrasNovas.set(fid, q);
   }
 
   /* a conferência da malha: toda aresta dirigida do que muda tem a oposta no que muda ou no que fica */
@@ -411,12 +535,8 @@ export function refinarFaixaDaCostura(st, { faces, costura, arestasDaCostura, pa
   const dirigidas = new Map();
   const conta = (m, a, b) => m.set(`${a}>${b}`, (m.get(`${a}>${b}`) ?? 0) + 1);
   const depois = new Map();
-  for (const [fid, vs] of poligono) {
-    const tris = triangulos.get(fid);
-    for (const P of tris ?? [vs]) for (let k = 0; k < P.length; k++) conta(depois, P[k], P[(k + 1) % P.length]);
-  }
+  for (const tris of triangulos.values()) for (const P of tris) for (let k = 0; k < 3; k++) conta(depois, P[k], P[(k + 1) % 3]);
   for (const f of st.F.values()) if (!mudam.has(f.id)) for (let k = 0; k < f.vs.length; k++) conta(dirigidas, f.vs[k], f.vs[(k + 1) % f.vs.length]);
-  /* as diagonais novas entram duas vezes, uma em cada sentido, dentro de `depois` */
   for (const [c, n] of depois) {
     const [a, b] = c.split('>');
     const oposta = (depois.get(`${b}>${a}`) ?? 0) + (dirigidas.get(`${b}>${a}`) ?? 0);
@@ -424,11 +544,11 @@ export function refinarFaixaDaCostura(st, { faces, costura, arestasDaCostura, pa
   }
   let novasFaces = 0;
   for (const tris of triangulos.values()) novasFaces += tris.length - 1;
-  if (primeiroF + novasFaces > limiteDeIds) return null;
+  if (primeiroF + novasFaces > limiteDeIds || novasFaces - absorvida.size > TETO_POR_PONTO_DO_PE * doPe.size) return null;
 
   /* aplica: as faces absorvidas saem (do estado, da lista do registro, da costura e dos donos), e a triangulação da sobrevivente
      cobre a faceta inteira */
-  for (const [id, p] of posNovas) { st.V.set(id, p); st.novosV?.push(id); }
+  for (const [id, p] of [...posNovas].sort((x, y) => x[0] - y[0])) { st.V.set(id, p); st.novosV?.push(id); }
   for (const g of [...absorvida].sort((x, y) => x - y)) {
     st.F.delete(g);
     st.parteAtribuidaEm?.delete(g);
@@ -439,15 +559,9 @@ export function refinarFaixaDaCostura(st, { faces, costura, arestasDaCostura, pa
   let kf = 0;
   const novas = [];
   const toca = tocaACostura;
-  for (const [fid, vs] of [...poligono.entries()].sort((x, y) => x[0] - y[0])) {
+  for (const [fid, tris] of [...triangulos.entries()].sort((x, y) => x[0] - y[0])) {
     const f = st.F.get(fid);
-    const tris = triangulos.get(fid);
     const q = quebrasNovas.get(fid);
-    if (!tris) {
-      f.vs = vs;
-      if (q) f.quebras = q;
-      continue;
-    }
     /* o triângulo de maior área fica com o id da face */
     let melhor = 0, areaMelhor = -1;
     tris.forEach((t, k) => { const a = tam(normalDe(t.map(posicao))); if (a > areaMelhor) { areaMelhor = a; melhor = k; } });
@@ -476,5 +590,5 @@ export function refinarFaixaDaCostura(st, { faces, costura, arestasDaCostura, pa
     if (toca.has(fid) && !melhorToca && i >= 0) costura.splice(i, 1);
     if (toca.has(fid) && melhorToca && i < 0) costura.push(fid);
   }
-  return { novas: novas.length - absorvida.size, tocadas: poligono.size + absorvida.size };
+  return { novas: novas.length - absorvida.size, tocadas: triangulos.size + absorvida.size };
 }

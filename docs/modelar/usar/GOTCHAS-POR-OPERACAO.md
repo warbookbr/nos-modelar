@@ -149,6 +149,43 @@ regulares longe da costura e leques compridos perto dela denunciam o
 problema. O erro foi atribuído primeiro ao núcleo, sem medir; medir o ângulo
 entre as superfícies na costura teria mostrado a causa de saída.
 
+## Junta de tubos soldada: `unir`, `friso` na costura com `cordao`, e `unir` com `vincarCostura`
+
+A bicicleta urbana alargou primeiro a ponta de cada tubo para imitar a solda,
+e a pessoa reprovou por imagem em 2026-11-15: lia como luva com linha de
+emenda. A concordância lisa do `arredondarCostura` leu como solda sem volume,
+o cordão redondo como mangueira e a lente com borda como divisa arredondada.
+A forma aprovada é o chanfro, e a junta soldada se declara em três passos:
+
+```js
+['unir', { origemId: 100, solidos: [{ origem: { op: 'loft', id: 1 } }, { origem: { op: 'loft', id: 2 } }] }],
+['friso', { origemId: 200, linha: { nome: 'solda' }, costura: { de: { op: 'unir', id: 100 } },
+  perfil: { cordao: { largura: 0.008 } } }],
+['unir', { origemId: 201, solidos: [{ origem: { op: 'unir', id: 100 } }, { origem: { op: 'friso', id: 200 } }],
+  vincarCostura: true }],
+```
+
+O `friso` lê a costura que o primeiro `unir` registrou e desenha o chanfro em
+cada ponto, com um pé em cada tubo a meia largura do canto; `entre: [i, j]`
+restringe a um par de sólidos, e sem ele cada par que se toca ganha o seu
+cordão. O `cordao` leva só a largura. O segundo `unir` funde o cordão aos tubos
+e, com `vincarCostura: true`, põe o pé do cordão como quebra de sombra. A
+receita não põe anéis nas pontas dos tubos: essa união refina sozinha a faixa
+de duas larguras em volta da costura, com passo de 0,4 da largura
+(`procedural/nucleo/operacoes/refino-da-costura.js`). Até 2026-11-16 a
+bicicleta punha anéis a cada 4 mm em cada ponta soldada, e eles saíram da
+receita.
+
+A recusa "a curva é fechada demais para a largura do perfil (...) a curva é a
+do encontro dos sólidos e não se abre; mude a largura do perfil" é limite de
+geometria: perto do ponto citado a costura vira mais do que o chanfro daquela
+largura comporta, como onde o estai encontra o tubo do selim logo abaixo do
+tubo superior. A saída é mudar a largura (ela muda também o passo com que a
+costura é seguida) ou afastar os tubos. Na bicicleta, com cordão de 8 mm, o
+estai a 50 mm ou mais abaixo da abraçadeira recusa assim. Já a recusa do
+`unir` por casca aberta ou por precisão é defeito do cálculo, e vai para o
+backlog com a receita que a reproduz.
+
 ## `arredondarCostura`: borda de rebaixo e fundo de rasgo não são o encontro côncavo
 
 Em 2026-09-29 uma sonda com um rebaixo cego numa placa e um rasgo passante num
