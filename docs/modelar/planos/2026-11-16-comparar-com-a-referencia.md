@@ -2,7 +2,7 @@
 
 **Estado:** rascunho
 
-**Território:** a declarar ao ativar; deve ficar em `tools/modelar/` (a bancada de linha de comando e um comando novo de prancha), `tools/bancadas/` se a prancha for montada no navegador, e as skills `criar-peca`, `laco-de-modelagem` e o agente `modelador` na parte que diz como comparar. O plano do [cordão de solda](2026-11-15-costura-em-no-de-tubos.md) usa a bicicleta e não toca nessas pastas.
+**Território:** a declarar ao ativar; deve ficar em `tools/modelar/` (a bancada de linha de comando e um comando novo de prancha), `tools/bancadas/` se a prancha for montada no navegador, e as skills `criar-peca`, `laco-de-modelagem` e o agente `modelador` na parte que diz como comparar. O plano do [cordão de solda](../decisoes/PLANOS-ENCERRADOS.md) usa a bicicleta e não toca nessas pastas.
 
 **Responsável:** a IA da sessão implementa; Tiago aprova por imagem.
 

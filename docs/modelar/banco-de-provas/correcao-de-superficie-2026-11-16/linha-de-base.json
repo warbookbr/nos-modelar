@@ -1,0 +1,1364 @@
+{
+  "formato": "modelar.linha-de-base-correcao-de-superficie@1",
+  "zonaMm": 80,
+  "medidas": [
+    {
+      "alvo": "tools/fixtures/correcao-de-superficie/rede-com-ruido",
+      "lado": null,
+      "vertices": 4141,
+      "faces": 4000,
+      "suavidade": [
+        {
+          "regiao": "A",
+          "indice": 12.039,
+          "kRms": 1.01
+        },
+        {
+          "regiao": "B",
+          "indice": 13.02,
+          "kRms": 0.881
+        },
+        {
+          "regiao": "C",
+          "indice": 13.489,
+          "kRms": 0.799
+        },
+        {
+          "regiao": "D",
+          "indice": 32.959,
+          "kRms": 1.373
+        }
+      ],
+      "pente": [
+        {
+          "corte": "z:125",
+          "curvas": 1,
+          "saltos": 0,
+          "maiorSalto": 0,
+          "mudancasDeSinal": 0,
+          "curvatura": {
+            "min": -0.197,
+            "max": 0.627
+          }
+        },
+        {
+          "corte": "z:375",
+          "curvas": 1,
+          "saltos": 2,
+          "maiorSalto": 0.479,
+          "mudancasDeSinal": 0,
+          "curvatura": {
+            "min": -0.446,
+            "max": 0.868
+          }
+        },
+        {
+          "corte": "x:250",
+          "curvas": 1,
+          "saltos": 2,
+          "maiorSalto": 0.415,
+          "mudancasDeSinal": 0,
+          "curvatura": {
+            "min": 0.018,
+            "max": 1.306
+          }
+        },
+        {
+          "corte": "x:750",
+          "curvas": 1,
+          "saltos": 5,
+          "maiorSalto": 1.82,
+          "mudancasDeSinal": 0,
+          "curvatura": {
+            "min": -2.011,
+            "max": 3.251
+          }
+        }
+      ],
+      "emendas": {
+        "resumo": {
+          "emendas": 4,
+          "acusam": 3,
+          "frestaMaximaMm": 0,
+          "anguloMaximoGraus": 1.106,
+          "razaoMaxima": 2.778
+        },
+        "emendas": [
+          {
+            "lados": [
+              "A",
+              "B"
+            ],
+            "tipo": "aresta comum",
+            "comprimentoMm": 251.8,
+            "anguloMaximo": 0.224,
+            "anguloMediano": 0.129,
+            "razaoMaxima": 2.253,
+            "razaoMediana": 1.654,
+            "curvaturas": [
+              0.719,
+              0.366
+            ],
+            "acusa": {
+              "fresta": 0,
+              "angulo": 0,
+              "curvatura": 10
+            }
+          },
+          {
+            "lados": [
+              "A",
+              "C"
+            ],
+            "tipo": "aresta comum",
+            "comprimentoMm": 502.3,
+            "anguloMaximo": 0.705,
+            "anguloMediano": 0.222,
+            "razaoMaxima": 1.759,
+            "razaoMediana": 1.534,
+            "curvaturas": [
+              0.806,
+              1.203
+            ],
+            "acusa": {
+              "fresta": 0,
+              "angulo": 0,
+              "curvatura": 23
+            }
+          },
+          {
+            "lados": [
+              "B",
+              "D"
+            ],
+            "tipo": "aresta comum",
+            "comprimentoMm": 502.2,
+            "anguloMaximo": 1.106,
+            "anguloMediano": 0.321,
+            "razaoMaxima": 2.778,
+            "razaoMediana": 1.318,
+            "curvaturas": [
+              0.52,
+              0.707
+            ],
+            "acusa": {
+              "fresta": 0,
+              "angulo": 1,
+              "curvatura": 5
+            }
+          },
+          {
+            "lados": [
+              "C",
+              "D"
+            ],
+            "tipo": "aresta comum",
+            "comprimentoMm": 251.5,
+            "anguloMaximo": 0.67,
+            "anguloMediano": 0.111,
+            "razaoMaxima": 2.127,
+            "razaoMediana": 1.332,
+            "curvaturas": [
+              0.207,
+              0.205
+            ],
+            "acusa": {
+              "fresta": 0,
+              "angulo": 0,
+              "curvatura": 0
+            }
+          }
+        ]
+      },
+      "ondulacao": {
+        "falhas": 9,
+        "foraDasFeicoes": 9,
+        "juntoDasFeicoes": 1,
+        "maiorAmplitudeMm": 0.599
+      },
+      "extraordinarios": {
+        "daGaiola": [
+          {
+            "rede": 0,
+            "ponto": "D.centro",
+            "valencia": 5,
+            "borda": false,
+            "posicaoMm": [
+              751.247,
+              48.726,
+              401.234
+            ]
+          }
+        ],
+        "daMalha": 1,
+        "casados": 1,
+        "semPar": [],
+        "espacamentoMm": 50.21264659433575
+      },
+      "g2PorRegiao": [
+        {
+          "regiao": "A",
+          "indice": 12.039,
+          "kRms": 1.01,
+          "areaMedidaM2": 0.126
+        },
+        {
+          "regiao": "B",
+          "indice": 13.02,
+          "kRms": 0.881,
+          "areaMedidaM2": 0.126
+        },
+        {
+          "regiao": "C",
+          "indice": 13.489,
+          "kRms": 0.799,
+          "areaMedidaM2": 0.126
+        },
+        {
+          "regiao": "D",
+          "indice": 30.195,
+          "kRms": 1.326,
+          "areaMedidaM2": 0.107
+        },
+        {
+          "regiao": "D @zonaEV",
+          "indice": 50.885,
+          "kRms": 1.715,
+          "areaMedidaM2": 0.02
+        }
+      ],
+      "costura": {
+        "noPlanoExato": 0,
+        "aMenosDe1e6SemSer0": 53,
+        "vaosPorLado": {
+          "+x": 0,
+          "-x": 0,
+          "cruza": 0
+        }
+      },
+      "zonaMm": 80
+    },
+    {
+      "alvo": "tools/fixtures/correcao-de-superficie/rede-sem-ruido",
+      "lado": null,
+      "vertices": 4141,
+      "faces": 4000,
+      "suavidade": [
+        {
+          "regiao": "A",
+          "indice": 4.815,
+          "kRms": 0.845
+        },
+        {
+          "regiao": "B",
+          "indice": 4.595,
+          "kRms": 0.747
+        },
+        {
+          "regiao": "C",
+          "indice": 7.966,
+          "kRms": 0.727
+        },
+        {
+          "regiao": "D",
+          "indice": 32.556,
+          "kRms": 1.254
+        }
+      ],
+      "pente": [
+        {
+          "corte": "z:125",
+          "curvas": 1,
+          "saltos": 0,
+          "maiorSalto": 0,
+          "mudancasDeSinal": 0,
+          "curvatura": {
+            "min": 0.007,
+            "max": 0.469
+          }
+        },
+        {
+          "corte": "z:375",
+          "curvas": 1,
+          "saltos": 2,
+          "maiorSalto": 0.586,
+          "mudancasDeSinal": 0,
+          "curvatura": {
+            "min": -0.804,
+            "max": 0.865
+          }
+        },
+        {
+          "corte": "x:250",
+          "curvas": 1,
+          "saltos": 2,
+          "maiorSalto": 0.485,
+          "mudancasDeSinal": 0,
+          "curvatura": {
+            "min": 0.017,
+            "max": 1.436
+          }
+        },
+        {
+          "corte": "x:750",
+          "curvas": 1,
+          "saltos": 4,
+          "maiorSalto": 1.851,
+          "mudancasDeSinal": 0,
+          "curvatura": {
+            "min": -0.075,
+            "max": 3.261
+          }
+        }
+      ],
+      "emendas": {
+        "resumo": {
+          "emendas": 4,
+          "acusam": 2,
+          "frestaMaximaMm": 0,
+          "anguloMaximoGraus": 0.334,
+          "razaoMaxima": 2.505
+        },
+        "emendas": [
+          {
+            "lados": [
+              "A",
+              "B"
+            ],
+            "tipo": "aresta comum",
+            "comprimentoMm": 251.6,
+            "anguloMaximo": 0.104,
+            "anguloMediano": 0.048,
+            "razaoMaxima": 1.468,
+            "razaoMediana": 1.402,
+            "curvaturas": [
+              0.431,
+              0.309
+            ],
+            "acusa": {
+              "fresta": 0,
+              "angulo": 0,
+              "curvatura": 0
+            }
+          },
+          {
+            "lados": [
+              "A",
+              "C"
+            ],
+            "tipo": "aresta comum",
+            "comprimentoMm": 502.1,
+            "anguloMaximo": 0.297,
+            "anguloMediano": 0.251,
+            "razaoMaxima": 1.741,
+            "razaoMediana": 1.682,
+            "curvaturas": [
+              0.733,
+              1.227
+            ],
+            "acusa": {
+              "fresta": 0,
+              "angulo": 0,
+              "curvatura": 41
+            }
+          },
+          {
+            "lados": [
+              "B",
+              "D"
+            ],
+            "tipo": "aresta comum",
+            "comprimentoMm": 502.1,
+            "anguloMaximo": 0.334,
+            "anguloMediano": 0.162,
+            "razaoMaxima": 1.682,
+            "razaoMediana": 1.235,
+            "curvaturas": [
+              0.587,
+              0.745
+            ],
+            "acusa": {
+              "fresta": 0,
+              "angulo": 0,
+              "curvatura": 4
+            }
+          },
+          {
+            "lados": [
+              "C",
+              "D"
+            ],
+            "tipo": "aresta comum",
+            "comprimentoMm": 251.6,
+            "anguloMaximo": 0.209,
+            "anguloMediano": 0.068,
+            "razaoMaxima": 2.505,
+            "razaoMediana": 1.543,
+            "curvaturas": [
+              0.208,
+              0.333
+            ],
+            "acusa": {
+              "fresta": 0,
+              "angulo": 0,
+              "curvatura": 0
+            }
+          }
+        ]
+      },
+      "ondulacao": {
+        "falhas": 2,
+        "foraDasFeicoes": 2,
+        "juntoDasFeicoes": 0,
+        "maiorAmplitudeMm": 0.679
+      },
+      "extraordinarios": {
+        "daGaiola": [
+          {
+            "rede": 0,
+            "ponto": "D.centro",
+            "valencia": 5,
+            "borda": false,
+            "posicaoMm": [
+              751.158,
+              47.713,
+              401.161
+            ]
+          }
+        ],
+        "daMalha": 1,
+        "casados": 1,
+        "semPar": [],
+        "espacamentoMm": 50.209126315590666
+      },
+      "g2PorRegiao": [
+        {
+          "regiao": "A",
+          "indice": 4.815,
+          "kRms": 0.845,
+          "areaMedidaM2": 0.126
+        },
+        {
+          "regiao": "B",
+          "indice": 4.595,
+          "kRms": 0.747,
+          "areaMedidaM2": 0.126
+        },
+        {
+          "regiao": "C",
+          "indice": 7.966,
+          "kRms": 0.727,
+          "areaMedidaM2": 0.126
+        },
+        {
+          "regiao": "D",
+          "indice": 24.808,
+          "kRms": 1.164,
+          "areaMedidaM2": 0.107
+        },
+        {
+          "regiao": "D @zonaEV",
+          "indice": 58.316,
+          "kRms": 1.668,
+          "areaMedidaM2": 0.02
+        }
+      ],
+      "costura": {
+        "noPlanoExato": 0,
+        "aMenosDe1e6SemSer0": 53,
+        "vaosPorLado": {
+          "+x": 0,
+          "-x": 0,
+          "cruza": 0
+        }
+      },
+      "zonaMm": 80
+    },
+    {
+      "alvo": "tools/fixtures/correcao-de-superficie/chapa-simetrica",
+      "lado": "centro",
+      "vertices": 15106,
+      "faces": 15237,
+      "suavidade": [
+        {
+          "regiao": "chapa",
+          "indice": 9.592,
+          "kRms": 1.749
+        }
+      ],
+      "pente": [
+        {
+          "corte": "z:250",
+          "curvas": 1,
+          "saltos": 2,
+          "maiorSalto": 0.692,
+          "mudancasDeSinal": 0,
+          "curvatura": {
+            "min": 0.108,
+            "max": 2.161
+          }
+        },
+        {
+          "corte": "z:500",
+          "curvas": 2,
+          "saltos": 6,
+          "maiorSalto": 0.862,
+          "mudancasDeSinal": 0,
+          "curvatura": {
+            "min": 0.125,
+            "max": 2.373
+          }
+        },
+        {
+          "corte": "z:750",
+          "curvas": 1,
+          "saltos": 2,
+          "maiorSalto": 0.692,
+          "mudancasDeSinal": 0,
+          "curvatura": {
+            "min": 0.108,
+            "max": 2.161
+          }
+        }
+      ],
+      "emendas": {
+        "resumo": {
+          "emendas": 0,
+          "acusam": 0,
+          "frestaMaximaMm": 0,
+          "anguloMaximoGraus": 0,
+          "razaoMaxima": 0
+        },
+        "emendas": []
+      },
+      "ondulacao": {
+        "falhas": 2,
+        "foraDasFeicoes": 2,
+        "juntoDasFeicoes": 4,
+        "maiorAmplitudeMm": 0.38
+      },
+      "extraordinarios": {
+        "daGaiola": [],
+        "daMalha": 0,
+        "casados": 0,
+        "semPar": [],
+        "espacamentoMm": 55.96217238741046
+      },
+      "g2PorRegiao": [
+        {
+          "regiao": "chapa",
+          "indice": 9.592,
+          "kRms": 1.749,
+          "areaMedidaM2": 1.471
+        }
+      ],
+      "costura": {
+        "noPlanoExato": 1,
+        "aMenosDe1e6SemSer0": 145,
+        "vaosPorLado": {
+          "+x": 1,
+          "-x": 0,
+          "cruza": 0
+        }
+      },
+      "zonaMm": 80
+    },
+    {
+      "alvo": "tools/fixtures/correcao-de-superficie/chapa-simetrica-espelhada",
+      "lado": "centro",
+      "vertices": 14882,
+      "faces": 15150,
+      "suavidade": [
+        {
+          "regiao": "chapa",
+          "indice": 9.602,
+          "kRms": 1.732
+        }
+      ],
+      "pente": [
+        {
+          "corte": "z:250",
+          "curvas": 1,
+          "saltos": 2,
+          "maiorSalto": 0.692,
+          "mudancasDeSinal": 0,
+          "curvatura": {
+            "min": 0.108,
+            "max": 2.161
+          }
+        },
+        {
+          "corte": "z:500",
+          "curvas": 3,
+          "saltos": 6,
+          "maiorSalto": 0.858,
+          "mudancasDeSinal": 0,
+          "curvatura": {
+            "min": 0.126,
+            "max": 2.393
+          }
+        },
+        {
+          "corte": "z:750",
+          "curvas": 1,
+          "saltos": 2,
+          "maiorSalto": 0.692,
+          "mudancasDeSinal": 0,
+          "curvatura": {
+            "min": 0.108,
+            "max": 2.161
+          }
+        }
+      ],
+      "emendas": {
+        "resumo": {
+          "emendas": 0,
+          "acusam": 0,
+          "frestaMaximaMm": 0,
+          "anguloMaximoGraus": 0,
+          "razaoMaxima": 0
+        },
+        "emendas": []
+      },
+      "ondulacao": {
+        "falhas": 2,
+        "foraDasFeicoes": 2,
+        "juntoDasFeicoes": 4,
+        "maiorAmplitudeMm": 0.38
+      },
+      "extraordinarios": {
+        "daGaiola": [],
+        "daMalha": 0,
+        "casados": 0,
+        "semPar": [],
+        "espacamentoMm": 55.96217238741046
+      },
+      "g2PorRegiao": [
+        {
+          "regiao": "chapa",
+          "indice": 9.602,
+          "kRms": 1.732,
+          "areaMedidaM2": 1.417
+        }
+      ],
+      "costura": {
+        "noPlanoExato": 146,
+        "aMenosDe1e6SemSer0": 0,
+        "vaosPorLado": {
+          "+x": 1,
+          "-x": 1,
+          "cruza": 0
+        }
+      },
+      "zonaMm": 80
+    },
+    {
+      "alvo": "tools/fixtures/correcao-de-superficie/emenda-g0",
+      "lado": null,
+      "vertices": 4617,
+      "faces": 4480,
+      "suavidade": [
+        {
+          "regiao": "direita",
+          "indice": 3.449,
+          "kRms": 0.636
+        },
+        {
+          "regiao": "esquerda",
+          "indice": 3.449,
+          "kRms": 0.636
+        }
+      ],
+      "pente": [
+        {
+          "corte": "z:200",
+          "curvas": 1,
+          "saltos": 2,
+          "maiorSalto": 4.591,
+          "mudancasDeSinal": 0,
+          "curvatura": {
+            "min": 0.077,
+            "max": 5.346
+          }
+        }
+      ],
+      "emendas": {
+        "resumo": {
+          "emendas": 1,
+          "acusam": 1,
+          "frestaMaximaMm": 0,
+          "anguloMaximoGraus": 6.758,
+          "razaoMaxima": 1
+        },
+        "emendas": [
+          {
+            "lados": [
+              "direita",
+              "esquerda"
+            ],
+            "tipo": "aresta comum",
+            "comprimentoMm": 400,
+            "anguloMaximo": 6.758,
+            "anguloMediano": 6.607,
+            "razaoMaxima": 1,
+            "razaoMediana": 1,
+            "curvaturas": [
+              0.481,
+              0.481
+            ],
+            "acusa": {
+              "fresta": 0,
+              "angulo": 57,
+              "curvatura": 0
+            }
+          }
+        ]
+      },
+      "ondulacao": {
+        "falhas": 0,
+        "foraDasFeicoes": 0,
+        "juntoDasFeicoes": 0,
+        "maiorAmplitudeMm": 0
+      },
+      "extraordinarios": {
+        "daGaiola": [],
+        "daMalha": 0,
+        "casados": 0,
+        "semPar": [],
+        "espacamentoMm": 30.202259905633813
+      },
+      "g2PorRegiao": [
+        {
+          "regiao": "direita",
+          "indice": 3.449,
+          "kRms": 0.636,
+          "areaMedidaM2": 0.121
+        },
+        {
+          "regiao": "esquerda",
+          "indice": 3.449,
+          "kRms": 0.636,
+          "areaMedidaM2": 0.121
+        }
+      ],
+      "costura": {
+        "noPlanoExato": 0,
+        "aMenosDe1e6SemSer0": 57,
+        "vaosPorLado": {
+          "+x": 0,
+          "-x": 0,
+          "cruza": 0
+        }
+      },
+      "zonaMm": 80
+    },
+    {
+      "alvo": "tools/fixtures/correcao-de-superficie/emenda-g1",
+      "lado": null,
+      "vertices": 4845,
+      "faces": 4704,
+      "suavidade": [
+        {
+          "regiao": "direita",
+          "indice": 4.285,
+          "kRms": 0.76
+        },
+        {
+          "regiao": "esquerda",
+          "indice": 9.016,
+          "kRms": 1.871
+        }
+      ],
+      "pente": [
+        {
+          "corte": "z:200",
+          "curvas": 1,
+          "saltos": 1,
+          "maiorSalto": 0.735,
+          "mudancasDeSinal": 0,
+          "curvatura": {
+            "min": 0.066,
+            "max": 2.087
+          }
+        }
+      ],
+      "emendas": {
+        "resumo": {
+          "emendas": 1,
+          "acusam": 1,
+          "frestaMaximaMm": 0,
+          "anguloMaximoGraus": 0.832,
+          "razaoMaxima": 1.77
+        },
+        "emendas": [
+          {
+            "lados": [
+              "direita",
+              "esquerda"
+            ],
+            "tipo": "aresta comum",
+            "comprimentoMm": 400,
+            "anguloMaximo": 0.832,
+            "anguloMediano": 0.238,
+            "razaoMaxima": 1.77,
+            "razaoMediana": 1.336,
+            "curvaturas": [
+              1.157,
+              1.53
+            ],
+            "acusa": {
+              "fresta": 0,
+              "angulo": 0,
+              "curvatura": 17
+            }
+          }
+        ]
+      },
+      "ondulacao": {
+        "falhas": 0,
+        "foraDasFeicoes": 0,
+        "juntoDasFeicoes": 0,
+        "maiorAmplitudeMm": 0
+      },
+      "extraordinarios": {
+        "daGaiola": [],
+        "daMalha": 0,
+        "casados": 0,
+        "semPar": [],
+        "espacamentoMm": 29.17442508370269
+      },
+      "g2PorRegiao": [
+        {
+          "regiao": "direita",
+          "indice": 4.285,
+          "kRms": 0.76,
+          "areaMedidaM2": 0.121
+        },
+        {
+          "regiao": "esquerda",
+          "indice": 9.016,
+          "kRms": 1.871,
+          "areaMedidaM2": 0.129
+        }
+      ],
+      "costura": {
+        "noPlanoExato": 0,
+        "aMenosDe1e6SemSer0": 57,
+        "vaosPorLado": {
+          "+x": 0,
+          "-x": 0,
+          "cruza": 0
+        }
+      },
+      "zonaMm": 80
+    },
+    {
+      "alvo": "tools/fixtures/correcao-de-superficie/emenda-g2",
+      "lado": null,
+      "vertices": 4617,
+      "faces": 4480,
+      "suavidade": [
+        {
+          "regiao": "direita",
+          "indice": 2.656,
+          "kRms": 0.647
+        },
+        {
+          "regiao": "esquerda",
+          "indice": 2.656,
+          "kRms": 0.647
+        }
+      ],
+      "pente": [
+        {
+          "corte": "z:200",
+          "curvas": 1,
+          "saltos": 0,
+          "maiorSalto": 0,
+          "mudancasDeSinal": 0,
+          "curvatura": {
+            "min": 0.077,
+            "max": 0.758
+          }
+        }
+      ],
+      "emendas": {
+        "resumo": {
+          "emendas": 1,
+          "acusam": 0,
+          "frestaMaximaMm": 0,
+          "anguloMaximoGraus": 0.386,
+          "razaoMaxima": 1
+        },
+        "emendas": [
+          {
+            "lados": [
+              "direita",
+              "esquerda"
+            ],
+            "tipo": "aresta comum",
+            "comprimentoMm": 400,
+            "anguloMaximo": 0.386,
+            "anguloMediano": 0.119,
+            "razaoMaxima": 1,
+            "razaoMediana": 1,
+            "curvaturas": [
+              0.673,
+              0.673
+            ],
+            "acusa": {
+              "fresta": 0,
+              "angulo": 0,
+              "curvatura": 0
+            }
+          }
+        ]
+      },
+      "ondulacao": {
+        "falhas": 0,
+        "foraDasFeicoes": 0,
+        "juntoDasFeicoes": 0,
+        "maiorAmplitudeMm": 0
+      },
+      "extraordinarios": {
+        "daGaiola": [],
+        "daMalha": 0,
+        "casados": 0,
+        "semPar": [],
+        "espacamentoMm": 30.202415748402156
+      },
+      "g2PorRegiao": [
+        {
+          "regiao": "direita",
+          "indice": 2.656,
+          "kRms": 0.647,
+          "areaMedidaM2": 0.121
+        },
+        {
+          "regiao": "esquerda",
+          "indice": 2.656,
+          "kRms": 0.647,
+          "areaMedidaM2": 0.121
+        }
+      ],
+      "costura": {
+        "noPlanoExato": 0,
+        "aMenosDe1e6SemSer0": 57,
+        "vaosPorLado": {
+          "+x": 0,
+          "-x": 0,
+          "cruza": 0
+        }
+      },
+      "zonaMm": 80
+    },
+    {
+      "alvo": "carro-fastback/lataria",
+      "lado": "centro",
+      "vertices": 140642,
+      "faces": 142123,
+      "suavidade": [
+        {
+          "regiao": "chapa",
+          "indice": 349.18,
+          "kRms": 6.381
+        },
+        {
+          "regiao": "paralamaTraseiro",
+          "indice": 878.579,
+          "kRms": 3.983
+        },
+        {
+          "regiao": "rebaixoLateral",
+          "indice": 43.261,
+          "kRms": 2.447
+        }
+      ],
+      "pente": [
+        {
+          "corte": "y:600",
+          "curvas": 3,
+          "saltos": 8,
+          "maiorSalto": 0.527,
+          "mudancasDeSinal": 0,
+          "curvatura": {
+            "min": -0.768,
+            "max": 3.575
+          }
+        },
+        {
+          "corte": "y:850",
+          "curvas": 2,
+          "saltos": 4,
+          "maiorSalto": 1.223,
+          "mudancasDeSinal": 0,
+          "curvatura": {
+            "min": -0.637,
+            "max": 5.23
+          }
+        },
+        {
+          "corte": "z:-800",
+          "curvas": 2,
+          "saltos": 25,
+          "maiorSalto": 42.506,
+          "mudancasDeSinal": 0,
+          "curvatura": {
+            "min": -34.73,
+            "max": 39.175
+          }
+        },
+        {
+          "corte": "z:-1700",
+          "curvas": 2,
+          "saltos": 28,
+          "maiorSalto": 60.517,
+          "mudancasDeSinal": 0,
+          "curvatura": {
+            "min": -17.443,
+            "max": 47.196
+          }
+        }
+      ],
+      "emendas": {
+        "resumo": {
+          "emendas": 7,
+          "acusam": 5,
+          "frestaMaximaMm": 0,
+          "anguloMaximoGraus": 56.628,
+          "razaoMaxima": 186.186
+        },
+        "emendas": [
+          {
+            "lados": [
+              "chapa",
+              "paralamaTraseiro"
+            ],
+            "tipo": "aresta comum",
+            "comprimentoMm": 234.7,
+            "anguloMaximo": 0.084,
+            "anguloMediano": 0.048,
+            "razaoMaxima": 2.483,
+            "razaoMediana": 1.396,
+            "curvaturas": [
+              0.365,
+              0.592
+            ],
+            "acusa": {
+              "fresta": 0,
+              "angulo": 0,
+              "curvatura": 4
+            }
+          },
+          {
+            "lados": [
+              "chapa",
+              "paralamaTraseiro"
+            ],
+            "tipo": "aresta comum",
+            "comprimentoMm": 2075.1,
+            "anguloMaximo": 56.628,
+            "anguloMediano": 5.485,
+            "razaoMaxima": 186.186,
+            "razaoMediana": 1.738,
+            "curvaturas": [
+              1.156,
+              0.81
+            ],
+            "acusa": {
+              "fresta": 0,
+              "angulo": 140,
+              "curvatura": 141
+            }
+          },
+          {
+            "lados": [
+              "chapa",
+              "paralamaTraseiro"
+            ],
+            "tipo": "aresta comum",
+            "comprimentoMm": 75.3,
+            "anguloMaximo": null,
+            "anguloMediano": null,
+            "razaoMaxima": null,
+            "razaoMediana": null,
+            "curvaturas": [
+              null,
+              null
+            ],
+            "acusa": {
+              "fresta": 0,
+              "angulo": 0,
+              "curvatura": 0
+            }
+          },
+          {
+            "lados": [
+              "chapa",
+              "rebaixoLateral"
+            ],
+            "tipo": "aresta comum",
+            "comprimentoMm": 1069.3,
+            "anguloMaximo": 0.242,
+            "anguloMediano": 0.053,
+            "razaoMaxima": 4.44,
+            "razaoMediana": 1.487,
+            "curvaturas": [
+              0.624,
+              0.562
+            ],
+            "acusa": {
+              "fresta": 0,
+              "angulo": 0,
+              "curvatura": 23
+            }
+          },
+          {
+            "lados": [
+              "chapa",
+              "rebaixoLateral"
+            ],
+            "tipo": "aresta comum",
+            "comprimentoMm": 987.4,
+            "anguloMaximo": 1.755,
+            "anguloMediano": 0.836,
+            "razaoMaxima": 4.081,
+            "razaoMediana": 1.566,
+            "curvaturas": [
+              1.318,
+              2.035
+            ],
+            "acusa": {
+              "fresta": 0,
+              "angulo": 18,
+              "curvatura": 34
+            }
+          },
+          {
+            "lados": [
+              "paralamaTraseiro",
+              "rebaixoLateral"
+            ],
+            "tipo": "aresta comum",
+            "comprimentoMm": 112.2,
+            "anguloMaximo": 0.127,
+            "anguloMediano": 0.076,
+            "razaoMaxima": 1.842,
+            "razaoMediana": 1.507,
+            "curvaturas": [
+              0.654,
+              0.419
+            ],
+            "acusa": {
+              "fresta": 0,
+              "angulo": 0,
+              "curvatura": 0
+            }
+          },
+          {
+            "lados": [
+              "paralamaTraseiro",
+              "rebaixoLateral"
+            ],
+            "tipo": "aresta comum",
+            "comprimentoMm": 481,
+            "anguloMaximo": 0.992,
+            "anguloMediano": 0.373,
+            "razaoMaxima": 3.567,
+            "razaoMediana": 1.586,
+            "curvaturas": [
+              0.231,
+              0.164
+            ],
+            "acusa": {
+              "fresta": 0,
+              "angulo": 0,
+              "curvatura": 19
+            }
+          }
+        ]
+      },
+      "ondulacao": {
+        "falhas": 11,
+        "foraDasFeicoes": 11,
+        "juntoDasFeicoes": 36,
+        "maiorAmplitudeMm": 0.789
+      },
+      "extraordinarios": {
+        "daGaiola": [
+          {
+            "rede": 0,
+            "ponto": "c_tampa.centro",
+            "valencia": 3,
+            "borda": false,
+            "posicaoMm": [
+              276.183,
+              1057.759,
+              -1956.749
+            ]
+          },
+          {
+            "rede": 0,
+            "ponto": "c_tampa.centro (espelho)",
+            "valencia": 3,
+            "borda": false,
+            "posicaoMm": [
+              -276.183,
+              1057.759,
+              -1956.749
+            ]
+          }
+        ],
+        "daMalha": 18,
+        "casados": 2,
+        "semPar": [
+          {
+            "ponto": [
+              -942.746,
+              663.176,
+              -1146.62
+            ],
+            "valencia": 5,
+            "daGaiola": null
+          },
+          {
+            "ponto": [
+              -932.21,
+              695.357,
+              -1549.752
+            ],
+            "valencia": 5,
+            "daGaiola": null
+          },
+          {
+            "ponto": [
+              -930.192,
+              642.925,
+              -1631.536
+            ],
+            "valencia": 5,
+            "daGaiola": null
+          },
+          {
+            "ponto": [
+              -473.036,
+              1105.089,
+              -1615.392
+            ],
+            "valencia": 5,
+            "daGaiola": null
+          },
+          {
+            "ponto": [
+              -381.407,
+              1096.949,
+              -1708.403
+            ],
+            "valencia": 5,
+            "daGaiola": null
+          },
+          {
+            "ponto": [
+              -345.22,
+              1094.281,
+              -1724.009
+            ],
+            "valencia": 5,
+            "daGaiola": null
+          },
+          {
+            "ponto": [
+              345.22,
+              1094.281,
+              -1724.009
+            ],
+            "valencia": 5,
+            "daGaiola": null
+          },
+          {
+            "ponto": [
+              381.407,
+              1096.949,
+              -1708.403
+            ],
+            "valencia": 5,
+            "daGaiola": null
+          },
+          {
+            "ponto": [
+              463.696,
+              907.847,
+              -2193.196
+            ],
+            "valencia": 5,
+            "daGaiola": null
+          },
+          {
+            "ponto": [
+              473.036,
+              1105.089,
+              -1615.392
+            ],
+            "valencia": 5,
+            "daGaiola": null
+          },
+          {
+            "ponto": [
+              684.645,
+              1016.385,
+              -682.079
+            ],
+            "valencia": 5,
+            "daGaiola": null
+          },
+          {
+            "ponto": [
+              749.209,
+              906.681,
+              -1991.703
+            ],
+            "valencia": 5,
+            "daGaiola": null
+          }
+        ],
+        "espacamentoMm": 51.392325626053946
+      },
+      "g2PorRegiao": [
+        {
+          "regiao": "chapa",
+          "indice": 350.013,
+          "kRms": 6.397,
+          "areaMedidaM2": 5.997
+        },
+        {
+          "regiao": "chapa @zonaEV",
+          "indice": 183.626,
+          "kRms": 3.638,
+          "areaMedidaM2": 0.04
+        },
+        {
+          "regiao": "paralamaTraseiro",
+          "indice": 878.579,
+          "kRms": 3.983,
+          "areaMedidaM2": 0.415
+        },
+        {
+          "regiao": "rebaixoLateral",
+          "indice": 43.261,
+          "kRms": 2.447,
+          "areaMedidaM2": 0.495
+        }
+      ],
+      "costura": {
+        "noPlanoExato": 1,
+        "aMenosDe1e6SemSer0": 539,
+        "vaosPorLado": {
+          "+x": 2,
+          "-x": 0,
+          "cruza": 1
+        }
+      },
+      "zonaMm": 80
+    }
+  ]
+}

@@ -1,14 +1,16 @@
 # Cache por passo da receita: refazer só o que mudou, entre comandos, medido no laço de modelagem
 
-**Estado:** rascunho
+**Estado:** ativo
 
-**Território:** a declarar ao ativar; deve ficar em `procedural/nucleo/planejador/`, `procedural/nucleo/nucleo.js` (a execução e a impressão digital das entradas), os manifestos das operações que leem a malha, `tools/modelar/olhar-bancada.mjs` e `tools/modelar/descrever-peca.mjs` (o uso do cache) e `docs/modelar/banco-de-provas/cache-por-passo-<data>/`.
+**Território:** `procedural/nucleo/planejador/`, `procedural/nucleo/nucleo.js`, `tools/modelar/descrever-peca.mjs`, `docs/modelar/banco-de-provas/cache-por-passo-2026-11-16/`
+
+Ativado em 2026-11-16 no fechamento do cordão de solda, como a pessoa decidiu. `tools/modelar/olhar-bancada.mjs`, onde a bancada usaria o cache (fatia 4), é do plano do reflexo enquanto ele estiver ativo, e entra neste território quando o reflexo fechar; até lá o cache se prova no `descrever`.
 
 **Responsável:** a IA da sessão implementa e mede; a pessoa decide o que fazer se o ganho não pagar a complexidade.
 
 **Repositório e base:** `warbookbr/nos-modelar`, main na ativação.
 
-Sucessor do plano do [cordão de solda](2026-11-15-costura-em-no-de-tubos.md), decidido pela pessoa em 2026-11-16: os dois mudam o núcleo, e este é ativado no fechamento daquele. Continua o [planejador de execução](../decisoes/PLANOS-ENCERRADOS.md), concluído em 2026-11-14, que levou o furgão realista de 118 s para 47 s com o rastreio declarado e mandou o cache por passo e a execução paralela para o backlog.
+Sucessor do plano do [cordão de solda](../decisoes/PLANOS-ENCERRADOS.md), decidido pela pessoa em 2026-11-16: os dois mudam o núcleo, e este é ativado no fechamento daquele. Continua o [planejador de execução](../decisoes/PLANOS-ENCERRADOS.md), concluído em 2026-11-14, que levou o furgão realista de 118 s para 47 s com o rastreio declarado e mandou o cache por passo e a execução paralela para o backlog.
 
 ## Problema observado
 
