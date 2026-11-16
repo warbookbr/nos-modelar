@@ -41,7 +41,7 @@
       "medio": {
         "parametros": {
           "afastamentoDoTO220": 3,
-          "alturaDaAba": 6.5,
+          "alturaDaAba": 6.2,
           "alturaDaBaseDaBarra": 2.5,
           "alturaDoCapacitor": 12,
           "alturaDoCorpoDoDIP": 3.3,
@@ -68,7 +68,7 @@
           "pinosPorLadoDoDIP": 7,
           "viasDaBarra": 20
         },
-        "hash": "sha256:ca083a465997a95bdcca6c63b97a8f3093633d775d00e9942973d357945c39d2",
+        "hash": "sha256:7daf903440a20720e3448ce938c84cdfc04d04dd2e5f1296eb1e401a66cc1cfb",
         "medidas": []
       },
       "maximo": {
@@ -91,7 +91,7 @@
           "fileiraDoDIP": 15.24,
           "fileirasDaBarra": 2,
           "ladoDoPinoDaBarra": 1,
-          "larguraDoCorpoDoDIP": 14,
+          "larguraDoCorpoDoDIP": 14.7,
           "larguraDoTO220": 10.7,
           "margemDoCorpoDoDIP": 2.2,
           "passoDoCapacitor": 7.5,
@@ -121,7 +121,7 @@
           "restricao": "pino-do-dip-encosta-no-corpo"
         },
         {
-          "ponto": "larguraDoCorpoDoDIP=14",
+          "ponto": "larguraDoCorpoDoDIP=14.7",
           "restricao": "pino-do-dip-sai-do-corpo"
         },
         {
@@ -139,7 +139,7 @@
       "barra-1x8": {
         "parametros": {
           "afastamentoDoTO220": 2.5,
-          "alturaDaAba": 6.5,
+          "alturaDaAba": 6.2,
           "alturaDaBaseDaBarra": 2.5,
           "alturaDoCapacitor": 11,
           "alturaDoCorpoDoDIP": 3.3,
@@ -172,7 +172,7 @@
       "dip-40": {
         "parametros": {
           "afastamentoDoTO220": 2.5,
-          "alturaDaAba": 6.5,
+          "alturaDaAba": 6.2,
           "alturaDaBaseDaBarra": 2.5,
           "alturaDoCapacitor": 11,
           "alturaDoCorpoDoDIP": 3.8,
@@ -205,7 +205,7 @@
       "dip-8": {
         "parametros": {
           "afastamentoDoTO220": 2.5,
-          "alturaDaAba": 6.5,
+          "alturaDaAba": 6.2,
           "alturaDaBaseDaBarra": 2.5,
           "alturaDoCapacitor": 11,
           "alturaDoCorpoDoDIP": 3.3,
@@ -238,7 +238,7 @@
       "eletrolitico-6-3x11": {
         "parametros": {
           "afastamentoDoTO220": 2.5,
-          "alturaDaAba": 6.5,
+          "alturaDaAba": 6.2,
           "alturaDaBaseDaBarra": 2.5,
           "alturaDoCapacitor": 11,
           "alturaDoCorpoDoDIP": 3.3,
@@ -271,7 +271,7 @@
       "resistor-1-4w": {
         "parametros": {
           "afastamentoDoTO220": 2.5,
-          "alturaDaAba": 6.5,
+          "alturaDaAba": 6.2,
           "alturaDaBaseDaBarra": 2.5,
           "alturaDoCapacitor": 11,
           "alturaDoCorpoDoDIP": 3.3,
@@ -304,7 +304,7 @@
       "to-220": {
         "parametros": {
           "afastamentoDoTO220": 2.5,
-          "alturaDaAba": 6.5,
+          "alturaDaAba": 6.2,
           "alturaDaBaseDaBarra": 2.5,
           "alturaDoCapacitor": 11,
           "alturaDoCorpoDoDIP": 3.3,
@@ -331,7 +331,7 @@
           "pinosPorLadoDoDIP": 4,
           "viasDaBarra": 8
         },
-        "hash": "sha256:0b721d33b66e9a76ec11e77a0818a29505401384a8a053eab4a9b60f087cc0fb",
+        "hash": "sha256:0fe98ece689cace176de42761a70f83505317338a954cd47bfe69e70a8493f6a",
         "medidas": []
       }
     },
@@ -351,7 +351,7 @@
           "restricao": "pino-do-dip-encosta-no-corpo"
         },
         {
-          "ponto": "barra-1x8: larguraDoCorpoDoDIP=14",
+          "ponto": "barra-1x8: larguraDoCorpoDoDIP=14.7",
           "restricao": "pino-do-dip-sai-do-corpo"
         },
         {
@@ -399,7 +399,7 @@
           "restricao": "pino-do-dip-encosta-no-corpo"
         },
         {
-          "ponto": "dip-8: larguraDoCorpoDoDIP=14",
+          "ponto": "dip-8: larguraDoCorpoDoDIP=14.7",
           "restricao": "pino-do-dip-sai-do-corpo"
         },
         {
@@ -423,7 +423,7 @@
           "restricao": "pino-do-dip-encosta-no-corpo"
         },
         {
-          "ponto": "eletrolitico-6-3x11: larguraDoCorpoDoDIP=14",
+          "ponto": "eletrolitico-6-3x11: larguraDoCorpoDoDIP=14.7",
           "restricao": "pino-do-dip-sai-do-corpo"
         },
         {
@@ -447,7 +447,7 @@
           "restricao": "pino-do-dip-encosta-no-corpo"
         },
         {
-          "ponto": "resistor-1-4w: larguraDoCorpoDoDIP=14",
+          "ponto": "resistor-1-4w: larguraDoCorpoDoDIP=14.7",
           "restricao": "pino-do-dip-sai-do-corpo"
         },
         {
@@ -471,7 +471,7 @@
           "restricao": "pino-do-dip-encosta-no-corpo"
         },
         {
-          "ponto": "to-220: larguraDoCorpoDoDIP=14",
+          "ponto": "to-220: larguraDoCorpoDoDIP=14.7",
           "restricao": "pino-do-dip-sai-do-corpo"
         },
         {
@@ -507,9 +507,9 @@
         "hash": "sha256:85d4804bf476bd3fa4b876824b405939b3b84efbf9a9601d24a9843cea3fd307"
       },
       "to-220": {
-        "hash": "sha256:0b721d33b66e9a76ec11e77a0818a29505401384a8a053eab4a9b60f087cc0fb"
+        "hash": "sha256:0fe98ece689cace176de42761a70f83505317338a954cd47bfe69e70a8493f6a"
       }
     },
-    "observacao": "a pessoa aprovou a prancha dos cinco encapsulamentos (resistor axial, eletrolítico, TO-220, DIP-8 e barra de pinos 1x8) em perspectiva e de cima, como estava, com o enquadramento imperfeito de dois quadros; o DIP-40 entra pela mesma geometria do DIP-8; a camada do crítico fica vazia"
+    "observacao": "reassinada em 2026-11-16 com as medidas conferidas contra as fontes primárias: a aba do TO-220 de 6,5 para 6,2 mm (JEDEC TO-220AB, 5,97 a 6,47) e o corpo do DIP até 14,7 mm (MS-011-AC), com a folga do pino ao corpo de 0,6 para 0,5 mm; a pessoa aprovou a correção sabendo que o TO-220 muda 0,3 mm e a prancha aprovada continua valendo pela forma; a camada do crítico fica vazia"
   }
 }
