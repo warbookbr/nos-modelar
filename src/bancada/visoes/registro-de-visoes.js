@@ -82,7 +82,7 @@ export const VISOES = Object.freeze([
     id: 'pintura',
     rotulo: 'Pintura',
     atalho: 'p',
-    /* Verniz sobre base escura refletindo faixas de luz paralelas ao comprimento da peça, com a largura das faixas no controle da visão. */
+    /* Tinta vermelha com verniz refletindo um estúdio de caixas de luz alongadas no comprimento da peça, com o número de caixas no controle da visão. */
     aplicar: aplicarPintura,
     desfazer: desfazerPintura,
     controlesDaCaptura: CONTROLES_DA_CAPTURA.pintura,

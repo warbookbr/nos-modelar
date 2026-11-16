@@ -9,6 +9,6 @@ export const CONTROLES_DA_CAPTURA = Object.freeze({
   curvatura: Object.freeze([]),
   zebra: Object.freeze(['larguraDaZebra']),
   'luz-rasante': Object.freeze(['azimute']),
-  pintura: Object.freeze(['larguraDaPintura']),
+  pintura: Object.freeze(['caixasDaPintura']),
 });
 export const IDS_DAS_VISOES_DA_CAPTURA = Object.freeze(Object.keys(CONTROLES_DA_CAPTURA));

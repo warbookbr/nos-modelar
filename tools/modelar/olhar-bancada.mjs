@@ -550,7 +550,7 @@ export async function olharBancada({
   visao: visaoDeclarada = null,
   larguraDaZebra: larguraDaZebraDeclarada = null,
   azimute: azimuteDeclarado = null,
-  larguraDaPintura: larguraDaPinturaDeclarada = null,
+  caixasDaPintura: caixasDaPinturaDeclaradas = null,
   enquadrar: enquadrarNaPeca = false,
   res: resDeclarada = 1280,
   espera: esperaDeclarada = 1200,
@@ -689,19 +689,20 @@ export async function olharBancada({
     if (visao !== null && !IDS_DAS_VISOES.includes(visao)) {
       erroDeUso(`--visao pede uma visão do registro (${IDS_DAS_VISOES.join(', ')}); veio "${visao}". Exemplo: --visao=zebra.`);
     }
-    const controleDaVisao = (nome, valor, opcao, minimo, maximo) => {
+    const controleDaVisao = (nome, valor, opcao, minimo, maximo, unidade = 'graus') => {
       if (valor === null || valor === undefined) return null;
       const numero = Number(valor);
       if (visao === null || !CONTROLES_DA_CAPTURA[visao]?.includes(nome)) {
         const donas = IDS_DAS_VISOES.filter((id) => CONTROLES_DA_CAPTURA[id].includes(nome));
         erroDeUso(`${opcao} só vale com --visao=${donas.join(' ou --visao=')}; a visão pedida é ${visao === null ? 'nenhuma' : `"${visao}"`}.`);
       }
-      if (!Number.isFinite(numero) || numero < minimo || numero > maximo) erroDeUso(`${opcao} pede graus de ${minimo} a ${maximo}; veio "${valor}".`);
+      if (!Number.isFinite(numero) || numero < minimo || numero > maximo) erroDeUso(`${opcao} pede ${unidade} de ${minimo} a ${maximo}; veio "${valor}".`);
       return numero;
     };
     const larguraDaZebra = controleDaVisao('larguraDaZebra', larguraDaZebraDeclarada, '--largura-da-zebra', 1.5, 15);
     const azimute = controleDaVisao('azimute', azimuteDeclarado, '--azimute', 0, 360);
-    const larguraDaPintura = controleDaVisao('larguraDaPintura', larguraDaPinturaDeclarada, '--largura-das-faixas', 1.5, 15);
+    const caixasDaPintura = controleDaVisao('caixasDaPintura', caixasDaPinturaDeclaradas, '--caixas-de-luz', 1, 4, 'caixas');
+    if (caixasDaPintura !== null && !Number.isInteger(caixasDaPintura)) erroDeUso(`--caixas-de-luz pede um número inteiro de caixas de 1 a 4; veio "${caixasDaPinturaDeclaradas}".`);
     if (visao !== null && (arame || coresPorParte)) erroDeUso('--visao não se mistura com --arame, --wireframe, --raio-x nem --cores: a visão troca o material da peça.');
     if (visao !== null && !(auditoria || revisar)) erroDeUso('--visao vale só na imagem de auditoria; não se mistura com --tela.');
     if (visao !== null && par) erroDeUso('--visao não se mistura com --par: a inspeção de par escolhe a vista e o material por conta própria.');
@@ -820,7 +821,7 @@ export async function olharBancada({
       focar ? 'focado' : null,
       arame === 'raio-x' ? 'raio-x' : (arame ? 'arame' : null),
       corte ? `corte-${corte.eixo}${corte.posicao}-${corte.lado}` : null,
-      visao && visao !== 'solida' ? `visao-${visao}${larguraDaZebra !== null ? `-${String(larguraDaZebra).replace('.', 'p')}graus` : ''}${azimute !== null ? `-az${String(azimute).replace('.', 'p')}` : ''}${larguraDaPintura !== null ? `-faixas${String(larguraDaPintura).replace('.', 'p')}graus` : ''}` : null,
+      visao && visao !== 'solida' ? `visao-${visao}${larguraDaZebra !== null ? `-${String(larguraDaZebra).replace('.', 'p')}graus` : ''}${azimute !== null ? `-az${String(azimute).replace('.', 'p')}` : ''}${caixasDaPintura !== null ? `-caixas${caixasDaPintura}` : ''}` : null,
       enquadrarNaPeca ? 'enquadrado' : null,
     ].filter(Boolean);
     const sufixo = sufixoPartes.length ? `-${sufixoPartes.join('-')}` : '';
@@ -1191,7 +1192,7 @@ export async function olharBancada({
          da auditoria, e a curvatura, que calcula num worker, é esperada até pintar. */
       if (visao !== null && indice === 0) {
         progresso.etapa = 'ligar a visão';
-        const ligada = await page.evaluate(([id, controles]) => window.__mecanificaBancada.visao(id, controles), [visao, { larguraDaZebra, azimute, larguraDaPintura }]);
+        const ligada = await page.evaluate(([id, controles]) => window.__mecanificaBancada.visao(id, controles), [visao, { larguraDaZebra, azimute, caixasDaPintura }]);
         if (!ligada?.ok) erroDeUso(`a bancada não ligou a visão "${visao}": ${ligada?.motivo ?? 'sem resposta'}${ligada?.dica ? ` (${ligada.dica})` : ''}.`);
         const pronta = await page.evaluate(() => window.__mecanificaBancada.visaoPronta());
         if (!pronta.pronta || pronta.erro) {
@@ -1200,7 +1201,7 @@ export async function olharBancada({
           falhasRelatadas.push({ categoria: 'modelo', codigo: 'visao_nao_pronta', vista: null, mensagem: `A visão ${visao} não terminou de pintar: ${pronta.erro ?? 'sem motivo'}.`, acao: 'Repita com --prazo maior ou confira a peça na bancada com a mesma visão.' });
           break;
         }
-        registrar(relato, logger, 'stdout', `visão: ${visao}${ligada.larguraDaZebra != null ? `, listras de ${ligada.larguraDaZebra} graus` : ''}${ligada.azimute != null ? `, luz a ${ligada.azimute} graus` : ''}${ligada.larguraDaPintura != null ? `, faixas de ${ligada.larguraDaPintura} graus` : ''}`);
+        registrar(relato, logger, 'stdout', `visão: ${visao}${ligada.larguraDaZebra != null ? `, listras de ${ligada.larguraDaZebra} graus` : ''}${ligada.azimute != null ? `, luz a ${ligada.azimute} graus` : ''}${ligada.caixasDaPintura != null ? `, ${ligada.caixasDaPintura} caixas de luz` : ''}`);
       }
       const ajuste = ajusteDaVista(vista);
       if (ajuste) await instalarAjuste();
@@ -1452,7 +1453,7 @@ export async function olharBancada({
 
 /* A AJUDA. Em 2026-11-03 um modelador gastou chamadas para descobrir o que o comando oferecia: ele recusava `--ajuda` e
    listava só os nomes das opções. Cada linha diz o que a opção faz; o detalhe da análise mora em PARE-E-ANALISE.md. */
-export const OPCOES_DA_CLI = ['peca', 'vistas', 'selecionadas', 'par', 'modo', 'projecao', 'explosao', 'res', 'espera', 'prazo', 'saida', 'relatorio', 'parte', 'zoom', 'zoom-antes', 'corte', 'corte-lado', 'ambiente', 'mirar', 'distancia', 'visao', 'largura-da-zebra', 'azimute', 'largura-das-faixas'];
+export const OPCOES_DA_CLI = ['peca', 'vistas', 'selecionadas', 'par', 'modo', 'projecao', 'explosao', 'res', 'espera', 'prazo', 'saida', 'relatorio', 'parte', 'zoom', 'zoom-antes', 'corte', 'corte-lado', 'ambiente', 'mirar', 'distancia', 'visao', 'largura-da-zebra', 'azimute', 'caixas-de-luz'];
 export const BANDEIRAS_DA_CLI = ['analise', 'listar', 'estrito', 'focar', 'revisar', 'auditoria', 'tela', 'cores', 'arame', 'wireframe', 'raio-x', 'sem-contatos', 'sem-cache', 'enquadrar'];
 export const AJUDA = `npm run bancada -- <peça> [opções]  (node tools/modelar/olhar-bancada.mjs)
 Captura a peça ou montagem na bancada, sem interface.
@@ -1474,7 +1475,7 @@ Captura a peça ou montagem na bancada, sem interface.
   --focar                enquadra a câmera nas selecionadas; se a câmera cair dentro da peça (parte pequena, vista de lado), recua-a para fora com o mesmo quadro
   --visao=<${IDS_DAS_VISOES.join('|')}>  liga a visão do registro da bancada antes da captura (a mesma dos atalhos da página: zebra b, luz rasante j, curvatura k, pintura p); a imagem sai com o nome -visao-<id>; não se mistura com --arame, --raio-x, --cores, --par, --tela nem --analise
   --largura-da-zebra=<graus>  com --visao=zebra, a largura de cada listra no horizonte do reflexo (1,5 a 15; padrão 4,5)
-  --largura-das-faixas=<graus>  com --visao=pintura, a largura de cada faixa de luz refletida (1,5 a 15; padrão 5)
+  --caixas-de-luz=<n>  com --visao=pintura, o número de caixas de luz do teto refletidas (1 a 4; padrão 2)
   --azimute=<graus>      com --visao=luz-rasante, a direção da luz no plano da imagem (0 a 360; padrão: a que a bancada escolhe pela vista)
   --enquadrar            fecha a câmera no que está à vista, para a peça ocupar 92 % da maior dimensão do quadro (a vista padrão deixa a lataria de um carro em um décimo); não se mistura com --par, --mirar, --focar, --revisar nem --analise
   --mirar=<x,y,z>        a câmera mira o ponto, em mm do referencial da peça, na vista de --vistas (ex.: --mirar=1200,900,-300 --vistas=direita); não se mistura com --focar, --par, --revisar nem --analise
@@ -1552,8 +1553,8 @@ export function comoCLI(argv, { aoProgredir = null } = {}) {
   if (lido.bandeira('analise') && lido.opcao('mirar')) {
     return Promise.resolve(erroEstruturado({ relato: novoRelato(), erro: new ErroDeUso('--mirar não se mistura com --analise: a análise tira as próprias vistas.') }));
   }
-  if (lido.bandeira('analise') && (lido.opcao('visao') || lido.bandeira('enquadrar') || lido.opcao('largura-da-zebra') || lido.opcao('azimute') || lido.opcao('largura-das-faixas'))) {
-    return Promise.resolve(erroEstruturado({ relato: novoRelato(), erro: new ErroDeUso('--visao, --largura-da-zebra, --azimute, --largura-das-faixas e --enquadrar não se misturam com --analise: a análise tira as próprias vistas; use `npm run bancada -- <peça> --visao=<id>`.') }));
+  if (lido.bandeira('analise') && (lido.opcao('visao') || lido.bandeira('enquadrar') || lido.opcao('largura-da-zebra') || lido.opcao('azimute') || lido.opcao('caixas-de-luz'))) {
+    return Promise.resolve(erroEstruturado({ relato: novoRelato(), erro: new ErroDeUso('--visao, --largura-da-zebra, --azimute, --caixas-de-luz e --enquadrar não se misturam com --analise: a análise tira as próprias vistas; use `npm run bancada -- <peça> --visao=<id>`.') }));
   }
   if (lido.bandeira('analise')) {
     const peca = lido.opcao('peca') ?? lido.posicional;
@@ -1575,7 +1576,7 @@ export function comoCLI(argv, { aoProgredir = null } = {}) {
     relatorio: lido.opcao('relatorio'), listar: lido.bandeira('listar'), estrito: lido.bandeira('estrito'),
     focar: lido.bandeira('focar'), revisar: lido.bandeira('revisar'),
     mirar: lido.opcao('mirar') ?? null, distancia: lido.opcao('distancia') ?? null, aoProgredir,
-    visao: lido.opcao('visao') ?? null, larguraDaZebra: lido.opcao('largura-da-zebra') ?? null, azimute: lido.opcao('azimute') ?? null, larguraDaPintura: lido.opcao('largura-das-faixas') ?? null,
+    visao: lido.opcao('visao') ?? null, larguraDaZebra: lido.opcao('largura-da-zebra') ?? null, azimute: lido.opcao('azimute') ?? null, caixasDaPintura: lido.opcao('caixas-de-luz') ?? null,
     enquadrar: lido.bandeira('enquadrar'),
     /* SEM INTERFACE POR PADRÃO desde 2026-09-23. Quem usa este comando é quase
        sempre a IA olhando a peça, e a imagem com painéis, cabeçalho, piso e

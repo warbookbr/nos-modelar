@@ -1,40 +1,37 @@
-/* visao-pintura.js — a visão Pintura da bancada: a peça vista como verniz brilhante sobre base escura, que reflete um ambiente de
- * faixas de luz paralelas ao comprimento dela. É a imagem que se compara com a foto de um carro de estúdio, e a segunda leitura da
- * superfície depois da zebra: a faixa lisa e contínua é a chapa boa, a faixa que serpenteia, se amontoa ou quebra é a chapa que
- * ondula.
+/* visao-pintura.js — a visão Pintura da bancada: a peça vista como lataria pintada de vermelho sob verniz, refletindo um estúdio de
+ * fotografia de carro: um gradiente do céu claro em cima para o chão escuro embaixo e janelas de luz grandes, de borda suave. É a
+ * imagem que se compara com a foto de um carro de estúdio, e a segunda leitura da superfície depois da zebra: a borda do reflexo da
+ * janela reta e o gradiente contínuo são a chapa boa, a borda torta ou o gradiente quebrado são a chapa que ondula.
  *
  * É VISÃO DE INSPEÇÃO: troca o material da peça enquanto está ligada, como a zebra, e não é material da peça, não entra na receita
- * nem na paleta e não muda o que a bancada salva. O ambiente é calculado aqui, de números, sem arquivo de imagem nem relógio.
+ * nem na paleta e não muda o que a bancada salva. O vermelho é uma cor fixa de inspeção, escolhida para contrastar com o branco
+ * das janelas, e o estúdio é calculado aqui, de números, sem arquivo de imagem nem relógio.
  *
- * A CONTA, por pixel: o olhar refletido pela normal (`reflect`, como na zebra) cai no ambiente, que são faixas ao redor do EIXO DO
- * COMPRIMENTO da peça (o eixo mais longo da caixa dela no mundo, medido ao ligar): a faixa é uma luz comprida paralela a esse eixo,
- * como as caixas de luz de um estúdio, vista em reflexo. O ângulo do reflexo ao redor do eixo escolhe a faixa (`cos(N·φ)` acima de
- * um limiar, com N inteiro para não haver emenda), e a borda é suavizada na largura de um pixel. O verniz soma ao escuro da base a
- * reflexão de Fresnel (0,05 de frente, subindo para o rasante) vezes a luz da faixa, e o resultado passa por uma curva de tons
- * própria; o material não tem luz nem o mapeamento de tons da cena (`toneMapped: false`).
+ * A CONTA, por pixel: o olhar refletido pela normal (`reflect`) cai no estúdio, descrito no sistema da peça: A é o eixo do
+ * COMPRIMENTO dela (o eixo mais longo da caixa no mundo, medido ao ligar), U é o cima do mundo e S é o lado. O estúdio tem (1) o
+ * gradiente de céu e chão pela altura da direção refletida, (2) as caixas de luz do teto, retângulos alongados no sentido de A num
+ * plano acima da peça, lado a lado no sentido de S, e (3) uma janela de luz de cada lado, no horizonte, que é o que a lateral
+ * reflete. A borda de cada caixa é suavizada por uma largura fixa mais a de um pixel. A pintura é a cor vermelha vezes o estúdio
+ * (o pigmento reflete o ambiente), somada ao reflexo do verniz, que é de Fresnel (0,04 de frente, subindo para o rasante) vezes o
+ * estúdio. O material não tem luz nem o mapeamento de tons da cena (`toneMapped: false`).
  *
- * A LARGURA, no controle, é o ângulo que cada faixa de luz ocupa ao redor do eixo, de 1,5 a 15 graus, e o vão escuro entre elas
- * mede quase o dobro. Todas as malhas leem a mesma largura, e mudar o controle não recompila nada. O controle mora na caixa
- * da visão (`contexto.pagina`), e a visão não toca a página. */
+ * O CONTROLE é o número de caixas de luz do teto, de 1 a 4. Todas as malhas leem o mesmo número, e mudar o controle não recompila
+ * nada. O controle mora na caixa da visão (`contexto.pagina`), e a visão não toca a página. */
 import * as THREE from 'three';
-import { restaurarMateriais, trocarMateriais } from './materiais-da-visao.js';
+import { restaurarMateriais, superficiesDe, trocarMateriais } from './materiais-da-visao.js';
 
 const ID = 'pintura';
-export const LARGURA_PADRAO_DA_FAIXA = 10;
-export const LARGURA_MINIMA_DA_FAIXA = 1.5;
-export const LARGURA_MAXIMA_DA_FAIXA = 15;
-/** A fração do período ocupada pela luz: a faixa mede 0,35 do período, e o vão escuro, 0,65. */
-export const FRACAO_DA_LUZ = 0.35;
-export const COR_DA_BASE = Object.freeze([0.012, 0.016, 0.03]);
-export const LUZ_DA_FAIXA = 14;
+export const CAIXAS_PADRAO = 2;
+export const CAIXAS_MINIMAS = 1;
+export const CAIXAS_MAXIMAS = 4;
+/** A cor da tinta de inspeção, linear: um vermelho médio. */
+export const COR_DA_TINTA = Object.freeze([0.55, 0.035, 0.04]);
 
-/** O número inteiro de faixas ao redor do eixo para uma faixa de `largura` graus. */
-export const faixasDaLargura = (largura) => Math.max(3, Math.round(360 * FRACAO_DA_LUZ / Math.min(LARGURA_MAXIMA_DA_FAIXA, Math.max(LARGURA_MINIMA_DA_FAIXA, largura))));
-/** A largura, em graus, que o número inteiro de faixas dá. */
-export const larguraDasFaixas = (faixas) => (360 * FRACAO_DA_LUZ) / faixas;
+/** O número inteiro de caixas de luz do teto mais perto de `n`, dentro dos limites. */
+export const caixasValidas = (n) => Math.min(CAIXAS_MAXIMAS, Math.max(CAIXAS_MINIMAS, Math.round(Number(n))));
 
 /* Valem para qualquer peça e sobrevivem à troca de visão enquanto a página está aberta. */
-const faixas = { value: faixasDaLargura(LARGURA_PADRAO_DA_FAIXA) };
+const caixas = { value: CAIXAS_PADRAO };
 const eixo = { value: new THREE.Vector3(0, 0, 1) };
 
 const VARIAVEIS = `
@@ -42,11 +39,47 @@ varying vec3 vPinturaPosicao;
 varying vec3 vPinturaNormal;
 `;
 
-/** O material da pintura: o básico do Three, com a cor da superfície trocada pela do verniz que reflete as faixas. */
+/** O trecho do fragmento que dá o estúdio (o brilho, de 0 a cerca de 6, na direção `d` do sistema A, U, S) e a pintura. */
+const ESTUDIO = `
+float pinturaCaixa(vec2 p, vec2 meio, float suave) {
+  vec2 q = abs(p) - meio;
+  float f = max(fwidth(p.x), fwidth(p.y));
+  float s = suave + 1.5 * f;
+  return (1.0 - smoothstep(-s, s, q.x)) * (1.0 - smoothstep(-s, s, q.y));
+}
+float pinturaEstudio(vec3 d, float n) {
+  float a = d.x; float u = d.y; float s = d.z;
+  /* céu e chão: do branco-azulado em cima a um cinza no horizonte e quase preto no chão */
+  float ceu = mix(0.5, 0.9, smoothstep(0.0, 0.9, u));
+  float chao = mix(0.5, 0.06, smoothstep(0.0, -0.6, u));
+  float fundo = u >= 0.0 ? ceu : chao;
+  float luz = 0.0;
+  /* caixas do teto, a altura 1: alongadas em A, lado a lado em S */
+  if (u > 0.08) {
+    vec2 p = vec2(a, s) / u;
+    for (int i = 0; i < 4; i++) {
+      float fi = float(i);
+      if (fi < n) {
+        float centro = (fi - 0.5 * (n - 1.0)) * 1.1;
+        luz = max(luz, pinturaCaixa(p - vec2(0.0, centro), vec2(2.6, 0.17), 0.12) * smoothstep(0.08, 0.2, u));
+      }
+    }
+  }
+  /* uma janela de luz de cada lado, no horizonte, a distância 1 */
+  float lado = abs(s);
+  if (lado > 0.25) {
+    vec2 q = vec2(a, u) / lado;
+    luz = max(luz, pinturaCaixa(q - vec2(0.0, 0.4), vec2(1.7, 0.4), 0.04) * smoothstep(0.25, 0.4, lado));
+  }
+  return fundo + 3.0 * luz;
+}
+`;
+
+/** O material da pintura: o básico do Three, com a cor da superfície trocada pela da tinta com verniz que reflete o estúdio. */
 export function materialDaPintura() {
   const material = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide, toneMapped: false });
   material.onBeforeCompile = (shader) => {
-    shader.uniforms.uPinturaFaixas = faixas;
+    shader.uniforms.uPinturaCaixas = caixas;
     shader.uniforms.uPinturaEixo = eixo;
     shader.vertexShader = shader.vertexShader
       .replace('#include <common>', `#include <common>\n${VARIAVEIS}`)
@@ -54,7 +87,7 @@ export function materialDaPintura() {
   vPinturaPosicao = (modelMatrix * vec4(transformed, 1.0)).xyz;
   vPinturaNormal = normalize(mat3(modelMatrix) * normal);`);
     shader.fragmentShader = shader.fragmentShader
-      .replace('#include <common>', `#include <common>\n${VARIAVEIS}uniform float uPinturaFaixas;\nuniform vec3 uPinturaEixo;`)
+      .replace('#include <common>', `#include <common>\n${VARIAVEIS}uniform float uPinturaCaixas;\nuniform vec3 uPinturaEixo;\n${ESTUDIO}`)
       .replace('vec4 diffuseColor = vec4( diffuse, opacity );', `
   vec3 pinturaNormal = normalize(vPinturaNormal) * (gl_FrontFacing ? 1.0 : -1.0);
   vec3 pinturaOlhar = isOrthographic
@@ -63,30 +96,26 @@ export function materialDaPintura() {
   vec3 pinturaReflexo = reflect(pinturaOlhar, pinturaNormal);
   vec3 pinturaA = normalize(uPinturaEixo);
   vec3 pinturaCima = abs(pinturaA.y) > 0.9 ? vec3(1.0, 0.0, 0.0) : vec3(0.0, 1.0, 0.0);
-  vec3 pinturaB = normalize(cross(pinturaA, pinturaCima));
-  vec3 pinturaC = cross(pinturaB, pinturaA);
-  float pinturaAngulo = atan(dot(pinturaReflexo, pinturaB), dot(pinturaReflexo, pinturaC));
-  float pinturaOnda = cos(pinturaAngulo * uPinturaFaixas);
-  float pinturaLimiar = cos(3.14159265 * ${FRACAO_DA_LUZ.toFixed(2)});
-  float pinturaBorda = max(2.0 * fwidth(pinturaOnda), 0.03);
-  float pinturaFaixa = smoothstep(pinturaLimiar - pinturaBorda, pinturaLimiar + pinturaBorda, pinturaOnda);
-  /* perto do eixo as faixas convergem num ponto; a luz some ali, como a caixa de luz que acaba, e não deixa o leque no quadro */
-  pinturaFaixa *= 1.0 - smoothstep(0.7, 0.9, abs(dot(pinturaReflexo, pinturaA)));
+  vec3 pinturaS = normalize(cross(pinturaA, pinturaCima));
+  vec3 pinturaU = cross(pinturaS, pinturaA);
+  vec3 pinturaD = vec3(dot(pinturaReflexo, pinturaA), dot(pinturaReflexo, pinturaU), dot(pinturaReflexo, pinturaS));
+  float pinturaAmbiente = pinturaEstudio(pinturaD, uPinturaCaixas);
   float pinturaCos = clamp(dot(-pinturaOlhar, pinturaNormal), 0.0, 1.0);
-  float pinturaFresnel = 0.05 + 0.95 * pow(1.0 - pinturaCos, 5.0);
-  vec3 pinturaBase = vec3(${COR_DA_BASE.map((c) => c.toFixed(3)).join(', ')}) * (0.6 + 0.4 * pinturaNormal.y);
-  vec3 pinturaLuz = vec3(${LUZ_DA_FAIXA.toFixed(1)}) * pinturaFaixa + vec3(0.02);
-  vec3 pinturaLinear = pinturaBase + pinturaFresnel * pinturaLuz;
-  vec3 pinturaTom = vec3(1.0) - exp(-1.5 * pinturaLinear);
+  float pinturaFresnel = 0.04 + 0.96 * pow(1.0 - pinturaCos, 5.0);
+  vec3 pinturaTinta = vec3(${COR_DA_TINTA.map((c) => c.toFixed(3)).join(', ')});
+  /* a tinta só recebe o fundo do estúdio (até 1,2): as janelas de luz entram pelo verniz, brancas, e não tingem o reflexo de rosa */
+  vec3 pinturaLinear = pinturaTinta * min(pinturaAmbiente, 1.2) * 0.6 + vec3(0.6 * pinturaFresnel + 0.4) * max(pinturaAmbiente - 0.9, 0.0) * 0.7 + vec3(pinturaFresnel) * pinturaAmbiente * 0.3;
+  vec3 pinturaTom = vec3(1.0) - exp(-1.3 * pinturaLinear);
   vec4 diffuseColor = vec4(diffuse * pinturaTom, opacity);`);
   };
-  material.customProgramCacheKey = () => 'visao-pintura';
+  material.customProgramCacheKey = () => 'visao-pintura-estudio';
   return material;
 }
 
 /** O eixo do comprimento da peça no mundo: o eixo de coordenadas da maior dimensão da caixa do grupo (o do carro, z). */
 export function eixoDoComprimento(grupo) {
-  const caixa = new THREE.Box3().setFromObject(grupo);
+  const caixa = new THREE.Box3();
+  for (const malha of superficiesDe(grupo)) caixa.expandByObject(malha);
   if (caixa.isEmpty()) return new THREE.Vector3(0, 0, 1);
   const t = caixa.getSize(new THREE.Vector3());
   if (t.x >= t.y && t.x >= t.z) return new THREE.Vector3(1, 0, 0);
@@ -94,28 +123,24 @@ export function eixoDoComprimento(grupo) {
   return new THREE.Vector3(0, 0, 1);
 }
 
-function formatarGraus(largura) {
-  return `${largura.toLocaleString('pt-BR', { maximumFractionDigits: 1 })}°`;
-}
-
-/* A página da visão ligada, para o controle acompanhar a largura trocada fora dele. */
+/* A página da visão ligada, para o controle acompanhar o número trocado fora dele. */
 let paginaLigada = null;
 
 function mostrarControle(pagina) {
   pagina?.mostrar(ID, {
     titulo: 'Pintura',
     controle: {
-      rotulo: 'Largura das faixas',
-      nome: 'larguraDaPintura',
-      min: LARGURA_MINIMA_DA_FAIXA,
-      max: LARGURA_MAXIMA_DA_FAIXA,
-      passo: 0.5,
-      valor: larguraDaPintura(),
-      formatar: formatarGraus,
-      aoMudar: (largura) => { faixas.value = faixasDaLargura(largura); },
+      rotulo: 'Caixas de luz',
+      nome: 'caixasDaPintura',
+      min: CAIXAS_MINIMAS,
+      max: CAIXAS_MAXIMAS,
+      passo: 1,
+      valor: caixasDaPintura(),
+      formatar: (n) => String(n),
+      aoMudar: (n) => { caixas.value = caixasValidas(n); },
     },
-    linhas: [{ texto: 'Verniz sobre base escura refletindo faixas de luz ao longo da peça: faixas retas e contínuas na chapa boa, tortas onde ela ondula.' }],
-    dados: { largura: larguraDaPintura() },
+    linhas: [{ texto: 'Tinta vermelha com verniz refletindo um estúdio: a borda das caixas de luz sai reta na chapa boa e torta onde ela ondula; o gradiente do céu ao chão quebra onde a curvatura salta.' }],
+    dados: { caixas: caixasDaPintura() },
   });
 }
 
@@ -132,10 +157,10 @@ export function desfazerPintura(contexto) {
   paginaLigada = null;
 }
 
-/** A largura das faixas em vigor, em graus (a do número inteiro de faixas mais perto), e a troca dela sem o controle. */
-export const larguraDaPintura = () => larguraDasFaixas(faixas.value);
-export function definirLarguraDaPintura(largura) {
-  faixas.value = faixasDaLargura(largura);
+/** O número de caixas de luz em vigor, e a troca dele sem o controle. */
+export const caixasDaPintura = () => caixas.value;
+export function definirCaixasDaPintura(n) {
+  caixas.value = caixasValidas(n);
   mostrarControle(paginaLigada);
-  return Math.round(larguraDaPintura() * 100) / 100;
+  return caixas.value;
 }
