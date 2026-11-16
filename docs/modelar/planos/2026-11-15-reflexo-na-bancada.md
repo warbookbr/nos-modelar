@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `tools/modelar/olhar-bancada.mjs`, `src/bancada/visoes/`, `tools/modelar/vistas-para-critica.mjs`, `tools/modelar/vistas-de-superficie.mjs`, `docs/modelar/usar/PARE-E-ANALISE.md`, `docs/modelar/banco-de-provas/reflexo-na-bancada-2026-11-15/`
+**Território:** `tools/modelar/olhar-bancada.mjs`, `src/bancada/visoes/`, `tools/modelar/vistas-para-critica.mjs`, `tools/modelar/vistas-de-superficie.mjs`, `docs/modelar/usar/PARE-E-ANALISE.md`, `docs/modelar/banco-de-provas/reflexo-na-bancada-2026-11-15/`, `tools/fixtures/acervo/chapa-de-reflexo-de-prova/`, `tools/fixtures/acervo/chapa-lisa-de-reflexo-de-prova/`, `tools/fixtures/reflexo-calibracao/`, `tools/modelar/pente-de-curvatura.mjs`, `tools/modelar/pente-de-curvatura.test.mjs`, `tools/modelar/mapa-de-desvio.mjs`, `tools/modelar/mapa-de-desvio.test.mjs`
 
 **Responsável:** a IA da sessão do cordão de solda conduz e mede desde 2026-11-16, quando a sessão do carro parou (a pessoa passou o plano); a pessoa julga por imagem se a superfície ficou legível.
 
@@ -29,6 +29,9 @@ O modelador, o crítico e a pessoa veem a superfície de uma peça de lataria po
 - Pintura brilhante: CRIAR a visão `pintura` em `src/bancada/visoes/`, com material de verniz sobre base escura e um ambiente de faixas de luz paralelas ao comprimento da peça, gerado por conta, sem arquivo de imagem. É visão de inspeção, como a zebra: não é material da peça, não entra na receita nem na paleta e não muda o que a bancada salva.
 - Pacote do crítico: ESTENDER `vistas:critica` para levar a zebra e a pintura da bancada na peça de lataria, ao lado das vistas do Blender enquanto a paridade não estiver medida.
 - Tirar a exigência do Blender do pacote de lataria: ADIAR até a fatia 3, que mede a luz rasante e a curvatura da bancada contra as do Blender na mesma peça; a decisão é da pessoa.
+- Pente de curvatura numa seção: CRIAR `tools/modelar/pente-de-curvatura.mjs`, que corta a peça num plano (como o `--corte` da bancada) e desenha a curva da seção com uma haste por ponto, de comprimento proporcional à curvatura, em imagem e em números (a curvatura ao longo da seção e onde ela muda de sinal ou salta). Acrescentado pela pessoa em 2026-11-16: a zebra é legível para o agente como medida, mas não para a pessoa julgar a olho, e o pente é a leitura padrão de superfície de carroceria, legível para os dois.
+- Mapa de desvio em milímetros: CRIAR `tools/modelar/mapa-de-desvio.mjs`, que pinta a peça pela distância, com sinal, a uma superfície lisa ajustada a ela (e, quando houver, à referência), com a escala em mm na imagem. Usa a régua de ondulação (`tools/modelar/ondulacao-da-superficie.mjs`, do plano do carro) só como leitura, sem mudá-la. Acrescentado pela pessoa em 2026-11-16, para dizer "aqui está 1,2 mm para dentro", que nem a pessoa nem o agente tiram da zebra.
+- Leitura da zebra: estudo com chapas de calibração de defeito conhecido (amassado, degrau, vinco de curvatura, ondulação) em `tools/fixtures/reflexo-calibracao/`, e a instrução de leitura escrita do que o estudo mostrou, provada por um crítico cego que acha cada defeito só com a instrução.
 - Reescrever as vistas do Blender, portar a régua e o pacote cego: fora. Eles medem malha contra referência e não são imagem de inspeção.
 
 ## Incluído
@@ -51,14 +54,17 @@ O modelador, o crítico e a pessoa veem a superfície de uma peça de lataria po
 - na chapa com amassado de prova, a zebra e a pintura mostram o amassado declarado e a chapa sem amassado sai com faixas paralelas, conferido por teste que mede a faixa na imagem;
 - o `pedido.md` de uma peça de lataria lista a zebra e a pintura, e o crítico cego, sem saber do amassado, o aponta na chapa de prova;
 - a pessoa diz, pelas imagens do quarto traseiro, que consegue julgar a superfície;
+- o pente de curvatura de uma seção da chapa com amassado mostra o salto da curvatura no amassado e o da chapa lisa não, conferido por teste nos números do pente; o mapa de desvio da chapa com amassado dá a profundidade declarada do amassado com erro de até 10%, por teste;
+- nas chapas de calibração, um crítico cego que recebe só a instrução de leitura acha o tipo e o lugar de cada defeito na zebra;
 - a paridade medida e a decisão da pessoa sobre o Blender registradas.
 
 ## Fatias
 
-1. Captura das visões que existem: `--visao`, `--enquadrar`, `--largura-da-zebra` e `--azimute` em `olhar-bancada.mjs`, com teste. Saída: a zebra, a luz rasante e a curvatura da bancada do quarto traseiro em arquivo, mostradas à pessoa.
+1. Feita (b14d782e): captura das visões que existem: `--visao`, `--enquadrar`, `--largura-da-zebra` e `--azimute` em `olhar-bancada.mjs`, com teste. Saída: a zebra, a luz rasante e a curvatura da bancada do quarto traseiro em arquivo, mostradas à pessoa.
 2. Visão `pintura`: material de verniz e ambiente de faixas, no registro, com teste na chapa de prova. Saída: a imagem do quarto traseiro ao lado da foto de referência, e o sim da pessoa de que dá para julgar.
-3. Pacote e paridade: a zebra e a pintura no `pedido.md`; a luz rasante e a curvatura da bancada medidas contra as do Blender (fração iluminada, posição do amassado, escala de cor). Saída: o relatório e a decisão da pessoa sobre exigir o Blender.
-4. Instrução: o passo no guia, e o fechamento.
+3. Pente de curvatura e mapa de desvio, provados nas chapas de calibração e no quarto traseiro, com as imagens ao lado da zebra e da pintura para a pessoa dizer qual leitura serve.
+4. Pacote e paridade: a zebra e a pintura no `pedido.md`; a luz rasante e a curvatura da bancada medidas contra as do Blender (fração iluminada, posição do amassado, escala de cor). Saída: o relatório e a decisão da pessoa sobre exigir o Blender.
+5. Instrução: o estudo de leitura da zebra nas chapas de calibração, a instrução de como ler a zebra, a pintura, o pente e o mapa de desvio no guia, provada pelo crítico cego, e o fechamento.
 
 ## Riscos e parada
 
