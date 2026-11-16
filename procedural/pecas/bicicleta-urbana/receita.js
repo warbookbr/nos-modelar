@@ -88,6 +88,8 @@ export const TABELA = {
   garfo_perna_diametro: 29, /* foto frontal: 29 mm logo abaixo do ombro (y 480 px) */
   garfo_coroa_diametro: 42,
   garfo_coroa_altura: 30,
+  /* o corpo da coroa desce além da saída das pernas e fecha arredondado, para cada perna sair pela lateral do cilindro e a solda dar a volta inteira nela */
+  garfo_coroa_desce: 14,
   garfo_ombro_largura: 37, /* o fim do ombro cai a ~46 mm do eixo */
   garfo_ombro_altura: 65,
   garfo_perna_diametro_ponta: 21, /* foto frontal: 24 mm em y 640 px, ~21 junto do eixo */
@@ -441,7 +443,8 @@ export function derivar(T) {
     /* cada perna é soldada no corpo da coroa, como na foto: as duas e o corpo formam a junta do garfo */
     tubo('garfo', 'aluminio', perna, pernaBase.map((q) => q.r), 32, 'garfo');
   }
-  tubo('garfo', 'aluminio', [naDirecao(H - T.garfo_coroa_altura), naDirecao(H), naDirecao(baseCaixa + 2)], [rCoroa, rCoroa, raioQ(T.caixa_direcao_diametro_baixo) - 0.5], 32, 'garfo');
+  const fundoCoroa = H - T.garfo_coroa_altura - T.garfo_coroa_desce;
+  tubo('garfo', 'aluminio', [naDirecao(fundoCoroa), naDirecao(fundoCoroa + 3), naDirecao(fundoCoroa + 8), naDirecao(H), naDirecao(baseCaixa + 2)], [rCoroa * 0.55, rCoroa * 0.85, rCoroa, rCoroa, raioQ(T.caixa_direcao_diametro_baixo) - 0.5], 32, 'garfo');
   const topoDaColuna = baseCaixa + T.caixa_direcao_comprimento + T.garfo_coluna_alem_da_caixa;
   tubo('garfo', 'aluminio', [naDirecao(T.garfo_eixo_a_coroa), naDirecao(topoDaColuna)], raioQ(T.garfo_coluna_diametro), 24);
 
