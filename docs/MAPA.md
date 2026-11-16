@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1974 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1977 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -579,6 +579,7 @@
 - `2026-11-15-costura-em-no-de-tubos.md` — Cordão de solda na costura de tubos: o friso que segue a costura de uma união, e a costura em nó de tubos
 - `2026-11-15-reflexo-na-bancada.md` — Reflexo na bancada: a superfície de lataria julgada sem o Blender
 - `2026-11-16-comparar-com-a-referencia.md` — Comparar com a referência sem script: a prancha modelo e foto, a conferência da receita, a saída da bancada e o pacote do crítico
+- `2026-11-16-eletronica-no-modelar.md` — Eletrônica no Modelar: plano-raiz que gera quatro planos a partir do Eletrifica
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
@@ -1128,6 +1129,7 @@
 - `arredondar-tampa-partida.test.ts` — arredondar-tampa-partida.test.ts — arredondarAresta e filete numa aresta cujo lado é uma tampa partida.
 - `atributos.js` — atributos.js — operações do grupo, isoladas por serviços explícitos do núcleo.
 - `aviso-de-degrau.test.ts` — aviso-de-degrau.test.ts — o arredondamento que termina em degrau não passa mais calado.
+- `booleana-cantos-quase-coincidentes.test.ts` — booleana-cantos-quase-coincidentes.test.ts — a união de dois sólidos cujos cantos ficam a menos da tolerância de fusão (2^-15 da meia-caixa dos operandos) um…
 - `booleana-casca-raspada.test.ts` — booleana-casca-raspada.test.ts — o canto solto que a booleana deixava quando o corte cruza a casca de um loft (achado na rodada das asas do avião, em 2026-10…
 - `booleana-faces-fundidas.test.ts` — booleana-faces-fundidas.test.ts — fatia 10 do plano "Ajustes no núcleo dos veículos" (docs/modelar/planos/encerrados/2026-10-21-ajustes-no- nucleo-dos-veicul…
 - `booleana-quebras-de-sombra.test.ts` — booleana-quebras-de-sombra.test.ts — defeito achado na carcaça da empilhadeira em 2026-11-10: a booleana sobre um corpo subdividido com vinco vivo deixava em…
@@ -3268,6 +3270,7 @@
 - `instancia-de-familia.mjs` — instancia-de-familia.mjs — uma instância de família procedural por uma chamada, em passos prontos para um esboço 2.0 ou uma receita.
 - `instancia-de-familia.test.mjs` — instancia-de-familia.test.mjs — a instância de família por uma chamada reproduz a roda do carrinho de mão: os passos em mm do estado do rascunho (`montarRoda…
 - `intencao-peca.test.ts` — @ts-expect-error — contrato JavaScript puro da autoria.
+- `juntas-vizinhas-da-bicicleta.test.mjs` — As uniões das juntas soldadas do quadro da bicicleta em medidas vizinhas das que sempre funcionaram: a coroa do garfo a 396 e a 404 mm e o topo dos estais a …
 - `lados-das-vistas.mjs` — lados-das-vistas.mjs — de que lado cada vista olha, em texto, para o brief do crítico cego.
 - `lasca.mjs` — lasca.mjs — lista cada face fina de uma receita: a parte, a razão, os cantos em milímetro e o passo que criou a face.
 - `lasca.test.mjs` — lasca.test.mjs — a lista de faces finas acha a lateral de uma aresta de 2,8 mm no perfil de uma perua, e diz a parte, a razão, os cantos em milímetro e o pas…
