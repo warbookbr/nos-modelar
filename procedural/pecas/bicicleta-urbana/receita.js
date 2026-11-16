@@ -85,15 +85,15 @@ export const TABELA = {
   /* garfo */
   garfo_offset: 45,
   garfo_eixo_a_coroa: 405,
-  garfo_perna_diametro: 27,
+  garfo_perna_diametro: 29, /* foto frontal: 29 mm logo abaixo do ombro (y 480 px) */
   garfo_coroa_diametro: 42,
   garfo_coroa_altura: 30,
-  garfo_ombro_largura: 38,
+  garfo_ombro_largura: 37, /* o fim do ombro cai a ~46 mm do eixo */
   garfo_ombro_altura: 65,
-  garfo_perna_diametro_ponta: 17,
+  garfo_perna_diametro_ponta: 21, /* foto frontal: 24 mm em y 640 px, ~21 junto do eixo */
   garfo_coluna_diametro: 28,
   garfo_coluna_alem_da_caixa: 50,
-  garfo_x: 58,
+  garfo_x: 56, /* centro da perna a 55-57 mm do eixo junto da roda (foto: 43 mm em y 480, 53 em y 640, abrindo em reta) */
   garfo_folga_pneu: 6,
   /* mesa e guidão */
   mesa_espacador: 10,
@@ -103,19 +103,24 @@ export const TABELA = {
   mesa_braco_comprimento: 88,
   mesa_braco_diametro: 36,
   mesa_angulo: 38,
-  guidao_largura: 680,
+  /* a largura de 722 é a total, ponta a ponta das manoplas, medida na foto frontal (691 px a 1,045 mm/px): o caminho termina antes, pelo raio da manopla inclinada */
+  guidao_largura: 722,
   guidao_diametro: 22,
-  /* a largura de 680 é a total, com as manoplas: o caminho termina antes, pelo raio da manopla inclinada */
   guidao_recuo_da_ponta: 15,
-  /* centro reto até guidao_reto_meio; o riser sobe suave em guidao_subida_comprimento; dali às pontas o guidão fica na altura final e só recua */
-  guidao_reto_meio: 90,
-  guidao_subida_comprimento: 100,
-  guidao_subida: 48,
+  /* perfil de frente da linha de centro, medido na foto frontal pelo centro do tubo em cada coluna (1,045 mm/px): [x a partir do eixo, altura
+     acima do centro na mesa], em mm. O tubo fica plano e baixo até x = 45 (ponto mais baixo, junto da mesa), sobe em rampa de uns 30 graus
+     entre x = 60 e x = 130 (13 mm de subida até x = 90 e 33 mm até x = 132) e dali segue subindo suave, uns 6 graus, até a ponta (57 mm em x = 341),
+     que a manopla acompanha; de x = 341 à ponta a foto acaba na manopla e vale a mesma inclinação suave */
+  guidao_perfil: [[0, 0], [45, 0], [60, 1.5], [75, 5.9], [90, 13], [111, 24.5], [132, 33.4], [153, 38.6], [173, 40.7], [194, 42.8], [236, 47.5], [278, 53.8], [299, 55.3], [320, 55.3], [341, 56.9], [361, 58.5]],
+  /* o recuo para trás cresce em reta de guidao_recuo_inicio (o fim do trecho plano) até a ponta */
+  guidao_recuo_inicio: 45,
   guidao_recuo: 75,
-  guidao_erguida_na_ponta: 8,
+  /* janela (mm, para cada lado) que arredonda as quinas do perfil medido */
+  guidao_suaviza: 10,
   guidao_secoes_por_lado: 40,
   manopla_diametro: 31,
-  manopla_comprimento: 82,
+  /* medida na foto frontal: 130 a 135 px */
+  manopla_comprimento: 137,
   /* canote e selim */
   canote_diametro: 27,
   canote_dentro: 120,
@@ -403,13 +408,12 @@ export function derivar(T) {
 
   /* GUIDÃO: caminho riser; x medido do centro, o trecho reto no meio, depois sobe e recua para as pontas */
   const meia = T.guidao_largura / 2 - T.guidao_recuo_da_ponta;
+  const alturaDe = (ax) => { let t = 0, n = 0; for (let d = -T.guidao_suaviza; d <= T.guidao_suaviza; d += T.guidao_suaviza / 4) { t += interp(T.guidao_perfil, Math.abs(ax + d)); n++; } return t / n; };
   const caminho = (de, ate, n) => Array.from({ length: n + 1 }, (_, i) => {
     const x = de + ((ate - de) * i) / n;
     const ax = Math.abs(x);
-    const us = Math.min(1, Math.max(0, (ax - T.guidao_reto_meio) / T.guidao_subida_comprimento));
-    const ur = Math.max(0, (ax - T.guidao_reto_meio) / (meia - T.guidao_reto_meio));
-    const uc = Math.max(0, (ax - T.guidao_reto_meio - T.guidao_subida_comprimento) / (meia - T.guidao_reto_meio - T.guidao_subida_comprimento));
-    return soma(guidaoCentro, [x, T.guidao_subida * us * us * (3 - 2 * us) + T.guidao_erguida_na_ponta * uc, -T.guidao_recuo * ur]);
+    const ur = Math.max(0, (ax - T.guidao_recuo_inicio) / (meia - T.guidao_recuo_inicio));
+    return soma(guidaoCentro, [x, alturaDe(ax), -T.guidao_recuo * ur]);
   });
   const pedaco = (de, ate) => caminho(de, ate, T.guidao_secoes_por_lado * 2);
   tubo('guidao', 'preto', pedaco(-meia + 5, meia - 5), raioQ(T.guidao_diametro), 28);
@@ -806,7 +810,7 @@ const receita = {
   },
   TOPO: { origem: 'chão sob o eixo do movimento central; y para cima, a frente da bicicleta em +z, o lado da corrente (direita da bicicleta) em -x' },
   PLANO: {
-    objeto: 'bicicleta urbana de marcha única, rodas de 670 mm, entre-eixos de 1000 mm, quadro médio de alumínio, guidão riser de 680 mm',
+    objeto: 'bicicleta urbana de marcha única, rodas de 670 mm, entre-eixos de 1000 mm, quadro médio de alumínio, guidão riser de 722 mm',
     referencias: ['referencias/alvo.md'],
     escala: { medida: 'diâmetro externo do pneu', milimetros: 670 },
     partes: [
@@ -817,7 +821,7 @@ const receita = {
       { nome: 'pneuTraseiro', forma: 'pneu de 48 mm de largura e 42 mm de altura, com sulcos, assentado no aro da roda traseira', tecnica: 'lathe do perfil do pneu' },
       { nome: 'rodaTraseira', forma: 'cubo com porcas, 36 raios cruzados e aro, centrados entre as gancheiras', tecnica: 'lathe de aro e cubo; raios por loft e arranja radial' },
       { nome: 'mesa', forma: 'braçadeira na coluna, pescoço curto inclinado para a frente e para cima e braçadeira que segura o guidão pelo centro', tecnica: 'loft circular' },
-      { nome: 'guidao', forma: 'guidão riser de 680 mm: centro reto, subida suave junto da mesa, pontas quase horizontais recuando levemente', tecnica: 'loft circular ao longo de caminho calculado' },
+      { nome: 'guidao', forma: 'guidão riser de 722 mm: sai da mesa subindo em cerca de 30 graus por uns 70 mm e segue subindo suave, uns 6 graus, até as pontas, recuando levemente', tecnica: 'loft circular ao longo de caminho calculado' },
       { nome: 'manoplas', forma: 'duas manoplas cilíndricas nas pontas do guidão', tecnica: 'loft circular sobre o mesmo caminho das pontas' },
       { nome: 'canote', forma: 'tubo fino dentro do tubo do selim, coaxial, saindo acima dele', tecnica: 'loft circular coaxial ao tubo do selim' },
       { nome: 'selim', forma: 'assento acolchoado arredondado, bico estreito e traseira larga, dois trilhos e braçadeira', tecnica: 'loft de seções elípticas; trilhos em loft; lathe da braçadeira' },
@@ -832,7 +836,7 @@ const receita = {
       'a corrente não liga a coroa à catraca, ou coroa e catraca fora do mesmo plano x',
       'o selim ou o guidão abaixo do tubo superior',
       'o canote ou a coluna do garfo fora do eixo do tubo que os recebe',
-      'guidão diferente da vista frontal: largura perto de 680 mm, pontas subindo e recuando',
+      'guidão diferente da vista frontal: largura perto de 722 mm, saída da mesa subindo em ângulo e pontas subindo suave e recuando',
     ],
   },
   contatos: CONTATOS,
