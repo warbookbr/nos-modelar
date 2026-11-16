@@ -20,6 +20,7 @@ import { aplicarCurvatura, desfazerCurvatura } from './visao-curvatura.js';
 import { aplicarLuzRasante, desfazerLuzRasante } from './visao-luz-rasante.js';
 import { aplicarPintura, desfazerPintura } from './visao-pintura.js';
 import { aplicarZebra, desfazerZebra } from './visao-zebra.js';
+import { CONTROLES_DA_CAPTURA } from '../../autoria/visoes-da-captura.js';
 
 export const VISAO_PADRAO = 'solida';
 
@@ -66,7 +67,7 @@ export const VISOES = Object.freeze([
     aplicar: aplicarZebra,
     desfazer: desfazerZebra,
     /* O que a captura por comando pode regular nesta visão (`--largura-da-zebra`), além de ligá-la. */
-    controlesDaCaptura: ['larguraDaZebra'],
+    controlesDaCaptura: CONTROLES_DA_CAPTURA.zebra,
   },
   {
     id: 'luz-rasante',
@@ -75,7 +76,7 @@ export const VISOES = Object.freeze([
     /* Um sol a 10 graus do plano da imagem, com sombra e o resto da luz apagado, com a direção no controle da visão. */
     aplicar: aplicarLuzRasante,
     desfazer: desfazerLuzRasante,
-    controlesDaCaptura: ['azimute'],
+    controlesDaCaptura: CONTROLES_DA_CAPTURA['luz-rasante'],
   },
   {
     id: 'pintura',
@@ -84,7 +85,7 @@ export const VISOES = Object.freeze([
     /* Verniz sobre base escura refletindo faixas de luz paralelas ao comprimento da peça, com a largura das faixas no controle da visão. */
     aplicar: aplicarPintura,
     desfazer: desfazerPintura,
-    controlesDaCaptura: ['larguraDaPintura'],
+    controlesDaCaptura: CONTROLES_DA_CAPTURA.pintura,
   },
 ]);
 

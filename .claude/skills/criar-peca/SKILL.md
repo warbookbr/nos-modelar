@@ -39,38 +39,7 @@ Depois de mudar silhueta, encontro, corte, união ou arredondamento, faça o pas
    lida por `descrever_capacidade` no MCP procedural. As receitas do acervo são
    aprovadas e provam capacidades do núcleo, mas não são molde de forma, que
    vem da referência e do plano.
-5. Na primeira tentativa, pergunte à pessoa se o que vai ser modelado é um
-   conjunto e, se for, se é complexo. Num conjunto complexo, sugira trabalhar
-   cada parte isolada na bancada (`--selecionadas=<parte> --modo=isolar
-   --focar` em `npm run bancada` e `olhar-bancada`), comparada sozinha com o
-   recorte dela na referência, quando isso ajudar a focar na parte que está
-   sendo modelada; no conjunto inteiro a parte pequena some e o defeito dela
-   passa.
-6. A forma de uma parte sai das medidas da referência (contornos e perfis
-   tirados da imagem, em milímetros, pela régua de uma medida conhecida), e
-   não de curvas inventadas ajustadas a olho.
-
-## Rodadas fora do laço
-
-Um ajuste de forma feito fora do laço de modelagem, em conversa com a pessoa,
-também conta rodadas: cada versão mostrada é uma. Antes de mostrar, passe as
-vistas pelo `critico-visual` cego, com a referência. Depois de três rodadas na
-mesma parte sem nota 8 do crítico ou sem o sim da pessoa, pare e consulte a
-pessoa com o registro das três, em vez de tentar a quarta.
-
-A consulta traz o diagnóstico, respondido por medida, antes da pergunta se
-segue:
-
-1. Quantos pixels a parte ocupa na referência; abaixo de uns 300 px no lado
-   maior, a recomendação é pedir uma imagem de perto.
-2. A descrição escrita da parte, peça por peça, que a pessoa confirma ou corrige.
-3. Quais vistas faltam na referência e o que foi suposto por isso.
-4. Se a referência mostra a mesma peça que a pessoa quer.
-5. Se a forma saiu de medidas da referência ou de ajuste a olho.
-6. Se as notas do crítico oscilaram entre rodadas que mudaram pouco; se sim, ele
-   julgou sem medida, e o pacote seguinte leva o contorno medido.
-
-A recomendação segue o primeiro item que falhou, na ordem da lista.
+5. Parte de conjunto e rodadas sem acerto: [`references/referencia-e-rodadas.md`](references/referencia-e-rodadas.md).
 
 ## Identidade
 

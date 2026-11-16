@@ -50,22 +50,8 @@ caixa colada). O que ficar de fora fica por decisão escrita. Confira a
 orientação de cada extremidade contra a imagem, e não contra o que parece
 natural.
 
-Antes de modelar cada parte, confira a referência dela por medida, e não por
-impressão:
-
-1. Meça quantos pixels a parte ocupa na imagem. Abaixo de uns 300 px no lado
-   maior, peça à pessoa uma imagem de perto da parte; com menos que isso a forma
-   é adivinhada (o pedal da bicicleta tinha 100 por 50 px, e três rodadas
-   modelaram uma peça que não era a da foto).
-2. Escreva o que vê na parte, peça por peça (o que é aberto e o que é maciço,
-   as bordas, quantos furos, pinos ou nervuras), e só modele depois que a pessoa
-   confirmar ou corrigir. Não responda a si mesmo se consegue ler os detalhes: a
-   descrição escrita é o teste.
-3. Diga quais vistas a referência mostra e quais faltam para a forma da parte.
-   O que nenhuma vista mostra fica escrito como suposição, ou se pede outra
-   imagem.
-4. Confirme que a imagem mostra a mesma peça que a pessoa quer, e não uma
-   parecida.
+Antes de modelar cada parte, confira a referência dela por medida (pixels da parte, descrição escrita confirmada pela pessoa,
+vistas que faltam, mesma peça), como diz [`referencia-e-rodadas.md`](../criar-peca/references/referencia-e-rodadas.md).
 
 ## 3. Perguntas fixas
 

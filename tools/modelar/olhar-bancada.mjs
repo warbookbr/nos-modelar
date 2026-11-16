@@ -25,7 +25,7 @@ import { PASTA_DO_CACHE, assinaturaDaEntrada, executarReceitaGuardada } from './
 import { FATOR_DE_AMOSTRAGEM, reduzirPorMedia } from './capturar-montagem.mjs';
 import { reduzirEmParalelo } from './reduzir-em-paralelo.mjs';
 import { lancarChromium } from './navegador.mjs';
-import { IDS_DAS_VISOES, VISOES } from '../../src/bancada/visoes/registro-de-visoes.js';
+import { CONTROLES_DA_CAPTURA, IDS_DAS_VISOES_DA_CAPTURA as IDS_DAS_VISOES } from '../../src/autoria/visoes-da-captura.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
@@ -692,8 +692,8 @@ export async function olharBancada({
     const controleDaVisao = (nome, valor, opcao, minimo, maximo) => {
       if (valor === null || valor === undefined) return null;
       const numero = Number(valor);
-      if (visao === null || !VISOES.find((v) => v.id === visao)?.controlesDaCaptura?.includes(nome)) {
-        const donas = VISOES.filter((v) => v.controlesDaCaptura?.includes(nome)).map((v) => v.id);
+      if (visao === null || !CONTROLES_DA_CAPTURA[visao]?.includes(nome)) {
+        const donas = IDS_DAS_VISOES.filter((id) => CONTROLES_DA_CAPTURA[id].includes(nome));
         erroDeUso(`${opcao} só vale com --visao=${donas.join(' ou --visao=')}; a visão pedida é ${visao === null ? 'nenhuma' : `"${visao}"`}.`);
       }
       if (!Number.isFinite(numero) || numero < minimo || numero > maximo) erroDeUso(`${opcao} pede graus de ${minimo} a ${maximo}; veio "${valor}".`);

@@ -6,7 +6,8 @@
 import { describe, expect, it } from 'vitest';
 import * as THREE from 'three';
 import { criarControladorPartes } from '../controlar-partes.js';
-import { VISOES, VISAO_PADRAO, criarSeletorDeVisao, visaoDisponivel } from './registro-de-visoes.js';
+import { IDS_DAS_VISOES, VISOES, VISAO_PADRAO, criarSeletorDeVisao, visaoDisponivel } from './registro-de-visoes.js';
+import { IDS_DAS_VISOES_DA_CAPTURA } from '../../autoria/visoes-da-captura.js';
 
 function pecaDeUmaParte() {
   const raiz = new THREE.Group();
@@ -146,5 +147,12 @@ describe('seletor de visão: a visão forçada pela captura', () => {
 
   it('declara que controle da captura cada visão aceita', () => {
     expect(Object.fromEntries(VISOES.filter((v) => v.controlesDaCaptura).map((v) => [v.id, v.controlesDaCaptura]))).toEqual({ zebra: ['larguraDaZebra'], 'luz-rasante': ['azimute'], pintura: ['larguraDaPintura'] });
+  });
+});
+
+
+describe('a lista da captura e o registro dizem o mesmo', () => {
+  it('os ids são os mesmos, na mesma ordem', () => {
+    expect([...IDS_DAS_VISOES]).toEqual([...IDS_DAS_VISOES_DA_CAPTURA]);
   });
 });

@@ -2,8 +2,8 @@
    dos estais a 40, 43 e 48 mm recusavam a união com "é defeito do cálculo" (plano da costura em nó de tubos, gate 8). Cada valor roda só os
    sólidos das juntas e os passos delas (tmp/varredura/juntas.mjs faz a varredura de 1 em 1 mm). */
 import { describe, expect, it } from 'vitest';
-import { TABELA, gerarPassos } from '../../procedural/pecas/bicicleta-urbana/receita.js';
-import { nucleo } from '../../procedural/nucleo/entrada.js';
+import { TABELA, gerarPassos } from '../../pecas/bicicleta-urbana/receita.js';
+import { nucleo } from '../entrada.js';
 
 /* só os sólidos das juntas soldadas e os passos da junta (unir, friso com costura, unir com vincarCostura) */
 function juntas(T) {

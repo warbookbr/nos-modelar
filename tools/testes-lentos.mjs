@@ -18,7 +18,7 @@ import { lerHistorico } from './vitest-duracoes.mjs';
 
 export const TESTES_LENTOS = [
   /* 2026-11-16: as uniões das juntas soldadas do quadro da bicicleta em cinco medidas vizinhas; uns 10 s cada, 50 s com a máquina livre */
-  'tools/modelar/juntas-vizinhas-da-bicicleta.test.mjs',
+  'procedural/nucleo/operacoes/booleana-juntas-vizinhas-da-bicicleta.test.mjs',
   /* 2026-11-16: as visões de reflexo por comando (zebra em duas chapas, luz rasante e curvatura), cada captura abrindo navegador e peça;
      38 s com a máquina livre */
   'tools/modelar/olhar-bancada-visoes.test.mjs',

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1982 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1984 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -59,6 +59,7 @@
 
 - `operacoes-procedurais.md` — Referência de operações procedurais
 - `por-que.md` — Por que cada regra da skill `criar-peca` existe
+- `referencia-e-rodadas.md` — Referência por medida e rodadas fora do laço
 
 ## .claude/skills/desenhar-prancha/
 
@@ -1133,6 +1134,7 @@
 - `booleana-cantos-quase-coincidentes.test.ts` — booleana-cantos-quase-coincidentes.test.ts — a segunda tentativa reforçada da união (`reforco` em booleanas.js) e o que ela não pode fazer.
 - `booleana-casca-raspada.test.ts` — booleana-casca-raspada.test.ts — o canto solto que a booleana deixava quando o corte cruza a casca de um loft (achado na rodada das asas do avião, em 2026-10…
 - `booleana-faces-fundidas.test.ts` — booleana-faces-fundidas.test.ts — fatia 10 do plano "Ajustes no núcleo dos veículos" (docs/modelar/planos/encerrados/2026-10-21-ajustes-no- nucleo-dos-veicul…
+- `booleana-juntas-vizinhas-da-bicicleta.test.mjs` — As uniões das juntas soldadas do quadro da bicicleta em medidas vizinhas das que sempre funcionaram: a coroa do garfo a 396 e a 404 mm e o topo dos estais a …
 - `booleana-quebras-de-sombra.test.ts` — booleana-quebras-de-sombra.test.ts — defeito achado na carcaça da empilhadeira em 2026-11-10: a booleana sobre um corpo subdividido com vinco vivo deixava em…
 - `booleanas-carga.test.ts` — booleanas-carga.test.ts — fatia 5 do plano "União de sólidos". O núcleo carrega a Manifold sozinho, por await no topo de `manifold.js`: quem só importa a fac…
 - `booleanas-revisao-2.test.ts` — booleanas-revisao-2.test.ts — regressões da segunda revisão adversarial das booleanas (2026-09-29): tolerâncias que dependiam da posição, costura mista que s…
@@ -2342,6 +2344,7 @@
 - `veredito-de-forma.test.js` — veredito-de-forma.test.js — o veredito que não deixa a correção para o chute.
 - `vincos-da-malha.js` — vincos-da-malha.js — os vincos nomeados que os passos `subdivisao` declaram, onde eles ficaram na malha entregue.
 - `vinculos-de-medida.js` — vinculos-de-medida.js — o grafo de "esta medida vem daquela porta" dentro de uma montagem, e a ordem de construção que ele impõe.
+- `visoes-da-captura.js` — visoes-da-captura.js — os ids das visões de inspeção da bancada e os controles que a captura por comando regula em cada uma. Mora fora de src/bancada/ porque…
 - `vistas-da-bancada.js` — vistas-da-bancada.js — as direções das vistas nomeadas da bancada, em dado puro, para quem roda sem navegador (o esboço 2.0) e para a própria bancada, que as…
 
 ## src/bancada/
@@ -3280,7 +3283,6 @@
 - `instancia-de-familia.mjs` — instancia-de-familia.mjs — uma instância de família procedural por uma chamada, em passos prontos para um esboço 2.0 ou uma receita.
 - `instancia-de-familia.test.mjs` — instancia-de-familia.test.mjs — a instância de família por uma chamada reproduz a roda do carrinho de mão: os passos em mm do estado do rascunho (`montarRoda…
 - `intencao-peca.test.ts` — @ts-expect-error — contrato JavaScript puro da autoria.
-- `juntas-vizinhas-da-bicicleta.test.mjs` — As uniões das juntas soldadas do quadro da bicicleta em medidas vizinhas das que sempre funcionaram: a coroa do garfo a 396 e a 404 mm e o topo dos estais a …
 - `lados-das-vistas.mjs` — lados-das-vistas.mjs — de que lado cada vista olha, em texto, para o brief do crítico cego.
 - `lasca.mjs` — lasca.mjs — lista cada face fina de uma receita: a parte, a razão, os cantos em milímetro e o passo que criou a face.
 - `lasca.test.mjs` — lasca.test.mjs — a lista de faces finas acha a lateral de uma aresta de 2,8 mm no perfil de uma perua, e diz a parte, a razão, os cantos em milímetro e o pas…
