@@ -400,7 +400,7 @@ const receita = {
     referencias: ['../../referencias/lateral.prancha.svg', '../../referencias/traseira.prancha.svg', '../../referencias/superior.prancha.svg'],
     escala: { medida: 'comprimento total do carro, de z -2375 a 2375', milimetros: 4750 },
     partes: [
-      { nome: 'chapa', forma: 'chapa contínua de 2 mm do meio da porta à traseira, lisa, com o teto, a coluna que cai até a tampa, a quina da traseira, o arco da roda de trás, o degrau do ombro até a base da coluna, o vão do vidro lateral traseiro, o vão da lanterna e o vão do vidro traseiro', tecnica: 'subdivisao de uma gaiolaPorRede cujas arestas seguem as curvas da prancha, com os vãos por furoPassante e aberturaPorContorno' },
+      { nome: 'chapa', forma: 'chapa contínua de 2 mm do meio da porta à traseira, lisa, com teto, coluna caindo até a tampa, quina da traseira, arco da roda, degrau do ombro à coluna e os vãos do vidro lateral, da lanterna e do vidro traseiro', tecnica: 'subdivisao de uma gaiolaPorRede cujas arestas seguem as curvas da prancha, com os vãos por furoPassante e aberturaPorContorno' },
       { nome: 'paralamaTraseiro', forma: 'a faixa da chapa do para-lama traseiro, que sai 38 mm sobre a linha da porta vista de cima, sem moldura de arco', tecnica: 'região da mesma chapa, da pele analítica da planta (meia largura 950 contra 912)' },
       { nome: 'rebaixoLateral', forma: 'o rebaixo côncavo em cunha da lateral, do meio da porta até morrer antes do arco, sob o vinco do ombro', tecnica: 'região da mesma chapa, com um sino de profundidade entre a base e o topo do rebaixo' },
     ],
