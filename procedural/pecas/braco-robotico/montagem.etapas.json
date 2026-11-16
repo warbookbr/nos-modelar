@@ -7,11 +7,23 @@
       "instancia": "base",
       "estado": "fixa",
       "juntas": [],
-      "forma": "sha256:acfa753e83ef96c273d1c29ef9690b54f595725db66875bacf5ad1905656866e",
+      "forma": "sha256:7a7da776c41ee4aebb51685f9f67fa86e1ec0bf69fc9a93968d7dab83f82e4ac",
+      "motivo": "a receita mudou depois do aceite",
       "aceite": {
-        "por": "pessoa",
-        "observacao": "aceitou a rodada 4: corpo 210 mm, pé avançando sob a caixa, topo com chanfro pequeno"
-      }
+        "por": "Tiago, 2026-11-16: base aprovada por imagem com a quina de baixo viva",
+        "analise": "ausente"
+      },
+      "reaberturas": [
+        {
+          "por": "leitura do registro",
+          "motivo": "a receita mudou depois do aceite",
+          "aceite": {
+            "por": "pessoa",
+            "observacao": "aceitou a rodada 4: corpo 210 mm, pé avançando sob a caixa, topo com chanfro pequeno"
+          },
+          "forma": "sha256:acfa753e83ef96c273d1c29ef9690b54f595725db66875bacf5ad1905656866e"
+        }
+      ]
     },
     {
       "instancia": "anelCintura",
