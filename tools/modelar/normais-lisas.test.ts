@@ -34,9 +34,12 @@
    provadas. Agora cada uma tem uma mutação que a mata:
    - a soma é do estado NEUTRO inteiro — morre se ela passar a ser por lote de
      desenho (parte × material), porque a divisa ganha costura;
-   - a soma é pesada pela ÁREA — morre se a normal do triângulo for normalizada
-     antes de entrar na conta, porque uma abinha passa a valer o mesmo que um
-     barril 350× maior;
+   - a soma é pesada pelo ÂNGULO do canto de cada triângulo (desde 2026-11-16;
+     antes era pela área, e a normal dependia de em quantos triângulos a face
+     vizinha estava partida) — morre se o peso voltar a ser a área ou a ser
+     igual, porque a faixa partida em leque puxa a normal do anel; a abinha
+     estreita que não deve puxar a normal do barril se separa com `liso` de
+     ângulo;
    - soma que degenera cai na CHAPADA — morre se o vetor nulo virar normal, e o
      que aparece na tela é um anel preto;
    - a normal chapada é a do TRIÂNGULO, não a do plano da face — morre se o
@@ -292,29 +295,55 @@ describe('a soma das normais lisas é do estado NEUTRO inteiro, não do lote de 
   });
 });
 
-describe('a soma das normais lisas é pesada pela ÁREA de cada triângulo', () => {
+describe('a soma das normais lisas é pesada pelo ÂNGULO do canto de cada triângulo', () => {
   /* uma casca de revolução com duas faixas de tamanhos MUITO diferentes: um
      barril de altura 10 (normal radial) e uma abinha de 0,02 inclinada a 45°.
-     No anel que as duas dividem, a área do barril é ~350× a da abinha. */
+     No anel que as duas dividem, as duas faixas têm quase o mesmo ângulo de canto. */
   const CASCA = 80;
-  const casca = nucleo([
+  const cascaCom = (liso: any) => nucleo([
     ['lathe', { origemId: CASCA, lados: LADOS, perfil: [[1, 0], [1, 10], [1.02, 10.02]], superficie: true }],
     ['parte', { nome: 'casca', sel: { origem: { op: 'lathe', id: CASCA } } }],
-    ['liso', { sel: { origem: { op: 'lathe', id: CASCA } } }],
+    ['liso', { ...liso, sel: { origem: { op: 'lathe', id: CASCA } } }],
   ], {}, {});
+  const casca = cascaCom({});
+  const noAnel = (neutro: any) => [...normaisPorPonto(neutro, 'casca')]
+    .filter(([ponto]) => ponto.split(',')[1] === '10.000000')
+    .flatMap(([, normais]) => normais);
 
-  it('o anel compartilhado herda quase inteira a normal da faixa GRANDE', () => {
-    const noAnel = [...normaisPorPonto(casca, 'casca')]
-      .filter(([ponto]) => ponto.split(',')[1] === '10.000000')
-      .flatMap(([, normais]) => normais);
-    expect(noAnel.length).toBeGreaterThan(0);
-    for (const n of noAnel) {
-      /* pesada pela área: |y| ≈ 0,0020. Com peso IGUAL por triângulo a abinha de
-         45° valeria o mesmo que o barril inteiro e |y| passaria de 0,38 — 190×
-         maior. A margem de 0,01 separa os dois casos sem ambiguidade. */
-      expect(Math.abs(n[1])).toBeLessThan(0.01);
-      expect(unitario(n)).toBeCloseTo(1, 6);
+  it('sem ângulo, o anel compartilhado fica no meio das duas faixas: o peso não é a área', () => {
+    const n = noAnel(casca);
+    expect(n.length).toBeGreaterThan(0);
+    /* pelo ângulo, |y| fica perto de sen(22,5°) ≈ 0,38 (o trapézio da abinha abre um pouco mais que 90° no anel); pela área,
+       |y| ≈ 0,002 */
+    for (const v of n) { expect(Math.abs(v[1])).toBeGreaterThan(0.35); expect(Math.abs(v[1])).toBeLessThan(0.45); expect(unitario(v)).toBeCloseTo(1, 6); }
+  });
+
+  it('com liso de 30 graus, a abinha de 45 fica fora da média e o barril continua radial no anel', () => {
+    const n = noAnel(cascaCom({ angulo: 30 })).filter((v) => Math.abs(v[1]) < 0.5);
+    expect(n.length).toBeGreaterThan(0);
+    for (const v of n) expect(Math.abs(v[1])).toBeLessThan(1e-9);
+  });
+
+  it('partir as faces do barril em leques não muda a normal do anel', () => {
+    const partida = { ...casca, V: new Map(casca.V), F: new Map() };
+    let novo = 1e9;
+    for (const f of casca.F.values()) {
+      const P = f.vs.map((v: number) => casca.V.get(v));
+      const alto = P.some((p: number[]) => p[1] < 1);
+      if (!alto || f.vs.length !== 4) { partida.F.set(f.id, f); continue; }
+      /* 5 pontos na aresta de baixo (y = 0) e o leque a partir do canto de cima que vem depois dela */
+      const k = P.findIndex((p: number[], i: number) => p[1] < 1 && P[(i + 1) % 4][1] < 1);
+      const a = f.vs[k], b = f.vs[(k + 1) % 4];
+      const meio = [1, 2, 3, 4, 5].map((j) => { const id = novo++; partida.V.set(id, casca.V.get(a).map((x: number, i: number) => x + (casca.V.get(b)[i] - x) * (j / 6))); return id; });
+      const cadeia = [a, ...meio, b, f.vs[(k + 2) % 4], f.vs[(k + 3) % 4]];
+      const topo = (k + 2) % 4;
+      const centro = f.vs[topo];
+      const ordem = [...cadeia.slice(cadeia.indexOf(centro) + 1), ...cadeia.slice(0, cadeia.indexOf(centro))];
+      for (let j = 0; j + 1 < ordem.length; j++) { const id = novo++; partida.F.set(id, { ...f, id, vs: [centro, ordem[j], ordem[j + 1]] }); }
     }
+    const antes = noAnel(casca).map((v) => v.map((x: number) => +x.toFixed(9)).join(',')).sort();
+    const depois = noAnel(partida).map((v) => v.map((x: number) => +x.toFixed(9)).join(',')).sort();
+    expect(new Set(depois)).toEqual(new Set(antes));
   });
 });
 

@@ -346,15 +346,11 @@ export function derivar(T) {
       const u = (d - acum[i - 1]) / (acum[i] - acum[i - 1]);
       return { p: pts[i - 1].map((v, k) => v + (pts[i][k] - v) * u), r: r[i - 1] + (r[i] - r[i - 1]) * u };
     };
-    /* o tubo é um corpo só, da ponta à ponta: o trecho de cada ponta soldada ganha anéis a cada 4 mm (deslocados 0,37 do passo,
-       para não coincidirem com a costura de outro tubo), para a união com o cordão não deixar triângulos longos que riscam o
-       sombreado, e o meio fica com oito; o tubo entra inteiro na união do quadro */
+    /* o tubo é um corpo só, da ponta à ponta, com oito anéis no meio e um em cada ponto do traçado; o refino da faixa em volta
+       da costura é da união que recebe o cordão (refino-da-costura.js), e o tubo entra inteiro na união do quadro */
     const ss = new Set([0, total]);
-    const faixa = (a, b) => { const partes = Math.max(8, Math.round((b - a) / 4)); for (let k = 1; k < partes; k++) ss.add(a + ((b - a) * (k + 0.37)) / partes); };
     const a = inicio ? trecho : 0;
     const b = fim ? total - trecho : total;
-    if (inicio) faixa(0, a);
-    if (fim) faixa(b, total);
     for (let k = 0; k <= 8; k++) ss.add(a + ((b - a) * k) / 8);
     pts.forEach((_, i) => ss.add(acum[i]));
     const lista = [...ss].sort((x, y) => x - y).filter((x, i, arr) => i === 0 || x - arr[i - 1] > 1e-6);

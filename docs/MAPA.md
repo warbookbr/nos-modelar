@@ -6,6 +6,7 @@
 > algum arquivo-fonte estiver sem cabeçalho.
 
 1992 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1987 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1178,6 +1179,7 @@
 - `ponto-repetido.test.ts` — ponto-repetido.test.ts — a recusa do contorno que não é polígono simples diz qual ponto se repete ou quais arestas se cruzam.
 - `primitivas-basicas.js` — primitivas-basicas.js — geradores fundamentais registrados pelo núcleo, sem estado global.
 - `primitivas-superficie.js` — primitivas-superficie.js — primitivas fechadas que recebem serviços explícitos do núcleo.
+- `refino-da-costura.js` — refino-da-costura.js — o refino da faixa que o cordão de solda toca (plano do cordão de solda na costura de tubos, fatia 7).
 - `subdivisao-limite.test.ts` — subdivisao-limite.test.ts — a recusa do passo `subdivisao` que gera mais vértices ou faces que o limite do passo. Precisa de uma gaiola de 576 quadros no nív…
 - `subdivisao-recusas.test.ts` — subdivisao-recusas.test.ts — cada recusa de entrada do passo `subdivisao` com a entrada ruim e o campo que a recusa cita. A revisão das verificações (2026-11…
 - `subdivisao.js` — subdivisao.js (operação) — gera uma superfície Catmull-Clark com vincos a partir de uma gaiola declarada. A geometria sai de `procedural/nucleo/subdivisao.js…
@@ -2312,6 +2314,7 @@
 - `molduras-do-vao-chapa-cortada.test.mjs` — molduras-do-vao-chapa-cortada.test.mjs — a abertura de uma chapa que um corte em painéis atravessou (atrito 2 do RECEITA.md do sedã).
 - `molduras-do-vao.js` — molduras-do-vao.js — os vãos das chapas da peça: cada abertura declarada, e a moldura em volta de cada uma medida sobre a malha.
 - `molduras-do-vao.test.mjs` — molduras-do-vao.test.mjs — a moldura em volta do vão, medida sobre a malha varrida de verdade (fatia 12 do plano de ajustes no núcleo).
+- `normal-lisa-por-angulo.test.js` — normal-lisa-por-angulo.test.js — a normal lisa pesa cada face pelo ângulo do canto dela no vértice, nos quatro lugares que a calculam (o adaptador do núcleo,…
 - `origem-de-parametro.js` — origem-de-parametro.js — de onde veio cada número da tabela.
 - `origem-de-parametro.test.js` — origem-de-parametro.test.js — a regra que impede a rodada de absorção de inventar número para fechar a conta.
 - `parametros-declarados.js` — parametros-declarados.js — a pergunta única: quais números desta receita alguém pode mexer, e qual é o valor de cada um agora.

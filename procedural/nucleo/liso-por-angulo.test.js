@@ -12,6 +12,32 @@ describe('liso por ângulo', () => {
     expect(() => valorDoLiso('30')).toThrow(/entre 0 e 180/);
   });
 
+  it('a face plana dividida em N triângulos dá, nos cantos da aresta com a vizinha dobrada, a mesma normal lisa que a face inteira', () => {
+    /* o quadrado no chão (y = 0) e a vizinha dobrada 40° na aresta x = 0; com `n`, o quadrado vira um leque a partir de (1, 0, 0),
+       com n - 1 pontos na aresta de trás */
+    const ctx = { tex: { texCanvas: (w, h) => ({ width: w, height: h }) }, m4: { ident: () => new Float32Array(16) } };
+    const a = (40 * Math.PI) / 180;
+    const normaisNaAresta = (n) => {
+      const V = new Map([[1, [0, 0, 0]], [2, [0, 0, 1]], [3, [1, 0, 1]], [4, [1, 0, 0]], [5, [-Math.cos(a), Math.sin(a), 0]], [6, [-Math.cos(a), Math.sin(a), 1]]]);
+      const F = new Map([[1, { id: 1, vs: [1, 5, 6, 2], liso: true, parte: 'p' }]]);
+      if (n === 1) F.set(2, { id: 2, vs: [1, 2, 3, 4], liso: true, parte: 'p' });
+      else {
+        const tras = [2];
+        for (let j = 1; j < n; j++) { V.set(10 + j, [j / n, 0, 1]); tras.push(10 + j); }
+        tras.push(3);
+        F.set(2, { id: 2, vs: [4, 1, 2], liso: true, parte: 'p' });
+        for (let j = 0; j + 1 < tras.length; j++) F.set(3 + j, { id: 3 + j, vs: [4, tras[j], tras[j + 1]], liso: true, parte: 'p' });
+      }
+      const v = adaptarV3({ V, F }, ctx).lotes.flatMap((l) => [...l.mesh.v]);
+      const saida = [];
+      for (let k = 0; k < v.length; k += 8) if (Math.abs(v[k]) < 1e-12 && Math.abs(v[k + 1]) < 1e-12) saida.push([v[k + 5], v[k + 6], v[k + 7]].map((x) => +x.toFixed(9)));
+      return [...new Set(saida.map((x) => x.join(',')))];
+    };
+    const inteira = normaisNaAresta(1);
+    expect(inteira).toHaveLength(1);
+    for (const n of [2, 4, 9]) expect(normaisNaAresta(n)).toEqual(inteira);
+  });
+
   it('deixa fora da média a face além do limite', () => {
     const cima = { u: [0, 1, 0], n: [0, 1, 0] };
     const lado = { u: [1, 0, 0], n: [1, 0, 0] };
@@ -78,6 +104,7 @@ describe('quebra de sombra', () => {
     const com = noTopo();
     expect(com.every((z) => z > 1 - 1e-9 || z < 1e-9)).toBe(true);
     for (const f of neutro.F.values()) delete f.quebras;
-    expect(noTopo().some((z) => z > 0.1 && z < 0.9)).toBe(true);
+    /* sem a quebra, a borda mistura o topo e a lateral */
+    expect(noTopo().some((z) => z > 1e-6 && z < 1 - 1e-6)).toBe(true);
   });
 });
