@@ -76,15 +76,15 @@ export const TABELA = {
   /* garfo */
   garfo_offset: 45,
   garfo_eixo_a_coroa: 375,
-  garfo_perna_diametro: 26,
+  garfo_perna_diametro: 30,
   garfo_coroa_diametro: 46,
   garfo_coroa_altura: 30,
-  garfo_ombro_largura: 27,
-  garfo_ombro_altura: 22,
-  garfo_perna_diametro_ponta: 18,
+  garfo_ombro_largura: 38,
+  garfo_ombro_altura: 65,
+  garfo_perna_diametro_ponta: 17,
   garfo_coluna_diametro: 28,
   garfo_coluna_alem_da_caixa: 50,
-  garfo_x: 50,
+  garfo_x: 58,
   garfo_folga_pneu: 6,
   /* mesa e guidão */
   mesa_espacador: 10,
@@ -268,22 +268,22 @@ export function derivar(T) {
   const nUp = 16;
   /* cada perna nasce no centro da coroa, dentro do colar, abre num ombro redondo e desce quase vertical; a abertura nunca fica abaixo da folga mínima do pneu */
   const raioPneuG = T.aro_assento_diametro / 2 + T.pneu_altura;
-  const rTopo = raioQ(T.garfo_perna_diametro + 8);
+  const rTopo = raioQ(T.garfo_perna_diametro);
   const rLaminaMm = (u) => rTopo + (raioQ(T.garfo_perna_diametro_ponta) - rTopo) * u;
   const exigeX = (p, r) => (Math.hypot(p[1] - yEixo, p[2] - zEixoFrente) - r < raioPneuG + T.garfo_folga_pneu ? T.pneu_largura / 2 + T.garfo_folga_pneu + r + 0.3 : 0);
   /* a coroa da foto frontal: um corpo cilíndrico no eixo de direção, entre o anel da caixa e as pernas; cada perna nasce na
-     lateral dele, com a curva concentrada no alto (o ombro, um quarto de elipse de `garfo_ombro_largura` por
-     `garfo_ombro_altura`), e desce reta, inclinada até a ponteira (a pessoa apontou as pernas em arco e a coroa sem corpo) */
+     lateral dele, com a curva concentrada no alto (o ombro, que abre `garfo_ombro_largura` ao longo de
+     `garfo_ombro_altura` e vai fechando como uma parábola, o contorno medido na foto frontal), e desce reta, inclinada até a ponteira (a pessoa apontou as pernas em arco e a coroa sem corpo) */
   const H = T.garfo_eixo_a_coroa;
   const rCoroa = raioQ(T.garfo_coroa_diametro);
-  const x0 = rCoroa - rTopo * 0.4;
+  const x0 = rCoroa - rTopo * 0.8;
   const h0 = H - T.garfo_coroa_altura * 0.45;
-  const nOmbro = 6;
+  const nOmbro = 8;
   const pernaBase = [];
   for (let j = 0; j <= nOmbro; j++) {
-    const th = (j / nOmbro) * (Math.PI / 2);
-    const p = naDirecao(h0 - T.garfo_ombro_altura * (1 - Math.cos(th)));
-    pernaBase.push({ p, r: rTopo, exige: 0, x: x0 + T.garfo_ombro_largura * Math.sin(th) });
+    const v = j / nOmbro;
+    const p = naDirecao(h0 - T.garfo_ombro_altura * v);
+    pernaBase.push({ p, r: rTopo, exige: 0, x: x0 + T.garfo_ombro_largura * (1 - (1 - v) ** 2) });
   }
   const hReta = h0 - T.garfo_ombro_altura, xReta = x0 + T.garfo_ombro_largura;
   for (let i = 1; i <= nUp; i++) {
