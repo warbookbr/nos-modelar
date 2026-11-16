@@ -120,6 +120,7 @@ Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 | Carrinho de mão como família de objeto | candidato apontado pela pessoa em 2026-10-11, vindo de `CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md` (histórico retirado, ver [a crônica](../decisoes/HISTORICO-RETIRADO.md)): chassi, caçamba e a roda no perfil de carrinho de mão, a partir do carrinho azul aprovado |
 | Bacia em casca como primitiva | candidato apontado pela pessoa em 2026-10-11, vindo do mesmo documento: a caçamba generalizada, com parede inclinada e contorno em D ou retangular |
 | Dobradiça de caneco para a porta sobreposta passar de 90° | candidato apontado pela pessoa em 2026-10-11, vindo do mesmo documento, junto com as ressalvas do fechamento do plano das ferramentas de modelagem |
+| Isolar uma instância de parte repetida na bancada | `--selecionadas=<parte> --modo=isolar --focar` isola a parte inteira, e numa parte que se repete (os dois pedais da `bicicleta-urbana`, em 2026-11-16) o enquadramento pega as duas cópias e cada uma sai pequena; `--mirar` com `--distancia` no ponto de uma cópia também saiu pequeno. Para ver um pedal só foi preciso gerar em 4000 px e recortar por script. Falta escolher uma instância (por índice, lado ou ponto) e enquadrar só ela |
 
 Dezesseis linhas que diziam "concluído" saíram desta tabela em 2026-09-11. Elas
 descreviam trabalho entregue, e candidato entregue não é candidato: o registro
