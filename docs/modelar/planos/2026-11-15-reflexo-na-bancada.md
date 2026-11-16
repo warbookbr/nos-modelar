@@ -1,6 +1,6 @@
 # Reflexo na bancada: a superfície de lataria julgada sem o Blender
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `tools/modelar/olhar-bancada.mjs`, `src/bancada/visoes/`, `tools/modelar/vistas-para-critica.mjs`, `tools/modelar/vistas-de-superficie.mjs`, `docs/modelar/usar/PARE-E-ANALISE.md`, `docs/modelar/banco-de-provas/reflexo-na-bancada-2026-11-15/`, `tools/fixtures/acervo/chapa-de-reflexo-de-prova/`, `tools/fixtures/acervo/chapa-lisa-de-reflexo-de-prova/`, `tools/fixtures/reflexo-calibracao/`, `tools/modelar/pente-de-curvatura.mjs`, `tools/modelar/pente-de-curvatura.test.mjs`, `tools/modelar/mapa-de-desvio.mjs`, `tools/modelar/mapa-de-desvio.test.mjs`, `tools/modelar/continuidade-nas-emendas.mjs`, `tools/modelar/continuidade-nas-emendas.test.mjs`, `tools/modelar/suavidade-por-regiao.mjs`, `tools/modelar/suavidade-por-regiao.test.mjs`, `tools/modelar/imagem-de-medida.mjs`, `src/bancada/componentes/ponte-da-captura.js`, `src/autoria/visoes-da-captura.js`
 
@@ -70,7 +70,7 @@ O modelador, o crítico e a pessoa veem a superfície de uma peça de lataria po
 4. Feita (e081ceb8): continuidade nas emendas e índice de suavidade, com a extração de `imagem-de-medida.mjs`, provados nas chapas de calibração e no quarto traseiro antes e depois da rodada 2 do carro.
 5. Feita: pacote e paridade: a zebra e a pintura no `pedido.md`; a luz rasante e a curvatura da bancada medidas contra as do Blender (fração iluminada, posição do amassado, escala de cor). Saída: o relatório e a decisão da pessoa sobre exigir o Blender.
 6. Feita: sem o Blender, decidido pela pessoa em 2026-11-16 pela paridade da fatia 5: o `vistas:critica` captura a luz rasante e a curvatura pela bancada, com a fração iluminada medida e a recusa abaixo de 25%, o pacote e `superficieDoPacote` aceitam essas imagens, a vista de três quartos é medida contra o Blender antes de entrar, a vista de quina sai também delas, e a exigência de `MODELAR_BLENDER` deixa o pacote de lataria (o Blender fica como conferência opcional).
-7. Instrução: o estudo de leitura da zebra nas chapas de calibração, a instrução de como ler a zebra, a pintura, o pente e o mapa de desvio no guia, provada pelo crítico cego, e o fechamento.
+7. Feita (0a4fe50e a 50660490): instrução: o estudo de leitura da zebra nas chapas de calibração, a instrução de como ler a zebra, a pintura, o pente e o mapa de desvio no guia, provada pelo crítico cego, e o fechamento.
 
 ## Sucessor
 
@@ -82,4 +82,8 @@ A captura roda num navegador sem placa de vídeo, e o material de verniz com amb
 
 ## Fechamento
 
-Em aberto.
+Concluído em 2026-11-16, por decisão da pessoa depois da terceira rodada da prova cega. A bancada captura por comando a zebra (deitada e em pé, `--angulo-da-zebra`), a pintura de estúdio, a luz rasante e a curvatura, e o pacote do crítico de lataria leva as quatro sem o Blender, que fica como conferência com `--com-blender`; a paridade com o Blender foi medida na chapa de prova e no quarto traseiro (posição do amassado a 2,4 mm, a mesma escala de curvatura, correlação de 0,95 a 0,999), e a vista de três quartos entrou depois de medida. As ferramentas de medida `desvio`, `pente`, `emendas` e `suavidade` acham, nas chapas de calibração, cada defeito declarado com o tipo e o tamanho certos, por teste. O guia `PARE-E-ANALISE.md` tem a seção Ler o reflexo, e o pedido de lataria traz a leitura curta.
+
+Gate: a captura com `--enquadrar`, a zebra e a pintura que mostram o amassado e as faixas paralelas na lisa, por teste, o pedido da lataria com as visões e o crítico cego achando o amassado na chapa de prova, a pessoa julgando a superfície pela pintura e pelas medidas, o pente e o mapa de desvio nos números declarados, e a paridade com a decisão da pessoa sobre o Blender estão cumpridos. A leitura cega da zebra nas chapas de calibração ficou em cinco de sete na terceira e última rodada (duas e três nas anteriores), com o vinco suave lido como degrau; a pessoa aceitou fechar assim, com a zebra lida pelo crítico como apoio e a fronteira entre vinco e degrau decidida pela medida de emendas, escrita no guia. Commits: b14d782e, 82f30228, 0a7f465d, e081ceb8, ffc4a277, 9f9ea5cf, 0a4fe50e, f90a0762, 7ff3f86b e o registro das rodadas no banco de provas até 50660490.
+
+Candidatos ao backlog: a nota do crítico por perguntas fechadas e em duas ordens, que o sucessor já traz; a altura da luz rasante imposta pela captura (já no backlog); e a escolha de quina das imagens de superfície pela fração do quadro, que vale para as visões da bancada e deve valer para qualquer imagem nova do pacote.
