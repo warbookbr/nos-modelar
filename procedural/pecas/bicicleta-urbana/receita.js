@@ -125,7 +125,6 @@ export const TABELA = {
   canote_cabeca_comprimento: 16,
   canote_cabeca_sobra: 2.5,
   selim_trilho_diametro: 6,
-  selim_trilho_x: 28,
   selim_lados: 48,
     /* transmissão */
   dentes_coroa: 40,
@@ -191,9 +190,11 @@ const SELIM_MEDIDO = {
   presilha: 120,
   topo: [[0, -12], [6, 1], [12, 2], [18, 1], [31, 0], [43, 0], [55, -1], [68, -2], [80, -3], [98, -3], [110, -4], [123, -4], [141, -3], [160, -2], [178, -1], [196, 0], [209, 0], [221, -1], [233, -3], [240, -5], [246, -7], [252, -12], [256, -18]],
   base: [[0, -17], [6, -21.5], [12, -24.5], [18, -26], [25, -34], [31, -38], [37, -41], [43, -43], [55, -46], [68, -50], [86, -51], [98, -50], [104, -46], [116, -42], [129, -38], [141, -34], [153, -31], [166, -29], [178, -27.5], [196, -27.5], [215, -29], [227, -29.5], [240, -28.5], [252, -26], [256, -25.6]],
+  /* a meia distância entre os trilhos, medida de frente: abrem sob as abas e chegam à presilha a 22 mm do centro */
+  trilhoX: [[58, 30], [95, 24], [110, 22], [135, 22], [165, 19], [184, 15]],
   trilho: [[58, -40], [66, -56], [75, -60.5], [87, -62], [100, -63.5], [115, -64], [130, -62], [145, -57], [155, -51.5], [163, -46], [170, -41], [177, -35], [184, -25]],
   abaCima: [[0, 0], [0.6, 0], [0.64, -0.021], [0.72, -0.045], [0.8, -0.089], [0.89, -0.179], [0.97, -0.334], [1, -0.62]],
-  abaBaixo: [[0, -0.872], [0.45, -0.872], [0.55, -0.915], [0.64, -0.936], [0.72, -0.957], [0.8, -1], [0.89, -1], [0.97, -0.915], [1, -0.68]],
+  abaBaixo: [[0, -0.7], [0.3, -0.74], [0.45, -0.86], [0.55, -0.915], [0.64, -0.936], [0.72, -0.957], [0.8, -1], [0.89, -1], [0.97, -0.915], [1, -0.68]],
   planta: [[0, 8], [4, 30], [10, 48], [18, 62], [26, 70], [35, 74], [95, 74], [110, 66], [125, 48], [140, 32], [155, 24], [170, 22], [235, 19], [244, 16], [250, 12], [256, 7]],
   larguraAba: 74,
   larguraNariz: 22,
@@ -429,12 +430,14 @@ export function derivar(T) {
     const [s0, s1] = [SM.trilho[0][0], SM.trilho[SM.trilho.length - 1][0]];
     for (let i = 0; i <= 40; i++) {
       const sMm = s0 + ((s1 - s0) * i) / 40;
-      trilho.push([lado * Math.min(T.selim_trilho_x, 0.7 * meiaLargura(sMm)), yRef + interp(SM.trilho, sMm), zDoSelim(sMm)]);
+      trilho.push([lado * Math.min(interp(SM.trilhoX, sMm), 0.7 * meiaLargura(sMm)), yRef + interp(SM.trilho, sMm), zDoSelim(sMm)]);
     }
     tubo('selim', 'preto', trilho, trilho.map(() => raioQ(T.selim_trilho_diametro)), 12);
   }
   /* braçadeira pequena e escura sob o assento, sobre o topo do canote */
-  torno('selim', 'preto', [[0, -T.selim_trilho_x - 4], [rBraco, -T.selim_trilho_x - 4], [rBraco, T.selim_trilho_x + 4], [0, T.selim_trilho_x + 4]], [0, apoio[1] + rBraco - 2, apoio[2]], { lados: 20, liso: 40 });
+  /* a presilha só abraça os dois trilhos, na distância deles sobre o canote */
+  const xPresilha = interp(SELIM_MEDIDO.trilhoX, SELIM_MEDIDO.presilha) + T.selim_trilho_diametro / 2 + 3;
+  torno('selim', 'preto', [[0, -xPresilha], [rBraco, -xPresilha], [rBraco, xPresilha], [0, xPresilha]], [0, apoio[1] + rBraco - 2, apoio[2]], { lados: 20, liso: 40 });
 
   /* RODAS: cubo, aro, pneu e raios no mesmo corpo */
   const rodas = [['rodaDianteira', zEixoFrente, T.eixo_dianteiro_largura], ['rodaTraseira', zEixoTras, T.eixo_traseiro_largura]];
