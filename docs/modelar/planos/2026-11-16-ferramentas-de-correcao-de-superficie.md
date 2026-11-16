@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/nucleo/gaiola-por-rede.js`, `procedural/nucleo/gaiola-por-rede-liso.js`, `procedural/nucleo/curva-da-gaiola.js`, `procedural/nucleo/operacoes/abertura-por-contorno.js`, `procedural/nucleo/subdivisao.js`, `procedural/nucleo/alisar-curvas.js`, `tools/fixtures/correcao-de-superficie/`, `docs/modelar/banco-de-provas/correcao-de-superficie-2026-11-16/`, e os testes desses arquivos.
+**Território:** `procedural/nucleo/gaiola-por-rede.js`, `procedural/nucleo/gaiola-por-rede-liso.js`, `procedural/nucleo/curva-da-gaiola.js`, `procedural/nucleo/operacoes/abertura-por-contorno.js`, `procedural/nucleo/subdivisao.js`, `procedural/nucleo/operacoes/subdivisao.js`, `procedural/nucleo/uso-operacoes.js`, `procedural/nucleo/operacoes/abertura-por-contorno-simetria.test.ts`, `procedural/nucleo/alisar-curvas.js`, `tools/fixtures/correcao-de-superficie/`, `docs/modelar/banco-de-provas/correcao-de-superficie-2026-11-16/`, e os testes desses arquivos.
 
 Ativado pela pessoa em 2026-11-16, no lugar do plano do robô humanoide, que foi congelado. A lataria do carro não entra: ela é do plano do carro, que roda a rodada 3 com as ferramentas novas.
 
@@ -60,8 +60,8 @@ Resolver a gaiola inteira por energia (Halstead, Kass e DeRose, 1993): ADIAR, s�
 
 ## Fatias
 
-1. As chapas de prova e a linha de base medida (índice, pente, emendas, G2 por região), incluindo o quarto traseiro da rodada 2.
-2. O corte com simetria e a costura em x 0 exato, que destrava a rodada 3 mais cedo.
+1. Feita: as chapas de prova e a linha de base medida (índice, pente, emendas, G2 por região), incluindo o quarto traseiro da rodada 2.
+2. Feita: o corte com simetria e a costura em x 0 exato (opções `costuraExata` da subdivisão e `simetria` da abertura, sem mudar o acervo), que destrava a rodada 3 mais cedo.
 3. O alisamento das curvas declaradas.
 4. A emenda com continuidade declarada.
 5. A medida do G2 alcançável e a decisão da pessoa sobre o caminho.

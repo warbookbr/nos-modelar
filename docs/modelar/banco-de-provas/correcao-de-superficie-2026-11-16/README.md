@@ -1,0 +1,43 @@
+# Correção de superfície: chapas de prova, linha de base e corte com simetria
+
+Registro das fatias 1 e 2 do plano [ferramentas de correção de superfície](../../planos/2026-11-16-ferramentas-de-correcao-de-superficie.md), medidas em 2026-11-16. Os números completos estão em `linha-de-base.json`, gerado por
+
+```
+node tools/fixtures/correcao-de-superficie/linha-de-base.mjs --com=carro-fastback/lataria --saida=docs/modelar/banco-de-provas/correcao-de-superficie-2026-11-16/linha-de-base.json
+```
+
+que roda `suavidade`, `pente`, `emendas` e `ondulacao` pelas próprias ferramentas, com as opções de `ALVOS` no mesmo arquivo, e mede o G2 por região. As chapas de prova levam uns 40 s; o quarto traseiro, uns 6 min sem o cache de medida.
+
+## As chapas de prova
+
+Ficam em `tools/fixtures/correcao-de-superficie/`, com a forma e o defeito declarados em `chapas.mjs` e uma `receita.js` por chapa. A `rede-com-ruido` é um painel de 1000 por 500 mm de `gaiolaPorRede` com quatro retalhos, um deles (`D`) de cinco lados, cujo centro é vértice extraordinário de valência 5; cada ponto-chave que não é nó sai da superfície em y pelo ruído declarado em `RUIDO` (amplitude 2 mm, sequência de ângulo áureo, 36 pontos), e os nós são os pontos duros. A `rede-sem-ruido` é a de controle. A `chapa-simetrica` é a metade x >= 0 de uma casca de seção em quarto de elipse com `simetria: 'x'` na rede, 2 mm de espessura e um vão lateral de 300 por 150 mm por `aberturaPorContorno` na vista 'x', sentido '+'; a `chapa-simetrica-espelhada` é a mesma com as duas opções da fatia 2. As `emenda-g0`, `emenda-g1` e `emenda-g2` são dois retalhos de uma rede que se encontram na curva `emenda`, cada um uma parte: G2 com os dois lados em arco de 1,5 m, G1 com 0,5 m contra 1,5 m (razão 3, tangente comum) e G0 com o lado direito girado 6 graus e a curva em vinco vivo.
+
+## Linha de base
+
+O índice de suavidade está em 1/m², por parte; o pente dá os saltos de curvatura de cada corte e o maior deles em 1/m; a emenda dá o maior ângulo e a mediana da razão de curvatura; a ondulação dá as falhas e a maior amplitude.
+
+| Chapa | Suavidade por região | Pente (saltos e maior salto) | Emendas | Ondulação |
+|---|---|---|---|---|
+| rede-com-ruido | A 12,0; B 13,0; C 13,5; D 33,0 | z:125 0; z:375 2 (0,48); x:250 2 (0,42); x:750 5 (1,82) | 4, 3 acusam; ângulo até 1,11°, razão mediana 1,32 a 1,65 | 9 falhas, 0,60 mm |
+| rede-sem-ruido | A 4,8; B 4,6; C 8,0; D 32,6 | z:125 0; z:375 2 (0,59); x:250 2 (0,49); x:750 4 (1,85) | 4, 2 acusam; ângulo até 0,33°, razão mediana 1,24 a 1,68 | 2 falhas, 0,68 mm |
+| chapa-simetrica (lado centro) | 9,59 | z:250 2; z:500 6 (0,86); z:750 2 | uma parte só | 2 falhas, 0,38 mm |
+| emenda-g2 | 2,66 e 2,66 | z:200 0 | ângulo 0,39°, razão 1,00 | 0 |
+| emenda-g1 | esquerda 9,02, direita 4,29 | z:200 1 (0,74) | ângulo 0,83°, razão mediana 1,34 (máxima 1,77) | 0 |
+| emenda-g0 | 3,45 e 3,45 | z:200 2 (4,59) | ângulo 6,76° (mediana 6,61), razão 1,00 | 0 |
+| quarto traseiro (lado centro) | chapa 349,2; paralamaTraseiro 878,6; rebaixoLateral 43,3 | y:600 8 (0,53); y:850 4 (1,22); z:-800 25 (42,5); z:-1700 28 (60,5) | 7, 5 acusam; o maior ângulo, 56,6°, é o degrau em vinco do ombro | 11 falhas, 0,79 mm |
+
+O ruído de 2 mm sobe o índice dos retalhos de quatro lados de 4,6 a 8,0 para 12,0 a 13,5, de duas a três vezes o controle, e é isso que o alisamento da fatia 3 precisa levar a menos da metade. No retalho `D` o ruído quase não aparece, porque o índice dele é dominado pelo vértice extraordinário (ver abaixo). O pente quase não distingue o ruído do controle: os saltos dos cortes z:375, x:250 e x:750 existem nas duas redes e estão nas curvas entre retalhos e no centro de `D`, onde a curvatura do preenchimento muda de um retalho para outro. Nas emendas, a G2 declarada sai em 0,39° e razão 1,00, a G1 declarada com razão 3 sai com razão mediana de 1,34, porque a subdivisão alisa a curvatura através da curva compartilhada, e a G0 sai com os 6° declarados mais 0,8° do arco. O quarto traseiro bate com a rodada 2 registrada no plano do carro (índice 349 da chapa com `--lado=centro`, 11 falhas de 0,79 mm); os cortes em z atravessam os vincos declarados do ombro e da coluna, e os saltos deles são das dobras, não de ondulação.
+
+## G2 por região e vértices extraordinários
+
+Os vértices extraordinários foram achados de dois jeitos que se conferem. O primeiro é a declaração da gaiola: `gaiolaPorRede` devolve `extraordinarios`, pego da chapa de prova em `REDE` e do quarto traseiro por `capturarGaiolas` enquanto a receita monta os passos, com o espelho de cada um na simetria. O segundo é a malha entregue: o vértice de dentro da pele medida (toda aresta dele com duas faces) cujas faces em volta são todas quadriláteros e não são quatro. Cada vértice da malha é casado com o da gaiola mais perto a até um espaçamento da gaiola (a mediana das arestas dela). O índice de cada região é então partido em dois, a zona de 80 mm em volta de cada extraordinário casado e o resto.
+
+Na rede, a gaiola declara um só, `D.centro`, de valência 5, e a malha acha um só, casado com ele. O índice da zona dele é 58,3 1/m² no controle e 50,9 com ruído, contra 24,8 e 30,2 no resto de `D` e 4,6 a 13,5 nos retalhos regulares: a curvatura em volta do extraordinário varia de cinco a doze vezes mais que num retalho regular, sem ruído nenhum, o que é o limite G1 da subdivisão previsto pela pesquisa. No quarto traseiro a gaiola declara `c_tampa.centro` de valência 3 e o espelho dele; a malha acha 18 vértices nessa condição, dos quais 2 casam com a gaiola. Os outros 16 têm valência 5 e ficam na borda dos vãos cortados depois da subdivisão (arco da roda dos dois lados, vidro lateral, lanterna e vidro traseiro): são da repartição da booleana, e não da gaiola. A conferência das valências da gaiola cheia (toda face, a costura e as bordas) confirma que ela só tem esse vértice de dentro com valência diferente de 4. A zona dele tem índice 183,6, abaixo dos 350,0 do resto da chapa, porque o resto carrega o degrau do ombro e os cantos da tampa.
+
+## Fatia 2: o corte com simetria e a costura em x 0 exato
+
+O atrito da rodada 2 se reproduz na `chapa-simetrica` e no repro do ramo carro (`tmp/carro-r2/repro-espelho.mjs`): a casca tem 1 vértice em x 0 exato e 145 a menos de 1e-6 m dele sem estar, e o vão sai só no lado +x. A face de fora da subdivisão já sai exata na gaiola sem medidas (no repro, 13 de 13), mas a face interna da espessura, que se desloca pela normal média, fica a 1e-19 m do plano, e com as medidas da rede a de fora também fica; o `espelha` só solda o vértice com x igual a 0.
+
+As duas opções novas, nenhuma automática, resolvem os dois. `costuraExata: true` no passo `subdivisao` (só com `simetria: 'x'`) põe em x 0 exato todo vértice da superfície a até 1e-12 do porte dela do plano, e o da face interna que corresponde a cada um. `simetria: 'x'` no passo `aberturaPorContorno` corta o vão desenhado e o espelhado na mesma booleana, com os dois prismas num sólido só (os ids dos vértices novos são os do bloco do passo, e dois cortes no mesmo passo colidiriam), e separa as bordas pelo desenho que cada uma segue; nas vistas 'y' e 'z' o espelho troca o sinal de u, na 'x' inverte o sentido (e os dois prismas recuam um milésimo da profundidade da chapa do plano entre as camadas, para não dividirem a tampa), e na vista por vetor o vetor troca o sinal de dx. A origem sem parte é a chapa com os dois vãos, `parede` e `lente` juntam os dois, `borda` é a do vão declarado e `espelho.borda` a do outro, e `neutro.aberturas` ganha uma entrada por vão, a espelhada com `espelho: true`. O vão que toca o plano recusa. Na `chapa-simetrica-espelhada` a casca sai com 146 vértices em x 0 exato e nenhum perto sem estar, um vão de cada lado e a malha fechada, com o índice de 9,60 contra 9,59. No quarto traseiro, com as duas opções aplicadas numa cópia fora do repositório (a receita é do plano do carro e não mudou), o vidro lateral (vista 'x') e a lanterna (vista 'z') saem nos dois lados, sem órfão, e a costura fica com 537 vértices em x 0 exato; sobram 3 a menos de 1e-6, que são vértices da booleana do vidro traseiro, que cruza o plano.
+
+A costura exata não pode ser automática: mudaria a malha, por resíduos de 1e-19 a 1e-13 m, de cinco peças do acervo com subdivisão simétrica e espessura (carenagem-de-prova, carro-fastback/lataria e as três partes do sedã). Sem as opções, o acervo não muda: o estado canônico do furgão (17 vãos por contorno), do quarto traseiro, da carenagem e dos vidros do sedã é o mesmo, byte a byte, antes e depois, e o retrato do acervo está no relatório da fatia.

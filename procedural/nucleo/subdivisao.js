@@ -670,6 +670,31 @@ export function operadorDasMedidas(gaiola, medidas) {
   return { aplicar, exato, tamanho: nV };
 }
 
+/** Fração do porte da superfície até a qual um vértice está no plano x = 0 da simetria: o vértice fora da costura tem a imagem
+ *  dele a 2 |x|, e a essa distância os dois seriam o mesmo ponto. */
+export const FOLGA_DA_COSTURA = 1e-12;
+
+/** costuraEmXExata(vertices, nSuperficie, comInterna) -> { vertices, mudaram }
+ *  Na superfície subdividida de uma gaiola espelhada, a costura é o plano x = 0, mas a soma em ordem diferente das duas metades
+ *  (e a normal média da espessura, na face interna) deixa nela resíduos de 1e-19 a 1e-17 m, e a solda que procura x igual a 0
+ *  não a acha. Devolve a lista nova com x = 0 exato nos vértices da superfície (os `nSuperficie` primeiros) a até
+ *  FOLGA_DA_COSTURA do porte do plano e, com `comInterna` (a espessura), no vértice da face interna que corresponde a cada um (o
+ *  índice dele mais `nSuperficie`); `mudaram` conta os vértices que saíram do lugar. Não muda a lista recebida. */
+export function costuraEmXExata(vertices, nSuperficie, comInterna = false) {
+  let porte = 0;
+  for (let k = 0; k < nSuperficie; k++) for (const c of vertices[k]) porte = Math.max(porte, Math.abs(c));
+  const folga = FOLGA_DA_COSTURA * porte;
+  const saida = vertices.slice();
+  let mudaram = 0;
+  const zerar = (k) => { if (saida[k][0] !== 0) { saida[k] = [0, saida[k][1], saida[k][2]]; mudaram++; } };
+  for (let k = 0; k < nSuperficie; k++) {
+    if (Math.abs(vertices[k][0]) > folga) continue;
+    zerar(k);
+    if (comInterna) zerar(k + nSuperficie);
+  }
+  return { vertices: saida, mudaram };
+}
+
 /* Espelha a gaiola no plano x = 0 ANTES de subdividir: os vértices com |x| <= tolerância ficam compartilhados pelas duas
  * metades e a costura sai lisa (subdividir a metade e espelhar depois deixaria a costura como borda, na regra de vinco).
  * Vértices novos: os da metade original nos mesmos índices, depois as imagens dos que não estão no plano, na ordem. */

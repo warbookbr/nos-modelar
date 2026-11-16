@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2029 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2030 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -232,6 +232,10 @@
 ## docs/modelar/banco-de-provas/carrinho-refeito-2026-10-08/
 
 - `ATRITOS.md` — Atritos
+
+## docs/modelar/banco-de-provas/correcao-de-superficie-2026-11-16/
+
+- `README.md` — Correção de superfície: chapas de prova, linha de base e corte com simetria
 
 ## docs/modelar/banco-de-provas/costura-em-no-de-tubos-2026-11-15/
 

@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:96c7058aac1a4bd41ef2867e85d8a56dbdd6a73f812a590c920cf5d31aa0c7c7",
+  "assinatura": "sha256:0f2c8be1452cf603336a47a80376f2593fdc84f984b0966f5cd431c20affaf6f",
   "total": 42,
   "operacoes": [
     {
@@ -105,6 +105,11 @@
             "limpezaFina": {
               "type": "boolean",
               "description": "true: a limpeza da costura não torna lasca uma face de pele saudável e a face com três cantos alinhados se divide por uma diagonal (o vão que dobra uma quina pede); false: a limpeza de antes. Sem ele, true na vista por vetor oblíqua e false nos eixos x, y e z, para a malha de vãos já aceitos não mudar."
+            },
+            "simetria": {
+              "type": "string",
+              "minLength": 1,
+              "description": "'x': o vão desenhado num lado do plano x = 0 sai também no outro, espelhado, na chapa simétrica (como a de subdivisao com simetria: 'x'), por exemplo { vista: 'y', simetria: 'x', contorno: { inicio: [0.12, -0.04], trechos: [...] } }. Na vista 'x' pede sentido, e o espelho corta o sentido oposto; na vista por vetor, o vetor com dx trocado de sinal. Sem ele, só o vão desenhado, mesmo na chapa com simetria."
             }
           }
         },
@@ -261,7 +266,8 @@
           "Dois vãos vistos do mesmo eixo: o contorno do segundo precisa de 0,3 mm ou mais de folga do furo do primeiro (a bateria de 2026-11-06 mediu); abaixo disso a limpeza funde vértices da borda do primeiro e o passo recusa com a medida, e o contorno que toca o furo ou entra nele recusa como contorno que cruza a borda da chapa. Vãos de vistas diferentes só precisam que o do segundo não toque o furo do primeiro visto do eixo dele.",
           "Com sentido, a camada cortada é a que fica de um lado do plano que passa entre as duas, medido nos pontos do contorno e numa grade dentro dele; a outra camada que passe desse plano fora do contorno recusa o vão pela borda, e a recusa diz o plano. A camada do meio de um corpo de três não se alcança.",
           "A limpeza da costura deixa a lasca que não acha como desfazer (na sela de flanco forte, uma face da parede ou da lente com quatro pontos alinhados) e a conta em limpeza.finasRestantes do registro, das faces que a booleana devolveu (limpeza.escopoDasFinas diz se foi o trecho recortado da vizinhança ou a chapa inteira); o gate de malha a acusa. O registro vizinhanca diz se o vão recortou o trecho e por qual caminho (via: direto, paredes soltas ou tubo absorvido, com facesDeTubo), ou o motivo de a booleana ter visto a chapa inteira.",
-          "Vão que atravessa a emenda de duas chapas e contorno em três dimensões livre ficam de fora."
+          "Vão que atravessa a emenda de duas chapas e contorno em três dimensões livre ficam de fora.",
+          "Com simetria: 'x', o vão espelhado corta a chapa que o vão declarado deixou, no mesmo passo: a origem sem parte é a chapa com os dois vãos, parede e lente juntam os dois, borda é a do vão declarado (a que o friso segue) e espelho.borda a do outro. O vão declarado que toca ou cruza o plano x = 0 (a borda a menos de 0,1 mm dele) recusa."
         ],
         "diagnosticos": []
       }
@@ -4694,6 +4700,10 @@
               "minLength": 1,
               "description": "'x': a gaiola é a metade x >= 0 e é espelhada antes de subdividir, com a costura lisa."
             },
+            "costuraExata": {
+              "type": "boolean",
+              "description": "Com simetria: 'x', true põe a costura em x = 0 exato, na superfície e na face interna da espessura (sem ele, a face interna fica a 1e-19 m do plano e a solda pelo plano não a acha), por exemplo { simetria: 'x', espessura: 0.002, costuraExata: true }. Padrão false, para a malha das peças aceitas não mudar."
+            },
             "medidas": {
               "type": "array",
               "description": "Cotas da gaiola: o nome de ponto é cota exata, por onde a superfície limite passa; { ponto, peso } é cota que a superfície aproxima por mínimos quadrados, sem passar por ela, com os pontos em volta presos perto da gaiola declarada (peso 1 pesa o desvio à cota igual ao deslocamento de um ponto da gaiola; quanto maior, mais perto da cota). Os pontos não citados ficam onde foram declarados. Com pesoPadrao, o nome sozinho ganha o peso dele, e a cota exata é { ponto, exata: true }."
@@ -5150,7 +5160,7 @@
       }
     }
   ],
-  "assinaturaComExtensoes": "sha256:bec3279a8f9c16994aadf70d26a12f0e3a160fd081ccb8aee9a9cea68ea10f5d",
+  "assinaturaComExtensoes": "sha256:3394aef18cbc4b86b79bbfc48c18ae6e3266d2f5d71a4621d31ac5d5af044d0f",
   "totalExtensoes": 5,
   "extensoes": [
     {

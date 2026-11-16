@@ -134,6 +134,22 @@ const SEGMENTOS_ARCO_PADRAO = 4;
 export const RECUO_PADRAO_DA_LENTE = 2.5;
 /** Distância, em metro, até a qual um vértice da costura é o ponto do polígono desenhado (a Manifold devolve Float32). */
 const NO_POLIGONO = 2e-6;
+/** Distância mínima, em metro, da borda do vão declarado ao plano x = 0 para a simetria espelhá-lo: abaixo dela as duas bordas se
+ *  tocariam no plano. */
+export const FOLGA_DO_PLANO = 1e-4;
+
+/** espelhoDoContorno(vista, quadro, poligono, sentido, num) -> { quadro, poligono, sentido, vista }
+ *  O mesmo vão espelhado no plano x = 0, como o passo o corta: nas vistas 'y' e 'z' o u do desenho é x e troca de sinal; na 'x' o
+ *  desenho é o mesmo e o sentido se inverte, porque o eixo da vista é o que o espelho troca; na vista por vetor, o vetor com dx
+ *  trocado de sinal e cada ponto levado ao quadro dele pelo espelho do ponto no espaço. */
+export function espelhoDoContorno(vista, quadro, poligono, sentido, num = (x) => x) {
+  if (vista === 'x') return { quadro, poligono: poligono.map((p) => [...p]), sentido: sentido === '+' ? '-' : '+', vista };
+  if (typeof vista === 'string') return { quadro, poligono: poligono.map(([u, v]) => [-u, v]), sentido, vista };
+  const d = vista.map(num); const dm = [-d[0], d[1], d[2]];
+  const qm = quadroDaVista(dm);
+  const poligonoM = poligono.map(([u, v]) => { const p = quadro.mundo([u, v, 0]); const l = qm.local([-p[0], p[1], p[2]]); return [l[0], l[1]]; });
+  return { quadro: qm, poligono: poligonoM, sentido, vista: dm };
+}
 
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 const soma = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
@@ -461,6 +477,14 @@ function prismaDoContorno(poligono, q, de, ate) {
   let volume = 0;
   for (const f of faces) for (let k = 1; k + 1 < f.length; k++) volume += ponto(pontos[f[0]], cruz(pontos[f[k]], pontos[f[k + 1]]));
   if (volume < 0) for (const f of faces) f.reverse();
+  return { pontos, faces };
+}
+
+/** Os prismas dos vãos de um passo num sólido só, de componentes separados, para a mesma booleana; o de um vão sai como entrou. */
+function juntarSolidos(solidos) {
+  if (solidos.length === 1) return solidos[0];
+  const pontos = []; const faces = [];
+  for (const s of solidos) { const base = pontos.length; pontos.push(...s.pontos); faces.push(...s.faces.map((f) => f.map((k) => base + k))); }
   return { pontos, faces };
 }
 
@@ -1180,7 +1204,7 @@ export function criarOperacoesAberturaPorContorno(servicos) {
 
   /* `chapaInteiraPor` é só da rede: o motivo com que o vão, recusado no trecho recortado, é refeito na chapa inteira. A operação
      publicada tem a assinatura de todas, `(st, a, i)`. */
-  function abrir(st, a, i, chapaInteiraPor = null) {
+  function abrir(st, a, i) {
     if (a.origemId == null) return grita(st, i, OP, 'origemId', `${OP} é sempre estrutural: origemId é obrigatório (a chapa cortada, a parede e a borda do vão são citadas por ele)`);
     if (!Number.isSafeInteger(a.origemId) || a.origemId < 0) return grita(st, i, OP, 'origemId', 'origemId precisa ser inteiro não-negativo');
     const declaracoes = st.declaracoesOrigem.get(a.origemId) ?? [];
@@ -1236,6 +1260,13 @@ export function criarOperacoesAberturaPorContorno(servicos) {
       return grita(st, i, OP, 'segmentosArco', `o bico em ${texto2(pior.p)} sai com ${fmt(pior.discretizado)} graus contra ${fmt(pior.desenhado)} desenhados (diferença de ${fmt(pior.erro)}, acima dos ${ERRO_MAXIMO_DO_BICO} graus do gate de forma): a corda do primeiro segmento da curva que forma o bico se afasta da tangente dela; ${conserto}`);
     }
 
+    /* A SIMETRIA. Com `simetria: 'x'`, o vão declarado num lado do plano x = 0 sai também no outro: o mesmo contorno, espelhado, corta
+       a chapa que o primeiro corte deixou, pela mesma vista espelhada (na vista 'x', o sentido oposto; na vista por vetor, o vetor
+       com dx trocado de sinal). Sem a declaração, o passo corta só o vão desenhado, como sempre, mesmo na chapa com simetria. */
+    if (a.simetria != null && a.simetria !== 'x') return grita(st, i, OP, 'simetria', `simetria só aceita 'x' (o vão declarado num lado do plano x = 0 sai também no outro, espelhado), e veio ${JSON.stringify(a.simetria)}`);
+    const simetria = a.simetria ?? null;
+    if (simetria && a.vista === 'x' && sentido === null) return grita(st, i, OP, 'sentido', "com simetria: 'x' na vista 'x', o prisma do contorno atravessa o plano de simetria e o vão espelhado é o mesmo prisma; declare sentido ('+' ou '-'), o lado da chapa que o vão declarado corta, e a simetria corta o outro");
+
     // ---- a chapa vista do eixo ----
     const wasm = manifoldCarregada();
     if (!wasm) return grita(st, i, OP, null, `${OP} precisa da biblioteca Manifold, que não carregou: ${erroDaCargaDaManifold()?.message ?? 'motivo desconhecido'}`);
@@ -1244,37 +1275,69 @@ export function criarOperacoesAberturaPorContorno(servicos) {
     if (st.orfaos.length > antes) return;
     const idsDaChapa = [...selecao.faces].sort((x, y) => x - y);
     if (!idsDaChapa.length) return grita(st, i, OP, 'chapa', 'a seleção da chapa não tem face nenhuma');
-    const { eixo, u: iu, v: iv } = quadro;
-    const Vl = noQuadro(st.V, quadro);
-    /* uma passada pela chapa: a profundidade dela no eixo, a caixa dela, e as faces que tocam a caixa do contorno na vista, as únicas
-       que a conferência da projeção e a espessura medem (nenhuma outra face cruza um ponto nem um lado do contorno) */
-    const [u0, v0, u1, v1] = [Math.min(...poligono.map((p) => p[0])), Math.min(...poligono.map((p) => p[1])), Math.max(...poligono.map((p) => p[0])), Math.max(...poligono.map((p) => p[1]))];
-    let wMin = Infinity, wMax = -Infinity;
-    const minDaChapa = [Infinity, Infinity, Infinity], maxDaChapa = [-Infinity, -Infinity, -Infinity];
-    const proximas = new Map();
-    for (const id of idsDaChapa) {
-      const vs = st.F.get(id).vs;
-      let a0 = Infinity, a1 = -Infinity, b0 = Infinity, b1 = -Infinity;
-      for (const v of vs) {
-        const p = st.V.get(v); const l = quadro.identidade ? p : Vl.get(v);
-        for (let c = 0; c < 3; c++) { if (p[c] < minDaChapa[c]) minDaChapa[c] = p[c]; if (p[c] > maxDaChapa[c]) maxDaChapa[c] = p[c]; }
-        const w = l[eixo]; if (w < wMin) wMin = w; if (w > wMax) wMax = w;
-        if (l[iu] < a0) a0 = l[iu]; if (l[iu] > a1) a1 = l[iu]; if (l[iv] < b0) b0 = l[iv]; if (l[iv] > b1) b1 = l[iv];
+    const vaos = [{ quadro, poligono, sentido, vista: a.vista }];
+    if (simetria) {
+      /* nas vistas 'y' e 'z' o u do desenho é x: o contorno que chega perto do plano recusa antes do corte */
+      if (a.vista === 'y' || a.vista === 'z') {
+        const us = poligono.map((p) => p[0]); const uMin = Math.min(...us), uMax = Math.max(...us);
+        if (!(uMin > FOLGA_DO_PLANO || uMax < -FOLGA_DO_PLANO)) return grita(st, i, OP, 'simetria', `com simetria: 'x', o vão declarado precisa ficar de um lado só do plano x = 0, a mais de ${mm(FOLGA_DO_PLANO)} mm dele, e o contorno vai de x ${mm(uMin)} a ${mm(uMax)} mm; o vão que toca ou cruza o plano sai inteiro do contorno desenhado sem simetria`);
       }
-      if (!(a1 < u0 - 1e-9 || a0 > u1 + 1e-9 || b1 < v0 - 1e-9 || b0 > v1 + 1e-9)) proximas.set(id, vs);
+      vaos.push(espelhoDoContorno(a.vista, quadro, poligono, sentido, (x) => st.num(x)));
     }
-    const projecao = conferirProjecao(st.V, proximas, poligono, quadro, sentido);
-    if (projecao.recusa) return grita(st, i, OP, 'contorno', projecao.recusa);
-    const margem = 0.25 * (wMax - wMin) + 1e-3;
-    /* com a camada, o prisma vai de fora da chapa, do lado de quem olha, até o plano entre a primeira camada e a seguinte */
-    const de = projecao.corte != null && sentido === '+' ? projecao.corte : wMin - margem;
-    const ate = projecao.corte != null && sentido === '-' ? projecao.corte : wMax + margem;
-    const facesDaCamada = projecao.corte == null ? proximas : new Map([...proximas].filter(([, vs]) => projecao.naCamada(vs)));
-    let prisma;
-    try { prisma = prismaDoContorno(poligono, quadro, de, ate); } catch (e) {
-      if (e instanceof ErroDePerfil) return grita(st, i, OP, 'contorno', e.message);
-      throw e;
+    const corte = cortar(st, a, i, { wasm, limpezaFina, recuoDeclarado, idsDaChapa, vaos });
+    if (corte?.ok) registraOrigem(st, i, OP, a.origemId, corte.registro);
+  }
+
+  /* O corte de um vão: o prisma do polígono na vista, a booleana sobre a chapa (ou o trecho dela em volta), a limpeza da costura e as
+     bordas. Devolve { ok, registro } para o passo registrar a origem, ou o grito. */
+  function cortar(st, a, i, { wasm, limpezaFina, recuoDeclarado, idsDaChapa, vaos }, chapaInteiraPor = null) {
+    /* `vaos` é o vão desenhado e, com a simetria, o espelhado: { quadro, poligono, sentido, vista } cada um. Os dois prismas vão juntos
+       à mesma booleana, porque os ids dos vértices novos são os do bloco do passo, e as bordas se separam pelo lado do plano. */
+    const { quadro, poligono, vista } = vaos[0];
+    const { eixo, u: iu, v: iv } = quadro;
+    const minDaChapa = [Infinity, Infinity, Infinity], maxDaChapa = [-Infinity, -Infinity, -Infinity];
+    const lidos = [];
+    const mesmoEixo = vaos.length > 1 && vaos[1].quadro === vaos[0].quadro && vaos[0].sentido !== vaos[1].sentido;
+    for (const [k, vao] of vaos.entries()) {
+      const q = vao.quadro; const P = vao.poligono;
+      const { eixo: e, u: qu, v: qv } = q;
+      const Vq = noQuadro(st.V, q);
+      /* uma passada pela chapa: a profundidade dela no eixo, a caixa dela, e as faces que tocam a caixa do contorno na vista, as únicas
+         que a conferência da projeção e a espessura medem (nenhuma outra face cruza um ponto nem um lado do contorno) */
+      const [u0, v0, u1, v1] = [Math.min(...P.map((p) => p[0])), Math.min(...P.map((p) => p[1])), Math.max(...P.map((p) => p[0])), Math.max(...P.map((p) => p[1]))];
+      let wMin = Infinity, wMax = -Infinity;
+      const proximas = new Map();
+      for (const id of idsDaChapa) {
+        const vs = st.F.get(id).vs;
+        let a0 = Infinity, a1 = -Infinity, b0 = Infinity, b1 = -Infinity;
+        for (const v of vs) {
+          const p = st.V.get(v); const l = q.identidade ? p : Vq.get(v);
+          if (k === 0) for (let c = 0; c < 3; c++) { if (p[c] < minDaChapa[c]) minDaChapa[c] = p[c]; if (p[c] > maxDaChapa[c]) maxDaChapa[c] = p[c]; }
+          const w = l[e]; if (w < wMin) wMin = w; if (w > wMax) wMax = w;
+          if (l[qu] < a0) a0 = l[qu]; if (l[qu] > a1) a1 = l[qu]; if (l[qv] < b0) b0 = l[qv]; if (l[qv] > b1) b1 = l[qv];
+        }
+        if (!(a1 < u0 - 1e-9 || a0 > u1 + 1e-9 || b1 < v0 - 1e-9 || b0 > v1 + 1e-9)) proximas.set(id, vs);
+      }
+      const projecao = conferirProjecao(st.V, proximas, P, q, vao.sentido);
+      if (projecao.recusa) return grita(st, i, OP, 'contorno', k === 0 ? projecao.recusa : `no vão espelhado pela simetria: ${projecao.recusa}`);
+      const margem = 0.25 * (wMax - wMin) + 1e-3;
+      /* com a camada, o prisma vai de fora da chapa, do lado de quem olha, até o plano entre a primeira camada e a seguinte */
+      let de = projecao.corte != null && vao.sentido === '+' ? projecao.corte : wMin - margem;
+      let ate = projecao.corte != null && vao.sentido === '-' ? projecao.corte : wMax + margem;
+      /* na vista 'x' com simetria os dois prismas param no mesmo plano entre as camadas: cada um recua um milésimo da profundidade da
+         chapa, para não dividirem a tampa na booleana */
+      if (mesmoEixo && projecao.corte != null) { const recuo = 1e-3 * (wMax - wMin); if (vao.sentido === '+') de += recuo; else ate -= recuo; }
+      const facesDaCamada = projecao.corte == null ? proximas : new Map([...proximas].filter(([, vs]) => projecao.naCamada(vs)));
+      let prismaDoVao;
+      try { prismaDoVao = prismaDoContorno(P, q, de, ate); } catch (e) {
+        if (e instanceof ErroDePerfil) return grita(st, i, OP, 'contorno', e.message);
+        throw e;
+      }
+      lidos.push({ ...vao, Vq, proximas, de, ate, facesDaCamada, prisma: prismaDoVao });
     }
+    const { facesDaCamada } = lidos[0];
+    const proximas = lidos.length === 1 ? lidos[0].proximas : new Map(lidos.flatMap((l) => [...l.proximas]));
+    const prisma = juntarSolidos(lidos.map((l) => l.prisma));
     /* o piso de área da booleana, 2e-9 do quadrado do tamanho da chapa: o canto e a face abaixo de dez pisos se fundem */
     const escala = Math.max(...[0, 1, 2].map((c) => maxDaChapa[c] - minDaChapa[c]));
     const piso = 2e-9 * escala * escala;
@@ -1289,10 +1352,10 @@ export function criarOperacoesAberturaPorContorno(servicos) {
     const topo = BLOCO + FAIXA_ESTENDIDA;
     /* a face toca o prisma quando a projeção dela no desenho encosta no contorno (o prisma atravessa a chapa de lado a lado) */
     const espessuraDaChapa = () => espessuraVistaDoEixo(st.V, facesDaCamada, poligono, quadro);
-    const tocaOPrisma = (id) => {
-      const vs = proximas.get(id);
-      return vs != null && projecaoToca(vs.map((v) => { const l = quadro.identidade ? st.V.get(v) : Vl.get(v); return [l[iu], l[iv]]; }), poligono, TOQUE_NO_PRISMA);
-    };
+    const tocaOPrisma = (id) => lidos.some(({ proximas: perto, quadro: q, Vq, poligono: P }) => {
+      const vs = perto.get(id);
+      return vs != null && projecaoToca(vs.map((v) => { const l = q.identidade ? st.V.get(v) : Vq.get(v); return [l[q.u], l[q.v]]; }), P, TOQUE_NO_PRISMA);
+    });
     const viz = chapaInteiraPor ? { motivo: chapaInteiraPor } : vizinhancaDoVao({ V: st.V, F: st.F, idsDaChapa, proximas, pontosDoPrisma: prisma.pontos, caixaDaChapa: [minDaChapa, maxDaChapa], espessura: espessuraDaChapa, tocaOPrisma });
     const recortada = !viz.motivo;
     const idsPerto = recortada ? viz.ids : idsDaChapa;
@@ -1319,8 +1382,9 @@ export function criarOperacoesAberturaPorContorno(servicos) {
     } : null;
 
     /* a lente sai da Manifold aqui, antes de o corte mexer na peça: a recusa dela não deixa a chapa cortada pela metade */
-    const noPoligono = (P) => (p) => { const l = quadro.local(p); return P.some((q) => Math.hypot(l[iu] - q[0], l[iv] - q[1]) <= NO_POLIGONO); };
-    const noDesenho = noPoligono(poligono);
+    const noPoligono = (P, qd = quadro) => (p) => { const l = qd.local(p); return P.some((q) => Math.hypot(l[qd.u] - q[0], l[qd.v] - q[1]) <= NO_POLIGONO); };
+    const noDesenhoDe = lidos.map((l) => noPoligono(l.poligono, l.quadro));
+    const noDesenho = noDesenhoDe.length === 1 ? noDesenhoDe[0] : (p) => noDesenhoDe.some((f) => f(p));
     let lenteCalculada = null;
     let recuoDaLente = null;
     if (copia) {
@@ -1332,14 +1396,18 @@ export function criarOperacoesAberturaPorContorno(servicos) {
         if (e == null) return grita(st, i, OP, 'recuoDaLente', 'a espessura da chapa no contorno não se mede pela reta do eixo, e o recuo padrão da lente depende dela; declare recuoDaLente em metro');
         recuoDaLente = RECUO_PADRAO_DA_LENTE * e;
       }
-      const recuado = recuarPoligono(poligono, recuoDaLente);
+      const recuados = lidos.map((l) => recuarPoligono(l.poligono, recuoDaLente));
+      const recuado = recuados[0];
       if (recuado.erro) return grita(st, i, OP, 'recuoDaLente', `a lente não cabe no vão: ${recuado.erro}; reduza recuoDaLente (o recuo de 0 deixa a lente do tamanho do vão)`);
+      const naoCabe = recuados.find((x) => x.erro);
+      if (naoCabe) return grita(st, i, OP, 'recuoDaLente', `a lente não cabe no vão espelhado pela simetria: ${naoCabe.erro}; reduza recuoDaLente`);
       let r;
-      try { const prismaDaLente = recuoDaLente > 0 ? prismaDoContorno(recuado.poligono, quadro, de, ate) : prisma; r = intersecaoNaManifold(wasm, [copia, prismaDaLente], extremosDos([minDaChapa, maxDaChapa, ...prismaDaLente.pontos])); } catch (e) { return grita(st, i, OP, 'lente', `a lente não saiu: ${e.message}`); }
+      try { const prismaDaLente = recuoDaLente > 0 ? juntarSolidos(lidos.map((l, k) => prismaDoContorno(recuados[k].poligono, l.quadro, l.de, l.ate))) : prisma; r = intersecaoNaManifold(wasm, [copia, prismaDaLente], extremosDos([minDaChapa, maxDaChapa, ...prismaDaLente.pontos])); } catch (e) { return grita(st, i, OP, 'lente', `a lente não saiu: ${e.message}`); }
       const facesL = new Map(r.faces.map((f, k) => [k, f.vs]));
       const paredeL = new Set(r.faces.map((f, k) => (f.solido === 1 ? k : -1)).filter((k) => k >= 0));
       const costuraL = new Set([...paredeL].flatMap((k) => facesL.get(k)));
-      const naVoltaDaLente = noPoligono(recuado.poligono);
+      const naVoltaDe = lidos.map((l, k) => noPoligono(recuados[k].poligono, l.quadro));
+      const naVoltaDaLente = naVoltaDe.length === 1 ? naVoltaDe[0] : (p) => naVoltaDe.some((f) => f(p));
       const fixosL = new Set([...costuraL].filter((v) => naVoltaDaLente(r.pontos[v])));
       const limpaL0 = limparCostura({ pos: (v) => r.pontos[v], faces: facesL, costura: costuraL, fixos: fixosL, piso, parede: paredeL, guardaDeFina: limpezaFina });
       const limpaL = tirarValenciaDois(fundirLascas({ pos: (v) => r.pontos[v], faces: limpaL0.faces, costura: costuraL, parede: paredeL, piso }).faces);
@@ -1380,7 +1448,7 @@ export function criarOperacoesAberturaPorContorno(servicos) {
         const recusa = st.orfaos[antesDoCorte].motivo;
         st.orfaos.length = antesDoCorte;
         tirarPrisma();
-        return abrir(st, a, i, `a booleana recusou o trecho recortado (${recusa.slice(0, 160)}), e o vão foi refeito na chapa inteira`);
+        return cortar(st, a, i, { wasm, limpezaFina, recuoDeclarado, idsDaChapa, vaos }, `a booleana recusou o trecho recortado (${recusa.slice(0, 160)}), e o vão foi refeito na chapa inteira`);
       }
       for (const o of st.orfaos.slice(antesDoCorte)) { o.op = OP; o.ref = o.ref === 'solidos' || o.ref === 'solidos[0]' ? 'chapa' : o.ref; o.motivo = `o corte da chapa pela booleana recusou: ${o.motivo}`; }
       tirarPrisma();
@@ -1482,39 +1550,63 @@ export function criarOperacoesAberturaPorContorno(servicos) {
     // ---- as bordas: a de fora é a que encosta na face externa de uma chapa por subdivisão, ou a voltada para o eixo ----
     const casca = new Map(facesPerto.map((f) => [f, st.F.get(f).vs]));
     const voltas = voltasDaBorda(casca, parede);
-    if (!voltas || voltas.length !== 2) return grita(st, i, OP, 'chapa', `o corte deixou ${voltas ? voltas.length : 'uma'} borda${voltas?.length === 1 ? '' : 's'} ${voltas ? '' : 'que não fecha '}em vez das duas de uma chapa (a de fora e a de dentro); confira que a chapa é uma chapa com espessura que o contorno atravessa uma vez`);
+    const nVoltas = 2 * lidos.length;
+    if (!voltas || voltas.length !== nVoltas) return grita(st, i, OP, 'chapa', `o corte deixou ${voltas ? voltas.length : 'uma'} borda${voltas?.length === 1 ? '' : 's'} ${voltas ? '' : 'que não fecha '}em vez ${lidos.length === 1 ? 'das duas de uma chapa (a de fora e a de dentro)' : 'das quatro dos dois vãos (a de fora e a de dentro de cada um)'}; confira que a chapa é uma chapa com espessura que o contorno atravessa uma vez`);
     const externas = new Set();
     for (const regs of st.origens.values()) for (const r of regs) if (r.op === 'subdivisao' && Array.isArray(r.externa)) for (const f of r.externa) externas.add(f);
     const raizDe = (f) => { let x = f; while (st.pedacosDe.has(x)) x = st.pedacosDe.get(x); return x; };
     const facesDaVolta = (volta) => { const s = new Set(volta); return facesPerto.filter((f) => !parede.has(f) && st.F.get(f).vs.some((v) => s.has(v))); };
     const naExterna = (volta) => facesDaVolta(volta).some((f) => externas.has(raizDe(f)));
-    const paraOEixo = (volta) => facesDaVolta(volta).reduce((s, f) => s + newell(st.F.get(f).vs.map((v) => quadro.local(st.V.get(v))))[eixo], 0);
-    let [fora, dentro] = voltas;
-    const ef = naExterna(fora), ed = naExterna(dentro);
-    if (ef !== ed ? ed : paraOEixo(dentro) > paraOEixo(fora)) [fora, dentro] = [dentro, fora];
-    /* cada volta começa no ponto do início do desenho e anda no sentido em que ele foi desenhado */
-    const sentidoDesenhado = Math.sign(areaDoPoligono2(poligono));
-    const ordenar = (volta) => {
-      const q = volta.map((v) => { const l = quadro.local(st.V.get(v)); return [l[iu], l[iv]]; });
-      let lista = Math.sign(areaDoPoligono2(q)) === sentidoDesenhado ? [...volta] : [...volta].reverse();
-      const k = lista.findIndex((v) => { const l = quadro.local(st.V.get(v)); return Math.hypot(l[iu] - poligono[0][0], l[iv] - poligono[0][1]) <= NO_POLIGONO; });
-      if (k > 0) lista = [...lista.slice(k), ...lista.slice(0, k)];
-      return lista;
-    };
-    fora = ordenar(fora); dentro = ordenar(dentro);
-    /* a espessura, medida pela normal da pele de fora entre os pontos do desenho das duas bordas */
-    const espessuras = [];
-    for (const v of fora) {
-      if (!fixos.has(v)) continue;
-      const p = st.V.get(v);
-      const pl = quadro.local(p);
-      const par = dentro.find((w) => { if (!fixos.has(w)) return false; const l = quadro.local(st.V.get(w)); return Math.hypot(l[iu] - pl[iu], l[iv] - pl[iv]) <= NO_POLIGONO; });
-      if (par == null) continue;
-      const n = facesPerto.filter((f) => !parede.has(f) && st.F.get(f).vs.includes(v)).reduce((s, f) => soma(s, newell(st.F.get(f).vs.map((x) => st.V.get(x)))), [0, 0, 0]);
-      if (tamanho(n) > 0) espessuras.push(Math.abs(ponto(sub(p, st.V.get(par)), n)) / tamanho(n));
+    /* com a simetria, cada volta é do vão cujo desenho ela segue (na vista 'x' os dois desenhos coincidem, e decide o lado do plano) */
+    const voltasDe = lidos.map(() => []);
+    if (lidos.length === 1) voltasDe[0].push(...voltas);
+    else {
+      for (const volta of voltas) {
+        const xm = volta.reduce((t, v) => t + st.V.get(v)[0], 0) / volta.length;
+        const conta = noDesenhoDe.map((f) => volta.filter((v) => f(st.V.get(v))).length);
+        const k = conta[0] !== conta[1] ? (conta[0] > conta[1] ? 0 : 1) : lidos.findIndex((l) => (l.sentido === '+') === (xm > 0));
+        voltasDe[k].push(volta);
+      }
+      const torta = voltasDe.findIndex((vs) => vs.length !== 2);
+      if (torta >= 0) return grita(st, i, OP, 'simetria', `o corte com simetria deixou ${voltasDe[0].length} bordas no vão declarado e ${voltasDe[1].length} no espelhado, em vez de duas em cada; o vão declarado precisa ficar de um lado só do plano x = 0, sem tocar o espelho dele`);
+      for (const [k, vs] of voltasDe.entries()) {
+        const xs = vs.flat().map((v) => st.V.get(v)[0]);
+        const xMin = Math.min(...xs), xMax = Math.max(...xs);
+        if (!(xMin > 0 || xMax < 0)) return grita(st, i, OP, 'simetria', `com simetria: 'x', a borda do vão ${k === 0 ? 'declarado' : 'espelhado'} vai de x ${mm(xMin)} a ${mm(xMax)} mm e toca o plano x = 0; o vão que toca ou cruza o plano sai inteiro do contorno desenhado sem simetria`);
+      }
     }
-    espessuras.sort((x, y) => x - y);
-    const espessura = espessuras.length ? espessuras[espessuras.length >> 1] : null;
+    const bordas = [];
+    for (const [k, l] of lidos.entries()) {
+      const q = l.quadro; const P = l.poligono; const { u: qu, v: qv } = q;
+      const paraOEixo = (volta) => facesDaVolta(volta).reduce((s, f) => s + newell(st.F.get(f).vs.map((v) => q.local(st.V.get(v))))[q.eixo], 0);
+      let [fora, dentro] = voltasDe[k];
+      const ef = naExterna(fora), ed = naExterna(dentro);
+      if (ef !== ed ? ed : paraOEixo(dentro) > paraOEixo(fora)) [fora, dentro] = [dentro, fora];
+      /* cada volta começa no ponto do início do desenho e anda no sentido em que ele foi desenhado */
+      const sentidoDesenhado = Math.sign(areaDoPoligono2(P));
+      const ordenar = (volta) => {
+        const pl = volta.map((v) => { const x = q.local(st.V.get(v)); return [x[qu], x[qv]]; });
+        let lista = Math.sign(areaDoPoligono2(pl)) === sentidoDesenhado ? [...volta] : [...volta].reverse();
+        const j = lista.findIndex((v) => { const x = q.local(st.V.get(v)); return Math.hypot(x[qu] - P[0][0], x[qv] - P[0][1]) <= NO_POLIGONO; });
+        if (j > 0) lista = [...lista.slice(j), ...lista.slice(0, j)];
+        return lista;
+      };
+      fora = ordenar(fora); dentro = ordenar(dentro);
+      /* a espessura, medida pela normal da pele de fora entre os pontos do desenho das duas bordas */
+      const espessuras = [];
+      for (const v of fora) {
+        if (!fixos.has(v)) continue;
+        const p = st.V.get(v);
+        const pl = q.local(p);
+        const par = dentro.find((w) => { if (!fixos.has(w)) return false; const x = q.local(st.V.get(w)); return Math.hypot(x[qu] - pl[qu], x[qv] - pl[qv]) <= NO_POLIGONO; });
+        if (par == null) continue;
+        const n = facesPerto.filter((f) => !parede.has(f) && st.F.get(f).vs.includes(v)).reduce((s, f) => soma(s, newell(st.F.get(f).vs.map((x) => st.V.get(x)))), [0, 0, 0]);
+        if (tamanho(n) > 0) espessuras.push(Math.abs(ponto(sub(p, st.V.get(par)), n)) / tamanho(n));
+      }
+      espessuras.sort((x, y) => x - y);
+      bordas.push({ fora, dentro, espessura: espessuras.length ? espessuras[espessuras.length >> 1] : null });
+    }
+    const { fora, dentro, espessura } = bordas[0];
 
     // ---- a lente, calculada antes do corte e posta na peça depois da parede ----
     const lente = [];
@@ -1539,12 +1631,24 @@ export function criarOperacoesAberturaPorContorno(servicos) {
        `limpeza.escopoDasFinas` diz se a conta é do 'trecho' ou da 'chapa' */
     const finasRestantes = [...facesPerto, ...lente].filter((f) => st.F.has(f) && razaoDaFace(st.F.get(f).vs.map((v) => st.V.get(v))) < LIMITE_DE_FACE_FINA).length;
     const vizinhanca = { recortada, faces: idsPerto.length, daChapa: idsDaChapa.length, ...(recortada ? { via: viz.via, facesDeTubo: viz.tubos } : { motivo: viz.motivo }) };
-    (st.aberturas ??= []).push({ passo: i, origemId: a.origemId, vista: a.vista, borda: { fora: [...fora], dentro: [...dentro] }, espessura, parede: [...parede].sort((x, y) => x - y), lente: [...lente], recuoDaLente, vizinhanca, limpeza: { verticesFundidos: limpa.fundidos.size, desvioDaFusao, facesSemArea: limpa.removidas.length + valencia.removidas.length, lascas: lascas.removidas.length, divisoes, finasRestantes, escopoDasFinas: recortada ? 'trecho' : 'chapa' } });
-    registraOrigem(st, i, OP, a.origemId, {
-      faces: facesDaChapaCortada, parede: [...parede].sort((x, y) => x - y), lente, borda: { fora, dentro }, espessura, vista: a.vista, passo: i, lenteDeclarada: !!a.lente, recuoDaLente, vizinhanca,
+    const limpeza = { verticesFundidos: limpa.fundidos.size, desvioDaFusao, facesSemArea: limpa.removidas.length + valencia.removidas.length, lascas: lascas.removidas.length, divisoes, finasRestantes, escopoDasFinas: recortada ? 'trecho' : 'chapa' };
+    (st.aberturas ??= []).push({ passo: i, origemId: a.origemId, vista, borda: { fora: [...fora], dentro: [...dentro] }, espessura, parede: [...parede].sort((x, y) => x - y), lente: [...lente], recuoDaLente, vizinhanca, limpeza: { ...limpeza } });
+    const registro = {
+      faces: facesDaChapaCortada, parede: [...parede].sort((x, y) => x - y), lente, borda: { fora, dentro }, espessura, vista, passo: i, lenteDeclarada: !!a.lente, recuoDaLente, vizinhanca,
       /* o que a limpeza fez na chapa: vértices fundidos e o quanto a superfície saiu do lugar deles, faces que sumiram e lascas */
-      limpeza: { verticesFundidos: limpa.fundidos.size, desvioDaFusao, facesSemArea: limpa.removidas.length + valencia.removidas.length, lascas: lascas.removidas.length, divisoes, finasRestantes, escopoDasFinas: recortada ? 'trecho' : 'chapa' },
-    });
+      limpeza,
+    };
+    if (lidos.length > 1) {
+      /* o vão espelhado: a borda dele, e a parede e a lente do lado dele do plano (a origem sem parte e as partes juntam os dois) */
+      const lado = Math.sign(bordas[1].fora.reduce((t, v) => t + st.V.get(v)[0], 0));
+      const doLado = (f) => Math.sign(st.F.get(f).vs.reduce((t, v) => t + st.V.get(v)[0], 0)) === lado;
+      const espelho = { borda: { fora: bordas[1].fora, dentro: bordas[1].dentro }, espessura: bordas[1].espessura, vista: lidos[1].vista, parede: registro.parede.filter(doLado), lente: lente.filter(doLado) };
+      st.aberturas.at(-1).parede = registro.parede.filter((f) => !doLado(f));
+      st.aberturas.at(-1).lente = lente.filter((f) => !doLado(f));
+      st.aberturas.push({ passo: i, origemId: a.origemId, vista: espelho.vista, espelho: true, borda: { fora: [...espelho.borda.fora], dentro: [...espelho.borda.dentro] }, espessura: espelho.espessura, parede: espelho.parede, lente: espelho.lente, recuoDaLente, vizinhanca, limpeza: { ...limpeza } });
+      registro.simetria = 'x'; registro.espelho = espelho;
+    }
+    return { ok: true, registro };
   }
 
   return {
