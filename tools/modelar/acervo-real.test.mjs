@@ -61,7 +61,11 @@ const SEGUNDOS_POR_ALVO = 2;
    de novo no CI e anotada aqui. A razão é a do CI: na máquina local, com agentes modelando ao lado, o furgão mediu 16,7 e 17,9
    vezes a soma das outras (254 e 250 s contra 15 e 14 s), porque a peça de 190 mil faces sofre com a memória disputada e as
    pequenas não. Fora do CI o teto é o dobro, 30, que ainda pega a regressão grande; o CI cobra a razão justa. */
-const PECAS_PESADAS = { 'furgao-realista': process.env.CI ? 15 : 30 };
+/* A bicicleta-urbana entrou como peça pesada em 2026-11-16: com as 27 juntas soldadas pelo cordão e o refino automático da costura
+   (fim do plano do cordão de solda) ela passou a levar uns 38 s por execução no CI, e só ela levava a soma das peças comuns de
+   menos de 108 s para 110,6 s. A razão medida no CI foi 2,3 vezes a soma das outras peças comuns (77 s contra 33 s); o aviso fica
+   no dobro, 5 no CI e 10 fora dele. O plano do cache por passo tem a bicicleta como peça da linha de base. */
+const PECAS_PESADAS = { 'furgao-realista': process.env.CI ? 15 : 30, 'bicicleta-urbana': process.env.CI ? 5 : 10 };
 
 describe('acervo real, inteiro', () => {
   const alvos = alvosDoAcervo().map((a) => a.nome);
