@@ -18,6 +18,7 @@
  * (`visao-curvatura.js`, `visao-zebra.js`, `visao-luz-rasante.js`). */
 import { aplicarCurvatura, desfazerCurvatura } from './visao-curvatura.js';
 import { aplicarLuzRasante, desfazerLuzRasante } from './visao-luz-rasante.js';
+import { aplicarPintura, desfazerPintura } from './visao-pintura.js';
 import { aplicarZebra, desfazerZebra } from './visao-zebra.js';
 
 export const VISAO_PADRAO = 'solida';
@@ -64,6 +65,8 @@ export const VISOES = Object.freeze([
     /* Listras pelo vetor refletido, que andam com a câmera, com a largura no controle da visão. */
     aplicar: aplicarZebra,
     desfazer: desfazerZebra,
+    /* O que a captura por comando pode regular nesta visão (`--largura-da-zebra`), além de ligá-la. */
+    controlesDaCaptura: ['larguraDaZebra'],
   },
   {
     id: 'luz-rasante',
@@ -72,8 +75,21 @@ export const VISOES = Object.freeze([
     /* Um sol a 10 graus do plano da imagem, com sombra e o resto da luz apagado, com a direção no controle da visão. */
     aplicar: aplicarLuzRasante,
     desfazer: desfazerLuzRasante,
+    controlesDaCaptura: ['azimute'],
+  },
+  {
+    id: 'pintura',
+    rotulo: 'Pintura',
+    atalho: 'p',
+    /* Verniz sobre base escura refletindo faixas de luz paralelas ao comprimento da peça, com a largura das faixas no controle da visão. */
+    aplicar: aplicarPintura,
+    desfazer: desfazerPintura,
+    controlesDaCaptura: ['larguraDaPintura'],
   },
 ]);
+
+/** Os ids das visões que a captura por comando liga (`--visao`), na ordem do registro. */
+export const IDS_DAS_VISOES = Object.freeze(VISOES.map((visao) => visao.id));
 
 export function visaoDisponivel(visao) {
   return typeof visao?.aplicar === 'function' && typeof visao?.desfazer === 'function';
@@ -136,8 +152,22 @@ export function criarSeletorDeVisao({ visoes = VISOES, inicial = VISAO_PADRAO, a
       suspenso = true;
     },
     retomar() {
+      /* uma visão forçada durante a suspensão sai antes de a escolhida voltar */
+      desfazer();
       suspenso = false;
       aplicar();
+    },
+    /* A captura por comando liga a visão pedida com o seletor suspenso, sem mudar a escolhida da pessoa nem a preferência guardada;
+       `retomar()` a desfaz e devolve a escolhida. */
+    forcar(id) {
+      const visao = porId.get(id);
+      if (!visao) return { ok: false, motivo: 'desconhecida' };
+      if (!visaoDisponivel(visao)) return { ok: false, motivo: 'indisponivel', dica: visao.dica ?? null };
+      if (!contexto) return { ok: false, motivo: 'sem-peca' };
+      desfazer();
+      visao.aplicar(contexto);
+      aplicada = id;
+      return { ok: true, visao: id };
     },
   };
 }

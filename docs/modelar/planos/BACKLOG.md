@@ -159,6 +159,7 @@ travando alguém, não quando é plausível**.
 | `loft` fechado | 0 de 22 — **medida inválida**, ver abaixo | **implementado** |
 | variantes nomeadas de revisão | nenhuma ramificação ocorreu; a cadeia de autoria é linear e a escrita concorrente é recusada, não ramificada | recusado |
 | Casca aberta por face sem parte | no pedal da `bicicleta-urbana` (2026-11-16), as paredes que um `subtrair` cria nasceram sem parte, a troca de um grupo provisório anterior ao corte não as alcançou, e a guarda disse só "parte pedais tem casca aberta (136 arestas soltas)"; o modelador achou a causa com script próprio. A guarda poderia dizer quantas faces sem parte encostam na borda aberta, ou o `subtrair` herdar a parte das faces que o corte cria |
+| Booleana que aceita forma errada sem recusa | a revisão adversarial da fatia 6 do cordão (2026-11-16) achou, já na base anterior: o `subtrair` que deixa parede abaixo de ~15 µm devolve uma pirâmide com 1/3 do volume, 12 de 1500 contatos quase coincidentes no `intersectar` saem aceitos com erro de volume acima de 1%, e o contato por aresta parcial (ou aresta deitada numa face) passa como dois sólidos separados. Nenhum teste confere volume do que a booleana aceita; falta um gate de volume contra a Manifold direta na booleana |
 
 A comparação que decide: `em`/`eixo` entrou com **128 de 853 passos** (15%) em
 transporte puro, e o ponto nomeado com **18 de 61 parâmetros** do freio

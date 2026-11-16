@@ -181,6 +181,41 @@ export function escolherLuz(normais, vista, {
   return melhor ?? { azimute: preferido, elevacao: elevacoes[0], nota: 0, legivel: 0, estourada: 0, sombra: 0 };
 }
 
+/** O brilho linear, depois da exposição, que a superfície mais clara da peça vista (o percentil `PERCENTIL_DA_EXPOSICAO` das amostras) não passa. */
+export const BRILHO_MAXIMO_DA_LUZ = 0.7;
+export const PERCENTIL_DA_EXPOSICAO = 0.99;
+
+/**
+ * A exposição (de 0 a 1, o fator sobre a força da luz) com que a luz de `elevacao` e `azimute` não estoura a peça vista: 1 quando o
+ * percentil 99 do brilho das amostras iluminadas (pesadas por `pesos`) já fica abaixo de `BRILHO_MAXIMO_DA_LUZ`, e o que leva esse
+ * brilho até ele quando passa. A luz rasante do Blender é a 10 graus com o brilho de 0,2 e não estoura; a luz mais alta que a bancada
+ * escolhe numa vista de três quartos leva a face voltada para ela ao branco (a traseira do quarto traseiro do carro, medida em
+ * 2026-11-16), e a exposição a traz de volta ao legível sem trocar a direção.
+ */
+export function exposicaoDaLuz(normais, vista, elevacao, azimute, { pesos = null, rasanteGraus = RASANTE_GRAUS, alvo = BRILHO_RASANTE } = {}) {
+  const N = voltadasParaACamera(normais, vista.zCam);
+  const n = Math.floor(N.length / 3);
+  const d = direcaoDaLuz(vista, elevacao, azimute);
+  const brilhos = [];
+  let total = 0;
+  for (let i = 0; i < n; i++) {
+    const c = -(N[3 * i] * d[0] + N[3 * i + 1] * d[1] + N[3 * i + 2] * d[2]);
+    if (c <= 0) continue;
+    const p = pesos ? pesos[i] : 1;
+    brilhos.push([(alvo * c) / Math.sin(rasanteGraus * RAD), p]);
+    total += p;
+  }
+  if (!(total > 0)) return 1;
+  brilhos.sort((a, b) => a[0] - b[0]);
+  let acumulado = 0;
+  let alto = brilhos[brilhos.length - 1][0];
+  for (const [b, p] of brilhos) {
+    acumulado += p;
+    if (acumulado >= PERCENTIL_DA_EXPOSICAO * total) { alto = b; break; }
+  }
+  return alto > BRILHO_MAXIMO_DA_LUZ ? arredondar4(BRILHO_MAXIMO_DA_LUZ / alto) : 1;
+}
+
 /**
  * As amostras de uma vista a partir de triângulos no quadro do mundo (`posicoes`, 9 números por triângulo): a normal de cada
  * triângulo voltado para a câmera e, de peso, a área dele projetada no plano da imagem. Quando os voltados para a câmera somam

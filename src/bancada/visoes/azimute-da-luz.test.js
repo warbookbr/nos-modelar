@@ -6,7 +6,7 @@
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { ELEVACOES_DA_LUZ, amostrasDaVista, direcaoDaLuz, escolherAzimutes, escolherLuz, legibilidadeDaLuz } from './azimute-da-luz.js';
+import { ELEVACOES_DA_LUZ, amostrasDaVista, direcaoDaLuz, escolherAzimutes, escolherLuz, exposicaoDaLuz, legibilidadeDaLuz, BRILHO_MAXIMO_DA_LUZ } from './azimute-da-luz.js';
 
 const BLENDER = fileURLToPath(new URL('../../../tools/blender/', import.meta.url));
 const temNumpy = spawnSync('python3', ['-c', 'import numpy'], { encoding: 'utf8' }).status === 0;
@@ -151,5 +151,17 @@ describe('a luz única da bancada', () => {
     }
     expect(soLegivel).toMatchObject({ elevacao: 30, azimute: 30, estourada: 1 / 3 });
     expect(escolherLuz(normais, VISTAS.topo)).toEqual({ azimute: 50, elevacao: 40, nota: 0.5976, legivel: 0.5976, estourada: 0, sombra: 0 });
+  });
+
+  it('a exposição leva ao legível a face que a luz alcança de frente e deixa em 1 a luz que não estoura', () => {
+    /* a face voltada para a luz (a 90 graus de elevação a luz vem da câmera) chega a 1,15 de brilho a 10 graus de referência: a exposição o põe em 0,7 */
+    const defrente = [0, 1, 0];
+    const e = exposicaoDaLuz(defrente, VISTAS.topo, 90, 0);
+    expect(e).toBeCloseTo(BRILHO_MAXIMO_DA_LUZ / (0.2 / seno(10)), 3);
+    expect((0.2 / seno(10)) * e).toBeLessThanOrEqual(BRILHO_MAXIMO_DA_LUZ + 1e-3);
+    /* a luz rasante, a 10 graus da superfície, não passa de 0,2 e fica sem redução */
+    expect(exposicaoDaLuz([0, 1, 0], VISTAS.topo, 10, 0)).toBe(1);
+    /* sem amostra iluminada, 1 */
+    expect(exposicaoDaLuz([], VISTAS.topo, 10, 0)).toBe(1);
   });
 });
