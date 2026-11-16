@@ -4,7 +4,7 @@
 
 **Território:** `tools/modelar/olhar-bancada.mjs`, `src/bancada/visoes/`, `tools/modelar/vistas-para-critica.mjs`, `tools/modelar/vistas-de-superficie.mjs`, `docs/modelar/usar/PARE-E-ANALISE.md`, `docs/modelar/banco-de-provas/reflexo-na-bancada-2026-11-15/`
 
-**Responsável:** a IA da sessão do carro conduz e mede, e a pessoa julga por imagem se a superfície ficou legível.
+**Responsável:** a IA da sessão do cordão de solda conduz e mede desde 2026-11-16, quando a sessão do carro parou (a pessoa passou o plano); a pessoa julga por imagem se a superfície ficou legível.
 
 **Repositório e base:** `warbookbr/nos-modelar`, main de 2026-11-15 (af68628e).
 
