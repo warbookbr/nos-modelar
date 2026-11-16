@@ -885,8 +885,8 @@ passo `subdivisao` é de lataria, e o pacote do crítico dela leva as duas vista
 (`npm run vistas:critica` com `MODELAR_BLENDER`); a peça de subdivisão que não é
 chapa declara `PLANO.lataria: { dispensa: '<motivo>' }`, que o `descrever` mostra
 como aviso, e a carroceria de outra técnica declara `PLANO.lataria: { partes:
-[...] }`. Para olhar as duas vistas antes do crítico, rode `MODELAR_BLENDER=<blender>
-npm run vistas:superficie -- <peça>`. Na curvatura, a lataria a até 40 mm dos
+[...] }`. Para olhar as duas vistas antes do crítico, rode `npm run
+vistas:superficie -- <peça>`, que usa a bancada. Na curvatura, a lataria a até 40 mm dos
 vincos nomeados dos passos `subdivisao` sai em ocre e fora da escala (`--faixa-mm=`
 muda a faixa, `--sem-faixa-dos-vincos` volta à escala da lataria inteira), porque
 a dobra pedida esticava a escala e apagava o amassado. O ocre é a feição declarada, e não defeito.

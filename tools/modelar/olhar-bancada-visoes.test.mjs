@@ -173,6 +173,43 @@ describe('olhar-bancada: as visões de reflexo por comando', () => {
   }, 120_000);
 });
 
+describe('olhar-bancada: a vista de três quartos e a caixa da visão (plano do reflexo, fatia 6)', () => {
+  /* a proporção da caixa da chapa de prova (1000 por 600 mm no plano xy) projetada numa câmera ortográfica que olha de `d`, com +y para cima */
+  const proporcao = (d) => {
+    const l = Math.hypot(...d); const z = d.map((c) => c / l);
+    const xl = Math.hypot(z[2], z[0]); const x = [z[2] / xl, 0, -z[0] / xl];
+    const y = [z[1] * x[2] - z[2] * x[1], z[2] * x[0] - z[0] * x[2], z[0] * x[1] - z[1] * x[0]];
+    const larg = Math.abs(x[0]) * 1000 + Math.abs(x[1]) * 600; const alt = Math.abs(y[0]) * 1000 + Math.abs(y[1]) * 600;
+    return larg / alt;
+  };
+
+  it('a três quartos olha de (0,55; 0,45; 0,70), como a do Blender, e não da isométrica; a captura devolve a escala da curvatura e a luz da caixa', async () => {
+    const curvatura = await capturar(AMASSADA, ['--visao=curvatura', '--enquadrar', '--projecao=ortografica', '--res=900x900'], 'tresquartos');
+    expect(curvatura.nome).toMatch(/tresquartos-orto-visao-curvatura-enquadrado/);
+    const c = medir(curvatura.arquivo);
+    const medida = c.largura / c.altura;
+    /* a chapa é abaulada, e a proporção da caixa plana é aproximada: a três quartos fica perto dela e longe da isométrica */
+    expect(Math.abs(medida - proporcao([0.55, 0.45, 0.70]))).toBeLessThan(0.06);
+    expect(Math.abs(medida - proporcao([0.55, 0.45, 0.70]))).toBeLessThan(Math.abs(medida - proporcao([1, 0.72, 1])) / 2);
+
+    const { olharBancada } = await import('./olhar-bancada.mjs');
+    const saida = relative(REPO, mkdtempSync(join(PASTA, 'r-')));
+    const r = await olharBancada({ peca: AMASSADA, auditoria: true, visao: 'luz-rasante', enquadrar: true, projecao: 'ortografica', vistas: 'frontal', medirContatos: false, res: '600x600', saida });
+    expect(r.ok, r.stderr).toBe(true);
+    const dados = r.resultado.visao.dados;
+    expect(r.resultado.visao.id).toBe('luz-rasante');
+    /* a chapa vista de frente encara a câmera: a luz fica a 10 graus, e a outra direção boa a 90 graus da escolhida */
+    expect(Number(dados.elevacao)).toBe(10);
+    expect([90, 270]).toContain(((Number(dados.segundoAzimute) - Number(dados.azimute)) % 360 + 360) % 360);
+    expect(r.stdout).toMatch(/a outra direção boa desta vista: \d+ graus/);
+    const k = await olharBancada({ peca: AMASSADA, auditoria: true, visao: 'curvatura', enquadrar: true, projecao: 'ortografica', vistas: 'frontal', medirContatos: false, res: '600x600', saida: relative(REPO, mkdtempSync(join(PASTA, 'k-'))) });
+    /* a escala é a da conta da bancada na chapa de prova (0,24758 1/m, medida na paridade da fatia 5), e a linha de estado, com o tempo, não volta */
+    expect(Number(k.resultado.visao.dados.escala)).toBeCloseTo(0.24758, 4);
+    expect(k.resultado.visao.linhas.join(' ')).toMatch(/saturam em ±0,248 1\/m/);
+    expect(k.resultado.visao.linhas.join(' ')).not.toMatch(/ ms/);
+  }, 180_000);
+});
+
 /** O limite declarado da fração de pixels da peça no branco (os três canais em 250 ou mais) na luz rasante. Antes da exposição, o quarto traseiro do carro saía com 18 %. */
 const LIMITE_DE_PIXELS_SATURADOS = 0.01;
 

@@ -1,0 +1,101 @@
+{
+  "peca": "chapa-de-reflexo-de-prova",
+  "rotulo": "chapa-tresquartos",
+  "vistaBlender": "tresquartos",
+  "vistaBancada": "tresquartos",
+  "caixaBlenderPx": [
+    249,
+    47,
+    1166,
+    994
+  ],
+  "rasante": [
+    {
+      "azimute": 30,
+      "blender": {
+        "fracao": 0.9992,
+        "fracaoRemedida": 0.9968,
+        "amassado": {
+          "u": 0.3844,
+          "v": 0.4746,
+          "maximo": 0.0078
+        }
+      },
+      "bancada": {
+        "fracao": 1,
+        "elevacao": 50,
+        "arquivo": "tmp/paridade-reflexo/chapa-tresquartos/c-01/bancada-chapa-de-reflexo-de-prova-tresquartos-orto-visao-luz-rasante-az30-enquadrado.png",
+        "caixaPx": [
+          233,
+          42,
+          1167,
+          1008
+        ],
+        "amassado": null
+      },
+      "luminancia": {
+        "pontos": 1585,
+        "correlacao": 0.5548,
+        "diferencaMediana": 0.1216,
+        "mediaBlender": 0.9736,
+        "mediaBancada": 0.8538
+      }
+    },
+    {
+      "azimute": 120,
+      "blender": {
+        "fracao": 0.9992,
+        "fracaoRemedida": 0.9972,
+        "amassado": {
+          "u": 0.384,
+          "v": 0.4756,
+          "maximo": 0.0353
+        }
+      },
+      "bancada": {
+        "fracao": 0.9996,
+        "elevacao": 50,
+        "arquivo": "tmp/paridade-reflexo/chapa-tresquartos/c-03/bancada-chapa-de-reflexo-de-prova-tresquartos-orto-visao-luz-rasante-az120-enquadrado.png",
+        "caixaPx": [
+          233,
+          42,
+          1167,
+          1008
+        ],
+        "amassado": {
+          "u": 0.3809,
+          "v": 0.4721,
+          "maximo": 0.0118
+        }
+      },
+      "luminancia": {
+        "pontos": 1586,
+        "correlacao": 0.7969,
+        "diferencaMediana": 0.3961,
+        "mediaBlender": 0.4048,
+        "mediaBancada": 0.8074
+      }
+    }
+  ],
+  "curvatura": {
+    "escalaBlender": 0.24703,
+    "escalaBancada": 0.24758,
+    "arquivoBancada": "tmp/paridade-reflexo/chapa-tresquartos/c-05/bancada-chapa-de-reflexo-de-prova-tresquartos-orto-visao-curvatura-enquadrado.png",
+    "pontos": 1458,
+    "correlacao": 0.9954554942085114,
+    "diferencaMediana": 0.002831687715823622,
+    "diferencaP90": 0.005340762367403162,
+    "amassado": {
+      "blender": {
+        "u": 0.3839,
+        "v": 0.4744,
+        "maximo": 1.8711
+      },
+      "bancada": {
+        "u": 0.3839,
+        "v": 0.4741,
+        "maximo": 1.8629
+      }
+    }
+  }
+}

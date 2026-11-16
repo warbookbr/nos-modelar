@@ -1,0 +1,97 @@
+{
+  "peca": "chapa-de-reflexo-de-prova",
+  "rotulo": "chapa-tresquartos-luz-da-bancada",
+  "vistaBlender": "tresquartos",
+  "vistaBancada": "tresquartos",
+  "caixaBlenderPx": [
+    249,
+    47,
+    1166,
+    994
+  ],
+  "rasante": [
+    {
+      "azimute": 30,
+      "blender": {
+        "fracao": 0.9992,
+        "fracaoRemedida": 0.9968,
+        "amassado": {
+          "u": 0.3844,
+          "v": 0.4746,
+          "maximo": 0.0078
+        }
+      },
+      "bancada": {
+        "azimute": 240,
+        "fracao": 1,
+        "elevacao": 50,
+        "arquivo": "tmp/paridade-reflexo/chapa-tresquartos-luz-da-bancada/c-01/bancada-chapa-de-reflexo-de-prova-tresquartos-orto-visao-luz-rasante-enquadrado.png",
+        "caixaPx": [
+          233,
+          42,
+          1167,
+          1008
+        ],
+        "amassado": {
+          "u": 0.3818,
+          "v": 0.4713,
+          "maximo": 0.0314
+        }
+      }
+    },
+    {
+      "azimute": 120,
+      "blender": {
+        "fracao": 0.9992,
+        "fracaoRemedida": 0.9972,
+        "amassado": {
+          "u": 0.384,
+          "v": 0.4756,
+          "maximo": 0.0353
+        }
+      },
+      "bancada": {
+        "azimute": 150,
+        "fracao": 1,
+        "elevacao": 50,
+        "arquivo": "tmp/paridade-reflexo/chapa-tresquartos-luz-da-bancada/c-03/bancada-chapa-de-reflexo-de-prova-tresquartos-orto-visao-luz-rasante-az150-enquadrado.png",
+        "caixaPx": [
+          233,
+          42,
+          1167,
+          1008
+        ],
+        "amassado": {
+          "u": 0.382,
+          "v": 0.4739,
+          "maximo": 0.0196
+        }
+      }
+    }
+  ],
+  "curvatura": {
+    "escalaBlender": 0.24703,
+    "escalaBancada": 0.24758,
+    "arquivoBancada": "tmp/paridade-reflexo/chapa-tresquartos-luz-da-bancada/c-05/bancada-chapa-de-reflexo-de-prova-tresquartos-orto-visao-curvatura-enquadrado.png",
+    "pontos": 1458,
+    "correlacao": 0.9954554942085114,
+    "diferencaMediana": 0.002831687715823622,
+    "diferencaP90": 0.005340762367403162,
+    "amassado": {
+      "blender": {
+        "u": 0.3839,
+        "v": 0.4744,
+        "maximo": 1.8711
+      },
+      "bancada": {
+        "u": 0.3839,
+        "v": 0.4741,
+        "maximo": 1.8629
+      }
+    }
+  },
+  "azimutesDaBancada": [
+    240,
+    150
+  ]
+}

@@ -62,11 +62,11 @@ azimutes de cada vista são escolhidos pelo que a câmera dela vê, para a luz c
 no lado da peça que a imagem mostra, e o pacote recusa a imagem com menos de 25 %
 da peça iluminada, dizendo qual é e a fração medida. `npm run vistas:critica` gera
 as duas vistas com o resto do pacote do crítico e põe a seção "Superfície" no
-pedido, e sem `MODELAR_BLENDER` apontando o Blender recusa o pacote da peça de
-lataria com o comando; `rodada-de-modelagem --registrar` recusa o veredito do
+pedido, pela bancada, sem precisar do Blender (que fica como conferência
+opcional com `--com-blender`); `rodada-de-modelagem --registrar` recusa o veredito do
 crítico de peça de lataria cujo pacote não trouxe as duas vistas da versão medida,
 e `--acao` não a dá por fechada sem elas. Para olhar antes do crítico, as duas
-saem sozinhas de `MODELAR_BLENDER=<blender> npm run vistas:superficie -- <peça>`.
+saem sozinhas de `npm run vistas:superficie -- <peça>`.
 Abra cada imagem em tamanho nativo como as demais.
 
 ## 2. Antes de qualquer julgamento: abra o alvo e sobreponha

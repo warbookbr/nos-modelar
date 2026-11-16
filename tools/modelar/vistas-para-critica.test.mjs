@@ -6,12 +6,12 @@
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { basename, join } from 'node:path';
+import { basename, dirname, join } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
 import { lerPergunta } from '../../src/autoria/perguntas-do-critico.js';
 import {
   ELEVACOES_DA_LUZ_RASANTE, LIMITE_DO_VEREDITO, PERGUNTA_DO_ALVO, PRAZO_DA_CAPTURA_MONTADA_MS, VISTAS_MONTADAS, ladoDaVista, montagemDaPeca, montarPedido, pastaDaRodada, prefixoDaPeca, referenciasDoPlano,
-  DISTANCIA_DE_PERTO_MM, campoDePertoMm, MOTIVO_SEM_MEDIR, ReceitaReprovada, decidirLuzRasante, imprimir, fracaoVisivelDaPeca, lerReferenciasExternas, lerOrientacaoDaReferencia, LIMITE_DA_ORIENTACAO, AJUDA, mensagemDaLatariaSemBlender, imagensDoReflexo, LEITURA_DA_FAIXA, MINIMO_DO_REFLEXO, luzRasanteDoPacote, primeiraQuePassa, unidadeDoAlvo, vistaDoArquivo, vistasMontadasVisiveis, vistasParaCritica, vistasRepetidas,
+  DISTANCIA_DE_PERTO_MM, campoDePertoMm, MOTIVO_SEM_MEDIR, ReceitaReprovada, decidirLuzRasante, imprimir, fracaoVisivelDaPeca, lerReferenciasExternas, lerOrientacaoDaReferencia, LIMITE_DA_ORIENTACAO, AJUDA, imagensDoReflexo, LEITURA_DA_FAIXA, MINIMO_DO_REFLEXO, luzRasanteDoPacote, primeiraQuePassa, unidadeDoAlvo, vistaDoArquivo, vistasMontadasVisiveis, vistasParaCritica, vistasRepetidas,
 } from './vistas-para-critica.mjs';
 
 const area = mkdtempSync(join(tmpdir(), 'vistas-critica-'));
@@ -937,24 +937,21 @@ describe('a linha de comando', () => {
   });
 });
 
-describe('a recusa da lataria sem o Blender', () => {
-  it('diz também o caminho da dispensa: PLANO.lataria com dispensa, que a pessoa dá, e o comando seguinte', () => {
-    const texto = mensagemDaLatariaSemBlender('p/q', { lataria: true, porque: 'a receita tem superfície livre por subdivisão (PASSOS[0])', luzRasante: true });
-    expect(texto).toContain("a peça 'p/q' é de lataria");
-    expect(texto).toContain("PLANO.lataria = { dispensa: '<motivo, com ao menos 15 caracteres>' }");
-    expect(texto).toContain('não é chapa de superfície livre');
-    expect(texto).toContain('decisão da pessoa');
-    expect(texto).toContain('npm run vistas:critica -- p/q');
-  });
-
-  it('a peça de emenda, que não é lataria, mantém a mensagem de antes, sem a dispensa', () => {
-    const texto = mensagemDaLatariaSemBlender('p/q', { lataria: false, porque: 'emenda sombreada', luzRasante: true });
-    expect(texto).not.toContain('dispensa');
-  });
-
-  it('o pacote de uma peça de lataria sem Blender recusa antes de capturar, com o caminho da dispensa', async () => {
-    await expect(vistasParaCritica('tools/fixtures/lataria-com-vinco/receita.js', { saida: join(area, 'sem-blender'), pastaDasCapturas: area, dependencias: { medirReceita: medirPassa, blender: null } }))
-      .rejects.toThrow(/PLANO\.lataria = \{ dispensa:/);
+describe('a lataria sem o Blender', () => {
+  it('o pacote de uma peça de lataria sem Blender não é mais recusado: a luz rasante e a curvatura vêm da bancada', async () => {
+    const base = mkdtempSync(join(area, 'sem-blender-'));
+    const peca = 'tools/fixtures/lataria-com-vinco/receita.js';
+    const chamadas = [];
+    const superficieDaBancada = async (p, { pasta, lataria, capturar }) => {
+      chamadas.push({ p, lataria: lataria.lataria, capturar: typeof capturar });
+      const arquivo = join(pasta, 'superficie', 'peca-frente-rasante-az30.png');
+      mkdirSync(dirname(arquivo), { recursive: true });
+      writeFileSync(arquivo, 'x');
+      return { fonte: 'bancada', partes: [], rasante: [{ arquivo, vista: 'frente', azimute: 30, elevacao: 10, iluminada: 0.9 }], curvatura: [{ arquivo, vista: 'frente' }], faixa: null, fora: [] };
+    };
+    const resultado = await vistasParaCritica(peca, { saida: join(base, 'rodada'), pastaDasCapturas: base, dependencias: { medirReceita: medirPassa, blender: null, olharBancada: bancadaFalsa(base, peca).fazer, superficieDaBancada, rodadasAnteriores: () => [] } });
+    expect(chamadas).toEqual([{ p: peca, lataria: true, capturar: 'function' }]);
+    expect(readFileSync(resultado.pedido, 'utf8')).toContain('com a luz a 10 graus do plano da imagem');
   }, 60_000);
 });
 
@@ -1093,9 +1090,9 @@ describe('o reflexo da bancada no pacote da peça de lataria', () => {
       const medidas = opcoes.visao ? vistas.map((v) => ({ nome: v, enquadramento: { largura: ENQUADRADA[v][0], altura: ENQUADRADA[v][1], area: ENQUADRADA[v][0] * ENQUADRADA[v][1] } })) : undefined;
       return { ok: true, resultado: { arquivos, ...(medidas ? { vistas: medidas } : {}) } };
     };
-    const img = (vista, azimute) => ({ arquivo: join(base, `blender-${vista}-${azimute}.png`), vista, azimute, iluminada: 0.6 });
-    const vistasDeSuperficie = async () => ({ obj: join(base, 'peca.obj'), partes: [], rasante: [img('frente', 30)], curvatura: [{ arquivo: join(base, 'curv-frente.png'), vista: 'frente' }], faixa: null });
-    const resultado = await vistasParaCritica(PECA, { saida: pasta, pastaDasCapturas: base, dependencias: { medirReceita: medirPassa, blender: '/blender', olharBancada, vistasDeSuperficie, rodadasAnteriores: () => [] } });
+    const img = (vista, azimute) => ({ arquivo: join(base, `rasante-${vista}-${azimute}.png`), vista, azimute, iluminada: 0.6 });
+    const superficieDaBancada = async () => ({ fonte: 'bancada', partes: [], rasante: [img('frente', 30)], curvatura: [{ arquivo: join(base, 'curv-frente.png'), vista: 'frente' }], faixa: null, fora: [] });
+    const resultado = await vistasParaCritica(PECA, { saida: pasta, pastaDasCapturas: base, dependencias: { medirReceita: medirPassa, blender: null, olharBancada, superficieDaBancada, rodadasAnteriores: () => [] } });
     return { resultado, chamadas, pedido: readFileSync(join(pasta, 'pedido.md'), 'utf8'), manifesto: JSON.parse(readFileSync(join(pasta, 'pacote.json'), 'utf8')) };
   }
 
@@ -1113,8 +1110,8 @@ describe('o reflexo da bancada no pacote da peça de lataria', () => {
       expect(manifesto.reflexo[visao]).toEqual({ imagens: resultado.reflexo[visao].imagens.map((i) => i.arquivo), fora: ['direita', 'superior'] });
     }
     expect(secao).toContain('Ficaram de fora, porque a peça aparece de quina e ocupa menos de 20 % do quadro num dos lados: direita, superior.');
-    /* as vistas do Blender continuam no pedido */
-    expect(pedido).toContain('blender-frente-30.png');
+    /* a luz rasante e a curvatura, também da bancada, continuam no pedido */
+    expect(pedido).toContain('rasante-frente-30.png');
     expect(imprimir(resultado)).toContain('REFLEXO DA BANCADA');
   }, 60_000);
 

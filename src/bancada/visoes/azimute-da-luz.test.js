@@ -6,7 +6,7 @@
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { ELEVACOES_DA_LUZ, amostrasDaVista, direcaoDaLuz, escolherAzimutes, escolherLuz, exposicaoDaLuz, legibilidadeDaLuz, BRILHO_MAXIMO_DA_LUZ } from './azimute-da-luz.js';
+import { ELEVACOES_DA_LUZ, amostrasDaVista, direcaoDaLuz, escolherAzimutes, escolherLuz, exposicaoDaLuz, legibilidadeDaLuz, segundaLuz, BRILHO_MAXIMO_DA_LUZ } from './azimute-da-luz.js';
 
 const BLENDER = fileURLToPath(new URL('../../../tools/blender/', import.meta.url));
 const temNumpy = spawnSync('python3', ['-c', 'import numpy'], { encoding: 'utf8' }).status === 0;
@@ -151,6 +151,32 @@ describe('a luz única da bancada', () => {
     }
     expect(soLegivel).toMatchObject({ elevacao: 30, azimute: 30, estourada: 1 / 3 });
     expect(escolherLuz(normais, VISTAS.topo)).toEqual({ azimute: 50, elevacao: 40, nota: 0.5976, legivel: 0.5976, estourada: 0, sombra: 0 });
+  });
+
+  it('a segunda luz fica a 90 graus da primeira, na mesma elevação, do lado de maior nota, pela mesma conta', () => {
+    const normais = normaisDeUmaChapaOndulada(400, 7);
+    const luz = escolherLuz(normais, VISTAS.tresquartos);
+    const segunda = segundaLuz(normais, VISTAS.tresquartos, luz);
+    /* a nota de um azimute, à mão, como em escolherLuz: a legibilidade média menos a fração estourada, com as normais viradas para a câmera */
+    const z = VISTAS.tresquartos.zCam;
+    const nota = (azimute) => {
+      const d = direcaoDaLuz(VISTAS.tresquartos, luz.elevacao, azimute);
+      let soma = 0;
+      for (let i = 0; i < normais.length / 3; i++) {
+        const n = normais.slice(3 * i, 3 * i + 3);
+        const s = n[0] * z[0] + n[1] * z[1] + n[2] * z[2] < 0 ? -1 : 1;
+        const c = -s * (n[0] * d[0] + n[1] * d[1] + n[2] * d[2]);
+        soma += c > 0 && (0.2 * c) / seno(10) >= 1 ? -1 : legibilidadeDaLuz(c);
+      }
+      return Math.round((soma / (normais.length / 3)) * 1e4) / 1e4;
+    };
+    const lados = [(luz.azimute + 90) % 360, (luz.azimute + 270) % 360];
+    expect(lados).toContain(segunda.azimute);
+    expect(segunda.elevacao).toBe(luz.elevacao);
+    expect(segunda.nota).toBeCloseTo(nota(segunda.azimute), 3);
+    expect(segunda.nota).toBeGreaterThanOrEqual(nota(lados.find((a) => a !== segunda.azimute)) - 1e-4);
+    /* a primeira, pela mesma conta, é a de escolherLuz */
+    expect(nota(luz.azimute)).toBeCloseTo(luz.nota, 3);
   });
 
   it('a exposição leva ao legível a face que a luz alcança de frente e deixa em 1 a luz que não estoura', () => {

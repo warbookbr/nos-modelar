@@ -32,14 +32,22 @@ const REPO = resolve(HERE, '../..');
 const OUT = join(REPO, 'tools/bancadas/out');
 /* Onde cada captura grava a sessão própria dela: dentro do que o servidor da captura serve, e numa pasta que o controle de versão ignora. */
 const SESSOES = join(OUT, 'sessoes');
-const VISTAS_VALIDAS = ['isometrica', 'isometrica-traseira', 'frontal', 'traseira', 'direita', 'esquerda', 'superior', 'inferior'];
+const VISTAS_VALIDAS = ['isometrica', 'isometrica-traseira', 'tresquartos', 'frontal', 'traseira', 'direita', 'esquerda', 'superior', 'inferior'];
 /* A isométrica de trás é a isométrica girada meia volta em torno do eixo vertical que passa pelo alvo da câmera: o mesmo quadro (a caixa é
    simétrica nesse giro) visto do lado oposto. A bancada não a conhece; a ferramenta a faz na página, depois de a vista isométrica assentar. */
 const VISTA_ISO_TRASEIRA = 'isometrica-traseira';
+/* A VISTA DE TRÊS QUARTOS DAS VISTAS DE SUPERFÍCIE: a câmera olha de (0,55; 0,45; 0,70), com +y para cima, que é a `tresquartos` de
+   `vistas_padrao` (tools/blender/comum.py), e não a isométrica da bancada, que olha de (1; 0,72; 1). Também ela é feita na página, a
+   partir da isométrica: a câmera gira em volta do alvo até essa direção, à mesma distância (plano do reflexo, fatia 6). */
+export const VISTA_TRES_QUARTOS = 'tresquartos';
+export const DIRECAO_DA_TRES_QUARTOS = Object.freeze([0.55, 0.45, 0.70]);
 const DIRECAO_DAS_VISTAS = Object.freeze({
   ...Object.fromEntries(Object.entries(VISTAS_BANCADA).map(([nome, v]) => [nome, v.direcao])),
   [VISTA_ISO_TRASEIRA]: Object.freeze([-1, 0.72, -1]),
+  [VISTA_TRES_QUARTOS]: DIRECAO_DA_TRES_QUARTOS,
 });
+/* As vistas que a página não conhece pelo nome e a ferramenta faz a partir da isométrica. */
+const VISTAS_FEITAS_NA_PAGINA = new Set([VISTA_ISO_TRASEIRA, VISTA_TRES_QUARTOS]);
 /* A DISTÂNCIA DA CÂMERA QUE MIRA UM PONTO, em mm, quando `--distancia` não vem: o campo visível no ponto tem então uns 410 mm de altura. */
 export const DISTANCIA_PADRAO_DA_MIRA_MM = 600;
 /* De quanto em quanto tempo a captura diz em que passo está, quando alguém escuta (`aoProgredir`). */
@@ -120,6 +128,7 @@ function esperarCameraEPararQuadros([quadros, limite, parar, ajuste = null]) {
      vezes 1000), de `distanciaMm` e da direção da vista. O quadro é o do campo de 38 graus a essa distância, nas duas projeções, e a
      distância mínima dos controles cede para a câmera poder chegar perto;
    - `giro`: gira a câmera meia volta em torno do eixo vertical do alvo (a isométrica de trás);
+   - `direcao` ([x, y, z]): põe a câmera, à mesma distância do alvo, olhando dele ao longo dessa direção, com +y para cima (a três quartos);
    - `fora`: se a câmera ficou dentro da caixa da peça inteira (o `--focar` de uma parte pequena a põe a 0,6 m do centro dela, que
      em contexto é dentro da cabine), recua-a ao longo do mesmo raio até passar da caixa, e na perspectiva compensa o recuo com o zoom
      da câmera, de modo que o quadro não muda.
@@ -176,6 +185,13 @@ export function ajustarCamera(ajuste) {
     cam.position.set(2 * alvo.x - p.x, p.y, 2 * alvo.z - p.z);
     cam.lookAt(alvo);
     relato.girou = true;
+  } else if (ajuste.direcao) {
+    const dir = new V3(...ajuste.direcao).normalize();
+    const d = cam.position.distanceTo(alvo);
+    cam.position.copy(alvo).addScaledVector(dir, d);
+    cam.up.set(0, 1, 0);
+    cam.lookAt(alvo);
+    relato.direcao = [dir.x, dir.y, dir.z].map((c) => Math.round(c * 1e4) / 1e4);
   }
   if (ajuste.enquadrar) {
     /* Fecha o quadro no que está à vista (a mesma geometria visível que `caixaDoVisivel` reúne): centra o envelope projetado dos vértices
@@ -995,8 +1011,9 @@ export async function olharBancada({
     const ajusteDaVista = (vista) => {
       if (mira) return { mirar: { mm: mira.mm, distanciaMm: mira.distanciaMm, direcao: DIRECAO_DAS_VISTAS[vista] ?? DIRECAO_DAS_VISTAS.isometrica } };
       const giro = vista === VISTA_ISO_TRASEIRA;
+      const direcao = vista === VISTA_TRES_QUARTOS ? [...DIRECAO_DA_TRES_QUARTOS] : null;
       const fora = Boolean(focar || par);
-      return giro || fora || enquadrarNaPeca ? { giro, fora, ...(enquadrarNaPeca ? { enquadrar: true } : {}) } : null;
+      return giro || direcao || fora || enquadrarNaPeca ? { giro, ...(direcao ? { direcao } : {}), fora, ...(enquadrarNaPeca ? { enquadrar: true } : {}) } : null;
     };
     let ajusteInstalado = false;
     const instalarAjuste = async () => {
@@ -1011,7 +1028,7 @@ export async function olharBancada({
       if (ehFixtureHarness) params.set('peca', peca);
       if (sessaoDaCaptura) params.set('sessao', relative(REPO, sessaoDaCaptura).replaceAll('\\', '/'));
       if (alvos.length) params.set('selecionadas', [...alvos].sort().join(','));
-      if (VISTAS_VALIDAS.includes(vista) && vista !== 'isometrica' && vista !== VISTA_ISO_TRASEIRA) params.set('vista', vista);
+      if (VISTAS_VALIDAS.includes(vista) && vista !== 'isometrica' && !VISTAS_FEITAS_NA_PAGINA.has(vista)) params.set('vista', vista);
       if (projecao === 'ortografica') params.set('projecao', 'ortografica');
       if (modoAlvo !== 'todas') params.set('modo', modoAlvo);
       if (explosao > 0) params.set('explosao', explosao.toFixed(2));
@@ -1028,6 +1045,7 @@ export async function olharBancada({
     let pecaRelatada = null;
     progresso.total = vistas.length;
     let dadoDaChamada = null;
+    let legendaDaVisao = null;
     for (const [indice, vista] of vistas.entries()) {
       progresso.vista = vista;
       const url = urlDa(vista);
@@ -1045,7 +1063,7 @@ export async function olharBancada({
         await page.evaluate((alvo) => {
           window.__modelarQuadros?.retomar();
           window.__mecanificaBancada.ambiente().definirVista(alvo, { instantaneo: true });
-        }, vista === VISTA_ISO_TRASEIRA ? 'isometrica' : vista);
+        }, VISTAS_FEITAS_NA_PAGINA.has(vista) ? 'isometrica' : vista);
       }
       progresso.etapa = 'ler o estado da bancada';
       /* o que se lê da peça não muda de uma vista para a seguinte da mesma chamada */
@@ -1201,7 +1219,16 @@ export async function olharBancada({
           falhasRelatadas.push({ categoria: 'modelo', codigo: 'visao_nao_pronta', vista: null, mensagem: `A visão ${visao} não terminou de pintar: ${pronta.erro ?? 'sem motivo'}.`, acao: 'Repita com --prazo maior ou confira a peça na bancada com a mesma visão.' });
           break;
         }
-        registrar(relato, logger, 'stdout', `visão: ${visao}${ligada.larguraDaZebra != null ? `, listras de ${ligada.larguraDaZebra} graus` : ''}${ligada.azimute != null ? `, luz a ${ligada.azimute} graus` : ''}${ligada.caixasDaPintura != null ? `, ${ligada.caixasDaPintura} caixas de luz` : ''}`);
+        /* o que a caixa da visão diz (a escala e a legenda da curvatura, a direção e a altura da luz rasante, e a outra direção boa da
+           vista), lido dos `data-*` e das linhas dela, sem a de estado, que traz o tempo da conta: a imagem de auditoria não mostra a caixa,
+           e quem usa a imagem escreve a escala nela (plano do reflexo, fatia 6) */
+        legendaDaVisao = await page.evaluate(() => {
+          const caixa = document.getElementById('painelVisao');
+          if (!caixa) return null;
+          return { dados: { ...caixa.dataset }, titulo: caixa.querySelector('h2')?.textContent ?? null, linhas: [...caixa.querySelectorAll('p:not(.estado-visao)')].map((p) => p.textContent).filter(Boolean) };
+        });
+        const alturaDaLuz = legendaDaVisao?.dados?.elevacao;
+        registrar(relato, logger, 'stdout', `visão: ${visao}${ligada.larguraDaZebra != null ? `, listras de ${ligada.larguraDaZebra} graus` : ''}${(ligada.azimute ?? legendaDaVisao?.dados?.azimute) != null ? `, luz a ${ligada.azimute ?? legendaDaVisao.dados.azimute} graus` : ''}${visao === 'luz-rasante' && alturaDaLuz != null ? ` e ${alturaDaLuz} graus do plano da imagem` : ''}${visao === 'luz-rasante' && legendaDaVisao?.dados?.segundoAzimute != null ? ` (a outra direção boa desta vista: ${legendaDaVisao.dados.segundoAzimute} graus)` : ''}${ligada.caixasDaPintura != null ? `, ${ligada.caixasDaPintura} caixas de luz` : ''}`);
       }
       const ajuste = ajusteDaVista(vista);
       if (ajuste) await instalarAjuste();
@@ -1407,6 +1434,7 @@ export async function olharBancada({
       paresAcusados: contatos.estado === 'pulados' || contatos.estado === 'falhou' ? null : paresAcusados, contatos, paresCapturados, cargasDePagina,
       dicas: dicas.listar(),
       ...(capturarEmMemoria ? { capturas } : {}),
+      ...(visao !== null ? { visao: { id: visao, ...(legendaDaVisao ?? { dados: {}, titulo: null, linhas: [] }) } } : {}),
     };
     resposta = {
       ok: !falhou, codigo: falhou ? 1 : 0, erro: falhou ? { categoria: 'bancada', codigo: 'bancada_recusou', mensagem: 'A bancada encerrou a captura sem aceitar a revisão.' } : null,
@@ -1463,7 +1491,7 @@ Captura a peça ou montagem na bancada, sem interface.
   --zoom=<vista>:<x0,y0,x1,y1>   com --analise, recorta o retângulo em pixels da vista (4 inteiros) e amplia 3 vezes
   --zoom=<vista>:mm:<x0,y0,z0,x1,y1,z1>   o mesmo recorte por uma caixa em mm do referencial da peça (dois cantos opostos), projetada na vista; o prefixo mm: é obrigatório, e 6 números sem ele são recusados
   --zoom-antes=<png>     com --zoom, põe o mesmo recorte de uma captura anterior ao lado
-  --vistas=<a,b,...>     escolhe as vistas: ${VISTAS_VALIDAS.join(', ')}
+  --vistas=<a,b,...>     escolhe as vistas: ${VISTAS_VALIDAS.join(', ')} (tresquartos olha de 0,55; 0,45; 0,70, como a das vistas de superfície do Blender; use com --enquadrar)
   --arame | --wireframe  malha opaca sobre a peça (sem raio X e sem sombra da malha de trás)
   --raio-x               malha transparente, com o que fica atrás à vista
   --cores                uma cor por parte
