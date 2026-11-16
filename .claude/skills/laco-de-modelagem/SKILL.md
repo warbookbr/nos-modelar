@@ -17,6 +17,11 @@ Depois de mudar silhueta, encontro, corte, união ou arredondamento, e antes de 
 [`PARE-E-ANALISE.md`](../../../docs/modelar/usar/PARE-E-ANALISE.md) (`npm run bancada -- <peça> --analise`) e abra as imagens.
 
 
+Num conjunto complexo, a parte em trabalho é vista e criticada isolada
+(`--selecionadas=<parte> --modo=isolar --focar`), ao lado do recorte dela na
+referência, além da vista do conjunto, como diz a skill
+[`criar-peca`](../criar-peca/SKILL.md).
+
 ## O processo leve, para objeto de uma família
 
 Medido nos aparelhos de caixa (2026-10-16): uma família que já cobre o objeto, com perfis, torna o laço completo desnecessário. Use o processo leve quando o objeto é um perfil de uma família existente, ou uma família nova de forma simples, de uma caixa com frente (porta, painel, botões, puxador, pés). Não o use quando o objeto exige geometria que nenhuma família tem, quando tem partes que se movem ou quando a pessoa pediu o laço completo.

@@ -120,40 +120,13 @@ export const TABELA = {
   canote_diametro: 27,
   canote_dentro: 120,
   canote_total: 250,
-  selim_comprimento: 270,
-  selim_largura: 150,
-  selim_espessura: 44,
-  /* perfil de lado medido na foto: a traseira sobe, o meio cede, o nariz volta quase à altura do meio */
-  selim_traseira_alta: 9,
-  selim_cela: 5,
-  selim_cupula: 4,
-  selim_afundamento: 4,
-  selim_trilho_curva: 26,
-  selim_presilha_a_frente: 5,
   selim_braco_raio: 11,
-  /* a casca de baixo do selim, mais escura, aparece sob o estofado como na foto lateral */
-  selim_casca_espessura: 10,
-  selim_casca_abaixo: 3,
-  selim_casca_largura: 0.84,
   /* cabeça do canote que segura a presilha, como na foto lateral */
   canote_cabeca_comprimento: 16,
   canote_cabeca_sobra: 2.5,
   selim_trilho_diametro: 6,
   selim_trilho_x: 28,
-  /* largura do nariz, em fração da traseira; a cintura estreita de selim_cintura_inicio a selim_cintura_fim do comprimento */
-  selim_largura_bico: 0.3,
-  selim_cintura_inicio: 0.32,
-  selim_cintura_fim: 0.62,
-  /* as abas de trás caem para os lados, como na foto frontal */
-  selim_caimento: 32,
-  /* o nariz, de lado: o topo desce em curva no último quarto, a base fica reta e a ponta termina num corte reto */
-  selim_nariz_queda: 0.38,
-  /* onde os trilhos saem da casca, em fração do comprimento a partir da traseira */
-  selim_trilho_tras: 0.2,
-  selim_trilho_frente: 0.78,
-  selim_largura_traseira: 0.75,
-  selim_secoes: 22,
-  selim_lados: 28,
+  selim_lados: 48,
     /* transmissão */
   dentes_coroa: 40,
   dentes_catraca: 16,
@@ -195,6 +168,35 @@ const fechoConvexo = (pts) => {
   const cruz = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
   const meia = (lista) => { const h = []; for (const q of lista) { while (h.length >= 2 && cruz(h[h.length - 2], h[h.length - 1], q) <= 0) h.pop(); h.push(q); } h.pop(); return h; };
   return [...meia(p), ...meia([...p].reverse())];
+};
+
+/* interpolação linear numa lista [[x, y], ...] em x crescente, com as pontas mantidas */
+const interp = (lista, x) => {
+  if (x <= lista[0][0]) return lista[0][1];
+  for (let i = 1; i < lista.length; i++) if (x <= lista[i][0]) { const [x0, y0] = lista[i - 1], [x1, y1] = lista[i]; return y0 + ((y1 - y0) * (x - x0)) / (x1 - x0); }
+  return lista[lista.length - 1][1];
+};
+/* seção de nariz normalizada (topo 0, base -1): cantos de raio 0,35 da largura, em quarto de elipse */
+const cantoRedondo = (u, baixo) => {
+  const c = 0.6, e = Math.min(1, Math.max(0, (u - c) / (1 - c)));
+  const fora = 0.5 * (1 - Math.sqrt(Math.max(0, 1 - e * e)));
+  return baixo ? -1 + fora : -fora;
+};
+
+/* O selim medido nas fotos, em mm. De lado (régua: a roda de 670 mm), a cada ~6 mm da traseira ao nariz: o topo e a base da
+   silhueta, relativos ao topo da traseira, e o caminho dos trilhos. De frente (régua: a caixa de direção), a seção sob as abas,
+   em fração da meia largura (u) e da altura (topo 0, ponto mais baixo -1). A planta é suposta, por falta de foto de cima. */
+const SELIM_MEDIDO = {
+  comprimento: 256,
+  presilha: 120,
+  topo: [[0, -12], [6, 1], [12, 2], [18, 1], [31, 0], [43, 0], [55, -1], [68, -2], [80, -3], [98, -3], [110, -4], [123, -4], [141, -3], [160, -2], [178, -1], [196, 0], [209, 0], [221, -1], [233, -3], [240, -5], [246, -7], [252, -12], [256, -18]],
+  base: [[0, -17], [6, -21.5], [12, -24.5], [18, -26], [25, -34], [31, -38], [37, -41], [43, -43], [55, -46], [68, -50], [86, -51], [98, -50], [104, -46], [116, -42], [129, -38], [141, -34], [153, -31], [166, -29], [178, -27.5], [196, -27.5], [215, -29], [227, -29.5], [240, -28.5], [252, -26], [256, -25.6]],
+  trilho: [[58, -40], [66, -56], [75, -60.5], [87, -62], [100, -63.5], [115, -64], [130, -62], [145, -57], [155, -51.5], [163, -46], [170, -41], [177, -35], [184, -25]],
+  abaCima: [[0, 0], [0.6, 0], [0.64, -0.021], [0.72, -0.045], [0.8, -0.089], [0.89, -0.179], [0.97, -0.334], [1, -0.62]],
+  abaBaixo: [[0, -0.872], [0.45, -0.872], [0.55, -0.915], [0.64, -0.936], [0.72, -0.957], [0.8, -1], [0.89, -1], [0.97, -0.915], [1, -0.68]],
+  planta: [[0, 8], [4, 30], [10, 48], [18, 62], [26, 70], [35, 74], [95, 74], [110, 66], [125, 48], [140, 32], [155, 24], [170, 22], [235, 19], [244, 16], [250, 12], [256, 7]],
+  larguraAba: 74,
+  larguraNariz: 22,
 };
 
 const rad = (g) => (g * Math.PI) / 180;
@@ -389,68 +391,45 @@ export function derivar(T) {
   tubo('canote', 'preto', [noSelim(baseCanote), noSelim(topoCanote)], raioQ(T.canote_diametro), 16);
   tubo('canote', 'preto', [noSelim(topoCanote - T.canote_cabeca_comprimento), noSelim(topoCanote - T.canote_cabeca_comprimento / 2), noSelim(topoCanote)], [raioQ(T.canote_diametro) + 0.5, raioQ(T.canote_diametro) + T.canote_cabeca_sobra, raioQ(T.canote_diametro) + T.canote_cabeca_sobra], 24);
   const apoio = noSelim(topoCanote);
-  /* o assento fica atrás da presilha do canote por selim_presilha_a_frente: a presilha cai um pouco à frente do centro dele */
-  const centroSelim = [0, 0, apoio[2] - T.selim_presilha_a_frente];
-  const secoes = [];
-  const nSel = T.selim_secoes;
-  /* perfil medido nas fotos: de cima, traseira larga, cintura que estreita depressa no meio e nariz longo e estreito, de ponta
-     redonda; de lado, nariz rombudo; as pontas fecham em arco, sem ponta cônica */
-  const suave = (u) => { const x = Math.min(1, Math.max(0, u)); return x * x * (3 - 2 * x); };
-  const perfilSelim = (t) => {
-    const tr = T.selim_largura_traseira, b = T.selim_largura_bico;
-    const ci = T.selim_cintura_inicio, cf = T.selim_cintura_fim;
-    let larg = T.selim_largura * (t < 0.1 ? tr + (1 - tr) * Math.sin((t / 0.1) * Math.PI / 2)
-      : t < cf ? 1 - (1 - b) * suave((t - ci) / (cf - ci)) : b * (1 - 0.15 * (t - cf) / (1 - cf)));
-    let esp = T.selim_espessura * (1 - 0.45 * t ** 1.3);
-    /* o centro da seção segue a espessura antes do fecho das pontas: sem isso a ponta sobe até o topo e vira um lábio */
-    const espCheia = esp;
-    /* o topo desce no nariz e também arredonda para baixo no fim da traseira, sem bico */
-    const queda = T.selim_nariz_queda * suave((t - 0.72) / 0.28) + 0.3 * suave((0.14 - t) / 0.14);
-    esp *= 1 - queda;
-    const fecha = (u) => Math.sqrt(Math.max(0.02, 1 - u * u));
-    if (t > 0.9) { const f = fecha((t - 0.9) / 0.1 * 0.95); larg *= f; }
-    if (t < 0.12) { const f = fecha((0.12 - t) / 0.12 * 0.93); larg *= f; esp *= 0.3 + 0.7 * f; }
-    const sela = T.selim_traseira_alta * (1 - Math.min(1, t / 0.45)) ** 2 - T.selim_cela * Math.sin(Math.PI * Math.min(1, Math.max(0, (t - 0.15) / 0.75))) ** 2;
-    const yrel = -espCheia / 2 + T.selim_cupula * (1 - t) ** 2 + sela - (espCheia * queda) / 2; /* a barriga sobe para o nariz; o topo segue a sela */
-    const afunda = T.selim_afundamento * Math.sin(Math.PI * Math.min(1, Math.max(0, (t - 0.08) / 0.7))) ** 1.5;
-    /* as orelhas de trás caem para os lados e para baixo, mais na traseira */
-    /* a queda acompanha a largura: onde a traseira já fechou, a orelha não cai, e o fim do selim fica redondo */
-    const cai = T.selim_caimento * Math.max(0, 1 - t / 0.5) ** 1.3 * Math.min(1, larg / T.selim_largura) ** 3;
-    return { larg, esp, yrel, afunda, cai };
-  };
-  const zDoSelim = (t) => centroSelim[2] - 0.46 * T.selim_comprimento + T.selim_comprimento * t * 0.92;
-  for (let i = 0; i <= nSel; i++) {
-    const t = i / nSel;
-    secoes.push({ t, z: zDoSelim(t), ...perfilSelim(t) });
-  }
-  /* trilhos, como na foto lateral: saem da casca em selim_trilho_tras e selim_trilho_frente, descem curtos e íngremes atrás,
-     correm retos pela presilha e sobem numa rampa longa e suave até o nariz; curva contínua, amostrada mais fina que as seções */
-  const tA = T.selim_trilho_tras, tB = T.selim_trilho_frente;
-  const queda = (u) => (u < 0.26 ? Math.sin((u / 0.26) * Math.PI / 2) : u < 0.6 ? 1 : 1 - suave((u - 0.6) / 0.4));
-  const trilhoRel = (t, dentro = 0) => {
-    const q = perfilSelim(t);
-    const x = Math.min(T.selim_trilho_x, 0.7 * q.larg / 2);
-    const barriga = (q.esp / 2) * (1 - (x / (q.larg / 2)) ** 2.5) ** 0.4;
-    return { x, y: q.yrel - barriga - 1 + dentro - T.selim_trilho_curva * queda((t - tA) / (tB - tA)) };
-  };
-  const tDoCanote = (apoio[2] - zDoSelim(0)) / (0.92 * T.selim_comprimento);
+  /* SELIM pelas medidas das fotos (SELIM_MEDIDO): o comprimento s vai da traseira (0) ao nariz, e a altura y é relativa ao topo
+     da traseira; a presilha do canote fica em s = SELIM_MEDIDO.presilha */
+  const SM = SELIM_MEDIDO;
   const rBraco = T.selim_braco_raio;
-  const yBase = apoio[1] + rBraco - 2 - trilhoRel(tDoCanote).y;
-  for (const q of secoes) q.y = yBase + q.yrel;
-  centroSelim[1] = yBase;
-  itens.push({ k: 'selim', parte: 'selim', material: 'preto', secoes, base: centroSelim, apoioY: apoio[1] });
-  /* a casca: a mesma planta, um pouco mais estreita, rasa e baixa, de modo que só a faixa de baixo apareça sob o estofado */
-  const casca = secoes.filter((q) => q.t >= 0.04 && q.t <= 0.62).map((q) => ({ ...q, larg: q.larg * T.selim_casca_largura, esp: T.selim_casca_espessura, afunda: 0,
-    y: q.y - q.esp / 2 + T.selim_casca_espessura / 2 - T.selim_casca_abaixo }));
-  itens.push({ k: 'selim', parte: 'selim', material: 'borracha', secoes: casca, base: centroSelim, apoioY: apoio[1] });
+  const zDoSelim = (sMm) => apoio[2] - SM.presilha + sMm;
+  const yRef = apoio[1] + rBraco - 2 - interp(SM.trilho, SM.presilha);
+  const centroSelim = [0, yRef, zDoSelim(SM.presilha)];
+  /* planta (suposta, sem foto de cima): traseira redonda, largura cheia sob as abas, cintura e nariz estreito de ponta redonda */
+  const meiaLargura = (sMm) => interp(SM.planta, sMm);
+  const secoes = [];
+  const nS = 44;
+  for (let i = 0; i <= nS; i++) {
+    const sMm = SM.comprimento * (0.004 + (0.992 * i) / nS);
+    const topo = interp(SM.topo, sMm), base = interp(SM.base, sMm), w = Math.max(1.5, meiaLargura(sMm));
+    /* quanto a seção é aba (perfil medido de frente) ou nariz (retângulo de cantos redondos), pela largura */
+    const aba = Math.min(1, Math.max(0, (w - SM.larguraNariz) / (SM.larguraAba - SM.larguraNariz)));
+    const alto = topo - base;
+    const pts = [];
+    const n = T.selim_lados;
+    /* de u = +1 por cima até u = -1 e de volta por baixo, a mesma contagem em todas as seções */
+    for (let k = 0; k < n; k++) {
+      const ang = (2 * Math.PI * k) / n;
+      const u = Math.cos(ang);
+      const cima = Math.sin(ang) >= 0;
+      const perfil = cima ? SM.abaCima : SM.abaBaixo;
+      const redondo = cima ? cantoRedondo(Math.abs(u), 0) : cantoRedondo(Math.abs(u), 1);
+      const yn = aba * interp(perfil, Math.abs(u)) + (1 - aba) * redondo;
+      pts.push([u * w, topo + yn * alto]);
+    }
+    secoes.push({ z: zDoSelim(sMm), y: yRef, pts });
+  }
+  itens.push({ k: 'selim', parte: 'selim', material: 'preto', secoes });
+  /* trilhos: o caminho medido de lado; a largura entre eles acompanha a planta */
   for (const lado of [-1, 1]) {
-    const nT = 32;
     const trilho = [];
-    for (let i = 0; i <= nT; i++) {
-      const t = tA + ((tB - tA) * i) / nT;
-      /* as duas pontas entram 5 mm na casca */
-      const r = trilhoRel(t, i === 0 || i === nT ? 5 : 0);
-      trilho.push([lado * r.x, yBase + r.y, zDoSelim(t)]);
+    const [s0, s1] = [SM.trilho[0][0], SM.trilho[SM.trilho.length - 1][0]];
+    for (let i = 0; i <= 40; i++) {
+      const sMm = s0 + ((s1 - s0) * i) / 40;
+      trilho.push([lado * Math.min(T.selim_trilho_x, 0.7 * meiaLargura(sMm)), yRef + interp(SM.trilho, sMm), zDoSelim(sMm)]);
     }
     tubo('selim', 'preto', trilho, trilho.map(() => raioQ(T.selim_trilho_diametro)), 12);
   }
@@ -604,22 +583,17 @@ export function gerarPassos(T) {
     } else if (it.k === 'selim') {
       const oid = proximo();
       const sx = it.secoes;
-      const secoes = sx.map((s) => {
-        const meia = s.larg / 2;
-        const pts = [];
-        const n = T.selim_lados;
-        for (let i = 0; i < n; i++) {
-          const th = (2 * Math.PI * i) / n;
-          const c = Math.cos(th); const sn = Math.sin(th);
-          /* superelipse: acolchoado cheio e de cantos redondos */
-          const xn = Math.sign(c) * Math.abs(c) ** 0.8; /* afundamento do topo: só na metade de cima, mais fundo no eixo do assento */
-          /* o caimento curva a seção para baixo só nas abas, fora do terço do meio, sem afinar a borda */
-          pts.push([m(xn * meia), m(Math.sign(sn) * Math.abs(sn) ** 0.8 * (s.esp / 2) - (sn > 0 ? s.afunda * (1 - xn * xn) * Math.abs(sn) : 0) - s.cai * Math.max(0, (Math.abs(xn) - 0.25) / 0.75) ** 1.6)]);
-        }
-        return { pos: [0, m(s.y), m(s.z)], contorno: pts };
-      });
-      const polo = (z, y) => ({ pos: [0, m(y), m(z)], raio: 0 });
-      passos.push(['loft', { origemId: oid, lados: T.selim_lados, secoes: [polo(sx[0].z - T.selim_tampa, sx[0].y), ...secoes, polo(sx[sx.length - 1].z + T.selim_tampa, sx[sx.length - 1].y)] }]);
+      /* no quadro local do loft ao longo de +z, o segundo eixo do contorno aponta para -y do mundo: a altura entra com o sinal trocado,
+         e a largura também, para o contorno seguir anti-horário (a seção é simétrica em x) */
+      const secoes = sx.map((q) => ({ pos: [0, m(q.y), m(q.z)], contorno: q.pts.map(([x, y]) => [m(-x), m(-y)]) }));
+      /* as pontas fecham numa linha, na mesma reta das seções (o caminho fica reto e as seções não giram): a traseira numa linha
+         deitada no meio da altura, e o nariz num corte em pé, o corte reto da foto lateral */
+      const alturas = (q) => { const ys = q.pts.map((p) => p[1]); return [Math.min(...ys), Math.max(...ys)]; };
+      const xs = (q) => Math.max(...q.pts.map((p) => p[0]));
+      const [b0, t0] = alturas(sx[0]), [b1, t1] = alturas(sx[sx.length - 1]);
+      const tras = { pos: [0, m(sx[0].y), m(sx[0].z - T.selim_tampa)], aresta: [[m(-xs(sx[0]) * 0.6), m(-(b0 + t0) / 2)], [m(xs(sx[0]) * 0.6), m(-(b0 + t0) / 2)]] };
+      const nariz = { pos: [0, m(sx[sx.length - 1].y), m(sx[sx.length - 1].z + T.selim_tampa)], aresta: [[0, m(-(b1 + 0.15 * (t1 - b1)))], [0, m(-(t1 - 0.15 * (t1 - b1)))]] };
+      passos.push(['loft', { origemId: oid, lados: T.selim_lados, secoes: [tras, ...secoes, nariz] }]);
       marca(it.parte, it.material, { origem: { op: 'loft', id: oid } });
       passos.push(['liso', { angulo: 50, sel: { origem: { op: 'loft', id: oid } } }]);
     } else if (it.k === 'raios') {
