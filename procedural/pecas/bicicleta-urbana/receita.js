@@ -35,6 +35,12 @@ export const TABELA = {
   porca_raio: 10,
   porca_espessura: 7,
   ponteira_raio: 16,
+  /* placa da gancheira traseira, medida na foto lateral */
+  gancheira_raio: 18,
+  gancheira_alcance: 42,
+  gancheira_meia_largura: 11,
+  gancheira_espessura: 6,
+  gancheira_rasgo: 22,
   eixo_dianteiro_largura: 100,
   eixo_traseiro_largura: 140,
   raio_diametro: 2.8,
@@ -47,18 +53,18 @@ export const TABELA = {
   lados_roda: 72,
   lados_pneu_secao: 4,
   /* tubos do quadro (diâmetro externo) */
-  tubo_superior_diametro: 38,
-  tubo_inferior_diametro: 48,
-  tubo_selim_diametro: 42,
-  caixa_direcao_diametro: 54,
-  caixa_direcao_diametro_baixo: 60,
+  tubo_superior_diametro: 34,
+  tubo_inferior_diametro: 40,
+  tubo_selim_diametro: 34,
+  caixa_direcao_diametro: 46,
+  caixa_direcao_diametro_baixo: 52,
   caixa_sobre_coroa: 14,
-  abracadeira_selim_diametro: 48,
+  abracadeira_selim_diametro: 40,
   abracadeira_selim_comprimento: 10,
   caixa_direcao_comprimento: 160,
   estai_diametro: 20,
   estai_folga_pneu: 6.5,
-  estai_abaixo_da_abracadeira: 40,
+  estai_abaixo_da_abracadeira: 46,
   solda_largura: 8,
   solda_trecho: 70,
   base_diametro: 18,
@@ -66,9 +72,9 @@ export const TABELA = {
   base_x_inicio: 36,
   movimento_central_raio: 20,
   movimento_central_largura: 68,
-  tubo_selim_comprimento: 560,
+  tubo_selim_comprimento: 540,
   tubo_superior_no_selim: 750,
-  tubo_superior_na_direcao: 525,
+  tubo_superior_na_direcao: 513,
   tubo_inferior_na_direcao: 62,
   lados_tubo: 48,
   tampa_conica: 0.6,
@@ -76,8 +82,8 @@ export const TABELA = {
   /* garfo */
   garfo_offset: 45,
   garfo_eixo_a_coroa: 405,
-  garfo_perna_diametro: 30,
-  garfo_coroa_diametro: 46,
+  garfo_perna_diametro: 27,
+  garfo_coroa_diametro: 42,
   garfo_coroa_altura: 30,
   garfo_ombro_largura: 38,
   garfo_ombro_altura: 65,
@@ -114,9 +120,12 @@ export const TABELA = {
   selim_comprimento: 270,
   selim_largura: 150,
   selim_espessura: 44,
+  /* perfil de lado medido na foto: a traseira sobe, o meio cede, o nariz volta quase à altura do meio */
+  selim_traseira_alta: 9,
+  selim_cela: 5,
   selim_cupula: 4,
   selim_afundamento: 4,
-  selim_trilho_curva: 5,
+  selim_trilho_curva: 26,
   selim_presilha_a_frente: 5,
   selim_braco_raio: 8,
   selim_trilho_diametro: 6,
@@ -158,6 +167,14 @@ export const TABELA = {
   pedal_altura: 16,
   pedal_profundidade: 68,
   pedal_afastamento: 96,
+};
+
+/* fecho convexo de pontos 2D (cadeia monótona), no sentido anti-horário */
+const fechoConvexo = (pts) => {
+  const p = [...pts].sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+  const cruz = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+  const meia = (lista) => { const h = []; for (const q of lista) { while (h.length >= 2 && cruz(h[h.length - 2], h[h.length - 1], q) <= 0) h.pop(); h.push(q); } h.pop(); return h; };
+  return [...meia(p), ...meia([...p].reverse())];
 };
 
 const rad = (g) => (g * Math.PI) / 180;
@@ -208,6 +225,9 @@ export function derivar(T) {
   };
   const torno = (parte, material, perfil, em, { lados = T.lados_roda, liso = 35, eixo = 'x', junta = null } = {}) => itens.push({ k: 'torno', parte, material, perfil, em, lados, liso, eixo, junta });
 
+  /* placa plana de contorno [z, y] em mm, de x0 a x0 + espessura, com um rasgo opcional {centro: [z, y], comprimento em z, largura em y} */
+  const placa = (parte, material, contorno, x0, espessura, rasgo = null) => itens.push({ k: 'placa', parte, material, contorno, x0, espessura, rasgo });
+
   const zEixoTras = -T.chainstay;
   const zEixoFrente = T.entre_eixos - T.chainstay;
   const yEixo = T.altura_eixo;
@@ -256,11 +276,25 @@ export function derivar(T) {
        ponta entra no tubo pela mesma linha, para trás do ponto de solda */
     const solda = soma(topoEstai, esc(tras, rS));
     const xMeio = T.pneu_largura / 2 + T.estai_folga_pneu + rE + 0.5;
+    /* o estai e a base terminam na placa da gancheira, antes do eixo, como na foto lateral */
+    const fimNaPlaca = T.gancheira_alcance - 6;
     const rumo = unit(menos(dropout, solda));
     const ao = (f, x) => [lado * x, solda[1] + (dropout[1] - solda[1]) * f, solda[2] + (dropout[2] - solda[2]) * f];
     const dentro = soma(solda, esc(rumo, -(rE + 6)));
-    soldado([[lado * xLado, dentro[1], dentro[2]], ao(0, xLado), ao(0.12, xLado + 4), ao(0.25, xMeio), ao(0.55, xMeio + 4), ao(1, T.eixo_traseiro_largura / 2)], rE, T.lados_tubo, 'selimTopo', `gancheira${lado}`, T.solda_trecho);
-    soldado([[lado * T.base_x_inicio, yBB, 0], dropout], raioQ(T.base_diametro), T.lados_tubo, 'mc', `gancheira${lado}`, T.solda_trecho);
+    soldado([[lado * xLado, dentro[1], dentro[2]], ao(0, xLado), ao(0.12, xLado + 4), ao(0.25, xMeio), ao(0.55, xMeio + 4), ao(1 - fimNaPlaca / norma(menos(dropout, solda)), T.eixo_traseiro_largura / 2)], rE, T.lados_tubo, 'selimTopo', `gancheira${lado}`, T.solda_trecho);
+    const inicioBase = [lado * T.base_x_inicio, yBB, 0];
+    soldado([inicioBase, soma(dropout, esc(unit(menos(inicioBase, dropout)), fimNaPlaca))], raioQ(T.base_diametro), T.lados_tubo, 'mc', `gancheira${lado}`, T.solda_trecho);
+    /* a placa da gancheira, como na foto lateral: envolve o eixo por trás, com o rasgo horizontal em que a roda corre, e se
+       estende ao longo do estai e da base, onde as duas hastes chegam; o contorno é o fecho convexo desses pontos no plano (z, y) */
+    const ao2 = (q) => unit([q[2] - zEixoTras, q[1] - yEixo]);
+    const pts = [];
+    for (let k = 0; k < 24; k++) { const t = (2 * Math.PI * k) / 24; pts.push([T.gancheira_raio * Math.cos(t), T.gancheira_raio * Math.sin(t)]); }
+    for (const d of [ao2(solda), ao2(bb)]) {
+      const nrm = [-d[1], d[0]];
+      for (const w of [-1, 1]) pts.push([d[0] * T.gancheira_alcance + nrm[0] * w * T.gancheira_meia_largura, d[1] * T.gancheira_alcance + nrm[1] * w * T.gancheira_meia_largura]);
+    }
+    placa('quadro', 'aluminio', fechoConvexo(pts).map(([dz, dy]) => [zEixoTras + dz, yEixo + dy]), lado * T.eixo_traseiro_largura / 2 - T.gancheira_espessura / 2, T.gancheira_espessura,
+      { centro: [zEixoTras - T.gancheira_rasgo / 2 + T.eixo_raio, yEixo], comprimento: T.gancheira_rasgo, largura: 2 * T.eixo_raio + 1 });
   }
   torno('quadro', 'aluminio', [[0, -T.movimento_central_largura / 2], [T.movimento_central_raio, -T.movimento_central_largura / 2], [T.movimento_central_raio, T.movimento_central_largura / 2], [0, T.movimento_central_largura / 2]], bb, { lados: 24, liso: 40, junta: 'quadro' });
 
@@ -345,7 +379,8 @@ export function derivar(T) {
     const fecha = (u) => Math.sqrt(Math.max(0.02, 1 - u * u));
     if (t > 0.84) { const f = fecha((t - 0.8) / 0.2 * 0.72); larg *= f; esp *= f; }
     if (t < 0.06) { const f = fecha((0.06 - t) / 0.06 * 0.9); larg *= f; esp *= f; }
-    const yrel = -esp / 2 + T.selim_cupula * (1 - t) ** 2; /* o topo fica na mesma altura; a barriga sobe para o nariz */
+    const sela = T.selim_traseira_alta * (1 - Math.min(1, t / 0.45)) ** 2 - T.selim_cela * Math.sin(Math.PI * Math.min(1, Math.max(0, (t - 0.15) / 0.75))) ** 2;
+    const yrel = -esp / 2 + T.selim_cupula * (1 - t) ** 2 + sela; /* a barriga sobe para o nariz; o topo segue a sela */
     const afunda = T.selim_afundamento * Math.sin(Math.PI * Math.min(1, Math.max(0, (t - 0.08) / 0.7))) ** 1.5;
     return { larg, esp, yrel, afunda };
   };
@@ -357,7 +392,9 @@ export function derivar(T) {
   const trilhoRel = (q) => {
     const x = Math.min(T.selim_trilho_x, 0.7 * q.larg / 2);
     const barriga = (q.esp / 2) * (1 - (x / (q.larg / 2)) ** 2.5) ** 0.4;
-    return { x, y: q.yrel - barriga - 1 - T.selim_trilho_curva * Math.sin(Math.PI * q.t) };
+    /* como na foto lateral: os trilhos descem das pontas da casca e correm retos por baixo, em U de fundo chato, onde a presilha os prende */
+    const u = Math.min(1, Math.max(0, (q.t - 2 / nSel) / ((nSel - 4) / nSel)));
+    return { x, y: q.yrel - barriga - 1 - T.selim_trilho_curva * Math.min(1, 2.2 * Math.sin(Math.PI * u)) };
   };
   const doCanote = secoes.reduce((a, q) => (Math.abs(q.z - apoio[2]) < Math.abs(a.z - apoio[2]) ? q : a));
   const rBraco = T.selim_braco_raio;
@@ -599,6 +636,13 @@ export function gerarPassos(T) {
       const copias = proximo();
       passos.push(['arranja', { modo: 'radial', total: it.total, graus: it.graus, eixo: 'x', pivo: v(it.pivo), origemId: copias, derivaDe: { op: 'cubo', id: oid }, sel }]);
       marca(it.parte, it.material, { origem: { op: 'arranja', id: copias, de: { op: 'cubo', id: oid } } });
+    } else if (it.k === 'placa') {
+      /* extrusão em x: o ponto [u, v] do perfil vai para y = -u, z = v */
+      const oid = proximo();
+      const furos = it.rasgo ? [{ retangulo: { largura: m(it.rasgo.largura), profundidade: m(it.rasgo.comprimento), centro: [m(-it.rasgo.centro[1]), m(it.rasgo.centro[0])], cantos: m(it.rasgo.largura / 2 - 0.01) } }] : undefined;
+      passos.push(['extrusao', { origemId: oid, eixo: 'x', altura: m(it.espessura), perfil: it.contorno.map(([z, y]) => [m(-y), m(z)]), ...(furos ? { furos } : {}), segmentosArco: 4, em: [m(it.x0), 0, 0] }]);
+      marca(it.parte, it.material, { origem: { op: 'extrusao', id: oid } });
+      passos.push(['liso', { angulo: 30, sel: { origem: { op: 'extrusao', id: oid } } }]);
     } else if (it.k === 'pedal') {
       /* pedal de plataforma: placa maciça com borda levantada e seis pinos, igual nos dois lados */
       const larg = it.x1 - it.x0;
