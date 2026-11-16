@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1988 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2001 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2958,6 +2958,38 @@
 
 - `receita.js` — O suporte com a sapata 1 mm para +x: outra malha, ainda dentro do envelope de 2 mm do volume da sapata.
 
+## tools/fixtures/reflexo-calibracao/
+
+- `chapas.mjs` — chapas.mjs — as chapas de calibração do reflexo: chapas de defeito conhecido, geradas por conta, para provar a continuidade nas emendas, o índice de suavidad…
+
+## tools/fixtures/reflexo-calibracao/degrau/
+
+- `receita.js` — reflexo-calibracao/degrau/receita.js — a chapa de calibração 'degrau' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
+
+## tools/fixtures/reflexo-calibracao/lisa/
+
+- `receita.js` — reflexo-calibracao/lisa/receita.js — a chapa de calibração 'lisa' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
+
+## tools/fixtures/reflexo-calibracao/ondulada-025/
+
+- `receita.js` — reflexo-calibracao/ondulada-025/receita.js — a chapa de calibração 'ondulada-025' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
+
+## tools/fixtures/reflexo-calibracao/ondulada-050/
+
+- `receita.js` — reflexo-calibracao/ondulada-050/receita.js — a chapa de calibração 'ondulada-050' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
+
+## tools/fixtures/reflexo-calibracao/ondulada-100/
+
+- `receita.js` — reflexo-calibracao/ondulada-100/receita.js — a chapa de calibração 'ondulada-100' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
+
+## tools/fixtures/reflexo-calibracao/quebra-de-curvatura/
+
+- `receita.js` — reflexo-calibracao/quebra-de-curvatura/receita.js — a chapa de calibração 'quebra-de-curvatura' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
+
+## tools/fixtures/reflexo-calibracao/vinco/
+
+- `receita.js` — reflexo-calibracao/vinco/receita.js — a chapa de calibração 'vinco' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
+
 ## tools/fixtures/saliencia-declarada/
 
 - `receita.js` — saliencia-declarada — chapa neutra com uma saliência (ou um rebaixo) de dupla curvatura desenhada de propósito, para provar a declaração `PLANO.saliencias` d…
@@ -3208,6 +3240,8 @@
 - `conferir-vistas.test.mjs` — conferir-vistas.test.mjs — a rodada de conferência sobre uma cena sintética, sem navegador: dois cubos de cores diferentes lado a lado, uma referência em PNG…
 - `configuracao-composicoes.mjs` — configuracao-composicoes.mjs — o registro de composições que um comando recebe.
 - `contexto-montagem-estudo.test.ts` — Repete R001/R002 no descritor de contexto e mede a economia Agent-First.
+- `continuidade-nas-emendas.mjs` — continuidade-nas-emendas.mjs — percorre as linhas onde dois trechos da chapa se encontram e mede, ponto a ponto, a fresta (mm), o ângulo entre as normais dos…
+- `continuidade-nas-emendas.test.mjs` — continuidade-nas-emendas.test.mjs — a continuidade nas emendas nas chapas de calibração do reflexo (`tools/fixtures/reflexo-calibracao/`): acha o degrau (G0)…
 - `contorno-da-imagem.mjs` — contorno-da-imagem.mjs — a porta de linha de comando do módulo `modulos/contorno-da-imagem`, que separa as partes de uma imagem de referência por watershed c…
 - `contorno-da-imagem.test.mjs` — contorno-da-imagem.test.mjs — o contorno sai da imagem, igual nas duas execuções, separa partes do mesmo cinza e recusa semente fora da parte.
 - `contorno-da-peca.mjs` — contorno-da-peca.mjs — o contorno por parte no veredito da peça.
@@ -3278,6 +3312,7 @@
 - `frente-da-fonte.mjs` — frente-da-fonte.mjs — de que lado fica a frente de uma malha de referência, e a conferência de que o `partes.json` a registrou.
 - `frente-da-fonte.test.mjs` — Testes de frente-da-fonte.mjs: a frente lida pelas rodas, faróis e para-brisa nomeados, a declaração obrigatória quando a malha é uma peça só, a recusa da fr…
 - `hierarquia-partes.test.ts` — hierarquia-partes.test.ts — árvore semântica sem Three.js ou geometria.
+- `imagem-de-medida.mjs` — imagem-de-medida.mjs — o desenho das imagens das ferramentas de medida da superfície: o quadro de pixels RGBA com a fonte de 5 por 7, a base da câmera ortogr…
 - `impacto-global.test.ts` — impacto-global.test.ts — provas da R03 sobre o mapa canônico v1.
 - `importar-receita.mjs` — importar-receita.mjs — import dinâmico de receita SEM cache obsoleto.
 - `instancia-de-familia.mjs` — instancia-de-familia.mjs — uma instância de família procedural por uma chamada, em passos prontos para um esboço 2.0 ou uma receita.
@@ -3399,6 +3434,8 @@
 - `sobra-entre-partes.test.mjs` — sobra-entre-partes.test.mjs — a placa reta que passa do corpo em arco nos cantos sobra na vista de cima, com a distância conhecida; a placa encurtada para de…
 - `sobreposicao-de-cortes.mjs` — sobreposicao-de-cortes.mjs — os cortes planos do modelo sobre os do sólido do esboço que a receita refina, numa imagem por eixo.
 - `sobreposicao-de-cortes.test.mjs` — sobreposicao-de-cortes.test.mjs — os cortes do modelo sobre os do sólido do esboço: o corte de uma malha, o desvio entre as duas linhas, o desenho e, de pont…
+- `suavidade-por-regiao.mjs` — suavidade-por-regiao.mjs — o índice de suavidade de cada região da chapa: quanto a curvatura varia por área, um número por região, para comparar uma rodada c…
+- `suavidade-por-regiao.test.mjs` — suavidade-por-regiao.test.mjs — o índice de suavidade nas chapas de calibração do reflexo (`tools/fixtures/reflexo-calibracao/`): a lisa (um arco de raio con…
 - `transformacao-rigida.test.ts` — @ts-expect-error — módulo neutro JavaScript, exercitado pelo contrato público.
 - `triangulos-da-receita.mjs` — triangulos-da-receita.mjs — os triângulos de uma receita em milímetro, com a parte de cada um, pela mesma triangulação que a cena usa (`adaptarThree`).
 - `universo-autoria.mjs` — universo-autoria.mjs — adaptador confinado do snapshot do universo.

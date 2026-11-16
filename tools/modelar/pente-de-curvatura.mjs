@@ -37,7 +37,8 @@ import { pathToFileURL } from 'node:url';
 import { lerCorte } from '../../src/autoria/corte-de-plano.js';
 import { lerArgumentos } from './argumentos.mjs';
 import { ErroDeEntrada, lerEntradaDeMedida, opcaoDaLinha } from './entrada-de-medida.mjs';
-import { Quadro, VISTAS, baseDaVista, malhaDoNeutro, numeroRedondo, selecionarLado } from './mapa-de-desvio.mjs';
+import { Quadro, baseDaVista, numeroRedondo } from './imagem-de-medida.mjs';
+import { malhaDoNeutro, selecionarLado } from './mapa-de-desvio.mjs';
 
 export const PADROES = Object.freeze({ passoMm: 5, suavizarMm: 8, limiar: 0.4, janelaMm: 20, zero: 0.05 });
 const LIMITE_DA_HASTE_PX = 120; /* a haste de um vinco agudo (dezenas de 1/m) é cortada aqui, e a curvatura inteira fica no JSON */

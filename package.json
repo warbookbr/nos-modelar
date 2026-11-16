@@ -100,6 +100,8 @@
     "ondulacao": "node tools/modelar/ondulacao-da-superficie.mjs",
     "pente": "node tools/modelar/pente-de-curvatura.mjs",
     "desvio": "node tools/modelar/mapa-de-desvio.mjs",
+    "emendas": "node tools/modelar/continuidade-nas-emendas.mjs",
+    "suavidade": "node tools/modelar/suavidade-por-regiao.mjs",
     "raio:aresta": "node tools/modelar/raio-da-aresta.mjs",
     "alisar": "node tools/modelar/alisar-a-superficie.mjs",
     "vincos-das-linhas": "node tools/modelar/vincos-das-linhas.mjs",

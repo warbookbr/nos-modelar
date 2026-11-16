@@ -280,3 +280,7 @@ os operandos são maiores (medido no chassi de três receitas de veículo).
 - Face abaixo do piso que o `unir`/`arredondarCostura` ainda deixa: 1 face na peça de prova `face-degenerada-em-dois-lathe` e 2 de 8 variantes do encontro de tubos medidas pelo revisor em 2026-11-13 (o fator 0,2 da partição por colinear não fecha a classe). Veio do fechamento do plano das costuras.
 
 - `aberturaPorContorno` que não fecha a borda derruba os vãos seguintes da cadeia em silêncio (partes inteiras somem da peça), e só o passo que falhou reclama; reproduz no furgão realista com `luz_canto_segmentos` em 7, 8, 9, 12, 14, 16 ou 24 (passo 813). Deveria recusar alto no passo e dizer quais vãos caíram. Achado na rodada de acabamento de 2026-11-14.
+
+- A `subdivisao` não marca no neutro as arestas que descendem de uma curva ou vinco declarado da gaiola, e por isso `npm run emendas` só acha emenda pela parte ou pela procedência das faces, e não pela curva que o autor declarou. Veio da fatia 4 do plano do reflexo na bancada, em 2026-11-16; a marca seria uma lista de arestas por curva no registro da origem, com nome geral.
+
+- `npm run desvio` reserva 70 px no alto da imagem e as duas linhas de legenda descem até uns 76 px, encostando o texto na peça; `npm run emendas` já usa 90 px. E `capacidade.mjs` não tem ficha de `desvio`, `pente`, `emendas` nem `suavidade`. Veio da fatia 4 do plano do reflexo na bancada, em 2026-11-16.
