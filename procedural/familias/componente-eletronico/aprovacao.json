@@ -486,5 +486,30 @@
     }
   },
   "critico": null,
-  "pessoa": null
+  "pessoa": {
+    "data": "2026-11-16",
+    "aprovou": true,
+    "prancha": "docs/modelar/banco-de-provas/componentes-eletronicos-2026-11-16/fatia-1-prancha.png",
+    "perfis": {
+      "barra-1x8": {
+        "hash": "sha256:b00ca1815e6f524608828b5875b9d64a60f9ae707fb73ded67070246dcf3637e"
+      },
+      "dip-40": {
+        "hash": "sha256:826a36b67c4bd947dc91e6d34095e26164c76babb9a9b5a439f0b85490f2c30b"
+      },
+      "dip-8": {
+        "hash": "sha256:7aee723a121c1f71517371ce25e73003e4f95c1a7402346c1efa42b902184f7d"
+      },
+      "eletrolitico-6-3x11": {
+        "hash": "sha256:996f32e37f4ea9c48c9f857766f1385fbf11606d7161fa70e78df6369b765660"
+      },
+      "resistor-1-4w": {
+        "hash": "sha256:85d4804bf476bd3fa4b876824b405939b3b84efbf9a9601d24a9843cea3fd307"
+      },
+      "to-220": {
+        "hash": "sha256:0b721d33b66e9a76ec11e77a0818a29505401384a8a053eab4a9b60f087cc0fb"
+      }
+    },
+    "observacao": "a pessoa aprovou a prancha dos cinco encapsulamentos (resistor axial, eletrolítico, TO-220, DIP-8 e barra de pinos 1x8) em perspectiva e de cima, como estava, com o enquadramento imperfeito de dois quadros; o DIP-40 entra pela mesma geometria do DIP-8; a camada do crítico fica vazia"
+  }
 }
