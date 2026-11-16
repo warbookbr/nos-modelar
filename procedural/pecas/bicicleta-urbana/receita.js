@@ -185,19 +185,23 @@ export const TABELA = {
   aranha_braco_raio: 9,
   aranha_cubo_raio: 26,
   aranha_poste_raio: 3.5,
-  /* pedal medido na foto lateral: uns 90 mm de comprimento (z) por uns 20 de altura, com corpo cilíndrico no meio sobre o eixo,
-     duas barras laterais com janela retangular e fileira de pinos na borda de cima */
-  pedal_largura: 78,
-  pedal_altura: 20,
-  pedal_profundidade: 100, /* quadro de lado, ref-pedal-lado.png: uns 100 x 20 mm, cantos redondos */
-  pedal_barra: 24,
-  pedal_janela_margem: 4, /* quanto sobra de quadro em y em volta da janela de lado, mm */
+  /* pedal medido nas fotos ampliadas (ref-pedal-lado-perto.png, ref-pedal-frente-perto*.png): uma caixa só de uns 100 (z) x 78 (x) x 22 (y) mm, cantos
+     redondos, maciça por fora, com janelas rasas nas faces e o corpo do eixo um pouco mais alto no meio */
+  pedal_largura: 78, /* ao longo do eixo (x) */
+  pedal_altura: 22,
+  pedal_profundidade: 100, /* frente a trás (z) */
+  pedal_canto: 5, /* raio dos cantos do contorno de lado, mm */
+  pedal_rebaixo: 2.5, /* profundidade das janelas rasas, mm */
+  pedal_janela_margem: 4, /* quanto sobra de parede em y em volta da janela de lado, mm */
   pedal_janela_comp: 26, /* comprimento (z) de cada janela de lado, mm */
-  pedal_janela_centro: 0.27, /* centro de cada janela, fração do comprimento a partir do meio */
-  pedal_canto: 5, /* raio dos cantos do quadro de lado, mm */
+  pedal_janela_centro: 0.27, /* centro de cada janela de lado, fração da profundidade a partir do meio */
+  pedal_janela_frente_larg: 20, /* largura (x) de cada janela da frente e de trás, mm */
+  pedal_janela_frente_x: 21, /* deslocamento em x de cada uma a partir do meio, mm */
   pedal_pino_altura: 2.5,
   pedal_pino: 1.6, /* raio dos pinos, mm */
-  pedal_corpo_raio: 14,
+  pedal_pino_borda: 6, /* distância do pino à borda da frente ou de trás, mm */
+  pedal_corpo_raio: 12.5, /* corpo do eixo: 1,5 mm mais alto que a meia altura da caixa */
+  pedal_corpo_recuo: 12, /* quanto o corpo do eixo fica recuado de cada face de lado, mm */
   pedal_tampa: 3,
 };
 
@@ -798,32 +802,43 @@ export function gerarPassos(T) {
       marca(it.parte, it.material, { origem: { op: 'loft', id: oid } });
       passos.push(['liso', { angulo: 35, sel: { origem: { op: 'loft', id: oid } } }]);
     } else if (it.k === 'pedal') {
-      /* pedal de plataforma: duas barras laterais, cada uma uma extrusão em x do contorno de lado (quadro de cantos redondos) com duas janelas
-         furadas de lado, corpo cilíndrico redondo no meio, um pouco mais alto que o quadro, e pinos pequenos nas bordas de cima e de baixo */
-      const bw = T.pedal_barra;
-      const jan = T.pedal_janela_comp;
-      for (const [xa, cx] of [[it.x0, it.x0 + bw / 2], [it.x1 - bw, it.x1 - bw / 2]]) {
-        const oid = proximo();
-        const furo = (dz) => ({ retangulo: { largura: m(it.alt - 2 * T.pedal_janela_margem), profundidade: m(jan), centro: [0, m(dz)], cantos: m(2) } });
-        passos.push(['extrusao', { origemId: oid, eixo: 'x', altura: m(bw), perfil: { retangulo: { largura: m(it.alt), profundidade: m(it.prof), cantos: m(T.pedal_canto) } }, furos: [furo(it.prof * T.pedal_janela_centro), furo(-it.prof * T.pedal_janela_centro)], segmentosArco: 4, em: [m(xa), m(it.y), m(it.z)] }]);
-        marca('pedais', it.material, { origem: { op: 'extrusao', id: oid } });
-        passos.push(['liso', { angulo: 30, sel: { origem: { op: 'extrusao', id: oid } } }]);
-        for (const sy of [1, -1]) for (const fz of [-0.4, -0.15, 0.15, 0.4]) {
-          const pid = proximo();
-          const y0 = it.y + sy * it.alt / 2;
-          const ya = Math.min(y0 - sy * 0.5, y0 + sy * T.pedal_pino_altura), yb = Math.max(y0 - sy * 0.5, y0 + sy * T.pedal_pino_altura);
-          passos.push(['lathe', { origemId: pid, eixo: 'y', lados: 8, perfil: [[0, m(ya)], [m(T.pedal_pino), m(ya)], [m(T.pedal_pino), m(yb)], [0, m(yb)]], em: [m(cx), 0, m(it.z + fz * it.prof)] }]);
-          marca('pedais', it.material, { origem: { op: 'lathe', id: pid } });
-        }
+      /* pedal de plataforma, como nas fotos ampliadas: UMA caixa de cantos redondos (extrusão em x do contorno de lado, na largura toda), maciça por fora,
+         com janelas rasas rebaixadas por subtrair nas faces de fora e de dentro (duas de cada) e nas da frente e de trás (duas), o corpo do eixo
+         (cilindro em x) um pouco mais alto que a caixa, a tampa redonda na face de fora e pinos nas bordas de cima e de baixo */
+      const oid = proximo();
+      passos.push(['extrusao', { origemId: oid, eixo: 'x', altura: m(it.x1 - it.x0), perfil: { retangulo: { largura: m(it.alt), profundidade: m(it.prof), cantos: m(T.pedal_canto) } }, segmentosArco: 4, em: [m(it.x0), m(it.y), m(it.z)] }]);
+      const cortes = [];
+      const cubo = (x0, x1, y0, y1, z0, z1) => { const id = proximo(); cortes.push(id); passos.push(['cubo', { origemId: id, larg: m(x1 - x0), alt: m(y1 - y0), prof: m(z1 - z0), em: [m((x0 + x1) / 2), m(y0), m((z0 + z1) / 2)] }]); };
+      const rj = T.pedal_rebaixo, ex = 1;
+      const yj0 = it.y - it.alt / 2 + T.pedal_janela_margem, yj1 = it.y + it.alt / 2 - T.pedal_janela_margem;
+      for (const dz of [it.prof * T.pedal_janela_centro, -it.prof * T.pedal_janela_centro]) {
+        for (const [xa, xb] of [[it.x0 - ex, it.x0 + rj], [it.x1 - rj, it.x1 + ex]]) cubo(xa, xb, yj0, yj1, it.z + dz - T.pedal_janela_comp / 2, it.z + dz + T.pedal_janela_comp / 2);
       }
+      const xm = (it.x0 + it.x1) / 2;
+      for (const dx of [-T.pedal_janela_frente_x, T.pedal_janela_frente_x]) {
+        for (const [za, zb] of [[it.z - it.prof / 2 - ex, it.z - it.prof / 2 + rj], [it.z + it.prof / 2 - rj, it.z + it.prof / 2 + ex]]) cubo(xm + dx - T.pedal_janela_frente_larg / 2, xm + dx + T.pedal_janela_frente_larg / 2, it.y - it.alt / 2 + 5, it.y + it.alt / 2 - 5, za, zb);
+      }
+      const sid = proximo();
+      passos.push(['subtrair', { origemId: sid, solidos: [{ origem: { op: 'extrusao', id: oid } }, ...cortes.map((id) => ({ origem: { op: 'cubo', id } }))] }]);
+      marca('pedais', it.material, { origem: { op: 'subtrair', id: sid } });
+      for (const sy of [1, -1]) for (const fz of [-1, 1]) for (const fx of [-0.36, -0.12, 0.12, 0.36]) {
+        const pid = proximo();
+        const y0 = it.y + sy * it.alt / 2;
+        const ya = Math.min(y0 - sy * 0.5, y0 + sy * T.pedal_pino_altura), yb = Math.max(y0 - sy * 0.5, y0 + sy * T.pedal_pino_altura);
+        passos.push(['lathe', { origemId: pid, eixo: 'y', lados: 8, perfil: [[0, m(ya)], [m(T.pedal_pino), m(ya)], [m(T.pedal_pino), m(yb)], [0, m(yb)]], em: [m(xm + fx * (it.x1 - it.x0)), 0, m(it.z + fz * (it.prof / 2 - T.pedal_pino_borda))] }]);
+        marca('pedais', it.material, { origem: { op: 'lathe', id: pid } });
+      }
+      /* corpo do eixo: cilindro em x no centro, mais alto que a caixa (raio maior que a meia altura), recuado das faces de lado */
       const cid = proximo();
       const rc2 = T.pedal_corpo_raio;
-      passos.push(['lathe', { origemId: cid, eixo: 'x', lados: 20, perfil: [[0, m(it.x0 + bw - 1)], [m(rc2), m(it.x0 + bw - 1)], [m(rc2), m(it.x1 - bw + 1)], [0, m(it.x1 - bw + 1)]], em: [0, m(it.y), m(it.z)] }]);
+      const xc0 = it.x0 + T.pedal_corpo_recuo, xc1 = it.x1 - T.pedal_corpo_recuo;
+      passos.push(['lathe', { origemId: cid, eixo: 'x', lados: 20, perfil: [[0, m(xc0)], [m(rc2), m(xc0)], [m(rc2), m(xc1)], [0, m(xc1)]], em: [0, m(it.y), m(it.z)] }]);
       marca('pedais', it.material, { origem: { op: 'lathe', id: cid } });
-      /* tampa redonda na face de fora, como na foto frontal */
+      /* tampa redonda na face de fora, vista no centro da face lateral */
       const xo = it.lado > 0 ? it.x1 : it.x0;
       const tid = proximo();
-      passos.push(['lathe', { origemId: tid, eixo: 'x', lados: 20, perfil: [[0, m(Math.min(xo, xo + it.lado * T.pedal_tampa))], [m(rc2 - 1.5), m(Math.min(xo, xo + it.lado * T.pedal_tampa))], [m(rc2 - 1.5), m(Math.max(xo, xo + it.lado * T.pedal_tampa))], [0, m(Math.max(xo, xo + it.lado * T.pedal_tampa))]], em: [0, m(it.y), m(it.z)] }]);
+      const xt0 = Math.min(xo - it.lado * 1, xo + it.lado * T.pedal_tampa), xt1 = Math.max(xo - it.lado * 1, xo + it.lado * T.pedal_tampa);
+      passos.push(['lathe', { origemId: tid, eixo: 'x', lados: 20, perfil: [[0, m(xt0)], [m(rc2 - 1), m(xt0)], [m(rc2 - 1), m(xt1)], [0, m(xt1)]], em: [0, m(it.y), m(it.z)] }]);
       marca('pedais', it.material, { origem: { op: 'lathe', id: tid } });
       const eid = proximo();
       passos.push(['lathe', { origemId: eid, eixo: 'x', lados: 12, perfil: [[0, m(Math.min(it.eixoDe, it.eixoAte))], [m(it.eixoRaio), m(Math.min(it.eixoDe, it.eixoAte))], [m(it.eixoRaio), m(Math.max(it.eixoDe, it.eixoAte))], [0, m(Math.max(it.eixoDe, it.eixoAte))]], em: [0, m(it.y), m(it.z)] }]);
