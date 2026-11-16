@@ -59,7 +59,7 @@ Escamas da solda: ADIAR para o plano da ferramenta de material, como relevo que 
 5. Toda recusa nova cita o ponto e a saída, e tem teste que a cita (`recusas:check`).
 6. A pessoa vê as junções do selim, da caixa de direção e do movimento central da bicicleta, de perto e inteira, ao lado da foto, e aprova ou devolve.
 7. Documentação: a nota de uso e o registro das rodadas de forma e das medidas no banco de provas.
-8. Na bicicleta, a varredura da coroa do garfo de 395 a 405 mm e a do topo dos estais de 40 a 56 mm, de 1 em 1 mm, fecham a união do cordão sem recusa; e um teste com dois sólidos cujos cantos ficam a menos da tolerância declarada prova a fusão e a malha fechada.
+8. Na bicicleta, a varredura da coroa do garfo de 395 a 405 mm e a do topo dos estais de 40 a 56 mm, de 1 em 1 mm, fecha as uniões das juntas sem a recusa "é defeito do cálculo" (casca aberta ou precisão); a recusa do `friso` por curva fechada demais, que diz o ponto e a largura, é limite de geometria e não conta. A linha de base, em 2026-11-16, com a placa da gancheira na junta do quadro: 18 de 27 valores recusam, 12 por casca aberta na gancheira ou no topo do tubo do selim, 1 por uma aresta de 0,15 µm que a primeira união deixa para a segunda, e 6 (estais de 51 a 56 mm) pelo cordão que não cabe entre o estai e o tubo superior. Um teste com dois sólidos cujos cantos ficam a menos da tolerância declarada prova a fusão e a malha fechada.
 9. A receita da bicicleta declara a solda só com `unir`, `friso` com `costura` e `cordao`, e `unir` com `vincarCostura`, sem anéis próprios nas pontas dos tubos, e o cordão continua sem triângulo longo, medido como na fatia 3.
 
 ## Fatias
