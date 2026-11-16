@@ -1,8 +1,10 @@
 # Ferramentas de correção de superfície: alisar as curvas pela medida, cortar com simetria e emendar com continuidade declarada, rumo ao G2 de produção
 
-**Estado:** rascunho
+**Estado:** ativo
 
-**Território:** a declarar ao ativar; deve ficar em `procedural/nucleo/gaiola-por-rede.js`, `procedural/nucleo/gaiola-por-rede-liso.js`, `procedural/nucleo/curva-da-gaiola.js`, `procedural/nucleo/operacoes/abertura-por-contorno.js`, `procedural/nucleo/subdivisao.js`, um arquivo novo do núcleo para o alisamento das curvas, os testes de cada um, `tools/fixtures/correcao-de-superficie/` e `docs/modelar/banco-de-provas/correcao-de-superficie-<data>/`. A lataria do carro não entra: ela é do plano do carro, que roda a rodada 3 com as ferramentas novas.
+**Território:** `procedural/nucleo/gaiola-por-rede.js`, `procedural/nucleo/gaiola-por-rede-liso.js`, `procedural/nucleo/curva-da-gaiola.js`, `procedural/nucleo/operacoes/abertura-por-contorno.js`, `procedural/nucleo/subdivisao.js`, `procedural/nucleo/alisar-curvas.js`, `tools/fixtures/correcao-de-superficie/`, `docs/modelar/banco-de-provas/correcao-de-superficie-2026-11-16/`, e os testes desses arquivos.
+
+Ativado pela pessoa em 2026-11-16, no lugar do plano do robô humanoide, que foi congelado. A lataria do carro não entra: ela é do plano do carro, que roda a rodada 3 com as ferramentas novas.
 
 **Responsável:** a IA da sessão implementa e mede; a pessoa julga a forma por imagem e decide entre os caminhos do G2.
 

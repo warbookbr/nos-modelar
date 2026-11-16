@@ -1,6 +1,8 @@
 # Modelagem de robô humanoide: o que já serve, o que falta na montagem e por onde começar
 
-**Estado:** ativo
+**Estado:** congelado
+
+Congelado pela pessoa em 2026-11-16, parado e sem trabalho em curso, para dar o lugar de plano ativo às ferramentas de correção de superfície; volta à raiz e a `ativo` quando a pessoa pedir, do ponto em que estava.
 
 **Território:** `procedural/pecas/robo-humanoide/`, `docs/modelar/banco-de-provas/robo-humanoide-2026-11-14/`, `tools/modelar/planejado-contra-executado.mjs`
 

@@ -1,6 +1,6 @@
 # Robô humanoide, braço direito: rodada de alinhamento
 
-Registro da fatia 1 do plano [modelagem de robô humanoide](../../../docs/modelar/planos/2026-11-14-modelagem-de-robo.md). A rodada foi conduzida com a pessoa em 2026-11-14 pela sessão que coordena o plano, e este arquivo foi escrito por um agente despachado a partir das decisões que ela relatou. Por isso ele não traz a seção de aceite, que cabe a quem conduziu a rodada, e separa o que a pessoa fixou do que foi proposto sem ela.
+Registro da fatia 1 do plano [modelagem de robô humanoide](../../../docs/modelar/planos/congelados/2026-11-14-modelagem-de-robo.md). A rodada foi conduzida com a pessoa em 2026-11-14 pela sessão que coordena o plano, e este arquivo foi escrito por um agente despachado a partir das decisões que ela relatou. Por isso ele não traz a seção de aceite, que cabe a quem conduziu a rodada, e separa o que a pessoa fixou do que foi proposto sem ela.
 
 ## O objeto e as referências
 

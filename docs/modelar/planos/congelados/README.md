@@ -41,3 +41,4 @@ zero daqui a três meses.
 | [vocabulário poligonal da bancada](2026-09-17-vocabulario-poligonal-da-bancada.md) (`docs/modelar/planos/congelados/2026-09-17-vocabulario-poligonal-da-bancada.md`) | 2026-09-17 | absorver edição livre deixar de ser o gargalo, ou uma peça concreta precisar de uma dessas formas |
 | [carroceria por casca deformável](2026-09-10-carroceria-por-casca-deformavel.md) (`docs/modelar/planos/congelados/2026-09-10-carroceria-por-casca-deformavel.md`) | 2026-09-10 | existir no acervo uma casca base de carro, fechada e com regiões nomeadas, reconhecível como carro antes de qualquer ajuste |
 
+| [modelagem de robô humanoide](2026-11-14-modelagem-de-robo.md) (`docs/modelar/planos/congelados/2026-11-14-modelagem-de-robo.md`) | 2026-11-16 | a pessoa pedir; foi congelado parado, sem trabalho em curso, para dar lugar às ferramentas de correção de superfície |
