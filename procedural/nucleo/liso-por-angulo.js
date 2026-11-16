@@ -13,7 +13,8 @@
 
    `entradas` é a lista das faces lisas que tocam o vértice, cada uma com a
    normal unitária `u` e o peso `n` (a normal unitária multiplicada pelo ângulo
-   do canto da face no vértice, `anguloDoCanto`). Devolve a normal unitária, ou null. */
+   do canto da face no vértice, `anguloDoCanto`, e por `fatorDaFaceLisa`). Devolve a normal unitária, ou null. */
+import { LIMITE_DE_FACE_FINA } from './topologia.js';
 export function normalLisaDoCanto(uFace, liso, entradas) {
   const limite = typeof liso === 'number' ? Math.cos((liso * Math.PI) / 180) : -Infinity;
   let x = 0; let y = 0; let z = 0;
@@ -36,7 +37,13 @@ export function normalLisaDoCanto(uFace, liso, entradas) {
 
    `anguloDoCanto(anterior, ponto, seguinte, normal)` devolve o ângulo interno, em radianos, do canto `ponto` do polígono cujos
    cantos vizinhos são `anterior` e `seguinte`. Com a `normal` do polígono (no sentido dos cantos), o canto reflexo de um
-   polígono côncavo dá mais de pi; sem ela, o ângulo fica entre 0 e pi, o que basta para triângulo. Aresta de comprimento nulo dá 0. */
+   polígono côncavo dá mais de pi; sem ela, o ângulo fica entre 0 e pi, o que basta para triângulo. Aresta de comprimento nulo dá 0.
+
+   A LASCA NÃO PESA. Pelo ângulo, a lasca (a face fina que uma booleana deixa, de normal sem precisão) vale no canto o mesmo que
+   a face boa ao lado, e o canto quase raso dela (perto de pi) puxava a normal lisa da vizinha: na garrafa de vidro, 20° pelo
+   ângulo contra meio grau pela área. Por isso o peso é o ângulo vezes `fatorDaFaceLisa`, que apaga a face cuja razão (área
+   sobre o quadrado da maior aresta, a mesma de `topologia.js`) fica abaixo de LIMITE_DE_FACE_FINA e sobe em rampa até 1 no
+   dobro dele. A conta é da face inteira, e não de cada triângulo, para que dividir uma face boa não mude o peso dela. */
 export function anguloDoCanto(anterior, ponto, seguinte, normal = null) {
   const ax = anterior[0] - ponto[0], ay = anterior[1] - ponto[1], az = anterior[2] - ponto[2];
   const bx = seguinte[0] - ponto[0], by = seguinte[1] - ponto[1], bz = seguinte[2] - ponto[2];
@@ -46,6 +53,21 @@ export function anguloDoCanto(anterior, ponto, seguinte, normal = null) {
   if (s === 0 && d === 0) return 0;
   const a = Math.atan2(s, d);
   return a < 0 ? a + 2 * Math.PI : a;
+}
+
+/* `fatorDaFaceLisa(pontos)` -> de PISO_DO_FATOR a 1: 0 (o piso) até a razão LIMITE_DE_FACE_FINA, 1 a partir do dobro, em rampa
+   entre os dois. O piso deixa a normal de um canto só de lascas sair delas, e não nula. */
+const PISO_DO_FATOR = 1e-6;
+export function fatorDaFaceLisa(pontos) {
+  let x = 0; let y = 0; let z = 0; let maior = 0;
+  for (let k = 0; k < pontos.length; k++) {
+    const a = pontos[k]; const b = pontos[(k + 1) % pontos.length];
+    x += (a[1] - b[1]) * (a[2] + b[2]); y += (a[2] - b[2]) * (a[0] + b[0]); z += (a[0] - b[0]) * (a[1] + b[1]);
+    maior = Math.max(maior, Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]));
+  }
+  if (!(maior > 0)) return PISO_DO_FATOR;
+  const razao = Math.hypot(x, y, z) / 2 / (maior * maior);
+  return Math.max(PISO_DO_FATOR, Math.min(1, razao / LIMITE_DE_FACE_FINA - 1));
 }
 
 /* As quebras de sombra. A face lisa pode trazer `quebras`, a lista de arestas suas, como pares de ids de vértice, em que

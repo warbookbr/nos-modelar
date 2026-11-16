@@ -31,7 +31,7 @@ import { writeFileSync } from 'node:fs';
 import { basename, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { VISTAS_BANCADA } from '../../src/autoria/vistas-da-bancada.js';
-import { anguloDoCanto } from '../../procedural/nucleo/liso-por-angulo.js';
+import { anguloDoCanto, fatorDaFaceLisa } from '../../procedural/nucleo/liso-por-angulo.js';
 import { FUNDO_DO_PAINEL, imagem, paraPng } from './leitura-por-regioes.mjs';
 import { ErroDoModelo, abrirModelo, faceNoRecorte, lerRecorte, painelDaOpcao, quadroDoRecorte, resumoDaAbertura } from './modelo-aberto.mjs';
 
@@ -123,18 +123,18 @@ const paraLinear = (c) => { const x = c / 255; return x <= 0.04045 ? x / 12.92 :
 const paraSrgb = (x) => { const c = x <= 0.0031308 ? x * 12.92 : 1.055 * (x ** (1 / 2.4)) - 0.055; return Math.max(0, Math.min(255, Math.round(c * 255))); };
 const chaveDoPonto = (parte, p) => `${parte}|${Math.round(p[0] * 1000)}|${Math.round(p[1] * 1000)}|${Math.round(p[2] * 1000)}`;
 
-/** A normal de cada canto de cada face: a média, pesada pelo ângulo do canto (como na bancada), das faces da mesma parte no mesmo ponto a menos de `liso` graus. */
+/** A normal de cada canto de cada face: a média, pesada pelo ângulo do canto vezes o fator da lasca (como na bancada), das faces da mesma parte no mesmo ponto a menos de `liso` graus. */
 export function normaisDosCantos(faces, liso = LISO_PADRAO) {
   const normal = faces.map((f) => {
     let n = [0, 0, 0];
     for (let i = 0; i < f.pts.length; i += 1) { const a = f.pts[i]; const b = f.pts[(i + 1) % f.pts.length]; n = [n[0] + (a[1] - b[1]) * (a[2] + b[2]), n[1] + (a[2] - b[2]) * (a[0] + b[0]), n[2] + (a[0] - b[0]) * (a[1] + b[1])]; }
-    return { peso: n, u: unit(n) };
+    return { peso: n, u: unit(n), fator: fatorDaFaceLisa(f.pts) };
   });
   if (!(liso > 0)) return faces.map((f, i) => f.pts.map(() => normal[i].u));
   const porPonto = new Map();
   faces.forEach((f, i) => f.pts.forEach((p, c) => {
     const k = chaveDoPonto(f.parte, p); if (!porPonto.has(k)) porPonto.set(k, []);
-    const m = f.pts.length; porPonto.get(k).push([i, anguloDoCanto(f.pts[(c - 1 + m) % m], p, f.pts[(c + 1) % m], normal[i].u)]);
+    const m = f.pts.length; porPonto.get(k).push([i, anguloDoCanto(f.pts[(c - 1 + m) % m], p, f.pts[(c + 1) % m], normal[i].u) * normal[i].fator]);
   }));
   const limite = Math.cos((liso * Math.PI) / 180);
   return faces.map((f, i) => f.pts.map((p) => {

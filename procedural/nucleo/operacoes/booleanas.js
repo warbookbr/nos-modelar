@@ -285,11 +285,14 @@ export function criarOperacoesBooleanas(servicos) {
     });
     /* o cordão de solda entre os operandos declara o passo do refino da faixa que ele toca (refino-da-costura.js) */
     let refino = null;
-    if (op === 'unir') for (const s of a.solidos) {
+    if (op === 'unir') a.solidos.forEach((s, k) => {
       const o = s?.origem;
-      if (!o || o.op !== 'friso') continue;
-      for (const r of st.origens.get(o.id) ?? []) if (r.op === 'friso' && r.refinoDaCostura) refino = { passo: Math.min(refino?.passo ?? Infinity, r.refinoDaCostura.passo), faixa: Math.max(refino?.faixa ?? 0, r.refinoDaCostura.faixa) };
-    }
+      if (!o || o.op !== 'friso') return;
+      for (const r of st.origens.get(o.id) ?? []) {
+        if (r.op !== 'friso' || !r.refinoDaCostura) continue;
+        refino = { passo: Math.min(refino?.passo ?? Infinity, r.refinoDaCostura.passo), faixa: Math.max(refino?.faixa ?? 0, r.refinoDaCostura.faixa), cordoes: new Set([...(refino?.cordoes ?? []), k]) };
+      }
+    });
     return nucleoBooleano(st, i, op, wasm, a.origemId, operandosDoCalculo, null, { vincarCostura: a.vincarCostura === true, origemDoOperando, refino });
   }
 
@@ -1073,8 +1076,6 @@ export function criarOperacoesBooleanas(servicos) {
         ...cortadas, ...pedacosNovos.map((c) => [c[0], c[1]]),
       ].filter(([, P]) => new Set(P).size >= 3 && areaDe(pos, P) < piso * 1e-3);
       if (semArea.length) {
-        /* a união que ia recusar por face sem área tenta de novo, uma vez, com os reforços da segunda tentativa (o canto que cai em cima de outro funde-se); o que a primeira aceita não muda */
-        if (!extra && !reforco && op === 'unir') return nucleoBooleano(st, i, op, wasm, origemId, operandos, extra, { vincarCostura, origemDoOperando, reforco: true, refino });
         const [fid, P] = semArea[0];
         if (extra) return grita(st, i, op, extra.ref, `o arredondamento deixaria ${semArea.length} face(s) sem área (cantos colineares), a primeira vinda da face ${fid}: o raio não combina com o tamanho das faces deste encaixe; tente um raio diferente, começando por um menor (raioMinimo e regiao não mudam a tampa que gera a lasca); nada foi alterado`);
         return grita(st, i, op, 'solidos', `o resultado teria ${semArea.length} face(s) degenerada(s) (área zero: os cantos ficam colineares), a primeira vinda da face ${fid} com ${P.length} cantos; laterais coplanares entre os sólidos costumam causar isto. Afaste as laterais (uma delas 1 mm menor) ou una os sólidos por outra partição; nada foi alterado`);
@@ -1282,7 +1283,20 @@ export function criarOperacoesBooleanas(servicos) {
       if (novas.length) f.quebras = [...(f.quebras ?? []), ...novas];
     }
     let refinado = null;
-    if (refino != null && !extra) refinado = refinarFaixaDaCostura(st, { faces, costura: facesDaCostura, arestasDaCostura: costuraFinal, passo: refino.passo, faixa: refino.faixa, idV: (k) => idDoPasso(i, k), idF: (k) => idDoPasso(i, k), primeiroV: provisorios.length, primeiroF: pedacosNovos.length, limiteDeIds: BLOCO + FAIXA_ESTENDIDA, donos });
+    if (refino != null && !extra) {
+      /* a faixa sai só do pé do cordão: as arestas da costura em que uma das faces vem do operando que é o cordão (`donos`); a
+         costura de outro sólido da mesma união (um terceiro tubo sem cordão) não é refinada */
+      const doCordao = new Set();
+      for (const fid of facesDaCostura) {
+        if (!refino.cordoes.has(donos[fid])) continue;
+        const vs = st.F.get(fid).vs;
+        vs.forEach((v, k) => { const w = vs[(k + 1) % vs.length]; const c = v < w ? `${v}-${w}` : `${w}-${v}`; if (costuraFinal.has(c)) doCordao.add(c); });
+      }
+      if (doCordao.size) {
+        refinado = refinarFaixaDaCostura(st, { faces, costura: facesDaCostura, arestasDaCostura: costuraFinal, arestasDoPe: doCordao, cordoes: refino.cordoes, passo: refino.passo, faixa: refino.faixa, idV: (k) => idDoPasso(i, k), idF: (k) => idDoPasso(i, k), primeiroV: provisorios.length, primeiroF: pedacosNovos.length, limiteDeIds: BLOCO + FAIXA_ESTENDIDA, donos });
+        if (!refinado) st.avisos.push({ passo: i, op, ref: 'refinoDaCostura', origemId, motivo: 'o refino da faixa em volta do pé do cordão deixaria a malha aberta (ou acabaria os ids do passo) e ficou de fora; a união sai sem ele, com os triângulos longos do corte' });
+      }
+    }
     if (extra?.aoAplicar) extra.aoAplicar({ pedacosDeEntrada, consumidas: [...consumidas] });
     const MOTIVOS_DO_SEM_EFEITO = {
       longe: (q) => `${q} não toca a peça ou só encosta nela: nenhuma face da peça foi cortada nem consumida e nenhum pedaço novo entrou; confira a posição e o tamanho da ferramenta`,

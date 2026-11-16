@@ -2,7 +2,7 @@
    Sem Three.js, sem disco, sem relógio nem acaso. A ordem de tudo (partes, primitivas, materiais, texturas) sai da ordem dos ids de
    face e dos nomes das partes, nunca da ordem de inserção de um mapa externo. */
 import { PNG } from 'pngjs';
-import { anguloDoCanto, chaveDoCantoLiso, normalLisaDoCanto } from '../../../procedural/nucleo/liso-por-angulo.js';
+import { anguloDoCanto, chaveDoCantoLiso, fatorDaFaceLisa, normalLisaDoCanto } from '../../../procedural/nucleo/liso-por-angulo.js';
 import { normalizarMaterial, normalizarMateriais } from '../../../src/autoria/material-da-receita.js';
 import { caixaDaParte, coordenadasDeTextura, medidasDaProjecao } from '../../../src/autoria/coordenada-de-textura.js';
 import { gerarMapaDeFlocos, gerarMapasDoRelevo, metrosPorTileDoRelevo, METROS_POR_TILE_DOS_FLOCOS } from '../../textura/src/mapas.js';
@@ -70,7 +70,7 @@ function cruzDoTriangulo(a, b, c) {
   return [uy * vz - uz * vy, uz * vx - ux * vz, ux * vy - uy * vx];
 }
 
-/* As normais suaves, como na bancada: só a face `liso` entra na soma, pesada pelo ângulo do canto, por canto (vértice, ou vértice e setor quando há `quebras`). */
+/* As normais suaves, como na bancada: só a face `liso` entra na soma, pesada pelo ângulo do canto vezes o fator da lasca, por canto (vértice, ou vértice e setor quando há `quebras`). */
 function normaisSuaves(faces) {
   const chave = chaveDoCantoLiso(faces.map((f) => f.original));
   const soma = new Map();
@@ -78,13 +78,16 @@ function normaisSuaves(faces) {
   for (const f of faces) {
     if (!f.original.liso) continue;
     const daFace = new Map();
+    const fator = fatorDaFaceLisa(f.original.vs.map((id) => f.vertices.get(id)));
     for (const tri of f.triangulos) {
       const P = tri.map((id) => f.vertices.get(id));
-      const u = normalizar(cruzDoTriangulo(...P));
+      let u = normalizar(cruzDoTriangulo(...P));
       if (!u) continue;
+      /* o triângulo virado contra o plano da face (a face em gravata, ou o leque de uma côncava) entra com a normal do plano, como na bancada */
+      if (u[0] * f.normal[0] + u[1] * f.normal[1] + u[2] * f.normal[2] <= 0) u = f.normal;
       for (let j = 0; j < 3; j++) {
-        /* o peso é o ângulo do canto do triângulo, como na bancada (`anguloDoCanto`) */
-        const w = anguloDoCanto(P[(j + 2) % 3], P[j], P[(j + 1) % 3]);
+        /* o peso é o ângulo do canto do triângulo vezes o fator da lasca da face, como na bancada (`anguloDoCanto`, `fatorDaFaceLisa`) */
+        const w = anguloDoCanto(P[(j + 2) % 3], P[j], P[(j + 1) % 3]) * fator;
         const n = [u[0] * w, u[1] * w, u[2] * w];
         const id = tri[j];
         const k = chave(f.original, id);

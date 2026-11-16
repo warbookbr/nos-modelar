@@ -1,6 +1,6 @@
 /* adaptador.js — projeção visual do neutro; não conhece receitas nem execução. */
 import { N_INFLU, norm3, normalDaFace, temNomeDeParte } from './nucleo.js';
-import { anguloDoCanto, chaveDoCantoLiso, normalLisaDoCanto } from './liso-por-angulo.js';
+import { anguloDoCanto, chaveDoCantoLiso, fatorDaFaceLisa, normalLisaDoCanto } from './liso-por-angulo.js';
 import { triangularFace } from './triangulacao-face.js';
 
 /* ----------------------------------------------------------------------------
@@ -64,11 +64,13 @@ export function adaptarV3(neutro, ctx, MATERIAIS = {}) {
   /* a soma é por canto: a chave é o vértice, ou o vértice e o setor quando uma face lisa declara `quebras` (o vinco
      vivo da subdivisão), e a média não passa por cima da quebra; sem quebra, a chave é o vértice, como antes. */
   const chave = chaveDoCantoLiso(faces);
-  /* o peso de cada face é o ângulo do canto dela no vértice (liso-por-angulo.js): a normal não muda quando uma face plana
-     vizinha se divide em mais pedaços */
+  /* o peso de cada face é o ângulo do canto dela no vértice vezes o fator que apaga a lasca (liso-por-angulo.js): a normal não
+     muda quando uma face plana vizinha se divide em mais pedaços, e a face fina não a puxa */
+  const fator = new Map();
+  for (const f of faces) if (f.liso) { const P = f.vs.map((v) => V.get(v)); fator.set(f.id, P.every(Boolean) ? fatorDaFaceLisa(P) : 0); }
   const pesoDoCanto = (f, k) => {
     const n = f.vs.length; const a = V.get(f.vs[(k - 1 + n) % n]), p = V.get(f.vs[k]), b = V.get(f.vs[(k + 1) % n]);
-    return a && p && b ? anguloDoCanto(a, p, b, nFace.get(f.id)) : 1;
+    return a && p && b ? anguloDoCanto(a, p, b, nFace.get(f.id)) * fator.get(f.id) : 0;
   };
   const acc = new Map();
   for (const f of faces) if (f.liso) { const n = nFace.get(f.id); f.vs.forEach((v, k) => { const w = pesoDoCanto(f, k); const c = chave(f, v); const s = acc.get(c) || [0, 0, 0]; acc.set(c, [s[0] + n[0] * w, s[1] + n[1] * w, s[2] + n[2] * w]); }); }
