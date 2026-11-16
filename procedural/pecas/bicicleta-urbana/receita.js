@@ -205,10 +205,15 @@ export const TABELA = {
   pedal_caixa_sai: 6.4, /* quanto a caixa sai da moldura (y 188 a 225 px), mm */
   pedal_caixa_altura: 18, /* altura da caixa do refletor, mm */
   pedal_refletor_altura: 11, /* altura do refletor na janela da caixa, mm */
-  pedal_refletor_sai: 0.8, /* quanto o refletor (em preto por enquanto) sai da face da caixa, mm */
-  pedal_rebaixo: 2.5, /* profundidade do rebaixo da ponta de fora, mm */
-  pedal_rebaixo_comp: 30, /* comprimento (z) do rebaixo da ponta de fora, mm */
-  pedal_rebaixo_alt: 13, /* altura do rebaixo da ponta de fora, mm */
+  pedal_janela_prof: 2.5, /* profundidade da janela do refletor na face da caixa, mm */
+  pedal_janela_margem: 3, /* moldura preta de cada lado da janela do refletor, mm */
+  pedal_janela_borda: 1.5, /* moldura preta em cima e embaixo da janela, mm */
+  pedal_rebaixo: 2.5, /* quanto a abertura da ponta de fora passa da face de fora, mm */
+  pedal_rebaixo_comp: 50, /* comprimento (z) da abertura passante da ponta de fora, mm */
+  pedal_rebaixo_alt: 13, /* altura da abertura passante da ponta de fora, mm */
+  pedal_rebaixo_canto: 3, /* raio dos cantos da abertura da ponta de fora, mm */
+  pedal_borda_raio: 2.5, /* raio do arredondamento das bordas da moldura, mm */
+  pedal_borda_paineis: 3, /* painéis do arredondamento */
   pedal_pino: 1.9, /* raio dos pinos, mm */
   pedal_pino_altura: 1.5, /* quanto o pino sai da face, mm */
   /* pinos (u, v) em px: 4 em cada borda da frente e de trás, 3 na borda de fora, 2 na de dentro e 4 sobre a barra do meio; os mesmos embaixo */
@@ -218,8 +223,6 @@ export const TABELA = {
   pedal_ressalto: 4.5, /* ressalto redondo entre a porca e a moldura (u 775 a 800 px), mm */
   pedal_ressalto_raio: 12, /* mm */
   pedal_rosca_raio: 6.5, /* rosca de 9/16" a 13 mm de diâmetro na escala adotada, mm */
-  pedal_tampa: 3, /* tampa redonda na ponta de fora, mm */
-  pedal_tampa_raio: 8.5, /* mm */
 };
 
 /* fecho convexo de pontos 2D (cadeia monótona), no sentido anti-horário */
@@ -836,14 +839,40 @@ export function gerarPassos(T) {
       const furos = T.pedal_aberturas_px.map(([a0, a1, b0, b1]) => ({ retangulo: { largura: m(Math.abs(U(a1) - U(a0))), profundidade: m((b1 - b0) * k), centro: [m((U(a0) + U(a1)) / 2), m(W((b0 + b1) / 2))], cantos: m(T.pedal_abertura_canto) } }));
       const oid = proximo();
       passos.push(['extrusao', { origemId: oid, eixo: 'y', altura: m(T.pedal_altura), perfil: { contorno: { inicio: pts[0], trechos } }, furos, segmentosArco: 4, em: [0, m(y0), 0] }]);
-      /* rebaixo da ponta de fora (a abertura da ponta, rasa) */
+      /* bordas de plástico moldado: o topo e o fundo da moldura, por fora e nas duas aberturas, arredondados com `arredondarAresta` em cadeia (o laço
+         inteiro a partir de uma aresta): o de fora pela aresta mais para trás, os das aberturas pela aresta mais para trás de uma e mais para a frente
+         da outra; depois de arredondado, o laço deixa de ser aresta viva, e o filtro `viva` só enxerga os que ainda faltam. O arredondamento vem antes
+         do corte da ponta, porque o corte parte a parede em faces que ligam o laço de cima a vértices a mais, e a cadeia recusa o canto */
+      const idsArredonda = [];
+      for (const dirY of [1, -1]) for (const lado of ['min', 'min', 'max']) {
+        const aid = proximo();
+        idsArredonda.push(aid);
+        passos.push(['arredondarAresta', { origemId: aid, raio: m(T.pedal_borda_raio), paineis: T.pedal_borda_paineis, cadeia: { ate: 50 },
+          sel: { origem: { op: 'extrusao', id: oid }, onde: { alvo: 'aresta', tipo: 'viva', angulo: 60, normal: { dir: [0, dirY, 0], ate: 5 }, extremo: { eixo: 'z', lado } } } }]);
+      }
+      /* a moldura inteira (a extrusão e as faixas dos arredondamentos) vira um grupo provisório, que a marcação final troca por `pedais`: é a
+         seleção que cobre as faces das duas origens como um sólido só */
+      const grupoMoldura = `moldura-${ld > 0 ? 'e' : 'd'}`;
+      passos.push(['parte', { nome: grupoMoldura, sel: { origem: { op: 'extrusao', id: oid } } }]);
+      for (const idA of idsArredonda) passos.push(['parte', { nome: grupoMoldura, sel: { origem: { op: 'arredondarAresta', id: idA } } }]);
+      const molduraSel = { grupo: grupoMoldura };
+      const xFora0 = U(Math.min(...T.pedal_contorno_px.map((p) => p[0])));
+      /* abertura retangular de cantos redondos que atravessa a parede da ponta de fora e chega às aberturas de cima (a tampa da rosca, que ficaria
+         solta dentro dela, não existe mais) */
       const cid = proximo();
-      const xFora = U(Math.min(...T.pedal_contorno_px.map((p) => p[0])));
-      passos.push(['cubo', { origemId: cid, larg: m(2 * T.pedal_rebaixo), alt: m(T.pedal_rebaixo_alt), prof: m(T.pedal_rebaixo_comp), em: [m(xFora), m(it.y - T.pedal_rebaixo_alt / 2), m(it.z)] }]);
+      const xFora = xFora0;
+      const xAbertura = U(Math.min(...T.pedal_aberturas_px.map((a) => a[0])));
+      const xa0 = Math.min(xFora + ld * T.pedal_rebaixo, xAbertura - ld * 2), xa1 = Math.max(xFora + ld * T.pedal_rebaixo, xAbertura - ld * 2);
+      passos.push(['extrusao', { origemId: cid, eixo: 'x', altura: m(xa1 - xa0), perfil: { retangulo: { largura: m(T.pedal_rebaixo_alt), profundidade: m(T.pedal_rebaixo_comp), cantos: m(T.pedal_rebaixo_canto) } }, segmentosArco: 4, em: [m(xa0), m(it.y), m(it.z)] }]);
       const sid = proximo();
-      passos.push(['subtrair', { origemId: sid, solidos: [{ origem: { op: 'extrusao', id: oid } }, { origem: { op: 'cubo', id: cid } }] }]);
-      marca('pedais', it.material, { origem: { op: 'subtrair', id: sid } });
-      /* caixas do refletor, frente e atrás, mais estreitas que a moldura; o refletor é um retângulo raso na face de cada uma */
+      passos.push(['subtrair', { origemId: sid, solidos: [molduraSel, { origem: { op: 'extrusao', id: cid } }] }]);
+      /* o grupo provisório vira `pedais` já aqui (a marcação em lote vem no fim e não troca parte de face já nomeada) */
+      passos.push(['parte', { nome: 'pedais', sel: molduraSel, substituir: true }]);
+      passos.push(['material', { sel: { origem: { op: 'subtrair', id: sid } }, usa: it.material }]);
+      for (const idA of idsArredonda) passos.push(['material', { sel: { origem: { op: 'arredondarAresta', id: idA } }, usa: it.material }]);
+      passos.push(['material', { sel: { origem: { op: 'extrusao', id: oid } }, usa: it.material }]);
+      /* caixas do refletor, frente e atrás, mais estreitas que a moldura, com uma janela na face; o refletor laranja fica dentro da janela, e a
+         caixa preta a emoldura */
       const [cu0, cu1] = T.pedal_caixa_px;
       const zMoldura = T.pedal_profundidade / 2;
       for (const fz of [-1, 1]) {
@@ -851,11 +880,15 @@ export function gerarPassos(T) {
         const zi = it.z + fz * (zMoldura - 1), zf = it.z + fz * (zMoldura + T.pedal_caixa_sai);
         const bid = proximo();
         passos.push(['extrusao', { origemId: bid, eixo: 'y', altura: m(T.pedal_caixa_altura), perfil: { retangulo: { largura: m(Math.abs(xa - xb)), profundidade: m(Math.abs(zf - zi)), centro: [m((xa + xb) / 2), m((zi + zf) / 2)], cantos: m(2) } }, segmentosArco: 4, em: [0, m(it.y - T.pedal_caixa_altura / 2), 0] }]);
-        marca('pedais', it.material, { origem: { op: 'extrusao', id: bid } });
+        const jid = proximo();
+        const larJ = Math.abs(xa - xb) - 2 * T.pedal_janela_margem, altJ = T.pedal_refletor_altura + 2 * T.pedal_janela_borda;
+        passos.push(['cubo', { origemId: jid, larg: m(larJ), alt: m(altJ), prof: m(T.pedal_janela_prof + 1), em: [m((xa + xb) / 2), m(it.y - altJ / 2), m(zf - fz * (T.pedal_janela_prof - 1) / 2 + fz * 0)] }]);
+        const kid = proximo();
+        passos.push(['subtrair', { origemId: kid, solidos: [{ origem: { op: 'extrusao', id: bid } }, { origem: { op: 'cubo', id: jid } }] }]);
+        marca('pedais', it.material, { origem: { op: 'subtrair', id: kid } });
         const rid = proximo();
-        const zr = it.z + fz * (zMoldura + T.pedal_caixa_sai + T.pedal_refletor_sai / 2 - 0.3);
-        passos.push(['cubo', { origemId: rid, larg: m(Math.abs(xa - xb) - 10), alt: m(T.pedal_refletor_altura), prof: m(T.pedal_refletor_sai + 0.6), em: [m((xa + xb) / 2), m(it.y - T.pedal_refletor_altura / 2), m(zr)] }]);
-        marca('pedais', it.material, { origem: { op: 'cubo', id: rid } });
+        passos.push(['cubo', { origemId: rid, larg: m(larJ - 1), alt: m(altJ - 1), prof: m(2), em: [m((xa + xb) / 2), m(it.y - (altJ - 1) / 2), m(zf - fz * (T.pedal_janela_prof - 0.5))] }]);
+        marca('pedais', 'refletor', { origem: { op: 'cubo', id: rid } });
       }
       /* pinos em cima e embaixo (cilindros de 8 lados com a ponta reta) */
       for (const sy of [1, -1]) for (const p of T.pedal_pinos_px) {
@@ -865,11 +898,6 @@ export function gerarPassos(T) {
         passos.push(['lathe', { origemId: pid, eixo: 'y', lados: 8, perfil: [[0, m(ya)], [m(T.pedal_pino), m(ya)], [m(T.pedal_pino), m(yb)], [0, m(yb)]], em: [m(U(p[0])), 0, m(W(p[1]))] }]);
         marca('pedais', it.material, { origem: { op: 'lathe', id: pid } });
       }
-      /* tampa redonda na ponta de fora */
-      const tid = proximo();
-      const xt0 = Math.min(xFora - ld * 1, xFora + ld * T.pedal_tampa), xt1 = Math.max(xFora - ld * 1, xFora + ld * T.pedal_tampa);
-      passos.push(['lathe', { origemId: tid, eixo: 'x', lados: 20, perfil: [[0, m(xt0)], [m(T.pedal_tampa_raio), m(xt0)], [m(T.pedal_tampa_raio), m(xt1)], [0, m(xt1)]], em: [0, m(it.y), m(it.z)] }]);
-      marca('pedais', it.material, { origem: { op: 'lathe', id: tid } });
       /* ressalto redondo entre a porca e a moldura */
       const rsid = proximo();
       const xr0 = Math.min(xi, xi - ld * T.pedal_ressalto), xr1 = Math.max(xi, xi - ld * T.pedal_ressalto);
@@ -939,6 +967,7 @@ const receita = {
     aluminioEscuro: { cor: '#2b2e33', metalicidade: 0.6, aspereza: 0.45 },
     aroMetal: { cor: '#3a3d42', metalicidade: 0.7, aspereza: 0.4 },
     preto: { cor: '#1c1d20', metalicidade: 0.1, aspereza: 0.6 },
+    refletor: { cor: '#e8901e', metalicidade: 0.1, aspereza: 0.3 },
     borracha: { cor: '#161616', metalicidade: 0, aspereza: 0.9 },
     aco: { cor: '#9aa0a6', metalicidade: 0.85, aspereza: 0.35 },
   },
