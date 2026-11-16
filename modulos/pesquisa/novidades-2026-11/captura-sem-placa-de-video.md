@@ -44,7 +44,7 @@ WebGPU em Node por Dawn: pacote `webgpu` em https://github.com/dawn-gpu/node-web
 
 ### 7. Outros sinalizadores do SwiftShader
 
-O que existe são `--enable-unsafe-swiftshader` (opt-in obrigatório desde o Chromium 137 estimado, https://groups.google.com/a/chromium.org/g/blink-dev/c/yhFguWS_3pM, aviso desde o 130) e `--use-gl=angle --use-angle=swiftshader-webgl` (documentado em docs/gpu/swiftshader.md do Chromium). Não achei benchmark publicado de outros sinalizadores acelerando o SwiftShader, e os meus (compositor sem GPU, threads de raster, vsync) não mudaram o tempo. Não há ganho aqui; o próprio conjunto atual do repositório já é o que o Chromium documenta.
+O que existe são `--enable-unsafe-swiftshader` (opt-in obrigatório desde o Chromium 137 estimado, https://groups.google.com/a/chromium.org/g/blink-dev/c/yhFguWS_3pM, aviso desde o 130) e `--use-gl=angle --use-angle=swiftshader-webgl` (documentado no arquivo swiftshader.md da pasta docs/gpu do código do Chromium). Não achei benchmark publicado de outros sinalizadores acelerando o SwiftShader, e os meus (compositor sem GPU, threads de raster, vsync) não mudaram o tempo. Não há ganho aqui; o próprio conjunto atual do repositório já é o que o Chromium documenta.
 
 ## Recomendação, em ordem
 
