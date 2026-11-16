@@ -1085,7 +1085,7 @@ describe('o reflexo da bancada no pacote da peça de lataria', () => {
     const olharBancada = async (opcoes) => {
       chamadas.push(opcoes);
       const vistas = opcoes.revisar ? ['isometrica', 'frontal', 'direita', 'superior'] : String(opcoes.vistas).split(',');
-      const sufixo = [opcoes.selecionadas ? `sel-${opcoes.selecionadas}` : null, opcoes.arame ? `arame-${opcoes.arame}` : null, opcoes.visao ? `visao-${opcoes.visao}` : null, opcoes.enquadrar ? 'enquadrado' : 'orto'].filter(Boolean).join('-');
+      const sufixo = [opcoes.selecionadas ? `sel-${opcoes.selecionadas}` : null, opcoes.arame ? `arame-${opcoes.arame}` : null, opcoes.visao ? `visao-${opcoes.visao}` : null, opcoes.anguloDaZebra != null ? `a${opcoes.anguloDaZebra}` : null, opcoes.enquadrar ? 'enquadrado' : 'orto'].filter(Boolean).join('-');
       const arquivos = vistas.map((v) => { const a = join(base, `${prefixoDaPeca(PECA)}${v}-${sufixo}.png`); writeFileSync(a, a); return a; });
       const medidas = opcoes.visao ? vistas.map((v) => ({ nome: v, enquadramento: { largura: ENQUADRADA[v][0], altura: ENQUADRADA[v][1], area: ENQUADRADA[v][0] * ENQUADRADA[v][1] } })) : undefined;
       return { ok: true, resultado: { arquivos, ...(medidas ? { vistas: medidas } : {}) } };
@@ -1096,21 +1096,25 @@ describe('o reflexo da bancada no pacote da peça de lataria', () => {
     return { resultado, chamadas, pedido: readFileSync(join(pasta, 'pedido.md'), 'utf8'), manifesto: JSON.parse(readFileSync(join(pasta, 'pacote.json'), 'utf8')) };
   }
 
-  it('captura a zebra e a pintura enquadradas e as lista no pedido, com a frase da faixa, sem a vista de quina', async () => {
+  it('captura a zebra nas duas direções e a pintura enquadradas e as lista no pedido, com a frase da faixa, sem a vista de quina', async () => {
     const { resultado, chamadas, pedido, manifesto } = await pacote();
     const visoes = chamadas.filter((c) => c.visao);
-    expect(visoes.map((c) => [c.visao, c.enquadrar, c.vistas])).toEqual([['zebra', true, 'isometrica,frontal,direita,superior'], ['pintura', true, 'isometrica,frontal,direita,superior']]);
+    const VISTAS = 'isometrica,frontal,direita,superior';
+    expect(visoes.map((c) => [c.visao, c.anguloDaZebra ?? null, c.enquadrar, c.vistas])).toEqual([['zebra', null, true, VISTAS], ['zebra', 90, true, VISTAS], ['pintura', null, true, VISTAS]]);
     expect(titulos(pedido)).toContain('Reflexo');
     expect(titulos(pedido).indexOf('Reflexo')).toBe(titulos(pedido).indexOf('Superfície') + 1);
     const secao = pedido.slice(pedido.indexOf('## Reflexo'), pedido.indexOf('## Partes'));
     expect(secao).toContain(LEITURA_DA_FAIXA);
     /* a leitura curta do guia vai inteira, item a item, e cabe num pedido */
     for (const linha of LEITURA_DO_REFLEXO) expect(secao).toContain(`- ${linha}`);
-    for (const visao of ['zebra', 'pintura']) {
-      for (const vista of ['isometrica', 'frontal']) expect(secao).toContain(`- ${vista}: ${join(resultado.pasta, '..', `${prefixoDaPeca(PECA)}${vista}-visao-${visao}-enquadrado.png`)}`);
-      expect(secao).not.toContain(`direita-visao-${visao}`);
-      expect(manifesto.reflexo[visao]).toEqual({ imagens: resultado.reflexo[visao].imagens.map((i) => i.arquivo), fora: ['direita', 'superior'] });
+    for (const [chave, sufixo] of [['zebra', 'zebra'], ['zebra-em-pe', 'zebra-a90'], ['pintura', 'pintura']]) {
+      for (const vista of ['isometrica', 'frontal']) expect(secao).toContain(`- ${vista}: ${join(resultado.pasta, '..', `${prefixoDaPeca(PECA)}${vista}-visao-${sufixo}-enquadrado.png`)}`);
+      expect(secao).not.toContain(`direita-visao-${sufixo}`);
+      expect(manifesto.reflexo[chave]).toEqual({ imagens: resultado.reflexo[chave].imagens.map((i) => i.arquivo), fora: ['direita', 'superior'] });
     }
+    /* as duas direções da zebra, cada uma com o seu título, a deitada antes */
+    expect(secao.indexOf('Com a listra deitada (0 grau):')).toBeGreaterThan(-1);
+    expect(secao.indexOf('Com a listra deitada (0 grau):')).toBeLessThan(secao.indexOf('Com a listra em pé (90 graus):'));
     expect(secao).toContain('Ficaram de fora, porque a peça aparece de quina e ocupa menos de 20 % do quadro num dos lados: direita, superior.');
     /* a luz rasante e a curvatura, também da bancada, continuam no pedido */
     expect(pedido).toContain('rasante-frente-30.png');
@@ -1139,10 +1143,10 @@ describe('o reflexo da bancada no pacote da peça de lataria', () => {
 });
 
 describe('a leitura curta do reflexo no pedido', () => {
-  it('cabe em até 12 linhas, diz o que cada defeito faz com a faixa e o que a zebra não vê, e a seção a traz antes das imagens', () => {
+  it('cabe em até 12 linhas, diz o que cada defeito faz com a faixa e que uma direção da zebra vê o que a outra não vê, e a seção a traz antes das imagens', () => {
     expect(LEITURA_DO_REFLEXO.length).toBeLessThanOrEqual(12);
     const texto = LEITURA_DO_REFLEXO.join(' ');
-    for (const termo of ['Degrau', 'Vinco', 'Quebra de curvatura', 'Ondulação', 'Amassado', 'listras horizontais', 'pintura']) expect(texto).toContain(termo);
+    for (const termo of ['Degrau', 'Vinco', 'Quebra de curvatura', 'Ondulação', 'Amassado', 'deitada (0 grau)', 'em pé (90 graus)', 'uma vê o que a outra não vê', 'pintura']) expect(texto).toContain(termo);
     expect(texto).toContain(LEITURA_DA_FAIXA);
     const secao = secaoDoReflexo({ zebra: { imagens: [{ arquivo: '/z.png', vista: 'frontal' }], fora: [] }, pintura: { imagens: [], fora: [] } });
     expect(secao[0]).toBe('## Reflexo');

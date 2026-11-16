@@ -13,9 +13,9 @@ const maior = (json) => Math.max(...json.regioes.map((r) => r.indice));
 describe('suavidade por região', () => {
   it('dá um número por região, a lisa perto de zero e as onduladas em ordem de amplitude', async () => {
     const lisa = suavidadePorRegiao(await neutroDe('lisa'), { lado: '+z' });
-    expect(lisa.json.regioes.map((r) => r.regiao)).toEqual(['direita', 'esquerda']);
+    expect(lisa.json.regioes.map((r) => r.regiao)).toEqual(['chapa']);
     expect(maior(lisa.json)).toBeLessThan(0.05);
-    expect(lisa.tabela).toMatch(/direita/);
+    expect(lisa.tabela).toMatch(/chapa/);
     const onduladas = Object.entries(CHAPAS).filter(([, c]) => c.defeito.tipo === 'ondulacao').sort(([, a], [, b]) => a.defeito.amplitudeMm - b.defeito.amplitudeMm);
     expect(onduladas.length).toBeGreaterThanOrEqual(3);
     const indices = [];

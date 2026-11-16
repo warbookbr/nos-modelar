@@ -1,11 +1,14 @@
 #!/usr/bin/env node
 /* preparar-prova-cega.mjs — os pedidos da prova cega da leitura do reflexo (plano do reflexo na bancada, fatia 7).
  *
- * Para cada chapa de calibração (`tools/fixtures/reflexo-calibracao/chapas.mjs`), girada 45 graus no próprio plano (a zebra da bancada
- * não vê a emenda vertical; ver `estudo-de-leitura.mjs`), gera uma receita de nome neutro, com o PLANO dizendo só "chapa abaulada de
- * prova", captura a zebra e a pintura enquadradas nas vistas frontal, isometrica e tresquartos, copia as imagens com nomes neutros e
- * escreve um `pedido.md` com a seção Reflexo que o pedido de lataria de `vistas:critica` traz (`secaoDoReflexo`). O nome da chapa e o
- * defeito ficam só no gabarito, fora das pastas dos pedidos.
+ * Para cada chapa de calibração (`tools/fixtures/reflexo-calibracao/chapas.mjs`), girada 45 graus no próprio plano, gera uma receita de
+ * nome neutro, com o PLANO dizendo só "chapa abaulada de prova", captura a zebra com a listra deitada e em pé (`--angulo-da-zebra=90`)
+ * e a pintura, enquadradas nas vistas frontal, isometrica e tresquartos, como o pacote de lataria de `vistas:critica` as captura
+ * (`CAPTURAS_DO_REFLEXO`), copia as imagens com nomes neutros e escreve um `pedido.md` com a seção Reflexo que esse pedido traz
+ * (`secaoDoReflexo`). O nome da chapa e o defeito ficam só no gabarito, fora das pastas dos pedidos.
+ *
+ * Segunda rodada (2026-11-16): as chapas numa malha só, sem a borda livre na linha do meio, a zebra nas duas direções e as letras
+ * embaralhadas de novo.
  *
  * Uso: node docs/modelar/banco-de-provas/reflexo-na-bancada-2026-11-15/preparar-prova-cega.mjs
  *   Saída em tmp/prova-cega/: pedidos/chapa-<letra>/pedido.md e as imagens, e gabarito.json. */
@@ -14,28 +17,28 @@ import { join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { comoCLI } from '../../../../tools/modelar/olhar-bancada.mjs';
 import { CHAPAS } from '../../../../tools/fixtures/reflexo-calibracao/chapas.mjs';
-import { secaoDoReflexo } from '../../../../tools/modelar/vistas-para-critica.mjs';
+import { CAPTURAS_DO_REFLEXO, secaoDoReflexo } from '../../../../tools/modelar/vistas-para-critica.mjs';
 
 const REPO = resolve(fileURLToPath(new URL('../../../..', import.meta.url)));
 const BASE = join(REPO, 'tmp/prova-cega');
 const VISTAS = ['frontal', 'isometrica', 'tresquartos'];
 const GIRO = 45;
 /* a ordem das letras é fixa e não segue a de CHAPAS, para a letra não dizer a chapa */
-const LETRAS = { 'ondulada-050': 'a', vinco: 'b', lisa: 'c', 'ondulada-100': 'd', 'quebra-de-curvatura': 'e', degrau: 'f', 'ondulada-025': 'g' };
+const LETRAS = { degrau: 'a', 'ondulada-025': 'b', 'quebra-de-curvatura': 'c', lisa: 'd', 'ondulada-050': 'e', 'ondulada-100': 'f', vinco: 'g' };
 
-/* onde fica a emenda, nas imagens, para o gabarito: a linha do meio da chapa, perpendicular ao arco */
-const LUGAR_DA_EMENDA = 'a linha reta pelo centro da chapa que liga o meio dos dois lados maiores: na vista frontal, a diagonal que desce da esquerda para a direita, de perto de (0,3; 0,3) a (0,7; 0,7) do quadro (a emenda em x = 300 mm da chapa girada 45 graus)';
+/* onde fica a linha do defeito, nas imagens, para o gabarito: a linha do meio da chapa, perpendicular ao arco */
+const LUGAR_DA_EMENDA = 'a linha reta pelo centro da chapa que liga o meio dos dois lados maiores: na vista frontal, a diagonal que desce da esquerda para a direita, de perto de (0,3; 0,3) a (0,7; 0,7) do quadro (a linha x = 300 mm da chapa girada 45 graus)';
 const lugar = (d) => (d.tipo === 'nenhum' ? 'nenhum' : d.tipo === 'ondulacao'
   ? `a chapa inteira: ${Math.round(600 / d.comprimentoDeOndaMm)} ondas de ${d.comprimentoDeOndaMm} mm de comprimento e ${String(d.amplitudeMm).replace('.', ',')} mm de amplitude, com as cristas paralelas à diagonal do centro`
   : LUGAR_DA_EMENDA);
 
 /* o que o estudo mediu e o crítico pode ler diferente do declarado */
 const NOTAS = {
-  lisa: 'as duas folhas não são soldadas, e a faixa faz um dente de poucos pixels colado à linha do meio mesmo na lisa (a normal da borda de cada folha); isso não conta como defeito achado',
-  degrau: 'a zebra não muda contra a lisa (1 a 2 em 10 mil pixels de frente); o que aparece é o traço do degrau na linha do meio nas vistas oblíquas e o mesmo dente da lisa: ler "traço fino na linha do meio, sem salto da faixa" é o acerto',
+  lisa: 'numa malha só, sem emenda: a zebra e a pintura não têm linha nenhuma no meio (o salto da listra na linha, medido sem comparar com outra chapa, fica abaixo de 1 px de frente); qualquer defeito apontado é engano',
+  degrau: 'a faixa atravessa a linha sem salto; o que aparece é a parede do desnível como traço fino na linha do meio nas vistas oblíquas: ler "traço fino na linha do meio, sem salto da faixa" é o acerto',
 };
 rmSync(BASE, { recursive: true, force: true });
-const gabarito = { giroGraus: GIRO, vistas: VISTAS, chapas: {} };
+const gabarito = { rodada: 2, giroGraus: GIRO, vistas: VISTAS, zebra: 'deitada (0 grau) e em pé (90 graus)', chapas: {} };
 for (const [nome, letra] of Object.entries(LETRAS)) {
   const pasta = join(BASE, 'receitas', `chapa-${letra}`);
   mkdirSync(pasta, { recursive: true });
@@ -51,15 +54,15 @@ for (const [nome, letra] of Object.entries(LETRAS)) {
   ].join('\n'));
   const saida = join(BASE, 'capturas', `chapa-${letra}`);
   const imagens = {};
-  for (const visao of ['zebra', 'pintura']) {
-    const r = await comoCLI([relative(REPO, pasta), `--vistas=${VISTAS.join(',')}`, '--enquadrar', '--sem-contatos', '--res=900x900', `--visao=${visao}`, `--saida=${relative(REPO, join(saida, visao))}`]);
-    if (r.codigo !== 0) throw new Error(`${letra} ${visao}: ${r.stderr}`);
+  for (const { chave, visao, anguloDaZebra } of CAPTURAS_DO_REFLEXO) {
+    const r = await comoCLI([relative(REPO, pasta), `--vistas=${VISTAS.join(',')}`, '--enquadrar', '--sem-contatos', '--res=900x900', `--visao=${visao}`, ...(anguloDaZebra !== null ? [`--angulo-da-zebra=${anguloDaZebra}`] : []), `--saida=${relative(REPO, join(saida, chave))}`]);
+    if (r.codigo !== 0) throw new Error(`${letra} ${chave}: ${r.stderr}`);
     const destino = join(BASE, 'pedidos', `chapa-${letra}`);
     mkdirSync(destino, { recursive: true });
-    imagens[visao] = VISTAS.map((vista) => {
-      const origem = readdirSync(join(saida, visao)).find((f) => f.includes(`-${vista}-`) && f.endsWith('.png'));
-      const arquivo = join(destino, `${visao}-${vista}.png`);
-      copyFileSync(join(saida, visao, origem), arquivo);
+    imagens[chave] = VISTAS.map((vista) => {
+      const origem = readdirSync(join(saida, chave)).find((f) => f.includes(`-${vista}-`) && f.endsWith('.png'));
+      const arquivo = join(destino, `${chave}-${vista}.png`);
+      copyFileSync(join(saida, chave, origem), arquivo);
       return { arquivo, vista };
     });
   }
@@ -70,7 +73,7 @@ for (const [nome, letra] of Object.entries(LETRAS)) {
     '## Modelo', '',
     'As vistas olham destes lados: frontal, de frente para a pele de fora da chapa; isometrica, de cima, da direita e da frente; '
     + 'tresquartos, de três quartos pela frente, um pouco de cima.', '',
-    ...secaoDoReflexo({ zebra: { imagens: imagens.zebra, fora: [] }, pintura: { imagens: imagens.pintura, fora: [] } }),
+    ...secaoDoReflexo(Object.fromEntries(Object.entries(imagens).map(([chave, lista]) => [chave, { imagens: lista, fora: [] }]))),
     '## O que responder', '',
     'Diga se a chapa tem defeito de superfície. Para cada defeito: o tipo (degrau, vinco, quebra de curvatura, ondulação, amassado ou '
     + 'outro, dito com as suas palavras), o lugar na chapa (em fração da imagem ou pela forma da chapa: centro, canto, diagonal, borda), '

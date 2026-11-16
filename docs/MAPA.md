@@ -3356,7 +3356,7 @@
 - `normais-lisas.test.ts` — normais-lisas.test.ts — a borda do furo serrilhava na bancada, e a peça não tinha culpa: o `freio-disco` já usa 12 lados no furo do prisioneiro e já marca a …
 - `objeto.mjs` — objeto.mjs — o estado das referências de um objeto que passa por mapa de partes e prancha de contornos, e o que vem a seguir.
 - `objeto.test.mjs` — objeto.test.mjs — a ferramenta lê cada etapa do fluxo no disco e aponta a primeira que falta.
-- `olhar-bancada-visoes.test.mjs` — olhar-bancada-visoes.test.mjs — a captura por comando das visões de reflexo (`--visao`, `--largura-da-zebra`, `--azimute`, `--enquadrar`).
+- `olhar-bancada-visoes.test.mjs` — olhar-bancada-visoes.test.mjs — a captura por comando das visões de reflexo (`--visao`, `--largura-da-zebra`, `--angulo-da-zebra`, `--azimute`, `--enquadrar`).
 - `olhar-bancada.mjs` — olhar-bancada.mjs — serviço headless de vistas e sua CLI fina.
 - `olhar-bancada.test.mjs` — olhar-bancada.test.mjs — validação antecipada de peças e mitigação de timeout em capturas headless.
 - `olhar-montagem.mjs` — olhar-montagem.mjs — CLI fina sobre captura importável de montagem.

@@ -1,10 +1,11 @@
 #!/usr/bin/env node
 /* estudo-de-leitura.mjs — o estudo de leitura da zebra e da pintura nas chapas de calibração (plano do reflexo na bancada, fatia 7).
  *
- * Captura, para cada chapa de `tools/fixtures/reflexo-calibracao/chapas.mjs`, a zebra (duas larguras de listra), a pintura e a imagem
- * de uma cor por parte (que dá onde fica a emenda na imagem), nas vistas frontal, isometrica e tresquartos, enquadradas, com a chapa
- * como está (a emenda vertical) e girada 45 graus no próprio plano (`giroGraus`). As receitas de cada caso são geradas em
- * tmp/estudo-leitura/receitas/ e as imagens ficam em tmp/estudo-leitura/capturas/.
+ * Captura, para cada chapa de `tools/fixtures/reflexo-calibracao/chapas.mjs`, a zebra (duas larguras de listra, deitada, e na chapa
+ * sem giro também em pé, `--angulo-da-zebra=90`), a pintura e a imagem de uma cor por parte (que dá onde fica a linha do defeito na
+ * imagem; a lisa e as onduladas, de uma parte só, a tomam da mesma chapa separada em duas partes em x = 300 mm), nas vistas frontal,
+ * isometrica e tresquartos, enquadradas, com a chapa como está (a linha em pé) e girada 45 graus no próprio plano (`giroGraus`). As
+ * receitas de cada caso são geradas em tmp/estudo-leitura/receitas/ e as imagens ficam em tmp/estudo-leitura/capturas/.
  *
  * Mede em cada imagem, perto da emenda e em toda a chapa:
  *  - a fração de pixels que muda contra a chapa lisa na mesma vista (|luminância| acima de 40/255);
@@ -14,8 +15,12 @@
  *    a distância ao longo da emenda até a borda de mesma polaridade do outro lado, em px e em fração do período;
  *  - o espaçamento das listras de cada lado (o período, pelo número de bordas ao longo de uma linha paralela à emenda a 12 px dela) e a
  *    razão entre os dois lados;
- *  - o serpentear: cada borda de listra seguida coluna a coluna, ajustada por um polinômio de grau 2, e o resíduo entre os percentis 5 e
- *    95, em px, mediano entre as bordas.
+ *  - a borda torta na linha, sem comparar com a lisa: das bordas de listra a até 6 px da linha, a fração cuja direção se afasta mais de
+ *    15 graus da direção das bordas a até 40 px dela, e o mesmo em volta das paralelas a 60 e a 120 px (o maior delas, para comparar);
+ *  - a linha na emenda: em cada pixel a até 1,5 px da linha do defeito, o tom contra os pixels a 4 px de cada lado, ao longo da normal
+ *    da linha, onde os dois concordam entre si (diferença abaixo de 20/255); a fração dos pixels que se afastam da média deles mais de
+ *    40/255 (um traço fino ou um dente, e não a borda de uma listra) na linha e, para comparar, nas faixas paralelas a 60 e a 120 px
+ *    dela. Na chapa sem nada na linha a fração na linha fica no nível das paralelas; o dente das folhas não soldadas a levantava.
  *
  * Com `--ferramentas`, roda nas mesmas chapas, sem giro, o pente, o mapa de desvio, a continuidade nas emendas (raio de 50, 25 e 15 mm) e
  * o índice de suavidade, e grava estudo-de-leitura-ferramentas.json e estudo-ferramentas.jpg.
@@ -29,14 +34,18 @@ import { fileURLToPath } from 'node:url';
 import { PNG } from 'pngjs';
 import sharp from 'sharp';
 import { comoCLI } from '../../../../tools/modelar/olhar-bancada.mjs';
-import { CHAPAS } from '../../../../tools/fixtures/reflexo-calibracao/chapas.mjs';
+import { CHAPAS, temEmenda } from '../../../../tools/fixtures/reflexo-calibracao/chapas.mjs';
 
 const REPO = resolve(fileURLToPath(new URL('../../../..', import.meta.url)));
 const AQUI = resolve(fileURLToPath(new URL('.', import.meta.url)));
-const BASE = join(REPO, 'tmp/estudo-leitura');
+/* `--base=<pasta>` lê e grava as capturas noutra pasta de tmp/ (a rodada das folhas não soldadas, para comparar a linha na emenda) */
+const OUTRA_BASE = process.argv.find((a) => a.startsWith('--base='))?.slice(7) ?? null;
+const BASE = join(REPO, OUTRA_BASE ?? 'tmp/estudo-leitura');
 const VISTAS = ['frontal', 'isometrica', 'tresquartos'];
 const GIROS = [0, 45];
 const LARGURAS = [3, 9];
+/* a listra em pé só na chapa sem giro: é nela que a deitada não vê a linha nem a onda */
+const ANGULOS_DE_PE = { 0: [90], 45: [] };
 const FUNDO = [242, 244, 243];
 const NOMES = Object.keys(CHAPAS);
 
@@ -49,17 +58,34 @@ function receita(nome, giro) {
   return relative(REPO, pasta);
 }
 
-/* as capturas de um caso: a zebra nas duas larguras, a pintura e as cores por parte */
-const CAPTURAS = [
-  ...LARGURAS.map((l) => ({ id: `zebra-${l}`, args: ['--visao=zebra', `--largura-da-zebra=${l}`] })),
+/* a receita da imagem das cores: a própria chapa, ou, na de uma parte só, a mesma malha separada em duas partes em x = 300 mm antes do
+   giro, para a imagem dizer onde fica a linha do defeito das outras chapas */
+function receitaDasCores(nome, giro) {
+  if (temEmenda(nome)) return receita(nome, giro);
+  const pasta = join(BASE, 'receitas', `${caso(nome, giro)}-em-duas-partes`);
+  mkdirSync(pasta, { recursive: true });
+  writeFileSync(join(pasta, 'receita.js'), [
+    "import { chapaDeCalibracao } from '../../../../tools/fixtures/reflexo-calibracao/chapas.mjs';",
+    `const base = chapaDeCalibracao('${nome}', { giroGraus: ${giro} });`,
+    'const caixa = (x0, x1) => ({ regiao: { min: [x0, -1, -1], max: [x1, 1, 1] } });',
+    "const partes = [['parte', { nome: 'esquerda', sel: caixa(-1, 0.305) }], ['parte', { nome: 'direita', sel: caixa(0.295, 1), substituir: true }]];",
+    "export default { ...base, PASSOS: [base.PASSOS[0], ...partes, ...base.PASSOS.filter((p) => p[0] === 'rotaciona')] };", '',
+  ].join('\n'));
+  return relative(REPO, pasta);
+}
+
+/* as capturas de um caso: a zebra nas duas larguras (e, sem giro, também em pé), a pintura e as cores por parte */
+const idDaZebra = (l, a) => `zebra-${l}${a ? `-a${a}` : ''}`;
+const capturasDe = (giro) => [
+  ...[0, ...ANGULOS_DE_PE[giro]].flatMap((a) => LARGURAS.map((l) => ({ id: idDaZebra(l, a), args: ['--visao=zebra', `--largura-da-zebra=${l}`, ...(a ? [`--angulo-da-zebra=${a}`] : [])] }))),
   { id: 'pintura', args: ['--visao=pintura'] },
-  { id: 'cores', args: ['--cores'] },
+  { id: 'cores', args: ['--cores'], cores: true },
 ];
 
 async function capturar() {
   for (const giro of GIROS) for (const nome of NOMES) {
-    const peca = receita(nome, giro);
-    for (const c of CAPTURAS) {
+    for (const c of capturasDe(giro)) {
+      const peca = c.cores ? receitaDasCores(nome, giro) : receita(nome, giro);
       const saida = relative(REPO, join(BASE, 'capturas', caso(nome, giro), c.id));
       if (existsSync(join(REPO, saida)) && readdirSync(join(REPO, saida)).filter((a) => a.endsWith('.png')).length === VISTAS.length) continue;
       const r = await comoCLI([peca, `--vistas=${VISTAS.join(',')}`, '--enquadrar', '--sem-contatos', '--res=900x900', `--saida=${saida}`, ...c.args]);
@@ -242,6 +268,43 @@ function medirImagem(img, emenda, lisa) {
     return passos.length >= 3 ? 2 * pct(passos, 0.5) : NaN;
   };
   const pE = periodoDoLado(-1, dirE); const pD = periodoDoLado(1, dirD);
+  /* a linha na emenda: o pixel cujo tom difere dos vizinhos a 4 px de cada lado pela normal da linha quando os dois vizinhos concordam
+     entre si (um traço fino ou um dente, e não a borda de uma listra, que separa os dois vizinhos), na linha e nas faixas paralelas */
+  const foraDaMedia = (centro) => {
+    let n = 0; let fora = 0;
+    for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+      if (!dentro[y * W + x] || Math.abs(dist(x, y) - centro) > 1.5) continue;
+      const xa = Math.round(x - 4 * emenda.n[0]); const ya = Math.round(y - 4 * emenda.n[1]);
+      const xb = Math.round(x + 4 * emenda.n[0]); const yb = Math.round(y + 4 * emenda.n[1]);
+      if (xa < 0 || ya < 0 || xb < 0 || yb < 0 || xa >= W || xb >= W || ya >= H || yb >= H || !dentro[ya * W + xa] || !dentro[yb * W + xb]) continue;
+      const a = L(xa, ya); const b = L(xb, yb);
+      n++; if (Math.abs(a - b) < 20 && Math.abs(L(x, y) - (a + b) / 2) > 40) fora++;
+    }
+    return n ? fora / n : NaN;
+  };
+  /* a borda torta na linha, sem a lisa: as bordas de listra (Sobel acima de 100) numa faixa de 6 px em volta da linha e, para comparar,
+     em volta das paralelas a 60 e a 120 px dela; a fração das bordas da faixa cuja direção se afasta mais de 15 graus da mediana das
+     bordas a até 40 px dela. O dente das folhas não soldadas é uma borda torta colada à linha */
+  const bordasTortas = (centro) => {
+    const dirs = []; const perto = [];
+    for (let y = 1; y < H - 1; y++) for (let x = 1; x < W - 1; x++) {
+      const d = dist(x, y) - centro;
+      if (!dentro[y * W + x] || Math.abs(d) > 40) continue;
+      const gx = -L(x - 1, y - 1) - 2 * L(x - 1, y) - L(x - 1, y + 1) + L(x + 1, y - 1) + 2 * L(x + 1, y) + L(x + 1, y + 1);
+      const gy = -L(x - 1, y - 1) - 2 * L(x, y - 1) - L(x + 1, y - 1) + L(x - 1, y + 1) + 2 * L(x, y + 1) + L(x + 1, y + 1);
+      if (Math.hypot(gx, gy) < 100) continue;
+      const o = ((((Math.atan2(gy, gx) * 180) / Math.PI) % 180) + 180) % 180;
+      dirs.push(o); if (Math.abs(d) <= 6) perto.push(o);
+    }
+    if (perto.length < 20) return null;
+    /* a mediana circular, módulo 180: a direção que deixa menos bordas a mais de 15 graus */
+    const afast = (a, b) => { const x = Math.abs(a - b); return Math.min(x, 180 - x); };
+    let ref = 0; let melhor = Infinity;
+    for (let c = 0; c < 180; c += 1) { const f = dirs.filter((o) => afast(o, c) > 15).length; if (f < melhor) { melhor = f; ref = c; } }
+    return perto.filter((o) => afast(o, ref) > 15).length / perto.length;
+  };
+  const tortaNaLinha = bordasTortas(0); const tortasLonge = [-120, -60, 60, 120].map(bordasTortas).filter((v) => v !== null);
+  const naLinha = foraDaMedia(0); const paralelas = [-120, -60, 60, 120].map(foraDaMedia).filter(Number.isFinite);
   return {
     limiar: r2(limiar), mudouContraALisa: Math.round((mudou / Math.max(1, n)) * 10000) / 10000,
     periodoDaLisaPx: r2(periodoDaLisa),
@@ -250,37 +313,19 @@ function medirImagem(img, emenda, lisa) {
     deslocamentoP95Px: r2(pct(longe, 0.95)), deslocamentoP95EmPeriodos: r2(pct(longe, 0.95) / periodoDaLisa), bordasSemPar: r2(semPar),
     saltoNaEmendaPx: r2(ladoD - ladoE), saltoNaEmendaEmPeriodos: r2((ladoD - ladoE) / periodoDaLisa),
     inclinacaoEsquerdaPor100Px: r2(inclinacao(-1)), inclinacaoDireitaPor100Px: r2(inclinacao(1)),
+    bordaTortaNaLinha: { naLinha: tortaNaLinha === null ? null : Math.round(tortaNaLinha * 1000) / 1000, maiorLonge: tortasLonge.length ? Math.round(Math.max(...tortasLonge) * 1000) / 1000 : null },
+    linhaNaEmenda: { naLinha: Math.round(naLinha * 10000) / 10000, longe: Math.round((paralelas.reduce((a, b) => a + b, 0) / Math.max(1, paralelas.length)) * 10000) / 10000, maiorLonge: Math.round(Math.max(...paralelas) * 10000) / 10000 },
   };
 }
 
-/* o resíduo de y contra o polinômio de grau 2 em x, por mínimos quadrados */
-function residuoDeGrau2(xs, ys) {
-  const n = xs.length; const m = xs.reduce((s, v) => s + v, 0) / n;
-  const S = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]; const b = [0, 0, 0];
-  for (let i = 0; i < n; i++) { const t = xs[i] - m; const f = [1, t, t * t]; for (let a = 0; a < 3; a++) { b[a] += f[a] * ys[i]; for (let c = 0; c < 3; c++) S[a][c] += f[a] * f[c]; } }
-  const c = resolver(S, b);
-  return xs.map((x, i) => { const t = x - m; return ys[i] - (c[0] + c[1] * t + c[2] * t * t); });
-}
-function resolver(A, b) {
-  const M = A.map((l, i) => [...l, b[i]]); const n = b.length;
-  for (let i = 0; i < n; i++) {
-    let p = i; for (let k = i + 1; k < n; k++) if (Math.abs(M[k][i]) > Math.abs(M[p][i])) p = k;
-    [M[i], M[p]] = [M[p], M[i]];
-    for (let k = i + 1; k < n; k++) { const f = M[k][i] / M[i][i]; for (let j = i; j <= n; j++) M[k][j] -= f * M[i][j]; }
-  }
-  const x = new Array(n).fill(0);
-  for (let i = n - 1; i >= 0; i--) { let s = M[i][n]; for (let j = i + 1; j < n; j++) s -= M[i][j] * x[j]; x[i] = s / M[i][i]; }
-  return x;
-}
-
 function medir() {
-  const saida = { vistas: VISTAS, giros: GIROS, largurasDaZebra: LARGURAS, defeitos: Object.fromEntries(NOMES.map((n) => [n, CHAPAS[n].defeito])), casos: {} };
+  const saida = { vistas: VISTAS, giros: GIROS, largurasDaZebra: LARGURAS, angulosDaZebraEmPe: ANGULOS_DE_PE, defeitos: Object.fromEntries(NOMES.map((n) => [n, CHAPAS[n].defeito])), casos: {} };
   for (const giro of GIROS) for (const nome of NOMES) {
     const r = {};
     for (const vista of VISTAS) {
       const emenda = emendaDaImagem(lerPng(arquivoDe(nome, giro, 'cores', vista)));
       r[vista] = { emenda: { angulo: r2((Math.atan2(emenda.t[1], emenda.t[0]) * 180) / Math.PI), pixels: emenda.pixels } };
-      for (const id of [...LARGURAS.map((l) => `zebra-${l}`), 'pintura']) {
+      for (const id of capturasDe(giro).filter((c) => !c.cores && existsSync(join(BASE, 'capturas', caso(nome, giro), c.id))).map((c) => c.id)) {
         const lisa = lerPng(arquivoDe('lisa', giro, id, vista));
         r[vista][id] = medirImagem(lerPng(arquivoDe(nome, giro, id, vista)), emenda, lisa);
       }
@@ -288,19 +333,25 @@ function medir() {
     saida.casos[caso(nome, giro)] = r;
     process.stderr.write(`medido ${caso(nome, giro)}\n`);
   }
-  writeFileSync(join(AQUI, 'estudo-de-leitura.json'), `${JSON.stringify(saida, null, 1)}\n`);
+  writeFileSync(join(OUTRA_BASE ? BASE : AQUI, 'estudo-de-leitura.json'), `${JSON.stringify(saida, null, 1)}\n`);
   return saida;
 }
 
-/* as figuras: uma linha por chapa, com a zebra de 3 e de 9 graus e a pintura, numa vista e num giro, reduzidas */
+/* as figuras: uma linha por chapa, com as capturas pedidas lado a lado, numa vista e num giro, reduzidas */
 async function figuras() {
   const LADO = 220;
-  for (const [giro, vista] of [[0, 'isometrica'], [45, 'frontal'], [45, 'isometrica']]) {
+  const FIGURAS = [
+    [0, 'isometrica', ['zebra-3', 'zebra-9', 'pintura'], 'estudo-g0-isometrica.jpg'],
+    [0, 'frontal', ['zebra-3', 'zebra-9', 'zebra-3-a90', 'zebra-9-a90'], 'estudo-g0-frontal-em-pe.jpg'],
+    [45, 'frontal', ['zebra-3', 'zebra-9', 'pintura'], 'estudo-g45-frontal.jpg'],
+    [45, 'isometrica', ['zebra-3', 'zebra-9', 'pintura'], 'estudo-g45-isometrica.jpg'],
+  ];
+  for (const [giro, vista, ids, arquivo] of FIGURAS) {
     const blocos = [];
-    NOMES.forEach((nome, i) => ['zebra-3', 'zebra-9', 'pintura'].forEach((id, j) => blocos.push({ input: arquivoDe(nome, giro, id, vista), left: j * LADO, top: i * LADO })));
+    NOMES.forEach((nome, i) => ids.forEach((id, j) => blocos.push({ input: arquivoDe(nome, giro, id, vista), left: j * LADO, top: i * LADO })));
     const entradas = await Promise.all(blocos.map(async (b) => ({ ...b, input: await sharp(b.input).resize(LADO, LADO).toBuffer() })));
-    await sharp({ create: { width: 3 * LADO, height: NOMES.length * LADO, channels: 3, background: { r: 242, g: 244, b: 243 } } })
-      .composite(entradas).jpeg({ quality: 78 }).toFile(join(AQUI, `estudo-g${giro}-${vista}.jpg`));
+    await sharp({ create: { width: ids.length * LADO, height: NOMES.length * LADO, channels: 3, background: { r: 242, g: 244, b: 243 } } })
+      .composite(entradas).jpeg({ quality: 78 }).toFile(join(AQUI, arquivo));
   }
 }
 
@@ -318,7 +369,7 @@ function ferramentas() {
     for (const raio of [50, 25, 15]) {
       const e = rodar('continuidade-nas-emendas.mjs', [peca, '--lado=+z', '--vista=frontal', `--raio=${raio}`, '--amostras=nao', `--saida=${join(pasta, `emendas-${nome}-${raio}.png`)}`]);
       const em = e.emendas[0];
-      emendas[raio] = { ...e.resumo, acusa: em?.acusa, medianas: em?.medianas, semAjuste: em?.semAjuste };
+      emendas[raio] = { ...e.resumo, emendas: e.emendas.length, acusa: em?.acusa, medianas: em?.medianas, maximos: em ? { frestaMm: em.maximos.frestaMm?.valor, anguloGraus: em.maximos.anguloGraus?.valor, razaoDeCurvatura: em.maximos.razaoDeCurvatura?.valor } : undefined, semAjuste: em?.semAjuste };
     }
     const s = rodar('suavidade-por-regiao.mjs', [peca, '--lado=+z']);
     res[nome] = {
@@ -342,7 +393,7 @@ async function figuraDasFerramentas() {
     .composite(entradas).jpeg({ quality: 80 }).toFile(join(AQUI, 'estudo-ferramentas.jpg'));
 }
 
-const args = new Set(process.argv.slice(2));
+const args = new Set(process.argv.slice(2).filter((a) => !a.startsWith('--base=')));
 if (args.has('--ferramentas')) { ferramentas(); await figuraDasFerramentas(); }
 const todos = !args.has('--capturar') && !args.has('--medir') && !args.has('--figuras') && !args.has('--ferramentas');
 if (todos || args.has('--capturar')) await capturar();

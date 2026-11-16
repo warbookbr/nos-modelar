@@ -48,7 +48,8 @@
  *    nenhuma que passe o pacote é recusado: a luz que vinha de um lado que a câmera não via já chegou ao crítico como uma imagem preta
  *    com traços de borda.
  *  - a zebra e a pintura da bancada, também na peça de lataria (plano do reflexo, 2026-11-16): capturadas com `--visao` e `--enquadrar`
- *    nas quatro vistas do conjunto, sem a vista em que a chapa aparece de quina, com a leitura curta da faixa refletida
+ *    nas quatro vistas do conjunto, a zebra com a listra deitada e em pé (`--angulo-da-zebra=90`), sem a vista em que a chapa aparece
+ *    de quina, com a leitura curta da faixa refletida
  *    (`LEITURA_DO_REFLEXO`, a versão do guia de leitura em `PARE-E-ANALISE.md` que cabe no pedido);
  *
  * A pasta traz ainda o `pacote.json`, com a impressão do texto da receita que o pacote mostra e as imagens de superfície: é por ele
@@ -122,7 +123,15 @@ export const VISTAS_DO_ARAME = 'isometrica,traseira';
    +z ocupa 3 % da largura na vista direita e 2 % da altura na superior, depois de enquadrada), e a imagem em que a peça ocupa menos de
    `MINIMO_DO_REFLEXO` do quadro em um dos lados sai do pedido, dita nele; a mesma regra vale para a luz rasante e a curvatura
    (`MINIMO_DE_QUINA`), que também saem da bancada. */
-export const VISOES_DO_REFLEXO = Object.freeze(['zebra', 'pintura']);
+/* A zebra vai em duas direções: a listra deitada (0 grau, a do Blender) lê a chapa inclinar para cima e para baixo, e a em pé
+   (`--angulo-da-zebra=90`) lê a inclinação para os lados; nas chapas de calibração sem giro, a deitada não vê o vinco, a quebra nem a
+   onda em pé, e a em pé os mostra (estudo de leitura, fatia 7). Cada captura tem a chave do pacote, a visão e o ângulo da listra. */
+export const CAPTURAS_DO_REFLEXO = Object.freeze([
+  Object.freeze({ chave: 'zebra', visao: 'zebra', anguloDaZebra: null }),
+  Object.freeze({ chave: 'zebra-em-pe', visao: 'zebra', anguloDaZebra: 90 }),
+  Object.freeze({ chave: 'pintura', visao: 'pintura', anguloDaZebra: null }),
+]);
+export const VISOES_DO_REFLEXO = Object.freeze(CAPTURAS_DO_REFLEXO.map((c) => c.chave));
 export const VISTAS_DO_REFLEXO = VISTAS_DO_CONJUNTO;
 export const RES_DO_REFLEXO = '900x900';
 export const MINIMO_DO_REFLEXO = MINIMO_DE_QUINA;
@@ -577,7 +586,7 @@ function secaoDaSuperficie({ rasante, curvatura, faixa = null, semLuz = [], font
   ];
 }
 
-/* A seção do reflexo da peça de lataria: a zebra e a pintura da bancada, com a leitura curta da faixa. As vistas têm os nomes e os lados
+/* A seção do reflexo da peça de lataria: a zebra, nas duas direções da listra, e a pintura da bancada, com a leitura curta da faixa. As vistas têm os nomes e os lados
    da bancada, os de Modelo. A leitura curta (`LEITURA_DO_REFLEXO`) é a do guia `docs/modelar/usar/PARE-E-ANALISE.md#ler-o-reflexo`,
    medida nas chapas de calibração (`tools/fixtures/reflexo-calibracao/`, estudo em
    `docs/modelar/banco-de-provas/reflexo-na-bancada-2026-11-15/`): o que cada defeito faz com a faixa e o que a zebra não vê. */
@@ -590,7 +599,7 @@ export const LEITURA_DO_REFLEXO = Object.freeze([
   'Quebra de curvatura, o raio mudando numa linha sem dobra: a faixa não se parte; ela faz um cotovelo na linha e fica mais apertada de um lado que do outro.',
   'Ondulação: a faixa serpenteia em ondas regulares por toda a área; quanto maior a onda, mais a faixa entorta, até se dobrar em ziguezague e as listras se multiplicarem.',
   'Amassado: a faixa se curva em volta de um disco, ou o disco aparece com a cor invertida.',
-  'A zebra tem listras horizontais e só vê a superfície inclinar para cima ou para baixo: uma linha de defeito em pé, ou uma onda de cristas em pé, pode não mudar a faixa em vista nenhuma. A faixa reta não prova que a chapa está lisa nessa direção.',
+  'A zebra vem em duas direções, e uma vê o que a outra não vê: a listra deitada (0 grau) lê a chapa inclinar para cima e para baixo, e a em pé (90 graus), para os lados. Uma linha de defeito ou uma onda que corre na mesma direção da listra quase não muda a faixa; na outra direção aparece. Leia as duas antes de dizer que a chapa está lisa.',
   'A pintura mostra o mesmo pela borda clara da caixa de luz; de frente ela serrilha na ondulação e dobra no vinco, mas de três quartos e de cima quase não mostra a ondulação.',
   'Para cada defeito, diga o tipo, a linha ou a área na chapa (centro, diagonal, borda, canto) e as imagens em que o viu.',
 ]);
@@ -606,10 +615,13 @@ export function secaoDoReflexo(reflexo) {
     + 'Modelo. Como ler:', '',
     ...lista(LEITURA_DO_REFLEXO), '',
   ];
-  if (reflexo.zebra?.imagens?.length) {
+  const emPe = reflexo['zebra-em-pe'];
+  if (reflexo.zebra?.imagens?.length || emPe?.imagens?.length) {
     L.push('A zebra: listras pretas e brancas de um ambiente distante refletidas na chapa, sem sombra. Num painel liso a listra corre reta '
       + 'ou em curva suave e com a largura parelha; onde ela entorta, se estreita em leque, se amontoa ou se parte, a chapa afunda, ondula ou '
-      + 'dobra ali.', '', ...lista(reflexo.zebra.imagens.map(imagem)), '', ...fora(reflexo.zebra));
+      + 'dobra ali.', '');
+    if (reflexo.zebra?.imagens?.length) L.push('Com a listra deitada (0 grau):', '', ...lista(reflexo.zebra.imagens.map(imagem)), '', ...fora(reflexo.zebra));
+    if (emPe?.imagens?.length) L.push('Com a listra em pé (90 graus):', '', ...lista(emPe.imagens.map(imagem)), '', ...fora(emPe));
   }
   if (reflexo.pintura?.imagens?.length) {
     L.push('A pintura: verniz brilhante sobre base escura, sob caixas de luz de estúdio, como a foto de um carro. O reflexo claro das caixas '
@@ -1599,9 +1611,9 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
     }
     /* a zebra e a pintura da bancada, só na peça de lataria (a de emenda sombreada leva a luz rasante e não é chapa) */
     if (lataria.lataria) {
-      for (const visao of VISOES_DO_REFLEXO) {
-        const feita = await capturar(`visão ${visao}`, { peca, auditoria: true, visao, enquadrar: true, vistas: VISTAS_DO_REFLEXO, res: RES_DO_REFLEXO });
-        reflexo[visao] = imagensDoReflexo(feita, peca);
+      for (const { chave, visao, anguloDaZebra } of CAPTURAS_DO_REFLEXO) {
+        const feita = await capturar(`visão ${chave}`, { peca, auditoria: true, visao, enquadrar: true, vistas: VISTAS_DO_REFLEXO, res: RES_DO_REFLEXO, ...(anguloDaZebra !== null ? { anguloDaZebra } : {}) });
+        reflexo[chave] = imagensDoReflexo(feita, peca);
       }
     }
     /* a luz rasante e a curvatura da lataria, da bancada, na mesma abertura do navegador */
