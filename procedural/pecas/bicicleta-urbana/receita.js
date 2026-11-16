@@ -98,7 +98,15 @@ export const TABELA = {
   garfo_x: 56, /* centro da perna a 55-57 mm do eixo junto da roda (foto: 43 mm em y 480, 53 em y 640, abrindo em reta) */
   garfo_folga_pneu: 6,
   /* mesa e guidão */
-  mesa_espacador: 10,
+  /* pilha acima da caixa de direção, medida na foto frontal (tmp/ref-cone.png): tampa cônica preta do movimento, assentada no topo da caixa, e três anéis
+     de espaçador de ~38 mm separados por dois sulcos rasos. Os diâmetros são os medidos e não passam disso. */
+  cone_altura: 17,
+  cone_diametro_baixo: 49,
+  cone_diametro_topo: 37,
+  espacador_altura: 24,
+  espacador_diametro: 38,
+  espacador_sulco_fundo: 0.6,
+  espacador_sulco_largura: 1.4,
   mesa_folga_acima_caixa: 0,
   mesa_fixacao_comprimento: 48,
   mesa_fixacao_diametro: 40,
@@ -110,19 +118,20 @@ export const TABELA = {
      orelhas redondas nos cantos com a cabeça de parafuso de ~8,8 mm: parafusos a 27 mm um do outro na largura e 33 mm na altura, a placa
      inteira de ~45 mm de altura com as orelhas */
   mesa_tampa_largura: 40,
-  mesa_tampa_altura: 34,
-  mesa_tampa_canto: 6,
-  mesa_tampa_espessura: 14, /* da linha de centro do guidão para a frente: o guidão (raio 11) fica 3 mm abaixo da face */
+  mesa_tampa_raio: 17.5, /* casca fundida em volta do guidão: cilindro de eixo x com as pontas arredondadas, só a metade da frente */
+  mesa_tampa_borda: 3, /* raio do arredondado das duas pontas */
+  mesa_tampa_atras: 2, /* a casca passa 2 mm do plano do eixo do guidão para trás */
+  mesa_orelha_topo: 8, /* face plana das orelhas, a partir do eixo do guidão */
   mesa_tampa_janela_largura: 19,
   mesa_tampa_janela_altura: 25,
-  mesa_tampa_janela_canto: 3,
+  mesa_tampa_janela_canto: 5.5,
   mesa_parafuso_dx: 27,
   mesa_parafuso_dy: 33,
-  mesa_orelha_raio: 6,
-  mesa_parafuso_cabeca_raio: 4.4,
-  mesa_parafuso_cabeca_altura: 3,
-  mesa_parafuso_sextavado_raio: 1.9, /* sextavado interno (chave allen) da cabeça */
-  mesa_parafuso_sextavado_prof: 2,
+  mesa_orelha_raio: 5.2,
+  mesa_parafuso_cabeca_raio: 3.4,
+  mesa_parafuso_cabeca_altura: 1.2,
+  mesa_parafuso_sextavado_raio: 1.5, /* sextavado interno (chave allen) da cabeça */
+  mesa_parafuso_sextavado_prof: 1,
   mesa_guidao_folga: 0.15,
   /* a largura de 722 é a total, ponta a ponta das manoplas, medida na foto frontal (691 px a 1,045 mm/px): o caminho termina antes, pelo raio da manopla inclinada */
   guidao_largura: 722,
@@ -469,8 +478,19 @@ export function derivar(T) {
 
   /* MESA: espaçador e braçadeira do diâmetro da caixa no topo da coluna, e uma só extensão que sobe para a frente até o guidão */
   const topoCaixa = baseCaixa + T.caixa_direcao_comprimento;
-  tubo('garfo', 'aluminio', [naDirecao(topoCaixa - 2), naDirecao(topoCaixa + T.mesa_espacador)], [raioQ(T.caixa_direcao_diametro) - 0.5, raioQ(T.mesa_fixacao_diametro)], 32);
-  const fixaBaixo = topoCaixa + T.mesa_espacador + T.mesa_folga_acima_caixa;
+  const pilha = T.cone_altura + T.espacador_altura;
+  const rCone0 = T.cone_diametro_baixo / 2, rCone1 = T.cone_diametro_topo / 2, rEsp = T.espacador_diametro / 2;
+  /* tampa cônica preta, curta e lisa: a base assenta no topo da caixa, sem degrau além dos 2,5 mm de raio medidos */
+  tubo('garfo', 'preto', [naDirecao(topoCaixa - 1), naDirecao(topoCaixa), naDirecao(topoCaixa + T.cone_altura)], [rCone0 - 1, rCone0, rCone1], 40);
+  /* espaçadores: três anéis iguais com dois sulcos rasos entre eles */
+  {
+    const a = topoCaixa + T.cone_altura, h = T.espacador_altura / 3, sw = T.espacador_sulco_largura, rs = rEsp - T.espacador_sulco_fundo;
+    const pts = [[0, rEsp - 1], [0.01, rEsp]];
+    for (const k of [1, 2]) pts.push([k * h - sw / 2 - 0.01, rEsp], [k * h - sw / 2, rs], [k * h + sw / 2, rs], [k * h + sw / 2 + 0.01, rEsp]);
+    pts.push([T.espacador_altura, rEsp]);
+    tubo('garfo', 'preto', pts.map(([z]) => naDirecao(a + z)), pts.map(([, r]) => r), 40);
+  }
+  const fixaBaixo = topoCaixa + pilha + T.mesa_folga_acima_caixa;
   const fixaCima = fixaBaixo + T.mesa_fixacao_comprimento;
   tubo('mesa', 'preto', [naDirecao(fixaBaixo), naDirecao(fixaCima)], raioQ(T.mesa_fixacao_diametro), 32);
   const centroFixa = naDirecao(fixaCima - 14);
@@ -811,29 +831,37 @@ export function gerarPassos(T) {
       /* tampa de frente do guidão: placa de cantos redondos (extrusão em z) com a janela passante e o furo do guidão por `subtrair`,
          quatro orelhas e quatro cabeças de parafuso (extrusões circulares em z) com o sextavado interno. Tudo no sistema local em G e girado depois. */
       const [gx, gy, gz] = it.centro;
-      const ids = [];
-      const E = T.mesa_tampa_espessura;
-      const ex = (id, altura, perfil, x, y, z) => passos.push(['extrusao', { origemId: id, eixo: 'z', altura: m(altura), perfil, segmentosArco: 6, em: [m(x), m(y), m(z)] }]);
+      const R = T.mesa_tampa_raio, L = T.mesa_tampa_largura;
+      const ex = (id, altura, perfil, x, y, z) => passos.push(['extrusao', { origemId: id, eixo: 'z', altura: m(altura), perfil, segmentosArco: 8, em: [m(x), m(y), m(z)] }]);
       const sol = (id) => ({ origem: { op: 'extrusao', id } });
-      const pid = proximo();
-      ex(pid, E, { retangulo: { largura: m(T.mesa_tampa_largura), profundidade: m(T.mesa_tampa_altura), cantos: m(T.mesa_tampa_canto) } }, gx, gy, gz);
+      /* casca: revolução em torno do eixo do guidão (x) com as duas pontas arredondadas; as quatro orelhas são cilindros em z que se unem a ela */
+      const cid0 = proximo();
+      passos.push(['lathe', { origemId: cid0, eixo: 'x', lados: 40, segmentosCurva: 4, perfil: [[0, m(-L / 2)], [m(R), m(-L / 2), m(T.mesa_tampa_borda)], [m(R), m(L / 2), m(T.mesa_tampa_borda)], [0, m(L / 2)]], em: [m(gx), m(gy), m(gz)] }]);
+      const orelhas = [];
+      for (const sx of [-1, 1]) for (const sy of [-1, 1]) {
+        const oid = proximo();
+        ex(oid, T.mesa_orelha_topo + T.mesa_tampa_atras, { circulo: { raio: m(T.mesa_orelha_raio) } }, gx + (sx * T.mesa_parafuso_dx) / 2, gy + (sy * T.mesa_parafuso_dy) / 2, gz - T.mesa_tampa_atras);
+        orelhas.push({ origem: { op: 'extrusao', id: oid } });
+      }
+      const uid = proximo();
+      passos.push(['unir', { origemId: uid, solidos: [{ origem: { op: 'lathe', id: cid0 } }, ...orelhas] }]);
+      const trasId = proximo();
+      ex(trasId, 40, { retangulo: { largura: m(L + 20), profundidade: m(2 * R + 30) } }, gx, gy, gz - T.mesa_tampa_atras - 40);
       const jid = proximo();
-      ex(jid, E + 6, { retangulo: { largura: m(T.mesa_tampa_janela_largura), profundidade: m(T.mesa_tampa_janela_altura), cantos: m(T.mesa_tampa_janela_canto) } }, gx, gy, gz + 2);
+      ex(jid, R + 6, { retangulo: { largura: m(T.mesa_tampa_janela_largura), profundidade: m(T.mesa_tampa_janela_altura), cantos: m(T.mesa_tampa_janela_canto) } }, gx, gy, gz + 2);
       const fid = proximo();
-      passos.push(['extrusao', { origemId: fid, eixo: 'x', altura: m(T.mesa_tampa_largura + 10), perfil: { circulo: { raio: m(T.guidao_diametro / 2 + T.mesa_guidao_folga) } }, segmentosArco: 8, em: [m(gx - T.mesa_tampa_largura / 2 - 5), m(gy), m(gz)] }]);
+      passos.push(['extrusao', { origemId: fid, eixo: 'x', altura: m(L + 10), perfil: { circulo: { raio: m(T.guidao_diametro / 2 + T.mesa_guidao_folga) } }, segmentosArco: 8, em: [m(gx - L / 2 - 5), m(gy), m(gz)] }]);
       const cid = proximo();
-      passos.push(['subtrair', { origemId: cid, solidos: [sol(pid), sol(jid), sol(fid)] }]);
-      ids.push({ op: 'subtrair', id: cid });
+      passos.push(['subtrair', { origemId: cid, solidos: [{ origem: { op: 'unir', id: uid } }, sol(trasId), sol(jid), sol(fid)] }]);
+      passos.push(['liso', { angulo: 40, sel: { origem: { op: 'subtrair', id: cid } } }]);
+      const ids = [{ op: 'subtrair', id: cid }];
       const hex = (r) => Array.from({ length: 6 }, (_, k) => [m(r * Math.cos((k * Math.PI) / 3)), m(r * Math.sin((k * Math.PI) / 3))]);
       for (const sx of [-1, 1]) for (const sy of [-1, 1]) {
         const x = gx + (sx * T.mesa_parafuso_dx) / 2, y = gy + (sy * T.mesa_parafuso_dy) / 2;
-        const oid = proximo();
-        ex(oid, E, { circulo: { raio: m(T.mesa_orelha_raio) } }, x, y, gz);
-        ids.push({ op: 'extrusao', id: oid });
         const hid = proximo();
-        ex(hid, T.mesa_parafuso_cabeca_altura, { circulo: { raio: m(T.mesa_parafuso_cabeca_raio) } }, x, y, gz + E);
+        ex(hid, T.mesa_parafuso_cabeca_altura, { circulo: { raio: m(T.mesa_parafuso_cabeca_raio) } }, x, y, gz + T.mesa_orelha_topo);
         const sid2 = proximo();
-        ex(sid2, T.mesa_parafuso_sextavado_prof + 1, hex(T.mesa_parafuso_sextavado_raio), x, y, gz + E + T.mesa_parafuso_cabeca_altura - T.mesa_parafuso_sextavado_prof);
+        ex(sid2, T.mesa_parafuso_sextavado_prof + 1, hex(T.mesa_parafuso_sextavado_raio), x, y, gz + T.mesa_orelha_topo + T.mesa_parafuso_cabeca_altura - T.mesa_parafuso_sextavado_prof);
         const kid = proximo();
         passos.push(['subtrair', { origemId: kid, solidos: [sol(hid), sol(sid2)] }]);
         ids.push({ op: 'subtrair', id: kid });
