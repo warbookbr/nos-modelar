@@ -127,7 +127,9 @@ export function gerarPassos(t = TABELA) {
       raioInterno: 0, raioExterno: P.R, inicio: -0.005, fim: 0,
     },
   }]);
-  passos.push(['liso', { sel: { origem: { op: 'lathe', id: ID.corpo } } }]);
+  /* Com ângulo: a tampa de baixo e a lateral do corpo se encontram numa quina viva, e a média sem ângulo deixava o disco grande da tampa
+     puxar a sombra da lateral para baixo (a lateral escurecia em direção ao pé com o peso pelo ângulo do canto). */
+  passos.push(['liso', { angulo: 40, sel: { origem: { op: 'lathe', id: ID.corpo } } }]);
   /* O pé é loft de seções recuadas em arco; sem liso a sombra marca cada seção como degrau. */
   passos.push(['liso', { sel: { origem: { op: 'loft', id: ID.pe } } }]);
   passos.push(['liso', { sel: { origem: { op: 'loft', id: ID.caixa } } }]);
