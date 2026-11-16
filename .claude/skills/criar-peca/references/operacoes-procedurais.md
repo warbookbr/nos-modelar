@@ -1118,6 +1118,18 @@ espelhada, a que toca nas duas vira volta, e a que não toca ganha a cópia
 espelhada. `origem` publica as faces, `parte: 'lateral'` a superfície varrida e
 `parte: 'pontas'` as tampas das pontas abertas.
 
+### Cordão de solda na união de tubos: `costura` e `cordao`
+
+Junta de tubos soldada se faz com três passos: o `unir` dos tubos; o `friso`
+com `costura: { de: { op: 'unir', id } }` (e `entre: [i, j]` para um par só)
+e `perfil: { cordao: { largura } }`, o chanfro desenhado em cada ponto no
+canto entre os dois sólidos; e o `unir` desse resultado com o friso, com
+`vincarCostura: true`. A receita não põe anéis nas pontas dos tubos, porque a
+união que recebe o cordão refina a faixa em volta da costura sozinha. A recusa
+do friso por curva fechada demais cita o ponto e a largura e é limite de
+geometria, que se resolve mudando a largura; o caso e as medidas estão em
+[`GOTCHAS-POR-OPERACAO.md`](../../../../docs/modelar/usar/GOTCHAS-POR-OPERACAO.md#junta-de-tubos-soldada-unir-friso-na-costura-com-cordao-e-unir-com-vincarcostura).
+
 ### Aba que dobra a borda de um vão: `aba`
 
 Uma chapa pode dobrar para dentro na borda de um vão, em poucos milímetros de raio, e formar uma aba; um corte que atravessa a borda mostra se há aba, o ângulo, o raio e a largura. O `friso` com perfil desenhado à mão não faz essa aba: o passo recusa o perfil que não sobe acima da linha (`o perfil fica todo abaixo da linha`) e, se ele sobe um pouco, o que desce mais que a espessura (`ele atravessaria a face de dentro`), de modo que uma perna de 20 mm não passa. A opção `aba` toma o lugar de `perfil` e desenha o perfil em L sozinha:
