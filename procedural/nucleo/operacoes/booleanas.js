@@ -73,6 +73,7 @@
 import { somarFacesTocadas, somarVerticesTocados } from '../somas-do-rastreio.js';
 import { areaDe, fundir, fundirCoplanares, melhorInicio, pedacosConvexos } from '../pedacos-convexos.js';
 import { moldeDeDentro, ErroDoMolde } from '../molde-de-dentro.js';
+import { refinarFaixaDaCostura } from './refino-da-costura.js';
 import { memoizarPura } from '../memoria-de-pura.js';
 import { areaMinimaDe, limparNoEstado } from './limpar-lascas.js';
 
@@ -282,7 +283,14 @@ export function criarOperacoesBooleanas(servicos) {
       const partes = op === 'unir' ? cascasQueSeCruzam(st, faces) : [faces];
       for (const f of partes) { operandosDoCalculo.push(f); origemDoOperando.push(k); }
     });
-    return nucleoBooleano(st, i, op, wasm, a.origemId, operandosDoCalculo, null, { vincarCostura: a.vincarCostura === true, origemDoOperando });
+    /* o cordão de solda entre os operandos declara o passo do refino da faixa que ele toca (refino-da-costura.js) */
+    let refino = null;
+    if (op === 'unir') for (const s of a.solidos) {
+      const o = s?.origem;
+      if (!o || o.op !== 'friso') continue;
+      for (const r of st.origens.get(o.id) ?? []) if (r.op === 'friso' && r.refinoDaCostura) refino = { passo: Math.min(refino?.passo ?? Infinity, r.refinoDaCostura.passo), faixa: Math.max(refino?.faixa ?? 0, r.refinoDaCostura.faixa) };
+    }
+    return nucleoBooleano(st, i, op, wasm, a.origemId, operandosDoCalculo, null, { vincarCostura: a.vincarCostura === true, origemDoOperando, refino });
   }
 
   /* O CAMINHO COMUM: sólidos do núcleo entram na Manifold, o resultado volta
@@ -290,7 +298,7 @@ export function criarOperacoesBooleanas(servicos) {
      o resultado a partir dos sólidos já convertidos e devolve junto um sólido
      AUXILIAR (o material do arredondamento), cujas faces não vêm de face
      nenhuma do núcleo e por isso nascem todas com id novo. */
-  function nucleoBooleano(st, i, op, wasm, origemId, operandos, extra, { vincarCostura = false, origemDoOperando = null, reforco = false, semGatilhoDaAresta = false } = {}) {
+  function nucleoBooleano(st, i, op, wasm, origemId, operandos, extra, { vincarCostura = false, origemDoOperando = null, reforco = false, semGatilhoDaAresta = false, refino = null } = {}) {
     /* SEGUNDA TENTATIVA (`reforco`). Quando o portão de casca fechada recusa o resultado da união (só dela: o reforço não vale para subtrair, intersectar nem aparar), o cálculo roda de novo, uma vez, com três reforços
        que a primeira tentativa não tem: (1) a solda dos cantos novos volta a tentar os que a regra dos dois vizinhos em comum barrou, até nenhum mais sair (na união, a segunda tentativa também começa quando sobra uma aresta de menos de 2^-19 da meia-caixa depois da primeira solda; cinco cantos
        novos colados num canto antigo se barravam um ao outro); (2) a partição de um pedaço pela diagonal não escolhe um canto que já tem aresta com o canto de saída,
@@ -1065,6 +1073,8 @@ export function criarOperacoesBooleanas(servicos) {
         ...cortadas, ...pedacosNovos.map((c) => [c[0], c[1]]),
       ].filter(([, P]) => new Set(P).size >= 3 && areaDe(pos, P) < piso * 1e-3);
       if (semArea.length) {
+        /* a união que ia recusar por face sem área tenta de novo, uma vez, com os reforços da segunda tentativa (o canto que cai em cima de outro funde-se); o que a primeira aceita não muda */
+        if (!extra && !reforco && op === 'unir') return nucleoBooleano(st, i, op, wasm, origemId, operandos, extra, { vincarCostura, origemDoOperando, reforco: true, refino });
         const [fid, P] = semArea[0];
         if (extra) return grita(st, i, op, extra.ref, `o arredondamento deixaria ${semArea.length} face(s) sem área (cantos colineares), a primeira vinda da face ${fid}: o raio não combina com o tamanho das faces deste encaixe; tente um raio diferente, começando por um menor (raioMinimo e regiao não mudam a tampa que gera a lasca); nada foi alterado`);
         return grita(st, i, op, 'solidos', `o resultado teria ${semArea.length} face(s) degenerada(s) (área zero: os cantos ficam colineares), a primeira vinda da face ${fid} com ${P.length} cantos; laterais coplanares entre os sólidos costumam causar isto. Afaste as laterais (uma delas 1 mm menor) ou una os sólidos por outra partição; nada foi alterado`);
@@ -1141,10 +1151,10 @@ export function criarOperacoesBooleanas(servicos) {
       }));
       if (curta) {
         const recusas = st.orfaos.length;
-        const r = nucleoBooleano(st, i, op, wasm, origemId, operandos, extra, { vincarCostura, origemDoOperando, reforco: true });
+        const r = nucleoBooleano(st, i, op, wasm, origemId, operandos, extra, { vincarCostura, origemDoOperando, reforco: true, refino });
         if (st.orfaos.length === recusas) return r;
         st.orfaos.length = recusas;
-        return nucleoBooleano(st, i, op, wasm, origemId, operandos, extra, { vincarCostura, origemDoOperando, semGatilhoDaAresta: true });
+        return nucleoBooleano(st, i, op, wasm, origemId, operandos, extra, { vincarCostura, origemDoOperando, semGatilhoDaAresta: true, refino });
       }
     }
     /* ---- PORTÃO DE CASCA FECHADA ----
@@ -1163,7 +1173,7 @@ export function criarOperacoesBooleanas(servicos) {
       const casca = porRepresentante;
       const falha = cascaAberta(porRepresentante, pos) ?? cascaAberta(porIdEscrito, pos);
       if (falha && extra?.tentativa) return { falhouCasca: falha };
-      if (falha && !extra && !reforco && op === 'unir') return nucleoBooleano(st, i, op, wasm, origemId, operandos, extra, { vincarCostura, origemDoOperando, reforco: true });
+      if (falha && !extra && !reforco && op === 'unir') return nucleoBooleano(st, i, op, wasm, origemId, operandos, extra, { vincarCostura, origemDoOperando, reforco: true, refino });
       /* na tentativa (os prismas em meia-esquadria), pedaço sem área também
          reprova: é o sinal de tampas vizinhas que não coincidem, e o modo por
          fatias não tem tampa no meio da costura */
@@ -1271,6 +1281,8 @@ export function criarOperacoesBooleanas(servicos) {
       vs.forEach((v, k) => { const w = vs[(k + 1) % vs.length]; const c = v < w ? `${v}-${w}` : `${w}-${v}`; if (costuraFinal.has(c) && !ja.has(c)) { ja.add(c); novas.push([v, w]); } });
       if (novas.length) f.quebras = [...(f.quebras ?? []), ...novas];
     }
+    let refinado = null;
+    if (refino != null && !extra) refinado = refinarFaixaDaCostura(st, { faces, costura: facesDaCostura, arestasDaCostura: costuraFinal, passo: refino.passo, faixa: refino.faixa, idV: (k) => idDoPasso(i, k), idF: (k) => idDoPasso(i, k), primeiroV: provisorios.length, primeiroF: pedacosNovos.length, limiteDeIds: BLOCO + FAIXA_ESTENDIDA, donos });
     if (extra?.aoAplicar) extra.aoAplicar({ pedacosDeEntrada, consumidas: [...consumidas] });
     const MOTIVOS_DO_SEM_EFEITO = {
       longe: (q) => `${q} não toca a peça ou só encosta nela: nenhuma face da peça foi cortada nem consumida e nenhum pedaço novo entrou; confira a posição e o tamanho da ferramenta`,
@@ -1289,6 +1301,7 @@ export function criarOperacoesBooleanas(servicos) {
       arestas,
       passo: i,
       ...(extra ? {} : { donos }),
+      ...(refinado ? { refinoDaCostura: { faces: refinado.novas, tocadas: refinado.tocadas } } : {}),
       ...(extra?.registroExtra ?? {}),
     });
   }

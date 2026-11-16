@@ -2,7 +2,7 @@
    Sem Three.js, sem disco, sem relógio nem acaso. A ordem de tudo (partes, primitivas, materiais, texturas) sai da ordem dos ids de
    face e dos nomes das partes, nunca da ordem de inserção de um mapa externo. */
 import { PNG } from 'pngjs';
-import { chaveDoCantoLiso, normalLisaDoCanto } from '../../../procedural/nucleo/liso-por-angulo.js';
+import { anguloDoCanto, chaveDoCantoLiso, normalLisaDoCanto } from '../../../procedural/nucleo/liso-por-angulo.js';
 import { normalizarMaterial, normalizarMateriais } from '../../../src/autoria/material-da-receita.js';
 import { caixaDaParte, coordenadasDeTextura, medidasDaProjecao } from '../../../src/autoria/coordenada-de-textura.js';
 import { gerarMapaDeFlocos, gerarMapasDoRelevo, metrosPorTileDoRelevo, METROS_POR_TILE_DOS_FLOCOS } from '../../textura/src/mapas.js';
@@ -63,14 +63,14 @@ function normalDePoligono(pontos) {
   return normalizar([x, y, z]);
 }
 
-/* normal NÃO normalizada do triângulo (módulo = dobro da área, o peso da soma) */
+/* normal NÃO normalizada do triângulo (módulo = dobro da área) */
 function cruzDoTriangulo(a, b, c) {
   const ux = b[0] - a[0]; const uy = b[1] - a[1]; const uz = b[2] - a[2];
   const vx = c[0] - a[0]; const vy = c[1] - a[1]; const vz = c[2] - a[2];
   return [uy * vz - uz * vy, uz * vx - ux * vz, ux * vy - uy * vx];
 }
 
-/* As normais suaves, como na bancada: só a face `liso` entra na soma, por canto (vértice, ou vértice e setor quando há `quebras`). */
+/* As normais suaves, como na bancada: só a face `liso` entra na soma, pesada pelo ângulo do canto, por canto (vértice, ou vértice e setor quando há `quebras`). */
 function normaisSuaves(faces) {
   const chave = chaveDoCantoLiso(faces.map((f) => f.original));
   const soma = new Map();
@@ -79,8 +79,14 @@ function normaisSuaves(faces) {
     if (!f.original.liso) continue;
     const daFace = new Map();
     for (const tri of f.triangulos) {
-      const n = cruzDoTriangulo(...tri.map((id) => f.vertices.get(id)));
-      for (const id of tri) {
+      const P = tri.map((id) => f.vertices.get(id));
+      const u = normalizar(cruzDoTriangulo(...P));
+      if (!u) continue;
+      for (let j = 0; j < 3; j++) {
+        /* o peso é o ângulo do canto do triângulo, como na bancada (`anguloDoCanto`) */
+        const w = anguloDoCanto(P[(j + 2) % 3], P[j], P[(j + 1) % 3]);
+        const n = [u[0] * w, u[1] * w, u[2] * w];
+        const id = tri[j];
         const k = chave(f.original, id);
         for (const alvo of [soma, daFace]) {
           const acc = alvo.get(k);

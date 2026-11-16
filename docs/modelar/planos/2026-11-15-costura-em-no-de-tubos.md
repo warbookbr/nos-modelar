@@ -2,7 +2,9 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/nucleo/operacoes/friso.js`, `procedural/nucleo/operacoes/friso-na-costura.test.ts`, `procedural/nucleo/operacoes/booleanas.js`, `procedural/nucleo/operacoes/arredondar-costura-no.test.ts`, `procedural/nucleo/fixtures/no-de-tubos.js`, `procedural/pecas/bicicleta-urbana/`, `docs/modelar/banco-de-provas/costura-em-no-de-tubos-2026-11-15/`
+**Território:** `procedural/nucleo/operacoes/friso.js`, `procedural/nucleo/operacoes/friso-na-costura.test.ts`, `procedural/nucleo/operacoes/booleanas.js`, `procedural/nucleo/operacoes/arredondar-costura-no.test.ts`, `procedural/nucleo/fixtures/no-de-tubos.js`, `procedural/pecas/bicicleta-urbana/`, `docs/modelar/banco-de-provas/costura-em-no-de-tubos-2026-11-15/`, `procedural/nucleo/operacoes/refino-da-costura.js`, `procedural/nucleo/adaptador.js`, `procedural/nucleo/liso-por-angulo.js`, `procedural/nucleo/liso-por-angulo.test.js`, `src/autoria/adaptar-three.js`, `src/autoria/normal-lisa-por-angulo.test.js`, `modulos/exportador-gltf/src/gerar-gltf.js`, `tools/modelar/vista-rapida.mjs`, `tools/modelar/normais-lisas.test.ts`
+
+O território cresceu em 2026-11-16 com a decisão da pessoa, na fatia 7: o refino da costura mostrou que a normal lisa pesava as faces por contagem ou por área, e o peso pelo ângulo do canto entrou nos quatro lugares que a calculam.
 
 **Responsável:** a IA desta sessão conduz e mede, e a pessoa julga a forma por imagem.
 

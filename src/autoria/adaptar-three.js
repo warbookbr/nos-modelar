@@ -1,6 +1,6 @@
 /* adaptar-three.js — adaptador neutro do núcleo da Oficina para Three.js; não altera o formato persistido. */
 import * as THREE from 'three';
-import { chaveDoCantoLiso, normalLisaDoCanto } from '../../procedural/nucleo/liso-por-angulo.js';
+import { anguloDoCanto, chaveDoCantoLiso, normalLisaDoCanto } from '../../procedural/nucleo/liso-por-angulo.js';
 import { normalizarMaterial, normalizarMateriais } from './material-da-receita.js';
 import { coordenadasDeTextura, caixaDaParte, medidasDaProjecao } from './coordenada-de-textura.js';
 import { gerarMapaDeFlocos, gerarMapasDoRelevo, metrosPorTileDoRelevo, METROS_POR_TILE_DOS_FLOCOS } from '../../modulos/textura/src/mapas.js';
@@ -354,8 +354,9 @@ function prepararFaces(neutro) {
 }
 
 /**
- * O mapa de normais SUAVES: uma normal por VÉRTICE do núcleo, somada por área
- * apenas sobre as faces marcadas `liso`.
+ * O mapa de normais SUAVES: uma normal por VÉRTICE do núcleo, somada sobre as
+ * faces marcadas `liso` com o peso do ângulo do canto (`anguloDoCanto`), que não
+ * muda quando uma face plana vizinha está partida em mais triângulos.
  *
  * A regra tem duas metades e as duas importam. A primeira: `liso` é a única
  * fonte de suavização — face sem a marca continua chapada, byte por byte como
@@ -382,8 +383,12 @@ function normaisSuaves(neutro, preparo) {
     const { pontos, tris, normal: uFace } = preparo.get(face.id);
     const somaDaFace = new Map();
     for (const [ia, ib, ic] of tris) {
-      const n = normalDoTriangulo(pontos[ia], pontos[ib], pontos[ic]);
-      for (const k of [ia, ib, ic]) {
+      const u = normalizar(normalDoTriangulo(pontos[ia], pontos[ib], pontos[ic]));
+      if (!u) continue;
+      for (const [k, antes, depois] of [[ia, ic, ib], [ib, ia, ic], [ic, ib, ia]]) {
+        /* o peso é o ângulo do canto do triângulo: os triângulos de uma face plana somam no vértice o ângulo da face inteira */
+        const w = anguloDoCanto(pontos[antes], pontos[k], pontos[depois]);
+        const n = [u[0] * w, u[1] * w, u[2] * w];
         const id = chave(face, face.vs[k]);
         const acc = soma.get(id);
         if (acc) { acc[0] += n[0]; acc[1] += n[1]; acc[2] += n[2]; } else soma.set(id, [n[0], n[1], n[2]]);

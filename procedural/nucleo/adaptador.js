@@ -1,6 +1,6 @@
 /* adaptador.js — projeção visual do neutro; não conhece receitas nem execução. */
 import { N_INFLU, norm3, normalDaFace, temNomeDeParte } from './nucleo.js';
-import { chaveDoCantoLiso, normalLisaDoCanto } from './liso-por-angulo.js';
+import { anguloDoCanto, chaveDoCantoLiso, normalLisaDoCanto } from './liso-por-angulo.js';
 import { triangularFace } from './triangulacao-face.js';
 
 /* ----------------------------------------------------------------------------
@@ -58,19 +58,25 @@ export function adaptarV3(neutro, ctx, MATERIAIS = {}) {
   const faces = [...F.values()].sort((a, b) => a.id - b.id);
 
   /* normais: por face (chapado) e, pra `liso`, média por vértice das faces
-     lisas que o tocam. (Intocado do swatch — o 11a só troca a textura+UV.) */
+     lisas que o tocam, pesada pelo ângulo do canto. */
   const nFace = new Map();
   for (const f of faces) nFace.set(f.id, normalDaFace(V, f.vs));
   /* a soma é por canto: a chave é o vértice, ou o vértice e o setor quando uma face lisa declara `quebras` (o vinco
      vivo da subdivisão), e a média não passa por cima da quebra; sem quebra, a chave é o vértice, como antes. */
   const chave = chaveDoCantoLiso(faces);
+  /* o peso de cada face é o ângulo do canto dela no vértice (liso-por-angulo.js): a normal não muda quando uma face plana
+     vizinha se divide em mais pedaços */
+  const pesoDoCanto = (f, k) => {
+    const n = f.vs.length; const a = V.get(f.vs[(k - 1 + n) % n]), p = V.get(f.vs[k]), b = V.get(f.vs[(k + 1) % n]);
+    return a && p && b ? anguloDoCanto(a, p, b, nFace.get(f.id)) : 1;
+  };
   const acc = new Map();
-  for (const f of faces) if (f.liso) { const n = nFace.get(f.id); for (const v of f.vs) { const c = chave(f, v); const s = acc.get(c) || [0, 0, 0]; acc.set(c, [s[0] + n[0], s[1] + n[1], s[2] + n[2]]); } }
+  for (const f of faces) if (f.liso) { const n = nFace.get(f.id); f.vs.forEach((v, k) => { const w = pesoDoCanto(f, k); const c = chave(f, v); const s = acc.get(c) || [0, 0, 0]; acc.set(c, [s[0] + n[0] * w, s[1] + n[1] * w, s[2] + n[2] * w]); }); }
   const nSuave = new Map();
   for (const [v, s] of acc) nSuave.set(v, norm3(s[0], s[1], s[2]));
   /* liso com ângulo: a média muda por face, e sai de `normalLisaDoCanto`. */
   const lisasPorVertice = new Map();
-  for (const f of faces) if (f.liso) { const n = nFace.get(f.id); for (const v of f.vs) { const c = chave(f, v); if (!lisasPorVertice.has(c)) lisasPorVertice.set(c, []); lisasPorVertice.get(c).push({ u: n, n }); } }
+  for (const f of faces) if (f.liso) { const n = nFace.get(f.id); f.vs.forEach((v, k) => { const w = pesoDoCanto(f, k); const c = chave(f, v); if (!lisasPorVertice.has(c)) lisasPorVertice.set(c, []); lisasPorVertice.get(c).push({ u: n, n: [n[0] * w, n[1] * w, n[2] * w] }); }); }
   const normalLisa = (f, v) => (typeof f.liso === 'number'
     ? normalLisaDoCanto(nFace.get(f.id), f.liso, lisasPorVertice.get(chave(f, v)) ?? [])
     : nSuave.get(chave(f, v)));

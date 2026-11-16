@@ -280,3 +280,5 @@ os operandos são maiores (medido no chassi de três receitas de veículo).
 - Face abaixo do piso que o `unir`/`arredondarCostura` ainda deixa: 1 face na peça de prova `face-degenerada-em-dois-lathe` e 2 de 8 variantes do encontro de tubos medidas pelo revisor em 2026-11-13 (o fator 0,2 da partição por colinear não fecha a classe). Veio do fechamento do plano das costuras.
 
 - `aberturaPorContorno` que não fecha a borda derruba os vãos seguintes da cadeia em silêncio (partes inteiras somem da peça), e só o passo que falhou reclama; reproduz no furgão realista com `luz_canto_segmentos` em 7, 8, 9, 12, 14, 16 ou 24 (passo 813). Deveria recusar alto no passo e dizer quais vãos caíram. Achado na rodada de acabamento de 2026-11-14.
+
+- O núcleo leu `process.env` (chaves de depuração do refino da costura) e a bancada não abriu a bicicleta no navegador, com `ReferenceError`; nenhum gate pegou. Proposta: `npm run arquitetura:check` recusar `process.` em `procedural/nucleo/`. Veio da fatia 7 do plano do cordão de solda, em 2026-11-16.

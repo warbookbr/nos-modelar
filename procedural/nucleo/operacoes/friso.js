@@ -46,6 +46,7 @@ import { espelharGaiolaEmX } from '../subdivisao.js';
 import { formaParaContorno, ErroDePerfil, SEGMENTOS_ARCO_PADRAO } from '../perfil2d.js';
 import { ehSimples } from '../contorno.js';
 import { bordaDaAbertura } from './abertura-por-contorno.js';
+import { faixaDoRefino, passoDoRefino } from './refino-da-costura.js';
 import { EXEMPLO_DE_CORDAO, cordaoNoQuadro, linhaDaCostura, perfilDoCordao } from './linha-da-costura.js';
 
 /** A aba sai com as faces lisas até este ângulo, como as da superfície: a dobra arredonda a sombra e a ponta e a espessura ficam vivas. */
@@ -608,7 +609,7 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
     if (vertices.length > limite || faces.length > limite) return grita(st, i, 'friso', 'linha', `o friso gera ${vertices.length} vértices e ${faces.length} faces, acima do limite do passo (${limite})`);
     vertices.forEach((p, k) => addV(st, idDoPasso(i, k), p));
     const facesSaida = faces.map((f, k) => { const id = idDoPasso(i, k); addF(st, id, f.map((v) => idDoPasso(i, v))); if (comAba) st.F.get(id).liso = LISO_DA_ABA; if (medidasDoCordao) st.F.get(id).liso = LISO_DO_CORDAO; return id; });
-    if (a.origemId != null) registraOrigem(st, i, 'friso', a.origemId, { faces: facesSaida, lateral: lateral.map((k) => facesSaida[k]), pontas: tampas.map((k) => facesSaida[k]) });
+    if (a.origemId != null) registraOrigem(st, i, 'friso', a.origemId, { faces: facesSaida, lateral: lateral.map((k) => facesSaida[k]), pontas: tampas.map((k) => facesSaida[k]), ...(medidasDoCordao ? { refinoDaCostura: { passo: passoDoRefino(medidasDoCordao.largura), faixa: faixaDoRefino(medidasDoCordao.largura) } } : {}) });
   },
   };
 }

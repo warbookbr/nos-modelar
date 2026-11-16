@@ -12,8 +12,8 @@
    nítida, e cada lado continua liso por dentro. A malha não muda; só a sombra.
 
    `entradas` é a lista das faces lisas que tocam o vértice, cada uma com a
-   normal unitária `u` e o peso `n` (a normal já multiplicada pelo que o
-   adaptador usa como peso). Devolve a normal unitária, ou null. */
+   normal unitária `u` e o peso `n` (a normal unitária multiplicada pelo ângulo
+   do canto da face no vértice, `anguloDoCanto`). Devolve a normal unitária, ou null. */
 export function normalLisaDoCanto(uFace, liso, entradas) {
   const limite = typeof liso === 'number' ? Math.cos((liso * Math.PI) / 180) : -Infinity;
   let x = 0; let y = 0; let z = 0;
@@ -23,6 +23,29 @@ export function normalLisaDoCanto(uFace, liso, entradas) {
   }
   const t = Math.hypot(x, y, z);
   return t > 1e-12 ? [x / t, y / t, z / t] : null;
+}
+
+/* O PESO DE CADA FACE NA NORMAL LISA é o ângulo do canto dela no vértice. Com peso igual (cada face conta 1) ou pela área do
+   triângulo, a normal dependia de em quantos pedaços cada face vizinha estava partida: uma faceta de cilindro dividida em leque
+   puxava a normal da aresta para o lado dela, e o sombreado mostrava uma faixa clara onde o refino da costura dividiu uma faceta
+   e a vizinha não. O ângulo não muda quando uma face plana se divide (os ângulos dos pedaços no vértice somam o ângulo da face
+   inteira), e por isso todo lugar que calcula a normal lisa (o adaptador do núcleo, a bancada, o exportador glTF e a vista
+   rápida) usa este peso. A consequência: sem a área, uma tira estreita lisa vale no anel o mesmo que a face grande ao lado, e o
+   `liso` sem ângulo numa quina viva (a lateral e a tampa de um mesmo torno) inclina a normal da quina pela metade; o que separa
+   as duas é o `liso` com ângulo.
+
+   `anguloDoCanto(anterior, ponto, seguinte, normal)` devolve o ângulo interno, em radianos, do canto `ponto` do polígono cujos
+   cantos vizinhos são `anterior` e `seguinte`. Com a `normal` do polígono (no sentido dos cantos), o canto reflexo de um
+   polígono côncavo dá mais de pi; sem ela, o ângulo fica entre 0 e pi, o que basta para triângulo. Aresta de comprimento nulo dá 0. */
+export function anguloDoCanto(anterior, ponto, seguinte, normal = null) {
+  const ax = anterior[0] - ponto[0], ay = anterior[1] - ponto[1], az = anterior[2] - ponto[2];
+  const bx = seguinte[0] - ponto[0], by = seguinte[1] - ponto[1], bz = seguinte[2] - ponto[2];
+  const cx = by * az - bz * ay, cy = bz * ax - bx * az, cz = bx * ay - by * ax;
+  const d = bx * ax + by * ay + bz * az;
+  const s = normal ? cx * normal[0] + cy * normal[1] + cz * normal[2] : Math.hypot(cx, cy, cz);
+  if (s === 0 && d === 0) return 0;
+  const a = Math.atan2(s, d);
+  return a < 0 ? a + 2 * Math.PI : a;
 }
 
 /* As quebras de sombra. A face lisa pode trazer `quebras`, a lista de arestas suas, como pares de ids de vértice, em que

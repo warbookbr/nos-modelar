@@ -30,7 +30,9 @@ describe('friso na costura de uma união', () => {
       expect(arestasSemPar(n)).toEqual([]);
       expect(vinculosNaoManifold(n)).toEqual([]);
       const soTubos = nucleo(p.slice(0, -2));
-      expect(n.F.size - soTubos.F.size).toBeLessThanOrEqual(teto);
+      /* o teto é do cordão e dos cortes da união; as faces a mais do refino da faixa (que trocou os anéis finos da receita) contam à parte */
+      const refino = n.origens.get(201)[0].refinoDaCostura?.faces ?? 0;
+      expect(n.F.size - soTubos.F.size - refino).toBeLessThanOrEqual(teto);
     });
   }
 
@@ -63,6 +65,52 @@ describe('friso na costura de uma união', () => {
     expect(costura.every((c: string) => quebras.has(c))).toBe(true);
     const sem = nucleo(passosDoCordao('T reto 17/8', 7, { vincar: false }));
     expect([...sem.F.values()].some((f: any) => f.quebras?.length)).toBe(false);
+  });
+
+  it('o refino da faixa: com anéis de 10 mm nos tubos, nenhuma aresta de dobra em volta da costura passa de 1,5 passo (0,4 da largura), nenhum ponto novo cai dentro de uma faceta, a malha fecha e o resultado é o mesmo duas vezes', () => {
+    const p = passosDoCordao('obliquo 60 17/16', 7, { passoDoAnel: 0.01 });
+    const n = nucleo(p);
+    expect(n.orfaos).toEqual([]);
+    expect(arestasSemPar(n)).toEqual([]);
+    expect(vinculosNaoManifold(n)).toEqual([]);
+    const refino = n.origens.get(201)[0].refinoDaCostura;
+    expect(refino.faces).toBeGreaterThan(0);
+    const costura = [...new Set(n.origens.get(201)[0].arestas.flat())].map((v: any) => n.V.get(v));
+    const perto = (q: number[]) => costura.some((c: number[]) => Math.hypot(q[0] - c[0], q[1] - c[1], q[2] - c[2]) < m(7));
+    const normal = new Map<number, number[]>();
+    const facesDaAresta = new Map<string, number[]>();
+    const facesDoVertice = new Map<number, number[]>();
+    const lasca = new Set<number>();
+    for (const f of n.F.values()) {
+      const P = f.vs.map((v: number) => n.V.get(v));
+      const s = [0, 0, 0];
+      P.forEach((a: number[], k: number) => { const b = P[(k + 1) % P.length]; s[0] += (a[1] - b[1]) * (a[2] + b[2]); s[1] += (a[2] - b[2]) * (a[0] + b[0]); s[2] += (a[0] - b[0]) * (a[1] + b[1]); });
+      const t = Math.hypot(s[0], s[1], s[2]);
+      normal.set(f.id, s.map((x) => x / t));
+      let per = 0;
+      P.forEach((a: number[], k: number) => { const b = P[(k + 1) % P.length]; per += Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]); });
+      if (t / per < (m(7) * 0.4) / 10) lasca.add(f.id);
+      f.vs.forEach((v: number, k: number) => {
+        const w = f.vs[(k + 1) % f.vs.length]; const c = v < w ? `${v}-${w}` : `${w}-${v}`;
+        facesDaAresta.set(c, [...(facesDaAresta.get(c) ?? []), f.id]);
+        facesDoVertice.set(v, [...(facesDoVertice.get(v) ?? []), f.id]);
+      });
+    }
+    const mesmoPlano = (fs: number[]) => fs.every((g) => { const a = normal.get(fs[0])!, b = normal.get(g)!; return a[0] * b[0] + a[1] * b[1] + a[2] * b[2] > Math.cos((0.01 * Math.PI) / 180); });
+    /* a aresta de dobra entre facetas (o tubo de 48 lados dobra 7,5° em cada uma; acima de 30° é a quina do cordão) é a que o refino
+       divide; a de dentro de uma faceta e a de uma lasca (largura abaixo de um décimo do passo, normal sem precisão) ficam inteiras,
+       porque o ponto novo nelas teria a normal chapada da faceta ou a da lasca */
+    const diedro = (fs: number[]) => { const a = normal.get(fs[0])!, b = normal.get(fs[1])!; return (Math.acos(Math.min(1, a[0] * b[0] + a[1] * b[1] + a[2] * b[2])) * 180) / Math.PI; };
+    let maior = 0;
+    for (const [c, fs] of facesDaAresta) {
+      if (fs.length !== 2 || fs.some((f) => lasca.has(f)) || diedro(fs) < 5 || diedro(fs) > 30) continue;
+      const [a, b] = c.split('-').map((v) => n.V.get(Number(v)));
+      if (perto(a.map((x: number, i: number) => (x + b[i]) / 2))) maior = Math.max(maior, Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]));
+    }
+    expect(maior).toBeLessThanOrEqual(m(7) * 0.4 * 1.5 * 1.001);
+    const dentroDaFaceta = [...facesDoVertice].filter(([v, fs]) => perto(n.V.get(v)) && mesmoPlano(fs));
+    expect(dentroDaFaceta).toEqual([]);
+    expect(JSON.stringify(neutroCanonico(nucleo(p)))).toBe(JSON.stringify(neutroCanonico(n)));
   });
 
   it('o cordão de tubos de raio igual termina onde as superfícies ficam tangentes, e a malha fecha', () => {
