@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1977 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1978 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -580,6 +580,7 @@
 - `2026-11-15-reflexo-na-bancada.md` — Reflexo na bancada: a superfície de lataria julgada sem o Blender
 - `2026-11-16-comparar-com-a-referencia.md` — Comparar com a referência sem script: a prancha modelo e foto, a conferência da receita, a saída da bancada e o pacote do crítico
 - `2026-11-16-eletronica-no-modelar.md` — Eletrônica no Modelar: plano-raiz que gera quatro planos a partir do Eletrifica
+- `2026-11-16-familia-componentes-eletronicos.md` — Família de componentes eletrônicos: as peças por encapsulamento e a placa declarada, provadas no braço robótico
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar

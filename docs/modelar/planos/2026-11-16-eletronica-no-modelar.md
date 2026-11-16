@@ -36,7 +36,7 @@ Simulador da base óptica, boot, energia, térmico, óptica, dados e RTL: ADIAR.
 
 ## O objeto que usa o resultado
 
-Os três primeiros planos se provam no mesmo objeto do acervo, para a linha não construir estrutura sem uso: uma peça que hoje mostra caixa onde há eletrônica e tem motor ou luz. A escolha fica com a pessoa ao escrever o plano 1, entre o braço robótico e um eletrodoméstico do acervo; o plano 1 põe a placa nele, o plano 2 liga e verifica o circuito dele, e o plano 3 desenha o esquemático dele.
+Os três primeiros planos se provam no mesmo objeto do acervo, para a linha não construir estrutura sem uso: uma peça que hoje mostra caixa onde há eletrônica e tem motor ou luz. A pessoa escolheu o braço robótico em 2026-11-16; o plano 1 põe a placa nele, o plano 2 liga e verifica o circuito dele, e o plano 3 desenha o esquemático dele.
 
 ## Invariantes para os quatro planos
 
@@ -90,7 +90,7 @@ Ler o pacote de fabricação de uma placa que já existe (contorno, pads, furos,
 
 ## Fatias
 
-1. Escrever o plano 1, família de componentes eletrônicos. Pode ser feito já; a ativação dele espera um lugar de plano ativo.
+1. Feita em 2026-11-16: o plano 1, [família de componentes eletrônicos](2026-11-16-familia-componentes-eletronicos.md), com o braço robótico como objeto-alvo, escolhido pela pessoa. Pode ser feito já; a ativação dele espera um lugar de plano ativo.
 2. Escrever o plano 2, ligações elétricas, depois que o plano 1 for ativado (ele usa a placa e as peças como portadoras das portas).
 3. Escrever o plano 3, esquemático, depois que o plano 2 for ativado (ele desenha a lista de ligações do 2).
 4. Escrever o plano 4, análise, depois que os três fecharem; e fechar este.
