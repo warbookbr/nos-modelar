@@ -58,6 +58,20 @@ vistas pelo `critico-visual` cego, com a referência. Depois de três rodadas na
 mesma parte sem nota 8 do crítico ou sem o sim da pessoa, pare e consulte a
 pessoa com o registro das três, em vez de tentar a quarta.
 
+A consulta traz o diagnóstico, respondido por medida, antes da pergunta se
+segue:
+
+1. Quantos pixels a parte ocupa na referência; abaixo de uns 300 px no lado
+   maior, a recomendação é pedir uma imagem de perto.
+2. A descrição escrita da parte, peça por peça, que a pessoa confirma ou corrige.
+3. Quais vistas faltam na referência e o que foi suposto por isso.
+4. Se a referência mostra a mesma peça que a pessoa quer.
+5. Se a forma saiu de medidas da referência ou de ajuste a olho.
+6. Se as notas do crítico oscilaram entre rodadas que mudaram pouco; se sim, ele
+   julgou sem medida, e o pacote seguinte leva o contorno medido.
+
+A recomendação segue o primeiro item que falhou, na ordem da lista.
+
 ## Identidade
 
 Nomes semânticos sempre: `origemId`, `ALIASES`, `parte`, `publicarPorta`.
