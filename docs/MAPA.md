@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1984 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1988 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2518,7 +2518,7 @@
 - `registro-de-visoes.test.js` — registro-de-visoes.test.js — o seletor de visão sobre o controlador das partes.
 - `visao-curvatura.js` — visao-curvatura.js — a visão Curvatura da bancada: a curvatura média pintada nos vértices da peça, com a escala, as cores e a faixa ocre dos vincos das vista…
 - `visao-luz-rasante.js` — visao-luz-rasante.js — a visão Luz rasante da bancada: uma luz de sol baixa sobre o plano da imagem, com sombra, sobre a peça em material fosco, com o resto …
-- `visao-pintura.js` — visao-pintura.js — a visão Pintura da bancada: a peça vista como verniz brilhante sobre base escura, que reflete um ambiente de faixas de luz paralelas ao co…
+- `visao-pintura.js` — visao-pintura.js — a visão Pintura da bancada: a peça vista como lataria pintada de vermelho sob verniz, refletindo um estúdio de fotografia de carro: um gra…
 - `visao-zebra.js` — visao-zebra.js — a visão Zebra da bancada: listras pelo vetor refletido, como a zebra das vistas do Blender (`_material` de `tools/blender/comum.py`, tipo 'z…
 - `visoes-de-superficie.test.js` — visoes-de-superficie.test.js — a curvatura, a zebra e a luz rasante da bancada sobre a peça na cena, sem navegador.
 
@@ -3294,6 +3294,8 @@
 - `linhas-do-modelo.test.mjs` — linhas-do-modelo.test.mjs — as linhas tiradas da malha: o contorno, a divisa entre partes, a quina do degrau e a dobra fechada saem; a curva larga não sai.
 - `mapa-da-receita.mjs` — mapa-da-receita.mjs — o mapa de uma receita do acervo, para ler só o trecho que se precisa.
 - `mapa-da-receita.test.mjs` — mapa-da-receita.test.mjs — o mapa de toda receita do acervo sai sem erro, cada linha citada tem o nome dito e a saída cabe numa tela
+- `mapa-de-desvio.mjs` — mapa-de-desvio.mjs — pinta uma peça pela distância, com sinal e em milímetro, a uma superfície lisa ajustada a ela.
+- `mapa-de-desvio.test.mjs` — mapa-de-desvio.test.mjs — o mapa de desvio na chapa abaulada de prova: com o amassado declarado (1,2 mm de fundo e 80 mm de raio em x 400 e y 300) ele mede a…
 - `mapa-dependencias.test.ts` — mapa-dependencias.test.ts — provas da R02 sobre o snapshot da R01.
 - `material-da-peca.mjs` — material-da-peca.mjs — imprime tudo que pertence a uma peça e onde está.
 - `material-da-peca.test.mjs` — material-da-peca.test.mjs — o retrato do espalhamento, antes de arrumar.
@@ -3335,6 +3337,8 @@
 - `pasta-da-peca.test.mjs` — pasta-da-peca.test.mjs — a peça passa a poder ser uma pasta.
 - `peca-com-parametros.mjs` — peca-com-parametros.mjs — executa uma receita com parâmetros trocados e devolve a peça resolvida que o resolvedor de montagem lê.
 - `pedidos-da-pessoa.mjs` — pedidos-da-pessoa.mjs — registra os pedidos de alteração da pessoa e conta quantos foram por etapa.
+- `pente-de-curvatura.mjs` — pente-de-curvatura.mjs — o pente de curvatura de uma seção da peça: a curva do corte e, em cada ponto, uma haste de comprimento proporcional à curvatura, em …
+- `pente-de-curvatura.test.mjs` — pente-de-curvatura.test.mjs — o pente de curvatura na chapa abaulada de prova. A seção x:400 passa pelo centro do amassado (y 300, raio de 80 mm): a curvatur…
 - `perfil-da-execucao.mjs` — perfil-da-execucao.mjs — mede a execução de uma receita sem mudar nada nela (fatia 1 do plano do planejador de execução).
 - `perfil-da-execucao.test.mjs` — perfil-da-execucao.test.mjs — prova a ferramenta de perfil: mede sem mudar a malha, analisa o acervo e recusa argumento desconhecido.
 - `perfil-por-cor.mjs` — perfil-por-cor.mjs — os pixels de uma vista classificados pela cor do material e, linha a linha, os trechos de cada cor e a meia largura de cada uma em cada …
