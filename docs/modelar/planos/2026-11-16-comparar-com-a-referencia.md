@@ -8,6 +8,8 @@
 
 **Repositório e base:** `warbookbr/nos-modelar`, main na ativação.
 
+Sucessor do plano [reflexo na bancada](2026-11-15-reflexo-na-bancada.md), decidido pela pessoa em 2026-11-16: é ativado no fechamento dele.
+
 ## Problema observado
 
 Na sessão de 2026-11-13 a 2026-11-16 (furgão, cordão de solda e bicicleta), os 67 registros de agente (a sessão principal e 66 subagentes) somam 3.945 comandos de shell: 1.488 do implementador, 1.144 da sessão principal, 518 do modelador, 458 do revisor e 337 do agente geral; o crítico visual não roda shell, só abre imagens. A contagem, por padrão de comando, está na análise guardada fora do repositório, no scratchpad da sessão, e se refaz pelos registros com `npm run medir:transcricao` e um filtro por padrão.
@@ -46,6 +48,8 @@ Medição livre na foto: ADIAR, de propósito. Fica por script, porque a máscar
 
 Sonda de teste fora de `tools/`: ADIAR. A sessão copiou 117 vezes um teste de `tmp/` para `tools/zz-*.test.ts` para o vitest o achar, e renderizou `.obj` da fixture no Blender 44 vezes porque a bancada só mostra peça. Os dois são do trabalho de núcleo e ficam no backlog, com a contagem.
 
+Crítico por perguntas fechadas: REFATORAR o pedido do crítico. Acrescentado pela pessoa em 2026-11-16, a partir das pesquisas de projetos parecidos (`modulos/pesquisa/novidades-2026-11/agentes-de-ia-para-cad.md`): a nota oscila entre rodadas parecidas, e os trabalhos que a estabilizaram trocaram a nota livre por perguntas fechadas (sim, não ou não dá para ver, cada uma apontando a imagem), mostraram as imagens em duas ordens e só aceitaram o veredito que se manteve nas duas. A nota passa a sair das respostas, por regra escrita, e a variação se mede em cinco repetições da mesma imagem. A mudança vai no pedido que `vistas:critica` monta e no laço que o despacha; `.claude/agents/critico-visual.md` não muda sem a pessoa pedir.
+
 Envio por git: USAR DIRETO. A rotina de envio é sensível e depende da sessão; fica manual.
 
 ## Incluído
@@ -74,6 +78,7 @@ Envio por git: USAR DIRETO. A rotina de envio é sensível e depende da sessão;
 5. Uma rodada de modelador com referência, medida por `medir:transcricao` e pelo filtro desta análise, usa no máximo um quarto dos comandos de prancha, saída e conferência da linha de base (41 em 83 nas sete rodadas da bicicleta), e nenhum script de medição livre foi impedido.
 6. O crítico recebe o pacote com o contorno sobreposto numa peça com contorno medido, e a revisão registra se a nota oscilou menos entre rodadas parecidas.
 7. Ajuda de cada comando com as opções novas, e a nota nas skills.
+8. O crítico por perguntas fechadas: na mesma imagem repetida cinco vezes, a nota varia menos que com o pedido de hoje (medido nos dois, com o mesmo pacote), e a pergunta que muda de resposta entre as duas ordens sai como "não verificável" em vez de virar defeito.
 
 ## Fatias
 
@@ -82,7 +87,8 @@ Envio por git: USAR DIRETO. A rotina de envio é sensível e depende da sessão;
 3. A prancha, com régua, região, vistas e isolamento, provada no selim e no pedal.
 4. A cópia de parte repetida, pelo zoom em mm ou pela escolha de instância.
 5. O pacote do crítico com o contorno sobreposto.
-6. Skills, agente, documentação e fechamento.
+6. O crítico por perguntas fechadas, em duas ordens, com a variação medida em cinco repetições antes e depois.
+7. Skills, agente, documentação e fechamento.
 
 ## Riscos e parada
 

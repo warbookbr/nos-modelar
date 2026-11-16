@@ -44,6 +44,9 @@
  *    peça de lataria é recusado antes de qualquer captura, com o comando. A imagem de luz rasante com menos de 25 % da peça iluminada
  *    (`LIMIAR_DA_LUZ_RASANTE`) também o recusa, dizendo a imagem e a fração: a luz que vinha de um lado que a câmera não via já chegou
  *    ao crítico como uma imagem preta com traços de borda.
+ *  - a zebra e a pintura da bancada, também na peça de lataria (plano do reflexo, 2026-11-16): capturadas com `--visao` e `--enquadrar`
+ *    nas quatro vistas do conjunto, sem a vista em que a chapa aparece de quina, com a frase que diz como se lê a faixa refletida
+ *    (`LEITURA_DA_FAIXA`). Vão ao lado da luz rasante e da curvatura do Blender, que continuam exigidas até a pessoa decidir pela paridade;
  *
  * A pasta traz ainda o `pacote.json`, com a impressão do texto da receita que o pacote mostra e as imagens de superfície: é por ele
  * que o registro da rodada sabe se o crítico de peça de lataria recebeu as duas vistas da versão medida.
@@ -112,6 +115,15 @@ export const DISTANCIA_DE_PERTO_MM = 220;
 /** O lado, em mm, do quadro quadrado de uma vista de perto à `distanciaMm` (o campo de 38 graus de `olhar-bancada.mjs`). */
 export const campoDePertoMm = (distanciaMm) => Math.round(2 * distanciaMm * Math.tan((19 * Math.PI) / 180));
 export const VISTAS_DO_ARAME = 'isometrica,traseira';
+/* O REFLEXO DA BANCADA NA PEÇA DE LATARIA (plano do reflexo, fatia 5): a zebra e a pintura (`src/bancada/visoes/`), capturadas com
+   `--visao` e `--enquadrar`, nas quatro vistas do conjunto. A chapa vista de quina sai como um traço (a chapa de prova de frente para
+   +z ocupa 3 % da largura na vista direita e 2 % da altura na superior, depois de enquadrada), e a imagem em que a peça ocupa menos de
+   `MINIMO_DO_REFLEXO` do quadro em um dos lados sai do pedido, dita nele. Vão ao lado das vistas do Blender, que seguem exigidas
+   enquanto a pessoa não decidir pela paridade medida. */
+export const VISOES_DO_REFLEXO = Object.freeze(['zebra', 'pintura']);
+export const VISTAS_DO_REFLEXO = VISTAS_DO_CONJUNTO;
+export const RES_DO_REFLEXO = '900x900';
+export const MINIMO_DO_REFLEXO = 0.2;
 /* As vistas do conjunto montado, com o quadro na peça: as seis que o conjunto da peça sozinha tem, mais a de baixo, em quadro mais
    quadrado que o da bancada, porque o quadro fecha na caixa da peça e a folga da forma dela é que decide o que sobra. A de baixo
    entrou porque o alojamento do trem do nariz, que abre para baixo, só se confirmava nos cortes. */
@@ -364,7 +376,7 @@ export function contornosDasReferencias({ imagens = [], citadas = [], existe = e
  * encaixes com as vizinhas (`cortesDosEncaixes`); `anteriores` os pontos de rodadas anteriores que quem conduz atribuiu ao plano, às
  * ferramentas ou ao crítico (`pontosJaAtribuidos`).
  */
-export function montarPedido({ peca, plano = null, orientacao = null, alvo = null, afastamentos = [], referencias = [], modelo = [], arame = [], montado = null, sobreposicao = null, partes = [], perguntas = [], superficie = null, contornos = [], encaixes = [], anteriores = [], medicao = null }) {
+export function montarPedido({ peca, plano = null, orientacao = null, alvo = null, afastamentos = [], referencias = [], modelo = [], arame = [], montado = null, sobreposicao = null, partes = [], perguntas = [], superficie = null, reflexo = null, contornos = [], encaixes = [], anteriores = [], medicao = null }) {
   const imagem = ({ arquivo, vista, tipo }) => `${vista}${tipo ? `, ${tipo}` : ''}: ${arquivo}`;
   /* O lado de cada vista é dito uma vez, em Modelo, e vale pelo nome para o modelo, o montado e as partes: dito junto de cada imagem,
      o mesmo texto longo se repetia mais de vinte vezes na peça de onze partes. */
@@ -447,6 +459,7 @@ export function montarPedido({ peca, plano = null, orientacao = null, alvo = nul
   );
 
   if (superficie) L.push(...secaoDaSuperficie(superficie));
+  if (reflexo && VISOES_DO_REFLEXO.some((v) => reflexo[v]?.imagens?.length)) L.push(...secaoDoReflexo(reflexo));
 
   if (montado) {
     L.push(
@@ -541,6 +554,32 @@ function secaoDaSuperficie({ rasante, curvatura, faixa = null, semLuz = [] }) {
     + `azul cercada de vermelho num painel que devia ser liso é um afundamento.${textoDaFaixa}`, '',
     ...lista(curvatura.map(({ arquivo, vista }) => `${vista}: ${arquivo}`)), '',
   ];
+}
+
+/* A seção do reflexo da peça de lataria: a zebra e a pintura da bancada, com a frase que diz como se lê a faixa. As vistas têm os nomes
+   e os lados da bancada, os de Modelo. */
+export const LEITURA_DA_FAIXA = 'Faixa reta e contínua é chapa boa; faixa torta, amontoada ou quebrada é defeito.';
+function secaoDoReflexo(reflexo) {
+  const imagem = ({ arquivo, vista }) => `${vista}: ${arquivo}`;
+  const fora = (r) => (r?.fora?.length
+    ? [`Ficaram de fora, porque a peça aparece de quina e ocupa menos de ${String(Math.round(MINIMO_DO_REFLEXO * 100))} % do quadro num dos lados: ${r.fora.map((f) => f.vista).join(', ')}.`, '']
+    : []);
+  const L = [
+    '## Reflexo', '',
+    'A peça é de chapa, e estas vistas da bancada a mostram por reflexo, com a peça enchendo o quadro e olhando dos lados descritos em '
+    + `Modelo. ${LEITURA_DA_FAIXA} Diga onde a faixa se desvia e o que isso diz da chapa.`, '',
+  ];
+  if (reflexo.zebra?.imagens?.length) {
+    L.push('A zebra: listras pretas e brancas de um ambiente distante refletidas na chapa, sem sombra. Num painel liso a listra corre reta '
+      + 'ou em curva suave e com a largura parelha; onde ela entorta, se estreita em leque, se amontoa ou se parte, a chapa afunda, ondula ou '
+      + 'dobra ali. A listra que se parte numa linha mostra uma quina ou um degrau.', '', ...lista(reflexo.zebra.imagens.map(imagem)), '', ...fora(reflexo.zebra));
+  }
+  if (reflexo.pintura?.imagens?.length) {
+    L.push('A pintura: verniz brilhante sobre base escura, sob caixas de luz de estúdio, como a foto de um carro. O reflexo claro das caixas '
+      + 'corre pela chapa em faixa; faixa reta e contínua é chapa boa, e a faixa torta, amontoada ou quebrada, ou uma mancha clara ou escura '
+      + 'num painel liso, é defeito.', '', ...lista(reflexo.pintura.imagens.map(imagem)), '', ...fora(reflexo.pintura));
+  }
+  return L;
 }
 
 /* ---------- os pontos que rodadas anteriores já atribuíram ---------- */
@@ -1453,7 +1492,8 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   /* QUANTAS IMAGENS O PACOTE TEM E QUANTAS JÁ SAÍRAM, para a recusa de uma captura dizer o que faltava. */
   const total = VISTAS_DO_CONJUNTO.split(',').length + 1 + 1 + VISTAS_DO_ARAME.split(',').length + 1
     + VISTAS_DA_PARTE.split(',').length * partes.length
-    + (plano?.partes ?? []).reduce((soma, p) => soma + (p.dePerto?.length ?? 0), 0);
+    + (plano?.partes ?? []).reduce((soma, p) => soma + (p.dePerto?.length ?? 0), 0)
+    + (lataria.lataria ? VISOES_DO_REFLEXO.length * VISTAS_DO_REFLEXO.split(',').length : 0);
   let feitas = 0;
   const capturar = async (quem, opcoes) => {
     const resposta = await dep.olharBancada({ ...opcoes, logger, ...(prazoDeCargaMs ? { prazoDeCargaMs } : {}), ...(compartilhada ? { compartilhada } : {}) });
@@ -1469,6 +1509,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   let raioX;
   const porParte = [];
   const dePerto = [];
+  const reflexo = {};
   try {
     conjunto = await capturar('conjunto', { peca, revisar: true, res: RES_CONJUNTO });
     exigirVistasDiferentes(conjunto, 'do conjunto');
@@ -1512,6 +1553,13 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
           res: RES_DE_PERTO, mirar: entrada.ponto, distancia: distanciaMm,
         });
         dePerto.push({ parte, ponto: entrada.ponto, oQue: entrada.oQue, distanciaMm, campoMm: campoDePertoMm(distanciaMm), arquivo: arquivosDe(feita)[0] });
+      }
+    }
+    /* a zebra e a pintura da bancada, só na peça de lataria (a de emenda sombreada leva a luz rasante e não é chapa) */
+    if (lataria.lataria) {
+      for (const visao of VISOES_DO_REFLEXO) {
+        const feita = await capturar(`visão ${visao}`, { peca, auditoria: true, visao, enquadrar: true, vistas: VISTAS_DO_REFLEXO, res: RES_DO_REFLEXO });
+        reflexo[visao] = imagensDoReflexo(feita, peca);
       }
     }
   } finally {
@@ -1600,20 +1648,45 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
     partes: porParte.map(({ parte, resultado }) => ({ nome: parte, ...(caixas.get(parte) ? { caixaMm: caixas.get(parte) } : {}), ...(dePerto.some((d) => d.parte === parte) ? { dePerto: dePerto.filter((d) => d.parte === parte) } : {}), imagens: arquivosDe(resultado).map((arquivo) => ({ arquivo, vista: vistaDoArquivo(arquivo, peca) ?? 'vista' })) })),
     perguntas: [...(perguntas.todas ?? []), ...(declarado ? [lerPergunta(PERGUNTA_DO_ALVO, 'a pergunta do alvo')] : [])],
     superficie,
+    reflexo: lataria.lataria ? reflexo : null,
     medicao: medicaoDoPacote,
   });
   const arquivoDoPedido = join(pasta, 'pedido.md');
   writeFileSync(arquivoDoPedido, pedido, 'utf8');
   const manifesto = gravarManifesto(pasta, { peca, receita: impressao, lataria, superficie });
-  if (dePerto.length) {
-    /* aditivo: sem `dePerto` o pacote.json sai como sempre saiu */
+  const temReflexo = Object.keys(reflexo).length > 0;
+  if (dePerto.length || temReflexo) {
+    /* aditivo: sem `dePerto` e sem reflexo o pacote.json sai como sempre saiu */
     const dado = JSON.parse(readFileSync(manifesto, 'utf8'));
-    writeFileSync(manifesto, `${JSON.stringify({ ...dado, dePerto }, null, 2)}\n`, 'utf8');
+    const reflexoNoManifesto = temReflexo
+      ? Object.fromEntries(Object.entries(reflexo).map(([visao, r]) => [visao, { imagens: r.imagens.map((i) => i.arquivo), fora: r.fora.map((f) => f.vista) }]))
+      : null;
+    writeFileSync(manifesto, `${JSON.stringify({ ...dado, ...(dePerto.length ? { dePerto } : {}), ...(reflexoNoManifesto ? { reflexo: reflexoNoManifesto } : {}) }, null, 2)}\n`, 'utf8');
   }
 
   return {
-    peca, partes, conjunto, traseira, esquerda, arame, raioX, porParte, dePerto, pasta, pedido: arquivoDoPedido, manifesto, alvo, montada, sobreposicao, superficie, lataria, referencias, encaixes, avisos, medicao: medicaoDoPacote,
+    peca, partes, conjunto, traseira, esquerda, arame, raioX, porParte, dePerto, reflexo: temReflexo ? reflexo : null, pasta, pedido: arquivoDoPedido, manifesto, alvo, montada, sobreposicao, superficie, lataria, referencias, encaixes, avisos, medicao: medicaoDoPacote,
   };
+}
+
+/**
+ * As imagens de uma visão de reflexo que vão ao pedido: `{ imagens: [{ arquivo, vista }], fora: [{ vista, arquivo, largura, altura }] }`.
+ * Sai a vista em que a peça enquadrada ocupa menos de `minimo` da largura ou da altura do quadro (a chapa vista de quina), medido pela
+ * bancada (`resultado.vistas[i].enquadramento`, na ordem dos arquivos); a captura sem a medida entra inteira. Se todas caem, fica a de
+ * maior área, para o pedido nunca ficar sem a visão.
+ */
+export function imagensDoReflexo(resposta, peca, minimo = MINIMO_DO_REFLEXO) {
+  const arquivos = arquivosDe(resposta);
+  const medidas = Array.isArray(resposta?.resultado?.vistas) ? resposta.resultado.vistas : [];
+  const todas = arquivos.map((arquivo, i) => {
+    const e = medidas[i]?.enquadramento;
+    return { arquivo, vista: vistaDoArquivo(arquivo, peca) ?? medidas[i]?.nome ?? 'vista', largura: e?.largura ?? null, altura: e?.altura ?? null, area: e?.area ?? null };
+  });
+  const cabe = (i) => i.largura === null || i.altura === null || Math.min(i.largura, i.altura) >= minimo;
+  let entram = todas.filter(cabe);
+  if (!entram.length && todas.length) entram = [todas.reduce((a, b) => ((b.area ?? 0) > (a.area ?? 0) ? b : a))];
+  const fora = todas.filter((i) => !entram.includes(i)).map(({ vista, arquivo, largura, altura }) => ({ vista, arquivo, largura, altura }));
+  return { imagens: entram.map(({ arquivo, vista }) => ({ arquivo, vista })), fora };
 }
 
 /** A recusa de lataria sem Blender, com o caminho da dispensa para a peça que tem subdivisão e não é chapa. */
@@ -1857,6 +1930,13 @@ export function imprimir(resultado) {
       : `SUPERFÍCIE (luz rasante: ${resultado.lataria.porque}):`);
     for (const { arquivo } of superficie.rasante) linhas.push(`  ${arquivo} (luz rasante)`);
     for (const { arquivo } of superficie.curvatura) linhas.push(`  ${arquivo} (curvatura da lataria)`);
+  }
+  if (resultado.reflexo) {
+    linhas.push('', `REFLEXO DA BANCADA (peça de lataria; ${LEITURA_DA_FAIXA.charAt(0).toLowerCase()}${LEITURA_DA_FAIXA.slice(1)}):`);
+    for (const [visao, r] of Object.entries(resultado.reflexo)) {
+      for (const { arquivo } of r.imagens) linhas.push(`  ${arquivo} (${visao})`);
+      for (const f of r.fora) linhas.push(`  fora do pedido: ${visao} ${f.vista}, de quina (${porcento(f.largura ?? 0)} da largura e ${porcento(f.altura ?? 0)} da altura do quadro)`);
+    }
   }
   if (resultado.referencias?.ignoradas?.length) linhas.push('', `REFERÊNCIAS fora do pedido, porque não são imagem: ${resultado.referencias.ignoradas.join(', ')}`);
   for (const aviso of resultado.avisos ?? []) linhas.push('', `AVISO: ${aviso}`);

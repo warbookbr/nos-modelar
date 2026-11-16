@@ -282,3 +282,9 @@ os operandos são maiores (medido no chassi de três receitas de veículo).
 - `aberturaPorContorno` que não fecha a borda derruba os vãos seguintes da cadeia em silêncio (partes inteiras somem da peça), e só o passo que falhou reclama; reproduz no furgão realista com `luz_canto_segmentos` em 7, 8, 9, 12, 14, 16 ou 24 (passo 813). Deveria recusar alto no passo e dizer quais vãos caíram. Achado na rodada de acabamento de 2026-11-14.
 
 - O núcleo leu `process.env` (chaves de depuração do refino da costura) e a bancada não abriu a bicicleta no navegador, com `ReferenceError`; nenhum gate pegou. Proposta: `npm run arquitetura:check` recusar `process.` em `procedural/nucleo/`. Veio da fatia 7 do plano do cordão de solda, em 2026-11-16.
+
+- A `subdivisao` não marca no neutro as arestas que descendem de uma curva ou vinco declarado da gaiola, e por isso `npm run emendas` só acha emenda pela parte ou pela procedência das faces, e não pela curva que o autor declarou. Veio da fatia 4 do plano do reflexo na bancada, em 2026-11-16; a marca seria uma lista de arestas por curva no registro da origem, com nome geral.
+
+- `npm run desvio` reserva 70 px no alto da imagem e as duas linhas de legenda descem até uns 76 px, encostando o texto na peça; `npm run emendas` já usa 90 px. E `capacidade.mjs` não tem ficha de `desvio`, `pente`, `emendas` nem `suavidade`. Veio da fatia 4 do plano do reflexo na bancada, em 2026-11-16.
+
+- O pacote do crítico de lataria: a curvatura e a luz rasante do Blender saem na vista de quina mesmo quando a chapa ali tem poucos pixels (76 px de largura na chapa de prova, com título e legenda cortados), enquanto a zebra e a pintura da bancada já tiram a vista de quina; e o vocabulário de `sentido` do veredito não tem termo para afundamento ou abaulamento localizado num painel liso. Veio do crítico cego na chapa de prova, fatia 5 do plano do reflexo, em 2026-11-16.

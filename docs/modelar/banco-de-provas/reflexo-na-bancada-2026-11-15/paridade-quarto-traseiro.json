@@ -1,0 +1,71 @@
+{
+  "peca": "carro-fastback/lataria",
+  "rotulo": "quarto-traseiro",
+  "vistaBlender": "lado",
+  "vistaBancada": "direita",
+  "caixaBlenderPx": [
+    62,
+    200,
+    1338,
+    851
+  ],
+  "rasante": [
+    {
+      "azimute": 230,
+      "blender": {
+        "fracao": 0.909,
+        "fracaoRemedida": 0.9084
+      },
+      "bancada": {
+        "fracao": 0.9079,
+        "arquivo": "tmp/paridade-reflexo/quarto-traseiro/c-9fd2t8/bancada-carro-fastback-lataria-direita-orto-visao-luz-rasante-az230-enquadrado.png",
+        "caixaPx": [
+          56,
+          196,
+          1344,
+          854
+        ]
+      },
+      "luminancia": {
+        "pontos": 1710,
+        "correlacao": 0.9806,
+        "diferencaMediana": 0.1216,
+        "mediaBlender": 0.6375,
+        "mediaBancada": 0.5333
+      }
+    },
+    {
+      "azimute": 320,
+      "blender": {
+        "fracao": 0.7852,
+        "fracaoRemedida": 0.7845
+      },
+      "bancada": {
+        "fracao": 0.8048,
+        "arquivo": "tmp/paridade-reflexo/quarto-traseiro/c-e4ky24/bancada-carro-fastback-lataria-direita-orto-visao-luz-rasante-az320-enquadrado.png",
+        "caixaPx": [
+          56,
+          196,
+          1344,
+          854
+        ]
+      },
+      "luminancia": {
+        "pontos": 1710,
+        "correlacao": 0.952,
+        "diferencaMediana": 0.0745,
+        "mediaBlender": 0.5005,
+        "mediaBancada": 0.447
+      }
+    }
+  ],
+  "curvatura": {
+    "escalaBlender": 3.77573,
+    "escalaBancada": 3.77574,
+    "arquivoBancada": "tmp/paridade-reflexo/quarto-traseiro/c-kcdavs/bancada-carro-fastback-lataria-direita-orto-visao-curvatura-enquadrado.png",
+    "pontos": 872,
+    "correlacao": 0.9843830463612215,
+    "diferencaMediana": 0.04725447367564106,
+    "diferencaP90": 0.23715536521310954
+  }
+}

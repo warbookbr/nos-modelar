@@ -11,7 +11,7 @@ import { afterAll, describe, expect, it } from 'vitest';
 import { lerPergunta } from '../../src/autoria/perguntas-do-critico.js';
 import {
   ELEVACOES_DA_LUZ_RASANTE, LIMITE_DO_VEREDITO, PERGUNTA_DO_ALVO, PRAZO_DA_CAPTURA_MONTADA_MS, VISTAS_MONTADAS, ladoDaVista, montagemDaPeca, montarPedido, pastaDaRodada, prefixoDaPeca, referenciasDoPlano,
-  DISTANCIA_DE_PERTO_MM, campoDePertoMm, MOTIVO_SEM_MEDIR, ReceitaReprovada, decidirLuzRasante, imprimir, fracaoVisivelDaPeca, lerReferenciasExternas, lerOrientacaoDaReferencia, LIMITE_DA_ORIENTACAO, AJUDA, mensagemDaLatariaSemBlender, luzRasanteDoPacote, primeiraQuePassa, unidadeDoAlvo, vistaDoArquivo, vistasMontadasVisiveis, vistasParaCritica, vistasRepetidas,
+  DISTANCIA_DE_PERTO_MM, campoDePertoMm, MOTIVO_SEM_MEDIR, ReceitaReprovada, decidirLuzRasante, imprimir, fracaoVisivelDaPeca, lerReferenciasExternas, lerOrientacaoDaReferencia, LIMITE_DA_ORIENTACAO, AJUDA, mensagemDaLatariaSemBlender, imagensDoReflexo, LEITURA_DA_FAIXA, MINIMO_DO_REFLEXO, luzRasanteDoPacote, primeiraQuePassa, unidadeDoAlvo, vistaDoArquivo, vistasMontadasVisiveis, vistasParaCritica, vistasRepetidas,
 } from './vistas-para-critica.mjs';
 
 const area = mkdtempSync(join(tmpdir(), 'vistas-critica-'));
@@ -1072,5 +1072,69 @@ describe('a vista de perto da feição pequena (dePerto da parte no PLANO)', () 
     expect(manifesto.dePerto).toEqual(resultado.dePerto);
     expect(manifesto.dePerto[0]).toMatchObject({ parte: 'bloco', ponto: [100, 300, 200], distanciaMm: 120, campoMm: 83 });
     expect(imprimir(resultado)).toContain('DE PERTO');
+  });
+});
+
+describe('o reflexo da bancada no pacote da peça de lataria', () => {
+  const PECA = 'chapa-de-reflexo-de-prova';
+  /* a enquadração que a bancada mediu na chapa de prova de frente para +z (`npm run bancada -- chapa-de-reflexo-de-prova --visao=zebra
+     --enquadrar`): a direita e a superior a veem de quina */
+  const ENQUADRADA = { isometrica: [0.81, 0.92], frontal: [0.92, 0.56], direita: [0.03, 0.92], superior: [0.92, 0.02] };
+
+  async function pacote() {
+    const base = mkdtempSync(join(area, 'reflexo-'));
+    const pasta = join(base, 'rodada');
+    const chamadas = [];
+    const olharBancada = async (opcoes) => {
+      chamadas.push(opcoes);
+      const vistas = opcoes.revisar ? ['isometrica', 'frontal', 'direita', 'superior'] : String(opcoes.vistas).split(',');
+      const sufixo = [opcoes.selecionadas ? `sel-${opcoes.selecionadas}` : null, opcoes.arame ? `arame-${opcoes.arame}` : null, opcoes.visao ? `visao-${opcoes.visao}` : null, opcoes.enquadrar ? 'enquadrado' : 'orto'].filter(Boolean).join('-');
+      const arquivos = vistas.map((v) => { const a = join(base, `${prefixoDaPeca(PECA)}${v}-${sufixo}.png`); writeFileSync(a, a); return a; });
+      const medidas = opcoes.visao ? vistas.map((v) => ({ nome: v, enquadramento: { largura: ENQUADRADA[v][0], altura: ENQUADRADA[v][1], area: ENQUADRADA[v][0] * ENQUADRADA[v][1] } })) : undefined;
+      return { ok: true, resultado: { arquivos, ...(medidas ? { vistas: medidas } : {}) } };
+    };
+    const img = (vista, azimute) => ({ arquivo: join(base, `blender-${vista}-${azimute}.png`), vista, azimute, iluminada: 0.6 });
+    const vistasDeSuperficie = async () => ({ obj: join(base, 'peca.obj'), partes: [], rasante: [img('frente', 30)], curvatura: [{ arquivo: join(base, 'curv-frente.png'), vista: 'frente' }], faixa: null });
+    const resultado = await vistasParaCritica(PECA, { saida: pasta, pastaDasCapturas: base, dependencias: { medirReceita: medirPassa, blender: '/blender', olharBancada, vistasDeSuperficie, rodadasAnteriores: () => [] } });
+    return { resultado, chamadas, pedido: readFileSync(join(pasta, 'pedido.md'), 'utf8'), manifesto: JSON.parse(readFileSync(join(pasta, 'pacote.json'), 'utf8')) };
+  }
+
+  it('captura a zebra e a pintura enquadradas e as lista no pedido, com a frase da faixa, sem a vista de quina', async () => {
+    const { resultado, chamadas, pedido, manifesto } = await pacote();
+    const visoes = chamadas.filter((c) => c.visao);
+    expect(visoes.map((c) => [c.visao, c.enquadrar, c.vistas])).toEqual([['zebra', true, 'isometrica,frontal,direita,superior'], ['pintura', true, 'isometrica,frontal,direita,superior']]);
+    expect(titulos(pedido)).toContain('Reflexo');
+    expect(titulos(pedido).indexOf('Reflexo')).toBe(titulos(pedido).indexOf('Superfície') + 1);
+    const secao = pedido.slice(pedido.indexOf('## Reflexo'), pedido.indexOf('## Partes'));
+    expect(secao).toContain(LEITURA_DA_FAIXA);
+    for (const visao of ['zebra', 'pintura']) {
+      for (const vista of ['isometrica', 'frontal']) expect(secao).toContain(`- ${vista}: ${join(resultado.pasta, '..', `${prefixoDaPeca(PECA)}${vista}-visao-${visao}-enquadrado.png`)}`);
+      expect(secao).not.toContain(`direita-visao-${visao}`);
+      expect(manifesto.reflexo[visao]).toEqual({ imagens: resultado.reflexo[visao].imagens.map((i) => i.arquivo), fora: ['direita', 'superior'] });
+    }
+    expect(secao).toContain('Ficaram de fora, porque a peça aparece de quina e ocupa menos de 20 % do quadro num dos lados: direita, superior.');
+    /* as vistas do Blender continuam no pedido */
+    expect(pedido).toContain('blender-frente-30.png');
+    expect(imprimir(resultado)).toContain('REFLEXO DA BANCADA');
+  }, 60_000);
+
+  it('a peça que não é de lataria não captura reflexo nem ganha a seção', async () => {
+    const base = mkdtempSync(join(area, 'sem-reflexo-'));
+    const peca = 'tools/fixtures/referencia-do-plano/presente/receita.js';
+    const bancada = bancadaFalsa(base, peca);
+    const resultado = await vistasParaCritica(peca, { saida: join(base, 'rodada'), pastaDasCapturas: base, dependencias: { medirReceita: medirPassa, olharBancada: bancada.fazer, rodadasAnteriores: () => [] } });
+    expect(bancada.chamadas.filter((c) => c.visao)).toEqual([]);
+    expect(resultado.reflexo).toBeNull();
+    expect(readFileSync(resultado.pedido, 'utf8')).not.toContain('## Reflexo');
+  }, 60_000);
+
+  it('a vista de quina sai, a captura sem medida entra, e com todas de quina fica a de maior área', () => {
+    const r = (vistas) => ({ resultado: { arquivos: vistas.map(([v]) => `/o/${prefixoDaPeca(PECA)}${v}-visao-zebra.png`), vistas: vistas.map(([v, l, a]) => ({ nome: v, enquadramento: l === undefined ? undefined : { largura: l, altura: a, area: l * a } })) } });
+    expect(imagensDoReflexo(r([['frontal', 0.9, 0.5], ['direita', 0.03, 0.9]]), PECA).imagens.map((i) => i.vista)).toEqual(['frontal']);
+    expect(imagensDoReflexo(r([['frontal'], ['direita', 0.03, 0.9]]), PECA).imagens.map((i) => i.vista)).toEqual(['frontal']);
+    const quina = imagensDoReflexo(r([['direita', 0.03, 0.9], ['superior', 0.9, 0.1]]), PECA);
+    expect(quina.imagens.map((i) => i.vista)).toEqual(['superior']);
+    expect(quina.fora.map((f) => f.vista)).toEqual(['direita']);
+    expect(MINIMO_DO_REFLEXO).toBe(0.2);
   });
 });

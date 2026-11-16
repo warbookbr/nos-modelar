@@ -6,6 +6,7 @@
 > algum arquivo-fonte estiver sem cabeçalho.
 
 1998 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2003 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -428,6 +429,11 @@
 
 - `RESULTADO.md` — Sonda: do esboço traduzido à receita do Mecanifica, sem agente (2026-10-19)
 - `sonda-passos.mjs` — sonda-passos.mjs — converte as caixas de um esboço traduzido em passos `cubo` e `parte` da receita do Mecanifica e compara a caixa envolvente da malha execut…
+
+## docs/modelar/banco-de-provas/reflexo-na-bancada-2026-11-15/
+
+- `README.md` — Reflexo na bancada: a paridade da luz rasante e da curvatura com o Blender
+- `medir-paridade.mjs` — medir-paridade.mjs — a luz rasante e a curvatura da bancada medidas contra as do Blender na mesma peça e na mesma vista (fatia 5 do plano do reflexo na banca…
 
 ## docs/modelar/banco-de-provas/revisao-das-verificacoes-2026-11-13/
 
@@ -2538,7 +2544,7 @@
 - `registro-de-visoes.test.js` — registro-de-visoes.test.js — o seletor de visão sobre o controlador das partes.
 - `visao-curvatura.js` — visao-curvatura.js — a visão Curvatura da bancada: a curvatura média pintada nos vértices da peça, com a escala, as cores e a faixa ocre dos vincos das vista…
 - `visao-luz-rasante.js` — visao-luz-rasante.js — a visão Luz rasante da bancada: uma luz de sol baixa sobre o plano da imagem, com sombra, sobre a peça em material fosco, com o resto …
-- `visao-pintura.js` — visao-pintura.js — a visão Pintura da bancada: a peça vista como verniz brilhante sobre base escura, que reflete um ambiente de faixas de luz paralelas ao co…
+- `visao-pintura.js` — visao-pintura.js — a visão Pintura da bancada: a peça vista como lataria pintada de vermelho sob verniz, refletindo um estúdio de fotografia de carro: um gra…
 - `visao-zebra.js` — visao-zebra.js — a visão Zebra da bancada: listras pelo vetor refletido, como a zebra das vistas do Blender (`_material` de `tools/blender/comum.py`, tipo 'z…
 - `visoes-de-superficie.test.js` — visoes-de-superficie.test.js — a curvatura, a zebra e a luz rasante da bancada sobre a peça na cena, sem navegador.
 
@@ -2978,6 +2984,38 @@
 
 - `receita.js` — O suporte com a sapata 1 mm para +x: outra malha, ainda dentro do envelope de 2 mm do volume da sapata.
 
+## tools/fixtures/reflexo-calibracao/
+
+- `chapas.mjs` — chapas.mjs — as chapas de calibração do reflexo: chapas de defeito conhecido, geradas por conta, para provar a continuidade nas emendas, o índice de suavidad…
+
+## tools/fixtures/reflexo-calibracao/degrau/
+
+- `receita.js` — reflexo-calibracao/degrau/receita.js — a chapa de calibração 'degrau' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
+
+## tools/fixtures/reflexo-calibracao/lisa/
+
+- `receita.js` — reflexo-calibracao/lisa/receita.js — a chapa de calibração 'lisa' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
+
+## tools/fixtures/reflexo-calibracao/ondulada-025/
+
+- `receita.js` — reflexo-calibracao/ondulada-025/receita.js — a chapa de calibração 'ondulada-025' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
+
+## tools/fixtures/reflexo-calibracao/ondulada-050/
+
+- `receita.js` — reflexo-calibracao/ondulada-050/receita.js — a chapa de calibração 'ondulada-050' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
+
+## tools/fixtures/reflexo-calibracao/ondulada-100/
+
+- `receita.js` — reflexo-calibracao/ondulada-100/receita.js — a chapa de calibração 'ondulada-100' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
+
+## tools/fixtures/reflexo-calibracao/quebra-de-curvatura/
+
+- `receita.js` — reflexo-calibracao/quebra-de-curvatura/receita.js — a chapa de calibração 'quebra-de-curvatura' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
+
+## tools/fixtures/reflexo-calibracao/vinco/
+
+- `receita.js` — reflexo-calibracao/vinco/receita.js — a chapa de calibração 'vinco' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
+
 ## tools/fixtures/saliencia-declarada/
 
 - `receita.js` — saliencia-declarada — chapa neutra com uma saliência (ou um rebaixo) de dupla curvatura desenhada de propósito, para provar a declaração `PLANO.saliencias` d…
@@ -3228,6 +3266,8 @@
 - `conferir-vistas.test.mjs` — conferir-vistas.test.mjs — a rodada de conferência sobre uma cena sintética, sem navegador: dois cubos de cores diferentes lado a lado, uma referência em PNG…
 - `configuracao-composicoes.mjs` — configuracao-composicoes.mjs — o registro de composições que um comando recebe.
 - `contexto-montagem-estudo.test.ts` — Repete R001/R002 no descritor de contexto e mede a economia Agent-First.
+- `continuidade-nas-emendas.mjs` — continuidade-nas-emendas.mjs — percorre as linhas onde dois trechos da chapa se encontram e mede, ponto a ponto, a fresta (mm), o ângulo entre as normais dos…
+- `continuidade-nas-emendas.test.mjs` — continuidade-nas-emendas.test.mjs — a continuidade nas emendas nas chapas de calibração do reflexo (`tools/fixtures/reflexo-calibracao/`): acha o degrau (G0)…
 - `contorno-da-imagem.mjs` — contorno-da-imagem.mjs — a porta de linha de comando do módulo `modulos/contorno-da-imagem`, que separa as partes de uma imagem de referência por watershed c…
 - `contorno-da-imagem.test.mjs` — contorno-da-imagem.test.mjs — o contorno sai da imagem, igual nas duas execuções, separa partes do mesmo cinza e recusa semente fora da parte.
 - `contorno-da-peca.mjs` — contorno-da-peca.mjs — o contorno por parte no veredito da peça.
@@ -3298,6 +3338,7 @@
 - `frente-da-fonte.mjs` — frente-da-fonte.mjs — de que lado fica a frente de uma malha de referência, e a conferência de que o `partes.json` a registrou.
 - `frente-da-fonte.test.mjs` — Testes de frente-da-fonte.mjs: a frente lida pelas rodas, faróis e para-brisa nomeados, a declaração obrigatória quando a malha é uma peça só, a recusa da fr…
 - `hierarquia-partes.test.ts` — hierarquia-partes.test.ts — árvore semântica sem Three.js ou geometria.
+- `imagem-de-medida.mjs` — imagem-de-medida.mjs — o desenho das imagens das ferramentas de medida da superfície: o quadro de pixels RGBA com a fonte de 5 por 7, a base da câmera ortogr…
 - `impacto-global.test.ts` — impacto-global.test.ts — provas da R03 sobre o mapa canônico v1.
 - `importar-receita.mjs` — importar-receita.mjs — import dinâmico de receita SEM cache obsoleto.
 - `instancia-de-familia.mjs` — instancia-de-familia.mjs — uma instância de família procedural por uma chamada, em passos prontos para um esboço 2.0 ou uma receita.
@@ -3314,6 +3355,8 @@
 - `linhas-do-modelo.test.mjs` — linhas-do-modelo.test.mjs — as linhas tiradas da malha: o contorno, a divisa entre partes, a quina do degrau e a dobra fechada saem; a curva larga não sai.
 - `mapa-da-receita.mjs` — mapa-da-receita.mjs — o mapa de uma receita do acervo, para ler só o trecho que se precisa.
 - `mapa-da-receita.test.mjs` — mapa-da-receita.test.mjs — o mapa de toda receita do acervo sai sem erro, cada linha citada tem o nome dito e a saída cabe numa tela
+- `mapa-de-desvio.mjs` — mapa-de-desvio.mjs — pinta uma peça pela distância, com sinal e em milímetro, a uma superfície lisa ajustada a ela.
+- `mapa-de-desvio.test.mjs` — mapa-de-desvio.test.mjs — o mapa de desvio na chapa abaulada de prova: com o amassado declarado (1,2 mm de fundo e 80 mm de raio em x 400 e y 300) ele mede a…
 - `mapa-dependencias.test.ts` — mapa-dependencias.test.ts — provas da R02 sobre o snapshot da R01.
 - `material-da-peca.mjs` — material-da-peca.mjs — imprime tudo que pertence a uma peça e onde está.
 - `material-da-peca.test.mjs` — material-da-peca.test.mjs — o retrato do espalhamento, antes de arrumar.
@@ -3355,6 +3398,8 @@
 - `pasta-da-peca.test.mjs` — pasta-da-peca.test.mjs — a peça passa a poder ser uma pasta.
 - `peca-com-parametros.mjs` — peca-com-parametros.mjs — executa uma receita com parâmetros trocados e devolve a peça resolvida que o resolvedor de montagem lê.
 - `pedidos-da-pessoa.mjs` — pedidos-da-pessoa.mjs — registra os pedidos de alteração da pessoa e conta quantos foram por etapa.
+- `pente-de-curvatura.mjs` — pente-de-curvatura.mjs — o pente de curvatura de uma seção da peça: a curva do corte e, em cada ponto, uma haste de comprimento proporcional à curvatura, em …
+- `pente-de-curvatura.test.mjs` — pente-de-curvatura.test.mjs — o pente de curvatura na chapa abaulada de prova. A seção x:400 passa pelo centro do amassado (y 300, raio de 80 mm): a curvatur…
 - `perfil-da-execucao.mjs` — perfil-da-execucao.mjs — mede a execução de uma receita sem mudar nada nela (fatia 1 do plano do planejador de execução).
 - `perfil-da-execucao.test.mjs` — perfil-da-execucao.test.mjs — prova a ferramenta de perfil: mede sem mudar a malha, analisa o acervo e recusa argumento desconhecido.
 - `perfil-por-cor.mjs` — perfil-por-cor.mjs — os pixels de uma vista classificados pela cor do material e, linha a linha, os trechos de cada cor e a meia largura de cada uma em cada …
@@ -3415,6 +3460,8 @@
 - `sobra-entre-partes.test.mjs` — sobra-entre-partes.test.mjs — a placa reta que passa do corpo em arco nos cantos sobra na vista de cima, com a distância conhecida; a placa encurtada para de…
 - `sobreposicao-de-cortes.mjs` — sobreposicao-de-cortes.mjs — os cortes planos do modelo sobre os do sólido do esboço que a receita refina, numa imagem por eixo.
 - `sobreposicao-de-cortes.test.mjs` — sobreposicao-de-cortes.test.mjs — os cortes do modelo sobre os do sólido do esboço: o corte de uma malha, o desvio entre as duas linhas, o desenho e, de pont…
+- `suavidade-por-regiao.mjs` — suavidade-por-regiao.mjs — o índice de suavidade de cada região da chapa: quanto a curvatura varia por área, um número por região, para comparar uma rodada c…
+- `suavidade-por-regiao.test.mjs` — suavidade-por-regiao.test.mjs — o índice de suavidade nas chapas de calibração do reflexo (`tools/fixtures/reflexo-calibracao/`): a lisa (um arco de raio con…
 - `transformacao-rigida.test.ts` — @ts-expect-error — módulo neutro JavaScript, exercitado pelo contrato público.
 - `triangulos-da-receita.mjs` — triangulos-da-receita.mjs — os triângulos de uma receita em milímetro, com a parte de cada um, pela mesma triangulação que a cena usa (`adaptarThree`).
 - `universo-autoria.mjs` — universo-autoria.mjs — adaptador confinado do snapshot do universo.

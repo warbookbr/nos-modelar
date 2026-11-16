@@ -54,6 +54,7 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
   - [cadeira_ripada_simples: remodelagem em PASSOS](receitas-externas-2026-10-19/remodelagem-cadeira-ripada-simples/RELATORIO.md) — `receitas-externas-2026-10-19/remodelagem-cadeira-ripada-simples`
   - [Sonda: do esboço traduzido à receita do Mecanifica, sem agente (2026-10-19)](receitas-externas-2026-10-19/sonda-passos/RESULTADO.md) — `receitas-externas-2026-10-19/sonda-passos`
   - [Triagem das 66 receitas por família candidata](receitas-externas-2026-10-19/triagem.md) — `receitas-externas-2026-10-19`
+- [Reflexo na bancada: a paridade da luz rasante e da curvatura com o Blender](reflexo-na-bancada-2026-11-15/README.md) — `reflexo-na-bancada-2026-11-15`
 - [Revisão das verificações e dos testes: medidas e veredito](revisao-das-verificacoes-2026-11-13/README.md) — `revisao-das-verificacoes-2026-11-13`
 - [Revisão do projeto para o trabalho da IA: medidas e relatório](revisao-do-projeto-2026-11-13/README.md) — `revisao-do-projeto-2026-11-13`
 - `rodada-2026-10-08`
