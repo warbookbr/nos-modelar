@@ -299,7 +299,8 @@ const unit = (a) => esc(a, 1 / norma(a));
 /** Tudo o que a receita desenha, em milímetro: a posição dos nós, os perfis e os trechos da corrente. */
 export function derivar(T) {
   const itens = [];
-  const tubo = (parte, material, pts, raios, lados = T.lados_tubo) => itens.push({ k: 'tubo', parte, material, pts, raios: Array.isArray(raios) ? raios : pts.map(() => raios), lados });
+  /* `junta` põe o tubo numa união soldada com os outros da mesma junta (cordão na costura); sem ela, o tubo fica solto na parte */
+  const tubo = (parte, material, pts, raios, lados = T.lados_tubo, junta = null) => itens.push({ k: 'tubo', parte, material, pts, raios: Array.isArray(raios) ? raios : pts.map(() => raios), lados, junta });
   /* Tubo do quadro com as pontas marcadas para a solda: o trecho de cada ponta (de comprimento `trecho`) entra na união da junta
      que o recebe, e o meio fica um tubo só. A união (`unir`) funde os tubos de cada junta num sólido só, sem face interna, e o
      cordão de solda é o `friso` na costura dessa união (`costura` com perfil `cordao`), um chanfro de `solda_largura` mm em cada
@@ -437,9 +438,10 @@ export function derivar(T) {
   for (const q of pernaBase) q.x = Math.max(q.x, q.exige);
   for (const lado of [-1, 1]) {
     const perna = pernaBase.map((q) => { const p = [...q.p]; p[0] = lado * q.x; return p; });
-    tubo('garfo', 'aluminio', perna, pernaBase.map((q) => q.r), 32);
+    /* cada perna é soldada no corpo da coroa, como na foto: as duas e o corpo formam a junta do garfo */
+    tubo('garfo', 'aluminio', perna, pernaBase.map((q) => q.r), 32, 'garfo');
   }
-  tubo('garfo', 'aluminio', [naDirecao(H - T.garfo_coroa_altura), naDirecao(H), naDirecao(baseCaixa + 2)], [rCoroa, rCoroa, raioQ(T.caixa_direcao_diametro_baixo) - 0.5], 32);
+  tubo('garfo', 'aluminio', [naDirecao(H - T.garfo_coroa_altura), naDirecao(H), naDirecao(baseCaixa + 2)], [rCoroa, rCoroa, raioQ(T.caixa_direcao_diametro_baixo) - 0.5], 32, 'garfo');
   const topoDaColuna = baseCaixa + T.caixa_direcao_comprimento + T.garfo_coluna_alem_da_caixa;
   tubo('garfo', 'aluminio', [naDirecao(T.garfo_eixo_a_coroa), naDirecao(topoDaColuna)], raioQ(T.garfo_coluna_diametro), 24);
 
@@ -921,7 +923,8 @@ export function gerarPassos(T) {
     passos.push(['unir', { origemId: idUniao, vincarCostura: true, solidos: [{ origem: { op: 'unir', id: idTubos } }, { origem: { op: 'friso', id: idCordao } }] }]);
     const selUniao = { origem: { op: 'unir', id: idUniao } };
     passos.push(['liso', { angulo: 40, sel: selUniao }]);
-    marca('quadro', 'aluminio', selUniao);
+    /* a junta leva o nome da parte a que pertence: 'quadro' ou 'garfo' */
+    marca(junta, 'aluminio', selUniao);
   }
   for (const [nome, lista] of partes) {
     for (const { sel, material } of lista) {
@@ -967,7 +970,7 @@ const receita = {
     aluminioEscuro: { cor: '#2b2e33', metalicidade: 0.6, aspereza: 0.45 },
     aroMetal: { cor: '#3a3d42', metalicidade: 0.7, aspereza: 0.4 },
     preto: { cor: '#1c1d20', metalicidade: 0.1, aspereza: 0.6 },
-    refletor: { cor: '#e8901e', metalicidade: 0.1, aspereza: 0.3 },
+    refletor: { cor: '#c4691a', metalicidade: 0.1, aspereza: 0.3 },
     borracha: { cor: '#161616', metalicidade: 0, aspereza: 0.9 },
     aco: { cor: '#9aa0a6', metalicidade: 0.85, aspereza: 0.35 },
   },
