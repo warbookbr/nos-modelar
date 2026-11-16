@@ -290,7 +290,13 @@ export function criarOperacoesBooleanas(servicos) {
      o resultado a partir dos sólidos já convertidos e devolve junto um sólido
      AUXILIAR (o material do arredondamento), cujas faces não vêm de face
      nenhuma do núcleo e por isso nascem todas com id novo. */
-  function nucleoBooleano(st, i, op, wasm, origemId, operandos, extra, { vincarCostura = false, origemDoOperando = null } = {}) {
+  function nucleoBooleano(st, i, op, wasm, origemId, operandos, extra, { vincarCostura = false, origemDoOperando = null, reforco = false } = {}) {
+    /* SEGUNDA TENTATIVA (`reforco`). Quando o portão de casca fechada recusa o resultado da booleana comum, o cálculo roda de novo, uma vez, com três reforços
+       que a primeira tentativa não tem: (1) a solda dos cantos novos volta a tentar os que a regra dos dois vizinhos em comum barrou, até nenhum mais sair (na união, a segunda tentativa também começa quando sobra uma aresta de menos de 2^-19 da meia-caixa depois da primeira solda; cinco cantos
+       novos colados num canto antigo se barravam um ao outro); (2) a partição de um pedaço pela diagonal não escolhe um canto que já tem aresta com o canto de saída,
+       o que deixaria quatro faces nessa aresta; (3) um canto antigo que a fusão de lascas deixou com duas faces sai das duas, como o canto novo. A primeira tentativa
+       é a de sempre, bit a bit: o resultado que já passava não muda, e só o que recusaria chega aqui (retrato do acervo, 2026-11-16: a solda reforçada em todas as
+       uniões mudava a malha de cinco peças fora da bicicleta). */
 
     // ---- solda dos cantos coincidentes (representante = menor id) ----
     /* A solda vale ENTRE operandos também: dois cubos idênticos entram com os
@@ -465,7 +471,7 @@ export function criarOperacoesBooleanas(servicos) {
     }
     const pos = (v) => posNova.get(v) ?? st.V.get(v);
     const apelido = new Map();         // vértice novo soldado -> vértice que fica
-    const idDe = (j) => { const v = idDoGrupo.get(raiz(j)); return apelido.get(v) ?? v; };
+    const idDe = (j) => { let v = idDoGrupo.get(raiz(j)); while (apelido.has(v)) v = apelido.get(v); return v; };
     const nTri = TV.length / 3;
     const triDe = (t) => [idDe(TV[3 * t]), idDe(TV[3 * t + 1]), idDe(TV[3 * t + 2])];
 
@@ -587,6 +593,7 @@ export function criarOperacoesBooleanas(servicos) {
       let melhor = null;
       for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) for (let dz = -1; dz <= 1; dz++) {
         for (const w of grade.get(`${cx + dx},${cy + dy},${cz + dz}`) ?? []) {
+          if (apelido.has(w)) continue;
           if (tamanho(sub(pos(w), p)) <= tolSolda && (melhor == null || (w >= 0) > (melhor >= 0) || ((w >= 0) === (melhor >= 0) && Math.abs(w) < Math.abs(melhor)))) melhor = w;
         }
       }
@@ -618,15 +625,38 @@ export function criarOperacoesBooleanas(servicos) {
       for (const x of nv) if (x !== w && nw.has(x)) comuns++;
       return comuns === 2;
     };
+    const soldar = (v, w) => {
+      apelido.set(v, w);
+      const nv = vizinhos.get(v) ?? new Set();
+      for (const x of nv) { if (x === w) continue; liga(w, x); const nx = vizinhos.get(x); nx.delete(v); nx.add(w); }
+      vizinhos.get(w)?.delete(v);
+      vizinhos.delete(v);
+    };
+    const barrados = [];
     for (const v of [...posNova.keys()].sort((x, y) => y - x)) {
       const w = vizinhoPerto(posNova.get(v));
-      if (w != null && podeSoldar(v, w)) {
-        apelido.set(v, w);
-        const nv = vizinhos.get(v) ?? new Set();
-        for (const x of nv) { if (x === w) continue; liga(w, x); const nx = vizinhos.get(x); nx.delete(v); nx.add(w); }
-        vizinhos.get(w)?.delete(v);
-        vizinhos.delete(v);
-      } else inserir(v, posNova.get(v));
+      if (w != null && podeSoldar(v, w)) soldar(v, w);
+      else { inserir(v, posNova.get(v)); if (w != null) barrados.push(v); }
+    }
+    /* Um canto antigo com vários cantos novos colados nele (cinco a menos de 0,5 µm, na junta de dois tubos) barra cada soldagem
+       enquanto os outros ainda existem: com três vizinhos em comum, o colapso beliscaria a casca. Cada soldagem que sai tira
+       vizinhos dos que sobraram, e os barrados voltam a tentar até nenhum mais sair. */
+    for (let mudou = reforco; mudou;) {
+      mudou = false;
+      for (let k = 0; k < barrados.length; k++) {
+        const v = barrados[k];
+        if (apelido.has(v)) continue;
+        const w = vizinhoPerto(posNova.get(v));
+        if (w != null && podeSoldar(v, w)) { soldar(v, w); mudou = true; }
+      }
+    }
+
+    const pisoDePrecisao = Math.max(meiaCaixa, 1e-9) * 2 ** -19;   // o dobro do piso que a razão de precisão recusa (2^-20 da meia-caixa)
+    /* aresta de menos de 2^-19 da meia-caixa (o dobro do piso da razão de precisão) que a regra dos dois vizinhos em comum não deixou fundir: a casca passa no portão, mas a aresta (0,15 µm numa peça de 0,86 m) estoura a
+       razão de precisão da booleana seguinte; a segunda tentativa a funde */
+    if (!reforco && !extra && op === 'unir' && barrados.some((v) => !apelido.has(v) && [...(vizinhos.get(v) ?? [])].some((w) => tamanho(sub(pos(w), pos(v))) <= pisoDePrecisao))) {
+      liberar();
+      return nucleoBooleano(st, i, op, wasm, origemId, operandos, extra, { vincarCostura, origemDoOperando, reforco: true });
     }
 
     /* ---- LASCA: triângulo sem área ----
@@ -861,6 +891,12 @@ export function criarOperacoesBooleanas(servicos) {
        `arredondar-costura.test.ts` mantém a face fina legítima partida e a carroceria do sedã não perde parte; com 0,15 ainda sobram 11 pares inconclusivos, com 0,3 o braço a 20
        graus deixa um triângulo de 4,8e-10 m², e com o piso inteiro a carroceria do sedã perde a parte da travessa da cabine (o `aparar` recusa o resultado com um vértice de vínculo partido) */
     const semArea = Math.max(piso * 0.2, 1e-12);
+    const chaveAresta = (x, y) => (x < y ? `${x}_${y}` : `${y}_${x}`);
+    let arestasVivas = null;
+    const levantarArestas = () => {
+      arestasVivas = new Set();
+      for (const P of [...mantidas.map((fid) => cicloRep(st.F.get(fid).vs)), ...cortadas.map((c) => c[1]), ...pedacosNovos.map((c) => c[1])]) for (let k = 0; k < P.length; k++) arestasVivas.add(chaveAresta(P[k], P[(k + 1) % P.length]));
+    };
     const semColinear = (P) => {
       if (P.length <= 3) return [P];
       for (let k = 0; k < P.length; k++) {
@@ -870,6 +906,7 @@ export function criarOperacoesBooleanas(servicos) {
         for (let j = 0; j < P.length; j++) {
           if (j === k || j === (k + 1) % P.length || j === (k + P.length - 1) % P.length) continue;
           const d = areaTri(a, c, P[j]);
+          if (reforco && arestasVivas?.has(chaveAresta(v, P[j]))) continue;
           if (d > valor) { valor = d; melhor = j; }
         }
         if (melhor < 0) return [P];
@@ -880,6 +917,7 @@ export function criarOperacoesBooleanas(servicos) {
            geratriz de um cilindro cruza a do outro) devolve o pedaço sem área que a fusão acabou de absorver, e o
            laço do acabamento oscila até desistir; o canto colinear fica, e `melhorInicio` põe o leque longe dele */
         if (areaDe(pos, um) < semArea || areaDe(pos, dois) < semArea) continue;
+        arestasVivas?.add(chaveAresta(P[k], P[melhor]));
         return [...semColinear(um), ...semColinear(dois)];
       }
       return [P];
@@ -920,6 +958,7 @@ export function criarOperacoesBooleanas(servicos) {
         if (j >= 0) { cortadas[k] = [fid, pedacosNovos[j][1]]; pedacosNovos.splice(j, 1); }
         else { cortadas.splice(k, 1); consumidas.push(fid); }
       }
+      levantarArestas();
       for (let k = 0; k < cortadas.length; k++) {
         const partes = semColinear(cortadas[k][1]).map((P) => melhorInicio(pos, P));
         if (partes.length > 1) mudou = true;
@@ -928,6 +967,7 @@ export function criarOperacoesBooleanas(servicos) {
         cortadas[k][1] = partes[maior];
         partes.forEach((P, j) => { if (j !== maior) pedacosNovos.push([cortadas[k][0], P, false]); });
       }
+      levantarArestas();
       for (let k = pedacosNovos.length - 1; k >= 0; k--) {
         const [fid, P, aux] = pedacosNovos[k];
         const partes = semColinear(P).map((Q) => melhorInicio(pos, Q));
@@ -943,13 +983,28 @@ export function criarOperacoesBooleanas(servicos) {
        (a face que vira dois cantos some, e a aresta dela passa à outra), e o
        vínculo de cada vértice volta a ser um laço de três ou mais faces, que é
        o que o teste de contato exige de malha fechada. */
+    /* Canto ANTIGO que só o resultado desta operação usa (nenhuma face mantida, nenhuma face fora dos sólidos da operação, nenhum outro canto fundido a ele): a
+       fusão de lascas pode deixá-lo com duas faces só, como a um canto novo, e então ele sai das duas do mesmo modo. Calculado sob demanda. */
+    let usadosFora = null;
+    const cantoSoDoResultado = (v) => {
+      if (v < 0) return false;
+      if (!usadosFora) {
+        usadosFora = new Set();
+        const dentro = new Set(entradas);
+        for (const [fid, f] of st.F) if (!dentro.has(fid)) for (const u of f.vs) usadosFora.add(u);
+        for (const [u, r] of repDe) if (u !== r) { usadosFora.add(u); usadosFora.add(r); }
+        for (const fid of mantidas) for (const u of cicloRep(st.F.get(fid).vs)) usadosFora.add(u);
+      }
+      return !usadosFora.has(v);
+    };
     for (let volta = 0; volta < 4; volta++) {
       const lista = [...cortadas, ...pedacosNovos];
       const usos = new Map();
-      for (const item of lista) for (const v of item[1]) if (v < 0) { if (!usos.has(v)) usos.set(v, []); usos.get(v).push(item); }
+      for (const item of lista) for (const v of item[1]) { if (!usos.has(v)) usos.set(v, []); usos.get(v).push(item); }
       let tirou = false;
       for (const [v, donos] of usos) {
         if (donos.length !== 2) continue;
+        if (v >= 0 && (!reforco || !cantoSoDoResultado(v))) continue;
         const vizinhos = donos.map(([, P]) => { const k = P.indexOf(v); return new Set([P[(k + P.length - 1) % P.length], P[(k + 1) % P.length]]); });
         if (![...vizinhos[0]].every((w) => vizinhos[1].has(w))) continue;
         religaCostura(v, donos.map((item) => item[1]));
@@ -1093,6 +1148,7 @@ export function criarOperacoesBooleanas(servicos) {
       const casca = porRepresentante;
       const falha = cascaAberta(porRepresentante, pos) ?? cascaAberta(porIdEscrito, pos);
       if (falha && extra?.tentativa) return { falhouCasca: falha };
+      if (falha && !extra && !reforco) return nucleoBooleano(st, i, op, wasm, origemId, operandos, extra, { vincarCostura, origemDoOperando, reforco: true });
       /* na tentativa (os prismas em meia-esquadria), pedaço sem área também
          reprova: é o sinal de tampas vizinhas que não coincidem, e o modo por
          fatias não tem tampa no meio da costura */
