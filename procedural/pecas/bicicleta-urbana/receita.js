@@ -185,24 +185,41 @@ export const TABELA = {
   aranha_braco_raio: 9,
   aranha_cubo_raio: 26,
   aranha_poste_raio: 3.5,
-  /* pedal medido nas fotos ampliadas (ref-pedal-lado-perto.png, ref-pedal-frente-perto*.png): uma caixa só de uns 100 (z) x 78 (x) x 22 (y) mm, cantos
-     redondos, maciça por fora, com janelas rasas nas faces e o corpo do eixo um pouco mais alto no meio */
-  pedal_largura: 78, /* ao longo do eixo (x) */
-  pedal_altura: 22,
-  pedal_profundidade: 100, /* frente a trás (z) */
-  pedal_canto: 5, /* raio dos cantos do contorno de lado, mm */
-  pedal_rebaixo: 2.5, /* profundidade das janelas rasas, mm */
-  pedal_janela_margem: 4, /* quanto sobra de parede em y em volta da janela de lado, mm */
-  pedal_janela_comp: 26, /* comprimento (z) de cada janela de lado, mm */
-  pedal_janela_centro: 0.27, /* centro de cada janela de lado, fração da profundidade a partir do meio */
-  pedal_janela_frente_larg: 20, /* largura (x) de cada janela da frente e de trás, mm */
-  pedal_janela_frente_x: 21, /* deslocamento em x de cada uma a partir do meio, mm */
-  pedal_pino_altura: 2.5,
-  pedal_pino: 1.6, /* raio dos pinos, mm */
-  pedal_pino_borda: 6, /* distância do pino à borda da frente ou de trás, mm */
-  pedal_corpo_raio: 12.5, /* corpo do eixo: 1,5 mm mais alto que a meia altura da caixa */
-  pedal_corpo_recuo: 12, /* quanto o corpo do eixo fica recuado de cada face de lado, mm */
-  pedal_tampa: 3,
+  /* PEDAL, de uma referência nova (pedal genérico de plástico preto, fotos locais pedal-cima.png de 1024 px e pedal-perspectiva.webp): gaiola de uma
+     peça só, moldura de cantos redondos com duas aberturas passantes de cada lado de uma barra central, caixas rasas de refletor na frente e atrás,
+     porca sextavada e rosca entre a moldura e o braço. As formas vêm da vista de cima em PIXELS da foto (u = px ao longo do eixo, v = px de frente a
+     trás); a escala vem de duas medidas e de uma escolha: a moldura mede 580 px de frente a trás (pedal_ref_px_prof) e a rosca de 9/16" (14,3 mm)
+     daria uns 5 px/mm, ou seja 116 mm de frente a trás, grande para um pedal; na foto lateral da bicicleta o pedal mede uns 100 mm, e é isso que se
+     usa (pedal_profundidade), de modo que 1 px = pedal_profundidade / pedal_ref_px_prof mm (uns 0,172 mm). */
+  pedal_ref_px_prof: 580, /* frente a trás da moldura na foto, px (y 225 a 805), sem as caixas do refletor */
+  pedal_profundidade: 100, /* medida adotada, frente a trás da moldura, mm (escolha: foto lateral da bicicleta) */
+  pedal_altura: 25, /* espessura da moldura, da vista em perspectiva, mm */
+  pedal_px_face_dentro: 770, /* u da face de dentro (lado do braço) da moldura, px */
+  pedal_px_centro_v: 515, /* v do meio da moldura, px */
+  /* contorno externo (u, v em px), do canto de dentro de trás para o de fora: o lado de fora (u pequeno) tem os dois cantos chanfrados */
+  pedal_contorno_px: [[730, 228], [228, 228], [108, 390], [108, 640], [240, 805], [735, 805], [770, 740], [770, 300]],
+  pedal_canto: 5, /* raio dos cantos do contorno, mm */
+  pedal_aberturas_px: [[243, 675, 287, 445], [243, 675, 574, 746]], /* [u0, u1, v0, v1] das duas aberturas passantes, px */
+  pedal_abertura_canto: 5, /* raio dos cantos das aberturas, mm */
+  pedal_caixa_px: [275, 660], /* u0 e u1 da caixa do refletor (frente e atrás), px, mais estreita que a moldura */
+  pedal_caixa_sai: 6.4, /* quanto a caixa sai da moldura (y 188 a 225 px), mm */
+  pedal_caixa_altura: 18, /* altura da caixa do refletor, mm */
+  pedal_refletor_altura: 11, /* altura do refletor na janela da caixa, mm */
+  pedal_refletor_sai: 0.8, /* quanto o refletor (em preto por enquanto) sai da face da caixa, mm */
+  pedal_rebaixo: 2.5, /* profundidade do rebaixo da ponta de fora, mm */
+  pedal_rebaixo_comp: 30, /* comprimento (z) do rebaixo da ponta de fora, mm */
+  pedal_rebaixo_alt: 13, /* altura do rebaixo da ponta de fora, mm */
+  pedal_pino: 1.9, /* raio dos pinos, mm */
+  pedal_pino_altura: 1.5, /* quanto o pino sai da face, mm */
+  /* pinos (u, v) em px: 4 em cada borda da frente e de trás, 3 na borda de fora, 2 na de dentro e 4 sobre a barra do meio; os mesmos embaixo */
+  pedal_pinos_px: [[289, 242], [403, 242], [517, 242], [631, 242], [262, 785], [396, 785], [530, 785], [660, 785], [160, 478], [160, 568], [175, 385], [727, 390], [735, 570], [293, 497], [400, 497], [510, 497], [617, 497]],
+  pedal_porca_altura: 8.5, /* porca sextavada entre o braço e o ressalto, ao longo do eixo (u 800 a 850 px), mm */
+  pedal_porca_raio: 9.25, /* raio circunscrito da porca (16 mm entre faces), mm */
+  pedal_ressalto: 4.5, /* ressalto redondo entre a porca e a moldura (u 775 a 800 px), mm */
+  pedal_ressalto_raio: 12, /* mm */
+  pedal_rosca_raio: 6.5, /* rosca de 9/16" a 13 mm de diâmetro na escala adotada, mm */
+  pedal_tampa: 3, /* tampa redonda na ponta de fora, mm */
+  pedal_tampa_raio: 8.5, /* mm */
 };
 
 /* fecho convexo de pontos 2D (cadeia monótona), no sentido anti-horário */
@@ -636,8 +653,7 @@ export function derivar(T) {
     pedalPts[lado] = ponta;
     const xFora = bx + e + T.pedivela_degrau; /* face de fora do braço na ponta */
     const x0 = lado * xFora;
-    const x1 = lado * (xFora + T.pedal_largura);
-    itens.push({ k: 'pedal', parte: 'pedais', material: 'preto', x0: Math.min(x0, x1), x1: Math.max(x0, x1), y: ponta[1], z: ponta[2], lado, eixoRaio: 5, eixoDe: lado * (xFora - 2), eixoAte: lado * (xFora + T.pedal_largura - 6), alt: T.pedal_altura, prof: T.pedal_profundidade });
+    itens.push({ k: 'pedal', parte: 'pedais', material: 'preto', xFace: x0, y: ponta[1], z: ponta[2], lado, eixoRaio: T.pedal_rosca_raio, eixoDe: lado * (xFora - 2) });
   }
 
   /* CATRACA */
@@ -802,46 +818,71 @@ export function gerarPassos(T) {
       marca(it.parte, it.material, { origem: { op: 'loft', id: oid } });
       passos.push(['liso', { angulo: 35, sel: { origem: { op: 'loft', id: oid } } }]);
     } else if (it.k === 'pedal') {
-      /* pedal de plataforma, como nas fotos ampliadas: UMA caixa de cantos redondos (extrusão em x do contorno de lado, na largura toda), maciça por fora,
-         com janelas rasas rebaixadas por subtrair nas faces de fora e de dentro (duas de cada) e nas da frente e de trás (duas), o corpo do eixo
-         (cilindro em x) um pouco mais alto que a caixa, a tampa redonda na face de fora e pinos nas bordas de cima e de baixo */
+      /* pedal de gaiola da referência nova: UM sólido, a extrusão em y do contorno de cima (cantos chanfrados e arredondados) com as duas aberturas
+         passantes como furos, de cada lado da barra central; caixas rasas de refletor na frente e atrás (extrusões em y), refletor em retângulo raso,
+         rebaixo na ponta de fora, pinos redondos em cima e embaixo, e a porca sextavada, o ressalto e a rosca entre o braço e a moldura.
+         As formas vêm em px da foto de cima; k converte px em mm. u = distância para fora a partir da face de dentro da moldura, w = frente/trás. */
+      const k = T.pedal_profundidade / T.pedal_ref_px_prof;
+      const ld = it.lado;
+      const xi = it.xFace + ld * (T.pedal_porca_altura + T.pedal_ressalto); /* face de dentro da moldura, mm */
+      const U = (px) => xi + ld * (T.pedal_px_face_dentro - px) * k; /* x em mm */
+      const W = (py) => it.z + (py - T.pedal_px_centro_v) * k; /* z em mm */
+      const uv = ([px, py]) => [m(U(px)), m(W(py))];
+      const y0 = it.y - T.pedal_altura / 2;
+      const pts = T.pedal_contorno_px.map(uv);
+      if (ld < 0) pts.reverse(); /* o espelho inverte o sentido do contorno */
+      const trechos = [{ concordancia: m(T.pedal_canto) }];
+      for (let q = 1; q < pts.length; q++) trechos.push({ reto: pts[q] }, { concordancia: m(T.pedal_canto) });
+      const furos = T.pedal_aberturas_px.map(([a0, a1, b0, b1]) => ({ retangulo: { largura: m(Math.abs(U(a1) - U(a0))), profundidade: m((b1 - b0) * k), centro: [m((U(a0) + U(a1)) / 2), m(W((b0 + b1) / 2))], cantos: m(T.pedal_abertura_canto) } }));
       const oid = proximo();
-      passos.push(['extrusao', { origemId: oid, eixo: 'x', altura: m(it.x1 - it.x0), perfil: { retangulo: { largura: m(it.alt), profundidade: m(it.prof), cantos: m(T.pedal_canto) } }, segmentosArco: 4, em: [m(it.x0), m(it.y), m(it.z)] }]);
-      const cortes = [];
-      const cubo = (x0, x1, y0, y1, z0, z1) => { const id = proximo(); cortes.push(id); passos.push(['cubo', { origemId: id, larg: m(x1 - x0), alt: m(y1 - y0), prof: m(z1 - z0), em: [m((x0 + x1) / 2), m(y0), m((z0 + z1) / 2)] }]); };
-      const rj = T.pedal_rebaixo, ex = 1;
-      const yj0 = it.y - it.alt / 2 + T.pedal_janela_margem, yj1 = it.y + it.alt / 2 - T.pedal_janela_margem;
-      for (const dz of [it.prof * T.pedal_janela_centro, -it.prof * T.pedal_janela_centro]) {
-        for (const [xa, xb] of [[it.x0 - ex, it.x0 + rj], [it.x1 - rj, it.x1 + ex]]) cubo(xa, xb, yj0, yj1, it.z + dz - T.pedal_janela_comp / 2, it.z + dz + T.pedal_janela_comp / 2);
-      }
-      const xm = (it.x0 + it.x1) / 2;
-      for (const dx of [-T.pedal_janela_frente_x, T.pedal_janela_frente_x]) {
-        for (const [za, zb] of [[it.z - it.prof / 2 - ex, it.z - it.prof / 2 + rj], [it.z + it.prof / 2 - rj, it.z + it.prof / 2 + ex]]) cubo(xm + dx - T.pedal_janela_frente_larg / 2, xm + dx + T.pedal_janela_frente_larg / 2, it.y - it.alt / 2 + 5, it.y + it.alt / 2 - 5, za, zb);
-      }
+      passos.push(['extrusao', { origemId: oid, eixo: 'y', altura: m(T.pedal_altura), perfil: { contorno: { inicio: pts[0], trechos } }, furos, segmentosArco: 4, em: [0, m(y0), 0] }]);
+      /* rebaixo da ponta de fora (a abertura da ponta, rasa) */
+      const cid = proximo();
+      const xFora = U(Math.min(...T.pedal_contorno_px.map((p) => p[0])));
+      passos.push(['cubo', { origemId: cid, larg: m(2 * T.pedal_rebaixo), alt: m(T.pedal_rebaixo_alt), prof: m(T.pedal_rebaixo_comp), em: [m(xFora), m(it.y - T.pedal_rebaixo_alt / 2), m(it.z)] }]);
       const sid = proximo();
-      passos.push(['subtrair', { origemId: sid, solidos: [{ origem: { op: 'extrusao', id: oid } }, ...cortes.map((id) => ({ origem: { op: 'cubo', id } }))] }]);
+      passos.push(['subtrair', { origemId: sid, solidos: [{ origem: { op: 'extrusao', id: oid } }, { origem: { op: 'cubo', id: cid } }] }]);
       marca('pedais', it.material, { origem: { op: 'subtrair', id: sid } });
-      for (const sy of [1, -1]) for (const fz of [-1, 1]) for (const fx of [-0.36, -0.12, 0.12, 0.36]) {
+      /* caixas do refletor, frente e atrás, mais estreitas que a moldura; o refletor é um retângulo raso na face de cada uma */
+      const [cu0, cu1] = T.pedal_caixa_px;
+      const zMoldura = T.pedal_profundidade / 2;
+      for (const fz of [-1, 1]) {
+        const xa = U(cu0), xb = U(cu1);
+        const zi = it.z + fz * (zMoldura - 1), zf = it.z + fz * (zMoldura + T.pedal_caixa_sai);
+        const bid = proximo();
+        passos.push(['extrusao', { origemId: bid, eixo: 'y', altura: m(T.pedal_caixa_altura), perfil: { retangulo: { largura: m(Math.abs(xa - xb)), profundidade: m(Math.abs(zf - zi)), centro: [m((xa + xb) / 2), m((zi + zf) / 2)], cantos: m(2) } }, segmentosArco: 4, em: [0, m(it.y - T.pedal_caixa_altura / 2), 0] }]);
+        marca('pedais', it.material, { origem: { op: 'extrusao', id: bid } });
+        const rid = proximo();
+        const zr = it.z + fz * (zMoldura + T.pedal_caixa_sai + T.pedal_refletor_sai / 2 - 0.3);
+        passos.push(['cubo', { origemId: rid, larg: m(Math.abs(xa - xb) - 10), alt: m(T.pedal_refletor_altura), prof: m(T.pedal_refletor_sai + 0.6), em: [m((xa + xb) / 2), m(it.y - T.pedal_refletor_altura / 2), m(zr)] }]);
+        marca('pedais', it.material, { origem: { op: 'cubo', id: rid } });
+      }
+      /* pinos em cima e embaixo (cilindros de 8 lados com a ponta reta) */
+      for (const sy of [1, -1]) for (const p of T.pedal_pinos_px) {
         const pid = proximo();
-        const y0 = it.y + sy * it.alt / 2;
-        const ya = Math.min(y0 - sy * 0.5, y0 + sy * T.pedal_pino_altura), yb = Math.max(y0 - sy * 0.5, y0 + sy * T.pedal_pino_altura);
-        passos.push(['lathe', { origemId: pid, eixo: 'y', lados: 8, perfil: [[0, m(ya)], [m(T.pedal_pino), m(ya)], [m(T.pedal_pino), m(yb)], [0, m(yb)]], em: [m(xm + fx * (it.x1 - it.x0)), 0, m(it.z + fz * (it.prof / 2 - T.pedal_pino_borda))] }]);
+        const yb0 = it.y + sy * T.pedal_altura / 2;
+        const ya = Math.min(yb0 - sy * 0.5, yb0 + sy * T.pedal_pino_altura), yb = Math.max(yb0 - sy * 0.5, yb0 + sy * T.pedal_pino_altura);
+        passos.push(['lathe', { origemId: pid, eixo: 'y', lados: 8, perfil: [[0, m(ya)], [m(T.pedal_pino), m(ya)], [m(T.pedal_pino), m(yb)], [0, m(yb)]], em: [m(U(p[0])), 0, m(W(p[1]))] }]);
         marca('pedais', it.material, { origem: { op: 'lathe', id: pid } });
       }
-      /* corpo do eixo: cilindro em x no centro, mais alto que a caixa (raio maior que a meia altura), recuado das faces de lado */
-      const cid = proximo();
-      const rc2 = T.pedal_corpo_raio;
-      const xc0 = it.x0 + T.pedal_corpo_recuo, xc1 = it.x1 - T.pedal_corpo_recuo;
-      passos.push(['lathe', { origemId: cid, eixo: 'x', lados: 20, perfil: [[0, m(xc0)], [m(rc2), m(xc0)], [m(rc2), m(xc1)], [0, m(xc1)]], em: [0, m(it.y), m(it.z)] }]);
-      marca('pedais', it.material, { origem: { op: 'lathe', id: cid } });
-      /* tampa redonda na face de fora, vista no centro da face lateral */
-      const xo = it.lado > 0 ? it.x1 : it.x0;
+      /* tampa redonda na ponta de fora */
       const tid = proximo();
-      const xt0 = Math.min(xo - it.lado * 1, xo + it.lado * T.pedal_tampa), xt1 = Math.max(xo - it.lado * 1, xo + it.lado * T.pedal_tampa);
-      passos.push(['lathe', { origemId: tid, eixo: 'x', lados: 20, perfil: [[0, m(xt0)], [m(rc2 - 1), m(xt0)], [m(rc2 - 1), m(xt1)], [0, m(xt1)]], em: [0, m(it.y), m(it.z)] }]);
+      const xt0 = Math.min(xFora - ld * 1, xFora + ld * T.pedal_tampa), xt1 = Math.max(xFora - ld * 1, xFora + ld * T.pedal_tampa);
+      passos.push(['lathe', { origemId: tid, eixo: 'x', lados: 20, perfil: [[0, m(xt0)], [m(T.pedal_tampa_raio), m(xt0)], [m(T.pedal_tampa_raio), m(xt1)], [0, m(xt1)]], em: [0, m(it.y), m(it.z)] }]);
       marca('pedais', it.material, { origem: { op: 'lathe', id: tid } });
+      /* ressalto redondo entre a porca e a moldura */
+      const rsid = proximo();
+      const xr0 = Math.min(xi, xi - ld * T.pedal_ressalto), xr1 = Math.max(xi, xi - ld * T.pedal_ressalto);
+      passos.push(['lathe', { origemId: rsid, eixo: 'x', lados: 20, perfil: [[0, m(xr0)], [m(T.pedal_ressalto_raio), m(xr0)], [m(T.pedal_ressalto_raio), m(xr1)], [0, m(xr1)]], em: [0, m(it.y), m(it.z)] }]);
+      marca('pedais', it.material, { origem: { op: 'lathe', id: rsid } });
+      /* porca sextavada (revolução de 6 lados, aço) encostada no braço, e a rosca (aço) do braço até a moldura */
+      const pxid = proximo();
+      const xp0 = Math.min(it.xFace, it.xFace + ld * T.pedal_porca_altura), xp1 = Math.max(it.xFace, it.xFace + ld * T.pedal_porca_altura);
+      passos.push(['lathe', { origemId: pxid, eixo: 'x', lados: 6, perfil: [[0, m(xp0)], [m(T.pedal_porca_raio), m(xp0)], [m(T.pedal_porca_raio), m(xp1)], [0, m(xp1)]], em: [0, m(it.y), m(it.z)] }]);
+      marca('pedais', 'aco', { origem: { op: 'lathe', id: pxid } });
       const eid = proximo();
-      passos.push(['lathe', { origemId: eid, eixo: 'x', lados: 12, perfil: [[0, m(Math.min(it.eixoDe, it.eixoAte))], [m(it.eixoRaio), m(Math.min(it.eixoDe, it.eixoAte))], [m(it.eixoRaio), m(Math.max(it.eixoDe, it.eixoAte))], [0, m(Math.max(it.eixoDe, it.eixoAte))]], em: [0, m(it.y), m(it.z)] }]);
+      const xe0 = Math.min(it.eixoDe, xi + ld * 1), xe1 = Math.max(it.eixoDe, xi + ld * 1);
+      passos.push(['lathe', { origemId: eid, eixo: 'x', lados: 12, perfil: [[0, m(xe0)], [m(it.eixoRaio), m(xe0)], [m(it.eixoRaio), m(xe1)], [0, m(xe1)]], em: [0, m(it.y), m(it.z)] }]);
       marca('pedais', 'aco', { origem: { op: 'lathe', id: eid } });
     }
   }
