@@ -63,6 +63,8 @@ describe('o portão de casca fechada confere os representantes e os ids escritos
   it('dois cubos que só se tocam num canto gritam no unir, com a conta de sempre (0 arestas sem par, 1 vértice com vínculo que não é um laço)', () => {
     const [m] = grita([C(1, 1, [0, 0, 0]), C(2, 1, [1, 1, 1]), ['unir', { origemId: 9, solidos: [sel('cubo', 1), sel('cubo', 2)] }]]);
     expect(m).toMatch(/0 aresta\(s\) dirigida\(s\) sem par, 1 vértice\(s\) com vínculo que não é um laço só/);
+    /* a recusa diz onde: o canto em que os cubos se tocam, em milímetros */
+    expect(m).toMatch(/o primeiro em \(500, 1000, 500\) mm/);
   });
   it('dois cubos que só se tocam numa aresta gritam no unir, com a conta de sempre (2 arestas sem par, 2 vértices)', () => {
     const [m] = grita([C(1, 1, [0, 0, 0]), C(2, 1, [1, 1, 0]), ['unir', { origemId: 9, solidos: [sel('cubo', 1), sel('cubo', 2)] }]]);

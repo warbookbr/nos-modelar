@@ -75,7 +75,7 @@ export const TABELA = {
   selim_tampa: 7,
   /* garfo */
   garfo_offset: 45,
-  garfo_eixo_a_coroa: 375,
+  garfo_eixo_a_coroa: 405,
   garfo_perna_diametro: 30,
   garfo_coroa_diametro: 46,
   garfo_coroa_altura: 30,

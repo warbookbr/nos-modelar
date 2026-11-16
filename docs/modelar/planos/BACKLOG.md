@@ -120,6 +120,7 @@ Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 | Carrinho de mão como família de objeto | candidato apontado pela pessoa em 2026-10-11, vindo de `CONTEXTO-FERRAMENTAS-DE-MODELAGEM.md` (histórico retirado, ver [a crônica](../decisoes/HISTORICO-RETIRADO.md)): chassi, caçamba e a roda no perfil de carrinho de mão, a partir do carrinho azul aprovado |
 | Bacia em casca como primitiva | candidato apontado pela pessoa em 2026-10-11, vindo do mesmo documento: a caçamba generalizada, com parede inclinada e contorno em D ou retangular |
 | Dobradiça de caneco para a porta sobreposta passar de 90° | candidato apontado pela pessoa em 2026-10-11, vindo do mesmo documento, junto com as ressalvas do fechamento do plano das ferramentas de modelagem |
+| Canto quase coincidente na união do cordão de solda | na `bicicleta-urbana` com `garfo_eixo_a_coroa` de 398 a 402 mm, a união do quadro com o cordão (o `unir` com `vincarCostura`) recusa a casca: um canto novo do corte cai a 16 µm de um canto do cordão na gancheira direita, os dois não se fundem e uma aresta fica com quatro faces; 395 e 405 fecham, e a recusa já diz o ponto; a correção é a união fundir canto novo que cai a menos de uma tolerância de um canto do operando, medida contra o retrato do acervo |
 
 Dezesseis linhas que diziam "concluído" saíram desta tabela em 2026-09-11. Elas
 descreviam trabalho entregue, e candidato entregue não é candidato: o registro

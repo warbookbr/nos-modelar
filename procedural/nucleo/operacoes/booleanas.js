@@ -202,7 +202,7 @@ export function criarOperacoesBooleanas(servicos) {
 
   /* casca fechada e manifold, sobre polígonos de ids: devolve null ou o texto
      do defeito */
-  function cascaAberta(poligonos) {
+  function cascaAberta(poligonos, pos) {
     if (!poligonos.length) return 'sem nenhuma face (casca vazia)';
     const dirigidas = new Map(), vinculo = new Map();
     for (const P of poligonos) for (let k = 0; k < P.length; k++) {
@@ -211,18 +211,21 @@ export function criarOperacoesBooleanas(servicos) {
       if (!vinculo.has(a)) vinculo.set(a, []);
       vinculo.get(a).push([ant, b]);
     }
-    let semPar = 0;
-    for (const [c, n] of dirigidas) { const [a, b] = c.split('>'); if (n !== 1 || dirigidas.get(`${b}>${a}`) !== 1) semPar++; }
+    let semPar = 0, onde = null;
+    for (const [c, n] of dirigidas) { const [a, b] = c.split('>'); if (n !== 1 || dirigidas.get(`${b}>${a}`) !== 1) { semPar++; onde ??= a; } }
     let naoManifold = 0;
-    for (const lista of vinculo.values()) {
+    for (const [v, lista] of vinculo) {
       const prox = new Map(lista.map(([p, q]) => [q, p]));
-      if (prox.size !== lista.length || lista.length < 3) { naoManifold++; continue; }
+      if (prox.size !== lista.length || lista.length < 3) { naoManifold++; onde ??= v; continue; }
       let c = lista[0][1], passos = 0;
       do { c = prox.get(c); passos++; } while (c !== undefined && c !== lista[0][1] && passos <= lista.length);
-      if (passos !== lista.length) naoManifold++;
+      if (passos !== lista.length) { naoManifold++; onde ??= v; }
     }
     if (!semPar && !naoManifold) return null;
-    return `aberto ou não-manifold: ${semPar} aresta(s) dirigida(s) sem par, ${naoManifold} vértice(s) com vínculo que não é um laço só`;
+    /* o ponto do primeiro defeito, em milímetros, para quem escreve a receita achar a junção */
+    const p = pos && onde != null ? pos(typeof onde === 'string' && /^-?\d+$/.test(onde) ? Number(onde) : onde) : null;
+    const ondeTxt = p ? `, o primeiro em (${p.map((x) => Math.round(x * 1000)).join(', ')}) mm` : '';
+    return `aberto ou não-manifold: ${semPar} aresta(s) dirigida(s) sem par, ${naoManifold} vértice(s) com vínculo que não é um laço só${ondeTxt}`;
   }
 
   /* potência de dois perto de 2^-20 do tamanho: a mesma para a peça em
@@ -1088,7 +1091,7 @@ export function criarOperacoesBooleanas(servicos) {
       const porRepresentante = [...mantidas.map((fid) => cicloRep(st.F.get(fid).vs)), ...depois].filter((P) => new Set(P).size >= 3);
       const porIdEscrito = [...mantidas.map((fid) => vsDaMantida.get(fid) ?? st.F.get(fid).vs), ...depois].filter((P) => new Set(P).size >= 3);
       const casca = porRepresentante;
-      const falha = cascaAberta(porRepresentante) ?? cascaAberta(porIdEscrito);
+      const falha = cascaAberta(porRepresentante, pos) ?? cascaAberta(porIdEscrito, pos);
       if (falha && extra?.tentativa) return { falhouCasca: falha };
       /* na tentativa (os prismas em meia-esquadria), pedaço sem área também
          reprova: é o sinal de tampas vizinhas que não coincidem, e o modo por
