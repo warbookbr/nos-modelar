@@ -5,8 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1992 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
-1987 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1998 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -793,6 +792,13 @@
 ## modulos/pesquisa/bibliotecas/
 
 - `BIBLIOTECAS.md` — Bibliotecas avaliadas e ainda fora
+
+## modulos/pesquisa/novidades-2026-11/
+
+- `agentes-de-ia-para-cad.md` — Agentes que geram CAD ou 3D por código: pesquisa 2024 a 2026
+- `alisamento-de-superficie.md` — Alisamento de curvas e gaiolas, continuidade G1/G2 e emendas: estado da arte para o Modelar
+- `captura-sem-placa-de-video.md` — Captura da bancada mais rápida: opções e medição (2026-11-16)
+- `manifold-3-5-5.md` — Manifold (manifold-3d): versões depois da 3.5.4, até 2026-11-16
 
 ## modulos/textura/
 
