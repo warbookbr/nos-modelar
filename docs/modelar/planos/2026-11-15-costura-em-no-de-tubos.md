@@ -73,6 +73,10 @@ Escamas da solda: ADIAR para o plano da ferramenta de material, como relevo que 
 7. O refinamento perto da costura feito pela ferramenta, e a bicicleta sem os anéis próprios (gate 9).
 8. Documentação e fechamento.
 
+## Sucessor
+
+Decidido pela pessoa em 2026-11-16: ao fechar este plano, a mesma sessão ativa o plano do [cache por passo da receita](2026-11-16-cache-por-passo.md), que espera este porque os dois mudam o núcleo. O fechamento deste só está completo com o sucessor ativado (território declarado, estado `ativo` e o índice atualizado) ou com a decisão da pessoa de adiá-lo escrita aqui.
+
 ## Riscos e parada
 
 Se o chanfro na bicicleta inteira não convencer a pessoa, o plano para e a forma volta a ser decidida com ela. Se a união do cordão com os tubos continuar falhando em algum caso da fixture depois de duas abordagens de robustez, o plano para e a pessoa decide entre a concordância só pelo `arredondarCostura` e uma operação que desloca a malha dos tubos sem booleana. Se o ponto triplo não fechar em duas abordagens, a pessoa decide entre terminar o cordão antes dele e adiar. Mudança que altere a malha de qualquer peça do acervo fora da bicicleta é motivo de parada, e não de atualização do retrato. Se a fusão da fatia 6 mudar a malha de alguma peça do acervo, ela fica restrita à união com `vincarCostura` e a pessoa decide se vale estendê-la; se não houver tolerância que feche a varredura sem mudar o acervo, a pessoa decide entre manter a recusa, que já diz o ponto, e outra abordagem.
