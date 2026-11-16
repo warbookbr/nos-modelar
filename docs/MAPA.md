@@ -5,8 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2029 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
-2005 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2020 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1139,7 +1138,6 @@
 
 ## procedural/nucleo/operacoes/
 
-- `abertura-por-contorno-simetria.test.ts` — abertura-por-contorno-simetria.test.ts — o vão por contorno que segue a simetria declarada (`simetria: 'x'` do passo `aberturaPorContorno`) e a costura da su…
 - `abertura-por-contorno.js` — abertura-por-contorno.js (operação) — `aberturaPorContorno`: um vão na chapa pela curva que a receita desenha numa vista, sem depender das linhas da gaiola. …
 - `abertura-por-contorno.test.ts` — abertura-por-contorno.test.ts — a operação `aberturaPorContorno` na peça de teste `tools/fixtures/abertura-de-prova/`, pelos gates do plano da abertura de co…
 - `arestas-em-cadeia.js` — arestas-em-cadeia.js — arredondar de uma vez a cadeia de arestas que continua em tangência a partir da escolhida.
@@ -2735,40 +2733,6 @@
 ## tools/fixtures/corpo-por-fatias/ponto-perdido/
 
 - `receita.js` — ponto-perdido/receita.js — peça de prova da porta de avisos das operações de composição: um cilindro de 40 pontos por fatia feito por `corpoPorFatias` com a …
-
-## tools/fixtures/correcao-de-superficie/
-
-- `chapas.mjs` — chapas.mjs — as chapas de prova do plano das ferramentas de correção de superfície (`docs/modelar/planos/2026-11-16-ferramentas-de-correcao-de-superficie.md`…
-- `chapas.test.mjs` — chapas.test.mjs — as chapas de prova do plano das ferramentas de correção de superfície: cada uma monta sem órfão, com a forma e o defeito declarados em `cha…
-- `linha-de-base.mjs` — linha-de-base.mjs — a linha de base do plano das ferramentas de correção de superfície: as quatro medidas de superfície (`suavidade`, `pente`, `emendas`, `on…
-
-## tools/fixtures/correcao-de-superficie/chapa-simetrica/
-
-- `receita.js` — correcao-de-superficie/chapa-simetrica/receita.js — a chapa de prova 'chapa-simetrica' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
-
-## tools/fixtures/correcao-de-superficie/chapa-simetrica-espelhada/
-
-- `receita.js` — correcao-de-superficie/chapa-simetrica-espelhada/receita.js — a chapa de prova 'chapa-simetrica-espelhada' de `../chapas.mjs`, onde estão a forma e o defeito…
-
-## tools/fixtures/correcao-de-superficie/emenda-g0/
-
-- `receita.js` — correcao-de-superficie/emenda-g0/receita.js — a chapa de prova 'emenda-g0' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
-
-## tools/fixtures/correcao-de-superficie/emenda-g1/
-
-- `receita.js` — correcao-de-superficie/emenda-g1/receita.js — a chapa de prova 'emenda-g1' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
-
-## tools/fixtures/correcao-de-superficie/emenda-g2/
-
-- `receita.js` — correcao-de-superficie/emenda-g2/receita.js — a chapa de prova 'emenda-g2' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
-
-## tools/fixtures/correcao-de-superficie/rede-com-ruido/
-
-- `receita.js` — correcao-de-superficie/rede-com-ruido/receita.js — a chapa de prova 'rede-com-ruido' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
-
-## tools/fixtures/correcao-de-superficie/rede-sem-ruido/
-
-- `receita.js` — correcao-de-superficie/rede-sem-ruido/receita.js — a chapa de prova 'rede-sem-ruido' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
 
 ## tools/fixtures/costuras-e-furos/
 
