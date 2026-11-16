@@ -4,11 +4,17 @@
  * o teste conferir que nenhuma sumiu: os consumidores (`olhar-bancada`, as guardas de `tools/modelar/guardas/`) chamam
  * estes nomes de fora do repositório da página, e uma chave perdida só aparece quando um deles quebra. */
 
+import { definirLarguraDaZebra } from '../visoes/visao-zebra.js';
+import { definirAzimuteDaLuzRasante } from '../visoes/visao-luz-rasante.js';
+import { estadoDaCurvatura } from '../visoes/visao-curvatura.js';
+
+const PRAZO_DA_VISAO_MS = 60_000;
+
 export const CHAVES_DA_PONTE = Object.freeze([
   'ready', 'peca', 'pecasDisponiveis', 'nomePeca', 'carregado', 'partes', 'estatisticas', 'imagemReferencia',
   'diagnosticos', 'portas', 'selecaoIgnorada', 'controlador', 'ambiente', 'edicaoDeMalha', 'edicaoDeMalhaDesenhaMalha',
   'sincronizador', 'selecionar', 'modo', 'vista', 'projecao', 'explosao', 'focar', 'focarContato', 'inspecionarPar',
-  'enquadrar', 'enquadramento', 'auditoria', 'semAuditoria', 'corte', 'carregarPayloadSessao', 'estado', 'marcadoresDePar', 'url',
+  'enquadrar', 'enquadramento', 'visao', 'visaoPronta', 'auditoria', 'semAuditoria', 'corte', 'carregarPayloadSessao', 'estado', 'marcadoresDePar', 'url',
 ]);
 
 export function criarPonteDaCaptura({
@@ -75,6 +81,29 @@ export function criarPonteDaCaptura({
     /* Métrica de câmera consumida pela revisão headless: a bancada já sabe
        medir a silhueta projetada; faltava publicar isso na ponte. */
     enquadramento: () => ambiente.medirEnquadramento(),
+    /* A VISÃO DO REGISTRO NA CAPTURA (`--visao`): liga a visão pedida sobre a peça com o seletor suspenso da auditoria e aplica os
+       controles dela (`larguraDaZebra`, em graus, da zebra; `azimute`, em graus, da luz rasante). Devolve { ok, visao } ou { ok: false,
+       motivo }. `semAuditoria` a desfaz. */
+    visao: (id, { larguraDaZebra = null, azimute = null } = {}) => {
+      const resultado = seletorDeVisao.forcar(id);
+      if (!resultado.ok) return resultado;
+      const feito = { ...resultado };
+      if (id === 'zebra' && larguraDaZebra !== null) feito.larguraDaZebra = definirLarguraDaZebra(larguraDaZebra);
+      if (id === 'luz-rasante' && azimute !== null) feito.azimute = definirAzimuteDaLuzRasante(ambiente, azimute);
+      return feito;
+    },
+    /* Resolve quando a visão ligada terminou de pintar: a curvatura calcula num worker e não está pronta ao ligar; as outras estão. */
+    visaoPronta: () => new Promise((resolver) => {
+      const inicio = performance.now();
+      const passo = () => {
+        const c = estadoDaCurvatura(ambiente);
+        const calculando = c.ativa && (c.pendente || c.emVoo || (!c.resultado && !c.erro));
+        if (!calculando) { resolver({ pronta: true, erro: c.ativa ? (c.erro ? String(c.erro.message ?? c.erro) : null) : null }); return; }
+        if (performance.now() - inicio > PRAZO_DA_VISAO_MS) { resolver({ pronta: false, erro: 'a curvatura não terminou no prazo' }); return; }
+        setTimeout(passo, 50);
+      };
+      passo();
+    }),
     /* AUDITORIA — a imagem feita para ser lida, não para ser usada.
        Tira o cromo da interface, o piso, a grade e a sombra, e opcionalmente
        pinta uma cor por parte. Devolve a LEGENDA, porque imagem colorida sem

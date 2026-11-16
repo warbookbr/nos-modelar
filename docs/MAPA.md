@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1973 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1976 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2645,6 +2645,14 @@
 - `vizinhanca-de-todo-vao.test.ts` — vizinhanca-de-todo-vao.test.ts — bateria do plano `docs/modelar/planos/encerrados/2026-11-09-abertura-na-vizinhanca-de-todo-vao.md`: o vão cuja vizinhança al…
 - `vizinhanca.test.ts` — vizinhanca.test.ts — bateria do plano `docs/modelar/planos/encerrados/2026-11-06-abertura-so-na-vizinhanca.md`: a booleana do vão recebe só o trecho da chapa…
 
+## tools/fixtures/acervo/chapa-de-reflexo-de-prova/
+
+- `receita.js` — chapa-de-reflexo-de-prova/receita.js — a chapa de `tools/blender/chapa-com-amassado-de-prova.mjs` como peça da bancada, para provar a captura das visões de r…
+
+## tools/fixtures/acervo/chapa-lisa-de-reflexo-de-prova/
+
+- `receita.js` — chapa-lisa-de-reflexo-de-prova/receita.js — a chapa de `chapa-de-reflexo-de-prova` sem o amassado, a de controle da zebra.
+
 ## tools/fixtures/acervo/materiais-de-prova/
 
 - `receita.js` — materiais-de-prova/receita.js — a peça de prova dos materiais realistas (plano 2026-11-08-materiais-realistas).
@@ -3296,6 +3304,7 @@
 - `normais-lisas.test.ts` — normais-lisas.test.ts — a borda do furo serrilhava na bancada, e a peça não tinha culpa: o `freio-disco` já usa 12 lados no furo do prisioneiro e já marca a …
 - `objeto.mjs` — objeto.mjs — o estado das referências de um objeto que passa por mapa de partes e prancha de contornos, e o que vem a seguir.
 - `objeto.test.mjs` — objeto.test.mjs — a ferramenta lê cada etapa do fluxo no disco e aponta a primeira que falta.
+- `olhar-bancada-visoes.test.mjs` — olhar-bancada-visoes.test.mjs — a captura por comando das visões de reflexo (`--visao`, `--largura-da-zebra`, `--azimute`, `--enquadrar`).
 - `olhar-bancada.mjs` — olhar-bancada.mjs — serviço headless de vistas e sua CLI fina.
 - `olhar-bancada.test.mjs` — olhar-bancada.test.mjs — validação antecipada de peças e mitigação de timeout em capturas headless.
 - `olhar-montagem.mjs` — olhar-montagem.mjs — CLI fina sobre captura importável de montagem.

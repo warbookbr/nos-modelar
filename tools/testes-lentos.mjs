@@ -17,6 +17,9 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { lerHistorico } from './vitest-duracoes.mjs';
 
 export const TESTES_LENTOS = [
+  /* 2026-11-16: as visões de reflexo por comando (zebra em duas chapas, luz rasante e curvatura), cada captura abrindo navegador e peça;
+     38 s com a máquina livre */
+  'tools/modelar/olhar-bancada-visoes.test.mjs',
   /* 2026-11-15: a ondulação da saliência declarada da lataria do carro; 14,1 e 14,8 s sozinho no CI, em duas execuções seguidas */
   'tools/modelar/ondulacao-saliencia-declarada.test.mjs',
   /* 2026-11-15: a leitura por regiões; 14,8 e 15,3 s sozinho no CI, com dois avisos seguidos de três */

@@ -25,6 +25,7 @@ import { PASTA_DO_CACHE, assinaturaDaEntrada, executarReceitaGuardada } from './
 import { FATOR_DE_AMOSTRAGEM, reduzirPorMedia } from './capturar-montagem.mjs';
 import { reduzirEmParalelo } from './reduzir-em-paralelo.mjs';
 import { lancarChromium } from './navegador.mjs';
+import { IDS_DAS_VISOES, VISOES } from '../../src/bancada/visoes/registro-de-visoes.js';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
@@ -175,6 +176,42 @@ export function ajustarCamera(ajuste) {
     cam.position.set(2 * alvo.x - p.x, p.y, 2 * alvo.z - p.z);
     cam.lookAt(alvo);
     relato.girou = true;
+  }
+  if (ajuste.enquadrar) {
+    /* Fecha o quadro no que está à vista (a mesma geometria visível que `caixaDoVisivel` reúne): centra o envelope projetado dos vértices
+       no quadro e ajusta o zoom até a maior dimensão dele ocupar 92 % do quadro; repete porque, na perspectiva, o deslocamento muda o envelope. */
+    const projetar = () => {
+      cam.updateMatrixWorld(true);
+      cam.updateProjectionMatrix();
+      const min = new V3(Infinity, Infinity, 0); const max = new V3(-Infinity, -Infinity, 0);
+      const p = new V3();
+      raiz.traverseVisible((o) => {
+        const pos = o.geometry?.getAttribute?.('position'); if (!pos) return;
+        for (let i = 0; i < pos.count; i++) { p.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld).project(cam); min.min(p); max.max(p); }
+      });
+      return { min, max };
+    };
+    const el = amb.renderer.domElement;
+    const aspecto = Math.max(0.001, el.clientWidth / Math.max(1, el.clientHeight));
+    for (let volta = 0; volta < 5; volta++) {
+      const { min, max } = projetar();
+      if (!Number.isFinite(min.x)) return { erro: 'a página não tem geometria visível para enquadrar' };
+      const cx = (min.x + max.x) / 2; const cy = (min.y + max.y) / 2;
+      const meiaAltura = cam.isPerspectiveCamera
+        ? (cam.position.distanceTo(alvo) * Math.tan((cam.fov * Math.PI) / 360)) / cam.zoom
+        : (cam.top - cam.bottom) / 2 / cam.zoom;
+      const direita = new V3().setFromMatrixColumn(cam.matrixWorld, 0);
+      const cima = new V3().setFromMatrixColumn(cam.matrixWorld, 1);
+      const passo = direita.multiplyScalar(cx * meiaAltura * aspecto).add(cima.multiplyScalar(cy * meiaAltura));
+      cam.position.add(passo);
+      alvo.add(passo);
+      cam.lookAt(alvo);
+      const meio = Math.max((max.x - min.x) / 2, (max.y - min.y) / 2);
+      cam.zoom *= 0.92 / Math.max(meio, 1e-6);
+      cam.updateProjectionMatrix();
+    }
+    const { min, max } = projetar();
+    relato.enquadrou = { largura: Math.min(2, max.x - min.x) / 2, altura: Math.min(2, max.y - min.y) / 2, zoom: cam.zoom };
   }
   amb.controls.update();
   cam.updateMatrixWorld(true);
@@ -508,6 +545,12 @@ export async function olharBancada({
   explosao: explosaoDeclarada = 0,
   /* `ambiente`: 'estudio', 'ceu' ou 'nenhum', o ambiente de reflexo da bancada (`?ambiente=`); sem ele vale o padrão da página. */
   ambiente = null,
+  /* A VISÃO DO REGISTRO da bancada (`--visao`: zebra, luz-rasante, curvatura...) ligada antes da captura, com o controle dela em graus
+     (`larguraDaZebra` da zebra, `azimute` da luz rasante). `enquadrar` fecha a câmera na peça visível (`--enquadrar`). */
+  visao: visaoDeclarada = null,
+  larguraDaZebra: larguraDaZebraDeclarada = null,
+  azimute: azimuteDeclarado = null,
+  enquadrar: enquadrarNaPeca = false,
   res: resDeclarada = 1280,
   espera: esperaDeclarada = 1200,
   saida: saidaDeclarada = null,
@@ -641,6 +684,26 @@ export async function olharBancada({
     if (ambiente !== null && !['estudio', 'ceu', 'nenhum'].includes(ambiente)) {
       erroDeUso(`--ambiente pede estudio, ceu ou nenhum; veio "${ambiente}".`);
     }
+    const visao = visaoDeclarada === null || visaoDeclarada === undefined ? null : String(visaoDeclarada);
+    if (visao !== null && !IDS_DAS_VISOES.includes(visao)) {
+      erroDeUso(`--visao pede uma visão do registro (${IDS_DAS_VISOES.join(', ')}); veio "${visao}". Exemplo: --visao=zebra.`);
+    }
+    const controleDaVisao = (nome, valor, opcao, minimo, maximo) => {
+      if (valor === null || valor === undefined) return null;
+      const numero = Number(valor);
+      if (visao === null || !VISOES.find((v) => v.id === visao)?.controlesDaCaptura?.includes(nome)) {
+        const donas = VISOES.filter((v) => v.controlesDaCaptura?.includes(nome)).map((v) => v.id);
+        erroDeUso(`${opcao} só vale com --visao=${donas.join(' ou --visao=')}; a visão pedida é ${visao === null ? 'nenhuma' : `"${visao}"`}.`);
+      }
+      if (!Number.isFinite(numero) || numero < minimo || numero > maximo) erroDeUso(`${opcao} pede graus de ${minimo} a ${maximo}; veio "${valor}".`);
+      return numero;
+    };
+    const larguraDaZebra = controleDaVisao('larguraDaZebra', larguraDaZebraDeclarada, '--largura-da-zebra', 1.5, 15);
+    const azimute = controleDaVisao('azimute', azimuteDeclarado, '--azimute', 0, 360);
+    if (visao !== null && (arame || coresPorParte)) erroDeUso('--visao não se mistura com --arame, --wireframe, --raio-x nem --cores: a visão troca o material da peça.');
+    if (visao !== null && !(auditoria || revisar)) erroDeUso('--visao vale só na imagem de auditoria; não se mistura com --tela.');
+    if (visao !== null && par) erroDeUso('--visao não se mistura com --par: a inspeção de par escolhe a vista e o material por conta própria.');
+    if (enquadrarNaPeca && (par || mirarDeclarado || focar || revisar)) erroDeUso('--enquadrar não se mistura com --par, --mirar, --focar nem --revisar: eles já decidem o quadro.');
     /* `--res` aceita LARGURA ou LARGURAxALTURA.
      *
      * A proporção era 16:9 fixa no código, e objeto ALTO gastava o quadro à toa:
@@ -755,6 +818,8 @@ export async function olharBancada({
       focar ? 'focado' : null,
       arame === 'raio-x' ? 'raio-x' : (arame ? 'arame' : null),
       corte ? `corte-${corte.eixo}${corte.posicao}-${corte.lado}` : null,
+      visao && visao !== 'solida' ? `visao-${visao}${larguraDaZebra !== null ? `-${String(larguraDaZebra).replace('.', 'p')}graus` : ''}${azimute !== null ? `-az${String(azimute).replace('.', 'p')}` : ''}` : null,
+      enquadrarNaPeca ? 'enquadrado' : null,
     ].filter(Boolean);
     const sufixo = sufixoPartes.length ? `-${sufixoPartes.join('-')}` : '';
     if (!capturarEmMemoria) criarDiretorioConfinado(saida, { raiz: REPO });
@@ -838,7 +903,7 @@ export async function olharBancada({
        não troca. Com `compartilhada`, uma chamada que terminou bem deixa a página aberta, e a próxima da mesma peça, do mesmo quadro,
        da mesma projeção e da mesma explosão reaplica a auditoria, a seleção e o modo pela ponte, como a primeira já fazia por cima
        da URL, e refaz o enquadramento. Qualquer outra diferença abre página nova. */
-    const reaproveitavel = Boolean(compartilhada) && auditoriaEfetiva && !par && !listar && !corte;
+    const reaproveitavel = Boolean(compartilhada) && auditoriaEfetiva && !par && !listar && !corte && visao === null && !enquadrarNaPeca;
     const chaveDaPagina = JSON.stringify({ peca, sessao: sessaoDaCaptura, largura, altura, projecao, explosao, ambiente });
     chaveDaPaginaDaChamada = chaveDaPagina;
     reaproveitavelDaChamada = reaproveitavel;
@@ -928,7 +993,7 @@ export async function olharBancada({
       if (mira) return { mirar: { mm: mira.mm, distanciaMm: mira.distanciaMm, direcao: DIRECAO_DAS_VISTAS[vista] ?? DIRECAO_DAS_VISTAS.isometrica } };
       const giro = vista === VISTA_ISO_TRASEIRA;
       const fora = Boolean(focar || par);
-      return giro || fora ? { giro, fora } : null;
+      return giro || fora || enquadrarNaPeca ? { giro, fora, ...(enquadrarNaPeca ? { enquadrar: true } : {}) } : null;
     };
     let ajusteInstalado = false;
     const instalarAjuste = async () => {
@@ -1120,6 +1185,21 @@ export async function olharBancada({
           await page.evaluate(() => window.__mecanificaBancada.enquadrar());
         }
       }
+      /* A visão do registro vale para todas as vistas da chamada: liga na primeira, pela ponte, depois da seleção e do enquadramento
+         da auditoria, e a curvatura, que calcula num worker, é esperada até pintar. */
+      if (visao !== null && indice === 0) {
+        progresso.etapa = 'ligar a visão';
+        const ligada = await page.evaluate(([id, controles]) => window.__mecanificaBancada.visao(id, controles), [visao, { larguraDaZebra, azimute }]);
+        if (!ligada?.ok) erroDeUso(`a bancada não ligou a visão "${visao}": ${ligada?.motivo ?? 'sem resposta'}${ligada?.dica ? ` (${ligada.dica})` : ''}.`);
+        const pronta = await page.evaluate(() => window.__mecanificaBancada.visaoPronta());
+        if (!pronta.pronta || pronta.erro) {
+          registrar(relato, logger, 'stderr', `\nVISÃO ${visao} NÃO PRONTA: ${pronta.erro ?? 'sem motivo'}`);
+          falhou = true;
+          falhasRelatadas.push({ categoria: 'modelo', codigo: 'visao_nao_pronta', vista: null, mensagem: `A visão ${visao} não terminou de pintar: ${pronta.erro ?? 'sem motivo'}.`, acao: 'Repita com --prazo maior ou confira a peça na bancada com a mesma visão.' });
+          break;
+        }
+        registrar(relato, logger, 'stdout', `visão: ${visao}${ligada.larguraDaZebra != null ? `, listras de ${ligada.larguraDaZebra} graus` : ''}${ligada.azimute != null ? `, luz a ${ligada.azimute} graus` : ''}`);
+      }
       const ajuste = ajusteDaVista(vista);
       if (ajuste) await instalarAjuste();
       if (primeiraDaPagina) {
@@ -1135,6 +1215,7 @@ export async function olharBancada({
         const feito = await page.evaluate(() => window.__modelarAjuste ?? null);
         if (feito?.erro) registrar(relato, logger, 'stderr', `  ajuste da câmera recusado: ${feito.erro}`);
         if (feito?.mirou) registrar(relato, logger, 'stdout', `câmera mirando [${feito.mirou.ponto.join('; ')}] mm de ${feito.mirou.distanciaMm} mm (campo de ${feito.mirou.campoMm} mm de altura no ponto)`);
+        if (feito?.enquadrou) registrar(relato, logger, 'stdout', `enquadrado na peça visível: ocupa ${(feito.enquadrou.largura * 100).toFixed(0)}% da largura e ${(feito.enquadrou.altura * 100).toFixed(0)}% da altura do quadro`);
         if (feito?.afastou) {
           registrar(relato, logger, 'stdout', `a câmera de ${vista} estava dentro da peça; afastada de ${feito.afastou.deMm} para ${feito.afastou.paraMm} mm do alvo, com o mesmo quadro`);
           anotarDica('camera-recuada', 'a câmera recuou para fora da peça e o que fica entre ela e o alvo (a casca do lado oposto) pode escondê-lo: para ver a parte, use a vista do lado dela, --modo=isolar ou --corte.', vista);
@@ -1369,8 +1450,8 @@ export async function olharBancada({
 
 /* A AJUDA. Em 2026-11-03 um modelador gastou chamadas para descobrir o que o comando oferecia: ele recusava `--ajuda` e
    listava só os nomes das opções. Cada linha diz o que a opção faz; o detalhe da análise mora em PARE-E-ANALISE.md. */
-export const OPCOES_DA_CLI = ['peca', 'vistas', 'selecionadas', 'par', 'modo', 'projecao', 'explosao', 'res', 'espera', 'prazo', 'saida', 'relatorio', 'parte', 'zoom', 'zoom-antes', 'corte', 'corte-lado', 'ambiente', 'mirar', 'distancia'];
-export const BANDEIRAS_DA_CLI = ['analise', 'listar', 'estrito', 'focar', 'revisar', 'auditoria', 'tela', 'cores', 'arame', 'wireframe', 'raio-x', 'sem-contatos', 'sem-cache'];
+export const OPCOES_DA_CLI = ['peca', 'vistas', 'selecionadas', 'par', 'modo', 'projecao', 'explosao', 'res', 'espera', 'prazo', 'saida', 'relatorio', 'parte', 'zoom', 'zoom-antes', 'corte', 'corte-lado', 'ambiente', 'mirar', 'distancia', 'visao', 'largura-da-zebra', 'azimute'];
+export const BANDEIRAS_DA_CLI = ['analise', 'listar', 'estrito', 'focar', 'revisar', 'auditoria', 'tela', 'cores', 'arame', 'wireframe', 'raio-x', 'sem-contatos', 'sem-cache', 'enquadrar'];
 export const AJUDA = `npm run bancada -- <peça> [opções]  (node tools/modelar/olhar-bancada.mjs)
 Captura a peça ou montagem na bancada, sem interface.
 
@@ -1389,6 +1470,10 @@ Captura a peça ou montagem na bancada, sem interface.
   --selecionadas=<a,b>   partes selecionadas; com --modo e --focar
   --modo=<${MODOS.join('|')}>  com --selecionadas: todas, a seleção no contexto, ou só ela
   --focar                enquadra a câmera nas selecionadas; se a câmera cair dentro da peça (parte pequena, vista de lado), recua-a para fora com o mesmo quadro
+  --visao=<${IDS_DAS_VISOES.join('|')}>  liga a visão do registro da bancada antes da captura (a mesma dos atalhos da página: zebra b, luz rasante j, curvatura k); a imagem sai com o nome -visao-<id>; não se mistura com --arame, --raio-x, --cores, --par, --tela nem --analise
+  --largura-da-zebra=<graus>  com --visao=zebra, a largura de cada listra no horizonte do reflexo (1,5 a 15; padrão 4,5)
+  --azimute=<graus>      com --visao=luz-rasante, a direção da luz no plano da imagem (0 a 360; padrão: a que a bancada escolhe pela vista)
+  --enquadrar            fecha a câmera no que está à vista, para a peça ocupar 92 % da maior dimensão do quadro (a vista padrão deixa a lataria de um carro em um décimo); não se mistura com --par, --mirar, --focar, --revisar nem --analise
   --mirar=<x,y,z>        a câmera mira o ponto, em mm do referencial da peça, na vista de --vistas (ex.: --mirar=1200,900,-300 --vistas=direita); não se mistura com --focar, --par, --revisar nem --analise
   --distancia=<mm>       com --mirar: a distância da câmera ao ponto (padrão ${DISTANCIA_PADRAO_DA_MIRA_MM}; o campo visível no ponto tem 0,69 vez a distância de altura)
   --sem-contatos         não mede os contatos da peça (a medida executa a receita em Node, uns 100 s no furgão); o relato diz "NÃO medidos", e lista vazia de pares não quer dizer sem achado
@@ -1464,6 +1549,9 @@ export function comoCLI(argv, { aoProgredir = null } = {}) {
   if (lido.bandeira('analise') && lido.opcao('mirar')) {
     return Promise.resolve(erroEstruturado({ relato: novoRelato(), erro: new ErroDeUso('--mirar não se mistura com --analise: a análise tira as próprias vistas.') }));
   }
+  if (lido.bandeira('analise') && (lido.opcao('visao') || lido.bandeira('enquadrar') || lido.opcao('largura-da-zebra') || lido.opcao('azimute'))) {
+    return Promise.resolve(erroEstruturado({ relato: novoRelato(), erro: new ErroDeUso('--visao, --largura-da-zebra, --azimute e --enquadrar não se misturam com --analise: a análise tira as próprias vistas; use `npm run bancada -- <peça> --visao=<id>`.') }));
+  }
   if (lido.bandeira('analise')) {
     const peca = lido.opcao('peca') ?? lido.posicional;
     const contatos = { medirContatos: !lido.bandeira('sem-contatos'), cacheDeContatos: !lido.bandeira('sem-cache') };
@@ -1484,6 +1572,8 @@ export function comoCLI(argv, { aoProgredir = null } = {}) {
     relatorio: lido.opcao('relatorio'), listar: lido.bandeira('listar'), estrito: lido.bandeira('estrito'),
     focar: lido.bandeira('focar'), revisar: lido.bandeira('revisar'),
     mirar: lido.opcao('mirar') ?? null, distancia: lido.opcao('distancia') ?? null, aoProgredir,
+    visao: lido.opcao('visao') ?? null, larguraDaZebra: lido.opcao('largura-da-zebra') ?? null, azimute: lido.opcao('azimute') ?? null,
+    enquadrar: lido.bandeira('enquadrar'),
     /* SEM INTERFACE POR PADRÃO desde 2026-09-23. Quem usa este comando é quase
        sempre a IA olhando a peça, e a imagem com painéis, cabeçalho, piso e
        grade deixava a peça numa faixa estreita no meio; a imagem limpa
