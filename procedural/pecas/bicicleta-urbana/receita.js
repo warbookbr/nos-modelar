@@ -41,6 +41,9 @@ export const TABELA = {
   gancheira_meia_largura: 11,
   gancheira_espessura: 6,
   gancheira_rasgo: 22,
+  /* o estai e a base afinam nos últimos gancheira_afina mm até gancheira_ponta do raio, onde a chapa entra no tubo, e se soldam nela */
+  gancheira_afina: 14,
+  gancheira_ponta: 0.7,
   eixo_dianteiro_largura: 100,
   eixo_traseiro_largura: 140,
   raio_diametro: 2.8,
@@ -130,8 +133,16 @@ export const TABELA = {
   selim_braco_raio: 8,
   selim_trilho_diametro: 6,
   selim_trilho_x: 28,
-  selim_largura_bico: 0.15,
-  selim_largura_traseira: 1,
+  /* largura do nariz, em fração da traseira; a cintura estreita de selim_cintura_inicio a selim_cintura_fim do comprimento */
+  selim_largura_bico: 0.3,
+  selim_cintura_inicio: 0.32,
+  selim_cintura_fim: 0.62,
+  /* as abas de trás caem para os lados, como na foto frontal */
+  selim_caimento: 12,
+  /* onde os trilhos saem da casca, em fração do comprimento a partir da traseira */
+  selim_trilho_tras: 0.2,
+  selim_trilho_frente: 0.78,
+  selim_largura_traseira: 0.75,
   selim_secoes: 22,
   selim_lados: 28,
     /* transmissão */
@@ -226,7 +237,7 @@ export function derivar(T) {
   const torno = (parte, material, perfil, em, { lados = T.lados_roda, liso = 35, eixo = 'x', junta = null } = {}) => itens.push({ k: 'torno', parte, material, perfil, em, lados, liso, eixo, junta });
 
   /* placa plana de contorno [z, y] em mm, de x0 a x0 + espessura, com um rasgo opcional {centro: [z, y], comprimento em z, largura em y} */
-  const placa = (parte, material, contorno, x0, espessura, rasgo = null) => itens.push({ k: 'placa', parte, material, contorno, x0, espessura, rasgo });
+  const placa = (parte, material, contorno, x0, espessura, rasgo = null, junta = null) => itens.push({ k: 'placa', parte, material, contorno, x0, espessura, rasgo, junta });
 
   const zEixoTras = -T.chainstay;
   const zEixoFrente = T.entre_eixos - T.chainstay;
@@ -281,9 +292,10 @@ export function derivar(T) {
     const rumo = unit(menos(dropout, solda));
     const ao = (f, x) => [lado * x, solda[1] + (dropout[1] - solda[1]) * f, solda[2] + (dropout[2] - solda[2]) * f];
     const dentro = soma(solda, esc(rumo, -(rE + 6)));
-    soldado([[lado * xLado, dentro[1], dentro[2]], ao(0, xLado), ao(0.12, xLado + 4), ao(0.25, xMeio), ao(0.55, xMeio + 4), ao(1 - fimNaPlaca / norma(menos(dropout, solda)), T.eixo_traseiro_largura / 2)], rE, T.lados_tubo, 'selimTopo', `gancheira${lado}`, T.solda_trecho);
+    soldado([[lado * xLado, dentro[1], dentro[2]], ao(0, xLado), ao(0.12, xLado + 4), ao(0.25, xMeio), ao(0.55, xMeio + 4), ao(1 - (fimNaPlaca + T.gancheira_afina) / norma(menos(dropout, solda)), T.eixo_traseiro_largura / 2), ao(1 - fimNaPlaca / norma(menos(dropout, solda)), T.eixo_traseiro_largura / 2)], [rE, rE, rE, rE, rE, rE, rE * T.gancheira_ponta], T.lados_tubo, 'selimTopo', `gancheira${lado}`, T.solda_trecho);
     const inicioBase = [lado * T.base_x_inicio, yBB, 0];
-    soldado([inicioBase, soma(dropout, esc(unit(menos(inicioBase, dropout)), fimNaPlaca))], raioQ(T.base_diametro), T.lados_tubo, 'mc', `gancheira${lado}`, T.solda_trecho);
+    const rB = raioQ(T.base_diametro);
+    soldado([inicioBase, soma(dropout, esc(unit(menos(inicioBase, dropout)), fimNaPlaca + T.gancheira_afina)), soma(dropout, esc(unit(menos(inicioBase, dropout)), fimNaPlaca))], [rB, rB, rB * T.gancheira_ponta], T.lados_tubo, 'mc', `gancheira${lado}`, T.solda_trecho);
     /* a placa da gancheira, como na foto lateral: envolve o eixo por trás, com o rasgo horizontal em que a roda corre, e se
        estende ao longo do estai e da base, onde as duas hastes chegam; o contorno é o fecho convexo desses pontos no plano (z, y) */
     const ao2 = (q) => unit([q[2] - zEixoTras, q[1] - yEixo]);
@@ -294,7 +306,7 @@ export function derivar(T) {
       for (const w of [-1, 1]) pts.push([d[0] * T.gancheira_alcance + nrm[0] * w * T.gancheira_meia_largura, d[1] * T.gancheira_alcance + nrm[1] * w * T.gancheira_meia_largura]);
     }
     placa('quadro', 'aluminio', fechoConvexo(pts).map(([dz, dy]) => [zEixoTras + dz, yEixo + dy]), lado * T.eixo_traseiro_largura / 2 - T.gancheira_espessura / 2, T.gancheira_espessura,
-      { centro: [zEixoTras - T.gancheira_rasgo / 2 + T.eixo_raio, yEixo], comprimento: T.gancheira_rasgo, largura: 2 * T.eixo_raio + 1 });
+      { centro: [zEixoTras - T.gancheira_rasgo / 2 + T.eixo_raio, yEixo], comprimento: T.gancheira_rasgo, largura: 2 * T.eixo_raio + 1 }, 'quadro');
   }
   torno('quadro', 'aluminio', [[0, -T.movimento_central_largura / 2], [T.movimento_central_raio, -T.movimento_central_largura / 2], [T.movimento_central_raio, T.movimento_central_largura / 2], [0, T.movimento_central_largura / 2]], bb, { lados: 24, liso: 40, junta: 'quadro' });
 
@@ -371,39 +383,56 @@ export function derivar(T) {
   const centroSelim = [0, 0, apoio[2] - T.selim_presilha_a_frente];
   const secoes = [];
   const nSel = T.selim_secoes;
-  /* perfil de lado: topo nivelado, casca fina que afina para o nariz; as pontas fecham em arco, sem ponta cônica */
+  /* perfil medido nas fotos: de cima, traseira larga, cintura que estreita depressa no meio e nariz longo e estreito, de ponta
+     redonda; de lado, nariz rombudo; as pontas fecham em arco, sem ponta cônica */
+  const suave = (u) => { const x = Math.min(1, Math.max(0, u)); return x * x * (3 - 2 * x); };
   const perfilSelim = (t) => {
-    const tr = T.selim_largura_traseira;
-    let larg = t < 0.2 ? T.selim_largura * (tr + (1 - tr) * Math.sin((t / 0.2) * Math.PI / 2)) : T.selim_largura * ((1 - T.selim_largura_bico) * (1 - ((t - 0.2) / 0.8) ** 1.1) + T.selim_largura_bico);
-    let esp = T.selim_espessura * (1 - 0.35 * t ** 1.3);
+    const tr = T.selim_largura_traseira, b = T.selim_largura_bico;
+    const ci = T.selim_cintura_inicio, cf = T.selim_cintura_fim;
+    let larg = T.selim_largura * (t < 0.1 ? tr + (1 - tr) * Math.sin((t / 0.1) * Math.PI / 2)
+      : t < cf ? 1 - (1 - b) * suave((t - ci) / (cf - ci)) : b * (1 - 0.15 * (t - cf) / (1 - cf)));
+    let esp = T.selim_espessura * (1 - 0.45 * t ** 1.3);
+    /* o centro da seção segue a espessura antes do fecho das pontas: sem isso a ponta sobe até o topo e vira um lábio */
+    const espCheia = esp;
     const fecha = (u) => Math.sqrt(Math.max(0.02, 1 - u * u));
-    if (t > 0.84) { const f = fecha((t - 0.8) / 0.2 * 0.72); larg *= f; esp *= f; }
+    if (t > 0.9) { const f = fecha((t - 0.9) / 0.1 * 0.8); larg *= f; esp *= 0.55 + 0.45 * f; }
     if (t < 0.06) { const f = fecha((0.06 - t) / 0.06 * 0.9); larg *= f; esp *= f; }
     const sela = T.selim_traseira_alta * (1 - Math.min(1, t / 0.45)) ** 2 - T.selim_cela * Math.sin(Math.PI * Math.min(1, Math.max(0, (t - 0.15) / 0.75))) ** 2;
-    const yrel = -esp / 2 + T.selim_cupula * (1 - t) ** 2 + sela; /* a barriga sobe para o nariz; o topo segue a sela */
+    const yrel = -espCheia / 2 + T.selim_cupula * (1 - t) ** 2 + sela; /* a barriga sobe para o nariz; o topo segue a sela */
     const afunda = T.selim_afundamento * Math.sin(Math.PI * Math.min(1, Math.max(0, (t - 0.08) / 0.7))) ** 1.5;
-    return { larg, esp, yrel, afunda };
+    const cai = T.selim_caimento * Math.max(0, 1 - t / 0.55);
+    return { larg, esp, yrel, afunda, cai };
   };
+  const zDoSelim = (t) => centroSelim[2] - 0.46 * T.selim_comprimento + T.selim_comprimento * t * 0.92;
   for (let i = 0; i <= nSel; i++) {
     const t = i / nSel;
-    secoes.push({ t, z: centroSelim[2] - 0.46 * T.selim_comprimento + T.selim_comprimento * t * 0.92, ...perfilSelim(t) });
+    secoes.push({ t, z: zDoSelim(t), ...perfilSelim(t) });
   }
-  /* trilhos: seguem a barriga do assento por fora dela, com uma barriga levemente curva entre as pontas */
-  const trilhoRel = (q) => {
+  /* trilhos, como na foto lateral: saem da casca em selim_trilho_tras e selim_trilho_frente, descem curtos e íngremes atrás,
+     correm retos pela presilha e sobem numa rampa longa e suave até o nariz; curva contínua, amostrada mais fina que as seções */
+  const tA = T.selim_trilho_tras, tB = T.selim_trilho_frente;
+  const queda = (u) => (u < 0.26 ? Math.sin((u / 0.26) * Math.PI / 2) : u < 0.6 ? 1 : 1 - suave((u - 0.6) / 0.4));
+  const trilhoRel = (t, dentro = 0) => {
+    const q = perfilSelim(t);
     const x = Math.min(T.selim_trilho_x, 0.7 * q.larg / 2);
     const barriga = (q.esp / 2) * (1 - (x / (q.larg / 2)) ** 2.5) ** 0.4;
-    /* como na foto lateral: os trilhos descem das pontas da casca e correm retos por baixo, em U de fundo chato, onde a presilha os prende */
-    const u = Math.min(1, Math.max(0, (q.t - 2 / nSel) / ((nSel - 4) / nSel)));
-    return { x, y: q.yrel - barriga - 1 - T.selim_trilho_curva * Math.min(1, 2.2 * Math.sin(Math.PI * u)) };
+    return { x, y: q.yrel - barriga - 1 + dentro - T.selim_trilho_curva * queda((t - tA) / (tB - tA)) };
   };
-  const doCanote = secoes.reduce((a, q) => (Math.abs(q.z - apoio[2]) < Math.abs(a.z - apoio[2]) ? q : a));
+  const tDoCanote = (apoio[2] - zDoSelim(0)) / (0.92 * T.selim_comprimento);
   const rBraco = T.selim_braco_raio;
-  const yBase = apoio[1] + rBraco - 2 - trilhoRel(doCanote).y;
+  const yBase = apoio[1] + rBraco - 2 - trilhoRel(tDoCanote).y;
   for (const q of secoes) q.y = yBase + q.yrel;
   centroSelim[1] = yBase;
   itens.push({ k: 'selim', parte: 'selim', material: 'preto', secoes, base: centroSelim, apoioY: apoio[1] });
   for (const lado of [-1, 1]) {
-    const trilho = secoes.slice(2, nSel - 1).map((q) => { const r = trilhoRel(q); return [lado * r.x, yBase + r.y, q.z]; });
+    const nT = 32;
+    const trilho = [];
+    for (let i = 0; i <= nT; i++) {
+      const t = tA + ((tB - tA) * i) / nT;
+      /* as duas pontas entram 5 mm na casca */
+      const r = trilhoRel(t, i === 0 || i === nT ? 5 : 0);
+      trilho.push([lado * r.x, yBase + r.y, zDoSelim(t)]);
+    }
     tubo('selim', 'aco', trilho, trilho.map(() => raioQ(T.selim_trilho_diametro)), 12);
   }
   /* braçadeira pequena e escura sob o assento, sobre o topo do canote */
@@ -565,7 +594,8 @@ export function gerarPassos(T) {
           const c = Math.cos(th); const sn = Math.sin(th);
           /* superelipse: acolchoado cheio e de cantos redondos */
           const xn = Math.sign(c) * Math.abs(c) ** 0.8; /* afundamento do topo: só na metade de cima, mais fundo no eixo do assento */
-          pts.push([m(xn * meia), m(Math.sign(sn) * Math.abs(sn) ** 0.8 * (s.esp / 2) - (sn > 0 ? s.afunda * (1 - xn * xn) * Math.abs(sn) : 0))]);
+          /* o caimento curva a seção para baixo só nas abas, fora do terço do meio, sem afinar a borda */
+          pts.push([m(xn * meia), m(Math.sign(sn) * Math.abs(sn) ** 0.8 * (s.esp / 2) - (sn > 0 ? s.afunda * (1 - xn * xn) * Math.abs(sn) : 0) - s.cai * Math.max(0, (Math.abs(xn) - 0.35) / 0.65) ** 2)]);
         }
         return { pos: [0, m(s.y), m(s.z)], contorno: pts };
       });
@@ -641,8 +671,11 @@ export function gerarPassos(T) {
       const oid = proximo();
       const furos = it.rasgo ? [{ retangulo: { largura: m(it.rasgo.largura), profundidade: m(it.rasgo.comprimento), centro: [m(-it.rasgo.centro[1]), m(it.rasgo.centro[0])], cantos: m(it.rasgo.largura / 2 - 0.01) } }] : undefined;
       passos.push(['extrusao', { origemId: oid, eixo: 'x', altura: m(it.espessura), perfil: it.contorno.map(([z, y]) => [m(-y), m(z)]), ...(furos ? { furos } : {}), segmentosArco: 4, em: [m(it.x0), 0, 0] }]);
-      marca(it.parte, it.material, { origem: { op: 'extrusao', id: oid } });
-      passos.push(['liso', { angulo: 30, sel: { origem: { op: 'extrusao', id: oid } } }]);
+      if (soldar(it)) (juntas.get(it.junta) ?? juntas.set(it.junta, []).get(it.junta)).push({ origem: { op: 'extrusao', id: oid } });
+      else {
+        marca(it.parte, it.material, { origem: { op: 'extrusao', id: oid } });
+        passos.push(['liso', { angulo: 30, sel: { origem: { op: 'extrusao', id: oid } } }]);
+      }
     } else if (it.k === 'pedal') {
       /* pedal de plataforma: placa maciça com borda levantada e seis pinos, igual nos dois lados */
       const larg = it.x1 - it.x0;
