@@ -12,7 +12,8 @@
  *   valência 5. As curvas têm ponto-chave a cada 100 mm. Na `rede-com-ruido` cada ponto-chave que não é nó (os nós são os pontos duros)
  *   sai da superfície em y pelo ruído declarado em `RUIDO` (amplitude `AMPLITUDE_DO_RUIDO_MM`, a sequência de ângulo áureo, sem sorteio),
  *   como uma curva digitada ponto a ponto; a `rede-sem-ruido` é a de controle. As curvas são cota exata (a superfície passa por elas). Cada
- *   retalho é uma parte (`grupos` da subdivisão), para medir por região.
+ *   retalho é uma parte (`grupos` da subdivisão), para medir por região. A `rede-alisada` é a `rede-com-ruido` com a opção `alisarCurvas`
+ *   da rede (`ALISAMENTO_DE_PROVA`), a prova da fatia 3.
  * - `chapa-simetrica` e `chapa-simetrica-espelhada`: a metade x >= 0 de uma casca de seção em quarto de elipse (600 mm de meia largura,
  *   500 mm de altura na crista em x = 0) ao longo de z de 0 a 1000 mm, com a meia largura caindo 10% nas pontas, `simetria: 'x'` na rede,
  *   2 mm de espessura, e um vão lateral por `aberturaPorContorno` no flanco, visto de +x (vista 'x', sentido '+'), o retângulo `VAO`. A
@@ -65,7 +66,7 @@ export const RUIDO = (() => {
 })();
 
 /** definicaoDaRede({ ruido }): a definição de `gaiolaPorRede` do painel, com ou sem o ruído declarado. */
-export function definicaoDaRede({ ruido = true, passo = 50 } = {}) {
+export function definicaoDaRede({ ruido = true, passo = 50, alisarCurvas = null } = {}) {
   const P = (x, z) => [x, painel(x, z), z];
   const nos = Object.fromEntries(Object.entries(NOS_DA_REDE).map(([nome, [x, z]]) => [nome, P(x, z)]));
   const curvas = Object.entries(CURVAS_DA_REDE).map(([nome, pontos]) => ({
@@ -73,7 +74,7 @@ export function definicaoDaRede({ ruido = true, passo = 50 } = {}) {
     pontos: pontos.map((p, k) => (typeof p === 'string' ? p : [p[0], painel(p[0], p[1]) + (ruido ? RUIDO[nome][k] : 0), p[1]])),
   }));
   return {
-    passo, fora: [0, 1, 0], nos, curvas,
+    passo, fora: [0, 1, 0], nos, curvas, ...(alisarCurvas ? { alisarCurvas } : {}),
     retalhos: [
       { nome: 'A', borda: [{ curva: 'baixo', de: 'N00', ate: 'N10' }, { curva: 'centro', de: 'N10', ate: 'N11' }, { curva: 'meio', de: 'N11', ate: 'N01' }, { curva: 'esquerda', de: 'N01', ate: 'N00' }] },
       { nome: 'B', borda: [{ curva: 'baixo', de: 'N10', ate: 'N20' }, { curva: 'direita', de: 'N20', ate: 'N21' }, { curva: 'meio', de: 'N21', ate: 'N11' }, { curva: 'centro', de: 'N11', ate: 'N10' }] },
@@ -91,12 +92,16 @@ export function pontosDosRetalhos(g) {
   return Object.fromEntries([...dentro].map(([r, s]) => [r, [...s].sort()]));
 }
 
+/** O alisamento das curvas da `rede-alisada`: a `rede-com-ruido` com a opção `alisarCurvas` da rede, os nós fixos e o limite de deslocamento
+ *  (a chapa de prova não tem prancha) um pouco acima da amplitude do ruído, para o alisamento poder devolver a curva à superfície. */
+export const ALISAMENTO_DE_PROVA = Object.freeze({ tolerancia: 2.5 });
+
 /** A receita da rede: a superfície (sem espessura, uma pele) em nível 2, com uma parte por retalho. */
-function receitaDeRede(nome, { ruido }) {
-  const g = gaiolaPorRede(definicaoDaRede({ ruido }));
+function receitaDeRede(nome, { ruido, alisarCurvas = null }) {
+  const g = gaiolaPorRede(definicaoDaRede({ ruido, alisarCurvas }));
   const grupos = Object.entries(pontosDosRetalhos(g)).map(([r, pontos]) => ({ nome: r, pontos }));
   return {
-    meta: { nome: `correcao-de-superficie/${nome}`, desc: `painel de prova da gaiola por rede ${ruido ? `com as curvas digitadas com ruído de ${AMPLITUDE_DO_RUIDO_MM} mm` : 'sem ruído, o de controle'}` },
+    meta: { nome: `correcao-de-superficie/${nome}`, desc: `painel de prova da gaiola por rede ${ruido ? `com as curvas digitadas com ruído de ${AMPLITUDE_DO_RUIDO_MM} mm${alisarCurvas ? ', alisadas pela opção alisarCurvas' : ''}` : 'sem ruído, o de controle'}` },
     PARAMS: {},
     TOPO: { origem: 'canto do painel em x = 0 e z = 0, y para fora', ...g.pontos },
     PASSOS: [
@@ -244,10 +249,11 @@ function planoDeProva(objeto, milimetros, partes) {
 export function receitaDeProva(nome) {
   if (nome === 'rede-com-ruido') return receitaDeRede(nome, { ruido: true });
   if (nome === 'rede-sem-ruido') return receitaDeRede(nome, { ruido: false });
+  if (nome === 'rede-alisada') return receitaDeRede(nome, { ruido: true, alisarCurvas: ALISAMENTO_DE_PROVA });
   if (nome === 'chapa-simetrica') return receitaDaChapaSimetrica(nome, { espelhada: false });
   if (nome === 'chapa-simetrica-espelhada') return receitaDaChapaSimetrica(nome, { espelhada: true });
   if (Object.hasOwn(EMENDAS, nome)) return receitaDaEmenda(nome);
   throw new Error(`chapa de prova '${nome}' não existe; use ${CHAPAS_DE_PROVA.join(', ')}`);
 }
 
-export const CHAPAS_DE_PROVA = Object.freeze(['rede-com-ruido', 'rede-sem-ruido', 'chapa-simetrica', 'chapa-simetrica-espelhada', ...Object.keys(EMENDAS)]);
+export const CHAPAS_DE_PROVA = Object.freeze(['rede-com-ruido', 'rede-sem-ruido', 'rede-alisada', 'chapa-simetrica', 'chapa-simetrica-espelhada', ...Object.keys(EMENDAS)]);

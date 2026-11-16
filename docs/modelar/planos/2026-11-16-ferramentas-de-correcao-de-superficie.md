@@ -51,7 +51,7 @@ Resolver a gaiola inteira por energia (Halstead, Kass e DeRose, 1993): ADIAR, s�
 
 ## Gate de saída
 
-1. Na rede de prova com ruído, o alisamento leva o índice de suavidade e o pente a menos da metade, com os pontos duros fixos e a silhueta dentro de 1 mm, por teste.
+1. Na rede de prova com ruído, o alisamento tira mais de nove décimos do excesso do índice de suavidade sobre o controle sem ruído nos retalhos regulares, leva o desvio do pente ao controle a menos da metade e não cria salto que o controle não tenha, com os pontos duros fixos e o deslocamento dentro da tolerância declarada, por teste. Reescrito em 2026-11-16 na fatia 3: o índice bruto e a contagem de saltos não caem à metade onde vêm do preenchimento e do vértice extraordinário, que o controle sem ruído já tem.
 2. Na chapa simétrica, o vão declarado num lado sai nos dois, com a malha fechada e a costura em x 0 exato, por teste; o repro da rodada 2 passa.
 3. Nas chapas emendadas, `emendas` mede o ângulo e a razão de curvatura dentro do declarado (G1 abaixo de 0,5 grau; G2 com a razão abaixo de 1,2) fora dos vértices extraordinários, por teste.
 4. O relatório do G2 alcançável, por região, nas chapas e no quarto traseiro, com a decisão da pessoa sobre o caminho escrita aqui.
@@ -62,7 +62,7 @@ Resolver a gaiola inteira por energia (Halstead, Kass e DeRose, 1993): ADIAR, s�
 
 1. Feita: as chapas de prova e a linha de base medida (índice, pente, emendas, G2 por região), incluindo o quarto traseiro da rodada 2.
 2. Feita: o corte com simetria e a costura em x 0 exato (opções `costuraExata` da subdivisão e `simetria` da abertura, sem mudar o acervo), que destrava a rodada 3 mais cedo.
-3. O alisamento das curvas declaradas.
+3. Feita: o alisamento das curvas declaradas (`alisarCurvas` em `gaiolaPorRede`, curva de variação mínima linearizada com os pontos duros fixos e o deslocamento limitado).
 4. A emenda com continuidade declarada.
 5. A medida do G2 alcançável e a decisão da pessoa sobre o caminho.
 6. Revisão adversarial, documentação e fechamento.

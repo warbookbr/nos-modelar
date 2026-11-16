@@ -34,6 +34,7 @@ const PASTA = 'tools/fixtures/correcao-de-superficie';
 export const ALVOS = Object.freeze({
   'rede-com-ruido': { cortes: ['z:125', 'z:375', 'x:250', 'x:750'] },
   'rede-sem-ruido': { cortes: ['z:125', 'z:375', 'x:250', 'x:750'] },
+  'rede-alisada': { cortes: ['z:125', 'z:375', 'x:250', 'x:750'] },
   'chapa-simetrica': { lado: 'centro', cortes: ['z:250', 'z:500', 'z:750'] },
   'chapa-simetrica-espelhada': { lado: 'centro', cortes: ['z:250', 'z:500', 'z:750'] },
   'emenda-g0': { cortes: ['z:200'] },

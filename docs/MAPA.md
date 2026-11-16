@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2030 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2034 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -964,6 +964,8 @@
 
 - `CLAUDE.md` — Núcleo: o que só vale nesta pasta
 - `adaptador.js` — adaptador.js — projeção visual do neutro; não conhece receitas nem execução.
+- `alisar-curvas.js` — alisar-curvas.js — os pontos-chave de uma curva declarada alisados pela curva de variação mínima linearizada
+- `alisar-curvas.test.mjs` — alisar-curvas.test.mjs — a curva de variação mínima linearizada: não mexe no arco, no círculo nem na parábola, tira o ruído, deixa os pontos duros onde estão…
 - `animacao.js` — animacao.js — animação rígida e skinning sobre lotes já adaptados.
 - `aparar.test.ts` — aparar.test.ts — `aparar`: o sólido cortado pelo lado de dentro de uma chapa subdividida, a `folga` da pele de dentro dela. Mede, numa calota de gaiola de ci…
 - `apoio-do-vinco.js` — apoio-do-vinco.js — o raio de uma aresta de caráter, em milímetro, convertido na distância das colunas de apoio.
@@ -2739,6 +2741,7 @@
 
 ## tools/fixtures/correcao-de-superficie/
 
+- `alisamento.test.mjs` — alisamento.test.mjs — o gate 1 do plano das ferramentas de correção de superfície (fatia 3): na `rede-com-ruido`, a opção `alisarCurvas` da rede leva o exces…
 - `chapas.mjs` — chapas.mjs — as chapas de prova do plano das ferramentas de correção de superfície (`docs/modelar/planos/2026-11-16-ferramentas-de-correcao-de-superficie.md`…
 - `chapas.test.mjs` — chapas.test.mjs — as chapas de prova do plano das ferramentas de correção de superfície: cada uma monta sem órfão, com a forma e o defeito declarados em `cha…
 - `linha-de-base.mjs` — linha-de-base.mjs — a linha de base do plano das ferramentas de correção de superfície: as quatro medidas de superfície (`suavidade`, `pente`, `emendas`, `on…
@@ -2762,6 +2765,10 @@
 ## tools/fixtures/correcao-de-superficie/emenda-g2/
 
 - `receita.js` — correcao-de-superficie/emenda-g2/receita.js — a chapa de prova 'emenda-g2' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
+
+## tools/fixtures/correcao-de-superficie/rede-alisada/
+
+- `receita.js` — correcao-de-superficie/rede-alisada/receita.js — a chapa de prova 'rede-alisada' de `../chapas.mjs`: a rede com ruído com as curvas alisadas pela opção `alis…
 
 ## tools/fixtures/correcao-de-superficie/rede-com-ruido/
 

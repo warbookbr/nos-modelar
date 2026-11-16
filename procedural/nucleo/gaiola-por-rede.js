@@ -19,6 +19,8 @@
  *   cantos: nomes de nós que ficam canto vivo além dos achados.
  *   simetria: 'x' declara a metade x >= 0, que o passo espelha.
  *   prefixo: texto posto na frente do nome de todo ponto.
+ *   alisarCurvas: true | { energia?, rigidez?, tolerancia?, silhueta?, iteracoes?, curvas?, pontosDuros? } alisa os pontos-chave das curvas
+ *     pela curva de variação mínima antes de montar a gaiola, com os nós fixos; tolerancia é o maior deslocamento em mm (1 por padrão).
  * devolve: { pontos, passo, linha(curva), pontoDaCurva, linhas, nos, curvas, retalhos, densidades, extraordinarios, avisos, ... }.
  * exemplo:
  *   gaiolaPorRede({ passo: 50, fora: [0, 1, 0], nos: { A: [0, 0, 0], B: [200, 0, 0], C: [200, 0, 200], D: [0, 0, 200] },
@@ -76,6 +78,8 @@
  * liso: true (padrão), false ou { iteracoes (2), energia ('variacao' ou 'placa'), ancora }: o alisamento do miolo, descrito em A CONTINUIDADE.
  * anguloDeCanto: o desvio de direção (graus, 35 por padrão) a partir do qual o encontro de duas arestas de borda é canto vivo; cantos:
  *   nomes de nós que ficam canto vivo além dos achados. simetria: 'x', como em `gaiolaPorEstacoes`. prefixo: texto posto na frente dos nomes.
+ * alisarCurvas: true | { energia, rigidez, tolerancia, silhueta, iteracoes, curvas, pontosDuros }: o alisamento das curvas declaradas, descrito
+ *   em O ALISAMENTO DAS CURVAS. Sem ele (o padrão), as curvas passam pelos pontos-chave como foram escritos.
  *
  * O PREENCHIMENTO. Os pontos da borda de cada retalho são os das curvas, à mesma distância de arco um do outro em cada arco.
  * No retalho de quatro lados o interior é a interpolação transfinita de Coons: P(u, v) = (1-v) A(u) + v C(u) + (1-u) D(v) + u B(v)
@@ -96,6 +100,18 @@
  * `liso: { iteracoes, energia, ancora }` ajusta o alisamento. A gaiola traz em `continuidade` o salto de tangente de cada curva
  * compartilhada (o ângulo entre as normais das faces da gaiola dos dois lados, em graus; numa superfície lisa sobra a curvatura entre as
  * faces) e em `alisamento` o maior deslocamento.
+ *
+ * O ALISAMENTO DAS CURVAS. O `liso` alisa o miolo com as curvas fixas, e por isso não alcança a ondulação que nasce da digitação ponto a
+ * ponto das curvas: o preenchimento herda a curvatura delas. Com `alisarCurvas`, cada curva escolhida (`curvas`, todas as que não são
+ * poligonais por padrão) tem os pontos-chave alisados por `alisarPontosDaCurva` (`alisar-curvas.js`, a curva de variação mínima
+ * linearizada de Moreton e Séquin) antes de a Catmull-Rom passar por eles. Ficam onde estão, bit a bit, os nós (o ponto-chave escrito como
+ * nome), as pontas da curva aberta e os pontos que `pontosDuros: { curva: [k] }` declara (k é a posição na lista de pontos da curva); o nó
+ * em `cantos`, e o nó onde a poligonal dos pontos-chave vira mais que `anguloDeCanto`, parte a curva em trechos alisados à parte. Nenhum
+ * ponto anda mais que `tolerancia` mm (1 por padrão), e com `silhueta: { vista, tolerancia }` o deslocamento visto pela vista ('x', 'y'
+ * ou 'z', o eixo para onde a vista olha) não passa da tolerância dela: as curvas lidas da prancha ficam na silhueta dela, e o que se mexe
+ * é a profundidade. `energia` ('variacao' ou 'curvatura'), `rigidez` (1000) e `iteracoes` (2) vão para `alisarPontosDaCurva`. A saída
+ * ganha `alisamentoDasCurvas`, com as opções, e por curva os pontos duros, os de corte, os limitados, o deslocamento de cada ponto-chave
+ * em mm e a energia antes e depois. O nó dado por { curva, fracao } fica na curva alisada. Sem a opção, nada muda.
  *
  * Os vértices extraordinários (valência diferente de 4 no interior, de 2 a 3 na borda) saem declarados, pelo nome, em `extraordinarios`:
  * os nós onde três ou cinco retalhos se encontram, os centros dos retalhos de n lados e o que a borda deixar.
@@ -123,6 +139,7 @@ import { alteracoesDaRede, assinaturaDaRede, divisoesFixadas, registrarGaiola } 
 import { curvaCentripeta } from './gaiola-interpolada.js';
 import { extraordinarios as extraordinariosDa } from './gaiola-aneis.js';
 import { alisarMioloNaNormal } from './gaiola-por-rede-liso.js';
+import { alisarPontosDaCurva, lerOpcoesDoAlisamento } from './alisar-curvas.js';
 
 const MM = 1000;
 const AMOSTRAS_POR_TRECHO = 96;
@@ -364,6 +381,40 @@ function lerLeitura(l) {
   return o;
 }
 
+/* A opção `alisarCurvas`: true, ou { energia, rigidez, tolerancia, silhueta, iteracoes, curvas, pontosDuros }. Devolve null (sem a opção),
+   ou { opcoes (as de `alisarPontosDaCurva`), curvas: Set de nomes, pontosDuros: Map curva -> Set de índices de ponto-chave }. */
+function lerAlisarCurvas(a, declaradas) {
+  if (a == null || a === false) return null;
+  const x = a === true ? {} : a;
+  if (!x || typeof x !== 'object' || Array.isArray(x)) falha(`alisarCurvas é ${JSON.stringify(a)}; use true ou { energia, rigidez, tolerancia, silhueta, iteracoes, curvas, pontosDuros }`);
+  exigirCampos(x, ['energia', 'rigidez', 'tolerancia', 'silhueta', 'iteracoes', 'curvas', 'pontosDuros'], 'alisarCurvas');
+  const { curvas: escolhidas, pontosDuros, ...resto } = x;
+  let opcoes;
+  try { opcoes = lerOpcoesDoAlisamento(resto, 'alisarCurvas'); } catch (e) { falha(e.message.replace(/^alisar curvas: /, '')); }
+  const lisas = [...declaradas.values()].filter((c) => !c.poligonal).map((c) => c.nome);
+  let curvas;
+  if (escolhidas == null) curvas = new Set(lisas);
+  else {
+    if (!Array.isArray(escolhidas) || escolhidas.some((n) => typeof n !== 'string')) falha(`alisarCurvas.curvas é ${JSON.stringify(escolhidas)}; use a lista dos nomes das curvas a alisar (sem ela, todas as que não são poligonais)`);
+    for (const n of escolhidas) {
+      if (!declaradas.has(n)) falha(`alisarCurvas.curvas cita a curva ${citar(n)}, que não existe; as curvas são ${lista([...declaradas.keys()])}`);
+      if (declaradas.get(n).poligonal) falha(`alisarCurvas.curvas cita a curva poligonal ${citar(n)}; a poligonal tem os cantos nos pontos e não se alisa`);
+    }
+    curvas = new Set(escolhidas);
+  }
+  const duros = new Map();
+  if (pontosDuros != null) {
+    if (!pontosDuros || typeof pontosDuros !== 'object' || Array.isArray(pontosDuros)) falha(`alisarCurvas.pontosDuros é ${JSON.stringify(pontosDuros)}; use { curva: [índices dos pontos-chave, de 0] }`);
+    for (const [n, ks] of Object.entries(pontosDuros)) {
+      if (!declaradas.has(n)) falha(`alisarCurvas.pontosDuros cita a curva ${citar(n)}, que não existe; as curvas são ${lista([...declaradas.keys()])}`);
+      const total = declaradas.get(n).pontos.length;
+      if (!Array.isArray(ks) || ks.some((k) => !(Number.isInteger(k) && k >= 0 && k < total))) falha(`alisarCurvas.pontosDuros da curva ${citar(n)} é ${JSON.stringify(ks)}; use índices de ponto-chave de 0 a ${total - 1}`);
+      duros.set(n, new Set(ks));
+    }
+  }
+  return { opcoes, curvas, pontosDuros: duros };
+}
+
 /* ----------------------------------------------------------------- sistema */
 
 /* As divisões de cada arco. `linhas`: { termos: Map(variável -> coeficiente), rhs, texto } com a soma dos termos igual a rhs; `alvos`: Map
@@ -492,7 +543,7 @@ export function gaiolaPorRede(definicaoDada) {
       retalhos: definicaoDada.retalhos.flatMap((r) => (r && alt.acrescentar?.retalhos?.[r.nome] ? alt.acrescentar.retalhos[r.nome] : [r])),
     }
     : definicaoDada;
-  exigirCampos(definicao, ['curvas', 'nos', 'retalhos', 'passo', 'anguloMax', 'fora', 'leitura', 'interior', 'liso', 'anguloDeCanto', 'cantos', 'simetria', 'prefixo'], 'a definição da rede');
+  exigirCampos(definicao, ['curvas', 'nos', 'retalhos', 'passo', 'anguloMax', 'fora', 'leitura', 'interior', 'liso', 'anguloDeCanto', 'cantos', 'simetria', 'prefixo', 'alisarCurvas'], 'a definição da rede');
   const { simetria = null, prefixo = '' } = definicao;
   if (simetria !== null && simetria !== 'x') falha("simetria só aceita 'x'");
   if (typeof prefixo !== 'string') falha('prefixo precisa ser texto');
@@ -518,6 +569,9 @@ export function gaiolaPorRede(definicaoDada) {
   const leitura = lerLeitura(definicao.leitura);
   const declaradas = lerCurvasDeclaradas(definicao.curvas);
   const nosDeclarados = lerNosDeclarados(definicao.nos, declaradas);
+  const alisarCurvas = lerAlisarCurvas(definicao.alisarCurvas, declaradas);
+  const cantosDeclarados = new Set(Array.isArray(definicao.cantos) ? definicao.cantos : []);
+  const relatorioDoAlisamento = alisarCurvas ? new Map() : null;
   const pref = (n) => `${prefixo}${n}`;
 
   /* ---- a geometria das curvas e a posição dos nós, avaliadas sob demanda ---- */
@@ -538,7 +592,8 @@ export function gaiolaPorRede(definicaoDada) {
     if (andando.has(`c:${nome}`)) falha(`a curva ${citar(nome)} depende de si mesma por um nó dela`);
     andando.add(`c:${nome}`);
     const d = declaradas.get(nome);
-    const chaves = d.pontos.map((p) => (typeof p === 'string' ? posicaoDoNo(p, `a curva ${citar(nome)}`) : p));
+    let chaves = d.pontos.map((p) => (typeof p === 'string' ? posicaoDoNo(p, `a curva ${citar(nome)}`) : p));
+    if (alisarCurvas && alisarCurvas.curvas.has(nome)) chaves = alisarChaves(nome, d, chaves);
     for (let j = 0; j + 1 < chaves.length; j++) if (!(norma(sub(chaves[j + 1], chaves[j])) > 0)) falha(`a curva ${citar(nome)} repete o ponto-chave: o ${j + 1}º e o ${j + 2}º são iguais`);
     if (d.fechada && !(norma(sub(chaves[0], chaves[chaves.length - 1])) > 0)) falha(`a curva fechada ${citar(nome)} repete o primeiro ponto-chave no fim; a volta fecha sozinha`);
     const c = criarCurva(nome, chaves, d.fechada, d.poligonal);
@@ -547,6 +602,35 @@ export function gaiolaPorRede(definicaoDada) {
     curvas.set(nome, c);
     return c;
   };
+  /* O ALISAMENTO DAS CURVAS (`alisarCurvas`): os pontos-chave de cada curva escolhida passam pela curva de variação mínima linearizada
+     (`alisar-curvas.js`) antes de a curva ser feita. Os nós (o ponto-chave que é nome) e as pontas da curva aberta são duros, como os que
+     `pontosDuros` declara; o nó em canto (de `cantos`, ou onde a poligonal dos pontos-chave vira mais que `anguloDeCanto`) parte a curva
+     em trechos alisados à parte. O nó dado por { curva, fracao } fica na curva alisada. */
+  function alisarChaves(nome, d, chaves) {
+    const n = chaves.length;
+    const duros = []; const partir = [];
+    const limiteDoCanto = typeof anguloDeCanto === 'number' ? anguloDeCanto : null;
+    d.pontos.forEach((p, k) => {
+      if (typeof p === 'string') duros.push(k);
+      if (alisarCurvas.pontosDuros.get(nome)?.has(k)) duros.push(k);
+      const tem = d.fechada || (k > 0 && k < n - 1);
+      if (!tem) return;
+      if (typeof p === 'string' && cantosDeclarados.has(p)) { partir.push(k); return; }
+      if (limiteDoCanto === null || !duros.includes(k)) return;
+      const a = chaves[(k - 1 + n) % n]; const b = chaves[k]; const c = chaves[(k + 1) % n];
+      const u = sub(b, a); const v = sub(c, b);
+      const cosseno = dot(u, v) / (norma(u) * norma(v));
+      if ((Math.acos(Math.max(-1, Math.min(1, cosseno))) * 180) / Math.PI > limiteDoCanto) partir.push(k);
+    });
+    const r = alisarPontosDaCurva(chaves, { ...alisarCurvas.opcoes, fechada: d.fechada, duros: [...new Set(duros)], partir, onde: `alisarCurvas na curva ${citar(nome)}` });
+    const r4 = (x) => Math.round(x * 1e4) / 1e4;
+    relatorioDoAlisamento.set(nome, {
+      pontos: n, duros: r.duros, partida: partir, limitados: r.limitados,
+      deslocamentosMm: r.deslocamentos.map(r4), maiorDeslocamentoMm: r4(r.maiorDeslocamento),
+      variacaoAntes: r4(r.variacaoAntes), variacaoDepois: r4(r.variacaoDepois),
+    });
+    return r.pontos;
+  }
   for (const nome of declaradas.keys()) curvaDe(nome);
 
   /* ---- os nós e os nós de cada curva ---- */
@@ -1303,6 +1387,14 @@ export function gaiolaPorRede(definicaoDada) {
     pontos, passo, linha, pontoDaCurva, linhas: linhasDasCurvas, nos: nosSaida, curvas: curvasSaida, retalhos: retalhosSaida, densidades,
     extraordinarios: extra, cantos: cantosAchados, continuidade, alisamento, avisos, origens: ordenadas, entradas, estrutura, fixacao,
   };
+  if (alisarCurvas) {
+    const curvasDoRelatorio = Object.fromEntries([...relatorioDoAlisamento].sort((a, b) => (a[0] < b[0] ? -1 : 1)));
+    saida.alisamentoDasCurvas = {
+      ...alisarCurvas.opcoes,
+      curvas: curvasDoRelatorio,
+      maiorDeslocamentoMm: Math.max(0, ...Object.values(curvasDoRelatorio).map((c) => c.maiorDeslocamentoMm)),
+    };
+  }
   registrarGaiola(saida);
   return saida;
 }
