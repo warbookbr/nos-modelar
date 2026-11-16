@@ -120,7 +120,13 @@ export const TABELA = {
   canote_diametro: 27,
   canote_dentro: 120,
   canote_total: 250,
-  selim_braco_raio: 11,
+  selim_braco_raio: 7,
+  /* a presilha: um bloco compacto sobre o canote, com o berço dos trilhos em cima e o parafuso embaixo, à frente */
+  presilha_largura: 30,
+  presilha_profundidade: 26,
+  presilha_altura: 13,
+  presilha_parafuso_raio: 3,
+  presilha_parafuso_comprimento: 10,
   /* cabeça do canote que segura a presilha, como na foto lateral */
   canote_cabeca_comprimento: 16,
   canote_cabeca_sobra: 2.5,
@@ -192,13 +198,28 @@ const SELIM_MEDIDO = {
   base: [[0, -17], [6, -21.5], [12, -24.5], [18, -26], [25, -31], [31, -35], [37, -38], [43, -40], [55, -42], [68, -43], [86, -43], [98, -42], [104, -40], [116, -38], [129, -36], [141, -34], [153, -31], [166, -29], [178, -27.5], [196, -27.5], [215, -29], [227, -29.5], [240, -28.5], [252, -26], [256, -25.6]],
   /* a meia distância entre os trilhos, medida de frente: abrem sob as abas e chegam à presilha a 22 mm do centro */
   trilhoX: [[58, 34], [80, 24], [95, 21], [135, 21], [165, 18], [184, 14]],
-  trilho: [[58, -40], [66, -56], [75, -60.5], [87, -62], [100, -63.5], [115, -64], [130, -62], [145, -57], [155, -51.5], [163, -46], [170, -41], [177, -35], [184, -25]],
+  /* o trilho de lado em três retas, como na foto: a descida curta sob a traseira, o trecho longo que passa pela presilha subindo
+     pouco, e a rampa até o nariz; só a dobra da frente é arredondada (raio trilhoRaio). A primeira e a última ponta entram na casca. */
+  trilhoCantos: [[60, -40], [74, -54], [150, -50], [186, -25]],
+  trilhoRaio: 14,
   abaCima: [[0, 0], [0.6, 0], [0.64, -0.021], [0.72, -0.045], [0.8, -0.089], [0.89, -0.179], [0.97, -0.334], [1, -0.62]],
   abaBaixo: [[0, -0.74], [0.3, -0.8], [0.45, -0.92], [0.55, -0.97], [0.64, -1], [0.72, -0.99], [0.8, -0.96], [0.89, -0.9], [0.97, -0.8], [1, -0.66]],
   planta: [[0, 8], [4, 30], [10, 48], [18, 62], [26, 70], [35, 74], [95, 74], [110, 66], [125, 48], [140, 32], [155, 24], [170, 22], [232, 19], [242, 17.5], [248, 15], [252, 12], [255, 8.5], [256, 6]],
   larguraAba: 74,
   larguraNariz: 22,
 };
+
+/* o caminho do trilho: as retas entre os cantos, com o canto de índice 2 trocado por um arco de Bézier que começa e termina a
+   trilhoRaio dele; amostras a cada ~4 mm, para a interpolação linear seguir as retas */
+SELIM_MEDIDO.caminhoDoTrilho = (() => {
+  const c = SELIM_MEDIDO.trilhoCantos, r = SELIM_MEDIDO.trilhoRaio;
+  const rumo = (a, b) => { const d = Math.hypot(b[0] - a[0], b[1] - a[1]); return [(b[0] - a[0]) / d, (b[1] - a[1]) / d]; };
+  const [b, cc, d] = [c[1], c[2], c[3]];
+  const p1 = [cc[0] + rumo(cc, b)[0] * r, cc[1] + rumo(cc, b)[1] * r], p2 = [cc[0] + rumo(cc, d)[0] * r, cc[1] + rumo(cc, d)[1] * r];
+  const reta = (a, z, n) => Array.from({ length: n }, (_, i) => [a[0] + ((z[0] - a[0]) * i) / n, a[1] + ((z[1] - a[1]) * i) / n]);
+  const arco = Array.from({ length: 8 }, (_, i) => { const t = i / 8; const u = 1 - t; return [u * u * p1[0] + 2 * u * t * cc[0] + t * t * p2[0], u * u * p1[1] + 2 * u * t * cc[1] + t * t * p2[1]]; });
+  return [...reta(c[0], b, 4), ...reta(b, p1, 16), ...arco, ...reta(p2, d, 8), d];
+})();
 
 const rad = (g) => (g * Math.PI) / 180;
 const deg = (r) => (r * 180) / Math.PI;
@@ -397,7 +418,7 @@ export function derivar(T) {
   const SM = SELIM_MEDIDO;
   const rBraco = T.selim_braco_raio;
   const zDoSelim = (sMm) => apoio[2] - SM.presilha + sMm;
-  const yRef = apoio[1] + rBraco - 2 - interp(SM.trilho, SM.presilha);
+  const yRef = apoio[1] + rBraco - 2 - interp(SM.caminhoDoTrilho, SM.presilha);
   const centroSelim = [0, yRef, zDoSelim(SM.presilha)];
   /* planta (suposta, sem foto de cima): traseira redonda, largura cheia sob as abas, cintura e nariz estreito de ponta redonda */
   const meiaLargura = (sMm) => interp(SM.planta, sMm);
@@ -424,20 +445,18 @@ export function derivar(T) {
     secoes.push({ z: zDoSelim(sMm), y: yRef, pts });
   }
   itens.push({ k: 'selim', parte: 'selim', material: 'preto', secoes });
-  /* trilhos: o caminho medido de lado; a largura entre eles acompanha a planta */
+  /* trilhos: três retas pelos cantos medidos, com a dobra da frente em arco; a largura entre eles acompanha a planta */
   for (const lado of [-1, 1]) {
-    const trilho = [];
-    const [s0, s1] = [SM.trilho[0][0], SM.trilho[SM.trilho.length - 1][0]];
-    for (let i = 0; i <= 40; i++) {
-      const sMm = s0 + ((s1 - s0) * i) / 40;
-      trilho.push([lado * Math.min(interp(SM.trilhoX, sMm), 0.7 * meiaLargura(sMm)), yRef + interp(SM.trilho, sMm), zDoSelim(sMm)]);
-    }
+    const trilho = SM.caminhoDoTrilho.map(([sMm, y]) => [lado * Math.min(interp(SM.trilhoX, sMm), 0.7 * meiaLargura(sMm)), yRef + y, zDoSelim(sMm)]);
     tubo('selim', 'preto', trilho, trilho.map(() => raioQ(T.selim_trilho_diametro)), 12);
   }
   /* braçadeira pequena e escura sob o assento, sobre o topo do canote */
-  /* a presilha só abraça os dois trilhos, na distância deles sobre o canote */
+  /* a presilha, como na foto: o berço só abraça os dois trilhos, sobre um bloco compacto no topo do canote, com o parafuso embaixo */
   const xPresilha = interp(SELIM_MEDIDO.trilhoX, SELIM_MEDIDO.presilha) + T.selim_trilho_diametro / 2 + 3;
-  torno('selim', 'preto', [[0, -xPresilha], [rBraco, -xPresilha], [rBraco, xPresilha], [0, xPresilha]], [0, apoio[1] + rBraco - 2, apoio[2]], { lados: 20, liso: 40 });
+  const yBerco = apoio[1] + rBraco - 2;
+  torno('selim', 'preto', [[0, -xPresilha], [rBraco, -xPresilha], [rBraco, xPresilha], [0, xPresilha]], [0, yBerco, apoio[2]], { lados: 20, liso: 40 });
+  itens.push({ k: 'bloco', parte: 'selim', material: 'preto', larg: T.presilha_largura, alt: T.presilha_altura, prof: T.presilha_profundidade, em: [0, yBerco - T.presilha_altura, apoio[2]] });
+  tubo('selim', 'aco', [[0, yBerco - T.presilha_altura + 1, apoio[2] + T.presilha_profundidade / 4], [0, yBerco - T.presilha_altura - T.presilha_parafuso_comprimento, apoio[2] + T.presilha_profundidade / 4]], raioQ(2 * T.presilha_parafuso_raio), 12);
 
   /* RODAS: cubo, aro, pneu e raios no mesmo corpo */
   const rodas = [['rodaDianteira', zEixoFrente, T.eixo_dianteiro_largura], ['rodaTraseira', zEixoTras, T.eixo_traseiro_largura]];
@@ -662,6 +681,11 @@ export function gerarPassos(T) {
       const copias = proximo();
       passos.push(['arranja', { modo: 'radial', total: it.total, graus: it.graus, eixo: 'x', pivo: v(it.pivo), origemId: copias, derivaDe: { op: 'cubo', id: oid }, sel }]);
       marca(it.parte, it.material, { origem: { op: 'arranja', id: copias, de: { op: 'cubo', id: oid } } });
+    } else if (it.k === 'bloco') {
+      /* caixa de base em `em` (o centro da face de baixo) */
+      const oid = proximo();
+      passos.push(['cubo', { origemId: oid, larg: m(it.larg), alt: m(it.alt), prof: m(it.prof), em: v(it.em) }]);
+      marca(it.parte, it.material, { origem: { op: 'cubo', id: oid } });
     } else if (it.k === 'placa') {
       /* extrusão em x: o ponto [u, v] do perfil vai para y = -u, z = v */
       const oid = proximo();
