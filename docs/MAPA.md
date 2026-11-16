@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1973 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1974 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -578,6 +578,7 @@
 - `2026-11-14-prancha-menos-manual.md` — Prancha menos manual: desvio medido, leitura combinada de um comando e o que ficou de fora declarado
 - `2026-11-15-costura-em-no-de-tubos.md` — Cordão de solda na costura de tubos: o friso que segue a costura de uma união, e a costura em nó de tubos
 - `2026-11-15-reflexo-na-bancada.md` — Reflexo na bancada: a superfície de lataria julgada sem o Blender
+- `2026-11-16-comparar-com-a-referencia.md` — Comparar com a referência sem script: a prancha modelo e foto, a conferência da receita, a saída da bancada e o pacote do crítico
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
@@ -1295,7 +1296,7 @@
 
 ## procedural/pecas/bicicleta-urbana/
 
-- `receita.js` — bicicleta-urbana — bicicleta urbana de marcha única, peça inteira, de quadro médio e rodas 700c.
+- `receita.js` — bicicleta-urbana — bicicleta urbana de marcha única, peça inteira, de quadro médio e rodas de 670 mm.
 
 ## procedural/pecas/bicicleta-urbana/referencias/
 

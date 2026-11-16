@@ -1,0 +1,93 @@
+# Comparar com a referência sem script: a prancha modelo e foto, a conferência da receita, a saída da bancada e o pacote do crítico
+
+**Estado:** rascunho
+
+**Território:** a declarar ao ativar; deve ficar em `tools/modelar/` (a bancada de linha de comando e um comando novo de prancha), `tools/bancadas/` se a prancha for montada no navegador, e as skills `criar-peca`, `laco-de-modelagem` e o agente `modelador` na parte que diz como comparar. O plano do [cordão de solda](2026-11-15-costura-em-no-de-tubos.md) usa a bicicleta e não toca nessas pastas.
+
+**Responsável:** a IA da sessão implementa; Tiago aprova por imagem.
+
+**Repositório e base:** `warbookbr/nos-modelar`, main na ativação.
+
+## Problema observado
+
+Na sessão de 2026-11-13 a 2026-11-16 (furgão, cordão de solda e bicicleta), os 67 registros de agente (a sessão principal e 66 subagentes) somam 3.945 comandos de shell: 1.488 do implementador, 1.144 da sessão principal, 518 do modelador, 458 do revisor e 337 do agente geral; o crítico visual não roda shell, só abre imagens. A contagem, por padrão de comando, está na análise guardada fora do repositório, no scratchpad da sessão, e se refaz pelos registros com `npm run medir:transcricao` e um filtro por padrão.
+
+Uma parte desses comandos é o trabalho normal de ler, editar, testar e versionar (1.389 leituras, 836 edições por script, 547 rodadas de teste, 903 de git) e não é assunto deste plano. Outra parte é a mesma tarefa reescrita à mão a cada vez, com a mesma forma:
+
+- montar a prancha do modelo ao lado da foto: 163 scripts de imagem, 133 da sessão principal e 26 do modelador, cada um recortando, escalando e colando de novo;
+- conferir se a receita gera sem recusa: 188 scripts de uma linha com `nucleo(gerarPassos(TABELA))`, e um modelador concluiu errado que o motor não devolvia as recusas;
+- apagar a pasta de saída antes da bancada, que não sobrescreve: 86 `rm -rf`, com 8 rodadas perdidas porque a pasta já existia;
+- separar uma das cópias de uma parte repetida (os dois pedais) recortando a imagem por script, porque o isolamento pega a parte inteira;
+- preparar a pasta do crítico, copiando e recortando as vistas e as fotos a cada rodada (sete vezes só no selim).
+
+Nas sete rodadas de modelador da bicicleta, 41 dos 83 comandos de shell foram prancha, apagar saída, conferir o motor e medir a foto. Além do custo, a conta manual é onde o erro entra sem aviso: a régua da foto frontal errada no começo, o contorno do selim invertido e a escala diferente entre as metades de uma prancha do pedal saíram desses scripts.
+
+O crítico do selim deu 5, 7, 5, 6, 7 e 5 em rodadas que mudavam pouco, e se contradisse (abas cheias demais numa, finas demais na seguinte). As fotos do selim eram pequenas e o crítico julgava a olho, sem a medida; a espessura que ele disse estar o dobro batia com a foto ponto a ponto quando medida.
+
+A análise também mostrou o que não deve virar ferramenta fechada. A medição na foto usou mais de doze limiares e máscaras diferentes (cor para o garfo cinza-azulado contra o pneu preto, luminância para o selim, o primeiro trecho escuro de cada coluna para a silhueta, o maior trecho para as orelhas), varreu por linha ou por coluna conforme a peça, e o recorte foi escolhido à mão em 58 casos e pela extensão da peça em 43. Essa liberdade é o que fez a medida servir a cada peça. E a bancada já tinha uma parte do que faltou: `--zoom=<vista>:mm:<caixa>` recorta uma caixa em mm da peça, mas só com `--analise`, e ninguém a usou para o pedal.
+
+## Resultado
+
+Um comando monta a prancha do modelo ao lado da foto na mesma escala, por régua declarada, a partir de vistas que a bancada gera ou de imagens já geradas; a bancada sobrescreve a saída quando pedido e enquadra uma cópia de parte repetida; a conferência da receita sem recusa é um comando; e o pacote do crítico sai pronto, com o contorno medido sobreposto quando houver. A medição livre na foto continua por script, com a régua e o recorte da prancha disponíveis como parâmetros.
+
+## Filtro Agent-First
+
+Prancha modelo e referência: ENVOLVER. A intenção é "ponha esta vista da peça ao lado desta foto, na mesma escala". Um comando com parâmetros (`--foto`, `--regiao` em px da foto, `--regua` como `<px>=<mm>` numa medida da foto, `--vistas`, `--parte` para isolar, `--disposicao=lado|sobreposto|grade`) cobre os 163 casos medidos; recorte à mão e por extensão viram as duas formas de `--regiao` (caixa em px, ou `auto` pela extensão). O script de imagem continua permitido para o caso que o comando não cobre, e cada caso assim vira registro de atrito, não regra nova.
+
+Conferência da receita: ENVOLVER `descrever`. A intenção é "esta receita gera sem recusa, e qual é a primeira". Uma opção curta (`--recusas`) que roda só o motor e imprime as recusas com passo, operação e motivo, filtrando as de material quando pedido, evita o script de uma linha e o engano sobre onde as recusas aparecem.
+
+Saída da bancada: REFATORAR `olhar-bancada` com `--sobrescrever`, que apaga só a pasta pedida e só se ela tiver sido criada pela bancada (um marcador dentro dela), para não virar um `rm -rf` de qualquer caminho.
+
+Cópia de parte repetida: REFATORAR. Primeiro medir se `--zoom=<vista>:mm:<caixa>` fora de `--analise` basta; se bastar, a mudança é liberar o zoom em mm para as vistas comuns e dizer na ajuda de `--selecionadas` que ele isola uma cópia. Só se não bastar entra uma escolha de instância por lado ou índice.
+
+Pacote do crítico: ENVOLVER a prancha. O comando grava a pasta com as vistas recortadas e as fotos, o brief com as instruções de orientação já usadas nesta sessão (de que lado cada vista olha, o que a foto esconde) e, quando a peça tiver contorno medido, a sobreposição do contorno da foto sobre a vista, para o crítico julgar a medida e não só a impressão.
+
+Medição livre na foto: ADIAR, de propósito. Fica por script, porque a máscara, o sentido da varredura e o trecho escolhido mudam com a peça; a skill [contorno da imagem](../../../.claude/skills/contorno-da-imagem/SKILL.md) já cobre o contorno de parte inteira. O que o plano oferece a ela é a régua e o recorte da prancha como parâmetros reaproveitáveis.
+
+Sonda de teste fora de `tools/`: ADIAR. A sessão copiou 117 vezes um teste de `tmp/` para `tools/zz-*.test.ts` para o vitest o achar, e renderizou `.obj` da fixture no Blender 44 vezes porque a bancada só mostra peça. Os dois são do trabalho de núcleo e ficam no backlog, com a contagem.
+
+Envio por git: USAR DIRETO. A rotina de envio é sensível e depende da sessão; fica manual.
+
+## Incluído
+
+- o comando de prancha com régua, região, vistas, isolamento e disposição, e a prova em duas peças com referência (a bicicleta e uma do acervo com foto);
+- `--recusas` em `descrever`;
+- `--sobrescrever` em `olhar-bancada`, com o marcador de pasta criada pela bancada;
+- a cópia de parte repetida, primeiro pelo zoom em mm;
+- o pacote do crítico com o contorno sobreposto quando houver;
+- a skill `criar-peca`, a do laço e o agente `modelador` dizendo quando usar o comando e quando o script livre continua sendo o caminho.
+
+## Excluído
+
+- a medição livre na foto como ferramenta fechada;
+- a sonda fora de `tools/` e a vista da fixture sem Blender, que vão ao backlog;
+- a espera de comando longo em segundo plano (155 leituras de saída e 147 esperas), que é do ambiente e não do projeto;
+- o envio por git;
+- `medir:transcricao` não responde a `--ajuda` (lê a opção como arquivo); vai ao backlog como item curto.
+
+## Gate de saída
+
+1. Nas rodadas de forma da bicicleta refeitas como prova (o selim de lado e de frente e o pedal isolado), a prancha de cada uma sai com um comando, na mesma escala da foto pela régua declarada, e a pessoa confirma por imagem que lê como as pranchas feitas à mão nesta sessão.
+2. `descrever --recusas` dá a mesma lista que `nucleo(gerarPassos(TABELA)).orfaos` em três peças, uma delas com recusa de propósito.
+3. `olhar-bancada --sobrescrever` refaz a saída numa pasta que ela criou e recusa, com mensagem que diz o caminho, uma pasta que ela não criou.
+4. Um pedal da bicicleta sai isolado e enquadrado sozinho, sem recorte por script.
+5. Uma rodada de modelador com referência, medida por `medir:transcricao` e pelo filtro desta análise, usa no máximo um quarto dos comandos de prancha, saída e conferência da linha de base (41 em 83 nas sete rodadas da bicicleta), e nenhum script de medição livre foi impedido.
+6. O crítico recebe o pacote com o contorno sobreposto numa peça com contorno medido, e a revisão registra se a nota oscilou menos entre rodadas parecidas.
+7. Ajuda de cada comando com as opções novas, e a nota nas skills.
+
+## Fatias
+
+1. Linha de base: a contagem desta análise reproduzida por um comando sobre os registros, e a decisão de onde a prancha é montada (no navegador da bancada, que já lê jpg e webp, ou em Node com a foto convertida antes).
+2. `descrever --recusas` e `olhar-bancada --sobrescrever`, que são pequenas e tiram metade dos comandos repetidos.
+3. A prancha, com régua, região, vistas e isolamento, provada no selim e no pedal.
+4. A cópia de parte repetida, pelo zoom em mm ou pela escolha de instância.
+5. O pacote do crítico com o contorno sobreposto.
+6. Skills, agente, documentação e fechamento.
+
+## Riscos e parada
+
+Se a prancha precisar de mais de cinco opções novas para cobrir os casos medidos, o comando está tentando fechar o que é aberto: para, e a pessoa decide entre cortar opções e deixar o caso para o script. Se uma rodada de modelador com o comando passar a gastar mais chamadas do que sem ele, a ferramenta volta ao desenho. A medição livre na foto não entra em nenhuma fatia; se a pessoa quiser trazê-la, é outro plano.
+
+## Fechamento
+
+A preencher.
