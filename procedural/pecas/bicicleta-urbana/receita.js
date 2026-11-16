@@ -81,7 +81,7 @@ export const TABELA = {
   tubo_inferior_na_direcao: 62,
   lados_tubo: 48,
   tampa_conica: 0.6,
-  selim_tampa: 7,
+  selim_tampa: 3,
   /* garfo */
   garfo_offset: 45,
   garfo_eixo_a_coroa: 405,
@@ -130,7 +130,14 @@ export const TABELA = {
   selim_afundamento: 4,
   selim_trilho_curva: 26,
   selim_presilha_a_frente: 5,
-  selim_braco_raio: 8,
+  selim_braco_raio: 11,
+  /* a casca de baixo do selim, mais escura, aparece sob o estofado como na foto lateral */
+  selim_casca_espessura: 10,
+  selim_casca_abaixo: 3,
+  selim_casca_largura: 0.84,
+  /* cabeça do canote que segura a presilha, como na foto lateral */
+  canote_cabeca_comprimento: 16,
+  canote_cabeca_sobra: 2.5,
   selim_trilho_diametro: 6,
   selim_trilho_x: 28,
   /* largura do nariz, em fração da traseira; a cintura estreita de selim_cintura_inicio a selim_cintura_fim do comprimento */
@@ -378,6 +385,7 @@ export function derivar(T) {
   const baseCanote = T.tubo_selim_comprimento - T.canote_dentro;
   const topoCanote = baseCanote + T.canote_total;
   tubo('canote', 'preto', [noSelim(baseCanote), noSelim(topoCanote)], raioQ(T.canote_diametro), 16);
+  tubo('canote', 'preto', [noSelim(topoCanote - T.canote_cabeca_comprimento), noSelim(topoCanote - T.canote_cabeca_comprimento / 2), noSelim(topoCanote)], [raioQ(T.canote_diametro) + 0.5, raioQ(T.canote_diametro) + T.canote_cabeca_sobra, raioQ(T.canote_diametro) + T.canote_cabeca_sobra], 24);
   const apoio = noSelim(topoCanote);
   /* o assento fica atrás da presilha do canote por selim_presilha_a_frente: a presilha cai um pouco à frente do centro dele */
   const centroSelim = [0, 0, apoio[2] - T.selim_presilha_a_frente];
@@ -395,7 +403,7 @@ export function derivar(T) {
     /* o centro da seção segue a espessura antes do fecho das pontas: sem isso a ponta sobe até o topo e vira um lábio */
     const espCheia = esp;
     const fecha = (u) => Math.sqrt(Math.max(0.02, 1 - u * u));
-    if (t > 0.9) { const f = fecha((t - 0.9) / 0.1 * 0.8); larg *= f; esp *= 0.55 + 0.45 * f; }
+    if (t > 0.9) { const f = fecha((t - 0.9) / 0.1 * 0.95); larg *= f; esp *= 0.55 + 0.45 * f; }
     if (t < 0.06) { const f = fecha((0.06 - t) / 0.06 * 0.9); larg *= f; esp *= f; }
     const sela = T.selim_traseira_alta * (1 - Math.min(1, t / 0.45)) ** 2 - T.selim_cela * Math.sin(Math.PI * Math.min(1, Math.max(0, (t - 0.15) / 0.75))) ** 2;
     const yrel = -espCheia / 2 + T.selim_cupula * (1 - t) ** 2 + sela; /* a barriga sobe para o nariz; o topo segue a sela */
@@ -424,6 +432,10 @@ export function derivar(T) {
   for (const q of secoes) q.y = yBase + q.yrel;
   centroSelim[1] = yBase;
   itens.push({ k: 'selim', parte: 'selim', material: 'preto', secoes, base: centroSelim, apoioY: apoio[1] });
+  /* a casca: a mesma planta, um pouco mais estreita, rasa e baixa, de modo que só a faixa de baixo apareça sob o estofado */
+  const casca = secoes.filter((q) => q.t >= 0.04 && q.t <= 0.62).map((q) => ({ ...q, larg: q.larg * T.selim_casca_largura, esp: T.selim_casca_espessura, afunda: 0,
+    y: q.y - q.esp / 2 + T.selim_casca_espessura / 2 - T.selim_casca_abaixo }));
+  itens.push({ k: 'selim', parte: 'selim', material: 'borracha', secoes: casca, base: centroSelim, apoioY: apoio[1] });
   for (const lado of [-1, 1]) {
     const nT = 32;
     const trilho = [];
@@ -433,7 +445,7 @@ export function derivar(T) {
       const r = trilhoRel(t, i === 0 || i === nT ? 5 : 0);
       trilho.push([lado * r.x, yBase + r.y, zDoSelim(t)]);
     }
-    tubo('selim', 'aco', trilho, trilho.map(() => raioQ(T.selim_trilho_diametro)), 12);
+    tubo('selim', 'preto', trilho, trilho.map(() => raioQ(T.selim_trilho_diametro)), 12);
   }
   /* braçadeira pequena e escura sob o assento, sobre o topo do canote */
   torno('selim', 'preto', [[0, -T.selim_trilho_x - 4], [rBraco, -T.selim_trilho_x - 4], [rBraco, T.selim_trilho_x + 4], [0, T.selim_trilho_x + 4]], [0, apoio[1] + rBraco - 2, apoio[2]], { lados: 20, liso: 40 });
