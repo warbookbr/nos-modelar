@@ -39,6 +39,8 @@ Escamas da solda: ADIAR para o plano da ferramenta de material, como relevo que 
 - o perfil `cordao`, o chanfro posto em cada ponto no canto, com o sombreado próprio;
 - a robustez da união do cordão com os tubos, e o ponto triplo;
 - as junções do quadro da bicicleta refeitas com o cordão, com imagem para a pessoa;
+- a união que funde o canto novo que cai quase em cima de um canto de operando, em vez de recusar a casca: na bicicleta, a coroa do garfo de 398 a 402 mm e o topo dos estais em 48 e 52 mm recusam hoje a união do cordão (um canto do corte a 16 µm de um canto do cordão, ou uma aresta de 0,15 µm vinda da união dos tubos), e a saída foi desviar a medida;
+- o refinamento da malha do tubo perto da costura feito pela ferramenta, e não pela receita: hoje a bicicleta põe anéis a cada 4 mm na ponta de cada tubo soldado, num ajudante próprio, para o cordão não deixar triângulo longo, e toda peça nova com solda teria de repetir isso;
 - a nota em `GOTCHAS-POR-OPERACAO.md` e nas skills de modelagem dizendo que junta de tubos soldada se faz com `unir` e `friso` com `costura` e `cordao`.
 
 ## Excluído
@@ -57,19 +59,23 @@ Escamas da solda: ADIAR para o plano da ferramenta de material, como relevo que 
 5. Toda recusa nova cita o ponto e a saída, e tem teste que a cita (`recusas:check`).
 6. A pessoa vê as junções do selim, da caixa de direção e do movimento central da bicicleta, de perto e inteira, ao lado da foto, e aprova ou devolve.
 7. Documentação: a nota de uso e o registro das rodadas de forma e das medidas no banco de provas.
+8. Na bicicleta, a varredura da coroa do garfo de 395 a 405 mm e a do topo dos estais de 40 a 56 mm, de 1 em 1 mm, fecham a união do cordão sem recusa; e um teste com dois sólidos cujos cantos ficam a menos da tolerância declarada prova a fusão e a malha fechada.
+9. A receita da bicicleta declara a solda só com `unir`, `friso` com `costura` e `cordao`, e `unir` com `vincarCostura`, sem anéis próprios nas pontas dos tubos, e o cordão continua sem triângulo longo, medido como na fatia 3.
 
 ## Fatias
 
 1. Feita: a fixture do nó de tubos e a linha de base da recusa no ponto triplo (main 8b204c45).
 2. Feita: a linha da costura como fonte do `friso`, reamostrada e suavizada, com a normal média da superfície de cada sólido.
-3. O perfil `cordao` como chanfro enxuto, com o sombreado próprio, o defeito do alto da junção oblíqua corrigido e a união robusta nos casos de dois tubos; a forma já foi escolhida pela pessoa.
-4. O ponto triplo, revisado pelo revisor adversarial por ser mudança de núcleo.
-5. A bicicleta: as cinco juntas com o cordão, medição da peça e imagens para a pessoa.
-6. Documentação e fechamento.
+3. Feita: o perfil `cordao` como chanfro enxuto, com o sombreado próprio, o defeito do alto da junção oblíqua corrigido e a união robusta nos casos de dois tubos; a forma já foi escolhida pela pessoa.
+4. Feita: o ponto triplo, revisado pelo revisor adversarial por ser mudança de núcleo.
+5. Em andamento: a bicicleta, com as juntas com o cordão, a medição da peça e as imagens para a pessoa; espera a aprovação da forma.
+6. A fusão do canto quase coincidente na união, com a tolerância declarada e medida contra o retrato do acervo, e a varredura do gate 8; revisada pelo revisor adversarial por ser mudança de núcleo. Vem logo depois da aprovação da bicicleta, por ser a correção que mais custa a quem escreve receita.
+7. O refinamento perto da costura feito pela ferramenta, e a bicicleta sem os anéis próprios (gate 9).
+8. Documentação e fechamento.
 
 ## Riscos e parada
 
-Se o chanfro na bicicleta inteira não convencer a pessoa, o plano para e a forma volta a ser decidida com ela. Se a união do cordão com os tubos continuar falhando em algum caso da fixture depois de duas abordagens de robustez, o plano para e a pessoa decide entre a concordância só pelo `arredondarCostura` e uma operação que desloca a malha dos tubos sem booleana. Se o ponto triplo não fechar em duas abordagens, a pessoa decide entre terminar o cordão antes dele e adiar. Mudança que altere a malha de qualquer peça do acervo fora da bicicleta é motivo de parada, e não de atualização do retrato.
+Se o chanfro na bicicleta inteira não convencer a pessoa, o plano para e a forma volta a ser decidida com ela. Se a união do cordão com os tubos continuar falhando em algum caso da fixture depois de duas abordagens de robustez, o plano para e a pessoa decide entre a concordância só pelo `arredondarCostura` e uma operação que desloca a malha dos tubos sem booleana. Se o ponto triplo não fechar em duas abordagens, a pessoa decide entre terminar o cordão antes dele e adiar. Mudança que altere a malha de qualquer peça do acervo fora da bicicleta é motivo de parada, e não de atualização do retrato. Se a fusão da fatia 6 mudar a malha de alguma peça do acervo, ela fica restrita à união com `vincarCostura` e a pessoa decide se vale estendê-la; se não houver tolerância que feche a varredura sem mudar o acervo, a pessoa decide entre manter a recusa, que já diz o ponto, e outra abordagem.
 
 ## Fechamento
 
