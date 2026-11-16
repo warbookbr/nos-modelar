@@ -1,0 +1,304 @@
+{
+  "sessao": {
+    "janela": {
+      "ate": "2026-11-16T11:50:22Z"
+    },
+    "registros": 67,
+    "registrosPorTipo": {
+      "principal": 1,
+      "critico-visual": 15,
+      "implementador": 20,
+      "modelador": 12,
+      "revisor-adversarial": 10,
+      "general-purpose": 9
+    },
+    "comandos": 3945,
+    "comandosPorTipo": {
+      "principal": 1144,
+      "implementador": 1488,
+      "modelador": 518,
+      "revisor-adversarial": 458,
+      "general-purpose": 337
+    },
+    "padroes": {
+      "leitura": {
+        "comandos": 1389,
+        "falhas": 13,
+        "porTipo": {
+          "principal": 386,
+          "implementador": 665,
+          "modelador": 166,
+          "revisor-adversarial": 58,
+          "general-purpose": 114
+        }
+      },
+      "git": {
+        "comandos": 903,
+        "falhas": 15,
+        "porTipo": {
+          "principal": 394,
+          "implementador": 272,
+          "modelador": 53,
+          "revisor-adversarial": 83,
+          "general-purpose": 101
+        }
+      },
+      "saida-de-tarefa": {
+        "comandos": 160,
+        "falhas": 14,
+        "porTipo": {
+          "principal": 64,
+          "implementador": 48,
+          "revisor-adversarial": 14,
+          "modelador": 25,
+          "general-purpose": 9
+        }
+      },
+      "gates": {
+        "comandos": 99,
+        "falhas": 0,
+        "porTipo": {
+          "principal": 88,
+          "implementador": 11
+        }
+      },
+      "outro": {
+        "comandos": 757,
+        "falhas": 22,
+        "porTipo": {
+          "principal": 103,
+          "implementador": 218,
+          "modelador": 124,
+          "revisor-adversarial": 224,
+          "general-purpose": 88
+        }
+      },
+      "conferir-motor": {
+        "comandos": 188,
+        "falhas": 7,
+        "porTipo": {
+          "principal": 74,
+          "implementador": 69,
+          "modelador": 17,
+          "revisor-adversarial": 23,
+          "general-purpose": 5
+        }
+      },
+      "catalogo-mapa": {
+        "comandos": 192,
+        "falhas": 0,
+        "porTipo": {
+          "principal": 79,
+          "implementador": 80,
+          "modelador": 1,
+          "general-purpose": 24,
+          "revisor-adversarial": 8
+        }
+      },
+      "edicao-por-script": {
+        "comandos": 836,
+        "falhas": 10,
+        "porTipo": {
+          "principal": 245,
+          "implementador": 408,
+          "modelador": 88,
+          "revisor-adversarial": 34,
+          "general-purpose": 61
+        }
+      },
+      "teste": {
+        "comandos": 547,
+        "falhas": 2,
+        "porTipo": {
+          "principal": 139,
+          "implementador": 322,
+          "revisor-adversarial": 38,
+          "general-purpose": 47,
+          "modelador": 1
+        }
+      },
+      "descrever-medir": {
+        "comandos": 464,
+        "falhas": 8,
+        "porTipo": {
+          "principal": 74,
+          "implementador": 227,
+          "modelador": 104,
+          "revisor-adversarial": 52,
+          "general-purpose": 7
+        }
+      },
+      "bancada": {
+        "comandos": 166,
+        "falhas": 9,
+        "porTipo": {
+          "principal": 73,
+          "modelador": 87,
+          "implementador": 5,
+          "general-purpose": 1
+        }
+      },
+      "medir-foto": {
+        "comandos": 231,
+        "falhas": 3,
+        "porTipo": {
+          "principal": 82,
+          "modelador": 27,
+          "implementador": 107,
+          "revisor-adversarial": 4,
+          "general-purpose": 11
+        }
+      },
+      "blender": {
+        "comandos": 84,
+        "falhas": 3,
+        "porTipo": {
+          "principal": 56,
+          "modelador": 4,
+          "implementador": 23,
+          "general-purpose": 1
+        }
+      },
+      "prancha-por-script": {
+        "comandos": 163,
+        "falhas": 2,
+        "porTipo": {
+          "principal": 133,
+          "modelador": 26,
+          "implementador": 4
+        }
+      },
+      "sonda-de-teste": {
+        "comandos": 128,
+        "falhas": 1,
+        "porTipo": {
+          "principal": 117,
+          "revisor-adversarial": 10,
+          "implementador": 1
+        }
+      },
+      "apagar-saida": {
+        "comandos": 86,
+        "falhas": 8,
+        "porTipo": {
+          "principal": 60,
+          "modelador": 26
+        }
+      }
+    },
+    "avulsas": {
+      "saida-de-tarefa-lida": 155,
+      "espera-com-sleep": 147,
+      "blender-com-obj": 44
+    },
+    "alvo": 608
+  },
+  "rodadasDaBicicleta": {
+    "janela": {
+      "desde": "2026-11-16T10:54Z",
+      "ate": "2026-11-16T11:50:22Z",
+      "tipo": "modelador"
+    },
+    "registros": 7,
+    "registrosPorTipo": {
+      "modelador": 7
+    },
+    "comandos": 83,
+    "comandosPorTipo": {
+      "modelador": 83
+    },
+    "padroes": {
+      "leitura": {
+        "comandos": 35,
+        "falhas": 1,
+        "porTipo": {
+          "modelador": 35
+        }
+      },
+      "git": {
+        "comandos": 9,
+        "falhas": 1,
+        "porTipo": {
+          "modelador": 9
+        }
+      },
+      "outro": {
+        "comandos": 13,
+        "falhas": 1,
+        "porTipo": {
+          "modelador": 13
+        }
+      },
+      "edicao-por-script": {
+        "comandos": 14,
+        "falhas": 1,
+        "porTipo": {
+          "modelador": 14
+        }
+      },
+      "conferir-motor": {
+        "comandos": 4,
+        "falhas": 0,
+        "porTipo": {
+          "modelador": 4
+        }
+      },
+      "bancada": {
+        "comandos": 20,
+        "falhas": 3,
+        "porTipo": {
+          "modelador": 20
+        }
+      },
+      "apagar-saida": {
+        "comandos": 16,
+        "falhas": 3,
+        "porTipo": {
+          "modelador": 16
+        }
+      },
+      "prancha-por-script": {
+        "comandos": 16,
+        "falhas": 0,
+        "porTipo": {
+          "modelador": 16
+        }
+      },
+      "medir-foto": {
+        "comandos": 8,
+        "falhas": 0,
+        "porTipo": {
+          "modelador": 8
+        }
+      },
+      "descrever-medir": {
+        "comandos": 8,
+        "falhas": 0,
+        "porTipo": {
+          "modelador": 8
+        }
+      },
+      "saida-de-tarefa": {
+        "comandos": 4,
+        "falhas": 2,
+        "porTipo": {
+          "modelador": 4
+        }
+      }
+    },
+    "avulsas": {
+      "saida-de-tarefa-lida": 4,
+      "espera-com-sleep": 1
+    },
+    "alvo": 42,
+    "descricoes": [
+      "2026-11-16T11:33:37.487Z modelador (20) Pedivela e pedal, rodada 2",
+      "2026-11-16T10:58:51.617Z modelador (6) Modelar o selim, rodada 2",
+      "2026-11-16T11:08:44.850Z modelador (4) Modelar o selim, rodada 3",
+      "2026-11-16T11:44:43.821Z modelador (13) Pedal em plataforma única, rodada 3",
+      "2026-11-16T11:23:39.388Z modelador (17) Modelar pedivelas e pedais",
+      "2026-11-16T11:16:29.514Z modelador (15) Modelar guidão e garfo da bicicleta",
+      "2026-11-16T10:54:55.456Z modelador (8) Modelar o selim da bicicleta"
+    ]
+  }
+}
