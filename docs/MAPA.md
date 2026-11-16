@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-1984 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+1992 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -579,9 +579,11 @@
 - `2026-11-14-prancha-menos-manual.md` — Prancha menos manual: desvio medido, leitura combinada de um comando e o que ficou de fora declarado
 - `2026-11-15-costura-em-no-de-tubos.md` — Cordão de solda na costura de tubos: o friso que segue a costura de uma união, e a costura em nó de tubos
 - `2026-11-15-reflexo-na-bancada.md` — Reflexo na bancada: a superfície de lataria julgada sem o Blender
+- `2026-11-16-cache-por-passo.md` — Cache por passo da receita: refazer só o que mudou, entre comandos, medido no laço de modelagem
 - `2026-11-16-comparar-com-a-referencia.md` — Comparar com a referência sem script: a prancha modelo e foto, a conferência da receita, a saída da bancada e o pacote do crítico
-- `2026-11-16-eletronica-no-modelar.md` — Eletrônica no Modelar: plano-raiz que gera quatro planos a partir do Eletrifica
+- `2026-11-16-eletronica-no-modelar.md` — O lado Modelar da mecatrônica: plano-raiz que gera a família de componentes e a ponte
 - `2026-11-16-familia-componentes-eletronicos.md` — Família de componentes eletrônicos: as peças por encapsulamento e a placa declarada, provadas no braço robótico
+- `2026-11-16-ponte-com-a-mecatronica.md` — Ponte com a mecatrônica: a ficha do objeto exportada, as portas elétricas declaradas e o pedido que volta conferido
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
@@ -892,6 +894,15 @@
 - `geometria.js` — geometria.js — as medidas do cilindro hidráulico a partir dos parâmetros da família, puras e em milímetro.
 - `index.js` — index.js — a família `cilindro-hidraulico`: atuador linear de dupla ação, camisa de casca nativa e haste ligada a ela por uma articulação prismática, com a m…
 - `montagem.js` — montagem.js — a montagem v5 que a família gera: a camisa e a haste, peças distintas, ligadas por uma articulação prismática com o curso declarado.
+
+## procedural/familias/componente-eletronico/
+
+- `componente-eletronico.test.js` — componente-eletronico.test.js — a família `componente-eletronico`: cada um dos cinco encapsulamentos gerado com os parâmetros dele no mínimo, no padrão e no …
+- `composicoes.js` — composicoes.js — as composições procedurais da família `componente-eletronico`, uma por variante de encapsulamento.
+- `derivar.js` — derivar.js — dos parâmetros do componente eletrônico (milímetro) à chamada de composição (metro).
+- `geometria.js` — geometria.js — as constantes de construção da família `componente-eletronico` e as contas puras em milímetro.
+- `index.js` — index.js — a família `componente-eletronico` carregada: o contrato `familia.json`, as composições e o `derivar`, e a escolha de material por peça.
+- `prancha.js` — prancha.js — a peça de prova da família `componente-eletronico`: os cinco encapsulamentos da fatia 1 lado a lado numa placa, para a prancha que a pessoa apro…
 
 ## procedural/familias/dobradica/
 

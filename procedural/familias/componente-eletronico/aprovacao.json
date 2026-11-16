@@ -1,0 +1,490 @@
+{
+  "formato": "mecanifica.aprovacao-da-familia@1",
+  "familia": "componente-eletronico",
+  "versao": "1.0.0",
+  "mecanica": {
+    "data": "2026-11-16",
+    "pontos": {
+      "minimo": {
+        "parametros": {
+          "afastamentoDoTO220": 0,
+          "alturaDaAba": 5.5,
+          "alturaDaBaseDaBarra": 2,
+          "alturaDoCapacitor": 5,
+          "alturaDoCorpoDoDIP": 2.9,
+          "alturaDoCorpoTO220": 8.4,
+          "comprimentoDoResistor": 3.2,
+          "diametroDoCapacitor": 4,
+          "diametroDoFio": 0.4,
+          "diametroDoFuroDaAba": 3.5,
+          "diametroDoResistor": 1.6,
+          "encapsulamento": 1,
+          "espessuraDaAba": 1.15,
+          "espessuraDoTO220": 4.2,
+          "faixasDoResistor": 4,
+          "fileiraDoDIP": 7.62,
+          "fileirasDaBarra": 1,
+          "ladoDoPinoDaBarra": 0.5,
+          "larguraDoCorpoDoDIP": 6.1,
+          "larguraDoTO220": 9.6,
+          "margemDoCorpoDoDIP": 0.5,
+          "passoDoCapacitor": 1.5,
+          "passoDoResistor": 7.62,
+          "pernaAbaixoDaPlaca": 1,
+          "pinoAcimaDaBase": 3,
+          "pinosPorLadoDoDIP": 4,
+          "viasDaBarra": 1
+        },
+        "hash": "sha256:35b93fa98ab8b939627d14430754520db8aede82cc8a1fae9022ddb00d1e4763",
+        "medidas": []
+      },
+      "medio": {
+        "parametros": {
+          "afastamentoDoTO220": 3,
+          "alturaDaAba": 6.5,
+          "alturaDaBaseDaBarra": 2.5,
+          "alturaDoCapacitor": 12,
+          "alturaDoCorpoDoDIP": 3.3,
+          "alturaDoCorpoTO220": 9,
+          "comprimentoDoResistor": 6.5,
+          "diametroDoCapacitor": 8,
+          "diametroDoFio": 0.6,
+          "diametroDoFuroDaAba": 3.7,
+          "diametroDoResistor": 2.5,
+          "encapsulamento": 3,
+          "espessuraDaAba": 1.3,
+          "espessuraDoTO220": 4.6,
+          "faixasDoResistor": 5,
+          "fileiraDoDIP": 7.62,
+          "fileirasDaBarra": 2,
+          "ladoDoPinoDaBarra": 0.64,
+          "larguraDoCorpoDoDIP": 6.35,
+          "larguraDoTO220": 10.2,
+          "margemDoCorpoDoDIP": 0.9,
+          "passoDoCapacitor": 3.5,
+          "passoDoResistor": 12.7,
+          "pernaAbaixoDaPlaca": 3.5,
+          "pinoAcimaDaBase": 6,
+          "pinosPorLadoDoDIP": 7,
+          "viasDaBarra": 20
+        },
+        "hash": "sha256:ca083a465997a95bdcca6c63b97a8f3093633d775d00e9942973d357945c39d2",
+        "medidas": []
+      },
+      "maximo": {
+        "parametros": {
+          "afastamentoDoTO220": 6,
+          "alturaDaAba": 7,
+          "alturaDaBaseDaBarra": 3,
+          "alturaDoCapacitor": 40,
+          "alturaDoCorpoDoDIP": 5,
+          "alturaDoCorpoTO220": 9.5,
+          "comprimentoDoResistor": 12,
+          "diametroDoCapacitor": 18,
+          "diametroDoFio": 1,
+          "diametroDoFuroDaAba": 3.9,
+          "diametroDoResistor": 4.5,
+          "encapsulamento": 5,
+          "espessuraDaAba": 1.4,
+          "espessuraDoTO220": 4.8,
+          "faixasDoResistor": 5,
+          "fileiraDoDIP": 15.24,
+          "fileirasDaBarra": 2,
+          "ladoDoPinoDaBarra": 1,
+          "larguraDoCorpoDoDIP": 14,
+          "larguraDoTO220": 10.7,
+          "margemDoCorpoDoDIP": 2.2,
+          "passoDoCapacitor": 7.5,
+          "passoDoResistor": 25.4,
+          "pernaAbaixoDaPlaca": 6,
+          "pinoAcimaDaBase": 12,
+          "pinosPorLadoDoDIP": 20,
+          "viasDaBarra": 40
+        },
+        "hash": "sha256:88b45c673ed465c18da8fc6012287c076209f62bd9315550b5c9a2834acc24ae",
+        "medidas": []
+      }
+    },
+    "varredura": {
+      "sondas": 54,
+      "recusasDeclaradas": [
+        {
+          "ponto": "comprimentoDoResistor=12",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "diametroDoCapacitor=4",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "fileiraDoDIP=15.24",
+          "restricao": "pino-do-dip-encosta-no-corpo"
+        },
+        {
+          "ponto": "larguraDoCorpoDoDIP=14",
+          "restricao": "pino-do-dip-sai-do-corpo"
+        },
+        {
+          "ponto": "passoDoCapacitor=7.5",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "passoDoResistor=7.62",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        }
+      ]
+    },
+    "portas": [],
+    "perfis": {
+      "barra-1x8": {
+        "parametros": {
+          "afastamentoDoTO220": 2.5,
+          "alturaDaAba": 6.5,
+          "alturaDaBaseDaBarra": 2.5,
+          "alturaDoCapacitor": 11,
+          "alturaDoCorpoDoDIP": 3.3,
+          "alturaDoCorpoTO220": 9,
+          "comprimentoDoResistor": 6.5,
+          "diametroDoCapacitor": 6.3,
+          "diametroDoFio": 0.6,
+          "diametroDoFuroDaAba": 3.7,
+          "diametroDoResistor": 2.3,
+          "encapsulamento": 5,
+          "espessuraDaAba": 1.3,
+          "espessuraDoTO220": 4.5,
+          "faixasDoResistor": 4,
+          "fileiraDoDIP": 7.62,
+          "fileirasDaBarra": 1,
+          "ladoDoPinoDaBarra": 0.64,
+          "larguraDoCorpoDoDIP": 6.35,
+          "larguraDoTO220": 10,
+          "margemDoCorpoDoDIP": 0.8,
+          "passoDoCapacitor": 2.5,
+          "passoDoResistor": 10.16,
+          "pernaAbaixoDaPlaca": 3,
+          "pinoAcimaDaBase": 6,
+          "pinosPorLadoDoDIP": 4,
+          "viasDaBarra": 8
+        },
+        "hash": "sha256:b00ca1815e6f524608828b5875b9d64a60f9ae707fb73ded67070246dcf3637e",
+        "medidas": []
+      },
+      "dip-40": {
+        "parametros": {
+          "afastamentoDoTO220": 2.5,
+          "alturaDaAba": 6.5,
+          "alturaDaBaseDaBarra": 2.5,
+          "alturaDoCapacitor": 11,
+          "alturaDoCorpoDoDIP": 3.8,
+          "alturaDoCorpoTO220": 9,
+          "comprimentoDoResistor": 6.5,
+          "diametroDoCapacitor": 6.3,
+          "diametroDoFio": 0.6,
+          "diametroDoFuroDaAba": 3.7,
+          "diametroDoResistor": 2.3,
+          "encapsulamento": 4,
+          "espessuraDaAba": 1.3,
+          "espessuraDoTO220": 4.5,
+          "faixasDoResistor": 4,
+          "fileiraDoDIP": 15.24,
+          "fileirasDaBarra": 1,
+          "ladoDoPinoDaBarra": 0.64,
+          "larguraDoCorpoDoDIP": 13.7,
+          "larguraDoTO220": 10,
+          "margemDoCorpoDoDIP": 1.9,
+          "passoDoCapacitor": 2.5,
+          "passoDoResistor": 10.16,
+          "pernaAbaixoDaPlaca": 3,
+          "pinoAcimaDaBase": 6,
+          "pinosPorLadoDoDIP": 20,
+          "viasDaBarra": 8
+        },
+        "hash": "sha256:826a36b67c4bd947dc91e6d34095e26164c76babb9a9b5a439f0b85490f2c30b",
+        "medidas": []
+      },
+      "dip-8": {
+        "parametros": {
+          "afastamentoDoTO220": 2.5,
+          "alturaDaAba": 6.5,
+          "alturaDaBaseDaBarra": 2.5,
+          "alturaDoCapacitor": 11,
+          "alturaDoCorpoDoDIP": 3.3,
+          "alturaDoCorpoTO220": 9,
+          "comprimentoDoResistor": 6.5,
+          "diametroDoCapacitor": 6.3,
+          "diametroDoFio": 0.6,
+          "diametroDoFuroDaAba": 3.7,
+          "diametroDoResistor": 2.3,
+          "encapsulamento": 4,
+          "espessuraDaAba": 1.3,
+          "espessuraDoTO220": 4.5,
+          "faixasDoResistor": 4,
+          "fileiraDoDIP": 7.62,
+          "fileirasDaBarra": 1,
+          "ladoDoPinoDaBarra": 0.64,
+          "larguraDoCorpoDoDIP": 6.35,
+          "larguraDoTO220": 10,
+          "margemDoCorpoDoDIP": 0.8,
+          "passoDoCapacitor": 2.5,
+          "passoDoResistor": 10.16,
+          "pernaAbaixoDaPlaca": 3,
+          "pinoAcimaDaBase": 6,
+          "pinosPorLadoDoDIP": 4,
+          "viasDaBarra": 8
+        },
+        "hash": "sha256:7aee723a121c1f71517371ce25e73003e4f95c1a7402346c1efa42b902184f7d",
+        "medidas": []
+      },
+      "eletrolitico-6-3x11": {
+        "parametros": {
+          "afastamentoDoTO220": 2.5,
+          "alturaDaAba": 6.5,
+          "alturaDaBaseDaBarra": 2.5,
+          "alturaDoCapacitor": 11,
+          "alturaDoCorpoDoDIP": 3.3,
+          "alturaDoCorpoTO220": 9,
+          "comprimentoDoResistor": 6.5,
+          "diametroDoCapacitor": 6.3,
+          "diametroDoFio": 0.5,
+          "diametroDoFuroDaAba": 3.7,
+          "diametroDoResistor": 2.3,
+          "encapsulamento": 2,
+          "espessuraDaAba": 1.3,
+          "espessuraDoTO220": 4.5,
+          "faixasDoResistor": 4,
+          "fileiraDoDIP": 7.62,
+          "fileirasDaBarra": 1,
+          "ladoDoPinoDaBarra": 0.64,
+          "larguraDoCorpoDoDIP": 6.35,
+          "larguraDoTO220": 10,
+          "margemDoCorpoDoDIP": 0.8,
+          "passoDoCapacitor": 2.5,
+          "passoDoResistor": 10.16,
+          "pernaAbaixoDaPlaca": 3,
+          "pinoAcimaDaBase": 6,
+          "pinosPorLadoDoDIP": 4,
+          "viasDaBarra": 8
+        },
+        "hash": "sha256:996f32e37f4ea9c48c9f857766f1385fbf11606d7161fa70e78df6369b765660",
+        "medidas": []
+      },
+      "resistor-1-4w": {
+        "parametros": {
+          "afastamentoDoTO220": 2.5,
+          "alturaDaAba": 6.5,
+          "alturaDaBaseDaBarra": 2.5,
+          "alturaDoCapacitor": 11,
+          "alturaDoCorpoDoDIP": 3.3,
+          "alturaDoCorpoTO220": 9,
+          "comprimentoDoResistor": 6.5,
+          "diametroDoCapacitor": 6.3,
+          "diametroDoFio": 0.6,
+          "diametroDoFuroDaAba": 3.7,
+          "diametroDoResistor": 2.3,
+          "encapsulamento": 1,
+          "espessuraDaAba": 1.3,
+          "espessuraDoTO220": 4.5,
+          "faixasDoResistor": 4,
+          "fileiraDoDIP": 7.62,
+          "fileirasDaBarra": 1,
+          "ladoDoPinoDaBarra": 0.64,
+          "larguraDoCorpoDoDIP": 6.35,
+          "larguraDoTO220": 10,
+          "margemDoCorpoDoDIP": 0.8,
+          "passoDoCapacitor": 2.5,
+          "passoDoResistor": 10.16,
+          "pernaAbaixoDaPlaca": 3,
+          "pinoAcimaDaBase": 6,
+          "pinosPorLadoDoDIP": 4,
+          "viasDaBarra": 8
+        },
+        "hash": "sha256:85d4804bf476bd3fa4b876824b405939b3b84efbf9a9601d24a9843cea3fd307",
+        "medidas": []
+      },
+      "to-220": {
+        "parametros": {
+          "afastamentoDoTO220": 2.5,
+          "alturaDaAba": 6.5,
+          "alturaDaBaseDaBarra": 2.5,
+          "alturaDoCapacitor": 11,
+          "alturaDoCorpoDoDIP": 3.3,
+          "alturaDoCorpoTO220": 9,
+          "comprimentoDoResistor": 6.5,
+          "diametroDoCapacitor": 6.3,
+          "diametroDoFio": 0.6,
+          "diametroDoFuroDaAba": 3.7,
+          "diametroDoResistor": 2.3,
+          "encapsulamento": 3,
+          "espessuraDaAba": 1.3,
+          "espessuraDoTO220": 4.5,
+          "faixasDoResistor": 4,
+          "fileiraDoDIP": 7.62,
+          "fileirasDaBarra": 1,
+          "ladoDoPinoDaBarra": 0.64,
+          "larguraDoCorpoDoDIP": 6.35,
+          "larguraDoTO220": 10,
+          "margemDoCorpoDoDIP": 0.8,
+          "passoDoCapacitor": 2.5,
+          "passoDoResistor": 10.16,
+          "pernaAbaixoDaPlaca": 3,
+          "pinoAcimaDaBase": 6,
+          "pinosPorLadoDoDIP": 4,
+          "viasDaBarra": 8
+        },
+        "hash": "sha256:0b721d33b66e9a76ec11e77a0818a29505401384a8a053eab4a9b60f087cc0fb",
+        "medidas": []
+      }
+    },
+    "escalasDosPerfis": {
+      "sondas": 264,
+      "recusasDeclaradas": [
+        {
+          "ponto": "barra-1x8: comprimentoDoResistor=12",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "barra-1x8: diametroDoCapacitor=4",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "barra-1x8: fileiraDoDIP=15.24",
+          "restricao": "pino-do-dip-encosta-no-corpo"
+        },
+        {
+          "ponto": "barra-1x8: larguraDoCorpoDoDIP=14",
+          "restricao": "pino-do-dip-sai-do-corpo"
+        },
+        {
+          "ponto": "barra-1x8: passoDoCapacitor=7.5",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "barra-1x8: passoDoResistor=7.62",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "dip-40: comprimentoDoResistor=12",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "dip-40: diametroDoCapacitor=4",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "dip-40: fileiraDoDIP=7.62",
+          "restricao": "pino-do-dip-sai-do-corpo"
+        },
+        {
+          "ponto": "dip-40: larguraDoCorpoDoDIP=6.1",
+          "restricao": "pino-do-dip-encosta-no-corpo"
+        },
+        {
+          "ponto": "dip-40: passoDoCapacitor=7.5",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "dip-40: passoDoResistor=7.62",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "dip-8: comprimentoDoResistor=12",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "dip-8: diametroDoCapacitor=4",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "dip-8: fileiraDoDIP=15.24",
+          "restricao": "pino-do-dip-encosta-no-corpo"
+        },
+        {
+          "ponto": "dip-8: larguraDoCorpoDoDIP=14",
+          "restricao": "pino-do-dip-sai-do-corpo"
+        },
+        {
+          "ponto": "dip-8: passoDoCapacitor=7.5",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "dip-8: passoDoResistor=7.62",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "eletrolitico-6-3x11: comprimentoDoResistor=12",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "eletrolitico-6-3x11: diametroDoCapacitor=4",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "eletrolitico-6-3x11: fileiraDoDIP=15.24",
+          "restricao": "pino-do-dip-encosta-no-corpo"
+        },
+        {
+          "ponto": "eletrolitico-6-3x11: larguraDoCorpoDoDIP=14",
+          "restricao": "pino-do-dip-sai-do-corpo"
+        },
+        {
+          "ponto": "eletrolitico-6-3x11: passoDoCapacitor=7.5",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "eletrolitico-6-3x11: passoDoResistor=7.62",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "resistor-1-4w: comprimentoDoResistor=12",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "resistor-1-4w: diametroDoCapacitor=4",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "resistor-1-4w: fileiraDoDIP=15.24",
+          "restricao": "pino-do-dip-encosta-no-corpo"
+        },
+        {
+          "ponto": "resistor-1-4w: larguraDoCorpoDoDIP=14",
+          "restricao": "pino-do-dip-sai-do-corpo"
+        },
+        {
+          "ponto": "resistor-1-4w: passoDoCapacitor=7.5",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "resistor-1-4w: passoDoResistor=7.62",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "to-220: comprimentoDoResistor=12",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "to-220: diametroDoCapacitor=4",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "to-220: fileiraDoDIP=15.24",
+          "restricao": "pino-do-dip-encosta-no-corpo"
+        },
+        {
+          "ponto": "to-220: larguraDoCorpoDoDIP=14",
+          "restricao": "pino-do-dip-sai-do-corpo"
+        },
+        {
+          "ponto": "to-220: passoDoCapacitor=7.5",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "to-220: passoDoResistor=7.62",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        }
+      ]
+    }
+  },
+  "critico": null,
+  "pessoa": null
+}
