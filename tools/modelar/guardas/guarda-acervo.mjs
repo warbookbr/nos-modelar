@@ -146,9 +146,9 @@ export function etapaQueEspera(peca, { raiz = ACERVO } = {}) {
   const instancia = (montagem.instancias ?? []).find((item) => item.alvo?.ref === peca);
   if (!instancia || !(montagem.etapas ?? []).includes(instancia.id)) return null;
   const registro = arquivo.replace(/\.json$/, '.etapas.json');
-  const estado = existsSync(registro)
-    ? JSON.parse(readFileSync(registro, 'utf8')).etapas?.find((e) => e.instancia === instancia.id)?.estado
-    : null;
+  const lido = existsSync(registro) ? JSON.parse(readFileSync(registro, 'utf8')) : null;
+  /* No registro da versão 3 o estado não está gravado, e esta dispensa só vale para receita sem passo: etapa sem geometria nunca é fixa. */
+  const estado = lido?.versao === 3 ? 'nao-conferivel' : lido?.etapas?.find((e) => e.instancia === instancia.id)?.estado;
   return estado === 'fixa' ? null : { montagem: relative(raiz, arquivo).replaceAll('\\', '/'), instancia: instancia.id };
 }
 

@@ -106,6 +106,14 @@ function congelar(valor) {
   return valor;
 }
 
+/* Os aceites vigentes, por instância, sem medir nada: para quem só quer o aceite como fato (quem aceitou, os defeitos aceitos), e não o
+   estado, que só a leitura com o medido de agora dá. Não valida o registro. */
+export function aceitesVigentes(registro) {
+  const ultimo = new Map();
+  for (const evento of registro?.eventos ?? []) ultimo.set(evento.instancia, evento);
+  return new Map([...ultimo].filter(([, evento]) => evento.tipo === 'aceite').map(([instancia, evento]) => [instancia, evento.aceite]));
+}
+
 export function registroVazio(montagemId) {
   return { formato: FORMATO_REGISTRO_DE_ETAPAS, versao: VERSAO_REGISTRO_PELA_IMPRESSAO, montagem: montagemId, eventos: [] };
 }

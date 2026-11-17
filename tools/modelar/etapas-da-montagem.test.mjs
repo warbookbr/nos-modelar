@@ -1,14 +1,19 @@
 /* etapas-da-montagem.test.mjs — a porta que fixa etapa. Fixar exige a etapa
    ser a próxima, o crítico ter fechado a peça dela, a nota de passagem, as
    juntas passando e o aceite da pessoa. Cada recusa tem o seu caso. */
-import { copyFileSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { registrarRodada } from '../../src/autoria/laco-de-modelagem.js';
 import { ErroEtapaDeConstrucao } from '../../src/autoria/etapas-de-construcao.js';
-import { AVISO_DO_CAMINHO_ANTIGO, arquivoDoRegistro, auditarEtapas, comoCLI, descreverAuditoria, estadoDasEtapas, fixar, gravarRegistro, medirAgora, montagemAteAGeometria, olharEtapas, reabrir } from './etapas-da-montagem.mjs';
+import { AVISO_DO_CAMINHO_ANTIGO, arquivoDoRegistro, auditarEtapas, comoCLI, descreverAuditoria, estadoDasEtapas, fixar, gravarRegistro, medirAgora, montagemAteAGeometria, olharEtapas, reabrir, registroComEstado } from './etapas-da-montagem.mjs';
+import { aceitesDasEtapas } from './custo-por-peca.mjs';
+import { etapaQueEspera } from './guardas/guarda-acervo.mjs';
+import { etapaFixaDaPeca } from './vistas-de-superficie.mjs';
+import { estadoDoObjeto } from './objeto.mjs';
+import { lerEtapas as lerEtapasDoFluxo } from './fluxo-do-objeto.mjs';
 import {
   acrescentarAceite, acrescentarReabertura, avisosDaImpressao, diferencasDaImpressao, imprimirEtapa, lerEtapas, registroVazio,
 } from '../../src/autoria/etapas-pela-impressao.js';
@@ -1448,6 +1453,72 @@ describe('o registro da versão 3 pelos comandos', () => {
     expect(novo.versao).toBe(3);
     expect(novos).toEqual([]);
     await expect(estadoDasEtapas(arquivo, { receitas: RECEITAS, anterior: { formato: 'mecanifica.registro-de-etapas', versao: 3, montagem: 'tres-blocos', eventos: 'x' } })).rejects.toMatchObject({ codigo: 'registro-invalido' });
+  });
+
+  describe('os consumidores do estado leem o registro v3 pela leitura', () => {
+    const v3 = async (defeitos = []) => {
+      const medido = await medirAgora(arquivo, { receitas: RECEITAS });
+      return medido.ordem.slice(0, 2).reduce((r, id, i) => acrescentarAceite(r, medido, id, { por: 'Ana, 2026-11-10', ...(i === 0 ? { defeitosAceitos: defeitos } : {}) }), registroVazio('tres-blocos'));
+    };
+
+    it('registroComEstado: a versão 3 sai da leitura, a 2 como gravada, e sem registro é null', async () => {
+      const registro = await v3();
+      const lida = await registroComEstado(arquivo, { receitas: RECEITAS, anterior: registro });
+      expect(lida.etapas.map((e) => [e.instancia, e.estado])).toEqual([['base', 'fixa'], ['meio', 'fixa'], ['topo', 'aberta']]);
+      expect(lida.etapas[0].aceite.por).toBe('Ana, 2026-11-10');
+      const mudada = await registroComEstado(arquivo, { receitas: comTabela('bloco-com-pino', { alturaDoPino: 18 }), anterior: registro });
+      expect(mudada.etapas.map((e) => e.estado)).toEqual(['quebrada', 'quebrada', 'aberta']);
+      const antigo = { ...ANTIGO, etapas: [{ instancia: 'base', estado: 'fixa' }] };
+      expect(await registroComEstado(arquivo, { anterior: antigo })).toBe(antigo);
+      expect(await registroComEstado(arquivo, { anterior: null })).toBeNull();
+    });
+
+    it('custo por peça: o aceite vigente e os defeitos aceitos saem dos eventos, sem medir', async () => {
+      const pasta = join(area, 'objeto');
+      mkdirSync(pasta);
+      copyFileSync(arquivo, join(pasta, 'montagem.json'));
+      writeFileSync(join(pasta, 'montagem.etapas.json'), JSON.stringify(await v3(['risco', 'marca'])));
+      const aceites = aceitesDasEtapas(pasta);
+      expect(aceites.get('bloco-com-pino')).toEqual({ defeitosAceitos: 2, data: '2026-11-10' });
+      expect(aceites.get('bloco-com-furo-e-pino')).toEqual({ defeitosAceitos: 0, data: '2026-11-10' });
+      expect(aceites.has('bloco-com-furo')).toBe(false);
+    });
+
+    it('as guardas: a receita sem passo espera a etapa no registro v3, que nunca a tem fixa, e no v2 vale o gravado', () => {
+      const raiz = join(area, 'acervo');
+      mkdirSync(join(raiz, 'obj'), { recursive: true });
+      writeFileSync(join(raiz, 'obj', 'montagem.json'), JSON.stringify({ instancias: [{ id: 'a', alvo: { ref: 'obj/x' } }], etapas: ['a'] }));
+      const registro = join(raiz, 'obj', 'montagem.etapas.json');
+      writeFileSync(registro, JSON.stringify({ versao: 3, eventos: [] }));
+      expect(etapaQueEspera('obj/x', { raiz })).toEqual({ montagem: 'obj/montagem.json', instancia: 'a' });
+      writeFileSync(registro, JSON.stringify({ versao: 2, etapas: [{ instancia: 'a', estado: 'fixa' }] }));
+      expect(etapaQueEspera('obj/x', { raiz })).toBeNull();
+    });
+
+    it('a superfície: sem medir o registro v3 não está fixa, e com a etapa medida vale a medida; o v2 vale o gravado', () => {
+      const raiz = join(area, 'acervo');
+      mkdirSync(join(raiz, 'obj'), { recursive: true });
+      writeFileSync(join(raiz, 'obj', 'montagem.json'), JSON.stringify({ instancias: [{ id: 'a', alvo: { ref: 'obj/x' } }], etapas: ['a'] }));
+      const registro = join(raiz, 'obj', 'montagem.etapas.json');
+      writeFileSync(registro, JSON.stringify({ versao: 3, eventos: [] }));
+      expect(etapaFixaDaPeca('obj/x', { raiz })).toBe(false);
+      expect(etapaFixaDaPeca('obj/x', { raiz, etapaFixa: true })).toBe(true);
+      writeFileSync(registro, JSON.stringify({ versao: 2, etapas: [{ instancia: 'a', estado: 'fixa' }] }));
+      expect(etapaFixaDaPeca('obj/x', { raiz })).toBe(true);
+    });
+
+    it('o resumo do objeto e o fluxo contam as fixas pela leitura, e o resumo sem a leitura recusa o v3', () => {
+      const acervo = join(area, 'acervo');
+      const pasta = join(acervo, 'coisa');
+      mkdirSync(pasta, { recursive: true });
+      writeFileSync(join(pasta, 'ALINHAMENTO.md'), '# coisa\n');
+      writeFileSync(join(pasta, 'montagem.json'), JSON.stringify({ id: 'coisa', etapas: ['a', 'b'], instancias: [] }));
+      writeFileSync(join(pasta, 'montagem.etapas.json'), JSON.stringify({ versao: 3, eventos: [] }));
+      expect(() => estadoDoObjeto('coisa', { acervo })).toThrow(/versão 3/);
+      const lido = { versao: 3, etapas: [{ instancia: 'a', estado: 'fixa' }, { instancia: 'b', estado: 'quebrada' }] };
+      expect(estadoDoObjeto('coisa', { acervo, registroLido: lido }).etapas.find((e) => e.etapa === 'modelagem por etapa').estado).toBe('1 de 2 fixas; próxima b');
+      expect(lerEtapasDoFluxo(pasta, { registroLido: lido })).toMatchObject({ fixas: ['a'], abertas: ['b'], proxima: 'b' });
+    });
   });
 });
 

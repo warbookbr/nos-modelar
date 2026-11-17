@@ -58,7 +58,7 @@ import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { afastamentoDaParte, normalizarEsbocoDoRefinamento } from '../../src/autoria/refinamento-global.js';
 import { avisoDaDispensa } from '../../src/autoria/lataria.js';
 import { normalizarPlanoDeModelagem } from '../../src/autoria/plano-de-modelagem.js';
-import { comandoDoPacote, pastaDaRodada, superficieDaPeca, superficieDoPacote } from './vistas-de-superficie.mjs';
+import { comandoDoPacote, etapaFixaDaPecaMedida, pastaDaRodada, superficieDaPeca, superficieDoPacote } from './vistas-de-superficie.mjs';
 import { palavras } from './leitura-por-regioes.mjs';
 import { lascasDaReceita } from './lasca.mjs';
 
@@ -230,7 +230,7 @@ export async function medirReceita(peca, { rodadas, pasta } = {}) {
     if (veredito.reprova) falhas.push(veredito.reprova);
   }
   const passou = falhas.length === 0;
-  const { lataria, luzRasante, porque } = superficieDaPeca(peca, receita, plano);
+  const { lataria, luzRasante, porque } = superficieDaPeca(peca, receita, plano, { etapaFixa: await etapaFixaDaPecaMedida(peca) });
   return { passou, sha256, texto, caminho, relatorio: cortar(passou ? `${feitas.join(', ')}: ok` : falhas.join('\n')), lataria: { lataria, porque }, luzRasante: { luzRasante, porque }, avisos, ...(facesFinas ? { facesFinas } : {}) };
 }
 

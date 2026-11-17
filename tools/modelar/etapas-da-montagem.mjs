@@ -312,6 +312,16 @@ export async function reabrir(arquivoMontagem, instancia, por, opcoes = {}) {
   return reaberto;
 }
 
+/* O registro com o estado de cada etapa, para quem só consome o estado (o fluxo do objeto, o resumo do objeto, as vistas): o da
+   versão 3 passa pela leitura com o medido de agora, e o antigo traz o estado gravado. Sem registro, null. */
+export async function registroComEstado(arquivoMontagem, opcoes = {}) {
+  const registro = opcoes.anterior !== undefined ? opcoes.anterior : lerRegistroDoDisco(arquivoMontagem);
+  if (!registro) return null;
+  if (!registroPelaImpressao(registro)) return registro;
+  const { leitura } = await estadoDasEtapas(arquivoMontagem, { ...opcoes, anterior: registro });
+  return { ...registro, etapas: leitura.etapas.map(({ instancia, estado, aceite, motivo }) => ({ instancia, estado, ...(aceite ? { aceite } : {}), ...(motivo ? { motivo } : {}) })) };
+}
+
 export const SAIDA_DAS_VISTAS = join(REPO, 'tools/bancadas/out');
 
 /* `foco` é a instância (id, ou o caminho dela) que o quadro enquadra, entre as etapas já construídas; sem ele o quadro é o do conjunto.

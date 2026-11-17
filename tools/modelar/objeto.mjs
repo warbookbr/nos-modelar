@@ -66,7 +66,7 @@ export function pastaDasReferencias(pasta) {
   return destino;
 }
 
-export function estadoDoObjeto(objeto, { acervo = ACERVO } = {}) {
+export function estadoDoObjeto(objeto, { acervo = ACERVO, registroLido } = {}) {
   const pasta = join(acervo, objeto);
   if (!existsSync(pasta)) throw new Error(`o objeto '${objeto}' não existe em ${relative(REPO, acervo) || acervo}.`);
   const refs = pastaDasReferencias(pasta);
@@ -106,7 +106,9 @@ export function estadoDoObjeto(objeto, { acervo = ACERVO } = {}) {
   }
 
   const arquivoEtapas = join(pasta, 'montagem.etapas.json');
-  const registro = existsSync(arquivoEtapas) ? JSON.parse(readFileSync(arquivoEtapas, 'utf8')) : null;
+  /* o registro da versão 3 não grava o estado: quem o mediu (`registroComEstado`) passa `registroLido` */
+  const registro = registroLido ?? (existsSync(arquivoEtapas) ? JSON.parse(readFileSync(arquivoEtapas, 'utf8')) : null);
+  if (registro?.versao === 3 && !registroLido) throw new Error(`${objeto}: o registro de etapas é da versão 3, que não grava o estado; use estadoDoObjetoMedido (o comando objeto já usa).`);
   const montagem = existsSync(join(pasta, 'montagem.json')) ? JSON.parse(readFileSync(join(pasta, 'montagem.json'), 'utf8')) : null;
   const ordem = montagem?.etapas ?? [];
   const fixas = new Set((registro?.etapas ?? []).filter((e) => e.estado === 'fixa').map((e) => e.instancia));
@@ -125,6 +127,16 @@ export function estadoDoObjeto(objeto, { acervo = ACERVO } = {}) {
   return { objeto, etapas, proxima: pendente ?? null, pacotes, substituidas };
 }
 
+/** O estado do objeto com o registro da versão 3 lido pela impressão do aceite (mede a montagem de agora); os outros, como gravados. */
+export async function estadoDoObjetoMedido(objeto, { acervo = ACERVO } = {}) {
+  const pasta = join(acervo, objeto);
+  const arquivo = join(pasta, 'montagem.etapas.json');
+  const montagem = join(pasta, 'montagem.json');
+  if (!existsSync(arquivo) || !existsSync(montagem) || JSON.parse(readFileSync(arquivo, 'utf8')).versao !== 3) return estadoDoObjeto(objeto, { acervo });
+  const { registroComEstado } = await import('./etapas-da-montagem.mjs');
+  return estadoDoObjeto(objeto, { acervo, registroLido: await registroComEstado(montagem) });
+}
+
 function imprimir({ objeto, etapas, proxima, pacotes, substituidas = [] }) {
   const linhas = [`objeto ${objeto}`, ''];
   for (const e of etapas) linhas.push(`  ${e.etapa.padEnd(40)} ${e.estado}`);
@@ -141,6 +153,6 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const objeto = process.argv[2];
   if (!objeto) { process.stderr.write('uso: npm run objeto -- <objeto>\n'); process.exitCode = 2; }
   else {
-    try { process.stdout.write(imprimir(estadoDoObjeto(objeto))); } catch (erro) { process.stderr.write(`objeto: ${erro.message}\n`); process.exitCode = 1; }
+    try { process.stdout.write(imprimir(await estadoDoObjetoMedido(objeto))); } catch (erro) { process.stderr.write(`objeto: ${erro.message}\n`); process.exitCode = 1; }
   }
 }

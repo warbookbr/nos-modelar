@@ -330,12 +330,21 @@ export function acaoSemMedir(rodadas, textoDaReceita, { limite } = {}) {
   return { ...acaoDaReceita(rodadas, { sha256, medicao }, { limite }), medida: mesmoTexto, mesmoTexto };
 }
 
+/** O registro da versão 3 com o estado medido pela leitura pela impressão do aceite; undefined para os outros, que `lerEtapas` lê como gravados. */
+async function registroMedidoSeV3(pasta) {
+  const arquivo = join(pasta, 'montagem.json');
+  if (lerJson(join(pasta, 'montagem.etapas.json'))?.versao !== 3 || !existsSync(arquivo)) return undefined;
+  const { registroComEstado } = await import('./etapas-da-montagem.mjs');
+  return registroComEstado(arquivo);
+}
+
 /** As etapas da montagem, na ordem dela, com o estado do registro (`aberta` quando o registro não a tem) e a próxima, por `proximaEtapa`. */
-export function lerEtapas(pasta) {
+export function lerEtapas(pasta, { registroLido } = {}) {
   const arquivo = join(pasta, 'montagem.json');
   const montagem = lerJson(arquivo);
   if (!montagem) return null;
-  const registro = lerJson(join(pasta, 'montagem.etapas.json'));
+  /* o registro da versão 3 não grava o estado: quem o mediu (`registroComEstado`) passa `registroLido`; sem ele, o estado gravado */
+  const registro = registroLido ?? lerJson(join(pasta, 'montagem.etapas.json'));
   const estado = new Map((registro?.etapas ?? []).map((e) => [e.instancia, e.estado]));
   const etapas = (Array.isArray(montagem.etapas) ? montagem.etapas : []).map((instancia) => ({ instancia, estado: estado.get(instancia) ?? 'aberta' }));
   const proxima = proximaEtapa({ etapas });
@@ -394,7 +403,8 @@ export async function fluxoDoObjeto(pastaDoObjeto, { medir = null, acervo = ACER
   const referencias = lerReferencias(pasta);
   if (conferencia && !ehPasta(conferencia)) throw new Error(`--conferencia=${conferencia}: a pasta não existe; espera-se a pasta de saída de npm run conferir:vistas, com o resumo.json.`);
   const rascunho = lerRascunho(pasta, { conferencia: conferencia ? resolve(conferencia) : null });
-  const etapas = lerEtapas(pasta);
+  const registroLido = await registroMedidoSeV3(pasta);
+  const etapas = lerEtapas(pasta, { registroLido });
   const estadoDaInstancia = new Map((etapas?.etapas ?? []).map((e) => [e.instancia, e.estado]));
   const pecas = [];
   const rodadasPorPeca = new Map();

@@ -112,7 +112,7 @@ import { blocoDasPerguntas, perguntasDaPecaArquivo } from './perguntas-da-peca.m
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 import {
   LADO_DA_VISTA_DE_SUPERFICIE, LIMIAR_DA_LUZ_RASANTE, MANIFESTO_DO_PACOTE, MINIMO_DE_QUINA, PASTA_DA_SUPERFICIE, SAIDA_PADRAO, comandoDasVistasDoBlender, exigirLuzNaSuperficie, gravarManifesto, imagensEscuras,
-  impressaoDoTexto, pastaDaRodada, superficieDaBancada, superficieDaPeca, vistasDeSuperficie,
+  etapaFixaDaPecaMedida, impressaoDoTexto, pastaDaRodada, superficieDaBancada, superficieDaPeca, vistasDeSuperficie,
 } from './vistas-de-superficie.mjs';
 
 const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
@@ -1270,6 +1270,14 @@ export function registroDasEtapas(montagem, { existe = existsSync, ler = (f) => 
   return JSON.parse(ler(arquivo));
 }
 
+/** O mesmo registro com o estado de cada etapa: o da versão 3 passa pela leitura pela impressão do aceite (mede a montagem de agora). */
+export async function registroDasEtapasMedido(montagem) {
+  const arquivo = montagem?.arquivo;
+  if (!arquivo || !existsSync(arquivo.replace(/\.json$/, '.etapas.json'))) return null;
+  const { registroComEstado } = await import('./etapas-da-montagem.mjs');
+  return registroComEstado(arquivo);
+}
+
 /**
  * A etapa fixa da peça, do registro de etapas já lido: `{ instancia, por }` quando toda instância da peça (`montagem.instancias`, de
  * `montagemDaPeca`) está fixa no registro, ou null (peça sozinha, sem registro, ou alguma instância aberta ou quebrada). Puro.
@@ -2237,7 +2245,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
     contornoSobreposto: prancharContorno,
     prancharDesenhadas,
     montagemDaPeca: (p) => montagemDaPeca(p),
-    registroDasEtapas: (m) => registroDasEtapas(m),
+    registroDasEtapas: (m) => registroDasEtapasMedido(m),
     ...dependencias,
   };
   const blender = Object.hasOwn(dependencias, 'blender') ? dependencias.blender : doAmbiente('BLENDER');
@@ -2263,7 +2271,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   const contornosDeFora = lerContornosExternos(contornosExternos, { regioes: regioesDosContornos, ...(dependencias.existe ? { existe: dependencias.existe } : {}), ...(dependencias.lerContorno ? { ler: dependencias.lerContorno } : {}) });
   /* a peça de lataria leva a luz rasante e a curvatura da lataria, que saem da bancada; o Blender só roda pedido, como conferência, e
      sem ele o pedido é recusado antes de gastar captura */
-  const lataria = superficieDaPeca(peca, receita, plano);
+  const lataria = superficieDaPeca(peca, receita, plano, { etapaFixa: await etapaFixaDaPecaMedida(peca) });
   if (comBlender && !blender) throw new Error(`--com-blender roda o Blender como conferência e pede MODELAR_BLENDER apontando o executável: \`${comandoDasVistasDoBlender(peca)}\`; sem a conferência, o pacote sai só com a bancada.`);
   const declarado = await dep.esbocoDeclarado(peca);
   /* as formas do esboço que a receita refina e o alvo guardado com elas, conferidos antes de gastar captura */
@@ -2299,7 +2307,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   }
   let sobrepor = { entradas: [], fora: [] };
   /* a peça com a etapa fixa não recebe contorno: nem desenhado, nem citado como medida do lado */
-  const fixa = montagem && contornosMedidos.length ? etapaFixaDaPeca(montagem, dep.registroDasEtapas(montagem)) : null;
+  const fixa = montagem && contornosMedidos.length ? etapaFixaDaPeca(montagem, await dep.registroDasEtapas(montagem)) : null;
   if (fixa) {
     sobrepor.fora.push(motivoDaEtapaFixa(fixa, contornosMedidos, montagem.arquivo));
     contornosDoPedido = [];

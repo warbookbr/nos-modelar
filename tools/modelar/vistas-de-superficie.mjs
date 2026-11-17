@@ -89,7 +89,8 @@ export const impressaoDoTexto = (texto) => `sha256:${createHash('sha256').update
  * Se a etapa da peça, na montagem do objeto dela (`<objeto>/montagem.json`), está fixa no registro: a peça aceita pela pessoa.
  * Peça fora de montagem, ou sem registro, não está.
  */
-export function etapaFixaDaPeca(peca, { raiz = join(REPO, 'procedural/pecas') } = {}) {
+export function etapaFixaDaPeca(peca, { raiz = join(REPO, 'procedural/pecas'), etapaFixa } = {}) {
+  if (typeof etapaFixa === 'boolean') return etapaFixa;
   const [objeto, parte] = peca.split('/');
   if (!parte) return false;
   const arquivo = join(raiz, objeto, 'montagem.json');
@@ -97,7 +98,25 @@ export function etapaFixaDaPeca(peca, { raiz = join(REPO, 'procedural/pecas') } 
   if (!existsSync(arquivo) || !existsSync(registro)) return false;
   try {
     const instancia = (JSON.parse(readFileSync(arquivo, 'utf8')).instancias ?? []).find((item) => item.alvo?.ref === peca);
-    return Boolean(instancia) && JSON.parse(readFileSync(registro, 'utf8')).etapas?.find((e) => e.instancia === instancia.id)?.estado === 'fixa';
+    const lido = JSON.parse(readFileSync(registro, 'utf8'));
+    /* o registro da versão 3 não grava o estado: quem pode medir passa `etapaFixa` (`etapaFixaDaPecaMedida`); aqui, sem medir, não está fixa */
+    if (lido.versao === 3) return false;
+    return Boolean(instancia) && lido.etapas?.find((e) => e.instancia === instancia.id)?.estado === 'fixa';
+  } catch { return false; }
+}
+
+/** A mesma pergunta de `etapaFixaDaPeca`, com o registro da versão 3 lido pela impressão do aceite (mede a montagem de agora). */
+export async function etapaFixaDaPecaMedida(peca, opcoes = {}) {
+  const { raiz = join(REPO, 'procedural/pecas') } = opcoes;
+  const [objeto, parte] = peca.split('/');
+  if (!parte) return false;
+  const arquivo = join(raiz, objeto, 'montagem.json');
+  if (!existsSync(arquivo) || !existsSync(join(raiz, objeto, 'montagem.etapas.json'))) return false;
+  try {
+    const instancia = (JSON.parse(readFileSync(arquivo, 'utf8')).instancias ?? []).find((item) => item.alvo?.ref === peca);
+    if (!instancia) return false;
+    const { registroComEstado } = await import('./etapas-da-montagem.mjs');
+    return (await registroComEstado(arquivo))?.etapas?.find((e) => e.instancia === instancia.id)?.estado === 'fixa';
   } catch { return false; }
 }
 
@@ -121,7 +140,7 @@ export function superficieDaPeca(peca, receita, plano = null, opcoes = {}) {
 export async function latariaDaPeca(peca, { opcao = 1, entrada = null } = {}) {
   const lida = entrada ?? await lerEntradaDeMedida(peca, { opcao, montagem: false });
   const plano = normalizarPlanoDeModelagem(lida.receita?.PLANO);
-  return { ...superficieDaPeca(peca, lida.receita, plano), caminho: lida.abs };
+  return { ...superficieDaPeca(peca, lida.receita, plano, { etapaFixa: await etapaFixaDaPecaMedida(peca) }), caminho: lida.abs };
 }
 
 /* ---------- a luz rasante quase toda escura ---------- */
