@@ -95,10 +95,11 @@ export function atualizarRegistro(montagemId, medidas, anterior = null, { citaco
       /* As portas que as etapas seguintes citam, como estão agora: a etapa aberta as leva, e a que se fixa guarda as do aceite. */
       const comPortas = portas && Object.keys(portas).length ? { portas } : {};
       if (!fixa) return { instancia, estado: 'aberta', juntas, ...comForma, ...comPortas };
-      /* Quebrada que voltou a passar não se refixa sozinha com o aceite
-         antigo: a pessoa aceitou outra coisa, e precisa olhar de novo. O aceite
-         já foi guardado em `reaberturas` quando ela quebrou. */
-      if (fixa.estado === 'quebrada') return { instancia, estado: passou ? 'aberta' : 'quebrada', juntas, ...comForma, ...comPortas };
+      /* A QUEBRADA SEGUE QUEBRADA. Ela não se refixa sozinha com o aceite antigo, nem volta a aberta sozinha quando as juntas
+         voltam a passar: até 2026-11-17 voltava, e uma quebrada gravada por outra escrita do registro virava aberta na leitura
+         seguinte, sem `--por` e sem a prova das posteriores que a reabertura faz. Só `--reabrir` a tira deste estado. O aceite já
+         foi guardado em `reaberturas` quando ela quebrou. */
+      if (fixa.estado === 'quebrada') return { instancia, estado: 'quebrada', juntas, ...comForma, ...comPortas, motivo: fixa.motivo ?? 'quebrou depois do aceite e espera a reabertura' };
       /* FORMA QUE MUDOU DEPOIS DO ACEITE. As juntas só pegam mudança que
          desencaixa; alargar a base mantém o anel encaixado pelo vínculo, e a
          etapa continuava fixa com um aceite dado a outra peça. */
@@ -107,16 +108,23 @@ export function atualizarRegistro(montagemId, medidas, anterior = null, { citaco
         ? Boolean(forma) && aceita !== forma
         : Boolean(fixa.receita && textoDaReceita) && fixa.receita !== textoDaReceita;
       const formaDoAceite = aceita ?? (mudou ? null : forma ?? null);
-      if (!mudou && passou) {
+      /* A PORTA CITADA QUE MUDOU COM A MALHA IGUAL. A etapa fixa guarda as portas que as posteriores citam; a receita que muda
+         só a porta (o lugar do encaixe) não muda a forma, e as posteriores iam junto sem nada acusar. */
+      const portasMudadas = fixa.portas ? Object.keys(fixa.portas).sort().flatMap((nome) => {
+        const d = diferencas(fixa.portas[nome], portas?.[nome]);
+        return d.length ? [`a porta '${nome}' mudou depois do aceite: ${d.join('; ')}`] : [];
+      }) : [];
+      if (!mudou && passou && !portasMudadas.length) {
         return { instancia, estado: 'fixa', juntas, ...(formaDoAceite ? { forma: formaDoAceite } : {}), ...(fixa.portas ? { portas: fixa.portas } : {}), aceite: fixa.aceite };
       }
-      const motivo = mudou ? 'a receita mudou depois do aceite' : 'uma junta deixou de passar depois do aceite';
+      const motivo = mudou ? 'a receita mudou depois do aceite' : portasMudadas.length ? portasMudadas.join('; ') : 'uma junta deixou de passar depois do aceite';
       const guardado = {
         por: 'leitura do registro', motivo,
         ...(fixa.aceite ? { aceite: fixa.aceite } : {}),
         ...(formaDoAceite ? { forma: formaDoAceite } : {}),
         ...(!formaDoAceite && fixa.receita ? { receita: fixa.receita } : {}),
         ...(fixa.portas ? { portas: fixa.portas } : {}),
+        ...juntasDasPosteriores(anterior, instancia),
       };
       return {
         instancia, estado: 'quebrada', juntas, ...comForma, ...comPortas, motivo,
@@ -130,6 +138,20 @@ export function atualizarRegistro(montagemId, medidas, anterior = null, { citaco
     ? etapa : { ...etapa, reaberturas: historico.get(etapa.instancia) }));
   registro.etapas = abalarPelasPortas(registro.etapas, citacoes);
   return registro;
+}
+
+/* AS JUNTAS DAS POSTERIORES NO ACEITE. Quando a etapa fixa quebra, a medida das juntas que as posteriores têm com ela fica guardada
+   com o aceite, como estava no registro gravado antes da mudança. A reabertura sem as portas do aceite prova a porta pela junta, e
+   a medida de comparação não pode ser a da última escrita do registro: uma escrita no meio do caminho (a reabertura de outra etapa)
+   grava as juntas já com a mudança, e a prova passaria a comparar a mudança com ela mesma (2026-11-17). */
+function juntasDasPosteriores(anterior, instancia) {
+  const etapas = anterior?.etapas ?? [];
+  const indice = etapas.findIndex((e) => e.instancia === instancia);
+  if (indice < 0) return {};
+  const porPosterior = Object.fromEntries(etapas.slice(indice + 1)
+    .map((e) => [e.instancia, (e.juntas ?? []).filter((j) => j.com === instancia)])
+    .filter(([, juntas]) => juntas.length));
+  return Object.keys(porPosterior).length ? { juntasDasPosteriores: porPosterior } : {};
 }
 
 /* As portas do aceite de uma etapa: na fixa, as que ela guardou ao ser fixada; na que não está fixa, as da última reabertura que
@@ -161,9 +183,17 @@ function abalarPelasPortas(etapas, citacoes) {
       const citada = porId.get(g.etapa);
       if (!citada) continue;
       if (abaladas.has(g.etapa)) { motivos.push(`cita a porta '${g.porta}' de '${g.etapa}' (${g.meios.join(', ')}), que ${abaladas.get(g.etapa)}`); continue; }
-      if (citada.estado === 'fixa' || g.profunda) continue;
+      if (g.profunda) continue;
+      /* A porta citada fora das portas do aceite (a citação nova na montagem, depois do aceite da etapa citada) não tem com que
+         ser conferida, e abala a posterior, como na reabertura. Etapa sem portas guardadas (registro de antes de 2026-11-17) fica
+         de fora: não há referência. */
       const referencia = portasDeReferencia(citada);
-      if (!referencia || referencia[g.porta] === undefined) continue;
+      if (!referencia) continue;
+      if (referencia[g.porta] === undefined) {
+        motivos.push(`a porta '${g.porta}' de '${g.etapa}', que ela cita (${g.meios.join(', ')}), não está nas portas do aceite de '${g.etapa}'`);
+        continue;
+      }
+      if (citada.estado === 'fixa') continue;
       const d = diferencas(referencia[g.porta], citada.portas?.[g.porta]);
       if (d.length) motivos.push(`a porta '${g.porta}' de '${g.etapa}', que ela cita (${g.meios.join(', ')}), mudou desde o aceite de '${g.etapa}': ${d.join('; ')}`);
     }
@@ -194,6 +224,10 @@ export function fixarEtapa(registro, instancia, aceite) {
     falhar('etapa-fora-de-ordem', `a próxima etapa é '${proxima?.instancia ?? 'nenhuma'}', e não '${instancia}'.`);
   }
   const etapa = registro.etapas[indice];
+  /* A quebrada não se fixa direto: a reabertura é que prova as posteriores e guarda a referência das portas. */
+  if (etapa.estado === 'quebrada') {
+    falhar('etapa-quebrada', `'${instancia}' está quebrada (${etapa.motivo ?? 'sem motivo'}); reabra-a com --reabrir e --por da pessoa antes de fixar.`);
+  }
   const reprovadas = etapa.juntas.filter((junta) => !junta.satisfeita).map((junta) => junta.relacao);
   if (reprovadas.length) {
     falhar('etapa-com-junta-reprovada', `'${instancia}' tem junta reprovada: ${reprovadas.join(', ')}.`);
@@ -224,7 +258,7 @@ export function fixarEtapa(registro, instancia, aceite) {
    `citacoes` são todas as citações de porta da montagem, [{ etapa, porta, posterior, por, relacao?, profunda? }]; `portasAgora`, as
    portas desta etapa como a receita as publica agora; `anterior`, o registro gravado. As portas do aceite desta etapa são as de
    `portasDeReferencia`. Quando o registro não as guardou (registro de antes de 2026-11-17), a porta citada só se prova por uma junta
-   medida sobre ela, com a medida igual à do registro anterior; a porta citada só por vínculo ou por posição, sem junta, não está
+   medida sobre ela, com a medida igual à do aceite (a do registro gravado, na etapa fixa, ou a que a leitura guardou quando ela quebrou); a porta citada só por vínculo ou por posição, sem junta, não está
    provada, e a citação de porta de dentro de uma submontagem também não. A etapa posterior aberta não corta a cadeia: se ela não
    provou as citações dela, toda posterior que a cita também não prova.
 
@@ -240,7 +274,12 @@ const medidasIguais = (a, b) => JSON.stringify(a ?? null, (_, v) => NUMERO(v)) =
 
 export function conferirPosteriores(registro, instancia, { citacoes, portasAgora, anterior = null }) {
   const indice = registro.etapas.findIndex((etapa) => etapa.instancia === instancia);
-  const referencia = portasDeReferencia(registro.etapas[indice]);
+  const etapa = registro.etapas[indice];
+  const referencia = portasDeReferencia(etapa);
+  /* a medida das juntas do aceite: na etapa fixa, a do registro gravado; na quebrada, a que a leitura guardou quando ela quebrou */
+  const juntasDoAceite = etapa.estado === 'fixa'
+    ? (p) => anterior?.etapas?.find((e) => e.instancia === p)?.juntas ?? null
+    : (p) => [...(etapa.reaberturas ?? [])].reverse().find((r) => r.juntasDasPosteriores)?.juntasDasPosteriores?.[p] ?? null;
   const suspeitas = new Map([[instancia, null]]);
   const mudaram = [];
   const provas = [];
@@ -259,16 +298,17 @@ export function conferirPosteriores(registro, instancia, { citacoes, portasAgora
         else comoProvou.push(`a porta '${g.porta}' igual à do aceite`);
         continue;
       }
-      /* sem as portas do aceite: só a junta medida sobre a porta prova, com a medida do registro anterior */
+      /* sem as portas do aceite: só a junta medida sobre a porta prova, com a medida do aceite */
       if (!g.relacoes.length) { problemas.push(`${onde}, não tem junta medida que a prove, e as portas do aceite de '${instancia}' não estão guardadas no registro`); continue; }
-      const antes = anterior?.etapas?.find((e) => e.instancia === posterior.instancia)?.juntas ?? [];
+      const antes = juntasDoAceite(posterior.instancia);
+      if (!antes) { problemas.push(`${onde}: a medida das juntas no aceite de '${instancia}' não está guardada, e as portas do aceite também não`); continue; }
       const ruins = g.relacoes.filter((relacao) => {
         const agora = posterior.juntas?.find((j) => j.relacao === relacao);
         const velha = antes.find((j) => j.relacao === relacao);
         return !agora || !velha || !medidasIguais(velha.medidas, agora.medidas);
       });
-      if (ruins.length) problemas.push(`${onde}: a medida da junta ${ruins.map((r) => `'${r}'`).join(', ')} não é a do registro anterior`);
-      else comoProvou.push(`a porta '${g.porta}' provada pela junta ${g.relacoes.map((r) => `'${r}'`).join(', ')}, com a medida do registro anterior (as portas do aceite não estão guardadas)`);
+      if (ruins.length) problemas.push(`${onde}: a medida da junta ${ruins.map((r) => `'${r}'`).join(', ')} não é a do aceite`);
+      else comoProvou.push(`a porta '${g.porta}' provada pela junta ${g.relacoes.map((r) => `'${r}'`).join(', ')}, com a medida do aceite (as portas do aceite não estão guardadas)`);
     }
     if (posterior.estado === 'quebrada') problemas.push(posterior.motivo ?? 'a etapa está quebrada');
     if (problemas.length) {

@@ -19,7 +19,7 @@ describe('reabrir a base do braço com a receita nova', () => {
     expect(registro.etapas[0]).toMatchObject({ instancia: 'base', estado: 'aberta' });
     expect(registro.etapas.slice(1).map((e) => [e.instancia, e.estado])).toEqual(ANTES.etapas.slice(1).map((e) => [e.instancia, 'fixa']));
     expect(provas).toHaveLength(11);
-    expect(provas[0]).toBe("anelCintura: forma do aceite, a porta 'assento' provada pela junta 'anelSentaNaBase', com a medida do registro anterior (as portas do aceite não estão guardadas)");
+    expect(provas[0]).toBe("anelCintura: forma do aceite, a porta 'assento' provada pela junta 'anelSentaNaBase', com a medida do aceite (as portas do aceite não estão guardadas)");
     expect(provas.slice(1).every((p) => p.endsWith(', sem citar porta de etapa reaberta ou não provada'))).toBe(true);
     /* o aceite antigo da base segue em reaberturas, e as portas de agora ficam guardadas para a próxima reabertura */
     expect(registro.etapas[0].reaberturas.at(-2)).toMatchObject({ por: 'leitura do registro', aceite: ANTES.etapas[0].aceite, forma: ANTES.etapas[0].forma });
