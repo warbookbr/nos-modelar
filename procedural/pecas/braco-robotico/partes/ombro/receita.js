@@ -293,7 +293,7 @@ const receita = {
   get TOPO() { return { origem: 'centro da boca de baixo do pescoço; y para cima, a saída para +Z', ...derivar(this.PARAMS).pontos }; },
   PLANO: {
     objeto: 'ombro do braço robótico: gira com a cintura e carrega a junta do ombro, de eixo horizontal',
-    referencias: ['../../referencias/frontal.contornos.json'],
+    referencias: ['../../ALINHAMENTO.md'],
     escala: { medida: 'diâmetro do anel da cintura, onde o pé assenta', milimetros: 210 },
     partes: [
       { nome: 'pescoco', forma: 'L de ponta-cabeça de 190 mm de largura por 220 de comprimento na direção da junta: parte de pé com a frente recuada 30 mm da deitada, quinas de 75 em planta, saída redonda do diâmetro da largura; eixo a 115, topo a 210', tecnica: 'uma malha contínua por subdivisao de gaiola de anéis do pé à saída; seção de cantos arredondados que vira redonda; curva do encontro de baixo nos pontos da gaiola; vincos vivos na borda de baixo e na borda da saída' },

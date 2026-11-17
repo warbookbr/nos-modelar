@@ -82,7 +82,7 @@
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
-import { basename, dirname, isAbsolute, join, resolve } from 'node:path';
+import { basename, dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { linhaDaVista } from './lados-das-vistas.mjs';
 import { paraPng } from './leitura-por-regioes.mjs';
@@ -737,6 +737,38 @@ export function contornosParaSobrepor({ contornos = [], lidos = new Map(), nomes
   return { entradas, fora };
 }
 
+/* SÓ A PEÇA EM MODELAGEM RECEBE O CONTORNO. Em 2026-11-17 o pacote do ombro do braço robótico desenhou e citou como medida
+ * `frontal.contornos.json`, resto de uma foto que saiu do repositório, sobre uma peça que a pessoa já tinha aceitado: o contorno não
+ * correspondia à peça aprovada e os críticos leram a diferença como defeito. O sinal gravado de peça aprovada é a etapa fixa no
+ * registro de etapas da montagem (`<montagem>.etapas.json`, que só `etapas-da-montagem.mjs --fixar` escreve, com o aceite da pessoa);
+ * a peça sozinha, fora de montagem, não grava aprovação nenhuma e continua recebendo o contorno. */
+
+/** O registro de etapas gravado ao lado da montagem, ou null sem ele. Lê só o arquivo: não resolve a montagem. */
+export function registroDasEtapas(montagem, { existe = existsSync, ler = (f) => readFileSync(f, 'utf8') } = {}) {
+  const arquivo = montagem?.arquivo?.replace(/\.json$/, '.etapas.json');
+  if (!arquivo || !existe(arquivo)) return null;
+  return JSON.parse(ler(arquivo));
+}
+
+/**
+ * A etapa fixa da peça, do registro de etapas já lido: `{ instancia, por }` quando toda instância da peça (`montagem.instancias`, de
+ * `montagemDaPeca`) está fixa no registro, ou null (peça sozinha, sem registro, ou alguma instância aberta ou quebrada). Puro.
+ */
+export function etapaFixaDaPeca(montagem, registro) {
+  if (!montagem?.instancias?.length || !Array.isArray(registro?.etapas)) return null;
+  const etapas = montagem.instancias.map((id) => registro.etapas.find((e) => e?.instancia === id));
+  if (etapas.some((e) => e?.estado !== 'fixa')) return null;
+  return { instancia: etapas[0].instancia, por: etapas[0].aceite?.por ?? null };
+}
+
+/** O motivo, para o pedido, de os contornos de uma peça com a etapa fixa ficarem fora do pacote. */
+export function motivoDaEtapaFixa(fixa, contornos, arquivoDaMontagem) {
+  const nomes = [...new Set(contornos.map((c) => basename(c.arquivo)))].join(', ');
+  return `${nomes} ${contornos.length > 1 ? 'ficam' : 'fica'} fora do pacote, sem desenho nem citação como medida: a etapa '${fixa.instancia}' está fixa no registro de etapas da montagem`
+    + `${fixa.por ? ` (aceite: ${fixa.por})` : ''}, e o pacote só usa contorno de peça em modelagem, porque o contorno de uma peça já aprovada pode ser resto de uma referência encerrada. `
+    + `Reabrir a etapa (\`node tools/modelar/etapas-da-montagem.mjs ${relative(REPO, arquivoDaMontagem)} --reabrir ${fixa.instancia} --por "<quem, data: motivo>"\`) o traz de volta.`;
+}
+
 /** A pose da instância no mundo da montagem resolvida, como `cortesDosEncaixes` a resolve; null se a instância ainda não está construída. */
 export async function poseDaInstancia(montagem) {
   const [{ receitasDaMontagem, montagemAteAGeometria }, { lerMontagemPersistida }, { resolverMontagemPersistida }, { carregadoresDeReceitas }] = await Promise.all([
@@ -757,6 +789,9 @@ const textoDoEncontro = (e) => (e
   : '');
 
 function secaoDoContornoSobreposto({ arquivo, linhas = [], fora = [] }) {
+  if (!arquivo) {
+    return ['## Contorno medido sobre o modelo', '', 'Nenhum contorno medido foi desenhado sobre o modelo neste pacote.', '', ...fora.flatMap((f) => [`Fora do contorno sobreposto: ${f}`, ''])];
+  }
   const L = [
     '## Contorno medido sobre o modelo', '',
     'A vista ortográfica do modelo com a linha do contorno tirado da referência por cima, em mm, posta no lugar que o referencial da peça dá, '
@@ -1595,6 +1630,8 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
     caixasDasPartes: async (arquivo, rec) => caixasDasPartes((await import('./entrada-de-medida.mjs')).executarReceitaGuardada(arquivo, rec).executada.neutro),
     poseDaInstancia,
     contornoSobreposto: prancharContorno,
+    montagemDaPeca: (p) => montagemDaPeca(p),
+    registroDasEtapas: (m) => registroDasEtapas(m),
     ...dependencias,
   };
   const blender = Object.hasOwn(dependencias, 'blender') ? dependencias.blender : doAmbiente('BLENDER');
@@ -1635,15 +1672,22 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
     dados = await dep.formasGuardadas(bruto, declarado.opcao, declarado.esboco);
     alvoDaReceita = alvoGuardado({ declarado, dados });
   }
-  const montagem = montagemDaPeca(peca);
+  const montagem = dep.montagemDaPeca(peca);
   const avisos = [];
   /* os contornos medidos que o pedido cita por lado e os da pasta da peça, que o veredito confere, lidos antes da captura */
-  const contornosDoPedido = contornosDasReferencias({ imagens: referencias.imagens, citadas: citadasQueNaoSaoImagem(plano, dirname(caminho)) });
-  const contornosMedidos = [...contornosDoPedido];
+  let contornosDoPedido = contornosDasReferencias({ imagens: referencias.imagens, citadas: citadasQueNaoSaoImagem(plano, dirname(caminho)) });
+  let contornosMedidos = [...contornosDoPedido];
   for (const c of contornosDaPeca({ caminhoDaReceita: caminho, raiz: REPO })) {
     if (c.vista && !contornosMedidos.some((x) => x.arquivo === c.caminho)) contornosMedidos.push({ arquivo: c.caminho, lado: c.vista });
   }
   let sobrepor = { entradas: [], fora: [] };
+  /* a peça com a etapa fixa não recebe contorno: nem desenhado, nem citado como medida do lado */
+  const fixa = montagem && contornosMedidos.length ? etapaFixaDaPeca(montagem, dep.registroDasEtapas(montagem)) : null;
+  if (fixa) {
+    sobrepor.fora.push(motivoDaEtapaFixa(fixa, contornosMedidos, montagem.arquivo));
+    contornosDoPedido = [];
+    contornosMedidos = [];
+  }
   if (contornosMedidos.length) {
     const lidos = new Map(contornosMedidos.map(({ arquivo }) => {
       try { return [arquivo, lerContornos(JSON.parse(readFileSync(arquivo, 'utf8')), basename(arquivo))]; } catch (erro) { return [arquivo, erro]; }

@@ -12,7 +12,7 @@ import { lerPergunta } from '../../src/autoria/perguntas-do-critico.js';
 import {
   ELEVACOES_DA_LUZ_RASANTE, LIMITE_DO_VEREDITO, PERGUNTA_DO_ALVO, PRAZO_DA_CAPTURA_MONTADA_MS, VISTAS_MONTADAS, ladoDaVista, montagemDaPeca, montarPedido, pastaDaRodada, prefixoDaPeca, referenciasDoPlano,
   DISTANCIA_DE_PERTO_MM, campoDePertoMm, MOTIVO_SEM_MEDIR, ReceitaReprovada, decidirLuzRasante, imprimir, fracaoVisivelDaPeca, lerReferenciasExternas, lerOrientacaoDaReferencia, LIMITE_DA_ORIENTACAO, AJUDA, imagensDoReflexo, LEITURA_DA_FAIXA, LEITURA_DO_REFLEXO, secaoDoReflexo, MINIMO_DO_REFLEXO, luzRasanteDoPacote, primeiraQuePassa, unidadeDoAlvo, vistaDoArquivo, vistasMontadasVisiveis, vistasParaCritica, vistasRepetidas,
-  ARQUIVO_DO_CONTORNO_SOBREPOSTO, contornosParaSobrepor,
+  ARQUIVO_DO_CONTORNO_SOBREPOSTO, contornosParaSobrepor, etapaFixaDaPeca, motivoDaEtapaFixa, registroDasEtapas,
 } from './vistas-para-critica.mjs';
 import { lerContornos } from './comparar-contornos.mjs';
 
@@ -1274,5 +1274,60 @@ describe('o contorno medido sobre o modelo', () => {
     expect(resultado.contornoSobreposto.arquivo).toBe(join(pasta, ARQUIVO_DO_CONTORNO_SOBREPOSTO));
     expect(readFileSync(join(pasta, 'pedido.md'), 'utf8')).toContain(`- contorno sobreposto: ${join(pasta, ARQUIVO_DO_CONTORNO_SOBREPOSTO)}`);
     expect(JSON.parse(readFileSync(resultado.manifesto, 'utf8')).contornoSobreposto.imagem).toBe(join(pasta, ARQUIVO_DO_CONTORNO_SOBREPOSTO));
+  }, 60_000);
+
+  it('a etapa fixa vem do registro de etapas: toda instância da peça fixa, e nada fora de montagem', () => {
+    const montagem = { arquivo: '/m/montagem.json', instancia: 'ombro', instancias: ['ombro'] };
+    const registro = { etapas: [{ instancia: 'base', estado: 'fixa' }, { instancia: 'ombro', estado: 'fixa', aceite: { por: 'pessoa, 2026-11-05' } }] };
+    expect(etapaFixaDaPeca(montagem, registro)).toEqual({ instancia: 'ombro', por: 'pessoa, 2026-11-05' });
+    expect(etapaFixaDaPeca(montagem, { etapas: [{ instancia: 'ombro', estado: 'aberta' }] })).toBeNull();
+    expect(etapaFixaDaPeca(montagem, { etapas: [{ instancia: 'ombro', estado: 'quebrada' }] })).toBeNull();
+    expect(etapaFixaDaPeca({ ...montagem, instancias: ['ombro', 'outro'] }, registro)).toBeNull();
+    expect(etapaFixaDaPeca(null, registro)).toBeNull();
+    expect(etapaFixaDaPeca(montagem, null)).toBeNull();
+    const lidos = [];
+    expect(registroDasEtapas(montagem, { existe: () => true, ler: (f) => { lidos.push(f); return JSON.stringify(registro); } })).toEqual(registro);
+    expect(lidos).toEqual(['/m/montagem.etapas.json']);
+    expect(registroDasEtapas(montagem, { existe: () => false })).toBeNull();
+  });
+
+  it('o ombro do braço robótico está fixo no registro gravado, e o contorno dele fica de fora', () => {
+    const montagem = montagemDaPeca('braco-robotico/ombro');
+    expect(etapaFixaDaPeca(montagem, registroDasEtapas(montagem))?.instancia).toBe('ombro');
+  });
+
+  it('o pedido sem prancha diz que nenhum contorno foi desenhado, e por quê', () => {
+    const motivo = motivoDaEtapaFixa({ instancia: 'ombro', por: 'pessoa' }, [{ arquivo: '/r/frontal.contornos.json' }, { arquivo: '/r/lateral.contornos.json' }], join(dirname(dirname(import.meta.dirname)), 'm/montagem.json'));
+    expect(motivo).toMatch(/^frontal\.contornos\.json, lateral\.contornos\.json ficam fora do pacote, sem desenho nem citação como medida: a etapa 'ombro' está fixa/);
+    expect(motivo).toContain('--reabrir ombro');
+    const pedido = montarPedido({ peca: 'p', contornoSobreposto: { arquivo: null, fora: [motivo] } });
+    expect(pedido).toContain('Nenhum contorno medido foi desenhado sobre o modelo neste pacote.');
+    expect(pedido).toContain(`Fora do contorno sobreposto: ${motivo}`);
+    expect(pedido).not.toContain('contorno sobreposto: null');
+  });
+
+  it('a peça com a etapa fixa sai sem a prancha do contorno e sem citá-lo como medida, com o motivo no pedido', async () => {
+    const PECA = 'tools/fixtures/refina-forma-global/contorno-ok/receita.js';
+    const base = mkdtempSync(join(area, 'contorno-fixo-'));
+    const pasta = join(base, 'rodada');
+    const bancada = bancadaFalsa(base, PECA);
+    const pedidos = [];
+    const resultado = await vistasParaCritica(PECA, {
+      saida: pasta, pastaDasCapturas: base,
+      dependencias: {
+        medirReceita: medirPassa, olharBancada: bancada.fazer, rodadasAnteriores: () => [],
+        montagemDaPeca: () => ({ arquivo: join(base, 'montagem.json'), instancia: 'peca', instancias: ['peca'] }),
+        registroDasEtapas: () => ({ etapas: [{ instancia: 'peca', estado: 'fixa', aceite: { por: 'pessoa, 2026-11-17' } }] }),
+        poseDaInstancia: async () => { throw new Error('a pose não é pedida para peça fixa'); },
+        olharEtapas: async () => { throw Object.assign(new Error('fora das etapas'), { codigo: 'foco-fora-das-etapas' }); },
+        cortesDosEncaixes: async () => ({ cortes: [] }),
+        contornoSobreposto: async (opcoes) => { pedidos.push(opcoes); return null; },
+      },
+    });
+    expect(pedidos).toEqual([]);
+    expect(resultado.contornoSobreposto).toBeNull();
+    const pedido = readFileSync(join(pasta, 'pedido.md'), 'utf8');
+    expect(pedido).toContain("Fora do contorno sobreposto: frontal.contornos.json fica fora do pacote, sem desenho nem citação como medida: a etapa 'peca' está fixa no registro de etapas da montagem (aceite: pessoa, 2026-11-17)");
+    expect(pedido).not.toMatch(/a medida deste lado vem dos contornos/);
   }, 60_000);
 });
