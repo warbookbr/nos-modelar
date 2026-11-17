@@ -28,7 +28,7 @@ A leitura e os comandos `--fixar` e `--reabrir` de `etapas-da-montagem` são USA
 
 - a função de impressão e a leitura pura, com os ataques das cinco revisões convertidos em testes permanentes com `expect`, nos dois sentidos (o que deve quebrar quebra, o que não mudou segue fixo);
 - `fixar` e `reabrir` só acrescentando eventos, e os consumidores que leem o estado gravado passando pela leitura;
-- a migração dos cinco registros do acervo (51 etapas fixas) sem novo aceite: pela reconstrução no commit que gravou cada aceite, com o hash da forma como contraprova, e, onde o commit não reproduz a forma, pela impressão de agora marcada `origem: migração`, com a condição de a forma de agora ser a do aceite;
+- a migração dos cinco registros do acervo (52 etapas fixas) sem novo aceite: pela reconstrução no commit que gravou cada aceite, com o hash da forma como contraprova, e, onde o commit não reproduz a forma, pela impressão de agora marcada `origem: migração`, com a condição de a forma de agora ser a do aceite;
 - o contrato em `MONTAGENS-SEMANTICAS.md` e a nota na skill.
 
 ## Excluído
@@ -39,7 +39,7 @@ A leitura e os comandos `--fixar` e `--reabrir` de `etapas-da-montagem` são USA
 ## Gate de saída
 
 1. Os ataques das cinco revisões passam como testes nos dois sentidos, e um teste de propriedade mostra que nenhuma sequência de leituras e de comandos sobre outras etapas muda a impressão de um aceite.
-2. A guarda do acervo devolve as 51 etapas fixas depois da migração, com a origem de cada impressão listada.
+2. A guarda do acervo devolve as 52 etapas fixas depois da migração, com a origem de cada impressão listada.
 3. Não sobra no código leitura de "registro sem portas" nem estado gravado usado como entrada.
 4. Revisão adversarial sem bloqueio.
 
@@ -47,9 +47,9 @@ A leitura e os comandos `--fixar` e `--reabrir` de `etapas-da-montagem` são USA
 
 1. Impressão e leitura pura, com a tabela de ataques como testes. Feita em 2026-11-17, na [pasta do plano](../banco-de-provas/etapas-pela-impressao-2026-11-17/README.md): `src/autoria/etapas-pela-impressao.js` guarda eventos imutáveis (versão 3) e lê o estado de cada etapa pela comparação da impressão de agora com a do aceite vigente, e `medirAgora` monta o medido da montagem resolvida; os ataques A1 a E8 e a propriedade das sequências estão em `etapas-da-montagem.test.mjs`, e no braço do acervo, medido à mão, o deslocamento de 30 mm da junta do ombro quebra o braço e as nove seguintes e o desfazer as devolve fixas. `fixar` e `reabrir` ainda usam o caminho antigo.
 2. A ferramenta e os consumidores. Feita em 2026-11-17, na [pasta do plano](../banco-de-provas/etapas-pela-impressao-2026-11-17/README.md#fatia-2-a-ferramenta-e-os-consumidores): `fixar` e `reabrir` só acrescentam eventos ao registro v3 e os consumidores do estado passam pela leitura; o registro v1 e v2 segue lido pelo caminho antigo, escolhido só pela versão do registro, com aviso, até a migração da fatia 3.
-3. A migração do acervo, com relatório por etapa. Feita em 2026-11-17, na [pasta do plano](../banco-de-provas/etapas-pela-impressao-2026-11-17/README.md#fatia-3-a-migração-em-ensaio): das 52 etapas fixas, 43 migraram pela história do commit do aceite (via a), 9 pela impressão de agora com a porta não provada (via b, as oito do avião e o anel da cintura do braço, nomeadas no README) e nenhuma ficou de fora (via c); os cinco registros foram gravados, um commit por montagem, a leitura nova devolve as 52 fixas, a guarda do acervo lê pela impressão e lista a origem de cada uma, e o caminho antigo (inclusive o registro v1 e v2) saiu do código, que recusa o registro antigo com a mensagem que manda rodar a migração.
+3. A migração do acervo, com relatório por etapa. Feita em 2026-11-17, na [pasta do plano](../banco-de-provas/etapas-pela-impressao-2026-11-17/README.md#fatia-3-a-migração-em-ensaio): das 52 etapas fixas, 43 migraram pela história do commit do aceite (via a), 9 pela impressão de agora (via b, as oito do avião e o anel da cintura do braço; só o anel cita porta e leva a porta não provada) e nenhuma ficou de fora (via c); os cinco registros foram gravados, um commit por montagem, a leitura nova devolve as 52 fixas, a guarda do acervo lê pela impressão e lista a origem de cada uma, e o caminho antigo (inclusive o registro v1 e v2) saiu do código, que recusa o registro antigo com a mensagem que manda rodar a migração.
 4. Contrato, skill e fechamento.
 
 ## Riscos e parada
 
-A impressão sensível demais quebraria as 51 etapas a cada mudança mínima do motor; a comparação usa a tolerância de 12 algarismos que o código já usa, e se a migração não reproduzir a forma em mais da metade das etapas o plano para e volta à pessoa. A porta de dentro de submontagem pode não ser exposta no mundo pelo resolvedor; se não for, ela fica fora da impressão com aviso, e não se inventa leitura.
+A impressão sensível demais quebraria as 52 etapas a cada mudança mínima do motor; a comparação usa a tolerância de 12 algarismos que o código já usa, e se a migração não reproduzir a forma em mais da metade das etapas o plano para e volta à pessoa. A porta de dentro de submontagem pode não ser exposta no mundo pelo resolvedor; se não for, ela fica fora da impressão com aviso, e não se inventa leitura.
