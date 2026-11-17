@@ -426,20 +426,24 @@ describe('o registro gravado no meio do caminho', () => {
     const receitas = vazia('bloco-com-pino');
     const erro = await fixar(arquivo, 'base', aceite, { ...opcoes, receitas }).catch((e) => e);
     expect(erro.codigo).toBe('etapa-sem-geometria');
-    expect(erro.message).toMatch(/escreva os PASSOS/);
+    expect(erro.message).toMatch(/PASSOS/);
+    expect(erro.message).toMatch(/submontagem/);
     await recusa(fixar(arquivo, 'base', { ...aceite, aceiteHumano: true }, { ...opcoes, receitas }), 'etapa-sem-geometria');
   });
 
-  it('D4: a etapa fixa sem geometria mantém no registro as juntas do aceite, e a referência do C3 sobrevive', async () => {
+  it('E7: no registro sem portas, reabrir a base esvaziada recusa enquanto a posterior fixa depende da porta, e a base cheia não deixa o pino mudado ser fixado', async () => {
     gravarRegistro(arquivo, semPortas(await tresFixas()));
-    const receitas = vazia('bloco-com-furo-e-pino');
-    const antes = disco().etapas[1].juntas;
-    gravarRegistro(arquivo, await reabrir(arquivo, 'topo', POR, { ...opcoes, receitas }));
-    expect(disco().etapas[1].juntas).toEqual(antes);
-    expect(antes.length).toBeGreaterThan(0);
-    const { registro } = await estadoDasEtapas(arquivo, { receitas: movido() });
-    expect(estados(registro)).toEqual(['fixa', 'quebrada', 'aberta']);
-    expect(registro.etapas[1].motivo).toMatch(/medida da junta 'meioNoPinoDaBase' mudou/);
+    await recusa(reabrir(arquivo, 'base', POR, { ...opcoes, receitas: vazia('bloco-com-pino') }), 'etapa-com-posteriores-fixas');
+    gravarRegistro(arquivo, await reabrir(arquivo, 'base', POR, opcoes));
+    const movidoX = comPassosDaBase(portaDoPino((i) => ({ ...i, centro: [i.centro[0] + 0.005, i.centro[1], i.centro[2]] })));
+    expect(estados((await estadoDasEtapas(arquivo, { receitas: movidoX })).registro)).toEqual(['aberta', 'quebrada', 'quebrada']);
+    await recusa(fixar(arquivo, 'base', aceite, { ...opcoes, receitas: movidoX }), 'etapa-com-posterior-quebrada');
+  });
+
+  it('E8: no registro sem portas, o meio esvaziado com o pino da base movido não deixa reabrir a base e lavar a junta do meio', async () => {
+    gravarRegistro(arquivo, semPortas(await tresFixas()));
+    const movidoEMeioVazio = { ...movido(), 'bloco-com-furo-e-pino': { ...RECEITAS['bloco-com-furo-e-pino'], PASSOS: [] } };
+    await recusa(reabrir(arquivo, 'base', POR, { ...opcoes, receitas: movidoEMeioVazio }), 'etapa-com-posteriores-fixas');
   });
 
   it('C3: no registro sem portas, a medida da junta que mudou com a malha igual quebra a posterior fixa', async () => {

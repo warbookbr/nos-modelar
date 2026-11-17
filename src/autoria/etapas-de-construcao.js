@@ -99,10 +99,7 @@ export function atualizarRegistro(montagemId, medidas, anterior = null, { citaco
          voltam a passar: até 2026-11-17 voltava, e uma quebrada gravada por outra escrita do registro virava aberta na leitura
          seguinte, sem `--por` e sem a prova das posteriores que a reabertura faz. Só `--reabrir` a tira deste estado. O aceite já
          foi guardado em `reaberturas` quando ela quebrou. */
-      /* A ETAPA SEM GEOMETRIA AGORA (PASSOS vazio) não mede junta nenhuma: o registro mantém as juntas do aceite, e não as vazias de
-         agora, que apagariam a referência da medida da junta (2026-11-17). */
-      const juntasGravadas = !forma && fixa.juntas?.length ? fixa.juntas : juntas;
-      if (fixa.estado === 'quebrada') return { instancia, estado: 'quebrada', juntas: juntasGravadas, ...comForma, ...comPortas, motivo: fixa.motivo ?? 'quebrou depois do aceite e espera a reabertura' };
+      if (fixa.estado === 'quebrada') return { instancia, estado: 'quebrada', juntas, ...comForma, ...comPortas, motivo: fixa.motivo ?? 'quebrou depois do aceite e espera a reabertura' };
       /* FORMA QUE MUDOU DEPOIS DO ACEITE. As juntas só pegam mudança que
          desencaixa; alargar a base mantém o anel encaixado pelo vínculo, e a
          etapa continuava fixa com um aceite dado a outra peça. */
@@ -127,7 +124,7 @@ export function atualizarRegistro(montagemId, medidas, anterior = null, { citaco
       });
       portasMudadas.push(...juntasMudadas);
       if (!mudou && passou && !portasMudadas.length) {
-        return { instancia, estado: 'fixa', juntas: juntasGravadas, ...(formaDoAceite ? { forma: formaDoAceite } : {}), ...(fixa.portas ? { portas: fixa.portas } : {}), aceite: fixa.aceite };
+        return { instancia, estado: 'fixa', juntas, ...(formaDoAceite ? { forma: formaDoAceite } : {}), ...(fixa.portas ? { portas: fixa.portas } : {}), aceite: fixa.aceite };
       }
       const motivo = mudou ? 'a receita mudou depois do aceite' : portasMudadas.length ? portasMudadas.join('; ') : 'uma junta deixou de passar depois do aceite';
       const guardado = {
@@ -139,7 +136,7 @@ export function atualizarRegistro(montagemId, medidas, anterior = null, { citaco
         ...juntasDasPosteriores(anterior, instancia),
       };
       return {
-        instancia, estado: 'quebrada', juntas: juntasGravadas, ...comForma, ...comPortas, motivo,
+        instancia, estado: 'quebrada', juntas, ...comForma, ...comPortas, motivo,
         reaberturas: [...(historico.get(instancia) ?? []), guardado],
       };
     }),
@@ -243,7 +240,7 @@ export function fixarEtapa(registro, instancia, aceite, { citacoes = [], portasA
   /* A etapa sem geometria (a receita sem PASSOS, sem `forma` na leitura) não tem o que aceitar: o aceite seria dado a nada, e as
      posteriores se apoiariam numa porta que ninguém mediu. */
   if (!etapa.forma) {
-    falhar('etapa-sem-geometria', `'${instancia}' não tem geometria na leitura de agora (a receita não gera forma); escreva os PASSOS dela antes de fixar.`);
+    falhar('etapa-sem-geometria', `'${instancia}' não tem geometria na leitura de agora (a leitura não assina forma para ela: numa peça a receita não gera forma, e escrever os PASSOS dela resolve; numa submontagem não há forma própria, e ela não se fixa por esta etapa).`);
   }
   const reprovadas = etapa.juntas.filter((junta) => !junta.satisfeita).map((junta) => junta.relacao);
   if (reprovadas.length) {

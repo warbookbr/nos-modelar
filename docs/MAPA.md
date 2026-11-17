@@ -5,8 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2054 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
-2092 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2099 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -247,6 +246,10 @@
 - `README.md` — Comparar com a referência: a linha de base dos comandos repetidos e onde a prancha é montada
 - `contar-comandos.mjs` — contar-comandos.mjs — a linha de base do plano de comparar com a referência (fatia 1): os comandos de shell dos registros de uma sessão do Claude Code, conta…
 - `medir-montagem.mjs` — medir-montagem.mjs — onde a prancha modelo e foto é montada (fatia 1 do plano de comparar com a referência): no Chromium, que decodifica jpg, webp e png, ou …
+
+## docs/modelar/banco-de-provas/componentes-eletronicos-2026-11-16/
+
+- `README.md` — Componentes eletrônicos (2026-11-16): limitações conhecidas da reabertura de etapas
 
 ## docs/modelar/banco-de-provas/correcao-de-superficie-2026-11-16/
 
