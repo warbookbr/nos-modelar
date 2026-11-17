@@ -137,6 +137,7 @@ export const TESTES_LENTOS = [
   'tools/modelar/vincos-da-rede.test.mjs',
   'tools/modelar/vincos-das-linhas.test.mjs',
   'tools/modelar/vistas-de-superficie.test.mjs',
+  'tools/modelar/vistas-para-critica.test.mjs',
   'tools/oficina/oficina.test.ts',
 ];
 
