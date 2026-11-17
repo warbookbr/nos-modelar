@@ -12,7 +12,7 @@ import { lerPergunta } from '../../src/autoria/perguntas-do-critico.js';
 import {
   ELEVACOES_DA_LUZ_RASANTE, LIMITE_DO_VEREDITO, PERGUNTA_DO_ALVO, PRAZO_DA_CAPTURA_MONTADA_MS, VISTAS_MONTADAS, ladoDaVista, vistaDaPranchaDesenhada, avisoDasReferenciasIgnoradas, referenciasSemLeitura, montagemDaPeca, montarPedido, pastaDaRodada, prefixoDaPeca, referenciasDoPlano,
   DISTANCIA_DE_PERTO_MM, campoDePertoMm, MOTIVO_SEM_MEDIR, ReceitaReprovada, decidirLuzRasante, imprimir, fracaoVisivelDaPeca, lerReferenciasExternas, lerOrientacaoDaReferencia, LIMITE_DA_ORIENTACAO, AJUDA, imagensDoReflexo, LEITURA_DA_FAIXA, LEITURA_DO_REFLEXO, secaoDoReflexo, MINIMO_DO_REFLEXO, luzRasanteDoPacote, primeiraQuePassa, unidadeDoAlvo, vistaDoArquivo, vistasMontadasVisiveis, vistasParaCritica, vistasRepetidas,
-  ARQUIVO_DO_CONTORNO_SOBREPOSTO, contornosParaSobrepor, etapaFixaDaPeca, lerContornosExternos, lerRegioesDoContorno, motivoDaEtapaFixa, registroDasEtapas,
+  ARQUIVO_DO_CONTORNO_SOBREPOSTO, contornosParaSobrepor, etapaFixaDaPeca, lerContornosExternos, lerRegioesDoContorno, motivoDaEtapaFixa, registroDasEtapasMedido,
   ARQUIVO_DAS_PERGUNTAS_FECHADAS, FORMATO_DAS_PERGUNTAS_FECHADAS, NAO_DA_PARA_VER, NAO_VERIFICAVEL, REGRA_DA_NOTA, arquivoDoPedidoFechado, juntarOrdens, lerRespostasFechadas,
   montarPedidoFechado, notaDasRespostas, notaEscrita, normalizarResposta, perguntasFechadas, relatorioDaJuncao, relatorioDasNotas, respostasQueMudaram, variacaoDasNotas,
   ARQUIVO_DOS_DADOS_DO_PEDIDO, afirmacoesDaForma, gravarPedidos, notaPelaRegra, pesosDasPerguntas, refazerPedidos, semMedidas,
@@ -1521,16 +1521,12 @@ describe('o contorno medido sobre o modelo', () => {
     expect(etapaFixaDaPeca({ ...montagem, instancias: ['ombro', 'outro'] }, registro)).toBeNull();
     expect(etapaFixaDaPeca(null, registro)).toBeNull();
     expect(etapaFixaDaPeca(montagem, null)).toBeNull();
-    const lidos = [];
-    expect(registroDasEtapas(montagem, { existe: () => true, ler: (f) => { lidos.push(f); return JSON.stringify(registro); } })).toEqual(registro);
-    expect(lidos).toEqual(['/m/montagem.etapas.json']);
-    expect(registroDasEtapas(montagem, { existe: () => false })).toBeNull();
   });
 
-  it('o ombro do braço robótico está fixo no registro gravado, e o contorno dele fica de fora', () => {
+  it('o ombro do braço robótico está fixo pela leitura do registro gravado, e o contorno dele fica de fora', async () => {
     const montagem = montagemDaPeca('braco-robotico/ombro');
-    expect(etapaFixaDaPeca(montagem, registroDasEtapas(montagem))?.instancia).toBe('ombro');
-  });
+    expect(etapaFixaDaPeca(montagem, await registroDasEtapasMedido(montagem))?.instancia).toBe('ombro');
+  }, 120_000);
 
   it('o pedido sem prancha diz que nenhum contorno foi desenhado, e por quê', () => {
     const motivo = motivoDaEtapaFixa({ instancia: 'ombro', por: 'pessoa' }, [{ arquivo: '/r/frontal.contornos.json' }, { arquivo: '/r/lateral.contornos.json' }], join(dirname(dirname(import.meta.dirname)), 'm/montagem.json'));

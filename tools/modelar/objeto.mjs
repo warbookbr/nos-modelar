@@ -107,8 +107,8 @@ export function estadoDoObjeto(objeto, { acervo = ACERVO, registroLido } = {}) {
 
   const arquivoEtapas = join(pasta, 'montagem.etapas.json');
   /* o registro da versão 3 não grava o estado: quem o mediu (`registroComEstado`) passa `registroLido` */
-  const registro = registroLido ?? (existsSync(arquivoEtapas) ? JSON.parse(readFileSync(arquivoEtapas, 'utf8')) : null);
-  if (registro?.versao === 3 && !registroLido) throw new Error(`${objeto}: o registro de etapas é da versão 3, que não grava o estado; use estadoDoObjetoMedido (o comando objeto já usa).`);
+  if (!registroLido && existsSync(arquivoEtapas)) throw new Error(`${objeto}: o registro de etapas não grava o estado; use estadoDoObjetoMedido (o comando objeto já usa).`);
+  const registro = registroLido ?? null;
   const montagem = existsSync(join(pasta, 'montagem.json')) ? JSON.parse(readFileSync(join(pasta, 'montagem.json'), 'utf8')) : null;
   const ordem = montagem?.etapas ?? [];
   const fixas = new Set((registro?.etapas ?? []).filter((e) => e.estado === 'fixa').map((e) => e.instancia));
@@ -132,7 +132,7 @@ export async function estadoDoObjetoMedido(objeto, { acervo = ACERVO } = {}) {
   const pasta = join(acervo, objeto);
   const arquivo = join(pasta, 'montagem.etapas.json');
   const montagem = join(pasta, 'montagem.json');
-  if (!existsSync(arquivo) || !existsSync(montagem) || JSON.parse(readFileSync(arquivo, 'utf8')).versao !== 3) return estadoDoObjeto(objeto, { acervo });
+  if (!existsSync(arquivo) || !existsSync(montagem)) return estadoDoObjeto(objeto, { acervo });
   const { registroComEstado } = await import('./etapas-da-montagem.mjs');
   return estadoDoObjeto(objeto, { acervo, registroLido: await registroComEstado(montagem) });
 }

@@ -1260,17 +1260,10 @@ export function lerRegioesDoContorno(texto) {
 /* SÓ A PEÇA EM MODELAGEM RECEBE O CONTORNO. Em 2026-11-17 o pacote do ombro do braço robótico desenhou e citou como medida
  * `frontal.contornos.json`, resto de uma foto que saiu do repositório, sobre uma peça que a pessoa já tinha aceitado: o contorno não
  * correspondia à peça aprovada e os críticos leram a diferença como defeito. O sinal gravado de peça aprovada é a etapa fixa no
- * registro de etapas da montagem (`<montagem>.etapas.json`, que só `etapas-da-montagem.mjs --fixar` escreve, com o aceite da pessoa);
+ * registro de etapas da montagem (`<montagem>.etapas.json`, que só `etapas-da-montagem.mjs --fixar` escreve, com o aceite da pessoa), lido pela impressão do aceite;
  * a peça sozinha, fora de montagem, não grava aprovação nenhuma e continua recebendo o contorno. */
 
-/** O registro de etapas gravado ao lado da montagem, ou null sem ele. Lê só o arquivo: não resolve a montagem. */
-export function registroDasEtapas(montagem, { existe = existsSync, ler = (f) => readFileSync(f, 'utf8') } = {}) {
-  const arquivo = montagem?.arquivo?.replace(/\.json$/, '.etapas.json');
-  if (!arquivo || !existe(arquivo)) return null;
-  return JSON.parse(ler(arquivo));
-}
-
-/** O mesmo registro com o estado de cada etapa: o da versão 3 passa pela leitura pela impressão do aceite (mede a montagem de agora). */
+/** O registro de etapas ao lado da montagem com o estado de cada etapa, pela leitura pela impressão do aceite (mede a montagem de agora); null sem registro. */
 export async function registroDasEtapasMedido(montagem) {
   const arquivo = montagem?.arquivo;
   if (!arquivo || !existsSync(arquivo.replace(/\.json$/, '.etapas.json'))) return null;

@@ -36,10 +36,12 @@ rodada(objeto, 'dificil', 3, {
 writeFileSync(join(objeto, 'montagem.json'), JSON.stringify({
   instancias: [{ id: 'dificilEsquerda', alvo: { tipo: 'peca', ref: 'obj/dificil' } }, { id: 'simples', alvo: { tipo: 'peca', ref: 'obj/simples' } }],
 }));
+/* o registro de eventos: o aceite vigente de cada etapa é um fato, que o custo lê sem medir a montagem */
 writeFileSync(join(objeto, 'montagem.etapas.json'), JSON.stringify({
-  etapas: [
-    { instancia: 'simples', estado: 'fixa', aceite: { por: 'a pessoa, 2026-11-04: fixa' } },
-    { instancia: 'dificilEsquerda', estado: 'fixa', aceite: { por: 'a pessoa, 2026-11-05: aceito', defeitosAceitos: ['a', 'b'] } },
+  formato: 'mecanifica.registro-de-etapas', versao: 3, montagem: 'obj',
+  eventos: [
+    { tipo: 'aceite', instancia: 'simples', aceite: { por: 'a pessoa, 2026-11-04: fixa' }, impressao: {} },
+    { tipo: 'aceite', instancia: 'dificilEsquerda', aceite: { por: 'a pessoa, 2026-11-05: aceito', defeitosAceitos: ['a', 'b'] }, impressao: {} },
   ],
 }));
 

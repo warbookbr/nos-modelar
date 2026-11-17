@@ -96,11 +96,9 @@ function lerJson(caminho) {
 export function aceitesDasEtapas(pasta) {
   const aceites = new Map();
   const etapas = lerJson(join(pasta, 'montagem.etapas.json'));
-  /* o registro da versão 3 guarda os aceites como eventos; o aceite vigente de cada etapa é um fato, e não pede o medido */
-  const doRegistro = etapas?.versao === 3
-    ? [...aceitesVigentes(etapas)].map(([instancia, aceite]) => ({ instancia, aceite }))
-    : etapas?.etapas;
-  if (!Array.isArray(doRegistro)) return aceites;
+  /* o registro guarda os aceites como eventos; o aceite vigente de cada etapa é um fato, e não pede o medido */
+  if (etapas?.versao !== 3) return aceites;
+  const doRegistro = [...aceitesVigentes(etapas)].map(([instancia, aceite]) => ({ instancia, aceite }));
   const montagem = lerJson(join(pasta, 'montagem.json'));
   const refs = new Map();
   for (const i of Array.isArray(montagem?.instancias) ? montagem.instancias : []) {

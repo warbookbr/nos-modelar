@@ -1,6 +1,7 @@
 /* migrar-etapas-para-impressao.test.mjs — a migração dos registros v2 para o v3: a classificação de cada etapa fixa pelas três vias,
    o aceite copiado como está, o relatório e a gravação. O caso do acervo (o carrinho de mão, um commit só) roda de verdade e mora na
    lista de lentos. */
+import { execFileSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -120,12 +121,17 @@ describe('o relatório e a gravação', () => {
 });
 
 describe('o acervo: o carrinho de mão, pelo commit do aceite', () => {
-  it('as quatro etapas migram, todas conferem a forma pelo commit e a leitura de agora as dá fixas', async () => {
+  it('as quatro etapas migram, todas conferem a forma pelo commit e a leitura de agora as dá fixas, e o v3 gravado é o mesmo', async () => {
     const montagem = fileURLToPath(new URL('../../procedural/pecas/carrinho-de-mao/montagem.json', import.meta.url));
-    const relatorio = await planejarMigracao(montagem);
+    /* o registro v2 que a migração leu, como estava no commit do aceite (o arquivo de hoje já é o v3 gravado) */
+    const antigo = JSON.parse(execFileSync('git', ['show', 'b0519ff3:procedural/pecas/carrinho-de-mao/montagem.etapas.json'], { encoding: 'utf8', cwd: fileURLToPath(new URL('../..', import.meta.url)) }));
+    const relatorio = await planejarMigracao(montagem, { registroAntigo: antigo });
     expect(relatorio.contagem).toEqual({ a: 4, b: 0, c: 0, aberta: 0 });
     expect(relatorio.fixasDepois).toBe(4);
     expect(relatorio.registro.eventos.every((e) => e.origem.via === 'commit do aceite')).toBe(true);
-    expect(JSON.parse(readFileSync(arquivoDoRegistro(montagem), 'utf8')).versao).toBe(2);
+    const gravado = JSON.parse(readFileSync(arquivoDoRegistro(montagem), 'utf8'));
+    expect(gravado.versao).toBe(3);
+    expect(gravado.eventos).toEqual(JSON.parse(JSON.stringify(relatorio.registro.eventos)));
+    await expect(planejarMigracao(montagem)).rejects.toThrow(/já é da versão 3/);
   }, 300_000);
 });

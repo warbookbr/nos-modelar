@@ -64,7 +64,7 @@ describe('os consumidores do estado, sobre um registro v3 em disco', () => {
     expect(medicoesFeitas() - antes).toBe(1);
     expect(recebidos.length).toBeGreaterThan(0);
     expect(recebidos.every((r) => r === recebidos[0] && r.etapas.length === 4)).toBe(true);
-    expect(() => lerEtapasDoFluxo(pasta)).toThrow(/versão 3/);
+    expect(() => lerEtapasDoFluxo(pasta)).toThrow(/não grava o estado/);
   }, 120_000);
 
   it('rodada-de-modelagem: a luz rasante da roda sai da etapa medida que a medição recebe, e a etapa aberta não a dispensa', async () => {

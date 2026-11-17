@@ -86,26 +86,14 @@ export const comandoDasVistasDoBlender = (peca) => `MODELAR_BLENDER=<caminho do 
 export const impressaoDoTexto = (texto) => `sha256:${createHash('sha256').update(texto).digest('hex')}`;
 
 /**
- * Se a etapa da peça, na montagem do objeto dela (`<objeto>/montagem.json`), está fixa no registro: a peça aceita pela pessoa.
- * Peça fora de montagem, ou sem registro, não está.
+ * Se a etapa da peça está fixa, na decisão da superfície. O estado não está gravado no registro: quem pode medir passa `etapaFixa`
+ * (`etapaFixaDaPecaMedida`, ou `superficieDaPecaMedida`, que a chama só quando a resposta decide algo); sem ele, a peça não está fixa.
  */
-export function etapaFixaDaPeca(peca, { raiz = join(REPO, 'procedural/pecas'), etapaFixa } = {}) {
-  if (typeof etapaFixa === 'boolean') return etapaFixa;
-  const [objeto, parte] = peca.split('/');
-  if (!parte) return false;
-  const arquivo = join(raiz, objeto, 'montagem.json');
-  const registro = join(raiz, objeto, 'montagem.etapas.json');
-  if (!existsSync(arquivo) || !existsSync(registro)) return false;
-  try {
-    const instancia = (JSON.parse(readFileSync(arquivo, 'utf8')).instancias ?? []).find((item) => item.alvo?.ref === peca);
-    const lido = JSON.parse(readFileSync(registro, 'utf8'));
-    /* o registro da versão 3 não grava o estado: quem pode medir passa `etapaFixa` (`etapaFixaDaPecaMedida`); aqui, sem medir, não está fixa */
-    if (lido.versao === 3) return false;
-    return Boolean(instancia) && lido.etapas?.find((e) => e.instancia === instancia.id)?.estado === 'fixa';
-  } catch { return false; }
+export function etapaFixaDaPeca(peca, { etapaFixa } = {}) {
+  return etapaFixa === true;
 }
 
-/** A mesma pergunta de `etapaFixaDaPeca`, com o registro da versão 3 lido pela impressão do aceite (mede a montagem de agora). */
+/** A etapa da peça, na montagem do objeto dela (`<objeto>/montagem.json`), está fixa pela leitura do registro (mede a montagem de agora)? Peça fora de montagem, ou sem registro, não. */
 export async function etapaFixaDaPecaMedida(peca, opcoes = {}) {
   const { raiz = join(REPO, 'procedural/pecas'), registro: dado } = opcoes;
   const [objeto, parte] = peca.split('/');

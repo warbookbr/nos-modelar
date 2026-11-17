@@ -333,10 +333,10 @@ export function acaoSemMedir(rodadas, textoDaReceita, { limite } = {}) {
 /** A medição de uma peça no `--medir`, com o registro de etapas que o fluxo já mediu, para não medir a montagem outra vez por peça. */
 export const medirDePeca = (ref, opcoesDaPeca) => acaoDaPeca(ref, { ...opcoesDaPeca, medir: () => medirReceita(ref, { registroDasEtapas: opcoesDaPeca.registroLido }) });
 
-/** O registro da versão 3 com o estado medido pela leitura pela impressão do aceite; undefined para os outros, que `lerEtapas` lê como gravados. */
+/** O registro com o estado medido pela leitura pela impressão do aceite (um registro de versão 1 ou 2 recusa, com o comando que o migra); undefined sem registro. */
 async function registroMedidoSeV3(pasta) {
   const arquivo = join(pasta, 'montagem.json');
-  if (lerJson(join(pasta, 'montagem.etapas.json'))?.versao !== 3 || !existsSync(arquivo)) return undefined;
+  if (!existsSync(join(pasta, 'montagem.etapas.json')) || !existsSync(arquivo)) return undefined;
   const { registroComEstado } = await import('./etapas-da-montagem.mjs');
   return registroComEstado(arquivo);
 }
@@ -346,11 +346,11 @@ export function lerEtapas(pasta, { registroLido } = {}) {
   const arquivo = join(pasta, 'montagem.json');
   const montagem = lerJson(arquivo);
   if (!montagem) return null;
-  if (!registroLido && lerJson(join(pasta, 'montagem.etapas.json'))?.versao === 3) {
-    throw new Error(`${pasta}: o registro de etapas é da versão 3, que não grava o estado; passe o registro medido (registroLido), como o fluxo do objeto faz.`);
+  if (!registroLido && existsSync(join(pasta, 'montagem.etapas.json'))) {
+    throw new Error(`${pasta}: o registro de etapas não grava o estado; passe o registro medido (registroLido, de registroComEstado), como o fluxo do objeto faz.`);
   }
-  /* o registro da versão 3 não grava o estado: quem o mediu (`registroComEstado`) passa `registroLido`; sem ele, o estado gravado */
-  const registro = registroLido ?? lerJson(join(pasta, 'montagem.etapas.json'));
+  /* o estado de cada etapa sai da leitura pela impressão do aceite (`registroComEstado`), que quem chama já mediu */
+  const registro = registroLido ?? null;
   const estado = new Map((registro?.etapas ?? []).map((e) => [e.instancia, e.estado]));
   const etapas = (Array.isArray(montagem.etapas) ? montagem.etapas : []).map((instancia) => ({ instancia, estado: estado.get(instancia) ?? 'aberta' }));
   const proxima = proximaEtapa({ etapas });
@@ -397,7 +397,7 @@ function proximoDaPeca(p, etapas) {
  * O fluxo do objeto: o estado de cada passo, as peças com a ação e o próximo comando, as etapas e o passo em que o objeto está.
  * `medir(ref)` mede uma peça de verdade (a `acaoDaPeca` de `--acao`); sem ele a ação sai de `acaoSemMedir`.
  */
-export async function fluxoDoObjeto(pastaDoObjeto, { medir = null, acervo = ACERVO, conferencia = null } = {}) {
+export async function fluxoDoObjeto(pastaDoObjeto, { medir = null, acervo = ACERVO, conferencia = null, registroDasEtapas = undefined } = {}) {
   const pasta = resolve(pastaDoObjeto);
   const raizDoAcervo = resolve(acervo);
   const esperado = `espera-se a pasta de um objeto, existente ou a criar em ${rel(raizDoAcervo)}/<objeto>/`;
@@ -409,7 +409,7 @@ export async function fluxoDoObjeto(pastaDoObjeto, { medir = null, acervo = ACER
   const referencias = lerReferencias(pasta);
   if (conferencia && !ehPasta(conferencia)) throw new Error(`--conferencia=${conferencia}: a pasta não existe; espera-se a pasta de saída de npm run conferir:vistas, com o resumo.json.`);
   const rascunho = lerRascunho(pasta, { conferencia: conferencia ? resolve(conferencia) : null });
-  const registroLido = await registroMedidoSeV3(pasta);
+  const registroLido = registroDasEtapas !== undefined ? registroDasEtapas : await registroMedidoSeV3(pasta);
   const etapas = lerEtapas(pasta, { registroLido });
   const estadoDaInstancia = new Map((etapas?.etapas ?? []).map((e) => [e.instancia, e.estado]));
   const pecas = [];

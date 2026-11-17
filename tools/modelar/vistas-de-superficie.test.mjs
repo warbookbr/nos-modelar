@@ -26,7 +26,7 @@ import { doAmbiente } from '../ambiente.mjs';
 import { acaoDaPeca, gravarRodada, lerRodadas, medirReceita, registrarMedida, resumoDoLaco } from './rodada-de-modelagem.mjs';
 import {
   LIMIAR_DA_LUZ_RASANTE, MANIFESTO_DO_PACOTE, MINIMO_DE_QUINA, comandoDoPacote, exigirLuzNaSuperficie, fracaoIluminadaDoPng, gravarManifesto, impressaoDoTexto, legendaNaCurvatura, mensagemSemBlender,
-  superficieDaBancada, superficieDaPeca, superficieDoPacote, textoParaAFonte, vincosDaMalha, vistasDeSuperficie,
+  superficieDaBancada, superficieDaPeca, superficieDaPecaMedida, superficieDoPacote, textoParaAFonte, vincosDaMalha, vistasDeSuperficie,
 } from './vistas-de-superficie.mjs';
 import { FUNDO } from './imagem-de-medida.mjs';
 import { montarPedido, prefixoDaPeca, vistasParaCritica } from './vistas-para-critica.mjs';
@@ -775,19 +775,35 @@ describe('a luz rasante da peça com sombreamento suave sobre a emenda de uma fu
 
 describe('a emenda sombreada e a etapa fixa', () => {
   const RECEITA = { PASSOS: [['unir', { origemId: 3, solidos: [{ origem: { op: 'cubo', id: 1 } }, { origem: { op: 'cubo', id: 2 } }] }], ['liso', { sel: { origem: { op: 'unir', id: 3 } }, angulo: 45 }]] };
-  const montar = (estado) => {
+  const montar = () => {
     const raiz = mkdtempSync(join(area, 'acervo-'));
     mkdirSync(join(raiz, 'objeto'), { recursive: true });
     writeFileSync(join(raiz, 'objeto/montagem.json'), JSON.stringify({ instancias: [{ id: 'corpo', alvo: { tipo: 'peca', ref: 'objeto/corpo' } }] }));
-    if (estado) writeFileSync(join(raiz, 'objeto/montagem.etapas.json'), JSON.stringify({ etapas: [{ instancia: 'corpo', estado }] }));
+    writeFileSync(join(raiz, 'objeto/montagem.etapas.json'), '{}');
     return raiz;
   };
+  const registroCom = (estado) => ({ etapas: [{ instancia: 'corpo', estado }] });
 
-  it('a etapa fixa por aceite da pessoa não é reaberta pela regra, e a aberta, a quebrada e a peça fora de montagem levam a luz rasante', () => {
-    expect(superficieDaPeca('objeto/corpo', RECEITA, null, { raiz: montar('fixa') })).toMatchObject({ lataria: false, luzRasante: false, porque: expect.stringContaining('a etapa da peça está fixa') });
-    for (const estado of ['aberta', 'quebrada', null]) expect(superficieDaPeca('objeto/corpo', RECEITA, null, { raiz: montar(estado) }).luzRasante).toBe(true);
-    expect(superficieDaPeca('solta/peca', RECEITA, null, { raiz: montar('fixa') }).luzRasante).toBe(true);
+  it('a etapa fixa por aceite da pessoa não é reaberta pela regra, e a não fixa e a peça sem a medida levam a luz rasante', () => {
+    expect(superficieDaPeca('objeto/corpo', RECEITA, null, { etapaFixa: true })).toMatchObject({ lataria: false, luzRasante: false, porque: expect.stringContaining('a etapa da peça está fixa') });
+    expect(superficieDaPeca('objeto/corpo', RECEITA, null, { etapaFixa: false }).luzRasante).toBe(true);
+    expect(superficieDaPeca('objeto/corpo', RECEITA, null).luzRasante).toBe(true);
     /* a lataria não ganha a folga */
-    expect(superficieDaPeca('objeto/corpo', { PASSOS: [{ op: 'subdivisao' }] }, null, { raiz: montar('fixa') })).toMatchObject({ lataria: true, luzRasante: true });
+    expect(superficieDaPeca('objeto/corpo', { PASSOS: [{ op: 'subdivisao' }] }, null, { etapaFixa: true })).toMatchObject({ lataria: true, luzRasante: true });
+  });
+
+  it('a superfície medida lê o estado do registro medido, e só o pede quando a resposta decide algo', async () => {
+    const raiz = montar();
+    for (const [estado, luz] of [['fixa', false], ['aberta', true], ['quebrada', true]]) {
+      expect((await superficieDaPecaMedida('objeto/corpo', RECEITA, null, { raiz, registro: registroCom(estado) })).luzRasante).toBe(luz);
+    }
+    expect((await superficieDaPecaMedida('solta/peca', RECEITA, null, { raiz, registro: registroCom('fixa') })).luzRasante).toBe(true);
+    let pedidos = 0;
+    const registro = async () => { pedidos += 1; return registroCom('fixa'); };
+    await superficieDaPecaMedida('objeto/corpo', { PASSOS: [{ op: 'subdivisao' }] }, null, { raiz, registro });
+    await superficieDaPecaMedida('objeto/corpo', { PASSOS: [['cubo', { origemId: 1 }]] }, null, { raiz, registro });
+    expect(pedidos).toBe(0);
+    await superficieDaPecaMedida('objeto/corpo', RECEITA, null, { raiz, registro });
+    expect(pedidos).toBe(1);
   });
 });
