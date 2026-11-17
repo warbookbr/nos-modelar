@@ -296,3 +296,8 @@ As duas pranchas do item 1 foram refeitas em 2026-11-17 pelos comandos das fatia
 | 8. a nota fechada varia menos e a pergunta que muda sai como não verificável | passou | amplitude 0,6 e desvio 0,22 contra 1 e 0,49, em quatro pares |
 
 O item 5 pede uma rodada de modelador de verdade, com referência e com os comandos à mão, medida por `npm run medir:transcricao -- --atritos <sessão.jsonl>` e por `contar-comandos.mjs <sessão.jsonl> --tipo=modelador --listar-alvo` na janela dela; o agente desta fatia não despacha outro agente, e ela fica com quem conduz. O item 6 pede dois críticos em cada pacote do selim, com e sem o contorno, que estão prontos desde [a prova no selim](#a-prova-do-item-6-no-selim-da-bicicleta-2026-11-17).
+
+### A medida do item 6 no selim, 2026-11-17
+
+Dois críticos em cada pacote da bicicleta, com e sem o contorno medido do selim (tirado de `tmp/bicicleta/lateral.png` em três rodadas do `npm run contorno`, nota 8, à espera do aceite da pessoa): com o contorno, notas 8 e 7; sem, 8 e 7. A nota oscilou igual. Os dois críticos com o contorno o leram certo: a linha coincide com o selim na horizontal (427 a 681 mm contra 435 a 691 mm do modelo), o trecho tracejado de encontro com o canote não foi lido como medida, e nenhum apontou defeito falso; um anotou o topo uns 15 mm abaixo do modelo, que é a diferença de escala entre a régua do contorno (entre-eixos) e a da prancha (pneu), registrada no backlog. O contorno não estabiliza a nota, o que é papel das perguntas fechadas da fatia 6; ele dá ao crítico a medida da forma lida na foto no lugar de uma estimativa a olho.
+
