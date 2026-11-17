@@ -52,7 +52,7 @@ describe('ajustarCurvaLisa nas curvas analíticas', () => {
     let x = 0; let y = 0; let th = 0; const pontos = [[0, 0]]; const L = 1600; const n = 160; const h = L / n;
     const kDe = (s) => { const f = s / L; if (f < 0.15) return 0; if (f < 0.3) return ((f - 0.15) / 0.15) / 300; if (f < 0.45) return (1 - (f - 0.3) / 0.15) / 300; if (f < 0.55) return (-(f - 0.45) / 0.1) / 500; if (f < 0.8) return -1 / 500; if (f < 0.9) return (-(0.9 - f) / 0.1) / 500; return 0; };
     for (let i = 0; i < n; i += 1) { const k = kDe((i + 0.5) * h); th += (k * h) / 2; x += Math.cos(th) * h; y += Math.sin(th) * h; th += (k * h) / 2; pontos.push([x, y]); }
-    const a = ajustarCurvaLisa(ruido(pontos, 0.2), { tolerancia: 1, maximoDeTrechos: 10 });
+    const a = ajustarCurvaLisa(ruido(pontos, 0.2), { tolerancia: 1, maximoDeClotoides: 10 });
     expect(a.cabe).toBe(true);
     expect(a.inflexoes).toBe(1);
     expect(a.clotoides.length).toBeLessThanOrEqual(9);
@@ -66,8 +66,8 @@ describe('ajustarCurvaLisa nas curvas analíticas', () => {
 
   it('recusa o que não entende, dizendo o que recebeu', () => {
     expect(() => ajustarCurvaLisa([[0, 0], [1, 1]])).toThrow(/pontos espera uma lista de 3 pontos ou mais, e veio 2 ponto/);
-    expect(() => ajustarCurvaLisa(arco(500, 90, 10), { tolerancia: 0 })).toThrow(/tolerancia espera mm maior que zero, e veio 0/);
-    expect(() => ajustarCurvaLisa(arco(500, 90, 10), { maximoDeTrechos: 0 })).toThrow(/maximoDeTrechos espera um inteiro/);
+    expect(() => ajustarCurvaLisa(arco(500, 90, 10), { tolerancia: 0 })).toThrow(/tolerancia espera um número maior que zero.*veio 0/);
+    expect(() => ajustarCurvaLisa(arco(500, 90, 10), { maximoDeClotoides: 0 })).toThrow(/maximoDeClotoides espera um inteiro/);
     expect(() => ajustarCurvaLisa(arco(500, 90, 10), { duros: [10] })).toThrow(/duros espera índices de 0 a 9/);
     expect(() => ajustarCurvaLisa([[0, 0], [1, 1], [NaN, 2]])).toThrow(/o ponto 2 precisa ser/);
     expect(() => ajustarCurvaLisa(arco(500, 90, 10), { eixos: [1, 1] })).toThrow(/eixos espera dois/);
@@ -75,7 +75,7 @@ describe('ajustarCurvaLisa nas curvas analíticas', () => {
 
   it('o teto de trechos devolve a curva com cabe falso e o desvio que ficou', () => {
     const planta = clotoide(80, 800, -1 / 400, 1 / 400).map(([x, y], i) => [x, y + 8 * Math.sin(i / 6)]);
-    const a = ajustarCurvaLisa(planta, { tolerancia: 0.5, maximoDeTrechos: 1 });
+    const a = ajustarCurvaLisa(planta, { tolerancia: 0.5, maximoDeClotoides: 1 });
     expect(a.cabe).toBe(false);
     expect(a.desvioMaximo).toBeGreaterThan(0.5);
     expect(a.clotoides).toHaveLength(1);
@@ -99,5 +99,95 @@ describe('a curva que a rede consome', () => {
     const noFio = g.linha('baixo').map((nome) => g.pontos[nome].map((c) => c * 1000));
     expect(noFio.length).toBeGreaterThan(10);
     for (const [x, , z] of noFio) { const d = Math.min(...fina.map(([u, v]) => Math.hypot(u - x, v - z))); expect(d).toBeLessThan(0.3); }
+  });
+});
+
+/* integração independente (Runge-Kutta de quarto grau, passo de um milésimo do arco) da curva devolvida, para medir o desvio real dos pontos sem usar o código do ajuste */
+function curvaIndependente(a) {
+  const L = a.comprimento; const N = 20000; const h = L / N;
+  const kEm = (s) => { const j = a.joelhos; let i = 1; while (i < j.length - 1 && j[i].s < s) i += 1; const t = (s - j[i - 1].s) / (j[i].s - j[i - 1].s); return j[i - 1].k + (j[i].k - j[i - 1].k) * Math.min(1, Math.max(0, t)); };
+  let [x, y] = a.inicio; let th = a.rumo; const saida = [[x, y]];
+  for (let i = 0; i < N; i += 1) {
+    const s = i * h; const k1 = kEm(s); const k2 = kEm(s + h / 2); const k3 = kEm(s + h);
+    const f = (t, kk) => [Math.cos(t), Math.sin(t), kk];
+    const a1 = f(th, k1); const a2 = f(th + (h / 2) * a1[2], k2); const a3 = f(th + (h / 2) * a2[2], k2); const a4 = f(th + h * a3[2], k3);
+    x += (h / 6) * (a1[0] + 2 * a2[0] + 2 * a3[0] + a4[0]); y += (h / 6) * (a1[1] + 2 * a2[1] + 2 * a3[1] + a4[1]);
+    th += (h / 6) * (a1[2] + 2 * a2[2] + 2 * a3[2] + a4[2]);
+    saida.push([x, y]);
+  }
+  return saida;
+}
+const desvioReal = (a, pontos) => {
+  const c = curvaIndependente(a);
+  const aoSegmento = (u, v, [x0, y0], [x1, y1]) => { const ex = x1 - x0; const ey = y1 - y0; const t = Math.max(0, Math.min(1, ((u - x0) * ex + (v - y0) * ey) / (ex * ex + ey * ey))); return Math.hypot(u - x0 - ex * t, v - y0 - ey * t); };
+  return Math.max(...pontos.map(([u, v]) => { let m = Infinity; for (let i = 0; i < c.length - 1; i += 1) m = Math.min(m, aoSegmento(u, v, c[i], c[i + 1])); return m; }));
+};
+
+describe('ajustarCurvaLisa: ruído comparável ao espaçamento', () => {
+  for (const [amplitude, passo, tolerancia] of [[6, 10, 12.7], [2, 3, 4.2], [1, 2, 2.1], [4, 10, 8.5], [10, 20, 21]]) {
+    it(`arco de 600 mm de raio e 900 mm, ruído de ${amplitude} mm a cada ${passo} mm, tolerância ${tolerancia}: uma clotoide e nenhuma inflexão`, () => {
+      const n = Math.round(900 / passo) + 1;
+      const pontos = ruido(Array.from({ length: n }, (_, i) => { const a = (i * passo) / 600; return [600 * Math.sin(a), 600 * (1 - Math.cos(a))]; }), amplitude);
+      const a = ajustarCurvaLisa(pontos, { tolerancia });
+      expect(a.cabe).toBe(true);
+      expect(a.inflexoes).toBe(0);
+      expect(a.clotoides.length).toBeLessThanOrEqual(2);
+    });
+  }
+});
+
+describe('ajustarCurvaLisa: entrada degenerada, escala, ordem e custo', () => {
+  it('recusa pontos todos iguais e curva de comprimento desprezível perto da tolerância', () => {
+    expect(() => ajustarCurvaLisa([[5, 5], [5, 5], [5, 5], [5, 5]], { tolerancia: 1 })).toThrow(/ajustarCurvaLisa: .*comprimento/);
+    expect(() => ajustarCurvaLisa([[0, 0], [0.5, 0], [1, 0.1], [1.5, 0]], { tolerancia: 1 })).toThrow(/comprimento .* 1,6.*tolerância 1|comprimento/);
+  });
+
+  it('o desvio devolvido vale na escala de milímetros e na de dezenas de metros, medido por integração independente', () => {
+    for (const [R, graus, tolerancia] of [[3, 90, 0.02], [50000, 20, 5], [200, 120, 0.05]]) {
+      const n = 60; const pontos = Array.from({ length: n }, (_, i) => { const t = ((i / (n - 1)) * graus * Math.PI) / 180; return [R * Math.sin(t), R * (1 - Math.cos(t))]; });
+      const a = ajustarCurvaLisa(pontos, { tolerancia });
+      expect(a.cabe).toBe(true);
+      expect(desvioReal(a, pontos)).toBeLessThanOrEqual(tolerancia * 1.02);
+      expect(Math.abs(a.desvioMaximo - desvioReal(a, pontos))).toBeLessThan(tolerancia * 0.1);
+    }
+  });
+
+  it('pontos fora de ordem ao longo da curva dão cabe falso', () => {
+    const n = 40; const pontos = Array.from({ length: n }, (_, i) => { const t = (i / (n - 1)) * (Math.PI / 2); return [500 * Math.sin(t), 500 * (1 - Math.cos(t))]; });
+    const embaralhados = [...pontos.slice(0, 10), ...pontos.slice(20, 30), ...pontos.slice(10, 20), ...pontos.slice(30)];
+    expect(ajustarCurvaLisa(embaralhados, { tolerancia: 1 }).cabe).toBe(false);
+  });
+
+  it('pontos que vão e voltam sobre a mesma curva, ou uma curva bem mais longa que a poligonal, dão cabe falso', () => {
+    const n = 30; const ida = Array.from({ length: n }, (_, i) => { const t = (i / (n - 1)) * (Math.PI / 2); return [500 * Math.sin(t), 500 * (1 - Math.cos(t))]; });
+    expect(ajustarCurvaLisa([...ida, ...[...ida].reverse().slice(1)], { tolerancia: 1 }).cabe).toBe(false);
+  });
+
+  it('um arco de 1 km de raio com 3000 pontos e ruído leva poucos segundos', () => {
+    const n = 3001; const pontos = ruido(Array.from({ length: n }, (_, i) => { const t = (i * 0.5) / 1000; return [1000 * Math.sin(t), 1000 * (1 - Math.cos(t))]; }), 0.3);
+    const t0 = Date.now(); const a = ajustarCurvaLisa(pontos, { tolerancia: 1 });
+    expect(a.cabe).toBe(true); expect(a.clotoides.length).toBeLessThanOrEqual(2); expect(a.inflexoes).toBe(0);
+    expect(Date.now() - t0).toBeLessThan(8000);
+  });
+});
+
+describe('ajustarCurvaLisa: a contagem de inflexões mede a sagita na curva integrada', () => {
+  const porCurvatura = (kDe, L, n) => { let x = 0; let y = 0; let th = 0; const h = L / n; const saida = [[0, 0]]; for (let i = 0; i < n; i += 1) { const k = kDe((i + 0.5) * h); th += (k * h) / 2; x += Math.cos(th) * h; y += Math.sin(th) * h; th += (k * h) / 2; saida.push([x, y]); } return saida; };
+  const comLobulo = (fundo) => (s) => { const base = 1 / 400; if (s < 300 || s > 600) return base; const t = 1 - Math.abs(s - 450) / 150; return base - (base - fundo) * t; };
+  it('um lóbulo triangular fundo conta duas inflexões, e o raso que a tolerância não distingue some', () => {
+    const fundo = ajustarCurvaLisa(porCurvatura(comLobulo(-1 / 250), 900, 180), { tolerancia: 1, maximoDeClotoides: 10 });
+    expect(fundo.cabe).toBe(true); expect(fundo.inflexoes).toBe(2);
+    const raso = ajustarCurvaLisa(porCurvatura(comLobulo(-1 / 40000), 900, 180), { tolerancia: 1, maximoDeClotoides: 10 });
+    expect(raso.cabe).toBe(true); expect(raso.inflexoes).toBe(0);
+  });
+});
+
+describe('ajustarCurvaLisa: a entrada recusada diz o que recebeu', () => {
+  const ok = Array.from({ length: 10 }, (_, i) => [i * 10, i * i]);
+  it('mistura de pontos de 2 e de 3 componentes, tolerância em texto, duros que não é lista e coordenada livre que varia', () => {
+    expect(() => ajustarCurvaLisa([[0, 0], [1, 1, 0], [2, 3], [3, 7]])).toThrow(/ajustarCurvaLisa: .*2 e 3 componentes.*ponto 1/);
+    expect(() => ajustarCurvaLisa(ok, { tolerancia: '5' })).toThrow(/ajustarCurvaLisa: tolerancia espera .*veio "5"/);
+    expect(() => ajustarCurvaLisa(ok, { duros: 3 })).toThrow(/ajustarCurvaLisa: duros espera uma lista.*veio 3/);
+    expect(() => ajustarCurvaLisa(ok.map(([x, y], i) => [x, 5 * i, y]), { tolerancia: 1, eixos: [0, 2] })).toThrow(/ajustarCurvaLisa: .*coordenada livre.*varia/);
   });
 });

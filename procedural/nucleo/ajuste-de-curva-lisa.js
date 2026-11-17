@@ -5,44 +5,55 @@
  *   cresce ou cai linear com o comprimento de arco em cada trecho, e é contínua entre trechos), com a tolerância declarada e o desvio a cada ponto medido.
  * quando: a curva-guia de uma chapa (planta, nível, queda) vem de pontos lidos, e a curva de Catmull-Rom por eles faz de cada ponto uma lombada de curvatura que
  *   a zebra mostra como onda; aqui sai uma curva de curvatura mínima em trechos, e os pontos que a rede consome saem dela.
- * unidades: mm, como a TABELA. A curva é plana: `eixos` diz quais duas coordenadas dos pontos de 3 componentes entram (padrão [0, 1]); a terceira, constante.
+ * unidades: as dos pontos (mm, como a TABELA); a tolerância e o passo, na mesma unidade. A curva é plana: `eixos` diz quais duas coordenadas dos pontos de 3
+ *   componentes entram (padrão [0, 1]); a terceira tem de variar menos que a tolerância, e a média dela volta nos pontos da rede.
  * campos:
- *   pontos: [[u, v] | [x, y, z], ...] em ordem ao longo da curva, de 3 pontos em diante (a curva é aberta; a fechada se ajusta em dois arcos).
- *   tolerancia: o maior desvio aceito de qualquer ponto à curva, em mm (1 por padrão).
- *   maximoDeTrechos: o teto de clotoides (8 por padrão); passado ele a curva sai com `cabe: false` e o desvio que ficou.
- *   duros: índices de pontos por onde a curva passa de perto (um nó da rede): pesam 20 vezes mais no ajuste, e o desvio deles é medido como os outros.
+ *   pontos: [[u, v] | [x, y, z], ...] em ordem ao longo da curva, todos do mesmo tamanho, de 3 pontos em diante (a curva é aberta; a fechada se ajusta em dois arcos).
+ *   tolerancia: o maior desvio aceito de qualquer ponto à curva (1 por padrão), número maior que zero.
+ *   maximoDeClotoides: o teto de clotoides (8 por padrão); passado ele a curva sai com `cabe: false` e o desvio que ficou.
+ *   duros: lista de índices de pontos por onde a curva passa de perto (um nó da rede): pesam 20 vezes mais no ajuste, e o desvio deles é medido como os outros.
  *   eixos: [i, j] as duas coordenadas lidas dos pontos de 3 componentes.
- * devolve: { cabe, tolerancia, desvioMaximo, desvios, trechos, inflexoes, comprimento, joelhos, inicio, rumo, ponto(s), amostrar(passoMm), pontosDaRede(passoMm, opcoes) }
- *   joelhos: [{ s, k }] o comprimento de arco (mm) e a curvatura (1/mm, positiva para a esquerda) de cada vértice da curvatura; entre dois a curvatura é linear.
- *   trechos: as corridas de curvatura monótona, { de, ate, k0, k1, sentido: 'cresce' | 'cai' | 'constante', joelhos } (de e ate em mm de arco); `clotoides`: os
+ * devolve: { cabe, tolerancia, desvioMaximo, desvios, trechos, clotoides, inflexoes, comprimento, joelhos, inicio, rumo, ponto(s), amostrar(passo), pontosDaRede(passo, opcoes) }
+ *   desvioMaximo: o maior desvio de um ponto à curva; desvioDaCurva: o maior desvio da curva à poligonal dos pontos (o outro sentido, que tira da conta a densidade da entrada).
+ *   cabe: os dois desvios, medidos na curva integrada a passo fino, estão dentro da tolerância, os pontos se projetam na curva em ordem e o comprimento dela não passa
+ *     do da poligonal dos pontos além da tolerância; senão `cabe: false`, e o resto do resultado descreve o que ficou.
+ *   joelhos: [{ s, k }] o comprimento de arco e a curvatura (1/unidade, positiva para a esquerda) de cada vértice da curvatura; entre dois a curvatura é linear.
+ *   trechos: as corridas de curvatura monótona, { de, ate, k0, k1, sentido: 'cresce' | 'cai' | 'constante', joelhos } (de e ate em comprimento de arco); `clotoides`: os
  *     trechos de curvatura linear de que a cadeia é feita, um por par de joelhos.
- *   inflexoes: quantas vezes a curvatura troca de sinal (a faixa de um sinal só que move a curva menos que a tolerância, giro × comprimento / 8, não conta: é a reta que a tolerância não distingue).
- *   pontosDaRede(passoMm, { nome, completar }): { nome, pontos } no formato de `curvas` de `gaiolaPorRede`: pontos-chave sobre a curva ajustada a cada passoMm de arco,
- *     com a ponta exata; `completar(u, v)` devolve [x, y, z] (sem ele, a terceira coordenada é a constante dos pontos de entrada).
+ *   inflexoes: quantas vezes a curvatura troca de sinal entre faixas que movem a curva mais que a tolerância (a sagita da faixa, medida na curva integrada, é a
+ *     distância máxima dela à corda; a faixa abaixo da tolerância é a reta que a tolerância não distingue).
+ *   pontosDaRede(passo, { nome, completar }): { nome, pontos } no formato de `curvas` de `gaiolaPorRede`: pontos-chave sobre a curva ajustada a cada `passo` de arco,
+ *     com a ponta exata; `completar(u, v)` devolve [x, y, z] (sem ele, a terceira coordenada é a média dos pontos de entrada).
  * exemplo:
- *   const aj = ajustarCurvaLisa(pontosDaPrancha, { tolerancia: 3 }); // aj.trechos.length, aj.inflexoes, aj.desvioMaximo
+ *   const aj = ajustarCurvaLisa(pontosDaPrancha, { tolerancia: 3 }); // aj.clotoides.length, aj.inflexoes, aj.desvioMaximo
  *   gaiolaPorRede({ ..., curvas: [aj.pontosDaRede(60, { nome: 'planta' }), ...] })
- * peça: procedural/nucleo/ajuste-de-curva-lisa.test.mjs (arco, clotoide, cônica e S analíticos, com ruído, e a planta do carro).
+ * peça: procedural/nucleo/ajuste-de-curva-lisa.test.mjs (arco, clotoide, elipse e S analíticos, com ruído, a escala, a ordem e as recusas).
  * FIM DA FICHA
  *
- * POR QUE CLOTOIDE. Uma curva lisa do ponto de vista da zebra é a de curvatura que não oscila: a ondulação de 200 a 500 mm vem de variações de 0,1 1/m. A clotoide
+ * POR QUE CLOTOIDE. Uma curva lisa do ponto de vista da zebra é a de curvatura que não oscila: a ondulação longa vem de variações de 0,1 1/m. A clotoide
  * (curvatura linear em s) é a de variação mínima entre duas curvaturas dadas, é fechada sob o ajuste (a cadeia com curvatura contínua é G2 por construção, sem
- * condição de emenda), e a inflexão cai onde a curvatura passa por zero, sem lobo. A cônica tem curvatura monótona só em cada metade e pede a posição do
+ * condição de emenda), e a inflexão cai onde a curvatura passa por zero, sem lóbulo. A cônica tem curvatura monótona só em cada metade e pede a posição do
  * eixo; a cúbica de curvatura monótona pede a condição de monotonia sobre os coeficientes. Para o mesmo desvio, a cadeia de clotoides tem os mesmos graus de
  * liberdade (um par de curvaturas e um comprimento por trecho) sem restrição sobre eles.
  *
- * COMO AJUSTA. A curva é { início, rumo, comprimento L, joelhos (fração do arco, curvatura) }; a posição sai de integrar a curvatura (Simpson, passo de 2 mm).
- * O resíduo de cada ponto é a distância com sinal à curva (ao ponto mais perto da curva amostrada), mais as duas pontas, e o ajuste é de mínimos quadrados
- * de Levenberg-Marquardt, com jacobiano por diferença finita, sobre o início, o rumo, L, as curvaturas e as frações dos joelhos. Parte de uma clotoide só
- * (curvaturas por mínimos quadrados sobre o rumo lido dos pontos); enquanto o desvio máximo passa da tolerância, entra um joelho no ponto de maior desvio e o
- * ajuste refaz de onde estava; no fim, tenta tirar cada joelho (o de menor custo primeiro) e guarda a retirada que ainda cabe na tolerância: sai o menor número de
- * trechos que o ajuste achou, e não o menor possível. O resultado é determinístico (nenhum sorteio, nenhum relógio). */
+ * COMO AJUSTA. A curva é { início, rumo, comprimento L, joelhos (fração do arco, curvatura) }; a posição sai de integrar a curvatura (Simpson na curvatura e ponto
+ * médio no rumo), com o passo escolhido pelo comprimento, pela curvatura e pela tolerância (a flecha da corda abaixo de 1/20 dela) e os joelhos como quebra do
+ * passo. O resíduo de cada ponto é a distância com sinal à curva (ao ponto mais perto da curva amostrada), mais as duas pontas e uma penalidade pequena sobre a
+ * variação de curvatura de cada trecho (Δk² / comprimento, que prefere a rampa ao lóbulo que o ajuste inventaria para ganhar uma fração da tolerância); o ajuste
+ * é de Levenberg-Marquardt, com jacobiano por diferença finita, sobre o início, o rumo, L, as curvaturas e as frações dos joelhos, e para por convergência. Com mais de
+ * 400 pontos o ajuste usa 400 deles (espaçados, com as pontas e os duros), e o desvio de todos é medido depois. Parte de uma clotoide só, com o rumo lido da corda dos
+ * pontos numa janela de 3% do arco (um ruído do tamanho do espaçamento não o desvia); enquanto o desvio máximo passa da tolerância, entra um joelho no ponto de maior
+ * desvio e o ajuste refaz de onde estava; no fim tenta tirar cada joelho e guarda a retirada que ainda cabe, e de todos os ajustes que cabem fica o de menos clotoides
+ * (e, a igual, o de menor custo): sai o menor número de trechos que o ajuste achou, e não o menor possível. O resultado é determinístico (nenhum sorteio, nenhum relógio). */
 
-const PASSO = 2;
 const MINIMO_DA_FRACAO = 0.01;
 const PESO_DA_PONTA = 10;
+const PESO_DO_DURO = 20;
+const MAXIMO_NO_AJUSTE = 400;
+const REGULARIZACAO = 100;
 
 const erro = (texto) => { throw new Error(`ajustarCurvaLisa: ${texto}`); };
+const citar = (v) => { try { return typeof v === 'number' ? String(v) : JSON.stringify(v) ?? String(v); } catch { return String(v); } };
 
 /* ---------- a curva por joelhos ---------- */
 
@@ -54,61 +65,88 @@ function curvaturaEm(f, fr, k) {
   return k[i - 1] + ((k[i] - k[i - 1]) * (f - fr[i - 1])) / (fr[i] - fr[i - 1]);
 }
 
-/** integra a curva em passos de PASSO mm: devolve { x, y, th } em Float64Array, do arco 0 ao L, e o passo efetivo h */
-function integrar(p, fr) {
-  const { x0, y0, th0, L, k } = p;
-  const n = Math.max(2, Math.ceil(L / PASSO)); const h = L / n;
-  const x = new Float64Array(n + 1); const y = new Float64Array(n + 1); const th = new Float64Array(n + 1);
-  x[0] = x0; y[0] = y0; th[0] = th0;
-  /* a curvatura nos 2n + 1 pontos de meio e de ponta, andando pelos joelhos uma vez só */
-  const kk = new Float64Array(2 * n + 1); let j = 1;
-  for (let i = 0; i <= 2 * n; i += 1) {
-    const f = i / (2 * n);
-    while (j < fr.length - 1 && fr[j] < f) j += 1;
-    kk[i] = f <= fr[0] ? k[0] : f >= fr[fr.length - 1] ? k[fr.length - 1] : k[j - 1] + ((k[j] - k[j - 1]) * (f - fr[j - 1])) / (fr[j] - fr[j - 1]);
+/** o passo de integração: o limite do comprimento, a flecha da corda abaixo de 1/20 (1/100 no fino) da tolerância e o giro de 0,1 radiano por passo */
+function passoDe(L, kmax, tolerancia, fino) {
+  const k = kmax + 1e-300;
+  return Math.min(L / (fino ? 400 : 60), fino ? 0.25 * Math.max(1, L / 1000) : 2 * Math.max(1, L / 1000), Math.sqrt((8 * tolerancia) / ((fino ? 100 : 20) * k)), 0.1 / k);
+}
+
+/** o número de passos de cada trecho de curvatura linear, pelo passo de `passoDe` */
+function passosPorTrecho(fr, L, k, tolerancia, fino) {
+  const h = passoDe(L, Math.max(...k.map(Math.abs)), tolerancia, fino);
+  return fr.slice(1).map((f, j) => Math.max(2, Math.ceil(((f - fr[j]) * L) / h)));
+}
+
+/** integra a curva: devolve { x, y, th, s, n } em Float64Array; a curvatura é linear em cada trecho, então Simpson nela é exato */
+function integrar({ x0, y0, th0, L, k }, fr, passos) {
+  const total = passos.reduce((a, b) => a + b, 1);
+  const x = new Float64Array(total); const y = new Float64Array(total); const th = new Float64Array(total); const s = new Float64Array(total);
+  x[0] = x0; y[0] = y0; th[0] = th0; let i = 0;
+  for (let j = 0; j < fr.length - 1; j += 1) {
+    const s0 = fr[j] * L; const len = (fr[j + 1] - fr[j]) * L; const q = passos[j]; const h = len / q; const ka = k[j]; const dk = k[j + 1] - k[j];
+    for (let t = 0; t < q; t += 1) {
+      const k0 = ka + (dk * t) / q; const k1 = ka + (dk * (t + 0.5)) / q; const k2 = ka + (dk * (t + 1)) / q;
+      const meio = th[i] + ((k0 + k1) * h) / 4;
+      x[i + 1] = x[i] + Math.cos(meio) * h; y[i + 1] = y[i] + Math.sin(meio) * h;
+      th[i + 1] = th[i] + (((k0 + 4 * k1 + k2) / 6) * h); s[i + 1] = s0 + (len * (t + 1)) / q; i += 1;
+    }
   }
-  for (let i = 0; i < n; i += 1) {
-    const k0 = kk[2 * i]; const k1 = kk[2 * i + 1]; const k2 = kk[2 * i + 2];
-    const meio = th[i] + ((k0 + k1) * h) / 4;
-    x[i + 1] = x[i] + Math.cos(meio) * h; y[i + 1] = y[i] + Math.sin(meio) * h;
-    th[i + 1] = th[i] + (((k0 + 4 * k1 + k2) / 6) * h);
-  }
-  return { x, y, th, h, n };
+  return { x, y, th, s, n: total - 1 };
 }
 
 /* as frações dos joelhos interiores, apertadas para ficarem em ordem com folga mínima */
-function frações(interiores, n) {
+function fracoes(interiores, n) {
   const fr = [0, ...interiores, 1];
   for (let i = 1; i < n - 1; i += 1) fr[i] = Math.min(1 - MINIMO_DA_FRACAO * (n - 1 - i), Math.max(fr[i - 1] + MINIMO_DA_FRACAO, fr[i]));
   return fr;
 }
 
 /* os parâmetros p = [x0, y0, th0, L, k_0..k_{n-1}, f_1..f_{n-2}] */
-const desempacotar = (p, n) => ({ x0: p[0], y0: p[1], th0: p[2], L: p[3], k: p.slice(4, 4 + n), fr: frações(p.slice(4 + n), n) });
+const desempacotar = (p, n) => ({ x0: p[0], y0: p[1], th0: p[2], L: p[3], k: p.slice(4, 4 + n), fr: fracoes(p.slice(4 + n), n) });
 
-/** a distância com sinal (positiva à esquerda da curva) de cada ponto à curva amostrada; `janela` guarda o índice mais perto de cada ponto */
-function desviosDos(P, c, janela) {
-  const { x, y, n } = c; const m = P.length; const d = new Float64Array(m);
+/** a distância com sinal (positiva à esquerda da curva) de cada ponto à curva amostrada, e o arco da projeção; `janela` guarda o índice mais perto de cada ponto
+ *  (negativo: busca global) e a busca local, se acaba na borda da janela, refaz-se global */
+function desviosDos(P, c, janela, projecoes = null) {
+  const { x, y, s, n } = c; const m = P.length; const d = new Float64Array(m);
+  const mais = (i, de, ate, passo) => { let melhor = de; let menor = Infinity; for (let j = de; j <= ate; j += passo) { const q = (x[j] - P[i][0]) ** 2 + (y[j] - P[i][1]) ** 2; if (q < menor) { menor = q; melhor = j; } } return melhor; };
   for (let i = 0; i < m; i += 1) {
-    const [px, py] = P[i];
-    let melhor = -1; let menor = Infinity;
-    const grosso = janela[i] < 0;
-    const [de, ate, passo] = grosso ? [0, n, Math.max(1, Math.floor(n / 200))] : [Math.max(0, janela[i] - 16), Math.min(n, janela[i] + 16), 1];
-    for (let j = de; j <= ate; j += passo) { const q = (x[j] - px) ** 2 + (y[j] - py) ** 2; if (q < menor) { menor = q; melhor = j; } }
-    if (grosso) { const a = Math.max(0, melhor - passo); const b = Math.min(n, melhor + passo); for (let j = a; j <= b; j += 1) { const q = (x[j] - px) ** 2 + (y[j] - py) ** 2; if (q < menor) { menor = q; melhor = j; } } }
+    let melhor;
+    const global = () => { const passo = Math.max(1, Math.floor(n / 200)); const g = mais(i, 0, n, passo); return mais(i, Math.max(0, g - passo), Math.min(n, g + passo), 1); };
+    if (janela[i] < 0) melhor = global();
+    else {
+      const de = Math.max(0, janela[i] - 24); const ate = Math.min(n, janela[i] + 24); melhor = mais(i, de, ate, 1);
+      if ((melhor === de && de > 0) || (melhor === ate && ate < n)) melhor = global();
+    }
     janela[i] = melhor;
     /* a projeção na reta do segmento mais perto, para o desvio não depender da amostragem */
-    let dist = Math.sqrt(menor); let sinal = 0;
+    let dist = Math.hypot(x[melhor] - P[i][0], y[melhor] - P[i][1]); let sinal = 0; let arco = s[melhor];
     for (const [a, b] of [[Math.max(0, melhor - 1), melhor], [melhor, Math.min(n, melhor + 1)]]) {
       if (a === b) continue;
       const ex = x[b] - x[a]; const ey = y[b] - y[a]; const l2 = ex * ex + ey * ey;
-      const t = Math.max(0, Math.min(1, ((px - x[a]) * ex + (py - y[a]) * ey) / l2));
-      const dx = px - (x[a] + ex * t); const dy = py - (y[a] + ey * t); const q = Math.hypot(dx, dy);
-      if (q <= dist + 1e-12) { dist = q; sinal = ex * dy - ey * dx; }
+      const t = l2 > 0 ? Math.max(0, Math.min(1, ((P[i][0] - x[a]) * ex + (P[i][1] - y[a]) * ey) / l2)) : 0;
+      const dx = P[i][0] - (x[a] + ex * t); const dy = P[i][1] - (y[a] + ey * t); const q = Math.hypot(dx, dy);
+      if (q <= dist + 1e-12) { dist = q; sinal = ex * dy - ey * dx; arco = s[a] + t * (s[b] - s[a]); }
     }
     d[i] = sinal >= 0 ? dist : -dist;
+    if (projecoes) projecoes[i] = arco;
   }
   return d;
+}
+
+/** o maior desvio da curva à poligonal dos pontos (o outro sentido do desvio de cada ponto à curva): amostra a curva em até 600 pontos e mede a distância ao
+ *  segmento mais perto da poligonal; com ele o resultado não depende de a entrada ter 200 ou 5000 pontos sobre a mesma forma. Devolve { maximo, arco } */
+function desvioDaCurva(P, c) {
+  const passo = Math.max(1, Math.floor(c.n / 600)); let maximo = 0; let arco = 0;
+  for (let i = 0; i <= c.n; i += i + passo > c.n && i < c.n ? c.n - i : passo) {
+    let menor = Infinity;
+    for (let j = 0; j < P.length - 1; j += 1) {
+      const ex = P[j + 1][0] - P[j][0]; const ey = P[j + 1][1] - P[j][1]; const l2 = ex * ex + ey * ey;
+      const t = l2 > 0 ? Math.max(0, Math.min(1, ((c.x[i] - P[j][0]) * ex + (c.y[i] - P[j][1]) * ey) / l2)) : 0;
+      const q = (c.x[i] - P[j][0] - ex * t) ** 2 + (c.y[i] - P[j][1] - ey * t) ** 2; if (q < menor) menor = q;
+    }
+    if (menor > maximo * maximo) { maximo = Math.sqrt(menor); arco = c.s[i]; }
+  }
+  return { maximo, arco };
 }
 
 /* ---------- mínimos quadrados de Levenberg-Marquardt ---------- */
@@ -118,7 +156,7 @@ function resolver(A, b) {
   for (let i = 0; i < n; i += 1) {
     let pv = i; for (let r = i + 1; r < n; r += 1) if (Math.abs(M[r][i]) > Math.abs(M[pv][i])) pv = r;
     [M[i], M[pv]] = [M[pv], M[i]];
-    if (Math.abs(M[i][i]) < 1e-300) return null;
+    if (!(Math.abs(M[i][i]) > 1e-300)) return null;
     for (let r = i + 1; r < n; r += 1) { const f = M[r][i] / M[i][i]; for (let c = i; c <= n; c += 1) M[r][c] -= f * M[i][c]; }
   }
   const x = new Array(n).fill(0);
@@ -126,169 +164,239 @@ function resolver(A, b) {
   return x;
 }
 
-function lm(residuo, p0, escala, { iteracoes = 40 } = {}) {
-  let p = [...p0]; let r = residuo(p); let custo = r.reduce((s, v) => s + v * v, 0); let lambda = 1e-3;
-  for (let it = 0; it < iteracoes; it += 1) {
+const somaDeQuadrados = (r) => { let t = 0; for (const v of r) t += v * v; return Number.isFinite(t) ? t : Infinity; };
+
+/** LM que para por convergência (ganho relativo do custo abaixo de 1e-7 em dois passos seguidos) ou no teto de 80 iterações, e devolve o melhor visto */
+function lm(residuo, p0, escala) {
+  let p = [...p0]; let r = residuo(p); let custo = somaDeQuadrados(r); let lambda = 1e-3; let parados = 0;
+  for (let it = 0; it < 80 && Number.isFinite(custo); it += 1) {
     const J = p.map((_, j) => { const h = escala[j] * 1e-4; const q = [...p]; q[j] += h; const rq = residuo(q); return rq.map((v, i) => (v - r[i]) / h); });
     const m = r.length; const np = p.length;
     const JTJ = Array.from({ length: np }, () => new Array(np).fill(0)); const g = new Array(np).fill(0);
-    for (let a = 0; a < np; a += 1) { for (let i = 0; i < m; i += 1) g[a] += J[a][i] * r[i]; for (let b = a; b < np; b += 1) { let s = 0; for (let i = 0; i < m; i += 1) s += J[a][i] * J[b][i]; JTJ[a][b] = s; JTJ[b][a] = s; } }
-    let melhorou = false;
-    for (let tentativa = 0; tentativa < 8; tentativa += 1) {
+    for (let a = 0; a < np; a += 1) { for (let i = 0; i < m; i += 1) g[a] += J[a][i] * r[i]; for (let b = a; b < np; b += 1) { let t = 0; for (let i = 0; i < m; i += 1) t += J[a][i] * J[b][i]; JTJ[a][b] = t; JTJ[b][a] = t; } }
+    let aceitou = false;
+    for (let tentativa = 0; tentativa < 8 && !aceitou; tentativa += 1) {
       const A = JTJ.map((linha, i) => linha.map((v, j) => (i === j ? v + lambda * (v + 1e-12) : v)));
       const passo = resolver(A, g.map((v) => -v));
       if (!passo) { lambda *= 10; continue; }
-      const q = p.map((v, i) => v + passo[i]); const rq = residuo(q); const cq = rq.reduce((s, v) => s + v * v, 0);
-      if (cq < custo) { const ganho = custo - cq; p = q; r = rq; custo = cq; lambda = Math.max(1e-9, lambda / 5); melhorou = ganho > 1e-9 * (1 + custo); if (!melhorou) return { p, custo }; break; }
-      lambda *= 8;
+      const q = p.map((v, i) => v + passo[i]); const rq = residuo(q); const cq = somaDeQuadrados(rq);
+      if (cq < custo) { const ganho = (custo - cq) / (custo + 1e-300); p = q; r = rq; custo = cq; lambda = Math.max(1e-9, lambda / 5); aceitou = true; parados = ganho < 1e-7 ? parados + 1 : 0; } else lambda *= 8;
     }
-    if (!melhorou) break;
+    if (!aceitou || parados >= 2) break;
   }
   return { p, custo };
 }
 
-/* ---------- o ajuste ---------- */
+/* ---------- a entrada ---------- */
 
-function pontosDe(entrada, eixos) {
+function lerEntrada(entrada, { tolerancia, maximoDeClotoides, duros, eixos }) {
+  if (typeof tolerancia !== 'number' || !(tolerancia > 0) || !Number.isFinite(tolerancia)) erro(`tolerancia espera um número maior que zero (a mesma unidade dos pontos), e veio ${citar(tolerancia)}`);
+  if (!Number.isInteger(maximoDeClotoides) || maximoDeClotoides < 1) erro(`maximoDeClotoides espera um inteiro de 1 em diante, e veio ${citar(maximoDeClotoides)}`);
+  if (!Array.isArray(eixos) || eixos.length !== 2 || !eixos.every((e) => [0, 1, 2].includes(e)) || eixos[0] === eixos[1]) erro(`eixos espera dois dos índices 0, 1 e 2, e veio ${citar(eixos)}`);
+  if (!Array.isArray(duros)) erro(`duros espera uma lista de índices de pontos, e veio ${citar(duros)}`);
   if (!Array.isArray(entrada) || entrada.length < 3) erro(`pontos espera uma lista de 3 pontos ou mais, e veio ${Array.isArray(entrada) ? `${entrada.length} ponto(s)` : typeof entrada}`);
-  const [i, j] = eixos;
-  const P = entrada.map((q, k) => {
-    if (!Array.isArray(q) || q.length < 2 || !q.every((c) => Number.isFinite(c))) erro(`o ponto ${k} precisa ser [u, v] ou [x, y, z] de números finitos, e veio ${JSON.stringify(q)}`);
-    if (q.length === 2) return [q[0], q[1]];
-    return [q[i], q[j]];
+  const tamanho = Array.isArray(entrada[0]) ? entrada[0].length : null;
+  entrada.forEach((q, k) => {
+    if (!Array.isArray(q) || !(q.length === 2 || q.length === 3) || !q.every((c) => Number.isFinite(c))) erro(`o ponto ${k} precisa ser [u, v] ou [x, y, z] de números finitos, e veio ${citar(q)}`);
+    if (q.length !== tamanho) erro(`os pontos misturam ${tamanho} e ${q.length} componentes (o ponto ${k} tem ${q.length}): passe todos com 2 ou todos com 3`);
   });
-  const livre = [0, 1, 2].find((e) => e !== i && e !== j);
-  const constante = entrada[0].length >= 3 ? entrada.reduce((s, q) => s + q[livre], 0) / entrada.length : 0;
-  return { P, constante, livre };
+  for (const i of duros) if (!Number.isInteger(i) || i < 0 || i >= entrada.length) erro(`duros espera índices de 0 a ${entrada.length - 1}, e veio ${citar(i)}`);
+  const [i, j] = eixos; const tem3 = tamanho === 3;
+  const P = entrada.map((q) => (tem3 ? [q[i], q[j]] : [q[0], q[1]]));
+  const livre = tem3 ? [0, 1, 2].find((e) => e !== i && e !== j) : null;
+  let constante = 0;
+  if (tem3) {
+    const vals = entrada.map((q) => q[livre]); const lo = Math.min(...vals); const hi = Math.max(...vals);
+    if (hi - lo > tolerancia) erro(`a coordenada livre (índice ${livre}) varia ${citar(hi - lo)} entre os pontos, acima da tolerância ${citar(tolerancia)}: a curva não é plana nos eixos ${citar(eixos)}; passe os eixos certos ou projete os pontos antes`);
+    constante = vals.reduce((a, b) => a + b, 0) / vals.length;
+  }
+  let L = 0; for (let k = 1; k < P.length; k += 1) L += Math.hypot(P[k][0] - P[k - 1][0], P[k][1] - P[k - 1][1]);
+  if (!(L > 4 * tolerancia)) erro(`o comprimento da poligonal dos pontos (${citar(Math.round(L * 1e6) / 1e6)}) é nulo ou desprezível perto da tolerância ${citar(tolerancia)} (pede mais de ${citar(4 * tolerancia)}): não há curva a ajustar`);
+  return { P, constante, livre, tem3, comprimentoDosPontos: L };
 }
 
-/* a curvatura inicial por mínimos quadrados sobre o rumo lido dos pontos, com os joelhos em fr */
+/* ---------- o ajuste ---------- */
+
+/** os pontos que o LM usa: todos até MAXIMO_NO_AJUSTE, e acima disso os espaçados, com as pontas e os duros */
+function reduzir(P, duros) {
+  if (P.length <= MAXIMO_NO_AJUSTE) return P.map((_, i) => i);
+  const passo = Math.ceil(P.length / MAXIMO_NO_AJUSTE); const fica = new Set([0, P.length - 1, ...duros]);
+  for (let i = 0; i < P.length; i += passo) fica.add(i);
+  return [...fica].sort((a, b) => a - b);
+}
+
+/* a curvatura inicial por mínimos quadrados sobre o rumo lido dos pontos pela corda numa janela de 3% do arco, com os joelhos em fr */
 function iniciar(P, fr) {
   const m = P.length; const s = [0];
   for (let i = 1; i < m; i += 1) s.push(s[i - 1] + Math.hypot(P[i][0] - P[i - 1][0], P[i][1] - P[i - 1][1]));
-  const L = s[m - 1];
-  /* o rumo no meio de cada segmento, desenrolado */
+  const L = s[m - 1]; const janela = 0.03 * L;
   const rumo = []; let anterior = null;
-  for (let i = 0; i < m - 1; i += 1) { let a = Math.atan2(P[i + 1][1] - P[i][1], P[i + 1][0] - P[i][0]); if (anterior !== null) { while (a - anterior > Math.PI) a -= 2 * Math.PI; while (a - anterior < -Math.PI) a += 2 * Math.PI; } rumo.push(a); anterior = a; }
-  const n = fr.length;
-  /* a integral de cada chapéu até f, numérica */
-  const N = 400; const tabela = fr.map((_, j) => { const t = [0]; for (let q = 1; q <= N; q += 1) { const f0 = (q - 1) / N; const f1 = q / N; const chapeu = (f) => { if (j > 0 && f >= fr[j - 1] && f <= fr[j]) return (f - fr[j - 1]) / (fr[j] - fr[j - 1]); if (j < n - 1 && f >= fr[j] && f <= fr[j + 1]) return (fr[j + 1] - f) / (fr[j + 1] - fr[j]); return 0; }; t.push(t[q - 1] + ((chapeu(f0) + chapeu(f1)) / 2) * (f1 - f0) * L); } return t; });
-  const em = (j, f) => { const x = f * N; const a = Math.min(N - 1, Math.floor(x)); return tabela[j][a] + (tabela[j][a + 1] - tabela[j][a]) * (x - a); };
-  /* o rumo de saída: a corda dos pontos até 5% do comprimento (no mínimo dois segmentos), e só as curvaturas saem dos mínimos quadrados */
-  let fim = 1; while (fim < m - 1 && s[fim] < 0.05 * L) fim += 1;
-  const th0 = Math.atan2(P[fim][1] - P[0][1], P[fim][0] - P[0][0]);
-  const A = Array.from({ length: n }, () => new Array(n).fill(0)); const b = new Array(n).fill(0);
-  for (let i = 0; i < m - 1; i += 1) {
-    const f = ((s[i] + s[i + 1]) / 2) / L; const linha = fr.map((_, j) => em(j, f));
-    const alvo = rumo[i] - th0;
-    for (let a = 0; a < n; a += 1) { b[a] += linha[a] * alvo; for (let c = 0; c < n; c += 1) A[a][c] += linha[a] * linha[c]; }
+  for (let i = 0; i < m; i += 1) {
+    let a = i; while (a > 0 && s[i] - s[a - 1] <= janela) a -= 1;
+    let b = i; while (b < m - 1 && s[b + 1] - s[i] <= janela) b += 1;
+    if (a === b) { a = Math.max(0, i - 1); b = Math.min(m - 1, i + 1); }
+    let r = Math.atan2(P[b][1] - P[a][1], P[b][0] - P[a][0]);
+    if (anterior !== null) { while (r - anterior > Math.PI) r -= 2 * Math.PI; while (r - anterior < -Math.PI) r += 2 * Math.PI; }
+    rumo.push(r); anterior = r;
   }
-  for (let a = 0; a < n; a += 1) A[a][a] += 1e-9;
-  const sol = resolver(A, b) ?? new Array(n).fill(0);
-  return { th0, k: sol, L };
+  const n = fr.length; const N = 400;
+  const chapeu = (j, f) => { if (j > 0 && f >= fr[j - 1] && f <= fr[j]) return (f - fr[j - 1]) / (fr[j] - fr[j - 1]); if (j < n - 1 && f >= fr[j] && f <= fr[j + 1]) return (fr[j + 1] - f) / (fr[j + 1] - fr[j]); return 0; };
+  const tabela = fr.map((_, j) => { const t = [0]; for (let q = 1; q <= N; q += 1) t.push(t[q - 1] + ((chapeu(j, (q - 1) / N) + chapeu(j, q / N)) / 2) * (1 / N) * L); return t; });
+  const em = (j, f) => { const x = f * N; const a = Math.min(N - 1, Math.floor(x)); return tabela[j][a] + (tabela[j][a + 1] - tabela[j][a]) * (x - a); };
+  const A = Array.from({ length: n + 1 }, () => new Array(n + 1).fill(0)); const b = new Array(n + 1).fill(0);
+  for (let i = 0; i < m; i += 1) {
+    const f = s[i] / L; const linha = [1, ...fr.map((_, j) => em(j, f))];
+    for (let a = 0; a <= n; a += 1) { b[a] += linha[a] * rumo[i]; for (let c = 0; c <= n; c += 1) A[a][c] += linha[a] * linha[c]; }
+  }
+  for (let a = 0; a <= n; a += 1) A[a][a] += 1e-12 * (1 + A[a][a]);
+  const sol = resolver(A, b) ?? [rumo[0], ...new Array(n).fill(0)];
+  return { th0: sol[0], k: sol.slice(1), L };
 }
 
-function ajustarComJoelhos(P, pesos, ext, joelhos, partida) {
-  const n = joelhos.length;
-  const m = P.length;
+function ajustarComJoelhos(ctx, joelhos, partida) {
+  const { P, pesos, indices, tolerancia } = ctx; const n = joelhos.length;
+  const Pt = indices.map((i) => P[i]); const pt = indices.map((i) => pesos[i]); const pt0 = [...pt]; const m = Pt.length;
+  const base = partida ?? (() => { const ini = iniciar(Pt, joelhos); return [Pt[0][0], Pt[0][1], ini.th0, ini.L, ...ini.k, ...joelhos.slice(1, -1)]; })();
+  const q0 = desempacotar(base, n);
+  const passos = passosPorTrecho(q0.fr, q0.L, q0.k.map((v) => v * 1.5), tolerancia, false);
+  const peso = REGULARIZACAO * tolerancia * Math.sqrt(q0.L);
+  const janela = new Array(m).fill(-1);
   const residuo = (p) => {
-    const q = desempacotar(p, n); const c = integrar(q, q.fr);
-    const d = desviosDos(P, c, ext.janela.slice());
-    const r = new Array(m + 4);
-    for (let i = 0; i < m; i += 1) r[i] = d[i] * pesos[i];
-    r[m] = (c.x[0] - P[0][0]) * PESO_DA_PONTA; r[m + 1] = (c.y[0] - P[0][1]) * PESO_DA_PONTA;
-    r[m + 2] = (c.x[c.n] - P[m - 1][0]) * PESO_DA_PONTA; r[m + 3] = (c.y[c.n] - P[m - 1][1]) * PESO_DA_PONTA;
+    const q = desempacotar(p, n); const c = integrar(q, q.fr, passos);
+    const d = desviosDos(Pt, c, janela.slice());
+    const r = new Array(m + 4 + (n - 1));
+    for (let i = 0; i < m; i += 1) r[i] = d[i] * pt[i];
+    r[m] = (c.x[0] - Pt[0][0]) * PESO_DA_PONTA; r[m + 1] = (c.y[0] - Pt[0][1]) * PESO_DA_PONTA;
+    r[m + 2] = (c.x[c.n] - Pt[m - 1][0]) * PESO_DA_PONTA; r[m + 3] = (c.y[c.n] - Pt[m - 1][1]) * PESO_DA_PONTA;
+    for (let j = 0; j < n - 1; j += 1) { const len = (q.fr[j + 1] - q.fr[j]) * q.L; r[m + 4 + j] = (peso * (q.k[j + 1] - q.k[j])) / Math.sqrt(len); }
     return r;
   };
-  const base = partida ?? (() => { const ini = iniciar(P, joelhos); return [P[0][0], P[0][1], ini.th0, ini.L, ...ini.k, ...joelhos.slice(1, -1)]; })();
-  /* a primeira busca global dos pontos mais perto, para as janelas */
-  { const q = desempacotar(base, n); desviosDos(P, integrar(q, q.fr), ext.janela.fill(-1)); }
-  const L0 = base[3];
-  const escala = base.map((_, j) => (j < 2 ? 1 : j === 2 ? 1e-2 : j === 3 ? 1 : j < 4 + n ? 1 / L0 : 1e-2));
-  /* o ajuste em duas rodadas: a janela de busca se refaz entre elas */
+  const refazerJanela = (p) => { const q = desempacotar(p, n); desviosDos(Pt, integrar(q, q.fr, passos), janela.fill(-1)); };
+  refazerJanela(base);
+  const L0 = base[3]; const kEscala = 1 / L0;
+  const escala = base.map((_, j) => (j < 2 ? Math.max(tolerancia, 1e-9) : j === 2 ? 1e-2 : j === 3 ? L0 * 1e-2 : j < 4 + n ? kEscala : 1e-2));
   let { p, custo } = lm(residuo, base, escala);
-  { const q = desempacotar(p, n); desviosDos(P, integrar(q, q.fr), ext.janela.fill(-1)); }
+  refazerJanela(p);
   ({ p, custo } = lm(residuo, p, escala));
-  const q = desempacotar(p, n); const c = integrar(q, q.fr); const d = desviosDos(P, c, ext.janela.fill(-1));
-  let maximo = 0; let onde = 0; for (let i = 0; i < m; i += 1) if (Math.abs(d[i]) > maximo) { maximo = Math.abs(d[i]); onde = i; }
-  return { p, custo, d, maximo, onde, q, c };
+  /* o desvio de todos os pontos, na curva do mesmo passo grosso */
+  const medir = (pp) => {
+    const q = desempacotar(pp, n); const c = integrar(q, q.fr, passos);
+    const proj = new Float64Array(P.length); const d = desviosDos(P, c, new Array(P.length).fill(-1), proj);
+    let maximo = 0; let arcoDoErro = 0; for (let i = 0; i < P.length; i += 1) { const v = Math.abs(d[i]); if (v > maximo) { maximo = v; arcoDoErro = proj[i]; } }
+    const volta = desvioDaCurva(P, c);
+    if (volta.maximo > maximo) { maximo = volta.maximo; arcoDoErro = volta.arco; }
+    return { p: pp, q, d, maximo: Number.isFinite(maximo) ? maximo : Infinity, arcoDoErro };
+  };
+  let medido = medir(p);
+  /* quase dentro da tolerância: duas rodadas com peso maior nos pontos que mais desviam (Lawson), que trocam um pouco do erro médio pelo máximo */
+  for (let rodada = 0; rodada < 2 && medido.maximo > ctx.alvo && medido.maximo <= 1.3 * tolerancia; rodada += 1) {
+    indices.forEach((gi, k) => { pt[k] = pt0[k] * (1 + 6 * Math.max(0, Math.abs(medido.d[gi]) / tolerancia - 0.6) ** 2); });
+    refazerJanela(medido.p);
+    const r = lm(residuo, medido.p, escala);
+    const novo = medir(r.p);
+    if (novo.maximo < medido.maximo) { medido = novo; custo = r.custo; } else break;
+  }
+  const { d, maximo, arcoDoErro, q } = medido; p = medido.p;
+  return { p, custo, d, maximo: Number.isFinite(maximo) ? maximo : Infinity, arcoDoErro, q };
 }
 
-/** ajustarCurvaLisa(pontos, { tolerancia, maximoDeTrechos, duros, eixos }) -> o ajuste descrito na ficha */
-export function ajustarCurvaLisa(entrada, { tolerancia = 1, maximoDeTrechos = 8, duros = [], eixos = [0, 1] } = {}) {
-  if (!(tolerancia > 0)) erro(`tolerancia espera mm maior que zero, e veio ${tolerancia}`);
-  if (!Number.isInteger(maximoDeTrechos) || maximoDeTrechos < 1) erro(`maximoDeTrechos espera um inteiro de 1 em diante, e veio ${maximoDeTrechos}`);
-  if (!Array.isArray(eixos) || eixos.length !== 2 || !eixos.every((e) => [0, 1, 2].includes(e)) || eixos[0] === eixos[1]) erro(`eixos espera dois dos índices 0, 1 e 2, e veio ${JSON.stringify(eixos)}`);
-  const { P, constante, livre } = pontosDe(entrada, eixos);
-  for (const i of duros) if (!Number.isInteger(i) || i < 0 || i >= P.length) erro(`duros espera índices de 0 a ${P.length - 1}, e veio ${JSON.stringify(i)}`);
-  const pesos = P.map((_, i) => (duros.includes(i) ? 20 : 1));
-  const ext = { janela: new Array(P.length).fill(-1) };
-  let joelhos = [0, 1]; let melhor = ajustarComJoelhos(P, pesos, ext, joelhos, null);
-  const reajustar = (fr, partida) => ajustarComJoelhos(P, pesos, ext, fr, partida);
+/** ajustarCurvaLisa(pontos, { tolerancia, maximoDeClotoides, duros, eixos }) -> o ajuste descrito na ficha */
+export function ajustarCurvaLisa(entrada, { tolerancia = 1, maximoDeClotoides = 8, duros = [], eixos = [0, 1] } = {}) {
+  const lido = lerEntrada(entrada, { tolerancia, maximoDeClotoides, duros, eixos });
+  const { P } = lido;
+  const pesos = P.map((_, i) => (duros.includes(i) ? PESO_DO_DURO : 1));
+  /* o alvo do ajuste é 3% abaixo da tolerância: a medida do ajuste é no passo grosso, e a final, no fino, difere por frações dela */
+  const ctx = { P, pesos, indices: reduzir(P, duros), tolerancia, alvo: 0.97 * tolerancia };
+  let joelhos = [0, 1]; let atual = ajustarComJoelhos(ctx, joelhos, null);
+  const guardados = [atual];
   /* entra um joelho no ponto de maior desvio, enquanto passa da tolerância */
-  while (melhor.maximo > tolerancia && joelhos.length - 1 < maximoDeTrechos) {
-    const { q, c } = melhor; const fr = q.fr;
-    const s = (ext.janela[melhor.onde] / c.n);
-    let f = Math.min(1 - 2 * MINIMO_DA_FRACAO, Math.max(2 * MINIMO_DA_FRACAO, s));
+  while (atual.maximo > ctx.alvo && joelhos.length - 1 < maximoDeClotoides) {
+    const { q } = atual; const fr = q.fr;
+    let f = Math.min(1 - 2 * MINIMO_DA_FRACAO, Math.max(2 * MINIMO_DA_FRACAO, atual.arcoDoErro / q.L));
     let i = 1; while (i < fr.length - 1 && fr[i] < f) i += 1;
     if (f - fr[i - 1] < 2 * MINIMO_DA_FRACAO || fr[i] - f < 2 * MINIMO_DA_FRACAO) f = (fr[i - 1] + fr[i]) / 2;
     const novos = [...fr.slice(0, i), f, ...fr.slice(i)]; const kf = curvaturaEm(f, fr, q.k);
     const ks = [...q.k.slice(0, i), kf, ...q.k.slice(i)];
-    melhor = reajustar(novos, [q.x0, q.y0, q.th0, q.L, ...ks, ...novos.slice(1, -1)]);
-    joelhos = novos;
+    atual = ajustarComJoelhos(ctx, novos, [q.x0, q.y0, q.th0, q.L, ...ks, ...novos.slice(1, -1)]);
+    joelhos = novos; guardados.push(atual);
   }
   /* tira os joelhos que a tolerância dispensa, o de menor custo primeiro */
-  let podou = melhor.maximo <= tolerancia;
-  while (podou && joelhos.length > 2) {
+  let melhor = atual;
+  let podou = melhor.maximo <= ctx.alvo;
+  while (podou && melhor.q.fr.length > 2) {
     podou = false;
     const candidatos = [];
-    for (let i = 1; i < joelhos.length - 1; i += 1) {
-      const { q } = melhor; const fr = q.fr.filter((_, j) => j !== i); const ks = q.k.filter((_, j) => j !== i);
-      const t = reajustar(fr, [q.x0, q.y0, q.th0, q.L, ...ks, ...fr.slice(1, -1)]);
-      if (t.maximo <= tolerancia) candidatos.push(t);
+    const { q } = melhor;
+    for (let i = 1; i < q.fr.length - 1; i += 1) {
+      const fr = q.fr.filter((_, j) => j !== i); const ks = q.k.filter((_, j) => j !== i);
+      const t = ajustarComJoelhos(ctx, fr, [q.x0, q.y0, q.th0, q.L, ...ks, ...fr.slice(1, -1)]);
+      if (t.maximo <= ctx.alvo) candidatos.push(t);
     }
-    if (candidatos.length) { candidatos.sort((a, b) => a.custo - b.custo); melhor = candidatos[0]; joelhos = melhor.q.fr; podou = true; }
+    if (candidatos.length) { candidatos.sort((a, b) => a.custo - b.custo); melhor = candidatos[0]; guardados.push(melhor); podou = true; }
   }
-  return montar(melhor, P, tolerancia, constante, livre, eixos, entrada.length > 0 && entrada[0].length >= 3);
+  /* de todos os ajustes que cabem, o de menos clotoides e, a igual, o de menor custo; se nenhum cabe, o de menor desvio */
+  const cabem = guardados.filter((g) => g.maximo <= ctx.alvo);
+  const escolhido = cabem.length ? cabem.sort((a, b) => a.q.fr.length - b.q.fr.length || a.custo - b.custo)[0] : guardados.sort((a, b) => a.maximo - b.maximo)[0];
+  return montar(escolhido, lido, tolerancia, eixos);
 }
 
 /* ---------- o resultado ---------- */
 
-function montar(ajuste, P, tolerancia, constante, livre, eixos, tem3) {
-  const { q } = ajuste; const { fr, k, L } = q;
+function montar(ajuste, lido, tolerancia, eixos) {
+  const { P, constante, livre, tem3, comprimentoDosPontos } = lido; const { q } = ajuste; const { fr, k, L } = q;
   const joelhos = fr.map((f, i) => ({ s: f * L, k: k[i] }));
   const clotoides = joelhos.slice(1).map((b, i) => ({ de: joelhos[i].s, ate: b.s, k0: joelhos[i].k, k1: b.k, comprimento: b.s - joelhos[i].s }));
-  /* as faixas de um sinal só da curvatura, amostradas a 1 mm: a faixa que move a curva menos que a tolerância (volta total da tangente × comprimento / 8)
-   * é ruído do ajuste, e não lóbulo; a inflexão é a troca de sinal entre as faixas que ficam */
-  const faixas = []; const passoS = Math.min(1, L / 200); const nS = Math.round(L / passoS);
-  for (let i = 0; i < nS; i += 1) {
-    const kk = curvaturaEm((i + 0.5) / nS, fr, k); const sg = Math.sign(kk);
-    const ultima = faixas[faixas.length - 1];
-    if (ultima && (ultima.sg === sg || sg === 0)) { ultima.l += passoS; ultima.giro += Math.abs(kk) * passoS; } else faixas.push({ sg, l: passoS, giro: Math.abs(kk) * passoS });
+  /* a curva a passo fino, e o desvio de todos os pontos nela */
+  const passos = passosPorTrecho(fr, L, k, tolerancia, true);
+  const c = integrar(q, fr, passos);
+  const proj = new Float64Array(P.length); const desvios = desviosDos(P, c, new Array(P.length).fill(-1), proj);
+  let desvioMaximo = 0; for (const v of desvios) desvioMaximo = Math.max(desvioMaximo, Math.abs(v));
+  const desvioDaCurvaMaximo = desvioDaCurva(P, c).maximo;
+  if (![q.x0, q.y0, q.th0, L, ...k, ...fr, desvioMaximo, desvioDaCurvaMaximo].every(Number.isFinite) || !(L > 0)) erro(`o ajuste não convergiu a uma curva finita (comprimento ${citar(L)}, desvio ${citar(desvioMaximo)}); a entrada tem ${P.length} pontos e tolerância ${citar(tolerancia)}`);
+  /* a ordem: os pontos se projetam ao longo do arco sem voltar mais que o dobro da tolerância, e as pontas caem junto das pontas da curva */
+  let ordenados = proj[0] <= 2 * tolerancia && L - proj[P.length - 1] <= 2 * tolerancia;
+  for (let i = 1; i < P.length && ordenados; i += 1) if (proj[i] < proj[i - 1] - 2 * tolerancia) ordenados = false;
+  const comprimentoCerto = L <= 1.05 * comprimentoDosPontos + 2 * tolerancia;
+  /* as faixas de um sinal só da curvatura, na curva integrada: a sagita da faixa (a maior distância dela à corda) abaixo da tolerância é reta, e não lóbulo */
+  const kk = Array.from(c.s, (s) => curvaturaEm(s / L, fr, k));
+  const faixas = []; let inicio = 0; let sinal = 0;
+  for (let i = 0; i <= c.n; i += 1) {
+    const sg = Math.abs(kk[i]) < 1e-12 ? 0 : Math.sign(kk[i]);
+    if (sg !== 0 && sinal === 0) sinal = sg;
+    if (sg !== 0 && sg !== sinal) { faixas.push({ sg: sinal, de: inicio, ate: i }); inicio = i; sinal = sg; }
   }
-  const fica = faixas.filter((f) => (f.giro * f.l) / 8 >= tolerancia);
+  faixas.push({ sg: sinal, de: inicio, ate: c.n });
+  const sagita = ({ de, ate }) => {
+    const ex = c.x[ate] - c.x[de]; const ey = c.y[ate] - c.y[de]; const l = Math.hypot(ex, ey); let m = 0;
+    for (let i = de; i <= ate; i += 1) m = Math.max(m, l > 0 ? Math.abs(ex * (c.y[i] - c.y[de]) - ey * (c.x[i] - c.x[de])) / l : Math.hypot(c.x[i] - c.x[de], c.y[i] - c.y[de]));
+    return m;
+  };
+  const fica = faixas.filter((f) => f.sg !== 0 && sagita(f) >= tolerancia);
   let inflexoes = 0; for (let i = 1; i < fica.length; i += 1) if (fica[i].sg !== fica[i - 1].sg) inflexoes += 1;
-  const faixa = (comp) => (4 * tolerancia) / (comp * comp);
   /* as corridas de curvatura monótona */
-  const direcao = (c) => { const dk = c.k1 - c.k0; const tol = faixa(c.comprimento) * 0.1; return Math.abs(dk) <= tol ? 0 : Math.sign(dk); };
+  const faixaDeReta = (comp) => (4 * tolerancia) / (comp * comp);
+  const direcao = (b) => { const dk = b.k1 - b.k0; return Math.abs(dk) <= faixaDeReta(b.comprimento) * 0.1 ? 0 : Math.sign(dk); };
   const trechos = []; let corrida = null;
-  for (const c of clotoides) {
-    const d = direcao(c);
-    if (corrida && (d === 0 || corrida.d === 0 || d === corrida.d)) { corrida.ate = c.ate; corrida.k1 = c.k1; corrida.joelhos += 1; if (corrida.d === 0) corrida.d = d; } else { if (corrida) trechos.push(corrida); corrida = { de: c.de, ate: c.ate, k0: c.k0, k1: c.k1, d, joelhos: 1 }; }
+  for (const b of clotoides) {
+    const d = direcao(b);
+    if (corrida && (d === 0 || corrida.d === 0 || d === corrida.d)) { corrida.ate = b.ate; corrida.k1 = b.k1; corrida.joelhos += 1; if (corrida.d === 0) corrida.d = d; } else { if (corrida) trechos.push(corrida); corrida = { de: b.de, ate: b.ate, k0: b.k0, k1: b.k1, d, joelhos: 1 }; }
   }
   if (corrida) trechos.push(corrida);
   const trechosFinais = trechos.map(({ d, ...t }) => ({ ...t, sentido: d > 0 ? 'cresce' : d < 0 ? 'cai' : 'constante' }));
-  const c = integrar(q, fr);
-  const ponto = (s) => { const u = Math.min(c.n, Math.max(0, (s / L) * c.n)); const i = Math.min(c.n - 1, Math.floor(u)); const t = u - i; return [c.x[i] + (c.x[i + 1] - c.x[i]) * t, c.y[i] + (c.y[i + 1] - c.y[i]) * t]; };
+  const ponto = (s) => {
+    const alvo = Math.min(L, Math.max(0, s)); let lo = 0; let hi = c.n;
+    while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (c.s[mid] <= alvo) lo = mid; else hi = mid; }
+    const t = (alvo - c.s[lo]) / (c.s[hi] - c.s[lo] || 1);
+    return [c.x[lo] + (c.x[hi] - c.x[lo]) * t, c.y[lo] + (c.y[hi] - c.y[lo]) * t];
+  };
   const amostrar = (passoMm) => {
-    if (!(passoMm > 0)) erro(`passoMm espera mm maior que zero, e veio ${passoMm}`);
+    if (typeof passoMm !== 'number' || !(passoMm > 0)) erro(`passo espera um número maior que zero (a unidade dos pontos), e veio ${citar(passoMm)}`);
     const n = Math.max(1, Math.round(L / passoMm)); return Array.from({ length: n + 1 }, (_, i) => ponto((i * L) / n));
   };
   const para3d = (u, v) => { const r = [0, 0, 0]; r[eixos[0]] = u; r[eixos[1]] = v; r[livre] = constante; return r; };
-  const resultado = {
-    cabe: ajuste.maximo <= tolerancia, tolerancia, desvioMaximo: ajuste.maximo, desvios: Array.from(ajuste.d), comprimento: L,
+  return {
+    cabe: desvioMaximo <= tolerancia && desvioDaCurvaMaximo <= tolerancia && ordenados && comprimentoCerto, tolerancia, desvioMaximo, desvioDaCurva: desvioDaCurvaMaximo, desvios: Array.from(desvios), comprimento: L,
     joelhos, clotoides, trechos: trechosFinais, inflexoes, inicio: [q.x0, q.y0], rumo: q.th0, ponto, amostrar,
-    pontosDaRede: (passoMm, { nome = 'curva', completar = tem3 ? para3d : (u, v) => [u, v, constante] } = {}) => ({ nome, pontos: amostrar(passoMm).map(([u, v]) => completar(u, v)) }),
+    pontosDaRede: (passo, { nome = 'curva', completar = tem3 ? para3d : (u, v) => [u, v, constante] } = {}) => ({ nome, pontos: amostrar(passo).map(([u, v]) => completar(u, v)) }),
   };
-  return resultado;
 }
