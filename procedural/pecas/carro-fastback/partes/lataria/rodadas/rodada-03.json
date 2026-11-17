@@ -1,0 +1,313 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "carro-fastback/lataria",
+  "numero": 3,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/carro-fastback/referencias/lateral.prancha.svg",
+    "nota": 6.8,
+    "defeitos": [
+      {
+        "parte": "chapa",
+        "tipo": "superficie",
+        "onde": "lateral da porta e quarto traseiro, abaixo do ombro",
+        "sentido": "segmentado",
+        "evidencia": "P16: zebra da vista direita com anéis fechados e ondas na porta e no quarto; pintura isométrica com reflexo irregular no ombro; bordas serrilhadas nas partes isoladas."
+      },
+      {
+        "parte": "chapa",
+        "tipo": "superficie",
+        "onde": "painel da porta ao quarto traseiro",
+        "sentido": "segmentado",
+        "evidencia": "P6: a chapa é contínua, mas a zebra mostra anéis fechados e ondas na porta e no quarto, e a chapa não é lisa."
+      }
+    ],
+    "observacao": "A silhueta confere com as três pranchas e as feições prometidas existem; o que reprova é a ondulação da chapa, vista nas zebras e na pintura, e o serrilhado nas bordas das regiões isoladas."
+  },
+  "partes": [
+    {
+      "nome": "chapa",
+      "confere": false,
+      "observacao": "tem o degrau das lanternas e a aba da tampa sobre a faixa recuada, mas ainda 7 falhas de ondulação, de até 0,86 mm, na traseira, na tampa e no ombro; chapa não lisa; falta o ressalto de baixo da faixa, preso à silhueta da prancha"
+    },
+    {
+      "nome": "paralamaTraseiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rebaixoLateral",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "o README da fatia 5 cita tmp/correcao-f5/carro/receita.js, que nao existe no ramo; marcar as curvas pede copiar a receita com sed",
+    "medida-na-curva e onde-ondula, na superficie limite sem os cortes, deram o contrario da malha final para passo 90 (suavidade 304 para 443, rebaixo 25,8 para 216)",
+    "suavidade so mede por parte e nao ha opcao de caixas; as caixas foram partes extras numa copia de medida",
+    "o indice de suavidade e dominado por vinco e borda de vao e e caotico com a densidade de pontos (coluna: 751, 675, 1071, 1032 para 3, 4, 6, 8 pontos)",
+    "PLANO.partes.forma acima de 240 caracteres so e recusada no descrever, depois de uns 60 s",
+    "vistas:critica levou 15 min de relogio na maquina carregada",
+    "cada variante custa 3 a 4,5 min e precisa morar em tmp/ do repositorio; falta --params nas medidas",
+    "os dois pedidos fechados deram 6,8 (juntar: P16 de criterio e P6 de forma); com as pranchas sobrepostas a silhueta confere nas tres vistas, e a borda de baixo da traseira sobe em arco a uns 300-330 mm contra a reta da prancha em 220-230 mm",
+    "o degrau das lanternas pedido pela pessoa foi lido pelos dois criticos (P9 e P15); as lanternas sao retangulos largos, e a foto mostra tres barras altas que contornam a quina",
+    "a nota de passagem do modelador passou de 600 caracteres e so foi recusada no registro; quem conduziu a encurtou"
+  ],
+  "notaDePassagem": "Degrau das lanternas: recuo no perfil da traseira (y 900 a z -2190, uns 35 mm sob a aba, proporção lida na foto) e vinco topoDaCalota 0,3 só na curva Q3; sem o vinco a caixa da traseira vai de 345 a 1025, com ele a 418. Perfil alisado a 50 (9 para 7 falhas). G1, passo 90, liso, pesoPorCurva, vincos mais finos e faixa coluna-quina mais densa foram medidos e rejeitados. Falta o ressalto de baixo da faixa e as 7 falhas, cuja energia está nos vincos e nas bordas dos vãos.",
+  "receita": {
+    "sha256": "sha256:93ea172972f55ffa43b140a964003c85969d40066400d7b3bdd3e111493b194e",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 10,
+      "acrescentadas": 33,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * RODADA 4. O degrau das lanternas entrou pelo perfil da traseira (`traseira`, recuo no nível `topo`), e a quina do ombro à coluna e a coroa ganharam"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " * `alisamento.quina`; `emendaG1` e `chapa.pesoPorCurva` ficam vazios (medidos, sem ganho: README do banco de provas e `rodadas/`)."
+        },
+        {
+          "tipo": "-",
+          "linha": 35,
+          "texto": "  alisamento: { planta: 40, comprimento: 120, teto: 100, queda: 20, perfil: 30 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "  alisamento: { planta: 40, comprimento: 120, teto: 100, queda: 20, perfil: 50, quina: 120 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 63,
+          "texto": "  /* o perfil da traseira no eixo do carro, [y, z]: de cima para baixo, da borda da tampa ao fundo; a calota desloca cada nível por ele */"
+        },
+        {
+          "tipo": "-",
+          "linha": 64,
+          "texto": "  traseira: [[1037, -2210], [961, -2224], [881, -2241], [845, -2258], [760, -2321], [629, -2369], [570, -2375], [500, -2373], [416, -2350], [333, -2302]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "  /* o perfil da traseira no eixo do carro, [y, z]: de cima para baixo, da borda da tampa ao fundo; a calota desloca cada nível por ele. O degrau das"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "   * lanternas: abaixo da quina da aba (961, -2224, na silhueta da prancha lateral) a faixa recua até o nível `topo` (900, -2190, uns 35 mm para dentro da"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "   * aba, a proporção da imagem de referência, que não é medida) e volta para fora pela lanterna até o para-choque (-2321 a y 760), como na prancha */"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "  traseira: [[1037, -2210], [961, -2224], [900, -2190], [845, -2240], [760, -2321], [629, -2369], [570, -2375], [500, -2373], [416, -2350], [333, -2302]],"
+        },
+        {
+          "tipo": "-",
+          "linha": 77,
+          "texto": "  vincos: { ombro: 0.5, coluna: 0.3, quinaDoTeto: 0.4, bordaDaTampa: 0.2 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "  /* as curvas que declaram a emenda lisa de tangente comum (`continuidade: 'G1'` da rede) e o deslocamento que se tolera (mm); vazio, nenhuma */"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "  emendaG1: { curvas: [], tolerancia: 1 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "  /* topoDaCalota: o vinco da quina do degrau das lanternas, no nível `topo` da volta da traseira (só a calota, o lado da porta não tem); medido: sem ele o"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "   * índice da caixa da traseira vai de 345 a 1025, com ele (0,3 ou 0,5) a 418 */"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "  vincos: { ombro: 0.5, coluna: 0.3, quinaDoTeto: 0.4, bordaDaTampa: 0.2, topoDaCalota: 0.3 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 196,
+          "texto": "  const zx = lisa(T.quinaDoTeto.map(([z, x]) => [z, x])); const zy = lisa(T.quinaDoTeto.map(([z, , y]) => [z, y]));"
+        },
+        {
+          "tipo": "+",
+          "linha": 204,
+          "texto": "  const zx = lisa(T.quinaDoTeto.map(([z, x]) => [z, x]), A.quina ?? A.comprimento); const zy = lisa(T.quinaDoTeto.map(([z, , y]) => [z, y]), A.quina ?? A.comprimento);"
+        },
+        {
+          "tipo": "-",
+          "linha": 326,
+          "texto": "    const vinco = j === 4 ? T.vincos.bordaDaTampa : vincosDe[j];"
+        },
+        {
+          "tipo": "+",
+          "linha": 334,
+          "texto": "    const vinco = j === 4 ? T.vincos.bordaDaTampa : j === 3 ? T.vincos.topoDaCalota : vincosDe[j];"
+        },
+        {
+          "tipo": "-",
+          "linha": 359,
+          "texto": "  const pesadas = T.chapa.pesoDasCurvas ? curvas.map((c) => ({ ...c, peso: T.chapa.pesoDasCurvas })) : curvas;"
+        },
+        {
+          "tipo": "-",
+          "linha": 360,
+          "texto": "  const rede = gaiolaPorRede({ passo: T.chapa.passo, anguloMax: T.chapa.anguloMax, fora: [1, 0, 0], simetria: 'x', nos, curvas: pesadas, retalhos, ...(T.chapa.liso ? { liso: T.chapa.liso } : {}), ...alisamentoDasCurvas(T, curvas, nos) });"
+        },
+        {
+          "tipo": "+",
+          "linha": 367,
+          "texto": "  const comPeso = T.chapa.pesoDasCurvas ? curvas.map((c) => ({ ...c, peso: T.chapa.pesoPorCurva?.[c.nome] ?? T.chapa.pesoDasCurvas })) : curvas;"
+        },
+        {
+          "tipo": "+",
+          "linha": 368,
+          "texto": "  const G1 = T.emendaG1.curvas;"
+        },
+        {
+          "tipo": "+",
+          "linha": 369,
+          "texto": "  const pesadas = G1.length ? comPeso.map((c) => (G1.includes(c.nome) ? { ...c, continuidade: 'G1' } : c)) : comPeso;"
+        },
+        {
+          "tipo": "+",
+          "linha": 370,
+          "texto": "  const rede = gaiolaPorRede({ passo: T.chapa.passo, anguloMax: T.chapa.anguloMax, fora: [1, 0, 0], simetria: 'x', nos, curvas: pesadas, retalhos, ...(T.chapa.liso ? { liso: T.chapa.liso } : {}), ...(G1.length ? { limitesDaEmenda: { tolerancia: T.emendaG1.tolerancia } } : {}), ...alisamentoDasCurvas(T, curvas, nos) });"
+        },
+        {
+          "tipo": "+",
+          "linha": 448,
+          "texto": "/* O que só esta peça diz ao pacote do crítico: as pranchas estão no referencial do carro em mm (o quarto traseiro cai sobre a metade de"
+        },
+        {
+          "tipo": "+",
+          "linha": 449,
+          "texto": " * trás delas), a superior desenha o comprimento na horizontal e gira 90 graus para casar com a vista de cima, e a foto lateral, gerada"
+        },
+        {
+          "tipo": "+",
+          "linha": 450,
+          "texto": " * por IA e guardada em `referencias/locais/` fora do git, olha do lado +x, com a frente à esquerda. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 451,
+          "texto": "export const CRITICA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 452,
+          "texto": "  pranchas: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 453,
+          "texto": "    'lateral.prancha.svg': { referencial: true },"
+        },
+        {
+          "tipo": "+",
+          "linha": 454,
+          "texto": "    'traseira.prancha.svg': { referencial: true },"
+        },
+        {
+          "tipo": "+",
+          "linha": 455,
+          "texto": "    'superior.prancha.svg': { girar: 90, referencial: true },"
+        },
+        {
+          "tipo": "+",
+          "linha": 456,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 457,
+          "texto": "  referencias: { 'lateral.png': 'direita', 'traseira.png': 'traseira' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 458,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 459,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 445,
+          "texto": "    referencias: ['../../referencias/lateral.prancha.svg', '../../referencias/traseira.prancha.svg', '../../referencias/superior.prancha.svg'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 467,
+          "texto": "    referencias: ['../../referencias/lateral.prancha.svg', '../../referencias/traseira.prancha.svg', '../../referencias/superior.prancha.svg', '../../referencias/locais/lateral.png', '../../referencias/locais/traseira.png'],"
+        },
+        {
+          "tipo": "-",
+          "linha": 448,
+          "texto": "      { nome: 'chapa', forma: 'chapa contínua de 2 mm do meio da porta à traseira, lisa, com teto, coluna caindo até a tampa, quina da traseira, arco da roda, degrau do ombro à coluna e os vãos do vidro lateral, da lanterna e do vidro traseiro', tecnica: 'subdivisao de uma gaiolaPorRede cujas arestas seguem as curvas da prancha, com os vãos por furoPassante e aberturaPorContorno' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 470,
+          "texto": "      { nome: 'chapa', forma: 'chapa contínua de 2 mm do meio da porta à traseira, lisa, com teto, coluna até a tampa, quina, arco, degrau do ombro, degrau das lanternas (aba da tampa sobre a faixa recuada) e os vãos de vidro e lanterna', tecnica: 'subdivisao de uma gaiolaPorRede cujas arestas seguem as curvas da prancha, com os vãos por furoPassante e aberturaPorContorno' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 480,
+          "texto": "      'a traseira sem o degrau das lanternas: a tampa que não termina em aba sobre a faixa recuada dos vãos, ou a chapa que não volta para fora abaixo dela',"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes chapa, paralamaTraseiro, rebaixoLateral",
+    "imagens": [
+      "peca-frente-rasante-az0.png",
+      "peca-frente-rasante-az270.png",
+      "peca-lado-rasante-az180.png",
+      "peca-lado-rasante-az270.png",
+      "peca-topo-rasante-az270.png",
+      "peca-topo-rasante-az180.png",
+      "peca-tresquartos-rasante-az20.png",
+      "peca-tresquartos-rasante-az290.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  },
+  "registradaEm": "2026-11-17T13:29:39.344Z",
+  "facesFinas": {
+    "total": 1,
+    "porParte": {
+      "chapa": 1
+    }
+  }
+}
