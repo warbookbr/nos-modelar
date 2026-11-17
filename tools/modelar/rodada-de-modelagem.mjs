@@ -280,15 +280,19 @@ function vereditoDasFacesFinas({ total, porParte }, { base, anteriores, lataria,
   return { aviso };
 }
 
-/* O que do PLANO entra no pedido do crítico: o objeto, a escala, as referências, a forma de cada parte, os critérios e a família que escolhe
-   critérios e perguntas. `lataria`, `dobrasAceitas` e `saliencias` são do texto e das réguas, e trocá-los não muda o que o crítico lê. O PLANO inválido
-   entra inteiro, como era. */
+/* O que do PLANO entra no pedido do crítico: o objeto, a escala, as referências, a forma de cada parte, os critérios, a família que escolhe
+   critérios e perguntas e a espessura mínima. `lataria`, `dobrasAceitas` e `saliencias` são do texto e das réguas, e `categoria` é só o rótulo
+   da janela Abrir; trocá-los não muda o que o crítico lê, e por isso saem da impressão. Todo campo opcional do PLANO está numa das duas listas
+   abaixo, e o teste cobra isso: campo novo que ninguém classificou entraria na impressão e faria o laço perder o julgamento já dado. O PLANO
+   inválido entra inteiro, como era. */
+export const CAMPOS_OPCIONAIS_LIDOS_PELO_CRITICO = Object.freeze(['familia', 'familiaProcedural', 'espessuraMinima']);
+export const CAMPOS_OPCIONAIS_NAO_LIDOS_PELO_CRITICO = Object.freeze(['lataria', 'dobrasAceitas', 'saliencias', 'categoria']);
 export function planoQueOCriticoLe(plano) {
   let normal;
   try { normal = normalizarPlanoDeModelagem(plano); } catch { return plano ?? null; }
   if (normal === null) return null;
-  const { lataria: _lataria, dobrasAceitas: _dobras, saliencias: _saliencias, ...lido } = normal;
-  void _lataria; void _dobras; void _saliencias;
+  const lido = { ...normal };
+  for (const campo of CAMPOS_OPCIONAIS_NAO_LIDOS_PELO_CRITICO) delete lido[campo];
   return lido;
 }
 

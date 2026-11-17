@@ -14,6 +14,9 @@ export const CATEGORIAS_DE_OBJETO = Object.freeze([
 
 export const IDS_DE_CATEGORIA = Object.freeze(CATEGORIAS_DE_OBJETO.map((c) => c.id));
 
+/* `outros` é só a queda de quem não declara: declará-lo seria dizer que não se sabe, que é o mesmo que não declarar. */
+export const IDS_DECLARAVEIS = Object.freeze(IDS_DE_CATEGORIA.filter((id) => id !== 'outros'));
+
 export function ehCategoriaDeObjeto(valor) {
-  return IDS_DE_CATEGORIA.includes(valor);
+  return IDS_DECLARAVEIS.includes(valor);
 }

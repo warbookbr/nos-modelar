@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { ErroMontagemPersistida, lerMontagemPersistida } from './ler-montagem-persistida.js';
 import { normalizarPlanoDeModelagem } from './plano-de-modelagem.js';
-import { IDS_DE_CATEGORIA } from './categorias-de-objeto.js';
+import { IDS_DECLARAVEIS } from './categorias-de-objeto.js';
 
 const { categoria: _declarada, ...MONTAGEM } = JSON.parse(readFileSync(new URL('../../procedural/pecas/carrinho-de-mao/montagem.json', import.meta.url), 'utf8'));
 const PLANO = {
@@ -19,12 +19,14 @@ describe('categoria declarada pelo objeto', () => {
     expect(lerMontagemPersistida({ ...MONTAGEM, categoria: 'robotica' }).categoria).toBe('robotica');
     expect('categoria' in lerMontagemPersistida(MONTAGEM)).toBe(false);
     expect(() => lerMontagemPersistida({ ...MONTAGEM, categoria: 'brinquedos' })).toThrow(ErroMontagemPersistida);
+    expect(() => lerMontagemPersistida({ ...MONTAGEM, categoria: 'outros' })).toThrow(ErroMontagemPersistida);
   });
 
   it('o PLANO aceita uma categoria da lista, a mantém na forma canônica e recusa a de fora', () => {
     expect(normalizarPlanoDeModelagem({ ...PLANO, categoria: 'utensilios' }).categoria).toBe('utensilios');
     expect('categoria' in normalizarPlanoDeModelagem(PLANO)).toBe(false);
     expect(() => normalizarPlanoDeModelagem({ ...PLANO, categoria: 'brinquedos' })).toThrow(/categoria/);
+    expect(() => normalizarPlanoDeModelagem({ ...PLANO, categoria: 'outros' })).toThrow(/categoria/);
   });
 
   it('as montagens em dados do acervo declaram categoria da lista, e leem sem erro', () => {
@@ -33,7 +35,7 @@ describe('categoria declarada pelo objeto', () => {
     expect(pastas.length).toBeGreaterThan(0);
     for (const pasta of pastas) {
       const lida = lerMontagemPersistida(JSON.parse(readFileSync(new URL(`${pasta}/montagem.json`, raiz), 'utf8')));
-      expect(IDS_DE_CATEGORIA, `${pasta}/montagem.json`).toContain(lida.categoria);
+      expect(IDS_DECLARAVEIS, `${pasta}/montagem.json não declara 'categoria' (ou declara uma fora da lista): acrescente \"categoria\" com um destes valores: ${IDS_DECLARAVEIS.join(', ')}`).toContain(lida.categoria);
     }
   });
 });

@@ -3,7 +3,7 @@
 import { identidadeTransformacaoRigida, validarTransformacaoRigida } from './transformacao-rigida.js';
 import { ErroVinculoDeMedida, lerEtapas, lerVinculos } from './vinculos-de-medida.js';
 import { ErroPosicaoPorPorta, lerPosicoes } from './posicao-por-porta.js';
-import { ehCategoriaDeObjeto, IDS_DE_CATEGORIA } from './categorias-de-objeto.js';
+import { ehCategoriaDeObjeto, IDS_DECLARAVEIS } from './categorias-de-objeto.js';
 
 export const FORMATO = 'mecanifica.montagem';
 export const VERSAO = 1;
@@ -390,7 +390,7 @@ function lerV5(dado) {
   chavesExatas(dado, ['formato', 'versao', 'id', 'instancias', 'relacoes', 'etapas', 'vinculos', 'posicoes', 'auditoriaIntersecoes', 'apoioNoChao', 'manual', 'categoria'], '$');
   const { etapas: etapasBrutas, vinculos: vinculosBrutos, posicoes: posicoesBrutas, auditoriaIntersecoes, apoioNoChao, manual, categoria, ...base } = dado;
   /* `categoria` é o rótulo com que a janela Abrir da bancada agrupa o objeto; só navega, e não muda geometria nem medida. */
-  if (categoria !== undefined && !ehCategoriaDeObjeto(categoria)) falhar('categoria-invalida', 'categoria', `precisa ser uma de ${IDS_DE_CATEGORIA.join(', ')}.`);
+  if (categoria !== undefined && !ehCategoriaDeObjeto(categoria)) falhar('categoria-invalida', 'categoria', `precisa ser uma de ${IDS_DECLARAVEIS.join(', ')}.`);
   const lida = lerV3({ ...base, versao: VERSAO_ATUAL });
   const posesDeclaradas = new Set(dado.instancias
     .filter((instancia) => ehObjetoSimples(instancia) && instancia.pose !== undefined)

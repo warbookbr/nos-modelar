@@ -24,7 +24,7 @@
  * um retrato de execução. */
 
 import { criteriosDe, FAMILIAS_DE_OBJETO } from '../../procedural/criterios/index.js';
-import { ehCategoriaDeObjeto, IDS_DE_CATEGORIA } from './categorias-de-objeto.js';
+import { ehCategoriaDeObjeto, IDS_DECLARAVEIS } from './categorias-de-objeto.js';
 import { normalizarLataria } from './lataria.js';
 import { normalizarDobrasAceitas } from './dobras-aceitas.js';
 import { normalizarSaliencias } from './saliencias-declaradas.js';
@@ -186,7 +186,7 @@ export function normalizarPlanoDeModelagem(valor, { quem = 'PLANO' } = {}) {
     falhar(quem, `'familia' precisa ser uma família de objeto com critérios (${FAMILIAS_DE_OBJETO.join(', ')}); veio ${JSON.stringify(valor.familia)}.`);
   }
   if (valor.categoria !== undefined && !ehCategoriaDeObjeto(valor.categoria)) {
-    falhar(quem, `'categoria' precisa ser uma de ${IDS_DE_CATEGORIA.join(', ')}; veio ${JSON.stringify(valor.categoria)}.`);
+    falhar(quem, `'categoria' precisa ser uma de ${IDS_DECLARAVEIS.join(', ')}; veio ${JSON.stringify(valor.categoria)}.`);
   }
   if (valor.familiaProcedural !== undefined && !(typeof valor.familiaProcedural === 'string' && ID_DE_FAMILIA.test(valor.familiaProcedural))) {
     falhar(quem, `'familiaProcedural' precisa ser o id de uma família de procedural/familias (minúsculas, hífen entre as palavras); veio ${JSON.stringify(valor.familiaProcedural)}.`);
