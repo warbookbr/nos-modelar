@@ -291,6 +291,7 @@ const receita = {
   },
   TOPO: { origem: 'canto de baixo da aba de parede, no meio da largura e encostado na parede; y para cima e a aba do tubo avança para +z' },
   PLANO: {
+    categoria: 'utensilios',
     objeto: 'suporte em L de chapa grossa que prende um tubo de 30 mm de diâmetro a uma parede, com duas abas de 6 mm',
     referencias: ['referencias/alvo.md'],
     escala: { medida: 'diâmetro do tubo que o recorte abraça', milimetros: 30 },
