@@ -139,6 +139,14 @@ Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 | `pedacosConvexos` lento em tampa com muitos furos | `procedural/nucleo/pedacos-convexos.js` recomeça a fusão do primeiro par depois de cada fusão, e o custo cresce perto do cubo dos triângulos: 2,3 s numa tampa de 1124 triângulos e 34 s numa camada de 189 furos da placa |
 | Vista de baixo escura na bancada | a vista inferior sai quase preta sem `--ambiente=estudio`, porque a luz vem de cima; a vista de baixo devia acender uma luz de baixo por padrão |
 | `chamar` da família sem os parâmetros completos | `src/autoria/chamar-familia.js` completa os parâmetros com perfil e padrões e não devolve o resultado, e `placa.js` repete a ordem de precedência em `parametrosCompletos`; exportar a função evita a cópia |
+| `alisarCurvas` atravessa o vinco | na rodada 3 do carro o alisamento não parte a curva no nó em que ela cruza uma curva declarada vinco quando a virada fica abaixo do `anguloDeCanto`, e o remédio do aviso (o nó em `cantos`) vira canto vivo na subdivisão; o modelador contornou com `partirSecaoEm`. Partir no nó que está numa curva com `vinco`, em `gaiola-por-rede.js` |
+| `alisamentoNoLimite` não distingue amostragem de ruído | na pele analítica do carro o alisamento mexeu até 6,5 mm nas seções e, com o dobro de pontos, menos de 1,2 mm: era feição amostrada de menos. O aviso deve comparar o deslocamento com o espaçamento dos pontos-chave |
+| Medida de receita recusada sem dizer que foi recusada | com a receita recusada, `suavidade` imprime "(sem parte)" com zero e `ondulacao` diz que o vértice 0 não está na malha; `entrada-de-medida.mjs` deve recusar a entrada com órfão e dizer a recusa |
+| `--params=<json>` nas medidas | cada variante da receita do carro custou uns 5 min e teve de morar em `tmp/` do repositório para o cache seguir o import; o modelador esperou 1,9 h somadas em 23 `sleep`. As medidas aceitarem parâmetros sobre a receita da peça evita a cópia |
+| Pacote do crítico dividido em duas pastas | `vistas-para-critica --saida=<pasta>` grava ali só `superficie/` e os pedidos; zebra, pintura e vistas isoladas vão para `tools/bancadas/out/` e sobrescrevem a rodada anterior |
+| Parte da mesma chapa fora de `lataria.partes` | a curvatura da lataria deixou cinza o para-lama e o rebaixo do carro, faces da mesma subdivisão que a chapa, porque só `chapa` estava em `lataria.partes`; avisar a parte da mesma origem que ficou de fora |
+| `suavidade --regiao=<caixa>` | a `ondulacao` não acusa as faixas da lateral do carro que a zebra mostra, e a `suavidade` só mede por parte; medir dentro de uma caixa |
+| `undefined` no aviso do `descrever` | `npm run descrever -- carro-fastback/lataria` mostra "passo 3 (limparLascas, lascasRestantes): undefined" |
 
 Dezesseis linhas que diziam "concluído" saíram desta tabela em 2026-09-11. Elas
 descreviam trabalho entregue, e candidato entregue não é candidato: o registro
