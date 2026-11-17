@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2105 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2107 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2309,6 +2309,8 @@
 - `caminho-simetrico.js` — caminho-simetrico.js — utilitário declarativo para construção de caminhos bilaterais simétricos para a primitiva `loft` no motor procedural do Modelar.
 - `caminho-simetrico.test.mjs` — caminho-simetrico.test.mjs — testes unitários para a função criarCaminhoSimetrico.
 - `catalogo-pecas.js` — catalogo-pecas.js — contrato explícito da lista que uma aplicação pode publicar. O catálogo é dado de aplicação; o núcleo e os validadores recebem receitas d…
+- `categoria-da-montagem.test.js` — categoria-da-montagem.test.js — a categoria que a janela Abrir lê da montagem em dados e do PLANO vem de uma lista fechada.
+- `categorias-de-objeto.js` — categorias-de-objeto.js — a lista fechada de categorias com que a janela Abrir da bancada separa o acervo.
 - `chamar-familia.js` — chamar-familia.js — a porta de entrada de uma família: `chamar(familia, id, parametros)`.
 - `chamar-familia.test.js` — chamar-familia.test.js — `definirFamilia` e `chamar` sobre a família de prova: o que o `derivar` recebe e o que ele pode devolver. As recusas dos parâmetros …
 - `conferir-articulacao.js` — conferir-articulacao — o curso de uma articulação declarada, conferido contra as malhas de uma montagem resolvida. Serviço neutro, sem Three.js.
