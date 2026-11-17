@@ -1,12 +1,12 @@
 # Abrir peça com filtros: a janela de abrir da bancada busca por nome e separa por categoria e situação
 
-**Estado:** rascunho
+**Estado:** ativo
 
-**Território:** a declarar ao ativar. O provável é `src/bancada/acervo-receitas.js`, `src/bancada/componentes/menu-abrir.js` e os testes deles, e o lugar onde a janela é desenhada em `src/bancada/main.js`, só no trecho da janela de abrir.
+**Território:** `src/bancada/acervo-receitas.js`, `src/bancada/acervo-receitas.test.js`, `src/bancada/componentes/menu-abrir.js`, `src/bancada/componentes/menu-abrir.test.js`, `docs/modelar/banco-de-provas/abrir-peca-com-filtros-2026-11-17/`; e, só no trecho da janela de abrir, `src/bancada/main.js`.
 
 **Responsável:** a IA da sessão implementa; Tiago pediu em 2026-11-17 e aprova pela imagem da janela.
 
-**Repositório e base:** `warbookbr/nos-modelar`, main na ativação. Não toca núcleo nem receita, e pode rodar ao lado dos outros planos.
+**Repositório e base:** `warbookbr/nos-modelar`, main de 2026-11-17, ativado pela pessoa em 2026-11-17 na vaga do cache por passo, que fechou. Não toca núcleo nem receita, e pode rodar ao lado dos outros planos.
 
 ## Problema observado
 
