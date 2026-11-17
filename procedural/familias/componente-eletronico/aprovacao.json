@@ -2284,12 +2284,22 @@
   },
   "critico": null,
   "pessoa": {
-    "data": "2026-11-16",
+    "data": "2026-11-17",
     "aprovou": true,
-    "prancha": "docs/modelar/banco-de-provas/componentes-eletronicos-2026-11-16/fatia-1-prancha.png",
+    "prancha": "docs/modelar/banco-de-provas/componentes-eletronicos-2026-11-16/fatia-2-prancha.png",
+    "pranchaAnterior": "docs/modelar/banco-de-provas/componentes-eletronicos-2026-11-16/fatia-1-prancha.png",
     "perfis": {
       "barra-1x8": {
         "hash": "sha256:b00ca1815e6f524608828b5875b9d64a60f9ae707fb73ded67070246dcf3637e"
+      },
+      "borne-2-vias": {
+        "hash": "sha256:bc1e21f71c5e633405e5dd6452951119c31b1c9342b0b6d1d50d34ef95169e3e"
+      },
+      "borne-3-vias": {
+        "hash": "sha256:f593f83f4d0552ae1906ba9fdd4b0b706ee66e27254d7a94cb6c604e982eccca"
+      },
+      "ceramico-disco-5": {
+        "hash": "sha256:8fa34380f8663df0a34cafc313b826f105a9f60dd0e140ae0a45692c09d2a872"
       },
       "dip-40": {
         "hash": "sha256:826a36b67c4bd947dc91e6d34095e26164c76babb9a9b5a439f0b85490f2c30b"
@@ -2297,16 +2307,46 @@
       "dip-8": {
         "hash": "sha256:7aee723a121c1f71517371ce25e73003e4f95c1a7402346c1efa42b902184f7d"
       },
+      "dissipador-to-220": {
+        "hash": "sha256:a389b1f04772d219f65aad353a055382ea6800fe572f602e8c7fc1c500c253ce"
+      },
       "eletrolitico-6-3x11": {
         "hash": "sha256:996f32e37f4ea9c48c9f857766f1385fbf11606d7161fa70e78df6369b765660"
+      },
+      "jack-de-alimentacao": {
+        "hash": "sha256:14a8f5d2ba97f62342199d31f060a2ba277e02925ea9b5c4f7d8734c35292b49"
+      },
+      "led-3": {
+        "hash": "sha256:45fc66d245002926ac7550bb5a84c7ed5d2e2fe2799095e1031ef441660149ca"
+      },
+      "led-5": {
+        "hash": "sha256:4d6883bbc0b8d6052519afc1da55490cb63665325a6ba99fc8870deaf2b1eecc"
+      },
+      "modulo-driver-de-passo": {
+        "hash": "sha256:d836fa1a970639eededca0db3ae16304b9e1e92b50fda864888a2730b0284ba2"
+      },
+      "modulo-microcontrolador": {
+        "hash": "sha256:f440804fc21972de4ddad7b80c04ddd50311a17990b755654d786d54a6fa5582"
       },
       "resistor-1-4w": {
         "hash": "sha256:85d4804bf476bd3fa4b876824b405939b3b84efbf9a9601d24a9843cea3fd307"
       },
+      "soic-16": {
+        "hash": "sha256:2e01ae25eda18531dec54d3e369fd5f405fe93c55f174b137a6edd6c31ab51ce"
+      },
+      "soic-8": {
+        "hash": "sha256:7a327a094627883d6e0d52138ff37fd87aa534e1194523d01e6bb29fbdfdcf25"
+      },
       "to-220": {
         "hash": "sha256:0fe98ece689cace176de42761a70f83505317338a954cd47bfe69e70a8493f6a"
+      },
+      "to-220-no-dissipador": {
+        "hash": "sha256:46cb86fe88709489be771f59fdbadb91e9783e6e4a8e8d95bb3276b34fca66c7"
+      },
+      "to-92": {
+        "hash": "sha256:35b3378b058752824d839d1ce702a1f48df457582a13334a6d7af725abf6c554"
       }
     },
-    "observacao": "reassinada em 2026-11-16 com as medidas conferidas contra as fontes primárias: a aba do TO-220 de 6,5 para 6,2 mm (JEDEC TO-220AB, 5,97 a 6,47) e o corpo do DIP até 14,7 mm (MS-011-AC), com a folga do pino ao corpo de 0,6 para 0,5 mm; a pessoa aprovou a correção sabendo que o TO-220 muda 0,3 mm e a prancha aprovada continua valendo pela forma; a camada do crítico fica vazia"
+    "observacao": "reassinada em 2026-11-16 com as medidas conferidas contra as fontes primárias: a aba do TO-220 de 6,5 para 6,2 mm (JEDEC TO-220AB, 5,97 a 6,47) e o corpo do DIP até 14,7 mm (MS-011-AC), com a folga do pino ao corpo de 0,6 para 0,5 mm; a pessoa aprovou a correção sabendo que o TO-220 muda 0,3 mm e a prancha aprovada continua valendo pela forma; a camada do crítico fica vazia; em 2026-11-17 a pessoa aprovou a prancha da fatia 2, com os treze perfis novos, como estava, e os seis da fatia 1 seguem com o mesmo hash"
   }
 }
