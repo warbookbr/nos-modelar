@@ -31,10 +31,22 @@ describe('a medida na curva declarada', () => {
     expect(emenda('emenda-g0').anguloMaximoGraus).toBeGreaterThan(6);
   });
 
-  it('a rampa: a G1 (razão 3) sobe a curvatura de um lado ao outro, e a G2 declarada é a mais plana', () => {
+  it('a rampa: a G1 (razão 3) sobe a curvatura de um lado ao outro, e a G2 declarada é a mais plana (3,1 contra 6,6 da G2 sem declaração, fora da faixa da borda)', () => {
     const g1 = emenda('emenda-g1'); const g2 = emenda('emenda-g2'); const g2d = emenda('emenda-g2-declarada');
     expect(g1.inclinacaoForaDosSingulares).toBeGreaterThan(2 * g2.inclinacaoForaDosSingulares);
-    expect(g2d.inclinacaoForaDosSingulares).toBeLessThan(g2.inclinacaoForaDosSingulares / 5);
+    /* o lugar do máximo: fora da faixa da borda livre (a mais de `afastamentoDaBordaMm` das duas pontas da curva, que termina na borda), e o
+       máximo da faixa da borda, à parte, sai na ponta, onde a curvatura ainda sobe de zero; sem o afastamento, ele seria o da curva */
+    for (const [nome, m] of [['emenda-g1', g1], ['emenda-g2', g2]]) {
+      const z = m.ondeInclinacaoForaDosSingulares.pontoMm[2];
+      expect(m.afastamentoDaBordaMm, nome).toBeCloseTo(2 * m.faixaMm, 3);
+      expect(Math.min(z, m.comprimentoMm - z), nome).toBeGreaterThanOrEqual(m.afastamentoDaBordaMm - 1);
+      const zb = m.ondeInclinacaoNaBorda.pontoMm[2];
+      expect(Math.min(zb, m.comprimentoMm - zb), nome).toBeLessThan(2);
+      expect(m.inclinacaoNaBorda, nome).toBeGreaterThan(2 * m.inclinacaoForaDosSingulares);
+    }
+    /* na G1 declarada o máximo é o da curva, no meio da chapa, e a faixa da borda não passa dele */
+    expect(emenda('emenda-g1-declarada').inclinacaoNaBorda).toBeLessThanOrEqual(emenda('emenda-g1-declarada').inclinacaoForaDosSingulares);
+    expect(g2d.inclinacaoForaDosSingulares).toBeLessThan(g2.inclinacaoForaDosSingulares / 2);
     /* na G1 a curvatura na borda da faixa fica entre a de cada lado desenhada (2 e 0,67 1/m), e na curva, entre as duas */
     const [a, b] = g1.curvaturaNaFaixa;
     expect(Math.min(a, b)).toBeLessThan(g1.curvaturaNaLinha);

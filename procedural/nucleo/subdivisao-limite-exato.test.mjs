@@ -163,13 +163,35 @@ describe('a descendência e a medida das linhas', () => {
     expect(() => descendenciaDasLinhas(g.faces, g.vertices.length, 1, [[0, 6]])).toThrow(/que não formam aresta da gaiola/);
   });
 
+  it('a linha que passa por uma face que não é de quatro lados, ou que liga vértices sem aresta, recusa em vez de dar salto falso', () => {
+    const g = grade(4, (i, j) => 0.05 * i * i + 0.02 * j * j);
+    const tri = g.faces.findIndex((x) => x[0] === 11); const [a, b, c, d] = g.faces[tri]; g.faces.splice(tri, 1, [a, b, c], [a, c, d]);
+    expect(() => medirLinhasNoLimite(g, [{ nome: 'x', vertices: [10, 11, 12, 13, 14] }], { faixa: 1 })).toThrow(/face .*, de 3 lados/);
+    expect(() => medirLinhasNoLimite(g, [{ nome: 'x', vertices: [5, 7, 8] }], { faixa: 1 })).toThrow(/não formam aresta/);
+    expect(medirLinhasNoLimite(g, [{ nome: 'x', vertices: [0, 1, 2, 3, 4] }], { faixa: 1 })[0].perfisCortados).toBeGreaterThanOrEqual(0);
+  });
+
+  it('a borda livre é região própria: a inclinação de longe dela não conta a subida da ponta, que sai à parte', () => {
+    const g = grade(8, (i, j) => 0.05 * i * i + 0.02 * j * j);
+    let G = g; for (let n = 0; n < 2; n++) G = refinarGaiola(G);
+    const linha = descendenciaDasLinhas(g.faces, g.vertices.length, 2, [[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => i * 9 + 4)])[0];
+    const [m] = medirLinhasNoLimite(G, [{ nome: 'meio', vertices: linha, faixa: 2 }], { afastamentoDaBorda: 2 });
+    const [todo] = medirLinhasNoLimite(G, [{ nome: 'meio', vertices: linha, faixa: 2 }], { afastamentoDaBorda: 0 });
+    expect(m.afastamentoDaBorda).toBe(2);
+    expect(m.inclinacaoNaBorda).toBeGreaterThan(0);
+    expect(m.inclinacaoForaDosSingulares).toBeLessThanOrEqual(todo.inclinacaoForaDosSingulares);
+    expect(todo.inclinacaoNaBorda).toBe(0);
+    expect(m.ondeInclinacaoForaDosSingulares.ponto[1]).toBeGreaterThanOrEqual(2 - 1e-9);
+    expect(m.ondeInclinacaoForaDosSingulares.ponto[1]).toBeLessThanOrEqual(6 + 1e-9);
+  });
+
   it('na linha lisa o salto de curvatura é zero e sobra a rampa; no vinco vivo, o ângulo', () => {
     const N = 8;
     const g = grade(N, (i, j) => (j <= 4 ? 0.02 * (j - 4) ** 2 : 0.08 * (j - 4) ** 2));
     const linha = Array.from({ length: N + 1 }, (_, i) => 4 * (N + 1) + i);
     let G = g; for (let n = 0; n < 2; n++) G = refinarGaiola(G);
     const [d] = descendenciaDasLinhas(g.faces, g.vertices.length, 2, [linha]);
-    const [m] = medirLinhasNoLimite(G, [{ nome: 'meio', vertices: d }], { faixa: 2 });
+    const [m] = medirLinhasNoLimite(G, [{ nome: 'meio', vertices: d }], { faixa: 2, afastamentoDaBorda: 1 });
     expect(m.medidas).toBeGreaterThan(50);
     expect(m.saltoMaximo).toBeLessThan(1e-10);
     expect(m.anguloMaximoGraus).toBeLessThan(1e-6);

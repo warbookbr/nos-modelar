@@ -1046,10 +1046,20 @@ const ao_longo = (am, s) => (s % 2 === 0 ? am.du : am.dv);
  * a curvatura diverge) a inclinação cresce sem limite; `inclinacaoForaDosSingulares` é a maior a mais de `raioDoSingular` (padrão metade
  * da faixa) de todos eles e dos pontos de `evitar` (os do vinco de nitidez finita, que o refino apaga da gaiola mas deixa um filete de raio
  * pequeno na superfície), e `singularesPerto` conta os que ficam a menos da faixa e do raio da linha.
+ * A BORDA LIVRE é região própria. A regra de borda da subdivisão zera a curvatura que atravessa a borda livre, e a curvatura sobe de zero
+ * ao valor da superfície numa faixa junto dela; a curva que termina na borda herda essa subida na ponta, e o máximo da inclinação sai ali,
+ * a 1 mm da borda, e mede a borda, e não a emenda (na `emenda-g1`, 92,65 em z = 0,9 mm contra 42,4 a 30 mm da borda). Por isso
+ * `inclinacaoForaDosSingulares` só conta o que fica a mais de `afastamentoDaBorda` de toda aresta de borda livre, e `inclinacaoNaBorda` dá o
+ * máximo da faixa da borda, longe dos singulares, à parte, com `ondeInclinacaoNaBorda`. O padrão do afastamento é o dobro da `faixa` da
+ * linha (quatro arestas da gaiola de origem, 114 mm nas emendas de prova): o máximo da `emenda-g1` a 30, 57, 80, 100, 120, 150 e 180 mm é
+ * 42,4, 29,3, 26,7, 26,0, 25,6, 25,3 e 25,2, e o da `emenda-g2`, 11,9, 7,4, 6,7, 6,62, 6,61, 6,61 e 6,61; a duas arestas ele ainda cai
+ * 10% no passo seguinte, e a quatro está no patamar (a G2) ou a 3% do valor de 180 mm (a G1).
+ * A linha com uma face que não é de quatro lados em um dos lados recusa (a medida usa o parâmetro de quadrilátero); o perfil que a
+ * fileira de faces para ao encontrar uma face que não é de quatro lados sai contado em `perfisCortados`.
  * Devolve { nome, ..., arestas, saltoMaximo, anguloMaximoGraus, inclinacaoMaxima, ondeInclinacao, inclinacaoForaDosSingulares,
  * curvaturaNaLinha, curvaturaNaFaixa, extraordinarios: [{ vertice, valencia, ponto, salto }] } com as curvaturas na unidade inversa da gaiola.
  */
-export function medirLinhasNoLimite(gaiola, linhas, { faixa = null, amostras = 4, passosPorFace = 4, epsilon = 1e-4, raioDoSingular = null, evitar = [] } = {}) {
+export function medirLinhasNoLimite(gaiola, linhas, { faixa = null, amostras = 4, passosPorFace = 4, epsilon = 1e-4, raioDoSingular = null, evitar = [], afastamentoDaBorda = null } = {}) {
   const sup = superficieLimite(gaiola);
   const F = gaiola.faces; const P = gaiola.vertices;
   const dirigida = new Map();
@@ -1067,6 +1077,13 @@ export function medirLinhasNoLimite(gaiola, linhas, { faixa = null, amostras = 4
     if (cantosDeclarados.has(x) || (naBorda.has(x) ? valencia[x] !== 3 : valencia[x] !== 4)) singulares.push(P[x]);
   }
   for (const p of evitar) singulares.push(p);
+  /* as arestas de borda livre, para a distância à borda */
+  const segmentosDaBorda = arestas.filter((e) => e.faces.length === 1).map((e) => [P[e.a], P[e.b]]);
+  const distanciaAoSegmento = (p, [a, b]) => {
+    const ab = [b[0] - a[0], b[1] - a[1], b[2] - a[2]]; const ap = [p[0] - a[0], p[1] - a[1], p[2] - a[2]];
+    const l2 = pontoV(ab, ab); const t = l2 > 0 ? Math.max(0, Math.min(1, pontoV(ap, ab) / l2)) : 0;
+    return Math.hypot(ap[0] - t * ab[0], ap[1] - t * ab[1], ap[2] - t * ab[2]);
+  };
   const mediana = (xs) => { const s = xs.filter((x) => x !== null && Number.isFinite(x)).sort((a, b) => a - b); return s.length ? s[s.length >> 1] : null; };
   /* a curvatura transversal da amostra que entrou pelo lado s */
   const transversal = (am, s) => {
@@ -1074,11 +1091,12 @@ export function medirLinhasNoLimite(gaiola, linhas, { faixa = null, amostras = 4
     const d = unitario(vetorial(am.normal, ao_longo(am, s)));
     return d ? curvaturaNormal(am, d) : null;
   };
+  let perfisCortados = 0;
   const caminhar = (face, s, t, largura) => {
     const saida = [];
     let f = face, lado = s, anterior = null, andado = 0;
     for (let volta = 0; volta < 4096 && andado < largura; volta++) {
-      if (F[f].length !== 4) break;
+      if (F[f].length !== 4) { perfisCortados++; break; }
       for (let p = volta === 0 ? 0 : 1; p <= passosPorFace; p++) {
         const am = sup.avaliar(f, ...PARAMETRO_DO_LADO[lado](t, p / passosPorFace));
         if (anterior) andado += dist(anterior, am.ponto);
@@ -1095,14 +1113,23 @@ export function medirLinhasNoLimite(gaiola, linhas, { faixa = null, amostras = 4
   };
   return linhas.map((linha) => {
     const { vertices, faixa: faixaDaLinha = null, ...resto } = linha;
+    const cortadosAntes = perfisCortados;
     let comprimento = 0;
     for (let k = 1; k < vertices.length; k++) comprimento += dist(P[vertices[k - 1]], P[vertices[k]]);
     const largura = faixaDaLinha ?? faixa ?? (8 * comprimento) / Math.max(1, vertices.length - 1);
     let saltoMaximo = 0, anguloMaximo = 0, inclinacaoMaxima = 0, ondeInclinacao = null, ondeSalto = null, medidas = 0;
-    let inclinacaoRegular = 0, ondeRegular = null;
+    let inclinacaoRegular = 0, ondeRegular = null, inclinacaoBorda = 0, ondeBorda = null;
     const raio = raioDoSingular ?? largura / 2;
+    const afastamento = afastamentoDaBorda ?? 2 * largura;
     const perto = singulares.filter((q) => vertices.some((v) => dist(P[v], q) < largura + raio));
     const longeDoSingular = (p) => perto.every((q) => dist(p, q) >= raio);
+    const bordaPerto = segmentosDaBorda.filter((sg) => vertices.some((v) => distanciaAoSegmento(P[v], sg) < largura + afastamento));
+    const longeDaBorda = (p) => bordaPerto.every((sg) => distanciaAoSegmento(p, sg) >= afastamento);
+    const faceDe = (x, y) => { const d = dirigida.get(`${x}>${y}`); if (d && F[d.face].length !== 4) throw new TypeError(`medirLinhasNoLimite: a linha ${linha.nome ?? ''} passa pela face ${d.face}, de ${F[d.face].length} lados, e a medida pede faces de quatro lados (refine a gaiola)`); };
+    for (let k = 1; k < vertices.length; k++) {
+      if (!dirigida.has(`${vertices[k - 1]}>${vertices[k]}`) && !dirigida.has(`${vertices[k]}>${vertices[k - 1]}`)) throw new TypeError(`medirLinhasNoLimite: a linha ${linha.nome ?? ''} liga ${vertices[k - 1]} a ${vertices[k]}, que não formam aresta da gaiola`);
+      faceDe(vertices[k - 1], vertices[k]); faceDe(vertices[k], vertices[k - 1]);
+    }
     const naLinha = [], longeA = [], longeB = [];
     for (let k = 1; k < vertices.length; k++) {
       const p = vertices[k - 1], q = vertices[k];
@@ -1132,7 +1159,10 @@ export function medirLinhasNoLimite(gaiola, linhas, { faixa = null, amostras = 4
             const inc = Math.abs(b.k - a.k) / (b.s - a.s);
             const onde = { ponto: b.ponto, distancia: (a.s + b.s) / 2, lado: (A && i === 0) ? 'esquerda' : 'direita' };
             if (inc > inclinacaoMaxima) { inclinacaoMaxima = inc; ondeInclinacao = onde; }
-            if (inc > inclinacaoRegular && longeDoSingular(a.ponto) && longeDoSingular(b.ponto)) { inclinacaoRegular = inc; ondeRegular = onde; }
+            if (longeDoSingular(a.ponto) && longeDoSingular(b.ponto)) {
+              if (longeDaBorda(a.ponto) && longeDaBorda(b.ponto)) { if (inc > inclinacaoRegular) { inclinacaoRegular = inc; ondeRegular = onde; } }
+              else if (inc > inclinacaoBorda) { inclinacaoBorda = inc; ondeBorda = onde; }
+            }
           }
           const fim = perfil.at(-1);
           if (fim) ((A && i === 0) ? longeA : longeB).push(fim.k);
@@ -1154,6 +1184,7 @@ export function medirLinhasNoLimite(gaiola, linhas, { faixa = null, amostras = 4
     return {
       ...resto, arestas: vertices.length - 1, comprimento, faixa: largura, medidas, saltoMaximo, ondeSalto, anguloMaximoGraus: anguloMaximo, inclinacaoMaxima, ondeInclinacao,
       inclinacaoForaDosSingulares: inclinacaoRegular, ondeInclinacaoForaDosSingulares: ondeRegular, singularesPerto: perto.length,
+      inclinacaoNaBorda: inclinacaoBorda, ondeInclinacaoNaBorda: ondeBorda, afastamentoDaBorda: afastamento, perfisCortados: perfisCortados - cortadosAntes,
       curvaturaNaLinha: mediana(naLinha), curvaturaNaFaixa: [mediana(longeA), mediana(longeB)], extraordinarios,
     };
   });
