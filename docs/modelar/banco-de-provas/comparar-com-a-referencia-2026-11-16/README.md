@@ -91,3 +91,30 @@ Dois limites ficam à vista nas pranchas. Os dois pedais aparecem juntos porque 
 ### O que a prancha tira da linha de base
 
 Pela numeração de `contar-comandos.mjs ... --tipo=modelador --listar-alvo`, na mesma janela das sete rodadas, os 42 comandos do alvo se dividem assim. A fatia 2 tirou 14 (só apagar a saída: 3, 4, 6, 7, 10 a 13, 32, 33, 36, 37, 40, 41), e 7 esperam `descrever --recusas` (1, 2, 14, 15, 20, 31, 38). A prancha tira 11, os que montam, recortam ou escalam a vista contra a foto, ou preparam isso (capturar para a prancha, conferir o tamanho das imagens): 5, 8, 9, 16, 21, 22, 23, 25, 26, 27 e 34. Ficam 10: três que montam as vistas do modelo sozinhas, recortando um dos pedais (17 a 19, da fatia 4), três de medição livre na foto, que o plano mantém por script (30, 35, 39), a conferência das bibliotecas antes dela (29) e três que só caem em `medir-foto` porque citam `guarda:referencial` (24, 28, 42). Com as fatias 2 e 3 e o `--recusas`, o alvo cai de 42 para 10 em 83, que é o quarto do gate 5; sem o `--recusas`, para 17.
+
+## Fatia 4: a cópia de uma parte repetida
+
+A parte `pedais` da bicicleta tem as duas cópias, e isolá-la mostra os dois pedais juntos, a 2,0 px/mm de frente e 2,1 px/mm de lado numa captura de 1920 por 1080 (a tabela da fatia 3). O plano mandava medir primeiro se o `--zoom=<vista>:mm:<caixa>` da análise bastava. Não basta: ele recorta os pixels da captura já feita e amplia 3 vezes, e o pedal de uns 130 mm continua com os mesmos 2 px/mm, uns 260 px de largura num quadro de 1920; o recorte isola o pedal, mas não o enquadra. Por isso entrou a escolha de instância, pelo lado.
+
+`--copia=<eixo><+|->[,...]`, em [`olhar-bancada.mjs`](../../../../tools/modelar/olhar-bancada.mjs) e na prancha, escolhe a cópia pelo lado do centro da caixa da seleção isolada, em cada eixo do referencial da peça. A página não desenha o que fica do outro lado (um plano de recorte do renderizador por item) e enquadra a câmera só nos vértices que ficam, com a mesma regra de 92 % do `--enquadrar`. O relato traz a caixa em mm do que ficou. Dois itens de eixos diferentes separam uma de quatro cópias (`x+,z-`). Pede `--selecionadas` e a seleção isolada, que vira o modo padrão com ela, e recusa `--mirar`, `--corte`, `--enquadrar`, `--revisar`, `--tela` e `--analise`. Na prancha, `--copia` vale com `--parte` e entra no nome do arquivo.
+
+```
+node tools/modelar/olhar-bancada.mjs bicicleta-urbana --selecionadas=pedais --copia=x- --vistas=direita,frontal,isometrica \
+  --projecao=ortografica --res=1920x1080 --sem-contatos --saida=tools/bancadas/out/pedal-copia
+node tools/modelar/prancha-de-referencia.mjs bicicleta-urbana --parte=pedais --copia=x- --vistas=direita,frontal --espelhar=direita \
+  --foto='tmp/bicicleta/lateral.jpg;tmp/bicicleta/frontal.webp' --regua='1162,738,1811,738=670;654,80,1345,80=680' \
+  --regiao='1012,790,1110,830;830,842,932,890'
+```
+
+O pedal de x negativo é o de baixo à esquerda na foto frontal e o de perto na lateral, do lado da corrente (`lado_da_corrente: -1`). A bancada relatou o centro da seleção em (0; 270; 0) mm e a caixa da cópia de (-229,1; 233; 107) a (-100; 261; 219,8) mm, com 8.052 dos 16.104 vértices à vista, a metade exata. O pedal ocupa 92 % da largura do quadro nas vistas direita e frontal e 92 % da altura na isométrica.
+
+| prancha | escala da prancha | vista | modelo, extensão e escala | foto, extensão na região e escala |
+| --- | --- | --- | --- | --- |
+| pedal x- | 9,24 px/mm | direita | 112,9 x 28,1 mm, 15,66 px/mm | 98,1 x 37,2 mm, 0,97 px/mm (com um trecho do braço por cima) |
+| pedal x- | | frontal | 129,3 x 28,1 mm, 13,68 px/mm | 92,5 x 41,3 mm, 1,02 px/mm (com a borda do braço à direita) |
+
+O modelo passou de 2,0 a 2,1 px/mm com os dois pedais para 13,7 a 15,7 px/mm com um, e a prancha não amplia mais o modelo (a escala comum, 9,24 px/mm, fica abaixo da dele). A foto é que é ampliada, porque o pedal nela tem uns 100 px. A extensão da foto inclui o que a região não consegue deixar de fora (o braço cruza o pedal na lateral), e a leitura dela continua sendo a da prancha, não uma medida.
+
+O teste fica em [`prancha-de-referencia.test.mjs`](../../../../tools/modelar/prancha-de-referencia.test.mjs): a leitura de `--copia`, a recusa sem `--parte`, o nome do arquivo, e a função da página rodando sobre uma cena three.js em Node com duas cópias de um bloco em x = -100 e +100 mm, em que o plano deixa de fora a de x positivo, a caixa relatada é a da outra e a câmera a centra a 92 % da largura.
+
+Os comandos 17 a 19 da linha de base, que montavam as vistas do modelo recortando um dos pedais por script, saem com a fatia 4. Com as fatias 2, 3 e 4, o alvo cai de 42 para 7 em 83: três de medição livre na foto, que o plano mantém por script (30, 35, 39), a conferência das bibliotecas antes dela (29) e três que só caem em `medir-foto` porque citam `guarda:referencial` (24, 28, 42).

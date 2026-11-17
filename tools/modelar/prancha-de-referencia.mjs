@@ -412,7 +412,7 @@ const TIPOS = { '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png'
 const dataUrl = (bytes, tipo) => `data:${tipo};base64,${Buffer.from(bytes).toString('base64')}`;
 
 /** Lê e confere o pedido antes de abrir bancada e navegador: um erro de escrita não custa uma captura. */
-export function lerPedido({ peca, foto, regua, regiao, vistas, parte, disposicao, espelhar, saida }) {
+export function lerPedido({ peca, foto, regua, regiao, vistas, parte, copia, disposicao, espelhar, saida }) {
   if (!peca) recusar('falta a peça: node tools/modelar/prancha-de-referencia.mjs <peça> --foto=<arquivo> --regua=<medida>.');
   const listaDeVistas = lerVistas(vistas);
   if (!foto) recusar('falta --foto=<arquivo> (jpg, png ou webp; fora do repositório, se for de terceiro).');
@@ -429,13 +429,18 @@ export function lerPedido({ peca, foto, regua, regiao, vistas, parte, disposicao
   const espelhadas = espelhar ? String(espelhar).split(',').map((s) => s.trim()).filter(Boolean) : [];
   for (const v of espelhadas) if (!listaDeVistas.includes(v)) recusar(`--espelhar: '${v}' não está em --vistas (${listaDeVistas.join(', ')}).`);
   const partes = parte ? String(parte).split(',').map((s) => s.trim()).filter(Boolean) : [];
+  /* a cópia de uma parte repetida (`--copia`, da bancada): um lado por eixo do centro da parte isolada; a bancada confere a escrita */
+  const ladosDaCopia = copia ? String(copia).split(',').map((s) => s.trim()).filter(Boolean) : [];
+  if (ladosDaCopia.length && !partes.length) recusar(`--copia=${copia} separa uma cópia da parte isolada; diga a parte com --parte (ex.: --parte=pedais --copia=x-).`);
+  for (const l of ladosDaCopia) if (!/^[xyz][+-]$/.test(l)) recusar(`--copia: '${l}' não se lê; cada item é um eixo e um sinal, x+, x-, y+, y-, z+ ou z-, separados por vírgula (ex.: --copia=x-).`);
   const disp = disposicao ?? 'lado';
   if (!DISPOSICOES.includes(disp)) recusar(`--disposicao '${disp}' não existe; use ${DISPOSICOES.join(' ou ')}.`);
-  const nomePadrao = `prancha-${peca}${partes.length ? `-${partes.join('-')}` : ''}-${listaDeVistas.join('-')}.png`;
+  const sufixoDaCopia = ladosDaCopia.length ? `-copia-${ladosDaCopia.map((l) => `${l[0]}${l[1] === '+' ? 'mais' : 'menos'}`).join('-')}` : '';
+  const nomePadrao = `prancha-${peca}${partes.length ? `-${partes.join('-')}` : ''}${sufixoDaCopia}-${listaDeVistas.join('-')}.png`;
   const arquivo = resolve(REPO, saida ?? join(relative(REPO, OUT), nomePadrao));
   if (relative(REPO, arquivo).startsWith('..')) recusar(`--saida '${saida}' fica fora do repositório; a prancha é gravada dentro dele (padrão tools/bancadas/out/).`);
   if (extname(arquivo).toLowerCase() !== '.png') recusar(`--saida '${saida}' precisa terminar em .png.`);
-  return { peca, vistas: listaDeVistas, fotos, reguas, regioes, espelhadas, partes, disposicao: disp, arquivo };
+  return { peca, vistas: listaDeVistas, fotos, reguas, regioes, espelhadas, partes, copia: ladosDaCopia.length ? ladosDaCopia.join(',') : null, disposicao: disp, arquivo };
 }
 
 /**
@@ -446,11 +451,12 @@ export async function prancharReferencia(opcoes, { olhar = null, chromium = null
   const pedido = lerPedido(opcoes);
   const olharBancada = olhar ?? (await import('./olhar-bancada.mjs')).olharBancada;
   const isolar = pedido.partes.length > 0;
-  logger(`prancha: capturando ${pedido.peca}${isolar ? ` (${pedido.partes.join(', ')} isolada)` : ''} nas vistas ${pedido.vistas.join(', ')}, em projeção ortográfica`);
+  const nomeDoIsolado = `${pedido.partes.join(', ')}${pedido.copia ? `, cópia ${pedido.copia}` : ''}`;
+  logger(`prancha: capturando ${pedido.peca}${isolar ? ` (${nomeDoIsolado} isolada)` : ''} nas vistas ${pedido.vistas.join(', ')}, em projeção ortográfica`);
   const r = await olharBancada({
     peca: pedido.peca, vistas: pedido.vistas, res: RESOLUCAO_DA_CAPTURA, projecao: 'ortografica', auditoria: true, capturarEmMemoria: true, medirContatos: false,
     projetar: PONTOS_DA_ESCALA,
-    ...(isolar ? { selecionadas: pedido.partes, modo: 'isolar', focar: true } : { enquadrar: true }),
+    ...(isolar ? { selecionadas: pedido.partes, modo: 'isolar', focar: true, ...(pedido.copia ? { copia: pedido.copia } : {}) } : { enquadrar: true }),
     aoProgredir: logger,
   });
   if (!r.ok) recusar(`a bancada recusou a captura: ${r.erro?.mensagem ?? ''}\n${r.stderr ?? ''}`.trim());
@@ -471,7 +477,7 @@ export async function prancharReferencia(opcoes, { olhar = null, chromium = null
     for (const [i, m] of medidas.fotos.entries()) {
       if (m.fora) recusar(`--regiao ${pedido.regioes[i].join(',')} cai fora da foto ${pedido.fotos[i].nome}, que tem ${m.largura} por ${m.altura} px.`);
     }
-    const titulo = `${pedido.peca}${isolar ? `, ${pedido.partes.join(' e ')} isolada` : ''}: modelo e foto de referência`;
+    const titulo = `${pedido.peca}${isolar ? `, ${pedido.partes.join(' e ')}${pedido.copia ? ` (só a cópia ${pedido.copia})` : ''} isolada` : ''}: modelo e foto de referência`;
     const plano = disporPrancha({
       titulo,
       disposicao: pedido.disposicao,
@@ -490,7 +496,7 @@ export async function prancharReferencia(opcoes, { olhar = null, chromium = null
     writeFileSync(pedido.arquivo, Buffer.from(png, 'base64'));
     const json = pedido.arquivo.replace(/\.png$/i, '.json');
     const relato = {
-      peca: pedido.peca, partes: pedido.partes, disposicao: pedido.disposicao, escalaDaPrancha: plano.escala,
+      peca: pedido.peca, partes: pedido.partes, ...(pedido.copia ? { copia: pedido.copia, caixaDaCopiaMm: r.resultado.vistas[0]?.copia?.caixaMm ?? null } : {}), disposicao: pedido.disposicao, escalaDaPrancha: plano.escala,
       largura: plano.largura, altura: plano.altura,
       linhas: plano.linhas.map((l, i) => ({ ...l, foto: { ...l.foto, regua: pedido.reguas[i] } })),
     };
@@ -503,7 +509,7 @@ export async function prancharReferencia(opcoes, { olhar = null, chromium = null
 
 /* ---------- A CLI ---------- */
 
-export const OPCOES_DA_CLI = ['peca', 'foto', 'regua', 'regiao', 'vistas', 'parte', 'disposicao', 'espelhar', 'saida'];
+export const OPCOES_DA_CLI = ['peca', 'foto', 'regua', 'regiao', 'vistas', 'parte', 'copia', 'disposicao', 'espelhar', 'saida'];
 
 export const AJUDA = `node tools/modelar/prancha-de-referencia.mjs <peça> --foto=<arquivo> --regua=<medida> [opções]
 Monta a prancha modelo e foto: a vista ortográfica da peça (ou da parte isolada) ao lado da foto de referência, na mesma escala em mm.
@@ -515,9 +521,10 @@ A escala do modelo vem da câmera da bancada; a da foto, da régua. Grava o PNG 
   --regiao=<x0,y0,x1,y1|auto>  a caixa da foto a mostrar, em px (dois cantos opostos); auto (padrão) é a extensão do que não é fundo
   --vistas=<a,b>         as vistas ortográficas de eixo, uma linha da prancha por vista: ${VISTAS_DA_PRANCHA.join(', ')} (padrão direita)
   --parte=<a,b>          isola e enquadra estas partes, como --selecionadas=<a,b> --modo=isolar --focar da bancada; sem ela, a peça inteira
+  --copia=<eixo><+|->[,...]  com --parte: só a cópia da parte repetida do lado pedido do centro dela, em cada eixo (ex.: --parte=pedais --copia=x-, o pedal de x negativo), isolada e enquadrada sozinha, como --copia da bancada
   --espelhar=<a,b>       espelha a foto nestas vistas, quando ela olha a peça do lado oposto ao da vista (ex.: a frente à direita na foto e à esquerda na vista)
   --disposicao=<lado|sobreposto>  lado (padrão): modelo à esquerda e foto à direita; sobreposto: o modelo translúcido sobre a foto, pelo centro das extensões
-  --saida=<arquivo.png>  dentro do repositório (padrão tools/bancadas/out/prancha-<peça>[-<partes>]-<vistas>.png); sobrescreve a prancha anterior
+  --saida=<arquivo.png>  dentro do repositório (padrão tools/bancadas/out/prancha-<peça>[-<partes>][-copia-<lados>]-<vistas>.png); sobrescreve a prancha anterior
 
 Com mais de uma vista, --foto, --regua e --regiao levam um valor por vista separado por ';' (entre aspas no shell), ou um só, que vale para todas:
   node tools/modelar/prancha-de-referencia.mjs bicicleta-urbana --parte=selim --vistas=direita,frontal --espelhar=direita \\
@@ -533,7 +540,7 @@ export async function comoCLI(argv, { logger = (l) => process.stderr.write(`${l}
     const lido = lerArgumentos(argv, { opcoes: OPCOES_DA_CLI, bandeiras: [], posicional: { nome: 'a peça', obrigatorio: false } });
     const r = await prancharReferencia({
       peca: lido.opcao('peca') ?? lido.posicional, foto: lido.opcao('foto'), regua: lido.opcao('regua'), regiao: lido.opcao('regiao'),
-      vistas: lido.opcao('vistas'), parte: lido.opcao('parte'), disposicao: lido.opcao('disposicao'), espelhar: lido.opcao('espelhar'),
+      vistas: lido.opcao('vistas'), parte: lido.opcao('parte'), copia: lido.opcao('copia'), disposicao: lido.opcao('disposicao'), espelhar: lido.opcao('espelhar'),
       saida: lido.opcao('saida'),
     }, { logger, ...injetar });
     const linhas = r.medidas.linhas.map((l) => `  ${l.vista}: modelo ${l.modelo.extensaoMm.join(' x ')} mm (${casa(l.modelo.pxPorMm)} px/mm); foto ${l.foto.extensaoMm.join(' x ')} mm (${casa(l.foto.pxPorMm)} px/mm)${l.foto.espelhada ? ', espelhada' : ''}`);

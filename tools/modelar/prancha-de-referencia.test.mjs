@@ -1,8 +1,11 @@
+/* Testes da prancha modelo e foto (régua, região, plano, pedido, montagem no navegador) e da cópia de parte repetida da bancada. */
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { PNG } from 'pngjs';
-import { describe, expect, it } from 'vitest';
+import * as THREE from 'three';
+import { afterEach, describe, expect, it } from 'vitest';
+import { ajustarCamera, lerCopia } from './olhar-bancada.mjs';
 import {
   PONTOS_DA_ESCALA, comoCLI, disporPrancha, escalaDaVista, extensaoNaImagem, fundoDaCaixa, lerPedido, lerRegiao, lerRegua, lerVistas,
   passoDaRegua, porVista, prancharReferencia,
@@ -128,6 +131,11 @@ describe('o pedido', () => {
       expect(() => lerPedido({ peca: 'x', foto, regua: '10=10', espelhar: 'frontal' })).toThrow(/não está em --vistas/);
       expect(() => lerPedido({ peca: 'x', foto })).toThrow(/falta --regua/);
       expect(lerPedido({ peca: 'x', foto, regua: '10=10', parte: 'selim' }).arquivo).toMatch(/tools\/bancadas\/out\/prancha-x-selim-direita\.png$/);
+      const comCopia = lerPedido({ peca: 'x', foto, regua: '10=10', parte: 'pedais', copia: 'x-,z+' });
+      expect(comCopia.copia).toBe('x-,z+');
+      expect(comCopia.arquivo).toMatch(/prancha-x-pedais-copia-xmenos-zmais-direita\.png$/);
+      expect(() => lerPedido({ peca: 'x', foto, regua: '10=10', copia: 'x-' })).toThrow(/--parte/);
+      expect(() => lerPedido({ peca: 'x', foto, regua: '10=10', parte: 'pedais', copia: 'esquerdo' })).toThrow(/x\+, x-/);
     } finally { rmSync(pasta, { recursive: true, force: true }); }
   });
   it('responde a --ajuda e recusa opção desconhecida', async () => {
@@ -148,23 +156,79 @@ describe('a prancha montada no navegador', () => {
       /* modelo: o mesmo retângulo a 2 px/mm, sobre o fundo da bancada */
       const modelo = PNG.sync.write(imagem(640, 360, [241, 243, 242], [100, 80, 400, 180], [20, 20, 20]));
       const olhar = async (pedido) => {
-        expect(pedido).toMatchObject({ projecao: 'ortografica', capturarEmMemoria: true, selecionadas: ['bloco'], modo: 'isolar', focar: true });
+        expect(pedido).toMatchObject({ projecao: 'ortografica', capturarEmMemoria: true, selecionadas: ['bloco'], modo: 'isolar', focar: true, copia: 'x-' });
         return {
           ok: true,
           resultado: {
-            vistas: [{ projecaoMm: { pixels: [[0, 0], [0, 0], [0, -200], [200, 0]], quadro: [640, 360] } }],
+            vistas: [{ projecaoMm: { pixels: [[0, 0], [0, 0], [0, -200], [200, 0]], quadro: [640, 360] }, copia: { caixaMm: [[-1, 0, 0], [0, 1, 1]] } }],
             capturas: [{ nome: 'direita', largura: 640, altura: 360, dados: modelo }],
           },
         };
       };
       const saida = join(pasta, 'p.png');
-      const r = await prancharReferencia({ peca: 'teste', foto, regua: '0,0,100,0=100', parte: 'bloco', saida }, { olhar });
+      const r = await prancharReferencia({ peca: 'teste', foto, regua: '0,0,100,0=100', parte: 'bloco', copia: 'x-', saida }, { olhar });
       const lido = JSON.parse(readFileSync(r.json, 'utf8'));
       expect(lido.linhas[0].modelo.extensaoMm).toEqual([150, 50]);
       expect(lido.linhas[0].foto.extensaoMm).toEqual([150, 50]);
+      expect(lido).toMatchObject({ copia: 'x-', caixaDaCopiaMm: [[-1, 0, 0], [0, 1, 1]] });
       const png = PNG.sync.read(readFileSync(saida));
       expect(png.width).toBe(lido.largura);
       expect(png.height).toBe(lido.altura);
     } finally { rmSync(pasta, { recursive: true, force: true }); }
   }, 60_000);
+});
+
+/* A cópia de uma parte repetida (fatia 4 do plano): `--copia` da bancada, pela função que roda na página, sobre uma cena three.js de
+   verdade em Node. Duas cópias de um bloco de 40 por 20 por 10 mm, em x = -100 e x = +100 mm, como os dois pedais. */
+describe('a cópia de uma parte repetida na bancada', () => {
+  afterEach(() => { delete globalThis.window; });
+  const montar = () => {
+    const scene = new THREE.Scene();
+    const raiz = new THREE.Group();
+    for (const x of [-0.1, 0.1]) {
+      const malha = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.02, 0.01), new THREE.MeshBasicMaterial());
+      malha.position.set(x, 0.3, 0);
+      malha.userData.faces = [];
+      raiz.add(malha);
+    }
+    scene.add(raiz);
+    const camera = new THREE.OrthographicCamera(-1.6, 1.6, 0.9, -0.9, 0.01, 100);
+    camera.position.set(0, 0.3, 5);
+    const target = new THREE.Vector3(0, 0.3, 0);
+    camera.lookAt(target);
+    const renderer = { clippingPlanes: [], domElement: { clientWidth: 1600, clientHeight: 900 } };
+    globalThis.window = { __mecanificaBancada: { ambiente: () => ({ camera, scene, renderer, controls: { target, update() {}, minDistance: 0, maxDistance: 100 } }) } };
+    return { camera, renderer, raiz };
+  };
+
+  it('lê um lado por eixo e recusa o que não é eixo e sinal, ou eixo repetido', () => {
+    expect(lerCopia('x-')).toEqual([{ eixo: 'x', sinal: -1 }]);
+    expect(lerCopia('x+, z-')).toEqual([{ eixo: 'x', sinal: 1 }, { eixo: 'z', sinal: -1 }]);
+    expect(lerCopia(null)).toBeNull();
+    expect(() => lerCopia('esquerdo')).toThrow(/x\+, x-/);
+    expect(() => lerCopia('x+,x-')).toThrow(/repete eixo/);
+  });
+
+  it('desenha só a cópia do lado pedido e enquadra a câmera nela', () => {
+    const { camera, renderer } = montar();
+    const feito = ajustarCamera({ copia: lerCopia('x-'), enquadrar: true });
+    expect(feito.erro).toBeUndefined();
+    expect(feito.copia).toMatchObject({ lados: 'x-', centroMm: [0, 300, 0], caixaMm: [[-120, 290, -5], [-80, 310, 5]], vertices: 24, verticesAVista: 48 });
+    /* o plano deixa de fora a cópia de x positivo (distância negativa) e mantém a de x negativo */
+    const [plano] = renderer.clippingPlanes;
+    const distancia = (x) => plano.normal.dot(new THREE.Vector3(x, 0.3, 0)) + plano.constant;
+    expect(distancia(-0.1)).toBeGreaterThan(0);
+    expect(distancia(0.1)).toBeLessThan(0);
+    /* a cópia ocupa 92 % do quadro na largura e fica no centro dele */
+    expect(feito.enquadrou.largura).toBeCloseTo(0.92, 2);
+    const centro = new THREE.Vector3(-0.1, 0.3, 0).project(camera);
+    expect(Math.abs(centro.x)).toBeLessThan(1e-6);
+    expect(Math.abs(centro.y)).toBeLessThan(1e-6);
+  });
+
+  it('recusa quando não há geometria à vista para separar', () => {
+    const { raiz } = montar();
+    raiz.children.forEach((m) => { m.visible = false; });
+    expect(ajustarCamera({ copia: lerCopia('x-'), enquadrar: true }).erro).toMatch(/geometria visível/);
+  });
 });
