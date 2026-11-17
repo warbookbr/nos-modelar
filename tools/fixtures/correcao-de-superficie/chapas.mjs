@@ -24,6 +24,9 @@
  *   seção em z é reta. A continuidade declarada (a da superfície que gerou os pontos) está em `EMENDAS[nome]`: G2 com os dois arcos de raio
  *   1,5 m; G1 com o da esquerda de 0,5 m e o da direita de 1,5 m (razão de curvatura 3, tangente comum); G0 com a direita girada 6 graus em
  *   torno da emenda e a curva `emenda` declarada vinco vivo, para a dobra não ser alisada pela subdivisão.
+ * - `emenda-g1-declarada`, `emenda-g2-declarada` e `emenda-g1-em-g2`: as mesmas chapas com a continuidade declarada na curva `emenda`
+ *   (`continuidade` da curva de `gaiolaPorRede`, a prova da fatia 4), em `EMENDAS_DECLARADAS`: a G1 com a G1 declarada, a G2 com a G2, e a
+ *   G1 (razão de curvatura 3) com a G2 declarada, o caso em que a emenda tem de mudar a forma para a curvatura ficar igual.
  *
  * Dado de teste: fora do acervo publicado. As receitas ficam em `tools/fixtures/correcao-de-superficie/<nome>/receita.js` e abrem pelo caminho
  * (`npm run suavidade -- tools/fixtures/correcao-de-superficie/rede-com-ruido`). A linha de base medida nelas está em
@@ -193,7 +196,16 @@ export function pontoDaEmenda(nome, x, z) {
   return [EMENDA_X_MM + dx * Math.cos(a) - y * Math.sin(a), dx * Math.sin(a) + y * Math.cos(a), z];
 }
 
-export function definicaoDaEmenda(nome, { passo = 30 } = {}) {
+/** As chapas emendadas com a continuidade declarada na curva `emenda`: a superfície de `de` (uma de `EMENDAS`) e a `continuidade` da curva. */
+export const EMENDAS_DECLARADAS = Object.freeze({
+  'emenda-g1-declarada': { de: 'emenda-g1', continuidade: 'G1' },
+  'emenda-g2-declarada': { de: 'emenda-g2', continuidade: 'G2' },
+  'emenda-g1-em-g2': { de: 'emenda-g1', continuidade: 'G2' },
+});
+
+/** definicaoDaEmenda(nome, { passo, continuidade }): a rede da chapa emendada `nome` (de `EMENDAS`); com `continuidade` ('G1' ou 'G2'), a
+ *  curva `emenda` a declara, e sem ela a rede é a de sempre. */
+export function definicaoDaEmenda(nome, { passo = 30, continuidade = null } = {}) {
   const e = EMENDAS[nome];
   const P = (x, z) => pontoDaEmenda(nome, x, z);
   const xsE = [50, 100, 150, 200, 250]; const xsD = [350, 400, 450, 500, 550];
@@ -207,7 +219,7 @@ export function definicaoDaEmenda(nome, { passo = 30 } = {}) {
       { nome: 'cimaEsquerda', pontos: ['A1', ...xsE.map((x) => P(x, ALTURA_DA_EMENDA_MM)), 'B1'] },
       { nome: 'cimaDireita', pontos: ['B1', ...xsD.map((x) => P(x, ALTURA_DA_EMENDA_MM)), 'C1'] },
       { nome: 'ladoEsquerdo', pontos: ['A', ...ao(0), 'A1'] },
-      { nome: 'emenda', pontos: ['B', ...ao(EMENDA_X_MM), 'B1'], ...(e.vinco ? { vinco: e.vinco } : {}) },
+      { nome: 'emenda', pontos: ['B', ...ao(EMENDA_X_MM), 'B1'], ...(e.vinco ? { vinco: e.vinco } : {}), ...(continuidade ? { continuidade } : {}) },
       { nome: 'ladoDireito', pontos: ['C', ...ao(LARGURA_DA_EMENDA_MM), 'C1'] },
     ],
     retalhos: [
@@ -218,19 +230,22 @@ export function definicaoDaEmenda(nome, { passo = 30 } = {}) {
 }
 
 function receitaDaEmenda(nome) {
-  const e = EMENDAS[nome];
-  const g = gaiolaPorRede(definicaoDaEmenda(nome));
+  const declarada = EMENDAS_DECLARADAS[nome] ?? null;
+  const e = EMENDAS[declarada ? declarada.de : nome];
+  const g = gaiolaPorRede(definicaoDaEmenda(declarada ? declarada.de : nome, declarada ? { continuidade: declarada.continuidade } : {}));
   const grupos = Object.entries(pontosDosRetalhos(g)).map(([r, pontos]) => ({ nome: r, pontos }));
   return {
-    meta: { nome: `correcao-de-superficie/${nome}`, desc: `duas chapas de prova emendadas na curva x = 300 mm, declaradas em ${e.continuidade}` },
+    meta: { nome: `correcao-de-superficie/${nome}`, desc: declarada
+      ? `duas chapas de prova emendadas na curva x = 300 mm, a superfície em ${e.continuidade} e a curva da emenda declarada ${declarada.continuidade}`
+      : `duas chapas de prova emendadas na curva x = 300 mm, declaradas em ${e.continuidade}` },
     PARAMS: {},
     TOPO: { origem: 'canto da chapa em x = 0 e z = 0, y para fora; a emenda é x = 0,3', ...g.pontos },
     PASSOS: [
       ['subdivisao', { origemId: 1, ...g.passo, niveis: 2, grupos }],
       ...grupos.map(({ nome: r }) => ['parte', { nome: r, sel: { origem: { op: 'subdivisao', id: 1, parte: r } } }]),
     ],
-    PLANO: planoDeProva(`duas chapas de 300 por 400 mm emendadas em ${e.continuidade} declarada`, LARGURA_DA_EMENDA_MM, grupos.map(({ nome: r }) => r)),
-    EMENDA: e,
+    PLANO: planoDeProva(declarada ? `duas chapas de 300 por 400 mm emendadas em ${e.continuidade}, com a emenda declarada ${declarada.continuidade}` : `duas chapas de 300 por 400 mm emendadas em ${e.continuidade} declarada`, LARGURA_DA_EMENDA_MM, grupos.map(({ nome: r }) => r)),
+    EMENDA: declarada ? { ...e, declarada: declarada.continuidade } : e,
     REDE: g,
   };
 }
@@ -252,8 +267,8 @@ export function receitaDeProva(nome) {
   if (nome === 'rede-alisada') return receitaDeRede(nome, { ruido: true, alisarCurvas: ALISAMENTO_DE_PROVA });
   if (nome === 'chapa-simetrica') return receitaDaChapaSimetrica(nome, { espelhada: false });
   if (nome === 'chapa-simetrica-espelhada') return receitaDaChapaSimetrica(nome, { espelhada: true });
-  if (Object.hasOwn(EMENDAS, nome)) return receitaDaEmenda(nome);
+  if (Object.hasOwn(EMENDAS, nome) || Object.hasOwn(EMENDAS_DECLARADAS, nome)) return receitaDaEmenda(nome);
   throw new Error(`chapa de prova '${nome}' não existe; use ${CHAPAS_DE_PROVA.join(', ')}`);
 }
 
-export const CHAPAS_DE_PROVA = Object.freeze(['rede-com-ruido', 'rede-sem-ruido', 'rede-alisada', 'chapa-simetrica', 'chapa-simetrica-espelhada', ...Object.keys(EMENDAS)]);
+export const CHAPAS_DE_PROVA = Object.freeze(['rede-com-ruido', 'rede-sem-ruido', 'rede-alisada', 'chapa-simetrica', 'chapa-simetrica-espelhada', ...Object.keys(EMENDAS), ...Object.keys(EMENDAS_DECLARADAS)]);
