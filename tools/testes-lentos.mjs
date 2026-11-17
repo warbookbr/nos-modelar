@@ -17,6 +17,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { lerHistorico } from './vitest-duracoes.mjs';
 
 export const TESTES_LENTOS = [
+  /* 2026-11-17: reabrir a base do braço resolve a montagem inteira de doze etapas, com a placa de controle na base; uns 35 s */
+  'tools/modelar/etapas-reabrir-braco.test.mjs',
   /* 2026-11-16: as uniões das juntas soldadas do quadro da bicicleta em cinco medidas vizinhas; uns 10 s cada, 50 s com a máquina livre */
   'procedural/nucleo/operacoes/booleana-juntas-vizinhas-da-bicicleta.test.mjs',
   /* 2026-11-16: as visões de reflexo por comando (zebra em duas chapas, luz rasante e curvatura), cada captura abrindo navegador e peça;

@@ -82,15 +82,17 @@ export function atualizarRegistro(montagemId, medidas, anterior = null) {
     formato: FORMATO_REGISTRO_DE_ETAPAS,
     versao: VERSAO_REGISTRO_DE_ETAPAS,
     montagem: montagemId,
-    etapas: medidas.map(({ instancia, juntas, forma, textoDaReceita }) => {
+    etapas: medidas.map(({ instancia, juntas, forma, textoDaReceita, portas }) => {
       const passou = juntas.every((junta) => junta.satisfeita);
       const fixa = fixas.get(instancia);
       const comForma = forma ? { forma } : {};
-      if (!fixa) return { instancia, estado: 'aberta', juntas, ...comForma };
+      /* As portas que as etapas seguintes citam, como estão agora: a etapa aberta as leva, e a que se fixa guarda as do aceite. */
+      const comPortas = portas && Object.keys(portas).length ? { portas } : {};
+      if (!fixa) return { instancia, estado: 'aberta', juntas, ...comForma, ...comPortas };
       /* Quebrada que voltou a passar não se refixa sozinha com o aceite
          antigo: a pessoa aceitou outra coisa, e precisa olhar de novo. O aceite
          já foi guardado em `reaberturas` quando ela quebrou. */
-      if (fixa.estado === 'quebrada') return { instancia, estado: passou ? 'aberta' : 'quebrada', juntas, ...comForma };
+      if (fixa.estado === 'quebrada') return { instancia, estado: passou ? 'aberta' : 'quebrada', juntas, ...comForma, ...comPortas };
       /* FORMA QUE MUDOU DEPOIS DO ACEITE. As juntas só pegam mudança que
          desencaixa; alargar a base mantém o anel encaixado pelo vínculo, e a
          etapa continuava fixa com um aceite dado a outra peça. */
@@ -100,7 +102,7 @@ export function atualizarRegistro(montagemId, medidas, anterior = null) {
         : Boolean(fixa.receita && textoDaReceita) && fixa.receita !== textoDaReceita;
       const formaDoAceite = aceita ?? (mudou ? null : forma ?? null);
       if (!mudou && passou) {
-        return { instancia, estado: 'fixa', juntas, ...(formaDoAceite ? { forma: formaDoAceite } : {}), aceite: fixa.aceite };
+        return { instancia, estado: 'fixa', juntas, ...(formaDoAceite ? { forma: formaDoAceite } : {}), ...(fixa.portas ? { portas: fixa.portas } : {}), aceite: fixa.aceite };
       }
       const motivo = mudou ? 'a receita mudou depois do aceite' : 'uma junta deixou de passar depois do aceite';
       const guardado = {
@@ -108,9 +110,10 @@ export function atualizarRegistro(montagemId, medidas, anterior = null) {
         ...(fixa.aceite ? { aceite: fixa.aceite } : {}),
         ...(formaDoAceite ? { forma: formaDoAceite } : {}),
         ...(!formaDoAceite && fixa.receita ? { receita: fixa.receita } : {}),
+        ...(fixa.portas ? { portas: fixa.portas } : {}),
       };
       return {
-        instancia, estado: 'quebrada', juntas, ...comForma, motivo,
+        instancia, estado: 'quebrada', juntas, ...comForma, ...comPortas, motivo,
         reaberturas: [...(historico.get(instancia) ?? []), guardado],
       };
     }),
@@ -155,19 +158,73 @@ export function fixarEtapa(registro, instancia, aceite) {
   };
 }
 
-/* REABRIR. Só a pessoa reabre uma etapa fixa, como só ela dá o aceite humano:
-   nenhum agente reabre por conta própria. A etapa volta a aberta, e o aceite e
-   a forma que ela tinha vão para `reaberturas`, com quem, quando e por quê,
-   em vez de sumir. Recusa reabrir etapa que não está fixa, e recusa reabrir se
-   alguma etapa posterior está fixa ou quebrada: ela foi construída em cima
-   desta, e reabrir em cascata desfaria aceites que a pessoa não citou. A regra
-   é reabrir de trás para frente, uma etapa por vez, cada uma com o seu motivo. */
-export function reabrirEtapa(registro, instancia, { por, quando, motivo } = {}) {
+/* AS POSTERIORES QUE PROVAM NÃO TER MUDADO. Reabrir uma etapa não reabre as que vieram depois dela quando cada uma prova que não
+   mudou: está fixa (a forma, o hash da malha, é a do aceite e as juntas passam) e as portas desta etapa que ela cita são as mesmas
+   do aceite desta. Sem isso, mudar a base do braço para pôr a placa de controle exigia reabrir as onze etapas de cima, que a pessoa
+   não citou (2026-11-17).
+
+   `citacoes` são as portas desta etapa que cada posterior cita, por relação, vínculo ou posição: [{ posterior, porta, por }].
+   `portasAgora` são as portas desta etapa como a receita as publica agora, { nome: interface }. As portas do aceite são as que o
+   registro guardou ao fixar a etapa (na etapa fixa, ou na última reabertura que as tem, na quebrada). O registro de antes desta
+   regra não as guardava: aí a prova da porta é a medida das juntas da posterior com esta, igual à do registro anterior
+   (`anterior`), que pega porta que mudou de raio, eixo ou lugar onde há junta medida, e não pega a porta citada só por posição.
+   Devolve { mudaram: [{ posterior, oQue }], provas: [texto] }. */
+const NUMERO = (v) => (typeof v === 'number' ? Number(v.toPrecision(12)) : v);
+function diferencas(antes, agora) {
+  const chaves = [...new Set([...Object.keys(antes ?? {}), ...Object.keys(agora ?? {})])].sort();
+  const texto = (v) => JSON.stringify(Array.isArray(v) ? v.map(NUMERO) : NUMERO(v));
+  return chaves.filter((k) => texto(antes?.[k]) !== texto(agora?.[k])).map((k) => `${k}: ${texto(antes?.[k])} → ${texto(agora?.[k])}`);
+}
+const medidasIguais = (a, b) => JSON.stringify(a ?? null, (_, v) => NUMERO(v)) === JSON.stringify(b ?? null, (_, v) => NUMERO(v));
+
+export function conferirPosteriores(registro, instancia, { citacoes = [], portasAgora = {}, anterior = null } = {}) {
+  const indice = registro.etapas.findIndex((etapa) => etapa.instancia === instancia);
+  const etapa = registro.etapas[indice];
+  const portasDoAceite = etapa.estado === 'fixa' ? etapa.portas
+    : [...(etapa.reaberturas ?? [])].reverse().find((r) => r.portas)?.portas;
+  const mudaram = [];
+  const provas = [];
+  for (const posterior of registro.etapas.slice(indice + 1)) {
+    if (posterior.estado !== 'fixa' && posterior.estado !== 'quebrada') continue;
+    if (posterior.estado === 'quebrada') {
+      mudaram.push({ posterior: posterior.instancia, oQue: posterior.motivo ?? 'a etapa está quebrada' });
+      continue;
+    }
+    const citadas = citacoes.filter((c) => c.posterior === posterior.instancia);
+    const portas = [...new Set(citadas.map((c) => c.porta))];
+    const mudancas = [];
+    if (portas.length && portasDoAceite) {
+      for (const porta of portas) {
+        const d = diferencas(portasDoAceite[porta], portasAgora[porta]);
+        if (d.length) mudancas.push(`a porta '${porta}' de '${instancia}', que ela cita (${citadas.filter((c) => c.porta === porta).map((c) => c.por).join(', ')}), mudou: ${d.join('; ')}`);
+      }
+    } else if (portas.length) {
+      const antes = anterior?.etapas?.find((e) => e.instancia === posterior.instancia)?.juntas ?? [];
+      for (const junta of posterior.juntas.filter((j) => j.com === instancia)) {
+        const velha = antes.find((j) => j.relacao === junta.relacao);
+        if (!velha || !medidasIguais(velha.medidas, junta.medidas)) mudancas.push(`a medida da junta '${junta.relacao}' com '${instancia}' não é a do registro anterior`);
+      }
+    }
+    if (mudancas.length) { mudaram.push({ posterior: posterior.instancia, oQue: mudancas.join('; ') }); continue; }
+    provas.push(`${posterior.instancia}: forma do aceite${portas.length
+      ? (portasDoAceite ? `, e as portas citadas de '${instancia}' (${portas.join(', ')}) iguais às do aceite`
+        : `; as portas de '${instancia}' não estão guardadas no registro (anterior a 2026-11-17), e as juntas com ela têm a medida do registro anterior`)
+      : `, sem porta de '${instancia}' citada`}`);
+  }
+  return { mudaram, provas };
+}
+
+/* REABRIR. Só a pessoa reabre uma etapa, como só ela dá o aceite humano: nenhum agente reabre por conta própria. Reabre a etapa
+   fixa e a quebrada (a que a receita mudou depois do aceite, cujo aceite a leitura já guardou em `reaberturas`). A etapa volta a
+   aberta, e o aceite e a forma que ela tinha vão para `reaberturas`, com quem, quando e por quê, em vez de sumir. As etapas
+   posteriores ficam fixas quando cada uma prova que não mudou (`conferirPosteriores`); se alguma mudou, a reabertura é recusada
+   dizendo qual e o quê, e a regra antiga vale para ela: reabrir de trás para frente, uma etapa por vez, cada uma com o seu motivo. */
+export function reabrirEtapa(registro, instancia, { por, quando, motivo } = {}, contexto = {}) {
   const indice = registro.etapas.findIndex((etapa) => etapa.instancia === instancia);
   if (indice < 0) falhar('etapa-inexistente', `a etapa '${instancia}' não existe nesta montagem.`);
   const etapa = registro.etapas[indice];
-  if (etapa.estado !== 'fixa') {
-    falhar('etapa-nao-fixa', `a etapa '${instancia}' está ${etapa.estado}; só se reabre etapa fixa.`);
+  if (etapa.estado !== 'fixa' && etapa.estado !== 'quebrada') {
+    falhar('etapa-nao-fixa', `a etapa '${instancia}' está ${etapa.estado}; só se reabre etapa fixa ou quebrada.`);
   }
   const quem = typeof por === 'string' ? por.trim() : '';
   const porque = typeof motivo === 'string' ? motivo.trim() : '';
@@ -175,16 +232,22 @@ export function reabrirEtapa(registro, instancia, { por, quando, motivo } = {}) 
   if (!quem || !porque || !data) {
     falhar('reabertura-sem-autor', `reabrir '${instancia}' exige quem reabriu, a data e o motivo ("<quem, data: motivo>").`);
   }
-  const posteriores = registro.etapas.slice(indice + 1).filter((e) => e.estado === 'fixa' || e.estado === 'quebrada').map((e) => e.instancia);
-  if (posteriores.length) {
-    falhar('etapa-com-posteriores-fixas', `'${instancia}' tem etapas posteriores construídas sobre ela (${posteriores.join(', ')}); reabra-as antes, da última para a primeira.`);
+  const { mudaram } = conferirPosteriores(registro, instancia, contexto);
+  if (mudaram.length) {
+    falhar('etapa-com-posteriores-fixas', `'${instancia}' tem etapas posteriores que mudaram: ${mudaram.map((m) => `'${m.posterior}' (${m.oQue})`).join('; ')}; reabra-as antes, da última para a primeira.`);
   }
-  const { aceite, forma, receita, reaberturas = [], ...resto } = etapa;
-  const registroDaReabertura = { por: quem, quando: data, motivo: porque, ...(aceite ? { aceite } : {}), ...(forma ? { forma } : {}), ...(receita ? { receita } : {}) };
+  const quebrada = etapa.estado === 'quebrada';
+  const { aceite, forma, receita, portas, motivo: _motivo, reaberturas = [], ...resto } = etapa;
+  /* Na quebrada, o aceite e a forma do aceite já estão na reabertura que a leitura guardou; a forma dela agora é a nova. */
+  const registroDaReabertura = {
+    por: quem, quando: data, motivo: porque,
+    ...(!quebrada && aceite ? { aceite } : {}), ...(!quebrada && forma ? { forma } : {}), ...(!quebrada && receita ? { receita } : {}),
+  };
+  const portasAgora = contexto.portasAgora && Object.keys(contexto.portasAgora).length ? { portas: contexto.portasAgora } : {};
   return {
     ...registro,
     etapas: registro.etapas.map((item, i) => (i === indice
-      ? { ...resto, estado: 'aberta', ...(forma ? { forma } : {}), reaberturas: [...reaberturas, registroDaReabertura] }
+      ? { ...resto, estado: 'aberta', ...(forma ? { forma } : {}), ...portasAgora, reaberturas: [...reaberturas, registroDaReabertura] }
       : item)),
   };
 }

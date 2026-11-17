@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2053 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2054 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -3380,6 +3380,7 @@
 - `etapas-da-montagem.mjs` — etapas-da-montagem.mjs — o registro de etapas de uma montagem v5, em disco, e a única porta para fixar uma etapa.
 - `etapas-da-montagem.test.mjs` — etapas-da-montagem.test.mjs — a porta que fixa etapa. Fixar exige a etapa ser a próxima, o crítico ter fechado a peça dela, a nota de passagem, as juntas pas…
 - `etapas-de-construcao.test.mjs` — etapas-de-construcao.test.mjs — fatia 3 do plano "a peça nasce encaixada": o registro de etapas, a junta medida quando a parte entra e a recusa de seguir com…
+- `etapas-reabrir-braco.test.mjs` — etapas-reabrir-braco.test.mjs — reabrir a base do braço robótico, com a receita de agora (a caixa lateral com a placa de controle e a tampa, plano da família…
 - `executar-receita.test.ts` — executar-receita.test.ts — prova a fronteira pura sem carregar catálogo.
 - `exemplo-canonico.test.mjs` — exemplo-canonico.test.mjs — o exemplo de receita que a documentação ensina precisa passar pelo mesmo caminho que o acervo.
 - `exportar-gltf-braco.test.mjs` — exportar-gltf-braco.test.mjs — LENTO (está em `TESTES_LENTOS`: resolve o braço inteiro, uns 15 s). Plano as partes do braço, fatia 2, gate 4: o braço montado…
