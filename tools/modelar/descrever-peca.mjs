@@ -132,18 +132,21 @@ function amostraDeOrfaos(neutro) { return linhasDeOrfaos(neutro); }
 /* O REGISTRO QUE CRONOMETRA CADA PASSO. O núcleo não mede o tempo de um passo, e o `descrever` precisava dele para dizer qual vão custou (a janela da
    cabine do furgão foi de 118 s a 207 s em 2026-11-09 sem nada acusar). O núcleo consulta o registro uma vez por passo, na ordem e antes de executar
    (`registro.resolver(op)` no laço dos `PASSOS`), e o cronômetro mede de uma consulta à seguinte: o passo `k` dura da consulta `k` à `k + 1`, e o último
-   fecha em `fechar`, depois da execução. A operação volta do registro como veio. Embrulhar o `executar` dela, como este cronômetro fazia, tirava o passo do
+   fecha em `fechar`, depois da execução. Numa execução que recomeçou de um ponto guardado o núcleo só consulta os passos dali em diante, e
+   `deslocamento()` diz quantos passos ficaram para trás (`estatisticas.recomecouDoPasso` da memória): o índice de quem lê (`tempos`, `aoPasso`)
+   continua o do passo na receita, e não o da consulta. A operação volta do registro como veio. Embrulhar o `executar` dela, como este cronômetro fazia, tirava o passo do
    caminho rápido do núcleo, que só confia na declaração de escrita da operação quando a função é a original, e cada passo voltava a retratar a malha
    inteira: o `descrever` do furgão foi de 180 s a 480 s (CI de 2026-11-12, `guarda:tempo`). `fechar(passos)` descarta os tempos quando o número de
    consultas não é o de passos executados, porque aí o índice da consulta não é o do passo. */
-export function registroCronometrado(base, { total, tempos, aoPasso }) {
+export function registroCronometrado(base, { total, tempos, aoPasso, deslocamento = () => 0 }) {
   const voltas = [];
   const fecharAnterior = (agora) => {
     const k = voltas.length - 1;
     if (k < 0 || voltas[k].ms != null) return;
     voltas[k].ms = agora - voltas[k].t0;
-    tempos.set(k, { op: voltas[k].op, ms: voltas[k].ms });
-    aoPasso?.(k, total, voltas[k].op);
+    const passo = k + deslocamento();
+    tempos.set(passo, { op: voltas[k].op, ms: voltas[k].ms });
+    aoPasso?.(passo, total, voltas[k].op);
   };
   const registro = {
     ...base,
@@ -156,7 +159,7 @@ export function registroCronometrado(base, { total, tempos, aoPasso }) {
   };
   const fechar = (passos) => {
     fecharAnterior(performance.now());
-    if (!Array.isArray(passos) || passos.length !== voltas.length) tempos.clear();
+    if (!Array.isArray(passos) || passos.length !== voltas.length + deslocamento()) tempos.clear();
   };
   return { registro, fechar };
 }
@@ -476,6 +479,7 @@ export async function descreverPecaReutilizavel({
   progresso(`executando a receita${totalDePassos == null ? '' : ` (${totalDePassos} passos)`}`);
   const cronometro = registroCronometrado(execucao.registroOperacoes ?? REGISTRO_DA_RECEITA, {
     total: totalDePassos, tempos,
+    deslocamento: () => cache?.memoria.estatisticas.recomecouDoPasso ?? 0,
     aoPasso: (i, total, op) => {
       if (aoProgredir && intervaloDoProgressoMs > 0 && performance.now() - ultimaLinha >= intervaloDoProgressoMs) {
         /* a batida chega quando o passo `i` fecha, isto é, quando o seguinte começa */

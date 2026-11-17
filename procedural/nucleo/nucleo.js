@@ -3779,7 +3779,7 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
       if (!ponto) continue;
       /* `proprio`: a memória devolve um estado que é só desta execução (o lido do disco, por exemplo), e a cópia não precisa ser feita */
       const estado = ponto.proprio === true ? ponto.estado : copiarEstado(ponto.estado);
-      if (estado) { Object.assign(st, estado); inicio = k + 1; memoria.estatisticas.restaurados += 1; }
+      if (estado) { Object.assign(st, estado); inicio = k + 1; memoria.estatisticas.restaurados += 1; memoria.estatisticas.recomecouDoPasso = inicio; }
       break;
     }
   }
