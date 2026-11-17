@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2022 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2024 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -3419,6 +3419,8 @@
 - `planejado-contra-executado.test.mjs` — planejado-contra-executado.test.mjs — a régua do planejado contra o executado, sobre a fixture neutra de três blocos empilhados (`tools/fixtures/planejado-co…
 - `pngjs.d.ts` — pngjs.d.ts — a declaração mínima do `pngjs` para o typecheck dos testes em TypeScript: o pacote não traz tipos, e `capturar-montagem.test.ts` o usa para mont…
 - `portas-espelho-arranja.test.ts` — portas-espelho-arranja.test.ts — prova adversarial de AUT-2026-15: uma interface não pode permanecer no espaço da fonte quando a sua geometria foi copiada. C…
+- `prancha-de-referencia.mjs` — prancha-de-referencia.mjs — a prancha modelo e foto: a vista da peça (ou de uma parte isolada) ao lado da foto de referência, as duas na mesma escala em mm, …
+- `prancha-de-referencia.test.mjs` — Uma imagem RGBA lisa com um retângulo de outra cor: a extensão esperada é o retângulo.
 - `procedencia-check.mjs` — Gate N3: contrato reduzido e explícito de procedência da fonte de restrições.
 - `procedencia-check.test.mjs` — Provas do gate N3 para procedência de valores estruturais.
 - `proporcoes.mjs` — proporcoes.mjs — a fonte única das medidas de uma montagem, e a conferência de que os outros lugares a seguem.

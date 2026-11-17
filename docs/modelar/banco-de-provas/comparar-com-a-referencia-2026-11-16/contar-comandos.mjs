@@ -14,7 +14,8 @@
  * auxiliar dessas tarefas, que é a medida do gate 5.
  *
  * Uso: node docs/modelar/banco-de-provas/comparar-com-a-referencia-2026-11-16/contar-comandos.mjs <sessão.jsonl>
- *        [--desde=<ISO>] [--ate=<ISO>] [--tipo=<agente>] [--descricao=<regex>] [--exemplos=<padrão>] [--json] */
+ *        [--desde=<ISO>] [--ate=<ISO>] [--tipo=<agente>] [--descricao=<regex>] [--exemplos=<padrão>] [--listar-alvo] [--json]
+ * `--listar-alvo` imprime os comandos do alvo, numerados na ordem em que foram chamados, que é a numeração do README da pasta. */
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { basename, dirname, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -101,7 +102,7 @@ const conta = (mapa, chave, n = 1) => { mapa[chave] = (mapa[chave] ?? 0) + n; };
 
 /* A contagem na janela: { registros, registrosPorTipo, comandos, comandosPorTipo, padroes: { nome: { comandos, falhas, porTipo } },
    alvo, exemplos }. Só os registros que começaram na janela entram, e deles só os comandos chamados nela. */
-export function contar(registros, { desde = null, ate = null, tipo = null, descricao = null, exemplosDe = null } = {}) {
+export function contar(registros, { desde = null, ate = null, tipo = null, descricao = null, exemplosDe = null, listarAlvo = false } = {}) {
   const t0 = desde ? Date.parse(desde) : -Infinity;
   const t1 = ate ? Date.parse(ate) : Infinity;
   if (Number.isNaN(t0) || Number.isNaN(t1)) throw new Error(`horário inválido em --desde ou --ate: ${desde ?? ''} ${ate ?? ''}`);
@@ -109,7 +110,7 @@ export function contar(registros, { desde = null, ate = null, tipo = null, descr
   const re = descricao ? new RegExp(descricao, 'i') : null;
   const escolhidos = registros.filter((r) => dentro(r.inicio) && (!tipo || r.tipo === tipo) && (!re || re.test(r.descricao)));
   const out = { registros: escolhidos.length, registrosPorTipo: {}, comandos: 0, comandosPorTipo: {}, padroes: {}, avulsas: {}, alvo: 0, exemplos: [],
-    descricoes: [] };
+    descricoes: [], listaDoAlvo: [] };
   for (const r of escolhidos) {
     conta(out.registrosPorTipo, r.tipo);
     const cmds = r.comandos.filter((c) => dentro(c.horario));
@@ -117,7 +118,10 @@ export function contar(registros, { desde = null, ate = null, tipo = null, descr
     for (const c of cmds) {
       out.comandos += 1; conta(out.comandosPorTipo, r.tipo);
       const nomes = padroesDe(c.comando);
-      if (noAlvo(c.comando, nomes)) out.alvo += 1;
+      if (noAlvo(c.comando, nomes)) {
+        out.alvo += 1;
+        if (listarAlvo) out.listaDoAlvo.push(`#${out.alvo} [${nomes.join(',')}]${c.falha ? ' falhou' : ''} ${c.comando.replace(/\n/g, ' ⏎ ').slice(0, 200)}`);
+      }
       for (const [n, re] of AVULSAS) if (re.test(c.comando)) conta(out.avulsas, n);
       for (const n of nomes) {
         const p = out.padroes[n] ??= { comandos: 0, falhas: 0, porTipo: {} };
@@ -143,6 +147,7 @@ export function relatorio(c) {
     `alvo do plano (${ALVO.join(', ')}, com os scripts auxiliares): ${c.alvo} de ${c.comandos}`,
   ];
   if (c.exemplos.length) linhas.push('exemplos:', ...c.exemplos.map((e) => `  - ${e}`));
+  if (c.listaDoAlvo.length) linhas.push('comandos do alvo:', ...c.listaDoAlvo.map((e) => `  ${e}`));
   return linhas.join('\n');
 }
 
@@ -151,10 +156,10 @@ if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
   const opcao = (nome) => args.find((a) => a.startsWith(`--${nome}=`))?.slice(nome.length + 3) ?? null;
   const arquivo = args.find((a) => !a.startsWith('--'));
   if (!arquivo || args.includes('--ajuda')) {
-    console.log('uso: contar-comandos.mjs <sessão.jsonl> [--desde=<ISO>] [--ate=<ISO>] [--tipo=<agente>] [--descricao=<regex>] [--exemplos=<padrão>] [--json]');
+    console.log('uso: contar-comandos.mjs <sessão.jsonl> [--desde=<ISO>] [--ate=<ISO>] [--tipo=<agente>] [--descricao=<regex>] [--exemplos=<padrão>] [--listar-alvo] [--json]');
     process.exit(arquivo ? 0 : 1);
   }
   const c = contar(lerSessao(arquivo), { desde: opcao('desde'), ate: opcao('ate'), tipo: opcao('tipo'), descricao: opcao('descricao'),
-    exemplosDe: opcao('exemplos') });
+    exemplosDe: opcao('exemplos'), listarAlvo: args.includes('--listar-alvo') });
   console.log(args.includes('--json') ? JSON.stringify(c, null, 2) : relatorio(c));
 }

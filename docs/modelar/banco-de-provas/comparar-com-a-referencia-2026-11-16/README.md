@@ -51,3 +51,35 @@ A primeira versão da medida devolvia os pixels das duas decodificações da fot
 ## Fatia 2: o que `--sobrescrever` tira da linha de base
 
 `olhar-bancada --sobrescrever`, com `--saida`, apaga e refaz a pasta quando ela tem o marcador `.saida-da-bancada`, que a bancada grava ao criar a pasta de `--saida`; a pasta sem o marcador é recusada com o caminho na mensagem, e a padrão, a que a contém e o uso sem `--saida` ou com `--analise` também. Dos 42 comandos do alvo nas sete rodadas da bicicleta, 21 entram no alvo só por apagar a saída ou conferir o motor, sem prancha nem medida de foto no mesmo comando: 14 de apagar a saída, que `--sobrescrever` tira, e 7 de conferir o motor (`nucleo(gerarPassos(...))`, `tmp/chk.mjs` e a busca por `orfaos`), que esperam o `descrever --recusas`. A conta usa `padroesDe`, `noAlvo` e `ALVO` do `contar-comandos.mjs`, tirando do alvo os padrões `apagar-saida` e `conferir-motor` e o auxiliar `tmp/chk.mjs`/`orfaos`, e mantendo o `tmp/prancha.*`. `--recusas` não entrou nesta fatia porque mora em `tools/modelar/descrever-peca.mjs`, território do plano do cache por passo.
+
+## Fatia 3: a prancha modelo e foto por um comando
+
+[`tools/modelar/prancha-de-referencia.mjs`](../../../../tools/modelar/prancha-de-referencia.mjs) captura a vista na bancada, em memória e em projeção ortográfica, com a parte isolada e enquadrada (`--parte`) ou a peça inteira enquadrada, e monta a prancha no Chromium sem WebGL, como a fatia 1 decidiu: a página decodifica as imagens, mede a extensão do que não é fundo e desenha o plano que o módulo monta em Node, e devolve só o PNG em base64. A escala do modelo é medida pela câmera, com a origem e 100 mm em cada eixo projetados no quadro da vista; a da foto vem de `--regua`, uma medida conhecida dela em px e em mm. As duas metades saem na mesma escala, com régua em mm, a extensão de cada uma em caixa tracejada e um JSON ao lado com as escalas e as extensões em mm. As opções são `--foto`, `--regua`, `--regiao` (caixa em px da foto, ou `auto` pela extensão), `--vistas` (só as ortográficas de eixo), `--parte`, `--espelhar` e `--disposicao=lado|sobreposto`, além de `--saida`; com mais de uma vista, foto, régua e região levam um valor por vista separado por `;`. A `grade` do plano é a prancha com mais de uma vista, uma linha por vista, e não virou opção.
+
+`--espelhar` entrou porque o caso o pediu: na vista `direita` da bancada a bicicleta tem a frente à esquerda, e na foto lateral a frente está à direita, o que é a inversão do contorno do selim que a sessão cometeu à mão. Na vista frontal a foto e o modelo concordam (o pedal baixo à esquerda nos dois), e ela não se espelha.
+
+As duas pranchas da prova, com as fotos em `tmp/bicicleta/`, fora do repositório (a régua lateral é o pneu de 670 mm, medido de 1162 a 1811 px na linha do eixo; a frontal é o guidão de 680 mm do alvo, de 654 a 1345 px):
+
+```
+node tools/modelar/prancha-de-referencia.mjs bicicleta-urbana --parte=selim --vistas=direita,frontal --espelhar=direita \
+  --foto='tmp/bicicleta/lateral.jpg;tmp/bicicleta/frontal.webp' --regua='1162,738,1811,738=670;654,80,1345,80=680' \
+  --regiao='560,110,870,240;880,150,1100,250'
+node tools/modelar/prancha-de-referencia.mjs bicicleta-urbana --parte=pedais --vistas=direita,frontal --espelhar=direita \
+  --foto='tmp/bicicleta/lateral.jpg;tmp/bicicleta/frontal.webp' --regua='1162,738,1811,738=670;654,80,1345,80=680' \
+  --regiao='1000,760,1140,840;820,630,1180,900'
+```
+
+| prancha | escala da prancha | vista | modelo, extensão e escala | foto, extensão na região e escala |
+| --- | --- | --- | --- | --- |
+| selim | 3,43 px/mm | direita | 260,1 x 77,9 mm, 3,55 px/mm | 260,2 x 116,7 mm, 0,97 px/mm (com o canote) |
+| selim | | frontal | 148,1 x 77,9 mm, 5,50 px/mm | 142,7 x 98,4 mm, 1,02 px/mm (com a mesa na frente) |
+| pedais | 1,73 px/mm | direita | 439,8 x 74,4 mm, 2,10 px/mm | 110,5 x 40,3 mm, 0,97 px/mm (o pedal de perto e a ponta do braço) |
+| pedais | | frontal | 458,5 x 74,6 mm, 2,01 px/mm | 317,9 x 265,7 mm, 1,02 px/mm (os dois pedais, braços e pneu) |
+
+Cada prancha leva uns 40 s, quase todos da bancada (servidor e carga da peça); a montagem no navegador leva menos de 1 s. A escala do modelo não depende do tamanho da captura: o selim deu 260,2 mm de comprido a 1280 por 720 e 260,1 a 1920 por 1080, que é o tamanho fixado, porque a 1280 os pedais saíam a 1,4 px/mm e a prancha os ampliava. A prancha só dá a extensão do que não é fundo na região, que serve à leitura; a medida de um detalhe da foto continua por script, que pode usar a régua e a região da prancha.
+
+Dois limites ficam à vista nas pranchas. Os dois pedais aparecem juntos porque a parte `pedais` é uma só, e isolar um deles é a fatia 4. E `sobreposto` alinha pelo centro das extensões, o que desloca o selim quando a região da foto pega o canote; a região mais justa, sem o canote, conserta.
+
+### O que a prancha tira da linha de base
+
+Pela numeração de `contar-comandos.mjs ... --tipo=modelador --listar-alvo`, na mesma janela das sete rodadas, os 42 comandos do alvo se dividem assim. A fatia 2 tirou 14 (só apagar a saída: 3, 4, 6, 7, 10 a 13, 32, 33, 36, 37, 40, 41), e 7 esperam `descrever --recusas` (1, 2, 14, 15, 20, 31, 38). A prancha tira 11, os que montam, recortam ou escalam a vista contra a foto, ou preparam isso (capturar para a prancha, conferir o tamanho das imagens): 5, 8, 9, 16, 21, 22, 23, 25, 26, 27 e 34. Ficam 10: três que montam as vistas do modelo sozinhas, recortando um dos pedais (17 a 19, da fatia 4), três de medição livre na foto, que o plano mantém por script (30, 35, 39), a conferência das bibliotecas antes dela (29) e três que só caem em `medir-foto` porque citam `guarda:referencial` (24, 28, 42). Com as fatias 2 e 3 e o `--recusas`, o alvo cai de 42 para 10 em 83, que é o quarto do gate 5; sem o `--recusas`, para 17.
