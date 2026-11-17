@@ -25,11 +25,14 @@
  * As chapas de calibração (`tools/fixtures/reflexo-calibracao/`) provam a ordem no teste: a lisa dá perto de zero e as onduladas de
  * 0,25, 0,5 e 1 mm sobem nessa ordem.
  *
+ * O AVISO DE ÁREA. A região cuja área medida fica abaixo de `--area-minima` (fração da área dela, padrão 0,75) sai com `aviso` no JSON e
+ * `AVISO` na tabela: o índice é só do que foi medido, e comparar um índice de 4,11 de 5,90 m² (a chapa do carro com passo 90) ou de 0,0004 m² (o
+ * rebaixo) com outro de área inteira engana. O aviso não muda o índice.
  * O QUE ELE DIZ. JSON na saída padrão (`regioes`: nome, índice em 1/m², energia, área total e medida em m², faces e vértices medidos,
  * curvatura quadrática média, a raiz da média por área de k1² + k2², em 1/m), e a tabela legível na saída de erro (para não sujar o JSON de quem o lê por cano).
  *
  * Uso: node tools/modelar/suavidade-por-regiao.mjs <peça> [--opcao=<n>] [--lado=<+z|-z|+x|-x|+y|-y|centro>] [--por=<parte|origem|ambos>]
- *        [--raio=<mm>] [--saida=<json>]
+ *        [--raio=<mm>] [--area-minima=<fração>] [--saida=<json>]
  *   (também `npm run suavidade -- <peça> ...`). Com `--saida` o JSON vai também para o arquivo. */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { basename, dirname, resolve } from 'node:path';
@@ -39,7 +42,7 @@ import { ajusteLocal, indiceDosGrupos, malhaComGrupos } from './continuidade-nas
 import { ErroDeEntrada, lerEntradaDeMedida, opcaoDaLinha } from './entrada-de-medida.mjs';
 import { selecionarLado } from './mapa-de-desvio.mjs';
 
-export const PADROES = Object.freeze({ raioMm: 40 });
+export const PADROES = Object.freeze({ raioMm: 40, areaMinima: 0.75 });
 
 /** O gradiente (por mm) de uma função linear num triângulo de vértices a, b, c (mm) com valores fa, fb, fc. */
 function gradienteNoTriangulo(a, b, c, fa, fb, fc) {
@@ -52,8 +55,9 @@ function gradienteNoTriangulo(a, b, c, fa, fb, fc) {
 }
 
 /** suavidadePorRegiao(neutro, { nome, lado, por, raioMm }) -> { json, tabela } */
-export function suavidadePorRegiao(neutro, { nome = 'peca', lado = null, por = 'parte', raioMm = PADROES.raioMm } = {}) {
+export function suavidadePorRegiao(neutro, { nome = 'peca', lado = null, por = 'parte', raioMm = PADROES.raioMm, areaMinima = PADROES.areaMinima } = {}) {
   if (!(raioMm > 0)) throw new Error(`--raio espera um número de mm maior que zero, e veio ${raioMm}`);
+  if (!(areaMinima >= 0 && areaMinima <= 1)) throw new Error(`--area-minima espera uma fração de 0 a 1 da área da região, e veio ${areaMinima}`);
   const malha = malhaComGrupos(neutro, { por });
   const { P, N, faces, grupos, areas } = malha;
   const sel = selecionarLado(malha, lado);
@@ -93,11 +97,12 @@ export function suavidadePorRegiao(neutro, { nome = 'peca', lado = null, por = '
       regiao: g, indice: areaMedida ? Math.round(Math.sqrt(energia / areaMedida) * 1000) / 1000 : null, energia: Math.round(energia * 1e4) / 1e4,
       areaM2: Math.round(areaTotal * 1e-6 * 1e5) / 1e5, areaMedidaM2: Math.round(areaMedida * 1e5) / 1e5, faces: faces.filter((_, k) => selFace[k] && grupos[k] === g).length, facesMedidas,
       verticesMedidos: tensores.size, curvaturaRmsPorM: areaMedida ? Math.round(Math.sqrt(curv2 / areaMedida) * 1000) / 1000 : null,
+      ...(areaTotal > 0 && areaMedida < areaMinima * areaTotal * 1e-6 ? { aviso: `a área medida é ${Math.round((areaMedida / (areaTotal * 1e-6)) * 100)}% da área da região (${Math.round(areaMedida * 1e5) / 1e5} de ${Math.round(areaTotal * 1e-6 * 1e5) / 1e5} m²), abaixo de ${Math.round(areaMinima * 100)}%: o índice é só da parte medida, e a região tem vértice sem vizinhos bastantes (quina, borda, malha grossa para o raio ${raioMm} mm); mude o raio ou a malha antes de comparar` } : {}),
     });
   }
   if (!regioes.length) throw new Error('nenhuma região foi medida: o lado não tem face, ou a peça não tem face');
   const json = {
-    peca: nome, lado, por, parametros: { raioMm },
+    peca: nome, lado, por, parametros: { raioMm, areaMinima },
     unidades: { indice: '1/m² (raiz da média por área de ||grad S||², S o tensor de curvatura em 1/m)', energia: '1/m² (integral de ||grad S||² dA, em m²)', area: 'm²' },
     regioes,
   };
@@ -105,11 +110,12 @@ export function suavidadePorRegiao(neutro, { nome = 'peca', lado = null, por = '
   const larg = Math.max(8, ...regioes.map((r) => r.regiao.length));
   const tabela = [`suavidade por região — ${nome}${lado ? ` (lado ${lado})` : ''}, por ${por}, raio ${raioMm} mm`,
     `${col('região', larg)}  ${num('índice 1/m²', 12)}  ${num('energia', 10)}  ${num('área m²', 9)}  ${num('medida m²', 10)}  ${num('k rms 1/m', 10)}`,
-    ...regioes.map((r) => `${col(r.regiao, larg)}  ${num(r.indice, 12)}  ${num(r.energia, 10)}  ${num(r.areaM2, 9)}  ${num(r.areaMedidaM2, 10)}  ${num(r.curvaturaRmsPorM, 10)}`)].join('\n');
+    ...regioes.map((r) => `${col(r.regiao, larg)}  ${num(r.indice, 12)}  ${num(r.energia, 10)}  ${num(r.areaM2, 9)}  ${num(r.areaMedidaM2, 10)}  ${num(r.curvaturaRmsPorM, 10)}`),
+    ...regioes.filter((r) => r.aviso).map((r) => `AVISO ${r.regiao}: ${r.aviso}`)].join('\n');
   return { json, tabela };
 }
 
-export const OPCOES_DA_CLI = ['opcao', 'lado', 'por', 'raio', 'saida'];
+export const OPCOES_DA_CLI = ['opcao', 'lado', 'por', 'raio', 'area-minima', 'saida'];
 
 async function principal(argv) {
   let lido;
@@ -118,13 +124,15 @@ async function principal(argv) {
   if (lido.bandeira('ajuda') || !peca) { process.stderr.write(`uso: node tools/modelar/suavidade-por-regiao.mjs <peça> [--${OPCOES_DA_CLI.join('=...] [--')}=...]\n  ver o cabeçalho do arquivo\n`); return lido.bandeira('ajuda') ? 0 : 2; }
   const t = lido.opcao('raio'); const raioMm = t === null || t === undefined ? PADROES.raioMm : Number(t);
   if (!Number.isFinite(raioMm)) { process.stderr.write(`suavidade: --raio espera um número de mm, e veio '${t}'\n`); return 2; }
+  const ta = lido.opcao('area-minima'); const areaMinima = ta === null || ta === undefined ? PADROES.areaMinima : Number(ta);
+  if (!(areaMinima >= 0 && areaMinima <= 1)) { process.stderr.write(`suavidade: --area-minima espera uma fração de 0 a 1, e veio '${ta}'\n`); return 2; }
   let entrada;
   try { entrada = await lerEntradaDeMedida(peca, { opcao: opcaoDaLinha(lido.opcao('opcao')), montagem: false }); } catch (e) {
     if (e instanceof ErroDeEntrada) { process.stderr.write(`suavidade: ${e.message}\n`); return 2; }
     throw e;
   }
   const nome = basename(peca).replace(/\.(mjs|js|json)$/, '');
-  const { json, tabela } = suavidadePorRegiao(entrada.executar().neutro, { nome, lado: lido.opcao('lado') ?? null, por: lido.opcao('por') ?? 'parte', raioMm });
+  const { json, tabela } = suavidadePorRegiao(entrada.executar().neutro, { nome, lado: lido.opcao('lado') ?? null, por: lido.opcao('por') ?? 'parte', raioMm, areaMinima });
   const texto = `${JSON.stringify(json, null, 2)}\n`;
   if (lido.opcao('saida')) { const s = resolve(lido.opcao('saida')); mkdirSync(dirname(s), { recursive: true }); writeFileSync(s, texto); }
   process.stderr.write(`${tabela}\n`);

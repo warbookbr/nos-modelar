@@ -37,4 +37,17 @@ describe('suavidade por região', () => {
     expect(() => suavidadePorRegiao(neutro, { raioMm: -1 })).toThrow(/--raio/);
     expect(() => suavidadePorRegiao(neutro, { por: 'cor' })).toThrow(/--por/);
   });
+
+  it('avisa quando a área medida fica abaixo da fração pedida da área da região, sem mudar o índice', async () => {
+    const neutro = await neutroDe('lisa');
+    const inteira = suavidadePorRegiao(neutro, { lado: '+z' });
+    expect(inteira.json.regioes[0].aviso).toBeUndefined();
+    expect(inteira.tabela).not.toMatch(/AVISO/);
+    const curta = suavidadePorRegiao(neutro, { lado: '+z', raioMm: 5 });
+    expect(curta.json.regioes[0].areaMedidaM2).toBe(0);
+    expect(curta.json.regioes[0].aviso).toMatch(/área medida é 0% da área da região \(0 de 0\.2416\d* m²\), abaixo de 75%/);
+    expect(curta.tabela).toMatch(/AVISO chapa:/);
+    expect(suavidadePorRegiao(neutro, { lado: '+z', raioMm: 5, areaMinima: 0 }).json.regioes[0].aviso).toBeUndefined();
+    expect(() => suavidadePorRegiao(neutro, { areaMinima: 2 })).toThrow(/--area-minima espera/);
+  });
 });
