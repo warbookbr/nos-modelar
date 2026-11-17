@@ -77,11 +77,14 @@ describe('barra superior', () => {
 
   it('o acervo lista as receitas, marca as de ensaio e escolher fecha a janela e abre a peça', () => {
     const { $, abrirDoAcervo } = montar();
-    const linhas = $('listaAcervo').querySelectorAll('[data-receita]');
-    /* o objeto de várias partes é uma entrada de montagem, e a parte dele não é entrada */
-    expect(linhas.map((l) => l.dataset.receita)).toEqual(['furgao', 'objeto', 'peca-de-prova']);
-    expect(linhas[1].querySelector('kbd').textContent).toBe('montagem');
-    expect(linhas[2].querySelector('.marca-ensaio').textContent).toBe('ensaio');
+    const lerLinhas = () => $('listaAcervo').querySelectorAll('[data-receita]');
+    /* o objeto de várias partes é uma entrada de montagem, e a parte dele não é entrada; as de ensaio ficam escondidas até a janela as pedir */
+    expect(lerLinhas().map((l) => l.dataset.receita)).toEqual(['furgao', 'objeto']);
+    expect(lerLinhas()[1].querySelector('kbd').textContent).toBe('montagem');
+    $('menuAbrir').querySelector('[data-situacao="ensaio"]').click();
+    expect(lerLinhas().map((l) => l.dataset.receita)).toEqual(['furgao', 'objeto', 'peca-de-prova']);
+    expect(lerLinhas()[2].querySelector('.marca-ensaio').textContent).toBe('ensaio');
+    const linhas = lerLinhas();
     $('btnMenuAbrir').click();
     linhas[0].click();
     expect($('menuAbrir').hidden).toBe(true);
