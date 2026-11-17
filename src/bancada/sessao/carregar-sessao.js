@@ -4,8 +4,30 @@ import { adaptarMontagemThree } from '../../autoria/adaptar-montagem-three.js';
 import { caixasPorParte, portasPublicadas } from '../../autoria/descrever-partes.js';
 import { executarReceita } from '../../autoria/executar-receita.js';
 import { resolverMontagemPersistida } from '../../autoria/resolver-montagem-persistida.js';
+import { FORMATO_DO_NEUTRO_EM_TEXTO, neutroDoTexto } from '../../../procedural/nucleo/planejador/neutro-em-texto.js';
 
-/* `neutro` é o resultado de uma execução já feita (o cache da bancada, `cache-da-execucao.js`); sem ele, a receita executa aqui. */
+/* A captura da bancada executava a receita duas vezes: na ativação, no Node, e aqui, na página. A ativação grava agora, ao lado do arquivo
+   da sessão, o neutro que ela executou (`procedural/nucleo/planejador/neutro-em-texto.js`), e a página o lê em vez de executar. */
+export { FORMATO_DO_NEUTRO_EM_TEXTO, neutroDoTexto };
+
+/* A leitura do neutro gravado ao lado da sessão, síncrona: o processamento do payload é síncrono no sincronizador (`aplicarPayload`),
+   e a captura espera o modelo entrar na cena. Fora do navegador, ou quando a leitura falha, volta null e a receita executa aqui. */
+function lerNeutroDaSessao(arquivo) {
+  if (typeof XMLHttpRequest === 'undefined' || typeof arquivo !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9._/-]*\.json$/.test(arquivo) || arquivo.includes('..')) return null;
+  try {
+    const pedido = new XMLHttpRequest();
+    pedido.open('GET', `${import.meta.env?.BASE_URL ?? './'}${arquivo}`, false);
+    pedido.send();
+    if (pedido.status !== 200) return null;
+    return neutroDoTexto(pedido.responseText);
+  } catch (erro) {
+    console.warn(`sessão: o neutro gravado em ${arquivo} não carregou (${erro?.message ?? erro}); a receita executa na página.`);
+    return null;
+  }
+}
+
+/* `neutro` é o resultado de uma execução já feita (o cache da bancada, `cache-da-execucao.js`, ou o neutro que a ativação gravou ao lado
+   da sessão); sem ele, a receita executa aqui. */
 export function processarReceitaSessao(receita, { nome = 'Sessão Ativa', neutro: neutroPronto = null } = {}) {
   if (!receita || !Array.isArray(receita.PASSOS)) {
     throw new Error('sessão: receita precisa expor PASSOS procedurais.');
@@ -59,12 +81,15 @@ export function processarMontagemSessao(montagemDefinicao, { catalogo = [] } = {
   };
 }
 
-export function processarPayloadSessao(payload) {
+export function processarPayloadSessao(payload, { lerNeutro = lerNeutroDaSessao } = {}) {
   if (!payload) throw new Error('sessão: payload vazio.');
 
   if (payload.receita) {
+    /* o neutro que a ativação executou, quando ela o gravou ao lado da sessão (`payload.neutro.arquivo`) */
+    const neutro = payload.neutro?.formato === FORMATO_DO_NEUTRO_EM_TEXTO ? lerNeutro(payload.neutro.arquivo) : null;
     return processarReceitaSessao(payload.receita, {
       nome: payload.alvo?.nome ?? payload.receita.meta?.nome ?? 'Peça Ativa',
+      neutro,
     });
   }
 

@@ -2,7 +2,9 @@
  * Uso, da raiz do repositório, um modo e uma peça por processo (o processo novo paga a importação como o comando paga):
  *   node --max-old-space-size=8192 <este arquivo> execucao <peça>    importar, executar passo a passo, copiar e serializar o estado
  *   node --max-old-space-size=8192 <este arquivo> descrever <peça>   as etapas do `descrever`, pelo andamento que ele já relata
- *   node --max-old-space-size=8192 <este arquivo> bancada <peça> [--zebra] [--com-cache]   as etapas de uma captura da bancada
+ *   node --max-old-space-size=8192 <este arquivo> bancada <peça> [--zebra] [--com-cache] [--antes]   as etapas de uma captura da bancada;
+ *                                                                    `--antes` a faz como antes da fatia 4 (a ativação sem o cache por
+ *                                                                    prefixo e a página executando a receita)
  *   node --max-old-space-size=8192 <este arquivo> laco <peça>        o `descrever` sem o cache por prefixo, com ele frio (grava), com ele
  *                                                                    depois de uma edição no fim (a receita sem o último passo) e com a
  *                                                                    receita repetida, numa pasta de cache temporária (fatia 4)
@@ -112,11 +114,14 @@ async function bancada() {
   }
   const marcas = [{ t: performance.now(), linha: 'bancada: antes da primeira etapa (ativar a sessão, que executa a receita no Node)' }];
   const { olharBancada } = await import('../../../../tools/modelar/olhar-bancada.mjs');
+  const { ativarReceitaBancada } = await import('../../../../tools/modelar/ativar-bancada.mjs');
+  const comoAntes = resto.includes('--antes');
   const r = await olharBancada({
     peca, vistas: zebra ? 'direita' : 'isometrica', ...(zebra ? { visao: 'zebra', enquadrar: true } : {}),
     auditoria: true,
     /* a página do quarto traseiro executa a receita por mais que o prazo padrão de 90 s por etapa, e a captura caía duas vezes nele */
     prazoDeCargaMs: 600_000,
+    ...(comoAntes ? { dependencias: { ativarReceitaBancada: (o) => ativarReceitaBancada({ ...o, cachePorPrefixo: false, estadoParaPagina: false }) } } : {}),
     aoProgredir: (linha) => marcas.push({ t: performance.now(), linha }), intervaloDoProgressoMs: 200,
   });
   const fim = performance.now();
@@ -126,7 +131,7 @@ async function bancada() {
     const etapa = m.linha.match(/ainda em '([^']+)'/)?.[1] ?? m.linha.replace(/^bancada: /, '').replace(/ \(.*$/, '').replace(/, \d+ s desde o começo$/, '');
     porEtapa.set(etapa, (porEtapa.get(etapa) ?? 0) + ((marcas[i + 1]?.t ?? fim) - m.t));
   });
-  return { ok: r?.ok ?? null, erro: r?.ok === false ? String(r?.erro?.message ?? r?.stderr ?? '').slice(0, 300) : undefined, zebra, comCache, apagados, etapas: [...porEtapa].map(([etapa, ms]) => ({ etapa, s: s(ms) })) };
+  return { ok: r?.ok ?? null, erro: r?.ok === false ? String(r?.erro?.message ?? r?.stderr ?? '').slice(0, 300) : undefined, zebra, comCache, comoAntes, apagados, etapas: [...porEtapa].map(([etapa, ms]) => ({ etapa, s: s(ms) })) };
 }
 
 async function laco() {

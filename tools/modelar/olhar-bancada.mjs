@@ -14,7 +14,8 @@ import { lerArgumentos } from './argumentos.mjs';
 import { ErroDeConfinamento, criarDiretorioConfinado, verificarCaminhoConfinado } from './caminho-confinado.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 import { iniciarRegistro } from './diario.mjs';
-import { ativarReceitaBancada } from './ativar-bancada.mjs';
+import { ativarReceitaBancada, arquivoDoNeutroDaSessao } from './ativar-bancada.mjs';
+import { memoriaDoHost } from '../../procedural/nucleo/planejador/armazem-em-pasta.mjs';
 import { paresIndistinguiveis } from '../../src/autoria/cor-de-auditoria.js';
 import { lerCorte, lerLadoDoCorte, normalizarCorte } from '../../src/autoria/corte-de-plano.js';
 import { VISTAS_BANCADA } from '../../src/autoria/vistas-da-bancada.js';
@@ -371,8 +372,11 @@ const rotuloDosContatos = (abs) => `contatos-${basename(abs).replace(/[^A-Za-z0-
 async function medirNoNode(caminho, { cache = true } = {}) {
   const moduloDaPeca = await importarReceita(caminho);
   const receitaDaPeca = receitaDoModulo(moduloDaPeca);
-  /* a execução que a ativação da bancada acabou de guardar serve aqui: a receita é executada uma vez só por captura */
-  const { neutro } = executarReceitaGuardada(caminho, receitaDaPeca, { cache }).executada;
+  /* a execução que a ativação da bancada acabou de guardar serve aqui: a receita é executada uma vez só por captura; sem ela, a execução
+     recomeça do estado que o cache por prefixo guardou (plano do cache por passo, fatia 4) */
+  let memoria = null;
+  try { memoria = memoriaDoHost({ rotulo: caminho }).memoria; } catch { memoria = null; }
+  const { neutro } = executarReceitaGuardada(caminho, receitaDaPeca, { cache, memoria }).executada;
   return contatosDaPeca(neutro, receitaDaPeca).naoDeclarados.map((item) => item.par);
 }
 
@@ -641,7 +645,7 @@ export async function abrirCapturaCompartilhada({ dependencias = {}, logger = nu
         const limpeza = await fecharRecursos({ browser, vite, pagina: this.pagina?.page ?? null, proprios: false });
         limpeza.push(...await fecharRecursos({ browser, vite }));
         this.pagina = null;
-        for (const { arquivo } of this.sessoes.values()) rmSync(arquivo, { force: true });
+        for (const { arquivo } of this.sessoes.values()) { rmSync(arquivo, { force: true }); rmSync(arquivoDoNeutroDaSessao(arquivo), { force: true }); }
         this.sessoes.clear();
         return limpeza;
       },
@@ -1594,7 +1598,7 @@ export async function olharBancada({
       ...limpezaForcada,
       ...await fecharRecursos({ browser, vite, pagina: deixarAberta ? null : page, proprios: !compartilhada }),
     ];
-    if (sessaoDaCaptura && !compartilhada) rmSync(sessaoDaCaptura, { force: true });
+    if (sessaoDaCaptura && !compartilhada) { rmSync(sessaoDaCaptura, { force: true }); rmSync(arquivoDoNeutroDaSessao(sessaoDaCaptura), { force: true }); }
     if (limpeza.length) {
       resposta ??= erroEstruturado({ relato, erro: new Error('A bancada falhou ao fechar seus recursos.') });
       resposta.ok = false;

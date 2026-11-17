@@ -1,9 +1,16 @@
 /* ativar-bancada.mjs — ativa qualquer peca ou montagem procedural na sessao ativa da bancada 3D. */
-import { copyFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { copyFileSync, existsSync, mkdirSync, renameSync, writeFileSync } from 'node:fs';
 import { dirname, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { caixasPorParte, portasPublicadas } from '../../src/autoria/descrever-partes.js';
 import { executarReceitaGuardada } from './entrada-de-medida.mjs';
+import { executarReceita } from '../../src/autoria/executar-receita.js';
+import { memoriaDoHost } from '../../procedural/nucleo/planejador/armazem-em-pasta.mjs';
+import { FORMATO_DO_NEUTRO_EM_TEXTO, neutroEmTexto } from '../../procedural/nucleo/planejador/neutro-em-texto.js';
+
+/* O arquivo do neutro executado, ao lado do arquivo da sessão de uma captura: `<sessão sem .json>.neutro.json`. Quem apaga a sessão apaga
+   este também. */
+export const arquivoDoNeutroDaSessao = (arquivoDaSessao) => arquivoDaSessao.replace(/\.json$/, '.neutro.json');
 import { lerArgumentos } from './argumentos.mjs';
 import { importarReceita } from './importar-receita.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
@@ -43,6 +50,12 @@ export async function ativarReceitaBancada({
    * ativação não a refaz quando nada mudou; `cache: false` (`--sem-cache`) executa de novo e regrava. Com `perfil` a receita já não é a do
    * arquivo, e a execução não passa pelo cache. */
   cache = true,
+  /* O CACHE POR PREFIXO (plano do cache por passo, fatia 4): a execução que não sai do cache da receita inteira recomeça do estado que
+   * o comando anterior guardou para o mesmo prefixo de passos (`tmp/cache-por-prefixo/`). `cachePorPrefixo: false` executa inteira. */
+  cachePorPrefixo = true,
+  /* O NEUTRO PARA A PÁGINA: com `arquivoDaSessao`, o neutro executado aqui é gravado ao lado da sessão e a página o lê em vez de executar
+   * a receita de novo. `estadoParaPagina: false` grava só a sessão, e a página executa. A `raiz` dos dois tem de ser a que a página serve. */
+  estadoParaPagina = true,
 } = {}) {
   if (!alvo) {
     throw new Error('Informe a receita (ex.: peca-de-prova ou --arquivo=<caminho.js>)');
@@ -75,9 +88,11 @@ export async function ativarReceitaBancada({
     ? { ...original, PARAMS: { ...original.PARAMS, perfil } }
     : original;
 
+  let memoria = null;
+  if (cachePorPrefixo) { try { memoria = memoriaDoHost({ rotulo: caminhoAbsoluto }).memoria; } catch { memoria = null; } }
   const { executada, doCache } = perfil
-    ? { executada: executarReceitaGuardada(caminhoAbsoluto, receita, { cache: false }).executada, doCache: false }
-    : executarReceitaGuardada(caminhoAbsoluto, receita, { cache });
+    ? { executada: executarReceitaGuardada(caminhoAbsoluto, receita, { cache: false, memoria }).executada, doCache: false }
+    : executarReceitaGuardada(caminhoAbsoluto, receita, { cache, memoria });
   const { neutro } = executada;
   const { caixas, facesSemParte } = caixasPorParte(neutro);
   const portas = portasPublicadas(neutro);
@@ -173,6 +188,22 @@ export async function ativarReceitaBancada({
 
   if (arquivoDaSessao) {
     mkdirSync(dirname(arquivoDaSessao), { recursive: true });
+    /* o neutro vai antes da sessão: quando a página lê a sessão, o arquivo que ela cita já está inteiro. O neutro que não se escreve
+       (dado que o texto não guarda) fica de fora, e a página executa a receita como antes. */
+    if (estadoParaPagina) {
+      try {
+        /* o neutro do cache da receita inteira (`tmp/cache-de-medida/`) volta da serialização sem os campos que o núcleo deixa fora da
+           enumeração (`origens`, `chapas`, `aberturas`...), que a página usa; nesse caso o neutro da página sai do cache por prefixo,
+           que recomeça do último ponto da mesma receita */
+        const daPagina = Object.getOwnPropertyDescriptor(neutro, 'origens') ? neutro : (memoria ? executarReceita(receita, { memoria }).neutro : null);
+        if (!daPagina) throw new Error('sem o neutro completo');
+        const destino = arquivoDoNeutroDaSessao(arquivoDaSessao);
+        const parcial = `${destino}.${process.pid}.parcial`;
+        writeFileSync(parcial, neutroEmTexto(daPagina), 'utf8');
+        renameSync(parcial, destino);
+        payload.neutro = { formato: FORMATO_DO_NEUTRO_EM_TEXTO, arquivo: relative(raizSessao, destino).replace(/\\/g, '/') };
+      } catch { /* sem o neutro, a página executa */ }
+    }
     writeFileSync(arquivoDaSessao, JSON.stringify(payload, null, 2), 'utf8');
   } else {
     mkdirSync(resolve(raizSessao, 'public'), { recursive: true });
