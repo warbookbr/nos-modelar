@@ -41,6 +41,9 @@ import {
   ErroEtapaDeConstrucao, atualizarRegistro, conferirPosteriores, fixarEtapa, juntasPorEtapa, lerAutorDaReabertura, proximaEtapa, reabrirEtapa,
 } from '../../src/autoria/etapas-de-construcao.js';
 import { interfaceNoMundo } from '../../src/autoria/posicao-por-porta.js';
+import {
+  VERSAO_REGISTRO_PELA_IMPRESSAO, acrescentarAceite, acrescentarReabertura, lerEtapas, registroVazio,
+} from '../../src/autoria/etapas-pela-impressao.js';
 import { proximaAcao } from '../../src/autoria/laco-de-modelagem.js';
 import { estadoDaAnalise } from './analise-da-peca.mjs';
 import { capturarMontagem } from './capturar-montagem.mjs';
@@ -148,7 +151,27 @@ function portasCitadasAgora(neutro, nomes) {
   }));
 }
 
-export async function estadoDasEtapas(arquivoMontagem, { receitas, anterior, impressoes } = {}) {
+/* A VERSÃO DO REGISTRO ESCOLHE O CAMINHO, e só ela. Sem registro, ou com um da versão 3, o estado sai da leitura pela impressão do
+   aceite (`etapas-pela-impressao.js`). Um registro da versão 1 ou 2 (o do acervo, até a migração da fatia 3 do plano das etapas pela
+   impressão) segue lido pelo caminho antigo, que grava o estado em cada etapa, e o comando avisa. */
+export const AVISO_DO_CAMINHO_ANTIGO = 'aviso: o registro de etapas é da versão anterior à impressão do aceite e este comando o lê pelo caminho antigo (estado gravado em cada etapa); a migração para a versão 3 é a fatia 3 do plano das etapas pela impressão do aceite.';
+export const registroPelaImpressao = (registro) => registro === null || registro === undefined || registro.versao === VERSAO_REGISTRO_PELA_IMPRESSAO;
+
+function lerRegistroDoDisco(arquivoMontagem) {
+  const arquivo = arquivoDoRegistro(arquivoMontagem);
+  return existsSync(arquivo) ? JSON.parse(readFileSync(arquivo, 'utf8')) : null;
+}
+
+export async function estadoDasEtapas(arquivoMontagem, { receitas, anterior, impressoes, avisar = () => {} } = {}) {
+  const registroAnterior = anterior !== undefined ? anterior : lerRegistroDoDisco(arquivoMontagem);
+  if (registroPelaImpressao(registroAnterior)) {
+    const medido = await medirAgora(arquivoMontagem, { receitas });
+    const registro = registroAnterior ?? registroVazio(medido.montagem);
+    const leitura = lerEtapas(registro, medido);
+    const portas = medido.portas;
+    return { montagem: lerMontagemPersistida(JSON.parse(readFileSync(arquivoMontagem, 'utf8'))), versao: VERSAO_REGISTRO_PELA_IMPRESSAO, registro, leitura, medido, anterior: registroAnterior, citacoes: medido.citacoes, portas };
+  }
+  avisar(AVISO_DO_CAMINHO_ANTIGO);
   const dado = JSON.parse(readFileSync(arquivoMontagem, 'utf8'));
   const montagem = lerMontagemPersistida(dado);
   const todas = receitas ?? await receitasDaMontagem(montagem);
@@ -169,10 +192,8 @@ export async function estadoDasEtapas(arquivoMontagem, { receitas, anterior, imp
   for (const medida of [...medidas, ...semGeometria]) {
     if (impressao[medida.instancia]) medida.textoDaReceita = impressao[medida.instancia];
   }
-  const registroAnterior = anterior !== undefined ? anterior
-    : existsSync(arquivoDoRegistro(arquivoMontagem)) ? JSON.parse(readFileSync(arquivoDoRegistro(arquivoMontagem), 'utf8')) : null;
   const portas = Object.fromEntries(medidas.filter((m) => m.portas).map((m) => [m.instancia, m.portas]));
-  return { montagem, registro: atualizarRegistro(montagem.id, [...medidas, ...semGeometria], registroAnterior, { citacoes }), anterior: registroAnterior, citacoes, portas };
+  return { montagem, versao: 2, registro: atualizarRegistro(montagem.id, [...medidas, ...semGeometria], registroAnterior, { citacoes }), anterior: registroAnterior, citacoes, portas };
 }
 
 /* O MEDIDO AGORA, para a leitura por impressão (`etapas-pela-impressao.js`): por etapa, a assinatura da forma, os parâmetros que a
@@ -234,9 +255,22 @@ export function conferirRodadasDaEtapa(montagem, instancia, rodadasDe = (ref) =>
   return [];
 }
 
-export async function fixar(arquivoMontagem, instancia, aceite, opcoes = {}) {
-  const { montagem, registro, citacoes, portas } = await estadoDasEtapas(arquivoMontagem, opcoes);
-  const proxima = proximaEtapa(registro);
+/* O aviso do `fixar`: as etapas depois da fixada que seguem quebradas. Aceitar a etapa não as refixa: cada uma quebrou pela própria
+   impressão, e só a reabertura dela seguida de um aceite novo a devolve. */
+function avisoDasPosterioresQuebradas(leitura, instancia) {
+  const indice = leitura.etapas.findIndex((e) => e.instancia === instancia);
+  const quebradas = leitura.etapas.slice(indice + 1).filter((e) => e.estado === 'quebrada');
+  return quebradas.length
+    ? `aviso: ${quebradas.map((e) => `'${e.instancia}'`).join(', ')} ${quebradas.length > 1 ? 'seguem quebradas' : 'segue quebrada'} depois deste aceite (${quebradas.map((e) => `${e.instancia}: ${e.motivo}`).join('; ')}); reabra cada uma, da primeira para a última, e aceite de novo.`
+    : null;
+}
+
+/* Fixa a etapa e devolve também a leitura de depois. A versão do registro escolhe o caminho: o novo só acrescenta o evento do aceite. */
+export async function fixarComLeitura(arquivoMontagem, instancia, aceite, opcoes = {}) {
+  const estado = await estadoDasEtapas(arquivoMontagem, opcoes);
+  const { montagem, registro, citacoes, portas } = estado;
+  const novo = estado.versao === VERSAO_REGISTRO_PELA_IMPRESSAO;
+  const proxima = novo ? estado.leitura.proxima : proximaEtapa(registro);
   /* A ordem é conferida antes das rodadas, para a mensagem apontar a etapa
      certa quando alguém tenta pular. */
   let defeitosAceitos = [];
@@ -247,16 +281,31 @@ export async function fixar(arquivoMontagem, instancia, aceite, opcoes = {}) {
      humano vale em qualquer ponto. 'feita' = manifesto com o hash da receita de agora. */
   const ref = montagem.instancias.find((item) => item.id === instancia)?.alvo.ref;
   const analise = ref ? estadoDaAnalise(ref, opcoes.analise ?? {}) : 'ausente';
-  return fixarEtapa(registro, instancia, { por: aceite?.por, observacao: aceite?.observacao, defeitosAceitos, analise }, { citacoes, portasAgora: portas });
+  const dado = { por: aceite?.por, observacao: aceite?.observacao, defeitosAceitos, analise };
+  if (!novo) return { registro: fixarEtapa(registro, instancia, dado, { citacoes, portasAgora: portas }), leitura: null, avisos: [] };
+  const aceito = acrescentarAceite(registro, estado.medido, instancia, dado);
+  const leitura = lerEtapas(aceito, estado.medido);
+  return { registro: aceito, leitura, avisos: [avisoDasPosterioresQuebradas(leitura, instancia)].filter(Boolean) };
 }
 
-/* Reabrir é decisão da pessoa, como o aceite humano: `por` traz
-   "<quem, data: motivo>" e nenhum agente reabre por conta própria. As etapas
-   posteriores ficam fixas quando provam que não mudaram (a forma e as portas
-   desta que elas citam); `provas` diz, de cada uma, o que provou. */
+export async function fixar(arquivoMontagem, instancia, aceite, opcoes = {}) {
+  const { registro, avisos } = await fixarComLeitura(arquivoMontagem, instancia, aceite, opcoes);
+  for (const aviso of avisos) (opcoes.avisar ?? (() => {}))(aviso);
+  return registro;
+}
+
+/* Reabrir é decisão da pessoa, como o aceite humano: `por` traz "<quem, data: motivo>" e nenhum agente reabre por conta própria.
+   No registro novo é só acrescentar o evento (sem medir: as posteriores seguem fixas enquanto a impressão delas for a do aceite, e
+   quebram pela própria impressão quando a porta que citam muda). No antigo, as posteriores ficam fixas quando provam que não
+   mudaram (a forma e as portas desta que elas citam); `provas` diz, de cada uma, o que provou. */
 export async function reabrir(arquivoMontagem, instancia, por, opcoes = {}) {
   const autor = lerAutorDaReabertura(por);
-  const { registro, anterior, citacoes, portas } = await estadoDasEtapas(arquivoMontagem, opcoes);
+  const anterior = opcoes.anterior !== undefined ? opcoes.anterior : lerRegistroDoDisco(arquivoMontagem);
+  if (registroPelaImpressao(anterior)) {
+    const registro = acrescentarReabertura(anterior ?? registroVazio(lerMontagemPersistida(JSON.parse(readFileSync(arquivoMontagem, 'utf8'))).id), instancia, autor);
+    return opcoes.comProvas ? { registro, provas: [] } : registro;
+  }
+  const { registro, citacoes, portas } = await estadoDasEtapas(arquivoMontagem, opcoes);
   const contexto = { citacoes, portasAgora: portas[instancia] ?? {}, anterior };
   const reaberto = reabrirEtapa(registro, instancia, autor, contexto);
   if (opcoes.comProvas) return { registro: reaberto, provas: conferirPosteriores(registro, instancia, contexto).provas };
@@ -423,7 +472,7 @@ const etapaOrdenada = (etapa) => Object.fromEntries([
 
 export function gravarRegistro(arquivoMontagem, registro) {
   const arquivo = arquivoDoRegistro(arquivoMontagem);
-  const texto = `${JSON.stringify({ ...registro, etapas: registro.etapas.map(etapaOrdenada) }, null, 2)}\n`;
+  const texto = `${JSON.stringify(registro.versao === VERSAO_REGISTRO_PELA_IMPRESSAO ? registro : { ...registro, etapas: registro.etapas.map(etapaOrdenada) }, null, 2)}\n`;
   if (existsSync(arquivo) && readFileSync(arquivo, 'utf8') === texto) return false;
   writeFileSync(arquivo, texto, 'utf8');
   return true;
@@ -447,24 +496,45 @@ export async function comoCLI(argv) {
     const { construidas, arquivos, foco } = await olharEtapas(caminho, { vistas: valor('--vistas')?.split(',').filter(Boolean), foco: valor('--foco') ?? null });
     return { codigo: 0, texto: `etapas desenhadas juntas: ${construidas.join(', ')}${foco ? `\nquadro na instância '${foco.join('/')}'` : ''}\n${arquivos.map((a) => `  ${a}`).join('\n')}` };
   }
+  const avisos = [];
+  const avisar = (texto) => { if (!avisos.includes(texto)) avisos.push(texto); };
+  const comAvisos = (texto) => (avisos.length ? `${avisos.join('\n')}\n${texto}` : texto);
+  /* O retrato do registro depois do comando: o novo é lido com o medido de agora; o antigo traz o estado gravado em cada etapa. */
+  const retrato = async (registro, pronta = null) => {
+    if (registro.versao === VERSAO_REGISTRO_PELA_IMPRESSAO) {
+      const leitura = pronta ?? (await estadoDasEtapas(caminho, { anterior: registro })).leitura;
+      const linhas = leitura.etapas.map((e) => `  ${e.estado.padEnd(14)} ${e.instancia}${e.motivo ? ` — ${e.motivo}` : ''}`).join('\n');
+      return { linhas, proxima: leitura.proxima };
+    }
+    return { linhas: descrever(registro), proxima: proximaEtapa(registro) };
+  };
   const reaberta = valor('--reabrir');
   if (reaberta) {
-    const { registro, provas } = await reabrir(caminho, reaberta, valor('--por'), { comProvas: true });
+    const { registro, provas } = await reabrir(caminho, reaberta, valor('--por'), { comProvas: true, avisar });
     gravarRegistro(caminho, registro);
-    const proxima = proximaEtapa(registro);
+    const { linhas, proxima } = await retrato(registro);
     const ficam = provas.length ? `\nposteriores que ficam fixas, e a prova de cada uma:\n${provas.map((p) => `  ${p}`).join('\n')}` : '';
-    return { codigo: 0, texto: `etapa '${reaberta}' reaberta.${ficam}\n${descrever(registro)}\npróxima etapa: ${proxima ? `${proxima.instancia} (${proxima.estado})` : 'nenhuma; todas fixas.'}` };
+    return { codigo: 0, texto: comAvisos(`etapa '${reaberta}' reaberta.${ficam}\n${linhas}\npróxima etapa: ${proxima ? `${proxima.instancia} (${proxima.estado})` : 'nenhuma; todas fixas.'}`) };
   }
   const instancia = valor('--fixar');
-  const registro = instancia
-    ? await fixar(caminho, instancia, { por: valor('--por'), observacao: valor('--observacao'), aceiteHumano: argv.includes('--aceite-humano') })
-    : (await estadoDasEtapas(caminho)).registro;
-  if (instancia) gravarRegistro(caminho, registro);
-  const proxima = proximaEtapa(registro);
+  let registro;
+  let pronta = null;
+  if (instancia) {
+    const feito = await fixarComLeitura(caminho, instancia, { por: valor('--por'), observacao: valor('--observacao'), aceiteHumano: argv.includes('--aceite-humano') }, { avisar });
+    feito.avisos.forEach(avisar);
+    registro = feito.registro;
+    pronta = feito.leitura;
+    gravarRegistro(caminho, registro);
+  } else {
+    const estado = await estadoDasEtapas(caminho, { avisar });
+    registro = estado.registro;
+    pronta = estado.leitura ?? null;
+  }
+  const { linhas, proxima } = await retrato(registro, pronta);
   return {
     codigo: 0,
-    texto: `${instancia ? `etapa '${instancia}' fixa.\n` : ''}${descrever(registro)}\n`
-      + `próxima etapa: ${proxima ? `${proxima.instancia} (${proxima.estado})` : 'nenhuma; todas fixas.'}`,
+    texto: comAvisos(`${instancia ? `etapa '${instancia}' fixa.\n` : ''}${linhas}\n`
+      + `próxima etapa: ${proxima ? `${proxima.instancia} (${proxima.estado})` : 'nenhuma; todas fixas.'}`),
   };
 }
 

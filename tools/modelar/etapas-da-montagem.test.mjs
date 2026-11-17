@@ -8,7 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { registrarRodada } from '../../src/autoria/laco-de-modelagem.js';
 import { ErroEtapaDeConstrucao } from '../../src/autoria/etapas-de-construcao.js';
-import { arquivoDoRegistro, auditarEtapas, comoCLI, descreverAuditoria, estadoDasEtapas, fixar, gravarRegistro, medirAgora, montagemAteAGeometria, olharEtapas, reabrir } from './etapas-da-montagem.mjs';
+import { AVISO_DO_CAMINHO_ANTIGO, arquivoDoRegistro, auditarEtapas, comoCLI, descreverAuditoria, estadoDasEtapas, fixar, gravarRegistro, medirAgora, montagemAteAGeometria, olharEtapas, reabrir } from './etapas-da-montagem.mjs';
 import {
   acrescentarAceite, acrescentarReabertura, avisosDaImpressao, diferencasDaImpressao, imprimirEtapa, lerEtapas, registroVazio,
 } from '../../src/autoria/etapas-pela-impressao.js';
@@ -16,6 +16,7 @@ import { receitaComParametros } from './peca-com-parametros.mjs';
 import { lerMontagemPersistida } from '../../src/autoria/ler-montagem-persistida.js';
 import { RECEITAS } from '../fixtures/tres-blocos-vinculados/receitas/bloco.js';
 
+const ANTIGO = { formato: 'mecanifica.registro-de-etapas', versao: 2, montagem: 'tres-blocos', etapas: [] };
 const ORIGEM = fileURLToPath(new URL('../fixtures/tres-blocos-vinculados/montagens/tres-blocos.json', import.meta.url));
 let area;
 let arquivo;
@@ -23,6 +24,9 @@ beforeEach(() => {
   area = mkdtempSync(join(tmpdir(), 'etapas-'));
   arquivo = join(area, 'tres-blocos.json');
   copyFileSync(ORIGEM, arquivo);
+  /* o registro da versão 2, vazio: os testes do caminho antigo (e os do acervo, até a migração) começam dele; a versão do registro é
+     o que escolhe o caminho, então sem ele o comando já usaria a leitura pela impressão */
+  writeFileSync(arquivoDoRegistro(arquivo), `${JSON.stringify(ANTIGO)}\n`);
 });
 afterEach(() => rmSync(area, { recursive: true, force: true }));
 
@@ -47,7 +51,7 @@ describe('etapas ainda sem geometria', () => {
   const comTopoVazio = () => ({ ...RECEITAS, 'bloco-com-furo': { ...RECEITAS['bloco-com-furo'], PASSOS: [] } });
 
   it('resolve até antes da primeira receita vazia e deixa as seguintes abertas sem junta', async () => {
-    const { registro } = await estadoDasEtapas(arquivo, { receitas: comTopoVazio(), anterior: null });
+    const { registro } = await estadoDasEtapas(arquivo, { receitas: comTopoVazio(), anterior: ANTIGO });
     expect(registro.etapas.map((e) => [e.instancia, e.estado, e.juntas.length])).toEqual([
       ['base', 'aberta', 0], ['meio', 'aberta', 1], ['topo', 'aberta', 0],
     ]);
@@ -55,7 +59,7 @@ describe('etapas ainda sem geometria', () => {
 
   it('a etapa sem geometria não pode ser fixada', async () => {
     const receitas = comTopoVazio();
-    let registro = await fixar(arquivo, 'base', aceite, { receitas, anterior: null, rodadasDe: todasFechadas });
+    let registro = await fixar(arquivo, 'base', aceite, { receitas, anterior: ANTIGO, rodadasDe: todasFechadas });
     registro = await fixar(arquivo, 'meio', aceite, { receitas, anterior: registro, rodadasDe: todasFechadas });
     await recusa(fixar(arquivo, 'topo', aceite, { receitas, anterior: registro, rodadasDe: () => [] }), 'etapa-sem-critico');
   });
@@ -63,22 +67,22 @@ describe('etapas ainda sem geometria', () => {
 
 describe('etapas da montagem em disco', () => {
   it('mostra as etapas abertas e aponta a primeira', async () => {
-    const { registro } = await estadoDasEtapas(arquivo, { receitas: RECEITAS, anterior: null });
+    const { registro } = await estadoDasEtapas(arquivo, { receitas: RECEITAS, anterior: ANTIGO });
     expect(registro.etapas.map((e) => e.estado)).toEqual(['aberta', 'aberta', 'aberta']);
     expect(registro.etapas[1].juntas[0]).toMatchObject({ relacao: 'meioNoPinoDaBase', satisfeita: true });
   });
 
   it('recusa fixar sem o crítico ter fechado a peça', async () => {
-    await recusa(fixar(arquivo, 'base', aceite, { receitas: RECEITAS, anterior: null, rodadasDe: () => [] }), 'etapa-sem-critico');
-    await recusa(fixar(arquivo, 'base', aceite, { receitas: RECEITAS, anterior: null, rodadasDe: (r) => [rodada(r, { fechada: false })] }), 'etapa-sem-critico');
+    await recusa(fixar(arquivo, 'base', aceite, { receitas: RECEITAS, anterior: ANTIGO, rodadasDe: () => [] }), 'etapa-sem-critico');
+    await recusa(fixar(arquivo, 'base', aceite, { receitas: RECEITAS, anterior: ANTIGO, rodadasDe: (r) => [rodada(r, { fechada: false })] }), 'etapa-sem-critico');
   });
 
   it('recusa fixar sem a nota de passagem', async () => {
-    await recusa(fixar(arquivo, 'base', aceite, { receitas: RECEITAS, anterior: null, rodadasDe: (r) => [rodada(r, { nota: null })] }), 'etapa-sem-nota');
+    await recusa(fixar(arquivo, 'base', aceite, { receitas: RECEITAS, anterior: ANTIGO, rodadasDe: (r) => [rodada(r, { nota: null })] }), 'etapa-sem-nota');
   });
 
   it('recusa fixar fora de ordem ou sem aceite, e fixa quando tudo está em dia', async () => {
-    const opcoes = { receitas: RECEITAS, anterior: null, rodadasDe: todasFechadas };
+    const opcoes = { receitas: RECEITAS, anterior: ANTIGO, rodadasDe: todasFechadas };
     await recusa(fixar(arquivo, 'meio', aceite, opcoes), 'etapa-fora-de-ordem');
     await recusa(fixar(arquivo, 'base', {}, opcoes), 'etapa-sem-aceite');
     const registro = await fixar(arquivo, 'base', aceite, opcoes);
@@ -96,7 +100,7 @@ describe('aceite humano com defeito em aberto', () => {
   })];
 
   it('no meio do laço, grava que o crítico não fechou junto dos defeitos', async () => {
-    const noMeio = { receitas: RECEITAS, anterior: null, rodadasDe: comDefeito, limiteDe: () => 6 };
+    const noMeio = { receitas: RECEITAS, anterior: ANTIGO, rodadasDe: comDefeito, limiteDe: () => 6 };
     await recusa(fixar(arquivo, 'base', aceite, noMeio), 'etapa-sem-critico');
     const registro = await fixar(arquivo, 'base', { ...aceite, aceiteHumano: true }, noMeio);
     const aceitos = registro.etapas[0].aceite.defeitosAceitos;
@@ -105,7 +109,7 @@ describe('aceite humano com defeito em aberto', () => {
   });
 
   it('com o laço parado, grava os defeitos aceitos', async () => {
-    const noMeio = { receitas: RECEITAS, anterior: null, rodadasDe: comDefeito, limiteDe: () => 6 };
+    const noMeio = { receitas: RECEITAS, anterior: ANTIGO, rodadasDe: comDefeito, limiteDe: () => 6 };
     const parado = { ...noMeio, limiteDe: () => 1 };
     await recusa(fixar(arquivo, 'base', aceite, parado), 'etapa-sem-critico');
     const registro = await fixar(arquivo, 'base', { ...aceite, aceiteHumano: true }, parado);
@@ -115,7 +119,7 @@ describe('aceite humano com defeito em aberto', () => {
 
 
 describe('reabrir etapa fixa', () => {
-  const opcoes = { receitas: RECEITAS, anterior: null, rodadasDe: todasFechadas };
+  const opcoes = { receitas: RECEITAS, anterior: ANTIGO, rodadasDe: todasFechadas };
   const POR = 'pessoa, 2026-09-26: refazer pelo desenho novo';
   async function duasFixas() {
     const r = await fixar(arquivo, 'base', { por: 'pessoa', observacao: 'ok' }, opcoes);
@@ -152,7 +156,7 @@ describe('reabrir com as posteriores fixas que provam não ter mudado', () => {
   const POR = 'pessoa, 2026-11-17: a base muda e o meio não';
   const comBase = (tabela) => ({ ...RECEITAS, 'bloco-com-pino': receitaComParametros(RECEITAS['bloco-com-pino'], tabela) });
   async function duasFixas() {
-    const r = await fixar(arquivo, 'base', aceite, { ...opcoes, anterior: null });
+    const r = await fixar(arquivo, 'base', aceite, { ...opcoes, anterior: ANTIGO });
     const d = await fixar(arquivo, 'meio', aceite, { ...opcoes, anterior: r });
     return fixar(arquivo, 'topo', aceite, { ...opcoes, anterior: d });
   }
@@ -310,7 +314,7 @@ describe('o registro gravado no meio do caminho', () => {
     .map((p) => ['publicarPorta', { ...p[1], nome: 'outro', interface: { ...p[1].interface, centro: [0, p[1].interface.centro[1] + 0.01, 0] } }])];
   const disco = () => JSON.parse(readFileSync(arquivoDoRegistro(arquivo), 'utf8'));
   async function tresFixas(receitas = RECEITAS) {
-    let r = await fixar(arquivo, 'base', aceite, { ...opcoes, receitas, anterior: null });
+    let r = await fixar(arquivo, 'base', aceite, { ...opcoes, receitas, anterior: ANTIGO });
     r = await fixar(arquivo, 'meio', aceite, { ...opcoes, receitas, anterior: r });
     return fixar(arquivo, 'topo', aceite, { ...opcoes, receitas, anterior: r });
   }
@@ -459,7 +463,7 @@ describe('o registro gravado no meio do caminho', () => {
 });
 
 describe('a etapa compara a forma que a receita gera, e não o texto', () => {
-  const opcoes = { receitas: RECEITAS, anterior: null, rodadasDe: todasFechadas };
+  const opcoes = { receitas: RECEITAS, anterior: ANTIGO, rodadasDe: todasFechadas };
   const comOutroTexto = { ...RECEITAS, 'bloco-com-pino': { ...RECEITAS['bloco-com-pino'], meta: { nome: 'outro nome', desc: 'comentário novo' }, PLANO: { criterios: ['critério novo'] } } };
   const comOutraForma = { ...RECEITAS, 'bloco-com-pino': receitaComParametros(RECEITAS['bloco-com-pino'], { raioDoCorpo: 31 }) };
 
@@ -482,7 +486,7 @@ describe('a etapa compara a forma que a receita gera, e não o texto', () => {
 
 describe('campo analise no aceite', () => {
   const opcoes = (manifesto) => ({
-    receitas: RECEITAS, anterior: null, rodadasDe: todasFechadas,
+    receitas: RECEITAS, anterior: ANTIGO, rodadasDe: todasFechadas,
     analise: { lerManifestoDe: () => manifesto, hashDe: () => 'hash-atual' },
   });
 
@@ -1363,3 +1367,87 @@ describe('a leitura pela impressão do aceite', () => {
     });
   });
 });
+
+/* A FATIA 2: `fixar` e `reabrir` só acrescentam eventos ao registro da versão 3, e a versão do registro escolhe o caminho. */
+describe('o registro da versão 3 pelos comandos', () => {
+  const opcoes = { receitas: RECEITAS, rodadasDe: todasFechadas };
+  const POR = 'pessoa, 2026-11-17: fatia 2';
+  const comTabela = (ref, tabela) => ({ ...RECEITAS, [ref]: receitaComParametros(RECEITAS[ref], tabela) });
+  const semRegistro = () => rmSync(arquivoDoRegistro(arquivo), { force: true });
+  const lido = async (extra = {}) => (await estadoDasEtapas(arquivo, { receitas: RECEITAS, ...extra })).leitura.etapas.map((e) => `${e.instancia}:${e.estado}`).join(' ');
+  const gravado = () => JSON.parse(readFileSync(arquivoDoRegistro(arquivo), 'utf8'));
+  async function tresFixasEmDisco() {
+    semRegistro();
+    for (const id of ['base', 'meio', 'topo']) gravarRegistro(arquivo, await fixar(arquivo, id, aceite, opcoes));
+  }
+
+  it('sem registro, o primeiro fixar cria o da versão 3, só com eventos, e o estado sai da leitura', async () => {
+    semRegistro();
+    const registro = await fixar(arquivo, 'base', aceite, opcoes);
+    gravarRegistro(arquivo, registro);
+    expect(Object.keys(gravado())).toEqual(['formato', 'versao', 'montagem', 'eventos']);
+    expect(gravado().versao).toBe(3);
+    expect(gravado().eventos.map((e) => [e.tipo, e.instancia])).toEqual([['aceite', 'base']]);
+    expect(await lido()).toBe('base:fixa meio:aberta topo:aberta');
+    const estado = await estadoDasEtapas(arquivo, { receitas: RECEITAS });
+    expect(estado.leitura.proxima.instancia).toBe('meio');
+  });
+
+  it('fixar na ordem, reabrir só acrescenta evento e as posteriores seguem fixas', async () => {
+    await tresFixasEmDisco();
+    expect(await lido()).toBe('base:fixa meio:fixa topo:fixa');
+    const antes = gravado();
+    const reaberto = await reabrir(arquivo, 'base', POR, { receitas: {} });
+    expect(reaberto.eventos.slice(0, 3)).toEqual(antes.eventos);
+    expect(reaberto.eventos.at(-1)).toEqual({ tipo: 'reabertura', instancia: 'base', por: 'pessoa', quando: '2026-11-17', motivo: 'fatia 2' });
+    gravarRegistro(arquivo, reaberto);
+    expect(await lido()).toBe('base:aberta meio:fixa topo:fixa');
+    await recusa(reabrir(arquivo, 'base', POR), 'etapa-nao-fixa');
+    await recusa(reabrir(arquivo, 'meio', 'sem data'), 'reabertura-sem-autor');
+  });
+
+  it('as recusas do fixar seguem: fora de ordem, sem o crítico e sem aceite', async () => {
+    semRegistro();
+    await recusa(fixar(arquivo, 'meio', aceite, opcoes), 'etapa-fora-de-ordem');
+    await recusa(fixar(arquivo, 'base', aceite, { receitas: RECEITAS, rodadasDe: () => [] }), 'etapa-sem-critico');
+    await recusa(fixar(arquivo, 'base', {}, opcoes), 'etapa-sem-aceite');
+  });
+
+  it('fixar a etapa com posteriores quebradas avisa, sem recusar, que elas seguem quebradas', async () => {
+    await tresFixasEmDisco();
+    gravarRegistro(arquivo, await reabrir(arquivo, 'base', POR));
+    const mudadas = comTabela('bloco-com-pino', { alturaDoPino: 18 });
+    const avisos = [];
+    const registro = await fixar(arquivo, 'base', aceite, { receitas: mudadas, rodadasDe: todasFechadas, avisar: (t) => avisos.push(t) });
+    expect(avisos).toHaveLength(1);
+    expect(avisos[0]).toMatch(/^aviso: 'meio' segue quebrada depois deste aceite \(meio: mudou depois do aceite: /);
+    expect(avisos[0]).toContain('reabra cada uma');
+    gravarRegistro(arquivo, registro);
+    expect(await lido({ receitas: mudadas })).toBe('base:fixa meio:quebrada topo:fixa');
+    /* sem posterior quebrada, nenhum aviso */
+    const limpos = [];
+    await tresFixasEmDisco();
+    gravarRegistro(arquivo, await reabrir(arquivo, 'topo', POR));
+    gravarRegistro(arquivo, await fixar(arquivo, 'topo', aceite, { ...opcoes, avisar: (t) => limpos.push(t) }));
+    expect(limpos).toEqual([]);
+  });
+
+  it('a versão do registro escolhe o caminho: o da versão 2 é lido pelo antigo e o comando avisa; o da 3 e a ausência, não', async () => {
+    const avisos = [];
+    const antigo = await estadoDasEtapas(arquivo, { receitas: RECEITAS, avisar: (t) => avisos.push(t) });
+    expect(antigo.versao).toBe(2);
+    expect(antigo.registro.etapas.map((e) => e.estado)).toEqual(['aberta', 'aberta', 'aberta']);
+    expect(avisos).toEqual([AVISO_DO_CAMINHO_ANTIGO]);
+    expect(AVISO_DO_CAMINHO_ANTIGO).toMatch(/caminho antigo/);
+    const fixou = await fixar(arquivo, 'base', aceite, { ...opcoes, anterior: undefined, avisar: (t) => avisos.push(t) });
+    expect(fixou.versao).toBe(2);
+    expect(avisos).toHaveLength(2);
+    semRegistro();
+    const novos = [];
+    const novo = await estadoDasEtapas(arquivo, { receitas: RECEITAS, avisar: (t) => novos.push(t) });
+    expect(novo.versao).toBe(3);
+    expect(novos).toEqual([]);
+    await expect(estadoDasEtapas(arquivo, { receitas: RECEITAS, anterior: { formato: 'mecanifica.registro-de-etapas', versao: 3, montagem: 'tres-blocos', eventos: 'x' } })).rejects.toMatchObject({ codigo: 'registro-invalido' });
+  });
+});
+
