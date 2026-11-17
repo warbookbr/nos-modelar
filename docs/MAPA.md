@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2102 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2104 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -313,6 +313,10 @@
 - `medir-conferencia-do-aviao.mjs` — medir-conferencia-do-aviao.mjs — a conferência de forma das sete partes do avião com `REFINA.esboco`, antes e depois de as formas do esboço virarem dado guar…
 - `medir-farol.mjs` — medir-farol.mjs — as medidas do gate 1 do plano esboço pelo núcleo: em cada opção do farol na chapa curva (`farol-na-chapa.esboco.mjs`), a borda de fora de c…
 - `mesa-com-variantes.js` — mesa-com-variantes — cópia de prova de `procedural/pecas/mesa-quadrada-escura/receita.js` para o gate 2 do plano esboço pelo núcleo: o mesmo código, com este…
+
+## docs/modelar/banco-de-provas/etapas-pela-impressao-2026-11-17/
+
+- `README.md` — Etapas pela impressão do aceite: provas
 
 ## docs/modelar/banco-de-provas/familias-de-desenho-2026-10-14/braco/
 
@@ -2343,6 +2347,7 @@
 - `dobras-aceitas.test.js` — dobras-aceitas.test.js — `PLANO.dobrasAceitas`: o normalizador recusa o que o campo não admite, o plano sem o campo mantém a forma canônica de antes, e a ace…
 - `encosto-da-peca.test.mjs` — encosto-da-peca.test.mjs — uma tolerância de "encosta" só para a peça, e a distância do par declarado que não acontece (atrito 5 do RECEITA.md do sedã).
 - `etapas-de-construcao.js` — etapas-de-construcao.js — o registro de cada etapa de uma montagem v5: a parte que entrou, as juntas que passaram a existir com ela e o resultado da medida d…
+- `etapas-pela-impressao.js` — etapas-pela-impressao.js — o estado de cada etapa de uma montagem v5 como função pura do registro de eventos e do medido agora.
 - `executar-receita-barras.test.mjs` — executar-receita-barras.test.mjs — a estruturaDeBarras na receita de peça: o tubo entre dois pontos, com as pontas fechadas pela operação.
 - `executar-receita.js` — executar-receita.js — fronteira pura para executar uma receita já carregada.
 - `familia-esboco.js` — familia-esboco.js — a conferência entre a família e o componente do esboço de mesmo nome (núcleo, sem disco).
