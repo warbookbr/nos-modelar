@@ -7,7 +7,8 @@
  * unidades: curvas e nós entram em mm; `pontos` sai em metro, para pôr em TOPO.
  * campos:
  *   curvas: [{ nome, pontos, fechada?, poligonal?, vinco?, peso?, exata?, passo?, continuidade? }] pontos são [x, y, z] ou o nome de um nó;
- *     continuidade: 'G1' | 'G2' declara a curva entre dois retalhos emenda lisa de tangente comum (G1) ou de curvatura igual (G2).
+ *     continuidade: 'G1' | 'G2' declara a curva entre dois retalhos emenda lisa de tangente comum (G1) ou de curvatura igual (G2, experimental:
+ *     muda a forma de toda superfície de dupla curvatura e sai com aviso).
  *   nos: { nome: [x, y, z] | { curva, fracao } } ponto nomeado onde curvas se encontram; o nó { curva, fracao } fica sobre uma curva.
  *   retalhos: [{ nome, borda, divisoes? }] borda são as curvas (ou { curva, de?, ate? }) que fecham o retalho, de três a oito lados.
  *   passo: espaçamento alvo da rede em mm, de onde saem as divisões que o retalho não declara.
@@ -22,6 +23,8 @@
  *   prefixo: texto posto na frente do nome de todo ponto.
  *   alisarCurvas: true | { energia?, rigidez?, tolerancia?, toleranciaPorCurva?, silhueta?, iteracoes?, curvas?, pontosDuros? } tira o ruído
  *     dos pontos-chave das curvas antes de montar a gaiola, com os nós fixos; tolerancia é o maior deslocamento em mm (1 por padrão).
+ *   limitesDaEmenda: { tolerancia?, toleranciaPorCurva?, angulo?, razao? } os limites da continuidade declarada, que dão aviso: o quanto a
+ *     declaração pode mover a gaiola (mm, 1 por padrão) e o ângulo (1 grau) e a razão de curvatura (1,5, na G2) medidos nela.
  * devolve: { pontos, passo, linha(curva), pontoDaCurva, linhas, nos, curvas, retalhos, densidades, extraordinarios, avisos, emendas?, ... }.
  * exemplo:
  *   gaiolaPorRede({ passo: 50, fora: [0, 1, 0], nos: { A: [0, 0, 0], B: [200, 0, 0], C: [200, 0, 200], D: [0, 0, 200] },
@@ -82,6 +85,8 @@
  *   nomes de nós que ficam canto vivo além dos achados. simetria: 'x', como em `gaiolaPorEstacoes`. prefixo: texto posto na frente dos nomes.
  * alisarCurvas: true | { energia, rigidez, tolerancia, toleranciaPorCurva, silhueta, iteracoes, curvas, pontosDuros }: o alisamento das curvas declaradas, descrito
  *   em O ALISAMENTO DAS CURVAS. Sem ele (o padrão), as curvas passam pelos pontos-chave como foram escritos.
+ * limitesDaEmenda: { tolerancia, toleranciaPorCurva: { curva: mm }, angulo, razao }: os limites da emenda declarada, descritos em A EMENDA
+ *   DECLARADA; vale só com uma curva com `continuidade`.
  *
  * O PREENCHIMENTO. Os pontos da borda de cada retalho são os das curvas, à mesma distância de arco um do outro em cada arco.
  * No retalho de quatro lados o interior é a interpolação transfinita de Coons: P(u, v) = (1-v) A(u) + v C(u) + (1-u) D(v) + u B(v)
@@ -133,29 +138,45 @@
  * curvas que terminam no nó da emenda, uma de cada lado, chegam a ele cada uma com a tangente da própria ponta (a do ponto refletido), e o
  * limite da subdivisão, exato na curva e de peso 1 no miolo, afunda alguns centésimos ao lado dela; a leitura de um lado só de
  * `continuidade-nas-emendas.mjs` acusa ali até 0,8 grau. Com `continuidade` na curva:
- *   - as curvas que terminam num nó dela (o ponto-chave escrito como nome, ou o nó { curva, fracao } sobre ela) e não são emendadas, quando
- *     são duas, viram o mesmo desvio abaixo de `anguloDeCanto` e o nó não está em `cantos`, se juntam: o trecho da ponta de cada uma usa o
- *     ponto-chave vizinho do nó na outra, como a Catmull-Rom de uma curva só pelos dois, e a tangente no nó é a mesma (`juncoes`); três ou
- *     mais saem em `emendaSemPar`, e a que dobra, em `emendaDobrada`, sem a junção;
+ *   - as curvas que terminam num nó dela (o ponto-chave escrito como nome, ou o nó { curva, fracao } sobre ela), emendadas ou não, se
+ *     casam aos pares pela direção com que saem do nó, do par mais reto ao mais dobrado, e o par que atravessa outra curva emendada (as
+ *     de baixo e de cima das chapas emendadas, ou duas curvas emendadas que se encontram ponta com ponta no nó de uma terceira) se junta
+ *     quando o desvio entre as duas fica abaixo de `anguloDeCanto` (ou dos 35 graus do padrão, com anguloDeCanto: false) e o nó não está
+ *     em `cantos`: o trecho da ponta de cada uma usa o ponto-chave vizinho do nó na outra, como a Catmull-Rom de uma curva só pelos dois,
+ *     e a tangente no nó é a mesma (`juncoes`). O desvio se confere pelos pontos-chave dados, e o vizinho que é nó { curva, fracao } entra
+ *     pela posição na curva dele; a que dobra sai em `emendaDobrada` e a que fica sem par, em `emendaSemPar`, sem a junção;
  *   - os pontos de dentro dos dois retalhos a até duas arestas da curva (a faixa) ganham a cota da curva (exata, ou o peso dela, se for
  *     maior que o do miolo);
  *   - no alisamento do miolo, a G1 tira do laplaciano, como o vinco, o ponto da curva que tem três fileiras de miolo livre de cada lado (cada
  *     lado guarda a curvatura dele; na faixa estreita entre duas curvas a curva fica no laplaciano, que é o que segura a fileira ali), e
  *     prende a inclinação dos dois lados uma à outra: a de cada lado é a da parábola pelo ponto da curva e pelas duas fileiras seguintes,
  *     exata em seção de curvatura constante, e o termo, na unidade do laplaciano, pesa 100 vezes uma aresta da variação; a G2 deixa a curva
- *     no laplaciano, pesa a variação mil vezes mais nas arestas da faixa (a curvatura fica a mesma dos dois lados e quase constante perto
- *     da curva) e põe o mesmo termo da tangente. A âncora do alisamento se mede sem esses pesos.
+ *     no laplaciano, pesa a variação mil vezes mais nas arestas da faixa e põe o mesmo termo da tangente. A âncora do alisamento se mede
+ *     sem esses pesos.
+ * A G2 É EXPERIMENTAL. O peso mil da variação na faixa (PESO_DA_CURVATURA) é o que muda a forma: ele quer a curvatura constante na faixa
+ * nas duas direções, e toda superfície de dupla curvatura sai do lugar, mesmo com a curvatura igual dos dois lados (no paraboloide de raio
+ * 0,6 m a gaiola anda 17,8 mm com o peso mil, 11,9 com 100, 3,4 com 10 e 0,5 com 1, o mesmo da G1; na chapa de prova `emenda-dupla`, 22,2 mm,
+ * e a curvatura lida troca de sinal), empurra o salto de curvatura para a borda da faixa e, na curva fechada, dobra faces. Por isso toda
+ * curva G2 sai com `emendaG2Experimental` em `avisos` e `experimental: true` em `emendas`, e a dobra que ela causa recusa a rede dizendo
+ * isso, em vez de mandar declarar liso: false, que a emenda não aceita. A formulação nova da G2 é da fatia 5 do plano.
  * Na chapa de prova de razão de curvatura 3 com G1, a leitura vai de 0,83 a 0,04 grau, e a superfície, a até 60 mm da emenda, fica a
- * 0,18 mm da desenhada (1,24 mm sem a declaração); na de curvatura igual com G2, de 0,39 a 0,03 grau com a razão 1, a 0,05 mm da
- * desenhada perto da emenda e a 0,25 no resto (0,10 sem a declaração), com a curvatura lida 6% abaixo da desenhada. A G2 numa emenda de
- * curvaturas diferentes muda a forma (5,5 mm na chapa de razão 3) e iguala a curvatura a mais de três espaçamentos das pontas; nas pontas a curva que atravessa a emenda traz o salto nos
- * pontos-chave dela, que a G2 não mexe, e a razão sobe até 1,6. O ponto da curva de valência diferente de 4 (de 3 na borda) é vértice
- * extraordinário, onde a subdivisão é no máximo G1: fica fora do termo da tangente, e na G2 sai em `emendaG2NoExtraordinario`. A curva
- * emendada precisa de um arco entre dois retalhos e do `liso` ligado. A saída ganha `emendas`, por curva: a continuidade, os lados, as
- * junções, os pontos com as duas fileiras, os que a parábola não descreve (`semMedida`: a seção sobe mais que meia distância, a fileira
- * entorta), os que só as curvas definem (`dasCurvas`: o cruzamento com outra curva, onde nenhuma fileira de um lado é miolo que se
- * move, e a tangente é a que as curvas dão), o tamanho da faixa, os extraordinários e, na gaiola alisada, o maior ângulo entre as tangentes dos dois lados e a maior razão
- * das curvaturas pela mesma parábola. Sem a declaração, nada muda.
+ * 0,18 mm da desenhada (1,24 mm sem a declaração); na de curvatura igual com G2, de 0,39 a 0,03 grau com a razão 1. Na de dupla
+ * curvatura com G1, de 1,39 a 0,38 grau, com a gaiola a 0,22 mm da que sai sem a declaração; na seção em S (inflexão na emenda) com G1,
+ * de 0,43 a 0,17 grau, e a superfície vai de 2,6 a 0,24 mm da desenhada. O ponto da curva de valência diferente de 4 (de 3 na borda) é
+ * vértice extraordinário, onde a subdivisão é no máximo G1: fica fora do termo da tangente, e na G2 sai em `emendaG2NoExtraordinario`. A
+ * curva emendada precisa de um arco entre dois retalhos e do `liso` ligado; a curva no plano de simetria (`simetria: 'x'`) é borda de um
+ * retalho só, e o outro lado dela é a metade espelhada, que a subdivisão emenda: ali a declaração é recusada dizendo isso.
+ * A saída ganha `emendas`, por curva: a continuidade (e `experimental` na G2), os lados, as junções, os pontos com as duas fileiras, os que
+ * a parábola não descreve (`semMedida`: a seção sobe mais que meia distância, a fileira entorta), os que só as curvas definem
+ * (`dasCurvas`: o cruzamento com outra curva, onde nenhuma fileira de um lado é miolo que se move, e a tangente é a que as curvas dão), os
+ * medidos (`medidos`), o tamanho da faixa, os extraordinários e, na gaiola alisada, o maior ângulo entre as tangentes dos dois lados e a
+ * razão das curvaturas pela mesma parábola, com sinal: a maior curvatura sobre a menor (com o piso de 0,1 1/m), negativa quando as duas
+ * têm sinais opostos (a inflexão, que a G2 não iguala), e a maior é a do maior salto relativo. Sem ponto medido, o ângulo e a razão saem
+ * null, com `emendaSemMedida` em `avisos`. A saída traz também o deslocamento que a declaração causa: a mesma rede sem a continuidade em
+ * curva nenhuma, montada com as mesmas divisões, é a referência, e o maior deslocamento dos pontos dos retalhos dos dois lados sai em
+ * `deslocamentoMaximoMm` (null se a referência não monta). Pelo padrão de `alisarCurvas`, `limitesDaEmenda` dá a tolerância desse
+ * deslocamento (1 mm, ou a da curva em `toleranciaPorCurva`), e a curva que passa dela sai com `emendaMoveu`; o ângulo acima de `angulo`
+ * (1 grau) e, na G2, a razão negativa ou acima de `razao` (1,5) saem com `emendaAcimaDoLimite`. Sem a declaração, nada muda.
  *
  * Os vértices extraordinários (valência diferente de 4 no interior, de 2 a 3 na borda) saem declarados, pelo nome, em `extraordinarios`:
  * os nós onde três ou cinco retalhos se encontram, os centros dos retalhos de n lados e o que a borda deixar.
@@ -179,7 +200,7 @@
  * curva (da fechada inteira, com o primeiro repetido no fim): é a linha que o `friso` percorre. Os nomes dos pontos de dentro de um arco
  * dependem da densidade, e por isso a receita não os cita: cita a curva, o nó ou o retalho. */
 
-import { alteracoesDaRede, assinaturaDaRede, divisoesFixadas, registrarGaiola } from './gaiola-captura.js';
+import { alteracoesDaRede, assinaturaDaRede, capturarGaiolas, comAlteracoesNaRede, comDivisoesFixas, divisoesFixadas, registrarGaiola } from './gaiola-captura.js';
 import { curvaCentripeta } from './gaiola-interpolada.js';
 import { extraordinarios as extraordinariosDa } from './gaiola-aneis.js';
 import { alisarMioloNaNormal, LONGE_DA_FILEIRA, INCLINACAO_DA_FILEIRA } from './gaiola-por-rede-liso.js';
@@ -213,6 +234,9 @@ const PESO_DA_TANGENTE = 100;
 const PESO_DA_CURVATURA = 1000;
 /* o piso da curvatura (1/m) na razão da emenda medida na gaiola, o mesmo de `continuidade-nas-emendas.mjs` */
 const PISO_DA_RAZAO = 0.1;
+/* os limites da emenda declarada (`limitesDaEmenda`): o deslocamento da gaiola pela declaração (mm, o padrão de `alisarCurvas`), e o
+   ângulo (graus) e a razão de curvatura medidos na gaiola, os limiares de `continuidade-nas-emendas.mjs` */
+const LIMITES_DA_EMENDA_PADRAO = Object.freeze({ tolerancia: 1, angulo: 1, razao: 1.5 });
 
 const citar = (n) => `'${n}'`;
 const lista = (nomes) => nomes.map(citar).join(', ');
@@ -421,56 +445,104 @@ function lerCurvasDeclaradas(curvas) {
 }
 
 /* AS JUNÇÕES DA EMENDA (`continuidade`). Em cada nó de uma curva emendada (o ponto-chave escrito como nome, e o nó dado por
-   { curva, fracao } sobre ela), as curvas que terminam ali e não são emendadas são as que atravessam a emenda, uma de cada lado. Quando
-   são duas, saem do nó em sentidos quase opostos (o desvio entre elas abaixo de `anguloDeCanto`) e o nó não está em `cantos`, as duas se
-   juntam: o trecho da ponta de cada uma usa o ponto-chave vizinho do nó na outra, e a tangente no nó é a mesma nas duas. Só a topologia
-   e os pontos dados por coordenada entram aqui; a posição dos pontos que são nó dado por { curva, fracao } não se confere, para não
-   fazer curva antes da hora. Devolve { pontas: Map curva -> { inicio?, fim? } (cada um { curva, inicio }: a outra curva e se a ponta dela
-   no nó é o começo), porEmenda: Map curva emendada -> [{ no, curvas }], avisos }. */
+   { curva, fracao } sobre ela), as curvas que terminam ali, emendadas ou não, se casam aos pares pela direção com que saem do nó: o par
+   que sai em sentidos quase opostos (o desvio abaixo de `anguloDeCanto`, ou dos 35 graus do padrão quando ele é false) vem primeiro, e
+   cada ponta entra num par só. O par se junta quando outra curva emendada passa pelo nó (as duas atravessam a emenda dela, uma de cada
+   lado, como as de baixo e de cima das chapas emendadas, ou duas curvas emendadas que se encontram ponta com ponta no nó de uma terceira)
+   e o nó não está em `cantos`: o trecho da ponta de cada uma usa o ponto-chave vizinho do nó na outra, e a tangente no nó é a mesma nas
+   duas. A direção sai dos pontos-chave dados, antes do alisamento das curvas e da junção; o nó dado por { curva, fracao } entra pela
+   posição na curva feita só com os pontos-chave dela, sem as junções. A curva que atravessa e fica sem par sai em `emendaDobrada` (as
+   duas que viram mais que o limite uma para a outra) ou em `emendaSemPar` (três ou mais). Devolve { pontas: Map curva -> { inicio?, fim? }
+   (cada um { curva, inicio }: a outra curva e se a ponta dela no nó é o começo), porEmenda: Map curva emendada -> [{ no, curvas }],
+   avisos }. */
 function juncoesDasEmendas(declaradas, nosDeclarados, cantosDeclarados, anguloDeCanto) {
   const pontas = new Map(); const porEmenda = new Map(); const avisos = [];
   const emendadas = [...declaradas.values()].filter((c) => c.continuidade != null);
   if (!emendadas.length) return { pontas, porEmenda, avisos };
-  const nomesEmendados = new Set(emendadas.map((c) => c.nome));
-  const coordenada = (p) => (typeof p !== 'string' ? p : nosDeclarados.get(p)?.tipo === 'ponto' ? nosDeclarados.get(p).p : null);
-  const feitos = new Map();
+  const limite = typeof anguloDeCanto === 'number' ? anguloDeCanto : ANGULO_DE_CANTO_PADRAO;
+  /* a posição provisória de um ponto-chave: a coordenada dada, o nó dado por coordenada, ou o nó { curva, fracao } na curva dos pontos-chave dados */
+  const provisorias = new Map(); const andando = new Set();
+  const posicao = (p) => {
+    if (typeof p !== 'string') return p;
+    if (provisorias.has(p)) return provisorias.get(p);
+    const d = nosDeclarados.get(p);
+    let r = null;
+    if (d?.tipo === 'ponto') r = d.p;
+    else if (d?.tipo === 'curva' && declaradas.has(d.curva) && !andando.has(p)) {
+      andando.add(p);
+      const c = declaradas.get(d.curva);
+      const chaves = c.pontos.map(posicao);
+      andando.delete(p);
+      if (chaves.every((q) => q !== null)) { try { r = criarCurva(d.curva, chaves, c.fechada, c.poligonal).em(d.fracao); } catch { r = null; } }
+    }
+    provisorias.set(p, r);
+    return r;
+  };
+  /* os nós de cada curva emendada e, de cada nó, as curvas emendadas que passam por ele */
+  const nosDa = new Map(); const emendadasNoNo = new Map();
   for (const e of emendadas) {
     const nosDela = [...new Set([...e.pontos.filter((p) => typeof p === 'string'), ...[...nosDeclarados].filter(([, d]) => d.tipo === 'curva' && d.curva === e.nome).map(([n]) => n)])];
-    const lista = [];
-    for (const no of nosDela) {
-      if (feitos.has(no)) { if (feitos.get(no)) lista.push(feitos.get(no)); continue; }
+    nosDa.set(e.nome, nosDela);
+    for (const no of nosDela) { if (!emendadasNoNo.has(no)) emendadasNoNo.set(no, new Set()); emendadasNoNo.get(no).add(e.nome); }
+  }
+  const juncoesDoNo = new Map();
+  for (const e of emendadas) {
+    for (const no of nosDa.get(e.nome)) {
+      if (juncoesDoNo.has(no)) continue;
+      const doNo = [];
+      juncoesDoNo.set(no, doNo);
       const terminam = [];
       for (const c of declaradas.values()) {
-        if (nomesEmendados.has(c.nome) || c.fechada || c.poligonal) continue;
+        if (c.fechada || c.poligonal) continue;
         if (c.pontos[0] === no) terminam.push({ curva: c.nome, inicio: true, vizinho: c.pontos[1] });
         if (c.pontos[c.pontos.length - 1] === no) terminam.push({ curva: c.nome, inicio: false, vizinho: c.pontos[c.pontos.length - 2] });
       }
-      let juncao = null;
-      if (terminam.length === 2 && terminam[0].curva !== terminam[1].curva) {
-        const [a, b] = terminam;
-        const pn = coordenada(no); const pa = coordenada(a.vizinho); const pb = coordenada(b.vizinho);
-        let desvio = null;
-        if (pn && pa && pb) {
-          const u = sub(pa, pn); const v = sub(pn, pb);
-          desvio = (Math.acos(Math.max(-1, Math.min(1, dot(u, v) / (norma(u) * norma(v) || 1)))) * 180) / Math.PI;
-        }
-        if (cantosDeclarados.has(no)) avisos.push({ ref: 'emendaNoCanto', curva: e.nome, no, texto: `a curva ${citar(e.nome)} declara continuidade ${citar(e.continuidade)}, mas o nó ${citar(no)} está em cantos: as curvas ${citar(a.curva)} e ${citar(b.curva)} ficam com o canto ali, sem a tangente comum` });
-        else if (desvio !== null && typeof anguloDeCanto === 'number' && desvio > anguloDeCanto) avisos.push({ ref: 'emendaDobrada', curva: e.nome, no, desvioGraus: Math.round(desvio * 10) / 10, texto: `no nó ${citar(no)} da curva emendada ${citar(e.nome)}, as curvas ${citar(a.curva)} e ${citar(b.curva)} viram ${br(desvio)} graus uma para a outra, acima de anguloDeCanto: ficam sem a tangente comum; se é dobra, a curva é vinco, e se não é, acerte os pontos-chave vizinhos do nó` });
-        else {
-          juncao = { no, curvas: [a.curva, b.curva] };
-          for (const [x, y] of [[a, b], [b, a]]) {
-            if (!pontas.has(x.curva)) pontas.set(x.curva, {});
-            pontas.get(x.curva)[x.inicio ? 'inicio' : 'fim'] = { curva: y.curva, inicio: y.inicio };
-          }
-        }
-      } else if (terminam.length > 2) {
-        avisos.push({ ref: 'emendaSemPar', curva: e.nome, no, curvas: terminam.map((t) => t.curva), texto: `no nó ${citar(no)} da curva emendada ${citar(e.nome)} terminam ${terminam.length} curvas (${terminam.map((t) => citar(t.curva)).join(', ')}); a tangente comum se põe entre duas, uma de cada lado, e ali nenhuma foi junta` });
+      const naEmenda = emendadasNoNo.get(no);
+      /* as que atravessam: as que terminam no nó e não são a própria curva emendada que acaba ali sem outra emendada que a cruze */
+      const atravessam = terminam.filter((t) => [...naEmenda].some((n) => n !== t.curva));
+      if (atravessam.length < 2) continue;
+      if (cantosDeclarados.has(no)) {
+        avisos.push({ ref: 'emendaNoCanto', curva: e.nome, no, texto: `a curva ${citar(e.nome)} declara continuidade ${citar(e.continuidade)}, mas o nó ${citar(no)} está em cantos: as curvas ${lista(atravessam.map((t) => t.curva))} ficam com o canto ali, sem a tangente comum` });
+        continue;
       }
-      feitos.set(no, juncao);
-      if (juncao) lista.push(juncao);
+      const pn = posicao(no);
+      const direcao = (t) => { const q = posicao(t.vizinho); if (!pn || !q) return null; const u = sub(q, pn); const l = norma(u); return l > 0 ? vezes(u, 1 / l) : null; };
+      for (const t of atravessam) t.dir = direcao(t);
+      /* os pares candidatos, do mais reto ao mais dobrado, e na mesma ordem sempre (a das curvas na definição) */
+      const pares = [];
+      for (let i = 0; i < atravessam.length; i++) for (let j = i + 1; j < atravessam.length; j++) {
+        const a = atravessam[i]; const b = atravessam[j];
+        if (a.curva === b.curva || !a.dir || !b.dir) continue;
+        /* o par se junta se outra emendada passa pelo nó: a emenda que as duas atravessam */
+        if (![...naEmenda].some((n) => n !== a.curva && n !== b.curva)) continue;
+        const desvio = (Math.acos(Math.max(-1, Math.min(1, -dot(a.dir, b.dir)))) * 180) / Math.PI;
+        pares.push({ a, b, desvio, ordem: pares.length });
+      }
+      pares.sort((x, y) => x.desvio - y.desvio || x.ordem - y.ordem);
+      const usadas = new Set();
+      for (const { a, b, desvio } of pares) {
+        if (usadas.has(a) || usadas.has(b) || desvio > limite) continue;
+        usadas.add(a); usadas.add(b);
+        doNo.push({ no, curvas: [a.curva, b.curva] });
+        for (const [x, y] of [[a, b], [b, a]]) {
+          if (!pontas.has(x.curva)) pontas.set(x.curva, {});
+          pontas.get(x.curva)[x.inicio ? 'inicio' : 'fim'] = { curva: y.curva, inicio: y.inicio };
+        }
+      }
+      /* a curva que atravessa e ficou sem par: a que não é emendada (a emendada que acaba no nó é a própria emenda, que segue por outra) */
+      const sobram = atravessam.filter((t) => !usadas.has(t) && !naEmenda.has(t.curva));
+      if (!sobram.length) continue;
+      const soltas = atravessam.filter((t) => !naEmenda.has(t.curva));
+      if (soltas.length === 2 && sobram.length === 2 && sobram[0].dir && sobram[1].dir) {
+        const [a, b] = sobram;
+        const desvio = (Math.acos(Math.max(-1, Math.min(1, -dot(a.dir, b.dir)))) * 180) / Math.PI;
+        avisos.push({ ref: 'emendaDobrada', curva: e.nome, no, desvioGraus: Math.round(desvio * 10) / 10, limiteGraus: limite, texto: `no nó ${citar(no)} da curva emendada ${citar(e.nome)}, as curvas ${citar(a.curva)} e ${citar(b.curva)} viram ${br(desvio)} graus uma para a outra, acima de ${typeof anguloDeCanto === 'number' ? 'anguloDeCanto' : `${br(limite)} graus (o padrão de anguloDeCanto, que vale na junção mesmo com anguloDeCanto: false)`}: ficam sem a tangente comum; se é dobra, a curva é vinco, e se não é, acerte os pontos-chave vizinhos do nó` });
+      } else if (soltas.length > 2 || sobram.length < soltas.length) {
+        avisos.push({ ref: 'emendaSemPar', curva: e.nome, no, curvas: sobram.map((t) => t.curva), texto: `no nó ${citar(no)} da curva emendada ${citar(e.nome)} terminam ${atravessam.length} curvas (${lista(atravessam.map((t) => t.curva))}); a tangente comum se põe entre duas que saem do nó em sentidos opostos, e ${sobram.length === 1 ? `a curva ${citar(sobram[0].curva)} ficou` : `as curvas ${lista(sobram.map((t) => t.curva))} ficaram`} sem par` });
+      }
     }
-    porEmenda.set(e.nome, lista);
   }
+  for (const e of emendadas) porEmenda.set(e.nome, nosDa.get(e.nome).flatMap((no) => (juncoesDoNo.get(no) ?? []).filter((j) => !j.curvas.includes(e.nome))));
   return { pontas, porEmenda, avisos };
 }
 
@@ -549,6 +621,37 @@ function lerAlisarCurvas(a, declaradas) {
     }
   }
   return { opcoes, curvas, pontosDuros: duros, tolerancias };
+}
+
+/* A opção `limitesDaEmenda`: { tolerancia, toleranciaPorCurva, angulo, razao }, sobre os padrões de LIMITES_DA_EMENDA_PADRAO. Devolve
+   { tolerancia, angulo, razao, tolerancias: Map curva -> mm }; vale só com uma curva com `continuidade`. */
+function lerLimitesDaEmenda(l, declaradas) {
+  const emendadas = [...declaradas.values()].filter((c) => c.continuidade != null).map((c) => c.nome);
+  if (l == null) return { ...LIMITES_DA_EMENDA_PADRAO, tolerancias: new Map() };
+  if (!emendadas.length) falha('limitesDaEmenda vale com a continuidade declarada, e nenhuma curva declara continuidade');
+  exigirCampos(l, ['tolerancia', 'toleranciaPorCurva', 'angulo', 'razao'], 'limitesDaEmenda');
+  const positivo = (v, onde) => { if (!(typeof v === 'number' && Number.isFinite(v) && v > 0)) falha(`limitesDaEmenda.${onde} é ${JSON.stringify(v)}; precisa ser número finito maior que zero`); return v; };
+  const r = { ...LIMITES_DA_EMENDA_PADRAO, tolerancias: new Map() };
+  if (l.tolerancia != null) r.tolerancia = positivo(l.tolerancia, 'tolerancia');
+  if (l.angulo != null) r.angulo = positivo(l.angulo, 'angulo');
+  if (l.razao != null) { r.razao = positivo(l.razao, 'razao'); if (r.razao < 1) falha(`limitesDaEmenda.razao é ${JSON.stringify(l.razao)}; a razão é a maior curvatura sobre a menor, de 1 para cima`); }
+  if (l.toleranciaPorCurva != null) {
+    if (!l.toleranciaPorCurva || typeof l.toleranciaPorCurva !== 'object' || Array.isArray(l.toleranciaPorCurva)) falha(`limitesDaEmenda.toleranciaPorCurva é ${JSON.stringify(l.toleranciaPorCurva)}; use { curva: mm }`);
+    for (const [n, v] of Object.entries(l.toleranciaPorCurva)) {
+      if (!emendadas.includes(n)) falha(`limitesDaEmenda.toleranciaPorCurva cita a curva ${citar(n)}, que não declara continuidade; as emendadas são ${lista(emendadas)}`);
+      r.tolerancias.set(n, positivo(v, `toleranciaPorCurva.${n}`));
+    }
+  }
+  return r;
+}
+
+/* a definição sem as coordenadas: a assinatura da rede, que fixa as divisões (`gaiola-captura.js`) e vai em `estrutura` */
+function semCoordenadasDa(definicao) {
+  return {
+    ...definicao,
+    curvas: definicao.curvas.map((c) => ({ ...c, pontos: c.pontos.map((p) => (typeof p === 'string' ? p : null)) })),
+    ...(definicao.nos ? { nos: Object.fromEntries(Object.entries(definicao.nos).map(([n, d]) => [n, Array.isArray(d) ? null : d])) } : {}),
+  };
 }
 
 /* ----------------------------------------------------------------- sistema */
@@ -679,7 +782,7 @@ export function gaiolaPorRede(definicaoDada) {
       retalhos: definicaoDada.retalhos.flatMap((r) => (r && alt.acrescentar?.retalhos?.[r.nome] ? alt.acrescentar.retalhos[r.nome] : [r])),
     }
     : definicaoDada;
-  exigirCampos(definicao, ['curvas', 'nos', 'retalhos', 'passo', 'anguloMax', 'fora', 'leitura', 'interior', 'liso', 'anguloDeCanto', 'cantos', 'simetria', 'prefixo', 'alisarCurvas'], 'a definição da rede');
+  exigirCampos(definicao, ['curvas', 'nos', 'retalhos', 'passo', 'anguloMax', 'fora', 'leitura', 'interior', 'liso', 'anguloDeCanto', 'cantos', 'simetria', 'prefixo', 'alisarCurvas', 'limitesDaEmenda'], 'a definição da rede');
   const { simetria = null, prefixo = '' } = definicao;
   if (simetria !== null && simetria !== 'x') falha("simetria só aceita 'x'");
   if (typeof prefixo !== 'string') falha('prefixo precisa ser texto');
@@ -706,6 +809,7 @@ export function gaiolaPorRede(definicaoDada) {
   const declaradas = lerCurvasDeclaradas(definicao.curvas);
   const nosDeclarados = lerNosDeclarados(definicao.nos, declaradas);
   const alisarCurvas = lerAlisarCurvas(definicao.alisarCurvas, declaradas);
+  const limitesDaEmenda = lerLimitesDaEmenda(definicao.limitesDaEmenda, declaradas);
   const cantosDeclarados = new Set(Array.isArray(definicao.cantos) ? definicao.cantos : []);
   const juncoes = juncoesDasEmendas(declaradas, nosDeclarados, cantosDeclarados, anguloDeCanto);
   const relatorioDoAlisamento = alisarCurvas ? new Map() : null;
@@ -1046,11 +1150,7 @@ export function gaiolaPorRede(definicaoDada) {
     }
   }
   const chaveDoArco = (a) => `${a.curva}:${a.de}>${a.ate}`;
-  const semCoordenadas = {
-    ...definicao,
-    curvas: definicao.curvas.map((c) => ({ ...c, pontos: c.pontos.map((p) => (typeof p === 'string' ? p : null)) })),
-    ...(definicao.nos ? { nos: Object.fromEntries(Object.entries(definicao.nos).map(([n, d]) => [n, Array.isArray(d) ? null : d])) } : {}),
-  };
+  const semCoordenadas = semCoordenadasDa(definicao);
   /* a ferramenta que mede o que um ponto-chave move fixa as divisões de cada arco e a posição relativa de cada ponto dentro do arco: a
      malha fica a mesma e os pontos acompanham a curva sem o deslize que o espaçamento por curvatura daria a cada milímetro movido */
   const fixas = divisoesFixadas(assinaturaDaRede(semCoordenadas));
@@ -1350,7 +1450,13 @@ export function gaiolaPorRede(definicaoDada) {
     if (tipo == null) continue;
     if (!liso) falha(`a curva ${citar(nome)} declara continuidade ${citar(tipo)} e a rede tem liso: false; a emenda se impõe no alisamento do miolo, que precisa ficar ligado`);
     const arcosDela = arcosDaCurva.get(nome).arcos.filter((a) => a.usos.length === 2);
-    if (!arcosDela.length) falha(`a curva ${citar(nome)} declara continuidade ${citar(tipo)}, mas nenhum arco dela é lado de dois retalhos; a emenda é a curva entre dois retalhos`);
+    if (!arcosDela.length) {
+      /* a curva no plano de simetria é borda de um retalho só: o outro lado é a metade espelhada */
+      const noPlano = simetria === 'x' && arcosDaCurva.get(nome).arcos.some((a) => a.usos.length === 1)
+        && arcosDaCurva.get(nome).arcos.filter((a) => a.usos.length === 1).every((a) => verticesDoArco.get(a.id).every((id) => Math.abs(posicao.get(id)[0]) < 1e-6));
+      if (noPlano) falha(`a curva ${citar(nome)} declara continuidade ${citar(tipo)}, mas fica no plano de simetria x = 0: o outro lado dela é a metade espelhada, que a subdivisão emenda pela simetria, e a continuidade declarada vale só na curva entre dois retalhos da rede; tire a declaração dela`);
+      falha(`a curva ${citar(nome)} declara continuidade ${citar(tipo)}, mas nenhum arco dela é lado de dois retalhos; a emenda é a curva entre dois retalhos`);
+    }
     const daCurva = new Set(); const aoLongo = new Map(); const lados = new Set();
     for (const a of arcosDela) {
       const ids = verticesDoArco.get(a.id);
@@ -1449,7 +1555,14 @@ export function gaiolaPorRede(definicaoDada) {
       const facesDele = facesDoRetalho.get(r2.nome);
       const media = facesDele.map(nf).reduce(soma, [0, 0, 0]);
       const dobradas = facesDele.filter((f) => dot(nf(f), media) <= 0);
-      if (dobradas.length) falha(`o alisamento do miolo dobrou ${dobradas.length} face(s) do retalho ${citar(r2.nome)}; as curvas dele pedem uma superfície que o preenchimento não segue; declare liso: false, ou ponha uma curva a mais dentro do retalho`);
+      if (dobradas.length) {
+        /* com a emenda declarada num lado do retalho, liso: false não vale: o remédio é a declaração */
+        const doLado = emendasDeclaradas.filter((e) => e.lados.has(r2.nome));
+        const g2 = doLado.filter((e) => e.tipo === 'G2');
+        if (g2.length) falha(`o alisamento do miolo dobrou ${dobradas.length} face(s) do retalho ${citar(r2.nome)}, com a continuidade 'G2' declarada ${g2.length === 1 ? 'na curva' : 'nas curvas'} ${lista(g2.map((e) => e.nome))}: a G2 é experimental, e o peso dela na faixa da emenda muda a forma de toda superfície de dupla curvatura, aqui até dobrar faces; declare 'G1' ou tire a declaração`);
+        if (doLado.length) falha(`o alisamento do miolo dobrou ${dobradas.length} face(s) do retalho ${citar(r2.nome)}, com a continuidade declarada ${doLado.length === 1 ? 'na curva' : 'nas curvas'} ${lista(doLado.map((e) => e.nome))}; as curvas dele pedem uma superfície que o preenchimento não segue: ponha uma curva a mais dentro do retalho, ou tire a declaração (liso: false não vale com ela)`);
+        falha(`o alisamento do miolo dobrou ${dobradas.length} face(s) do retalho ${citar(r2.nome)}; as curvas dele pedem uma superfície que o preenchimento não segue; declare liso: false, ou ponha uma curva a mais dentro do retalho`);
+      }
     }
   }
 
@@ -1544,8 +1657,20 @@ export function gaiolaPorRede(definicaoDada) {
   /* ---- a emenda declarada, medida na gaiola: o ângulo entre as tangentes dos dois lados e a razão das curvaturas, pela parábola de cada lado
      (a mesma de `termosDaTangente`), em cada ponto da curva com as duas fileiras ---- */
   const emendasSaida = {};
+  /* O que a declaração move: a mesma rede sem a continuidade em curva nenhuma, montada com as divisões desta (a mesma malha), fora da
+     captura e das alterações de teste. A diferença por ponto, nos retalhos dos dois lados de cada curva emendada, é o deslocamento da
+     forma; a rede sem a declaração que não monta deixa o deslocamento sem medida (null). */
+  let semDeclaracao = null;
+  if (emendasDeclaradas.length) {
+    const { limitesDaEmenda: _limites, ...resto } = definicao;
+    const referencia = { ...resto, curvas: definicao.curvas.map(({ continuidade: _c, ...c }) => c) };
+    const fixacaoDaReferencia = { divisoes: Object.fromEntries(usados.map((a) => [chaveDoArco(a), a.n])), fracoes: Object.fromEntries([...fracaoDoVertice].map(([id, v]) => [id, v.noArco])) };
+    try {
+      semDeclaracao = comAlteracoesNaRede(null, () => capturarGaiolas(() => comDivisoesFixas(new Map([[assinaturaDaRede(semCoordenadasDa(referencia)), fixacaoDaReferencia]]), () => gaiolaPorRede(referencia))).resultado);
+    } catch { semDeclaracao = null; }
+  }
   for (const e of emendasDeclaradas) {
-    let anguloMaximo = 0; let razaoMaxima = 1; let ondeAngulo = null; let ondeRazao = null; let semMedida = 0; let dasCurvas = 0;
+    let anguloMaximo = null; let razaoMaxima = null; let saltoMaximo = -1; let ondeAngulo = null; let ondeRazao = null; let semMedida = 0; let dasCurvas = 0; let medidos = 0;
     for (const { c, lados } of e.fileiras) {
       /* o ponto em que nenhuma fileira de um lado é miolo que o alisamento move (o cruzamento com outra curva, a faixa sem miolo) tem a
          tangente que as curvas dão: fica fora do máximo e se conta em `dasCurvas` */
@@ -1565,11 +1690,17 @@ export function gaiolaPorRede(definicaoDada) {
         return { s: (g1.f * g2.d * g2.d - g2.f * g1.d * g1.d) / den, k: (2 * (g2.f * g1.d - g1.f * g2.d)) / den };
       });
       if (doLado.some((x) => x === null)) { semMedida += 1; continue; }
+      medidos += 1;
       const angulo = Math.abs(Math.atan(doLado[0].s) + Math.atan(doLado[1].s)) * 180 / Math.PI;
-      const [ka, kb] = doLado.map((x) => Math.abs(x.k) * MM);
-      const razao = Math.max(ka, kb) / Math.max(Math.min(ka, kb), PISO_DA_RAZAO);
-      if (angulo > anguloMaximo) { anguloMaximo = angulo; ondeAngulo = c; }
-      if (razao > razaoMaxima) { razaoMaxima = razao; ondeRazao = c; }
+      /* a razão com sinal: a maior curvatura sobre a menor (com o piso), negativa quando as duas, acima do piso, têm sinais opostos (a
+         inflexão na emenda). A maior é a do maior salto relativo, a diferença das curvaturas com sinal sobre a menor */
+      const [ka, kb] = doLado.map((x) => x.k * MM);
+      const menor = Math.max(Math.min(Math.abs(ka), Math.abs(kb)), PISO_DA_RAZAO);
+      const oposta = Math.min(Math.abs(ka), Math.abs(kb)) >= PISO_DA_RAZAO && ka * kb < 0;
+      const razao = (oposta ? -1 : 1) * (Math.max(Math.abs(ka), Math.abs(kb)) / menor);
+      const salto = oposta ? Math.abs(razao) + 1 : razao - 1;
+      if (anguloMaximo === null || angulo > anguloMaximo) { anguloMaximo = angulo; ondeAngulo = c; }
+      if (salto > saltoMaximo) { saltoMaximo = salto; razaoMaxima = razao; ondeRazao = c; }
     }
     if (e.tipo === 'G2' && e.extraordinarios.length) {
       avisos.push({
@@ -1577,10 +1708,57 @@ export function gaiolaPorRede(definicaoDada) {
         texto: `a curva ${citar(e.nome)} declara continuidade 'G2' e passa por ${e.extraordinarios.length === 1 ? 'um vértice extraordinário' : `${e.extraordinarios.length} vértices extraordinários`} (${lista(e.extraordinarios.slice(0, 6))}): ali a subdivisão é no máximo G1, e a curvatura não fica igual dos dois lados; tire o vértice extraordinário da curva (o nó onde três ou cinco retalhos se encontram, o centro de um retalho de n lados), se a emenda pede G2 ali`,
       });
     }
+    /* o deslocamento da forma pela declaração, nos pontos das faces dos retalhos dos dois lados */
+    let deslocamento = null; let ondeDeslocamento = null;
+    if (semDeclaracao) {
+      deslocamento = 0;
+      const vistos = new Set();
+      for (const r of [...e.lados].sort()) for (const f of facesDoRetalho.get(r)) for (const id of f) {
+        if (vistos.has(id)) continue;
+        vistos.add(id);
+        const q = semDeclaracao.pontos[id];
+        if (!q) continue;
+        const d = norma(sub(pontos[id], q)) * MM;
+        if (d > deslocamento) { deslocamento = d; ondeDeslocamento = id; }
+      }
+    }
+    const tolerancia = limitesDaEmenda.tolerancias.get(e.nome) ?? limitesDaEmenda.tolerancia;
+    const g2 = e.tipo === 'G2';
+    if (g2) {
+      avisos.push({
+        ref: 'emendaG2Experimental', curva: e.nome,
+        texto: `a curva ${citar(e.nome)} declara continuidade 'G2', que é experimental: o peso da variação na faixa da emenda muda a forma de toda superfície de dupla curvatura, mesmo com a curvatura igual dos dois lados (17,8 mm no paraboloide de raio 0,6 m da chapa de prova), empurra o salto de curvatura para a borda da faixa e, numa curva fechada, dobra faces; use a G1, que põe a tangente comum e deixa a curvatura de cada lado, e confira a forma na bancada se ficar com a G2`,
+      });
+    }
+    if (deslocamento !== null && deslocamento > tolerancia) {
+      avisos.push({
+        ref: 'emendaMoveu', curva: e.nome, continuidade: e.tipo, deslocamentoMaximoMm: Math.round(deslocamento * 1000) / 1000, ponto: ondeDeslocamento, toleranciaMm: tolerancia,
+        texto: `a continuidade ${citar(e.tipo)} declarada na curva ${citar(e.nome)} move a gaiola dos retalhos ${lista([...e.lados].sort())} até ${br(deslocamento)} mm do que ela é sem a declaração (no ponto ${citar(ondeDeslocamento)}), acima da tolerância de ${br(tolerancia)} mm de limitesDaEmenda; ${g2 ? 'a G2 é experimental, e a G1 move bem menos; ' : ''}confira a forma na bancada e, se é a que se quer, declare a tolerância dela em limitesDaEmenda.toleranciaPorCurva, e se não é, tire a declaração ou acerte as curvas dos dois lados`,
+      });
+    }
+    if (medidos === 0) {
+      avisos.push({
+        ref: 'emendaSemMedida', curva: e.nome, continuidade: e.tipo, pontos: e.fileiras.length, semMedida, dasCurvas,
+        texto: `a continuidade ${citar(e.tipo)} da curva ${citar(e.nome)} não se mediu na gaiola: nenhum ponto dela tem as duas fileiras de miolo que o alisamento move (${e.fileiras.length} com as fileiras, ${dasCurvas} que só as curvas definem, ${semMedida} que a parábola não descreve); o ângulo e a razão saem null, e a emenda se confere na superfície, com npm run emendas`,
+      });
+    } else {
+      const acima = [];
+      if (anguloMaximo > limitesDaEmenda.angulo) acima.push(`o ângulo entre as tangentes chega a ${br(anguloMaximo)} graus (no ponto ${citar(ondeAngulo)}), acima de ${br(limitesDaEmenda.angulo)}`);
+      if (g2 && (razaoMaxima < 0 || razaoMaxima > limitesDaEmenda.razao)) acima.push(razaoMaxima < 0 ? `a curvatura troca de sinal na emenda (a razão com sinal é ${br(razaoMaxima)}, no ponto ${citar(ondeRazao)}), o que a G2 não iguala` : `a razão das curvaturas chega a ${br(razaoMaxima)} (no ponto ${citar(ondeRazao)}), acima de ${br(limitesDaEmenda.razao)}`);
+      if (acima.length) {
+        avisos.push({
+          ref: 'emendaAcimaDoLimite', curva: e.nome, continuidade: e.tipo, anguloMaximoGraus: Math.round(anguloMaximo * 1000) / 1000, razaoMaxima: Math.round(razaoMaxima * 1000) / 1000, limiteAnguloGraus: limitesDaEmenda.angulo, ...(g2 ? { limiteRazao: limitesDaEmenda.razao } : {}),
+          texto: `a continuidade ${citar(e.tipo)} declarada na curva ${citar(e.nome)} não se cumpre na gaiola: ${acima.join(', e ')} (limitesDaEmenda); confira os pontos-chave das curvas que atravessam a emenda perto desse ponto, ou a faixa estreita entre duas curvas, onde o termo da tangente não alcança`,
+        });
+      }
+    }
     emendasSaida[e.nome] = {
-      continuidade: e.tipo, lados: [...e.lados].sort(), juncoes: juncoes.porEmenda.get(e.nome) ?? [], pontos: e.fileiras.length, semMedida, dasCurvas, faixa: e.faixa.size,
+      continuidade: e.tipo, ...(g2 ? { experimental: true } : {}), lados: [...e.lados].sort(), juncoes: juncoes.porEmenda.get(e.nome) ?? [], pontos: e.fileiras.length, semMedida, dasCurvas, faixa: e.faixa.size,
       extraordinarios: [...e.extraordinarios].sort(),
-      anguloMaximoGraus: Math.round(anguloMaximo * 1000) / 1000, pontoDoAngulo: ondeAngulo, razaoMaxima: Math.round(razaoMaxima * 1000) / 1000, pontoDaRazao: ondeRazao,
+      medidos, anguloMaximoGraus: anguloMaximo === null ? null : Math.round(anguloMaximo * 1000) / 1000, pontoDoAngulo: ondeAngulo,
+      razaoMaxima: razaoMaxima === null ? null : Math.round(razaoMaxima * 1000) / 1000, pontoDaRazao: ondeRazao,
+      deslocamentoMaximoMm: deslocamento === null ? null : Math.round(deslocamento * 1000) / 1000, pontoDoDeslocamento: ondeDeslocamento, toleranciaMm: tolerancia,
+      limiteAnguloGraus: limitesDaEmenda.angulo, ...(g2 ? { limiteRazao: limitesDaEmenda.razao } : {}),
     };
   }
 
