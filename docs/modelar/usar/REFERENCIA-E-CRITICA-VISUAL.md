@@ -51,6 +51,17 @@ menor), `ausencia` (faltando), `uniao` (afastado, atravessando), `superficie`
 `src/autoria/veredito-de-forma.js` recusa o que sair disso. O veredito é achado,
 nunca aprovação: quem aprova forma é a pessoa.
 
+No laço de uma peça vai o pedido por perguntas fechadas que o mesmo comando grava,
+nas duas ordens: um crítico recebe `pedido-fechado-a.md` e outro
+`pedido-fechado-b.md`, cada um sem a história, e
+`node tools/modelar/vistas-para-critica.mjs --juntar=<pasta da rodada> <resposta A> <resposta B>`
+dá a nota da rodada pela regra escrita no pedido; a pergunta que muda entre as
+ordens sai como não verificável e tira metade do peso, sem virar defeito inteiro.
+A nota variou 0,6 assim, contra 1 com o `pedido.md`, na mesma imagem repetida.
+Até o `--registrar` ler o par, registra-se a resposta da ordem A como veio, com a
+nota das duas ordens em `--atrito`, e a rodada que uma nota fecha e a outra não
+vai à pessoa.
+
 A rodada fecha com nota 8 ou mais e nenhum defeito. No laço de uma peça
 (`rodada-de-modelagem`), o limite é de 6 rodadas, e o laço para antes se 3
 rodadas seguidas não reduzem os defeitos; passar disso é decisão da pessoa,

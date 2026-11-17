@@ -109,20 +109,19 @@ O que o `descrever` cobra de contato vem da receita: `contatos` lista os pares q
 
 Cada imagem responde uma pergunta: `--modo=isolar` para a superfície,
 `--modo=contexto` para caber e encaixar, `--par a,b` para uma junta, e todas as
-partes para a leitura geral. A bancada serve para
-investigar; o pacote que vai ao crítico sai de `npm run vistas:critica`.
+partes para a leitura geral. A bancada investiga; o pacote do crítico sai de
+`npm run vistas:critica`.
 
 `npm run malha:conferir -- <peça>` pega fechamento e face de área nula, e
-`npm run conferir:referencia` mede a borda da peça contra a foto quando não há
-prancha.
+`npm run conferir:referencia` mede a borda contra a foto. Prancha modelo e foto,
+recusas, saída, cópia de parte repetida e crítico em duas ordens:
+[`comparar-com-a-referencia.md`](references/comparar-com-a-referencia.md).
 
 De perto, `--mirar=x,y,z` em vez de recortar captura de 3.200 px; só a chapa, com `npm run vista:rapida -- <peça> --vista=<vista> --saida=<png> --ate-passo=N`; `--sem-contatos` se só se quer a imagem; mais em [`PARE-E-ANALISE.md`](../../../docs/modelar/usar/PARE-E-ANALISE.md#olhar-de-perto-sem-recortar-captura).
 
-`porteiro` permanece diagnóstico da bancada; não substitui a descrição nem as
-vistas da bancada.
+`porteiro` permanece diagnóstico da bancada e não substitui a descrição nem as vistas.
 
-O laço visual (olhar o PNG, sobrepor ao alvo, despachar o crítico sem contexto)
-mora em [`LACO-VISUAL.md`](../../../docs/modelar/usar/LACO-VISUAL.md).
+O laço visual (olhar o PNG, sobrepor ao alvo, despachar o crítico cego) mora em [`LACO-VISUAL.md`](../../../docs/modelar/usar/LACO-VISUAL.md).
 
 ## Consulta
 

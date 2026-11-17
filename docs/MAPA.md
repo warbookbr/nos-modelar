@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2048 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2049 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -57,6 +57,7 @@
 
 ## .claude/skills/criar-peca/references/
 
+- `comparar-com-a-referencia.md` — Comparar com a referência por comando
 - `operacoes-procedurais.md` — Referência de operações procedurais
 - `por-que.md` — Por que cada regra da skill `criar-peca` existe
 - `referencia-e-rodadas.md` — Referência por medida e rodadas fora do laço
