@@ -62,7 +62,7 @@ Resolver a gaiola inteira por energia (Halstead, Kass e DeRose, 1993): ADIAR, s�
 
 1. Feita: as chapas de prova e a linha de base medida (índice, pente, emendas, G2 por região), incluindo o quarto traseiro da rodada 2.
 2. Feita: o corte com simetria e a costura em x 0 exato (opções `costuraExata` da subdivisão e `simetria` da abertura, sem mudar o acervo), que destrava a rodada 3 mais cedo.
-3. Feita: o alisamento das curvas declaradas (`alisarCurvas` em `gaiolaPorRede`, curva de variação mínima linearizada com os pontos duros fixos e o deslocamento limitado).
+3. Feita: o alisamento das curvas declaradas (`alisarCurvas` em `gaiolaPorRede`, energia pelo resíduo do ajuste polinomial local, com os pontos duros fixos, o deslocamento limitado por curva e aviso na curva que anda), depois de três revisões adversariais; o limite aceito é a feição na escala do espaçamento dos pontos e o canto a menos de 20 tolerâncias de outro ou da ponta, que arredondam até a tolerância e se resolvem com o ponto declarado como nó em `cantos`; achar o canto pela forma fica para a fatia 4.
 4. A emenda com continuidade declarada.
 5. A medida do G2 alcançável e a decisão da pessoa sobre o caminho.
 6. Revisão adversarial, documentação e fechamento.
