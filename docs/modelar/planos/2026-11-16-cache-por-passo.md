@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/nucleo/planejador/`, `procedural/nucleo/nucleo.js`, `tools/modelar/descrever-peca.mjs`, `src/bancada/carregar-peca.js`, `docs/modelar/banco-de-provas/cache-por-passo-2026-11-16/`; o `descrever-peca.mjs` foi emprestado em 2026-11-17, por decisão da pessoa, ao plano de comparar com a referência só para a opção recusas, um ramo logo depois de executar a receita
+**Território:** `procedural/nucleo/planejador/`, `procedural/nucleo/nucleo.js`, `tools/modelar/descrever-peca.mjs`, `src/bancada/carregar-peca.js`, `docs/modelar/banco-de-provas/cache-por-passo-2026-11-16/`; e, por empréstimo pedido por quem conduz em 2026-11-17 (nenhum plano ativo o tem), `procedural/nucleo/memoria-de-pura.js` e o teste dele, só para a chave exata distinguir o buraco de uma lista; o `descrever-peca.mjs` foi emprestado em 2026-11-17, por decisão da pessoa, ao plano de comparar com a referência só para a opção recusas, um ramo logo depois de executar a receita
 
 Ativado em 2026-11-16 no fechamento do cordão de solda, como a pessoa decidiu. O plano do reflexo fechou, e `src/bancada/carregar-peca.js`, onde a página da bancada executa a receita, entrou no território em 2026-11-17 para a fatia 4. `tools/modelar/olhar-bancada.mjs`, onde a captura usaria o cache, é do plano de comparar com a referência, que deve fechar antes da fatia 4; se não fechar, ele vem por empréstimo pedido a quem conduz.
 

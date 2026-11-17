@@ -1,6 +1,6 @@
 /* memoria-de-pura.test.mjs — a memória das últimas chamadas de uma função pura devolve o que a função devolveria, sem refazer a conta. */
 import { describe, expect, it } from 'vitest';
-import { memoizarPura } from './memoria-de-pura.js';
+import { chaveExata, memoizarPura } from './memoria-de-pura.js';
 import { ajustarGaiolaAsMedidasComPeso, subdividirCatmullClark } from './subdivisao.js';
 
 function contada(corpo) {
@@ -10,6 +10,22 @@ function contada(corpo) {
 }
 
 describe('memoizarPura', () => {
+  it('o buraco de uma lista não é o valor indefinido: a chave distingue os dois, e a memória não serve o resultado de um ao outro', () => {
+    // eslint-disable-next-line no-sparse-arrays
+    const comBuraco = [0, , 0];
+    expect(chaveExata([comBuraco])).not.toBe(chaveExata([[0, undefined, 0]]));
+    expect(chaveExata([Object.assign([1], { x: 1 })])).toBeNull();
+    expect(chaveExata(['\u0000h'])).toBeNull();
+    const f = contada((xs) => Object.keys(xs).length);
+    const m = memoizarPura(f);
+    expect(m(comBuraco)).toBe(2);
+    expect(m([0, undefined, 0])).toBe(3);
+    expect(f.chamadas).toBe(2);
+    // eslint-disable-next-line no-sparse-arrays
+    expect(m([0, , 0])).toBe(2);
+    expect(f.chamadas).toBe(2);
+  });
+
   it('a segunda chamada com os mesmos argumentos sai da memória e é igual à primeira', () => {
     const f = contada(({ v }) => ({ soma: v.reduce((s, x) => s + x, 0), v: [...v] }));
     const m = memoizarPura(f);
