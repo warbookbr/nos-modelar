@@ -1,0 +1,208 @@
+/* subdivisao-limite-exato.test.mjs — o oráculo da superfície limite (`superficieLimite`), a descendência das linhas e a medida na linha
+ * (`descendenciaDasLinhas`, `medirLinhasNoLimite`): a posição confere com a fórmula fechada do ponto limite (`limitesDaGaiola`) nos pontos
+ * diádicos, também no extraordinário, no vinco e na borda; a quadrática sai exata no retalho regular; a curvatura é a mesma avaliada na
+ * gaiola e na gaiola refinada; e a linha lisa não tem salto de curvatura, só a rampa. */
+import { describe, expect, it } from 'vitest';
+import { curvaturaNormal, descendenciaDasLinhas, limitesDaGaiola, medirLinhasNoLimite, refinarGaiola, subdividirCatmullClark, superficieLimite } from './subdivisao.js';
+
+/* a grade (N+1) x (N+1) de altura z = f(i, j), em faces anti-horárias vistas de +z */
+function grade(N, f, extra = {}) {
+  const vertices = []; const faces = [];
+  for (let j = 0; j <= N; j++) for (let i = 0; i <= N; i++) vertices.push([i, j, f(i, j)]);
+  for (let j = 0; j < N; j++) for (let i = 0; i < N; i++) { const k = j * (N + 1) + i; faces.push([k, k + 1, k + N + 2, k + N + 1]); }
+  return { vertices, faces, ...extra };
+}
+
+/* a grade com o vértice do meio de valência 5: a face de baixo à direita do meio vira duas, por um ponto novo no meio da aresta de baixo */
+function gradeComExtraordinario() {
+  const g = grade(6, (i, j) => 0.05 * ((i - 3) ** 2) - 0.03 * ((j - 3) ** 2) + 0.01 * i * j);
+  const meio = 3 * 7 + 3; const k = 3 * 7 + 3; // a face [meio, meio+1, meio+8, meio+7] tem o canto de baixo à esquerda no meio
+  const fi = g.faces.findIndex((f) => f[0] === k);
+  const [a, b, c, d] = g.faces[fi];
+  const novo = g.vertices.length; g.vertices.push([(g.vertices[a][0] + g.vertices[d][0] + g.vertices[c][0]) / 3, (g.vertices[a][1] + g.vertices[d][1] + g.vertices[c][1]) / 3, 0.02]);
+  g.faces.splice(fi, 1, [a, b, c, novo], [a, novo, c, d]);
+  return { g, meio };
+}
+
+/* a face do nível n que desce da face fi da gaiola pelo caminho dos quadrantes de (u, v), e o (u, v) nela */
+function descer(gaiola, fi, u, v, n) {
+  let acc = 0; for (let k = 0; k < fi; k++) acc += gaiola.faces[k].length;
+  const filha = (x, y) => (x < 0.5 && y < 0.5 ? [0, 2 * x, 2 * y] : y < 0.5 ? [1, 2 * y, 2 - 2 * x] : x >= 0.5 ? [2, 2 - 2 * x, 2 - 2 * y] : [3, 2 - 2 * y, 2 * x]);
+  let [k, x, y] = filha(u, v); let j = acc + k;
+  for (let m = 1; m < n; m++) { [k, x, y] = filha(x, y); j = 4 * j + k; }
+  return { j, u: x, v: y };
+}
+
+const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+
+describe('a superfície limite exata', () => {
+  it('reproduz a quadrática no retalho regular: a posição deslocada de (a + b) / 3 e a curvatura gaussiana exata', () => {
+    const [a, b, c] = [0.3, -0.2, 0.15];
+    const sup = superficieLimite(grade(8, (i, j) => a * i * i + b * j * j + c * i * j));
+    const s = sup.avaliar(3 * 8 + 3, 0.3, 0.7);
+    const [x, y] = [3.3, 3.7];
+    expect(dist(s.ponto, [x, y, a * x * x + b * y * y + c * x * y + (a + b) / 3])).toBeLessThan(1e-12);
+    const fx = 2 * a * x + c * y, fy = 2 * b * y + c * x; const W = 1 + fx * fx + fy * fy;
+    expect(s.K).toBeCloseTo((4 * a * b - c * c) / (W * W), 12);
+    expect(s.profundidade).toBe(0);
+    /* a curvatura normal nas direções principais é a principal */
+    expect(curvaturaNormal(s, s.d1)).toBeCloseTo(s.k1, 10);
+    expect(curvaturaNormal(s, s.d2)).toBeCloseTo(s.k2, 10);
+  });
+
+  it('confere com a fórmula fechada do ponto limite nos pontos diádicos, no extraordinário, no vinco vivo, no vinco fracionário e na borda', () => {
+    const { g } = gradeComExtraordinario();
+    const gaiola = { ...g, vincos: [[1, 2, Infinity], [2, 3, Infinity], [15, 16, 1.5]], cantos: [0] };
+    const sup = superficieLimite(gaiola);
+    let G = gaiola; for (let n = 0; n < 5; n++) G = refinarGaiola(G);
+    const lim = limitesDaGaiola(G);
+    let pior = 0; let fundo = 0;
+    gaiola.faces.forEach((f, fi) => {
+      for (const [u, v] of [[0, 0], [1, 1], [0.5, 0.25], [1 / 32, 3 / 32], [0.75, 0.75]]) {
+        const d = descer(gaiola, fi, u, v, 5);
+        const canto = [[0, 0], [1, 0], [1, 1], [0, 1]].findIndex(([x, y]) => x === d.u && y === d.v);
+        const s = sup.avaliar(fi, u, v);
+        pior = Math.max(pior, dist(s.ponto, lim[G.faces[d.j][canto]]));
+        fundo = Math.max(fundo, s.profundidade);
+      }
+    });
+    expect(pior).toBeLessThan(1e-12);
+    expect(fundo).toBeGreaterThan(3);
+  });
+
+  it('a curvatura é a mesma na gaiola e na gaiola refinada, perto do extraordinário; nele, a posição sai sem curvatura e a normal é a do limite', () => {
+    const { g, meio } = gradeComExtraordinario();
+    const sup0 = superficieLimite(g); const G2 = refinarGaiola(refinarGaiola(g)); const sup2 = superficieLimite(G2);
+    let pior = 0;
+    g.faces.forEach((f, fi) => {
+      if (!f.includes(meio)) return;
+      const c = [[0, 0], [1, 0], [1, 1], [0, 1]][f.indexOf(meio)];
+      for (const t of [0.2, 0.01, 1e-4]) {
+        const u = c[0] ? 1 - t : t, v = c[1] ? 1 - 0.6 * t : 0.6 * t;
+        const A = sup0.avaliar(fi, u, v); const d = descer(g, fi, u, v, 2); const B = sup2.avaliar(d.j, d.u, d.v);
+        expect(A.extraordinario).toBe(false);
+        pior = Math.max(pior, Math.abs(A.k1 - B.k1) / Math.max(1, Math.abs(A.k1)), Math.abs(A.k2 - B.k2) / Math.max(1, Math.abs(A.k2)));
+      }
+      const no = sup0.avaliar(fi, c[0], c[1]);
+      expect(no.extraordinario).toBe(true);
+      expect(no.k1).toBe(null);
+      expect(dist(no.ponto, limitesDaGaiola(g)[meio])).toBeLessThan(1e-12);
+      const perto = sup0.avaliar(fi, c[0] ? 1 - 1e-6 : 1e-6, c[1] ? 1 - 1e-6 : 1e-6);
+      expect(dist(no.normal, perto.normal)).toBeLessThan(1e-4);
+    });
+    expect(pior).toBeLessThan(1e-9);
+  });
+
+  it('o piso de distância depende da valência: num plano a curvatura que sai é nula, e abaixo do piso sai null com extraordinario', () => {
+    /* a gaiola polar de valência n no centro, achatada no plano z = 0,3 x + 0,2 y */
+    const polar = (n) => {
+      const V = [[0, 0, 0]]; const A = [], B = [], C = [];
+      const P = (r, t) => { const x = r * Math.cos(t), y = r * Math.sin(t); return [x, y, 0.3 * x + 0.2 * y]; };
+      for (let k = 0; k < n; k++) { A.push(V.length); V.push(P(1, (2 * Math.PI * k) / n)); }
+      for (let k = 0; k < n; k++) { B.push(V.length); V.push(P(1.6, (2 * Math.PI * (k + 0.5)) / n)); }
+      for (let k = 0; k < 2 * n; k++) { C.push(V.length); V.push(P(2.6, (2 * Math.PI * k) / (2 * n))); }
+      const faces = [];
+      for (let k = 0; k < n; k++) { const k1 = (k + 1) % n; faces.push([0, A[k], B[k], A[k1]], [A[k], C[2 * k], C[2 * k + 1], B[k]], [B[k], C[2 * k + 1], C[(2 * k + 2) % (2 * n)], A[k1]]); }
+      return { vertices: V, faces };
+    };
+    const pisos = {};
+    for (const n of [3, 5, 6, 8]) {
+      const sup = superficieLimite(polar(n));
+      let primeiroNulo = null;
+      for (let k = 2; k <= 45; k++) {
+        const t = 2 ** -k; const a = sup.avaliar(0, t, 0.6 * t);
+        if (a.extraordinario) { primeiroNulo ??= k; expect(a.k1, `n=${n} k=${k}`).toBeNull(); expect(a.normal, `n=${n} k=${k}`).not.toBeNull(); continue; }
+        expect(primeiroNulo, `n=${n} k=${k}: voltou a ter curvatura abaixo do piso`).toBeNull();
+        expect(Math.max(Math.abs(a.k1), Math.abs(a.k2)), `n=${n} k=${k}`).toBeLessThan(1e-7);
+      }
+      pisos[n] = primeiroNulo;
+    }
+    expect(pisos[3]).toBeLessThan(26); expect(pisos[3]).toBeGreaterThan(15);
+    for (const n of [5, 6, 8]) expect(pisos[n], `n=${n}`).toBeGreaterThan(30);
+    expect(pisos[8]).toBeGreaterThan(pisos[6]); expect(pisos[6]).toBeGreaterThan(pisos[5]); expect(pisos[5]).toBeGreaterThan(pisos[3]);
+  });
+
+  it('o sinal da curvatura: o cubo de faces viradas para fora tem curvatura positiva', () => {
+    const vertices = [[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0], [0, 0, 1], [1, 0, 1], [1, 1, 1], [0, 1, 1]];
+    const faces = [[0, 3, 2, 1], [4, 5, 6, 7], [0, 1, 5, 4], [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7]];
+    const s = superficieLimite({ vertices, faces }).avaliar(1, 0.5, 0.5);
+    expect(s.normal[2]).toBeGreaterThan(0.99);
+    expect(s.k2).toBeGreaterThan(0);
+  });
+
+  it('a face de n lados pede o canto, e (u, v) fora de [0, 1] ou a face que não existe recusam', () => {
+    const sup = superficieLimite({ vertices: [[0, 0, 0], [1, 0, 0], [1, 1, 0.2], [0, 1, 0], [-0.5, 0.5, 0.1]], faces: [[0, 1, 2, 3, 4]] });
+    expect(() => sup.avaliar(0, 0.5, 0.5)).not.toThrow();
+    expect(() => sup.avaliar(0, 0.5, 0.5, { canto: 5 })).toThrow(/tem 5 lados, e o canto precisa ser inteiro/);
+    expect(() => sup.avaliar(0, 1.5, 0.5)).toThrow(/precisa estar em \[0, 1\]/);
+    expect(() => sup.avaliar(3, 0.5, 0.5)).toThrow(/não existe na gaiola/);
+  });
+
+  it('recusa o que não é número: (u, v) null ou ausente, e a nitidez de vinco null, NaN ou -Infinity (Infinity é o vinco vivo)', () => {
+    const g = grade(3, () => 0);
+    const sup = superficieLimite(g);
+    for (const ruim of [null, undefined, NaN, '0.5']) {
+      expect(() => sup.avaliar(4, ruim, 0.5), String(ruim)).toThrow(/precisa estar em \[0, 1\]/);
+      expect(() => sup.avaliar(4, 0.5, ruim), String(ruim)).toThrow(/precisa estar em \[0, 1\]/);
+    }
+    for (const ruim of [null, undefined, NaN, -Infinity, -1, '1']) expect(() => superficieLimite({ ...g, vincos: [[5, 6, ruim]] }), String(ruim)).toThrow(/nitidez inválida/);
+    expect(() => superficieLimite({ ...g, vincos: [[5, 6, Infinity]] })).not.toThrow();
+    expect(() => superficieLimite({ ...g, vincos: [[5, 6, 0]] })).not.toThrow();
+  });
+});
+
+describe('a descendência e a medida das linhas', () => {
+  it('a descendência segue os vincos que a subdivisão marca, e a linha que não é aresta recusa', () => {
+    const g = grade(4, (i, j) => 0.1 * i * j);
+    const linha = [5, 6, 7, 8];
+    const r = subdividirCatmullClark({ ...g, vincos: [[5, 6, 1], [6, 7, 1], [7, 8, 1]], niveis: 2, comVincos: true });
+    const [d] = descendenciaDasLinhas(g.faces, g.vertices.length, 2, [linha]);
+    expect(d).toHaveLength(13);
+    const marcadas = new Set(r.vincos.map(([a, b]) => (a < b ? `${a},${b}` : `${b},${a}`)));
+    for (let k = 1; k < d.length; k++) expect(marcadas.has(d[k - 1] < d[k] ? `${d[k - 1]},${d[k]}` : `${d[k]},${d[k - 1]}`)).toBe(true);
+    expect(() => descendenciaDasLinhas(g.faces, g.vertices.length, 1, [[0, 6]])).toThrow(/que não formam aresta da gaiola/);
+  });
+
+  it('a linha que passa por uma face que não é de quatro lados, ou que liga vértices sem aresta, recusa em vez de dar salto falso', () => {
+    const g = grade(4, (i, j) => 0.05 * i * i + 0.02 * j * j);
+    const tri = g.faces.findIndex((x) => x[0] === 11); const [a, b, c, d] = g.faces[tri]; g.faces.splice(tri, 1, [a, b, c], [a, c, d]);
+    expect(() => medirLinhasNoLimite(g, [{ nome: 'x', vertices: [10, 11, 12, 13, 14] }], { faixa: 1 })).toThrow(/face .*, de 3 lados/);
+    expect(() => medirLinhasNoLimite(g, [{ nome: 'x', vertices: [5, 7, 8] }], { faixa: 1 })).toThrow(/não formam aresta/);
+    expect(medirLinhasNoLimite(g, [{ nome: 'x', vertices: [0, 1, 2, 3, 4] }], { faixa: 1 })[0].perfisCortados).toBeGreaterThanOrEqual(0);
+  });
+
+  it('a borda livre é região própria: a inclinação de longe dela não conta a subida da ponta, que sai à parte', () => {
+    const g = grade(8, (i, j) => 0.05 * i * i + 0.02 * j * j);
+    let G = g; for (let n = 0; n < 2; n++) G = refinarGaiola(G);
+    const linha = descendenciaDasLinhas(g.faces, g.vertices.length, 2, [[0, 1, 2, 3, 4, 5, 6, 7, 8].map((i) => i * 9 + 4)])[0];
+    const [m] = medirLinhasNoLimite(G, [{ nome: 'meio', vertices: linha, faixa: 2 }], { afastamentoDaBorda: 2 });
+    const [todo] = medirLinhasNoLimite(G, [{ nome: 'meio', vertices: linha, faixa: 2 }], { afastamentoDaBorda: 0 });
+    expect(m.afastamentoDaBorda).toBe(2);
+    expect(m.inclinacaoNaBorda).toBeGreaterThan(0);
+    expect(m.inclinacaoForaDosSingulares).toBeLessThanOrEqual(todo.inclinacaoForaDosSingulares);
+    expect(todo.inclinacaoNaBorda).toBe(0);
+    expect(m.ondeInclinacaoForaDosSingulares.ponto[1]).toBeGreaterThanOrEqual(2 - 1e-9);
+    expect(m.ondeInclinacaoForaDosSingulares.ponto[1]).toBeLessThanOrEqual(6 + 1e-9);
+  });
+
+  it('na linha lisa o salto de curvatura é zero e sobra a rampa; no vinco vivo, o ângulo', () => {
+    const N = 8;
+    const g = grade(N, (i, j) => (j <= 4 ? 0.02 * (j - 4) ** 2 : 0.08 * (j - 4) ** 2));
+    const linha = Array.from({ length: N + 1 }, (_, i) => 4 * (N + 1) + i);
+    let G = g; for (let n = 0; n < 2; n++) G = refinarGaiola(G);
+    const [d] = descendenciaDasLinhas(g.faces, g.vertices.length, 2, [linha]);
+    const [m] = medirLinhasNoLimite(G, [{ nome: 'meio', vertices: d }], { faixa: 2, afastamentoDaBorda: 1 });
+    expect(m.medidas).toBeGreaterThan(50);
+    expect(m.saltoMaximo).toBeLessThan(1e-10);
+    expect(m.anguloMaximoGraus).toBeLessThan(1e-6);
+    expect(m.inclinacaoForaDosSingulares).toBeGreaterThan(0.01);
+    /* a curvatura transversal na borda da faixa: a de cada lado, desenhada (0,04 e 0,16 por unidade), e na linha, a do meio da rampa */
+    const [kA, kB] = m.curvaturaNaFaixa.map(Math.abs).sort((x, y) => x - y);
+    expect(kA).toBeLessThan(Math.abs(m.curvaturaNaLinha));
+    expect(Math.abs(m.curvaturaNaLinha)).toBeLessThan(kB);
+    const vivo = { ...g, vincos: linha.slice(1).map((v, k) => [linha[k], v, Infinity]) };
+    let GV = vivo; for (let n = 0; n < 2; n++) GV = refinarGaiola(GV);
+    const [mv] = medirLinhasNoLimite(GV, [{ nome: 'meio', vertices: d }], { faixa: 2 });
+    expect(mv.anguloMaximoGraus).toBeGreaterThan(1);
+  });
+});

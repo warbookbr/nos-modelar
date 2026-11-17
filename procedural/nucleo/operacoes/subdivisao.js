@@ -10,7 +10,7 @@
    mesmo onde o diedro cai abaixo do ângulo, nas pontas do vinco. `quebraNosVincos: 'todos'` quebra também nos vincos de
    nitidez fracionária, e `'nenhum'` deixa só o ângulo; `liso: false` devolve as faces chapadas. Só a marca de sombra
    muda: as posições e as faces são as mesmas com qualquer opção. */
-import { subdividirCatmullClark, espelharGaiolaEmX, costuraEmXExata, ajustarGaiolaAsMedidas, ajustarGaiolaAsMedidasComPeso, nitidezDoVinco } from '../subdivisao.js';
+import { subdividirCatmullClark, espelharGaiolaEmX, costuraEmXExata, ajustarGaiolaAsMedidas, ajustarGaiolaAsMedidasComPeso, nitidezDoVinco, descendenciaDasLinhas } from '../subdivisao.js';
 import { espessarSuperficie, ErroDaEspessura } from '../espessura.js';
 import { valorDoLiso } from '../liso-por-angulo.js';
 
@@ -93,6 +93,49 @@ function vincosPorNome(lista, indiceDoNome, faces, st) {
     }
   }
   return { vincos };
+}
+
+const EXEMPLO_DE_CURVA = "{ nome: 'cintura', pontos: ['c0', 'c1', 'c2'], continuidade: 'G1' }";
+const CONTINUIDADES = ['G1', 'G2'];
+
+/** curvasPorNome(lista, indiceDoNome, faces) -> { curvas: [{ nome, continuidade, vertices }] } ou { erro }
+ *  As curvas declaradas da gaiola (`gaiolaPorRede` com `marcarCurvas`): cada uma a sequência de nomes de ponto ao longo das arestas da
+ *  gaiola, com a continuidade que a rede declarou nela. Só marcam a malha: nada da geometria muda. O mesmo nome pode vir em mais de uma
+ *  entrada, um trecho por entrada. */
+export function curvasPorNome(lista, indiceDoNome, faces) {
+  if (!Array.isArray(lista)) return { erro: `curvas precisa ser lista de curvas nomeadas, como ${EXEMPLO_DE_CURVA}` };
+  const arestas = new Set();
+  for (const f of faces) for (let k = 0; k < f.length; k++) arestas.add(chave(f[k], f[(k + 1) % f.length]));
+  const curvas = [];
+  for (const c of lista) {
+    if (!c || typeof c !== 'object' || Array.isArray(c) || typeof c.nome !== 'string' || !c.nome) return { erro: `cada curva precisa ser objeto com nome, como ${EXEMPLO_DE_CURVA}` };
+    const extra = Object.keys(c).filter((k) => !['nome', 'pontos', 'continuidade'].includes(k));
+    if (extra.length) return { erro: `a curva ${citar(c.nome)} tem campo desconhecido ${extra.map(citar).join(', ')}; os campos são nome, pontos e, opcional, continuidade` };
+    if (!Array.isArray(c.pontos) || c.pontos.length < 2 || c.pontos.some((p) => typeof p !== 'string' || !indiceDoNome.has(p))) return { erro: `a curva ${citar(c.nome)} precisa de pontos: lista de dois ou mais nomes de ponto da gaiola, em sequência ao longo das arestas` };
+    if (c.continuidade != null && !CONTINUIDADES.includes(c.continuidade)) return { erro: `a curva ${citar(c.nome)} tem continuidade ${JSON.stringify(c.continuidade)}; a continuidade é 'G1' ou 'G2'` };
+    const vertices = c.pontos.map((p) => indiceDoNome.get(p));
+    for (let k = 1; k < vertices.length; k++) {
+      if (!arestas.has(chave(vertices[k - 1], vertices[k]))) return { erro: `a curva ${citar(c.nome)} liga ${citar(c.pontos[k - 1])} a ${citar(c.pontos[k])}, que não formam aresta da gaiola` };
+    }
+    curvas.push({ nome: c.nome, continuidade: c.continuidade ?? null, vertices });
+  }
+  return { curvas };
+}
+
+/* As curvas declaradas levadas à superfície refinada: cada uma a cadeia dos vértices da pele (os primeiros da malha, antes da espessura) ao
+   longo das arestas que descendem dela, com o id de cada vértice no neutro; na simetria, a imagem espelhada de cada curva que sai do plano
+   vem junto, com espelho: true. */
+function curvasDaMalha(curvas, gaiola, niveis, idDe) {
+  const lista = [];
+  for (const c of curvas) {
+    lista.push({ ...c, espelho: false });
+    if (gaiola.imagem) {
+      const imagem = c.vertices.map((k) => gaiola.imagem[k]);
+      if (imagem.some((k, j) => k !== c.vertices[j])) lista.push({ ...c, vertices: imagem, espelho: true });
+    }
+  }
+  const cadeias = descendenciaDasLinhas(gaiola.faces, gaiola.vertices.length, niveis, lista.map((c) => c.vertices));
+  return lista.map((c, k) => ({ nome: c.nome, continuidade: c.continuidade, espelho: c.espelho, gaiola: c.vertices, vertices: cadeias[k], ids: cadeias[k].map(idDe) }));
 }
 
 const EXEMPLO_DE_GRUPO = "{ nome: 'pe', pontos: ['g00', 'g01', 'g10', 'g11'] }";
@@ -361,6 +404,14 @@ export function criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, co
     if (liso === false && a.quebraNosVincos != null) return grita(st, i, 'subdivisao', 'quebraNosVincos', 'quebraNosVincos só vale com as faces lisas; com liso: false toda aresta já divide a sombra');
     if (a.costuraExata != null && a.costuraExata !== true && a.costuraExata !== false) return grita(st, i, 'subdivisao', 'costuraExata', `costuraExata só aceita true (a costura da simetria sai em x = 0 exato, também na face interna da espessura) ou false, e veio ${JSON.stringify(a.costuraExata)}`);
     if (a.costuraExata === true && a.simetria !== 'x') return grita(st, i, 'subdivisao', 'costuraExata', "costuraExata só vale com simetria: 'x', porque a costura é a do plano x = 0 da gaiola espelhada; declare a simetria ou tire costuraExata");
+    let curvasDeclaradas = null;
+    if (a.curvas != null) {
+      const nomes = new Map();
+      declarados.forEach((v, k) => { if (typeof v === 'string') nomes.set(v, k); });
+      const lidas = curvasPorNome(a.curvas, nomes, gaiola.faces);
+      if (lidas.erro) return grita(st, i, 'subdivisao', 'curvas', lidas.erro);
+      curvasDeclaradas = lidas.curvas;
+    }
     let r;
     let gruposDaGaiola = null;
     try {
@@ -425,7 +476,9 @@ export function criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, co
     }
     /* A gaiola da chapa, para a conferência dos vãos (`src/autoria/molduras-do-vao.js`) achar as aberturas pela borda livre dela:
        os nomes, as faces por índice da gaiola cheia (a simetria aplicada), as posições, os níveis e a imagem espelhada. Só leitura;
-       nada disto entra na malha nem na forma canônica. */
+       nada disto entra na malha nem na forma canônica. Os vincos, os cantos e a borda completam a gaiola para o oráculo da superfície
+       limite (`superficieLimite` de `subdivisao.js`), e `curvas`, com o campo do passo, é a marca das arestas que descendem de cada curva
+       declarada, para a medida da emenda ler a curva, e não a borda entre as partes. */
     const indiceDoNome = new Map();
     declarados.forEach((v, k) => { if (typeof v === 'string') indiceDoNome.set(v, k); });
     (st.chapas ??= []).push({
@@ -433,6 +486,8 @@ export function criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, co
       faces: gaiola.faces.map((f) => [...f]), vertices: gaiola.vertices.map((p) => [...p]), nVertices: gaiola.vertices.length,
       niveis: Math.trunc(st.num(a.niveis ?? 2)), simetria: a.simetria ?? null, imagem: gaiola.imagem ?? null,
       pele, espessura, lado: a.lado ?? 'contraNormal',
+      vincos: gaiola.vincos.map((v) => [...v]), cantos: [...(gaiola.cantos ?? [])], borda: a.borda ?? 'suave',
+      ...(curvasDeclaradas ? { curvas: curvasDaMalha(curvasDeclaradas, gaiola, Math.trunc(st.num(a.niveis ?? 2)), (k) => idDoPasso(i, k)) } : {}),
     });
   },
   };
