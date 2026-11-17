@@ -7,9 +7,13 @@
  * disco e o ponto que ele guardasse levaria a versão nova sem ser dela. A conta lê uns 130 arquivos e os dois pacotes, uns 60 ms.
  *
  * O armazém grava cada nome ao lado e renomeia (a leitura nunca vê um ponto pela metade), lista a pasta para a limpeza das versões
- * velhas e tranca o índice com um arquivo de trava criado de forma exclusiva: quem não o cria espera, em passos de 20 ms, até 10 s, e a
- * trava de mais de 30 s, de um processo que morreu, é tomada. Quem não consegue a trava não grava (o cache é conveniência). */
-import { closeSync, mkdirSync, openSync, readdirSync, readFileSync, renameSync, rmSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
+ * velhas e tranca o índice com um arquivo de trava criado de forma exclusiva, que leva o pid de quem a criou. Quem não a cria olha o dono:
+ * se o processo dele não existe mais (`process.kill(pid, 0)`, que só testa a existência), a trava é tomada na hora; se existe, espera em
+ * passos de 20 ms, até 1 s, e desiste (o cache é conveniência: quem não consegue a trava segue sem gravar, em vez de atrasar o comando).
+ * A trava sem pid legível (criada e ainda sem o pid escrito, ou de outra versão desta ferramenta) só é tomada depois de 30 s. A tomada
+ * renomeia a trava antes de apagá-la, e deixa uma corrida estreita entre dois que a tomam ao mesmo tempo; o custo dela é um ponto ou uma
+ * entrada de índice perdidos, nunca um resultado diferente. */
+import { closeSync, mkdirSync, openSync, readdirSync, readFileSync, renameSync, rmSync, statSync, unlinkSync, writeFileSync, writeSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { deserialize, serialize } from 'node:v8';
@@ -21,9 +25,11 @@ const RAIZ = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 export const PASTA_DO_CACHE_POR_PREFIXO = join(RAIZ, 'tmp', 'cache-por-prefixo');
 export const VERSAO_NA_IMPORTACAO = versaoDoCodigoNoDisco();
 
-const ESPERA_DA_TRAVA_MS = 10_000;
+const ESPERA_DA_TRAVA_MS = 1_000;
 const TRAVA_ABANDONADA_MS = 30_000;
 const PASSO_DA_ESPERA_MS = 20;
+/** O processo existe? `process.kill(pid, 0)` não envia sinal nenhum, só testa; sem permissão sobre o processo (EPERM) ele existe. */
+const processoVive = (pid) => { try { process.kill(pid, 0); return true; } catch (erro) { return erro?.code === 'EPERM'; } };
 const dormir = (ms) => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms);
 
 /** O armazém numa pasta: `{ ler, gravar, apagar, listar, trancar }`. */
@@ -40,15 +46,22 @@ export function criarArmazemEmPasta(pasta = PASTA_DO_CACHE_POR_PREFIXO, { espera
     },
     apagar(nome) { try { unlinkSync(caminho(nome)); } catch (erro) { if (erro?.code !== 'ENOENT') throw erro; } },
     listar() { try { return readdirSync(pasta); } catch { return []; } },
-    /* espera a trava, roda fn e solta a trava antes de voltar; sem a trava em 10 s, lança, e a memória não grava */
+    /* há quantos ms o arquivo foi escrito pela última vez, ou null se ele não existe */
+    idadeMs(nome) { try { return Date.now() - statSync(caminho(nome)).mtimeMs; } catch { return null; } },
+    /* espera a trava, roda fn e solta a trava antes de voltar; sem a trava no prazo, lança, e a memória não grava */
     trancar(nome, fn) {
       const trava = caminho(`${nome}.trava`);
       const inicio = Date.now();
       let fd = null;
       while (fd === null) {
-        try { fd = openSync(trava, 'wx'); } catch (erro) {
+        try { fd = openSync(trava, 'wx'); writeSync(fd, String(process.pid)); } catch (erro) {
+          if (fd !== null) { closeSync(fd); fd = null; rmSync(trava, { force: true }); throw erro; }
           if (erro?.code !== 'EEXIST') throw erro;
-          try { if (Date.now() - statSync(trava).mtimeMs > travaAbandonadaMs) { rmSync(trava, { force: true }); continue; } } catch { continue; }
+          try {
+            const dono = Number.parseInt(readFileSync(trava, 'utf8'), 10);
+            const semDono = Number.isInteger(dono) && dono > 0 ? !processoVive(dono) : Date.now() - statSync(trava).mtimeMs > travaAbandonadaMs;
+            if (semDono) { const tomada = `${trava}.${process.pid}.tomada`; renameSync(trava, tomada); rmSync(tomada, { force: true }); continue; }
+          } catch { continue; }
           if (Date.now() - inicio > esperaDaTravaMs) throw new Error(`cache por prefixo: a trava ${trava} não soltou em ${esperaDaTravaMs} ms`);
           dormir(PASSO_DA_ESPERA_MS);
         }

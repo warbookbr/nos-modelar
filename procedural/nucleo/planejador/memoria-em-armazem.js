@@ -38,16 +38,26 @@ const FORMATO = 'mecanifica.ponto-de-execucao@1';
 /** A marca de uma versão, que abre o nome de tudo o que ela guarda no armazém. */
 export const marcaDaVersao = (versao) => `v${sha256Hex(String(versao)).slice(0, 12)}`;
 
+/* O `.parcial` é a gravação em curso de outro processo (o armazém grava ao lado e renomeia), e a limpeza só o apaga quando ele é mais velho
+   que isto: uma gravação leva milissegundos, e o que passou de cinco minutos é resto de um processo que morreu. */
+export const PARCIAL_ABANDONADO_MS = 5 * 60_000;
+
 /**
- * Apaga do armazém o que é de outra versão do código (e os restos `.parcial` de uma gravação interrompida): todo nome que começa por
- * marca de versão e não pela desta. Precisa de `armazem.listar()`; sem ela não faz nada. Devolve quantos nomes apagou.
+ * Apaga do armazém o que é de outra versão do código: todo nome que começa por marca de versão e não pela desta, e os restos `.parcial` e
+ * `.trava` (de qualquer versão) que passaram de `PARCIAL_ABANDONADO_MS`. Precisa de `armazem.listar()`; sem ela não faz nada, e sem
+ * `armazem.idadeMs(nome)` não apaga nenhum `.parcial` nem `.trava`, porque não sabe se alguém ainda escreve nele. Devolve quantos
+ * nomes apagou.
  */
 export function limparOutrasVersoes(armazem, versao) {
   if (typeof armazem?.listar !== 'function') return 0;
   const marca = `${marcaDaVersao(versao)}-`;
   let apagados = 0;
   for (const nome of armazem.listar()) {
-    if (!/^v[0-9a-f]{12}-/.test(nome) || (nome.startsWith(marca) && !nome.endsWith('.parcial'))) continue;
+    if (!/^v[0-9a-f]{12}-/.test(nome)) continue;
+    if (/\.(parcial|trava)$/.test(nome)) {
+      const idade = typeof armazem.idadeMs === 'function' ? armazem.idadeMs(nome) : null;
+      if (idade === null || idade <= PARCIAL_ABANDONADO_MS) continue;
+    } else if (nome.startsWith(marca)) continue;
     try { armazem.apagar(nome); apagados += 1; } catch { /* outro processo pode tê-lo apagado */ }
   }
   return apagados;

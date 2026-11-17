@@ -1,13 +1,14 @@
 /* armazem-em-pasta.test.mjs — o armazém em disco do cache por prefixo e a memória do host (plano do cache por passo, fatia 4): a
  * gravação ao lado e renomeada, a trava do índice, a memória que só lê quando o código do disco mudou depois da importação, a limpeza
  * das versões velhas e o `descrever` com o cache, que dá a mesma saída e recomeça do estado guardado pelo comando anterior. */
-import { existsSync, mkdtempSync, readdirSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdtempSync, readdirSync, readFileSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { nucleo } from '../entrada.js';
 import { VERSAO_NA_IMPORTACAO, criarArmazemEmPasta, memoriaDoHost } from './armazem-em-pasta.mjs';
-import { marcaDaVersao } from './memoria-em-armazem.js';
+import { PARCIAL_ABANDONADO_MS, marcaDaVersao } from './memoria-em-armazem.js';
 import { versaoDoCodigoNoDisco } from './versao-do-codigo.mjs';
 import { divergenciaDaImpressao } from './impressao-do-neutro.js';
 import { descreverPecaReutilizavel } from '../../../tools/modelar/descrever-peca.mjs';
@@ -43,6 +44,57 @@ describe('o armazém em pasta', () => {
     let tomou = false;
     a.trancar('i', () => { tomou = true; });
     expect(tomou).toBe(true);
+  });
+});
+
+describe('a trava com o pid do dono', () => {
+  /* o pid de um processo que acabou de morrer */
+  const pidMorto = () => spawnSync(process.execPath, ['-e', 'process.stdout.write(String(process.pid))'], { encoding: 'utf8' }).stdout.trim();
+
+  it('a trava de um processo que não existe mais é tomada na hora, sem esperar a idade dela', () => {
+    const pasta = pastaNova();
+    const a = criarArmazemEmPasta(pasta, { esperaDaTravaMs: 5_000, travaAbandonadaMs: 60_000 });
+    writeFileSync(join(pasta, 'i.trava'), pidMorto());
+    let tomou = false;
+    const t = performance.now();
+    a.trancar('i', () => { tomou = true; });
+    expect(tomou).toBe(true);
+    expect(performance.now() - t).toBeLessThan(1_000);
+  });
+
+  it('a trava de um processo vivo não é tomada, e quem espera desiste no prazo curto do padrão', () => {
+    const pasta = pastaNova();
+    const a = criarArmazemEmPasta(pasta);
+    writeFileSync(join(pasta, 'i.trava'), String(process.ppid));
+    const t = performance.now();
+    expect(() => a.trancar('i', () => {})).toThrow(/não soltou em 1000 ms/);
+    expect(performance.now() - t).toBeLessThan(3_000);
+    expect(existsSync(join(pasta, 'i.trava'))).toBe(true);
+  });
+
+  it('a trava criada leva o pid do dono', () => {
+    const pasta = pastaNova();
+    let lido = null;
+    criarArmazemEmPasta(pasta).trancar('i', () => { lido = readFileSync(join(pasta, 'i.trava'), 'utf8'); });
+    expect(lido).toBe(String(process.pid));
+  });
+});
+
+describe('a limpeza das versões velhas', () => {
+  it('apaga só o .parcial de mais de PARCIAL_ABANDONADO_MS, o de outro processo que escreve agora fica', () => {
+    const pasta = pastaNova();
+    const marca = marcaDaVersao(VERSAO_NA_IMPORTACAO);
+    const recente = join(pasta, `${marca}-ponto-a.4242.parcial`);
+    const velho = join(pasta, `${marca}-ponto-b.4243.parcial`);
+    const deOutraVersao = join(pasta, `${marcaDaVersao('outra')}-ponto-c.4244.parcial`);
+    for (const f of [recente, velho, deOutraVersao]) writeFileSync(f, 'meio');
+    const antigo = (Date.now() - PARCIAL_ABANDONADO_MS - 60_000) / 1000;
+    utimesSync(velho, antigo, antigo);
+    const { limpos } = memoriaDoHost({ rotulo: 'r', pasta });
+    expect(limpos).toBe(1);
+    expect(existsSync(recente)).toBe(true);
+    expect(existsSync(velho)).toBe(false);
+    expect(existsSync(deOutraVersao)).toBe(true);
   });
 });
 

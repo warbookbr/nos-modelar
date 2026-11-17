@@ -283,16 +283,23 @@ describe('o que a revisão do cache por prefixo achou', () => {
 
   it('a limpeza apaga o que é de outra versão e os restos de gravação, e deixa o desta', () => {
     const arquivos = new Map();
-    const armazem = { ler: (n) => arquivos.get(n) ?? null, gravar: (n, b) => { arquivos.set(n, b); }, apagar: (n) => { arquivos.delete(n); }, listar: () => [...arquivos.keys()] };
+    const armazem = { ler: (n) => arquivos.get(n) ?? null, gravar: (n, b) => { arquivos.set(n, b); }, apagar: (n) => { arquivos.delete(n); }, listar: () => [...arquivos.keys()], idadeMs: (n) => (n.endsWith('-ponto-recente.124.parcial') ? 1_000 : 3_600_000) };
     comMemoria(cubos(1), {}, memoriaDe(armazem, { versao: 'velha' }));
     comMemoria(cubos(1), {}, memoriaDe(armazem, { versao: 'nova' }));
     arquivos.set(`${marcaDaVersao('nova')}-ponto-x.123.parcial`, Buffer.from(''));
+    arquivos.set(`${marcaDaVersao('nova')}-ponto-recente.124.parcial`, Buffer.from(''));
     arquivos.set('outro-arquivo', Buffer.from(''));
     const antes = [...arquivos.keys()].filter((n) => n.startsWith(marcaDaVersao('nova')) && !n.endsWith('.parcial')).length;
     expect(limparOutrasVersoes(armazem, 'nova')).toBeGreaterThan(1);
     expect([...arquivos.keys()].filter((n) => n.startsWith(marcaDaVersao('velha')))).toEqual([]);
-    expect([...arquivos.keys()].filter((n) => n.endsWith('.parcial'))).toEqual([]);
-    expect([...arquivos.keys()].filter((n) => n.startsWith(marcaDaVersao('nova'))).length).toBe(antes);
+    /* o resto de gravação antigo sai; o recente, que outro processo ainda escreve, fica */
+    expect([...arquivos.keys()].filter((n) => n.endsWith('.parcial'))).toEqual([`${marcaDaVersao('nova')}-ponto-recente.124.parcial`]);
+    expect([...arquivos.keys()].filter((n) => n.startsWith(marcaDaVersao('nova')) && !n.endsWith('.parcial')).length).toBe(antes);
+    /* sem como saber a idade, nenhum .parcial é apagado */
+    const semIdade = { ...armazem, idadeMs: undefined };
+    arquivos.set(`${marcaDaVersao('nova')}-ponto-y.125.parcial`, Buffer.from(''));
+    limparOutrasVersoes(semIdade, 'nova');
+    expect(arquivos.has(`${marcaDaVersao('nova')}-ponto-y.125.parcial`)).toBe(true);
     expect(arquivos.has('outro-arquivo')).toBe(true);
   });
 
