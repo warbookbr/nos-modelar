@@ -1,12 +1,12 @@
 # Curvas lisas e zebra numérica: a curva lida da prancha vira poucos trechos de curvatura monótona, e a ondulação longa que o crítico vê vira número
 
-**Estado:** rascunho
+**Estado:** ativo
 
-**Território:** a declarar ao ativar. O provável é um módulo novo de ajuste de curvas em `procedural/nucleo/` ao lado de `alisar-curvas.js`, uma medida nova em `tools/fixtures/correcao-de-superficie/` sobre o oráculo `superficieLimite`, os testes deles e `docs/modelar/banco-de-provas/curvas-lisas-<data>/`; a lataria do carro entra como prova pelo plano do carro.
+**Território:** `procedural/nucleo/ajuste-de-curva-lisa.js` e o teste dele, `tools/modelar/zebra-numerica.mjs` e o teste dele, `tools/modelar/suavidade-por-regiao.mjs` (só o aviso de área), `tools/fixtures/curvas-lisas/`, `docs/modelar/banco-de-provas/curvas-lisas-2026-11-17/`. A lataria do carro entra como prova pelo plano do carro, e a medida nova pode ler o oráculo e as chapas de prova da correção de superfície sem mudá-las, porque são do plano da correção de superfície.
 
 **Responsável:** a IA da sessão implementa e conduz a revisão adversarial; Tiago decidiu em 2026-11-17 pausar as rodadas do carro e escrever este plano, e aprova a forma do carro por imagem.
 
-**Repositório e base:** `warbookbr/nos-modelar`, main na ativação, quando abrir vaga depois do plano das etapas pela impressão do aceite.
+**Repositório e base:** `warbookbr/nos-modelar`, main de 2026-11-17 (57c39806), ativado pela pessoa em 2026-11-17 na vaga da leitura por partes, que foi congelada.
 
 ## Problema observado
 

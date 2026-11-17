@@ -74,7 +74,7 @@ robótico, e `npm run comecar -- modelar/peca/corrigir` lista as peças. Os gate
 vez por `npm run gates`, e `reguas:check` reprova quando a lista local e a do CI
 divergem.
 
-Planos ativos: <!-- planos-ativos:inicio -->[ferramentas de correção de superfície](docs/modelar/planos/2026-11-16-ferramentas-de-correcao-de-superficie.md), [modelagem de carro de passeio](docs/modelar/planos/2026-11-14-modelagem-de-carro.md), [cache por passo da receita](docs/modelar/planos/2026-11-16-cache-por-passo.md) e [etapas pela impressão do aceite](docs/modelar/planos/2026-11-17-etapas-pela-impressao-do-aceite.md).<!-- planos-ativos:fim -->
+Planos ativos: <!-- planos-ativos:inicio -->[ferramentas de correção de superfície](docs/modelar/planos/2026-11-16-ferramentas-de-correcao-de-superficie.md), [modelagem de carro de passeio](docs/modelar/planos/2026-11-14-modelagem-de-carro.md), [cache por passo da receita](docs/modelar/planos/2026-11-16-cache-por-passo.md), [etapas pela impressão do aceite](docs/modelar/planos/2026-11-17-etapas-pela-impressao-do-aceite.md) e [curvas lisas e zebra numérica](docs/modelar/planos/2026-11-17-curvas-lisas-e-zebra-numerica.md).<!-- planos-ativos:fim -->
 
 Já fecharam [ajustes no núcleo dos veículos](./docs/modelar/decisoes/PLANOS-ENCERRADOS.md) em 2026-10-30;
 Já fecharam [veículos de referência livre](./docs/modelar/decisoes/PLANOS-ENCERRADOS.md) em 2026-10-20; [objetos externos
