@@ -41,8 +41,8 @@ A lista de `listarParaBancada` é USAR DIRETO e ganha a categoria e a situação
 
 ## Fatias
 
-1. A categoria e a situação em `listarParaBancada`, com teste sobre o acervo.
-2. A janela com busca e filtros, imagem e fechamento.
+1. Feita em 2026-11-17: a categoria e a situação em `listarParaBancada`, com teste sobre o acervo. A categoria vem de `PLANO.familia`, lida em segundo plano por `classificar()`, porque `PLANO` mora dentro da receita e lê-lo na construção traria todas ao pacote inicial; 18 de 58 de trabalho caem em outros (31%).
+2. Feita em 2026-11-17, falta a aprovação da pessoa: a janela com busca e filtros e a imagem em `docs/modelar/banco-de-provas/abrir-peca-com-filtros-2026-11-17/`.
 
 ## Riscos e parada
 
