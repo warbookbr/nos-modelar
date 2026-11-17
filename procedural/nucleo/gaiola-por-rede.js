@@ -153,7 +153,8 @@
  * extraordinário, onde a subdivisão é no máximo G1: fica fora do termo da tangente, e na G2 sai em `emendaG2NoExtraordinario`. A curva
  * emendada precisa de um arco entre dois retalhos e do `liso` ligado. A saída ganha `emendas`, por curva: a continuidade, os lados, as
  * junções, os pontos com as duas fileiras, os que a parábola não descreve (`semMedida`: a seção sobe mais que meia distância, a fileira
- * entorta), o tamanho da faixa, os extraordinários e, na gaiola alisada, o maior ângulo entre as tangentes dos dois lados e a maior razão
+ * entorta), os que só as curvas definem (`dasCurvas`: o cruzamento com outra curva, onde nenhuma fileira de um lado é miolo que se
+ * move, e a tangente é a que as curvas dão), o tamanho da faixa, os extraordinários e, na gaiola alisada, o maior ângulo entre as tangentes dos dois lados e a maior razão
  * das curvaturas pela mesma parábola. Sem a declaração, nada muda.
  *
  * Os vértices extraordinários (valência diferente de 4 no interior, de 2 a 3 na borda) saem declarados, pelo nome, em `extraordinarios`:
@@ -1363,6 +1364,8 @@ export function gaiolaPorRede(definicaoDada) {
     }
     emendasDeclaradas.push({ nome, tipo, daCurva, aoLongo, lados, arcos: arcosDela });
   }
+  /* o miolo que o alisamento move: o de dentro dos retalhos de quatro lados, de valência 4 */
+  const mioloQueSeMove = new Set(retalhos.filter((r) => r.cadeia.length === 4).flatMap((r) => interiorDoRetalho.get(r.nome)).filter((id) => vizinhos.get(id)?.size === 4));
   const facesPorVertice = new Map();
   faces.forEach((f, i) => { for (const v of f) { if (!facesPorVertice.has(v)) facesPorVertice.set(v, []); facesPorVertice.get(v).push(i); } });
   const naBordaLivre = (v) => [...(vizinhos.get(v) ?? [])].some((w) => contagem.get(chaveDeAresta(v, w)) === 1);
@@ -1542,8 +1545,11 @@ export function gaiolaPorRede(definicaoDada) {
      (a mesma de `termosDaTangente`), em cada ponto da curva com as duas fileiras ---- */
   const emendasSaida = {};
   for (const e of emendasDeclaradas) {
-    let anguloMaximo = 0; let razaoMaxima = 1; let ondeAngulo = null; let ondeRazao = null; let semMedida = 0;
+    let anguloMaximo = 0; let razaoMaxima = 1; let ondeAngulo = null; let ondeRazao = null; let semMedida = 0; let dasCurvas = 0;
     for (const { c, lados } of e.fileiras) {
+      /* o ponto em que nenhuma fileira de um lado é miolo que o alisamento move (o cruzamento com outra curva, a faixa sem miolo) tem a
+         tangente que as curvas dão: fica fora do máximo e se conta em `dasCurvas` */
+      if (!lados.every((l) => mioloQueSeMove.has(l.a1) || mioloQueSeMove.has(l.a2))) { dasCurvas += 1; continue; }
       let nc = [0, 0, 0];
       for (const i of facesDoVertice.get(c)) nc = soma(nc, normaisDaFace[i]);
       nc = vezes(nc, 1 / (norma(nc) || 1));
@@ -1572,7 +1578,7 @@ export function gaiolaPorRede(definicaoDada) {
       });
     }
     emendasSaida[e.nome] = {
-      continuidade: e.tipo, lados: [...e.lados].sort(), juncoes: juncoes.porEmenda.get(e.nome) ?? [], pontos: e.fileiras.length, semMedida, faixa: e.faixa.size,
+      continuidade: e.tipo, lados: [...e.lados].sort(), juncoes: juncoes.porEmenda.get(e.nome) ?? [], pontos: e.fileiras.length, semMedida, dasCurvas, faixa: e.faixa.size,
       extraordinarios: [...e.extraordinarios].sort(),
       anguloMaximoGraus: Math.round(anguloMaximo * 1000) / 1000, pontoDoAngulo: ondeAngulo, razaoMaxima: Math.round(razaoMaxima * 1000) / 1000, pontoDaRazao: ondeRazao,
     };
