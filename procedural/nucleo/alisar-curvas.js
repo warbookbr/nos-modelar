@@ -11,10 +11,10 @@
  *   duros: índices dos pontos que não se mexem; na curva aberta as duas pontas são sempre duras.
  *   partir: índices onde a curva se parte em trechos alisados à parte (o canto); são duros também.
  *   energia: 'quartica' (padrão, a quinta diferença dividida, zero em toda quártica) ou 'cubica' (a quarta, zero em toda cúbica).
- *   rigidez: o peso da energia contra o desvio aos pontos dados (1 por padrão).
+ *   rigidez: o peso da energia contra o desvio aos pontos dados (1 por padrão, de 1e-6 a 1e6).
  *   tolerancia: o maior deslocamento de um ponto, em mm (1 por padrão).
  *   silhueta: { vista: 'x' | 'y' | 'z', tolerancia } o maior deslocamento visto ao longo do eixo da vista, em mm.
- *   simetria: 'x' para a curva da metade x >= 0: o ponto com x = 0 fica com x = 0, e nenhum vai a x < 0.
+ *   simetria: 'x' para a curva da metade x >= 0: o ponto a até 1e-6 mm do plano fica com o x dado, e nenhum outro vai a x < 0.
  *   iteracoes: quantas vezes a parametrização se refaz pela curva da volta anterior (2 por padrão, de 1 a 10); a volta só fica se baixar a energia.
  * devolve: { pontos, deslocamentos, limitados, duros, variacaoAntes, variacaoDepois, maiorDeslocamento, voltas }.
  * exemplo:
@@ -37,8 +37,16 @@
  * curva de curvatura variável para a de curvatura constante até o limite (a elipse de 2000 por 600 em 24 pontos andava 95 mm, a hélice
  * 37,8 e a clotoide 25).
  *
- * O trecho curto. Com k = 5 o trecho de m pontos tem m - 5 janelas, e o de menos de oito pontos ficaria com menos de três: nele a ordem
- * cai para max(4, m - 3), a quarta diferença no trecho de cinco a sete pontos. O trecho de menos de cinco pontos fica como está.
+ * O trecho curto. Com k = 5 o trecho aberto de m pontos tem m - 5 janelas, e o de menos de oito pontos ficaria com menos de três: nele a
+ * ordem cai para max(4, m - 3), a quarta diferença no trecho de cinco a sete pontos; o ciclo tem m janelas e cai para m - 1 só abaixo de
+ * seis pontos. O trecho de menos de cinco pontos fica como está. A quarta diferença no trecho de cinco a sete pontos não separa forma de
+ * ruído no arco aberto: o arco limpo de raio 1000 em sete pontos anda 0,13 mm com 45 graus, 2,3 com 90, 7,7 com 120 e 42 com 180
+ * (de oito pontos para cima, menos de 0,1); o trecho assim precisa de mais pontos ou de tolerância pequena.
+ *
+ * A REGRA EM PONTOS POR VOLTA. A curva de curvatura constante se alisa sem andar quando a volta inteira dela teria uns 16 pontos: o
+ * círculo fechado de 16 pontos anda 0,08 mm por 1000 mm de raio, o de 12 anda 1,4 e o de 8, 65. A curva aberta perde nas pontas: a hélice
+ * de raio 300 com 20 pontos por volta, com 0,1 mm de ruído, anda 0,52 mm no ponto vizinho da ponta, com 24 pontos 0,22 e com 32, 0,07.
+ * A curva que anda mais que meia tolerância, ou que bate nela, sai com aviso na gaiolaPorRede.
  *
  * O limite do método. O que muda num comprimento da ordem do espaçamento não se distingue do ruído pela amostragem: a curvatura da ponta
  * da elipse muda num comprimento menor que o raio dela. Com o raio da ponta em umas sete vezes o espaçamento a elipse anda 0,02 mm (a de
@@ -79,6 +87,10 @@ export const ALISAR_CURVAS_PADRAO = Object.freeze({ energia: 'quartica', rigidez
 /* a ordem da diferença de cada energia: a de ordem k zera o polinômio de grau k - 1 no parâmetro da corda */
 const ORDEM = Object.freeze({ quartica: 5, cubica: 4 });
 const ORDEM_MINIMA = 4;
+/* a faixa da rigidez aceita */
+const RIGIDEZ = Object.freeze([1e-6, 1e6]);
+/* a distância (mm) ao plano de simetria abaixo da qual o ponto conta como nele: a mesma folga (1e-9 m) da gaiolaPorRede, em mm */
+const NO_PLANO = 1e-6;
 const EIXO = Object.freeze({ x: 0, y: 1, z: 2 });
 const REDUCAO_MAXIMA = 40;
 const PASSOS_DA_RIGIDEZ = 24;
@@ -100,7 +112,7 @@ export function conferirTolerancia(v, campo, onde) {
 export function lerOpcoesDoAlisamento(opcoes = {}, onde = 'o alisamento') {
   const o = { ...ALISAR_CURVAS_PADRAO, silhueta: null, simetria: null, ...Object.fromEntries(Object.entries(opcoes ?? {}).filter(([, v]) => v != null)) };
   if (!Object.hasOwn(ORDEM, o.energia)) falha(`${onde} tem energia ${valor(o.energia)}; use 'quartica' (a quinta diferença, padrão) ou 'cubica' (a quarta)`);
-  if (!(typeof o.rigidez === 'number' && Number.isFinite(o.rigidez) && o.rigidez > 0)) falha(`${onde} tem rigidez ${valor(o.rigidez)}; a rigidez é número finito maior que zero (1 por padrão)`);
+  if (!(typeof o.rigidez === 'number' && o.rigidez >= RIGIDEZ[0] && o.rigidez <= RIGIDEZ[1])) falha(`${onde} tem rigidez ${valor(o.rigidez)}; a rigidez vai de 1e-6 a 1e6 (1 por padrão): abaixo disso a curva não se mexe, e acima a conta perde a precisão sem alisar mais`);
   conferirTolerancia(o.tolerancia, 'tolerancia', onde);
   if (!(Number.isInteger(o.iteracoes) && o.iteracoes >= 1 && o.iteracoes <= 10)) falha(`${onde} tem iteracoes ${valor(o.iteracoes)}; use um inteiro de 1 a 10`);
   if (o.simetria !== null && o.simetria !== 'x') falha(`${onde} tem simetria ${valor(o.simetria)}; a simetria só aceita 'x' (a metade x >= 0)`);
@@ -236,15 +248,17 @@ export function alisarPontosDaCurva(pontos, opcoes = {}) {
     const j = (i + 1) % n;
     if (!(distancia(P0[i], P0[j]) > 0)) falha(`${onde} repete o ponto-chave: o de índice ${i} e o de índice ${j} são iguais (${valor(P0[i])}), e a corda entre eles é nula; tire um dos dois`);
   }
-  if (o.simetria === 'x') { const i = P0.findIndex((p) => p[0] < 0); if (i >= 0) falha(`${onde} tem simetria 'x' e o ponto de índice ${i} em x ${P0[i][0]} < 0; a curva é da metade x >= 0`); }
+  if (o.simetria === 'x') { const i = P0.findIndex((p) => p[0] < -NO_PLANO); if (i >= 0) falha(`${onde} tem simetria 'x' e o ponto de índice ${i} em x ${P0[i][0]} < 0; a curva é da metade x >= 0 (o ponto a até ${NO_PLANO} mm do plano conta como nele)`); }
   const duro = new Set([...duros, ...partir, ...(fechada ? [] : [0, n - 1])]);
-  const trechos = trechosDaCurva(n, fechada, new Set(partir)).map((tr) => ({ ...tr, k: Math.max(ORDEM_MINIMA, Math.min(ORDEM[o.energia], tr.indices.length - 3)) }));
+  /* a ordem do trecho: a da energia, ou menos no trecho aberto curto (que tem m - k janelas) e no ciclo curto (que tem m, e precisa de k + 1 pontos) */
+  const ordemDo = (tr) => Math.max(ORDEM_MINIMA, Math.min(ORDEM[o.energia], tr.indices.length - (tr.ciclico ? 1 : 3)));
+  const trechos = trechosDaCurva(n, fechada, new Set(partir)).map((tr) => ({ ...tr, k: ordemDo(tr) }));
   /* o trecho curto demais para a energia (menos de k + 1 pontos) não tem resíduo e fica como está */
   const linhasDe = (P) => trechos.map((tr) => (tr.indices.length >= tr.k + 1 ? residuosDoTrecho(tr.indices, P, tr.k, tr.ciclico) : []));
   /* a energia da curva P com a parametrização dela mesma: a medida do quanto ela ondula */
   const energiaPropria = (P) => linhasDe(P).reduce((s, L) => s + energiaDe(L, P), 0);
   /* a coordenada presa: as três do ponto duro, e o x do ponto no plano de simetria */
-  const presa = P0.map((p, i) => [0, 1, 2].map((q) => duro.has(i) || (q === 0 && o.simetria === 'x' && p[0] === 0)));
+  const presa = P0.map((p, i) => [0, 1, 2].map((q) => duro.has(i) || (q === 0 && o.simetria === 'x' && Math.abs(p[0]) <= NO_PLANO)));
 
   /* uma solução com os parâmetros das linhas dadas, com os limites: o trecho em que um ponto passa se resolve com a maior rigidez que
      cabe, e o que ainda passar é cortado */
@@ -257,7 +271,7 @@ export function alisarPontosDaCurva(pontos, opcoes = {}) {
       if (duro.has(i)) return false;
       const d = [P[i][0] - P0[i][0], P[i][1] - P0[i][1], P[i][2] - P0[i][2]];
       const { total, visto } = excessos(d, o.tolerancia, o.silhueta);
-      return total > 1 || visto > 1 || (o.simetria === 'x' && P[i][0] < 0);
+      return total > 1 || visto > 1 || (o.simetria === 'x' && !presa[i][0] && P[i][0] < 0);
     });
     trechos.forEach((tr, q) => {
       resolverTrecho(tr, P0, pesos, presa, linhas[q], o.rigidez, P);
@@ -280,7 +294,7 @@ export function alisarPontosDaCurva(pontos, opcoes = {}) {
       const d = [P[i][0] - P0[i][0], P[i][1] - P0[i][1], P[i][2] - P0[i][2]];
       const { total, visto } = excessos(d, o.tolerancia, o.silhueta);
       if (total > 1 || visto > 1) { const e = cortarAoLimite(d, o.tolerancia, o.silhueta); P[i] = [P0[i][0] + e[0], P0[i][1] + e[1], P0[i][2] + e[2]]; }
-      if (o.simetria === 'x' && P[i][0] < 0) P[i][0] = 0;
+      if (o.simetria === 'x' && !presa[i][0] && P[i][0] < 0) P[i][0] = 0;
     }
     return { P, limitados };
   }

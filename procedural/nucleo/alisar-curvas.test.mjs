@@ -76,6 +76,21 @@ describe('alisarPontosDaCurva', () => {
     expect(() => alisarPontosDaCurva([[0, 0, 0], [-1, 100, 0], [0, 200, 0]], { simetria: 'x' })).toThrow(/ponto de índice 1 em x -1 < 0/);
   });
 
+  it('o ponto a até 1e-6 mm do plano conta como nele: fica com o x dado, e a curva não é recusada', () => {
+    const pts = [[0, 0, 0], [-1e-12, 100, 1], [5, 200, 0], [10, 300, 1], [20, 400, 0], [30, 500, 0]];
+    const r = alisarPontosDaCurva(pts, { simetria: 'x', tolerancia: 2.5 });
+    expect(Object.is(r.pontos[1][0], -1e-12)).toBe(true);
+    for (const p of r.pontos.slice(2)) expect(p[0]).toBeGreaterThanOrEqual(0);
+    expect(() => alisarPontosDaCurva([[0, 0, 0], [-2e-6, 100, 0], [0, 200, 0]], { simetria: 'x' })).toThrow(/x -0.000002 < 0/);
+  });
+
+  it('no ciclo curto a ordem é a da energia enquanto cabe: o heptágono com quartica anda menos que com cubica', () => {
+    const c = Array.from({ length: 7 }, (_, i) => { const t = (i / 7) * 2 * Math.PI; return [1000 * Math.cos(t), 1000 * Math.sin(t), 0]; });
+    const q = alisarPontosDaCurva(c, { fechada: true, tolerancia: 1e4, iteracoes: 1 }).maiorDeslocamento;
+    const k = alisarPontosDaCurva(c, { fechada: true, tolerancia: 1e4, iteracoes: 1, energia: 'cubica' }).maiorDeslocamento;
+    expect(q).toBeLessThan(k * 0.9);
+  });
+
   it('em qualquer número de voltas a variação nunca sobe, e variacaoDepois é a energia da curva devolvida', () => {
     const casos = [
       ['hélice com ruído', helice.map((p, i) => (i === 0 || i === 20 ? p : [p[0] + ruido(i), p[1] - ruido(i + 3), p[2] + ruido(i + 7, 1)])), {}],
@@ -109,6 +124,7 @@ describe('alisarPontosDaCurva', () => {
     expect(() => alisarPontosDaCurva(p, { tolerancia: Infinity })).toThrow(/tolerancia Infinity;/);
     expect(() => alisarPontosDaCurva(p, { silhueta: { vista: 'w', tolerancia: 1 } })).toThrow(/silhueta/);
     expect(() => alisarPontosDaCurva(p, { simetria: 'y' })).toThrow(/simetria "y"/);
+    for (const rigidez of [1e300, 1e-300, 1e7]) expect(() => alisarPontosDaCurva(p, { rigidez })).toThrow(/rigidez .*vai de 1e-6 a 1e6/);
     expect(() => alisarPontosDaCurva(p, { duros: [7] })).toThrow(/ponto 7 .* de 0 a 3/);
   });
 });

@@ -35,7 +35,7 @@ function elipse(a, b, h) {
   });
 }
 const CONTROLES = {
-  'hélice de raio 300 com 20 pontos por volta': [Array.from({ length: 21 }, (_, i) => { const t = (i / 20) * 2 * Math.PI; return [300 * Math.cos(t), 300 * Math.sin(t), (400 * t) / (2 * Math.PI)]; }), {}],
+  'hélice de raio 300 com 24 pontos por volta': [Array.from({ length: 25 }, (_, i) => { const t = (i / 24) * 2 * Math.PI; return [300 * Math.cos(t), 300 * Math.sin(t), (400 * t) / (2 * Math.PI)]; }), {}],
   'senoide de amplitude 100 com 20 pontos por onda': [Array.from({ length: 21 }, (_, i) => [i * 100, 100 * Math.sin((i / 20) * 2 * Math.PI), 0]), {}],
   'clotoide de 2000 mm': [(() => { const p = []; let x = 0; let y = 0; let th = 0; for (let i = 0; i <= 20; i++) { p.push([x, y, 0]); th += i * 0.01; x += 100 * Math.cos(th); y += 100 * Math.sin(th); } return p; })(), {}],
   'elipse de 2000 por 600 a cada 25 mm': [elipse(2000, 600, 25), { fechada: true }],
@@ -50,8 +50,14 @@ describe('os controles limpos de curvatura variável', () => {
       const r = alisarPontosDaCurva(p, { ...o, tolerancia: ALISAMENTO_DE_PROVA.tolerancia });
       expect(r.maiorDeslocamento, nome).toBeLessThan(LIMITE_DA_FORMA_MM);
       expect(r.limitados, nome).toEqual([]);
-      /* o mesmo controle com o ruído da rede (na normal da poligonal, mais um terço dele fora do plano): o erro quadrático médio cai à metade */
       const n = p.length; const duro = new Set([...(o.duros ?? []), ...(o.fechada ? [] : [0, n - 1])]);
+      /* o viés: a volta que baixa a energia pode ser rejeitada no controle exato (a hélice limpa sai com 0 voltas), e o controle passaria
+         sem alisar; com 0,1 mm de ruído fora do plano a volta fica, e o que a forma anda é o viés do método */
+      const quase = p.map((q, i) => (duro.has(i) ? [...q] : [q[0], q[1], q[2] + 0.1 * Math.sin(ANGULO_AUREO * (i + 1) * 7)]));
+      const v = alisarPontosDaCurva(quase, { ...o, tolerancia: ALISAMENTO_DE_PROVA.tolerancia });
+      expect(v.voltas, nome).toBeGreaterThan(0);
+      expect(Math.max(...v.pontos.map((q, i) => Math.hypot(q[0] - p[i][0], q[1] - p[i][1], q[2] - p[i][2]))), nome).toBeLessThan(LIMITE_DA_FORMA_MM);
+      /* o mesmo controle com o ruído da rede (na normal da poligonal, mais um terço dele fora do plano): o erro quadrático médio cai à metade */
       const comRuido = p.map((q, i) => {
         if (duro.has(i)) return [...q];
         const a = p[(i - 1 + n) % n]; const b = p[(i + 1) % n]; const l = Math.hypot(b[0] - a[0], b[1] - a[1]) || 1;
@@ -191,6 +197,47 @@ describe.skipIf(!manifoldCarregada())('o alisamento das curvas declaradas na red
         });
       }
     }
+  });
+
+  it('na curva densa, o ruído da ordem da tolerância não vira canto; o canto verdadeiro vira um corte só', () => {
+    const AU = ANGULO_AUREO;
+    for (const espacamento of [4, 5, 7]) {
+      const d = definicaoDaRede({ ruido: false });
+      const baixo = d.curvas.find((c) => c.nome === 'baixo');
+      const pts = ['N00']; let k = 0;
+      for (let x = espacamento; x < 500; x += espacamento) pts.push([x, painel(x, 0) + 2 * Math.sin(AU * ++k * 7), 0]);
+      pts.push('N10');
+      for (let x = 500 + espacamento; x < 1000; x += espacamento) pts.push([x, painel(x, 0) + 2 * Math.sin(AU * ++k * 7), 0]);
+      pts.push('N20'); baixo.pontos = pts;
+      const c = gaiolaPorRede({ ...d, alisarCurvas: { tolerancia: 2.5 } }).alisamentoDasCurvas.curvas.baixo;
+      expect(c.partida, `${espacamento} mm`).toEqual([]);
+      const rms = Math.sqrt(c.pontosChave.reduce((s, p) => s + (p[1] - painel(p[0], p[2])) ** 2, 0) / c.pontosChave.length);
+      expect(rms, `${espacamento} mm`).toBeLessThan(0.1);
+    }
+    /* o mesmo trecho com uma lomba entre x 250 e 500, que nasce e morre com 40 graus de inclinação, ponto a cada 5 mm e o mesmo ruído:
+       um corte em cada pé, o de x 250 (ponto 50) e o do nó N10 (ponto 100), e nenhum no meio da lomba */
+    const d = definicaoDaRede({ ruido: false });
+    const baixo = d.curvas.find((c) => c.nome === 'baixo');
+    const subida = Math.tan((40 * Math.PI) / 180);
+    const y = (x) => painel(x, 0) + (x > 250 && x < 500 ? (x - 250) * subida * (500 - x) / 250 : 0);
+    const pts = ['N00']; let k = 0;
+    for (let x = 5; x < 500; x += 5) pts.push([x, y(x) + 2 * Math.sin(AU * ++k * 7), 0]);
+    pts.push('N10');
+    for (let x = 505; x < 1000; x += 5) pts.push([x, painel(x, 0) + 2 * Math.sin(AU * ++k * 7), 0]);
+    pts.push('N20'); baixo.pontos = pts;
+    const c = gaiolaPorRede({ ...d, alisarCurvas: { tolerancia: 2.5 } }).alisamentoDasCurvas.curvas.baixo;
+    expect(c.partida).toEqual([50, 100]);
+  });
+
+  it('a curva que bate no limite ou anda mais que meia tolerância sai com aviso', () => {
+    const avisos = (alisarCurvas) => gaiolaPorRede(definicaoDaRede({ ruido: true, alisarCurvas })).avisos.filter((a) => a.ref.startsWith('alisamento'));
+    const um = avisos({ tolerancia: 1 });
+    expect(um.filter((a) => a.ref === 'alisamentoNoLimite').map((a) => a.curva).sort()).toEqual(['baixo', 'centro', 'direita', 'esquerda', 'meio', 'topo']);
+    expect(um[0].texto).toMatch(/alisarCurvas: a curva '.*' bateu na tolerância de 1 mm/);
+    const largo = avisos({ tolerancia: 2.5 });
+    expect(largo.every((a) => a.ref === 'alisamentoAndou')).toBe(true);
+    expect(largo.length).toBeGreaterThan(0);
+    expect(gaiolaPorRede({ ...definicaoDaChapaSimetrica(), alisarCurvas: true }).avisos.filter((a) => a.ref.startsWith('alisamento'))).toEqual([]);
   });
 
   it('o ponto-chave repetido é recusado com a posição dele, antes do alisamento', () => {
