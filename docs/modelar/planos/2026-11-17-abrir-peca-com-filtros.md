@@ -42,7 +42,8 @@ A lista de `listarParaBancada` é USAR DIRETO e ganha a categoria e a situação
 ## Fatias
 
 1. Feita em 2026-11-17: a categoria e a situação em `listarParaBancada`, com teste sobre o acervo. A categoria vem de `PLANO.familia`, lida em segundo plano por `classificar()`, porque `PLANO` mora dentro da receita e lê-lo na construção traria todas ao pacote inicial; 18 de 58 de trabalho caem em outros (31%).
-2. Feita em 2026-11-17, falta a aprovação da pessoa: a janela com busca e filtros e a imagem em `docs/modelar/banco-de-provas/abrir-peca-com-filtros-2026-11-17/`.
+2. Feita em 2026-11-17 e aprovada pela pessoa pela imagem no mesmo dia ("a janela esta aprovada"): a janela com busca e filtros e a imagem em `docs/modelar/banco-de-provas/abrir-peca-com-filtros-2026-11-17/`.
+3. Feita em 2026-11-17, pedida pela pessoa ao aceitar a recomendação: o objeto declara a categoria (`PLANO.categoria` na receita e `categoria` na montagem em dados, de lista fechada em `src/autoria/categorias-de-objeto.js`), para os que caíam em Outros nascerem em Robótica, Eletrônica, Ferramentas e utensílios, Móveis e Veículos. `PLANO.familia` não serve, porque é validada contra os critérios de `procedural/criterios/` e põe perguntas no brief do crítico. `carro-fastback/lataria` fica em Outros até o plano do carro declará-la.
 
 ## Riscos e parada
 
