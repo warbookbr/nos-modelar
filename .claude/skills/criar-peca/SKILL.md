@@ -136,7 +136,10 @@ contrato opcional `INTENCAO`, para quando a função não é óbvia pela geometr
 [`AUTORIA-RECEITA-DECLARATIVA.md`](../../../docs/modelar/usar/AUTORIA-RECEITA-DECLARATIVA.md)
 (a receita como dado JSON, usada pela autoria por MCP) e
 [`CONFERIR-CONTRA-REFERENCIA.md`](../../../docs/modelar/usar/CONFERIR-CONTRA-REFERENCIA.md)
-(a borda da peça contra a foto). Para curva bilateral contínua,
+(a borda da peça contra a foto). Para placa de circuito com componentes, use a
+família `componente-eletronico` e a seção "Peça de uma família" de
+[`AUTORIA-DE-PECA.md`](../../../docs/modelar/usar/AUTORIA-DE-PECA.md), sem desenhar
+o cilindro do capacitor nem a caixa do chip na receita. Para curva bilateral contínua,
 `criarCaminhoSimetrico()` em `src/autoria/caminho-simetrico.js` garante a
 simetria sem fresta nas pontas.
 
