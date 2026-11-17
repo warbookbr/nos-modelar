@@ -1,6 +1,6 @@
 # Etapas pela impressão do aceite: provas
 
-Plano: [Etapas pela impressão do aceite](../../planos/2026-11-17-etapas-pela-impressao-do-aceite.md).
+Plano: [Etapas pela impressão do aceite](../../decisoes/PLANOS-ENCERRADOS.md).
 
 ## Fatia 1: a impressão e a leitura pura
 
