@@ -15,6 +15,7 @@ import {
   ARQUIVO_DO_CONTORNO_SOBREPOSTO, contornosParaSobrepor, etapaFixaDaPeca, motivoDaEtapaFixa, registroDasEtapas,
   ARQUIVO_DAS_PERGUNTAS_FECHADAS, FORMATO_DAS_PERGUNTAS_FECHADAS, NAO_DA_PARA_VER, NAO_VERIFICAVEL, REGRA_DA_NOTA, arquivoDoPedidoFechado, juntarOrdens, lerRespostasFechadas,
   montarPedidoFechado, notaDasRespostas, notaEscrita, normalizarResposta, perguntasFechadas, relatorioDaJuncao, relatorioDasNotas, respostasQueMudaram, variacaoDasNotas,
+  ARQUIVO_DOS_DADOS_DO_PEDIDO, afirmacoesDaForma, gravarPedidos, notaPelaRegra, pesosDasPerguntas, refazerPedidos, semMedidas,
 } from './vistas-para-critica.mjs';
 import { extrairVeredito } from '../../src/autoria/calibracao-do-critico.js';
 import { lerContornos } from './comparar-contornos.mjs';
@@ -336,7 +337,12 @@ describe('o pacote de uma receita que refina um esboço', () => {
     const dado = JSON.parse(readFileSync(join(pasta, ARQUIVO_DAS_PERGUNTAS_FECHADAS), 'utf8'));
     expect(dado.formato).toBe(FORMATO_DAS_PERGUNTAS_FECHADAS);
     expect(dado.pedidos).toEqual({ a: resultado.pedidosFechados.a, b: resultado.pedidosFechados.b });
-    expect(dado.perguntas.map((q) => q.origem)).toEqual(['alvo', 'parte:bloco', 'parte:viga', 'criterio:1', 'criterio:2']);
+    /* a viga promete "caixa de 300 por 40 por 60 mm girada 30 graus em z, com o centro 400 mm acima do chão": duas afirmações sem medida */
+    expect(dado.perguntas.map((q) => q.origem)).toEqual(['alvo', 'parte:bloco', 'parte:viga', 'parte:viga', 'criterio:1', 'criterio:2']);
+    expect(dado.perguntas.filter((q) => q.origem === 'parte:viga').map((q) => [q.texto, q.peso])).toEqual([
+      ['A parte `viga` mostra isto nas imagens: caixa girada em z?', 0.5], ['A parte `viga` mostra isto nas imagens: com o centro acima do chão?', 0.5],
+    ]);
+    expect(JSON.parse(readFileSync(join(pasta, ARQUIVO_DOS_DADOS_DO_PEDIDO), 'utf8')).dados.peca).toBe(resultado.peca);
   }, 60_000);
 
   it('o alvo é a composta guardada com as formas do esboço, copiada para a pasta da rodada, e a unidade é a nula porque nenhuma forma ligada declara unidade', async () => {
@@ -1358,7 +1364,8 @@ describe('o pedido por perguntas fechadas, em duas ordens', () => {
     expect(perguntas.map((p) => p.id)).toEqual(perguntas.map((_, i) => `P${i + 1}`));
     expect(perguntas.map((p) => p.origem)).toEqual(['alvo', 'referencia:esquerda', 'parte:bloco', 'parte:viga', 'criterio:1', 'criterio:2']);
     expect(perguntas.find((p) => p.origem === 'referencia:esquerda').texto).toBe('Na vista esquerda do modelo, a silhueta e o lugar de cada parte seguem os de `lateral.png`?');
-    expect(perguntas.find((p) => p.origem === 'parte:bloco').texto).toBe(`A parte \`bloco\` aparece nas imagens com a forma prometida: ${PLANO.partes[0].forma}?`);
+    expect(perguntas.find((p) => p.origem === 'parte:bloco')).toMatchObject({ texto: 'A parte `bloco` mostra isto nas imagens: caixa com um furo passante?', peso: 1 });
+    expect(perguntas.find((p) => p.origem === 'parte:viga').texto).toBe('A parte `viga` mostra isto nas imagens: caixa inclinada?');
     expect(perguntas.find((p) => p.origem === 'criterio:1')).toMatchObject({ grupo: 'criterio', defeitoSe: 'sim', texto: 'As imagens mostram isto: o bloco sem o furo?' });
     expect(perguntas.filter((p) => p.grupo === 'forma').every((p) => p.defeitoSe === 'não')).toBe(true);
     expect(perguntasFechadas(structuredClone(DADOS))).toEqual(perguntas);
@@ -1388,8 +1395,13 @@ describe('o pedido por perguntas fechadas, em duas ordens', () => {
       expect(texto).toContain(REGRA_DA_NOTA);
       expect(texto).toContain('`sim`, `não` ou `não dá para ver`');
       expect(texto).toContain('Estas perguntas são abertas e não entram na regra da nota');
+      expect(texto).toContain('Medida não se responde a olho.');
+      expect(texto).toContain('- P3. A parte `bloco` mostra isto nas imagens: caixa com um furo passante? (o `não` tira 1)');
+      expect(texto).not.toContain('Forma prometida:');
+      expect(texto).toContain('Técnica prometida: caixa menos cilindro');
       expect(texto).not.toMatch(/\bPASSOS\b|receita|rodada|histórico|mudou|ferramenta/i);
     }
+    expect(montarPedido(DADOS)).toContain(`Forma prometida: ${PLANO.partes[0].forma}`);
     expect(montarPedidoFechado(DADOS, 'a')).toBe(A);
     expect(() => montarPedidoFechado(DADOS, 'c')).toThrow(/ordem do pedido fechado 'c' desconhecida/);
   });
@@ -1416,26 +1428,57 @@ describe('o pedido por perguntas fechadas, em duas ordens', () => {
     expect(() => lerRespostasFechadas(resposta(todas({}).slice(0, 4)), perguntas)).toThrow(/sem resposta para P5, P6/);
   });
 
-  it('a nota sai das respostas pela regra: 10, 9 e 8 pela forma, 7, 6 e 5 pelos critérios, e "não dá para ver" não conta', () => {
+  it('a nota sai das respostas pela regra: cada parte tira até um ponto, o primeiro critério 3 e os seguintes 1, sem saturar, e "não dá para ver" não conta', () => {
     const base = { P1: 'sim', P2: 'sim', P3: 'sim', P4: 'sim', P5: 'não', P6: 'não' };
     const nota = (mudanca) => notaDasRespostas(perguntas, { ...base, ...mudanca }).nota;
     expect(nota({})).toBe(10);
     expect(nota({ P3: 'não' })).toBe(9);
     expect(nota({ P3: 'não', P4: 'não' })).toBe(8);
-    expect(nota({ P5: 'sim', P3: 'não' })).toBe(7);
+    /* a regra de antes dava 8 a dois, três ou quatro defeitos de forma; esta os separa */
+    expect(nota({ P1: 'não', P2: 'não', P3: 'não', P4: 'não' })).toBe(6);
+    expect(nota({ P5: 'sim' })).toBe(7);
+    expect(nota({ P5: 'sim', P3: 'não' })).toBe(6);
     expect(nota({ P5: 'sim', P6: 'sim' })).toBe(6);
     expect(nota({ P1: NAO_DA_PARA_VER, P6: NAO_DA_PARA_VER })).toBe(10);
-    expect(notaDasRespostas(perguntas, { ...base, P3: 'não', P5: 'sim' })).toMatchObject({ forma: ['P3'], criterio: ['P5'] });
+    expect(notaDasRespostas(perguntas, { ...base, P3: 'não', P5: 'sim' })).toMatchObject({ forma: ['P3'], criterio: ['P5'], tira: { forma: 1, criterio: 1 } });
     const tres = [...perguntas, { id: 'P7', grupo: 'criterio', defeitoSe: 'sim' }];
     expect(notaDasRespostas(tres, { ...base, P5: 'sim', P6: 'sim', P7: 'sim' }).nota).toBe(5);
+    expect([notaPelaRegra(0, 0), notaPelaRegra(2.5, 0), notaPelaRegra(0, 0.5), notaPelaRegra(8, 3)]).toEqual([10, 7.5, 8.5, 0]);
   });
 
-  it('a resposta que muda entre as duas ordens sai como não verificável e não vira defeito', () => {
+  it('a parte de várias afirmações reparte o ponto entre elas, e a pergunta gravada sem peso vale pela origem', () => {
+    const dados = { ...DADOS, plano: { ...PLANO, partes: [{ nome: 'garfo', forma: 'garfo reto: cabeça larga e arredondada, duas pernas que afinam, e coluna coaxial à caixa de direção', tecnica: 'loft' }] } };
+    const ps = perguntasFechadas(dados).filter((p) => p.origem === 'parte:garfo');
+    expect(ps.map((p) => p.texto)).toEqual([
+      'A parte `garfo` mostra isto nas imagens: garfo reto?',
+      'A parte `garfo` (garfo reto) mostra isto nas imagens: cabeça larga e arredondada?',
+      'A parte `garfo` (garfo reto) mostra isto nas imagens: pernas que afinam?',
+      'A parte `garfo` (garfo reto) mostra isto nas imagens: coluna coaxial à caixa de direção?',
+    ]);
+    expect(ps.every((p) => p.peso === 0.25)).toBe(true);
+    const todasAs = perguntasFechadas(dados);
+    const r = Object.fromEntries(todasAs.map((p) => [p.id, p.grupo === 'criterio' ? 'não' : 'sim']));
+    expect(notaDasRespostas(todasAs, { ...r, [ps[1].id]: 'não' }).nota).toBe(9.8);
+    expect(montarPedidoFechado(dados, 'a')).toContain(`${ps[1].id}. A parte \`garfo\` (garfo reto) mostra isto nas imagens: cabeça larga e arredondada? (o \`não\` tira 0,25)`);
+    const semPeso = [{ id: 'P1', grupo: 'forma', origem: 'parte:a' }, { id: 'P2', grupo: 'forma', origem: 'parte:a' }, { id: 'P3', grupo: 'forma', origem: 'parte:b' }, { id: 'P4', grupo: 'criterio', origem: 'criterio:1' }];
+    expect([...pesosDasPerguntas(semPeso).values()]).toEqual([0.5, 0.5, 1, 1]);
+  });
+
+  it('a resposta que muda entre as duas ordens sai como não verificável e tira metade do peso na nota das duas', () => {
     const a = { P1: 'sim', P2: 'não', P3: 'sim', P4: 'sim', P5: 'sim', P6: 'não' };
     const b = { P1: 'sim', P2: 'não', P3: 'não', P4: 'sim', P5: 'não', P6: 'não' };
     const j = juntarOrdens(perguntas, a, b);
     expect(j.linhas.filter((l) => l.final === NAO_VERIFICAVEL).map((l) => l.id)).toEqual(['P3', 'P5']);
-    expect(j).toMatchObject({ nota: 9, forma: ['P2'], criterio: [], naoVerificaveis: ['P3', 'P5'], porOrdem: { a: 7, b: 8 } });
+    expect(j).toMatchObject({ nota: 7, forma: ['P2'], criterio: [], naoVerificaveis: ['P3', 'P5'], porOrdem: { a: 6, b: 8 }, tira: { forma: 1.5, criterio: 0.5 } });
+  });
+
+  it('as perguntas que mudam não sobem a nota das duas acima das ordens: dois defeitos em cada, todos diferentes, dão 8 e não 10', () => {
+    const ok = { P1: 'sim', P2: 'sim', P3: 'sim', P4: 'sim', P5: 'não', P6: 'não' };
+    const j = juntarOrdens(perguntas, { ...ok, P3: 'não', P4: 'não' }, { ...ok, P1: 'não', P2: 'não' });
+    expect(j.naoVerificaveis).toEqual(['P1', 'P2', 'P3', 'P4']);
+    expect(j.forma).toEqual([]);
+    expect(j).toMatchObject({ nota: 8, porOrdem: { a: 8, b: 8 } });
+    expect(juntarOrdens(perguntas, { ...ok, P3: 'não' }, { ...ok, P3: NAO_DA_PARA_VER }).nota).toBe(9.5);
   });
 
   it('a variação de cinco notas e as perguntas cuja resposta final mudou entre repetições', () => {
@@ -1450,11 +1493,11 @@ describe('o pedido por perguntas fechadas, em duas ordens', () => {
     const a = { arquivo: 'a1.md', texto: resposta(todas({ P3: 'não' }), 9) };
     const b = { arquivo: 'b1.md', texto: resposta(todas({ P3: 'sim' }), 8) };
     const texto = relatorioDaJuncao(perguntas, [{ a, b }, { a, b: a }]);
-    expect(texto).toContain('nota pela regra, com as duas ordens: 10 (só a ordem A: 9; só a B: 10; o crítico escreveu 9 e 8)');
+    expect(texto).toContain('nota pela regra, com as duas ordens: 9,5 (só a ordem A: 9; só a B: 10; o crítico escreveu 9 e 8)');
     expect(texto).toContain('não verificáveis (a resposta mudou entre as ordens): P3 (A não, B sim)');
     expect(texto).toContain('VARIAÇÃO EM 2 REPETIÇÕES');
-    expect(texto).toContain('nota pela regra, com as duas ordens: 10, 9; amplitude 1');
-    expect(relatorioDasNotas([a, b, a])).toContain('VARIAÇÃO EM 3 RESPOSTAS: 9, 8, 9; amplitude 1');
+    expect(texto).toContain('nota pela regra, com as duas ordens: 9,5 / 9; amplitude 0,5');
+    expect(relatorioDasNotas([a, b, a])).toContain('VARIAÇÃO EM 3 RESPOSTAS: 9 / 8 / 9; amplitude 1');
     expect(() => relatorioDasNotas([{ arquivo: 'x.md', texto: 'sem veredito' }])).toThrow(/x.md não termina com o veredito JSON/);
   });
 
@@ -1466,13 +1509,68 @@ describe('o pedido por perguntas fechadas, em duas ordens', () => {
     const cli = (...args) => spawnSync(process.execPath, [join(import.meta.dirname, 'vistas-para-critica.mjs'), ...args], { encoding: 'utf8', timeout: 20_000 });
     const r = cli(`--juntar=${pasta}`, join(pasta, 'a.md'), join(pasta, 'b.md'));
     expect(r.status).toBe(0);
-    expect(r.stdout).toContain('nota pela regra, com as duas ordens: 10 (só a ordem A: 10; só a B: 7');
+    expect(r.stdout).toContain('nota pela regra, com as duas ordens: 8,5 (só a ordem A: 10; só a B: 7');
     expect(r.stdout).toContain('P5 (A não, B sim)');
     const impar = cli(`--juntar=${pasta}`, join(pasta, 'a.md'));
     expect(impar.status).toBe(2);
     expect(impar.stderr).toContain('aceito pares, a da ordem A antes da B');
     const notas = cli('--notas', join(pasta, 'a.md'), join(pasta, 'b.md'));
     expect(notas.status).toBe(0);
-    expect(notas.stdout).toContain('VARIAÇÃO EM 2 RESPOSTAS: 7, 7; amplitude 0');
+    expect(notas.stdout).toContain('VARIAÇÃO EM 2 RESPOSTAS: 7 / 7; amplitude 0');
+  });
+
+  it('o pacote grava os dados do pedido, e --refazer-pedidos refaz os três pedidos e as perguntas por eles, sem capturar', () => {
+    const pasta = mkdtempSync(join(area, 'refazer-'));
+    const gravado = gravarPedidos(pasta, DADOS);
+    expect(gravado.pedidosFechados.quantas).toBe(perguntas.length);
+    const nomes = ['pedido.md', 'pedido-fechado-a.md', 'pedido-fechado-b.md', ARQUIVO_DAS_PERGUNTAS_FECHADAS];
+    const antes = nomes.map((n) => readFileSync(join(pasta, n), 'utf8'));
+    expect(antes[1]).toBe(A);
+    for (const n of nomes) rmSync(join(pasta, n));
+    refazerPedidos(pasta);
+    expect(nomes.map((n) => readFileSync(join(pasta, n), 'utf8'))).toEqual(antes);
+    const cli = spawnSync(process.execPath, [join(import.meta.dirname, 'vistas-para-critica.mjs'), `--refazer-pedidos=${pasta}`], { encoding: 'utf8', timeout: 20_000 });
+    expect(cli.status).toBe(0);
+    expect(cli.stdout).toContain(`(${perguntas.length} perguntas fechadas)`);
+    const vazia = mkdtempSync(join(area, 'refazer-vazia-'));
+    expect(() => refazerPedidos(vazia)).toThrow(new RegExp(`não achei .*${ARQUIVO_DOS_DADOS_DO_PEDIDO}`));
+  });
+});
+
+/* ---------- a forma prometida em afirmações ---------- */
+
+describe('a forma prometida em afirmações que se veem, sem medida nem contagem', () => {
+  it('tira a medida com unidade, a coordenada, o intervalo e a contagem antes do nome', () => {
+    expect(semMedidas('pneu de 48 mm de largura e 42 mm de altura, com sulcos, assentado no aro')).toBe('pneu, com sulcos, assentado no aro');
+    expect(semMedidas('pinhão de 16 dentes no cubo traseiro, no plano da coroa')).toBe('pinhão com dentes no cubo traseiro, no plano da coroa');
+    expect(semMedidas('ligando a coroa à catraca por dois trechos retos e dois enrolamentos')).toBe('ligando a coroa à catraca por trechos retos e enrolamentos');
+    expect(semMedidas('placa clara de 618 por 265 por 88 mm, de y 309 a 574, saindo do para-choque até z 3044')).toBe('placa clara, saindo do para-choque');
+    expect(semMedidas('sai da mesa subindo em cerca de 30 graus por uns 70 mm e segue subindo suave, uns 6 graus, até as pontas')).toBe('sai da mesa subindo e segue subindo suave, até as pontas');
+    expect(semMedidas('a fresta de 6 mm em 380 entre ele e a parte presa')).toBe('a fresta entre ele e a parte presa');
+    expect(semMedidas('bulbo de 6 mm de raio e 30 de comprimento com flange')).toBe('bulbo com flange');
+    expect(semMedidas('coroa e catraca fora do mesmo plano x')).toBe('coroa e catraca fora do mesmo plano x');
+  });
+
+  it('parte nas vírgulas de fora dos parênteses, junta o pedaço curto ao vizinho e põe o nome antes dos dois-pontos primeiro', () => {
+    expect(afirmacoesDaForma('pneu de 48 mm de largura e 42 mm de altura, com sulcos, assentado no aro da roda dianteira').afirmacoes)
+      .toEqual(['pneu, com sulcos', 'assentado no aro da roda dianteira']);
+    expect(afirmacoesDaForma('tubos redondos: superior, inferior (mais grosso), do selim, caixa de direção grossa')).toEqual({
+      nome: 'tubos redondos', afirmacoes: ['tubos redondos', 'superior, inferior (mais grosso), do selim', 'caixa de direção grossa'],
+    });
+    expect(afirmacoesDaForma('eixo com tampa e dois braços opostos, achatados e afunilados, no movimento central').afirmacoes)
+      .toEqual(['eixo com tampa e braços opostos, achatados e afunilados, no movimento central']);
+    expect(afirmacoesDaForma('cubo com porcas, 36 raios cruzados e aro, centrados entre as pernas do garfo').afirmacoes)
+      .toEqual(['cubo com porcas', 'raios cruzados e aro', 'centrados entre as pernas do garfo']);
+    expect(afirmacoesDaForma('30,4 por 23,6 por 2 mm, cantos de 3 mm, x 202,9 a 233,3, y 287,7 a 311,3')).toEqual({ nome: null, afirmacoes: [] });
+    expect(afirmacoesDaForma('cubo com porcas, 36 raios cruzados e aro')).toEqual(afirmacoesDaForma('cubo com porcas, 36 raios cruzados e aro.'));
+  });
+
+  it('a parte só de medidas vira a pergunta de que ela aparece, e o critério sai sem medida', () => {
+    const dados = { ...DADOS, plano: { ...PLANO, partes: [{ nome: 'botao', forma: '30,4 por 23,6 por 2 mm, x 202,9 a 233,3', tecnica: 'caixa' }], criteriosDeReprovacao: ['guidão diferente da vista frontal: largura perto de 722 mm, pontas subindo', 'folga de 2 mm'] } };
+    const ps = perguntasFechadas(dados);
+    expect(ps.find((p) => p.origem === 'parte:botao').texto).toBe('A parte `botao` aparece nas imagens?');
+    expect(ps.filter((p) => p.grupo === 'criterio').map((p) => p.texto)).toEqual([
+      'As imagens mostram isto: guidão diferente da vista frontal: largura, pontas subindo?', 'As imagens mostram isto: folga de 2 mm?',
+    ]);
   });
 });

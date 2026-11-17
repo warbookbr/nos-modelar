@@ -57,8 +57,10 @@
  *    de nome da instância ou de uma parte (plano de comparar com a referência, fatia 5);
  *  - o pedido por perguntas fechadas (`pedido-fechado-a.md` e `pedido-fechado-b.md`, com `perguntas-fechadas.json`), sobre as mesmas
  *    imagens em duas ordens, ao lado do `pedido.md` de hoje (fatia 6 do mesmo plano): cada resposta é `sim`, `não` ou `não dá para ver`
- *    citando a imagem, a que muda entre as ordens sai como não verificável, e a nota sai das respostas por `REGRA_DA_NOTA`;
- *    `--juntar=<pasta>` lê as duas respostas, e `--notas` dá a variação das notas do pedido de hoje;
+ *    citando a imagem, a forma prometida de cada parte chega em afirmações sem medida nem contagem (`afirmacoesDaForma`), a que muda
+ *    entre as ordens sai como não verificável e tira metade do peso, e a nota sai das respostas por `REGRA_DA_NOTA`;
+ *    `--juntar=<pasta>` lê as duas respostas, `--notas` dá a variação das notas do pedido de hoje, e `--refazer-pedidos=<pasta>`
+ *    refaz os pedidos pelo `dados-do-pedido.json` da pasta, sem capturar;
  *
  * A pasta traz ainda o `pacote.json`, com a impressão do texto da receita que o pacote mostra e as imagens de superfície: é por ele
  * que o registro da rodada sabe se o crítico de peça de lataria recebeu as duas vistas da versão medida.
@@ -531,11 +533,12 @@ export function secoesDoPedido({ peca, plano = null, orientacao = null, alvo = n
 
   if (partes.length) {
     abrir('partes');
-    L.push('## Partes', '', `Uma vista isolada de cada parte, olhando dos lados descritos em Modelo, com a forma e a técnica que o plano prometeu para ela. ${fechado ? 'A forma prometida de cada parte é perguntada nas perguntas fechadas, mais abaixo. ' : 'Diga, em uma linha por parte, se a forma que você vê é a prometida; parte prometida que não aparece na imagem é ausência. '}Feição menor que uns 10 mm só se julga pela vista de perto, quando a parte a traz; sem ela, a imagem isolada não a mostra e você não aponta defeito nem aprova a feição.`, '');
+    L.push('## Partes', '', `Uma vista isolada de cada parte, olhando dos lados descritos em Modelo, com a forma e a técnica que o plano prometeu para ela. ${fechado ? 'A forma prometida de cada parte é perguntada, afirmação por afirmação, nas perguntas fechadas, mais abaixo. ' : 'Diga, em uma linha por parte, se a forma que você vê é a prometida; parte prometida que não aparece na imagem é ausência. '}Feição menor que uns 10 mm só se julga pela vista de perto, quando a parte a traz; sem ela, a imagem isolada não a mostra e você não aponta defeito nem aprova a feição.`, '');
     for (const { nome, imagens, caixaMm = null, dePerto = [] } of partes) {
       const prometida = plano?.partes.find((p) => p.nome === nome);
       L.push(`### ${nome}`, '');
-      if (prometida) L.push(`Forma prometida: ${prometida.forma}`, '', `Técnica prometida: ${prometida.tecnica}`, '');
+      /* no pedido fechado a forma prometida chega como afirmações nas perguntas, sem a medida e a contagem que a imagem não mostra */
+      if (prometida) L.push(...(fechado ? [] : [`Forma prometida: ${prometida.forma}`, '']), `Técnica prometida: ${prometida.tecnica}`, '');
       if (caixaMm) L.push(`Caixa da parte na malha executada: ${caixaMm.map((n) => mmTexto(n).replace(' mm', '')).join(' por ')} mm (x, y, z); a vista isolada não tem escala, e o tamanho e a espessura da parte se julgam por esta caixa.`, '');
       L.push(...lista(imagens.map(imagem)), '');
       if (dePerto.length) {
@@ -558,6 +561,112 @@ export function secoesDoPedido({ peca, plano = null, orientacao = null, alvo = n
   abrir('veredito');
   L.push('## Veredito', '', `No veredito em JSON, \`onde\`, \`evidencia\` e \`observacao\` têm até ${LIMITE_DO_VEREDITO} caracteres cada, porque o registro recusa o mais longo; o detalhe vai no texto da resposta.`, '');
   return S;
+}
+
+/* ---------- a forma prometida em afirmações que se veem ----------
+ *
+ * Na medida do item 8 (2026-11-17, cinco pares de respostas sobre o pacote da bicicleta), as perguntas que mudaram de resposta entre
+ * as ordens eram quase todas compostas e traziam número que a imagem não mostra: "pinhão de 16 dentes", "pneu de 48 mm de largura e
+ * 42 mm de altura", "dois trechos retos e dois enrolamentos". O crítico respondia `não` porque não contava os dentes, ou `sim` porque
+ * a forma geral estava lá, e a resposta dependia da ordem. A contagem e a medida em milímetro são do `descrever`, que as mede; a
+ * pergunta fechada fica com o que a imagem mostra. `semMedidas` tira do texto a medida com unidade, a coordenada (`x 202,9 a 233,3`),
+ * o intervalo de números e a contagem antes do nome (`36 raios` vira `raios`, `de 16 dentes` vira `com dentes`), e
+ * `afirmacoesDaForma` parte o que sobra nas vírgulas, nos dois-pontos e nos pontos e vírgulas de fora dos parênteses, juntando ao
+ * vizinho o pedaço de uma palavra de conteúdo ("superior", "com sulcos") e o de até duas que só qualifica o anterior ("no movimento
+ * central", "achatados e afunilados"), porque sozinhos eles não são afirmação. O que vem antes dos
+ * dois-pontos é o nome da forma (`garfo reto`, `tubos redondos`), vira a primeira afirmação e vai entre parênteses nas outras. */
+const NUM = String.raw`-?\d+(?:[.,]\d+)?`;
+const FORA_DE_PALAVRA = String.raw`(?![\p{L}\d])`;
+const ANTES_DO_NUMERO = String.raw`(?:(?:de|em|com|por|a|à|até|entre|uns|umas|cerca de|perto de|mais de|menos de|quase)\s+)*`;
+const DIMENSAO = String.raw`(?:largura|meia[- ]largura|altura|diâmetro|espessura|raio|comprimento|profundidade|perna|faixa|chapa|folga|recuo|parede|aba|passo)`;
+const DE_DIMENSAO = String.raw`(?:de|da|do)\s+${DIMENSAO}${FORA_DE_PALAVRA}`;
+const UMA_MEDIDA = String.raw`${ANTES_DO_NUMERO}${NUM}(?:\s*(?:por|a|até|e|x|,)\s*${NUM})*\s*(?:(?:mm|cm|m|graus?|°|%)${FORA_DE_PALAVRA}(?:\s+${DE_DIMENSAO})?|${DE_DIMENSAO})`;
+const MEDIDAS = new RegExp(String.raw`(?<![\p{L}\d])${UMA_MEDIDA}(?:\s*(?:,\s*|e\s+|ou\s+)${UMA_MEDIDA})*`, 'gu');
+const UMA_COORDENADA = String.raw`${ANTES_DO_NUMERO}(?:centro\s+em\s+)?[xyz]\s+${NUM}(?:\s*(?:a|até)\s*${NUM})?${FORA_DE_PALAVRA}`;
+const COORDENADAS = new RegExp(String.raw`(?<![\p{L}\d])${UMA_COORDENADA}(?:\s*(?:,\s*|e\s+)${UMA_COORDENADA})*`, 'gu');
+const INTERVALOS = new RegExp(String.raw`(?<![\p{L}\d])${ANTES_DO_NUMERO}${NUM}(?:\s*(?:a|até|e|,)\s*${NUM})+${FORA_DE_PALAVRA}`, 'gu');
+const CONTAGEM = String.raw`(?:\d+|dois|duas|três|quatro|cinco|seis|sete|oito|nove|dez|onze|doze|quinze|vinte|trinta|quarenta)`;
+/* a contagem é a que vem antes de um nome: "30 da boca" e "380 entre" são posição, e saem com os números soltos */
+const NAO_E_NOME = String.raw`(?:e|ou|de|da|do|das|dos|a|o|as|os|à|ao|em|no|na|nos|nas|entre|até|com|por|para|sobre|sob)(?!\p{L})`;
+const CONTAGENS = new RegExp(String.raw`(?<![\p{L}\d])(de\s+)?${CONTAGEM}\s+(?=\p{L})(?!${NAO_E_NOME})`, 'gu');
+const NUMEROS_SOLTOS = new RegExp(String.raw`(?<![\p{L}\d])${ANTES_DO_NUMERO}${NUM}${FORA_DE_PALAVRA}`, 'gu');
+const PALAVRA_PENDENTE = /\s+(?:e|ou|de|da|do|dos|das|em|a|à|até|com|por|entre|centro em)$/u;
+
+
+/** O texto sem medida com unidade, coordenada, intervalo de números nem contagem antes do nome, com a pontuação arrumada. Puro. */
+export function semMedidas(texto) {
+  let t = String(texto)
+    .replace(COORDENADAS, ' ')
+    .replace(MEDIDAS, ' ')
+    .replace(INTERVALOS, ' ')
+    .replace(CONTAGENS, (_, de) => (de ? 'com ' : ''))
+    .replace(NUMEROS_SOLTOS, ' ');
+  t = t.replace(/\s+/g, ' ').replace(/\(\s+/g, '(').replace(/\s+([,;:)])/g, '$1').replace(/\(\s*[,;:]?\s*\)/g, '');
+  for (let antes = null; antes !== t;) {
+    antes = t;
+    t = t.replace(/([,;:])\s*[,;]/g, '$1').replace(/\s+(?:e|ou|de|da|do|dos|das|em|a|à|até|com|por|entre)(?=[,;:)])/gu, '').replace(/([,;:(])\s*(?:e|ou)\s+(?=[,;:)])/gu, '$1');
+  }
+  return t.replace(/\s+([,;:)])/g, '$1').replace(/^[\s,;:]+|[\s,;:]+$/g, '').replace(/\s+/g, ' ');
+}
+
+/* parte o texto nos separadores dados, só fora dos parênteses */
+function partirForaDosParenteses(texto, separadores) {
+  const pedacos = [];
+  let profundidade = 0;
+  let atual = '';
+  for (const c of texto) {
+    if (c === '(') profundidade += 1;
+    if (c === ')') profundidade = Math.max(0, profundidade - 1);
+    if (profundidade === 0 && separadores.includes(c)) { pedacos.push(atual); atual = ''; } else atual += c;
+  }
+  pedacos.push(atual);
+  return pedacos;
+}
+
+const limparPedaco = (p) => {
+  let t = p.trim().replace(/^(?:e|ou)\s+/u, '');
+  while (PALAVRA_PENDENTE.test(t)) t = t.replace(PALAVRA_PENDENTE, '');
+  return t.trim();
+};
+
+/* as palavras que não contam para o tamanho de uma afirmação, e as que abrem um pedaço que só qualifica o anterior */
+const PALAVRAS_VAZIAS = new Set(['e', 'ou', 'de', 'da', 'do', 'das', 'dos', 'a', 'o', 'as', 'os', 'à', 'ao', 'aos', 'às', 'no', 'na', 'nos', 'nas', 'em', 'um',
+  'uma', 'uns', 'umas', 'com', 'sem', 'por', 'para', 'pelo', 'pela', 'sob', 'sobre', 'entre', 'até', 'dele', 'dela', 'num', 'numa', 'que', 'se', 'cada']);
+const ABRE_QUALIFICACAO = /^(?:de|da|do|das|dos|no|na|nos|nas|em|com|sem|sob|sobre|entre|até|dentro|fora|acima|abaixo|atrás|junto|ao|à|para|pelo|pela|por|num|numa|cada|\p{L}+(?:ad|id)[oa]s?|\p{L}+ndo)$/u;
+const conteudo = (texto) => (String(texto).toLowerCase().match(/\p{L}+/gu) ?? []).filter((p) => !PALAVRAS_VAZIAS.has(p)).length;
+const qualifica = (texto) => ABRE_QUALIFICACAO.test(String(texto).toLowerCase().match(/\p{L}+/u)?.[0] ?? '');
+
+/** Quantas palavras de conteúdo um pedaço precisa para ser afirmação sozinho: duas, e três quando ele abre qualificando o anterior
+ *  (`no movimento central`, `achatados e afunilados`); o menor junta-se ao vizinho. */
+export const PALAVRAS_DA_AFIRMACAO = Object.freeze({ nome: 2, qualificacao: 3 });
+
+const sozinho = (p) => conteudo(p) >= (qualifica(p) ? PALAVRAS_DA_AFIRMACAO.qualificacao : PALAVRAS_DA_AFIRMACAO.nome);
+
+/**
+ * A forma prometida de uma parte em afirmações simples, sem medida nem contagem: `{ nome, afirmacoes }`. `nome` é o que vem antes dos
+ * primeiros dois-pontos, ou null; ele é a primeira afirmação quando tem duas palavras de conteúdo. Sem nada que se veja (a forma só de
+ * medidas), devolve `afirmacoes: []`. Puro e determinístico.
+ */
+export function afirmacoesDaForma(forma) {
+  const limpo = semMedidas(String(forma).replace(/[.\s]+$/, ''));
+  const [cabeca, ...resto] = partirForaDosParenteses(limpo, [':']);
+  const nome = resto.length ? limparPedaco(cabeca) || null : null;
+  const corpo = resto.length ? resto.join(',') : cabeca;
+  const pedacos = partirForaDosParenteses(corpo, [',', ';']).map(limparPedaco).filter((p) => conteudo(p) > 0);
+  const afirmacoes = [];
+  let pendente = null;
+  for (const p of pedacos) {
+    const juntado = pendente ? `${pendente}, ${p}` : p;
+    if (sozinho(juntado) && (pendente || !afirmacoes.length || sozinho(p))) { afirmacoes.push(juntado); pendente = null; }
+    else if (afirmacoes.length && !pendente) afirmacoes[afirmacoes.length - 1] = `${afirmacoes.at(-1)}, ${p}`;
+    else pendente = juntado;
+  }
+  if (pendente) {
+    if (afirmacoes.length) afirmacoes[afirmacoes.length - 1] = `${afirmacoes.at(-1)}, ${pendente}`;
+    else if (conteudo(pendente) >= PALAVRAS_DA_AFIRMACAO.nome) afirmacoes.push(pendente);
+  }
+  if (nome && conteudo(nome) >= PALAVRAS_DA_AFIRMACAO.nome) afirmacoes.unshift(nome);
+  return { nome, afirmacoes: [...new Set(afirmacoes)] };
 }
 
 /* ---------- o pedido por perguntas fechadas, em duas ordens ----------
@@ -591,9 +700,17 @@ export const GRUPOS_DAS_PERGUNTAS = Object.freeze({
   forma: Object.freeze({ titulo: 'Perguntas de forma', defeitoSe: RESPOSTA_NAO, peso: 'defeito de forma' }),
   criterio: Object.freeze({ titulo: 'Perguntas dos critérios de reprovação', defeitoSe: RESPOSTA_SIM, peso: 'defeito estrutural' }),
 });
+/* A regra da nota, desde a medida do item 8 (2026-11-17). A anterior (9 com um defeito de forma, 8 com dois ou mais, 7, 6 e 5 pelos
+   critérios) saturou: nas dez respostas da bicicleta, com dois, três ou quatro defeitos de forma, a nota foi 8 em todas, e a regra não
+   separava o pacote de dois defeitos do de dez. Agora cada defeito tira o seu peso e nada satura até 0. Cada vista com referência, a
+   composta do alvo e cada parte valem um ponto, repartido igualmente entre as perguntas delas, para a parte de muitas afirmações não
+   pesar nem oscilar mais que a de uma; o primeiro defeito de critério tira 3, que mantém o teto de 7 da regra anterior para a peça com
+   defeito estrutural, e cada um dos seguintes tira 1, que mantém o 6 e o 5 dela sem defeito de forma. */
+export const PONTOS_DO_CRITERIO = Object.freeze({ primeiro: 3, seguinte: 1 });
 export const REGRA_DA_NOTA = 'conte como defeito o `sim` de uma pergunta de critério de reprovação e o `não` de uma pergunta de forma; '
-  + '`não dá para ver` não conta. Com defeito de critério, a nota é 7 com um, 6 com dois e 5 com três ou mais; sem defeito de critério, '
-  + 'é 9 com um defeito de forma, 8 com dois ou mais, e 10 sem defeito nenhum.';
+  + '`não dá para ver` não conta. Cada defeito de forma tira o que a pergunta diz entre parênteses: cada vista com referência, a composta '
+  + 'do alvo e cada parte valem um ponto, repartido igualmente entre as perguntas delas. O primeiro defeito de critério tira 3 pontos e '
+  + 'cada um dos seguintes tira 1. A nota é 10 menos o que os defeitos tiram, com uma casa decimal, e não fica abaixo de 0.';
 
 /* as vistas que o pedido usa, pelo nome da bancada, na ordem do `VISTA_DO_ESBOCO`: as mesmas que a seção Modelo descreve */
 function vistasUsadas({ modelo = [], arame = [], montado = null, partes = [] }) {
@@ -602,8 +719,10 @@ function vistasUsadas({ modelo = [], arame = [], montado = null, partes = [] }) 
 }
 
 /**
- * As perguntas fechadas de um pedido, dos mesmos dados de `montarPedido`: `[{ id, grupo, origem, texto, defeitoSe }]`, numeradas `P1`,
- * `P2`... na ordem A (forma antes de critério). Puro e determinístico: os mesmos dados dão as mesmas perguntas com os mesmos números.
+ * As perguntas fechadas de um pedido, dos mesmos dados de `montarPedido`: `[{ id, grupo, origem, texto, defeitoSe, peso }]`, numeradas
+ * `P1`, `P2`... na ordem A (forma antes de critério). Cada parte do `PLANO` dá uma pergunta por afirmação de `afirmacoesDaForma`, sem
+ * medida nem contagem, e as perguntas de uma parte têm a mesma `origem` e dividem o ponto dela (`peso`); o critério de reprovação vale 1 e
+ * sai sem medida, ou como está quando a medida é tudo o que ele diz. Puro e determinístico.
  */
 export function perguntasFechadas(dados) {
   const { plano = null, alvo = null, referencias = [], orientacao = null } = dados;
@@ -614,12 +733,41 @@ export function perguntasFechadas(dados) {
     brutas.push({ grupo: 'forma', origem: `referencia:${vista}`, texto: `Na vista ${vista} do modelo, a silhueta e o lugar de cada parte seguem os de ${mesmas.map((n) => `\`${n}\``).join(' e ')}?` });
   }
   for (const { nome, forma } of plano?.partes ?? []) {
-    brutas.push({ grupo: 'forma', origem: `parte:${nome}`, texto: `A parte \`${nome}\` aparece nas imagens com a forma prometida: ${forma.replace(/[.\s]+$/, '')}?` });
+    const { nome: daForma, afirmacoes } = afirmacoesDaForma(forma);
+    if (!afirmacoes.length) { brutas.push({ grupo: 'forma', origem: `parte:${nome}`, texto: `A parte \`${nome}\` aparece nas imagens?` }); continue; }
+    for (const afirmacao of afirmacoes) {
+      const contexto = daForma && afirmacao !== daForma ? ` (${daForma})` : '';
+      brutas.push({ grupo: 'forma', origem: `parte:${nome}`, texto: `A parte \`${nome}\`${contexto} mostra isto nas imagens: ${afirmacao}?` });
+    }
   }
   for (const [i, criterio] of (plano?.criteriosDeReprovacao ?? []).entries()) {
-    brutas.push({ grupo: 'criterio', origem: `criterio:${i + 1}`, texto: `As imagens mostram isto: ${criterio.replace(/[.\s]+$/, '')}?` });
+    const limpo = semMedidas(criterio.replace(/[.\s]+$/, ''));
+    const texto = conteudo(limpo) >= PALAVRAS_DA_AFIRMACAO.nome ? limpo : criterio.replace(/[.\s]+$/, '');
+    brutas.push({ grupo: 'criterio', origem: `criterio:${i + 1}`, texto: `As imagens mostram isto: ${texto}?` });
   }
-  return brutas.map((p, i) => Object.freeze({ id: `P${i + 1}`, ...p, defeitoSe: GRUPOS_DAS_PERGUNTAS[p.grupo].defeitoSe }));
+  const porOrigem = new Map();
+  for (const p of brutas) porOrigem.set(p.origem, (porOrigem.get(p.origem) ?? 0) + 1);
+  return brutas.map((p, i) => Object.freeze({
+    id: `P${i + 1}`, ...p, defeitoSe: GRUPOS_DAS_PERGUNTAS[p.grupo].defeitoSe, peso: p.grupo === 'forma' ? 1 / porOrigem.get(p.origem) : 1,
+  }));
+}
+
+/** O peso de cada pergunta, `Map(id → peso)`: o `peso` gravado, ou, nas perguntas gravadas antes dele, o ponto da origem repartido
+ *  entre as perguntas de forma dela e 1 no critério. */
+export function pesosDasPerguntas(perguntas) {
+  const porOrigem = new Map();
+  for (const p of perguntas) if (p.grupo === 'forma') porOrigem.set(p.origem, (porOrigem.get(p.origem) ?? 0) + 1);
+  return new Map(perguntas.map((p) => [p.id, Number.isFinite(p.peso) ? p.peso : p.grupo === 'forma' ? 1 / porOrigem.get(p.origem) : 1]));
+}
+
+const umaCasa = (x) => Math.round(x * 10) / 10;
+const pesoTexto = (peso) => String(Math.round(peso * 100) / 100).replace('.', ',');
+
+/** A nota pela `REGRA_DA_NOTA`, do que os defeitos de forma tiram e de quantos defeitos de critério há (os dois podem ser fracionários
+ *  na junção das ordens). */
+export function notaPelaRegra(forma, criterio) {
+  const tira = forma + PONTOS_DO_CRITERIO.primeiro * Math.min(criterio, 1) + PONTOS_DO_CRITERIO.seguinte * Math.max(0, criterio - 1);
+  return Math.max(0, umaCasa(10 - tira));
 }
 
 /* a ordem das seções de imagem em cada ordem: a A é a de hoje (referência antes do modelo); a B põe o modelo antes e a referência depois */
@@ -636,14 +784,19 @@ function secaoDasPerguntasFechadas(perguntas, ordem) {
     '## Perguntas fechadas', '',
     'Responda a cada pergunta com `sim`, `não` ou `não dá para ver`, olhando só as imagens deste pedido. `sim` e `não` citam a imagem em que você '
     + 'viu e dizem o que ela mostra, sem repetir a pergunta; `não dá para ver` vale quando nenhuma imagem mostra o que a pergunta pede, e não se '
-    + 'adivinha. Responda cada pergunta pelo que a imagem mostra, e não pela resposta de outra pergunta. A pergunta de parte fala da forma inteira '
-    + 'prometida: se uma feição dela falta ou está diferente na imagem, a resposta é `não`, e a evidência diz qual.', '',
+    + 'adivinha. Responda cada pergunta pelo que a imagem mostra, e não pela resposta de outra pergunta. Cada pergunta de parte faz uma afirmação '
+    + 'sobre a forma dela: se a imagem mostra a feição diferente ou sem ela, a resposta é `não`, e a evidência diz qual.', '',
+    'Medida não se responde a olho. As perguntas não trazem contagem nem medida em milímetro, que se medem na malha, fora deste pedido: não conte '
+    + 'dentes, raios, elos nem lados, e não estime tamanho, ângulo ou espessura pela imagem. A diferença que só uma medida diria não é `não`; '
+    + 'o `não` é a feição que a imagem mostra ausente ou com outra forma.', '',
   ];
+  const pesos = pesosDasPerguntas(perguntas);
   for (const grupo of ordem === 'b' ? [...grupos].reverse() : grupos) {
     const doGrupo = perguntas.filter((p) => p.grupo === grupo);
     if (!doGrupo.length) continue;
     const { titulo, defeitoSe, peso } = GRUPOS_DAS_PERGUNTAS[grupo];
-    L.push(`${titulo} (\`${defeitoSe}\` é ${peso}):`, '', ...lista((ordem === 'b' ? [...doGrupo].reverse() : doGrupo).map((p) => `${p.id}. ${p.texto}`)), '');
+    const linha = (p) => `${p.id}. ${p.texto}${grupo === 'forma' ? ` (o \`${defeitoSe}\` tira ${pesoTexto(pesos.get(p.id))})` : ''}`;
+    L.push(`${titulo} (\`${defeitoSe}\` é ${peso}):`, '', ...lista((ordem === 'b' ? [...doGrupo].reverse() : doGrupo).map(linha)), '');
   }
   return L;
 }
@@ -729,25 +882,39 @@ export function lerRespostasFechadas(texto, perguntas, onde = 'a resposta') {
   return { respostas, semImagem };
 }
 
-/** A nota pela `REGRA_DA_NOTA`, de `{ [id]: resposta }` (as três respostas ou `NAO_VERIFICAVEL`): `{ nota, criterio, forma,
- *  naoVerificaveis, naoDaParaVer }`, com os ids de cada caso. */
+/** A nota pela `REGRA_DA_NOTA`, de `{ [id]: resposta }` (as três respostas ou `NAO_VERIFICAVEL`, que não conta): `{ nota, tira: { forma,
+ *  criterio }, criterio, forma, naoVerificaveis, naoDaParaVer }`, com os ids de cada caso. */
 export function notaDasRespostas(perguntas, respostas) {
   const r = { criterio: [], forma: [], naoVerificaveis: [], naoDaParaVer: [] };
+  const pesos = pesosDasPerguntas(perguntas);
+  const tira = { forma: 0, criterio: 0 };
   for (const p of perguntas) {
     const dada = respostas[p.id];
     if (dada === NAO_VERIFICAVEL) r.naoVerificaveis.push(p.id);
     else if (dada === NAO_DA_PARA_VER) r.naoDaParaVer.push(p.id);
-    else if (dada === p.defeitoSe) r[p.grupo].push(p.id);
+    else if (dada === p.defeitoSe) { r[p.grupo].push(p.id); tira[p.grupo] += pesos.get(p.id); }
   }
-  const nota = r.criterio.length ? Math.max(5, 8 - r.criterio.length) : r.forma.length ? (r.forma.length === 1 ? 9 : 8) : 10;
-  return { nota, ...r };
+  return { nota: notaPelaRegra(tira.forma, tira.criterio), tira, ...r };
 }
 
-/** Junta as respostas das duas ordens: a pergunta com a mesma resposta nas duas fica com ela, e a que muda sai `NAO_VERIFICAVEL`. */
+/**
+ * Junta as respostas das duas ordens: a pergunta com a mesma resposta nas duas fica com ela, e a que muda sai `NAO_VERIFICAVEL`. A nota
+ * das duas juntas conta cada pergunta pela média das duas ordens: o defeito dado nas duas tira o peso inteiro, e o dado numa só tira a
+ * metade. Contar a não verificável como sem defeito, como a junção fazia até 2026-11-17, subia a nota quando muitas perguntas mudavam
+ * (a repetição 1 da bicicleta teve seis e deu 10 com as duas ordens em 8): tirar a pergunta tirava o defeito. Pela média, a nota das
+ * duas é a média das notas das ordens (abaixo dela só quando uma ordem dá dois defeitos de critério ou mais e a outra nenhum, pelo
+ * primeiro defeito de critério tirar mais), nunca acima, e a pergunta não verificável não vira defeito inteiro.
+ */
 export function juntarOrdens(perguntas, a, b) {
   const linhas = perguntas.map((p) => ({ id: p.id, a: a[p.id], b: b[p.id], final: a[p.id] === b[p.id] ? a[p.id] : NAO_VERIFICAVEL }));
   const finais = Object.fromEntries(linhas.map((l) => [l.id, l.final]));
-  return { linhas, ...notaDasRespostas(perguntas, finais), porOrdem: { a: notaDasRespostas(perguntas, a).nota, b: notaDasRespostas(perguntas, b).nota } };
+  const pesos = pesosDasPerguntas(perguntas);
+  const tira = { forma: 0, criterio: 0 };
+  for (const p of perguntas) tira[p.grupo] += pesos.get(p.id) * ((a[p.id] === p.defeitoSe) + (b[p.id] === p.defeitoSe)) / 2;
+  return {
+    linhas, ...notaDasRespostas(perguntas, finais), nota: notaPelaRegra(tira.forma, tira.criterio), tira,
+    porOrdem: { a: notaDasRespostas(perguntas, a).nota, b: notaDasRespostas(perguntas, b).nota },
+  };
 }
 
 /** A nota que o crítico escreveu no veredito JSON que fecha a resposta, ou null; tolerante, porque só serve à medida da variação. */
@@ -769,7 +936,7 @@ export function variacaoDasNotas(notas) {
   const media = notas.reduce((s, x) => s + x, 0) / n;
   const desvio = Math.sqrt(notas.reduce((s, x) => s + (x - media) ** 2, 0) / n);
   const arred = (x) => Math.round(x * 100) / 100;
-  return { notas, minimo: Math.min(...notas), maximo: Math.max(...notas), amplitude: Math.max(...notas) - Math.min(...notas), media: arred(media), desvio: arred(desvio) };
+  return { notas, minimo: Math.min(...notas), maximo: Math.max(...notas), amplitude: arred(Math.max(...notas) - Math.min(...notas)), media: arred(media), desvio: arred(desvio) };
 }
 
 /** As perguntas cuja resposta final mudou entre repetições (`juntadas` de `juntarOrdens`): `[{ id, contagem: { resposta: n } }]`. */
@@ -796,6 +963,40 @@ export function lerPerguntasFechadas(caminho, { ler = (f) => readFileSync(f, 'ut
   const dado = JSON.parse(ler(arquivo));
   if (dado?.formato !== FORMATO_DAS_PERGUNTAS_FECHADAS || !Array.isArray(dado.perguntas)) throw new Error(`${arquivo} tem formato ${JSON.stringify(dado?.formato)}; aceito ${FORMATO_DAS_PERGUNTAS_FECHADAS}.`);
   return { arquivo, ...dado };
+}
+
+/* Os dados do pedido ficam na pasta da rodada desde 2026-11-17, para o pedido mudar sem refazer as capturas: o pacote da bicicleta leva
+   uns 8 minutos, e mudar a pergunta ou a regra só precisa dos mesmos dados com o texto novo (`--refazer-pedidos`). */
+export const ARQUIVO_DOS_DADOS_DO_PEDIDO = 'dados-do-pedido.json';
+export const FORMATO_DOS_DADOS_DO_PEDIDO = 'mecanifica.dados-do-pedido@1';
+
+/**
+ * Grava numa pasta de rodada os dados do pedido, o `pedido.md`, os dois pedidos fechados e o `perguntas-fechadas.json`, todos dos mesmos
+ * dados. Devolve `{ pedido, pedidosFechados: { a, b, perguntas, quantas } }`, com os caminhos.
+ */
+export function gravarPedidos(pasta, dados) {
+  writeFileSync(join(pasta, ARQUIVO_DOS_DADOS_DO_PEDIDO), `${JSON.stringify({ formato: FORMATO_DOS_DADOS_DO_PEDIDO, dados }, null, 2)}\n`, 'utf8');
+  const pedido = join(pasta, 'pedido.md');
+  writeFileSync(pedido, montarPedido(dados), 'utf8');
+  /* os dois pedidos por perguntas fechadas, sobre as mesmas imagens, e as perguntas que a junção das respostas lê */
+  const fechadas = perguntasFechadas(dados);
+  const pedidos = Object.fromEntries(ORDENS_DO_PEDIDO.map((ordem) => {
+    const arquivo = join(pasta, arquivoDoPedidoFechado(ordem));
+    writeFileSync(arquivo, montarPedidoFechado(dados, ordem, fechadas), 'utf8');
+    return [ordem, arquivo];
+  }));
+  const perguntas = join(pasta, ARQUIVO_DAS_PERGUNTAS_FECHADAS);
+  writeFileSync(perguntas, `${JSON.stringify(dadoDasPerguntasFechadas({ peca: dados.peca, perguntas: fechadas, pedidos }), null, 2)}\n`, 'utf8');
+  return { pedido, pedidosFechados: { ...pedidos, perguntas, quantas: fechadas.length } };
+}
+
+/** Refaz os pedidos de uma pasta de rodada pelos dados que o pacote gravou nela, sem capturar nada; recusa a pasta sem eles. */
+export function refazerPedidos(pasta, { ler = (f) => readFileSync(f, 'utf8'), existe = existsSync } = {}) {
+  const arquivo = join(pasta, ARQUIVO_DOS_DADOS_DO_PEDIDO);
+  if (!existe(arquivo)) throw new Error(`não achei ${arquivo}; ele sai do pacote do crítico desde 2026-11-17, e a pasta de antes só se refaz pelo pacote inteiro (\`node tools/modelar/vistas-para-critica.mjs <peça> --saida=${pasta}\`).`);
+  const lido = JSON.parse(ler(arquivo));
+  if (lido?.formato !== FORMATO_DOS_DADOS_DO_PEDIDO || !lido.dados?.peca) throw new Error(`${arquivo} tem formato ${JSON.stringify(lido?.formato)}; aceito ${FORMATO_DOS_DADOS_DO_PEDIDO}.`);
+  return gravarPedidos(pasta, lido.dados);
 }
 
 /* A seção da superfície da peça de lataria. As vistas têm os nomes e os lados das do Blender (`vistas_padrao` de `tools/blender/comum.py`),
@@ -2169,17 +2370,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
     reflexo: lataria.lataria ? reflexo : null,
     medicao: medicaoDoPacote,
   };
-  const arquivoDoPedido = join(pasta, 'pedido.md');
-  writeFileSync(arquivoDoPedido, montarPedido(dadosDoPedido), 'utf8');
-  /* os dois pedidos por perguntas fechadas, sobre as mesmas imagens, e as perguntas que a junção das respostas lê */
-  const fechadas = perguntasFechadas(dadosDoPedido);
-  const pedidosFechados = Object.fromEntries(ORDENS_DO_PEDIDO.map((ordem) => {
-    const arquivo = join(pasta, arquivoDoPedidoFechado(ordem));
-    writeFileSync(arquivo, montarPedidoFechado(dadosDoPedido, ordem, fechadas), 'utf8');
-    return [ordem, arquivo];
-  }));
-  const arquivoDasPerguntas = join(pasta, ARQUIVO_DAS_PERGUNTAS_FECHADAS);
-  writeFileSync(arquivoDasPerguntas, `${JSON.stringify(dadoDasPerguntasFechadas({ peca, perguntas: fechadas, pedidos: pedidosFechados }), null, 2)}\n`, 'utf8');
+  const { pedido: arquivoDoPedido, pedidosFechados } = gravarPedidos(pasta, dadosDoPedido);
   const manifesto = gravarManifesto(pasta, { peca, receita: impressao, lataria, superficie, conferenciaDoBlender });
   const temReflexo = Object.keys(reflexo).length > 0;
   if (sobrepor.feita) {
@@ -2196,7 +2387,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   }
 
   return {
-    peca, partes, conjunto, traseira, esquerda, arame, raioX, porParte, dePerto, contornoSobreposto: sobrepor.feita ?? null, reflexo: temReflexo ? reflexo : null, pasta, pedido: arquivoDoPedido, pedidosFechados: { ...pedidosFechados, perguntas: arquivoDasPerguntas, quantas: fechadas.length }, manifesto, alvo, montada, sobreposicao, superficie, conferenciaDoBlender, lataria, referencias, encaixes, avisos, medicao: medicaoDoPacote,
+    peca, partes, conjunto, traseira, esquerda, arame, raioX, porParte, dePerto, contornoSobreposto: sobrepor.feita ?? null, reflexo: temReflexo ? reflexo : null, pasta, pedido: arquivoDoPedido, pedidosFechados, manifesto, alvo, montada, sobreposicao, superficie, conferenciaDoBlender, lataria, referencias, encaixes, avisos, medicao: medicaoDoPacote,
   };
 }
 
@@ -2497,7 +2688,7 @@ export function relatorioDaJuncao(perguntas, pares) {
     const j = juntarOrdens(perguntas, ra.respostas, rb.respostas);
     juntadas.push(j);
     linhas.push(`REPETIÇÃO ${i + 1} (ordem A: ${a.arquivo}; ordem B: ${b.arquivo})`,
-      `  nota pela regra, com as duas ordens: ${j.nota} (só a ordem A: ${j.porOrdem.a}; só a B: ${j.porOrdem.b}; o crítico escreveu ${numeroComVirgula(notaEscrita(a.texto))} e ${numeroComVirgula(notaEscrita(b.texto))})`,
+      `  nota pela regra, com as duas ordens: ${numeroComVirgula(j.nota)} (só a ordem A: ${numeroComVirgula(j.porOrdem.a)}; só a B: ${numeroComVirgula(j.porOrdem.b)}; o crítico escreveu ${numeroComVirgula(notaEscrita(a.texto))} e ${numeroComVirgula(notaEscrita(b.texto))})`,
       `  defeitos de critério: ${j.criterio.join(', ') || 'nenhum'}; de forma: ${j.forma.join(', ') || 'nenhum'}`,
       `  não verificáveis (a resposta mudou entre as ordens): ${j.linhas.filter((l) => l.final === NAO_VERIFICAVEL).map((l) => `${l.id} (A ${l.a}, B ${l.b})`).join(', ') || 'nenhuma'}`,
       `  não dá para ver nas duas: ${j.naoDaParaVer.join(', ') || 'nenhuma'}`);
@@ -2507,7 +2698,7 @@ export function relatorioDaJuncao(perguntas, pares) {
   if (pares.length > 1) {
     const v = variacaoDasNotas(juntadas.map((j) => j.nota));
     const porOrdem = (o) => variacaoDasNotas(juntadas.map((j) => j.porOrdem[o]));
-    const texto = (x) => `${x.notas.join(', ')}; amplitude ${x.amplitude}, média ${numeroComVirgula(x.media)}, desvio ${numeroComVirgula(x.desvio)}`;
+    const texto = (x) => `${x.notas.map(numeroComVirgula).join(' / ')}; amplitude ${numeroComVirgula(x.amplitude)}, média ${numeroComVirgula(x.media)}, desvio ${numeroComVirgula(x.desvio)}`;
     linhas.push('', `VARIAÇÃO EM ${pares.length} REPETIÇÕES`, `  nota pela regra, com as duas ordens: ${texto(v)}`, `  só a ordem A: ${texto(porOrdem('a'))}`, `  só a ordem B: ${texto(porOrdem('b'))}`);
     const mudaram = respostasQueMudaram(perguntas, juntadas);
     linhas.push(`  perguntas cuja resposta final mudou entre repetições: ${mudaram.map((m) => `${m.id} (${Object.entries(m.contagem).map(([r, n]) => `${r} ${n}`).join(', ')})`).join('; ') || 'nenhuma'}`);
@@ -2523,8 +2714,8 @@ export function relatorioDasNotas(respostas) {
     return nota;
   });
   const v = variacaoDasNotas(notas);
-  return `${[...respostas.map(({ arquivo }, i) => `${arquivo}: nota ${notas[i]}`),
-    `VARIAÇÃO EM ${notas.length} RESPOSTAS: ${notas.join(', ')}; amplitude ${v.amplitude}, média ${numeroComVirgula(v.media)}, desvio ${numeroComVirgula(v.desvio)}`].join('\n')}\n`;
+  return `${[...respostas.map(({ arquivo }, i) => `${arquivo}: nota ${numeroComVirgula(notas[i])}`),
+    `VARIAÇÃO EM ${notas.length} RESPOSTAS: ${notas.map(numeroComVirgula).join(' / ')}; amplitude ${numeroComVirgula(v.amplitude)}, média ${numeroComVirgula(v.media)}, desvio ${numeroComVirgula(v.desvio)}`].join('\n')}\n`;
 }
 
 export const AJUDA = `uso: node tools/modelar/vistas-para-critica.mjs <peça> [opções]
@@ -2549,10 +2740,12 @@ ver, cada resposta citando a imagem) nas duas ordens, sobre as mesmas imagens, e
 ordem, sem a história, e junte as respostas:
 
   uso: node tools/modelar/vistas-para-critica.mjs --juntar=<pasta da rodada> <resposta A> <resposta B> [<resposta A> <resposta B>]...
-       a nota pela regra escrita no pedido, com as duas ordens; a pergunta que muda de resposta entre as ordens sai como não verificável,
-       e com mais de um par a variação das notas e as perguntas que mudaram entre repetições
+       a nota pela regra escrita no pedido, com as duas ordens; a pergunta que muda de resposta entre as ordens sai como não verificável
+       e tira metade do peso, e com mais de um par a variação das notas e as perguntas que mudaram entre repetições
   uso: node tools/modelar/vistas-para-critica.mjs --notas <resposta>...
        a nota que o crítico escreveu em cada resposta ao mesmo pedido, e a variação
+  uso: node tools/modelar/vistas-para-critica.mjs --refazer-pedidos=<pasta da rodada>
+       refaz os três pedidos e as perguntas pelo dados-do-pedido.json que o pacote gravou na pasta, sem capturar nada
 
 Código de saída: 0 pacote montado, 1 recusa (receita reprovada, luz rasante toda escura, --com-blender sem o Blender, captura sem imagem), 2 uso errado.
 `;
@@ -2562,6 +2755,13 @@ async function principal(argv) {
   let externas = [];
   const orientacoes = [];
   if (argv.slice(2).includes('--ajuda')) { process.stdout.write(AJUDA); return 0; }
+  const refazer = argv.slice(2).find((a) => a.startsWith('--refazer-pedidos='));
+  if (refazer) {
+    if (argv.length !== 3) { process.stderr.write('uso: node tools/modelar/vistas-para-critica.mjs --refazer-pedidos=<pasta da rodada>\nveio mais de um argumento; a opção refaz uma pasta só.\n'); return 2; }
+    const { pedido, pedidosFechados } = refazerPedidos(resolve(refazer.slice('--refazer-pedidos='.length)));
+    process.stdout.write(`pedidos refeitos pelos dados gravados na pasta, sem capturar nada:\n  ${pedido}\n  ${pedidosFechados.a}\n  ${pedidosFechados.b}\n  ${pedidosFechados.perguntas} (${pedidosFechados.quantas} perguntas fechadas)\n`);
+    return 0;
+  }
   const juntar = argv.slice(2).find((a) => a.startsWith('--juntar='));
   if (juntar || argv[2] === '--notas') {
     const arquivos = argv.slice(3);
