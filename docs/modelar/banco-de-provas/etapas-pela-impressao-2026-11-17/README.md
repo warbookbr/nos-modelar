@@ -42,6 +42,26 @@ A porta de dentro de submontagem não entra na impressão (o resolvedor não a e
 
 A revisão não bloqueou e pediu quatro correções, feitas com teste: o aceite acrescentado à mão sem reabertura entre dois aceites, a reabertura antes do aceite e o aceite com junta que não passa recusam (`registro-invalido`), assim como impressão com campo null, de outro tipo ou sobrando e registro de outra montagem; os eventos são cópias congeladas e a leitura devolve o aceite copiado; a poeira abaixo de 1e-12 vale zero antes de comparar; e número não finito recusa a impressão. As 16 mutações que sobreviviam ganharam `expect` (comparação das impressões, interface no mundo e rotação da pose, validação, órfãos, avisos, corte do resumo, ordem das citadas, campos do aceite).
 
-## O que fica para as fatias 2 e 3
+## Fatia 2: a ferramenta e os consumidores
 
-A fatia 2 troca o caminho de `fixar` e `reabrir` (e os consumidores do estado gravado) para acrescentar eventos e ler por `lerEtapas`, tira `conferirPosteriores`, `abalarPelasPortas`, `portasDeReferencia`, `juntasDasPosteriores` e a leitura do registro v1, e decide se `fixar` mantém a recusa por posterior quebrada (a leitura nova deixa aceitar a base com a meio quebrada, que então pede reabertura). A fatia 3 escreve o comando de migração dos cinco registros do acervo, com a reconstrução por commit e a impressão `origem: migração`, e o relatório por etapa. A guarda do acervo só passa a cobrar impressão depois dessa migração.
+`fixar` e `reabrir` em `tools/modelar/etapas-da-montagem.mjs` só acrescentam eventos ao registro da versão 3 (`acrescentarAceite` e `acrescentarReabertura`); `estadoDasEtapas` devolve a leitura pela impressão do aceite (`leitura`, com o `medido`), e `fixarComLeitura` devolve também a leitura de depois. O `reabrir` do registro novo não mede nada. O `fixar` avisa, sem recusar, das etapas posteriores que seguem quebradas: aceitar a base não refixa o meio, que quebrou pela própria impressão e pede reabertura e novo aceite.
+
+A escolha do caminho é só pela versão do registro: sem registro, ou da versão 3, vale a leitura nova (o primeiro `fixar` num objeto sem registro grava o da versão 3); da versão 1 ou 2 vale o caminho antigo, que grava o estado em cada etapa, e o comando imprime o aviso `AVISO_DO_CAMINHO_ANTIGO`. Não há bandeira de linha de comando. Os cinco registros do acervo seguem na versão 2 até a fatia 3, e nenhum foi tocado.
+
+Os consumidores do estado gravado, e como cada um lia e lê agora:
+
+| Consumidor | Lia | Lê no registro v3 |
+| --- | --- | --- |
+| `fluxo-do-objeto.mjs` (`lerEtapas`) | `estado` de cada etapa do arquivo | o estado da leitura (`registroComEstado`, que mede a montagem); o v2 como gravado |
+| `objeto.mjs` (`estadoDoObjeto`) | `estado` fixa e quebrada para a contagem e a próxima parte | o mesmo, pela leitura, no comando (`estadoDoObjetoMedido`); `estadoDoObjeto` sem a leitura recusa o v3 em vez de contar errado |
+| `vistas-de-superficie.mjs` (`etapaFixaDaPeca`) | `estado === 'fixa'` da etapa da peça, para dispensar a luz rasante | `etapaFixaDaPecaMedida` (assíncrona, pela leitura), passada por `latariaDaPeca`, `rodada-de-modelagem` e `vistas-para-critica`; a versão síncrona, sem a medida, responde que não está fixa (o lado que não dispensa nada) |
+| `vistas-para-critica.mjs` (`registroDasEtapas`, `etapaFixaDaPeca`) | `estado` de cada instância da peça, para tirar o contorno de peça aprovada | `registroDasEtapasMedido`, o registro com o estado da leitura; `etapaFixaDaPeca` segue pura sobre ele |
+| `custo-por-peca.mjs` (`aceitesDasEtapas`) | o `aceite` de cada etapa, não o estado | os aceites vigentes dos eventos (`aceitesVigentes`), sem medir |
+| `guardas/guarda-acervo.mjs` e `guarda-referencial.mjs` (`etapaQueEspera`) | `estado` da etapa de uma receita sem passos | o v3 não grava estado, e etapa sem geometria nunca é fixa, então a receita sem passos sempre espera a etapa |
+| `guardas/etapas-do-acervo.test.mjs` | `estadoDasEtapas` sobre o registro v2 | igual, pelo caminho antigo, até a fatia 3 |
+
+`receitasDaMontagem`, `montagemAteAGeometria` e `citacoesDasPortas` são usados por `planejado-contra-executado`, `entrada-de-medida`, `manual` e `instalacao-solar` sem tocar no estado. Os testes novos estão no bloco "o registro da versão 3 pelos comandos" de `etapas-da-montagem.test.mjs` (os do caminho antigo começam de um registro v2 vazio, porque sem ele o comando já usa a leitura nova) e, para o braço com um registro v3 construído em memória (reabrir a base acrescenta um evento, as onze seguem fixas, aceitar de novo devolve as doze, sem gravar), em `etapas-reabrir-braco.test.mjs`. O comando de linha em `--fixar` não tem teste de arquivo, porque a fixture usa peças que não estão no acervo; foi rodado à mão numa cópia do `carrinho-de-mao` sem registro (leitura v3, abertas) e com o registro v2 do acervo (aviso do caminho antigo).
+
+## O que fica para a fatia 3
+
+A fatia 3 escreve o comando de migração dos cinco registros do acervo, com a reconstrução por commit e a impressão `origem: migração`, e o relatório por etapa; a guarda do acervo só passa a cobrar impressão depois dela, e o caminho antigo (`atualizarRegistro`, `conferirPosteriores`, `abalarPelasPortas`, `portasDeReferencia`, `juntasDasPosteriores`, a leitura do v1) sai na migração do último registro.

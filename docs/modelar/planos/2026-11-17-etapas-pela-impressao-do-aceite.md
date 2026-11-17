@@ -46,7 +46,7 @@ A leitura e os comandos `--fixar` e `--reabrir` de `etapas-da-montagem` são USA
 ## Fatias
 
 1. Impressão e leitura pura, com a tabela de ataques como testes. Feita em 2026-11-17, na [pasta do plano](../banco-de-provas/etapas-pela-impressao-2026-11-17/README.md): `src/autoria/etapas-pela-impressao.js` guarda eventos imutáveis (versão 3) e lê o estado de cada etapa pela comparação da impressão de agora com a do aceite vigente, e `medirAgora` monta o medido da montagem resolvida; os ataques A1 a E8 e a propriedade das sequências estão em `etapas-da-montagem.test.mjs`, e no braço do acervo, medido à mão, o deslocamento de 30 mm da junta do ombro quebra o braço e as nove seguintes e o desfazer as devolve fixas. `fixar` e `reabrir` ainda usam o caminho antigo.
-2. A ferramenta e os consumidores.
+2. A ferramenta e os consumidores. Feita em 2026-11-17, na [pasta do plano](../banco-de-provas/etapas-pela-impressao-2026-11-17/README.md#fatia-2-a-ferramenta-e-os-consumidores): `fixar` e `reabrir` só acrescentam eventos ao registro v3 e os consumidores do estado passam pela leitura; o registro v1 e v2 segue lido pelo caminho antigo, escolhido só pela versão do registro, com aviso, até a migração da fatia 3.
 3. A migração do acervo, com relatório por etapa.
 4. Contrato, skill e fechamento.
 
