@@ -47,22 +47,38 @@ Recomendação: seguir para a fatia 2 (o ajuste de curva lisa), que não depende
 
 ## Fatia 2: o ajuste de curva lisa
 
-`procedural/nucleo/ajuste-de-curva-lisa.js` (`ajustarCurvaLisa`, ficha no cabeçalho do arquivo, testes `ajuste-de-curva-lisa.test.mjs` e `ajuste-de-curva-lisa-planta.test.mjs`) recebe pontos de uma curva plana e uma tolerância em mm e devolve uma cadeia de clotoides (curvatura linear em cada trecho, contínua entre trechos, logo G2 sem condição de emenda), com os joelhos da curvatura, o número de inflexões, as corridas de curvatura monótona (`trechos`) e o desvio a cada ponto. `pontosDaRede(passo, { nome })` devolve a curva no formato de `curvas` de `gaiolaPorRede`: pontos-chave sobre a curva ajustada, que a Catmull-Rom da rede reproduz a menos de 0,3 mm com passo de 60 mm (o teste monta uma rede de um retalho e mede os pontos da linha dela contra a curva fina). `gaiolaPorRede` e `curva-da-gaiola.js` não mudaram.
+`procedural/nucleo/ajuste-de-curva-lisa.js` (`ajustarCurvaLisa`, ficha no cabeçalho do arquivo, testes `ajuste-de-curva-lisa.test.mjs` e `ajuste-de-curva-lisa-planta.test.mjs`) recebe pontos de uma curva plana e uma tolerância e devolve uma cadeia de clotoides (curvatura linear em cada trecho, contínua entre trechos, logo G2 sem condição de emenda), com os joelhos da curvatura, o número de inflexões, as corridas de curvatura monótona (`trechos`) e o desvio a cada ponto. `pontosDaRede(passo, { nome })` devolve a curva no formato de `curvas` de `gaiolaPorRede`: pontos-chave sobre a curva ajustada, que a Catmull-Rom da rede reproduz a menos de 0,3 mm com passo de 60 mm (o teste monta uma rede de um retalho e mede os pontos da linha dela contra a curva fina). `gaiolaPorRede` e `curva-da-gaiola.js` não mudaram.
 
 Por que clotoide e não cônica ou cúbica: a clotoide é a curva de menor variação de curvatura entre duas curvaturas dadas, a cadeia delas com curvatura contínua é G2 por construção, e a inflexão cai onde a curvatura cruza zero. A cônica só tem curvatura monótona em cada metade e pede a posição do eixo; a cúbica de curvatura monótona pede uma condição de monotonia sobre os coeficientes. Os graus de liberdade por trecho são os mesmos e sem restrição.
 
-O método: Levenberg-Marquardt sobre início, rumo, comprimento, curvaturas e posição dos joelhos, com resíduo de distância com sinal à curva (passo de integração de 2 mm), começando de uma clotoide só; enquanto o desvio máximo passa da tolerância entra um joelho no ponto de maior desvio, e no fim tenta-se tirar cada joelho que a tolerância dispensa. A inflexão conta a troca de sinal entre as faixas de curvatura que movem a curva mais que a tolerância (giro × comprimento / 8), porque uma curvatura de 0,01 1/m dentro da tolerância não é lóbulo. Duas decisões custaram uma volta cada: o peso das pontas (sem ele o ajuste largava a ponta da curva e fazia um gancho de 10 graus nos primeiros 60 mm, o que trava o ajuste da rodada 5 em 5,4 mm) e o rumo de saída tirado da corda dos primeiros pontos, em vez de ajustado junto.
+O método: Levenberg-Marquardt sobre início, rumo, comprimento, curvaturas e posição dos joelhos, com resíduo de distância com sinal à curva, as pontas com peso 10, os duros com peso 20 e uma penalidade pequena sobre a variação de curvatura de cada trecho (Δk² por comprimento, que prefere a rampa ao lóbulo). Começa de uma clotoide só, com o rumo lido da corda dos pontos numa janela de 3% do arco; enquanto o desvio máximo passa de 97% da tolerância entra um joelho no ponto de maior desvio, e no fim se tira cada joelho que a tolerância dispensa. De todos os ajustes que cabem fica o de menos clotoides. O passo de integração vem do comprimento, da curvatura e da tolerância (a flecha da corda abaixo de 1/20 dela no ajuste e de 1/100 na medida final), com os joelhos quebrando o passo; o LM usa no máximo 400 pontos e para por convergência. `cabe` mede, na curva a passo fino, o desvio de cada ponto à curva e o da curva à poligonal dos pontos (que tira da conta a densidade da entrada), a projeção dos pontos em ordem ao longo do arco e o comprimento da curva perto do da poligonal. A inflexão conta a troca de sinal entre as faixas de curvatura cuja sagita, medida na curva integrada, passa da tolerância.
+
+Correções da revisão adversarial da fatia 2, com o antes e o depois (as provas novas falhavam no código antigo):
+
+| Achado | Antes | Depois |
+|---|---|---|
+| Ruído do tamanho do espaçamento (arco de 600 mm e 900 mm; 6 mm a cada 10 mm com tolerância 12,7; 2 mm a cada 3 mm com 4,2; 1 mm a cada 2 mm com 2,1) | 3 dos 5 casos falhavam (4 clotoides e 1 inflexão inventada, ou `cabe` falso), pelo rumo inicial de segmentos seguidos | os 5 dão 1 clotoide e nenhuma inflexão, pelo rumo da corda numa janela de 3% do arco |
+| Pontos todos iguais | `cabe` verdadeiro com NaN | recusa com o comprimento da poligonal e a tolerância; o resultado não finito também é recusado |
+| Escala (arco de 3 mm de raio com tolerância 0,02; de 50 m com 5; de 200 mm com 0,05) | passo de 2 mm absoluto, desvio acima da tolerância | passo relativo, e o desvio devolvido confere com uma integração independente de Runge-Kutta a menos de 10% da tolerância |
+| Pontos fora de ordem, ou indo e voltando | só a distância ao conjunto | `cabe` falso |
+| Lóbulo inventado na planta, entre os arcos 3400 e 3490 mm (3,5, -2,4 e 1,1 1/m) | 3,61, -2,45 e 1,09 1/m onde a entrada só tem curvatura positiva | a curvatura depois de 2300 mm fica positiva (de 0,04 a 3,28 1/m); o teste cobra mais que -0,2 1/m |
+| Contagem de inflexões por giro × comprimento / 8 | só vale para curvatura constante | sagita da faixa na curva integrada; o lóbulo triangular fundo conta 2 inflexões, o raso 0 |
+| Custo: arco de 1 km de raio com 3000 pontos e ruído | 124,9 s | 0,08 s (convergência e no máximo 400 pontos no LM) |
+| Planta a 0,8 mm e a 20 mm | contagem de clotoides sem prova, e 8 a 9 conforme a densidade | 8 clotoides nas quatro densidades (20, 10, 5 e 0,8 mm), com uma inflexão |
+| Entrada | misturar pontos de 2 e de 3 componentes, tolerância em texto, `duros` que não é lista e coordenada livre que varia passavam | recusa com o valor recebido; a coordenada livre pode variar até a tolerância |
+
+`maximoDeTrechos` virou `maximoDeClotoides`, que é o que ele conta.
 
 Provas em curvas analíticas (os mesmos casos do teste), desvio máximo medido, número de clotoides e de inflexões:
 
 | Curva | limpa (tolerância 0,5 mm) | com ruído de 0,3 mm (tolerância 1 mm) |
 |---|---|---|
-| arco de 500 mm, 90 graus | 0,001 mm, 1 clotoide, 0 inflexão | 0,444 mm, 1, 0 |
+| arco de 500 mm, 90 graus | 0,001 mm, 1 clotoide, 0 inflexão | 0,445 mm, 1, 0 |
 | clotoide de 1/800 a 1/300 | 0,001 mm, 1, 0 | 0,439 mm, 1, 0 |
-| quarto de elipse de 600 por 250 mm | 0,483 mm, 2, 0 | 0,754 mm, 2, 0 |
-| S de 1/400 a -1/400 | 0,000 mm, 1, 1 | 0,496 mm, 1, 1 |
+| quarto de elipse de 600 por 250 mm | 0,479 mm, 2, 0 | 0,752 mm, 2, 0 |
+| S de 1/400 a -1/400 | 0,001 mm, 1, 1 | 0,497 mm, 1, 1 |
 
-A planta da lataria do carro-fastback (a TABELA da receita, só leitura: o polígono com filete da prancha de `contornoDaPlanta`, 802 pontos a cada 5 mm, 4005 mm de arco) com tolerância de 3 mm: cabe com 9 clotoides, desvio máximo 2,81 mm, 8 corridas de curvatura monótona e 1 inflexão, em uns 6 s. Com 8 clotoides o desvio é 3,16 mm, com 6 é 10,5 mm. Os joelhos (arco em mm, curvatura em 1/m): 0 em 0; 1596 em 0; 1804 em -1,13; 1864 em 0,64; 2237 em 0,06; 3004 em 0,90; 3399 em 3,61; 3439 em -2,45; 3483 em 1,09; 4004 em -0,09. Lida como a forma pede: reta da frente até o lóbulo do para-lama (curvatura de -1,1 1/m, raio de uns 900 mm, que sai para fora), a volta com curvatura que sobe a 3,6 1/m (raio de uns 280 mm) no canto de trás, com uma oscilação de 40 mm nesse lóbulo (3,61, -2,45, 1,09) que é o ajuste seguindo os três filetes de 300, 400 e 600 mm do canto dentro dos 3 mm, e a ponta do eixo do carro. São 2 lóbulos, mas 9 clotoides, porque cada lóbulo pede subida e descida. O ajuste do carro continua sem rodada: o uso desta curva na receita é a fatia 3.
+A planta da lataria do carro-fastback (a TABELA da receita, só leitura: o polígono com filete da prancha de `contornoDaPlanta`, 802 pontos a cada 5 mm, 4005 mm de arco) com tolerância de 3 mm: cabe com 8 clotoides em 6 corridas de curvatura monótona, desvio máximo 2,87 mm e 1 inflexão, em uns 2 s; a 20, 10 e 0,8 mm de espaçamento dá os mesmos 8 clotoides, 6 corridas e 1 inflexão, com desvio de 2,71 a 2,85 mm. Os joelhos a 5 mm (arco em mm, curvatura em 1/m): 0 em 0; 1597 em 0; 1766 em -1,01; 1908 em 0,65; 2211 em 0,04; 3022 em 0,92; 3321 em 3,28; 3415 em 0,98; 4004 em 0,08. Lida como a forma pede: reta da frente até o lóbulo do para-lama (curvatura de -1 1/m, raio de uns 1000 mm, que sai para fora), a volta com curvatura que sobe a 3,3 1/m (raio de uns 300 mm) no canto de trás, e a ponta no eixo do carro. A entrada ali é uma sequência de filetes de 300, 400 e 600 mm com retas curtas entre eles, de curvatura positiva; o ajuste os substitui por uma rampa que sobe a 3,3 1/m e desce a 1 1/m, sem sinal oposto. São 2 lóbulos e 8 clotoides, porque cada lóbulo pede subida e descida. Esta versão corrige a anterior, que dava 9 clotoides com 2,81 mm e um lóbulo de 3,6, -2,5 e 1,1 1/m que não existe na entrada. O teste da planta acopla à peça: se a TABELA mudar, os números mudam com ela. O ajuste do carro continua sem rodada: o uso desta curva na receita é a fatia 3.
 
 Atritos:
 
@@ -74,3 +90,7 @@ Atritos:
    Custo: nenhum ainda; o ajudante não aparece na busca por capacidade.
    O processo pegou: não.
    Destino: backlog, registrar a ficha quando o plano der o arquivo.
+3. A primeira versão passou nos testes que escrevi e falhou em cinco achados da revisão adversarial (ruído denso, entrada degenerada, escala, ordem e custo), porque os testes só usavam ruído bem menor que o espaçamento e curvas de uns 500 mm.
+   Custo: uma rodada de revisão e de correção.
+   O processo pegou: sim, a revisão adversarial.
+   Destino: ferramenta, os testes novos em `ajuste-de-curva-lisa.test.mjs` cobrem ruído do tamanho do espaçamento, escala de milímetros a dezenas de metros, ordem e custo.

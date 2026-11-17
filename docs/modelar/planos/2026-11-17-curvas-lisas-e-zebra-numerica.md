@@ -42,7 +42,7 @@ O ajuste é capacidade nova do núcleo (ENVOLVER sobre a curva da gaiola: entram
 ## Fatias
 
 1. Feita em 2026-11-17: a zebra numérica (`tools/modelar/zebra-numerica.mjs`) e o aviso de área do índice de suavidade (`--area-minima`), medidos nas rodadas 2 a 4 do carro e nas chapas de prova (`docs/modelar/banco-de-provas/curvas-lisas-2026-11-17/`). A medida é estável com a densidade (no máximo 3 extremos e 1 laço de diferença, contra ±5 extremos do protótipo) e conta laço onde o crítico viu laço, mas o gate de saída 2 fica em aberto: nenhuma rodada julgada lisa existe para separar o lisa do reprovado, e a pessoa decide o próximo passo.
-2. Feita em 2026-11-17: o ajuste de curva lisa no núcleo (`procedural/nucleo/ajuste-de-curva-lisa.js`), cadeia de clotoides com as provas analíticas, limpas e com ruído, e a planta do carro-fastback dentro de 3 mm (2,81 mm, 9 clotoides em 2 lóbulos, 1 inflexão), no banco de provas desta pasta; a revisão adversarial do núcleo e o uso na receita ficam para a fatia 3.
+2. Feita em 2026-11-17: o ajuste de curva lisa no núcleo (`procedural/nucleo/ajuste-de-curva-lisa.js`), cadeia de clotoides com as provas analíticas, limpas e com ruído, e a planta do carro-fastback dentro de 3 mm (2,87 mm, 8 clotoides em 2 lóbulos, 1 inflexão, a mesma contagem de 20 a 0,8 mm de espaçamento), no banco de provas desta pasta; a revisão adversarial do núcleo e o uso na receita ficam para a fatia 3.
 3. A rodada do carro com as duas, e o fechamento.
 
 ## Riscos e parada
