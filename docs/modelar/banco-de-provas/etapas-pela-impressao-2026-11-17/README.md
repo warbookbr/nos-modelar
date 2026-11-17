@@ -66,6 +66,23 @@ Os consumidores do estado gravado, e como cada um lia e lê agora:
 
 A revisão não bloqueou e pediu cinco correções, todas feitas com teste. A versão do registro decide o caminho com recusa: ausente ou 3 vai à leitura nova, 1, 2 ou sem versão (com `etapas`) ao antigo, qualquer outro valor recusa, e o antigo recusa registro que traga `eventos`, para uma versão adulterada não apagar o histórico. A gravação do v3 relê o disco e recusa (`registro-mudou-no-disco`) quando os eventos de lá não são o começo dos novos, de modo que dois comandos que partem do mesmo registro não perdem evento; a janela entre a releitura e a escrita é a de duas instruções síncronas, e não há trava entre processos. A medição é tolerante: a impressão de uma etapa só depende das anteriores, então uma receita que não executa, ou uma montagem que não resolve, numa etapa deixa as anteriores medidas e dá aquela e as seguintes como não conferíveis, com o motivo (`medirAgora` procura por bissecção a maior parte que resolve), e o fluxo e o resumo do objeto não caem. A superfície só mede a montagem quando a resposta decide algo (peça de luz rasante sem lataria), e `vistasParaCritica` e o `--medir` do fluxo passam um registro medido só (`registro` como função, `registroLido`). Na empilhadeira (23 etapas, v3 em memória, cópia em pasta temporária) uma medição leva 9,7 s: pedir a etapa fixa de cada uma das 23 peças, como a fatia 2 fazia, custou 23 medições e 190 s, e pela decisão preguiçosa com o registro compartilhado são 1 medição e 8 s. `etapas-consumidores-v3.test.mjs` (na lista de lentos) liga cada consumidor a um v3 em disco e falha com as mutações que a revisão listou (tirar o registro de `rodada-de-modelagem`, de `vistas-para-critica` e de `latariaDaPeca`, voltar `vistas-para-critica` à versão síncrona, `registroLido` indefinido no fluxo), mais o `--medir` sem `registroLido`, o resumo do objeto sem a medida e a etapa fixa que ignora o registro dado. Além disso, `etapaQueEspera` só diz que a etapa espera quando a receita não tem passos (`semPassos`), o `reabrir` do v3 confere `registro.montagem`, e `lerEtapas` do fluxo recusa o v3 sem o registro medido.
 
-## O que fica para a fatia 3
+## Fatia 3: a migração em ensaio
 
-A fatia 3 escreve o comando de migração dos cinco registros do acervo, com a reconstrução por commit e a impressão `origem: migração`, e o relatório por etapa; a guarda do acervo só passa a cobrar impressão depois dela, e o caminho antigo (`atualizarRegistro`, `conferirPosteriores`, `abalarPelasPortas`, `portasDeReferencia`, `juntasDasPosteriores`, a leitura do v1) sai na migração do último registro.
+O comando `tools/modelar/migrar-etapas-para-impressao.mjs <montagem.json>` classifica cada etapa fixa do registro v2 e imprime o relatório sem gravar; `--gravar` grava o registro v3 no lugar do antigo (só sobre um v2), e `--json` dá o relatório em JSON. A via (a) reconstrói pelo commit que gravou o aceite (o primeiro commit do histórico de `montagem.etapas.json` em que a etapa aparece fixa com o aceite de agora): a árvore `procedural`, `src`, `tools` e `modulos` daquele commit é extraída numa pasta temporária e `medir-arvore-para-migracao.mjs` roda ali com os módulos do próprio commit (misturar o código de agora com o núcleo antigo não carrega), e o hash da forma gravado é a contraprova. A via (b) usa a impressão de agora, marcada `origem: migração` com `portaNaoProvada`, quando o commit não reproduz a forma ou não pôde ser medido, com a condição de a forma de agora ser a gravada e as medidas das juntas gravadas baterem com as de agora (12 algarismos). A via (c) não migra a etapa, que fica aberta, com o motivo. O aceite entra como está (quem, quando, palavras, defeitos aceitos, análise), e o evento ganha o campo `origem`.
+
+Ensaio de 2026-11-17, uma montagem por vez (o sedã levou uns 200 s por resolução, 4 commits):
+
+| Montagem | Etapas fixas | Via (a) | Via (b) | Via (c) | Fixas pela leitura de agora |
+| --- | --- | --- | --- | --- | --- |
+| aviao | 8 | 0 | 8 | 0 | 8 |
+| braco-robotico | 12 | 11 | 1 | 0 | 12 |
+| carrinho-de-mao | 4 | 4 | 0 | 0 | 4 |
+| empilhadeira | 23 | 23 | 0 | 0 | 23 |
+| sedan-chassi-e-lataria | 5 | 5 | 0 | 0 | 5 |
+| total | 52 | 43 | 9 | 0 | 52 |
+
+As nove da via (b) são as oito do avião e o anel da cintura do braço: os commits dos aceites são de antes de `src/autoria/assinatura-da-forma.js` existir, e a árvore deles não carrega o filho (`Cannot find module .../assinatura-da-forma.js`). Para elas a porta citada fica não provada, e a leitura de agora as dá fixas porque a forma e as medidas das juntas são as gravadas. Nenhuma etapa caiu na via (c), e nenhuma das migradas é quebrada pela leitura de agora. Os cinco registros não foram gravados nesta rodada.
+
+## O que fica depois da migração em ensaio
+
+Gravar os cinco registros (`--gravar`, uma montagem por vez) depois da decisão da pessoa, com a guarda do acervo passando a cobrar a leitura nova; o caminho antigo (`atualizarRegistro`, `conferirPosteriores`, `abalarPelasPortas`, `portasDeReferencia`, `juntasDasPosteriores`, a leitura do v1) sai na migração do último registro.

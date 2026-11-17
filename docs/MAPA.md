@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2105 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2108 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -3536,9 +3536,12 @@
 - `mcp-degrau-1-preparacao.test.mjs` — Provas da fatia preparatória: importação silenciosa, serviço estruturado e limpeza.
 - `medidas-da-fonte.mjs` — medidas-da-fonte.mjs — tira de `fonte-partes.json`, em milímetro, o ponto de partida das três vistas da carroceria: o perfil lateral, a planta, a seção front…
 - `medidas-da-fonte.test.mjs` — Testes de medidas-da-fonte.mjs sobre a fonte sintética da fixture de caixas: perfil, seção, planta, rodas, o trecho de receita que o núcleo executa e a recus…
+- `medir-arvore-para-migracao.mjs` — medir-arvore-para-migracao.mjs — o filho da migração dos registros de etapas: mede a montagem na árvore onde está (a de um commit antigo, extraída numa pasta…
 - `medir-importar-receita.mjs` — medir-importar-receita.mjs — o tempo de importar cada receita e gerar os passos dela, num processo novo.
 - `medir-transcricao.mjs` — medir-transcricao.mjs — onde vão os tokens de um agente: `npm run medir:transcricao -- <transcrição.jsonl> [...]`.
 - `medir-transcricao.test.mjs` — medir-transcricao.test.mjs — a medição de uma transcrição: turnos e entrada somada pelo `usage` (uma vez por mensagem), cada resultado de ferramenta na etapa…
+- `migrar-etapas-para-impressao.mjs` — migrar-etapas-para-impressao.mjs — migra o registro de etapas de uma montagem (versão 2, com o estado gravado em cada etapa) para o da versão 3 (eventos e im…
+- `migrar-etapas-para-impressao.test.mjs` — migrar-etapas-para-impressao.test.mjs — a migração dos registros v2 para o v3: a classificação de cada etapa fixa pelas três vias, o aceite copiado como está…
 - `modelo-aberto.mjs` — modelo-aberto.mjs — a entrada comum das ferramentas de vista: abre um esboço OU uma receita de peça e devolve a mesma estrutura.
 - `modelo-aberto.test.mjs` — modelo-aberto.test.mjs — as ferramentas de vista da empilhadeira abrindo receita de peça, e não só esboço (plano de conferência, fatia 6).
 - `modelo-de-referencia.mjs` — modelo-de-referencia.mjs — estuda uma malha de terceiros (OBJ, FBX ou glTF) como REFERÊNCIA de forma, sem a levar ao repositório.

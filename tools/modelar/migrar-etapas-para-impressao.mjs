@@ -101,14 +101,14 @@ function medirNoCommit(commit, arquivoMontagem) {
   }
 }
 
-/* O relatório da migração de uma montagem, sem gravar nada. `medirDoCommit(commit)` é injetável para o teste. */
-export async function planejarMigracao(arquivoMontagem, { medirDoCommit = (commit) => medirNoCommit(commit, arquivoMontagem), medidoAgora = null, avisar = () => {} } = {}) {
+/* O relatório da migração de uma montagem, sem gravar nada. `medirDoCommit(commit)`, `medidoAgora` e `commits` (Map instância → commit) são injetáveis para o teste. */
+export async function planejarMigracao(arquivoMontagem, { medirDoCommit = (commit) => medirNoCommit(commit, arquivoMontagem), medidoAgora = null, commits: dosCommits = null, avisar = () => {} } = {}) {
   const arquivoRegistro = arquivoDoRegistro(arquivoMontagem);
   const antigo = JSON.parse(readFileSync(arquivoRegistro, 'utf8'));
   if (antigo.versao === 3) throw new Error(`${relative(REPO, arquivoRegistro)} já é da versão 3; nada a migrar.`);
   if (!Array.isArray(antigo.etapas)) throw new Error(`${relative(REPO, arquivoRegistro)} não traz a lista \`etapas\` do formato antigo.`);
   const agora = medidoAgora ?? await medirAgora(arquivoMontagem);
-  const commits = commitsDosAceites(arquivoRegistro, antigo);
+  const commits = dosCommits ?? commitsDosAceites(arquivoRegistro, antigo);
   const medidos = new Map();
   const medidoDe = async (commit) => {
     if (!medidos.has(commit)) { avisar(`medindo a montagem no commit ${commit.slice(0, 8)}...`); medidos.set(commit, await medirDoCommit(commit)); }
