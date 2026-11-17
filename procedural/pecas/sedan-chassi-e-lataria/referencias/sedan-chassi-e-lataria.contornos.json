@@ -1,5 +1,9 @@
 {
  "formato": "mecanifica.contornos@1",
+ "imagem": {
+  "caminho": "../../carro-sedan-classico/referencias/fonte-partes.json",
+  "sha256": "8116bc719995347a456d356fc33b8f6b6bf412333c4643020a094ec4ddccda33"
+ },
  "fonte": "derivado por derivar-contornos.mjs das silhuetas em fatias de procedural/pecas/carro-sedan-classico/referencias/fonte-partes.json (escala de 4,4 m); os valores das fatias ligados pelo meio de cada fatia, incerteza de meia fatia (46 mm em z, 32 mm em y); só os contornos em mm, x para a direita e y para cima da imagem",
  "escalas": {
   "lado": {

@@ -1,6 +1,10 @@
 {
  "formato": "mecanifica.contornos@1",
  "imagem": {
+  "foraDoRepositorio": {
+   "motivo": "a foto frontal do braço robótico de que este contorno saiu nunca foi versionada: em 2026-11-17 não estava no repositório nem no histórico dele, e não há registro de quem a tem; o contorno não se refaz nem se confere, e vale como registro do que foi medido, não como medida nova",
+   "encerrada": true
+  },
   "sha256": "e77cfff325deb4c4e1a243cc4ddf12d062ae8d4371086c4bef0e3ceb1fecf2a7",
   "largura": 1380,
   "altura": 752

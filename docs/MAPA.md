@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2044 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2046 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -3628,6 +3628,8 @@
 - `guarda-temas-e-visoes.mjs` — guarda-temas-e-visoes.mjs — a prova num navegador de verdade dos gates 1 e 6 do plano das visões de conferência e da interface, no arranjo único da bancada.
 - `guarda-tempo-do-descrever.mjs` — guarda-tempo-do-descrever.mjs — o `descrever` da peça mais pesada do acervo cabe no orçamento de tempo.
 - `guarda-tempo-do-descrever.test.mjs` — guarda-tempo-do-descrever.test.mjs — o veredito da guarda de tempo reprova com o número medido e o orçamento, e a medida só vale para uma peça do tamanho que…
+- `origem-dos-contornos.mjs` — origem-dos-contornos.mjs — confere que cada `*.contornos.json` do acervo diz de onde veio a imagem que mediu.
+- `origem-dos-contornos.test.mjs` — origem-dos-contornos.test.mjs — o contorno diz de onde veio a imagem, e a guarda do acervo reprova o que não diz. Os casos estão em tools/fixtures/origem-dos…
 - `rodar-guardas.mjs` — rodar-guardas.mjs — o gate `bancada:guardas`: as guardas que abrem a bancada num navegador só e, quando precisam, num servidor só.
 - `rodar-guardas.test.mjs` — rodar-guardas.test.mjs — o gate `bancada:guardas` roda cada guarda no processo dela, diz o nome e o veredito de cada uma, e a falha de uma não esconde as out…
 

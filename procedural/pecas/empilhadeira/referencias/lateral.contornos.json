@@ -1,6 +1,10 @@
 {
  "formato": "mecanifica.contornos@1",
  "imagem": {
+  "foraDoRepositorio": {
+   "motivo": "a foto lateral da empilhadeira, de outubro, de que este contorno saiu nunca foi versionada: em 2026-11-17 não estava no repositório nem no histórico dele, e não há registro de quem a tem; o contorno não se refaz nem se confere, e vale como registro do que foi medido, não como medida nova",
+   "encerrada": true
+  },
   "sha256": "f2981f73ce0955205e6bcf367803b1e96091d024fa65003a68eb7d79f83bce5e",
   "largura": 1024,
   "altura": 572

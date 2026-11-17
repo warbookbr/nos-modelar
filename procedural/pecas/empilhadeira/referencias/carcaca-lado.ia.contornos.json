@@ -1,6 +1,7 @@
 {
  "formato": "mecanifica.contornos@1",
  "imagem": {
+  "caminho": "carcaca-lado.ia.png",
   "sha256": "0dcbbbd387d4b73f20231a9a7e1fcb5914eabdaac455770e737b9496303677f2",
   "largura": 1024,
   "altura": 572
