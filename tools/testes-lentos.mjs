@@ -17,8 +17,9 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { lerHistorico } from './vitest-duracoes.mjs';
 
 export const TESTES_LENTOS = [
-  /* 2026-11-17: o cache por prefixo no acervo inteiro (plano do cache por passo, fatia 3), uma execução e meia de cada receita; 709 s
-     com a máquina dividida com outros agentes, 268 s deles na carroceria do sedã */
+  /* 2026-11-17: o cache por prefixo no conjunto de cobertura (plano do cache por passo, fatia 3): o exemplo de cada operação e sete peças
+     baratas, 24 s com a máquina dividida, 14 deles no exemplo de cada operação e na leitura das 121 receitas para conferir a cobertura; a
+     varredura das 121 só roda com CACHE_ACERVO_INTEIRO=1 */
   'procedural/nucleo/planejador/cache-por-prefixo-acervo.test.mjs',
   /* 2026-11-17: a leitura declarada conferida em cinco peças do acervo (plano do cache por passo, fatia 2); 21 s com a máquina dividida */
   'procedural/nucleo/planejador/leitura-declarada-acervo.test.mjs',
