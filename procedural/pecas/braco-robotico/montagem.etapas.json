@@ -1,62 +1,146 @@
 {
   "formato": "mecanifica.registro-de-etapas",
-  "versao": 2,
+  "versao": 3,
   "montagem": "braco-robotico",
-  "etapas": [
+  "eventos": [
     {
+      "tipo": "aceite",
       "instancia": "base",
-      "estado": "fixa",
-      "juntas": [],
-      "forma": "sha256:21081dc5b156f75d462187e0085f661d70f9189aa229d05256afd980de58681e",
-      "portas": {
-        "assento": {
-          "forma": "anel",
-          "papel": "recebe",
-          "eixo": [
-            0,
-            1,
-            0
-          ],
-          "centro": [
-            0,
-            0.22,
-            0
-          ],
-          "raioInterno": 0,
-          "raioExterno": 0.105,
-          "inicio": -0.005,
-          "fim": 0
-        }
-      },
       "aceite": {
         "por": "a pessoa, 2026-11-17: 'Esta boa sim, aprovada!' (base com a placa de controle e a tampa fumê com parafusos de aço escuro, pela imagem antes e depois)",
         "analise": "ausente"
       },
-      "reaberturas": [
-        {
-          "por": "leitura do registro",
-          "motivo": "a receita mudou depois do aceite",
-          "aceite": {
-            "por": "pessoa",
-            "observacao": "aceitou a rodada 4: corpo 210 mm, pé avançando sob a caixa, topo com chanfro pequeno"
-          },
-          "forma": "sha256:acfa753e83ef96c273d1c29ef9690b54f595725db66875bacf5ad1905656866e"
+      "impressao": {
+        "forma": "sha256:21081dc5b156f75d462187e0085f661d70f9189aa229d05256afd980de58681e",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0,
+            0
+          ]
         },
-        {
-          "por": "leitura do registro",
-          "motivo": "a receita mudou depois do aceite",
-          "aceite": {
-            "por": "Tiago, 2026-11-16: base aprovada por imagem com a quina de baixo viva",
-            "analise": "ausente"
-          },
-          "forma": "sha256:7a7da776c41ee4aebb51685f9f67fa86e1ec0bf69fc9a93968d7dab83f82e4ac"
+        "juntas": [],
+        "citadas": [],
+        "anteriores": []
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "7894db300e5ad96f56ec8aa61cbc9803b37e0c61"
+      }
+    },
+    {
+      "tipo": "aceite",
+      "instancia": "anelCintura",
+      "aceite": {
+        "por": "pessoa",
+        "observacao": "aceitou a rodada 2: faixa única de 25 mm"
+      },
+      "impressao": {
+        "forma": "sha256:bfd1572c7750f72867a686ab7501aa807341d42e7a3cda1b901d5047cf9d76c2",
+        "parametros": [
+          {
+            "param": "raio",
+            "valor": 105,
+            "unidade": "mm"
+          }
+        ],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0.22,
+            0
+          ]
         },
-        {
-          "por": "Tiago",
-          "quando": "2026-11-17",
-          "motivo": "placa de controle e tampa transparente na caixa lateral, plano da família de componentes",
-          "portas": {
-            "assento": {
+        "juntas": [
+          {
+            "relacao": "anelSentaNaBase",
+            "com": "base",
+            "satisfeita": true,
+            "medidas": {
+              "disponiveis": true,
+              "alinhamento": 1,
+              "descentro": 0,
+              "sobreposicaoRadial": 0.01,
+              "sobreposicaoAxial": 0,
+              "separacaoAxial": 0,
+              "tolerancia": 0.000001,
+              "toleranciaNumerica": 0.000001,
+              "radialEsperado": {
+                "minimo": 0.01,
+                "maximo": 0.01,
+                "nominal": 0.01,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
+              },
+              "axialEsperado": {
+                "minimo": 0,
+                "maximo": 0,
+                "nominal": 0,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
+              },
+              "frestaEsperada": {
+                "minimo": 0,
+                "maximo": 0,
+                "nominal": 0,
+                "toleranciaFabricacao": null,
+                "formato": "sem-fresta"
+              }
+            }
+          }
+        ],
+        "citadas": [
+          {
+            "etapa": "base",
+            "porta": "assento",
+            "por": [
+              "posição anelSobreABase",
+              "relação anelSentaNaBase",
+              "vínculo anelComORaioDaBase"
+            ],
+            "interface": {
               "forma": "anel",
               "papel": "recebe",
               "eixo": [
@@ -75,110 +159,21 @@
               "fim": 0
             }
           }
-        }
-      ]
-    },
-    {
-      "instancia": "anelCintura",
-      "estado": "fixa",
-      "juntas": [
-        {
-          "relacao": "anelSentaNaBase",
-          "com": "base",
-          "satisfeita": true,
-          "medidas": {
-            "disponiveis": true,
-            "alinhamento": 1,
-            "descentro": 0,
-            "sobreposicaoRadial": 0.009999999999999995,
-            "sobreposicaoAxial": 0,
-            "separacaoAxial": 0,
-            "tolerancia": 0.000001,
-            "toleranciaNumerica": 0.000001,
-            "radialEsperado": {
-              "minimo": 0.01,
-              "maximo": 0.01,
-              "nominal": 0.01,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
-              },
-              "formato": "nominal-fabricacao"
-            },
-            "axialEsperado": {
-              "minimo": 0,
-              "maximo": 0,
-              "nominal": 0,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
-              },
-              "formato": "nominal-fabricacao"
-            },
-            "frestaEsperada": {
-              "minimo": 0,
-              "maximo": 0,
-              "nominal": 0,
-              "toleranciaFabricacao": null,
-              "formato": "sem-fresta"
-            }
-          }
-        }
-      ],
-      "forma": "sha256:bfd1572c7750f72867a686ab7501aa807341d42e7a3cda1b901d5047cf9d76c2",
-      "aceite": {
-        "por": "pessoa",
-        "observacao": "aceitou a rodada 2: faixa única de 25 mm"
+        ],
+        "anteriores": [
+          "base"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "impressão de agora",
+        "portaNaoProvada": true,
+        "commit": "17db8d25342eac8bfde9e84d2e5a76e44b17dbde"
       }
     },
     {
+      "tipo": "aceite",
       "instancia": "ombro",
-      "estado": "fixa",
-      "juntas": [
-        {
-          "relacao": "ombroSentaNoAnel",
-          "com": "anelCintura",
-          "satisfeita": true,
-          "medidas": {
-            "disponiveis": true,
-            "alinhamento": 1,
-            "descentro": 0,
-            "sobreposicaoRadial": 0.009999999999999995,
-            "sobreposicaoAxial": 0,
-            "separacaoAxial": 0,
-            "tolerancia": 0.000001,
-            "toleranciaNumerica": 0.000001,
-            "radialEsperado": {
-              "minimo": 0.01,
-              "maximo": 0.01,
-              "nominal": 0.01,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
-              },
-              "formato": "nominal-fabricacao"
-            },
-            "axialEsperado": {
-              "minimo": 0,
-              "maximo": 0,
-              "nominal": 0,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
-              },
-              "formato": "nominal-fabricacao"
-            },
-            "frestaEsperada": {
-              "minimo": 0,
-              "maximo": 0,
-              "nominal": 0,
-              "toleranciaFabricacao": null,
-              "formato": "sem-fresta"
-            }
-          }
-        }
-      ],
-      "forma": "sha256:008db946851ad0d0010d8442ae0d8133dd71b4d77decb1dc349c26a045dcb3f3",
       "aceite": {
         "por": "pessoa, 2026-11-05: aceitou o ombro 30 mm mais longo, em malha única pela gaiola, com o topo plano até a parede de trás",
         "defeitosAceitos": [
@@ -189,82 +184,126 @@
         ],
         "analise": "feita"
       },
-      "reaberturas": [
-        {
-          "por": "pessoa",
-          "quando": "2026-09-26",
-          "motivo": "refazer o ombro pelo desenho novo; o antigo fica como variação ombro-tambor",
-          "aceite": {
-            "por": "pessoa, 2026-09-25",
-            "observacao": "aceita no limite da rodada 8",
-            "defeitosAceitos": [
-              "colar: uniao em borda superior do colar, na junção com a base do corpo",
-              "tambor: posicao em borda inferior do disco em relação às quinas de baixo da face do corpo"
-            ]
-          },
-          "receita": "e4fd3ba725d2e524f539fe4892270bed597d0dc3d88cc303553be30f58e7d4a4"
-        },
-        {
-          "por": "pessoa",
-          "quando": "2026-09-28",
-          "motivo": "arredondar a borda de cima do corpo do ombro",
-          "aceite": {
-            "por": "pessoa, 2026-09-28: volta ao ombro com tambor, que ela escolheu vendo a imagem; os dois defeitos aceitos antes continuam aceitos",
-            "defeitosAceitos": [
-              "colar: uniao em borda superior do colar, na junção com a base do corpo",
-              "tambor: posicao em borda inferior do disco em relação às quinas de baixo da face do corpo"
-            ]
-          },
-          "receita": "e4fd3ba725d2e524f539fe4892270bed597d0dc3d88cc303553be30f58e7d4a4"
-        },
-        {
-          "por": "leitura do registro",
-          "motivo": "a receita mudou depois do aceite",
-          "aceite": {
-            "por": "a pessoa, 2026-09-29: aceitou olhando as vistas o ombro de coluna unida ao braço, canto reto e fim redondo no anel",
-            "defeitosAceitos": [
-              "crítico não fechou: modelar — 2 defeito(s) apontado(s) na rodada 8.",
-              "colar: uniao em borda superior do colar, na junção com a base do corpo",
-              "tambor: posicao em borda inferior do disco em relação às quinas de baixo da face do corpo"
-            ]
-          },
-          "forma": "sha256:d6c4b94a6c0b60269cca6e07375e60633077b7dd3fe87b0038ae6abc4376c4da"
-        },
-        {
-          "por": "leitura do registro",
-          "motivo": "a receita mudou depois do aceite",
-          "aceite": {
-            "por": "pessoa, 2026-11-03: 'Vamos com a opção B sim, prosseguimos com a que a gente tava trabalhando', depois de ver a rodada 11 e as marcas de acabamento junto à saída e no encontro de baixo",
-            "defeitosAceitos": [
-              "anel: superficie em contorno do disco, face frontal",
-              "pescoco: superficie em encontro de baixo entre a frente da parte de pé e a parte deitada",
-              "pescoco: superficie em transição de seção retangular para redonda junto à saída, cantos superior esquerdo e inferior direito"
+      "impressao": {
+        "forma": "sha256:008db946851ad0d0010d8442ae0d8133dd71b4d77decb1dc349c26a045dcb3f3",
+        "parametros": [
+          {
+            "param": "raioDoPescoco",
+            "valor": 105,
+            "unidade": "mm"
+          }
+        ],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
             ],
-            "analise": "ausente"
-          },
-          "forma": "sha256:1b6a3121f6d82373a885bd26eda48e7e221b98870f9aa43559478460bcaca24b"
-        },
-        {
-          "por": "leitura do registro",
-          "motivo": "a receita mudou depois do aceite",
-          "aceite": {
-            "por": "Tiago, 2026-11-04: quinas de trás de 75 mm dentro do anel, posição mantida pela recomendação, forma aprovada sem crítico",
-            "defeitosAceitos": [
-              "anel: superficie em contorno do disco, face frontal",
-              "pescoco: superficie em encontro de baixo entre a frente da parte de pé e a parte deitada",
-              "pescoco: superficie em transição de seção retangular para redonda junto à saída, cantos superior esquerdo e inferior direito"
+            [
+              0,
+              1,
+              0
             ],
-            "analise": "ausente"
-          },
-          "forma": "sha256:7bfefdef59eef5af30f2d40e0e4a5ad628c22b98e45be86fe4de573b4d221150"
-        }
-      ]
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0.245,
+            0
+          ]
+        },
+        "juntas": [
+          {
+            "relacao": "ombroSentaNoAnel",
+            "com": "anelCintura",
+            "satisfeita": true,
+            "medidas": {
+              "disponiveis": true,
+              "alinhamento": 1,
+              "descentro": 0,
+              "sobreposicaoRadial": 0.01,
+              "sobreposicaoAxial": 0,
+              "separacaoAxial": 0,
+              "tolerancia": 0.000001,
+              "toleranciaNumerica": 0.000001,
+              "radialEsperado": {
+                "minimo": 0.01,
+                "maximo": 0.01,
+                "nominal": 0.01,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
+              },
+              "axialEsperado": {
+                "minimo": 0,
+                "maximo": 0,
+                "nominal": 0,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
+              },
+              "frestaEsperada": {
+                "minimo": 0,
+                "maximo": 0,
+                "nominal": 0,
+                "toleranciaFabricacao": null,
+                "formato": "sem-fresta"
+              }
+            }
+          }
+        ],
+        "citadas": [
+          {
+            "etapa": "anelCintura",
+            "porta": "topo",
+            "por": [
+              "posição ombroSobreOAnel",
+              "relação ombroSentaNoAnel",
+              "vínculo colarComORaioDoAnel"
+            ],
+            "interface": {
+              "forma": "anel",
+              "papel": "recebe",
+              "eixo": [
+                0,
+                1,
+                0
+              ],
+              "centro": [
+                0,
+                0.245,
+                0
+              ],
+              "raioInterno": 0,
+              "raioExterno": 0.105,
+              "inicio": -0.005,
+              "fim": 0
+            }
+          }
+        ],
+        "anteriores": [
+          "base",
+          "anelCintura"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "ef478824fb7f7461346bfe092d6cb0187bf6a6c7"
+      }
     },
     {
+      "tipo": "aceite",
       "instancia": "braco",
-      "estado": "fixa",
-      "juntas": [],
-      "forma": "sha256:57e94e28db97957798c38d8efae544bbf4df10ed65c2716d605648cdeb0fc21a",
       "aceite": {
         "por": "Tiago, 2026-11-13, pela imagem de antes e depois da correção da agulha na costura",
         "defeitosAceitos": [
@@ -274,114 +313,82 @@
         ],
         "analise": "ausente"
       },
-      "reaberturas": [
-        {
-          "por": "leitura do registro",
-          "motivo": "a receita mudou depois do aceite",
-          "aceite": {
-            "por": "Tiago, 2026-11-04, pelas imagens da rodada 5, com o arredondamento acompanhando o chanfro",
-            "defeitosAceitos": [
-              "crítico não fechou: modelar — 2 defeito(s) apontado(s) na rodada 5.",
-              "coluna: superficie em encontro com o pé, lado +z e lado direito, logo acima do pé",
-              "pe: superficie em costura de entrada da coluna no pé, face cilíndrica superior"
+      "impressao": {
+        "forma": "sha256:57e94e28db97957798c38d8efae544bbf4df10ed65c2716d605648cdeb0fc21a",
+        "parametros": [
+          {
+            "param": "raioDaJunta",
+            "valor": 95,
+            "unidade": "mm"
+          }
+        ],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
             ],
-            "analise": "ausente"
-          },
-          "forma": "sha256:bf44df0dd6044fb9b4b2d16f7be940a812920bbbf0083a8cf81f15caecf88015"
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0.36,
+            0.153
+          ]
         },
-        {
-          "por": "pessoa",
-          "quando": "2026-11-09",
-          "motivo": "o colar do cotovelo sai, por não girar, e a coluna cresce 25 mm no lugar dele",
-          "aceite": {
-            "por": "pessoa, 2026-11-05: aceitou a coluna refeita como malha única por gaiolaPorLacos",
-            "defeitosAceitos": [
-              "crítico não fechou: modelar — 2 defeito(s) apontado(s) na rodada 5.",
-              "coluna: superficie em encontro com o pé, lado +z e lado direito, logo acima do pé",
-              "pe: superficie em costura de entrada da coluna no pé, face cilíndrica superior"
+        "juntas": [],
+        "citadas": [
+          {
+            "etapa": "ombro",
+            "porta": "juntaDoOmbro",
+            "por": [
+              "posição bracoNaJuntaDoOmbro",
+              "vínculo juntaComORaioDoAnel"
             ],
-            "analise": "ausente"
-          },
-          "forma": "sha256:3fed783363b3f5f574a9a1d8ba7f3595eecd3a77555e55f6d32fdd8efc4db024"
-        },
-        {
-          "por": "leitura do registro",
-          "motivo": "a receita mudou depois do aceite",
-          "aceite": {
-            "por": "pessoa, 2026-11-09: aceitou o braço superior numa peça só, com os tubos de 190 mm",
-            "defeitosAceitos": [
-              "crítico não fechou: modelar — 2 defeito(s) apontado(s) na rodada 5.",
-              "coluna: superficie em encontro com o pé, lado +z e lado direito, logo acima do pé",
-              "pe: superficie em costura de entrada da coluna no pé, face cilíndrica superior"
-            ],
-            "analise": "ausente"
-          },
-          "forma": "sha256:489416bafeb3199e337eda62b61dfa502a23e3dbbb69a1bf876d179fa7079216"
-        },
-        {
-          "por": "leitura do registro",
-          "motivo": "a receita mudou depois do aceite",
-          "aceite": {
-            "por": "Tiago",
-            "defeitosAceitos": [
-              "crítico não fechou: modelar — 2 defeito(s) apontado(s) na rodada 5.",
-              "coluna: superficie em encontro com o pé, lado +z e lado direito, logo acima do pé",
-              "pe: superficie em costura de entrada da coluna no pé, face cilíndrica superior"
-            ],
-            "analise": "ausente"
-          },
-          "forma": "sha256:596f1439be5f3eb3f13223ff61fe23d4f2135e31e2b97008f4e4198fdabc569e"
-        }
-      ]
-    },
-    {
-      "instancia": "anelAntebraco",
-      "estado": "fixa",
-      "juntas": [
-        {
-          "relacao": "anelAntebracoSentaNaSaida",
-          "com": "braco",
-          "satisfeita": true,
-          "medidas": {
-            "disponiveis": true,
-            "alinhamento": 1,
-            "descentro": 0,
-            "sobreposicaoRadial": 0.009999999999999995,
-            "sobreposicaoAxial": 0,
-            "separacaoAxial": 0,
-            "tolerancia": 0.000001,
-            "toleranciaNumerica": 0.000001,
-            "radialEsperado": {
-              "minimo": 0.01,
-              "maximo": 0.01,
-              "nominal": 0.01,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
-              },
-              "formato": "nominal-fabricacao"
-            },
-            "axialEsperado": {
-              "minimo": 0,
-              "maximo": 0,
-              "nominal": 0,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
-              },
-              "formato": "nominal-fabricacao"
-            },
-            "frestaEsperada": {
-              "minimo": 0,
-              "maximo": 0,
-              "nominal": 0,
-              "toleranciaFabricacao": null,
-              "formato": "sem-fresta"
+            "interface": {
+              "forma": "cilindro",
+              "papel": "externa",
+              "eixo": [
+                0,
+                0,
+                1
+              ],
+              "centro": [
+                0,
+                0.36,
+                0.153
+              ],
+              "raio": 0.095,
+              "inicio": 0,
+              "fim": 0.005
             }
           }
-        }
-      ],
-      "forma": "sha256:0aac9441c2302403154a031e60cf12ffce511d250ba106abe32e02a8326b794c",
+        ],
+        "anteriores": [
+          "base",
+          "anelCintura",
+          "ombro"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "73a57d9c7c8a9b1c294e49d237d99379da02942e"
+      }
+    },
+    {
+      "tipo": "aceite",
+      "instancia": "anelAntebraco",
       "aceite": {
         "por": "pessoa, 2026-11-09: aceitou o braço superior numa peça só, com os tubos de 190 mm",
         "defeitosAceitos": [
@@ -389,83 +396,128 @@
         ],
         "analise": "ausente"
       },
-      "reaberturas": [
-        {
-          "por": "pessoa",
-          "quando": "2026-11-09",
-          "motivo": "o eixo da junta do cotovelo passa a ser paralelo ao do ombro, e o cotovelo vira espelho do ombro",
-          "aceite": {
-            "por": "pessoa, 2026-11-09: aceitou o anel do antebraço, único de 25 mm e rente à saída do cotovelo",
-            "defeitosAceitos": [
-              "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
+      "impressao": {
+        "forma": "sha256:0aac9441c2302403154a031e60cf12ffce511d250ba106abe32e02a8326b794c",
+        "parametros": [
+          {
+            "param": "raio",
+            "valor": 95,
+            "unidade": "mm"
+          }
+        ],
+        "pose": {
+          "rotacao": [
+            [
+              0,
+              0,
+              1
             ],
-            "analise": "ausente"
-          },
-          "forma": "sha256:28edc4e2d43e3f07de00b97883bff89cc5f74d9fed9197584d4350e4e18c69f6"
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              -1,
+              0,
+              0
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0.884,
+            0.133
+          ]
         },
-        {
-          "por": "pessoa",
-          "quando": "2026-11-09",
-          "motivo": "o colar do cotovelo sai, por não girar, e a coluna cresce 25 mm no lugar dele",
-          "aceite": {
-            "por": "pessoa, 2026-11-09: aceitou com o cotovelo paralelo ao ombro; o antebraço com o pé de 176 mm até a conferência de porta em T",
-            "defeitosAceitos": [
-              "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
-            ],
-            "analise": "ausente"
-          },
-          "forma": "sha256:28edc4e2d43e3f07de00b97883bff89cc5f74d9fed9197584d4350e4e18c69f6"
-        }
-      ]
-    },
-    {
-      "instancia": "antebraco",
-      "estado": "fixa",
-      "juntas": [
-        {
-          "relacao": "antebracoSentaNoAnel",
-          "com": "anelAntebraco",
-          "satisfeita": true,
-          "medidas": {
-            "disponiveis": true,
-            "alinhamento": 1,
-            "descentro": 0,
-            "sobreposicaoRadial": 0.009999999999999995,
-            "sobreposicaoAxial": 0,
-            "separacaoAxial": 0,
-            "tolerancia": 0.000001,
-            "toleranciaNumerica": 0.000001,
-            "radialEsperado": {
-              "minimo": 0.01,
-              "maximo": 0.01,
-              "nominal": 0.01,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
+        "juntas": [
+          {
+            "relacao": "anelAntebracoSentaNaSaida",
+            "com": "braco",
+            "satisfeita": true,
+            "medidas": {
+              "disponiveis": true,
+              "alinhamento": 1,
+              "descentro": 0,
+              "sobreposicaoRadial": 0.01,
+              "sobreposicaoAxial": 0,
+              "separacaoAxial": 0,
+              "tolerancia": 0.000001,
+              "toleranciaNumerica": 0.000001,
+              "radialEsperado": {
+                "minimo": 0.01,
+                "maximo": 0.01,
+                "nominal": 0.01,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
               },
-              "formato": "nominal-fabricacao"
-            },
-            "axialEsperado": {
-              "minimo": 0,
-              "maximo": 0,
-              "nominal": 0,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
+              "axialEsperado": {
+                "minimo": 0,
+                "maximo": 0,
+                "nominal": 0,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
               },
-              "formato": "nominal-fabricacao"
-            },
-            "frestaEsperada": {
-              "minimo": 0,
-              "maximo": 0,
-              "nominal": 0,
-              "toleranciaFabricacao": null,
-              "formato": "sem-fresta"
+              "frestaEsperada": {
+                "minimo": 0,
+                "maximo": 0,
+                "nominal": 0,
+                "toleranciaFabricacao": null,
+                "formato": "sem-fresta"
+              }
             }
           }
-        }
-      ],
-      "forma": "sha256:720685f37d74bf619278906e3bf9eab4d3c0defb03d7989cd00e3c33c6d94f73",
+        ],
+        "citadas": [
+          {
+            "etapa": "braco",
+            "porta": "saida",
+            "por": [
+              "posição anelSobreASaida",
+              "relação anelAntebracoSentaNaSaida",
+              "vínculo anelComORaioDaSaida"
+            ],
+            "interface": {
+              "forma": "anel",
+              "papel": "recebe",
+              "eixo": [
+                0,
+                0,
+                -1
+              ],
+              "centro": [
+                0,
+                0.884,
+                0.133
+              ],
+              "raioInterno": 0,
+              "raioExterno": 0.095,
+              "inicio": -0.005,
+              "fim": 0
+            }
+          }
+        ],
+        "anteriores": [
+          "base",
+          "anelCintura",
+          "ombro",
+          "braco"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "6e78f6f75028c06789eeee5904440390669c2ff3"
+      }
+    },
+    {
+      "tipo": "aceite",
+      "instancia": "antebraco",
       "aceite": {
         "por": "Tiago, 2026-11-13, pela imagem de antes e depois da correção da agulha na costura",
         "defeitosAceitos": [
@@ -473,163 +525,253 @@
         ],
         "analise": "ausente"
       },
-      "reaberturas": [
-        {
-          "por": "pessoa",
-          "quando": "2026-11-09",
-          "motivo": "o colar do cotovelo sai, por não girar, e a coluna cresce 25 mm no lugar dele",
-          "aceite": {
-            "por": "pessoa, 2026-11-09: aceitou com o cotovelo paralelo ao ombro; o antebraço com o pé de 176 mm até a conferência de porta em T",
-            "defeitosAceitos": [
-              "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
+      "impressao": {
+        "forma": "sha256:720685f37d74bf619278906e3bf9eab4d3c0defb03d7989cd00e3c33c6d94f73",
+        "parametros": [
+          {
+            "param": "raio",
+            "valor": 95,
+            "unidade": "mm"
+          }
+        ],
+        "pose": {
+          "rotacao": [
+            [
+              0,
+              0,
+              1
             ],
-            "analise": "ausente"
-          },
-          "forma": "sha256:fa5b90aa57b7509aa3c8cf36a5f037a8a80d7955e1fe5a47641efe94ea88100a"
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              -1,
+              0,
+              0
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0.884,
+            0.108
+          ]
         },
-        {
-          "por": "pessoa",
-          "quando": "2026-11-09",
-          "motivo": "a carcaça da junta 4 do punho passa a fazer parte do antebraço",
-          "aceite": {
-            "por": "pessoa, 2026-11-09: aceitou o braço superior numa peça só, com os tubos de 190 mm",
-            "defeitosAceitos": [
-              "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
-            ],
-            "analise": "ausente"
-          },
-          "forma": "sha256:6c62ea8ef4c04071f02c11166c12c267421fe1859aeb8421012cb75ee9555946"
-        },
-        {
-          "por": "leitura do registro",
-          "motivo": "a receita mudou depois do aceite",
-          "aceite": {
-            "por": "pessoa, 2026-11-09: aceitou o antebraço com a carcaça da junta 4, pé e carcaça de 190 mm e o tubo rente",
-            "defeitosAceitos": [
-              "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
-            ],
-            "analise": "ausente"
-          },
-          "forma": "sha256:5b92d53e321bc8e351e330ea29b0215a28fc9ec26cd6c70a113a6b46a2ac5bb7"
-        },
-        {
-          "por": "leitura do registro",
-          "motivo": "a receita mudou depois do aceite",
-          "aceite": {
-            "por": "Tiago",
-            "defeitosAceitos": [
-              "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
-            ],
-            "analise": "ausente"
-          },
-          "forma": "sha256:4e32eacd1474009691f6430a8876b69877d373b70859c3c6381e6b483607c72e"
-        }
-      ]
-    },
-    {
-      "instancia": "anelPunho4",
-      "estado": "fixa",
-      "juntas": [
-        {
-          "relacao": "anelPunho4SentaNaSaida",
-          "com": "antebraco",
-          "satisfeita": true,
-          "medidas": {
-            "disponiveis": true,
-            "alinhamento": 1,
-            "descentro": 0,
-            "sobreposicaoRadial": 0.010000000000000002,
-            "sobreposicaoAxial": 0,
-            "separacaoAxial": 0,
-            "tolerancia": 0.000001,
-            "toleranciaNumerica": 0.000001,
-            "radialEsperado": {
-              "minimo": 0.01,
-              "maximo": 0.01,
-              "nominal": 0.01,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
+        "juntas": [
+          {
+            "relacao": "antebracoSentaNoAnel",
+            "com": "anelAntebraco",
+            "satisfeita": true,
+            "medidas": {
+              "disponiveis": true,
+              "alinhamento": 1,
+              "descentro": 0,
+              "sobreposicaoRadial": 0.01,
+              "sobreposicaoAxial": 0,
+              "separacaoAxial": 0,
+              "tolerancia": 0.000001,
+              "toleranciaNumerica": 0.000001,
+              "radialEsperado": {
+                "minimo": 0.01,
+                "maximo": 0.01,
+                "nominal": 0.01,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
               },
-              "formato": "nominal-fabricacao"
-            },
-            "axialEsperado": {
-              "minimo": 0,
-              "maximo": 0,
-              "nominal": 0,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
+              "axialEsperado": {
+                "minimo": 0,
+                "maximo": 0,
+                "nominal": 0,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
               },
-              "formato": "nominal-fabricacao"
-            },
-            "frestaEsperada": {
-              "minimo": 0,
-              "maximo": 0,
-              "nominal": 0,
-              "toleranciaFabricacao": null,
-              "formato": "sem-fresta"
+              "frestaEsperada": {
+                "minimo": 0,
+                "maximo": 0,
+                "nominal": 0,
+                "toleranciaFabricacao": null,
+                "formato": "sem-fresta"
+              }
             }
           }
-        }
-      ],
-      "forma": "sha256:fb77c3150476d88df78bdf89db778430bfb180f793ea00ac2f686e5554ae6ea6",
+        ],
+        "citadas": [
+          {
+            "etapa": "anelAntebraco",
+            "porta": "topo",
+            "por": [
+              "posição antebracoSobreOAnel",
+              "relação antebracoSentaNoAnel",
+              "vínculo antebracoComORaioDoAnel"
+            ],
+            "interface": {
+              "forma": "anel",
+              "papel": "recebe",
+              "eixo": [
+                0,
+                0,
+                -1
+              ],
+              "centro": [
+                0,
+                0.884,
+                0.108
+              ],
+              "raioInterno": 0,
+              "raioExterno": 0.095,
+              "inicio": -0.005,
+              "fim": 0
+            }
+          }
+        ],
+        "anteriores": [
+          "base",
+          "anelCintura",
+          "ombro",
+          "braco",
+          "anelAntebraco"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "73a57d9c7c8a9b1c294e49d237d99379da02942e"
+      }
+    },
+    {
+      "tipo": "aceite",
+      "instancia": "anelPunho4",
       "aceite": {
         "por": "pessoa, 2026-11-09: aceitou o anel e o elo da junta 4 do punho, com 135 mm",
         "defeitosAceitos": [
           "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
         ],
         "analise": "ausente"
+      },
+      "impressao": {
+        "forma": "sha256:fb77c3150476d88df78bdf89db778430bfb180f793ea00ac2f686e5554ae6ea6",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ]
+          ],
+          "deslocamento": [
+            0.443,
+            0.884,
+            0.108
+          ]
+        },
+        "juntas": [
+          {
+            "relacao": "anelPunho4SentaNaSaida",
+            "com": "antebraco",
+            "satisfeita": true,
+            "medidas": {
+              "disponiveis": true,
+              "alinhamento": 1,
+              "descentro": 0,
+              "sobreposicaoRadial": 0.01,
+              "sobreposicaoAxial": 0,
+              "separacaoAxial": 0,
+              "tolerancia": 0.000001,
+              "toleranciaNumerica": 0.000001,
+              "radialEsperado": {
+                "minimo": 0.01,
+                "maximo": 0.01,
+                "nominal": 0.01,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
+              },
+              "axialEsperado": {
+                "minimo": 0,
+                "maximo": 0,
+                "nominal": 0,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
+              },
+              "frestaEsperada": {
+                "minimo": 0,
+                "maximo": 0,
+                "nominal": 0,
+                "toleranciaFabricacao": null,
+                "formato": "sem-fresta"
+              }
+            }
+          }
+        ],
+        "citadas": [
+          {
+            "etapa": "antebraco",
+            "porta": "saida",
+            "por": [
+              "posição anelPunho4SobreASaida",
+              "relação anelPunho4SentaNaSaida"
+            ],
+            "interface": {
+              "forma": "anel",
+              "papel": "recebe",
+              "eixo": [
+                0,
+                0,
+                1
+              ],
+              "centro": [
+                0.443,
+                0.884,
+                0.108
+              ],
+              "raioInterno": 0,
+              "raioExterno": 0.095,
+              "inicio": -0.005,
+              "fim": 0
+            }
+          }
+        ],
+        "anteriores": [
+          "base",
+          "anelCintura",
+          "ombro",
+          "braco",
+          "anelAntebraco",
+          "antebraco"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "87435a79a65515195f7480a3c81b6d52d2f24d62"
       }
     },
     {
+      "tipo": "aceite",
       "instancia": "eloPunho4",
-      "estado": "fixa",
-      "juntas": [
-        {
-          "relacao": "eloPunho4SentaNoAnel",
-          "com": "anelPunho4",
-          "satisfeita": true,
-          "medidas": {
-            "disponiveis": true,
-            "alinhamento": 1,
-            "descentro": 0,
-            "sobreposicaoRadial": 0.010000000000000002,
-            "sobreposicaoAxial": 0,
-            "separacaoAxial": 0,
-            "tolerancia": 0.000001,
-            "toleranciaNumerica": 0.000001,
-            "radialEsperado": {
-              "minimo": 0.01,
-              "maximo": 0.01,
-              "nominal": 0.01,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
-              },
-              "formato": "nominal-fabricacao"
-            },
-            "axialEsperado": {
-              "minimo": 0,
-              "maximo": 0,
-              "nominal": 0,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
-              },
-              "formato": "nominal-fabricacao"
-            },
-            "frestaEsperada": {
-              "minimo": 0,
-              "maximo": 0,
-              "nominal": 0,
-              "toleranciaFabricacao": null,
-              "formato": "sem-fresta"
-            }
-          }
-        }
-      ],
-      "forma": "sha256:56d6d57e05a3c1ef84f52ed509da68486369e64b7a9289317222128269b4f9df",
       "aceite": {
         "por": "Tiago",
         "defeitosAceitos": [
@@ -637,125 +779,264 @@
         ],
         "analise": "ausente"
       },
-      "reaberturas": [
-        {
-          "por": "leitura do registro",
-          "motivo": "a receita mudou depois do aceite",
-          "aceite": {
-            "por": "pessoa, 2026-11-09: aceitou o anel e o elo da junta 4 do punho, com 135 mm",
-            "defeitosAceitos": [
-              "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
+      "impressao": {
+        "forma": "sha256:56d6d57e05a3c1ef84f52ed509da68486369e64b7a9289317222128269b4f9df",
+        "parametros": [
+          {
+            "param": "raio",
+            "valor": 67.5,
+            "unidade": "mm"
+          }
+        ],
+        "pose": {
+          "rotacao": [
+            [
+              0,
+              0,
+              -1
             ],
-            "analise": "ausente"
-          },
-          "forma": "sha256:1dbdb6d83d668745f96805d978d9fd501f22b6a6efb8493b4d285c259ef31207"
-        }
-      ]
-    },
-    {
-      "instancia": "anelPunho5",
-      "estado": "fixa",
-      "juntas": [
-        {
-          "relacao": "anelPunho5SentaNaSaida",
-          "com": "eloPunho4",
-          "satisfeita": true,
-          "medidas": {
-            "disponiveis": true,
-            "alinhamento": 1,
-            "descentro": 0,
-            "sobreposicaoRadial": 0.010000000000000002,
-            "sobreposicaoAxial": 0,
-            "separacaoAxial": 0,
-            "tolerancia": 0.000001,
-            "toleranciaNumerica": 0.000001,
-            "radialEsperado": {
-              "minimo": 0.01,
-              "maximo": 0.01,
-              "nominal": 0.01,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ]
+          ],
+          "deslocamento": [
+            0.443,
+            0.884,
+            0.133
+          ]
+        },
+        "juntas": [
+          {
+            "relacao": "eloPunho4SentaNoAnel",
+            "com": "anelPunho4",
+            "satisfeita": true,
+            "medidas": {
+              "disponiveis": true,
+              "alinhamento": 1,
+              "descentro": 0,
+              "sobreposicaoRadial": 0.01,
+              "sobreposicaoAxial": 0,
+              "separacaoAxial": 0,
+              "tolerancia": 0.000001,
+              "toleranciaNumerica": 0.000001,
+              "radialEsperado": {
+                "minimo": 0.01,
+                "maximo": 0.01,
+                "nominal": 0.01,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
               },
-              "formato": "nominal-fabricacao"
-            },
-            "axialEsperado": {
-              "minimo": 0,
-              "maximo": 0,
-              "nominal": 0,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
+              "axialEsperado": {
+                "minimo": 0,
+                "maximo": 0,
+                "nominal": 0,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
               },
-              "formato": "nominal-fabricacao"
-            },
-            "frestaEsperada": {
-              "minimo": 0,
-              "maximo": 0,
-              "nominal": 0,
-              "toleranciaFabricacao": null,
-              "formato": "sem-fresta"
+              "frestaEsperada": {
+                "minimo": 0,
+                "maximo": 0,
+                "nominal": 0,
+                "toleranciaFabricacao": null,
+                "formato": "sem-fresta"
+              }
             }
           }
-        }
-      ],
-      "forma": "sha256:fb77c3150476d88df78bdf89db778430bfb180f793ea00ac2f686e5554ae6ea6",
+        ],
+        "citadas": [
+          {
+            "etapa": "anelPunho4",
+            "porta": "topo",
+            "por": [
+              "posição eloPunho4SobreOAnel",
+              "relação eloPunho4SentaNoAnel",
+              "vínculo eloComORaioDoAnel"
+            ],
+            "interface": {
+              "forma": "anel",
+              "papel": "recebe",
+              "eixo": [
+                0,
+                0,
+                1
+              ],
+              "centro": [
+                0.443,
+                0.884,
+                0.133
+              ],
+              "raioInterno": 0,
+              "raioExterno": 0.0675,
+              "inicio": -0.005,
+              "fim": 0
+            }
+          }
+        ],
+        "anteriores": [
+          "base",
+          "anelCintura",
+          "ombro",
+          "braco",
+          "anelAntebraco",
+          "antebraco",
+          "anelPunho4"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "69ffcff15cf14d63402e93325770c10b42ced17e"
+      }
+    },
+    {
+      "tipo": "aceite",
+      "instancia": "anelPunho5",
       "aceite": {
         "por": "pessoa, 2026-11-09: aceitou o anel da junta 5 do punho",
         "defeitosAceitos": [
           "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
         ],
         "analise": "ausente"
+      },
+      "impressao": {
+        "forma": "sha256:fb77c3150476d88df78bdf89db778430bfb180f793ea00ac2f686e5554ae6ea6",
+        "parametros": [
+          {
+            "param": "raio",
+            "valor": 67.5,
+            "unidade": "mm"
+          }
+        ],
+        "pose": {
+          "rotacao": [
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0.443,
+            0.684,
+            0.2005
+          ]
+        },
+        "juntas": [
+          {
+            "relacao": "anelPunho5SentaNaSaida",
+            "com": "eloPunho4",
+            "satisfeita": true,
+            "medidas": {
+              "disponiveis": true,
+              "alinhamento": 1,
+              "descentro": 0,
+              "sobreposicaoRadial": 0.01,
+              "sobreposicaoAxial": 0,
+              "separacaoAxial": 0,
+              "tolerancia": 0.000001,
+              "toleranciaNumerica": 0.000001,
+              "radialEsperado": {
+                "minimo": 0.01,
+                "maximo": 0.01,
+                "nominal": 0.01,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
+              },
+              "axialEsperado": {
+                "minimo": 0,
+                "maximo": 0,
+                "nominal": 0,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
+              },
+              "frestaEsperada": {
+                "minimo": 0,
+                "maximo": 0,
+                "nominal": 0,
+                "toleranciaFabricacao": null,
+                "formato": "sem-fresta"
+              }
+            }
+          }
+        ],
+        "citadas": [
+          {
+            "etapa": "eloPunho4",
+            "porta": "saida",
+            "por": [
+              "posição anelPunho5SobreASaida",
+              "relação anelPunho5SentaNaSaida",
+              "vínculo anelPunho5ComORaioDaSaida"
+            ],
+            "interface": {
+              "forma": "anel",
+              "papel": "recebe",
+              "eixo": [
+                0,
+                -1,
+                0
+              ],
+              "centro": [
+                0.443,
+                0.684,
+                0.2005
+              ],
+              "raioInterno": 0,
+              "raioExterno": 0.0675,
+              "inicio": -0.005,
+              "fim": 0
+            }
+          }
+        ],
+        "anteriores": [
+          "base",
+          "anelCintura",
+          "ombro",
+          "braco",
+          "anelAntebraco",
+          "antebraco",
+          "anelPunho4",
+          "eloPunho4"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "1cbdf863e951f87a8d9291795316cfae34a6bc23"
       }
     },
     {
+      "tipo": "aceite",
       "instancia": "eloPunho5",
-      "estado": "fixa",
-      "juntas": [
-        {
-          "relacao": "eloPunho5SentaNoAnel",
-          "com": "anelPunho5",
-          "satisfeita": true,
-          "medidas": {
-            "disponiveis": true,
-            "alinhamento": 1,
-            "descentro": 0,
-            "sobreposicaoRadial": 0.010000000000000002,
-            "sobreposicaoAxial": 0,
-            "separacaoAxial": 0,
-            "tolerancia": 0.000001,
-            "toleranciaNumerica": 0.000001,
-            "radialEsperado": {
-              "minimo": 0.01,
-              "maximo": 0.01,
-              "nominal": 0.01,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
-              },
-              "formato": "nominal-fabricacao"
-            },
-            "axialEsperado": {
-              "minimo": 0,
-              "maximo": 0,
-              "nominal": 0,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
-              },
-              "formato": "nominal-fabricacao"
-            },
-            "frestaEsperada": {
-              "minimo": 0,
-              "maximo": 0,
-              "nominal": 0,
-              "toleranciaFabricacao": null,
-              "formato": "sem-fresta"
-            }
-          }
-        }
-      ],
-      "forma": "sha256:4e910977bd7d0d3748f00b8d91107976ecb3bdf0b3b6da062019ac28c38f8da2",
       "aceite": {
         "por": "Tiago, 2026-11-13, pela imagem de antes e depois da correção da agulha na costura",
         "defeitosAceitos": [
@@ -763,137 +1044,268 @@
         ],
         "analise": "ausente"
       },
-      "reaberturas": [
-        {
-          "por": "leitura do registro",
-          "motivo": "a receita mudou depois do aceite",
-          "aceite": {
-            "por": "pessoa, 2026-11-09: aceitou o elo da junta 5 do punho, com o pé e o tubo de 135 mm",
-            "defeitosAceitos": [
-              "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
+      "impressao": {
+        "forma": "sha256:4e910977bd7d0d3748f00b8d91107976ecb3bdf0b3b6da062019ac28c38f8da2",
+        "parametros": [
+          {
+            "param": "raio",
+            "valor": 67.5,
+            "unidade": "mm"
+          }
+        ],
+        "pose": {
+          "rotacao": [
+            [
+              0,
+              1,
+              0
             ],
-            "analise": "ausente"
-          },
-          "forma": "sha256:7655646e5cd30df1dd691122ee7e4dbb07aa635bef490796db37b3e85ed2afe3"
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0.443,
+            0.659,
+            0.2005
+          ]
         },
-        {
-          "por": "leitura do registro",
-          "motivo": "a receita mudou depois do aceite",
-          "aceite": {
-            "por": "Tiago",
-            "defeitosAceitos": [
-              "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
-            ],
-            "analise": "ausente"
-          },
-          "forma": "sha256:534ef96aa5decbe3d08245b9c93788f8d7aca4fcbb3441a4da36f19c486ce59b"
-        }
-      ]
-    },
-    {
-      "instancia": "anelPunho6",
-      "estado": "fixa",
-      "juntas": [
-        {
-          "relacao": "anelPunho6SentaNaSaida",
-          "com": "eloPunho5",
-          "satisfeita": true,
-          "medidas": {
-            "disponiveis": true,
-            "alinhamento": 1,
-            "descentro": 0,
-            "sobreposicaoRadial": 0.010000000000000002,
-            "sobreposicaoAxial": 0,
-            "separacaoAxial": 0,
-            "tolerancia": 0.000001,
-            "toleranciaNumerica": 0.000001,
-            "radialEsperado": {
-              "minimo": 0.01,
-              "maximo": 0.01,
-              "nominal": 0.01,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
+        "juntas": [
+          {
+            "relacao": "eloPunho5SentaNoAnel",
+            "com": "anelPunho5",
+            "satisfeita": true,
+            "medidas": {
+              "disponiveis": true,
+              "alinhamento": 1,
+              "descentro": 0,
+              "sobreposicaoRadial": 0.01,
+              "sobreposicaoAxial": 0,
+              "separacaoAxial": 0,
+              "tolerancia": 0.000001,
+              "toleranciaNumerica": 0.000001,
+              "radialEsperado": {
+                "minimo": 0.01,
+                "maximo": 0.01,
+                "nominal": 0.01,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
               },
-              "formato": "nominal-fabricacao"
-            },
-            "axialEsperado": {
-              "minimo": 0,
-              "maximo": 0,
-              "nominal": 0,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
+              "axialEsperado": {
+                "minimo": 0,
+                "maximo": 0,
+                "nominal": 0,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
               },
-              "formato": "nominal-fabricacao"
-            },
-            "frestaEsperada": {
-              "minimo": 0,
-              "maximo": 0,
-              "nominal": 0,
-              "toleranciaFabricacao": null,
-              "formato": "sem-fresta"
+              "frestaEsperada": {
+                "minimo": 0,
+                "maximo": 0,
+                "nominal": 0,
+                "toleranciaFabricacao": null,
+                "formato": "sem-fresta"
+              }
             }
           }
-        }
-      ],
-      "forma": "sha256:fb77c3150476d88df78bdf89db778430bfb180f793ea00ac2f686e5554ae6ea6",
+        ],
+        "citadas": [
+          {
+            "etapa": "anelPunho5",
+            "porta": "topo",
+            "por": [
+              "posição eloPunho5SobreOAnel",
+              "relação eloPunho5SentaNoAnel",
+              "vínculo eloPunho5ComORaioDoAnel"
+            ],
+            "interface": {
+              "forma": "anel",
+              "papel": "recebe",
+              "eixo": [
+                0,
+                -1,
+                0
+              ],
+              "centro": [
+                0.443,
+                0.659,
+                0.2005
+              ],
+              "raioInterno": 0,
+              "raioExterno": 0.0675,
+              "inicio": -0.005,
+              "fim": 0
+            }
+          }
+        ],
+        "anteriores": [
+          "base",
+          "anelCintura",
+          "ombro",
+          "braco",
+          "anelAntebraco",
+          "antebraco",
+          "anelPunho4",
+          "eloPunho4",
+          "anelPunho5"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "73a57d9c7c8a9b1c294e49d237d99379da02942e"
+      }
+    },
+    {
+      "tipo": "aceite",
+      "instancia": "anelPunho6",
       "aceite": {
         "por": "pessoa, 2026-11-09: aceitou o anel da junta 6 e o flange",
         "defeitosAceitos": [
           "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
         ],
         "analise": "ausente"
+      },
+      "impressao": {
+        "forma": "sha256:fb77c3150476d88df78bdf89db778430bfb180f793ea00ac2f686e5554ae6ea6",
+        "parametros": [
+          {
+            "param": "raio",
+            "valor": 67.5,
+            "unidade": "mm"
+          }
+        ],
+        "pose": {
+          "rotacao": [
+            [
+              0,
+              0,
+              -1
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ]
+          ],
+          "deslocamento": [
+            0.443,
+            0.5915,
+            0.26805
+          ]
+        },
+        "juntas": [
+          {
+            "relacao": "anelPunho6SentaNaSaida",
+            "com": "eloPunho5",
+            "satisfeita": true,
+            "medidas": {
+              "disponiveis": true,
+              "alinhamento": 1,
+              "descentro": 0,
+              "sobreposicaoRadial": 0.01,
+              "sobreposicaoAxial": 0,
+              "separacaoAxial": 0,
+              "tolerancia": 0.000001,
+              "toleranciaNumerica": 0.000001,
+              "radialEsperado": {
+                "minimo": 0.01,
+                "maximo": 0.01,
+                "nominal": 0.01,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
+              },
+              "axialEsperado": {
+                "minimo": 0,
+                "maximo": 0,
+                "nominal": 0,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
+              },
+              "frestaEsperada": {
+                "minimo": 0,
+                "maximo": 0,
+                "nominal": 0,
+                "toleranciaFabricacao": null,
+                "formato": "sem-fresta"
+              }
+            }
+          }
+        ],
+        "citadas": [
+          {
+            "etapa": "eloPunho5",
+            "porta": "saida",
+            "por": [
+              "posição anelPunho6SobreASaida",
+              "relação anelPunho6SentaNaSaida",
+              "vínculo anelPunho6ComORaioDaSaida"
+            ],
+            "interface": {
+              "forma": "anel",
+              "papel": "recebe",
+              "eixo": [
+                0,
+                0,
+                1
+              ],
+              "centro": [
+                0.443,
+                0.5915,
+                0.26805
+              ],
+              "raioInterno": 0,
+              "raioExterno": 0.0675,
+              "inicio": -0.005,
+              "fim": 0
+            }
+          }
+        ],
+        "anteriores": [
+          "base",
+          "anelCintura",
+          "ombro",
+          "braco",
+          "anelAntebraco",
+          "antebraco",
+          "anelPunho4",
+          "eloPunho4",
+          "anelPunho5",
+          "eloPunho5"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "27c97d9eb061a3324f4714458dd546f36cf750eb"
       }
     },
     {
+      "tipo": "aceite",
       "instancia": "flange",
-      "estado": "fixa",
-      "juntas": [
-        {
-          "relacao": "flangeSentaNoAnel",
-          "com": "anelPunho6",
-          "satisfeita": true,
-          "medidas": {
-            "disponiveis": true,
-            "alinhamento": 1,
-            "descentro": 0,
-            "sobreposicaoRadial": 0.010000000000000002,
-            "sobreposicaoAxial": 0,
-            "separacaoAxial": 0,
-            "tolerancia": 0.000001,
-            "toleranciaNumerica": 0.000001,
-            "radialEsperado": {
-              "minimo": 0.01,
-              "maximo": 0.01,
-              "nominal": 0.01,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
-              },
-              "formato": "nominal-fabricacao"
-            },
-            "axialEsperado": {
-              "minimo": 0,
-              "maximo": 0,
-              "nominal": 0,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
-              },
-              "formato": "nominal-fabricacao"
-            },
-            "frestaEsperada": {
-              "minimo": 0,
-              "maximo": 0,
-              "nominal": 0,
-              "toleranciaFabricacao": null,
-              "formato": "sem-fresta"
-            }
-          }
-        }
-      ],
-      "forma": "sha256:41cf3febc4c1279e6df658d4b3f46b19eb0be9ed60d68e4c536ea537b3d02edd",
       "aceite": {
         "por": "Tiago",
         "defeitosAceitos": [
@@ -901,20 +1313,131 @@
         ],
         "analise": "ausente"
       },
-      "reaberturas": [
-        {
-          "por": "leitura do registro",
-          "motivo": "a receita mudou depois do aceite",
-          "aceite": {
-            "por": "pessoa, 2026-11-09: aceitou o anel da junta 6 e o flange",
-            "defeitosAceitos": [
-              "crítico não fechou: modelar — nenhuma rodada ainda: a peça não existe."
+      "impressao": {
+        "forma": "sha256:41cf3febc4c1279e6df658d4b3f46b19eb0be9ed60d68e4c536ea537b3d02edd",
+        "parametros": [
+          {
+            "param": "raioDoApoio",
+            "valor": 67.5,
+            "unidade": "mm"
+          }
+        ],
+        "pose": {
+          "rotacao": [
+            [
+              0,
+              0,
+              -1
             ],
-            "analise": "ausente"
-          },
-          "forma": "sha256:dc5bb25a5fc59f514fa0b17ca34473b5290f8d743e854ae183e8789b2ac72229"
-        }
-      ]
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              1,
+              0,
+              0
+            ]
+          ],
+          "deslocamento": [
+            0.443,
+            0.5915,
+            0.29305
+          ]
+        },
+        "juntas": [
+          {
+            "relacao": "flangeSentaNoAnel",
+            "com": "anelPunho6",
+            "satisfeita": true,
+            "medidas": {
+              "disponiveis": true,
+              "alinhamento": 1,
+              "descentro": 0,
+              "sobreposicaoRadial": 0.01,
+              "sobreposicaoAxial": 0,
+              "separacaoAxial": 0,
+              "tolerancia": 0.000001,
+              "toleranciaNumerica": 0.000001,
+              "radialEsperado": {
+                "minimo": 0.01,
+                "maximo": 0.01,
+                "nominal": 0.01,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
+              },
+              "axialEsperado": {
+                "minimo": 0,
+                "maximo": 0,
+                "nominal": 0,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
+              },
+              "frestaEsperada": {
+                "minimo": 0,
+                "maximo": 0,
+                "nominal": 0,
+                "toleranciaFabricacao": null,
+                "formato": "sem-fresta"
+              }
+            }
+          }
+        ],
+        "citadas": [
+          {
+            "etapa": "anelPunho6",
+            "porta": "topo",
+            "por": [
+              "posição flangeSobreOAnel",
+              "relação flangeSentaNoAnel",
+              "vínculo flangeComORaioDoAnel"
+            ],
+            "interface": {
+              "forma": "anel",
+              "papel": "recebe",
+              "eixo": [
+                0,
+                0,
+                1
+              ],
+              "centro": [
+                0.443,
+                0.5915,
+                0.29305
+              ],
+              "raioInterno": 0,
+              "raioExterno": 0.0675,
+              "inicio": -0.005,
+              "fim": 0
+            }
+          }
+        ],
+        "anteriores": [
+          "base",
+          "anelCintura",
+          "ombro",
+          "braco",
+          "anelAntebraco",
+          "antebraco",
+          "anelPunho4",
+          "eloPunho4",
+          "anelPunho5",
+          "eloPunho5",
+          "anelPunho6"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "69ffcff15cf14d63402e93325770c10b42ced17e"
+      }
     }
   ]
 }
