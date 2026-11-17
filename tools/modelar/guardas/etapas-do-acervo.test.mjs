@@ -6,10 +6,13 @@
  * só quebraram na leitura seguinte). Este teste lê cada registro como a ferramenta lê, sem gravar, e reprova a etapa com aceite
  * vigente que a leitura não devolve fixa; a mensagem lista a origem de cada impressão (a história do commit do aceite, ou a impressão
  * de agora herdada na migração, com a porta não provada). O acervo foi migrado em 2026-11-17: 52 etapas, 43 pela história e 9 herdadas. */
-import { existsSync, readdirSync, readFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdtempSync, readdirSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { estadoDasEtapas } from '../etapas-da-montagem.mjs';
+import { acrescentarAceite } from '../../../src/autoria/etapas-pela-impressao.js';
+import { estadoDasEtapas, gravarRegistro, reabrir } from '../etapas-da-montagem.mjs';
+import { conferirEtapasDoAcervo } from './etapas-do-acervo.mjs';
 import { REPO } from '../resolver-caminho-receita.mjs';
 
 const ACERVO = join(REPO, 'procedural/pecas');
@@ -21,8 +24,9 @@ describe('as etapas fixas do acervo seguem fixas na releitura', () => {
     expect(MONTAGENS.length).toBeGreaterThan(0);
   });
 
-  /* a origem de cada impressão migrada, como a migração a gravou: `commit do aceite` (reconstruída pela árvore do commit, com o hash da
-     forma como contraprova) ou `impressão de agora` (a do dia da migração, com a porta citada não provada) */
+  /* a origem de cada impressão migrada, como a migração a gravou, e o máximo de cada uma: reabrir e aceitar de novo só tira etapas dela.
+     `commit do aceite` é a impressão reconstruída pela árvore do commit, com a forma e as juntas conferidas; `impressão de agora` é a do
+     dia da migração, herdada (a porta citada, quando há, não está provada) */
   const ORIGENS = {
     aviao: { 'impressão de agora': 8 },
     'braco-robotico': { 'commit do aceite': 11, 'impressão de agora': 1 },
@@ -33,22 +37,45 @@ describe('as etapas fixas do acervo seguem fixas na releitura', () => {
 
   for (const arquivo of MONTAGENS) {
     const nome = arquivo.slice(ACERVO.length + 1).replace(/\/montagem\.json$/, '');
-    it(`${nome}: nenhuma etapa com aceite quebra ao ser relida, e a origem de cada impressão é a migrada`, async () => {
-      const gravado = JSON.parse(readFileSync(arquivo.replace(/\.json$/, '.etapas.json'), 'utf8'));
-      expect(gravado.versao, `${nome}: o registro deve ser da versão 3; migre-o com migrar-etapas-para-impressao.mjs`).toBe(3);
-      const { leitura } = await estadoDasEtapas(arquivo);
-      const comAceite = new Map(gravado.eventos.filter((e) => e.tipo === 'aceite').map((e) => [e.instancia, e]));
-      const naoFixas = leitura.etapas.filter((e) => comAceite.has(e.instancia) && e.estado !== 'fixa');
-      const mensagem = naoFixas.map((e) => `etapa '${e.instancia}' da montagem '${nome}' tem aceite (impressão: ${comAceite.get(e.instancia).origem?.via ?? 'dada com o aceite'}) e a releitura a devolve ${e.estado} (${e.motivo ?? 'sem motivo'}): `
+    it(`${nome}: nenhum aceite vigente quebra ao ser relido, e a origem das impressões migradas não passa da gravada`, async () => {
+      const r = await conferirEtapasDoAcervo(arquivo, { origensMaximas: ORIGENS[nome] ?? null });
+      expect(r.versaoErrada, `${nome}: o registro deve ser da versão 3; migre-o com migrar-etapas-para-impressao.mjs`).toBeUndefined();
+      const mensagem = r.naoFixas.map((e) => `etapa '${e.instancia}' da montagem '${nome}' tem aceite vigente (impressão: ${r.vigentes.get(e.instancia).origem?.via ?? 'dada com o aceite'}) e a releitura a devolve ${e.estado} (${e.motivo ?? 'sem motivo'}): `
         + 'a receita dela ou de uma parte anterior mudou depois do aceite. Reabra a etapa com a pessoa (`npm run etapas -- <montagem.json> --reabrir <instância> --por "<quem, data: motivo>"`) ou desfaça a mudança.').join('\n');
-      expect(naoFixas.map((e) => e.instancia), mensagem).toEqual([]);
-      const porOrigem = {};
-      for (const e of comAceite.values()) porOrigem[e.origem?.via ?? 'dada com o aceite'] = (porOrigem[e.origem?.via ?? 'dada com o aceite'] ?? 0) + 1;
-      const listadas = [...comAceite.values()].map((e) => `${e.instancia}: ${e.origem?.via ?? 'dada com o aceite'}${e.origem?.portaNaoProvada ? ' (porta não provada)' : ''}`);
-      expect(porOrigem, `as origens das impressões de '${nome}':\n${listadas.join('\n')}`).toEqual(ORIGENS[nome] ?? porOrigem);
+      expect(r.naoFixas.map((e) => e.instancia), mensagem).toEqual([]);
+      expect(r.excedidas, `as origens migradas e vigentes de '${nome}':\n${r.listadas.join('\n')}`).toEqual([]);
       /* reler a montagem do sedã leva 199 s na máquina local (2026-11-13), contra 3 a 11 s das outras: só a carroceria dele, de 174 mil faces com o
          chassi aparado pela lataria, executa em mais de 3 minutos. O limite é o dos outros testes que percorrem o acervo; o custo é da receita do
          sedã, anotado no fechamento da fatia 4c do plano do núcleo, e não deste teste. */
     }, 900_000);
   }
+
+  /* A REABERTURA PELO CAMINHO LEGÍTIMO NÃO REPROVA A GUARDA: o aceite anulado não é cobrado e o aceite novo não conta como migrado. */
+  it('a etapa reaberta, e depois aceita de novo, numa cópia do carrinho de mão, passa na guarda com as origens que sobram', async () => {
+    const area = mkdtempSync(join(tmpdir(), 'guarda-reabre-'));
+    try {
+      const pasta = join(area, 'carrinho-de-mao');
+      cpSync(join(ACERVO, 'carrinho-de-mao'), pasta, { recursive: true });
+      const montagem = join(pasta, 'montagem.json');
+      const maximos = ORIGENS['carrinho-de-mao'];
+      expect((await conferirEtapasDoAcervo(montagem, { origensMaximas: maximos })).porOrigem).toEqual({ 'commit do aceite': 4 });
+      /* reaberta: a etapa sai das vigentes, e o aceite anulado não é cobrado */
+      let registro = await reabrir(montagem, 'roda', 'Ana, 2026-11-17: prova da guarda');
+      gravarRegistro(montagem, registro);
+      const reaberta = await conferirEtapasDoAcervo(montagem, { origensMaximas: maximos });
+      expect(reaberta.naoFixas).toEqual([]);
+      expect(reaberta.porOrigem).toEqual({ 'commit do aceite': 3 });
+      /* aceite novo depois dela: vale no lugar, e o conjunto migrado só diminui */
+      const { medido } = await estadoDasEtapas(montagem);
+      registro = acrescentarAceite(registro, medido, 'roda', { por: 'Ana, 2026-11-17: de novo' });
+      gravarRegistro(montagem, registro);
+      const refeita = await conferirEtapasDoAcervo(montagem, { origensMaximas: maximos });
+      expect(refeita.naoFixas).toEqual([]);
+      expect(refeita.excedidas).toEqual([]);
+      expect(refeita.porOrigem).toEqual({ 'commit do aceite': 3 });
+      expect([...refeita.vigentes.keys()]).toHaveLength(4);
+      /* uma origem a mais do que a gravada reprova */
+      expect((await conferirEtapasDoAcervo(montagem, { origensMaximas: { 'commit do aceite': 2 } })).excedidas).toEqual(['commit do aceite']);
+    } finally { rmSync(area, { recursive: true, force: true }); }
+  }, 300_000);
 });
