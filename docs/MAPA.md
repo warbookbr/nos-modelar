@@ -58,6 +58,7 @@
 ## .claude/skills/criar-peca/references/
 
 - `comparar-com-a-referencia.md` — Comparar com a referência por comando
+- `eletronica.md` — Placa de circuito e componentes eletrônicos
 - `operacoes-procedurais.md` — Referência de operações procedurais
 - `por-que.md` — Por que cada regra da skill `criar-peca` existe
 - `referencia-e-rodadas.md` — Referência por medida e rodadas fora do laço
@@ -249,7 +250,7 @@
 
 ## docs/modelar/banco-de-provas/componentes-eletronicos-2026-11-16/
 
-- `README.md` — Componentes eletrônicos (2026-11-16): limitações conhecidas da reabertura de etapas
+- `README.md` — Componentes eletrônicos (2026-11-16): provas do gate de saída e limitações conhecidas
 
 ## docs/modelar/banco-de-provas/correcao-de-superficie-2026-11-16/
 
@@ -609,7 +610,6 @@
 - `2026-11-16-cache-por-passo.md` — Cache por passo da receita: refazer só o que mudou, entre comandos, medido no laço de modelagem
 - `2026-11-16-comparar-com-a-referencia.md` — Comparar com a referência sem script: a prancha modelo e foto, a conferência da receita, a saída da bancada e o pacote do crítico
 - `2026-11-16-eletronica-no-modelar.md` — O lado Modelar da mecatrônica: plano-raiz que gera a família de componentes e a ponte
-- `2026-11-16-familia-componentes-eletronicos.md` — Família de componentes eletrônicos: as peças por encapsulamento e a placa declarada, provadas no braço robótico
 - `2026-11-16-ferramentas-de-correcao-de-superficie.md` — Ferramentas de correção de superfície: alisar as curvas pela medida, cortar com simetria e emendar com continuidade declarada, rumo ao G2 de produção
 - `2026-11-16-ponte-com-a-mecatronica.md` — Ponte com a mecatrônica: a ficha do objeto exportada, as portas elétricas declaradas e o pedido que volta conferido
 - `2026-11-17-trilhas-e-validacao-da-placa.md` — Trilhas de cobre e validação elétrica da placa declarada: a lista de ligações vira cobre conferido por regra e por conectividade

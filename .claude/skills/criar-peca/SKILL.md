@@ -10,7 +10,7 @@ construído parte por parte pelo laço, em
 [`../laco-de-modelagem/SKILL.md`](../laco-de-modelagem/SKILL.md), sobre uma
 montagem que deriva medida e posição de cada parte das vizinhas. O porquê de
 cada regra abaixo está em [`references/por-que.md`](references/por-que.md), para
-consultar quando uma regra parecer arbitrária.
+quando uma regra parecer arbitrária.
 
 Depois de mudar silhueta, encontro, corte, união ou arredondamento, faça o passo de
 [`PARE-E-ANALISE.md`](../../../docs/modelar/usar/PARE-E-ANALISE.md) (`npm run bancada -- <peça> --analise`) e abra as imagens.
@@ -36,9 +36,8 @@ Depois de mudar silhueta, encontro, corte, união ou arredondamento, faça o pas
    estão ligados.
 4. Toda operação usada vem do
    [catálogo gerado](../../../docs/modelar/gerado/CATALOGO-CAPACIDADES.md),
-   lida por `descrever_capacidade` no MCP procedural. As receitas do acervo são
-   aprovadas e provam capacidades do núcleo, mas não são molde de forma, que
-   vem da referência e do plano.
+   lida por `descrever_capacidade` no MCP procedural. As receitas do acervo provam
+   capacidades do núcleo e não são molde de forma, que vem da referência e do plano.
 5. Parte de conjunto e rodadas sem acerto: [`references/referencia-e-rodadas.md`](references/referencia-e-rodadas.md).
 
 ## Identidade
@@ -125,7 +124,7 @@ O laço visual (olhar o PNG, sobrepor ao alvo, despachar o crítico cego) mora e
 
 ## Consulta
 
-O que ler antes e o que abrir só quando a condição aparece está no roteiro
+O que ler antes e o que abrir sob demanda está no roteiro
 `modelar/peca` (`npm run comecar -- modelar/peca`), com
 [`GUIA-AUTORIA-IA.md`](../../../docs/modelar/usar/GUIA-AUTORIA-IA.md) (a anatomia
 da receita e a esteira de comandos) e
@@ -134,14 +133,11 @@ da receita e a esteira de comandos) e
 [`INTENCAO-PECA-V1.md`](../../../docs/modelar/usar/INTENCAO-PECA-V1.md) (o
 contrato opcional `INTENCAO`, para quando a função não é óbvia pela geometria),
 [`AUTORIA-RECEITA-DECLARATIVA.md`](../../../docs/modelar/usar/AUTORIA-RECEITA-DECLARATIVA.md)
-(a receita como dado JSON, usada pela autoria por MCP) e
+(a receita como dado JSON, para o MCP) e
 [`CONFERIR-CONTRA-REFERENCIA.md`](../../../docs/modelar/usar/CONFERIR-CONTRA-REFERENCIA.md)
-(a borda da peça contra a foto). Para placa de circuito com componentes, use a
-família `componente-eletronico` e a seção "Peça de uma família" de
-[`AUTORIA-DE-PECA.md`](../../../docs/modelar/usar/AUTORIA-DE-PECA.md), sem desenhar
-o cilindro do capacitor nem a caixa do chip na receita. Para curva bilateral contínua,
+(a borda da peça contra a foto). Para curva bilateral contínua,
 `criarCaminhoSimetrico()` em `src/autoria/caminho-simetrico.js` garante a
-simetria sem fresta nas pontas.
+simetria sem fresta nas pontas. Placa com componentes: [`references/eletronica.md`](references/eletronica.md).
 
 ## Entrega
 

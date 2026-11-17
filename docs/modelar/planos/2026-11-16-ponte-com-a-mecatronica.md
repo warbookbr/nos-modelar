@@ -8,7 +8,7 @@
 
 **Repositório e base:** `warbookbr/nos-modelar`, main na ativação; o outro lado do contrato é `warbookbr/nos-mecatronica`, pelo contrato da ponte (o README da pasta `ponte/` de lá) e pela decisão 0001 de lá, que separa a forma da simulação.
 
-Gerado pelo plano-raiz [o lado Modelar da mecatrônica](2026-11-16-eletronica-no-modelar.md), fatia 2. Objeto-alvo: o braço robótico, o mesmo do [plano da família de componentes](2026-11-16-familia-componentes-eletronicos.md).
+Gerado pelo plano-raiz [o lado Modelar da mecatrônica](2026-11-16-eletronica-no-modelar.md), fatia 2. Objeto-alvo: o braço robótico, o mesmo do [plano da família de componentes](../decisoes/PLANOS-ENCERRADOS.md).
 
 ## Problema observado
 
