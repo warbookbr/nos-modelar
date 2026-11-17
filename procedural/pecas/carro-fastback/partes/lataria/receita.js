@@ -11,15 +11,14 @@
  * soleira à base da coluna os níveis correm pelo contorno da planta e dão a volta pela traseira até o eixo do carro, misturando suavemente a seção
  * do lado com o perfil da traseira no eixo. O arco, o vidro lateral, a lanterna e o vidro traseiro são vãos abertos na chapa pronta.
  *
- * NOTA PARA A PRÓXIMA ETAPA (rodada 2). A onda da rodada 1 vinha de três fontes, e cada uma tem o seu parâmetro: as tabelas lidas por pixel, que a
- * interpolação deixava com quebra de curvatura em cada ponto (agora alisadas por média gaussiana, `alisamento`); as seções com poucos pontos-chave
- * no sino do rebaixo e no rolo do ombro (`pontosChave.secao` e `.coroa`); e a cota exata das curvas, que fazia a superfície passar por todos os
- * pontos e ondular entre eles (`chapa.pesoDasCurvas`: com peso 1 ela só se aproxima deles, e as falhas caíram de 25 para 11). O degrau do ombro à
- * base da coluna é uma faixa própria da rede (o nível `coluna`, com vinco), e não um ponto-chave dentro da seção, que foi o que deu raio de 0,4 mm
- * na rodada 1; na volta da traseira o vinco do ombro é o da borda da tampa (0,2), porque ali a face de trás encontra o degrau em ângulo reto e a
- * nitidez do lado (0,5) fazia a espessura passar do raio. O vidro lateral tem a borda de baixo levada acima da base da coluna, para o corte não
- * pegar o degrau. Os vãos por contorno continuam só no lado +x: `aberturaPorContorno` não segue a simetria da chapa e `espelha` não solda a
- * costura, cujos vértices não ficam exatamente em x 0; o vidro traseiro, que cruza o eixo, sai inteiro. O spoiler fica fora desta etapa.
+ * NOTA PARA A PRÓXIMA ETAPA (rodada 3). A rodada 2 tirou a onda das tabelas lidas por pixel (média gaussiana, `alisamento`), adensou o sino do
+ * rebaixo e o rolo do ombro (`pontosChave`), passou a só aproximar as curvas (`chapa.pesoDasCurvas`) e fez do degrau do ombro à coluna uma
+ * faixa própria da rede (o nível `coluna`, com vinco). A rodada 3 alisa as curvas da rede pelo núcleo (`alisarCurvas`), com 3 mm nas que
+ * passam pelo para-lama e pelo rebaixo e as outras sem alisar, e parte a seção no ombro (`partirSecaoEm`), porque o alisamento arredondava
+ * a dobra do vinco onde ela vira menos que o ângulo de canto; o índice do para-lama caiu de 809 para 86. O rebaixo some `folgaDoArco`
+ * antes da boca do arco, e a região dele acaba ali. O vidro lateral e a lanterna saem nos dois lados (simetria na abertura e costura exata
+ * na subdivisão); o vidro traseiro, que cruza o eixo, sai inteiro. A seção densa (10 pontos do topo do rebaixo ao ombro) estreita a faixa
+ * do vinco do ombro abaixo da espessura, e a subdivisão recusa. O spoiler fica fora desta etapa.
  *
  * A cadeia: a TABELA em mm; `derivar` calcula a pele, os nós, as curvas e os retalhos; `gerarPassos` converte para metro com `m()`. */
 import { gaiolaPorRede } from '../../../../nucleo/gaiola-por-rede.js';
@@ -51,9 +50,12 @@ export const TABELA = {
   /* o rebaixo côncavo: a profundidade máxima na porta (mm), de onde ela começa a morrer (z), e a folga (mm) entre onde ela some e a boca da
    * frente do arco da roda (z do eixo mais o raio): o rebaixo morre antes do arco, e a região dele acaba onde ele some */
   rebaixo: { profundidade: 20, cheioAte: -300, folgaDoArco: 60 },
-  /* o alisamento das curvas da rede (`alisarCurvas`), o maior deslocamento de um ponto-chave em mm: o das curvas em geral, e o das que
-   * passam pelo para-lama ou pelo rebaixo, que a pessoa soltou até 3 mm (o ruído delas passa de 1 mm); `resto` null deixa as outras sem alisar */
-  alisarCurvas: { resto: 1, regioes: 3 },
+  /* o alisamento das curvas da rede (`alisarCurvas`), o maior deslocamento de um ponto-chave em mm: o das curvas que passam pelo para-lama
+   * ou pelo rebaixo, que a pessoa soltou até 3 mm (o ruído delas passa de 1 mm), e o das outras (`resto`, até 1 mm pela decisão; null as
+   * deixa sem alisar). Medido na rodada 3 com a seção partida no ombro: com 1 mm no resto a chapa sai com índice 326 e 10 falhas, sem
+   * alisar o resto 304 e 9, e o para-lama e o rebaixo iguais (86 e 25,5); as curvas do resto são as da coluna, da quina, da borda da tampa
+   * e do perfil da traseira, que vão ao limite de 1 mm arredondando a feição, e por isso ficam sem alisar */
+  alisarCurvas: { resto: null, regioes: 3 },
   /* a quina do teto e a coluna, [z, x, y]: do teto sobre a porta, o vidro lateral traseiro e a coluna caindo até a tampa */
   quinaDoTeto: [[0, 598, 1262], [-400, 588, 1288], [-800, 595, 1262], [-1200, 630, 1135], [-1600, 520, 1090], [-2050, 430, 1049]],
   /* o eixo do carro, a linha do teto à tampa, [z, y]: o teto sobre a porta, o pico, a queda do fastback e a tampa */
@@ -73,8 +75,9 @@ export const TABELA = {
    * índice do para-lama de 239 para 86 e o da chapa de 373 para 326; partida também na coluna e na quina, a chapa subiu a 454 */
   partirSecaoEm: ['ombro'],
   vincos: { ombro: 0.5, coluna: 0.3, quinaDoTeto: 0.4, bordaDaTampa: 0.2 },
-  /* o arco da roda traseira: centro no eixo traseiro, raio da prancha (pneu de 340 mais 40) */
-  arco: { z: -1375, y: 340, raio: 380, lados: 96 },
+  /* o arco da roda traseira: centro no eixo traseiro, raio da prancha (pneu de 340 mais 40), e os lados do polígono do corte (com 96, um vértice
+   * dele caía a 0,4 mm de um da chapa perto do topo do arco e deixava uma face fina em cada lado) */
+  arco: { z: -1375, y: 340, raio: 380, lados: 100 },
   /* as partes por região da chapa, caixas [min, max] em mm: o para-lama saliente (atrás da porta, sobre o arco) e o rebaixo da lateral (do meio da porta até onde ele some, antes do arco: a caixa dele só dá x e y atrás, e o z de trás sai de `ondeORebaixoSome`); o rebaixo vale onde as duas se sobrepõem */
   partes: { paralama: { min: [780, 250, -1950], max: [960, 1010, -900] }, rebaixo: { min: [780, 380], max: [960, 840, 1] } },
   /* o vão do vidro lateral traseiro, [z, y] do contorno da prancha lateral (a borda de fora da moldura); a borda de baixo sobe até a base da coluna mais a folga */
