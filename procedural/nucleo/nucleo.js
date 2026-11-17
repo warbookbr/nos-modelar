@@ -13,7 +13,8 @@
 import { criarResolverNumerico, distanciaDeEdicao, ErroDeResolucao, nomesProximos } from './expressoes.js';
 import { TIPO_MALHA_POLIGONAL, artefatoDaMalha, criarEstadoDeProcedencia, procedenciaCanonica, registrarProcedencia } from './artefatos.js';
 import { criarRegistroOperacoes } from './registro.js';
-import { chavesDosPrefixos, copiarEstado, registroServeAMemoria } from './memoria-de-execucao.js';
+import { copiarEstado, registroServeAMemoria } from './memoria-de-execucao.js';
+import { chavesDosPrefixos } from './planejador/chave-do-prefixo.js';
 import { criarLeituraDoPasso } from './planejador/leitura-do-passo.js';
 import { conferirLeituraDoPasso } from './planejador/leitura-declarada.js';
 import { divergenciaDaImpressao } from './planejador/impressao-do-neutro.js';
@@ -3741,29 +3742,36 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
      a chave do prefixo de passos (e do que o rodeia), e uma execução cujo prefixo é o mesmo recomeça dali. Só vale com o registro do
      próprio núcleo ou o que o host marcou (`confiarNaMemoriaDoRegistro`), e nunca muda o resultado: a prova é o neutro bit a bit contra a execução sem memória. */
   const memoria = OPCOES.memoria && registroServeAMemoria(OPCOES.registroOperacoes) ? OPCOES.memoria : null;
-  const chavesDoPrefixo = memoria ? chavesDosPrefixos({ dict, MATERIAIS, ESQUELETO, ALIASES, declaracoes: [...declaracoesOrigem], modoRetrato, registro: (OPCOES.registroOperacoes ?? REGISTRO_OPERACOES).assinatura }, PASSOS) : null;
-  /* Quais passos viram ponto: guardar o estado inteiro custa uma cópia (5 s com 174 mil faces), então não é todo passo. Entram os
-     últimos `PONTOS_NO_FIM` passos das operações pesadas, para o ajuste depois da última delas recomeçar dali, e o último passo
-     de operação cara antes do ponto onde esta execução diverge da anterior, para a execução seguinte recomeçar dali. A memória que
-     declara `todoPasso` guarda depois de cada passo, e a que declara `passosGuardados` (lista de índices) guarda só depois desses: são as
-     provas do cache por prefixo, em receitas pequenas e no acervo. */
+  /* `recursos`: o que o ambiente deu ao processo e muda o resultado de um passo (a Manifold carregada ou não). Entra na chave, de modo que
+     o estado de um processo sem a biblioteca nunca serve a um processo com ela, e vice-versa. */
+  const chavesDoPrefixo = memoria ? chavesDosPrefixos({ dict, MATERIAIS, ESQUELETO, ALIASES, declaracoes: [...declaracoesOrigem], modoRetrato, registro: (OPCOES.registroOperacoes ?? REGISTRO_OPERACOES).assinatura, recursos: { manifold: manifoldCarregada() !== null } }, PASSOS) : null;
+  /* Quais passos viram ponto: guardar o estado inteiro custa uma cópia (5 s com 174 mil faces), então não é todo passo. A memória que
+     decide (`deveGuardar(i, { op, ms, antesDaDivergencia, total })`, a memória em armazém) recebe, ao fim de cada passo executado, quanto
+     ele levou e se ele é o passo antes do primeiro que mudou desde a execução anterior; o tempo decide só onde guardar, nunca o resultado.
+     Na memória que não decide, entram os últimos `PONTOS_NO_FIM` passos das operações pesadas, para o ajuste depois da última delas
+     recomeçar dali, e o último passo de operação cara antes do ponto onde esta execução diverge da anterior. */
   const pontosDeMemoria = new Set();
-  if (chavesDoPrefixo && Array.isArray(memoria.passosGuardados)) {
-    for (const i of memoria.passosGuardados) if (Number.isSafeInteger(i) && i >= 0 && i < PASSOS.length) pontosDeMemoria.add(i);
-    memoria.ultimaCadeia = chavesDoPrefixo;
-  } else if (chavesDoPrefixo) {
-    if (memoria.todoPasso === true) PASSOS.forEach((_, i) => pontosDeMemoria.add(i));
-    const pesados = [];
-    PASSOS.forEach((passo, i) => { if (OPERACOES_PESADAS.has(passo?.[0])) pesados.push(i); });
-    for (const i of pesados.slice(-PONTOS_NO_FIM)) pontosDeMemoria.add(i);
+  const decide = Boolean(chavesDoPrefixo) && typeof memoria.deveGuardar === 'function';
+  let divergencia = null;
+  if (chavesDoPrefixo) {
     const anterior = memoria.ultimaCadeia;
-    if (anterior) {
-      let divergencia = 0;
+    if (Array.isArray(anterior)) {
+      divergencia = 0;
       while (divergencia < chavesDoPrefixo.length && divergencia < anterior.length && chavesDoPrefixo[divergencia] === anterior[divergencia]) divergencia += 1;
-      if (divergencia < chavesDoPrefixo.length) for (let i = divergencia - 1; i >= 0; i -= 1) if (OPERACOES_CARAS.has(PASSOS[i]?.[0])) { pontosDeMemoria.add(i); break; }
+    }
+    if (!decide) {
+      const pesados = [];
+      PASSOS.forEach((passo, i) => { if (OPERACOES_PESADAS.has(passo?.[0])) pesados.push(i); });
+      for (const i of pesados.slice(-PONTOS_NO_FIM)) pontosDeMemoria.add(i);
+      if (divergencia !== null && divergencia < chavesDoPrefixo.length) for (let i = divergencia - 1; i >= 0; i -= 1) if (OPERACOES_CARAS.has(PASSOS[i]?.[0])) { pontosDeMemoria.add(i); break; }
     }
     memoria.ultimaCadeia = chavesDoPrefixo;
   }
+  /* UM PASSO QUE GRITA POR FALTA DE RECURSO ENVENENA O QUE VEM DEPOIS. Sem a Manifold, a booleana grita e não corta, e o estado dali em
+     diante é o de uma peça sem o corte; nenhum ponto é guardado depois do primeiro passo que gritou com a biblioteca ausente. */
+  let semRecurso = false;
+  /* as chaves que esta execução guardou: se o modo conferido recusar o recomeço, elas saem junto com o ponto de onde ela recomeçou */
+  const guardadosNestaExecucao = [];
   let inicio = 0;
   if (chavesDoPrefixo) {
     for (let k = PASSOS.length - 1; k >= 0; k -= 1) {
@@ -3777,6 +3785,8 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
   }
   PASSOS.forEach((passo, i) => {
     if (i < inicio) return;
+    const t0DoPasso = decide ? performance.now() : 0;
+    const orfaosAntesDoPasso = st.orfaos.length;
     const [op, args = {}] = passo;
     const registro = OPCOES.registroOperacoes ?? REGISTRO_OPERACOES;
     if (!registro || typeof registro.resolver !== 'function') throw new Error('oficina: registro de operações inválido');
@@ -3894,12 +3904,17 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
         partes: Object.keys(st.partes).filter((id) => !antesPartes.has(id)).sort(),
       },
     });
-    if (chavesDoPrefixo && pontosDeMemoria.has(i)) {
+    if (st.orfaos.length > orfaosAntesDoPasso && manifoldCarregada() === null) semRecurso = true;
+    const guardar = chavesDoPrefixo && !semRecurso && (decide
+      ? memoria.deveGuardar(i, { op: registrada.nome, ms: performance.now() - t0DoPasso, antesDaDivergencia: divergencia !== null && i === divergencia - 1, total: PASSOS.length }) === true
+      : pontosDeMemoria.has(i));
+    if (guardar) {
       /* `copiaPropria`: a memória faz a cópia dela dentro de `guardar`, na hora (a serialização para o disco), e recebe o estado vivo;
          `guardar` que devolve false não guardou */
       const vivo = Object.fromEntries(Object.entries(st).filter(([campo, valor]) => !CAMPOS_FORA_DA_MEMORIA.has(campo) && typeof valor !== 'function'));
       const estado = memoria.copiaPropria === true ? vivo : copiarEstado(vivo);
       if (!estado || memoria.guardar(chavesDoPrefixo[i], i, estado) === false) memoria.estatisticas.recusados += 1;
+      else guardadosNestaExecucao.push(chavesDoPrefixo[i]);
     }
   });
   aplicarHierarquiaDasPartes(st);
@@ -3954,8 +3969,12 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
      memória, e as duas têm de dar a mesma impressão do neutro (`planejador/impressao-do-neutro.js`); a divergência é recusada. */
   if (memoria && OPCOES.memoriaConferida === true && inicio > 0) {
     const inteira = nucleo(PASSOS, PARAMS, TOPO, MATERIAIS, ESQUELETO, ALIASES, { ...OPCOES, memoria: null, memoriaConferida: false, aoLer: undefined, aoRastrear: undefined, leitura: undefined });
-    const divergencia = divergenciaDaImpressao(saida, inteira);
-    if (divergencia) throw new Error(`oficina: a execução que recomeçou do estado guardado depois do passo ${inicio - 1} divergiu da execução inteira: ${divergencia}`);
+    const diferenca = divergenciaDaImpressao(saida, inteira);
+    if (diferenca) {
+      /* o ponto recusado sai da memória, e com ele os que esta execução guardou a partir dele, para a seguinte não recomeçar de nenhum */
+      for (const chave of [chavesDoPrefixo[inicio - 1], ...guardadosNestaExecucao]) memoria.descartar?.(chave);
+      throw new Error(`oficina: a execução que recomeçou do estado guardado depois do passo ${inicio - 1} divergiu da execução inteira: ${diferenca}`);
+    }
   }
   return saida;
 }
