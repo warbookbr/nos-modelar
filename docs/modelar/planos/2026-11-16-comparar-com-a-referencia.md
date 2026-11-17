@@ -1,6 +1,6 @@
 # Comparar com a referência sem script: a prancha modelo e foto, a conferência da receita, a saída da bancada e o pacote do crítico
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `tools/modelar/olhar-bancada.mjs`, `tools/modelar/medir-transcricao.mjs`, `tools/modelar/lados-das-vistas.mjs`, `tools/modelar/vistas-para-critica.mjs`, `tools/modelar/vistas-para-critica.test.mjs`, `tools/modelar/prancha-de-referencia.mjs`, `tools/modelar/prancha-de-referencia.test.mjs`, `tools/bancadas/`, `.claude/skills/criar-peca/`, `.claude/agents/modelador.md`, `docs/modelar/banco-de-provas/comparar-com-a-referencia-2026-11-16/`, `tools/modelar/descrever-recusas.test.mjs`; e, por empréstimo do plano do cache por passo que a pessoa decidiu em 2026-11-17, tools/modelar/descrever-peca.mjs só para a opção recusas (o caminho fica sem crase para não sobrepor os territórios); o `olhar-bancada.mjs` foi emprestado em 2026-11-17, por quem conduz, ao plano do cache por passo, só para ligar o cache; e, por empréstimo mínimo de 2026-11-17 para a prancha SVG do plano, tools/modelar/referencias-do-plano.mjs, que ganhou a lista `pranchas` e o aviso das referências ignoradas
 
