@@ -155,8 +155,8 @@
  *     sem esses pesos.
  * A G2 É EXPERIMENTAL. O peso mil da variação na faixa (PESO_DA_CURVATURA) é o que muda a forma: ele quer a curvatura constante na faixa
  * nas duas direções, e toda superfície de dupla curvatura sai do lugar, mesmo com a curvatura igual dos dois lados (no paraboloide de raio
- * 0,6 m a gaiola anda 17,8 mm com o peso mil, 11,9 com 100, 3,4 com 10 e 0,5 com 1, o mesmo da G1; na chapa de prova `emenda-dupla`, 22,2 mm,
- * e a curvatura lida troca de sinal), empurra o salto de curvatura para a borda da faixa e, na curva fechada, dobra faces. Por isso toda
+ * 0,3 m a gaiola anda 17,8 mm com o peso mil, 11,9 com 100, 3,4 com 10 e 0,5 com 1, o mesmo da G1; na chapa de prova `emenda-dupla`, de
+ * raio 0,6 m, 22,2 mm, e a curvatura lida troca de sinal), empurra o salto de curvatura para a borda da faixa e, na curva fechada, dobra faces. Por isso toda
  * curva G2 sai com `emendaG2Experimental` em `avisos` e `experimental: true` em `emendas`, e a dobra que ela causa recusa a rede dizendo
  * isso, em vez de mandar declarar liso: false, que a emenda não aceita. A formulação nova da G2 é da fatia 5 do plano.
  * Na chapa de prova de razão de curvatura 3 com G1, a leitura vai de 0,83 a 0,04 grau, e a superfície, a até 60 mm da emenda, fica a
@@ -1727,7 +1727,7 @@ export function gaiolaPorRede(definicaoDada) {
     if (g2) {
       avisos.push({
         ref: 'emendaG2Experimental', curva: e.nome,
-        texto: `a curva ${citar(e.nome)} declara continuidade 'G2', que é experimental: o peso da variação na faixa da emenda muda a forma de toda superfície de dupla curvatura, mesmo com a curvatura igual dos dois lados (17,8 mm no paraboloide de raio 0,6 m da chapa de prova), empurra o salto de curvatura para a borda da faixa e, numa curva fechada, dobra faces; use a G1, que põe a tangente comum e deixa a curvatura de cada lado, e confira a forma na bancada se ficar com a G2`,
+        texto: `a curva ${citar(e.nome)} declara continuidade 'G2', que é experimental: o peso da variação na faixa da emenda muda a forma de toda superfície de dupla curvatura, mesmo com a curvatura igual dos dois lados (22 mm na chapa de prova emenda-dupla, de raio 0,6 m nas duas direções), empurra o salto de curvatura para a borda da faixa e, numa curva fechada, dobra faces; use a G1, que põe a tangente comum e deixa a curvatura de cada lado, e confira a forma na bancada se ficar com a G2`,
       });
     }
     if (deslocamento !== null && deslocamento > tolerancia) {
