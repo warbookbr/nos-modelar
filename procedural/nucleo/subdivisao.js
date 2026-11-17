@@ -162,7 +162,7 @@ function nitidezDosVincos(faces, vincos) {
     if (!Array.isArray(v) || v.length !== 3) throw new TypeError(`subdivisão: vinco ${k} precisa ser [a, b, nitidez]`);
     const [a, b, x] = v;
     if (!indice.has(chave(a, b))) throw new TypeError(`subdivisão: vinco ${k} cita a aresta ${a}-${b}, que não existe na gaiola`);
-    if (!(x >= 0)) throw new TypeError(`subdivisão: vinco ${k} com nitidez inválida`);
+    if (typeof x !== 'number' || !(x >= 0)) throw new TypeError(`subdivisão: vinco ${k} com nitidez inválida (precisa ser número maior ou igual a zero, ou Infinity)`);
     nitidez.set(chave(a, b), x >= NITIDEZ_VIVA ? NITIDEZ_INFINITA : x);
   }
   return nitidez;
@@ -978,7 +978,7 @@ export function superficieLimite(gaiola) {
   };
   const avaliar = (face, u, v, { canto = 0, daNormal = false } = {}) => {
     if (!Number.isInteger(face) || face < 0 || face >= F.length) throw new TypeError(`superfície limite: a face ${face} não existe na gaiola`);
-    if (!(u >= 0 && u <= 1 && v >= 0 && v <= 1)) throw new TypeError(`superfície limite: (u, v) precisa estar em [0, 1], e veio (${u}, ${v})`);
+    if (typeof u !== 'number' || typeof v !== 'number' || !(u >= 0 && u <= 1 && v >= 0 && v <= 1)) throw new TypeError(`superfície limite: (u, v) precisa estar em [0, 1], e veio (${u}, ${v})`);
     if (F[face].length !== 4 && !(Number.isInteger(canto) && canto >= 0 && canto < F[face].length)) throw new TypeError(`superfície limite: a face ${face} tem ${F[face].length} lados, e o canto precisa ser inteiro de 0 a ${F[face].length - 1}`);
     const r = avaliarLocal(face, u, v, canto);
     if (r.grade) {

@@ -137,6 +137,18 @@ describe('a superfície limite exata', () => {
     expect(() => sup.avaliar(0, 1.5, 0.5)).toThrow(/precisa estar em \[0, 1\]/);
     expect(() => sup.avaliar(3, 0.5, 0.5)).toThrow(/não existe na gaiola/);
   });
+
+  it('recusa o que não é número: (u, v) null ou ausente, e a nitidez de vinco null, NaN ou -Infinity (Infinity é o vinco vivo)', () => {
+    const g = grade(3, () => 0);
+    const sup = superficieLimite(g);
+    for (const ruim of [null, undefined, NaN, '0.5']) {
+      expect(() => sup.avaliar(4, ruim, 0.5), String(ruim)).toThrow(/precisa estar em \[0, 1\]/);
+      expect(() => sup.avaliar(4, 0.5, ruim), String(ruim)).toThrow(/precisa estar em \[0, 1\]/);
+    }
+    for (const ruim of [null, undefined, NaN, -Infinity, -1, '1']) expect(() => superficieLimite({ ...g, vincos: [[5, 6, ruim]] }), String(ruim)).toThrow(/nitidez inválida/);
+    expect(() => superficieLimite({ ...g, vincos: [[5, 6, Infinity]] })).not.toThrow();
+    expect(() => superficieLimite({ ...g, vincos: [[5, 6, 0]] })).not.toThrow();
+  });
 });
 
 describe('a descendência e a medida das linhas', () => {
