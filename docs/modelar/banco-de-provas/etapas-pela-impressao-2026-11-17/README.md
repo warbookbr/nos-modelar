@@ -46,7 +46,7 @@ A revisão não bloqueou e pediu quatro correções, feitas com teste: o aceite 
 
 `fixar` e `reabrir` em `tools/modelar/etapas-da-montagem.mjs` só acrescentam eventos ao registro da versão 3 (`acrescentarAceite` e `acrescentarReabertura`); `estadoDasEtapas` devolve a leitura pela impressão do aceite (`leitura`, com o `medido`), e `fixarComLeitura` devolve também a leitura de depois. O `reabrir` do registro novo não mede nada. O `fixar` avisa, sem recusar, das etapas posteriores que seguem quebradas: aceitar a base não refixa o meio, que quebrou pela própria impressão e pede reabertura e novo aceite.
 
-A escolha do caminho é só pela versão do registro: sem registro, ou da versão 3, vale a leitura nova (o primeiro `fixar` num objeto sem registro grava o da versão 3); da versão 1 ou 2 vale o caminho antigo, que grava o estado em cada etapa, e o comando imprime o aviso `AVISO_DO_CAMINHO_ANTIGO`. Não há bandeira de linha de comando. Os cinco registros do acervo seguem na versão 2 até a fatia 3, e nenhum foi tocado.
+Na fatia 2, até a migração do acervo (a fatia 3 tirou o caminho antigo, e hoje o registro v1 e v2 recusa), a escolha do caminho era só pela versão do registro: sem registro, ou da versão 3, vale a leitura nova (o primeiro `fixar` num objeto sem registro grava o da versão 3); da versão 1 ou 2 vale o caminho antigo, que grava o estado em cada etapa, e o comando imprime o aviso `AVISO_DO_CAMINHO_ANTIGO`. Não há bandeira de linha de comando. Os cinco registros do acervo seguem na versão 2 até a fatia 3, e nenhum foi tocado.
 
 Os consumidores do estado gravado, e como cada um lia e lê agora:
 
@@ -81,8 +81,14 @@ Ensaio de 2026-11-17, uma montagem por vez (o sedã levou uns 200 s por resoluç
 | sedan-chassi-e-lataria | 5 | 5 | 0 | 0 | 5 |
 | total | 52 | 43 | 9 | 0 | 52 |
 
-As nove da via (b) são as oito do avião e o anel da cintura do braço: os commits dos aceites são de antes de `src/autoria/assinatura-da-forma.js` existir, e a árvore deles não carrega o filho (`Cannot find module .../assinatura-da-forma.js`). Para elas a porta citada fica não provada, e a leitura de agora as dá fixas porque a forma e as medidas das juntas são as gravadas. Nenhuma etapa caiu na via (c), e nenhuma das migradas é quebrada pela leitura de agora. Os cinco registros não foram gravados nesta rodada.
+As nove da via (b) são as oito do avião e o anel da cintura do braço: os commits dos aceites são de antes de `src/autoria/assinatura-da-forma.js` existir, e a árvore deles não carrega o filho (`Cannot find module .../assinatura-da-forma.js`). Para elas a porta citada fica não provada, e a leitura de agora as dá fixas porque a forma e as medidas das juntas são as gravadas. Nenhuma etapa caiu na via (c), e nenhuma das migradas é quebrada pela leitura de agora. Os cinco registros não foram gravados nesta rodada; foram gravados na seguinte (abaixo).
 
-## O que fica depois da migração em ensaio
+### A migração gravada e o caminho antigo fora
 
-Gravar os cinco registros (`--gravar`, uma montagem por vez) depois da decisão da pessoa, com a guarda do acervo passando a cobrar a leitura nova; o caminho antigo (`atualizarRegistro`, `conferirPosteriores`, `abalarPelasPortas`, `portasDeReferencia`, `juntasDasPosteriores`, a leitura do v1) sai na migração do último registro.
+Em 2026-11-17, depois do ensaio, os cinco registros foram gravados com `--gravar`, uma montagem por vez, um commit por montagem, e a leitura nova devolveu depois de cada uma as mesmas fixas do ensaio (aviao 8, braco-robotico 12, carrinho-de-mao 4, empilhadeira 23, sedan-chassi-e-lataria 5, as 52). A origem das impressões, por montagem: avião 8 de agora; braço 11 pela história e 1 de agora; carrinho de mão 4 pela história; empilhadeira 23 pela história; sedã 5 pela história. As nove de porta não provada, todas de via (b) com `origem.portaNaoProvada`, são `fuselagem`, `motor`, `helice`, `asas`, `empenagem-horizontal`, `empenagem-vertical`, `trem-do-nariz` e `trens-principais` do avião e `anelCintura` do braço. A guarda do acervo (`tools/modelar/guardas/etapas-do-acervo.test.mjs`) passou a ler pela impressão, exige o registro da versão 3, lista a origem de cada impressão na mensagem e confere as contagens por origem.
+
+O caminho antigo saiu do código: `atualizarRegistro`, `fixarEtapa`, `reabrirEtapa`, `conferirPosteriores`, `abalarPelasPortas`, `portasDeReferencia`, `juntasDasPosteriores`, a leitura do registro v1 e o estado gravado como entrada. Um registro de versão 1 ou 2 recusa em todo comando (`registro-antigo`), com a mensagem que manda rodar `migrar-etapas-para-impressao.mjs <montagem.json> --gravar`. Os consumidores leem só o registro medido (`registroComEstado`) ou, onde só importa o aceite, os eventos (`aceitesVigentes`); o `fluxoDoObjeto` aceita o registro dado pronto (`registroDasEtapas`) para os testes. A fixture `tools/fixtures/reabrir-a-base-do-braco/` saiu junto, porque era um registro v2.
+
+## O que fica (fatia 4)
+
+O contrato em `MONTAGENS-SEMANTICAS.md`, a nota na skill `laco-de-modelagem` e o fechamento do plano com a revisão adversarial.
