@@ -56,7 +56,11 @@ function papeis(orientacao) {
 /* O que a vista faz com um vetor do mundo na imagem (x para a direita, y para baixo, como a tela do esboço): "fica à direita",
    "fica em cima", "desce para a esquerda"; null quando o vetor está sobre o eixo do olho e some na imagem. */
 function posicaoNaImagem(vista, v) {
-  const [u, w] = VISTAS_TODAS[vista].p(v);
+  return posicaoDoDeslocamento(VISTAS_TODAS[vista].p(v));
+}
+
+/* A posição de um deslocamento na imagem, [u, w] com u para a direita e w para baixo, em fração do comprimento de um eixo inteiro. */
+function posicaoDoDeslocamento([u, w]) {
   const h = Math.abs(u) > 0.2 ? (u > 0 ? 'direita' : 'esquerda') : null;
   const t = Math.abs(w) > 0.2 ? (w > 0 ? 'embaixo' : 'em cima') : null;
   if (h && t) return `${w > 0 ? 'desce' : 'sobe'} para a ${h}`;
@@ -112,4 +116,40 @@ export function ladosDasVistas({ orientacao = null, extras = [] } = {}) {
   if (extras.length === 0) L.push(`  ${base} O que está voltado para ${lista(falta)} só aparece nas vistas a mais (frontal-oposta, lateral-oposta, inferior), que a unidade pede em "vistas", e nos cortes.`);
   else L.push(`  ${base}${falta.length > 0 ? ` O que está voltado para ${lista(falta)} continua sem vista, só nos cortes.` : ''}`);
   return L;
+}
+
+/* ---------- As vistas da bancada ----------
+ *
+ * Cada vista da bancada e da montagem é, em olho, uma vista do esboço: a `direita` da bancada olha de +x, como a `lateral`, e a
+ * `esquerda`, de -x, como a `lateral-oposta`. A prancha modelo e foto e o pacote do crítico dizem por elas para onde cada eixo do modelo
+ * cai na imagem; na vista direita +z fica à esquerda, e é por isso que a foto lateral de um objeto com a frente em +z e fotografado com
+ * a frente à direita precisa de `--espelhar` na prancha. */
+export const VISTA_DO_ESBOCO = Object.freeze({
+  isometrica: 'isometrica', frontal: 'frontal', direita: 'lateral', esquerda: 'lateral-oposta', traseira: 'frontal-oposta', superior: 'superior', inferior: 'inferior',
+});
+
+/** A frase de lado da vista da bancada ("olha de +x; +y fica em cima, +z fica à esquerda"), sem o nome da vista, ou null para uma vista
+    que não existe. */
+export function ladoDaVistaDaBancada(vista, orientacao = null) {
+  const nome = VISTA_DO_ESBOCO[vista];
+  return nome === undefined ? null : linhaDaVista(nome, orientacao).slice(nome.length + 2);
+}
+
+/** Para onde +x, +y e +z caem na imagem da vista da bancada, pela vista do esboço: { '+x': 'fica à esquerda' | ... | null }. */
+export function eixosDaVistaDaBancada(vista) {
+  const nome = VISTA_DO_ESBOCO[vista];
+  exigir(nome !== undefined, `vista da bancada "${vista}" desconhecida (vistas: ${Object.keys(VISTA_DO_ESBOCO).join(', ')})`);
+  return Object.fromEntries(['+x', '+y', '+z'].map((e) => [e, posicaoNaImagem(nome, VETOR[e])]));
+}
+
+/** Para onde +x, +y e +z caem numa imagem, medido: `pixels` são as projeções em px (x para a direita, y para baixo) da origem e de um
+    mesmo comprimento em cada eixo, [o, x, y, z]. O deslocamento de cada eixo vai em fração do maior dos três, e o eixo que encurta a
+    menos de um quinto some, como na frase de lado. */
+export function eixosMedidosNaImagem(pixels) {
+  exigir(Array.isArray(pixels) && pixels.length === 4, 'a medida dos eixos pede a projeção da origem e de um ponto em cada eixo, [o, x, y, z].');
+  const [o, ...pontas] = pixels;
+  const deslocamentos = pontas.map((p) => [p[0] - o[0], p[1] - o[1]]);
+  const maior = Math.max(...deslocamentos.map(([u, w]) => Math.hypot(u, w)));
+  exigir(maior > 0, 'os três eixos projetam no mesmo ponto da imagem.');
+  return Object.fromEntries(['+x', '+y', '+z'].map((e, i) => [e, posicaoDoDeslocamento(deslocamentos[i].map((c) => c / maior))]));
 }

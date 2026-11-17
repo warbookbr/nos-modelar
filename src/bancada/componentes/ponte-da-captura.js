@@ -12,7 +12,7 @@ import { estadoDaCurvatura } from '../visoes/visao-curvatura.js';
 const PRAZO_DA_VISAO_MS = 60_000;
 
 export const CHAVES_DA_PONTE = Object.freeze([
-  'ready', 'peca', 'pecasDisponiveis', 'nomePeca', 'carregado', 'partes', 'estatisticas', 'imagemReferencia',
+  'ready', 'peca', 'pecasDisponiveis', 'nomePeca', 'carregado', 'partes', 'estatisticas', 'neutroDaSessao', 'imagemReferencia',
   'diagnosticos', 'portas', 'selecaoIgnorada', 'controlador', 'ambiente', 'edicaoDeMalha', 'edicaoDeMalhaDesenhaMalha',
   'sincronizador', 'selecionar', 'modo', 'vista', 'projecao', 'explosao', 'focar', 'focarContato', 'inspecionarPar',
   'enquadrar', 'enquadramento', 'visao', 'visaoPronta', 'auditoria', 'semAuditoria', 'corte', 'carregarPayloadSessao', 'estado', 'marcadoresDePar', 'url',
@@ -39,6 +39,8 @@ export function criarPonteDaCaptura({
       return [...cena.modelo.partes.keys()].sort((a, b) => a.localeCompare(b, 'pt-BR'));
     },
     get estatisticas() { return cena.modelo?.estatisticas ?? null; },
+    /* de onde veio o neutro do modelo em cena: `{ origem: 'gravado' | 'fornecido' | 'executado', motivo?, arquivo? }`, ou null (a captura o põe no relato) */
+    get neutroDaSessao() { return cena.modelo?.origemDoNeutro ?? null; },
     /* A imagem de referência COMO ESTÁ NA CENA, e não a requisição que a
        trouxe. A guarda da pasta da peça afirmava só que o navegador pediu o
        arquivo e recebeu 200; com isso, a sobreposição podia falhar em virar

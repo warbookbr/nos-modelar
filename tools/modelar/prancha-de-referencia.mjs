@@ -25,6 +25,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { lerArgumentos } from './argumentos.mjs';
 import { verificarCaminhoConfinado } from './caminho-confinado.mjs';
 import { iniciarRegistro } from './diario.mjs';
+import { eixosDaVistaDaBancada, eixosMedidosNaImagem, ladoDaVistaDaBancada } from './lados-das-vistas.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const REPO = resolve(HERE, '../..');
@@ -297,7 +298,7 @@ function reguaDoPainel(ops, { painel, zeroX, zeroY, comprimentoX, comprimentoY, 
 /**
  * Monta o plano de desenho da prancha a partir das medidas: uma linha por vista, com a escala comum (px da prancha por mm) a maior que
  * cabe em `alturaDaLinha` e em `larguraMaxima`. `linhas[i]` traz:
- * - `vista`, e `modelo`: `{ largura, altura, extensao, pxPorMm }` da imagem da bancada;
+ * - `vista`, e `modelo`: `{ largura, altura, extensao, pxPorMm, eixos? }` da imagem da bancada, com `eixos` como `eixosDaVista` os dá;
  * - `foto`: `{ nome, largura, altura, regiao (caixa pedida ou null), extensao, pxPorMm, espelhar, regua }`.
  * Devolve `{ largura, altura, fundo, operacoes, escala, linhas }`, e `linhas` traz as medidas em mm que vão também para o JSON.
  */
@@ -351,11 +352,13 @@ export function disporPrancha({ titulo, linhas, disposicao = 'lado', alturaDaLin
   for (const [i, l] of linhas.entries()) {
     const m = medidas[i];
     const alturaDaLinhaPx = Math.round((disposicao === 'lado' ? Math.max(m.recMmm[1], m.recFmm[1]) : uniao[i].u[3] - uniao[i].u[1]) * escala);
-    const topo = y + ALTURA_DO_ROTULO;
+    /* a frase de lado do modelo vai numa terceira linha do rótulo */
+    const fraseDosEixos = l.modelo.eixos ? `eixos do modelo: ${l.modelo.eixos.frase}` : null;
+    const topo = y + ALTURA_DO_ROTULO + (fraseDosEixos ? 17 : 0);
     const fotoTexto = `foto ${l.foto.nome}${l.foto.espelhar ? ' (espelhada)' : ''}, régua ${mm1(l.foto.regua.mm)} mm = ${mm1(l.foto.regua.px)} px`;
     const linhaRelato = {
       vista: l.vista,
-      modelo: { pxPorMm: l.modelo.pxPorMm, extensaoPx: l.modelo.extensao, extensaoMm: m.extMmm.map((v) => Number(v.toFixed(1))) },
+      modelo: { pxPorMm: l.modelo.pxPorMm, extensaoPx: l.modelo.extensao, extensaoMm: m.extMmm.map((v) => Number(v.toFixed(1))), ...(l.modelo.eixos ? { eixos: l.modelo.eixos } : {}) },
       foto: {
         nome: l.foto.nome, espelhada: Boolean(l.foto.espelhar), pxPorMm: l.foto.pxPorMm, regiaoPx: l.foto.regiao ?? 'auto',
         extensaoPx: l.foto.extensao, extensaoMm: m.extFmm.map((v) => Number(v.toFixed(1))),
@@ -370,6 +373,7 @@ export function disporPrancha({ titulo, linhas, disposicao = 'lado', alturaDaLin
         const painel = [x, dy, w, h];
         ops.push({ tipo: 'texto', texto: rotulo[0], em: [x, y + 16], tamanho: 14, peso: 'bold', cor });
         ops.push({ tipo: 'texto', texto: rotulo[1], em: [x, y + 33], tamanho: 12, cor: '#444' });
+        if (rotulo[2]) ops.push({ tipo: 'texto', texto: rotulo[2], em: [x, y + 50], tamanho: 12, cor, eixos: true });
         ops.push({ tipo: 'retangulo', caixa: painel, preencher: '#ffffff' });
         ops.push({ tipo: 'imagem', fonte, indice: i, recorte: [rec[0], rec[1], rec[2] - rec[0], rec[3] - rec[1]], destino: painel, espelhar });
         ops.push({ tipo: 'retangulo', caixa: painel, cor: '#bbb' });
@@ -384,13 +388,13 @@ export function disporPrancha({ titulo, linhas, disposicao = 'lado', alturaDaLin
       };
       desenhar({
         fonte: 'modelos', rec: m.recM, k: l.modelo.pxPorMm, ext: l.modelo.extensao, espelhar: false, cor: COR_DO_MODELO,
-        rotulo: [`modelo, vista ${l.vista} (ortográfica)`, `extensão ${mm1(m.extMmm[0])} x ${mm1(m.extMmm[1])} mm`],
+        rotulo: [`modelo, vista ${l.vista} (ortográfica)`, `extensão ${mm1(m.extMmm[0])} x ${mm1(m.extMmm[1])} mm`, fraseDosEixos],
       });
       desenhar({
         fonte: 'fotos', rec: m.recF, k: l.foto.pxPorMm, ext: l.foto.extensao, espelhar: Boolean(l.foto.espelhar), cor: COR_DA_FOTO,
         rotulo: [fotoTexto, `região ${l.foto.regiao ? `${l.foto.regiao.join(',')} px` : 'auto'}; extensão do que não é fundo ${mm1(m.extFmm[0])} x ${mm1(m.extFmm[1])} mm`],
       });
-      largura = Math.max(largura, x - ESPACO + MARGEM);
+      largura = Math.max(largura, x - ESPACO + MARGEM, fraseDosEixos ? MARGEM + LARGURA_DA_REGUA + larguraDoTexto(fraseDosEixos, 12) + MARGEM : 0);
     } else {
       const u = uniao[i];
       const x0 = MARGEM + LARGURA_DA_REGUA;
@@ -398,6 +402,7 @@ export function disporPrancha({ titulo, linhas, disposicao = 'lado', alturaDaLin
       const emPx = (c) => [x0 + (c[0] - u.u[0]) * escala, topo + (c[1] - u.u[1]) * escala, (c[2] - c[0]) * escala, (c[3] - c[1]) * escala].map((v) => Math.round(v));
       ops.push({ tipo: 'texto', texto: `vista ${l.vista}: modelo translúcido (caixa azul) sobre a ${fotoTexto}`, em: [x0, y + 16], tamanho: 14, peso: 'bold', cor: COR_DO_MODELO });
       ops.push({ tipo: 'texto', texto: `alinhados pelo centro das extensões; modelo ${mm1(m.extMmm[0])} x ${mm1(m.extMmm[1])} mm, foto ${mm1(m.extFmm[0])} x ${mm1(m.extFmm[1])} mm`, em: [x0, y + 33], tamanho: 12, cor: '#444' });
+      if (fraseDosEixos) ops.push({ tipo: 'texto', texto: fraseDosEixos, em: [x0, y + 50], tamanho: 12, cor: COR_DO_MODELO, eixos: true });
       ops.push({ tipo: 'retangulo', caixa: painel, preencher: '#ffffff' });
       ops.push({ tipo: 'imagem', fonte: 'fotos', indice: i, recorte: [m.recF[0], m.recF[1], m.recF[2] - m.recF[0], m.recF[3] - m.recF[1]], destino: emPx(u.caixaF), espelhar: Boolean(l.foto.espelhar) });
       ops.push({ tipo: 'imagem', fonte: 'modelos', indice: i, recorte: [m.recM[0], m.recM[1], m.recM[2] - m.recM[0], m.recM[3] - m.recM[1]], destino: emPx(u.caixaM), alfa: 0.55 });
@@ -408,12 +413,31 @@ export function disporPrancha({ titulo, linhas, disposicao = 'lado', alturaDaLin
       ops.push({ tipo: 'retangulo', caixa: caixaM, cor: COR_DO_MODELO, tracejado: [5, 4] });
       ops.push({ tipo: 'retangulo', caixa: emPx(extF), cor: COR_DA_FOTO, tracejado: [5, 4] });
       reguaDoPainel(ops, { painel, zeroX: caixaM[0], zeroY: caixaM[1] + caixaM[3], comprimentoX: u.u[2] - u.u[0], comprimentoY: u.u[3] - u.u[1], escala, cor: COR_DO_MODELO });
-      largura = Math.max(largura, x0 + painel[2] + MARGEM);
+      largura = Math.max(largura, x0 + painel[2] + MARGEM, fraseDosEixos ? x0 + larguraDoTexto(fraseDosEixos, 12) + MARGEM : 0);
     }
     relato.push(linhaRelato);
     y = topo + alturaDaLinhaPx + ALTURA_DA_REGUA + ESPACO;
   }
   return { largura: Math.ceil(Math.max(largura, 900)), altura: Math.ceil(y - ESPACO + MARGEM), fundo: '#f4f4f2', operacoes: ops, escala, linhas: relato };
+}
+
+/**
+ * PARA ONDE CADA EIXO DO MODELO CAI NA IMAGEM DA VISTA, pela frase de lado de `lados-das-vistas.mjs` e conferido pela projeção que a
+ * bancada mediu (`projecaoMm` dos `PONTOS_DA_ESCALA`). Na sessão da bicicleta a vista direita mostrava a frente à esquerda e a foto
+ * lateral, à direita, e o espelhamento só foi visto na prancha montada; a frase vai na prancha e no JSON para ele não passar sem aviso.
+ * Uma frase que não bate com a medida é recusada, porque ela diria o lado errado. Devolve `{ frase, medidos }`.
+ */
+export function eixosDaVista(vista, projecaoMm) {
+  const frase = ladoDaVistaDaBancada(vista);
+  if (frase === null) recusar(`a vista '${vista}' não tem frase de lado; as vistas da prancha são ${VISTAS_DA_PRANCHA.join(', ')}.`);
+  if (!projecaoMm?.pixels || projecaoMm.pixels.length !== 4) recusar('a bancada não devolveu a projeção dos pontos da escala nesta vista.');
+  const medidos = eixosMedidosNaImagem(projecaoMm.pixels);
+  const esperados = eixosDaVistaDaBancada(vista);
+  const diferentes = Object.keys(esperados).filter((e) => esperados[e] !== medidos[e]);
+  if (diferentes.length) {
+    recusar(`a vista ${vista} da bancada não projeta como a frase de lado diz (${frase}): ${diferentes.map((e) => `${e} ${medidos[e] ?? 'some'} na captura`).join(', ')}; a prancha não sai com o lado errado escrito nela.`);
+  }
+  return { frase, medidos };
 }
 
 /* ---------- O contorno medido sobre a vista do modelo (fatia 5) ----------
@@ -811,6 +835,7 @@ export async function prancharReferencia(opcoes, { olhar = null, chromium = null
   if (!r.ok) recusar(`a bancada recusou a captura: ${r.erro?.mensagem ?? ''}\n${r.stderr ?? ''}`.trim());
   const capturas = r.resultado.capturas;
   const escalas = r.resultado.vistas.map((v, i) => escalaDaVista(v.projecaoMm, capturas[i].largura));
+  const eixos = r.resultado.vistas.map((v, i) => eixosDaVista(pedido.vistas[i], v.projecaoMm));
 
   const navegador = chromium ?? (await import('playwright')).chromium;
   const lancarChromium = lancar ?? (await import('./navegador.mjs')).lancarChromium;
@@ -832,7 +857,7 @@ export async function prancharReferencia(opcoes, { olhar = null, chromium = null
       disposicao: pedido.disposicao,
       linhas: pedido.vistas.map((vista, i) => ({
         vista,
-        modelo: { largura: medidas.modelos[i].largura, altura: medidas.modelos[i].altura, extensao: medidas.modelos[i].extensao, pxPorMm: escalas[i] },
+        modelo: { largura: medidas.modelos[i].largura, altura: medidas.modelos[i].altura, extensao: medidas.modelos[i].extensao, pxPorMm: escalas[i], eixos: eixos[i] },
         foto: {
           nome: pedido.fotos[i].nome, largura: medidas.fotos[i].largura, altura: medidas.fotos[i].altura, regiao: pedido.regioes[i],
           extensao: medidas.fotos[i].extensao, pxPorMm: pedido.reguas[i].pxPorMm, espelhar: pedido.espelhadas.includes(vista), regua: pedido.reguas[i],
@@ -863,6 +888,8 @@ export const OPCOES_DA_CLI = ['peca', 'foto', 'regua', 'regiao', 'vistas', 'part
 export const AJUDA = `node tools/modelar/prancha-de-referencia.mjs <peça> --foto=<arquivo> --regua=<medida> [opções]
 Monta a prancha modelo e foto: a vista ortográfica da peça (ou da parte isolada) ao lado da foto de referência, na mesma escala em mm.
 A escala do modelo vem da câmera da bancada; a da foto, da régua. Grava o PNG e, ao lado, um JSON com as escalas e as extensões em mm.
+Cada linha diz, na prancha e no JSON (modelo.eixos), para onde os eixos do modelo caem na imagem da vista, pela frase de lado conferida
+com a câmera (na direita, +z fica à esquerda): se a foto mostra a frente do outro lado, use --espelhar.
 
   --foto=<arquivo>       a foto de referência, jpg, png ou webp (a de terceiro fica fora do repositório, em tmp/)
   --regua=<px>=<mm>      uma medida conhecida da foto: o comprimento em px e o mesmo em mm (ex.: 649=670, o pneu de 670 mm)
@@ -892,7 +919,7 @@ export async function comoCLI(argv, { logger = (l) => process.stderr.write(`${l}
       vistas: lido.opcao('vistas'), parte: lido.opcao('parte'), copia: lido.opcao('copia'), disposicao: lido.opcao('disposicao'), espelhar: lido.opcao('espelhar'),
       saida: lido.opcao('saida'),
     }, { logger, ...injetar });
-    const linhas = r.medidas.linhas.map((l) => `  ${l.vista}: modelo ${l.modelo.extensaoMm.join(' x ')} mm (${casa(l.modelo.pxPorMm)} px/mm); foto ${l.foto.extensaoMm.join(' x ')} mm (${casa(l.foto.pxPorMm)} px/mm)${l.foto.espelhada ? ', espelhada' : ''}`);
+    const linhas = r.medidas.linhas.map((l) => `  ${l.vista}: modelo ${l.modelo.extensaoMm.join(' x ')} mm (${casa(l.modelo.pxPorMm)} px/mm); foto ${l.foto.extensaoMm.join(' x ')} mm (${casa(l.foto.pxPorMm)} px/mm)${l.foto.espelhada ? ', espelhada' : ''}${l.modelo.eixos ? `\n    eixos do modelo: ${l.modelo.eixos.frase}` : ''}`);
     return { codigo: 0, stdout: `prancha: ${r.arquivo}\nmedidas: ${r.json}\nescala da prancha: ${casa(r.medidas.escalaDaPrancha)} px/mm\n${linhas.join('\n')}\n`, stderr: '' };
   } catch (erro) {
     return { codigo: erro instanceof ErroDePrancha || /argumento|opção|bandeira/i.test(erro.message) ? 2 : 1, stdout: '', stderr: `prancha-de-referencia: ${erro.message}\n` };

@@ -14,7 +14,8 @@ import { lerArgumentos } from './argumentos.mjs';
 import { ErroDeConfinamento, criarDiretorioConfinado, verificarCaminhoConfinado } from './caminho-confinado.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 import { iniciarRegistro } from './diario.mjs';
-import { ativarReceitaBancada } from './ativar-bancada.mjs';
+import { ativarReceitaBancada, arquivoDoNeutroDaSessao, varrerSessoesAbandonadas } from './ativar-bancada.mjs';
+import { memoriaDoHost } from '../../procedural/nucleo/planejador/armazem-em-pasta.mjs';
 import { paresIndistinguiveis } from '../../src/autoria/cor-de-auditoria.js';
 import { lerCorte, lerLadoDoCorte, normalizarCorte } from '../../src/autoria/corte-de-plano.js';
 import { VISTAS_BANCADA } from '../../src/autoria/vistas-da-bancada.js';
@@ -140,6 +141,38 @@ export function lerCopia(texto) {
   });
   if (new Set(lidos.map((l) => l.eixo)).size !== lidos.length) throw new ErroDeUso(`--copia repete eixo (${itens.join(',')}); um lado por eixo.`);
   return lidos;
+}
+
+/* AS MIRAS DE UMA CHAMADA (`--mirar`). Uma mira é `x,y,z` em mm do referencial da peça, com a distância de `--distancia` (ou a padrão),
+   ou `x,y,z,d` com a distância dela; várias se separam por `/` (ou `;`, entre aspas no shell), e a chamada tira cada vista de
+   `--vistas` em cada mira, na mesma página. A prancha de componentes da fatia 2 da família foram 36 chamadas de uma mira e uma vista,
+   cada uma subindo servidor, navegador e página e executando a receita de novo. Na API vale também `[x, y, z]` e a lista de listas.
+   Devolve a lista (vazia sem mira), cada uma `{ mm: [x, y, z], distanciaMm }`. */
+export function lerMiras(declarado, distanciaDeclarada = null) {
+  const semDistancia = distanciaDeclarada === null || distanciaDeclarada === undefined;
+  if (declarado === null || declarado === undefined || declarado === false) {
+    if (!semDistancia) throw new ErroDeUso('--distancia só vale junto de --mirar.');
+    return [];
+  }
+  const distanciaComum = semDistancia ? DISTANCIA_PADRAO_DA_MIRA_MM : Number(distanciaDeclarada);
+  if (!(distanciaComum > 0)) throw new ErroDeUso(`--distancia pede milímetros maiores que zero; veio "${distanciaDeclarada}".`);
+  const itens = Array.isArray(declarado)
+    ? (Array.isArray(declarado[0]) ? declarado : [declarado])
+    : String(declarado).split(/[/;]/).map((s) => s.trim()).filter(Boolean).map((s) => s.split(','));
+  if (!itens.length) throw new ErroDeUso('--mirar veio vazio; escreva x,y,z em milímetros do referencial da peça, por exemplo --mirar=1200,900,-300.');
+  const miras = itens.map((item) => {
+    const numeros = item.map((n) => Number(String(n).trim()));
+    if (![3, 4].includes(numeros.length) || !numeros.every(Number.isFinite)) {
+      throw new ErroDeUso(`--mirar pede x,y,z em milímetros do referencial da peça, por exemplo --mirar=1200,900,-300, ou várias miras x,y,z[,distância] separadas por /; veio "${Array.isArray(declarado) ? JSON.stringify(declarado) : declarado}".`);
+    }
+    const distanciaMm = numeros.length === 4 ? numeros[3] : distanciaComum;
+    if (!(distanciaMm > 0)) throw new ErroDeUso(`--mirar: a distância da mira ${numeros.slice(0, 3).join(',')} pede milímetros maiores que zero; veio "${numeros[3]}".`);
+    return { mm: numeros.slice(0, 3), distanciaMm };
+  });
+  const chaves = miras.map((m) => `${m.mm.join(',')},${m.distanciaMm}`);
+  const repetida = chaves.find((c, i) => chaves.indexOf(c) !== i);
+  if (repetida) throw new ErroDeUso(`--mirar repete a mira ${repetida}; as duas dariam a mesma imagem.`);
+  return miras;
 }
 
 /* O AJUSTE DA CÂMERA FEITO NA PÁGINA, sobre a câmera já quieta, pela ponte e pelo ambiente que a bancada publica (nada de `src/bancada`
@@ -368,11 +401,19 @@ const RAIZES_DA_MEDIDA_DE_CONTATOS = ['tools/modelar/entrada-de-medida.mjs', 'to
 const VERSAO_DO_CACHE_DE_CONTATOS = 1;
 const rotuloDosContatos = (abs) => `contatos-${basename(abs).replace(/[^A-Za-z0-9._-]/g, '_')}.${createHash('sha256').update(abs).digest('hex').slice(0, 6)}`;
 
+/** A memória do cache por prefixo da medida: com `--sem-cache` (`cache: false`) não há, e a receita executa do zero. */
+export function memoriaDaMedida(caminho, { cache = true, criar = memoriaDoHost } = {}) {
+  if (!cache) return null;
+  try { return criar({ rotulo: caminho }).memoria; } catch { return null; }
+}
+
 async function medirNoNode(caminho, { cache = true } = {}) {
   const moduloDaPeca = await importarReceita(caminho);
   const receitaDaPeca = receitaDoModulo(moduloDaPeca);
-  /* a execução que a ativação da bancada acabou de guardar serve aqui: a receita é executada uma vez só por captura */
-  const { neutro } = executarReceitaGuardada(caminho, receitaDaPeca, { cache }).executada;
+  /* a execução que a ativação da bancada acabou de guardar serve aqui: a receita é executada uma vez só por captura; sem ela, a execução
+     recomeça do estado que o cache por prefixo guardou (plano do cache por passo, fatia 4) */
+  const memoria = memoriaDaMedida(caminho, { cache });
+  const { neutro } = executarReceitaGuardada(caminho, receitaDaPeca, { cache, memoria }).executada;
   return contatosDaPeca(neutro, receitaDaPeca).naoDeclarados.map((item) => item.par);
 }
 
@@ -641,7 +682,7 @@ export async function abrirCapturaCompartilhada({ dependencias = {}, logger = nu
         const limpeza = await fecharRecursos({ browser, vite, pagina: this.pagina?.page ?? null, proprios: false });
         limpeza.push(...await fecharRecursos({ browser, vite }));
         this.pagina = null;
-        for (const { arquivo } of this.sessoes.values()) rmSync(arquivo, { force: true });
+        for (const { arquivo } of this.sessoes.values()) { rmSync(arquivo, { force: true }); rmSync(arquivoDoNeutroDaSessao(arquivo), { force: true }); }
         this.sessoes.clear();
         return limpeza;
       },
@@ -686,7 +727,8 @@ export async function olharBancada({
   estrito = false,
   focar = false,
   revisar = false,
-  /* A câmera que mira um ponto: `mirar` em mm do referencial da peça (`[x, y, z]` ou `"x,y,z"`) e `distancia` da câmera a ele, em mm. */
+  /* A câmera que mira um ponto: `mirar` em mm do referencial da peça (`[x, y, z]` ou `"x,y,z"`) e `distancia` da câmera a ele, em mm;
+     várias miras (`"x,y,z[,d]/x,y,z[,d]"` ou a lista de listas) tiram cada vista em cada mira, na mesma página (ver `lerMiras`). */
   mirar: mirarDeclarado = null,
   distancia: distanciaDeclarada = null,
   /* Pontos em mm do referencial da peça a projetar no quadro de cada vista (o `--zoom` em mm da análise): cada vista relatada traz `projecaoMm`. */
@@ -733,6 +775,8 @@ export async function olharBancada({
   /* o arquivo da sessão própria desta captura (ver `ativarReceitaBancada`), apagado ao fim; com `compartilhada` ele é da peça e não
      da chamada, e quem o apaga é `compartilhada.fechar()` */
   let sessaoDaCaptura = null;
+  /* de onde veio o neutro que a página desenhou (`origem`: gravado, fornecido ou executado, com o `motivo` quando executou) */
+  let neutroDaPagina = null;
   let page = null;
   /* o que a captura estava fazendo, para o prazo vencido dizer onde parou */
   /* A etapa é uma propriedade com aviso: ao entrar numa etapa longa a captura diz qual é, antes de começá-la, porque a de medir os
@@ -872,18 +916,11 @@ export async function olharBancada({
        quando a ponte existe — imagem com cromo é pior, não é rodada quebrada. */
     const auditoriaEfetiva = Boolean(auditoria || revisar);
     if (focar && !selecionadas.length) erroDeUso('--focar exige --selecionadas');
-    let mira = null;
-    if (mirarDeclarado !== null && mirarDeclarado !== undefined) {
-      const numeros = Array.isArray(mirarDeclarado) ? mirarDeclarado.map(Number) : String(mirarDeclarado).split(',').map((n) => Number(n.trim()));
-      if (numeros.length !== 3 || !numeros.every(Number.isFinite)) erroDeUso(`--mirar pede x,y,z em milímetros do referencial da peça, por exemplo --mirar=1200,900,-300; veio "${mirarDeclarado}".`);
-      const distancia = distanciaDeclarada === null || distanciaDeclarada === undefined ? DISTANCIA_PADRAO_DA_MIRA_MM : Number(distanciaDeclarada);
-      if (!(distancia > 0)) erroDeUso(`--distancia pede milímetros maiores que zero; veio "${distanciaDeclarada}".`);
+    const miras = lerMiras(mirarDeclarado, distanciaDeclarada);
+    if (miras.length) {
       if (par) erroDeUso('--mirar não se mistura com --par: o par escolhe a vista e o foco por conta própria.');
       if (revisar) erroDeUso('--mirar não se mistura com --revisar: a revisão confere a silhueta inteira no quadro, e a mira a corta de propósito.');
       if (focar) erroDeUso('--mirar não se mistura com --focar: os dois decidem o quadro; mire o ponto e escolha as partes com --selecionadas e --modo.');
-      mira = { mm: numeros, distanciaMm: distancia };
-    } else if (distanciaDeclarada !== null && distanciaDeclarada !== undefined) {
-      erroDeUso('--distancia só vale junto de --mirar.');
     }
     let corte = null;
     if (corteDeclarado) {
@@ -931,9 +968,12 @@ export async function olharBancada({
                a peça num arquivo seu, único por processo e por chamada, e aponta a página para ele pela URL (`?sessao=`). Com
                `compartilhada` o arquivo é um por peça e por conjunto de chamadas, e as chamadas seguintes da mesma peça o reusam. */
             sessaoDaCaptura = join(SESSOES, `${apelidoDeArquivo(peca)}-${process.pid}-${randomUUID()}.json`);
+            /* a sessão e o neutro que uma captura morta deixou para trás saem por idade; os desta chamada e os das capturas compartilhadas ficam */
+            varrerSessoesAbandonadas(SESSOES, { emUso: [sessaoDaCaptura, ...[...(compartilhada?.sessoes.values() ?? [])].map((x) => x.arquivo)] });
             const inicioDaAtivacao = performance.now();
-            const ativada = await ativar({ alvo: caminhoReceita, raiz: REPO, arquivoDaSessao: sessaoDaCaptura, cache: cacheDeContatos });
+            const ativada = await ativar({ alvo: caminhoReceita, raiz: REPO, arquivoDaSessao: sessaoDaCaptura, cache: cacheDeContatos, cachePorPrefixo: cacheDeContatos });
             if (compartilhada) compartilhada.sessoes.set(peca, { arquivo: sessaoDaCaptura, pares: null });
+            for (const aviso of ativada?.avisos ?? []) registrar(relato, logger, 'stderr', `ativação: aviso: ${aviso}`);
             if (logger) logger('info', `Peça '${peca}' ativada na sessão da bancada.`);
             const segundosDaAtivacao = Math.round((performance.now() - inicioDaAtivacao) / 100) / 10;
             registrar(relato, logger, 'stdout', ativada?.doCache
@@ -948,27 +988,35 @@ export async function olharBancada({
 
     const saida = capturarEmMemoria ? null : (caminhoInterno(saidaDeclarada, 'saida') ?? OUT);
     const relatorio = capturarEmMemoria ? null : caminhoInterno(relatorioDeclarado, 'relatorio');
-    const sufixoPartes = [
-      selecionadas.length ? `sel-${[...selecionadas].sort().join('+')}` : null,
-      modo !== 'todas' ? modo : null,
-      projecao === 'ortografica' ? 'orto' : null,
-      explosao > 0 ? `exp${Math.round(explosao * 100)}` : null,
-      mira ? `mira-${mira.mm.map((n) => String(Math.round(n * 10) / 10).replace('-', 'm').replace('.', 'p')).join('_')}-d${Math.round(mira.distanciaMm)}` : null,
-      par ? 'par' : null,
-      focar ? 'focado' : null,
-      arame === 'raio-x' ? 'raio-x' : (arame ? 'arame' : null),
-      corte ? `corte-${corte.eixo}${corte.posicao}-${corte.lado}` : null,
-      visao && visao !== 'solida' ? `visao-${visao}${larguraDaZebra !== null ? `-${String(larguraDaZebra).replace('.', 'p')}graus` : ''}${anguloDaZebra !== null ? `-a${String(anguloDaZebra).replace('.', 'p').replace('-', 'm')}` : ''}${azimute !== null ? `-az${String(azimute).replace('.', 'p')}` : ''}${caixasDaPintura !== null ? `-caixas${caixasDaPintura}` : ''}` : null,
-      enquadrarNaPeca ? 'enquadrado' : null,
-      copia ? `copia-${copia.map((c) => `${c.eixo}${c.sinal > 0 ? 'mais' : 'menos'}`).join('-')}` : null,
-    ].filter(Boolean);
-    const sufixo = sufixoPartes.length ? `-${sufixoPartes.join('-')}` : '';
+    /* o sufixo do nome da imagem, com a mira dela: cada mira da lista sai num arquivo próprio */
+    const sufixoDa = (mira) => {
+      const partes = [
+        selecionadas.length ? `sel-${[...selecionadas].sort().join('+')}` : null,
+        modo !== 'todas' ? modo : null,
+        projecao === 'ortografica' ? 'orto' : null,
+        explosao > 0 ? `exp${Math.round(explosao * 100)}` : null,
+        mira ? `mira-${mira.mm.map((n) => String(Math.round(n * 10) / 10).replace('-', 'm').replace('.', 'p')).join('_')}-d${Math.round(mira.distanciaMm)}` : null,
+        par ? 'par' : null,
+        focar ? 'focado' : null,
+        arame === 'raio-x' ? 'raio-x' : (arame ? 'arame' : null),
+        corte ? `corte-${corte.eixo}${corte.posicao}-${corte.lado}` : null,
+        visao && visao !== 'solida' ? `visao-${visao}${larguraDaZebra !== null ? `-${String(larguraDaZebra).replace('.', 'p')}graus` : ''}${anguloDaZebra !== null ? `-a${String(anguloDaZebra).replace('.', 'p').replace('-', 'm')}` : ''}${azimute !== null ? `-az${String(azimute).replace('.', 'p')}` : ''}${caixasDaPintura !== null ? `-caixas${caixasDaPintura}` : ''}` : null,
+        enquadrarNaPeca ? 'enquadrado' : null,
+        copia ? `copia-${copia.map((c) => `${c.eixo}${c.sinal > 0 ? 'mais' : 'menos'}`).join('-')}` : null,
+      ].filter(Boolean);
+      return partes.length ? `-${partes.join('-')}` : '';
+    };
+    /* AS POSIÇÕES DA CHAMADA: cada vista em cada mira, mira por mira; sem mira, as vistas. */
+    const posicoes = (miras.length ? miras : [null]).flatMap((mira) => vistas.map((vista) => ({ vista, mira, sufixo: sufixoDa(mira) })));
     if (!capturarEmMemoria) prepararSaida({ saida, declarada: Boolean(saidaDeclarada), sobrescrever });
     else if (sobrescrever) erroDeUso('--sobrescrever não vale para a captura em memória, que não grava pasta.');
     const arquivosPlanejados = !capturarEmMemoria && peca
-      ? vistas.map((vista) => join(saida, `bancada-${apelidoDeArquivo(peca)}-${vista}${sufixo}.png`))
+      ? posicoes.map(({ vista, sufixo }) => join(saida, `bancada-${apelidoDeArquivo(peca)}-${vista}${sufixo}.png`))
       : [];
     for (const arquivo of arquivosPlanejados) verificarCaminhoConfinado(arquivo, { raiz: REPO });
+    if (miras.length > 1 && new Set(arquivosPlanejados).size !== arquivosPlanejados.length) {
+      erroDeUso('--mirar: duas miras da lista dão o mesmo nome de imagem (o nome guarda o ponto a 0,1 mm e a distância a 1 mm); afaste os pontos ou as distâncias.');
+    }
     if (saidaDeclarada && arquivosPlanejados.some((arquivo) => existsSync(arquivo))) {
       erroDeUso(`--saida '${relative(REPO, saida)}' já contém uma ou mais imagens desta rodada; a bancada não sobrescreve artefato de revisão sem pedido. Use --sobrescrever para apagar e refazer a pasta (só vale numa pasta criada pela bancada) ou escolha outra --saida.`);
     }
@@ -1131,7 +1179,7 @@ export async function olharBancada({
       if (!terminou) await page.waitForTimeout(espera);
     };
     /* O ajuste da câmera desta vista (ver `ajustarCamera`), ou null quando a vista é a da bancada sem mais nada. */
-    const ajusteDaVista = (vista) => {
+    const ajusteDaVista = (vista, mira) => {
       if (mira) return { mirar: { mm: mira.mm, distanciaMm: mira.distanciaMm, direcao: DIRECAO_DAS_VISTAS[vista] ?? DIRECAO_DAS_VISTAS.isometrica } };
       const giro = vista === VISTA_ISO_TRASEIRA;
       const direcao = vista === VISTA_TRES_QUARTOS ? [...DIRECAO_DA_TRES_QUARTOS] : null;
@@ -1168,10 +1216,10 @@ export async function olharBancada({
     const dicas = criarDicas();
     const anotarDica = (chave, texto, vista = null) => dicas.anotar(chave, texto, vista);
     let pecaRelatada = null;
-    progresso.total = vistas.length;
+    progresso.total = posicoes.length;
     let dadoDaChamada = null;
     let legendaDaVisao = null;
-    for (const [indice, vista] of vistas.entries()) {
+    for (const [indice, { vista, mira, sufixo }] of posicoes.entries()) {
       progresso.vista = vista;
       const url = urlDa(vista);
       /* a primeira vista de uma página é a que a abre; as seguintes só trocam a câmera */
@@ -1201,7 +1249,7 @@ export async function olharBancada({
           peca: (typeof b.peca === 'function' ? b.peca() : b.peca) ?? b.nomePeca ?? null,
           partes: b.partes ?? [],
           selecaoIgnorada: b.selecaoIgnorada ?? [], diagnosticos: b.diagnosticos ?? null,
-          estatisticas: b.estatisticas ?? null, estado: b.estado ? b.estado() : null,
+          estatisticas: b.estatisticas ?? null, estado: b.estado ? b.estado() : null, neutroDaSessao: b.neutroDaSessao ?? null,
         };
       });
       dadoDaChamada = dado;
@@ -1221,6 +1269,13 @@ export async function olharBancada({
         registrar(relato, logger, 'stdout', `peça: ${dado.peca}`);
         registrar(relato, logger, 'stdout', `partes (${dado.partes.length}): ${dado.partes.join(', ')}`);
         registrar(relato, logger, 'stdout', `malha: ${dado.estatisticas.facesNeutras} faces, ${dado.estatisticas.triangulos} triângulos, ${semParte} sem identidade`);
+        /* o caminho que a página usou para ter o neutro: só tem sentido numa peça que veio de uma sessão desta captura */
+        if (sessaoDaCaptura) {
+          neutroDaPagina = dado.neutroDaSessao;
+          registrar(relato, logger, 'stdout', neutroDaPagina?.origem === 'gravado'
+            ? `página: neutro lido do arquivo que a ativação gravou (${neutroDaPagina.arquivo}); a receita não executou na página.`
+            : `página: receita executada na página${neutroDaPagina?.motivo ? ` (o neutro gravado não serviu: ${neutroDaPagina.motivo})` : ''}.`);
+        }
         /* a ponte confere os nomes que a URL da subida trouxe; numa página reaproveitada a seleção veio de fora da URL, e a conferência é daqui */
         const selecaoIgnorada = paginaNova ? dado.selecaoIgnorada : selecionadas.filter((nome) => !dado.partes.includes(nome));
         if (selecaoIgnorada.length) {
@@ -1355,7 +1410,7 @@ export async function olharBancada({
         const alturaDaLuz = legendaDaVisao?.dados?.elevacao;
         registrar(relato, logger, 'stdout', `visão: ${visao}${ligada.larguraDaZebra != null ? `, listras de ${ligada.larguraDaZebra} graus` : ''}${ligada.anguloDaZebra != null ? `, listra a ${ligada.anguloDaZebra} graus da horizontal` : ''}${(ligada.azimute ?? legendaDaVisao?.dados?.azimute) != null ? `, luz a ${ligada.azimute ?? legendaDaVisao.dados.azimute} graus` : ''}${visao === 'luz-rasante' && alturaDaLuz != null ? ` e ${alturaDaLuz} graus do plano da imagem` : ''}${visao === 'luz-rasante' && legendaDaVisao?.dados?.segundoAzimute != null ? ` (a outra direção boa desta vista: ${legendaDaVisao.dados.segundoAzimute} graus)` : ''}${ligada.caixasDaPintura != null ? `, ${ligada.caixasDaPintura} caixas de luz` : ''}`);
       }
-      const ajuste = ajusteDaVista(vista);
+      const ajuste = ajusteDaVista(vista, mira);
       let copiaDaVista = null;
       if (ajuste) await instalarAjuste();
       if (primeiraDaPagina) {
@@ -1412,6 +1467,7 @@ export async function olharBancada({
         nome: vistaRelatada,
         ...(projecaoMm ? { projecaoMm } : {}),
         ...(copiaDaVista ? { copia: copiaDaVista } : {}),
+        ...(mira ? { mira: { mm: mira.mm, distanciaMm: mira.distanciaMm } } : {}),
         enquadramento: {
           valida: enquadramento.valida, area: enquadramento.area, largura: enquadramento.largura,
           altura: enquadramento.altura, cortado: enquadramento.cortado,
@@ -1424,7 +1480,7 @@ export async function olharBancada({
         const dados = await fotografar();
         garantirPrazo();
         progresso.feitas += 1;
-        capturas.push({ nome: vistaRelatada, mimeType: 'image/png', largura, altura, dados });
+        capturas.push({ nome: vistaRelatada, ...(mira ? { mira: { mm: mira.mm, distanciaMm: mira.distanciaMm } } : {}), mimeType: 'image/png', largura, altura, dados });
         registrar(relato, logger, 'stdout', `${vistaRelatada.padEnd(11)} memória: ${dados.byteLength} bytes`);
       } else {
         const apelidoEfetivo = apelidoDeArquivo(peca ?? dado.peca);
@@ -1561,7 +1617,7 @@ export async function olharBancada({
     }
     const resultado = {
       peca: pecaRelatada, falhas: falhasRelatadas, vistas: vistasRelatadas, arquivos: arquivosPlanejados,
-      paresAcusados: contatos.estado === 'pulados' || contatos.estado === 'falhou' ? null : paresAcusados, contatos, paresCapturados, cargasDePagina,
+      paresAcusados: contatos.estado === 'pulados' || contatos.estado === 'falhou' ? null : paresAcusados, contatos, paresCapturados, cargasDePagina, neutroDaPagina,
       dicas: dicas.listar(),
       ...(capturarEmMemoria ? { capturas } : {}),
       ...(visao !== null ? { visao: { id: visao, ...(legendaDaVisao ?? { dados: {}, titulo: null, linhas: [] }) } } : {}),
@@ -1594,7 +1650,7 @@ export async function olharBancada({
       ...limpezaForcada,
       ...await fecharRecursos({ browser, vite, pagina: deixarAberta ? null : page, proprios: !compartilhada }),
     ];
-    if (sessaoDaCaptura && !compartilhada) rmSync(sessaoDaCaptura, { force: true });
+    if (sessaoDaCaptura && !compartilhada) { rmSync(sessaoDaCaptura, { force: true }); rmSync(arquivoDoNeutroDaSessao(sessaoDaCaptura), { force: true }); }
     if (limpeza.length) {
       resposta ??= erroEstruturado({ relato, erro: new Error('A bancada falhou ao fechar seus recursos.') });
       resposta.ok = false;
@@ -1639,9 +1695,10 @@ Captura a peça ou montagem na bancada, sem interface.
   --azimute=<graus>      com --visao=luz-rasante, a direção da luz no plano da imagem (0 a 360; padrão: a que a bancada escolhe pela vista)
   --enquadrar            fecha a câmera no que está à vista, para a peça ocupar 92 % da maior dimensão do quadro (a vista padrão deixa a lataria de um carro em um décimo); não se mistura com --par, --mirar, --focar, --revisar nem --analise
   --mirar=<x,y,z>        a câmera mira o ponto, em mm do referencial da peça, na vista de --vistas (ex.: --mirar=1200,900,-300 --vistas=direita); não se mistura com --focar, --par, --revisar nem --analise
-  --distancia=<mm>       com --mirar: a distância da câmera ao ponto (padrão ${DISTANCIA_PADRAO_DA_MIRA_MM}; o campo visível no ponto tem 0,69 vez a distância de altura)
+  --mirar=<x,y,z[,d]>/<x,y,z[,d]>/...  várias miras numa chamada, separadas por / (ou ; entre aspas): cada vista de --vistas em cada mira, na mesma página e com uma execução da receita, uma imagem por mira e vista com o ponto no nome; o quarto número é a distância daquela mira, em mm (ex.: --mirar=-250,4,0,20/11,7,0,46 --vistas=isometrica,superior dá 4 imagens)
+  --distancia=<mm>       com --mirar: a distância da câmera ao ponto, para as miras sem a quarta coordenada (padrão ${DISTANCIA_PADRAO_DA_MIRA_MM}; o campo visível no ponto tem 0,69 vez a distância de altura)
   --sem-contatos         não mede os contatos da peça (a medida executa a receita em Node, uns 100 s no furgão); o relato diz "NÃO medidos", e lista vazia de pares não quer dizer sem achado
-  --sem-cache            executa a receita e mede os contatos de novo; sem ele, a execução e a medida da mesma receita (mesmo conteúdo) vêm de tmp/cache-de-medida/ e o relato diz "lidos do cache"
+  --sem-cache            executa a receita do zero (sem o cache por prefixo de tmp/cache-por-prefixo/) e mede os contatos de novo; sem ele, a execução e a medida da mesma receita (mesmo conteúdo) vêm de tmp/cache-de-medida/ e o relato diz "lidos do cache"
   --par=<a,b>            inspeção dirigida de duas partes (isola e escolhe a vista legível)
   --explosao=<0..1>      afasta as partes da montagem
   --projecao=<perspectiva|ortografica>  padrão perspectiva; ortográfica com --revisar e --par

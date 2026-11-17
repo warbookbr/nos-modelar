@@ -52,7 +52,9 @@ segue:
 4. Se a referência mostra a mesma peça que a pessoa quer.
 5. Se a forma saiu de medidas da referência ou de ajuste a olho.
 6. Se as notas do crítico oscilaram entre rodadas que mudaram pouco; se sim, ele
-   julgou sem medida, e o pacote seguinte leva o contorno medido.
+   julgou sem medida, e o pacote seguinte leva o contorno medido e vai pelo
+   pedido fechado nas duas ordens, com a nota de `vistas-para-critica.mjs --juntar`
+   ([comparar-com-a-referencia.md](comparar-com-a-referencia.md#o-pacote-do-crítico)).
 
 A recomendação segue o primeiro item que falhou, na ordem da lista.
 

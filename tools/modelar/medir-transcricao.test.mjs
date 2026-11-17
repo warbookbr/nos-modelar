@@ -1,7 +1,13 @@
 /* medir-transcricao.test.mjs — a medição de uma transcrição: turnos e entrada somada pelo `usage` (uma vez por mensagem),
    cada resultado de ferramenta na etapa da sua chamada, imagem pelo valor fixo, e a soma de várias transcrições. */
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { CARACTERES_POR_TOKEN, comandoEscreve, etapaDaChamada, medirTranscricao, textoDaMedicao, TOKENS_POR_IMAGEM } from './medir-transcricao.mjs';
+import {
+  CARACTERES_POR_TOKEN, chamadaDoTrecho, comandoEscreve, comoCLI, contarAtritos, etapaDaChamada, lerSessao, medirTranscricao, textoDaMedicao,
+  TOKENS_POR_IMAGEM, trechosDoComando,
+} from './medir-transcricao.mjs';
 
 const assistente = (id, usage, content) => JSON.stringify({ type: 'assistant', message: { id, usage, content } });
 const usuario = (content) => JSON.stringify({ type: 'user', message: { content } });
@@ -78,5 +84,87 @@ describe('medirTranscricao', () => {
       assistente('a2', uso(10, 1100, 5), [{ type: 'tool_use', id: 'b2', name: 'Bash', input: { command: "cd /c && sed -i 's/+/-/' a.js" } }]),
     ].join('\n');
     expect(medirTranscricao(t, { raiz: '/c' }).primeiroPasso).toMatchObject({ turno: 2, bytes: 40, chamadas: 1 });
+  });
+});
+
+/* A CONTAGEM DE ATRITOS POR COMANDO (`--atritos`, fatia 7 do plano de comparar com a referência). Uma sessão de mentira, a principal e
+   um subagente, com a bancada chamada num laço e uma a uma, a opção de memória do Node, um script criado em tmp/ e rodado, e falhas. */
+describe('os atritos por comando', () => {
+  const chamada = (id, comando, horario) => JSON.stringify({ type: 'assistant', timestamp: horario, cwd: '/r', message: { id: `m-${id}`, content: [{ type: 'tool_use', id, name: 'Bash', input: { command: comando } }] } });
+  const resultado = (id, horario, texto, erro = false) => JSON.stringify({ type: 'user', timestamp: horario, message: { content: [{ type: 'tool_result', tool_use_id: id, content: texto, is_error: erro }] } });
+  const escrita = (id, caminho, horario) => JSON.stringify({ type: 'assistant', timestamp: horario, message: { id: `m-${id}`, content: [{ type: 'tool_use', id, name: 'Write', input: { file_path: caminho, content: 'x' } }] } });
+  const t = (s) => `2026-11-17T10:00:${String(s).padStart(2, '0')}Z`;
+
+  function sessao() {
+    const pasta = mkdtempSync(join(tmpdir(), 'atritos-'));
+    const principal = [];
+    for (let i = 0; i < 4; i++) {
+      principal.push(chamada(`b${i}`, `cd /r/.claude/worktrees/a && node tools/modelar/olhar-bancada.mjs p --mirar=${i},0,0 --saida=tmp/v${i}`, t(i * 10)));
+      principal.push(resultado(`b${i}`, t(i * 10 + 8), i === 3 ? 'Exit code 2\nrecusou' : 'ok', false));
+    }
+    principal.push(chamada('n1', 'NODE_OPTIONS=--max-old-space-size=8192 npx vitest run a.test.mjs', t(50)));
+    principal.push(resultado('n1', t(51), 'ok'));
+    principal.push(chamada('g1', 'git -C /r status --short; grep -n x a.js', t(52)));
+    principal.push(resultado('g1', t(53), 'Exit code 1', true));
+    const sub = [
+      chamada('s1', "cat > tmp/prancha.py <<'EOF'\nfrom PIL import Image\nimport os; os.system('node tools/x.mjs')\nEOF\npython3 tmp/prancha.py", t(1)),
+      resultado('s1', t(2), 'Traceback (most recent call last)'),
+      escrita('w1', '/r/tmp/chk.mjs', t(3)),
+      chamada('s2', 'node --max-old-space-size=6000 tmp/chk.mjs && npm run -s bancada -- p --vistas=direita', t(4)),
+      resultado('s2', t(14), 'ok'),
+      chamada('s3', 'for v in a b; do node --stack-size=4000 /r/tools/modelar/olhar-bancada.mjs p --vistas=$v; done', t(20)),
+      resultado('s3', t(40), 'ok'),
+    ];
+    writeFileSync(join(pasta, 's.jsonl'), `${principal.join('\n')}\n`);
+    mkdirSync(join(pasta, 's', 'subagents'), { recursive: true });
+    writeFileSync(join(pasta, 's', 'subagents', 'agent-1.jsonl'), `${sub.join('\n')}\n`);
+    writeFileSync(join(pasta, 's', 'subagents', 'agent-1.meta.json'), JSON.stringify({ agentType: 'modelador', description: 'd' }));
+    return pasta;
+  }
+
+  it('parte o comando fora das aspas e sem o corpo do heredoc, e dá a chave de cada trecho', () => {
+    expect(trechosDoComando("cd /r && python3 - <<'EOF'\np='a; b'\nEOF\nnode -e \"a(); b()\" | head -3")).toEqual(['cd /r', "python3 - <<'EOF'", 'node -e "a(); b()"', 'head -3']);
+    expect(chamadaDoTrecho('NODE_OPTIONS="--max-old-space-size=8192 --expose-gc" node --input-type=module tools/a.mjs').opcoesDeNode).toEqual([
+      ['NODE_OPTIONS', '--max-old-space-size=8192'], ['NODE_OPTIONS', '--expose-gc'],
+    ]);
+    expect(chamadaDoTrecho('timeout 300 node --max-old-space-size=3072 /r/.claude/worktrees/b/tools/a.mjs --x', '/r')).toMatchObject({ chave: 'node tools/a.mjs', opcoesDeNode: [['--max-old-space-size', '3072']] });
+    expect(trechosDoComando('npm test 2>&1 | tail -3; node a.mjs &> /dev/null & wait')).toEqual(['npm test 2>&1', 'tail -3', 'node a.mjs &> /dev/null', 'wait']);
+    expect(chamadaDoTrecho('npm run -s bancada -- p').chave).toBe('npm run bancada');
+    expect(chamadaDoTrecho('git -C /r log --oneline').chave).toBe('git log');
+    expect(chamadaDoTrecho('python3 -I tmp/m.py a').chave).toBe('python3 tmp/m.py');
+    expect(chamadaDoTrecho('node -e "x"').chave).toBe('node -e');
+  });
+
+  it('acha, sem padrão dado, a bancada repetida, as falhas, o script de tmp/ e as opções de memória do Node', () => {
+    const pasta = sessao();
+    try {
+      const a = contarAtritos(lerSessao(join(pasta, 's.jsonl')), { limite: 3 });
+      expect(a).toMatchObject({ registros: 2, comandos: 9, falhas: 3, limite: 3 });
+      /* o mesmo script por caminho relativo e absoluto de outra cópia é uma chave só; git e grep são rotina e ficam fora */
+      expect(a.repetidos).toEqual([{ chave: 'node tools/modelar/olhar-bancada.mjs', vezes: 5, falhas: 1, segundos: 52 }]);
+      expect(a.falharam.map((k) => k.chave)).toEqual(['node tools/modelar/olhar-bancada.mjs', 'python3 tmp/prancha.py']);
+      expect(a.scripts).toEqual({ arquivos: 2, escritas: 2, rodadas: 2, maisRodados: [{ nome: 'prancha.py', vezes: 1 }, { nome: 'chk.mjs', vezes: 1 }] });
+      expect(a.opcoesDeNode).toEqual([
+        { opcao: '--max-old-space-size', vezes: 2, pelaVariavel: 1, valores: ['6000', '8192'] },
+        { opcao: '--stack-size', vezes: 1, pelaVariavel: 0, valores: ['4000'] },
+      ]);
+      const cli = comoCLI(['--atritos=3', join(pasta, 's.jsonl')]);
+      expect(cli.codigo).toBe(0);
+      expect(cli.stdout).toContain('2 registro(s) (o principal e os subagentes), 9 comandos de shell, 3 falharam (33,3%)');
+      expect(cli.stdout).toMatch(/ +5 vezes +1 falhas +52 s +node tools\/modelar\/olhar-bancada\.mjs/);
+      expect(cli.stdout).toContain('scripts criados em tmp/: 2 arquivo(s) em 2 escrita(s), rodados 2 vez(es)');
+      expect(cli.stdout).toMatch(/2 vezes +--max-old-space-size \(6000, 8192\), 1 pelo NODE_OPTIONS/);
+      /* com o limite padrão, de 10, a bancada não passa e a lista diz nenhum */
+      expect(comoCLI(['--atritos', join(pasta, 's.jsonl')]).stdout).toContain('chamados mais de 10 vezes, fora ler, navegar e versionar (vezes, falhas, tempo somado das chamadas):\n   nenhum');
+    } finally { rmSync(pasta, { recursive: true, force: true }); }
+  });
+
+  it('responde a --ajuda com a opção nova e recusa o limite que não é inteiro, a opção desconhecida e o arquivo que não existe', () => {
+    const ajuda = comoCLI(['--ajuda']);
+    expect(ajuda.codigo).toBe(0);
+    expect(ajuda.stdout).toContain('--atritos[=N]');
+    expect(comoCLI(['--atritos=0', 'x.jsonl']).stderr).toMatch(/--atritos pede um número inteiro de vezes, 1 ou mais; veio "0"/);
+    expect(comoCLI(['--repetidos', 'x.jsonl']).codigo).toBe(2);
+    expect(comoCLI(['/nao/existe.jsonl']).stderr).toContain("a transcrição '/nao/existe.jsonl' não existe");
   });
 });

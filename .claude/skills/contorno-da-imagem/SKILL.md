@@ -177,6 +177,21 @@ sem `--por` ou sem rodada registrada, e `--nova-serie` arquiva o aceite junto
 com as rodadas. Nenhum agente usa `--aceite-humano` por conta própria; só com
 o aceite dito pela pessoa, com as palavras dela em `--por`.
 
+## O contorno no pacote da peça
+
+O crítico desta skill julga o mapa de partes e continua pelo `roteiro.md` do
+pacote do contorno. O contorno que fecha aqui serve depois ao crítico da peça:
+`npm run vistas:critica -- <peça>` o desenha sobre a vista ortográfica em
+`contorno-sobreposto.png`, com o trecho que é encontro com outra região do mapa
+tracejado e fora da medida, e o deixa de fora, com o motivo no pedido, quando toda
+instância da peça está fixa no registro da montagem. Esse crítico recebe o pedido
+por perguntas fechadas nas duas ordens, e a nota sai de
+`node tools/modelar/vistas-para-critica.mjs --juntar=<pasta da rodada> <resposta A> <resposta B>`,
+como diz [O laço do crítico](../../../docs/modelar/usar/REFERENCIA-E-CRITICA-VISUAL.md#o-laço-do-crítico).
+A medida de um detalhe da foto que o contorno de parte inteira não dá continua por
+script, que pode tomar a régua e a região do JSON da prancha modelo e foto
+(`node tools/modelar/prancha-de-referencia.mjs`).
+
 ## Ao fechar
 
 O contorno em milímetro fica em `<imagem>.contornos.json`, e o mapa de partes

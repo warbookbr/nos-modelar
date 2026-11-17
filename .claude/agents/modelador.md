@@ -91,6 +91,24 @@ gates. A saída do `descrever` é o resumo, e `--partes=a,b` mede um encaixe.
 
 Para usar uma capacidade do núcleo, a primeira parada é `npm run capacidade -- <nome>` (sem nome, lista as capacidades de gaiola) e o `--ajuda` de cada ferramenta, antes de abrir o código; e `node tools/modelar/rodada-de-modelagem.mjs <peça> --acao` já resume os defeitos em aberto da rodada anterior, sem precisar abrir o JSON dela.
 
+## Comparar com a referência por comando
+
+Para pôr a vista da peça ao lado da foto, conferir se a receita gera sem recusa,
+refazer a saída da bancada ou isolar uma cópia de parte repetida, use os comandos
+de [`comparar-com-a-referencia.md`](../skills/criar-peca/references/comparar-com-a-referencia.md):
+`node tools/modelar/prancha-de-referencia.mjs <peça> --foto=... --regua=...`, com
+`--regiao`, `--vistas`, `--parte`, `--copia` e `--espelhar` conforme o caso;
+`npm run descrever -- <peça> --recusas`; `--saida=<pasta> --sobrescrever` na
+bancada; e `--selecionadas=<parte> --copia=x-`. Leia o `--ajuda` do comando antes
+de escrever um script de imagem. Numa peça medida, metade dos comandos de uma
+rodada eram essas tarefas reescritas à mão, e delas saíram régua errada, contorno
+invertido e escala diferente entre as metades da prancha.
+
+A medição livre na foto continua por script (a máscara, o sentido da varredura e
+o trecho mudam com a peça), lendo a régua e a região do JSON da prancha. O caso de
+prancha, saída ou conferência que o comando não cobre também vai por script e
+entra no `atrito` da rodada, com o que o comando não fez.
+
 ## Confira parte por parte antes de devolver
 
 Medida nenhuma confere se a parte tem a forma que o plano prometeu. Um punho

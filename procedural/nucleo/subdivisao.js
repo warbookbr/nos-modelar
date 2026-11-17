@@ -162,7 +162,7 @@ function nitidezDosVincos(faces, vincos) {
     if (!Array.isArray(v) || v.length !== 3) throw new TypeError(`subdivisão: vinco ${k} precisa ser [a, b, nitidez]`);
     const [a, b, x] = v;
     if (!indice.has(chave(a, b))) throw new TypeError(`subdivisão: vinco ${k} cita a aresta ${a}-${b}, que não existe na gaiola`);
-    if (!(x >= 0)) throw new TypeError(`subdivisão: vinco ${k} com nitidez inválida`);
+    if (typeof x !== 'number' || !(x >= 0)) throw new TypeError(`subdivisão: vinco ${k} com nitidez inválida (precisa ser número maior ou igual a zero, ou Infinity)`);
     nitidez.set(chave(a, b), x >= NITIDEZ_VIVA ? NITIDEZ_INFINITA : x);
   }
   return nitidez;
@@ -712,4 +712,480 @@ export function espelharGaiolaEmX({ vertices, faces, vincos = [], cantos = [] },
   }
   const can = [...new Set([...cantos, ...cantos.map((i) => imagem[i])])];
   return { vertices: V, faces: F, vincos: vin, cantos: can, imagem };
+}
+
+/* ---- a superfície limite exata: o oráculo ----
+ *
+ * `superficieLimite(gaiola)` avalia a superfície limite de Catmull-Clark num ponto (face, u, v) da gaiola, sem malha intermediária e sem
+ * aproximação, com a posição, as derivadas primeira e segunda, a normal, as curvaturas principais e as direções delas. Serve de régua para
+ * as ferramentas que leem a curvatura da malha entregue (de nível finito, em que a curvatura sai por diferença) e para os gates de forma.
+ *
+ * O RETALHO REGULAR. Fora dos vértices extraordinários e dos vincos, a superfície limite sobre uma face de quatro lados é a B-spline bicúbica
+ * uniforme dos 16 pontos da grade 4 x 4 em volta dela (Stam 1998; é o que faz a regra de Catmull-Clark ser C2 ali). A face é regular quando
+ * cada canto tem quatro arestas e quatro quadriláteros, sem nitidez e sem ser canto declarado. A borda e o vinco vivo também dão retalho
+ * polinomial, com a fileira de fora trocada pela reflexão linear da de dentro (P_fora = 2 P_borda - P_dentro): a regra de vinco (6P + A + B) / 8
+ * e o ponto médio da aresta viva são exatamente a regra da B-spline sobre essa fileira, nível após nível. Isso vale no canto da borda que
+ * tem uma aresta viva de cada lado da face e mais uma que a continua (o vértice de borda de valência 3, o vinco de valência 4), e no canto
+ * que é canto (declarado, `borda: 'cantos'` com uma face, ou três arestas vivas), onde a reflexão das duas direções dá P fixo.
+ *
+ * PERTO DO EXTRAORDINÁRIO. A face que não é regular (um canto de valência diferente de 4, um vinco de nitidez finita, o canto de borda com
+ * `borda: 'suave'`, o dardo) se refina só na vizinhança dela: o anel de faces que tocam os cantos dela refina pela mesma `refinar` da
+ * subdivisão, que dá os pontos certos da face filha e do anel da filha, e a filha que contém (u, v) é a nova face. Cada nível divide o
+ * parâmetro por dois; a filha que não toca o canto irregular já é regular, de modo que o ponto a uma fração f do canto extraordinário
+ * chega ao retalho regular em uns log2(1/f) níveis, e a nitidez finita s se apaga em ceil(s) níveis. O anel é transladado para o primeiro
+ * vértice da face antes de refinar (a regra é média ponderada, e a translação não muda o resultado), e por isso as diferenças da grade
+ * fundo continuam com a precisão relativa da máquina. O erro, porém, cresce com o fundo: o anel de m níveis tem tamanho físico lambda^m (lambda,
+ * o autovalor subdominante da valência n, c = cos(2 pi / n): (c + 5 + raiz((c + 9)(c + 1))) / 16, que é 0,41 na valência 3, 0,55 na 5,
+ * 0,58 na 6 e 0,61 na 8) e o parâmetro 2^-m, e o ruído da máquina do anel vira erro relativo de curvatura de uns eps lambda^-m. Por isso
+ * a avaliação para no fundo em que isso chega a `ERRO_RELATIVO_DA_CURVATURA` (2e-8), que depende da valência: uns 2^-20 do canto na
+ * valência 3 (num plano o oráculo devolvia |k| de 1,8e-5 a 2^-30 e 5,4 a 2^-45, com `extraordinario: false`), 2^-30 na 5 e mais fundo nas
+ * maiores, com o teto de `PROFUNDIDADE_DO_LIMITE`. No próprio vértice extraordinário, e abaixo desse piso, a posição sai da fórmula
+ * fechada do ponto limite (a de `limitesDaGaiola`), a normal da avaliação logo acima do piso, e a curvatura não existe (a de Catmull-Clark
+ * diverge ou depende da direção ali), e sai null com `extraordinario: true`.
+ *
+ * O PARÂMETRO. Na face de quatro lados [c0, c1, c2, c3], u vai de c0 a c1 e v de c0 a c3, de 0 a 1; na de n lados, `canto` escolhe o
+ * quadrilátero do canto k depois de um refino (c_k em (0, 0), u para o meio da aresta (c_k, c_k+1), v para o da aresta (c_k-1, c_k)). As
+ * derivadas saem nesse parâmetro; a normal é du x dv unitária, que segue a orientação da face.
+ *
+ * O SINAL DA CURVATURA. A curvatura normal é k(d) = -II(d)/I(d), positiva quando a superfície se afasta da normal (convexa vista do lado da
+ * normal, a calota com a normal para fora), o sinal de `continuidade-nas-emendas.mjs`; k1 >= k2 são as principais, K = k1 k2 e H a média. */
+
+const PROFUNDIDADE_DO_LIMITE = 48;
+const DELTA_NO_EXTRAORDINARIO = 2 ** -30;
+const ERRO_RELATIVO_DA_CURVATURA = 2e-8;
+const EPSILON_DA_MAQUINA = 2 ** -52;
+
+/** o autovalor subdominante da subdivisão de Catmull-Clark num vértice interior de valência n */
+export const autovalorSubdominante = (n) => { const c = Math.cos((2 * Math.PI) / n); return (c + 5 + Math.sqrt((c + 9) * (c + 1))) / 16; };
+
+/** o fundo (níveis de refino) até o qual a curvatura perto de um vértice interior de valência n guarda `ERRO_RELATIVO_DA_CURVATURA`:
+ *  eps lambda^-m <= erro; a valência 4 não tem piso */
+export function fundoUtilDaValencia(n) {
+  if (n === 4) return PROFUNDIDADE_DO_LIMITE;
+  return Math.min(PROFUNDIDADE_DO_LIMITE, Math.floor(Math.log(ERRO_RELATIVO_DA_CURVATURA / EPSILON_DA_MAQUINA) / -Math.log(autovalorSubdominante(n))));
+}
+
+/* o fundo útil da malha local: o menor da valência dos cantos interiores da face 0 que não têm quatro faces */
+function fundoUtilDaMalha({ F }) {
+  let fundo = PROFUNDIDADE_DO_LIMITE;
+  for (const c of F[0]) {
+    let nF = 0; const viz = new Set();
+    for (const f of F) { const k = f.indexOf(c); if (k < 0) continue; nF++; viz.add(f[(k + 1) % f.length]); viz.add(f[(k + f.length - 1) % f.length]); }
+    if (nF !== 4 && viz.size === nF) fundo = Math.min(fundo, fundoUtilDaValencia(nF));
+  }
+  return fundo;
+}
+
+const PERTO = [[1, 0], [3, 1], [2, 3], [0, 2]];
+const LONGE = [[2, 0], [3, 2], [1, 3], [0, 1]];
+const DENTRO = [[1, 1], [2, 1], [2, 2], [1, 2]];
+const CANTO_DA_GRADE = [[0, 0], [3, 0], [3, 3], [0, 3]];
+
+/* o anel da face fi (ela e as faces que tocam algum canto dela), como malha local transladada para o primeiro vértice de fi; a face fi é a 0 */
+function anelDaFace(V, F, nitidez, cantos, fi, facesDoV) {
+  const outras = new Set();
+  for (const c of F[fi]) for (const g of facesDoV[c]) if (g !== fi) outras.add(g);
+  const lista = [fi, ...[...outras].sort((a, b) => a - b)];
+  const o = V[F[fi][0]];
+  const mapa = new Map(); const Vl = []; const globais = [];
+  const Fl = lista.map((g) => F[g].map((j) => {
+    let m = mapa.get(j);
+    if (m === undefined) { m = Vl.length; mapa.set(j, m); Vl.push([V[j][0] - o[0], V[j][1] - o[1], V[j][2] - o[2]]); globais.push(j); }
+    return m;
+  }));
+  const nl = new Map();
+  for (const f of Fl) for (let k = 0; k < f.length; k++) {
+    const a = f[k], b = f[(k + 1) % f.length]; const s = nitidez.get(chave(globais[a], globais[b]));
+    if (s !== undefined) nl.set(chave(a, b), s);
+  }
+  const cl = new Set();
+  for (const [j, m] of mapa) if (cantos.has(j)) cl.add(m);
+  return { V: Vl, F: Fl, nitidez: nl, cantos: cl, origem: o };
+}
+
+/* a grade 4 x 4 da face 0 da malha local, com a reflexão na borda e no vinco vivo, ou null quando a face não é retalho regular */
+function gradeDoRetalho({ V, F, nitidez, cantos }, borda) {
+  const f = F[0];
+  if (f.length !== 4) return null;
+  const { arestas, indice } = arestasDa(F);
+  const facesDoV = facesPorVertice(V.length, F);
+  const incid = Array.from({ length: V.length }, () => []);
+  arestas.forEach((e, k) => { incid[e.a].push(k); incid[e.b].push(k); });
+  const sDe = (k) => (arestas[k].faces.length !== 2 ? NITIDEZ_INFINITA : (nitidez.get(chave(arestas[k].a, arestas[k].b)) ?? 0));
+  const lados = [];
+  for (let s = 0; s < 4; s++) {
+    const a = f[s], b = f[(s + 1) % 4]; const k = indice.get(chave(a, b)); const sh = sDe(k);
+    if (sh !== 0 && sh !== NITIDEZ_INFINITA) return null;
+    if (sh === NITIDEZ_INFINITA) { lados.push({ vivo: true }); continue; }
+    const g = arestas[k].faces.find((x) => x !== 0); const G = F[g];
+    if (g === undefined || G.length !== 4) return null;
+    const j = G.indexOf(b);
+    if (G[(j + 1) % 4] !== a) return null;
+    lados.push({ vivo: false, face: g, perto: G[(j + 2) % 4], longe: G[(j + 3) % 4] });
+  }
+  const P = Array.from({ length: 4 }, () => new Array(4).fill(null));
+  for (let k = 0; k < 4; k++) P[DENTRO[k][0]][DENTRO[k][1]] = V[f[k]];
+  const diagonais = [];
+  for (let k = 0; k < 4; k++) {
+    const c = f[k]; const A = lados[k]; const B = lados[(k + 3) % 4];
+    const vivas = incid[c].filter((e) => sDe(e) > 0);
+    if (vivas.some((e) => sDe(e) !== NITIDEZ_INFINITA)) return null;
+    const canto = cantos.has(c) || (borda === 'cantos' && facesDoV[c].length === 1 && incid[c].some((e) => arestas[e].faces.length === 1));
+    if (!A.vivo && !B.vivo) {
+      if (canto || vivas.length || incid[c].length !== 4 || facesDoV[c].length !== 4) return null;
+      const resto = facesDoV[c].filter((g) => g !== 0 && g !== A.face && g !== B.face);
+      if (resto.length !== 1 || F[resto[0]].length !== 4) return null;
+      const D = F[resto[0]]; const j = D.indexOf(c);
+      const vizinhos = new Set([D[(j + 1) % 4], D[(j + 3) % 4]]);
+      if (!vizinhos.has(A.perto) || !vizinhos.has(B.longe)) return null;
+      diagonais.push({ tipo: 'face', v: D[(j + 2) % 4] });
+    } else if (A.vivo !== B.vivo) {
+      if (canto || vivas.length !== 2) return null;
+      const continua = B.vivo ? A.perto : B.longe;
+      const e = indice.get(chave(c, continua));
+      if (e === undefined || sDe(e) !== NITIDEZ_INFINITA) return null;
+      diagonais.push({ tipo: 'reflexo', lado: B.vivo ? k : (k + 3) % 4, perto: B.vivo });
+    } else {
+      if (!canto && vivas.length < 3) return null;
+      diagonais.push({ tipo: 'reflexo', lado: k, perto: true });
+    }
+  }
+  const em = ([i, j]) => P[i][j];
+  const refletir = (a, b) => [2 * a[0] - b[0], 2 * a[1] - b[1], 2 * a[2] - b[2]];
+  for (let s = 0; s < 4; s++) {
+    const [ip, jp] = PERTO[s]; const [il, jl] = LONGE[s];
+    if (lados[s].vivo) {
+      P[ip][jp] = refletir(em(DENTRO[s]), em(DENTRO[(s + 3) % 4]));
+      P[il][jl] = refletir(em(DENTRO[(s + 1) % 4]), em(DENTRO[(s + 2) % 4]));
+    } else { P[ip][jp] = V[lados[s].perto]; P[il][jl] = V[lados[s].longe]; }
+  }
+  diagonais.forEach((d, k) => {
+    const [i, j] = CANTO_DA_GRADE[k];
+    if (d.tipo === 'face') { P[i][j] = V[d.v]; return; }
+    /* a reflexão ao longo da fileira de fora do lado: a partir da célula do lado junto deste canto, contra a seguinte */
+    P[i][j] = d.perto ? refletir(em(PERTO[d.lado]), em(LONGE[d.lado])) : refletir(em(LONGE[d.lado]), em(PERTO[d.lado]));
+  });
+  return P;
+}
+
+function baseCubica(t) {
+  const s = 1 - t; const t2 = t * t; const t3 = t2 * t;
+  return [
+    [(s * s * s) / 6, (3 * t3 - 6 * t2 + 4) / 6, (-3 * t3 + 3 * t2 + 3 * t + 1) / 6, t3 / 6],
+    [-(s * s) / 2, 1.5 * t2 - 2 * t, -1.5 * t2 + t + 0.5, t2 / 2],
+    [s, 3 * t - 2, 1 - 3 * t, t],
+  ];
+}
+
+/* posição e derivadas até a segunda da B-spline bicúbica da grade P no parâmetro (u, v) */
+function avaliarGrade(P, u, v) {
+  const bu = baseCubica(u); const bv = baseCubica(v);
+  const soma = (du, dv) => {
+    const r = [0, 0, 0];
+    for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) {
+      const w = bu[du][i] * bv[dv][j]; const p = P[i][j];
+      r[0] += w * p[0]; r[1] += w * p[1]; r[2] += w * p[2];
+    }
+    return r;
+  };
+  return { S: soma(0, 0), Su: soma(1, 0), Sv: soma(0, 1), Suu: soma(2, 0), Suv: soma(1, 1), Svv: soma(0, 2) };
+}
+
+const pontoV = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+const vetorial = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+const unitario = (a) => { const m = Math.hypot(a[0], a[1], a[2]); return m > 0 ? [a[0] / m, a[1] / m, a[2] / m] : null; };
+
+/* normal, formas fundamentais e curvaturas a partir das derivadas (no parâmetro em que vierem: a curvatura não depende dele) */
+function geometriaDoPonto({ Su, Sv, Suu, Suv, Svv }) {
+  const n = unitario(vetorial(Su, Sv));
+  if (!n) return { normal: null, k1: null, k2: null, K: null, H: null, d1: null, d2: null, fundamentais: null };
+  const E = pontoV(Su, Su), Fm = pontoV(Su, Sv), G = pontoV(Sv, Sv);
+  const L = -pontoV(Suu, n), M = -pontoV(Suv, n), N = -pontoV(Svv, n);
+  const det = E * G - Fm * Fm;
+  const K = (L * N - M * M) / det; const H = (E * N - 2 * Fm * M + G * L) / (2 * det);
+  const disc = Math.sqrt(Math.max(0, H * H - K)); const k1 = H + disc; const k2 = H - disc;
+  /* a direção principal de k: (L - k E) a + (M - k F) b = 0, ou a outra linha quando esta é nula */
+  const direcao = (k) => {
+    const r1 = [L - k * E, M - k * Fm]; const r2 = [M - k * Fm, N - k * G];
+    const r = Math.hypot(...r1) >= Math.hypot(...r2) ? r1 : r2;
+    const [a, b] = Math.hypot(...r) > 0 ? [-r[1], r[0]] : [1, 0];
+    return unitario([a * Su[0] + b * Sv[0], a * Su[1] + b * Sv[1], a * Su[2] + b * Sv[2]]);
+  };
+  const d1 = direcao(k1); let d2 = direcao(k2);
+  if (disc === 0 || !d2 || Math.abs(pontoV(d1, d2)) > 0.5) d2 = unitario(vetorial(n, d1));
+  return { normal: n, k1, k2, K, H, d1, d2, fundamentais: { E, F: Fm, G, L, M, N, Su, Sv } };
+}
+
+/** curvaturaNormal(amostra, direcao) -> a curvatura normal (1/unidade) da amostra de `superficieLimite` na direção tangente `direcao`
+ *  (vetor 3D, a parte fora do plano tangente é descartada), com o sinal de k1 e k2; null quando a amostra não tem curvatura. */
+export function curvaturaNormal(amostra, direcao) {
+  const f = amostra?.fundamentais;
+  if (!f) return null;
+  const { E, F: Fm, G, L, M, N, Su, Sv } = f;
+  const x = pontoV(direcao, Su), y = pontoV(direcao, Sv); const det = E * G - Fm * Fm;
+  const a = (G * x - Fm * y) / det, b = (E * y - Fm * x) / det;
+  const I = E * a * a + 2 * Fm * a * b + G * b * b;
+  return I > 0 ? (L * a * a + 2 * M * a * b + N * b * b) / I : null;
+}
+
+/* a filha da face 0 (de quatro lados) que contém (u, v), o parâmetro nela e a matriz J de d(u', v')/d(u, v) */
+function filhaDoQuadrante(u, v) {
+  if (u < 0.5 && v < 0.5) return { k: 0, u: 2 * u, v: 2 * v, J: [[2, 0], [0, 2]] };
+  if (v < 0.5) return { k: 1, u: 2 * v, v: 2 - 2 * u, J: [[0, 2], [-2, 0]] };
+  if (u >= 0.5) return { k: 2, u: 2 - 2 * u, v: 2 - 2 * v, J: [[-2, 0], [0, -2]] };
+  return { k: 3, u: 2 - 2 * v, v: 2 * u, J: [[0, -2], [2, 0]] };
+}
+
+const multiplicar2 = (A, B) => [[A[0][0] * B[0][0] + A[0][1] * B[1][0], A[0][0] * B[0][1] + A[0][1] * B[1][1]], [A[1][0] * B[0][0] + A[1][1] * B[1][0], A[1][0] * B[0][1] + A[1][1] * B[1][1]]];
+
+/**
+ * superficieLimite(gaiola) -> { avaliar(face, u, v, { canto }) }
+ * gaiola: { vertices, faces, vincos, cantos, borda }, no formato de `subdividirCatmullClark`. `avaliar` devolve { ponto, du, dv, duu, duv,
+ * dvv, normal, k1, k2, K, H, d1, d2, fundamentais, profundidade, extraordinario }: as derivadas no parâmetro da face (u de c0 a c1, v de
+ * c0 a c3), a normal unitária, as curvaturas principais (sinal descrito acima) com as direções, e quantos refinos locais a avaliação pediu.
+ * Na face de n lados, `canto` (0 a n - 1) escolhe o quadrilátero do canto e (u, v) é o parâmetro nele.
+ */
+export function superficieLimite(gaiola) {
+  const { nitidez, C, facesDoV } = prepararLimite(gaiola);
+  const borda = gaiola.borda ?? 'suave'; const P = gaiola.vertices; const F = gaiola.faces;
+  const avaliarLocal = (face, u, v, canto) => {
+    let malha = anelDaFace(P, F, nitidez, C, face, facesDoV);
+    let origem = malha.origem; let J = [[1, 0], [0, 1]];
+    let uu = u, vv = v; let n = F[face].length;
+    for (let profundidade = 0; ; profundidade++) {
+      const grade = n === 4 ? gradeDoRetalho(malha, borda) : null;
+      if (grade) return { grade, uu, vv, J, origem, profundidade, malha: null };
+      if (profundidade >= fundoUtilDaMalha(malha)) return { grade: null, uu, vv, J, origem, profundidade, malha };
+      const r = refinar(malha.V, malha.F, malha.nitidez, malha.cantos, borda);
+      let k;
+      if (n === 4) { const q = filhaDoQuadrante(uu, vv); k = q.k; uu = q.u; vv = q.v; J = multiplicar2(q.J, J); } else k = canto;
+      const proxima = anelDaFace(r.V, r.F, r.nitidez, malha.cantos, k, facesPorVertice(r.V.length, r.F));
+      origem = [origem[0] + proxima.origem[0], origem[1] + proxima.origem[1], origem[2] + proxima.origem[2]];
+      malha = proxima; n = 4;
+    }
+  };
+  /* as derivadas da filha levadas ao parâmetro da face: d/du = J00 d/du' + J10 d/dv', e a segunda por J^T H J */
+  const levar = (d, J) => {
+    const comb = (a, x, b, y) => [a * x[0] + b * y[0], a * x[1] + b * y[1], a * x[2] + b * y[2]];
+    const du = comb(J[0][0], d.Su, J[1][0], d.Sv); const dv = comb(J[0][1], d.Su, J[1][1], d.Sv);
+    const seg = (p, q) => {
+      const r = [0, 0, 0];
+      const H = [[d.Suu, d.Suv], [d.Suv, d.Svv]];
+      for (let a = 0; a < 2; a++) for (let b = 0; b < 2; b++) { const w = J[a][p] * J[b][q]; for (let x = 0; x < 3; x++) r[x] += w * H[a][b][x]; }
+      return r;
+    };
+    return { du, dv, duu: seg(0, 0), duv: seg(0, 1), dvv: seg(1, 1) };
+  };
+  const avaliar = (face, u, v, { canto = 0, daNormal = false } = {}) => {
+    if (!Number.isInteger(face) || face < 0 || face >= F.length) throw new TypeError(`superfície limite: a face ${face} não existe na gaiola`);
+    if (typeof u !== 'number' || typeof v !== 'number' || !(u >= 0 && u <= 1 && v >= 0 && v <= 1)) throw new TypeError(`superfície limite: (u, v) precisa estar em [0, 1], e veio (${u}, ${v})`);
+    if (F[face].length !== 4 && !(Number.isInteger(canto) && canto >= 0 && canto < F[face].length)) throw new TypeError(`superfície limite: a face ${face} tem ${F[face].length} lados, e o canto precisa ser inteiro de 0 a ${F[face].length - 1}`);
+    const r = avaliarLocal(face, u, v, canto);
+    if (r.grade) {
+      const d = avaliarGrade(r.grade, r.uu, r.vv);
+      const g = geometriaDoPonto(d);
+      const ponto = [r.origem[0] + d.S[0], r.origem[1] + d.S[1], r.origem[2] + d.S[2]];
+      return { ponto, ...levar(d, r.J), ...g, profundidade: r.profundidade, extraordinario: false };
+    }
+    /* o canto irregular da face filha: a posição pela fórmula fechada, a normal a DELTA_NO_EXTRAORDINARIO dele, sem curvatura */
+    const m = r.malha;
+    const L = limiteDaEstrela(estrelaDe(m.V, m.F, facesPorVertice(m.V.length, m.F)[0], m.nitidez, 0), m.cantos.has(0), borda);
+    const ponto = [r.origem[0] + L[0], r.origem[1] + L[1], r.origem[2] + L[2]];
+    if (daNormal) return { ponto, normal: null, k1: null, k2: null, extraordinario: true, profundidade: r.profundidade };
+    const delta = Math.min(0.25, Math.max(DELTA_NO_EXTRAORDINARIO, 2 ** -(r.profundidade - 2)));
+    const passo = (x) => x + (x < 1 ? 1 : -1) * delta;
+    const { normal } = avaliar(face, passo(u), passo(v), { canto, daNormal: true });
+    return { ponto, du: null, dv: null, duu: null, duv: null, dvv: null, normal, k1: null, k2: null, K: null, H: null, d1: null, d2: null, fundamentais: null, profundidade: r.profundidade, extraordinario: true };
+  };
+  return { avaliar };
+}
+
+/** descendenciaDasLinhas(faces, nVertices, niveis, cadeias) -> as cadeias levadas ao nível `niveis` do refino
+ *  Cada cadeia é uma lista de índices de vértice da gaiola em que cada par seguido é aresta dela; a saída é a lista dos vértices da malha
+ *  refinada ao longo das arestas que descendem dela, na mesma ordem (o vértice da gaiola mantém o índice e o ponto de aresta entra entre as
+ *  duas pontas, nível a nível, com a numeração de `subdividirCatmullClark`). Só a topologia: as posições não entram. */
+export function descendenciaDasLinhas(faces, nVertices, niveis, cadeias) {
+  let F = faces.map((f) => [...f]); let nV = nVertices; let C = cadeias.map((c) => [...c]);
+  for (let n = 0; n < niveis; n++) {
+    const { arestas, indice } = arestasDa(F);
+    C = C.map((c, j) => c.flatMap((v, k) => {
+      if (k === 0) return [v];
+      const e = indice.get(chave(c[k - 1], v));
+      if (e === undefined) throw new TypeError(`subdivisão: a linha ${j} liga ${c[k - 1]} a ${v}, que não formam aresta da gaiola`);
+      return [nV + e, v];
+    }));
+    const Fn = [];
+    F.forEach((f, fi) => {
+      for (let k = 0; k < f.length; k++) {
+        const v = f[k], prox = f[(k + 1) % f.length], ant = f[(k - 1 + f.length) % f.length];
+        Fn.push([v, nV + indice.get(chave(v, prox)), nV + arestas.length + fi, nV + indice.get(chave(ant, v))]);
+      }
+    });
+    nV += arestas.length + F.length; F = Fn;
+  }
+  return C;
+}
+
+/* o ponto (u, v) da face que entra pelo lado s à fração t do lado (de c_s a c_s+1) e anda w para dentro, até o lado oposto em w = 1 */
+const PARAMETRO_DO_LADO = [(t, w) => [t, w], (t, w) => [1 - w, t], (t, w) => [1 - t, 1 - w], (t, w) => [w, 1 - t]];
+const ao_longo = (am, s) => (s % 2 === 0 ? am.du : am.dv);
+
+/**
+ * medirLinhasNoLimite(gaiola, linhas, { faixa, amostras, passosPorFace, epsilon }) -> uma medida por linha
+ * A continuidade da superfície limite de `gaiola` (já no nível em que as linhas foram levadas, com faces de quatro lados ao longo delas)
+ * ao longo de cada linha { nome, vertices, faixa?, ...outros campos, que voltam na saída }, pelo oráculo `superficieLimite`; a `faixa` da
+ * linha vence a das opções, e sem as duas ela é oito arestas da linha (duas da gaiola no nível 2). Em cada aresta da linha,
+ * em `amostras` frações dela, a curvatura normal na direção que atravessa a linha (no plano tangente, perpendicular a ela) é avaliada nas
+ * duas faces que a aresta separa, e a diferença é o SALTO de curvatura, exato: zero onde a superfície é C2, que é toda a linha fora dos
+ * vértices extraordinários e dos vincos. Da linha para dentro de cada lado, ao longo da fileira de faces que a atravessa, até `faixa`
+ * (na unidade da gaiola), a mesma curvatura transversal é amostrada `passosPorFace` vezes por face, e a maior variação dela por
+ * comprimento é a INCLINAÇÃO da rampa (1/unidade²): a G2 da subdivisão sem salto, com a curvatura que muda de um lado ao outro numa
+ * largura de poucas faces. No vértice extraordinário da linha (interior, de valência diferente de 4), o salto é o da curvatura transversal
+ * entre a aresta que chega e a que sai, a `epsilon` do comprimento da aresta dele. A linha de borda (um lado só) mede só o lado que tem.
+ * Perto de um ponto singular da superfície limite (o extraordinário, o canto declarado, o vértice de borda de valência diferente de 3, onde
+ * a curvatura diverge) a inclinação cresce sem limite; `inclinacaoForaDosSingulares` é a maior a mais de `raioDoSingular` (padrão metade
+ * da faixa) de todos eles e dos pontos de `evitar` (os do vinco de nitidez finita, que o refino apaga da gaiola mas deixa um filete de raio
+ * pequeno na superfície), e `singularesPerto` conta os que ficam a menos da faixa e do raio da linha.
+ * A BORDA LIVRE é região própria. A regra de borda da subdivisão zera a curvatura que atravessa a borda livre, e a curvatura sobe de zero
+ * ao valor da superfície numa faixa junto dela; a curva que termina na borda herda essa subida na ponta, e o máximo da inclinação sai ali,
+ * a 1 mm da borda, e mede a borda, e não a emenda (na `emenda-g1`, 92,65 em z = 0,9 mm contra 42,4 a 30 mm da borda). Por isso
+ * `inclinacaoForaDosSingulares` só conta o que fica a mais de `afastamentoDaBorda` de toda aresta de borda livre, e `inclinacaoNaBorda` dá o
+ * máximo da faixa da borda, longe dos singulares, à parte, com `ondeInclinacaoNaBorda`. O padrão do afastamento é o dobro da `faixa` da
+ * linha (quatro arestas da gaiola de origem, 114 mm nas emendas de prova): o máximo da `emenda-g1` a 30, 57, 80, 100, 120, 150 e 180 mm é
+ * 42,4, 29,3, 26,7, 26,0, 25,6, 25,3 e 25,2, e o da `emenda-g2`, 11,9, 7,4, 6,7, 6,62, 6,61, 6,61 e 6,61; a duas arestas ele ainda cai
+ * 10% no passo seguinte, e a quatro está no patamar (a G2) ou a 3% do valor de 180 mm (a G1).
+ * A linha com uma face que não é de quatro lados em um dos lados recusa (a medida usa o parâmetro de quadrilátero); o perfil que a
+ * fileira de faces para ao encontrar uma face que não é de quatro lados sai contado em `perfisCortados`.
+ * Devolve { nome, ..., arestas, saltoMaximo, anguloMaximoGraus, inclinacaoMaxima, ondeInclinacao, inclinacaoForaDosSingulares,
+ * curvaturaNaLinha, curvaturaNaFaixa, extraordinarios: [{ vertice, valencia, ponto, salto }] } com as curvaturas na unidade inversa da gaiola.
+ */
+export function medirLinhasNoLimite(gaiola, linhas, { faixa = null, amostras = 4, passosPorFace = 4, epsilon = 1e-4, raioDoSingular = null, evitar = [], afastamentoDaBorda = null } = {}) {
+  const sup = superficieLimite(gaiola);
+  const F = gaiola.faces; const P = gaiola.vertices;
+  const dirigida = new Map();
+  F.forEach((f, fi) => { for (let k = 0; k < f.length; k++) dirigida.set(`${f[k]}>${f[(k + 1) % f.length]}`, { face: fi, lado: k }); });
+  const { arestas } = arestasDa(F);
+  const valencia = new Array(P.length).fill(0); const naBorda = new Set();
+  for (const e of arestas) { valencia[e.a]++; valencia[e.b]++; if (e.faces.length !== 2) { naBorda.add(e.a); naBorda.add(e.b); } }
+  const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
+  /* os pontos singulares da superfície limite: o vértice extraordinário de dentro, o de borda que não tem valência 3 (o canto da chapa) e o
+     canto declarado, onde a curvatura diverge ou depende da direção */
+  const cantosDeclarados = new Set(gaiola.cantos ?? []);
+  const singulares = [];
+  for (let x = 0; x < P.length; x++) {
+    if (!valencia[x]) continue;
+    if (cantosDeclarados.has(x) || (naBorda.has(x) ? valencia[x] !== 3 : valencia[x] !== 4)) singulares.push(P[x]);
+  }
+  for (const p of evitar) singulares.push(p);
+  /* as arestas de borda livre, para a distância à borda */
+  const segmentosDaBorda = arestas.filter((e) => e.faces.length === 1).map((e) => [P[e.a], P[e.b]]);
+  const distanciaAoSegmento = (p, [a, b]) => {
+    const ab = [b[0] - a[0], b[1] - a[1], b[2] - a[2]]; const ap = [p[0] - a[0], p[1] - a[1], p[2] - a[2]];
+    const l2 = pontoV(ab, ab); const t = l2 > 0 ? Math.max(0, Math.min(1, pontoV(ap, ab) / l2)) : 0;
+    return Math.hypot(ap[0] - t * ab[0], ap[1] - t * ab[1], ap[2] - t * ab[2]);
+  };
+  const mediana = (xs) => { const s = xs.filter((x) => x !== null && Number.isFinite(x)).sort((a, b) => a - b); return s.length ? s[s.length >> 1] : null; };
+  /* a curvatura transversal da amostra que entrou pelo lado s */
+  const transversal = (am, s) => {
+    if (!am.normal || !am.fundamentais) return null;
+    const d = unitario(vetorial(am.normal, ao_longo(am, s)));
+    return d ? curvaturaNormal(am, d) : null;
+  };
+  let perfisCortados = 0;
+  const caminhar = (face, s, t, largura) => {
+    const saida = [];
+    let f = face, lado = s, anterior = null, andado = 0;
+    for (let volta = 0; volta < 4096 && andado < largura; volta++) {
+      if (F[f].length !== 4) { perfisCortados++; break; }
+      for (let p = volta === 0 ? 0 : 1; p <= passosPorFace; p++) {
+        const am = sup.avaliar(f, ...PARAMETRO_DO_LADO[lado](t, p / passosPorFace));
+        if (anterior) andado += dist(anterior, am.ponto);
+        anterior = am.ponto;
+        saida.push({ s: andado, k: transversal(am, lado), ponto: am.ponto });
+        if (andado >= largura) break;
+      }
+      const e = (lado + 2) % 4; const a = F[f][e], b = F[f][(e + 1) % 4];
+      const prox = dirigida.get(`${b}>${a}`);
+      if (!prox) break;
+      f = prox.face; lado = prox.lado;
+    }
+    return saida;
+  };
+  return linhas.map((linha) => {
+    const { vertices, faixa: faixaDaLinha = null, ...resto } = linha;
+    const cortadosAntes = perfisCortados;
+    let comprimento = 0;
+    for (let k = 1; k < vertices.length; k++) comprimento += dist(P[vertices[k - 1]], P[vertices[k]]);
+    const largura = faixaDaLinha ?? faixa ?? (8 * comprimento) / Math.max(1, vertices.length - 1);
+    let saltoMaximo = 0, anguloMaximo = 0, inclinacaoMaxima = 0, ondeInclinacao = null, ondeSalto = null, medidas = 0;
+    let inclinacaoRegular = 0, ondeRegular = null, inclinacaoBorda = 0, ondeBorda = null;
+    const raio = raioDoSingular ?? largura / 2;
+    const afastamento = afastamentoDaBorda ?? 2 * largura;
+    const perto = singulares.filter((q) => vertices.some((v) => dist(P[v], q) < largura + raio));
+    const longeDoSingular = (p) => perto.every((q) => dist(p, q) >= raio);
+    const bordaPerto = segmentosDaBorda.filter((sg) => vertices.some((v) => distanciaAoSegmento(P[v], sg) < largura + afastamento));
+    const longeDaBorda = (p) => bordaPerto.every((sg) => distanciaAoSegmento(p, sg) >= afastamento);
+    const faceDe = (x, y) => { const d = dirigida.get(`${x}>${y}`); if (d && F[d.face].length !== 4) throw new TypeError(`medirLinhasNoLimite: a linha ${linha.nome ?? ''} passa pela face ${d.face}, de ${F[d.face].length} lados, e a medida pede faces de quatro lados (refine a gaiola)`); };
+    for (let k = 1; k < vertices.length; k++) {
+      if (!dirigida.has(`${vertices[k - 1]}>${vertices[k]}`) && !dirigida.has(`${vertices[k]}>${vertices[k - 1]}`)) throw new TypeError(`medirLinhasNoLimite: a linha ${linha.nome ?? ''} liga ${vertices[k - 1]} a ${vertices[k]}, que não formam aresta da gaiola`);
+      faceDe(vertices[k - 1], vertices[k]); faceDe(vertices[k], vertices[k - 1]);
+    }
+    const naLinha = [], longeA = [], longeB = [];
+    for (let k = 1; k < vertices.length; k++) {
+      const p = vertices[k - 1], q = vertices[k];
+      const A = dirigida.get(`${p}>${q}`), B = dirigida.get(`${q}>${p}`);
+      for (let j = 0; j < amostras; j++) {
+        const t = (j + 0.5) / amostras;
+        const lados = [];
+        if (A) lados.push({ ...A, t, am: sup.avaliar(A.face, ...PARAMETRO_DO_LADO[A.lado](t, 0)) });
+        if (B) lados.push({ ...B, t: 1 - t, am: sup.avaliar(B.face, ...PARAMETRO_DO_LADO[B.lado](1 - t, 0)) });
+        if (!lados.length) continue;
+        const ref = lados[0];
+        const d = ref.am.normal && unitario(vetorial(ref.am.normal, ao_longo(ref.am, ref.lado)));
+        const ks = lados.map((l) => (d && l.am.fundamentais ? curvaturaNormal(l.am, d) : null));
+        naLinha.push(ks[0]);
+        if (lados.length === 2 && ks[0] !== null && ks[1] !== null) {
+          medidas++;
+          const salto = Math.abs(ks[0] - ks[1]);
+          if (salto > saltoMaximo) { saltoMaximo = salto; ondeSalto = ref.am.ponto; }
+          const c = Math.max(-1, Math.min(1, pontoV(lados[0].am.normal, lados[1].am.normal)));
+          anguloMaximo = Math.max(anguloMaximo, (Math.acos(c) * 180) / Math.PI);
+        }
+        lados.forEach((l, i) => {
+          const perfil = caminhar(l.face, l.lado, l.t, largura);
+          for (let m = 1; m < perfil.length; m++) {
+            const a = perfil[m - 1], b = perfil[m];
+            if (a.k === null || b.k === null || !(b.s > a.s)) continue;
+            const inc = Math.abs(b.k - a.k) / (b.s - a.s);
+            const onde = { ponto: b.ponto, distancia: (a.s + b.s) / 2, lado: (A && i === 0) ? 'esquerda' : 'direita' };
+            if (inc > inclinacaoMaxima) { inclinacaoMaxima = inc; ondeInclinacao = onde; }
+            if (longeDoSingular(a.ponto) && longeDoSingular(b.ponto)) {
+              if (longeDaBorda(a.ponto) && longeDaBorda(b.ponto)) { if (inc > inclinacaoRegular) { inclinacaoRegular = inc; ondeRegular = onde; } }
+              else if (inc > inclinacaoBorda) { inclinacaoBorda = inc; ondeBorda = onde; }
+            }
+          }
+          const fim = perfil.at(-1);
+          if (fim) ((A && i === 0) ? longeA : longeB).push(fim.k);
+        });
+      }
+    }
+    /* os vértices extraordinários de dentro da linha: a curvatura transversal a epsilon dele, na aresta que chega e na que sai */
+    const extraordinarios = [];
+    for (let k = 1; k + 1 < vertices.length; k++) {
+      const x = vertices[k];
+      if (valencia[x] === 4 || naBorda.has(x)) continue;
+      const antes = dirigida.get(`${vertices[k - 1]}>${x}`) ?? null; const depois = dirigida.get(`${x}>${vertices[k + 1]}`) ?? null;
+      if (!antes || !depois) continue;
+      const a = sup.avaliar(antes.face, ...PARAMETRO_DO_LADO[antes.lado](1 - epsilon, 0));
+      const b = sup.avaliar(depois.face, ...PARAMETRO_DO_LADO[depois.lado](epsilon, 0));
+      const ka = transversal(a, antes.lado), kb = transversal(b, depois.lado);
+      extraordinarios.push({ vertice: x, valencia: valencia[x], ponto: P[x], curvaturas: [ka, kb], salto: ka !== null && kb !== null ? Math.abs(ka - kb) : null });
+    }
+    return {
+      ...resto, arestas: vertices.length - 1, comprimento, faixa: largura, medidas, saltoMaximo, ondeSalto, anguloMaximoGraus: anguloMaximo, inclinacaoMaxima, ondeInclinacao,
+      inclinacaoForaDosSingulares: inclinacaoRegular, ondeInclinacaoForaDosSingulares: ondeRegular, singularesPerto: perto.length,
+      inclinacaoNaBorda: inclinacaoBorda, ondeInclinacaoNaBorda: ondeBorda, afastamentoDaBorda: afastamento, perfisCortados: perfisCortados - cortadosAntes,
+      curvaturaNaLinha: mediana(naLinha), curvaturaNaFaixa: [mediana(longeA), mediana(longeB)], extraordinarios,
+    };
+  });
 }
