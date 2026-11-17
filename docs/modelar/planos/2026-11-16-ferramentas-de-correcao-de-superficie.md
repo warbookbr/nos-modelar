@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/nucleo/gaiola-por-rede.js`, `procedural/nucleo/gaiola-por-rede-liso.js`, `procedural/nucleo/curva-da-gaiola.js`, `procedural/nucleo/operacoes/abertura-por-contorno.js`, `procedural/nucleo/subdivisao.js`, `procedural/nucleo/alisar-curvas.js`, `tools/fixtures/correcao-de-superficie/`, `docs/modelar/banco-de-provas/correcao-de-superficie-2026-11-16/`, e os testes desses arquivos.
+**Território:** `procedural/nucleo/gaiola-por-rede.js`, `procedural/nucleo/gaiola-por-rede-liso.js`, `procedural/nucleo/curva-da-gaiola.js`, `procedural/nucleo/operacoes/abertura-por-contorno.js`, `procedural/nucleo/subdivisao.js`, `procedural/nucleo/operacoes/subdivisao.js`, `procedural/nucleo/uso-operacoes.js`, `src/autoria/molduras-do-vao.js`, `procedural/nucleo/operacoes/friso.js`, `procedural/nucleo/operacoes/abertura-por-contorno-simetria.test.ts`, `procedural/nucleo/alisar-curvas.js`, `tools/fixtures/correcao-de-superficie/`, `docs/modelar/banco-de-provas/correcao-de-superficie-2026-11-16/`, e os testes desses arquivos.
 
 Ativado pela pessoa em 2026-11-16, no lugar do plano do robô humanoide, que foi congelado. A lataria do carro não entra: ela é do plano do carro, que roda a rodada 3 com as ferramentas novas.
 
@@ -51,7 +51,7 @@ Resolver a gaiola inteira por energia (Halstead, Kass e DeRose, 1993): ADIAR, s�
 
 ## Gate de saída
 
-1. Na rede de prova com ruído, o alisamento leva o índice de suavidade e o pente a menos da metade, com os pontos duros fixos e a silhueta dentro de 1 mm, por teste.
+1. Na rede de prova com ruído, o alisamento tira mais de nove décimos do excesso do índice de suavidade sobre o controle sem ruído nos retalhos regulares, leva o desvio do pente ao controle a menos da metade e não cria salto que o controle não tenha, com os pontos duros fixos e o deslocamento dentro da tolerância declarada, por teste. Reescrito em 2026-11-16 na fatia 3: o índice bruto e a contagem de saltos não caem à metade onde vêm do preenchimento e do vértice extraordinário, que o controle sem ruído já tem.
 2. Na chapa simétrica, o vão declarado num lado sai nos dois, com a malha fechada e a costura em x 0 exato, por teste; o repro da rodada 2 passa.
 3. Nas chapas emendadas, `emendas` mede o ângulo e a razão de curvatura dentro do declarado (G1 abaixo de 0,5 grau; G2 com a razão abaixo de 1,2) fora dos vértices extraordinários, por teste.
 4. O relatório do G2 alcançável, por região, nas chapas e no quarto traseiro, com a decisão da pessoa sobre o caminho escrita aqui.
@@ -60,9 +60,9 @@ Resolver a gaiola inteira por energia (Halstead, Kass e DeRose, 1993): ADIAR, s�
 
 ## Fatias
 
-1. As chapas de prova e a linha de base medida (índice, pente, emendas, G2 por região), incluindo o quarto traseiro da rodada 2.
-2. O corte com simetria e a costura em x 0 exato, que destrava a rodada 3 mais cedo.
-3. O alisamento das curvas declaradas.
+1. Feita: as chapas de prova e a linha de base medida (índice, pente, emendas, G2 por região), incluindo o quarto traseiro da rodada 2.
+2. Feita: o corte com simetria e a costura em x 0 exato (opções `costuraExata` da subdivisão e `simetria` da abertura, sem mudar o acervo), que destrava a rodada 3 mais cedo.
+3. Feita: o alisamento das curvas declaradas (`alisarCurvas` em `gaiolaPorRede`, energia pelo resíduo do ajuste polinomial local, com os pontos duros fixos, o deslocamento limitado por curva e aviso na curva que anda), depois de três revisões adversariais; o limite aceito é a feição na escala do espaçamento dos pontos e o canto a menos de 20 tolerâncias de outro ou da ponta, que arredondam até a tolerância e se resolvem com o ponto declarado como nó em `cantos`; achar o canto pela forma fica para a fatia 4.
 4. A emenda com continuidade declarada.
 5. A medida do G2 alcançável e a decisão da pessoa sobre o caminho.
 6. Revisão adversarial, documentação e fechamento.

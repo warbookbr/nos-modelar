@@ -6,6 +6,7 @@
 > algum arquivo-fonte estiver sem cabeçalho.
 
 2019 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2034 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -232,6 +233,10 @@
 ## docs/modelar/banco-de-provas/carrinho-refeito-2026-10-08/
 
 - `ATRITOS.md` — Atritos
+
+## docs/modelar/banco-de-provas/correcao-de-superficie-2026-11-16/
+
+- `README.md` — Correção de superfície: chapas de prova, linha de base e corte com simetria
 
 ## docs/modelar/banco-de-provas/costura-em-no-de-tubos-2026-11-15/
 
@@ -961,6 +966,8 @@
 
 - `CLAUDE.md` — Núcleo: o que só vale nesta pasta
 - `adaptador.js` — adaptador.js — projeção visual do neutro; não conhece receitas nem execução.
+- `alisar-curvas.js` — alisar-curvas.js — os pontos-chave de uma curva declarada alisados pelo resíduo do ajuste polinomial local, sem mexer na forma
+- `alisar-curvas.test.mjs` — alisar-curvas.test.mjs — o alisamento pelo resíduo do ajuste polinomial local: não mexe no arco, no círculo nem na parábola, tira o ruído, deixa os pontos du…
 - `animacao.js` — animacao.js — animação rígida e skinning sobre lotes já adaptados.
 - `aparar.test.ts` — aparar.test.ts — `aparar`: o sólido cortado pelo lado de dentro de uma chapa subdividida, a `folga` da pele de dentro dela. Mede, numa calota de gaiola de ci…
 - `apoio-do-vinco.js` — apoio-do-vinco.js — o raio de uma aresta de caráter, em milímetro, convertido na distância das colunas de apoio.
@@ -2732,6 +2739,45 @@
 ## tools/fixtures/corpo-por-fatias/ponto-perdido/
 
 - `receita.js` — ponto-perdido/receita.js — peça de prova da porta de avisos das operações de composição: um cilindro de 40 pontos por fatia feito por `corpoPorFatias` com a …
+
+## tools/fixtures/correcao-de-superficie/
+
+- `alisamento.test.mjs` — alisamento.test.mjs — o gate 1 do plano das ferramentas de correção de superfície (fatia 3): na `rede-com-ruido`, a opção `alisarCurvas` da rede leva o exces…
+- `chapas.mjs` — chapas.mjs — as chapas de prova do plano das ferramentas de correção de superfície (`docs/modelar/planos/2026-11-16-ferramentas-de-correcao-de-superficie.md`…
+- `chapas.test.mjs` — chapas.test.mjs — as chapas de prova do plano das ferramentas de correção de superfície: cada uma monta sem órfão, com a forma e o defeito declarados em `cha…
+- `linha-de-base.mjs` — linha-de-base.mjs — a linha de base do plano das ferramentas de correção de superfície: as quatro medidas de superfície (`suavidade`, `pente`, `emendas`, `on…
+
+## tools/fixtures/correcao-de-superficie/chapa-simetrica/
+
+- `receita.js` — correcao-de-superficie/chapa-simetrica/receita.js — a chapa de prova 'chapa-simetrica' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
+
+## tools/fixtures/correcao-de-superficie/chapa-simetrica-espelhada/
+
+- `receita.js` — correcao-de-superficie/chapa-simetrica-espelhada/receita.js — a chapa de prova 'chapa-simetrica-espelhada' de `../chapas.mjs`, onde estão a forma e o defeito…
+
+## tools/fixtures/correcao-de-superficie/emenda-g0/
+
+- `receita.js` — correcao-de-superficie/emenda-g0/receita.js — a chapa de prova 'emenda-g0' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
+
+## tools/fixtures/correcao-de-superficie/emenda-g1/
+
+- `receita.js` — correcao-de-superficie/emenda-g1/receita.js — a chapa de prova 'emenda-g1' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
+
+## tools/fixtures/correcao-de-superficie/emenda-g2/
+
+- `receita.js` — correcao-de-superficie/emenda-g2/receita.js — a chapa de prova 'emenda-g2' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
+
+## tools/fixtures/correcao-de-superficie/rede-alisada/
+
+- `receita.js` — correcao-de-superficie/rede-alisada/receita.js — a chapa de prova 'rede-alisada' de `../chapas.mjs`: a rede com ruído com as curvas alisadas pela opção `alis…
+
+## tools/fixtures/correcao-de-superficie/rede-com-ruido/
+
+- `receita.js` — correcao-de-superficie/rede-com-ruido/receita.js — a chapa de prova 'rede-com-ruido' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
+
+## tools/fixtures/correcao-de-superficie/rede-sem-ruido/
+
+- `receita.js` — correcao-de-superficie/rede-sem-ruido/receita.js — a chapa de prova 'rede-sem-ruido' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
 
 ## tools/fixtures/costuras-e-furos/
 

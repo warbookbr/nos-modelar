@@ -39,7 +39,8 @@
    abriu, inteira e fechada (`linha: { nome }`, sem pontos), e a normal é a da pele em volta de cada ponto (`bordaDaAbertura`).
    A borda tem os pontos que o corte deixou, alguns a frações de milímetro de um canto vivo; o ponto que deixa um trecho mais
    curto que o recuo da esquadria nas duas pontas dele (o de `varrerPerfil`, com folga de metade) sai da linha (`afinarNosCantos`),
-   e o friso segue a corda até o canto. A espessura é a que o passo da abertura mediu na borda. */
+   e o friso segue a corda até o canto. A espessura é a que o passo da abertura mediu na borda. Com `simetria: 'x'` no passo da
+   abertura, o friso segue também a borda de fora do vão espelhado, a que o corte deixou do outro lado do plano. */
 import { ANGULO_MAXIMO_DA_ABA, ErroDoFriso, TRECHO_MAXIMO_EM_ARESTAS, cadeiaRefinada, ladoDaBorda, menorArestaDoPerfil, passosDoArcoDaAba, perfilDaAba, perfilDaPeleDaAba, posicoesDaLinha, tampaDaAba, varrerPerfil } from '../friso.js';
 import { valorDoLiso } from '../liso-por-angulo.js';
 import { espelharGaiolaEmX } from '../subdivisao.js';
@@ -105,7 +106,7 @@ function registroDaVarredura({ passo, origemId, nome, aba, superficie, gaiola, c
   });
   const fechada = cadeia.fechada;
   return {
-    passo, origemId, nome, aba, superficie, gaiola, fechada, espelhada: cadeia.espelhada,
+    passo, origemId, nome, aba, superficie, gaiola, fechada, espelhada: cadeia.espelhada, ...(cadeia.espelhoDaAbertura ? { espelhoDaAbertura: true } : {}),
     pontas: fechada ? null : [pontas[0], pontas[1]],
     secoes: lidas.map(({ s, p, e, d }) => ({ s, p, e, d })),
     extremos: fechada ? null : [lidas[0].anel, lidas[lidas.length - 1].anel],
@@ -115,17 +116,30 @@ function registroDaVarredura({ passo, origemId, nome, aba, superficie, gaiola, c
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 const emMm = (p) => `[${p.map((x) => Number((x * 1000).toFixed(2))).join(', ')}] mm`;
 
-/* A linha sobre a borda de fora de uma abertura por contorno: uma cadeia fechada, com o lado da chapa. */
+/* A linha sobre a borda de fora de uma abertura por contorno: uma cadeia fechada, com o lado da chapa. Com a simetria do passo da
+   abertura, o friso segue também a borda do vão espelhado, como o friso da gaiola segue a cópia espelhada: a cadeia dela é a borda
+   que o corte deixou do outro lado (a booleana não sai espelhada ponto a ponto), marcada `espelhoDaAbertura`, que a conferência dos
+   vãos (`src/autoria/molduras-do-vao.js`) confere contra a borda daquele vão. */
 function linhaNaAbertura(st, a) {
   const b = bordaDaAbertura(st, a.superficie);
   if (b.erro) return { erro: ['superficie', b.erro] };
-  let lado;
-  try { lado = ladoDaBorda(b.faces, b.cadeia); } catch (e) {
-    if (!(e instanceof ErroDoFriso)) throw e;
-    return { erro: ['superficie', `a borda do vão da abertura ${a.superficie.id}, perto de ${emMm(b.pontos[e.indice ?? 0])}: ${e.motivo}; o friso lê a borda como o passo da abertura a deixou`] };
+  const bordas = [b];
+  if (b.temEspelho) {
+    const e = bordaDaAbertura(st, a.superficie, { espelho: true });
+    if (e.erro) return { erro: ['superficie', e.erro] };
+    bordas.push(e);
   }
-  const pontos = b.pontos; const nomeDoIndice = (j) => `${emMm(pontos[Math.min(j, pontos.length - 1)])} da borda do vão`;
-  return { cadeias: [{ pontos, normais: b.normais, fechada: true, espelhada: false, lado, nomeDoIndice, nomes: [], passo: 1 }], espessura: b.espessura, passo: b.passo, gaiola: null };
+  const cadeias = [];
+  for (const [k, borda] of bordas.entries()) {
+    let lado;
+    try { lado = ladoDaBorda(borda.faces, borda.cadeia); } catch (e) {
+      if (!(e instanceof ErroDoFriso)) throw e;
+      return { erro: ['superficie', `a borda do vão da abertura ${a.superficie.id}${k ? ' (o vão espelhado pela simetria)' : ''}, perto de ${emMm(borda.pontos[e.indice ?? 0])}: ${e.motivo}; o friso lê a borda como o passo da abertura a deixou`] };
+    }
+    const pontos = borda.pontos; const nomeDoIndice = (j) => `${emMm(pontos[Math.min(j, pontos.length - 1)])} da borda do vão${k ? ' espelhado' : ''}`;
+    cadeias.push({ pontos, normais: borda.normais, fechada: true, espelhada: false, espelhoDaAbertura: k === 1, lado, nomeDoIndice, nomes: [], passo: 1 });
+  }
+  return { cadeias, espessura: b.espessura, passo: b.passo, gaiola: null };
 }
 
 /** afinarNosCantos(cadeia, perfil) -> cadeia: tira da volta os pontos que deixam um trecho mais curto que o recuo da esquadria

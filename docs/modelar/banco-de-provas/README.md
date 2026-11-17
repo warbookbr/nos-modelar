@@ -17,7 +17,7 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
   - [Custo por peça do carrinho de mão](carrinho-de-mao-2026-11-11/CUSTO-POR-PECA.md) — `carrinho-de-mao-2026-11-11`
 - [Atritos](carrinho-refeito-2026-10-08/ATRITOS.md) — `carrinho-refeito-2026-10-08`
 - `componentes-eletronicos-2026-11-16`
-- `correcao-de-superficie-2026-11-16`
+- [Correção de superfície: chapas de prova, linha de base e corte com simetria](correcao-de-superficie-2026-11-16/README.md) — `correcao-de-superficie-2026-11-16`
 - [Cordão de solda na costura de tubos: rodadas de forma e medidas](costura-em-no-de-tubos-2026-11-15/README.md) — `costura-em-no-de-tubos-2026-11-15`
 - [Braço robótico, vista lateral: a descrição](desenho-braco-2026-10-14/DESCRICAO.md) — `desenho-braco-2026-10-14`
   - [Braço robótico, vista lateral: o resultado da prova](desenho-braco-2026-10-14/RESULTADO.md) — `desenho-braco-2026-10-14`

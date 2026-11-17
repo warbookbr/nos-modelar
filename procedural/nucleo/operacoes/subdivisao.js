@@ -10,7 +10,7 @@
    mesmo onde o diedro cai abaixo do ângulo, nas pontas do vinco. `quebraNosVincos: 'todos'` quebra também nos vincos de
    nitidez fracionária, e `'nenhum'` deixa só o ângulo; `liso: false` devolve as faces chapadas. Só a marca de sombra
    muda: as posições e as faces são as mesmas com qualquer opção. */
-import { subdividirCatmullClark, espelharGaiolaEmX, ajustarGaiolaAsMedidas, ajustarGaiolaAsMedidasComPeso, nitidezDoVinco } from '../subdivisao.js';
+import { subdividirCatmullClark, espelharGaiolaEmX, costuraEmXExata, ajustarGaiolaAsMedidas, ajustarGaiolaAsMedidasComPeso, nitidezDoVinco } from '../subdivisao.js';
 import { espessarSuperficie, ErroDaEspessura } from '../espessura.js';
 import { valorDoLiso } from '../liso-por-angulo.js';
 
@@ -359,6 +359,8 @@ export function criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, co
     const quebra = a.quebraNosVincos ?? 'vivos';
     if (!QUEBRAS.includes(quebra)) return grita(st, i, 'subdivisao', 'quebraNosVincos', `quebraNosVincos precisa ser 'vivos' (o padrão: a sombra se divide nos vincos vivos), 'todos' (também nos de nitidez fracionária) ou 'nenhum', e veio ${JSON.stringify(quebra)}`);
     if (liso === false && a.quebraNosVincos != null) return grita(st, i, 'subdivisao', 'quebraNosVincos', 'quebraNosVincos só vale com as faces lisas; com liso: false toda aresta já divide a sombra');
+    if (a.costuraExata != null && a.costuraExata !== true && a.costuraExata !== false) return grita(st, i, 'subdivisao', 'costuraExata', `costuraExata só aceita true (a costura da simetria sai em x = 0 exato, também na face interna da espessura) ou false, e veio ${JSON.stringify(a.costuraExata)}`);
+    if (a.costuraExata === true && a.simetria !== 'x') return grita(st, i, 'subdivisao', 'costuraExata', "costuraExata só vale com simetria: 'x', porque a costura é a do plano x = 0 da gaiola espelhada; declare a simetria ou tire costuraExata");
     let r;
     let gruposDaGaiola = null;
     try {
@@ -391,6 +393,11 @@ export function criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, co
         const lugaresTexto = lugaresDaEspessura(e.lugares, r.vertices, gaiola, declarados, e.tipo, nomesDosLugares);
         return grita(st, i, 'subdivisao', 'espessura', `${e.motivo}${lugaresTexto}${notaDoRaioPedido(a.vincos, nomesDosLugares, e.lugares, espessura, st)}`);
       }
+    }
+    /* a costura da simetria em x = 0 exato: sem isso a face interna da espessura sai a 1e-19 m do plano, e quem solda pelo plano não a acha */
+    if (a.costuraExata === true) {
+      r = { ...r, vertices: costuraEmXExata(r.vertices, nS, espessura !== null).vertices };
+      pele.vertices = espessura === null ? r.vertices : costuraEmXExata(pele.vertices, nS).vertices;
     }
     const limite = BLOCO + FAIXA_ESTENDIDA;
     if (r.vertices.length > limite || r.faces.length > limite) return grita(st, i, 'subdivisao', 'niveis', `a subdivisão gera ${r.vertices.length} vértices e ${r.faces.length} faces, acima do limite do passo (${limite})`);
