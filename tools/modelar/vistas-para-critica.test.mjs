@@ -1109,6 +1109,20 @@ describe('a prancha desenhada em mm que o plano cita (e o aviso do que o pacote 
     expect(imprimir(resultado)).toContain('PRANCHA DESENHADA');
   });
 
+  it('com a origem em mm o pedido diz que o desenho foi recortado pela caixa do modelo e sobreposto pelas coordenadas; sem ela, diz o motivo do centro e avisa', async () => {
+    const com = (alinhamento) => async (pedido) => {
+      writeFileSync(pedido.saida, 'png');
+      return { arquivo: pedido.saida, json: pedido.saida.replace(/\.png$/, '.json'), lidas: [{ caminho: pedido.pranchas[0].caminho, vista: pedido.pranchas[0].vista, larguraMm: 400, alturaMm: 300, pxPorMm: 0.5, alinhamento }] };
+    };
+    const certo = await montar(com({ tipo: 'coordenadas', caixaMm: [-230, -30, 30, 330] }));
+    expect(certo.pedido).toContain('recortado pela caixa do modelo (-230, -30, 30, 330 mm: h mín, v mín, h máx, v máx) e sobreposto pelas coordenadas');
+    expect(certo.pedido).toContain('mesmo trecho, mesmo quando o modelo é só uma parte do objeto');
+    expect(certo.resultado.avisos.join('\n')).not.toMatch(/centro das extensões/);
+    const centro = await montar(com({ tipo: 'centro', motivo: 'as origens não coincidem' }));
+    expect(centro.pedido).toContain('alinhado pelo centro das extensões, e não pelas coordenadas: as origens não coincidem');
+    expect(centro.resultado.avisos.join('\n')).toMatch(/lateral\.prancha\.svg: o desenho não foi sobreposto pelas coordenadas em mm, e saiu alinhado pelo centro das extensões \(as origens não coincidem\)/);
+  });
+
   it('a prancha que não sai é aviso e consta do pedido, e o pacote segue', async () => {
     const { resultado, pedido } = await montar(async () => { throw new Error('o navegador não abriu'); });
     expect(resultado.pranchaDesenhada).toBeNull();

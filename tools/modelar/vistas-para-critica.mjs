@@ -443,7 +443,7 @@ export function secoesDoPedido({ peca, plano = null, orientacao = null, alvo = n
     }
   } else {
     L.push(pranchaDesenhada
-      ? 'A receita não refina um esboço aprovado, e o alvo é a prancha desenhada da seção seguinte, que está na mesma escala do modelo: `alvo` do veredito leva o caminho da imagem da prancha que você comparou (a de `lado`, ou a de `sobreposta` quando o modelo é a peça inteira do desenho).'
+      ? 'A receita não refina um esboço aprovado, e o alvo é a prancha desenhada da seção seguinte, que está na mesma escala do modelo: `alvo` do veredito leva o caminho da imagem da prancha que você comparou (a de `lado`, ou a de `sobreposta`).'
       : referencias.length
       ? 'A receita não refina um esboço aprovado, e o alvo é a referência da seção seguinte: `alvo` do veredito leva o caminho da imagem de referência que você comparou.'
       : 'A receita não refina um esboço aprovado e o pedido não traz imagem de referência: `alvo` do veredito leva o texto `sem alvo: <motivo>`, com o motivo em uma frase. Não ponha ali o caminho do pedido nem de qualquer imagem do pacote.');
@@ -1343,7 +1343,8 @@ export async function pranchaDoPlano({ pranchas, peca, pasta, critica, orientaca
     }
   }
   if (!imagens.length) return { feita: null, fora };
-  const linhas = entradas.map((e) => ({ vista: e.vista, caminho: e.caminho, presumida: e.presumida, girar: e.girar, larguraMm: lidas.find((l) => l.caminho === e.caminho)?.larguraMm ?? null, alturaMm: lidas.find((l) => l.caminho === e.caminho)?.alturaMm ?? null }));
+  const linhas = entradas.map((e) => ({ vista: e.vista, caminho: e.caminho, presumida: e.presumida, girar: e.girar, alinhamento: lidas.find((l) => l.caminho === e.caminho)?.alinhamento ?? null, larguraMm: lidas.find((l) => l.caminho === e.caminho)?.larguraMm ?? null, alturaMm: lidas.find((l) => l.caminho === e.caminho)?.alturaMm ?? null }));
+  for (const l of linhas) if (l.alinhamento?.tipo === 'centro') fora.push(`${basename(l.caminho)}: o desenho não foi sobreposto pelas coordenadas em mm, e saiu alinhado pelo centro das extensões (${l.alinhamento.motivo ?? 'sem origem em mm'}); a sobreposição dessa vista só vale se o modelo for a peça inteira do desenho.`);
   return { feita: { linhas, imagens, fora }, fora };
 }
 
@@ -1352,14 +1353,16 @@ function secaoDaPranchaDesenhada({ linhas, imagens, fora = [] }, { orientacao = 
     '## Prancha desenhada', '',
     'O plano cita uma prancha desenhada: o desenho cotado da silhueta, em mm no referencial da peça, e não uma foto nem o objeto real em outra escala. '
     + 'As imagens abaixo põem o modelo e o desenho na mesma escala em mm, cada um com a régua dele no painel, na vista do modelo que olha do mesmo lado que o desenho. '
-    + 'Em `lado` o modelo fica à esquerda e o desenho à direita, em recortes de mesma escala; em `sobreposta` o modelo translúcido cobre o desenho, alinhados pelo centro das extensões, o que só vale quando o modelo é a peça inteira do desenho: se ele é uma parte (o quarto traseiro de um carro inteiro, por exemplo), a sobreposição não os alinha e vale a imagem `lado`. '
+    + 'O desenho está no mesmo referencial em mm que o modelo e é recortado pela caixa do modelo naquela vista, com 10% de margem, de modo que as duas imagens mostram o mesmo trecho, mesmo quando o modelo é só uma parte do objeto (o quarto traseiro de um carro inteiro, por exemplo). '
+    + 'Em `lado` o modelo fica à esquerda e o desenho à direita, em recortes de mesma escala; em `sobreposta` o modelo translúcido cobre o desenho, alinhados pelas coordenadas em mm. '
+    + 'Onde as coordenadas não valem, a linha da vista abaixo diz que o alinhamento saiu pelo centro das extensões e por quê, e então a sobreposição só vale se o modelo for a peça inteira do desenho. '
     + 'A silhueta de lado, de cima ou de trás do modelo sai da prancha onde um contorno passa do outro além da tolerância do plano, e a diferença se lê em mm pela régua do painel, '
     + 'e não pela impressão de proporção. As cotas e os textos do desenho foram tirados da imagem, e valem as linhas do contorno, dos painéis e dos vidros.',
     alvo ? 'Esta prancha é medida em mm além do alvo do esboço, e não o substitui: a nota continua contra o alvo, e a silhueta fora da prancha entra como defeito.' : '',
     '',
     ...lista(imagens.map((i) => `${i.disposicao}: ${i.arquivo}`)), '',
     'Cada vista do desenho e a vista do modelo que a compara:', '',
-    ...lista(linhas.map((l) => `${basename(l.caminho)}: vista ${l.vista} do modelo (${ladoDaVista(l.vista, orientacao)})${l.larguraMm ? `; o desenho mede ${mm(l.larguraMm)} x ${mm(l.alturaMm)} mm` : ''}${l.girar ? `; o desenho foi girado ${l.girar} graus no sentido horário, para olhar do mesmo lado que a vista` : ''}${l.presumida ? '; o lado do desenho não foi declarado e a vista saiu do nome do arquivo: se os dois contornos aparecerem espelhados, diga no veredito o que você presumiu' : ''}`)), '',
+    ...lista(linhas.map((l) => `${basename(l.caminho)}: vista ${l.vista} do modelo (${ladoDaVista(l.vista, orientacao)})${l.larguraMm ? `; o desenho mede ${mm(l.larguraMm)} x ${mm(l.alturaMm)} mm` : ''}${l.alinhamento?.tipo === 'coordenadas' ? `; recortado pela caixa do modelo (${l.alinhamento.caixaMm?.join(', ')} mm: h mín, v mín, h máx, v máx) e sobreposto pelas coordenadas` : l.alinhamento?.tipo === 'centro' ? `; alinhado pelo centro das extensões, e não pelas coordenadas: ${l.alinhamento.motivo ?? 'sem origem em mm'}` : ''}${l.girar ? `; o desenho foi girado ${l.girar} graus no sentido horário, para olhar do mesmo lado que a vista` : ''}${l.presumida ? '; o lado do desenho não foi declarado e a vista saiu do nome do arquivo: se os dois contornos aparecerem espelhados, diga no veredito o que você presumiu' : ''}`)), '',
   ].filter((linha, i, todas) => !(linha === '' && todas[i - 1] === ''));
   for (const f of fora) L.push(`Fora da prancha desenhada: ${f}`, '');
   return L;

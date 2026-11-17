@@ -8,7 +8,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { ajustarCamera, lerCopia } from './olhar-bancada.mjs';
 import {
   PONTOS_DA_ESCALA, comoCLI, disporPrancha, eixosDaVista, escalaDaVista, extensaoNaImagem, fundoDaCaixa, lerPedido, lerRegiao, lerRegua, lerVistas,
-  passoDaRegua, porVista, prancharReferencia, caixaDoContornoSvg, lerPranchaDesenhada,
+  passoDaRegua, porVista, prancharReferencia, caixaDoContornoSvg, lerPranchaDesenhada, alinharPelasCoordenadas,
   aoReferencialDaPeca, disporContorno, pontoDoContorno, prancharContorno, projetorDaVista, vistaNaPeca,
   TRACEJADO_DO_ENCONTRO, encontrosDoAnel, ladosDaCaixaNoEncontro, ladosEmTexto, trechosDoAnel,
 } from './prancha-de-referencia.mjs';
@@ -449,5 +449,65 @@ describe('a prancha desenhada em mm (SVG)', () => {
     expect(caixaDoContornoSvg('<path class="contorno" d="M 1 2 L 11 2 L 11 7 Z"/><path class="outra" d="M 500 500 L 600 600"/>')).toEqual([1, 2, 11, 7]);
     expect(() => caixaDoContornoSvg('<path class="contorno" d="M 1 2 C 3 4 5 6 7 8"/>')).toThrow(/além de M, L e Z/);
     expect(() => caixaDoContornoSvg('<path class="x" d="M 1 2"/>')).toThrow(/nenhum <path class="contorno">/);
+  });
+});
+
+describe('a prancha desenhada alinhada pelas coordenadas em mm', () => {
+  const FIXTURE = join(REPO, 'tools/fixtures/comparar-com-prancha/referencias/lateral.prancha.svg');
+
+  it('a origem e a caixa do desenho, na imagem girada, saem do relatório: h para a direita e v para cima', () => {
+    const r = lerPranchaDesenhada(FIXTURE);
+    expect(r.caixaImagemMm).toEqual([-200, 0, 200, 300]);
+    /* o contorno vai de x 50 a 250 e de y 30 a 180 px, ampliado 3 vezes; a origem em mm cai a 200 mm * 1,5 px/mm do lado esquerdo e 0 mm da base */
+    expect(r.origemPx).toEqual([50 * 3 + 200 * 1.5, 180 * 3]);
+    const g = lerPranchaDesenhada(FIXTURE, { girar: 90 });
+    expect(g.caixaImagemMm).toEqual([0, -200, 300, 200]);
+  });
+
+  const desenho = { caixaMm: [-200, 0, 200, 300], pxPorMm: 1.5, origemPx: [450, 540], largura: 900, altura: 660 };
+
+  it('recorta o desenho pela caixa do modelo com 10% de margem, em px do desenho', () => {
+    /* o modelo ocupa h -200 a 0 e v 0 a 300 mm: a origem dele em (400, 400) px a 2 px/mm */
+    const a = alinharPelasCoordenadas({ modelo: { origemPx: [400, 700], extensao: [0, 100, 400, 700], pxPorMm: 2 }, desenho });
+    expect(a.ok).toBe(true);
+    expect(a.caixaMm).toEqual([-230, -30, 30, 330]);
+    expect(a.regiao).toEqual([Math.round(450 - 230 * 1.5), Math.round(540 - 330 * 1.5), Math.round(450 + 30 * 1.5), Math.round(540 + 30 * 1.5)]);
+  });
+
+  it('recusa, dizendo por quê, o modelo que não cabe na caixa do desenho ou a bancada sem origem', () => {
+    const fora = alinharPelasCoordenadas({ modelo: { origemPx: [0, 700], extensao: [0, 100, 1400, 700], pxPorMm: 2 }, desenho });
+    expect(fora.ok).toBe(false);
+    expect(fora.motivo).toMatch(/as origens não coincidem/);
+    expect(alinharPelasCoordenadas({ modelo: { origemPx: undefined, extensao: [0, 0, 1, 1], pxPorMm: 1 }, desenho }).motivo).toMatch(/não deu a origem/);
+  });
+
+  it('sobreposto, as duas imagens coincidem na origem em mm e não no centro das extensões', () => {
+    const linha = {
+      vista: 'esquerda', alinhamento: { tipo: 'coordenadas' },
+      modelo: { largura: 1000, altura: 500, extensao: [100, 100, 300, 200], pxPorMm: 1, origemPx: [100, 200] },
+      foto: { nome: 'f.svg', largura: 900, altura: 600, regiao: [400, 100, 800, 400], extensao: [450, 150, 750, 350], pxPorMm: 1, espelhar: false, regua: { px: 100, mm: 100 }, origemPx: [500, 300] },
+    };
+    const p = disporPrancha({ titulo: 't', linhas: [linha], disposicao: 'sobreposto' });
+    const [caixaM, caixaF] = p.operacoes.filter((o) => o.tipo === 'retangulo' && o.tracejado).map((o) => o.caixa);
+    /* modelo: de 0 a 200 mm à direita da origem; desenho: de -50 a 250 mm: o desenho começa 50 mm antes do modelo */
+    expect(Math.abs((caixaM[0] - caixaF[0]) - 50 * p.escala)).toBeLessThanOrEqual(1);
+    expect(p.linhas[0].alinhamento).toEqual({ tipo: 'coordenadas' });
+    const centrado = disporPrancha({ titulo: 't', linhas: [{ ...linha, alinhamento: { tipo: 'centro', motivo: 'sem origem' } }], disposicao: 'sobreposto' });
+    expect(centrado.linhas[0].alinhamento).toEqual({ tipo: 'centro', motivo: 'sem origem' });
+    expect(centrado.operacoes.some((o) => o.tipo === 'texto' && /centro das extensões \(sem origem\)/.test(o.texto))).toBe(true);
+  });
+
+  it('a imagem é larga o bastante para o título de cada metade, em lado e em sobreposto', () => {
+    const nome = `${'longo-'.repeat(40)}.svg`;
+    const linha = {
+      vista: 'esquerda',
+      modelo: { largura: 1000, altura: 500, extensao: [100, 100, 300, 200], pxPorMm: 1 },
+      foto: { nome, largura: 900, altura: 600, regiao: null, extensao: [450, 150, 750, 350], pxPorMm: 1, espelhar: false, regua: { px: 100, mm: 100 } },
+    };
+    for (const disposicao of ['lado', 'sobreposto']) {
+      const p = disporPrancha({ titulo: 't', linhas: [linha], disposicao });
+      const titulo = p.operacoes.filter((o) => o.tipo === 'texto' && o.texto.includes(nome)).sort((a, b) => b.texto.length - a.texto.length)[0];
+      expect(p.largura, disposicao).toBeGreaterThanOrEqual(titulo.em[0] + Math.ceil(titulo.texto.length * titulo.tamanho * 0.56));
+    }
   });
 });
