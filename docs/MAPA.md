@@ -604,7 +604,6 @@
 
 - `2026-11-08-ferramenta-de-material.md` — Ferramenta de material para o agente: ver, compor e reaproveitar materiais sem rodar a peça inteira
 - `2026-11-10-rebaixo-por-contorno.md` — Rebaixo por contorno: o degrau, o sulco e a borda rebaixada num corpo
-- `2026-11-14-leitura-por-partes.md` — Leitura por partes: a prancha e o esboço conferidos contra a referência, parte por parte
 - `2026-11-14-modelagem-de-carro.md` — Modelagem de carro de passeio: o que já serve, onde a carroceria travou antes e por onde começar
 - `2026-11-14-prancha-menos-manual.md` — Prancha menos manual: desvio medido, leitura combinada de um comando e o que ficou de fora declarado
 - `2026-11-16-cache-por-passo.md` — Cache por passo da receita: refazer só o que mudou, entre comandos, medido no laço de modelagem
@@ -648,6 +647,7 @@
 - `2026-08-25-modelador-inverso-priors-familia.md` — Modelador inverso com priors por família
 - `2026-09-10-carroceria-por-casca-deformavel.md` — Carroceria por casca deformável ajustada contra referência
 - `2026-09-17-vocabulario-poligonal-da-bancada.md` — Vocabulário poligonal da bancada
+- `2026-11-14-leitura-por-partes.md` — Leitura por partes: a prancha e o esboço conferidos contra a referência, parte por parte
 - `2026-11-14-modelagem-de-robo.md` — Modelagem de robô humanoide: o que já serve, o que falta na montagem e por onde começar
 - `README.md` — Planos congelados
 

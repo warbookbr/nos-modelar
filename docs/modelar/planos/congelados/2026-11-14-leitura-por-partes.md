@@ -1,6 +1,8 @@
 # Leitura por partes: a prancha e o esboço conferidos contra a referência, parte por parte
 
-**Estado:** ativo
+**Estado:** congelado
+
+Congelado pela pessoa em 2026-11-17, sem trabalho em curso desde a ativação, para dar o lugar de plano ativo às curvas lisas e à zebra numérica e à janela de abrir com filtros. Não foi refutado: a leitura da prancha e do esboço parte por parte continua valendo, e a outra rota é medir a lisura antes da forma. Volta à raiz e a `ativo` quando a pessoa pedir, do ponto em que estava (fatia 1 por fazer). Nada foi levado a outro plano; fica parada com ele a nota na skill `laco-de-modelagem` que o plano de comparar deixou para este.
 
 **Território:** `tools/modelar/leitura-por-regioes.mjs`, `tools/modelar/leitura-por-regioes.test.mjs`, `tools/fixtures/leitura-por-partes/`, `.claude/skills/desenhar-prancha/SKILL.md`, `.claude/skills/prancha-dos-contornos/SKILL.md`, `.claude/skills/esbocar-opcoes/SKILL.md`, `docs/modelar/usar/CONFERIR-CONTRA-REFERENCIA.md`, `.claude/skills/laco-de-modelagem/SKILL.md`.
 

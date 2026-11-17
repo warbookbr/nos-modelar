@@ -8,7 +8,7 @@
 
 **Repositório e base:** `warbookbr/nos-modelar`, main de 2026-11-14 com o ramo do carro.
 
-Pedido pela pessoa em 2026-11-14, depois da análise do que é manual no desenho da prancha. Espera o fechamento do plano da [leitura por partes](2026-11-14-leitura-por-partes.md), que tem no território `tools/modelar/leitura-por-regioes.mjs`.
+Pedido pela pessoa em 2026-11-14, depois da análise do que é manual no desenho da prancha. Espera o fechamento do plano da [leitura por partes](congelados/2026-11-14-leitura-por-partes.md), que tem no território `tools/modelar/leitura-por-regioes.mjs`.
 
 ## Problema observado
 
