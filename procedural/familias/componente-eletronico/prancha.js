@@ -66,6 +66,11 @@ const comBase = (v, base) => {
 /** As chamadas da família, uma por componente, com o material de cada elemento escolhido. */
 export const chamadas = (T = TABELA) => T.componentes.map(({ id, perfil, materiais }) => comMateriais(chamar(COMPONENTE_ELETRONICO, id, { perfil }), materiais));
 
+/* as chamadas de um componente: a dele e as que vão na mesma posição (`com`, como o dissipador atrás do TO-220) */
+const chamadasDoLugar = ({ id, perfil, materiais, com = [] }) => [{ id, perfil, materiais }, ...com]
+  .map((c) => comMateriais(chamar(COMPONENTE_ELETRONICO, c.id, { perfil: c.perfil }), c.materiais));
+
+/** Os passos da placa de fundo e dos componentes em fila; cada chamada soma uma base própria de 100 aos ids de origem. */
 export function gerarPassos(T = TABELA) {
   const passos = [
     ['cubo', { origemId: 1, larg: m(T.componentes.reduce((s, c) => s + c.largura, 0) + T.vao * (T.componentes.length - 1) + 2 * T.margem), alt: m(T.espessuraDaPlaca), prof: m(T.profundidadeDaPlaca), em: [0, m(-T.espessuraDaPlaca), 0] }],
@@ -74,25 +79,33 @@ export function gerarPassos(T = TABELA) {
     ['solido', { sel: { origem: { op: 'cubo', id: 1 } } }],
   ];
   const xs = posicoes(T);
-  chamadas(T).forEach((chamada, k) => {
-    const base = 100 * (k + 1);
-    const elementos = [];
-    for (const passo of expandirChamadasDeComposicao(familias().registroComposicoes, [chamada]).passos) {
-      const [op, args] = comBase(passo, base);
-      passos.push([op, args]);
-      if (op === 'parte') elementos.push(args.sel);
+  let base = 0;
+  T.componentes.forEach((componente, k) => {
+    for (const chamada of chamadasDoLugar(componente)) {
+      base += 100;
+      const elementos = [];
+      for (const passo of expandirChamadasDeComposicao(familias().registroComposicoes, [chamada]).passos) {
+        const [op, args] = comBase(passo, base);
+        passos.push([op, args]);
+        if (op === 'parte') elementos.push(args.sel);
+      }
+      for (const sel of elementos) passos.push(['transladar', { d: [m(xs[k]), 0, 0], sel }]);
     }
-    for (const sel of elementos) passos.push(['transladar', { d: [m(xs[k]), 0, 0], sel }]);
   });
   return passos;
 }
 
-const receita = {
-  meta: { nome: 'componente-eletronico/prancha', desc: 'prova da família componente-eletronico: resistor axial, eletrolítico radial, TO-220, DIP-8 e barra de 8 vias lado a lado numa placa' },
-  PARAMS: TABELA,
-  MATERIAIS,
+/** A receita de prova de uma tabela de componentes, com os materiais dela. */
+export const receitaDaPrancha = ({ nome, desc, tabela, materiais }) => ({
+  meta: { nome, desc }, PARAMS: tabela, MATERIAIS: materiais,
   TOPO: { origem: 'centro da face de cima da placa; y para cima, os componentes em fila ao longo de x' },
   get PASSOS() { return gerarPassos(this.PARAMS); },
-};
+});
+
+const receita = receitaDaPrancha({
+  nome: 'componente-eletronico/prancha',
+  desc: 'prova da família componente-eletronico: resistor axial, eletrolítico radial, TO-220, DIP-8 e barra de 8 vias lado a lado numa placa',
+  tabela: TABELA, materiais: MATERIAIS,
+});
 
 export default receita;

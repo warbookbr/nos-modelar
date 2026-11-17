@@ -4,7 +4,7 @@
   "versao": "1.0.0",
   "nivel": "componente",
   "parametros": {
-    "encapsulamento": { "tipo": "inteiro", "unidade": "contagem", "padrao": 1, "minimo": 1, "maximo": 5, "medio": 3 },
+    "encapsulamento": { "tipo": "inteiro", "unidade": "contagem", "padrao": 1, "minimo": 1, "maximo": 13, "medio": 7 },
     "pernaAbaixoDaPlaca": { "tipo": "numero", "unidade": "mm", "padrao": 3, "minimo": 1, "maximo": 6, "medio": 3.5 },
     "diametroDoFio": { "tipo": "numero", "unidade": "mm", "padrao": 0.6, "minimo": 0.4, "maximo": 1, "medio": 0.6 },
     "comprimentoDoResistor": { "tipo": "numero", "unidade": "mm", "padrao": 6.5, "minimo": 3.2, "maximo": 12, "medio": 6.5 },
@@ -30,7 +30,37 @@
     "fileirasDaBarra": { "tipo": "inteiro", "unidade": "contagem", "padrao": 1, "minimo": 1, "maximo": 2, "medio": 2 },
     "alturaDaBaseDaBarra": { "tipo": "numero", "unidade": "mm", "padrao": 2.5, "minimo": 2, "maximo": 3, "medio": 2.5 },
     "pinoAcimaDaBase": { "tipo": "numero", "unidade": "mm", "padrao": 6, "minimo": 3, "maximo": 12, "medio": 6 },
-    "ladoDoPinoDaBarra": { "tipo": "numero", "unidade": "mm", "padrao": 0.64, "minimo": 0.5, "maximo": 1, "medio": 0.64 }
+    "ladoDoPinoDaBarra": { "tipo": "numero", "unidade": "mm", "padrao": 0.64, "minimo": 0.5, "maximo": 1, "medio": 0.64 },
+    "diametroDoDisco": { "tipo": "numero", "unidade": "mm", "padrao": 5, "minimo": 5, "maximo": 14, "medio": 8 },
+    "espessuraDoDisco": { "tipo": "numero", "unidade": "mm", "padrao": 3.5, "minimo": 2.5, "maximo": 4, "medio": 3 },
+    "passoDoDisco": { "tipo": "numero", "unidade": "mm", "padrao": 5, "minimo": 2.5, "maximo": 7.5, "medio": 5 },
+    "afastamentoDoDisco": { "tipo": "numero", "unidade": "mm", "padrao": 2, "minimo": 1, "maximo": 6, "medio": 3 },
+    "diametroDoLED": { "tipo": "numero", "unidade": "mm", "padrao": 5, "minimo": 2.9, "maximo": 5, "medio": 3 },
+    "diametroDaBordaDoLED": { "tipo": "numero", "unidade": "mm", "padrao": 5.9, "minimo": 3.2, "maximo": 5.9, "medio": 4 },
+    "alturaDoLED": { "tipo": "numero", "unidade": "mm", "padrao": 8.6, "minimo": 4.9, "maximo": 8.85, "medio": 6 },
+    "afastamentoDoLED": { "tipo": "numero", "unidade": "mm", "padrao": 0, "minimo": 0, "maximo": 5, "medio": 2 },
+    "larguraDoTO92": { "tipo": "numero", "unidade": "mm", "padrao": 4.8, "minimo": 4.45, "maximo": 5.2, "medio": 4.8 },
+    "alturaDoTO92": { "tipo": "numero", "unidade": "mm", "padrao": 4.8, "minimo": 4.32, "maximo": 5.33, "medio": 4.8 },
+    "espessuraDoTO92": { "tipo": "numero", "unidade": "mm", "padrao": 3.7, "minimo": 3.18, "maximo": 4.19, "medio": 3.7 },
+    "afastamentoDoTO92": { "tipo": "numero", "unidade": "mm", "padrao": 2.75, "minimo": 1.5, "maximo": 4, "medio": 2.75 },
+    "pinosPorLadoDoSOIC": { "tipo": "inteiro", "unidade": "contagem", "padrao": 4, "minimo": 4, "maximo": 8, "medio": 7 },
+    "larguraDoCorpoDoSOIC": { "tipo": "numero", "unidade": "mm", "padrao": 3.9, "minimo": 3.8, "maximo": 4, "medio": 3.9 },
+    "larguraTotalDoSOIC": { "tipo": "numero", "unidade": "mm", "padrao": 6, "minimo": 5.8, "maximo": 6.2, "medio": 6 },
+    "alturaDoSOIC": { "tipo": "numero", "unidade": "mm", "padrao": 1.55, "minimo": 1.35, "maximo": 1.75, "medio": 1.55 },
+    "margemDoCorpoDoSOIC": { "tipo": "numero", "unidade": "mm", "padrao": 0.545, "minimo": 0.455, "maximo": 0.595, "medio": 0.515 },
+    "viasDoBorne": { "tipo": "inteiro", "unidade": "contagem", "padrao": 2, "minimo": 2, "maximo": 3, "medio": 3 },
+    "pinosPorFileiraDoModulo": { "tipo": "inteiro", "unidade": "contagem", "padrao": 8, "minimo": 2, "maximo": 20, "medio": 19 },
+    "fileiraDoModulo": { "tipo": "numero", "unidade": "mm", "padrao": 12.7, "minimo": 12.7, "maximo": 25.4, "medio": 25.4 },
+    "alturaDoEspacadorDoModulo": { "tipo": "numero", "unidade": "mm", "padrao": 2.5, "minimo": 2.5, "maximo": 8.5, "medio": 2.5 },
+    "comprimentoDoChipDoModulo": { "tipo": "numero", "unidade": "mm", "padrao": 5, "minimo": 3, "maximo": 25.5, "medio": 25.5 },
+    "larguraDoChipDoModulo": { "tipo": "numero", "unidade": "mm", "padrao": 5, "minimo": 3, "maximo": 18, "medio": 18 },
+    "alturaDoChipDoModulo": { "tipo": "numero", "unidade": "mm", "padrao": 0.9, "minimo": 0.5, "maximo": 3.1, "medio": 3.1 },
+    "deslocamentoDoChipDoModulo": { "tipo": "numero", "unidade": "mm", "padrao": 0, "minimo": 0, "maximo": 18, "medio": 17.42 },
+    "larguraDoDissipador": { "tipo": "numero", "unidade": "mm", "padrao": 25.4, "minimo": 19, "maximo": 30, "medio": 25.4 },
+    "alturaDoDissipador": { "tipo": "numero", "unidade": "mm", "padrao": 29.97, "minimo": 23, "maximo": 38, "medio": 29.97 },
+    "profundidadeDoDissipador": { "tipo": "numero", "unidade": "mm", "padrao": 12.7, "minimo": 11.5, "maximo": 19, "medio": 12.7 },
+    "espessuraDaChapaDoDissipador": { "tipo": "numero", "unidade": "mm", "padrao": 1.02, "minimo": 0.8, "maximo": 1.6, "medio": 1.02 },
+    "alturaDoFuroDoDissipador": { "tipo": "numero", "unidade": "mm", "padrao": 17.78, "minimo": 10, "maximo": 25, "medio": 17.78 }
   },
   "restricoes": [
     {
@@ -57,6 +87,46 @@
       "id": "pino-do-dip-encosta-no-corpo",
       "expressao": "fileiraDoDIP - larguraDoCorpoDoDIP <= 2.5",
       "motivo": "o ombro do pino do DIP vai do corpo à fileira; mais de 2,5 mm de vão é a fileira de 600 mil com o corpo de 300, que não existe: use o corpo largo com a fileira de 15,24"
+    },
+    {
+      "id": "terminais-dentro-do-disco",
+      "expressao": "passoDoDisco <= diametroDoDisco",
+      "motivo": "o terminal do disco sai de dentro do disco e, no passo maior que 35 % do diâmetro, dobra até o passo; com o passo maior que o diâmetro a dobra passaria da borda do disco: use um disco maior ou um passo menor"
+    },
+    {
+      "id": "dobra-do-disco-acima-da-placa",
+      "expressao": "passoDoDisco / 2 - 0.35 * diametroDoDisco + 1 <= afastamentoDoDisco",
+      "motivo": "a dobra de 45 graus do terminal do disco desce do disco até o passo antes do assento; com o disco baixo demais ela cairia abaixo da face da placa: afaste o disco da placa ou use um passo menor"
+    },
+    {
+      "id": "borda-do-led-maior-que-o-corpo",
+      "expressao": "diametroDoLED + 0.3 <= diametroDaBordaDoLED",
+      "motivo": "a borda do LED é mais larga que o corpo (3,2 no de 2,9 e 5,9 no de 5,0) e leva o chanfro do catodo; sem 0,3 mm de sobra não há borda nem chanfro"
+    },
+    {
+      "id": "domo-do-led-cabe-na-altura",
+      "expressao": "diametroDoLED / 2 + 1.5 <= alturaDoLED",
+      "motivo": "a altura do LED vai da base da borda ao topo do domo: a borda de 1,0, ao menos 0,5 de corpo reto e o domo de meio diâmetro; mais baixa que isso o domo entraria na borda"
+    },
+    {
+      "id": "chip-entre-as-fileiras-do-modulo",
+      "expressao": "larguraDoChipDoModulo + 1 <= fileiraDoModulo",
+      "motivo": "o componente de cima do módulo fica entre as duas fileiras de pinos, que passam 0,3 mm acima da placa filha; mais largo que a fileira ele cobriria os pinos"
+    },
+    {
+      "id": "chip-sobre-o-modulo-positivo",
+      "expressao": "deslocamentoDoChipDoModulo + comprimentoDoChipDoModulo / 2 <= 1.27 * pinosPorFileiraDoModulo + 7",
+      "motivo": "o componente de cima pode passar da ponta da placa filha (a antena do módulo do microcontrolador passa 6,04 mm), mas não mais de 7 mm"
+    },
+    {
+      "id": "chip-sobre-o-modulo-negativo",
+      "expressao": "comprimentoDoChipDoModulo / 2 - deslocamentoDoChipDoModulo <= 1.27 * pinosPorFileiraDoModulo + 7",
+      "motivo": "o componente de cima pode passar da ponta da placa filha (a antena do módulo do microcontrolador passa 6,04 mm), mas não mais de 7 mm"
+    },
+    {
+      "id": "furo-dentro-do-dissipador",
+      "expressao": "alturaDoFuroDoDissipador + 3 <= alturaDoDissipador",
+      "motivo": "o furo do parafuso da aba fica na chapa de trás do dissipador; acima disso ele sairia pelo topo: use um dissipador mais alto ou o furo mais baixo"
     }
   ],
   "portas": [],
@@ -64,17 +134,27 @@
   "perguntas": {
     "corpo": [
       "Cada componente se lê pelo encapsulamento: o resistor deitado com as pontas mais largas, o eletrolítico em pé com a borda do topo, o TO-220 em pé com a aba atrás, o DIP com o entalhe numa ponta e a barra com a base baixa?",
-      "O corpo tem cor própria, distinta da dos terminais e da aba metálica?"
+      "O corpo tem cor própria, distinta da dos terminais e da aba metálica?",
+      "O disco cerâmico fica em pé com a borda arredondada, o LED tem a borda na base com o chanfro do catodo, o TO-92 mostra a face plana na frente, o SOIC é baixo com a marca do pino 1, o borne mostra a boca do fio na frente e o jack a boca redonda na ponta?",
+      "O dissipador é um canal com a chapa de trás furada e as fendas nos dois flanges, e encosta nas costas da aba do TO-220?"
     ],
     "terminal": [
       "Os terminais do resistor saem pelo eixo do corpo, dobram num quarto de volta e descem retos, sem atravessar o corpo?",
-      "Os terminais do TO-220 e os pinos do DIP e da barra estão no passo de 2,54 mm, alinhados e todos do mesmo comprimento abaixo da placa?"
+      "Os terminais do TO-220 e os pinos do DIP e da barra estão no passo de 2,54 mm, alinhados e todos do mesmo comprimento abaixo da placa?",
+      "Os dois terminais de fora do TO-92 saem do corpo juntos e abrem até o passo de 2,54 antes da placa, e os do disco abrem até o passo dele sem passar da borda do disco?",
+      "Os pinos do SOIC saem do meio da altura do corpo e deitam o pé na placa, em asa de gaivota, e as aletas de solda do dissipador descem pela base dos flanges?"
     ],
     "faixa": [
       "As faixas do resistor contornam o corpo inteiro e a de tolerância fica separada das outras, na ponta da direita?"
     ],
     "marca": [
       "A faixa de polaridade do eletrolítico fica do lado do terminal negativo e o topo mostra o disco com o vinco em cruz?"
+    ],
+    "parafuso": [
+      "Cada via do borne tem o parafuso de fenda dentro do poço do topo, acima da boca do fio?"
+    ],
+    "placa-filha": [
+      "O módulo de placa é uma placa filha fina sobre as duas barras de pinos, com o componente principal em cima e os pinos passando pela placa de baixo?"
     ]
   },
   "perfis": {
@@ -101,6 +181,58 @@
     "barra-1x8": {
       "descricao": "Barra de pinos macho de 2,54 mm, uma fileira de 8 vias, base de 2,5 mm e pino de 0,64 mm com 6 mm acima da base.",
       "parametros": { "encapsulamento": 5, "viasDaBarra": 8, "fileirasDaBarra": 1, "alturaDaBaseDaBarra": 2.5, "pinoAcimaDaBase": 6, "ladoDoPinoDaBarra": 0.64 }
+    },
+    "to-220-no-dissipador": {
+      "descricao": "O mesmo TO-220 a 5,38 mm da placa, com o furo da aba a 17,78 mm dela, na altura do furo do dissipador em canal.",
+      "parametros": { "encapsulamento": 3, "larguraDoTO220": 10, "alturaDoCorpoTO220": 9, "espessuraDoTO220": 4.5, "alturaDaAba": 6.2, "afastamentoDoTO220": 5.38 }
+    },
+    "ceramico-disco-5": {
+      "descricao": "Capacitor cerâmico de disco de 5 mm de diâmetro e até 3,5 mm de espessura, fio de 0,6 mm no passo de 5,0 mm, dobrado até o passo.",
+      "parametros": { "encapsulamento": 6, "diametroDoDisco": 5, "espessuraDoDisco": 3.5, "passoDoDisco": 5, "diametroDoFio": 0.6, "afastamentoDoDisco": 2 }
+    },
+    "led-3": {
+      "descricao": "LED T-1 de 3 mm: domo de 2,9, borda de 3,2, 5,4 mm de altura, encostado na placa.",
+      "parametros": { "encapsulamento": 7, "diametroDoLED": 2.9, "diametroDaBordaDoLED": 3.2, "alturaDoLED": 5.4, "afastamentoDoLED": 0 }
+    },
+    "led-5": {
+      "descricao": "LED T-1 3/4 de 5 mm: domo de 5,0, borda de 5,9, 8,6 mm de altura, encostado na placa.",
+      "parametros": { "encapsulamento": 7, "diametroDoLED": 5, "diametroDaBordaDoLED": 5.9, "alturaDoLED": 8.6, "afastamentoDoLED": 0 }
+    },
+    "to-92": {
+      "descricao": "Transistor ou regulador pequeno em TO-92 com os terminais dobrados para o passo de 2,54, a 2,75 mm da placa.",
+      "parametros": { "encapsulamento": 8, "larguraDoTO92": 4.8, "alturaDoTO92": 4.8, "espessuraDoTO92": 3.7, "afastamentoDoTO92": 2.75 }
+    },
+    "soic-8": {
+      "descricao": "Circuito integrado em SOIC de 8 pinos (MS-012 AA): corpo de 4,9 por 3,9 mm, 6,0 mm de ponta a ponta dos pés.",
+      "parametros": { "encapsulamento": 9, "pinosPorLadoDoSOIC": 4, "larguraDoCorpoDoSOIC": 3.9, "larguraTotalDoSOIC": 6, "alturaDoSOIC": 1.55, "margemDoCorpoDoSOIC": 0.545 }
+    },
+    "soic-16": {
+      "descricao": "Circuito integrado em SOIC de 16 pinos (MS-012 AC): corpo de 9,9 por 3,9 mm.",
+      "parametros": { "encapsulamento": 9, "pinosPorLadoDoSOIC": 8, "larguraDoCorpoDoSOIC": 3.9, "larguraTotalDoSOIC": 6, "alturaDoSOIC": 1.55, "margemDoCorpoDoSOIC": 0.505 }
+    },
+    "borne-2-vias": {
+      "descricao": "Borne de parafuso de duas vias no passo de 5,08 mm, 9,8 de fundo e 13,8 de altura.",
+      "parametros": { "encapsulamento": 10, "viasDoBorne": 2 }
+    },
+    "borne-3-vias": {
+      "descricao": "Borne de parafuso de três vias no passo de 5,08 mm.",
+      "parametros": { "encapsulamento": 10, "viasDoBorne": 3 }
+    },
+    "jack-de-alimentacao": {
+      "descricao": "Jack de alimentação de pino de 2,0 mm em ângulo reto: corpo de 9,0 por 11,0 por 14,4, boca de 6,5, três terminais.",
+      "parametros": { "encapsulamento": 11 }
+    },
+    "modulo-driver-de-passo": {
+      "descricao": "Placa portadora do driver de passo: 20,3 por 15,2 mm, duas fileiras de oito pinos a 12,7 mm, o driver em QFN de 5 por 5 por 0,9 no meio.",
+      "parametros": { "encapsulamento": 12, "pinosPorFileiraDoModulo": 8, "fileiraDoModulo": 12.7, "alturaDoEspacadorDoModulo": 2.5, "comprimentoDoChipDoModulo": 5, "larguraDoChipDoModulo": 5, "alturaDoChipDoModulo": 0.9, "deslocamentoDoChipDoModulo": 0 }
+    },
+    "modulo-microcontrolador": {
+      "descricao": "Placa de desenvolvimento do microcontrolador: 48,26 por 27,94 mm, duas fileiras de 19 pinos a 25,4 mm, o módulo de 25,5 por 18 por 3,1 passando 6,04 mm da ponta.",
+      "parametros": { "encapsulamento": 12, "pinosPorFileiraDoModulo": 19, "fileiraDoModulo": 25.4, "alturaDoEspacadorDoModulo": 2.5, "comprimentoDoChipDoModulo": 25.5, "larguraDoChipDoModulo": 18, "alturaDoChipDoModulo": 3.1, "deslocamentoDoChipDoModulo": 17.42 }
+    },
+    "dissipador-to-220": {
+      "descricao": "Dissipador em canal para TO-220: 25,4 de largura, 29,97 de altura, 12,7 de fundo, chapa de 1,02, furo a 17,78 da base; com o TO-220 de mesma espessura, encosta nas costas da aba.",
+      "parametros": { "encapsulamento": 13, "larguraDoDissipador": 25.4, "alturaDoDissipador": 29.97, "profundidadeDoDissipador": 12.7, "espessuraDaChapaDoDissipador": 1.02, "alturaDoFuroDoDissipador": 17.78, "espessuraDoTO220": 4.5 }
     }
   }
 }

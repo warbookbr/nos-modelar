@@ -1,10 +1,12 @@
 /* index.js — a família `componente-eletronico` carregada: o contrato `familia.json`, as composições e o `derivar`, e a
    escolha de material por peça.
 
-   Componentes de furo passante pelo encapsulamento, no referencial da placa (y = 0 na face de cima, os terminais descendo
-   abaixo dela, o centro dos furos em x = z = 0): o resistor axial deitado com as faixas de cor, o eletrolítico radial em pé
-   com a faixa de polaridade e o topo marcado, o TO-220 em pé com a aba furada, o DIP com o entalhe do pino 1 e a barra de
-   pinos de uma ou duas fileiras. As medidas são as típicas de cada encapsulamento, como estimativa (`geometria.js` e
+   Componentes pelo encapsulamento, no referencial da placa (y = 0 na face de cima, os terminais descendo abaixo dela, o
+   centro dos furos em x = z = 0): o resistor axial deitado com as faixas de cor, o eletrolítico radial em pé com a faixa de
+   polaridade e o topo marcado, o TO-220 em pé com a aba furada, o DIP com o entalhe do pino 1, a barra de pinos de uma ou
+   duas fileiras, o capacitor cerâmico de disco, o LED de 3 e 5 mm, o TO-92, o SOIC de montagem em superfície, o borne de
+   parafuso de 2 e 3 vias, o jack de alimentação, o módulo de placa (a placa filha com pinos) e o dissipador em canal do
+   TO-220, no referencial do TO-220 (`outros-encapsulamentos.js`). As medidas são as típicas de cada encapsulamento, como estimativa (`geometria.js` e
    `familia.json` dizem a fonte de cada uma). Cada elemento sai com parte e material próprios. */
 import contratoJson from './familia.json' with { type: 'json' };
 import { definirFamilia } from '../../../src/autoria/chamar-familia.js';
@@ -21,11 +23,14 @@ export const COMPONENTE_ELETRONICO = Object.freeze(definirFamilia({
 }));
 
 /* a escolha de material da receita, pelo nome curto do elemento; `faixas` é a lista das cores do resistor, da primeira à última */
-const ESCOLHAS = Object.freeze({ corpo: 'materialDoCorpo', terminal: 'materialDoTerminal', marca: 'materialDaMarca', topo: 'materialDoTopo', aba: 'materialDaAba' });
+const ESCOLHAS = Object.freeze({
+  corpo: 'materialDoCorpo', terminal: 'materialDoTerminal', marca: 'materialDaMarca', topo: 'materialDoTopo', aba: 'materialDaAba',
+  parafuso: 'materialDoParafuso', placa: 'materialDaPlaca', chip: 'materialDoChip',
+});
 
 /**
  * A chamada `chamada` (de `chamar`) com o material de cada elemento escolhido pela receita: `{ corpo, terminal, marca, topo, aba,
- * faixas: [...] }`, cada valor um nome de `MATERIAIS` da receita. Recusa o elemento que a variante chamada não tem e a lista de
+ * parafuso, placa, chip, faixas: [...] }`, cada valor um nome de `MATERIAIS` da receita. Recusa o elemento que a variante chamada não tem e a lista de
  * faixas de tamanho diferente do número de faixas do resistor. O que a receita não escolhe fica no padrão (`MATERIAIS_PADRAO`).
  */
 export function comMateriais(chamada, escolha = {}) {

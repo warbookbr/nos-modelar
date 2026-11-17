@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2019 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2021 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -916,6 +916,8 @@
 - `derivar.js` — derivar.js — dos parâmetros do componente eletrônico (milímetro) à chamada de composição (metro).
 - `geometria.js` — geometria.js — as constantes de construção da família `componente-eletronico` e as contas puras em milímetro.
 - `index.js` — index.js — a família `componente-eletronico` carregada: o contrato `familia.json`, as composições e o `derivar`, e a escolha de material por peça.
+- `outros-encapsulamentos.js` — outros-encapsulamentos.js — os passos dos encapsulamentos da fatia 2 da família `componente-eletronico`: o capacitor cerâmico de disco, o LED de 3 e 5 mm, o …
+- `prancha-2.js` — prancha-2.js — a peça de prova da fatia 2 da família `componente-eletronico`: os encapsulamentos restantes e o dissipador lado a lado numa placa, para a pran…
 - `prancha.js` — prancha.js — a peça de prova da família `componente-eletronico`: os cinco encapsulamentos da fatia 1 lado a lado numa placa, para a prancha que a pessoa apro…
 
 ## procedural/familias/dobradica/

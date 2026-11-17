@@ -7,110 +7,212 @@
     "pontos": {
       "minimo": {
         "parametros": {
+          "afastamentoDoDisco": 1,
+          "afastamentoDoLED": 0,
           "afastamentoDoTO220": 0,
+          "afastamentoDoTO92": 1.5,
           "alturaDaAba": 5.5,
           "alturaDaBaseDaBarra": 2,
           "alturaDoCapacitor": 5,
+          "alturaDoChipDoModulo": 0.5,
           "alturaDoCorpoDoDIP": 2.9,
           "alturaDoCorpoTO220": 8.4,
+          "alturaDoDissipador": 23,
+          "alturaDoEspacadorDoModulo": 2.5,
+          "alturaDoFuroDoDissipador": 10,
+          "alturaDoLED": 4.9,
+          "alturaDoSOIC": 1.35,
+          "alturaDoTO92": 4.32,
+          "comprimentoDoChipDoModulo": 3,
           "comprimentoDoResistor": 3.2,
+          "deslocamentoDoChipDoModulo": 0,
+          "diametroDaBordaDoLED": 3.2,
           "diametroDoCapacitor": 4,
+          "diametroDoDisco": 5,
           "diametroDoFio": 0.4,
           "diametroDoFuroDaAba": 3.5,
+          "diametroDoLED": 2.9,
           "diametroDoResistor": 1.6,
           "encapsulamento": 1,
           "espessuraDaAba": 1.15,
+          "espessuraDaChapaDoDissipador": 0.8,
+          "espessuraDoDisco": 2.5,
           "espessuraDoTO220": 4.2,
+          "espessuraDoTO92": 3.18,
           "faixasDoResistor": 4,
           "fileiraDoDIP": 7.62,
+          "fileiraDoModulo": 12.7,
           "fileirasDaBarra": 1,
           "ladoDoPinoDaBarra": 0.5,
+          "larguraDoChipDoModulo": 3,
           "larguraDoCorpoDoDIP": 6.1,
+          "larguraDoCorpoDoSOIC": 3.8,
+          "larguraDoDissipador": 19,
           "larguraDoTO220": 9.6,
+          "larguraDoTO92": 4.45,
+          "larguraTotalDoSOIC": 5.8,
           "margemDoCorpoDoDIP": 0.5,
+          "margemDoCorpoDoSOIC": 0.455,
           "passoDoCapacitor": 1.5,
+          "passoDoDisco": 2.5,
           "passoDoResistor": 7.62,
           "pernaAbaixoDaPlaca": 1,
           "pinoAcimaDaBase": 3,
+          "pinosPorFileiraDoModulo": 2,
           "pinosPorLadoDoDIP": 4,
-          "viasDaBarra": 1
+          "pinosPorLadoDoSOIC": 4,
+          "profundidadeDoDissipador": 11.5,
+          "viasDaBarra": 1,
+          "viasDoBorne": 2
         },
         "hash": "sha256:35b93fa98ab8b939627d14430754520db8aede82cc8a1fae9022ddb00d1e4763",
         "medidas": []
       },
       "medio": {
         "parametros": {
+          "afastamentoDoDisco": 3,
+          "afastamentoDoLED": 2,
           "afastamentoDoTO220": 3,
+          "afastamentoDoTO92": 2.75,
           "alturaDaAba": 6.2,
           "alturaDaBaseDaBarra": 2.5,
           "alturaDoCapacitor": 12,
+          "alturaDoChipDoModulo": 3.1,
           "alturaDoCorpoDoDIP": 3.3,
           "alturaDoCorpoTO220": 9,
+          "alturaDoDissipador": 29.97,
+          "alturaDoEspacadorDoModulo": 2.5,
+          "alturaDoFuroDoDissipador": 17.78,
+          "alturaDoLED": 6,
+          "alturaDoSOIC": 1.55,
+          "alturaDoTO92": 4.8,
+          "comprimentoDoChipDoModulo": 25.5,
           "comprimentoDoResistor": 6.5,
+          "deslocamentoDoChipDoModulo": 17.42,
+          "diametroDaBordaDoLED": 4,
           "diametroDoCapacitor": 8,
+          "diametroDoDisco": 8,
           "diametroDoFio": 0.6,
           "diametroDoFuroDaAba": 3.7,
+          "diametroDoLED": 3,
           "diametroDoResistor": 2.5,
-          "encapsulamento": 3,
+          "encapsulamento": 7,
           "espessuraDaAba": 1.3,
+          "espessuraDaChapaDoDissipador": 1.02,
+          "espessuraDoDisco": 3,
           "espessuraDoTO220": 4.6,
+          "espessuraDoTO92": 3.7,
           "faixasDoResistor": 5,
           "fileiraDoDIP": 7.62,
+          "fileiraDoModulo": 25.4,
           "fileirasDaBarra": 2,
           "ladoDoPinoDaBarra": 0.64,
+          "larguraDoChipDoModulo": 18,
           "larguraDoCorpoDoDIP": 6.35,
+          "larguraDoCorpoDoSOIC": 3.9,
+          "larguraDoDissipador": 25.4,
           "larguraDoTO220": 10.2,
+          "larguraDoTO92": 4.8,
+          "larguraTotalDoSOIC": 6,
           "margemDoCorpoDoDIP": 0.9,
+          "margemDoCorpoDoSOIC": 0.515,
           "passoDoCapacitor": 3.5,
+          "passoDoDisco": 5,
           "passoDoResistor": 12.7,
           "pernaAbaixoDaPlaca": 3.5,
           "pinoAcimaDaBase": 6,
+          "pinosPorFileiraDoModulo": 19,
           "pinosPorLadoDoDIP": 7,
-          "viasDaBarra": 20
+          "pinosPorLadoDoSOIC": 7,
+          "profundidadeDoDissipador": 12.7,
+          "viasDaBarra": 20,
+          "viasDoBorne": 3
         },
-        "hash": "sha256:7daf903440a20720e3448ce938c84cdfc04d04dd2e5f1296eb1e401a66cc1cfb",
+        "hash": "sha256:5762e6468c2761c06ebe5f9c41ba08bb233cae5a1a8369880a507e4705ff9850",
         "medidas": []
       },
       "maximo": {
         "parametros": {
+          "afastamentoDoDisco": 6,
+          "afastamentoDoLED": 5,
           "afastamentoDoTO220": 6,
+          "afastamentoDoTO92": 4,
           "alturaDaAba": 7,
           "alturaDaBaseDaBarra": 3,
           "alturaDoCapacitor": 40,
+          "alturaDoChipDoModulo": 3.1,
           "alturaDoCorpoDoDIP": 5,
           "alturaDoCorpoTO220": 9.5,
+          "alturaDoDissipador": 38,
+          "alturaDoEspacadorDoModulo": 8.5,
+          "alturaDoFuroDoDissipador": 25,
+          "alturaDoLED": 8.85,
+          "alturaDoSOIC": 1.75,
+          "alturaDoTO92": 5.33,
+          "comprimentoDoChipDoModulo": 25.5,
           "comprimentoDoResistor": 12,
+          "deslocamentoDoChipDoModulo": 18,
+          "diametroDaBordaDoLED": 5.9,
           "diametroDoCapacitor": 18,
+          "diametroDoDisco": 14,
           "diametroDoFio": 1,
           "diametroDoFuroDaAba": 3.9,
+          "diametroDoLED": 5,
           "diametroDoResistor": 4.5,
-          "encapsulamento": 5,
+          "encapsulamento": 13,
           "espessuraDaAba": 1.4,
+          "espessuraDaChapaDoDissipador": 1.6,
+          "espessuraDoDisco": 4,
           "espessuraDoTO220": 4.8,
+          "espessuraDoTO92": 4.19,
           "faixasDoResistor": 5,
           "fileiraDoDIP": 15.24,
+          "fileiraDoModulo": 25.4,
           "fileirasDaBarra": 2,
           "ladoDoPinoDaBarra": 1,
+          "larguraDoChipDoModulo": 18,
           "larguraDoCorpoDoDIP": 14.7,
+          "larguraDoCorpoDoSOIC": 4,
+          "larguraDoDissipador": 30,
           "larguraDoTO220": 10.7,
+          "larguraDoTO92": 5.2,
+          "larguraTotalDoSOIC": 6.2,
           "margemDoCorpoDoDIP": 2.2,
+          "margemDoCorpoDoSOIC": 0.595,
           "passoDoCapacitor": 7.5,
+          "passoDoDisco": 7.5,
           "passoDoResistor": 25.4,
           "pernaAbaixoDaPlaca": 6,
           "pinoAcimaDaBase": 12,
+          "pinosPorFileiraDoModulo": 20,
           "pinosPorLadoDoDIP": 20,
-          "viasDaBarra": 40
+          "pinosPorLadoDoSOIC": 8,
+          "profundidadeDoDissipador": 19,
+          "viasDaBarra": 40,
+          "viasDoBorne": 3
         },
-        "hash": "sha256:88b45c673ed465c18da8fc6012287c076209f62bd9315550b5c9a2834acc24ae",
+        "hash": "sha256:e83c974bb9b3ff199d95f96eb76aa3967967e4f39b5aa10394f5bb2e95bf551a",
         "medidas": []
       }
     },
     "varredura": {
-      "sondas": 54,
+      "sondas": 114,
       "recusasDeclaradas": [
+        {
+          "ponto": "afastamentoDoDisco=1",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
         {
           "ponto": "comprimentoDoResistor=12",
           "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "deslocamentoDoChipDoModulo=18",
+          "restricao": "chip-sobre-o-modulo-positivo"
+        },
+        {
+          "ponto": "diametroDaBordaDoLED=3.2",
+          "restricao": "borda-do-led-maior-que-o-corpo"
         },
         {
           "ponto": "diametroDoCapacitor=4",
@@ -121,12 +223,20 @@
           "restricao": "pino-do-dip-encosta-no-corpo"
         },
         {
+          "ponto": "larguraDoChipDoModulo=18",
+          "restricao": "chip-entre-as-fileiras-do-modulo"
+        },
+        {
           "ponto": "larguraDoCorpoDoDIP=14.7",
           "restricao": "pino-do-dip-sai-do-corpo"
         },
         {
           "ponto": "passoDoCapacitor=7.5",
           "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "passoDoDisco=7.5",
+          "restricao": "dobra-do-disco-acima-da-placa"
         },
         {
           "ponto": "passoDoResistor=7.62",
@@ -138,209 +248,1220 @@
     "perfis": {
       "barra-1x8": {
         "parametros": {
+          "afastamentoDoDisco": 2,
+          "afastamentoDoLED": 0,
           "afastamentoDoTO220": 2.5,
+          "afastamentoDoTO92": 2.75,
           "alturaDaAba": 6.2,
           "alturaDaBaseDaBarra": 2.5,
           "alturaDoCapacitor": 11,
+          "alturaDoChipDoModulo": 0.9,
           "alturaDoCorpoDoDIP": 3.3,
           "alturaDoCorpoTO220": 9,
+          "alturaDoDissipador": 29.97,
+          "alturaDoEspacadorDoModulo": 2.5,
+          "alturaDoFuroDoDissipador": 17.78,
+          "alturaDoLED": 8.6,
+          "alturaDoSOIC": 1.55,
+          "alturaDoTO92": 4.8,
+          "comprimentoDoChipDoModulo": 5,
           "comprimentoDoResistor": 6.5,
+          "deslocamentoDoChipDoModulo": 0,
+          "diametroDaBordaDoLED": 5.9,
           "diametroDoCapacitor": 6.3,
+          "diametroDoDisco": 5,
           "diametroDoFio": 0.6,
           "diametroDoFuroDaAba": 3.7,
+          "diametroDoLED": 5,
           "diametroDoResistor": 2.3,
           "encapsulamento": 5,
           "espessuraDaAba": 1.3,
+          "espessuraDaChapaDoDissipador": 1.02,
+          "espessuraDoDisco": 3.5,
           "espessuraDoTO220": 4.5,
+          "espessuraDoTO92": 3.7,
           "faixasDoResistor": 4,
           "fileiraDoDIP": 7.62,
+          "fileiraDoModulo": 12.7,
           "fileirasDaBarra": 1,
           "ladoDoPinoDaBarra": 0.64,
+          "larguraDoChipDoModulo": 5,
           "larguraDoCorpoDoDIP": 6.35,
+          "larguraDoCorpoDoSOIC": 3.9,
+          "larguraDoDissipador": 25.4,
           "larguraDoTO220": 10,
+          "larguraDoTO92": 4.8,
+          "larguraTotalDoSOIC": 6,
           "margemDoCorpoDoDIP": 0.8,
+          "margemDoCorpoDoSOIC": 0.545,
           "passoDoCapacitor": 2.5,
+          "passoDoDisco": 5,
           "passoDoResistor": 10.16,
           "pernaAbaixoDaPlaca": 3,
           "pinoAcimaDaBase": 6,
+          "pinosPorFileiraDoModulo": 8,
           "pinosPorLadoDoDIP": 4,
-          "viasDaBarra": 8
+          "pinosPorLadoDoSOIC": 4,
+          "profundidadeDoDissipador": 12.7,
+          "viasDaBarra": 8,
+          "viasDoBorne": 2
         },
         "hash": "sha256:b00ca1815e6f524608828b5875b9d64a60f9ae707fb73ded67070246dcf3637e",
         "medidas": []
       },
-      "dip-40": {
+      "borne-2-vias": {
         "parametros": {
+          "afastamentoDoDisco": 2,
+          "afastamentoDoLED": 0,
           "afastamentoDoTO220": 2.5,
+          "afastamentoDoTO92": 2.75,
           "alturaDaAba": 6.2,
           "alturaDaBaseDaBarra": 2.5,
           "alturaDoCapacitor": 11,
-          "alturaDoCorpoDoDIP": 3.8,
+          "alturaDoChipDoModulo": 0.9,
+          "alturaDoCorpoDoDIP": 3.3,
           "alturaDoCorpoTO220": 9,
+          "alturaDoDissipador": 29.97,
+          "alturaDoEspacadorDoModulo": 2.5,
+          "alturaDoFuroDoDissipador": 17.78,
+          "alturaDoLED": 8.6,
+          "alturaDoSOIC": 1.55,
+          "alturaDoTO92": 4.8,
+          "comprimentoDoChipDoModulo": 5,
           "comprimentoDoResistor": 6.5,
+          "deslocamentoDoChipDoModulo": 0,
+          "diametroDaBordaDoLED": 5.9,
           "diametroDoCapacitor": 6.3,
+          "diametroDoDisco": 5,
           "diametroDoFio": 0.6,
           "diametroDoFuroDaAba": 3.7,
+          "diametroDoLED": 5,
           "diametroDoResistor": 2.3,
-          "encapsulamento": 4,
+          "encapsulamento": 10,
           "espessuraDaAba": 1.3,
+          "espessuraDaChapaDoDissipador": 1.02,
+          "espessuraDoDisco": 3.5,
           "espessuraDoTO220": 4.5,
+          "espessuraDoTO92": 3.7,
           "faixasDoResistor": 4,
-          "fileiraDoDIP": 15.24,
+          "fileiraDoDIP": 7.62,
+          "fileiraDoModulo": 12.7,
           "fileirasDaBarra": 1,
           "ladoDoPinoDaBarra": 0.64,
-          "larguraDoCorpoDoDIP": 13.7,
+          "larguraDoChipDoModulo": 5,
+          "larguraDoCorpoDoDIP": 6.35,
+          "larguraDoCorpoDoSOIC": 3.9,
+          "larguraDoDissipador": 25.4,
           "larguraDoTO220": 10,
-          "margemDoCorpoDoDIP": 1.9,
+          "larguraDoTO92": 4.8,
+          "larguraTotalDoSOIC": 6,
+          "margemDoCorpoDoDIP": 0.8,
+          "margemDoCorpoDoSOIC": 0.545,
           "passoDoCapacitor": 2.5,
+          "passoDoDisco": 5,
           "passoDoResistor": 10.16,
           "pernaAbaixoDaPlaca": 3,
           "pinoAcimaDaBase": 6,
+          "pinosPorFileiraDoModulo": 8,
+          "pinosPorLadoDoDIP": 4,
+          "pinosPorLadoDoSOIC": 4,
+          "profundidadeDoDissipador": 12.7,
+          "viasDaBarra": 8,
+          "viasDoBorne": 2
+        },
+        "hash": "sha256:bc1e21f71c5e633405e5dd6452951119c31b1c9342b0b6d1d50d34ef95169e3e",
+        "medidas": []
+      },
+      "borne-3-vias": {
+        "parametros": {
+          "afastamentoDoDisco": 2,
+          "afastamentoDoLED": 0,
+          "afastamentoDoTO220": 2.5,
+          "afastamentoDoTO92": 2.75,
+          "alturaDaAba": 6.2,
+          "alturaDaBaseDaBarra": 2.5,
+          "alturaDoCapacitor": 11,
+          "alturaDoChipDoModulo": 0.9,
+          "alturaDoCorpoDoDIP": 3.3,
+          "alturaDoCorpoTO220": 9,
+          "alturaDoDissipador": 29.97,
+          "alturaDoEspacadorDoModulo": 2.5,
+          "alturaDoFuroDoDissipador": 17.78,
+          "alturaDoLED": 8.6,
+          "alturaDoSOIC": 1.55,
+          "alturaDoTO92": 4.8,
+          "comprimentoDoChipDoModulo": 5,
+          "comprimentoDoResistor": 6.5,
+          "deslocamentoDoChipDoModulo": 0,
+          "diametroDaBordaDoLED": 5.9,
+          "diametroDoCapacitor": 6.3,
+          "diametroDoDisco": 5,
+          "diametroDoFio": 0.6,
+          "diametroDoFuroDaAba": 3.7,
+          "diametroDoLED": 5,
+          "diametroDoResistor": 2.3,
+          "encapsulamento": 10,
+          "espessuraDaAba": 1.3,
+          "espessuraDaChapaDoDissipador": 1.02,
+          "espessuraDoDisco": 3.5,
+          "espessuraDoTO220": 4.5,
+          "espessuraDoTO92": 3.7,
+          "faixasDoResistor": 4,
+          "fileiraDoDIP": 7.62,
+          "fileiraDoModulo": 12.7,
+          "fileirasDaBarra": 1,
+          "ladoDoPinoDaBarra": 0.64,
+          "larguraDoChipDoModulo": 5,
+          "larguraDoCorpoDoDIP": 6.35,
+          "larguraDoCorpoDoSOIC": 3.9,
+          "larguraDoDissipador": 25.4,
+          "larguraDoTO220": 10,
+          "larguraDoTO92": 4.8,
+          "larguraTotalDoSOIC": 6,
+          "margemDoCorpoDoDIP": 0.8,
+          "margemDoCorpoDoSOIC": 0.545,
+          "passoDoCapacitor": 2.5,
+          "passoDoDisco": 5,
+          "passoDoResistor": 10.16,
+          "pernaAbaixoDaPlaca": 3,
+          "pinoAcimaDaBase": 6,
+          "pinosPorFileiraDoModulo": 8,
+          "pinosPorLadoDoDIP": 4,
+          "pinosPorLadoDoSOIC": 4,
+          "profundidadeDoDissipador": 12.7,
+          "viasDaBarra": 8,
+          "viasDoBorne": 3
+        },
+        "hash": "sha256:f593f83f4d0552ae1906ba9fdd4b0b706ee66e27254d7a94cb6c604e982eccca",
+        "medidas": []
+      },
+      "ceramico-disco-5": {
+        "parametros": {
+          "afastamentoDoDisco": 2,
+          "afastamentoDoLED": 0,
+          "afastamentoDoTO220": 2.5,
+          "afastamentoDoTO92": 2.75,
+          "alturaDaAba": 6.2,
+          "alturaDaBaseDaBarra": 2.5,
+          "alturaDoCapacitor": 11,
+          "alturaDoChipDoModulo": 0.9,
+          "alturaDoCorpoDoDIP": 3.3,
+          "alturaDoCorpoTO220": 9,
+          "alturaDoDissipador": 29.97,
+          "alturaDoEspacadorDoModulo": 2.5,
+          "alturaDoFuroDoDissipador": 17.78,
+          "alturaDoLED": 8.6,
+          "alturaDoSOIC": 1.55,
+          "alturaDoTO92": 4.8,
+          "comprimentoDoChipDoModulo": 5,
+          "comprimentoDoResistor": 6.5,
+          "deslocamentoDoChipDoModulo": 0,
+          "diametroDaBordaDoLED": 5.9,
+          "diametroDoCapacitor": 6.3,
+          "diametroDoDisco": 5,
+          "diametroDoFio": 0.6,
+          "diametroDoFuroDaAba": 3.7,
+          "diametroDoLED": 5,
+          "diametroDoResistor": 2.3,
+          "encapsulamento": 6,
+          "espessuraDaAba": 1.3,
+          "espessuraDaChapaDoDissipador": 1.02,
+          "espessuraDoDisco": 3.5,
+          "espessuraDoTO220": 4.5,
+          "espessuraDoTO92": 3.7,
+          "faixasDoResistor": 4,
+          "fileiraDoDIP": 7.62,
+          "fileiraDoModulo": 12.7,
+          "fileirasDaBarra": 1,
+          "ladoDoPinoDaBarra": 0.64,
+          "larguraDoChipDoModulo": 5,
+          "larguraDoCorpoDoDIP": 6.35,
+          "larguraDoCorpoDoSOIC": 3.9,
+          "larguraDoDissipador": 25.4,
+          "larguraDoTO220": 10,
+          "larguraDoTO92": 4.8,
+          "larguraTotalDoSOIC": 6,
+          "margemDoCorpoDoDIP": 0.8,
+          "margemDoCorpoDoSOIC": 0.545,
+          "passoDoCapacitor": 2.5,
+          "passoDoDisco": 5,
+          "passoDoResistor": 10.16,
+          "pernaAbaixoDaPlaca": 3,
+          "pinoAcimaDaBase": 6,
+          "pinosPorFileiraDoModulo": 8,
+          "pinosPorLadoDoDIP": 4,
+          "pinosPorLadoDoSOIC": 4,
+          "profundidadeDoDissipador": 12.7,
+          "viasDaBarra": 8,
+          "viasDoBorne": 2
+        },
+        "hash": "sha256:8fa34380f8663df0a34cafc313b826f105a9f60dd0e140ae0a45692c09d2a872",
+        "medidas": []
+      },
+      "dip-40": {
+        "parametros": {
+          "afastamentoDoDisco": 2,
+          "afastamentoDoLED": 0,
+          "afastamentoDoTO220": 2.5,
+          "afastamentoDoTO92": 2.75,
+          "alturaDaAba": 6.2,
+          "alturaDaBaseDaBarra": 2.5,
+          "alturaDoCapacitor": 11,
+          "alturaDoChipDoModulo": 0.9,
+          "alturaDoCorpoDoDIP": 3.8,
+          "alturaDoCorpoTO220": 9,
+          "alturaDoDissipador": 29.97,
+          "alturaDoEspacadorDoModulo": 2.5,
+          "alturaDoFuroDoDissipador": 17.78,
+          "alturaDoLED": 8.6,
+          "alturaDoSOIC": 1.55,
+          "alturaDoTO92": 4.8,
+          "comprimentoDoChipDoModulo": 5,
+          "comprimentoDoResistor": 6.5,
+          "deslocamentoDoChipDoModulo": 0,
+          "diametroDaBordaDoLED": 5.9,
+          "diametroDoCapacitor": 6.3,
+          "diametroDoDisco": 5,
+          "diametroDoFio": 0.6,
+          "diametroDoFuroDaAba": 3.7,
+          "diametroDoLED": 5,
+          "diametroDoResistor": 2.3,
+          "encapsulamento": 4,
+          "espessuraDaAba": 1.3,
+          "espessuraDaChapaDoDissipador": 1.02,
+          "espessuraDoDisco": 3.5,
+          "espessuraDoTO220": 4.5,
+          "espessuraDoTO92": 3.7,
+          "faixasDoResistor": 4,
+          "fileiraDoDIP": 15.24,
+          "fileiraDoModulo": 12.7,
+          "fileirasDaBarra": 1,
+          "ladoDoPinoDaBarra": 0.64,
+          "larguraDoChipDoModulo": 5,
+          "larguraDoCorpoDoDIP": 13.7,
+          "larguraDoCorpoDoSOIC": 3.9,
+          "larguraDoDissipador": 25.4,
+          "larguraDoTO220": 10,
+          "larguraDoTO92": 4.8,
+          "larguraTotalDoSOIC": 6,
+          "margemDoCorpoDoDIP": 1.9,
+          "margemDoCorpoDoSOIC": 0.545,
+          "passoDoCapacitor": 2.5,
+          "passoDoDisco": 5,
+          "passoDoResistor": 10.16,
+          "pernaAbaixoDaPlaca": 3,
+          "pinoAcimaDaBase": 6,
+          "pinosPorFileiraDoModulo": 8,
           "pinosPorLadoDoDIP": 20,
-          "viasDaBarra": 8
+          "pinosPorLadoDoSOIC": 4,
+          "profundidadeDoDissipador": 12.7,
+          "viasDaBarra": 8,
+          "viasDoBorne": 2
         },
         "hash": "sha256:826a36b67c4bd947dc91e6d34095e26164c76babb9a9b5a439f0b85490f2c30b",
         "medidas": []
       },
       "dip-8": {
         "parametros": {
+          "afastamentoDoDisco": 2,
+          "afastamentoDoLED": 0,
           "afastamentoDoTO220": 2.5,
+          "afastamentoDoTO92": 2.75,
           "alturaDaAba": 6.2,
           "alturaDaBaseDaBarra": 2.5,
           "alturaDoCapacitor": 11,
+          "alturaDoChipDoModulo": 0.9,
           "alturaDoCorpoDoDIP": 3.3,
           "alturaDoCorpoTO220": 9,
+          "alturaDoDissipador": 29.97,
+          "alturaDoEspacadorDoModulo": 2.5,
+          "alturaDoFuroDoDissipador": 17.78,
+          "alturaDoLED": 8.6,
+          "alturaDoSOIC": 1.55,
+          "alturaDoTO92": 4.8,
+          "comprimentoDoChipDoModulo": 5,
           "comprimentoDoResistor": 6.5,
+          "deslocamentoDoChipDoModulo": 0,
+          "diametroDaBordaDoLED": 5.9,
           "diametroDoCapacitor": 6.3,
+          "diametroDoDisco": 5,
           "diametroDoFio": 0.6,
           "diametroDoFuroDaAba": 3.7,
+          "diametroDoLED": 5,
           "diametroDoResistor": 2.3,
           "encapsulamento": 4,
           "espessuraDaAba": 1.3,
+          "espessuraDaChapaDoDissipador": 1.02,
+          "espessuraDoDisco": 3.5,
           "espessuraDoTO220": 4.5,
+          "espessuraDoTO92": 3.7,
           "faixasDoResistor": 4,
           "fileiraDoDIP": 7.62,
+          "fileiraDoModulo": 12.7,
           "fileirasDaBarra": 1,
           "ladoDoPinoDaBarra": 0.64,
+          "larguraDoChipDoModulo": 5,
           "larguraDoCorpoDoDIP": 6.35,
+          "larguraDoCorpoDoSOIC": 3.9,
+          "larguraDoDissipador": 25.4,
           "larguraDoTO220": 10,
+          "larguraDoTO92": 4.8,
+          "larguraTotalDoSOIC": 6,
           "margemDoCorpoDoDIP": 0.8,
+          "margemDoCorpoDoSOIC": 0.545,
           "passoDoCapacitor": 2.5,
+          "passoDoDisco": 5,
           "passoDoResistor": 10.16,
           "pernaAbaixoDaPlaca": 3,
           "pinoAcimaDaBase": 6,
+          "pinosPorFileiraDoModulo": 8,
           "pinosPorLadoDoDIP": 4,
-          "viasDaBarra": 8
+          "pinosPorLadoDoSOIC": 4,
+          "profundidadeDoDissipador": 12.7,
+          "viasDaBarra": 8,
+          "viasDoBorne": 2
         },
         "hash": "sha256:7aee723a121c1f71517371ce25e73003e4f95c1a7402346c1efa42b902184f7d",
         "medidas": []
       },
-      "eletrolitico-6-3x11": {
+      "dissipador-to-220": {
         "parametros": {
+          "afastamentoDoDisco": 2,
+          "afastamentoDoLED": 0,
           "afastamentoDoTO220": 2.5,
+          "afastamentoDoTO92": 2.75,
           "alturaDaAba": 6.2,
           "alturaDaBaseDaBarra": 2.5,
           "alturaDoCapacitor": 11,
+          "alturaDoChipDoModulo": 0.9,
           "alturaDoCorpoDoDIP": 3.3,
           "alturaDoCorpoTO220": 9,
+          "alturaDoDissipador": 29.97,
+          "alturaDoEspacadorDoModulo": 2.5,
+          "alturaDoFuroDoDissipador": 17.78,
+          "alturaDoLED": 8.6,
+          "alturaDoSOIC": 1.55,
+          "alturaDoTO92": 4.8,
+          "comprimentoDoChipDoModulo": 5,
           "comprimentoDoResistor": 6.5,
+          "deslocamentoDoChipDoModulo": 0,
+          "diametroDaBordaDoLED": 5.9,
           "diametroDoCapacitor": 6.3,
-          "diametroDoFio": 0.5,
+          "diametroDoDisco": 5,
+          "diametroDoFio": 0.6,
           "diametroDoFuroDaAba": 3.7,
+          "diametroDoLED": 5,
           "diametroDoResistor": 2.3,
-          "encapsulamento": 2,
+          "encapsulamento": 13,
           "espessuraDaAba": 1.3,
+          "espessuraDaChapaDoDissipador": 1.02,
+          "espessuraDoDisco": 3.5,
           "espessuraDoTO220": 4.5,
+          "espessuraDoTO92": 3.7,
           "faixasDoResistor": 4,
           "fileiraDoDIP": 7.62,
+          "fileiraDoModulo": 12.7,
           "fileirasDaBarra": 1,
           "ladoDoPinoDaBarra": 0.64,
+          "larguraDoChipDoModulo": 5,
           "larguraDoCorpoDoDIP": 6.35,
+          "larguraDoCorpoDoSOIC": 3.9,
+          "larguraDoDissipador": 25.4,
           "larguraDoTO220": 10,
+          "larguraDoTO92": 4.8,
+          "larguraTotalDoSOIC": 6,
           "margemDoCorpoDoDIP": 0.8,
+          "margemDoCorpoDoSOIC": 0.545,
           "passoDoCapacitor": 2.5,
+          "passoDoDisco": 5,
           "passoDoResistor": 10.16,
           "pernaAbaixoDaPlaca": 3,
           "pinoAcimaDaBase": 6,
+          "pinosPorFileiraDoModulo": 8,
           "pinosPorLadoDoDIP": 4,
-          "viasDaBarra": 8
+          "pinosPorLadoDoSOIC": 4,
+          "profundidadeDoDissipador": 12.7,
+          "viasDaBarra": 8,
+          "viasDoBorne": 2
+        },
+        "hash": "sha256:a389b1f04772d219f65aad353a055382ea6800fe572f602e8c7fc1c500c253ce",
+        "medidas": []
+      },
+      "eletrolitico-6-3x11": {
+        "parametros": {
+          "afastamentoDoDisco": 2,
+          "afastamentoDoLED": 0,
+          "afastamentoDoTO220": 2.5,
+          "afastamentoDoTO92": 2.75,
+          "alturaDaAba": 6.2,
+          "alturaDaBaseDaBarra": 2.5,
+          "alturaDoCapacitor": 11,
+          "alturaDoChipDoModulo": 0.9,
+          "alturaDoCorpoDoDIP": 3.3,
+          "alturaDoCorpoTO220": 9,
+          "alturaDoDissipador": 29.97,
+          "alturaDoEspacadorDoModulo": 2.5,
+          "alturaDoFuroDoDissipador": 17.78,
+          "alturaDoLED": 8.6,
+          "alturaDoSOIC": 1.55,
+          "alturaDoTO92": 4.8,
+          "comprimentoDoChipDoModulo": 5,
+          "comprimentoDoResistor": 6.5,
+          "deslocamentoDoChipDoModulo": 0,
+          "diametroDaBordaDoLED": 5.9,
+          "diametroDoCapacitor": 6.3,
+          "diametroDoDisco": 5,
+          "diametroDoFio": 0.5,
+          "diametroDoFuroDaAba": 3.7,
+          "diametroDoLED": 5,
+          "diametroDoResistor": 2.3,
+          "encapsulamento": 2,
+          "espessuraDaAba": 1.3,
+          "espessuraDaChapaDoDissipador": 1.02,
+          "espessuraDoDisco": 3.5,
+          "espessuraDoTO220": 4.5,
+          "espessuraDoTO92": 3.7,
+          "faixasDoResistor": 4,
+          "fileiraDoDIP": 7.62,
+          "fileiraDoModulo": 12.7,
+          "fileirasDaBarra": 1,
+          "ladoDoPinoDaBarra": 0.64,
+          "larguraDoChipDoModulo": 5,
+          "larguraDoCorpoDoDIP": 6.35,
+          "larguraDoCorpoDoSOIC": 3.9,
+          "larguraDoDissipador": 25.4,
+          "larguraDoTO220": 10,
+          "larguraDoTO92": 4.8,
+          "larguraTotalDoSOIC": 6,
+          "margemDoCorpoDoDIP": 0.8,
+          "margemDoCorpoDoSOIC": 0.545,
+          "passoDoCapacitor": 2.5,
+          "passoDoDisco": 5,
+          "passoDoResistor": 10.16,
+          "pernaAbaixoDaPlaca": 3,
+          "pinoAcimaDaBase": 6,
+          "pinosPorFileiraDoModulo": 8,
+          "pinosPorLadoDoDIP": 4,
+          "pinosPorLadoDoSOIC": 4,
+          "profundidadeDoDissipador": 12.7,
+          "viasDaBarra": 8,
+          "viasDoBorne": 2
         },
         "hash": "sha256:996f32e37f4ea9c48c9f857766f1385fbf11606d7161fa70e78df6369b765660",
         "medidas": []
       },
-      "resistor-1-4w": {
+      "jack-de-alimentacao": {
         "parametros": {
+          "afastamentoDoDisco": 2,
+          "afastamentoDoLED": 0,
           "afastamentoDoTO220": 2.5,
+          "afastamentoDoTO92": 2.75,
           "alturaDaAba": 6.2,
           "alturaDaBaseDaBarra": 2.5,
           "alturaDoCapacitor": 11,
+          "alturaDoChipDoModulo": 0.9,
           "alturaDoCorpoDoDIP": 3.3,
           "alturaDoCorpoTO220": 9,
+          "alturaDoDissipador": 29.97,
+          "alturaDoEspacadorDoModulo": 2.5,
+          "alturaDoFuroDoDissipador": 17.78,
+          "alturaDoLED": 8.6,
+          "alturaDoSOIC": 1.55,
+          "alturaDoTO92": 4.8,
+          "comprimentoDoChipDoModulo": 5,
           "comprimentoDoResistor": 6.5,
+          "deslocamentoDoChipDoModulo": 0,
+          "diametroDaBordaDoLED": 5.9,
           "diametroDoCapacitor": 6.3,
+          "diametroDoDisco": 5,
           "diametroDoFio": 0.6,
           "diametroDoFuroDaAba": 3.7,
+          "diametroDoLED": 5,
           "diametroDoResistor": 2.3,
-          "encapsulamento": 1,
+          "encapsulamento": 11,
           "espessuraDaAba": 1.3,
+          "espessuraDaChapaDoDissipador": 1.02,
+          "espessuraDoDisco": 3.5,
           "espessuraDoTO220": 4.5,
+          "espessuraDoTO92": 3.7,
           "faixasDoResistor": 4,
           "fileiraDoDIP": 7.62,
+          "fileiraDoModulo": 12.7,
           "fileirasDaBarra": 1,
           "ladoDoPinoDaBarra": 0.64,
+          "larguraDoChipDoModulo": 5,
           "larguraDoCorpoDoDIP": 6.35,
+          "larguraDoCorpoDoSOIC": 3.9,
+          "larguraDoDissipador": 25.4,
           "larguraDoTO220": 10,
+          "larguraDoTO92": 4.8,
+          "larguraTotalDoSOIC": 6,
           "margemDoCorpoDoDIP": 0.8,
+          "margemDoCorpoDoSOIC": 0.545,
           "passoDoCapacitor": 2.5,
+          "passoDoDisco": 5,
           "passoDoResistor": 10.16,
           "pernaAbaixoDaPlaca": 3,
           "pinoAcimaDaBase": 6,
+          "pinosPorFileiraDoModulo": 8,
           "pinosPorLadoDoDIP": 4,
-          "viasDaBarra": 8
+          "pinosPorLadoDoSOIC": 4,
+          "profundidadeDoDissipador": 12.7,
+          "viasDaBarra": 8,
+          "viasDoBorne": 2
+        },
+        "hash": "sha256:14a8f5d2ba97f62342199d31f060a2ba277e02925ea9b5c4f7d8734c35292b49",
+        "medidas": []
+      },
+      "led-3": {
+        "parametros": {
+          "afastamentoDoDisco": 2,
+          "afastamentoDoLED": 0,
+          "afastamentoDoTO220": 2.5,
+          "afastamentoDoTO92": 2.75,
+          "alturaDaAba": 6.2,
+          "alturaDaBaseDaBarra": 2.5,
+          "alturaDoCapacitor": 11,
+          "alturaDoChipDoModulo": 0.9,
+          "alturaDoCorpoDoDIP": 3.3,
+          "alturaDoCorpoTO220": 9,
+          "alturaDoDissipador": 29.97,
+          "alturaDoEspacadorDoModulo": 2.5,
+          "alturaDoFuroDoDissipador": 17.78,
+          "alturaDoLED": 5.4,
+          "alturaDoSOIC": 1.55,
+          "alturaDoTO92": 4.8,
+          "comprimentoDoChipDoModulo": 5,
+          "comprimentoDoResistor": 6.5,
+          "deslocamentoDoChipDoModulo": 0,
+          "diametroDaBordaDoLED": 3.2,
+          "diametroDoCapacitor": 6.3,
+          "diametroDoDisco": 5,
+          "diametroDoFio": 0.6,
+          "diametroDoFuroDaAba": 3.7,
+          "diametroDoLED": 2.9,
+          "diametroDoResistor": 2.3,
+          "encapsulamento": 7,
+          "espessuraDaAba": 1.3,
+          "espessuraDaChapaDoDissipador": 1.02,
+          "espessuraDoDisco": 3.5,
+          "espessuraDoTO220": 4.5,
+          "espessuraDoTO92": 3.7,
+          "faixasDoResistor": 4,
+          "fileiraDoDIP": 7.62,
+          "fileiraDoModulo": 12.7,
+          "fileirasDaBarra": 1,
+          "ladoDoPinoDaBarra": 0.64,
+          "larguraDoChipDoModulo": 5,
+          "larguraDoCorpoDoDIP": 6.35,
+          "larguraDoCorpoDoSOIC": 3.9,
+          "larguraDoDissipador": 25.4,
+          "larguraDoTO220": 10,
+          "larguraDoTO92": 4.8,
+          "larguraTotalDoSOIC": 6,
+          "margemDoCorpoDoDIP": 0.8,
+          "margemDoCorpoDoSOIC": 0.545,
+          "passoDoCapacitor": 2.5,
+          "passoDoDisco": 5,
+          "passoDoResistor": 10.16,
+          "pernaAbaixoDaPlaca": 3,
+          "pinoAcimaDaBase": 6,
+          "pinosPorFileiraDoModulo": 8,
+          "pinosPorLadoDoDIP": 4,
+          "pinosPorLadoDoSOIC": 4,
+          "profundidadeDoDissipador": 12.7,
+          "viasDaBarra": 8,
+          "viasDoBorne": 2
+        },
+        "hash": "sha256:45fc66d245002926ac7550bb5a84c7ed5d2e2fe2799095e1031ef441660149ca",
+        "medidas": []
+      },
+      "led-5": {
+        "parametros": {
+          "afastamentoDoDisco": 2,
+          "afastamentoDoLED": 0,
+          "afastamentoDoTO220": 2.5,
+          "afastamentoDoTO92": 2.75,
+          "alturaDaAba": 6.2,
+          "alturaDaBaseDaBarra": 2.5,
+          "alturaDoCapacitor": 11,
+          "alturaDoChipDoModulo": 0.9,
+          "alturaDoCorpoDoDIP": 3.3,
+          "alturaDoCorpoTO220": 9,
+          "alturaDoDissipador": 29.97,
+          "alturaDoEspacadorDoModulo": 2.5,
+          "alturaDoFuroDoDissipador": 17.78,
+          "alturaDoLED": 8.6,
+          "alturaDoSOIC": 1.55,
+          "alturaDoTO92": 4.8,
+          "comprimentoDoChipDoModulo": 5,
+          "comprimentoDoResistor": 6.5,
+          "deslocamentoDoChipDoModulo": 0,
+          "diametroDaBordaDoLED": 5.9,
+          "diametroDoCapacitor": 6.3,
+          "diametroDoDisco": 5,
+          "diametroDoFio": 0.6,
+          "diametroDoFuroDaAba": 3.7,
+          "diametroDoLED": 5,
+          "diametroDoResistor": 2.3,
+          "encapsulamento": 7,
+          "espessuraDaAba": 1.3,
+          "espessuraDaChapaDoDissipador": 1.02,
+          "espessuraDoDisco": 3.5,
+          "espessuraDoTO220": 4.5,
+          "espessuraDoTO92": 3.7,
+          "faixasDoResistor": 4,
+          "fileiraDoDIP": 7.62,
+          "fileiraDoModulo": 12.7,
+          "fileirasDaBarra": 1,
+          "ladoDoPinoDaBarra": 0.64,
+          "larguraDoChipDoModulo": 5,
+          "larguraDoCorpoDoDIP": 6.35,
+          "larguraDoCorpoDoSOIC": 3.9,
+          "larguraDoDissipador": 25.4,
+          "larguraDoTO220": 10,
+          "larguraDoTO92": 4.8,
+          "larguraTotalDoSOIC": 6,
+          "margemDoCorpoDoDIP": 0.8,
+          "margemDoCorpoDoSOIC": 0.545,
+          "passoDoCapacitor": 2.5,
+          "passoDoDisco": 5,
+          "passoDoResistor": 10.16,
+          "pernaAbaixoDaPlaca": 3,
+          "pinoAcimaDaBase": 6,
+          "pinosPorFileiraDoModulo": 8,
+          "pinosPorLadoDoDIP": 4,
+          "pinosPorLadoDoSOIC": 4,
+          "profundidadeDoDissipador": 12.7,
+          "viasDaBarra": 8,
+          "viasDoBorne": 2
+        },
+        "hash": "sha256:4d6883bbc0b8d6052519afc1da55490cb63665325a6ba99fc8870deaf2b1eecc",
+        "medidas": []
+      },
+      "modulo-driver-de-passo": {
+        "parametros": {
+          "afastamentoDoDisco": 2,
+          "afastamentoDoLED": 0,
+          "afastamentoDoTO220": 2.5,
+          "afastamentoDoTO92": 2.75,
+          "alturaDaAba": 6.2,
+          "alturaDaBaseDaBarra": 2.5,
+          "alturaDoCapacitor": 11,
+          "alturaDoChipDoModulo": 0.9,
+          "alturaDoCorpoDoDIP": 3.3,
+          "alturaDoCorpoTO220": 9,
+          "alturaDoDissipador": 29.97,
+          "alturaDoEspacadorDoModulo": 2.5,
+          "alturaDoFuroDoDissipador": 17.78,
+          "alturaDoLED": 8.6,
+          "alturaDoSOIC": 1.55,
+          "alturaDoTO92": 4.8,
+          "comprimentoDoChipDoModulo": 5,
+          "comprimentoDoResistor": 6.5,
+          "deslocamentoDoChipDoModulo": 0,
+          "diametroDaBordaDoLED": 5.9,
+          "diametroDoCapacitor": 6.3,
+          "diametroDoDisco": 5,
+          "diametroDoFio": 0.6,
+          "diametroDoFuroDaAba": 3.7,
+          "diametroDoLED": 5,
+          "diametroDoResistor": 2.3,
+          "encapsulamento": 12,
+          "espessuraDaAba": 1.3,
+          "espessuraDaChapaDoDissipador": 1.02,
+          "espessuraDoDisco": 3.5,
+          "espessuraDoTO220": 4.5,
+          "espessuraDoTO92": 3.7,
+          "faixasDoResistor": 4,
+          "fileiraDoDIP": 7.62,
+          "fileiraDoModulo": 12.7,
+          "fileirasDaBarra": 1,
+          "ladoDoPinoDaBarra": 0.64,
+          "larguraDoChipDoModulo": 5,
+          "larguraDoCorpoDoDIP": 6.35,
+          "larguraDoCorpoDoSOIC": 3.9,
+          "larguraDoDissipador": 25.4,
+          "larguraDoTO220": 10,
+          "larguraDoTO92": 4.8,
+          "larguraTotalDoSOIC": 6,
+          "margemDoCorpoDoDIP": 0.8,
+          "margemDoCorpoDoSOIC": 0.545,
+          "passoDoCapacitor": 2.5,
+          "passoDoDisco": 5,
+          "passoDoResistor": 10.16,
+          "pernaAbaixoDaPlaca": 3,
+          "pinoAcimaDaBase": 6,
+          "pinosPorFileiraDoModulo": 8,
+          "pinosPorLadoDoDIP": 4,
+          "pinosPorLadoDoSOIC": 4,
+          "profundidadeDoDissipador": 12.7,
+          "viasDaBarra": 8,
+          "viasDoBorne": 2
+        },
+        "hash": "sha256:d836fa1a970639eededca0db3ae16304b9e1e92b50fda864888a2730b0284ba2",
+        "medidas": []
+      },
+      "modulo-microcontrolador": {
+        "parametros": {
+          "afastamentoDoDisco": 2,
+          "afastamentoDoLED": 0,
+          "afastamentoDoTO220": 2.5,
+          "afastamentoDoTO92": 2.75,
+          "alturaDaAba": 6.2,
+          "alturaDaBaseDaBarra": 2.5,
+          "alturaDoCapacitor": 11,
+          "alturaDoChipDoModulo": 3.1,
+          "alturaDoCorpoDoDIP": 3.3,
+          "alturaDoCorpoTO220": 9,
+          "alturaDoDissipador": 29.97,
+          "alturaDoEspacadorDoModulo": 2.5,
+          "alturaDoFuroDoDissipador": 17.78,
+          "alturaDoLED": 8.6,
+          "alturaDoSOIC": 1.55,
+          "alturaDoTO92": 4.8,
+          "comprimentoDoChipDoModulo": 25.5,
+          "comprimentoDoResistor": 6.5,
+          "deslocamentoDoChipDoModulo": 17.42,
+          "diametroDaBordaDoLED": 5.9,
+          "diametroDoCapacitor": 6.3,
+          "diametroDoDisco": 5,
+          "diametroDoFio": 0.6,
+          "diametroDoFuroDaAba": 3.7,
+          "diametroDoLED": 5,
+          "diametroDoResistor": 2.3,
+          "encapsulamento": 12,
+          "espessuraDaAba": 1.3,
+          "espessuraDaChapaDoDissipador": 1.02,
+          "espessuraDoDisco": 3.5,
+          "espessuraDoTO220": 4.5,
+          "espessuraDoTO92": 3.7,
+          "faixasDoResistor": 4,
+          "fileiraDoDIP": 7.62,
+          "fileiraDoModulo": 25.4,
+          "fileirasDaBarra": 1,
+          "ladoDoPinoDaBarra": 0.64,
+          "larguraDoChipDoModulo": 18,
+          "larguraDoCorpoDoDIP": 6.35,
+          "larguraDoCorpoDoSOIC": 3.9,
+          "larguraDoDissipador": 25.4,
+          "larguraDoTO220": 10,
+          "larguraDoTO92": 4.8,
+          "larguraTotalDoSOIC": 6,
+          "margemDoCorpoDoDIP": 0.8,
+          "margemDoCorpoDoSOIC": 0.545,
+          "passoDoCapacitor": 2.5,
+          "passoDoDisco": 5,
+          "passoDoResistor": 10.16,
+          "pernaAbaixoDaPlaca": 3,
+          "pinoAcimaDaBase": 6,
+          "pinosPorFileiraDoModulo": 19,
+          "pinosPorLadoDoDIP": 4,
+          "pinosPorLadoDoSOIC": 4,
+          "profundidadeDoDissipador": 12.7,
+          "viasDaBarra": 8,
+          "viasDoBorne": 2
+        },
+        "hash": "sha256:f440804fc21972de4ddad7b80c04ddd50311a17990b755654d786d54a6fa5582",
+        "medidas": []
+      },
+      "resistor-1-4w": {
+        "parametros": {
+          "afastamentoDoDisco": 2,
+          "afastamentoDoLED": 0,
+          "afastamentoDoTO220": 2.5,
+          "afastamentoDoTO92": 2.75,
+          "alturaDaAba": 6.2,
+          "alturaDaBaseDaBarra": 2.5,
+          "alturaDoCapacitor": 11,
+          "alturaDoChipDoModulo": 0.9,
+          "alturaDoCorpoDoDIP": 3.3,
+          "alturaDoCorpoTO220": 9,
+          "alturaDoDissipador": 29.97,
+          "alturaDoEspacadorDoModulo": 2.5,
+          "alturaDoFuroDoDissipador": 17.78,
+          "alturaDoLED": 8.6,
+          "alturaDoSOIC": 1.55,
+          "alturaDoTO92": 4.8,
+          "comprimentoDoChipDoModulo": 5,
+          "comprimentoDoResistor": 6.5,
+          "deslocamentoDoChipDoModulo": 0,
+          "diametroDaBordaDoLED": 5.9,
+          "diametroDoCapacitor": 6.3,
+          "diametroDoDisco": 5,
+          "diametroDoFio": 0.6,
+          "diametroDoFuroDaAba": 3.7,
+          "diametroDoLED": 5,
+          "diametroDoResistor": 2.3,
+          "encapsulamento": 1,
+          "espessuraDaAba": 1.3,
+          "espessuraDaChapaDoDissipador": 1.02,
+          "espessuraDoDisco": 3.5,
+          "espessuraDoTO220": 4.5,
+          "espessuraDoTO92": 3.7,
+          "faixasDoResistor": 4,
+          "fileiraDoDIP": 7.62,
+          "fileiraDoModulo": 12.7,
+          "fileirasDaBarra": 1,
+          "ladoDoPinoDaBarra": 0.64,
+          "larguraDoChipDoModulo": 5,
+          "larguraDoCorpoDoDIP": 6.35,
+          "larguraDoCorpoDoSOIC": 3.9,
+          "larguraDoDissipador": 25.4,
+          "larguraDoTO220": 10,
+          "larguraDoTO92": 4.8,
+          "larguraTotalDoSOIC": 6,
+          "margemDoCorpoDoDIP": 0.8,
+          "margemDoCorpoDoSOIC": 0.545,
+          "passoDoCapacitor": 2.5,
+          "passoDoDisco": 5,
+          "passoDoResistor": 10.16,
+          "pernaAbaixoDaPlaca": 3,
+          "pinoAcimaDaBase": 6,
+          "pinosPorFileiraDoModulo": 8,
+          "pinosPorLadoDoDIP": 4,
+          "pinosPorLadoDoSOIC": 4,
+          "profundidadeDoDissipador": 12.7,
+          "viasDaBarra": 8,
+          "viasDoBorne": 2
         },
         "hash": "sha256:85d4804bf476bd3fa4b876824b405939b3b84efbf9a9601d24a9843cea3fd307",
         "medidas": []
       },
-      "to-220": {
+      "soic-16": {
         "parametros": {
+          "afastamentoDoDisco": 2,
+          "afastamentoDoLED": 0,
           "afastamentoDoTO220": 2.5,
+          "afastamentoDoTO92": 2.75,
           "alturaDaAba": 6.2,
           "alturaDaBaseDaBarra": 2.5,
           "alturaDoCapacitor": 11,
+          "alturaDoChipDoModulo": 0.9,
           "alturaDoCorpoDoDIP": 3.3,
           "alturaDoCorpoTO220": 9,
+          "alturaDoDissipador": 29.97,
+          "alturaDoEspacadorDoModulo": 2.5,
+          "alturaDoFuroDoDissipador": 17.78,
+          "alturaDoLED": 8.6,
+          "alturaDoSOIC": 1.55,
+          "alturaDoTO92": 4.8,
+          "comprimentoDoChipDoModulo": 5,
           "comprimentoDoResistor": 6.5,
+          "deslocamentoDoChipDoModulo": 0,
+          "diametroDaBordaDoLED": 5.9,
           "diametroDoCapacitor": 6.3,
+          "diametroDoDisco": 5,
           "diametroDoFio": 0.6,
           "diametroDoFuroDaAba": 3.7,
+          "diametroDoLED": 5,
           "diametroDoResistor": 2.3,
-          "encapsulamento": 3,
+          "encapsulamento": 9,
           "espessuraDaAba": 1.3,
+          "espessuraDaChapaDoDissipador": 1.02,
+          "espessuraDoDisco": 3.5,
           "espessuraDoTO220": 4.5,
+          "espessuraDoTO92": 3.7,
           "faixasDoResistor": 4,
           "fileiraDoDIP": 7.62,
+          "fileiraDoModulo": 12.7,
           "fileirasDaBarra": 1,
           "ladoDoPinoDaBarra": 0.64,
+          "larguraDoChipDoModulo": 5,
           "larguraDoCorpoDoDIP": 6.35,
+          "larguraDoCorpoDoSOIC": 3.9,
+          "larguraDoDissipador": 25.4,
           "larguraDoTO220": 10,
+          "larguraDoTO92": 4.8,
+          "larguraTotalDoSOIC": 6,
           "margemDoCorpoDoDIP": 0.8,
+          "margemDoCorpoDoSOIC": 0.505,
           "passoDoCapacitor": 2.5,
+          "passoDoDisco": 5,
           "passoDoResistor": 10.16,
           "pernaAbaixoDaPlaca": 3,
           "pinoAcimaDaBase": 6,
+          "pinosPorFileiraDoModulo": 8,
           "pinosPorLadoDoDIP": 4,
-          "viasDaBarra": 8
+          "pinosPorLadoDoSOIC": 8,
+          "profundidadeDoDissipador": 12.7,
+          "viasDaBarra": 8,
+          "viasDoBorne": 2
+        },
+        "hash": "sha256:2e01ae25eda18531dec54d3e369fd5f405fe93c55f174b137a6edd6c31ab51ce",
+        "medidas": []
+      },
+      "soic-8": {
+        "parametros": {
+          "afastamentoDoDisco": 2,
+          "afastamentoDoLED": 0,
+          "afastamentoDoTO220": 2.5,
+          "afastamentoDoTO92": 2.75,
+          "alturaDaAba": 6.2,
+          "alturaDaBaseDaBarra": 2.5,
+          "alturaDoCapacitor": 11,
+          "alturaDoChipDoModulo": 0.9,
+          "alturaDoCorpoDoDIP": 3.3,
+          "alturaDoCorpoTO220": 9,
+          "alturaDoDissipador": 29.97,
+          "alturaDoEspacadorDoModulo": 2.5,
+          "alturaDoFuroDoDissipador": 17.78,
+          "alturaDoLED": 8.6,
+          "alturaDoSOIC": 1.55,
+          "alturaDoTO92": 4.8,
+          "comprimentoDoChipDoModulo": 5,
+          "comprimentoDoResistor": 6.5,
+          "deslocamentoDoChipDoModulo": 0,
+          "diametroDaBordaDoLED": 5.9,
+          "diametroDoCapacitor": 6.3,
+          "diametroDoDisco": 5,
+          "diametroDoFio": 0.6,
+          "diametroDoFuroDaAba": 3.7,
+          "diametroDoLED": 5,
+          "diametroDoResistor": 2.3,
+          "encapsulamento": 9,
+          "espessuraDaAba": 1.3,
+          "espessuraDaChapaDoDissipador": 1.02,
+          "espessuraDoDisco": 3.5,
+          "espessuraDoTO220": 4.5,
+          "espessuraDoTO92": 3.7,
+          "faixasDoResistor": 4,
+          "fileiraDoDIP": 7.62,
+          "fileiraDoModulo": 12.7,
+          "fileirasDaBarra": 1,
+          "ladoDoPinoDaBarra": 0.64,
+          "larguraDoChipDoModulo": 5,
+          "larguraDoCorpoDoDIP": 6.35,
+          "larguraDoCorpoDoSOIC": 3.9,
+          "larguraDoDissipador": 25.4,
+          "larguraDoTO220": 10,
+          "larguraDoTO92": 4.8,
+          "larguraTotalDoSOIC": 6,
+          "margemDoCorpoDoDIP": 0.8,
+          "margemDoCorpoDoSOIC": 0.545,
+          "passoDoCapacitor": 2.5,
+          "passoDoDisco": 5,
+          "passoDoResistor": 10.16,
+          "pernaAbaixoDaPlaca": 3,
+          "pinoAcimaDaBase": 6,
+          "pinosPorFileiraDoModulo": 8,
+          "pinosPorLadoDoDIP": 4,
+          "pinosPorLadoDoSOIC": 4,
+          "profundidadeDoDissipador": 12.7,
+          "viasDaBarra": 8,
+          "viasDoBorne": 2
+        },
+        "hash": "sha256:7a327a094627883d6e0d52138ff37fd87aa534e1194523d01e6bb29fbdfdcf25",
+        "medidas": []
+      },
+      "to-220": {
+        "parametros": {
+          "afastamentoDoDisco": 2,
+          "afastamentoDoLED": 0,
+          "afastamentoDoTO220": 2.5,
+          "afastamentoDoTO92": 2.75,
+          "alturaDaAba": 6.2,
+          "alturaDaBaseDaBarra": 2.5,
+          "alturaDoCapacitor": 11,
+          "alturaDoChipDoModulo": 0.9,
+          "alturaDoCorpoDoDIP": 3.3,
+          "alturaDoCorpoTO220": 9,
+          "alturaDoDissipador": 29.97,
+          "alturaDoEspacadorDoModulo": 2.5,
+          "alturaDoFuroDoDissipador": 17.78,
+          "alturaDoLED": 8.6,
+          "alturaDoSOIC": 1.55,
+          "alturaDoTO92": 4.8,
+          "comprimentoDoChipDoModulo": 5,
+          "comprimentoDoResistor": 6.5,
+          "deslocamentoDoChipDoModulo": 0,
+          "diametroDaBordaDoLED": 5.9,
+          "diametroDoCapacitor": 6.3,
+          "diametroDoDisco": 5,
+          "diametroDoFio": 0.6,
+          "diametroDoFuroDaAba": 3.7,
+          "diametroDoLED": 5,
+          "diametroDoResistor": 2.3,
+          "encapsulamento": 3,
+          "espessuraDaAba": 1.3,
+          "espessuraDaChapaDoDissipador": 1.02,
+          "espessuraDoDisco": 3.5,
+          "espessuraDoTO220": 4.5,
+          "espessuraDoTO92": 3.7,
+          "faixasDoResistor": 4,
+          "fileiraDoDIP": 7.62,
+          "fileiraDoModulo": 12.7,
+          "fileirasDaBarra": 1,
+          "ladoDoPinoDaBarra": 0.64,
+          "larguraDoChipDoModulo": 5,
+          "larguraDoCorpoDoDIP": 6.35,
+          "larguraDoCorpoDoSOIC": 3.9,
+          "larguraDoDissipador": 25.4,
+          "larguraDoTO220": 10,
+          "larguraDoTO92": 4.8,
+          "larguraTotalDoSOIC": 6,
+          "margemDoCorpoDoDIP": 0.8,
+          "margemDoCorpoDoSOIC": 0.545,
+          "passoDoCapacitor": 2.5,
+          "passoDoDisco": 5,
+          "passoDoResistor": 10.16,
+          "pernaAbaixoDaPlaca": 3,
+          "pinoAcimaDaBase": 6,
+          "pinosPorFileiraDoModulo": 8,
+          "pinosPorLadoDoDIP": 4,
+          "pinosPorLadoDoSOIC": 4,
+          "profundidadeDoDissipador": 12.7,
+          "viasDaBarra": 8,
+          "viasDoBorne": 2
         },
         "hash": "sha256:0fe98ece689cace176de42761a70f83505317338a954cd47bfe69e70a8493f6a",
+        "medidas": []
+      },
+      "to-220-no-dissipador": {
+        "parametros": {
+          "afastamentoDoDisco": 2,
+          "afastamentoDoLED": 0,
+          "afastamentoDoTO220": 5.38,
+          "afastamentoDoTO92": 2.75,
+          "alturaDaAba": 6.2,
+          "alturaDaBaseDaBarra": 2.5,
+          "alturaDoCapacitor": 11,
+          "alturaDoChipDoModulo": 0.9,
+          "alturaDoCorpoDoDIP": 3.3,
+          "alturaDoCorpoTO220": 9,
+          "alturaDoDissipador": 29.97,
+          "alturaDoEspacadorDoModulo": 2.5,
+          "alturaDoFuroDoDissipador": 17.78,
+          "alturaDoLED": 8.6,
+          "alturaDoSOIC": 1.55,
+          "alturaDoTO92": 4.8,
+          "comprimentoDoChipDoModulo": 5,
+          "comprimentoDoResistor": 6.5,
+          "deslocamentoDoChipDoModulo": 0,
+          "diametroDaBordaDoLED": 5.9,
+          "diametroDoCapacitor": 6.3,
+          "diametroDoDisco": 5,
+          "diametroDoFio": 0.6,
+          "diametroDoFuroDaAba": 3.7,
+          "diametroDoLED": 5,
+          "diametroDoResistor": 2.3,
+          "encapsulamento": 3,
+          "espessuraDaAba": 1.3,
+          "espessuraDaChapaDoDissipador": 1.02,
+          "espessuraDoDisco": 3.5,
+          "espessuraDoTO220": 4.5,
+          "espessuraDoTO92": 3.7,
+          "faixasDoResistor": 4,
+          "fileiraDoDIP": 7.62,
+          "fileiraDoModulo": 12.7,
+          "fileirasDaBarra": 1,
+          "ladoDoPinoDaBarra": 0.64,
+          "larguraDoChipDoModulo": 5,
+          "larguraDoCorpoDoDIP": 6.35,
+          "larguraDoCorpoDoSOIC": 3.9,
+          "larguraDoDissipador": 25.4,
+          "larguraDoTO220": 10,
+          "larguraDoTO92": 4.8,
+          "larguraTotalDoSOIC": 6,
+          "margemDoCorpoDoDIP": 0.8,
+          "margemDoCorpoDoSOIC": 0.545,
+          "passoDoCapacitor": 2.5,
+          "passoDoDisco": 5,
+          "passoDoResistor": 10.16,
+          "pernaAbaixoDaPlaca": 3,
+          "pinoAcimaDaBase": 6,
+          "pinosPorFileiraDoModulo": 8,
+          "pinosPorLadoDoDIP": 4,
+          "pinosPorLadoDoSOIC": 4,
+          "profundidadeDoDissipador": 12.7,
+          "viasDaBarra": 8,
+          "viasDoBorne": 2
+        },
+        "hash": "sha256:46cb86fe88709489be771f59fdbadb91e9783e6e4a8e8d95bb3276b34fca66c7",
+        "medidas": []
+      },
+      "to-92": {
+        "parametros": {
+          "afastamentoDoDisco": 2,
+          "afastamentoDoLED": 0,
+          "afastamentoDoTO220": 2.5,
+          "afastamentoDoTO92": 2.75,
+          "alturaDaAba": 6.2,
+          "alturaDaBaseDaBarra": 2.5,
+          "alturaDoCapacitor": 11,
+          "alturaDoChipDoModulo": 0.9,
+          "alturaDoCorpoDoDIP": 3.3,
+          "alturaDoCorpoTO220": 9,
+          "alturaDoDissipador": 29.97,
+          "alturaDoEspacadorDoModulo": 2.5,
+          "alturaDoFuroDoDissipador": 17.78,
+          "alturaDoLED": 8.6,
+          "alturaDoSOIC": 1.55,
+          "alturaDoTO92": 4.8,
+          "comprimentoDoChipDoModulo": 5,
+          "comprimentoDoResistor": 6.5,
+          "deslocamentoDoChipDoModulo": 0,
+          "diametroDaBordaDoLED": 5.9,
+          "diametroDoCapacitor": 6.3,
+          "diametroDoDisco": 5,
+          "diametroDoFio": 0.6,
+          "diametroDoFuroDaAba": 3.7,
+          "diametroDoLED": 5,
+          "diametroDoResistor": 2.3,
+          "encapsulamento": 8,
+          "espessuraDaAba": 1.3,
+          "espessuraDaChapaDoDissipador": 1.02,
+          "espessuraDoDisco": 3.5,
+          "espessuraDoTO220": 4.5,
+          "espessuraDoTO92": 3.7,
+          "faixasDoResistor": 4,
+          "fileiraDoDIP": 7.62,
+          "fileiraDoModulo": 12.7,
+          "fileirasDaBarra": 1,
+          "ladoDoPinoDaBarra": 0.64,
+          "larguraDoChipDoModulo": 5,
+          "larguraDoCorpoDoDIP": 6.35,
+          "larguraDoCorpoDoSOIC": 3.9,
+          "larguraDoDissipador": 25.4,
+          "larguraDoTO220": 10,
+          "larguraDoTO92": 4.8,
+          "larguraTotalDoSOIC": 6,
+          "margemDoCorpoDoDIP": 0.8,
+          "margemDoCorpoDoSOIC": 0.545,
+          "passoDoCapacitor": 2.5,
+          "passoDoDisco": 5,
+          "passoDoResistor": 10.16,
+          "pernaAbaixoDaPlaca": 3,
+          "pinoAcimaDaBase": 6,
+          "pinosPorFileiraDoModulo": 8,
+          "pinosPorLadoDoDIP": 4,
+          "pinosPorLadoDoSOIC": 4,
+          "profundidadeDoDissipador": 12.7,
+          "viasDaBarra": 8,
+          "viasDoBorne": 2
+        },
+        "hash": "sha256:35b3378b058752824d839d1ce702a1f48df457582a13334a6d7af725abf6c554",
         "medidas": []
       }
     },
     "escalasDosPerfis": {
-      "sondas": 264,
+      "sondas": 1862,
       "recusasDeclaradas": [
+        {
+          "ponto": "barra-1x8: afastamentoDoDisco=1",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
         {
           "ponto": "barra-1x8: comprimentoDoResistor=12",
           "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "barra-1x8: deslocamentoDoChipDoModulo=18",
+          "restricao": "chip-sobre-o-modulo-positivo"
+        },
+        {
+          "ponto": "barra-1x8: diametroDaBordaDoLED=3.2",
+          "restricao": "borda-do-led-maior-que-o-corpo"
         },
         {
           "ponto": "barra-1x8: diametroDoCapacitor=4",
@@ -351,6 +1472,10 @@
           "restricao": "pino-do-dip-encosta-no-corpo"
         },
         {
+          "ponto": "barra-1x8: larguraDoChipDoModulo=18",
+          "restricao": "chip-entre-as-fileiras-do-modulo"
+        },
+        {
           "ponto": "barra-1x8: larguraDoCorpoDoDIP=14.7",
           "restricao": "pino-do-dip-sai-do-corpo"
         },
@@ -359,12 +1484,160 @@
           "restricao": "terminais-dentro-do-capacitor"
         },
         {
+          "ponto": "barra-1x8: passoDoDisco=7.5",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
           "ponto": "barra-1x8: passoDoResistor=7.62",
           "restricao": "dobra-do-resistor-fora-do-corpo"
         },
         {
+          "ponto": "borne-2-vias: afastamentoDoDisco=1",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
+          "ponto": "borne-2-vias: comprimentoDoResistor=12",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "borne-2-vias: deslocamentoDoChipDoModulo=18",
+          "restricao": "chip-sobre-o-modulo-positivo"
+        },
+        {
+          "ponto": "borne-2-vias: diametroDaBordaDoLED=3.2",
+          "restricao": "borda-do-led-maior-que-o-corpo"
+        },
+        {
+          "ponto": "borne-2-vias: diametroDoCapacitor=4",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "borne-2-vias: fileiraDoDIP=15.24",
+          "restricao": "pino-do-dip-encosta-no-corpo"
+        },
+        {
+          "ponto": "borne-2-vias: larguraDoChipDoModulo=18",
+          "restricao": "chip-entre-as-fileiras-do-modulo"
+        },
+        {
+          "ponto": "borne-2-vias: larguraDoCorpoDoDIP=14.7",
+          "restricao": "pino-do-dip-sai-do-corpo"
+        },
+        {
+          "ponto": "borne-2-vias: passoDoCapacitor=7.5",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "borne-2-vias: passoDoDisco=7.5",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
+          "ponto": "borne-2-vias: passoDoResistor=7.62",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "borne-3-vias: afastamentoDoDisco=1",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
+          "ponto": "borne-3-vias: comprimentoDoResistor=12",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "borne-3-vias: deslocamentoDoChipDoModulo=18",
+          "restricao": "chip-sobre-o-modulo-positivo"
+        },
+        {
+          "ponto": "borne-3-vias: diametroDaBordaDoLED=3.2",
+          "restricao": "borda-do-led-maior-que-o-corpo"
+        },
+        {
+          "ponto": "borne-3-vias: diametroDoCapacitor=4",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "borne-3-vias: fileiraDoDIP=15.24",
+          "restricao": "pino-do-dip-encosta-no-corpo"
+        },
+        {
+          "ponto": "borne-3-vias: larguraDoChipDoModulo=18",
+          "restricao": "chip-entre-as-fileiras-do-modulo"
+        },
+        {
+          "ponto": "borne-3-vias: larguraDoCorpoDoDIP=14.7",
+          "restricao": "pino-do-dip-sai-do-corpo"
+        },
+        {
+          "ponto": "borne-3-vias: passoDoCapacitor=7.5",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "borne-3-vias: passoDoDisco=7.5",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
+          "ponto": "borne-3-vias: passoDoResistor=7.62",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "ceramico-disco-5: afastamentoDoDisco=1",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
+          "ponto": "ceramico-disco-5: comprimentoDoResistor=12",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "ceramico-disco-5: deslocamentoDoChipDoModulo=18",
+          "restricao": "chip-sobre-o-modulo-positivo"
+        },
+        {
+          "ponto": "ceramico-disco-5: diametroDaBordaDoLED=3.2",
+          "restricao": "borda-do-led-maior-que-o-corpo"
+        },
+        {
+          "ponto": "ceramico-disco-5: diametroDoCapacitor=4",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "ceramico-disco-5: fileiraDoDIP=15.24",
+          "restricao": "pino-do-dip-encosta-no-corpo"
+        },
+        {
+          "ponto": "ceramico-disco-5: larguraDoChipDoModulo=18",
+          "restricao": "chip-entre-as-fileiras-do-modulo"
+        },
+        {
+          "ponto": "ceramico-disco-5: larguraDoCorpoDoDIP=14.7",
+          "restricao": "pino-do-dip-sai-do-corpo"
+        },
+        {
+          "ponto": "ceramico-disco-5: passoDoCapacitor=7.5",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "ceramico-disco-5: passoDoDisco=7.5",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
+          "ponto": "ceramico-disco-5: passoDoResistor=7.62",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "dip-40: afastamentoDoDisco=1",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
           "ponto": "dip-40: comprimentoDoResistor=12",
           "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "dip-40: deslocamentoDoChipDoModulo=18",
+          "restricao": "chip-sobre-o-modulo-positivo"
+        },
+        {
+          "ponto": "dip-40: diametroDaBordaDoLED=3.2",
+          "restricao": "borda-do-led-maior-que-o-corpo"
         },
         {
           "ponto": "dip-40: diametroDoCapacitor=4",
@@ -375,6 +1648,10 @@
           "restricao": "pino-do-dip-sai-do-corpo"
         },
         {
+          "ponto": "dip-40: larguraDoChipDoModulo=18",
+          "restricao": "chip-entre-as-fileiras-do-modulo"
+        },
+        {
           "ponto": "dip-40: larguraDoCorpoDoDIP=6.1",
           "restricao": "pino-do-dip-encosta-no-corpo"
         },
@@ -383,12 +1660,28 @@
           "restricao": "terminais-dentro-do-capacitor"
         },
         {
+          "ponto": "dip-40: passoDoDisco=7.5",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
           "ponto": "dip-40: passoDoResistor=7.62",
           "restricao": "dobra-do-resistor-fora-do-corpo"
         },
         {
+          "ponto": "dip-8: afastamentoDoDisco=1",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
           "ponto": "dip-8: comprimentoDoResistor=12",
           "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "dip-8: deslocamentoDoChipDoModulo=18",
+          "restricao": "chip-sobre-o-modulo-positivo"
+        },
+        {
+          "ponto": "dip-8: diametroDaBordaDoLED=3.2",
+          "restricao": "borda-do-led-maior-que-o-corpo"
         },
         {
           "ponto": "dip-8: diametroDoCapacitor=4",
@@ -399,6 +1692,10 @@
           "restricao": "pino-do-dip-encosta-no-corpo"
         },
         {
+          "ponto": "dip-8: larguraDoChipDoModulo=18",
+          "restricao": "chip-entre-as-fileiras-do-modulo"
+        },
+        {
           "ponto": "dip-8: larguraDoCorpoDoDIP=14.7",
           "restricao": "pino-do-dip-sai-do-corpo"
         },
@@ -407,12 +1704,72 @@
           "restricao": "terminais-dentro-do-capacitor"
         },
         {
+          "ponto": "dip-8: passoDoDisco=7.5",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
           "ponto": "dip-8: passoDoResistor=7.62",
           "restricao": "dobra-do-resistor-fora-do-corpo"
         },
         {
+          "ponto": "dissipador-to-220: afastamentoDoDisco=1",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
+          "ponto": "dissipador-to-220: comprimentoDoResistor=12",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "dissipador-to-220: deslocamentoDoChipDoModulo=18",
+          "restricao": "chip-sobre-o-modulo-positivo"
+        },
+        {
+          "ponto": "dissipador-to-220: diametroDaBordaDoLED=3.2",
+          "restricao": "borda-do-led-maior-que-o-corpo"
+        },
+        {
+          "ponto": "dissipador-to-220: diametroDoCapacitor=4",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "dissipador-to-220: fileiraDoDIP=15.24",
+          "restricao": "pino-do-dip-encosta-no-corpo"
+        },
+        {
+          "ponto": "dissipador-to-220: larguraDoChipDoModulo=18",
+          "restricao": "chip-entre-as-fileiras-do-modulo"
+        },
+        {
+          "ponto": "dissipador-to-220: larguraDoCorpoDoDIP=14.7",
+          "restricao": "pino-do-dip-sai-do-corpo"
+        },
+        {
+          "ponto": "dissipador-to-220: passoDoCapacitor=7.5",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "dissipador-to-220: passoDoDisco=7.5",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
+          "ponto": "dissipador-to-220: passoDoResistor=7.62",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "eletrolitico-6-3x11: afastamentoDoDisco=1",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
           "ponto": "eletrolitico-6-3x11: comprimentoDoResistor=12",
           "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "eletrolitico-6-3x11: deslocamentoDoChipDoModulo=18",
+          "restricao": "chip-sobre-o-modulo-positivo"
+        },
+        {
+          "ponto": "eletrolitico-6-3x11: diametroDaBordaDoLED=3.2",
+          "restricao": "borda-do-led-maior-que-o-corpo"
         },
         {
           "ponto": "eletrolitico-6-3x11: diametroDoCapacitor=4",
@@ -423,6 +1780,10 @@
           "restricao": "pino-do-dip-encosta-no-corpo"
         },
         {
+          "ponto": "eletrolitico-6-3x11: larguraDoChipDoModulo=18",
+          "restricao": "chip-entre-as-fileiras-do-modulo"
+        },
+        {
           "ponto": "eletrolitico-6-3x11: larguraDoCorpoDoDIP=14.7",
           "restricao": "pino-do-dip-sai-do-corpo"
         },
@@ -431,12 +1792,244 @@
           "restricao": "terminais-dentro-do-capacitor"
         },
         {
+          "ponto": "eletrolitico-6-3x11: passoDoDisco=7.5",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
           "ponto": "eletrolitico-6-3x11: passoDoResistor=7.62",
           "restricao": "dobra-do-resistor-fora-do-corpo"
         },
         {
+          "ponto": "jack-de-alimentacao: afastamentoDoDisco=1",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
+          "ponto": "jack-de-alimentacao: comprimentoDoResistor=12",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "jack-de-alimentacao: deslocamentoDoChipDoModulo=18",
+          "restricao": "chip-sobre-o-modulo-positivo"
+        },
+        {
+          "ponto": "jack-de-alimentacao: diametroDaBordaDoLED=3.2",
+          "restricao": "borda-do-led-maior-que-o-corpo"
+        },
+        {
+          "ponto": "jack-de-alimentacao: diametroDoCapacitor=4",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "jack-de-alimentacao: fileiraDoDIP=15.24",
+          "restricao": "pino-do-dip-encosta-no-corpo"
+        },
+        {
+          "ponto": "jack-de-alimentacao: larguraDoChipDoModulo=18",
+          "restricao": "chip-entre-as-fileiras-do-modulo"
+        },
+        {
+          "ponto": "jack-de-alimentacao: larguraDoCorpoDoDIP=14.7",
+          "restricao": "pino-do-dip-sai-do-corpo"
+        },
+        {
+          "ponto": "jack-de-alimentacao: passoDoCapacitor=7.5",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "jack-de-alimentacao: passoDoDisco=7.5",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
+          "ponto": "jack-de-alimentacao: passoDoResistor=7.62",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "led-3: afastamentoDoDisco=1",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
+          "ponto": "led-3: comprimentoDoResistor=12",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "led-3: deslocamentoDoChipDoModulo=18",
+          "restricao": "chip-sobre-o-modulo-positivo"
+        },
+        {
+          "ponto": "led-3: diametroDoCapacitor=4",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "led-3: diametroDoLED=5",
+          "restricao": "borda-do-led-maior-que-o-corpo"
+        },
+        {
+          "ponto": "led-3: fileiraDoDIP=15.24",
+          "restricao": "pino-do-dip-encosta-no-corpo"
+        },
+        {
+          "ponto": "led-3: larguraDoChipDoModulo=18",
+          "restricao": "chip-entre-as-fileiras-do-modulo"
+        },
+        {
+          "ponto": "led-3: larguraDoCorpoDoDIP=14.7",
+          "restricao": "pino-do-dip-sai-do-corpo"
+        },
+        {
+          "ponto": "led-3: passoDoCapacitor=7.5",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "led-3: passoDoDisco=7.5",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
+          "ponto": "led-3: passoDoResistor=7.62",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "led-5: afastamentoDoDisco=1",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
+          "ponto": "led-5: comprimentoDoResistor=12",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "led-5: deslocamentoDoChipDoModulo=18",
+          "restricao": "chip-sobre-o-modulo-positivo"
+        },
+        {
+          "ponto": "led-5: diametroDaBordaDoLED=3.2",
+          "restricao": "borda-do-led-maior-que-o-corpo"
+        },
+        {
+          "ponto": "led-5: diametroDoCapacitor=4",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "led-5: fileiraDoDIP=15.24",
+          "restricao": "pino-do-dip-encosta-no-corpo"
+        },
+        {
+          "ponto": "led-5: larguraDoChipDoModulo=18",
+          "restricao": "chip-entre-as-fileiras-do-modulo"
+        },
+        {
+          "ponto": "led-5: larguraDoCorpoDoDIP=14.7",
+          "restricao": "pino-do-dip-sai-do-corpo"
+        },
+        {
+          "ponto": "led-5: passoDoCapacitor=7.5",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "led-5: passoDoDisco=7.5",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
+          "ponto": "led-5: passoDoResistor=7.62",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "modulo-driver-de-passo: afastamentoDoDisco=1",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
+          "ponto": "modulo-driver-de-passo: comprimentoDoResistor=12",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "modulo-driver-de-passo: deslocamentoDoChipDoModulo=18",
+          "restricao": "chip-sobre-o-modulo-positivo"
+        },
+        {
+          "ponto": "modulo-driver-de-passo: diametroDaBordaDoLED=3.2",
+          "restricao": "borda-do-led-maior-que-o-corpo"
+        },
+        {
+          "ponto": "modulo-driver-de-passo: diametroDoCapacitor=4",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "modulo-driver-de-passo: fileiraDoDIP=15.24",
+          "restricao": "pino-do-dip-encosta-no-corpo"
+        },
+        {
+          "ponto": "modulo-driver-de-passo: larguraDoChipDoModulo=18",
+          "restricao": "chip-entre-as-fileiras-do-modulo"
+        },
+        {
+          "ponto": "modulo-driver-de-passo: larguraDoCorpoDoDIP=14.7",
+          "restricao": "pino-do-dip-sai-do-corpo"
+        },
+        {
+          "ponto": "modulo-driver-de-passo: passoDoCapacitor=7.5",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "modulo-driver-de-passo: passoDoDisco=7.5",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
+          "ponto": "modulo-driver-de-passo: passoDoResistor=7.62",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "modulo-microcontrolador: afastamentoDoDisco=1",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
+          "ponto": "modulo-microcontrolador: comprimentoDoResistor=12",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "modulo-microcontrolador: diametroDaBordaDoLED=3.2",
+          "restricao": "borda-do-led-maior-que-o-corpo"
+        },
+        {
+          "ponto": "modulo-microcontrolador: diametroDoCapacitor=4",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "modulo-microcontrolador: fileiraDoDIP=15.24",
+          "restricao": "pino-do-dip-encosta-no-corpo"
+        },
+        {
+          "ponto": "modulo-microcontrolador: fileiraDoModulo=12.7",
+          "restricao": "chip-entre-as-fileiras-do-modulo"
+        },
+        {
+          "ponto": "modulo-microcontrolador: larguraDoCorpoDoDIP=14.7",
+          "restricao": "pino-do-dip-sai-do-corpo"
+        },
+        {
+          "ponto": "modulo-microcontrolador: passoDoCapacitor=7.5",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "modulo-microcontrolador: passoDoDisco=7.5",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
+          "ponto": "modulo-microcontrolador: passoDoResistor=7.62",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "resistor-1-4w: afastamentoDoDisco=1",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
           "ponto": "resistor-1-4w: comprimentoDoResistor=12",
           "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "resistor-1-4w: deslocamentoDoChipDoModulo=18",
+          "restricao": "chip-sobre-o-modulo-positivo"
+        },
+        {
+          "ponto": "resistor-1-4w: diametroDaBordaDoLED=3.2",
+          "restricao": "borda-do-led-maior-que-o-corpo"
         },
         {
           "ponto": "resistor-1-4w: diametroDoCapacitor=4",
@@ -447,6 +2040,10 @@
           "restricao": "pino-do-dip-encosta-no-corpo"
         },
         {
+          "ponto": "resistor-1-4w: larguraDoChipDoModulo=18",
+          "restricao": "chip-entre-as-fileiras-do-modulo"
+        },
+        {
           "ponto": "resistor-1-4w: larguraDoCorpoDoDIP=14.7",
           "restricao": "pino-do-dip-sai-do-corpo"
         },
@@ -455,12 +2052,116 @@
           "restricao": "terminais-dentro-do-capacitor"
         },
         {
+          "ponto": "resistor-1-4w: passoDoDisco=7.5",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
           "ponto": "resistor-1-4w: passoDoResistor=7.62",
           "restricao": "dobra-do-resistor-fora-do-corpo"
         },
         {
+          "ponto": "soic-16: afastamentoDoDisco=1",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
+          "ponto": "soic-16: comprimentoDoResistor=12",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "soic-16: deslocamentoDoChipDoModulo=18",
+          "restricao": "chip-sobre-o-modulo-positivo"
+        },
+        {
+          "ponto": "soic-16: diametroDaBordaDoLED=3.2",
+          "restricao": "borda-do-led-maior-que-o-corpo"
+        },
+        {
+          "ponto": "soic-16: diametroDoCapacitor=4",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "soic-16: fileiraDoDIP=15.24",
+          "restricao": "pino-do-dip-encosta-no-corpo"
+        },
+        {
+          "ponto": "soic-16: larguraDoChipDoModulo=18",
+          "restricao": "chip-entre-as-fileiras-do-modulo"
+        },
+        {
+          "ponto": "soic-16: larguraDoCorpoDoDIP=14.7",
+          "restricao": "pino-do-dip-sai-do-corpo"
+        },
+        {
+          "ponto": "soic-16: passoDoCapacitor=7.5",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "soic-16: passoDoDisco=7.5",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
+          "ponto": "soic-16: passoDoResistor=7.62",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "soic-8: afastamentoDoDisco=1",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
+          "ponto": "soic-8: comprimentoDoResistor=12",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "soic-8: deslocamentoDoChipDoModulo=18",
+          "restricao": "chip-sobre-o-modulo-positivo"
+        },
+        {
+          "ponto": "soic-8: diametroDaBordaDoLED=3.2",
+          "restricao": "borda-do-led-maior-que-o-corpo"
+        },
+        {
+          "ponto": "soic-8: diametroDoCapacitor=4",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "soic-8: fileiraDoDIP=15.24",
+          "restricao": "pino-do-dip-encosta-no-corpo"
+        },
+        {
+          "ponto": "soic-8: larguraDoChipDoModulo=18",
+          "restricao": "chip-entre-as-fileiras-do-modulo"
+        },
+        {
+          "ponto": "soic-8: larguraDoCorpoDoDIP=14.7",
+          "restricao": "pino-do-dip-sai-do-corpo"
+        },
+        {
+          "ponto": "soic-8: passoDoCapacitor=7.5",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "soic-8: passoDoDisco=7.5",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
+          "ponto": "soic-8: passoDoResistor=7.62",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "to-220: afastamentoDoDisco=1",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
           "ponto": "to-220: comprimentoDoResistor=12",
           "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "to-220: deslocamentoDoChipDoModulo=18",
+          "restricao": "chip-sobre-o-modulo-positivo"
+        },
+        {
+          "ponto": "to-220: diametroDaBordaDoLED=3.2",
+          "restricao": "borda-do-led-maior-que-o-corpo"
         },
         {
           "ponto": "to-220: diametroDoCapacitor=4",
@@ -471,6 +2172,10 @@
           "restricao": "pino-do-dip-encosta-no-corpo"
         },
         {
+          "ponto": "to-220: larguraDoChipDoModulo=18",
+          "restricao": "chip-entre-as-fileiras-do-modulo"
+        },
+        {
           "ponto": "to-220: larguraDoCorpoDoDIP=14.7",
           "restricao": "pino-do-dip-sai-do-corpo"
         },
@@ -479,7 +2184,99 @@
           "restricao": "terminais-dentro-do-capacitor"
         },
         {
+          "ponto": "to-220: passoDoDisco=7.5",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
           "ponto": "to-220: passoDoResistor=7.62",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "to-220-no-dissipador: afastamentoDoDisco=1",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
+          "ponto": "to-220-no-dissipador: comprimentoDoResistor=12",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "to-220-no-dissipador: deslocamentoDoChipDoModulo=18",
+          "restricao": "chip-sobre-o-modulo-positivo"
+        },
+        {
+          "ponto": "to-220-no-dissipador: diametroDaBordaDoLED=3.2",
+          "restricao": "borda-do-led-maior-que-o-corpo"
+        },
+        {
+          "ponto": "to-220-no-dissipador: diametroDoCapacitor=4",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "to-220-no-dissipador: fileiraDoDIP=15.24",
+          "restricao": "pino-do-dip-encosta-no-corpo"
+        },
+        {
+          "ponto": "to-220-no-dissipador: larguraDoChipDoModulo=18",
+          "restricao": "chip-entre-as-fileiras-do-modulo"
+        },
+        {
+          "ponto": "to-220-no-dissipador: larguraDoCorpoDoDIP=14.7",
+          "restricao": "pino-do-dip-sai-do-corpo"
+        },
+        {
+          "ponto": "to-220-no-dissipador: passoDoCapacitor=7.5",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "to-220-no-dissipador: passoDoDisco=7.5",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
+          "ponto": "to-220-no-dissipador: passoDoResistor=7.62",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "to-92: afastamentoDoDisco=1",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
+          "ponto": "to-92: comprimentoDoResistor=12",
+          "restricao": "dobra-do-resistor-fora-do-corpo"
+        },
+        {
+          "ponto": "to-92: deslocamentoDoChipDoModulo=18",
+          "restricao": "chip-sobre-o-modulo-positivo"
+        },
+        {
+          "ponto": "to-92: diametroDaBordaDoLED=3.2",
+          "restricao": "borda-do-led-maior-que-o-corpo"
+        },
+        {
+          "ponto": "to-92: diametroDoCapacitor=4",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "to-92: fileiraDoDIP=15.24",
+          "restricao": "pino-do-dip-encosta-no-corpo"
+        },
+        {
+          "ponto": "to-92: larguraDoChipDoModulo=18",
+          "restricao": "chip-entre-as-fileiras-do-modulo"
+        },
+        {
+          "ponto": "to-92: larguraDoCorpoDoDIP=14.7",
+          "restricao": "pino-do-dip-sai-do-corpo"
+        },
+        {
+          "ponto": "to-92: passoDoCapacitor=7.5",
+          "restricao": "terminais-dentro-do-capacitor"
+        },
+        {
+          "ponto": "to-92: passoDoDisco=7.5",
+          "restricao": "dobra-do-disco-acima-da-placa"
+        },
+        {
+          "ponto": "to-92: passoDoResistor=7.62",
           "restricao": "dobra-do-resistor-fora-do-corpo"
         }
       ]
