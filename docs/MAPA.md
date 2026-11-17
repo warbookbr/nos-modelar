@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2095 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2096 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -608,6 +608,7 @@
 - `2026-11-16-familia-componentes-eletronicos.md` — Família de componentes eletrônicos: as peças por encapsulamento e a placa declarada, provadas no braço robótico
 - `2026-11-16-ferramentas-de-correcao-de-superficie.md` — Ferramentas de correção de superfície: alisar as curvas pela medida, cortar com simetria e emendar com continuidade declarada, rumo ao G2 de produção
 - `2026-11-16-ponte-com-a-mecatronica.md` — Ponte com a mecatrônica: a ficha do objeto exportada, as portas elétricas declaradas e o pedido que volta conferido
+- `2026-11-17-abrir-peca-com-filtros.md` — Abrir peça com filtros: a janela de abrir da bancada busca por nome e separa por categoria e situação
 - `2026-11-17-etapas-pela-impressao-do-aceite.md` — Etapas pela impressão do aceite: o estado de cada etapa sai da comparação do medido agora com o que a pessoa aprovou
 - `2026-11-17-trilhas-e-validacao-da-placa.md` — Trilhas de cobre e validação elétrica da placa declarada: a lista de ligações vira cobre conferido por regra e por conectividade
 - `BACKLOG.md` — Backlog aberto
