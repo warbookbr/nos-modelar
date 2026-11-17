@@ -164,6 +164,7 @@ Abrir só quando a condição aparecer:
 - `docs/modelar/usar/PARAMETROS-VIVOS.md`, quando for alterar um número da receita.
 - `docs/modelar/usar/PARE-E-ANALISE.md`, quando for declarar a forma pronta.
 - `docs/modelar/usar/README.md`, quando a tarefa pede o mapa dos contratos de uso que o roteiro não cita.
+- `docs/modelar/usar/CACHE-POR-PASSO.md`, quando um comando repetido sobre a mesma peça parece lento ou serve um resultado suspeito, para ligar, limpar ou desligar o cache por passo.
 - `docs/modelar/usar/CONFERIR-CONTRA-REFERENCIA.md`, quando há foto de referência e não há prancha, para medir a borda em milímetro.
 - `docs/modelar/guias/modelar-carroceria.md`, quando a peça é uma chapa contínua de superfície lisa, com dobras vivas, raio de borda, arcos e vãos, modelada por subdivisão.
 - `docs/modelar/guias/modelar-veiculo-em-chassi-e-lataria.md`, quando o objeto é um veículo com chassi por baixo e lataria em painéis separados por vãos.
@@ -211,6 +212,7 @@ Abrir só quando a condição aparecer:
 - `docs/modelar/usar/PARAMETROS-VIVOS.md`, quando for alterar um número da receita.
 - `docs/modelar/usar/PARE-E-ANALISE.md`, quando for declarar a forma pronta.
 - `docs/modelar/usar/README.md`, quando a tarefa pede o mapa dos contratos de uso que o roteiro não cita.
+- `docs/modelar/usar/CACHE-POR-PASSO.md`, quando um comando repetido sobre a mesma peça parece lento ou serve um resultado suspeito, para ligar, limpar ou desligar o cache por passo.
 - `docs/modelar/usar/CONFERIR-CONTRA-REFERENCIA.md`, quando há foto de referência e não há prancha, para medir a borda em milímetro.
 - `docs/modelar/guias/modelar-carroceria.md`, quando a peça é uma chapa contínua de superfície lisa, com dobras vivas, raio de borda, arcos e vãos, modelada por subdivisão.
 - `docs/modelar/guias/modelar-veiculo-em-chassi-e-lataria.md`, quando o objeto é um veículo com chassi por baixo e lataria em painéis separados por vãos.
@@ -258,6 +260,7 @@ Abrir só quando a condição aparecer:
 - `docs/modelar/usar/PARAMETROS-VIVOS.md`, quando for alterar um número da receita.
 - `docs/modelar/usar/PARE-E-ANALISE.md`, quando for declarar a forma pronta.
 - `docs/modelar/usar/README.md`, quando a tarefa pede o mapa dos contratos de uso que o roteiro não cita.
+- `docs/modelar/usar/CACHE-POR-PASSO.md`, quando um comando repetido sobre a mesma peça parece lento ou serve um resultado suspeito, para ligar, limpar ou desligar o cache por passo.
 - `docs/modelar/usar/CONFERIR-CONTRA-REFERENCIA.md`, quando há foto de referência e não há prancha, para medir a borda em milímetro.
 - `docs/modelar/guias/modelar-carroceria.md`, quando a peça é uma chapa contínua de superfície lisa, com dobras vivas, raio de borda, arcos e vãos, modelada por subdivisão.
 - `docs/modelar/guias/modelar-veiculo-em-chassi-e-lataria.md`, quando o objeto é um veículo com chassi por baixo e lataria em painéis separados por vãos.
