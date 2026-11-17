@@ -428,6 +428,18 @@ describe('a prancha desenhada em mm (SVG)', () => {
     expect(() => lerPranchaDesenhada(FIXTURE, { ler })).toThrow(/não são da mesma rodada/);
   });
 
+  it('girar 90 graus no sentido horário troca largura e altura, leva o contorno para o canto certo e muda a escala em mm só pela troca', () => {
+    const r = lerPranchaDesenhada(FIXTURE, { girar: 90 });
+    expect(r.larguraMm).toBe(300);
+    expect(r.alturaMm).toBe(400);
+    expect(r.pxPorMm).toBeCloseTo(1.5, 9);
+    expect(r.regua).toBe('450=300');
+    expect(r.svg).toContain('viewBox="0 0 220 300"');
+    expect(r.svg).toContain('width="660" height="900"');
+    expect(r.svg).toContain('matrix(0 1 -1 0 220 0)');
+    expect(() => lerPranchaDesenhada(FIXTURE, { girar: 45 })).toThrow(/múltiplos de 90/);
+  });
+
   it('recusa a prancha sem relatório ao lado e o nome que não diz o lado', () => {
     expect(() => lerPranchaDesenhada(FIXTURE, { existe: () => false })).toThrow(/falta lateral\.prancha\.relatorio\.json/);
     expect(() => lerPranchaDesenhada('/x/qualquer.prancha.svg')).toThrow(/<lado>\.prancha\.svg/);

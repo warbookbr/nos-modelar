@@ -443,7 +443,7 @@ export function secoesDoPedido({ peca, plano = null, orientacao = null, alvo = n
     }
   } else {
     L.push(pranchaDesenhada
-      ? 'A receita não refina um esboço aprovado, e o alvo é a prancha desenhada da seção seguinte, que está na mesma escala do modelo: `alvo` do veredito leva o caminho da imagem da prancha que você comparou (a de `sobreposta`, ou a de `lado`).'
+      ? 'A receita não refina um esboço aprovado, e o alvo é a prancha desenhada da seção seguinte, que está na mesma escala do modelo: `alvo` do veredito leva o caminho da imagem da prancha que você comparou (a de `lado`, ou a de `sobreposta` quando o modelo é a peça inteira do desenho).'
       : referencias.length
       ? 'A receita não refina um esboço aprovado, e o alvo é a referência da seção seguinte: `alvo` do veredito leva o caminho da imagem de referência que você comparou.'
       : 'A receita não refina um esboço aprovado e o pedido não traz imagem de referência: `alvo` do veredito leva o texto `sem alvo: <motivo>`, com o motivo em uma frase. Não ponha ali o caminho do pedido nem de qualquer imagem do pacote.');
@@ -1321,21 +1321,21 @@ export function vistaDaPranchaDesenhada(caminho, critica = { referencias: {} }, 
 
 /** As duas imagens e as linhas da prancha desenhada, ou os motivos de não haver. `pranchas` são os `.prancha.svg` que o plano cita e a
  *  pasta da rodada recebe o que sai. Falhar aqui não derruba o pacote, mas o motivo vai ao aviso e ao pedido: nunca silêncio. */
-export async function pranchaDoPlano({ pranchas, peca, pasta, critica, orientacao, prancharDesenhadas: pranchar }) {
+export async function pranchaDoPlano({ pranchas, peca, pasta, critica, orientacao, prancharDesenhadas: pranchar, prazoDeCargaMs = null }) {
   const fora = [];
   const entradas = [];
   for (const caminho of pranchas) {
     const v = vistaDaPranchaDesenhada(caminho, critica, orientacao);
     if (!v) { fora.push(`${basename(caminho)}: o lado dela não é uma vista ortográfica de eixo (${VISTAS_DA_PRANCHA.join(', ')}); declare-o em CRITICA.referencias.`); continue; }
     if (entradas.some((e) => e.vista === v.vista)) { fora.push(`${basename(caminho)}: outra prancha já cobre a vista ${v.vista}.`); continue; }
-    entradas.push({ caminho, ...v });
+    entradas.push({ caminho, ...v, girar: critica.pranchas?.[basename(caminho)]?.girar ?? 0 });
   }
   const imagens = [];
   let lidas = [];
   for (const [disposicao, nome] of [['lado', 'lado'], ['sobreposto', 'sobreposta']]) {
     if (!entradas.length) break;
     try {
-      const r = await pranchar({ peca, pranchas: entradas.map(({ caminho, vista }) => ({ caminho, vista })), saida: join(pasta, `prancha-desenhada-${nome}.png`), disposicao });
+      const r = await pranchar({ peca, pranchas: entradas.map(({ caminho, vista, girar }) => ({ caminho, vista, girar })), saida: join(pasta, `prancha-desenhada-${nome}.png`), disposicao, ...(prazoDeCargaMs ? { prazoDeCargaMs } : {}) });
       imagens.push({ disposicao: nome, arquivo: r.arquivo, json: r.json });
       lidas = r.lidas ?? lidas;
     } catch (erro) {
@@ -1343,7 +1343,7 @@ export async function pranchaDoPlano({ pranchas, peca, pasta, critica, orientaca
     }
   }
   if (!imagens.length) return { feita: null, fora };
-  const linhas = entradas.map((e) => ({ vista: e.vista, caminho: e.caminho, presumida: e.presumida, larguraMm: lidas.find((l) => l.caminho === e.caminho)?.larguraMm ?? null, alturaMm: lidas.find((l) => l.caminho === e.caminho)?.alturaMm ?? null }));
+  const linhas = entradas.map((e) => ({ vista: e.vista, caminho: e.caminho, presumida: e.presumida, girar: e.girar, larguraMm: lidas.find((l) => l.caminho === e.caminho)?.larguraMm ?? null, alturaMm: lidas.find((l) => l.caminho === e.caminho)?.alturaMm ?? null }));
   return { feita: { linhas, imagens, fora }, fora };
 }
 
@@ -1352,14 +1352,14 @@ function secaoDaPranchaDesenhada({ linhas, imagens, fora = [] }, { orientacao = 
     '## Prancha desenhada', '',
     'O plano cita uma prancha desenhada: o desenho cotado da silhueta, em mm no referencial da peça, e não uma foto nem o objeto real em outra escala. '
     + 'As imagens abaixo põem o modelo e o desenho na mesma escala em mm, cada um com a régua dele no painel, na vista do modelo que olha do mesmo lado que o desenho. '
-    + 'Em `lado` o modelo fica à esquerda e o desenho à direita, em recortes de mesma escala; em `sobreposta` o modelo translúcido cobre o desenho, alinhados pelo centro das extensões. '
+    + 'Em `lado` o modelo fica à esquerda e o desenho à direita, em recortes de mesma escala; em `sobreposta` o modelo translúcido cobre o desenho, alinhados pelo centro das extensões, o que só vale quando o modelo é a peça inteira do desenho: se ele é uma parte (o quarto traseiro de um carro inteiro, por exemplo), a sobreposição não os alinha e vale a imagem `lado`. '
     + 'A silhueta de lado, de cima ou de trás do modelo sai da prancha onde um contorno passa do outro além da tolerância do plano, e a diferença se lê em mm pela régua do painel, '
     + 'e não pela impressão de proporção. As cotas e os textos do desenho foram tirados da imagem, e valem as linhas do contorno, dos painéis e dos vidros.',
     alvo ? 'Esta prancha é medida em mm além do alvo do esboço, e não o substitui: a nota continua contra o alvo, e a silhueta fora da prancha entra como defeito.' : '',
     '',
     ...lista(imagens.map((i) => `${i.disposicao}: ${i.arquivo}`)), '',
     'Cada vista do desenho e a vista do modelo que a compara:', '',
-    ...lista(linhas.map((l) => `${basename(l.caminho)}: vista ${l.vista} do modelo (${ladoDaVista(l.vista, orientacao)})${l.larguraMm ? `; o desenho mede ${mm(l.larguraMm)} x ${mm(l.alturaMm)} mm` : ''}${l.presumida ? '; o lado do desenho não foi declarado e a vista saiu do nome do arquivo: se os dois contornos aparecerem espelhados, diga no veredito o que você presumiu' : ''}`)), '',
+    ...lista(linhas.map((l) => `${basename(l.caminho)}: vista ${l.vista} do modelo (${ladoDaVista(l.vista, orientacao)})${l.larguraMm ? `; o desenho mede ${mm(l.larguraMm)} x ${mm(l.alturaMm)} mm` : ''}${l.girar ? `; o desenho foi girado ${l.girar} graus no sentido horário, para olhar do mesmo lado que a vista` : ''}${l.presumida ? '; o lado do desenho não foi declarado e a vista saiu do nome do arquivo: se os dois contornos aparecerem espelhados, diga no veredito o que você presumiu' : ''}`)), '',
   ].filter((linha, i, todas) => !(linha === '' && todas[i - 1] === ''));
   for (const f of fora) L.push(`Fora da prancha desenhada: ${f}`, '');
   return L;
@@ -2135,14 +2135,20 @@ export function montagemDaPeca(peca, { raiz = REPO } = {}) {
 
 /* A receita pode exportar `CRITICA`, com o que só ela sabe sobre o pacote: `referencias`, o lado de onde olha uma imagem cujo nome não
    diz (`{ 'foto.png': 'lateral' }`, um de `LADOS_DECLARAVEIS`), e `cortes`, o plano de um encaixe que a malha sozinha não dá
-   (`[{ vizinha, ponto: [x, y, z], normal: [x, y, z], motivo }]`, em mm no mundo da montagem). Fica fora do `PLANO` e dos `CONTATOS`
+   (`[{ vizinha, ponto: [x, y, z], normal: [x, y, z], motivo }]`, em mm no mundo da montagem), e `pranchas`, o que só a receita sabe de uma prancha desenhada
+   (`{ 'superior.prancha.svg': { girar: 90 } }`: os graus, horários, que giram o desenho para olhar do mesmo lado que a vista do modelo). Fica fora do `PLANO` e dos `CONTATOS`
    porque os dois são lidos por validadores que recusam campo novo. */
 export function lerCritica(bruta) {
   if (bruta === null || bruta === undefined) return { referencias: {}, cortes: [] };
   const objeto = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
   if (!objeto(bruta)) throw new Error('CRITICA da receita deve ser um objeto com `referencias` e `cortes`.');
-  const extras = Object.keys(bruta).filter((k) => !['referencias', 'cortes'].includes(k));
-  if (extras.length) throw new Error(`CRITICA: campo desconhecido '${extras[0]}'; aceito 'referencias' e 'cortes'.`);
+  const extras = Object.keys(bruta).filter((k) => !['referencias', 'cortes', 'pranchas'].includes(k));
+  if (extras.length) throw new Error(`CRITICA: campo desconhecido '${extras[0]}'; aceito 'referencias', 'cortes' e 'pranchas'.`);
+  const pranchas = bruta.pranchas ?? {};
+  if (!objeto(pranchas)) throw new Error('CRITICA.pranchas deve ser um objeto { arquivo: { girar } }.');
+  for (const [arquivo, p] of Object.entries(pranchas)) {
+    if (!objeto(p) || !Object.keys(p).every((k) => k === 'girar') || ![0, 90, 180, 270].includes(p.girar ?? 0)) throw new Error(`CRITICA.pranchas['${arquivo}'] aceita só { girar: 0, 90, 180 ou 270 } (graus no sentido horário).`);
+  }
   const referencias = bruta.referencias ?? {};
   if (!objeto(referencias)) throw new Error('CRITICA.referencias deve ser um objeto { arquivo: lado }.');
   for (const [arquivo, lado] of Object.entries(referencias)) {
@@ -2157,7 +2163,7 @@ export function lerCritica(bruta) {
     }
     if (typeof c.motivo !== 'string' || c.motivo.trim().length < 12) throw new Error(`CRITICA.cortes[${i}]: 'motivo' diz por que o plano é declarado, com pelo menos 12 caracteres.`);
   });
-  return { referencias: { ...referencias }, cortes: cortes.map((c) => ({ ...c })) };
+  return { referencias: { ...referencias }, cortes: cortes.map((c) => ({ ...c })), ...(Object.keys(pranchas).length ? { pranchas: { ...pranchas } } : {}) };
 }
 
 /* os arquivos que o plano cita e que não são imagem, com o caminho absoluto, como `referenciasDoPlano` os resolve */
@@ -2399,7 +2405,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   /* A prancha desenhada em mm que o plano cita: o modelo e o desenho na mesma escala, na vista que olha do mesmo lado. */
   let pranchaDesenhada = null;
   if (referencias.pranchas.length) {
-    const r = await pranchaDoPlano({ pranchas: referencias.pranchas, peca, pasta, critica, orientacao: dados?.orientacao ?? null, prancharDesenhadas: dep.prancharDesenhadas });
+    const r = await pranchaDoPlano({ pranchas: referencias.pranchas, peca, pasta, critica, orientacao: dados?.orientacao ?? null, prancharDesenhadas: dep.prancharDesenhadas, prazoDeCargaMs });
     pranchaDesenhada = r.feita ?? { linhas: [], imagens: [], fora: r.fora };
     for (const f of r.fora) avisos.push(`prancha desenhada: ${f}`);
     if (!r.feita) avisos.push(`o plano cita ${referencias.pranchas.map((c) => basename(c)).join(', ')} e a prancha desenhada não entrou no pacote: o crítico não tem o desenho para comparar a silhueta.`);

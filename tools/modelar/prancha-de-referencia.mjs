@@ -171,7 +171,14 @@ export function extensaoNaImagem(dados, largura, caixa, fundo, limiar) {
 
 /* Fase 1, na página: decodifica as imagens (guardadas em `window.__prancha` para a fase 2) e mede fundo e extensão de cada uma. */
 async function carregarEMedirNaPagina({ modelos, fotos, limiar }) {
-  const ler = async (url) => createImageBitmap(await (await fetch(url)).blob());
+  /* o SVG não decodifica por blob no createImageBitmap do Chromium; passa pelo elemento de imagem, que o rasteriza no tamanho do desenho */
+  const ler = async (url) => {
+    if (!url.startsWith('data:image/svg+xml')) return createImageBitmap(await (await fetch(url)).blob());
+    const img = new Image();
+    img.src = url;
+    await img.decode();
+    return createImageBitmap(img);
+  };
   const pixels = (bm) => {
     const c = new OffscreenCanvas(bm.width, bm.height);
     const g = c.getContext('2d', { willReadFrequently: true });
@@ -820,7 +827,7 @@ export function lerPedido({ peca, foto, regua, regiao, vistas, parte, copia, dis
  * Monta a prancha e grava o PNG e, ao lado, o JSON das medidas. `olhar` é o `olharBancada` (injetável no teste) e `chromium` o do
  * Playwright. Devolve `{ arquivo, json, medidas }`.
  */
-export async function prancharReferencia(opcoes, { rotulo = 'foto', olhar = null, chromium = null, lancar = null, logger = () => {} } = {}) {
+export async function prancharReferencia(opcoes, { rotulo = 'foto', prazoDeCargaMs = null, olhar = null, chromium = null, lancar = null, logger = () => {} } = {}) {
   const pedido = lerPedido(opcoes);
   const olharBancada = olhar ?? (await import('./olhar-bancada.mjs')).olharBancada;
   const isolar = pedido.partes.length > 0;
@@ -831,6 +838,7 @@ export async function prancharReferencia(opcoes, { rotulo = 'foto', olhar = null
     projetar: PONTOS_DA_ESCALA,
     ...(isolar ? { selecionadas: pedido.partes, modo: 'isolar', focar: true, ...(pedido.copia ? { copia: pedido.copia } : {}) } : { enquadrar: true }),
     aoProgredir: logger,
+    ...(prazoDeCargaMs ? { prazoDeCargaMs } : {}),
   });
   if (!r.ok) recusar(`a bancada recusou a captura: ${r.erro?.mensagem ?? ''}\n${r.stderr ?? ''}`.trim());
   const capturas = r.resultado.capturas;
@@ -908,7 +916,8 @@ export function caixaDoContornoSvg(texto, nome = 'a prancha') {
  * desenho: vem da caixa do contorno em px e da caixa em mm que o relatório da prancha grava, e as duas direções precisam concordar em 3%.
  * Devolve `{ svg, vista, regua, regiao, pxPorMm, caixaMm, larguraMm, alturaMm }`.
  */
-export function lerPranchaDesenhada(caminhoSvg, { ler = (c) => readFileSync(c, 'utf8'), existe = existsSync } = {}) {
+export function lerPranchaDesenhada(caminhoSvg, { ler = (c) => readFileSync(c, 'utf8'), existe = existsSync, girar = 0 } = {}) {
+  if (![0, 90, 180, 270].includes(girar)) recusar(`girar ${girar}: a prancha desenhada gira em múltiplos de 90 graus, no sentido horário (0, 90, 180 ou 270).`);
   const nome = basename(caminhoSvg);
   const lado = /^(.*)\.prancha\.svg$/.exec(nome)?.[1] ?? '';
   const vista = VISTA_DA_PRANCHA_DESENHADA[lado.split(/[^a-z]+/i).pop()?.toLowerCase()] ?? null;
@@ -919,9 +928,17 @@ export function lerPranchaDesenhada(caminhoSvg, { ler = (c) => readFileSync(c, '
   const caixa = Object.values(porVistaDoRelatorio)[0]?.caixa;
   if (!caixa || ![caixa.xMin, caixa.xMax, caixa.yMin, caixa.yMax].every(Number.isFinite)) recusar(`${basename(relatorio)} não traz relatorio.porVista.<vista>.caixa com xMin, xMax, yMin e yMax em mm.`);
   const texto = ler(caminhoSvg);
-  const [x0, y0, x1, y1] = caixaDoContornoSvg(texto, nome);
-  const larguraMm = caixa.xMax - caixa.xMin;
-  const alturaMm = caixa.yMax - caixa.yMin;
+  let [x0, y0, x1, y1] = caixaDoContornoSvg(texto, nome);
+  const trocam = girar === 90 || girar === 270;
+  /* o relatório dá a caixa do desenho como foi traçado; a imagem girada troca a largura e a altura em mm junto com as de px */
+  const larguraMm = trocam ? caixa.yMax - caixa.yMin : caixa.xMax - caixa.xMin;
+  const alturaMm = trocam ? caixa.xMax - caixa.xMin : caixa.yMax - caixa.yMin;
+  const medidaDoDesenho = girar ? /viewBox="0 0 ([\d.]+) ([\d.]+)"/.exec(texto) : null;
+  if (girar && !medidaDoDesenho) recusar(`${nome}: girar pede <svg viewBox="0 0 <largura> <altura>">, e o desenho abre com outro.`);
+  const [W, H] = medidaDoDesenho ? [Number(medidaDoDesenho[1]), Number(medidaDoDesenho[2])] : [0, 0];
+  if (girar === 90) [x0, y0, x1, y1] = [H - y1, x0, H - y0, x1];
+  else if (girar === 180) [x0, y0, x1, y1] = [W - x1, H - y1, W - x0, H - y0];
+  else if (girar === 270) [x0, y0, x1, y1] = [y0, W - x1, y1, W - x0];
   const k = (x1 - x0) / larguraMm;
   const kAltura = (y1 - y0) / alturaMm;
   if (!(k > 0) || Math.abs(kAltura - k) > k * 0.03) {
@@ -931,8 +948,14 @@ export function lerPranchaDesenhada(caminhoSvg, { ler = (c) => readFileSync(c, '
   const f = AMPLIACAO_DO_SVG;
   const abertura = /<svg\b[^>]*>/.exec(texto);
   if (!abertura || !/\bviewBox=/.test(abertura[0])) recusar(`${nome} não abre com <svg viewBox=...>.`);
-  const ampliada = abertura[0].replace(/\s(width|height)="([\d.]+)"/g, (_, atributo, valor) => ` ${atributo}="${Number(valor) * f}"`);
-  const svg = texto.replace(abertura[0], `${ampliada}<style>${COTAS_ESCONDIDAS} { display: none }</style>`);
+  let ampliada = abertura[0].replace(/\s(width|height)="([\d.]+)"/g, (_, atributo, valor) => ` ${atributo}="${Number(valor) * f}"`);
+  let miolo = texto.slice(abertura.index + abertura[0].length).replace(/<\/svg>\s*$/, '');
+  if (girar) {
+    const matriz = { 90: `0 1 -1 0 ${H} 0`, 180: `-1 0 0 -1 ${W} ${H}`, 270: `0 -1 1 0 0 ${W}` }[girar];
+    ampliada = ampliada.replace(/viewBox="[^"]*"/, `viewBox="0 0 ${trocam ? H : W} ${trocam ? W : H}"`).replace(/\swidth="([\d.]+)"/, () => ` width="${(trocam ? H : W) * f}"`).replace(/\sheight="([\d.]+)"/, () => ` height="${(trocam ? W : H) * f}"`);
+    miolo = `<g transform="matrix(${matriz})">${miolo}</g>`;
+  }
+  const svg = `${texto.slice(0, abertura.index)}${ampliada}<style>${COTAS_ESCONDIDAS} { display: none }</style>${miolo}</svg>\n`;
   const regiao = [x0 - folga, y0 - folga, x1 + folga, y1 + folga].map((v) => Math.max(0, Math.round(v * f)));
   return { svg, vista, regua: `${Math.round((x1 - x0) * f * 100) / 100}=${Math.round(larguraMm * 100) / 100}`, regiao: regiao.join(','), pxPorMm: k * f, caixaMm: caixa, larguraMm, alturaMm };
 }
@@ -942,9 +965,9 @@ export function lerPranchaDesenhada(caminhoSvg, { ler = (c) => readFileSync(c, '
  * na mesma escala em mm. `pranchas` é `[{ caminho, vista? }]` (a `vista` declarada vale no lugar da do nome); grava `<saida>` e, ao lado,
  * o SVG ampliado de cada uma. Devolve `{ arquivo, json, medidas, vistas }`.
  */
-export async function prancharDesenhadas({ peca, pranchas, saida, disposicao = 'lado', espelhar = [] }, dependencias = {}) {
+export async function prancharDesenhadas({ peca, pranchas, saida, disposicao = 'lado', espelhar = [], prazoDeCargaMs = null }, dependencias = {}) {
   if (!pranchas?.length) recusar('prancharDesenhadas pede ao menos uma prancha.');
-  const lidas = pranchas.map((p) => ({ ...lerPranchaDesenhada(p.caminho, dependencias.leitura ?? {}), caminho: p.caminho }));
+  const lidas = pranchas.map((p) => ({ ...lerPranchaDesenhada(p.caminho, { ...(dependencias.leitura ?? {}), girar: p.girar ?? 0 }), caminho: p.caminho, girar: p.girar ?? 0 }));
   const vistas = lidas.map((l, i) => pranchas[i].vista ?? l.vista);
   const arquivos = lidas.map((l, i) => {
     const arquivo = saida.replace(/\.png$/i, `-${vistas[i]}.svg`);
@@ -955,8 +978,8 @@ export async function prancharDesenhadas({ peca, pranchas, saida, disposicao = '
   const resultado = await prancharReferencia({
     peca, vistas: vistas.join(','), foto: arquivos.join(';'), regua: lidas.map((l) => l.regua).join(';'), regiao: lidas.map((l) => l.regiao).join(';'),
     disposicao, espelhar: espelhar.join(','), saida,
-  }, { ...dependencias, rotulo: 'prancha desenhada' });
-  return { ...resultado, vistas, lidas: lidas.map(({ caminho, vista, larguraMm, alturaMm, pxPorMm }, i) => ({ caminho, vista: vistas[i], larguraMm, alturaMm, pxPorMm })) };
+  }, { ...dependencias, rotulo: 'prancha desenhada', ...(prazoDeCargaMs ? { prazoDeCargaMs } : {}) });
+  return { ...resultado, vistas, lidas: lidas.map(({ caminho, larguraMm, alturaMm, pxPorMm, girar }, i) => ({ caminho, vista: vistas[i], larguraMm, alturaMm, pxPorMm, girar })) };
 }
 
 /* ---------- A CLI ---------- */

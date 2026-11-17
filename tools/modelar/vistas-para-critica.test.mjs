@@ -630,6 +630,8 @@ describe('a referência que vale para cada vista do modelo', () => {
     expect(() => lerCritica({ cortes: [{ ...corte, normal: [0, 0, 0] }] })).toThrow(/normal' não nula/);
     expect(() => lerCritica({ cortes: [{ ...corte, motivo: 'x' }] })).toThrow(/motivo/);
     expect(() => lerCritica({ outra: 1 })).toThrow(/campo desconhecido 'outra'/);
+    expect(lerCritica({ pranchas: { 'superior.prancha.svg': { girar: 90 } } }).pranchas).toEqual({ 'superior.prancha.svg': { girar: 90 } });
+    expect(() => lerCritica({ pranchas: { 'x.prancha.svg': { girar: 45 } } })).toThrow(/aceita só \{ girar/);
   });
 });
 
