@@ -302,7 +302,7 @@ function reguaDoPainel(ops, { painel, zeroX, zeroY, comprimentoX, comprimentoY, 
  * - `foto`: `{ nome, largura, altura, regiao (caixa pedida ou null), extensao, pxPorMm, espelhar, regua }`.
  * Devolve `{ largura, altura, fundo, operacoes, escala, linhas }`, e `linhas` traz as medidas em mm que vão também para o JSON.
  */
-export function disporPrancha({ titulo, linhas, disposicao = 'lado', alturaDaLinha = ALTURA_DA_LINHA, larguraMaxima = LARGURA_MAXIMA }) {
+export function disporPrancha({ titulo, linhas, disposicao = 'lado', alturaDaLinha = ALTURA_DA_LINHA, larguraMaxima = LARGURA_MAXIMA, rotulo = 'foto' }) {
   if (!DISPOSICOES.includes(disposicao)) recusar(`--disposicao '${disposicao}' não existe; use ${DISPOSICOES.join(' ou ')}.`);
   /* o que cada painel mostra, em px da imagem de origem e em mm */
   const medidas = linhas.map((l) => {
@@ -355,7 +355,7 @@ export function disporPrancha({ titulo, linhas, disposicao = 'lado', alturaDaLin
     /* a frase de lado do modelo vai numa terceira linha do rótulo */
     const fraseDosEixos = l.modelo.eixos ? `eixos do modelo: ${l.modelo.eixos.frase}` : null;
     const topo = y + ALTURA_DO_ROTULO + (fraseDosEixos ? 17 : 0);
-    const fotoTexto = `foto ${l.foto.nome}${l.foto.espelhar ? ' (espelhada)' : ''}, régua ${mm1(l.foto.regua.mm)} mm = ${mm1(l.foto.regua.px)} px`;
+    const fotoTexto = `${rotulo} ${l.foto.nome}${l.foto.espelhar ? ' (espelhada)' : ''}, régua ${mm1(l.foto.regua.mm)} mm = ${mm1(l.foto.regua.px)} px`;
     const linhaRelato = {
       vista: l.vista,
       modelo: { pxPorMm: l.modelo.pxPorMm, extensaoPx: l.modelo.extensao, extensaoMm: m.extMmm.map((v) => Number(v.toFixed(1))), ...(l.modelo.eixos ? { eixos: l.modelo.eixos } : {}) },
@@ -401,7 +401,7 @@ export function disporPrancha({ titulo, linhas, disposicao = 'lado', alturaDaLin
       const painel = [x0, topo, Math.round((u.u[2] - u.u[0]) * escala), alturaDaLinhaPx];
       const emPx = (c) => [x0 + (c[0] - u.u[0]) * escala, topo + (c[1] - u.u[1]) * escala, (c[2] - c[0]) * escala, (c[3] - c[1]) * escala].map((v) => Math.round(v));
       ops.push({ tipo: 'texto', texto: `vista ${l.vista}: modelo translúcido (caixa azul) sobre a ${fotoTexto}`, em: [x0, y + 16], tamanho: 14, peso: 'bold', cor: COR_DO_MODELO });
-      ops.push({ tipo: 'texto', texto: `alinhados pelo centro das extensões; modelo ${mm1(m.extMmm[0])} x ${mm1(m.extMmm[1])} mm, foto ${mm1(m.extFmm[0])} x ${mm1(m.extFmm[1])} mm`, em: [x0, y + 33], tamanho: 12, cor: '#444' });
+      ops.push({ tipo: 'texto', texto: `alinhados pelo centro das extensões; modelo ${mm1(m.extMmm[0])} x ${mm1(m.extMmm[1])} mm, ${rotulo} ${mm1(m.extFmm[0])} x ${mm1(m.extFmm[1])} mm`, em: [x0, y + 33], tamanho: 12, cor: '#444' });
       if (fraseDosEixos) ops.push({ tipo: 'texto', texto: fraseDosEixos, em: [x0, y + 50], tamanho: 12, cor: COR_DO_MODELO, eixos: true });
       ops.push({ tipo: 'retangulo', caixa: painel, preencher: '#ffffff' });
       ops.push({ tipo: 'imagem', fonte: 'fotos', indice: i, recorte: [m.recF[0], m.recF[1], m.recF[2] - m.recF[0], m.recF[3] - m.recF[1]], destino: emPx(u.caixaF), espelhar: Boolean(l.foto.espelhar) });
@@ -781,7 +781,7 @@ export async function prancharContorno({ peca, contornos, arquivo, titulo = null
 
 /* ---------- O serviço ---------- */
 
-const TIPOS = { '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp' };
+const TIPOS = { '.svg': 'image/svg+xml', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp' };
 const dataUrl = (bytes, tipo) => `data:${tipo};base64,${Buffer.from(bytes).toString('base64')}`;
 
 /** Lê e confere o pedido antes de abrir bancada e navegador: um erro de escrita não custa uma captura. */
@@ -794,7 +794,7 @@ export function lerPedido({ peca, foto, regua, regiao, vistas, parte, copia, dis
     const abs = resolve(f);
     if (!existsSync(abs)) recusar(`--foto: '${f}' não existe.`);
     const tipo = TIPOS[extname(abs).toLowerCase()];
-    if (!tipo) recusar(`--foto: '${f}' não é jpg, png nem webp.`);
+    if (!tipo) recusar(`--foto: '${f}' não é jpg, png, webp nem svg.`);
     return { abs, nome: basename(abs), tipo };
   });
   const reguas = porVista(regua, listaDeVistas, 'regua').map(lerRegua);
@@ -820,7 +820,7 @@ export function lerPedido({ peca, foto, regua, regiao, vistas, parte, copia, dis
  * Monta a prancha e grava o PNG e, ao lado, o JSON das medidas. `olhar` é o `olharBancada` (injetável no teste) e `chromium` o do
  * Playwright. Devolve `{ arquivo, json, medidas }`.
  */
-export async function prancharReferencia(opcoes, { olhar = null, chromium = null, lancar = null, logger = () => {} } = {}) {
+export async function prancharReferencia(opcoes, { rotulo = 'foto', olhar = null, chromium = null, lancar = null, logger = () => {} } = {}) {
   const pedido = lerPedido(opcoes);
   const olharBancada = olhar ?? (await import('./olhar-bancada.mjs')).olharBancada;
   const isolar = pedido.partes.length > 0;
@@ -851,9 +851,10 @@ export async function prancharReferencia(opcoes, { olhar = null, chromium = null
     for (const [i, m] of medidas.fotos.entries()) {
       if (m.fora) recusar(`--regiao ${pedido.regioes[i].join(',')} cai fora da foto ${pedido.fotos[i].nome}, que tem ${m.largura} por ${m.altura} px.`);
     }
-    const titulo = `${pedido.peca}${isolar ? `, ${pedido.partes.join(' e ')}${pedido.copia ? ` (só a cópia ${pedido.copia})` : ''} isolada` : ''}: modelo e foto de referência`;
+    const titulo = `${pedido.peca}${isolar ? `, ${pedido.partes.join(' e ')}${pedido.copia ? ` (só a cópia ${pedido.copia})` : ''} isolada` : ''}: modelo e ${rotulo === 'foto' ? 'foto de referência' : rotulo}`;
     const plano = disporPrancha({
       titulo,
+      rotulo,
       disposicao: pedido.disposicao,
       linhas: pedido.vistas.map((vista, i) => ({
         vista,
@@ -879,6 +880,83 @@ export async function prancharReferencia(opcoes, { olhar = null, chromium = null
   } finally {
     await browser.close().catch(() => {});
   }
+}
+
+/* ---------- A prancha desenhada em mm (SVG) ---------- */
+
+/* A vista que o nome da prancha sugere quando ninguém a declara; `vistas:critica` escolhe pela convenção das referências (o lateral sem orientação olha de -x) ou pelo que a receita declara em CRITICA.referencias. */
+export const VISTA_DA_PRANCHA_DESENHADA = Object.freeze({ lateral: 'esquerda', frontal: 'frontal', traseira: 'traseira', superior: 'superior', inferior: 'inferior' });
+const AMPLIACAO_DO_SVG = 3;
+const COTAS_ESCONDIDAS = 'text, .cota, .ext, .cotat, .tit, .sub, .rot, .lmt, .cortet';
+
+/** A caixa em px do que o desenho traça com a classe `contorno` (os pontos dos comandos M e L; outro comando é recusado). */
+export function caixaDoContornoSvg(texto, nome = 'a prancha') {
+  const xs = [];
+  const ys = [];
+  for (const m of texto.matchAll(/<path\b[^>]*\bclass="contorno"[^>]*\bd="([^"]*)"/g)) {
+    if (/[^MLZ0-9eE.,\s+-]/.test(m[1])) recusar(`${nome}: o contorno usa um comando de caminho além de M, L e Z, que a leitura da caixa não cobre; desenhe o contorno em segmentos (a ferramenta de prancha já o faz).`);
+    const n = m[1].match(/-?\d+(?:\.\d+)?(?:e[+-]?\d+)?/gi) ?? [];
+    for (let i = 0; i + 1 < n.length; i += 2) { xs.push(Number(n[i])); ys.push(Number(n[i + 1])); }
+  }
+  if (!xs.length) recusar(`${nome} não traça nenhum <path class="contorno">; sem ele a escala em mm não se mede.`);
+  return [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)];
+}
+
+/**
+ * Lê uma prancha `<lado>.prancha.svg` com o `<lado>.prancha.relatorio.json` ao lado e a deixa pronta para a prancha modelo e desenho: o
+ * SVG ampliado e sem as cotas e os textos (`svg`), a régua e a região em px do raster, e a escala. A escala não é declarada no
+ * desenho: vem da caixa do contorno em px e da caixa em mm que o relatório da prancha grava, e as duas direções precisam concordar em 3%.
+ * Devolve `{ svg, vista, regua, regiao, pxPorMm, caixaMm, larguraMm, alturaMm }`.
+ */
+export function lerPranchaDesenhada(caminhoSvg, { ler = (c) => readFileSync(c, 'utf8'), existe = existsSync } = {}) {
+  const nome = basename(caminhoSvg);
+  const lado = /^(.*)\.prancha\.svg$/.exec(nome)?.[1] ?? '';
+  const vista = VISTA_DA_PRANCHA_DESENHADA[lado.split(/[^a-z]+/i).pop()?.toLowerCase()] ?? null;
+  if (!vista) recusar(`${nome}: o nome da prancha desenhada é <lado>.prancha.svg, com o lado em ${Object.keys(VISTA_DA_PRANCHA_DESENHADA).join(', ')}.`);
+  const relatorio = caminhoSvg.replace(/\.svg$/i, '.relatorio.json');
+  if (!existe(relatorio)) recusar(`${nome}: falta ${basename(relatorio)} ao lado, que dá a caixa do desenho em mm (o relatório que o script da prancha grava).`);
+  const porVistaDoRelatorio = JSON.parse(ler(relatorio))?.relatorio?.porVista ?? {};
+  const caixa = Object.values(porVistaDoRelatorio)[0]?.caixa;
+  if (!caixa || ![caixa.xMin, caixa.xMax, caixa.yMin, caixa.yMax].every(Number.isFinite)) recusar(`${basename(relatorio)} não traz relatorio.porVista.<vista>.caixa com xMin, xMax, yMin e yMax em mm.`);
+  const texto = ler(caminhoSvg);
+  const [x0, y0, x1, y1] = caixaDoContornoSvg(texto, nome);
+  const larguraMm = caixa.xMax - caixa.xMin;
+  const alturaMm = caixa.yMax - caixa.yMin;
+  const k = (x1 - x0) / larguraMm;
+  const kAltura = (y1 - y0) / alturaMm;
+  if (!(k > 0) || Math.abs(kAltura - k) > k * 0.03) {
+    recusar(`${nome}: o contorno mede ${(x1 - x0).toFixed(1)} x ${(y1 - y0).toFixed(1)} px e o relatório diz ${larguraMm.toFixed(1)} x ${alturaMm.toFixed(1)} mm, ${k.toFixed(4)} e ${kAltura.toFixed(4)} px/mm, que passam de 3% de diferença; o desenho e o relatório não são da mesma rodada.`);
+  }
+  const folga = Math.max(8, 0.04 * Math.max(x1 - x0, y1 - y0));
+  const f = AMPLIACAO_DO_SVG;
+  const abertura = /<svg\b[^>]*>/.exec(texto);
+  if (!abertura || !/\bviewBox=/.test(abertura[0])) recusar(`${nome} não abre com <svg viewBox=...>.`);
+  const ampliada = abertura[0].replace(/\s(width|height)="([\d.]+)"/g, (_, atributo, valor) => ` ${atributo}="${Number(valor) * f}"`);
+  const svg = texto.replace(abertura[0], `${ampliada}<style>${COTAS_ESCONDIDAS} { display: none }</style>`);
+  const regiao = [x0 - folga, y0 - folga, x1 + folga, y1 + folga].map((v) => Math.max(0, Math.round(v * f)));
+  return { svg, vista, regua: `${Math.round((x1 - x0) * f * 100) / 100}=${Math.round(larguraMm * 100) / 100}`, regiao: regiao.join(','), pxPorMm: k * f, caixaMm: caixa, larguraMm, alturaMm };
+}
+
+/**
+ * A prancha modelo e desenho: o modelo na vista da bancada que cada prancha desenhada mostra, ao lado do desenho ou sobreposto a ele,
+ * na mesma escala em mm. `pranchas` é `[{ caminho, vista? }]` (a `vista` declarada vale no lugar da do nome); grava `<saida>` e, ao lado,
+ * o SVG ampliado de cada uma. Devolve `{ arquivo, json, medidas, vistas }`.
+ */
+export async function prancharDesenhadas({ peca, pranchas, saida, disposicao = 'lado', espelhar = [] }, dependencias = {}) {
+  if (!pranchas?.length) recusar('prancharDesenhadas pede ao menos uma prancha.');
+  const lidas = pranchas.map((p) => ({ ...lerPranchaDesenhada(p.caminho, dependencias.leitura ?? {}), caminho: p.caminho }));
+  const vistas = lidas.map((l, i) => pranchas[i].vista ?? l.vista);
+  const arquivos = lidas.map((l, i) => {
+    const arquivo = saida.replace(/\.png$/i, `-${vistas[i]}.svg`);
+    mkdirSync(dirname(arquivo), { recursive: true });
+    writeFileSync(arquivo, l.svg);
+    return arquivo;
+  });
+  const resultado = await prancharReferencia({
+    peca, vistas: vistas.join(','), foto: arquivos.join(';'), regua: lidas.map((l) => l.regua).join(';'), regiao: lidas.map((l) => l.regiao).join(';'),
+    disposicao, espelhar: espelhar.join(','), saida,
+  }, { ...dependencias, rotulo: 'prancha desenhada' });
+  return { ...resultado, vistas, lidas: lidas.map(({ caminho, vista, larguraMm, alturaMm, pxPorMm }, i) => ({ caminho, vista: vistas[i], larguraMm, alturaMm, pxPorMm })) };
 }
 
 /* ---------- A CLI ---------- */

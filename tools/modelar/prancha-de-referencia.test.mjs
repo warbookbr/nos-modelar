@@ -8,7 +8,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { ajustarCamera, lerCopia } from './olhar-bancada.mjs';
 import {
   PONTOS_DA_ESCALA, comoCLI, disporPrancha, eixosDaVista, escalaDaVista, extensaoNaImagem, fundoDaCaixa, lerPedido, lerRegiao, lerRegua, lerVistas,
-  passoDaRegua, porVista, prancharReferencia,
+  passoDaRegua, porVista, prancharReferencia, caixaDoContornoSvg, lerPranchaDesenhada,
   aoReferencialDaPeca, disporContorno, pontoDoContorno, prancharContorno, projetorDaVista, vistaNaPeca,
   TRACEJADO_DO_ENCONTRO, encontrosDoAnel, ladosDaCaixaNoEncontro, ladosEmTexto, trechosDoAnel,
 } from './prancha-de-referencia.mjs';
@@ -405,5 +405,37 @@ describe('o trecho do contorno que é encontro com outra região', () => {
     const textos = plano.operacoes.filter((o) => o.tipo === 'texto').map((o) => o.texto);
     expect(textos).toContain('  tracejado: 200 mm de encontro com baixo, não é borda da peça; o lado de baixo da caixa cai no encontro e não mede a peça');
     expect(textos.some((t) => t.includes('o trecho tracejado é encontro'))).toBe(true);
+  });
+});
+
+describe('a prancha desenhada em mm (SVG)', () => {
+  const FIXTURE = join(REPO, 'tools/fixtures/comparar-com-prancha/referencias/lateral.prancha.svg');
+
+  it('a escala sai da caixa do contorno em px e da caixa em mm do relatório, e a régua e a região são do raster ampliado', () => {
+    const r = lerPranchaDesenhada(FIXTURE);
+    expect(r.vista).toBe('esquerda');
+    expect(r.pxPorMm).toBeCloseTo(1.5, 9);
+    expect(r.regua).toBe('600=400');
+    expect(r.regiao.split(',').map(Number).every((n) => n >= 0)).toBe(true);
+    expect(r.svg).toContain('width="900" height="660"');
+    expect(r.svg).toContain('display: none');
+    expect(r.larguraMm).toBe(400);
+    expect(r.alturaMm).toBe(300);
+  });
+
+  it('recusa o relatório que não é da mesma rodada do desenho, dizendo as duas escalas', () => {
+    const ler = (c) => (c.endsWith('.json') ? JSON.stringify({ relatorio: { porVista: { lateral: { caixa: { xMin: -200, xMax: 200, yMin: 0, yMax: 200 } } } } }) : readFileSync(c, 'utf8'));
+    expect(() => lerPranchaDesenhada(FIXTURE, { ler })).toThrow(/não são da mesma rodada/);
+  });
+
+  it('recusa a prancha sem relatório ao lado e o nome que não diz o lado', () => {
+    expect(() => lerPranchaDesenhada(FIXTURE, { existe: () => false })).toThrow(/falta lateral\.prancha\.relatorio\.json/);
+    expect(() => lerPranchaDesenhada('/x/qualquer.prancha.svg')).toThrow(/<lado>\.prancha\.svg/);
+  });
+
+  it('lê a caixa do contorno e recusa o caminho com comando que ela não cobre', () => {
+    expect(caixaDoContornoSvg('<path class="contorno" d="M 1 2 L 11 2 L 11 7 Z"/><path class="outra" d="M 500 500 L 600 600"/>')).toEqual([1, 2, 11, 7]);
+    expect(() => caixaDoContornoSvg('<path class="contorno" d="M 1 2 C 3 4 5 6 7 8"/>')).toThrow(/além de M, L e Z/);
+    expect(() => caixaDoContornoSvg('<path class="x" d="M 1 2"/>')).toThrow(/nenhum <path class="contorno">/);
   });
 });

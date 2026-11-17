@@ -10,7 +10,7 @@ import { basename, dirname, join } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
 import { lerPergunta } from '../../src/autoria/perguntas-do-critico.js';
 import {
-  ELEVACOES_DA_LUZ_RASANTE, LIMITE_DO_VEREDITO, PERGUNTA_DO_ALVO, PRAZO_DA_CAPTURA_MONTADA_MS, VISTAS_MONTADAS, ladoDaVista, montagemDaPeca, montarPedido, pastaDaRodada, prefixoDaPeca, referenciasDoPlano,
+  ELEVACOES_DA_LUZ_RASANTE, LIMITE_DO_VEREDITO, PERGUNTA_DO_ALVO, PRAZO_DA_CAPTURA_MONTADA_MS, VISTAS_MONTADAS, ladoDaVista, vistaDaPranchaDesenhada, montagemDaPeca, montarPedido, pastaDaRodada, prefixoDaPeca, referenciasDoPlano,
   DISTANCIA_DE_PERTO_MM, campoDePertoMm, MOTIVO_SEM_MEDIR, ReceitaReprovada, decidirLuzRasante, imprimir, fracaoVisivelDaPeca, lerReferenciasExternas, lerOrientacaoDaReferencia, LIMITE_DA_ORIENTACAO, AJUDA, imagensDoReflexo, LEITURA_DA_FAIXA, LEITURA_DO_REFLEXO, secaoDoReflexo, MINIMO_DO_REFLEXO, luzRasanteDoPacote, primeiraQuePassa, unidadeDoAlvo, vistaDoArquivo, vistasMontadasVisiveis, vistasParaCritica, vistasRepetidas,
   ARQUIVO_DO_CONTORNO_SOBREPOSTO, contornosParaSobrepor, etapaFixaDaPeca, lerContornosExternos, lerRegioesDoContorno, motivoDaEtapaFixa, registroDasEtapas,
   ARQUIVO_DAS_PERGUNTAS_FECHADAS, FORMATO_DAS_PERGUNTAS_FECHADAS, NAO_DA_PARA_VER, NAO_VERIFICAVEL, REGRA_DA_NOTA, arquivoDoPedidoFechado, juntarOrdens, lerRespostasFechadas,
@@ -112,17 +112,17 @@ describe('as referências do plano', () => {
   it('guarda só as imagens, com o caminho absoluto, e diz as que não são imagem e as que faltam', () => {
     const plano = { referencias: ['docs/ref/lateral.png', 'docs/ref/andaime.json', 'docs/mapa.JPG', 'docs/ref/some.png'] };
     expect(referenciasDoPlano(plano, { raiz: '/repo', pastaDaReceita: '/receita', existe })).toEqual({
-      imagens: ['/repo/docs/ref/lateral.png', '/repo/docs/mapa.JPG'], ignoradas: ['docs/ref/andaime.json'], ausentes: ['docs/ref/some.png'], locaisAusentes: [],
+      imagens: ['/repo/docs/ref/lateral.png', '/repo/docs/mapa.JPG'], pranchas: [], ignoradas: ['docs/ref/andaime.json'], ausentes: ['docs/ref/some.png'], locaisAusentes: [],
     });
   });
 
   it('o caminho que não existe a partir da raiz vale a partir da pasta da receita', () => {
     const r = referenciasDoPlano({ referencias: ['../andaime.json', '../x.png'] }, { raiz: '/repo', pastaDaReceita: '/receita-pai/filha', existe: (c) => c === '/receita-pai/andaime.json' || c === '/receita-pai/x.png' });
-    expect(r).toEqual({ imagens: ['/receita-pai/x.png'], ignoradas: ['../andaime.json'], ausentes: [], locaisAusentes: [] });
+    expect(r).toEqual({ imagens: ['/receita-pai/x.png'], pranchas: [], ignoradas: ['../andaime.json'], ausentes: [], locaisAusentes: [] });
   });
 
   it('plano ausente não tem referência', () => {
-    expect(referenciasDoPlano(null)).toEqual({ imagens: [], ignoradas: [], ausentes: [], locaisAusentes: [] });
+    expect(referenciasDoPlano(null)).toEqual({ imagens: [], pranchas: [], ignoradas: [], ausentes: [], locaisAusentes: [] });
   });
 });
 
@@ -1058,6 +1058,77 @@ describe('a medição da receita antes do pacote', () => {
     expect(imprimir(resultado)).toContain('MEDIÇÃO DA RECEITA: NÃO FEITA');
     expect(readFileSync(join(pasta, 'pedido.md'), 'utf8')).toContain(`Medição da receita: NÃO FEITA: ${MOTIVO_SEM_MEDIR}.`);
   }, 60_000);
+});
+
+describe('a prancha desenhada em mm que o plano cita (e o aviso do que o pacote não leva)', () => {
+  const PECA = 'tools/fixtures/comparar-com-prancha/receita.js';
+  const SVG = join(dirname(new URL(import.meta.url).pathname), '../fixtures/comparar-com-prancha/referencias/lateral.prancha.svg');
+
+  async function montar(pranchar) {
+    const base = mkdtempSync(join(area, 'prancha-'));
+    const pasta = join(base, 'rodada');
+    const bancada = bancadaFalsa(base, PECA);
+    const pedidos = [];
+    const resultado = await vistasParaCritica(PECA, {
+      saida: pasta, pastaDasCapturas: base,
+      dependencias: {
+        medirReceita: medirPassa, olharBancada: bancada.fazer, rodadasAnteriores: () => [],
+        prancharDesenhadas: pranchar ?? (async (pedido) => {
+          pedidos.push(pedido);
+          writeFileSync(pedido.saida, 'png');
+          return { arquivo: pedido.saida, json: pedido.saida.replace(/\.png$/, '.json'), lidas: [{ caminho: pedido.pranchas[0].caminho, vista: pedido.pranchas[0].vista, larguraMm: 400, alturaMm: 300, pxPorMm: 0.5 }] };
+        }),
+      },
+    });
+    return { resultado, pasta, pedidos, pedido: readFileSync(join(pasta, 'pedido.md'), 'utf8') };
+  }
+
+  it('a referência citada que não é imagem nem prancha sai como aviso na saída e no pedido, e não em silêncio', async () => {
+    const { resultado, pedido } = await montar();
+    expect(resultado.referencias.ignoradas).toEqual(['referencias/alvo.md']);
+    expect(resultado.avisos.join('\n')).toMatch(/PLANO\.referencias cita um arquivo que não entra no pacote do crítico.*referencias\/alvo\.md/);
+    expect(imprimir(resultado)).toMatch(/AVISO: PLANO\.referencias cita um arquivo que não entra/);
+    expect(pedido).toContain('O plano cita também referencias/alvo.md, que não é imagem nem prancha desenhada e por isso não entra neste pedido');
+  });
+
+  it('a prancha SVG vira duas imagens na mesma escala, na vista declarada, e o pedido a chama de desenho cotado e não de objeto real em outra escala', async () => {
+    const { resultado, pasta, pedidos, pedido } = await montar();
+    expect(referenciasDoPlano({ referencias: ['referencias/lateral.prancha.svg'] }, { pastaDaReceita: dirname(SVG).replace(/referencias$/, '') }).pranchas).toEqual([SVG]);
+    expect(pedidos.map((p) => [p.disposicao, p.pranchas[0].vista, basename(p.saida)])).toEqual([['lado', 'esquerda', 'prancha-desenhada-lado.png'], ['sobreposto', 'esquerda', 'prancha-desenhada-sobreposta.png']]);
+    expect(resultado.pranchaDesenhada.imagens.map((i) => i.disposicao)).toEqual(['lado', 'sobreposta']);
+    const secao = pedido.slice(pedido.indexOf('## Prancha desenhada'), pedido.indexOf('## Modelo'));
+    expect(secao).toContain('não uma foto nem o objeto real em outra escala');
+    expect(secao).toContain(`sobreposta: ${join(pasta, 'prancha-desenhada-sobreposta.png')}`);
+    expect(secao).toContain('lateral.prancha.svg: vista esquerda do modelo');
+    expect(secao).not.toContain('não foi declarado');
+    expect(pedido).toContain('o alvo é a prancha desenhada da seção seguinte');
+    expect(pedido).not.toContain('O plano não cita imagem de referência.');
+    expect(JSON.parse(readFileSync(join(pasta, 'pacote.json'), 'utf8')).pranchaDesenhada.linhas[0]).toMatchObject({ vista: 'esquerda', presumida: false });
+    expect(imprimir(resultado)).toContain('PRANCHA DESENHADA');
+  });
+
+  it('a prancha que não sai é aviso e consta do pedido, e o pacote segue', async () => {
+    const { resultado, pedido } = await montar(async () => { throw new Error('o navegador não abriu'); });
+    expect(resultado.pranchaDesenhada).toBeNull();
+    expect(resultado.avisos.join('\n')).toMatch(/a prancha desenhada em lado a lado não saiu: o navegador não abriu/);
+    expect(resultado.avisos.join('\n')).toMatch(/lateral\.prancha\.svg e a prancha desenhada não entrou no pacote/);
+    expect(pedido).not.toContain('## Prancha desenhada');
+  });
+
+  it('sem declaração o lado sai do nome do arquivo, e o pedido diz que foi presumido', () => {
+    expect(vistaDaPranchaDesenhada('/x/lateral.prancha.svg')).toEqual({ vista: 'esquerda', presumida: true });
+    expect(vistaDaPranchaDesenhada('/x/lateral.prancha.svg', { referencias: {} }, { frente: '+z', direita: '-x' })).toMatchObject({ presumida: true });
+    expect(vistaDaPranchaDesenhada('/x/traseira.prancha.svg', { referencias: {} })).toMatchObject({ vista: 'traseira' });
+    expect(vistaDaPranchaDesenhada('/x/lateral.prancha.svg', { referencias: { 'lateral.prancha.svg': 'esquerda' } })).toEqual({ vista: 'esquerda', presumida: false });
+    expect(vistaDaPranchaDesenhada('/x/iso.prancha.svg')).toBeNull();
+  });
+
+  it('o pedido fechado ganha uma pergunta por vista da prancha', () => {
+    const dados = { plano: null, pranchaDesenhada: { linhas: [{ vista: 'esquerda', caminho: '/x/lateral.prancha.svg' }], imagens: [{ disposicao: 'lado', arquivo: '/p/l.png' }], fora: [] } };
+    const textos = perguntasFechadas(dados).map((p) => p.texto);
+    expect(textos.some((t) => /Na vista esquerda do modelo, a silhueta de lado segue a da prancha desenhada `lateral\.prancha\.svg`/.test(t))).toBe(true);
+    expect(montarPedidoFechado({ peca: 'x', ...dados }, 'a')).toContain('## Prancha desenhada');
+  });
 });
 
 describe('a vista de perto da feição pequena (dePerto da parte no PLANO)', () => {
