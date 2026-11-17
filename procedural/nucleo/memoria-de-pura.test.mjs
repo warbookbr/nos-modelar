@@ -15,6 +15,9 @@ describe('memoizarPura', () => {
     const comBuraco = [0, , 0];
     expect(chaveExata([comBuraco])).not.toBe(chaveExata([[0, undefined, 0]]));
     expect(chaveExata([Object.assign([1], { x: 1 })])).toBeNull();
+    /* o buraco com uma propriedade a mais deixa a contagem das propriedades igual à da lista cheia */
+    // eslint-disable-next-line no-sparse-arrays
+    expect(chaveExata([Object.assign([0, , 0], { nota: 'x' })])).toBeNull();
     expect(chaveExata(['\u0000h'])).toBeNull();
     const f = contada((xs) => Object.keys(xs).length);
     const m = memoizarPura(f);

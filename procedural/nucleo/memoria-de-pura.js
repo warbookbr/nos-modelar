@@ -33,11 +33,13 @@ export function chaveExata(argumentos) {
       }
       if (typeof valor === 'string' && valor.startsWith('\u0000')) throw NAO_SERIALIZAVEL;
       if (Array.isArray(valor)) {
-        const proprias = Reflect.ownKeys(valor);
-        if (proprias.length !== valor.length + 1) {
-          /* um buraco faz faltar um índice; uma propriedade fora dos índices (ou um símbolo) sobra */
-          if (proprias.some((k) => k !== 'length' && !(typeof k === 'string' && String(Number(k)) === k && Number(k) < valor.length))) throw NAO_SERIALIZAVEL;
-          return Array.from({ length: valor.length }, (_, k) => (Object.hasOwn(valor, k) ? valor[k] : BURACO));
+        /* a propriedade fora dos índices (ou um símbolo) desliga a chave; o buraco se acha índice por índice, e não pela contagem das
+           propriedades, que um buraco e uma propriedade a mais deixariam igual */
+        for (const k of Reflect.ownKeys(valor)) {
+          if (k !== 'length' && !(typeof k === 'string' && String(Number(k)) === k && Number(k) < valor.length)) throw NAO_SERIALIZAVEL;
+        }
+        for (let k = 0; k < valor.length; k += 1) {
+          if (!Object.hasOwn(valor, k)) return Array.from({ length: valor.length }, (_, j) => (Object.hasOwn(valor, j) ? valor[j] : BURACO));
         }
       }
       return valor;

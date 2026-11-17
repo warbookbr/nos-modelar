@@ -3971,8 +3971,11 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
     const inteira = nucleo(PASSOS, PARAMS, TOPO, MATERIAIS, ESQUELETO, ALIASES, { ...OPCOES, memoria: null, memoriaConferida: false, aoLer: undefined, aoRastrear: undefined, leitura: undefined });
     const diferenca = divergenciaDaImpressao(saida, inteira);
     if (diferenca) {
-      /* o ponto recusado sai da memória, e com ele os que esta execução guardou a partir dele, para a seguinte não recomeçar de nenhum */
-      for (const chave of [chavesDoPrefixo[inicio - 1], ...guardadosNestaExecucao]) memoria.descartar?.(chave);
+      /* o ponto recusado sai da memória, e com ele todos os desta receita (`descartarTodos`): o estado envenenado pode ter vindo de um
+         ponto anterior, que já gerou os seguintes; a memória que não sabe descartar a receita inteira descarta o recusado e os que esta
+         execução guardou a partir dele */
+      if (typeof memoria.descartarTodos === 'function') memoria.descartarTodos();
+      else for (const chave of [chavesDoPrefixo[inicio - 1], ...guardadosNestaExecucao]) memoria.descartar?.(chave);
       throw new Error(`oficina: a execução que recomeçou do estado guardado depois do passo ${inicio - 1} divergiu da execução inteira: ${diferenca}`);
     }
   }

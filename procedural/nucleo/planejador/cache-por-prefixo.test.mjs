@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url';
 import { serialize, deserialize } from 'node:v8';
 import { describe, expect, it } from 'vitest';
 import { nucleo, usoDaOperacao } from '../entrada.js';
-import { criarMemoriaEmArmazem } from './memoria-em-armazem.js';
+import { criarMemoriaEmArmazem, limparOutrasVersoes, marcaDaVersao } from './memoria-em-armazem.js';
 import { divergenciaDaImpressao } from './impressao-do-neutro.js';
 import { chaveExataDoPasso } from './chave-do-prefixo.js';
 import { entradaDaVersaoNoDisco, versaoDoCodigo } from './versao-do-codigo.mjs';
@@ -105,7 +105,7 @@ describe('o que o cache refaz e o que ele serve', () => {
     expect(r.executados).toBe(4);
     expect(outra.estatisticas.lidos).toBe(0);
     /* o ponto gravado com uma versão no nome e outra dentro (um nome que colidisse) também é recusado */
-    const [nome] = [...armazem.arquivos.keys()].filter((n) => n.startsWith('ponto-'));
+    const [nome] = [...armazem.arquivos.keys()].filter((n) => n.includes('-ponto-'));
     const ponto = deserialize(armazem.arquivos.get(nome));
     armazem.arquivos.set(nome, serialize({ ...ponto, versao: 'v0' }));
     const memoria = memoriaDe(armazem, { versao: 'v1' });
@@ -144,23 +144,24 @@ describe('o que o cache refaz e o que ele serve', () => {
     const armazem = armazemNaMemoria();
     const memoria = memoriaDe(armazem, { maximo: 2 });
     comMemoria(receita('a'), {}, memoria);
-    expect([...armazem.arquivos.keys()].filter((n) => n.startsWith('ponto-'))).toHaveLength(2);
+    expect([...armazem.arquivos.keys()].filter((n) => n.includes('-ponto-'))).toHaveLength(2);
     expect(memoria.tamanho).toBe(2);
   });
 
-  it('o modo conferido recusa a execução que recomeçou de um estado que não é o do prefixo, e apaga o ponto recusado', () => {
+  it('o modo conferido recusa a execução que recomeçou de um estado que não é o do prefixo, e apaga os pontos da receita', () => {
     const armazem = armazemNaMemoria();
     const memoria = memoriaDe(armazem);
     comMemoria(receita('a'), {}, memoria);
     /* troca o estado guardado depois do passo 2 pelo de depois do passo 1: a chave diz um prefixo, o estado é outro */
-    const pontos = [...armazem.arquivos.keys()].filter((n) => n.startsWith('ponto-')).map((n) => [n, deserialize(armazem.arquivos.get(n))]);
+    const pontos = [...armazem.arquivos.keys()].filter((n) => n.includes('-ponto-')).map((n) => [n, deserialize(armazem.arquivos.get(n))]);
     const depois1 = pontos.find(([, p]) => p.passo === 1)[1], [nome2, depois2] = pontos.find(([, p]) => p.passo === 2);
     armazem.arquivos.set(nome2, serialize({ ...depois2, estado: depois1.estado }));
     expect(() => nucleo(receita('b'), {}, {}, {}, null, [], { memoria, memoriaConferida: true }))
       .toThrow(/a execução que recomeçou do estado guardado depois do passo 2 divergiu da execução inteira: o campo '\w+' difere/);
     expect(armazem.arquivos.has(nome2)).toBe(false);
-    /* sai o ponto recusado e o que a execução recusada guardou depois dele (o do passo 3, feito a partir do estado trocado) */
-    expect(memoria.estatisticas.descartados).toBe(2);
+    /* saem todos os pontos desta receita: o veneno pode ter vindo de qualquer ponto anterior ao recomeço */
+    expect([...armazem.arquivos.keys()].filter((n) => n.includes('-ponto-'))).toEqual([]);
+    expect(memoria.estatisticas.descartados).toBeGreaterThanOrEqual(1);
     /* a execução seguinte, sem o modo conferido, não recomeça do ponto recusado */
     expect(divergenciaDaImpressao(nucleo(receita('b'), {}, {}, {}, null, [], { memoria }), nucleo(receita('b')))).toBeNull();
   });
@@ -205,6 +206,10 @@ describe('o que a revisão do cache por prefixo achou', () => {
     expect(versaoDoCodigo({ ...e, pacotes: { ...e.pacotes, 'manifold-3d': '0.0.0' } })).not.toBe(base);
     expect(versaoDoCodigo({ ...e, pacotes: { ...e.pacotes, earcut: '0.0.0' } })).not.toBe(base);
     expect(versaoDoCodigo({ ...e, node: 'v0.0.0' })).not.toBe(base);
+    expect(e.arquitetura).toBe(process.arch);
+    expect(versaoDoCodigo({ ...e, arquitetura: 'outra' })).not.toBe(base);
+    /* o pacote entra pelo conteúdo (o .wasm da Manifold inclusive) e pelas dependências que declara */
+    expect(e.pacotes['manifold-3d']).toMatch(/^\d+\.\d+\.\d+ [0-9a-f]{24} /);
     expect(versaoDoCodigo({ ...e, arquivos: [...e.arquivos].reverse() })).toBe(base);
   });
 
@@ -240,21 +245,65 @@ describe('o que a revisão do cache por prefixo achou', () => {
     expect(executados(cubos(2), caro)).toBe(6);
   });
 
-  it('o índice trancado não perde o ponto de outro processo que guarda ao mesmo tempo', () => {
+  it('o ponto, o índice e o descarte se gravam dentro da trava, que roda antes de voltar', () => {
     const arquivos = new Map();
-    let preso = false; const fila = [];
-    let entreLeituraEGravacao = null;
+    const registro = [];
+    let preso = false;
     const armazem = {
-      ler: (n) => arquivos.get(n) ?? null, apagar: (n) => { arquivos.delete(n); },
-      gravar: (n, b) => { if (n.startsWith('indice-') && entreLeituraEGravacao) { const f = entreLeituraEGravacao; entreLeituraEGravacao = null; f(); } arquivos.set(n, b); },
-      trancar: (nome, fn) => { if (preso) { fila.push(fn); return; } preso = true; try { fn(); } finally { preso = false; while (fila.length) { preso = true; try { fila.shift()(); } finally { preso = false; } } } },
+      ler: (n) => { registro.push(`ler ${n.includes('-indice-') ? 'indice' : 'ponto'}${preso ? ' trancado' : ''}`); return arquivos.get(n) ?? null; },
+      gravar: (n, b) => { registro.push(`gravar ${n.includes('-indice-') ? 'indice' : 'ponto'}${preso ? ' trancado' : ''}`); arquivos.set(n, b); },
+      apagar: (n) => { registro.push(`apagar ${preso ? 'trancado' : ''}`); arquivos.delete(n); },
+      /* a trava de verdade espera a de outro processo; aqui ela só marca o trecho trancado e roda fn antes de voltar */
+      trancar: (nome, fn) => { expect(preso).toBe(false); preso = true; try { fn(); } finally { preso = false; } },
     };
-    const A = memoriaDe(armazem, { maximo: 4 }), B = memoriaDe(armazem, { maximo: 4 });
-    entreLeituraEGravacao = () => B.guardar('chave-b', 0, { x: 2 });
-    A.guardar('chave-a', 0, { x: 1 });
-    expect(A.tamanho).toBe(2);
-    A.limpar();
-    expect([...arquivos.keys()].filter((n) => n.startsWith('ponto-'))).toEqual([]);
+    const A = memoriaDe(armazem, { maximo: 4 });
+    expect(A.guardar('chave-a', 0, { x: 1 })).toBe(true);
+    expect(registro).toEqual(['ler indice trancado', 'gravar ponto trancado', 'gravar indice trancado']);
+    registro.length = 0;
+    A.descartar('chave-a');
+    expect(registro).toEqual(['ler indice trancado', 'apagar trancado', 'gravar indice trancado']);
+    expect(A.tamanho).toBe(0);
+  });
+
+  it('o ponto envenenado que já gerou outros: o primeiro conferido recusa e apaga a receita toda, e o seguinte passa', () => {
+    const arquivos = new Map();
+    const armazem = { ler: (n) => arquivos.get(n) ?? null, gravar: (n, b) => { arquivos.set(n, b); }, apagar: (n) => { arquivos.delete(n); } };
+    const memoria = memoriaDe(armazem);
+    const seis = (lado3) => Array.from({ length: 6 }, (_, k) => ['cubo', { origemId: k + 1, lado: k === 3 ? lado3 : 1, em: [k * 2, 0, 0] }]);
+    nucleo(seis(1), {}, {}, {}, null, [], { memoria });
+    const pontos = [...arquivos].filter(([n]) => n.includes('-ponto-')).map(([n, b]) => [n, deserialize(b)]);
+    const p1 = pontos.find(([, p]) => p.passo === 1)[1], [n2, p2] = pontos.find(([, p]) => p.passo === 2);
+    arquivos.set(n2, serialize({ ...p2, estado: p1.estado }));
+    /* sem o conferido, a edição do passo 3 recomeça do ponto envenenado e guarda os pontos 3, 4 e 5 a partir dele */
+    nucleo(seis(2), {}, {}, {}, null, [], { memoria });
+    expect(() => nucleo(seis(2), {}, {}, {}, null, [], { memoria, memoriaConferida: true })).toThrow(/divergiu da execução inteira/);
+    expect(() => nucleo(seis(2), {}, {}, {}, null, [], { memoria, memoriaConferida: true })).not.toThrow();
+    expect(divergenciaDaImpressao(nucleo(seis(2), {}, {}, {}, null, [], { memoria }), nucleo(seis(2)))).toBeNull();
+  });
+
+  it('a limpeza apaga o que é de outra versão e os restos de gravação, e deixa o desta', () => {
+    const arquivos = new Map();
+    const armazem = { ler: (n) => arquivos.get(n) ?? null, gravar: (n, b) => { arquivos.set(n, b); }, apagar: (n) => { arquivos.delete(n); }, listar: () => [...arquivos.keys()] };
+    comMemoria(cubos(1), {}, memoriaDe(armazem, { versao: 'velha' }));
+    comMemoria(cubos(1), {}, memoriaDe(armazem, { versao: 'nova' }));
+    arquivos.set(`${marcaDaVersao('nova')}-ponto-x.123.parcial`, Buffer.from(''));
+    arquivos.set('outro-arquivo', Buffer.from(''));
+    const antes = [...arquivos.keys()].filter((n) => n.startsWith(marcaDaVersao('nova')) && !n.endsWith('.parcial')).length;
+    expect(limparOutrasVersoes(armazem, 'nova')).toBeGreaterThan(1);
+    expect([...arquivos.keys()].filter((n) => n.startsWith(marcaDaVersao('velha')))).toEqual([]);
+    expect([...arquivos.keys()].filter((n) => n.endsWith('.parcial'))).toEqual([]);
+    expect([...arquivos.keys()].filter((n) => n.startsWith(marcaDaVersao('nova'))).length).toBe(antes);
+    expect(arquivos.has('outro-arquivo')).toBe(true);
+  });
+
+  it('a memória só de leitura recomeça dos pontos e não guarda nenhum', () => {
+    const armazem = armazemNaMemoria();
+    comMemoria(cubos(1), {}, memoriaDe(armazem));
+    const antes = [...armazem.arquivos.keys()].sort().join();
+    const leitura = memoriaDe(armazem, { somenteLeitura: true });
+    expect(comMemoria(cubos(1), {}, leitura).executados).toBe(0);
+    expect(comMemoria(cubos(2), {}, leitura).executados).toBe(6);
+    expect([...armazem.arquivos.keys()].sort().join()).toBe(antes);
   });
 
   it('o estado lido só não é copiado quando o desserializador devolve cópia', () => {

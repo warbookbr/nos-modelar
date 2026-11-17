@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2061 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2063 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1223,6 +1223,8 @@
 
 ## procedural/nucleo/planejador/
 
+- `armazem-em-pasta.mjs` — armazem-em-pasta.mjs — o armazém em disco do cache por prefixo e a memória que o host em Node dá ao núcleo (plano do cache por passo, fatia 4). Só roda em No…
+- `armazem-em-pasta.test.mjs` — armazem-em-pasta.test.mjs — o armazém em disco do cache por prefixo e a memória do host (plano do cache por passo, fatia 4): a gravação ao lado e renomeada, …
 - `cache-por-prefixo-acervo.test.mjs` — cache-por-prefixo-acervo.test.mjs — o cache por prefixo em receitas do acervo (plano do cache por passo, fatia 3). Cada receita roda uma vez inteira, guardan…
 - `cache-por-prefixo.test.mjs` — cache-por-prefixo.test.mjs — o cache por prefixo entre execuções (plano do cache por passo, fatia 3): a memória em armazém guarda o estado depois de cada pas…
 - `chave-do-prefixo.js` — chave-do-prefixo.js — a chave encadeada do prefixo de passos, para o cache por prefixo (plano do cache por passo, fatia 3).
