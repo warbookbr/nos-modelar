@@ -191,7 +191,7 @@ export function lerEtapas(registro, medido) {
     if (!vigente) return { instancia, estado: 'aberta', ...comAvisos };
     const agora = imprimirEtapa(medido, instancia);
     if (!agora) {
-      return { instancia, estado: 'nao-conferivel', motivo: 'não há geometria para medir agora, e o aceite não pode ser conferido', aceite: structuredClone(vigente.aceite), ...comAvisos };
+      return { instancia, estado: 'nao-conferivel', motivo: `não há geometria para medir agora${medido.etapas[instancia]?.erro ? ` (${medido.etapas[instancia].erro})` : ''}, e o aceite não pode ser conferido`, aceite: structuredClone(vigente.aceite), ...comAvisos };
     }
     const diferencas = diferencasDaImpressao(canonico(vigente.impressao), agora);
     if (!diferencas.length) return { instancia, estado: 'fixa', aceite: structuredClone(vigente.aceite), ...comAvisos };
@@ -217,7 +217,7 @@ export function acrescentarAceite(registro, medido, instancia, aceite = {}) {
   }
   const impressao = imprimirEtapa(medido, instancia);
   if (!impressao) {
-    falhar('etapa-sem-geometria', `'${instancia}' não tem geometria na leitura de agora; o aceite seria dado a nada, e as posteriores se apoiariam numa porta que ninguém mediu.`);
+    falhar('etapa-sem-geometria', `'${instancia}' não tem geometria na leitura de agora${medido.etapas[instancia]?.erro ? ` (${medido.etapas[instancia].erro})` : ''}; o aceite seria dado a nada, e as posteriores se apoiariam numa porta que ninguém mediu.`);
   }
   const reprovadas = impressao.juntas.filter((junta) => !junta.satisfeita).map((junta) => junta.relacao);
   if (reprovadas.length) falhar('etapa-com-junta-reprovada', `'${instancia}' tem junta reprovada: ${reprovadas.join(', ')}.`);

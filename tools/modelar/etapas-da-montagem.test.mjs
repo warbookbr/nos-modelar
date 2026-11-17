@@ -1380,6 +1380,7 @@ describe('o registro da versão 3 pelos comandos', () => {
   const comTabela = (ref, tabela) => ({ ...RECEITAS, [ref]: receitaComParametros(RECEITAS[ref], tabela) });
   const semRegistro = () => rmSync(arquivoDoRegistro(arquivo), { force: true });
   const lido = async (extra = {}) => (await estadoDasEtapas(arquivo, { receitas: RECEITAS, ...extra })).leitura.etapas.map((e) => `${e.instancia}:${e.estado}`).join(' ');
+  const aceitarTodasV3 = (medido, quantas = 99) => medido.ordem.slice(0, quantas).reduce((r, id) => acrescentarAceite(r, medido, id, aceite), registroVazio('tres-blocos'));
   const gravado = () => JSON.parse(readFileSync(arquivoDoRegistro(arquivo), 'utf8'));
   async function tresFixasEmDisco() {
     semRegistro();
@@ -1490,7 +1491,8 @@ describe('o registro da versão 3 pelos comandos', () => {
       writeFileSync(join(raiz, 'obj', 'montagem.json'), JSON.stringify({ instancias: [{ id: 'a', alvo: { ref: 'obj/x' } }], etapas: ['a'] }));
       const registro = join(raiz, 'obj', 'montagem.etapas.json');
       writeFileSync(registro, JSON.stringify({ versao: 3, eventos: [] }));
-      expect(etapaQueEspera('obj/x', { raiz })).toEqual({ montagem: 'obj/montagem.json', instancia: 'a' });
+      expect(etapaQueEspera('obj/x', { raiz, semPassos: true })).toEqual({ montagem: 'obj/montagem.json', instancia: 'a' });
+      expect(etapaQueEspera('obj/x', { raiz })).toBeNull();
       writeFileSync(registro, JSON.stringify({ versao: 2, etapas: [{ instancia: 'a', estado: 'fixa' }] }));
       expect(etapaQueEspera('obj/x', { raiz })).toBeNull();
     });
@@ -1518,6 +1520,86 @@ describe('o registro da versão 3 pelos comandos', () => {
       const lido = { versao: 3, etapas: [{ instancia: 'a', estado: 'fixa' }, { instancia: 'b', estado: 'quebrada' }] };
       expect(estadoDoObjeto('coisa', { acervo, registroLido: lido }).etapas.find((e) => e.etapa === 'modelagem por etapa').estado).toBe('1 de 2 fixas; próxima b');
       expect(lerEtapasDoFluxo(pasta, { registroLido: lido })).toMatchObject({ fixas: ['a'], abertas: ['b'], proxima: 'b' });
+    });
+  });
+
+  describe('a revisão da fatia 2: versão adulterada, gravação concorrente e receita quebrada', () => {
+    it('a versão adulterada não apaga o histórico: só 3, 1, 2 e a ausência do registro têm caminho, e o antigo recusa eventos', async () => {
+      await tresFixasEmDisco();
+      const real = gravado();
+      expect(real.eventos).toHaveLength(3);
+      for (const versao of [2, '3', 4, undefined, 1, null]) {
+        const adulterado = { ...real, versao };
+        if (versao === undefined) delete adulterado.versao;
+        await expect(estadoDasEtapas(arquivo, { receitas: RECEITAS, anterior: adulterado }), `versão ${versao}`).rejects.toMatchObject({ codigo: 'registro-invalido' });
+        await expect(reabrir(arquivo, 'base', POR, { anterior: adulterado }), `reabrir, versão ${versao}`).rejects.toMatchObject({ codigo: 'registro-invalido' });
+        await expect(registroComEstado(arquivo, { receitas: RECEITAS, anterior: adulterado }), `estado, versão ${versao}`).rejects.toMatchObject({ codigo: 'registro-invalido' });
+      }
+      /* o do formato antigo sem versão, mas com `etapas`, segue pelo caminho antigo */
+      const semVersao = { formato: ANTIGO.formato, montagem: 'tres-blocos', etapas: [] };
+      expect((await estadoDasEtapas(arquivo, { receitas: RECEITAS, anterior: semVersao })).versao).toBe(2);
+      await expect(estadoDasEtapas(arquivo, { receitas: RECEITAS, anterior: { formato: ANTIGO.formato, versao: 2 } })).rejects.toMatchObject({ codigo: 'registro-invalido' });
+    });
+
+    it('o reabrir v3 confere a montagem do registro', async () => {
+      await tresFixasEmDisco();
+      await expect(reabrir(arquivo, 'base', POR, { anterior: { ...gravado(), montagem: 'outra' } })).rejects.toMatchObject({ codigo: 'registro-de-outra-montagem' });
+    });
+
+    it('dois comandos que partem do mesmo registro: o segundo a gravar recusa em vez de apagar o evento do primeiro', async () => {
+      semRegistro();
+      gravarRegistro(arquivo, await fixar(arquivo, 'base', aceite, opcoes));
+      gravarRegistro(arquivo, await fixar(arquivo, 'meio', aceite, opcoes));
+      /* os dois leram [base, meio]: um reabre a base, o outro fixa o topo */
+      const reabertura = await reabrir(arquivo, 'base', POR);
+      const topo = await fixar(arquivo, 'topo', aceite, opcoes);
+      gravarRegistro(arquivo, topo);
+      const antes = readFileSync(arquivoDoRegistro(arquivo), 'utf8');
+      expect(() => gravarRegistro(arquivo, reabertura)).toThrow(/outro comando gravou/);
+      try { gravarRegistro(arquivo, reabertura); } catch (erro) { expect(erro.codigo).toBe('registro-mudou-no-disco'); }
+      expect(readFileSync(arquivoDoRegistro(arquivo), 'utf8')).toBe(antes);
+      expect(gravado().eventos.map((e) => e.tipo)).toEqual(['aceite', 'aceite', 'aceite']);
+      /* regravar o mesmo registro, ou um que o acrescenta, vale */
+      expect(gravarRegistro(arquivo, topo)).toBe(false);
+      gravarRegistro(arquivo, await reabrir(arquivo, 'base', POR));
+      expect(gravado().eventos).toHaveLength(4);
+    });
+
+    it('a gravação no meio da medição: o comando que mediu sobre o registro de antes não o sobrescreve', async () => {
+      semRegistro();
+      let concorrente;
+      const receitas = { ...RECEITAS };
+      const base = receitas['bloco-com-pino'];
+      const lenta = Object.defineProperties({}, { ...Object.getOwnPropertyDescriptors(base), PASSOS: { enumerable: true, configurable: true, get() {
+        /* outro comando grava durante a medição deste */
+        if (!concorrente) { concorrente = true; gravarRegistro(arquivo, registroDeOutro); }
+        return base.PASSOS;
+      } } });
+      const registroDeOutro = { formato: 'mecanifica.registro-de-etapas', versao: 3, montagem: 'tres-blocos', eventos: [{ tipo: 'aceite', instancia: 'base', aceite: { por: 'outro' }, impressao: { forma: 'x', parametros: [], pose: {}, juntas: [], citadas: [], anteriores: [] } }] };
+      const meu = await fixar(arquivo, 'base', aceite, { receitas: { ...receitas, 'bloco-com-pino': lenta }, rodadasDe: todasFechadas });
+      expect(concorrente).toBe(true);
+      expect(() => gravarRegistro(arquivo, meu)).toThrow(/outro comando gravou/);
+      expect(gravado().eventos[0].aceite.por).toBe('outro');
+    });
+
+    it('a receita que não executa deixa as anteriores medidas e dá a etapa e as seguintes como não conferíveis, com o motivo, sem derrubar', async () => {
+      const registro = aceitarTodasV3(await medirAgora(arquivo, { receitas: RECEITAS }));
+      const quebra = (ref, erro) => ({ ...RECEITAS, [ref]: Object.defineProperties({}, { ...Object.getOwnPropertyDescriptors(RECEITAS[ref]), PASSOS: { enumerable: true, configurable: true, get() { throw erro; } } }) });
+      const lida = async (receitas) => (await registroComEstado(arquivo, { receitas, anterior: registro })).etapas;
+      const porReceita = await lida(quebra('bloco-com-furo-e-pino', new Error('receita com defeito')));
+      expect(porReceita.map((e) => `${e.instancia}:${e.estado}`)).toEqual(['base:fixa', 'meio:nao-conferivel', 'topo:nao-conferivel']);
+      expect(porReceita[1].motivo).toContain('a receita não executa: receita com defeito');
+      expect(porReceita[2].motivo).toContain('não há geometria');
+      /* a montagem que não resolve a partir de uma etapa: a operação que a receita pede não existe */
+      const semOperacao = { ...RECEITAS, 'bloco-com-furo': { ...RECEITAS['bloco-com-furo'], PASSOS: [['operacaoQueNaoExiste', {}]] } };
+      const porResolucao = await lida(semOperacao);
+      expect(porResolucao.map((e) => `${e.instancia}:${e.estado}`)).toEqual(['base:fixa', 'meio:fixa', 'topo:nao-conferivel']);
+      expect(porResolucao[2].motivo).toContain('a montagem não resolve a partir desta etapa');
+      expect((await lida(RECEITAS)).map((e) => e.estado)).toEqual(['fixa', 'fixa', 'fixa']);
+      /* aceitar a etapa quebrada recusa dizendo por quê */
+      const medidoQuebrado = await medirAgora(arquivo, { receitas: quebra('bloco-com-furo-e-pino', new Error('receita com defeito')) });
+      const soBase = aceitarTodasV3(await medirAgora(arquivo, { receitas: RECEITAS }), 1);
+      expect(() => acrescentarAceite(soBase, medidoQuebrado, 'meio', aceite)).toThrow(/receita com defeito/);
     });
   });
 });

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2104 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2105 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -3478,6 +3478,7 @@
 - `esboco-para-passos.test.mjs` — A conversão do esboço em passos de receita: as onze cadeiras escolhidas (receitas do externo traduzidas em esboço) convertem sem recusa, e a malha que o núcl…
 - `estado-bancada.test.ts` — estado-bancada.test.ts — contrato headless das vistas, seleção, contexto e URL da bancada.
 - `estudo-campo-revalidacao.test.ts` — R05: estudo de campo sobre uma peça compartilhada em duas raízes.
+- `etapas-consumidores-v3.test.mjs` — etapas-consumidores-v3.test.mjs — cada consumidor do estado das etapas, de ponta a ponta, sobre um registro v3 em disco. A pasta de prova é uma cópia do `car…
 - `etapas-da-montagem.mjs` — etapas-da-montagem.mjs — o registro de etapas de uma montagem v5, em disco, e a única porta para fixar uma etapa.
 - `etapas-da-montagem.test.mjs` — etapas-da-montagem.test.mjs — a porta que fixa etapa. Fixar exige a etapa ser a próxima, o crítico ter fechado a peça dela, a nota de passagem, as juntas pas…
 - `etapas-de-construcao.test.mjs` — etapas-de-construcao.test.mjs — fatia 3 do plano "a peça nasce encaixada": o registro de etapas, a junta medida quando a parte entra e a recusa de seguir com…
