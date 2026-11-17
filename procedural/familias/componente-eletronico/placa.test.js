@@ -6,6 +6,7 @@
    publicada reconstrói a pose nas duas faces; e as recusas da declaração. */
 import { describe, expect, it } from 'vitest';
 import { executarReceita } from '../../../src/autoria/executar-receita.js';
+import { analisarTopologia } from '../../nucleo/topologia.js';
 import { chamar, criarRegistroDeFamilias } from '../index.js';
 import { COMPONENTE_ELETRONICO, comMateriais } from './index.js';
 import { eixoEAngulo, placaDeclarada } from './placa.js';
@@ -150,6 +151,9 @@ describe('as recusas da declaração', () => {
     ['encosta em peça que não existe', (d) => { d.pecas[0].encostaEm = [{ peca: 'u9', motivo: 'teste' }]; }, /encostaEm\[0\]\.peca/],
     ['espessura menor que o cobre', (d) => { d.espessura = 0.1; }, /placa\.espessura/],
     ['contorno de dois pontos', (d) => { d.contorno = [[0, 0], [1, 1]]; }, /placa\.contorno/],
+    ['pose sem posição', (d) => { d.pose = { rotacoes: [] }; }, /placa\.pose\.posicao/],
+    ['pose com eixo desconhecido', (d) => { d.pose = { rotacoes: [{ eixo: 'w', graus: 90 }], posicao: [0, 0, 0] }; }, /placa\.pose\.rotacoes\[0\]/],
+    ['pose com graus em texto', (d) => { d.pose = { rotacoes: [{ eixo: 'x', graus: '90' }], posicao: [0, 0, 0] }; }, /placa\.pose\.rotacoes\[0\]/],
   ])('%s', (_, mudar, mensagem) => {
     expect(com(mudar)).toThrow(mensagem);
   });
@@ -157,5 +161,110 @@ describe('as recusas da declaração', () => {
     const { pecas } = placaDeclarada({ ...base(), pecas: [{ id: 'u1', perfil: 'soic-8', posicao: [0, 0], lado: 'baixo' }] });
     expect(pecas[1].posicao).toEqual([0, -1.6, 0]);
     expect(pecas[1].terminais.every((t) => !t.atravessa && t.naPlaca[1] === -1.6)).toBe(true);
+  });
+});
+
+/* a pose na peça hospedeira: a malha da placa posta é a da placa sem pose, vértice a vértice, levada pelas rotações e pela
+   translação declaradas; e o que se publica passa ao referencial da peça, com o da placa em naPlaca */
+describe('a pose da placa na peça hospedeira', () => {
+  const declaracao = (pose) => ({
+    contorno: { retangulo: { largura: 40, profundidade: 30, cantos: 2 } },
+    furos: [{ centro: [16, 11], diametro: 3.2 }],
+    pecas: [
+      { id: 'r1', perfil: 'resistor-1-4w', posicao: [-4, -6], giro: 30 },
+      { id: 'u1', perfil: 'soic-8', posicao: [8, 6], lado: 'baixo', giro: 90 },
+      { id: 'c1', perfil: 'eletrolitico-6-3x11', posicao: [-10, 8] },
+    ],
+    ...(pose ? { pose } : {}),
+  });
+  const POSE = { rotacoes: [{ eixo: 'z', graus: 90 }, { eixo: 'y', graus: -30 }], posicao: [-110, 115, 7] };
+  const giro = (eixo, graus) => {
+    const t = (graus * Math.PI) / 180, c = Math.cos(t), s = Math.sin(t);
+    return { x: [[1, 0, 0], [0, c, -s], [0, s, c]], y: [[c, 0, s], [0, 1, 0], [-s, 0, c]], z: [[c, -s, 0], [s, c, 0], [0, 0, 1]] }[eixo];
+  };
+  const aplicar = (m, p) => m.map(([a, b, c]) => a * p[0] + b * p[1] + c * p[2]);
+  /* a pose esperada sai da declaração: cada rotação na ordem, depois a translação */
+  const posar = (p) => POSE.rotacoes.reduce((q, r) => aplicar(giro(r.eixo, r.graus), q), p).map((v, k) => v + POSE.posicao[k]);
+  const malha = (d) => {
+    const gerada = placaDeclarada(d);
+    const nomes = new Set([...gerada.materiais, 'corpo', 'metal', 'marca', 'placa-filha', 'faixa-1', 'faixa-2', 'faixa-3', 'faixa-4', 'faixa-5']);
+    const receita = { PASSOS: gerada.passos, PARAMS: {}, TOPO: {}, ALIASES: [], MATERIAIS: Object.fromEntries([...nomes].map((n) => [n, { cor: '#808080' }])) };
+    return { gerada, neutro: executarReceita(receita, registro).neutro };
+  };
+
+  it('a malha posta é a malha sem pose levada pela pose, parte por parte, vértice a vértice', () => {
+    const sem = malha(declaracao());
+    const com = malha(declaracao(POSE));
+    expect(com.neutro.orfaos ?? []).toEqual([]);
+    let pior = 0;
+    for (const parte of ['placa', 'r1', 'u1', 'c1']) {
+      const vertices = (n) => [...new Set([...n.F.values()].filter((f) => f.parte === parte).flatMap((f) => f.vs))].sort((a, b) => a - b).map((v) => n.V.get(v).map((c) => c * 1000));
+      const antes = vertices(sem.neutro), depois = vertices(com.neutro);
+      expect(depois.length, parte).toBe(antes.length);
+      expect(antes.length, parte).toBeGreaterThan(0);
+      antes.forEach((p, k) => { pior = Math.max(pior, ...posar(p).map((v, j) => Math.abs(v - depois[k][j]))); });
+    }
+    expect(pior).toBeLessThan(1e-6);
+  });
+
+  it('publica a posição e a orientação no referencial da peça, e as da placa em naPlaca', () => {
+    const sem = placaDeclarada(declaracao()).pecas;
+    const { pecas, pose } = placaDeclarada(declaracao(POSE));
+    /* a matriz da pose montada da declaração, coluna por coluna, e a orientação publicada da pose volta a ela */
+    const colunas = [[1, 0, 0], [0, 1, 0], [0, 0, 1]].map((e) => POSE.rotacoes.reduce((q, r) => aplicar(giro(r.eixo, r.graus), q), e));
+    const matrizDaPose = [0, 1, 2].map((i) => colunas.map((c) => c[i]));
+    rodrigues(pose.orientacao).forEach((linha, i) => linha.forEach((v, j) => expect(v).toBeCloseTo(matrizDaPose[i][j], 9)));
+    expect(pose.posicao).toEqual(POSE.posicao);
+    expect(pecas[0].posicao).toEqual(POSE.posicao);
+    for (const [k, p] of pecas.entries()) {
+      expect(p.naPlaca).toEqual({ posicao: sem[k].posicao, orientacao: sem[k].orientacao });
+      posar(sem[k].posicao).forEach((v, j) => expect(p.posicao[j]).toBeCloseTo(v, 9));
+      /* a orientação publicada é a da pose composta com a da peça na placa */
+      const esperada = rodrigues(sem[k].orientacao).map((linha, i) => linha.map((_, j) => matrizDaPose[i].reduce((soma, v, n) => soma + v * rodrigues(sem[k].orientacao)[n][j], 0)));
+      const publicada = rodrigues(p.orientacao);
+      esperada.forEach((linha, i) => linha.forEach((v, j) => expect(publicada[i][j]).toBeCloseTo(v, 9)));
+      /* os terminais seguem no plano da placa */
+      expect(p.terminais ?? []).toEqual(sem[k].terminais ?? []);
+    }
+  });
+
+  it('sem pose a saída não muda, e partesDoPlano promete a placa e cada componente', () => {
+    const gerada = placaDeclarada(declaracao());
+    expect(gerada.pose).toBeUndefined();
+    expect(gerada.pecas.every((p) => p.naPlaca === undefined)).toBe(true);
+    expect(gerada.partesDoPlano.map((p) => p.nome)).toEqual(['placa', 'r1', 'u1', 'c1']);
+    for (const p of gerada.partesDoPlano) expect(p.forma.length).toBeLessThanOrEqual(240);
+  });
+});
+
+/* a placa em faixas: com mais furos numa camada do que a extrusão triangula em tempo razoável, a camada sai em faixas que
+   somam o contorno, cada furo inteiro numa faixa só, e a malha continua fechada */
+describe('a placa com muitos furos sai em faixas', () => {
+  const declaracao = {
+    contorno: { retangulo: { largura: 120, profundidade: 60, cantos: 3 } },
+    furos: [{ centro: [-55, -25], diametro: 3.2 }, { centro: [55, 25], diametro: 3.2 }],
+    pecas: [
+      { id: 'j1', perfil: 'barra-1x8', parametros: { viasDaBarra: 40, fileirasDaBarra: 2 }, posicao: [0, -15] },
+      { id: 'u1', perfil: 'dip-40', posicao: [0, 12] },
+    ],
+  };
+  const area = (p) => Math.abs(p.reduce((s, [x, z], k) => { const [x1, z1] = p[(k + 1) % p.length]; return s + x * z1 - x1 * z; }, 0)) / 2;
+  it('cada camada soma a área do contorno, com cada furo numa faixa só', () => {
+    const gerada = placaDeclarada(declaracao);
+    const camadas = [1, 2, 3].map((k) => gerada.passos.filter(([op, a]) => op === 'extrusao' && (a.origemId === k || (a.origemId >= 100 && a.origemId < 1000 && (a.origemId - 100) % 3 === k - 1))));
+    const contorno = area(gerada.pecas[0].contorno) * 1e-6;
+    const furosNaPlaca = gerada.furos.length;
+    for (const faixas of camadas) {
+      expect(faixas.length).toBeGreaterThan(1);
+      expect(faixas.reduce((s, [, a]) => s + area(a.perfil), 0)).toBeCloseTo(contorno, 12);
+    }
+    expect(camadas[0].reduce((s, [, a]) => s + a.furos.length, 0)).toBe(furosNaPlaca);
+  });
+  it('a malha em faixas é fechada e sem passo sem efeito', () => {
+    const gerada = placaDeclarada(declaracao);
+    const nomes = new Set([...gerada.materiais, 'corpo', 'metal', 'marca', 'placa-filha', 'faixa-1', 'faixa-2', 'faixa-3', 'faixa-4', 'faixa-5']);
+    const { neutro } = executarReceita({ PASSOS: gerada.passos, PARAMS: {}, TOPO: {}, ALIASES: [], MATERIAIS: Object.fromEntries([...nomes].map((n) => [n, { cor: '#808080' }])) }, registro);
+    expect(neutro.orfaos ?? []).toEqual([]);
+    expect(analisarTopologia({ vertices: neutro.V, faces: neutro.F }).achados.filter((a) => ['casca-aberta', 'aresta-nao-manifold', 'orientacao-incoerente'].includes(a.codigo))).toEqual([]);
   });
 });

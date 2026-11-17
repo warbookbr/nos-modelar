@@ -1392,7 +1392,7 @@
 
 ## procedural/pecas/braco-robotico/partes/base/
 
-- `receita.js` — braco-robotico/base — a base do braço robótico, com a caixa lateral.
+- `receita.js` — braco-robotico/base — a base do braço robótico, com a caixa lateral e a placa de controle dentro dela.
 
 ## procedural/pecas/braco-robotico/partes/base/rodadas/
 

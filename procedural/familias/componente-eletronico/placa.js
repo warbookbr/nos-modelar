@@ -23,6 +23,12 @@
    mais (a lâmina do jack, a aleta do dissipador), ganha furo oblongo; os outros, furo redondo. Os polígonos dos furos circunscrevem a forma nominal, então a folga
    vale também na malha facetada.
 
+   A pose da placa na peça hospedeira é opção da declaração (`pose: { rotacoes: [{ eixo, graus }], posicao: [x, y, z] }`, em
+   graus e mm): as rotações, em ordem, em torno dos eixos da peça e da origem dela pela regra da mão direita do núcleo, e depois a
+   translação levam a placa inteira, com os componentes, do referencial dela ao da peça. Com pose, a posição e a orientação
+   publicadas de cada peça são as do referencial da peça hospedeira (o que a ficha cita), e as do referencial da placa ficam em
+   `naPlaca`; os furos, as ilhas e os terminais continuam no plano da placa. Sem pose nada muda.
+
    Recusa antes de gerar passo, com `ErroFamilia` (campo, valor e o aceito): id inválido ou repetido, tipo ou lado
    desconhecido, posição ou giro que não é número, furo ou ilha fora do contorno ou perto da borda, e duas ilhas, ou ilha e furo
    de fixação, mais perto que a folga, citando os dois componentes e os terminais. */
@@ -146,6 +152,70 @@ function distanciaEntreConvexos(a, b) {
   }
   return 0;
 }
+/* A PLACA EM FAIXAS. A tampa de uma extrusão com furos sai do núcleo em pedaços convexos fundidos dois a dois, e a fusão recomeça
+   do primeiro par a cada fusão: o custo cresce com o cubo dos triângulos da tampa. A placa de controle do braço, com 189 furos,
+   levava 34 s numa só camada (medido em 2026-11-17), e a placa tem três (o laminado e o cobre das duas faces). Com mais de
+   `FUROS_SEM_FAIXA` furos numa camada, o contorno convexo é cortado em faixas de até `FUROS_POR_FAIXA` furos por retas de x
+   constante que passam entre os furos, e cada faixa é uma extrusão com os furos dela: as faixas encostam face a face, no mesmo material e na mesma parte, como
+   a ilha encosta na camada de cobre. Contorno côncavo, ou furos sem vão entre eles, fica numa extrusão só. */
+const FUROS_SEM_FAIXA = 96;
+const FUROS_POR_FAIXA = 24;
+const VAO_DO_CORTE = 0.2;
+function convexoNoPlano(p) {
+  let sinal = 0;
+  for (let k = 0; k < p.length; k += 1) {
+    const [a, b, c] = [p[k], p[(k + 1) % p.length], p[(k + 2) % p.length]];
+    const z = (b[0] - a[0]) * (c[1] - b[1]) - (b[1] - a[1]) * (c[0] - b[0]);
+    if (Math.abs(z) < 1e-12) continue;
+    if (sinal && Math.sign(z) !== sinal) return false;
+    sinal = Math.sign(z);
+  }
+  return true;
+}
+/* o polígono convexo `p` recortado ao semiplano x >= corte (lado = 1) ou x <= corte (lado = -1) */
+function recortar(p, corte, lado) {
+  const dentro = ([x]) => lado * (x - corte) >= 0;
+  const saida = [];
+  p.forEach((a, k) => {
+    const b = p[(k + 1) % p.length];
+    if (dentro(a)) saida.push(a);
+    if (dentro(a) !== dentro(b)) {
+      const t = (corte - a[0]) / (b[0] - a[0]);
+      saida.push([corte, a[1] + t * (b[1] - a[1])]);
+    }
+  });
+  return saida.filter((q, k) => Math.hypot(q[0] - saida[(k + 1) % saida.length][0], q[1] - saida[(k + 1) % saida.length][1]) > 1e-9);
+}
+function faixasDaCamada(contorno, furos) {
+  if (furos.length <= FUROS_SEM_FAIXA || !convexoNoPlano(contorno)) return [{ contorno, furos }];
+  const faixa = furos.map((f) => ({ f, min: Math.min(...f.map((q) => q[0])), max: Math.max(...f.map((q) => q[0])) })).sort((a, b) => a.min - b.min || a.max - b.max);
+  /* os cortes possíveis: o meio de cada vão de x em que nenhum furo passa */
+  const cortes = [];
+  let alcance = faixa[0].max;
+  for (let k = 1; k < faixa.length; k += 1) {
+    if (faixa[k].min - alcance >= VAO_DO_CORTE) cortes.push({ x: (faixa[k].min + alcance) / 2, antes: k });
+    alcance = Math.max(alcance, faixa[k].max);
+  }
+  /* a cada faixa, o último corte que ainda deixa nela no máximo FUROS_POR_FAIXA furos (ou o primeiro, se nenhum deixa) */
+  const escolhidos = [];
+  let inicio = 0;
+  while (faixa.length - inicio > FUROS_POR_FAIXA) {
+    const cabem = cortes.filter((c) => c.antes > inicio && c.antes - inicio <= FUROS_POR_FAIXA);
+    const corte = cabem.at(-1) ?? cortes.find((c) => c.antes > inicio);
+    if (!corte) break;
+    escolhidos.push(corte);
+    inicio = corte.antes;
+  }
+  if (!escolhidos.length) return [{ contorno, furos }];
+  const limites = [-Infinity, ...escolhidos.map((c) => c.x), Infinity];
+  return limites.slice(0, -1).map((x0, k) => {
+    const x1 = limites[k + 1];
+    let p = contorno;
+    if (Number.isFinite(x0)) p = recortar(p, x0, 1);
+    if (Number.isFinite(x1)) p = recortar(p, x1, -1);
+    return { contorno: p, furos: faixa.filter((f) => f.min > x0 && f.max < x1).map((f) => f.f) };
+  });
+}
 const distanciaABorda = (ponto, contorno) => Math.min(...arestas(contorno).map(([a, b]) => distanciaAoSegmento(ponto, a, b)));
 
 /* ---------- a pose de um componente na placa ---------- */
@@ -158,6 +228,32 @@ function matrizDaPose(giro, lado) {
   return ry.map((linha) => linha.map((v, j) => v * f[j]));
 }
 const aplicar = (m, [x, y, z]) => m.map(([a, b, c]) => a * x + b * y + c * z);
+const produto = (a, b) => a.map((linha) => [0, 1, 2].map((j) => linha.reduce((soma, v, k) => soma + v * b[k][j], 0)));
+const IDENTIDADE = [[1, 0, 0], [0, 1, 0], [0, 0, 1]];
+
+/* a matriz de uma rotação do núcleo (`rotaciona`), pela regra da mão direita: x +90 leva +y a +z, y +90 leva +x a -z, z +90 leva
+   +y a -x */
+function matrizDaRotacao(eixo, graus) {
+  const t = (graus * Math.PI) / 180, c = Math.cos(t), s = Math.sin(t);
+  if (eixo === 'x') return [[1, 0, 0], [0, c, -s], [0, s, c]];
+  if (eixo === 'y') return [[c, 0, s], [0, 1, 0], [-s, 0, c]];
+  return [[c, -s, 0], [s, c, 0], [0, 0, 1]];
+}
+
+/* a pose da placa na peça hospedeira: a lista de rotações, aplicadas em ordem, e a posição da origem da placa, em mm */
+function lerPose(pose) {
+  if (pose === undefined) return null;
+  const aceito = '{ rotacoes?: [{ eixo: \'x\' | \'y\' | \'z\', graus }], posicao: [x, y, z] } em graus e mm, no referencial da peça hospedeira';
+  if (!pose || typeof pose !== 'object' || Array.isArray(pose)) recusar('placa.pose', pose, aceito);
+  const { rotacoes = [], posicao } = pose;
+  if (!Array.isArray(posicao) || posicao.length !== 3 || !posicao.every(numero)) recusar('placa.pose.posicao', posicao, 'o ponto [x, y, z] em mm onde fica a origem da placa (o centro da face de cima)');
+  if (!Array.isArray(rotacoes)) recusar('placa.pose.rotacoes', rotacoes, aceito);
+  rotacoes.forEach((r, k) => {
+    if (!r || !['x', 'y', 'z'].includes(r.eixo) || !numero(r.graus)) recusar(`placa.pose.rotacoes[${k}]`, r, "{ eixo: 'x' | 'y' | 'z', graus }, pela regra da mão direita do núcleo");
+  });
+  const matriz = rotacoes.reduce((m, r) => produto(matrizDaRotacao(r.eixo, r.graus), m), IDENTIDADE);
+  return { rotacoes: rotacoes.map(({ eixo, graus }) => ({ eixo, graus })), posicao: [...posicao], matriz };
+}
 
 /** Eixo e ângulo (graus, mão direita) de uma matriz de rotação 3x3, como a ficha da ponte escreve a orientação. */
 export function eixoEAngulo(m) {
@@ -241,11 +337,14 @@ const m2 = (pontos) => pontos.map(([x, z]) => [metro(x), metro(z)]);
 /**
  * Os passos de uma placa declarada e o que ela publica. `declaracao`: `{ id = 'placa', contorno, espessura?, furos?: [{ centro:
  * [x, z], diametro }], pecas: [{ id, tipo ou perfil, parametros?, posicao: [x, z], giro? = 0, lado? = 'cima', materiais?, nome?,
- * encostaEm?: [{ peca, motivo }] }], materiais?: { placa = 'placa', ilha = 'ilha' }, pai? }`, em mm e graus; `opcoes.base` soma
+ * encostaEm?: [{ peca, motivo }] }], materiais?: { placa = 'placa', ilha = 'ilha' }, pai?, pose?: { rotacoes?: [{ eixo, graus }],
+ * posicao: [x, y, z] } }`, em mm e graus; `opcoes.base` soma
  * um valor aos ids de origem, para a placa entrar numa receita que já tem os dela. Devolve `{ passos, pecas, furos, ilhas,
  * contatos, ilhasDaReceita, materiais }`: `pecas` traz a placa e cada componente com família, variante, posição (mm), orientação
- * e terminais, nos nomes de campo da ficha da ponte; `contatos` e `ilhasDaReceita` vão para `contatos` e `ilhas` da receita;
- * `materiais`, os nomes que a receita precisa declarar em `MATERIAIS`.
+ * e terminais, nos nomes de campo da ficha da ponte (com pose, posição e orientação no referencial da peça hospedeira, e as da
+ * placa em `naPlaca`); `pose`, quando declarada, a da placa; `contatos` e `ilhasDaReceita` vão para `contatos` e `ilhas` da receita;
+ * `materiais`, os nomes que a receita precisa declarar em `MATERIAIS`; `partesDoPlano`, a entrada { nome, forma, tecnica } de cada
+ * parte para o `PLANO.partes` da receita.
  */
 export function placaDeclarada(declaracao, { base = 0 } = {}) {
   if (!declaracao || typeof declaracao !== 'object') recusar('placa', declaracao, 'a declaração { id, contorno, espessura, furos, pecas }');
@@ -259,6 +358,7 @@ export function placaDeclarada(declaracao, { base = 0 } = {}) {
   if (!Array.isArray(declaracao.pecas) || !declaracao.pecas.length) recusar('placa.pecas', declaracao.pecas, 'lista de ao menos um componente');
   const ids = new Set([id]);
   const lidas = declaracao.pecas.map((peca, k) => lerPeca(peca, k, ids));
+  const pose = lerPose(declaracao.pose);
 
   /* os furos de fixação */
   const fixacao = (declaracao.furos ?? []).map((f, k) => {
@@ -357,14 +457,16 @@ export function placaDeclarada(declaracao, { base = 0 } = {}) {
   /* o miolo do laminado, furado nos terminais e na fixação, e a camada de cada face, aberta onde a ilha entra: a face da placa
      fica plana em y = 0 e em y = -espessura, com as ilhas rentes a ela, e o componente que assenta toca a placa onde quer que
      encoste (na camada ou na ilha) */
-  elemento('extrusao', base + 1, {
-    perfil: m2(contorno), furos: [...furosDosTerminais.map((c) => m2(c.furo)), ...fixacao.map((f) => m2(f.poligono))],
-    altura: metro(espessura - 2 * P.cobre), em: [0, metro(-espessura + P.cobre), 0],
-  }, nomes.placa);
-  LADOS.forEach((face, k) => elemento('extrusao', base + 2 + k, {
-    perfil: m2(contorno), furos: [...ilhas.filter((i) => i.face === face).map((i) => m2(i.poligono)), ...fixacao.map((f) => m2(f.poligono))],
-    altura: metro(P.cobre), em: [0, metro(face === 'cima' ? -P.cobre : -espessura), 0],
-  }, nomes.placa));
+  /* cada camada numa extrusão, ou em faixas quando tem furos demais; a primeira faixa fica com o id de sempre (base + 1, + 2 e + 3)
+     e as outras vêm de base + 100, três por faixa */
+  const camadas = [
+    { furos: [...furosDosTerminais.map((c) => c.furo), ...fixacao.map((f) => f.poligono)], altura: espessura - 2 * P.cobre, y: -espessura + P.cobre },
+    ...LADOS.map((face) => ({ furos: [...ilhas.filter((i) => i.face === face).map((i) => i.poligono), ...fixacao.map((f) => f.poligono)], altura: P.cobre, y: face === 'cima' ? -P.cobre : -espessura })),
+  ];
+  camadas.forEach((camada, k) => faixasDaCamada(contorno, camada.furos).forEach((faixa, j) => elemento('extrusao', j === 0 ? base + 1 + k : base + 100 + 3 * (j - 1) + k, {
+    perfil: m2(faixa.contorno), furos: faixa.furos.map(m2),
+    altura: metro(camada.altura), em: [0, metro(camada.y), 0],
+  }, nomes.placa)));
   const baseDasIlhas = base + 1000 * (pecas.length + 1);
   ilhas.forEach((ilha, k) => {
     const doTerminal = cobre.find((c) => c.peca === ilha.peca && c.terminal === ilha.terminal);
@@ -384,17 +486,47 @@ export function placaDeclarada(declaracao, { base = 0 } = {}) {
     if (peca.giro) passos.push(['rotaciona', { eixo: 'y', graus: peca.giro, pivo: [0, 0, 0], sel }]);
     passos.push(['transladar', { d: peca.posicao.map(metro), sel }]);
   });
+  /* a pose na peça hospedeira, parte por parte (a placa e cada componente), depois de cada uma estar no lugar dela na placa */
+  if (pose) {
+    for (const nome of [id, ...pecas.map((p) => p.id)]) {
+      const sel = { grupo: nome };
+      for (const { eixo, graus } of pose.rotacoes) if (graus) passos.push(['rotaciona', { eixo, graus, pivo: [0, 0, 0], sel }]);
+      if (pose.posicao.some((v) => v !== 0)) passos.push(['transladar', { d: pose.posicao.map(metro), sel }]);
+    }
+  }
 
   const materiais = [...new Set([nomes.placa, nomes.ilha, ...pecas.flatMap((p) => Object.entries(p.chamada.argumentos).filter(([n]) => n.startsWith('material')).map(([, v]) => v))])].sort();
   const placa = { id, familia: FAMILIA, variante: 'placa-declarada', lado: null, giro: 0, posicao: [0, 0, 0], orientacao: { eixo: [0, 1, 0], angulo: 0 }, espessura, contorno: contorno.map((p) => p.map(limpo)) };
+  /* com pose, a posição e a orientação de cada peça passam ao referencial da peça hospedeira, e as da placa ficam em naPlaca */
+  const naPeca = (p, matriz) => {
+    if (!pose) return p;
+    const posicao = aplicar(pose.matriz, p.posicao).map((v, k) => limpo(v + pose.posicao[k]));
+    return { ...p, posicao, orientacao: eixoEAngulo(produto(pose.matriz, matriz)), naPlaca: { posicao: p.posicao, orientacao: p.orientacao } };
+  };
+  const matrizes = new Map(lidas.map((l) => [l.id, matrizDaPose(l.giro, l.lado)]));
+  /* a entrada de cada parte no PLANO da receita hospedeira, que precisa prometer cada parte que a peça entrega */
+  const [largura, profundidade] = [0, 1].map((k) => Math.max(...contorno.map((p) => p[k])) - Math.min(...contorno.map((p) => p[k])));
+  const partesDoPlano = [
+    {
+      nome: id,
+      forma: `placa de circuito de ${limpo(largura)} por ${limpo(profundidade)} mm e ${espessura} mm de espessura, com ${fixacao.length} furo(s) de fixação, ${furosDosTerminais.length} furo(s) de terminal e as ilhas de cobre das duas faces`,
+      tecnica: 'placa declarada da família componente-eletronico: o laminado e o cobre por extrusão furada',
+    },
+    ...pecas.map((p) => ({
+      nome: p.id,
+      forma: `${p.nome ? `${p.nome}: ` : ''}${p.tipo} (${p.variante}) na face de ${p.lado} da placa ${id}, em [${p.posicao[0]}, ${p.posicao[2]}] mm, com giro de ${p.giro} graus`.slice(0, 240),
+      tecnica: 'chamada da família componente-eletronico, posta pela placa declarada',
+    })),
+  ];
   return {
     passos,
-    pecas: [placa, ...pecas.map(({ chamada, ...resto }) => resto)],
+    ...(pose ? { pose: { rotacoes: pose.rotacoes, posicao: pose.posicao.map(limpo), orientacao: eixoEAngulo(pose.matriz) } } : {}),
+    pecas: [naPeca(placa, IDENTIDADE), ...pecas.map(({ chamada, ...resto }) => naPeca(resto, matrizes.get(resto.id)))],
     furos: [
       ...furosDosTerminais.map((c) => ({ peca: c.peca, terminal: c.terminal, poligono: c.furo.map((p) => p.map(limpo)) })),
       ...fixacao.map((f, k) => ({ peca: id, terminal: null, fixacao: k, poligono: f.poligono.map((p) => p.map(limpo)) })),
     ],
     ilhas: ilhas.map((i) => ({ ...i, poligono: i.poligono.map((p) => p.map(limpo)) })),
-    contatos, ilhasDaReceita, materiais,
+    contatos, ilhasDaReceita, materiais, partesDoPlano,
   };
 }
