@@ -129,3 +129,60 @@ A subdivisão Catmull-Clark já é C2 ao longo de toda curva declarada fora dos 
 As abordagens, da mais barata à mais ambiciosa: (1) posição dos extraordinários por projeto, sem garantia; (2) condição transversal com perfil de curvatura declarado no lugar do peso isotrópico, uma fatia; (3) energia de variação de curvatura sobre o limite, com as curvas como restrição, duas a três fatias; (4) regras melhores no extraordinário (regra de face de Karčiauskas e Peters 2021, ajuste para curvatura limitada, subdivisão guiada), que não chegam a G2 com bicúbica estacionária (Reif 1996, de memória); (5) tampa G2 de N lados em volta de cada extraordinário (transfinita com fitas de curvatura, Gregory G2, tampas polinomiais de grau 6 ou 7), amostrada nos mesmos vértices, três a seis fatias; (6) retalhos de grau 5 a 7 com G2 explícita entre vizinhos, o padrão de estúdio, dez a vinte fatias; (7) ajuste de B-spline sobre a malha para painel retangular recortado, três a cinco fatias. As citações marcadas de memória precisam ser conferidas antes de virar plano.
 
 A pessoa escolheu os degraus 2, 3 e 5 sobre a base atual; a 6 não é coberta por eles e fica como plano sucessor a analisar, com a tampa da 5 reaproveitada.
+
+## Fatia 5, primeiro passo: o oráculo, o gate analítico e a medida na curva (2026-11-17)
+
+O primeiro passo da decisão acima, sem método novo de continuidade. Quatro peças entraram.
+
+O oráculo da superfície limite é `superficieLimite` em `procedural/nucleo/subdivisao.js`: a posição, as derivadas até a segunda, a normal, as curvaturas principais e as direções delas num ponto (face, u, v) da gaiola, exatas. O retalho regular é a B-spline bicúbica dos 16 pontos em volta; a borda e o vinco vivo entram pela reflexão linear da fileira de fora, que reproduz a regra de vinco nível a nível; o retalho irregular (o extraordinário, o canto, o canto de borda, o vinco de nitidez finita) se refina só no anel da face até o ponto cair num retalho regular, transladado para não perder precisão. Confere com a fórmula fechada do ponto limite a 1e-16 m nos pontos diádicos das chapas de prova (no extraordinário, no vinco vivo da `emenda-g0`, na borda e no canto), a curvatura avaliada na gaiola e na gaiola refinada dois níveis bate a 1e-12, e a quadrática sai exata (teste em `procedural/nucleo/subdivisao-limite-exato.test.mjs`). No próprio vértice extraordinário a posição sai da fórmula fechada e a curvatura sai null; perto dele ela diverge devagar (no valência 5 da `rede-sem-ruido`, k1 de 3,9 1/m a 0,1 do parâmetro para 54 a 1e-8).
+
+A marca das curvas no neutro: `marcarCurvas: true` na `gaiolaPorRede` põe as curvas em `passo.curvas`, e o passo `subdivisao` aceita `curvas: [{ nome, pontos, continuidade? }]` e grava em `chapas[k].curvas` a cadeia dos vértices que descendem de cada uma (e da imagem espelhada, na simetria), com os ids do neutro, junto com os vincos, os cantos e a borda que o oráculo pede. A malha não muda: o neutro canônico com a marca é o mesmo sem ela (teste). `npm run emendas` (`tools/modelar/continuidade-nas-emendas.mjs`) fica fora do território do plano e ainda acha a emenda pela borda das partes; a medida na curva está em `tools/fixtures/correcao-de-superficie/medida-na-curva.mjs`, que lê a marca, e ligar a ferramenta a ela é uma linha quando o território a incluir.
+
+A medida em dois números por curva (`medirLinhasNoLimite`, pela ferramenta acima): o salto exato da curvatura transversal entre os dois lados e a inclinação máxima da rampa dela na faixa de duas arestas da gaiola de cada lado, longe dos pontos singulares (o extraordinário, o canto declarado e o canto da borda, onde a curvatura diverge e a inclinação não tem teto). O salto sai entre 4e-16 e 3e-14 1/m em toda curva lisa de toda chapa de prova, zero de máquina, como a C2 da subdivisão prevê; o ângulo sai zero, e 7,1 graus no vinco vivo da `emenda-g0`. O que distingue as emendas é a rampa e a curvatura na curva contra a da borda da faixa (1/m², 1/m):
+
+| Chapa | Inclinação | Curvatura na curva | Na borda da faixa, de cada lado |
+|---|---|---|---|
+| emenda-g1 (sem declaração, desenhada 2,0 e 0,67) | 92,7 | 1,63 | 0,95 e 1,68 |
+| emenda-g1-declarada | 34,5 | 1,37 | 0,80 e 2,19 |
+| emenda-g2 (sem declaração, desenhada 0,67 dos dois lados) | 30,0 | 0,81 | 0,65 e 0,65 |
+| emenda-g2-declarada | 3,1 | 0,64 | 0,70 e 0,70 |
+| emenda-g1-em-g2 | 23,5 | 1,17 | 1,36 e 1,18 |
+| emenda-dupla (desenhada 1,67 dos dois lados) | 94,7 | 2,31 | 1,62 e 1,62 |
+| emenda-dupla-declarada (G1) | 37,1 | 1,74 | 2,04 e 2,04 |
+
+O gate que faltou na fatia 4 está em `tools/fixtures/correcao-de-superficie/analiticas.test.mjs`, sobre o paraboloide (raio 0,4 m no topo), a calota (0,5 m) e o toro (0,5 e 0,2 m, com curvatura gaussiana dos dois sinais) de `SUPERFICIES_ANALITICAS`, numa rede de quatro retalhos com passo de 25 mm, medido na superfície limite pelo oráculo em 16 pontos por face, contra a distância exata à superfície. O limite de 0,05 mm não é alcançado por nenhuma opção, nem sem opção, e as nove entradas ficam marcadas conhecidas, com o teste falhando se uma piorar ou se passar a caber no limite:
+
+| Superfície | Sem opção: chapa inteira e a 50 mm da borda | G1: distância e deslocamento pela opção | G2: distância e deslocamento |
+|---|---|---|---|
+| paraboloide | 0,39 e 0,23 | 0,40 e 0,21 | 8,04 e 7,82 |
+| calota | 0,62 e 0,39 | 0,63 e 0,22 | 8,13 e 8,49 |
+| toro | 1,11 e 0,94 | 1,18 e 0,38 | 19,1 e 20,0 |
+
+A régua confere: sem o alisamento do miolo e com o interior cotado com peso 100 (`liso: false, interior: 100`), o paraboloide, que o preenchimento de Coons reproduz exato, fica a 0,02 mm a 50 mm da borda. O que tira a rede sem opção da superfície é o alisamento do miolo, a regra de borda (a curvatura que atravessa a borda livre vai a zero nela) e a cota de peso 1 do interior; a G1 soma até 0,38 mm, e a G2 experimental, de 8 a 20 mm.
+
+O que o oráculo mostra sobre a ondulação. Nas três superfícies analíticas, lisas e sem nada a corrigir, toda curva declarada de dentro é uma crista de curvatura transversal sem opção: no paraboloide 3,28 1/m na curva contra 2,25 na borda da faixa (a superfície tem 2,5), na calota 2,80 contra 1,93 (tem 2,0), no toro 6,20 contra 4,97 através do tubo e 1,09 contra 0,33 em volta do eixo; com a G1 a crista vira vale (2,46 contra 2,69 no paraboloide). É o mesmo nas chapas emendadas (a `emenda-g2`, de curvatura igual, tem 0,81 na curva contra 0,65 ao lado) e na `rede-sem-ruido` (a curva `meio` tem 1,06 contra 0,80 e 0,64). O salto é zero e a forma não tem degrau; o que a zebra lê na curva é essa crista, que nasce de a curva ser cota exata e o miolo, de peso 1. Fora das curvas, a curvatura oscila na frequência da gaiola: um erro de posição δ dos pontos da gaiola de espaçamento h faz a curvatura variar uns 16 δ / h², e no paraboloide com o interior cotado a 5 micrômetros de erro ela já vira 0,05 a 0,1 1/m a cada duas arestas (`onde-ondula.mjs`, que conta essas viradas por classe de lugar).
+
+No quarto traseiro, numa cópia da receita fora do repositório com `marcarCurvas` (`tmp/correcao-f5/carro/receita.js` do ramo, a da fatia 4 com a marca; a medida é da superfície limite, só com os passos `subdivisao`, e leva 2 min), pelos mesmos dois comandos:
+
+```
+node tools/fixtures/correcao-de-superficie/medida-na-curva.mjs tmp/correcao-f5/carro/receita.js
+node tools/fixtures/correcao-de-superficie/onde-ondula.mjs tmp/correcao-f5/carro/receita.js
+```
+
+As 22 curvas (e as 19 espelhadas) saem com o salto de curvatura entre 3e-15 e 3e-12 1/m e o ângulo zero: a emenda do carro não tem degrau de curvatura em lugar nenhum, nem nos vincos de nitidez finita (L4 a L6, Q4 e Q5), que no limite são filetes lisos de curvatura até 712 1/m (raio de 1,4 mm no L4, de nitidez 0,5). A inclinação da rampa, longe dos pontos singulares e dos vincos, vai de 9 a 26 1/m² nas seções S1 a S4 e na L7 (a ordem da `emenda-g2`), 47 no perfil da traseira, de 235 a 800 nas longitudinais L1 a L3, nas Q1 a Q3 e na Qeixo (de duas vezes e meia a nove vezes a `emenda-g1`), com os maiores na lateral a x 820 a 920 mm, entre o topo do rebaixo e o ombro, e 12 698 1/m² na S5, a 26 mm dela, em x 435, y 1066, z -1862, na volta da coluna para a tampa, a 186 mm do extraordinário de valência 3. Nas seções a curva também é crista ou vale contra a borda da faixa (S4: 0,19 1/m na curva, 0,04 e 0,53 a 63 mm).
+
+Onde a curvatura vira, com a régua de 0,1 1/m, no quarto traseiro e, para comparar, na rede de prova sem ruído (viradas por metro de fileira, a mediana do quanto vira e a parte da energia de variação da curvatura fora do vinco):
+
+| Classe | Quarto traseiro | rede-sem-ruido |
+|---|---|---|
+| miolo dos retalhos | 6,2/m, 0,12 1/m, 63% em 239 m | 7,5/m, 0,11, 63% |
+| a até meio espaçamento de uma curva declarada | 11,0/m, 0,12 1/m, 30% em 71 m | 13,8/m, 0,12, 8% |
+| vinco (a até meio espaçamento) | 17,1/m, 0,24 1/m, em 89 m | nenhum |
+| ponto singular (a até um espaçamento) | 15,0/m, 0,13 1/m, 6% em 2,7 m | 6,3/m, 0,16, 18% |
+| borda livre | 3,5/m, 0,13 1/m, 1% em 15 m | 6,3/m, 0,11, 12% |
+
+O que isso diz sobre a ondulação do carro: ela não está no vértice extraordinário (são 2,7 m de fileira de 327, e 6% da energia) nem num salto de curvatura nas curvas (não há salto). Está em três lugares, nesta ordem de densidade: ao longo dos vincos do degrau e da tampa, onde a curvatura vira 17 vezes por metro com o dobro da amplitude do resto, que é a ondulação fina que a pintura mostrava ao longo do degrau; ao longo das curvas declaradas, que viram 1,8 vez mais por metro que o miolo e levam 30% da energia em 21% do comprimento, a crista ou vale de curvatura que a cota exata da curva contra o miolo de peso 1 deixa; e no miolo, com a ondulação na frequência da gaiola que nasce de erros de posição de micrômetros, e que a rede de prova sem ruído nenhum também tem na mesma taxa (7,5/m contra 6,2/m). Os três são o que os degraus 2 e 3 do caminho decidido atacam: a condição transversal com perfil declarado tira a crista da curva, e a energia de variação de curvatura sobre o limite, com o oráculo como medida, a ondulação do miolo; a tampa do extraordinário (degrau 5) pesa pouco no quarto traseiro.
+
+Dois achados laterais, para o plano do carro. O canto que a `gaiolaPorRede` acha na metade simétrica onde a borda dobra para o plano x = 0 (na `chapa-simetrica`, `crista0` e `crista1000`; no carro, `t_soleira` e `e0_eixo`) continua canto depois do espelho, onde a borda é reta: a curvatura ali diverge como 1/d (442 1/m a 0,05 mm do canto na `chapa-simetrica`), e a regra certa seria a de vinco de borda. E o vértice de borda de valência 2 (o canto de um retalho de n lados na borda, como o `M` da `rede-sem-ruido`) é ponto singular, com a inclinação da curvatura a 1 mm dele de 9,8e6 1/m².
+
+O processo não teria pegado o que o oráculo mostrou: as medidas de antes liam a malha de nível finito por ajuste e não separam crista de rampa nem de salto; o gate analítico e a medida na curva ficam agora como teste (`analiticas.test.mjs`, `medida-na-curva.test.mjs`, `onde-ondula.test.mjs`). Sem as opções novas nada muda: o estado canônico das 21 chapas de prova (malha e rede, por hash), da carenagem de prova, da carroceria do sedã, do kukri, do ombro do braço robótico, da caçamba do carrinho de mão, do banco da empilhadeira, da chapa de prova da rede, da gota, da rodada 1 do quarto traseiro e do quarto traseiro (só os passos `subdivisao`) é o mesmo antes e depois, byte a byte.

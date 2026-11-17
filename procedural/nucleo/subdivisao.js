@@ -1014,11 +1014,12 @@ const ao_longo = (am, s) => (s % 2 === 0 ? am.du : am.dv);
  * entre a aresta que chega e a que sai, a `epsilon` do comprimento da aresta dele. A linha de borda (um lado só) mede só o lado que tem.
  * Perto de um ponto singular da superfície limite (o extraordinário, o canto declarado, o vértice de borda de valência diferente de 3, onde
  * a curvatura diverge) a inclinação cresce sem limite; `inclinacaoForaDosSingulares` é a maior a mais de `raioDoSingular` (padrão metade
- * da faixa) de todos eles, e `singularesPerto` conta os que ficam a menos da faixa e do raio da linha.
+ * da faixa) de todos eles e dos pontos de `evitar` (os do vinco de nitidez finita, que o refino apaga da gaiola mas deixa um filete de raio
+ * pequeno na superfície), e `singularesPerto` conta os que ficam a menos da faixa e do raio da linha.
  * Devolve { nome, ..., arestas, saltoMaximo, anguloMaximoGraus, inclinacaoMaxima, ondeInclinacao, inclinacaoForaDosSingulares,
  * curvaturaNaLinha, curvaturaNaFaixa, extraordinarios: [{ vertice, valencia, ponto, salto }] } com as curvaturas na unidade inversa da gaiola.
  */
-export function medirLinhasNoLimite(gaiola, linhas, { faixa = null, amostras = 4, passosPorFace = 4, epsilon = 1e-4, raioDoSingular = null } = {}) {
+export function medirLinhasNoLimite(gaiola, linhas, { faixa = null, amostras = 4, passosPorFace = 4, epsilon = 1e-4, raioDoSingular = null, evitar = [] } = {}) {
   const sup = superficieLimite(gaiola);
   const F = gaiola.faces; const P = gaiola.vertices;
   const dirigida = new Map();
@@ -1035,6 +1036,7 @@ export function medirLinhasNoLimite(gaiola, linhas, { faixa = null, amostras = 4
     if (!valencia[x]) continue;
     if (cantosDeclarados.has(x) || (naBorda.has(x) ? valencia[x] !== 3 : valencia[x] !== 4)) singulares.push(P[x]);
   }
+  for (const p of evitar) singulares.push(p);
   const mediana = (xs) => { const s = xs.filter((x) => x !== null && Number.isFinite(x)).sort((a, b) => a - b); return s.length ? s[s.length >> 1] : null; };
   /* a curvatura transversal da amostra que entrou pelo lado s */
   const transversal = (am, s) => {

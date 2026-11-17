@@ -10,7 +10,8 @@
  * sai em dois números: o SALTO de curvatura transversal entre os dois lados, exato, que é zero onde a subdivisão é C2 (toda a curva fora dos
  * vértices extraordinários e dos vincos), e a INCLINAÇÃO máxima da rampa, a maior variação da curvatura transversal por comprimento na
  * faixa de cada lado (padrão: duas arestas da gaiola), em 1/m², fora da vizinhança dos pontos singulares (o extraordinário, o canto
- * declarado e o canto da borda, onde a curvatura diverge e a inclinação não tem teto; a inclinação com eles também sai). Saem também o ângulo entre as normais (zero fora do vinco vivo), a
+ * declarado e o canto da borda, onde a curvatura diverge e a inclinação não tem teto) e dos vincos declarados (o de nitidez finita é liso no
+ * limite, com um filete de poucos milímetros; a curva que é vinco sai com `vinco: true`); a inclinação com eles também sai. Saem também o ângulo entre as normais (zero fora do vinco vivo), a
  * curvatura transversal na curva e na borda da faixa de cada lado (a rampa vai de uma à outra), e o salto entre a aresta que chega e a que
  * sai em cada vértice extraordinário da curva.
  *
@@ -23,7 +24,7 @@
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { executarReceita } from '../../../src/autoria/executar-receita.js';
-import { medirLinhasNoLimite, refinarGaiola } from '../../../procedural/nucleo/subdivisao.js';
+import { descendenciaDasLinhas, medirLinhasNoLimite, refinarGaiola } from '../../../procedural/nucleo/subdivisao.js';
 import { CHAPAS_DE_PROVA, receitaDeProva } from './chapas.mjs';
 
 const r3 = (x) => (x == null || !Number.isFinite(x) ? null : Math.round(x * 1000) / 1000);
@@ -41,13 +42,20 @@ export function medirCurvasDoNeutro(neutro, { faixaMm = null, curvas: so = null 
       const faixa = faixaMm != null ? faixaMm / 1000 : (2 * soma) / Math.max(1, c.gaiola.length - 1);
       return { nome: c.nome, continuidade: c.continuidade, espelho: c.espelho, vertices: c.vertices, faixa };
     });
-    const medidas = medirLinhasNoLimite(gaiola, linhas);
+    /* os vincos declarados, levados ao nível da malha: a inclinação longe deles é a da emenda, e a curva que é vinco sai marcada */
+    const vincos = chapa.vincos ?? [];
+    const evitar = vincos.length ? descendenciaDasLinhas(chapa.faces, chapa.vertices.length, chapa.niveis, vincos.map(([a, b]) => [a, b])).flat().map((v) => gaiola.vertices[v]) : [];
+    const chaveDe = (a, b) => (a < b ? `${a},${b}` : `${b},${a}`);
+    const noVinco = new Set(vincos.filter(([, , s]) => s > 0).map(([a, b]) => chaveDe(a, b)));
+    chapa.curvas.forEach((c) => { const l = linhas.find((x) => x.vertices === c.vertices); if (l) l.vinco = c.gaiola.slice(1).every((v, j) => noVinco.has(chaveDe(c.gaiola[j], v))); });
+    const medidas = medirLinhasNoLimite(gaiola, linhas, { evitar });
     return {
       passo: chapa.passo, origemId: chapa.origemId,
       curvas: medidas.map((m) => ({
-        nome: m.nome, continuidade: m.continuidade, espelho: m.espelho, arestas: m.arestas, comprimentoMm: r3(m.comprimento * 1000), faixaMm: r3(m.faixa * 1000), medidas: m.medidas,
+        nome: m.nome, continuidade: m.continuidade, espelho: m.espelho, vinco: m.vinco ?? false, arestas: m.arestas, comprimentoMm: r3(m.comprimento * 1000), faixaMm: r3(m.faixa * 1000), medidas: m.medidas,
         salto: m.saltoMaximo, ondeSalto: mm(m.ondeSalto), anguloMaximoGraus: r3(m.anguloMaximoGraus),
         lados: m.medidas ? 2 : 1, inclinacaoForaDosSingulares: r3(m.inclinacaoForaDosSingulares), singularesPerto: m.singularesPerto,
+        ondeInclinacaoForaDosSingulares: m.ondeInclinacaoForaDosSingulares ? { pontoMm: mm(m.ondeInclinacaoForaDosSingulares.ponto), distanciaMm: r3(m.ondeInclinacaoForaDosSingulares.distancia * 1000), lado: m.ondeInclinacaoForaDosSingulares.lado } : null,
         inclinacao: r3(m.inclinacaoMaxima), ondeInclinacao: m.ondeInclinacao ? { pontoMm: mm(m.ondeInclinacao.ponto), distanciaMm: r3(m.ondeInclinacao.distancia * 1000), lado: m.ondeInclinacao.lado } : null,
         curvaturaNaLinha: r3(m.curvaturaNaLinha), curvaturaNaFaixa: m.curvaturaNaFaixa.map(r3),
         extraordinarios: m.extraordinarios.map((e) => ({ valencia: e.valencia, pontoMm: mm(e.ponto), curvaturas: e.curvaturas.map(r3), salto: r3(e.salto) })),
@@ -73,7 +81,7 @@ async function principal() {
   if (!chapas.length) { console.error(`${alvo}: nenhum passo subdivisao com curvas marcadas; declare marcarCurvas: true na gaiolaPorRede`); process.exit(1); }
   for (const c of chapas) {
     console.error(`passo ${c.passo} (origem ${c.origemId}):`);
-    for (const m of c.curvas) console.error(`  ${m.nome}${m.espelho ? ' (espelho)' : ''}${m.continuidade ? ` ${m.continuidade}` : ''}${m.lados === 1 ? ' (borda)' : ''}: salto ${m.salto.toExponential(1)} 1/m, inclinação ${m.inclinacaoForaDosSingulares} 1/m² (${m.inclinacao} com ${m.singularesPerto} ponto(s) singular(es) perto), ângulo ${m.anguloMaximoGraus} grau, curvatura ${m.curvaturaNaLinha} na curva e ${m.curvaturaNaFaixa.join(' / ')} a ${m.faixaMm} mm${m.extraordinarios.length ? `, ${m.extraordinarios.length} extraordinário(s), salto ${m.extraordinarios.map((e) => e.salto).join(', ')}` : ''}`);
+    for (const m of c.curvas) console.error(`  ${m.nome}${m.espelho ? ' (espelho)' : ''}${m.continuidade ? ` ${m.continuidade}` : ''}${m.lados === 1 ? ' (borda)' : ''}${m.vinco ? ' (vinco)' : ''}: salto ${m.salto.toExponential(1)} 1/m, inclinação ${m.inclinacaoForaDosSingulares} 1/m² (${m.inclinacao} com ${m.singularesPerto} ponto(s) singular(es) perto), ângulo ${m.anguloMaximoGraus} grau, curvatura ${m.curvaturaNaLinha} na curva e ${m.curvaturaNaFaixa.join(' / ')} a ${m.faixaMm} mm${m.extraordinarios.length ? `, ${m.extraordinarios.length} extraordinário(s), salto ${m.extraordinarios.map((e) => e.salto).join(', ')}` : ''}`);
   }
   process.stdout.write(`${JSON.stringify({ alvo, chapas }, null, 1)}\n`);
 }

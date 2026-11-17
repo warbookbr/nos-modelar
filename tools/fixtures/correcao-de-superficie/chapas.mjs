@@ -41,6 +41,13 @@
  * - `rede-tres-no-no`: a curva V declarada G1 com três curvas no nó M dela, H1 de um lado e X2 e X3 do outro com o mesmo desvio
  *   (`definicaoTresNoNo`): o empate, em que nenhuma se junta, qualquer que seja a ordem das curvas.
  *
+ * - as superfícies analíticas `SUPERFICIES_ANALITICAS` (paraboloide, calota e toro), com `definicaoAnalitica`: a rede de quatro retalhos
+ *   sobre cada uma, com ou sem a continuidade declarada nas duas curvas de dentro, o gate de continuidade da fatia 5 (`analiticas.mjs`).
+ *   Não são receitas: o gate monta a gaiola pelo passo e mede a superfície limite pelo oráculo.
+ *
+ * `receitaDeProva(nome, { marcarCurvas: true })` monta a rede com `marcarCurvas`, e o neutro da chapa marca as arestas das curvas, que
+ * `medida-na-curva.mjs` e `onde-ondula.mjs` leem; sem a opção a receita é a de sempre.
+ *
  * Dado de teste: fora do acervo publicado. As receitas ficam em `tools/fixtures/correcao-de-superficie/<nome>/receita.js` e abrem pelo caminho
  * (`npm run suavidade -- tools/fixtures/correcao-de-superficie/rede-com-ruido`). A linha de base medida nelas está em
  * `docs/modelar/banco-de-provas/correcao-de-superficie-2026-11-16/`. */
