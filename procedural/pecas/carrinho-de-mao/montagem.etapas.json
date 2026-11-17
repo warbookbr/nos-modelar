@@ -1,77 +1,234 @@
 {
   "formato": "mecanifica.registro-de-etapas",
-  "versao": 2,
+  "versao": 3,
   "montagem": "carrinho-de-mao",
-  "etapas": [
+  "eventos": [
     {
+      "tipo": "aceite",
       "instancia": "chassi",
-      "estado": "fixa",
-      "juntas": [],
-      "forma": "sha256:e1b2cc7c900646860595c03736c046f4db11b922f8e2ad2ed135c6aa42d7b75e",
       "aceite": {
         "por": "IA da sessão por delegação da pessoa, 2026-11-11: \"não vou ter tempo para supervisionar nem aprovar então deixo sobre sua tutoria\"; forma aceita por quem conduz pelas imagens e pelos vereditos",
         "analise": "ausente"
+      },
+      "impressao": {
+        "forma": "sha256:e1b2cc7c900646860595c03736c046f4db11b922f8e2ad2ed135c6aa42d7b75e",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0,
+            0
+          ]
+        },
+        "juntas": [],
+        "citadas": [],
+        "anteriores": []
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "b0519ff30b0035a095e9c38b4b6e17267ab07315"
       }
     },
     {
+      "tipo": "aceite",
       "instancia": "pes",
-      "estado": "fixa",
-      "juntas": [],
-      "forma": "sha256:dccedc2361c083f97502f658451ae034784842ddd5d6e59a791b3d3eb69cd807",
       "aceite": {
         "por": "IA da sessão por delegação da pessoa, 2026-11-11: \"não vou ter tempo para supervisionar nem aprovar então deixo sobre sua tutoria\"; forma aceita por quem conduz pelas imagens e pelos vereditos",
         "analise": "ausente"
-      }
-    },
-    {
-      "instancia": "cacamba",
-      "estado": "fixa",
-      "juntas": [],
-      "forma": "sha256:b5dcc8086a351302eecb5455dfcb0f1af86e360f9d7467b9a569ce6ed31087d3",
-      "aceite": {
-        "por": "IA da sessão por delegação da pessoa, 2026-11-11: \"não vou ter tempo para supervisionar nem aprovar então deixo sobre sua tutoria\"; forma aceita por quem conduz pelas imagens e pelos vereditos",
-        "analise": "ausente"
-      }
-    },
-    {
-      "instancia": "roda",
-      "estado": "fixa",
-      "juntas": [
-        {
-          "relacao": "rodaGiraNoEixo",
-          "com": "chassi",
-          "satisfeita": true,
-          "medidas": {
-            "disponiveis": true,
-            "alinhamento": 1,
-            "descentro": 0,
-            "folgaRadial": 0.004,
-            "folgaRadialMinima": 0.004,
-            "folgaRadialMaxima": 0.004,
-            "tolerancia": 0.000001,
-            "toleranciaNumerica": 0.000001,
-            "especificacaoFolgaRadial": {
-              "minimo": 0.004,
-              "maximo": 0.004,
-              "nominal": 0.004,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
-              },
-              "formato": "nominal-fabricacao"
-            },
-            "inicioReferencia": -0.051,
-            "fimReferencia": 0.051,
-            "inicioMovel": -0.051,
-            "fimMovel": 0.05100000000000001,
-            "sobraInicio": 0,
-            "sobraFim": 1.3877787807814457e-17,
-            "sobreposicaoAxial": 0.102,
-            "separacaoAxial": 0
+      },
+      "impressao": {
+        "forma": "sha256:dccedc2361c083f97502f658451ae034784842ddd5d6e59a791b3d3eb69cd807",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0,
+            0
+          ]
+        },
+        "juntas": [],
+        "citadas": [
+          {
+            "etapa": "chassi",
+            "porta": "apoioDosPes",
+            "por": [
+              "posição pesSobOsBracos"
+            ],
+            "interface": {
+              "forma": "plano",
+              "papel": "recebe",
+              "ponto": [
+                0,
+                0.25,
+                -0.47
+              ],
+              "centro": [
+                0,
+                0.25,
+                -0.47
+              ],
+              "normal": [
+                0,
+                -1,
+                0
+              ],
+              "eixo": [
+                0,
+                -1,
+                0
+              ],
+              "extensao": [
+                0.361139823009,
+                0.6
+              ],
+              "largura": 0.361139823009,
+              "comprimento": 0.6,
+              "referencia": [
+                1,
+                0,
+                0
+              ]
+            }
           }
-        }
-      ],
-      "forma": "sha256:8aab261fb58ccac3cf271a02b49535aac58a167b6aaebc083a53acbc1c19eb7f",
+        ],
+        "anteriores": [
+          "chassi"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "b0519ff30b0035a095e9c38b4b6e17267ab07315"
+      }
+    },
+    {
+      "tipo": "aceite",
+      "instancia": "cacamba",
+      "aceite": {
+        "por": "IA da sessão por delegação da pessoa, 2026-11-11: \"não vou ter tempo para supervisionar nem aprovar então deixo sobre sua tutoria\"; forma aceita por quem conduz pelas imagens e pelos vereditos",
+        "analise": "ausente"
+      },
+      "impressao": {
+        "forma": "sha256:b5dcc8086a351302eecb5455dfcb0f1af86e360f9d7467b9a569ce6ed31087d3",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0,
+            0
+          ]
+        },
+        "juntas": [],
+        "citadas": [
+          {
+            "etapa": "chassi",
+            "porta": "apoioDaCacamba",
+            "por": [
+              "posição cacambaSobreOsBracos"
+            ],
+            "interface": {
+              "forma": "plano",
+              "papel": "recebe",
+              "ponto": [
+                0,
+                0.282,
+                -0.47
+              ],
+              "centro": [
+                0,
+                0.282,
+                -0.47
+              ],
+              "normal": [
+                0,
+                1,
+                0
+              ],
+              "eixo": [
+                0,
+                1,
+                0
+              ],
+              "extensao": [
+                0.361139823009,
+                0.6
+              ],
+              "largura": 0.361139823009,
+              "comprimento": 0.6,
+              "referencia": [
+                1,
+                0,
+                0
+              ]
+            }
+          }
+        ],
+        "anteriores": [
+          "chassi",
+          "pes"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "b0519ff30b0035a095e9c38b4b6e17267ab07315"
+      }
+    },
+    {
+      "tipo": "aceite",
+      "instancia": "roda",
       "aceite": {
         "por": "IA da sessão por delegação da pessoa, 2026-11-11: \"não vou ter tempo para supervisionar nem aprovar então deixo sobre sua tutoria\"; forma aceita por quem conduz pelas imagens e pelos vereditos; o furo do disco menor que o cubo vem da família roda-pneu e fica aceito",
         "defeitosAceitos": [
@@ -79,6 +236,124 @@
           "disco: uniao em furo central do disco, na coroa em volta do cubo"
         ],
         "analise": "feita"
+      },
+      "impressao": {
+        "forma": "sha256:8aab261fb58ccac3cf271a02b49535aac58a167b6aaebc083a53acbc1c19eb7f",
+        "parametros": [
+          {
+            "param": "larguraDoCubo",
+            "valor": 102,
+            "unidade": "mm"
+          },
+          {
+            "param": "raioDoFuroDoCubo",
+            "valor": 12,
+            "unidade": "mm"
+          }
+        ],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0.17,
+            0
+          ]
+        },
+        "juntas": [
+          {
+            "relacao": "rodaGiraNoEixo",
+            "com": "chassi",
+            "satisfeita": true,
+            "medidas": {
+              "disponiveis": true,
+              "alinhamento": 1,
+              "descentro": 0,
+              "folgaRadial": 0.004,
+              "folgaRadialMinima": 0.004,
+              "folgaRadialMaxima": 0.004,
+              "tolerancia": 0.000001,
+              "toleranciaNumerica": 0.000001,
+              "especificacaoFolgaRadial": {
+                "minimo": 0.004,
+                "maximo": 0.004,
+                "nominal": 0.004,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
+              },
+              "inicioReferencia": -0.051,
+              "fimReferencia": 0.051,
+              "inicioMovel": -0.051,
+              "fimMovel": 0.051,
+              "sobraInicio": 0,
+              "sobraFim": 0,
+              "sobreposicaoAxial": 0.102,
+              "separacaoAxial": 0
+            }
+          }
+        ],
+        "citadas": [
+          {
+            "etapa": "chassi",
+            "porta": "eixo",
+            "por": [
+              "posição rodaNoEixo",
+              "relação rodaGiraNoEixo",
+              "vínculo cuboNoAssentoDoEixo",
+              "vínculo furoDoCuboPeloEixo"
+            ],
+            "interface": {
+              "forma": "cilindro",
+              "papel": "externa",
+              "eixo": [
+                1,
+                0,
+                0
+              ],
+              "centro": [
+                -0.051,
+                0.17,
+                0
+              ],
+              "raio": 0.008,
+              "inicio": 0,
+              "fim": 0.102,
+              "referencia": [
+                0,
+                1,
+                0
+              ]
+            }
+          }
+        ],
+        "anteriores": [
+          "chassi",
+          "pes",
+          "cacamba"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "b0519ff30b0035a095e9c38b4b6e17267ab07315"
       }
     }
   ]
