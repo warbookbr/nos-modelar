@@ -6,3 +6,5 @@ Este ramo guarda só imagens de referência que não entram na main, para não s
     git archive FETCH_HEAD robo-humanoide | tar -x --strip-components=1 -C procedural/pecas/robo-humanoide/referencias/locais/
 
 As imagens do robô humanoide foram geradas por IA e valem como caráter da forma, nunca como medida.
+
+As quatro vistas do `carro-fastback` (lateral, frontal, traseira e superior), trazidas de novo pela pessoa em 2026-11-17, também foram geradas por IA e valem como caráter da forma, nunca como medida; as medidas são as das pranchas cotadas em `procedural/pecas/carro-fastback/referencias/`. Restauram-se como as do robô, trocando a pasta da peça.
