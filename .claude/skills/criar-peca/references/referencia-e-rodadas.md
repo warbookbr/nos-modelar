@@ -58,3 +58,4 @@ segue:
 
 A recomendação segue o primeiro item que falhou, na ordem da lista.
 
+Cada variante da receita medida numa rodada reaproveita os passos que não mudaram, pelo cache por passo; o [guia do cache](../../../../docs/modelar/usar/CACHE-POR-PASSO.md) diz como ele se liga, como limpar e quando rodar com `--sem-cache`.
