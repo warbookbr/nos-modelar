@@ -90,7 +90,7 @@ import { createHash } from 'node:crypto';
 import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { basename, dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { linhaDaVista } from './lados-das-vistas.mjs';
+import { VISTA_DO_ESBOCO, ladoDaVistaDaBancada, linhaDaVista } from './lados-das-vistas.mjs';
 import { paraPng } from './leitura-por-regioes.mjs';
 import { prepararSolido } from '../../src/autoria/contato-de-solidos.js';
 import { doAmbiente } from '../ambiente.mjs';
@@ -226,17 +226,9 @@ export function partesDoPlano(receita) {
 
 /* ---------- o lado de onde cada vista olha ---------- */
 
-/* Cada vista da bancada e da montagem é, em olho, uma vista do esboço (`lados-das-vistas.mjs`), que já sabe dizer de onde ela olha
-   e, com a orientação do esboço, o lado do objeto que ela mostra. */
-const VISTA_DO_ESBOCO = Object.freeze({
-  isometrica: 'isometrica', frontal: 'frontal', direita: 'lateral', esquerda: 'lateral-oposta', traseira: 'frontal-oposta', superior: 'superior', inferior: 'inferior',
-});
-
-/** Onde a vista da bancada olha, em texto ("olha de +x e vê o lado direito; ..."), ou null para uma vista que não existe. */
-export function ladoDaVista(vista, orientacao = null) {
-  const nome = VISTA_DO_ESBOCO[vista];
-  return nome === undefined ? null : linhaDaVista(nome, orientacao).slice(nome.length + 2);
-}
+/** Onde a vista da bancada olha, em texto ("olha de +x e vê o lado direito; ..."), ou null para uma vista que não existe; a frase e a
+    tabela das vistas moram em `lados-das-vistas.mjs`, que a prancha modelo e foto também usa. */
+export const ladoDaVista = ladoDaVistaDaBancada;
 
 /** A vista de uma captura da bancada, pelo nome do arquivo (`bancada-<peça>-<vista>[-opções].png`), ou null se não achar. */
 export function vistaDoArquivo(arquivo, peca) {

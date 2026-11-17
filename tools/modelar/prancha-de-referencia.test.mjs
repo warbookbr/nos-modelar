@@ -7,7 +7,7 @@ import * as THREE from 'three';
 import { afterEach, describe, expect, it } from 'vitest';
 import { ajustarCamera, lerCopia } from './olhar-bancada.mjs';
 import {
-  PONTOS_DA_ESCALA, comoCLI, disporPrancha, escalaDaVista, extensaoNaImagem, fundoDaCaixa, lerPedido, lerRegiao, lerRegua, lerVistas,
+  PONTOS_DA_ESCALA, comoCLI, disporPrancha, eixosDaVista, escalaDaVista, extensaoNaImagem, fundoDaCaixa, lerPedido, lerRegiao, lerRegua, lerVistas,
   passoDaRegua, porVista, prancharReferencia,
   aoReferencialDaPeca, disporContorno, pontoDoContorno, prancharContorno, projetorDaVista, vistaNaPeca,
   TRACEJADO_DO_ENCONTRO, encontrosDoAnel, ladosDaCaixaNoEncontro, ladosEmTexto, trechosDoAnel,
@@ -162,7 +162,7 @@ describe('a prancha montada no navegador', () => {
         return {
           ok: true,
           resultado: {
-            vistas: [{ projecaoMm: { pixels: [[0, 0], [0, 0], [0, -200], [200, 0]], quadro: [640, 360] }, copia: { caixaMm: [[-1, 0, 0], [0, 1, 1]] } }],
+            vistas: [{ projecaoMm: { pixels: [[0, 0], [0, 0], [0, -200], [-200, 0]], quadro: [640, 360] }, copia: { caixaMm: [[-1, 0, 0], [0, 1, 1]] } }],
             capturas: [{ nome: 'direita', largura: 640, altura: 360, dados: modelo }],
           },
         };
@@ -176,6 +176,54 @@ describe('a prancha montada no navegador', () => {
       const png = PNG.sync.read(readFileSync(saida));
       expect(png.width).toBe(lido.largura);
       expect(png.height).toBe(lido.altura);
+    } finally { rmSync(pasta, { recursive: true, force: true }); }
+  }, 60_000);
+});
+
+/* PARA ONDE CADA EIXO CAI NA IMAGEM (fatia 7 do plano). A forma é assimétrica: um corpo de 150 por 50 mm com o nariz de 30 por 20 mm na
+   frente, em +z. A projeção é a da vista direita da bancada (olho em +x, y para cima): +z vai para a esquerda da imagem, e o nariz com
+   ela. A frase de lado da prancha tem de deixar ver isso sem abrir a imagem. */
+describe('os eixos do modelo na prancha', () => {
+  /* a origem no centro do quadro de 640 por 360, a 2 px/mm: 100 mm em +y sobem 200 px e 100 mm em +z vão 200 px para a esquerda */
+  const DIREITA = { pixels: [[320, 180], [320, 180], [320, -20], [120, 180]], quadro: [640, 360] };
+
+  it('a frase da vista direita diz que +z, a frente da forma, fica à esquerda, e confere com a projeção da câmera', () => {
+    const eixos = eixosDaVista('direita', DIREITA);
+    expect(eixos.frase).toBe('olha de +x; +y fica em cima, +z fica à esquerda');
+    expect(eixos.medidos).toEqual({ '+x': null, '+y': 'fica em cima', '+z': 'fica à esquerda' });
+    /* a mesma forma vista da esquerda tem a frente à direita */
+    expect(eixosDaVista('esquerda', { ...DIREITA, pixels: [[320, 180], [320, 180], [320, -20], [520, 180]] }).frase).toBe('olha de -x; +y fica em cima, +z fica à direita');
+  });
+
+  it('recusa a captura que não projeta como a frase diz, em vez de escrever o lado errado na prancha', () => {
+    const espelhada = { ...DIREITA, pixels: [[320, 180], [320, 180], [320, -20], [520, 180]] };
+    expect(() => eixosDaVista('direita', espelhada)).toThrow(/não projeta como a frase de lado diz.*\+z fica à direita na captura/);
+  });
+
+  it('a prancha e o JSON levam a frase, e o nariz da forma está do lado que ela diz', async () => {
+    const pasta = mkdtempSync(join(REPO, 'tmp', 'prancha-eixos-'));
+    try {
+      /* o modelo: corpo de z = -75 a +75 mm e y = 0 a 50 mm; o nariz de z = +75 a +105 mm e y = 15 a 35 mm, pelo projetor da vista */
+      const projetar = projetorDaVista(DIREITA, 640);
+      const caixaPx = (z0, z1, y0, y1) => { const a = projetar([0, y1, z1]); const b = projetar([0, y0, z0]); return [Math.round(a[0]), Math.round(a[1]), Math.round(b[0]), Math.round(b[1])]; };
+      const corpo = caixaPx(-75, 75, 0, 50);
+      const nariz = caixaPx(75, 105, 15, 35);
+      const png = imagem(640, 360, [241, 243, 242], corpo, [20, 20, 20]);
+      for (let y = nariz[1]; y < nariz[3]; y++) for (let x = nariz[0]; x < nariz[2]; x++) png.data.set([20, 20, 20, 255], (y * 640 + x) * 4);
+      const foto = join(pasta, 'foto.png');
+      writeFileSync(foto, PNG.sync.write(imagem(300, 100, [255, 255, 255], [40, 30, 190, 80], [30, 30, 30])));
+      const olhar = async () => ({ ok: true, resultado: { vistas: [{ projecaoMm: DIREITA }], capturas: [{ nome: 'direita', largura: 640, altura: 360, dados: PNG.sync.write(png) }] } });
+      const r = await prancharReferencia({ peca: 'teste', foto, regua: '100=100', saida: join(pasta, 'p.png') }, { olhar });
+      const lido = JSON.parse(readFileSync(r.json, 'utf8'));
+      expect(lido.linhas[0].modelo.eixos.frase).toContain('+z fica à esquerda');
+      /* o nariz, a frente em +z, está à esquerda do corpo na imagem, e a extensão do modelo começa nele */
+      expect(nariz[2]).toBeLessThanOrEqual(corpo[0]);
+      expect(lido.linhas[0].modelo.extensaoPx[0]).toBe(nariz[0]);
+      expect(lido.linhas[0].modelo.extensaoMm).toEqual([180, 50]);
+      const plano = disporPrancha({ titulo: 't', linhas: [{ vista: 'direita', modelo: { largura: 640, altura: 360, extensao: lido.linhas[0].modelo.extensaoPx, pxPorMm: 2, eixos: lido.linhas[0].modelo.eixos }, foto: { nome: 'f', largura: 300, altura: 100, regiao: null, extensao: [40, 30, 190, 80], pxPorMm: 1, espelhar: false, regua: { px: 100, mm: 100 } } }] });
+      expect(plano.operacoes.find((o) => o.eixos)?.texto).toBe('eixos do modelo: olha de +x; +y fica em cima, +z fica à esquerda');
+      const cli = await comoCLI(['teste', `--foto=${foto}`, '--regua=100=100', `--saida=${join(pasta, 'q.png')}`], { olhar, logger: () => {} });
+      expect(cli.stdout).toContain('eixos do modelo: olha de +x; +y fica em cima, +z fica à esquerda');
     } finally { rmSync(pasta, { recursive: true, force: true }); }
   }, 60_000);
 });

@@ -16,9 +16,12 @@
  * Uso: node docs/modelar/banco-de-provas/comparar-com-a-referencia-2026-11-16/contar-comandos.mjs <sessão.jsonl>
  *        [--desde=<ISO>] [--ate=<ISO>] [--tipo=<agente>] [--descricao=<regex>] [--exemplos=<padrão>] [--listar-alvo] [--json]
  * `--listar-alvo` imprime os comandos do alvo, numerados na ordem em que foram chamados, que é a numeração do README da pasta. */
-import { existsSync, readFileSync, readdirSync } from 'node:fs';
-import { basename, dirname, join } from 'node:path';
 import { pathToFileURL } from 'node:url';
+/* A leitura dos registros (o principal e os dos subagentes, cada chamada de Bash com o horário e a falha) mora na ferramenta
+   `medir:transcricao`, que a usa na contagem de atritos por comando (`--atritos`, fatia 7 do plano). */
+import { lerRegistro, lerSessao } from '../../../../tools/modelar/medir-transcricao.mjs';
+
+export { lerRegistro, lerSessao };
 
 /* Os padrões da análise, na ordem em que ela os aplicou. */
 export const PADROES = [
@@ -54,48 +57,6 @@ export const noAlvo = (comando, nomes = padroesDe(comando)) => nomes.some((n) =>
 export function padroesDe(comando) {
   const achados = PADROES.filter(([, re]) => re.test(comando)).map(([nome]) => nome);
   return achados.length ? achados : ['outro'];
-}
-
-const falhou = (bloco) => {
-  const txt = typeof bloco.content === 'string' ? bloco.content : JSON.stringify(bloco.content);
-  return Boolean(bloco.is_error) || txt.includes('Traceback') || txt.slice(0, 40).includes('Exit code');
-};
-
-/* Um registro, dado como texto JSONL: { inicio, comandos: [{ comando, horario, falha }] }. */
-export function lerRegistro(jsonl) {
-  let inicio = null;
-  const comandos = [];
-  const porId = new Map();
-  for (const linha of jsonl.split('\n')) {
-    if (!linha) continue;
-    let o;
-    try { o = JSON.parse(linha); } catch { continue; }
-    if (o.timestamp && !inicio) inicio = o.timestamp;
-    const conteudo = o.message?.content;
-    if (!Array.isArray(conteudo)) continue;
-    for (const b of conteudo) {
-      if (b.type === 'tool_use' && b.name === 'Bash' && !porId.has(b.id)) {
-        const c = { comando: b.input?.command ?? '', horario: o.timestamp, falha: false };
-        porId.set(b.id, c); comandos.push(c);
-      } else if (b.type === 'tool_result' && porId.has(b.tool_use_id) && falhou(b)) porId.get(b.tool_use_id).falha = true;
-    }
-  }
-  return { inicio, comandos };
-}
-
-/* A sessão: o registro principal e os dos subagentes, cada um { arquivo, tipo, descricao, inicio, comandos }. */
-export function lerSessao(arquivo) {
-  const registros = [{ arquivo, tipo: 'principal', descricao: '', ...lerRegistro(readFileSync(arquivo, 'utf8')) }];
-  const pasta = join(dirname(arquivo), basename(arquivo, '.jsonl'), 'subagents');
-  if (existsSync(pasta)) {
-    for (const nome of readdirSync(pasta).filter((n) => n.endsWith('.jsonl')).sort()) {
-      let meta = {};
-      try { meta = JSON.parse(readFileSync(join(pasta, nome.replace(/\.jsonl$/, '.meta.json')), 'utf8')); } catch { /* sem meta */ }
-      registros.push({ arquivo: join(pasta, nome), tipo: meta.agentType ?? '?', descricao: meta.description ?? '',
-        ...lerRegistro(readFileSync(join(pasta, nome), 'utf8')) });
-    }
-  }
-  return registros;
 }
 
 const conta = (mapa, chave, n = 1) => { mapa[chave] = (mapa[chave] ?? 0) + n; };

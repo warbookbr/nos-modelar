@@ -7,7 +7,7 @@ import { PNG } from 'pngjs';
 import { describe, expect, it } from 'vitest';
 import { FATOR_DE_AMOSTRAGEM } from './capturar-montagem.mjs';
 import * as THREE from 'three';
-import { MARCADOR_DA_SAIDA, PRAZO_DE_CARGA_MS, abrirCapturaCompartilhada, prepararSaida, agendarEncerramento, ajustarCamera, comoCLI, criarDicas, medirParesAcusados, olharBancada, projetarPontos } from './olhar-bancada.mjs';
+import { MARCADOR_DA_SAIDA, PRAZO_DE_CARGA_MS, abrirCapturaCompartilhada, prepararSaida, agendarEncerramento, ajustarCamera, comoCLI, criarDicas, lerMiras, medirParesAcusados, olharBancada, projetarPontos } from './olhar-bancada.mjs';
 import { analisarPeca } from './analise-da-peca.mjs';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -663,6 +663,46 @@ describe('a câmera que mira um ponto e a isométrica de trás', () => {
     const emArquivo = await olharBancada({ peca: 'fixture-visual', res: '640x360', auditoria: true, mirar: '1200,-900.5,0', distancia: 250, vistas: ['direita'], saida: 'tools/bancadas/out/teste-da-mira', dependencias: bancadaDosAjustes().dependencias });
     expect(emArquivo.resultado.arquivos[0]).toMatch(/bancada-fixture-visual-direita-mira-1200_m900p5_0-d250\.png$/);
     rmSync(join(REPO, 'tools/bancadas/out/teste-da-mira'), { recursive: true, force: true });
+  });
+
+  it('lê várias miras separadas por /, com a distância de cada uma no quarto número, e recusa a lista mal formada ou repetida', () => {
+    expect(lerMiras('1,2,3/4,5,6,80; 7,8,9', 150)).toEqual([
+      { mm: [1, 2, 3], distanciaMm: 150 }, { mm: [4, 5, 6], distanciaMm: 80 }, { mm: [7, 8, 9], distanciaMm: 150 },
+    ]);
+    expect(lerMiras([[1, 2, 3, 40], [4, 5, 6]])).toEqual([{ mm: [1, 2, 3], distanciaMm: 40 }, { mm: [4, 5, 6], distanciaMm: 600 }]);
+    expect(lerMiras([1, 2, 3])).toEqual([{ mm: [1, 2, 3], distanciaMm: 600 }]);
+    expect(lerMiras(null)).toEqual([]);
+    expect(() => lerMiras('1,2,3/4,5')).toThrow(/--mirar pede x,y,z.*separadas por \/; veio "1,2,3\/4,5"/);
+    expect(() => lerMiras('1,2,3,0')).toThrow(/a distância da mira 1,2,3 pede milímetros maiores que zero/);
+    expect(() => lerMiras('1,2,3/1,2,3,600')).toThrow(/repete a mira 1,2,3,600/);
+    expect(() => lerMiras(null, 300)).toThrow(/--distancia só vale junto de --mirar/);
+  });
+
+  it('várias miras numa chamada tiram cada vista em cada mira na mesma página, uma carga só, e cada imagem leva a mira dela no nome e no relato', async () => {
+    const { registro, dependencias } = bancadaDosAjustes();
+    const r = await olharBancada({ ...comum, mirar: '10,20,30,50/-40,0,5', distancia: 90, vistas: ['isometrica', 'superior'], dependencias });
+    expect(r.ok).toBe(true);
+    expect(registro.urls).toHaveLength(1);
+    expect(registro.ajustes.map((a) => [a.mirar.mm, a.mirar.distanciaMm])).toEqual([[[10, 20, 30], 50], [[10, 20, 30], 50], [[-40, 0, 5], 90], [[-40, 0, 5], 90]]);
+    const direcoes = registro.ajustes.map((a) => a.mirar.direcao.join());
+    expect([direcoes[0] === direcoes[2], direcoes[1] === direcoes[3], direcoes[0] === direcoes[1]]).toEqual([true, true, false]);
+    expect(r.resultado.capturas.map((c) => [c.nome, c.mira.mm])).toEqual([
+      ['isometrica', [10, 20, 30]], ['superior', [10, 20, 30]], ['isometrica', [-40, 0, 5]], ['superior', [-40, 0, 5]],
+    ]);
+    expect(r.resultado.vistas.map((v) => v.mira.distanciaMm)).toEqual([50, 50, 90, 90]);
+    const emArquivo = await olharBancada({ peca: 'fixture-visual', res: '640x360', auditoria: true, mirar: '1,2,3/4,5,6,80', vistas: ['direita'], saida: 'tools/bancadas/out/teste-das-miras', dependencias: bancadaDosAjustes().dependencias });
+    try {
+      expect(emArquivo.resultado.arquivos.map((a) => a.split('/').pop())).toEqual([
+        'bancada-fixture-visual-direita-mira-1_2_3-d600.png', 'bancada-fixture-visual-direita-mira-4_5_6-d80.png',
+      ]);
+      expect(emArquivo.resultado.arquivos.every((a) => existsSync(a))).toBe(true);
+    } finally {
+      rmSync(join(REPO, 'tools/bancadas/out/teste-das-miras'), { recursive: true, force: true });
+    }
+    const mesmoNome = await olharBancada({ ...comum, capturarEmMemoria: false, saida: 'tools/bancadas/out/teste-das-miras', mirar: '1,2,3/1.01,2,3', vistas: ['direita'], dependencias: bancadaDosAjustes().dependencias });
+    expect(mesmoNome.codigo).toBe(2);
+    expect(mesmoNome.erro.mensagem).toMatch(/duas miras da lista dão o mesmo nome de imagem/);
+    rmSync(join(REPO, 'tools/bancadas/out/teste-das-miras'), { recursive: true, force: true });
   });
 
   it('a isométrica de trás abre a página na isométrica, gira a câmera na página e a segunda vista troca para a isométrica, sem pedir uma vista que a bancada não tem', async () => {

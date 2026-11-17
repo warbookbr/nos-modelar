@@ -214,3 +214,33 @@ O pacote grava também `dados-do-pedido.json`, os mesmos dados de que os três p
 
 Os mesmos críticos, sobre os pedidos fechados refeitos (afirmações simples, sem medida nem contagem, e a regra nova da nota), em quatro pares das duas ordens; o quinto par não se completou porque a ordem A foi parada duas vezes pela salvaguarda do modelo do crítico, sem resposta. Pela regra, com as duas ordens: 8,8, 9, 9,4 e 9 (amplitude 0,6, desvio 0,22); só a ordem A: amplitude 0,2, desvio 0,1; só a ordem B: amplitude 1,2, desvio 0,47. O pedido de hoje deu 8, 7, 7, 7 e 8 (amplitude 1, desvio 0,49). A nota varia menos com as perguntas fechadas, e o item 8 passa. Duas ressalvas ficam escritas: a nota fechada é mais alta (média 9,05 contra 7,4), porque a medida saiu da pergunta e o crítico deixa de apontar diferença de tamanho, que passa a ser do `descrever`; e de 3 a 5 perguntas por repetição ainda viram não verificáveis, quase todas entre `não dá para ver` numa ordem e uma resposta na outra.
 
+
+## Fatia 7: várias miras numa chamada, os eixos na prancha e os atritos por comando
+
+### Várias miras numa chamada da bancada
+
+`--mirar` aceita agora uma lista, `x,y,z[,d]/x,y,z[,d]/...`, com a distância de cada mira no quarto número (sem ele vale `--distancia` ou a padrão), e a chamada tira cada vista de `--vistas` em cada mira, na mesma página, com uma subida de servidor e navegador e uma execução da receita. Cada imagem leva a mira no nome, como já levava, e o relato de cada vista traz `mira`; duas miras que dariam o mesmo nome de imagem, ou a mesma mira repetida, são recusadas antes de abrir a bancada. A leitura da lista é `lerMiras`, em [`olhar-bancada.mjs`](../../../../tools/modelar/olhar-bancada.mjs), e os testes em [`olhar-bancada.test.mjs`](../../../../tools/modelar/olhar-bancada.test.mjs) conferem a ordem das câmeras e das imagens, a carga única da página e os nomes.
+
+A medida refez a prancha da fatia 2 da família de componentes (`procedural/familias/componente-eletronico/prancha-2.js`, 12 miras com a distância de cada uma, nas vistas isométrica, isométrica de trás e superior, 900 px, sem contatos), que tinham sido 36 chamadas de uma mira e uma vista por script. As duas formas rodaram na mesma rodada, a lista antes e depois das 36 chamadas, com outro agente usando a bancada na máquina ao mesmo tempo:
+
+| forma | chamadas | tempo |
+| --- | --- | --- |
+| uma chamada com a lista, antes | 1 | 70,8 s |
+| 36 chamadas de uma mira e uma vista | 36 | 552,0 s (de 9,2 a 109,8 s cada) |
+| uma chamada com a lista, depois | 1 | 62,6 s |
+
+As 36 imagens da lista e as 36 das chamadas avulsas, com os mesmos nomes, são iguais pixel a pixel (diferença 0 em todos os canais), e as duas rodadas da lista também. A lista levou entre 11 % e 13 % do tempo das 36 chamadas.
+
+### Para onde cada eixo do modelo cai na prancha
+
+A prancha modelo e foto escreve, numa terceira linha do rótulo do modelo e em `modelo.eixos` do JSON, a frase de lado da vista, que [`lados-das-vistas.mjs`](../../../../tools/modelar/lados-das-vistas.mjs) já dava ao pacote do crítico: na vista direita, "olha de +x; +y fica em cima, +z fica à esquerda". A tabela das vistas da bancada (`VISTA_DO_ESBOCO`) passou do pacote do crítico para esse arquivo, que os dois usam. A frase é conferida pela projeção que a bancada mede dos pontos da escala (`eixosMedidosNaImagem`), e a captura que não projeta como a frase diz é recusada, para a prancha não sair com o lado errado escrito.
+
+Na bancada de verdade, com a bicicleta em ortográfica, as seis vistas da prancha deram a medida igual à frase: na direita +z fica à esquerda e o ponto a z = +500 mm cai 622 px à esquerda do ponto a z = -500 mm, e na esquerda os mesmos 622 px à direita. A bicicleta tem a frente em +z, e a prancha da vista direita com a captura da esquerda no lugar da foto lateral tirada do outro lado mostra a frente à esquerda no modelo e à direita na foto, com a frase acima do modelo. O teste em [`prancha-de-referencia.test.mjs`](../../../../tools/modelar/prancha-de-referencia.test.mjs) usa uma forma assimétrica, um corpo com o nariz em +z, e confere que a frase diz +z à esquerda, que o nariz está à esquerda do corpo na imagem e que a extensão começa nele.
+
+### Os atritos por comando em `medir:transcricao`
+
+`npm run medir:transcricao -- --atritos[=N] <sessão.jsonl>` lê a transcrição e as dos subagentes dela, com a leitura de registros do `contar-comandos.mjs`, que passou para a ferramenta e é importada de lá (a linha de base da fatia 1 refeita com ela deu os mesmos números, nas duas janelas de `linha-de-base.json`). Cada chamada de shell é partida em trechos fora das aspas e sem o corpo dos heredocs, e cada trecho vira uma chave (`node <script>`, `node -e`, `npm run <x>`, `npx <ferramenta>`, `python3 <script>`), com o caminho do script sem a pasta da cópia isolada. O relatório dá as chaves chamadas mais de N vezes (padrão 10) e as que falharam, fora ler, navegar e versionar, com o tempo somado; os scripts criados em `tmp/` (do repositório, do sistema e do scratchpad) e quantas vezes rodaram; e as opções de Node fora do padrão do projeto (as de código na linha e a `--import` do `package.json`), também pelo `NODE_OPTIONS`. A ferramenta passou a responder a `--ajuda`, que a ajuda da opção nova pedia, e aceita `--raiz=`.
+
+Sobre a sessão de 2026-11-13 a 2026-11-17 (o registro principal e 189 subagentes, 8.173 comandos de shell, 161 com falha), sem padrão dado, a lista trouxe a bancada entre as chaves repetidas, 152 chamadas diretas de `olhar-bancada.mjs` (10 falhas, 2,8 h somadas) e 123 por `npm run bancada` (5 falhas, 2,5 h), e a opção de memória do Node à frente das opções fora do padrão, `--max-old-space-size` em 48 comandos, com 6000, 6144 e 8192. Trouxe também 163 `sleep` (29 falhas, 4,9 h), 292 `rm` e 243 scripts criados em `tmp/`, em 295 escritas, rodados 434 vezes. Os números são os do registro lido em 2026-11-17, com esta fatia em curso, e nada dele entra no repositório além deles.
+
+A primeira rodada sobre o registro deu à frente uma chave `1` com 2.623 chamadas: o `2>&1` partia o comando no `&`. O teste com a sessão de mentira não tinha o redirecionamento e não pegou; o `&` junto de `>` deixou de partir, e o teste passou a ter o caso.
