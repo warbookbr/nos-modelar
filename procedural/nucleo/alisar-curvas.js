@@ -1,83 +1,115 @@
-/* alisar-curvas.js — os pontos-chave de uma curva declarada alisados pela curva de variação mínima linearizada
+/* alisar-curvas.js — os pontos-chave de uma curva declarada alisados pelo resíduo do ajuste polinomial local, sem mexer na forma
  *
  * FICHA alisarPontosDaCurva
- * serve: alisar os pontos-chave digitados de uma curva (lidos de imagem, ponto a ponto) sem tirá-la dos pontos duros nem de um limite.
+ * serve: tirar o ruído dos pontos-chave digitados de uma curva (lidos de imagem, ponto a ponto) sem tirá-la dos pontos duros nem de um limite, e sem mexer na forma.
  * quando: a curva ondula porque cada ponto-chave tem o erro da leitura; numa gaiolaPorRede use a opção alisarCurvas, que chama esta função
  *   em cada curva antes de montar a gaiola; para o miolo dos retalhos já há o `liso` da rede.
  * unidades: mm na entrada e na saída.
  * campos:
- *   pontos: [[x, y, z]] os pontos-chave da curva, em ordem.
+ *   pontos: [[x, y, z]] os pontos-chave da curva, em ordem; dois seguidos iguais são recusados.
  *   fechada: true se a curva dá a volta (o último ponto não repete o primeiro).
  *   duros: índices dos pontos que não se mexem; na curva aberta as duas pontas são sempre duras.
  *   partir: índices onde a curva se parte em trechos alisados à parte (o canto); são duros também.
- *   energia: 'variacao' (padrão, a terceira diferença) ou 'curvatura' (a segunda, que achata o arco).
- *   rigidez: o peso da energia contra o desvio aos pontos dados (1000 por padrão).
+ *   energia: 'quartica' (padrão, a quinta diferença dividida, zero em toda quártica) ou 'cubica' (a quarta, zero em toda cúbica).
+ *   rigidez: o peso da energia contra o desvio aos pontos dados (1 por padrão).
  *   tolerancia: o maior deslocamento de um ponto, em mm (1 por padrão).
  *   silhueta: { vista: 'x' | 'y' | 'z', tolerancia } o maior deslocamento visto ao longo do eixo da vista, em mm.
- *   iteracoes: quantas vezes a parametrização se refaz pelo comprimento da corda da curva alisada (2 por padrão).
- * devolve: { pontos, deslocamentos, limitados, duros, variacaoAntes, variacaoDepois, maiorDeslocamento }.
+ *   simetria: 'x' para a curva da metade x >= 0: o ponto com x = 0 fica com x = 0, e nenhum vai a x < 0.
+ *   iteracoes: quantas vezes a parametrização se refaz pela curva da volta anterior (2 por padrão, de 1 a 10); a volta só fica se baixar a energia.
+ * devolve: { pontos, deslocamentos, limitados, duros, variacaoAntes, variacaoDepois, maiorDeslocamento, voltas }.
  * exemplo:
- *   alisarPontosDaCurva([[0, 0, 0], [100, 1.5, 0], [200, -1, 0], [300, 0.8, 0], [400, 0, 0]], { tolerancia: 2 })
+ *   alisarPontosDaCurva([[0, 0, 0], [100, 1.5, 0], [200, -1, 0], [300, 0.8, 0], [400, -0.6, 0], [500, 1.2, 0], [600, 0, 0]], { tolerancia: 2 })
  * peça: tools/fixtures/correcao-de-superficie/rede-com-ruido (a rede com ruído de 2 mm, alisada pela opção alisarCurvas da gaiolaPorRede).
  * FIM DA FICHA
  *
- * Função pura, sem Three.js e sem domínio. A curva de variação mínima (Moreton e Séquin, 1992) minimiza a integral do quadrado da derivada
- * da curvatura, e não a da curvatura: por isso não achata um arco legítimo e tira o ziguezague de curvatura que o pente mostra. O problema
- * exato não é linear; a versão linearizada usada aqui troca a derivada da curvatura pela terceira derivada da curva em relação ao
- * comprimento de arco, medida pela terceira diferença dividida dos pontos sobre o parâmetro do comprimento da corda (a soma das distâncias
- * entre pontos seguidos). Cada quatro pontos seguidos dão um resíduo r = 3! · h³ · f[t0, t1, t2, t3], com h a corda média do trecho, que
- * na curva de espaçamento uniforme é a terceira diferença comum, em mm. A terceira derivada de uma curva de curvatura constante não é
- * zero: no arco ela é -κ² vezes a tangente. Por isso a energia pesa só a parte do resíduo fora da tangente da corda do meio dos quatro
- * pontos (no círculo amostrado por igual a terceira diferença é exatamente tangente a essa corda), e o arco, o círculo e a parábola
- * amostrada ficam onde estão; sem isso, um quarto de círculo de 1 m em dez trechos andava 52 mm. A tangente sai da curva da volta
- * anterior. Com `energia: 'curvatura'` o resíduo é o de três pontos, 2! · h² · f[t0, t1, t2], inteiro, a viga de menor flexão, que puxa
- * a curva para a reta.
+ * Função pura, sem Three.js e sem domínio.
  *
- * O sistema. A curva alisada p minimiza Σ |p_i - p0_i|² (os pontos livres) + rigidez · Σ |Q_j r_j|², com Q_j = I - T_j T_jᵀ (a
- * identidade na energia de curvatura) e os pontos duros fixos e eliminados do sistema. A matriz é simétrica, definida positiva e em banda
- * (cada ponto toca os três vizinhos de cada lado, com as três coordenadas acopladas pela tangente), e se resolve pelo gradiente conjugado
- * do núcleo (`gradienteConjugado`, de `gaiola-por-rede-liso.js`), em ordem fixa de pontos. Com a rigidez de 1000, a componente de mais alta frequência (a do ziguezague ponto a ponto) cai a menos de 1/60 000
- * e a de dez pontos por onda a 1/57; a de grau 2 fica onde está. A parametrização e as tangentes se refazem pela curva alisada `iteracoes` vezes.
+ * O RUÍDO E A FORMA. O ruído de leitura troca de sinal de um ponto-chave para o seguinte (o da rede de prova tem período de três pontos); a
+ * forma muda devagar de um ponto para o outro. A energia mede só o que muda depressa: em cada janela de k + 1 pontos seguidos, o resíduo é
+ * a diferença dividida de ordem k dos pontos sobre o parâmetro do comprimento da corda (a soma das distâncias entre pontos seguidos),
+ * r = k! · h^k · f[t0, ..., tk], com h a corda média do trecho, que na curva de espaçamento uniforme é a k-ésima diferença comum, em mm.
+ * Ela é zero em todo polinômio de grau menor que k no parâmetro da corda: é o resíduo do ajuste local de grau k - 1 pelos k + 1 pontos.
+ * Com 'quartica' (k = 5) a forma que o polinômio de grau 4 descreve em seis pontos (o arco, a parábola, a clotoide, a hélice, a senoide de
+ * vinte pontos por onda) não pesa quase nada, e o ruído pesa inteiro: na curva de espaçamento uniforme, a componente de período p pontos
+ * tem o resíduo multiplicado por (2 sen(π/p))^5, que é 15 no ruído de período três e 0,003 na onda de vinte pontos. A rigidez 1 corta no
+ * período de seis pontos: a componente de período seis cai à metade, a de três a menos de 1/200 e a de vinte fica a 1/100 000 do lugar.
+ * O primeiro jeito, a terceira diferença com rigidez 1000 (a curva de variação mínima linearizada), não separava os dois: puxava toda
+ * curva de curvatura variável para a de curvatura constante até o limite (a elipse de 2000 por 600 em 24 pontos andava 95 mm, a hélice
+ * 37,8 e a clotoide 25).
+ *
+ * O trecho curto. Com k = 5 o trecho de m pontos tem m - 5 janelas, e o de menos de oito pontos ficaria com menos de três: nele a ordem
+ * cai para max(4, m - 3), a quarta diferença no trecho de cinco a sete pontos. O trecho de menos de cinco pontos fica como está.
+ *
+ * O limite do método. O que muda num comprimento da ordem do espaçamento não se distingue do ruído pela amostragem: a curvatura da ponta
+ * da elipse muda num comprimento menor que o raio dela. Com o raio da ponta em umas sete vezes o espaçamento a elipse anda 0,02 mm (a de
+ * 2000 por 600, raio de 180 mm, com ponto a cada 25 mm de arco; a de 1000 por 600, raio de 360, a cada 50); com 3,6 vezes, de 0,9 a 1,3
+ * mm (as mesmas a cada 50 e a cada 100 mm); com 1,8 vez (a de 2000 por 600 a cada 100 mm) e na de 24 pontos igualmente espaçados no
+ * ângulo, a ponta vai ao limite (sem limite, 10 e 130 mm). O arco de espaçamento desigual, de corda até seis vezes a menor em sete
+ * pontos, anda até o limite onde a corda é longa. A curva com feição assim precisa de pontos mais juntos nela, de pontos duros na feição
+ * ou de tolerância menor nela (a `toleranciaPorCurva` da gaiolaPorRede).
+ *
+ * O sistema. A curva alisada p = p0 + d minimiza Σ w_i |d_i|² + rigidez · Σ |r_j(p0) + Σ c d|² sobre os deslocamentos d das coordenadas
+ * livres; as três coordenadas são independentes, e cada uma é um sistema simétrico, definido positivo e em banda, que se resolve pelo
+ * gradiente conjugado do núcleo (`gradienteConjugado`, de `gaiola-por-rede-liso.js`), em ordem fixa de pontos. A curva sem ruído e sem
+ * forma de ordem k (a reta, a parábola) tem resíduo zero e d = 0 exato.
+ *
+ * As voltas e a energia. A parametrização sai da curva da volta anterior (na primeira, da dada), `iteracoes` vezes; cada volta só fica se
+ * a energia da curva nova, medida com a parametrização dela mesma, for menor que a da volta anterior, e a primeira, menor que a da curva
+ * dada; senão a volta anterior é a resposta (a curva dada, se nenhuma baixou). Por isso a variação nunca sobe (teste). `variacaoAntes` e
+ * `variacaoDepois` são essa energia, Σ |r_j|² em mm², da curva dada e da devolvida, cada uma com a própria parametrização.
  *
  * Os pontos duros, os trechos e o limite. Os pontos duros (os que o chamador marca, mais as pontas da curva aberta) ficam onde estão,
  * bit a bit. Os pontos de `partir` são duros e cortam a curva: cada trecho entre dois deles se alisa sozinho, e a energia não atravessa
- * o canto. Depois de resolver, o ponto que andou mais que `tolerancia` (em mm, a distância em 3D), ou cujo deslocamento visto pela
- * `silhueta` (o que sobra tirando a componente ao longo do eixo da vista, isto é, o que a vista da prancha mostra) passa da tolerância
- * dela, tem o peso do desvio multiplicado (por 1,5 vezes o quadrado da razão ao limite, no mínimo 2; só nas duas coordenadas da vista,
- * se é a silhueta que passa), e o sistema se resolve de novo, até nenhum passar ou 40 voltas; os de peso subido saem em `limitados`. Com
- * peso, a curva continua o mínimo de uma energia em que a dada é candidata, e por isso a variação nunca sobe pelo limite (prender o ponto
- * no deslocamento cortado, o primeiro jeito tentado, fazia a variação de curvas lidas de prancha subir até 26%). O limite nunca é
- * ultrapassado: o ponto que ainda passar depois das voltas é cortado ao limite, como última operação.
+ * o canto. Depois de resolver, se um ponto do trecho andou mais que `tolerancia` (em mm, a distância em 3D), ou o deslocamento visto pela
+ * `silhueta` (o que sobra tirando a componente ao longo do eixo da vista) passa da tolerância dela, ou ele foi a x < 0 com `simetria: 'x'`,
+ * o trecho inteiro se resolve de novo com a maior rigidez que cabe no limite, achada por 24 passos de bisseção no expoente (a rigidez
+ * vezes 2^-r, r de 0 a 40); os pontos que passavam saem em `limitados`. A rigidez menor solta primeiro a onda longa e continua tirando a
+ * curta, e a curva sai lisa. O primeiro jeito, subir o peso do desvio só no ponto que passava, deixava um bico nele: no quarto traseiro
+ * com a tolerância de 3 mm o índice do para-lama ficava em 350, contra 224 com a rigidez do trecho. O limite nunca é ultrapassado: o
+ * ponto que ainda passar é cortado ao limite (e o x negativo, a 0), como última operação. Com `simetria: 'x'` o ponto que está no plano
+ * tem o x preso, como coordenada dura. Quando o ruído passa da tolerância em boa parte das curvas, cada curva fica com uma rigidez, e a
+ * diferença entre curvas vizinhas ondula a superfície: no quarto traseiro com 1 mm o para-lama vai de 879 (sem a opção) a 1921, e com 3
+ * mm a 224; a tolerância tem de cobrir a amplitude do ruído (`toleranciaPorCurva` na gaiolaPorRede).
  *
- * O relatório. `deslocamentos[i]` é quanto o ponto i andou (mm), `variacaoAntes` e `variacaoDepois` são Σ |r_j|² (mm²) com a parametrização
- * da curva dada, que é a medida do quanto a curva ondula, e `maiorDeslocamento` é o maior dos deslocamentos. Tudo é determinístico: a mesma
- * curva dá os mesmos números, bit a bit. */
+ * Tudo é determinístico: a mesma curva dá os mesmos números, bit a bit. */
 
 import { gradienteConjugado } from './gaiola-por-rede-liso.js';
 
-export const ALISAR_CURVAS_PADRAO = Object.freeze({ energia: 'variacao', rigidez: 1000, tolerancia: 1, iteracoes: 2 });
-const ORDEM = Object.freeze({ variacao: 3, curvatura: 2 });
+export const ALISAR_CURVAS_PADRAO = Object.freeze({ energia: 'quartica', rigidez: 1, tolerancia: 1, iteracoes: 2 });
+/* a ordem da diferença de cada energia: a de ordem k zera o polinômio de grau k - 1 no parâmetro da corda */
+const ORDEM = Object.freeze({ quartica: 5, cubica: 4 });
+const ORDEM_MINIMA = 4;
 const EIXO = Object.freeze({ x: 0, y: 1, z: 2 });
-const VOLTAS_DO_LIMITE = 40;
+const REDUCAO_MAXIMA = 40;
+const PASSOS_DA_RIGIDEZ = 24;
 
 const distancia = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
 const fatorial = (k) => (k <= 1 ? 1 : k * fatorial(k - 1));
+/* o valor recebido, como a recusa o mostra: o número como ele é (NaN e Infinity inclusive), o resto em JSON */
+const valor = (v) => (typeof v === 'number' || v === undefined ? String(v) : JSON.stringify(v));
 
 function falha(texto) { throw new TypeError(`alisar curvas: ${texto}`); }
 
+/** Confere uma tolerância (mm, número finito maior que zero); `campo` e `onde` dizem quem a declarou, para a recusa. */
+export function conferirTolerancia(v, campo, onde) {
+  if (!(typeof v === 'number' && Number.isFinite(v) && v > 0)) falha(`${onde} tem ${campo} ${valor(v)}; a tolerância é o maior deslocamento de um ponto, número finito maior que zero, em mm`);
+  return v;
+}
+
 /** Lê e confere as opções do alisamento de uma curva; `onde` diz quem as declarou, para a recusa. */
 export function lerOpcoesDoAlisamento(opcoes = {}, onde = 'o alisamento') {
-  const o = { ...ALISAR_CURVAS_PADRAO, silhueta: null, ...Object.fromEntries(Object.entries(opcoes ?? {}).filter(([, v]) => v != null)) };
-  if (!Object.hasOwn(ORDEM, o.energia)) falha(`${onde} tem energia ${JSON.stringify(o.energia)}; use 'variacao' (a terceira diferença, padrão) ou 'curvatura'`);
-  if (!(typeof o.rigidez === 'number' && Number.isFinite(o.rigidez) && o.rigidez > 0)) falha(`${onde} tem rigidez ${JSON.stringify(o.rigidez)}; a rigidez é número finito maior que zero (1000 por padrão)`);
-  if (!(typeof o.tolerancia === 'number' && Number.isFinite(o.tolerancia) && o.tolerancia > 0)) falha(`${onde} tem tolerancia ${JSON.stringify(o.tolerancia)}; a tolerância é o maior deslocamento de um ponto, número finito maior que zero, em mm`);
-  if (!(Number.isInteger(o.iteracoes) && o.iteracoes >= 1 && o.iteracoes <= 10)) falha(`${onde} tem iteracoes ${JSON.stringify(o.iteracoes)}; use um inteiro de 1 a 10`);
+  const o = { ...ALISAR_CURVAS_PADRAO, silhueta: null, simetria: null, ...Object.fromEntries(Object.entries(opcoes ?? {}).filter(([, v]) => v != null)) };
+  if (!Object.hasOwn(ORDEM, o.energia)) falha(`${onde} tem energia ${valor(o.energia)}; use 'quartica' (a quinta diferença, padrão) ou 'cubica' (a quarta)`);
+  if (!(typeof o.rigidez === 'number' && Number.isFinite(o.rigidez) && o.rigidez > 0)) falha(`${onde} tem rigidez ${valor(o.rigidez)}; a rigidez é número finito maior que zero (1 por padrão)`);
+  conferirTolerancia(o.tolerancia, 'tolerancia', onde);
+  if (!(Number.isInteger(o.iteracoes) && o.iteracoes >= 1 && o.iteracoes <= 10)) falha(`${onde} tem iteracoes ${valor(o.iteracoes)}; use um inteiro de 1 a 10`);
+  if (o.simetria !== null && o.simetria !== 'x') falha(`${onde} tem simetria ${valor(o.simetria)}; a simetria só aceita 'x' (a metade x >= 0)`);
   if (o.silhueta !== null) {
     const s = o.silhueta;
-    if (!s || typeof s !== 'object' || Array.isArray(s) || !Object.hasOwn(EIXO, s.vista)) falha(`${onde} tem silhueta ${JSON.stringify(s)}; a silhueta é { vista: 'x' | 'y' | 'z', tolerancia } em mm`);
+    if (!s || typeof s !== 'object' || Array.isArray(s) || !Object.hasOwn(EIXO, s.vista)) falha(`${onde} tem silhueta ${valor(s)}; a silhueta é { vista: 'x' | 'y' | 'z', tolerancia } em mm`);
     const extra = Object.keys(s).filter((k) => k !== 'vista' && k !== 'tolerancia');
     if (extra.length) falha(`${onde} tem na silhueta o campo ${extra.map((k) => `'${k}'`).join(', ')}, que não existe; use vista e tolerancia`);
-    if (!(typeof s.tolerancia === 'number' && Number.isFinite(s.tolerancia) && s.tolerancia > 0)) falha(`${onde} tem silhueta.tolerancia ${JSON.stringify(s.tolerancia)}; é o maior deslocamento visto pela vista '${s.vista}', número finito maior que zero, em mm`);
+    if (!(typeof s.tolerancia === 'number' && Number.isFinite(s.tolerancia) && s.tolerancia > 0)) falha(`${onde} tem silhueta.tolerancia ${valor(s.tolerancia)}; é o maior deslocamento visto pela vista '${s.vista}', número finito maior que zero, em mm`);
   }
   return o;
 }
@@ -107,16 +139,14 @@ function residuosDoTrecho(indices, P, k, ciclico) {
   return linhas;
 }
 
-/* Σ |Q r|² dos resíduos sobre as posições P, com a tangente de cada resíduo tirada quando `tangentes` é dada. */
-function variacao(linhas, P, tangentes) {
+/* Σ |r|² dos resíduos sobre as posições P. */
+function energiaDe(linhas, P) {
   let s = 0;
-  linhas.forEach((L, j) => {
-    const r = [0, 0, 0];
-    for (const [i, c] of L) { r[0] += c * P[i][0]; r[1] += c * P[i][1]; r[2] += c * P[i][2]; }
-    const T = tangentes ? tangentes[j] : null;
-    if (T) { const t = r[0] * T[0] + r[1] * T[1] + r[2] * T[2]; r[0] -= t * T[0]; r[1] -= t * T[1]; r[2] -= t * T[2]; }
-    s += r[0] * r[0] + r[1] * r[1] + r[2] * r[2];
-  });
+  for (const L of linhas) {
+    let x = 0; let y = 0; let z = 0;
+    for (const [i, c] of L) { x += c * P[i][0]; y += c * P[i][1]; z += c * P[i][2]; }
+    s += x * x + y * y + z * z;
+  }
   return s;
 }
 
@@ -139,49 +169,33 @@ function trechosDaCurva(n, fechada, partir) {
   return trechos;
 }
 
-/* A tangente de cada resíduo da energia de variação: a direção da corda do meio dos quatro pontos, sobre as posições P. Na curva de
-   curvatura constante a terceira diferença é tangente a essa corda (no círculo amostrado por igual, exatamente), e é essa parte que sai
-   da energia: o que sobra é a variação da curvatura. */
-function tangentesDosResiduos(linhas, P) {
-  return linhas.map((L) => {
-    const a = P[L[1][0]]; const b = P[L[2][0]];
-    const d = [b[0] - a[0], b[1] - a[1], b[2] - a[2]]; const l = Math.hypot(...d);
-    return l > 0 ? d.map((v) => v / l) : null;
-  });
-}
-
-/* Resolve um trecho: as posições novas dos pontos livres dele, com os fixos em `fixos` (Map índice -> posição). Com tangentes, cada
-   resíduo pesa só a parte fora da tangente dele, Q r com Q = I - T Tᵀ, e as três coordenadas se acoplam num sistema só de 3m variáveis. */
-function resolverTrecho(trecho, P0, pesos, fixos, linhas, tangentes, rigidez, saida) {
-  const livres = [...new Set(trecho.indices)].filter((i) => !fixos.has(i));
-  if (!livres.length) return;
-  const posDoLivre = new Map(livres.map((i, a) => [i, a]));
-  const m = livres.length;
-  const A = Array.from({ length: 3 * m }, () => new Map());
-  const b = new Float64Array(3 * m);
-  const somar = (u, v, x) => A[u].set(v, (A[u].get(v) ?? 0) + x);
-  for (let a = 0; a < m; a++) for (let q = 0; q < 3; q++) { const w = pesos[livres[a]][q]; somar(3 * a + q, 3 * a + q, w); b[3 * a + q] = w * P0[livres[a]][q]; }
-  linhas.forEach((L, j) => {
-    const T = tangentes ? tangentes[j] : null;
-    const Q = [0, 1, 2].map((q) => [0, 1, 2].map((s) => (q === s ? 1 : 0) - (T ? T[q] * T[s] : 0)));
-    const r = [0, 0, 0];
-    for (const [i, c] of L) if (fixos.has(i)) { const p = fixos.get(i); r[0] += c * p[0]; r[1] += c * p[1]; r[2] += c * p[2]; }
-    const Qr = Q.map((linha) => linha[0] * r[0] + linha[1] * r[1] + linha[2] * r[2]);
-    for (const [i, ci] of L) {
-      if (!posDoLivre.has(i)) continue;
-      const a = posDoLivre.get(i);
-      for (let q = 0; q < 3; q++) b[3 * a + q] -= rigidez * ci * Qr[q];
-      for (const [k, ck] of L) {
-        if (!posDoLivre.has(k)) continue;
-        const d = posDoLivre.get(k);
-        for (let q = 0; q < 3; q++) for (let s = 0; s < 3; s++) if (Q[q][s] !== 0) somar(3 * a + q, 3 * d + s, rigidez * ci * ck * Q[q][s]);
+/* Resolve um trecho pelo deslocamento d de cada coordenada livre: minimiza Σ w d² + rigidez Σ |r0_j + Σ c d|², com r0_j o resíduo dos
+   pontos dados e a coordenada presa (`presa[i][q]`) com d = 0. As três coordenadas são independentes, e cada uma é um sistema em banda. */
+function resolverTrecho(trecho, P0, pesos, presa, linhas, rigidez, saida) {
+  const pontos = [...new Set(trecho.indices)];
+  for (let q = 0; q < 3; q++) {
+    const livres = pontos.filter((i) => !presa[i][q]);
+    if (!livres.length) continue;
+    const pos = new Map(livres.map((i, a) => [i, a]));
+    const A = livres.map(() => new Map());
+    const b = new Float64Array(livres.length);
+    const somar = (u, v, x) => A[u].set(v, (A[u].get(v) ?? 0) + x);
+    livres.forEach((i, a) => somar(a, a, pesos[i][q]));
+    for (const L of linhas) {
+      let r0 = 0;
+      for (const [i, c] of L) r0 += c * P0[i][q];
+      for (const [i, ci] of L) {
+        const a = pos.get(i);
+        if (a === undefined) continue;
+        b[a] -= rigidez * ci * r0;
+        for (const [k, ck] of L) { const e = pos.get(k); if (e !== undefined) somar(a, e, rigidez * ci * ck); }
       }
     }
-  });
-  const colunas = A.map((linha) => [...linha].sort((x, y) => x[0] - y[0]));
-  const diag = Float64Array.from(colunas.map((linha, u) => linha.find(([v]) => v === u)[1]));
-  const x = gradienteConjugado(colunas, diag, 0, b);
-  for (let a = 0; a < m; a++) saida[livres[a]] = [x[3 * a], x[3 * a + 1], x[3 * a + 2]];
+    const colunas = A.map((linha) => [...linha].sort((x, y) => x[0] - y[0]));
+    const diag = Float64Array.from(colunas.map((linha, u) => linha.find(([v]) => v === u)[1]));
+    const d = gradienteConjugado(colunas, diag, 0, b);
+    livres.forEach((i, a) => { saida[i][q] = P0[i][q] + d[a]; });
+  }
 }
 
 /* Quanto o deslocamento d passa de cada limite: a razão (maior que 1 quando passa) da distância em 3D e da vista da silhueta. */
@@ -205,73 +219,91 @@ function cortarAoLimite(d, tolerancia, silhueta) {
   return e;
 }
 
-function passaDoLimite(d, tolerancia, silhueta) {
-  if (Math.hypot(...d) > tolerancia) return true;
-  if (!silhueta) return false;
-  const q = EIXO[silhueta.vista];
-  return Math.hypot(...d.filter((_, a) => a !== q)) > silhueta.tolerancia;
-}
-
 /**
- * alisarPontosDaCurva(pontos, opcoes) -> { pontos, deslocamentos, limitados, duros, variacaoAntes, variacaoDepois, maiorDeslocamento }
- *   pontos: [[x, y, z]] em mm; opcoes: { fechada, duros, partir, energia, rigidez, tolerancia, silhueta, iteracoes }, descritas na ficha.
- *   Devolve as posições novas sem mexer nas dadas.
+ * alisarPontosDaCurva(pontos, opcoes) -> { pontos, deslocamentos, limitados, duros, variacaoAntes, variacaoDepois, maiorDeslocamento, voltas }
+ *   pontos: [[x, y, z]] em mm; opcoes: { fechada, duros, partir, energia, rigidez, tolerancia, silhueta, simetria, iteracoes }, descritas na
+ *   ficha; `onde` diz quem chamou, para a recusa. Devolve as posições novas sem mexer nas dadas; `voltas` é quantas voltas ficaram.
  */
 export function alisarPontosDaCurva(pontos, opcoes = {}) {
   const { fechada = false, duros = [], partir = [], onde = 'o alisamento', ...resto } = opcoes;
   const o = lerOpcoesDoAlisamento(resto, onde);
   if (!Array.isArray(pontos) || pontos.some((p) => !Array.isArray(p) || p.length !== 3 || !p.every(Number.isFinite))) falha(`${onde} recebeu pontos que não são [x, y, z] finitos em mm`);
   const n = pontos.length;
-  const k = ORDEM[o.energia];
   const P0 = pontos.map((p) => [...p]);
-  for (const lista of [duros, partir]) for (const i of lista) if (!(Number.isInteger(i) && i >= 0 && i < n)) falha(`${onde} cita o ponto ${JSON.stringify(i)} como duro ou corte; a curva tem os pontos de 0 a ${n - 1}`);
+  for (const lista of [duros, partir]) for (const i of lista) if (!(Number.isInteger(i) && i >= 0 && i < n)) falha(`${onde} cita o ponto ${valor(i)} como duro ou corte; a curva tem os pontos de 0 a ${n - 1}`);
+  const cordas = fechada && n > 2 ? n : n - 1;
+  for (let i = 0; i < cordas; i++) {
+    const j = (i + 1) % n;
+    if (!(distancia(P0[i], P0[j]) > 0)) falha(`${onde} repete o ponto-chave: o de índice ${i} e o de índice ${j} são iguais (${valor(P0[i])}), e a corda entre eles é nula; tire um dos dois`);
+  }
+  if (o.simetria === 'x') { const i = P0.findIndex((p) => p[0] < 0); if (i >= 0) falha(`${onde} tem simetria 'x' e o ponto de índice ${i} em x ${P0[i][0]} < 0; a curva é da metade x >= 0`); }
   const duro = new Set([...duros, ...partir, ...(fechada ? [] : [0, n - 1])]);
-  const trechos = trechosDaCurva(n, fechada, new Set(partir));
+  const trechos = trechosDaCurva(n, fechada, new Set(partir)).map((tr) => ({ ...tr, k: Math.max(ORDEM_MINIMA, Math.min(ORDEM[o.energia], tr.indices.length - 3)) }));
   /* o trecho curto demais para a energia (menos de k + 1 pontos) não tem resíduo e fica como está */
-  const linhasDe = (P) => trechos.map((tr) => (tr.indices.length >= k + 1 ? residuosDoTrecho(tr.indices, P, k, tr.ciclico) : []));
-  const linhasDadas = linhasDe(P0);
-  const comTangente = o.energia === 'variacao';
-  const tangentesDe = (linhas, P) => linhas.map((L) => (comTangente ? tangentesDosResiduos(L, P) : null));
-  const tangentesDadas = tangentesDe(linhasDadas, P0);
-  const variacaoAntes = linhasDadas.reduce((s, L, q) => s + variacao(L, P0, tangentesDadas[q]), 0);
-  const fixos = new Map([...duro].sort((a, b) => a - b).map((i) => [i, P0[i]]));
-  /* o peso do desvio de cada coordenada de cada ponto: 1, e sobe no ponto que passa do limite (as três coordenadas, se passa da tolerância;
-     as duas que a vista da silhueta mostra, se passa da dela), até nenhum passar */
-  const pesos = P0.map(() => [1, 1, 1]);
-  const limitados = new Set();
-  let P = P0.map((p) => [...p]);
-  for (let volta = 0; volta < VOLTAS_DO_LIMITE; volta++) {
-    let linhas = linhasDadas; let tangentes = tangentesDadas;
-    for (let it = 0; it < o.iteracoes; it++) {
-      const novo = P0.map((p, i) => (fixos.has(i) ? [...fixos.get(i)] : [...p]));
-      trechos.forEach((tr, q) => resolverTrecho(tr, P0, pesos, fixos, linhas[q], tangentes[q], o.rigidez, novo));
-      P = novo;
-      if (it + 1 < o.iteracoes) { linhas = linhasDe(P); tangentes = tangentesDe(linhas, P); }
-    }
-    let passou = false;
+  const linhasDe = (P) => trechos.map((tr) => (tr.indices.length >= tr.k + 1 ? residuosDoTrecho(tr.indices, P, tr.k, tr.ciclico) : []));
+  /* a energia da curva P com a parametrização dela mesma: a medida do quanto ela ondula */
+  const energiaPropria = (P) => linhasDe(P).reduce((s, L) => s + energiaDe(L, P), 0);
+  /* a coordenada presa: as três do ponto duro, e o x do ponto no plano de simetria */
+  const presa = P0.map((p, i) => [0, 1, 2].map((q) => duro.has(i) || (q === 0 && o.simetria === 'x' && p[0] === 0)));
+
+  /* uma solução com os parâmetros das linhas dadas, com os limites: o trecho em que um ponto passa se resolve com a maior rigidez que
+     cabe, e o que ainda passar é cortado */
+  function resolverComLimite(linhas) {
+    const pesos = P0.map(() => [1, 1, 1]);
+    const limitados = new Set();
+    const P = P0.map((p) => [...p]);
+    /* os pontos do trecho que passam de um limite na solução P */
+    const passam = (tr) => tr.indices.filter((i) => {
+      if (duro.has(i)) return false;
+      const d = [P[i][0] - P0[i][0], P[i][1] - P0[i][1], P[i][2] - P0[i][2]];
+      const { total, visto } = excessos(d, o.tolerancia, o.silhueta);
+      return total > 1 || visto > 1 || (o.simetria === 'x' && P[i][0] < 0);
+    });
+    trechos.forEach((tr, q) => {
+      resolverTrecho(tr, P0, pesos, presa, linhas[q], o.rigidez, P);
+      const fora = passam(tr);
+      if (!fora.length) return;
+      /* o trecho que passa do limite se resolve com a maior rigidez que cabe nele, por bisseção no logaritmo: a rigidez menor solta
+         primeiro a onda longa (a forma) e continua tirando a curta (o ruído), e a curva sai lisa, sem o bico do ponto preso */
+      for (const i of fora) limitados.add(i);
+      /* a rigidez é a dada vezes 2^-r: r = 0 não cabe, r = REDUCAO_MAXIMA (a rigidez a 1e-12 da dada) cabe sempre, salvo o corte */
+      let naoCabe = 0; let cabe = REDUCAO_MAXIMA;
+      for (let passo = 0; passo < PASSOS_DA_RIGIDEZ; passo++) {
+        const r = (naoCabe + cabe) / 2;
+        resolverTrecho(tr, P0, pesos, presa, linhas[q], o.rigidez * 2 ** -r, P);
+        if (passam(tr).length) naoCabe = r; else cabe = r;
+      }
+      resolverTrecho(tr, P0, pesos, presa, linhas[q], o.rigidez * 2 ** -cabe, P);
+    });
     for (let i = 0; i < n; i++) {
-      if (fixos.has(i)) continue;
-      const { total, visto } = excessos([P[i][0] - P0[i][0], P[i][1] - P0[i][1], P[i][2] - P0[i][2]], o.tolerancia, o.silhueta);
-      if (total > 1) { const f = Math.max(2, 1.5 * total * total); for (let q = 0; q < 3; q++) pesos[i][q] *= f; }
-      if (visto > 1) { const f = Math.max(2, 1.5 * visto * visto); const e = EIXO[o.silhueta.vista]; for (let q = 0; q < 3; q++) if (q !== e) pesos[i][q] *= f; }
-      if (total > 1 || visto > 1) { passou = true; limitados.add(i); }
+      if (duro.has(i)) { P[i] = [...P0[i]]; continue; }
+      const d = [P[i][0] - P0[i][0], P[i][1] - P0[i][1], P[i][2] - P0[i][2]];
+      const { total, visto } = excessos(d, o.tolerancia, o.silhueta);
+      if (total > 1 || visto > 1) { const e = cortarAoLimite(d, o.tolerancia, o.silhueta); P[i] = [P0[i][0] + e[0], P0[i][1] + e[1], P0[i][2] + e[2]]; }
+      if (o.simetria === 'x' && P[i][0] < 0) P[i][0] = 0;
     }
-    if (!passou) break;
+    return { P, limitados };
   }
-  /* o que ainda passar depois das voltas é cortado ao limite: o corte é a última palavra */
-  for (let i = 0; i < n; i++) {
-    if (duro.has(i)) { P[i] = [...P0[i]]; continue; }
-    const d = [P[i][0] - P0[i][0], P[i][1] - P0[i][1], P[i][2] - P0[i][2]];
-    if (passaDoLimite(d, o.tolerancia, o.silhueta)) { const e = cortarAoLimite(d, o.tolerancia, o.silhueta); P[i] = [P0[i][0] + e[0], P0[i][1] + e[1], P0[i][2] + e[2]]; limitados.add(i); }
+
+  /* cada volta refaz a parametrização pela curva da volta anterior, e só fica se baixar a energia própria da curva */
+  const variacaoAntes = energiaPropria(P0);
+  let atual = { P: P0, limitados: new Set() }; let energia = variacaoAntes; let voltas = 0;
+  for (let it = 0; it < o.iteracoes; it++) {
+    const novo = resolverComLimite(linhasDe(atual.P));
+    const e = energiaPropria(novo.P);
+    if (!(e < energia)) break;
+    atual = novo; energia = e; voltas = it + 1;
   }
+  const P = atual.P.map((p) => [...p]);
   const deslocamentos = P.map((p, i) => distancia(p, P0[i]));
   return {
     pontos: P,
     deslocamentos,
-    limitados: [...limitados].sort((a, b) => a - b),
+    limitados: [...atual.limitados].sort((a, b) => a - b),
     duros: [...duro].sort((a, b) => a - b),
     variacaoAntes,
-    variacaoDepois: linhasDadas.reduce((s, L, q) => s + variacao(L, P, tangentesDe([L], P)[0]), 0),
+    variacaoDepois: energia,
     maiorDeslocamento: deslocamentos.reduce((s, d) => Math.max(s, d), 0),
+    voltas,
   };
 }

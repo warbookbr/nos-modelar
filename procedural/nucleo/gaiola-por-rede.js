@@ -19,8 +19,8 @@
  *   cantos: nomes de nós que ficam canto vivo além dos achados.
  *   simetria: 'x' declara a metade x >= 0, que o passo espelha.
  *   prefixo: texto posto na frente do nome de todo ponto.
- *   alisarCurvas: true | { energia?, rigidez?, tolerancia?, silhueta?, iteracoes?, curvas?, pontosDuros? } alisa os pontos-chave das curvas
- *     pela curva de variação mínima antes de montar a gaiola, com os nós fixos; tolerancia é o maior deslocamento em mm (1 por padrão).
+ *   alisarCurvas: true | { energia?, rigidez?, tolerancia?, toleranciaPorCurva?, silhueta?, iteracoes?, curvas?, pontosDuros? } tira o ruído
+ *     dos pontos-chave das curvas antes de montar a gaiola, com os nós fixos; tolerancia é o maior deslocamento em mm (1 por padrão).
  * devolve: { pontos, passo, linha(curva), pontoDaCurva, linhas, nos, curvas, retalhos, densidades, extraordinarios, avisos, ... }.
  * exemplo:
  *   gaiolaPorRede({ passo: 50, fora: [0, 1, 0], nos: { A: [0, 0, 0], B: [200, 0, 0], C: [200, 0, 200], D: [0, 0, 200] },
@@ -78,7 +78,7 @@
  * liso: true (padrão), false ou { iteracoes (2), energia ('variacao' ou 'placa'), ancora }: o alisamento do miolo, descrito em A CONTINUIDADE.
  * anguloDeCanto: o desvio de direção (graus, 35 por padrão) a partir do qual o encontro de duas arestas de borda é canto vivo; cantos:
  *   nomes de nós que ficam canto vivo além dos achados. simetria: 'x', como em `gaiolaPorEstacoes`. prefixo: texto posto na frente dos nomes.
- * alisarCurvas: true | { energia, rigidez, tolerancia, silhueta, iteracoes, curvas, pontosDuros }: o alisamento das curvas declaradas, descrito
+ * alisarCurvas: true | { energia, rigidez, tolerancia, toleranciaPorCurva, silhueta, iteracoes, curvas, pontosDuros }: o alisamento das curvas declaradas, descrito
  *   em O ALISAMENTO DAS CURVAS. Sem ele (o padrão), as curvas passam pelos pontos-chave como foram escritos.
  *
  * O PREENCHIMENTO. Os pontos da borda de cada retalho são os das curvas, à mesma distância de arco um do outro em cada arco.
@@ -103,15 +103,21 @@
  *
  * O ALISAMENTO DAS CURVAS. O `liso` alisa o miolo com as curvas fixas, e por isso não alcança a ondulação que nasce da digitação ponto a
  * ponto das curvas: o preenchimento herda a curvatura delas. Com `alisarCurvas`, cada curva escolhida (`curvas`, todas as que não são
- * poligonais por padrão) tem os pontos-chave alisados por `alisarPontosDaCurva` (`alisar-curvas.js`, a curva de variação mínima
- * linearizada de Moreton e Séquin) antes de a Catmull-Rom passar por eles. Ficam onde estão, bit a bit, os nós (o ponto-chave escrito como
- * nome), as pontas da curva aberta e os pontos que `pontosDuros: { curva: [k] }` declara (k é a posição na lista de pontos da curva); o nó
- * em `cantos`, e o nó onde a poligonal dos pontos-chave vira mais que `anguloDeCanto`, parte a curva em trechos alisados à parte. Nenhum
- * ponto anda mais que `tolerancia` mm (1 por padrão), e com `silhueta: { vista, tolerancia }` o deslocamento visto pela vista ('x', 'y'
- * ou 'z', o eixo para onde a vista olha) não passa da tolerância dela: as curvas lidas da prancha ficam na silhueta dela, e o que se mexe
- * é a profundidade. `energia` ('variacao' ou 'curvatura'), `rigidez` (1000) e `iteracoes` (2) vão para `alisarPontosDaCurva`. A saída
- * ganha `alisamentoDasCurvas`, com as opções, e por curva os pontos duros, os de corte, os limitados, o deslocamento de cada ponto-chave
- * em mm e a energia antes e depois. O nó dado por { curva, fracao } fica na curva alisada. Sem a opção, nada muda.
+ * poligonais por padrão) tem os pontos-chave alisados por `alisarPontosDaCurva` (`alisar-curvas.js`) antes de a Catmull-Rom passar por
+ * eles. A energia é o resíduo do ajuste polinomial local (a quinta diferença dividida no parâmetro da corda, zero em toda quártica), que
+ * pesa o ruído que troca de sinal de um ponto para o outro e quase não pesa a forma de curvatura variável amostrada com folga: a
+ * clotoide, a senoide, a hélice, a seção em quarto de elipse e a elipse com o raio da ponta em sete espaçamentos, limpas, andam menos de
+ * 0,3 mm. O que muda num comprimento da ordem do espaçamento (a ponta de raio pequeno com poucos pontos, o arco de corda muito desigual)
+ * não se distingue do ruído e anda até a tolerância; a ficha de `alisarPontosDaCurva` dá os números. Ficam onde estão, bit a bit, os nós (o ponto-chave escrito como nome), as pontas da curva aberta e
+ * os pontos que `pontosDuros: { curva: [k] }` declara (k é a posição na lista de pontos da curva); o nó em `cantos`, e todo ponto-chave
+ * onde a poligonal dos pontos-chave vira mais que `anguloDeCanto`, parte a curva em trechos alisados à parte. Nenhum ponto anda mais que
+ * `tolerancia` mm (1 por padrão), ou que a da curva em `toleranciaPorCurva: { curva: mm }`, e com `silhueta: { vista, tolerancia }` o
+ * deslocamento visto pela vista ('x', 'y' ou 'z', o eixo para onde a vista olha) não passa da tolerância dela: as curvas lidas da prancha
+ * ficam na silhueta dela, e o que se mexe é a profundidade. Com `simetria: 'x'`, o ponto-chave em x = 0 fica com x = 0 e nenhum vai a
+ * x < 0; se a curva entre eles passa do plano, a recusa de x < 0 diz quanto o alisamento a mexeu. `energia` ('quartica' ou 'cubica'),
+ * `rigidez` (1) e `iteracoes` (2) vão para `alisarPontosDaCurva`. A saída ganha `alisamentoDasCurvas`, com as opções, e por curva a
+ * tolerância, os pontos duros, os de corte, os limitados, os pontos-chave alisados (mm), o deslocamento de cada um em mm e a energia antes
+ * e depois. O nó dado por { curva, fracao } fica na curva alisada. Sem a opção, nada muda.
  *
  * Os vértices extraordinários (valência diferente de 4 no interior, de 2 a 3 na borda) saem declarados, pelo nome, em `extraordinarios`:
  * os nós onde três ou cinco retalhos se encontram, os centros dos retalhos de n lados e o que a borda deixar.
@@ -139,7 +145,7 @@ import { alteracoesDaRede, assinaturaDaRede, divisoesFixadas, registrarGaiola } 
 import { curvaCentripeta } from './gaiola-interpolada.js';
 import { extraordinarios as extraordinariosDa } from './gaiola-aneis.js';
 import { alisarMioloNaNormal } from './gaiola-por-rede-liso.js';
-import { alisarPontosDaCurva, lerOpcoesDoAlisamento } from './alisar-curvas.js';
+import { alisarPontosDaCurva, conferirTolerancia, lerOpcoesDoAlisamento } from './alisar-curvas.js';
 
 const MM = 1000;
 const AMOSTRAS_POR_TRECHO = 96;
@@ -381,14 +387,15 @@ function lerLeitura(l) {
   return o;
 }
 
-/* A opção `alisarCurvas`: true, ou { energia, rigidez, tolerancia, silhueta, iteracoes, curvas, pontosDuros }. Devolve null (sem a opção),
-   ou { opcoes (as de `alisarPontosDaCurva`), curvas: Set de nomes, pontosDuros: Map curva -> Set de índices de ponto-chave }. */
+/* A opção `alisarCurvas`: true, ou { energia, rigidez, tolerancia, toleranciaPorCurva, silhueta, iteracoes, curvas, pontosDuros }. Devolve
+   null (sem a opção), ou { opcoes (as de `alisarPontosDaCurva`), curvas: Set de nomes, pontosDuros: Map curva -> Set de índices de
+   ponto-chave, tolerancias: Map curva -> mm }. */
 function lerAlisarCurvas(a, declaradas) {
   if (a == null || a === false) return null;
   const x = a === true ? {} : a;
-  if (!x || typeof x !== 'object' || Array.isArray(x)) falha(`alisarCurvas é ${JSON.stringify(a)}; use true ou { energia, rigidez, tolerancia, silhueta, iteracoes, curvas, pontosDuros }`);
-  exigirCampos(x, ['energia', 'rigidez', 'tolerancia', 'silhueta', 'iteracoes', 'curvas', 'pontosDuros'], 'alisarCurvas');
-  const { curvas: escolhidas, pontosDuros, ...resto } = x;
+  if (!x || typeof x !== 'object' || Array.isArray(x)) falha(`alisarCurvas é ${JSON.stringify(a)}; use true ou { energia, rigidez, tolerancia, toleranciaPorCurva, silhueta, iteracoes, curvas, pontosDuros }`);
+  exigirCampos(x, ['energia', 'rigidez', 'tolerancia', 'toleranciaPorCurva', 'silhueta', 'iteracoes', 'curvas', 'pontosDuros'], 'alisarCurvas');
+  const { curvas: escolhidas, pontosDuros, toleranciaPorCurva, ...resto } = x;
   let opcoes;
   try { opcoes = lerOpcoesDoAlisamento(resto, 'alisarCurvas'); } catch (e) { falha(e.message.replace(/^alisar curvas: /, '')); }
   const lisas = [...declaradas.values()].filter((c) => !c.poligonal).map((c) => c.nome);
@@ -412,7 +419,18 @@ function lerAlisarCurvas(a, declaradas) {
       duros.set(n, new Set(ks));
     }
   }
-  return { opcoes, curvas, pontosDuros: duros };
+  /* a tolerância de cada curva, por cima da de todas: a curva que a pessoa quer mais presa (ou mais solta) que as outras */
+  const tolerancias = new Map();
+  if (toleranciaPorCurva != null) {
+    if (!toleranciaPorCurva || typeof toleranciaPorCurva !== 'object' || Array.isArray(toleranciaPorCurva)) falha(`alisarCurvas.toleranciaPorCurva é ${JSON.stringify(toleranciaPorCurva)}; use { curva: mm }`);
+    for (const [n, v] of Object.entries(toleranciaPorCurva)) {
+      if (!declaradas.has(n)) falha(`alisarCurvas.toleranciaPorCurva cita a curva ${citar(n)}, que não existe; as curvas são ${lista([...declaradas.keys()])}`);
+      if (!curvas.has(n)) falha(`alisarCurvas.toleranciaPorCurva cita a curva ${citar(n)}, que não é alisada; as alisadas são ${lista([...curvas])}`);
+      try { conferirTolerancia(v, `toleranciaPorCurva.${n}`, 'alisarCurvas'); } catch (e) { falha(e.message.replace(/^alisar curvas: /, '')); }
+      tolerancias.set(n, v);
+    }
+  }
+  return { opcoes, curvas, pontosDuros: duros, tolerancias };
 }
 
 /* ----------------------------------------------------------------- sistema */
@@ -593,19 +611,21 @@ export function gaiolaPorRede(definicaoDada) {
     andando.add(`c:${nome}`);
     const d = declaradas.get(nome);
     let chaves = d.pontos.map((p) => (typeof p === 'string' ? posicaoDoNo(p, `a curva ${citar(nome)}`) : p));
-    if (alisarCurvas && alisarCurvas.curvas.has(nome)) chaves = alisarChaves(nome, d, chaves);
+    /* a repetição se confere nos pontos dados, antes do alisamento: a corda nula não tem parâmetro */
     for (let j = 0; j + 1 < chaves.length; j++) if (!(norma(sub(chaves[j + 1], chaves[j])) > 0)) falha(`a curva ${citar(nome)} repete o ponto-chave: o ${j + 1}º e o ${j + 2}º são iguais`);
     if (d.fechada && !(norma(sub(chaves[0], chaves[chaves.length - 1])) > 0)) falha(`a curva fechada ${citar(nome)} repete o primeiro ponto-chave no fim; a volta fecha sozinha`);
+    if (alisarCurvas && alisarCurvas.curvas.has(nome)) chaves = alisarChaves(nome, d, chaves);
     const c = criarCurva(nome, chaves, d.fechada, d.poligonal);
     c.decl = d;
     andando.delete(`c:${nome}`);
     curvas.set(nome, c);
     return c;
   };
-  /* O ALISAMENTO DAS CURVAS (`alisarCurvas`): os pontos-chave de cada curva escolhida passam pela curva de variação mínima linearizada
+  /* O ALISAMENTO DAS CURVAS (`alisarCurvas`): os pontos-chave de cada curva escolhida passam por `alisarPontosDaCurva`
      (`alisar-curvas.js`) antes de a curva ser feita. Os nós (o ponto-chave que é nome) e as pontas da curva aberta são duros, como os que
-     `pontosDuros` declara; o nó em canto (de `cantos`, ou onde a poligonal dos pontos-chave vira mais que `anguloDeCanto`) parte a curva
-     em trechos alisados à parte. O nó dado por { curva, fracao } fica na curva alisada. */
+     `pontosDuros` declara; o nó em `cantos` e todo ponto-chave (nó ou número) onde a poligonal dos pontos-chave vira mais que
+     `anguloDeCanto` partem a curva em trechos alisados à parte. Com `simetria: 'x'` o alisamento mantém x >= 0 e o x dos pontos em x = 0.
+     O nó dado por { curva, fracao } fica na curva alisada. */
   function alisarChaves(nome, d, chaves) {
     const n = chaves.length;
     const duros = []; const partir = [];
@@ -616,16 +636,17 @@ export function gaiolaPorRede(definicaoDada) {
       const tem = d.fechada || (k > 0 && k < n - 1);
       if (!tem) return;
       if (typeof p === 'string' && cantosDeclarados.has(p)) { partir.push(k); return; }
-      if (limiteDoCanto === null || !duros.includes(k)) return;
+      if (limiteDoCanto === null) return;
       const a = chaves[(k - 1 + n) % n]; const b = chaves[k]; const c = chaves[(k + 1) % n];
       const u = sub(b, a); const v = sub(c, b);
       const cosseno = dot(u, v) / (norma(u) * norma(v));
       if ((Math.acos(Math.max(-1, Math.min(1, cosseno))) * 180) / Math.PI > limiteDoCanto) partir.push(k);
     });
-    const r = alisarPontosDaCurva(chaves, { ...alisarCurvas.opcoes, fechada: d.fechada, duros: [...new Set(duros)], partir, onde: `alisarCurvas na curva ${citar(nome)}` });
+    const tolerancia = alisarCurvas.tolerancias.get(nome) ?? alisarCurvas.opcoes.tolerancia;
+    const r = alisarPontosDaCurva(chaves, { ...alisarCurvas.opcoes, tolerancia, ...(simetria ? { simetria } : {}), fechada: d.fechada, duros: [...new Set(duros)], partir, onde: `alisarCurvas na curva ${citar(nome)}` });
     const r4 = (x) => Math.round(x * 1e4) / 1e4;
     relatorioDoAlisamento.set(nome, {
-      pontos: n, duros: r.duros, partida: partir, limitados: r.limitados,
+      pontos: n, tolerancia, duros: r.duros, partida: partir, limitados: r.limitados, pontosChave: r.pontos,
       deslocamentosMm: r.deslocamentos.map(r4), maiorDeslocamentoMm: r4(r.maiorDeslocamento),
       variacaoAntes: r4(r.variacaoAntes), variacaoDepois: r4(r.variacaoDepois),
     });
@@ -1216,7 +1237,12 @@ export function gaiolaPorRede(definicaoDada) {
   if (medidas.length) passo.medidas = medidas;
   if (simetria) {
     const negativos = vertices.filter((p) => pontos[p][0] < -1e-9);
-    if (negativos.length) falha(`na simetria em x a rede é a metade x >= 0, e ${negativos.length === 1 ? 'o ponto' : 'os pontos'} ${lista(negativos.slice(0, 6))} ${negativos.length === 1 ? 'tem' : 'têm'} x < 0`);
+    if (negativos.length) {
+      /* com o alisamento, a recusa diz quanto cada curva dos pontos negativos andou: os pontos-chave ficam em x >= 0, e o que sai é a curva entre eles */
+      const daOpcao = alisarCurvas ? [...new Set(negativos.map((p) => fracaoDoVertice.get(p)?.curva).filter((c) => c && relatorioDoAlisamento.has(c)))] : [];
+      const nota = daOpcao.length ? `; alisarCurvas mexeu nos pontos-chave ${daOpcao.length === 1 ? 'da curva' : 'das curvas'} ${daOpcao.map((c) => `${citar(c)} (até ${relatorioDoAlisamento.get(c).maiorDeslocamentoMm} mm)`).join(', ')}, e a curva entre eles passou do plano: declare pontosDuros onde ela encosta no plano ou baixe a tolerância dela em toleranciaPorCurva` : '';
+      falha(`na simetria em x a rede é a metade x >= 0, e ${negativos.length === 1 ? 'o ponto' : 'os pontos'} ${lista(negativos.slice(0, 6))} ${negativos.length === 1 ? 'tem' : 'têm'} x < 0${nota}`);
+    }
     passo.simetria = simetria;
   }
 

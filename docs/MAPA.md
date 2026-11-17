@@ -964,8 +964,8 @@
 
 - `CLAUDE.md` — Núcleo: o que só vale nesta pasta
 - `adaptador.js` — adaptador.js — projeção visual do neutro; não conhece receitas nem execução.
-- `alisar-curvas.js` — alisar-curvas.js — os pontos-chave de uma curva declarada alisados pela curva de variação mínima linearizada
-- `alisar-curvas.test.mjs` — alisar-curvas.test.mjs — a curva de variação mínima linearizada: não mexe no arco, no círculo nem na parábola, tira o ruído, deixa os pontos duros onde estão…
+- `alisar-curvas.js` — alisar-curvas.js — os pontos-chave de uma curva declarada alisados pelo resíduo do ajuste polinomial local, sem mexer na forma
+- `alisar-curvas.test.mjs` — alisar-curvas.test.mjs — o alisamento pelo resíduo do ajuste polinomial local: não mexe no arco, no círculo nem na parábola, tira o ruído, deixa os pontos du…
 - `animacao.js` — animacao.js — animação rígida e skinning sobre lotes já adaptados.
 - `aparar.test.ts` — aparar.test.ts — `aparar`: o sólido cortado pelo lado de dentro de uma chapa subdividida, a `folga` da pele de dentro dela. Mede, numa calota de gaiola de ci…
 - `apoio-do-vinco.js` — apoio-do-vinco.js — o raio de uma aresta de caráter, em milímetro, convertido na distância das colunas de apoio.
