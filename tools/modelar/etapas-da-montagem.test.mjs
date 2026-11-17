@@ -1271,6 +1271,14 @@ describe('a leitura pela impressão do aceite', () => {
       expect(JSON.stringify(r)).toBe(antes);
       expect(() => { lerEtapas(r, medido).etapas[0].aceite.por = 'trocado'; }).not.toThrow();
       expect(JSON.stringify(r)).toBe(antes);
+      /* em cada estado, o aceite devolvido é cópia */
+      const limpo = await medir();
+      const tudo = aceitarTodas(limpo);
+      const congelado = JSON.stringify(tudo);
+      for (const lido of [limpo, await medir(pinoDaBaseEmY), await medir(vazia('bloco-com-pino'))]) {
+        for (const etapa of lerEtapas(tudo, lido).etapas) expect(() => { etapa.aceite.por = 'trocado'; }).not.toThrow();
+      }
+      expect(JSON.stringify(tudo)).toBe(congelado);
       expect(Object.isFrozen(r.eventos[0])).toBe(true);
       expect(Object.isFrozen(r.eventos[0].impressao.pose)).toBe(true);
     });

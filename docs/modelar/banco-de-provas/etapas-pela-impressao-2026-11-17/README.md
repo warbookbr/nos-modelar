@@ -34,6 +34,14 @@ A coluna "antiga hoje" é o que o código ainda em uso faz com o mesmo ataque, m
 
 A impressão da etapa traz os meios de citação (relação, vínculo, posição) como texto com o id, de modo que renomear uma relação quebra a etapa que a cita; é mais sensível do que o mínimo, e a fatia 3 mede quantas das 51 etapas isso quebra na migração. A etapa depois da primeira receita sem passos não tem geometria na leitura de agora (a montagem se resolve só até ela), então fica não conferível mesmo com a receita própria intacta. A porta de dentro de submontagem não entra na impressão e a leitura devolve um aviso por etapa; nenhum caso da fixture a exercita, e a fatia 3 confere se o braço, o avião e os outros têm alguma.
 
+## Limites declarados da impressão
+
+A porta de dentro de submontagem não entra na impressão (o resolvedor não a expõe no mundo), e na prática é inalcançável: o acervo não tem submontagem nem relação com caminho profundo, e `medirAgora` só publica portas de peça. A leitura mantém o aviso por etapa para o dia em que houver. A expectativa de interseção (`auditoriaIntersecoes`) e o apoio no chão ficam fora da impressão, como já ficavam fora do estado antes: o aceite da etapa não os cobre. A especificação da relação (a folga declarada e a tolerância) entra só pela medida da junta, e não pelo texto dela.
+
+## Revisão adversarial da fatia 1
+
+A revisão não bloqueou e pediu quatro correções, feitas com teste: o aceite acrescentado à mão sem reabertura entre dois aceites, a reabertura antes do aceite e o aceite com junta que não passa recusam (`registro-invalido`), assim como impressão com campo null, de outro tipo ou sobrando e registro de outra montagem; os eventos são cópias congeladas e a leitura devolve o aceite copiado; a poeira abaixo de 1e-12 vale zero antes de comparar; e número não finito recusa a impressão. As 16 mutações que sobreviviam ganharam `expect` (comparação das impressões, interface no mundo e rotação da pose, validação, órfãos, avisos, corte do resumo, ordem das citadas, campos do aceite).
+
 ## O que fica para as fatias 2 e 3
 
 A fatia 2 troca o caminho de `fixar` e `reabrir` (e os consumidores do estado gravado) para acrescentar eventos e ler por `lerEtapas`, tira `conferirPosteriores`, `abalarPelasPortas`, `portasDeReferencia`, `juntasDasPosteriores` e a leitura do registro v1, e decide se `fixar` mantém a recusa por posterior quebrada (a leitura nova deixa aceitar a base com a meio quebrada, que então pede reabertura). A fatia 3 escreve o comando de migração dos cinco registros do acervo, com a reconstrução por commit e a impressão `origem: migração`, e o relatório por etapa. A guarda do acervo só passa a cobrar impressão depois dessa migração.
