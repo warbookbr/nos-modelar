@@ -1,6 +1,6 @@
 # Comparar com a referência: a linha de base dos comandos repetidos e onde a prancha é montada
 
-Pasta do plano [comparar com a referência sem script](../../planos/2026-11-16-comparar-com-a-referencia.md), fatia 1, medida em 2026-11-16. A fatia tem duas perguntas: se a contagem do "Problema observado" do plano se refaz por um comando sobre os registros da sessão, e se a prancha modelo e foto deve ser montada no navegador da bancada ou em Node com a foto convertida antes.
+Pasta do plano [comparar com a referência sem script](../../decisoes/PLANOS-ENCERRADOS.md), fatia 1, medida em 2026-11-16. A fatia tem duas perguntas: se a contagem do "Problema observado" do plano se refaz por um comando sobre os registros da sessão, e se a prancha modelo e foto deve ser montada no navegador da bancada ou em Node com a foto convertida antes.
 
 ## A contagem por comando
 
