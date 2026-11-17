@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2049 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2051 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2723,6 +2723,14 @@
 
 - `receita.js` — peca-de-prova/receita.js — a peça que as guardas de navegador usam.
 - `receita.test.mjs` — receita.test.mjs — a peça de prova cumpre o que as guardas exigem dela.
+
+## tools/fixtures/comparar-com-prancha/
+
+- `receita.js` — Peça de ensaio: o plano cita uma prancha desenhada em mm (referencias/lateral.prancha.svg, com o relatório ao lado) e um texto (referencias/alvo.md). A pranc…
+
+## tools/fixtures/comparar-com-prancha/referencias/
+
+- `alvo.md` — Texto de ensaio que o plano cita e o pacote do crítico não lê.
 
 ## tools/fixtures/composicao-parametrica/
 
