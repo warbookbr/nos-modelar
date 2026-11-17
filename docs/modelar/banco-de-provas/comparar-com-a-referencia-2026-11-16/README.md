@@ -164,6 +164,37 @@ A pessoa apontou que a prova desta fatia usou um contorno que não devia valer: 
 
 Por decisão da pessoa, o `PLANO` do ombro passa a citar o `ALINHAMENTO.md` do braço, que registra o que ela aceitou, e o arquivo de coordenadas fica. O pacote agora lê o registro de etapas gravado ao lado da montagem (`<montagem>.etapas.json`, que só `etapas-da-montagem.mjs --fixar` escreve, com o aceite da pessoa): quando toda instância da peça está fixa, nenhum contorno é desenhado nem citado como medida de um lado, e o pedido diz quais ficaram de fora, a etapa, o aceite e o comando que reabre a etapa. Etapa aberta ou quebrada continua recebendo o contorno. A peça sozinha, fora de montagem, não grava aprovação em lugar nenhum e continua recebendo o contorno; o processo passa a pegar o resto de referência só nas peças de montagem. Os testes estão em [`vistas-para-critica.test.mjs`](../../../../tools/modelar/vistas-para-critica.test.mjs), incluindo um que lê o registro real e confirma que o ombro está fixo. A prova da fatia passa a ser o selim da bicicleta, que tem referência em uso.
 
+### A prova do item 6 no selim da bicicleta, 2026-11-17
+
+O contorno do selim é o `tmp/bicicleta/lateral.contornos.json`, tirado pelo `npm run contorno` da foto lateral `tmp/bicicleta/lateral.png` (a `lateral.jpg` convertida, com os mesmos 2000 x 1116 px), com a região `selim` e a declaração `imagem.foraDoRepositorio` ("foto de terceiro da bicicleta, fica em tmp", `encerrada: false`). A foto e o contorno ficam fora do git. A série de regiões do contorno teve três rodadas do crítico do roteiro do contorno e está à espera do aceite da pessoa: o pacote abaixo usa o contorno antes desse aceite, e a medida do item 6 vale como prova do pacote, não como aceite da série. Se a pessoa mudar a série, os dois pacotes se refazem pelos mesmos comandos.
+
+O pacote só lia contorno citado no plano, ao lado de imagem citada ou na pasta da peça, e o da foto de terceiro não está em nenhum dos três. Entrou `--contorno=<caminho>[@<lado>]` em `vistas:critica`, que o desenha sobre o modelo e o cita como medida do lado, como `--referencia` traz a foto: sem `@`, o lado sai do nome do arquivo; o contorno sem a origem da imagem dita (`imagem.caminho` ou `imagem.foraDoRepositorio`, conferida pela mesma `motivoDaOrigem` da guarda do acervo) e o de referência encerrada são recusados antes da captura, com o motivo. Entrou também `--regioes-do-contorno=<nome>[,...]`, que vale para o `--contorno` anterior e desenha só as regiões dadas, sem a silhueta: na bicicleta, sem ela, a silhueta inteira e as quinze regiões com nome de parte iriam juntas para a mesma vista. Quando a `--referencia` tem o mesmo nome do contorno, o pedido diz de que imagem ele foi tirado. Os testes estão em [`vistas-para-critica.test.mjs`](../../../../tools/modelar/vistas-para-critica.test.mjs).
+
+Os dois pacotes saem sobre as mesmas fotos e as mesmas orientações da fatia 6, um com o contorno e outro sem:
+
+```
+node tools/modelar/vistas-para-critica.mjs bicicleta-urbana --saida=tools/bancadas/out/critica-bicicleta-selim-com-contorno \
+  --referencia=<raiz>/tmp/bicicleta/lateral.png@esquerda \
+  --orientacao-da-referencia='foto do lado da corrente, como a vista esquerda do modelo, com a frente da bicicleta à direita da imagem, sem giro nem espelho' \
+  --referencia=<raiz>/tmp/bicicleta/frontal.webp@frontal \
+  --orientacao-da-referencia='foto de frente, como a vista frontal do modelo, sem giro nem espelho' \
+  --contorno=<raiz>/tmp/bicicleta/lateral.contornos.json --regioes-do-contorno=selim
+```
+
+O sem contorno é o mesmo comando com `--saida=tools/bancadas/out/critica-bicicleta-selim-sem-contorno` e sem as duas últimas opções. O pacote com o contorno levou 10 min 30 s e o sem, 8 min 13 s, os dois com a medição da receita aprovada. Os dois `pedido.md` citam as mesmas 49 imagens, e o com o contorno cita também `contorno-sobreposto.png`; as 41 capturas comuns, gravadas na mesma pasta da bancada, deram o mesmo sha256 depois de cada pacote, e as 8 de superfície, uma cópia em cada pasta, são iguais pixel a pixel. Os pedidos diferem só na seção "Contorno medido sobre o modelo" e nas duas linhas das vistas laterais, que no pacote com o contorno dizem que a medida daquele lado vem de `lateral.contornos.json`, tirado de `lateral.png`.
+
+O contorno cai na vista esquerda do modelo, que olha o lado da corrente com a frente à direita, como a foto. Na imagem, em mm a partir do canto de baixo à esquerda da extensão do modelo (1.670,6 x 1.065,9 mm), medido pelos pixels da imagem gravada, a 0,51 px por mm:
+
+| medida | selim do modelo | contorno `selim` |
+| --- | --- | --- |
+| começo e fim na horizontal | 435 a 691 mm | 427,4 a 681,0 mm |
+| topo | 966 mm | 951 mm |
+| extensão | 256 mm de comprimento | 253,6 x 89,5 mm, com o trilho e a braçadeira |
+
+A linha do contorno corre sobre o corpo do selim, uns 15 mm abaixo do topo do modelo e 8 a 10 mm mais para trás, e desce pelo trilho até a braçadeira; os 43,9 mm do encontro com o canote saem tracejados. A diferença de altura tem uma causa provável na escala: o contorno põe a foto em mm pelos dois eixos das rodas, 1.000 mm de entre-eixos em 988,7 px (1,0114 mm por px), e a prancha da fatia 3 a pôs pelo pneu, 670 mm em 649 px (1,0324 mm por px). As duas medidas da foto não cabem juntas no modelo, que tem os dois valores, e a diferença de 2 % dá uns 19 mm na altura do selim. Quem decide qual régua vale é a pessoa, no aceite da série.
+
+A medida do item 6, dois `critico-visual` em cada pacote com o `pedido.md` de hoje, sem a história, fica com quem conduz. Os dois pacotes apontam para as capturas da bancada em `tools/bancadas/out`, que o próximo pacote da bicicleta apaga e refaz; os críticos rodam antes de outro pacote dela.
+
 ## Fatia 6: o pedido por perguntas fechadas, em duas ordens
 
 `vistas:critica` grava, ao lado do `pedido.md` de hoje e sobre as mesmas imagens, `pedido-fechado-a.md`, `pedido-fechado-b.md` e `perguntas-fechadas.json`, em [`vistas-para-critica.mjs`](../../../../tools/modelar/vistas-para-critica.mjs). As perguntas saem do que a receita já declara: uma por vista do modelo que tem referência do mesmo lado, uma pela composta do alvo quando a receita refina um esboço, uma por parte do `PLANO` com a forma prometida inteira, e uma por critério de reprovação. A resposta é `sim`, `não` ou `não dá para ver`, e cada `sim` e `não` cita a imagem e diz o que ela mostra. As duas polaridades se misturam de propósito: na pergunta de forma o defeito é o `não`, e na de critério é o `sim`, porque a pergunta de sim ou não convida a confirmar o que se leu, que é a razão de `perguntas-do-critico.js` recusar essa forma nas perguntas abertas da família.
@@ -260,8 +291,8 @@ As duas pranchas do item 1 foram refeitas em 2026-11-17 pelos comandos das fatia
 | 3. `--sobrescrever` refaz a pasta da bancada e recusa a outra, dizendo o caminho | passou | `npx vitest run tools/modelar/olhar-bancada.test.mjs -t sobrescrever`, 4 de 4 |
 | 4. um pedal sai isolado e enquadrado sozinho | passou | `--copia=x-`, 13,7 a 15,7 px/mm contra 2,0 a 2,1 com os dois |
 | 5. uma rodada de modelador com referência usa no máximo um quarto dos 42 em 83 | em aberto | a conta pela numeração da linha de base dá 7 em 83, mas nenhuma rodada de modelador com os comandos foi medida |
-| 6. o crítico recebe o contorno sobreposto e a revisão registra a oscilação | em aberto | medido no ombro (6 e 5 com e sem o contorno, 7 e 6 com o tracejado), mas o contorno do ombro era resto de uma referência encerrada, e a prova passou ao selim, que não tem contorno medido |
+| 6. o crítico recebe o contorno sobreposto e a revisão registra a oscilação | em aberto | medido no ombro (6 e 5 com e sem o contorno, 7 e 6 com o tracejado), mas o contorno do ombro era resto de uma referência encerrada; os dois pacotes do selim, com e sem o contorno medido, estão prontos, e faltam os críticos |
 | 7. a ajuda de cada comando e a nota nas skills | passou, menos a nota na `laco-de-modelagem` | esta seção |
 | 8. a nota fechada varia menos e a pergunta que muda sai como não verificável | passou | amplitude 0,6 e desvio 0,22 contra 1 e 0,49, em quatro pares |
 
-O item 5 pede uma rodada de modelador de verdade, com referência e com os comandos à mão, medida por `npm run medir:transcricao -- --atritos <sessão.jsonl>` e por `contar-comandos.mjs <sessão.jsonl> --tipo=modelador --listar-alvo` na janela dela; o agente desta fatia não despacha outro agente, e ela fica com quem conduz. O item 6 pede o contorno do selim tirado da foto lateral pela skill `contorno-da-imagem`, com a foto fora do repositório (`--fora-do-repositorio`), e depois dois críticos em cada pacote do selim, com e sem o contorno.
+O item 5 pede uma rodada de modelador de verdade, com referência e com os comandos à mão, medida por `npm run medir:transcricao -- --atritos <sessão.jsonl>` e por `contar-comandos.mjs <sessão.jsonl> --tipo=modelador --listar-alvo` na janela dela; o agente desta fatia não despacha outro agente, e ela fica com quem conduz. O item 6 pede dois críticos em cada pacote do selim, com e sem o contorno, que estão prontos desde [a prova no selim](#a-prova-do-item-6-no-selim-da-bicicleta-2026-11-17).
