@@ -520,14 +520,28 @@ describe('a prancha desenhada: leitura estrita, cobertura, réguas e uma captura
   it('recusa viewBox de origem não nula, width diferente do viewBox e contorno em grupo com transformação, mesmo sem girar', () => {
     expect(() => lerPranchaDesenhada(FIXTURE, lerCom((t) => t.replace('viewBox="0 0 300 220"', 'viewBox="-100 0 300 220"')))).toThrow(/origem -100 0/);
     expect(() => lerPranchaDesenhada(FIXTURE, lerCom((t) => t.replace('width="300"', 'width="150"')))).toThrow(/width="150" difere do viewBox \(300\)/);
-    expect(() => lerPranchaDesenhada(FIXTURE, lerCom((t) => t.replace('<path class="contorno"', '<g transform="translate(10 0)"><path class="contorno"').replace('</svg>', '</g></svg>')))).toThrow(/há 'transform' no desenho/);
+    expect(() => lerPranchaDesenhada(FIXTURE, lerCom((t) => t.replace('<path class="contorno"', '<g transform="translate(10 0)"><path class="contorno"').replace('</svg>', '</g></svg>')))).toThrow(/há 'transform' em/);
   });
 
   it('recusa transform em qualquer elemento, inclusive no próprio traço e no style, e width ou height com unidade', () => {
-    expect(() => lerPranchaDesenhada(FIXTURE, lerCom((t) => t.replace('<path class="contorno"', '<path transform="translate(9 0)" class="contorno"')))).toThrow(/há 'transform' no desenho/);
-    expect(() => lerPranchaDesenhada(FIXTURE, lerCom((t) => t.replace('<path class="contorno"', '<path style="transform: scale(2)" class="contorno"')))).toThrow(/há 'transform' no desenho/);
+    expect(() => lerPranchaDesenhada(FIXTURE, lerCom((t) => t.replace('<path class="contorno"', '<path transform="translate(9 0)" class="contorno"')))).toThrow(/há 'transform' em/);
+    expect(() => lerPranchaDesenhada(FIXTURE, lerCom((t) => t.replace('<path class="contorno"', '<path style="transform: scale(2)" class="contorno"')))).toThrow(/há 'transform' em/);
     expect(() => lerPranchaDesenhada(FIXTURE, lerCom((t) => t.replace('width="300"', 'width="300px"')))).toThrow(/não é só um número em px/);
     expect(() => lerPranchaDesenhada(FIXTURE, lerCom((t) => t.replace('height="220"', 'height="100%"')))).toThrow(/não é só um número em px/);
+  });
+
+  it('o transform num rótulo de cota (texto que a rasterização tira) não recusa, e o grupo que o contém e a classe escondida também não', () => {
+    expect(() => lerPranchaDesenhada(FIXTURE, lerCom((t) => t.replace('</svg>', '<text class="cotat" transform="rotate(-90 5 5)">1</text><path class="cota" transform="scale(2)" d="M 0 0"/></svg>')))).not.toThrow();
+    expect(() => lerPranchaDesenhada(FIXTURE, lerCom((t) => t.replace('</svg>', '<g class="traco" transform="scale(2)"><circle r="2"/></g></svg>')))).toThrow(/há 'transform'/);
+  });
+
+  it('as pranchas reais do carro, com o relatório ao lado, se leem sem recusa', () => {
+    const pasta = join(REPO, 'procedural/pecas/carro-fastback/referencias');
+    for (const [lado, girar] of [['lateral', 0], ['traseira', 0], ['frontal', 0], ['superior', 90]]) {
+      const r = lerPranchaDesenhada(join(pasta, `${lado}.prancha.svg`), { girar });
+      expect(r.pxPorMm, lado).toBeGreaterThan(0.1);
+      expect(r.svg).toContain('display: none');
+    }
   });
 
   it('o relatório que não é JSON é recusa com o nome do arquivo', () => {

@@ -1101,7 +1101,14 @@ export function lerPranchaDesenhada(caminhoSvg, { ler = (c) => readFileSync(c, '
     if (dado !== undefined && !/^\d+(\.\d+)?$/.test(dado.trim())) recusar(`${nome}: ${atributo}="${dado}" não é só um número em px (unidade como px, mm ou %, não vale); a escala em mm se mede com o tamanho em px igual ao do viewBox.`);
     if (dado !== undefined && Number(dado) !== esperado) recusar(`${nome}: ${atributo}="${dado}" difere do viewBox (${esperado}); a escala em mm se mede com o tamanho em px igual ao do viewBox.`);
   }
-  if (/\btransform\s*[=:]/i.test(texto)) recusar(`${nome}: há 'transform' no desenho (atributo ou style, em grupo ou no próprio traço), e a caixa do contorno lida em px não vale com ele; desenhe sem transformação.`);
+  /* `transform` recusa onde a caixa do contorno em px deixaria de valer: no traço, nos elementos que a rasterização mantém e nos grupos que os contêm. Os que a rasterização tira antes (texto e as classes de COTAS_ESCONDIDAS, como o rótulo de cota girado) não contam. */
+  const escondidas = new Set(COTAS_ESCONDIDAS.split(',').map((c) => c.trim()).filter((c) => c.startsWith('.')).map((c) => c.slice(1)));
+  for (const [tag, nomeDaTag, atributos] of texto.matchAll(/<([a-zA-Z][\w-]*)\b([^>]*)>/g)) {
+    if (/^(text|tspan|style|title|desc)$/i.test(nomeDaTag)) continue;
+    const classes = (/\bclass="([^"]*)"/.exec(atributos)?.[1] ?? '').split(/\s+/);
+    if (classes.some((c) => escondidas.has(c))) continue;
+    if (/\btransform\s*[=:]/i.test(atributos)) recusar(`${nome}: há 'transform' em ${tag.slice(0, 60)}… (atributo ou style), que a rasterização mantém, e a caixa do contorno lida em px não vale com ele; desenhe sem transformação.`);
+  }
   if (girar === 90) [x0, y0, x1, y1] = [H - y1, x0, H - y0, x1];
   else if (girar === 180) [x0, y0, x1, y1] = [W - x1, H - y1, W - x0, H - y0];
   else if (girar === 270) [x0, y0, x1, y1] = [y0, W - x1, y1, W - x0];
