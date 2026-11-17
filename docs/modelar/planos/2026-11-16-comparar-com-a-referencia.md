@@ -2,9 +2,9 @@
 
 **Estado:** ativo
 
-**Território:** `tools/modelar/olhar-bancada.mjs`, `tools/modelar/vistas-para-critica.mjs`, `tools/modelar/vistas-para-critica.test.mjs`, `tools/modelar/prancha-de-referencia.mjs`, `tools/modelar/prancha-de-referencia.test.mjs`, `tools/bancadas/`, `.claude/skills/criar-peca/`, `.claude/agents/modelador.md`, `docs/modelar/banco-de-provas/comparar-com-a-referencia-2026-11-16/`
+**Território:** `tools/modelar/olhar-bancada.mjs`, `tools/modelar/vistas-para-critica.mjs`, `tools/modelar/vistas-para-critica.test.mjs`, `tools/modelar/prancha-de-referencia.mjs`, `tools/modelar/prancha-de-referencia.test.mjs`, `tools/bancadas/`, `.claude/skills/criar-peca/`, `.claude/agents/modelador.md`, `docs/modelar/banco-de-provas/comparar-com-a-referencia-2026-11-16/`, `tools/modelar/descrever-recusas.test.mjs`; e, por empréstimo do plano do cache por passo que a pessoa decidiu em 2026-11-17, tools/modelar/descrever-peca.mjs só para a opção recusas (o caminho fica sem crase para não sobrepor os territórios)
 
-Ativado em 2026-11-16 no fechamento do reflexo na bancada, como a pessoa decidiu. Duas partes esperam outro plano: `--recusas` em `descrever` mexe em `tools/modelar/descrever-peca.mjs`, que é do cache por passo enquanto ele estiver ativo, e a nota na skill `laco-de-modelagem` é do plano da leitura por partes; as duas entram quando o dono fechar, ou com a pessoa decidindo emprestar o arquivo.
+Ativado em 2026-11-16 no fechamento do reflexo na bancada, como a pessoa decidiu. Duas partes esperavam outro plano: `--recusas` em `descrever` mexe em `tools/modelar/descrever-peca.mjs`, que é do cache por passo enquanto ele estiver ativo, e entrou em 2026-11-17 pelo empréstimo do arquivo que a pessoa decidiu, só para essa mudança; a nota na skill `laco-de-modelagem` é do plano da leitura por partes; as duas entram quando o dono fechar, ou com a pessoa decidindo emprestar o arquivo.
 
 **Responsável:** a IA da sessão implementa; Tiago aprova por imagem.
 
@@ -85,7 +85,7 @@ Envio por git: USAR DIRETO. A rotina de envio é sensível e depende da sessão;
 ## Fatias
 
 1. Linha de base: a contagem desta análise reproduzida por um comando sobre os registros, e a decisão de onde a prancha é montada (no navegador da bancada, que já lê jpg e webp, ou em Node com a foto convertida antes). Feita em 2026-11-16, na [pasta do plano](../banco-de-provas/comparar-com-a-referencia-2026-11-16/README.md): o `contar-comandos.mjs` refaz todos os números do Problema observado, menos o das sete rodadas, que dá 42 em 83 e não os 41 contados à mão. A prancha é montada no navegador: o Chromium já é dependência da bancada, lê jpg e webp sem passo prévio e montou a prancha das fotos da bicicleta em 166 a 250 ms, contra 348 a 457 ms em Node com a conversão pelo `ffmpeg`, que é do sistema; o projeto não declara decodificador de jpg nem de webp para Node, e o `sharp` da raiz é dependência transitiva que a cópia de `npm ci` não traz.
-2. `descrever --recusas` e `olhar-bancada --sobrescrever`, que são pequenas e tiram metade dos comandos repetidos.
+2. `descrever --recusas` e `olhar-bancada --sobrescrever`, que são pequenas e tiram metade dos comandos repetidos. Feita em 2026-11-17, na [pasta do plano](../banco-de-provas/comparar-com-a-referencia-2026-11-16/README.md): `--sobrescrever` tira 14 dos 42 comandos do alvo nas sete rodadas e `--recusas` mais 7, e com a prancha da fatia 3 sobram 10 em 83; `--recusas` dá a mesma lista do núcleo em três peças, uma com recusa de propósito. O filtro das recusas de material não entrou.
 3. A prancha, com régua, região, vistas e isolamento, provada no selim e no pedal.
 4. A cópia de parte repetida, pelo zoom em mm ou pela escolha de instância.
 5. O pacote do crítico com o contorno sobreposto.
