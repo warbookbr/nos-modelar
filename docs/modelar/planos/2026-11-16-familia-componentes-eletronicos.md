@@ -1,6 +1,6 @@
 # Família de componentes eletrônicos: as peças por encapsulamento e a placa declarada, provadas no braço robótico
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `procedural/familias/componente-eletronico/`, `procedural/familias/index.js`, `procedural/pecas/braco-robotico/partes/base/`, `docs/modelar/banco-de-provas/componentes-eletronicos-2026-11-16/`
 
@@ -61,9 +61,9 @@ Leitor de Gerber: fora, no nos-mecatronica.
 
 1. Feita em 2026-11-16, aprovada pela pessoa: a família com cinco encapsulamentos de forma diferente (resistor axial, eletrolítico, TO-220, DIP, conector em barra), com teste e a prancha para a pessoa.
 2. Feita em 2026-11-17, aprovada pela pessoa: os encapsulamentos restantes e o dissipador (treze perfis novos, medidas de fonte primária).
-3. Feita em 2026-11-17: a placa declarada (`placa.js`, `terminais.js`), com a placa de prova de 16 componentes, furos e ilhas, componentes nas duas faces e as peças publicadas com os nomes de campo da ficha 1.0 da ponte; a imagem espera a aprovação da pessoa.
-4. A placa de controle do braço robótico na caixa lateral da base, com imagem para a pessoa.
-5. Documentação, banco de provas e fechamento.
+3. Feita e aprovada pela pessoa em 2026-11-17 ("sobe a placa"): a placa declarada (`placa.js`, `terminais.js`), com a placa de prova de 16 componentes, furos e ilhas, componentes nas duas faces e as peças publicadas com os nomes de campo da ficha 1.0 da ponte.
+4. Feita e aprovada pela pessoa em 2026-11-17 ("Esta boa sim, aprovada!"): a placa de controle do braço robótico na caixa lateral da base, com a tampa fumê, a borda chanfrada e os parafusos de aço escuro.
+5. Feita em 2026-11-17: a nota de uso, a prova de cada item do gate de saída no banco de provas e o fechamento.
 
 ## Riscos e parada
 
@@ -71,4 +71,8 @@ Se a família precisar de capacidade nova no núcleo (por exemplo, terminal dobr
 
 ## Fechamento
 
-A preencher.
+Fechado em 2026-11-17, com os seis itens do gate de saída conferidos (a prova de cada um está no [README do banco de provas](../../../docs/modelar/banco-de-provas/componentes-eletronicos-2026-11-16/README.md)).
+
+Entregou a família `componente-eletronico` com treze encapsulamentos (resistor axial, eletrolítico, cerâmico de disco, LED de 3 e 5 mm, TO-220, TO-92, DIP, SOIC, barra de pinos, borne, jack, módulo de placa e dissipador do TO-220), a placa declarada (`placa.js`, `terminais.js`) com os componentes nas duas faces, furos, ilhas e uma parte por componente, e a placa de controle do braço robótico na caixa lateral da base, com a tampa fumê. Os testes da família passam (125 testes em 4 arquivos), a guarda do acervo passa nas treze partes do braço, e o retrato de 121 peças mostra 120 iguais e a base do braço como a única mudada, de propósito. As fatias 1 e 2 (pranchas) e as fatias 3 e 4 (placa de prova e placa de controle) foram aprovadas pela pessoa por imagem.
+
+Ficam fora, sem decisão da pessoa pendente: as três limitações da reabertura de etapas, que fecham no plano [etapas pela impressão do aceite](2026-11-17-etapas-pela-impressao-do-aceite.md); a guarda do acervo só aceita o nome de peça (`braco-robotico/base`) e não o da pasta do objeto, o que o item 4 do gate escreveu errado; e a base de comparação do retrato, que num ramo com ramos irmãos juntados precisa ser montada à mão. As trilhas e a validação da placa seguem no plano [trilhas e validação da placa](2026-11-17-trilhas-e-validacao-da-placa.md).
