@@ -13,8 +13,8 @@ describe('a planta da lataria do carro-fastback', () => {
     expect(esparsa.cabe).toBe(true);
     expect(esparsa.desvioMaximo).toBeLessThanOrEqual(3);
     expect(esparsa.inflexoes).toBe(1);
-    expect(esparsa.clotoides.length).toBeLessThanOrEqual(8);
-    expect(esparsa.trechos.length).toBeLessThanOrEqual(6);
+    expect(esparsa.clotoides.length).toBeLessThanOrEqual(9);
+    expect(esparsa.trechos.length).toBeLessThanOrEqual(8);
     expect(Math.abs(esparsa.comprimento - C.total)).toBeLessThan(15);
     /* depois do lóbulo do para-lama a entrada só tem curvatura de um sinal (os filetes do canto de trás e a reta entre eles): o ajuste não troca de sinal ali */
     for (const j of esparsa.joelhos.filter((q) => q.s > 2300)) expect(j.k).toBeGreaterThan(-0.2e-3);

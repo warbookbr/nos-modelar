@@ -6,15 +6,16 @@
  * quando: a curva-guia de uma chapa (planta, nível, queda) vem de pontos lidos, e a curva de Catmull-Rom por eles faz de cada ponto uma lombada de curvatura que
  *   a zebra mostra como onda; aqui sai uma curva de curvatura mínima em trechos, e os pontos que a rede consome saem dela.
  * unidades: as dos pontos (mm, como a TABELA); a tolerância e o passo, na mesma unidade. A curva é plana: `eixos` diz quais duas coordenadas dos pontos de 3
- *   componentes entram (padrão [0, 1]); a terceira tem de variar menos que a tolerância, e a média dela volta nos pontos da rede.
+ *   componentes entram (padrão [0, 1]); a terceira vira constante (o meio da faixa dela), e a metade da faixa entra em quadratura no desvio: o plano fica com sqrt(tolerância² - metade²), e metade que já gasta a tolerância é recusada.
  * campos:
  *   pontos: [[u, v] | [x, y, z], ...] em ordem ao longo da curva, todos do mesmo tamanho, de 3 pontos em diante (a curva é aberta; a fechada se ajusta em dois arcos).
  *   tolerancia: o maior desvio aceito de qualquer ponto à curva (1 por padrão), número maior que zero.
  *   maximoDeClotoides: o teto de clotoides (8 por padrão); passado ele a curva sai com `cabe: false` e o desvio que ficou.
  *   duros: lista de índices de pontos por onde a curva passa de perto (um nó da rede): pesam 20 vezes mais no ajuste, e o desvio deles é medido como os outros.
  *   eixos: [i, j] as duas coordenadas lidas dos pontos de 3 componentes.
- * devolve: { cabe, tolerancia, desvioMaximo, desvios, trechos, clotoides, inflexoes, comprimento, joelhos, inicio, rumo, ponto(s), amostrar(passo), pontosDaRede(passo, opcoes) }
- *   desvioMaximo: o maior desvio de um ponto à curva; desvioDaCurva: o maior desvio da curva à poligonal dos pontos (o outro sentido, que tira da conta a densidade da entrada).
+ * devolve: { cabe, motivo, tolerancia, desvioMaximo, desvios, trechos, clotoides, inflexoes, comprimento, joelhos, inicio, rumo, ponto(s), amostrar(passo), pontosDaRede(passo, opcoes) }
+ *   motivo: null quando cabe; senão o texto de cada condição que falhou (desvio, desvio da curva à poligonal, ordem dos pontos, comprimento), com os valores.
+ *   desvioMaximo: o maior desvio de um ponto à curva (3D, quando os pontos têm 3 componentes); desvioDaCurva: o maior desvio da curva à poligonal dos pontos (o outro sentido, que tira da conta a densidade da entrada).
  *   cabe: os dois desvios, medidos na curva integrada a passo fino, estão dentro da tolerância, os pontos se projetam na curva em ordem e o comprimento dela não passa
  *     do da poligonal dos pontos além da tolerância; senão `cabe: false`, e o resto do resultado descreve o que ficou.
  *   joelhos: [{ s, k }] o comprimento de arco e a curvatura (1/unidade, positiva para a esquerda) de cada vértice da curvatura; entre dois a curvatura é linear.
@@ -23,7 +24,7 @@
  *   inflexoes: quantas vezes a curvatura troca de sinal entre faixas que movem a curva mais que a tolerância (a sagita da faixa, medida na curva integrada, é a
  *     distância máxima dela à corda; a faixa abaixo da tolerância é a reta que a tolerância não distingue).
  *   pontosDaRede(passo, { nome, completar }): { nome, pontos } no formato de `curvas` de `gaiolaPorRede`: pontos-chave sobre a curva ajustada a cada `passo` de arco,
- *     com a ponta exata; `completar(u, v)` devolve [x, y, z] (sem ele, a terceira coordenada é a média dos pontos de entrada).
+ *     com a ponta exata; `completar(u, v)` devolve [x, y, z] (sem ele, a terceira coordenada é a constante do ajuste).
  * exemplo:
  *   const aj = ajustarCurvaLisa(pontosDaPrancha, { tolerancia: 3 }); // aj.clotoides.length, aj.inflexoes, aj.desvioMaximo
  *   gaiolaPorRede({ ..., curvas: [aj.pontosDaRede(60, { nome: 'planta' }), ...] })
@@ -37,11 +38,11 @@
  * liberdade (um par de curvaturas e um comprimento por trecho) sem restrição sobre eles.
  *
  * COMO AJUSTA. A curva é { início, rumo, comprimento L, joelhos (fração do arco, curvatura) }; a posição sai de integrar a curvatura (Simpson na curvatura e ponto
- * médio no rumo), com o passo escolhido pelo comprimento, pela curvatura e pela tolerância (a flecha da corda abaixo de 1/20 dela) e os joelhos como quebra do
+ * médio no rumo), com o passo escolhido pelo comprimento, pela curvatura e pela tolerância (a flecha da corda abaixo de 1/40 dela) e os joelhos como quebra do
  * passo. O resíduo de cada ponto é a distância com sinal à curva (ao ponto mais perto da curva amostrada), mais as duas pontas e uma penalidade pequena sobre a
- * variação de curvatura de cada trecho (Δk² / comprimento, que prefere a rampa ao lóbulo que o ajuste inventaria para ganhar uma fração da tolerância); o ajuste
+ * variação de curvatura (0,1 × tolerância × Δk × L, adimensional em Δk × L, de modo que a mesma forma em outra escala dá o mesmo ajuste, e pequena perto dos desvios: só prefere a rampa ao salto quando o desvio empata); o ajuste
  * é de Levenberg-Marquardt, com jacobiano por diferença finita, sobre o início, o rumo, L, as curvaturas e as frações dos joelhos, e para por convergência. Com mais de
- * 400 pontos o ajuste usa 400 deles (espaçados, com as pontas e os duros), e o desvio de todos é medido depois. Parte de uma clotoide só, com o rumo lido da corda dos
+ * 400 pontos o ajuste usa 400 deles (espaçados, com as pontas e os duros, e os piores de cada ajuste anterior), e o desvio de todos é medido depois. Parte de uma clotoide só, com o rumo lido da corda dos
  * pontos numa janela de 3% do arco (um ruído do tamanho do espaçamento não o desvia); enquanto o desvio máximo passa da tolerância, entra um joelho no ponto de maior
  * desvio e o ajuste refaz de onde estava; no fim tenta tirar cada joelho e guarda a retirada que ainda cabe, e de todos os ajustes que cabem fica o de menos clotoides
  * (e, a igual, o de menor custo): sai o menor número de trechos que o ajuste achou, e não o menor possível. O resultado é determinístico (nenhum sorteio, nenhum relógio). */
@@ -50,7 +51,9 @@ const MINIMO_DA_FRACAO = 0.01;
 const PESO_DA_PONTA = 10;
 const PESO_DO_DURO = 20;
 const MAXIMO_NO_AJUSTE = 400;
-const REGULARIZACAO = 100;
+const REGULARIZACAO = 0.1;
+/* a faixa de curvatura de um sinal só conta como lóbulo se a sagita dela, na curva integrada, passa de 80% da tolerância: abaixo disso o ajuste não distingue o lóbulo da reta */
+const LIMIAR_DO_LOBULO = 0.8;
 
 const erro = (texto) => { throw new Error(`ajustarCurvaLisa: ${texto}`); };
 const citar = (v) => { try { return typeof v === 'number' ? String(v) : JSON.stringify(v) ?? String(v); } catch { return String(v); } };
@@ -65,10 +68,10 @@ function curvaturaEm(f, fr, k) {
   return k[i - 1] + ((k[i] - k[i - 1]) * (f - fr[i - 1])) / (fr[i] - fr[i - 1]);
 }
 
-/** o passo de integração: o limite do comprimento, a flecha da corda abaixo de 1/20 (1/100 no fino) da tolerância e o giro de 0,1 radiano por passo */
+/** o passo de integração: o comprimento dividido por 60 (por 400 no fino), a flecha da corda abaixo de 1/40 (1/200 no fino) da tolerância e o giro de 0,1 radiano por passo: tudo cresce e encolhe com a escala */
 function passoDe(L, kmax, tolerancia, fino) {
   const k = kmax + 1e-300;
-  return Math.min(L / (fino ? 400 : 60), fino ? 0.25 * Math.max(1, L / 1000) : 2 * Math.max(1, L / 1000), Math.sqrt((8 * tolerancia) / ((fino ? 100 : 20) * k)), 0.1 / k);
+  return Math.min(L / (fino ? 400 : 60), Math.sqrt((8 * tolerancia) / ((fino ? 200 : 40) * k)), 0.1 / k);
 }
 
 /** o número de passos de cada trecho de curvatura linear, pelo passo de `passoDe` */
@@ -197,6 +200,7 @@ function lerEntrada(entrada, { tolerancia, maximoDeClotoides, duros, eixos }) {
   if (!Array.isArray(entrada) || entrada.length < 3) erro(`pontos espera uma lista de 3 pontos ou mais, e veio ${Array.isArray(entrada) ? `${entrada.length} ponto(s)` : typeof entrada}`);
   const tamanho = Array.isArray(entrada[0]) ? entrada[0].length : null;
   entrada.forEach((q, k) => {
+    if (Array.isArray(q) && q.some((c) => Number.isFinite(c) && Math.abs(c) > 1e100)) erro(`o ponto ${k} tem coordenada de módulo acima de 1e100 (${citar(q)}): as contas do ajuste perdem o desvio; passe pontos numa unidade em que a curva tenha a ordem de grandeza do uso`);
     if (!Array.isArray(q) || !(q.length === 2 || q.length === 3) || !q.every((c) => Number.isFinite(c))) erro(`o ponto ${k} precisa ser [u, v] ou [x, y, z] de números finitos, e veio ${citar(q)}`);
     if (q.length !== tamanho) erro(`os pontos misturam ${tamanho} e ${q.length} componentes (o ponto ${k} tem ${q.length}): passe todos com 2 ou todos com 3`);
   });
@@ -204,15 +208,17 @@ function lerEntrada(entrada, { tolerancia, maximoDeClotoides, duros, eixos }) {
   const [i, j] = eixos; const tem3 = tamanho === 3;
   const P = entrada.map((q) => (tem3 ? [q[i], q[j]] : [q[0], q[1]]));
   const livre = tem3 ? [0, 1, 2].find((e) => e !== i && e !== j) : null;
-  let constante = 0;
+  let constante = 0; let meio = 0; let livres = null; let tolEfetiva = tolerancia;
   if (tem3) {
-    const vals = entrada.map((q) => q[livre]); const lo = Math.min(...vals); const hi = Math.max(...vals);
-    if (hi - lo > tolerancia) erro(`a coordenada livre (índice ${livre}) varia ${citar(hi - lo)} entre os pontos, acima da tolerância ${citar(tolerancia)}: a curva não é plana nos eixos ${citar(eixos)}; passe os eixos certos ou projete os pontos antes`);
-    constante = vals.reduce((a, b) => a + b, 0) / vals.length;
+    livres = entrada.map((q) => q[livre]); const lo = Math.min(...livres); const hi = Math.max(...livres);
+    constante = (lo + hi) / 2; meio = (hi - lo) / 2;
+    /* o desvio na coordenada livre (até meio) e o no plano somam em quadratura no desvio 3D: o plano fica com o que sobra da tolerância */
+    if (!(meio < tolerancia)) erro(`a coordenada livre (índice ${livre}) varia ${citar(hi - lo)} entre os pontos, e metade disso (${citar(meio)}) já gasta a tolerância ${citar(tolerancia)}: a curva não é plana nos eixos ${citar(eixos)}; passe os eixos certos ou projete os pontos antes`);
+    tolEfetiva = Math.sqrt(tolerancia * tolerancia - meio * meio);
   }
   let L = 0; for (let k = 1; k < P.length; k += 1) L += Math.hypot(P[k][0] - P[k - 1][0], P[k][1] - P[k - 1][1]);
   if (!(L > 4 * tolerancia)) erro(`o comprimento da poligonal dos pontos (${citar(Math.round(L * 1e6) / 1e6)}) é nulo ou desprezível perto da tolerância ${citar(tolerancia)} (pede mais de ${citar(4 * tolerancia)}): não há curva a ajustar`);
-  return { P, constante, livre, tem3, comprimentoDosPontos: L };
+  return { P, constante, livre, tem3, livres, tolEfetiva, comprimentoDosPontos: L };
 }
 
 /* ---------- o ajuste ---------- */
@@ -254,12 +260,12 @@ function iniciar(P, fr) {
 }
 
 function ajustarComJoelhos(ctx, joelhos, partida) {
-  const { P, pesos, indices, tolerancia } = ctx; const n = joelhos.length;
+  const { P, pesos, tolerancia } = ctx; const indices = ctx.indices; const n = joelhos.length;
   const Pt = indices.map((i) => P[i]); const pt = indices.map((i) => pesos[i]); const pt0 = [...pt]; const m = Pt.length;
   const base = partida ?? (() => { const ini = iniciar(Pt, joelhos); return [Pt[0][0], Pt[0][1], ini.th0, ini.L, ...ini.k, ...joelhos.slice(1, -1)]; })();
   const q0 = desempacotar(base, n);
-  const passos = passosPorTrecho(q0.fr, q0.L, q0.k.map((v) => v * 1.5), tolerancia, false);
-  const peso = REGULARIZACAO * tolerancia * Math.sqrt(q0.L);
+  let passos = passosPorTrecho(q0.fr, q0.L, q0.k.map((v) => v * 1.5), tolerancia, false);
+  
   const janela = new Array(m).fill(-1);
   const residuo = (p) => {
     const q = desempacotar(p, n); const c = integrar(q, q.fr, passos);
@@ -268,10 +274,11 @@ function ajustarComJoelhos(ctx, joelhos, partida) {
     for (let i = 0; i < m; i += 1) r[i] = d[i] * pt[i];
     r[m] = (c.x[0] - Pt[0][0]) * PESO_DA_PONTA; r[m + 1] = (c.y[0] - Pt[0][1]) * PESO_DA_PONTA;
     r[m + 2] = (c.x[c.n] - Pt[m - 1][0]) * PESO_DA_PONTA; r[m + 3] = (c.y[c.n] - Pt[m - 1][1]) * PESO_DA_PONTA;
-    for (let j = 0; j < n - 1; j += 1) { const len = (q.fr[j + 1] - q.fr[j]) * q.L; r[m + 4 + j] = (peso * (q.k[j + 1] - q.k[j])) / Math.sqrt(len); }
+    for (let j = 0; j < n - 1; j += 1) r[m + 4 + j] = REGULARIZACAO * tolerancia * (q.k[j + 1] - q.k[j]) * q.L;
     return r;
   };
-  const refazerJanela = (p) => { const q = desempacotar(p, n); desviosDos(Pt, integrar(q, q.fr, passos), janela.fill(-1)); };
+  /* os passos se refazem pela curvatura de cada ponto de partida, que cresce quando o ajuste acha a forma */
+  const refazerJanela = (p) => { const q = desempacotar(p, n); passos = passosPorTrecho(q.fr, q.L, q.k.map((v) => v * 1.5), tolerancia, false); desviosDos(Pt, integrar(q, q.fr, passos), janela.fill(-1)); };
   refazerJanela(base);
   const L0 = base[3]; const kEscala = 1 / L0;
   const escala = base.map((_, j) => (j < 2 ? Math.max(tolerancia, 1e-9) : j === 2 ? 1e-2 : j === 3 ? L0 * 1e-2 : j < 4 + n ? kEscala : 1e-2));
@@ -280,7 +287,7 @@ function ajustarComJoelhos(ctx, joelhos, partida) {
   ({ p, custo } = lm(residuo, p, escala));
   /* o desvio de todos os pontos, na curva do mesmo passo grosso */
   const medir = (pp) => {
-    const q = desempacotar(pp, n); const c = integrar(q, q.fr, passos);
+    const q = desempacotar(pp, n); const c = integrar(q, q.fr, passosPorTrecho(q.fr, q.L, q.k, tolerancia, false));
     const proj = new Float64Array(P.length); const d = desviosDos(P, c, new Array(P.length).fill(-1), proj);
     let maximo = 0; let arcoDoErro = 0; for (let i = 0; i < P.length; i += 1) { const v = Math.abs(d[i]); if (v > maximo) { maximo = v; arcoDoErro = proj[i]; } }
     const volta = desvioDaCurva(P, c);
@@ -297,16 +304,23 @@ function ajustarComJoelhos(ctx, joelhos, partida) {
     if (novo.maximo < medido.maximo) { medido = novo; custo = r.custo; } else break;
   }
   const { d, maximo, arcoDoErro, q } = medido; p = medido.p;
+  /* com a entrada reduzida, os piores pontos deste ajuste entram no conjunto dos seguintes: o ajuste não perde de vista o que a inserção de joelho vai mirar */
+  if (indices.length < P.length) {
+    const piores = Array.from(d, (v, i) => [Math.abs(v), i]).sort((a, b) => b[0] - a[0] || a[1] - b[1]).slice(0, 8).map(([, i]) => i);
+    const novos = piores.filter((i) => !ctx.indices.includes(i));
+    if (novos.length) ctx.indices = [...ctx.indices, ...novos].sort((a, b) => a - b);
+  }
   return { p, custo, d, maximo: Number.isFinite(maximo) ? maximo : Infinity, arcoDoErro, q };
 }
 
 /** ajustarCurvaLisa(pontos, { tolerancia, maximoDeClotoides, duros, eixos }) -> o ajuste descrito na ficha */
-export function ajustarCurvaLisa(entrada, { tolerancia = 1, maximoDeClotoides = 8, duros = [], eixos = [0, 1] } = {}) {
+export function ajustarCurvaLisa(entrada, { tolerancia: toleranciaPedida = 1, maximoDeClotoides = 8, duros = [], eixos = [0, 1] } = {}) {
+  let tolerancia = toleranciaPedida;
   const lido = lerEntrada(entrada, { tolerancia, maximoDeClotoides, duros, eixos });
-  const { P } = lido;
+  const { P } = lido; const original = tolerancia; tolerancia = lido.tolEfetiva;
   const pesos = P.map((_, i) => (duros.includes(i) ? PESO_DO_DURO : 1));
-  /* o alvo do ajuste é 3% abaixo da tolerância: a medida do ajuste é no passo grosso, e a final, no fino, difere por frações dela */
-  const ctx = { P, pesos, indices: reduzir(P, duros), tolerancia, alvo: 0.97 * tolerancia };
+  /* o alvo do ajuste é 5% abaixo da tolerância: a medida do ajuste é no passo grosso, e a final, no fino, difere por frações dela */
+  const ctx = { P, pesos, indices: reduzir(P, duros), tolerancia, alvo: 0.95 * tolerancia };
   let joelhos = [0, 1]; let atual = ajustarComJoelhos(ctx, joelhos, null);
   const guardados = [atual];
   /* entra um joelho no ponto de maior desvio, enquanto passa da tolerância */
@@ -337,13 +351,13 @@ export function ajustarCurvaLisa(entrada, { tolerancia = 1, maximoDeClotoides = 
   /* de todos os ajustes que cabem, o de menos clotoides e, a igual, o de menor custo; se nenhum cabe, o de menor desvio */
   const cabem = guardados.filter((g) => g.maximo <= ctx.alvo);
   const escolhido = cabem.length ? cabem.sort((a, b) => a.q.fr.length - b.q.fr.length || a.custo - b.custo)[0] : guardados.sort((a, b) => a.maximo - b.maximo)[0];
-  return montar(escolhido, lido, tolerancia, eixos);
+  return montar(escolhido, lido, tolerancia, eixos, original);
 }
 
 /* ---------- o resultado ---------- */
 
-function montar(ajuste, lido, tolerancia, eixos) {
-  const { P, constante, livre, tem3, comprimentoDosPontos } = lido; const { q } = ajuste; const { fr, k, L } = q;
+function montar(ajuste, lido, tolerancia, eixos, original) {
+  const { P, constante, livre, tem3, livres, comprimentoDosPontos } = lido; const { q } = ajuste; const { fr, k, L } = q;
   const joelhos = fr.map((f, i) => ({ s: f * L, k: k[i] }));
   const clotoides = joelhos.slice(1).map((b, i) => ({ de: joelhos[i].s, ate: b.s, k0: joelhos[i].k, k1: b.k, comprimento: b.s - joelhos[i].s }));
   /* a curva a passo fino, e o desvio de todos os pontos nela */
@@ -354,14 +368,21 @@ function montar(ajuste, lido, tolerancia, eixos) {
   const desvioDaCurvaMaximo = desvioDaCurva(P, c).maximo;
   if (![q.x0, q.y0, q.th0, L, ...k, ...fr, desvioMaximo, desvioDaCurvaMaximo].every(Number.isFinite) || !(L > 0)) erro(`o ajuste não convergiu a uma curva finita (comprimento ${citar(L)}, desvio ${citar(desvioMaximo)}); a entrada tem ${P.length} pontos e tolerância ${citar(tolerancia)}`);
   /* a ordem: os pontos se projetam ao longo do arco sem voltar mais que o dobro da tolerância, e as pontas caem junto das pontas da curva */
-  let ordenados = proj[0] <= 2 * tolerancia && L - proj[P.length - 1] <= 2 * tolerancia;
-  for (let i = 1; i < P.length && ordenados; i += 1) if (proj[i] < proj[i - 1] - 2 * tolerancia) ordenados = false;
+  let motivoDaOrdem = null;
+  if (!(proj[0] <= 2 * tolerancia)) motivoDaOrdem = `o primeiro ponto se projeta a ${citar(proj[0])} do começo da curva, além de 2 tolerâncias`;
+  else if (!(L - proj[P.length - 1] <= 2 * tolerancia)) motivoDaOrdem = `o último ponto se projeta a ${citar(L - proj[P.length - 1])} do fim da curva, além de 2 tolerâncias (a curva fechada, que volta ao primeiro ponto, se ajusta em dois arcos)`;
+  for (let i = 1; i < P.length && !motivoDaOrdem; i += 1) if (proj[i] < proj[i - 1] - 2 * tolerancia) motivoDaOrdem = `o ponto ${i} se projeta ${citar(proj[i - 1] - proj[i])} antes do ponto ${i - 1} ao longo da curva, além de 2 tolerâncias: os pontos não estão em ordem`;
   const comprimentoCerto = L <= 1.05 * comprimentoDosPontos + 2 * tolerancia;
+  const motivos = [];
+  if (!(desvioMaximo <= tolerancia)) motivos.push(`o desvio de um ponto à curva (${citar(desvioMaximo)}) passa da tolerância ${citar(tolerancia)}; falta clotoide ou a tolerância é pequena`);
+  if (!(desvioDaCurvaMaximo <= tolerancia)) motivos.push(`o desvio da curva à poligonal dos pontos (${citar(desvioDaCurvaMaximo)}) passa da tolerância ${citar(tolerancia)}`);
+  if (motivoDaOrdem) motivos.push(motivoDaOrdem);
+  if (!comprimentoCerto) motivos.push(`o comprimento da curva (${citar(L)}) passa do da poligonal (${citar(comprimentoDosPontos)}) além de 5% e 2 tolerâncias`);
   /* as faixas de um sinal só da curvatura, na curva integrada: a sagita da faixa (a maior distância dela à corda) abaixo da tolerância é reta, e não lóbulo */
   const kk = Array.from(c.s, (s) => curvaturaEm(s / L, fr, k));
   const faixas = []; let inicio = 0; let sinal = 0;
   for (let i = 0; i <= c.n; i += 1) {
-    const sg = Math.abs(kk[i]) < 1e-12 ? 0 : Math.sign(kk[i]);
+    const sg = Math.abs(kk[i]) * L < 1e-9 ? 0 : Math.sign(kk[i]);
     if (sg !== 0 && sinal === 0) sinal = sg;
     if (sg !== 0 && sg !== sinal) { faixas.push({ sg: sinal, de: inicio, ate: i }); inicio = i; sinal = sg; }
   }
@@ -371,7 +392,7 @@ function montar(ajuste, lido, tolerancia, eixos) {
     for (let i = de; i <= ate; i += 1) m = Math.max(m, l > 0 ? Math.abs(ex * (c.y[i] - c.y[de]) - ey * (c.x[i] - c.x[de])) / l : Math.hypot(c.x[i] - c.x[de], c.y[i] - c.y[de]));
     return m;
   };
-  const fica = faixas.filter((f) => f.sg !== 0 && sagita(f) >= tolerancia);
+  const fica = faixas.filter((f) => f.sg !== 0 && sagita(f) >= LIMIAR_DO_LOBULO * tolerancia);
   let inflexoes = 0; for (let i = 1; i < fica.length; i += 1) if (fica[i].sg !== fica[i - 1].sg) inflexoes += 1;
   /* as corridas de curvatura monótona */
   const faixaDeReta = (comp) => (4 * tolerancia) / (comp * comp);
@@ -394,8 +415,12 @@ function montar(ajuste, lido, tolerancia, eixos) {
     const n = Math.max(1, Math.round(L / passoMm)); return Array.from({ length: n + 1 }, (_, i) => ponto((i * L) / n));
   };
   const para3d = (u, v) => { const r = [0, 0, 0]; r[eixos[0]] = u; r[eixos[1]] = v; r[livre] = constante; return r; };
+  /* o desvio 3D: o do plano e o da coordenada livre (a distância dela à constante) em quadratura */
+  const d3 = (v, i) => (tem3 ? Math.hypot(v, livres[i] - constante) : v);
+  const desvios3 = Array.from(desvios, (v, i) => d3(v, i));
   return {
-    cabe: desvioMaximo <= tolerancia && desvioDaCurvaMaximo <= tolerancia && ordenados && comprimentoCerto, tolerancia, desvioMaximo, desvioDaCurva: desvioDaCurvaMaximo, desvios: Array.from(desvios), comprimento: L,
+    cabe: motivos.length === 0, motivo: motivos.length ? motivos.join('; ') : null, tolerancia: original, desvioMaximo: Math.max(...desvios3.map(Math.abs)),
+    desvioDaCurva: tem3 ? Math.hypot(desvioDaCurvaMaximo, Math.max(...livres.map((z) => Math.abs(z - constante)))) : desvioDaCurvaMaximo, desvios: desvios3, comprimento: L,
     joelhos, clotoides, trechos: trechosFinais, inflexoes, inicio: [q.x0, q.y0], rumo: q.th0, ponto, amostrar,
     pontosDaRede: (passo, { nome = 'curva', completar = tem3 ? para3d : (u, v) => [u, v, constante] } = {}) => ({ nome, pontos: amostrar(passo).map(([u, v]) => completar(u, v)) }),
   };

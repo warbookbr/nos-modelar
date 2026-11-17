@@ -191,3 +191,53 @@ describe('ajustarCurvaLisa: a entrada recusada diz o que recebeu', () => {
     expect(() => ajustarCurvaLisa(ok.map(([x, y], i) => [x, 5 * i, y]), { tolerancia: 1, eixos: [0, 2] })).toThrow(/ajustarCurvaLisa: .*coordenada livre.*varia/);
   });
 });
+
+describe('ajustarCurvaLisa: invariância de escala, lombada, coordenada livre e curva fechada', () => {
+  /* reta de 200, filete de 90 graus de raio 20, reta de 200, pontos a cada 1 */
+  const filete = () => {
+    const p = []; for (let i = 0; i <= 200; i += 1) p.push([i, 0]);
+    const n = Math.round((Math.PI / 2) * 20); for (let i = 1; i <= n; i += 1) { const a = (i / n) * (Math.PI / 2); p.push([200 + 20 * Math.sin(a), 20 * (1 - Math.cos(a))]); }
+    for (let i = 1; i <= 200; i += 1) p.push([220, 20 + i]);
+    return p;
+  };
+  const esse = () => clotoide(300, 300, -1 / 60, 1 / 60);
+  for (const [nome, gerar, inflexoes] of [['filete de 90 graus entre duas retas', filete, 0], ['S de curvatura variável', esse, 1]]) {
+    it(`${nome}: o mesmo cabe e as mesmas inflexões a ×1e-3, ×1 e ×1e3`, () => {
+      const lidos = [1e-3, 1, 1e3].map((S) => ajustarCurvaLisa(gerar().map(([x, y]) => [x * S, y * S]), { tolerancia: 0.5 * S }));
+      for (const a of lidos) { expect(a.cabe, a.motivo).toBe(true); expect(a.inflexoes).toBe(inflexoes); }
+      expect(lidos[0].clotoides.length).toBe(lidos[1].clotoides.length);
+      expect(lidos[2].clotoides.length).toBe(lidos[1].clotoides.length);
+    });
+  }
+
+  /* uma lombada gaussiana de 3 mm e sigma 40 sobre um arco de raio 20000: a curvatura troca de sinal duas vezes, com sagita de 1,18 mm acima da tolerância */
+  const lombada = (passo) => Array.from({ length: Math.round(400 / passo) + 1 }, (_, i) => { const x = i * passo - 200; return [x, (x * x) / 40000 + 3 * Math.exp(-(x * x) / (2 * 40 * 40))]; });
+  it('a lombada de 3 mm sobre um arco de 20 m: duas inflexões e cabe, a 15, 5 e 1 mm de espaçamento', () => {
+    for (const passo of [15, 5, 1]) {
+      const a = ajustarCurvaLisa(lombada(passo), { tolerancia: 1, maximoDeClotoides: 10 });
+      expect(a.cabe, `passo ${passo}: ${a.motivo}`).toBe(true);
+      expect(a.inflexoes, `passo ${passo}`).toBe(2);
+    }
+  });
+
+  it('a coordenada livre em rampa de 0 a 0,5 com tolerância 0,5: o desvio 3D até a curva da rede fica dentro da tolerância', () => {
+    const elipse2d = elipse(600, 250, 70); const n = elipse2d.length;
+    const pontos = elipse2d.map(([x, y], i) => [x, y, (0.5 * i) / (n - 1)]);
+    const a = ajustarCurvaLisa(pontos, { tolerancia: 0.5, eixos: [0, 1] });
+    expect(a.cabe, a.motivo).toBe(true);
+    expect(a.desvioMaximo).toBeLessThanOrEqual(0.5);
+    const rede = a.pontosDaRede(0.5).pontos;
+    const ao3d = ([px, py, pz]) => { let m = Infinity; for (let i = 0; i < rede.length - 1; i += 1) { const [ax, ay, az] = rede[i]; const [bx, by, bz] = rede[i + 1]; const ex = bx - ax; const ey = by - ay; const ez = bz - az; const t = Math.max(0, Math.min(1, ((px - ax) * ex + (py - ay) * ey + (pz - az) * ez) / (ex * ex + ey * ey + ez * ez))); m = Math.min(m, Math.hypot(px - ax - ex * t, py - ay - ey * t, pz - az - ez * t)); } return m; };
+    expect(Math.max(...pontos.map(ao3d))).toBeLessThanOrEqual(0.5);
+    expect(() => ajustarCurvaLisa(elipse2d.map(([x, y], i) => [x, y, (2 * i) / (n - 1)]), { tolerancia: 0.5 })).toThrow(/coordenada livre.*gasta a tolerância/);
+  });
+
+  it('a curva fechada sai cabe falso dizendo o motivo, e coordenada enorme é recusada com o valor', () => {
+    const circulo = Array.from({ length: 41 }, (_, i) => [300 * Math.cos((i / 40) * 2 * Math.PI), 300 * Math.sin((i / 40) * 2 * Math.PI)]);
+    const a = ajustarCurvaLisa(circulo, { tolerancia: 1 });
+    expect(a.cabe).toBe(false);
+    expect(a.motivo).toMatch(/último ponto se projeta|não estão em ordem|primeiro ponto se projeta/);
+    expect(() => ajustarCurvaLisa([[0, 0], [1, 1], [2, 4], [1e300, 5]], { tolerancia: 1 })).toThrow(/ponto 3 tem coordenada de módulo acima de 1e100.*1e\+300/);
+    expect(ajustarCurvaLisa(arco(500, 90, 30), { tolerancia: 0.5 }).motivo).toBe(null);
+  });
+});
