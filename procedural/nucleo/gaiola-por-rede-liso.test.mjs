@@ -231,6 +231,41 @@ describe('gradiente conjugado do alisamento do miolo', () => {
     expect(comPlaca).toBeGreaterThan(5);
   });
 
+  it('com os pesos e a tangente da emenda declarada, os dois caminhos de montagem dão as mesmas posições, bit a bit, e o peso 1 em toda aresta é a conta de sempre', () => {
+    let comTangente = 0;
+    for (let semente = 1; semente <= 12; semente++) {
+      const aleatorio = gerador(900 + semente);
+      const larg = 7 + (semente % 3); const alt = 5 + (semente % 2);
+      const meio = Math.floor(larg / 2);
+      const posicoes = [];
+      for (let j = 0; j < alt; j++) for (let i = 0; i < larg; i++) {
+        const k = i < meio ? 2 : 0.7;
+        const x = (i - meio) * 0.03;
+        posicoes.push([x + (aleatorio() - 0.5) * 0.002, j * 0.03, -0.5 * k * x * x + (aleatorio() - 0.5) * 0.001]);
+      }
+      const faces = [];
+      for (let j = 0; j < alt - 1; j++) for (let i = 0; i < larg - 1; i++) faces.push([j * larg + i, j * larg + i + 1, (j + 1) * larg + i + 1, (j + 1) * larg + i]);
+      const livres = new Set(); const pulados = new Set();
+      for (let v = 0; v < posicoes.length; v++) {
+        const i = v % larg; const j = Math.floor(v / larg);
+        if (i === 0 || j === 0 || i === larg - 1 || j === alt - 1) pulados.add(v); else if (i !== meio) livres.add(v);
+      }
+      /* a coluna do meio é a curva emendada: a tangente comum em cada ponto de dentro dela, e o peso maior nas arestas a até duas colunas */
+      const tangentes = [];
+      for (let j = 1; j < alt - 1; j++) tangentes.push({ c: j * larg + meio, lados: [[j * larg + meio - 1, j * larg + meio - 2], [j * larg + meio + 1, j * larg + meio + 2]], peso: 100 });
+      const naFaixa = (v) => Math.abs((v % larg) - meio) <= 2;
+      const opcoes = { iteracoes: 1 + (semente % 2), pesoDaAresta: (a, b) => (naFaixa(a) && naFaixa(b) ? 100 : 1), ...(semente % 2 ? { tangentes } : {}) };
+      const denso = alisarMioloNaNormal(posicoes, faces, livres, pulados, opcoes);
+      const porMapas = alisarMioloNaNormal(posicoes, faces, livres, pulados, { ...opcoes, limiteDenso: 0 });
+      denso.posicoes.forEach((p, v) => p.forEach((x, c) => { if (!Object.is(porMapas.posicoes[v][c], x)) throw new Error(`semente ${semente} ponto ${v} eixo ${c}: ${porMapas.posicoes[v][c]} contra ${x}`); }));
+      const semPeso = alisarMioloNaNormal(posicoes, faces, livres, pulados, { iteracoes: opcoes.iteracoes });
+      const pesoUm = alisarMioloNaNormal(posicoes, faces, livres, pulados, { iteracoes: opcoes.iteracoes, pesoDaAresta: () => 1 });
+      semPeso.posicoes.forEach((p, v) => p.forEach((x, c) => { if (!Object.is(pesoUm.posicoes[v][c], x)) throw new Error(`semente ${semente} ponto ${v} eixo ${c}: o peso 1 mudou a conta`); }));
+      if (opcoes.tangentes && denso.deslocamentoMaximo > 0) comTangente += 1;
+    }
+    expect(comTangente).toBeGreaterThan(3);
+  });
+
   it('o alisamento de uma grade com um calombo continua sem mexer nos pulados e a tirar o calombo', () => {
     /* grade 7x7 plana com o ponto central erguido: os livres são o miolo, e o calombo desce */
     const lado = 7;

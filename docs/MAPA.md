@@ -6,6 +6,7 @@
 > algum arquivo-fonte estiver sem cabeçalho.
 
 2049 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2062 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -247,7 +248,7 @@
 
 ## docs/modelar/banco-de-provas/correcao-de-superficie-2026-11-16/
 
-- `README.md` — Correção de superfície: chapas de prova, linha de base e corte com simetria
+- `README.md` — Correção de superfície: chapas de prova, linha de base, corte com simetria, alisamento e emenda declarada
 
 ## docs/modelar/banco-de-provas/costura-em-no-de-tubos-2026-11-15/
 
@@ -1045,6 +1046,7 @@
 - `gaiola-por-lacos.js` — gaiola-por-lacos.js — monta a gaiola fechada da operação `subdivisao` a partir de laços, um contorno por plano ao longo de um eixo
 - `gaiola-por-lacos.test.ts` — gaiola-por-lacos.test.ts — o ajudante `gaiolaPorLacos` em peças pequenas feitas aqui: a barra da ficha, a reamostragem por trecho, a escada da tampa, a fusão…
 - `gaiola-por-rede-contato.test.mjs` — gaiola-por-rede-contato.test.mjs — o contato declarado da moldura de 10 mm com a chapa por rede de curvas
+- `gaiola-por-rede-emenda.test.mjs` — gaiola-por-rede-emenda.test.mjs — a emenda com continuidade declarada da gaiola por rede (`continuidade: 'G1' | 'G2'` na curva), na gaiola: as recusas, a jun…
 - `gaiola-por-rede-liso.js` — gaiola-por-rede-liso.js — o miolo dos retalhos alisado pela normal, para a tangente não quebrar nas curvas compartilhadas
 - `gaiola-por-rede-liso.test.mjs` — gaiola-por-rede-liso.test.mjs — o alisamento do miolo dá o MESMO resultado de antes de a montagem do sistema e o gradiente conjugado passarem a trabalhar sob…
 - `gaiola-por-rede-origem.test.mjs` — gaiola-por-rede-origem.test.mjs — a gaiola por rede de curvas publica de onde vem cada ponto, as entradas editáveis e a estrutura.
@@ -2759,6 +2761,7 @@
 - `alisamento.test.mjs` — alisamento.test.mjs — o gate 1 do plano das ferramentas de correção de superfície (fatia 3): na `rede-com-ruido`, a opção `alisarCurvas` da rede leva o exces…
 - `chapas.mjs` — chapas.mjs — as chapas de prova do plano das ferramentas de correção de superfície (`docs/modelar/planos/2026-11-16-ferramentas-de-correcao-de-superficie.md`…
 - `chapas.test.mjs` — chapas.test.mjs — as chapas de prova do plano das ferramentas de correção de superfície: cada uma monta sem órfão, com a forma e o defeito declarados em `cha…
+- `emendas.test.mjs` — emendas.test.mjs — o item 3 do gate de saída do plano das ferramentas de correção de superfície (fatia 4): nas chapas emendadas com a continuidade declarada …
 - `linha-de-base.mjs` — linha-de-base.mjs — a linha de base do plano das ferramentas de correção de superfície: as quatro medidas de superfície (`suavidade`, `pente`, `emendas`, `on…
 
 ## tools/fixtures/correcao-de-superficie/chapa-simetrica/
@@ -2769,6 +2772,14 @@
 
 - `receita.js` — correcao-de-superficie/chapa-simetrica-espelhada/receita.js — a chapa de prova 'chapa-simetrica-espelhada' de `../chapas.mjs`, onde estão a forma e o defeito…
 
+## tools/fixtures/correcao-de-superficie/emenda-dupla/
+
+- `receita.js` — correcao-de-superficie/emenda-dupla/receita.js — a chapa de prova 'emenda-dupla' de `../chapas.mjs`, onde estão a forma e a continuidade declarada.
+
+## tools/fixtures/correcao-de-superficie/emenda-dupla-declarada/
+
+- `receita.js` — correcao-de-superficie/emenda-dupla-declarada/receita.js — a chapa de prova 'emenda-dupla-declarada' de `../chapas.mjs`, onde estão a forma e a continuidade …
+
 ## tools/fixtures/correcao-de-superficie/emenda-g0/
 
 - `receita.js` — correcao-de-superficie/emenda-g0/receita.js — a chapa de prova 'emenda-g0' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
@@ -2777,9 +2788,37 @@
 
 - `receita.js` — correcao-de-superficie/emenda-g1/receita.js — a chapa de prova 'emenda-g1' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
 
+## tools/fixtures/correcao-de-superficie/emenda-g1-declarada/
+
+- `receita.js` — correcao-de-superficie/emenda-g1-declarada/receita.js — a chapa de prova 'emenda-g1-declarada' de `../chapas.mjs`, onde estão a forma e a continuidade declar…
+
+## tools/fixtures/correcao-de-superficie/emenda-g1-em-g2/
+
+- `receita.js` — correcao-de-superficie/emenda-g1-em-g2/receita.js — a chapa de prova 'emenda-g1-em-g2' de `../chapas.mjs`, onde estão a forma e a continuidade declarada.
+
 ## tools/fixtures/correcao-de-superficie/emenda-g2/
 
 - `receita.js` — correcao-de-superficie/emenda-g2/receita.js — a chapa de prova 'emenda-g2' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
+
+## tools/fixtures/correcao-de-superficie/emenda-g2-declarada/
+
+- `receita.js` — correcao-de-superficie/emenda-g2-declarada/receita.js — a chapa de prova 'emenda-g2-declarada' de `../chapas.mjs`, onde estão a forma e a continuidade declar…
+
+## tools/fixtures/correcao-de-superficie/emenda-inflexao/
+
+- `receita.js` — correcao-de-superficie/emenda-inflexao/receita.js — a chapa de prova 'emenda-inflexao' de `../chapas.mjs`, onde estão a forma e a continuidade declarada.
+
+## tools/fixtures/correcao-de-superficie/emenda-inflexao-declarada/
+
+- `receita.js` — correcao-de-superficie/emenda-inflexao-declarada/receita.js — a chapa de prova 'emenda-inflexao-declarada' de `../chapas.mjs`, onde estão a forma e a continu…
+
+## tools/fixtures/correcao-de-superficie/emenda-inflexao-lisa/
+
+- `receita.js` — correcao-de-superficie/emenda-inflexao-lisa/receita.js — a chapa de prova 'emenda-inflexao-lisa' de `../chapas.mjs`, onde estão a forma e a continuidade decl…
+
+## tools/fixtures/correcao-de-superficie/emenda-inflexao-lisa-declarada/
+
+- `receita.js` — correcao-de-superficie/emenda-inflexao-lisa-declarada/receita.js — a chapa de prova 'emenda-inflexao-lisa-declarada' de `../chapas.mjs`, onde estão a forma e…
 
 ## tools/fixtures/correcao-de-superficie/rede-alisada/
 
@@ -2789,9 +2828,21 @@
 
 - `receita.js` — correcao-de-superficie/rede-com-ruido/receita.js — a chapa de prova 'rede-com-ruido' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
 
+## tools/fixtures/correcao-de-superficie/rede-em-fila/
+
+- `receita.js` — correcao-de-superficie/rede-em-fila/receita.js — a chapa de prova 'rede-em-fila' de `../chapas.mjs`, onde estão a forma e a continuidade declarada.
+
+## tools/fixtures/correcao-de-superficie/rede-ponta-com-ponta/
+
+- `receita.js` — correcao-de-superficie/rede-ponta-com-ponta/receita.js — a chapa de prova 'rede-ponta-com-ponta' de `../chapas.mjs`, onde estão a forma e a continuidade decl…
+
 ## tools/fixtures/correcao-de-superficie/rede-sem-ruido/
 
 - `receita.js` — correcao-de-superficie/rede-sem-ruido/receita.js — a chapa de prova 'rede-sem-ruido' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
+
+## tools/fixtures/correcao-de-superficie/rede-tres-no-no/
+
+- `receita.js` — correcao-de-superficie/rede-tres-no-no/receita.js — a chapa de prova 'rede-tres-no-no' de `../chapas.mjs`, onde estão a forma e a continuidade declarada.
 
 ## tools/fixtures/costuras-e-furos/
 

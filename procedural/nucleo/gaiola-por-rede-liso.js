@@ -109,8 +109,10 @@ const LIMITE_DENSO = 1500;
  *   posicoes: [[x, y, z]] da gaiola; faces: índices; livres: Set dos pontos que se mexem; pulados: Set dos pontos sem laplaciano (borda
  *   livre e vinco, que o chamador marca). energia: 'variacao' (padrão) ou 'placa'. Devolve as posições novas, sem mexer nas dadas.
  *   `limiteDenso` (só para o teste de equivalência) é o número de livres até o qual o sistema se monta em matriz densa.
+ *   `pesoDaAresta(s, t)` (opcional) é o peso do termo da variação na aresta s-t, 1 sem ele; `tangentes` (opcional) são os termos da tangente
+ *   comum na emenda G1, descritos em `termosDaTangente`. Sem os dois, a conta é a de sempre, bit a bit.
  */
-export function alisarMioloNaNormal(posicoes, faces, livres, pulados, { iteracoes = 2, energia = 'variacao', ancora = 1e-4, limiteDenso = LIMITE_DENSO } = {}) {
+export function alisarMioloNaNormal(posicoes, faces, livres, pulados, { iteracoes = 2, energia = 'variacao', ancora = 1e-4, limiteDenso = LIMITE_DENSO, pesoDaAresta = null, tangentes = null } = {}) {
   const n = posicoes.length;
   const viz = Array.from({ length: n }, () => new Set());
   for (const f of faces) for (let k = 0; k < f.length; k++) { const a = f[k]; const b = f[(k + 1) % f.length]; viz[a].add(b); viz[b].add(a); }
@@ -122,9 +124,10 @@ export function alisarMioloNaNormal(posicoes, faces, livres, pulados, { iteracoe
   let maior = 0;
   for (let volta = 0; volta < iteracoes; volta++) {
     const N = normaisDosVertices(P, faces);
+    const extras = tangentes?.length ? termosDaTangente(P, N, tangentes, indiceDoLivre) : null;
     const h = denso
-      ? resolverVoltaDensa({ P, N, n, vizinhos, pulados, lista, indiceDoLivre, energia, ancora })
-      : resolverVoltaPorMapas({ P, N, n, vizinhos, pulados, lista, indiceDoLivre, energia, ancora });
+      ? resolverVoltaDensa({ P, N, n, vizinhos, pulados, lista, indiceDoLivre, energia, ancora, pesoDaAresta, extras })
+      : resolverVoltaPorMapas({ P, N, n, vizinhos, pulados, lista, indiceDoLivre, energia, ancora, pesoDaAresta, extras });
     const novo = P.map((q) => [...q]);
     lista.forEach((v, i) => {
       novo[v] = [P[v][0] + h[i] * N[v][0], P[v][1] + h[i] * N[v][1], P[v][2] + h[i] * N[v][2]];
@@ -135,8 +138,59 @@ export function alisarMioloNaNormal(posicoes, faces, livres, pulados, { iteracoe
   return { posicoes: P, deslocamentoMaximo: maior, iteracoes };
 }
 
+/* A TANGENTE COMUM NA EMENDA (`continuidade` na curva da rede). Cada item de `tangentes` é { c, lados: [[a1, a2], [b1, b2]], peso }: o ponto c
+   da curva emendada e, de cada lado, as duas fileiras seguintes da gaiola na direção que atravessa a curva. A inclinação de um lado é a da
+   parábola pelo ponto c e pelas duas fileiras, sobre o plano tangente de c (a altura f ao longo da normal de c e a distância d no plano, ao
+   longo da direção de c para a1): s = (f1 d2² − f2 d1²) / (d1 d2 (d2 − d1)), exata para uma seção de curvatura constante, de modo que a
+   curvatura de cada lado não entra. A tangente é comum quando as duas inclinações, cada uma medida para fora de c, somam zero; o termo é
+   o quadrado dessa soma dividida pela distância média de c à primeira fileira (a unidade do laplaciano, uma curvatura: com a soma crua o
+   termo pesava dezenas de milhares de vezes uma aresta da variação numa gaiola de 70 mm, e o sistema saía de centenas de milímetros), e é
+   linear no deslocamento h de cada fileira livre pela normal dela. O ponto em que a segunda fileira não fica além de 1,5 vez a primeira (a
+   gaiola torta) ou em que um lado sobe mais que meia distância sobre o plano de c (a parábola não descreve a seção ali) fica sem o termo
+   naquela volta. Devolve os termos { r0, coef: [[livre, g]], peso } em ordem fixa. */
+export const LONGE_DA_FILEIRA = 1.5;
+export const INCLINACAO_DA_FILEIRA = 0.5;
+function termosDaTangente(P, N, tangentes, indiceDoLivre) {
+  const termos = [];
+  for (const { c, lados, peso } of tangentes) {
+    const nc = N[c]; const pc = P[c];
+    let r0 = 0; const coef = new Map(); let valido = true;
+    /* a soma das inclinações dividida pela distância média à primeira fileira: o termo fica na unidade do laplaciano (uma curvatura), e o
+       peso dele se lê contra o de uma aresta da variação, qualquer que seja o espaçamento da gaiola */
+    const escala = lados.reduce((x, [a1]) => x + norma(sub(P[a1], pc)), 0) / lados.length;
+    for (const [a1, a2] of lados) {
+      /* a direção que atravessa a curva: a de c para a1 no plano tangente; d é a distância ao longo dela, e f a altura pela normal */
+      const u = sub(P[a1], pc); const fu = dot(u, nc);
+      const t0 = [u[0] - fu * nc[0], u[1] - fu * nc[1], u[2] - fu * nc[2]]; const lt = norma(t0);
+      if (!(lt > 0)) { valido = false; break; }
+      const t = [t0[0] / lt, t0[1] / lt, t0[2] / lt];
+      const geo = [a1, a2].map((v) => { const d = sub(P[v], pc); return { f: dot(d, nc), d: dot(d, t) }; });
+      const [{ f: f1, d: d1 }, { f: f2, d: d2 }] = geo;
+      const den = d1 * d2 * (d2 - d1);
+      /* a parábola de um lado só vale com a segunda fileira bem além da primeira e o lado pouco inclinado sobre o plano de c */
+      if (!(d1 > 0 && d2 > LONGE_DA_FILEIRA * d1 && Math.abs(f2) < INCLINACAO_DA_FILEIRA * d2)) { valido = false; break; }
+      r0 += (f1 * d2 * d2 - f2 * d1 * d1) / den / escala;
+      const g1 = (dot(N[a1], nc) * d2 * d2) / den / escala; const g2 = -(dot(N[a2], nc) * d1 * d1) / den / escala;
+      for (const [v, g] of [[a1, g1], [a2, g2]]) if (indiceDoLivre.has(v)) coef.set(indiceDoLivre.get(v), (coef.get(indiceDoLivre.get(v)) ?? 0) + g);
+    }
+    if (!valido || !coef.size) continue;
+    termos.push({ r0, coef: [...coef].sort((x, y) => x[0] - y[0]), peso });
+  }
+  return termos;
+}
+
+/* Soma os termos escalares de `termosDaTangente` ao sistema (a linha u ganha peso·g_u·g_v e o lado direito −peso·g_u·r0), em ordem fixa. */
+function somarTermosEscalares(extras, somar, b) {
+  for (const { r0, coef, peso } of extras) {
+    for (const [u, gu] of coef) {
+      b[u] -= peso * gu * r0;
+      for (const [v, gv] of coef) somar(u, v, peso * gu * gv);
+    }
+  }
+}
+
 /* O deslocamento h de uma volta, com o sistema montado em mapas (a montagem de antes, para os sistemas grandes demais para a densa). */
-function resolverVoltaPorMapas({ P, N, n, vizinhos, pulados, lista, indiceDoLivre, energia, ancora }) {
+function resolverVoltaPorMapas({ P, N, n, vizinhos, pulados, lista, indiceDoLivre, energia, ancora, pesoDaAresta = null, extras = null }) {
   /* o laplaciano de cada ponto que tem um: o valor L0 de agora e o coeficiente de cada ponto livre sobre o seu h */
   const L = new Array(n).fill(null);
   for (let s = 0; s < n; s++) {
@@ -164,7 +218,7 @@ function resolverVoltaPorMapas({ P, N, n, vizinhos, pulados, lista, indiceDoLivr
       if (!L[s]) continue;
       for (const t of vizinhos[s]) {
         if (t < s || !L[t]) continue;
-        const peso = 1;
+        const peso = pesoDaAresta ? pesoDaAresta(s, t) : 1;
         const coef = new Map(L[s].coef);
         for (const [u, c] of L[t].coef) coef.set(u, (coef.get(u) ?? 0) - c);
         termos.push({ peso, L0: sub(L[s].L0, L[t].L0), coef });
@@ -173,17 +227,22 @@ function resolverVoltaPorMapas({ P, N, n, vizinhos, pulados, lista, indiceDoLivr
   }
   const linhas = lista.map(() => new Map());
   const b = new Array(lista.length).fill(0);
+  /* com os pesos da emenda, a âncora se mede pela diagonal do sistema sem eles, para a emenda não endurecer a âncora do resto */
+  const pesado = !!(pesoDaAresta || extras);
+  const diagonalSemPeso = pesado ? new Float64Array(lista.length) : null;
   for (const { peso, L0, coef } of termos) {
     const itens = [...coef].filter(([, c]) => c !== 0).sort((x, y) => x[0] - y[0]);
     for (const [u, cu] of itens) {
       const nu = N[lista[u]];
+      if (pesado) diagonalSemPeso[u] += cu * cu * dot(nu, nu);
       b[u] -= peso * cu * dot(nu, L0);
       for (const [v, cv] of itens) linhas[u].set(v, (linhas[u].get(v) ?? 0) + peso * cu * cv * dot(nu, N[lista[v]]));
     }
   }
+  if (extras) somarTermosEscalares(extras, (u, v, x) => linhas[u].set(v, (linhas[u].get(v) ?? 0) + x), b);
   /* gradiente conjugado, com Jacobi, na ordem fixa dos pontos e das colunas */
   const colunas = linhas.map((m) => [...m].sort((x, y) => x[0] - y[0]));
-  const escala = colunas.reduce((m, c, i) => Math.max(m, ...c.filter(([j]) => j === i).map(([, v]) => v)), 0) || 1;
+  const escala = (pesado ? diagonalSemPeso.reduce((m, v) => Math.max(m, v), 0) : colunas.reduce((m, c, i) => Math.max(m, ...c.filter(([j]) => j === i).map(([, v]) => v)), 0)) || 1;
   const folga = ancora * escala;
   const diag = colunas.map((c, i) => { const d = c.find(([j]) => j === i); return (d ? d[1] : 0) + folga; });
   return gradienteConjugado(colunas, diag, folga, b);
@@ -193,7 +252,7 @@ function resolverVoltaPorMapas({ P, N, n, vizinhos, pulados, lista, indiceDoLivr
    Cada conta é a de `resolverVoltaPorMapas`, na mesma ordem: os termos na ordem das arestas, os coeficientes de cada termo em
    ordem de índice, e cada célula da matriz soma as parcelas na ordem em que os termos chegam (começando de zero, como o mapa
    começava de `?? 0`). Uma célula tocada conta como presente mesmo que a soma dê zero, como a entrada do mapa contava. */
-function resolverVoltaDensa({ P, N, n, vizinhos, pulados, lista, indiceDoLivre, energia, ancora }) {
+function resolverVoltaDensa({ P, N, n, vizinhos, pulados, lista, indiceDoLivre, energia, ancora, pesoDaAresta = null, extras = null }) {
   const m = lista.length;
   const idxLivre = new Int32Array(n).fill(-1);
   for (const [v, i] of indiceDoLivre) idxLivre[v] = i;
@@ -224,10 +283,13 @@ function resolverVoltaDensa({ P, N, n, vizinhos, pulados, lista, indiceDoLivre, 
     tem[s] = 1; ini[s + 1] = cIdx.length;
   }
   const A = new Float64Array(m * m); const ocupada = new Uint8Array(m * m);
+  /* com os pesos da emenda, a âncora se mede pela diagonal do sistema sem eles (como em `resolverVoltaPorMapas`) */
+  const pesado = !!(pesoDaAresta || extras);
+  const diagonalSemPeso = pesado ? new Float64Array(m) : null;
   const b = new Float64Array(m);
   const acc = new Float64Array(m); const marca = new Int32Array(m); const tocados = new Int32Array(m); const itens = new Int32Array(m);
   let carimbo = 0;
-  const termo = (L0a, L0b, nTocados) => {
+  const termo = (L0a, L0b, nTocados, w = 1) => {
     /* os itens: os coeficientes não nulos, em ordem de índice */
     let q = 0;
     for (let i = 0; i < nTocados; i++) if (acc[tocados[i]] !== 0) itens[q++] = tocados[i];
@@ -236,11 +298,12 @@ function resolverVoltaDensa({ P, N, n, vizinhos, pulados, lista, indiceDoLivre, 
     for (let a = 0; a < q; a++) {
       const u = ordenados[a]; const cu = acc[u];
       const nu0 = NL[3 * u]; const nu1 = NL[3 * u + 1]; const nu2 = NL[3 * u + 2];
-      b[u] -= 1 * cu * (nu0 * d0 + nu1 * d1 + nu2 * d2);
+      b[u] -= w * cu * (nu0 * d0 + nu1 * d1 + nu2 * d2);
       const base = u * m;
+      if (pesado) diagonalSemPeso[u] += cu * cu * (nu0 * nu0 + nu1 * nu1 + nu2 * nu2);
       for (let c = 0; c < q; c++) {
         const v = ordenados[c];
-        A[base + v] += 1 * cu * acc[v] * (nu0 * NL[3 * v] + nu1 * NL[3 * v + 1] + nu2 * NL[3 * v + 2]);
+        A[base + v] += w * cu * acc[v] * (nu0 * NL[3 * v] + nu1 * NL[3 * v + 1] + nu2 * NL[3 * v + 2]);
         ocupada[base + v] = 1;
       }
     }
@@ -263,9 +326,10 @@ function resolverVoltaDensa({ P, N, n, vizinhos, pulados, lista, indiceDoLivre, 
         if (marca[u] === carimbo) acc[u] = acc[u] - cVal[e];
         else { acc[u] = 0 - cVal[e]; marca[u] = carimbo; tocados[nT++] = u; }
       }
-      termo(doPonto(s), doPonto(t), nT);
+      termo(doPonto(s), doPonto(t), nT, pesoDaAresta ? pesoDaAresta(s, t) : 1);
     }
   }
+  if (extras) somarTermosEscalares(extras, (u, v, x) => { A[u * m + v] += x; ocupada[u * m + v] = 1; }, b);
   /* o sistema em colunas esparsas (CSR), na ordem de coluna */
   const inicio = new Int32Array(m + 1);
   for (let u = 0; u < m; u++) {
@@ -283,7 +347,7 @@ function resolverVoltaDensa({ P, N, n, vizinhos, pulados, lista, indiceDoLivre, 
       if (v === u) { diagonal[u] = A[base + v]; temDiagonal[u] = 1; escalaDoSistema = Math.max(escalaDoSistema, A[base + v]); }
     }
   }
-  const escala = escalaDoSistema || 1;
+  const escala = (pesado ? diagonalSemPeso.reduce((x, v) => Math.max(x, v), 0) : escalaDoSistema) || 1;
   const folga = ancora * escala;
   const diag = new Float64Array(m);
   for (let u = 0; u < m; u++) diag[u] = (temDiagonal[u] ? diagonal[u] : 0) + folga;
