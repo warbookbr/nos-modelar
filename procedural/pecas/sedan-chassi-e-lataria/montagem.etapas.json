@@ -43,6 +43,8 @@
       },
       "origem": {
         "tipo": "migração",
+        "v2": "73a57d9c7c8a9b1c294e49d237d99379da02942e",
+        "reaberturasAntigas": 1,
         "via": "commit do aceite",
         "commit": "73a57d9c7c8a9b1c294e49d237d99379da02942e"
       }
@@ -132,6 +134,7 @@
       },
       "origem": {
         "tipo": "migração",
+        "v2": "73a57d9c7c8a9b1c294e49d237d99379da02942e",
         "via": "commit do aceite",
         "commit": "9297f2d37dbb0b4d9021916ef89e65bf5033ef5e"
       }
@@ -222,6 +225,7 @@
       },
       "origem": {
         "tipo": "migração",
+        "v2": "73a57d9c7c8a9b1c294e49d237d99379da02942e",
         "via": "commit do aceite",
         "commit": "475470477bd62ea73d9e58955fca01cbeb50cbd4"
       }
@@ -313,6 +317,7 @@
       },
       "origem": {
         "tipo": "migração",
+        "v2": "73a57d9c7c8a9b1c294e49d237d99379da02942e",
         "via": "commit do aceite",
         "commit": "475470477bd62ea73d9e58955fca01cbeb50cbd4"
       }
@@ -405,6 +410,7 @@
       },
       "origem": {
         "tipo": "migração",
+        "v2": "73a57d9c7c8a9b1c294e49d237d99379da02942e",
         "via": "commit do aceite",
         "commit": "3caebc96c6e2609c696d556701701b53981470af"
       }
