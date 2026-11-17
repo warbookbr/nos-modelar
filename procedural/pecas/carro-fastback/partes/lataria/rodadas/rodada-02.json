@@ -1,0 +1,1099 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "carro-fastback/lataria",
+  "numero": 2,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "sem alvo: a receita não refina um esboço aprovado e o pedido não traz imagem de referência",
+    "nota": 6.8,
+    "defeitos": [
+      {
+        "parte": "chapa",
+        "tipo": "superficie",
+        "onde": "flanco abaixo do ombro e traseira, fora das saliências declaradas",
+        "sentido": "segmentado",
+        "evidencia": "P12: ondulação fora das saliências declaradas, vista na zebra isométrica e na pintura isométrica (manchas no ombro e na traseira). Nenhum dos três sentidos descreve ondulação."
+      },
+      {
+        "parte": "chapa",
+        "tipo": "superficie",
+        "onde": "flanco e porta, do meio da porta ao arco; ombro e traseira",
+        "sentido": "segmentado",
+        "evidencia": "P1: zebra isométrica com laços e ondas no flanco, curvatura com faixas vermelhas e azuis alternadas, chapa não lisa. Nenhum dos três sentidos descreve ondulação; segmentado é o mais próximo."
+      }
+    ],
+    "observacao": "A forma geral do quarto traseiro está presente e legível, mas a chapa do flanco ondula; sem alvo e sem as vistas de cima e de perfil das partes, a forma do rebaixo e a saída do para-lama não foram julgadas."
+  },
+  "partes": [
+    {
+      "nome": "chapa",
+      "confere": false,
+      "observacao": "chapa continua de 2 mm com teto, coluna, quina, arco, degrau e os vaos dos dois lados; ainda 9 falhas de ondulacao fora das saliencias (tampa, traseira, coluna, ate 0,92 mm), que pedem a emenda G1 ausente neste ramo"
+    },
+    {
+      "nome": "paralamaTraseiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rebaixoLateral",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "continuidade G1 e limitesDaEmenda (fatia 4) nao estao no ramo carro: o pedido os dava como disponiveis",
+    "alisarCurvas nao parte a curva no no em que ela cruza um vinco abaixo do anguloDeCanto; o remedio cantos vira canto vivo na subdivisao",
+    "alisarCurvas le subamostragem da pele analitica como ruido (6,5 mm nas secoes, menos de 1,2 mm com o dobro de pontos) e o aviso nao distingue",
+    "suavidade e ondulacao medem receita com orfao sem dizer que houve recusa: '(sem parte)' e 'vertice 0 nao esta na malha entregue'",
+    "cada variante custa cerca de 5 min e precisa morar em tmp/ do repositorio para o cache seguir o import; falta --params nas medidas",
+    "vistas-para-critica --saida grava so superficie e pedidos; zebra, pintura e vistas isoladas vao para tools/bancadas/out e sobrescrevem a rodada anterior",
+    "a curvatura da lataria deixou cinza as partes de regiao da mesma chapa sem avisar, porque so 'chapa' estava em lataria.partes",
+    "ondulacao nao acusa as faixas da lateral que a zebra mostra, e suavidade so mede por parte, sem caixa de regiao",
+    "descrever mostra 'limparLascas, lascasRestantes: undefined'",
+    "quem conduziu deu a emenda G1 da fatia 4 como disponivel sem conferir que ela estava no ramo carro; o processo nao pegou",
+    "os dois pedidos fechados deram 6,8 (juntar: P12 de criterio e P1 de forma), e P11 ficou sem leitura porque vistas:critica ignora em silencio as pranchas .svg que o PLANO cita"
+  ],
+  "notaDePassagem": "Alisamento de 3 mm nas curvas com ponto no para-lama ou no rebaixo, resto sem alisar: 1 mm no resto subiu a chapa de 304 para 326 com a secao partida. Secao partida so no ombro: para-lama 809 para 86; partir tambem coluna e quina deu chapa 454. Pontos-chave mais densos estreitam o vinco do ombro abaixo da espessura e a subdivisao recusa. Rebaixo some 60 mm antes da boca do arco. Arco com 100 lados porque 96 deixava face fina. As 9 falhas restantes estao na tampa e na traseira e pedem a emenda G1 da fatia 4.",
+  "receita": {
+    "sha256": "sha256:dd9bca5b49c1beec9b71dd54fba005b75fdb4dab16754adacd7e9047192fbf9f",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 135,
+      "acrescentadas": 305,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 8,
+          "texto": " * estação (de baixo: soleira, base do rebaixo, meio do rebaixo, topo do rebaixo, ombro, quina do teto e eixo do carro) e as linhas ao comprimento por"
+        },
+        {
+          "tipo": "-",
+          "linha": 9,
+          "texto": " * esses mesmos níveis. Todo ponto-chave vem de uma pele analítica da TABELA: a meia largura da planta menos a queda do ombro (a seção traseira)"
+        },
+        {
+          "tipo": "-",
+          "linha": 10,
+          "texto": " * menos o rebaixo (um sino entre a base e o topo, que morre antes do arco), e o teto como uma coroa. A parte de trás da estação `traseira` é a calota"
+        },
+        {
+          "tipo": "-",
+          "linha": 11,
+          "texto": " * da traseira: os níveis dão a volta pela planta (a quina) até o eixo do carro. O arco, o vidro lateral e a lanterna são vãos abertos na chapa"
+        },
+        {
+          "tipo": "-",
+          "linha": 12,
+          "texto": " * pronta por `aberturaPorContorno`, porque a gaiola só precisa seguir as feições que a superfície carrega."
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * estação (de baixo: soleira, base do rebaixo, meio do rebaixo, topo do rebaixo, ombro, base da coluna, quina do teto e eixo do carro) e as linhas"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * ao comprimento por esses níveis. Todo ponto-chave sai de uma pele analítica da TABELA: o contorno da planta da prancha superior (polígono com"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * filete, alisado ao longo do arco), recuado pela normal de quanto a seção cai (o ombro, a porta e o rebaixo), e o teto como uma coroa. Da"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * soleira à base da coluna os níveis correm pelo contorno da planta e dão a volta pela traseira até o eixo do carro, misturando suavemente a seção"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " * do lado com o perfil da traseira no eixo. O arco, o vidro lateral, a lanterna e o vidro traseiro são vãos abertos na chapa pronta."
+        },
+        {
+          "tipo": "-",
+          "linha": 14,
+          "texto": " * NOTA PARA A PRÓXIMA ETAPA. O arco é `furoPassante` (cilindro de eixo x), e não borda livre da gaiola, porque `aberturaPorContorno` exige o vão inteiro dentro da chapa e o"
+        },
+        {
+          "tipo": "-",
+          "linha": 15,
+          "texto": " * arco abre pela soleira; o vidro lateral não corta com mais de seis estações (a grade de 9 estações fez o corte deixar borda que não fecha). A simetria em x está"
+        },
+        {
+          "tipo": "-",
+          "linha": 16,
+          "texto": " * declarada na rede (a chapa sai com os dois lados); as partes `paralamaTraseiro` e `rebaixoLateral` são regiões do lado +x. O degrau de 55 mm do ombro até a"
+        },
+        {
+          "tipo": "-",
+          "linha": 17,
+          "texto": " * base da coluna, que a seção traseira mostra, não entrou: um ponto-chave ali deu raio de 0,4 mm no vinco e a espessura inverteu faces. O spoiler fica fora desta etapa."
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * NOTA PARA A PRÓXIMA ETAPA (rodada 3). A rodada 2 tirou a onda das tabelas lidas por pixel (média gaussiana, `alisamento`), adensou o sino do"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " * rebaixo e o rolo do ombro (`pontosChave`), passou a só aproximar as curvas (`chapa.pesoDasCurvas`) e fez do degrau do ombro à coluna uma"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " * faixa própria da rede (o nível `coluna`, com vinco). A rodada 3 alisa as curvas da rede pelo núcleo (`alisarCurvas`), com 3 mm nas que"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * passam pelo para-lama e pelo rebaixo e as outras sem alisar, e parte a seção no ombro (`partirSecaoEm`), porque o alisamento arredondava"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * a dobra do vinco onde ela vira menos que o ângulo de canto; o índice do para-lama caiu de 809 para 86. O rebaixo some `folgaDoArco`"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " * antes da boca do arco, e a região dele acaba ali. O vidro lateral e a lanterna saem nos dois lados (simetria na abertura e costura exata"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": " * na subdivisão); o vidro traseiro, que cruza o eixo, sai inteiro. A seção densa (10 pontos do topo do rebaixo ao ombro) estreita a faixa"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": " * do vinco do ombro abaixo da espessura, e a subdivisão recusa. O spoiler fica fora desta etapa."
+        },
+        {
+          "tipo": "-",
+          "linha": 26,
+          "texto": "  /* a chapa e a malha: espessura de chapa de aço, espaçamento da gaiola e níveis de subdivisão */"
+        },
+        {
+          "tipo": "-",
+          "linha": 27,
+          "texto": "  chapa: { espessura: 2, passo: 70, niveis: 2, anguloMax: 15 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 28,
+          "texto": "  /* a planta: a meia largura máxima da lataria pelo comprimento, [z, x], lida da vista de cima (320 mm de porta a 912, o ombro do para-lama a 950 em z -1300, a quina da traseira) */"
+        },
+        {
+          "tipo": "-",
+          "linha": 29,
+          "texto": "  planta: [[300, 912], [-750, 912], [-950, 940], [-1300, 950], [-1700, 930], [-1850, 893], [-2050, 840]],"
+        },
+        {
+          "tipo": "-",
+          "linha": 30,
+          "texto": "  /* a quina da traseira em planta, [z, x], de z -2050 ao eixo do carro; a calota usa estes pontos em cada nível */"
+        },
+        {
+          "tipo": "-",
+          "linha": 31,
+          "texto": "  quina: [[-1850, 893], [-2050, 840], [-2150, 770], [-2250, 690], [-2340, 400], [-2372, 120], [-2375, 0]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "  /* a chapa e a malha: espessura de chapa de aço, espaçamento da gaiola, níveis de subdivisão e o peso com que a superfície se aproxima das curvas (sem ele, passa por elas) */"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "  chapa: { espessura: 2, passo: 70, niveis: 2, anguloMax: 15, pesoDasCurvas: 1 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "  /* a planta, [z, x, raio], a metade da silhueta da prancha superior da frente da porta ao eixo do carro atrás (o polígono com filete por vértice da prancha) */"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "  planta: [[1000, 915, 200], [300, 912, 5000], [-750, 912, 3000], [-950, 940, 300], [-1300, 950, 2000], [-1700, 930, 800], [-2050, 840, 800], [-2250, 690, 300], [-2340, 400, 400], [-2372, 120, 600], [-2379, 0, 4000]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "  /* o alisamento das curvas, desvio da média gaussiana em mm: a planta ao longo do contorno, as tabelas ao comprimento, a queda do ombro e o perfil da traseira na altura */"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "  alisamento: { planta: 40, comprimento: 120, teto: 100, queda: 20, perfil: 30 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 33,
+          "texto": "  queda: [[170, 30], [210, 22], [300, 0], [600, 0], [758, 12], [827, 47], [932, 107], [978, 157], [1010, 150]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "  queda: [[170, 30], [210, 22], [300, 0], [600, 0], [758, 12], [827, 47], [932, 107], [978, 157], [1010, 160]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "  /* o degrau da seção traseira entre o ombro e a base da coluna (805 a y 1000 para 745 a y 1014): uma faixa de chapa própria da rede, de `largura` para dentro e `subida` para cima,"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "   * que dá a volta pela traseira como a borda da tampa; `folgaDoVidro` é quanto a borda de baixo do vidro lateral fica acima da base da coluna */"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "  degrau: { largura: 55, subida: 14, folgaDoVidro: 8 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "  /* as alturas dos níveis no eixo do carro, atrás: o fundo, a base e o topo do rebaixo, o meio entre eles e a borda da tampa (o ombro) */"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "  calota: { soleira: 333, base: 700, meio: 800, topo: 900, ombro: 1037 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 41,
+          "texto": "  /* o rebaixo côncavo: a profundidade máxima na porta (mm), e de onde ela começa a morrer até onde some (z) */"
+        },
+        {
+          "tipo": "-",
+          "linha": 42,
+          "texto": "  rebaixo: { profundidade: 20, cheioAte: -300, someEm: -1150 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "  /* o rebaixo côncavo: a profundidade máxima na porta (mm), de onde ela começa a morrer (z), e a folga (mm) entre onde ela some e a boca da"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "   * frente do arco da roda (z do eixo mais o raio): o rebaixo morre antes do arco, e a região dele acaba onde ele some */"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "  rebaixo: { profundidade: 20, cheioAte: -300, folgaDoArco: 60 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "  /* o alisamento das curvas da rede (`alisarCurvas`), o maior deslocamento de um ponto-chave em mm: o das curvas que passam pelo para-lama"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "   * ou pelo rebaixo, que a pessoa soltou até 3 mm (o ruído delas passa de 1 mm), e o das outras (`resto`, até 1 mm pela decisão; null as"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "   * deixa sem alisar). Medido na rodada 3 com a seção partida no ombro: com 1 mm no resto a chapa sai com índice 326 e 10 falhas, sem"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "   * alisar o resto 304 e 9, e o para-lama e o rebaixo iguais (86 e 25,5); as curvas do resto são as da coluna, da quina, da borda da tampa"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "   * e do perfil da traseira, que vão ao limite de 1 mm arredondando a feição, e por isso ficam sem alisar */"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "  alisarCurvas: { resto: null, regioes: 3 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 44,
+          "texto": "  quinaDoTeto: [[0, 612, 1262], [-400, 600, 1288], [-800, 620, 1262], [-1200, 625, 1135], [-1600, 520, 1090], [-2050, 430, 1049]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "  quinaDoTeto: [[0, 598, 1262], [-400, 588, 1288], [-800, 595, 1262], [-1200, 630, 1135], [-1600, 520, 1090], [-2050, 430, 1049]],"
+        },
+        {
+          "tipo": "-",
+          "linha": 46,
+          "texto": "  teto: [[0, 1346], [-320, 1381], [-728, 1341], [-1000, 1300], [-1132, 1269], [-1500, 1168], [-1893, 1059], [-2000, 1049], [-2050, 1048], [-2170, 1041], [-2210, 1037]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "  teto: [[0, 1346], [-320, 1381], [-728, 1341], [-1000, 1300], [-1132, 1269], [-1500, 1168], [-1893, 1050], [-2000, 1041], [-2050, 1040], [-2170, 1038], [-2210, 1037]],"
+        },
+        {
+          "tipo": "-",
+          "linha": 49,
+          "texto": "  /* a coroa do teto, expoente da seção entre a quina do teto e o eixo (a seção traseira: 3 mm a 300 de 590, 30 mm a 487) */"
+        },
+        {
+          "tipo": "-",
+          "linha": 50,
+          "texto": "  coroa: 3.5,"
+        },
+        {
+          "tipo": "-",
+          "linha": 51,
+          "texto": "  /* as estações ao comprimento, z; a última é a que fecha a calota da traseira */"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "  /* a coroa do teto, expoente da seção entre a quina do teto e o eixo (a seção traseira: 3 mm a 300 de 590, 30 mm a 487, de uma queda de 93 até a quina) */"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "  coroa: 5.5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "  /* as estações ao comprimento, z; a última é onde começa a calota da traseira */"
+        },
+        {
+          "tipo": "-",
+          "linha": 53,
+          "texto": "  /* o vinco do ombro (a quina entre a lateral e a faixa do teto) e da quina do teto, nitidez de 0 a 1 */"
+        },
+        {
+          "tipo": "-",
+          "linha": 54,
+          "texto": "  vincos: { ombro: 0.55, quinaDoTeto: 0.4, bordaDaTampa: 0.2 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 55,
+          "texto": "  /* o arco da roda traseira: centro no eixo traseiro, raio da prancha (pneu de 340 mais 40) */"
+        },
+        {
+          "tipo": "-",
+          "linha": 56,
+          "texto": "  arco: { z: -1375, y: 340, raio: 380, lados: 96 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 57,
+          "texto": "  /* as partes por região da chapa, caixas [min, max] em mm: o para-lama saliente (atrás da porta, sobre o arco) e o rebaixo da lateral (do meio da porta até morrer no arco); o rebaixo vale onde as duas se sobrepõem */"
+        },
+        {
+          "tipo": "-",
+          "linha": 58,
+          "texto": "  partes: { paralama: { min: [780, 250, -1950], max: [960, 1010, -900] }, rebaixo: { min: [780, 380, -1150], max: [960, 840, 1] } },"
+        },
+        {
+          "tipo": "-",
+          "linha": 59,
+          "texto": "  /* o vão do vidro lateral traseiro, [z, y] do contorno da prancha lateral (a borda de fora da moldura) */"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "  /* os pontos-chave entre os nós: o espaçamento ao comprimento, na volta da calota e no perfil da traseira (mm), quantos em cada vão da seção,"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "   * de baixo para cima até a quina, e as frações da quina em que a coroa do teto é lida, mais juntas perto da quina, onde ela cai. Mais"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "   * densos, o alisamento das curvas anda menos (as linhas, menos de 1,2 mm), mas a seção densa estreita a faixa do vinco do ombro abaixo da"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "   * espessura (raio de 1,1 mm) e as linhas densas subiram o índice da chapa de 326 para 364 */"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "  pontosChave: { comprimento: 100, calota: 90, perfil: 60, secao: [3, 3, 3, 5, 0, 4], coroa: [0.92, 0.84, 0.75, 0.65, 0.5, 0.33, 0.16] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "  /* os níveis em que a seção se parte em curvas, para o alisamento não arredondar a dobra do vinco que ela cruza: só o ombro, que tirou o"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "   * índice do para-lama de 239 para 86 e o da chapa de 373 para 326; partida também na coluna e na quina, a chapa subiu a 454 */"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "  partirSecaoEm: ['ombro'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "  vincos: { ombro: 0.5, coluna: 0.3, quinaDoTeto: 0.4, bordaDaTampa: 0.2 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "  /* o arco da roda traseira: centro no eixo traseiro, raio da prancha (pneu de 340 mais 40), e os lados do polígono do corte (com 96, um vértice"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "   * dele caía a 0,4 mm de um da chapa perto do topo do arco e deixava uma face fina em cada lado) */"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "  arco: { z: -1375, y: 340, raio: 380, lados: 100 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "  /* as partes por região da chapa, caixas [min, max] em mm: o para-lama saliente (atrás da porta, sobre o arco) e o rebaixo da lateral (do meio da porta até onde ele some, antes do arco: a caixa dele só dá x e y atrás, e o z de trás sai de `ondeORebaixoSome`); o rebaixo vale onde as duas se sobrepõem */"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "  partes: { paralama: { min: [780, 250, -1950], max: [960, 1010, -900] }, rebaixo: { min: [780, 380], max: [960, 840, 1] } },"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "  /* o vão do vidro lateral traseiro, [z, y] do contorno da prancha lateral (a borda de fora da moldura); a borda de baixo sobe até a base da coluna mais a folga */"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "  /* o vão do vidro traseiro, a metade [z, x, raio] da prancha superior (a borda de cima, a lateral e o canto de baixo), espelhada no eixo do carro */"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "  vidroTraseiro: [[-975, 0, 5000], [-955, 532, 60], [-1500, 502, 3000], [-1680, 445, 200], [-1795, 0, 1500]],"
+        },
+        {
+          "tipo": "-",
+          "linha": 92,
+          "texto": "const suave = (u) => { const s = Math.min(1, Math.max(0, u)); return s * s * (3 - 2 * s); };"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "/* os pesos da média gaussiana, em 41 amostras de -2,5 a 2,5 desvios */"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "const GAUSS = (() => { const k = []; for (let i = -20; i <= 20; i += 1) { const t = (i / 20) * 2.5; k.push([t, Math.exp(-0.5 * t * t)]); } const soma = k.reduce((a, [, w]) => a + w, 0); return k.map(([t, w]) => [t, w / soma]); })();"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "/** A função alisada por média gaussiana de desvio `sigma` (mm): tira a quebra de curvatura que a interpolação deixa em cada ponto da tabela, que a chapa brilhante mostra como onda. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "export const alisar = (f, sigma) => (x) => GAUSS.reduce((a, [t, w]) => a + w * f(x + sigma * t), 0);"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "const suave = (u) => { const s = Math.min(1, Math.max(0, u)); return s * s * s * (s * (6 * s - 15) + 10); };"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "/** O polígono [a, b, raio] com filete por vértice, amostrado: os trechos retos e os arcos de cada canto. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "function filete2d(pts) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "  const out = [[pts[0][0], pts[0][1]]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": "  for (let i = 1; i < pts.length - 1; i += 1) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": "    const [pa, pb, r = 0] = pts[i];"
+        },
+        {
+          "tipo": "+",
+          "linha": 131,
+          "texto": "    const ua = [pts[i - 1][0] - pa, pts[i - 1][1] - pb]; const ub = [pts[i + 1][0] - pa, pts[i + 1][1] - pb];"
+        },
+        {
+          "tipo": "+",
+          "linha": 132,
+          "texto": "    const la = Math.hypot(...ua); const lb = Math.hypot(...ub);"
+        },
+        {
+          "tipo": "+",
+          "linha": 133,
+          "texto": "    const teta = Math.acos(Math.max(-1, Math.min(1, (ua[0] * ub[0] + ua[1] * ub[1]) / (la * lb))));"
+        },
+        {
+          "tipo": "+",
+          "linha": 134,
+          "texto": "    if (!(r > 0) || teta < 1e-4 || Math.PI - teta < 1e-4) { out.push([pa, pb]); continue; }"
+        },
+        {
+          "tipo": "+",
+          "linha": 135,
+          "texto": "    let t = r / Math.tan(teta / 2); let rr = r;"
+        },
+        {
+          "tipo": "+",
+          "linha": 136,
+          "texto": "    const lim = 0.5 * Math.min(la, lb); if (t > lim) { t = lim; rr = t * Math.tan(teta / 2); }"
+        },
+        {
+          "tipo": "+",
+          "linha": 137,
+          "texto": "    const A = [pa + (ua[0] / la) * t, pb + (ua[1] / la) * t]; const B = [pa + (ub[0] / lb) * t, pb + (ub[1] / lb) * t];"
+        },
+        {
+          "tipo": "+",
+          "linha": 138,
+          "texto": "    const bi = [ua[0] / la + ub[0] / lb, ua[1] / la + ub[1] / lb]; const lbi = Math.hypot(...bi);"
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": "    const C = [pa + (bi[0] / lbi) * (rr / Math.sin(teta / 2)), pb + (bi[1] / lbi) * (rr / Math.sin(teta / 2))];"
+        },
+        {
+          "tipo": "+",
+          "linha": 140,
+          "texto": "    const a0 = Math.atan2(A[1] - C[1], A[0] - C[0]); let da = Math.atan2(B[1] - C[1], B[0] - C[0]) - a0;"
+        },
+        {
+          "tipo": "+",
+          "linha": 141,
+          "texto": "    if (da > Math.PI) da -= 2 * Math.PI; if (da < -Math.PI) da += 2 * Math.PI;"
+        },
+        {
+          "tipo": "+",
+          "linha": 142,
+          "texto": "    const n = Math.max(2, Math.ceil(Math.abs(da) / (Math.PI / 180)));"
+        },
+        {
+          "tipo": "+",
+          "linha": 143,
+          "texto": "    for (let k = 0; k <= n; k += 1) out.push([C[0] + rr * Math.cos(a0 + (da * k) / n), C[1] + rr * Math.sin(a0 + (da * k) / n)]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 144,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 145,
+          "texto": "  out.push([pts[pts.length - 1][0], pts[pts.length - 1][1]]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 146,
+          "texto": "  return out;"
+        },
+        {
+          "tipo": "+",
+          "linha": 147,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 148,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 149,
+          "texto": "/** O contorno da planta, [z, x] da frente ao eixo do carro atrás: o polígono com filete da prancha, refeito a cada 5 mm de arco e alisado"
+        },
+        {
+          "tipo": "+",
+          "linha": 150,
+          "texto": " * pela média gaussiana ao longo do arco; o fim de trás continua espelhado, para a média passar lisa pelo eixo do carro. Devolve o ponto e a"
+        },
+        {
+          "tipo": "+",
+          "linha": 151,
+          "texto": " * normal para dentro (de x para o eixo do carro no lado, de z para a frente na traseira) em cada comprimento de arco. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 152,
+          "texto": "export function contornoDaPlanta(planta, sigma) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 153,
+          "texto": "  const bruto = filete2d([...planta, ...planta.slice(0, -1).reverse().map(([z, x, r]) => [z, -x, r])]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 154,
+          "texto": "  const h = 5; const pts = [bruto[0]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 155,
+          "texto": "  let resto = 0;"
+        },
+        {
+          "tipo": "+",
+          "linha": 156,
+          "texto": "  for (let i = 1; i < bruto.length; i += 1) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 157,
+          "texto": "    const [a, b] = [bruto[i - 1], bruto[i]]; const l = Math.hypot(b[0] - a[0], b[1] - a[1]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 158,
+          "texto": "    let d = h - resto;"
+        },
+        {
+          "tipo": "+",
+          "linha": 159,
+          "texto": "    while (d <= l) { pts.push([a[0] + ((b[0] - a[0]) * d) / l, a[1] + ((b[1] - a[1]) * d) / l]); d += h; }"
+        },
+        {
+          "tipo": "+",
+          "linha": 160,
+          "texto": "    resto = l - (d - h);"
+        },
+        {
+          "tipo": "+",
+          "linha": 161,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 162,
+          "texto": "  const raio = Math.ceil((2.5 * sigma) / h);"
+        },
+        {
+          "tipo": "+",
+          "linha": 163,
+          "texto": "  const pesos = []; for (let k = -raio; k <= raio; k += 1) pesos.push(Math.exp(-0.5 * ((k * h) / sigma) ** 2));"
+        },
+        {
+          "tipo": "+",
+          "linha": 164,
+          "texto": "  const soma = pesos.reduce((a, w) => a + w, 0);"
+        },
+        {
+          "tipo": "+",
+          "linha": 165,
+          "texto": "  const lisos = pts.map((_, i) => { let z = 0; let x = 0; for (let k = -raio; k <= raio; k += 1) { const p = pts[Math.min(pts.length - 1, Math.max(0, i + k))]; z += p[0] * pesos[k + raio]; x += p[1] * pesos[k + raio]; } return [z / soma, x / soma]; });"
+        },
+        {
+          "tipo": "+",
+          "linha": 166,
+          "texto": "  /* a metade x >= 0: até onde o contorno cruza o eixo do carro */"
+        },
+        {
+          "tipo": "+",
+          "linha": 167,
+          "texto": "  let fim = lisos.findIndex((p, i) => i > 0 && p[1] <= 0);"
+        },
+        {
+          "tipo": "+",
+          "linha": 168,
+          "texto": "  const [a, b] = [lisos[fim - 1], lisos[fim]]; const f = a[1] / (a[1] - b[1]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 169,
+          "texto": "  const meia = [...lisos.slice(0, fim), [a[0] + (b[0] - a[0]) * f, 0]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 170,
+          "texto": "  const s = [0]; for (let i = 1; i < meia.length; i += 1) s.push(s[i - 1] + Math.hypot(meia[i][0] - meia[i - 1][0], meia[i][1] - meia[i - 1][1]));"
+        },
+        {
+          "tipo": "+",
+          "linha": 171,
+          "texto": "  const total = s[s.length - 1];"
+        },
+        {
+          "tipo": "+",
+          "linha": 172,
+          "texto": "  const achar = (u) => { let lo = 0; let hi = meia.length - 1; while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (s[mid] <= u) lo = mid; else hi = mid; } return lo; };"
+        },
+        {
+          "tipo": "+",
+          "linha": 173,
+          "texto": "  const ponto = (u) => { const c = Math.min(total, Math.max(0, u)); const i = Math.min(achar(c), meia.length - 2); const t = (c - s[i]) / (s[i + 1] - s[i]); return [meia[i][0] + (meia[i + 1][0] - meia[i][0]) * t, meia[i][1] + (meia[i + 1][1] - meia[i][1]) * t]; };"
+        },
+        {
+          "tipo": "+",
+          "linha": 174,
+          "texto": "  /* a tangente por diferença central de 10 mm; a normal para dentro é a tangente girada: (-dx, dz) em [z, x] */"
+        },
+        {
+          "tipo": "+",
+          "linha": 175,
+          "texto": "  const normal = (u) => { const p = ponto(u - 10); const q = ponto(u + 10); const l = Math.hypot(q[0] - p[0], q[1] - p[1]); return [-(q[1] - p[1]) / l, (q[0] - p[0]) / l]; };"
+        },
+        {
+          "tipo": "+",
+          "linha": 176,
+          "texto": "  /* o comprimento de arco em que o contorno passa por z, no lado (onde z cai ao longo do arco) */"
+        },
+        {
+          "tipo": "+",
+          "linha": 177,
+          "texto": "  const deZ = (z) => { let lo = 0; let hi = total; for (let k = 0; k < 60; k += 1) { const mid = (lo + hi) / 2; if (ponto(mid)[0] > z) lo = mid; else hi = mid; } return (lo + hi) / 2; };"
+        },
+        {
+          "tipo": "+",
+          "linha": 178,
+          "texto": "  return { ponto, normal, deZ, total, zFim: meia[meia.length - 1][0] };"
+        },
+        {
+          "tipo": "+",
+          "linha": 179,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 180,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 181,
+          "texto": "/** O z em que o rebaixo some: a folga antes da boca da frente do arco da roda. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 182,
+          "texto": "export const ondeORebaixoSome = (T) => T.arco.z + T.arco.raio + T.rebaixo.folgaDoArco;"
+        },
+        {
+          "tipo": "+",
+          "linha": 183,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 184,
+          "texto": "/** As caixas das regiões em mm: a do rebaixo acaba, atrás, onde ele some. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 185,
+          "texto": "export const caixasDasPartes = (T) => ({ paralama: T.partes.paralama, rebaixo: { min: [...T.partes.rebaixo.min, ondeORebaixoSome(T)], max: T.partes.rebaixo.max } });"
+        },
+        {
+          "tipo": "+",
+          "linha": 186,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 96,
+          "texto": "  const W = pchip([[1000, 912], ...T.planta]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 97,
+          "texto": "  const quedaDe = pchip(T.queda);"
+        },
+        {
+          "tipo": "-",
+          "linha": 98,
+          "texto": "  const yBase = pchip(T.baseDoRebaixo); const yTopo = pchip(T.topoDoRebaixo);"
+        },
+        {
+          "tipo": "-",
+          "linha": 99,
+          "texto": "  const yOmbro = pchip(T.ombro); const ySoleira = pchip(T.soleira);"
+        },
+        {
+          "tipo": "-",
+          "linha": 100,
+          "texto": "  const yTeto = pchip(T.teto);"
+        },
+        {
+          "tipo": "-",
+          "linha": 101,
+          "texto": "  const zx = pchip(T.quinaDoTeto.map(([z, x]) => [z, x])); const zy = pchip(T.quinaDoTeto.map(([z, , y]) => [z, y]));"
+        },
+        {
+          "tipo": "-",
+          "linha": 102,
+          "texto": "  const { profundidade, cheioAte, someEm } = T.rebaixo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 189,
+          "texto": "  const A = T.alisamento;"
+        },
+        {
+          "tipo": "+",
+          "linha": 190,
+          "texto": "  const O = contornoDaPlanta(T.planta, A.planta);"
+        },
+        {
+          "tipo": "+",
+          "linha": 191,
+          "texto": "  const lisa = (tab, s = A.comprimento) => alisar(pchip(tab), s);"
+        },
+        {
+          "tipo": "+",
+          "linha": 192,
+          "texto": "  const quedaDe = alisar(pchip(T.queda), A.queda);"
+        },
+        {
+          "tipo": "+",
+          "linha": 193,
+          "texto": "  const yBase = lisa(T.baseDoRebaixo); const yTopo = lisa(T.topoDoRebaixo);"
+        },
+        {
+          "tipo": "+",
+          "linha": 194,
+          "texto": "  const yOmbro = lisa(T.ombro); const ySoleira = lisa(T.soleira);"
+        },
+        {
+          "tipo": "+",
+          "linha": 195,
+          "texto": "  const yTeto = lisa(T.teto, A.teto);"
+        },
+        {
+          "tipo": "+",
+          "linha": 196,
+          "texto": "  const zx = lisa(T.quinaDoTeto.map(([z, x]) => [z, x])); const zy = lisa(T.quinaDoTeto.map(([z, , y]) => [z, y]));"
+        },
+        {
+          "tipo": "+",
+          "linha": 197,
+          "texto": "  const zEixo = alisar(pchip(T.traseira.map(([y, z]) => [y, z])), A.perfil);"
+        },
+        {
+          "tipo": "+",
+          "linha": 198,
+          "texto": "  const { profundidade, cheioAte } = T.rebaixo; const someEm = ondeORebaixoSome(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 203,
+          "texto": "    /* o sino em seno à quarta: valor, inclinação e curvatura nulos na base e no topo, para o reflexo não quebrar na borda do rebaixo */"
+        },
+        {
+          "tipo": "-",
+          "linha": 108,
+          "texto": "    return fundo(z) * s * s;"
+        },
+        {
+          "tipo": "+",
+          "linha": 205,
+          "texto": "    return fundo(z) * s ** 4;"
+        },
+        {
+          "tipo": "-",
+          "linha": 112,
+          "texto": "  const xLado = (z, y) => W(z) - quedaDe(y) - portaExtra(z, y) - rebaixo(z, y);"
+        },
+        {
+          "tipo": "+",
+          "linha": 209,
+          "texto": "  /* quanto o lado sai para dentro do contorno da planta, pela normal, em z e y */"
+        },
+        {
+          "tipo": "+",
+          "linha": 210,
+          "texto": "  const recuo = (z, y) => quedaDe(y) + portaExtra(z, y) + rebaixo(z, y);"
+        },
+        {
+          "tipo": "-",
+          "linha": 115,
+          "texto": "  /* a calota: o ponto do nível em y0 (em z -2050) até y1 (no eixo), numa planta da quina, deslocado pelo perfil da traseira */"
+        },
+        {
+          "tipo": "-",
+          "linha": 116,
+          "texto": "  const zEixo = pchip(T.traseira.map(([y, z]) => [y, z]));"
+        },
+        {
+          "tipo": "-",
+          "linha": 117,
+          "texto": "  const quina = (y0, y1, f) => {"
+        },
+        {
+          "tipo": "-",
+          "linha": 118,
+          "texto": "    const [zq0, xq0] = T.quina[0];"
+        },
+        {
+          "tipo": "-",
+          "linha": 119,
+          "texto": "    return T.quina.map(([z, x]) => {"
+        },
+        {
+          "tipo": "-",
+          "linha": 120,
+          "texto": "      const w = (zq0 - z) / (zq0 - T.quina[T.quina.length - 1][0]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 121,
+          "texto": "      const y = y0 + (y1 - y0) * w;"
+        },
+        {
+          "tipo": "-",
+          "linha": 122,
+          "texto": "      return [x - (quedaDe(y) * x) / xq0 * f, y, z + (zEixo(y) + 2375) * w * f];"
+        },
+        {
+          "tipo": "-",
+          "linha": 123,
+          "texto": "    });"
+        },
+        {
+          "tipo": "-",
+          "linha": 124,
+          "texto": "  };"
+        },
+        {
+          "tipo": "-",
+          "linha": 125,
+          "texto": "  return { W, quedaDe, yBase, yTopo, yOmbro, ySoleira, yTeto, R, fundo, rebaixo, xLado, coroa, zEixo, quina };"
+        },
+        {
+          "tipo": "+",
+          "linha": 213,
+          "texto": "  /* o ponto 3D do contorno de arco u recuado de d pela normal, na altura y */"
+        },
+        {
+          "tipo": "+",
+          "linha": 214,
+          "texto": "  const sobre = (u, d, y) => { const [z, x] = O.ponto(u); const [nz, nx] = O.normal(u); return [x + d * nx, y, z + d * nz]; };"
+        },
+        {
+          "tipo": "+",
+          "linha": 215,
+          "texto": "  return { O, quedaDe, yBase, yTopo, yOmbro, ySoleira, yTeto, R, fundo, rebaixo, recuo, coroa, zEixo, sobre };"
+        },
+        {
+          "tipo": "-",
+          "linha": 128,
+          "texto": "const NIVEIS = ['soleira', 'base', 'meio', 'topo', 'ombro', 'quina', 'eixo'];"
+        },
+        {
+          "tipo": "+",
+          "linha": 218,
+          "texto": "const NIVEIS = ['soleira', 'base', 'meio', 'topo', 'ombro', 'coluna', 'quina', 'eixo'];"
+        },
+        {
+          "tipo": "+",
+          "linha": 219,
+          "texto": "const LADO = 6; /* os níveis que correm pelo contorno da planta e dão a volta pela traseira: da soleira à coluna */"
+        },
+        {
+          "tipo": "+",
+          "linha": 221,
+          "texto": "/** Uma caixa [min, max] em mm contém o ponto [x, y, z] em mm. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 222,
+          "texto": "const naCaixa = (p, { min, max }) => p.every((c, k) => c >= min[k] && c <= max[k]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 223,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 224,
+          "texto": "/** A opção `alisarCurvas` da rede, da TABELA: a tolerância das curvas que têm ponto-chave nas regiões do para-lama ou do rebaixo (as caixas"
+        },
+        {
+          "tipo": "+",
+          "linha": 225,
+          "texto": " * de `partes`), que a pessoa soltou até `regioes` mm, e a das outras (`resto`; null as deixa sem alisar); sem `alisarCurvas` na TABELA, nada. */"
+        }
+      ],
+      "cortada": true
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes chapa, paralamaTraseiro, rebaixoLateral",
+    "imagens": [
+      "peca-frente-rasante-az0.png",
+      "peca-frente-rasante-az270.png",
+      "peca-lado-rasante-az180.png",
+      "peca-lado-rasante-az270.png",
+      "peca-topo-rasante-az270.png",
+      "peca-topo-rasante-az180.png",
+      "peca-tresquartos-rasante-az20.png",
+      "peca-tresquartos-rasante-az290.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  },
+  "registradaEm": "2026-11-17T10:19:12.001Z",
+  "facesFinas": {
+    "total": 1,
+    "porParte": {
+      "chapa": 1
+    }
+  }
+}
