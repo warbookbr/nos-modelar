@@ -12,7 +12,7 @@ import { lerPergunta } from '../../src/autoria/perguntas-do-critico.js';
 import {
   ELEVACOES_DA_LUZ_RASANTE, LIMITE_DO_VEREDITO, PERGUNTA_DO_ALVO, PRAZO_DA_CAPTURA_MONTADA_MS, VISTAS_MONTADAS, ladoDaVista, montagemDaPeca, montarPedido, pastaDaRodada, prefixoDaPeca, referenciasDoPlano,
   DISTANCIA_DE_PERTO_MM, campoDePertoMm, MOTIVO_SEM_MEDIR, ReceitaReprovada, decidirLuzRasante, imprimir, fracaoVisivelDaPeca, lerReferenciasExternas, lerOrientacaoDaReferencia, LIMITE_DA_ORIENTACAO, AJUDA, imagensDoReflexo, LEITURA_DA_FAIXA, LEITURA_DO_REFLEXO, secaoDoReflexo, MINIMO_DO_REFLEXO, luzRasanteDoPacote, primeiraQuePassa, unidadeDoAlvo, vistaDoArquivo, vistasMontadasVisiveis, vistasParaCritica, vistasRepetidas,
-  ARQUIVO_DO_CONTORNO_SOBREPOSTO, contornosParaSobrepor, etapaFixaDaPeca, motivoDaEtapaFixa, registroDasEtapas,
+  ARQUIVO_DO_CONTORNO_SOBREPOSTO, contornosParaSobrepor, etapaFixaDaPeca, lerContornosExternos, lerRegioesDoContorno, motivoDaEtapaFixa, registroDasEtapas,
   ARQUIVO_DAS_PERGUNTAS_FECHADAS, FORMATO_DAS_PERGUNTAS_FECHADAS, NAO_DA_PARA_VER, NAO_VERIFICAVEL, REGRA_DA_NOTA, arquivoDoPedidoFechado, juntarOrdens, lerRespostasFechadas,
   montarPedidoFechado, notaDasRespostas, notaEscrita, normalizarResposta, perguntasFechadas, relatorioDaJuncao, relatorioDasNotas, respostasQueMudaram, variacaoDasNotas,
   ARQUIVO_DOS_DADOS_DO_PEDIDO, afirmacoesDaForma, gravarPedidos, notaPelaRegra, pesosDasPerguntas, refazerPedidos, semMedidas,
@@ -957,6 +957,17 @@ describe('a linha de comando', () => {
     expect(duas.status).toBe(2);
     expect(duas.stderr).toContain('duas vezes para a mesma referência');
   });
+
+  it('--regioes-do-contorno vale para o --contorno anterior, e sem ele ou repetida é recusada com o uso', () => {
+    expect(AJUDA).toContain('--contorno=<caminho>[@<lado>]');
+    expect(AJUDA).toContain('--regioes-do-contorno=<nome>');
+    const antes = rodar('x/y', '--regioes-do-contorno=selim');
+    expect(antes.status).toBe(2);
+    expect(antes.stderr).toContain('veio antes de qualquer --contorno');
+    const duas = rodar('x/y', '--contorno=/fora/lateral.contornos.json', '--regioes-do-contorno=selim', '--regioes-do-contorno=canote');
+    expect(duas.status).toBe(2);
+    expect(duas.stderr).toContain('duas vezes para o mesmo contorno');
+  });
 });
 
 describe('a lataria sem o Blender', () => {
@@ -1294,6 +1305,75 @@ describe('o contorno medido sobre o modelo', () => {
     expect(resultado.contornoSobreposto.arquivo).toBe(join(pasta, ARQUIVO_DO_CONTORNO_SOBREPOSTO));
     expect(readFileSync(join(pasta, 'pedido.md'), 'utf8')).toContain(`- contorno sobreposto: ${join(pasta, ARQUIVO_DO_CONTORNO_SOBREPOSTO)}`);
     expect(JSON.parse(readFileSync(resultado.manifesto, 'utf8')).contornoSobreposto.imagem).toBe(join(pasta, ARQUIVO_DO_CONTORNO_SOBREPOSTO));
+  }, 60_000);
+
+  /* o contorno de fora do repositório, como `npm run contorno --fora-do-repositorio` o grava */
+  const deFora = (imagem = { foraDoRepositorio: { motivo: 'foto de terceiro, fica em tmp', encerrada: false }, sha256: 'ab', largura: 10, altura: 10 }) => ({
+    formato: 'mecanifica.contornos@1', mmPorPx: 1, ...(imagem ? { imagem } : {}),
+    silhueta: { contornoMm: [[-100, 0], [100, 0], [100, 200], [-100, 200]] },
+    regioes: { coluna: { contornoMm: [[-40, 20], [40, 20], [40, 200], [-40, 200]] }, base: { contornoMm: [[-100, 0], [100, 0], [100, 20], [-100, 20]] } },
+  });
+  const gravarContorno = (pasta, nome, json) => { mkdirSync(pasta, { recursive: true }); const f = join(pasta, nome); writeFileSync(f, JSON.stringify(json)); return f; };
+
+  it('--contorno lê o lado pelo nome ou pelo @, e recusa o contorno sem a origem da imagem ou de referência encerrada', () => {
+    const pasta = mkdtempSync(join(area, 'contorno-externo-'));
+    const lateral = gravarContorno(pasta, 'lateral.contornos.json', deFora());
+    expect(lerContornosExternos([lateral])).toEqual([{ arquivo: lateral, lado: 'lateral', externo: true }]);
+    const semNome = gravarContorno(pasta, 'medido.contornos.json', deFora());
+    expect(lerContornosExternos([`${semNome}@superior`], { regioes: [['coluna']] })).toEqual([{ arquivo: semNome, lado: 'superior', regioes: ['coluna'], externo: true }]);
+    expect(() => lerContornosExternos([semNome])).toThrow(/o nome do arquivo não diz o lado.*diga o lado com --contorno=.*@lateral/);
+    expect(() => lerContornosExternos([`${lateral}@traseira`])).toThrow(/o lado 'traseira' não é um dos que o contorno em mm mede \(frontal, lateral, superior\)/);
+    expect(() => lerContornosExternos([join(pasta, 'some', 'lateral.contornos.json')])).toThrow(/não existe/);
+    expect(() => lerContornosExternos([lateral, `${lateral}@lateral`])).toThrow(/veio mais de uma vez/);
+    const semOrigem = gravarContorno(join(pasta, 'sem'), 'lateral.contornos.json', deFora(null));
+    expect(() => lerContornosExternos([semOrigem])).toThrow(/não entra sem a declaração de origem da imagem: o contorno não diz de onde veio a imagem/);
+    const semMotivo = gravarContorno(join(pasta, 'motivo'), 'lateral.contornos.json', deFora({ foraDoRepositorio: { motivo: ' ', encerrada: false } }));
+    expect(() => lerContornosExternos([semMotivo])).toThrow(/imagem.foraDoRepositorio não diz o motivo/);
+    const encerrada = gravarContorno(join(pasta, 'encerrada'), 'lateral.contornos.json', deFora({ foraDoRepositorio: { motivo: 'a foto saiu', encerrada: true } }));
+    expect(() => lerContornosExternos([encerrada])).toThrow(/encerrada é true \(a foto saiu\).*não entra como medida/);
+    expect(() => lerContornosExternos([lateral], { regioes: [['selim']] })).toThrow(/a região selim não existe no contorno; ele tem base, coluna/);
+    expect(lerRegioesDoContorno('selim, canote')).toEqual(['selim', 'canote']);
+    expect(() => lerRegioesDoContorno('selim,,canote')).toThrow(/nomes de região separados por vírgula/);
+    expect(() => lerRegioesDoContorno('selim,selim')).toThrow(/mais de uma vez/);
+  });
+
+  it('as regiões pedidas são as únicas desenhadas, sem a silhueta, e a que falta fica de fora com o motivo', () => {
+    const lidos = new Map([['/r/lateral.contornos.json', lerContornos(deFora())]]);
+    const { entradas } = contornosParaSobrepor({ contornos: [{ arquivo: '/r/lateral.contornos.json', lado: 'lateral', regioes: ['coluna'] }], lidos, nomes: ['coluna', 'base'] });
+    expect(entradas[0].vista).toBe('esquerda');
+    expect(entradas[0].aneis.map((a) => a.nome)).toEqual(['coluna']);
+    const falta = contornosParaSobrepor({ contornos: [{ arquivo: '/r/lateral.contornos.json', lado: 'lateral', regioes: ['selim'] }], lidos, nomes: [] });
+    expect(falta.entradas).toEqual([]);
+    expect(falta.fora).toEqual(['lateral.contornos.json fica fora do contorno sobreposto: não tem a região selim (tem base, coluna).']);
+  });
+
+  it('o pacote desenha o contorno de --contorno e o cita como medida do lado, tirado da --referencia de mesmo nome', async () => {
+    const PECA = 'tools/fixtures/refina-forma-global/contorno-ok/receita.js';
+    const base = mkdtempSync(join(area, 'contorno-de-fora-'));
+    const pasta = join(base, 'rodada');
+    const fotos = join(base, 'fotos');
+    const contorno = gravarContorno(fotos, 'lateral.contornos.json', deFora());
+    writeFileSync(join(fotos, 'lateral.png'), 'png');
+    const bancada = bancadaFalsa(base, PECA);
+    const pedidos = [];
+    await vistasParaCritica(PECA, {
+      saida: pasta, pastaDasCapturas: base,
+      referenciasExternas: [`${join(fotos, 'lateral.png')}@esquerda`], contornosExternos: [contorno], regioesDosContornos: [['coluna']],
+      dependencias: {
+        medirReceita: medirPassa, olharBancada: bancada.fazer, rodadasAnteriores: () => [],
+        contornoSobreposto: async (opcoes) => {
+          pedidos.push(opcoes);
+          writeFileSync(opcoes.arquivo, 'png');
+          return { arquivo: opcoes.arquivo, json: opcoes.arquivo.replace(/png$/, 'json'), medidas: { linhas: [] } };
+        },
+      },
+    });
+    expect(pedidos[0].contornos.map((c) => [c.vista, c.aneis.map((a) => a.nome)])).toEqual([['esquerda', ['coluna']], ['frontal', ['silhueta', 'coluna', 'sapata']]]);
+    expect(pedidos[0].contornos[0].arquivo).toBe(contorno);
+    expect(readFileSync(join(pasta, 'pedido.md'), 'utf8')).toContain('a medida deste lado vem dos contornos em mm de `lateral.contornos.json`, tirados de `lateral.png`');
+    const semOrigem = gravarContorno(join(base, 'sem'), 'lateral.contornos.json', deFora(null));
+    const recusa = await vistasParaCritica(PECA, { saida: pasta, pastaDasCapturas: base, contornosExternos: [semOrigem], dependencias: { medirReceita: medirPassa, olharBancada: bancada.fazer } }).catch((e) => e);
+    expect(recusa.message).toMatch(/não entra sem a declaração de origem/);
   }, 60_000);
 
   it('a etapa fixa vem do registro de etapas: toda instância da peça fixa, e nada fora de montagem', () => {

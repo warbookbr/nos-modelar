@@ -97,6 +97,7 @@ import { doAmbiente } from '../ambiente.mjs';
 import { avisarReferenciasLocaisAusentes, mensagemDeReferenciasAusentes, referenciasDoPlano } from './referencias-do-plano.mjs';
 import { lerContornos, vistaDoMesmoOlho } from './comparar-contornos.mjs';
 import { contornosDaPeca } from './contorno-da-peca.mjs';
+import { motivoDaOrigem } from './guardas/origem-dos-contornos.mjs';
 import {
   FOLGA_DA_SILHUETA_PX, VISTAS_DO_CONTORNO, aoReferencialDaPeca, encontrosDoAnel, ladosEmTexto, pontoDoContorno, prancharContorno,
   vistaNaPeca,
@@ -1160,7 +1161,7 @@ export function contornosParaSobrepor({ contornos = [], lidos = new Map(), nomes
   const entradas = [];
   const fora = [];
   const nomesDaPeca = new Set(nomes);
-  for (const { arquivo, lado } of contornos) {
+  for (const { arquivo, lado, regioes: pedidas = null } of contornos) {
     const nome = basename(arquivo);
     if (!VISTAS_DO_CONTORNO.includes(lado)) { fora.push(`${nome} fica fora do contorno sobreposto: o lado ${lado ?? 'sem nome'} não é um dos que o contorno em mm mede (${VISTAS_DO_CONTORNO.join(', ')}).`); continue; }
     const lido = lidos.get(arquivo);
@@ -1168,8 +1169,12 @@ export function contornosParaSobrepor({ contornos = [], lidos = new Map(), nomes
     const mundo = vistasDaReferencia(lado, orientacao)?.mesma;
     const vista = mundo ? vistaNaPeca(mundo, pose) : null;
     if (!vista) { fora.push(`${nome} fica fora do contorno sobreposto: a pose da peça na montagem gira o olho da vista ${mundo ?? lado} para fora de um eixo.`); continue; }
-    const regioes = Object.entries(lido.regioes).filter(([n]) => nomesDaPeca.has(n)).sort(([a], [b]) => a.localeCompare(b));
-    const escolhidas = [...(deObjeto ? [] : [['silhueta', lido.silhueta]]), ...regioes];
+    /* as regiões pedidas por nome (`--regioes-do-contorno`) são as únicas desenhadas, sem a silhueta: no selim da bicicleta a silhueta
+       e as quinze partes afogariam a linha da parte em julgamento */
+    const faltam = (pedidas ?? []).filter((n) => !Object.hasOwn(lido.regioes, n));
+    if (faltam.length) { fora.push(`${nome} fica fora do contorno sobreposto: não tem a região ${faltam.join(', ')} (tem ${Object.keys(lido.regioes).sort().join(', ')}).`); continue; }
+    const regioes = Object.entries(lido.regioes).filter(([n]) => (pedidas ? pedidas.includes(n) : nomesDaPeca.has(n))).sort(([a], [b]) => a.localeCompare(b));
+    const escolhidas = [...(deObjeto || pedidas ? [] : [['silhueta', lido.silhueta]]), ...regioes];
     if (!escolhidas.length) {
       fora.push(`${nome} fica fora do contorno sobreposto: é contorno do objeto, e nenhuma região dele tem o nome da instância ou de uma parte do plano (${[...nomesDaPeca].join(', ') || 'nenhum'}).`);
       continue;
@@ -1190,6 +1195,58 @@ export function contornosParaSobrepor({ contornos = [], lidos = new Map(), nomes
     entradas.push({ vista, arquivo, rotulo: `o contorno ${lado} de ${nome}${pose ? ', posto no referencial da peça pela pose dela na montagem' : ''}`, aneis });
   }
   return { entradas, fora };
+}
+
+/* O CONTORNO DE FORA DO REPOSITÓRIO. O contorno tirado de uma foto de terceiro fica em `tmp/`, ao lado dela, e nem o plano nem a pasta
+ * da peça o citam; `--contorno` o traz ao pacote como `--referencia` traz a foto. Só entra o contorno que diz de onde veio a imagem
+ * (`imagem.caminho` ou `imagem.foraDoRepositorio`, que `npm run contorno` grava e a guarda do acervo confere) e cuja imagem ainda há
+ * quem tenha: o de referência encerrada vale como registro do que se mediu, e foi um desses, no ombro do braço robótico, que os críticos
+ * leram como defeito. */
+
+/**
+ * Os contornos dados por `--contorno=<caminho>[@<lado>]`, lidos e conferidos antes da captura. `regioes[i]` é a lista de regiões a desenhar
+ * do i-ésimo (`--regioes-do-contorno`), ou null para as de sempre. Devolve `[{ arquivo, lado, regioes?, externo: true }]`; recusa com
+ * o que veio, o que se esperava e como consertar.
+ */
+export function lerContornosExternos(valores, { regioes = [], existe = existsSync, ler = (f) => readFileSync(f, 'utf8') } = {}) {
+  const vistos = new Set();
+  return valores.map((bruto, i) => {
+    const texto = String(bruto);
+    const arroba = texto.lastIndexOf('@');
+    const temLado = arroba > 0 && !texto.slice(arroba).includes('/');
+    const dado = temLado ? texto.slice(0, arroba) : texto;
+    if (!dado) throw new Error(`--contorno=${texto}: falta o caminho do *.contornos.json.`);
+    const arquivo = resolve(dado);
+    const lado = temLado ? texto.slice(arroba + 1) : ladoDoNome(arquivo);
+    if (!VISTAS_DO_CONTORNO.includes(lado)) {
+      throw new Error(`--contorno=${texto}: ${temLado ? `o lado '${lado}'` : 'o nome do arquivo não diz o lado, e'} não é um dos que o contorno em mm mede (${VISTAS_DO_CONTORNO.join(', ')}); diga o lado com --contorno=${dado}@lateral.`);
+    }
+    if (!existe(arquivo)) throw new Error(`--contorno=${texto}: ${arquivo} não existe.`);
+    if (vistos.has(arquivo)) throw new Error(`--contorno: ${arquivo} veio mais de uma vez.`);
+    vistos.add(arquivo);
+    let json;
+    try { json = JSON.parse(ler(arquivo)); } catch (erro) { throw new Error(`--contorno=${texto}: ${arquivo} não é JSON (${erro.message}).`); }
+    const lido = lerContornos(json, basename(arquivo));
+    const origem = motivoDaOrigem(json, arquivo);
+    if (origem) throw new Error(`--contorno=${texto}: o contorno não entra sem a declaração de origem da imagem: ${origem}.`);
+    if (json.imagem?.foraDoRepositorio?.encerrada === true) {
+      throw new Error(`--contorno=${texto}: imagem.foraDoRepositorio.encerrada é true (${json.imagem.foraDoRepositorio.motivo}): o contorno de uma referência encerrada é registro do que se mediu e não entra como medida; tire o contorno de novo de uma imagem que ainda exista.`);
+    }
+    const pedidas = regioes[i] ?? null;
+    if (pedidas) {
+      const faltam = pedidas.filter((n) => !Object.hasOwn(lido.regioes, n));
+      if (faltam.length) throw new Error(`--regioes-do-contorno de ${basename(arquivo)}: a região ${faltam.join(', ')} não existe no contorno; ele tem ${Object.keys(lido.regioes).sort().join(', ')}.`);
+    }
+    return { arquivo, lado, ...(pedidas ? { regioes: pedidas } : {}), externo: true };
+  });
+}
+
+/** A lista de `--regioes-do-contorno=<nome>[,<nome>]...`, sem repetição nem nome vazio. */
+export function lerRegioesDoContorno(texto) {
+  const nomes = String(texto).split(',').map((n) => n.trim());
+  if (!nomes.length || nomes.some((n) => !n)) throw new Error(`--regioes-do-contorno=${texto}: esperava nomes de região separados por vírgula, como --regioes-do-contorno=selim,canote.`);
+  if (new Set(nomes).size !== nomes.length) throw new Error(`--regioes-do-contorno=${texto}: uma região veio mais de uma vez.`);
+  return nomes;
 }
 
 /* SÓ A PEÇA EM MODELAGEM RECEBE O CONTORNO. Em 2026-11-17 o pacote do ombro do braço robótico desenhou e citou como medida
@@ -2069,7 +2126,7 @@ export class ReceitaReprovada extends Error {
 
    `saida` é a pasta da rodada, onde saem o pedido, o alvo, as vistas montadas e a sobreposição; as capturas da bancada continuam em
    `tools/bancadas/out`, com os nomes de sempre. `dependencias` troca o que o teste não quer pagar. */
-export async function vistasParaCritica(peca, { logger = null, saida = null, referenciasExternas = [], orientacoesDasReferencias = [], prazoDeCargaMs = null, pastaDasCapturas = SAIDA_PADRAO, semMedir = false, comBlender = false, dependencias = {} } = {}) {
+export async function vistasParaCritica(peca, { logger = null, saida = null, referenciasExternas = [], orientacoesDasReferencias = [], contornosExternos = [], regioesDosContornos = [], prazoDeCargaMs = null, pastaDasCapturas = SAIDA_PADRAO, semMedir = false, comBlender = false, dependencias = {} } = {}) {
   const dep = {
     /* a medição é a de `rodada-de-modelagem.mjs` (a que o registro e `--acao` usam), importada na hora para não criar ciclo de carga */
     medirReceita: async (p) => (await import('./rodada-de-modelagem.mjs')).medirReceita(p),
@@ -2109,6 +2166,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   }
   avisarReferenciasLocaisAusentes(referencias.locaisAusentes);
   const externas = lerReferenciasExternas(referenciasExternas, { existe: dependencias.existe ?? existsSync, orientacoes: orientacoesDasReferencias });
+  const contornosDeFora = lerContornosExternos(contornosExternos, { regioes: regioesDosContornos, ...(dependencias.existe ? { existe: dependencias.existe } : {}), ...(dependencias.lerContorno ? { ler: dependencias.lerContorno } : {}) });
   /* a peça de lataria leva a luz rasante e a curvatura da lataria, que saem da bancada; o Blender só roda pedido, como conferência, e
      sem ele o pedido é recusado antes de gastar captura */
   const lataria = superficieDaPeca(peca, receita, plano);
@@ -2131,7 +2189,14 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   const avisos = [];
   /* os contornos medidos que o pedido cita por lado e os da pasta da peça, que o veredito confere, lidos antes da captura */
   let contornosDoPedido = contornosDasReferencias({ imagens: referencias.imagens, citadas: citadasQueNaoSaoImagem(plano, dirname(caminho)) });
-  let contornosMedidos = [...contornosDoPedido];
+  /* o de `--contorno` vem da imagem da `--referencia` com o mesmo nome, quando ela é dada */
+  for (const c of contornosDeFora) {
+    if (contornosDoPedido.some((x) => x.arquivo === c.arquivo)) continue;
+    const deImagem = externas.find((e) => e.caminho.replace(/\.[a-z0-9]+$/i, '.contornos.json') === c.arquivo)?.caminho ?? null;
+    contornosDoPedido.push({ arquivo: c.arquivo, lado: c.lado, deImagem });
+  }
+  const regioesDe = new Map(contornosDeFora.filter((c) => c.regioes).map((c) => [c.arquivo, c.regioes]));
+  let contornosMedidos = contornosDoPedido.map((c) => (regioesDe.has(c.arquivo) ? { ...c, regioes: regioesDe.get(c.arquivo) } : c));
   for (const c of contornosDaPeca({ caminhoDaReceita: caminho, raiz: REPO })) {
     if (c.vista && !contornosMedidos.some((x) => x.arquivo === c.caminho)) contornosMedidos.push({ arquivo: c.caminho, lado: c.vista });
   }
@@ -2651,6 +2716,7 @@ export function imprimir(resultado) {
       for (const f of r.fora) linhas.push(`  fora do pedido: ${visao} ${f.vista}, de quina (${porcento(f.largura ?? 0)} da largura e ${porcento(f.altura ?? 0)} da altura do quadro)`);
     }
   }
+  if (resultado.contornoSobreposto) linhas.push('', 'CONTORNO MEDIDO SOBRE O MODELO:', `  ${resultado.contornoSobreposto.arquivo}`);
   if (resultado.referencias?.ignoradas?.length) linhas.push('', `REFERÊNCIAS fora do pedido, porque não são imagem: ${resultado.referencias.ignoradas.join(', ')}`);
   for (const aviso of resultado.avisos ?? []) linhas.push('', `AVISO: ${aviso}`);
   linhas.push('', 'PEDIDO (o texto pronto para o crítico, com todos os caminhos acima):', `  ${resultado.pedido}`);
@@ -2713,8 +2779,9 @@ export function relatorioDasNotas(respostas) {
 export const AJUDA = `uso: node tools/modelar/vistas-para-critica.mjs <peça> [opções]
 
 Monta o pacote do crítico visual da peça: mede a receita, captura as vistas e grava o pedido.md.
-Quando a peça tem contorno medido (*.contornos.json citado no plano, ao lado de uma imagem citada ou na pasta da peça), o pacote
-leva também contorno-sobreposto.png: a vista ortográfica com a linha do contorno no lugar em mm que o referencial da peça dá.
+Quando a peça tem contorno medido (*.contornos.json citado no plano, ao lado de uma imagem citada, na pasta da peça ou dado por
+--contorno), o pacote leva também contorno-sobreposto.png: a vista ortográfica com a linha do contorno no lugar em mm que o
+referencial da peça dá.
 
   <peça>                                    a receita, como nas outras ferramentas (por exemplo aviao/motor)
   --saida=<pasta da rodada>                 onde o pacote é gravado
@@ -2725,6 +2792,11 @@ leva também contorno-sobreposto.png: a vista ortográfica com a linha do contor
   --referencia=<caminho absoluto>[@<vista>] imagem de fora do repositório (frontal, direita, esquerda, traseira, superior, inferior, isometrica); repetível
   --orientacao-da-referencia=<texto>        como a imagem da --referencia anterior está girada ou espelhada, em palavras (até ${LIMITE_DA_ORIENTACAO} caracteres);
                                             vale para a última --referencia dada antes dela, e o pedido a escreve no lugar da frase dos eixos
+  --contorno=<caminho>[@<lado>]             *.contornos.json de fora do repositório (o de uma foto de terceiro, em tmp/), desenhado sobre o
+                                            modelo e citado como medida do lado (frontal, lateral, superior; sem @, o nome diz); recusa o
+                                            contorno sem a origem da imagem (imagem.caminho ou imagem.foraDoRepositorio) e o de referência
+                                            encerrada; repetível
+  --regioes-do-contorno=<nome>[,<nome>]...  só essas regiões do --contorno anterior são desenhadas, sem a silhueta (ex.: selim)
   --ajuda                                   esta mensagem
 
 Além do pedido.md, o pacote grava pedido-fechado-a.md e pedido-fechado-b.md, o pedido por perguntas fechadas (sim, não ou não dá para
@@ -2746,6 +2818,8 @@ async function principal(argv) {
   let lido;
   let externas = [];
   const orientacoes = [];
+  const contornos = [];
+  const regioes = [];
   if (argv.slice(2).includes('--ajuda')) { process.stdout.write(AJUDA); return 0; }
   const refazer = argv.slice(2).find((a) => a.startsWith('--refazer-pedidos='));
   if (refazer) {
@@ -2778,7 +2852,11 @@ async function principal(argv) {
        para a última referência dada antes dela. */
     const resto = [];
     for (const a of argv.slice(2)) {
-      if (a.startsWith('--referencia=')) { externas.push(a.slice('--referencia='.length)); orientacoes.push(null); } else if (a.startsWith('--orientacao-da-referencia=')) {
+      if (a.startsWith('--contorno=')) { contornos.push(a.slice('--contorno='.length)); regioes.push(null); } else if (a.startsWith('--regioes-do-contorno=')) {
+        if (!contornos.length) throw new Error('--regioes-do-contorno veio antes de qualquer --contorno; dê as regiões depois do contorno a que elas valem.');
+        if (regioes[contornos.length - 1] !== null) throw new Error(`--regioes-do-contorno veio duas vezes para o mesmo contorno (${contornos[contornos.length - 1]}); dê uma lista só.`);
+        regioes[contornos.length - 1] = lerRegioesDoContorno(a.slice('--regioes-do-contorno='.length));
+      } else if (a.startsWith('--referencia=')) { externas.push(a.slice('--referencia='.length)); orientacoes.push(null); } else if (a.startsWith('--orientacao-da-referencia=')) {
         const texto = a.slice('--orientacao-da-referencia='.length);
         if (!externas.length) throw new Error('--orientacao-da-referencia veio antes de qualquer --referencia; dê a orientação depois da referência a que ela vale.');
         if (orientacoes[externas.length - 1] !== null) throw new Error(`--orientacao-da-referencia veio duas vezes para a mesma referência (${externas[externas.length - 1]}); dê uma só.`);
@@ -2788,12 +2866,12 @@ async function principal(argv) {
     lido = lerArgumentos(resto, { opcoes: ['saida', 'prazo'], bandeiras: ['sem-medir', 'com-blender'], posicional: { nome: 'a peça', obrigatorio: true } });
     if (lido.opcao('prazo') !== null && !(Number(lido.opcao('prazo')) > 0)) throw new Error(`--prazo pede segundos maiores que zero; veio "${lido.opcao('prazo')}".`);
   } catch (erro) {
-    process.stderr.write(`uso: node tools/modelar/vistas-para-critica.mjs <peça> [--saida=<pasta da rodada>] [--prazo=<segundos>] [--sem-medir] [--com-blender] [--referencia=<caminho absoluto da imagem>[@<vista>] [--orientacao-da-referencia=<texto>]]... (--ajuda diz mais)\n${erro.message}\n`);
+    process.stderr.write(`uso: node tools/modelar/vistas-para-critica.mjs <peça> [--saida=<pasta da rodada>] [--prazo=<segundos>] [--sem-medir] [--com-blender] [--referencia=<caminho absoluto da imagem>[@<vista>] [--orientacao-da-referencia=<texto>]]... [--contorno=<caminho>[@<lado>] [--regioes-do-contorno=<nome>,...]]... (--ajuda diz mais)\n${erro.message}\n`);
     return 2;
   }
   /* --prazo: a peça pesada (o furgão realista, em 2026-11-06) não entra na cena nos 90 s de cada captura. */
   const prazo = lido.opcao('prazo');
-  const resultado = await vistasParaCritica(lido.posicional, { saida: lido.opcao('saida'), referenciasExternas: externas, orientacoesDasReferencias: orientacoes, semMedir: lido.bandeira('sem-medir'), comBlender: lido.bandeira('com-blender'), ...(prazo !== null ? { prazoDeCargaMs: Number(prazo) * 1000 } : {}) });
+  const resultado = await vistasParaCritica(lido.posicional, { saida: lido.opcao('saida'), referenciasExternas: externas, orientacoesDasReferencias: orientacoes, contornosExternos: contornos, regioesDosContornos: regioes, semMedir: lido.bandeira('sem-medir'), comBlender: lido.bandeira('com-blender'), ...(prazo !== null ? { prazoDeCargaMs: Number(prazo) * 1000 } : {}) });
   process.stdout.write(imprimir(resultado));
   return 0;
 }
