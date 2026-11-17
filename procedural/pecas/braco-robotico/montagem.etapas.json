@@ -50,7 +50,27 @@
         {
           "por": "Tiago",
           "quando": "2026-11-17",
-          "motivo": "placa de controle e tampa transparente na caixa lateral, plano da família de componentes"
+          "motivo": "placa de controle e tampa transparente na caixa lateral, plano da família de componentes",
+          "portas": {
+            "assento": {
+              "forma": "anel",
+              "papel": "recebe",
+              "eixo": [
+                0,
+                1,
+                0
+              ],
+              "centro": [
+                0,
+                0.22,
+                0
+              ],
+              "raioInterno": 0,
+              "raioExterno": 0.105,
+              "inicio": -0.005,
+              "fim": 0
+            }
+          }
         }
       ]
     },

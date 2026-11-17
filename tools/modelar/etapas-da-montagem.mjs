@@ -112,15 +112,20 @@ function impressoesDasReceitas(montagem, impressoes, emMemoria) {
 
 /* AS PORTAS CITADAS. Cada porta de uma etapa que uma etapa posterior cita, por relação (a ponta da etapa, quando a outra é
    posterior), por vínculo (de onde a medida vem) ou por posição (em que porta a posterior se encaixa): [{ etapa, porta,
-   posterior, por }]. Só a citação da instância de cima (caminho de um nível) entra; a porta de dentro de uma submontagem não. */
+   posterior, por, relacao? }]. A porta de dentro de uma submontagem (caminho de mais de um nível) entra com `profunda: true` e o
+   caminho no nome, porque a reabertura não a confere e não pode tratá-la como provada. */
 export function citacoesDasPortas(montagem) {
   const ordem = new Map(montagem.etapas.map((id, k) => [id, k]));
   const depois = (a, b) => ordem.has(a) && ordem.has(b) && ordem.get(b) > ordem.get(a);
   const citacoes = [];
   for (const relacao of montagem.relacoes ?? []) {
     for (const [ponta, outra] of [[relacao.referencia, relacao.movel], [relacao.movel, relacao.referencia]]) {
-      if (ponta.caminho.length === 1 && depois(ponta.caminho[0], outra.caminho[0])) {
-        citacoes.push({ etapa: ponta.caminho[0], porta: ponta.porta, posterior: outra.caminho[0], por: `relação ${relacao.id}` });
+      if (depois(ponta.caminho[0], outra.caminho[0])) {
+        const profunda = ponta.caminho.length > 1;
+        citacoes.push({
+          etapa: ponta.caminho[0], porta: profunda ? `${ponta.caminho.slice(1).join('/')}:${ponta.porta}` : ponta.porta,
+          posterior: outra.caminho[0], por: `relação ${relacao.id}`, relacao: relacao.id, ...(profunda ? { profunda } : {}),
+        });
       }
     }
   }
@@ -155,7 +160,7 @@ export async function estadoDasEtapas(arquivoMontagem, { receitas, anterior, imp
   for (const medida of medidas) {
     const neutro = resolvida.instancias.find((item) => item.id === medida.instancia)?.definicao?.neutro;
     if (neutro) medida.forma = assinaturaDaForma(neutro);
-    const nomes = citacoes.filter((c) => c.etapa === medida.instancia).map((c) => c.porta);
+    const nomes = citacoes.filter((c) => c.etapa === medida.instancia && !c.profunda).map((c) => c.porta);
     if (neutro && nomes.length) medida.portas = portasCitadasAgora(neutro, nomes);
   }
   const semGeometria = montagem.etapas.slice(construidas.length).map((instancia) => ({ instancia, juntas: [] }));
@@ -166,7 +171,7 @@ export async function estadoDasEtapas(arquivoMontagem, { receitas, anterior, imp
   const registroAnterior = anterior !== undefined ? anterior
     : existsSync(arquivoDoRegistro(arquivoMontagem)) ? JSON.parse(readFileSync(arquivoDoRegistro(arquivoMontagem), 'utf8')) : null;
   const portas = Object.fromEntries(medidas.filter((m) => m.portas).map((m) => [m.instancia, m.portas]));
-  return { montagem, registro: atualizarRegistro(montagem.id, [...medidas, ...semGeometria], registroAnterior), anterior: registroAnterior, citacoes, portas };
+  return { montagem, registro: atualizarRegistro(montagem.id, [...medidas, ...semGeometria], registroAnterior, { citacoes }), anterior: registroAnterior, citacoes, portas };
 }
 
 /* As condições que moram nas rodadas da peça da etapa. `rodadasDe(ref)` é
@@ -221,7 +226,7 @@ export async function fixar(arquivoMontagem, instancia, aceite, opcoes = {}) {
 export async function reabrir(arquivoMontagem, instancia, por, opcoes = {}) {
   const autor = lerAutorDaReabertura(por);
   const { registro, anterior, citacoes, portas } = await estadoDasEtapas(arquivoMontagem, opcoes);
-  const contexto = { citacoes: citacoes.filter((c) => c.etapa === instancia), portasAgora: portas[instancia] ?? {}, anterior };
+  const contexto = { citacoes, portasAgora: portas[instancia] ?? {}, anterior };
   const reaberto = reabrirEtapa(registro, instancia, autor, contexto);
   if (opcoes.comProvas) return { registro: reaberto, provas: conferirPosteriores(registro, instancia, contexto).provas };
   return reaberto;

@@ -132,7 +132,7 @@ describe('reabrir etapa fixa', () => {
     registro = await reabrir(arquivo, 'meio', POR, { ...opcoes, anterior: registro });
     expect(registro.etapas.map((e) => e.estado)).toEqual(['fixa', 'aberta', 'aberta']);
     expect(registro.etapas[1].aceite).toBeUndefined();
-    expect(registro.etapas[1].reaberturas).toEqual([{ por: 'pessoa', quando: '2026-09-26', motivo: 'refazer pelo desenho novo', aceite: { por: 'pessoa', analise: 'ausente' }, forma: expect.stringMatching(/^sha256:/) }]);
+    expect(registro.etapas[1].reaberturas).toEqual([{ por: 'pessoa', quando: '2026-09-26', motivo: 'refazer pelo desenho novo', aceite: { por: 'pessoa', analise: 'ausente' }, forma: expect.stringMatching(/^sha256:/), portas: { pino: expect.objectContaining({ forma: 'cilindro' }) } }]);
     /* A releitura mantém a etapa aberta e o histórico. */
     const { registro: relido } = await estadoDasEtapas(arquivo, { receitas: RECEITAS, anterior: registro });
     expect(relido.etapas[1]).toMatchObject({ estado: 'aberta', reaberturas: registro.etapas[1].reaberturas });
@@ -150,8 +150,11 @@ describe('reabrir com as posteriores fixas que provam não ter mudado', () => {
   const comBase = (tabela) => ({ ...RECEITAS, 'bloco-com-pino': receitaComParametros(RECEITAS['bloco-com-pino'], tabela) });
   async function duasFixas() {
     const r = await fixar(arquivo, 'base', aceite, { ...opcoes, anterior: null });
-    return fixar(arquivo, 'meio', aceite, { ...opcoes, anterior: r });
+    const d = await fixar(arquivo, 'meio', aceite, { ...opcoes, anterior: r });
+    return fixar(arquivo, 'topo', aceite, { ...opcoes, anterior: d });
   }
+  const estados = (r) => r.etapas.map((e) => e.estado);
+  const semPortas = (r) => ({ ...r, etapas: r.etapas.map(({ portas, ...e }) => e) });
 
   it('o aceite guarda as portas que as posteriores citam', async () => {
     const registro = await duasFixas();
@@ -162,25 +165,29 @@ describe('reabrir com as posteriores fixas que provam não ter mudado', () => {
   it('reabre a base fixa e mantém o meio fixo', async () => {
     const registro = await duasFixas();
     const { registro: reaberto, provas } = await reabrir(arquivo, 'base', POR, { ...opcoes, anterior: registro, comProvas: true });
-    expect(reaberto.etapas.map((e) => e.estado)).toEqual(['aberta', 'fixa', 'aberta']);
-    expect(provas).toEqual([expect.stringMatching(/^meio: forma do aceite, e as portas citadas de 'base' \(pino\) iguais às do aceite$/)]);
-    expect(reaberto.etapas[0].reaberturas.at(-1)).toMatchObject({ por: 'pessoa', motivo: 'a base muda e o meio não', aceite });
+    expect(estados(reaberto)).toEqual(['aberta', 'fixa', 'fixa']);
+    expect(provas).toEqual([
+      "meio: forma do aceite, a porta 'pino' igual à do aceite",
+      "topo: forma do aceite, sem citar porta de etapa reaberta ou não provada",
+    ]);
+    /* a reabertura guarda o aceite e as portas do aceite, a referência das leituras seguintes */
+    expect(reaberto.etapas[0].reaberturas.at(-1)).toMatchObject({ por: 'pessoa', motivo: 'a base muda e o meio não', aceite, portas: registro.etapas[0].portas });
   });
 
   it('reabre a base quebrada por uma mudança que não toca a porta citada, e o meio segue fixo', async () => {
     const registro = await duasFixas();
     const receitas = comBase({ raioDoCorpo: 34 });
     const { registro: quebrada } = await estadoDasEtapas(arquivo, { receitas, anterior: registro });
-    expect(quebrada.etapas.map((e) => e.estado)).toEqual(['quebrada', 'fixa', 'aberta']);
+    expect(estados(quebrada)).toEqual(['quebrada', 'fixa', 'fixa']);
     const reaberto = await reabrir(arquivo, 'base', POR, { ...opcoes, receitas, anterior: registro });
-    expect(reaberto.etapas.map((e) => e.estado)).toEqual(['aberta', 'fixa', 'aberta']);
+    expect(estados(reaberto)).toEqual(['aberta', 'fixa', 'fixa']);
     /* o aceite antigo está na reabertura que a leitura guardou, e a nova traz quem reabriu */
     expect(reaberto.etapas[0].reaberturas.map((r) => r.por)).toEqual(['leitura do registro', 'pessoa']);
     expect(reaberto.etapas[0].reaberturas[0]).toMatchObject({ aceite, forma: registro.etapas[0].forma });
     expect(reaberto.etapas[0].motivo).toBeUndefined();
     /* a releitura segue com a base aberta e o meio fixo */
     const { registro: relido } = await estadoDasEtapas(arquivo, { receitas, anterior: reaberto });
-    expect(relido.etapas.map((e) => e.estado)).toEqual(['aberta', 'fixa', 'aberta']);
+    expect(estados(relido)).toEqual(['aberta', 'fixa', 'fixa']);
   });
 
   it('recusa quando a porta que a posterior cita mudou, dizendo qual e o quê', async () => {
@@ -190,7 +197,7 @@ describe('reabrir com as posteriores fixas que provam não ter mudado', () => {
     try { await reabrir(arquivo, 'base', POR, { ...opcoes, receitas, anterior: registro }); } catch (e) { erro = e; }
     expect(erro).toBeInstanceOf(ErroEtapaDeConstrucao);
     expect(erro.codigo).toBe('etapa-com-posteriores-fixas');
-    expect(erro.message).toMatch(/'meio' \(a porta 'pino' de 'base', que ela cita \(relação meioNoPinoDaBase, vínculo .*\), mudou: fim: 0\.015 → 0\.018\)/);
+    expect(erro.message).toMatch(/'meio' \(a porta 'pino' de 'base', que ela cita \(relação meioNoPinoDaBase, vínculo .*\), mudou desde o aceite de 'base': fim: 0\.015 → 0\.018\)/);
   });
 
   it('recusa quando a posterior quebrou junto', async () => {
@@ -199,11 +206,84 @@ describe('reabrir com as posteriores fixas que provam não ter mudado', () => {
     await recusa(reabrir(arquivo, 'base', POR, { ...opcoes, receitas, anterior: registro }), 'etapa-com-posteriores-fixas');
   });
 
-  it('sem as portas no registro (anterior a esta regra), prova pela medida das juntas com a etapa reaberta', async () => {
-    const semPortas = (r) => ({ ...r, etapas: r.etapas.map(({ portas, ...e }) => e) });
+  it('sem as portas no registro (anterior a esta regra), prova pela medida da junta sobre a porta, e guarda as portas provadas', async () => {
     const registro = semPortas(await duasFixas());
-    const { provas } = await reabrir(arquivo, 'base', POR, { ...opcoes, receitas: comBase({ raioDoCorpo: 34 }), anterior: registro, comProvas: true });
-    expect(provas).toEqual([expect.stringMatching(/as portas de 'base' não estão guardadas no registro .* as juntas com ela têm a medida do registro anterior$/)]);
+    const { registro: reaberto, provas } = await reabrir(arquivo, 'base', POR, { ...opcoes, receitas: comBase({ raioDoCorpo: 34 }), anterior: registro, comProvas: true });
+    expect(provas[0]).toBe("meio: forma do aceite, a porta 'pino' provada pela junta 'meioNoPinoDaBase', com a medida do registro anterior (as portas do aceite não estão guardadas)");
+    expect(reaberto.etapas[0].reaberturas.at(-1).portas.pino).toMatchObject({ fim: 0.015 });
+  });
+
+  /* A1 e A6 da revisão de 2026-11-17: a etapa reaberta que muda depois a porta citada quebrava nada, e o --fixar dela fixava tudo
+     com o aceite antigo das posteriores. */
+  it.each([
+    ['reaberta fixa', {}],
+    ['reaberta quebrada', { raioDoCorpo: 34 }],
+  ])('%s: mudar depois a porta citada quebra as posteriores pela cadeia, e o --fixar dela recusa', async (_, antes) => {
+    const registro = await duasFixas();
+    const reaberto = await reabrir(arquivo, 'base', POR, { ...opcoes, receitas: comBase(antes), anterior: registro });
+    for (const tabela of [{ alturaDoPino: 18 }, { alturaDoCorpo: 30 }]) {
+      const receitas = comBase({ ...antes, ...tabela });
+      const { registro: relido } = await estadoDasEtapas(arquivo, { receitas, anterior: reaberto });
+      expect(estados(relido)).toEqual(['aberta', 'quebrada', 'quebrada']);
+      expect(relido.etapas[1].motivo).toMatch(/^a porta 'pino' de 'base', que ela cita \(.*\), mudou desde o aceite de 'base': /);
+      expect(relido.etapas[2].motivo).toMatch(/^cita a porta 'pino' de 'meio' \(.*\), que quebrou por isso$/);
+      expect(relido.etapas[1].reaberturas.at(-1)).toMatchObject({ por: 'leitura do registro', aceite });
+      await recusa(fixar(arquivo, 'base', aceite, { ...opcoes, receitas, anterior: reaberto }), 'etapa-com-posterior-quebrada');
+    }
+    /* a mesma receita da reabertura não quebra nada, e a base se fixa */
+    const { registro: igual } = await estadoDasEtapas(arquivo, { receitas: comBase(antes), anterior: reaberto });
+    expect(estados(igual)).toEqual(['aberta', 'fixa', 'fixa']);
+    expect(estados(await fixar(arquivo, 'base', aceite, { ...opcoes, receitas: comBase(antes), anterior: reaberto }))).toEqual(['fixa', 'fixa', 'fixa']);
+  });
+
+  /* A7: sem as portas do aceite, a porta citada só por posição e vínculo não tem junta que a prove. */
+  it('sem as portas no registro, a porta citada sem junta medida não está provada e a reabertura recusa', async () => {
+    const dado = JSON.parse(readFileSync(arquivo, 'utf8'));
+    dado.relacoes = dado.relacoes.filter((r) => r.id !== 'meioNoPinoDaBase');
+    writeFileSync(arquivo, JSON.stringify(dado, null, 2));
+    const registro = semPortas(await duasFixas());
+    let erro;
+    try { await reabrir(arquivo, 'base', POR, { ...opcoes, receitas: comBase({ raioDoCorpo: 34 }), anterior: registro }); } catch (e) { erro = e; }
+    expect(erro?.codigo).toBe('etapa-com-posteriores-fixas');
+    expect(erro.message).toMatch(/'meio' \(a porta 'pino' de 'base', que ela cita \(vínculo .*posição meioSobreABase\), não tem junta medida que a prove/);
+  });
+
+  /* A3: a etapa intermediária aberta não corta a cadeia. */
+  it('com o meio aberto, a base que muda a porta que o meio cita não deixa o topo fixo', async () => {
+    const registro = await duasFixas();
+    const meioAberto = await reabrir(arquivo, 'meio', POR, { ...opcoes, anterior: registro });
+    const receitas = comBase({ alturaDoCorpo: 30 });
+    const { registro: lido } = await estadoDasEtapas(arquivo, { receitas, anterior: meioAberto });
+    expect(estados(lido)).toEqual(['quebrada', 'aberta', 'quebrada']);
+    await recusa(reabrir(arquivo, 'base', POR, { ...opcoes, receitas, anterior: meioAberto }), 'etapa-com-posteriores-fixas');
+    /* a prova pela cadeia, sem a leitura ter quebrado o topo: o meio aberto não provou, e o topo, que o cita, também não */
+    const { conferirPosteriores } = await import('../../src/autoria/etapas-de-construcao.js');
+    const comTopoFixo = { ...lido, etapas: lido.etapas.map((e) => (e.instancia === 'topo' ? { ...e, estado: 'fixa', motivo: undefined } : e)) };
+    const { citacoes, portas } = await estadoDasEtapas(arquivo, { receitas, anterior: meioAberto });
+    const { mudaram } = conferirPosteriores(comTopoFixo, 'base', { citacoes, portasAgora: portas.base, anterior: meioAberto });
+    expect(mudaram.map((m) => m.posterior)).toEqual(['topo']);
+    expect(mudaram[0].oQue).toMatch(/^cita a porta 'pino' de 'meio' \(.*\), que está aberta e não provou: a porta 'pino' de 'base'.* mudou: centro: /);
+  });
+
+  /* A5: sem o contexto não há prova de porta. */
+  it('reabrirEtapa sem o contexto recusa', async () => {
+    const { reabrirEtapa } = await import('../../src/autoria/etapas-de-construcao.js');
+    const registro = await duasFixas();
+    expect(() => reabrirEtapa(registro, 'base', { por: 'p', quando: '2026-11-17', motivo: 'x' })).toThrow(/exige o contexto/);
+  });
+
+  /* NIT: a porta de dentro de uma submontagem não é conferida, e a citação dela não prova. */
+  it('a citação de porta de dentro de uma submontagem entra marcada como profunda e não prova', async () => {
+    const { citacoesDasPortas } = await import('./etapas-da-montagem.mjs');
+    const montagem = {
+      etapas: ['a', 'b'],
+      relacoes: [{ id: 'r', referencia: { caminho: ['a', 'sub'], porta: 'p' }, movel: { caminho: ['b'], porta: 'q' } }],
+    };
+    expect(citacoesDasPortas(montagem)).toEqual([{ etapa: 'a', porta: 'sub:p', posterior: 'b', por: 'relação r', relacao: 'r', profunda: true }]);
+    const { conferirPosteriores } = await import('../../src/autoria/etapas-de-construcao.js');
+    const registro = { etapas: [{ instancia: 'a', estado: 'fixa', portas: {} }, { instancia: 'b', estado: 'fixa', juntas: [] }] };
+    const { mudaram } = conferirPosteriores(registro, 'a', { citacoes: citacoesDasPortas(montagem), portasAgora: {} });
+    expect(mudaram[0].oQue).toMatch(/fica dentro de uma submontagem/);
   });
 });
 
