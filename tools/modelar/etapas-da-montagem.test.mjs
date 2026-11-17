@@ -10,7 +10,7 @@ import { registrarRodada } from '../../src/autoria/laco-de-modelagem.js';
 import { ErroEtapaDeConstrucao } from '../../src/autoria/etapas-de-construcao.js';
 import { arquivoDoRegistro, auditarEtapas, comoCLI, descreverAuditoria, estadoDasEtapas, fixar, gravarRegistro, medirAgora, montagemAteAGeometria, olharEtapas, reabrir } from './etapas-da-montagem.mjs';
 import {
-  acrescentarAceite, acrescentarReabertura, imprimirEtapa, lerEtapas, registroVazio,
+  acrescentarAceite, acrescentarReabertura, avisosDaImpressao, diferencasDaImpressao, imprimirEtapa, lerEtapas, registroVazio,
 } from '../../src/autoria/etapas-pela-impressao.js';
 import { receitaComParametros } from './peca-com-parametros.mjs';
 import { lerMontagemPersistida } from '../../src/autoria/ler-montagem-persistida.js';
@@ -1107,7 +1107,7 @@ describe('a leitura pela impressão do aceite', () => {
       let acrescentados = 0;
       let recusados = 0;
       for (const medido of [congelar(await medir()), congelar(medidoDeSeis())]) {
-        const base = congelar(aceitarTodas(medido, registroVazio('p')));
+        const base = congelar(aceitarTodas(medido, registroVazio(medido.montagem ?? 'p')));
         for (const alvo of medido.ordem) {
           for (let semente = 1; semente <= 12; semente += 1) {
             const sorte = sorteio(semente * 7919);
@@ -1144,6 +1144,214 @@ describe('a leitura pela impressão do aceite', () => {
       const mexido = { ...medido, portas: { ...medido.portas, c: { saida: { ...medido.portas.c.saida, raio: 0.5 } } } };
       expect(estados(registro, mexido)).toEqual({ a: 'fixa', b: 'fixa', c: 'fixa', d: 'quebrada', e: 'fixa', f: 'fixa' });
       expect(estados(registro, medido)).toEqual({ a: 'fixa', b: 'fixa', c: 'fixa', d: 'fixa', e: 'fixa', f: 'fixa' });
+    });
+  });
+
+  describe('o que a revisão da fatia 1 achou', () => {
+    const copia = (v) => JSON.parse(JSON.stringify(v));
+    const comEtapa = (m, id, f) => ({ ...m, etapas: { ...m.etapas, [id]: f(copia(m.etapas[id])) } });
+    /* as poses declaradas no lugar das posições: a citante tem pose fixa, e a citada pode andar ou girar sem a citante ir junto */
+    const posar = (poses) => mudarMontagem((dado) => {
+      dado.posicoes = [];
+      dado.instancias.forEach((item) => { if (poses[item.id]) item.pose = poses[item.id]; });
+    });
+    const POSES = { base: { deslocamento: [0, 0, 0] }, meio: { deslocamento: [0, 0.02, 0] }, topo: { deslocamento: [0, 0.04, 0] } };
+    const girada = { rotacao: [[0, -1, 0], [1, 0, 0], [0, 0, 1]], deslocamento: [0, 0.02, 0] };
+    const linhas = async (poses, id) => {
+      posar(POSES);
+      const antes = imprimirEtapa(await medir(), id);
+      posar(poses);
+      return diferencasDaImpressao(antes, imprimirEtapa(await medir(), id));
+    };
+
+    it('a citada que anda ou gira, com a citante de pose declarada, muda a impressão da citante pela interface no mundo', async () => {
+      const andou = await linhas({ ...POSES, base: { deslocamento: [0.05, 0, 0] } }, 'meio');
+      expect(andou.join('\n')).toContain('citadas[base/pino].interface.centro[0]: 0 → 0.05');
+      expect(andou.join('\n')).not.toContain('pose');
+      const girou = await linhas({ ...POSES, base: { rotacao: [[0, -1, 0], [1, 0, 0], [0, 0, 1]], deslocamento: [0, 0, 0] } }, 'meio');
+      expect(girou.join('\n')).toContain('citadas[base/pino].interface.eixo');
+    });
+
+    it('a pose da própria etapa entra inteira, a rotação e o deslocamento', async () => {
+      const gira = await linhas({ ...POSES, meio: girada }, 'meio');
+      expect(gira.join('\n')).toContain('pose.rotacao');
+      expect(gira.join('\n')).not.toContain('pose.deslocamento');
+      const anda = await linhas({ ...POSES, meio: { deslocamento: [0, 0.03, 0] } }, 'meio');
+      expect(anda.join('\n')).toContain('pose.deslocamento[1]: 0.02 → 0.03');
+      expect(anda.join('\n')).not.toContain('pose.rotacao');
+    });
+
+    it('a comparação enxerga chave só de um lado, elemento que some, que aparece e lista de outro tamanho', () => {
+      expect(diferencasDaImpressao({ a: 1 }, { a: 1, b: 2 })).toEqual(['impressão.b: ausente → 2']);
+      expect(diferencasDaImpressao({ a: 1, b: 2 }, { a: 1 })).toEqual(['impressão.b: 2 → ausente']);
+      expect(diferencasDaImpressao({ l: [1, 2] }, { l: [1] })).toEqual(['impressão.l[1]: 2 → ausente']);
+      expect(diferencasDaImpressao({ l: [1] }, { l: [1, 2] })).toEqual(['impressão.l[1]: ausente → 2']);
+      const a = { relacao: 'a', x: 1 };
+      const b = { relacao: 'b', x: 1 };
+      expect(diferencasDaImpressao({ juntas: [a, b] }, { juntas: [a] })).toEqual(['impressão.juntas[b]: {"relacao":"b","x":1} → ausente']);
+      expect(diferencasDaImpressao({ juntas: [a] }, { juntas: [a, b] })).toEqual(['impressão.juntas[b]: ausente → {"relacao":"b","x":1}']);
+      expect(diferencasDaImpressao({ juntas: [a, b] }, { juntas: [b, a] })).toEqual([]);
+      expect(diferencasDaImpressao({ juntas: [a] }, { juntas: [b] }).length).toBe(2);
+      expect(diferencasDaImpressao([], [{ relacao: 'a' }])).toEqual(['impressão[0]: ausente → {"relacao":"a"}']);
+    });
+
+    /* um medido de duas etapas à mão, para os casos que a fixture não tem */
+    const pequeno = (extra = {}) => ({
+      montagem: 'm', ordem: ['a', 'b'],
+      etapas: { a: { forma: 'sha256:a', parametros: [], pose: { rotacao: [[1, 0, 0], [0, 1, 0], [0, 0, 1]], deslocamento: [0, 0, 0] }, juntas: [] }, b: { forma: 'sha256:b', parametros: [], pose: { rotacao: [[1, 0, 0], [0, 1, 0], [0, 0, 1]], deslocamento: [0, 1, 0] }, juntas: [] } },
+      citacoes: [{ etapa: 'a', porta: 'p', posterior: 'b', por: 'posição x' }, { etapa: 'a', porta: 'p', posterior: 'b', por: 'relação r', relacao: 'r' }, { etapa: 'a', porta: 'o', posterior: 'b', por: 'vínculo v' }],
+      portas: { a: { p: { centro: [0, 0, 0] }, o: { centro: [1, 0, 0] } } },
+      ...extra,
+    });
+
+    it('as citadas e os meios saem em ordem fixa, de qualquer ordem em que a montagem os declare', () => {
+      const a = pequeno();
+      const b = pequeno({ citacoes: [...a.citacoes].reverse() });
+      expect(JSON.stringify(imprimirEtapa(a, 'b'))).toBe(JSON.stringify(imprimirEtapa(b, 'b')));
+      expect(imprimirEtapa(a, 'b').citadas.map((c) => c.porta)).toEqual(['o', 'p']);
+      expect(imprimirEtapa(a, 'b').citadas[1].por).toEqual(['posição x', 'relação r']);
+    });
+
+    it('a citação que some, ou que aparece, quebra a citante', () => {
+      const registro = acrescentarAceite(acrescentarAceite(registroVazio('m'), pequeno(), 'a', aceite), pequeno(), 'b', aceite);
+      const semUma = pequeno({ citacoes: pequeno().citacoes.slice(0, 2) });
+      expect(estados(registro, semUma)).toEqual({ a: 'fixa', b: 'quebrada' });
+      expect(motivo(registro, semUma, 'b')).toContain('citadas[a/o]');
+      const so = acrescentarAceite(acrescentarAceite(registroVazio('m'), semUma, 'a', aceite), semUma, 'b', aceite);
+      expect(estados(so, pequeno())).toEqual({ a: 'fixa', b: 'quebrada' });
+    });
+
+    it('a porta de dentro de submontagem fica fora da impressão e a leitura avisa', () => {
+      const m = pequeno({ citacoes: [...pequeno().citacoes, { etapa: 'a', porta: 'sub/x:p', posterior: 'b', por: 'relação q', relacao: 'q', profunda: true }] });
+      expect(imprimirEtapa(m, 'b').citadas.map((c) => c.porta)).toEqual(['o', 'p']);
+      expect(avisosDaImpressao(m, 'b')).toHaveLength(1);
+      expect(avisosDaImpressao(m, 'b')[0]).toContain("'sub/x:p'");
+      expect(avisosDaImpressao(m, 'a')).toEqual([]);
+      const registro = acrescentarAceite(acrescentarAceite(registroVazio('m'), m, 'a', aceite), m, 'b', aceite);
+      const lida = lerEtapas(registro, m).etapas;
+      expect(lida[1].avisos).toHaveLength(1);
+      expect(lida[0].avisos).toBeUndefined();
+    });
+
+    it('o registro com evento de etapa que a montagem não tem devolve a lista de órfãos', () => {
+      const registro = acrescentarAceite(registroVazio('m'), pequeno(), 'a', aceite);
+      const menor = { ...pequeno(), ordem: ['b'], etapas: { b: pequeno().etapas.b }, citacoes: [], portas: {} };
+      expect(lerEtapas(registro, menor).orfaos).toEqual(['a']);
+      expect(lerEtapas(registro, pequeno()).orfaos).toEqual([]);
+    });
+
+    it('o motivo mostra as primeiras diferenças e conta as demais', () => {
+      const registro = acrescentarAceite(registroVazio('m'), pequeno(), 'a', aceite);
+      const muitos = comEtapa(pequeno(), 'a', (e) => ({ ...e, parametros: Array.from({ length: 9 }, (_, i) => ({ param: `p${i}`, valor: i, unidade: 'mm' })) }));
+      const dito = motivo(registro, muitos, 'a');
+      expect(dito).toContain('; e mais 3');
+      expect(dito.split(';').length).toBe(7);
+      expect(motivo(registro, comEtapa(pequeno(), 'a', (e) => ({ ...e, forma: 'sha256:z' })), 'a')).not.toContain('e mais');
+    });
+
+    it('o aceite guarda quem, observação, defeitos e análise; a pessoa e a reabertura saem sem espaço nas pontas', async () => {
+      const medido = await medir();
+      const defeitos = ['risco'];
+      const analise = { a: 1 };
+      const r = acrescentarAceite(registroVazio('tres-blocos'), medido, 'base', { por: '  Ana  ', observacao: ' ok ', defeitosAceitos: defeitos, analise });
+      expect(r.eventos[0].aceite).toEqual({ por: 'Ana', observacao: 'ok', defeitosAceitos: ['risco'], analise: { a: 1 } });
+      const sem = acrescentarAceite(registroVazio('tres-blocos'), medido, 'base', { por: 'Ana' });
+      expect(sem.eventos[0].aceite).toEqual({ por: 'Ana' });
+      const reaberto = acrescentarReabertura(r, 'base', { por: ' Ana ', quando: ' 2026-11-17 ', motivo: ' porque ' });
+      expect(reaberto.eventos[1]).toEqual({ tipo: 'reabertura', instancia: 'base', por: 'Ana', quando: '2026-11-17', motivo: 'porque' });
+    });
+
+    it('o registro não compartilha objeto com quem o alimentou nem com quem o lê (R7, R8)', async () => {
+      const medido = await medir();
+      const defeitos = ['risco'];
+      const r = acrescentarAceite(registroVazio('tres-blocos'), medido, 'base', { por: 'p', defeitosAceitos: defeitos, analise: { a: 1 } });
+      const antes = JSON.stringify(r);
+      defeitos.push('outro');
+      medido.etapas.base.juntas.push({ relacao: 'x' });
+      expect(JSON.stringify(r)).toBe(antes);
+      expect(() => { lerEtapas(r, medido).etapas[0].aceite.por = 'trocado'; }).not.toThrow();
+      expect(JSON.stringify(r)).toBe(antes);
+      expect(Object.isFrozen(r.eventos[0])).toBe(true);
+      expect(Object.isFrozen(r.eventos[0].impressao.pose)).toBe(true);
+    });
+
+    describe('o registro adulterado à mão recusa', () => {
+      const lerOu = (registro, medido) => codigoDe(() => lerEtapas(registro, medido));
+      let medido; let r;
+      beforeEach(async () => { medido = await medir(); r = copia(aceitarTodas(medido)); });
+
+      it('formato, versão, campos sobrando e instância ausente', () => {
+        expect(lerOu({ ...r, formato: 'outro' }, medido)).toBe('registro-invalido');
+        expect(lerOu({ ...r, versao: 9 }, medido)).toBe('registro-invalido');
+        expect(lerOu({ ...r, eventos: 'x' }, medido)).toBe('registro-invalido');
+        expect(lerOu({ ...r, etapas: [] }, medido)).toBe('registro-invalido');
+        expect(lerOu({ ...r, eventos: [{ ...r.eventos[0], instancia: '' }] }, medido)).toBe('registro-invalido');
+        expect(lerOu({ ...r, eventos: [{ ...r.eventos[0], estado: 'fixa' }] }, medido)).toBe('registro-invalido');
+        expect(lerOu({ ...r, eventos: [{ ...r.eventos[0], tipo: 'fixou' }] }, medido)).toBe('registro-invalido');
+        expect(lerOu(null, medido)).toBe('registro-invalido');
+      });
+
+      it('aceite sem quem, e reabertura sem quem, quando ou motivo', () => {
+        const semPor = copia(r); semPor.eventos[0].aceite = {};
+        expect(lerOu(semPor, medido)).toBe('registro-invalido');
+        for (const campo of ['por', 'quando', 'motivo']) {
+          const rea = { tipo: 'reabertura', instancia: 'base', por: 'p', quando: 'q', motivo: 'm', [campo]: ' ' };
+          expect(lerOu({ ...r, eventos: [...r.eventos, rea] }, medido)).toBe('registro-invalido');
+        }
+        const boa = { tipo: 'reabertura', instancia: 'base', por: 'p', quando: 'q', motivo: 'm' };
+        expect(lerOu({ ...r, eventos: [...r.eventos, boa] }, medido)).toBeUndefined();
+      });
+
+      it('R5 o aceite à mão sem reabertura não devolve a quebrada a fixa; a reabertura antes do aceite também recusa', () => {
+        const dup = { ...r, eventos: [...r.eventos, r.eventos[0]] };
+        expect(lerOu(dup, medido)).toBe('registro-invalido');
+        const fora = { ...r, eventos: [{ tipo: 'reabertura', instancia: 'base', por: 'p', quando: 'q', motivo: 'm' }, ...r.eventos] };
+        expect(lerOu(fora, medido)).toBe('registro-invalido');
+        const duasReaberturas = { ...r, eventos: [...r.eventos, ...[1, 2].map(() => ({ tipo: 'reabertura', instancia: 'base', por: 'p', quando: 'q', motivo: 'm' }))] };
+        expect(lerOu(duasReaberturas, medido)).toBe('registro-invalido');
+      });
+
+      it('R6 o aceite com junta que não passa, impressão com null, campo sobrando ou tipo trocado', () => {
+        const reprovada = copia(r); reprovada.eventos[1].impressao.juntas[0].satisfeita = false;
+        expect(lerOu(reprovada, medido)).toBe('registro-invalido');
+        const semFlag = copia(r); delete semFlag.eventos[1].impressao.juntas[0].satisfeita;
+        expect(lerOu(semFlag, medido)).toBe('registro-invalido');
+        for (const campo of ['forma', 'parametros', 'pose', 'juntas', 'citadas', 'anteriores']) {
+          const nulo = copia(r); nulo.eventos[1].impressao[campo] = null;
+          expect(lerOu(nulo, medido)).toBe('registro-invalido');
+        }
+        const tipo = copia(r); tipo.eventos[1].impressao.juntas = 'x';
+        expect(lerOu(tipo, medido)).toBe('registro-invalido');
+        const sobra = copia(r); sobra.eventos[1].impressao.estado = 'fixa';
+        expect(lerOu(sobra, medido)).toBe('registro-invalido');
+        const semImpressao = copia(r); delete semImpressao.eventos[1].impressao;
+        expect(lerOu(semImpressao, medido)).toBe('registro-invalido');
+      });
+
+      it('o registro de outra montagem recusa, e acrescentar reabertura também valida o registro', () => {
+        expect(lerOu({ ...r, montagem: 'outra' }, medido)).toBe('registro-de-outra-montagem');
+        expect(codigoDe(() => acrescentarReabertura({ ...r, versao: 9 }, 'base', POR))).toBe('registro-invalido');
+      });
+    });
+
+    describe('números', () => {
+      it('R1 a poeira perto de zero não quebra, e o piso não esconde uma diferença de verdade', async () => {
+        const medido = await medir();
+        const registro = aceitarTodas(medido);
+        const suja = comEtapa(medido, 'meio', (e) => { e.pose.deslocamento[0] = 1e-17; e.pose.rotacao[0][1] = 6.123233995736766e-17; return e; });
+        expect(estados(registro, suja).meio).toBe('fixa');
+        expect(estados(registro, comEtapa(medido, 'meio', (e) => { e.pose.deslocamento[0] = 1e-9; return e; })).meio).toBe('quebrada');
+        expect(estados(registro, comEtapa(medido, 'meio', (e) => { e.pose.deslocamento[0] = -0; return e; })).meio).toBe('fixa');
+      });
+
+      it('número não finito na medida recusa a impressão e o aceite', async () => {
+        const medido = await medir();
+        for (const valor of [NaN, Infinity, -Infinity]) {
+          const ruim = comEtapa(medido, 'meio', (e) => ({ ...e, pose: { ...e.pose, deslocamento: [valor, 0.02, 0] } }));
+          expect(codigoDe(() => imprimirEtapa(ruim, 'meio'))).toBe('impressao-nao-finita');
+          expect(codigoDe(() => acrescentarAceite(aceitarTodas({ ...medido, ordem: ['base'] }), ruim, 'meio', aceite))).toBe('impressao-nao-finita');
+        }
+      });
     });
   });
 });

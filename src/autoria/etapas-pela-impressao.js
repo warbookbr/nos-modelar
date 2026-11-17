@@ -28,7 +28,10 @@ function falhar(codigo, mensagem) {
   throw new ErroEtapaDeConstrucao(codigo, mensagem);
 }
 
-const numero = (v) => (typeof v === 'number' ? Number(v.toPrecision(12)) : v);
+/* 12 algarismos significativos, com piso absoluto: a poeira de ponto flutuante perto de zero (1e-17 onde era 0, o cosseno de um quarto de
+   volta) não é diferença. */
+const PISO = 1e-12;
+const numero = (v) => (typeof v === 'number' ? (Math.abs(v) < PISO ? 0 : Number(v.toPrecision(12))) : v);
 /* O valor como o JSON o guarda, com os números em 12 algarismos: o que se grava é o que se compara. */
 const canonico = (v) => JSON.parse(JSON.stringify(v, (_, x) => numero(x)));
 const comparar = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
@@ -49,14 +52,22 @@ export function imprimirEtapa(medido, instancia) {
   const citadas = [...grupos.values()]
     .sort((a, b) => comparar(a.etapa, b.etapa) || comparar(a.porta, b.porta))
     .map((g) => ({ etapa: g.etapa, porta: g.porta, por: [...g.por].sort(comparar), interface: medido.portas?.[g.etapa]?.[g.porta] ?? null }));
-  return canonico({
+  const impressao = {
     forma: agora.forma,
     parametros: [...(agora.parametros ?? [])].sort((a, b) => comparar(a.param, b.param)),
     pose: agora.pose ?? null,
     juntas: [...(agora.juntas ?? [])].sort((a, b) => comparar(a.relacao, b.relacao)),
     citadas,
     anteriores: medido.ordem.slice(0, indice),
-  });
+  };
+  exigirFinitos(impressao, `a impressão de '${instancia}'`);
+  return canonico(impressao);
+}
+
+/* NaN e infinito virariam null no JSON e se leriam iguais entre si: a impressão os recusa. */
+function exigirFinitos(valor, onde) {
+  if (typeof valor === 'number' && !Number.isFinite(valor)) falhar('impressao-nao-finita', `${onde} tem um número não finito (${valor}); a medida de agora não é confiável.`);
+  if (valor && typeof valor === 'object') Object.values(valor).forEach((v) => exigirFinitos(v, onde));
 }
 
 /* O que a impressão de uma etapa deixa de fora, para a leitura dizer: a citação de porta de dentro de submontagem. */
@@ -90,15 +101,27 @@ export function diferencasDaImpressao(antes, agora, caminho = 'impressão') {
   return texto(antes) === texto(agora) ? [] : [`${caminho}: ${texto(antes)} → ${texto(agora)}`];
 }
 
+function congelar(valor) {
+  if (valor && typeof valor === 'object' && !Object.isFrozen(valor)) { Object.freeze(valor); Object.values(valor).forEach(congelar); }
+  return valor;
+}
+
 export function registroVazio(montagemId) {
   return { formato: FORMATO_REGISTRO_DE_ETAPAS, versao: VERSAO_REGISTRO_PELA_IMPRESSAO, montagem: montagemId, eventos: [] };
 }
 
-const CAMPOS_DA_IMPRESSAO = ['forma', 'parametros', 'pose', 'juntas', 'citadas', 'anteriores'];
+const TIPOS_DA_IMPRESSAO = { forma: 'string', parametros: 'array', pose: 'objeto', juntas: 'array', citadas: 'array', anteriores: 'array' };
 const textoNaoVazio = (v) => typeof v === 'string' && v.trim() !== '';
+const tipoDe = (v) => (Array.isArray(v) ? 'array' : v === null ? 'null' : typeof v === 'object' ? 'objeto' : typeof v);
+const soChaves = (objeto, permitidas, onde) => {
+  const sobram = Object.keys(objeto).filter((k) => !permitidas.includes(k));
+  if (sobram.length) falhar('registro-invalido', `${onde}: campos que o registro não tem (${sobram.join(', ')}); o estado nunca é gravado.`);
+};
 
-/* O registro é lido inteiro e sem tolerância: a ausência de um campo nunca é lida como "não mudou". Os registros de versão 1 e 2
-   guardavam o estado e a referência das portas em vários lugares, e se leem pela migração, não por aqui. */
+/* O registro é lido inteiro e sem tolerância: a ausência de um campo nunca é lida como "não mudou", e campo sobrando, null ou de outro
+   tipo recusa. Os registros de versão 1 e 2 guardavam o estado e a referência das portas em vários lugares, e se leem pela migração,
+   não por aqui. A sequência também se confere: o aceite de uma etapa vem primeiro ou depois de uma reabertura dela, e a reabertura vem
+   depois de um aceite; o aceite com junta que não passa não existe. */
 function validarRegistro(registro) {
   if (!registro || registro.formato !== FORMATO_REGISTRO_DE_ETAPAS) falhar('registro-invalido', 'o registro de etapas não tem o formato esperado.');
   if (registro.versao === 1 || registro.versao === 2) {
@@ -107,20 +130,34 @@ function validarRegistro(registro) {
   if (registro.versao !== VERSAO_REGISTRO_PELA_IMPRESSAO || !Array.isArray(registro.eventos)) {
     falhar('registro-invalido', `o registro de etapas deve ser da versão ${VERSAO_REGISTRO_PELA_IMPRESSAO}, com a lista de eventos.`);
   }
+  soChaves(registro, ['formato', 'versao', 'montagem', 'eventos'], 'o registro');
+  const ultimo = new Map();
   registro.eventos.forEach((evento, i) => {
     const onde = `evento ${i}`;
-    if (!textoNaoVazio(evento?.instancia)) falhar('registro-invalido', `${onde}: sem instância.`);
+    if (!evento || typeof evento !== 'object' || !textoNaoVazio(evento.instancia)) falhar('registro-invalido', `${onde}: sem instância.`);
+    const anterior = ultimo.get(evento.instancia);
     if (evento.tipo === 'aceite') {
+      soChaves(evento, ['tipo', 'instancia', 'aceite', 'impressao'], onde);
+      if (anterior === 'aceite') falhar('registro-invalido', `${onde}: o aceite de '${evento.instancia}' vem depois de outro aceite sem reabertura entre eles.`);
       if (!textoNaoVazio(evento.aceite?.por)) falhar('registro-invalido', `${onde}: o aceite de '${evento.instancia}' não diz quem aceitou.`);
-      const faltam = CAMPOS_DA_IMPRESSAO.filter((campo) => evento.impressao?.[campo] === undefined);
-      if (faltam.length) falhar('registro-invalido', `${onde}: a impressão do aceite de '${evento.instancia}' não traz ${faltam.join(', ')}.`);
+      const impressao = evento.impressao;
+      if (!impressao || typeof impressao !== 'object') falhar('registro-invalido', `${onde}: o aceite de '${evento.instancia}' não traz a impressão.`);
+      soChaves(impressao, Object.keys(TIPOS_DA_IMPRESSAO), `${onde}, impressão`);
+      for (const [campo, tipo] of Object.entries(TIPOS_DA_IMPRESSAO)) {
+        if (tipoDe(impressao[campo]) !== tipo) falhar('registro-invalido', `${onde}: a impressão do aceite de '${evento.instancia}' deve trazer ${campo} (${tipo}).`);
+      }
+      const reprovadas = impressao.juntas.filter((j) => j?.satisfeita !== true).map((j) => j?.relacao);
+      if (reprovadas.length) falhar('registro-invalido', `${onde}: o aceite de '${evento.instancia}' traz junta que não passa (${reprovadas.join(', ')}).`);
     } else if (evento.tipo === 'reabertura') {
+      soChaves(evento, ['tipo', 'instancia', 'por', 'quando', 'motivo'], onde);
+      if (anterior !== 'aceite') falhar('registro-invalido', `${onde}: a reabertura de '${evento.instancia}' não vem depois de um aceite.`);
       if (!textoNaoVazio(evento.por) || !textoNaoVazio(evento.quando) || !textoNaoVazio(evento.motivo)) {
         falhar('registro-invalido', `${onde}: a reabertura de '${evento.instancia}' exige quem, quando e motivo.`);
       }
     } else {
       falhar('registro-invalido', `${onde}: tipo '${evento.tipo}' desconhecido.`);
     }
+    ultimo.set(evento.instancia, evento.tipo);
   });
 }
 
@@ -136,6 +173,9 @@ const resumo = (dif) => (dif.length > MOSTRADAS ? `${dif.slice(0, MOSTRADAS).joi
 /* O estado de cada etapa, na ordem da montagem. Função pura de (registro, medido): não grava nada e não muda o registro. */
 export function lerEtapas(registro, medido) {
   validarRegistro(registro);
+  if (medido.montagem !== undefined && registro.montagem !== medido.montagem) {
+    falhar('registro-de-outra-montagem', `o registro é da montagem '${registro.montagem}', e o medido é da '${medido.montagem}'.`);
+  }
   const etapas = medido.ordem.map((instancia) => {
     const vigente = aceiteVigente(registro, instancia);
     const avisos = avisosDaImpressao(medido, instancia);
@@ -143,11 +183,11 @@ export function lerEtapas(registro, medido) {
     if (!vigente) return { instancia, estado: 'aberta', ...comAvisos };
     const agora = imprimirEtapa(medido, instancia);
     if (!agora) {
-      return { instancia, estado: 'nao-conferivel', motivo: 'não há geometria para medir agora, e o aceite não pode ser conferido', aceite: vigente.aceite, ...comAvisos };
+      return { instancia, estado: 'nao-conferivel', motivo: 'não há geometria para medir agora, e o aceite não pode ser conferido', aceite: structuredClone(vigente.aceite), ...comAvisos };
     }
-    const diferencas = diferencasDaImpressao(vigente.impressao, agora);
-    if (!diferencas.length) return { instancia, estado: 'fixa', aceite: vigente.aceite, ...comAvisos };
-    return { instancia, estado: 'quebrada', motivo: `mudou depois do aceite: ${resumo(diferencas)}`, diferencas, aceite: vigente.aceite, ...comAvisos };
+    const diferencas = diferencasDaImpressao(canonico(vigente.impressao), agora);
+    if (!diferencas.length) return { instancia, estado: 'fixa', aceite: structuredClone(vigente.aceite), ...comAvisos };
+    return { instancia, estado: 'quebrada', motivo: `mudou depois do aceite: ${resumo(diferencas)}`, diferencas, aceite: structuredClone(vigente.aceite), ...comAvisos };
   });
   const conhecidas = new Set(medido.ordem);
   const orfaos = [...new Set(registro.eventos.map((e) => e.instancia).filter((id) => !conhecidas.has(id)))];
@@ -177,12 +217,13 @@ export function acrescentarAceite(registro, medido, instancia, aceite = {}) {
   if (!por) falhar('etapa-sem-aceite', `fixar '${instancia}' exige o aceite da pessoa, com quem aceitou.`);
   const observacao = typeof aceite.observacao === 'string' ? aceite.observacao.trim() : '';
   const defeitosAceitos = Array.isArray(aceite.defeitosAceitos) ? aceite.defeitosAceitos : [];
-  const evento = {
+  /* o evento é uma cópia congelada: nada do que o chamador guardou entra por referência, e nada muda depois */
+  const evento = congelar(structuredClone({
     tipo: 'aceite',
     instancia,
     aceite: { por, ...(observacao ? { observacao } : {}), ...(defeitosAceitos.length ? { defeitosAceitos } : {}), ...(aceite.analise ? { analise: aceite.analise } : {}) },
     impressao,
-  };
+  }));
   return { ...registro, eventos: [...registro.eventos, evento] };
 }
 
@@ -198,5 +239,5 @@ export function acrescentarReabertura(registro, instancia, autor = {}) {
   if (![por, quando, motivo].every(textoNaoVazio)) {
     falhar('reabertura-sem-autor', `reabrir '${instancia}' exige quem reabriu, a data e o motivo ("<quem, data: motivo>").`);
   }
-  return { ...registro, eventos: [...registro.eventos, { tipo: 'reabertura', instancia, por: por.trim(), quando: quando.trim(), motivo: motivo.trim() }] };
+  return { ...registro, eventos: [...registro.eventos, congelar({ tipo: 'reabertura', instancia, por: por.trim(), quando: quando.trim(), motivo: motivo.trim() })] };
 }
