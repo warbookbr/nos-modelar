@@ -51,6 +51,10 @@
  *    nas quatro vistas do conjunto, a zebra com a listra deitada e em pé (`--angulo-da-zebra=90`), sem a vista em que a chapa aparece
  *    de quina, com a leitura curta da faixa refletida
  *    (`LEITURA_DO_REFLEXO`, a versão do guia de leitura em `PARE-E-ANALISE.md` que cabe no pedido);
+ *  - o contorno medido sobre o modelo (`contorno-sobreposto.png`), quando a peça tem `*.contornos.json` citado no plano, ao lado de uma
+ *    imagem citada ou na pasta dela: a vista ortográfica com a linha do contorno posta no referencial da peça pela câmera, pela prancha de
+ *    `prancha-de-referencia.mjs` (`prancharContorno`), e no objeto de várias partes pela pose da instância na montagem, só com as regiões
+ *    de nome da instância ou de uma parte (plano de comparar com a referência, fatia 5);
  *
  * A pasta traz ainda o `pacote.json`, com a impressão do texto da receita que o pacote mostra e as imagens de superfície: é por ele
  * que o registro da rodada sabe se o crítico de peça de lataria recebeu as duas vistas da versão medida.
@@ -78,14 +82,19 @@
 import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
-import { basename, dirname, isAbsolute, join, resolve } from 'node:path';
+import { basename, dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { linhaDaVista } from './lados-das-vistas.mjs';
 import { paraPng } from './leitura-por-regioes.mjs';
 import { prepararSolido } from '../../src/autoria/contato-de-solidos.js';
 import { doAmbiente } from '../ambiente.mjs';
 import { avisarReferenciasLocaisAusentes, mensagemDeReferenciasAusentes, referenciasDoPlano } from './referencias-do-plano.mjs';
-import { vistaDoMesmoOlho } from './comparar-contornos.mjs';
+import { lerContornos, vistaDoMesmoOlho } from './comparar-contornos.mjs';
+import { contornosDaPeca } from './contorno-da-peca.mjs';
+import {
+  FOLGA_DA_SILHUETA_PX, VISTAS_DO_CONTORNO, aoReferencialDaPeca, encontrosDoAnel, ladosEmTexto, pontoDoContorno, prancharContorno,
+  vistaNaPeca,
+} from './prancha-de-referencia.mjs';
 import { normalizarPlanoDeModelagem } from '../../src/autoria/plano-de-modelagem.js';
 import { lerPergunta } from '../../src/autoria/perguntas-do-critico.js';
 import { textoDoAfastamento } from '../../src/autoria/refinamento-global.js';
@@ -390,7 +399,7 @@ export function contornosDasReferencias({ imagens = [], citadas = [], existe = e
  * encaixes com as vizinhas (`cortesDosEncaixes`); `anteriores` os pontos de rodadas anteriores que quem conduz atribuiu ao plano, às
  * ferramentas ou ao crítico (`pontosJaAtribuidos`).
  */
-export function montarPedido({ peca, plano = null, orientacao = null, alvo = null, afastamentos = [], referencias = [], modelo = [], arame = [], montado = null, sobreposicao = null, partes = [], perguntas = [], superficie = null, reflexo = null, contornos = [], encaixes = [], anteriores = [], medicao = null }) {
+export function montarPedido({ peca, plano = null, orientacao = null, alvo = null, afastamentos = [], referencias = [], modelo = [], arame = [], montado = null, sobreposicao = null, partes = [], perguntas = [], superficie = null, reflexo = null, contornos = [], contornoSobreposto = null, encaixes = [], anteriores = [], medicao = null }) {
   const imagem = ({ arquivo, vista, tipo }) => `${vista}${tipo ? `, ${tipo}` : ''}: ${arquivo}`;
   /* O lado de cada vista é dito uma vez, em Modelo, e vale pelo nome para o modelo, o montado e as partes: dito junto de cada imagem,
      o mesmo texto longo se repetia mais de vinte vezes na peça de onze partes. */
@@ -461,6 +470,8 @@ export function montarPedido({ peca, plano = null, orientacao = null, alvo = nul
       ...lista(referenciasPorVista(vistasDoPedido, referencias, contornos, orientacao).map(linhaDaReferenciaPorVista)), '',
     );
   }
+
+  if (contornoSobreposto) L.push(...secaoDoContornoSobreposto(contornoSobreposto));
 
   L.push(
     '## Modelo', '',
@@ -669,6 +680,136 @@ export function rodadasDaPasta(pasta) {
 /* a pasta das rodadas da peça: ao lado da receita em `receita.js`, ou no histórico antigo */
 function pastaDasRodadas(peca, caminho) {
   return caminho.endsWith('receita.js') ? join(dirname(caminho), 'rodadas') : join(REPO, 'tmp/rodadas', peca);
+}
+
+/* ---------- o contorno medido sobre o modelo ----------
+ *
+ * O crítico do selim da bicicleta deu 5, 7, 5, 6, 7 e 5 em rodadas que mudavam pouco, julgando a olho contra fotos pequenas, e disse a
+ * espessura o dobro da que batia com a foto ponto a ponto quando medida. Quando a peça tem contorno medido, o pacote leva a vista do
+ * modelo com a linha desse contorno por cima, no lugar em mm que o referencial da peça dá (`prancharContorno`), para o crítico julgar a
+ * diferença medida e não só a impressão. Os contornos são os que o pedido já cita por lado (`contornosDasReferencias`) e os da pasta da
+ * peça que o veredito confere (`contornosDaPeca`). O contorno de um objeto de várias partes está no mundo da montagem: ele vai ao
+ * referencial da peça pela pose da instância, e só as regiões com o nome da instância ou de uma parte do plano são desenhadas, porque a
+ * silhueta do objeto inteiro afogaria a peça. */
+export const ARQUIVO_DO_CONTORNO_SOBREPOSTO = 'contorno-sobreposto.png';
+/* o contorno sem mmPorPx não diz o tamanho do px da referência; a folga do encontro supõe 1,6 mm por px, a do braço robótico */
+const FOLGA_SEM_ESCALA_MM_POR_PX = 1.6;
+
+/**
+ * Os contornos a sobrepor, de dados já lidos. `contornos` são `[{ arquivo, lado }]`; `lidos` dá o `lerContornos` de cada arquivo (ou o
+ * erro de leitura); `nomes` são a instância e as partes do plano; `pose` a da instância no mundo da montagem (ou null, peça sozinha);
+ * `orientacao` a do esboço. Devolve `{ entradas: [{ vista, rotulo, arquivo, aneis: [{ nome, pontosMm }] }], fora: [texto] }`, com
+ * `pontosMm` já no referencial da peça. Puro.
+ */
+export function contornosParaSobrepor({ contornos = [], lidos = new Map(), nomes = [], pose = null, deObjeto = false, orientacao = null }) {
+  const entradas = [];
+  const fora = [];
+  const nomesDaPeca = new Set(nomes);
+  for (const { arquivo, lado } of contornos) {
+    const nome = basename(arquivo);
+    if (!VISTAS_DO_CONTORNO.includes(lado)) { fora.push(`${nome} fica fora do contorno sobreposto: o lado ${lado ?? 'sem nome'} não é um dos que o contorno em mm mede (${VISTAS_DO_CONTORNO.join(', ')}).`); continue; }
+    const lido = lidos.get(arquivo);
+    if (!lido || lido instanceof Error) { fora.push(`${nome} fica fora do contorno sobreposto: ${lido?.message ?? 'não foi lido'}.`); continue; }
+    const mundo = vistasDaReferencia(lado, orientacao)?.mesma;
+    const vista = mundo ? vistaNaPeca(mundo, pose) : null;
+    if (!vista) { fora.push(`${nome} fica fora do contorno sobreposto: a pose da peça na montagem gira o olho da vista ${mundo ?? lado} para fora de um eixo.`); continue; }
+    const regioes = Object.entries(lido.regioes).filter(([n]) => nomesDaPeca.has(n)).sort(([a], [b]) => a.localeCompare(b));
+    const escolhidas = [...(deObjeto ? [] : [['silhueta', lido.silhueta]]), ...regioes];
+    if (!escolhidas.length) {
+      fora.push(`${nome} fica fora do contorno sobreposto: é contorno do objeto, e nenhuma região dele tem o nome da instância ou de uma parte do plano (${[...nomesDaPeca].join(', ') || 'nenhum'}).`);
+      continue;
+    }
+    /* o trecho da região que divide fronteira com outra região do mapa é encontro, não silhueta: no ombro do braço robótico o anel da
+       cintura tapa o pé, e dois críticos leram o lado de baixo do contorno, 33 mm acima do pé do modelo, como defeito */
+    const folgaMm = FOLGA_DA_SILHUETA_PX * (lido.mmPorPx ?? FOLGA_SEM_ESCALA_MM_POR_PX);
+    const aneis = escolhidas.map(([n, forma]) => ({
+      nome: n,
+      pontosMm: forma.aneis.map((anel) => anel.map((p) => aoReferencialDaPeca(pontoDoContorno(lado, p), pose))),
+      ...(n === 'silhueta' ? {} : {
+        encontros: forma.aneis.map((anel) => encontrosDoAnel(anel, {
+          silhueta: lido.silhueta.aneis, folgaMm,
+          vizinhas: Object.fromEntries(Object.entries(lido.regioes).filter(([outra]) => outra !== n).map(([outra, f]) => [outra, f.aneis])),
+        })),
+      }),
+    }));
+    entradas.push({ vista, arquivo, rotulo: `o contorno ${lado} de ${nome}${pose ? ', posto no referencial da peça pela pose dela na montagem' : ''}`, aneis });
+  }
+  return { entradas, fora };
+}
+
+/* SÓ A PEÇA EM MODELAGEM RECEBE O CONTORNO. Em 2026-11-17 o pacote do ombro do braço robótico desenhou e citou como medida
+ * `frontal.contornos.json`, resto de uma foto que saiu do repositório, sobre uma peça que a pessoa já tinha aceitado: o contorno não
+ * correspondia à peça aprovada e os críticos leram a diferença como defeito. O sinal gravado de peça aprovada é a etapa fixa no
+ * registro de etapas da montagem (`<montagem>.etapas.json`, que só `etapas-da-montagem.mjs --fixar` escreve, com o aceite da pessoa);
+ * a peça sozinha, fora de montagem, não grava aprovação nenhuma e continua recebendo o contorno. */
+
+/** O registro de etapas gravado ao lado da montagem, ou null sem ele. Lê só o arquivo: não resolve a montagem. */
+export function registroDasEtapas(montagem, { existe = existsSync, ler = (f) => readFileSync(f, 'utf8') } = {}) {
+  const arquivo = montagem?.arquivo?.replace(/\.json$/, '.etapas.json');
+  if (!arquivo || !existe(arquivo)) return null;
+  return JSON.parse(ler(arquivo));
+}
+
+/**
+ * A etapa fixa da peça, do registro de etapas já lido: `{ instancia, por }` quando toda instância da peça (`montagem.instancias`, de
+ * `montagemDaPeca`) está fixa no registro, ou null (peça sozinha, sem registro, ou alguma instância aberta ou quebrada). Puro.
+ */
+export function etapaFixaDaPeca(montagem, registro) {
+  if (!montagem?.instancias?.length || !Array.isArray(registro?.etapas)) return null;
+  const etapas = montagem.instancias.map((id) => registro.etapas.find((e) => e?.instancia === id));
+  if (etapas.some((e) => e?.estado !== 'fixa')) return null;
+  return { instancia: etapas[0].instancia, por: etapas[0].aceite?.por ?? null };
+}
+
+/** O motivo, para o pedido, de os contornos de uma peça com a etapa fixa ficarem fora do pacote. */
+export function motivoDaEtapaFixa(fixa, contornos, arquivoDaMontagem) {
+  const nomes = [...new Set(contornos.map((c) => basename(c.arquivo)))].join(', ');
+  return `${nomes} ${contornos.length > 1 ? 'ficam' : 'fica'} fora do pacote, sem desenho nem citação como medida: a etapa '${fixa.instancia}' está fixa no registro de etapas da montagem`
+    + `${fixa.por ? ` (aceite: ${fixa.por})` : ''}, e o pacote só usa contorno de peça em modelagem, porque o contorno de uma peça já aprovada pode ser resto de uma referência encerrada. `
+    + `Reabrir a etapa (\`node tools/modelar/etapas-da-montagem.mjs ${relative(REPO, arquivoDaMontagem)} --reabrir ${fixa.instancia} --por "<quem, data: motivo>"\`) o traz de volta.`;
+}
+
+/** A pose da instância no mundo da montagem resolvida, como `cortesDosEncaixes` a resolve; null se a instância ainda não está construída. */
+export async function poseDaInstancia(montagem) {
+  const [{ receitasDaMontagem, montagemAteAGeometria }, { lerMontagemPersistida }, { resolverMontagemPersistida }, { carregadoresDeReceitas }] = await Promise.all([
+    import('./etapas-da-montagem.mjs'), import('../../src/autoria/ler-montagem-persistida.js'),
+    import('../../src/autoria/resolver-montagem-persistida.js'), import('./peca-com-parametros.mjs'),
+  ]);
+  const dado = JSON.parse(readFileSync(montagem.arquivo, 'utf8'));
+  const lida = lerMontagemPersistida(dado);
+  const receitas = await receitasDaMontagem(lida);
+  const { dado: parcial, construidas } = montagemAteAGeometria(dado, lida, receitas);
+  if (!construidas.includes(montagem.instancia)) return null;
+  const resolvida = await resolverMontagemPersistida(parcial, carregadoresDeReceitas(receitas));
+  return (resolvida.instancias ?? []).find((i) => i.id === montagem.instancia)?.poseMundo ?? null;
+}
+
+const textoDoEncontro = (e) => (e
+  ? ` (tracejado: ${mm(e.comprimentoMm)} mm de encontro com ${e.vizinhas.join(', ')}, não é borda da peça${e.ladosDaCaixa.length ? `; ${ladosEmTexto(e.ladosDaCaixa)}` : ''})`
+  : '');
+
+function secaoDoContornoSobreposto({ arquivo, linhas = [], fora = [] }) {
+  if (!arquivo) {
+    return ['## Contorno medido sobre o modelo', '', 'Nenhum contorno medido foi desenhado sobre o modelo neste pacote.', '', ...fora.flatMap((f) => [`Fora do contorno sobreposto: ${f}`, ''])];
+  }
+  const L = [
+    '## Contorno medido sobre o modelo', '',
+    'A vista ortográfica do modelo com a linha do contorno tirado da referência por cima, em mm, posta no lugar que o referencial da peça dá, '
+    + 'pela mesma câmera que dá a escala da vista; a régua do painel é em mm. Não há alinhamento por centro: onde a linha e a silhueta do modelo '
+    + 'não coincidem, a diferença de posição ou de tamanho é medida, e a legenda dá a extensão de cada uma. Julgue proporção, silhueta e espessura '
+    + 'por esta imagem antes de julgá-las pela referência a olho; o que a linha não traça (detalhe interno, cor) continua na referência.', '',
+    'O trecho tracejado do contorno de uma região é encontro com outra região do mapa: ali, na referência, outra parte encosta na peça ou a tapa, '
+    + 'e a linha marca onde a região da imagem acaba, não a borda da peça contra o fundo. Esse trecho não serve de medida, e a distância entre ele e '
+    + 'o modelo não é defeito; só o trecho cheio é silhueta. Quando um lado da caixa do contorno cai no encontro, a extensão e o canto daquele lado '
+    + 'também não medem a peça.', '',
+    `- contorno sobreposto: ${arquivo}`, '',
+  ];
+  for (const l of linhas) {
+    L.push(...lista([`vista ${l.vista}, ${l.rotulo}: modelo ${l.modelo.extensaoMm.map(mm).join(' x ')} mm; ${l.contornos.map((c) => `contorno ${c.nome} ${c.extensaoMm.map(mm).join(' x ')} mm, canto de baixo à esquerda a ${c.cantoMenosModeloMm.map(mm).join(' e ')} mm do canto do modelo${textoDoEncontro(c.encontro)}`).join('; ')}`]));
+  }
+  if (linhas.length) L.push('');
+  for (const f of fora) L.push(`Fora do contorno sobreposto: ${f}`, '');
+  return L;
 }
 
 function secaoDosAnteriores(pontos) {
@@ -1487,6 +1628,10 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
     vistasDeSuperficie,
     superficieDaBancada,
     caixasDasPartes: async (arquivo, rec) => caixasDasPartes((await import('./entrada-de-medida.mjs')).executarReceitaGuardada(arquivo, rec).executada.neutro),
+    poseDaInstancia,
+    contornoSobreposto: prancharContorno,
+    montagemDaPeca: (p) => montagemDaPeca(p),
+    registroDasEtapas: (m) => registroDasEtapas(m),
     ...dependencias,
   };
   const blender = Object.hasOwn(dependencias, 'blender') ? dependencias.blender : doAmbiente('BLENDER');
@@ -1527,8 +1672,36 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
     dados = await dep.formasGuardadas(bruto, declarado.opcao, declarado.esboco);
     alvoDaReceita = alvoGuardado({ declarado, dados });
   }
-  const montagem = montagemDaPeca(peca);
+  const montagem = dep.montagemDaPeca(peca);
   const avisos = [];
+  /* os contornos medidos que o pedido cita por lado e os da pasta da peça, que o veredito confere, lidos antes da captura */
+  let contornosDoPedido = contornosDasReferencias({ imagens: referencias.imagens, citadas: citadasQueNaoSaoImagem(plano, dirname(caminho)) });
+  let contornosMedidos = [...contornosDoPedido];
+  for (const c of contornosDaPeca({ caminhoDaReceita: caminho, raiz: REPO })) {
+    if (c.vista && !contornosMedidos.some((x) => x.arquivo === c.caminho)) contornosMedidos.push({ arquivo: c.caminho, lado: c.vista });
+  }
+  let sobrepor = { entradas: [], fora: [] };
+  /* a peça com a etapa fixa não recebe contorno: nem desenhado, nem citado como medida do lado */
+  const fixa = montagem && contornosMedidos.length ? etapaFixaDaPeca(montagem, dep.registroDasEtapas(montagem)) : null;
+  if (fixa) {
+    sobrepor.fora.push(motivoDaEtapaFixa(fixa, contornosMedidos, montagem.arquivo));
+    contornosDoPedido = [];
+    contornosMedidos = [];
+  }
+  if (contornosMedidos.length) {
+    const lidos = new Map(contornosMedidos.map(({ arquivo }) => {
+      try { return [arquivo, lerContornos(JSON.parse(readFileSync(arquivo, 'utf8')), basename(arquivo))]; } catch (erro) { return [arquivo, erro]; }
+    }));
+    const pose = montagem ? await dep.poseDaInstancia(montagem) : null;
+    if (montagem && !pose) {
+      sobrepor.fora.push(`a instância '${montagem.instancia}' ainda não está entre as etapas construídas da montagem, e o contorno do objeto não tem onde ser posto no referencial da peça.`);
+    } else {
+      sobrepor = contornosParaSobrepor({
+        contornos: contornosMedidos, lidos, pose, deObjeto: Boolean(montagem), orientacao: dados?.orientacao ?? null,
+        nomes: [...(montagem ? [montagem.instancia] : []), ...partes],
+      });
+    }
+  }
   if (!plano) avisos.push('a receita não declara PLANO: o pedido sai sem objeto, partes e critérios, e sem alvo da forma prometida.');
 
   const pasta = saida ? resolve(saida) : pastaDaRodada(peca, pastaDasCapturas);
@@ -1614,6 +1787,18 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
       for (const { chave, visao, anguloDaZebra } of CAPTURAS_DO_REFLEXO) {
         const feita = await capturar(`visão ${chave}`, { peca, auditoria: true, visao, enquadrar: true, vistas: VISTAS_DO_REFLEXO, res: RES_DO_REFLEXO, ...(anguloDaZebra !== null ? { anguloDaZebra } : {}) });
         reflexo[chave] = imagensDoReflexo(feita, peca);
+      }
+    }
+    /* o contorno medido sobre o modelo, na mesma abertura do servidor; a falha dele sai do pedido com o motivo, e não derruba o pacote */
+    if (sobrepor.entradas.length) {
+      try {
+        const feita = await dep.contornoSobreposto(
+          { peca, contornos: sobrepor.entradas, arquivo: join(pasta, ARQUIVO_DO_CONTORNO_SOBREPOSTO) },
+          { olhar: (opcoes) => dep.olharBancada({ ...opcoes, logger, ...(prazoDeCargaMs ? { prazoDeCargaMs } : {}), ...(compartilhada ? { compartilhada } : {}) }), logger: logger ?? (() => {}) },
+        );
+        sobrepor.feita = feita;
+      } catch (erro) {
+        sobrepor.fora.push(`a prancha do contorno sobreposto falhou: ${erro.message.split('\n')[0]}`);
       }
     }
     /* a luz rasante e a curvatura da lataria, da bancada, na mesma abertura do navegador */
@@ -1703,7 +1888,10 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
       ...referencias.imagens.map((c) => ({ caminho: c, ...(critica.referencias[basename(c)] ? { lado: critica.referencias[basename(c)] } : {}) })),
       ...externas.filter((e) => !referencias.imagens.includes(e.caminho)),
     ],
-    contornos: contornosDasReferencias({ imagens: referencias.imagens, citadas: citadasQueNaoSaoImagem(plano, dirname(caminho)) }),
+    contornos: contornosDoPedido,
+    contornoSobreposto: sobrepor.feita || sobrepor.fora.length
+      ? { arquivo: sobrepor.feita?.arquivo ?? null, linhas: sobrepor.feita?.medidas.linhas ?? [], fora: sobrepor.fora }
+      : null,
     encaixes,
     anteriores: pontosJaAtribuidos((dep.rodadasAnteriores ?? rodadasDaPasta)(pastaDasRodadas(peca, caminho))),
     modelo: [conjunto, traseira, esquerda].flatMap((r) => arquivosDe(r).map((arquivo) => ({ arquivo, vista: vistaDoArquivo(arquivo, peca) ?? 'vista' }))),
@@ -1723,6 +1911,10 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   writeFileSync(arquivoDoPedido, pedido, 'utf8');
   const manifesto = gravarManifesto(pasta, { peca, receita: impressao, lataria, superficie, conferenciaDoBlender });
   const temReflexo = Object.keys(reflexo).length > 0;
+  if (sobrepor.feita) {
+    const dado = JSON.parse(readFileSync(manifesto, 'utf8'));
+    writeFileSync(manifesto, `${JSON.stringify({ ...dado, contornoSobreposto: { imagem: sobrepor.feita.arquivo, medidas: sobrepor.feita.json, contornos: sobrepor.entradas.map((e) => e.arquivo) } }, null, 2)}\n`, 'utf8');
+  }
   if (dePerto.length || temReflexo) {
     /* aditivo: sem `dePerto` e sem reflexo o pacote.json sai como sempre saiu */
     const dado = JSON.parse(readFileSync(manifesto, 'utf8'));
@@ -1733,7 +1925,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   }
 
   return {
-    peca, partes, conjunto, traseira, esquerda, arame, raioX, porParte, dePerto, reflexo: temReflexo ? reflexo : null, pasta, pedido: arquivoDoPedido, manifesto, alvo, montada, sobreposicao, superficie, conferenciaDoBlender, lataria, referencias, encaixes, avisos, medicao: medicaoDoPacote,
+    peca, partes, conjunto, traseira, esquerda, arame, raioX, porParte, dePerto, contornoSobreposto: sobrepor.feita ?? null, reflexo: temReflexo ? reflexo : null, pasta, pedido: arquivoDoPedido, manifesto, alvo, montada, sobreposicao, superficie, conferenciaDoBlender, lataria, referencias, encaixes, avisos, medicao: medicaoDoPacote,
   };
 }
 
@@ -2014,6 +2206,8 @@ export function imprimir(resultado) {
 export const AJUDA = `uso: node tools/modelar/vistas-para-critica.mjs <peça> [opções]
 
 Monta o pacote do crítico visual da peça: mede a receita, captura as vistas e grava o pedido.md.
+Quando a peça tem contorno medido (*.contornos.json citado no plano, ao lado de uma imagem citada ou na pasta da peça), o pacote
+leva também contorno-sobreposto.png: a vista ortográfica com a linha do contorno no lugar em mm que o referencial da peça dá.
 
   <peça>                                    a receita, como nas outras ferramentas (por exemplo aviao/motor)
   --saida=<pasta da rodada>                 onde o pacote é gravado

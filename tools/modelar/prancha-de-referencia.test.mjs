@@ -9,6 +9,8 @@ import { ajustarCamera, lerCopia } from './olhar-bancada.mjs';
 import {
   PONTOS_DA_ESCALA, comoCLI, disporPrancha, escalaDaVista, extensaoNaImagem, fundoDaCaixa, lerPedido, lerRegiao, lerRegua, lerVistas,
   passoDaRegua, porVista, prancharReferencia,
+  aoReferencialDaPeca, disporContorno, pontoDoContorno, prancharContorno, projetorDaVista, vistaNaPeca,
+  TRACEJADO_DO_ENCONTRO, encontrosDoAnel, ladosDaCaixaNoEncontro, ladosEmTexto, trechosDoAnel,
 } from './prancha-de-referencia.mjs';
 
 const REPO = resolve(fileURLToPath(new URL('.', import.meta.url)), '../..');
@@ -230,5 +232,130 @@ describe('a cópia de uma parte repetida na bancada', () => {
     const { raiz } = montar();
     raiz.children.forEach((m) => { m.visible = false; });
     expect(ajustarCamera({ copia: lerCopia('x-'), enquadrar: true }).erro).toMatch(/geometria visível/);
+  });
+});
+
+/* O contorno medido sobre o modelo (fatia 5): os pontos do contorno postos no quadro da vista pela projeção da câmera. */
+describe('o contorno medido sobre a vista do modelo', () => {
+  it('põe o (h, v) de cada vista no referencial, com o eixo do olho em zero', () => {
+    expect(pontoDoContorno('frontal', [10, 20])).toEqual([10, 20, 0]);
+    expect(pontoDoContorno('lateral', [10, 20])).toEqual([0, 20, 10]);
+    expect(pontoDoContorno('superior', [10, 20])).toEqual([10, 0, -20]);
+    expect(() => pontoDoContorno('isometrica', [0, 0])).toThrow(/frontal, lateral, superior/);
+  });
+  it('leva o ponto do mundo da montagem à peça pela inversa da pose, e gira o olho com ela', () => {
+    const pose = { rotacao: [[0, 0, 1], [0, 1, 0], [-1, 0, 0]], deslocamento: [0.1, 0.2, 0] };
+    /* o ponto (0, 0, 1) da peça vai a (1, 0, 0) girado, e a (101, 200, 0) mm no mundo */
+    const p = aoReferencialDaPeca([101, 200, 0], pose);
+    expect(p.map((c) => Math.round(c * 1e9) / 1e9)).toEqual([0, 0, 1]);
+    expect(aoReferencialDaPeca([1, 2, 3], null)).toEqual([1, 2, 3]);
+    expect(vistaNaPeca('frontal', pose)).toBe('esquerda');
+    expect(vistaNaPeca('frontal', null)).toBe('frontal');
+    expect(vistaNaPeca('frontal', { rotacao: [[0.6, 0, 0.8], [0, 1, 0], [-0.8, 0, 0.6]] })).toBeNull();
+  });
+  it('projeta pela afim dos quatro pontos da escala, na largura da imagem gravada', () => {
+    const projetar = projetorDaVista({ pixels: [[320, 280], [520, 280], [320, 80], [320, 280]], quadro: [640, 360] }, 1280);
+    expect(projetar([0, 0, 0])).toEqual([640, 560]);
+    expect(projetar([50, 100, 7])).toEqual([840, 160]);
+  });
+  it('o painel cobre o contorno que passa do quadro, e a legenda mede extensão e canto em mm', () => {
+    const plano = disporContorno({
+      titulo: 't',
+      linhas: [{ vista: 'frontal', rotulo: 'r', modelo: { largura: 640, altura: 360, extensao: [220, 80, 420, 280], pxPorMm: 2 }, aneis: [{ nome: 'silhueta', pontosPx: [[[200, 60], [700, 60], [700, 280], [200, 280]]] }] }],
+    });
+    expect(plano.linhas[0].contornos[0]).toMatchObject({ nome: 'silhueta', extensaoMm: [250, 110], cantoMenosModeloMm: [-10, 0] });
+    expect(plano.linhas[0].modelo.extensaoMm).toEqual([100, 100]);
+    const caminho = plano.operacoes.find((o) => o.tipo === 'caminho');
+    const painel = caminho.recorte;
+    for (const [x, y] of caminho.pontos) {
+      expect(x).toBeGreaterThanOrEqual(painel[0]);
+      expect(x).toBeLessThanOrEqual(painel[0] + painel[2]);
+      expect(y).toBeGreaterThanOrEqual(painel[1]);
+      expect(y).toBeLessThanOrEqual(painel[1] + painel[3]);
+    }
+    /* a imagem só ocupa a parte do painel que ela cobre: o contorno vai além da borda direita dela */
+    const imagem = plano.operacoes.find((o) => o.tipo === 'imagem');
+    expect(imagem.recorte[0] + imagem.recorte[2]).toBe(640);
+    expect(imagem.destino[2]).toBeLessThan(caminho.recorte[2]);
+  });
+  it('desenha no navegador a linha onde o referencial a põe, com a captura da bancada simulada', async () => {
+    const pasta = mkdtempSync(join(REPO, 'tmp', 'contorno-'));
+    try {
+      /* a vista frontal a 2 px/mm: a origem em (320, 280) e um bloco de x -50 a 50 e y 0 a 100 mm */
+      const modelo = PNG.sync.write(imagem(640, 360, [241, 243, 242], [220, 80, 420, 280], [20, 20, 20]));
+      const olhar = async (pedido) => {
+        expect(pedido).toMatchObject({ vistas: ['frontal'], projecao: 'ortografica', capturarEmMemoria: true, enquadrar: true });
+        return { ok: true, resultado: { vistas: [{ projecaoMm: { pixels: [[320, 280], [520, 280], [320, 80], [320, 280]], quadro: [640, 360] } }], capturas: [{ nome: 'frontal', largura: 640, altura: 360, dados: modelo }] } };
+      };
+      const quadrado = [[-50, 0, 0], [50, 0, 0], [50, 100, 0], [-50, 100, 0]];
+      const arquivo = join(pasta, 'contorno.png');
+      /* o lado de baixo do quadrado é encontro com outra região: a marca segue da entrada à prancha e ao JSON das medidas */
+      const encontros = [[{ encontro: true, vizinha: 'cintura' }, ...[1, 2, 3].map(() => ({ encontro: false, vizinha: null }))]];
+      const r = await prancharContorno({ peca: 'teste', arquivo, contornos: [{ vista: 'frontal', rotulo: 'o contorno frontal', aneis: [{ nome: 'ombro', pontosMm: [quadrado], encontros }] }] }, { olhar });
+      const lido = JSON.parse(readFileSync(r.json, 'utf8'));
+      expect(lido.linhas[0].contornos[0]).toMatchObject({ extensaoMm: [100, 100], cantoMenosModeloMm: [0, 0], encontro: { vizinhas: ['cintura'], comprimentoMm: 100, ladosDaCaixa: ['de baixo'] } });
+      const png = PNG.sync.read(readFileSync(arquivo));
+      expect([png.width, png.height]).toEqual([lido.largura, lido.altura]);
+      /* a linha vermelha existe e cai sobre a borda do bloco */
+      let vermelhos = 0;
+      for (let k = 0; k < png.data.length; k += 4) if (png.data[k] > 180 && png.data[k + 1] < 90 && png.data[k + 2] < 70) vermelhos += 1;
+      expect(vermelhos).toBeGreaterThan(400);
+    } finally { rmSync(pasta, { recursive: true, force: true }); }
+  }, 60_000);
+});
+
+/* O trecho de encontro: a região que divide fronteira com outra região do mapa não tem borda ali, e o crítico do ombro do braço robótico
+   leu o pé dele, tapado pelo anel da cintura, como 33 mm acima do modelo. Um objeto 200 x 200 mm partido em cima e embaixo a y = 100. */
+describe('o trecho do contorno que é encontro com outra região', () => {
+  const silhueta = [[[-100, 0], [100, 0], [100, 200], [-100, 200]]];
+  const cima = [[-100, 100], [100, 100], [100, 200], [-100, 200]];
+  const baixo = [[[-100, 0], [100, 0], [100, 100], [-100, 100]]];
+
+  it('classifica cada lado: o que encosta na outra região é encontro, com o nome dela, e o resto é silhueta', () => {
+    const lados = encontrosDoAnel(cima, { silhueta, vizinhas: { baixo }, folgaMm: 4.7 });
+    expect(lados).toEqual([{ encontro: true, vizinha: 'baixo' }, { encontro: false, vizinha: null }, { encontro: false, vizinha: null }, { encontro: false, vizinha: null }]);
+    /* longe de toda região, o lado interno ainda é encontro, com o resto do objeto */
+    expect(encontrosDoAnel(cima, { silhueta, vizinhas: {}, folgaMm: 4.7 })[0]).toEqual({ encontro: true, vizinha: null });
+    /* a 2 mm da silhueta, dentro da folga, o lado conta como silhueta */
+    expect(encontrosDoAnel([[-98, 100], [98, 100], [98, 198], [-98, 198]], { silhueta, vizinhas: { baixo }, folgaMm: 4.7 }).map((l) => l.encontro)).toEqual([true, false, false, false]);
+  });
+
+  it('parte o anel em trechos abertos pela classe, sem partir um trecho na volta', () => {
+    const pontos = [[0, 0], [1, 0], [2, 0], [2, 1], [0, 1]];
+    const e = (encontro) => ({ encontro, vizinha: null });
+    const trechos = trechosDoAnel(pontos, [e(false), e(true), e(true), e(false), e(false)]);
+    expect(trechos).toEqual([
+      { encontro: true, fechado: false, pontos: [[1, 0], [2, 0], [2, 1]] },
+      { encontro: false, fechado: false, pontos: [[2, 1], [0, 1], [0, 0], [1, 0]] },
+    ]);
+    expect(trechosDoAnel(pontos, null)).toEqual([{ encontro: false, fechado: true, pontos }]);
+    expect(trechosDoAnel(pontos, pontos.map(() => e(true)))[0]).toMatchObject({ encontro: true, fechado: true });
+  });
+
+  it('diz que lado da caixa cai no encontro, pelo comprimento junto da borda', () => {
+    const lados = encontrosDoAnel(cima, { silhueta, vizinhas: { baixo }, folgaMm: 4.7 });
+    /* em px com y para baixo, o lado de baixo do anel (v = 100) é o de y maior */
+    const px = cima.map(([h, v]) => [h, 200 - v]);
+    expect(ladosDaCaixaNoEncontro([{ pontos: px, lados }], [-100, 0, 100, 100], 3)).toEqual(['de baixo']);
+    expect(ladosDaCaixaNoEncontro([{ pontos: px, lados: null }], [-100, 0, 100, 100], 3)).toEqual([]);
+    expect(ladosEmTexto(['de baixo'])).toBe('o lado de baixo da caixa cai no encontro e não mede a peça');
+    expect(ladosEmTexto(['esquerdo', 'de baixo'])).toBe('os lados esquerdo e de baixo da caixa caem no encontro e não medem a peça');
+  });
+
+  it('a prancha desenha o encontro tracejado e a legenda diz com quem ele é e que lado não mede', () => {
+    const lados = encontrosDoAnel(cima, { silhueta, vizinhas: { baixo }, folgaMm: 4.7 });
+    const pontosPx = [cima.map(([h, v]) => [320 + 2 * h, 280 - 2 * v])];
+    const plano = disporContorno({
+      titulo: 't',
+      linhas: [{ vista: 'frontal', rotulo: 'r', modelo: { largura: 640, altura: 360, extensao: [120, 80, 520, 280], pxPorMm: 2 }, aneis: [{ nome: 'cima', pontosPx, encontros: [lados] }] }],
+    });
+    const caminhos = plano.operacoes.filter((o) => o.tipo === 'caminho');
+    expect(caminhos.map((c) => [Boolean(c.encontro), c.fechado, c.tracejado ?? null])).toEqual([[true, false, TRACEJADO_DO_ENCONTRO], [false, false, null]]);
+    /* o trecho tracejado é o lado de v = 100 mm, a y = 80 px da imagem */
+    expect(caminhos[0].pontos.length).toBe(2);
+    expect(plano.linhas[0].contornos[0].encontro).toEqual({ vizinhas: ['baixo'], comprimentoMm: 200, ladosDaCaixa: ['de baixo'] });
+    const textos = plano.operacoes.filter((o) => o.tipo === 'texto').map((o) => o.texto);
+    expect(textos).toContain('  tracejado: 200 mm de encontro com baixo, não é borda da peça; o lado de baixo da caixa cai no encontro e não mede a peça');
+    expect(textos.some((t) => t.includes('o trecho tracejado é encontro'))).toBe(true);
   });
 });
