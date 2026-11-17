@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2103 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2106 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -261,6 +261,10 @@
 - `CORDAO.md` — Protótipo do cordão de solda, 2026-11-15
 - `README.md` — Cordão de solda na costura de tubos: rodadas de forma e medidas
 - `SONDA.md` — Sonda da costura arredondada em nó de tubos, 2026-11-15
+
+## docs/modelar/banco-de-provas/curvas-lisas-2026-11-17/
+
+- `README.md` — Curvas lisas e zebra numérica: fatia 1, a zebra numérica e o aviso de área
 
 ## docs/modelar/banco-de-provas/desenho-braco-2026-10-14/
 
@@ -3665,6 +3669,8 @@
 - `vistas-para-critica.mjs` — vistas-para-critica.mjs — monta, numa chamada, o pacote que a crítica visual precisa receber: as imagens e o pedido pronto.
 - `vistas-para-critica.test.mjs` — vistas-para-critica.test.mjs — o pacote que a crítica visual recebe: o prefixo que apaga as imagens velhas pega só as da peça pedida, a unidade do alvo sai d…
 - `vistas-texturizadas.mjs` — vistas-texturizadas.mjs — três vistas de uma peça do acervo COM a textura que a exportação OBJ gera, para quem precisa julgar o acabamento (eletrodoméstico, …
+- `zebra-numerica.mjs` — zebra-numerica.mjs — a zebra da bancada contada em número: quantas ilhas de reflexo, e quantos laços fechados de listra, a superfície limite da chapa tem em …
+- `zebra-numerica.test.mjs` — zebra-numerica.test.mjs — a zebra numérica nas chapas de prova da correção de superfície: o controle sem ruído não tem laço fechado e o com ruído tem, o núme…
 
 ## tools/modelar/fixtures/
 

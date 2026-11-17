@@ -1,3 +1,5 @@
+/* zebra-numerica.test.mjs — a zebra numérica nas chapas de prova da correção de superfície: o controle sem ruído não tem laço fechado e o com ruído tem,
+ * o número varia menos que os ±5 extremos do protótipo entre densidades de pontos, a persistência dos extremos e as recusas da medida. */
 import { spawnSync } from 'node:child_process';
 import { describe, expect, it } from 'vitest';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
