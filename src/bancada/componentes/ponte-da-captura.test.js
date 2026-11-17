@@ -47,6 +47,9 @@ describe('ponte da captura', () => {
     expect(ponte.partes).toEqual(['cabine', 'roda']);
     expect(ponte.selecaoIgnorada).toEqual(['porta']);
     expect(ponte.nomePeca).toBe('Furgão');
+    expect(ponte.neutroDaSessao).toBeNull();
+    cena.modelo.origemDoNeutro = { origem: 'gravado', arquivo: 'x.neutro.json' };
+    expect(ponte.neutroDaSessao).toEqual({ origem: 'gravado', arquivo: 'x.neutro.json' });
     expect(ponte.estado()).toEqual({
       peca: 'Furgão', selecionadas: ['cabine'], modo: 'todas', vista: 'direita', projecao: 'perspectiva', cameraLivre: null, inspecao: null,
     });

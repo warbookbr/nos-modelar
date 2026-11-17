@@ -2,7 +2,12 @@
  * Uso, da raiz do repositório, um modo e uma peça por processo (o processo novo paga a importação como o comando paga):
  *   node --max-old-space-size=8192 <este arquivo> execucao <peça>    importar, executar passo a passo, copiar e serializar o estado
  *   node --max-old-space-size=8192 <este arquivo> descrever <peça>   as etapas do `descrever`, pelo andamento que ele já relata
- *   node --max-old-space-size=8192 <este arquivo> bancada <peça> [--zebra] [--com-cache]   as etapas de uma captura da bancada
+ *   node --max-old-space-size=8192 <este arquivo> bancada <peça> [--zebra] [--com-cache] [--antes]   as etapas de uma captura da bancada;
+ *                                                                    `--antes` a faz como antes da fatia 4 (a ativação sem o cache por
+ *                                                                    prefixo e a página executando a receita)
+ *   node --max-old-space-size=8192 <este arquivo> laco <peça>        o `descrever` sem o cache por prefixo, com ele frio (grava), com ele
+ *                                                                    depois de uma edição no fim (a receita sem o último passo) e com a
+ *                                                                    receita repetida, numa pasta de cache temporária (fatia 4)
  * Sem `--com-cache` a captura apaga antes as entradas desta receita em `tmp/cache-de-medida/` (o cache das ferramentas, fora do controle de versão),
  * para medir a captura de depois de uma edição.
  * Cada modo imprime uma linha JSON, com a carga da máquina (`os.loadavg()`) antes e depois. Nada no repositório versionado é escrito: a captura
@@ -109,11 +114,14 @@ async function bancada() {
   }
   const marcas = [{ t: performance.now(), linha: 'bancada: antes da primeira etapa (ativar a sessão, que executa a receita no Node)' }];
   const { olharBancada } = await import('../../../../tools/modelar/olhar-bancada.mjs');
+  const { ativarReceitaBancada } = await import('../../../../tools/modelar/ativar-bancada.mjs');
+  const comoAntes = resto.includes('--antes');
   const r = await olharBancada({
     peca, vistas: zebra ? 'direita' : 'isometrica', ...(zebra ? { visao: 'zebra', enquadrar: true } : {}),
     auditoria: true,
     /* a página do quarto traseiro executa a receita por mais que o prazo padrão de 90 s por etapa, e a captura caía duas vezes nele */
     prazoDeCargaMs: 600_000,
+    ...(comoAntes ? { dependencias: { ativarReceitaBancada: (o) => ativarReceitaBancada({ ...o, cachePorPrefixo: false, estadoParaPagina: false }) } } : {}),
     aoProgredir: (linha) => marcas.push({ t: performance.now(), linha }), intervaloDoProgressoMs: 200,
   });
   const fim = performance.now();
@@ -123,10 +131,37 @@ async function bancada() {
     const etapa = m.linha.match(/ainda em '([^']+)'/)?.[1] ?? m.linha.replace(/^bancada: /, '').replace(/ \(.*$/, '').replace(/, \d+ s desde o começo$/, '');
     porEtapa.set(etapa, (porEtapa.get(etapa) ?? 0) + ((marcas[i + 1]?.t ?? fim) - m.t));
   });
-  return { ok: r?.ok ?? null, erro: r?.ok === false ? String(r?.erro?.message ?? r?.stderr ?? '').slice(0, 300) : undefined, zebra, comCache, apagados, etapas: [...porEtapa].map(([etapa, ms]) => ({ etapa, s: s(ms) })) };
+  return { ok: r?.ok ?? null, erro: r?.ok === false ? String(r?.erro?.message ?? r?.stderr ?? '').slice(0, 300) : undefined, zebra, comCache, comoAntes, apagados, etapas: [...porEtapa].map(([etapa, ms]) => ({ etapa, s: s(ms) })) };
 }
 
-const medir = { execucao, descrever, bancada }[modo];
+async function laco() {
+  const { mkdtempSync, rmSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const pasta = mkdtempSync(join(tmpdir(), 'laco-cache-'));
+  const caminho = resolverCaminhoReceita(peca);
+  const modulo = receitaDoModulo(await importarReceita(caminho));
+  const passos = Array.isArray(modulo.PASSOS) ? modulo.PASSOS : null;
+  const editada = passos ? { ...modulo, PASSOS: passos.slice(0, -1) } : null;
+  const uma = async (rotulo, opcoes) => {
+    const marcas = [];
+    const t = performance.now();
+    const r = await descreverPecaReutilizavel({ peca, pastaDoCachePorPrefixo: pasta, aoProgredir: (linha) => marcas.push({ t: performance.now(), linha }), intervaloDoProgressoMs: 0, ...opcoes });
+    const fim = performance.now();
+    const i = marcas.findIndex((m) => /executando a receita/.test(m.linha));
+    const executar = i >= 0 ? s((marcas.slice(i + 1).find((m) => !/cache por prefixo/.test(m.linha))?.t ?? fim) - marcas[i].t) : null;
+    return { rotulo, codigo: r.codigo, totalS: s(fim - t), executarS: executar, doCache: marcas.some((m) => /cache por prefixo: recomeçou/.test(m.linha)) };
+  };
+  const medidas = [
+    await uma('sem cache', { cachePorPrefixo: false }),
+    await uma('com cache, frio', { cachePorPrefixo: true }),
+    ...(editada ? [await uma('com cache, sem o último passo', { cachePorPrefixo: true, modulo: editada })] : []),
+    await uma('com cache, a mesma receita', { cachePorPrefixo: true }),
+  ];
+  rmSync(pasta, { recursive: true, force: true });
+  return { passos: passos?.length ?? null, medidas };
+}
+
+const medir = { execucao, descrever, bancada, laco }[modo];
 if (!medir || !peca) { console.error('uso: <execucao|descrever|bancada> <peça>'); process.exit(2); }
 const dado = await medir();
 const cpuDepois = cpu();

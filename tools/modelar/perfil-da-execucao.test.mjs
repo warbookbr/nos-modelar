@@ -22,7 +22,8 @@ describe('perfil da execução', () => {
     expect(r.perfil.passos).toBe(5);
     expect(r.perfil.maisCaros).toHaveLength(3);
     expect(r.perfil.porOperacao.map((x) => x.op).sort()).toEqual(['cubo', 'subtrair']);
-    expect(r.grafo.totais).toMatchObject({ passos: 5, criadoras: 3, leMalha: 2, leituraDeclarada: 0, barreiras: 2 });
+    /* os dois `subtrair` têm leitura declarada (procedural/nucleo/planejador/leitura-declarada.js) e continuam barreira, porque varrem as faces */
+    expect(r.grafo.totais).toMatchObject({ passos: 5, criadoras: 3, leMalha: 2, leituraDeclarada: 2, barreiras: 2 });
     expect(r.estritas).toHaveLength(1);
     expect(r.estritas[0].ms).toBeGreaterThan(0);
   });
@@ -34,7 +35,7 @@ describe('perfil da execução', () => {
   it('o acervo carrega cada peça de passos e conta as sequências (numa amostra)', async () => {
     const linhas = await analiseDoAcervo({ pecas: ['kukri', 'carenagem-de-prova', 'aviao/empenagem-vertical'] });
     expect(linhas.map((p) => p.peca)).toEqual(['kukri', 'carenagem-de-prova', 'aviao/empenagem-vertical']);
-    expect(linhas[0]).toMatchObject({ totais: { leituraDeclarada: 0 } });
+    expect(linhas[0]).toMatchObject({ totais: { leMalha: 7, leituraDeclarada: 4, barreiras: 7 } });
     expect(linhas[2].estritas).toHaveLength(1);
   });
 

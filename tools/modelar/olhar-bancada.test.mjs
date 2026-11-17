@@ -7,7 +7,7 @@ import { PNG } from 'pngjs';
 import { describe, expect, it } from 'vitest';
 import { FATOR_DE_AMOSTRAGEM } from './capturar-montagem.mjs';
 import * as THREE from 'three';
-import { MARCADOR_DA_SAIDA, PRAZO_DE_CARGA_MS, abrirCapturaCompartilhada, prepararSaida, agendarEncerramento, ajustarCamera, comoCLI, criarDicas, lerMiras, medirParesAcusados, olharBancada, projetarPontos } from './olhar-bancada.mjs';
+import { MARCADOR_DA_SAIDA, PRAZO_DE_CARGA_MS, abrirCapturaCompartilhada, prepararSaida, agendarEncerramento, ajustarCamera, comoCLI, criarDicas, lerMiras, medirParesAcusados, memoriaDaMedida, olharBancada, projetarPontos } from './olhar-bancada.mjs';
 import { analisarPeca } from './analise-da-peca.mjs';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -311,7 +311,7 @@ const REPO_DO_TESTE = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 describe('carga da página', () => {
   const ENQUADRAMENTO = { valida: true, area: 0.3, largura: 0.5, altura: 0.6, cortado: false };
 
-  function bancadaContada({ falharPonte = false, perderPonte = false } = {}) {
+  function bancadaContada({ falharPonte = false, perderPonte = false, neutroDaSessao = null } = {}) {
     const contagem = { servidores: 0, navegadores: 0, paginas: 0, cargas: 0, esperas: [], cortes: [], vistasTrocadas: 0, paginasFechadas: 0, navegadoresFechados: 0 };
     const page = {
       on() {},
@@ -338,7 +338,7 @@ describe('carga da página', () => {
         if (texto.includes('b.ready')) {
           return {
             ready: true, erro: null, peca: 'Peça falsa', partes: ['a'], selecaoIgnorada: [], diagnosticos: { facesSemParte: [] },
-            estatisticas: { facesNeutras: 1, triangulos: 2 }, estado: null,
+            estatisticas: { facesNeutras: 1, triangulos: 2 }, estado: null, neutroDaSessao,
           };
         }
         if (texto.includes('.enquadramento()')) return { url: 'http://127.0.0.1/harness.html', enquadramento: ENQUADRAMENTO };
@@ -429,6 +429,35 @@ describe('carga da página', () => {
     expect(contagem.projecoes).toBe(2);
     const sem = await olharBancada({ ...comum, vistas: ['frontal'], dependencias });
     expect(sem.resultado.vistas[0].projecaoMm).toBeUndefined();
+  });
+
+  it('o relato diz se a página leu o neutro gravado pela ativação ou executou a receita, e o aviso da ativação aparece', async () => {
+    const comReceita = { ...comum, peca: 'peca-de-prova', vistas: ['isometrica'] };
+    const ativar = async () => ({ avisos: ['o neutro não foi gravado ao lado da sessão (disco cheio); a página executa a receita.'] });
+    const medir = async () => ({ pares: [], origem: 'medidos', segundos: 0 });
+    const gravado = bancadaContada({ neutroDaSessao: { origem: 'gravado', arquivo: 'tools/bancadas/out/sessoes/x.neutro.json' } });
+    const lido = await olharBancada({ ...comReceita, dependencias: { ...gravado.dependencias, ativarReceitaBancada: async () => ({}), medirParesAcusados: medir } });
+    expect(lido.resultado.neutroDaPagina).toMatchObject({ origem: 'gravado' });
+    expect(lido.stdout).toMatch(/página: neutro lido do arquivo que a ativação gravou \(tools\/bancadas\/out\/sessoes\/x\.neutro\.json\); a receita não executou na página/);
+    const executado = bancadaContada({ neutroDaSessao: { origem: 'executado', motivo: 'o servidor respondeu 404' } });
+    const rodou = await olharBancada({ ...comReceita, dependencias: { ...executado.dependencias, ativarReceitaBancada: ativar, medirParesAcusados: medir } });
+    expect(rodou.resultado.neutroDaPagina).toMatchObject({ origem: 'executado' });
+    expect(rodou.stdout).toMatch(/página: receita executada na página \(o neutro gravado não serviu: o servidor respondeu 404\)/);
+    expect(rodou.stderr).toMatch(/ativação: aviso: o neutro não foi gravado ao lado da sessão \(disco cheio\)/);
+  });
+
+  it('--sem-cache desliga também o cache por prefixo na ativação e na medida', async () => {
+    const { dependencias } = bancadaContada();
+    const recebidos = [];
+    const ativar = async (o) => { recebidos.push({ cache: o.cache, cachePorPrefixo: o.cachePorPrefixo }); };
+    const medir = async () => ({ pares: [], origem: 'medidos', segundos: 0 });
+    const comReceita = { ...comum, peca: 'peca-de-prova', vistas: ['isometrica'] };
+    await olharBancada({ ...comReceita, cacheDeContatos: false, dependencias: { ...dependencias, ativarReceitaBancada: ativar, medirParesAcusados: medir } });
+    await olharBancada({ ...comReceita, dependencias: { ...dependencias, ativarReceitaBancada: ativar, medirParesAcusados: medir } });
+    expect(recebidos).toEqual([{ cache: false, cachePorPrefixo: false }, { cache: true, cachePorPrefixo: true }]);
+    const criar = () => ({ memoria: { marca: 'memoria' } });
+    expect(memoriaDaMedida('/x/receita.js', { cache: false, criar })).toBeNull();
+    expect(memoriaDaMedida('/x/receita.js', { cache: true, criar })).toEqual({ marca: 'memoria' });
   });
 
   it('a medida de contatos de uma receita diz no relato se foi medida agora, lida do cache ou pulada, e a pulada não chama a medida', async () => {

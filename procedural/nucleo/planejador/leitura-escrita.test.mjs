@@ -34,13 +34,15 @@ describe('grafo de leitura e escrita (só leitura)', () => {
     expect(chave({ op: 'x', id: 1, parte: 'lente' })).not.toBe(chave({ op: 'x', id: 1 }));
   });
 
-  it('o manifesto de hoje não declara leitura por seleção: todo passo que lê a malha é barreira', () => {
+  it('o passo que lê a malha sem leitura declarada, ou com a declarada malha, é barreira', () => {
     const passos = [cubo(1), cubo(2), sub(3, o('cubo', 1), o('cubo', 2)), ['material', { sel: o('subtrair', 3), usa: 'x' }]];
     const a = analisarPassos(passos, { manifesto });
     expect(a.map((p) => p.categoria)).toEqual(['criadora', 'criadora', 'le-malha', 'le-malha']);
-    expect(a.every((p) => p.leituraDeclarada === false)).toBe(true);
+    /* o subtrair declara a leitura (as faces, 'malha'); o material não declara */
+    expect(a.map((p) => p.leituraDeclarada)).toEqual([false, false, true, false]);
     expect(a.map((p) => p.barreira)).toEqual([false, false, true, true]);
-    expect(totaisDoGrafo(a)).toMatchObject({ passos: 4, criadoras: 2, leMalha: 2, leituraDeclarada: 0, barreiras: 2, leituraExtraivel: 2 });
+    expect(totaisDoGrafo(a)).toMatchObject({ passos: 4, criadoras: 2, leMalha: 2, leituraDeclarada: 1, barreiras: 2, leituraExtraivel: 2 });
+    expect(analisarPassos(passos, { manifesto, tabela: { subtrair: { V: 'citados', F: 'citados' } } })[2].barreira).toBe(false);
     expect(resumoPorOperacao(a).find((r) => r.op === 'subtrair')).toMatchObject({ passos: 1, leMalha: 1, barreiras: 1, extraiveis: 1 });
   });
 
