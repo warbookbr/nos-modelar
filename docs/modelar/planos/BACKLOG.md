@@ -24,6 +24,9 @@ Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 | Recusas do `friso` sem teste | as recusas das linhas 120 e 377 de `friso.js` estão em `SEM_ENTRADA_QUE_ALCANCE` do `recusas:check` por falta de fixture; escrever a fixture e tirar as exceções |
 | Retrato do acervo contra a base | `retrato-do-acervo --comparar` exige referência gravada à mão; uma opção `--base=<commit>` que meça numa worktree limpa prova malha idêntica sem 23 min de passos manuais |
 | Cache por passo da receita | refazer só os passos que dependem do que mudou, com a impressão digital das entradas; precisa da leitura declarada nos manifestos (hoje 0 de 6.611 passos que leem a malha), medida em `procedural/nucleo/planejador/leitura-escrita.js` |
+| Leitura do `friso` invisível ao planejador | `costura.de` não está em `CAMPOS_DE_REFERENCIA` de `procedural/nucleo/planejador/leitura-escrita.js`, e o manifesto dá o `friso` como criador (`artefatos.entra` vazio) embora ele leia a costura; achado da revisão da fatia 2 do cache por passo |
+| Seleção ausente sem leitura dinâmica | `resolverSelecao` com `sel` nulo devolve a peça inteira, e `leituraDosArgumentos` não marca o passo como dinâmico; decidir se a ausência grita ou se conta como leitura da malha inteira |
+| Deleção e ausência fora do registro | a procedência não lista a entrada que o passo apagou (`apagaFace` sai com `faces: []`), e o registro de leitura descarta o `get` e o `has` de entrada ausente; os dois escondem a dependência de quem apagou |
 | Execução paralela de partes independentes | só depois do cache por passo; medir o custo de clonar o estado contra o ganho |
 | Conferência do retrato do acervo no CI | `conferir-retrato-do-acervo --acervo` leva cerca de 20 min e só roda por comando; decidir se vira gate do CI ou roda quando se mexe em `nucleoBooleano` ou no rastreio |
 | `etapas-do-acervo.test.mjs` acima de 120 s | 175 a 207 s nos gates, dominado pelo sedã; medir por etapa e dividir |

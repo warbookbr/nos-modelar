@@ -18,15 +18,15 @@ Todo comando que olha uma peça (bancada, descrever, guardas, varreduras, testes
 
 ## Resultado
 
-Um comando repetido sobre a mesma receita com um passo mudado refaz só os passos que dependem dele, com a malha idêntica bit a bit à da execução completa, e o tempo medido do laço (gerar, capturar, medir) cai em pelo menos metade na bicicleta e no quarto traseiro do carro.
+Um comando repetido sobre a mesma receita com um passo mudado refaz só esse passo e os que vêm depois dele, recomeçando do estado guardado logo antes, com a malha idêntica bit a bit à da execução completa, e o tempo medido do laço (gerar, capturar, medir) cai em pelo menos metade na bicicleta e no quarto traseiro do carro.
 
 ## Filtro Agent-First
 
 Linha de base: MEDIR antes de tudo, por peça pesada (bicicleta, carro, furgão realista, braço), quanto do tempo de cada comando é execução da receita, captura, conferência de contato e descrição, para o cache mirar no que custa.
 
-Leitura declarada: REFATORAR os manifestos das operações que leem a malha, declarando o que leem, conferido contra a leitura real pelo modo conferido que o planejador já tem.
+Leitura declarada: DECLARAR o que as operações da linha de base leem, conferido contra a leitura real; desde a revisão da fatia 2 ela é diagnóstico e medida, e não governa o cache.
 
-Cache: CRIAR no planejador a impressão digital das entradas de cada passo (os argumentos e o estado lido) e o estado guardado entre comandos, em disco fora do repositório, com o modo conferido que refaz tudo e compara bit a bit.
+Cache: CRIAR no planejador o cache por prefixo entre comandos: o estado depois do passo k guardado em disco, fora do repositório, sob a chave do conteúdo dos passos 0 a k e da versão do código do núcleo, e a edição no passo j recomeçando do último estado guardado antes de j, com o modo conferido que refaz tudo e compara bit a bit.
 
 Execução paralela das partes independentes: ADIAR para depois do cache, como o backlog diz, salvo se a linha de base mostrar que ela paga sozinha.
 
@@ -34,7 +34,7 @@ Execução paralela das partes independentes: ADIAR para depois do cache, como o
 
 - a linha de base medida, por comando e por peça pesada;
 - a leitura declarada nas operações que a peça pesada usa, conferida;
-- o cache por passo com a impressão digital, o estado entre comandos e o modo conferido;
+- o cache por prefixo com a chave pelo conteúdo e a versão do núcleo, o estado entre comandos e o modo conferido;
 - o uso do cache na bancada e no `descrever`;
 - a prova no acervo inteiro: malha idêntica com e sem cache;
 - o tempo do laço antes e depois na bicicleta e no carro, no banco de provas.
@@ -48,15 +48,15 @@ Execução paralela das partes independentes: ADIAR para depois do cache, como o
 ## Gate de saída
 
 1. A malha de toda receita do acervo é idêntica com e sem cache, pelo modo conferido, por teste.
-2. Mudar o último passo de uma receita refaz só ele e os que dependem dele, por teste que conta os passos executados.
+2. Mudar um passo de uma receita refaz só ele e os que vêm depois dele, e mudar o último refaz só ele, por teste que conta os passos executados.
 3. O laço medido (gerar, capturar, medir) cai em pelo menos metade na bicicleta, mediana de três, mesma máquina; no quarto traseiro do carro, cuja execução varia 50 % entre execuções iguais pela `subdivisao`, a queda se mede pelos passos executados no laço, contados como no gate 2.
 4. O cache nunca serve estado de outra versão do núcleo nem de outra receita: a impressão digital inclui a versão do código do núcleo, por teste.
 
 ## Fatias
 
 1. Linha de base, com a decisão de onde o cache rende mais. Feita em 2026-11-17, na [pasta do plano](../banco-de-provas/cache-por-passo-2026-11-16/README.md), pelo `medir-linha-de-base.mjs`, com a carga, o roubo de CPU e uma calibração ao lado de cada medida. A execução da receita é de 65 % a 94 % do laço depois de uma edição (`descrever` e uma captura): 39,8 s de 56,5 s na bicicleta, 385 s de 411 s no quarto traseiro do carro e 147 s de 227 s no furgão realista, medianas de três; o braço não é peça pesada (as treze partes executam em 11 s somadas), e a parada do plano não vale. Em todo laço a mesma receita é executada três vezes, no `descrever`, que não lê o cache da receita inteira, na ativação da captura, que o lê, e na página da bancada, que nunca o lê, e o que mais rende é executar uma vez por edição: o laço da bicicleta iria a uns 29 s e o do carro a uns 170 s, abaixo da metade do gate 3. Depois disso, o cache por passo rende na bicicleta e no carro com pontos logo depois das operações caras (as uniões do quadro, a subdivisão da chapa), que é a memória de execução que o núcleo já tem num processo, gravada em disco com a versão do núcleo na chave; no furgão, em que o prefixo ainda refaz metade da execução, o ganho depende da leitura declarada. A decisão, tomada em 2026-11-17: primeiro a receita passa a ser executada uma vez por edição (o `descrever` lê e grava o cache da receita inteira, e a página da bancada, em `src/bancada/carregar-peca.js`, recebe o estado executado em vez de executar o módulo, na fatia 4), e só depois vem o cache por passo em disco, que grava os pontos da memória de execução entre comandos com a versão do código do núcleo na chave.
-2. Leitura declarada nas operações da linha de base, conferida. Feita em 2026-11-17, na [pasta do plano](../banco-de-provas/cache-por-passo-2026-11-16/README.md#fatia-2-a-leitura-declarada-conferida): o núcleo ganhou o registro de leitura por passo, desligado por padrão, e a declaração das nove operações está em `procedural/nucleo/planejador/leitura-declarada.js`, conferida nas 121 receitas do acervo. As primitivas (`lathe`, `extrusao`, `subdivisao`) não leem a malha que existia, o `friso` lê só a costura citada, o `subtrair` lê os vértices citados e varre as faces, e `unir`, `aberturaPorContorno`, `limparLascas` e `arredondarAresta` varrem a malha. Como as operações caras são as que varrem, a dependência por leitura rende pouco além do prefixo enquanto elas não forem estreitadas, o que muda `procedural/nucleo/operacoes/`, fora do território: a decisão de estreitá-las é da pessoa, e a da abertura por contorno inclui o raio da peça inteira, que hoje entra na conta do vão.
-3. O cache e o modo conferido, com o acervo idêntico.
+2. Leitura declarada nas operações da linha de base, conferida. Feita em 2026-11-17, na [pasta do plano](../banco-de-provas/cache-por-passo-2026-11-16/README.md#fatia-2-a-leitura-declarada-conferida): o núcleo ganhou o registro de leitura por passo, desligado por padrão, e a declaração das nove operações está em `procedural/nucleo/planejador/leitura-declarada.js`, conferida nas 121 receitas do acervo. As primitivas (`lathe`, `extrusao`, `subdivisao`) não leem a malha que existia, o `friso` lê só a costura citada, o `subtrair` lê os vértices citados e varre as faces, e `unir`, `aberturaPorContorno`, `limparLascas` e `arredondarAresta` varrem a malha. Como as operações caras são as que varrem, a dependência por leitura rende pouco além do prefixo enquanto elas não forem estreitadas, o que muda `procedural/nucleo/operacoes/`, fora do território: a decisão de estreitá-las é da pessoa, e a da abertura por contorno inclui o raio da peça inteira, que hoje entra na conta do vão. A revisão adversarial da fatia 2 (2026-11-17) mostrou que a declaração não serve para pular passos, e quem conduz decidiu que ela não governa o cache: fica como diagnóstico e medida. As lacunas são cinco. A `subdivisao` lê `st.pontosDaGaiola`, que uma `subdivisao` anterior deixou, e a saída de uma segunda subdivisão muda quando só a primeira muda, com a leitura declarada 'nada'. O `friso` lê os próprios argumentos e `st.superficiesDosFrisos`, que outro passo guardou, e a mesma malha com outros nomes de ponto muda o friso. A leitura de uma entrada ausente (o `get` e o `has` de uma face que um passo anterior apagou) some do resumo, como a deleção some do lado da escrita, na procedência. O planejador não vê o que o `friso` cita (`costura.de` não está nos campos de referência, e o manifesto o dá como criador). A seleção ausente (`sel` nulo) resolve a peça inteira sem marcar a leitura como dinâmica. As três primeiras são testes de edição em `procedural/nucleo/planejador/cache-por-prefixo.test.mjs`, e as três últimas estão no backlog.
+3. O cache por prefixo em disco e o modo conferido, com o acervo idêntico.
 4. Uso na bancada e no `descrever`, com o tempo do laço medido.
 5. Documentação e fechamento.
 

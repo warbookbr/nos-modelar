@@ -16,6 +16,7 @@ import { criarRegistroOperacoes } from './registro.js';
 import { chavesDosPrefixos, copiarEstado, registroServeAMemoria } from './memoria-de-execucao.js';
 import { criarLeituraDoPasso } from './planejador/leitura-do-passo.js';
 import { conferirLeituraDoPasso } from './planejador/leitura-declarada.js';
+import { divergenciaDaImpressao } from './planejador/impressao-do-neutro.js';
 import { essenciaisDaOperacao, recusasDeEssenciais, usoDaOperacao } from './uso-operacoes.js';
 import { criarOperacoesSubdivisao } from './operacoes/subdivisao.js';
 import { criarOperacoesFriso } from './operacoes/friso.js';
@@ -3743,9 +3744,15 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
   const chavesDoPrefixo = memoria ? chavesDosPrefixos({ dict, MATERIAIS, ESQUELETO, ALIASES, declaracoes: [...declaracoesOrigem], modoRetrato, registro: (OPCOES.registroOperacoes ?? REGISTRO_OPERACOES).assinatura }, PASSOS) : null;
   /* Quais passos viram ponto: guardar o estado inteiro custa uma cópia (5 s com 174 mil faces), então não é todo passo. Entram os
      últimos `PONTOS_NO_FIM` passos das operações pesadas, para o ajuste depois da última delas recomeçar dali, e o último passo
-     de operação cara antes do ponto onde esta execução diverge da anterior, para a execução seguinte recomeçar dali. */
+     de operação cara antes do ponto onde esta execução diverge da anterior, para a execução seguinte recomeçar dali. A memória que
+     declara `todoPasso` guarda depois de cada passo, e a que declara `passosGuardados` (lista de índices) guarda só depois desses: são as
+     provas do cache por prefixo, em receitas pequenas e no acervo. */
   const pontosDeMemoria = new Set();
-  if (chavesDoPrefixo) {
+  if (chavesDoPrefixo && Array.isArray(memoria.passosGuardados)) {
+    for (const i of memoria.passosGuardados) if (Number.isSafeInteger(i) && i >= 0 && i < PASSOS.length) pontosDeMemoria.add(i);
+    memoria.ultimaCadeia = chavesDoPrefixo;
+  } else if (chavesDoPrefixo) {
+    if (memoria.todoPasso === true) PASSOS.forEach((_, i) => pontosDeMemoria.add(i));
     const pesados = [];
     PASSOS.forEach((passo, i) => { if (OPERACOES_PESADAS.has(passo?.[0])) pesados.push(i); });
     for (const i of pesados.slice(-PONTOS_NO_FIM)) pontosDeMemoria.add(i);
@@ -3762,7 +3769,8 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
     for (let k = PASSOS.length - 1; k >= 0; k -= 1) {
       const ponto = memoria.buscar(chavesDoPrefixo[k]);
       if (!ponto) continue;
-      const estado = copiarEstado(ponto.estado);
+      /* `proprio`: a memória devolve um estado que é só desta execução (o lido do disco, por exemplo), e a cópia não precisa ser feita */
+      const estado = ponto.proprio === true ? ponto.estado : copiarEstado(ponto.estado);
       if (estado) { Object.assign(st, estado); inicio = k + 1; memoria.estatisticas.restaurados += 1; }
       break;
     }
@@ -3887,8 +3895,11 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
       },
     });
     if (chavesDoPrefixo && pontosDeMemoria.has(i)) {
-      const estado = copiarEstado(Object.fromEntries(Object.entries(st).filter(([campo, valor]) => !CAMPOS_FORA_DA_MEMORIA.has(campo) && typeof valor !== 'function')));
-      if (estado) memoria.guardar(chavesDoPrefixo[i], i, estado); else memoria.estatisticas.recusados += 1;
+      /* `copiaPropria`: a memória faz a cópia dela dentro de `guardar`, na hora (a serialização para o disco), e recebe o estado vivo;
+         `guardar` que devolve false não guardou */
+      const vivo = Object.fromEntries(Object.entries(st).filter(([campo, valor]) => !CAMPOS_FORA_DA_MEMORIA.has(campo) && typeof valor !== 'function'));
+      const estado = memoria.copiaPropria === true ? vivo : copiarEstado(vivo);
+      if (!estado || memoria.guardar(chavesDoPrefixo[i], i, estado) === false) memoria.estatisticas.recusados += 1;
     }
   });
   aplicarHierarquiaDasPartes(st);
@@ -3939,6 +3950,13 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
   Object.defineProperty(saida, 'chapas', { value: st.chapas ?? [], enumerable: false });
   /* aberturas: a borda, a espessura e a limpeza de cada passo `aberturaPorContorno`, para a conferência dos vãos e as provas. Fora da enumeração, como `chapas`. */
   Object.defineProperty(saida, 'aberturas', { value: st.aberturas ?? [], enumerable: false });
+  /* O MODO CONFERIDO DA MEMÓRIA (`OPCOES.memoriaConferida`): a execução que recomeçou de um estado guardado roda de novo inteira, sem
+     memória, e as duas têm de dar a mesma impressão do neutro (`planejador/impressao-do-neutro.js`); a divergência é recusada. */
+  if (memoria && OPCOES.memoriaConferida === true && inicio > 0) {
+    const inteira = nucleo(PASSOS, PARAMS, TOPO, MATERIAIS, ESQUELETO, ALIASES, { ...OPCOES, memoria: null, memoriaConferida: false, aoLer: undefined, aoRastrear: undefined, leitura: undefined });
+    const divergencia = divergenciaDaImpressao(saida, inteira);
+    if (divergencia) throw new Error(`oficina: a execução que recomeçou do estado guardado depois do passo ${inicio - 1} divergiu da execução inteira: ${divergencia}`);
+  }
   return saida;
 }
 
