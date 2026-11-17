@@ -1,6 +1,6 @@
 # Cache por passo da receita: refazer só o que mudou, entre comandos, medido no laço de modelagem
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `procedural/nucleo/planejador/`, `procedural/nucleo/nucleo.js`, `tools/modelar/descrever-peca.mjs`, `src/bancada/carregar-peca.js`, `tools/modelar/entrada-de-medida.mjs`, `tools/modelar/ativar-bancada.mjs`, `src/bancada/sessao/carregar-sessao.js`, `docs/modelar/banco-de-provas/cache-por-passo-2026-11-16/` (os três do meio por empréstimo aprovado por quem conduz em 2026-11-17, para a captura executar a receita uma vez só; nenhum outro plano ativo os tem); e, por empréstimo pedido por quem conduz em 2026-11-17 (nenhum plano ativo o tem), `procedural/nucleo/memoria-de-pura.js` e o teste dele, só para a chave exata distinguir o buraco de uma lista; e, por empréstimo do plano de comparar com a referência pedido por quem conduz em 2026-11-17, tools/modelar/olhar-bancada.mjs só para ligar o cache (sem crase, para não sobrepor os territórios); o `descrever-peca.mjs` foi emprestado em 2026-11-17, por decisão da pessoa, ao plano de comparar com a referência só para a opção recusas, um ramo logo depois de executar a receita
 
