@@ -98,7 +98,7 @@ export async function conferirUmaPeca(peca, { raiz = REPO } = {}) {
   /* Parte planejada que espera a etapa: o referencial declarado já foi
      conferido acima, e o chão só pode ser medido quando houver geometria. A
      dispensa é a mesma de `guarda:acervo`. */
-  if (receita.PASSOS?.length === 0 && etapaQueEspera(peca)) return null;
+  if (receita.PASSOS?.length === 0 && etapaQueEspera(peca, { semPassos: true })) return null;
 
   /* PARTE QUE SE ENCAIXA EM OUTRA NÃO TEM O CHÃO NA ORIGEM. Numa montagem, a
      origem de cada parte depois da primeira é o encaixe dela na parte de

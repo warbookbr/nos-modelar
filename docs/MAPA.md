@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2103 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2109 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -314,6 +314,10 @@
 - `medir-farol.mjs` — medir-farol.mjs — as medidas do gate 1 do plano esboço pelo núcleo: em cada opção do farol na chapa curva (`farol-na-chapa.esboco.mjs`), a borda de fora de c…
 - `mesa-com-variantes.js` — mesa-com-variantes — cópia de prova de `procedural/pecas/mesa-quadrada-escura/receita.js` para o gate 2 do plano esboço pelo núcleo: o mesmo código, com este…
 
+## docs/modelar/banco-de-provas/etapas-pela-impressao-2026-11-17/
+
+- `README.md` — Etapas pela impressão do aceite: provas
+
 ## docs/modelar/banco-de-provas/familias-de-desenho-2026-10-14/braco/
 
 - `NOTAS.md` — Braço robótico, vista lateral: o desenho por restrições ajustado à referência
@@ -611,7 +615,6 @@
 - `2026-11-16-ponte-com-a-mecatronica.md` — Ponte com a mecatrônica: a ficha do objeto exportada, as portas elétricas declaradas e o pedido que volta conferido
 - `2026-11-17-abrir-peca-com-filtros.md` — Abrir peça com filtros: a janela de abrir da bancada busca por nome e separa por categoria e situação
 - `2026-11-17-curvas-lisas-e-zebra-numerica.md` — Curvas lisas e zebra numérica: a curva lida da prancha vira poucos trechos de curvatura monótona, e a ondulação longa que o crítico vê vira número
-- `2026-11-17-etapas-pela-impressao-do-aceite.md` — Etapas pela impressão do aceite: o estado de cada etapa sai da comparação do medido agora com o que a pessoa aprovou
 - `2026-11-17-trilhas-e-validacao-da-placa.md` — Trilhas de cobre e validação elétrica da placa declarada: a lista de ligações vira cobre conferido por regra e por conectividade
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
@@ -2343,7 +2346,8 @@
 - `dobras-aceitas.js` — dobras-aceitas.js — a dobra, o vinco e o chanfro que a peça declara de propósito, com o motivo.
 - `dobras-aceitas.test.js` — dobras-aceitas.test.js — `PLANO.dobrasAceitas`: o normalizador recusa o que o campo não admite, o plano sem o campo mantém a forma canônica de antes, e a ace…
 - `encosto-da-peca.test.mjs` — encosto-da-peca.test.mjs — uma tolerância de "encosta" só para a peça, e a distância do par declarado que não acontece (atrito 5 do RECEITA.md do sedã).
-- `etapas-de-construcao.js` — etapas-de-construcao.js — o registro de cada etapa de uma montagem v5: a parte que entrou, as juntas que passaram a existir com ela e o resultado da medida d…
+- `etapas-de-construcao.js` — etapas-de-construcao.js — o que há de comum ao registro de etapas de uma montagem v5: o formato, o erro, as juntas medidas em cada etapa e a próxima etapa a …
+- `etapas-pela-impressao.js` — etapas-pela-impressao.js — o estado de cada etapa de uma montagem v5 como função pura do registro de eventos e do medido agora.
 - `executar-receita-barras.test.mjs` — executar-receita-barras.test.mjs — a estruturaDeBarras na receita de peça: o tubo entre dois pontos, com as pontas fechadas pela operação.
 - `executar-receita.js` — executar-receita.js — fronteira pura para executar uma receita já carregada.
 - `familia-esboco.js` — familia-esboco.js — a conferência entre a família e o componente do esboço de mesmo nome (núcleo, sem disco).
@@ -3474,10 +3478,11 @@
 - `esboco-para-passos.test.mjs` — A conversão do esboço em passos de receita: as onze cadeiras escolhidas (receitas do externo traduzidas em esboço) convertem sem recusa, e a malha que o núcl…
 - `estado-bancada.test.ts` — estado-bancada.test.ts — contrato headless das vistas, seleção, contexto e URL da bancada.
 - `estudo-campo-revalidacao.test.ts` — R05: estudo de campo sobre uma peça compartilhada em duas raízes.
+- `etapas-consumidores-v3.test.mjs` — etapas-consumidores-v3.test.mjs — cada consumidor do estado das etapas, de ponta a ponta, sobre um registro v3 em disco. A pasta de prova é uma cópia do `car…
 - `etapas-da-montagem.mjs` — etapas-da-montagem.mjs — o registro de etapas de uma montagem v5, em disco, e a única porta para fixar uma etapa.
 - `etapas-da-montagem.test.mjs` — etapas-da-montagem.test.mjs — a porta que fixa etapa. Fixar exige a etapa ser a próxima, o crítico ter fechado a peça dela, a nota de passagem, as juntas pas…
-- `etapas-de-construcao.test.mjs` — etapas-de-construcao.test.mjs — fatia 3 do plano "a peça nasce encaixada": o registro de etapas, a junta medida quando a parte entra e a recusa de seguir com…
-- `etapas-reabrir-braco.test.mjs` — etapas-reabrir-braco.test.mjs — reabrir a base do braço robótico, com a receita de agora (a caixa lateral com a placa de controle e a tampa, plano da família…
+- `etapas-de-construcao.test.mjs` — etapas-de-construcao.test.mjs — fatia 3 do plano "a peça nasce encaixada": as juntas medidas em cada etapa e a próxima etapa a trabalhar. Provado na fixture …
+- `etapas-reabrir-braco.test.mjs` — etapas-reabrir-braco.test.mjs — reabrir a base do braço robótico sobre o registro v3 do acervo (migrado das impressões dos commits dos aceites): reabrir só a…
 - `executar-receita.test.ts` — executar-receita.test.ts — prova a fronteira pura sem carregar catálogo.
 - `exemplo-canonico.test.mjs` — exemplo-canonico.test.mjs — o exemplo de receita que a documentação ensina precisa passar pelo mesmo caminho que o acervo.
 - `exportar-gltf-braco.test.mjs` — exportar-gltf-braco.test.mjs — LENTO (está em `TESTES_LENTOS`: resolve o braço inteiro, uns 15 s). Plano as partes do braço, fatia 2, gate 4: o braço montado…
@@ -3531,9 +3536,12 @@
 - `mcp-degrau-1-preparacao.test.mjs` — Provas da fatia preparatória: importação silenciosa, serviço estruturado e limpeza.
 - `medidas-da-fonte.mjs` — medidas-da-fonte.mjs — tira de `fonte-partes.json`, em milímetro, o ponto de partida das três vistas da carroceria: o perfil lateral, a planta, a seção front…
 - `medidas-da-fonte.test.mjs` — Testes de medidas-da-fonte.mjs sobre a fonte sintética da fixture de caixas: perfil, seção, planta, rodas, o trecho de receita que o núcleo executa e a recus…
+- `medir-arvore-para-migracao.mjs` — medir-arvore-para-migracao.mjs — o filho da migração dos registros de etapas: mede a montagem na árvore onde está (a de um commit antigo, extraída numa pasta…
 - `medir-importar-receita.mjs` — medir-importar-receita.mjs — o tempo de importar cada receita e gerar os passos dela, num processo novo.
 - `medir-transcricao.mjs` — medir-transcricao.mjs — onde vão os tokens de um agente: `npm run medir:transcricao -- <transcrição.jsonl> [...]`.
 - `medir-transcricao.test.mjs` — medir-transcricao.test.mjs — a medição de uma transcrição: turnos e entrada somada pelo `usage` (uma vez por mensagem), cada resultado de ferramenta na etapa…
+- `migrar-etapas-para-impressao.mjs` — migrar-etapas-para-impressao.mjs — migra o registro de etapas de uma montagem (versão 2, com o estado gravado em cada etapa) para o da versão 3 (eventos e im…
+- `migrar-etapas-para-impressao.test.mjs` — migrar-etapas-para-impressao.test.mjs — a migração dos registros v2 para o v3: a classificação de cada etapa fixa pelas três vias, o aceite copiado como está…
 - `modelo-aberto.mjs` — modelo-aberto.mjs — a entrada comum das ferramentas de vista: abre um esboço OU uma receita de peça e devolve a mesma estrutura.
 - `modelo-aberto.test.mjs` — modelo-aberto.test.mjs — as ferramentas de vista da empilhadeira abrindo receita de peça, e não só esboço (plano de conferência, fatia 6).
 - `modelo-de-referencia.mjs` — modelo-de-referencia.mjs — estuda uma malha de terceiros (OBJ, FBX ou glTF) como REFERÊNCIA de forma, sem a levar ao repositório.
@@ -3720,7 +3728,8 @@
 ## tools/modelar/guardas/
 
 - `abre-na-bancada.test.mjs` — abre-na-bancada.test.mjs — toda peça e toda montagem do acervo vira cena Three.js pelo caminho da bancada, sem navegador.
-- `etapas-do-acervo.test.mjs` — etapas-do-acervo.test.mjs — a releitura de todo `montagem.etapas.json` do acervo.
+- `etapas-do-acervo.mjs` — etapas-do-acervo.mjs — a conferência de um registro de etapas do acervo, pela impressão do aceite, que o teste da guarda e o teste de regressão dela usam. Só…
+- `etapas-do-acervo.test.mjs` — etapas-do-acervo.test.mjs — a releitura de todo `montagem.etapas.json` do acervo, pela impressão do aceite.
 - `guarda-acervo.mjs` — guarda-acervo.mjs — roda o veredito completo sobre TODO o acervo.
 - `guarda-acervo.test.mjs` — guarda-acervo.test.mjs — a polaridade do veredito de contato.
 - `guarda-bancada-vazia.mjs` — guarda-bancada-vazia.mjs — prova o estado publicado sem catálogo.

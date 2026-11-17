@@ -207,10 +207,11 @@ describe('as peças e a montagem', () => {
   rodadaDe(pasta, 'c', RECEITA('c'), ['ponta de cima do corpo']);
   const instancias = ['a', 'b', 'c', 'd'].map((id) => ({ id, alvo: { tipo: 'peca', ref: `obj-de-prova/${id}` } }));
   escrever(join(pasta, 'montagem.json'), JSON.stringify({ id: 'obj', instancias, etapas: ['a', 'b', 'c', 'd'] }));
-  escrever(join(pasta, 'montagem.etapas.json'), JSON.stringify({ etapas: [{ instancia: 'a', estado: 'fixa' }, { instancia: 'b', estado: 'aberta' }] }));
+  /* o estado de cada etapa sai da leitura pela impressão do aceite, que o teste dá pronta */
+  const REGISTRO = { etapas: [{ instancia: 'a', estado: 'fixa' }, { instancia: 'b', estado: 'aberta' }] };
 
   it('dá a ação e o próximo comando de cada peça, e as etapas abertas e fixas', async () => {
-    const f = await fluxoDoObjeto(pasta);
+    const f = await fluxoDoObjeto(pasta, { registroDasEtapas: REGISTRO });
     expect(f.passo).toEqual({ numero: 4, nome: 'receitas' });
     const porNome = Object.fromEntries(f.pecas.map((p) => [p.peca, p]));
     expect(porNome.a).toMatchObject({ estado: 'fixa', proximo: null });
@@ -239,8 +240,7 @@ describe('as peças e a montagem', () => {
     escrever(join(fechado, 'partes', 'a', 'receita.js'), RECEITA('a'));
     rodadaDe(fechado, 'a', RECEITA('a'), []);
     escrever(join(fechado, 'montagem.json'), JSON.stringify({ id: 'obj', instancias: instancias.slice(0, 1), etapas: ['a'] }));
-    escrever(join(fechado, 'montagem.etapas.json'), JSON.stringify({ etapas: [{ instancia: 'a', estado: 'fixa' }] }));
-    const f = await fluxoDoObjeto(fechado);
+    const f = await fluxoDoObjeto(fechado, { registroDasEtapas: { etapas: [{ instancia: 'a', estado: 'fixa' }] } });
     expect(f.passo).toEqual({ numero: 6, nome: 'fechamento' });
     expect(f.passos[5].feito).toBe(true);
     expect(f.comandos).toHaveLength(2);

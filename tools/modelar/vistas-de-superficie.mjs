@@ -86,19 +86,39 @@ export const comandoDasVistasDoBlender = (peca) => `MODELAR_BLENDER=<caminho do 
 export const impressaoDoTexto = (texto) => `sha256:${createHash('sha256').update(texto).digest('hex')}`;
 
 /**
- * Se a etapa da peça, na montagem do objeto dela (`<objeto>/montagem.json`), está fixa no registro: a peça aceita pela pessoa.
- * Peça fora de montagem, ou sem registro, não está.
+ * Se a etapa da peça está fixa, na decisão da superfície. O estado não está gravado no registro: quem pode medir passa `etapaFixa`
+ * (`etapaFixaDaPecaMedida`, ou `superficieDaPecaMedida`, que a chama só quando a resposta decide algo); sem ele, a peça não está fixa.
  */
-export function etapaFixaDaPeca(peca, { raiz = join(REPO, 'procedural/pecas') } = {}) {
+export function etapaFixaDaPeca(peca, { etapaFixa } = {}) {
+  return etapaFixa === true;
+}
+
+/** A etapa da peça, na montagem do objeto dela (`<objeto>/montagem.json`), está fixa pela leitura do registro (mede a montagem de agora)? Peça fora de montagem, ou sem registro, não. */
+export async function etapaFixaDaPecaMedida(peca, opcoes = {}) {
+  const { raiz = join(REPO, 'procedural/pecas'), registro: dado } = opcoes;
   const [objeto, parte] = peca.split('/');
   if (!parte) return false;
   const arquivo = join(raiz, objeto, 'montagem.json');
-  const registro = join(raiz, objeto, 'montagem.etapas.json');
-  if (!existsSync(arquivo) || !existsSync(registro)) return false;
+  if (!existsSync(arquivo) || !existsSync(join(raiz, objeto, 'montagem.etapas.json'))) return false;
   try {
     const instancia = (JSON.parse(readFileSync(arquivo, 'utf8')).instancias ?? []).find((item) => item.alvo?.ref === peca);
-    return Boolean(instancia) && JSON.parse(readFileSync(registro, 'utf8')).etapas?.find((e) => e.instancia === instancia.id)?.estado === 'fixa';
+    if (!instancia) return false;
+    /* `registro` é o registro já com o estado medido (ou quem o dá, uma vez só): quem já mediu a montagem não a mede de novo */
+    const lido = typeof dado === 'function' ? await dado() : dado;
+    if (lido !== undefined) return lido?.etapas?.find((e) => e.instancia === instancia.id)?.estado === 'fixa';
+    const { registroComEstado } = await import('./etapas-da-montagem.mjs');
+    return (await registroComEstado(arquivo))?.etapas?.find((e) => e.instancia === instancia.id)?.estado === 'fixa';
   } catch { return false; }
+}
+
+/**
+ * `superficieDaPeca` com a etapa fixa medida, e só quando a resposta decide algo: a etapa fixa só dispensa a luz rasante da peça que a
+ * leva sem ser de lataria. Nas outras peças a montagem não é medida (no registro da versão 3, medir resolve a montagem inteira).
+ */
+export async function superficieDaPecaMedida(peca, receita, plano = null, opcoes = {}) {
+  const decidida = superficieDaReceita(receita, plano);
+  const etapaFixa = decidida.luzRasante && !decidida.lataria ? await etapaFixaDaPecaMedida(peca, opcoes) : false;
+  return superficieDaPeca(peca, receita, plano, { ...opcoes, etapaFixa });
 }
 
 /**
@@ -118,10 +138,10 @@ export function superficieDaPeca(peca, receita, plano = null, opcoes = {}) {
 /**
  * O que a peça leva ao pacote, lido da receita do acervo: `superficieDaPeca` com o caminho da receita.
  */
-export async function latariaDaPeca(peca, { opcao = 1, entrada = null } = {}) {
+export async function latariaDaPeca(peca, { opcao = 1, entrada = null, raiz } = {}) {
   const lida = entrada ?? await lerEntradaDeMedida(peca, { opcao, montagem: false });
   const plano = normalizarPlanoDeModelagem(lida.receita?.PLANO);
-  return { ...superficieDaPeca(peca, lida.receita, plano), caminho: lida.abs };
+  return { ...(await superficieDaPecaMedida(peca, lida.receita, plano, raiz ? { raiz } : {})), caminho: lida.abs };
 }
 
 /* ---------- a luz rasante quase toda escura ---------- */

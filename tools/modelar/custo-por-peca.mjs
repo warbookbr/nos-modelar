@@ -26,6 +26,7 @@
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { basename, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { aceitesVigentes } from '../../src/autoria/etapas-pela-impressao.js';
 
 export const ATRIBUICOES = Object.freeze(['modelador', 'plano', 'ferramenta', 'critico', 'familia']);
 const CAMPOS_DE_DATA = ['data', 'em', 'registradaEm', 'quando'];
@@ -95,13 +96,15 @@ function lerJson(caminho) {
 export function aceitesDasEtapas(pasta) {
   const aceites = new Map();
   const etapas = lerJson(join(pasta, 'montagem.etapas.json'));
-  if (!Array.isArray(etapas?.etapas)) return aceites;
+  /* o registro guarda os aceites como eventos; o aceite vigente de cada etapa é um fato, e não pede o medido */
+  if (etapas?.versao !== 3) return aceites;
+  const doRegistro = [...aceitesVigentes(etapas)].map(([instancia, aceite]) => ({ instancia, aceite }));
   const montagem = lerJson(join(pasta, 'montagem.json'));
   const refs = new Map();
   for (const i of Array.isArray(montagem?.instancias) ? montagem.instancias : []) {
     if (typeof i?.id === 'string' && typeof i?.alvo?.ref === 'string') refs.set(i.id, i.alvo.ref.split('/').pop());
   }
-  for (const e of etapas.etapas) {
+  for (const e of doRegistro) {
     if (!e?.aceite || typeof e.instancia !== 'string') continue;
     const peca = refs.get(e.instancia) ?? kebab(e.instancia);
     const n = Array.isArray(e.aceite.defeitosAceitos) ? e.aceite.defeitosAceitos.length : 0;
