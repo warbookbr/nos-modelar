@@ -33,7 +33,7 @@ function falhar(codigo, mensagem) {
 const PISO = 1e-12;
 const numero = (v) => (typeof v === 'number' ? (Math.abs(v) < PISO ? 0 : Number(v.toPrecision(12))) : v);
 /* O valor como o JSON o guarda, com os números em 12 algarismos: o que se grava é o que se compara. */
-const canonico = (v) => JSON.parse(JSON.stringify(v, (_, x) => numero(x)));
+export const canonico = (v) => JSON.parse(JSON.stringify(v, (_, x) => numero(x)));
 const comparar = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
 
 /* A impressão de uma etapa como o medido de agora a mostra; null quando a etapa não tem geometria para medir. */
@@ -145,7 +145,10 @@ function validarRegistro(registro) {
     if (!evento || typeof evento !== 'object' || !textoNaoVazio(evento.instancia)) falhar('registro-invalido', `${onde}: sem instância.`);
     const anterior = ultimo.get(evento.instancia);
     if (evento.tipo === 'aceite') {
-      soChaves(evento, ['tipo', 'instancia', 'aceite', 'impressao'], onde);
+      soChaves(evento, ['tipo', 'instancia', 'aceite', 'impressao', 'origem'], onde);
+      if (evento.origem !== undefined && (tipoDe(evento.origem) !== 'objeto' || !textoNaoVazio(evento.origem.tipo))) {
+        falhar('registro-invalido', `${onde}: a origem do aceite de '${evento.instancia}' deve ser um objeto com o tipo.`);
+      }
       if (anterior === 'aceite') falhar('registro-invalido', `${onde}: o aceite de '${evento.instancia}' vem depois de outro aceite sem reabertura entre eles.`);
       if (!textoNaoVazio(evento.aceite?.por)) falhar('registro-invalido', `${onde}: o aceite de '${evento.instancia}' não diz quem aceitou.`);
       const impressao = evento.impressao;
@@ -233,6 +236,18 @@ export function acrescentarAceite(registro, medido, instancia, aceite = {}) {
     impressao,
   }));
   return { ...registro, eventos: [...registro.eventos, evento] };
+}
+
+/* ACEITE MIGRADO. O aceite que a pessoa deu num registro de antes da impressão entra como está (quem, observação, defeitos aceitos,
+   análise), sem novo aceite, com a impressão que a migração reconstruiu e a `origem` que diz como: o aceite não se refaz, e a origem
+   é o que separa o aceite dado com a impressão do aceite migrado. Não confere ordem nem junta de agora: a migração já a classificou. */
+export function acrescentarAceiteMigrado(registro, instancia, aceiteAntigo, impressao, origem) {
+  validarRegistro(registro);
+  if (aceiteVigente(registro, instancia)) falhar('etapa-ja-fixa', `'${instancia}' já tem aceite vigente; a migração não o repete.`);
+  const evento = congelar(structuredClone({ tipo: 'aceite', instancia, aceite: aceiteAntigo, impressao, origem }));
+  const novo = { ...registro, eventos: [...registro.eventos, evento] };
+  validarRegistro(novo);
+  return novo;
 }
 
 /* Acrescenta a reabertura de uma etapa com aceite vigente, fixa ou quebrada. Só a pessoa reabre, com quem, data e motivo. O evento não
