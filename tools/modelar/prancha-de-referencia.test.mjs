@@ -9,6 +9,7 @@ import { ajustarCamera, lerCopia } from './olhar-bancada.mjs';
 import {
   PONTOS_DA_ESCALA, comoCLI, disporPrancha, escalaDaVista, extensaoNaImagem, fundoDaCaixa, lerPedido, lerRegiao, lerRegua, lerVistas,
   passoDaRegua, porVista, prancharReferencia,
+  aoReferencialDaPeca, disporContorno, pontoDoContorno, prancharContorno, projetorDaVista, vistaNaPeca,
 } from './prancha-de-referencia.mjs';
 
 const REPO = resolve(fileURLToPath(new URL('.', import.meta.url)), '../..');
@@ -231,4 +232,71 @@ describe('a cópia de uma parte repetida na bancada', () => {
     raiz.children.forEach((m) => { m.visible = false; });
     expect(ajustarCamera({ copia: lerCopia('x-'), enquadrar: true }).erro).toMatch(/geometria visível/);
   });
+});
+
+/* O contorno medido sobre o modelo (fatia 5): os pontos do contorno postos no quadro da vista pela projeção da câmera. */
+describe('o contorno medido sobre a vista do modelo', () => {
+  it('põe o (h, v) de cada vista no referencial, com o eixo do olho em zero', () => {
+    expect(pontoDoContorno('frontal', [10, 20])).toEqual([10, 20, 0]);
+    expect(pontoDoContorno('lateral', [10, 20])).toEqual([0, 20, 10]);
+    expect(pontoDoContorno('superior', [10, 20])).toEqual([10, 0, -20]);
+    expect(() => pontoDoContorno('isometrica', [0, 0])).toThrow(/frontal, lateral, superior/);
+  });
+  it('leva o ponto do mundo da montagem à peça pela inversa da pose, e gira o olho com ela', () => {
+    const pose = { rotacao: [[0, 0, 1], [0, 1, 0], [-1, 0, 0]], deslocamento: [0.1, 0.2, 0] };
+    /* o ponto (0, 0, 1) da peça vai a (1, 0, 0) girado, e a (101, 200, 0) mm no mundo */
+    const p = aoReferencialDaPeca([101, 200, 0], pose);
+    expect(p.map((c) => Math.round(c * 1e9) / 1e9)).toEqual([0, 0, 1]);
+    expect(aoReferencialDaPeca([1, 2, 3], null)).toEqual([1, 2, 3]);
+    expect(vistaNaPeca('frontal', pose)).toBe('esquerda');
+    expect(vistaNaPeca('frontal', null)).toBe('frontal');
+    expect(vistaNaPeca('frontal', { rotacao: [[0.6, 0, 0.8], [0, 1, 0], [-0.8, 0, 0.6]] })).toBeNull();
+  });
+  it('projeta pela afim dos quatro pontos da escala, na largura da imagem gravada', () => {
+    const projetar = projetorDaVista({ pixels: [[320, 280], [520, 280], [320, 80], [320, 280]], quadro: [640, 360] }, 1280);
+    expect(projetar([0, 0, 0])).toEqual([640, 560]);
+    expect(projetar([50, 100, 7])).toEqual([840, 160]);
+  });
+  it('o painel cobre o contorno que passa do quadro, e a legenda mede extensão e canto em mm', () => {
+    const plano = disporContorno({
+      titulo: 't',
+      linhas: [{ vista: 'frontal', rotulo: 'r', modelo: { largura: 640, altura: 360, extensao: [220, 80, 420, 280], pxPorMm: 2 }, aneis: [{ nome: 'silhueta', pontosPx: [[[200, 60], [700, 60], [700, 280], [200, 280]]] }] }],
+    });
+    expect(plano.linhas[0].contornos[0]).toMatchObject({ nome: 'silhueta', extensaoMm: [250, 110], cantoMenosModeloMm: [-10, 0] });
+    expect(plano.linhas[0].modelo.extensaoMm).toEqual([100, 100]);
+    const caminho = plano.operacoes.find((o) => o.tipo === 'caminho');
+    const painel = caminho.recorte;
+    for (const [x, y] of caminho.pontos) {
+      expect(x).toBeGreaterThanOrEqual(painel[0]);
+      expect(x).toBeLessThanOrEqual(painel[0] + painel[2]);
+      expect(y).toBeGreaterThanOrEqual(painel[1]);
+      expect(y).toBeLessThanOrEqual(painel[1] + painel[3]);
+    }
+    /* a imagem só ocupa a parte do painel que ela cobre: o contorno vai além da borda direita dela */
+    const imagem = plano.operacoes.find((o) => o.tipo === 'imagem');
+    expect(imagem.recorte[0] + imagem.recorte[2]).toBe(640);
+    expect(imagem.destino[2]).toBeLessThan(caminho.recorte[2]);
+  });
+  it('desenha no navegador a linha onde o referencial a põe, com a captura da bancada simulada', async () => {
+    const pasta = mkdtempSync(join(REPO, 'tmp', 'contorno-'));
+    try {
+      /* a vista frontal a 2 px/mm: a origem em (320, 280) e um bloco de x -50 a 50 e y 0 a 100 mm */
+      const modelo = PNG.sync.write(imagem(640, 360, [241, 243, 242], [220, 80, 420, 280], [20, 20, 20]));
+      const olhar = async (pedido) => {
+        expect(pedido).toMatchObject({ vistas: ['frontal'], projecao: 'ortografica', capturarEmMemoria: true, enquadrar: true });
+        return { ok: true, resultado: { vistas: [{ projecaoMm: { pixels: [[320, 280], [520, 280], [320, 80], [320, 280]], quadro: [640, 360] } }], capturas: [{ nome: 'frontal', largura: 640, altura: 360, dados: modelo }] } };
+      };
+      const quadrado = [[-50, 0, 0], [50, 0, 0], [50, 100, 0], [-50, 100, 0]];
+      const arquivo = join(pasta, 'contorno.png');
+      const r = await prancharContorno({ peca: 'teste', arquivo, contornos: [{ vista: 'frontal', rotulo: 'o contorno frontal', aneis: [{ nome: 'silhueta', pontosMm: [quadrado] }] }] }, { olhar });
+      const lido = JSON.parse(readFileSync(r.json, 'utf8'));
+      expect(lido.linhas[0].contornos[0]).toMatchObject({ extensaoMm: [100, 100], cantoMenosModeloMm: [0, 0] });
+      const png = PNG.sync.read(readFileSync(arquivo));
+      expect([png.width, png.height]).toEqual([lido.largura, lido.altura]);
+      /* a linha vermelha existe e cai sobre a borda do bloco */
+      let vermelhos = 0;
+      for (let k = 0; k < png.data.length; k += 4) if (png.data[k] > 180 && png.data[k + 1] < 90 && png.data[k + 2] < 70) vermelhos += 1;
+      expect(vermelhos).toBeGreaterThan(400);
+    } finally { rmSync(pasta, { recursive: true, force: true }); }
+  }, 60_000);
 });

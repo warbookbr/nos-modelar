@@ -225,6 +225,16 @@ async function desenharNaPagina(plano) {
     } else if (op.tipo === 'linha') {
       g.strokeStyle = op.cor; g.lineWidth = op.espessura ?? 1;
       g.beginPath(); g.moveTo(op.de[0], op.de[1]); g.lineTo(op.ate[0], op.ate[1]); g.stroke();
+    } else if (op.tipo === 'caminho') {
+      g.beginPath();
+      g.rect(op.recorte[0], op.recorte[1], op.recorte[2], op.recorte[3]);
+      g.clip();
+      g.strokeStyle = op.cor; g.lineWidth = op.espessura ?? 2; g.lineJoin = 'round';
+      if (op.tracejado) g.setLineDash(op.tracejado);
+      g.beginPath();
+      op.pontos.forEach(([px, py], k) => (k ? g.lineTo(px, py) : g.moveTo(px, py)));
+      if (op.fechado) g.closePath();
+      g.stroke();
     } else if (op.tipo === 'texto') {
       g.fillStyle = op.cor ?? '#222';
       g.font = `${op.peso ?? 'normal'} ${op.tamanho ?? 14}px sans-serif`;
@@ -404,6 +414,213 @@ export function disporPrancha({ titulo, linhas, disposicao = 'lado', alturaDaLin
     y = topo + alturaDaLinhaPx + ALTURA_DA_REGUA + ESPACO;
   }
   return { largura: Math.ceil(Math.max(largura, 900)), altura: Math.ceil(y - ESPACO + MARGEM), fundo: '#f4f4f2', operacoes: ops, escala, linhas: relato };
+}
+
+/* ---------- O contorno medido sobre a vista do modelo (fatia 5) ----------
+ *
+ * O pacote do crítico leva, quando a peça tem contorno medido (`mecanifica.contornos@1`, o que `npm run contorno` grava), a vista
+ * ortográfica do modelo com a linha desse contorno desenhada por cima, no lugar em mm em que o referencial da peça a põe. Ali não há
+ * régua de foto nem alinhamento por centro: a linha é posta pela mesma projeção da câmera que dá a escala do modelo, e a diferença entre
+ * a linha e a silhueta é diferença de posição e de tamanho em mm, que a régua do painel lê. */
+
+/* As vistas do contorno e o olho de cada vista da bancada (de que lado olha, no referencial da peça). */
+export const VISTAS_DO_CONTORNO = Object.freeze(['frontal', 'lateral', 'superior']);
+export const OLHO_DA_BANCADA = Object.freeze({
+  frontal: [0, 0, 1], traseira: [0, 0, -1], direita: [1, 0, 0], esquerda: [-1, 0, 0], superior: [0, 1, 0], inferior: [0, -1, 0],
+});
+export const CORES_DO_CONTORNO = Object.freeze(['#d2361f', '#1b8a3a', '#8a2bb5', '#b07800']);
+export const ALTURA_DO_CONTORNO = 640;
+export const FOLGA_DO_CONTORNO = 0.06;
+
+/** O ponto (h, v) em mm de um contorno da `vista` (frontal, lateral, superior) no referencial em que ele foi medido, com o eixo do olho
+ *  em 0: na frontal h é x e v é y, na lateral h é z e v é y, na superior h é x e v é menos z (`EIXOS_DA_VISTA` do comparador). */
+export function pontoDoContorno(vista, [h, v]) {
+  if (vista === 'frontal') return [h, v, 0];
+  if (vista === 'lateral') return [0, v, h];
+  if (vista === 'superior') return [h, 0, -v];
+  return recusar(`o contorno da vista '${vista}' não tem eixo declarado; as vistas do contorno são ${VISTAS_DO_CONTORNO.join(', ')}.`);
+}
+
+const rotacaoIdentidade = [[1, 0, 0], [0, 1, 0], [0, 0, 1]];
+
+/** Leva um ponto em mm do mundo da montagem ao referencial da peça, pela pose da instância (`{ rotacao, deslocamento em metro, escala }`,
+ *  a de `transformar`: mundo = deslocamento + escala · rotação · peça). Sem pose, o ponto já é da peça. */
+export function aoReferencialDaPeca(ponto, pose = null) {
+  if (!pose) return ponto;
+  const d = (pose.deslocamento ?? [0, 0, 0]).map((c) => c * 1000);
+  const R = pose.rotacao ?? rotacaoIdentidade;
+  const e = pose.escala ?? 1;
+  const q = [ponto[0] - d[0], ponto[1] - d[1], ponto[2] - d[2]];
+  /* a inversa da rotação é a transposta */
+  return [0, 1, 2].map((j) => (R[0][j] * q[0] + R[1][j] * q[1] + R[2][j] * q[2]) / e);
+}
+
+/** A vista da bancada, no referencial da peça, que olha do mesmo lado que a vista `mundo` da bancada olha no mundo da montagem: com a
+ *  pose girada, o olho gira com ela. Null quando o olho girado não cai sobre um eixo, e a linha do contorno não seria uma vista de eixo. */
+export function vistaNaPeca(mundo, pose = null) {
+  const olho = OLHO_DA_BANCADA[mundo];
+  if (!olho) return null;
+  const local = aoReferencialDaPeca(olho, pose ? { ...pose, deslocamento: [0, 0, 0], escala: 1 } : null);
+  const achada = Object.entries(OLHO_DA_BANCADA).find(([, o]) => o.every((c, k) => Math.abs(c - local[k]) < 1e-6));
+  return achada ? achada[0] : null;
+}
+
+/** A projeção da vista da bancada como função de ponto em mm da peça para px da imagem gravada, pelos quatro pontos de `PONTOS_DA_ESCALA`
+ *  projetados (`projecaoMm`): na ortográfica a projeção é afim, e os três eixos de 100 mm a dão inteira. */
+export function projetorDaVista(projecaoMm, larguraDaImagem) {
+  if (!projecaoMm?.pixels || projecaoMm.pixels.length !== 4 || !projecaoMm.quadro) recusar('a bancada não devolveu a projeção dos pontos da escala nesta vista.');
+  const fator = larguraDaImagem / projecaoMm.quadro[0];
+  const [o, ex, ey, ez] = projecaoMm.pixels;
+  const eixo = (p) => [(p[0] - o[0]) / PASSO_DA_ESCALA_MM, (p[1] - o[1]) / PASSO_DA_ESCALA_MM];
+  const [ax, ay, az] = [eixo(ex), eixo(ey), eixo(ez)];
+  return ([x, y, z]) => [
+    (o[0] + ax[0] * x + ay[0] * y + az[0] * z) * fator,
+    (o[1] + ax[1] * x + ay[1] * y + az[1] * z) * fator,
+  ];
+}
+
+/* a largura de uma linha de texto sans-serif, estimada por letra, com folga */
+const larguraDoTexto = (texto, tamanho) => Math.ceil(String(texto).length * tamanho * 0.56);
+
+const caixaDosPontos = (pontos) => [
+  Math.min(...pontos.map((p) => p[0])), Math.min(...pontos.map((p) => p[1])), Math.max(...pontos.map((p) => p[0])), Math.max(...pontos.map((p) => p[1])),
+];
+
+/**
+ * O plano de desenho da prancha do contorno: uma linha por vista, com a vista do modelo e os anéis do contorno por cima, na mesma
+ * escala. `linhas[i]` traz `vista`, `rotulo` (de onde veio o contorno), `modelo` (`{ largura, altura, extensao, pxPorMm }` da imagem
+ * da bancada) e `aneis` (`[{ nome, pontosPx: [[[x, y], ...], ...] }]`, cada um com os pedaços dele, já em px da imagem). O painel é a
+ * união da extensão do modelo com a caixa dos anéis, com folga, mesmo quando passa da imagem: o anel que sai do quadro da bancada
+ * aparece inteiro sobre o fundo. Devolve `{ largura, altura, fundo, operacoes, escala, linhas }`.
+ */
+export function disporContorno({ titulo, linhas, alturaDaLinha = ALTURA_DO_CONTORNO, larguraMaxima = LARGURA_MAXIMA }) {
+  if (!linhas.length) recusar('não há contorno a desenhar.');
+  const medidas = linhas.map((l) => {
+    if (!l.modelo.extensao) recusar(`a vista ${l.vista} do modelo saiu só com fundo: a peça não aparece nela.`);
+    const caixas = l.aneis.map((a) => caixaDosPontos(a.pontosPx.flat()));
+    const tudo = [l.modelo.extensao, ...caixas];
+    const u = [Math.min(...tudo.map((c) => c[0])), Math.min(...tudo.map((c) => c[1])), Math.max(...tudo.map((c) => c[2])), Math.max(...tudo.map((c) => c[3]))];
+    const f = Math.max(u[2] - u[0], u[3] - u[1]) * FOLGA_DO_CONTORNO;
+    const painelPx = [u[0] - f, u[1] - f, u[2] + f, u[3] + f];
+    const k = l.modelo.pxPorMm;
+    return { caixas, painelPx, larguraMm: (painelPx[2] - painelPx[0]) / k, alturaMm: (painelPx[3] - painelPx[1]) / k };
+  });
+  const sobraLargura = larguraMaxima - 2 * MARGEM - LARGURA_DA_REGUA;
+  const escala = Math.min(...medidas.map((m) => Math.min(alturaDaLinha / m.alturaMm, sobraLargura / m.larguraMm)));
+  const ops = [];
+  let y = MARGEM;
+  ops.push({ tipo: 'texto', texto: titulo, em: [MARGEM, y + 18], tamanho: 18, peso: 'bold' });
+  const subtitulo = [
+    'a linha colorida é o contorno medido na referência, em mm, posta no referencial da peça pela câmera da vista;',
+    `${casa(escala)} px da prancha por mm; régua em mm com o zero no canto de baixo à esquerda da extensão do modelo (caixa azul tracejada)`,
+  ];
+  subtitulo.forEach((texto, j) => ops.push({ tipo: 'texto', texto, em: [MARGEM, y + ALTURA_DO_TITULO + 12 + 17 * j], tamanho: 13, cor: '#555' }));
+  y += ALTURA_DO_TITULO + 24 + 17 * (subtitulo.length - 1);
+  /* a largura que o texto pede, estimada pelo tamanho da letra, para a legenda não passar da borda */
+  let largura = Math.max(MARGEM + larguraDoTexto(titulo, 18), ...subtitulo.map((t) => MARGEM + larguraDoTexto(t, 13))) + MARGEM;
+  const relato = [];
+  for (const [i, l] of linhas.entries()) {
+    const m = medidas[i];
+    const k = l.modelo.pxPorMm;
+    const s = escala / k;
+    const x0 = MARGEM + LARGURA_DA_REGUA;
+    const alturaDoRotulo = ALTURA_DO_ROTULO + 17 * (l.aneis.length + 1);
+    const topo = y + alturaDoRotulo;
+    const painel = [x0, topo, Math.round((m.painelPx[2] - m.painelPx[0]) * s), Math.round((m.painelPx[3] - m.painelPx[1]) * s)];
+    const emPrancha = ([px, py]) => [x0 + (px - m.painelPx[0]) * s, topo + (py - m.painelPx[1]) * s];
+    const extMm = [(l.modelo.extensao[2] - l.modelo.extensao[0]) / k, (l.modelo.extensao[3] - l.modelo.extensao[1]) / k];
+    const legenda = [`vista ${l.vista} do modelo (ortográfica)`, l.rotulo, `modelo: extensão ${mm1(extMm[0])} x ${mm1(extMm[1])} mm`];
+    ops.push({ tipo: 'texto', texto: legenda[0], em: [x0, y + 16], tamanho: 14, peso: 'bold', cor: COR_DO_MODELO });
+    ops.push({ tipo: 'texto', texto: legenda[1], em: [x0, y + 33], tamanho: 12, cor: '#444' });
+    ops.push({ tipo: 'texto', texto: legenda[2], em: [x0, y + 50], tamanho: 12, cor: COR_DO_MODELO });
+    largura = Math.max(largura, x0 + larguraDoTexto(legenda[0], 14) + MARGEM, ...legenda.slice(1).map((t) => x0 + larguraDoTexto(t, 12) + MARGEM));
+    const aneisRelato = l.aneis.map((a, j) => {
+      const c = m.caixas[j];
+      const cor = CORES_DO_CONTORNO[j % CORES_DO_CONTORNO.length];
+      const ext = [(c[2] - c[0]) / k, (c[3] - c[1]) / k];
+      /* a distância em mm entre o canto de baixo à esquerda do contorno e o do modelo, com y para cima */
+      const deslocado = [(c[0] - l.modelo.extensao[0]) / k, (l.modelo.extensao[3] - c[3]) / k];
+      const texto = `contorno ${a.nome}: extensão ${mm1(ext[0])} x ${mm1(ext[1])} mm; canto de baixo à esquerda a ${mm1(deslocado[0])} mm na horizontal e ${mm1(deslocado[1])} mm na vertical do canto do modelo`;
+      ops.push({ tipo: 'texto', texto, em: [x0, y + 67 + 17 * j], tamanho: 12, cor });
+      largura = Math.max(largura, x0 + larguraDoTexto(texto, 12) + MARGEM);
+      return { nome: a.nome, cor, extensaoMm: ext.map((v) => Number(v.toFixed(1))), cantoMenosModeloMm: deslocado.map((v) => Number(v.toFixed(1))) };
+    });
+    ops.push({ tipo: 'retangulo', caixa: painel, preencher: '#ffffff' });
+    /* a parte da imagem da bancada que cai no painel */
+    const rec = [Math.max(0, m.painelPx[0]), Math.max(0, m.painelPx[1]), Math.min(l.modelo.largura, m.painelPx[2]), Math.min(l.modelo.altura, m.painelPx[3])];
+    const [dx, dy] = emPrancha([rec[0], rec[1]]);
+    ops.push({ tipo: 'imagem', fonte: 'modelos', indice: i, recorte: [rec[0], rec[1], rec[2] - rec[0], rec[3] - rec[1]], destino: [dx, dy, (rec[2] - rec[0]) * s, (rec[3] - rec[1]) * s] });
+    ops.push({ tipo: 'retangulo', caixa: painel, cor: '#bbb' });
+    const [ex0, ey0] = emPrancha([l.modelo.extensao[0], l.modelo.extensao[1]]);
+    const [ex1, ey1] = emPrancha([l.modelo.extensao[2], l.modelo.extensao[3]]);
+    const caixaExt = [ex0, ey0, ex1 - ex0, ey1 - ey0].map((v) => Math.round(v * 2) / 2);
+    ops.push({ tipo: 'retangulo', caixa: caixaExt, cor: COR_DO_MODELO, tracejado: [5, 4] });
+    for (const [j, a] of l.aneis.entries()) {
+      const cor = CORES_DO_CONTORNO[j % CORES_DO_CONTORNO.length];
+      for (const pedaco of a.pontosPx) {
+        ops.push({ tipo: 'caminho', pontos: pedaco.map((p) => emPrancha(p).map((v) => Math.round(v * 10) / 10)), fechado: true, cor, espessura: 2, recorte: painel });
+      }
+    }
+    reguaDoPainel(ops, { painel, zeroX: caixaExt[0], zeroY: caixaExt[1] + caixaExt[3], comprimentoX: m.larguraMm, comprimentoY: m.alturaMm, escala, cor: COR_DO_MODELO });
+    largura = Math.max(largura, x0 + painel[2] + MARGEM);
+    relato.push({ vista: l.vista, rotulo: l.rotulo, modelo: { pxPorMm: k, extensaoPx: l.modelo.extensao, extensaoMm: extMm.map((v) => Number(v.toFixed(1))) }, contornos: aneisRelato });
+    y = topo + painel[3] + ALTURA_DA_REGUA + ESPACO;
+  }
+  return { largura: Math.ceil(Math.max(largura, 900)), altura: Math.ceil(y - ESPACO + MARGEM), fundo: '#f4f4f2', operacoes: ops, escala, linhas: relato };
+}
+
+/**
+ * A prancha do contorno medido sobre o modelo: captura as vistas pedidas na bancada, em ortográfica e com a peça enquadrada, põe os
+ * anéis de cada contorno no quadro pela projeção da câmera e grava o PNG e o JSON das medidas. `contornos` são
+ * `[{ vista (da bancada, no referencial da peça), rotulo, aneis: [{ nome, pontosMm: [[[x, y, z], ...], ...] }] }]`, os pontos já no
+ * referencial da peça; `arquivo` é o PNG a gravar. `olhar` é o `olharBancada` (o pacote passa o da sessão compartilhada). Devolve
+ * `{ arquivo, json, medidas }`.
+ */
+export async function prancharContorno({ peca, contornos, arquivo, titulo = null }, { olhar = null, chromium = null, lancar = null, logger = () => {} } = {}) {
+  if (!contornos?.length) recusar('não há contorno a sobrepor.');
+  const vistas = [...new Set(contornos.map((c) => c.vista))];
+  for (const v of vistas) if (!VISTAS_DA_PRANCHA.includes(v)) recusar(`a vista '${v}' não serve ao contorno sobreposto; ela pede uma vista ortográfica de eixo: ${VISTAS_DA_PRANCHA.join(', ')}.`);
+  const olharBancada = olhar ?? (await import('./olhar-bancada.mjs')).olharBancada;
+  logger(`contorno sobreposto: capturando ${peca} nas vistas ${vistas.join(', ')}, em projeção ortográfica`);
+  const r = await olharBancada({
+    peca, vistas, res: RESOLUCAO_DA_CAPTURA, projecao: 'ortografica', auditoria: true, capturarEmMemoria: true, medirContatos: false,
+    projetar: PONTOS_DA_ESCALA, enquadrar: true, aoProgredir: logger,
+  });
+  if (!r.ok) recusar(`a bancada recusou a captura do contorno sobreposto: ${r.erro?.mensagem ?? ''}\n${r.stderr ?? ''}`.trim());
+  const capturas = r.resultado.capturas;
+  const indiceDa = (v) => vistas.indexOf(v);
+  const navegador = chromium ?? (await import('playwright')).chromium;
+  const lancarChromium = lancar ?? (await import('./navegador.mjs')).lancarChromium;
+  const browser = await lancarChromium(navegador, { webgl: false });
+  try {
+    const page = await browser.newPage();
+    await page.addScriptTag({ content: `window.fundoDaCaixa = ${fundoDaCaixa.toString()};\nwindow.extensaoNaImagem = ${extensaoNaImagem.toString()};` });
+    /* uma imagem do modelo por linha, na ordem dos contornos (a mesma vista pode servir a dois contornos) */
+    const medidas = await page.evaluate(carregarEMedirNaPagina, {
+      modelos: contornos.map((c) => dataUrl(capturas[indiceDa(c.vista)].dados, 'image/png')), fotos: [], limiar: LIMIAR_DO_FUNDO,
+    });
+    const linhas = contornos.map((c, i) => {
+      const j = indiceDa(c.vista);
+      const largura = capturas[j].largura;
+      const vistaRelatada = r.resultado.vistas[j];
+      const projetar = projetorDaVista(vistaRelatada.projecaoMm, largura);
+      return {
+        vista: c.vista, rotulo: c.rotulo,
+        modelo: { largura: medidas.modelos[i].largura, altura: medidas.modelos[i].altura, extensao: medidas.modelos[i].extensao, pxPorMm: escalaDaVista(vistaRelatada.projecaoMm, largura) },
+        aneis: c.aneis.map((a) => ({ nome: a.nome, pontosPx: a.pontosMm.map((pedaco) => pedaco.map(projetar)) })),
+      };
+    });
+    const plano = disporContorno({ titulo: titulo ?? `${peca}: o contorno medido sobre o modelo`, linhas });
+    const png = await page.evaluate(desenharNaPagina, { largura: plano.largura, altura: plano.altura, fundo: plano.fundo, operacoes: plano.operacoes });
+    mkdirSync(dirname(arquivo), { recursive: true });
+    writeFileSync(arquivo, Buffer.from(png, 'base64'));
+    const json = arquivo.replace(/\.png$/i, '.json');
+    const relato = { peca, escalaDaPrancha: plano.escala, largura: plano.largura, altura: plano.altura, linhas: plano.linhas };
+    writeFileSync(json, `${JSON.stringify(relato, null, 2)}\n`);
+    return { arquivo, json, medidas: relato };
+  } finally {
+    await browser.close().catch(() => {});
+  }
 }
 
 /* ---------- O serviço ---------- */

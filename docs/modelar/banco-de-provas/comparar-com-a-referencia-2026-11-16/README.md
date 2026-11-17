@@ -118,3 +118,26 @@ O modelo passou de 2,0 a 2,1 px/mm com os dois pedais para 13,7 a 15,7 px/mm com
 O teste fica em [`prancha-de-referencia.test.mjs`](../../../../tools/modelar/prancha-de-referencia.test.mjs): a leitura de `--copia`, a recusa sem `--parte`, o nome do arquivo, e a função da página rodando sobre uma cena three.js em Node com duas cópias de um bloco em x = -100 e +100 mm, em que o plano deixa de fora a de x positivo, a caixa relatada é a da outra e a câmera a centra a 92 % da largura.
 
 Os comandos 17 a 19 da linha de base, que montavam as vistas do modelo recortando um dos pedais por script, saem com a fatia 4. Com as fatias 2, 3 e 4, o alvo cai de 42 para 7 em 83: três de medição livre na foto, que o plano mantém por script (30, 35, 39), a conferência das bibliotecas antes dela (29) e três que só caem em `medir-foto` porque citam `guarda:referencial` (24, 28, 42).
+
+## Fatia 5: o contorno medido no pacote do crítico
+
+Quando a peça tem contorno medido (`mecanifica.contornos@1`, citado no plano, ao lado de uma imagem citada ou na pasta da peça, onde o veredito o confere), `vistas:critica` grava `contorno-sobreposto.png` e o JSON das medidas ao lado, e o pedido ganha a seção "Contorno medido sobre o modelo", logo antes de "Modelo". A imagem é a vista ortográfica da bancada com a linha do contorno por cima, desenhada pela `prancharContorno` de [`prancha-de-referencia.mjs`](../../../../tools/modelar/prancha-de-referencia.mjs), no mesmo navegador sem WebGL da prancha das fatias 3 e 4. A linha não é alinhada pelo centro das extensões, como o `sobreposto` da prancha: cada ponto (h, v) do contorno vira um ponto em mm do referencial (na frontal h é x, na lateral h é z, na superior h é x e v é menos z, as convenções do comparador de contornos) e é projetado pela mesma câmera que dá a escala da vista, com a origem e 100 mm em cada eixo. A legenda dá a extensão do modelo e a de cada contorno em mm e a distância entre os cantos de baixo à esquerda dos dois.
+
+O contorno de um objeto de várias partes está no mundo da montagem. Ele vai ao referencial da peça pela pose da instância, resolvida como os cortes nos encaixes a resolvem (uns 17 s no braço robótico), e a vista da bancada gira com a pose; só as regiões com o nome da instância ou de uma parte do plano entram, porque a silhueta do objeto inteiro afogaria a peça. O que não entra sai no pedido com o motivo: o lado que o contorno em mm não mede (traseira, por exemplo), o arquivo que não se lê, o contorno do objeto sem região da peça, a pose que gira o olho para fora de um eixo e a falha da prancha, que não derruba o pacote.
+
+A prova é o ombro do braço robótico, que cita o contorno frontal do objeto (`procedural/pecas/braco-robotico/referencias/frontal.contornos.json`, região `ombro`), com a instância em (0; 245; 0) mm sem giro:
+
+```
+node tools/modelar/vistas-para-critica.mjs braco-robotico/ombro --saida=tools/bancadas/out/critica-ombro-depois
+```
+
+| medida | modelo | contorno `ombro` |
+| --- | --- | --- |
+| extensão na vista frontal | 190,2 x 210,1 mm | 202,1 x 176,9 mm |
+| canto de baixo à esquerda, do contorno menos o do modelo | | -2 mm em x, 32,9 mm em y |
+
+O contorno começa 32,9 mm acima da base do ombro porque, na foto, o anel da cintura tapa a parte de baixo dele, e a região do mapa é só o que aparece. O pacote leva cerca de 5 minutos, como sem o contorno; a prancha do contorno é uma captura a mais na sessão da bancada. O mesmo comando com `--saida=tools/bancadas/out/critica-ombro-antes`, na versão anterior à fatia, dá o pacote sem a seção, e os dois pedidos diferem só nela.
+
+A medida de se a nota do crítico oscila menos entre rodadas parecidas com o contorno no pacote (item 6 do gate de saída) pede despachar o `critico-visual` várias vezes com cada pacote, sem a história; o agente da fatia não tem como despachar outro agente, e ela fica para quem conduz, com os dois pacotes acima.
+
+Um achado à parte, que o processo não pegou: o contorno lateral da carcaça da empilhadeira (`carcaca-lado.ia.contornos.json`) tem o eixo traseiro em h = +1700 mm, e a carcaça o tem em z = -1700; pelo comparador, que lê h como z na lateral, a silhueta dá razão interseção/união de 0,041. O contorno está espelhado em relação à peça, e o veredito não o confere porque ele mora na pasta do objeto. O contorno sobreposto o mostraria espelhado; a correção é do contorno ou da convenção do comparador e fica fora deste plano.
