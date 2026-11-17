@@ -264,7 +264,7 @@ export function gerarPassos(t = TABELA) {
     }]);
     passos.push(['lathe', { origemId: ID.hasteDaTampa + k, eixo: 'x', lados: 16, segmentosCurva: 1, perfil: [[0, 0], [raioDaHaste, 0], [raioDaHaste, e], [0, e]], em }]);
     for (const op of [ID.cabecaDaTampa + k, ID.hasteDaTampa + k]) {
-      passos.push(['parte', { nome: 'parafusosDaTampa', material: 'aluminio', pai: 'caixaLateral', sel: { origem: { op: 'lathe', id: op } } }]);
+      passos.push(['parte', { nome: 'parafusosDaTampa', material: 'acoEscuro', pai: 'caixaLateral', sel: { origem: { op: 'lathe', id: op } } }]);
     }
   });
   passos.push(['publicarPorta', {
@@ -323,6 +323,9 @@ const receita = {
     /* a tampa da janela: vidro fumê leve, a pedido da pessoa em 2026-11-17 porque a tampa incolor (opacidade de 0,3) não aparecia. A
        cor é um cinza-azulado claro, o mais próximo da paleta existente: o vidro claro do farol do furgão (`lenteDoFarol` em
        procedural/pecas/furgao-realista/receita.js) escurecido; a opacidade fica em 0,38 para a placa continuar legível. */
+    /* os parafusos da tampa: o aço escuro do soquete do farol do furgão (`acoEscuro` em procedural/pecas/furgao-realista/receita.js), a
+       pedido da pessoa em 2026-11-17, para os parafusos aparecerem contra o vidro fumê */
+    acoEscuro: { tipo: 'metal', acabamento: 'pintado', cor: '#34363b', aspereza: 0.35, metalicidade: 0.85, verniz: 0.5, asperezaDoVerniz: 0.35 },
     vidroFume: { tipo: 'liso', cor: '#8fa3ad', mistura: 'transparente', opacidade: 0.38, aspereza: 0.25, metalicidade: 0 },
   },
   PLANO: {
