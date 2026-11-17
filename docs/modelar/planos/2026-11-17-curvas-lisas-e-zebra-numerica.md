@@ -1,0 +1,50 @@
+# Curvas lisas e zebra numérica: a curva lida da prancha vira poucos trechos de curvatura monótona, e a ondulação longa que o crítico vê vira número
+
+**Estado:** rascunho
+
+**Território:** a declarar ao ativar. O provável é um módulo novo de ajuste de curvas em `procedural/nucleo/` ao lado de `alisar-curvas.js`, uma medida nova em `tools/fixtures/correcao-de-superficie/` sobre o oráculo `superficieLimite`, os testes deles e `docs/modelar/banco-de-provas/curvas-lisas-<data>/`; a lataria do carro entra como prova pelo plano do carro.
+
+**Responsável:** a IA da sessão implementa e conduz a revisão adversarial; Tiago decidiu em 2026-11-17 pausar as rodadas do carro e escrever este plano, e aprova a forma do carro por imagem.
+
+**Repositório e base:** `warbookbr/nos-modelar`, main na ativação, quando abrir vaga depois do plano das etapas pela impressão do aceite.
+
+## Problema observado
+
+Cinco rodadas do quarto traseiro do `carro-fastback` pararam em 6,8 com a silhueta conferida nas três pranchas e a forma toda presente: o que reprova é a chapa não lisa, com anéis e ondas de 200 a 500 mm na zebra da lateral (registros em `procedural/pecas/carro-fastback/partes/lataria/rodadas/`). O estudo de 2026-11-17 e a medida de controle da rodada 5 mostraram que a causa são as curvas-guia lidas ponto a ponto da prancha: polígono com filete por vértice na planta, poligonais com média gaussiana nos níveis e na queda, cada vértice virando uma lombada de curvatura. Trocadas por curvas lisas, as ilhas da porta caíram de 27 para 4. Faltam duas ferramentas. O ajuste da planta à mão, por clotoides, não convergiu a 3 mm dos pontos, porque o núcleo não tem ajuste de curva lisa; e o índice de suavidade, que ajusta em 40 mm, é cego a essa onda longa e caótico com a densidade de pontos, de modo que nenhuma medida estável diz se uma mudança melhorou o que o crítico vê.
+
+## Resultado
+
+Uma curva dada por pontos e tolerância sai como poucos trechos de curvatura monótona, com o número de inflexões declarado e o desvio a cada ponto medido; e uma medida sobre a superfície limite conta, por região e por faixa de comprimento de onda, os extremos da normal e os laços fechados de isofota que a zebra mostra, estável com a densidade de pontos.
+
+## Filtro Agent-First
+
+O ajuste é capacidade nova do núcleo (ENVOLVER sobre a curva da gaiola: entram pontos e tolerância, sai a curva que `gaiolaPorRede` já consome). A zebra numérica é USAR DIRETO como ferramenta de medida, ao lado de `onde-ondula.mjs` e `medida-na-curva.mjs`, com saída que o modelador e o crítico leem. O índice de suavidade passa a avisar quando a área medida fica muito abaixo da área da região (REFATORAR pequeno).
+
+## Incluído
+
+- o ajuste de curva lisa, com prova em curvas analíticas conhecidas (arco, clotoide, cônica, a mesma com ruído) e na planta do carro dentro dos 3 mm que a pessoa soltou;
+- a zebra numérica, com prova nas chapas da fatia 5 da correção de superfície (a `rede-sem-ruido` dá a taxa de base do método) e nas rodadas 4 e 5 do carro, que o crítico já julgou;
+- o aviso de área no índice de suavidade;
+- uma rodada do carro com as duas, como prova, pelo laço de modelagem.
+
+## Excluído
+
+- a G2 e os degraus 2, 3 e 5 do plano da correção de superfície, que seguem lá;
+- a lanterna de três barras e o painel escuro da traseira, que são a etapa da traseira do carro.
+
+## Gate de saída
+
+1. O ajuste recupera as curvas analíticas com o número de inflexões certo e desvio dentro da tolerância, e a planta do carro dentro de 3 mm.
+2. A zebra numérica concorda com a leitura do crítico nas rodadas já julgadas (onde ele viu laços, ela conta laços) e varia menos que o ruído entre densidades de pontos.
+3. A rodada de prova do carro passa o critério de lisura do crítico, ou a medida mostra onde está o que falta, com a pessoa decidindo o próximo passo.
+4. Revisão adversarial sem bloqueio no núcleo.
+
+## Fatias
+
+1. A zebra numérica e o aviso de área, primeiro, para ter a medida antes da mudança.
+2. O ajuste de curva lisa no núcleo, com as provas analíticas.
+3. A rodada do carro com as duas, e o fechamento.
+
+## Riscos e parada
+
+Se a zebra numérica não concordar com o crítico nas rodadas já julgadas, ela não serve de critério, e o plano para na fatia 1 e volta à pessoa. Se a planta não couber em 3 mm com poucos trechos, a tolerância é decisão da pessoa, com a imagem das duas opções.
