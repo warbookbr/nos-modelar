@@ -5,10 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2019 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
-2034 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
-2025 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
-2021 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2043 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -236,14 +233,15 @@
 
 - `ATRITOS.md` — Atritos
 
-## docs/modelar/banco-de-provas/correcao-de-superficie-2026-11-16/
-
-- `README.md` — Correção de superfície: chapas de prova, linha de base e corte com simetria
 ## docs/modelar/banco-de-provas/comparar-com-a-referencia-2026-11-16/
 
 - `README.md` — Comparar com a referência: a linha de base dos comandos repetidos e onde a prancha é montada
 - `contar-comandos.mjs` — contar-comandos.mjs — a linha de base do plano de comparar com a referência (fatia 1): os comandos de shell dos registros de uma sessão do Claude Code, conta…
 - `medir-montagem.mjs` — medir-montagem.mjs — onde a prancha modelo e foto é montada (fatia 1 do plano de comparar com a referência): no Chromium, que decodifica jpg, webp e png, ou …
+
+## docs/modelar/banco-de-provas/correcao-de-superficie-2026-11-16/
+
+- `README.md` — Correção de superfície: chapas de prova, linha de base e corte com simetria
 
 ## docs/modelar/banco-de-provas/costura-em-no-de-tubos-2026-11-15/
 
@@ -1153,6 +1151,7 @@
 
 ## procedural/nucleo/operacoes/
 
+- `abertura-por-contorno-simetria.test.ts` — abertura-por-contorno-simetria.test.ts — o vão por contorno que segue a simetria declarada (`simetria: 'x'` do passo `aberturaPorContorno`) e a costura da su…
 - `abertura-por-contorno.js` — abertura-por-contorno.js (operação) — `aberturaPorContorno`: um vão na chapa pela curva que a receita desenha numa vista, sem depender das linhas da gaiola. …
 - `abertura-por-contorno.test.ts` — abertura-por-contorno.test.ts — a operação `aberturaPorContorno` na peça de teste `tools/fixtures/abertura-de-prova/`, pelos gates do plano da abertura de co…
 - `arestas-em-cadeia.js` — arestas-em-cadeia.js — arredondar de uma vez a cadeia de arestas que continua em tangência a partir da escolhida.
