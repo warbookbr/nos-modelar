@@ -48,8 +48,12 @@ export const TABELA = {
   calota: { soleira: 333, base: 700, meio: 800, topo: 900, ombro: 1037 },
   /* quanto a seção da porta cai mais para dentro que a do para-lama no ombro, mm */
   ombroDaPorta: 12,
-  /* o rebaixo côncavo: a profundidade máxima na porta (mm), e de onde ela começa a morrer até onde some (z) */
-  rebaixo: { profundidade: 20, cheioAte: -300, someEm: -1150 },
+  /* o rebaixo côncavo: a profundidade máxima na porta (mm), de onde ela começa a morrer (z), e a folga (mm) entre onde ela some e a boca da
+   * frente do arco da roda (z do eixo mais o raio): o rebaixo morre antes do arco, e a região dele acaba onde ele some */
+  rebaixo: { profundidade: 20, cheioAte: -300, folgaDoArco: 60 },
+  /* o alisamento das curvas da rede (`alisarCurvas`), o maior deslocamento de um ponto-chave em mm: o das curvas em geral, e o das que
+   * passam pelo para-lama ou pelo rebaixo, que a pessoa soltou até 3 mm (o ruído delas passa de 1 mm); `resto` null deixa as outras sem alisar */
+  alisarCurvas: { resto: 1, regioes: 3 },
   /* a quina do teto e a coluna, [z, x, y]: do teto sobre a porta, o vidro lateral traseiro e a coluna caindo até a tampa */
   quinaDoTeto: [[0, 598, 1262], [-400, 588, 1288], [-800, 595, 1262], [-1200, 630, 1135], [-1600, 520, 1090], [-2050, 430, 1049]],
   /* o eixo do carro, a linha do teto à tampa, [z, y]: o teto sobre a porta, o pico, a queda do fastback e a tampa */
@@ -60,16 +64,19 @@ export const TABELA = {
   coroa: 5.5,
   /* as estações ao comprimento, z; a última é onde começa a calota da traseira */
   estacoes: [0, -400, -800, -1200, -1600, -1850],
-  /* os pontos-chave entre os nós: o espaçamento ao comprimento e na volta da calota (mm), quantos em cada vão da seção, de baixo para cima até a quina, e as frações
-   * da quina em que a coroa do teto é lida, mais juntas perto da quina, onde ela cai */
-  pontosChave: { comprimento: 100, calota: 90, secao: [3, 3, 3, 5, 0, 4], coroa: [0.92, 0.84, 0.75, 0.65, 0.5, 0.33, 0.16] },
-  /* os vincos: o ombro (a borda de fora do degrau), a base da coluna (a borda de dentro do degrau), a quina do teto e a borda da tampa (o ombro na volta da traseira,
-   * mais macio porque ali a face de trás encontra o degrau em ângulo reto), nitidez de 0 a 1 */
+  /* os pontos-chave entre os nós: o espaçamento ao comprimento, na volta da calota e no perfil da traseira (mm), quantos em cada vão da seção,
+   * de baixo para cima até a quina, e as frações da quina em que a coroa do teto é lida, mais juntas perto da quina, onde ela cai. Mais
+   * densos, o alisamento das curvas anda menos (as linhas, menos de 1,2 mm), mas a seção densa estreita a faixa do vinco do ombro abaixo da
+   * espessura (raio de 1,1 mm) e as linhas densas subiram o índice da chapa de 326 para 364 */
+  pontosChave: { comprimento: 100, calota: 90, perfil: 60, secao: [3, 3, 3, 5, 0, 4], coroa: [0.92, 0.84, 0.75, 0.65, 0.5, 0.33, 0.16] },
+  /* os níveis em que a seção se parte em curvas, para o alisamento não arredondar a dobra do vinco que ela cruza: só o ombro, que tirou o
+   * índice do para-lama de 239 para 86 e o da chapa de 373 para 326; partida também na coluna e na quina, a chapa subiu a 454 */
+  partirSecaoEm: ['ombro'],
   vincos: { ombro: 0.5, coluna: 0.3, quinaDoTeto: 0.4, bordaDaTampa: 0.2 },
   /* o arco da roda traseira: centro no eixo traseiro, raio da prancha (pneu de 340 mais 40) */
   arco: { z: -1375, y: 340, raio: 380, lados: 96 },
-  /* as partes por região da chapa, caixas [min, max] em mm: o para-lama saliente (atrás da porta, sobre o arco) e o rebaixo da lateral (do meio da porta até morrer no arco); o rebaixo vale onde as duas se sobrepõem */
-  partes: { paralama: { min: [780, 250, -1950], max: [960, 1010, -900] }, rebaixo: { min: [780, 380, -1150], max: [960, 840, 1] } },
+  /* as partes por região da chapa, caixas [min, max] em mm: o para-lama saliente (atrás da porta, sobre o arco) e o rebaixo da lateral (do meio da porta até onde ele some, antes do arco: a caixa dele só dá x e y atrás, e o z de trás sai de `ondeORebaixoSome`); o rebaixo vale onde as duas se sobrepõem */
+  partes: { paralama: { min: [780, 250, -1950], max: [960, 1010, -900] }, rebaixo: { min: [780, 380], max: [960, 840, 1] } },
   /* o vão do vidro lateral traseiro, [z, y] do contorno da prancha lateral (a borda de fora da moldura); a borda de baixo sobe até a base da coluna mais a folga */
   vidroLateral: [[-703, 1001], [-692, 1009], [-702, 1247], [-712, 1258], [-719, 1258], [-910, 1218], [-1008, 1190], [-1199, 1121], [-1211, 1102], [-1205, 1091], [-1128, 1045], [-1084, 1031], [-911, 1013]],
   /* o vão do vidro traseiro, a metade [z, x, raio] da prancha superior (a borda de cima, a lateral e o canto de baixo), espelhada no eixo do carro */
@@ -168,6 +175,12 @@ export function contornoDaPlanta(planta, sigma) {
   return { ponto, normal, deZ, total, zFim: meia[meia.length - 1][0] };
 }
 
+/** O z em que o rebaixo some: a folga antes da boca da frente do arco da roda. */
+export const ondeORebaixoSome = (T) => T.arco.z + T.arco.raio + T.rebaixo.folgaDoArco;
+
+/** As caixas das regiões em mm: a do rebaixo acaba, atrás, onde ele some. */
+export const caixasDasPartes = (T) => ({ paralama: T.partes.paralama, rebaixo: { min: [...T.partes.rebaixo.min, ondeORebaixoSome(T)], max: T.partes.rebaixo.max } });
+
 /** A pele analítica da TABELA: as funções de que os pontos-chave das curvas saem. */
 export function pele(T) {
   const A = T.alisamento;
@@ -179,7 +192,7 @@ export function pele(T) {
   const yTeto = lisa(T.teto, A.teto);
   const zx = lisa(T.quinaDoTeto.map(([z, x]) => [z, x])); const zy = lisa(T.quinaDoTeto.map(([z, , y]) => [z, y]));
   const zEixo = alisar(pchip(T.traseira.map(([y, z]) => [y, z])), A.perfil);
-  const { profundidade, cheioAte, someEm } = T.rebaixo;
+  const { profundidade, cheioAte } = T.rebaixo; const someEm = ondeORebaixoSome(T);
   const fundo = (z) => profundidade * suave((z - someEm) / (cheioAte - someEm));
   const rebaixo = (z, y) => {
     const b = yBase(z); const t = yTopo(z);
@@ -201,6 +214,22 @@ export function pele(T) {
 
 const NIVEIS = ['soleira', 'base', 'meio', 'topo', 'ombro', 'coluna', 'quina', 'eixo'];
 const LADO = 6; /* os níveis que correm pelo contorno da planta e dão a volta pela traseira: da soleira à coluna */
+
+/** Uma caixa [min, max] em mm contém o ponto [x, y, z] em mm. */
+const naCaixa = (p, { min, max }) => p.every((c, k) => c >= min[k] && c <= max[k]);
+
+/** A opção `alisarCurvas` da rede, da TABELA: a tolerância das curvas que têm ponto-chave nas regiões do para-lama ou do rebaixo (as caixas
+ * de `partes`), que a pessoa soltou até `regioes` mm, e a das outras (`resto`; null as deixa sem alisar); sem `alisarCurvas` na TABELA, nada. */
+function alisamentoDasCurvas(T, curvas, nos) {
+  const A = T.alisarCurvas;
+  if (!A) return {};
+  const ponto = (p) => (typeof p === 'string' ? nos[p] : p);
+  const C = caixasDasPartes(T);
+  const nasRegioes = curvas.filter((c) => c.pontos.some((p) => naCaixa(ponto(p), C.paralama) || naCaixa(ponto(p), C.rebaixo)));
+  const porCurva = Object.fromEntries(nasRegioes.map((c) => [c.nome, A.regioes]));
+  if (A.resto == null) return { alisarCurvas: { tolerancia: A.regioes, curvas: nasRegioes.map((c) => c.nome) } };
+  return { alisarCurvas: { tolerancia: A.resto, toleranciaPorCurva: porCurva } };
+}
 
 /** A gaiola por rede de curvas: os nós em mm, as curvas ao comprimento e as seções, os retalhos. */
 export function derivar(T) {
@@ -236,25 +265,38 @@ export function derivar(T) {
   zs.forEach((z, i) => { const u = O.deZ(z); NIVEIS.forEach((k, j) => { nos[nome(i, j)] = fixo(j < LADO ? nivel(j, u) : cima(j, z)); }); });
   NIVEIS.slice(0, LADO).forEach((k, j) => { nos[`t_${k}`] = fixo([0, yCentro[j], P.zEixo(yCentro[Math.min(j, 4)]) + (j === 5 ? D.largura : 0)]); });
 
-  /* a seção de uma estação: os pontos-chave entre os nós, na pele (do lado, pela altura) e em linha da coluna à quina */
-  const secao = (i) => {
+  /* a seção de uma estação, vão por vão (o vão j vai do nível j ao j + 1): os pontos-chave de dentro do vão, na pele (do lado, pela altura),
+   * em linha da coluna à quina e na coroa do teto */
+  const dentroDoVao = (i, j) => {
     const z = zs[i]; const u = O.deZ(z); const pts = [];
-    const K = T.pontosChave.secao;
-    for (let j = 0; j < LADO; j += 1) {
-      pts.push(nome(i, j));
-      const a = nos[nome(i, j)]; const b = nos[nome(i, j + 1)];
-      for (let q = 1; q <= K[j]; q += 1) {
-        const f = q / (K[j] + 1);
-        if (j < 4) { const y = a[1] + (b[1] - a[1]) * f; pts.push(P.sobre(u, P.recuo(z, y), y)); } else pts.push(a.map((c, k) => c + (b[k] - c) * f));
-      }
+    const a = nos[nome(i, j)]; const b = nos[nome(i, j + 1)];
+    if (j === 6) { const xr = a[0]; for (const f of T.pontosChave.coroa) { const x = xr * f; pts.push([x, P.coroa(z, x), z]); } return pts; }
+    const K = T.pontosChave.secao[j];
+    for (let q = 1; q <= K; q += 1) {
+      const f = q / (K + 1);
+      if (j < 4) { const y = a[1] + (b[1] - a[1]) * f; pts.push(P.sobre(u, P.recuo(z, y), y)); } else pts.push(a.map((c, k) => c + (b[k] - c) * f));
     }
-    pts.push(nome(i, 6));
-    const xr = nos[nome(i, 6)][0];
-    for (const f of T.pontosChave.coroa) { const x = xr * f; pts.push([x, P.coroa(z, x), z]); }
-    pts.push(nome(i, 7));
     return pts;
   };
-  const curvas = zs.map((z, i) => ({ nome: `S${i}`, pontos: secao(i) }));
+  /* a seção é partida em curvas nos níveis de `partirSecaoEm`, onde cruza um vinco: o alisamento das curvas trata cada trecho à parte e não
+   * arredonda a dobra do vinco, que nas estações em que ela vira menos que o ângulo de canto da rede (35 graus; o ombro vira de 28 a 68)
+   * ele arredondaria até a tolerância, cada estação de um jeito. Na estação da traseira a quina não parte, porque o trecho da coluna ao
+   * eixo é um lado só da tampa (o retalho de três lados). */
+  const cortesDe = (i) => T.partirSecaoEm.map((k) => NIVEIS.indexOf(k)).filter((j) => !(i === iJ && j === 6));
+  const trechosDe = (i) => {
+    const c = cortesDe(i); const limites = [0, ...c, NIVEIS.length - 1];
+    return limites.slice(0, -1).map((de, k) => ({ nome: k === 0 ? `S${i}` : `S${i}${NIVEIS[de]}`, de, ate: limites[k + 1] }));
+  };
+  /* o nome da curva da seção i que contém o vão j */
+  const secaoDoVao = (i, j) => trechosDe(i).find((t) => j >= t.de && j < t.ate).nome;
+  const curvas = [];
+  zs.forEach((z, i) => {
+    for (const t of trechosDe(i)) {
+      const pts = [nome(i, t.de)];
+      for (let j = t.de; j < t.ate; j += 1) pts.push(...dentroDoVao(i, j), nome(i, j + 1));
+      curvas.push({ nome: t.nome, pontos: pts });
+    }
+  });
 
   /* as linhas ao comprimento: um ponto-chave a cada `pontosChave.comprimento` mm entre as estações */
   const vincosDe = { 4: T.vincos.ombro, 5: T.vincos.coluna, 6: T.vincos.quinaDoTeto };
@@ -288,7 +330,7 @@ export function derivar(T) {
     perfil.push(`t_${NIVEIS[j]}`);
     if (j === 0) break;
     const a = nos[`t_${NIVEIS[j]}`][1]; const b = nos[`t_${NIVEIS[j - 1]}`][1];
-    const k = j === 5 ? 0 : Math.max(0, Math.round((a - b) / 60) - 1);
+    const k = j === 5 ? 0 : Math.max(0, Math.round((a - b) / T.pontosChave.perfil) - 1);
     for (let s = 1; s <= k; s += 1) { const y = a + ((b - a) * s) / (k + 1); perfil.push([0, y, P.zEixo(y)]); }
   }
   curvas.push({ nome: 'perfilDaTraseira', pontos: perfil });
@@ -302,17 +344,17 @@ export function derivar(T) {
   const lado = (curva, de, ate) => ({ curva, de, ate });
   for (let i = 0; i < iJ; i += 1) {
     for (let j = 0; j < NIVEIS.length - 1; j += 1) {
-      retalhos.push({ nome: `r${i}_${NIVEIS[j]}`, borda: [lado(`L${j}`, nome(i, j), nome(i + 1, j)), lado(`S${i + 1}`, nome(i + 1, j), nome(i + 1, j + 1)), lado(`L${j + 1}`, nome(i + 1, j + 1), nome(i, j + 1)), lado(`S${i}`, nome(i, j + 1), nome(i, j))] });
+      retalhos.push({ nome: `r${i}_${NIVEIS[j]}`, borda: [lado(`L${j}`, nome(i, j), nome(i + 1, j)), lado(secaoDoVao(i + 1, j), nome(i + 1, j), nome(i + 1, j + 1)), lado(`L${j + 1}`, nome(i + 1, j + 1), nome(i, j + 1)), lado(secaoDoVao(i, j), nome(i, j + 1), nome(i, j))] });
     }
   }
   for (let j = 0; j < LADO - 1; j += 1) {
-    retalhos.push({ nome: `c_${NIVEIS[j]}`, borda: [lado(`Q${j}`, nome(iJ, j), `t_${NIVEIS[j]}`), lado('perfilDaTraseira', `t_${NIVEIS[j]}`, `t_${NIVEIS[j + 1]}`), lado(`Q${j + 1}`, `t_${NIVEIS[j + 1]}`, nome(iJ, j + 1)), lado(`S${iJ}`, nome(iJ, j + 1), nome(iJ, j))] });
+    retalhos.push({ nome: `c_${NIVEIS[j]}`, borda: [lado(`Q${j}`, nome(iJ, j), `t_${NIVEIS[j]}`), lado('perfilDaTraseira', `t_${NIVEIS[j]}`, `t_${NIVEIS[j + 1]}`), lado(`Q${j + 1}`, `t_${NIVEIS[j + 1]}`, nome(iJ, j + 1)), lado(secaoDoVao(iJ, j), nome(iJ, j + 1), nome(iJ, j))] });
   }
-  retalhos.push({ nome: 'c_tampa', borda: [lado(`S${iJ}`, nome(iJ, 5), nome(iJ, 7)), lado('Qeixo', nome(iJ, 7), 't_coluna'), lado('Q5', 't_coluna', nome(iJ, 5))] });
+  retalhos.push({ nome: 'c_tampa', borda: [lado(secaoDoVao(iJ, 5), nome(iJ, 5), nome(iJ, 7)), lado('Qeixo', nome(iJ, 7), 't_coluna'), lado('Q5', 't_coluna', nome(iJ, 5))] });
 
   /* com `pesoDasCurvas`, a superfície só se aproxima dos pontos das curvas por mínimos quadrados, em vez de passar por eles: a interpolação exata de muitos pontos ondula */
   const pesadas = T.chapa.pesoDasCurvas ? curvas.map((c) => ({ ...c, peso: T.chapa.pesoDasCurvas })) : curvas;
-  const rede = gaiolaPorRede({ passo: T.chapa.passo, anguloMax: T.chapa.anguloMax, fora: [1, 0, 0], simetria: 'x', nos, curvas: pesadas, retalhos, ...(T.chapa.liso ? { liso: T.chapa.liso } : {}) });
+  const rede = gaiolaPorRede({ passo: T.chapa.passo, anguloMax: T.chapa.anguloMax, fora: [1, 0, 0], simetria: 'x', nos, curvas: pesadas, retalhos, ...(T.chapa.liso ? { liso: T.chapa.liso } : {}), ...alisamentoDasCurvas(T, curvas, nos) });
   return { rede, P, zs };
 }
 
@@ -372,14 +414,14 @@ export function gerarPassos(T) {
   const L = T.lanterna;
   const arco = furoDoArco(T);
   return [
-    ['subdivisao', { origemId: 1, ...rede.passo, borda: 'cantos', niveis: T.chapa.niveis, espessura: m(T.chapa.espessura) }],
+    ['subdivisao', { origemId: 1, ...rede.passo, borda: 'cantos', niveis: T.chapa.niveis, espessura: m(T.chapa.espessura), costuraExata: true }],
     ...arco.passos,
-    ['aberturaPorContorno', { origemId: 4, chapa: ARCO, vista: 'x', sentido: '+', contorno: contornoDe(vidroLateralSobreODegrau(T, P)) }],
-    ['aberturaPorContorno', { origemId: 5, chapa: VIDRO, vista: 'z', contorno: contornoDe(retanguloArredondado(L.x0, L.x1, L.y0, L.y1, L.raio)) }],
+    ['aberturaPorContorno', { origemId: 4, chapa: ARCO, vista: 'x', sentido: '+', simetria: 'x', contorno: contornoDe(vidroLateralSobreODegrau(T, P)) }],
+    ['aberturaPorContorno', { origemId: 5, chapa: VIDRO, vista: 'z', simetria: 'x', contorno: contornoDe(retanguloArredondado(L.x0, L.x1, L.y0, L.y1, L.raio)) }],
     ['aberturaPorContorno', { origemId: 6, chapa: LANTERNA, vista: 'y', sentido: '+', contorno: contornoComFilete(vidroTraseiroInteiro(T)) }],
     ['parte', { nome: 'chapa', sel: VIDRO_TRASEIRO }],
-    ['parte', { nome: 'paralamaTraseiro', substituir: true, sel: { regiao: caixa(T.partes.paralama) } }],
-    ['parte', { nome: 'rebaixoLateral', substituir: true, sel: { regiao: caixa(T.partes.rebaixo) } }],
+    ['parte', { nome: 'paralamaTraseiro', substituir: true, sel: { regiao: caixa(caixasDasPartes(T).paralama) } }],
+    ['parte', { nome: 'rebaixoLateral', substituir: true, sel: { regiao: caixa(caixasDasPartes(T).rebaixo) } }],
   ];
 }
 
@@ -414,7 +456,7 @@ const receita = {
     lataria: { partes: ['chapa'] },
     saliencias: [
       { regiao: { min: [780, 250, -1950], max: [960, 1010, -700] }, sentido: 'fora', amplitudeMm: 38, motivo: 'o para-lama traseiro sai 38 mm sobre a linha da porta (950 contra 912 de meia largura, vista de cima), sem moldura, por desenho' },
-      { regiao: { min: [780, 380, -1200], max: [960, 840, 1] }, sentido: 'dentro', amplitudeMm: 20, motivo: 'o rebaixo côncavo em cunha da lateral, da porta ao arco traseiro, sob o vinco do ombro, é feição de dupla curvatura desenhada' },
+      { regiao: caixasDasPartes(TABELA).rebaixo, sentido: 'dentro', amplitudeMm: TABELA.rebaixo.profundidade, motivo: 'o rebaixo côncavo em cunha da lateral, da porta até morrer antes do arco traseiro, sob o vinco do ombro, é feição de dupla curvatura desenhada' },
     ],
   },
   PONTOS,
