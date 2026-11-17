@@ -13,7 +13,10 @@ import {
   ELEVACOES_DA_LUZ_RASANTE, LIMITE_DO_VEREDITO, PERGUNTA_DO_ALVO, PRAZO_DA_CAPTURA_MONTADA_MS, VISTAS_MONTADAS, ladoDaVista, montagemDaPeca, montarPedido, pastaDaRodada, prefixoDaPeca, referenciasDoPlano,
   DISTANCIA_DE_PERTO_MM, campoDePertoMm, MOTIVO_SEM_MEDIR, ReceitaReprovada, decidirLuzRasante, imprimir, fracaoVisivelDaPeca, lerReferenciasExternas, lerOrientacaoDaReferencia, LIMITE_DA_ORIENTACAO, AJUDA, imagensDoReflexo, LEITURA_DA_FAIXA, LEITURA_DO_REFLEXO, secaoDoReflexo, MINIMO_DO_REFLEXO, luzRasanteDoPacote, primeiraQuePassa, unidadeDoAlvo, vistaDoArquivo, vistasMontadasVisiveis, vistasParaCritica, vistasRepetidas,
   ARQUIVO_DO_CONTORNO_SOBREPOSTO, contornosParaSobrepor, etapaFixaDaPeca, motivoDaEtapaFixa, registroDasEtapas,
+  ARQUIVO_DAS_PERGUNTAS_FECHADAS, FORMATO_DAS_PERGUNTAS_FECHADAS, NAO_DA_PARA_VER, NAO_VERIFICAVEL, REGRA_DA_NOTA, arquivoDoPedidoFechado, juntarOrdens, lerRespostasFechadas,
+  montarPedidoFechado, notaDasRespostas, notaEscrita, normalizarResposta, perguntasFechadas, relatorioDaJuncao, relatorioDasNotas, respostasQueMudaram, variacaoDasNotas,
 } from './vistas-para-critica.mjs';
+import { extrairVeredito } from '../../src/autoria/calibracao-do-critico.js';
 import { lerContornos } from './comparar-contornos.mjs';
 
 const area = mkdtempSync(join(tmpdir(), 'vistas-critica-'));
@@ -325,6 +328,15 @@ describe('o pacote de uma receita que refina um esboço', () => {
     expect(pedido).toContain('### viga');
     expect(pedido).toContain('Forma prometida: caixa de 200 por 100 por 120 mm com um furo passante de 60 mm de diâmetro');
     expect(pedido).toContain(`  1. ${PERGUNTA_DO_ALVO}`);
+    /* os dois pedidos fechados saem ao lado, sobre as mesmas imagens, com as perguntas que a junção lê */
+    expect(resultado.pedidosFechados.a).toBe(join(pasta, arquivoDoPedidoFechado('a')));
+    const fechadoA = readFileSync(resultado.pedidosFechados.a, 'utf8');
+    const fechadoB = readFileSync(resultado.pedidosFechados.b, 'utf8');
+    for (const { resultado: r } of resultado.porParte) for (const arquivo of r.resultado.arquivos) { expect(fechadoA).toContain(arquivo); expect(fechadoB).toContain(arquivo); }
+    const dado = JSON.parse(readFileSync(join(pasta, ARQUIVO_DAS_PERGUNTAS_FECHADAS), 'utf8'));
+    expect(dado.formato).toBe(FORMATO_DAS_PERGUNTAS_FECHADAS);
+    expect(dado.pedidos).toEqual({ a: resultado.pedidosFechados.a, b: resultado.pedidosFechados.b });
+    expect(dado.perguntas.map((q) => q.origem)).toEqual(['alvo', 'parte:bloco', 'parte:viga', 'criterio:1', 'criterio:2']);
   }, 60_000);
 
   it('o alvo é a composta guardada com as formas do esboço, copiada para a pasta da rodada, e a unidade é a nula porque nenhuma forma ligada declara unidade', async () => {
@@ -345,7 +357,7 @@ describe('o pacote de uma receita que refina um esboço', () => {
     const base = mkdtempSync(join(area, 'limpeza-'));
     const pasta = join(base, 'rodada');
     mkdirSync(join(pasta, 'alvo'), { recursive: true });
-    for (const velho of ['pedido.md', 'etapas-x-frontal-orto.png', 'sobreposicao-q.png', 'alvo/velho.png', 'notas.txt']) writeFileSync(join(pasta, velho), 'velho');
+    for (const velho of ['pedido.md', 'pedido-fechado-b.md', 'perguntas-fechadas.json', 'etapas-x-frontal-orto.png', 'sobreposicao-q.png', 'alvo/velho.png', 'notas.txt']) writeFileSync(join(pasta, velho), 'velho');
     const bancada = bancadaFalsa(base, PECA);
     await vistasParaCritica(PECA, {
       saida: pasta, pastaDasCapturas: base,
@@ -355,6 +367,8 @@ describe('o pacote de uma receita que refina um esboço', () => {
       },
     });
     expect(readFileSync(join(pasta, 'pedido.md'), 'utf8')).toContain('# Pedido ao crítico visual');
+    expect(readFileSync(join(pasta, 'pedido-fechado-b.md'), 'utf8')).toContain('## Perguntas fechadas');
+    expect(readFileSync(join(pasta, 'perguntas-fechadas.json'), 'utf8')).toContain(FORMATO_DAS_PERGUNTAS_FECHADAS);
     expect(existsSync(join(pasta, 'etapas-x-frontal-orto.png'))).toBe(false);
     expect(existsSync(join(pasta, 'sobreposicao-q.png'))).toBe(false);
     expect(existsSync(join(pasta, 'alvo', 'velho.png'))).toBe(false);
@@ -1330,4 +1344,135 @@ describe('o contorno medido sobre o modelo', () => {
     expect(pedido).toContain("Fora do contorno sobreposto: frontal.contornos.json fica fora do pacote, sem desenho nem citação como medida: a etapa 'peca' está fixa no registro de etapas da montagem (aceite: pessoa, 2026-11-17)");
     expect(pedido).not.toMatch(/a medida deste lado vem dos contornos/);
   }, 60_000);
+});
+
+/* ---------- o pedido por perguntas fechadas ---------- */
+
+describe('o pedido por perguntas fechadas, em duas ordens', () => {
+  const perguntas = perguntasFechadas(DADOS);
+  const A = montarPedidoFechado(DADOS, 'a');
+  const B = montarPedidoFechado(DADOS, 'b');
+  const ids = (texto) => [...texto.matchAll(/^- (P\d+)\. /gm)].map((m) => m[1]);
+
+  it('as perguntas saem do que a receita declara: o alvo, a referência do mesmo lado, cada parte e cada critério, numeradas na ordem A', () => {
+    expect(perguntas.map((p) => p.id)).toEqual(perguntas.map((_, i) => `P${i + 1}`));
+    expect(perguntas.map((p) => p.origem)).toEqual(['alvo', 'referencia:esquerda', 'parte:bloco', 'parte:viga', 'criterio:1', 'criterio:2']);
+    expect(perguntas.find((p) => p.origem === 'referencia:esquerda').texto).toBe('Na vista esquerda do modelo, a silhueta e o lugar de cada parte seguem os de `lateral.png`?');
+    expect(perguntas.find((p) => p.origem === 'parte:bloco').texto).toBe(`A parte \`bloco\` aparece nas imagens com a forma prometida: ${PLANO.partes[0].forma}?`);
+    expect(perguntas.find((p) => p.origem === 'criterio:1')).toMatchObject({ grupo: 'criterio', defeitoSe: 'sim', texto: 'As imagens mostram isto: o bloco sem o furo?' });
+    expect(perguntas.filter((p) => p.grupo === 'forma').every((p) => p.defeitoSe === 'não')).toBe(true);
+    expect(perguntasFechadas(structuredClone(DADOS))).toEqual(perguntas);
+  });
+
+  it('a ordem A tem as imagens na ordem de hoje e a B põe o modelo e as partes antes do alvo e das referências; os critérios viram perguntas', () => {
+    expect(titulos(A)).toEqual(['Objeto', 'Alvo', 'Referências', 'Modelo', 'Montado', 'Sobreposição', 'Partes', 'Perguntas fechadas', 'Perguntas', 'Respostas e veredito']);
+    expect(titulos(B)).toEqual(['Objeto', 'Modelo', 'Montado', 'Sobreposição', 'Partes', 'Alvo', 'Referências', 'Perguntas fechadas', 'Perguntas', 'Respostas e veredito']);
+    expect(A).not.toContain('## Critérios de reprovação');
+    expect(A).not.toContain('Diga, em uma linha por parte');
+    expect(A).toContain('As perguntas fechadas de forma comparam o modelo a ela');
+  });
+
+  it('as duas ordens citam as mesmas imagens e as mesmas perguntas, com os mesmos números, e a B as lista de trás para a frente', () => {
+    const caminhos = (texto) => [...texto.matchAll(/\/[a-z]\/[\w.-]+\.png/g)].map((m) => m[0]).sort();
+    expect(caminhos(B)).toEqual(caminhos(A));
+    expect(caminhos(A)).toEqual(caminhos(montarPedido(DADOS)));
+    expect(ids(A)).toEqual(['P1', 'P2', 'P3', 'P4', 'P5', 'P6']);
+    expect(ids(B)).toEqual(['P6', 'P5', 'P4', 'P3', 'P2', 'P1']);
+    expect(A.indexOf('Perguntas de forma (`não` é defeito de forma)')).toBeLessThan(A.indexOf('Perguntas dos critérios de reprovação (`sim` é defeito estrutural)'));
+    expect(B.indexOf('Perguntas dos critérios de reprovação')).toBeLessThan(B.indexOf('Perguntas de forma'));
+  });
+
+  it('o pedido pede o bloco de respostas antes do veredito, com a imagem citada, e escreve a regra da nota', () => {
+    for (const texto of [A, B]) {
+      expect(texto).toContain('```respostas');
+      expect(texto).toContain(REGRA_DA_NOTA);
+      expect(texto).toContain('`sim`, `não` ou `não dá para ver`');
+      expect(texto).toContain('Estas perguntas são abertas e não entram na regra da nota');
+      expect(texto).not.toMatch(/\bPASSOS\b|receita|rodada|histórico|mudou|ferramenta/i);
+    }
+    expect(montarPedidoFechado(DADOS, 'a')).toBe(A);
+    expect(() => montarPedidoFechado(DADOS, 'c')).toThrow(/ordem do pedido fechado 'c' desconhecida/);
+  });
+
+  const resposta = (itens, nota = 7) => `texto\n\n\`\`\`respostas\n${JSON.stringify(itens)}\n\`\`\`\n\n\`\`\`json\n${JSON.stringify({ alvo: '/r/lateral.png', nota, defeitos: [], observacao: 'conjunto' })}\n\`\`\``;
+  const todas = (r) => perguntas.map((p) => ({ id: p.id, resposta: r[p.id] ?? (p.grupo === 'criterio' ? 'não' : 'sim'), imagem: 'm-direita.png', evidencia: 'visto' }));
+
+  it('lê as respostas do bloco, normaliza as três e o "não aparece nas vistas", e o veredito JSON continua lido no fim', () => {
+    expect(['Sim', 'NAO', 'Não dá para ver.', 'não aparece nas vistas', 'talvez'].map(normalizarResposta)).toEqual(['sim', 'não', NAO_DA_PARA_VER, NAO_DA_PARA_VER, null]);
+    const texto = resposta([...todas({}).slice(0, 5), { id: 'P6', resposta: 'não', evidencia: 'sem imagem' }]);
+    const lidas = lerRespostasFechadas(texto, perguntas);
+    expect(lidas.respostas).toEqual({ P1: 'sim', P2: 'sim', P3: 'sim', P4: 'sim', P5: 'não', P6: 'não' });
+    expect(lidas.semImagem).toEqual(['P6']);
+    expect(extrairVeredito(texto).nota).toBe(7);
+    expect(notaEscrita(texto)).toBe(7);
+  });
+
+  it('recusa o bloco que falta, o id desconhecido ou repetido, a resposta fora das três e a pergunta sem resposta', () => {
+    expect(() => lerRespostasFechadas('sem bloco', perguntas)).toThrow(/não traz o bloco ```respostas/);
+    expect(() => lerRespostasFechadas('```respostas\n{ nao é json\n```', perguntas)).toThrow(/não é JSON/);
+    expect(() => lerRespostasFechadas(resposta([...todas({}), { id: 'P9', resposta: 'sim' }]), perguntas)).toThrow(/id "P9", que não é pergunta deste pedido/);
+    expect(() => lerRespostasFechadas(resposta([...todas({}), { id: 'P1', resposta: 'sim' }]), perguntas)).toThrow(/P1 foi respondida duas vezes/);
+    expect(() => lerRespostasFechadas(resposta(todas({ P2: 'talvez' })), perguntas)).toThrow(/P2 respondeu "talvez"/);
+    expect(() => lerRespostasFechadas(resposta(todas({}).slice(0, 4)), perguntas)).toThrow(/sem resposta para P5, P6/);
+  });
+
+  it('a nota sai das respostas pela regra: 10, 9 e 8 pela forma, 7, 6 e 5 pelos critérios, e "não dá para ver" não conta', () => {
+    const base = { P1: 'sim', P2: 'sim', P3: 'sim', P4: 'sim', P5: 'não', P6: 'não' };
+    const nota = (mudanca) => notaDasRespostas(perguntas, { ...base, ...mudanca }).nota;
+    expect(nota({})).toBe(10);
+    expect(nota({ P3: 'não' })).toBe(9);
+    expect(nota({ P3: 'não', P4: 'não' })).toBe(8);
+    expect(nota({ P5: 'sim', P3: 'não' })).toBe(7);
+    expect(nota({ P5: 'sim', P6: 'sim' })).toBe(6);
+    expect(nota({ P1: NAO_DA_PARA_VER, P6: NAO_DA_PARA_VER })).toBe(10);
+    expect(notaDasRespostas(perguntas, { ...base, P3: 'não', P5: 'sim' })).toMatchObject({ forma: ['P3'], criterio: ['P5'] });
+    const tres = [...perguntas, { id: 'P7', grupo: 'criterio', defeitoSe: 'sim' }];
+    expect(notaDasRespostas(tres, { ...base, P5: 'sim', P6: 'sim', P7: 'sim' }).nota).toBe(5);
+  });
+
+  it('a resposta que muda entre as duas ordens sai como não verificável e não vira defeito', () => {
+    const a = { P1: 'sim', P2: 'não', P3: 'sim', P4: 'sim', P5: 'sim', P6: 'não' };
+    const b = { P1: 'sim', P2: 'não', P3: 'não', P4: 'sim', P5: 'não', P6: 'não' };
+    const j = juntarOrdens(perguntas, a, b);
+    expect(j.linhas.filter((l) => l.final === NAO_VERIFICAVEL).map((l) => l.id)).toEqual(['P3', 'P5']);
+    expect(j).toMatchObject({ nota: 9, forma: ['P2'], criterio: [], naoVerificaveis: ['P3', 'P5'], porOrdem: { a: 7, b: 8 } });
+  });
+
+  it('a variação de cinco notas e as perguntas cuja resposta final mudou entre repetições', () => {
+    expect(variacaoDasNotas([5, 7, 5, 6, 7])).toEqual({ notas: [5, 7, 5, 6, 7], minimo: 5, maximo: 7, amplitude: 2, media: 6, desvio: 0.89 });
+    const sim = Object.fromEntries(perguntas.map((p) => [p.id, p.grupo === 'criterio' ? 'não' : 'sim']));
+    const j1 = juntarOrdens(perguntas, sim, sim);
+    const j2 = juntarOrdens(perguntas, sim, { ...sim, P4: 'não' });
+    expect(respostasQueMudaram(perguntas, [j1, j2, j1])).toEqual([{ id: 'P4', contagem: { sim: 2, [NAO_VERIFICAVEL]: 1 } }]);
+  });
+
+  it('o relatório da junção dá a nota de cada repetição e a variação, e o das notas a do pedido de hoje', () => {
+    const a = { arquivo: 'a1.md', texto: resposta(todas({ P3: 'não' }), 9) };
+    const b = { arquivo: 'b1.md', texto: resposta(todas({ P3: 'sim' }), 8) };
+    const texto = relatorioDaJuncao(perguntas, [{ a, b }, { a, b: a }]);
+    expect(texto).toContain('nota pela regra, com as duas ordens: 10 (só a ordem A: 9; só a B: 10; o crítico escreveu 9 e 8)');
+    expect(texto).toContain('não verificáveis (a resposta mudou entre as ordens): P3 (A não, B sim)');
+    expect(texto).toContain('VARIAÇÃO EM 2 REPETIÇÕES');
+    expect(texto).toContain('nota pela regra, com as duas ordens: 10, 9; amplitude 1');
+    expect(relatorioDasNotas([a, b, a])).toContain('VARIAÇÃO EM 3 RESPOSTAS: 9, 8, 9; amplitude 1');
+    expect(() => relatorioDasNotas([{ arquivo: 'x.md', texto: 'sem veredito' }])).toThrow(/x.md não termina com o veredito JSON/);
+  });
+
+  it('--juntar lê as perguntas da pasta e os pares de respostas, e recusa número ímpar de respostas', () => {
+    const pasta = mkdtempSync(join(area, 'juntar-'));
+    writeFileSync(join(pasta, ARQUIVO_DAS_PERGUNTAS_FECHADAS), JSON.stringify({ formato: FORMATO_DAS_PERGUNTAS_FECHADAS, peca: 'prova/bloco', perguntas }));
+    writeFileSync(join(pasta, 'a.md'), resposta(todas({})));
+    writeFileSync(join(pasta, 'b.md'), resposta(todas({ P5: 'sim' })));
+    const cli = (...args) => spawnSync(process.execPath, [join(import.meta.dirname, 'vistas-para-critica.mjs'), ...args], { encoding: 'utf8', timeout: 20_000 });
+    const r = cli(`--juntar=${pasta}`, join(pasta, 'a.md'), join(pasta, 'b.md'));
+    expect(r.status).toBe(0);
+    expect(r.stdout).toContain('nota pela regra, com as duas ordens: 10 (só a ordem A: 10; só a B: 7');
+    expect(r.stdout).toContain('P5 (A não, B sim)');
+    const impar = cli(`--juntar=${pasta}`, join(pasta, 'a.md'));
+    expect(impar.status).toBe(2);
+    expect(impar.stderr).toContain('aceito pares, a da ordem A antes da B');
+    const notas = cli('--notas', join(pasta, 'a.md'), join(pasta, 'b.md'));
+    expect(notas.status).toBe(0);
+    expect(notas.stdout).toContain('VARIAÇÃO EM 2 RESPOSTAS: 7, 7; amplitude 0');
+  });
 });
