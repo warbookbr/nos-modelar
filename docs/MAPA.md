@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2103 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2105 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -103,6 +103,10 @@
 ## docs/modelar/banco-de-provas/abertura-em-qualquer-direcao-2026-11-06/
 
 - `README.md` — Abertura em qualquer direção — a bateria de limites da operação
+
+## docs/modelar/banco-de-provas/abrir-peca-com-filtros-2026-11-17/
+
+- `README.md` — Abrir peça com filtros, 2026-11-17
 
 ## docs/modelar/banco-de-provas/aviao-2026-10-11/
 
@@ -2504,7 +2508,8 @@
 - `endereco.js` — endereco.js — o endereço da página como estado reproduzível da bancada: os parâmetros lidos na subida, a escrita do estado na URL sem recarregar e a cópia do…
 - `endereco.test.js` — endereco.test.js — o endereço lê os parâmetros da subida, reescreve a URL só quando a consulta muda e copia o endereço.
 - `fronteira-da-pagina.test.js` — fronteira-da-pagina.test.js — só os componentes tocam a página: `main.js` e os módulos de estado, cena e sessão não procuram elemento, não ouvem a janela nem…
-- `menu-abrir.js` — menu-abrir.js — a janela Abrir da barra superior: a lista das receitas do acervo em trabalho, com as de ensaio marcadas.
+- `menu-abrir.js` — menu-abrir.js — a janela Abrir da barra superior: a lista das receitas do acervo em trabalho, com busca, filtro por categoria e por situação.
+- `menu-abrir.test.js` — menu-abrir.test.js — a janela Abrir busca por nome, separa por categoria e por situação, e os três filtros se combinam.
 - `menu-controles.js` — menu-controles.js — a janela Controles da barra superior: os comandos de teclado agrupados por assunto, a troca de tecla de cada um e a volta aos padrões.
 - `menu-estado.js` — menu-estado.js — a janela Estado da barra superior: o resumo do que está carregado e da ligação com a sessão, e a sequência de eventos desde que a página abriu.
 - `paineis-do-tema.js` — paineis-do-tema.js — os painéis que o tema deixa abrir sobre a cena (a árvore das partes e o painel da direita), quem os abre e fecha, e a regra que recolhe …
