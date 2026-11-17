@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 220" width="300" height="220">
+<rect width="300" height="220" fill="#fbfbfa"/>
+<style>.contorno{fill:none;stroke:#12233b;stroke-width:2}.cotat{fill:#b3593d;font-size:11px}</style>
+<text x="20" y="20" class="cotat">lateral cotada (mm)</text>
+<path class="contorno" d="M 50 180 L 250 180 L 250 30 L 50 30 L 50 180"/>
+</svg>

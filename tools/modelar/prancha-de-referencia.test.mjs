@@ -8,7 +8,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { ajustarCamera, lerCopia } from './olhar-bancada.mjs';
 import {
   PONTOS_DA_ESCALA, comoCLI, disporPrancha, eixosDaVista, escalaDaVista, extensaoNaImagem, fundoDaCaixa, lerPedido, lerRegiao, lerRegua, lerVistas,
-  passoDaRegua, porVista, prancharReferencia,
+  passoDaRegua, porVista, prancharReferencia, caixaDoContornoSvg, lerPranchaDesenhada, alinharPelasCoordenadas, prancharDesenhadas,
   aoReferencialDaPeca, disporContorno, pontoDoContorno, prancharContorno, projetorDaVista, vistaNaPeca,
   TRACEJADO_DO_ENCONTRO, encontrosDoAnel, ladosDaCaixaNoEncontro, ladosEmTexto, trechosDoAnel,
 } from './prancha-de-referencia.mjs';
@@ -405,5 +405,280 @@ describe('o trecho do contorno que é encontro com outra região', () => {
     const textos = plano.operacoes.filter((o) => o.tipo === 'texto').map((o) => o.texto);
     expect(textos).toContain('  tracejado: 200 mm de encontro com baixo, não é borda da peça; o lado de baixo da caixa cai no encontro e não mede a peça');
     expect(textos.some((t) => t.includes('o trecho tracejado é encontro'))).toBe(true);
+  });
+});
+
+describe('a prancha desenhada em mm (SVG)', () => {
+  const FIXTURE = join(REPO, 'tools/fixtures/comparar-com-prancha/referencias/lateral.prancha.svg');
+
+  it('a escala sai da caixa do contorno em px e da caixa em mm do relatório, e a régua e a região são do raster ampliado', () => {
+    const r = lerPranchaDesenhada(FIXTURE);
+    expect(r.vista).toBe('esquerda');
+    expect(r.pxPorMm).toBeCloseTo(1.5, 9);
+    expect(r.regua).toBe('600=400');
+    expect(r.regiao.split(',').map(Number).every((n) => n >= 0)).toBe(true);
+    expect(r.svg).toContain('width="900" height="660"');
+    expect(r.svg).toContain('display: none');
+    expect(r.larguraMm).toBe(400);
+    expect(r.alturaMm).toBe(300);
+  });
+
+  it('recusa o relatório que não é da mesma rodada do desenho, dizendo as duas escalas', () => {
+    const ler = (c) => (c.endsWith('.json') ? JSON.stringify({ relatorio: { porVista: { lateral: { caixa: { xMin: -200, xMax: 200, yMin: 0, yMax: 200 } } } } }) : readFileSync(c, 'utf8'));
+    expect(() => lerPranchaDesenhada(FIXTURE, { ler })).toThrow(/não são da mesma rodada/);
+  });
+
+  it('girar 90 graus no sentido horário troca largura e altura, leva o contorno para o canto certo e muda a escala em mm só pela troca', () => {
+    const r = lerPranchaDesenhada(FIXTURE, { girar: 90 });
+    expect(r.larguraMm).toBe(300);
+    expect(r.alturaMm).toBe(400);
+    expect(r.pxPorMm).toBeCloseTo(1.5, 9);
+    expect(r.regua).toBe('450=300');
+    expect(r.svg).toContain('viewBox="0 0 220 300"');
+    expect(r.svg).toContain('width="660" height="900"');
+    expect(r.svg).toContain('matrix(0 1 -1 0 220 0)');
+    expect(() => lerPranchaDesenhada(FIXTURE, { girar: 45 })).toThrow(/múltiplos de 90/);
+  });
+
+  it('recusa a prancha sem relatório ao lado e o nome que não diz o lado', () => {
+    expect(() => lerPranchaDesenhada(FIXTURE, { existe: () => false })).toThrow(/falta lateral\.prancha\.relatorio\.json/);
+    expect(() => lerPranchaDesenhada('/x/qualquer.prancha.svg')).toThrow(/<lado>\.prancha\.svg/);
+  });
+
+  it('lê a caixa do contorno e recusa o caminho com comando que ela não cobre', () => {
+    expect(caixaDoContornoSvg('<path class="contorno" d="M 1 2 L 11 2 L 11 7 Z"/><path class="outra" d="M 500 500 L 600 600"/>')).toEqual([1, 2, 11, 7]);
+    expect(() => caixaDoContornoSvg('<path class="contorno" d="M 1 2 C 3 4 5 6 7 8"/>')).toThrow(/além de M, L e Z/);
+    expect(() => caixaDoContornoSvg('<path class="x" d="M 1 2"/>')).toThrow(/nenhum <path class="contorno">/);
+  });
+});
+
+describe('a prancha desenhada alinhada pelas coordenadas em mm', () => {
+  const FIXTURE = join(REPO, 'tools/fixtures/comparar-com-prancha/referencias/lateral.prancha.svg');
+
+  it('a origem e a caixa do desenho, na imagem girada, saem do relatório: h para a direita e v para cima', () => {
+    const r = lerPranchaDesenhada(FIXTURE);
+    expect(r.caixaImagemMm).toEqual([-200, 0, 200, 300]);
+    /* o contorno vai de x 50 a 250 e de y 30 a 180 px, ampliado 3 vezes; a origem em mm cai a 200 mm * 1,5 px/mm do lado esquerdo e 0 mm da base */
+    expect(r.origemPx).toEqual([50 * 3 + 200 * 1.5, 180 * 3]);
+    const g = lerPranchaDesenhada(FIXTURE, { girar: 90 });
+    expect(g.caixaImagemMm).toEqual([0, -200, 300, 200]);
+  });
+
+  const desenho = { caixaMm: [-200, 0, 200, 300], pxPorMm: 1.5, origemPx: [450, 540], largura: 900, altura: 660 };
+
+  it('recorta o desenho pela caixa do modelo com 10% de margem, em px do desenho', () => {
+    /* o modelo ocupa h -200 a 0 e v 0 a 300 mm: a origem dele em (400, 400) px a 2 px/mm */
+    const a = alinharPelasCoordenadas({ modelo: { origemPx: [400, 700], extensao: [0, 100, 400, 700], pxPorMm: 2 }, desenho });
+    expect(a.ok).toBe(true);
+    expect(a.caixaMm).toEqual([-230, -30, 30, 330]);
+    expect(a.regiao).toEqual([Math.round(450 - 230 * 1.5), Math.round(540 - 330 * 1.5), Math.round(450 + 30 * 1.5), Math.round(540 + 30 * 1.5)]);
+  });
+
+  it('recusa, dizendo por quê, o modelo que não cabe na caixa do desenho ou a bancada sem origem', () => {
+    const fora = alinharPelasCoordenadas({ modelo: { origemPx: [0, 700], extensao: [0, 100, 1400, 700], pxPorMm: 2 }, desenho });
+    expect(fora.ok).toBe(false);
+    expect(fora.motivo).toMatch(/o modelo passa da caixa do desenho/);
+    expect(alinharPelasCoordenadas({ modelo: { origemPx: undefined, extensao: [0, 0, 1, 1], pxPorMm: 1 }, desenho }).motivo).toMatch(/não deu a origem/);
+  });
+
+  it('sobreposto, as duas imagens coincidem na origem em mm e não no centro das extensões', () => {
+    const linha = {
+      vista: 'esquerda', alinhamento: { tipo: 'coordenadas' },
+      modelo: { largura: 1000, altura: 500, extensao: [100, 100, 300, 200], pxPorMm: 1, origemPx: [100, 200] },
+      foto: { nome: 'f.svg', largura: 900, altura: 600, regiao: [400, 100, 800, 400], extensao: [450, 150, 750, 350], pxPorMm: 1, espelhar: false, regua: { px: 100, mm: 100 }, origemPx: [500, 300] },
+    };
+    const p = disporPrancha({ titulo: 't', linhas: [linha], disposicao: 'sobreposto' });
+    const [caixaM, caixaF] = p.operacoes.filter((o) => o.tipo === 'retangulo' && o.tracejado).map((o) => o.caixa);
+    /* modelo: de 0 a 200 mm à direita da origem; desenho: de -50 a 250 mm: o desenho começa 50 mm antes do modelo */
+    expect(Math.abs((caixaM[0] - caixaF[0]) - 50 * p.escala)).toBeLessThanOrEqual(1);
+    expect(p.linhas[0].alinhamento).toEqual({ tipo: 'coordenadas' });
+    const centrado = disporPrancha({ titulo: 't', linhas: [{ ...linha, alinhamento: { tipo: 'centro', motivo: 'sem origem' } }], disposicao: 'sobreposto' });
+    expect(centrado.linhas[0].alinhamento).toEqual({ tipo: 'centro', motivo: 'sem origem' });
+    expect(centrado.operacoes.some((o) => o.tipo === 'texto' && /centro das extensões \(sem origem\)/.test(o.texto))).toBe(true);
+  });
+
+  it('a imagem é larga o bastante para o título de cada metade, em lado e em sobreposto', () => {
+    const nome = `${'longo-'.repeat(40)}.svg`;
+    const linha = {
+      vista: 'esquerda',
+      modelo: { largura: 1000, altura: 500, extensao: [100, 100, 300, 200], pxPorMm: 1 },
+      foto: { nome, largura: 900, altura: 600, regiao: null, extensao: [450, 150, 750, 350], pxPorMm: 1, espelhar: false, regua: { px: 100, mm: 100 } },
+    };
+    for (const disposicao of ['lado', 'sobreposto']) {
+      const p = disporPrancha({ titulo: 't', linhas: [linha], disposicao });
+      const titulo = p.operacoes.filter((o) => o.tipo === 'texto' && o.texto.includes(nome)).sort((a, b) => b.texto.length - a.texto.length)[0];
+      expect(p.largura, disposicao).toBeGreaterThanOrEqual(titulo.em[0] + Math.ceil(titulo.texto.length * titulo.tamanho * 0.56));
+    }
+  });
+});
+
+describe('a prancha desenhada: leitura estrita, cobertura, réguas e uma captura só', () => {
+  const FIXTURE = join(REPO, 'tools/fixtures/comparar-com-prancha/referencias/lateral.prancha.svg');
+  const REL = FIXTURE.replace(/\.svg$/, '.relatorio.json');
+  const lerCom = (troca) => ({ ler: (c) => (c.endsWith('.json') ? readFileSync(REL, 'utf8') : troca(readFileSync(FIXTURE, 'utf8'))), existe: () => true });
+
+  it('recusa viewBox de origem não nula, width diferente do viewBox e contorno em grupo com transformação, mesmo sem girar', () => {
+    expect(() => lerPranchaDesenhada(FIXTURE, lerCom((t) => t.replace('viewBox="0 0 300 220"', 'viewBox="-100 0 300 220"')))).toThrow(/origem -100 0/);
+    expect(() => lerPranchaDesenhada(FIXTURE, lerCom((t) => t.replace('width="300"', 'width="150"')))).toThrow(/width="150" difere do viewBox \(300\)/);
+    expect(() => lerPranchaDesenhada(FIXTURE, lerCom((t) => t.replace('<path class="contorno"', '<g transform="translate(10 0)"><path class="contorno"').replace('</svg>', '</g></svg>')))).toThrow(/há 'transform' no desenho/);
+  });
+
+  it('recusa transform em qualquer elemento, inclusive no próprio traço e no style, e width ou height com unidade', () => {
+    expect(() => lerPranchaDesenhada(FIXTURE, lerCom((t) => t.replace('<path class="contorno"', '<path transform="translate(9 0)" class="contorno"')))).toThrow(/há 'transform' no desenho/);
+    expect(() => lerPranchaDesenhada(FIXTURE, lerCom((t) => t.replace('<path class="contorno"', '<path style="transform: scale(2)" class="contorno"')))).toThrow(/há 'transform' no desenho/);
+    expect(() => lerPranchaDesenhada(FIXTURE, lerCom((t) => t.replace('width="300"', 'width="300px"')))).toThrow(/não é só um número em px/);
+    expect(() => lerPranchaDesenhada(FIXTURE, lerCom((t) => t.replace('height="220"', 'height="100%"')))).toThrow(/não é só um número em px/);
+  });
+
+  it('o relatório que não é JSON é recusa com o nome do arquivo', () => {
+    const ler = (c) => (c.endsWith('.json') ? '{ não é json' : readFileSync(FIXTURE, 'utf8'));
+    expect(() => lerPranchaDesenhada(FIXTURE, { ler, existe: () => true })).toThrow(/lateral\.prancha\.relatorio\.json não se lê como JSON/);
+  });
+
+  it('as duas escalas precisam concordar em 0,5%: 1% de diferença é recusado', () => {
+    const ler = (c) => (c.endsWith('.json') ? JSON.stringify({ relatorio: { porVista: { lateral: { caixa: { xMin: -200, xMax: 200, yMin: 0, yMax: 303 } } } } }) : readFileSync(FIXTURE, 'utf8'));
+    expect(() => lerPranchaDesenhada(FIXTURE, { ler, existe: () => true })).toThrow(/passam de 0,5% de diferença/);
+  });
+
+  it('a vista declarada vale no lugar do nome, e lateral-direita se lê', () => {
+    const r = lerPranchaDesenhada('/x/lateral-direita.prancha.svg', { ...lerCom((t) => t), vista: 'direita' });
+    expect(r.vista).toBe('direita');
+    expect(() => lerPranchaDesenhada('/x/lateral-direita.prancha.svg', lerCom((t) => t))).toThrow(/o nome da prancha desenhada/);
+  });
+
+  it('o recorte e o desenho saem sem as linhas de eixo, caráter, corte e marcas', () => {
+    expect(lerPranchaDesenhada(FIXTURE).svg).toMatch(/\.eixo, \.carater, \.corte, \.lm \{ display: none \}/);
+  });
+
+  it('o modelo que passa da caixa do desenho diz em quantos mm e para que lado', () => {
+    const a = alinharPelasCoordenadas({ modelo: { origemPx: [0, 700], extensao: [0, 100, 1400, 700], pxPorMm: 2 }, desenho: { caixaMm: [-200, 0, 200, 300], pxPorMm: 1.5, origemPx: [450, 540], largura: 900, altura: 660 } });
+    expect(a.ok).toBe(false);
+    expect(a.motivo).toMatch(/o modelo passa da caixa do desenho \(h -200 a 200 e v 0 a 300 mm\): 500 mm à direita/);
+  });
+});
+
+describe('a prancha desenhada pelo prancharDesenhadas real (Chromium, bancada simulada)', () => {
+  const FIXTURE = join(REPO, 'tools/fixtures/comparar-com-prancha/referencias/lateral.prancha.svg');
+  /* a vista esquerda: +z à direita, +y em cima; origem em (200, 300) px a 1 px/mm no quadro de 640 por 360 */
+  const ESQUERDA = { pixels: [[200, 300], [200, 300], [200, 200], [300, 300]], quadro: [640, 360] };
+  /* o modelo: z de -150 a 0 mm e y de 0 a 250 mm, a metade de trás do bloco de 400 por 300 mm do desenho */
+  const modelo = (caixa) => PNG.sync.write(imagem(640, 360, [241, 243, 242], caixa, [20, 20, 20]));
+  const bancada = (png, projecao = ESQUERDA) => {
+    const chamadas = [];
+    const olhar = async (pedido) => { chamadas.push(pedido); return { ok: true, resultado: { vistas: [{ projecaoMm: projecao }], capturas: [{ nome: 'esquerda', largura: 640, altura: 360, dados: png }] } }; };
+    return { olhar, chamadas };
+  };
+
+  it('uma captura dá lado e sobreposta, com a caixa em mm, a cobertura e réguas iguais nas duas metades', async () => {
+    const pasta = mkdtempSync(join(REPO, 'tmp', 'prancha-desenhada-'));
+    try {
+      const b = bancada(modelo([50, 50, 200, 300]));
+      const r = await prancharDesenhadas({ peca: 'teste', pranchas: [{ caminho: FIXTURE, vista: 'esquerda', referencial: true }], saida: join(pasta, 'l.png'), sobreposta: join(pasta, 's.png') }, { olhar: b.olhar });
+      expect(b.chamadas).toHaveLength(1);
+      const lado = JSON.parse(readFileSync(r.json, 'utf8'));
+      const sobre = JSON.parse(readFileSync(r.tambem.json, 'utf8'));
+      expect(sobre.disposicao).toBe('sobreposto');
+      for (const relato of [lado, sobre]) {
+        const a = relato.linhas[0].alinhamento;
+        expect(a.tipo).toBe('coordenadas');
+        expect(a.caixaMm).toHaveLength(4);
+        expect(a.caixaMm.every(Number.isFinite)).toBe(true);
+        expect(a.cobertura).toBeGreaterThan(0.95);
+      }
+      expect(r.lidas[0].alinhamento.caixaMm).toEqual(lado.linhas[0].alinhamento.caixaMm);
+      expect(PNG.sync.read(readFileSync(r.tambem.arquivo)).width).toBe(sobre.largura);
+    } finally { rmSync(pasta, { recursive: true, force: true }); }
+  }, 90_000);
+
+  it('sem referencial: true cai no centro, dizendo por quê; com o modelo fora do desenho a cobertura cai', async () => {
+    const pasta = mkdtempSync(join(REPO, 'tmp', 'prancha-desenhada-'));
+    try {
+      const sem = await prancharDesenhadas({ peca: 'teste', pranchas: [{ caminho: FIXTURE, vista: 'esquerda' }], saida: join(pasta, 'a.png') }, { olhar: bancada(modelo([50, 50, 200, 300])).olhar });
+      expect(sem.lidas[0].alinhamento).toMatchObject({ tipo: 'centro' });
+      expect(sem.lidas[0].alinhamento.motivo).toMatch(/referencial: true/);
+      /* o modelo à direita da origem, com 400 mm de largura: passa da caixa do desenho */
+      const fora = await prancharDesenhadas({ peca: 'teste', pranchas: [{ caminho: FIXTURE, vista: 'esquerda', referencial: true }], saida: join(pasta, 'b.png') }, { olhar: bancada(modelo([200, 10, 600, 100])).olhar });
+      expect(fora.lidas[0].alinhamento.tipo).toBe('centro');
+      expect(fora.lidas[0].alinhamento.motivo).toMatch(/o modelo passa da caixa do desenho/);
+    } finally { rmSync(pasta, { recursive: true, force: true }); }
+  }, 90_000);
+
+  /* um desenho virtual de contorno em L (300 por 220 px a 0,5 px/mm; caixa de 400 por 300 mm): o vão do L fica à direita e embaixo */
+  const LETRA_L = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 220" width="300" height="220"><rect width="300" height="220" fill="#fbfbfa"/><style>.contorno{fill:none;stroke:#12233b;stroke-width:2}</style>'
+    + '<path class="contorno" d="M 50 30 L 250 30 L 250 100 L 150 100 L 150 180 L 50 180 L 50 30"/></svg>';
+  const REL_L = JSON.stringify({ relatorio: { porVista: { lateral: { caixa: { xMin: -200, xMax: 200, yMin: 0, yMax: 300 } } } } });
+  const virtual = (svg = LETRA_L) => ({ leitura: { ler: (c) => (c.endsWith('.json') ? REL_L : svg), existe: () => true } });
+  const L = '/virtual/lateral.prancha.svg';
+
+  it('o modelo no vão do L, do lado errado do desenho, dá cobertura abaixo de 85% no modo de coordenadas; no corpo do L, perto de 100%', async () => {
+    const pasta = mkdtempSync(join(REPO, 'tmp', 'prancha-desenhada-'));
+    try {
+      /* h de -30 a 100 mm e v de 10 a 100 mm: dentro da caixa do desenho, mas quase todo no vão do L */
+      const noVao = await prancharDesenhadas({ peca: 'teste', pranchas: [{ caminho: L, vista: 'esquerda', referencial: true }], saida: join(pasta, 'v.png') }, { olhar: bancada(modelo([170, 200, 300, 290])).olhar, ...virtual() });
+      expect(noVao.lidas[0].alinhamento.tipo).toBe('coordenadas');
+      expect(noVao.lidas[0].alinhamento.cobertura).toBeLessThan(0.85);
+      expect(noVao.lidas[0].alinhamento.cobertura).toBeLessThan(0.5);
+      /* h de -190 a -10 mm e v de 10 a 100 mm: na coluna do L */
+      const noCorpo = await prancharDesenhadas({ peca: 'teste', pranchas: [{ caminho: L, vista: 'esquerda', referencial: true }], saida: join(pasta, 'c.png') }, { olhar: bancada(modelo([10, 200, 190, 290])).olhar, ...virtual() });
+      expect(noCorpo.lidas[0].alinhamento.cobertura).toBeGreaterThan(0.95);
+    } finally { rmSync(pasta, { recursive: true, force: true }); }
+  }, 90_000);
+
+  it('o giro declarado errado leva o modelo para fora da caixa do desenho, e o motivo cita o giro e o lado', async () => {
+    const pasta = mkdtempSync(join(REPO, 'tmp', 'prancha-desenhada-'));
+    try {
+      const r = await prancharDesenhadas({ peca: 'teste', pranchas: [{ caminho: FIXTURE, vista: 'esquerda', referencial: true, girar: 90 }], saida: join(pasta, 'g.png') }, { olhar: bancada(modelo([50, 50, 200, 300])).olhar });
+      expect(r.lidas[0].alinhamento.tipo).toBe('centro');
+      expect(r.lidas[0].alinhamento.motivo).toMatch(/o modelo passa da caixa do desenho.*o giro e o lado declarados podem estar errados/);
+    } finally { rmSync(pasta, { recursive: true, force: true }); }
+  }, 90_000);
+
+  it('o contorno aberto diz que não fecha, e não culpa lado nem giro', async () => {
+    const pasta = mkdtempSync(join(REPO, 'tmp', 'prancha-desenhada-'));
+    try {
+      const aberto = LETRA_L.replace('L 50 30"/>', 'L 50 60"/>');
+      const r = await prancharDesenhadas({ peca: 'teste', pranchas: [{ caminho: L, vista: 'esquerda', referencial: true }], saida: join(pasta, 'a.png') }, { olhar: bancada(modelo([10, 200, 190, 290])).olhar, ...virtual(aberto) });
+      expect(r.lidas[0].alinhamento.contornoAberto).toBe(true);
+    } finally { rmSync(pasta, { recursive: true, force: true }); }
+  }, 90_000);
+
+  it('referencial: false explícito tem motivo próprio, que não soa como esquecimento', async () => {
+    const pasta = mkdtempSync(join(REPO, 'tmp', 'prancha-desenhada-'));
+    try {
+      const r = await prancharDesenhadas({ peca: 'teste', pranchas: [{ caminho: FIXTURE, vista: 'esquerda', referencial: false }], saida: join(pasta, 'f.png') }, { olhar: bancada(modelo([50, 50, 200, 300])).olhar });
+      expect(r.lidas[0].alinhamento.motivo).toMatch(/declara referencial: false.*de propósito/);
+    } finally { rmSync(pasta, { recursive: true, force: true }); }
+  }, 90_000);
+
+  it('um relatório corrompido recusa só aquela prancha, com o nome do arquivo, e a outra segue', async () => {
+    const pasta = mkdtempSync(join(REPO, 'tmp', 'prancha-desenhada-'));
+    try {
+      const ler = (c) => (c.endsWith('ruim.prancha.relatorio.json') ? '{ isto não é json' : c.endsWith('.json') ? REL_L : LETRA_L);
+      const r = await prancharDesenhadas({
+        peca: 'teste', pranchas: [{ caminho: '/virtual/ruim.prancha.svg', vista: 'traseira' }, { caminho: L, vista: 'esquerda', referencial: true }], saida: join(pasta, 'j.png'),
+      }, { olhar: bancada(modelo([10, 200, 190, 290])).olhar, leitura: { ler, existe: () => true } });
+      expect(r.recusadas).toHaveLength(1);
+      expect(r.recusadas[0]).toMatch(/^ruim\.prancha\.svg: ruim\.prancha\.relatorio\.json não se lê como JSON/);
+      expect(r.recusadas[0].match(/ruim\.prancha\.svg/g)).toHaveLength(1);
+      expect(r.vistas).toEqual(['esquerda']);
+    } finally { rmSync(pasta, { recursive: true, force: true }); }
+  }, 90_000);
+
+  it('as réguas das duas metades de lado cobrem os mesmos mm do referencial', () => {
+    const linha = {
+      vista: 'esquerda', alinhamento: { tipo: 'coordenadas', caixaMm: [-60, -20, 40, 120] },
+      modelo: { largura: 640, altura: 360, extensao: [50, 50, 200, 300], pxPorMm: 1, origemPx: [200, 300] },
+      foto: { nome: 'f.svg', largura: 900, altura: 600, regiao: null, extensao: [300, 200, 700, 500], pxPorMm: 1.5, espelhar: false, regua: { px: 600, mm: 400 }, origemPx: [450, 540] },
+    };
+    const p = disporPrancha({ titulo: 't', linhas: [linha] });
+    const imagens = p.operacoes.filter((o) => o.tipo === 'imagem');
+    /* as duas metades mostram 100 por 140 mm: o mesmo tamanho em px na prancha */
+    expect(Math.abs(imagens[0].destino[2] - imagens[1].destino[2])).toBeLessThanOrEqual(1);
+    expect(Math.abs(imagens[0].destino[3] - imagens[1].destino[3])).toBeLessThanOrEqual(1);
+    const horizontais = p.operacoes.filter((o) => o.tipo === 'texto' && o.alinhar === 'center' && /^-?\d+$/.test(o.texto)).map((o) => Number(o.texto));
+    const metade = horizontais.length / 2;
+    expect(horizontais.slice(0, metade)).toEqual(horizontais.slice(metade));
+    expect(horizontais).toContain(0);
+    expect(Math.min(...horizontais)).toBeLessThan(0);
   });
 });

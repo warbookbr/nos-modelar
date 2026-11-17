@@ -12,11 +12,12 @@ const EXTENSOES_DE_IMAGEM = new Set(['.png', '.jpg', '.jpeg', '.webp', '.gif']);
 
 /**
  * Os arquivos que `PLANO.referencias` cita, com o caminho absoluto: cada caminho vale a partir da raiz do repositório e, não existindo
- * ali, a partir da pasta da receita. O que não é imagem (o andaime, o esboço, o `alvo.md`) não vai ao crítico e sai em `ignoradas`, e o
+ * ali, a partir da pasta da receita. A prancha desenhada em mm (`<lado>.prancha.svg`) sai em `pranchas`, e `vistas:critica` a rasteriza e a põe ao lado do modelo. O que não é imagem nem prancha (o andaime, o esboço, o `alvo.md`) não vai ao crítico e sai em `ignoradas`, e o
  * que não existe sai em `ausentes`, salvo o declarado em `referencias/locais/` (ignorado pelo git), que sai em `locaisAusentes` e não reprova. `existe` é injetável para o teste.
  */
 export function referenciasDoPlano(plano, { pastaDaReceita, raiz = REPO, existe = existsSync } = {}) {
   const imagens = [];
+  const pranchas = [];
   const ignoradas = [];
   const ausentes = [];
   const locaisAusentes = [];
@@ -24,10 +25,11 @@ export function referenciasDoPlano(plano, { pastaDaReceita, raiz = REPO, existe 
     const candidatos = isAbsolute(citada) ? [citada] : [resolve(raiz, citada), resolve(pastaDaReceita ?? raiz, citada)];
     const achado = candidatos.find((c) => existe(c));
     if (achado === undefined) { (ehReferenciaLocal(citada) ? locaisAusentes : ausentes).push(citada); continue; }
+    if (/\.prancha\.svg$/i.test(achado)) { pranchas.push(achado); continue; }
     if (!EXTENSOES_DE_IMAGEM.has(extname(achado).toLowerCase())) { ignoradas.push(citada); continue; }
     imagens.push(achado);
   }
-  return { imagens, ignoradas, ausentes, locaisAusentes };
+  return { imagens, pranchas, ignoradas, ausentes, locaisAusentes };
 }
 
 /** A recusa de `PLANO.referencias` que cita arquivo inexistente: nomeia cada caminho, sem chamar de imagem o que pode ser texto. */
@@ -45,4 +47,17 @@ export function avisarReferenciasLocaisAusentes(locaisAusentes, escrever = (linh
     AVISADAS.add(caminho);
     escrever(`referência local ausente nesta máquina: ${caminho}\n`);
   }
+}
+
+/** O aviso do que o plano cita e o pacote do crítico não leva (não é imagem nem prancha desenhada): dito na saída e no pedido, nunca calado. */
+export function referenciasSemLeitura(ignoradas) {
+  /* o `.contornos.json` não é imagem, mas o pacote o lê (contornosDasReferencias) e o põe no contorno sobreposto: não é referência ignorada */
+  return (ignoradas ?? []).filter((c) => !/\.contornos\.json$/i.test(c));
+}
+
+export function avisoDasReferenciasIgnoradas(todas) {
+  const ignoradas = referenciasSemLeitura(todas);
+  if (!ignoradas.length) return null;
+  return `PLANO.referencias cita ${ignoradas.length === 1 ? 'um arquivo' : `${ignoradas.length} arquivos`} que não entra${ignoradas.length === 1 ? '' : 'm'} no pacote do crítico, porque não ${ignoradas.length === 1 ? 'é' : 'são'} imagem (png, jpg, webp, gif) nem prancha desenhada (<lado>.prancha.svg): ${ignoradas.join(', ')}. `
+    + 'O crítico não o lê; se ele devia comparar o modelo com isso, entregue uma imagem ou uma prancha <lado>.prancha.svg com o relatório ao lado.';
 }
