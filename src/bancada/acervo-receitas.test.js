@@ -5,7 +5,7 @@
  * entender o motivo. E montagem em pasta precisa aparecer com o nome da pasta,
  * que é o nome pelo qual todo o resto do repositório a chama. */
 import { describe, expect, it, vi } from 'vitest';
-import { listarAcervo, listarParaBancada } from './acervo-receitas.js';
+import { CATEGORIAS, CATEGORIA_DA_FAMILIA, categoriaDoPlano, classificarEntradas, listarAcervo, listarParaBancada } from './acervo-receitas.js';
 import { pecasDoAcervo } from '../../tools/modelar/guardas/guarda-acervo.mjs';
 
 describe('acervo de receitas da bancada', () => {
@@ -113,4 +113,76 @@ describe('montagem em dados na janela Abrir', () => {
   it('o acervo das ferramentas não ganha a montagem em dados', () => {
     expect(listarAcervo({ '../../procedural/pecas/solta/receita.js': importar }).map((e) => e.id)).toEqual(['solta']);
   });
+});
+
+describe('categoria e situação da lista da bancada', () => {
+  const receita = (plano) => async () => ({ default: { PLANO: plano } });
+
+  it('a categoria sai de PLANO.familia ou PLANO.familiaProcedural, e o que nada declara cai em outros', async () => {
+    const lista = listarParaBancada(
+      {
+        '../../procedural/pecas/carro/receita.js': receita({ familia: 'veiculo' }),
+        '../../procedural/pecas/poltrona/receita.js': receita({ familia: 'assento' }),
+        '../../procedural/pecas/roda/receita.js': receita({ familiaProcedural: 'roda-pneu', familia: 'veiculo' }),
+        '../../procedural/pecas/copo/receita.js': receita({ objeto: 'copo' }),
+        '../../procedural/pecas/sem-plano/receita.js': async () => ({ default: {} }),
+        '../../procedural/pecas/quebrada/receita.js': async () => { throw new Error('falha'); },
+      },
+      { '../../tools/fixtures/acervo/prova/receita.js': receita({}) },
+      { '../../procedural/pecas/objeto/montagem.json': async () => ({}) },
+    );
+    expect(lista.every((e) => e.categoria === null)).toBe(true);
+    await classificarEntradas(lista);
+    const por = Object.fromEntries(lista.map((e) => [e.id, e.categoria]));
+    expect(por).toEqual({
+      carro: 'veiculos', poltrona: 'moveis', roda: 'veiculos', copo: 'outros', 'sem-plano': 'outros', quebrada: 'outros', prova: 'outros', objeto: 'outros',
+    });
+  });
+
+  it('a situação é de ensaio para o que vem de fixtures e de trabalho para o resto, montagem em dados incluída', () => {
+    const lista = listarParaBancada(
+      { '../../procedural/pecas/quadro.js': async () => ({}) },
+      { '../../tools/fixtures/acervo/prova/receita.js': async () => ({}) },
+      { '../../procedural/pecas/objeto/montagem.json': async () => ({}) },
+    );
+    expect(Object.fromEntries(lista.map((e) => [e.id, e.situacao]))).toEqual({ objeto: 'trabalho', prova: 'ensaio', quadro: 'trabalho' });
+  });
+
+  it('o carregamento da categoria não baixa a receita duas vezes', async () => {
+    const importar = vi.fn(async () => ({ default: { PLANO: { familia: 'veiculo' } } }));
+    const [entrada] = listarParaBancada({ '../../procedural/pecas/carro/receita.js': importar }, {}, {});
+    await Promise.all([entrada.classificar(), entrada.classificar()]);
+    expect(importar).toHaveBeenCalledTimes(1);
+  });
+
+  it('categoriaDoPlano aceita plano ausente', () => {
+    expect(categoriaDoPlano(undefined)).toBe('outros');
+    expect(categoriaDoPlano({ familia: 'inexistente' })).toBe('outros');
+  });
+
+  /* O ACERVO REAL. Duas coisas que um objeto novo pode quebrar sem que ninguém olhe a janela: declarar uma família que a
+     tabela não conhece (cairia em outros sem aviso) e fazer o outros passar de um terço do acervo de trabalho, o ponto em
+     que o plano manda parar e voltar à pessoa em vez de inventar categoria. */
+  it('toda receita do acervo cai numa categoria, e a família declarada tem categoria na tabela', async () => {
+    const lista = listarParaBancada().filter((e) => !e.parteDe);
+    await classificarEntradas(lista);
+    const ids = new Set(CATEGORIAS.map((c) => c.id));
+    expect(lista.every((e) => ids.has(e.categoria))).toBe(true);
+    for (const entrada of lista.filter((e) => !e.emDados)) {
+      const plano = (await entrada.carregar()).PLANO;
+      for (const familia of [plano?.familia, plano?.familiaProcedural].filter(Boolean)) {
+        expect(Object.keys(CATEGORIA_DA_FAMILIA), `${entrada.id} declara a família ${familia}, que a tabela não conhece`).toContain(familia);
+      }
+      if (entrada.categoria === 'outros') expect(plano?.familia ?? plano?.familiaProcedural).toBeUndefined();
+    }
+  }, 120_000);
+
+  it('o outros não passa de um terço do acervo de trabalho', async () => {
+    const trabalho = listarParaBancada().filter((e) => !e.parteDe && e.situacao === 'trabalho');
+    await classificarEntradas(trabalho);
+    const outros = trabalho.filter((e) => e.categoria === 'outros');
+    expect(outros.length / trabalho.length, `outros: ${outros.map((e) => e.id).join(', ')}`).toBeLessThanOrEqual(1 / 3);
+    expect(trabalho.filter((e) => e.categoria === 'veiculos').length).toBeGreaterThan(0);
+    expect(trabalho.filter((e) => e.categoria === 'moveis').length).toBeGreaterThan(0);
+  }, 120_000);
 });
