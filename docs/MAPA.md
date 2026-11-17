@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2058 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2062 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2810,6 +2810,14 @@
 
 - `receita.js` — correcao-de-superficie/emenda-inflexao-declarada/receita.js — a chapa de prova 'emenda-inflexao-declarada' de `../chapas.mjs`, onde estão a forma e a continu…
 
+## tools/fixtures/correcao-de-superficie/emenda-inflexao-lisa/
+
+- `receita.js` — correcao-de-superficie/emenda-inflexao-lisa/receita.js — a chapa de prova 'emenda-inflexao-lisa' de `../chapas.mjs`, onde estão a forma e a continuidade decl…
+
+## tools/fixtures/correcao-de-superficie/emenda-inflexao-lisa-declarada/
+
+- `receita.js` — correcao-de-superficie/emenda-inflexao-lisa-declarada/receita.js — a chapa de prova 'emenda-inflexao-lisa-declarada' de `../chapas.mjs`, onde estão a forma e…
+
 ## tools/fixtures/correcao-de-superficie/rede-alisada/
 
 - `receita.js` — correcao-de-superficie/rede-alisada/receita.js — a chapa de prova 'rede-alisada' de `../chapas.mjs`: a rede com ruído com as curvas alisadas pela opção `alis…
@@ -2818,6 +2826,10 @@
 
 - `receita.js` — correcao-de-superficie/rede-com-ruido/receita.js — a chapa de prova 'rede-com-ruido' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
 
+## tools/fixtures/correcao-de-superficie/rede-em-fila/
+
+- `receita.js` — correcao-de-superficie/rede-em-fila/receita.js — a chapa de prova 'rede-em-fila' de `../chapas.mjs`, onde estão a forma e a continuidade declarada.
+
 ## tools/fixtures/correcao-de-superficie/rede-ponta-com-ponta/
 
 - `receita.js` — correcao-de-superficie/rede-ponta-com-ponta/receita.js — a chapa de prova 'rede-ponta-com-ponta' de `../chapas.mjs`, onde estão a forma e a continuidade decl…
@@ -2825,6 +2837,10 @@
 ## tools/fixtures/correcao-de-superficie/rede-sem-ruido/
 
 - `receita.js` — correcao-de-superficie/rede-sem-ruido/receita.js — a chapa de prova 'rede-sem-ruido' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
+
+## tools/fixtures/correcao-de-superficie/rede-tres-no-no/
+
+- `receita.js` — correcao-de-superficie/rede-tres-no-no/receita.js — a chapa de prova 'rede-tres-no-no' de `../chapas.mjs`, onde estão a forma e a continuidade declarada.
 
 ## tools/fixtures/costuras-e-furos/
 

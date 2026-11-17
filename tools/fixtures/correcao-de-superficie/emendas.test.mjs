@@ -9,12 +9,14 @@
  *
  * As chapas que a revisão da fatia 4 pediu: a `emenda-dupla` (dupla curvatura, a mesma dos dois lados), a `emenda-inflexao` (a seção em S,
  * de tangente comum e curvatura que troca de sinal) e a `rede-ponta-com-ponta` (as duas metades de uma curva emendada que se encontram
- * ponta com ponta no nó de outra curva emendada), com a G1 declarada; a G2 na dupla curvatura é o limite medido da G2 experimental. */
+ * ponta com ponta no nó de outra curva emendada), com a G1 declarada; a G2 na dupla curvatura é o limite medido da G2 experimental. As da
+ * segunda revisão: a `rede-em-fila` (o deslocamento de cada declaração separado do da vizinha), a `emenda-inflexao-lisa-declarada` (a
+ * curvatura que passa por zero na emenda não é salto de sinal) e a `rede-tres-no-no` (o empate no nó não junta e não depende da ordem). */
 import { describe, expect, it } from 'vitest';
 import { executarReceita } from '../../../src/autoria/executar-receita.js';
 import { continuidadeNasEmendas } from '../../modelar/continuidade-nas-emendas.mjs';
 import { gaiolaPorRede } from '../../../procedural/nucleo/gaiola-por-rede.js';
-import { definicaoDaEmenda, definicaoPontaComPonta, receitaDeProva } from './chapas.mjs';
+import { DECLARACOES_EM_FILA, definicaoDaEmenda, definicaoEmFila, definicaoPontaComPonta, definicaoTresNoNo, receitaDeProva } from './chapas.mjs';
 
 const LIMITE_G1_GRAUS = 0.5;
 const LIMITE_G2_RAZAO = 1.2;
@@ -28,6 +30,13 @@ function amostras(nome) {
   const fora = json.emendas[0].amostras.filter((a) => extra.every((e) => Math.hypot(a[1] - e[0], a[2] - e[1], a[3] - e[2]) > 30));
   const mediana = (k) => fora.map((a) => a[k]).sort((p, q) => p - q)[fora.length >> 1];
   return { receita, fora, angulo: Math.max(...fora.map((a) => a[6])), razao: Math.max(...fora.map((a) => a[9])), kA: mediana(7), kB: mediana(8) };
+}
+
+/* a maior distância (mm) entre os pontos de mesmo nome de duas gaiolas */
+function maiorDiferenca(a, b) {
+  let m = 0;
+  for (const [k, p] of Object.entries(a.pontos)) { const q = b.pontos[k]; if (q) m = Math.max(m, Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]) * 1000); }
+  return m;
 }
 
 /* o ângulo (graus) entre as direções com que as curvas `a` (que termina no nó) e `b` (que começa nele) passam pelo nó */
@@ -80,7 +89,7 @@ describe('a emenda com continuidade declarada, medida por emendas', () => {
     const g2 = gaiolaPorRede(definicaoDaEmenda('emenda-dupla', { continuidade: 'G2' }));
     expect(g2.emendas.emenda.experimental).toBe(true);
     expect(g2.emendas.emenda.deslocamentoMaximoMm).toBeGreaterThan(20);
-    expect(g2.avisos.filter((a) => a.ref.startsWith('emenda')).map((a) => a.ref)).toEqual(['emendaG2Experimental', 'emendaMoveu']);
+    expect(g2.avisos.filter((a) => a.ref.startsWith('emenda')).map((a) => a.ref)).toEqual(['emendaG2Experimental', 'emendaMoveu', 'emendaAcimaDoLimite']);
   });
 
   it('seção com inflexão: a G1 declarada fica abaixo de 0,5 grau com a curvatura de sinais opostos, e a razão da gaiola sai negativa', () => {
@@ -114,4 +123,64 @@ describe('a emenda com continuidade declarada, medida por emendas', () => {
       expect(Math.max(...medidas.map((a) => a[6]))).toBeLessThan(LIMITE_G1_GRAUS);
     }
   });
+
+  it('o deslocamento de cada curva é o da declaração dela: na fila com G2 em v1 e G1 em v2, o aviso de v2 é o que a G1 dela move', () => {
+    const g = receitaDeProva('rede-em-fila').REDE;
+    expect(g.emendas.v1.deslocamentoDe).toBe('curva');
+    /* a referência de v2 é a rede com a G2 de v1 só: a diferença entre as duas gaiolas é o deslocamento de v2 */
+    const semV2 = gaiolaPorRede(definicaoEmFila({ declaracoes: { v1: DECLARACOES_EM_FILA.v1 } }));
+    expect(g.emendas.v2.deslocamentoMaximoMm).toBeCloseTo(maiorDiferenca(semV2, g), 2);
+    const semV1 = gaiolaPorRede(definicaoEmFila({ declaracoes: { v2: DECLARACOES_EM_FILA.v2 } }));
+    expect(g.emendas.v1.deslocamentoMaximoMm).toBeCloseTo(maiorDiferenca(semV1, g), 2);
+    /* antes as duas saíam com os 15,6 mm do conjunto; a G1 de v2 move bem menos que a G2 de v1 */
+    expect(g.emendas.v2.deslocamentoMaximoMm).toBeLessThan(g.emendas.v1.deslocamentoMaximoMm / 2);
+    /* a medida olha a gaiola inteira: a G2 de v1 sozinha move também o retalho r2, que não é lado dela */
+    const soV1 = gaiolaPorRede(definicaoEmFila({ declaracoes: { v1: 'G2' } }));
+    const r2 = Math.max(...Object.keys(soV1.pontos).filter((k) => k.startsWith('r2.')).map((k) => Math.hypot(...soV1.pontos[k].map((x, i) => x - gaiolaPorRede(definicaoEmFila()).pontos[k][i])) * 1000));
+    expect(r2).toBeGreaterThan(5);
+    expect(soV1.emendas.v1.deslocamentoMaximoMm).toBeGreaterThanOrEqual(r2);
+    /* com mais de quatro curvas emendadas o deslocamento é do conjunto, num aviso só, com as curvas em volta do ponto */
+    const cinco = gaiolaPorRede({ ...definicaoEmFila({ declaracoes: { v1: 'G1', v2: 'G1', v3: 'G1', v4: 'G1', v5: 'G1' }, retalhos: 6 }), limitesDaEmenda: { tolerancia: 0.1 } });
+    expect(Object.values(cinco.emendas).every((e) => e.deslocamentoDe === 'conjunto')).toBe(true);
+    const moveu = cinco.avisos.filter((a) => a.ref === 'emendaMoveu');
+    expect(moveu).toHaveLength(1);
+    expect(moveu[0]).toMatchObject({ conjunto: true, curvas: ['v1'] });
+    expect(moveu[0].texto).toMatch(/do conjunto/);
+  });
+
+  it('inflexão lisa: a curvatura que passa por zero na emenda não é salto de sinal, e o S de dois arcos continua sendo', () => {
+    const g = receitaDeProva('emenda-inflexao-lisa-declarada').REDE;
+    expect(g.emendas.emenda.razaoMaxima).toBeGreaterThan(0);
+    expect(g.avisos.filter((a) => a.ref === 'emendaAcimaDoLimite')).toEqual([]);
+    expect(gaiolaPorRede(definicaoDaEmenda('emenda-inflexao', { continuidade: 'G2' })).emendas.emenda.razaoMaxima).toBeLessThan(0);
+    const { angulo, kA, kB } = amostras('emenda-inflexao-lisa-declarada');
+    expect(angulo).toBeLessThan(LIMITE_G1_GRAUS);
+    expect(Math.max(Math.abs(kA), Math.abs(kB))).toBeLessThan(0.5);
+  });
+
+  it('o empate no nó de três curvas não junta nenhuma, avisa, e a gaiola não depende da ordem das curvas', () => {
+    const g = receitaDeProva('rede-tres-no-no').REDE;
+    expect(g.emendas.V.juncoes.map((j) => j.no)).toEqual(['B', 'G']);
+    expect(g.avisos.find((a) => a.ref === 'emendaEmpate').curvas.sort()).toEqual(['H1', 'X2', 'X3']);
+    expect(maiorDiferenca(g, gaiolaPorRede(definicaoTresNoNo({ ordem: 2 })))).toBe(0);
+    /* sem empate, a mais reta se junta e a outra fica sem par */
+    const reta = gaiolaPorRede(definicaoTresNoNo({ dz: [10, 40] }));
+    expect(reta.emendas.V.juncoes[1]).toEqual({ no: 'M', curvas: ['H1', 'X2'] });
+    expect(reta.avisos.find((a) => a.ref === 'emendaSemPar').curvas).toEqual(['X3']);
+  });
+
+  it('a continuação não emendada da emenda não é curva sem par, e a quebra entre duas peças emendadas avisa', () => {
+    const continua = gaiolaPorRede(definicaoPontaComPonta({ continuidade: 'G1', declaradas: ['V1'], partirV: true }));
+    expect(continua.emendas.V1.juncoes.map((j) => j.no)).toEqual(['B', 'M']);
+    expect(continua.avisos.filter((a) => a.ref.startsWith('emenda'))).toEqual([]);
+    const pecas = gaiolaPorRede(definicaoPontaComPonta({ continuidade: 'G1', declaradas: ['V1', 'V2'], partirV: true }));
+    const quebra = pecas.avisos.find((a) => a.ref === 'emendaQuebrada');
+    expect(quebra).toMatchObject({ no: 'M', curvas: ['V1', 'V2'] });
+    expect(quebra.quebraGraus).toBeGreaterThan(0.5);
+    /* com a horizontal também emendada, as duas peças atravessam H1 e H2 e se juntam */
+    const tudo = gaiolaPorRede(definicaoPontaComPonta({ continuidade: 'G1', declaradas: ['V1', 'V2', 'H1', 'H2'], partirV: true }));
+    expect(tudo.emendas.H1.juncoes.map((j) => j.curvas.join('|'))).toContain('V1|V2');
+    expect(tudo.avisos.filter((a) => a.ref === 'emendaQuebrada')).toEqual([]);
+  });
 });
+

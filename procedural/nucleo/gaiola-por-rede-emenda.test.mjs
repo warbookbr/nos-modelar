@@ -125,6 +125,11 @@ describe('a emenda declarada da gaiola por rede', () => {
     expect(acima.texto).toMatch(/troca de sinal/);
   });
 
+  it('a razão é 1 quando as duas curvaturas ficam abaixo do piso, e não menos', () => {
+    const g = gaiolaPorRede(rede({ raios: [1e5, 1e5], continuidade: 'G1' }));
+    expect(g.emendas.emenda.razaoMaxima).toBe(1);
+  });
+
   it('sem ponto medido o ângulo e a razão saem null, com aviso, e não 0 grau e razão 1', () => {
     /* o lado direito com uma divisão só na largura: nenhuma fileira de miolo que o alisamento mova */
     const d = rede({ continuidade: 'G1' });
