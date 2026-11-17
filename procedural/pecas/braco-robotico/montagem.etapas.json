@@ -5,13 +5,28 @@
   "etapas": [
     {
       "instancia": "base",
-      "estado": "fixa",
+      "estado": "aberta",
       "juntas": [],
-      "forma": "sha256:7a7da776c41ee4aebb51685f9f67fa86e1ec0bf69fc9a93968d7dab83f82e4ac",
-      "motivo": "a receita mudou depois do aceite",
-      "aceite": {
-        "por": "Tiago, 2026-11-16: base aprovada por imagem com a quina de baixo viva",
-        "analise": "ausente"
+      "forma": "sha256:1f2a32ca0be18d3315d04834ee379fa05f45b9e1c6f6ead2fa6e8b556b26f460",
+      "portas": {
+        "assento": {
+          "forma": "anel",
+          "papel": "recebe",
+          "eixo": [
+            0,
+            1,
+            0
+          ],
+          "centro": [
+            0,
+            0.22,
+            0
+          ],
+          "raioInterno": 0,
+          "raioExterno": 0.105,
+          "inicio": -0.005,
+          "fim": 0
+        }
       },
       "reaberturas": [
         {
@@ -22,6 +37,20 @@
             "observacao": "aceitou a rodada 4: corpo 210 mm, pé avançando sob a caixa, topo com chanfro pequeno"
           },
           "forma": "sha256:acfa753e83ef96c273d1c29ef9690b54f595725db66875bacf5ad1905656866e"
+        },
+        {
+          "por": "leitura do registro",
+          "motivo": "a receita mudou depois do aceite",
+          "aceite": {
+            "por": "Tiago, 2026-11-16: base aprovada por imagem com a quina de baixo viva",
+            "analise": "ausente"
+          },
+          "forma": "sha256:7a7da776c41ee4aebb51685f9f67fa86e1ec0bf69fc9a93968d7dab83f82e4ac"
+        },
+        {
+          "por": "Tiago",
+          "quando": "2026-11-17",
+          "motivo": "placa de controle e tampa transparente na caixa lateral, plano da família de componentes"
         }
       ]
     },
