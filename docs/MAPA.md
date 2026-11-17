@@ -6,6 +6,7 @@
 > algum arquivo-fonte estiver sem cabeçalho.
 
 2096 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2099 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -58,6 +59,7 @@
 ## .claude/skills/criar-peca/references/
 
 - `comparar-com-a-referencia.md` — Comparar com a referência por comando
+- `eletronica.md` — Placa de circuito e componentes eletrônicos
 - `operacoes-procedurais.md` — Referência de operações procedurais
 - `por-que.md` — Por que cada regra da skill `criar-peca` existe
 - `referencia-e-rodadas.md` — Referência por medida e rodadas fora do laço
@@ -246,6 +248,10 @@
 - `README.md` — Comparar com a referência: a linha de base dos comandos repetidos e onde a prancha é montada
 - `contar-comandos.mjs` — contar-comandos.mjs — a linha de base do plano de comparar com a referência (fatia 1): os comandos de shell dos registros de uma sessão do Claude Code, conta…
 - `medir-montagem.mjs` — medir-montagem.mjs — onde a prancha modelo e foto é montada (fatia 1 do plano de comparar com a referência): no Chromium, que decodifica jpg, webp e png, ou …
+
+## docs/modelar/banco-de-provas/componentes-eletronicos-2026-11-16/
+
+- `README.md` — Componentes eletrônicos (2026-11-16): provas do gate de saída e limitações conhecidas
 
 ## docs/modelar/banco-de-provas/correcao-de-superficie-2026-11-16/
 
@@ -605,7 +611,6 @@
 - `2026-11-16-cache-por-passo.md` — Cache por passo da receita: refazer só o que mudou, entre comandos, medido no laço de modelagem
 - `2026-11-16-comparar-com-a-referencia.md` — Comparar com a referência sem script: a prancha modelo e foto, a conferência da receita, a saída da bancada e o pacote do crítico
 - `2026-11-16-eletronica-no-modelar.md` — O lado Modelar da mecatrônica: plano-raiz que gera a família de componentes e a ponte
-- `2026-11-16-familia-componentes-eletronicos.md` — Família de componentes eletrônicos: as peças por encapsulamento e a placa declarada, provadas no braço robótico
 - `2026-11-16-ferramentas-de-correcao-de-superficie.md` — Ferramentas de correção de superfície: alisar as curvas pela medida, cortar com simetria e emendar com continuidade declarada, rumo ao G2 de produção
 - `2026-11-16-ponte-com-a-mecatronica.md` — Ponte com a mecatrônica: a ficha do objeto exportada, as portas elétricas declaradas e o pedido que volta conferido
 - `2026-11-17-abrir-peca-com-filtros.md` — Abrir peça com filtros: a janela de abrir da bancada busca por nome e separa por categoria e situação
@@ -938,8 +943,13 @@
 - `geometria.js` — geometria.js — as constantes de construção da família `componente-eletronico` e as contas puras em milímetro.
 - `index.js` — index.js — a família `componente-eletronico` carregada: o contrato `familia.json`, as composições e o `derivar`, e a escolha de material por peça.
 - `outros-encapsulamentos.js` — outros-encapsulamentos.js — os passos dos encapsulamentos da fatia 2 da família `componente-eletronico`: o capacitor cerâmico de disco, o LED de 3 e 5 mm, o …
+- `placa-de-prova.js` — placa-de-prova.js — a placa de prova da fatia 3 do plano `docs/modelar/planos/2026-11-16-familia-componentes-eletronicos.md`: uma placa declarada de 100 por …
+- `placa-de-prova.test.js` — placa-de-prova.test.js — a placa de prova da fatia 3 do plano da família `componente-eletronico`, pela malha gerada: sem passo sem efeito, com cada component…
+- `placa.js` — placa.js — a placa declarada: o contorno, a espessura, os furos de fixação e a lista de componentes da família `componente-eletronico`, cada um com posição, …
+- `placa.test.js` — placa.test.js — a placa declarada da família `componente-eletronico` (fatia 3 do plano da família), sem a placa de prova, que tem arquivo próprio (`placa-de-…
 - `prancha-2.js` — prancha-2.js — a peça de prova da fatia 2 da família `componente-eletronico`: os encapsulamentos restantes e o dissipador lado a lado numa placa, para a pran…
 - `prancha.js` — prancha.js — a peça de prova da família `componente-eletronico`: os cinco encapsulamentos da fatia 1 lado a lado numa placa, para a prancha que a pessoa apro…
+- `terminais.js` — terminais.js — onde cada terminal de um encapsulamento encontra a placa, no referencial do componente, em milímetro.
 
 ## procedural/familias/dobradica/
 
@@ -1415,7 +1425,7 @@
 
 ## procedural/pecas/braco-robotico/partes/base/
 
-- `receita.js` — braco-robotico/base — a base do braço robótico, com a caixa lateral.
+- `receita.js` — braco-robotico/base — a base do braço robótico, com a caixa lateral e a placa de controle dentro dela.
 
 ## procedural/pecas/braco-robotico/partes/base/rodadas/
 
@@ -3468,6 +3478,7 @@
 - `etapas-da-montagem.mjs` — etapas-da-montagem.mjs — o registro de etapas de uma montagem v5, em disco, e a única porta para fixar uma etapa.
 - `etapas-da-montagem.test.mjs` — etapas-da-montagem.test.mjs — a porta que fixa etapa. Fixar exige a etapa ser a próxima, o crítico ter fechado a peça dela, a nota de passagem, as juntas pas…
 - `etapas-de-construcao.test.mjs` — etapas-de-construcao.test.mjs — fatia 3 do plano "a peça nasce encaixada": o registro de etapas, a junta medida quando a parte entra e a recusa de seguir com…
+- `etapas-reabrir-braco.test.mjs` — etapas-reabrir-braco.test.mjs — reabrir a base do braço robótico, com a receita de agora (a caixa lateral com a placa de controle e a tampa, plano da família…
 - `executar-receita.test.ts` — executar-receita.test.ts — prova a fronteira pura sem carregar catálogo.
 - `exemplo-canonico.test.mjs` — exemplo-canonico.test.mjs — o exemplo de receita que a documentação ensina precisa passar pelo mesmo caminho que o acervo.
 - `exportar-gltf-braco.test.mjs` — exportar-gltf-braco.test.mjs — LENTO (está em `TESTES_LENTOS`: resolve o braço inteiro, uns 15 s). Plano as partes do braço, fatia 2, gate 4: o braço montado…

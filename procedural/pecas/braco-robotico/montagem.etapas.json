@@ -7,10 +7,29 @@
       "instancia": "base",
       "estado": "fixa",
       "juntas": [],
-      "forma": "sha256:7a7da776c41ee4aebb51685f9f67fa86e1ec0bf69fc9a93968d7dab83f82e4ac",
-      "motivo": "a receita mudou depois do aceite",
+      "forma": "sha256:21081dc5b156f75d462187e0085f661d70f9189aa229d05256afd980de58681e",
+      "portas": {
+        "assento": {
+          "forma": "anel",
+          "papel": "recebe",
+          "eixo": [
+            0,
+            1,
+            0
+          ],
+          "centro": [
+            0,
+            0.22,
+            0
+          ],
+          "raioInterno": 0,
+          "raioExterno": 0.105,
+          "inicio": -0.005,
+          "fim": 0
+        }
+      },
       "aceite": {
-        "por": "Tiago, 2026-11-16: base aprovada por imagem com a quina de baixo viva",
+        "por": "a pessoa, 2026-11-17: 'Esta boa sim, aprovada!' (base com a placa de controle e a tampa fumê com parafusos de aço escuro, pela imagem antes e depois)",
         "analise": "ausente"
       },
       "reaberturas": [
@@ -22,6 +41,40 @@
             "observacao": "aceitou a rodada 4: corpo 210 mm, pé avançando sob a caixa, topo com chanfro pequeno"
           },
           "forma": "sha256:acfa753e83ef96c273d1c29ef9690b54f595725db66875bacf5ad1905656866e"
+        },
+        {
+          "por": "leitura do registro",
+          "motivo": "a receita mudou depois do aceite",
+          "aceite": {
+            "por": "Tiago, 2026-11-16: base aprovada por imagem com a quina de baixo viva",
+            "analise": "ausente"
+          },
+          "forma": "sha256:7a7da776c41ee4aebb51685f9f67fa86e1ec0bf69fc9a93968d7dab83f82e4ac"
+        },
+        {
+          "por": "Tiago",
+          "quando": "2026-11-17",
+          "motivo": "placa de controle e tampa transparente na caixa lateral, plano da família de componentes",
+          "portas": {
+            "assento": {
+              "forma": "anel",
+              "papel": "recebe",
+              "eixo": [
+                0,
+                1,
+                0
+              ],
+              "centro": [
+                0,
+                0.22,
+                0
+              ],
+              "raioInterno": 0,
+              "raioExterno": 0.105,
+              "inicio": -0.005,
+              "fim": 0
+            }
+          }
         }
       ]
     },

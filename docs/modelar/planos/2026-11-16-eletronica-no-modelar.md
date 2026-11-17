@@ -61,7 +61,7 @@ Os dois planos se provam no braço robótico, escolhido pela pessoa em 2026-11-1
 
 ### 1. Família de componentes eletrônicos
 
-Escrito em 2026-11-16: [família de componentes eletrônicos](2026-11-16-familia-componentes-eletronicos.md). Uma família procedural de peças eletrônicas por encapsulamento, com as medidas típicas declaradas como estimativa, e a placa como peça declarada na receita, com cada peça na própria parte para a ficha poder citá-la; vem do Eletrifica a tabela `BODIES` e `MODULES` de `modulos/pcb/render_3d.py`.
+Escrito em 2026-11-16: [família de componentes eletrônicos](../decisoes/PLANOS-ENCERRADOS.md). Uma família procedural de peças eletrônicas por encapsulamento, com as medidas típicas declaradas como estimativa, e a placa como peça declarada na receita, com cada peça na própria parte para a ficha poder citá-la; vem do Eletrifica a tabela `BODIES` e `MODULES` de `modulos/pcb/render_3d.py`.
 
 ### 2. Ponte com a mecatrônica
 

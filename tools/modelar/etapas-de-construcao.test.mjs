@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { lerMontagemPersistida } from '../../src/autoria/ler-montagem-persistida.js';
 import { resolverMontagemPersistida } from '../../src/autoria/resolver-montagem-persistida.js';
 import {
-  ErroEtapaDeConstrucao, atualizarRegistro, fixarEtapa, juntasPorEtapa, proximaEtapa,
+  ErroEtapaDeConstrucao, atualizarRegistro, fixarEtapa, juntasPorEtapa, proximaEtapa, reabrirEtapa,
 } from '../../src/autoria/etapas-de-construcao.js';
 import { carregadoresDeReceitas } from './peca-com-parametros.mjs';
 import { RECEITAS } from '../fixtures/tres-blocos-vinculados/receitas/bloco.js';
@@ -15,7 +15,8 @@ const montagem = () => JSON.parse(readFileSync(new URL('../fixtures/tres-blocos-
 
 async function medir(dado = montagem()) {
   const resolvida = await resolverMontagemPersistida(dado, carregadoresDeReceitas(RECEITAS));
-  return juntasPorEtapa(resolvida, lerMontagemPersistida(dado).etapas);
+  /* a etapa só se fixa com geometria: a forma de cada uma vem da leitura, aqui um rótulo estável */
+  return juntasPorEtapa(resolvida, lerMontagemPersistida(dado).etapas).map((m) => ({ ...m, forma: `forma-${m.instancia}` }));
 }
 
 function recusa(fn, codigo) {
@@ -66,9 +67,14 @@ describe('registro de etapas', () => {
     registro = atualizarRegistro('tres-blocos', await medir(dado), registro);
     expect(registro.etapas.map((e) => e.estado)).toEqual(['fixa', 'fixa', 'quebrada']);
     expect(proximaEtapa(registro).instancia).toBe('topo');
+    /* desfeita a mudança, a quebrada segue quebrada: só a reabertura, com quem reabriu, a tira desse estado */
     const consertado = atualizarRegistro('tres-blocos', await medir(), registro);
-    expect(consertado.etapas[2]).toMatchObject({ estado: 'aberta' });
+    expect(consertado.etapas[2]).toMatchObject({ estado: 'quebrada' });
     expect(consertado.etapas[2]).not.toHaveProperty('aceite');
+    recusa(() => fixarEtapa(consertado, 'topo', aceite), 'etapa-quebrada');
+    const reaberto = reabrirEtapa(consertado, 'topo', { por: 'pessoa', quando: '2026-11-17', motivo: 'o acréscimo voltou' }, { citacoes: [], portasAgora: {} });
+    expect(reaberto.etapas[2]).toMatchObject({ estado: 'aberta' });
+    expect(fixarEtapa(reaberto, 'topo', aceite).etapas[2].estado).toBe('fixa');
   });
 
   it('recusa montagem sem etapas', () => {
@@ -92,11 +98,11 @@ describe('forma que muda depois do aceite', () => {
     expect(quebrada.etapas[0]).not.toHaveProperty('aceite');
     const guardado = { motivo: 'a receita mudou depois do aceite', forma: 'forma-a', aceite: { por: 'pessoa', observacao: 'ok' } };
     expect(quebrada.etapas[0].reaberturas).toEqual([expect.objectContaining(guardado)]);
-    /* Na leitura seguinte ela reabre, e o aceite continua no histórico. */
-    const aberta = atualizarRegistro('m', medidas('forma-b', 'texto-2'), quebrada);
-    expect(aberta.etapas[0]).toMatchObject({ estado: 'aberta', forma: 'forma-b' });
-    expect(aberta.etapas[0].reaberturas).toEqual([expect.objectContaining(guardado)]);
-    const outra = atualizarRegistro('m', medidas('forma-b', 'texto-2'), aberta);
+    /* Nas leituras seguintes ela segue quebrada, sem voltar a aberta sozinha, e o aceite continua no histórico, uma vez só. */
+    const relida = atualizarRegistro('m', medidas('forma-b', 'texto-2'), quebrada);
+    expect(relida.etapas[0]).toMatchObject({ estado: 'quebrada', forma: 'forma-b', motivo: 'a receita mudou depois do aceite' });
+    expect(relida.etapas[0].reaberturas).toEqual([expect.objectContaining(guardado)]);
+    const outra = atualizarRegistro('m', medidas('forma-b', 'texto-2'), relida);
     expect(outra.etapas[0].reaberturas).toHaveLength(1);
   });
 

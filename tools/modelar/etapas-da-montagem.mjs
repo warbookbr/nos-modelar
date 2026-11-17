@@ -17,6 +17,10 @@
  *   node tools/modelar/etapas-da-montagem.mjs <montagem.json> --reabrir <instância> --por "<quem, data: motivo>"
  *   node tools/modelar/etapas-da-montagem.mjs <montagem.json> --olhar [--vistas frontal,direita,isometrica] [--foco <instância>]
  *
+ * `--reabrir` reabre a etapa fixa ou a quebrada (a que a receita mudou depois
+ * do aceite) e deixa fixas as posteriores que provam não ter mudado: a forma e
+ * as portas desta que elas citam são as do aceite; a que mudou é dita na recusa.
+ *
  * `--olhar` desenha juntas, em vista ortográfica, as etapas que já têm
  * geometria. A parte de cada etapa era mostrada sozinha, e a pessoa não
  * conseguia julgar o anel da cintura sem vê-lo sobre a base. `--foco` enquadra
@@ -34,7 +38,7 @@ import { medirApoioNoChao, submontagensComDeclaracao } from '../../src/autoria/a
 import { lerMontagemPersistida } from '../../src/autoria/ler-montagem-persistida.js';
 import { resolverMontagemPersistida } from '../../src/autoria/resolver-montagem-persistida.js';
 import {
-  ErroEtapaDeConstrucao, atualizarRegistro, fixarEtapa, juntasPorEtapa, lerAutorDaReabertura, proximaEtapa, reabrirEtapa,
+  ErroEtapaDeConstrucao, atualizarRegistro, conferirPosteriores, fixarEtapa, juntasPorEtapa, lerAutorDaReabertura, proximaEtapa, reabrirEtapa,
 } from '../../src/autoria/etapas-de-construcao.js';
 import { proximaAcao } from '../../src/autoria/laco-de-modelagem.js';
 import { estadoDaAnalise } from './analise-da-peca.mjs';
@@ -106,6 +110,43 @@ function impressoesDasReceitas(montagem, impressoes, emMemoria) {
   ]));
 }
 
+/* AS PORTAS CITADAS. Cada porta de uma etapa que uma etapa posterior cita, por relação (a ponta da etapa, quando a outra é
+   posterior), por vínculo (de onde a medida vem) ou por posição (em que porta a posterior se encaixa): [{ etapa, porta,
+   posterior, por, relacao? }]. A porta de dentro de uma submontagem (caminho de mais de um nível) entra com `profunda: true` e o
+   caminho no nome, porque a reabertura não a confere e não pode tratá-la como provada. */
+export function citacoesDasPortas(montagem) {
+  const ordem = new Map(montagem.etapas.map((id, k) => [id, k]));
+  const depois = (a, b) => ordem.has(a) && ordem.has(b) && ordem.get(b) > ordem.get(a);
+  const citacoes = [];
+  for (const relacao of montagem.relacoes ?? []) {
+    for (const [ponta, outra] of [[relacao.referencia, relacao.movel], [relacao.movel, relacao.referencia]]) {
+      if (depois(ponta.caminho[0], outra.caminho[0])) {
+        const profunda = ponta.caminho.length > 1;
+        citacoes.push({
+          etapa: ponta.caminho[0], porta: profunda ? `${ponta.caminho.slice(1).join('/')}:${ponta.porta}` : ponta.porta,
+          posterior: outra.caminho[0], por: `relação ${relacao.id}`, relacao: relacao.id, ...(profunda ? { profunda } : {}),
+        });
+      }
+    }
+  }
+  for (const vinculo of montagem.vinculos ?? []) {
+    if (depois(vinculo.de.instancia, vinculo.alvo.instancia)) citacoes.push({ etapa: vinculo.de.instancia, porta: vinculo.de.porta, posterior: vinculo.alvo.instancia, por: `vínculo ${vinculo.id}` });
+  }
+  for (const posicao of montagem.posicoes ?? []) {
+    if (depois(posicao.em.instancia, posicao.instancia)) citacoes.push({ etapa: posicao.em.instancia, porta: posicao.em.porta, posterior: posicao.instancia, por: `posição ${posicao.id}` });
+  }
+  return citacoes;
+}
+
+/* A interface de cada porta citada de uma instância, como a receita a publica agora, com 12 algarismos. */
+function portasCitadasAgora(neutro, nomes) {
+  const limpo = (v) => (Array.isArray(v) ? v.map(limpo) : typeof v === 'number' ? Number(v.toPrecision(12)) : v);
+  return Object.fromEntries([...new Set(nomes)].sort().flatMap((nome) => {
+    const porta = neutro?.portas?.get?.(nome);
+    return porta?.interface ? [[nome, Object.fromEntries(Object.entries(porta.interface).map(([k, v]) => [k, limpo(v)]))]] : [];
+  }));
+}
+
 export async function estadoDasEtapas(arquivoMontagem, { receitas, anterior, impressoes } = {}) {
   const dado = JSON.parse(readFileSync(arquivoMontagem, 'utf8'));
   const montagem = lerMontagemPersistida(dado);
@@ -113,11 +154,14 @@ export async function estadoDasEtapas(arquivoMontagem, { receitas, anterior, imp
   const { dado: parcial, construidas } = montagemAteAGeometria(dado, montagem, todas);
   const resolvida = construidas.length ? await resolverMontagemPersistida(parcial, carregadoresDeReceitas(todas)) : null;
   const medidas = resolvida ? juntasPorEtapa(resolvida, construidas) : [];
+  const citacoes = citacoesDasPortas(montagem);
   /* A forma de cada peça é a assinatura da malha que a receita gerou, com os
      parâmetros que a montagem derivou; a de uma submontagem não se assina. */
   for (const medida of medidas) {
     const neutro = resolvida.instancias.find((item) => item.id === medida.instancia)?.definicao?.neutro;
     if (neutro) medida.forma = assinaturaDaForma(neutro);
+    const nomes = citacoes.filter((c) => c.etapa === medida.instancia && !c.profunda).map((c) => c.porta);
+    if (neutro && nomes.length) medida.portas = portasCitadasAgora(neutro, nomes);
   }
   const semGeometria = montagem.etapas.slice(construidas.length).map((instancia) => ({ instancia, juntas: [] }));
   const impressao = impressoesDasReceitas(montagem, impressoes, Boolean(receitas));
@@ -126,7 +170,8 @@ export async function estadoDasEtapas(arquivoMontagem, { receitas, anterior, imp
   }
   const registroAnterior = anterior !== undefined ? anterior
     : existsSync(arquivoDoRegistro(arquivoMontagem)) ? JSON.parse(readFileSync(arquivoDoRegistro(arquivoMontagem), 'utf8')) : null;
-  return { montagem, registro: atualizarRegistro(montagem.id, [...medidas, ...semGeometria], registroAnterior) };
+  const portas = Object.fromEntries(medidas.filter((m) => m.portas).map((m) => [m.instancia, m.portas]));
+  return { montagem, registro: atualizarRegistro(montagem.id, [...medidas, ...semGeometria], registroAnterior, { citacoes }), anterior: registroAnterior, citacoes, portas };
 }
 
 /* As condições que moram nas rodadas da peça da etapa. `rodadasDe(ref)` é
@@ -159,7 +204,7 @@ export function conferirRodadasDaEtapa(montagem, instancia, rodadasDe = (ref) =>
 }
 
 export async function fixar(arquivoMontagem, instancia, aceite, opcoes = {}) {
-  const { montagem, registro } = await estadoDasEtapas(arquivoMontagem, opcoes);
+  const { montagem, registro, citacoes, portas } = await estadoDasEtapas(arquivoMontagem, opcoes);
   const proxima = proximaEtapa(registro);
   /* A ordem é conferida antes das rodadas, para a mensagem apontar a etapa
      certa quando alguém tenta pular. */
@@ -171,15 +216,20 @@ export async function fixar(arquivoMontagem, instancia, aceite, opcoes = {}) {
      humano vale em qualquer ponto. 'feita' = manifesto com o hash da receita de agora. */
   const ref = montagem.instancias.find((item) => item.id === instancia)?.alvo.ref;
   const analise = ref ? estadoDaAnalise(ref, opcoes.analise ?? {}) : 'ausente';
-  return fixarEtapa(registro, instancia, { por: aceite?.por, observacao: aceite?.observacao, defeitosAceitos, analise });
+  return fixarEtapa(registro, instancia, { por: aceite?.por, observacao: aceite?.observacao, defeitosAceitos, analise }, { citacoes, portasAgora: portas });
 }
 
 /* Reabrir é decisão da pessoa, como o aceite humano: `por` traz
-   "<quem, data: motivo>" e nenhum agente reabre por conta própria. */
+   "<quem, data: motivo>" e nenhum agente reabre por conta própria. As etapas
+   posteriores ficam fixas quando provam que não mudaram (a forma e as portas
+   desta que elas citam); `provas` diz, de cada uma, o que provou. */
 export async function reabrir(arquivoMontagem, instancia, por, opcoes = {}) {
   const autor = lerAutorDaReabertura(por);
-  const { registro } = await estadoDasEtapas(arquivoMontagem, opcoes);
-  return reabrirEtapa(registro, instancia, autor);
+  const { registro, anterior, citacoes, portas } = await estadoDasEtapas(arquivoMontagem, opcoes);
+  const contexto = { citacoes, portasAgora: portas[instancia] ?? {}, anterior };
+  const reaberto = reabrirEtapa(registro, instancia, autor, contexto);
+  if (opcoes.comProvas) return { registro: reaberto, provas: conferirPosteriores(registro, instancia, contexto).provas };
+  return reaberto;
 }
 
 export const SAIDA_DAS_VISTAS = join(REPO, 'tools/bancadas/out');
@@ -334,7 +384,7 @@ export function descreverAuditoria(auditoria) {
    campos `aceite` e `reaberturas` trocavam de lugar e o git mostrava o registro mudado sem mudança, e uma etapa quebrada lida
    duas vezes virava `aberta`, com o aceite da pessoa guardado no histórico. Agora só `--fixar` e `--reabrir` gravam, a etapa sai
    com os campos na ordem de ORDEM_DA_ETAPA, e o arquivo não é tocado quando o texto seria o mesmo. */
-const ORDEM_DA_ETAPA = ['instancia', 'estado', 'juntas', 'forma', 'receita', 'motivo', 'aceite', 'reaberturas'];
+const ORDEM_DA_ETAPA = ['instancia', 'estado', 'juntas', 'forma', 'portas', 'receita', 'motivo', 'aceite', 'reaberturas'];
 const etapaOrdenada = (etapa) => Object.fromEntries([
   ...ORDEM_DA_ETAPA.filter((chave) => chave in etapa).map((chave) => [chave, etapa[chave]]),
   ...Object.keys(etapa).filter((chave) => !ORDEM_DA_ETAPA.includes(chave)).sort().map((chave) => [chave, etapa[chave]]),
@@ -368,10 +418,11 @@ export async function comoCLI(argv) {
   }
   const reaberta = valor('--reabrir');
   if (reaberta) {
-    const registro = await reabrir(caminho, reaberta, valor('--por'));
+    const { registro, provas } = await reabrir(caminho, reaberta, valor('--por'), { comProvas: true });
     gravarRegistro(caminho, registro);
     const proxima = proximaEtapa(registro);
-    return { codigo: 0, texto: `etapa '${reaberta}' reaberta.\n${descrever(registro)}\npróxima etapa: ${proxima ? `${proxima.instancia} (${proxima.estado})` : 'nenhuma; todas fixas.'}` };
+    const ficam = provas.length ? `\nposteriores que ficam fixas, e a prova de cada uma:\n${provas.map((p) => `  ${p}`).join('\n')}` : '';
+    return { codigo: 0, texto: `etapa '${reaberta}' reaberta.${ficam}\n${descrever(registro)}\npróxima etapa: ${proxima ? `${proxima.instancia} (${proxima.estado})` : 'nenhuma; todas fixas.'}` };
   }
   const instancia = valor('--fixar');
   const registro = instancia

@@ -17,6 +17,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { lerHistorico } from './vitest-duracoes.mjs';
 
 export const TESTES_LENTOS = [
+  /* 2026-11-17: reabrir a base do braço resolve a montagem inteira de doze etapas, com a placa de controle na base; uns 35 s */
+  'tools/modelar/etapas-reabrir-braco.test.mjs',
   /* 2026-11-17: o cache por prefixo no conjunto de cobertura (plano do cache por passo, fatia 3): o exemplo de cada operação e sete peças
      baratas, 24 s com a máquina dividida, 14 deles no exemplo de cada operação e na leitura das 121 receitas para conferir a cobertura; a
      varredura das 121 só roda com CACHE_ACERVO_INTEIRO=1 */

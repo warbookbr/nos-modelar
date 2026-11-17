@@ -6,7 +6,8 @@
    polaridade e o topo marcado, o TO-220 em pé com a aba furada, o DIP com o entalhe do pino 1, a barra de pinos de uma ou
    duas fileiras, o capacitor cerâmico de disco, o LED de 3 e 5 mm, o TO-92, o SOIC de montagem em superfície, o borne de
    parafuso de 2 e 3 vias, o jack de alimentação, o módulo de placa (a placa filha com pinos) e o dissipador em canal do
-   TO-220, no referencial do TO-220 (`outros-encapsulamentos.js`). As medidas são as típicas de cada encapsulamento, como estimativa (`geometria.js` e
+   TO-220, no referencial do TO-220 (`outros-encapsulamentos.js`). A placa declarada (`placa.js`) monta esses componentes numa placa de circuito pela
+   posição, pelo giro e pelo lado de cada um. As medidas são as típicas de cada encapsulamento, como estimativa (`geometria.js` e
    `familia.json` dizem a fonte de cada uma). Cada elemento sai com parte e material próprios. */
 import contratoJson from './familia.json' with { type: 'json' };
 import { definirFamilia } from '../../../src/autoria/chamar-familia.js';
@@ -15,6 +16,10 @@ import { ENCAPSULAMENTOS, MATERIAIS_PADRAO, criarComposicoes } from './composico
 import { derivar } from './derivar.js';
 
 export { ENCAPSULAMENTOS, MATERIAIS_PADRAO };
+/* a placa declarada (`placa.js`) e o que ela lê de cada encapsulamento (`terminais.js`): onde cada terminal encontra a placa e a
+   altura do assento */
+export { PLACA, eixoEAngulo, placaDeclarada } from './placa.js';
+export { alturaDoAssento, terminaisDoComponente } from './terminais.js';
 
 export const CONTRATO_DO_COMPONENTE_ELETRONICO = contratoJson;
 

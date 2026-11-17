@@ -53,4 +53,5 @@ Consulta por assunto, para quando nenhum roteiro de `roteiros/ROTEIROS.md` cobre
   `src/autoria/`; o procedimento está em `usar/AJUSTE-DA-BANCADA.md`.
 - Homologação: `HOMOLOGACAO-FLUXO-IA.md` e `FLUXO-MODELAGEM-IA.md`.
 - Freio ou roda: a família `roda-pneu` (`procedural/familias/roda-pneu/`).
+- Placa de circuito ou componente eletrônico: a família `componente-eletronico` (`procedural/familias/componente-eletronico/`), com a nota de uso em `.claude/skills/criar-peca/references/eletronica.md`.
 - Trabalho histórico: o README da zona histórica antes de abrir evidências.
