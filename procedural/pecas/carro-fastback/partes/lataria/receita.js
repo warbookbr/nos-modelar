@@ -445,6 +445,18 @@ export const PONTOS = [
   { nome: 'canto de cima da frente da chapa: o teto sobre a porta, no corte de z 0', parte: 'chapa', medida: 'maximo', em: [TABELA.planta[3][1] - 10, TABELA.teto[1][1], 0], toleranciaMm: 6 },
 ];
 
+/* O que só esta peça diz ao pacote do crítico: as pranchas estão no referencial do carro em mm (o quarto traseiro cai sobre a metade de
+ * trás delas), a superior desenha o comprimento na horizontal e gira 90 graus para casar com a vista de cima, e a foto lateral, gerada
+ * por IA e guardada em `referencias/locais/` fora do git, olha do lado +x, com a frente à esquerda. */
+export const CRITICA = {
+  pranchas: {
+    'lateral.prancha.svg': { referencial: true },
+    'traseira.prancha.svg': { referencial: true },
+    'superior.prancha.svg': { girar: 90, referencial: true },
+  },
+  referencias: { 'lateral.png': 'direita', 'traseira.png': 'traseira' },
+};
+
 const receita = {
   meta: { nome: 'carro-fastback/lataria', desc: 'o quarto traseiro do cupê fastback: chapa contínua do meio da porta para trás, com para-lama saliente, rebaixo, coluna, arco e vãos' },
   PARAMS: TABELA,
@@ -452,7 +464,7 @@ const receita = {
   get TOPO() { return { origem: 'o centro do carro no chão: x para a direita, y para cima, a frente em +z', ...derivar(this.PARAMS).rede.pontos }; },
   PLANO: {
     objeto: 'o quarto traseiro de um cupê fastback de 4750 mm, do meio da porta para trás, lado +x',
-    referencias: ['../../referencias/lateral.prancha.svg', '../../referencias/traseira.prancha.svg', '../../referencias/superior.prancha.svg'],
+    referencias: ['../../referencias/lateral.prancha.svg', '../../referencias/traseira.prancha.svg', '../../referencias/superior.prancha.svg', '../../referencias/locais/lateral.png', '../../referencias/locais/traseira.png'],
     escala: { medida: 'comprimento total do carro, de z -2375 a 2375', milimetros: 4750 },
     partes: [
       { nome: 'chapa', forma: 'chapa contínua de 2 mm do meio da porta à traseira, lisa, com teto, coluna até a tampa, quina, arco, degrau do ombro, degrau das lanternas (aba da tampa sobre a faixa recuada) e os vãos de vidro e lanterna', tecnica: 'subdivisao de uma gaiolaPorRede cujas arestas seguem as curvas da prancha, com os vãos por furoPassante e aberturaPorContorno' },
