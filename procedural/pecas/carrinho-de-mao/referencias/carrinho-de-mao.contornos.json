@@ -1,5 +1,11 @@
 {
  "formato": "mecanifica.contornos@1",
+ "imagem": {
+  "foraDoRepositorio": {
+   "motivo": "fotos de terceiros que a pessoa mandou, com letras do fabricante em relevo no pneu, que a regra das marcas mantém fora do repositório (ALINHAMENTO.md do carrinho de mão); os contornos foram medidos nelas sem gravar o sha256, e só o que está aqui se confere",
+   "encerrada": false
+  }
+ },
  "fonte": "medido em fotos de referência de terceiros que não entram no repositório (vista de lado e vista de cima de um carrinho de mão de obra); só os contornos em mm, x para a direita e y para cima da imagem",
  "escalas": {
   "lado": {

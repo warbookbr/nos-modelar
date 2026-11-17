@@ -131,6 +131,8 @@ da segunda rodada em diante, só os defeitos que o comando imprimiu.
 **Meça antes do crítico.** Rode
 `npm run contorno -- <imagem> --regioes=<json>`, que grava o pacote em `<nome>.pacote` ao lado da imagem (`lateral.png` dá `lateral.pacote`), onde `npm run objeto` o procura. Parte
 listada abaixo do mínimo na borda volta ao desenhador sem passar pelo crítico.
+O contorno grava o caminho da imagem; imagem fora do repositório (foto de terceiro, `referencias/locais/`) pede
+`--fora-do-repositorio="<motivo>"`, e a guarda do acervo reprova contorno sem uma das duas origens.
 
 **Crítico.** Despache o `critico-visual` sempre pelo roteiro: mande o caminho
 de `roteiro.md` do pacote e peça que ele siga as etapas na ordem. O roteiro

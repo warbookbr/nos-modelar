@@ -33,6 +33,7 @@ import { REGISTRO_DA_RECEITA } from '../../../src/autoria/executar-receita.js';
 import { conferirPortasNaForma } from '../../../src/autoria/porta-confere-forma.js';
 import { limiteRelativo, medirFaceDegenerada } from '../reguas-de-malha/face-degenerada.mjs';
 import { analisarTopologia } from '../../../procedural/nucleo/topologia.js';
+import { contornosSemOrigem } from './origem-dos-contornos.mjs';
 
 const REPO = resolve(fileURLToPath(new URL('../../..', import.meta.url)));
 const ACERVO = join(REPO, 'procedural/pecas');
@@ -393,6 +394,9 @@ if (isMainThread && process.argv[1] && process.argv[1].endsWith('guarda-acervo.m
       process.exit(1);
     }
     const { reprovadas, esperando, avisos } = await conferirAcervo(pedidas);
+    /* O contorno que não diz de onde veio a imagem (origem-dos-contornos.mjs) reprova junto, só o dos objetos pedidos. */
+    const objetos = new Set(pedidas.map((p) => `procedural/pecas/${p.split('/')[0]}/`));
+    for (const { arquivo, motivo } of contornosSemOrigem()) if ([...objetos].some((o) => arquivo.startsWith(o))) reprovadas.push({ peca: arquivo, motivo: `  ${motivo}` });
     for (const { peca, motivo } of avisos) console.log(`guarda:acervo — ${peca} AVISO\n${motivo}\n`);
     for (const { peca, motivo } of reprovadas) console.error(`guarda:acervo — ${peca} REPROVOU\n${motivo}\n`);
     for (const { peca, montagem, instancia } of esperando) console.log(`guarda:acervo — ${peca} planejada, sem geometria: espera a etapa '${instancia}' de ${montagem}.`);
@@ -418,6 +422,7 @@ if (isMainThread && process.argv[1] && process.argv[1].endsWith('guarda-acervo.m
       + '  Apague a declaração.');
     process.exit(1);
   }
+  for (const { arquivo, motivo } of contornosSemOrigem()) reprovadas.push({ peca: arquivo, motivo: `  ${motivo}` });
   for (const { peca, motivo } of reprovadas) {
     console.error(`guarda:acervo — ${peca} REPROVOU\n${motivo}\n`);
   }

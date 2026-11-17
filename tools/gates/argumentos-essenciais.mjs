@@ -9,7 +9,7 @@
  *   4. tirar do exemplo um essencial (todas as alternativas dele) não é recusado, citando o campo, ou um campo positivo valendo 0 ou -1
  *      não é recusado citando o valor.
  * Uso: `node tools/gates/argumentos-essenciais.mjs`; sai com 1 e lista cada falha. */
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { OPS } from '../../procedural/nucleo/nucleo.js';
@@ -24,6 +24,7 @@ const PASTAS_DAS_CHAMADAS = ['tools/modelar', 'src'];
 const EXCECOES_DAS_CHAMADAS = new Set(['src/autoria/executar-receita.js']);
 
 function arquivosDe(pasta, achados = []) {
+  if (!existsSync(pasta)) return achados;
   for (const e of readdirSync(pasta, { withFileTypes: true })) {
     const caminho = join(pasta, e.name);
     if (e.isDirectory()) { if (e.name !== 'node_modules' && e.name !== 'fixtures') arquivosDe(caminho, achados); }
@@ -42,17 +43,81 @@ function argumentosDaChamada(texto, abre) {
   return null;
 }
 
-/** As chamadas `nucleo(...)` com argumentos e sem `registroOperacoes`, fora de `executarReceita`: `arquivo:linha`. */
+/* O TEXTO SÓ DE CÓDIGO. A busca de `nucleo(` olhava o texto cru e só pulava a linha que começa por `/*`, `*` ou `//`; o comentário de bloco
+   em linhas sem asterisco, que é o estilo do projeto, o comentário no fim da linha e o texto dentro de string passavam como chamada, e em
+   2026-11-17 o gate acusou um comentário de tools/modelar/descrever-peca.mjs. Aqui comentário, conteúdo de string, de template e de literal de
+   regex viram espaço, com as quebras de linha mantidas, de modo que posição e número de linha continuam os do arquivo. O código dentro de
+   `${...}` continua código. A barra abre regex quando o que vem antes não fecha um valor (identificador, número, `)` ou `]`), ou quando vem
+   depois de palavra como `return` e `typeof`. */
+const PALAVRAS_ANTES_DE_REGEX = new Set(['return', 'typeof', 'instanceof', 'in', 'of', 'new', 'delete', 'void', 'throw', 'case', 'do', 'else', 'yield', 'await']);
+
+export function textoSoDeCodigo(texto) {
+  const n = texto.length;
+  const saida = texto.split('');
+  const apagar = (de, ate) => { for (let k = de; k < Math.min(ate, n); k += 1) if (saida[k] !== '\n') saida[k] = ' '; };
+  const chaves = []; // uma entrada por `${` aberto: quantas `{` de código estão abertas dentro dele
+  /** Lê o miolo do template a partir de `k`; para depois do acento de fechamento ou do `${`. */
+  const template = (k) => {
+    const inicio = k;
+    while (k < n) {
+      if (texto[k] === '\\') k += 2;
+      else if (texto[k] === '`') { apagar(inicio, k); return k + 1; }
+      else if (texto[k] === '$' && texto[k + 1] === '{') { apagar(inicio, k); chaves.push(0); return k + 2; }
+      else k += 1;
+    }
+    apagar(inicio, n);
+    return n;
+  };
+  let anterior = '';
+  let i = 0;
+  while (i < n) {
+    const c = texto[i];
+    const d = texto[i + 1];
+    if (c === '/' && d === '/') { const fim = texto.indexOf('\n', i); const f = fim < 0 ? n : fim; apagar(i, f); i = f; continue; }
+    if (c === '/' && d === '*') { const fim = texto.indexOf('*/', i + 2); const f = fim < 0 ? n : fim + 2; apagar(i, f); i = f; continue; }
+    if (c === '"' || c === "'") {
+      let k = i + 1;
+      while (k < n && texto[k] !== c && texto[k] !== '\n') k += texto[k] === '\\' ? 2 : 1;
+      apagar(i + 1, k); i = k + 1; anterior = 'valor'; continue;
+    }
+    if (c === '`') { i = template(i + 1); anterior = 'valor'; continue; }
+    if (c === '{' && chaves.length) chaves[chaves.length - 1] += 1;
+    if (c === '}' && chaves.length) {
+      if (chaves.at(-1) === 0) { chaves.pop(); i = template(i + 1); anterior = 'valor'; continue; }
+      chaves[chaves.length - 1] -= 1;
+    }
+    if (c === '/' && !(/^[\w$]/.test(anterior) && !PALAVRAS_ANTES_DE_REGEX.has(anterior)) && anterior !== ')' && anterior !== ']') {
+      let k = i + 1;
+      let classe = false;
+      while (k < n && texto[k] !== '\n' && (classe || texto[k] !== '/')) {
+        if (texto[k] === '\\') k += 1;
+        else if (texto[k] === '[') classe = true;
+        else if (texto[k] === ']') classe = false;
+        k += 1;
+      }
+      if (texto[k] === '/') { apagar(i + 1, k); i = k + 1; while (i < n && /[a-z]/i.test(texto[i])) i += 1; anterior = 'valor'; continue; }
+    }
+    if (/[\w$]/.test(c)) {
+      let k = i;
+      while (k < n && /[\w$]/.test(texto[k])) k += 1;
+      anterior = texto.slice(i, k); i = k; continue;
+    }
+    if (!/\s/.test(c)) anterior = c;
+    i += 1;
+  }
+  return saida.join('');
+}
+
+/** As chamadas `nucleo(...)` com argumentos e sem `registroOperacoes`, fora de `executarReceita`, no código fora de comentário e string: `arquivo:linha`. */
 export function chamadasDeNucleoSemRegistro(raiz = RAIZ) {
   const achados = [];
   for (const pasta of PASTAS_DAS_CHAMADAS) {
     for (const arquivo of arquivosDe(join(raiz, pasta))) {
       const rel = relative(raiz, arquivo).replaceAll('\\', '/');
       if (EXCECOES_DAS_CHAMADAS.has(rel)) continue;
-      const texto = readFileSync(arquivo, 'utf8');
+      const texto = textoSoDeCodigo(readFileSync(arquivo, 'utf8'));
       for (const m of texto.matchAll(/(?<![\w.$])nucleo\(/g)) {
         const linhaDoInicio = texto.lastIndexOf('\n', m.index) + 1;
-        if (/^\s*(\/\*|\*|\/\/)/.test(texto.slice(linhaDoInicio, m.index + 1))) continue;
         if (/^\s*function\s/.test(texto.slice(linhaDoInicio, m.index))) continue;
         const args = argumentosDaChamada(texto, m.index + m[0].length - 1);
         if (args === null || !args.trim()) continue;

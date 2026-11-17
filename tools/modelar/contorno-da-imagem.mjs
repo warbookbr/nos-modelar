@@ -10,7 +10,7 @@
  *
  * USO
  *   npm run contorno -- <imagem.png> --regioes=<regioes.json> [--saida=<json>]
- *     [--opacidade=0.2]
+ *     [--opacidade=0.2] [--fora-do-repositorio="<motivo>"]
  *   npm run contorno -- --regioes=<regioes.json> --acao
  *   npm run contorno -- --regioes=<regioes.json> --registrar=<veredito.json>
  *   npm run contorno -- --regioes=<regioes.json> --nova-serie --por=<quem decidiu>
@@ -57,11 +57,21 @@
  *
  * As rodadas ficam em `<regioes>.rodadas/`, uma por arquivo, com as sementes
  * julgadas e o veredito do crítico. A saída do contorno é
- * `<imagem>.contornos.json`, igual a cada execução. */
+ * `<imagem>.contornos.json`, igual a cada execução.
+ *
+ * DE ONDE VEIO A IMAGEM. O contorno gravava só o sha256 e o tamanho da imagem,
+ * e um contorno do braço robótico cuja foto não estava no repositório serviu
+ * de medida sem nada acusar (2026-11-17). Agora `imagem.caminho` traz o
+ * caminho da imagem relativo à pasta do contorno; a imagem fora do repositório
+ * ou em `referencias/locais/`, que não se versiona (foto de terceiro, imagem
+ * com marca), pede `--fora-do-repositorio="<motivo>"`, que grava
+ * `imagem.foraDoRepositorio = { motivo, encerrada: false }` no lugar do
+ * caminho. A guarda do acervo (`guardas/origem-dos-contornos.mjs`) reprova o
+ * contorno sem nenhum dos dois e confere o sha256 quando há caminho. */
 import { createHash } from 'node:crypto';
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { basename, join, resolve } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { basename, dirname, isAbsolute, join, relative, resolve } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import {
   segmentar, silhuetaEmPedacos, sobreposicao, svgDoMapa, etiquetasFora, FONTE_DA_ETIQUETA, recortesDasDivisas, folhasDasDivisas, roteiroDoCritico, proximidadeDaBorda, MINIMO_NA_BORDA,
 } from '../../modulos/contorno-da-imagem/src/index.js';
@@ -70,6 +80,19 @@ import { lancarChromium } from './navegador.mjs';
 import { acaoDaPasta, aceitar, lerRodadas as lerRodadasDaPasta, registrarRodada as registrarNaPasta, novaSerie as novaSerieDaPasta } from './rodadas-com-critico.mjs';
 
 export const FORMATO = 'mecanifica.contornos@1';
+const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
+
+/** O que o contorno grava sobre a origem da imagem: `{ caminho }`, relativo à pasta da saída, ou `{ foraDoRepositorio }` com o motivo. */
+export function origemDaImagem(imagem, saida, { foraDoRepositorio = null, raiz = REPO } = {}) {
+  if (typeof foraDoRepositorio === 'string' && foraDoRepositorio.trim()) return { foraDoRepositorio: { motivo: foraDoRepositorio.trim(), encerrada: false } };
+  if (foraDoRepositorio !== null && foraDoRepositorio !== undefined) throw new Error(`--fora-do-repositorio veio sem motivo (recebi ${JSON.stringify(foraDoRepositorio)}); esperava --fora-do-repositorio="<por que a imagem fica fora do repositório>".`);
+  const noRepo = relative(raiz, resolve(imagem)).replaceAll('\\', '/');
+  if (noRepo.startsWith('..') || isAbsolute(noRepo) || noRepo.split('/').includes('locais')) {
+    throw new Error(`a imagem ${imagem} fica fora do repositório${noRepo.split('/').includes('locais') ? ' (em referencias/locais/, que não se versiona)' : ''}, e o contorno precisa dizer por quê; `
+      + 'rode de novo com --fora-do-repositorio="<motivo>", como --fora-do-repositorio="foto de terceiro com marca, fica na máquina da pessoa".');
+  }
+  return { caminho: relative(dirname(resolve(saida)), resolve(imagem)).replaceAll('\\', '/') };
+}
 const arred = (x) => (Math.round(x * 100) / 100) || 0;
 
 export async function contornosDaImagem(pngBuffer, config) {
@@ -229,8 +252,11 @@ async function principal(argv) {
   const imagem = resolve(alvo);
   const png = readFileSync(imagem);
   const config = JSON.parse(readFileSync(regioes, 'utf8'));
-  const { resultado, segmentacao } = await contornosDaImagem(png, config);
   const saida = valor('saida') ? resolve(valor('saida')) : imagem.replace(/\.png$/i, '.contornos.json');
+  const fora = argv.some((a) => a === '--fora-do-repositorio' || a.startsWith('--fora-do-repositorio=')) ? (valor('fora-do-repositorio') ?? '') : null;
+  const origem = origemDaImagem(imagem, saida, { foraDoRepositorio: fora });
+  const { resultado, segmentacao } = await contornosDaImagem(png, config);
+  resultado.imagem = { ...origem, ...resultado.imagem };
   writeFileSync(saida, `${JSON.stringify(resultado, null, 1)}\n`, 'utf8');
   process.stdout.write(`contorno — ${basename(imagem)}: ${Object.keys(resultado.regioes).length} região(ões), ${resultado.mmPorPx} mm/px\n  gravado em ${saida}\n`);
   /* O pacote mora sempre ao lado da imagem, em `<nome>.pacote`, que é onde

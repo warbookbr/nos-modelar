@@ -14,11 +14,13 @@
  *                 do acervo leu da malha (927 de fora, menos 222 de pneu, aro e cubo)
  *
  * Uso: node procedural/pecas/sedan-chassi-e-lataria/referencias/derivar-contornos.mjs */
+import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 
 const FONTE = new URL('../../carro-sedan-classico/referencias/fonte-partes.json', import.meta.url);
 const SAIDA = new URL('./sedan-chassi-e-lataria.contornos.json', import.meta.url);
-const fonte = JSON.parse(readFileSync(FONTE, 'utf8'));
+const bytesDaFonte = readFileSync(FONTE);
+const fonte = JSON.parse(bytesDaFonte.toString('utf8'));
 const mm = (v) => Math.round(v * 10000) / 10;
 const area = (l) => Math.abs(l.reduce((s, [a, b], i) => { const [c, d] = l[(i + 1) % l.length]; return s + (a * d - c * b); }, 0) / 2);
 const regiao = (pedacos) => ({ areaMm2: Math.round(pedacos.reduce((s, p) => s + area(p), 0)), contornoMm: pedacos[0], pedacos: pedacos.map((p) => ({ areaMm2: Math.round(area(p)), contornoMm: p })) });
@@ -48,6 +50,9 @@ const pneu = (s) => [[s * X_DE_DENTRO_DO_PNEU, 0], [s * mm(rodas.maximo[0]), 0],
 
 const saida = {
   formato: 'mecanifica.contornos@1',
+  /* A origem é a fonte em fatias, que está no repositório: a guarda do acervo (tools/modelar/guardas/origem-dos-contornos.mjs) confere
+     que o arquivo existe e que o sha256 é o dele. */
+  imagem: { caminho: '../../carro-sedan-classico/referencias/fonte-partes.json', sha256: createHash('sha256').update(bytesDaFonte).digest('hex') },
   fonte: 'derivado por derivar-contornos.mjs das silhuetas em fatias de procedural/pecas/carro-sedan-classico/referencias/fonte-partes.json (escala de 4,4 m); os valores das fatias ligados pelo meio de cada fatia, incerteza de meia fatia (46 mm em z, 32 mm em y); só os contornos em mm, x para a direita e y para cima da imagem',
   escalas: {
     lado: { origem: 'x = -z do modelo (a frente à esquerda), y = altura com o chão em 0', fatiaMm: 91.7 },

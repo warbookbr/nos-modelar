@@ -1,7 +1,7 @@
 /* argumentos-essenciais.test.mjs — o gate dos essenciais e a recusa na hora: cada receita mínima errada do inventário de erros
    (docs/modelar/banco-de-provas/revisao-do-projeto-2026-11-13) é recusada no passo certo, com a causa e o que fazer. */
 import { describe, expect, it } from 'vitest';
-import { chamadasDeNucleoSemRegistro, conferirArgumentosEssenciais } from './argumentos-essenciais.mjs';
+import { chamadasDeNucleoSemRegistro, conferirArgumentosEssenciais, textoSoDeCodigo } from './argumentos-essenciais.mjs';
 import { nucleo } from '../../procedural/nucleo/nucleo.js';
 import { REGISTRO_DA_RECEITA } from '../../src/autoria/executar-receita.js';
 import { essenciaisDaOperacao, recusasDeEssenciais } from '../../procedural/nucleo/uso-operacoes.js';
@@ -178,6 +178,22 @@ describe('o registro da receita nas ferramentas', () => {
       writeFileSync(join(raiz, 'src/autoria/executar-receita.js'), "const n = nucleo(a, b, c);\n");
       expect(chamadasDeNucleoSemRegistro(raiz)).toEqual(['tools/modelar/ruim.mjs:1']);
     } finally { rmSync(raiz, { recursive: true, force: true }); }
+  });
+
+  it('comentário de bloco sem asterisco, comentário no fim da linha e string não são chamada; a chamada real continua acusada', () => {
+    const raiz = new URL('../fixtures/nucleo-sem-registro/', import.meta.url).pathname;
+    expect(chamadasDeNucleoSemRegistro(raiz)).toEqual(['tools/modelar/casos.mjs:23']);
+  });
+
+  it('o texto só de código guarda tamanho e linhas, apaga comentário, string e regex e deixa o código de ${...}', () => {
+    const texto = "const u = 'a//b'; // x\nconst r = /\\/\\/[/']/g; /* y\n z */ const t = `k ${f(1)} m`; const d = a / b / c;\n";
+    const codigo = textoSoDeCodigo(texto);
+    expect(codigo).toHaveLength(texto.length);
+    expect(codigo.split('\n')).toHaveLength(texto.split('\n').length);
+    expect(codigo).not.toMatch(/[xyzkm]|a\/\/b/);
+    expect(codigo).toContain('f(1)');
+    expect(codigo).toContain('a / b / c');
+    expect(codigo).toContain("const u = '    ';");
   });
 
   it('o repositório não tem chamada de nucleo( sem registro em tools/modelar e src', () => {
