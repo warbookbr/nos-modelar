@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2043 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2044 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2970,6 +2970,10 @@
 ## tools/fixtures/nivel-zero/
 
 - `medir-blocagem.js` — Suporte de prova do tradutor do nível zero. A medida da blocagem mora em `src/autoria/medir-blocagem-nivel-zero.js`, porque o próprio tradutor a usa para o r…
+
+## tools/fixtures/nucleo-sem-registro/tools/modelar/
+
+- `casos.mjs` — casos.mjs — fixture do gate argumentos-essenciais (tools/gates/argumentos-essenciais.mjs): só a chamada real da linha 23 é acusada. Comentário de bloco em li…
 
 ## tools/fixtures/proporcoes/estante/pecas/montante/
 
