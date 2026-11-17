@@ -11,6 +11,8 @@
  * é baixada quando alguém escolhe abri-la.
  */
 
+import { CATEGORIAS_DE_OBJETO, ehCategoriaDeObjeto } from '../autoria/categorias-de-objeto.js';
+
 const MODULOS = import.meta.glob('../../procedural/pecas/**/*.js');
 
 /* AS RECEITAS DE ENSAIO TAMBÉM ENTRAM, e é por elas que as guardas de navegador
@@ -28,14 +30,11 @@ const ENSAIOS = import.meta.glob('../../tools/fixtures/acervo/**/*.js');
    (`sessao/montagem-em-dados.js`), sem um segundo leitor. */
 const MONTAGENS_EM_DADOS = import.meta.glob('../../procedural/pecas/*/montagem.json', { import: 'default' });
 
-/* AS CATEGORIAS SÃO AS QUE O ACERVO DECLARA. `PLANO.familia` (ou `familiaProcedural`) é o único critério que classifica a
-   peça sozinha; a pasta e a marca de montagem não dizem o que o objeto é, e a receita que não declara nada cai em
-   `outros`, cuja contagem na janela mostra quanto falta declarar. Família declarada e fora desta tabela é erro de teste. */
-export const CATEGORIAS = Object.freeze([
-  { id: 'veiculos', rotulo: 'Veículos' },
-  { id: 'moveis', rotulo: 'Móveis e eletrodomésticos' },
-  { id: 'outros', rotulo: 'Outros' },
-]);
+/* A CATEGORIA É DECLARADA PELO OBJETO. `PLANO.categoria` na receita da peça e `categoria` na montagem em dados, de uma lista
+   fechada (`src/autoria/categorias-de-objeto.js`). Quando o objeto não declara, vale a família de critérios que ele já tinha
+   (`PLANO.familia`, ou `familiaProcedural`) pela tabela abaixo, e o que nada declara cai em `outros`, cuja contagem na janela
+   mostra quanto falta declarar. Categoria declarada fora da lista é recusada pelo normalizador do PLANO e pelo leitor da montagem. */
+export const CATEGORIAS = CATEGORIAS_DE_OBJETO;
 export const CATEGORIA_DA_FAMILIA = Object.freeze({
   veiculo: 'veiculos',
   'movel-de-caixa': 'moveis',
@@ -43,6 +42,7 @@ export const CATEGORIA_DA_FAMILIA = Object.freeze({
 });
 
 export function categoriaDoPlano(plano) {
+  if (ehCategoriaDeObjeto(plano?.categoria)) return plano.categoria;
   return CATEGORIA_DA_FAMILIA[plano?.familia] ?? CATEGORIA_DA_FAMILIA[plano?.familiaProcedural] ?? 'outros';
 }
 
@@ -58,8 +58,8 @@ function comClassificacao(entrada) {
   const nova = { ...entrada, categoria: null, situacao: entrada.ensaio ? 'ensaio' : 'trabalho' };
   let pronta = null;
   nova.classificar = () => {
-    pronta ??= (entrada.emDados ? Promise.resolve(null) : entrada.carregar())
-      .then((receita) => categoriaDoPlano(receita?.PLANO))
+    pronta ??= entrada.carregar()
+      .then((receita) => (entrada.emDados ? (ehCategoriaDeObjeto(receita?.categoria) ? receita.categoria : 'outros') : categoriaDoPlano(receita?.PLANO)))
       .catch(() => 'outros')
       .then((categoria) => {
         nova.categoria = categoria;

@@ -125,17 +125,20 @@ describe('categoria e situação da lista da bancada', () => {
         '../../procedural/pecas/poltrona/receita.js': receita({ familia: 'assento' }),
         '../../procedural/pecas/roda/receita.js': receita({ familiaProcedural: 'roda-pneu', familia: 'veiculo' }),
         '../../procedural/pecas/copo/receita.js': receita({ objeto: 'copo' }),
+        '../../procedural/pecas/faca/receita.js': receita({ categoria: 'utensilios' }),
+        '../../procedural/pecas/sofa/receita.js': receita({ categoria: 'moveis', familia: 'assento' }),
+        '../../procedural/pecas/fora/receita.js': receita({ categoria: 'brinquedos' }),
         '../../procedural/pecas/sem-plano/receita.js': async () => ({ default: {} }),
         '../../procedural/pecas/quebrada/receita.js': async () => { throw new Error('falha'); },
       },
       { '../../tools/fixtures/acervo/prova/receita.js': receita({}) },
-      { '../../procedural/pecas/objeto/montagem.json': async () => ({}) },
+      { '../../procedural/pecas/objeto/montagem.json': async () => ({ categoria: 'robotica' }), '../../procedural/pecas/outro/montagem.json': async () => ({}) },
     );
     expect(lista.every((e) => e.categoria === null)).toBe(true);
     await classificarEntradas(lista);
     const por = Object.fromEntries(lista.map((e) => [e.id, e.categoria]));
     expect(por).toEqual({
-      carro: 'veiculos', poltrona: 'moveis', roda: 'veiculos', copo: 'outros', 'sem-plano': 'outros', quebrada: 'outros', prova: 'outros', objeto: 'outros',
+      carro: 'veiculos', poltrona: 'moveis', roda: 'veiculos', copo: 'outros', faca: 'utensilios', sofa: 'moveis', fora: 'outros', outro: 'outros', 'sem-plano': 'outros', quebrada: 'outros', prova: 'outros', objeto: 'robotica',
     });
   });
 
@@ -161,7 +164,7 @@ describe('categoria e situação da lista da bancada', () => {
   });
 
   /* O ACERVO REAL. Duas coisas que um objeto novo pode quebrar sem que ninguém olhe a janela: declarar uma família que a
-     tabela não conhece (cairia em outros sem aviso) e fazer o outros passar de um terço do acervo de trabalho, o ponto em
+     tabela não conhece (cairia em outros sem aviso) e fazer o outros passar de um décimo do acervo de trabalho (eram 18 de 58 antes de os objetos declararem a categoria; o plano mandava parar em um terço), o ponto em
      que o plano manda parar e voltar à pessoa em vez de inventar categoria. */
   it('toda receita do acervo cai numa categoria, e a família declarada tem categoria na tabela', async () => {
     const lista = listarParaBancada().filter((e) => !e.parteDe);
@@ -173,16 +176,18 @@ describe('categoria e situação da lista da bancada', () => {
       for (const familia of [plano?.familia, plano?.familiaProcedural].filter(Boolean)) {
         expect(Object.keys(CATEGORIA_DA_FAMILIA), `${entrada.id} declara a família ${familia}, que a tabela não conhece`).toContain(familia);
       }
-      if (entrada.categoria === 'outros') expect(plano?.familia ?? plano?.familiaProcedural).toBeUndefined();
+      if (entrada.categoria === 'outros') expect(plano?.categoria ?? plano?.familia ?? plano?.familiaProcedural).toBeUndefined();
     }
   }, 120_000);
 
-  it('o outros não passa de um terço do acervo de trabalho', async () => {
+  it('o outros não passa de um décimo do acervo de trabalho, e as categorias declaradas existem no acervo', async () => {
     const trabalho = listarParaBancada().filter((e) => !e.parteDe && e.situacao === 'trabalho');
     await classificarEntradas(trabalho);
     const outros = trabalho.filter((e) => e.categoria === 'outros');
-    expect(outros.length / trabalho.length, `outros: ${outros.map((e) => e.id).join(', ')}`).toBeLessThanOrEqual(1 / 3);
+    expect(outros.length / trabalho.length, `outros: ${outros.map((e) => e.id).join(', ')}`).toBeLessThanOrEqual(1 / 10);
     expect(trabalho.filter((e) => e.categoria === 'veiculos').length).toBeGreaterThan(0);
-    expect(trabalho.filter((e) => e.categoria === 'moveis').length).toBeGreaterThan(0);
+    for (const { id } of CATEGORIAS.filter((c) => c.id !== 'outros')) {
+      expect(trabalho.filter((e) => e.categoria === id).length, `nenhuma entrada em ${id}`).toBeGreaterThan(0);
+    }
   }, 120_000);
 });

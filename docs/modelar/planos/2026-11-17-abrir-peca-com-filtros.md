@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `src/bancada/acervo-receitas.js`, `src/bancada/acervo-receitas.test.js`, `src/bancada/componentes/menu-abrir.js`, `src/bancada/componentes/menu-abrir.test.js`, `docs/modelar/banco-de-provas/abrir-peca-com-filtros-2026-11-17/`; e, só no trecho da janela de abrir, `src/bancada/main.js`.
+**Território:** `src/bancada/acervo-receitas.js`, `src/bancada/acervo-receitas.test.js`, `src/bancada/componentes/menu-abrir.js`, `src/bancada/componentes/menu-abrir.test.js`, `docs/modelar/banco-de-provas/abrir-peca-com-filtros-2026-11-17/`; e, só no trecho da janela de abrir, `src/bancada/main.js`; a categoria declarada pelo objeto (fatia 3): `src/autoria/categorias-de-objeto.js`, `src/autoria/categoria-da-montagem.test.js`, `src/autoria/plano-de-modelagem.js`, `src/autoria/ler-montagem-persistida.js`, as receitas `procedural/pecas/{abajur-de-mesa,balcao-em-l,mesa-quadrada-escura,bicicleta-urbana,suporte-tubo,copo-de-vidro,garrafa-de-vidro,prato-fundo,vaso-de-ceramica,kukri}/receita.js` e os `procedural/pecas/{aviao,empilhadeira,sedan-chassi-e-lataria,braco-robotico,robo-humanoide,instalacao-solar,carrinho-de-mao}/montagem.json`, só na linha `categoria`.
 
 **Responsável:** a IA da sessão implementa; Tiago pediu em 2026-11-17 e aprova pela imagem da janela.
 
