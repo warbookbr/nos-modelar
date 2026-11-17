@@ -78,7 +78,7 @@ export const TABELA = {
   /* o perfil da traseira no eixo do carro, [y, z]: de cima para baixo, da borda da tampa ao fundo; a calota desloca cada nível por ele. O degrau das
    * lanternas: abaixo da quina da aba (961, -2224, na silhueta da prancha lateral) a faixa recua até o nível `topo` (900, -2190, uns 35 mm para dentro da
    * aba, a proporção da imagem de referência, que não é medida) e volta para fora pela lanterna até o para-choque (-2321 a y 760), como na prancha. Atrás a traseira é reta em -2375 de y 500 a 620 (a prancha lateral), e a borda de baixo desce até 304 em z -2282, onde a silhueta lateral a deixa */
-  traseira: [[1037, -2210], [961, -2224], [900, -2190], [845, -2240], [760, -2321], [629, -2374], [570, -2375], [500, -2375], [416, -2350], [333, -2302], [304, -2282]],
+  traseira: [[1037, -2210], [961, -2224], [900, -2190], [845, -2240], [760, -2321], [629, -2373], [570, -2375], [500, -2375], [416, -2350], [333, -2302], [304, -2282]],
   /* a coroa do teto, expoente da seção entre a quina do teto e o eixo (a seção traseira: 3 mm a 300 de 590, 30 mm a 487, de uma queda de 93 até a quina) */
   coroa: 5.5,
   /* as estações ao comprimento, z; a última é onde começa a calota da traseira */
@@ -98,7 +98,7 @@ export const TABELA = {
   vincos: { ombro: 0.5, coluna: 0.3, quinaDoTeto: 0.4, bordaDaTampa: 0.2, topoDaCalota: 0.3 },
   /* o arco da roda traseira: centro no eixo traseiro, raio da prancha (pneu de 340 mais 40), e os lados do polígono do corte (com 96, um vértice
    * dele caía a 0,4 mm de um da chapa perto do topo do arco e deixava uma face fina em cada lado) */
-  arco: { z: -1375, y: 340, raio: 380, lados: 100 },
+  arco: { z: -1375, y: 340, raio: 380, lados: 102 },
   /* as partes por região da chapa, caixas [min, max] em mm: o para-lama saliente (atrás da porta, sobre o arco) e o rebaixo da lateral (do meio da porta até onde ele some, antes do arco: a caixa dele só dá x e y atrás, e o z de trás sai de `ondeORebaixoSome`); o rebaixo vale onde as duas se sobrepõem */
   partes: { paralama: { min: [780, 250, -1950], max: [960, 1010, -900] }, rebaixo: { min: [780, 380], max: [960, 840, 1] } },
   /* o vão do vidro lateral traseiro, [z, y] do contorno da prancha lateral (a borda de fora da moldura); a borda de baixo sobe até a base da coluna mais a folga */
