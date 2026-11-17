@@ -10,7 +10,7 @@ import { basename, dirname, join } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
 import { lerPergunta } from '../../src/autoria/perguntas-do-critico.js';
 import {
-  ELEVACOES_DA_LUZ_RASANTE, LIMITE_DO_VEREDITO, PERGUNTA_DO_ALVO, PRAZO_DA_CAPTURA_MONTADA_MS, VISTAS_MONTADAS, ladoDaVista, vistaDaPranchaDesenhada, montagemDaPeca, montarPedido, pastaDaRodada, prefixoDaPeca, referenciasDoPlano,
+  ELEVACOES_DA_LUZ_RASANTE, LIMITE_DO_VEREDITO, PERGUNTA_DO_ALVO, PRAZO_DA_CAPTURA_MONTADA_MS, VISTAS_MONTADAS, ladoDaVista, vistaDaPranchaDesenhada, avisoDasReferenciasIgnoradas, referenciasSemLeitura, montagemDaPeca, montarPedido, pastaDaRodada, prefixoDaPeca, referenciasDoPlano,
   DISTANCIA_DE_PERTO_MM, campoDePertoMm, MOTIVO_SEM_MEDIR, ReceitaReprovada, decidirLuzRasante, imprimir, fracaoVisivelDaPeca, lerReferenciasExternas, lerOrientacaoDaReferencia, LIMITE_DA_ORIENTACAO, AJUDA, imagensDoReflexo, LEITURA_DA_FAIXA, LEITURA_DO_REFLEXO, secaoDoReflexo, MINIMO_DO_REFLEXO, luzRasanteDoPacote, primeiraQuePassa, unidadeDoAlvo, vistaDoArquivo, vistasMontadasVisiveis, vistasParaCritica, vistasRepetidas,
   ARQUIVO_DO_CONTORNO_SOBREPOSTO, contornosParaSobrepor, etapaFixaDaPeca, lerContornosExternos, lerRegioesDoContorno, motivoDaEtapaFixa, registroDasEtapas,
   ARQUIVO_DAS_PERGUNTAS_FECHADAS, FORMATO_DAS_PERGUNTAS_FECHADAS, NAO_DA_PARA_VER, NAO_VERIFICAVEL, REGRA_DA_NOTA, arquivoDoPedidoFechado, juntarOrdens, lerRespostasFechadas,
@@ -19,6 +19,7 @@ import {
 } from './vistas-para-critica.mjs';
 import { extrairVeredito } from '../../src/autoria/calibracao-do-critico.js';
 import { lerContornos } from './comparar-contornos.mjs';
+import { alvoDoRepositorio } from './rodada-de-modelagem.mjs';
 
 const area = mkdtempSync(join(tmpdir(), 'vistas-critica-'));
 /* A medição da receita trocada por uma que passa: o pacote mede antes de capturar, e os testes do pacote não pagam a medição real. */
@@ -1065,24 +1066,34 @@ describe('a medição da receita antes do pacote', () => {
 describe('a prancha desenhada em mm que o plano cita (e o aviso do que o pacote não leva)', () => {
   const PECA = 'tools/fixtures/comparar-com-prancha/receita.js';
   const SVG = join(dirname(new URL(import.meta.url).pathname), '../fixtures/comparar-com-prancha/referencias/lateral.prancha.svg');
+  const COORD = { tipo: 'coordenadas', caixaMm: [-230, -30, 30, 330], cobertura: 0.97 };
+
+  /* a bancada de prancha trocada por um gravador: uma chamada, as duas imagens */
+  const gravador = (alinhamento = COORD, extra = {}) => {
+    const pedidos = [];
+    const fazer = async (pedido) => {
+      pedidos.push(pedido);
+      const outra = pedido.sobreposta;
+      writeFileSync(pedido.saida, 'png');
+      writeFileSync(outra, 'png');
+      return {
+        arquivo: pedido.saida, json: pedido.saida.replace(/\.png$/, '.json'), tambem: { disposicao: 'sobreposto', arquivo: outra, json: outra.replace(/\.png$/, '.json') },
+        lidas: [{ caminho: pedido.pranchas[0].caminho, vista: pedido.pranchas[0].vista, larguraMm: 400, alturaMm: 300, pxPorMm: 0.5, alinhamento }], recusadas: [], ...extra,
+      };
+    };
+    return { fazer, pedidos };
+  };
 
   async function montar(pranchar) {
     const base = mkdtempSync(join(area, 'prancha-'));
     const pasta = join(base, 'rodada');
     const bancada = bancadaFalsa(base, PECA);
-    const pedidos = [];
+    const g = gravador();
     const resultado = await vistasParaCritica(PECA, {
       saida: pasta, pastaDasCapturas: base,
-      dependencias: {
-        medirReceita: medirPassa, olharBancada: bancada.fazer, rodadasAnteriores: () => [],
-        prancharDesenhadas: pranchar ?? (async (pedido) => {
-          pedidos.push(pedido);
-          writeFileSync(pedido.saida, 'png');
-          return { arquivo: pedido.saida, json: pedido.saida.replace(/\.png$/, '.json'), lidas: [{ caminho: pedido.pranchas[0].caminho, vista: pedido.pranchas[0].vista, larguraMm: 400, alturaMm: 300, pxPorMm: 0.5 }] };
-        }),
-      },
+      dependencias: { medirReceita: medirPassa, olharBancada: bancada.fazer, rodadasAnteriores: () => [], prancharDesenhadas: pranchar ?? g.fazer },
     });
-    return { resultado, pasta, pedidos, pedido: readFileSync(join(pasta, 'pedido.md'), 'utf8') };
+    return { resultado, pasta, pedidos: g.pedidos, pedido: readFileSync(join(pasta, 'pedido.md'), 'utf8') };
   }
 
   it('a referência citada que não é imagem nem prancha sai como aviso na saída e no pedido, e não em silêncio', async () => {
@@ -1093,56 +1104,87 @@ describe('a prancha desenhada em mm que o plano cita (e o aviso do que o pacote 
     expect(pedido).toContain('O plano cita também referencias/alvo.md, que não é imagem nem prancha desenhada e por isso não entra neste pedido');
   });
 
-  it('a prancha SVG vira duas imagens na mesma escala, na vista declarada, e o pedido a chama de desenho cotado e não de objeto real em outra escala', async () => {
+  it('o .contornos.json citado não é referência ignorada, porque o pacote o lê', () => {
+    expect(referenciasSemLeitura(['x/alvo.md', 'x/lateral.contornos.json'])).toEqual(['x/alvo.md']);
+    expect(avisoDasReferenciasIgnoradas(['x/lateral.contornos.json'])).toBeNull();
+  });
+
+  it('a prancha SVG vira duas imagens de uma captura só, na vista declarada, e o pedido a chama de desenho cotado e põe o .prancha.svg do repositório no alvo', async () => {
     const { resultado, pasta, pedidos, pedido } = await montar();
     expect(referenciasDoPlano({ referencias: ['referencias/lateral.prancha.svg'] }, { pastaDaReceita: dirname(SVG).replace(/referencias$/, '') }).pranchas).toEqual([SVG]);
-    expect(pedidos.map((p) => [p.disposicao, p.pranchas[0].vista, basename(p.saida)])).toEqual([['lado', 'esquerda', 'prancha-desenhada-lado.png'], ['sobreposto', 'esquerda', 'prancha-desenhada-sobreposta.png']]);
+    expect(pedidos).toHaveLength(1);
+    expect(pedidos[0].pranchas[0]).toMatchObject({ vista: 'esquerda', girar: 0, referencial: false });
+    expect(basename(pedidos[0].sobreposta)).toBe('prancha-desenhada-sobreposta.png');
     expect(resultado.pranchaDesenhada.imagens.map((i) => i.disposicao)).toEqual(['lado', 'sobreposta']);
     const secao = pedido.slice(pedido.indexOf('## Prancha desenhada'), pedido.indexOf('## Modelo'));
     expect(secao).toContain('não uma foto nem o objeto real em outra escala');
     expect(secao).toContain(`sobreposta: ${join(pasta, 'prancha-desenhada-sobreposta.png')}`);
-    expect(secao).toContain('lateral.prancha.svg: vista esquerda do modelo');
+    expect(secao).toContain(`${SVG}: vista esquerda do modelo`);
+    expect(secao).not.toContain('tolerância do plano');
+    expect(secao).toContain('o plano não declara uma tolerância');
     expect(secao).not.toContain('não foi declarado');
-    expect(pedido).toContain('o alvo é a prancha desenhada da seção seguinte');
     expect(pedido).not.toContain('O plano não cita imagem de referência.');
     expect(JSON.parse(readFileSync(join(pasta, 'pacote.json'), 'utf8')).pranchaDesenhada.linhas[0]).toMatchObject({ vista: 'esquerda', presumida: false });
     expect(imprimir(resultado)).toContain('PRANCHA DESENHADA');
+    /* o alvo do pedido é o desenho do repositório, e o registro da rodada o aceita: nenhuma imagem de tools/bancadas/out */
+    const alvo = pedido.slice(pedido.indexOf('## Alvo'), pedido.indexOf('## Referências'));
+    expect(alvo).toContain(`leva o caminho do desenho que o plano cita, no repositório`);
+    expect(alvo).toContain(SVG);
+    expect(alvo).not.toContain('prancha-desenhada-lado.png');
+    expect(alvoDoRepositorio(SVG)).toBe('tools/fixtures/comparar-com-prancha/referencias/lateral.prancha.svg');
   });
 
-  it('com a origem em mm o pedido diz que o desenho foi recortado pela caixa do modelo e sobreposto pelas coordenadas; sem ela, diz o motivo do centro e avisa', async () => {
-    const com = (alinhamento) => async (pedido) => {
-      writeFileSync(pedido.saida, 'png');
-      return { arquivo: pedido.saida, json: pedido.saida.replace(/\.png$/, '.json'), lidas: [{ caminho: pedido.pranchas[0].caminho, vista: pedido.pranchas[0].vista, larguraMm: 400, alturaMm: 300, pxPorMm: 0.5, alinhamento }] };
-    };
-    const certo = await montar(com({ tipo: 'coordenadas', caixaMm: [-230, -30, 30, 330] }));
-    expect(certo.pedido).toContain('recortado pela caixa do modelo (-230, -30, 30, 330 mm: h mín, v mín, h máx, v máx) e sobreposto pelas coordenadas');
-    expect(certo.pedido).toContain('mesmo trecho, mesmo quando o modelo é só uma parte do objeto');
-    expect(certo.resultado.avisos.join('\n')).not.toMatch(/centro das extensões/);
-    const centro = await montar(com({ tipo: 'centro', motivo: 'as origens não coincidem' }));
-    expect(centro.pedido).toContain('alinhado pelo centro das extensões, e não pelas coordenadas: as origens não coincidem');
-    expect(centro.resultado.avisos.join('\n')).toMatch(/lateral\.prancha\.svg: o desenho não foi sobreposto pelas coordenadas em mm, e saiu alinhado pelo centro das extensões \(as origens não coincidem\)/);
+  it('com a origem em mm o pedido diz que o desenho foi recortado pela caixa do modelo, sem "undefined", e sem ela diz o motivo do centro e avisa', async () => {
+    const certo = await montar(gravador({ tipo: 'coordenadas', caixaMm: [-230, -30, 30, 330], cobertura: 0.97 }).fazer);
+    expect(certo.pedido).toContain('recortado pela caixa do modelo (-230, -30, 30, 330 mm: h mín, v mín, h máx, v máx) e sobreposto pelas coordenadas; 97% da silhueta do modelo cai dentro');
+    expect(certo.pedido).not.toContain('undefined');
+    expect(certo.resultado.avisos.join('\n')).not.toMatch(/centro das extensões|cai dentro do contorno do desenho \(o limite/);
+    const centro = await montar(gravador({ tipo: 'centro', motivo: 'o modelo passa da caixa do desenho: 120 mm à direita' }).fazer);
+    expect(centro.pedido).toContain('alinhado pelo centro das extensões, e não pelas coordenadas: o modelo passa da caixa do desenho: 120 mm à direita');
+    expect(centro.resultado.avisos.join('\n')).toMatch(/lateral\.prancha\.svg: o desenho não foi sobreposto pelas coordenadas em mm, e saiu alinhado pelo centro das extensões \(o modelo passa da caixa do desenho: 120 mm à direita\)/);
+  });
+
+  it('a silhueta do modelo fora do contorno do desenho (lado ou giro errados) vira aviso e consta do pedido', async () => {
+    const { resultado, pedido } = await montar(gravador({ tipo: 'coordenadas', caixaMm: [0, 0, 1, 1], cobertura: 0.41 }).fazer);
+    expect(resultado.avisos.join('\n')).toMatch(/só 41% da silhueta do modelo cai dentro do contorno do desenho \(o limite é 85%\): o lado declarado ou o giro \(0 graus\) podem estar errados/);
+    expect(pedido).toContain('Fora da prancha desenhada: lateral.prancha.svg: só 41%');
+  });
+
+  it('a prancha recusada entre as lidas vai ao aviso e não derruba a outra', async () => {
+    const { resultado } = await montar(gravador(COORD, { recusadas: ['superior.prancha.svg: o contorno mede 1 px'] }).fazer);
+    expect(resultado.avisos.join('\n')).toMatch(/prancha desenhada: prancha recusada, superior\.prancha\.svg: o contorno mede 1 px/);
+    expect(resultado.pranchaDesenhada.imagens).toHaveLength(2);
   });
 
   it('a prancha que não sai é aviso e consta do pedido, e o pacote segue', async () => {
     const { resultado, pedido } = await montar(async () => { throw new Error('o navegador não abriu'); });
     expect(resultado.pranchaDesenhada).toBeNull();
-    expect(resultado.avisos.join('\n')).toMatch(/a prancha desenhada em lado a lado não saiu: o navegador não abriu/);
+    expect(resultado.avisos.join('\n')).toMatch(/a prancha desenhada não saiu: o navegador não abriu/);
     expect(resultado.avisos.join('\n')).toMatch(/lateral\.prancha\.svg e a prancha desenhada não entrou no pacote/);
     expect(pedido).not.toContain('## Prancha desenhada');
   });
 
-  it('sem declaração o lado sai do nome do arquivo, e o pedido diz que foi presumido', () => {
+  it('sem declaração o lado sai do nome do arquivo, inclusive lateral-direita, e o pedido diz que foi presumido', () => {
     expect(vistaDaPranchaDesenhada('/x/lateral.prancha.svg')).toEqual({ vista: 'esquerda', presumida: true });
+    expect(vistaDaPranchaDesenhada('/x/lateral-direita.prancha.svg')).toEqual({ vista: 'esquerda', presumida: true });
     expect(vistaDaPranchaDesenhada('/x/lateral.prancha.svg', { referencias: {} }, { frente: '+z', direita: '-x' })).toMatchObject({ presumida: true });
     expect(vistaDaPranchaDesenhada('/x/traseira.prancha.svg', { referencias: {} })).toMatchObject({ vista: 'traseira' });
-    expect(vistaDaPranchaDesenhada('/x/lateral.prancha.svg', { referencias: { 'lateral.prancha.svg': 'esquerda' } })).toEqual({ vista: 'esquerda', presumida: false });
+    expect(vistaDaPranchaDesenhada('/x/lateral.prancha.svg', { referencias: { 'lateral.prancha.svg': 'direita' } })).toEqual({ vista: 'direita', presumida: false });
     expect(vistaDaPranchaDesenhada('/x/iso.prancha.svg')).toBeNull();
   });
 
-  it('o pedido fechado ganha uma pergunta por vista da prancha', () => {
-    const dados = { plano: null, pranchaDesenhada: { linhas: [{ vista: 'esquerda', caminho: '/x/lateral.prancha.svg' }], imagens: [{ disposicao: 'lado', arquivo: '/p/l.png' }], fora: [] } };
+  it('CRITICA.pranchas leva girar e referencial até a captura da prancha', async () => {
+    const { pranchaDoPlano } = await import('./vistas-para-critica.mjs');
+    const g = gravador();
+    await pranchaDoPlano({ pranchas: [SVG], peca: 'x', pasta: area, critica: { referencias: {}, pranchas: { 'lateral.prancha.svg': { girar: 90, referencial: true } } }, orientacao: null, prancharDesenhadas: g.fazer });
+    expect(g.pedidos[0].pranchas[0]).toMatchObject({ girar: 90, referencial: true });
+  });
+
+  it('o pedido fechado ganha uma pergunta por vista da prancha, com o nome da vista', () => {
+    const dados = { plano: null, pranchaDesenhada: { linhas: [{ vista: 'superior', caminho: '/x/superior.prancha.svg' }], imagens: [{ disposicao: 'lado', arquivo: '/p/l.png' }], fora: [] } };
     const textos = perguntasFechadas(dados).map((p) => p.texto);
-    expect(textos.some((t) => /Na vista esquerda do modelo, a silhueta de lado segue a da prancha desenhada `lateral\.prancha\.svg`/.test(t))).toBe(true);
+    expect(textos.some((t) => /Na vista superior do modelo, a silhueta segue a da prancha desenhada `superior\.prancha\.svg`/.test(t))).toBe(true);
+    expect(textos.join(' ')).not.toContain('silhueta de lado');
     expect(montarPedidoFechado({ peca: 'x', ...dados }, 'a')).toContain('## Prancha desenhada');
   });
 });

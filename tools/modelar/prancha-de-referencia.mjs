@@ -203,6 +203,59 @@ async function carregarEMedirNaPagina({ modelos, fotos, limiar }) {
   return resposta;
 }
 
+/** O limite abaixo do qual a silhueta do modelo, posta sobre o desenho pelas coordenadas, é dita fora dele: o lado ou o giro declarados podem estar errados. */
+export const LIMITE_DA_COBERTURA = 0.85;
+
+/* Fase 3, na página: a fração dos pixels do modelo que caem dentro do contorno do desenho. O "dentro" é o que a água não alcança vindo da
+   borda da imagem do desenho, com os traços engrossados de 1 px para fechar frestas; a imagem do desenho é reduzida à metade. */
+async function medirCoberturaNaPagina({ linhas, limiar }) {
+  const S = 0.5;
+  const resposta = [];
+  for (const l of linhas) {
+    const bm = window.__prancha.fotos[l.indice];
+    const w = Math.ceil(bm.width * S); const h = Math.ceil(bm.height * S);
+    const cv = new OffscreenCanvas(w, h);
+    const g = cv.getContext('2d', { willReadFrequently: true });
+    g.drawImage(bm, 0, 0, w, h);
+    const d = g.getImageData(0, 0, w, h).data;
+    const tinta = new Uint8Array(w * h);
+    for (let i = 0; i < w * h; i++) {
+      if (d[i * 4 + 3] === 0) continue;
+      if (Math.max(Math.abs(d[i * 4] - l.fundoDesenho[0]), Math.abs(d[i * 4 + 1] - l.fundoDesenho[1]), Math.abs(d[i * 4 + 2] - l.fundoDesenho[2])) > limiar) tinta[i] = 1;
+    }
+    const grossa = new Uint8Array(w * h);
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+      if (!tinta[y * w + x]) continue;
+      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) { const xx = x + dx; const yy = y + dy; if (xx >= 0 && yy >= 0 && xx < w && yy < h) grossa[yy * w + xx] = 1; }
+    }
+    const fora = new Uint8Array(w * h);
+    const pilha = [];
+    const semear = (x, y) => { const i = y * w + x; if (!grossa[i] && !fora[i]) { fora[i] = 1; pilha.push(i); } };
+    for (let x = 0; x < w; x++) { semear(x, 0); semear(x, h - 1); }
+    for (let y = 0; y < h; y++) { semear(0, y); semear(w - 1, y); }
+    while (pilha.length) {
+      const i = pilha.pop(); const x = i % w; const y = (i - x) / w;
+      if (x > 0) semear(x - 1, y); if (x < w - 1) semear(x + 1, y); if (y > 0) semear(x, y - 1); if (y < h - 1) semear(x, y + 1);
+    }
+    const mm = window.__prancha.modelos[l.indice];
+    const cm = new OffscreenCanvas(mm.width, mm.height);
+    const gm = cm.getContext('2d', { willReadFrequently: true });
+    gm.drawImage(mm, 0, 0);
+    const dm = gm.getImageData(0, 0, mm.width, mm.height).data;
+    let total = 0; let dentro = 0;
+    for (let y = 0; y < mm.height; y += 2) for (let x = 0; x < mm.width; x += 2) {
+      const i = (y * mm.width + x) * 4;
+      if (dm[i + 3] === 0 || Math.max(Math.abs(dm[i] - l.fundoModelo[0]), Math.abs(dm[i + 1] - l.fundoModelo[1]), Math.abs(dm[i + 2] - l.fundoModelo[2])) <= limiar) continue;
+      total += 1;
+      const hmm = (x - l.origemModelo[0]) / l.kModelo; const vmm = (l.origemModelo[1] - y) / l.kModelo;
+      const px = Math.round((l.origemDesenho[0] + hmm * l.kDesenho) * S); const py = Math.round((l.origemDesenho[1] - vmm * l.kDesenho) * S);
+      if (px >= 0 && py >= 0 && px < w && py < h && !fora[py * w + px]) dentro += 1;
+    }
+    resposta.push({ total, dentro });
+  }
+  return resposta;
+}
+
 /* Fase 2, na página: executa o plano de desenho de `disporPrancha` e devolve o PNG em base64. */
 async function desenharNaPagina(plano) {
   const c = new OffscreenCanvas(plano.largura, plano.altura);
@@ -280,12 +333,12 @@ export function passoDaRegua(pxPorMm, minimoPx = 34) {
 }
 
 /* As marcas de uma régua em mm ao longo de um lado do painel, com o zero no início da extensão. */
-function reguaDoPainel(ops, { painel, zeroX, zeroY, comprimentoX, comprimentoY, escala, cor }) {
+function reguaDoPainel(ops, { painel, zeroX, zeroY, comprimentoX, comprimentoY, escala, cor, minimoX = 0, minimoY = 0 }) {
   const passo = passoDaRegua(escala);
   const [px, py, pw, ph] = painel;
   const yBase = py + ph + 4;
   ops.push({ tipo: 'linha', de: [px, yBase], ate: [px + pw, yBase], cor: '#999' });
-  for (let mm = 0; mm <= comprimentoX + 1e-9; mm += passo) {
+  for (let mm = Math.ceil(minimoX / passo - 1e-9) * passo; mm <= comprimentoX + 1e-9; mm += passo) {
     const x = zeroX + mm * escala;
     if (x < px - 0.5 || x > px + pw + 0.5) continue;
     ops.push({ tipo: 'linha', de: [x, yBase], ate: [x, yBase + 8], cor });
@@ -293,7 +346,7 @@ function reguaDoPainel(ops, { painel, zeroX, zeroY, comprimentoX, comprimentoY, 
   }
   const xBase = px - 4;
   ops.push({ tipo: 'linha', de: [xBase, py], ate: [xBase, py + ph], cor: '#999' });
-  for (let mm = 0; mm <= comprimentoY + 1e-9; mm += passo) {
+  for (let mm = Math.ceil(minimoY / passo - 1e-9) * passo; mm <= comprimentoY + 1e-9; mm += passo) {
     const y = zeroY - mm * escala;
     if (y < py - 0.5 || y > py + ph + 0.5) continue;
     ops.push({ tipo: 'linha', de: [xBase - 8, y], ate: [xBase, y], cor });
@@ -315,13 +368,19 @@ export function disporPrancha({ titulo, linhas, disposicao = 'lado', alturaDaLin
   const medidas = linhas.map((l) => {
     if (!l.modelo.extensao) recusar(`a vista ${l.vista} do modelo saiu só com fundo: a parte não aparece nela.`);
     if (!l.foto.extensao) recusar(`a foto ${l.foto.nome} não tem nada além do fundo na região ${l.foto.regiao ? l.foto.regiao.join(',') : 'inteira'}.`);
-    const recM = recorteComFolga(l.modelo.extensao, l.modelo.largura, l.modelo.altura);
-    const recF = l.foto.regiao
+    /* pelas coordenadas, as duas metades são recortadas pela mesma caixa em mm (`alinhamento.caixaMm`: h mín, v mín, h máx, v máx, com h para a direita e v para cima) */
+    const pelaCaixa = (o, k, largura, altura) => {
+      const [h0, v0, h1, v1] = l.alinhamento.caixaMm;
+      return [Math.max(0, Math.round(o[0] + h0 * k)), Math.max(0, Math.round(o[1] - v1 * k)), Math.min(largura, Math.round(o[0] + h1 * k)), Math.min(altura, Math.round(o[1] - v0 * k))];
+    };
+    const coord = l.alinhamento?.tipo === 'coordenadas' && l.alinhamento.caixaMm && l.modelo.origemPx && l.foto.origemPx && !l.foto.espelhar;
+    const recM = coord ? pelaCaixa(l.modelo.origemPx, l.modelo.pxPorMm, l.modelo.largura, l.modelo.altura) : recorteComFolga(l.modelo.extensao, l.modelo.largura, l.modelo.altura);
+    const recF = coord ? pelaCaixa(l.foto.origemPx, l.foto.pxPorMm, l.foto.largura, l.foto.altura) : l.foto.regiao
       ? [Math.max(0, l.foto.regiao[0]), Math.max(0, l.foto.regiao[1]), Math.min(l.foto.largura, l.foto.regiao[2]), Math.min(l.foto.altura, l.foto.regiao[3])]
       : recorteComFolga(l.foto.extensao, l.foto.largura, l.foto.altura);
     const emMm = (caixa, k) => [(caixa[2] - caixa[0]) / k, (caixa[3] - caixa[1]) / k];
     return {
-      recM, recF,
+      recM, recF, coord,
       recMmm: emMm(recM, l.modelo.pxPorMm), recFmm: emMm(recF, l.foto.pxPorMm),
       extMmm: emMm(l.modelo.extensao, l.modelo.pxPorMm), extFmm: emMm(l.foto.extensao, l.foto.pxPorMm),
     };
@@ -333,7 +392,7 @@ export function disporPrancha({ titulo, linhas, disposicao = 'lado', alturaDaLin
     /* pelas coordenadas, o ponto comum é a origem do referencial em mm, que cada imagem declara em px (`origemPx`); sem elas, o centro */
     const porCoordenadas = l.alinhamento?.tipo === 'coordenadas' && l.modelo.origemPx && l.foto.origemPx;
     const [cmx, cmy] = porCoordenadas ? [l.modelo.origemPx[0] / l.modelo.pxPorMm, l.modelo.origemPx[1] / l.modelo.pxPorMm] : centro(l.modelo.extensao, l.modelo.pxPorMm);
-    const fx = porCoordenadas ? l.foto.origemPx[0] / l.foto.pxPorMm
+    const fx = porCoordenadas ? (l.foto.espelhar ? l.foto.largura - l.foto.origemPx[0] : l.foto.origemPx[0]) / l.foto.pxPorMm
       : l.foto.espelhar ? (l.foto.largura - (l.foto.extensao[0] + l.foto.extensao[2]) / 2) / l.foto.pxPorMm : (l.foto.extensao[0] + l.foto.extensao[2]) / 2 / l.foto.pxPorMm;
     const fy = porCoordenadas ? l.foto.origemPx[1] / l.foto.pxPorMm : (l.foto.extensao[1] + l.foto.extensao[3]) / 2 / l.foto.pxPorMm;
     /* as caixas em mm relativas ao centro da extensão de cada uma */
@@ -359,7 +418,7 @@ export function disporPrancha({ titulo, linhas, disposicao = 'lado', alturaDaLin
   const ops = [];
   let y = MARGEM;
   ops.push({ tipo: 'texto', texto: titulo, em: [MARGEM, y + 18], tamanho: 18, peso: 'bold' });
-  ops.push({ tipo: 'texto', texto: `mesma escala nas duas metades: ${casa(escala)} px da prancha por mm; régua em mm, com o zero no canto de baixo à esquerda da extensão (caixa tracejada)`, em: [MARGEM, y + ALTURA_DO_TITULO + 12], tamanho: 13, cor: '#555' });
+  ops.push({ tipo: 'texto', texto: `mesma escala nas duas metades: ${casa(escala)} px da prancha por mm; ${medidas.some((m) => m.coord) ? 'régua em mm do referencial do objeto, com o zero na origem (as duas metades recortadas pela mesma caixa em mm)' : 'régua em mm, com o zero no canto de baixo à esquerda da extensão (caixa tracejada)'}`, em: [MARGEM, y + ALTURA_DO_TITULO + 12], tamanho: 13, cor: '#555' });
   y += ALTURA_DO_TITULO + 24;
   let largura = Math.ceil(MARGEM + larguraDoTexto('mesma escala nas duas metades: 0,00 px da prancha por mm; régua em mm, com o zero no canto de baixo à esquerda da extensão (caixa tracejada)', 13) + MARGEM);
   const relato = [];
@@ -372,7 +431,7 @@ export function disporPrancha({ titulo, linhas, disposicao = 'lado', alturaDaLin
     const fotoTexto = `${rotulo} ${l.foto.nome}${l.foto.espelhar ? ' (espelhada)' : ''}, régua ${mm1(l.foto.regua.mm)} mm = ${mm1(l.foto.regua.px)} px`;
     const linhaRelato = {
       vista: l.vista,
-      alinhamento: uniao[i].porCoordenadas ? { tipo: 'coordenadas' } : { tipo: 'centro', ...(l.alinhamento?.motivo ? { motivo: l.alinhamento.motivo } : {}) },
+      alinhamento: uniao[i].porCoordenadas ? { tipo: 'coordenadas', caixaMm: l.alinhamento.caixaMm, ...(l.alinhamento.cobertura !== undefined ? { cobertura: l.alinhamento.cobertura } : {}) } : { tipo: 'centro', ...(l.alinhamento?.motivo ? { motivo: l.alinhamento.motivo } : {}) },
       modelo: { pxPorMm: l.modelo.pxPorMm, extensaoPx: l.modelo.extensao, extensaoMm: m.extMmm.map((v) => Number(v.toFixed(1))), ...(l.modelo.eixos ? { eixos: l.modelo.eixos } : {}) },
       foto: {
         nome: l.foto.nome, espelhada: Boolean(l.foto.espelhar), pxPorMm: l.foto.pxPorMm, regiaoPx: l.foto.regiao ?? 'auto',
@@ -381,7 +440,7 @@ export function disporPrancha({ titulo, linhas, disposicao = 'lado', alturaDaLin
     };
     if (disposicao === 'lado') {
       let x = MARGEM + LARGURA_DA_REGUA;
-      const desenhar = ({ fonte, rec, k, ext, espelhar, larguraFonte, cor, rotulo }) => {
+      const desenhar = ({ fonte, rec, k, ext, espelhar, larguraFonte, cor, rotulo, origem = null }) => {
         const w = Math.round((rec[2] - rec[0]) / k * escala);
         const h = Math.round((rec[3] - rec[1]) / k * escala);
         const dy = topo + Math.round((alturaDaLinhaPx - h) / 2);
@@ -398,16 +457,20 @@ export function disporPrancha({ titulo, linhas, disposicao = 'lado', alturaDaLin
         const ex1 = espelhar ? rec[2] - ext[0] : ext[2] - rec[0];
         const caixaExt = [x + ex0 / k * escala, dy + (ext[1] - rec[1]) / k * escala, (ex1 - ex0) / k * escala, (ext[3] - ext[1]) / k * escala];
         ops.push({ tipo: 'retangulo', caixa: caixaExt.map((v) => Math.round(v * 2) / 2), cor, tracejado: [5, 4] });
-        reguaDoPainel(ops, { painel, zeroX: caixaExt[0], zeroY: caixaExt[1] + caixaExt[3], comprimentoX: (rec[2] - rec[0]) / k, comprimentoY: (rec[3] - rec[1]) / k, escala, cor });
+        if (origem) {
+          /* a régua em mm do referencial: o zero na origem do objeto, que cai a (origem - recorte) px do canto do painel */
+          const hEsq = (rec[0] - origem[0]) / k; const vTopo = (origem[1] - rec[1]) / k;
+          reguaDoPainel(ops, { painel, zeroX: x - hEsq * escala, zeroY: dy + vTopo * escala, comprimentoX: (rec[2] - origem[0]) / k, comprimentoY: vTopo, minimoX: hEsq, minimoY: (origem[1] - rec[3]) / k, escala, cor });
+        } else reguaDoPainel(ops, { painel, zeroX: caixaExt[0], zeroY: caixaExt[1] + caixaExt[3], comprimentoX: (rec[2] - rec[0]) / k, comprimentoY: (rec[3] - rec[1]) / k, escala, cor });
         x += w + ESPACO + LARGURA_DA_REGUA;
         void larguraFonte;
       };
       desenhar({
-        fonte: 'modelos', rec: m.recM, k: l.modelo.pxPorMm, ext: l.modelo.extensao, espelhar: false, cor: COR_DO_MODELO,
+        fonte: 'modelos', rec: m.recM, k: l.modelo.pxPorMm, ext: l.modelo.extensao, espelhar: false, cor: COR_DO_MODELO, origem: m.coord ? l.modelo.origemPx : null,
         rotulo: [`modelo, vista ${l.vista} (ortográfica)`, `extensão ${mm1(m.extMmm[0])} x ${mm1(m.extMmm[1])} mm`, fraseDosEixos],
       });
       desenhar({
-        fonte: 'fotos', rec: m.recF, k: l.foto.pxPorMm, ext: l.foto.extensao, espelhar: Boolean(l.foto.espelhar), cor: COR_DA_FOTO,
+        fonte: 'fotos', rec: m.recF, k: l.foto.pxPorMm, ext: l.foto.extensao, espelhar: Boolean(l.foto.espelhar), cor: COR_DA_FOTO, origem: m.coord ? l.foto.origemPx : null,
         rotulo: [fotoTexto, `região ${l.foto.regiao ? `${l.foto.regiao.join(',')} px` : 'auto'}; extensão do que não é fundo ${mm1(m.extFmm[0])} x ${mm1(m.extFmm[1])} mm`],
       });
       largura = Math.max(largura, x - ESPACO + MARGEM, fraseDosEixos ? MARGEM + LARGURA_DA_REGUA + larguraDoTexto(fraseDosEixos, 12) + MARGEM : 0);
@@ -427,7 +490,9 @@ export function disporPrancha({ titulo, linhas, disposicao = 'lado', alturaDaLin
       const caixaM = emPx(u.extM);
       ops.push({ tipo: 'retangulo', caixa: caixaM, cor: COR_DO_MODELO, tracejado: [5, 4] });
       ops.push({ tipo: 'retangulo', caixa: emPx(u.extF), cor: COR_DA_FOTO, tracejado: [5, 4] });
-      reguaDoPainel(ops, { painel, zeroX: caixaM[0], zeroY: caixaM[1] + caixaM[3], comprimentoX: u.u[2] - u.u[0], comprimentoY: u.u[3] - u.u[1], escala, cor: COR_DO_MODELO });
+      if (u.porCoordenadas) {
+        reguaDoPainel(ops, { painel, zeroX: x0 - u.u[0] * escala, zeroY: topo - u.u[1] * escala, comprimentoX: u.u[2], comprimentoY: -u.u[1], minimoX: u.u[0], minimoY: -u.u[3], escala, cor: COR_DO_MODELO });
+      } else reguaDoPainel(ops, { painel, zeroX: caixaM[0], zeroY: caixaM[1] + caixaM[3], comprimentoX: u.u[2] - u.u[0], comprimentoY: u.u[3] - u.u[1], escala, cor: COR_DO_MODELO });
       largura = Math.max(largura, x0 + painel[2] + MARGEM, fraseDosEixos ? x0 + larguraDoTexto(fraseDosEixos, 12) + MARGEM : 0);
     }
     relato.push(linhaRelato);
@@ -819,7 +884,8 @@ export function alinharPelasCoordenadas({ modelo, desenho, margem = MARGEM_DO_RE
   const folga = TOLERANCIA_DA_CAIXA * Math.max(dh1 - dh0, dv1 - dv0);
   if (h0 < dh0 - folga || h1 > dh1 + folga || vBaixo < dv0 - folga || vAlto > dv1 + folga) {
     const mm = (n) => Math.round(n);
-    return { ok: false, motivo: `o modelo ocupa h ${mm(h0)} a ${mm(h1)} e v ${mm(vBaixo)} a ${mm(vAlto)} mm e o desenho ${mm(dh0)} a ${mm(dh1)} e ${mm(dv0)} a ${mm(dv1)} mm: as origens não coincidem` };
+    const excessos = [['à esquerda', dh0 - h0], ['à direita', h1 - dh1], ['embaixo', dv0 - vBaixo], ['em cima', vAlto - dv1]].filter(([, e]) => e > 0);
+    return { ok: false, motivo: `o modelo passa da caixa do desenho (h ${mm(dh0)} a ${mm(dh1)} e v ${mm(dv0)} a ${mm(dv1)} mm): ${excessos.map(([lado, e]) => `${mm(e)} mm ${lado}`).join(', ')}; ou a origem do desenho não é a do modelo` };
   }
   const m = margem * Math.max(h1 - h0, vAlto - vBaixo);
   const kd = desenho.pxPorMm;
@@ -911,6 +977,7 @@ export async function prancharReferencia(opcoes, { rotulo = 'foto', prazoDeCarga
     let recortou = false;
     for (const [i, ancora] of pedido.ancoras.entries()) {
       if (!ancora) continue;
+      if (ancora.motivo) { alinhamentos[i] = { tipo: 'centro', motivo: ancora.motivo }; continue; }
       const a = alinharPelasCoordenadas({
         modelo: { origemPx: origensDoModelo[i], extensao: medidas.modelos[i].extensao, pxPorMm: escalas[i] },
         desenho: { ...ancora, pxPorMm: pedido.reguas[i].pxPorMm, largura: medidas.fotos[i].largura, altura: medidas.fotos[i].altura },
@@ -918,37 +985,51 @@ export async function prancharReferencia(opcoes, { rotulo = 'foto', prazoDeCarga
       if (a.ok) { pedido.regioes[i] = a.regiao; alinhamentos[i] = { tipo: 'coordenadas', caixaMm: a.caixaMm }; recortou = true; } else alinhamentos[i] = { tipo: 'centro', motivo: a.motivo };
     }
     if (recortou) medidas = await medirTudo();
+    /* a conferência de que o lado e o giro estão certos: a silhueta do modelo precisa cair dentro do contorno do desenho */
+    const aMedir = alinhamentos.map((a, i) => (a.tipo === 'coordenadas' ? i : -1)).filter((i) => i >= 0);
+    if (aMedir.length) {
+      const cob = await page.evaluate(medirCoberturaNaPagina, {
+        limiar: LIMIAR_DO_FUNDO,
+        linhas: aMedir.map((i) => ({
+          indice: i, fundoDesenho: medidas.fotos[i].fundo, fundoModelo: medidas.modelos[i].fundo, origemModelo: origensDoModelo[i], kModelo: escalas[i],
+          origemDesenho: pedido.ancoras[i].origemPx, kDesenho: pedido.reguas[i].pxPorMm,
+        })),
+      });
+      for (const [j, i] of aMedir.entries()) alinhamentos[i].cobertura = cob[j].total ? Math.round((cob[j].dentro / cob[j].total) * 1000) / 1000 : null;
+    }
     for (const [i, m] of medidas.fotos.entries()) {
       if (m.fora) recusar(`--regiao ${pedido.regioes[i].join(',')} cai fora da foto ${pedido.fotos[i].nome}, que tem ${m.largura} por ${m.altura} px.`);
     }
     const titulo = `${pedido.peca}${isolar ? `, ${pedido.partes.join(' e ')}${pedido.copia ? ` (só a cópia ${pedido.copia})` : ''} isolada` : ''}: modelo e ${rotulo === 'foto' ? 'foto de referência' : rotulo}`;
-    const plano = disporPrancha({
-      titulo,
-      rotulo,
-      disposicao: pedido.disposicao,
-      linhas: pedido.vistas.map((vista, i) => ({
-        vista,
-        alinhamento: alinhamentos[i],
-        modelo: { largura: medidas.modelos[i].largura, altura: medidas.modelos[i].altura, extensao: medidas.modelos[i].extensao, pxPorMm: escalas[i], eixos: eixos[i], origemPx: origensDoModelo[i] },
-        foto: {
-          origemPx: pedido.ancoras[i]?.origemPx ?? null,
-          nome: pedido.fotos[i].nome, largura: medidas.fotos[i].largura, altura: medidas.fotos[i].altura, regiao: pedido.regioes[i],
-          extensao: medidas.fotos[i].extensao, pxPorMm: pedido.reguas[i].pxPorMm, espelhar: pedido.espelhadas.includes(vista), regua: pedido.reguas[i],
-        },
-      })),
-    });
-    const png = await page.evaluate(desenharNaPagina, { largura: plano.largura, altura: plano.altura, fundo: plano.fundo, operacoes: plano.operacoes });
-    mkdirSync(dirname(pedido.arquivo), { recursive: true });
-    verificarCaminhoConfinado(pedido.arquivo, { raiz: REPO });
-    writeFileSync(pedido.arquivo, Buffer.from(png, 'base64'));
-    const json = pedido.arquivo.replace(/\.png$/i, '.json');
-    const relato = {
-      peca: pedido.peca, partes: pedido.partes, ...(pedido.copia ? { copia: pedido.copia, caixaDaCopiaMm: r.resultado.vistas[0]?.copia?.caixaMm ?? null } : {}), disposicao: pedido.disposicao, escalaDaPrancha: plano.escala,
-      largura: plano.largura, altura: plano.altura,
-      linhas: plano.linhas.map((l, i) => ({ ...l, foto: { ...l.foto, regua: pedido.reguas[i] } })),
+    const linhasDoPlano = pedido.vistas.map((vista, i) => ({
+      vista,
+      alinhamento: alinhamentos[i],
+      modelo: { largura: medidas.modelos[i].largura, altura: medidas.modelos[i].altura, extensao: medidas.modelos[i].extensao, pxPorMm: escalas[i], eixos: eixos[i], origemPx: origensDoModelo[i] },
+      foto: {
+        origemPx: pedido.ancoras[i]?.origemPx ?? null,
+        nome: pedido.fotos[i].nome, largura: medidas.fotos[i].largura, altura: medidas.fotos[i].altura, regiao: pedido.regioes[i],
+        extensao: medidas.fotos[i].extensao, pxPorMm: pedido.reguas[i].pxPorMm, espelhar: pedido.espelhadas.includes(vista), regua: pedido.reguas[i],
+      },
+    }));
+    /* uma captura da bancada serve a todas as disposições pedidas (`opcoes.tambem`: `{ disposicao, saida }`) */
+    const gravar = async (disposicao, arquivo) => {
+      const plano = disporPrancha({ titulo, rotulo, disposicao, linhas: linhasDoPlano });
+      const png = await page.evaluate(desenharNaPagina, { largura: plano.largura, altura: plano.altura, fundo: plano.fundo, operacoes: plano.operacoes });
+      mkdirSync(dirname(arquivo), { recursive: true });
+      verificarCaminhoConfinado(arquivo, { raiz: REPO });
+      writeFileSync(arquivo, Buffer.from(png, 'base64'));
+      const json = arquivo.replace(/\.png$/i, '.json');
+      const relato = {
+        peca: pedido.peca, partes: pedido.partes, ...(pedido.copia ? { copia: pedido.copia, caixaDaCopiaMm: r.resultado.vistas[0]?.copia?.caixaMm ?? null } : {}), disposicao, escalaDaPrancha: plano.escala,
+        largura: plano.largura, altura: plano.altura,
+        linhas: plano.linhas.map((l, i) => ({ ...l, foto: { ...l.foto, regua: pedido.reguas[i] } })),
+      };
+      writeFileSync(json, `${JSON.stringify(relato, null, 2)}\n`);
+      return { arquivo, json, medidas: relato };
     };
-    writeFileSync(json, `${JSON.stringify(relato, null, 2)}\n`);
-    return { arquivo: pedido.arquivo, json, medidas: relato };
+    const principal = await gravar(pedido.disposicao, pedido.arquivo);
+    const tambem = opcoes.tambem ? { disposicao: opcoes.tambem.disposicao, ...(await gravar(opcoes.tambem.disposicao, resolve(REPO, opcoes.tambem.saida))) } : null;
+    return { ...principal, ...(tambem ? { tambem } : {}) };
   } finally {
     await browser.close().catch(() => {});
   }
@@ -959,7 +1040,9 @@ export async function prancharReferencia(opcoes, { rotulo = 'foto', prazoDeCarga
 /* A vista que o nome da prancha sugere quando ninguém a declara; `vistas:critica` escolhe pela convenção das referências (o lateral sem orientação olha de -x) ou pelo que a receita declara em CRITICA.referencias. */
 export const VISTA_DA_PRANCHA_DESENHADA = Object.freeze({ lateral: 'esquerda', frontal: 'frontal', traseira: 'traseira', superior: 'superior', inferior: 'inferior' });
 const AMPLIACAO_DO_SVG = 3;
-const COTAS_ESCONDIDAS = 'text, .cota, .ext, .cotat, .tit, .sub, .rot, .lmt, .cortet';
+/* o que sai da imagem rasterizada: as cotas, os textos, e as linhas de eixo, de curva de caráter, de corte e as marcas, que são anotação e não forma */
+export const COTAS_ESCONDIDAS = 'text, .cota, .ext, .cotat, .tit, .sub, .rot, .lmt, .cortet, .eixo, .carater, .corte, .lm';
+export const CONCORDANCIA_DAS_ESCALAS = 0.005;
 
 /** A caixa em px do que o desenho traça com a classe `contorno` (os pontos dos comandos M e L; outro comando é recusado). */
 export function caixaDoContornoSvg(texto, nome = 'a prancha') {
@@ -977,14 +1060,15 @@ export function caixaDoContornoSvg(texto, nome = 'a prancha') {
 /**
  * Lê uma prancha `<lado>.prancha.svg` com o `<lado>.prancha.relatorio.json` ao lado e a deixa pronta para a prancha modelo e desenho: o
  * SVG ampliado e sem as cotas e os textos (`svg`), a régua e a região em px do raster, e a escala. A escala não é declarada no
- * desenho: vem da caixa do contorno em px e da caixa em mm que o relatório da prancha grava, e as duas direções precisam concordar em 3%.
+ * desenho: vem da caixa do contorno em px e da caixa em mm que o relatório da prancha grava, e as duas direções precisam concordar em 0,5%.
  * Devolve `{ svg, vista, regua, regiao, pxPorMm, caixaMm, larguraMm, alturaMm }`.
  */
-export function lerPranchaDesenhada(caminhoSvg, { ler = (c) => readFileSync(c, 'utf8'), existe = existsSync, girar = 0 } = {}) {
+export function lerPranchaDesenhada(caminhoSvg, { ler = (c) => readFileSync(c, 'utf8'), existe = existsSync, girar = 0, vista: vistaDeclarada = null } = {}) {
   if (![0, 90, 180, 270].includes(girar)) recusar(`girar ${girar}: a prancha desenhada gira em múltiplos de 90 graus, no sentido horário (0, 90, 180 ou 270).`);
   const nome = basename(caminhoSvg);
   const lado = /^(.*)\.prancha\.svg$/.exec(nome)?.[1] ?? '';
-  const vista = VISTA_DA_PRANCHA_DESENHADA[lado.split(/[^a-z]+/i).pop()?.toLowerCase()] ?? null;
+  /* a vista declarada por quem chama (a de `vistaDaPranchaDesenhada`) vale; sem ela, o último pedaço do nome */
+  const vista = vistaDeclarada ?? VISTA_DA_PRANCHA_DESENHADA[lado.split(/[^a-z]+/i).pop()?.toLowerCase()] ?? null;
   if (!vista) recusar(`${nome}: o nome da prancha desenhada é <lado>.prancha.svg, com o lado em ${Object.keys(VISTA_DA_PRANCHA_DESENHADA).join(', ')}.`);
   const relatorio = caminhoSvg.replace(/\.svg$/i, '.relatorio.json');
   if (!existe(relatorio)) recusar(`${nome}: falta ${basename(relatorio)} ao lado, que dá a caixa do desenho em mm (o relatório que o script da prancha grava).`);
@@ -997,16 +1081,23 @@ export function lerPranchaDesenhada(caminhoSvg, { ler = (c) => readFileSync(c, '
   /* o relatório dá a caixa do desenho como foi traçado; a imagem girada troca a largura e a altura em mm junto com as de px */
   const larguraMm = trocam ? caixa.yMax - caixa.yMin : caixa.xMax - caixa.xMin;
   const alturaMm = trocam ? caixa.xMax - caixa.xMin : caixa.yMax - caixa.yMin;
-  const medidaDoDesenho = girar ? /viewBox="0 0 ([\d.]+) ([\d.]+)"/.exec(texto) : null;
-  if (girar && !medidaDoDesenho) recusar(`${nome}: girar pede <svg viewBox="0 0 <largura> <altura>">, e o desenho abre com outro.`);
-  const [W, H] = medidaDoDesenho ? [Number(medidaDoDesenho[1]), Number(medidaDoDesenho[2])] : [0, 0];
+  /* o desenho precisa ter a origem do viewBox em 0 0, o tamanho em px igual ao do viewBox e o contorno fora de grupo com transformação: do contrário a caixa lida em px não é a que a imagem mostra */
+  const abertura0 = /<svg\b[^>]*>/.exec(texto)?.[0] ?? '';
+  const medidaDoDesenho = /viewBox="([-\d.]+) ([-\d.]+) ([\d.]+) ([\d.]+)"/.exec(abertura0);
+  if (!medidaDoDesenho || Number(medidaDoDesenho[1]) !== 0 || Number(medidaDoDesenho[2]) !== 0) recusar(`${nome}: a prancha desenhada abre com <svg viewBox="0 0 <largura> <altura>">, e este abre com ${medidaDoDesenho ? `origem ${medidaDoDesenho[1]} ${medidaDoDesenho[2]}` : 'outro formato'}; a escala em mm se mede nessa origem.`);
+  const [W, H] = [Number(medidaDoDesenho[3]), Number(medidaDoDesenho[4])];
+  for (const [atributo, esperado] of [['width', W], ['height', H]]) {
+    const dado = new RegExp(`\\s${atributo}="([\\d.]+)"`).exec(abertura0)?.[1];
+    if (dado !== undefined && Number(dado) !== esperado) recusar(`${nome}: ${atributo}="${dado}" difere do viewBox (${esperado}); a escala em mm se mede com o tamanho em px igual ao do viewBox.`);
+  }
+  if (/<g\b[^>]*\btransform=/.test(texto)) recusar(`${nome}: há grupo <g transform=...> no desenho, e a caixa do contorno lida em px não vale dentro dele; desenhe sem transformação.`);
   if (girar === 90) [x0, y0, x1, y1] = [H - y1, x0, H - y0, x1];
   else if (girar === 180) [x0, y0, x1, y1] = [W - x1, H - y1, W - x0, H - y0];
   else if (girar === 270) [x0, y0, x1, y1] = [y0, W - x1, y1, W - x0];
   const k = (x1 - x0) / larguraMm;
   const kAltura = (y1 - y0) / alturaMm;
-  if (!(k > 0) || Math.abs(kAltura - k) > k * 0.03) {
-    recusar(`${nome}: o contorno mede ${(x1 - x0).toFixed(1)} x ${(y1 - y0).toFixed(1)} px e o relatório diz ${larguraMm.toFixed(1)} x ${alturaMm.toFixed(1)} mm, ${k.toFixed(4)} e ${kAltura.toFixed(4)} px/mm, que passam de 3% de diferença; o desenho e o relatório não são da mesma rodada.`);
+  if (!(k > 0) || Math.abs(kAltura - k) > k * CONCORDANCIA_DAS_ESCALAS) {
+    recusar(`${nome}: o contorno mede ${(x1 - x0).toFixed(1)} x ${(y1 - y0).toFixed(1)} px e o relatório diz ${larguraMm.toFixed(1)} x ${alturaMm.toFixed(1)} mm, ${k.toFixed(4)} e ${kAltura.toFixed(4)} px/mm, que passam de 0,5% de diferença; o desenho e o relatório não são da mesma rodada.`);
   }
   const folga = Math.max(8, 0.04 * Math.max(x1 - x0, y1 - y0));
   const f = AMPLIACAO_DO_SVG;
@@ -1035,10 +1126,19 @@ export function lerPranchaDesenhada(caminhoSvg, { ler = (c) => readFileSync(c, '
  * na mesma escala em mm. `pranchas` é `[{ caminho, vista? }]` (a `vista` declarada vale no lugar da do nome); grava `<saida>` e, ao lado,
  * o SVG ampliado de cada uma. Devolve `{ arquivo, json, medidas, vistas }`.
  */
-export async function prancharDesenhadas({ peca, pranchas, saida, disposicao = 'lado', espelhar = [], prazoDeCargaMs = null }, dependencias = {}) {
+export async function prancharDesenhadas({ peca, pranchas, saida, disposicao = 'lado', sobreposta = null, espelhar = [], prazoDeCargaMs = null }, dependencias = {}) {
   if (!pranchas?.length) recusar('prancharDesenhadas pede ao menos uma prancha.');
-  const lidas = pranchas.map((p) => ({ ...lerPranchaDesenhada(p.caminho, { ...(dependencias.leitura ?? {}), girar: p.girar ?? 0 }), caminho: p.caminho, girar: p.girar ?? 0 }));
-  const vistas = lidas.map((l, i) => pranchas[i].vista ?? l.vista);
+  /* cada prancha é lida e recusada por si: uma ruim não derruba as outras */
+  const recusadas = [];
+  const lidas = [];
+  for (const p of pranchas) {
+    try { lidas.push({ ...lerPranchaDesenhada(p.caminho, { ...(dependencias.leitura ?? {}), girar: p.girar ?? 0, vista: p.vista ?? null }), caminho: p.caminho, girar: p.girar ?? 0, referencial: p.referencial === true }); } catch (erro) {
+      if (!(erro instanceof ErroDePrancha)) throw erro;
+      recusadas.push(`${basename(p.caminho)}: ${erro.message}`);
+    }
+  }
+  if (!lidas.length) recusar(`nenhuma prancha desenhada se leu: ${recusadas.join(' | ')}`);
+  const vistas = lidas.map((l) => l.vista);
   const arquivos = lidas.map((l, i) => {
     const arquivo = saida.replace(/\.png$/i, `-${vistas[i]}.svg`);
     mkdirSync(dirname(arquivo), { recursive: true });
@@ -1048,9 +1148,13 @@ export async function prancharDesenhadas({ peca, pranchas, saida, disposicao = '
   const resultado = await prancharReferencia({
     peca, vistas: vistas.join(','), foto: arquivos.join(';'), regua: lidas.map((l) => l.regua).join(';'), regiao: lidas.map((l) => l.regiao).join(';'),
     disposicao, espelhar: espelhar.join(','), saida,
-    ancoras: lidas.map((l) => ({ origemPx: l.origemPx, caixaMm: l.caixaImagemMm })),
+    /* a origem em mm só vale com a peça no referencial do desenho, o que a receita declara em CRITICA.pranchas (referencial: true); fora disso, o centro, dizendo por quê */
+    ancoras: lidas.map((l) => (l.referencial
+      ? { origemPx: l.origemPx, caixaMm: l.caixaImagemMm }
+      : { motivo: 'a receita não declara em CRITICA.pranchas que a peça está no referencial do desenho (referencial: true), e a peça de referencial próprio ou em pose de montagem cairia fora do lugar' })),
+    ...(sobreposta ? { tambem: { disposicao: 'sobreposto', saida: sobreposta } } : {}),
   }, { ...dependencias, rotulo: 'prancha desenhada', ...(prazoDeCargaMs ? { prazoDeCargaMs } : {}) });
-  return { ...resultado, vistas, lidas: lidas.map(({ caminho, larguraMm, alturaMm, pxPorMm, girar }, i) => ({ caminho, vista: vistas[i], larguraMm, alturaMm, pxPorMm, girar, alinhamento: resultado.medidas.linhas[i]?.alinhamento ?? null })) };
+  return { ...resultado, vistas, recusadas, lidas: lidas.map(({ caminho, larguraMm, alturaMm, pxPorMm, girar }, i) => ({ caminho, vista: vistas[i], larguraMm, alturaMm, pxPorMm, girar, alinhamento: resultado.medidas.linhas[i]?.alinhamento ?? null })) };
 }
 
 /* ---------- A CLI ---------- */

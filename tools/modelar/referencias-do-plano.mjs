@@ -50,8 +50,14 @@ export function avisarReferenciasLocaisAusentes(locaisAusentes, escrever = (linh
 }
 
 /** O aviso do que o plano cita e o pacote do crítico não leva (não é imagem nem prancha desenhada): dito na saída e no pedido, nunca calado. */
-export function avisoDasReferenciasIgnoradas(ignoradas) {
-  if (!ignoradas?.length) return null;
+export function referenciasSemLeitura(ignoradas) {
+  /* o `.contornos.json` não é imagem, mas o pacote o lê (contornosDasReferencias) e o põe no contorno sobreposto: não é referência ignorada */
+  return (ignoradas ?? []).filter((c) => !/\.contornos\.json$/i.test(c));
+}
+
+export function avisoDasReferenciasIgnoradas(todas) {
+  const ignoradas = referenciasSemLeitura(todas);
+  if (!ignoradas.length) return null;
   return `PLANO.referencias cita ${ignoradas.length === 1 ? 'um arquivo' : `${ignoradas.length} arquivos`} que não entra${ignoradas.length === 1 ? '' : 'm'} no pacote do crítico, porque não ${ignoradas.length === 1 ? 'é' : 'são'} imagem (png, jpg, webp, gif) nem prancha desenhada (<lado>.prancha.svg): ${ignoradas.join(', ')}. `
     + 'O crítico não o lê; se ele devia comparar o modelo com isso, entregue uma imagem ou uma prancha <lado>.prancha.svg com o relatório ao lado.';
 }
