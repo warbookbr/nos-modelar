@@ -1,6 +1,6 @@
 # Cache por passo: a linha de base do laço e onde o cache rende mais
 
-Pasta do plano [cache por passo da receita](../../planos/2026-11-16-cache-por-passo.md), fatia 1, medida em 2026-11-17 entre 01:43 e 03:06 UTC, numa máquina de quatro núcleos a 2,3 GHz e 15 GB, com Node 22.23.4 e sem outro agente rodando. O laço medido é o de depois de uma edição da receita: um `descrever` e uma captura da bancada, com a receita mudada desde a captura anterior.
+Pasta do plano [cache por passo da receita](../../decisoes/PLANOS-ENCERRADOS.md), fatia 1, medida em 2026-11-17 entre 01:43 e 03:06 UTC, numa máquina de quatro núcleos a 2,3 GHz e 15 GB, com Node 22.23.4 e sem outro agente rodando. O laço medido é o de depois de uma edição da receita: um `descrever` e uma captura da bancada, com a receita mudada desde a captura anterior.
 
 ## Como se refaz
 
