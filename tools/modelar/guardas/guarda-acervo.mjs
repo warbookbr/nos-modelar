@@ -137,7 +137,7 @@ export function vazioDeclarado({ raiz = ACERVO } = {}) {
    montagem do objeto (`<objeto>/montagem.json`), e a etapa dela não está fixa.
    O plano continua validado e as referências continuam cobradas. Parte fixa
    sem passo não existe, porque fixar exige o crítico ter fechado a peça. */
-export function etapaQueEspera(peca, { raiz = ACERVO } = {}) {
+export function etapaQueEspera(peca, { raiz = ACERVO, semPassos = false } = {}) {
   const [objeto, parte] = peca.split('/');
   if (!parte) return null;
   const arquivo = join(raiz, objeto, 'montagem.json');
@@ -148,7 +148,7 @@ export function etapaQueEspera(peca, { raiz = ACERVO } = {}) {
   const registro = arquivo.replace(/\.json$/, '.etapas.json');
   const lido = existsSync(registro) ? JSON.parse(readFileSync(registro, 'utf8')) : null;
   /* No registro da versão 3 o estado não está gravado, e esta dispensa só vale para receita sem passo: etapa sem geometria nunca é fixa. */
-  const estado = lido?.versao === 3 ? 'nao-conferivel' : lido?.etapas?.find((e) => e.instancia === instancia.id)?.estado;
+  const estado = lido?.versao === 3 ? (semPassos ? 'nao-conferivel' : 'fixa') : lido?.etapas?.find((e) => e.instancia === instancia.id)?.estado;
   return estado === 'fixa' ? null : { montagem: relative(raiz, arquivo).replaceAll('\\', '/'), instancia: instancia.id };
 }
 
@@ -224,8 +224,9 @@ export function motivoDeCascaAberta(forma, passos = [], executar = (prefixo) => 
 export async function conferirPeca(peca) {
   const reprovadas = [];
   const esperando = [];
-  const espera = etapaQueEspera(peca);
-  const vazia = espera && await receitaSemPasso(peca);
+  const semPasso = await receitaSemPasso(peca);
+  const espera = semPasso ? etapaQueEspera(peca, { semPassos: true }) : null;
+  const vazia = espera && semPasso;
   if (vazia) {
     try {
       const plano = normalizarPlanoDeModelagem(vazia.PLANO);

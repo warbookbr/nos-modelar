@@ -107,7 +107,7 @@ export function etapaFixaDaPeca(peca, { raiz = join(REPO, 'procedural/pecas'), e
 
 /** A mesma pergunta de `etapaFixaDaPeca`, com o registro da versão 3 lido pela impressão do aceite (mede a montagem de agora). */
 export async function etapaFixaDaPecaMedida(peca, opcoes = {}) {
-  const { raiz = join(REPO, 'procedural/pecas') } = opcoes;
+  const { raiz = join(REPO, 'procedural/pecas'), registro: dado } = opcoes;
   const [objeto, parte] = peca.split('/');
   if (!parte) return false;
   const arquivo = join(raiz, objeto, 'montagem.json');
@@ -115,9 +115,22 @@ export async function etapaFixaDaPecaMedida(peca, opcoes = {}) {
   try {
     const instancia = (JSON.parse(readFileSync(arquivo, 'utf8')).instancias ?? []).find((item) => item.alvo?.ref === peca);
     if (!instancia) return false;
+    /* `registro` é o registro já com o estado medido (ou quem o dá, uma vez só): quem já mediu a montagem não a mede de novo */
+    const lido = typeof dado === 'function' ? await dado() : dado;
+    if (lido !== undefined) return lido?.etapas?.find((e) => e.instancia === instancia.id)?.estado === 'fixa';
     const { registroComEstado } = await import('./etapas-da-montagem.mjs');
     return (await registroComEstado(arquivo))?.etapas?.find((e) => e.instancia === instancia.id)?.estado === 'fixa';
   } catch { return false; }
+}
+
+/**
+ * `superficieDaPeca` com a etapa fixa medida, e só quando a resposta decide algo: a etapa fixa só dispensa a luz rasante da peça que a
+ * leva sem ser de lataria. Nas outras peças a montagem não é medida (no registro da versão 3, medir resolve a montagem inteira).
+ */
+export async function superficieDaPecaMedida(peca, receita, plano = null, opcoes = {}) {
+  const decidida = superficieDaReceita(receita, plano);
+  const etapaFixa = decidida.luzRasante && !decidida.lataria ? await etapaFixaDaPecaMedida(peca, opcoes) : false;
+  return superficieDaPeca(peca, receita, plano, { ...opcoes, etapaFixa });
 }
 
 /**
@@ -137,10 +150,10 @@ export function superficieDaPeca(peca, receita, plano = null, opcoes = {}) {
 /**
  * O que a peça leva ao pacote, lido da receita do acervo: `superficieDaPeca` com o caminho da receita.
  */
-export async function latariaDaPeca(peca, { opcao = 1, entrada = null } = {}) {
+export async function latariaDaPeca(peca, { opcao = 1, entrada = null, raiz } = {}) {
   const lida = entrada ?? await lerEntradaDeMedida(peca, { opcao, montagem: false });
   const plano = normalizarPlanoDeModelagem(lida.receita?.PLANO);
-  return { ...superficieDaPeca(peca, lida.receita, plano, { etapaFixa: await etapaFixaDaPecaMedida(peca) }), caminho: lida.abs };
+  return { ...(await superficieDaPecaMedida(peca, lida.receita, plano, raiz ? { raiz } : {})), caminho: lida.abs };
 }
 
 /* ---------- a luz rasante quase toda escura ---------- */

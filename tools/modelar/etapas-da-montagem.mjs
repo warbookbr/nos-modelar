@@ -79,7 +79,11 @@ export function montagemAteAGeometria(dado, montagem, receitas) {
   const refDe = new Map(montagem.instancias.map((item) => [item.id, item.alvo.ref]));
   const primeiraVazia = montagem.etapas.findIndex((id) => (receitas[refDe.get(id)]?.PASSOS ?? []).length === 0);
   if (primeiraVazia < 0) return { dado, construidas: montagem.etapas };
-  const construidas = montagem.etapas.slice(0, primeiraVazia);
+  return montagemAteAs(dado, montagem, montagem.etapas.slice(0, primeiraVazia));
+}
+
+/* A montagem cortada nas etapas dadas (o começo da ordem): só as instâncias, relações, vínculos e posições que cabem nelas. */
+export function montagemAteAs(dado, montagem, construidas) {
   const fica = new Set(construidas);
   const topo = (lado) => lado?.caminho?.[0];
   /* As expectativas citam instâncias pelo caminho, e uma citação de instância
@@ -155,7 +159,23 @@ function portasCitadasAgora(neutro, nomes) {
    aceite (`etapas-pela-impressao.js`). Um registro da versão 1 ou 2 (o do acervo, até a migração da fatia 3 do plano das etapas pela
    impressão) segue lido pelo caminho antigo, que grava o estado em cada etapa, e o comando avisa. */
 export const AVISO_DO_CAMINHO_ANTIGO = 'aviso: o registro de etapas é da versão anterior à impressão do aceite e este comando o lê pelo caminho antigo (estado gravado em cada etapa); a migração para a versão 3 é a fatia 3 do plano das etapas pela impressão do aceite.';
-export const registroPelaImpressao = (registro) => registro === null || registro === undefined || registro.versao === VERSAO_REGISTRO_PELA_IMPRESSAO;
+/* Registro ausente ou da versão 3: a leitura nova. Versão 1, 2 ou sem versão (e com `etapas`): o caminho antigo, que recusa registro com
+   `eventos`. Qualquer outro valor de versão recusa: um registro adulterado não pode apagar o histórico caindo no outro caminho. */
+export function registroPelaImpressao(registro) {
+  if (registro === null || registro === undefined) return true;
+  if (registro.versao === VERSAO_REGISTRO_PELA_IMPRESSAO) return true;
+  const antigo = registro.versao === 1 || registro.versao === 2 || registro.versao === undefined;
+  if (!antigo) {
+    throw new ErroEtapaDeConstrucao('registro-invalido', `o registro de etapas traz a versão ${JSON.stringify(registro.versao)}; esperava 3 (impressão do aceite), 1 ou 2 (antigo), ou nenhum registro.`);
+  }
+  if ('eventos' in registro) {
+    throw new ErroEtapaDeConstrucao('registro-invalido', `o registro de etapas de versão ${JSON.stringify(registro.versao)} traz eventos, que só o da versão 3 tem; recusado em vez de lido pelo caminho antigo, que apagaria o histórico.`);
+  }
+  if (!Array.isArray(registro.etapas)) {
+    throw new ErroEtapaDeConstrucao('registro-invalido', 'o registro de etapas sem versão 3 precisa trazer a lista `etapas` do formato antigo.');
+  }
+  return false;
+}
 
 function lerRegistroDoDisco(arquivoMontagem) {
   const arquivo = arquivoDoRegistro(arquivoMontagem);
@@ -200,18 +220,48 @@ export async function estadoDasEtapas(arquivoMontagem, { receitas, anterior, imp
    montagem derivou, a pose no mundo e as juntas medidas; e, de cada porta que uma etapa posterior cita, a interface no mundo. A
    etapa sem geometria (receita sem passos, ou depois da primeira receita sem passos, ou submontagem) fica sem `forma`. Ainda não é o
    caminho de `fixar` e `reabrir`. */
+let medicoes = 0;
+/** Quantas vezes a montagem foi medida neste processo (`medirAgora`): para os testes provarem que um comando mede uma vez só. */
+export const medicoesFeitas = () => medicoes;
+
 export async function medirAgora(arquivoMontagem, { receitas } = {}) {
+  medicoes += 1;
   const dado = JSON.parse(readFileSync(arquivoMontagem, 'utf8'));
   const montagem = lerMontagemPersistida(dado);
   const todas = receitas ?? await receitasDaMontagem(montagem);
-  const { dado: parcial, construidas } = montagemAteAGeometria(dado, montagem, todas);
-  const resolvida = construidas.length ? await resolverMontagemPersistida(parcial, carregadoresDeReceitas(todas)) : null;
+  /* A IMPRESSÃO DE UMA ETAPA SÓ DEPENDE DAS ANTERIORES: a receita que não executa, ou a montagem que não resolve, numa etapa, deixa as
+     anteriores medidas e dá as seguintes (e ela) como sem geometria, com o motivo; o comando não cai. */
+  const erros = new Map();
+  const refDe = (id) => montagem.instancias.find((item) => item.id === id)?.alvo.ref;
+  let ordem = [...montagem.etapas];
+  for (const [indice, id] of ordem.entries()) {
+    try { void todas[refDe(id)]?.PASSOS; } catch (erro) { erros.set(id, `a receita não executa: ${erro.message}`); ordem = ordem.slice(0, indice); break; }
+  }
+  let construidas = montagemAteAGeometria(dado, { ...montagem, etapas: ordem }, todas).construidas;
+  const cortar = (ids) => (ids.length === montagem.etapas.length ? dado : montagemAteAs(dado, montagem, ids).dado);
+  const resolver = (ids) => resolverMontagemPersistida(cortar(ids), carregadoresDeReceitas(todas));
+  let resolvida = null;
+  if (construidas.length) {
+    try {
+      resolvida = await resolver(construidas);
+    } catch (erro) {
+      /* a maior parte que resolve, por bissecção: se o começo da ordem resolve, o fim que o contém também não resolve sozinho */
+      let bom = 0; let ruim = construidas.length; let mensagem = erro.message;
+      while (ruim - bom > 1) {
+        const meio = Math.floor((bom + ruim) / 2);
+        try { await resolver(construidas.slice(0, meio)); bom = meio; } catch (falha) { ruim = meio; mensagem = falha.message; }
+      }
+      resolvida = bom > 0 ? await resolver(construidas.slice(0, bom)) : null;
+      erros.set(construidas[bom], `a montagem não resolve a partir desta etapa: ${mensagem}`);
+      construidas = construidas.slice(0, bom);
+    }
+  }
   const juntas = new Map((resolvida ? juntasPorEtapa(resolvida, construidas) : []).map((e) => [e.instancia, e.juntas]));
   const citacoes = citacoesDasPortas(montagem);
   const etapas = {};
   const portas = {};
   for (const id of montagem.etapas) {
-    etapas[id] = { juntas: juntas.get(id) ?? [] };
+    etapas[id] = { juntas: juntas.get(id) ?? [], ...(erros.has(id) ? { erro: erros.get(id) } : {}) };
     const instancia = resolvida?.instancias.find((item) => item.id === id);
     const neutro = instancia?.definicao?.neutro;
     if (!neutro) continue;
@@ -302,7 +352,11 @@ export async function reabrir(arquivoMontagem, instancia, por, opcoes = {}) {
   const autor = lerAutorDaReabertura(por);
   const anterior = opcoes.anterior !== undefined ? opcoes.anterior : lerRegistroDoDisco(arquivoMontagem);
   if (registroPelaImpressao(anterior)) {
-    const registro = acrescentarReabertura(anterior ?? registroVazio(lerMontagemPersistida(JSON.parse(readFileSync(arquivoMontagem, 'utf8'))).id), instancia, autor);
+    const id = lerMontagemPersistida(JSON.parse(readFileSync(arquivoMontagem, 'utf8'))).id;
+    if (anterior && anterior.montagem !== id) {
+      throw new ErroEtapaDeConstrucao('registro-de-outra-montagem', `o registro é da montagem '${anterior.montagem}', e a montagem é '${id}'.`);
+    }
+    const registro = acrescentarReabertura(anterior ?? registroVazio(id), instancia, autor);
     return opcoes.comProvas ? { registro, provas: [] } : registro;
   }
   const { registro, citacoes, portas } = await estadoDasEtapas(arquivoMontagem, opcoes);
@@ -482,6 +536,15 @@ const etapaOrdenada = (etapa) => Object.fromEntries([
 
 export function gravarRegistro(arquivoMontagem, registro) {
   const arquivo = arquivoDoRegistro(arquivoMontagem);
+  /* NO REGISTRO DE EVENTOS NADA SE PERDE: dois comandos que medem ao mesmo tempo partem do mesmo registro, e o segundo a gravar
+     apagaria o evento do primeiro. A gravação relê o disco e recusa quando os eventos que estão lá não são o começo dos novos. */
+  if (registro.versao === VERSAO_REGISTRO_PELA_IMPRESSAO && existsSync(arquivo)) {
+    const disco = JSON.parse(readFileSync(arquivo, 'utf8'));
+    const deles = Array.isArray(disco.eventos) ? disco.eventos : null;
+    if (!deles || JSON.stringify(registro.eventos.slice(0, deles.length)) !== JSON.stringify(deles) || registro.eventos.length < deles.length) {
+      throw new ErroEtapaDeConstrucao('registro-mudou-no-disco', `o registro de etapas em disco ${deles ? `tem ${deles.length} evento(s) que o desta gravação (${registro.eventos.length}) não repete` : 'não é da versão 3'}; outro comando gravou depois de este ler. Nada foi gravado; rode o comando de novo.`);
+    }
+  }
   const texto = `${JSON.stringify(registro.versao === VERSAO_REGISTRO_PELA_IMPRESSAO ? registro : { ...registro, etapas: registro.etapas.map(etapaOrdenada) }, null, 2)}\n`;
   if (existsSync(arquivo) && readFileSync(arquivo, 'utf8') === texto) return false;
   writeFileSync(arquivo, texto, 'utf8');
