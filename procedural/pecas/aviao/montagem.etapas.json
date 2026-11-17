@@ -44,9 +44,9 @@
       },
       "origem": {
         "tipo": "migração",
-        "via": "impressão de agora",
-        "portaNaoProvada": true,
-        "commit": "cce94b67e1933f6adb5eea8aa43bdfdc4f91c035"
+        "v2": "6adef71a9d7de8efb8d1eec6d021ce8d607d5c38",
+        "reaberturasAntigas": 1,
+        "via": "impressão de agora"
       }
     },
     {
@@ -92,9 +92,9 @@
       },
       "origem": {
         "tipo": "migração",
-        "via": "impressão de agora",
-        "portaNaoProvada": true,
-        "commit": "cce94b67e1933f6adb5eea8aa43bdfdc4f91c035"
+        "v2": "6adef71a9d7de8efb8d1eec6d021ce8d607d5c38",
+        "reaberturasAntigas": 1,
+        "via": "impressão de agora"
       }
     },
     {
@@ -145,9 +145,8 @@
       },
       "origem": {
         "tipo": "migração",
-        "via": "impressão de agora",
-        "portaNaoProvada": true,
-        "commit": "cce94b67e1933f6adb5eea8aa43bdfdc4f91c035"
+        "v2": "6adef71a9d7de8efb8d1eec6d021ce8d607d5c38",
+        "via": "impressão de agora"
       }
     },
     {
@@ -194,9 +193,9 @@
       },
       "origem": {
         "tipo": "migração",
-        "via": "impressão de agora",
-        "portaNaoProvada": true,
-        "commit": "62b0cf19c2b6453ea82d1b6c4785d6b6490b02d9"
+        "v2": "6adef71a9d7de8efb8d1eec6d021ce8d607d5c38",
+        "reaberturasAntigas": 1,
+        "via": "impressão de agora"
       }
     },
     {
@@ -244,9 +243,9 @@
       },
       "origem": {
         "tipo": "migração",
-        "via": "impressão de agora",
-        "portaNaoProvada": true,
-        "commit": "62b0cf19c2b6453ea82d1b6c4785d6b6490b02d9"
+        "v2": "6adef71a9d7de8efb8d1eec6d021ce8d607d5c38",
+        "reaberturasAntigas": 1,
+        "via": "impressão de agora"
       }
     },
     {
@@ -298,9 +297,9 @@
       },
       "origem": {
         "tipo": "migração",
-        "via": "impressão de agora",
-        "portaNaoProvada": true,
-        "commit": "62b0cf19c2b6453ea82d1b6c4785d6b6490b02d9"
+        "v2": "6adef71a9d7de8efb8d1eec6d021ce8d607d5c38",
+        "reaberturasAntigas": 1,
+        "via": "impressão de agora"
       }
     },
     {
@@ -350,9 +349,9 @@
       },
       "origem": {
         "tipo": "migração",
-        "via": "impressão de agora",
-        "portaNaoProvada": true,
-        "commit": "62b0cf19c2b6453ea82d1b6c4785d6b6490b02d9"
+        "v2": "6adef71a9d7de8efb8d1eec6d021ce8d607d5c38",
+        "reaberturasAntigas": 1,
+        "via": "impressão de agora"
       }
     },
     {
@@ -403,9 +402,9 @@
       },
       "origem": {
         "tipo": "migração",
-        "via": "impressão de agora",
-        "portaNaoProvada": true,
-        "commit": "62b0cf19c2b6453ea82d1b6c4785d6b6490b02d9"
+        "v2": "6adef71a9d7de8efb8d1eec6d021ce8d607d5c38",
+        "reaberturasAntigas": 1,
+        "via": "impressão de agora"
       }
     }
   ]
