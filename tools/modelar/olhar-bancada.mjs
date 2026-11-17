@@ -369,13 +369,18 @@ const RAIZES_DA_MEDIDA_DE_CONTATOS = ['tools/modelar/entrada-de-medida.mjs', 'to
 const VERSAO_DO_CACHE_DE_CONTATOS = 1;
 const rotuloDosContatos = (abs) => `contatos-${basename(abs).replace(/[^A-Za-z0-9._-]/g, '_')}.${createHash('sha256').update(abs).digest('hex').slice(0, 6)}`;
 
+/** A memória do cache por prefixo da medida: com `--sem-cache` (`cache: false`) não há, e a receita executa do zero. */
+export function memoriaDaMedida(caminho, { cache = true, criar = memoriaDoHost } = {}) {
+  if (!cache) return null;
+  try { return criar({ rotulo: caminho }).memoria; } catch { return null; }
+}
+
 async function medirNoNode(caminho, { cache = true } = {}) {
   const moduloDaPeca = await importarReceita(caminho);
   const receitaDaPeca = receitaDoModulo(moduloDaPeca);
   /* a execução que a ativação da bancada acabou de guardar serve aqui: a receita é executada uma vez só por captura; sem ela, a execução
      recomeça do estado que o cache por prefixo guardou (plano do cache por passo, fatia 4) */
-  let memoria = null;
-  try { memoria = memoriaDoHost({ rotulo: caminho }).memoria; } catch { memoria = null; }
+  const memoria = memoriaDaMedida(caminho, { cache });
   const { neutro } = executarReceitaGuardada(caminho, receitaDaPeca, { cache, memoria }).executada;
   return contatosDaPeca(neutro, receitaDaPeca).naoDeclarados.map((item) => item.par);
 }
@@ -936,7 +941,7 @@ export async function olharBancada({
                `compartilhada` o arquivo é um por peça e por conjunto de chamadas, e as chamadas seguintes da mesma peça o reusam. */
             sessaoDaCaptura = join(SESSOES, `${apelidoDeArquivo(peca)}-${process.pid}-${randomUUID()}.json`);
             const inicioDaAtivacao = performance.now();
-            const ativada = await ativar({ alvo: caminhoReceita, raiz: REPO, arquivoDaSessao: sessaoDaCaptura, cache: cacheDeContatos });
+            const ativada = await ativar({ alvo: caminhoReceita, raiz: REPO, arquivoDaSessao: sessaoDaCaptura, cache: cacheDeContatos, cachePorPrefixo: cacheDeContatos });
             if (compartilhada) compartilhada.sessoes.set(peca, { arquivo: sessaoDaCaptura, pares: null });
             if (logger) logger('info', `Peça '${peca}' ativada na sessão da bancada.`);
             const segundosDaAtivacao = Math.round((performance.now() - inicioDaAtivacao) / 100) / 10;
@@ -1645,7 +1650,7 @@ Captura a peça ou montagem na bancada, sem interface.
   --mirar=<x,y,z>        a câmera mira o ponto, em mm do referencial da peça, na vista de --vistas (ex.: --mirar=1200,900,-300 --vistas=direita); não se mistura com --focar, --par, --revisar nem --analise
   --distancia=<mm>       com --mirar: a distância da câmera ao ponto (padrão ${DISTANCIA_PADRAO_DA_MIRA_MM}; o campo visível no ponto tem 0,69 vez a distância de altura)
   --sem-contatos         não mede os contatos da peça (a medida executa a receita em Node, uns 100 s no furgão); o relato diz "NÃO medidos", e lista vazia de pares não quer dizer sem achado
-  --sem-cache            executa a receita e mede os contatos de novo; sem ele, a execução e a medida da mesma receita (mesmo conteúdo) vêm de tmp/cache-de-medida/ e o relato diz "lidos do cache"
+  --sem-cache            executa a receita do zero (sem o cache por prefixo de tmp/cache-por-prefixo/) e mede os contatos de novo; sem ele, a execução e a medida da mesma receita (mesmo conteúdo) vêm de tmp/cache-de-medida/ e o relato diz "lidos do cache"
   --par=<a,b>            inspeção dirigida de duas partes (isola e escolhe a vista legível)
   --explosao=<0..1>      afasta as partes da montagem
   --projecao=<perspectiva|ortografica>  padrão perspectiva; ortográfica com --revisar e --par

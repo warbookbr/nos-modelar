@@ -45,6 +45,8 @@ const AREA = mkdtempSync(join(REPO, 'tmp', 'teste-ativar-bancada-'));
    trabalhando, e teste não desmonta o trabalho de ninguém. */
 const AREA_SESSAO = mkdtempSync(join(tmpdir(), 'modelar-sessao-teste-'));
 const SESSAO = join(AREA_SESSAO, 'public/sessao-ativa.json');
+/* e o cache por prefixo também: a ativação não grava no `tmp/cache-por-prefixo/` do repositório */
+const PASTA_PREFIXO = join(AREA_SESSAO, 'cache-por-prefixo');
 const temporarias = [];
 function receitaTemporaria(nome, corpo) {
   const caminho = join(AREA, `_teste-${nome}.js`);
@@ -55,7 +57,7 @@ function receitaTemporaria(nome, corpo) {
 
 function ativar(relativo) {
   try {
-    const saida = execFileSync('node', [ATIVAR, `--peca=${relativo}`, `--raiz-sessao=${AREA_SESSAO}`], {
+    const saida = execFileSync('node', [ATIVAR, `--peca=${relativo}`, `--raiz-sessao=${AREA_SESSAO}`, `--pasta-do-cache-por-prefixo=${PASTA_PREFIXO}`], {
       cwd: REPO, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
     });
     return { codigo: 0, saida, erro: '' };
@@ -151,7 +153,7 @@ describe('ativar-bancada: grito do motor é recusa', () => {
      e o caso não tem sujeito; ele volta sozinho com a próxima peça. */
   const [PECA_DO_ACERVO] = pecasDoAcervo();
   it.skipIf(!PECA_DO_ACERVO)('aceita argumento posicional com nome curto de peça do acervo', () => {
-    const proc = execFileSync('node', [ATIVAR, PECA_DO_ACERVO, `--raiz-sessao=${AREA_SESSAO}`], {
+    const proc = execFileSync('node', [ATIVAR, PECA_DO_ACERVO, `--raiz-sessao=${AREA_SESSAO}`, `--pasta-do-cache-por-prefixo=${PASTA_PREFIXO}`], {
       cwd: REPO, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
     });
     expect(proc).toContain('✓');
@@ -164,7 +166,7 @@ describe('ativar-bancada: grito do motor é recusa', () => {
 
   it('aceita argumento posicional com caminho relativo à raiz', () => {
     const caminho = receitaTemporaria('posicional', BOA);
-    const proc = execFileSync('node', [ATIVAR, caminho, `--raiz-sessao=${AREA_SESSAO}`], {
+    const proc = execFileSync('node', [ATIVAR, caminho, `--raiz-sessao=${AREA_SESSAO}`, `--pasta-do-cache-por-prefixo=${PASTA_PREFIXO}`], {
       cwd: REPO, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
     });
     expect(proc).toContain('✓');
@@ -192,10 +194,10 @@ describe('perfil não vaza entre ativações no mesmo processo', () => {
 };
 `;
     const alvo = receitaTemporaria('perfil', COM_PERFIL);
-    const comPerfil = await ativarReceitaBancada({ alvo, perfil: 'marcenaria', raizSessao: AREA_SESSAO });
+    const comPerfil = await ativarReceitaBancada({ alvo, perfil: 'marcenaria', raizSessao: AREA_SESSAO, pastaDoCachePorPrefixo: PASTA_PREFIXO });
     expect(comPerfil.payload.alvo.perfil).toBe('marcenaria');
 
-    const semPerfil = await ativarReceitaBancada({ alvo, raizSessao: AREA_SESSAO });
+    const semPerfil = await ativarReceitaBancada({ alvo, raizSessao: AREA_SESSAO, pastaDoCachePorPrefixo: PASTA_PREFIXO });
     expect(semPerfil.payload.alvo.perfil).not.toBe('marcenaria');
   });
 });
@@ -206,12 +208,12 @@ describe('a sessão própria de uma captura', () => {
   const OUTRA = BOA.replace('Fixture Boa', 'Fixture Do Trabalho');
 
   it('grava a peça só no arquivo pedido, e a sessão ativa de quem trabalha fica como estava', async () => {
-    await ativarReceitaBancada({ alvo: receitaTemporaria('trabalho', OUTRA), raizSessao: AREA_SESSAO });
+    await ativarReceitaBancada({ alvo: receitaTemporaria('trabalho', OUTRA), raizSessao: AREA_SESSAO, pastaDoCachePorPrefixo: PASTA_PREFIXO });
     const antesPublica = readFileSync(SESSAO, 'utf8');
     const antesRaiz = readFileSync(join(AREA_SESSAO, 'sessao-ativa.json'), 'utf8');
 
     const propria = join(AREA_SESSAO, 'sessoes', 'captura-1.json');
-    const r = await ativarReceitaBancada({ alvo: receitaTemporaria('captura', BOA), raizSessao: AREA_SESSAO, arquivoDaSessao: propria });
+    const r = await ativarReceitaBancada({ alvo: receitaTemporaria('captura', BOA), raizSessao: AREA_SESSAO, pastaDoCachePorPrefixo: PASTA_PREFIXO, arquivoDaSessao: propria });
 
     expect(r.arquivoDaSessao).toBe(propria);
     expect(JSON.parse(readFileSync(propria, 'utf8')).alvo.nome).toBe('Fixture Boa');
@@ -224,15 +226,15 @@ describe('a sessão própria de uma captura', () => {
     const a = join(AREA_SESSAO, 'sessoes', 'a.json');
     const b = join(AREA_SESSAO, 'sessoes', 'b.json');
     await Promise.all([
-      ativarReceitaBancada({ alvo: receitaTemporaria('par-a', BOA), raizSessao: AREA_SESSAO, arquivoDaSessao: a }),
-      ativarReceitaBancada({ alvo: receitaTemporaria('par-b', OUTRA), raizSessao: AREA_SESSAO, arquivoDaSessao: b }),
+      ativarReceitaBancada({ alvo: receitaTemporaria('par-a', BOA), raizSessao: AREA_SESSAO, pastaDoCachePorPrefixo: PASTA_PREFIXO, arquivoDaSessao: a }),
+      ativarReceitaBancada({ alvo: receitaTemporaria('par-b', OUTRA), raizSessao: AREA_SESSAO, pastaDoCachePorPrefixo: PASTA_PREFIXO, arquivoDaSessao: b }),
     ]);
     expect(JSON.parse(readFileSync(a, 'utf8')).alvo.nome).toBe('Fixture Boa');
     expect(JSON.parse(readFileSync(b, 'utf8')).alvo.nome).toBe('Fixture Do Trabalho');
   });
 
   it('sem o arquivo próprio nada muda: grava a sessão ativa, a pública e a da raiz', async () => {
-    const r = await ativarReceitaBancada({ alvo: receitaTemporaria('padrao', BOA), raizSessao: AREA_SESSAO });
+    const r = await ativarReceitaBancada({ alvo: receitaTemporaria('padrao', BOA), raizSessao: AREA_SESSAO, pastaDoCachePorPrefixo: PASTA_PREFIXO });
     expect(r.arquivoDaSessao).toBeNull();
     expect(JSON.parse(readFileSync(SESSAO, 'utf8')).alvo.nome).toBe('Fixture Boa');
     expect(JSON.parse(readFileSync(join(AREA_SESSAO, 'sessao-ativa.json'), 'utf8')).alvo.nome).toBe('Fixture Boa');
@@ -241,7 +243,7 @@ describe('a sessão própria de uma captura', () => {
 
 describe('ativar-bancada: a execução da receita vem do cache quando nada mudou', () => {
   const sessao = join(AREA_SESSAO, 'sessoes', 'cache.json');
-  const ativarDe = (alvo, extra = {}) => ativarReceitaBancada({ alvo, raizSessao: AREA_SESSAO, arquivoDaSessao: sessao, ...extra });
+  const ativarDe = (alvo, extra = {}) => ativarReceitaBancada({ alvo, raizSessao: AREA_SESSAO, pastaDoCachePorPrefixo: PASTA_PREFIXO, arquivoDaSessao: sessao, ...extra });
 
   it('não executa a receita na segunda vez, executa quando ela muda, com --sem-cache e com perfil', async () => {
     const alvo = receitaTemporaria('cache-a', BOA);
@@ -260,5 +262,23 @@ describe('ativar-bancada: a execução da receita vem do cache quando nada mudou
     expect(mudada.doCache).toBe(false);
     expect(mudada.nomeAlvo).toBe('Fixture Mudada');
     expect((await ativarDe(alvo)).doCache).toBe(true);
+  });
+});
+
+describe('ativar-bancada: o cache por prefixo e --sem-cache', () => {
+  const sessao = join(AREA_SESSAO, 'sessoes', 'prefixo.json');
+  const guardados = (pasta) => (existsSync(pasta) ? readdirSync(pasta).filter((n) => n.includes('-ponto-')) : []);
+
+  it('guarda pontos na pasta pedida, e com cache e cachePorPrefixo desligados (--sem-cache) não toca nela', async () => {
+    const alvo = receitaTemporaria('prefixo', BOA);
+    const pasta = mkdtempSync(join(tmpdir(), 'prefixo-'));
+    try {
+      await ativarReceitaBancada({ alvo, raizSessao: AREA_SESSAO, arquivoDaSessao: sessao, cache: false, cachePorPrefixo: false, pastaDoCachePorPrefixo: pasta });
+      expect(existsSync(pasta) ? readdirSync(pasta) : []).toEqual([]);
+      await ativarReceitaBancada({ alvo, raizSessao: AREA_SESSAO, arquivoDaSessao: sessao, cache: false, pastaDoCachePorPrefixo: pasta });
+      expect(guardados(pasta).length).toBeGreaterThan(0);
+    } finally {
+      rmSync(pasta, { recursive: true, force: true });
+    }
   });
 });

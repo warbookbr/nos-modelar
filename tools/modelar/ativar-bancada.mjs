@@ -53,6 +53,8 @@ export async function ativarReceitaBancada({
   /* O CACHE POR PREFIXO (plano do cache por passo, fatia 4): a execução que não sai do cache da receita inteira recomeça do estado que
    * o comando anterior guardou para o mesmo prefixo de passos (`tmp/cache-por-prefixo/`). `cachePorPrefixo: false` executa inteira. */
   cachePorPrefixo = true,
+  /* a pasta do cache por prefixo; sem ela, `tmp/cache-por-prefixo/` do repositório (os testes apontam para uma pasta temporária) */
+  pastaDoCachePorPrefixo = undefined,
   /* O NEUTRO PARA A PÁGINA: com `arquivoDaSessao`, o neutro executado aqui é gravado ao lado da sessão e a página o lê em vez de executar
    * a receita de novo. `estadoParaPagina: false` grava só a sessão, e a página executa. A `raiz` dos dois tem de ser a que a página serve. */
   estadoParaPagina = true,
@@ -89,7 +91,7 @@ export async function ativarReceitaBancada({
     : original;
 
   let memoria = null;
-  if (cachePorPrefixo) { try { memoria = memoriaDoHost({ rotulo: caminhoAbsoluto }).memoria; } catch { memoria = null; } }
+  if (cachePorPrefixo) { try { memoria = memoriaDoHost({ rotulo: caminhoAbsoluto, ...(pastaDoCachePorPrefixo ? { pasta: pastaDoCachePorPrefixo } : {}) }).memoria; } catch { memoria = null; } }
   const { executada, doCache } = perfil
     ? { executada: executarReceitaGuardada(caminhoAbsoluto, receita, { cache: false, memoria }).executada, doCache: false }
     : executarReceitaGuardada(caminhoAbsoluto, receita, { cache, memoria });
@@ -238,7 +240,7 @@ export async function ativarReceitaBancada({
 
 async function main() {
   const args = lerArgumentos(process.argv.slice(2), {
-    opcoes: ['arquivo', 'peca', 'porta', 'focar', 'modo', 'perfil', 'imagem', 'raiz-sessao'],
+    opcoes: ['arquivo', 'peca', 'porta', 'focar', 'modo', 'perfil', 'imagem', 'raiz-sessao', 'pasta-do-cache-por-prefixo'],
     bandeiras: ['ajuda', 'h'],
     posicional: { nome: 'a receita', obrigatorio: false },
   });
@@ -259,6 +261,8 @@ Opcoes:
   --imagem=<path>    Imagem de referencia visual vinculada a sessao
   --raiz-sessao=<d>  Onde gravar sessao-ativa.json (padrao: raiz do repo).
                      Existe para teste escrever fora da sessao de trabalho.
+  --pasta-do-cache-por-prefixo=<d>
+                     Onde guardar o cache por prefixo (padrao: tmp/cache-por-prefixo/).
 `);
     process.exit(0);
   }
@@ -279,6 +283,7 @@ Opcoes:
       imagem: args.opcao('imagem'),
       porta: args.opcao('porta') ?? '5174',
       raizSessao: args.opcao('raiz-sessao') ?? REPO,
+      pastaDoCachePorPrefixo: args.opcao('pasta-do-cache-por-prefixo'),
     });
 
     console.log(`\n✓ Receita ativada na Bancada com sucesso!`);
