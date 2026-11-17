@@ -331,7 +331,7 @@ export async function descreverPecaReutilizavel({
   estrito = false,
   semVeredito = false,
   /* `--recusas`: só executa a receita e devolve os órfãos do núcleo, sem medir nem conferir o plano. Substitui o script de uma linha com
-     `nucleo(gerarPassos(TABELA)).orfaos`, que a sessão de 2026-11-13 a 2026-11-16 reescreveu 188 vezes. */
+     os órfãos do núcleo sobre `gerarPassos(TABELA)`, que a sessão de 2026-11-13 a 2026-11-16 reescreveu 188 vezes. */
   recusas = false,
   /* Resumido por PADRÃO. A saída completa tem 9,8 KB numa peça de 11 partes, e
      cresce O(n²) nas relações — uma máquina de 40 partes passaria de 60 KB por
