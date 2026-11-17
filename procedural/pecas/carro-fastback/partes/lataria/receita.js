@@ -456,7 +456,8 @@ const receita = {
       'falha de ondulação fora das saliências declaradas, quina do ombro sem raio, ou aresta facetada',
       'o vão do vidro lateral, o arco da roda ou o vão da lanterna ausentes, ou a coluna sem cair até a tampa',
     ],
-    lataria: { partes: ['chapa'] },
+    /* as três partes são a mesma chapa: a curvatura da lataria as lê juntas (só com 'chapa', o para-lama e o rebaixo saíam cinza, sem dado) */
+    lataria: { partes: ['chapa', 'paralamaTraseiro', 'rebaixoLateral'] },
     saliencias: [
       { regiao: { min: [780, 250, -1950], max: [960, 1010, -700] }, sentido: 'fora', amplitudeMm: 38, motivo: 'o para-lama traseiro sai 38 mm sobre a linha da porta (950 contra 912 de meia largura, vista de cima), sem moldura, por desenho' },
       { regiao: caixasDasPartes(TABELA).rebaixo, sentido: 'dentro', amplitudeMm: TABELA.rebaixo.profundidade, motivo: 'o rebaixo côncavo em cunha da lateral, da porta até morrer antes do arco traseiro, sob o vinco do ombro, é feição de dupla curvatura desenhada' },
