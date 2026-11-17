@@ -15,7 +15,8 @@ const montagem = () => JSON.parse(readFileSync(new URL('../fixtures/tres-blocos-
 
 async function medir(dado = montagem()) {
   const resolvida = await resolverMontagemPersistida(dado, carregadoresDeReceitas(RECEITAS));
-  return juntasPorEtapa(resolvida, lerMontagemPersistida(dado).etapas);
+  /* a etapa só se fixa com geometria: a forma de cada uma vem da leitura, aqui um rótulo estável */
+  return juntasPorEtapa(resolvida, lerMontagemPersistida(dado).etapas).map((m) => ({ ...m, forma: `forma-${m.instancia}` }));
 }
 
 function recusa(fn, codigo) {

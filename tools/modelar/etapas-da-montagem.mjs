@@ -171,7 +171,7 @@ export async function estadoDasEtapas(arquivoMontagem, { receitas, anterior, imp
   const registroAnterior = anterior !== undefined ? anterior
     : existsSync(arquivoDoRegistro(arquivoMontagem)) ? JSON.parse(readFileSync(arquivoDoRegistro(arquivoMontagem), 'utf8')) : null;
   const portas = Object.fromEntries(medidas.filter((m) => m.portas).map((m) => [m.instancia, m.portas]));
-  return { montagem, registro: atualizarRegistro(montagem.id, [...medidas, ...semGeometria], registroAnterior, { citacoes, semGeometria: semGeometria.map((m) => m.instancia) }), anterior: registroAnterior, citacoes, portas };
+  return { montagem, registro: atualizarRegistro(montagem.id, [...medidas, ...semGeometria], registroAnterior, { citacoes }), anterior: registroAnterior, citacoes, portas };
 }
 
 /* As condições que moram nas rodadas da peça da etapa. `rodadasDe(ref)` é
