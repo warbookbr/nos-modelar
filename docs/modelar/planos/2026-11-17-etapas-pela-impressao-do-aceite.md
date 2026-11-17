@@ -1,12 +1,12 @@
 # Etapas pela impressão do aceite: o estado de cada etapa sai da comparação do medido agora com o que a pessoa aprovou
 
-**Estado:** rascunho
+**Estado:** ativo
 
-**Território:** a declarar ao ativar. O provável é `src/autoria/etapas-de-construcao.js`, `tools/modelar/etapas-da-montagem.mjs`, `tools/modelar/etapas-da-montagem.test.mjs`, `src/autoria/etapas-de-construcao.test.mjs`, `tools/modelar/guardas/etapas-do-acervo.test.mjs`, um comando novo de migração em `tools/modelar/`, os registros `montagem.etapas.json` do acervo (avião, braço robótico, carrinho de mão, empilhadeira e sedã), `docs/modelar/usar/MONTAGENS-SEMANTICAS.md` e a pasta de provas do plano; a nota na skill `laco-de-modelagem` entra por empréstimo do dono dela.
+**Território:** `src/autoria/etapas-de-construcao.js`, `tools/modelar/etapas-da-montagem.mjs`, `tools/modelar/etapas-da-montagem.test.mjs`, `tools/modelar/etapas-de-construcao.test.mjs`, `tools/modelar/etapas-reabrir-braco.test.mjs`, `tools/modelar/guardas/etapas-do-acervo.test.mjs`, `procedural/pecas/aviao/montagem.etapas.json`, `procedural/pecas/braco-robotico/montagem.etapas.json`, `procedural/pecas/carrinho-de-mao/montagem.etapas.json`, `procedural/pecas/empilhadeira/montagem.etapas.json`, `procedural/pecas/sedan-chassi-e-lataria/montagem.etapas.json`, `docs/modelar/usar/MONTAGENS-SEMANTICAS.md`, `docs/modelar/banco-de-provas/etapas-pela-impressao-2026-11-17/`; o comando de migração entra como arquivo novo na pasta das ferramentas de modelar, e a nota na skill `laco-de-modelagem` entra por empréstimo do dono dela.
 
 **Responsável:** a IA da sessão implementa e conduz a revisão adversarial; Tiago decidiu escrever o plano e pô-lo antes do robô humanoide na fila, e decidiu a regra do desfazer (abaixo), em 2026-11-17.
 
-**Repositório e base:** `warbookbr/nos-modelar`, main na ativação, depois do fechamento do plano da família de componentes eletrônicos, que leva a reabertura de etapas da forma atual com as limitações escritas.
+**Repositório e base:** `warbookbr/nos-modelar`, main de 2026-11-17 (60c159c4 e o fechamento do plano de comparar), ativado em 2026-11-17 depois do fechamento da família de componentes eletrônicos, que levou a reabertura de etapas da forma atual com três limitações escritas.
 
 ## Problema observado
 
