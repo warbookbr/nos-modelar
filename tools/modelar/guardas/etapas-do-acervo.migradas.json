@@ -1,0 +1,272 @@
+{
+  "aviao": {
+    "fuselagem": {
+      "aceite": "sha256:846d0c72458eca03fa48443ba28967f4d123998b6d80eaff5f2d2739dfdc402b",
+      "impressao": "sha256:53970cb10b559def06fd11c15210199d1aeb18ebc94fc0cf82dd8aca7c497f98",
+      "origem": "sha256:e4353df86c632ebaaf0430548cb8f73737931adfc9abbf14585cd7f39c73b727"
+    },
+    "motor": {
+      "aceite": "sha256:9ccb3827f4b1204ff7bdfb18e47975c0add1675ede68e394ceafbe124cd7af29",
+      "impressao": "sha256:3b7becb7b97165e1952fcd39cba68a617a59c78fffd87b343ffa357c982a080a",
+      "origem": "sha256:e4353df86c632ebaaf0430548cb8f73737931adfc9abbf14585cd7f39c73b727"
+    },
+    "helice": {
+      "aceite": "sha256:d36e0debb64a7a235c229df280bf710eec607b6a4fc85e04ad433227753aad94",
+      "impressao": "sha256:f5610126a6f7c6944d5af02f3d30b11f492c80906adf05fd04270143ef8ffee2",
+      "origem": "sha256:8bcb89c9888c5d31364cd95e7fecee692e6e2f393c8cf8c208e028b267c82130"
+    },
+    "asas": {
+      "aceite": "sha256:bb4be4f6da1c2d9a7336e78662fa6a46f76f5f56c85f5e7c62c28baac72b5968",
+      "impressao": "sha256:8afb3855a5a4209d4667a53ee754b13bd196f610d56fa3bab76a9d645cca3e50",
+      "origem": "sha256:e4353df86c632ebaaf0430548cb8f73737931adfc9abbf14585cd7f39c73b727"
+    },
+    "empenagem-horizontal": {
+      "aceite": "sha256:bb4be4f6da1c2d9a7336e78662fa6a46f76f5f56c85f5e7c62c28baac72b5968",
+      "impressao": "sha256:cd7cc14af0ea94fa15d9cbdfb1353f0da51f30d232ec0e3e6d7e8750ecd1df1b",
+      "origem": "sha256:e4353df86c632ebaaf0430548cb8f73737931adfc9abbf14585cd7f39c73b727"
+    },
+    "empenagem-vertical": {
+      "aceite": "sha256:39a72ba22061643cdb4fcb74c46f13d39282d5f0963c95fb90a2562efb5d0821",
+      "impressao": "sha256:e5a5e5b6dec572d3bf510452a355bc3e6f48edf56e30c6a1786842d746e70755",
+      "origem": "sha256:e4353df86c632ebaaf0430548cb8f73737931adfc9abbf14585cd7f39c73b727"
+    },
+    "trem-do-nariz": {
+      "aceite": "sha256:bb4be4f6da1c2d9a7336e78662fa6a46f76f5f56c85f5e7c62c28baac72b5968",
+      "impressao": "sha256:d55f926b4bc2941b6417c4807df74a9f5c42ca4c3f3d996fffdef841eb82ea0b",
+      "origem": "sha256:e4353df86c632ebaaf0430548cb8f73737931adfc9abbf14585cd7f39c73b727"
+    },
+    "trens-principais": {
+      "aceite": "sha256:bb4be4f6da1c2d9a7336e78662fa6a46f76f5f56c85f5e7c62c28baac72b5968",
+      "impressao": "sha256:8f013c7eb6d12ffe96428136d9f58c0fd7de3ec28e109806c6eac5e01495f7a1",
+      "origem": "sha256:e4353df86c632ebaaf0430548cb8f73737931adfc9abbf14585cd7f39c73b727"
+    }
+  },
+  "braco-robotico": {
+    "base": {
+      "aceite": "sha256:dd8adb840c7431a12b85f41d7e57dd7c9f3345035dfd7d3aea64a03847471df9",
+      "impressao": "sha256:d40186b4f94c71632c4396db2c6dacb1afa24b9b5f885f2adcdcc3fe2450b75d",
+      "origem": "sha256:1f96dcabbb84816d5330732883539da01c042e182b070a9c572df067319add71"
+    },
+    "anelCintura": {
+      "aceite": "sha256:aae175fe6e21d44c58d3954b830b7f07914ed8d434f27ff31381fac6759f38f0",
+      "impressao": "sha256:626645877cefb3163ec31f2d637cf4870b5036a8aa576c8f37a3fdc8f1445807",
+      "origem": "sha256:ba9884514bcb17ca6fa64d21b08195803bdaa75480302e6e7513e220ae469d14"
+    },
+    "ombro": {
+      "aceite": "sha256:959c4c3f3185e3bbaf78aaecdb945ff59cb755b2f614d405680da0da6178cb97",
+      "impressao": "sha256:5abd3f1aae3cbff04019143c3dc734abdc78581745bf56c197b002e4f024c201",
+      "origem": "sha256:687229712cf28f5ecb8d8ab40c80a02a13c5b5aed1ffc66d3046bd107308096a"
+    },
+    "braco": {
+      "aceite": "sha256:ddbb053d4393c13ef57589cb279f9913bf6bab11a07c32c166ebee04f325b900",
+      "impressao": "sha256:1b44de567ba0ed58f7f3dfa1f16db7e60e75fda2a09e66af3c282624aa43acc9",
+      "origem": "sha256:00270aca8b552bfe8c17bc67fd39e866b3cce827f7785197382b477ccc049264"
+    },
+    "anelAntebraco": {
+      "aceite": "sha256:6cf0702a23fa17a311aa0fce88273e17fcfa85e404ca155fda77304a938c9450",
+      "impressao": "sha256:d866e17db72002587e959ff353136602f368e213a86b86f38b28633e53e648a1",
+      "origem": "sha256:cc9a51013debf75b91e459d5a1aa5d79e429a67e75be595fccbfed5c0564b38d"
+    },
+    "antebraco": {
+      "aceite": "sha256:c6115f7cb34e7dc916422fc7daa42bf8ba650e3be9484a40d2701cd06931a91b",
+      "impressao": "sha256:f0a1e2abd73787bbe01da1d485781eba884e9db7e6da9bbe14e6acf1c582d4e0",
+      "origem": "sha256:00270aca8b552bfe8c17bc67fd39e866b3cce827f7785197382b477ccc049264"
+    },
+    "anelPunho4": {
+      "aceite": "sha256:d80c9242c88f610a85a1f0a224727ad81664a20f9a53972169e72eeac2292094",
+      "impressao": "sha256:ab2e4e2fabd724a5b76a045357a621d8cd6776516329e0233a66819b48187812",
+      "origem": "sha256:d2626daa19a659137aebc3137856ec42dc459a21b1d62f140915a5be0c35600d"
+    },
+    "eloPunho4": {
+      "aceite": "sha256:d2038bdabf926ecbf5d8d97c46772801724af1a1d991dac799c92bedce66ae8a",
+      "impressao": "sha256:aa53743046ed20e285ea4c00a8b490865e86c5475e5c62df9217675afe53d201",
+      "origem": "sha256:4acdb5f93793d32eabee1f2efbebca04c71e04afad51905163477860baf848cf"
+    },
+    "anelPunho5": {
+      "aceite": "sha256:cf50c2f305977eff19ccae540838d237a2adcb8cce0328a1aa962130f9fc7e5e",
+      "impressao": "sha256:c1cd31e68d0fca6e0eadbec778fd50bcdb37e9e9a28a0c83e398fc9ac07da4f0",
+      "origem": "sha256:c4dca71695789e6bdf83c64f872cf8be72fc0be0146870629fff558f72941ba7"
+    },
+    "eloPunho5": {
+      "aceite": "sha256:c6115f7cb34e7dc916422fc7daa42bf8ba650e3be9484a40d2701cd06931a91b",
+      "impressao": "sha256:b6dac0958390df7f542e3414469bc5fae7e68b4527e86539df549ca146eb4a00",
+      "origem": "sha256:23d5760f7cf6c6e66e179c4dabb31b6ed699876f0d7dbebbf6f05e2cbeb7a727"
+    },
+    "anelPunho6": {
+      "aceite": "sha256:60b651bd0938d296ae37928667dbfaf385e31277cbdb9de3aef4325f92fb2b1d",
+      "impressao": "sha256:b78ad1257549284883182b9d4ee6387b0e31a947e0471a03bab3191348e23a2c",
+      "origem": "sha256:bbd1d40cdf04b94026821c5dab9cee17c1ae65d75f8e4e99dd9d1a91ee89b5af"
+    },
+    "flange": {
+      "aceite": "sha256:d2038bdabf926ecbf5d8d97c46772801724af1a1d991dac799c92bedce66ae8a",
+      "impressao": "sha256:a811df8c42e695db8eea6bc526ee68e0b462141abea3bceb489fc29ef8b8a900",
+      "origem": "sha256:4acdb5f93793d32eabee1f2efbebca04c71e04afad51905163477860baf848cf"
+    }
+  },
+  "carrinho-de-mao": {
+    "chassi": {
+      "aceite": "sha256:f72e5328067dc3637c455168299d321767982066c57828a270af2ffdfd5a2048",
+      "impressao": "sha256:c89fc69d7bacf71a56b7cd120f32aa92dbb38988cb684ebee9c7e4a32ea50776",
+      "origem": "sha256:f5bb3f7ede395c2383a11611fefcbef5b4de16ff52e7c259e4b1ae17806d65f1"
+    },
+    "pes": {
+      "aceite": "sha256:f72e5328067dc3637c455168299d321767982066c57828a270af2ffdfd5a2048",
+      "impressao": "sha256:920ef7bbd2a97c730907170a75156fee69525f6cd3d951d6e296e875db1b955c",
+      "origem": "sha256:f5bb3f7ede395c2383a11611fefcbef5b4de16ff52e7c259e4b1ae17806d65f1"
+    },
+    "cacamba": {
+      "aceite": "sha256:f72e5328067dc3637c455168299d321767982066c57828a270af2ffdfd5a2048",
+      "impressao": "sha256:cdc7128795a9766be0138a9d5cd64820c39eee7980681030524951c7a7a242b3",
+      "origem": "sha256:f5bb3f7ede395c2383a11611fefcbef5b4de16ff52e7c259e4b1ae17806d65f1"
+    },
+    "roda": {
+      "aceite": "sha256:17b24b881b6e0a1104384f5dd430617654a87894acf262e98ce7baf972df30a8",
+      "impressao": "sha256:c36e7afb509c94afae041513af154e1f28b324110104f82670edf9fd31303104",
+      "origem": "sha256:f5bb3f7ede395c2383a11611fefcbef5b4de16ff52e7c259e4b1ae17806d65f1"
+    }
+  },
+  "empilhadeira": {
+    "carcaca": {
+      "aceite": "sha256:37629e4746eae312897c380b1084652cbd9e55ebd1f53565598d0eb95d847c1a",
+      "impressao": "sha256:66851f9f7f29e510c11c18718243c0c8bae77ac4c6bf049e2c6a8d89b836e800",
+      "origem": "sha256:e37d955207f48094a2d8d7c1893be5c5a5e8a249c47f73a297971afc4a5dd625"
+    },
+    "eixoDianteiro": {
+      "aceite": "sha256:49e7d3efa000b780a9796d86f8a5b26c62c86657d803a48099faf3bcedb22fc8",
+      "impressao": "sha256:225910abac03237f4367cc44ead25d66c78c15e1deefb8ad58c1465e5ed12a8c",
+      "origem": "sha256:1e9c31fa33d26c671ef74c3e8c184923461159a10d38a5a36c9a9660bba83f18"
+    },
+    "rodaDianteiraEsquerda": {
+      "aceite": "sha256:b96c40139b3eefeb15419809a4989d16113201f422466e5cd207419038269615",
+      "impressao": "sha256:8baab733548d3def85ef42e75c0e9255f569bed620cd4289b688744070ed51ff",
+      "origem": "sha256:5ee535a568da7d0ad140b63726e5bf97532abd907cc0b58f174d8f21837b9215"
+    },
+    "rodaDianteiraDireita": {
+      "aceite": "sha256:b96c40139b3eefeb15419809a4989d16113201f422466e5cd207419038269615",
+      "impressao": "sha256:7edfbff65a1222bc39a077f9f5fc62ffc6e1fc33b0e36b57a67f570d6b667345",
+      "origem": "sha256:5ee535a568da7d0ad140b63726e5bf97532abd907cc0b58f174d8f21837b9215"
+    },
+    "eixoTraseiro": {
+      "aceite": "sha256:a9f40994b536a982458c9028a91714409d46c6b7c0af4314cf05d2e05033d37f",
+      "impressao": "sha256:8255b31324289e1da66f089d8e03b31c1f56c8122c15cc6de057a350ce103d23",
+      "origem": "sha256:5ee535a568da7d0ad140b63726e5bf97532abd907cc0b58f174d8f21837b9215"
+    },
+    "rodaTraseiraEsquerda": {
+      "aceite": "sha256:83c0a90c4200f44dc2a075440456fb5cfb7d6dffa119e31c5ffb5fb6aed7ee38",
+      "impressao": "sha256:f67eaace488d6e2e8f0209bebdbdaec98b8fa80f24d763e55c2bcfe955c433b5",
+      "origem": "sha256:5ee535a568da7d0ad140b63726e5bf97532abd907cc0b58f174d8f21837b9215"
+    },
+    "rodaTraseiraDireita": {
+      "aceite": "sha256:83c0a90c4200f44dc2a075440456fb5cfb7d6dffa119e31c5ffb5fb6aed7ee38",
+      "impressao": "sha256:6a06eec16bc0c581d8187fe7b0b003df6a0ece2e628270682dff7ac1e7b43dbe",
+      "origem": "sha256:5ee535a568da7d0ad140b63726e5bf97532abd907cc0b58f174d8f21837b9215"
+    },
+    "torre": {
+      "aceite": "sha256:138dfd01a798bc97d30108d664b4407e2fd3b84310e346ca09d51ea91155777c",
+      "impressao": "sha256:4e28ef2cb1b49bf6ed7f32c9443b244ddd921e83a5aeb23dc64a6e1e7742d633",
+      "origem": "sha256:5ee535a568da7d0ad140b63726e5bf97532abd907cc0b58f174d8f21837b9215"
+    },
+    "canalInterno": {
+      "aceite": "sha256:138dfd01a798bc97d30108d664b4407e2fd3b84310e346ca09d51ea91155777c",
+      "impressao": "sha256:cc305cfb0a33549ed4310f2635e044edbab3c83fc71ebb0d27ac62a39d7264c4",
+      "origem": "sha256:5ee535a568da7d0ad140b63726e5bf97532abd907cc0b58f174d8f21837b9215"
+    },
+    "cilindroElevacao": {
+      "aceite": "sha256:138dfd01a798bc97d30108d664b4407e2fd3b84310e346ca09d51ea91155777c",
+      "impressao": "sha256:ea61922ef226f9a231775dcfbe4d79270c069fcfd584b40bba7a846838d7676f",
+      "origem": "sha256:5ee535a568da7d0ad140b63726e5bf97532abd907cc0b58f174d8f21837b9215"
+    },
+    "carro": {
+      "aceite": "sha256:f50c1272a3a194db0fbdb48828210eed1428e944fe6a0ff2ef84cf46a4b6a25f",
+      "impressao": "sha256:c5942a8c41d8b621dabde30eb0788b64e94bf20c70882b774e2f5a572b0815d8",
+      "origem": "sha256:5ee535a568da7d0ad140b63726e5bf97532abd907cc0b58f174d8f21837b9215"
+    },
+    "garfoEsquerdo": {
+      "aceite": "sha256:398fd401f5704c30015a9e9990462b34d7882794c0f74a230330a26b8cbf54af",
+      "impressao": "sha256:a9fe076d2cb939022b834bf9b295c0862a15b154cd8cb15e97ac728156ae8e48",
+      "origem": "sha256:5ee535a568da7d0ad140b63726e5bf97532abd907cc0b58f174d8f21837b9215"
+    },
+    "garfoDireito": {
+      "aceite": "sha256:398fd401f5704c30015a9e9990462b34d7882794c0f74a230330a26b8cbf54af",
+      "impressao": "sha256:7b592871ff78c5a6aa5bcc680c5386c3199ac133c9814bdc4e21d7ffbbad5999",
+      "origem": "sha256:5ee535a568da7d0ad140b63726e5bf97532abd907cc0b58f174d8f21837b9215"
+    },
+    "correntes": {
+      "aceite": "sha256:398fd401f5704c30015a9e9990462b34d7882794c0f74a230330a26b8cbf54af",
+      "impressao": "sha256:1746d60c8dc69710997d0a766f1ad7b1b9fba991af6deec0adb86d02287b8209",
+      "origem": "sha256:5ee535a568da7d0ad140b63726e5bf97532abd907cc0b58f174d8f21837b9215"
+    },
+    "cilindroInclinacaoEsquerdo": {
+      "aceite": "sha256:611d6343d9215df46ae2f37ee53eadcbf1b283ec56b0ec7db894a0afee4a6724",
+      "impressao": "sha256:8d1f5b427b0102336dc2591c55dd518467c090a79981dadec2f90040c5bd636a",
+      "origem": "sha256:5ee535a568da7d0ad140b63726e5bf97532abd907cc0b58f174d8f21837b9215"
+    },
+    "cilindroInclinacaoDireito": {
+      "aceite": "sha256:611d6343d9215df46ae2f37ee53eadcbf1b283ec56b0ec7db894a0afee4a6724",
+      "impressao": "sha256:7cb0ed1fa6bad4bababf46a5f171283b1e7517202eb38164cca2c26d7dde9d3a",
+      "origem": "sha256:5ee535a568da7d0ad140b63726e5bf97532abd907cc0b58f174d8f21837b9215"
+    },
+    "protetor": {
+      "aceite": "sha256:bc3e2f75a7569d0c39c2551842a009674379587c9a5dfef7b00a54c6458f3d8f",
+      "impressao": "sha256:38fc74fd3442f6985b789ca36b7e85bac6e106017b006fc43442cbc62a4d2060",
+      "origem": "sha256:5ee535a568da7d0ad140b63726e5bf97532abd907cc0b58f174d8f21837b9215"
+    },
+    "banco": {
+      "aceite": "sha256:a08b615da814f92e8a1676c4f58488e1a1175edec363e4922896fd025eb66171",
+      "impressao": "sha256:f5f78cb5eaa6dcb1988e7203cfd998b16d3ca61de3eb06a089ef2f00066fb363",
+      "origem": "sha256:5ee535a568da7d0ad140b63726e5bf97532abd907cc0b58f174d8f21837b9215"
+    },
+    "colunaDirecao": {
+      "aceite": "sha256:398fd401f5704c30015a9e9990462b34d7882794c0f74a230330a26b8cbf54af",
+      "impressao": "sha256:ab8320c05a7c2fea6c77bfab8e5d7286b5f84c01489e826e8a5677096e9798ae",
+      "origem": "sha256:5ee535a568da7d0ad140b63726e5bf97532abd907cc0b58f174d8f21837b9215"
+    },
+    "volante": {
+      "aceite": "sha256:b042cb1dd60ebb495fdb71e648e0c470fd325921fef7a3ecf704a95de32d3677",
+      "impressao": "sha256:8dd1f7e64d8916a01671a4ada5d22dffcf18608b27d54e160eb6fbed7659acdb",
+      "origem": "sha256:5ee535a568da7d0ad140b63726e5bf97532abd907cc0b58f174d8f21837b9215"
+    },
+    "glp": {
+      "aceite": "sha256:4ffd9ab27300ef4a116258c472d3a1800c0cf01612af5adef23bcba6f3f57000",
+      "impressao": "sha256:5fe546393dec8c7ca89e1738fbd36e40ff52c3bf303f891104d3ff1693ebee4b",
+      "origem": "sha256:5ee535a568da7d0ad140b63726e5bf97532abd907cc0b58f174d8f21837b9215"
+    },
+    "escape": {
+      "aceite": "sha256:ae45c94b3c291a644f19d9d89f5ffa7b6d6d86222e698e3dd32358a4ee9a63a1",
+      "impressao": "sha256:fadd56c7980f10cfe9608aa1b4ab02bb447a8ad7a428a2af4eab09aa664498ab",
+      "origem": "sha256:5ee535a568da7d0ad140b63726e5bf97532abd907cc0b58f174d8f21837b9215"
+    },
+    "alca": {
+      "aceite": "sha256:138dfd01a798bc97d30108d664b4407e2fd3b84310e346ca09d51ea91155777c",
+      "impressao": "sha256:c2746b1c93aedcbdd1b8e52128c1e61553d35d0039bdcc4205779d9800793efd",
+      "origem": "sha256:5ee535a568da7d0ad140b63726e5bf97532abd907cc0b58f174d8f21837b9215"
+    }
+  },
+  "sedan-chassi-e-lataria": {
+    "carroceria": {
+      "aceite": "sha256:abc6422d341aa1e03c896bd60e3e10cf124242d1fd3454445ab1520253b73057",
+      "impressao": "sha256:348fdfe144ad23894aa06f9e9968739aaba9bb9541c737177f5be3c314077709",
+      "origem": "sha256:af32c8ee590eebf2dbf90c529e0983b324c0ac4d3221755445eb4f211f82aaef"
+    },
+    "vidros": {
+      "aceite": "sha256:8ad5e538442f4db028f395700d1de613606a8d5c3612231298a0ccaa6b6a1056",
+      "impressao": "sha256:56dddbf736b645b923c28ab1816c6fd3417daa1b25514046a9d7d6a492ed7f49",
+      "origem": "sha256:67e15380970a96b381163a924e13940f4faaee16249479437a4b5cc988016e7f"
+    },
+    "frente-e-traseira": {
+      "aceite": "sha256:c533cdd2737f79b11910c0efacfb3d3e82e2bc261b2ba7ed229c0ce39eac0fe6",
+      "impressao": "sha256:0121efcfc90940cb2ccdb3dd78dd00134107c99c1b5d1d729ed1e8ca9c6ccf44",
+      "origem": "sha256:22cd09b8d8d2f6502ef880b1fb895e2faccb3a464c0d8f27fd10deecbb022260"
+    },
+    "rodas": {
+      "aceite": "sha256:c533cdd2737f79b11910c0efacfb3d3e82e2bc261b2ba7ed229c0ce39eac0fe6",
+      "impressao": "sha256:cf8cd35def812824aa44d047fb296ca4a80c0ede7c5e2064d3f06a5a22491296",
+      "origem": "sha256:22cd09b8d8d2f6502ef880b1fb895e2faccb3a464c0d8f27fd10deecbb022260"
+    },
+    "acessorios": {
+      "aceite": "sha256:c533cdd2737f79b11910c0efacfb3d3e82e2bc261b2ba7ed229c0ce39eac0fe6",
+      "impressao": "sha256:74e4a6d1c2f1f803ed6d9702f8ff3901da554d9000ebb7b3372848ca7930f11f",
+      "origem": "sha256:7b12a63ee219e8ffb4050f74d63b4943c5676a150d34280d6003c92c751fa20f"
+    }
+  }
+}
