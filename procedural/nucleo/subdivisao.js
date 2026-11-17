@@ -734,9 +734,14 @@ export function espelharGaiolaEmX({ vertices, faces, vincos = [], cantos = [] },
  * parâmetro por dois; a filha que não toca o canto irregular já é regular, de modo que o ponto a uma fração f do canto extraordinário
  * chega ao retalho regular em uns log2(1/f) níveis, e a nitidez finita s se apaga em ceil(s) níveis. O anel é transladado para o primeiro
  * vértice da face antes de refinar (a regra é média ponderada, e a translação não muda o resultado), e por isso as diferenças da grade
- * fundo continuam com a precisão relativa da máquina: a curvatura sai com 1e-9 de erro relativo a 2^-30 do canto. No próprio vértice
- * extraordinário a posição sai da fórmula fechada do ponto limite (a de `limitesDaGaiola`), a normal da avaliação a 2^-30 dele, e a
- * curvatura não existe (a de Catmull-Clark diverge ou depende da direção ali), e sai null com `extraordinario: true`.
+ * fundo continuam com a precisão relativa da máquina. O erro, porém, cresce com o fundo: o anel de m níveis tem tamanho físico lambda^m (lambda,
+ * o autovalor subdominante da valência n, c = cos(2 pi / n): (c + 5 + raiz((c + 9)(c + 1))) / 16, que é 0,41 na valência 3, 0,55 na 5,
+ * 0,58 na 6 e 0,61 na 8) e o parâmetro 2^-m, e o ruído da máquina do anel vira erro relativo de curvatura de uns eps lambda^-m. Por isso
+ * a avaliação para no fundo em que isso chega a `ERRO_RELATIVO_DA_CURVATURA` (2e-8), que depende da valência: uns 2^-20 do canto na
+ * valência 3 (num plano o oráculo devolvia |k| de 1,8e-5 a 2^-30 e 5,4 a 2^-45, com `extraordinario: false`), 2^-30 na 5 e mais fundo nas
+ * maiores, com o teto de `PROFUNDIDADE_DO_LIMITE`. No próprio vértice extraordinário, e abaixo desse piso, a posição sai da fórmula
+ * fechada do ponto limite (a de `limitesDaGaiola`), a normal da avaliação logo acima do piso, e a curvatura não existe (a de Catmull-Clark
+ * diverge ou depende da direção ali), e sai null com `extraordinario: true`.
  *
  * O PARÂMETRO. Na face de quatro lados [c0, c1, c2, c3], u vai de c0 a c1 e v de c0 a c3, de 0 a 1; na de n lados, `canto` escolhe o
  * quadrilátero do canto k depois de um refino (c_k em (0, 0), u para o meio da aresta (c_k, c_k+1), v para o da aresta (c_k-1, c_k)). As
@@ -747,6 +752,29 @@ export function espelharGaiolaEmX({ vertices, faces, vincos = [], cantos = [] },
 
 const PROFUNDIDADE_DO_LIMITE = 48;
 const DELTA_NO_EXTRAORDINARIO = 2 ** -30;
+const ERRO_RELATIVO_DA_CURVATURA = 2e-8;
+const EPSILON_DA_MAQUINA = 2 ** -52;
+
+/** o autovalor subdominante da subdivisão de Catmull-Clark num vértice interior de valência n */
+export const autovalorSubdominante = (n) => { const c = Math.cos((2 * Math.PI) / n); return (c + 5 + Math.sqrt((c + 9) * (c + 1))) / 16; };
+
+/** o fundo (níveis de refino) até o qual a curvatura perto de um vértice interior de valência n guarda `ERRO_RELATIVO_DA_CURVATURA`:
+ *  eps lambda^-m <= erro; a valência 4 não tem piso */
+export function fundoUtilDaValencia(n) {
+  if (n === 4) return PROFUNDIDADE_DO_LIMITE;
+  return Math.min(PROFUNDIDADE_DO_LIMITE, Math.floor(Math.log(ERRO_RELATIVO_DA_CURVATURA / EPSILON_DA_MAQUINA) / -Math.log(autovalorSubdominante(n))));
+}
+
+/* o fundo útil da malha local: o menor da valência dos cantos interiores da face 0 que não têm quatro faces */
+function fundoUtilDaMalha({ F }) {
+  let fundo = PROFUNDIDADE_DO_LIMITE;
+  for (const c of F[0]) {
+    let nF = 0; const viz = new Set();
+    for (const f of F) { const k = f.indexOf(c); if (k < 0) continue; nF++; viz.add(f[(k + 1) % f.length]); viz.add(f[(k + f.length - 1) % f.length]); }
+    if (nF !== 4 && viz.size === nF) fundo = Math.min(fundo, fundoUtilDaValencia(nF));
+  }
+  return fundo;
+}
 
 const PERTO = [[1, 0], [3, 1], [2, 3], [0, 2]];
 const LONGE = [[2, 0], [3, 2], [1, 3], [0, 1]];
@@ -927,7 +955,7 @@ export function superficieLimite(gaiola) {
     for (let profundidade = 0; ; profundidade++) {
       const grade = n === 4 ? gradeDoRetalho(malha, borda) : null;
       if (grade) return { grade, uu, vv, J, origem, profundidade, malha: null };
-      if (profundidade === PROFUNDIDADE_DO_LIMITE) return { grade: null, uu, vv, J, origem, profundidade, malha };
+      if (profundidade >= fundoUtilDaMalha(malha)) return { grade: null, uu, vv, J, origem, profundidade, malha };
       const r = refinar(malha.V, malha.F, malha.nitidez, malha.cantos, borda);
       let k;
       if (n === 4) { const q = filhaDoQuadrante(uu, vv); k = q.k; uu = q.u; vv = q.v; J = multiplicar2(q.J, J); } else k = canto;
@@ -948,7 +976,7 @@ export function superficieLimite(gaiola) {
     };
     return { du, dv, duu: seg(0, 0), duv: seg(0, 1), dvv: seg(1, 1) };
   };
-  const avaliar = (face, u, v, { canto = 0 } = {}) => {
+  const avaliar = (face, u, v, { canto = 0, daNormal = false } = {}) => {
     if (!Number.isInteger(face) || face < 0 || face >= F.length) throw new TypeError(`superfície limite: a face ${face} não existe na gaiola`);
     if (!(u >= 0 && u <= 1 && v >= 0 && v <= 1)) throw new TypeError(`superfície limite: (u, v) precisa estar em [0, 1], e veio (${u}, ${v})`);
     if (F[face].length !== 4 && !(Number.isInteger(canto) && canto >= 0 && canto < F[face].length)) throw new TypeError(`superfície limite: a face ${face} tem ${F[face].length} lados, e o canto precisa ser inteiro de 0 a ${F[face].length - 1}`);
@@ -963,8 +991,10 @@ export function superficieLimite(gaiola) {
     const m = r.malha;
     const L = limiteDaEstrela(estrelaDe(m.V, m.F, facesPorVertice(m.V.length, m.F)[0], m.nitidez, 0), m.cantos.has(0), borda);
     const ponto = [r.origem[0] + L[0], r.origem[1] + L[1], r.origem[2] + L[2]];
-    const passo = (x) => x + (x < 1 ? 1 : -1) * DELTA_NO_EXTRAORDINARIO;
-    const { normal } = avaliar(face, passo(u), passo(v), { canto });
+    if (daNormal) return { ponto, normal: null, k1: null, k2: null, extraordinario: true, profundidade: r.profundidade };
+    const delta = Math.min(0.25, Math.max(DELTA_NO_EXTRAORDINARIO, 2 ** -(r.profundidade - 2)));
+    const passo = (x) => x + (x < 1 ? 1 : -1) * delta;
+    const { normal } = avaliar(face, passo(u), passo(v), { canto, daNormal: true });
     return { ponto, du: null, dv: null, duu: null, duv: null, dvv: null, normal, k1: null, k2: null, K: null, H: null, d1: null, d2: null, fundamentais: null, profundidade: r.profundidade, extraordinario: true };
   };
   return { avaliar };

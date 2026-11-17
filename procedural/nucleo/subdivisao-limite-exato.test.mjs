@@ -93,6 +93,35 @@ describe('a superfície limite exata', () => {
     expect(pior).toBeLessThan(1e-9);
   });
 
+  it('o piso de distância depende da valência: num plano a curvatura que sai é nula, e abaixo do piso sai null com extraordinario', () => {
+    /* a gaiola polar de valência n no centro, achatada no plano z = 0,3 x + 0,2 y */
+    const polar = (n) => {
+      const V = [[0, 0, 0]]; const A = [], B = [], C = [];
+      const P = (r, t) => { const x = r * Math.cos(t), y = r * Math.sin(t); return [x, y, 0.3 * x + 0.2 * y]; };
+      for (let k = 0; k < n; k++) { A.push(V.length); V.push(P(1, (2 * Math.PI * k) / n)); }
+      for (let k = 0; k < n; k++) { B.push(V.length); V.push(P(1.6, (2 * Math.PI * (k + 0.5)) / n)); }
+      for (let k = 0; k < 2 * n; k++) { C.push(V.length); V.push(P(2.6, (2 * Math.PI * k) / (2 * n))); }
+      const faces = [];
+      for (let k = 0; k < n; k++) { const k1 = (k + 1) % n; faces.push([0, A[k], B[k], A[k1]], [A[k], C[2 * k], C[2 * k + 1], B[k]], [B[k], C[2 * k + 1], C[(2 * k + 2) % (2 * n)], A[k1]]); }
+      return { vertices: V, faces };
+    };
+    const pisos = {};
+    for (const n of [3, 5, 6, 8]) {
+      const sup = superficieLimite(polar(n));
+      let primeiroNulo = null;
+      for (let k = 2; k <= 45; k++) {
+        const t = 2 ** -k; const a = sup.avaliar(0, t, 0.6 * t);
+        if (a.extraordinario) { primeiroNulo ??= k; expect(a.k1, `n=${n} k=${k}`).toBeNull(); expect(a.normal, `n=${n} k=${k}`).not.toBeNull(); continue; }
+        expect(primeiroNulo, `n=${n} k=${k}: voltou a ter curvatura abaixo do piso`).toBeNull();
+        expect(Math.max(Math.abs(a.k1), Math.abs(a.k2)), `n=${n} k=${k}`).toBeLessThan(1e-7);
+      }
+      pisos[n] = primeiroNulo;
+    }
+    expect(pisos[3]).toBeLessThan(26); expect(pisos[3]).toBeGreaterThan(15);
+    for (const n of [5, 6, 8]) expect(pisos[n], `n=${n}`).toBeGreaterThan(30);
+    expect(pisos[8]).toBeGreaterThan(pisos[6]); expect(pisos[6]).toBeGreaterThan(pisos[5]); expect(pisos[5]).toBeGreaterThan(pisos[3]);
+  });
+
   it('o sinal da curvatura: o cubo de faces viradas para fora tem curvatura positiva', () => {
     const vertices = [[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0], [0, 0, 1], [1, 0, 1], [1, 1, 1], [0, 1, 1]];
     const faces = [[0, 3, 2, 1], [4, 5, 6, 7], [0, 1, 5, 4], [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7]];
