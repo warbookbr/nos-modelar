@@ -14,7 +14,8 @@ import { lerArgumentos } from './argumentos.mjs';
 import { ErroDeConfinamento, criarDiretorioConfinado, verificarCaminhoConfinado } from './caminho-confinado.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 import { iniciarRegistro } from './diario.mjs';
-import { ativarReceitaBancada } from './ativar-bancada.mjs';
+import { ativarReceitaBancada, arquivoDoNeutroDaSessao, varrerSessoesAbandonadas } from './ativar-bancada.mjs';
+import { memoriaDoHost } from '../../procedural/nucleo/planejador/armazem-em-pasta.mjs';
 import { paresIndistinguiveis } from '../../src/autoria/cor-de-auditoria.js';
 import { lerCorte, lerLadoDoCorte, normalizarCorte } from '../../src/autoria/corte-de-plano.js';
 import { VISTAS_BANCADA } from '../../src/autoria/vistas-da-bancada.js';
@@ -400,11 +401,19 @@ const RAIZES_DA_MEDIDA_DE_CONTATOS = ['tools/modelar/entrada-de-medida.mjs', 'to
 const VERSAO_DO_CACHE_DE_CONTATOS = 1;
 const rotuloDosContatos = (abs) => `contatos-${basename(abs).replace(/[^A-Za-z0-9._-]/g, '_')}.${createHash('sha256').update(abs).digest('hex').slice(0, 6)}`;
 
+/** A memória do cache por prefixo da medida: com `--sem-cache` (`cache: false`) não há, e a receita executa do zero. */
+export function memoriaDaMedida(caminho, { cache = true, criar = memoriaDoHost } = {}) {
+  if (!cache) return null;
+  try { return criar({ rotulo: caminho }).memoria; } catch { return null; }
+}
+
 async function medirNoNode(caminho, { cache = true } = {}) {
   const moduloDaPeca = await importarReceita(caminho);
   const receitaDaPeca = receitaDoModulo(moduloDaPeca);
-  /* a execução que a ativação da bancada acabou de guardar serve aqui: a receita é executada uma vez só por captura */
-  const { neutro } = executarReceitaGuardada(caminho, receitaDaPeca, { cache }).executada;
+  /* a execução que a ativação da bancada acabou de guardar serve aqui: a receita é executada uma vez só por captura; sem ela, a execução
+     recomeça do estado que o cache por prefixo guardou (plano do cache por passo, fatia 4) */
+  const memoria = memoriaDaMedida(caminho, { cache });
+  const { neutro } = executarReceitaGuardada(caminho, receitaDaPeca, { cache, memoria }).executada;
   return contatosDaPeca(neutro, receitaDaPeca).naoDeclarados.map((item) => item.par);
 }
 
@@ -673,7 +682,7 @@ export async function abrirCapturaCompartilhada({ dependencias = {}, logger = nu
         const limpeza = await fecharRecursos({ browser, vite, pagina: this.pagina?.page ?? null, proprios: false });
         limpeza.push(...await fecharRecursos({ browser, vite }));
         this.pagina = null;
-        for (const { arquivo } of this.sessoes.values()) rmSync(arquivo, { force: true });
+        for (const { arquivo } of this.sessoes.values()) { rmSync(arquivo, { force: true }); rmSync(arquivoDoNeutroDaSessao(arquivo), { force: true }); }
         this.sessoes.clear();
         return limpeza;
       },
@@ -766,6 +775,8 @@ export async function olharBancada({
   /* o arquivo da sessão própria desta captura (ver `ativarReceitaBancada`), apagado ao fim; com `compartilhada` ele é da peça e não
      da chamada, e quem o apaga é `compartilhada.fechar()` */
   let sessaoDaCaptura = null;
+  /* de onde veio o neutro que a página desenhou (`origem`: gravado, fornecido ou executado, com o `motivo` quando executou) */
+  let neutroDaPagina = null;
   let page = null;
   /* o que a captura estava fazendo, para o prazo vencido dizer onde parou */
   /* A etapa é uma propriedade com aviso: ao entrar numa etapa longa a captura diz qual é, antes de começá-la, porque a de medir os
@@ -957,9 +968,12 @@ export async function olharBancada({
                a peça num arquivo seu, único por processo e por chamada, e aponta a página para ele pela URL (`?sessao=`). Com
                `compartilhada` o arquivo é um por peça e por conjunto de chamadas, e as chamadas seguintes da mesma peça o reusam. */
             sessaoDaCaptura = join(SESSOES, `${apelidoDeArquivo(peca)}-${process.pid}-${randomUUID()}.json`);
+            /* a sessão e o neutro que uma captura morta deixou para trás saem por idade; os desta chamada e os das capturas compartilhadas ficam */
+            varrerSessoesAbandonadas(SESSOES, { emUso: [sessaoDaCaptura, ...[...(compartilhada?.sessoes.values() ?? [])].map((x) => x.arquivo)] });
             const inicioDaAtivacao = performance.now();
-            const ativada = await ativar({ alvo: caminhoReceita, raiz: REPO, arquivoDaSessao: sessaoDaCaptura, cache: cacheDeContatos });
+            const ativada = await ativar({ alvo: caminhoReceita, raiz: REPO, arquivoDaSessao: sessaoDaCaptura, cache: cacheDeContatos, cachePorPrefixo: cacheDeContatos });
             if (compartilhada) compartilhada.sessoes.set(peca, { arquivo: sessaoDaCaptura, pares: null });
+            for (const aviso of ativada?.avisos ?? []) registrar(relato, logger, 'stderr', `ativação: aviso: ${aviso}`);
             if (logger) logger('info', `Peça '${peca}' ativada na sessão da bancada.`);
             const segundosDaAtivacao = Math.round((performance.now() - inicioDaAtivacao) / 100) / 10;
             registrar(relato, logger, 'stdout', ativada?.doCache
@@ -1235,7 +1249,7 @@ export async function olharBancada({
           peca: (typeof b.peca === 'function' ? b.peca() : b.peca) ?? b.nomePeca ?? null,
           partes: b.partes ?? [],
           selecaoIgnorada: b.selecaoIgnorada ?? [], diagnosticos: b.diagnosticos ?? null,
-          estatisticas: b.estatisticas ?? null, estado: b.estado ? b.estado() : null,
+          estatisticas: b.estatisticas ?? null, estado: b.estado ? b.estado() : null, neutroDaSessao: b.neutroDaSessao ?? null,
         };
       });
       dadoDaChamada = dado;
@@ -1255,6 +1269,13 @@ export async function olharBancada({
         registrar(relato, logger, 'stdout', `peça: ${dado.peca}`);
         registrar(relato, logger, 'stdout', `partes (${dado.partes.length}): ${dado.partes.join(', ')}`);
         registrar(relato, logger, 'stdout', `malha: ${dado.estatisticas.facesNeutras} faces, ${dado.estatisticas.triangulos} triângulos, ${semParte} sem identidade`);
+        /* o caminho que a página usou para ter o neutro: só tem sentido numa peça que veio de uma sessão desta captura */
+        if (sessaoDaCaptura) {
+          neutroDaPagina = dado.neutroDaSessao;
+          registrar(relato, logger, 'stdout', neutroDaPagina?.origem === 'gravado'
+            ? `página: neutro lido do arquivo que a ativação gravou (${neutroDaPagina.arquivo}); a receita não executou na página.`
+            : `página: receita executada na página${neutroDaPagina?.motivo ? ` (o neutro gravado não serviu: ${neutroDaPagina.motivo})` : ''}.`);
+        }
         /* a ponte confere os nomes que a URL da subida trouxe; numa página reaproveitada a seleção veio de fora da URL, e a conferência é daqui */
         const selecaoIgnorada = paginaNova ? dado.selecaoIgnorada : selecionadas.filter((nome) => !dado.partes.includes(nome));
         if (selecaoIgnorada.length) {
@@ -1596,7 +1617,7 @@ export async function olharBancada({
     }
     const resultado = {
       peca: pecaRelatada, falhas: falhasRelatadas, vistas: vistasRelatadas, arquivos: arquivosPlanejados,
-      paresAcusados: contatos.estado === 'pulados' || contatos.estado === 'falhou' ? null : paresAcusados, contatos, paresCapturados, cargasDePagina,
+      paresAcusados: contatos.estado === 'pulados' || contatos.estado === 'falhou' ? null : paresAcusados, contatos, paresCapturados, cargasDePagina, neutroDaPagina,
       dicas: dicas.listar(),
       ...(capturarEmMemoria ? { capturas } : {}),
       ...(visao !== null ? { visao: { id: visao, ...(legendaDaVisao ?? { dados: {}, titulo: null, linhas: [] }) } } : {}),
@@ -1629,7 +1650,7 @@ export async function olharBancada({
       ...limpezaForcada,
       ...await fecharRecursos({ browser, vite, pagina: deixarAberta ? null : page, proprios: !compartilhada }),
     ];
-    if (sessaoDaCaptura && !compartilhada) rmSync(sessaoDaCaptura, { force: true });
+    if (sessaoDaCaptura && !compartilhada) { rmSync(sessaoDaCaptura, { force: true }); rmSync(arquivoDoNeutroDaSessao(sessaoDaCaptura), { force: true }); }
     if (limpeza.length) {
       resposta ??= erroEstruturado({ relato, erro: new Error('A bancada falhou ao fechar seus recursos.') });
       resposta.ok = false;
@@ -1677,7 +1698,7 @@ Captura a peça ou montagem na bancada, sem interface.
   --mirar=<x,y,z[,d]>/<x,y,z[,d]>/...  várias miras numa chamada, separadas por / (ou ; entre aspas): cada vista de --vistas em cada mira, na mesma página e com uma execução da receita, uma imagem por mira e vista com o ponto no nome; o quarto número é a distância daquela mira, em mm (ex.: --mirar=-250,4,0,20/11,7,0,46 --vistas=isometrica,superior dá 4 imagens)
   --distancia=<mm>       com --mirar: a distância da câmera ao ponto, para as miras sem a quarta coordenada (padrão ${DISTANCIA_PADRAO_DA_MIRA_MM}; o campo visível no ponto tem 0,69 vez a distância de altura)
   --sem-contatos         não mede os contatos da peça (a medida executa a receita em Node, uns 100 s no furgão); o relato diz "NÃO medidos", e lista vazia de pares não quer dizer sem achado
-  --sem-cache            executa a receita e mede os contatos de novo; sem ele, a execução e a medida da mesma receita (mesmo conteúdo) vêm de tmp/cache-de-medida/ e o relato diz "lidos do cache"
+  --sem-cache            executa a receita do zero (sem o cache por prefixo de tmp/cache-por-prefixo/) e mede os contatos de novo; sem ele, a execução e a medida da mesma receita (mesmo conteúdo) vêm de tmp/cache-de-medida/ e o relato diz "lidos do cache"
   --par=<a,b>            inspeção dirigida de duas partes (isola e escolhe a vista legível)
   --explosao=<0..1>      afasta as partes da montagem
   --projecao=<perspectiva|ortografica>  padrão perspectiva; ortográfica com --revisar e --par

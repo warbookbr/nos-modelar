@@ -8,12 +8,13 @@
  * o código de saída, o arquivo de sessão e a ordem da mensagem.
  */
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, utimesSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterAll, describe, expect, it } from 'vitest';
-import { ativarReceitaBancada } from './ativar-bancada.mjs';
+import { IDADE_DA_SESSAO_ABANDONADA_MS, arquivoDoNeutroDaSessao, ativarReceitaBancada, varrerSessoesAbandonadas } from './ativar-bancada.mjs';
+import { impressaoDaReceita, lerNeutroEmTexto } from '../../procedural/nucleo/planejador/neutro-em-texto.js';
 import { PASTA_DO_CACHE } from './entrada-de-medida.mjs';
 import { pecasDoAcervo } from './guardas/guarda-acervo.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
@@ -45,6 +46,8 @@ const AREA = mkdtempSync(join(REPO, 'tmp', 'teste-ativar-bancada-'));
    trabalhando, e teste não desmonta o trabalho de ninguém. */
 const AREA_SESSAO = mkdtempSync(join(tmpdir(), 'modelar-sessao-teste-'));
 const SESSAO = join(AREA_SESSAO, 'public/sessao-ativa.json');
+/* e o cache por prefixo também: a ativação não grava no `tmp/cache-por-prefixo/` do repositório */
+const PASTA_PREFIXO = join(AREA_SESSAO, 'cache-por-prefixo');
 const temporarias = [];
 function receitaTemporaria(nome, corpo) {
   const caminho = join(AREA, `_teste-${nome}.js`);
@@ -55,7 +58,7 @@ function receitaTemporaria(nome, corpo) {
 
 function ativar(relativo) {
   try {
-    const saida = execFileSync('node', [ATIVAR, `--peca=${relativo}`, `--raiz-sessao=${AREA_SESSAO}`], {
+    const saida = execFileSync('node', [ATIVAR, `--peca=${relativo}`, `--raiz-sessao=${AREA_SESSAO}`, `--pasta-do-cache-por-prefixo=${PASTA_PREFIXO}`], {
       cwd: REPO, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
     });
     return { codigo: 0, saida, erro: '' };
@@ -151,7 +154,7 @@ describe('ativar-bancada: grito do motor é recusa', () => {
      e o caso não tem sujeito; ele volta sozinho com a próxima peça. */
   const [PECA_DO_ACERVO] = pecasDoAcervo();
   it.skipIf(!PECA_DO_ACERVO)('aceita argumento posicional com nome curto de peça do acervo', () => {
-    const proc = execFileSync('node', [ATIVAR, PECA_DO_ACERVO, `--raiz-sessao=${AREA_SESSAO}`], {
+    const proc = execFileSync('node', [ATIVAR, PECA_DO_ACERVO, `--raiz-sessao=${AREA_SESSAO}`, `--pasta-do-cache-por-prefixo=${PASTA_PREFIXO}`], {
       cwd: REPO, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
     });
     expect(proc).toContain('✓');
@@ -164,7 +167,7 @@ describe('ativar-bancada: grito do motor é recusa', () => {
 
   it('aceita argumento posicional com caminho relativo à raiz', () => {
     const caminho = receitaTemporaria('posicional', BOA);
-    const proc = execFileSync('node', [ATIVAR, caminho, `--raiz-sessao=${AREA_SESSAO}`], {
+    const proc = execFileSync('node', [ATIVAR, caminho, `--raiz-sessao=${AREA_SESSAO}`, `--pasta-do-cache-por-prefixo=${PASTA_PREFIXO}`], {
       cwd: REPO, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
     });
     expect(proc).toContain('✓');
@@ -192,10 +195,10 @@ describe('perfil não vaza entre ativações no mesmo processo', () => {
 };
 `;
     const alvo = receitaTemporaria('perfil', COM_PERFIL);
-    const comPerfil = await ativarReceitaBancada({ alvo, perfil: 'marcenaria', raizSessao: AREA_SESSAO });
+    const comPerfil = await ativarReceitaBancada({ alvo, perfil: 'marcenaria', raizSessao: AREA_SESSAO, pastaDoCachePorPrefixo: PASTA_PREFIXO });
     expect(comPerfil.payload.alvo.perfil).toBe('marcenaria');
 
-    const semPerfil = await ativarReceitaBancada({ alvo, raizSessao: AREA_SESSAO });
+    const semPerfil = await ativarReceitaBancada({ alvo, raizSessao: AREA_SESSAO, pastaDoCachePorPrefixo: PASTA_PREFIXO });
     expect(semPerfil.payload.alvo.perfil).not.toBe('marcenaria');
   });
 });
@@ -206,12 +209,12 @@ describe('a sessão própria de uma captura', () => {
   const OUTRA = BOA.replace('Fixture Boa', 'Fixture Do Trabalho');
 
   it('grava a peça só no arquivo pedido, e a sessão ativa de quem trabalha fica como estava', async () => {
-    await ativarReceitaBancada({ alvo: receitaTemporaria('trabalho', OUTRA), raizSessao: AREA_SESSAO });
+    await ativarReceitaBancada({ alvo: receitaTemporaria('trabalho', OUTRA), raizSessao: AREA_SESSAO, pastaDoCachePorPrefixo: PASTA_PREFIXO });
     const antesPublica = readFileSync(SESSAO, 'utf8');
     const antesRaiz = readFileSync(join(AREA_SESSAO, 'sessao-ativa.json'), 'utf8');
 
     const propria = join(AREA_SESSAO, 'sessoes', 'captura-1.json');
-    const r = await ativarReceitaBancada({ alvo: receitaTemporaria('captura', BOA), raizSessao: AREA_SESSAO, arquivoDaSessao: propria });
+    const r = await ativarReceitaBancada({ alvo: receitaTemporaria('captura', BOA), raizSessao: AREA_SESSAO, pastaDoCachePorPrefixo: PASTA_PREFIXO, arquivoDaSessao: propria });
 
     expect(r.arquivoDaSessao).toBe(propria);
     expect(JSON.parse(readFileSync(propria, 'utf8')).alvo.nome).toBe('Fixture Boa');
@@ -224,15 +227,15 @@ describe('a sessão própria de uma captura', () => {
     const a = join(AREA_SESSAO, 'sessoes', 'a.json');
     const b = join(AREA_SESSAO, 'sessoes', 'b.json');
     await Promise.all([
-      ativarReceitaBancada({ alvo: receitaTemporaria('par-a', BOA), raizSessao: AREA_SESSAO, arquivoDaSessao: a }),
-      ativarReceitaBancada({ alvo: receitaTemporaria('par-b', OUTRA), raizSessao: AREA_SESSAO, arquivoDaSessao: b }),
+      ativarReceitaBancada({ alvo: receitaTemporaria('par-a', BOA), raizSessao: AREA_SESSAO, pastaDoCachePorPrefixo: PASTA_PREFIXO, arquivoDaSessao: a }),
+      ativarReceitaBancada({ alvo: receitaTemporaria('par-b', OUTRA), raizSessao: AREA_SESSAO, pastaDoCachePorPrefixo: PASTA_PREFIXO, arquivoDaSessao: b }),
     ]);
     expect(JSON.parse(readFileSync(a, 'utf8')).alvo.nome).toBe('Fixture Boa');
     expect(JSON.parse(readFileSync(b, 'utf8')).alvo.nome).toBe('Fixture Do Trabalho');
   });
 
   it('sem o arquivo próprio nada muda: grava a sessão ativa, a pública e a da raiz', async () => {
-    const r = await ativarReceitaBancada({ alvo: receitaTemporaria('padrao', BOA), raizSessao: AREA_SESSAO });
+    const r = await ativarReceitaBancada({ alvo: receitaTemporaria('padrao', BOA), raizSessao: AREA_SESSAO, pastaDoCachePorPrefixo: PASTA_PREFIXO });
     expect(r.arquivoDaSessao).toBeNull();
     expect(JSON.parse(readFileSync(SESSAO, 'utf8')).alvo.nome).toBe('Fixture Boa');
     expect(JSON.parse(readFileSync(join(AREA_SESSAO, 'sessao-ativa.json'), 'utf8')).alvo.nome).toBe('Fixture Boa');
@@ -241,7 +244,7 @@ describe('a sessão própria de uma captura', () => {
 
 describe('ativar-bancada: a execução da receita vem do cache quando nada mudou', () => {
   const sessao = join(AREA_SESSAO, 'sessoes', 'cache.json');
-  const ativarDe = (alvo, extra = {}) => ativarReceitaBancada({ alvo, raizSessao: AREA_SESSAO, arquivoDaSessao: sessao, ...extra });
+  const ativarDe = (alvo, extra = {}) => ativarReceitaBancada({ alvo, raizSessao: AREA_SESSAO, pastaDoCachePorPrefixo: PASTA_PREFIXO, arquivoDaSessao: sessao, ...extra });
 
   it('não executa a receita na segunda vez, executa quando ela muda, com --sem-cache e com perfil', async () => {
     const alvo = receitaTemporaria('cache-a', BOA);
@@ -260,5 +263,79 @@ describe('ativar-bancada: a execução da receita vem do cache quando nada mudou
     expect(mudada.doCache).toBe(false);
     expect(mudada.nomeAlvo).toBe('Fixture Mudada');
     expect((await ativarDe(alvo)).doCache).toBe(true);
+  });
+});
+
+describe('ativar-bancada: o cache por prefixo e --sem-cache', () => {
+  const sessao = join(AREA_SESSAO, 'sessoes', 'prefixo.json');
+  const guardados = (pasta) => (existsSync(pasta) ? readdirSync(pasta).filter((n) => n.includes('-ponto-')) : []);
+
+  it('guarda pontos na pasta pedida, e com cache e cachePorPrefixo desligados (--sem-cache) não toca nela', async () => {
+    const alvo = receitaTemporaria('prefixo', BOA);
+    const pasta = mkdtempSync(join(tmpdir(), 'prefixo-'));
+    try {
+      await ativarReceitaBancada({ alvo, raizSessao: AREA_SESSAO, arquivoDaSessao: sessao, cache: false, cachePorPrefixo: false, pastaDoCachePorPrefixo: pasta });
+      expect(existsSync(pasta) ? readdirSync(pasta) : []).toEqual([]);
+      await ativarReceitaBancada({ alvo, raizSessao: AREA_SESSAO, arquivoDaSessao: sessao, cache: false, pastaDoCachePorPrefixo: pasta });
+      expect(guardados(pasta).length).toBeGreaterThan(0);
+    } finally {
+      rmSync(pasta, { recursive: true, force: true });
+    }
+  });
+});
+
+describe('ativar-bancada: o neutro ao lado da sessão', () => {
+  const sessao = join(AREA_SESSAO, 'sessoes', 'neutro.json');
+  const ativarNeutro = (alvo, extra = {}) => ativarReceitaBancada({ alvo, raizSessao: AREA_SESSAO, arquivoDaSessao: sessao, pastaDoCachePorPrefixo: PASTA_PREFIXO, ...extra });
+
+  it('grava o neutro com a impressão da receita da sessão, e a página pode conferi-la', async () => {
+    const r = await ativarNeutro(receitaTemporaria('neutro-a', BOA));
+    expect(r.avisos).toEqual([]);
+    const lido = lerNeutroEmTexto(readFileSync(arquivoDoNeutroDaSessao(sessao), 'utf8'));
+    const naSessao = JSON.parse(readFileSync(sessao, 'utf8'));
+    expect(lido.impressao).toBe(impressaoDaReceita(naSessao.receita));
+    expect(naSessao.neutro.arquivo).toMatch(/neutro\.neutro\.json$/);
+  });
+
+  it('a falha de gravação do neutro vira aviso, tira o neutro velho de ao lado e deixa a sessão sem o campo `neutro`', async () => {
+    const alvo = receitaTemporaria('neutro-b', BOA);
+    await ativarNeutro(alvo);
+    expect(existsSync(arquivoDoNeutroDaSessao(sessao))).toBe(true);
+    /* uma pasta no lugar do arquivo do neutro faz a troca do arquivo parcial falhar */
+    const outra = join(AREA_SESSAO, 'sessoes', 'bloqueada.json');
+    mkdirSync(arquivoDoNeutroDaSessao(outra), { recursive: true });
+    const r = await ativarNeutro(alvo, { arquivoDaSessao: outra });
+    expect(r.avisos).toHaveLength(1);
+    expect(r.avisos[0]).toMatch(/o neutro não foi gravado ao lado da sessão/);
+    expect(JSON.parse(readFileSync(outra, 'utf8')).neutro).toBeUndefined();
+    expect(r.payload.neutro).toBeUndefined();
+  });
+
+  it('o arquivo da sessão que não termina em .json não tem neutro ao lado: a função recusa, e a ativação avisa e segue', async () => {
+    expect(arquivoDoNeutroDaSessao('/x/s.json')).toBe('/x/s.neutro.json');
+    expect(() => arquivoDoNeutroDaSessao('/x/s.txt')).toThrow(/.json/);
+    expect(() => arquivoDoNeutroDaSessao('/x/s')).toThrow(/.json/);
+    expect(() => arquivoDoNeutroDaSessao('/x/s.neutro.json')).toThrow(/.json/);
+    const semExtensao = join(AREA_SESSAO, 'sessoes', 'sem-extensao');
+    const r = await ativarNeutro(receitaTemporaria('neutro-c', BOA), { arquivoDaSessao: semExtensao });
+    expect(r.avisos).toHaveLength(1);
+    expect(JSON.parse(readFileSync(semExtensao, 'utf8')).alvo.nome).toBe('Fixture Boa');
+  });
+
+  it('a varredura apaga a sessão e o neutro velhos de uma captura morta, e deixa os recentes e os que estão em uso', () => {
+    const pasta = mkdtempSync(join(tmpdir(), 'varredura-'));
+    try {
+      const antigo = (Date.now() - IDADE_DA_SESSAO_ABANDONADA_MS - 3_600_000) / 1000;
+      const gravar = (nome, velho) => { const f = join(pasta, nome); writeFileSync(f, '{}'); if (velho) utimesSync(f, antigo, antigo); return f; };
+      gravar('morta.json', true); gravar('morta.neutro.json', true);
+      gravar('recente.json', false); gravar('recente.neutro.json', false);
+      const emUso = gravar('em-uso.json', true); gravar('em-uso.neutro.json', true);
+      const apagados = varrerSessoesAbandonadas(pasta, { emUso: [emUso] });
+      expect(apagados.sort()).toEqual(['morta.json', 'morta.neutro.json']);
+      expect(readdirSync(pasta).sort()).toEqual(['em-uso.json', 'em-uso.neutro.json', 'recente.json', 'recente.neutro.json']);
+      expect(varrerSessoesAbandonadas(join(pasta, 'nao-existe'))).toEqual([]);
+    } finally {
+      rmSync(pasta, { recursive: true, force: true });
+    }
   });
 });

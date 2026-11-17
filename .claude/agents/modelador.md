@@ -100,10 +100,9 @@ de [`comparar-com-a-referencia.md`](../skills/criar-peca/references/comparar-com
 `--regiao`, `--vistas`, `--parte`, `--copia` e `--espelhar` conforme o caso;
 `npm run descrever -- <peça> --recusas`; `--saida=<pasta> --sobrescrever` na
 bancada; e `--selecionadas=<parte> --copia=x-`. Leia o `--ajuda` do comando antes
-de escrever um script de imagem. Nas sete rodadas da bicicleta, 42 dos 83
-comandos foram essas tarefas reescritas à mão, e delas saíram a régua errada da
-foto frontal, o contorno do selim invertido e a escala diferente entre as metades
-da prancha do pedal.
+de escrever um script de imagem. Numa peça medida, metade dos comandos de uma
+rodada eram essas tarefas reescritas à mão, e delas saíram régua errada, contorno
+invertido e escala diferente entre as metades da prancha.
 
 A medição livre na foto continua por script (a máscara, o sentido da varredura e
 o trecho mudam com a peça), lendo a régua e a região do JSON da prancha. O caso de

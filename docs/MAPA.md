@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2051 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2094 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -224,7 +224,9 @@
 ## docs/modelar/banco-de-provas/cache-por-passo-2026-11-16/
 
 - `README.md` — Cache por passo: a linha de base do laço e onde o cache rende mais
+- `levantar-leitura.mjs` — levantar-leitura.mjs — o que cada operação lê de fato da malha, passo a passo, pelo registro de leitura do núcleo (fatia 2 do plano do cache por passo). Exec…
 - `medir-linha-de-base.mjs` — medir-linha-de-base.mjs — a linha de base do plano do cache por passo (fatia 1): onde vai o tempo de cada comando do laço numa peça pesada. Uso, da raiz do r…
+- `prova-da-captura.mjs` — prova-da-captura.mjs — a captura da bancada com a página lendo o neutro que a ativação gravou é igual, pixel a pixel, à captura com a página executando a rec…
 
 ## docs/modelar/banco-de-provas/cadeiras-2026-10-19/
 
@@ -247,7 +249,7 @@
 
 ## docs/modelar/banco-de-provas/correcao-de-superficie-2026-11-16/
 
-- `README.md` — Correção de superfície: chapas de prova, linha de base e corte com simetria
+- `README.md` — Correção de superfície: chapas de prova, linha de base, corte com simetria, alisamento e emenda declarada
 
 ## docs/modelar/banco-de-provas/costura-em-no-de-tubos-2026-11-15/
 
@@ -606,6 +608,7 @@
 - `2026-11-16-familia-componentes-eletronicos.md` — Família de componentes eletrônicos: as peças por encapsulamento e a placa declarada, provadas no braço robótico
 - `2026-11-16-ferramentas-de-correcao-de-superficie.md` — Ferramentas de correção de superfície: alisar as curvas pela medida, cortar com simetria e emendar com continuidade declarada, rumo ao G2 de produção
 - `2026-11-16-ponte-com-a-mecatronica.md` — Ponte com a mecatrônica: a ficha do objeto exportada, as portas elétricas declaradas e o pedido que volta conferido
+- `2026-11-17-trilhas-e-validacao-da-placa.md` — Trilhas de cobre e validação elétrica da placa declarada: a lista de ligações vira cobre conferido por regra e por conectividade
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
@@ -1045,8 +1048,10 @@
 - `gaiola-por-lacos.js` — gaiola-por-lacos.js — monta a gaiola fechada da operação `subdivisao` a partir de laços, um contorno por plano ao longo de um eixo
 - `gaiola-por-lacos.test.ts` — gaiola-por-lacos.test.ts — o ajudante `gaiolaPorLacos` em peças pequenas feitas aqui: a barra da ficha, a reamostragem por trecho, a escada da tampa, a fusão…
 - `gaiola-por-rede-contato.test.mjs` — gaiola-por-rede-contato.test.mjs — o contato declarado da moldura de 10 mm com a chapa por rede de curvas
+- `gaiola-por-rede-emenda.test.mjs` — gaiola-por-rede-emenda.test.mjs — a emenda com continuidade declarada da gaiola por rede (`continuidade: 'G1' | 'G2'` na curva), na gaiola: as recusas, a jun…
 - `gaiola-por-rede-liso.js` — gaiola-por-rede-liso.js — o miolo dos retalhos alisado pela normal, para a tangente não quebrar nas curvas compartilhadas
 - `gaiola-por-rede-liso.test.mjs` — gaiola-por-rede-liso.test.mjs — o alisamento do miolo dá o MESMO resultado de antes de a montagem do sistema e o gradiente conjugado passarem a trabalhar sob…
+- `gaiola-por-rede-marcas.test.mjs` — gaiola-por-rede-marcas.test.mjs — a opção `marcarCurvas` da `gaiolaPorRede` (fatia 5 do plano das ferramentas de correção de superfície): as curvas vão ao pa…
 - `gaiola-por-rede-origem.test.mjs` — gaiola-por-rede-origem.test.mjs — a gaiola por rede de curvas publica de onde vem cada ponto, as entradas editáveis e a estrutura.
 - `gaiola-por-rede-prova.test.mjs` — gaiola-por-rede-prova.test.mjs — o gate da fatia 2 do plano da carroceria por rede de curvas: a chapa lateral de 1000 × 600 mm
 - `gaiola-por-rede.js` — gaiola-por-rede.js — monta a gaiola da operação `subdivisao` a partir de uma rede de curvas nomeadas e dos retalhos que elas fecham
@@ -1112,6 +1117,7 @@
 - `sha256.js` — sha256.js — SHA-256 síncrono, portátil e sem dependência de Node.
 - `somas-do-rastreio.js` — somas-do-rastreio.js — a soma que uma operação faz ao conjunto de ids "tocados" do passo, para o rastreio declarado do retrato (nível 'tocados' em `ESCRITA_D…
 - `subdivisao-grupos.test.ts` — subdivisao-grupos.test.ts — os grupos de faces da gaiola do passo `subdivisao` (campo `grupos`): cada grupo é uma lista de nomes de ponto, as faces dele são …
+- `subdivisao-limite-exato.test.mjs` — subdivisao-limite-exato.test.mjs — o oráculo da superfície limite (`superficieLimite`), a descendência das linhas e a medida na linha (`descendenciaDasLinhas…
 - `subdivisao-ponto-repetido.test.mjs` — subdivisao-ponto-repetido.test.mjs — a recusa geral do ponto que dois passos `subdivisao` gravam sem declaração (ciclo 5 do sedã, atrito 2). O nome de ponto …
 - `subdivisao.js` — subdivisao.js — superfície de subdivisão Catmull-Clark com vincos
 - `subdivisao.test.mjs` — subdivisao.test.mjs — a subdivisão Catmull-Clark e a operação `subdivisao` contra a saída congelada do oráculo, com determinismo, ponto limite, interpolação,…
@@ -1214,6 +1220,7 @@
 - `primitivas-basicas.js` — primitivas-basicas.js — geradores fundamentais registrados pelo núcleo, sem estado global.
 - `primitivas-superficie.js` — primitivas-superficie.js — primitivas fechadas que recebem serviços explícitos do núcleo.
 - `refino-da-costura.js` — refino-da-costura.js — o refino da faixa que o cordão de solda toca (plano do cordão de solda na costura de tubos, fatia 7).
+- `subdivisao-curvas.test.mjs` — subdivisao-curvas.test.mjs — o campo `curvas` do passo `subdivisao` (fatia 5 do plano das ferramentas de correção de superfície): a marca, no neutro da chapa…
 - `subdivisao-limite.test.ts` — subdivisao-limite.test.ts — a recusa do passo `subdivisao` que gera mais vértices ou faces que o limite do passo. Precisa de uma gaiola de 576 quadros no nív…
 - `subdivisao-recusas.test.ts` — subdivisao-recusas.test.ts — cada recusa de entrada do passo `subdivisao` com a entrada ruim e o campo que a recusa cita. A revisão das verificações (2026-11…
 - `subdivisao.js` — subdivisao.js (operação) — gera uma superfície Catmull-Clark com vincos a partir de uma gaiola declarada. A geometria sai de `procedural/nucleo/subdivisao.js…
@@ -1223,8 +1230,26 @@
 
 ## procedural/nucleo/planejador/
 
+- `armazem-em-pasta.mjs` — armazem-em-pasta.mjs — o armazém em disco do cache por prefixo e a memória que o host em Node dá ao núcleo (plano do cache por passo, fatia 4). Só roda em No…
+- `armazem-em-pasta.test.mjs` — armazem-em-pasta.test.mjs — o armazém em disco do cache por prefixo e a memória do host (plano do cache por passo, fatia 4): a gravação ao lado e renomeada, …
+- `cache-por-prefixo-acervo.test.mjs` — cache-por-prefixo-acervo.test.mjs — o cache por prefixo em receitas do acervo (plano do cache por passo, fatia 3). Cada receita roda uma vez inteira, guardan…
+- `cache-por-prefixo.test.mjs` — cache-por-prefixo.test.mjs — o cache por prefixo entre execuções (plano do cache por passo, fatia 3): a memória em armazém guarda o estado depois de cada pas…
+- `chave-do-prefixo.js` — chave-do-prefixo.js — a chave encadeada do prefixo de passos, para o cache por prefixo (plano do cache por passo, fatia 3).
+- `impressao-do-neutro.js` — impressao-do-neutro.js — o neutro que o núcleo devolve, escrito campo a campo num texto que distingue tudo o que o distingue, para a comparação bit a bit do …
+- `leitura-declarada-acervo.test.mjs` — leitura-declarada-acervo.test.mjs — a leitura declarada conferida contra peças do acervo (fatia 2 do plano do cache por passo). As peças cobrem as declaraçõe…
+- `leitura-declarada.js` — leitura-declarada.js — o que cada operação do núcleo lê da malha, declarado, e a conferência contra o que o passo leu de fato (fatia 2 do plano do cache por …
+- `leitura-declarada.test.mjs` — leitura-declarada.test.mjs — prova o registro de leitura do núcleo e a leitura declarada das operações (fatia 2 do plano do cache por passo): o registro não …
+- `leitura-do-passo.js` — leitura-do-passo.js — o que um passo lê de fato da malha, registrado durante a execução (fatia 2 do plano do cache por passo).
 - `leitura-escrita.js` — leitura-escrita.js — o grafo de leitura e escrita de uma receita, extraído em modo só-leitura (fatia 1 do plano do planejador de execução). Nada aqui executa…
 - `leitura-escrita.test.mjs` — leitura-escrita.test.mjs — prova o grafo de leitura e escrita, as sequências de subtrair e o perfil de tempo do planejador (fatia 1).
+- `memoria-em-armazem.js` — memoria-em-armazem.js — a memória de execução guardada fora do processo, para um comando recomeçar do estado que o comando anterior deixou (plano do cache po…
+- `neutro-em-texto.js` — neutro-em-texto.js — o neutro do núcleo em texto e de volta (plano do cache por passo, fatia 4), para a ativação da bancada gravá-lo ao lado da sessão e a pá…
+- `versao-do-codigo.mjs` — versao-do-codigo.mjs — a versão do código que gera o estado de uma receita, para a chave do cache por prefixo (plano do cache por passo, fatia 3, gate 4): o …
+
+## procedural/nucleo/planejador/fixtures/
+
+- `processo-do-cache.mjs` — processo-do-cache.mjs — um comando que executa uma receita pequena com a memória em armazém numa pasta (cubo, cubo, unir, parte), para a prova do cache por p…
+- `sem-manifold.mjs` — sem-manifold.mjs — carregado com `node --import`, faz o processo rodar sem a biblioteca Manifold, como um ambiente em que o WebAssembly não carrega: a import…
 
 ## procedural/pecas/
 
@@ -2543,6 +2568,7 @@
 - `montagem-em-dados-acervo.test.js` — montagem-em-dados-acervo.test.js — LENTO (está em `TESTES_LENTOS`: resolve o avião e o braço reais, uns 20 s; o teste rápido, com uma montagem de fixture, é …
 - `montagem-em-dados.js` — montagem-em-dados.js — abre a montagem persistida (`<objeto>/montagem.json`) como modelo da bancada, com as peças nas posições da montagem.
 - `montagem-em-dados.test.js` — montagem-em-dados.test.js — uma montagem pequena, de fixture, abre pela montagem em dados com as peças nas posições dela.
+- `neutro-em-texto.test.js` — neutro-em-texto.test.js — o neutro que a ativação grava ao lado da sessão e a página lê em vez de executar a receita (plano do cache por passo, fatia 4): ida…
 - `registro-de-eventos.js` — registro-de-eventos.js — a memória curta da bancada.
 - `registro-de-eventos.test.js` — registro-de-eventos.test.js — prova que a memória curta da bancada guarda a sequência certa, junta repetição consecutiva e descarta o antigo, não o recente, …
 - `sessao-da-bancada.js` — sessao-da-bancada.js — de onde vem a peça da bancada: a sessão ativa que a IA envia, a peça aberta do acervo, a do catálogo e a entrega que espera quando a p…
@@ -2765,9 +2791,16 @@
 ## tools/fixtures/correcao-de-superficie/
 
 - `alisamento.test.mjs` — alisamento.test.mjs — o gate 1 do plano das ferramentas de correção de superfície (fatia 3): na `rede-com-ruido`, a opção `alisarCurvas` da rede leva o exces…
+- `analiticas.mjs` — analiticas.mjs — a medida do gate de continuidade da fatia 5 sobre as superfícies analíticas de `chapas.mjs`: a rede de quatro retalhos de `definicaoAnalitic…
+- `analiticas.test.mjs` — analiticas.test.mjs — o gate de continuidade que faltou na fatia 4 (fatia 5 do plano das ferramentas de correção de superfície): toda opção de continuidade d…
 - `chapas.mjs` — chapas.mjs — as chapas de prova do plano das ferramentas de correção de superfície (`docs/modelar/planos/2026-11-16-ferramentas-de-correcao-de-superficie.md`…
 - `chapas.test.mjs` — chapas.test.mjs — as chapas de prova do plano das ferramentas de correção de superfície: cada uma monta sem órfão, com a forma e o defeito declarados em `cha…
+- `emendas.test.mjs` — emendas.test.mjs — o item 3 do gate de saída do plano das ferramentas de correção de superfície (fatia 4): nas chapas emendadas com a continuidade declarada …
 - `linha-de-base.mjs` — linha-de-base.mjs — a linha de base do plano das ferramentas de correção de superfície: as quatro medidas de superfície (`suavidade`, `pente`, `emendas`, `on…
+- `medida-na-curva.mjs` — medida-na-curva.mjs — a continuidade medida NA CURVA declarada, pela superfície limite exata (fatia 5 do plano das ferramentas de correção de superfície, `do…
+- `medida-na-curva.test.mjs` — medida-na-curva.test.mjs — a medida da emenda na curva declarada (fatia 5 do plano das ferramentas de correção de superfície), pelo neutro marcado (`marcarCu…
+- `onde-ondula.mjs` — onde-ondula.mjs — onde a curvatura da superfície limite oscila, por classe de lugar (fatia 5 do plano das ferramentas de correção de superfície): perto de um…
+- `onde-ondula.test.mjs` — onde-ondula.test.mjs — a régua de onde a curvatura da superfície limite oscila (fatia 5): o ruído das curvas digitadas sobe as viradas do miolo sobre as da r…
 
 ## tools/fixtures/correcao-de-superficie/chapa-simetrica/
 
@@ -2777,6 +2810,14 @@
 
 - `receita.js` — correcao-de-superficie/chapa-simetrica-espelhada/receita.js — a chapa de prova 'chapa-simetrica-espelhada' de `../chapas.mjs`, onde estão a forma e o defeito…
 
+## tools/fixtures/correcao-de-superficie/emenda-dupla/
+
+- `receita.js` — correcao-de-superficie/emenda-dupla/receita.js — a chapa de prova 'emenda-dupla' de `../chapas.mjs`, onde estão a forma e a continuidade declarada.
+
+## tools/fixtures/correcao-de-superficie/emenda-dupla-declarada/
+
+- `receita.js` — correcao-de-superficie/emenda-dupla-declarada/receita.js — a chapa de prova 'emenda-dupla-declarada' de `../chapas.mjs`, onde estão a forma e a continuidade …
+
 ## tools/fixtures/correcao-de-superficie/emenda-g0/
 
 - `receita.js` — correcao-de-superficie/emenda-g0/receita.js — a chapa de prova 'emenda-g0' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
@@ -2785,9 +2826,37 @@
 
 - `receita.js` — correcao-de-superficie/emenda-g1/receita.js — a chapa de prova 'emenda-g1' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
 
+## tools/fixtures/correcao-de-superficie/emenda-g1-declarada/
+
+- `receita.js` — correcao-de-superficie/emenda-g1-declarada/receita.js — a chapa de prova 'emenda-g1-declarada' de `../chapas.mjs`, onde estão a forma e a continuidade declar…
+
+## tools/fixtures/correcao-de-superficie/emenda-g1-em-g2/
+
+- `receita.js` — correcao-de-superficie/emenda-g1-em-g2/receita.js — a chapa de prova 'emenda-g1-em-g2' de `../chapas.mjs`, onde estão a forma e a continuidade declarada.
+
 ## tools/fixtures/correcao-de-superficie/emenda-g2/
 
 - `receita.js` — correcao-de-superficie/emenda-g2/receita.js — a chapa de prova 'emenda-g2' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
+
+## tools/fixtures/correcao-de-superficie/emenda-g2-declarada/
+
+- `receita.js` — correcao-de-superficie/emenda-g2-declarada/receita.js — a chapa de prova 'emenda-g2-declarada' de `../chapas.mjs`, onde estão a forma e a continuidade declar…
+
+## tools/fixtures/correcao-de-superficie/emenda-inflexao/
+
+- `receita.js` — correcao-de-superficie/emenda-inflexao/receita.js — a chapa de prova 'emenda-inflexao' de `../chapas.mjs`, onde estão a forma e a continuidade declarada.
+
+## tools/fixtures/correcao-de-superficie/emenda-inflexao-declarada/
+
+- `receita.js` — correcao-de-superficie/emenda-inflexao-declarada/receita.js — a chapa de prova 'emenda-inflexao-declarada' de `../chapas.mjs`, onde estão a forma e a continu…
+
+## tools/fixtures/correcao-de-superficie/emenda-inflexao-lisa/
+
+- `receita.js` — correcao-de-superficie/emenda-inflexao-lisa/receita.js — a chapa de prova 'emenda-inflexao-lisa' de `../chapas.mjs`, onde estão a forma e a continuidade decl…
+
+## tools/fixtures/correcao-de-superficie/emenda-inflexao-lisa-declarada/
+
+- `receita.js` — correcao-de-superficie/emenda-inflexao-lisa-declarada/receita.js — a chapa de prova 'emenda-inflexao-lisa-declarada' de `../chapas.mjs`, onde estão a forma e…
 
 ## tools/fixtures/correcao-de-superficie/rede-alisada/
 
@@ -2797,9 +2866,21 @@
 
 - `receita.js` — correcao-de-superficie/rede-com-ruido/receita.js — a chapa de prova 'rede-com-ruido' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
 
+## tools/fixtures/correcao-de-superficie/rede-em-fila/
+
+- `receita.js` — correcao-de-superficie/rede-em-fila/receita.js — a chapa de prova 'rede-em-fila' de `../chapas.mjs`, onde estão a forma e a continuidade declarada.
+
+## tools/fixtures/correcao-de-superficie/rede-ponta-com-ponta/
+
+- `receita.js` — correcao-de-superficie/rede-ponta-com-ponta/receita.js — a chapa de prova 'rede-ponta-com-ponta' de `../chapas.mjs`, onde estão a forma e a continuidade decl…
+
 ## tools/fixtures/correcao-de-superficie/rede-sem-ruido/
 
 - `receita.js` — correcao-de-superficie/rede-sem-ruido/receita.js — a chapa de prova 'rede-sem-ruido' de `../chapas.mjs`, onde estão a forma e o defeito declarado.
+
+## tools/fixtures/correcao-de-superficie/rede-tres-no-no/
+
+- `receita.js` — correcao-de-superficie/rede-tres-no-no/receita.js — a chapa de prova 'rede-tres-no-no' de `../chapas.mjs`, onde estão a forma e a continuidade declarada.
 
 ## tools/fixtures/costuras-e-furos/
 
@@ -3361,6 +3442,7 @@
 - `descrever-partes-materiais.test.mjs` — descrever-partes-materiais.test.mjs — a revisão persiste os campos novos do material (verniz, transmissão, relevo e os demais) e as revisões já gravadas segu…
 - `descrever-partes.test.ts` — Contrato de medição headless exercitado por fixtures de capacidade. O catálogo publicado pode estar vazio; a régua recebe um módulo explícito.
 - `descrever-peca.mjs` — descrever-peca.mjs — serviço headless de medição e sua CLI fina.
+- `descrever-recomeco.test.mjs` — descrever-recomeco.test.mjs — o `descrever` que recomeça de um ponto guardado pelo cache por prefixo (plano do cache por passo, fatia 4) informa o passo da r…
 - `descrever-recusas.test.mjs` — descrever-recusas.test.mjs — `descrever --recusas` dá a mesma lista que `nucleo(gerarPassos(TABELA)).orfaos`, o script de uma linha que a sessão de 2026-11-1…
 - `descrever-reguas-de-malha.test.mjs` — descrever-reguas-de-malha.test.mjs — as três réguas de malha no `descrever` como aviso (plano "costuras e furos limpos", fatia 3): cada defeito das peças de …
 - `descrever-sem-calar.test.mjs` — descrever-sem-calar.test.mjs — o `descrever` e a `guarda:acervo` dizendo o que calavam (fatia 5 do plano de ferramentas de conferência e de vista): o órfão d…
