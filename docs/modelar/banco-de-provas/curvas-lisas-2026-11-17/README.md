@@ -44,3 +44,33 @@ Recomendação: seguir para a fatia 2 (o ajuste de curva lisa), que não depende
    Custo: uns 10 minutos de espera.
    O processo pegou: não.
    Destino: backlog, medir sobre o neutro já executado (o cache por passo do plano do cache).
+
+## Fatia 2: o ajuste de curva lisa
+
+`procedural/nucleo/ajuste-de-curva-lisa.js` (`ajustarCurvaLisa`, ficha no cabeçalho do arquivo, testes `ajuste-de-curva-lisa.test.mjs` e `ajuste-de-curva-lisa-planta.test.mjs`) recebe pontos de uma curva plana e uma tolerância em mm e devolve uma cadeia de clotoides (curvatura linear em cada trecho, contínua entre trechos, logo G2 sem condição de emenda), com os joelhos da curvatura, o número de inflexões, as corridas de curvatura monótona (`trechos`) e o desvio a cada ponto. `pontosDaRede(passo, { nome })` devolve a curva no formato de `curvas` de `gaiolaPorRede`: pontos-chave sobre a curva ajustada, que a Catmull-Rom da rede reproduz a menos de 0,3 mm com passo de 60 mm (o teste monta uma rede de um retalho e mede os pontos da linha dela contra a curva fina). `gaiolaPorRede` e `curva-da-gaiola.js` não mudaram.
+
+Por que clotoide e não cônica ou cúbica: a clotoide é a curva de menor variação de curvatura entre duas curvaturas dadas, a cadeia delas com curvatura contínua é G2 por construção, e a inflexão cai onde a curvatura cruza zero. A cônica só tem curvatura monótona em cada metade e pede a posição do eixo; a cúbica de curvatura monótona pede uma condição de monotonia sobre os coeficientes. Os graus de liberdade por trecho são os mesmos e sem restrição.
+
+O método: Levenberg-Marquardt sobre início, rumo, comprimento, curvaturas e posição dos joelhos, com resíduo de distância com sinal à curva (passo de integração de 2 mm), começando de uma clotoide só; enquanto o desvio máximo passa da tolerância entra um joelho no ponto de maior desvio, e no fim tenta-se tirar cada joelho que a tolerância dispensa. A inflexão conta a troca de sinal entre as faixas de curvatura que movem a curva mais que a tolerância (giro × comprimento / 8), porque uma curvatura de 0,01 1/m dentro da tolerância não é lóbulo. Duas decisões custaram uma volta cada: o peso das pontas (sem ele o ajuste largava a ponta da curva e fazia um gancho de 10 graus nos primeiros 60 mm, o que trava o ajuste da rodada 5 em 5,4 mm) e o rumo de saída tirado da corda dos primeiros pontos, em vez de ajustado junto.
+
+Provas em curvas analíticas (os mesmos casos do teste), desvio máximo medido, número de clotoides e de inflexões:
+
+| Curva | limpa (tolerância 0,5 mm) | com ruído de 0,3 mm (tolerância 1 mm) |
+|---|---|---|
+| arco de 500 mm, 90 graus | 0,001 mm, 1 clotoide, 0 inflexão | 0,444 mm, 1, 0 |
+| clotoide de 1/800 a 1/300 | 0,001 mm, 1, 0 | 0,439 mm, 1, 0 |
+| quarto de elipse de 600 por 250 mm | 0,483 mm, 2, 0 | 0,754 mm, 2, 0 |
+| S de 1/400 a -1/400 | 0,000 mm, 1, 1 | 0,496 mm, 1, 1 |
+
+A planta da lataria do carro-fastback (a TABELA da receita, só leitura: o polígono com filete da prancha de `contornoDaPlanta`, 802 pontos a cada 5 mm, 4005 mm de arco) com tolerância de 3 mm: cabe com 9 clotoides, desvio máximo 2,81 mm, 8 corridas de curvatura monótona e 1 inflexão, em uns 6 s. Com 8 clotoides o desvio é 3,16 mm, com 6 é 10,5 mm. Os joelhos (arco em mm, curvatura em 1/m): 0 em 0; 1596 em 0; 1804 em -1,13; 1864 em 0,64; 2237 em 0,06; 3004 em 0,90; 3399 em 3,61; 3439 em -2,45; 3483 em 1,09; 4004 em -0,09. Lida como a forma pede: reta da frente até o lóbulo do para-lama (curvatura de -1,1 1/m, raio de uns 900 mm, que sai para fora), a volta com curvatura que sobe a 3,6 1/m (raio de uns 280 mm) no canto de trás, com uma oscilação de 40 mm nesse lóbulo (3,61, -2,45, 1,09) que é o ajuste seguindo os três filetes de 300, 400 e 600 mm do canto dentro dos 3 mm, e a ponta do eixo do carro. São 2 lóbulos, mas 9 clotoides, porque cada lóbulo pede subida e descida. O ajuste do carro continua sem rodada: o uso desta curva na receita é a fatia 3.
+
+Atritos:
+
+1. O ajuste da planta largava o ponto de partida (6,7 mm fora) e fazia um gancho de 10 graus no começo; só a medida do resíduo das pontas mostrou (`a.inicio` contra o primeiro ponto).
+   Custo: duas rodadas de ajuste (uns 15 minutos).
+   O processo pegou: não.
+   Destino: ferramenta, o peso das pontas em `ajuste-de-curva-lisa.js`.
+2. A ficha `ajustarCurvaLisa` não entra em `npm run capacidade`, que lista os ajudantes por um registro fora do território deste plano (`tools/modelar/capacidade.mjs`).
+   Custo: nenhum ainda; o ajudante não aparece na busca por capacidade.
+   O processo pegou: não.
+   Destino: backlog, registrar a ficha quando o plano der o arquivo.

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2106 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2109 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -997,6 +997,9 @@
 
 - `CLAUDE.md` — Núcleo: o que só vale nesta pasta
 - `adaptador.js` — adaptador.js — projeção visual do neutro; não conhece receitas nem execução.
+- `ajuste-de-curva-lisa-planta.test.mjs` — ajuste-de-curva-lisa-planta.test.mjs — a planta da lataria do carro-fastback (a TABELA da receita, só leitura, o contorno do polígono com filete da prancha a…
+- `ajuste-de-curva-lisa.js` — ajuste-de-curva-lisa.js — a curva lida de pontos (da prancha, de uma imagem) ajustada a poucos trechos de curvatura monótona, com o desvio de cada ponto medido
+- `ajuste-de-curva-lisa.test.mjs` — ajuste-de-curva-lisa.test.mjs — o ajuste de curva lisa em curvas analíticas conhecidas (arco, clotoide, elipse, S), limpas e com ruído de leitura, com o núme…
 - `alisar-curvas.js` — alisar-curvas.js — os pontos-chave de uma curva declarada alisados pelo resíduo do ajuste polinomial local, sem mexer na forma
 - `alisar-curvas.test.mjs` — alisar-curvas.test.mjs — o alisamento pelo resíduo do ajuste polinomial local: não mexe no arco, no círculo nem na parábola, tira o ruído, deixa os pontos du…
 - `animacao.js` — animacao.js — animação rígida e skinning sobre lotes já adaptados.
