@@ -140,4 +140,20 @@ O contorno começa 32,9 mm acima da base do ombro porque, na foto, o anel da cin
 
 A medida de se a nota do crítico oscila menos entre rodadas parecidas com o contorno no pacote (item 6 do gate de saída) pede despachar o `critico-visual` várias vezes com cada pacote, sem a história; o agente da fatia não tem como despachar outro agente, e ela fica para quem conduz, com os dois pacotes acima.
 
+### A medida do item 6 e o trecho de encontro
+
+Quem conduz despachou o `critico-visual` duas vezes com cada pacote do ombro, sem a história. Sem o contorno (`critica-ombro-antes`) as notas foram 6 e 5; com o contorno (`critica-ombro-depois`), 6 e 5. A oscilação não mudou com o contorno sobreposto. Os dois críticos com o contorno apontaram como defeito o pé do ombro 33 mm mais baixo que o contorno e o contorno 8 a 12 mm além da borda direita do modelo. O primeiro não é defeito: na referência o anel da cintura tapa o pé do ombro, e o lado de baixo da região `ombro` é o encontro dela com a região `anelCintura` do mapa, e não a borda da peça. O processo não o pegou: o pacote desenhava a região inteira com a mesma linha cheia, e o pedido não dizia que parte dela é silhueta.
+
+A correção está no pacote. `encontrosDoAnel`, em [`prancha-de-referencia.mjs`](../../../../tools/modelar/prancha-de-referencia.mjs), classifica cada lado do anel de uma região: é silhueta quando a mediana da distância de 11 amostras dele à silhueta do objeto fica até 3 px da imagem de referência (4,7 mm no braço robótico, pelo `mmPorPx` do contorno), e é encontro quando não fica, com a região vizinha mais próxima até duas folgas. A prancha desenha o trecho de encontro tracejado, a legenda diz o comprimento dele, com que regiões ele é encontro e que lado da caixa do contorno cai nele, e o pedido diz ao crítico que o trecho tracejado não é borda da peça, não serve de medida e que a distância dele ao modelo não é defeito. No ombro, lado a lado do anel, em px da referência:
+
+| lados do anel `ombro` | distância à silhueta, mediana | classe |
+| --- | --- | --- |
+| esquerdo, x = 645 a 636, y = 419 a 526 | 4,3 a 30,4 px | encontro com `anelOmbro` |
+| canto de baixo à esquerda, x = 636, y = 526 a 528 | 2,0 px | silhueta |
+| de baixo, y = 528 a 530 | 7,5 a 52,0 px | encontro com `anelCintura` |
+| direito, x = 762 a 764 | 0,5 e 0,8 px | silhueta |
+| de cima, y = 418 a 419 | 1,4 px | silhueta |
+
+Dos 13 lados, 9 são encontro, 376,2 mm, e o lado de baixo da caixa do contorno cai no encontro. O lado direito é silhueta: ali a região encosta no fundo, e os 8 a 12 mm do contorno além da borda direita do modelo são diferença medida entre a peça e a referência, que o pacote mantém como medida. O de cima também é silhueta e bate com o topo do modelo (32,9 + 176,9 = 209,8 mm contra 210,1). O pacote refeito está em `tools/bancadas/out/critica-ombro-encontro`, pelo mesmo comando com `--saida` trocada, e o pedido difere do de `critica-ombro-depois` só no parágrafo do tracejado e no parêntese do encontro na linha do contorno. Os testes ficam em [`prancha-de-referencia.test.mjs`](../../../../tools/modelar/prancha-de-referencia.test.mjs) (a classificação num objeto partido em cima e embaixo, os trechos abertos, o lado da caixa, o desenho tracejado e a marca que segue da entrada ao JSON das medidas na página) e em [`vistas-para-critica.test.mjs`](../../../../tools/modelar/vistas-para-critica.test.mjs) (a marca na região e não na silhueta, e o texto do pedido). Medir de novo a oscilação com este pacote é de quem conduz.
+
 Um achado à parte, que o processo não pegou: o contorno lateral da carcaça da empilhadeira (`carcaca-lado.ia.contornos.json`) tem o eixo traseiro em h = +1700 mm, e a carcaça o tem em z = -1700; pelo comparador, que lê h como z na lateral, a silhueta dá razão interseção/união de 0,041. O contorno está espelhado em relação à peça, e o veredito não o confere porque ele mora na pasta do objeto. O contorno sobreposto o mostraria espelhado; a correção é do contorno ou da convenção do comparador e fica fora deste plano.

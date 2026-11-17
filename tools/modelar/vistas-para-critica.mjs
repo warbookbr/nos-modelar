@@ -91,7 +91,10 @@ import { doAmbiente } from '../ambiente.mjs';
 import { avisarReferenciasLocaisAusentes, mensagemDeReferenciasAusentes, referenciasDoPlano } from './referencias-do-plano.mjs';
 import { lerContornos, vistaDoMesmoOlho } from './comparar-contornos.mjs';
 import { contornosDaPeca } from './contorno-da-peca.mjs';
-import { VISTAS_DO_CONTORNO, aoReferencialDaPeca, pontoDoContorno, prancharContorno, vistaNaPeca } from './prancha-de-referencia.mjs';
+import {
+  FOLGA_DA_SILHUETA_PX, VISTAS_DO_CONTORNO, aoReferencialDaPeca, encontrosDoAnel, ladosEmTexto, pontoDoContorno, prancharContorno,
+  vistaNaPeca,
+} from './prancha-de-referencia.mjs';
 import { normalizarPlanoDeModelagem } from '../../src/autoria/plano-de-modelagem.js';
 import { lerPergunta } from '../../src/autoria/perguntas-do-critico.js';
 import { textoDoAfastamento } from '../../src/autoria/refinamento-global.js';
@@ -689,6 +692,8 @@ function pastaDasRodadas(peca, caminho) {
  * referencial da peça pela pose da instância, e só as regiões com o nome da instância ou de uma parte do plano são desenhadas, porque a
  * silhueta do objeto inteiro afogaria a peça. */
 export const ARQUIVO_DO_CONTORNO_SOBREPOSTO = 'contorno-sobreposto.png';
+/* o contorno sem mmPorPx não diz o tamanho do px da referência; a folga do encontro supõe 1,6 mm por px, a do braço robótico */
+const FOLGA_SEM_ESCALA_MM_POR_PX = 1.6;
 
 /**
  * Os contornos a sobrepor, de dados já lidos. `contornos` são `[{ arquivo, lado }]`; `lidos` dá o `lerContornos` de cada arquivo (ou o
@@ -714,9 +719,18 @@ export function contornosParaSobrepor({ contornos = [], lidos = new Map(), nomes
       fora.push(`${nome} fica fora do contorno sobreposto: é contorno do objeto, e nenhuma região dele tem o nome da instância ou de uma parte do plano (${[...nomesDaPeca].join(', ') || 'nenhum'}).`);
       continue;
     }
+    /* o trecho da região que divide fronteira com outra região do mapa é encontro, não silhueta: no ombro do braço robótico o anel da
+       cintura tapa o pé, e dois críticos leram o lado de baixo do contorno, 33 mm acima do pé do modelo, como defeito */
+    const folgaMm = FOLGA_DA_SILHUETA_PX * (lido.mmPorPx ?? FOLGA_SEM_ESCALA_MM_POR_PX);
     const aneis = escolhidas.map(([n, forma]) => ({
       nome: n,
       pontosMm: forma.aneis.map((anel) => anel.map((p) => aoReferencialDaPeca(pontoDoContorno(lado, p), pose))),
+      ...(n === 'silhueta' ? {} : {
+        encontros: forma.aneis.map((anel) => encontrosDoAnel(anel, {
+          silhueta: lido.silhueta.aneis, folgaMm,
+          vizinhas: Object.fromEntries(Object.entries(lido.regioes).filter(([outra]) => outra !== n).map(([outra, f]) => [outra, f.aneis])),
+        })),
+      }),
     }));
     entradas.push({ vista, arquivo, rotulo: `o contorno ${lado} de ${nome}${pose ? ', posto no referencial da peça pela pose dela na montagem' : ''}`, aneis });
   }
@@ -738,6 +752,10 @@ export async function poseDaInstancia(montagem) {
   return (resolvida.instancias ?? []).find((i) => i.id === montagem.instancia)?.poseMundo ?? null;
 }
 
+const textoDoEncontro = (e) => (e
+  ? ` (tracejado: ${mm(e.comprimentoMm)} mm de encontro com ${e.vizinhas.join(', ')}, não é borda da peça${e.ladosDaCaixa.length ? `; ${ladosEmTexto(e.ladosDaCaixa)}` : ''})`
+  : '');
+
 function secaoDoContornoSobreposto({ arquivo, linhas = [], fora = [] }) {
   const L = [
     '## Contorno medido sobre o modelo', '',
@@ -745,10 +763,14 @@ function secaoDoContornoSobreposto({ arquivo, linhas = [], fora = [] }) {
     + 'pela mesma câmera que dá a escala da vista; a régua do painel é em mm. Não há alinhamento por centro: onde a linha e a silhueta do modelo '
     + 'não coincidem, a diferença de posição ou de tamanho é medida, e a legenda dá a extensão de cada uma. Julgue proporção, silhueta e espessura '
     + 'por esta imagem antes de julgá-las pela referência a olho; o que a linha não traça (detalhe interno, cor) continua na referência.', '',
+    'O trecho tracejado do contorno de uma região é encontro com outra região do mapa: ali, na referência, outra parte encosta na peça ou a tapa, '
+    + 'e a linha marca onde a região da imagem acaba, não a borda da peça contra o fundo. Esse trecho não serve de medida, e a distância entre ele e '
+    + 'o modelo não é defeito; só o trecho cheio é silhueta. Quando um lado da caixa do contorno cai no encontro, a extensão e o canto daquele lado '
+    + 'também não medem a peça.', '',
     `- contorno sobreposto: ${arquivo}`, '',
   ];
   for (const l of linhas) {
-    L.push(...lista([`vista ${l.vista}, ${l.rotulo}: modelo ${l.modelo.extensaoMm.map(mm).join(' x ')} mm; ${l.contornos.map((c) => `contorno ${c.nome} ${c.extensaoMm.map(mm).join(' x ')} mm, canto de baixo à esquerda a ${c.cantoMenosModeloMm.map(mm).join(' e ')} mm do canto do modelo`).join('; ')}`]));
+    L.push(...lista([`vista ${l.vista}, ${l.rotulo}: modelo ${l.modelo.extensaoMm.map(mm).join(' x ')} mm; ${l.contornos.map((c) => `contorno ${c.nome} ${c.extensaoMm.map(mm).join(' x ')} mm, canto de baixo à esquerda a ${c.cantoMenosModeloMm.map(mm).join(' e ')} mm do canto do modelo${textoDoEncontro(c.encontro)}`).join('; ')}`]));
   }
   if (linhas.length) L.push('');
   for (const f of fora) L.push(`Fora do contorno sobreposto: ${f}`, '');

@@ -1207,6 +1207,34 @@ describe('o contorno medido sobre o modelo', () => {
     ]);
   });
 
+  it('a região marca como encontro o lado que divide com outra região, e a silhueta não leva encontro', () => {
+    const partido = {
+      formato: 'mecanifica.contornos@1', mmPorPx: 1.5,
+      silhueta: { contornoMm: [[-100, 0], [100, 0], [100, 200], [-100, 200]] },
+      regioes: { ombro: { contornoMm: [[-100, 100], [100, 100], [100, 200], [-100, 200]] }, cintura: { contornoMm: [[-100, 0], [100, 0], [100, 100], [-100, 100]] } },
+    };
+    const { entradas } = contornosParaSobrepor({ contornos: [{ arquivo: '/r/p.contornos.json', lado: 'frontal' }], lidos: new Map([['/r/p.contornos.json', lerContornos(partido)]]), nomes: ['ombro'] });
+    const [silhueta, ombro] = entradas[0].aneis;
+    expect(silhueta.encontros).toBeUndefined();
+    expect(ombro.encontros).toHaveLength(1);
+    expect(ombro.encontros[0]).toHaveLength(ombro.pontosMm[0].length);
+    /* o lado de y = 100 é o da cintura; os outros três são silhueta */
+    const i = ombro.pontosMm[0].findIndex((p, k, a) => p[1] === 100 && a[(k + 1) % a.length][1] === 100);
+    ombro.encontros[0].forEach((l, k) => expect(l).toEqual(k === i ? { encontro: true, vizinha: 'cintura' } : { encontro: false, vizinha: null }));
+  });
+
+  it('o pedido diz que o trecho tracejado é encontro e não serve de medida, e que lado da caixa cai nele', () => {
+    const pedido = montarPedido({
+      peca: 'p', contornoSobreposto: {
+        arquivo: '/x/contorno-sobreposto.png',
+        linhas: [{ vista: 'frontal', rotulo: 'r', modelo: { extensaoMm: [190, 210] }, contornos: [{ nome: 'ombro', extensaoMm: [202, 177], cantoMenosModeloMm: [-2, 33], encontro: { vizinhas: ['anelCintura', 'anelOmbro'], comprimentoMm: 376.2, ladosDaCaixa: ['de baixo'] } }] }],
+      },
+    });
+    expect(pedido).toMatch(/O trecho tracejado do contorno de uma região é encontro com outra região do mapa/);
+    expect(pedido).toMatch(/Esse trecho não serve de medida, e a distância entre ele e o modelo não é defeito/);
+    expect(pedido).toContain('contorno ombro 202 x 177 mm, canto de baixo à esquerda a -2 e 33 mm do canto do modelo (tracejado: 376,2 mm de encontro com anelCintura, anelOmbro, não é borda da peça; o lado de baixo da caixa cai no encontro e não mede a peça)');
+  });
+
   it('o pedido traz a seção com a imagem e as extensões, antes do modelo', () => {
     const pedido = montarPedido({
       peca: 'p', contornoSobreposto: {

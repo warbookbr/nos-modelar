@@ -431,6 +431,9 @@ export const OLHO_DA_BANCADA = Object.freeze({
 export const CORES_DO_CONTORNO = Object.freeze(['#d2361f', '#1b8a3a', '#8a2bb5', '#b07800']);
 export const ALTURA_DO_CONTORNO = 640;
 export const FOLGA_DO_CONTORNO = 0.06;
+/* o traço do trecho de encontro, e a distância à borda da caixa, em mm, em que um lado do anel conta para o lado da caixa */
+export const TRACEJADO_DO_ENCONTRO = Object.freeze([7, 5]);
+const FOLGA_DO_LADO_MM = 3;
 
 /** O ponto (h, v) em mm de um contorno da `vista` (frontal, lateral, superior) no referencial em que ele foi medido, com o eixo do olho
  *  em 0: na frontal h é x e v é y, na lateral h é z e v é y, na superior h é x e v é menos z (`EIXOS_DA_VISTA` do comparador). */
@@ -439,6 +442,104 @@ export function pontoDoContorno(vista, [h, v]) {
   if (vista === 'lateral') return [0, v, h];
   if (vista === 'superior') return [h, 0, -v];
   return recusar(`o contorno da vista '${vista}' não tem eixo declarado; as vistas do contorno são ${VISTAS_DO_CONTORNO.join(', ')}.`);
+}
+
+/* A folga, em px da imagem de referência, entre um trecho da região e a silhueta para ele contar como silhueta: o contorno da região é
+   simplificado e anda até uns 2 px da silhueta densa nos lados que são borda (o lado direito do ombro do braço robótico, 0,5 a 1,4 px). */
+export const FOLGA_DA_SILHUETA_PX = 3;
+const AMOSTRAS_DO_TRECHO = 11;
+
+const distanciaAoSegmento = (p, a, b) => {
+  const dx = b[0] - a[0];
+  const dy = b[1] - a[1];
+  const L = dx * dx + dy * dy;
+  const t = L ? Math.max(0, Math.min(1, ((p[0] - a[0]) * dx + (p[1] - a[1]) * dy) / L)) : 0;
+  return Math.hypot(p[0] - a[0] - t * dx, p[1] - a[1] - t * dy);
+};
+const distanciaAosAneis = (p, aneis) => {
+  let m = Infinity;
+  for (const anel of aneis) for (let i = 0; i < anel.length; i += 1) m = Math.min(m, distanciaAoSegmento(p, anel[i], anel[(i + 1) % anel.length]));
+  return m;
+};
+const mediana = (v) => [...v].sort((a, b) => a - b)[Math.floor(v.length / 2)];
+
+/**
+ * Cada lado (do ponto i ao i + 1, fechando no primeiro) de um anel em (h, v) mm de uma região do mapa, classificado: é silhueta quando a
+ * mediana da distância das amostras dele à silhueta do objeto fica até `folgaMm`, e é encontro quando não fica, porque ali a região
+ * divide fronteira com outra região do mapa (outra parte encosta nela ou a tapa na referência) e o trecho não é borda da peça contra o
+ * fundo. `silhueta` são os anéis da silhueta, `vizinhas` os anéis das outras regiões por nome; a vizinha do encontro é a mais próxima
+ * até duas folgas, ou null. Devolve `[{ encontro, vizinha }]`, um por lado. Puro.
+ */
+export function encontrosDoAnel(anel, { silhueta, vizinhas = {}, folgaMm }) {
+  return anel.map((a, i) => {
+    const b = anel[(i + 1) % anel.length];
+    const amostras = Array.from({ length: AMOSTRAS_DO_TRECHO }, (_, k) => [a[0] + (b[0] - a[0]) * k / (AMOSTRAS_DO_TRECHO - 1), a[1] + (b[1] - a[1]) * k / (AMOSTRAS_DO_TRECHO - 1)]);
+    if (mediana(amostras.map((p) => distanciaAosAneis(p, silhueta))) <= folgaMm) return { encontro: false, vizinha: null };
+    let vizinha = null;
+    let menor = 2 * folgaMm;
+    for (const [nome, aneis] of Object.entries(vizinhas)) {
+      const d = mediana(amostras.map((p) => distanciaAosAneis(p, aneis)));
+      if (d <= menor) { menor = d; vizinha = nome; }
+    }
+    return { encontro: true, vizinha };
+  });
+}
+
+/* Os trechos seguidos de um anel fechado com a mesma classificação: `[{ encontro, pontos }]`, cada um aberto, do primeiro ponto do
+   primeiro lado ao último ponto do último lado. Sem lado de encontro, um trecho só, fechado. */
+export function trechosDoAnel(pontos, lados) {
+  const n = pontos.length;
+  if (!lados?.some((l) => l.encontro)) return [{ encontro: false, fechado: true, pontos }];
+  if (lados.every((l) => l.encontro)) return [{ encontro: true, fechado: true, pontos }];
+  /* começa num lado que muda de classe em relação ao anterior, para nenhum trecho ficar partido na volta */
+  const inicio = lados.findIndex((l, i) => l.encontro !== lados[(i - 1 + n) % n].encontro);
+  const trechos = [];
+  for (let k = 0; k < n; k += 1) {
+    const i = (inicio + k) % n;
+    const atual = trechos.at(-1);
+    if (!atual || atual.encontro !== lados[i].encontro) trechos.push({ encontro: lados[i].encontro, fechado: false, pontos: [pontos[i]] });
+    trechos.at(-1).pontos.push(pontos[(i + 1) % n]);
+  }
+  return trechos;
+}
+
+const LADOS_DA_CAIXA = Object.freeze([['esquerdo', 0, 0], ['de baixo', 1, 3], ['direito', 0, 2], ['de cima', 1, 1]]);
+
+/** "o lado de baixo da caixa cai" ou "os lados esquerdo e de baixo da caixa caem": os lados de `ladosDaCaixaNoEncontro` em palavras. */
+export function ladosEmTexto(lados) {
+  if (lados.length === 1) return `o lado ${lados[0]} da caixa cai no encontro e não mede a peça`;
+  return `os lados ${lados.slice(0, -1).join(', ')} e ${lados.at(-1)} da caixa caem no encontro e não medem a peça`;
+}
+
+/**
+ * Os lados da caixa de um anel em px (y para baixo) que caem num encontro: para cada lado, os lados do anel com os dois pontos até
+ * `folgaPx` da borda da caixa decidem pelo comprimento, encontro contra silhueta; sem nenhum, decide o ponto extremo, que é encontro só
+ * quando os dois lados do anel que saem dele são. `pedacos` são `[{ pontos, lados }]`. Devolve os nomes (esquerdo, de baixo, direito,
+ * de cima).
+ */
+export function ladosDaCaixaNoEncontro(pedacos, caixa, folgaPx) {
+  const fora = [];
+  for (const [nome, eixo, k] of LADOS_DA_CAIXA) {
+    const borda = caixa[k];
+    let doEncontro = 0;
+    let daSilhueta = 0;
+    const extremos = [];
+    for (const { pontos, lados } of pedacos) {
+      const n = pontos.length;
+      pontos.forEach((p, i) => {
+        const q = pontos[(i + 1) % n];
+        const encontro = Boolean(lados?.[i]?.encontro);
+        if (Math.abs(p[eixo] - borda) <= folgaPx && Math.abs(q[eixo] - borda) <= folgaPx) {
+          const c = Math.hypot(q[0] - p[0], q[1] - p[1]);
+          if (encontro) doEncontro += c; else daSilhueta += c;
+        }
+        if (Math.abs(p[eixo] - borda) < 1e-9) extremos.push(Boolean(lados?.[i]?.encontro && lados?.[(i - 1 + n) % n]?.encontro));
+      });
+    }
+    const encontro = doEncontro + daSilhueta > 0 ? doEncontro > daSilhueta : extremos.length > 0 && extremos.every(Boolean);
+    if (encontro) fora.push(nome);
+  }
+  return fora;
 }
 
 const rotacaoIdentidade = [[1, 0, 0], [0, 1, 0], [0, 0, 1]];
@@ -489,7 +590,9 @@ const caixaDosPontos = (pontos) => [
 /**
  * O plano de desenho da prancha do contorno: uma linha por vista, com a vista do modelo e os anéis do contorno por cima, na mesma
  * escala. `linhas[i]` traz `vista`, `rotulo` (de onde veio o contorno), `modelo` (`{ largura, altura, extensao, pxPorMm }` da imagem
- * da bancada) e `aneis` (`[{ nome, pontosPx: [[[x, y], ...], ...] }]`, cada um com os pedaços dele, já em px da imagem). O painel é a
+ * da bancada) e `aneis` (`[{ nome, pontosPx: [[[x, y], ...], ...], encontros? }]`, cada um com os pedaços dele, já em px da imagem, e
+ * `encontros[p]` os lados do pedaço p como `encontrosDoAnel` os dá: o trecho de encontro sai tracejado, e a legenda diz com que região
+ * ele é encontro e que lados da caixa do contorno caem nele, que não medem a borda da peça). O painel é a
  * união da extensão do modelo com a caixa dos anéis, com folga, mesmo quando passa da imagem: o anel que sai do quadro da bancada
  * aparece inteiro sobre o fundo. Devolve `{ largura, altura, fundo, operacoes, escala, linhas }`.
  */
@@ -511,7 +614,8 @@ export function disporContorno({ titulo, linhas, alturaDaLinha = ALTURA_DO_CONTO
   let y = MARGEM;
   ops.push({ tipo: 'texto', texto: titulo, em: [MARGEM, y + 18], tamanho: 18, peso: 'bold' });
   const subtitulo = [
-    'a linha colorida é o contorno medido na referência, em mm, posta no referencial da peça pela câmera da vista;',
+    'a linha colorida é o contorno medido na referência, em mm, posta no referencial da peça pela câmera da vista; o trecho tracejado é encontro',
+    'com outra região do mapa (outra parte encosta ou tapa a peça na referência), não é borda da peça e não serve de medida;',
     `${casa(escala)} px da prancha por mm; régua em mm com o zero no canto de baixo à esquerda da extensão do modelo (caixa azul tracejada)`,
   ];
   subtitulo.forEach((texto, j) => ops.push({ tipo: 'texto', texto, em: [MARGEM, y + ALTURA_DO_TITULO + 12 + 17 * j], tamanho: 13, cor: '#555' }));
@@ -524,7 +628,8 @@ export function disporContorno({ titulo, linhas, alturaDaLinha = ALTURA_DO_CONTO
     const k = l.modelo.pxPorMm;
     const s = escala / k;
     const x0 = MARGEM + LARGURA_DA_REGUA;
-    const alturaDoRotulo = ALTURA_DO_ROTULO + 17 * (l.aneis.length + 1);
+    const comEncontro = l.aneis.filter((a) => a.encontros?.some((lados) => lados.some((x) => x.encontro))).length;
+    const alturaDoRotulo = ALTURA_DO_ROTULO + 17 * (l.aneis.length + comEncontro + 1);
     const topo = y + alturaDoRotulo;
     const painel = [x0, topo, Math.round((m.painelPx[2] - m.painelPx[0]) * s), Math.round((m.painelPx[3] - m.painelPx[1]) * s)];
     const emPrancha = ([px, py]) => [x0 + (px - m.painelPx[0]) * s, topo + (py - m.painelPx[1]) * s];
@@ -534,16 +639,38 @@ export function disporContorno({ titulo, linhas, alturaDaLinha = ALTURA_DO_CONTO
     ops.push({ tipo: 'texto', texto: legenda[1], em: [x0, y + 33], tamanho: 12, cor: '#444' });
     ops.push({ tipo: 'texto', texto: legenda[2], em: [x0, y + 50], tamanho: 12, cor: COR_DO_MODELO });
     largura = Math.max(largura, x0 + larguraDoTexto(legenda[0], 14) + MARGEM, ...legenda.slice(1).map((t) => x0 + larguraDoTexto(t, 12) + MARGEM));
+    let linhaDaLegenda = 0;
     const aneisRelato = l.aneis.map((a, j) => {
       const c = m.caixas[j];
       const cor = CORES_DO_CONTORNO[j % CORES_DO_CONTORNO.length];
       const ext = [(c[2] - c[0]) / k, (c[3] - c[1]) / k];
       /* a distância em mm entre o canto de baixo à esquerda do contorno e o do modelo, com y para cima */
       const deslocado = [(c[0] - l.modelo.extensao[0]) / k, (l.modelo.extensao[3] - c[3]) / k];
-      const texto = `contorno ${a.nome}: extensão ${mm1(ext[0])} x ${mm1(ext[1])} mm; canto de baixo à esquerda a ${mm1(deslocado[0])} mm na horizontal e ${mm1(deslocado[1])} mm na vertical do canto do modelo`;
-      ops.push({ tipo: 'texto', texto, em: [x0, y + 67 + 17 * j], tamanho: 12, cor });
-      largura = Math.max(largura, x0 + larguraDoTexto(texto, 12) + MARGEM);
-      return { nome: a.nome, cor, extensaoMm: ext.map((v) => Number(v.toFixed(1))), cantoMenosModeloMm: deslocado.map((v) => Number(v.toFixed(1))) };
+      const textos = [`contorno ${a.nome}: extensão ${mm1(ext[0])} x ${mm1(ext[1])} mm; canto de baixo à esquerda a ${mm1(deslocado[0])} mm na horizontal e ${mm1(deslocado[1])} mm na vertical do canto do modelo`];
+      const relato = { nome: a.nome, cor, extensaoMm: ext.map((v) => Number(v.toFixed(1))), cantoMenosModeloMm: deslocado.map((v) => Number(v.toFixed(1))) };
+      const pedacos = a.pontosPx.map((pontos, p) => ({ pontos, lados: a.encontros?.[p] ?? null }));
+      if (pedacos.some((pd) => pd.lados?.some((x) => x.encontro))) {
+        let comprimento = 0;
+        const vizinhas = new Set();
+        for (const { pontos, lados } of pedacos) {
+          (lados ?? []).forEach((x, i) => {
+            if (!x.encontro) return;
+            const q = pontos[(i + 1) % pontos.length];
+            comprimento += Math.hypot(q[0] - pontos[i][0], q[1] - pontos[i][1]) / k;
+            vizinhas.add(x.vizinha ?? 'o resto do objeto');
+          });
+        }
+        const lados = ladosDaCaixaNoEncontro(pedacos, c, FOLGA_DO_LADO_MM * k);
+        relato.encontro = { vizinhas: [...vizinhas].sort(), comprimentoMm: Number(comprimento.toFixed(1)), ladosDaCaixa: lados };
+        textos.push(`  tracejado: ${mm1(comprimento)} mm de encontro com ${relato.encontro.vizinhas.join(', ')}, não é borda da peça`
+          + (lados.length ? `; ${ladosEmTexto(lados)}` : ''));
+      }
+      for (const texto of textos) {
+        ops.push({ tipo: 'texto', texto, em: [x0, y + 67 + 17 * linhaDaLegenda], tamanho: 12, cor });
+        largura = Math.max(largura, x0 + larguraDoTexto(texto, 12) + MARGEM);
+        linhaDaLegenda += 1;
+      }
+      return relato;
     });
     ops.push({ tipo: 'retangulo', caixa: painel, preencher: '#ffffff' });
     /* a parte da imagem da bancada que cai no painel */
@@ -557,8 +684,13 @@ export function disporContorno({ titulo, linhas, alturaDaLinha = ALTURA_DO_CONTO
     ops.push({ tipo: 'retangulo', caixa: caixaExt, cor: COR_DO_MODELO, tracejado: [5, 4] });
     for (const [j, a] of l.aneis.entries()) {
       const cor = CORES_DO_CONTORNO[j % CORES_DO_CONTORNO.length];
-      for (const pedaco of a.pontosPx) {
-        ops.push({ tipo: 'caminho', pontos: pedaco.map((p) => emPrancha(p).map((v) => Math.round(v * 10) / 10)), fechado: true, cor, espessura: 2, recorte: painel });
+      for (const [p, pedaco] of a.pontosPx.entries()) {
+        for (const trecho of trechosDoAnel(pedaco, a.encontros?.[p])) {
+          ops.push({
+            tipo: 'caminho', pontos: trecho.pontos.map((q) => emPrancha(q).map((v) => Math.round(v * 10) / 10)), fechado: trecho.fechado, cor,
+            espessura: 2, recorte: painel, ...(trecho.encontro ? { tracejado: TRACEJADO_DO_ENCONTRO, encontro: true } : {}),
+          });
+        }
       }
     }
     reguaDoPainel(ops, { painel, zeroX: caixaExt[0], zeroY: caixaExt[1] + caixaExt[3], comprimentoX: m.larguraMm, comprimentoY: m.alturaMm, escala, cor: COR_DO_MODELO });
@@ -572,8 +704,8 @@ export function disporContorno({ titulo, linhas, alturaDaLinha = ALTURA_DO_CONTO
 /**
  * A prancha do contorno medido sobre o modelo: captura as vistas pedidas na bancada, em ortográfica e com a peça enquadrada, põe os
  * anéis de cada contorno no quadro pela projeção da câmera e grava o PNG e o JSON das medidas. `contornos` são
- * `[{ vista (da bancada, no referencial da peça), rotulo, aneis: [{ nome, pontosMm: [[[x, y, z], ...], ...] }] }]`, os pontos já no
- * referencial da peça; `arquivo` é o PNG a gravar. `olhar` é o `olharBancada` (o pacote passa o da sessão compartilhada). Devolve
+ * `[{ vista (da bancada, no referencial da peça), rotulo, aneis: [{ nome, pontosMm: [[[x, y, z], ...], ...], encontros? }] }]`, os pontos
+ * já no referencial da peça e `encontros` os lados de cada pedaço (`encontrosDoAnel`), que seguem à prancha; `arquivo` é o PNG a gravar. `olhar` é o `olharBancada` (o pacote passa o da sessão compartilhada). Devolve
  * `{ arquivo, json, medidas }`.
  */
 export async function prancharContorno({ peca, contornos, arquivo, titulo = null }, { olhar = null, chromium = null, lancar = null, logger = () => {} } = {}) {
@@ -607,7 +739,7 @@ export async function prancharContorno({ peca, contornos, arquivo, titulo = null
       return {
         vista: c.vista, rotulo: c.rotulo,
         modelo: { largura: medidas.modelos[i].largura, altura: medidas.modelos[i].altura, extensao: medidas.modelos[i].extensao, pxPorMm: escalaDaVista(vistaRelatada.projecaoMm, largura) },
-        aneis: c.aneis.map((a) => ({ nome: a.nome, pontosPx: a.pontosMm.map((pedaco) => pedaco.map(projetar)) })),
+        aneis: c.aneis.map((a) => ({ nome: a.nome, pontosPx: a.pontosMm.map((pedaco) => pedaco.map(projetar)), ...(a.encontros ? { encontros: a.encontros } : {}) })),
       };
     });
     const plano = disporContorno({ titulo: titulo ?? `${peca}: o contorno medido sobre o modelo`, linhas });
