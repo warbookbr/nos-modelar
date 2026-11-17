@@ -176,4 +176,7 @@ O neutro canônico e as imagens não mudaram. O hash do neutro (`impressaoDoNeut
 - A página lê o neutro por uma requisição síncrona, porque o processamento do payload é síncrono; o neutro de uma peça pesada (o do furgão passa de dezenas de megabytes em texto) bloqueia a página enquanto carrega.
 - O neutro do cache da receita inteira volta sem os campos que o núcleo deixa fora da enumeração, de modo que a ativação o refaz pelo cache por prefixo quando precisa dele para a página; com `--sem-cache` isso não ocorre, porque a execução é nova.
 - A varredura de sessões abandonadas usa só a idade do arquivo; uma sessão em curso de outro processo que passe de seis horas sem ser reescrita seria apagada.
-- A lista dos demais achados menores da revisão não chegou a quem fez estas correções além do que o pedido descreve; os que aparecem acima são os que o código mostrou.
+- Na volta do texto, o `artefato` deixa de estar congelado e as referências compartilhadas viram cópias (125 na bicicleta, como `frisos[4].extremos[1][3]`, que apontava para o mesmo objeto que um vértice de `V`); hoje a página não altera esses objetos.
+- As chaves de objeto que começam pelo caractere nulo não são escapadas, e um objeto cuja única chave é `"\u0000Map"` voltaria como Map.
+- A ativação usa `origens` como sinal de que o neutro está completo, o que depende de o núcleo continuar gravando esse campo.
+- A captura do quarto traseiro, que tem o maior neutro e é a maior leitura síncrona da página, não tem prova por imagem.
