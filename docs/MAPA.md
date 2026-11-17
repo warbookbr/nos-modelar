@@ -1613,7 +1613,7 @@
 
 ## procedural/pecas/carro-fastback/partes/lataria/rodadas/
 
-- `receita-01.js` — carro-fastback/lataria — o piloto do quarto traseiro: a chapa contínua de lataria do meio da porta (z 0) para trás, lado +x, com o para-lama traseiro salient…
+- `receita-04.js` — carro-fastback/lataria — o piloto do quarto traseiro: a chapa contínua de lataria do meio da porta (z 0) para trás, lado +x, com o para-lama traseiro salient…
 
 ## procedural/pecas/carro-fastback/referencias/
 
