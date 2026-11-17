@@ -4,7 +4,13 @@
  * O texto é o JSON do neutro com o que o JSON perderia escrito à parte: Map e Set como listas marcadas, na ordem de inserção, o zero
  * negativo, o NaN, o infinito e o valor indefinido distintos, o texto que começa pelo caractere nulo escapado, e cada campo próprio do
  * neutro com a descrição dele (os que o núcleo deixa fora da enumeração, como `origens` e `chapas`, voltam fora dela). Ida e volta
- * dão o mesmo neutro, campo a campo (`src/bancada/sessao/neutro-em-texto.test.js`). */
+ * dão o mesmo neutro, campo a campo (`src/bancada/sessao/neutro-em-texto.test.js`).
+ *
+ * O texto leva a IMPRESSÃO DA ENTRADA: o hash da receita como a sessão a grava (`impressaoDaReceita`). Quem lê o neutro compara a impressão
+ * dele com a da receita que tem em mãos, e recusa o neutro de outra receita (ou de outra versão da mesma): sem isso a página aceitava
+ * qualquer neutro que o arquivo da sessão citasse e desenhava a peça errada sem dizer. */
+import { sha256Hex } from '../sha256.js';
+
 export const FORMATO_DO_NEUTRO_EM_TEXTO = 'mecanifica.neutro-em-texto@1';
 const MARCA = '\u0000';
 
@@ -51,21 +57,27 @@ function decodificar(valor) {
   return valor;
 }
 
-/** O neutro em texto, para gravar ao lado da sessão. */
-export function neutroEmTexto(neutro) {
+/** A impressão da entrada: o hash da receita em JSON, o mesmo que a ativação grava na sessão e a página lê de volta (a ida e a volta do JSON não o muda). */
+export const impressaoDaReceita = (receita) => sha256Hex(JSON.stringify(receita ?? null));
+
+/** O neutro em texto, para gravar ao lado da sessão; `impressao` é a `impressaoDaReceita` da receita que o gerou. */
+export function neutroEmTexto(neutro, { impressao = null } = {}) {
   const campos = Reflect.ownKeys(neutro).filter((k) => typeof k === 'string').map((nome) => {
     const d = Object.getOwnPropertyDescriptor(neutro, nome);
     return [nome, d.value, { enumerable: d.enumerable, writable: d.writable, configurable: d.configurable }];
   });
-  return JSON.stringify({ formato: FORMATO_DO_NEUTRO_EM_TEXTO, campos }, codificar);
+  return JSON.stringify({ formato: FORMATO_DO_NEUTRO_EM_TEXTO, impressao, campos }, codificar);
 }
 
-/** O neutro de volta, com cada campo como o núcleo o descreveu. */
-export function neutroDoTexto(texto) {
+/** O neutro de volta e a impressão da entrada que ele traz (`null` se o texto não a tem), com cada campo como o núcleo o descreveu. */
+export function lerNeutroEmTexto(texto) {
   const lido = JSON.parse(texto);
   if (lido?.formato !== FORMATO_DO_NEUTRO_EM_TEXTO || !Array.isArray(lido.campos)) throw new TypeError('neutro em texto: formato desconhecido');
   const neutro = {};
   for (const [nome, valor, descricao] of lido.campos) Object.defineProperty(neutro, nome, { ...descricao, value: decodificar(valor) });
-  return neutro;
+  return { neutro, impressao: typeof lido.impressao === 'string' ? lido.impressao : null };
 }
+
+/** O neutro de volta, sem conferir a impressão (ver `lerNeutroEmTexto`). */
+export const neutroDoTexto = (texto) => lerNeutroEmTexto(texto).neutro;
 

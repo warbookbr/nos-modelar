@@ -1,16 +1,46 @@
 /* ativar-bancada.mjs — ativa qualquer peca ou montagem procedural na sessao ativa da bancada 3D. */
-import { copyFileSync, existsSync, mkdirSync, renameSync, writeFileSync } from 'node:fs';
-import { dirname, relative, resolve } from 'node:path';
+import { copyFileSync, existsSync, mkdirSync, readdirSync, renameSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { caixasPorParte, portasPublicadas } from '../../src/autoria/descrever-partes.js';
 import { executarReceitaGuardada } from './entrada-de-medida.mjs';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { memoriaDoHost } from '../../procedural/nucleo/planejador/armazem-em-pasta.mjs';
-import { FORMATO_DO_NEUTRO_EM_TEXTO, neutroEmTexto } from '../../procedural/nucleo/planejador/neutro-em-texto.js';
+import { FORMATO_DO_NEUTRO_EM_TEXTO, impressaoDaReceita, neutroEmTexto } from '../../procedural/nucleo/planejador/neutro-em-texto.js';
 
 /* O arquivo do neutro executado, ao lado do arquivo da sessão de uma captura: `<sessão sem .json>.neutro.json`. Quem apaga a sessão apaga
-   este também. */
-export const arquivoDoNeutroDaSessao = (arquivoDaSessao) => arquivoDaSessao.replace(/\.json$/, '.neutro.json');
+   este também. O arquivo da sessão que não termina em `.json` não tem neutro: devolver o próprio nome faria o neutro gravado por cima da
+   sessão, e a função recusa. */
+export function arquivoDoNeutroDaSessao(arquivoDaSessao) {
+  if (typeof arquivoDaSessao !== 'string' || !arquivoDaSessao.endsWith('.json') || arquivoDaSessao.endsWith('.neutro.json')) {
+    throw new TypeError(`o arquivo da sessão precisa terminar em .json (e não em .neutro.json) para ter o neutro ao lado: ${JSON.stringify(arquivoDaSessao)}`);
+  }
+  return `${arquivoDaSessao.slice(0, -'.json'.length)}.neutro.json`;
+}
+
+/* A sessão e o neutro de uma captura que morreu (Ctrl-C, `kill`, o prazo de quem a chamou) ficam na pasta das sessões: o neutro de um
+   furgão passa de megabytes. A varredura apaga o que é mais velho que isto e que este processo não usa; uma captura leva minutos, e as
+   horas de folga deixam de fora o arquivo de qualquer sessão em curso, de outro processo inclusive. */
+export const IDADE_DA_SESSAO_ABANDONADA_MS = 6 * 3_600_000;
+
+/** Apaga de `pasta` os `.json` (sessões e neutros) mais velhos que `idadeMaximaMs` e fora de `emUso`. Devolve os nomes apagados. */
+export function varrerSessoesAbandonadas(pasta, { idadeMaximaMs = IDADE_DA_SESSAO_ABANDONADA_MS, emUso = [], agora = Date.now() } = {}) {
+  const protegidos = new Set(emUso.flatMap((a) => { try { return [resolve(a), resolve(arquivoDoNeutroDaSessao(a))]; } catch { return [resolve(a)]; } }));
+  const apagados = [];
+  let nomes = [];
+  try { nomes = readdirSync(pasta); } catch { return apagados; }
+  for (const nome of nomes) {
+    if (!nome.endsWith('.json')) continue;
+    const arquivo = join(pasta, nome);
+    if (protegidos.has(resolve(arquivo))) continue;
+    try {
+      if (agora - statSync(arquivo).mtimeMs <= idadeMaximaMs) continue;
+      rmSync(arquivo, { force: true });
+      apagados.push(nome);
+    } catch { /* outro processo pode tê-lo apagado */ }
+  }
+  return apagados;
+}
 import { lerArgumentos } from './argumentos.mjs';
 import { importarReceita } from './importar-receita.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
@@ -99,6 +129,8 @@ export async function ativarReceitaBancada({
   const { caixas, facesSemParte } = caixasPorParte(neutro);
   const portas = portasPublicadas(neutro);
   const partesNomes = Array.from(caixas.keys());
+  /* o que a ativação não conseguiu fazer e o resultado não mostra: a captura os põe no relato */
+  const avisos = [];
 
   const partesSemMaterial = [];
   for (const nome of caixas.keys()) {
@@ -198,13 +230,17 @@ export async function ativarReceitaBancada({
            enumeração (`origens`, `chapas`, `aberturas`...), que a página usa; nesse caso o neutro da página sai do cache por prefixo,
            que recomeça do último ponto da mesma receita */
         const daPagina = Object.getOwnPropertyDescriptor(neutro, 'origens') ? neutro : (memoria ? executarReceita(receita, { memoria }).neutro : null);
-        if (!daPagina) throw new Error('sem o neutro completo');
+        if (!daPagina) throw new Error('sem o neutro completo (veio do cache da receita inteira e não há cache por prefixo)');
         const destino = arquivoDoNeutroDaSessao(arquivoDaSessao);
         const parcial = `${destino}.${process.pid}.parcial`;
-        writeFileSync(parcial, neutroEmTexto(daPagina), 'utf8');
+        writeFileSync(parcial, neutroEmTexto(daPagina, { impressao: impressaoDaReceita(receita) }), 'utf8');
         renameSync(parcial, destino);
         payload.neutro = { formato: FORMATO_DO_NEUTRO_EM_TEXTO, arquivo: relative(raizSessao, destino).replace(/\\/g, '/') };
-      } catch { /* sem o neutro, a página executa */ }
+      } catch (erro) {
+        /* o neutro de uma ativação anterior que ficou ao lado do mesmo arquivo de sessão não serve a esta */
+        try { rmSync(arquivoDoNeutroDaSessao(arquivoDaSessao), { force: true }); } catch { /* sem neutro ao lado, nada a apagar */ }
+        avisos.push(`o neutro não foi gravado ao lado da sessão (${erro?.message ?? erro}); a página executa a receita.`);
+      }
     }
     writeFileSync(arquivoDaSessao, JSON.stringify(payload, null, 2), 'utf8');
   } else {
@@ -235,6 +271,7 @@ export async function ativarReceitaBancada({
     payload,
     arquivoDaSessao,
     doCache,
+    avisos,
   };
 }
 
@@ -293,6 +330,7 @@ Opcoes:
       console.log('    lembre que {op:\'cilindro\',id} seleciona só as laterais; as tampas pedem tampa:\'fundo\' e tampa:\'topo\'.');
     }
     if (res.partesSemMaterial.length) console.log(`  ! partes sem material (renderizam cinza): ${res.partesSemMaterial.join(', ')}`);
+    for (const aviso of res.avisos) console.log(`  ! ${aviso}`);
     console.log(`  Arquivo de sessão: public/sessao-ativa.json`);
     console.log(`\nURL da Bancada:`);
     console.log(`  ${res.url}`);

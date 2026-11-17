@@ -8,12 +8,13 @@
  * o código de saída, o arquivo de sessão e a ordem da mensagem.
  */
 import { execFileSync } from 'node:child_process';
-import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
+import { existsSync, mkdirSync, readdirSync, readFileSync, utimesSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { afterAll, describe, expect, it } from 'vitest';
-import { ativarReceitaBancada } from './ativar-bancada.mjs';
+import { IDADE_DA_SESSAO_ABANDONADA_MS, arquivoDoNeutroDaSessao, ativarReceitaBancada, varrerSessoesAbandonadas } from './ativar-bancada.mjs';
+import { impressaoDaReceita, lerNeutroEmTexto } from '../../procedural/nucleo/planejador/neutro-em-texto.js';
 import { PASTA_DO_CACHE } from './entrada-de-medida.mjs';
 import { pecasDoAcervo } from './guardas/guarda-acervo.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
@@ -277,6 +278,62 @@ describe('ativar-bancada: o cache por prefixo e --sem-cache', () => {
       expect(existsSync(pasta) ? readdirSync(pasta) : []).toEqual([]);
       await ativarReceitaBancada({ alvo, raizSessao: AREA_SESSAO, arquivoDaSessao: sessao, cache: false, pastaDoCachePorPrefixo: pasta });
       expect(guardados(pasta).length).toBeGreaterThan(0);
+    } finally {
+      rmSync(pasta, { recursive: true, force: true });
+    }
+  });
+});
+
+describe('ativar-bancada: o neutro ao lado da sessão', () => {
+  const sessao = join(AREA_SESSAO, 'sessoes', 'neutro.json');
+  const ativarNeutro = (alvo, extra = {}) => ativarReceitaBancada({ alvo, raizSessao: AREA_SESSAO, arquivoDaSessao: sessao, pastaDoCachePorPrefixo: PASTA_PREFIXO, ...extra });
+
+  it('grava o neutro com a impressão da receita da sessão, e a página pode conferi-la', async () => {
+    const r = await ativarNeutro(receitaTemporaria('neutro-a', BOA));
+    expect(r.avisos).toEqual([]);
+    const lido = lerNeutroEmTexto(readFileSync(arquivoDoNeutroDaSessao(sessao), 'utf8'));
+    const naSessao = JSON.parse(readFileSync(sessao, 'utf8'));
+    expect(lido.impressao).toBe(impressaoDaReceita(naSessao.receita));
+    expect(naSessao.neutro.arquivo).toMatch(/neutro\.neutro\.json$/);
+  });
+
+  it('a falha de gravação do neutro vira aviso, tira o neutro velho de ao lado e deixa a sessão sem o campo `neutro`', async () => {
+    const alvo = receitaTemporaria('neutro-b', BOA);
+    await ativarNeutro(alvo);
+    expect(existsSync(arquivoDoNeutroDaSessao(sessao))).toBe(true);
+    /* uma pasta no lugar do arquivo do neutro faz a troca do arquivo parcial falhar */
+    const outra = join(AREA_SESSAO, 'sessoes', 'bloqueada.json');
+    mkdirSync(arquivoDoNeutroDaSessao(outra), { recursive: true });
+    const r = await ativarNeutro(alvo, { arquivoDaSessao: outra });
+    expect(r.avisos).toHaveLength(1);
+    expect(r.avisos[0]).toMatch(/o neutro não foi gravado ao lado da sessão/);
+    expect(JSON.parse(readFileSync(outra, 'utf8')).neutro).toBeUndefined();
+    expect(r.payload.neutro).toBeUndefined();
+  });
+
+  it('o arquivo da sessão que não termina em .json não tem neutro ao lado: a função recusa, e a ativação avisa e segue', async () => {
+    expect(arquivoDoNeutroDaSessao('/x/s.json')).toBe('/x/s.neutro.json');
+    expect(() => arquivoDoNeutroDaSessao('/x/s.txt')).toThrow(/.json/);
+    expect(() => arquivoDoNeutroDaSessao('/x/s')).toThrow(/.json/);
+    expect(() => arquivoDoNeutroDaSessao('/x/s.neutro.json')).toThrow(/.json/);
+    const semExtensao = join(AREA_SESSAO, 'sessoes', 'sem-extensao');
+    const r = await ativarNeutro(receitaTemporaria('neutro-c', BOA), { arquivoDaSessao: semExtensao });
+    expect(r.avisos).toHaveLength(1);
+    expect(JSON.parse(readFileSync(semExtensao, 'utf8')).alvo.nome).toBe('Fixture Boa');
+  });
+
+  it('a varredura apaga a sessão e o neutro velhos de uma captura morta, e deixa os recentes e os que estão em uso', () => {
+    const pasta = mkdtempSync(join(tmpdir(), 'varredura-'));
+    try {
+      const antigo = (Date.now() - IDADE_DA_SESSAO_ABANDONADA_MS - 3_600_000) / 1000;
+      const gravar = (nome, velho) => { const f = join(pasta, nome); writeFileSync(f, '{}'); if (velho) utimesSync(f, antigo, antigo); return f; };
+      gravar('morta.json', true); gravar('morta.neutro.json', true);
+      gravar('recente.json', false); gravar('recente.neutro.json', false);
+      const emUso = gravar('em-uso.json', true); gravar('em-uso.neutro.json', true);
+      const apagados = varrerSessoesAbandonadas(pasta, { emUso: [emUso] });
+      expect(apagados.sort()).toEqual(['morta.json', 'morta.neutro.json']);
+      expect(readdirSync(pasta).sort()).toEqual(['em-uso.json', 'em-uso.neutro.json', 'recente.json', 'recente.neutro.json']);
+      expect(varrerSessoesAbandonadas(join(pasta, 'nao-existe'))).toEqual([]);
     } finally {
       rmSync(pasta, { recursive: true, force: true });
     }

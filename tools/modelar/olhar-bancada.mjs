@@ -14,7 +14,7 @@ import { lerArgumentos } from './argumentos.mjs';
 import { ErroDeConfinamento, criarDiretorioConfinado, verificarCaminhoConfinado } from './caminho-confinado.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 import { iniciarRegistro } from './diario.mjs';
-import { ativarReceitaBancada, arquivoDoNeutroDaSessao } from './ativar-bancada.mjs';
+import { ativarReceitaBancada, arquivoDoNeutroDaSessao, varrerSessoesAbandonadas } from './ativar-bancada.mjs';
 import { memoriaDoHost } from '../../procedural/nucleo/planejador/armazem-em-pasta.mjs';
 import { paresIndistinguiveis } from '../../src/autoria/cor-de-auditoria.js';
 import { lerCorte, lerLadoDoCorte, normalizarCorte } from '../../src/autoria/corte-de-plano.js';
@@ -742,6 +742,8 @@ export async function olharBancada({
   /* o arquivo da sessão própria desta captura (ver `ativarReceitaBancada`), apagado ao fim; com `compartilhada` ele é da peça e não
      da chamada, e quem o apaga é `compartilhada.fechar()` */
   let sessaoDaCaptura = null;
+  /* de onde veio o neutro que a página desenhou (`origem`: gravado, fornecido ou executado, com o `motivo` quando executou) */
+  let neutroDaPagina = null;
   let page = null;
   /* o que a captura estava fazendo, para o prazo vencido dizer onde parou */
   /* A etapa é uma propriedade com aviso: ao entrar numa etapa longa a captura diz qual é, antes de começá-la, porque a de medir os
@@ -940,9 +942,12 @@ export async function olharBancada({
                a peça num arquivo seu, único por processo e por chamada, e aponta a página para ele pela URL (`?sessao=`). Com
                `compartilhada` o arquivo é um por peça e por conjunto de chamadas, e as chamadas seguintes da mesma peça o reusam. */
             sessaoDaCaptura = join(SESSOES, `${apelidoDeArquivo(peca)}-${process.pid}-${randomUUID()}.json`);
+            /* a sessão e o neutro que uma captura morta deixou para trás saem por idade; os desta chamada e os das capturas compartilhadas ficam */
+            varrerSessoesAbandonadas(SESSOES, { emUso: [sessaoDaCaptura, ...[...(compartilhada?.sessoes.values() ?? [])].map((x) => x.arquivo)] });
             const inicioDaAtivacao = performance.now();
             const ativada = await ativar({ alvo: caminhoReceita, raiz: REPO, arquivoDaSessao: sessaoDaCaptura, cache: cacheDeContatos, cachePorPrefixo: cacheDeContatos });
             if (compartilhada) compartilhada.sessoes.set(peca, { arquivo: sessaoDaCaptura, pares: null });
+            for (const aviso of ativada?.avisos ?? []) registrar(relato, logger, 'stderr', `ativação: aviso: ${aviso}`);
             if (logger) logger('info', `Peça '${peca}' ativada na sessão da bancada.`);
             const segundosDaAtivacao = Math.round((performance.now() - inicioDaAtivacao) / 100) / 10;
             registrar(relato, logger, 'stdout', ativada?.doCache
@@ -1210,7 +1215,7 @@ export async function olharBancada({
           peca: (typeof b.peca === 'function' ? b.peca() : b.peca) ?? b.nomePeca ?? null,
           partes: b.partes ?? [],
           selecaoIgnorada: b.selecaoIgnorada ?? [], diagnosticos: b.diagnosticos ?? null,
-          estatisticas: b.estatisticas ?? null, estado: b.estado ? b.estado() : null,
+          estatisticas: b.estatisticas ?? null, estado: b.estado ? b.estado() : null, neutroDaSessao: b.neutroDaSessao ?? null,
         };
       });
       dadoDaChamada = dado;
@@ -1230,6 +1235,13 @@ export async function olharBancada({
         registrar(relato, logger, 'stdout', `peça: ${dado.peca}`);
         registrar(relato, logger, 'stdout', `partes (${dado.partes.length}): ${dado.partes.join(', ')}`);
         registrar(relato, logger, 'stdout', `malha: ${dado.estatisticas.facesNeutras} faces, ${dado.estatisticas.triangulos} triângulos, ${semParte} sem identidade`);
+        /* o caminho que a página usou para ter o neutro: só tem sentido numa peça que veio de uma sessão desta captura */
+        if (sessaoDaCaptura) {
+          neutroDaPagina = dado.neutroDaSessao;
+          registrar(relato, logger, 'stdout', neutroDaPagina?.origem === 'gravado'
+            ? `página: neutro lido do arquivo que a ativação gravou (${neutroDaPagina.arquivo}); a receita não executou na página.`
+            : `página: receita executada na página${neutroDaPagina?.motivo ? ` (o neutro gravado não serviu: ${neutroDaPagina.motivo})` : ''}.`);
+        }
         /* a ponte confere os nomes que a URL da subida trouxe; numa página reaproveitada a seleção veio de fora da URL, e a conferência é daqui */
         const selecaoIgnorada = paginaNova ? dado.selecaoIgnorada : selecionadas.filter((nome) => !dado.partes.includes(nome));
         if (selecaoIgnorada.length) {
@@ -1570,7 +1582,7 @@ export async function olharBancada({
     }
     const resultado = {
       peca: pecaRelatada, falhas: falhasRelatadas, vistas: vistasRelatadas, arquivos: arquivosPlanejados,
-      paresAcusados: contatos.estado === 'pulados' || contatos.estado === 'falhou' ? null : paresAcusados, contatos, paresCapturados, cargasDePagina,
+      paresAcusados: contatos.estado === 'pulados' || contatos.estado === 'falhou' ? null : paresAcusados, contatos, paresCapturados, cargasDePagina, neutroDaPagina,
       dicas: dicas.listar(),
       ...(capturarEmMemoria ? { capturas } : {}),
       ...(visao !== null ? { visao: { id: visao, ...(legendaDaVisao ?? { dados: {}, titulo: null, linhas: [] }) } } : {}),
