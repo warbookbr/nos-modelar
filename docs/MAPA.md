@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2043 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2045 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -219,6 +219,11 @@
 ## docs/modelar/banco-de-provas/aviao-receita-2026-10-15/
 
 - `TRADUCAO.md` — O esboço do avião traduzido para o andaime
+
+## docs/modelar/banco-de-provas/cache-por-passo-2026-11-16/
+
+- `README.md` — Cache por passo: a linha de base do laço e onde o cache rende mais
+- `medir-linha-de-base.mjs` — medir-linha-de-base.mjs — a linha de base do plano do cache por passo (fatia 1): onde vai o tempo de cada comando do laço numa peça pesada. Uso, da raiz do r…
 
 ## docs/modelar/banco-de-provas/cadeiras-2026-10-19/
 
