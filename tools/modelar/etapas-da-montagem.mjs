@@ -40,6 +40,7 @@ import { resolverMontagemPersistida } from '../../src/autoria/resolver-montagem-
 import {
   ErroEtapaDeConstrucao, atualizarRegistro, conferirPosteriores, fixarEtapa, juntasPorEtapa, lerAutorDaReabertura, proximaEtapa, reabrirEtapa,
 } from '../../src/autoria/etapas-de-construcao.js';
+import { interfaceNoMundo } from '../../src/autoria/posicao-por-porta.js';
 import { proximaAcao } from '../../src/autoria/laco-de-modelagem.js';
 import { estadoDaAnalise } from './analise-da-peca.mjs';
 import { capturarMontagem } from './capturar-montagem.mjs';
@@ -172,6 +173,36 @@ export async function estadoDasEtapas(arquivoMontagem, { receitas, anterior, imp
     : existsSync(arquivoDoRegistro(arquivoMontagem)) ? JSON.parse(readFileSync(arquivoDoRegistro(arquivoMontagem), 'utf8')) : null;
   const portas = Object.fromEntries(medidas.filter((m) => m.portas).map((m) => [m.instancia, m.portas]));
   return { montagem, registro: atualizarRegistro(montagem.id, [...medidas, ...semGeometria], registroAnterior, { citacoes }), anterior: registroAnterior, citacoes, portas };
+}
+
+/* O MEDIDO AGORA, para a leitura por impressão (`etapas-pela-impressao.js`): por etapa, a assinatura da forma, os parâmetros que a
+   montagem derivou, a pose no mundo e as juntas medidas; e, de cada porta que uma etapa posterior cita, a interface no mundo. A
+   etapa sem geometria (receita sem passos, ou depois da primeira receita sem passos, ou submontagem) fica sem `forma`. Ainda não é o
+   caminho de `fixar` e `reabrir`. */
+export async function medirAgora(arquivoMontagem, { receitas } = {}) {
+  const dado = JSON.parse(readFileSync(arquivoMontagem, 'utf8'));
+  const montagem = lerMontagemPersistida(dado);
+  const todas = receitas ?? await receitasDaMontagem(montagem);
+  const { dado: parcial, construidas } = montagemAteAGeometria(dado, montagem, todas);
+  const resolvida = construidas.length ? await resolverMontagemPersistida(parcial, carregadoresDeReceitas(todas)) : null;
+  const juntas = new Map((resolvida ? juntasPorEtapa(resolvida, construidas) : []).map((e) => [e.instancia, e.juntas]));
+  const citacoes = citacoesDasPortas(montagem);
+  const etapas = {};
+  const portas = {};
+  for (const id of montagem.etapas) {
+    etapas[id] = { juntas: juntas.get(id) ?? [] };
+    const instancia = resolvida?.instancias.find((item) => item.id === id);
+    const neutro = instancia?.definicao?.neutro;
+    if (!neutro) continue;
+    etapas[id].forma = assinaturaDaForma(neutro);
+    etapas[id].parametros = (instancia.parametrosDerivados ?? []).map(({ param, valor, unidade }) => ({ param, valor, unidade }));
+    etapas[id].pose = instancia.poseMundo;
+    for (const nome of new Set(citacoes.filter((c) => c.etapa === id && !c.profunda).map((c) => c.porta))) {
+      const porta = neutro.portas?.get?.(nome);
+      if (porta?.interface) (portas[id] ??= {})[nome] = interfaceNoMundo(porta.interface, instancia.poseMundo);
+    }
+  }
+  return { montagem: montagem.id, ordem: [...montagem.etapas], etapas, citacoes, portas };
 }
 
 /* As condições que moram nas rodadas da peça da etapa. `rodadasDe(ref)` é

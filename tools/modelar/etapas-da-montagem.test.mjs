@@ -8,7 +8,10 @@ import { fileURLToPath } from 'node:url';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { registrarRodada } from '../../src/autoria/laco-de-modelagem.js';
 import { ErroEtapaDeConstrucao } from '../../src/autoria/etapas-de-construcao.js';
-import { arquivoDoRegistro, auditarEtapas, comoCLI, descreverAuditoria, estadoDasEtapas, fixar, gravarRegistro, montagemAteAGeometria, olharEtapas, reabrir } from './etapas-da-montagem.mjs';
+import { arquivoDoRegistro, auditarEtapas, comoCLI, descreverAuditoria, estadoDasEtapas, fixar, gravarRegistro, medirAgora, montagemAteAGeometria, olharEtapas, reabrir } from './etapas-da-montagem.mjs';
+import {
+  acrescentarAceite, acrescentarReabertura, imprimirEtapa, lerEtapas, registroVazio,
+} from '../../src/autoria/etapas-pela-impressao.js';
 import { receitaComParametros } from './peca-com-parametros.mjs';
 import { lerMontagemPersistida } from '../../src/autoria/ler-montagem-persistida.js';
 import { RECEITAS } from '../fixtures/tres-blocos-vinculados/receitas/bloco.js';
@@ -708,5 +711,439 @@ describe('o registro só se grava quando muda', () => {
     const r = await comoCLI([arquivo]).catch((erro) => ({ erro }));
     expect(readFileSync(arquivoDoRegistro(arquivo), 'utf8')).toBe(antes);
     expect(r).toBeDefined();
+  });
+});
+
+/* A LEITURA PELA IMPRESSÃO DO ACEITE (plano das etapas pela impressão, fatia 1). Os ataques das cinco revisões da reabertura de etapas
+   viram testes nos dois sentidos: o que deve quebrar quebra, e o que não mudou segue fixo. Nada aqui passa pelo caminho de `fixar` e
+   `reabrir`, que a fatia 2 troca; o registro é uma lista de eventos e o estado sai da comparação com o medido agora. */
+describe('a leitura pela impressão do aceite', () => {
+  const POR = 'pessoa, 2026-11-17: ataque';
+  const POR2 = 'pessoa, 2026-11-17: segunda';
+  const medir = (receitas = RECEITAS) => medirAgora(arquivo, { receitas });
+  const estados = (registro, medido) => Object.fromEntries(lerEtapas(registro, medido).etapas.map((e) => [e.instancia, e.estado]));
+  const motivo = (registro, medido, instancia) => lerEtapas(registro, medido).etapas.find((e) => e.instancia === instancia).motivo;
+  const aceitarTodas = (medido, de = registroVazio('tres-blocos')) => medido.ordem.reduce((r, id) => acrescentarAceite(r, medido, id, aceite), de);
+  const codigoDe = (f) => { try { f(); } catch (erro) { return erro.codigo; } return undefined; };
+  const mudarMontagem = (f) => { const dado = JSON.parse(readFileSync(arquivo, 'utf8')); f(dado); writeFileSync(arquivo, JSON.stringify(dado, null, 2)); };
+  const FIXAS = { base: 'fixa', meio: 'fixa', topo: 'fixa' };
+
+  const comTabela = (ref, tabela) => ({ ...RECEITAS, [ref]: receitaComParametros(RECEITAS[ref], tabela) });
+  const comBase = (tabela) => comTabela('bloco-com-pino', tabela);
+  const comMeio = (tabela) => comTabela('bloco-com-furo-e-pino', tabela);
+  const vazia = (ref) => ({ ...RECEITAS, [ref]: { ...RECEITAS[ref], PASSOS: [] } });
+  /* os passos da receita trocados por uma função, com a forma intacta quando a função só mexe na porta */
+  const comPassos = (ref, mudar, tabela = {}) => {
+    const descritores = Object.getOwnPropertyDescriptors(receitaComParametros(RECEITAS[ref], tabela));
+    const passos = { enumerable: true, configurable: true, get() { return mudar(descritores.PASSOS.get.call(this)); } };
+    return { ...RECEITAS, [ref]: Object.defineProperties({}, { ...descritores, PASSOS: passos }) };
+  };
+  const portaDoPino = (mudar) => (passos) => passos.map((p) => (p[0] === 'publicarPorta' && p[1].nome === 'pino'
+    ? ['publicarPorta', { ...p[1], interface: mudar(p[1].interface) }] : p));
+  const pinoDaBaseEmY = comPassos('bloco-com-pino', portaDoPino((i) => ({ ...i, centro: [0, i.centro[1] + 0.01, 0] })));
+  const pinoDaBaseEmX = comPassos('bloco-com-pino', portaDoPino((i) => ({ ...i, centro: [i.centro[0] + 0.005, i.centro[1], i.centro[2]] })));
+  const pinoDoMeioEmY = comPassos('bloco-com-furo-e-pino', portaDoPino((i) => ({ ...i, centro: [0, i.centro[1] + 0.01, 0] })));
+  const comOutro = comPassos('bloco-com-pino', (passos) => [...passos, ...passos.filter((p) => p[0] === 'publicarPorta' && p[1].nome === 'pino')
+    .map((p) => ['publicarPorta', { ...p[1], nome: 'outro', interface: { ...p[1].interface, centro: [0, p[1].interface.centro[1] + 0.01, 0] } }])]);
+  const comQuarto = (dado, { noFim }) => {
+    dado.instancias.push({ id: 'quarto', alvo: { tipo: 'peca', ref: 'bloco-com-furo' } });
+    if (noFim) {
+      dado.etapas.push('quarto');
+      dado.relacoes.push({ ...JSON.parse(JSON.stringify(dado.relacoes[0])), id: 'quartoNoOutroDaBase', referencia: { caminho: ['base'], porta: 'outro' }, movel: { caminho: ['quarto'], porta: 'furo' } });
+      dado.posicoes.push({ id: 'quartoSobreOOutro', instancia: 'quarto', porta: 'furo', em: { instancia: 'base', porta: 'outro' }, unidade: 'mm', afastamento: 0 });
+      dado.vinculos.push({ id: 'furoDoQuarto', alvo: { instancia: 'quarto', param: 'raioDoFuro' }, de: { instancia: 'base', porta: 'outro', medida: 'raio' }, unidade: 'mm', acrescimo: 0.2 });
+    } else {
+      dado.etapas.splice(1, 0, 'quarto');
+      dado.posicoes.push({ id: 'quartoSobreABase', instancia: 'quarto', porta: 'furo', em: { instancia: 'base', porta: 'pino' }, unidade: 'mm', afastamento: 0 });
+      dado.posicoes = dado.posicoes.map((p) => (p.id === 'meioSobreABase' ? { ...p, em: { instancia: 'quarto', porta: 'furo' }, afastamento: 5 } : p));
+    }
+  };
+
+  describe('o que a impressão guarda e o que a leitura devolve', () => {
+    it('guarda em valores a forma, os parâmetros, a pose, as juntas, as portas citadas vistas de quem cita e a ordem das anteriores', async () => {
+      const registro = aceitarTodas(await medir());
+      const impressao = (id) => registro.eventos.find((e) => e.instancia === id).impressao;
+      expect(impressao('base')).toMatchObject({ parametros: [], citadas: [], anteriores: [], juntas: [] });
+      expect(impressao('meio').forma).toMatch(/^sha256:[0-9a-f]{64}$/);
+      expect(impressao('meio').parametros).toEqual([{ param: 'raioDoFuro', valor: 10.2, unidade: 'mm' }, { param: 'raioDoPino', valor: 8, unidade: 'mm' }]);
+      expect(impressao('meio').pose.deslocamento).toEqual([0, 0.02, 0]);
+      expect(impressao('meio').juntas[0]).toMatchObject({ relacao: 'meioNoPinoDaBase', com: 'base', satisfeita: true });
+      expect(impressao('meio').juntas[0].medidas.folgaRadial).toBe(0.0002);
+      expect(impressao('meio').anteriores).toEqual(['base']);
+      expect(impressao('topo').anteriores).toEqual(['base', 'meio']);
+      const citada = impressao('meio').citadas[0];
+      expect(citada).toMatchObject({ etapa: 'base', porta: 'pino' });
+      expect(citada.por).toEqual(['posição meioSobreABase', 'relação meioNoPinoDaBase', 'vínculo furoDoMeioNoPinoDaBase', 'vínculo pinoDoMeioPeloPinoDaBase']);
+      expect(citada.interface).toMatchObject({ forma: 'cilindro', raio: 0.01, centro: [0, 0.02, 0], fim: 0.015 });
+    });
+
+    it('o registro tem só eventos, nenhum estado gravado, e a leitura devolve o mesmo para o mesmo registro e o mesmo medido', async () => {
+      const medido = await medir();
+      const registro = JSON.parse(JSON.stringify(aceitarTodas(medido)));
+      expect(JSON.stringify(registro)).not.toMatch(/"estado"/);
+      expect(Object.keys(registro).sort()).toEqual(['eventos', 'formato', 'montagem', 'versao']);
+      expect(JSON.stringify(lerEtapas(registro, medido))).toBe(JSON.stringify(lerEtapas(JSON.parse(JSON.stringify(registro)), medido)));
+      expect(estados(registro, medido)).toEqual(FIXAS);
+    });
+
+    it('a quebrada diz a diferença em valores, do aceite para o de agora', async () => {
+      const registro = aceitarTodas(await medir());
+      const dito = motivo(registro, await medir(pinoDaBaseEmY), 'meio');
+      expect(dito).toContain('impressão.citadas[base/pino].interface.centro[1]: 0.02 → 0.03');
+      expect(lerEtapas(registro, await medir(pinoDaBaseEmY)).etapas[1].diferencas.length).toBeGreaterThan(1);
+    });
+
+    it('os números se comparam com 12 algarismos: a poeira de ponto flutuante não quebra, uma diferença de verdade quebra', async () => {
+      const medido = await medir();
+      const registro = aceitarTodas(medido);
+      const mexido = (delta) => ({ ...medido, etapas: { ...medido.etapas, meio: { ...medido.etapas.meio, pose: { ...medido.etapas.meio.pose, deslocamento: [0, 0.02 + delta, 0] } } } });
+      expect(estados(registro, mexido(1e-15)).meio).toBe('fixa');
+      expect(estados(registro, mexido(1e-9)).meio).toBe('quebrada');
+    });
+  });
+
+  describe('o estado é derivado: fixa, quebrada, aberta e não conferível', () => {
+    it('a quebrada cuja mudança é desfeita volta a fixa sozinha, sem evento novo; e segue quebrada enquanto a mudança durar', async () => {
+      const original = await medir();
+      const registro = aceitarTodas(original);
+      const antes = JSON.stringify(registro);
+      const movido = await medir(pinoDaBaseEmY);
+      expect(estados(registro, movido)).toEqual({ base: 'fixa', meio: 'quebrada', topo: 'quebrada' });
+      expect(estados(registro, movido)).toEqual({ base: 'fixa', meio: 'quebrada', topo: 'quebrada' });
+      expect(estados(registro, original)).toEqual(FIXAS);
+      expect(JSON.stringify(registro)).toBe(antes);
+    });
+
+    it('só a reabertura explícita faz da quebrada uma aberta; a quebrada não se aceita direto (B7)', async () => {
+      const registro = aceitarTodas(await medir());
+      const alta = await medir(comBase({ alturaDoCorpo: 30 }));
+      expect(estados(registro, alta)).toEqual({ base: 'quebrada', meio: 'quebrada', topo: 'quebrada' });
+      expect(codigoDe(() => acrescentarAceite(registro, alta, 'base', aceite))).toBe('etapa-quebrada');
+      const reaberto = acrescentarReabertura(registro, 'base', POR);
+      expect(estados(reaberto, alta)).toEqual({ base: 'aberta', meio: 'quebrada', topo: 'quebrada' });
+      expect(estados(acrescentarAceite(reaberto, alta, 'base', aceite), alta)).toEqual({ base: 'fixa', meio: 'quebrada', topo: 'quebrada' });
+    });
+
+    it('sem aceite vigente a etapa é aberta, e a reabertura só vale para etapa com aceite', async () => {
+      const medido = await medir();
+      expect(estados(registroVazio('tres-blocos'), medido)).toEqual({ base: 'aberta', meio: 'aberta', topo: 'aberta' });
+      expect(codigoDe(() => acrescentarReabertura(registroVazio('tres-blocos'), 'base', POR))).toBe('etapa-nao-fixa');
+      const aberta = acrescentarReabertura(aceitarTodas(medido), 'topo', POR);
+      expect(codigoDe(() => acrescentarReabertura(aberta, 'topo', POR))).toBe('etapa-nao-fixa');
+      expect(codigoDe(() => acrescentarReabertura(aceitarTodas(medido), 'topo', 'sem data'))).toBe('reabertura-sem-autor');
+    });
+
+    it('A9 o registro passa pelo JSON sem mudar, e a reabertura do mesmo registro dá o mesmo resultado', async () => {
+      const medido = await medir();
+      const registro = JSON.parse(JSON.stringify(aceitarTodas(medido)));
+      const a = acrescentarReabertura(registro, 'base', POR);
+      const b = acrescentarReabertura(JSON.parse(JSON.stringify(registro)), 'base', POR);
+      expect(JSON.stringify(a)).toBe(JSON.stringify(b));
+      expect(estados(a, medido)).toEqual({ base: 'aberta', meio: 'fixa', topo: 'fixa' });
+    });
+
+    it('A6 nada do aceite se perde: reabrir acrescenta, e os eventos de antes seguem iguais', async () => {
+      const medido = await medir();
+      const registro = aceitarTodas(medido);
+      const reaberto = acrescentarReabertura(acrescentarReabertura(registro, 'topo', POR), 'meio', POR2);
+      expect(reaberto.eventos.slice(0, registro.eventos.length)).toEqual(registro.eventos);
+      expect(reaberto.eventos.slice(registro.eventos.length).map((e) => [e.tipo, e.instancia, e.por])).toEqual([['reabertura', 'topo', 'pessoa'], ['reabertura', 'meio', 'pessoa']]);
+      const refeito = acrescentarAceite(acrescentarAceite(reaberto, medido, 'meio', aceite), medido, 'topo', aceite);
+      expect(estados(refeito, medido)).toEqual(FIXAS);
+      expect(refeito.eventos.length).toBe(registro.eventos.length + 4);
+    });
+  });
+
+  describe('um formato só: sem portas guardadas, sem prova pela junta vazia', () => {
+    it('E5 o registro v1 e o v2 (estado e portas gravados) recusam, e o v3 sem a impressão completa também', async () => {
+      const medido = await medir();
+      const v3 = aceitarTodas(medido);
+      const v2 = { formato: v3.formato, versao: 2, montagem: 'tres-blocos', etapas: medido.ordem.map((instancia) => ({ instancia, estado: 'fixa', juntas: [], forma: 'sha256:x', aceite: { por: 'pessoa' } })) };
+      const v1 = { ...v2, versao: 1, etapas: v2.etapas.map(({ forma, ...e }) => ({ ...e, receita: `h-${e.instancia}` })) };
+      expect(codigoDe(() => lerEtapas(v1, medido))).toBe('registro-antigo');
+      expect(codigoDe(() => lerEtapas(v2, medido))).toBe('registro-antigo');
+      expect(codigoDe(() => acrescentarReabertura(v2, 'base', POR))).toBe('registro-antigo');
+      const semCitadas = JSON.parse(JSON.stringify(v3));
+      delete semCitadas.eventos[1].impressao.citadas;
+      expect(codigoDe(() => lerEtapas(semCitadas, medido))).toBe('registro-invalido');
+      const semForma = JSON.parse(JSON.stringify(v3));
+      delete semForma.eventos[0].impressao.forma;
+      expect(codigoDe(() => lerEtapas(semForma, medido))).toBe('registro-invalido');
+    });
+
+    it('A2 e A7 a porta que a posterior cita por vínculo e posição, sem a relação, também quebra pela impressão dela', async () => {
+      mudarMontagem((dado) => { dado.relacoes = dado.relacoes.filter((r) => r.id !== 'meioNoPinoDaBase'); });
+      const registro = aceitarTodas(await medir());
+      expect(registro.eventos[1].impressao.citadas[0].por).toEqual(['posição meioSobreABase', 'vínculo furoDoMeioNoPinoDaBase', 'vínculo pinoDoMeioPeloPinoDaBase']);
+      const reaberto = acrescentarReabertura(registro, 'base', POR);
+      for (const tabela of [{ alturaDoPino: 18 }, { alturaDoCorpo: 30 }]) {
+        expect(estados(reaberto, await medir(comBase(tabela))).meio).toBe('quebrada');
+        expect(estados(registro, await medir(comBase(tabela))).meio).toBe('quebrada');
+      }
+      expect(estados(reaberto, await medir())).toEqual({ base: 'aberta', meio: 'fixa', topo: 'fixa' });
+    });
+
+    it('A2 B5 B6 C3 D4 D6 E2 a porta movida com a malha igual, em y e em x, quebra o meio, e a mesma receita sem mudança segue fixa', async () => {
+      const registro = aceitarTodas(await medir());
+      expect(estados(registro, await medir())).toEqual(FIXAS);
+      for (const movido of [pinoDaBaseEmY, pinoDaBaseEmX]) {
+        expect(estados(registro, await medir(movido))).toEqual({ base: 'fixa', meio: 'quebrada', topo: 'quebrada' });
+      }
+    });
+  });
+
+  describe('reabrir antes e mudar depois', () => {
+    it('A1 a mudança da porta depois da reabertura quebra a posterior pela própria impressão; sem mudança ela segue fixa', async () => {
+      const original = await medir();
+      const registro = acrescentarReabertura(aceitarTodas(original), 'base', POR);
+      expect(estados(registro, original)).toEqual({ base: 'aberta', meio: 'fixa', topo: 'fixa' });
+      for (const [tabela, esperado] of [
+        [{ alturaDoPino: 18 }, { base: 'aberta', meio: 'quebrada', topo: 'fixa' }],
+        [{ alturaDoCorpo: 30 }, { base: 'aberta', meio: 'quebrada', topo: 'quebrada' }],
+      ]) {
+        const mudado = await medir(comBase(tabela));
+        expect(estados(registro, mudado)).toEqual(esperado);
+        /* refixar a base com a mudança não apaga nem reescreve o aceite do meio */
+        const refixada = acrescentarAceite(registro, mudado, 'base', aceite);
+        expect(estados(refixada, mudado).meio).toBe('quebrada');
+        expect(refixada.eventos.find((e) => e.instancia === 'meio')).toEqual(registro.eventos.find((e) => e.instancia === 'meio'));
+      }
+    });
+
+    it('A3 meio reaberto antes e a base mudada depois: a base quebra, o meio fica aberto e o topo quebra pela impressão dele', async () => {
+      const registro = acrescentarReabertura(aceitarTodas(await medir()), 'meio', POR);
+      expect(estados(registro, await medir(comBase({ alturaDoCorpo: 30 })))).toEqual({ base: 'quebrada', meio: 'aberta', topo: 'quebrada' });
+    });
+
+    it('A4 e C5 meio reaberto e com o pino mudado: o topo quebra, a base segue fixa', async () => {
+      const registro = acrescentarReabertura(aceitarTodas(await medir()), 'meio', POR);
+      for (const tabela of [{ alturaDoPino: 25 }, { alturaDoPino: 18 }]) {
+        expect(estados(registro, await medir(comMeio(tabela)))).toEqual({ base: 'fixa', meio: 'aberta', topo: 'quebrada' });
+      }
+    });
+
+    it('A5 não há reabertura sem a leitura: reabrir não prova nada, e a posterior quebrada segue quebrada', async () => {
+      const registro = aceitarTodas(await medir());
+      const mudado = await medir(comBase({ alturaDoPino: 18 }));
+      expect(estados(acrescentarReabertura(registro, 'base', POR), mudado).meio).toBe('quebrada');
+    });
+
+    it('B1 a quebrada não vira aberta por uma escrita sobre outra etapa, e só a reabertura a faz aberta', async () => {
+      const registro = aceitarTodas(await medir());
+      const mudado = await medir(comBase({ alturaDoPino: 18 }));
+      const escrito = acrescentarReabertura(acrescentarReabertura(registro, 'base', POR), 'topo', POR2);
+      expect(estados(escrito, mudado)).toEqual({ base: 'aberta', meio: 'quebrada', topo: 'aberta' });
+      expect(codigoDe(() => acrescentarAceite(escrito, mudado, 'base', aceite))).toBeUndefined();
+      expect(estados(acrescentarAceite(escrito, mudado, 'base', aceite), mudado).meio).toBe('quebrada');
+      expect(estados(acrescentarReabertura(escrito, 'meio', POR), mudado).meio).toBe('aberta');
+    });
+  });
+
+  describe('o que muda sem a malha mudar', () => {
+    it('B2 e A10 só a porta citada muda de lugar, com a malha igual: a base segue fixa e as que a citam quebram', async () => {
+      const registro = aceitarTodas(await medir());
+      const movido = await medir(pinoDaBaseEmY);
+      expect(movido.etapas.base.forma).toBe((await medir()).etapas.base.forma);
+      expect(estados(registro, movido)).toEqual({ base: 'fixa', meio: 'quebrada', topo: 'quebrada' });
+      expect(estados(acrescentarReabertura(registro, 'base', POR), movido)).toEqual({ base: 'aberta', meio: 'quebrada', topo: 'quebrada' });
+    });
+
+    it('B3 o afastamento da posição mudado na montagem quebra o meio, e o topo que está sobre ele', async () => {
+      const registro = aceitarTodas(await medir());
+      mudarMontagem((dado) => { dado.posicoes[0].afastamento = 5; });
+      expect(estados(registro, await medir())).toEqual({ base: 'fixa', meio: 'quebrada', topo: 'quebrada' });
+    });
+
+    it('B4 a citação nova numa porta que o aceite não tinha vai à impressão da citante e a quebra; a porta publicada sem citação não', async () => {
+      const registro = aceitarTodas(await medir(comOutro));
+      expect(estados(registro, await medir(comOutro))).toEqual(FIXAS);
+      const reaberto = acrescentarReabertura(registro, 'base', POR);
+      mudarMontagem((dado) => {
+        dado.relacoes[0].referencia.porta = 'outro';
+        dado.vinculos.filter((v) => v.de.instancia === 'base').forEach((v) => { v.de.porta = 'outro'; });
+        dado.posicoes[0].em.porta = 'outro';
+      });
+      const citando = await medir(comOutro);
+      expect(estados(reaberto, citando).meio).toBe('quebrada');
+      expect(motivo(reaberto, citando, 'meio')).toContain('citadas[base/outro]');
+    });
+
+    it('C2 etapa nova no fim, citando porta que o aceite da base não guardou: nada quebra, o aceite dela fica fixo e reabrir e aceitar de novo também', async () => {
+      const registro = aceitarTodas(await medir(comOutro));
+      mudarMontagem((dado) => comQuarto(dado, { noFim: true }));
+      const com = await medir(comOutro);
+      expect(estados(registro, com)).toEqual({ ...FIXAS, quarto: 'aberta' });
+      const aceito = acrescentarAceite(registro, com, 'quarto', aceite);
+      expect(aceito.eventos.at(-1).impressao.citadas.map((c) => `${c.etapa}/${c.porta}`)).toEqual(['base/outro']);
+      expect(estados(aceito, com)).toEqual({ ...FIXAS, quarto: 'fixa' });
+      const refeito = acrescentarAceite(acrescentarReabertura(aceito, 'quarto', POR), com, 'quarto', aceite);
+      expect(estados(refeito, com)).toEqual({ ...FIXAS, quarto: 'fixa' });
+    });
+
+    it('D5 etapa nova no meio da ordem, com o meio passando a se posicionar nela: o meio e o topo quebram, e o aceite da nova não os refixa', async () => {
+      const registro = aceitarTodas(await medir());
+      mudarMontagem((dado) => comQuarto(dado, { noFim: false }));
+      const com = await medir();
+      expect(com.ordem).toEqual(['base', 'quarto', 'meio', 'topo']);
+      expect(estados(registro, com)).toEqual({ base: 'fixa', quarto: 'aberta', meio: 'quebrada', topo: 'quebrada' });
+      expect(motivo(registro, com, 'meio')).toContain('impressão.anteriores');
+      expect(estados(acrescentarAceite(registro, com, 'quarto', aceite), com)).toEqual({ base: 'fixa', quarto: 'fixa', meio: 'quebrada', topo: 'quebrada' });
+    });
+
+    it('A8 a ordem das anteriores trocada difere: na leitura e na montagem que o resolvedor recusa', async () => {
+      const medido = await medir();
+      const registro = aceitarTodas(medido);
+      const trocado = { ...medido, ordem: ['meio', 'base', 'topo'] };
+      expect(estados(registro, trocado)).toEqual({ meio: 'quebrada', base: 'quebrada', topo: 'quebrada' });
+      expect(motivo(registro, trocado, 'topo')).toContain('impressão.anteriores');
+      mudarMontagem((dado) => { dado.etapas = ['meio', 'base', 'topo']; });
+      await expect(medir()).rejects.toThrow();
+    });
+
+    it('E5 e o meio mudado: o meio quebra e o topo, que cita só o pino que não mudou, segue fixo', async () => {
+      const registro = aceitarTodas(await medir());
+      expect(estados(registro, await medir(comMeio({ raioDoCorpo: 40 })))).toEqual({ base: 'fixa', meio: 'quebrada', topo: 'fixa' });
+      expect(estados(registro, await medir(comBase({ raioDoCorpo: 34 })))).toEqual({ base: 'quebrada', meio: 'fixa', topo: 'fixa' });
+    });
+  });
+
+  describe('sem geometria nunca é fixa, nem aceitável', () => {
+    it('D1 a etapa fixa com os passos esvaziados fica não conferível, e as seguintes também; ao voltar, volta fixa', async () => {
+      const registro = aceitarTodas(await medir());
+      expect(estados(registro, await medir(vazia('bloco-com-pino')))).toEqual({ base: 'nao-conferivel', meio: 'nao-conferivel', topo: 'nao-conferivel' });
+      expect(estados(registro, await medir(vazia('bloco-com-furo-e-pino')))).toEqual({ base: 'fixa', meio: 'nao-conferivel', topo: 'nao-conferivel' });
+      expect(estados(registro, await medir())).toEqual(FIXAS);
+      expect(lerEtapas(registro, await medir(vazia('bloco-com-pino'))).etapas[0].motivo).toContain('não há geometria');
+    });
+
+    it('D2 a etapa reaberta e esvaziada não se aceita, e a etapa sem geometria nunca tem impressão', async () => {
+      const registro = acrescentarReabertura(aceitarTodas(await medir()), 'base', POR);
+      const vazio = await medir(vazia('bloco-com-pino'));
+      expect(codigoDe(() => acrescentarAceite(registro, vazio, 'base', { ...aceite, aceiteHumano: true }))).toBe('etapa-sem-geometria');
+      expect(imprimirEtapa(vazio, 'base')).toBeNull();
+      expect(estados(registro, vazio).base).toBe('aberta');
+    });
+
+    it('D3 e C4 esvaziar uma etapa e escrever sobre outras não lava o aceite: ao voltar movida, as posteriores quebram', async () => {
+      const original = await medir();
+      const vazio = await medir(vazia('bloco-com-pino'));
+      const registro = acrescentarReabertura(acrescentarReabertura(aceitarTodas(original), 'topo', POR), 'base', POR2);
+      expect(estados(registro, vazio)).toEqual({ base: 'aberta', meio: 'nao-conferivel', topo: 'aberta' });
+      expect(estados(registro, await medir(pinoDaBaseEmY))).toEqual({ base: 'aberta', meio: 'quebrada', topo: 'aberta' });
+      expect(estados(registro, original)).toEqual({ base: 'aberta', meio: 'fixa', topo: 'aberta' });
+    });
+
+    it('E8 meio esvaziado, base reaberta e a porta do pino movida: o aceite antigo do meio não some, e refazê-lo exige reabrir', async () => {
+      const original = await medir();
+      const registro = aceitarTodas(original);
+      const movidoEMeioVazio = { ...pinoDaBaseEmY, 'bloco-com-furo-e-pino': vazia('bloco-com-furo-e-pino')['bloco-com-furo-e-pino'] };
+      expect(estados(registro, await medir(movidoEMeioVazio))).toEqual({ base: 'fixa', meio: 'nao-conferivel', topo: 'nao-conferivel' });
+      const reaberta = acrescentarReabertura(registro, 'base', POR);
+      const movido = await medir(pinoDaBaseEmY);
+      expect(estados(reaberta, movido)).toEqual({ base: 'aberta', meio: 'quebrada', topo: 'quebrada' });
+      let depois = acrescentarAceite(reaberta, movido, 'base', aceite);
+      expect(codigoDe(() => acrescentarAceite(depois, movido, 'meio', aceite))).toBe('etapa-quebrada');
+      depois = acrescentarAceite(acrescentarReabertura(depois, 'meio', POR), movido, 'meio', aceite);
+      expect(estados(depois, movido)).toEqual({ base: 'fixa', meio: 'fixa', topo: 'quebrada' });
+      depois = acrescentarAceite(acrescentarReabertura(depois, 'topo', POR), movido, 'topo', aceite);
+      expect(estados(depois, movido)).toEqual(FIXAS);
+    });
+  });
+
+  describe('o caminho que a pessoa faz de verdade', () => {
+    it('C1 e E1 reabrir tudo com a base vazia, restaurar e refixar na ordem devolve tudo fixo, com os aceites de agora', async () => {
+      const original = await medir();
+      let registro = aceitarTodas(original);
+      for (const id of ['topo', 'meio', 'base']) registro = acrescentarReabertura(registro, id, POR);
+      expect(estados(registro, await medir(vazia('bloco-com-pino')))).toEqual({ base: 'aberta', meio: 'aberta', topo: 'aberta' });
+      expect(estados(registro, original)).toEqual({ base: 'aberta', meio: 'aberta', topo: 'aberta' });
+      expect(codigoDe(() => acrescentarAceite(registro, original, 'meio', aceite))).toBe('etapa-fora-de-ordem');
+      for (const id of ['base', 'meio', 'topo']) registro = acrescentarAceite(registro, original, id, aceite);
+      expect(estados(registro, original)).toEqual(FIXAS);
+      expect(registro.eventos.filter((e) => e.tipo === 'aceite').length).toBe(6);
+    });
+
+    it('C1 mudar o pino, refixar tudo em cima da mudança e desfazê-la: tudo quebra, e ao refazer a mudança tudo volta fixo', async () => {
+      const original = await medir();
+      const mudado = await medir(comBase({ alturaDoPino: 18 }));
+      let registro = acrescentarReabertura(aceitarTodas(original), 'base', POR);
+      registro = acrescentarAceite(registro, mudado, 'base', aceite);
+      for (const id of ['meio', 'topo']) registro = acrescentarAceite(acrescentarReabertura(registro, id, POR), mudado, id, aceite);
+      expect(estados(registro, mudado)).toEqual(FIXAS);
+      expect(estados(registro, original).base).toBe('quebrada');
+      expect(estados(registro, original).meio).toBe('quebrada');
+      expect(estados(registro, mudado)).toEqual(FIXAS);
+    });
+
+    it('a etapa fora de ordem, sem quem aceitou ou com junta reprovada não se aceita (B8)', async () => {
+      const medido = await medir();
+      expect(codigoDe(() => acrescentarAceite(registroVazio('tres-blocos'), medido, 'meio', aceite))).toBe('etapa-fora-de-ordem');
+      expect(codigoDe(() => acrescentarAceite(registroVazio('tres-blocos'), medido, 'base', {}))).toBe('etapa-sem-aceite');
+      expect(codigoDe(() => acrescentarAceite(registroVazio('tres-blocos'), medido, 'base', { por: '   ' }))).toBe('etapa-sem-aceite');
+      expect(codigoDe(() => acrescentarAceite(registroVazio('tres-blocos'), medido, 'nenhuma', aceite))).toBe('etapa-inexistente');
+      const base = acrescentarAceite(registroVazio('tres-blocos'), medido, 'base', aceite);
+      expect(codigoDe(() => acrescentarAceite(base, medido, 'base', aceite))).toBe('etapa-ja-fixa');
+      const reprovada = { ...medido, etapas: { ...medido.etapas, meio: { ...medido.etapas.meio, juntas: medido.etapas.meio.juntas.map((j) => ({ ...j, satisfeita: false })) } } };
+      expect(codigoDe(() => acrescentarAceite(base, reprovada, 'meio', aceite))).toBe('etapa-com-junta-reprovada');
+    });
+  });
+
+  describe('a propriedade: nenhuma sequência sobre outras etapas muda o aceite de uma', () => {
+    const congelar = (valor) => {
+      if (valor && typeof valor === 'object' && !Object.isFrozen(valor)) { Object.freeze(valor); Object.values(valor).forEach(congelar); }
+      return valor;
+    };
+    /* um medido pequeno e à mão, de seis etapas em cadeia, cada uma citando a anterior */
+    const medidoDeSeis = () => {
+      const ordem = ['a', 'b', 'c', 'd', 'e', 'f'];
+      const etapas = Object.fromEntries(ordem.map((id, i) => [id, { forma: `sha256:${id}`, parametros: [], pose: { rotacao: [[1, 0, 0], [0, 1, 0], [0, 0, 1]], deslocamento: [0, i, 0] }, juntas: i ? [{ relacao: `r${i}`, com: ordem[i - 1], satisfeita: true, medidas: { folga: 0.1 * i } }] : [] }]));
+      const citacoes = ordem.slice(1).map((id, i) => ({ etapa: ordem[i], porta: 'saida', posterior: id, por: `relação r${i + 1}`, relacao: `r${i + 1}` }));
+      const portas = Object.fromEntries(ordem.slice(0, -1).map((id, i) => [id, { saida: { forma: 'cilindro', centro: [0, i, 0], raio: 0.01 * (i + 1) } }]));
+      return { ordem, etapas, citacoes, portas };
+    };
+    const sorteio = (semente) => { let x = semente >>> 0; return () => { x = (Math.imul(x, 1664525) + 1013904223) >>> 0; return x / 2 ** 32; }; };
+
+    it('com o medido fixo, comandos e leituras sobre as outras etapas deixam o aceite e o estado dela como estavam', async () => {
+      let acrescentados = 0;
+      let recusados = 0;
+      for (const medido of [congelar(await medir()), congelar(medidoDeSeis())]) {
+        const base = congelar(aceitarTodas(medido, registroVazio('p')));
+        for (const alvo of medido.ordem) {
+          for (let semente = 1; semente <= 12; semente += 1) {
+            const sorte = sorteio(semente * 7919);
+            const outras = medido.ordem.filter((id) => id !== alvo);
+            let registro = base;
+            for (let passo = 0; passo < 40; passo += 1) {
+              const quem = outras[Math.floor(sorte() * outras.length)];
+              const antes = registro;
+              const acao = sorte();
+              try {
+                if (acao < 0.4) registro = congelar(acrescentarReabertura(registro, quem, POR));
+                else if (acao < 0.8) registro = congelar(acrescentarAceite(registro, medido, quem, aceite));
+                else lerEtapas(registro, medido);
+              } catch (erro) { expect(erro.codigo).toBeDefined(); recusados += 1; }
+              acrescentados += registro.eventos.length - antes.eventos.length;
+              expect(registro.eventos.slice(0, antes.eventos.length)).toEqual(antes.eventos);
+              expect(registro.eventos.slice(antes.eventos.length).every((e) => e.instancia === quem)).toBe(true);
+            }
+            const evento = (r) => r.eventos.find((e) => e.instancia === alvo);
+            expect(registro.eventos.filter((e) => e.instancia === alvo)).toEqual(base.eventos.filter((e) => e.instancia === alvo));
+            expect(evento(registro)).toEqual(evento(base));
+            expect(lerEtapas(registro, medido).etapas.find((e) => e.instancia === alvo).estado).toBe('fixa');
+          }
+        }
+      }
+      /* a sequência não é vazia: houve reaberturas e aceites de verdade, e recusas também */
+      expect(acrescentados).toBeGreaterThan(500);
+      expect(recusados).toBeGreaterThan(100);
+    }, 120_000);
+
+    it('a mesma propriedade no sentido contrário: mudar uma etapa quebra só as que a citam, e desfazer devolve todas', () => {
+      const medido = medidoDeSeis();
+      const registro = aceitarTodas(medido, registroVazio('p'));
+      const mexido = { ...medido, portas: { ...medido.portas, c: { saida: { ...medido.portas.c.saida, raio: 0.5 } } } };
+      expect(estados(registro, mexido)).toEqual({ a: 'fixa', b: 'fixa', c: 'fixa', d: 'quebrada', e: 'fixa', f: 'fixa' });
+      expect(estados(registro, medido)).toEqual({ a: 'fixa', b: 'fixa', c: 'fixa', d: 'fixa', e: 'fixa', f: 'fixa' });
+    });
   });
 });
