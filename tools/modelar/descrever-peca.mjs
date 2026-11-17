@@ -27,6 +27,8 @@ import {
 import { formasDaPeca } from '../../src/autoria/forma-da-parte.js';
 import { nomesDaSubarvore } from '../../src/autoria/hierarquia-partes.js';
 import { REGISTRO_DA_RECEITA, executarReceita } from '../../src/autoria/executar-receita.js';
+import { confiarNaMemoriaDoRegistro, registroServeAMemoria } from '../../procedural/nucleo/memoria-de-execucao.js';
+import { memoriaDoHost } from '../../procedural/nucleo/planejador/armazem-em-pasta.mjs';
 import { FACES_MINIMAS_PARA_RECORTAR } from '../../procedural/nucleo/operacoes/abertura-por-contorno.js';
 import { avisosDasComposicoes } from './avisos-de-composicao.mjs';
 import { medirFaceDegenerada, medirTrianguloFino, medirSerrilhadoDaCostura } from './reguas-de-malha/reguas-de-malha.mjs';
@@ -130,18 +132,21 @@ function amostraDeOrfaos(neutro) { return linhasDeOrfaos(neutro); }
 /* O REGISTRO QUE CRONOMETRA CADA PASSO. O núcleo não mede o tempo de um passo, e o `descrever` precisava dele para dizer qual vão custou (a janela da
    cabine do furgão foi de 118 s a 207 s em 2026-11-09 sem nada acusar). O núcleo consulta o registro uma vez por passo, na ordem e antes de executar
    (`registro.resolver(op)` no laço dos `PASSOS`), e o cronômetro mede de uma consulta à seguinte: o passo `k` dura da consulta `k` à `k + 1`, e o último
-   fecha em `fechar`, depois da execução. A operação volta do registro como veio. Embrulhar o `executar` dela, como este cronômetro fazia, tirava o passo do
+   fecha em `fechar`, depois da execução. Numa execução que recomeçou de um ponto guardado o núcleo só consulta os passos dali em diante, e
+   `deslocamento()` diz quantos passos ficaram para trás (`estatisticas.recomecouDoPasso` da memória): o índice de quem lê (`tempos`, `aoPasso`)
+   continua o do passo na receita, e não o da consulta. A operação volta do registro como veio. Embrulhar o `executar` dela, como este cronômetro fazia, tirava o passo do
    caminho rápido do núcleo, que só confia na declaração de escrita da operação quando a função é a original, e cada passo voltava a retratar a malha
    inteira: o `descrever` do furgão foi de 180 s a 480 s (CI de 2026-11-12, `guarda:tempo`). `fechar(passos)` descarta os tempos quando o número de
    consultas não é o de passos executados, porque aí o índice da consulta não é o do passo. */
-export function registroCronometrado(base, { total, tempos, aoPasso }) {
+export function registroCronometrado(base, { total, tempos, aoPasso, deslocamento = () => 0 }) {
   const voltas = [];
   const fecharAnterior = (agora) => {
     const k = voltas.length - 1;
     if (k < 0 || voltas[k].ms != null) return;
     voltas[k].ms = agora - voltas[k].t0;
-    tempos.set(k, { op: voltas[k].op, ms: voltas[k].ms });
-    aoPasso?.(k, total, voltas[k].op);
+    const passo = k + deslocamento();
+    tempos.set(passo, { op: voltas[k].op, ms: voltas[k].ms });
+    aoPasso?.(passo, total, voltas[k].op);
   };
   const registro = {
     ...base,
@@ -154,7 +159,7 @@ export function registroCronometrado(base, { total, tempos, aoPasso }) {
   };
   const fechar = (passos) => {
     fecharAnterior(performance.now());
-    if (!Array.isArray(passos) || passos.length !== voltas.length) tempos.clear();
+    if (!Array.isArray(passos) || passos.length !== voltas.length + deslocamento()) tempos.clear();
   };
   return { registro, fechar };
 }
@@ -333,6 +338,13 @@ export async function descreverPecaReutilizavel({
   /* `--recusas`: só executa a receita e devolve os órfãos do núcleo, sem medir nem conferir o plano. Substitui o script de uma linha com
      os órfãos do núcleo sobre `gerarPassos(TABELA)`, que a sessão de 2026-11-13 a 2026-11-16 reescreveu 188 vezes. */
   recusas = false,
+  /* O CACHE POR PREFIXO (plano do cache por passo, fatia 4): a execução recomeça do estado que o comando anterior guardou em
+     `tmp/cache-por-prefixo/` para o mesmo prefixo de passos, e só os passos dali em diante rodam. A CLI o liga (`--sem-cache` o
+     desliga); o serviço o recebe desligado, para quem chama em processo (testes, o servidor MCP) escolher. O resultado é o mesmo bit a
+     bit; os tempos por passo do aviso da chapa inteira saem só dos passos que rodaram. */
+  cachePorPrefixo = false,
+  /* a pasta do cache por prefixo; sem ela, `tmp/cache-por-prefixo/` do repositório */
+  pastaDoCachePorPrefixo = undefined,
   /* Resumido por PADRÃO. A saída completa tem 9,8 KB numa peça de 11 partes, e
      cresce O(n²) nas relações — uma máquina de 40 partes passaria de 60 KB por
      chamada, várias vezes por rodada. Quem chama para MEDIR um encaixe pede
@@ -467,6 +479,7 @@ export async function descreverPecaReutilizavel({
   progresso(`executando a receita${totalDePassos == null ? '' : ` (${totalDePassos} passos)`}`);
   const cronometro = registroCronometrado(execucao.registroOperacoes ?? REGISTRO_DA_RECEITA, {
     total: totalDePassos, tempos,
+    deslocamento: () => cache?.memoria.estatisticas.recomecouDoPasso ?? 0,
     aoPasso: (i, total, op) => {
       if (aoProgredir && intervaloDoProgressoMs > 0 && performance.now() - ultimaLinha >= intervaloDoProgressoMs) {
         /* a batida chega quando o passo `i` fecha, isto é, quando o seguinte começa */
@@ -475,9 +488,17 @@ export async function descreverPecaReutilizavel({
     },
   });
   execucao = { ...execucao, registroOperacoes: cronometro.registro };
+  let cache = null;
+  if (cachePorPrefixo) {
+    /* o cronômetro devolve as operações do registro como vieram: ele serve à memória quando o registro de baixo serve */
+    if (registroServeAMemoria(registroOperacoes ?? REGISTRO_DA_RECEITA)) confiarNaMemoriaDoRegistro(cronometro.registro);
+    try { cache = memoriaDoHost({ rotulo: caminhoReceita ?? `peca:${peca}`, ...(pastaDoCachePorPrefixo ? { pasta: pastaDoCachePorPrefixo } : {}) }); } catch { cache = null; }
+    if (cache) execucao = { ...execucao, memoria: cache.memoria };
+  }
   try {
     ({ entrada, neutro, expansao } = executarReceita(receita, execucao));
     cronometro.fechar(entrada?.PASSOS);
+    if (cache?.memoria.estatisticas.restaurados) progresso(`cache por prefixo: recomeçou de um estado guardado, ${cache.memoria.estatisticas.lidos} ponto(s) lido(s)`);
   } catch (erro) {
     return falha(`O NÚCLEO RECUSOU A PEÇA\n  ${peca}: ${erro.message}`);
   }
@@ -968,6 +989,7 @@ Mede a peça pela malha e dá o veredito de contato, forma prometida e vãos. A 
   --sem-veredito         mede sem conferir contato e forma (a saída avisa)
   --composicoes=<módulo> registro de composições a usar
   --recusas              só executa a receita e lista os órfãos do núcleo (passo, operação, motivo), sem medir; sai 1 se houver
+  --sem-cache            executa a receita inteira, sem recomeçar do estado guardado pelo comando anterior (tmp/cache-por-prefixo/)
 
 Para conferir um encaixe, peça as duas partes: --partes=a,b. O resumo já traz todo contato e as folgas menores.
 `;
@@ -977,7 +999,7 @@ function comoCLI(argv, { aoProgredir = null } = {}) {
   try {
     lido = lerArgumentos(argv, {
       opcoes: ['partes', 'subarvore', 'casas', OPCAO_COMPOSICOES],
-      bandeiras: ['listar', 'estrito', 'completo', 'sem-veredito', 'recusas', 'ajuda'],
+      bandeiras: ['listar', 'estrito', 'completo', 'sem-veredito', 'recusas', 'sem-cache', 'ajuda'],
       posicional: { nome: 'a peça', obrigatorio: false },
     });
   } catch (erro) {
@@ -1007,6 +1029,7 @@ function comoCLI(argv, { aoProgredir = null } = {}) {
     resumo: !lido.bandeira('completo'),
     listar: lido.bandeira('listar'),
     composicoes: lido.opcao(OPCAO_COMPOSICOES),
+    cachePorPrefixo: !lido.bandeira('sem-cache'),
     aoProgredir,
   });
 }

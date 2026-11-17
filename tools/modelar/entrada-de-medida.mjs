@@ -113,15 +113,17 @@ const rotuloDe = (abs, opcao) => `${basename(abs).replace(/[^A-Za-z0-9._-]/g, '_
  * A execução da receita (`{ entrada, neutro }`) guardada por assinatura do conteúdo, a mesma de `lerEntradaDeMedida`: quem executa a receita em Node
  * (a ativação da bancada, a medida de contatos, as ferramentas de medida) lê a execução da última rodada quando nada mudou e grava a sua quando mudou,
  * de modo que a receita é executada uma vez só entre elas. `cache: false` executa de novo e regrava. Uma receita copiada com outro perfil, ou
- * outros PARAMS, não é a do arquivo: quem a passa deve chamar com `cache: false`.
+ * outros PARAMS, não é a do arquivo: quem a passa deve chamar com `cache: false`. `memoria` (a do cache por prefixo, `memoriaDoHost` de
+ * `procedural/nucleo/planejador/armazem-em-pasta.mjs`) vale quando a receita executa: ela recomeça do estado que o comando anterior
+ * guardou para o mesmo prefixo de passos, e o resultado é o mesmo.
  * @returns {{ executada: object, doCache: boolean }}
  */
-export function executarReceitaGuardada(abs, receita, { cache = true, pastaDoCache = PASTA_DO_CACHE } = {}) {
+export function executarReceitaGuardada(abs, receita, { cache = true, pastaDoCache = PASTA_DO_CACHE, memoria = null } = {}) {
   let sig = null;
   if (cache) { try { sig = assinaturaDaEntrada(abs); } catch { sig = null; } }
   const guardada = sig ? lerDoCache(pastaDoCache, sig.chave, rotuloDe(abs, 'r')) : null;
   if (guardada) return { executada: guardada, doCache: true };
-  const executada = executarReceita(receita);
+  const executada = executarReceita(receita, memoria ? { memoria } : {});
   if (sig) gravarNoCache(pastaDoCache, sig.chave, rotuloDe(abs, 'r'), executada);
   return { executada, doCache: false };
 }

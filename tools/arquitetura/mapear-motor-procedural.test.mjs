@@ -15,7 +15,9 @@ describe('mapa estático do motor procedural', () => {
       './artefatos.js', './expressoes.js', './manifold.js', './memoria-de-execucao.js', './operacoes/abertura-por-contorno.js', './operacoes/atributos.js', './operacoes/booleanas.js', './operacoes/edicao-direta.js',
       './operacoes/estruturais.js', './operacoes/friso.js', './operacoes/geradores-avancados.js', './operacoes/limpar-lascas.js', './operacoes/perfis.js',
       './operacoes/primitivas-basicas.js', './operacoes/primitivas-superficie.js', './operacoes/subdivisao.js',
-      './operacoes/transformacoes.js', './registro.js', './selecao-geometrica.js', './uso-operacoes.js', 'earcut',
+      './operacoes/transformacoes.js',
+      './planejador/chave-do-prefixo.js', './planejador/impressao-do-neutro.js', './planejador/leitura-declarada.js', './planejador/leitura-do-passo.js',
+      './registro.js', './selecao-geometrica.js', './uso-operacoes.js', 'earcut',
     ]);
     expect(mapa.consumidores).toContain('src/autoria/executar-receita.js');
   });

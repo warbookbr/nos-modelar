@@ -6,15 +6,20 @@
  * devolver o mesmo valor, e devolvê-lo da memória poupa a conta.
  *
  * O ARGUMENTO É A CHAVE, BIT A BIT. A chave é a serialização exata dos argumentos: o zero negativo, o NaN, o infinito e o
- * valor indefinido (que o JSON apagaria) saem distintos, e um argumento que não é dado simples (função, Map, Set, classe) desliga a memória para aquela chamada, que roda
+ * valor indefinido (que o JSON apagaria) saem distintos, o buraco de uma lista (`[0, , 0]`) sai diferente do valor indefinido (`[0, undefined, 0]`),
+ * porque o núcleo trata os dois de jeitos diferentes (o buraco é pulado, o indefinido é recusado), a lista com propriedade fora dos índices
+ * desliga a memória, e um argumento que não é dado simples (função, Map, Set, classe) desliga a memória para aquela chamada, que roda
  * como sempre. O resultado sai COPIADO (`structuredClone`), de modo que quem o recebe pode alterá-lo sem alterar o guardado, e o
  * erro lançado pela função não é guardado. */
 
 const NAO_SERIALIZAVEL = Symbol('nao-serializavel');
+/* o lugar do buraco na cópia da lista; o substituto o escreve como '\u0000h', que nenhum texto do argumento pode ser */
+const BURACO = Object.freeze({});
 
 export function chaveExata(argumentos) {
   try {
     return JSON.stringify(argumentos, function substituir(chave, valor) {
+      if (valor === BURACO) return '\u0000h';
       if (valor === undefined) return '\u0000u';
       if (typeof valor === 'number') {
         if (Object.is(valor, -0)) return '\u0000n:-0';
@@ -27,6 +32,16 @@ export function chaveExata(argumentos) {
         if ((proto !== Object.prototype && proto !== null) || typeof valor.toJSON === 'function') throw NAO_SERIALIZAVEL;
       }
       if (typeof valor === 'string' && valor.startsWith('\u0000')) throw NAO_SERIALIZAVEL;
+      if (Array.isArray(valor)) {
+        /* a propriedade fora dos índices (ou um símbolo) desliga a chave; o buraco se acha índice por índice, e não pela contagem das
+           propriedades, que um buraco e uma propriedade a mais deixariam igual */
+        for (const k of Reflect.ownKeys(valor)) {
+          if (k !== 'length' && !(typeof k === 'string' && String(Number(k)) === k && Number(k) < valor.length)) throw NAO_SERIALIZAVEL;
+        }
+        for (let k = 0; k < valor.length; k += 1) {
+          if (!Object.hasOwn(valor, k)) return Array.from({ length: valor.length }, (_, j) => (Object.hasOwn(valor, j) ? valor[j] : BURACO));
+        }
+      }
       return valor;
     });
   } catch (erro) {

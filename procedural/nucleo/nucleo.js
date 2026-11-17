@@ -13,7 +13,11 @@
 import { criarResolverNumerico, distanciaDeEdicao, ErroDeResolucao, nomesProximos } from './expressoes.js';
 import { TIPO_MALHA_POLIGONAL, artefatoDaMalha, criarEstadoDeProcedencia, procedenciaCanonica, registrarProcedencia } from './artefatos.js';
 import { criarRegistroOperacoes } from './registro.js';
-import { chavesDosPrefixos, copiarEstado, registroServeAMemoria } from './memoria-de-execucao.js';
+import { copiarEstado, registroServeAMemoria } from './memoria-de-execucao.js';
+import { chavesDosPrefixos } from './planejador/chave-do-prefixo.js';
+import { criarLeituraDoPasso } from './planejador/leitura-do-passo.js';
+import { conferirLeituraDoPasso } from './planejador/leitura-declarada.js';
+import { divergenciaDaImpressao } from './planejador/impressao-do-neutro.js';
 import { essenciaisDaOperacao, recusasDeEssenciais, usoDaOperacao } from './uso-operacoes.js';
 import { criarOperacoesSubdivisao } from './operacoes/subdivisao.js';
 import { criarOperacoesFriso } from './operacoes/friso.js';
@@ -1955,7 +1959,23 @@ function origemDoTermoDeAlias(termo) {
   return termo.origem;
 }
 
+/* A LEITURA DA RESOLUÇÃO É DA CITAÇÃO. Com o registro de leitura ligado (`OPCOES.leitura` ou `OPCOES.aoLer`, ver
+   `planejador/leitura-do-passo.js`), o que `resolverOrigem` e `resolverSelecao` leem vai para o balde da resolução, e o que elas devolvem
+   são os citados do passo. Desligado, `st.leitura` não existe e as duas chamam direto a resolução. */
 function resolverOrigem(st, origem) {
+  const leitura = st.leitura;
+  if (!leitura) return resolverOrigemBruta(st, origem);
+  leitura.entrarNaResolucao();
+  try { const r = resolverOrigemBruta(st, origem); if (Array.isArray(r?.faces)) leitura.citar(r.faces, null); return r; } finally { leitura.sairDaResolucao(); }
+}
+function resolverSelecao(st, sel, op, i, opcoes) {
+  const leitura = st.leitura;
+  if (!leitura) return resolverSelecaoBruta(st, sel, op, i, opcoes);
+  leitura.entrarNaResolucao();
+  try { const r = resolverSelecaoBruta(st, sel, op, i, opcoes); leitura.citar(r.faces, r.vertices); return r; } finally { leitura.sairDaResolucao(); }
+}
+
+function resolverOrigemBruta(st, origem) {
   const validacao = validarOrigem(origem);
   if (validacao.erro) return { erro: `origem inválida: ${validacao.erro}` };
   const declaracoes = st.declaracoesOrigem.get(origem.id) ?? [];
@@ -2076,7 +2096,7 @@ function confereId(st, i, op, args) {
 const SELETORES = ['tudo', 'v', 'f', 'grupo', 'regiao', 'origem', 'porta', 'alias', 'onde'];
 const SELETOR = new Set(SELETORES);
 
-function resolverSelecao(st, sel, op, i, { vazioNoop = false, soVertices = false } = {}) {
+function resolverSelecaoBruta(st, sel, op, i, { vazioNoop = false, soVertices = false } = {}) {
   if (sel == null) return { vertices: new Set(st.V.keys()), faces: new Set(st.F.keys()) };
   if (typeof sel !== 'object' || Array.isArray(sel)) {
     grita(st, i, op, 'sel', `seleção inválida: sel precisa ser um objeto com ${SELETORES.join(', ')}`);
@@ -3716,40 +3736,57 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
   const st = { V: new Map(), F: new Map(), orfaos: orfaosIniciais, avisos: [], merges: [], partes: {}, paisDasPartes: new Map(), origens: new Map(), portas: new Map(), declaracoesOrigem, aliases, dict, num, vec, materiais: MATERIAIS, esqueleto, ossoSet, pesos: new Map(), parteAtribuidaEm: new Map(), consumidas: new Map(), pedacosDe: new Map(), alvosF: null, alvosV: null, tocadosV: null, tocadosF: null, novosV: null, novosF: null, procedencia: criarEstadoDeProcedencia(), passos: PASSOS };
 
   const modoRetrato = OPCOES.retrato ?? 'rapido';
+  const registrarLeitura = OPCOES.leitura === 'conferido' || typeof OPCOES.aoLer === 'function';
   let retrato = null;
   /* MEMÓRIA DE EXECUÇÃO (opcional, `OPCOES.memoria`, de `criarMemoriaDeExecucao`): o estado depois de uma operação cara é guardado sob
      a chave do prefixo de passos (e do que o rodeia), e uma execução cujo prefixo é o mesmo recomeça dali. Só vale com o registro do
      próprio núcleo ou o que o host marcou (`confiarNaMemoriaDoRegistro`), e nunca muda o resultado: a prova é o neutro bit a bit contra a execução sem memória. */
   const memoria = OPCOES.memoria && registroServeAMemoria(OPCOES.registroOperacoes) ? OPCOES.memoria : null;
-  const chavesDoPrefixo = memoria ? chavesDosPrefixos({ dict, MATERIAIS, ESQUELETO, ALIASES, declaracoes: [...declaracoesOrigem], modoRetrato, registro: (OPCOES.registroOperacoes ?? REGISTRO_OPERACOES).assinatura }, PASSOS) : null;
-  /* Quais passos viram ponto: guardar o estado inteiro custa uma cópia (5 s com 174 mil faces), então não é todo passo. Entram os
-     últimos `PONTOS_NO_FIM` passos das operações pesadas, para o ajuste depois da última delas recomeçar dali, e o último passo
-     de operação cara antes do ponto onde esta execução diverge da anterior, para a execução seguinte recomeçar dali. */
+  /* `recursos`: o que o ambiente deu ao processo e muda o resultado de um passo (a Manifold carregada ou não). Entra na chave, de modo que
+     o estado de um processo sem a biblioteca nunca serve a um processo com ela, e vice-versa. */
+  const chavesDoPrefixo = memoria ? chavesDosPrefixos({ dict, MATERIAIS, ESQUELETO, ALIASES, declaracoes: [...declaracoesOrigem], modoRetrato, registro: (OPCOES.registroOperacoes ?? REGISTRO_OPERACOES).assinatura, recursos: { manifold: manifoldCarregada() !== null } }, PASSOS) : null;
+  /* Quais passos viram ponto: guardar o estado inteiro custa uma cópia (5 s com 174 mil faces), então não é todo passo. A memória que
+     decide (`deveGuardar(i, { op, ms, antesDaDivergencia, total })`, a memória em armazém) recebe, ao fim de cada passo executado, quanto
+     ele levou e se ele é o passo antes do primeiro que mudou desde a execução anterior; o tempo decide só onde guardar, nunca o resultado.
+     Na memória que não decide, entram os últimos `PONTOS_NO_FIM` passos das operações pesadas, para o ajuste depois da última delas
+     recomeçar dali, e o último passo de operação cara antes do ponto onde esta execução diverge da anterior. */
   const pontosDeMemoria = new Set();
+  const decide = Boolean(chavesDoPrefixo) && typeof memoria.deveGuardar === 'function';
+  let divergencia = null;
   if (chavesDoPrefixo) {
-    const pesados = [];
-    PASSOS.forEach((passo, i) => { if (OPERACOES_PESADAS.has(passo?.[0])) pesados.push(i); });
-    for (const i of pesados.slice(-PONTOS_NO_FIM)) pontosDeMemoria.add(i);
     const anterior = memoria.ultimaCadeia;
-    if (anterior) {
-      let divergencia = 0;
+    if (Array.isArray(anterior)) {
+      divergencia = 0;
       while (divergencia < chavesDoPrefixo.length && divergencia < anterior.length && chavesDoPrefixo[divergencia] === anterior[divergencia]) divergencia += 1;
-      if (divergencia < chavesDoPrefixo.length) for (let i = divergencia - 1; i >= 0; i -= 1) if (OPERACOES_CARAS.has(PASSOS[i]?.[0])) { pontosDeMemoria.add(i); break; }
+    }
+    if (!decide) {
+      const pesados = [];
+      PASSOS.forEach((passo, i) => { if (OPERACOES_PESADAS.has(passo?.[0])) pesados.push(i); });
+      for (const i of pesados.slice(-PONTOS_NO_FIM)) pontosDeMemoria.add(i);
+      if (divergencia !== null && divergencia < chavesDoPrefixo.length) for (let i = divergencia - 1; i >= 0; i -= 1) if (OPERACOES_CARAS.has(PASSOS[i]?.[0])) { pontosDeMemoria.add(i); break; }
     }
     memoria.ultimaCadeia = chavesDoPrefixo;
   }
+  /* UM PASSO QUE GRITA POR FALTA DE RECURSO ENVENENA O QUE VEM DEPOIS. Sem a Manifold, a booleana grita e não corta, e o estado dali em
+     diante é o de uma peça sem o corte; nenhum ponto é guardado depois do primeiro passo que gritou com a biblioteca ausente. */
+  let semRecurso = false;
+  /* as chaves que esta execução guardou: se o modo conferido recusar o recomeço, elas saem junto com o ponto de onde ela recomeçou */
+  const guardadosNestaExecucao = [];
   let inicio = 0;
   if (chavesDoPrefixo) {
     for (let k = PASSOS.length - 1; k >= 0; k -= 1) {
       const ponto = memoria.buscar(chavesDoPrefixo[k]);
       if (!ponto) continue;
-      const estado = copiarEstado(ponto.estado);
-      if (estado) { Object.assign(st, estado); inicio = k + 1; memoria.estatisticas.restaurados += 1; }
+      /* `proprio`: a memória devolve um estado que é só desta execução (o lido do disco, por exemplo), e a cópia não precisa ser feita */
+      const estado = ponto.proprio === true ? ponto.estado : copiarEstado(ponto.estado);
+      if (estado) { Object.assign(st, estado); inicio = k + 1; memoria.estatisticas.restaurados += 1; memoria.estatisticas.recomecouDoPasso = inicio; }
       break;
     }
   }
   PASSOS.forEach((passo, i) => {
     if (i < inicio) return;
+    const t0DoPasso = decide ? performance.now() : 0;
+    const orfaosAntesDoPasso = st.orfaos.length;
     const [op, args = {}] = passo;
     const registro = OPCOES.registroOperacoes ?? REGISTRO_OPERACOES;
     if (!registro || typeof registro.resolver !== 'function') throw new Error('oficina: registro de operações inválido');
@@ -3805,13 +3842,29 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
     }
     st.novosV = escrita?.V === 'acrescenta' ? [] : null;
     st.novosF = escrita?.F === 'acrescenta' ? [] : null;
+    /* O REGISTRO DE LEITURA (`OPCOES.leitura: 'conferido'` ou `OPCOES.aoLer`), desligado por padrão: as chaves que os mapas tinham antes do
+       passo e a leitura rastreada durante a função da operação, para dizer de que entradas anteriores o passo depende. */
+    const existentes = registrarLeitura ? { V: new Set(Map.prototype.keys.call(st.V)), F: new Set(Map.prototype.keys.call(st.F)), origens: new Set(Map.prototype.keys.call(st.origens)) } : null;
+    const leitura = registrarLeitura ? criarLeituraDoPasso({ V: st.V, F: st.F, origens: st.origens }) : null;
+    if (leitura) st.leitura = leitura;
     /* a restauração dos mapas é num `finally`: a operação que lança ou a nativa que recusa não deixa `set`, `delete` e `clear` remendados no estado */
     try {
       if (fn.nativaModelar) { try { const contexto = contextoNativo(st, i, { leitura: (registrada.artefatos?.entra ?? []).length > 0, op: registrada.nome }); fn(contexto, args); contexto.publicar(); } catch (erro) { grita(st, i, op, null, `extensão nativa recusou: ${erro.message}`); return; } }
       else comPassoNoErro(i, op, args, () => fn(st, args, i));
+      leitura?.parar();
       if (pose) aplicarPoseDeCriacao(st, antes, pose);
     } finally {
       for (const mapa of rastreados) { delete mapa.set; delete mapa.delete; delete mapa.clear; }
+      if (leitura) { leitura.restaurar(); delete st.leitura; }
+    }
+    if (leitura) {
+      const resumo = leitura.resumo(existentes);
+      if (typeof OPCOES.aoLer === 'function') OPCOES.aoLer(i, registrada.nome, resumo);
+      if (OPCOES.leitura === 'conferido' && registrada.executar === OPS[registrada.nome]) {
+        /* `OPCOES.leituraDeclarada` confere outra tabela no lugar da do planejador: a declaração proposta, antes de entrar nela */
+        const divergencia = conferirLeituraDoPasso(registrada.nome, resumo, OPCOES.leituraDeclarada ?? undefined);
+        if (divergencia) throw new Error(`oficina: a leitura declarada de '${registrada.nome}' não cobre o que o passo ${i} leu: ${divergencia}`);
+      }
     }
     const { alvosF, alvosV, tocadosV, tocadosF, novosV, novosF } = st;
     st.alvosF = st.alvosV = st.tocadosV = st.tocadosF = st.novosV = st.novosF = null;
@@ -3851,9 +3904,17 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
         partes: Object.keys(st.partes).filter((id) => !antesPartes.has(id)).sort(),
       },
     });
-    if (chavesDoPrefixo && pontosDeMemoria.has(i)) {
-      const estado = copiarEstado(Object.fromEntries(Object.entries(st).filter(([campo, valor]) => !CAMPOS_FORA_DA_MEMORIA.has(campo) && typeof valor !== 'function')));
-      if (estado) memoria.guardar(chavesDoPrefixo[i], i, estado); else memoria.estatisticas.recusados += 1;
+    if (st.orfaos.length > orfaosAntesDoPasso && manifoldCarregada() === null) semRecurso = true;
+    const guardar = chavesDoPrefixo && !semRecurso && (decide
+      ? memoria.deveGuardar(i, { op: registrada.nome, ms: performance.now() - t0DoPasso, antesDaDivergencia: divergencia !== null && i === divergencia - 1, total: PASSOS.length }) === true
+      : pontosDeMemoria.has(i));
+    if (guardar) {
+      /* `copiaPropria`: a memória faz a cópia dela dentro de `guardar`, na hora (a serialização para o disco), e recebe o estado vivo;
+         `guardar` que devolve false não guardou */
+      const vivo = Object.fromEntries(Object.entries(st).filter(([campo, valor]) => !CAMPOS_FORA_DA_MEMORIA.has(campo) && typeof valor !== 'function'));
+      const estado = memoria.copiaPropria === true ? vivo : copiarEstado(vivo);
+      if (!estado || memoria.guardar(chavesDoPrefixo[i], i, estado) === false) memoria.estatisticas.recusados += 1;
+      else guardadosNestaExecucao.push(chavesDoPrefixo[i]);
     }
   });
   aplicarHierarquiaDasPartes(st);
@@ -3904,6 +3965,20 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
   Object.defineProperty(saida, 'chapas', { value: st.chapas ?? [], enumerable: false });
   /* aberturas: a borda, a espessura e a limpeza de cada passo `aberturaPorContorno`, para a conferência dos vãos e as provas. Fora da enumeração, como `chapas`. */
   Object.defineProperty(saida, 'aberturas', { value: st.aberturas ?? [], enumerable: false });
+  /* O MODO CONFERIDO DA MEMÓRIA (`OPCOES.memoriaConferida`): a execução que recomeçou de um estado guardado roda de novo inteira, sem
+     memória, e as duas têm de dar a mesma impressão do neutro (`planejador/impressao-do-neutro.js`); a divergência é recusada. */
+  if (memoria && OPCOES.memoriaConferida === true && inicio > 0) {
+    const inteira = nucleo(PASSOS, PARAMS, TOPO, MATERIAIS, ESQUELETO, ALIASES, { ...OPCOES, memoria: null, memoriaConferida: false, aoLer: undefined, aoRastrear: undefined, leitura: undefined });
+    const diferenca = divergenciaDaImpressao(saida, inteira);
+    if (diferenca) {
+      /* o ponto recusado sai da memória, e com ele todos os desta receita (`descartarTodos`): o estado envenenado pode ter vindo de um
+         ponto anterior, que já gerou os seguintes; a memória que não sabe descartar a receita inteira descarta o recusado e os que esta
+         execução guardou a partir dele */
+      if (typeof memoria.descartarTodos === 'function') memoria.descartarTodos();
+      else for (const chave of [chavesDoPrefixo[inicio - 1], ...guardadosNestaExecucao]) memoria.descartar?.(chave);
+      throw new Error(`oficina: a execução que recomeçou do estado guardado depois do passo ${inicio - 1} divergiu da execução inteira: ${diferenca}`);
+    }
+  }
   return saida;
 }
 
