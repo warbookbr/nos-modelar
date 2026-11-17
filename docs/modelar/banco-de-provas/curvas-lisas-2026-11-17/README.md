@@ -99,3 +99,13 @@ Atritos:
    Custo: uma rodada de revisão e de correção.
    O processo pegou: sim, a revisão adversarial.
    Destino: ferramenta, os testes novos em `ajuste-de-curva-lisa.test.mjs` cobrem ruído do tamanho do espaçamento, escala de milímetros a dezenas de metros, ordem e custo.
+
+## A terceira revisão e a decisão da pessoa
+
+A terceira revisão adversarial do ajuste achou `cabe` e `desvioMaximo` seguros como ferramenta geral: nenhum `cabe` verdadeiro acima da tolerância de ×1e-3 a ×1e3, numa espiral de 30 rad, num arco de 340 graus, com ruído e numa curva 3D; o filete e o seno dão a mesma contagem nas três escalas, o ruído numa reta e num arco não inventa inflexão, e a planta dá 9 clotoides e 1 inflexão de 30 a 0,8 mm de espaçamento, com a amostra deslocada, a ×1e-3 e com ruído de ±1 (11 clotoides).
+
+Ela bloqueou a contagem de inflexões como métrica geral. A lombada do teste (3 mm, sigma 40, R 20 m, tolerância 1, pontos a 5 mm) conta 2 inflexões a ±200 e a ±1500, mas 0 a ±300, ±400 e ±800, com `cabe` verdadeiro e a curvatura negativa no meio da curva ajustada, onde a inflexão é obrigatória: o ajuste estreita o lóbulo, e a sagita dele contra a própria corda cai a 0,47, abaixo do limiar de 80%. Baixar o limiar a 0,5 ou 0,3 não resolve. Ela também achou a inserção de joelhos instável fora da planta (a lombada de 10 mm a ±800 cabe com 6 clotoides a 20 e 10 mm de espaçamento e não cabe com 10 a 5 e 2 mm, e o `motivo` diz que falta clotoide), o desvio da curva à poligonal punindo a flecha da corda da própria entrada em tolerância muito menor que ela, e cinco miudezas (reta com ruído rente à tolerância com 6 a 8 clotoides, coordenadas de 1e12 sem recusa por precisão, tolerância de 1e-7 em 24 s, a planta a ×1e-3 em 11,6 s, e o trecho de 3354 a 3394 mm da planta preso ao piso de 1% do arco).
+
+A pessoa decidiu em 2026-11-17 ("Pode ser sim") seguir a recomendação: a contagem de inflexões fica como diagnóstico, sem aprovar nem reprovar nada, com esta limitação escrita na ficha de `ajustarCurvaLisa`; a correção da contagem (a profundidade do lóbulo contra a ponte entre as faixas vizinhas, travada com a lombada a ±400 e ±800) e a da inserção fora da planta vão para o backlog; e a fatia 3 usa a planta, que é estável.
+
+O processo teria pegado sozinho? Não: o teste só tinha a lombada num comprimento e a densidade só na planta. A instrução que falta vai junto da correção no backlog: toda métrica de contagem do ajuste se prova em mais de um comprimento e mais de uma densidade fora da curva do objeto.

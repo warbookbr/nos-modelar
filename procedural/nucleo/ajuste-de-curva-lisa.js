@@ -23,6 +23,8 @@
  *     trechos de curvatura linear de que a cadeia é feita, um por par de joelhos.
  *   inflexoes: quantas vezes a curvatura troca de sinal entre faixas que movem a curva mais que a tolerância (a sagita da faixa, medida na curva integrada, é a
  *     distância máxima dela à corda; a faixa abaixo da tolerância é a reta que a tolerância não distingue).
+ *     É diagnóstico e não critério: o lóbulo estreito contra a corda curta conta 0 onde a inflexão é obrigatória (a lombada de 3 mm, sigma 40, entre ±300 e ±800),
+ *     e nenhum gate aprova ou reprova por este número até a contagem medir o lóbulo contra a ponte entre as faixas vizinhas.
  *   pontosDaRede(passo, { nome, completar }): { nome, pontos } no formato de `curvas` de `gaiolaPorRede`: pontos-chave sobre a curva ajustada a cada `passo` de arco,
  *     com a ponta exata; `completar(u, v)` devolve [x, y, z] (sem ele, a terceira coordenada é a constante do ajuste).
  * exemplo:
