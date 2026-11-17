@@ -77,7 +77,8 @@ export function juntasPorEtapa(montagemResolvida, etapas) {
    posterior cita de uma etapa não fixa é comparada com a do aceite dessa etapa (`portasDeReferencia`), e a posterior fixa cuja
    porta citada mudou vira `quebrada`, com o aceite guardado em `reaberturas`; o abalo segue pela cadeia, para a posterior que
    cita uma etapa abalada. `citacoes` vem de quem conhece a montagem (`citacoesDasPortas` da ferramenta). */
-export function atualizarRegistro(montagemId, medidas, anterior = null, { citacoes = [] } = {}) {
+export function atualizarRegistro(montagemId, medidas, anterior = null, { citacoes = [], semGeometria = [] } = {}) {
+  const semMalha = new Set(semGeometria);
   const fixas = new Map((anterior?.etapas ?? [])
     .filter((etapa) => etapa.estado === 'fixa' || etapa.estado === 'quebrada')
     .map((etapa) => [etapa.instancia, etapa]));
@@ -110,10 +111,19 @@ export function atualizarRegistro(montagemId, medidas, anterior = null, { citaco
       const formaDoAceite = aceita ?? (mudou ? null : forma ?? null);
       /* A PORTA CITADA QUE MUDOU COM A MALHA IGUAL. A etapa fixa guarda as portas que as posteriores citam; a receita que muda
          só a porta (o lugar do encaixe) não muda a forma, e as posteriores iam junto sem nada acusar. */
-      const portasMudadas = fixa.portas ? Object.keys(fixa.portas).sort().flatMap((nome) => {
+      const portasMudadas = fixa.portas && !semMalha.has(instancia) ? Object.keys(fixa.portas).sort().flatMap((nome) => {
         const d = diferencas(fixa.portas[nome], portas?.[nome]);
         return d.length ? [`a porta '${nome}' mudou depois do aceite: ${d.join('; ')}`] : [];
       }) : [];
+      /* A MEDIDA DA JUNTA QUE MUDOU COM A MALHA IGUAL, no registro de antes das portas guardadas (2026-11-17): a porta que a etapa
+         citada mexeu aparece na medida das juntas da posterior fixa, e sem as portas do aceite é a única marca que fica. */
+      const semReferencia = new Set(citacoes.filter((c) => c.posterior === instancia && c.relacao && !c.profunda
+        && !portasDeReferencia((anterior?.etapas ?? []).find((e) => e.instancia === c.etapa) ?? {})).map((c) => c.relacao));
+      const juntasMudadas = !passou ? [] : juntas.filter((junta) => semReferencia.has(junta.relacao)).flatMap((junta) => {
+        const velha = (fixa.juntas ?? []).find((j) => j.relacao === junta.relacao);
+        return velha?.medidas && junta.medidas && !medidasIguais(velha.medidas, junta.medidas) ? [`a medida da junta '${junta.relacao}' mudou depois do aceite, e a porta que ela mede não tem referência guardada no registro`] : [];
+      });
+      portasMudadas.push(...juntasMudadas);
       if (!mudou && passou && !portasMudadas.length) {
         return { instancia, estado: 'fixa', juntas, ...(formaDoAceite ? { forma: formaDoAceite } : {}), ...(fixa.portas ? { portas: fixa.portas } : {}), aceite: fixa.aceite };
       }
@@ -136,7 +146,7 @@ export function atualizarRegistro(montagemId, medidas, anterior = null, { citaco
      etapa já esteve fixa e por que deixou de estar. */
   registro.etapas = registro.etapas.map((etapa) => (etapa.reaberturas || !historico.has(etapa.instancia)
     ? etapa : { ...etapa, reaberturas: historico.get(etapa.instancia) }));
-  registro.etapas = abalarPelasPortas(registro.etapas, citacoes);
+  registro.etapas = abalarPelasPortas(registro.etapas, citacoes, semMalha);
   return registro;
 }
 
@@ -174,7 +184,7 @@ function porPorta(citacoes) {
   return [...grupos.values()];
 }
 
-function abalarPelasPortas(etapas, citacoes) {
+function abalarPelasPortas(etapas, citacoes, semMalha = new Set()) {
   const porId = new Map(etapas.map((e) => [e.instancia, e]));
   const abaladas = new Map();
   return etapas.map((etapa) => {
@@ -194,6 +204,8 @@ function abalarPelasPortas(etapas, citacoes) {
         continue;
       }
       if (citada.estado === 'fixa') continue;
+      /* A etapa ainda sem geometria não mede porta nenhuma: a porta é desconhecida, e não mudada. */
+      if (semMalha.has(g.etapa)) continue;
       const d = diferencas(referencia[g.porta], citada.portas?.[g.porta]);
       if (d.length) motivos.push(`a porta '${g.porta}' de '${g.etapa}', que ela cita (${g.meios.join(', ')}), mudou desde o aceite de '${g.etapa}': ${d.join('; ')}`);
     }
@@ -216,7 +228,7 @@ export function proximaEtapa(registro) {
 
 /* Fixa a etapa com o aceite da pessoa. Recusa fixar fora de ordem, com junta
    reprovada ou sem aceite: são as três formas de a bola de neve começar. */
-export function fixarEtapa(registro, instancia, aceite) {
+export function fixarEtapa(registro, instancia, aceite, { citacoes = [], portasAgora = {} } = {}) {
   const indice = registro.etapas.findIndex((etapa) => etapa.instancia === instancia);
   if (indice < 0) falhar('etapa-inexistente', `a etapa '${instancia}' não existe nesta montagem.`);
   const proxima = proximaEtapa(registro);
@@ -242,9 +254,21 @@ export function fixarEtapa(registro, instancia, aceite) {
   if (!por) falhar('etapa-sem-aceite', `fixar '${instancia}' exige o aceite da pessoa, com quem aceitou.`);
   const observacao = typeof aceite.observacao === 'string' ? aceite.observacao.trim() : '';
   const defeitosAceitos = Array.isArray(aceite.defeitosAceitos) ? aceite.defeitosAceitos : [];
+  /* A PORTA NOVA DE UMA ETAPA FIXA. A etapa que se fixa agora pode citar uma porta de etapa já fixa que o aceite desta não guardou
+     (a montagem ganhou a citação depois): a etapa citada não teve aceite dado a essa porta, e este aceite é o primeiro. A porta,
+     como a receita a publica agora, entra nas portas da etapa citada; a posterior que já existia e passa a citar porta fora do
+     aceite continua abalada (a diferença é que esta não tinha aceite antes). */
+  const novas = new Map();
+  for (const c of citacoes.filter((x) => x.posterior === instancia && !x.profunda)) {
+    const citada = registro.etapas.find((e) => e.instancia === c.etapa);
+    const agora = portasAgora[c.etapa]?.[c.porta];
+    if (citada?.estado === 'fixa' && citada.portas && citada.portas[c.porta] === undefined && agora !== undefined) {
+      novas.set(c.etapa, { ...(novas.get(c.etapa) ?? citada.portas), [c.porta]: agora });
+    }
+  }
   return {
     ...registro,
-    etapas: registro.etapas.map((item, i) => (i === indice
+    etapas: registro.etapas.map((item, i) => (novas.has(item.instancia) ? { ...item, portas: novas.get(item.instancia) } : item)).map((item, i) => (i === indice
       ? { ...item, estado: 'fixa', aceite: { por, ...(observacao ? { observacao } : {}), ...(defeitosAceitos.length ? { defeitosAceitos } : {}), ...(aceite.analise ? { analise: aceite.analise } : {}) } }
       : item)),
   };

@@ -171,7 +171,7 @@ export async function estadoDasEtapas(arquivoMontagem, { receitas, anterior, imp
   const registroAnterior = anterior !== undefined ? anterior
     : existsSync(arquivoDoRegistro(arquivoMontagem)) ? JSON.parse(readFileSync(arquivoDoRegistro(arquivoMontagem), 'utf8')) : null;
   const portas = Object.fromEntries(medidas.filter((m) => m.portas).map((m) => [m.instancia, m.portas]));
-  return { montagem, registro: atualizarRegistro(montagem.id, [...medidas, ...semGeometria], registroAnterior, { citacoes }), anterior: registroAnterior, citacoes, portas };
+  return { montagem, registro: atualizarRegistro(montagem.id, [...medidas, ...semGeometria], registroAnterior, { citacoes, semGeometria: semGeometria.map((m) => m.instancia) }), anterior: registroAnterior, citacoes, portas };
 }
 
 /* As condições que moram nas rodadas da peça da etapa. `rodadasDe(ref)` é
@@ -204,7 +204,7 @@ export function conferirRodadasDaEtapa(montagem, instancia, rodadasDe = (ref) =>
 }
 
 export async function fixar(arquivoMontagem, instancia, aceite, opcoes = {}) {
-  const { montagem, registro } = await estadoDasEtapas(arquivoMontagem, opcoes);
+  const { montagem, registro, citacoes, portas } = await estadoDasEtapas(arquivoMontagem, opcoes);
   const proxima = proximaEtapa(registro);
   /* A ordem é conferida antes das rodadas, para a mensagem apontar a etapa
      certa quando alguém tenta pular. */
@@ -216,7 +216,7 @@ export async function fixar(arquivoMontagem, instancia, aceite, opcoes = {}) {
      humano vale em qualquer ponto. 'feita' = manifesto com o hash da receita de agora. */
   const ref = montagem.instancias.find((item) => item.id === instancia)?.alvo.ref;
   const analise = ref ? estadoDaAnalise(ref, opcoes.analise ?? {}) : 'ausente';
-  return fixarEtapa(registro, instancia, { por: aceite?.por, observacao: aceite?.observacao, defeitosAceitos, analise });
+  return fixarEtapa(registro, instancia, { por: aceite?.por, observacao: aceite?.observacao, defeitosAceitos, analise }, { citacoes, portasAgora: portas });
 }
 
 /* Reabrir é decisão da pessoa, como o aceite humano: `por` traz

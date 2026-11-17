@@ -340,12 +340,14 @@ describe('o registro gravado no meio do caminho', () => {
     gravarRegistro(arquivo, semPortas(await tresFixas()));
     const receitas = comBase({ alturaDoCorpo: 30 });
     gravarRegistro(arquivo, await reabrir(arquivo, 'topo', POR, { ...opcoes, receitas }));
-    expect(estados(disco())).toEqual(['quebrada', 'fixa', 'aberta']);
+    /* a medida da junta que mudou, sem as portas do aceite para conferir, quebra o meio já na leitura */
+    expect(estados(disco())).toEqual(['quebrada', 'quebrada', 'aberta']);
     const guardada = disco().etapas[0].reaberturas.at(-1).juntasDasPosteriores.meio;
     expect(guardada.map((j) => j.relacao)).toEqual(['meioNoPinoDaBase']);
     expect(disco().etapas[1].juntas[0].medidas).not.toEqual(guardada[0].medidas);
+    expect(disco().etapas[1].motivo).toMatch(/medida da junta 'meioNoPinoDaBase' mudou/);
     /* relida, a base segue quebrada, não se fixa direto, e a reabertura compara com a junta do aceite, e não com a do disco */
-    expect(estados((await estadoDasEtapas(arquivo, { receitas })).registro)).toEqual(['quebrada', 'fixa', 'aberta']);
+    expect(estados((await estadoDasEtapas(arquivo, { receitas })).registro)).toEqual(['quebrada', 'quebrada', 'aberta']);
     await recusa(fixar(arquivo, 'base', aceite, { ...opcoes, receitas }), 'etapa-quebrada');
     await recusa(reabrir(arquivo, 'base', POR, { ...opcoes, receitas }), 'etapa-com-posteriores-fixas');
     /* a mudança que não toca a junta se prova pela junta guardada, depois da mesma escrita no meio do caminho */
@@ -380,6 +382,45 @@ describe('o registro gravado no meio do caminho', () => {
     expect(estados(registro)).toEqual(['aberta', 'quebrada', 'quebrada']);
     expect(registro.etapas[1].motivo).toMatch(/^a porta 'outro' de 'base', que ela cita \(.*\), não está nas portas do aceite de 'base'$/);
     await recusa(fixar(arquivo, 'base', aceite, { ...opcoes, receitas }), 'etapa-com-posterior-quebrada');
+  });
+
+  /* A quarta revisão (2026-11-17). */
+  const comQuarto = (dado) => {
+    dado.instancias.push({ id: 'quarto', alvo: { tipo: 'peca', ref: 'bloco-com-furo' } });
+    dado.etapas.push('quarto');
+    dado.relacoes.push({ ...JSON.parse(JSON.stringify(dado.relacoes[0])), id: 'quartoNoOutroDaBase', referencia: { caminho: ['base'], porta: 'outro' }, movel: { caminho: ['quarto'], porta: 'furo' } });
+    dado.posicoes.push({ id: 'quartoSobreOOutro', instancia: 'quarto', porta: 'furo', em: { instancia: 'base', porta: 'outro' }, unidade: 'mm', afastamento: 0 });
+    dado.vinculos.push({ id: 'furoDoQuarto', alvo: { instancia: 'quarto', param: 'raioDoFuro' }, de: { instancia: 'base', porta: 'outro', medida: 'raio' }, unidade: 'mm', acrescimo: 0.2 });
+    return dado;
+  };
+
+  it('C2: a etapa nova que cita porta da base fora do aceite fixa sem quebrar na releitura, e a porta entra nas da base', async () => {
+    const receitas = comPassosDaBase(comOutra);
+    gravarRegistro(arquivo, await tresFixas(receitas));
+    writeFileSync(arquivo, JSON.stringify(comQuarto(JSON.parse(readFileSync(arquivo, 'utf8'))), null, 2));
+    expect(estados((await estadoDasEtapas(arquivo, { receitas })).registro)).toEqual(['fixa', 'fixa', 'fixa', 'aberta']);
+    const fixado = await fixar(arquivo, 'quarto', aceite, { ...opcoes, receitas });
+    expect(Object.keys(fixado.etapas[0].portas).sort()).toEqual(['outro', 'pino']);
+    gravarRegistro(arquivo, fixado);
+    expect(estados((await estadoDasEtapas(arquivo, { receitas })).registro)).toEqual(['fixa', 'fixa', 'fixa', 'fixa']);
+    /* a porta guardada agora vale: mudá-la depois do aceite abala a base e a quarta */
+    const movida = comPassosDaBase((p) => comOutra(p).map((q) => (q[0] === 'publicarPorta' && q[1].nome === 'outro' ? ['publicarPorta', { ...q[1], interface: { ...q[1].interface, centro: [0, 0.09, 0] } }] : q)));
+    expect(estados((await estadoDasEtapas(arquivo, { receitas: movida })).registro)[0]).toBe('quebrada');
+  });
+
+  it('C4: a etapa sem geometria (PASSOS vazio) não faz as posteriores lerem a porta como mudada', async () => {
+    gravarRegistro(arquivo, await tresFixas());
+    gravarRegistro(arquivo, await reabrir(arquivo, 'base', POR, opcoes));
+    const vazia = { ...RECEITAS, 'bloco-com-pino': { ...RECEITAS['bloco-com-pino'], PASSOS: [] } };
+    expect(estados((await estadoDasEtapas(arquivo, { receitas: vazia })).registro)).toEqual(['aberta', 'fixa', 'fixa']);
+  });
+
+  it('C3: no registro sem portas, a medida da junta que mudou com a malha igual quebra a posterior fixa', async () => {
+    gravarRegistro(arquivo, semPortas(await tresFixas()));
+    const receitas = comPassosDaBase(portaDoPino((i) => ({ ...i, centro: [0, i.centro[1] + 0.01, 0] })));
+    const { registro } = await estadoDasEtapas(arquivo, { receitas });
+    expect(estados(registro)).toEqual(['fixa', 'quebrada', 'quebrada']);
+    expect(registro.etapas[1].motivo).toMatch(/medida da junta 'meioNoPinoDaBase' mudou/);
   });
 });
 
