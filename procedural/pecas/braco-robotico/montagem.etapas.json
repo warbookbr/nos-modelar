@@ -5,9 +5,9 @@
   "etapas": [
     {
       "instancia": "base",
-      "estado": "aberta",
+      "estado": "fixa",
       "juntas": [],
-      "forma": "sha256:1f2a32ca0be18d3315d04834ee379fa05f45b9e1c6f6ead2fa6e8b556b26f460",
+      "forma": "sha256:21081dc5b156f75d462187e0085f661d70f9189aa229d05256afd980de58681e",
       "portas": {
         "assento": {
           "forma": "anel",
@@ -27,6 +27,10 @@
           "inicio": -0.005,
           "fim": 0
         }
+      },
+      "aceite": {
+        "por": "a pessoa, 2026-11-17: 'Esta boa sim, aprovada!' (base com a placa de controle e a tampa fumê com parafusos de aço escuro, pela imagem antes e depois)",
+        "analise": "ausente"
       },
       "reaberturas": [
         {
