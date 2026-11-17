@@ -43,6 +43,8 @@
       },
       "origem": {
         "tipo": "migração",
+        "v2": "7894db300e5ad96f56ec8aa61cbc9803b37e0c61",
+        "reaberturasAntigas": 3,
         "via": "commit do aceite",
         "commit": "7894db300e5ad96f56ec8aa61cbc9803b37e0c61"
       }
@@ -166,9 +168,9 @@
       },
       "origem": {
         "tipo": "migração",
+        "v2": "7894db300e5ad96f56ec8aa61cbc9803b37e0c61",
         "via": "impressão de agora",
-        "portaNaoProvada": true,
-        "commit": "17db8d25342eac8bfde9e84d2e5a76e44b17dbde"
+        "portaNaoProvada": true
       }
     },
     {
@@ -297,6 +299,8 @@
       },
       "origem": {
         "tipo": "migração",
+        "v2": "7894db300e5ad96f56ec8aa61cbc9803b37e0c61",
+        "reaberturasAntigas": 5,
         "via": "commit do aceite",
         "commit": "ef478824fb7f7461346bfe092d6cb0187bf6a6c7"
       }
@@ -382,6 +386,8 @@
       },
       "origem": {
         "tipo": "migração",
+        "v2": "7894db300e5ad96f56ec8aa61cbc9803b37e0c61",
+        "reaberturasAntigas": 4,
         "via": "commit do aceite",
         "commit": "73a57d9c7c8a9b1c294e49d237d99379da02942e"
       }
@@ -511,6 +517,8 @@
       },
       "origem": {
         "tipo": "migração",
+        "v2": "7894db300e5ad96f56ec8aa61cbc9803b37e0c61",
+        "reaberturasAntigas": 2,
         "via": "commit do aceite",
         "commit": "6e78f6f75028c06789eeee5904440390669c2ff3"
       }
@@ -641,6 +649,8 @@
       },
       "origem": {
         "tipo": "migração",
+        "v2": "7894db300e5ad96f56ec8aa61cbc9803b37e0c61",
+        "reaberturasAntigas": 4,
         "via": "commit do aceite",
         "commit": "73a57d9c7c8a9b1c294e49d237d99379da02942e"
       }
@@ -765,6 +775,7 @@
       },
       "origem": {
         "tipo": "migração",
+        "v2": "7894db300e5ad96f56ec8aa61cbc9803b37e0c61",
         "via": "commit do aceite",
         "commit": "87435a79a65515195f7480a3c81b6d52d2f24d62"
       }
@@ -897,6 +908,8 @@
       },
       "origem": {
         "tipo": "migração",
+        "v2": "7894db300e5ad96f56ec8aa61cbc9803b37e0c61",
+        "reaberturasAntigas": 1,
         "via": "commit do aceite",
         "commit": "69ffcff15cf14d63402e93325770c10b42ced17e"
       }
@@ -1030,6 +1043,7 @@
       },
       "origem": {
         "tipo": "migração",
+        "v2": "7894db300e5ad96f56ec8aa61cbc9803b37e0c61",
         "via": "commit do aceite",
         "commit": "1cbdf863e951f87a8d9291795316cfae34a6bc23"
       }
@@ -1164,6 +1178,8 @@
       },
       "origem": {
         "tipo": "migração",
+        "v2": "7894db300e5ad96f56ec8aa61cbc9803b37e0c61",
+        "reaberturasAntigas": 2,
         "via": "commit do aceite",
         "commit": "73a57d9c7c8a9b1c294e49d237d99379da02942e"
       }
@@ -1299,6 +1315,7 @@
       },
       "origem": {
         "tipo": "migração",
+        "v2": "7894db300e5ad96f56ec8aa61cbc9803b37e0c61",
         "via": "commit do aceite",
         "commit": "27c97d9eb061a3324f4714458dd546f36cf750eb"
       }
@@ -1435,6 +1452,8 @@
       },
       "origem": {
         "tipo": "migração",
+        "v2": "7894db300e5ad96f56ec8aa61cbc9803b37e0c61",
+        "reaberturasAntigas": 1,
         "via": "commit do aceite",
         "commit": "69ffcff15cf14d63402e93325770c10b42ced17e"
       }
