@@ -17,6 +17,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { lerHistorico } from './vitest-duracoes.mjs';
 
 export const TESTES_LENTOS = [
+  /* 2026-11-17: a leitura declarada conferida em cinco peças do acervo (plano do cache por passo, fatia 2); 21 s com a máquina dividida */
+  'procedural/nucleo/planejador/leitura-declarada-acervo.test.mjs',
   /* 2026-11-16: as uniões das juntas soldadas do quadro da bicicleta em cinco medidas vizinhas; uns 10 s cada, 50 s com a máquina livre */
   'procedural/nucleo/operacoes/booleana-juntas-vizinhas-da-bicicleta.test.mjs',
   /* 2026-11-16: as visões de reflexo por comando (zebra em duas chapas, luz rasante e curvatura), cada captura abrindo navegador e peça;

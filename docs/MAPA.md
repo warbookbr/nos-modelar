@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2048 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2053 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -223,6 +223,7 @@
 ## docs/modelar/banco-de-provas/cache-por-passo-2026-11-16/
 
 - `README.md` — Cache por passo: a linha de base do laço e onde o cache rende mais
+- `levantar-leitura.mjs` — levantar-leitura.mjs — o que cada operação lê de fato da malha, passo a passo, pelo registro de leitura do núcleo (fatia 2 do plano do cache por passo). Exec…
 - `medir-linha-de-base.mjs` — medir-linha-de-base.mjs — a linha de base do plano do cache por passo (fatia 1): onde vai o tempo de cada comando do laço numa peça pesada. Uso, da raiz do r…
 
 ## docs/modelar/banco-de-provas/cadeiras-2026-10-19/
@@ -1222,6 +1223,10 @@
 
 ## procedural/nucleo/planejador/
 
+- `leitura-declarada-acervo.test.mjs` — leitura-declarada-acervo.test.mjs — a leitura declarada conferida contra peças do acervo (fatia 2 do plano do cache por passo). As peças cobrem as declaraçõe…
+- `leitura-declarada.js` — leitura-declarada.js — o que cada operação do núcleo lê da malha, declarado, e a conferência contra o que o passo leu de fato (fatia 2 do plano do cache por …
+- `leitura-declarada.test.mjs` — leitura-declarada.test.mjs — prova o registro de leitura do núcleo e a leitura declarada das operações (fatia 2 do plano do cache por passo): o registro não …
+- `leitura-do-passo.js` — leitura-do-passo.js — o que um passo lê de fato da malha, registrado durante a execução (fatia 2 do plano do cache por passo).
 - `leitura-escrita.js` — leitura-escrita.js — o grafo de leitura e escrita de uma receita, extraído em modo só-leitura (fatia 1 do plano do planejador de execução). Nada aqui executa…
 - `leitura-escrita.test.mjs` — leitura-escrita.test.mjs — prova o grafo de leitura e escrita, as sequências de subtrair e o perfil de tempo do planejador (fatia 1).
 

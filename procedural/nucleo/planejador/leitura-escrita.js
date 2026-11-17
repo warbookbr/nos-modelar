@@ -2,12 +2,15 @@
  * execução). Nada aqui executa a receita nem muda o núcleo: recebe a lista de passos, os aliases e o manifesto do registro de
  * operações e devolve contagens. A pergunta é quantos passos o planejador poderia reordenar ou agrupar se confiasse só no manifesto.
  *
- * O que o manifesto diz hoje é grosso: `artefatos.entra` não vazio quer dizer que a operação lê a malha, sem dizer quais seleções, e
- * `artefatos.sai` o que ela publica. Um campo de leitura por seleção não existe nele; por isso nenhum passo que lê tem leitura
- * declarada e todos viram barreira, pela regra do plano. A leitura que se enxerga é a dos argumentos: seleções por `origem`, `alias`
+ * O que o manifesto diz é grosso: `artefatos.entra` não vazio quer dizer que a operação lê a malha, sem dizer quais seleções, e
+ * `artefatos.sai` o que ela publica. A leitura por operação está declarada à parte, em `leitura-declarada.js` (plano do cache por passo,
+ * fatia 2), conferida contra a leitura real; um campo `leitura` no manifesto também vale, como antes. O passo que lê a malha sem
+ * leitura declarada, ou com a leitura declarada 'malha' em vértices ou faces, é barreira. A leitura que se enxerga é a dos argumentos: seleções por `origem`, `alias`
  * ou id. Ela é contada à parte (`extraivel`), porque é o que uma declaração futura no manifesto precisaria acertar.
  *
- * Determinístico e puro: nenhuma leitura de relógio, de disco ou de outro módulo. */
+ * Determinístico e puro: nenhuma leitura de relógio nem de disco; a única importação é a tabela da leitura declarada. */
+
+import { LEITURA_DAS_OPERACOES } from './leitura-declarada.js';
 
 /** Os campos de argumento que citam o que o passo lê (o `origemId` é a escrita, não está aqui). */
 export const CAMPOS_DE_REFERENCIA = Object.freeze(['sel', 'de', 'solidos', 'chapa', 'solido', 'derivaDe', 'a', 'b', 'referencia', 'para', 'selPara', 'face', 'faces', 'v', 'vs']);
@@ -93,21 +96,26 @@ export function operacoesDoManifesto(manifesto) {
  * Classifica cada passo pelo manifesto.
  * - `categoria`: 'criadora' (`artefatos.entra` vazio: lê só parâmetros e escreve geometria nova), 'le-malha' (`entra` não vazio) ou
  *   'desconhecida' (a operação não está no manifesto).
- * - `leituraDeclarada`: o manifesto traz um campo `leitura` para a operação. Hoje nenhuma traz.
- * - `barreira`: lê a malha sem leitura declarada, ou operação desconhecida; o planejador não reordena em torno dele.
+ * - `leituraDeclarada`: a operação tem leitura declarada, na tabela (`leitura-declarada.js`, ou a `tabela` passada) ou num campo
+ *   `leitura` do manifesto.
+ * - `leitura`: a declaração da tabela (`{ V, F }`), ou null.
+ * - `barreira`: lê a malha sem leitura declarada, ou com a declarada 'malha', ou operação desconhecida; o planejador não reordena em torno dele.
  * - `extraivel`: toda referência de leitura dos argumentos é estática (origem, alias ou id).
  */
-export function analisarPassos(passos, { manifesto, aliases = [] } = {}) {
+export function analisarPassos(passos, { manifesto, aliases = [], tabela = LEITURA_DAS_OPERACOES } = {}) {
   const porNome = operacoesDoManifesto(manifesto);
   const mapaDeAlias = mapaDeAliases(aliases);
   return passos.map((passo, i) => {
     const [op, args = {}] = Array.isArray(passo) ? passo : [];
     const declarada = porNome.get(op);
     const categoria = !declarada ? 'desconhecida' : (declarada.artefatos?.entra ?? []).length ? 'le-malha' : 'criadora';
-    const leituraDeclarada = Boolean(declarada) && Object.hasOwn(declarada, 'leitura') && declarada.leitura != null;
+    const leitura = Boolean(declarada) && Object.hasOwn(tabela, op) ? tabela[op] : null;
+    const noManifesto = Boolean(declarada) && Object.hasOwn(declarada, 'leitura') && declarada.leitura != null;
+    const leituraDeclarada = noManifesto || leitura !== null;
     const referencias = leituraDosArgumentos(args, mapaDeAlias);
-    const barreira = categoria === 'desconhecida' || (categoria === 'le-malha' && !leituraDeclarada);
-    return { i, op, categoria, leituraDeclarada, barreira, referencias: referencias.chaves, dinamica: referencias.dinamica, extraivel: !referencias.dinamica };
+    const leMalhaInteira = !noManifesto && leitura !== null && (leitura.V === 'malha' || leitura.F === 'malha');
+    const barreira = categoria === 'desconhecida' || (categoria === 'le-malha' && (!leituraDeclarada || leMalhaInteira));
+    return { i, op, categoria, leituraDeclarada, leitura, barreira, referencias: referencias.chaves, dinamica: referencias.dinamica, extraivel: !referencias.dinamica };
   });
 }
 

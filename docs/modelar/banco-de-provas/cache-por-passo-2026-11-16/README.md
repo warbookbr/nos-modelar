@@ -74,3 +74,23 @@ O cache por passo vem depois, sobre a execução que sobra, e rende de forma dif
 ## O que a fatia 2 precisa saber
 
 As operações a declarar primeiro são as que custam nas peças da linha de base: `aberturaPorContorno`, `subtrair`, `unir`, `subdivisao`, `arredondarAresta`, `lathe`, `extrusao`, `friso` e `limparLascas`, que somam mais de 90 % da execução das três. A edição de forma do carro costuma mudar a gaiola, que é o passo 0, e aí nem o prefixo nem a dependência poupam a `subdivisao`: o ganho no carro está nas edições dos vãos e da subtração, depois dela. O tempo do carro varia 50 % entre execuções iguais, e o gate 3 medido nele com mediana de três pode cair ou passar pela variação da `subdivisao`; contar os passos executados, como o gate 2 faz, é a medida que não varia.
+
+## Fatia 2: a leitura declarada, conferida
+
+Feita em 2026-11-17, sem medida de tempo (a máquina tinha outros agentes). O núcleo ganhou um registro de leitura, desligado por padrão: com `OPCOES.aoLer` ou `OPCOES.leitura: 'conferido'`, cada passo roda com uma leitura rastreada em `st.V`, `st.F` e `st.origens` (`procedural/nucleo/planejador/leitura-do-passo.js`), que separa o que a resolução da seleção lê, e o que ela devolve (os citados do passo), do que a função da operação lê depois. A leitura de uma entrada que o próprio passo criou não conta, e a consulta que a operação faz a um registro de origem cita as faces dele. A declaração por operação está em `procedural/nucleo/planejador/leitura-declarada.js`, por mapa, em três níveis: 'nada', 'citados' e 'malha'. O modo conferido recusa o passo que leu além do declarado, com o passo, a operação, o mapa e como leu.
+
+O [`levantar-leitura.mjs`](levantar-leitura.mjs) soma, por operação, quantos passos leram cada nível, e a soma de onze peças (a bicicleta, o furgão realista, partes do braço, da empilhadeira, do carrinho de mão, do sedã, do avião e da instalação solar) está em [`leitura-por-operacao.jsonl`](leitura-por-operacao.jsonl). As nove operações da linha de base ficaram assim:
+
+| operação | passos na soma | vértices | faces | onde ela varre |
+| --- | --- | --- | --- | --- |
+| `lathe`, `extrusao`, `subdivisao` | 185, 173, 57 | nada | nada | |
+| `friso` | 35 | citados | citados | |
+| `subtrair` | 47 | citados | malha | a coleta dos vértices sem face depois do corte e a face vizinha de uma aresta |
+| `unir` | 19 | malha | malha | as faces, como o `subtrair`, e os vértices quando refina a faixa da costura (a caixa da malha inteira, no cordão de solda) |
+| `aberturaPorContorno` | 17 | malha | malha | o raio da peça, de todos os vértices, e as chaves dos dois mapas para o id local livre |
+| `limparLascas` | 8 | malha | malha | a caixa de todos os vértices, e as faces |
+| `arredondarAresta` | 14 | malha | malha | as faces, para achar a outra face da aresta e a terceira de cada ponta |
+
+O `unir` foi declarado primeiro com os vértices 'citados', como a soma das peças mostrava, e a conferência o recusou na fixture do cordão de solda e no passo 301 da bicicleta, onde a união refina a costura; a declaração passou a 'malha'. A conferência do acervo, uma peça por processo com `--conferir`, passou nas 121 receitas (as raízes de `procedural/pecas/` e as partes de objeto), e o resultado está em [`conferencia-da-leitura.jsonl`](conferencia-da-leitura.jsonl). O teste `procedural/nucleo/planejador/leitura-declarada.test.mjs` prova o registro (a malha igual bit a bit com ele ligado, os mapas devolvidos sem nada instalado, a seleção que varre separada da operação), a recusa e os exemplos do registro, e `leitura-declarada-acervo.test.mjs`, que é lento, confere cinco peças que cobrem toda declaração que não é 'malha'.
+
+O que isso diz ao cache: as primitivas e os atributos não dependem de nada que já existia, e as transformações e o `friso` dependem só do que citam, mas as operações caras (as booleanas, a abertura por contorno, a limpeza de lascas e o arredondamento de aresta) leem a malha inteira, e um passo assim depende de todo passo anterior. No furgão, em que as 17 aberturas são metade da execução, a dependência por leitura só poupa uma abertura quando a edição vem depois dela, como o prefixo já faz. Estreitar essa leitura muda as operações (`procedural/nucleo/operacoes/`, fora do território), e a da abertura por contorno não é só varredura: o raio da peça inteira entra na conta dela, de modo que a abertura de um vão depende hoje da geometria de toda a peça.

@@ -14,6 +14,8 @@ import { criarResolverNumerico, distanciaDeEdicao, ErroDeResolucao, nomesProximo
 import { TIPO_MALHA_POLIGONAL, artefatoDaMalha, criarEstadoDeProcedencia, procedenciaCanonica, registrarProcedencia } from './artefatos.js';
 import { criarRegistroOperacoes } from './registro.js';
 import { chavesDosPrefixos, copiarEstado, registroServeAMemoria } from './memoria-de-execucao.js';
+import { criarLeituraDoPasso } from './planejador/leitura-do-passo.js';
+import { conferirLeituraDoPasso } from './planejador/leitura-declarada.js';
 import { essenciaisDaOperacao, recusasDeEssenciais, usoDaOperacao } from './uso-operacoes.js';
 import { criarOperacoesSubdivisao } from './operacoes/subdivisao.js';
 import { criarOperacoesFriso } from './operacoes/friso.js';
@@ -1955,7 +1957,23 @@ function origemDoTermoDeAlias(termo) {
   return termo.origem;
 }
 
+/* A LEITURA DA RESOLUÇÃO É DA CITAÇÃO. Com o registro de leitura ligado (`OPCOES.leitura` ou `OPCOES.aoLer`, ver
+   `planejador/leitura-do-passo.js`), o que `resolverOrigem` e `resolverSelecao` leem vai para o balde da resolução, e o que elas devolvem
+   são os citados do passo. Desligado, `st.leitura` não existe e as duas chamam direto a resolução. */
 function resolverOrigem(st, origem) {
+  const leitura = st.leitura;
+  if (!leitura) return resolverOrigemBruta(st, origem);
+  leitura.entrarNaResolucao();
+  try { const r = resolverOrigemBruta(st, origem); if (Array.isArray(r?.faces)) leitura.citar(r.faces, null); return r; } finally { leitura.sairDaResolucao(); }
+}
+function resolverSelecao(st, sel, op, i, opcoes) {
+  const leitura = st.leitura;
+  if (!leitura) return resolverSelecaoBruta(st, sel, op, i, opcoes);
+  leitura.entrarNaResolucao();
+  try { const r = resolverSelecaoBruta(st, sel, op, i, opcoes); leitura.citar(r.faces, r.vertices); return r; } finally { leitura.sairDaResolucao(); }
+}
+
+function resolverOrigemBruta(st, origem) {
   const validacao = validarOrigem(origem);
   if (validacao.erro) return { erro: `origem inválida: ${validacao.erro}` };
   const declaracoes = st.declaracoesOrigem.get(origem.id) ?? [];
@@ -2076,7 +2094,7 @@ function confereId(st, i, op, args) {
 const SELETORES = ['tudo', 'v', 'f', 'grupo', 'regiao', 'origem', 'porta', 'alias', 'onde'];
 const SELETOR = new Set(SELETORES);
 
-function resolverSelecao(st, sel, op, i, { vazioNoop = false, soVertices = false } = {}) {
+function resolverSelecaoBruta(st, sel, op, i, { vazioNoop = false, soVertices = false } = {}) {
   if (sel == null) return { vertices: new Set(st.V.keys()), faces: new Set(st.F.keys()) };
   if (typeof sel !== 'object' || Array.isArray(sel)) {
     grita(st, i, op, 'sel', `seleção inválida: sel precisa ser um objeto com ${SELETORES.join(', ')}`);
@@ -3716,6 +3734,7 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
   const st = { V: new Map(), F: new Map(), orfaos: orfaosIniciais, avisos: [], merges: [], partes: {}, paisDasPartes: new Map(), origens: new Map(), portas: new Map(), declaracoesOrigem, aliases, dict, num, vec, materiais: MATERIAIS, esqueleto, ossoSet, pesos: new Map(), parteAtribuidaEm: new Map(), consumidas: new Map(), pedacosDe: new Map(), alvosF: null, alvosV: null, tocadosV: null, tocadosF: null, novosV: null, novosF: null, procedencia: criarEstadoDeProcedencia(), passos: PASSOS };
 
   const modoRetrato = OPCOES.retrato ?? 'rapido';
+  const registrarLeitura = OPCOES.leitura === 'conferido' || typeof OPCOES.aoLer === 'function';
   let retrato = null;
   /* MEMÓRIA DE EXECUÇÃO (opcional, `OPCOES.memoria`, de `criarMemoriaDeExecucao`): o estado depois de uma operação cara é guardado sob
      a chave do prefixo de passos (e do que o rodeia), e uma execução cujo prefixo é o mesmo recomeça dali. Só vale com o registro do
@@ -3805,13 +3824,29 @@ export function nucleo(PASSOS, PARAMS = {}, TOPO = {}, MATERIAIS = {}, ESQUELETO
     }
     st.novosV = escrita?.V === 'acrescenta' ? [] : null;
     st.novosF = escrita?.F === 'acrescenta' ? [] : null;
+    /* O REGISTRO DE LEITURA (`OPCOES.leitura: 'conferido'` ou `OPCOES.aoLer`), desligado por padrão: as chaves que os mapas tinham antes do
+       passo e a leitura rastreada durante a função da operação, para dizer de que entradas anteriores o passo depende. */
+    const existentes = registrarLeitura ? { V: new Set(Map.prototype.keys.call(st.V)), F: new Set(Map.prototype.keys.call(st.F)), origens: new Set(Map.prototype.keys.call(st.origens)) } : null;
+    const leitura = registrarLeitura ? criarLeituraDoPasso({ V: st.V, F: st.F, origens: st.origens }) : null;
+    if (leitura) st.leitura = leitura;
     /* a restauração dos mapas é num `finally`: a operação que lança ou a nativa que recusa não deixa `set`, `delete` e `clear` remendados no estado */
     try {
       if (fn.nativaModelar) { try { const contexto = contextoNativo(st, i, { leitura: (registrada.artefatos?.entra ?? []).length > 0, op: registrada.nome }); fn(contexto, args); contexto.publicar(); } catch (erro) { grita(st, i, op, null, `extensão nativa recusou: ${erro.message}`); return; } }
       else comPassoNoErro(i, op, args, () => fn(st, args, i));
+      leitura?.parar();
       if (pose) aplicarPoseDeCriacao(st, antes, pose);
     } finally {
       for (const mapa of rastreados) { delete mapa.set; delete mapa.delete; delete mapa.clear; }
+      if (leitura) { leitura.restaurar(); delete st.leitura; }
+    }
+    if (leitura) {
+      const resumo = leitura.resumo(existentes);
+      if (typeof OPCOES.aoLer === 'function') OPCOES.aoLer(i, registrada.nome, resumo);
+      if (OPCOES.leitura === 'conferido' && registrada.executar === OPS[registrada.nome]) {
+        /* `OPCOES.leituraDeclarada` confere outra tabela no lugar da do planejador: a declaração proposta, antes de entrar nela */
+        const divergencia = conferirLeituraDoPasso(registrada.nome, resumo, OPCOES.leituraDeclarada ?? undefined);
+        if (divergencia) throw new Error(`oficina: a leitura declarada de '${registrada.nome}' não cobre o que o passo ${i} leu: ${divergencia}`);
+      }
     }
     const { alvosF, alvosV, tocadosV, tocadosF, novosV, novosF } = st;
     st.alvosF = st.alvosV = st.tocadosV = st.tocadosF = st.novosV = st.novosF = null;
