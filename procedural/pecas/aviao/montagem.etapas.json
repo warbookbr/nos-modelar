@@ -1,65 +1,105 @@
 {
   "formato": "mecanifica.registro-de-etapas",
-  "versao": 2,
+  "versao": 3,
   "montagem": "aviao",
-  "etapas": [
+  "eventos": [
     {
+      "tipo": "aceite",
       "instancia": "fuselagem",
-      "estado": "fixa",
-      "juntas": [],
       "aceite": {
         "por": "a pessoa, 2026-10-15: aceitou a fuselagem como está depois da rodada 3, com o para-brisa rente ao casco e nota 9 sem defeito",
         "observacao": "pendências do esboço que seguem: a cintura da cabine e a ondulação da linha de baixo entre o capô e a cabine",
         "analise": "ausente"
       },
-      "forma": "sha256:3c396f5a936716be3d3a4199d16b9d9b5781d4b0cc4840b66aec58e9ab6f72e9",
-      "reaberturas": [
-        {
-          "por": "a pessoa",
-          "quando": "2026-10-15",
-          "motivo": "pediu o para-brisa rente ao casco, como as janelas, com a abertura recortada no casco e o montante apoiado no vidro de ponta a ponta, depois da correção do sombreamento",
-          "aceite": {
-            "por": "a pessoa, 2026-10-15: aceitou a fuselagem como está pela escolha 'Aceitar como está (Recomendado)', com o para-brisa anguloso, a ondulação da linha de baixo e a largura da cabine, que vêm do esboço aprovado, anotados como pendência",
-            "defeitosAceitos": [
-              "crítico não fechou: modelar — 3 defeito(s) apontado(s) na rodada 2.",
-              "fuselagem: espessura em cintura da cabine, z≈4700 a 5800",
-              "fuselagem: superficie em linha inferior entre capô e cabine, z≈2750 a 3900",
-              "parabrisa: superficie em ponta dianteira e borda inferior"
+      "impressao": {
+        "forma": "sha256:3c396f5a936716be3d3a4199d16b9d9b5781d4b0cc4840b66aec58e9ab6f72e9",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
             ],
-            "analise": "ausente"
-          },
-          "receita": "f5a41f9d8781598eee6a6ac1ab70474e4c10391e9932e8ef4f3061dc28345d99"
-        }
-      ]
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0,
+            0
+          ]
+        },
+        "juntas": [],
+        "citadas": [],
+        "anteriores": []
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "impressão de agora",
+        "portaNaoProvada": true,
+        "commit": "cce94b67e1933f6adb5eea8aa43bdfdc4f91c035"
+      }
     },
     {
+      "tipo": "aceite",
       "instancia": "motor",
-      "estado": "fixa",
-      "juntas": [],
       "aceite": {
         "por": "a pessoa, 2026-10-15: o motor aceito antes volta a fixo sem mudança, depois da fuselagem reaberta",
         "observacao": "pendências do esboço: o furo da boca de ar abre na face de trás do capô, que a fuselagem tapa, e a raiz dos escapes é lisa onde o esboço tem um leque de frisos",
         "analise": "ausente"
       },
-      "forma": "sha256:cf775b9f472cf0169e1fc2121020bab09c62d73f970442cb391ebdfb45c916dc",
-      "reaberturas": [
-        {
-          "por": "a pessoa",
-          "quando": "2026-10-15",
-          "motivo": "a fuselagem reabre para o para-brisa rente ao casco, e o motor, etapa posterior fixa, reabre antes pela regra do comando, sem mudança na peça",
-          "aceite": {
-            "por": "a pessoa, 2026-10-15: aceitou o motor como está, depois do crítico fechar com nota 8 na rodada 2",
-            "observacao": "pendências do esboço: o furo da boca de ar abre na face de trás do capô, que a fuselagem tapa, e a raiz dos escapes é lisa onde o esboço tem um leque de frisos",
-            "analise": "ausente"
-          },
-          "receita": "b9f848b2ed990ae88e7b5a47fc5a97e07419278f40092329318569835b8dd36d"
-        }
-      ]
+      "impressao": {
+        "forma": "sha256:cf775b9f472cf0169e1fc2121020bab09c62d73f970442cb391ebdfb45c916dc",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0,
+            0
+          ]
+        },
+        "juntas": [],
+        "citadas": [],
+        "anteriores": [
+          "fuselagem"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "impressão de agora",
+        "portaNaoProvada": true,
+        "commit": "cce94b67e1933f6adb5eea8aa43bdfdc4f91c035"
+      }
     },
     {
+      "tipo": "aceite",
       "instancia": "helice",
-      "estado": "fixa",
-      "juntas": [],
       "aceite": {
         "por": "a pessoa, 2026-10-15: aceitou a hélice como está pela escolha 'Aceitar como está (Recomendado)', depois da nota 9 na rodada 1",
         "observacao": "pendência da família: o contorno do perfil da pá sai em lados retos numa vista isolada, pela resolução da superfície aerodinâmica, igual no esboço",
@@ -69,57 +109,149 @@
         ],
         "analise": "ausente"
       },
-      "forma": "sha256:f48bbc6c2138a5bf84c026fc989231bc6b208e10afbdf6c9adc70e024440330d"
+      "impressao": {
+        "forma": "sha256:f48bbc6c2138a5bf84c026fc989231bc6b208e10afbdf6c9adc70e024440330d",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0,
+            0
+          ]
+        },
+        "juntas": [],
+        "citadas": [],
+        "anteriores": [
+          "fuselagem",
+          "motor"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "impressão de agora",
+        "portaNaoProvada": true,
+        "commit": "cce94b67e1933f6adb5eea8aa43bdfdc4f91c035"
+      }
     },
     {
+      "tipo": "aceite",
       "instancia": "asas",
-      "estado": "fixa",
-      "juntas": [],
       "aceite": {
         "por": "a pessoa, 2026-10-16",
         "analise": "ausente"
       },
-      "forma": "sha256:1986c46b0548e4360e314c61d28a73e3ca0855ca0385dad624fca869f8bc0755",
-      "reaberturas": [
-        {
-          "por": "a pessoa",
-          "quando": "2026-10-15",
-          "motivo": "rodada de ajustes antes da aprovação do avião (asas, empenagens e o desvio dos vãos que contornava a booleana)",
-          "aceite": {
-            "por": "a pessoa, 2026-10-15: aceitou as asas como estão, depois do crítico fechar com nota 9 sem defeito na rodada 1",
-            "observacao": "o esboço difere da referência real em quatro pontos (a ponta mais baixa, a ponta de cantos vivos, a raiz sem carenagem e os casulos que faltam sob as asas), que a pessoa pediu para ver antes de decidir",
-            "analise": "ausente"
-          },
-          "receita": "d525701c97092e100dfdbcfc71b225c0c90c1a536436e1f50c93d492c6a383e1"
-        }
-      ]
+      "impressao": {
+        "forma": "sha256:1986c46b0548e4360e314c61d28a73e3ca0855ca0385dad624fca869f8bc0755",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0,
+            0
+          ]
+        },
+        "juntas": [],
+        "citadas": [],
+        "anteriores": [
+          "fuselagem",
+          "motor",
+          "helice"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "impressão de agora",
+        "portaNaoProvada": true,
+        "commit": "62b0cf19c2b6453ea82d1b6c4785d6b6490b02d9"
+      }
     },
     {
+      "tipo": "aceite",
       "instancia": "empenagem-horizontal",
-      "estado": "fixa",
-      "juntas": [],
       "aceite": {
         "por": "a pessoa, 2026-10-16",
         "analise": "ausente"
       },
-      "forma": "sha256:cb12ffc3d4c7f50accca203c099a4ac7128333cf4762e1bea200cbe6653083b5",
-      "reaberturas": [
-        {
-          "por": "a pessoa",
-          "quando": "2026-10-15",
-          "motivo": "rodada de ajustes antes da aprovação do avião (asas, empenagens e o desvio dos vãos que contornava a booleana)",
-          "aceite": {
-            "por": "a pessoa, 2026-10-15: aceitou a empenagem horizontal depois da nota 9 sem defeito na rodada 1",
-            "analise": "ausente"
-          },
-          "receita": "5bc82422587fe055d899408e4adcfd14f7271b4f8745ddf6b535023956c807cb"
-        }
-      ]
+      "impressao": {
+        "forma": "sha256:cb12ffc3d4c7f50accca203c099a4ac7128333cf4762e1bea200cbe6653083b5",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0,
+            0
+          ]
+        },
+        "juntas": [],
+        "citadas": [],
+        "anteriores": [
+          "fuselagem",
+          "motor",
+          "helice",
+          "asas"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "impressão de agora",
+        "portaNaoProvada": true,
+        "commit": "62b0cf19c2b6453ea82d1b6c4785d6b6490b02d9"
+      }
     },
     {
+      "tipo": "aceite",
       "instancia": "empenagem-vertical",
-      "estado": "fixa",
-      "juntas": [],
       "aceite": {
         "por": "a pessoa, 2026-10-16: aceita como está, com a ponta fina do degrau do topo do leme faltando (110 mm, só no corte)",
         "defeitosAceitos": [
@@ -127,68 +259,154 @@
         ],
         "analise": "ausente"
       },
-      "forma": "sha256:b292e7f14ac68938e87bc93ec4d04d043d2e48a4acb13cb8abb2356c3e107bb2",
-      "reaberturas": [
-        {
-          "por": "a pessoa",
-          "quando": "2026-10-15",
-          "motivo": "rodada de ajustes antes da aprovação do avião (asas, empenagens e o desvio dos vãos que contornava a booleana)",
-          "aceite": {
-            "por": "a pessoa, 2026-10-15: aceitou a empenagem vertical pela escolha 'Aceitar as duas (Recomendado)', depois da nota 9 na rodada 1",
-            "observacao": "pendência: o vão do leme fica uns 4 mm adiantado numa altura, pelo deslocamento que contorna o canto solto da booleana",
-            "defeitosAceitos": [
-              "crítico não fechou: modelar — 1 defeito(s) apontado(s) na rodada 1.",
-              "deriva: posicao em vértice do V do recorte do vão no bordo de fuga, corte y 3300"
+      "impressao": {
+        "forma": "sha256:b292e7f14ac68938e87bc93ec4d04d043d2e48a4acb13cb8abb2356c3e107bb2",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
             ],
-            "analise": "ausente"
-          },
-          "receita": "efa735b22dc5a3e93d53785220f544eb957fd951e53525b96b37bce861a8bd07"
-        }
-      ]
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0,
+            0
+          ]
+        },
+        "juntas": [],
+        "citadas": [],
+        "anteriores": [
+          "fuselagem",
+          "motor",
+          "helice",
+          "asas",
+          "empenagem-horizontal"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "impressão de agora",
+        "portaNaoProvada": true,
+        "commit": "62b0cf19c2b6453ea82d1b6c4785d6b6490b02d9"
+      }
     },
     {
+      "tipo": "aceite",
       "instancia": "trem-do-nariz",
-      "estado": "fixa",
-      "juntas": [],
       "aceite": {
         "por": "a pessoa, 2026-10-16",
         "analise": "ausente"
       },
-      "forma": "sha256:222bf0d9f01db92039863599d746cd5f40917a987e2275e21283c23cf4a3c2d5",
-      "reaberturas": [
-        {
-          "por": "a pessoa",
-          "quando": "2026-10-15",
-          "motivo": "rodada de ajustes antes da aprovação do avião (asas, empenagens e o desvio dos vãos que contornava a booleana)",
-          "aceite": {
-            "por": "a pessoa, 2026-10-15",
-            "analise": "ausente"
-          },
-          "receita": "6b5b2cd95a17e7eb9f455722ce1210c0b9176ad635786b715fd80742e9b927f4"
-        }
-      ]
+      "impressao": {
+        "forma": "sha256:222bf0d9f01db92039863599d746cd5f40917a987e2275e21283c23cf4a3c2d5",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0,
+            0
+          ]
+        },
+        "juntas": [],
+        "citadas": [],
+        "anteriores": [
+          "fuselagem",
+          "motor",
+          "helice",
+          "asas",
+          "empenagem-horizontal",
+          "empenagem-vertical"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "impressão de agora",
+        "portaNaoProvada": true,
+        "commit": "62b0cf19c2b6453ea82d1b6c4785d6b6490b02d9"
+      }
     },
     {
+      "tipo": "aceite",
       "instancia": "trens-principais",
-      "estado": "fixa",
-      "juntas": [],
       "aceite": {
         "por": "a pessoa, 2026-10-16",
         "analise": "ausente"
       },
-      "forma": "sha256:4332a48b0b548a437511ac5e8b51f4dfd4f7bc206221024f48a4445e8e9f3fed",
-      "reaberturas": [
-        {
-          "por": "a pessoa",
-          "quando": "2026-10-15",
-          "motivo": "rodada de ajustes antes da aprovação do avião (asas, empenagens e o desvio dos vãos que contornava a booleana)",
-          "aceite": {
-            "por": "a pessoa, 2026-10-15",
-            "analise": "ausente"
-          },
-          "receita": "a035605ff8a4b141f7f3191111d3a1a3b71dbc69148b5f3fc9e5d5b52ec08565"
-        }
-      ]
+      "impressao": {
+        "forma": "sha256:4332a48b0b548a437511ac5e8b51f4dfd4f7bc206221024f48a4445e8e9f3fed",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0,
+            0
+          ]
+        },
+        "juntas": [],
+        "citadas": [],
+        "anteriores": [
+          "fuselagem",
+          "motor",
+          "helice",
+          "asas",
+          "empenagem-horizontal",
+          "empenagem-vertical",
+          "trem-do-nariz"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "impressão de agora",
+        "portaNaoProvada": true,
+        "commit": "62b0cf19c2b6453ea82d1b6c4785d6b6490b02d9"
+      }
     }
   ]
 }
