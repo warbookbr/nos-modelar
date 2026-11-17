@@ -94,7 +94,7 @@ Envio por git: USAR DIRETO. A rotina de envio é sensível e depende da sessão;
 
 ## Riscos e parada
 
-Se a prancha precisar de mais de cinco opções novas para cobrir os casos medidos, o comando está tentando fechar o que é aberto: para, e a pessoa decide entre cortar opções e deixar o caso para o script. Se uma rodada de modelador com o comando passar a gastar mais chamadas do que sem ele, a ferramenta volta ao desenho. A medição livre na foto não entra em nenhuma fatia; se a pessoa quiser trazê-la, é outro plano.
+Se a prancha precisar de mais de cinco opções novas para cobrir os casos medidos, o comando está tentando fechar o que é aberto: para, e a pessoa decide entre cortar opções e deixar o caso para o script. Em 2026-11-17 a prancha chegou a oito opções (as seis do Filtro, mais `--espelhar` da fatia 3 e `--copia` da fatia 4, que vieram dos casos medidos), e a pessoa aceitou as oito. Se uma rodada de modelador com o comando passar a gastar mais chamadas do que sem ele, a ferramenta volta ao desenho. A medição livre na foto não entra em nenhuma fatia; se a pessoa quiser trazê-la, é outro plano.
 
 ## Fechamento
 
