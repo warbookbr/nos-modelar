@@ -1,0 +1,269 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "carro-fastback/lataria",
+  "numero": 4,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/carro-fastback/referencias/lateral.prancha.svg",
+    "nota": 6.8,
+    "defeitos": [
+      {
+        "parte": "chapa",
+        "tipo": "superficie",
+        "onde": "lateral da porta, do lado esquerdo da vista direita",
+        "sentido": "segmentado",
+        "evidencia": "P6: a chapa não é lisa; a zebra de 0 grau na vista direita mostra laços fechados na lateral."
+      },
+      {
+        "parte": "chapa",
+        "tipo": "superficie",
+        "onde": "lateral da porta, do lado esquerdo da vista direita, e área do vidro lateral",
+        "sentido": "segmentado",
+        "evidencia": "P16: zebra 0 grau (direita-visao-zebra-enquadrado) com laços fechados e ondas na lateral e no vidro lateral; não é faceta, é ondulação."
+      }
+    ],
+    "observacao": "A silhueta bate com as três pranchas e com as fotos; o que pesa é a ondulação da chapa na zebra e as bordas serrilhadas das partes isoladas. P12, P13 e P18 não puderam ser julgadas."
+  },
+  "partes": [
+    {
+      "nome": "chapa",
+      "confere": false,
+      "observacao": "teto, coluna, degrau das lanternas, arco, vãos e degrau do ombro estão; a chapa não é lisa: a planta segue em polígono com filete e 7 falhas de ondulação, o índice subiu a 855"
+    },
+    {
+      "nome": "paralamaTraseiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rebaixoLateral",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "conferir-pontos reprovou por 0,7 mm: o z esperado vem do mínimo da tabela traseira e o canto obtido move com qualquer lei do flanco",
+    "mudança de 1 mm na traseira levou as faces finas de 1 para 7 (vão da lanterna e arco caem sobre vértices)",
+    "onde-ondula não dá a normal nem linhas; escrevi oráculo e linhas em tmp/carro-r5",
+    "a métrica de extremos da normal tem ruído de ±5 e não separa 41 de 48; falta zebra numérica por faixa de onda",
+    "cada variante pede cópia em tmp e 35 a 90 s; falta --params",
+    "vistas:critica levou 16 min de relógio",
+    "o ajuste da planta em clotoides por LM trava em mínimo local; não passou de 5,4 mm de desvio",
+    "nenhum gate mede ondulação longa (200 a 500 mm); o critério liso fica só com o crítico",
+    "os dois pedidos fechados deram 6,8 de novo (P16 de criterio e P6 de forma); a medida de controle confirmou as curvas da porta como causa (27 para 4 extremos), mas a reescrita parcial so levou a chapa de 48 para 41, dentro do ruido de 5",
+    "a planta em clotoides nao convergiu a 3 mm; sem ajuste de curva lisa no nucleo e sem zebra numerica, o ganho de lisura nao se mede de forma estavel; candidatos a plano",
+    "as pranchas lateral (304 mm) e traseira (210 mm) discordam na borda de baixo da traseira; a borda ficou reta em 304 e a decisao foi levada a pessoa"
+  ],
+  "notaDePassagem": "Rodada 5: níveis do flanco em reta mais degraus de quinto grau e queda em lei única, ajustados por mínimos quadrados (0,9 a 5,6 mm dos pontos), com o mesmo z em todos os níveis; borda de baixo reta em 304 (a prancha traseira a põe em 210, o que a lateral não comporta: decidir). Oráculo: 48 para 41 extremos de normal, ruído de ±5; índice da chapa 320 para 855. No controle a queda pchip era a maior fonte na porta (4 contra 27). Falta a planta em clotoides e o rebaixo por lei.",
+  "receita": {
+    "sha256": "sha256:30a7f08311f26624a7081ed1a23f978ed38e9aadad025873555f244c7cbec1ba",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 10,
+      "acrescentadas": 24,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "  /* RODADA 5. As leis do flanco, ajustadas por mínimos quadrados aos pontos da prancha acima (`soleira`, `baseDoRebaixo`, `topoDoRebaixo`, `ombro` e `queda` ficam como"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "   * os pontos de conferência: nenhum número de `leis` é lido deles na geometria). Cada nível é uma reta mais um ou dois degraus de quinto grau (C2, curvatura que sobe e"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "   * desce uma vez cada, sem as lombadas da poligonal alisada): y(z) = a + b z + soma de A S((za - z) / (za - zb)); o ajuste deixa a soleira a 0,9 mm dos pontos, a base do"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "   * rebaixo a 2,6, o topo a 1,1 e o ombro a 2,1. A queda é uma lei só em y: o encolhimento da base (S de y 170 a 300) e a curva que rola o ombro (potência 3 de `desde`,"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "   * curvatura que nasce de zero, misturada em S de `mistura` (820 a 1004) ao patamar `topo`), a 5,6 mm dos pontos lidos (a leitura da prancha tem 25 mm de erro). Medido no oráculo: a queda pchip alisada era a maior fonte de"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "   * ondulação na porta (variante de controle com a queda trocada por parábola: 22 extremos de normal em 6 linhas, contra 4). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "  leis: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "    soleira: { a: 170.2127, b: 0.0008, degraus: [[87.1059, -1100, -1925], [6.7404, -1900, -2100]] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "    baseDoRebaixo: { a: 395.6249, b: -0.004, degraus: [[312.3619, -425, -1300], [-15.9175, -1625, -2100]] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "    topoDoRebaixo: { a: 789.3445, b: -0.0182, degraus: [[72.4024, -200, -2100]] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "    ombro: { a: 957.0491, b: -0.0098, degraus: [[32.6342, -100, -450]] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "    queda: { base: { A: 28.568, de: 170, ate: 300 }, rola: { A: 182.189, desde: 550, fim: 1004, p: 3, mistura: 820, topo: 159.353 } },"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "  },"
+        },
+        {
+          "tipo": "-",
+          "linha": 48,
+          "texto": "  /* as alturas dos níveis no eixo do carro, atrás: o fundo, a base e o topo do rebaixo, o meio entre eles e a borda da tampa (o ombro) */"
+        },
+        {
+          "tipo": "-",
+          "linha": 49,
+          "texto": "  calota: { soleira: 333, base: 700, meio: 800, topo: 900, ombro: 1037 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "  /* as alturas dos níveis no eixo do carro, atrás: o fundo (304, a borda de baixo reta da traseira no nível em que a silhueta da prancha lateral a deixa em z -2282; a prancha traseira a desenha reta em 210, o que a lateral não comporta), a base e o topo do rebaixo, o meio entre eles e a borda da tampa (o ombro) */"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "  calota: { soleira: 304, base: 700, meio: 800, topo: 900, ombro: 1037 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 67,
+          "texto": "   * aba, a proporção da imagem de referência, que não é medida) e volta para fora pela lanterna até o para-choque (-2321 a y 760), como na prancha */"
+        },
+        {
+          "tipo": "-",
+          "linha": 68,
+          "texto": "  traseira: [[1037, -2210], [961, -2224], [900, -2190], [845, -2240], [760, -2321], [629, -2369], [570, -2375], [500, -2373], [416, -2350], [333, -2302]],"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "   * aba, a proporção da imagem de referência, que não é medida) e volta para fora pela lanterna até o para-choque (-2321 a y 760), como na prancha. Atrás a traseira é reta em -2375 de y 500 a 620 (a prancha lateral), e a borda de baixo desce até 304 em z -2282, onde a silhueta lateral a deixa */"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "  traseira: [[1037, -2210], [961, -2224], [900, -2190], [845, -2240], [760, -2321], [629, -2373], [570, -2375], [500, -2375], [416, -2350], [333, -2302], [304, -2282]],"
+        },
+        {
+          "tipo": "-",
+          "linha": 88,
+          "texto": "  arco: { z: -1375, y: 340, raio: 380, lados: 100 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "  arco: { z: -1375, y: 340, raio: 380, lados: 102 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 200,
+          "texto": "  const quedaDe = alisar(pchip(T.queda), A.queda);"
+        },
+        {
+          "tipo": "-",
+          "linha": 201,
+          "texto": "  const yBase = lisa(T.baseDoRebaixo); const yTopo = lisa(T.topoDoRebaixo);"
+        },
+        {
+          "tipo": "-",
+          "linha": 202,
+          "texto": "  const yOmbro = lisa(T.ombro); const ySoleira = lisa(T.soleira);"
+        },
+        {
+          "tipo": "+",
+          "linha": 213,
+          "texto": "  const nivelDa = ({ a, b, degraus }) => (z) => a + b * z + degraus.reduce((t, [h, za, zb]) => t + h * suave((za - z) / (za - zb)), 0);"
+        },
+        {
+          "tipo": "+",
+          "linha": 214,
+          "texto": "  const quedaDe = (y) => { const { base, rola } = T.leis.queda; const u = Math.max(0, (y - rola.desde) / (rola.fim - rola.desde)); const t = suave((y - rola.mistura) / (rola.fim - rola.mistura)); return base.A * suave((base.ate - y) / (base.ate - base.de)) + rola.A * (1 - t) * u ** rola.p + rola.topo * t; };"
+        },
+        {
+          "tipo": "+",
+          "linha": 215,
+          "texto": "  const yBase = nivelDa(T.leis.baseDoRebaixo); const yTopo = nivelDa(T.leis.topoDoRebaixo);"
+        },
+        {
+          "tipo": "+",
+          "linha": 216,
+          "texto": "  const yOmbro = nivelDa(T.leis.ombro); const ySoleira = nivelDa(T.leis.soleira);"
+        },
+        {
+          "tipo": "-",
+          "linha": 222,
+          "texto": "  const sobre = (u, d, y) => { const [z, x] = O.ponto(u); const [nz, nx] = O.normal(u); return [x + d * nx, y, z + d * nz]; };"
+        },
+        {
+          "tipo": "+",
+          "linha": 236,
+          "texto": "  const sobre = (u, d, y, w = 0) => { const [z, x] = O.ponto(u); const [nz, nx] = O.normal(u); return [x + d * ((1 - w) * -1 + w * nx), y, z + d * w * nz]; };"
+        },
+        {
+          "tipo": "-",
+          "linha": 270,
+          "texto": "    return P.sobre(u, d, y);"
+        },
+        {
+          "tipo": "+",
+          "linha": 284,
+          "texto": "    return P.sobre(u, d, y, w);"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes chapa, paralamaTraseiro, rebaixoLateral",
+    "imagens": [
+      "peca-frente-rasante-az0.png",
+      "peca-frente-rasante-az270.png",
+      "peca-lado-rasante-az180.png",
+      "peca-lado-rasante-az270.png",
+      "peca-topo-rasante-az270.png",
+      "peca-topo-rasante-az180.png",
+      "peca-tresquartos-rasante-az20.png",
+      "peca-tresquartos-rasante-az290.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  },
+  "registradaEm": "2026-11-17T14:44:40.371Z",
+  "facesFinas": {
+    "total": 1,
+    "porParte": {
+      "chapa": 1
+    }
+  }
+}

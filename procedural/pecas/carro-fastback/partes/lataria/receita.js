@@ -11,15 +11,16 @@
  * soleira à base da coluna os níveis correm pelo contorno da planta e dão a volta pela traseira até o eixo do carro, misturando suavemente a seção
  * do lado com o perfil da traseira no eixo. O arco, o vidro lateral, a lanterna e o vidro traseiro são vãos abertos na chapa pronta.
  *
- * NOTA PARA A PRÓXIMA ETAPA (rodada 2). A onda da rodada 1 vinha de três fontes, e cada uma tem o seu parâmetro: as tabelas lidas por pixel, que a
- * interpolação deixava com quebra de curvatura em cada ponto (agora alisadas por média gaussiana, `alisamento`); as seções com poucos pontos-chave
- * no sino do rebaixo e no rolo do ombro (`pontosChave.secao` e `.coroa`); e a cota exata das curvas, que fazia a superfície passar por todos os
- * pontos e ondular entre eles (`chapa.pesoDasCurvas`: com peso 1 ela só se aproxima deles, e as falhas caíram de 25 para 11). O degrau do ombro à
- * base da coluna é uma faixa própria da rede (o nível `coluna`, com vinco), e não um ponto-chave dentro da seção, que foi o que deu raio de 0,4 mm
- * na rodada 1; na volta da traseira o vinco do ombro é o da borda da tampa (0,2), porque ali a face de trás encontra o degrau em ângulo reto e a
- * nitidez do lado (0,5) fazia a espessura passar do raio. O vidro lateral tem a borda de baixo levada acima da base da coluna, para o corte não
- * pegar o degrau. Os vãos por contorno continuam só no lado +x: `aberturaPorContorno` não segue a simetria da chapa e `espelha` não solda a
- * costura, cujos vértices não ficam exatamente em x 0; o vidro traseiro, que cruza o eixo, sai inteiro. O spoiler fica fora desta etapa.
+ * RODADA 4. O degrau das lanternas entrou pelo perfil da traseira (`traseira`, recuo no nível `topo`), e a quina do ombro à coluna e a coroa ganharam
+ * `alisamento.quina`; `emendaG1` e `chapa.pesoPorCurva` ficam vazios (medidos, sem ganho: README do banco de provas e `rodadas/`).
+ * NOTA PARA A PRÓXIMA ETAPA (rodada 3). A rodada 2 tirou a onda das tabelas lidas por pixel (média gaussiana, `alisamento`), adensou o sino do
+ * rebaixo e o rolo do ombro (`pontosChave`), passou a só aproximar as curvas (`chapa.pesoDasCurvas`) e fez do degrau do ombro à coluna uma
+ * faixa própria da rede (o nível `coluna`, com vinco). A rodada 3 alisa as curvas da rede pelo núcleo (`alisarCurvas`), com 3 mm nas que
+ * passam pelo para-lama e pelo rebaixo e as outras sem alisar, e parte a seção no ombro (`partirSecaoEm`), porque o alisamento arredondava
+ * a dobra do vinco onde ela vira menos que o ângulo de canto; o índice do para-lama caiu de 809 para 86. O rebaixo some `folgaDoArco`
+ * antes da boca do arco, e a região dele acaba ali. O vidro lateral e a lanterna saem nos dois lados (simetria na abertura e costura exata
+ * na subdivisão); o vidro traseiro, que cruza o eixo, sai inteiro. A seção densa (10 pontos do topo do rebaixo ao ombro) estreita a faixa
+ * do vinco do ombro abaixo da espessura, e a subdivisão recusa. O spoiler fica fora desta etapa.
  *
  * A cadeia: a TABELA em mm; `derivar` calcula a pele, os nós, as curvas e os retalhos; `gerarPassos` converte para metro com `m()`. */
 import { gaiolaPorRede } from '../../../../nucleo/gaiola-por-rede.js';
@@ -33,7 +34,7 @@ export const TABELA = {
   /* a planta, [z, x, raio], a metade da silhueta da prancha superior da frente da porta ao eixo do carro atrás (o polígono com filete por vértice da prancha) */
   planta: [[1000, 915, 200], [300, 912, 5000], [-750, 912, 3000], [-950, 940, 300], [-1300, 950, 2000], [-1700, 930, 800], [-2050, 840, 800], [-2250, 690, 300], [-2340, 400, 400], [-2372, 120, 600], [-2379, 0, 4000]],
   /* o alisamento das curvas, desvio da média gaussiana em mm: a planta ao longo do contorno, as tabelas ao comprimento, a queda do ombro e o perfil da traseira na altura */
-  alisamento: { planta: 40, comprimento: 120, teto: 100, queda: 20, perfil: 30 },
+  alisamento: { planta: 40, comprimento: 120, teto: 100, queda: 20, perfil: 50, quina: 120 },
   /* a queda do ombro: quanto a seção sai para dentro da meia largura da planta em cada altura, [y, mm], lida da seção traseira (952 a y 600, 795 a y 978) */
   queda: [[170, 30], [210, 22], [300, 0], [600, 0], [758, 12], [827, 47], [932, 107], [978, 157], [1010, 160]],
   /* as alturas dos níveis ao comprimento, [z, y]: a soleira (a borda de baixo), a base e o topo do rebaixo e o ombro (cintura na porta, ombro do para-lama atrás) */
@@ -41,35 +42,65 @@ export const TABELA = {
   baseDoRebaixo: [[0, 395], [-618, 420], [-1000, 640], [-1250, 715], [-2050, 700]],
   topoDoRebaixo: [[0, 790], [-724, 811], [-1023, 836], [-1300, 860], [-2050, 900]],
   ombro: [[0, 955], [-657, 996], [-1000, 1000], [-1300, 1004], [-2050, 1008]],
+  /* RODADA 5. As leis do flanco, ajustadas por mínimos quadrados aos pontos da prancha acima (`soleira`, `baseDoRebaixo`, `topoDoRebaixo`, `ombro` e `queda` ficam como
+   * os pontos de conferência: nenhum número de `leis` é lido deles na geometria). Cada nível é uma reta mais um ou dois degraus de quinto grau (C2, curvatura que sobe e
+   * desce uma vez cada, sem as lombadas da poligonal alisada): y(z) = a + b z + soma de A S((za - z) / (za - zb)); o ajuste deixa a soleira a 0,9 mm dos pontos, a base do
+   * rebaixo a 2,6, o topo a 1,1 e o ombro a 2,1. A queda é uma lei só em y: o encolhimento da base (S de y 170 a 300) e a curva que rola o ombro (potência 3 de `desde`,
+   * curvatura que nasce de zero, misturada em S de `mistura` (820 a 1004) ao patamar `topo`), a 5,6 mm dos pontos lidos (a leitura da prancha tem 25 mm de erro). Medido no oráculo: a queda pchip alisada era a maior fonte de
+   * ondulação na porta (variante de controle com a queda trocada por parábola: 22 extremos de normal em 6 linhas, contra 4). */
+  leis: {
+    soleira: { a: 170.2127, b: 0.0008, degraus: [[87.1059, -1100, -1925], [6.7404, -1900, -2100]] },
+    baseDoRebaixo: { a: 395.6249, b: -0.004, degraus: [[312.3619, -425, -1300], [-15.9175, -1625, -2100]] },
+    topoDoRebaixo: { a: 789.3445, b: -0.0182, degraus: [[72.4024, -200, -2100]] },
+    ombro: { a: 957.0491, b: -0.0098, degraus: [[32.6342, -100, -450]] },
+    queda: { base: { A: 28.568, de: 170, ate: 300 }, rola: { A: 182.189, desde: 550, fim: 1004, p: 3, mistura: 820, topo: 159.353 } },
+  },
   /* o degrau da seção traseira entre o ombro e a base da coluna (805 a y 1000 para 745 a y 1014): uma faixa de chapa própria da rede, de `largura` para dentro e `subida` para cima,
    * que dá a volta pela traseira como a borda da tampa; `folgaDoVidro` é quanto a borda de baixo do vidro lateral fica acima da base da coluna */
   degrau: { largura: 55, subida: 14, folgaDoVidro: 8 },
-  /* as alturas dos níveis no eixo do carro, atrás: o fundo, a base e o topo do rebaixo, o meio entre eles e a borda da tampa (o ombro) */
-  calota: { soleira: 333, base: 700, meio: 800, topo: 900, ombro: 1037 },
+  /* as alturas dos níveis no eixo do carro, atrás: o fundo (304, a borda de baixo reta da traseira no nível em que a silhueta da prancha lateral a deixa em z -2282; a prancha traseira a desenha reta em 210, o que a lateral não comporta), a base e o topo do rebaixo, o meio entre eles e a borda da tampa (o ombro) */
+  calota: { soleira: 304, base: 700, meio: 800, topo: 900, ombro: 1037 },
   /* quanto a seção da porta cai mais para dentro que a do para-lama no ombro, mm */
   ombroDaPorta: 12,
-  /* o rebaixo côncavo: a profundidade máxima na porta (mm), e de onde ela começa a morrer até onde some (z) */
-  rebaixo: { profundidade: 20, cheioAte: -300, someEm: -1150 },
+  /* o rebaixo côncavo: a profundidade máxima na porta (mm), de onde ela começa a morrer (z), e a folga (mm) entre onde ela some e a boca da
+   * frente do arco da roda (z do eixo mais o raio): o rebaixo morre antes do arco, e a região dele acaba onde ele some */
+  rebaixo: { profundidade: 20, cheioAte: -300, folgaDoArco: 60 },
+  /* o alisamento das curvas da rede (`alisarCurvas`), o maior deslocamento de um ponto-chave em mm: o das curvas que passam pelo para-lama
+   * ou pelo rebaixo, que a pessoa soltou até 3 mm (o ruído delas passa de 1 mm), e o das outras (`resto`, até 1 mm pela decisão; null as
+   * deixa sem alisar). Medido na rodada 3 com a seção partida no ombro: com 1 mm no resto a chapa sai com índice 326 e 10 falhas, sem
+   * alisar o resto 304 e 9, e o para-lama e o rebaixo iguais (86 e 25,5); as curvas do resto são as da coluna, da quina, da borda da tampa
+   * e do perfil da traseira, que vão ao limite de 1 mm arredondando a feição, e por isso ficam sem alisar */
+  alisarCurvas: { resto: null, regioes: 3 },
   /* a quina do teto e a coluna, [z, x, y]: do teto sobre a porta, o vidro lateral traseiro e a coluna caindo até a tampa */
   quinaDoTeto: [[0, 598, 1262], [-400, 588, 1288], [-800, 595, 1262], [-1200, 630, 1135], [-1600, 520, 1090], [-2050, 430, 1049]],
   /* o eixo do carro, a linha do teto à tampa, [z, y]: o teto sobre a porta, o pico, a queda do fastback e a tampa */
   teto: [[0, 1346], [-320, 1381], [-728, 1341], [-1000, 1300], [-1132, 1269], [-1500, 1168], [-1893, 1050], [-2000, 1041], [-2050, 1040], [-2170, 1038], [-2210, 1037]],
-  /* o perfil da traseira no eixo do carro, [y, z]: de cima para baixo, da borda da tampa ao fundo; a calota desloca cada nível por ele */
-  traseira: [[1037, -2210], [961, -2224], [881, -2241], [845, -2258], [760, -2321], [629, -2369], [570, -2375], [500, -2373], [416, -2350], [333, -2302]],
+  /* o perfil da traseira no eixo do carro, [y, z]: de cima para baixo, da borda da tampa ao fundo; a calota desloca cada nível por ele. O degrau das
+   * lanternas: abaixo da quina da aba (961, -2224, na silhueta da prancha lateral) a faixa recua até o nível `topo` (900, -2190, uns 35 mm para dentro da
+   * aba, a proporção da imagem de referência, que não é medida) e volta para fora pela lanterna até o para-choque (-2321 a y 760), como na prancha. Atrás a traseira é reta em -2375 de y 500 a 620 (a prancha lateral), e a borda de baixo desce até 304 em z -2282, onde a silhueta lateral a deixa */
+  traseira: [[1037, -2210], [961, -2224], [900, -2190], [845, -2240], [760, -2321], [629, -2373], [570, -2375], [500, -2375], [416, -2350], [333, -2302], [304, -2282]],
   /* a coroa do teto, expoente da seção entre a quina do teto e o eixo (a seção traseira: 3 mm a 300 de 590, 30 mm a 487, de uma queda de 93 até a quina) */
   coroa: 5.5,
   /* as estações ao comprimento, z; a última é onde começa a calota da traseira */
   estacoes: [0, -400, -800, -1200, -1600, -1850],
-  /* os pontos-chave entre os nós: o espaçamento ao comprimento e na volta da calota (mm), quantos em cada vão da seção, de baixo para cima até a quina, e as frações
-   * da quina em que a coroa do teto é lida, mais juntas perto da quina, onde ela cai */
-  pontosChave: { comprimento: 100, calota: 90, secao: [3, 3, 3, 5, 0, 4], coroa: [0.92, 0.84, 0.75, 0.65, 0.5, 0.33, 0.16] },
-  /* os vincos: o ombro (a borda de fora do degrau), a base da coluna (a borda de dentro do degrau), a quina do teto e a borda da tampa (o ombro na volta da traseira,
-   * mais macio porque ali a face de trás encontra o degrau em ângulo reto), nitidez de 0 a 1 */
-  vincos: { ombro: 0.5, coluna: 0.3, quinaDoTeto: 0.4, bordaDaTampa: 0.2 },
-  /* o arco da roda traseira: centro no eixo traseiro, raio da prancha (pneu de 340 mais 40) */
-  arco: { z: -1375, y: 340, raio: 380, lados: 96 },
-  /* as partes por região da chapa, caixas [min, max] em mm: o para-lama saliente (atrás da porta, sobre o arco) e o rebaixo da lateral (do meio da porta até morrer no arco); o rebaixo vale onde as duas se sobrepõem */
-  partes: { paralama: { min: [780, 250, -1950], max: [960, 1010, -900] }, rebaixo: { min: [780, 380, -1150], max: [960, 840, 1] } },
+  /* os pontos-chave entre os nós: o espaçamento ao comprimento, na volta da calota e no perfil da traseira (mm), quantos em cada vão da seção,
+   * de baixo para cima até a quina, e as frações da quina em que a coroa do teto é lida, mais juntas perto da quina, onde ela cai. Mais
+   * densos, o alisamento das curvas anda menos (as linhas, menos de 1,2 mm), mas a seção densa estreita a faixa do vinco do ombro abaixo da
+   * espessura (raio de 1,1 mm) e as linhas densas subiram o índice da chapa de 326 para 364 */
+  pontosChave: { comprimento: 100, calota: 90, perfil: 60, secao: [3, 3, 3, 5, 0, 4], coroa: [0.92, 0.84, 0.75, 0.65, 0.5, 0.33, 0.16] },
+  /* os níveis em que a seção se parte em curvas, para o alisamento não arredondar a dobra do vinco que ela cruza: só o ombro, que tirou o
+   * índice do para-lama de 239 para 86 e o da chapa de 373 para 326; partida também na coluna e na quina, a chapa subiu a 454 */
+  partirSecaoEm: ['ombro'],
+  /* as curvas que declaram a emenda lisa de tangente comum (`continuidade: 'G1'` da rede) e o deslocamento que se tolera (mm); vazio, nenhuma */
+  emendaG1: { curvas: [], tolerancia: 1 },
+  /* topoDaCalota: o vinco da quina do degrau das lanternas, no nível `topo` da volta da traseira (só a calota, o lado da porta não tem); medido: sem ele o
+   * índice da caixa da traseira vai de 345 a 1025, com ele (0,3 ou 0,5) a 418 */
+  vincos: { ombro: 0.5, coluna: 0.3, quinaDoTeto: 0.4, bordaDaTampa: 0.2, topoDaCalota: 0.3 },
+  /* o arco da roda traseira: centro no eixo traseiro, raio da prancha (pneu de 340 mais 40), e os lados do polígono do corte (com 96, um vértice
+   * dele caía a 0,4 mm de um da chapa perto do topo do arco e deixava uma face fina em cada lado) */
+  arco: { z: -1375, y: 340, raio: 380, lados: 102 },
+  /* as partes por região da chapa, caixas [min, max] em mm: o para-lama saliente (atrás da porta, sobre o arco) e o rebaixo da lateral (do meio da porta até onde ele some, antes do arco: a caixa dele só dá x e y atrás, e o z de trás sai de `ondeORebaixoSome`); o rebaixo vale onde as duas se sobrepõem */
+  partes: { paralama: { min: [780, 250, -1950], max: [960, 1010, -900] }, rebaixo: { min: [780, 380], max: [960, 840, 1] } },
   /* o vão do vidro lateral traseiro, [z, y] do contorno da prancha lateral (a borda de fora da moldura); a borda de baixo sobe até a base da coluna mais a folga */
   vidroLateral: [[-703, 1001], [-692, 1009], [-702, 1247], [-712, 1258], [-719, 1258], [-910, 1218], [-1008, 1190], [-1199, 1121], [-1211, 1102], [-1205, 1091], [-1128, 1045], [-1084, 1031], [-911, 1013]],
   /* o vão do vidro traseiro, a metade [z, x, raio] da prancha superior (a borda de cima, a lateral e o canto de baixo), espelhada no eixo do carro */
@@ -168,18 +199,25 @@ export function contornoDaPlanta(planta, sigma) {
   return { ponto, normal, deZ, total, zFim: meia[meia.length - 1][0] };
 }
 
+/** O z em que o rebaixo some: a folga antes da boca da frente do arco da roda. */
+export const ondeORebaixoSome = (T) => T.arco.z + T.arco.raio + T.rebaixo.folgaDoArco;
+
+/** As caixas das regiões em mm: a do rebaixo acaba, atrás, onde ele some. */
+export const caixasDasPartes = (T) => ({ paralama: T.partes.paralama, rebaixo: { min: [...T.partes.rebaixo.min, ondeORebaixoSome(T)], max: T.partes.rebaixo.max } });
+
 /** A pele analítica da TABELA: as funções de que os pontos-chave das curvas saem. */
 export function pele(T) {
   const A = T.alisamento;
   const O = contornoDaPlanta(T.planta, A.planta);
   const lisa = (tab, s = A.comprimento) => alisar(pchip(tab), s);
-  const quedaDe = alisar(pchip(T.queda), A.queda);
-  const yBase = lisa(T.baseDoRebaixo); const yTopo = lisa(T.topoDoRebaixo);
-  const yOmbro = lisa(T.ombro); const ySoleira = lisa(T.soleira);
+  const nivelDa = ({ a, b, degraus }) => (z) => a + b * z + degraus.reduce((t, [h, za, zb]) => t + h * suave((za - z) / (za - zb)), 0);
+  const quedaDe = (y) => { const { base, rola } = T.leis.queda; const u = Math.max(0, (y - rola.desde) / (rola.fim - rola.desde)); const t = suave((y - rola.mistura) / (rola.fim - rola.mistura)); return base.A * suave((base.ate - y) / (base.ate - base.de)) + rola.A * (1 - t) * u ** rola.p + rola.topo * t; };
+  const yBase = nivelDa(T.leis.baseDoRebaixo); const yTopo = nivelDa(T.leis.topoDoRebaixo);
+  const yOmbro = nivelDa(T.leis.ombro); const ySoleira = nivelDa(T.leis.soleira);
   const yTeto = lisa(T.teto, A.teto);
-  const zx = lisa(T.quinaDoTeto.map(([z, x]) => [z, x])); const zy = lisa(T.quinaDoTeto.map(([z, , y]) => [z, y]));
+  const zx = lisa(T.quinaDoTeto.map(([z, x]) => [z, x]), A.quina ?? A.comprimento); const zy = lisa(T.quinaDoTeto.map(([z, , y]) => [z, y]), A.quina ?? A.comprimento);
   const zEixo = alisar(pchip(T.traseira.map(([y, z]) => [y, z])), A.perfil);
-  const { profundidade, cheioAte, someEm } = T.rebaixo;
+  const { profundidade, cheioAte } = T.rebaixo; const someEm = ondeORebaixoSome(T);
   const fundo = (z) => profundidade * suave((z - someEm) / (cheioAte - someEm));
   const rebaixo = (z, y) => {
     const b = yBase(z); const t = yTopo(z);
@@ -195,12 +233,28 @@ export function pele(T) {
   const R = (z) => [zx(z), zy(z)];
   const coroa = (z, x) => { const [xr, yr] = R(z); return yTeto(z) - (yTeto(z) - yr) * (x / xr) ** T.coroa; };
   /* o ponto 3D do contorno de arco u recuado de d pela normal, na altura y */
-  const sobre = (u, d, y) => { const [z, x] = O.ponto(u); const [nz, nx] = O.normal(u); return [x + d * nx, y, z + d * nz]; };
+  const sobre = (u, d, y, w = 0) => { const [z, x] = O.ponto(u); const [nz, nx] = O.normal(u); return [x + d * ((1 - w) * -1 + w * nx), y, z + d * w * nz]; };
   return { O, quedaDe, yBase, yTopo, yOmbro, ySoleira, yTeto, R, fundo, rebaixo, recuo, coroa, zEixo, sobre };
 }
 
 const NIVEIS = ['soleira', 'base', 'meio', 'topo', 'ombro', 'coluna', 'quina', 'eixo'];
 const LADO = 6; /* os níveis que correm pelo contorno da planta e dão a volta pela traseira: da soleira à coluna */
+
+/** Uma caixa [min, max] em mm contém o ponto [x, y, z] em mm. */
+const naCaixa = (p, { min, max }) => p.every((c, k) => c >= min[k] && c <= max[k]);
+
+/** A opção `alisarCurvas` da rede, da TABELA: a tolerância das curvas que têm ponto-chave nas regiões do para-lama ou do rebaixo (as caixas
+ * de `partes`), que a pessoa soltou até `regioes` mm, e a das outras (`resto`; null as deixa sem alisar); sem `alisarCurvas` na TABELA, nada. */
+function alisamentoDasCurvas(T, curvas, nos) {
+  const A = T.alisarCurvas;
+  if (!A) return {};
+  const ponto = (p) => (typeof p === 'string' ? nos[p] : p);
+  const C = caixasDasPartes(T);
+  const nasRegioes = curvas.filter((c) => c.pontos.some((p) => naCaixa(ponto(p), C.paralama) || naCaixa(ponto(p), C.rebaixo)));
+  const porCurva = Object.fromEntries(nasRegioes.map((c) => [c.nome, A.regioes]));
+  if (A.resto == null) return { alisarCurvas: { tolerancia: A.regioes, curvas: nasRegioes.map((c) => c.nome) } };
+  return { alisarCurvas: { tolerancia: A.resto, toleranciaPorCurva: porCurva } };
+}
 
 /** A gaiola por rede de curvas: os nós em mm, as curvas ao comprimento e as seções, os retalhos. */
 export function derivar(T) {
@@ -227,7 +281,7 @@ export function derivar(T) {
     const dl = j === 5 ? P.recuo(z, yLado(4, z)) + D.largura : P.recuo(z, yl);
     const y = (1 - w) * yl + w * yCentro[j];
     const d = (1 - w) * dl + w * recuoCentro(j);
-    return P.sobre(u, d, y);
+    return P.sobre(u, d, y, w);
   };
   const cima = (j, z) => (j === 6 ? [...P.R(z), z] : [0, P.yTeto(z), z]);
   const nos = {};
@@ -236,25 +290,38 @@ export function derivar(T) {
   zs.forEach((z, i) => { const u = O.deZ(z); NIVEIS.forEach((k, j) => { nos[nome(i, j)] = fixo(j < LADO ? nivel(j, u) : cima(j, z)); }); });
   NIVEIS.slice(0, LADO).forEach((k, j) => { nos[`t_${k}`] = fixo([0, yCentro[j], P.zEixo(yCentro[Math.min(j, 4)]) + (j === 5 ? D.largura : 0)]); });
 
-  /* a seção de uma estação: os pontos-chave entre os nós, na pele (do lado, pela altura) e em linha da coluna à quina */
-  const secao = (i) => {
+  /* a seção de uma estação, vão por vão (o vão j vai do nível j ao j + 1): os pontos-chave de dentro do vão, na pele (do lado, pela altura),
+   * em linha da coluna à quina e na coroa do teto */
+  const dentroDoVao = (i, j) => {
     const z = zs[i]; const u = O.deZ(z); const pts = [];
-    const K = T.pontosChave.secao;
-    for (let j = 0; j < LADO; j += 1) {
-      pts.push(nome(i, j));
-      const a = nos[nome(i, j)]; const b = nos[nome(i, j + 1)];
-      for (let q = 1; q <= K[j]; q += 1) {
-        const f = q / (K[j] + 1);
-        if (j < 4) { const y = a[1] + (b[1] - a[1]) * f; pts.push(P.sobre(u, P.recuo(z, y), y)); } else pts.push(a.map((c, k) => c + (b[k] - c) * f));
-      }
+    const a = nos[nome(i, j)]; const b = nos[nome(i, j + 1)];
+    if (j === 6) { const xr = a[0]; for (const f of T.pontosChave.coroa) { const x = xr * f; pts.push([x, P.coroa(z, x), z]); } return pts; }
+    const K = T.pontosChave.secao[j];
+    for (let q = 1; q <= K; q += 1) {
+      const f = q / (K + 1);
+      if (j < 4) { const y = a[1] + (b[1] - a[1]) * f; pts.push(P.sobre(u, P.recuo(z, y), y)); } else pts.push(a.map((c, k) => c + (b[k] - c) * f));
     }
-    pts.push(nome(i, 6));
-    const xr = nos[nome(i, 6)][0];
-    for (const f of T.pontosChave.coroa) { const x = xr * f; pts.push([x, P.coroa(z, x), z]); }
-    pts.push(nome(i, 7));
     return pts;
   };
-  const curvas = zs.map((z, i) => ({ nome: `S${i}`, pontos: secao(i) }));
+  /* a seção é partida em curvas nos níveis de `partirSecaoEm`, onde cruza um vinco: o alisamento das curvas trata cada trecho à parte e não
+   * arredonda a dobra do vinco, que nas estações em que ela vira menos que o ângulo de canto da rede (35 graus; o ombro vira de 28 a 68)
+   * ele arredondaria até a tolerância, cada estação de um jeito. Na estação da traseira a quina não parte, porque o trecho da coluna ao
+   * eixo é um lado só da tampa (o retalho de três lados). */
+  const cortesDe = (i) => T.partirSecaoEm.map((k) => NIVEIS.indexOf(k)).filter((j) => !(i === iJ && j === 6));
+  const trechosDe = (i) => {
+    const c = cortesDe(i); const limites = [0, ...c, NIVEIS.length - 1];
+    return limites.slice(0, -1).map((de, k) => ({ nome: k === 0 ? `S${i}` : `S${i}${NIVEIS[de]}`, de, ate: limites[k + 1] }));
+  };
+  /* o nome da curva da seção i que contém o vão j */
+  const secaoDoVao = (i, j) => trechosDe(i).find((t) => j >= t.de && j < t.ate).nome;
+  const curvas = [];
+  zs.forEach((z, i) => {
+    for (const t of trechosDe(i)) {
+      const pts = [nome(i, t.de)];
+      for (let j = t.de; j < t.ate; j += 1) pts.push(...dentroDoVao(i, j), nome(i, j + 1));
+      curvas.push({ nome: t.nome, pontos: pts });
+    }
+  });
 
   /* as linhas ao comprimento: um ponto-chave a cada `pontosChave.comprimento` mm entre as estações */
   const vincosDe = { 4: T.vincos.ombro, 5: T.vincos.coluna, 6: T.vincos.quinaDoTeto };
@@ -278,7 +345,7 @@ export function derivar(T) {
     const pts = [nome(iJ, j)];
     for (let q = 1; q < nVolta; q += 1) pts.push(nivel(j, uJ + ((uFim - uJ) * q) / nVolta));
     pts.push(`t_${NIVEIS[j]}`);
-    const vinco = j === 4 ? T.vincos.bordaDaTampa : vincosDe[j];
+    const vinco = j === 4 ? T.vincos.bordaDaTampa : j === 3 ? T.vincos.topoDaCalota : vincosDe[j];
     curvas.push({ nome: `Q${j}`, pontos: pts, ...(vinco ? { vinco } : {}) });
   }
 
@@ -288,7 +355,7 @@ export function derivar(T) {
     perfil.push(`t_${NIVEIS[j]}`);
     if (j === 0) break;
     const a = nos[`t_${NIVEIS[j]}`][1]; const b = nos[`t_${NIVEIS[j - 1]}`][1];
-    const k = j === 5 ? 0 : Math.max(0, Math.round((a - b) / 60) - 1);
+    const k = j === 5 ? 0 : Math.max(0, Math.round((a - b) / T.pontosChave.perfil) - 1);
     for (let s = 1; s <= k; s += 1) { const y = a + ((b - a) * s) / (k + 1); perfil.push([0, y, P.zEixo(y)]); }
   }
   curvas.push({ nome: 'perfilDaTraseira', pontos: perfil });
@@ -302,17 +369,19 @@ export function derivar(T) {
   const lado = (curva, de, ate) => ({ curva, de, ate });
   for (let i = 0; i < iJ; i += 1) {
     for (let j = 0; j < NIVEIS.length - 1; j += 1) {
-      retalhos.push({ nome: `r${i}_${NIVEIS[j]}`, borda: [lado(`L${j}`, nome(i, j), nome(i + 1, j)), lado(`S${i + 1}`, nome(i + 1, j), nome(i + 1, j + 1)), lado(`L${j + 1}`, nome(i + 1, j + 1), nome(i, j + 1)), lado(`S${i}`, nome(i, j + 1), nome(i, j))] });
+      retalhos.push({ nome: `r${i}_${NIVEIS[j]}`, borda: [lado(`L${j}`, nome(i, j), nome(i + 1, j)), lado(secaoDoVao(i + 1, j), nome(i + 1, j), nome(i + 1, j + 1)), lado(`L${j + 1}`, nome(i + 1, j + 1), nome(i, j + 1)), lado(secaoDoVao(i, j), nome(i, j + 1), nome(i, j))] });
     }
   }
   for (let j = 0; j < LADO - 1; j += 1) {
-    retalhos.push({ nome: `c_${NIVEIS[j]}`, borda: [lado(`Q${j}`, nome(iJ, j), `t_${NIVEIS[j]}`), lado('perfilDaTraseira', `t_${NIVEIS[j]}`, `t_${NIVEIS[j + 1]}`), lado(`Q${j + 1}`, `t_${NIVEIS[j + 1]}`, nome(iJ, j + 1)), lado(`S${iJ}`, nome(iJ, j + 1), nome(iJ, j))] });
+    retalhos.push({ nome: `c_${NIVEIS[j]}`, borda: [lado(`Q${j}`, nome(iJ, j), `t_${NIVEIS[j]}`), lado('perfilDaTraseira', `t_${NIVEIS[j]}`, `t_${NIVEIS[j + 1]}`), lado(`Q${j + 1}`, `t_${NIVEIS[j + 1]}`, nome(iJ, j + 1)), lado(secaoDoVao(iJ, j), nome(iJ, j + 1), nome(iJ, j))] });
   }
-  retalhos.push({ nome: 'c_tampa', borda: [lado(`S${iJ}`, nome(iJ, 5), nome(iJ, 7)), lado('Qeixo', nome(iJ, 7), 't_coluna'), lado('Q5', 't_coluna', nome(iJ, 5))] });
+  retalhos.push({ nome: 'c_tampa', borda: [lado(secaoDoVao(iJ, 5), nome(iJ, 5), nome(iJ, 7)), lado('Qeixo', nome(iJ, 7), 't_coluna'), lado('Q5', 't_coluna', nome(iJ, 5))] });
 
   /* com `pesoDasCurvas`, a superfície só se aproxima dos pontos das curvas por mínimos quadrados, em vez de passar por eles: a interpolação exata de muitos pontos ondula */
-  const pesadas = T.chapa.pesoDasCurvas ? curvas.map((c) => ({ ...c, peso: T.chapa.pesoDasCurvas })) : curvas;
-  const rede = gaiolaPorRede({ passo: T.chapa.passo, anguloMax: T.chapa.anguloMax, fora: [1, 0, 0], simetria: 'x', nos, curvas: pesadas, retalhos, ...(T.chapa.liso ? { liso: T.chapa.liso } : {}) });
+  const comPeso = T.chapa.pesoDasCurvas ? curvas.map((c) => ({ ...c, peso: T.chapa.pesoPorCurva?.[c.nome] ?? T.chapa.pesoDasCurvas })) : curvas;
+  const G1 = T.emendaG1.curvas;
+  const pesadas = G1.length ? comPeso.map((c) => (G1.includes(c.nome) ? { ...c, continuidade: 'G1' } : c)) : comPeso;
+  const rede = gaiolaPorRede({ passo: T.chapa.passo, anguloMax: T.chapa.anguloMax, fora: [1, 0, 0], simetria: 'x', nos, curvas: pesadas, retalhos, ...(T.chapa.liso ? { liso: T.chapa.liso } : {}), ...(G1.length ? { limitesDaEmenda: { tolerancia: T.emendaG1.tolerancia } } : {}), ...alisamentoDasCurvas(T, curvas, nos) });
   return { rede, P, zs };
 }
 
@@ -372,14 +441,14 @@ export function gerarPassos(T) {
   const L = T.lanterna;
   const arco = furoDoArco(T);
   return [
-    ['subdivisao', { origemId: 1, ...rede.passo, borda: 'cantos', niveis: T.chapa.niveis, espessura: m(T.chapa.espessura) }],
+    ['subdivisao', { origemId: 1, ...rede.passo, borda: 'cantos', niveis: T.chapa.niveis, espessura: m(T.chapa.espessura), costuraExata: true }],
     ...arco.passos,
-    ['aberturaPorContorno', { origemId: 4, chapa: ARCO, vista: 'x', sentido: '+', contorno: contornoDe(vidroLateralSobreODegrau(T, P)) }],
-    ['aberturaPorContorno', { origemId: 5, chapa: VIDRO, vista: 'z', contorno: contornoDe(retanguloArredondado(L.x0, L.x1, L.y0, L.y1, L.raio)) }],
+    ['aberturaPorContorno', { origemId: 4, chapa: ARCO, vista: 'x', sentido: '+', simetria: 'x', contorno: contornoDe(vidroLateralSobreODegrau(T, P)) }],
+    ['aberturaPorContorno', { origemId: 5, chapa: VIDRO, vista: 'z', simetria: 'x', contorno: contornoDe(retanguloArredondado(L.x0, L.x1, L.y0, L.y1, L.raio)) }],
     ['aberturaPorContorno', { origemId: 6, chapa: LANTERNA, vista: 'y', sentido: '+', contorno: contornoComFilete(vidroTraseiroInteiro(T)) }],
     ['parte', { nome: 'chapa', sel: VIDRO_TRASEIRO }],
-    ['parte', { nome: 'paralamaTraseiro', substituir: true, sel: { regiao: caixa(T.partes.paralama) } }],
-    ['parte', { nome: 'rebaixoLateral', substituir: true, sel: { regiao: caixa(T.partes.rebaixo) } }],
+    ['parte', { nome: 'paralamaTraseiro', substituir: true, sel: { regiao: caixa(caixasDasPartes(T).paralama) } }],
+    ['parte', { nome: 'rebaixoLateral', substituir: true, sel: { regiao: caixa(caixasDasPartes(T).rebaixo) } }],
   ];
 }
 
@@ -390,6 +459,18 @@ export const PONTOS = [
   { nome: 'canto de cima da frente da chapa: o teto sobre a porta, no corte de z 0', parte: 'chapa', medida: 'maximo', em: [TABELA.planta[3][1] - 10, TABELA.teto[1][1], 0], toleranciaMm: 6 },
 ];
 
+/* O que só esta peça diz ao pacote do crítico: as pranchas estão no referencial do carro em mm (o quarto traseiro cai sobre a metade de
+ * trás delas), a superior desenha o comprimento na horizontal e gira 90 graus para casar com a vista de cima, e a foto lateral, gerada
+ * por IA e guardada em `referencias/locais/` fora do git, olha do lado +x, com a frente à esquerda. */
+export const CRITICA = {
+  pranchas: {
+    'lateral.prancha.svg': { referencial: true },
+    'traseira.prancha.svg': { referencial: true },
+    'superior.prancha.svg': { girar: 90, referencial: true },
+  },
+  referencias: { 'lateral.png': 'direita', 'traseira.png': 'traseira' },
+};
+
 const receita = {
   meta: { nome: 'carro-fastback/lataria', desc: 'o quarto traseiro do cupê fastback: chapa contínua do meio da porta para trás, com para-lama saliente, rebaixo, coluna, arco e vãos' },
   PARAMS: TABELA,
@@ -397,10 +478,10 @@ const receita = {
   get TOPO() { return { origem: 'o centro do carro no chão: x para a direita, y para cima, a frente em +z', ...derivar(this.PARAMS).rede.pontos }; },
   PLANO: {
     objeto: 'o quarto traseiro de um cupê fastback de 4750 mm, do meio da porta para trás, lado +x',
-    referencias: ['../../referencias/lateral.prancha.svg', '../../referencias/traseira.prancha.svg', '../../referencias/superior.prancha.svg'],
+    referencias: ['../../referencias/lateral.prancha.svg', '../../referencias/traseira.prancha.svg', '../../referencias/superior.prancha.svg', '../../referencias/locais/lateral.png', '../../referencias/locais/traseira.png'],
     escala: { medida: 'comprimento total do carro, de z -2375 a 2375', milimetros: 4750 },
     partes: [
-      { nome: 'chapa', forma: 'chapa contínua de 2 mm do meio da porta à traseira, lisa, com teto, coluna caindo até a tampa, quina da traseira, arco da roda, degrau do ombro à coluna e os vãos do vidro lateral, da lanterna e do vidro traseiro', tecnica: 'subdivisao de uma gaiolaPorRede cujas arestas seguem as curvas da prancha, com os vãos por furoPassante e aberturaPorContorno' },
+      { nome: 'chapa', forma: 'chapa contínua de 2 mm do meio da porta à traseira, lisa, com teto, coluna até a tampa, quina, arco, degrau do ombro, degrau das lanternas (aba da tampa sobre a faixa recuada) e os vãos de vidro e lanterna', tecnica: 'subdivisao de uma gaiolaPorRede cujas arestas seguem as curvas da prancha, com os vãos por furoPassante e aberturaPorContorno' },
       { nome: 'paralamaTraseiro', forma: 'a faixa da chapa do para-lama traseiro, que sai 38 mm sobre a linha da porta vista de cima, sem moldura de arco', tecnica: 'região da mesma chapa, da pele analítica da planta (meia largura 950 contra 912)' },
       { nome: 'rebaixoLateral', forma: 'o rebaixo côncavo em cunha da lateral, do meio da porta até morrer antes do arco, sob o vinco do ombro', tecnica: 'região da mesma chapa, com um sino de profundidade entre a base e o topo do rebaixo' },
     ],
@@ -410,11 +491,13 @@ const receita = {
       'o rebaixo da lateral é convexo, ou continua além do arco traseiro, ou some antes da porta',
       'falha de ondulação fora das saliências declaradas, quina do ombro sem raio, ou aresta facetada',
       'o vão do vidro lateral, o arco da roda ou o vão da lanterna ausentes, ou a coluna sem cair até a tampa',
+      'a traseira sem o degrau das lanternas: a tampa que não termina em aba sobre a faixa recuada dos vãos, ou a chapa que não volta para fora abaixo dela',
     ],
-    lataria: { partes: ['chapa'] },
+    /* as três partes são a mesma chapa: a curvatura da lataria as lê juntas (só com 'chapa', o para-lama e o rebaixo saíam cinza, sem dado) */
+    lataria: { partes: ['chapa', 'paralamaTraseiro', 'rebaixoLateral'] },
     saliencias: [
       { regiao: { min: [780, 250, -1950], max: [960, 1010, -700] }, sentido: 'fora', amplitudeMm: 38, motivo: 'o para-lama traseiro sai 38 mm sobre a linha da porta (950 contra 912 de meia largura, vista de cima), sem moldura, por desenho' },
-      { regiao: { min: [780, 380, -1200], max: [960, 840, 1] }, sentido: 'dentro', amplitudeMm: 20, motivo: 'o rebaixo côncavo em cunha da lateral, da porta ao arco traseiro, sob o vinco do ombro, é feição de dupla curvatura desenhada' },
+      { regiao: caixasDasPartes(TABELA).rebaixo, sentido: 'dentro', amplitudeMm: TABELA.rebaixo.profundidade, motivo: 'o rebaixo côncavo em cunha da lateral, da porta até morrer antes do arco traseiro, sob o vinco do ombro, é feição de dupla curvatura desenhada' },
     ],
   },
   PONTOS,
