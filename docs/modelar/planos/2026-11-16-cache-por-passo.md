@@ -66,4 +66,13 @@ Se a linha de base mostrar que a execução não é a maior fatia do tempo do la
 
 ## Fechamento
 
-A preencher.
+Fechado em 2026-11-17. O cache por prefixo guarda em `tmp/cache-por-prefixo/` o estado depois dos passos escolhidos pelo custo, e o `descrever`, a captura da bancada e a medida de contatos recomeçam dele; a página da bancada lê o neutro que a ativação gravou em vez de executar a receita de novo, e `--sem-cache` desliga tudo. O uso está em [`CACHE-POR-PASSO.md`](../usar/CACHE-POR-PASSO.md).
+
+Cada item do gate de saída tem prova registrada, na [pasta do plano](../banco-de-provas/cache-por-passo-2026-11-16/README.md):
+
+1. Malha idêntica com e sem cache em todo o acervo: `CACHE_ACERVO_INTEIRO=1 npx vitest run procedural/nucleo/planejador/cache-por-prefixo-acervo.test.mjs` deu o mesmo neutro nas 121 receitas (676 s, no commit `558350aa`), e o CI roda o conjunto de cobertura de 24 s pelo modo conferido.
+2. Mudar um passo refaz só ele e os seguintes: `cache-por-prefixo.test.mjs` conta os passos executados (a edição do último executa só ele; a receita de oito cubos refaz seis passos ao mudar o terceiro); os 21 testes passaram de novo na fusão de 2026-11-17.
+3. O laço da bicicleta caiu de 74,6 s para 32,0 s (−57 %, mediana de três, carga anotada), e o do quarto traseiro do carro, de 30 passos executados por laço para 2.
+4. A chave inclui a versão do código, a Manifold e o prefixo: o estado de outra versão e o do processo sem a Manifold não são servidos, e o ponto de outra receita só serve com o mesmo prefixo, por teste em `cache-por-prefixo.test.mjs`.
+
+O que o plano não fez: a leitura declarada ficou como diagnóstico e não governa o cache; estreitar as operações que varrem a malha e a execução paralela das partes independentes ficam no backlog; e as limitações conhecidas da fatia 4 (trava com pid reaproveitado, leitura síncrona do neutro pesado, varredura de sessões por idade, a captura do quarto traseiro sem prova por imagem) estão no README do banco de provas e na documentação de uso. A varredura inteira do gate 1 não foi repetida depois da fatia 4, que não mudou o núcleo; a prova por imagem da captura está em `prova-da-captura.jsonl`.

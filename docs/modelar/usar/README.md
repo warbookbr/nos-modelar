@@ -45,6 +45,8 @@ custa minutos; descobrir depois já custou doze rodadas neste repositório.
 [`METODO-DIAGNOSTICO-E-SEU-LIMITE.md`](METODO-DIAGNOSTICO-E-SEU-LIMITE.md) diz
 onde "observar, medir, corrigir" acha defeito para sempre sem a forma andar.
 
+[`CACHE-POR-PASSO.md`](CACHE-POR-PASSO.md) diz como o cache por passo da receita se liga, onde mora, como limpá-lo e como desligá-lo com `--sem-cache`; serve quando um comando repetido sobre a mesma peça parece lento ou serve um resultado suspeito.
+
 [`CONFERIR-CONTRA-REFERENCIA.md`](CONFERIR-CONTRA-REFERENCIA.md): com foto e sem
 prancha, `npm run conferir:referencia` mede a borda em milímetro e separa erro
 de inclinação de erro de altura.
