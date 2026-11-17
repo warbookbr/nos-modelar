@@ -59,9 +59,9 @@ Leitor de Gerber: fora, no nos-mecatronica.
 
 ## Fatias
 
-1. A família com cinco encapsulamentos de forma diferente (resistor axial, eletrolítico, TO-220, DIP, conector em barra), com teste e a prancha para a pessoa.
-2. Os encapsulamentos restantes e o dissipador.
-3. A placa declarada, com a placa de prova.
+1. Feita em 2026-11-16, aprovada pela pessoa: a família com cinco encapsulamentos de forma diferente (resistor axial, eletrolítico, TO-220, DIP, conector em barra), com teste e a prancha para a pessoa.
+2. Feita em 2026-11-17, aprovada pela pessoa: os encapsulamentos restantes e o dissipador (treze perfis novos, medidas de fonte primária).
+3. Feita em 2026-11-17: a placa declarada (`placa.js`, `terminais.js`), com a placa de prova de 16 componentes, furos e ilhas, componentes nas duas faces e as peças publicadas com os nomes de campo da ficha 1.0 da ponte; a imagem espera a aprovação da pessoa.
 4. A placa de controle do braço robótico na caixa lateral da base, com imagem para a pessoa.
 5. Documentação, banco de provas e fechamento.
 
