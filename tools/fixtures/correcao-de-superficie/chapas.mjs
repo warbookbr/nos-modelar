@@ -113,8 +113,8 @@ export function pontosDosRetalhos(g) {
 export const ALISAMENTO_DE_PROVA = Object.freeze({ tolerancia: 2.5 });
 
 /** A receita da rede: a superfície (sem espessura, uma pele) em nível 2, com uma parte por retalho. */
-function receitaDeRede(nome, { ruido, alisarCurvas = null }) {
-  const g = gaiolaPorRede(definicaoDaRede({ ruido, alisarCurvas }));
+function receitaDeRede(nome, { ruido, alisarCurvas = null }, marcas) {
+  const g = gaiolaPorRede({ ...definicaoDaRede({ ruido, alisarCurvas }), ...marcas });
   const grupos = Object.entries(pontosDosRetalhos(g)).map(([r, pontos]) => ({ nome: r, pontos }));
   return {
     meta: { nome: `correcao-de-superficie/${nome}`, desc: `painel de prova da gaiola por rede ${ruido ? `com as curvas digitadas com ruído de ${AMPLITUDE_DO_RUIDO_MM} mm${alisarCurvas ? ', alisadas pela opção alisarCurvas' : ''}` : 'sem ruído, o de controle'}` },
@@ -164,8 +164,8 @@ export function definicaoDaChapaSimetrica({ passo = 60 } = {}) {
 
 const m = (mm) => mm / 1000;
 
-function receitaDaChapaSimetrica(nome, { espelhada }) {
-  const g = gaiolaPorRede(definicaoDaChapaSimetrica());
+function receitaDaChapaSimetrica(nome, { espelhada }, marcas) {
+  const g = gaiolaPorRede({ ...definicaoDaChapaSimetrica(), ...marcas });
   const { z0, z1, y0, y1 } = VAO;
   const contorno = { inicio: [m(z0), m(y0)], trechos: [{ reto: [m(z1), m(y0)] }, { reto: [m(z1), m(y1)] }, { reto: [m(z0), m(y1)] }, { reto: [m(z0), m(y0)] }] };
   return {
@@ -252,10 +252,10 @@ export function definicaoDaEmenda(nome, { passo = 30, continuidade = null } = {}
   };
 }
 
-function receitaDaEmenda(nome) {
+function receitaDaEmenda(nome, marcas) {
   const declarada = EMENDAS_DECLARADAS[nome] ?? null;
   const e = EMENDAS[declarada ? declarada.de : nome];
-  const g = gaiolaPorRede(definicaoDaEmenda(declarada ? declarada.de : nome, declarada ? { continuidade: declarada.continuidade } : {}));
+  const g = gaiolaPorRede({ ...definicaoDaEmenda(declarada ? declarada.de : nome, declarada ? { continuidade: declarada.continuidade } : {}), ...marcas });
   const grupos = Object.entries(pontosDosRetalhos(g)).map(([r, pontos]) => ({ nome: r, pontos }));
   return {
     meta: { nome: `correcao-de-superficie/${nome}`, desc: declarada
@@ -314,8 +314,8 @@ export function definicaoPontaComPonta({ continuidade = null, passo = 25, declar
   };
 }
 
-function receitaPontaComPonta(nome) {
-  const g = gaiolaPorRede(definicaoPontaComPonta({ continuidade: 'G1' }));
+function receitaPontaComPonta(nome, marcas) {
+  const g = gaiolaPorRede({ ...definicaoPontaComPonta({ continuidade: 'G1' }), ...marcas });
   const grupos = Object.entries(pontosDosRetalhos(g)).map(([r, pontos]) => ({ nome: r, pontos }));
   return {
     meta: { nome: `correcao-de-superficie/${nome}`, desc: 'chapa de prova de quatro retalhos com a curva V e as duas metades da horizontal, que se encontram ponta com ponta no meio de V, declaradas G1' },
@@ -381,9 +381,81 @@ export function definicaoTresNoNo({ dz = [30, 30], ordem = 1, passo = 25 } = {})
   };
 }
 
+/* ---------- as superfícies analíticas ---------- */
+
+/* a distância (mm, com sinal: positiva para o lado de fora) do ponto p ao paraboloide y = -(x² + z²) / (2 R), pelo pé da perpendicular
+   achado por Gauss-Newton a partir de (x, z) do ponto */
+function distanciaAoParaboloide(p, R) {
+  let x = p[0], z = p[2];
+  for (let k = 0; k < 30; k++) {
+    const f = -(x * x + z * z) / (2 * R), fx = -x / R, fz = -z / R;
+    const r1 = f - p[1]; const g0 = x - p[0] + fx * r1, g1 = z - p[2] + fz * r1;
+    const a = 1 + fx * fx, b = fx * fz, c = 1 + fz * fz, det = a * c - b * b;
+    const dx = (c * g0 - b * g1) / det, dz = (a * g1 - b * g0) / det;
+    x -= dx; z -= dz;
+    if (Math.abs(dx) + Math.abs(dz) < 1e-12) break;
+  }
+  const f = -(x * x + z * z) / (2 * R);
+  return Math.sign(p[1] - f) * Math.hypot(x - p[0], f - p[1], z - p[2]);
+}
+
+/** As superfícies analíticas do gate de continuidade (fatia 5): três formas lisas em todo ponto, de dupla curvatura, em que nenhuma
+ *  declaração de continuidade tem o que corrigir, e que por isso toda opção de continuidade precisa deixar onde estão. `ponto(a, b)` dá o
+ *  ponto (mm) no parâmetro (a, b) de [0, 1]², `distancia(p)` a distância exata (mm, com sinal, positiva para fora) de um ponto à
+ *  superfície, `aBorda(p)` quanto o ponto está para dentro da borda livre (mm, sobre a superfície) e `fora` o sentido da chapa. O paraboloide tem raio de curvatura 0,4 m no topo e a calota, 0,5 m, as duas em 400 por 400 mm;
+ *  o toro (raio maior 0,5 m e do tubo 0,2 m, eixo y) vai de -25 a 25 graus em volta do eixo e de 20 a 140 graus no tubo, e por isso tem
+ *  curvatura gaussiana positiva por fora e negativa por cima do tubo, com a linha de curvatura nula no meio. */
+export const SUPERFICIES_ANALITICAS = Object.freeze({
+  paraboloide: {
+    ponto: (a, b) => { const x = 400 * (a - 0.5), z = 400 * (b - 0.5); return [x, -(x * x + z * z) / 800, z]; },
+    distancia: (p) => distanciaAoParaboloide(p, 400), fora: [0, 1, 0], aBorda: (p) => 200 - Math.max(Math.abs(p[0]), Math.abs(p[2])),
+  },
+  calota: {
+    ponto: (a, b) => { const x = 400 * (a - 0.5), z = 400 * (b - 0.5); return [x, Math.sqrt(500 ** 2 - x * x - z * z) - 500, z]; },
+    distancia: (p) => Math.hypot(p[0], p[1] + 500, p[2]) - 500, fora: [0, 1, 0], aBorda: (p) => 200 - Math.max(Math.abs(p[0]), Math.abs(p[2])),
+  },
+  toro: {
+    ponto: (a, b) => { const t = ((-25 + 50 * a) * Math.PI) / 180, f = ((20 + 120 * b) * Math.PI) / 180; const r = 500 + 200 * Math.cos(f); return [r * Math.sin(t), 200 * Math.sin(f), r * Math.cos(t)]; },
+    distancia: (p) => Math.hypot(Math.hypot(p[0], p[2]) - 500, p[1]) - 200, fora: [0, 1, 0.2],
+    aBorda: (p) => {
+      const t = Math.atan2(p[0], p[2]); const f = Math.atan2(p[1], Math.hypot(p[0], p[2]) - 500);
+      return Math.min(((25 * Math.PI) / 180 - Math.abs(t)) * Math.hypot(p[0], p[2]), Math.min(f - (20 * Math.PI) / 180, (140 * Math.PI) / 180 - f) * 200);
+    },
+  },
+});
+
+/** definicaoAnalitica(nome, { continuidade, passo, pontos }): a rede de quatro retalhos sobre a superfície analítica `nome`, com as curvas
+ *  h0 a h2 (b constante) e v0 a v2 (a constante) a cada meio do parâmetro e `pontos` trechos por curva, os pontos-chave tirados da
+ *  função; com `continuidade`, as duas curvas de dentro (h1 e v1, que se cruzam no nó N11) a declaram. */
+export function definicaoAnalitica(nome, { continuidade = null, passo = 25, pontos = 8 } = {}) {
+  const S = SUPERFICIES_ANALITICAS[nome];
+  if (!S) throw new Error(`superfície analítica '${nome}' não existe; use ${Object.keys(SUPERFICIES_ANALITICAS).join(', ')}`);
+  const nos = {};
+  for (const i of [0, 1, 2]) for (const j of [0, 1, 2]) nos[`N${i}${j}`] = S.ponto(i / 2, j / 2);
+  const curva = (nomeDaCurva, fixo, aoLongoDeA) => ({
+    nome: nomeDaCurva,
+    pontos: Array.from({ length: pontos + 1 }, (_, k) => {
+      const s = k / pontos;
+      if (k % (pontos / 2) === 0) return aoLongoDeA ? `N${2 * s}${2 * fixo}` : `N${2 * fixo}${2 * s}`;
+      return aoLongoDeA ? S.ponto(s, fixo) : S.ponto(fixo, s);
+    }),
+    ...(continuidade && fixo === 0.5 ? { continuidade } : {}),
+  });
+  const q = (i, j) => ({
+    nome: `q${i}${j}`,
+    borda: [{ curva: `h${j}`, de: `N${i}${j}`, ate: `N${i + 1}${j}` }, { curva: `v${i + 1}`, de: `N${i + 1}${j}`, ate: `N${i + 1}${j + 1}` },
+      { curva: `h${j + 1}`, de: `N${i + 1}${j + 1}`, ate: `N${i}${j + 1}` }, { curva: `v${i}`, de: `N${i}${j + 1}`, ate: `N${i}${j}` }],
+  });
+  return {
+    passo, fora: S.fora, nos,
+    curvas: [0, 0.5, 1].map((b, k) => curva(`h${k}`, b, true)).concat([0, 0.5, 1].map((a, k) => curva(`v${k}`, a, false))),
+    retalhos: [q(0, 0), q(1, 0), q(0, 1), q(1, 1)],
+  };
+}
+
 /* a receita de uma rede de prova sem superfície declarada por função: uma parte por retalho */
-function receitaDeRedeSimples(nome, definicao, objeto, milimetros) {
-  const g = gaiolaPorRede(definicao);
+function receitaDeRedeSimples(nome, definicao, objeto, milimetros, marcas) {
+  const g = gaiolaPorRede({ ...definicao, ...marcas });
   const grupos = Object.entries(pontosDosRetalhos(g)).map(([r, pontos]) => ({ nome: r, pontos }));
   return {
     meta: { nome: `correcao-de-superficie/${nome}`, desc: objeto },
@@ -408,17 +480,19 @@ function planoDeProva(objeto, milimetros, partes) {
   };
 }
 
-/** receitaDeProva(nome): a receita da chapa de prova `nome`. */
-export function receitaDeProva(nome) {
-  if (nome === 'rede-com-ruido') return receitaDeRede(nome, { ruido: true });
-  if (nome === 'rede-sem-ruido') return receitaDeRede(nome, { ruido: false });
-  if (nome === 'rede-alisada') return receitaDeRede(nome, { ruido: true, alisarCurvas: ALISAMENTO_DE_PROVA });
-  if (nome === 'chapa-simetrica') return receitaDaChapaSimetrica(nome, { espelhada: false });
-  if (nome === 'chapa-simetrica-espelhada') return receitaDaChapaSimetrica(nome, { espelhada: true });
-  if (Object.hasOwn(EMENDAS, nome) || Object.hasOwn(EMENDAS_DECLARADAS, nome)) return receitaDaEmenda(nome);
-  if (nome === 'rede-ponta-com-ponta') return receitaPontaComPonta(nome);
-  if (nome === 'rede-em-fila') return receitaDeRedeSimples(nome, definicaoEmFila({ declaracoes: DECLARACOES_EM_FILA }), 'três chapas de prova em fila sobre um paraboloide, a G2 declarada numa curva e a G1 na vizinha', 600);
-  if (nome === 'rede-tres-no-no') return receitaDeRedeSimples(nome, definicaoTresNoNo(), 'chapa de prova com três curvas no nó da curva emendada, duas delas empatadas', 400);
+/** receitaDeProva(nome, { marcarCurvas }): a receita da chapa de prova `nome`; com `marcarCurvas: true`, a rede leva as curvas ao passo
+ *  (`marcarCurvas` de `gaiolaPorRede`) e o neutro marca as arestas delas, para `medida-na-curva.mjs`; sem ela, a receita é a de sempre. */
+export function receitaDeProva(nome, { marcarCurvas = false } = {}) {
+  const m = marcarCurvas ? { marcarCurvas: true } : {};
+  if (nome === 'rede-com-ruido') return receitaDeRede(nome, { ruido: true }, m);
+  if (nome === 'rede-sem-ruido') return receitaDeRede(nome, { ruido: false }, m);
+  if (nome === 'rede-alisada') return receitaDeRede(nome, { ruido: true, alisarCurvas: ALISAMENTO_DE_PROVA }, m);
+  if (nome === 'chapa-simetrica') return receitaDaChapaSimetrica(nome, { espelhada: false }, m);
+  if (nome === 'chapa-simetrica-espelhada') return receitaDaChapaSimetrica(nome, { espelhada: true }, m);
+  if (Object.hasOwn(EMENDAS, nome) || Object.hasOwn(EMENDAS_DECLARADAS, nome)) return receitaDaEmenda(nome, m);
+  if (nome === 'rede-ponta-com-ponta') return receitaPontaComPonta(nome, m);
+  if (nome === 'rede-em-fila') return receitaDeRedeSimples(nome, definicaoEmFila({ declaracoes: DECLARACOES_EM_FILA }), 'três chapas de prova em fila sobre um paraboloide, a G2 declarada numa curva e a G1 na vizinha', 600, m);
+  if (nome === 'rede-tres-no-no') return receitaDeRedeSimples(nome, definicaoTresNoNo(), 'chapa de prova com três curvas no nó da curva emendada, duas delas empatadas', 400, m);
   throw new Error(`chapa de prova '${nome}' não existe; use ${CHAPAS_DE_PROVA.join(', ')}`);
 }
 

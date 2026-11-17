@@ -25,6 +25,8 @@
  *     dos pontos-chave das curvas antes de montar a gaiola, com os nós fixos; tolerancia é o maior deslocamento em mm (1 por padrão).
  *   limitesDaEmenda: { tolerancia?, toleranciaPorCurva?, angulo?, razao? } os limites da continuidade declarada, que dão aviso: o quanto a
  *     declaração pode mover a gaiola (mm, 1 por padrão) e o ângulo (0,5 grau) e a razão de curvatura (1,5, na G2) medidos nela.
+ *   marcarCurvas: true põe as curvas em `passo.curvas`, e o passo `subdivisao` marca no neutro (`chapas[k].curvas`) as arestas que descendem
+ *     de cada uma, para a medida da emenda ler a curva declarada; a malha não muda.
  * devolve: { pontos, passo, linha(curva), pontoDaCurva, linhas, nos, curvas, retalhos, densidades, extraordinarios, avisos, emendas?, ... }.
  * exemplo:
  *   gaiolaPorRede({ passo: 50, fora: [0, 1, 0], nos: { A: [0, 0, 0], B: [200, 0, 0], C: [200, 0, 200], D: [0, 0, 200] },
@@ -87,6 +89,9 @@
  *   em O ALISAMENTO DAS CURVAS. Sem ele (o padrão), as curvas passam pelos pontos-chave como foram escritos.
  * limitesDaEmenda: { tolerancia, toleranciaPorCurva: { curva: mm }, angulo, razao }: os limites da emenda declarada, descritos em A EMENDA
  *   DECLARADA; vale só com uma curva com `continuidade`.
+ * marcarCurvas: true acrescenta ao passo `curvas`, um { nome, pontos, continuidade? } por trecho usado de cada curva (os nomes de ponto ao
+ *   longo dele, como os de `vincos`), que o passo `subdivisao` leva à malha e grava no neutro, em `chapas[k].curvas`, sem mudar a geometria:
+ *   é o que deixa a medida da emenda achar a curva declarada, que a malha sozinha não carrega. Sem ela (o padrão), o passo é o de sempre.
  *
  * O PREENCHIMENTO. Os pontos da borda de cada retalho são os das curvas, à mesma distância de arco um do outro em cada arco.
  * No retalho de quatro lados o interior é a interpolação transfinita de Coons: P(u, v) = (1-v) A(u) + v C(u) + (1-u) D(v) + u B(v)
@@ -813,7 +818,9 @@ export function gaiolaPorRede(definicaoDada) {
       retalhos: definicaoDada.retalhos.flatMap((r) => (r && alt.acrescentar?.retalhos?.[r.nome] ? alt.acrescentar.retalhos[r.nome] : [r])),
     }
     : definicaoDada;
-  exigirCampos(definicao, ['curvas', 'nos', 'retalhos', 'passo', 'anguloMax', 'fora', 'leitura', 'interior', 'liso', 'anguloDeCanto', 'cantos', 'simetria', 'prefixo', 'alisarCurvas', 'limitesDaEmenda'], 'a definição da rede');
+  exigirCampos(definicao, ['curvas', 'nos', 'retalhos', 'passo', 'anguloMax', 'fora', 'leitura', 'interior', 'liso', 'anguloDeCanto', 'cantos', 'simetria', 'prefixo', 'alisarCurvas', 'limitesDaEmenda', 'marcarCurvas'], 'a definição da rede');
+  const marcarCurvas = definicao.marcarCurvas ?? false;
+  if (marcarCurvas !== true && marcarCurvas !== false) falha(`marcarCurvas é ${JSON.stringify(marcarCurvas)}; precisa ser true (as curvas vão ao passo e o neutro marca as arestas que descendem delas) ou false`);
   const { simetria = null, prefixo = '' } = definicao;
   if (simetria !== null && simetria !== 'x') falha("simetria só aceita 'x'");
   if (typeof prefixo !== 'string') falha('prefixo precisa ser texto');
@@ -1414,13 +1421,11 @@ export function gaiolaPorRede(definicaoDada) {
     for (const [campo, v] of [['de', de], ['ate', ate]]) if (v != null && !(typeof v === 'string' && nos.has(v) && nos.get(v).curvas.has(curvaNome))) falha(`linha(): ${campo} ${JSON.stringify(v)} não é nó da curva ${citar(curvaNome)}`);
     return cadeiaDaCurva(curvaNome, de ?? null, ate ?? null, `linha(${citar(curvaNome)})`);
   };
-  const vincos = [];
-  for (const [nome, c] of curvas) {
-    if (c.decl.vinco == null) continue;
+  /* os trechos contíguos de arcos usados de uma curva, cada um a lista dos nomes de ponto ao longo dele */
+  const trechosUsados = (nome, c) => {
     const { arcos: lista2 } = arcosDaCurva.get(nome);
     const usadosDaCurva = lista2.map((a) => a.usos.length > 0);
-    if (!usadosDaCurva.some(Boolean)) continue;
-    /* trechos contíguos de arcos usados */
+    if (!usadosDaCurva.some(Boolean)) return [];
     const trechos = [];
     let atual = [];
     for (let k = 0; k < lista2.length; k++) {
@@ -1428,11 +1433,24 @@ export function gaiolaPorRede(definicaoDada) {
     }
     if (atual.length) trechos.push(atual);
     if (c.fechada && trechos.length > 1 && usadosDaCurva[0] && usadosDaCurva[lista2.length - 1]) { const ultimo = trechos.pop(); trechos[0] = [...ultimo, ...trechos[0]]; }
-    trechos.forEach((t, k) => {
+    return trechos.map((t) => {
       const ids = [];
       for (const a of t) { const v = verticesDoArco.get(a.id); ids.push(...(ids.length ? v.slice(1) : v)); }
-      vincos.push({ nome: trechos.length > 1 ? pref(`${nome}.${k + 1}`) : pref(nome), pontos: ids, nitidez: c.decl.vinco });
+      return ids;
     });
+  };
+  const vincos = [];
+  for (const [nome, c] of curvas) {
+    if (c.decl.vinco == null) continue;
+    const trechos = trechosUsados(nome, c);
+    trechos.forEach((ids, k) => vincos.push({ nome: trechos.length > 1 ? pref(`${nome}.${k + 1}`) : pref(nome), pontos: ids, nitidez: c.decl.vinco }));
+  }
+  /* marcarCurvas: toda curva com arco usado vai ao passo como curva declarada (`curvas` da subdivisão), um trecho por entrada */
+  const curvasMarcadas = [];
+  if (marcarCurvas) {
+    for (const [nome, c] of curvas) {
+      for (const ids of trechosUsados(nome, c)) curvasMarcadas.push({ nome: pref(nome), pontos: ids, ...(c.decl.continuidade ? { continuidade: c.decl.continuidade } : {}) });
+    }
   }
   const linhasDasCurvas = {};
   for (const [nome] of curvas) {
@@ -1642,6 +1660,7 @@ export function gaiolaPorRede(definicaoDada) {
   const passo = { vertices: [...vertices], faces: facesComNomes, vincos: vincos.map((v) => ({ nome: v.nome, pontos: v.pontos, nitidez: v.nitidez })) };
   if (cantos.size) passo.cantos = vertices.filter((v) => cantos.has(v));
   if (medidas.length) passo.medidas = medidas;
+  if (marcarCurvas) passo.curvas = curvasMarcadas;
   if (simetria) {
     const negativos = vertices.filter((p) => pontos[p][0] < -1e-9);
     if (negativos.length) {
