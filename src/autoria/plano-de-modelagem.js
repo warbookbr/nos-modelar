@@ -24,6 +24,7 @@
  * um retrato de execução. */
 
 import { criteriosDe, FAMILIAS_DE_OBJETO } from '../../procedural/criterios/index.js';
+import { ehCategoriaDeObjeto, IDS_DECLARAVEIS } from './categorias-de-objeto.js';
 import { normalizarLataria } from './lataria.js';
 import { normalizarDobrasAceitas } from './dobras-aceitas.js';
 import { normalizarSaliencias } from './saliencias-declaradas.js';
@@ -42,8 +43,9 @@ export const CAMPOS_PLANO = Object.freeze([
    (`dobras-aceitas.js`): as réguas de superfície não os contam e os listam como aceitos. `saliencias` lista a saliência e o rebaixo de dupla curvatura que a peça desenha de
    propósito, com região, sentido e amplitude (`saliencias-declaradas.js`): a régua de ondulação mede o desvio contra eles. `espessuraMinima: { mm, partes? }` declara a parede mais fina que a
    peça aceita, em milímetro, para todas as partes ou só para as listadas: sem ele o `descrever` mostra a espessura por parte só como informação, e com ele
-   avisa a parte que passa abaixo. */
-export const CAMPOS_OPCIONAIS_DO_PLANO = Object.freeze(['familia', 'familiaProcedural', 'lataria', 'dobrasAceitas', 'saliencias', 'espessuraMinima']);
+   avisa a parte que passa abaixo. `categoria` é o rótulo com que a janela Abrir da bancada agrupa o objeto (`categorias-de-objeto.js`); ela só
+   navega, e não escolhe critério nem pergunta, que é o que `familia` faz. */
+export const CAMPOS_OPCIONAIS_DO_PLANO = Object.freeze(['familia', 'familiaProcedural', 'categoria', 'lataria', 'dobrasAceitas', 'saliencias', 'espessuraMinima']);
 export const CAMPOS_ESCALA = Object.freeze(['medida', 'milimetros']);
 export const CAMPOS_PARTE = Object.freeze(['nome', 'forma', 'tecnica']);
 /* `dePerto` da parte: onde o pedido ao crítico mostra a feição pequena que o plano promete (raio de 6 mm, rebaixo, friso), numa vista
@@ -183,6 +185,9 @@ export function normalizarPlanoDeModelagem(valor, { quem = 'PLANO' } = {}) {
   if (valor.familia !== undefined && criteriosDe(valor.familia) === undefined) {
     falhar(quem, `'familia' precisa ser uma família de objeto com critérios (${FAMILIAS_DE_OBJETO.join(', ')}); veio ${JSON.stringify(valor.familia)}.`);
   }
+  if (valor.categoria !== undefined && !ehCategoriaDeObjeto(valor.categoria)) {
+    falhar(quem, `'categoria' precisa ser uma de ${IDS_DECLARAVEIS.join(', ')}; veio ${JSON.stringify(valor.categoria)}.`);
+  }
   if (valor.familiaProcedural !== undefined && !(typeof valor.familiaProcedural === 'string' && ID_DE_FAMILIA.test(valor.familiaProcedural))) {
     falhar(quem, `'familiaProcedural' precisa ser o id de uma família de procedural/familias (minúsculas, hífen entre as palavras); veio ${JSON.stringify(valor.familiaProcedural)}.`);
   }
@@ -213,6 +218,7 @@ export function normalizarPlanoDeModelagem(valor, { quem = 'PLANO' } = {}) {
     criteriosDeReprovacao: listaDeTextos(valor.criteriosDeReprovacao, quem, 'criteriosDeReprovacao', MINIMO_DO_CRITERIO),
     ...(valor.familia === undefined ? {} : { familia: valor.familia }),
     ...(valor.familiaProcedural === undefined ? {} : { familiaProcedural: valor.familiaProcedural }),
+    ...(valor.categoria === undefined ? {} : { categoria: valor.categoria }),
     ...(valor.lataria === undefined ? {} : { lataria: normalizarLataria(valor.lataria, nomes, { quem }) }),
     ...(valor.dobrasAceitas === undefined ? {} : { dobrasAceitas: normalizarDobrasAceitas(valor.dobrasAceitas, nomes, { quem }) }),
     ...(valor.saliencias === undefined ? {} : { saliencias: normalizarSaliencias(valor.saliencias, { quem }) }),

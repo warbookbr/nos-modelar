@@ -147,6 +147,7 @@ Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 | Parte da mesma chapa fora de `lataria.partes` | a curvatura da lataria deixou cinza o para-lama e o rebaixo do carro, faces da mesma subdivisão que a chapa, porque só `chapa` estava em `lataria.partes`; avisar a parte da mesma origem que ficou de fora |
 | `suavidade --regiao=<caixa>` | a `ondulacao` não acusa as faixas da lateral do carro que a zebra mostra, e a `suavidade` só mede por parte; medir dentro de uma caixa |
 | `undefined` no aviso do `descrever` | `npm run descrever -- carro-fastback/lataria` mostra "passo 3 (limparLascas, lascasRestantes): undefined" |
+| Texto do abrir em `bancada.html` | a frase "mais as de ensaio, que existem para os testes e vêm marcadas" ficou defasada depois do plano do abrir com filtros, porque as de ensaio agora ficam atrás do filtro de situação |
 
 Dezesseis linhas que diziam "concluído" saíram desta tabela em 2026-09-11. Elas
 descreviam trabalho entregue, e candidato entregue não é candidato: o registro

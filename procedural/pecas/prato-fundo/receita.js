@@ -92,6 +92,7 @@ const receita = {
   MATERIAIS: { ceramica: { cor: '#f4f2ec', metalicidade: 0, aspereza: 0.25 } },
   TOPO: { origem: 'centro do plano de apoio, sob o anel; y para cima, eixo de revolução em y' },
   PLANO: {
+    categoria: 'utensilios',
     objeto: 'prato fundo de cerâmica branca de 230 mm de diâmetro e 45 mm de altura, aba de 35 mm, poço de 155 mm e anel de apoio de 95 mm',
     referencias: ['referencias/alvo.md'],
     escala: { medida: 'diâmetro total da peça', milimetros: 230 },

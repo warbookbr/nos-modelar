@@ -11,6 +11,8 @@
  * é baixada quando alguém escolhe abri-la.
  */
 
+import { CATEGORIAS_DE_OBJETO, ehCategoriaDeObjeto } from '../autoria/categorias-de-objeto.js';
+
 const MODULOS = import.meta.glob('../../procedural/pecas/**/*.js');
 
 /* AS RECEITAS DE ENSAIO TAMBÉM ENTRAM, e é por elas que as guardas de navegador
@@ -27,6 +29,46 @@ const ENSAIOS = import.meta.glob('../../tools/fixtures/acervo/**/*.js');
    a lista como uma entrada só, e quem a abre lê o JSON pelo leitor da autoria
    (`sessao/montagem-em-dados.js`), sem um segundo leitor. */
 const MONTAGENS_EM_DADOS = import.meta.glob('../../procedural/pecas/*/montagem.json', { import: 'default' });
+
+/* A CATEGORIA É DECLARADA PELO OBJETO. `PLANO.categoria` na receita da peça e `categoria` na montagem em dados, de uma lista
+   fechada (`src/autoria/categorias-de-objeto.js`). Quando o objeto não declara, vale a família de critérios que ele já tinha
+   (`PLANO.familia`, ou `familiaProcedural`) pela tabela abaixo, e o que nada declara cai em `outros`, cuja contagem na janela
+   mostra quanto falta declarar. Categoria declarada fora da lista é recusada pelo normalizador do PLANO e pelo leitor da montagem. */
+export const CATEGORIAS = CATEGORIAS_DE_OBJETO;
+export const CATEGORIA_DA_FAMILIA = Object.freeze({
+  veiculo: 'veiculos',
+  'movel-de-caixa': 'moveis',
+  assento: 'moveis',
+});
+
+export function categoriaDoPlano(plano) {
+  if (ehCategoriaDeObjeto(plano?.categoria)) return plano.categoria;
+  return CATEGORIA_DA_FAMILIA[plano?.familia] ?? CATEGORIA_DA_FAMILIA[plano?.familiaProcedural] ?? 'outros';
+}
+
+/* A CATEGORIA VEM DE `PLANO`, QUE MORA DENTRO DA RECEITA, e a receita só se baixa quando alguém a abre: ler `PLANO` na
+   construção da lista traria as sessenta receitas para o pacote inicial. Por isso `listarParaBancada` devolve cada entrada com
+   `categoria: null` e um `classificar()`, que carrega a receita (o módulo fica em cache, e abrir a peça depois não baixa de novo),
+   lê o `PLANO` e grava a categoria na entrada. A janela de abrir chama isso em segundo plano, depois que a peça inicial está na cena. */
+export function classificarEntradas(entradas) {
+  return Promise.all(entradas.map((entrada) => entrada.classificar()));
+}
+
+function comClassificacao(entrada) {
+  const nova = { ...entrada, categoria: null, situacao: entrada.ensaio ? 'ensaio' : 'trabalho' };
+  let pronta = null;
+  nova.classificar = () => {
+    pronta ??= entrada.carregar()
+      .then((receita) => (entrada.emDados ? (ehCategoriaDeObjeto(receita?.categoria) ? receita.categoria : 'outros') : categoriaDoPlano(receita?.PLANO)))
+      .catch(() => 'outros')
+      .then((categoria) => {
+        nova.categoria = categoria;
+        return categoria;
+      });
+    return pronta;
+  };
+  return nova;
+}
 
 /* Três formas convivem no acervo: peça de arquivo único, `quadro.js`, peça em
    pasta, `peca-de-prova/receita.js`, e montagem em pasta,
@@ -88,7 +130,7 @@ export function listarParaBancada(modulos = MODULOS, ensaios = ENSAIOS, montagen
     const objeto = entrada.id.split('/')[0];
     return entrada.id.includes('/') && objetos.has(objeto) ? { ...entrada, parteDe: objeto } : entrada;
   });
-  return ordenar([...receitas, ...listarAcervo(ensaios, { ensaio: true }), ...emDados]);
+  return ordenar([...receitas, ...listarAcervo(ensaios, { ensaio: true }), ...emDados]).map(comClassificacao);
 }
 
 /* Uma entrada por `<objeto>/montagem.json`, com o nome da pasta. `carregar` devolve o dado cru, e `emDados` diz à sessão

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2109 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2112 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -103,6 +103,10 @@
 ## docs/modelar/banco-de-provas/abertura-em-qualquer-direcao-2026-11-06/
 
 - `README.md` — Abertura em qualquer direção — a bateria de limites da operação
+
+## docs/modelar/banco-de-provas/abrir-peca-com-filtros-2026-11-17/
+
+- `README.md` — Abrir peça com filtros, 2026-11-17
 
 ## docs/modelar/banco-de-provas/aviao-2026-10-11/
 
@@ -613,7 +617,6 @@
 - `2026-11-16-eletronica-no-modelar.md` — O lado Modelar da mecatrônica: plano-raiz que gera a família de componentes e a ponte
 - `2026-11-16-ferramentas-de-correcao-de-superficie.md` — Ferramentas de correção de superfície: alisar as curvas pela medida, cortar com simetria e emendar com continuidade declarada, rumo ao G2 de produção
 - `2026-11-16-ponte-com-a-mecatronica.md` — Ponte com a mecatrônica: a ficha do objeto exportada, as portas elétricas declaradas e o pedido que volta conferido
-- `2026-11-17-abrir-peca-com-filtros.md` — Abrir peça com filtros: a janela de abrir da bancada busca por nome e separa por categoria e situação
 - `2026-11-17-curvas-lisas-e-zebra-numerica.md` — Curvas lisas e zebra numérica: a curva lida da prancha vira poucos trechos de curvatura monótona, e a ondulação longa que o crítico vê vira número
 - `2026-11-17-trilhas-e-validacao-da-placa.md` — Trilhas de cobre e validação elétrica da placa declarada: a lista de ligações vira cobre conferido por regra e por conectividade
 - `BACKLOG.md` — Backlog aberto
@@ -2308,6 +2311,8 @@
 - `caminho-simetrico.js` — caminho-simetrico.js — utilitário declarativo para construção de caminhos bilaterais simétricos para a primitiva `loft` no motor procedural do Modelar.
 - `caminho-simetrico.test.mjs` — caminho-simetrico.test.mjs — testes unitários para a função criarCaminhoSimetrico.
 - `catalogo-pecas.js` — catalogo-pecas.js — contrato explícito da lista que uma aplicação pode publicar. O catálogo é dado de aplicação; o núcleo e os validadores recebem receitas d…
+- `categoria-da-montagem.test.js` — categoria-da-montagem.test.js — a categoria que a janela Abrir lê da montagem em dados e do PLANO vem de uma lista fechada.
+- `categorias-de-objeto.js` — categorias-de-objeto.js — a lista fechada de categorias com que a janela Abrir da bancada separa o acervo.
 - `chamar-familia.js` — chamar-familia.js — a porta de entrada de uma família: `chamar(familia, id, parametros)`.
 - `chamar-familia.test.js` — chamar-familia.test.js — `definirFamilia` e `chamar` sobre a família de prova: o que o `derivar` recebe e o que ele pode devolver. As recusas dos parâmetros …
 - `conferir-articulacao.js` — conferir-articulacao — o curso de uma articulação declarada, conferido contra as malhas de uma montagem resolvida. Serviço neutro, sem Three.js.
@@ -2508,7 +2513,8 @@
 - `endereco.js` — endereco.js — o endereço da página como estado reproduzível da bancada: os parâmetros lidos na subida, a escrita do estado na URL sem recarregar e a cópia do…
 - `endereco.test.js` — endereco.test.js — o endereço lê os parâmetros da subida, reescreve a URL só quando a consulta muda e copia o endereço.
 - `fronteira-da-pagina.test.js` — fronteira-da-pagina.test.js — só os componentes tocam a página: `main.js` e os módulos de estado, cena e sessão não procuram elemento, não ouvem a janela nem…
-- `menu-abrir.js` — menu-abrir.js — a janela Abrir da barra superior: a lista das receitas do acervo em trabalho, com as de ensaio marcadas.
+- `menu-abrir.js` — menu-abrir.js — a janela Abrir da barra superior: a lista das receitas do acervo em trabalho, com busca, filtro por categoria e por situação.
+- `menu-abrir.test.js` — menu-abrir.test.js — a janela Abrir busca por nome, separa por categoria e por situação, e os três filtros se combinam.
 - `menu-controles.js` — menu-controles.js — a janela Controles da barra superior: os comandos de teclado agrupados por assunto, a troca de tecla de cada um e a volta aos padrões.
 - `menu-estado.js` — menu-estado.js — a janela Estado da barra superior: o resumo do que está carregado e da ligação com a sessão, e a sequência de eventos desde que a página abriu.
 - `paineis-do-tema.js` — paineis-do-tema.js — os painéis que o tema deixa abrir sobre a cena (a árvore das partes e o painel da direita), quem os abre e fecha, e a regra que recolhe …

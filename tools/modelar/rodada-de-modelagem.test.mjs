@@ -12,7 +12,8 @@ import { dirname, join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { proximaAcao } from '../../src/autoria/laco-de-modelagem.js';
-import { acaoDaPeca, ajustarImportsDaCopia, blocoDaPeca, contradicoesEntreRodadas, entradaDosArquivos, normalizarRelatoDoModelador, resumoDoLaco, gravarRodada, impressaoDaForma, lerArgumentos, lerRodadas, medirReceita, pastaDeRodadas, registrarMedida, textoFinalDoAssistente, ultimoBlocoJson } from './rodada-de-modelagem.mjs';
+import { CAMPOS_OPCIONAIS_LIDOS_PELO_CRITICO, CAMPOS_OPCIONAIS_NAO_LIDOS_PELO_CRITICO, planoQueOCriticoLe, acaoDaPeca, ajustarImportsDaCopia, blocoDaPeca, contradicoesEntreRodadas, entradaDosArquivos, normalizarRelatoDoModelador, resumoDoLaco, gravarRodada, impressaoDaForma, lerArgumentos, lerRodadas, medirReceita, pastaDeRodadas, registrarMedida, textoFinalDoAssistente, ultimoBlocoJson } from './rodada-de-modelagem.mjs';
+import { CAMPOS_OPCIONAIS_DO_PLANO } from '../../src/autoria/plano-de-modelagem.js';
 import { normalizarVeredito } from '../../src/autoria/veredito-de-forma.js';
 import { pecasDoAcervo } from './guardas/guarda-acervo.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
@@ -633,5 +634,26 @@ describe('a ação mantém o julgamento quando só o texto da receita mudou', ()
     const decisao = await acaoDaPeca(PECA, { rodadas: ler(PECA), pasta, medir: medirTexto(nova) });
     expect(decisao.acao).toBe('revisar');
     expect(decisao.motivo).toContain('falta o crítico julgar esta');
+  });
+});
+
+describe('o PLANO que o crítico lê', () => {
+  const PLANO = {
+    objeto: 'copo baixo de vidro liso de noventa milímetros de altura',
+    referencias: ['referencias/alvo.md'],
+    escala: { medida: 'altura total', milimetros: 90 },
+    partes: [{ nome: 'corpo', forma: 'revolução com fundo maciço', tecnica: 'revolução' }],
+    criteriosDeReprovacao: ['parede mais fina que a declarada na tabela'],
+  };
+
+  it('o mesmo PLANO com e sem categoria dá a mesma impressão, e a categoria não entra no que o crítico lê', () => {
+    expect(planoQueOCriticoLe({ ...PLANO, categoria: 'utensilios' })).toEqual(planoQueOCriticoLe(PLANO));
+    expect(planoQueOCriticoLe({ ...PLANO, categoria: 'utensilios' })).not.toHaveProperty('categoria');
+  });
+
+  it('todo campo opcional do PLANO está classificado como lido ou não lido pelo crítico, e só em uma lista', () => {
+    const classificados = [...CAMPOS_OPCIONAIS_LIDOS_PELO_CRITICO, ...CAMPOS_OPCIONAIS_NAO_LIDOS_PELO_CRITICO];
+    expect(new Set(classificados).size).toBe(classificados.length);
+    expect([...classificados].sort()).toEqual([...CAMPOS_OPCIONAIS_DO_PLANO].sort());
   });
 });

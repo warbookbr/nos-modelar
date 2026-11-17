@@ -1062,6 +1062,7 @@ const receita = {
   },
   TOPO: { origem: 'chão sob o eixo do movimento central; y para cima, a frente da bicicleta em +z, o lado da corrente (direita da bicicleta) em -x' },
   PLANO: {
+    categoria: 'veiculos',
     objeto: 'bicicleta urbana de marcha única, rodas de 670 mm, entre-eixos de 1000 mm, quadro médio de alumínio, guidão riser de 722 mm',
     referencias: ['referencias/alvo.md'],
     escala: { medida: 'diâmetro externo do pneu', milimetros: 670 },

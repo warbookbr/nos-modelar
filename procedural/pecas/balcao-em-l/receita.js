@@ -102,6 +102,7 @@ const receita = {
   },
   TOPO: { origem: 'chão, no canto de trás-esquerda do balcão; y para cima e a frente do balcão em +z' },
   PLANO: {
+    categoria: 'moveis',
     objeto: 'balcão de canto em L de 950 mm no braço longo, 545 mm no braço curto e 1200 mm de altura total, com tampo de 100 mm',
     referencias: ['referencias/alvo.md'],
     escala: { medida: 'altura total do balcão', milimetros: 1200 },
