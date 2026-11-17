@@ -8,7 +8,6 @@
 2. [modelagem de carro de passeio](2026-11-14-modelagem-de-carro.md). Território: `procedural/pecas/carro-fastback/`, `docs/modelar/banco-de-provas/carro-fastback-2026-11-14/`, `tools/modelar/ondulacao-da-superficie.mjs`, `procedural/criterios/veiculo.json`, `procedural/familias/roda-pneu/`. Em aberto: a fatia 2 (o quarto traseiro como piloto); a fatia 1 fechou com a prancha das quatro vistas e o alinhamento aceitos.
 3. [etapas pela impressão do aceite](2026-11-17-etapas-pela-impressao-do-aceite.md). Território: o que o plano declara (o registro de etapas, a ferramenta e os testes dela, os cinco `montagem.etapas.json` do acervo e o contrato das montagens). Em aberto: tudo, a começar pela fatia 1 (a impressão e a leitura pura, com os ataques das revisões como testes).
 4. [curvas lisas e zebra numérica](2026-11-17-curvas-lisas-e-zebra-numerica.md). Território: o que o plano declara (o ajuste de curva lisa no núcleo, a zebra numérica e o aviso de área do índice de suavidade). Em aberto: tudo, a começar pela fatia 1 (a zebra numérica, para ter a medida antes da mudança).
-5. [abrir peça com filtros](2026-11-17-abrir-peca-com-filtros.md). Território: a janela de abrir da bancada e a lista do acervo para ela. Em aberto: tudo, a começar pela fatia 1 (a categoria e a situação de cada item).
 
 A lista está em ordem de prioridade. A ordem desempata quando dois planos precisam do mesmo arquivo: o de menor prioridade espera ou pede à pessoa que mude o território.
 

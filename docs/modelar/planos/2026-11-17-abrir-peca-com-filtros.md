@@ -1,6 +1,6 @@
 # Abrir peça com filtros: a janela de abrir da bancada busca por nome e separa por categoria e situação
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `src/bancada/acervo-receitas.js`, `src/bancada/acervo-receitas.test.js`, `src/bancada/componentes/menu-abrir.js`, `src/bancada/componentes/menu-abrir.test.js`, `docs/modelar/banco-de-provas/abrir-peca-com-filtros-2026-11-17/`; e, só no trecho da janela de abrir, `src/bancada/main.js`; a categoria declarada pelo objeto (fatia 3): `src/autoria/categorias-de-objeto.js`, `src/autoria/categoria-da-montagem.test.js`, `src/autoria/plano-de-modelagem.js`, `src/autoria/ler-montagem-persistida.js`, `tools/modelar/rodada-de-modelagem.mjs` (só `planoQueOCriticoLe` e a lista de campos lidos) e `tools/modelar/rodada-de-modelagem.test.mjs`, as receitas `procedural/pecas/{abajur-de-mesa,balcao-em-l,mesa-quadrada-escura,bicicleta-urbana,suporte-tubo,copo-de-vidro,garrafa-de-vidro,prato-fundo,vaso-de-ceramica,kukri}/receita.js` e os `procedural/pecas/{aviao,empilhadeira,sedan-chassi-e-lataria,braco-robotico,robo-humanoide,instalacao-solar,carrinho-de-mao}/montagem.json`, só na linha `categoria`.
 
@@ -48,3 +48,14 @@ A lista de `listarParaBancada` é USAR DIRETO e ganha a categoria e a situação
 ## Riscos e parada
 
 Se mais de um terço do acervo cair em "outros", a classificação pelo que já está declarado não serve, e o plano para e volta à pessoa com a lista, em vez de inventar categoria.
+
+## Fechamento
+
+Concluído em 2026-11-17. Gate de saída, item por item:
+
+1. Toda receita do acervo cai numa categoria, e "outros" lista as que não declaram nada: `src/bancada/acervo-receitas.test.js` classifica o acervo real (58 de trabalho), recusa família declarada fora da tabela e limita Outros a um décimo, e a mensagem do teste lista as que ficam lá. Hoje são Veículos 33, Móveis e eletrodomésticos 14, Robótica 2, Eletrônica 1, Ferramentas e utensílios 7 e Outros 1 (`carro-fastback/lataria`, do plano do carro, que a declarará).
+2. A busca e os filtros se combinam, e limpar volta à lista completa: `src/bancada/componentes/menu-abrir.test.js` (busca sem maiúscula e acento, categoria com contagem, situação com as de ensaio escondidas e a marca mantida, os três juntos e o limpar).
+3. Imagem da janela aprovada pela pessoa em 2026-11-17 ("a janela esta aprovada"), e ela aceitou depois as categorias novas, declaradas pelos objetos: `docs/modelar/banco-de-provas/abrir-peca-com-filtros-2026-11-17/abrir-filtros.png`.
+4. Testes da bancada verdes (`npx vitest run src/bancada`), e o `guarda:acervo` ok depois das declarações.
+
+O que ficou: o texto de `bancada.html` sobre a janela ("mais as de ensaio, que existem para os testes e vêm marcadas") ficou defasado, porque as de ensaio agora ficam atrás do filtro; o arquivo estava fora do território, e a correção é uma linha de texto na bancada. A categoria é um campo opcional novo, `PLANO.categoria` e `categoria` na montagem em dados, de lista fechada em `src/autoria/categorias-de-objeto.js`; o crítico não o lê, e o teste de `rodada-de-modelagem.test.mjs` cobra que todo campo opcional do PLANO esteja classificado como lido ou não lido por ele.

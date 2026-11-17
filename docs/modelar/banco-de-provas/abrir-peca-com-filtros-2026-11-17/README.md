@@ -12,3 +12,5 @@ A categoria é declarada pelo objeto: `PLANO.categoria` na receita da peça e `c
 Antes das declarações, Outros tinha 18 de 58 entradas de trabalho (31%): 10 peças sem família e 7 montagens em dados, mais `carro-fastback/lataria`. Agora tem 1 de 58, a `carro-fastback/lataria`, que é do plano do carro e fica em Outros até ele declará-la. As 5 de ensaio também caem em Outros, mas ficam escondidas por padrão.
 
 Comando que reproduz a classificação: `npx vitest run src/bancada/acervo-receitas.test.js`. A aprovação da forma da janela é da pessoa, por estas imagens.
+
+O texto de `bancada.html` sobre a janela ("mais as de ensaio, que existem para os testes e vêm marcadas") ficou defasado, porque as de ensaio agora ficam atrás do filtro de situação. O arquivo estava fora do território do plano, e a correção é uma linha de texto da bancada.
