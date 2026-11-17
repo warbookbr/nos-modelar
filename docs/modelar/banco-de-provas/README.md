@@ -19,7 +19,7 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
 - [Atritos](carrinho-refeito-2026-10-08/ATRITOS.md) — `carrinho-refeito-2026-10-08`
 - [Comparar com a referência: a linha de base dos comandos repetidos e onde a prancha é montada](comparar-com-a-referencia-2026-11-16/README.md) — `comparar-com-a-referencia-2026-11-16`
 - `componentes-eletronicos-2026-11-16`
-- [Correção de superfície: chapas de prova, linha de base e corte com simetria](correcao-de-superficie-2026-11-16/README.md) — `correcao-de-superficie-2026-11-16`
+- [Correção de superfície: chapas de prova, linha de base, corte com simetria, alisamento e emenda declarada](correcao-de-superficie-2026-11-16/README.md) — `correcao-de-superficie-2026-11-16`
 - [Cordão de solda na costura de tubos: rodadas de forma e medidas](costura-em-no-de-tubos-2026-11-15/README.md) — `costura-em-no-de-tubos-2026-11-15`
 - [Braço robótico, vista lateral: a descrição](desenho-braco-2026-10-14/DESCRICAO.md) — `desenho-braco-2026-10-14`
   - [Braço robótico, vista lateral: o resultado da prova](desenho-braco-2026-10-14/RESULTADO.md) — `desenho-braco-2026-10-14`
