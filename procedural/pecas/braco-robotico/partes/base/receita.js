@@ -298,9 +298,10 @@ const receita = {
   /* As cores dos componentes são as das pranchas da família, escolhidas por peça, sem paleta nova. */
   MATERIAIS: {
     ...Object.fromEntries(placaPadrao.materiais.map((nome) => [nome, CORES_DOS_COMPONENTES[nome]])),
-    /* a tampa da janela: o vidro claro e liso do farol do furgão (`lenteDoFarol` em procedural/pecas/furgao-realista/receita.js), que
-       deixa ver o que há atrás dele */
-    vidroIncolor: { tipo: 'liso', cor: '#f4f8fa', mistura: 'transparente', opacidade: 0.2, aspereza: 0.03, metalicidade: 0 },
+    /* a tampa da janela: o vidro claro do farol do furgão (`lenteDoFarol` em procedural/pecas/furgao-realista/receita.js), um pouco
+       mais leitoso, a pedido da pessoa em 2026-11-17, só o bastante para se ver que há tampa (opacidade de 0,2 a 0,3 e aspereza de
+       0,03 a 0,25) */
+    vidroIncolor: { tipo: 'liso', cor: '#f4f8fa', mistura: 'transparente', opacidade: 0.3, aspereza: 0.25, metalicidade: 0 },
   },
   PLANO: {
     objeto: 'base do braço robótico industrial, presa no chão, com uma caixa colada no lado esquerdo que guarda a placa de controle',
