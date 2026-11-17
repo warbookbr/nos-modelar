@@ -15,6 +15,7 @@ import {
   BARRA, DIP, ELETROLITICO, FAIXAS_DO_RESISTOR, LADOS_DO_CAPACITOR, LADOS_DO_FIO, LADOS_DO_RESISTOR, LADOS_DO_TERMINAL,
   PASSO_DE_PINO, PERFIL_DO_RESISTOR, SOBRA_DA_FAIXA, TO220, comprimentoDoDip, contornoDaFaixa, pontosDoTerminalAxial,
 } from './geometria.js';
+import { CONSTRUTORES_DE_ENCAPSULAMENTO } from './outros-encapsulamentos.js';
 
 const MALHA = 'mecanifica.malha-poligonal@1';
 const PARTE = 'mecanifica.parte@1';
@@ -23,13 +24,16 @@ const metro = (mm) => Number((mm * MM).toPrecision(12));
 const p = (nome) => ({ parametro: nome });
 
 /* os encapsulamentos, pelo valor do parâmetro `encapsulamento` */
-export const ENCAPSULAMENTOS = Object.freeze({ 1: 'resistor-axial', 2: 'eletrolitico-radial', 3: 'to-220', 4: 'dip', 5: 'barra-de-pinos' });
+export const ENCAPSULAMENTOS = Object.freeze({
+  1: 'resistor-axial', 2: 'eletrolitico-radial', 3: 'to-220', 4: 'dip', 5: 'barra-de-pinos', 6: 'ceramico-de-disco', 7: 'led',
+  8: 'to-92', 9: 'soic', 10: 'borne-de-parafuso', 11: 'jack-de-alimentacao', 12: 'modulo-de-placa', 13: 'dissipador-to-220',
+});
 
 /* o material de cada elemento: o argumento de texto e o nome que ele traz quando a receita não escolhe */
 export const MATERIAIS_PADRAO = Object.freeze({
   materialDoCorpo: 'corpo', materialDoTerminal: 'metal', materialDaFaixa1: 'faixa-1', materialDaFaixa2: 'faixa-2',
   materialDaFaixa3: 'faixa-3', materialDaFaixa4: 'faixa-4', materialDaFaixa5: 'faixa-5', materialDaMarca: 'marca',
-  materialDoTopo: 'metal', materialDaAba: 'metal',
+  materialDoTopo: 'metal', materialDaAba: 'metal', materialDoParafuso: 'metal', materialDaPlaca: 'placa-filha', materialDoChip: 'corpo',
 });
 
 /** A variante de uma chamada, pelos parâmetros completos: o que muda a estrutura dos passos. */
@@ -37,12 +41,14 @@ export function varianteDe(parametros) {
   const tipo = ENCAPSULAMENTOS[parametros.encapsulamento];
   if (tipo === 'resistor-axial') return { tipo, faixas: parametros.faixasDoResistor };
   if (tipo === 'barra-de-pinos') return { tipo, fileiras: parametros.fileirasDaBarra, copias: parametros.viasDaBarra > 1 };
+  if (tipo === 'borne-de-parafuso') return { tipo, vias: parametros.viasDoBorne };
   return { tipo };
 }
 
 export function idDoComponente(variante) {
   if (variante.tipo === 'resistor-axial') return `componente-eletronico.resistor-axial-${variante.faixas}-faixas`;
   if (variante.tipo === 'barra-de-pinos') return `componente-eletronico.barra-de-pinos-${variante.fileiras}-fileira${variante.fileiras > 1 ? 's' : ''}${variante.copias ? '' : '-uma-via'}`;
+  if (variante.tipo === 'borne-de-parafuso') return `componente-eletronico.borne-de-parafuso-${variante.vias}-vias`;
   return `componente-eletronico.${variante.tipo}`;
 }
 
@@ -51,6 +57,9 @@ export const VARIANTES = Object.freeze([
   { tipo: 'eletrolitico-radial' }, { tipo: 'to-220' }, { tipo: 'dip' },
   { tipo: 'barra-de-pinos', fileiras: 1, copias: true }, { tipo: 'barra-de-pinos', fileiras: 2, copias: true },
   { tipo: 'barra-de-pinos', fileiras: 1, copias: false }, { tipo: 'barra-de-pinos', fileiras: 2, copias: false },
+  { tipo: 'ceramico-de-disco' }, { tipo: 'led' }, { tipo: 'to-92' }, { tipo: 'soic' },
+  { tipo: 'borne-de-parafuso', vias: 2 }, { tipo: 'borne-de-parafuso', vias: 3 },
+  { tipo: 'jack-de-alimentacao' }, { tipo: 'modulo-de-placa' }, { tipo: 'dissipador-to-220' },
 ].map((v) => Object.freeze(v)));
 
 /* o construtor dos passos de uma composição: cada valor que depende dos parâmetros vira um argumento com nome, e cada
@@ -278,7 +287,8 @@ export function planoDoComponente(variante, q) {
   else if (variante.tipo === 'eletrolitico-radial') eletrolitico(c, q);
   else if (variante.tipo === 'to-220') to220(c, q);
   else if (variante.tipo === 'dip') dip(c, q);
-  else barra(c, q, variante);
+  else if (variante.tipo === 'barra-de-pinos') barra(c, q, variante);
+  else CONSTRUTORES_DE_ENCAPSULAMENTO[variante.tipo](c, q, variante);
   return { nos: c.nos, argumentos: c.args, materiais: [...c.materiais].sort() };
 }
 
@@ -295,6 +305,7 @@ function exemploDe(variante, padroes) {
     ...padroes, encapsulamento,
     ...(variante.tipo === 'resistor-axial' ? { faixasDoResistor: variante.faixas } : {}),
     ...(variante.tipo === 'barra-de-pinos' ? { fileirasDaBarra: variante.fileiras, viasDaBarra: variante.copias ? Math.max(2, padroes.viasDaBarra) : 1 } : {}),
+    ...(variante.tipo === 'borne-de-parafuso' ? { viasDoBorne: variante.vias } : {}),
   };
 }
 
