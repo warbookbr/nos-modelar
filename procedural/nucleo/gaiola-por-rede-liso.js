@@ -138,24 +138,39 @@ export function alisarMioloNaNormal(posicoes, faces, livres, pulados, { iteracoe
   return { posicoes: P, deslocamentoMaximo: maior, iteracoes };
 }
 
-/* A TANGENTE COMUM NA EMENDA G1 (`continuidade: 'G1'` na curva da rede). Cada item de `tangentes` é { c, lados: [[a1, a2], [b1, b2]], peso }: o
-   ponto c da curva emendada e, de cada lado, as duas fileiras seguintes da gaiola na direção que atravessa a curva. A inclinação de um lado
-   é a da parábola pelo ponto c e pelas duas fileiras, sobre o plano tangente de c (a altura f ao longo da normal de c e a distância d no
-   plano): s = (f1 d2² − f2 d1²) / (d1 d2 (d2 − d1)), exata para uma seção de curvatura constante, de modo que a curvatura de cada lado não
-   entra. A tangente é comum quando as duas inclinações, cada uma medida para fora de c, somam zero; o termo é o quadrado dessa soma, e é
-   linear no deslocamento h de cada fileira livre pela normal dela. Devolve os termos { r0, coef: [[livre, g]], peso } em ordem fixa. */
+/* A TANGENTE COMUM NA EMENDA (`continuidade` na curva da rede). Cada item de `tangentes` é { c, lados: [[a1, a2], [b1, b2]], peso }: o ponto c
+   da curva emendada e, de cada lado, as duas fileiras seguintes da gaiola na direção que atravessa a curva. A inclinação de um lado é a da
+   parábola pelo ponto c e pelas duas fileiras, sobre o plano tangente de c (a altura f ao longo da normal de c e a distância d no plano, ao
+   longo da direção de c para a1): s = (f1 d2² − f2 d1²) / (d1 d2 (d2 − d1)), exata para uma seção de curvatura constante, de modo que a
+   curvatura de cada lado não entra. A tangente é comum quando as duas inclinações, cada uma medida para fora de c, somam zero; o termo é
+   o quadrado dessa soma dividida pela distância média de c à primeira fileira (a unidade do laplaciano, uma curvatura: com a soma crua o
+   termo pesava dezenas de milhares de vezes uma aresta da variação numa gaiola de 70 mm, e o sistema saía de centenas de milímetros), e é
+   linear no deslocamento h de cada fileira livre pela normal dela. O ponto em que a segunda fileira não fica além de 1,5 vez a primeira (a
+   gaiola torta) ou em que um lado sobe mais que meia distância sobre o plano de c (a parábola não descreve a seção ali) fica sem o termo
+   naquela volta. Devolve os termos { r0, coef: [[livre, g]], peso } em ordem fixa. */
+export const LONGE_DA_FILEIRA = 1.5;
+export const INCLINACAO_DA_FILEIRA = 0.5;
 function termosDaTangente(P, N, tangentes, indiceDoLivre) {
   const termos = [];
   for (const { c, lados, peso } of tangentes) {
     const nc = N[c]; const pc = P[c];
     let r0 = 0; const coef = new Map(); let valido = true;
+    /* a soma das inclinações dividida pela distância média à primeira fileira: o termo fica na unidade do laplaciano (uma curvatura), e o
+       peso dele se lê contra o de uma aresta da variação, qualquer que seja o espaçamento da gaiola */
+    const escala = lados.reduce((x, [a1]) => x + norma(sub(P[a1], pc)), 0) / lados.length;
     for (const [a1, a2] of lados) {
-      const geo = [a1, a2].map((v) => { const d = sub(P[v], pc); const f = dot(d, nc); return { f, d: norma([d[0] - f * nc[0], d[1] - f * nc[1], d[2] - f * nc[2]]) }; });
+      /* a direção que atravessa a curva: a de c para a1 no plano tangente; d é a distância ao longo dela, e f a altura pela normal */
+      const u = sub(P[a1], pc); const fu = dot(u, nc);
+      const t0 = [u[0] - fu * nc[0], u[1] - fu * nc[1], u[2] - fu * nc[2]]; const lt = norma(t0);
+      if (!(lt > 0)) { valido = false; break; }
+      const t = [t0[0] / lt, t0[1] / lt, t0[2] / lt];
+      const geo = [a1, a2].map((v) => { const d = sub(P[v], pc); return { f: dot(d, nc), d: dot(d, t) }; });
       const [{ f: f1, d: d1 }, { f: f2, d: d2 }] = geo;
       const den = d1 * d2 * (d2 - d1);
-      if (!(d1 > 0 && d2 > d1 && Math.abs(den) > 0)) { valido = false; break; }
-      r0 += (f1 * d2 * d2 - f2 * d1 * d1) / den;
-      const g1 = (dot(N[a1], nc) * d2 * d2) / den; const g2 = -(dot(N[a2], nc) * d1 * d1) / den;
+      /* a parábola de um lado só vale com a segunda fileira bem além da primeira e o lado pouco inclinado sobre o plano de c */
+      if (!(d1 > 0 && d2 > LONGE_DA_FILEIRA * d1 && Math.abs(f2) < INCLINACAO_DA_FILEIRA * d2)) { valido = false; break; }
+      r0 += (f1 * d2 * d2 - f2 * d1 * d1) / den / escala;
+      const g1 = (dot(N[a1], nc) * d2 * d2) / den / escala; const g2 = -(dot(N[a2], nc) * d1 * d1) / den / escala;
       for (const [v, g] of [[a1, g1], [a2, g2]]) if (indiceDoLivre.has(v)) coef.set(indiceDoLivre.get(v), (coef.get(indiceDoLivre.get(v)) ?? 0) + g);
     }
     if (!valido || !coef.size) continue;

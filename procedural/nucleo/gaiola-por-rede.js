@@ -6,7 +6,8 @@
  *   chapa de seções regulares ao longo de um eixo use gaiolaPorEstacoes, e para uma faixa de seção constante use gaiolaVarrida.
  * unidades: curvas e nós entram em mm; `pontos` sai em metro, para pôr em TOPO.
  * campos:
- *   curvas: [{ nome, pontos, fechada?, poligonal?, vinco?, peso?, exata?, passo? }] pontos são [x, y, z] ou o nome de um nó.
+ *   curvas: [{ nome, pontos, fechada?, poligonal?, vinco?, peso?, exata?, passo?, continuidade? }] pontos são [x, y, z] ou o nome de um nó;
+ *     continuidade: 'G1' | 'G2' declara a curva entre dois retalhos emenda lisa de tangente comum (G1) ou de curvatura igual (G2).
  *   nos: { nome: [x, y, z] | { curva, fracao } } ponto nomeado onde curvas se encontram; o nó { curva, fracao } fica sobre uma curva.
  *   retalhos: [{ nome, borda, divisoes? }] borda são as curvas (ou { curva, de?, ate? }) que fecham o retalho, de três a oito lados.
  *   passo: espaçamento alvo da rede em mm, de onde saem as divisões que o retalho não declara.
@@ -21,7 +22,7 @@
  *   prefixo: texto posto na frente do nome de todo ponto.
  *   alisarCurvas: true | { energia?, rigidez?, tolerancia?, toleranciaPorCurva?, silhueta?, iteracoes?, curvas?, pontosDuros? } tira o ruído
  *     dos pontos-chave das curvas antes de montar a gaiola, com os nós fixos; tolerancia é o maior deslocamento em mm (1 por padrão).
- * devolve: { pontos, passo, linha(curva), pontoDaCurva, linhas, nos, curvas, retalhos, densidades, extraordinarios, avisos, ... }.
+ * devolve: { pontos, passo, linha(curva), pontoDaCurva, linhas, nos, curvas, retalhos, densidades, extraordinarios, avisos, emendas?, ... }.
  * exemplo:
  *   gaiolaPorRede({ passo: 50, fora: [0, 1, 0], nos: { A: [0, 0, 0], B: [200, 0, 0], C: [200, 0, 200], D: [0, 0, 200] },
  *     curvas: [{ nome: 'baixo', pontos: ['A', 'B'] }, { nome: 'direita', pontos: ['B', 'C'] }, { nome: 'cima', pontos: ['C', 'D'] }, { nome: 'esquerda', pontos: ['D', 'A'] }],
@@ -37,7 +38,7 @@
  *
  * UNIDADES. As curvas e os nós entram em mm, como a `TABELA`; `pontos` sai em metro, como `TOPO`.
  *
- * curvas: [{ nome, pontos, fechada?, poligonal?, vinco?, peso?, exata?, passo? }]
+ * curvas: [{ nome, pontos, fechada?, poligonal?, vinco?, peso?, exata?, passo?, continuidade? }]
  *   pontos: os pontos-chave da curva, cada um [x, y, z] em mm ou o NOME de um nó (texto). A curva é a Catmull-Rom centrípeta por eles
  *     (a mesma de `gaiola-interpolada.js`: passa por todos os pontos-chave e não faz laço nem bico dentro de um trecho), medida pelo
  *     comprimento de arco: toda fração de curva neste arquivo é fração do comprimento, de 0 a 1. `fechada: true` fecha a volta (na
@@ -49,6 +50,7 @@
  *     com `peso` (número ou nome de PARAMS) ela só os aproxima por mínimos quadrados, o que serve ao dado lido de imagem, com erro.
  *     No nó em que duas curvas se encontram vale o maior peso, e a cota exata vence.
  *   passo: o espaçamento alvo (mm) desta curva, no lugar do `passo` da rede.
+ *   continuidade: 'G1' ou 'G2', a emenda declarada, descrita em A EMENDA DECLARADA. Não vale com vinco.
  * nos: { nome: [x, y, z] | { curva, fracao } }
  *   Um nó é um ponto nomeado onde curvas se encontram. O nó dado por coordenada é o ponto-chave de toda curva que o cita pelo nome; o nó
  *   dado por { curva, fracao } fica sobre essa curva, à fração do comprimento, e as outras curvas o citam como ponto-chave (é o
@@ -126,6 +128,34 @@
  * tolerância, os pontos duros, os de corte, os limitados, os pontos-chave alisados (mm), o deslocamento de cada um em mm e a energia antes
  * e depois. O nó dado por { curva, fracao } fica na curva alisada. Sem a opção, nada muda.
  *
+ * A EMENDA DECLARADA. Sem declaração a emenda lisa sai como o alisamento do miolo a deixa: a variação do laplaciano espalha pelo retalho
+ * inteiro o salto de curvatura que a curva compartilhada tiver (na chapa de prova de razão 3, a superfície sai 1,3 mm fora da desenhada), as
+ * curvas que terminam no nó da emenda, uma de cada lado, chegam a ele cada uma com a tangente da própria ponta (a do ponto refletido), e o
+ * limite da subdivisão, exato na curva e de peso 1 no miolo, afunda alguns centésimos ao lado dela; a leitura de um lado só de
+ * `continuidade-nas-emendas.mjs` acusa ali até 0,8 grau. Com `continuidade` na curva:
+ *   - as curvas que terminam num nó dela (o ponto-chave escrito como nome, ou o nó { curva, fracao } sobre ela) e não são emendadas, quando
+ *     são duas, viram o mesmo desvio abaixo de `anguloDeCanto` e o nó não está em `cantos`, se juntam: o trecho da ponta de cada uma usa o
+ *     ponto-chave vizinho do nó na outra, como a Catmull-Rom de uma curva só pelos dois, e a tangente no nó é a mesma (`juncoes`); três ou
+ *     mais saem em `emendaSemPar`, e a que dobra, em `emendaDobrada`, sem a junção;
+ *   - os pontos de dentro dos dois retalhos a até duas arestas da curva (a faixa) ganham a cota da curva (exata, ou o peso dela, se for
+ *     maior que o do miolo);
+ *   - no alisamento do miolo, a G1 tira do laplaciano, como o vinco, o ponto da curva que tem três fileiras de miolo livre de cada lado (cada
+ *     lado guarda a curvatura dele; na faixa estreita entre duas curvas a curva fica no laplaciano, que é o que segura a fileira ali), e
+ *     prende a inclinação dos dois lados uma à outra: a de cada lado é a da parábola pelo ponto da curva e pelas duas fileiras seguintes,
+ *     exata em seção de curvatura constante, e o termo, na unidade do laplaciano, pesa 100 vezes uma aresta da variação; a G2 deixa a curva
+ *     no laplaciano, pesa a variação mil vezes mais nas arestas da faixa (a curvatura fica a mesma dos dois lados e quase constante perto
+ *     da curva) e põe o mesmo termo da tangente. A âncora do alisamento se mede sem esses pesos.
+ * Na chapa de prova de razão de curvatura 3 com G1, a leitura vai de 0,83 a 0,04 grau, e a superfície, a até 60 mm da emenda, fica a
+ * 0,18 mm da desenhada (1,24 mm sem a declaração); na de curvatura igual com G2, de 0,39 a 0,03 grau com a razão 1, a 0,05 mm da
+ * desenhada perto da emenda e a 0,25 no resto (0,10 sem a declaração), com a curvatura lida 6% abaixo da desenhada. A G2 numa emenda de
+ * curvaturas diferentes muda a forma (5,5 mm na chapa de razão 3) e iguala a curvatura a mais de três espaçamentos das pontas; nas pontas a curva que atravessa a emenda traz o salto nos
+ * pontos-chave dela, que a G2 não mexe, e a razão sobe até 1,6. O ponto da curva de valência diferente de 4 (de 3 na borda) é vértice
+ * extraordinário, onde a subdivisão é no máximo G1: fica fora do termo da tangente, e na G2 sai em `emendaG2NoExtraordinario`. A curva
+ * emendada precisa de um arco entre dois retalhos e do `liso` ligado. A saída ganha `emendas`, por curva: a continuidade, os lados, as
+ * junções, os pontos com as duas fileiras, os que a parábola não descreve (`semMedida`: a seção sobe mais que meia distância, a fileira
+ * entorta), o tamanho da faixa, os extraordinários e, na gaiola alisada, o maior ângulo entre as tangentes dos dois lados e a maior razão
+ * das curvaturas pela mesma parábola. Sem a declaração, nada muda.
+ *
  * Os vértices extraordinários (valência diferente de 4 no interior, de 2 a 3 na borda) saem declarados, pelo nome, em `extraordinarios`:
  * os nós onde três ou cinco retalhos se encontram, os centros dos retalhos de n lados e o que a borda deixar.
  *
@@ -143,7 +173,7 @@
  * à rede para ela sair com a mesma malha depois de mexer nas entradas. `capturarGaiolas(fn)` (`gaiola-captura.js`) devolve as saídas montadas durante `fn`.
  *
  * gaiolaPorRede(definicao) -> { pontos, passo, linha(curva, de?, ate?), pontoDaCurva(curva, fracao), linhas, nos, curvas, retalhos, densidades, extraordinarios,
- *                               cantos, continuidade, alisamento, avisos, origens, entradas, estrutura }
+ *                               cantos, continuidade, alisamento, avisos, origens, entradas, estrutura, emendas? }
  * `pontos` vai para TOPO e `passo` se espalha no passo `subdivisao`. `linha(curva, de, ate)` devolve os nomes dos pontos ao longo da
  * curva (da fechada inteira, com o primeiro repetido no fim): é a linha que o `friso` percorre. Os nomes dos pontos de dentro de um arco
  * dependem da densidade, e por isso a receita não os cita: cita a curva, o nó ou o retalho. */
@@ -151,7 +181,7 @@
 import { alteracoesDaRede, assinaturaDaRede, divisoesFixadas, registrarGaiola } from './gaiola-captura.js';
 import { curvaCentripeta } from './gaiola-interpolada.js';
 import { extraordinarios as extraordinariosDa } from './gaiola-aneis.js';
-import { alisarMioloNaNormal } from './gaiola-por-rede-liso.js';
+import { alisarMioloNaNormal, LONGE_DA_FILEIRA, INCLINACAO_DA_FILEIRA } from './gaiola-por-rede-liso.js';
 import { alisarPontosDaCurva, conferirTolerancia, lerOpcoesDoAlisamento } from './alisar-curvas.js';
 
 const MM = 1000;
@@ -174,8 +204,8 @@ const ANGULO_AGUDO = 25;
 /* A EMENDA DECLARADA (`continuidade` na curva): G1 é o plano tangente comum, com a curvatura de cada lado livre; G2, também a curvatura
    igual dos dois lados. */
 const CONTINUIDADES = ['G1', 'G2'];
-/* as fileiras da gaiola de cada lado da curva emendada cujos pontos de dentro passam a cota exata: a superfície limite segue o preenchimento
-   ali, sem o afundamento entre a curva exata e o miolo de peso 1 que a leitura de um lado só lê como dobra */
+/* as fileiras da gaiola de cada lado da curva emendada cujos pontos de dentro ganham a cota da curva: a superfície limite segue o
+   preenchimento ali, sem o afundamento entre a curva exata e o miolo de peso 1 que a leitura de um lado só lê como dobra */
 const FAIXA_DA_EMENDA = 2;
 /* o peso, contra o de uma aresta da variação do laplaciano, da tangente comum (G1) e da variação dentro da faixa (G2) no alisamento do miolo */
 const PESO_DA_TANGENTE = 100;
@@ -1336,6 +1366,8 @@ export function gaiolaPorRede(definicaoDada) {
   const facesPorVertice = new Map();
   faces.forEach((f, i) => { for (const v of f) { if (!facesPorVertice.has(v)) facesPorVertice.set(v, []); facesPorVertice.get(v).push(i); } });
   const naBordaLivre = (v) => [...(vizinhos.get(v) ?? [])].some((w) => contagem.get(chaveDeAresta(v, w)) === 1);
+  /* a fileira que atravessa a emenda não passa por vinco, canto nem borda livre: a parábola de um lado só vale dentro do trecho liso */
+  const foraDaFileira = new Set([...vincos.flatMap((v) => v.pontos), ...cantos]);
   for (const e of emendasDeclaradas) {
     /* as fileiras que atravessam a curva em cada ponto dela de valência 4: de cada lado a1 (o vizinho fora da curva) e a2 (o vizinho de a1
        do outro lado da aresta c-a1, a fileira seguinte); o ponto de valência diferente fica fora, e é no máximo G1 */
@@ -1350,11 +1382,15 @@ export function gaiolaPorRede(definicaoDada) {
       const lados = [];
       for (const a1 of cruzam) {
         const comuns = (facesPorVertice.get(c) ?? []).filter((i) => faces[i].includes(a1));
-        if (comuns.length !== 2 || vizinhos.get(a1).size !== 4) break;
+        if (comuns.length !== 2 || vizinhos.get(a1).size !== 4 || foraDaFileira.has(a1) || naBordaLivre(a1)) break;
         const fora = new Set(comuns.flatMap((i) => faces[i]));
         const a2 = [...vizinhos.get(a1)].filter((w) => !fora.has(w));
-        if (a2.length !== 1) break;
-        lados.push({ a1, a2: a2[0], retalho: retalhoDaFace[comuns[0]] });
+        if (a2.length !== 1 || foraDaFileira.has(a2[0]) || naBordaLivre(a2[0])) break;
+        /* a terceira fileira, a3: o vizinho de a2 do outro lado da aresta a1-a2 */
+        const comuns2 = (facesPorVertice.get(a1) ?? []).filter((i) => faces[i].includes(a2[0]));
+        const fora2 = new Set(comuns2.flatMap((i) => faces[i]));
+        const a3 = vizinhos.get(a2[0]).size === 4 ? [...vizinhos.get(a2[0])].filter((w) => !fora2.has(w)) : [];
+        lados.push({ a1, a2: a2[0], a3: a3.length === 1 ? a3[0] : null, retalho: retalhoDaFace[comuns[0]] });
       }
       if (lados.length === 2 && lados[0].retalho !== lados[1].retalho) e.fileiras.push({ c, lados });
     }
@@ -1390,7 +1426,11 @@ export function gaiolaPorRede(definicaoDada) {
     if (emendasDeclaradas.length) {
       const tangentes = []; const naFaixaG2 = new Set();
       for (const e of emendasDeclaradas) {
-        if (e.tipo === 'G1') for (const id of e.daCurva) pulados.add(indice.get(id));
+        /* a G1 tira do laplaciano o ponto da curva cujas três fileiras de cada lado são miolo livre: a faixa estreita (uma ou duas fileiras
+           entre duas curvas) fica sem laplaciano que a atravesse e com um modo que só a âncora segura, e ali a curva fica no laplaciano */
+        if (e.tipo === 'G1') {
+          for (const { c, lados } of e.fileiras) if (lados.every((l) => [l.a1, l.a2, l.a3].every((v) => v !== null && livres.has(indice.get(v))))) pulados.add(indice.get(c));
+        }
         else for (const id of [...e.daCurva, ...e.faixa]) naFaixaG2.add(indice.get(id));
         for (const { c, lados } of e.fileiras) tangentes.push({ c: indice.get(c), lados: lados.map((l) => [indice.get(l.a1), indice.get(l.a2)]), peso: PESO_DA_TANGENTE });
       }
@@ -1419,8 +1459,13 @@ export function gaiolaPorRede(definicaoDada) {
     for (const a of arcosDaCurva.get(nome).arcos) if (a.usos.length) for (const id of verticesDoArco.get(a.id)) cotar(id, peso);
   }
   if (interior !== null) for (const r of retalhos) for (const id of interiorDoRetalho.get(r.nome)) cotar(id, interior);
-  /* a faixa da emenda declarada passa a cota exata: a superfície limite segue a gaiola alisada ali, sem afundar entre a curva e o miolo */
-  for (const e of emendasDeclaradas) for (const id of e.faixa) cotar(id, Infinity);
+  /* a faixa da emenda declarada ganha a cota da própria curva (exata, ou o peso dela): a superfície limite segue a gaiola alisada ali como
+     segue a curva, sem afundar entre a curva e o miolo de peso menor */
+  for (const e of emendasDeclaradas) {
+    const d = curvas.get(e.nome).decl;
+    const peso = d.exata === true ? Infinity : (d.peso != null ? d.peso : (leitura ? leitura.peso : Infinity));
+    for (const id of e.faixa) cotar(id, peso);
+  }
   const medidas = ordemDosVertices.filter((id) => pesoDe.has(id)).map((id) => (pesoDe.get(id) === Infinity ? id : { ponto: id, peso: pesoDe.get(id) }));
 
   /* ---- avisos da leitura ---- */
@@ -1497,17 +1542,23 @@ export function gaiolaPorRede(definicaoDada) {
      (a mesma de `termosDaTangente`), em cada ponto da curva com as duas fileiras ---- */
   const emendasSaida = {};
   for (const e of emendasDeclaradas) {
-    let anguloMaximo = 0; let razaoMaxima = 1; let ondeAngulo = null; let ondeRazao = null;
+    let anguloMaximo = 0; let razaoMaxima = 1; let ondeAngulo = null; let ondeRazao = null; let semMedida = 0;
     for (const { c, lados } of e.fileiras) {
       let nc = [0, 0, 0];
       for (const i of facesDoVertice.get(c)) nc = soma(nc, normaisDaFace[i]);
       nc = vezes(nc, 1 / (norma(nc) || 1));
       const pc = posicao.get(c);
+      /* a mesma parábola de `termosDaTangente`, ao longo da direção de c para a1 no plano tangente, e com o mesmo critério de validade:
+         onde a seção sobe mais que meia distância sobre o plano de c, ou a gaiola entorta a fileira, o ponto fica sem medida */
       const doLado = lados.map(({ a1, a2 }) => {
-        const [g1, g2] = [a1, a2].map((v) => { const d = sub(posicao.get(v), pc); const f = dot(d, nc); return { f, d: norma(sub(d, vezes(nc, f))) }; });
+        const u = sub(posicao.get(a1), pc); const t = sub(u, vezes(nc, dot(u, nc))); const lt = norma(t);
+        if (!(lt > 0)) return null;
+        const [g1, g2] = [a1, a2].map((v) => { const d = sub(posicao.get(v), pc); return { f: dot(d, nc), d: dot(d, t) / lt }; });
+        if (!(g1.d > 0 && g2.d > LONGE_DA_FILEIRA * g1.d && Math.abs(g2.f) < INCLINACAO_DA_FILEIRA * g2.d)) return null;
         const den = g1.d * g2.d * (g2.d - g1.d);
         return { s: (g1.f * g2.d * g2.d - g2.f * g1.d * g1.d) / den, k: (2 * (g2.f * g1.d - g1.f * g2.d)) / den };
       });
+      if (doLado.some((x) => x === null)) { semMedida += 1; continue; }
       const angulo = Math.abs(Math.atan(doLado[0].s) + Math.atan(doLado[1].s)) * 180 / Math.PI;
       const [ka, kb] = doLado.map((x) => Math.abs(x.k) * MM);
       const razao = Math.max(ka, kb) / Math.max(Math.min(ka, kb), PISO_DA_RAZAO);
@@ -1521,7 +1572,7 @@ export function gaiolaPorRede(definicaoDada) {
       });
     }
     emendasSaida[e.nome] = {
-      continuidade: e.tipo, lados: [...e.lados].sort(), juncoes: juncoes.porEmenda.get(e.nome) ?? [], pontos: e.fileiras.length, faixa: e.faixa.size,
+      continuidade: e.tipo, lados: [...e.lados].sort(), juncoes: juncoes.porEmenda.get(e.nome) ?? [], pontos: e.fileiras.length, semMedida, faixa: e.faixa.size,
       extraordinarios: [...e.extraordinarios].sort(),
       anguloMaximoGraus: Math.round(anguloMaximo * 1000) / 1000, pontoDoAngulo: ondeAngulo, razaoMaxima: Math.round(razaoMaxima * 1000) / 1000, pontoDaRazao: ondeRazao,
     };
