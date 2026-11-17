@@ -40,13 +40,20 @@
  * O trecho curto. Com k = 5 o trecho aberto de m pontos tem m - 5 janelas, e o de menos de oito pontos ficaria com menos de três: nele a
  * ordem cai para max(4, m - 3), a quarta diferença no trecho de cinco a sete pontos; o ciclo tem m janelas e cai para m - 1 só abaixo de
  * seis pontos. O trecho de menos de cinco pontos fica como está. A quarta diferença no trecho de cinco a sete pontos não separa forma de
- * ruído no arco aberto: o arco limpo de raio 1000 em sete pontos anda 0,13 mm com 45 graus, 2,3 com 90, 7,7 com 120 e 42 com 180
- * (de oito pontos para cima, menos de 0,1); o trecho assim precisa de mais pontos ou de tolerância pequena.
+ * ruído no arco aberto: o arco limpo de raio 1000 em sete pontos anda 0,13 mm com 45 graus, 2,3 com 90, 7,7 com 120 e 42 com 180.
+ * De oito pontos para cima o arco limpo exato fica no lugar só porque a volta é rejeitada (ela não baixa a energia); com um ruído
+ * pequeno a volta fica, e o arco aberto de oito pontos anda 0,11 mm com 90 graus, 0,56 com 120 e 5,1 com 180 (com nove pontos, 4,1),
+ * e o de onze pontos com 90 graus, 0,02. O trecho assim precisa de mais pontos ou de tolerância pequena.
  *
  * A REGRA EM PONTOS POR VOLTA. A curva de curvatura constante se alisa sem andar quando a volta inteira dela teria uns 16 pontos: o
- * círculo fechado de 16 pontos anda 0,08 mm por 1000 mm de raio, o de 12 anda 1,4 e o de 8, 65. A curva aberta perde nas pontas: a hélice
- * de raio 300 com 20 pontos por volta, com 0,1 mm de ruído, anda 0,52 mm no ponto vizinho da ponta, com 24 pontos 0,22 e com 32, 0,07.
+ * círculo fechado de 16 pontos anda 0,08 mm por 1000 mm de raio, o de 12 anda 1,4 e o de 8, 65. A curva aberta perde nas pontas e pede
+ * 24 pontos ou mais por volta: a hélice de raio 300 com 20 pontos por volta, com 0,1 mm de ruído, anda 0,52 mm no ponto vizinho da
+ * ponta, com 24 pontos 0,22 e com 32, 0,07; o arco aberto de 120 graus em oito pontos (21 por volta) anda 0,56.
  * A curva que anda mais que meia tolerância, ou que bate nela, sai com aviso na gaiolaPorRede.
+ *
+ * O canto. Esta função parte a curva só onde o chamador manda (`partir`). Na gaiolaPorRede o canto num ponto-chave numérico se acha
+ * pelas cordas até 20 tolerâncias de cada lado: os cantos a menos disso um do outro ou da ponta não são achados, e saem arredondados até
+ * a tolerância; o remédio é o nó em `cantos` (a ficha de gaiolaPorRede dá os números).
  *
  * O limite do método. O que muda num comprimento da ordem do espaçamento não se distingue do ruído pela amostragem: a curvatura da ponta
  * da elipse muda num comprimento menor que o raio dela. Com o raio da ponta em umas sete vezes o espaçamento a elipse anda 0,02 mm (a de

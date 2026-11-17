@@ -229,6 +229,46 @@ describe.skipIf(!manifoldCarregada())('o alisamento das curvas declaradas na red
     expect(c.partida).toEqual([50, 100]);
   });
 
+  /* o limite da medida do canto em escala, travado: os cantos a menos de 20 tolerâncias um do outro ou da ponta não são achados, o dano
+     fica dentro da tolerância e sai com aviso que dá o remédio; com o ponto do canto escrito como nó e posto em cantos, a forma fica */
+  it('o canto que a medida em escala não acha fica arredondado dentro da tolerância, com aviso, e o nó em cantos o guarda', () => {
+    const rodar = (feicao, nos = []) => {
+      const d = definicaoDaRede({ ruido: false });
+      const baixo = d.curvas.find((c) => c.nome === 'baixo');
+      const pts = ['N00']; const xs = [0];
+      for (let x = 10; x < 500; x += 10) {
+        if (nos.includes(x)) { d.nos[`C${x}`] = [x, painel(x, 0) + feicao(x), 0]; pts.push(`C${x}`); } else pts.push([x, painel(x, 0) + feicao(x), 0]);
+        xs.push(x);
+      }
+      pts.push('N10'); xs.push(500);
+      for (let x = 510; x < 1000; x += 10) { pts.push([x, painel(x, 0), 0]); xs.push(x); }
+      pts.push('N20'); xs.push(1000); baixo.pontos = pts;
+      const g = gaiolaPorRede({ ...d, ...(nos.length ? { cantos: nos.map((x) => `C${x}`) } : {}), alisarCurvas: { tolerancia: 2.5 } });
+      const c = g.alisamentoDasCurvas.curvas.baixo;
+      const desvio = Math.max(...c.pontosChave.map((p, i) => (typeof pts[i] === 'string' ? 0 : Math.abs(p[1] - painel(p[0], 0) - (xs[i] < 500 ? feicao(xs[i]) : 0)))));
+      const avisos = g.avisos.filter((a) => a.curva === 'baixo' && a.ref.startsWith('alisamento'));
+      return { cortes: c.partida.map((i) => xs[i]), desvio, maior: c.maiorDeslocamentoMm, avisos };
+    };
+    const v = (x) => Math.max(0, 40 - Math.abs(x - 250));
+    const doisV = (x) => Math.max(0, 20 - Math.abs(x - 250)) + Math.max(0, 20 - Math.abs(x - 290));
+    const pertoDaPonta = (x) => (x <= 20 ? 20 - x : 0);
+    for (const [nome, feicao, cortes, ref, nos] of [
+      ['V de 90 graus', v, [250], 'alisamentoAndou', [210, 250, 290]],
+      ['dois V a 40 mm', doisV, [], 'alisamentoNoLimite', [230, 250, 270, 290, 310]],
+      ['canto a 20 mm da ponta', pertoDaPonta, [], 'alisamentoNoLimite', [20]],
+    ]) {
+      const sem = rodar(feicao);
+      expect(sem.cortes, nome).toEqual(cortes);
+      expect(sem.desvio, nome).toBeGreaterThan(1);
+      expect(sem.maior, nome).toBeLessThanOrEqual(2.5);
+      expect(sem.avisos.map((a) => a.ref), nome).toEqual([ref]);
+      expect(sem.avisos[0].texto, nome).toMatch(/escreva o ponto do canto como nó e ponha o nó em cantos|escrevendo o ponto dele como nó e pondo o nó em cantos/);
+      const com = rodar(feicao, nos);
+      expect(com.desvio, nome).toBeLessThan(1e-3);
+      expect(com.avisos, nome).toEqual([]);
+    }
+  });
+
   it('a curva que bate no limite ou anda mais que meia tolerância sai com aviso', () => {
     const avisos = (alisarCurvas) => gaiolaPorRede(definicaoDaRede({ ruido: true, alisarCurvas })).avisos.filter((a) => a.ref.startsWith('alisamento'));
     const um = avisos({ tolerancia: 1 });

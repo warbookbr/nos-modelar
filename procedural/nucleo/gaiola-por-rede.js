@@ -111,8 +111,13 @@
  * não se distingue do ruído e anda até a tolerância; a ficha de `alisarPontosDaCurva` dá os números. Ficam onde estão, bit a bit, os nós (o ponto-chave escrito como nome), as pontas da curva aberta e
  * os pontos que `pontosDuros: { curva: [k] }` declara (k é a posição na lista de pontos da curva); o nó em `cantos`, e todo ponto-chave
  * onde a poligonal dos pontos-chave vira mais que `anguloDeCanto`, parte a curva em trechos alisados à parte: no nó o ângulo é o dos
- * vizinhos, e no ponto-chave numérico o das cordas até 20 tolerâncias de cada lado, que o ruído da ordem da tolerância não vira. A
- * curva que bate na tolerância, ou anda mais que metade dela, sai com aviso (`alisamentoNoLimite`, `alisamentoAndou`) em `avisos`. Nenhum ponto anda mais que
+ * vizinhos, e no ponto-chave numérico o das cordas até 20 tolerâncias de cada lado, que o ruído da ordem da tolerância não vira. O
+ * limite dessa medida: dois cantos a menos de 20 tolerâncias um do outro (o V estreito, o friso, o degrau curto) ou um canto a menos
+ * disso da ponta da curva aberta não são achados, e o alisamento os arredonda até a tolerância (no V de 90 graus com ponto a cada 10 mm
+ * e tolerância de 2,5, os cantos dos lados andam 2,1 mm; no par de V a 40 mm, 2,5 mm, no limite). O remédio é escrever o ponto do canto
+ * como nó e pôr o nó em `cantos`: o V e o par de V ficam onde estão; `pontosDuros` não basta, porque a energia atravessa o ponto duro
+ * e arredonda os vizinhos. A curva que bate na tolerância, ou anda mais que metade dela, sai com aviso (`alisamentoNoLimite`,
+ * `alisamentoAndou`) em `avisos`, com esse remédio. Nenhum ponto anda mais que
  * `tolerancia` mm (1 por padrão), ou que a da curva em `toleranciaPorCurva: { curva: mm }`, e com `silhueta: { vista, tolerancia }` o
  * deslocamento visto pela vista ('x', 'y' ou 'z', o eixo para onde a vista olha) não passa da tolerância dela: as curvas lidas da prancha
  * ficam na silhueta dela, e o que se mexe é a profundidade. Com `simetria: 'x'`, o ponto-chave em x = 0 fica com x = 0 e nenhum vai a
@@ -689,8 +694,8 @@ export function gaiolaPorRede(definicaoDada) {
       avisosDoAlisamento.push({
         ref: noLimite ? 'alisamentoNoLimite' : 'alisamentoAndou', curva: nome, maiorDeslocamentoMm: r4(r.maiorDeslocamento), toleranciaMm: tolerancia, limitados: r.limitados.length,
         texto: noLimite
-          ? `alisarCurvas: a curva ${citar(nome)} bateu na tolerância de ${br(tolerancia)} mm em ${r.limitados.length} de ${n} pontos-chave; o que passa dela (ruído maior que a tolerância, ou uma feição que a amostragem não acompanha) ficou só em parte: confira a curva, suba a tolerância dela em toleranciaPorCurva ou ponha pontosDuros na feição`
-          : `alisarCurvas: a curva ${citar(nome)} andou até ${br(r.maiorDeslocamento)} mm, mais que ${br(FRACAO_DO_AVISO * 100)}% da tolerância de ${br(tolerancia)} mm; se ela é limpa, isso é forma que a amostragem não acompanha (o círculo pede uns 16 pontos por volta), e não ruído`,
+          ? `alisarCurvas: a curva ${citar(nome)} bateu na tolerância de ${br(tolerancia)} mm em ${r.limitados.length} de ${n} pontos-chave; o que passa dela (ruído maior que a tolerância, ou uma feição que a amostragem não acompanha) ficou só em parte: confira a curva; se é ruído, suba a tolerância dela em toleranciaPorCurva; se é um canto, escreva o ponto do canto como nó e ponha o nó em cantos (pontosDuros não basta: o ponto fica, mas a energia passa por ele e arredonda os vizinhos)`
+          : `alisarCurvas: a curva ${citar(nome)} andou até ${br(r.maiorDeslocamento)} mm, mais que ${br(FRACAO_DO_AVISO * 100)}% da tolerância de ${br(tolerancia)} mm; se ela é limpa, isso é forma que a amostragem não acompanha (o círculo fechado pede uns 16 pontos por volta, a curva aberta 24 ou mais) ou um canto que o alisamento arredondou; o canto se guarda escrevendo o ponto dele como nó e pondo o nó em cantos (pontosDuros não basta)`,
       });
     }
     return r.pontos;
