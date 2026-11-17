@@ -121,3 +121,5 @@ A revisão adversarial dos commits `14833a64` e `02788903` conferiu que o estado
 4. Com `maximo = 4` e todo passo guardado, a edição só recomeçava do passo anterior nas quatro últimas posições. A memória em armazém escolhe agora os pontos pelo custo (o passo que leva ao menos `limiarDeCustoMs`, 250 ms por padrão, os dois últimos e o anterior ao primeiro que mudou desde a execução anterior), `maximo` é validado e é 16 por padrão, infinito com todo passo guardado, e a receita de oito cubos refaz seis passos ao mudar o terceiro.
 
 Também entraram a trava opcional do índice (`armazem.trancar`), que evita perder o ponto de outro processo que guarda ao mesmo tempo, e `desserializarDevolveCopia`, sem a qual o núcleo copia o estado lido, porque um armazém que devolve o objeto guardado teria o estado mudado pelos passos seguintes.
+
+A varredura inteira (`CACHE_ACERVO_INTEIRO=1`) rodou de novo em 2026-11-17 com o código destas correções, no commit `558350aa`: as 121 receitas deram o mesmo neutro recomeçando do passo do meio, em 676 s com a máquina dividida.
