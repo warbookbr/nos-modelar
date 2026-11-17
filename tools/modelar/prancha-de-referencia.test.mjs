@@ -520,7 +520,19 @@ describe('a prancha desenhada: leitura estrita, cobertura, réguas e uma captura
   it('recusa viewBox de origem não nula, width diferente do viewBox e contorno em grupo com transformação, mesmo sem girar', () => {
     expect(() => lerPranchaDesenhada(FIXTURE, lerCom((t) => t.replace('viewBox="0 0 300 220"', 'viewBox="-100 0 300 220"')))).toThrow(/origem -100 0/);
     expect(() => lerPranchaDesenhada(FIXTURE, lerCom((t) => t.replace('width="300"', 'width="150"')))).toThrow(/width="150" difere do viewBox \(300\)/);
-    expect(() => lerPranchaDesenhada(FIXTURE, lerCom((t) => t.replace('<path class="contorno"', '<g transform="translate(10 0)"><path class="contorno"').replace('</svg>', '</g></svg>')))).toThrow(/grupo <g transform/);
+    expect(() => lerPranchaDesenhada(FIXTURE, lerCom((t) => t.replace('<path class="contorno"', '<g transform="translate(10 0)"><path class="contorno"').replace('</svg>', '</g></svg>')))).toThrow(/há 'transform' no desenho/);
+  });
+
+  it('recusa transform em qualquer elemento, inclusive no próprio traço e no style, e width ou height com unidade', () => {
+    expect(() => lerPranchaDesenhada(FIXTURE, lerCom((t) => t.replace('<path class="contorno"', '<path transform="translate(9 0)" class="contorno"')))).toThrow(/há 'transform' no desenho/);
+    expect(() => lerPranchaDesenhada(FIXTURE, lerCom((t) => t.replace('<path class="contorno"', '<path style="transform: scale(2)" class="contorno"')))).toThrow(/há 'transform' no desenho/);
+    expect(() => lerPranchaDesenhada(FIXTURE, lerCom((t) => t.replace('width="300"', 'width="300px"')))).toThrow(/não é só um número em px/);
+    expect(() => lerPranchaDesenhada(FIXTURE, lerCom((t) => t.replace('height="220"', 'height="100%"')))).toThrow(/não é só um número em px/);
+  });
+
+  it('o relatório que não é JSON é recusa com o nome do arquivo', () => {
+    const ler = (c) => (c.endsWith('.json') ? '{ não é json' : readFileSync(FIXTURE, 'utf8'));
+    expect(() => lerPranchaDesenhada(FIXTURE, { ler, existe: () => true })).toThrow(/lateral\.prancha\.relatorio\.json não se lê como JSON/);
   });
 
   it('as duas escalas precisam concordar em 0,5%: 1% de diferença é recusado', () => {
@@ -591,13 +603,64 @@ describe('a prancha desenhada pelo prancharDesenhadas real (Chromium, bancada si
     } finally { rmSync(pasta, { recursive: true, force: true }); }
   }, 90_000);
 
-  it('o giro declarado errado derruba a cobertura da silhueta dentro do desenho', async () => {
+  /* um desenho virtual de contorno em L (300 por 220 px a 0,5 px/mm; caixa de 400 por 300 mm): o vão do L fica à direita e embaixo */
+  const LETRA_L = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 220" width="300" height="220"><rect width="300" height="220" fill="#fbfbfa"/><style>.contorno{fill:none;stroke:#12233b;stroke-width:2}</style>'
+    + '<path class="contorno" d="M 50 30 L 250 30 L 250 100 L 150 100 L 150 180 L 50 180 L 50 30"/></svg>';
+  const REL_L = JSON.stringify({ relatorio: { porVista: { lateral: { caixa: { xMin: -200, xMax: 200, yMin: 0, yMax: 300 } } } } });
+  const virtual = (svg = LETRA_L) => ({ leitura: { ler: (c) => (c.endsWith('.json') ? REL_L : svg), existe: () => true } });
+  const L = '/virtual/lateral.prancha.svg';
+
+  it('o modelo no vão do L, do lado errado do desenho, dá cobertura abaixo de 85% no modo de coordenadas; no corpo do L, perto de 100%', async () => {
     const pasta = mkdtempSync(join(REPO, 'tmp', 'prancha-desenhada-'));
     try {
-      /* girar 90 troca o retângulo de 400 por 300 mm por um de 300 por 400 mm: o modelo de 150 por 250 mm que cabia deixa de caber em altura */
-      const r = await prancharDesenhadas({ peca: 'teste', pranchas: [{ caminho: FIXTURE, vista: 'esquerda', referencial: true, girar: 90 }], saida: join(pasta, 'c.png') }, { olhar: bancada(modelo([50, 50, 200, 300])).olhar });
-      const a = r.lidas[0].alinhamento;
-      expect(a.tipo === 'centro' || a.cobertura < 0.85).toBe(true);
+      /* h de -30 a 100 mm e v de 10 a 100 mm: dentro da caixa do desenho, mas quase todo no vão do L */
+      const noVao = await prancharDesenhadas({ peca: 'teste', pranchas: [{ caminho: L, vista: 'esquerda', referencial: true }], saida: join(pasta, 'v.png') }, { olhar: bancada(modelo([170, 200, 300, 290])).olhar, ...virtual() });
+      expect(noVao.lidas[0].alinhamento.tipo).toBe('coordenadas');
+      expect(noVao.lidas[0].alinhamento.cobertura).toBeLessThan(0.85);
+      expect(noVao.lidas[0].alinhamento.cobertura).toBeLessThan(0.5);
+      /* h de -190 a -10 mm e v de 10 a 100 mm: na coluna do L */
+      const noCorpo = await prancharDesenhadas({ peca: 'teste', pranchas: [{ caminho: L, vista: 'esquerda', referencial: true }], saida: join(pasta, 'c.png') }, { olhar: bancada(modelo([10, 200, 190, 290])).olhar, ...virtual() });
+      expect(noCorpo.lidas[0].alinhamento.cobertura).toBeGreaterThan(0.95);
+    } finally { rmSync(pasta, { recursive: true, force: true }); }
+  }, 90_000);
+
+  it('o giro declarado errado leva o modelo para fora da caixa do desenho, e o motivo cita o giro e o lado', async () => {
+    const pasta = mkdtempSync(join(REPO, 'tmp', 'prancha-desenhada-'));
+    try {
+      const r = await prancharDesenhadas({ peca: 'teste', pranchas: [{ caminho: FIXTURE, vista: 'esquerda', referencial: true, girar: 90 }], saida: join(pasta, 'g.png') }, { olhar: bancada(modelo([50, 50, 200, 300])).olhar });
+      expect(r.lidas[0].alinhamento.tipo).toBe('centro');
+      expect(r.lidas[0].alinhamento.motivo).toMatch(/o modelo passa da caixa do desenho.*o giro e o lado declarados podem estar errados/);
+    } finally { rmSync(pasta, { recursive: true, force: true }); }
+  }, 90_000);
+
+  it('o contorno aberto diz que não fecha, e não culpa lado nem giro', async () => {
+    const pasta = mkdtempSync(join(REPO, 'tmp', 'prancha-desenhada-'));
+    try {
+      const aberto = LETRA_L.replace('L 50 30"/>', 'L 50 60"/>');
+      const r = await prancharDesenhadas({ peca: 'teste', pranchas: [{ caminho: L, vista: 'esquerda', referencial: true }], saida: join(pasta, 'a.png') }, { olhar: bancada(modelo([10, 200, 190, 290])).olhar, ...virtual(aberto) });
+      expect(r.lidas[0].alinhamento.contornoAberto).toBe(true);
+    } finally { rmSync(pasta, { recursive: true, force: true }); }
+  }, 90_000);
+
+  it('referencial: false explícito tem motivo próprio, que não soa como esquecimento', async () => {
+    const pasta = mkdtempSync(join(REPO, 'tmp', 'prancha-desenhada-'));
+    try {
+      const r = await prancharDesenhadas({ peca: 'teste', pranchas: [{ caminho: FIXTURE, vista: 'esquerda', referencial: false }], saida: join(pasta, 'f.png') }, { olhar: bancada(modelo([50, 50, 200, 300])).olhar });
+      expect(r.lidas[0].alinhamento.motivo).toMatch(/declara referencial: false.*de propósito/);
+    } finally { rmSync(pasta, { recursive: true, force: true }); }
+  }, 90_000);
+
+  it('um relatório corrompido recusa só aquela prancha, com o nome do arquivo, e a outra segue', async () => {
+    const pasta = mkdtempSync(join(REPO, 'tmp', 'prancha-desenhada-'));
+    try {
+      const ler = (c) => (c.endsWith('ruim.prancha.relatorio.json') ? '{ isto não é json' : c.endsWith('.json') ? REL_L : LETRA_L);
+      const r = await prancharDesenhadas({
+        peca: 'teste', pranchas: [{ caminho: '/virtual/ruim.prancha.svg', vista: 'traseira' }, { caminho: L, vista: 'esquerda', referencial: true }], saida: join(pasta, 'j.png'),
+      }, { olhar: bancada(modelo([10, 200, 190, 290])).olhar, leitura: { ler, existe: () => true } });
+      expect(r.recusadas).toHaveLength(1);
+      expect(r.recusadas[0]).toMatch(/^ruim\.prancha\.svg: ruim\.prancha\.relatorio\.json não se lê como JSON/);
+      expect(r.recusadas[0].match(/ruim\.prancha\.svg/g)).toHaveLength(1);
+      expect(r.vistas).toEqual(['esquerda']);
     } finally { rmSync(pasta, { recursive: true, force: true }); }
   }, 90_000);
 

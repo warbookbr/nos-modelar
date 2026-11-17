@@ -1113,7 +1113,7 @@ describe('a prancha desenhada em mm que o plano cita (e o aviso do que o pacote 
     const { resultado, pasta, pedidos, pedido } = await montar();
     expect(referenciasDoPlano({ referencias: ['referencias/lateral.prancha.svg'] }, { pastaDaReceita: dirname(SVG).replace(/referencias$/, '') }).pranchas).toEqual([SVG]);
     expect(pedidos).toHaveLength(1);
-    expect(pedidos[0].pranchas[0]).toMatchObject({ vista: 'esquerda', girar: 0, referencial: false });
+    expect(pedidos[0].pranchas[0]).toMatchObject({ vista: 'esquerda', girar: 0 });
     expect(basename(pedidos[0].sobreposta)).toBe('prancha-desenhada-sobreposta.png');
     expect(resultado.pranchaDesenhada.imagens.map((i) => i.disposicao)).toEqual(['lado', 'sobreposta']);
     const secao = pedido.slice(pedido.indexOf('## Prancha desenhada'), pedido.indexOf('## Modelo'));
@@ -1148,6 +1148,13 @@ describe('a prancha desenhada em mm que o plano cita (e o aviso do que o pacote 
     const { resultado, pedido } = await montar(gravador({ tipo: 'coordenadas', caixaMm: [0, 0, 1, 1], cobertura: 0.41 }).fazer);
     expect(resultado.avisos.join('\n')).toMatch(/só 41% da silhueta do modelo cai dentro do contorno do desenho \(o limite é 85%\): o lado declarado ou o giro \(0 graus\) podem estar errados/);
     expect(pedido).toContain('Fora da prancha desenhada: lateral.prancha.svg: só 41%');
+  });
+
+  it('o contorno aberto do desenho vira aviso que diz que o contorno não fecha, sem culpar lado nem giro', async () => {
+    const { resultado } = await montar(gravador({ tipo: 'coordenadas', caixaMm: [0, 0, 1, 1], cobertura: 0.016, contornoAberto: true }).fazer);
+    const avisos = resultado.avisos.join('\n');
+    expect(avisos).toMatch(/lateral\.prancha\.svg: o contorno do desenho não fecha/);
+    expect(avisos).not.toMatch(/só 2% da silhueta/);
   });
 
   it('a prancha recusada entre as lidas vai ao aviso e não derruba a outra', async () => {

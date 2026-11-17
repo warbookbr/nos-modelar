@@ -205,6 +205,8 @@ async function carregarEMedirNaPagina({ modelos, fotos, limiar }) {
 
 /** O limite abaixo do qual a silhueta do modelo, posta sobre o desenho pelas coordenadas, é dita fora dele: o lado ou o giro declarados podem estar errados. */
 export const LIMITE_DA_COBERTURA = 0.85;
+/** Abaixo desta fração da imagem do desenho dentro do contorno, o contorno é dito aberto: um carro fechado ocupa bem mais. */
+export const LIMITE_DO_INTERIOR = 0.08;
 
 /* Fase 3, na página: a fração dos pixels do modelo que caem dentro do contorno do desenho. O "dentro" é o que a água não alcança vindo da
    borda da imagem do desenho, com os traços engrossados de 1 px para fechar frestas; a imagem do desenho é reduzida à metade. */
@@ -251,7 +253,9 @@ async function medirCoberturaNaPagina({ linhas, limiar }) {
       const px = Math.round((l.origemDesenho[0] + hmm * l.kDesenho) * S); const py = Math.round((l.origemDesenho[1] - vmm * l.kDesenho) * S);
       if (px >= 0 && py >= 0 && px < w && py < h && !fora[py * w + px]) dentro += 1;
     }
-    resposta.push({ total, dentro });
+    let interior = 0;
+    for (let i = 0; i < w * h; i++) if (!fora[i]) interior += 1;
+    resposta.push({ total, dentro, interior: interior / (w * h) });
   }
   return resposta;
 }
@@ -431,7 +435,7 @@ export function disporPrancha({ titulo, linhas, disposicao = 'lado', alturaDaLin
     const fotoTexto = `${rotulo} ${l.foto.nome}${l.foto.espelhar ? ' (espelhada)' : ''}, régua ${mm1(l.foto.regua.mm)} mm = ${mm1(l.foto.regua.px)} px`;
     const linhaRelato = {
       vista: l.vista,
-      alinhamento: uniao[i].porCoordenadas ? { tipo: 'coordenadas', caixaMm: l.alinhamento.caixaMm, ...(l.alinhamento.cobertura !== undefined ? { cobertura: l.alinhamento.cobertura } : {}) } : { tipo: 'centro', ...(l.alinhamento?.motivo ? { motivo: l.alinhamento.motivo } : {}) },
+      alinhamento: uniao[i].porCoordenadas ? { tipo: 'coordenadas', caixaMm: l.alinhamento.caixaMm, ...(l.alinhamento.cobertura !== undefined ? { cobertura: l.alinhamento.cobertura } : {}), ...(l.alinhamento.contornoAberto ? { contornoAberto: true } : {}) } : { tipo: 'centro', ...(l.alinhamento?.motivo ? { motivo: l.alinhamento.motivo } : {}) },
       modelo: { pxPorMm: l.modelo.pxPorMm, extensaoPx: l.modelo.extensao, extensaoMm: m.extMmm.map((v) => Number(v.toFixed(1))), ...(l.modelo.eixos ? { eixos: l.modelo.eixos } : {}) },
       foto: {
         nome: l.foto.nome, espelhada: Boolean(l.foto.espelhar), pxPorMm: l.foto.pxPorMm, regiaoPx: l.foto.regiao ?? 'auto',
@@ -885,7 +889,7 @@ export function alinharPelasCoordenadas({ modelo, desenho, margem = MARGEM_DO_RE
   if (h0 < dh0 - folga || h1 > dh1 + folga || vBaixo < dv0 - folga || vAlto > dv1 + folga) {
     const mm = (n) => Math.round(n);
     const excessos = [['à esquerda', dh0 - h0], ['à direita', h1 - dh1], ['embaixo', dv0 - vBaixo], ['em cima', vAlto - dv1]].filter(([, e]) => e > 0);
-    return { ok: false, motivo: `o modelo passa da caixa do desenho (h ${mm(dh0)} a ${mm(dh1)} e v ${mm(dv0)} a ${mm(dv1)} mm): ${excessos.map(([lado, e]) => `${mm(e)} mm ${lado}`).join(', ')}; ou a origem do desenho não é a do modelo` };
+    return { ok: false, motivo: `o modelo passa da caixa do desenho (h ${mm(dh0)} a ${mm(dh1)} e v ${mm(dv0)} a ${mm(dv1)} mm): ${excessos.map(([lado, e]) => `${mm(e)} mm ${lado}`).join(', ')}; o giro e o lado declarados podem estar errados, ou a origem do desenho não é a do modelo` };
   }
   const m = margem * Math.max(h1 - h0, vAlto - vBaixo);
   const kd = desenho.pxPorMm;
@@ -995,7 +999,11 @@ export async function prancharReferencia(opcoes, { rotulo = 'foto', prazoDeCarga
           origemDesenho: pedido.ancoras[i].origemPx, kDesenho: pedido.reguas[i].pxPorMm,
         })),
       });
-      for (const [j, i] of aMedir.entries()) alinhamentos[i].cobertura = cob[j].total ? Math.round((cob[j].dentro / cob[j].total) * 1000) / 1000 : null;
+      for (const [j, i] of aMedir.entries()) {
+        alinhamentos[i].cobertura = cob[j].total ? Math.round((cob[j].dentro / cob[j].total) * 1000) / 1000 : null;
+        /* o desenho cujo interior é quase nulo tem o contorno aberto: a água entra pela fresta e a cobertura não mede lado nem giro */
+        if (cob[j].interior < LIMITE_DO_INTERIOR) alinhamentos[i].contornoAberto = true;
+      }
     }
     for (const [i, m] of medidas.fotos.entries()) {
       if (m.fora) recusar(`--regiao ${pedido.regioes[i].join(',')} cai fora da foto ${pedido.fotos[i].nome}, que tem ${m.largura} por ${m.altura} px.`);
@@ -1072,10 +1080,12 @@ export function lerPranchaDesenhada(caminhoSvg, { ler = (c) => readFileSync(c, '
   if (!vista) recusar(`${nome}: o nome da prancha desenhada é <lado>.prancha.svg, com o lado em ${Object.keys(VISTA_DA_PRANCHA_DESENHADA).join(', ')}.`);
   const relatorio = caminhoSvg.replace(/\.svg$/i, '.relatorio.json');
   if (!existe(relatorio)) recusar(`${nome}: falta ${basename(relatorio)} ao lado, que dá a caixa do desenho em mm (o relatório que o script da prancha grava).`);
-  const porVistaDoRelatorio = JSON.parse(ler(relatorio))?.relatorio?.porVista ?? {};
+  let porVistaDoRelatorio;
+  try { porVistaDoRelatorio = JSON.parse(ler(relatorio))?.relatorio?.porVista ?? {}; } catch (erro) { recusar(`${basename(relatorio)} não se lê como JSON (${erro.message}); gere o relatório de novo com o script da prancha.`); }
   const caixa = Object.values(porVistaDoRelatorio)[0]?.caixa;
   if (!caixa || ![caixa.xMin, caixa.xMax, caixa.yMin, caixa.yMax].every(Number.isFinite)) recusar(`${basename(relatorio)} não traz relatorio.porVista.<vista>.caixa com xMin, xMax, yMin e yMax em mm.`);
-  const texto = ler(caminhoSvg);
+  let texto;
+  try { texto = ler(caminhoSvg); } catch (erro) { recusar(`${nome} não se lê (${erro.message}).`); }
   let [x0, y0, x1, y1] = caixaDoContornoSvg(texto, nome);
   const trocam = girar === 90 || girar === 270;
   /* o relatório dá a caixa do desenho como foi traçado; a imagem girada troca a largura e a altura em mm junto com as de px */
@@ -1087,10 +1097,11 @@ export function lerPranchaDesenhada(caminhoSvg, { ler = (c) => readFileSync(c, '
   if (!medidaDoDesenho || Number(medidaDoDesenho[1]) !== 0 || Number(medidaDoDesenho[2]) !== 0) recusar(`${nome}: a prancha desenhada abre com <svg viewBox="0 0 <largura> <altura>">, e este abre com ${medidaDoDesenho ? `origem ${medidaDoDesenho[1]} ${medidaDoDesenho[2]}` : 'outro formato'}; a escala em mm se mede nessa origem.`);
   const [W, H] = [Number(medidaDoDesenho[3]), Number(medidaDoDesenho[4])];
   for (const [atributo, esperado] of [['width', W], ['height', H]]) {
-    const dado = new RegExp(`\\s${atributo}="([\\d.]+)"`).exec(abertura0)?.[1];
+    const dado = new RegExp(`\\s${atributo}="([^"]*)"`).exec(abertura0)?.[1];
+    if (dado !== undefined && !/^\d+(\.\d+)?$/.test(dado.trim())) recusar(`${nome}: ${atributo}="${dado}" não é só um número em px (unidade como px, mm ou %, não vale); a escala em mm se mede com o tamanho em px igual ao do viewBox.`);
     if (dado !== undefined && Number(dado) !== esperado) recusar(`${nome}: ${atributo}="${dado}" difere do viewBox (${esperado}); a escala em mm se mede com o tamanho em px igual ao do viewBox.`);
   }
-  if (/<g\b[^>]*\btransform=/.test(texto)) recusar(`${nome}: há grupo <g transform=...> no desenho, e a caixa do contorno lida em px não vale dentro dele; desenhe sem transformação.`);
+  if (/\btransform\s*[=:]/i.test(texto)) recusar(`${nome}: há 'transform' no desenho (atributo ou style, em grupo ou no próprio traço), e a caixa do contorno lida em px não vale com ele; desenhe sem transformação.`);
   if (girar === 90) [x0, y0, x1, y1] = [H - y1, x0, H - y0, x1];
   else if (girar === 180) [x0, y0, x1, y1] = [W - x1, H - y1, W - x0, H - y0];
   else if (girar === 270) [x0, y0, x1, y1] = [y0, W - x1, y1, W - x0];
@@ -1132,9 +1143,8 @@ export async function prancharDesenhadas({ peca, pranchas, saida, disposicao = '
   const recusadas = [];
   const lidas = [];
   for (const p of pranchas) {
-    try { lidas.push({ ...lerPranchaDesenhada(p.caminho, { ...(dependencias.leitura ?? {}), girar: p.girar ?? 0, vista: p.vista ?? null }), caminho: p.caminho, girar: p.girar ?? 0, referencial: p.referencial === true }); } catch (erro) {
-      if (!(erro instanceof ErroDePrancha)) throw erro;
-      recusadas.push(`${basename(p.caminho)}: ${erro.message}`);
+    try { lidas.push({ ...lerPranchaDesenhada(p.caminho, { ...(dependencias.leitura ?? {}), girar: p.girar ?? 0, vista: p.vista ?? null }), caminho: p.caminho, girar: p.girar ?? 0, referencial: p.referencial }); } catch (erro) {
+      recusadas.push(erro.message.startsWith(basename(p.caminho)) ? erro.message : `${basename(p.caminho)}: ${erro.message}`);
     }
   }
   if (!lidas.length) recusar(`nenhuma prancha desenhada se leu: ${recusadas.join(' | ')}`);
@@ -1149,9 +1159,9 @@ export async function prancharDesenhadas({ peca, pranchas, saida, disposicao = '
     peca, vistas: vistas.join(','), foto: arquivos.join(';'), regua: lidas.map((l) => l.regua).join(';'), regiao: lidas.map((l) => l.regiao).join(';'),
     disposicao, espelhar: espelhar.join(','), saida,
     /* a origem em mm só vale com a peça no referencial do desenho, o que a receita declara em CRITICA.pranchas (referencial: true); fora disso, o centro, dizendo por quê */
-    ancoras: lidas.map((l) => (l.referencial
+    ancoras: lidas.map((l) => (l.referencial === true
       ? { origemPx: l.origemPx, caixaMm: l.caixaImagemMm }
-      : { motivo: 'a receita não declara em CRITICA.pranchas que a peça está no referencial do desenho (referencial: true), e a peça de referencial próprio ou em pose de montagem cairia fora do lugar' })),
+      : { motivo: l.referencial === false ? 'a receita declara referencial: false em CRITICA.pranchas: a peça não está no referencial do desenho, e o alinhamento é pelo centro de propósito' : 'a receita não declara em CRITICA.pranchas que a peça está no referencial do desenho (referencial: true), e a peça de referencial próprio ou em pose de montagem cairia fora do lugar' })),
     ...(sobreposta ? { tambem: { disposicao: 'sobreposto', saida: sobreposta } } : {}),
   }, { ...dependencias, rotulo: 'prancha desenhada', ...(prazoDeCargaMs ? { prazoDeCargaMs } : {}) });
   return { ...resultado, vistas, recusadas, lidas: lidas.map(({ caminho, larguraMm, alturaMm, pxPorMm, girar }, i) => ({ caminho, vista: vistas[i], larguraMm, alturaMm, pxPorMm, girar, alinhamento: resultado.medidas.linhas[i]?.alinhamento ?? null })) };

@@ -1334,7 +1334,7 @@ export async function pranchaDoPlano({ pranchas, peca, pasta, critica, orientaca
     if (!v) { fora.push(`${basename(caminho)}: o lado dela não é uma vista ortográfica de eixo (${VISTAS_DA_PRANCHA.join(', ')}); declare-o em CRITICA.referencias.`); continue; }
     if (entradas.some((e) => e.vista === v.vista)) { fora.push(`${basename(caminho)}: outra prancha já cobre a vista ${v.vista}.`); continue; }
     const declarada = critica.pranchas?.[basename(caminho)] ?? {};
-    entradas.push({ caminho, ...v, girar: declarada.girar ?? 0, referencial: declarada.referencial === true });
+    entradas.push({ caminho, ...v, girar: declarada.girar ?? 0, referencial: declarada.referencial });
   }
   if (!entradas.length) return { feita: null, fora };
   let r;
@@ -1358,7 +1358,9 @@ export async function pranchaDoPlano({ pranchas, peca, pasta, critica, orientaca
   for (const l of linhas) {
     const a = l.alinhamento;
     if (a?.tipo === 'centro') fora.push(`${basename(l.caminho)}: o desenho não foi sobreposto pelas coordenadas em mm, e saiu alinhado pelo centro das extensões (${a.motivo ?? 'sem origem em mm'}); a sobreposição dessa vista só vale se o modelo for a peça inteira do desenho.`);
-    if (a?.tipo === 'coordenadas' && typeof a.cobertura === 'number' && a.cobertura < LIMITE_DA_COBERTURA_DA_PRANCHA) {
+    if (a?.tipo === 'coordenadas' && a.contornoAberto) {
+      fora.push(`${basename(l.caminho)}: o contorno do desenho não fecha (quase nada da imagem fica dentro dele): a cobertura da silhueta não se mede, e a conferência do lado e do giro não vale; feche o contorno no desenho.`);
+    } else if (a?.tipo === 'coordenadas' && typeof a.cobertura === 'number' && a.cobertura < LIMITE_DA_COBERTURA_DA_PRANCHA) {
       fora.push(`${basename(l.caminho)}: só ${Math.round(a.cobertura * 100)}% da silhueta do modelo cai dentro do contorno do desenho (o limite é ${Math.round(LIMITE_DA_COBERTURA_DA_PRANCHA * 100)}%): o lado declarado ou o giro (${l.girar} graus) podem estar errados, ou o modelo está fora do desenho.`);
     }
   }
