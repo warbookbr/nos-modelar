@@ -5,6 +5,9 @@
  * declarada não vê (a gaiola da `subdivisao`, a superfície do `friso` e a face que um passo apagou): muda só um passo anterior, e a
  * saída com o cache tem de ser a da execução inteira. Os outros provam os gates 2 e 4 do plano: a edição do último passo refaz só ele, e
  * o estado de outra versão do núcleo não é servido. */
+import { existsSync, mkdtempSync, readFileSync, rmSync, unlinkSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { serialize, deserialize } from 'node:v8';
 import { describe, expect, it } from 'vitest';
 import { nucleo, usoDaOperacao } from '../entrada.js';
@@ -101,6 +104,17 @@ describe('o que o cache refaz e o que ele serve', () => {
     armazem.arquivos.set(nome, serialize({ ...ponto, versao: 'v0' }));
     const memoria = memoriaDe(armazem, { versao: 'v1' });
     expect(memoria.buscar(ponto.chave)).toBeNull();
+  });
+
+  it('em disco, entre duas memórias (dois comandos), a segunda recomeça do estado que a primeira gravou', () => {
+    const pasta = mkdtempSync(join(tmpdir(), 'cache-por-prefixo-'));
+    try {
+      const disco = { ler: (n) => (existsSync(join(pasta, n)) ? readFileSync(join(pasta, n)) : null), gravar: (n, b) => writeFileSync(join(pasta, n), b), apagar: (n) => { try { unlinkSync(join(pasta, n)); } catch { /* já saiu */ } } };
+      expect(comMemoria(receita('a'), {}, memoriaDe(disco)).executados).toBe(4);
+      const segundo = comMemoria(receita('b'), {}, memoriaDe(disco));
+      expect(segundo.executados).toBe(1);
+      expect(divergenciaDaImpressao(segundo.n, nucleo(receita('b')))).toBeNull();
+    } finally { rmSync(pasta, { recursive: true, force: true }); }
   });
 
   it('o ponto é pelo conteúdo: outra receita com o mesmo prefixo recomeça dele, e o resultado é o dela', () => {

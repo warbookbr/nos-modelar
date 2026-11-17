@@ -37,8 +37,11 @@ describe('o cache por prefixo no acervo inteiro', () => {
       expect(inteira.executados).toBe(e.PASSOS.length);
       const doMeio = rodar();
       expect(divergenciaDaImpressao(doMeio.n, inteira.n)).toBeNull();
-      /* o ponto do meio que não se serializa (dado que a cópia não aguenta) não é guardado, e a execução segue inteira */
-      if (memoria.estatisticas.guardados > 0) expect(doMeio.executados).toBe(e.PASSOS.length - meio - 1);
+      /* a receita vazia (as partes ainda sem passo de um objeto em alinhamento) não tem ponto */
+      if (!e.PASSOS.length) { expect(memoria.estatisticas).toMatchObject({ guardados: 0, lidos: 0, falhas: 0 }); return; }
+      /* toda receita do acervo tem a chave e o estado serializáveis: o ponto do meio foi guardado e lido, e a segunda execução fez só a metade de trás */
+      expect(memoria.estatisticas).toMatchObject({ guardados: 1, lidos: 1, falhas: 0 });
+      expect(doMeio.executados).toBe(e.PASSOS.length - meio - 1);
     }, 900_000);
   }
 });
