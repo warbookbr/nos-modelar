@@ -1,13 +1,11 @@
 {
   "formato": "mecanifica.registro-de-etapas",
-  "versao": 2,
+  "versao": 3,
   "montagem": "empilhadeira",
-  "etapas": [
+  "eventos": [
     {
+      "tipo": "aceite",
       "instancia": "carcaca",
-      "estado": "fixa",
-      "juntas": [],
-      "forma": "sha256:541cda7bbec45bfee845bbb8bec31d98a6f041b2452facbaff5bd9f12a1e088c",
       "aceite": {
         "por": "a pessoa, 2026-11-10: Sim, aceito da maneira como esta, podemos seguir em frente",
         "defeitosAceitos": [
@@ -18,47 +16,47 @@
           "pocoTraseiro: ausencia em poço atrás do arco da lateral, onde o alvo mostra eixo e roda"
         ],
         "analise": "ausente"
+      },
+      "impressao": {
+        "forma": "sha256:541cda7bbec45bfee845bbb8bec31d98a6f041b2452facbaff5bd9f12a1e088c",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0,
+            0
+          ]
+        },
+        "juntas": [],
+        "citadas": [],
+        "anteriores": []
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "bd732395130506b02d02f5d3abec6ac10a322cc8"
       }
     },
     {
+      "tipo": "aceite",
       "instancia": "eixoDianteiro",
-      "estado": "fixa",
-      "juntas": [
-        {
-          "relacao": "eixoNaPassagemDosPocos",
-          "com": "carcaca",
-          "satisfeita": true,
-          "medidas": {
-            "disponiveis": true,
-            "alinhamento": 1,
-            "descentro": 0,
-            "folgaRadial": 0.3175,
-            "folgaRadialMinima": 0.3175,
-            "folgaRadialMaxima": 0.3175,
-            "tolerancia": 0.000001,
-            "toleranciaNumerica": 0.000001,
-            "especificacaoFolgaRadial": {
-              "minimo": 0.3175,
-              "maximo": 0.3175,
-              "nominal": 0.3175,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
-              },
-              "formato": "nominal-fabricacao"
-            },
-            "inicioReferencia": -0.377,
-            "fimReferencia": 0.377,
-            "inicioMovel": -0.377,
-            "fimMovel": 0.377,
-            "sobraInicio": 0,
-            "sobraFim": 0,
-            "sobreposicaoAxial": 0.754,
-            "separacaoAxial": 0
-          }
-        }
-      ],
-      "forma": "sha256:158e289082875efbfd428b7dc2e59f825b54afe9834871a76d662564391c0f55",
       "aceite": {
         "por": "a pessoa, 2026-11-10: Entendi, podemos seguir suas recomendações e avançar (aceite dos dois eixos como na imagem, com a junta do traseiro medida pelos poços)",
         "defeitosAceitos": [
@@ -67,56 +65,121 @@
           "eixoDianteiro: uniao em assentos em x=±270..323, topo do bloco sobre o tubo"
         ],
         "analise": "ausente"
+      },
+      "impressao": {
+        "forma": "sha256:158e289082875efbfd428b7dc2e59f825b54afe9834871a76d662564391c0f55",
+        "parametros": [
+          {
+            "param": "entreAsParedes",
+            "valor": 754,
+            "unidade": "mm"
+          }
+        ],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0.3525,
+            0
+          ]
+        },
+        "juntas": [
+          {
+            "relacao": "eixoNaPassagemDosPocos",
+            "com": "carcaca",
+            "satisfeita": true,
+            "medidas": {
+              "disponiveis": true,
+              "alinhamento": 1,
+              "descentro": 0,
+              "folgaRadial": 0.3175,
+              "folgaRadialMinima": 0.3175,
+              "folgaRadialMaxima": 0.3175,
+              "tolerancia": 0.000001,
+              "toleranciaNumerica": 0.000001,
+              "especificacaoFolgaRadial": {
+                "minimo": 0.3175,
+                "maximo": 0.3175,
+                "nominal": 0.3175,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
+              },
+              "inicioReferencia": -0.377,
+              "fimReferencia": 0.377,
+              "inicioMovel": -0.377,
+              "fimMovel": 0.377,
+              "sobraInicio": 0,
+              "sobraFim": 0,
+              "sobreposicaoAxial": 0.754,
+              "separacaoAxial": 0
+            }
+          }
+        ],
+        "citadas": [
+          {
+            "etapa": "carcaca",
+            "porta": "passagemDoEixoDianteiro",
+            "por": [
+              "posição eixoNaCarcaca",
+              "relação eixoNaPassagemDosPocos",
+              "vínculo eixoEntreAsParedesDosPocos"
+            ],
+            "interface": {
+              "forma": "cilindro",
+              "papel": "interna",
+              "eixo": [
+                1,
+                0,
+                0
+              ],
+              "centro": [
+                -0.377,
+                0.3525,
+                0
+              ],
+              "raio": 0.3925,
+              "inicio": 0,
+              "fim": 0.754,
+              "referencia": [
+                0,
+                1,
+                0
+              ]
+            }
+          }
+        ],
+        "anteriores": [
+          "carcaca"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "253118fbadf3556046dc13dcef37445ac941b394"
       }
     },
     {
+      "tipo": "aceite",
       "instancia": "rodaDianteiraEsquerda",
-      "estado": "fixa",
-      "juntas": [
-        {
-          "relacao": "rodaDianteiraEsquerdaGiraNoCubo",
-          "com": "eixoDianteiro",
-          "satisfeita": true,
-          "medidas": {
-            "disponiveis": true,
-            "alinhamento": 1,
-            "descentro": 0,
-            "sobreposicaoRadial": 0.04500000000000002,
-            "sobreposicaoAxial": 0,
-            "separacaoAxial": 0,
-            "tolerancia": 0.000001,
-            "toleranciaNumerica": 0.000001,
-            "radialEsperado": {
-              "minimo": 0.045,
-              "maximo": 0.045,
-              "nominal": 0.045,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
-              },
-              "formato": "nominal-fabricacao"
-            },
-            "axialEsperado": {
-              "minimo": 0,
-              "maximo": 0,
-              "nominal": 0,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
-              },
-              "formato": "nominal-fabricacao"
-            },
-            "frestaEsperada": {
-              "minimo": 0,
-              "maximo": 0,
-              "nominal": 0,
-              "toleranciaFabricacao": null,
-              "formato": "sem-fresta"
-            }
-          }
-        }
-      ],
-      "forma": "sha256:ca034175a3ed82135b592949d832df6b4d5564d8487cde38dcc10c1d9cb3eaee",
       "aceite": {
         "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
         "defeitosAceitos": [
@@ -124,56 +187,120 @@
           "pneu: uniao em metade de dentro da banda, na altura do eixo, e topo do pneu sob a aba do paralama"
         ],
         "analise": "ausente"
+      },
+      "impressao": {
+        "forma": "sha256:ca034175a3ed82135b592949d832df6b4d5564d8487cde38dcc10c1d9cb3eaee",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0.542,
+            0.3525,
+            0
+          ]
+        },
+        "juntas": [
+          {
+            "relacao": "rodaDianteiraEsquerdaGiraNoCubo",
+            "com": "eixoDianteiro",
+            "satisfeita": true,
+            "medidas": {
+              "disponiveis": true,
+              "alinhamento": 1,
+              "descentro": 0,
+              "sobreposicaoRadial": 0.045,
+              "sobreposicaoAxial": 0,
+              "separacaoAxial": 0,
+              "tolerancia": 0.000001,
+              "toleranciaNumerica": 0.000001,
+              "radialEsperado": {
+                "minimo": 0.045,
+                "maximo": 0.045,
+                "nominal": 0.045,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
+              },
+              "axialEsperado": {
+                "minimo": 0,
+                "maximo": 0,
+                "nominal": 0,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
+              },
+              "frestaEsperada": {
+                "minimo": 0,
+                "maximo": 0,
+                "nominal": 0,
+                "toleranciaFabricacao": null,
+                "formato": "sem-fresta"
+              }
+            }
+          }
+        ],
+        "citadas": [
+          {
+            "etapa": "eixoDianteiro",
+            "porta": "cuboEsquerdo",
+            "por": [
+              "posição rodaDianteiraEsquerdaNoCubo",
+              "relação rodaDianteiraEsquerdaGiraNoCubo"
+            ],
+            "interface": {
+              "forma": "anel",
+              "papel": "ocupa",
+              "eixo": [
+                -1,
+                0,
+                0
+              ],
+              "centro": [
+                0.463,
+                0.3525,
+                0
+              ],
+              "raioInterno": 0.05,
+              "raioExterno": 0.11,
+              "inicio": 0,
+              "fim": 0.059
+            }
+          }
+        ],
+        "anteriores": [
+          "carcaca",
+          "eixoDianteiro"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "3ac93d67d0eaac4f887f5e1eb2f4445476656feb"
       }
     },
     {
+      "tipo": "aceite",
       "instancia": "rodaDianteiraDireita",
-      "estado": "fixa",
-      "juntas": [
-        {
-          "relacao": "rodaDianteiraDireitaGiraNoCubo",
-          "com": "eixoDianteiro",
-          "satisfeita": true,
-          "medidas": {
-            "disponiveis": true,
-            "alinhamento": 1,
-            "descentro": 0,
-            "sobreposicaoRadial": 0.04500000000000002,
-            "sobreposicaoAxial": 0,
-            "separacaoAxial": 0,
-            "tolerancia": 0.000001,
-            "toleranciaNumerica": 0.000001,
-            "radialEsperado": {
-              "minimo": 0.045,
-              "maximo": 0.045,
-              "nominal": 0.045,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
-              },
-              "formato": "nominal-fabricacao"
-            },
-            "axialEsperado": {
-              "minimo": 0,
-              "maximo": 0,
-              "nominal": 0,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
-              },
-              "formato": "nominal-fabricacao"
-            },
-            "frestaEsperada": {
-              "minimo": 0,
-              "maximo": 0,
-              "nominal": 0,
-              "toleranciaFabricacao": null,
-              "formato": "sem-fresta"
-            }
-          }
-        }
-      ],
-      "forma": "sha256:ca034175a3ed82135b592949d832df6b4d5564d8487cde38dcc10c1d9cb3eaee",
       "aceite": {
         "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
         "defeitosAceitos": [
@@ -181,47 +308,121 @@
           "pneu: uniao em metade de dentro da banda, na altura do eixo, e topo do pneu sob a aba do paralama"
         ],
         "analise": "ausente"
+      },
+      "impressao": {
+        "forma": "sha256:ca034175a3ed82135b592949d832df6b4d5564d8487cde38dcc10c1d9cb3eaee",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            -0.542,
+            0.3525,
+            0
+          ]
+        },
+        "juntas": [
+          {
+            "relacao": "rodaDianteiraDireitaGiraNoCubo",
+            "com": "eixoDianteiro",
+            "satisfeita": true,
+            "medidas": {
+              "disponiveis": true,
+              "alinhamento": 1,
+              "descentro": 0,
+              "sobreposicaoRadial": 0.045,
+              "sobreposicaoAxial": 0,
+              "separacaoAxial": 0,
+              "tolerancia": 0.000001,
+              "toleranciaNumerica": 0.000001,
+              "radialEsperado": {
+                "minimo": 0.045,
+                "maximo": 0.045,
+                "nominal": 0.045,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
+              },
+              "axialEsperado": {
+                "minimo": 0,
+                "maximo": 0,
+                "nominal": 0,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
+              },
+              "frestaEsperada": {
+                "minimo": 0,
+                "maximo": 0,
+                "nominal": 0,
+                "toleranciaFabricacao": null,
+                "formato": "sem-fresta"
+              }
+            }
+          }
+        ],
+        "citadas": [
+          {
+            "etapa": "eixoDianteiro",
+            "porta": "cuboDireito",
+            "por": [
+              "posição rodaDianteiraDireitaNoCubo",
+              "relação rodaDianteiraDireitaGiraNoCubo"
+            ],
+            "interface": {
+              "forma": "anel",
+              "papel": "ocupa",
+              "eixo": [
+                1,
+                0,
+                0
+              ],
+              "centro": [
+                -0.463,
+                0.3525,
+                0
+              ],
+              "raioInterno": 0.05,
+              "raioExterno": 0.11,
+              "inicio": 0,
+              "fim": 0.059
+            }
+          }
+        ],
+        "anteriores": [
+          "carcaca",
+          "eixoDianteiro",
+          "rodaDianteiraEsquerda"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "3ac93d67d0eaac4f887f5e1eb2f4445476656feb"
       }
     },
     {
+      "tipo": "aceite",
       "instancia": "eixoTraseiro",
-      "estado": "fixa",
-      "juntas": [
-        {
-          "relacao": "eixoTraseiroNaPassagemDosPocos",
-          "com": "carcaca",
-          "satisfeita": true,
-          "medidas": {
-            "disponiveis": true,
-            "alinhamento": 1,
-            "descentro": 0,
-            "folgaRadial": 0.279,
-            "folgaRadialMinima": 0.279,
-            "folgaRadialMaxima": 0.279,
-            "tolerancia": 0.000001,
-            "toleranciaNumerica": 0.000001,
-            "especificacaoFolgaRadial": {
-              "minimo": 0.279,
-              "maximo": 0.279,
-              "nominal": 0.279,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
-              },
-              "formato": "nominal-fabricacao"
-            },
-            "inicioReferencia": -0.405,
-            "fimReferencia": 0.405,
-            "inicioMovel": -0.405,
-            "fimMovel": 0.405,
-            "sobraInicio": 0,
-            "sobraFim": 0,
-            "sobreposicaoAxial": 0.81,
-            "separacaoAxial": 0
-          }
-        }
-      ],
-      "forma": "sha256:77ab664e65c2ae807523bdfbd3c8d7601f52ff0a810b8a420b6ae7a59b773d48",
       "aceite": {
         "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
         "defeitosAceitos": [
@@ -229,269 +430,774 @@
           "mangas: espessura em região do pino-mestre e da ponta de eixo, em volta do cubo"
         ],
         "analise": "ausente"
-      }
-    },
-    {
-      "instancia": "rodaTraseiraEsquerda",
-      "estado": "fixa",
-      "juntas": [
-        {
-          "relacao": "rodaTraseiraEsquerdaGiraNoCubo",
-          "com": "eixoTraseiro",
-          "satisfeita": true,
-          "medidas": {
-            "disponiveis": true,
-            "alinhamento": 1,
-            "descentro": 0,
-            "sobreposicaoRadial": 0.017000000000000008,
-            "sobreposicaoAxial": 0,
-            "separacaoAxial": 0,
-            "tolerancia": 0.000001,
-            "toleranciaNumerica": 0.000001,
-            "radialEsperado": {
-              "minimo": 0.017,
-              "maximo": 0.017,
-              "nominal": 0.017,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
-              },
-              "formato": "nominal-fabricacao"
-            },
-            "axialEsperado": {
-              "minimo": 0,
-              "maximo": 0,
-              "nominal": 0,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
-              },
-              "formato": "nominal-fabricacao"
-            },
-            "frestaEsperada": {
-              "minimo": 0,
-              "maximo": 0,
-              "nominal": 0,
-              "toleranciaFabricacao": null,
-              "formato": "sem-fresta"
-            }
+      },
+      "impressao": {
+        "forma": "sha256:77ab664e65c2ae807523bdfbd3c8d7601f52ff0a810b8a420b6ae7a59b773d48",
+        "parametros": [
+          {
+            "param": "entreAsParedes",
+            "valor": 810,
+            "unidade": "mm"
           }
-        }
-      ],
-      "forma": "sha256:9dc2c12579cd2aa8328f0c20645eef093fb137d0aba07452906e7fa2f19ebbed",
-      "aceite": {
-        "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
-        "defeitosAceitos": [
-          "crítico não fechou: modelar — 2 defeito(s) apontado(s) na rodada 2.",
-          "pneu: superficie em ombro, crista iluminada no alto e cantos da silhueta alto-direito e baixo-esquerdo",
-          "pneu: uniao em face de dentro do pneu, alto-direito, junto à lateral da carcaça"
         ],
-        "analise": "ausente"
-      }
-    },
-    {
-      "instancia": "rodaTraseiraDireita",
-      "estado": "fixa",
-      "juntas": [
-        {
-          "relacao": "rodaTraseiraDireitaGiraNoCubo",
-          "com": "eixoTraseiro",
-          "satisfeita": true,
-          "medidas": {
-            "disponiveis": true,
-            "alinhamento": 1,
-            "descentro": 0,
-            "sobreposicaoRadial": 0.017000000000000008,
-            "sobreposicaoAxial": 0,
-            "separacaoAxial": 0,
-            "tolerancia": 0.000001,
-            "toleranciaNumerica": 0.000001,
-            "radialEsperado": {
-              "minimo": 0.017,
-              "maximo": 0.017,
-              "nominal": 0.017,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
-              },
-              "formato": "nominal-fabricacao"
-            },
-            "axialEsperado": {
-              "minimo": 0,
-              "maximo": 0,
-              "nominal": 0,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
-              },
-              "formato": "nominal-fabricacao"
-            },
-            "frestaEsperada": {
-              "minimo": 0,
-              "maximo": 0,
-              "nominal": 0,
-              "toleranciaFabricacao": null,
-              "formato": "sem-fresta"
-            }
-          }
-        }
-      ],
-      "forma": "sha256:9dc2c12579cd2aa8328f0c20645eef093fb137d0aba07452906e7fa2f19ebbed",
-      "aceite": {
-        "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
-        "defeitosAceitos": [
-          "crítico não fechou: modelar — 2 defeito(s) apontado(s) na rodada 2.",
-          "pneu: superficie em ombro, crista iluminada no alto e cantos da silhueta alto-direito e baixo-esquerdo",
-          "pneu: uniao em face de dentro do pneu, alto-direito, junto à lateral da carcaça"
-        ],
-        "analise": "ausente"
-      }
-    },
-    {
-      "instancia": "torre",
-      "estado": "fixa",
-      "juntas": [
-        {
-          "relacao": "olhalDireitoDaTorreNoEixo",
-          "com": "eixoDianteiro",
-          "satisfeita": true,
-          "medidas": {
-            "disponiveis": true,
-            "alinhamento": 1,
-            "descentro": 0,
-            "folgaRadial": 0.0020000000000000018,
-            "folgaRadialMinima": 0.002,
-            "folgaRadialMaxima": 0.002,
-            "tolerancia": 0.000001,
-            "toleranciaNumerica": 0.000001,
-            "especificacaoFolgaRadial": {
-              "minimo": 0.002,
-              "maximo": 0.002,
-              "nominal": 0.002,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
-              },
-              "formato": "nominal-fabricacao"
-            },
-            "inicioReferencia": -0.262,
-            "fimReferencia": -0.21500000000000002,
-            "inicioMovel": -0.262,
-            "fimMovel": -0.21500000000000002,
-            "sobraInicio": 0,
-            "sobraFim": 0,
-            "sobreposicaoAxial": 0.046999999999999986,
-            "separacaoAxial": 0
-          }
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0.284,
+            -1.7
+          ]
         },
-        {
-          "relacao": "olhalEsquerdoDaTorreNoEixo",
-          "com": "eixoDianteiro",
-          "satisfeita": true,
-          "medidas": {
-            "disponiveis": true,
-            "alinhamento": 1,
-            "descentro": 0,
-            "folgaRadial": 0.0020000000000000018,
-            "folgaRadialMinima": 0.002,
-            "folgaRadialMaxima": 0.002,
-            "tolerancia": 0.000001,
-            "toleranciaNumerica": 0.000001,
-            "especificacaoFolgaRadial": {
-              "minimo": 0.002,
-              "maximo": 0.002,
-              "nominal": 0.002,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
+        "juntas": [
+          {
+            "relacao": "eixoTraseiroNaPassagemDosPocos",
+            "com": "carcaca",
+            "satisfeita": true,
+            "medidas": {
+              "disponiveis": true,
+              "alinhamento": 1,
+              "descentro": 0,
+              "folgaRadial": 0.279,
+              "folgaRadialMinima": 0.279,
+              "folgaRadialMaxima": 0.279,
+              "tolerancia": 0.000001,
+              "toleranciaNumerica": 0.000001,
+              "especificacaoFolgaRadial": {
+                "minimo": 0.279,
+                "maximo": 0.279,
+                "nominal": 0.279,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
               },
-              "formato": "nominal-fabricacao"
-            },
-            "inicioReferencia": -0.262,
-            "fimReferencia": -0.21500000000000002,
-            "inicioMovel": -0.262,
-            "fimMovel": -0.21500000000000002,
-            "sobraInicio": 0,
-            "sobraFim": 0,
-            "sobreposicaoAxial": 0.046999999999999986,
-            "separacaoAxial": 0
-          }
-        }
-      ],
-      "forma": "sha256:94ee09130db5a9014afd556d47bbff68511909c62ac6997840b51cad35f153b2",
-      "aceite": {
-        "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
-        "analise": "ausente"
-      }
-    },
-    {
-      "instancia": "canalInterno",
-      "estado": "fixa",
-      "juntas": [],
-      "forma": "sha256:6457fc9d0f3dcdbeb879ffc6a45455bd52cd5de1d725cfadb16371619b8f1313",
-      "aceite": {
-        "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
-        "analise": "ausente"
-      }
-    },
-    {
-      "instancia": "cilindroElevacao",
-      "estado": "fixa",
-      "juntas": [
-        {
-          "relacao": "cilindroElevacaoNoAssento",
-          "com": "torre",
-          "satisfeita": true,
-          "medidas": {
-            "disponiveis": true,
-            "alinhamento": 1,
-            "descentro": 0,
-            "sobreposicaoRadial": 0.03,
-            "sobreposicaoAxial": 0,
-            "separacaoAxial": 0,
-            "tolerancia": 0.000001,
-            "toleranciaNumerica": 0.000001,
-            "radialEsperado": {
-              "minimo": 0.03,
-              "maximo": 0.03,
-              "nominal": 0.03,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
-              },
-              "formato": "nominal-fabricacao"
-            },
-            "axialEsperado": {
-              "minimo": 0,
-              "maximo": 0,
-              "nominal": 0,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
-              },
-              "formato": "nominal-fabricacao"
-            },
-            "frestaEsperada": {
-              "minimo": 0,
-              "maximo": 0,
-              "nominal": 0,
-              "toleranciaFabricacao": null,
-              "formato": "sem-fresta"
+              "inicioReferencia": -0.405,
+              "fimReferencia": 0.405,
+              "inicioMovel": -0.405,
+              "fimMovel": 0.405,
+              "sobraInicio": 0,
+              "sobraFim": 0,
+              "sobreposicaoAxial": 0.81,
+              "separacaoAxial": 0
             }
           }
-        }
-      ],
-      "forma": "sha256:b0bcbbc25e06342ca9b9b9fd7be9add6697be40aa49cde2ebd23c5ba13c84bff",
-      "aceite": {
-        "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
-        "analise": "ausente"
+        ],
+        "citadas": [
+          {
+            "etapa": "carcaca",
+            "porta": "passagemDoEixoTraseiro",
+            "por": [
+              "posição eixoTraseiroNaCarcaca",
+              "relação eixoTraseiroNaPassagemDosPocos",
+              "vínculo eixoTraseiroEntreAsParedesDosPocos"
+            ],
+            "interface": {
+              "forma": "cilindro",
+              "papel": "interna",
+              "eixo": [
+                -1,
+                0,
+                0
+              ],
+              "centro": [
+                0.405,
+                0.284,
+                -1.7
+              ],
+              "raio": 0.324,
+              "inicio": 0,
+              "fim": 0.81,
+              "referencia": [
+                0,
+                1,
+                0
+              ]
+            }
+          }
+        ],
+        "anteriores": [
+          "carcaca",
+          "eixoDianteiro",
+          "rodaDianteiraEsquerda",
+          "rodaDianteiraDireita"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "3ac93d67d0eaac4f887f5e1eb2f4445476656feb"
       }
     },
     {
+      "tipo": "aceite",
+      "instancia": "rodaTraseiraEsquerda",
+      "aceite": {
+        "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — 2 defeito(s) apontado(s) na rodada 2.",
+          "pneu: superficie em ombro, crista iluminada no alto e cantos da silhueta alto-direito e baixo-esquerdo",
+          "pneu: uniao em face de dentro do pneu, alto-direito, junto à lateral da carcaça"
+        ],
+        "analise": "ausente"
+      },
+      "impressao": {
+        "forma": "sha256:9dc2c12579cd2aa8328f0c20645eef093fb137d0aba07452906e7fa2f19ebbed",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0.549,
+            0.284,
+            -1.7
+          ]
+        },
+        "juntas": [
+          {
+            "relacao": "rodaTraseiraEsquerdaGiraNoCubo",
+            "com": "eixoTraseiro",
+            "satisfeita": true,
+            "medidas": {
+              "disponiveis": true,
+              "alinhamento": 1,
+              "descentro": 0,
+              "sobreposicaoRadial": 0.017,
+              "sobreposicaoAxial": 0,
+              "separacaoAxial": 0,
+              "tolerancia": 0.000001,
+              "toleranciaNumerica": 0.000001,
+              "radialEsperado": {
+                "minimo": 0.017,
+                "maximo": 0.017,
+                "nominal": 0.017,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
+              },
+              "axialEsperado": {
+                "minimo": 0,
+                "maximo": 0,
+                "nominal": 0,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
+              },
+              "frestaEsperada": {
+                "minimo": 0,
+                "maximo": 0,
+                "nominal": 0,
+                "toleranciaFabricacao": null,
+                "formato": "sem-fresta"
+              }
+            }
+          }
+        ],
+        "citadas": [
+          {
+            "etapa": "eixoTraseiro",
+            "porta": "cuboTraseiroEsquerdo",
+            "por": [
+              "posição rodaTraseiraEsquerdaNoCubo",
+              "relação rodaTraseiraEsquerdaGiraNoCubo"
+            ],
+            "interface": {
+              "forma": "anel",
+              "papel": "ocupa",
+              "eixo": [
+                -1,
+                0,
+                0
+              ],
+              "centro": [
+                0.55,
+                0.284,
+                -1.7
+              ],
+              "raioInterno": 0.05,
+              "raioExterno": 0.085,
+              "inicio": 0,
+              "fim": 0.07
+            }
+          }
+        ],
+        "anteriores": [
+          "carcaca",
+          "eixoDianteiro",
+          "rodaDianteiraEsquerda",
+          "rodaDianteiraDireita",
+          "eixoTraseiro"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "3ac93d67d0eaac4f887f5e1eb2f4445476656feb"
+      }
+    },
+    {
+      "tipo": "aceite",
+      "instancia": "rodaTraseiraDireita",
+      "aceite": {
+        "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — 2 defeito(s) apontado(s) na rodada 2.",
+          "pneu: superficie em ombro, crista iluminada no alto e cantos da silhueta alto-direito e baixo-esquerdo",
+          "pneu: uniao em face de dentro do pneu, alto-direito, junto à lateral da carcaça"
+        ],
+        "analise": "ausente"
+      },
+      "impressao": {
+        "forma": "sha256:9dc2c12579cd2aa8328f0c20645eef093fb137d0aba07452906e7fa2f19ebbed",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              -1,
+              0,
+              0
+            ],
+            [
+              0,
+              -1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            -0.549,
+            0.284,
+            -1.7
+          ]
+        },
+        "juntas": [
+          {
+            "relacao": "rodaTraseiraDireitaGiraNoCubo",
+            "com": "eixoTraseiro",
+            "satisfeita": true,
+            "medidas": {
+              "disponiveis": true,
+              "alinhamento": 1,
+              "descentro": 0,
+              "sobreposicaoRadial": 0.017,
+              "sobreposicaoAxial": 0,
+              "separacaoAxial": 0,
+              "tolerancia": 0.000001,
+              "toleranciaNumerica": 0.000001,
+              "radialEsperado": {
+                "minimo": 0.017,
+                "maximo": 0.017,
+                "nominal": 0.017,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
+              },
+              "axialEsperado": {
+                "minimo": 0,
+                "maximo": 0,
+                "nominal": 0,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
+              },
+              "frestaEsperada": {
+                "minimo": 0,
+                "maximo": 0,
+                "nominal": 0,
+                "toleranciaFabricacao": null,
+                "formato": "sem-fresta"
+              }
+            }
+          }
+        ],
+        "citadas": [
+          {
+            "etapa": "eixoTraseiro",
+            "porta": "cuboTraseiroDireito",
+            "por": [
+              "posição rodaTraseiraDireitaNoCubo",
+              "relação rodaTraseiraDireitaGiraNoCubo"
+            ],
+            "interface": {
+              "forma": "anel",
+              "papel": "ocupa",
+              "eixo": [
+                1,
+                0,
+                0
+              ],
+              "centro": [
+                -0.55,
+                0.284,
+                -1.7
+              ],
+              "raioInterno": 0.05,
+              "raioExterno": 0.085,
+              "inicio": 0,
+              "fim": 0.07
+            }
+          }
+        ],
+        "anteriores": [
+          "carcaca",
+          "eixoDianteiro",
+          "rodaDianteiraEsquerda",
+          "rodaDianteiraDireita",
+          "eixoTraseiro",
+          "rodaTraseiraEsquerda"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "3ac93d67d0eaac4f887f5e1eb2f4445476656feb"
+      }
+    },
+    {
+      "tipo": "aceite",
+      "instancia": "torre",
+      "aceite": {
+        "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
+        "analise": "ausente"
+      },
+      "impressao": {
+        "forma": "sha256:94ee09130db5a9014afd556d47bbff68511909c62ac6997840b51cad35f153b2",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0,
+            0
+          ]
+        },
+        "juntas": [
+          {
+            "relacao": "olhalDireitoDaTorreNoEixo",
+            "com": "eixoDianteiro",
+            "satisfeita": true,
+            "medidas": {
+              "disponiveis": true,
+              "alinhamento": 1,
+              "descentro": 0,
+              "folgaRadial": 0.002,
+              "folgaRadialMinima": 0.002,
+              "folgaRadialMaxima": 0.002,
+              "tolerancia": 0.000001,
+              "toleranciaNumerica": 0.000001,
+              "especificacaoFolgaRadial": {
+                "minimo": 0.002,
+                "maximo": 0.002,
+                "nominal": 0.002,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
+              },
+              "inicioReferencia": -0.262,
+              "fimReferencia": -0.215,
+              "inicioMovel": -0.262,
+              "fimMovel": -0.215,
+              "sobraInicio": 0,
+              "sobraFim": 0,
+              "sobreposicaoAxial": 0.047,
+              "separacaoAxial": 0
+            }
+          },
+          {
+            "relacao": "olhalEsquerdoDaTorreNoEixo",
+            "com": "eixoDianteiro",
+            "satisfeita": true,
+            "medidas": {
+              "disponiveis": true,
+              "alinhamento": 1,
+              "descentro": 0,
+              "folgaRadial": 0.002,
+              "folgaRadialMinima": 0.002,
+              "folgaRadialMaxima": 0.002,
+              "tolerancia": 0.000001,
+              "toleranciaNumerica": 0.000001,
+              "especificacaoFolgaRadial": {
+                "minimo": 0.002,
+                "maximo": 0.002,
+                "nominal": 0.002,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
+              },
+              "inicioReferencia": -0.262,
+              "fimReferencia": -0.215,
+              "inicioMovel": -0.262,
+              "fimMovel": -0.215,
+              "sobraInicio": 0,
+              "sobraFim": 0,
+              "sobreposicaoAxial": 0.047,
+              "separacaoAxial": 0
+            }
+          }
+        ],
+        "citadas": [
+          {
+            "etapa": "eixoDianteiro",
+            "porta": "pinoDaTorreDireito",
+            "por": [
+              "posição torreNoEixo",
+              "relação olhalDireitoDaTorreNoEixo"
+            ],
+            "interface": {
+              "forma": "cilindro",
+              "papel": "externa",
+              "eixo": [
+                1,
+                0,
+                0
+              ],
+              "centro": [
+                -0.404,
+                0.3525,
+                0
+              ],
+              "raio": 0.075,
+              "inicio": 0.142,
+              "fim": 0.189,
+              "referencia": [
+                0,
+                1,
+                0
+              ]
+            }
+          },
+          {
+            "etapa": "eixoDianteiro",
+            "porta": "pinoDaTorreEsquerdo",
+            "por": [
+              "relação olhalEsquerdoDaTorreNoEixo"
+            ],
+            "interface": {
+              "forma": "cilindro",
+              "papel": "externa",
+              "eixo": [
+                -1,
+                0,
+                0
+              ],
+              "centro": [
+                0.404,
+                0.3525,
+                0
+              ],
+              "raio": 0.075,
+              "inicio": 0.142,
+              "fim": 0.189,
+              "referencia": [
+                0,
+                1,
+                0
+              ]
+            }
+          }
+        ],
+        "anteriores": [
+          "carcaca",
+          "eixoDianteiro",
+          "rodaDianteiraEsquerda",
+          "rodaDianteiraDireita",
+          "eixoTraseiro",
+          "rodaTraseiraEsquerda",
+          "rodaTraseiraDireita"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "3ac93d67d0eaac4f887f5e1eb2f4445476656feb"
+      }
+    },
+    {
+      "tipo": "aceite",
+      "instancia": "canalInterno",
+      "aceite": {
+        "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
+        "analise": "ausente"
+      },
+      "impressao": {
+        "forma": "sha256:6457fc9d0f3dcdbeb879ffc6a45455bd52cd5de1d725cfadb16371619b8f1313",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0,
+            0
+          ]
+        },
+        "juntas": [],
+        "citadas": [
+          {
+            "etapa": "torre",
+            "porta": "guiaDoCanalInterno",
+            "por": [
+              "posição canalInternoNaTorre"
+            ],
+            "interface": {
+              "forma": "plano",
+              "papel": "recebe",
+              "ponto": [
+                0.29,
+                2.1,
+                0.236
+              ],
+              "centro": [
+                0.29,
+                2.1,
+                0.236
+              ],
+              "normal": [
+                -1,
+                0,
+                0
+              ],
+              "eixo": [
+                -1,
+                0,
+                0
+              ],
+              "extensao": [
+                0.232,
+                1.95
+              ],
+              "largura": 0.232,
+              "comprimento": 1.95,
+              "referencia": [
+                0,
+                1,
+                0
+              ]
+            }
+          }
+        ],
+        "anteriores": [
+          "carcaca",
+          "eixoDianteiro",
+          "rodaDianteiraEsquerda",
+          "rodaDianteiraDireita",
+          "eixoTraseiro",
+          "rodaTraseiraEsquerda",
+          "rodaTraseiraDireita",
+          "torre"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "3ac93d67d0eaac4f887f5e1eb2f4445476656feb"
+      }
+    },
+    {
+      "tipo": "aceite",
+      "instancia": "cilindroElevacao",
+      "aceite": {
+        "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
+        "analise": "ausente"
+      },
+      "impressao": {
+        "forma": "sha256:b0bcbbc25e06342ca9b9b9fd7be9add6697be40aa49cde2ebd23c5ba13c84bff",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0.21,
+            0.19
+          ]
+        },
+        "juntas": [
+          {
+            "relacao": "cilindroElevacaoNoAssento",
+            "com": "torre",
+            "satisfeita": true,
+            "medidas": {
+              "disponiveis": true,
+              "alinhamento": 1,
+              "descentro": 0,
+              "sobreposicaoRadial": 0.03,
+              "sobreposicaoAxial": 0,
+              "separacaoAxial": 0,
+              "tolerancia": 0.000001,
+              "toleranciaNumerica": 0.000001,
+              "radialEsperado": {
+                "minimo": 0.03,
+                "maximo": 0.03,
+                "nominal": 0.03,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
+              },
+              "axialEsperado": {
+                "minimo": 0,
+                "maximo": 0,
+                "nominal": 0,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
+              },
+              "frestaEsperada": {
+                "minimo": 0,
+                "maximo": 0,
+                "nominal": 0,
+                "toleranciaFabricacao": null,
+                "formato": "sem-fresta"
+              }
+            }
+          }
+        ],
+        "citadas": [
+          {
+            "etapa": "torre",
+            "porta": "assentoDoCilindro",
+            "por": [
+              "posição cilindroElevacaoNaTorre",
+              "relação cilindroElevacaoNoAssento"
+            ],
+            "interface": {
+              "forma": "anel",
+              "papel": "recebe",
+              "eixo": [
+                0,
+                1,
+                0
+              ],
+              "centro": [
+                0,
+                0.21,
+                0.19
+              ],
+              "raioInterno": 0,
+              "raioExterno": 0.03,
+              "inicio": -0.01,
+              "fim": 0
+            }
+          }
+        ],
+        "anteriores": [
+          "carcaca",
+          "eixoDianteiro",
+          "rodaDianteiraEsquerda",
+          "rodaDianteiraDireita",
+          "eixoTraseiro",
+          "rodaTraseiraEsquerda",
+          "rodaTraseiraDireita",
+          "torre",
+          "canalInterno"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "3ac93d67d0eaac4f887f5e1eb2f4445476656feb"
+      }
+    },
+    {
+      "tipo": "aceite",
       "instancia": "carro",
-      "estado": "fixa",
-      "juntas": [],
-      "forma": "sha256:59c948d41def9eab24c9321bbd4ee281d4278fb20aaa20eb1b4f694513f97889",
       "aceite": {
         "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
         "defeitosAceitos": [
@@ -500,43 +1206,401 @@
           "placaGarfos: uniao em montantes traseiros, trecho que entra na torre (z 235 a 353)"
         ],
         "analise": "feita"
+      },
+      "impressao": {
+        "forma": "sha256:59c948d41def9eab24c9321bbd4ee281d4278fb20aaa20eb1b4f694513f97889",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0,
+            0
+          ]
+        },
+        "juntas": [],
+        "citadas": [
+          {
+            "etapa": "canalInterno",
+            "porta": "guiaDoCarro",
+            "por": [
+              "posição carroNoCanalInterno"
+            ],
+            "interface": {
+              "forma": "plano",
+              "papel": "recebe",
+              "ponto": [
+                0.198,
+                0.26,
+                0.338
+              ],
+              "centro": [
+                0.198,
+                0.26,
+                0.338
+              ],
+              "normal": [
+                -1,
+                0,
+                0
+              ],
+              "eixo": [
+                -1,
+                0,
+                0
+              ],
+              "extensao": [
+                0.02,
+                1.84
+              ],
+              "largura": 0.02,
+              "comprimento": 1.84,
+              "referencia": [
+                0,
+                1,
+                0
+              ]
+            }
+          }
+        ],
+        "anteriores": [
+          "carcaca",
+          "eixoDianteiro",
+          "rodaDianteiraEsquerda",
+          "rodaDianteiraDireita",
+          "eixoTraseiro",
+          "rodaTraseiraEsquerda",
+          "rodaTraseiraDireita",
+          "torre",
+          "canalInterno",
+          "cilindroElevacao"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "3ac93d67d0eaac4f887f5e1eb2f4445476656feb"
       }
     },
     {
+      "tipo": "aceite",
       "instancia": "garfoEsquerdo",
-      "estado": "fixa",
-      "juntas": [],
-      "forma": "sha256:f3876ba405217c03b0d7c8a533d3cae9f57cea42cc18f606e3bb428e2f4cf41e",
       "aceite": {
         "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
         "analise": "feita"
+      },
+      "impressao": {
+        "forma": "sha256:f3876ba405217c03b0d7c8a533d3cae9f57cea42cc18f606e3bb428e2f4cf41e",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0.28,
+            0.05,
+            0.48
+          ]
+        },
+        "juntas": [],
+        "citadas": [
+          {
+            "etapa": "carro",
+            "porta": "apoioDoGarfoEsquerdo",
+            "por": [
+              "posição garfoEsquerdoNoCarro"
+            ],
+            "interface": {
+              "forma": "plano",
+              "papel": "recebe",
+              "ponto": [
+                0.28,
+                0.59,
+                0.48
+              ],
+              "centro": [
+                0.28,
+                0.59,
+                0.48
+              ],
+              "normal": [
+                0,
+                0,
+                1
+              ],
+              "eixo": [
+                0,
+                0,
+                1
+              ],
+              "extensao": [
+                1,
+                0.1
+              ],
+              "largura": 1,
+              "comprimento": 0.1,
+              "referencia": [
+                0,
+                1,
+                0
+              ]
+            }
+          }
+        ],
+        "anteriores": [
+          "carcaca",
+          "eixoDianteiro",
+          "rodaDianteiraEsquerda",
+          "rodaDianteiraDireita",
+          "eixoTraseiro",
+          "rodaTraseiraEsquerda",
+          "rodaTraseiraDireita",
+          "torre",
+          "canalInterno",
+          "cilindroElevacao",
+          "carro"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "3ac93d67d0eaac4f887f5e1eb2f4445476656feb"
       }
     },
     {
+      "tipo": "aceite",
       "instancia": "garfoDireito",
-      "estado": "fixa",
-      "juntas": [],
-      "forma": "sha256:f3876ba405217c03b0d7c8a533d3cae9f57cea42cc18f606e3bb428e2f4cf41e",
       "aceite": {
         "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
         "analise": "feita"
+      },
+      "impressao": {
+        "forma": "sha256:f3876ba405217c03b0d7c8a533d3cae9f57cea42cc18f606e3bb428e2f4cf41e",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            -0.28,
+            0.05,
+            0.48
+          ]
+        },
+        "juntas": [],
+        "citadas": [
+          {
+            "etapa": "carro",
+            "porta": "apoioDoGarfoDireito",
+            "por": [
+              "posição garfoDireitoNoCarro"
+            ],
+            "interface": {
+              "forma": "plano",
+              "papel": "recebe",
+              "ponto": [
+                -0.28,
+                0.59,
+                0.48
+              ],
+              "centro": [
+                -0.28,
+                0.59,
+                0.48
+              ],
+              "normal": [
+                0,
+                0,
+                1
+              ],
+              "eixo": [
+                0,
+                0,
+                1
+              ],
+              "extensao": [
+                1,
+                0.1
+              ],
+              "largura": 1,
+              "comprimento": 0.1,
+              "referencia": [
+                0,
+                1,
+                0
+              ]
+            }
+          }
+        ],
+        "anteriores": [
+          "carcaca",
+          "eixoDianteiro",
+          "rodaDianteiraEsquerda",
+          "rodaDianteiraDireita",
+          "eixoTraseiro",
+          "rodaTraseiraEsquerda",
+          "rodaTraseiraDireita",
+          "torre",
+          "canalInterno",
+          "cilindroElevacao",
+          "carro",
+          "garfoEsquerdo"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "3ac93d67d0eaac4f887f5e1eb2f4445476656feb"
       }
     },
     {
+      "tipo": "aceite",
       "instancia": "correntes",
-      "estado": "fixa",
-      "juntas": [],
-      "forma": "sha256:6c78f2ed86087a4918ba0aefbe94d05c62a5de7ae7bb2e4455af1ffa0b9fbce4",
       "aceite": {
         "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
         "analise": "feita"
+      },
+      "impressao": {
+        "forma": "sha256:6c78f2ed86087a4918ba0aefbe94d05c62a5de7ae7bb2e4455af1ffa0b9fbce4",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0,
+            0
+          ]
+        },
+        "juntas": [],
+        "citadas": [
+          {
+            "etapa": "cilindroElevacao",
+            "porta": "cabeca",
+            "por": [
+              "posição correntesNaCabeca"
+            ],
+            "interface": {
+              "forma": "plano",
+              "papel": "recebe",
+              "ponto": [
+                0,
+                1.42,
+                0.25
+              ],
+              "centro": [
+                0,
+                1.42,
+                0.25
+              ],
+              "normal": [
+                0,
+                0,
+                1
+              ],
+              "eixo": [
+                0,
+                0,
+                1
+              ],
+              "extensao": [
+                0.16,
+                0.04
+              ],
+              "largura": 0.16,
+              "comprimento": 0.04,
+              "referencia": [
+                0,
+                1,
+                0
+              ]
+            }
+          }
+        ],
+        "anteriores": [
+          "carcaca",
+          "eixoDianteiro",
+          "rodaDianteiraEsquerda",
+          "rodaDianteiraDireita",
+          "eixoTraseiro",
+          "rodaTraseiraEsquerda",
+          "rodaTraseiraDireita",
+          "torre",
+          "canalInterno",
+          "cilindroElevacao",
+          "carro",
+          "garfoEsquerdo",
+          "garfoDireito"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "3ac93d67d0eaac4f887f5e1eb2f4445476656feb"
       }
     },
     {
+      "tipo": "aceite",
       "instancia": "cilindroInclinacaoEsquerdo",
-      "estado": "fixa",
-      "juntas": [],
-      "forma": "sha256:06cc82bd33c9195937307108e7fbac4e0d10b5d4a0d40161184b2ff121a06e9c",
       "aceite": {
         "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
         "defeitosAceitos": [
@@ -545,13 +1609,105 @@
           "hasteInclinacao: uniao em ponta da haste, no encontro com a orelha da torre"
         ],
         "analise": "feita"
+      },
+      "impressao": {
+        "forma": "sha256:06cc82bd33c9195937307108e7fbac4e0d10b5d4a0d40161184b2ff121a06e9c",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0.355,
+            0.815,
+            0.06
+          ]
+        },
+        "juntas": [],
+        "citadas": [
+          {
+            "etapa": "torre",
+            "porta": "orelhaEsquerda",
+            "por": [
+              "posição cilindroInclinacaoEsquerdoNaOrelha"
+            ],
+            "interface": {
+              "forma": "plano",
+              "papel": "recebe",
+              "ponto": [
+                0.355,
+                0.86,
+                0.06
+              ],
+              "centro": [
+                0.355,
+                0.86,
+                0.06
+              ],
+              "normal": [
+                0,
+                0,
+                -1
+              ],
+              "eixo": [
+                0,
+                0,
+                -1
+              ],
+              "extensao": [
+                0.09,
+                0.06
+              ],
+              "largura": 0.09,
+              "comprimento": 0.06,
+              "referencia": [
+                0,
+                1,
+                0
+              ]
+            }
+          }
+        ],
+        "anteriores": [
+          "carcaca",
+          "eixoDianteiro",
+          "rodaDianteiraEsquerda",
+          "rodaDianteiraDireita",
+          "eixoTraseiro",
+          "rodaTraseiraEsquerda",
+          "rodaTraseiraDireita",
+          "torre",
+          "canalInterno",
+          "cilindroElevacao",
+          "carro",
+          "garfoEsquerdo",
+          "garfoDireito",
+          "correntes"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "3ac93d67d0eaac4f887f5e1eb2f4445476656feb"
       }
     },
     {
+      "tipo": "aceite",
       "instancia": "cilindroInclinacaoDireito",
-      "estado": "fixa",
-      "juntas": [],
-      "forma": "sha256:06cc82bd33c9195937307108e7fbac4e0d10b5d4a0d40161184b2ff121a06e9c",
       "aceite": {
         "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
         "defeitosAceitos": [
@@ -560,13 +1716,106 @@
           "hasteInclinacao: uniao em ponta da haste, no encontro com a orelha da torre"
         ],
         "analise": "feita"
+      },
+      "impressao": {
+        "forma": "sha256:06cc82bd33c9195937307108e7fbac4e0d10b5d4a0d40161184b2ff121a06e9c",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            -0.355,
+            0.815,
+            0.06
+          ]
+        },
+        "juntas": [],
+        "citadas": [
+          {
+            "etapa": "torre",
+            "porta": "orelhaDireita",
+            "por": [
+              "posição cilindroInclinacaoDireitoNaOrelha"
+            ],
+            "interface": {
+              "forma": "plano",
+              "papel": "recebe",
+              "ponto": [
+                -0.355,
+                0.86,
+                0.06
+              ],
+              "centro": [
+                -0.355,
+                0.86,
+                0.06
+              ],
+              "normal": [
+                0,
+                0,
+                -1
+              ],
+              "eixo": [
+                0,
+                0,
+                -1
+              ],
+              "extensao": [
+                0.09,
+                0.06
+              ],
+              "largura": 0.09,
+              "comprimento": 0.06,
+              "referencia": [
+                0,
+                1,
+                0
+              ]
+            }
+          }
+        ],
+        "anteriores": [
+          "carcaca",
+          "eixoDianteiro",
+          "rodaDianteiraEsquerda",
+          "rodaDianteiraDireita",
+          "eixoTraseiro",
+          "rodaTraseiraEsquerda",
+          "rodaTraseiraDireita",
+          "torre",
+          "canalInterno",
+          "cilindroElevacao",
+          "carro",
+          "garfoEsquerdo",
+          "garfoDireito",
+          "correntes",
+          "cilindroInclinacaoEsquerdo"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "3ac93d67d0eaac4f887f5e1eb2f4445476656feb"
       }
     },
     {
+      "tipo": "aceite",
       "instancia": "protetor",
-      "estado": "fixa",
-      "juntas": [],
-      "forma": "sha256:a4c4f3f8a2ac0fdc59beb021bbb65f8ed3fd625e0716e9ee02a0e8f53ca3930d",
       "aceite": {
         "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
         "defeitosAceitos": [
@@ -577,13 +1826,107 @@
           "quadro: superficie em contorno da coluna de trás, trecho médio"
         ],
         "analise": "ausente"
+      },
+      "impressao": {
+        "forma": "sha256:a4c4f3f8a2ac0fdc59beb021bbb65f8ed3fd625e0716e9ee02a0e8f53ca3930d",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0,
+            0
+          ]
+        },
+        "juntas": [],
+        "citadas": [
+          {
+            "etapa": "carcaca",
+            "porta": "apoioDoProtetorTrasEsquerdo",
+            "por": [
+              "posição protetorNasColunas"
+            ],
+            "interface": {
+              "forma": "plano",
+              "papel": "recebe",
+              "ponto": [
+                0.488,
+                1.1473,
+                -1.38715
+              ],
+              "centro": [
+                0.488,
+                1.1473,
+                -1.38715
+              ],
+              "normal": [
+                0,
+                0.998384706561,
+                0.0568152946414
+              ],
+              "eixo": [
+                0,
+                0.998384706561,
+                0.0568152946414
+              ],
+              "extensao": [
+                0.056,
+                0.242892342407
+              ],
+              "largura": 0.056,
+              "comprimento": 0.242892342407,
+              "referencia": [
+                1,
+                0,
+                0
+              ]
+            }
+          }
+        ],
+        "anteriores": [
+          "carcaca",
+          "eixoDianteiro",
+          "rodaDianteiraEsquerda",
+          "rodaDianteiraDireita",
+          "eixoTraseiro",
+          "rodaTraseiraEsquerda",
+          "rodaTraseiraDireita",
+          "torre",
+          "canalInterno",
+          "cilindroElevacao",
+          "carro",
+          "garfoEsquerdo",
+          "garfoDireito",
+          "correntes",
+          "cilindroInclinacaoEsquerdo",
+          "cilindroInclinacaoDireito"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "3ac93d67d0eaac4f887f5e1eb2f4445476656feb"
       }
     },
     {
+      "tipo": "aceite",
       "instancia": "banco",
-      "estado": "fixa",
-      "juntas": [],
-      "forma": "sha256:77270e1ee7b00b0483e4c0cdfba318be073435459dacad699a56214d3209044b",
       "aceite": {
         "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
         "defeitosAceitos": [
@@ -594,57 +1937,214 @@
           "encosto: superficie em quina do topo traseiro do encosto"
         ],
         "analise": "feita"
+      },
+      "impressao": {
+        "forma": "sha256:77270e1ee7b00b0483e4c0cdfba318be073435459dacad699a56214d3209044b",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0,
+            0
+          ]
+        },
+        "juntas": [],
+        "citadas": [
+          {
+            "etapa": "carcaca",
+            "porta": "apoioDoBanco",
+            "por": [
+              "posição bancoNaTampaDoMotor"
+            ],
+            "interface": {
+              "forma": "plano",
+              "papel": "recebe",
+              "ponto": [
+                0,
+                1.0129,
+                -0.95
+              ],
+              "centro": [
+                0,
+                1.0129,
+                -0.95
+              ],
+              "normal": [
+                0,
+                1,
+                0
+              ],
+              "eixo": [
+                0,
+                1,
+                0
+              ],
+              "extensao": [
+                0.5,
+                0.485
+              ],
+              "largura": 0.5,
+              "comprimento": 0.485,
+              "referencia": [
+                1,
+                0,
+                0
+              ]
+            }
+          }
+        ],
+        "anteriores": [
+          "carcaca",
+          "eixoDianteiro",
+          "rodaDianteiraEsquerda",
+          "rodaDianteiraDireita",
+          "eixoTraseiro",
+          "rodaTraseiraEsquerda",
+          "rodaTraseiraDireita",
+          "torre",
+          "canalInterno",
+          "cilindroElevacao",
+          "carro",
+          "garfoEsquerdo",
+          "garfoDireito",
+          "correntes",
+          "cilindroInclinacaoEsquerdo",
+          "cilindroInclinacaoDireito",
+          "protetor"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "3ac93d67d0eaac4f887f5e1eb2f4445476656feb"
       }
     },
     {
+      "tipo": "aceite",
       "instancia": "colunaDirecao",
-      "estado": "fixa",
-      "juntas": [],
-      "forma": "sha256:d444583a228e9960bf6e7e64eb391cabcfea8b562f0c6e995bdb98a9cf04b475",
       "aceite": {
         "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
         "analise": "feita"
+      },
+      "impressao": {
+        "forma": "sha256:d444583a228e9960bf6e7e64eb391cabcfea8b562f0c6e995bdb98a9cf04b475",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0,
+            0
+          ]
+        },
+        "juntas": [],
+        "citadas": [
+          {
+            "etapa": "carcaca",
+            "porta": "apoioDaColunaDeDirecao",
+            "por": [
+              "posição colunaDirecaoNoPainel"
+            ],
+            "interface": {
+              "forma": "plano",
+              "papel": "recebe",
+              "ponto": [
+                0,
+                0.9146,
+                -0.11
+              ],
+              "centro": [
+                0,
+                0.9146,
+                -0.11
+              ],
+              "normal": [
+                0,
+                1,
+                0
+              ],
+              "eixo": [
+                0,
+                1,
+                0
+              ],
+              "extensao": [
+                0.11,
+                0.11
+              ],
+              "largura": 0.11,
+              "comprimento": 0.11,
+              "referencia": [
+                1,
+                0,
+                0
+              ]
+            }
+          }
+        ],
+        "anteriores": [
+          "carcaca",
+          "eixoDianteiro",
+          "rodaDianteiraEsquerda",
+          "rodaDianteiraDireita",
+          "eixoTraseiro",
+          "rodaTraseiraEsquerda",
+          "rodaTraseiraDireita",
+          "torre",
+          "canalInterno",
+          "cilindroElevacao",
+          "carro",
+          "garfoEsquerdo",
+          "garfoDireito",
+          "correntes",
+          "cilindroInclinacaoEsquerdo",
+          "cilindroInclinacaoDireito",
+          "protetor",
+          "banco"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "3ac93d67d0eaac4f887f5e1eb2f4445476656feb"
       }
     },
     {
+      "tipo": "aceite",
       "instancia": "volante",
-      "estado": "fixa",
-      "juntas": [
-        {
-          "relacao": "volanteGiraNaColuna",
-          "com": "colunaDirecao",
-          "satisfeita": true,
-          "medidas": {
-            "disponiveis": true,
-            "alinhamento": 0.9999999999999998,
-            "descentro": 2.08173169767389e-17,
-            "folgaRadial": 0.0005000000000000004,
-            "folgaRadialMinima": 0.0005,
-            "folgaRadialMaxima": 0.0005,
-            "tolerancia": 0.000001,
-            "toleranciaNumerica": 0.000001,
-            "especificacaoFolgaRadial": {
-              "minimo": 0.0005,
-              "maximo": 0.0005,
-              "nominal": 0.0005,
-              "toleranciaFabricacao": {
-                "menos": 0,
-                "mais": 0
-              },
-              "formato": "nominal-fabricacao"
-            },
-            "inicioReferencia": 1.3936820070938032,
-            "fimReferencia": 1.408682007093803,
-            "inicioMovel": 1.3936820070938034,
-            "fimMovel": 1.4091820070938035,
-            "sobraInicio": -2.220446049250313e-16,
-            "sobraFim": 0.000500000000000389,
-            "sobreposicaoAxial": 0.01499999999999968,
-            "separacaoAxial": 0
-          }
-        }
-      ],
-      "forma": "sha256:328410e539439813e7d3871526b482a71d8f3bb03962b43fe82aeea457727bc9",
       "aceite": {
         "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
         "defeitosAceitos": [
@@ -652,13 +2152,139 @@
           "volante: superficie em seção do aro e encontros raio-aro"
         ],
         "analise": "feita"
+      },
+      "impressao": {
+        "forma": "sha256:328410e539439813e7d3871526b482a71d8f3bb03962b43fe82aeea457727bc9",
+        "parametros": [
+          {
+            "param": "raioDoFuro",
+            "valor": 22.5,
+            "unidade": "mm"
+          }
+        ],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0,
+            0
+          ]
+        },
+        "juntas": [
+          {
+            "relacao": "volanteGiraNaColuna",
+            "com": "colunaDirecao",
+            "satisfeita": true,
+            "medidas": {
+              "disponiveis": true,
+              "alinhamento": 1,
+              "descentro": 0,
+              "folgaRadial": 0.0005,
+              "folgaRadialMinima": 0.0005,
+              "folgaRadialMaxima": 0.0005,
+              "tolerancia": 0.000001,
+              "toleranciaNumerica": 0.000001,
+              "especificacaoFolgaRadial": {
+                "minimo": 0.0005,
+                "maximo": 0.0005,
+                "nominal": 0.0005,
+                "toleranciaFabricacao": {
+                  "menos": 0,
+                  "mais": 0
+                },
+                "formato": "nominal-fabricacao"
+              },
+              "inicioReferencia": 1.39368200709,
+              "fimReferencia": 1.40868200709,
+              "inicioMovel": 1.39368200709,
+              "fimMovel": 1.40918200709,
+              "sobraInicio": 0,
+              "sobraFim": 0.0005,
+              "sobreposicaoAxial": 0.015,
+              "separacaoAxial": 0
+            }
+          }
+        ],
+        "citadas": [
+          {
+            "etapa": "colunaDirecao",
+            "porta": "eixoDoVolante",
+            "por": [
+              "posição volanteNoEixoDaColuna",
+              "relação volanteGiraNaColuna",
+              "vínculo volanteNoEixoDaColuna"
+            ],
+            "interface": {
+              "forma": "cilindro",
+              "papel": "externa",
+              "eixo": [
+                0,
+                0.806404995856,
+                -0.591363663628
+              ],
+              "centro": [
+                0,
+                1.4,
+                -0.473
+              ],
+              "raio": 0.022,
+              "inicio": -0.015,
+              "fim": 0,
+              "referencia": [
+                1,
+                0,
+                0
+              ]
+            }
+          }
+        ],
+        "anteriores": [
+          "carcaca",
+          "eixoDianteiro",
+          "rodaDianteiraEsquerda",
+          "rodaDianteiraDireita",
+          "eixoTraseiro",
+          "rodaTraseiraEsquerda",
+          "rodaTraseiraDireita",
+          "torre",
+          "canalInterno",
+          "cilindroElevacao",
+          "carro",
+          "garfoEsquerdo",
+          "garfoDireito",
+          "correntes",
+          "cilindroInclinacaoEsquerdo",
+          "cilindroInclinacaoDireito",
+          "protetor",
+          "banco",
+          "colunaDirecao"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "3ac93d67d0eaac4f887f5e1eb2f4445476656feb"
       }
     },
     {
+      "tipo": "aceite",
       "instancia": "glp",
-      "estado": "fixa",
-      "juntas": [],
-      "forma": "sha256:8ce30fcd40ead68d88aa22ef94b280ff9341e2c501d8b77590b04ba5aac6632c",
       "aceite": {
         "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
         "defeitosAceitos": [
@@ -669,13 +2295,111 @@
           "cintas: uniao em borda interna de cada cinta, junto ao corpo do cilindro"
         ],
         "analise": "ausente"
+      },
+      "impressao": {
+        "forma": "sha256:8ce30fcd40ead68d88aa22ef94b280ff9341e2c501d8b77590b04ba5aac6632c",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0,
+            0
+          ]
+        },
+        "juntas": [],
+        "citadas": [
+          {
+            "etapa": "carcaca",
+            "porta": "apoioDoGlp",
+            "por": [
+              "posição glpNaTampa"
+            ],
+            "interface": {
+              "forma": "plano",
+              "papel": "recebe",
+              "ponto": [
+                0.03,
+                1.1487,
+                -1.84
+              ],
+              "centro": [
+                0.03,
+                1.1487,
+                -1.84
+              ],
+              "normal": [
+                0,
+                1,
+                0
+              ],
+              "eixo": [
+                0,
+                1,
+                0
+              ],
+              "extensao": [
+                0.52,
+                0.3
+              ],
+              "largura": 0.52,
+              "comprimento": 0.3,
+              "referencia": [
+                1,
+                0,
+                0
+              ]
+            }
+          }
+        ],
+        "anteriores": [
+          "carcaca",
+          "eixoDianteiro",
+          "rodaDianteiraEsquerda",
+          "rodaDianteiraDireita",
+          "eixoTraseiro",
+          "rodaTraseiraEsquerda",
+          "rodaTraseiraDireita",
+          "torre",
+          "canalInterno",
+          "cilindroElevacao",
+          "carro",
+          "garfoEsquerdo",
+          "garfoDireito",
+          "correntes",
+          "cilindroInclinacaoEsquerdo",
+          "cilindroInclinacaoDireito",
+          "protetor",
+          "banco",
+          "colunaDirecao",
+          "volante"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "3ac93d67d0eaac4f887f5e1eb2f4445476656feb"
       }
     },
     {
+      "tipo": "aceite",
       "instancia": "escape",
-      "estado": "fixa",
-      "juntas": [],
-      "forma": "sha256:c99bd78f8c980bcc7b51d1f7af0e46a547bacf2272b7c14c488963dcb867d441",
       "aceite": {
         "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
         "defeitosAceitos": [
@@ -683,16 +2407,217 @@
           "escape: ausencia em fuste, entre o pé e o cotovelo"
         ],
         "analise": "ausente"
+      },
+      "impressao": {
+        "forma": "sha256:c99bd78f8c980bcc7b51d1f7af0e46a547bacf2272b7c14c488963dcb867d441",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0,
+            0
+          ]
+        },
+        "juntas": [],
+        "citadas": [
+          {
+            "etapa": "carcaca",
+            "porta": "apoioDoEscape",
+            "por": [
+              "posição escapeNaTampa"
+            ],
+            "interface": {
+              "forma": "plano",
+              "papel": "recebe",
+              "ponto": [
+                -0.355,
+                1.1463,
+                -1.567
+              ],
+              "centro": [
+                -0.355,
+                1.1463,
+                -1.567
+              ],
+              "normal": [
+                0,
+                1,
+                0
+              ],
+              "eixo": [
+                0,
+                1,
+                0
+              ],
+              "extensao": [
+                0.09,
+                0.09
+              ],
+              "largura": 0.09,
+              "comprimento": 0.09,
+              "referencia": [
+                1,
+                0,
+                0
+              ]
+            }
+          }
+        ],
+        "anteriores": [
+          "carcaca",
+          "eixoDianteiro",
+          "rodaDianteiraEsquerda",
+          "rodaDianteiraDireita",
+          "eixoTraseiro",
+          "rodaTraseiraEsquerda",
+          "rodaTraseiraDireita",
+          "torre",
+          "canalInterno",
+          "cilindroElevacao",
+          "carro",
+          "garfoEsquerdo",
+          "garfoDireito",
+          "correntes",
+          "cilindroInclinacaoEsquerdo",
+          "cilindroInclinacaoDireito",
+          "protetor",
+          "banco",
+          "colunaDirecao",
+          "volante",
+          "glp"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "3ac93d67d0eaac4f887f5e1eb2f4445476656feb"
       }
     },
     {
+      "tipo": "aceite",
       "instancia": "alca",
-      "estado": "fixa",
-      "juntas": [],
-      "forma": "sha256:14a26291c734abf368fe965f66fb31517da6c2d854ea84a395e9458d801dbd23",
       "aceite": {
         "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
         "analise": "ausente"
+      },
+      "impressao": {
+        "forma": "sha256:14a26291c734abf368fe965f66fb31517da6c2d854ea84a395e9458d801dbd23",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0,
+            0
+          ]
+        },
+        "juntas": [],
+        "citadas": [
+          {
+            "etapa": "protetor",
+            "porta": "apoioDaAlcaEsquerda",
+            "por": [
+              "posição alcaNaColunaDoProtetor"
+            ],
+            "interface": {
+              "forma": "plano",
+              "papel": "recebe",
+              "ponto": [
+                0.4675,
+                1.5,
+                -0.26569064641
+              ],
+              "centro": [
+                0.4675,
+                1.5,
+                -0.26569064641
+              ],
+              "normal": [
+                0,
+                -0.250108092262,
+                -0.968217920814
+              ],
+              "eixo": [
+                0,
+                -0.250108092262,
+                -0.968217920814
+              ],
+              "extensao": [
+                0.035,
+                0.661008215446
+              ],
+              "largura": 0.035,
+              "comprimento": 0.661008215446,
+              "referencia": [
+                1,
+                0,
+                0
+              ]
+            }
+          }
+        ],
+        "anteriores": [
+          "carcaca",
+          "eixoDianteiro",
+          "rodaDianteiraEsquerda",
+          "rodaDianteiraDireita",
+          "eixoTraseiro",
+          "rodaTraseiraEsquerda",
+          "rodaTraseiraDireita",
+          "torre",
+          "canalInterno",
+          "cilindroElevacao",
+          "carro",
+          "garfoEsquerdo",
+          "garfoDireito",
+          "correntes",
+          "cilindroInclinacaoEsquerdo",
+          "cilindroInclinacaoDireito",
+          "protetor",
+          "banco",
+          "colunaDirecao",
+          "volante",
+          "glp",
+          "escape"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "via": "commit do aceite",
+        "commit": "3ac93d67d0eaac4f887f5e1eb2f4445476656feb"
       }
     }
   ]
