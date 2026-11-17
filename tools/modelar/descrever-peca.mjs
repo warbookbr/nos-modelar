@@ -330,6 +330,9 @@ export async function descreverPecaReutilizavel({
      mais efeito: o veredito roda de qualquer jeito. */
   estrito = false,
   semVeredito = false,
+  /* `--recusas`: só executa a receita e devolve os órfãos do núcleo, sem medir nem conferir o plano. Substitui o script de uma linha com
+     os órfãos do núcleo sobre `gerarPassos(TABELA)`, que a sessão de 2026-11-13 a 2026-11-16 reescreveu 188 vezes. */
+  recusas = false,
   /* Resumido por PADRÃO. A saída completa tem 9,8 KB numa peça de 11 partes, e
      cresce O(n²) nas relações — uma máquina de 40 partes passaria de 60 KB por
      chamada, várias vezes por rodada. Quem chama para MEDIR um encaixe pede
@@ -433,10 +436,10 @@ export async function descreverPecaReutilizavel({
      resolver caminho relativo, então só a lida do disco é conferida. */
   /* O PLANO INVÁLIDO TAMBÉM, ANTES DE EXECUTAR. O campo de texto acima de 240 caracteres só era recusado depois de a receita rodar,
      e no furgão realista isso custava 3 minutos por tentativa (2026-11-09); a mesma mensagem de mais abaixo sai agora antes. */
-  if (!semVeredito && receita.PLANO !== undefined) {
+  if (!semVeredito && !recusas && receita.PLANO !== undefined) {
     try { normalizarPlanoDeModelagem(receita.PLANO); } catch (erro) { return falha(`PLANO DE MODELAGEM INVÁLIDO\n  ${erro.message}`); }
   }
-  if (!semVeredito && caminhoReceita) {
+  if (!semVeredito && !recusas && caminhoReceita) {
     let planoDeReferencias = null;
     try { planoDeReferencias = normalizarPlanoDeModelagem(receita.PLANO); } catch { planoDeReferencias = null; }
     const { ausentes, locaisAusentes } = referenciasDoPlano(planoDeReferencias, { pastaDaReceita: dirname(caminhoReceita) });
@@ -477,6 +480,13 @@ export async function descreverPecaReutilizavel({
     cronometro.fechar(entrada?.PASSOS);
   } catch (erro) {
     return falha(`O NÚCLEO RECUSOU A PEÇA\n  ${peca}: ${erro.message}`);
+  }
+  if (recusas) {
+    const n = neutro.orfaos.length;
+    const stdout = n
+      ? `${n} RECUSA(S) DO NÚCLEO em '${peca}', a causa antes do eco:\n  ${linhasDeOrfaos(neutro, { limite: Infinity }).join('\n  ')}\n`
+      : `SEM RECUSA: '${peca}' gerou ${entrada?.PASSOS?.length ?? 0} passo(s) sem órfão no núcleo.\n`;
+    return { ok: n === 0, codigo: n ? 1 : 0, stdout, stderr: '', resultado: { orfaos: neutro.orfaos, neutro, expansao } };
   }
   /* Depois da execução, toda recusa de etapa seguinte carrega os órfãos: uma etapa que quebra por parte ausente (o contorno por parte, os vãos, os contatos)
      dizia só que a peça não tinha a parte, e a causa, o passo recusado antes, ficava calada. */
@@ -957,6 +967,7 @@ Mede a peça pela malha e dá o veredito de contato, forma prometida e vãos. A 
   --listar               lista as peças
   --sem-veredito         mede sem conferir contato e forma (a saída avisa)
   --composicoes=<módulo> registro de composições a usar
+  --recusas              só executa a receita e lista os órfãos do núcleo (passo, operação, motivo), sem medir; sai 1 se houver
 
 Para conferir um encaixe, peça as duas partes: --partes=a,b. O resumo já traz todo contato e as folgas menores.
 `;
@@ -966,7 +977,7 @@ function comoCLI(argv, { aoProgredir = null } = {}) {
   try {
     lido = lerArgumentos(argv, {
       opcoes: ['partes', 'subarvore', 'casas', OPCAO_COMPOSICOES],
-      bandeiras: ['listar', 'estrito', 'completo', 'sem-veredito', 'ajuda'],
+      bandeiras: ['listar', 'estrito', 'completo', 'sem-veredito', 'recusas', 'ajuda'],
       posicional: { nome: 'a peça', obrigatorio: false },
     });
   } catch (erro) {
@@ -992,6 +1003,7 @@ function comoCLI(argv, { aoProgredir = null } = {}) {
     casas,
     estrito: lido.bandeira('estrito'),
     semVeredito: lido.bandeira('sem-veredito'),
+    recusas: lido.bandeira('recusas'),
     resumo: !lido.bandeira('completo'),
     listar: lido.bandeira('listar'),
     composicoes: lido.opcao(OPCAO_COMPOSICOES),

@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/nucleo/planejador/`, `procedural/nucleo/nucleo.js`, `tools/modelar/descrever-peca.mjs`, `docs/modelar/banco-de-provas/cache-por-passo-2026-11-16/`
+**Território:** `procedural/nucleo/planejador/`, `procedural/nucleo/nucleo.js`, `tools/modelar/descrever-peca.mjs`, `docs/modelar/banco-de-provas/cache-por-passo-2026-11-16/`; o `descrever-peca.mjs` foi emprestado em 2026-11-17, por decisão da pessoa, ao plano de comparar com a referência só para a opção recusas, um ramo logo depois de executar a receita
 
 Ativado em 2026-11-16 no fechamento do cordão de solda, como a pessoa decidiu. `tools/modelar/olhar-bancada.mjs`, onde a bancada usaria o cache (fatia 4), é do plano do reflexo enquanto ele estiver ativo, e entra neste território quando o reflexo fechar; até lá o cache se prova no `descrever`.
 

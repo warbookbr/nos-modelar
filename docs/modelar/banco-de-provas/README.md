@@ -16,6 +16,7 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
 - [Carrinho de mão: atritos do alinhamento e do rascunho (2026-11-11)](carrinho-de-mao-2026-11-11/ATRITOS.md) — `carrinho-de-mao-2026-11-11`
   - [Custo por peça do carrinho de mão](carrinho-de-mao-2026-11-11/CUSTO-POR-PECA.md) — `carrinho-de-mao-2026-11-11`
 - [Atritos](carrinho-refeito-2026-10-08/ATRITOS.md) — `carrinho-refeito-2026-10-08`
+- [Comparar com a referência: a linha de base dos comandos repetidos e onde a prancha é montada](comparar-com-a-referencia-2026-11-16/README.md) — `comparar-com-a-referencia-2026-11-16`
 - `componentes-eletronicos-2026-11-16`
 - [Correção de superfície: chapas de prova, linha de base e corte com simetria](correcao-de-superficie-2026-11-16/README.md) — `correcao-de-superficie-2026-11-16`
 - [Cordão de solda na costura de tubos: rodadas de forma e medidas](costura-em-no-de-tubos-2026-11-15/README.md) — `costura-em-no-de-tubos-2026-11-15`

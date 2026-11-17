@@ -7,6 +7,7 @@
 
 2019 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 2034 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2025 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -237,6 +238,11 @@
 ## docs/modelar/banco-de-provas/correcao-de-superficie-2026-11-16/
 
 - `README.md` — Correção de superfície: chapas de prova, linha de base e corte com simetria
+## docs/modelar/banco-de-provas/comparar-com-a-referencia-2026-11-16/
+
+- `README.md` — Comparar com a referência: a linha de base dos comandos repetidos e onde a prancha é montada
+- `contar-comandos.mjs` — contar-comandos.mjs — a linha de base do plano de comparar com a referência (fatia 1): os comandos de shell dos registros de uma sessão do Claude Code, conta…
+- `medir-montagem.mjs` — medir-montagem.mjs — onde a prancha modelo e foto é montada (fatia 1 do plano de comparar com a referência): no Chromium, que decodifica jpg, webp e png, ou …
 
 ## docs/modelar/banco-de-provas/costura-em-no-de-tubos-2026-11-15/
 
@@ -3335,6 +3341,7 @@
 - `descrever-partes-materiais.test.mjs` — descrever-partes-materiais.test.mjs — a revisão persiste os campos novos do material (verniz, transmissão, relevo e os demais) e as revisões já gravadas segu…
 - `descrever-partes.test.ts` — Contrato de medição headless exercitado por fixtures de capacidade. O catálogo publicado pode estar vazio; a régua recebe um módulo explícito.
 - `descrever-peca.mjs` — descrever-peca.mjs — serviço headless de medição e sua CLI fina.
+- `descrever-recusas.test.mjs` — descrever-recusas.test.mjs — `descrever --recusas` dá a mesma lista que `nucleo(gerarPassos(TABELA)).orfaos`, o script de uma linha que a sessão de 2026-11-1…
 - `descrever-reguas-de-malha.test.mjs` — descrever-reguas-de-malha.test.mjs — as três réguas de malha no `descrever` como aviso (plano "costuras e furos limpos", fatia 3): cada defeito das peças de …
 - `descrever-sem-calar.test.mjs` — descrever-sem-calar.test.mjs — o `descrever` e a `guarda:acervo` dizendo o que calavam (fatia 5 do plano de ferramentas de conferência e de vista): o órfão d…
 - `descrever-separados.test.mjs` — descrever-separados.test.mjs — `separados` da receita no `descrever`: a peça com a folga pedida passa, e a que fica abaixo dela, ou se toca, reprova citando …
@@ -3459,6 +3466,8 @@
 - `planejado-contra-executado.test.mjs` — planejado-contra-executado.test.mjs — a régua do planejado contra o executado, sobre a fixture neutra de três blocos empilhados (`tools/fixtures/planejado-co…
 - `pngjs.d.ts` — pngjs.d.ts — a declaração mínima do `pngjs` para o typecheck dos testes em TypeScript: o pacote não traz tipos, e `capturar-montagem.test.ts` o usa para mont…
 - `portas-espelho-arranja.test.ts` — portas-espelho-arranja.test.ts — prova adversarial de AUT-2026-15: uma interface não pode permanecer no espaço da fonte quando a sua geometria foi copiada. C…
+- `prancha-de-referencia.mjs` — prancha-de-referencia.mjs — a prancha modelo e foto: a vista da peça (ou de uma parte isolada) ao lado da foto de referência, as duas na mesma escala em mm, …
+- `prancha-de-referencia.test.mjs` — Testes da prancha modelo e foto (régua, região, plano, pedido, montagem no navegador) e da cópia de parte repetida da bancada.
 - `procedencia-check.mjs` — Gate N3: contrato reduzido e explícito de procedência da fonte de restrições.
 - `procedencia-check.test.mjs` — Provas do gate N3 para procedência de valores estruturais.
 - `proporcoes.mjs` — proporcoes.mjs — a fonte única das medidas de uma montagem, e a conferência de que os outros lugares a seguem.

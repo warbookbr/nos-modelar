@@ -122,6 +122,26 @@ function esperarCameraEPararQuadros([quadros, limite, parar, ajuste = null]) {
   });
 }
 
+/* A CÓPIA DE UMA PARTE REPETIDA (`--copia`). Uma parte semântica pode ter mais de uma cópia (os dois pedais da bicicleta são a
+   parte `pedais`), e isolar a parte mostra as duas; na sessão da bicicleta um dos pedais saía recortando a imagem por script. O zoom
+   em mm da análise não resolvia: ele recorta os pixels da captura em que as duas cópias já estão enquadradas e amplia 3 vezes (os
+   pedais de frente, a 1920 px, ficam a 2 px/mm, e o recorte ampliado continua com esses pixels). Aqui cada item é um meio-espaço,
+   `<x|y|z><+|->`, pelo centro da caixa do que está à vista (a seleção isolada), no referencial da peça: o que fica do outro lado não é
+   desenhado (plano de recorte do renderizador) e a câmera se enquadra no que sobra. Dois itens de eixos diferentes separam quatro
+   cópias (`x+,z-`). */
+export function lerCopia(texto) {
+  if (texto === null || texto === undefined || texto === false) return null;
+  const itens = String(texto).split(',').map((s) => s.trim()).filter(Boolean);
+  if (!itens.length) throw new ErroDeUso('--copia veio vazia; escreva o lado da cópia por eixo, como --copia=x- ou --copia=x+,z-.');
+  const lidos = itens.map((item) => {
+    const c = /^([xyz])([+-])$/.exec(item);
+    if (!c) throw new ErroDeUso(`--copia: '${item}' não se lê; cada item é um eixo e um sinal, x+, x-, y+, y-, z+ ou z- (o lado do centro da seleção em que a cópia está), separados por vírgula.`);
+    return { eixo: c[1], sinal: c[2] === '+' ? 1 : -1 };
+  });
+  if (new Set(lidos.map((l) => l.eixo)).size !== lidos.length) throw new ErroDeUso(`--copia repete eixo (${itens.join(',')}); um lado por eixo.`);
+  return lidos;
+}
+
 /* O AJUSTE DA CÂMERA FEITO NA PÁGINA, sobre a câmera já quieta, pela ponte e pelo ambiente que a bancada publica (nada de `src/bancada`
    é tocado). Corre dentro do navegador e por isso é autossuficiente. `ajuste` traz:
    - `mirar` ({ mm: [x, y, z], distanciaMm, direcao }): a câmera olha o ponto, dado em mm do referencial da peça (a receita, em metro,
@@ -132,6 +152,8 @@ function esperarCameraEPararQuadros([quadros, limite, parar, ajuste = null]) {
    - `fora`: se a câmera ficou dentro da caixa da peça inteira (o `--focar` de uma parte pequena a põe a 0,6 m do centro dela, que
      em contexto é dentro da cabine), recua-a ao longo do mesmo raio até passar da caixa, e na perspectiva compensa o recuo com o zoom
      da câmera, de modo que o quadro não muda.
+   - `copia` ([{ eixo, sinal }]): só o que está do lado `sinal` do centro da caixa do que está à vista, em cada eixo do referencial da
+     peça, é desenhado (`renderer.clippingPlanes`) e entra no `enquadrar`; o relato traz a caixa em mm do que ficou.
    Devolve o que fez, e a ferramenta escreve isso no relato. */
 export function ajustarCamera(ajuste) {
   const amb = window.__mecanificaBancada.ambiente();
@@ -162,6 +184,51 @@ export function ajustarCamera(ajuste) {
   const dentro = (p, caixa) => p.x > caixa.min.x && p.x < caixa.max.x && p.y > caixa.min.y && p.y < caixa.max.y && p.z > caixa.min.z && p.z < caixa.max.z;
   const alvo = amb.controls.target;
   const relato = {};
+  let mantido = () => true;
+  if (ajuste.copia) {
+    /* a caixa do que está à vista no referencial da peça (metro, como a receita), vértice a vértice */
+    const min = [Infinity, Infinity, Infinity]; const max = [-Infinity, -Infinity, -Infinity];
+    const p = new V3();
+    raiz.traverseVisible((o) => {
+      const pos = o.geometry?.getAttribute?.('position'); if (!pos) return;
+      for (let i = 0; i < pos.count; i++) {
+        raiz.worldToLocal(p.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld));
+        const v = [p.x, p.y, p.z];
+        for (let k = 0; k < 3; k++) { if (v[k] < min[k]) min[k] = v[k]; if (v[k] > max[k]) max[k] = v[k]; }
+      }
+    });
+    if (!Number.isFinite(min[0])) return { erro: 'a página não tem geometria visível para separar a cópia' };
+    const centro = min.map((v, k) => (v + max[k]) / 2);
+    const pontoNoMundo = raiz.localToWorld(new V3(...centro));
+    const planos = ajuste.copia.map(({ eixo, sinal }) => {
+      const k = 'xyz'.indexOf(eixo);
+      const n = new V3(k === 0 ? sinal : 0, k === 1 ? sinal : 0, k === 2 ? sinal : 0).transformDirection(raiz.matrixWorld);
+      /* o renderizador só lê `normal` e `constant` do plano (copia-os para o dele); o que tem distância negativa não é desenhado */
+      return { normal: n, constant: -n.dot(pontoNoMundo) };
+    });
+    amb.renderer.clippingPlanes = planos;
+    mantido = (pw) => planos.every((pl) => pl.normal.dot(pw) + pl.constant >= 0);
+    const fmin = [Infinity, Infinity, Infinity]; const fmax = [-Infinity, -Infinity, -Infinity];
+    let ficaram = 0; let total = 0;
+    raiz.traverseVisible((o) => {
+      const pos = o.geometry?.getAttribute?.('position'); if (!pos) return;
+      for (let i = 0; i < pos.count; i++) {
+        total += 1;
+        p.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld);
+        if (!mantido(p)) continue;
+        ficaram += 1;
+        raiz.worldToLocal(p);
+        const v = [p.x, p.y, p.z];
+        for (let k = 0; k < 3; k++) { if (v[k] < fmin[k]) fmin[k] = v[k]; if (v[k] > fmax[k]) fmax[k] = v[k]; }
+      }
+    });
+    if (!ficaram) return { erro: `nenhum vértice à vista fica do lado ${ajuste.copia.map((c) => `${c.eixo}${c.sinal > 0 ? '+' : '-'}`).join(',')} do centro da seleção` };
+    const mm = (v) => Math.round(v * 10000) / 10;
+    relato.copia = {
+      lados: ajuste.copia.map((c) => `${c.eixo}${c.sinal > 0 ? '+' : '-'}`).join(','),
+      centroMm: centro.map(mm), caixaMm: [fmin.map(mm), fmax.map(mm)], vertices: ficaram, verticesAVista: total,
+    };
+  }
   if (ajuste.mirar) {
     const m = ajuste.mirar.mm;
     const c = raiz.localToWorld(new V3(m[0] / 1000, m[1] / 1000, m[2] / 1000));
@@ -203,7 +270,11 @@ export function ajustarCamera(ajuste) {
       const p = new V3();
       raiz.traverseVisible((o) => {
         const pos = o.geometry?.getAttribute?.('position'); if (!pos) return;
-        for (let i = 0; i < pos.count; i++) { p.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld).project(cam); min.min(p); max.max(p); }
+        for (let i = 0; i < pos.count; i++) {
+          p.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld);
+          if (!mantido(p)) continue;
+          p.project(cam); min.min(p); max.max(p);
+        }
       });
       return { min, max };
     };
@@ -389,6 +460,40 @@ function erroDeUso(mensagem) {
   throw new ErroDeUso(mensagem);
 }
 
+/* A SAÍDA QUE A BANCADA CRIOU. A bancada não sobrescreve imagem de revisão, e quem refazia a rodada apagava a pasta à mão antes:
+   86 `rm -rf` numa sessão, com rodadas perdidas porque a pasta já existia. `--sobrescrever` apaga a pasta de `--saida` e a refaz, mas só
+   quando ela tem o marcador que a bancada grava ao criá-la, para a opção não virar um `rm -rf` de qualquer caminho do repositório. */
+export const MARCADOR_DA_SAIDA = '.saida-da-bancada';
+
+/** Prepara a pasta de saída: cria a que falta e, se foi `declarada` e nasceu agora (ou foi refeita), grava o marcador nela. Com
+    `sobrescrever`, apaga antes a pasta que já existe, se ela tiver o marcador; sem ele, recusa dizendo o caminho. Nunca apaga a pasta
+    padrão nem uma que contenha a pasta das sessões da bancada. Devolve `{ existia, apagada, marcada }`. */
+export function prepararSaida({ saida, declarada, sobrescrever = false, raiz = REPO, protegidas = [OUT] }) {
+  const relativa = relative(raiz, saida) || '.';
+  if (sobrescrever && !declarada) {
+    erroDeUso('--sobrescrever exige --saida: a pasta padrão é de todas as capturas e não é apagada.');
+  }
+  if (sobrescrever && protegidas.some((p) => !relative(saida, p).startsWith('..'))) {
+    erroDeUso(`--sobrescrever recusou '${relativa}': a pasta contém a saída padrão da bancada; escolha uma pasta só desta rodada.`);
+  }
+  const existia = existsSync(saida);
+  let apagada = false;
+  if (sobrescrever && existia) {
+    verificarCaminhoConfinado(saida, { raiz });
+    if (!existsSync(join(saida, MARCADOR_DA_SAIDA))) {
+      erroDeUso(`--sobrescrever recusou '${relativa}': a pasta não tem o marcador ${MARCADOR_DA_SAIDA}, então não foi criada pela bancada. Apague-a você, se for o caso, ou escolha outra --saida.`);
+    }
+    rmSync(saida, { recursive: true });
+    apagada = true;
+  }
+  criarDiretorioConfinado(saida, { raiz });
+  const marcada = Boolean(declarada) && (!existia || apagada);
+  if (marcada) {
+    writeFileSync(join(saida, MARCADOR_DA_SAIDA), 'pasta criada pela bancada (olhar-bancada --saida); --sobrescrever pode apagá-la e refazê-la.\n', 'utf8');
+  }
+  return { existia, apagada, marcada };
+}
+
 function normalizarLista(valor) {
   if (valor === null || valor === undefined) return [];
   if (Array.isArray(valor)) return valor.map((item) => String(item).trim()).filter(Boolean);
@@ -569,9 +674,13 @@ export async function olharBancada({
   azimute: azimuteDeclarado = null,
   caixasDaPintura: caixasDaPinturaDeclaradas = null,
   enquadrar: enquadrarNaPeca = false,
+  /* `--copia`: a cópia de uma parte repetida, um lado por eixo (`'x-'`, `'x+,z-'` ou a lista lida por `lerCopia`); ver `lerCopia`. */
+  copia: copiaDeclarada = null,
   res: resDeclarada = 1280,
   espera: esperaDeclarada = 1200,
   saida: saidaDeclarada = null,
+  /* `--sobrescrever`: apaga e refaz a pasta de `--saida` se ela foi criada pela bancada (o marcador `MARCADOR_DA_SAIDA` dentro dela). */
+  sobrescrever = false,
   relatorio: relatorioDeclarado = null,
   listar = false,
   estrito = false,
@@ -696,7 +805,17 @@ export async function olharBancada({
     const vistas = par
       ? ['inspecao-par']
       : normalizarLista(vistasDeclaradas ?? (revisar ? 'isometrica,frontal,direita,superior' : 'isometrica,frontal,direita'));
-    const modo = par ? 'isolar' : (modoDeclarado ?? 'todas');
+    let copia = null;
+    if (copiaDeclarada !== null && copiaDeclarada !== undefined && copiaDeclarada !== false) {
+      try { copia = Array.isArray(copiaDeclarada) ? copiaDeclarada : lerCopia(copiaDeclarada); } catch (erro) { erroDeUso(erro.message); }
+      if (!selecionadas.length || par) erroDeUso('--copia separa uma cópia das partes de --selecionadas (ex.: --selecionadas=pedais --copia=x-); sem elas, ou com --par, não há o que separar.');
+      if (modoDeclarado !== null && modoDeclarado !== 'isolar') erroDeUso('--copia mostra só a cópia escolhida, com a seleção isolada; não misture com --modo=' + modoDeclarado + '.');
+      if (mirarDeclarado !== null && mirarDeclarado !== undefined) erroDeUso('--copia não se mistura com --mirar: os dois decidem o quadro.');
+      if (corteDeclarado) erroDeUso('--copia não se mistura com --corte: os dois recortam a peça por plano.');
+      if (revisar || enquadrarNaPeca) erroDeUso('--copia já enquadra a câmera na cópia; não se mistura com --revisar nem --enquadrar.');
+      if (!(auditoria || revisar)) erroDeUso('--copia vale só na imagem de auditoria; não se mistura com --tela.');
+    }
+    const modo = par ? 'isolar' : (modoDeclarado ?? (copia ? 'isolar' : 'todas'));
     const projecao = projecaoDeclarada ?? (revisar || par ? 'ortografica' : 'perspectiva');
     const explosao = Number(explosaoDeclarada ?? 0);
     if (ambiente !== null && !['estudio', 'ceu', 'nenhum'].includes(ambiente)) {
@@ -841,15 +960,17 @@ export async function olharBancada({
       corte ? `corte-${corte.eixo}${corte.posicao}-${corte.lado}` : null,
       visao && visao !== 'solida' ? `visao-${visao}${larguraDaZebra !== null ? `-${String(larguraDaZebra).replace('.', 'p')}graus` : ''}${anguloDaZebra !== null ? `-a${String(anguloDaZebra).replace('.', 'p').replace('-', 'm')}` : ''}${azimute !== null ? `-az${String(azimute).replace('.', 'p')}` : ''}${caixasDaPintura !== null ? `-caixas${caixasDaPintura}` : ''}` : null,
       enquadrarNaPeca ? 'enquadrado' : null,
+      copia ? `copia-${copia.map((c) => `${c.eixo}${c.sinal > 0 ? 'mais' : 'menos'}`).join('-')}` : null,
     ].filter(Boolean);
     const sufixo = sufixoPartes.length ? `-${sufixoPartes.join('-')}` : '';
-    if (!capturarEmMemoria) criarDiretorioConfinado(saida, { raiz: REPO });
+    if (!capturarEmMemoria) prepararSaida({ saida, declarada: Boolean(saidaDeclarada), sobrescrever });
+    else if (sobrescrever) erroDeUso('--sobrescrever não vale para a captura em memória, que não grava pasta.');
     const arquivosPlanejados = !capturarEmMemoria && peca
       ? vistas.map((vista) => join(saida, `bancada-${apelidoDeArquivo(peca)}-${vista}${sufixo}.png`))
       : [];
     for (const arquivo of arquivosPlanejados) verificarCaminhoConfinado(arquivo, { raiz: REPO });
     if (saidaDeclarada && arquivosPlanejados.some((arquivo) => existsSync(arquivo))) {
-      erroDeUso('--saida já contém uma ou mais imagens desta rodada; a bancada não sobrescreve artefato de revisão.');
+      erroDeUso(`--saida '${relative(REPO, saida)}' já contém uma ou mais imagens desta rodada; a bancada não sobrescreve artefato de revisão sem pedido. Use --sobrescrever para apagar e refazer a pasta (só vale numa pasta criada pela bancada) ou escolha outra --saida.`);
     }
 
     /* OS PARES ACUSADOS SÃO MEDIDOS EM NODE, não perguntados à bancada: é a
@@ -924,7 +1045,7 @@ export async function olharBancada({
        não troca. Com `compartilhada`, uma chamada que terminou bem deixa a página aberta, e a próxima da mesma peça, do mesmo quadro,
        da mesma projeção e da mesma explosão reaplica a auditoria, a seleção e o modo pela ponte, como a primeira já fazia por cima
        da URL, e refaz o enquadramento. Qualquer outra diferença abre página nova. */
-    const reaproveitavel = Boolean(compartilhada) && auditoriaEfetiva && !par && !listar && !corte && visao === null && !enquadrarNaPeca;
+    const reaproveitavel = Boolean(compartilhada) && auditoriaEfetiva && !par && !listar && !corte && visao === null && !enquadrarNaPeca && !copia;
     const chaveDaPagina = JSON.stringify({ peca, sessao: sessaoDaCaptura, largura, altura, projecao, explosao, ambiente });
     chaveDaPaginaDaChamada = chaveDaPagina;
     reaproveitavelDaChamada = reaproveitavel;
@@ -1015,7 +1136,9 @@ export async function olharBancada({
       const giro = vista === VISTA_ISO_TRASEIRA;
       const direcao = vista === VISTA_TRES_QUARTOS ? [...DIRECAO_DA_TRES_QUARTOS] : null;
       const fora = Boolean(focar || par);
-      return giro || direcao || fora || enquadrarNaPeca ? { giro, ...(direcao ? { direcao } : {}), fora, ...(enquadrarNaPeca ? { enquadrar: true } : {}) } : null;
+      return giro || direcao || fora || enquadrarNaPeca || copia
+        ? { giro, ...(direcao ? { direcao } : {}), fora, ...(enquadrarNaPeca || copia ? { enquadrar: true } : {}), ...(copia ? { copia } : {}) }
+        : null;
     };
     let ajusteInstalado = false;
     const instalarAjuste = async () => {
@@ -1233,6 +1356,7 @@ export async function olharBancada({
         registrar(relato, logger, 'stdout', `visão: ${visao}${ligada.larguraDaZebra != null ? `, listras de ${ligada.larguraDaZebra} graus` : ''}${ligada.anguloDaZebra != null ? `, listra a ${ligada.anguloDaZebra} graus da horizontal` : ''}${(ligada.azimute ?? legendaDaVisao?.dados?.azimute) != null ? `, luz a ${ligada.azimute ?? legendaDaVisao.dados.azimute} graus` : ''}${visao === 'luz-rasante' && alturaDaLuz != null ? ` e ${alturaDaLuz} graus do plano da imagem` : ''}${visao === 'luz-rasante' && legendaDaVisao?.dados?.segundoAzimute != null ? ` (a outra direção boa desta vista: ${legendaDaVisao.dados.segundoAzimute} graus)` : ''}${ligada.caixasDaPintura != null ? `, ${ligada.caixasDaPintura} caixas de luz` : ''}`);
       }
       const ajuste = ajusteDaVista(vista);
+      let copiaDaVista = null;
       if (ajuste) await instalarAjuste();
       if (primeiraDaPagina) {
         progresso.etapa = 'esperar a página assentar';
@@ -1246,7 +1370,10 @@ export async function olharBancada({
       if (ajuste) {
         const feito = await page.evaluate(() => window.__modelarAjuste ?? null);
         if (feito?.erro) registrar(relato, logger, 'stderr', `  ajuste da câmera recusado: ${feito.erro}`);
+        if (copia && !feito?.copia) erroDeUso(`--copia: a página não separou a cópia na vista ${vista}${feito?.erro ? ` (${feito.erro})` : ''}.`);
         if (feito?.mirou) registrar(relato, logger, 'stdout', `câmera mirando [${feito.mirou.ponto.join('; ')}] mm de ${feito.mirou.distanciaMm} mm (campo de ${feito.mirou.campoMm} mm de altura no ponto)`);
+        if (feito?.copia) registrar(relato, logger, 'stdout', `cópia ${feito.copia.lados} do centro da seleção (${feito.copia.centroMm.join('; ')} mm): caixa de [${feito.copia.caixaMm[0].join('; ')}] a [${feito.copia.caixaMm[1].join('; ')}] mm, ${feito.copia.vertices} de ${feito.copia.verticesAVista} vértices à vista`);
+        if (feito?.copia) copiaDaVista = feito.copia;
         if (feito?.enquadrou) registrar(relato, logger, 'stdout', `enquadrado na peça visível: ocupa ${(feito.enquadrou.largura * 100).toFixed(0)}% da largura e ${(feito.enquadrou.altura * 100).toFixed(0)}% da altura do quadro`);
         if (feito?.afastou) {
           registrar(relato, logger, 'stdout', `a câmera de ${vista} estava dentro da peça; afastada de ${feito.afastou.deMm} para ${feito.afastou.paraMm} mm do alvo, com o mesmo quadro`);
@@ -1284,6 +1411,7 @@ export async function olharBancada({
       vistasRelatadas.push({
         nome: vistaRelatada,
         ...(projecaoMm ? { projecaoMm } : {}),
+        ...(copiaDaVista ? { copia: copiaDaVista } : {}),
         enquadramento: {
           valida: enquadramento.valida, area: enquadramento.area, largura: enquadramento.largura,
           altura: enquadramento.altura, cortado: enquadramento.cortado,
@@ -1483,8 +1611,8 @@ export async function olharBancada({
 
 /* A AJUDA. Em 2026-11-03 um modelador gastou chamadas para descobrir o que o comando oferecia: ele recusava `--ajuda` e
    listava só os nomes das opções. Cada linha diz o que a opção faz; o detalhe da análise mora em PARE-E-ANALISE.md. */
-export const OPCOES_DA_CLI = ['peca', 'vistas', 'selecionadas', 'par', 'modo', 'projecao', 'explosao', 'res', 'espera', 'prazo', 'saida', 'relatorio', 'parte', 'zoom', 'zoom-antes', 'corte', 'corte-lado', 'ambiente', 'mirar', 'distancia', 'visao', 'largura-da-zebra', 'angulo-da-zebra', 'azimute', 'caixas-de-luz'];
-export const BANDEIRAS_DA_CLI = ['analise', 'listar', 'estrito', 'focar', 'revisar', 'auditoria', 'tela', 'cores', 'arame', 'wireframe', 'raio-x', 'sem-contatos', 'sem-cache', 'enquadrar'];
+export const OPCOES_DA_CLI = ['peca', 'vistas', 'selecionadas', 'par', 'modo', 'projecao', 'explosao', 'res', 'espera', 'prazo', 'saida', 'relatorio', 'parte', 'zoom', 'zoom-antes', 'corte', 'corte-lado', 'ambiente', 'mirar', 'distancia', 'visao', 'largura-da-zebra', 'angulo-da-zebra', 'azimute', 'caixas-de-luz', 'copia'];
+export const BANDEIRAS_DA_CLI = ['analise', 'listar', 'estrito', 'focar', 'revisar', 'auditoria', 'tela', 'cores', 'arame', 'wireframe', 'raio-x', 'sem-contatos', 'sem-cache', 'enquadrar', 'sobrescrever'];
 export const AJUDA = `npm run bancada -- <peça> [opções]  (node tools/modelar/olhar-bancada.mjs)
 Captura a peça ou montagem na bancada, sem interface.
 
@@ -1500,7 +1628,8 @@ Captura a peça ou montagem na bancada, sem interface.
   --corte=<x|y|z>:<mm>   vista de corte: um plano perpendicular ao eixo, na posição em mm do referencial da peça (ex.: z:0); um lado fica translúcido (opacidade 0,15) e o outro, normal e inteiro
   --corte-lado=<mais|menos>  com --corte: o lado do eixo que fica translúcido (padrão mais); não se mistura com --arame, --raio-x, --par nem --analise
   --ambiente=<estudio|ceu|nenhum>  o ambiente de reflexo da bancada; sem ele vale o padrão da página (a imagem de auditoria sai sem ambiente)
-  --selecionadas=<a,b>   partes selecionadas; com --modo e --focar
+  --selecionadas=<a,b>   partes selecionadas; com --modo e --focar; isola a parte inteira, com todas as cópias dela (os dois pedais), e --copia separa uma
+  --copia=<eixo><+|->[,...]  com --selecionadas: só a cópia do lado pedido do centro da seleção, em cada eixo do referencial da peça (ex.: --selecionadas=pedais --copia=x-, o pedal de x negativo; x+,z- separa uma de quatro), isolada e enquadrada sozinha; o resto não é desenhado; não se mistura com --modo além de isolar, --mirar, --corte, --enquadrar, --revisar, --tela nem --analise
   --modo=<${MODOS.join('|')}>  com --selecionadas: todas, a seleção no contexto, ou só ela
   --focar                enquadra a câmera nas selecionadas; se a câmera cair dentro da peça (parte pequena, vista de lado), recua-a para fora com o mesmo quadro
   --visao=<${IDS_DAS_VISOES.join('|')}>  liga a visão do registro da bancada antes da captura (a mesma dos atalhos da página: zebra b, luz rasante j, curvatura k, pintura p); a imagem sai com o nome -visao-<id>; não se mistura com --arame, --raio-x, --cores, --par, --tela nem --analise
@@ -1520,6 +1649,7 @@ Captura a peça ou montagem na bancada, sem interface.
   --espera=<ms>          espera depois de carregar (padrão 1200)
   --prazo=<s>            prazo de carga da peça por tentativa, também na --analise (padrão 90; peça pesada pede mais)
   --saida=<pasta>        pasta relativa dentro do repositório (padrão tools/bancadas/out/)
+  --sobrescrever         com --saida: apaga a pasta e a refaz, se ela foi criada pela bancada (o arquivo ${MARCADOR_DA_SAIDA} dentro dela); recusa, dizendo o caminho, a pasta que a bancada não criou; sem ele, imagem já existente na --saida é recusada
   --relatorio=<arquivo>  grava o relatório da rodada em JSON
   --revisar              o conjunto de vistas da revisão
   --tela                 mostra a interface da bancada (não se mistura com --cores, --arame)
@@ -1587,6 +1717,12 @@ export function comoCLI(argv, { aoProgredir = null } = {}) {
   if (lido.bandeira('analise') && (lido.opcao('visao') || lido.bandeira('enquadrar') || lido.opcao('largura-da-zebra') || lido.opcao('angulo-da-zebra') || lido.opcao('azimute') || lido.opcao('caixas-de-luz'))) {
     return Promise.resolve(erroEstruturado({ relato: novoRelato(), erro: new ErroDeUso('--visao, --largura-da-zebra, --angulo-da-zebra, --azimute, --caixas-de-luz e --enquadrar não se misturam com --analise: a análise tira as próprias vistas; use `npm run bancada -- <peça> --visao=<id>`.') }));
   }
+  if (lido.bandeira('analise') && lido.opcao('copia')) {
+    return Promise.resolve(erroEstruturado({ relato: novoRelato(), erro: new ErroDeUso('--copia não se mistura com --analise: a análise tira as próprias vistas; use `npm run bancada -- <peça> --selecionadas=<parte> --copia=<lado> --vistas=<a,b>`.') }));
+  }
+  if (lido.bandeira('analise') && lido.bandeira('sobrescrever')) {
+    return Promise.resolve(erroEstruturado({ relato: novoRelato(), erro: new ErroDeUso('--sobrescrever não se mistura com --analise: a análise já refaz a pasta dela a cada rodada (a padrão inteira, a de --saida pelo manifesto anterior).') }));
+  }
   if (lido.bandeira('analise')) {
     const peca = lido.opcao('peca') ?? lido.posicional;
     const contatos = { medirContatos: !lido.bandeira('sem-contatos'), cacheDeContatos: !lido.bandeira('sem-cache') };
@@ -1603,12 +1739,13 @@ export function comoCLI(argv, { aoProgredir = null } = {}) {
     ...(prazo !== undefined && prazo !== null ? { prazoDeCargaMs: Number(prazo) * 1000 } : {}),
     vistas: lido.opcao('vistas'), selecionadas: lido.opcao('selecionadas'), par: lido.opcao('par'),
     modo: lido.opcao('modo'), projecao: lido.opcao('projecao'), explosao: lido.opcao('explosao', '0'), ambiente: lido.opcao('ambiente') ?? null,
-    res: lido.opcao('res', '1280'), espera: lido.opcao('espera', '1200'), saida: lido.opcao('saida'),
+    res: lido.opcao('res', '1280'), espera: lido.opcao('espera', '1200'), saida: lido.opcao('saida'), sobrescrever: lido.bandeira('sobrescrever'),
     relatorio: lido.opcao('relatorio'), listar: lido.bandeira('listar'), estrito: lido.bandeira('estrito'),
     focar: lido.bandeira('focar'), revisar: lido.bandeira('revisar'),
     mirar: lido.opcao('mirar') ?? null, distancia: lido.opcao('distancia') ?? null, aoProgredir,
     visao: lido.opcao('visao') ?? null, larguraDaZebra: lido.opcao('largura-da-zebra') ?? null, anguloDaZebra: lido.opcao('angulo-da-zebra') ?? null, azimute: lido.opcao('azimute') ?? null, caixasDaPintura: lido.opcao('caixas-de-luz') ?? null,
     enquadrar: lido.bandeira('enquadrar'),
+    copia: lido.opcao('copia') ?? null,
     /* SEM INTERFACE POR PADRÃO desde 2026-09-23. Quem usa este comando é quase
        sempre a IA olhando a peça, e a imagem com painéis, cabeçalho, piso e
        grade deixava a peça numa faixa estreita no meio; a imagem limpa

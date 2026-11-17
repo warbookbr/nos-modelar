@@ -2,9 +2,9 @@
 
 **Estado:** ativo
 
-**Território:** `tools/modelar/olhar-bancada.mjs`, `tools/modelar/vistas-para-critica.mjs`, `tools/modelar/vistas-para-critica.test.mjs`, `tools/modelar/prancha-de-referencia.mjs`, `tools/modelar/prancha-de-referencia.test.mjs`, `tools/bancadas/`, `.claude/skills/criar-peca/`, `.claude/agents/modelador.md`, `docs/modelar/banco-de-provas/comparar-com-a-referencia-2026-11-16/`
+**Território:** `tools/modelar/olhar-bancada.mjs`, `tools/modelar/vistas-para-critica.mjs`, `tools/modelar/vistas-para-critica.test.mjs`, `tools/modelar/prancha-de-referencia.mjs`, `tools/modelar/prancha-de-referencia.test.mjs`, `tools/bancadas/`, `.claude/skills/criar-peca/`, `.claude/agents/modelador.md`, `docs/modelar/banco-de-provas/comparar-com-a-referencia-2026-11-16/`, `tools/modelar/descrever-recusas.test.mjs`; e, por empréstimo do plano do cache por passo que a pessoa decidiu em 2026-11-17, tools/modelar/descrever-peca.mjs só para a opção recusas (o caminho fica sem crase para não sobrepor os territórios)
 
-Ativado em 2026-11-16 no fechamento do reflexo na bancada, como a pessoa decidiu. Duas partes esperam outro plano: `--recusas` em `descrever` mexe em `tools/modelar/descrever-peca.mjs`, que é do cache por passo enquanto ele estiver ativo, e a nota na skill `laco-de-modelagem` é do plano da leitura por partes; as duas entram quando o dono fechar, ou com a pessoa decidindo emprestar o arquivo.
+Ativado em 2026-11-16 no fechamento do reflexo na bancada, como a pessoa decidiu. Duas partes esperavam outro plano: `--recusas` em `descrever` mexe em `tools/modelar/descrever-peca.mjs`, que é do cache por passo enquanto ele estiver ativo, e entrou em 2026-11-17 pelo empréstimo do arquivo que a pessoa decidiu, só para essa mudança; a nota na skill `laco-de-modelagem` é do plano da leitura por partes; as duas entram quando o dono fechar, ou com a pessoa decidindo emprestar o arquivo.
 
 **Responsável:** a IA da sessão implementa; Tiago aprova por imagem.
 
@@ -14,7 +14,7 @@ Sucessor do plano [reflexo na bancada](../decisoes/PLANOS-ENCERRADOS.md), decidi
 
 ## Problema observado
 
-Na sessão de 2026-11-13 a 2026-11-16 (furgão, cordão de solda e bicicleta), os 67 registros de agente (a sessão principal e 66 subagentes) somam 3.945 comandos de shell: 1.488 do implementador, 1.144 da sessão principal, 518 do modelador, 458 do revisor e 337 do agente geral; o crítico visual não roda shell, só abre imagens. A contagem, por padrão de comando, está na análise guardada fora do repositório, no scratchpad da sessão, e se refaz pelos registros com `npm run medir:transcricao` e um filtro por padrão.
+Na sessão de 2026-11-13 a 2026-11-16 (furgão, cordão de solda e bicicleta), os 67 registros de agente (a sessão principal e 66 subagentes) somam 3.945 comandos de shell: 1.488 do implementador, 1.144 da sessão principal, 518 do modelador, 458 do revisor e 337 do agente geral; o crítico visual não roda shell, só abre imagens. A contagem, por padrão de comando, se refaz pelos registros com o [`contar-comandos.mjs`](../banco-de-provas/comparar-com-a-referencia-2026-11-16/README.md) da pasta do plano, na janela da análise (`--ate=2026-11-16T11:50:22Z`).
 
 Uma parte desses comandos é o trabalho normal de ler, editar, testar e versionar (1.389 leituras, 836 edições por script, 547 rodadas de teste, 903 de git) e não é assunto deste plano. Outra parte é a mesma tarefa reescrita à mão a cada vez, com a mesma forma:
 
@@ -24,7 +24,7 @@ Uma parte desses comandos é o trabalho normal de ler, editar, testar e versiona
 - separar uma das cópias de uma parte repetida (os dois pedais) recortando a imagem por script, porque o isolamento pega a parte inteira;
 - preparar a pasta do crítico, copiando e recortando as vistas e as fotos a cada rodada (sete vezes só no selim).
 
-Nas sete rodadas de modelador da bicicleta, 41 dos 83 comandos de shell foram prancha, apagar saída, conferir o motor e medir a foto. Além do custo, a conta manual é onde o erro entra sem aviso: a régua da foto frontal errada no começo, o contorno do selim invertido e a escala diferente entre as metades de uma prancha do pedal saíram desses scripts.
+Nas sete rodadas de modelador da bicicleta, 42 dos 83 comandos de shell foram prancha, apagar saída, conferir o motor e medir a foto, contados pelo comando da fatia 1 (a contagem à mão tinha dado 41). Além do custo, a conta manual é onde o erro entra sem aviso: a régua da foto frontal errada no começo, o contorno do selim invertido e a escala diferente entre as metades de uma prancha do pedal saíram desses scripts.
 
 O crítico do selim deu 5, 7, 5, 6, 7 e 5 em rodadas que mudavam pouco, e se contradisse (abas cheias demais numa, finas demais na seguinte). As fotos do selim eram pequenas e o crítico julgava a olho, sem a medida; a espessura que ele disse estar o dobro batia com a foto ponto a ponto quando medida.
 
@@ -77,17 +77,17 @@ Envio por git: USAR DIRETO. A rotina de envio é sensível e depende da sessão;
 2. `descrever --recusas` dá a mesma lista que `nucleo(gerarPassos(TABELA)).orfaos` em três peças, uma delas com recusa de propósito.
 3. `olhar-bancada --sobrescrever` refaz a saída numa pasta que ela criou e recusa, com mensagem que diz o caminho, uma pasta que ela não criou.
 4. Um pedal da bicicleta sai isolado e enquadrado sozinho, sem recorte por script.
-5. Uma rodada de modelador com referência, medida por `medir:transcricao` e pelo filtro desta análise, usa no máximo um quarto dos comandos de prancha, saída e conferência da linha de base (41 em 83 nas sete rodadas da bicicleta), e nenhum script de medição livre foi impedido.
+5. Uma rodada de modelador com referência, medida por `medir:transcricao` e pelo filtro desta análise, usa no máximo um quarto dos comandos de prancha, saída e conferência da linha de base (42 em 83 nas sete rodadas da bicicleta, pelo `contar-comandos.mjs` da fatia 1), e nenhum script de medição livre foi impedido.
 6. O crítico recebe o pacote com o contorno sobreposto numa peça com contorno medido, e a revisão registra se a nota oscilou menos entre rodadas parecidas.
 7. Ajuda de cada comando com as opções novas, e a nota nas skills.
 8. O crítico por perguntas fechadas: na mesma imagem repetida cinco vezes, a nota varia menos que com o pedido de hoje (medido nos dois, com o mesmo pacote), e a pergunta que muda de resposta entre as duas ordens sai como "não verificável" em vez de virar defeito.
 
 ## Fatias
 
-1. Linha de base: a contagem desta análise reproduzida por um comando sobre os registros, e a decisão de onde a prancha é montada (no navegador da bancada, que já lê jpg e webp, ou em Node com a foto convertida antes).
-2. `descrever --recusas` e `olhar-bancada --sobrescrever`, que são pequenas e tiram metade dos comandos repetidos.
-3. A prancha, com régua, região, vistas e isolamento, provada no selim e no pedal.
-4. A cópia de parte repetida, pelo zoom em mm ou pela escolha de instância.
+1. Linha de base: a contagem desta análise reproduzida por um comando sobre os registros, e a decisão de onde a prancha é montada (no navegador da bancada, que já lê jpg e webp, ou em Node com a foto convertida antes). Feita em 2026-11-16, na [pasta do plano](../banco-de-provas/comparar-com-a-referencia-2026-11-16/README.md): o `contar-comandos.mjs` refaz todos os números do Problema observado, menos o das sete rodadas, que dá 42 em 83 e não os 41 contados à mão. A prancha é montada no navegador: o Chromium já é dependência da bancada, lê jpg e webp sem passo prévio e montou a prancha das fotos da bicicleta em 166 a 250 ms, contra 348 a 457 ms em Node com a conversão pelo `ffmpeg`, que é do sistema; o projeto não declara decodificador de jpg nem de webp para Node, e o `sharp` da raiz é dependência transitiva que a cópia de `npm ci` não traz.
+2. `descrever --recusas` e `olhar-bancada --sobrescrever`, que são pequenas e tiram metade dos comandos repetidos. Feita em 2026-11-17, na [pasta do plano](../banco-de-provas/comparar-com-a-referencia-2026-11-16/README.md): `--sobrescrever` tira 14 dos 42 comandos do alvo nas sete rodadas e `--recusas` mais 7, e com a prancha da fatia 3 sobram 10 em 83; `--recusas` dá a mesma lista do núcleo em três peças, uma com recusa de propósito. O filtro das recusas de material não entrou.
+3. A prancha, com régua, região, vistas e isolamento, provada no selim e no pedal. Feita em 2026-11-17, na [pasta do plano](../banco-de-provas/comparar-com-a-referencia-2026-11-16/README.md): `tools/modelar/prancha-de-referencia.mjs` monta modelo e foto na mesma escala, com régua em mm, e tira 11 dos 42 comandos do alvo; entrou também `--espelhar`, porque a vista direita da bancada mostra a bicicleta espelhada em relação à foto lateral. A confirmação da pessoa pedida no item 1 do gate de saída fica para o fechamento.
+4. A cópia de parte repetida, pelo zoom em mm ou pela escolha de instância. Feita em 2026-11-17, na [pasta do plano](../banco-de-provas/comparar-com-a-referencia-2026-11-16/README.md): o zoom em mm não bastava, porque recorta a captura dos dois pedais e o pedal fica com os mesmos 2 px/mm; entrou `--copia=<eixo><+|->` na bancada e na prancha, que desenha só a cópia do lado pedido do centro da seleção e enquadra a câmera nela, e o pedal sai a 13,7 a 15,7 px/mm. Tira os 3 comandos de recorte do pedal, e sobram 7 em 83.
 5. O pacote do crítico com o contorno sobreposto.
 6. O crítico por perguntas fechadas, em duas ordens, com a variação medida em cinco repetições antes e depois.
 7. Skills, agente, documentação e fechamento.
