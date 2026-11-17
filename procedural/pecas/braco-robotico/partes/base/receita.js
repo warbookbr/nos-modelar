@@ -20,7 +20,7 @@
  * A caixa lateral é oca e aberta na face de fora por uma janela com moldura, e guarda a placa de controle do braço (fatia 4 do
  * plano `docs/modelar/planos/2026-11-16-familia-componentes-eletronicos.md`): uma placa declarada da família
  * `componente-eletronico`, em pé, paralela à face de fora, com os componentes virados para a janela e presa ao corpo por quatro
- * espaçadores com parafuso. Os componentes seguem o que o braço precisa: um driver de passo em módulo por junta (as seis), com o
+ * espaçadores com parafuso. A janela é fechada por uma tampa transparente, pedida pela pessoa em 2026-11-17. Os componentes seguem o que o braço precisa: um driver de passo em módulo por junta (as seis), com o
  * capacitor do driver e o conector de quatro vias do motor de cada um, o microcontrolador em módulo, o borne da entrada de
  * alimentação com o capacitor de entrada, o regulador de 5 V em TO-220 no dissipador com o capacitor de saída, e o LED de
  * ligado com o resistor dele.
@@ -119,7 +119,7 @@ export const COMPONENTES_DA_PLACA = [
 ];
 
 const m = (mm) => mm / 1000;
-const ID = { corpo: 100, pe: 200, caixa: 300, cavidade: 310, janela: 320, caixaOca: 330, espacador: 500, cabeca: 520 };
+const ID = { corpo: 100, pe: 200, caixa: 300, cavidade: 310, janela: 320, caixaOca: 330, tampa: 340, espacador: 500, cabeca: 520 };
 /* Os ids de origem da placa declarada começam aqui, acima dos da base. */
 const BASE_DA_PLACA = 10000;
 
@@ -238,6 +238,13 @@ export function gerarPassos(t = TABELA) {
   passos.push(['transladar', { d: [C.xFora - 2 * e, (C.y0 + C.y1) / 2, 0], sel: janela }]);
   passos.push(['subtrair', { origemId: ID.caixaOca, solidos: [{ origem: { op: 'loft', id: ID.caixa } }, { origem: { op: 'loft', id: ID.cavidade } }, janela] }]);
   passos.push(['parte', { nome: 'caixaLateral', sel: { origem: { op: 'subtrair', id: ID.caixaOca } } }]);
+  /* A tampa transparente: o mesmo contorno da janela, na espessura da parede, assentada na moldura e rente à face de fora; a borda
+     dela encosta na borda da janela em volta toda, e a placa e os componentes ficam 12 mm ou mais atrás da face de dentro dela. */
+  const tampa = { origem: { op: 'extrusao', id: ID.tampa } };
+  passos.push(['extrusao', { origemId: ID.tampa, perfil: retanguloArredondado(alturaDaJanela / 2, larguraDaJanela / 2, m(t.cantoDaJanela)), altura: e }]);
+  passos.push(['rotaciona', { eixo: 'z', graus: -90, pivo: [0, 0, 0], sel: tampa }]);
+  passos.push(['transladar', { d: [C.xFora, (C.y0 + C.y1) / 2, 0], sel: tampa }]);
+  passos.push(['parte', { nome: 'tampaDaCaixa', material: 'vidroIncolor', pai: 'caixaLateral', sel: tampa }]);
   passos.push(['publicarPorta', {
     nome: 'assento', de: { op: 'lathe', id: ID.corpo, faixa: 3 },
     interface: {
@@ -289,7 +296,12 @@ const receita = {
   PARAMS: TABELA,
   TOPO: { origem: 'centro do fundo do pé no chão; y para cima, a caixa em -X' },
   /* As cores dos componentes são as das pranchas da família, escolhidas por peça, sem paleta nova. */
-  MATERIAIS: Object.fromEntries(placaPadrao.materiais.map((nome) => [nome, CORES_DOS_COMPONENTES[nome]])),
+  MATERIAIS: {
+    ...Object.fromEntries(placaPadrao.materiais.map((nome) => [nome, CORES_DOS_COMPONENTES[nome]])),
+    /* a tampa da janela: o vidro claro e liso do farol do furgão (`lenteDoFarol` em procedural/pecas/furgao-realista/receita.js), que
+       deixa ver o que há atrás dele */
+    vidroIncolor: { tipo: 'liso', cor: '#f4f8fa', mistura: 'transparente', opacidade: 0.2, aspereza: 0.03, metalicidade: 0 },
+  },
   PLANO: {
     objeto: 'base do braço robótico industrial, presa no chão, com uma caixa colada no lado esquerdo que guarda a placa de controle',
     referencias: ['../../referencias/lateral.prancha.png'],
@@ -298,6 +310,7 @@ const receita = {
       { nome: 'corpo', forma: 'cilindro de revolução em pé, 210 mm de diâmetro e 200 mm de altura; a quina do topo leva só um chanfro pequeno, sem sulco na junção com o anel', tecnica: 'revolução com perfil' },
       { nome: 'pe', forma: 'placa de 20 mm de altura, 230 mm de lado, que avança à esquerda por baixo da caixa até o meio dela; cantos e borda arredondados', tecnica: 'placa com cantos e bordas arredondados' },
       { nome: 'caixaLateral', forma: 'caixa oca de cantos arredondados encostada no corpo em -X, 50 mm de saída, apoiada no pé só onde ele existe, 10 mm mais baixa que o corpo, com parede de 3 mm e uma janela com moldura na face de fora', tecnica: 'caixa com bordas arredondadas menos o oco e a janela' },
+      { nome: 'tampaDaCaixa', forma: 'tampa transparente e incolor no contorno da janela, de cantos arredondados, com a espessura da parede, assentada na moldura e rente à face de fora da caixa', tecnica: 'extrusão do contorno da janela' },
       { nome: 'fixacaoDaPlaca', forma: 'quatro espaçadores de 6 mm da face de trás da placa até dentro do corpo e as quatro cabeças de parafuso na face de cima, nos furos de fixação', tecnica: 'revolução com perfil' },
       ...placaPadrao.partesDoPlano.map((p) => (p.nome === 'placa'
         ? { ...p, dePerto: [{ ponto: placaPadrao.pose.posicao, oQue: 'a placa de controle pela janela da caixa, com os drivers, o microcontrolador e a alimentação' }] }
@@ -310,6 +323,7 @@ const receita = {
       'a caixa solta do corpo, com fresta, ou flutuando acima do pé',
       'a caixa do lado errado: na vista frontal ela fica à esquerda, em -X',
       'a placa de controle tocando a parede da caixa ou o corpo, ou um componente saindo pela janela',
+      'a tampa opaca, solta da moldura, saindo da face de fora ou tocando a placa ou um componente',
       'um componente atravessando outro, ou fora da face da placa',
     ],
   },
@@ -320,6 +334,7 @@ const receita = {
       { par: ['caixaLateral', 'corpo'], motivo: 'a caixa de face plana entra até 12 mm no corpo redondo para não deixar fresta nas bordas da curva', penetracaoMaxima: 0.012 },
       { par: ['caixaLateral', 'pe'], motivo: 'a caixa se apoia no pé' },
       { par: ['fixacaoDaPlaca', 'placa'], motivo: 'os espaçadores encostam na face de trás da placa e as cabeças dos parafusos na de cima, em volta dos furos de fixação' },
+      { par: ['tampaDaCaixa', 'caixaLateral'], motivo: 'a tampa assenta na moldura: a borda dela encosta na borda da janela em volta toda' },
       { par: ['fixacaoDaPlaca', 'corpo'], motivo: 'a ponta de cada espaçador entra no corpo, que é curvo, para assentar inteira nele', penetracaoMaxima: 0.006 },
       ...placaDeControle(this.PARAMS).contatos,
     ];
