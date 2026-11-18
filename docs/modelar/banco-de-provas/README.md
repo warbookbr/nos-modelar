@@ -44,6 +44,7 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
   - [Carcaça da empilhadeira, vista lateral: o desenho por restrições ajustado à referência](familias-de-desenho-2026-10-14/carcaca/NOTAS.md) — `familias-de-desenho-2026-10-14/carcaca`
   - [Carcaça da empilhadeira nova, vista lateral: a descrição](familias-de-desenho-2026-10-14/prova/DESCRICAO.md) — `familias-de-desenho-2026-10-14/prova`
   - [Carcaça da empilhadeira nova pela família de desenho: o resultado da prova](familias-de-desenho-2026-10-14/prova/RESULTADO.md) — `familias-de-desenho-2026-10-14/prova`
+- [Ferramentas das rodadas: fatia 2, o cache por passo e `--params` nas medidas](ferramentas-das-rodadas-2026-11-18/README.md) — `ferramentas-das-rodadas-2026-11-18`
 - [Forma exata antes da malha: medidas e estudo](forma-exata-2026-11-13/README.md) — `forma-exata-2026-11-13`
 - [Furgão realista: alinhamento](furgao-realista-2026-10-30/ALINHAMENTO.md) — `furgao-realista-2026-10-30`
   - [Furgão realista: atritos](furgao-realista-2026-10-30/ATRITOS.md) — `furgao-realista-2026-10-30`
