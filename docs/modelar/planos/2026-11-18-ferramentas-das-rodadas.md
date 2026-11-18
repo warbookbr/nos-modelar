@@ -1,6 +1,6 @@
 # Ferramentas das rodadas: a decisão da pessoa e o esperado da medida ficam gravados, a medida usa o cache, o pente segue a zebra e cada rodada guarda as próprias imagens
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `tools/modelar/rodada-de-modelagem.mjs`, `tools/modelar/rodada-de-modelagem.test.mjs`, `src/autoria/laco-de-modelagem.js`, `src/autoria/laco-de-modelagem.test.js`, `tools/modelar/conferir-pontos.mjs`, `tools/modelar/entrada-de-medida.mjs`, `tools/modelar/entrada-de-medida.test.mjs`, `tools/modelar/pente-de-curvatura.mjs`, `tools/modelar/pente-de-curvatura.test.mjs`, `tools/modelar/vistas-para-critica.mjs`, `tools/modelar/vistas-para-critica.test.mjs`, `tools/modelar/etapas-da-montagem.mjs` e `tools/modelar/fluxo-do-objeto.mjs` (só a leitura da decisão gravada), `tools/modelar/guardas/guarda-acervo.mjs` e `tools/modelar/guardas/guarda-referencial.mjs` (só a opção de execução pelo cache, desligada por padrão), `docs/modelar/banco-de-provas/ferramentas-das-rodadas-2026-11-18/`.
 
@@ -50,3 +50,7 @@ A decisão da pessoa de seguir sem limite ou depois de uma parada sem convergên
 ## Riscos e parada
 
 Se a guarda do esperado recusar mudança legítima em mais de uma peça do acervo, ela passa a aviso e volta à pessoa. Se o cache der resultado diferente da execução direta em alguma medida, a ligação para e o caso vai ao plano do cache.
+
+## Fechamento
+
+Concluído em 2026-11-18, com as provas em `docs/modelar/banco-de-provas/ferramentas-das-rodadas-2026-11-18/`. Gate 1: as duas guardas têm testes nos dois sentidos, e cada ataque da revisão virou teste (`rodada-de-modelagem.test.mjs`, `laco-de-modelagem.test.js`, `fluxo-do-objeto.test.mjs`); toda mudança de esperado pede `--motivo-dos-pontos`, e todo `limite.json` pede quem, data e as palavras da pessoa. Gate 2: a zebra da lataria leva 80 s com a receita executada e 2,8 s pelo cache, com o JSON idêntico, e o `--acao` cai de 514 para 105 s. Gate 3: o pente guiado pela zebra corta 24 planos da lataria em 2,6 s e, em grade, mostrou no flanco da porta a faixa que a zebra não conta. Gate 4: a revisão adversarial bloqueou a guarda dos pontos na primeira versão; os quatro furos foram fechados e testados, e a parte da decisão da pessoa passou com dois ajustes. Ficam no backlog as réguas de dobra e vinco fora do cache (76 s por `--acao`), o teto de tamanho do cache, a lataria que não aceita `--params` enquanto lê a tabela direto, e os pesos dos testes lentos a medir de novo numa bateria inteira.
