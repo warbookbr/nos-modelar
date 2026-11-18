@@ -13,7 +13,7 @@
  *   maximoDeClotoides: o teto de clotoides (8 por padrão); passado ele a curva sai com `cabe: false` e o desvio que ficou.
  *   duros: lista de índices de pontos por onde a curva passa de perto (um nó da rede): pesam 20 vezes mais no ajuste, e o desvio deles é medido como os outros.
  *   eixos: [i, j] as duas coordenadas lidas dos pontos de 3 componentes.
- * devolve: { cabe, motivo, tolerancia, desvioMaximo, desvios, trechos, clotoides, inflexoes, comprimento, joelhos, inicio, rumo, ponto(s), amostrar(passo), pontosDaRede(passo, opcoes) }
+ * devolve: { cabe, motivo, tolerancia, desvioMaximo, desvios, trechos, clotoides, inflexoes, comprimento, joelhos, inicio, rumo, ponto(s), rumoEm(s), valorEm(a, opcoes), amostrar(passo), pontosDaRede(passo, opcoes) }
  *   motivo: null quando cabe; senão o texto de cada condição que falhou (desvio, desvio da curva à poligonal, ordem dos pontos, comprimento), com os valores.
  *   desvioMaximo: o maior desvio de um ponto à curva (3D, quando os pontos têm 3 componentes); desvioDaCurva: o maior desvio da curva à poligonal dos pontos (o outro sentido, que tira da conta a densidade da entrada).
  *   cabe: os dois desvios, medidos na curva integrada a passo fino, estão dentro da tolerância, os pontos se projetam na curva em ordem e o comprimento dela não passa
@@ -25,6 +25,15 @@
  *     distância máxima dela à corda; a faixa abaixo da tolerância é a reta que a tolerância não distingue).
  *     É diagnóstico e não critério: o lóbulo estreito contra a corda curta conta 0 onde a inflexão é obrigatória (a lombada de 3 mm, sigma 40, entre ±300 e ±800),
  *     e nenhum gate aprova ou reprova por este número até a contagem medir o lóbulo contra a ponte entre as faixas vizinhas.
+ *   ponto(s) e rumoEm(s): o ponto [u, v] e o rumo (radiano, o ângulo da tangente contra o primeiro eixo) da curva no comprimento de arco s, exatos: o rumo é a integral
+ *     fechada da curvatura, e o ponto sai dele por Gauss-Legendre de 5 pontos em pedaços de giro até 0,125 rad, a partir do começo do pedaço, sem corda entre amostras
+ *     (erro na ordem de 1e-13 do comprimento, em qualquer escala). Fora de 0 a `comprimento` vale a ponta; s que não é número finito recusa. `rumo` (sem o Em) é o
+ *     número do rumo no início, o mesmo de `guardado`. `amostrar` e `pontosDaRede` leem de `ponto`.
+ *     O desvio, `cabe` e as inflexões continuam medidos na curva integrada a passo fino (ponto médio no rumo, com a flecha da corda abaixo de 1/200 da tolerância),
+ *     que não é a leitura exata: as duas diferem por uma fração de centésimo da tolerância.
+ *   valorEm(a, { eixo, fora }): a curva lida como função: o valor da outra coordenada onde a coordenada `eixo` (0 ou 1 do plano da curva, 0 por padrão) vale `a`.
+ *     Recusa quando a coordenada `eixo` não cresce nem cai sempre ao longo da curva (o rumo fica perpendicular ao eixo ou o cruza, e a recusa diz entre quais arcos),
+ *     e quando `a` cai fora das pontas da curva, salvo com `fora: 'ponta'`, que devolve o valor da ponta mais perto (`fora: 'recusa'` é o padrão).
  *   pontosDaRede(passo, { nome, completar }): { nome, pontos } no formato de `curvas` de `gaiolaPorRede`: pontos-chave sobre a curva ajustada a cada `passo` de arco,
  *     com a ponta exata; `completar(u, v)` devolve [x, y, z] (sem ele, a terceira coordenada é a constante do ajuste).
  * exemplo:
@@ -34,13 +43,14 @@
  *     `tolerancia`, a do plano, que escolhe o passo da integração); é dado puro, que passa por JSON sem perder um bit.
  * guardar o ajuste: o ajuste leva segundos, e quem o usa na importação de uma receita guarda o resultado como dado versionado. `impressaoDoAjuste(pontos, opcoes)` dá a
  *   impressão da entrada ({ versao, pontos, soma, opcoes }: `VERSAO_DO_AJUSTE`, a contagem, a soma dos pontos em milionésimo da unidade e as opções),
- *   `curvaLisaGuardada(guardado)` refaz a curva ({ inicio, rumo, comprimento, joelhos, clotoides, ponto, amostrar }, os mesmos números do ajuste, sem medir) e
+ *   `curvaLisaGuardada(guardado)` refaz a curva ({ inicio, rumo, comprimento, joelhos, clotoides, ponto, rumoEm, valorEm, amostrar }, os mesmos números do ajuste, sem medir) e
  *   `curvaLisaDoGuardado({ nome, pontos, opcoes, guardados })` devolve o resultado de `ajustarCurvaLisa` com `doGuardado`: da curva guardada em `guardados[nome]`, medida
  *   contra os pontos de agora (`cabe` e os desvios são dessa medida), quando a impressão dela confere com a entrada (`doGuardado: true`), e do ajuste feito na hora
  *   quando não confere (`doGuardado: false`, com `mudou`, a lista do que difere), para quem chama avisar; só o dado guardado malformado recusa.
  *   Quem muda o algoritmo soma 1 em `VERSAO_DO_AJUSTE`, e o dado guardado antes deixa de conferir.
  *   Nada aqui lê nem escreve disco: quem guarda é a receita, e quem regrava é `tools/modelar/regravar-ajustes-de-curva.mjs`.
- * peça: procedural/nucleo/ajuste-de-curva-lisa.test.mjs (arco, clotoide, elipse e S analíticos, com ruído, a escala, a ordem e as recusas).
+ * peça: procedural/nucleo/ajuste-de-curva-lisa.test.mjs (arco, clotoide, elipse e S analíticos, com ruído, a escala, a ordem e as recusas; `ponto`, `rumoEm` e `valorEm`
+ *   contra a reta, o arco e a clotoide em forma fechada).
  * FIM DA FICHA
  *
  * POR QUE CLOTOIDE. Uma curva lisa do ponto de vista da zebra é a de curvatura que não oscila: a ondulação longa vem de variações de 0,1 1/m. A clotoide
@@ -368,19 +378,91 @@ export function ajustarCurvaLisa(entrada, { tolerancia: toleranciaPedida = 1, ma
 
 /* ---------- o resultado ---------- */
 
-/** o ponto no comprimento de arco s e a amostra a passo de arco, sobre a curva integrada */
-function leituraDaCurva(c, L) {
-  const ponto = (s) => {
-    const alvo = Math.min(L, Math.max(0, s)); let lo = 0; let hi = c.n;
-    while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (c.s[mid] <= alvo) lo = mid; else hi = mid; }
-    const t = (alvo - c.s[lo]) / (c.s[hi] - c.s[lo] || 1);
-    return [c.x[lo] + (c.x[hi] - c.x[lo]) * t, c.y[lo] + (c.y[hi] - c.y[lo]) * t];
+/* o maior giro do rumo num pedaço da leitura exata (radiano): com ele a quadratura de 5 pontos erra abaixo de 1e-16 do comprimento do pedaço */
+const GIRO_DO_PEDACO = 0.125;
+/* Gauss-Legendre de 5 pontos em [0, 1]: [abscissa, peso] */
+const GAUSS_5 = (() => {
+  const a = Math.sqrt(5 - 2 * Math.sqrt(10 / 7)) / 3; const b = Math.sqrt(5 + 2 * Math.sqrt(10 / 7)) / 3;
+  const wa = (322 + 13 * Math.sqrt(70)) / 900; const wb = (322 - 13 * Math.sqrt(70)) / 900;
+  return [[-b, wb], [-a, wa], [0, 128 / 225], [a, wa], [b, wb]].map(([x, w]) => [(1 + x) / 2, w / 2]);
+})();
+/* o cosseno abaixo do qual o rumo conta como perpendicular ao eixo em valorEm */
+const PERPENDICULAR = 1e-12;
+
+/** A leitura exata da curva { x0, y0, th0, L, k, fr }: o ponto e o rumo no comprimento de arco s, a amostra a passo de arco e o valor de uma coordenada onde a outra vale
+ *  o pedido. O rumo é a integral fechada da curvatura (quadrático em s dentro de cada clotoide). O ponto não tem forma fechada (é a integral de Fresnel): cada clotoide é
+ *  cortada em pedaços de giro até GIRO_DO_PEDACO, com o começo de cada pedaço guardado, e o ponto sai do começo do pedaço por Gauss-Legendre de 5 pontos sobre o rumo
+ *  exato, sem corda entre amostras; o erro fica na ordem do arredondamento (1e-13 do comprimento), em qualquer escala. */
+function leituraExata({ x0, y0, th0, L, k, fr }) {
+  const S = [0]; const X = [x0]; const Y = [y0]; const TH = [th0]; const K = []; const DK = [];
+  const avancar = (i, t) => {
+    let x = X[i]; let y = Y[i];
+    for (const [g, w] of GAUSS_5) { const u = g * t; const th = TH[i] + (K[i] + 0.5 * DK[i] * u) * u; x += w * t * Math.cos(th); y += w * t * Math.sin(th); }
+    return [x, y];
   };
+  for (let j = 0; j < fr.length - 1; j += 1) {
+    const s0 = fr[j] * L; const len = (fr[j + 1] - fr[j]) * L; const dk = (k[j + 1] - k[j]) / len;
+    const n = Math.max(1, Math.ceil((Math.max(Math.abs(k[j]), Math.abs(k[j + 1])) * len) / GIRO_DO_PEDACO)); const h = len / n;
+    for (let t = 0; t < n; t += 1) {
+      const i = S.length - 1; K.push(k[j] + ((k[j + 1] - k[j]) * t) / n); DK.push(dk);
+      const [x, y] = avancar(i, h);
+      S.push(t + 1 === n ? fr[j + 1] * L : s0 + (len * (t + 1)) / n); X.push(x); Y.push(y); TH.push(TH[i] + (K[i] + 0.5 * dk * h) * h);
+    }
+  }
+  const ultimo = S.length - 1; K.push(k[k.length - 1]); DK.push(0);
+  /* o pedaço em que o arco s cai, e quanto dele já passou; fora de [0, L] vale a ponta */
+  const onde = (s, quem) => {
+    if (typeof s !== 'number' || !Number.isFinite(s)) erro(`${quem} espera o comprimento de arco, um número finito de 0 a ${citar(L)}, e veio ${citar(s)}`);
+    const alvo = Math.min(L, Math.max(0, s)); let lo = 0; let hi = ultimo;
+    while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (S[mid] <= alvo) lo = mid; else hi = mid; }
+    return alvo >= S[hi] ? [hi, 0] : [lo, alvo - S[lo]];
+  };
+  const ponto = (s) => { const [i, t] = onde(s, 'ponto'); return t > 0 ? avancar(i, t) : [X[i], Y[i]]; };
+  const rumoEm = (s) => { const [i, t] = onde(s, 'rumoEm'); return TH[i] + (K[i] + 0.5 * DK[i] * t) * t; };
   const amostrar = (passoMm) => {
     if (typeof passoMm !== 'number' || !(passoMm > 0)) erro(`passo espera um número maior que zero (a unidade dos pontos), e veio ${citar(passoMm)}`);
     const n = Math.max(1, Math.round(L / passoMm)); return Array.from({ length: n + 1 }, (_, i) => ponto((i * L) / n));
   };
-  return { ponto, amostrar };
+  /* a curva como função de uma coordenada: ela cresce ou cai sempre quando o cosseno do rumo contra o eixo não troca de sinal nem fica nulo num pedaço inteiro.
+   * O rumo de cada pedaço fica entre os das pontas e o do vértice (onde a curvatura passa por zero), e o cosseno, entre os dessas pontas e ±1 nos múltiplos de pi. */
+  const funcoes = [null, null];
+  const funcaoDe = (eixo) => {
+    if (funcoes[eixo]) return funcoes[eixo];
+    const fase = eixo === 0 ? 0 : Math.PI / 2; let sentido = 0; let quebra = null;
+    for (let i = 0; i < ultimo && !quebra; i += 1) {
+      const h = S[i + 1] - S[i]; const angulos = [TH[i] - fase, TH[i + 1] - fase];
+      if (DK[i] !== 0) { const t = -K[i] / DK[i]; if (t > 0 && t < h) angulos.push(TH[i] + 0.5 * K[i] * t - fase); }
+      const lo = Math.min(...angulos); const hi = Math.max(...angulos); const cossenos = [Math.cos(lo), Math.cos(hi)];
+      for (let m = Math.ceil(lo / Math.PI); m * Math.PI <= hi; m += 1) cossenos.push(m % 2 === 0 ? 1 : -1);
+      const maior = Math.max(...cossenos); const menor = Math.min(...cossenos);
+      const deste = maior > PERPENDICULAR ? 1 : menor < -PERPENDICULAR ? -1 : 0;
+      if ((maior > PERPENDICULAR && menor < -PERPENDICULAR) || deste === 0 || (sentido !== 0 && deste !== sentido)) quebra = i; else sentido = deste;
+    }
+    const A = eixo === 0 ? X : Y; const B = eixo === 0 ? Y : X;
+    funcoes[eixo] = { quebra, sobe: sentido > 0, A, B };
+    return funcoes[eixo];
+  };
+  const valorEm = (a, opcoes = {}) => {
+    const { eixo = 0, fora = 'recusa' } = opcoes ?? {};
+    if (eixo !== 0 && eixo !== 1) erro(`valorEm espera eixo 0 ou 1 (a coordenada da curva plana em que o pedido é dado), e veio ${citar(eixo)}`);
+    if (fora !== 'recusa' && fora !== 'ponta') erro(`valorEm espera fora 'recusa' ou 'ponta' (o que fazer com o pedido além das pontas da curva), e veio ${citar(fora)}`);
+    if (typeof a !== 'number' || !Number.isFinite(a)) erro(`valorEm espera o valor da coordenada ${eixo}, um número finito, e veio ${citar(a)}`);
+    const { quebra, sobe, A, B } = funcaoDe(eixo);
+    if (quebra !== null) erro(`valorEm: a coordenada ${eixo} não cresce nem cai sempre ao longo da curva, que por isso não é função dela: entre os arcos ${citar(S[quebra])} e ${citar(S[quebra + 1])} o rumo (de ${citar(TH[quebra])} a ${citar(TH[quebra + 1])} rad) fica perpendicular ao eixo ${eixo} ou o cruza; peça pelo outro eixo ou leia a curva por ponto(s)`);
+    const antes = sobe ? a < A[0] : a > A[0]; const depois = sobe ? a > A[ultimo] : a < A[ultimo];
+    if ((antes || depois) && fora === 'recusa') erro(`valorEm: a coordenada ${eixo} da curva vai de ${citar(A[0])} a ${citar(A[ultimo])}, e o pedido ${citar(a)} cai fora; passe { fora: 'ponta' } para valer a ponta mais perto`);
+    if (antes) return B[0];
+    if (depois) return B[ultimo];
+    /* o pedaço em que o pedido cai, e a bisseção do arco dentro dele */
+    let lo = 0; let hi = ultimo;
+    while (hi - lo > 1) { const mid = (lo + hi) >> 1; if ((A[mid] <= a) === sobe) lo = mid; else hi = mid; }
+    if (a === A[lo]) return B[lo];
+    if (a === A[hi]) return B[hi];
+    let de = 0; let ate = S[hi] - S[lo];
+    for (let it = 0; it < 64 && ate > de; it += 1) { const mid = (de + ate) / 2; if (mid <= de || mid >= ate) break; if ((avancar(lo, mid)[eixo] < a) === sobe) de = mid; else ate = mid; }
+    return avancar(lo, (de + ate) / 2)[1 - eixo];
+  };
+  return { ponto, rumoEm, amostrar, valorEm };
 }
 
 function montar(ajuste, lido, tolerancia, eixos, original) {
@@ -431,7 +513,7 @@ function montar(ajuste, lido, tolerancia, eixos, original) {
   }
   if (corrida) trechos.push(corrida);
   const trechosFinais = trechos.map(({ d, ...t }) => ({ ...t, sentido: d > 0 ? 'cresce' : d < 0 ? 'cai' : 'constante' }));
-  const { ponto, amostrar } = leituraDaCurva(c, L);
+  const { ponto, rumoEm, amostrar, valorEm } = leituraExata(q);
   const para3d = (u, v) => { const r = [0, 0, 0]; r[eixos[0]] = u; r[eixos[1]] = v; r[livre] = constante; return r; };
   /* o desvio 3D: o do plano e o da coordenada livre (a distância dela à constante) em quadratura */
   const d3 = (v, i) => (tem3 ? Math.hypot(v, livres[i] - constante) : v);
@@ -439,7 +521,7 @@ function montar(ajuste, lido, tolerancia, eixos, original) {
   return {
     cabe: motivos.length === 0, motivo: motivos.length ? motivos.join('; ') : null, tolerancia: original, desvioMaximo: Math.max(...desvios3.map(Math.abs)),
     desvioDaCurva: tem3 ? Math.hypot(desvioDaCurvaMaximo, Math.max(...livres.map((z) => Math.abs(z - constante)))) : desvioDaCurvaMaximo, desvios: desvios3, comprimento: L,
-    joelhos, clotoides, trechos: trechosFinais, inflexoes, inicio: [q.x0, q.y0], rumo: q.th0, ponto, amostrar,
+    joelhos, clotoides, trechos: trechosFinais, inflexoes, inicio: [q.x0, q.y0], rumo: q.th0, ponto, rumoEm, amostrar, valorEm,
     guardado: { inicio: [q.x0, q.y0], rumo: q.th0, comprimento: L, joelhos: fr.map((f, i) => ({ f, k: k[i] })), tolerancia },
     pontosDaRede: (passo, { nome = 'curva', completar = tem3 ? para3d : (u, v) => [u, v, constante] } = {}) => ({ nome, pontos: amostrar(passo).map(([u, v]) => completar(u, v)) }),
   };
@@ -449,8 +531,10 @@ function montar(ajuste, lido, tolerancia, eixos, original) {
 
 /** A versão do ajuste, que entra na impressão. REGRA: quem muda o que `ajustarCurvaLisa` devolve para a mesma entrada (o ajuste, a escolha entre os ajustes, a integração
  * ou o passo dela, o formato de `guardado`) soma 1 aqui. O dado guardado com a versão antiga deixa de conferir, o ajuste é refeito na hora por quem o usa, e o teste do
- * comando que regrava (`tools/modelar/regravar-ajustes-de-curva.test.mjs`) reprova até o dado de cada receita ser regravado e a malha, conferida. */
-export const VERSAO_DO_AJUSTE = 1;
+ * comando que regrava (`tools/modelar/regravar-ajustes-de-curva.test.mjs`) reprova até o dado de cada receita ser regravado e a malha, conferida.
+ * Versão 2 (2026-11-18): `ponto(s)` passou da corda entre as amostras da curva integrada ao ponto exato, e `amostrar` e `pontosDaRede` leem dele; o ajuste escolhido e o
+ * `guardado` são os mesmos da versão 1, e o ponto anda uma fração de centésimo da tolerância (a flecha da corda que havia). */
+export const VERSAO_DO_AJUSTE = 2;
 
 const MILIONESIMO = 1e6;
 const opcoesDoAjuste = ({ tolerancia = 1, maximoDeClotoides = 8, duros = [], eixos = [0, 1] } = {}) => ({ tolerancia, maximoDeClotoides, duros, eixos });
@@ -479,15 +563,14 @@ function lerGuardado(guardado) {
   return { q: { x0: g.inicio[0], y0: g.inicio[1], th0: g.rumo, L: g.comprimento, k: J.map((j) => j.k), fr: J.map((j) => j.f) }, tolerancia: g.tolerancia };
 }
 
-/** A curva de um ajuste guardado (`guardado` do resultado de `ajustarCurvaLisa`, como veio ou depois de passar por JSON), refeita sem ajustar: a mesma integração a passo
- * fino, com os mesmos números. Devolve { inicio, rumo, comprimento, joelhos, clotoides, ponto(s), amostrar(passo) }. Não mede nada contra pontos: quem tem os pontos usa
- * `curvaLisaDoGuardado`, que mede. */
+/** A curva de um ajuste guardado (`guardado` do resultado de `ajustarCurvaLisa`, como veio ou depois de passar por JSON), refeita sem ajustar: a mesma leitura
+ * exata, com os mesmos números. Devolve { inicio, rumo, comprimento, joelhos, clotoides, ponto(s), rumoEm(s), valorEm(a, opcoes), amostrar(passo) }. Não mede nada contra pontos: quem tem os pontos usa
+ * `curvaLisaDoGuardado`, que mede. A tolerância guardada não entra na leitura exata; ela escolhe o passo da curva integrada em que `curvaLisaDoGuardado` mede. */
 export function curvaLisaGuardada(guardado) {
-  const { q, tolerancia } = lerGuardado(guardado); const { L, fr, k } = q;
-  const c = integrar(q, fr, passosPorTrecho(fr, L, k, tolerancia, true));
+  const { q } = lerGuardado(guardado); const { L, fr, k } = q;
   const joelhos = fr.map((f, i) => ({ s: f * L, k: k[i] }));
   const clotoides = joelhos.slice(1).map((b, i) => ({ de: joelhos[i].s, ate: b.s, k0: joelhos[i].k, k1: b.k, comprimento: b.s - joelhos[i].s }));
-  return { inicio: [q.x0, q.y0], rumo: q.th0, comprimento: L, joelhos, clotoides, ...leituraDaCurva(c, L) };
+  return { inicio: [q.x0, q.y0], rumo: q.th0, comprimento: L, joelhos, clotoides, ...leituraExata(q) };
 }
 
 /** A curva do ajuste de nome `nome`: a guardada em `guardados` ({ [nome]: { impressao, curva } }), refeita sem ajustar, quando a impressão guardada confere com a da entrada

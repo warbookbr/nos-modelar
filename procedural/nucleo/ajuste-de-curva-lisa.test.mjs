@@ -1,8 +1,8 @@
 /* ajuste-de-curva-lisa.test.mjs — o ajuste de curva lisa em curvas analíticas conhecidas (arco, clotoide, elipse, S), limpas e com ruído de leitura, com o número
  * de inflexões certo e o desvio de cada ponto dentro da tolerância; a curva que `gaiolaPorRede` consome; as recusas; e a planta da lataria do carro-fastback,
- * lida da TABELA da receita (só leitura), dentro dos 3 mm. */
+ * lida da TABELA da receita (só leitura), dentro dos 3 mm; e a leitura exata (`ponto`, `rumoEm`, `valorEm`) contra a reta, o arco e a clotoide em forma fechada. */
 import { describe, expect, it } from 'vitest';
-import { ajustarCurvaLisa } from './ajuste-de-curva-lisa.js';
+import { ajustarCurvaLisa, curvaLisaGuardada } from './ajuste-de-curva-lisa.js';
 import { gaiolaPorRede } from './gaiola-por-rede.js';
 
 const ANGULO_AUREO = Math.PI * (3 - Math.sqrt(5));
@@ -239,5 +239,129 @@ describe('ajustarCurvaLisa: invariância de escala, lombada, coordenada livre e 
     expect(a.motivo).toMatch(/último ponto se projeta|não estão em ordem|primeiro ponto se projeta/);
     expect(() => ajustarCurvaLisa([[0, 0], [1, 1], [2, 4], [1e300, 5]], { tolerancia: 1 })).toThrow(/ponto 3 tem coordenada de módulo acima de 1e100.*1e\+300/);
     expect(ajustarCurvaLisa(arco(500, 90, 30), { tolerancia: 0.5 }).motivo).toBe(null);
+  });
+});
+
+/* a curva dada direto pelos joelhos, sem ajuste: o que a leitura exata lê */
+const curvaDe = ({ inicio = [0, 0], rumo = 0, comprimento, joelhos }) => curvaLisaGuardada({ inicio, rumo, comprimento, joelhos, tolerancia: 1 });
+/* a clotoide pura (curvatura c s, do início [0, 0] e rumo 0) pela série de Fresnel: x = soma (-1)^n (c/2)^(2n) s^(4n+1) / ((2n)! (4n+1)), y = soma (-1)^n (c/2)^(2n+1) s^(4n+3) / ((2n+1)! (4n+3)) */
+const fresnel = (c, s) => {
+  const z = (c / 2) * s * s; let x = 0; let y = 0; let termo = 1;
+  for (let n = 0; n < 60; n += 1) { x += ((n % 2 ? -1 : 1) * termo * s) / (4 * n + 1); termo *= z / (2 * n + 1); y += ((n % 2 ? -1 : 1) * termo * s) / (4 * n + 3); termo *= z / (2 * n + 2); }
+  return [x, y];
+};
+const fracoesDoArco = [0, 0.001, 0.137, 0.25, 0.5, 0.61803, 0.9, 0.999, 1];
+
+describe('a leitura exata da curva: ponto, rumoEm e valorEm', () => {
+  it('a reta: o ponto e o rumo a menos de 1e-9 do comprimento, nas escalas de 1e-3, 1 e 1e3', () => {
+    for (const e of [1e-3, 1, 1e3]) {
+      const L = 1000 * e; const c = curvaDe({ inicio: [5 * e, -2 * e], rumo: 0.3, comprimento: L, joelhos: [{ f: 0, k: 0 }, { f: 1, k: 0 }] });
+      for (const f of fracoesDoArco) {
+        const [x, y] = c.ponto(f * L);
+        expect(Math.hypot(x - (5 * e + f * L * Math.cos(0.3)), y - (-2 * e + f * L * Math.sin(0.3))) / L).toBeLessThan(1e-9);
+        expect(c.rumoEm(f * L)).toBeCloseTo(0.3, 12);
+      }
+    }
+  });
+
+  it('o arco de 250 de raio e 3,6 rad: o ponto e o rumo a menos de 1e-9, nas três escalas', () => {
+    for (const e of [1e-3, 1, 1e3]) {
+      const R = 250 * e; const L = 900 * e; const th0 = 0.7; const c = curvaDe({ inicio: [3 * e, 4 * e], rumo: th0, comprimento: L, joelhos: [{ f: 0, k: 1 / R }, { f: 1, k: 1 / R }] });
+      for (const f of fracoesDoArco) {
+        const s = f * L; const [x, y] = c.ponto(s);
+        expect(Math.hypot(x - (3 * e + R * (Math.sin(th0 + s / R) - Math.sin(th0))), y - (4 * e - R * (Math.cos(th0 + s / R) - Math.cos(th0)))) / L).toBeLessThan(1e-9);
+        expect(Math.abs(c.rumoEm(s) - (th0 + s / R))).toBeLessThan(1e-9);
+      }
+    }
+  });
+
+  it('a clotoide pura, de curvatura 0 a 1/100 em 1000 (5 rad): o ponto contra a série de Fresnel e o rumo a menos de 1e-9, nas três escalas', () => {
+    for (const e of [1e-3, 1, 1e3]) {
+      const L = 1000 * e; const k1 = 1 / (100 * e); const c = curvaDe({ comprimento: L, joelhos: [{ f: 0, k: 0 }, { f: 1, k: k1 }] });
+      for (const f of fracoesDoArco) {
+        const s = f * L; const [x, y] = c.ponto(s); const [fx, fy] = fresnel(k1 / L, s);
+        expect(Math.hypot(x - fx, y - fy) / L).toBeLessThan(1e-9);
+        expect(Math.abs(c.rumoEm(s) - (0.5 * (k1 / L) * s * s))).toBeLessThan(1e-9);
+      }
+    }
+  });
+
+  it('a cadeia de três clotoides: o ponto e o rumo iguais aos da integração independente quebrada nos joelhos, e as pontas valem fora do arco', () => {
+    const L = 1200; const J = [{ f: 0, k: 1 / 900 }, { f: 0.3141, k: 1 / 120 }, { f: 0.72, k: -1 / 300 }, { f: 1, k: 1 / 2000 }];
+    const c = curvaDe({ inicio: [10, 20], rumo: -0.4, comprimento: L, joelhos: J });
+    /* Simpson de 4000 passos por clotoide sobre o rumo em forma fechada */
+    const referencia = (alvo) => {
+      let x = 10; let y = 20; let th = -0.4;
+      for (let j = 0; j < J.length - 1; j += 1) {
+        const de = J[j].f * L; const ate = Math.min(alvo, J[j + 1].f * L); if (ate <= de) break;
+        const dk = (J[j + 1].k - J[j].k) / ((J[j + 1].f - J[j].f) * L); const rumo = (u) => th + J[j].k * u + 0.5 * dk * u * u; const N = 4000; const h = (ate - de) / N;
+        for (let i = 0; i <= N; i += 1) { const w = (i === 0 || i === N ? 1 : i % 2 ? 4 : 2) * (h / 3); x += w * Math.cos(rumo(i * h)); y += w * Math.sin(rumo(i * h)); }
+        th = rumo(ate - de);
+      }
+      return [x, y, th];
+    };
+    for (const f of [...fracoesDoArco, 0.3141, 0.72, 0.3142, 0.7199]) {
+      const s = f * L; const [x, y] = c.ponto(s); const [rx, ry, rth] = referencia(s);
+      expect(Math.hypot(x - rx, y - ry) / L).toBeLessThan(1e-9);
+      expect(Math.abs(c.rumoEm(s) - rth)).toBeLessThan(1e-9);
+    }
+    expect(c.ponto(-5)).toEqual(c.ponto(0)); expect(c.ponto(L + 5)).toEqual(c.ponto(L)); expect(c.ponto(0)).toEqual([10, 20]);
+    expect(c.rumoEm(-5)).toBe(-0.4); expect(c.rumoEm(L + 5)).toBe(c.rumoEm(L));
+    const amostra = c.amostrar(100); expect(amostra).toHaveLength(13); expect(amostra[5]).toEqual(c.ponto(500));
+  });
+
+  it('o resultado do ajuste traz a mesma leitura da curva guardada, e rumoEm(0) é o rumo do início', () => {
+    const a = ajustarCurvaLisa(arco(500, 60, 60), { tolerancia: 0.5 }); const g = curvaLisaGuardada(JSON.parse(JSON.stringify(a.guardado)));
+    expect(a.rumoEm(0)).toBe(a.rumo); expect(a.ponto(0)).toEqual(a.inicio);
+    for (const f of fracoesDoArco) { const s = f * a.comprimento; expect(g.ponto(s)).toEqual(a.ponto(s)); expect(g.rumoEm(s)).toBe(a.rumoEm(s)); }
+    expect(g.valorEm(200)).toBe(a.valorEm(200));
+    /* o ponto exato fica sobre o arco de 500: a corda entre amostras ficava para dentro dele */
+    expect(Math.abs(a.valorEm(200) - (500 - Math.sqrt(500 * 500 - 200 * 200)))).toBeLessThan(0.5);
+  });
+
+  it('valorEm nos dois eixos e nos dois sentidos, no quarto de arco de 400 de raio', () => {
+    const R = 400; const L = (Math.PI / 2) * R;
+    /* x cresce e y cresce: do [0, 0], rumo 0, virando à esquerda */
+    const sobe = curvaDe({ comprimento: L, joelhos: [{ f: 0, k: 1 / R }, { f: 1, k: 1 / R }] });
+    /* a mesma curva andada ao contrário: x cai e y cai */
+    const cai = curvaDe({ inicio: [R, R], rumo: -Math.PI / 2, comprimento: L, joelhos: [{ f: 0, k: -1 / R }, { f: 1, k: -1 / R }] });
+    for (const c of [sobe, cai]) {
+      for (const x of [0.5, 37, 200, 399]) expect(Math.abs(c.valorEm(x) - (R - Math.sqrt(R * R - x * x))) / R).toBeLessThan(1e-9);
+      for (const y of [0.5, 37, 200, 399]) expect(Math.abs(c.valorEm(y, { eixo: 1 }) - Math.sqrt(R * R - (R - y) * (R - y))) / R).toBeLessThan(1e-9);
+    }
+    expect(sobe.valorEm(0)).toBe(0); expect(sobe.valorEm(sobe.ponto(L)[0])).toBe(sobe.ponto(L)[1]); expect(Math.abs(sobe.ponto(L)[1] - R)).toBeLessThan(1e-9);
+  });
+
+  it('valorEm fora das pontas: recusa com a faixa e o pedido, e com fora ponta devolve a ponta mais perto', () => {
+    const c = curvaDe({ inicio: [100, 7], rumo: Math.PI, comprimento: 80, joelhos: [{ f: 0, k: 0.001 }, { f: 1, k: 0.002 }] });
+    const [xFim, yFim] = c.ponto(80);
+    expect(() => c.valorEm(100.5)).toThrow(/valorEm: a coordenada 0 da curva vai de 100 a .*, e o pedido 100\.5 cai fora; passe \{ fora: 'ponta' \}/);
+    expect(() => c.valorEm(xFim - 1, { fora: 'recusa' })).toThrow(/cai fora/);
+    expect(c.valorEm(100.5, { fora: 'ponta' })).toBe(7); expect(c.valorEm(xFim - 1, { fora: 'ponta' })).toBe(yFim);
+    expect(Math.abs(c.valorEm(60, { fora: 'ponta' }) - c.valorEm(60))).toBe(0);
+  });
+
+  it('valorEm recusa a curva que não é função da coordenada pedida, dizendo entre quais arcos o rumo cruza', () => {
+    /* meia volta: x sobe e desce, y só sobe */
+    const meia = curvaDe({ comprimento: Math.PI * 100, joelhos: [{ f: 0, k: 0.01 }, { f: 1, k: 0.01 }] });
+    expect(() => meia.valorEm(50)).toThrow(/valorEm: a coordenada 0 não cresce nem cai sempre ao longo da curva, que por isso não é função dela: entre os arcos \d.* e \d.* o rumo/);
+    expect(Math.abs(meia.valorEm(100, { eixo: 1 }) - 100)).toBeLessThan(1e-9);
+    /* a reta ao longo do eixo 1 não é função da coordenada 0 */
+    const reta = curvaDe({ rumo: Math.PI / 2, comprimento: 50, joelhos: [{ f: 0, k: 0 }, { f: 1, k: 0 }] });
+    expect(() => reta.valorEm(0)).toThrow(/não cresce nem cai sempre/); expect(Math.abs(reta.valorEm(20, { eixo: 1 }))).toBeLessThan(1e-12);
+    /* o S que só cruza a perpendicular no meio de uma clotoide, onde a curvatura passa por zero: as duas pontas têm o rumo do mesmo lado */
+    const s = curvaDe({ rumo: -Math.PI / 2 + 0.05, comprimento: 400, joelhos: [{ f: 0, k: -0.001 }, { f: 1, k: 0.002 }] });
+    expect(Math.cos(s.rumoEm(0))).toBeGreaterThan(0); expect(Math.cos(s.rumoEm(400))).toBeGreaterThan(0);
+    expect(() => s.valorEm(1)).toThrow(/não cresce nem cai sempre/);
+  });
+
+  it('a leitura recusa o pedido que não entende, dizendo o que recebeu', () => {
+    const c = curvaDe({ comprimento: 100, joelhos: [{ f: 0, k: 0 }, { f: 1, k: 0.001 }] });
+    expect(() => c.ponto('10')).toThrow(/ponto espera o comprimento de arco, um número finito de 0 a 100, e veio "10"/);
+    expect(() => c.rumoEm(NaN)).toThrow(/rumoEm espera o comprimento de arco, um número finito de 0 a 100, e veio NaN/);
+    expect(() => c.amostrar(0)).toThrow(/passo espera um número maior que zero .*, e veio 0/);
+    expect(() => c.valorEm(10, { eixo: 2 })).toThrow(/valorEm espera eixo 0 ou 1 .*, e veio 2/);
+    expect(() => c.valorEm(10, { fora: 'corta' })).toThrow(/valorEm espera fora 'recusa' ou 'ponta' .*, e veio "corta"/);
+    expect(() => c.valorEm(undefined)).toThrow(/valorEm espera o valor da coordenada 0, um número finito, e veio undefined/);
   });
 });

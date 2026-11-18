@@ -304,8 +304,8 @@ function ajusteGuardado(nome, descricao, pontos, opcoes) {
 
 /** A planta lisa, com a mesma leitura de `contornoDaPlanta` (ponto, normal para dentro, deZ, total, zFim): a leitura da prancha ajustada pelo núcleo a uma cadeia de clotoides
  * dentro de `curvaLisa.planta.tolerancia`. O ajuste recebe a meia planta e o começo do espelho dela além do eixo do carro; como o ajuste não tem condição de ponta, nos últimos
- * `alemDoEixo` mm antes do eixo a curva é levada, em S, à média dela com o espelho do trecho de depois do eixo: no eixo ela é simétrica exata e cruza de frente. O rumo sai da
- * integral exata da curvatura dos joelhos, e o desvio de cada ponto lido à curva final é medido aqui: fora da tolerância, a receita recusa. O ajuste leva alguns segundos e
+ * `alemDoEixo` mm antes do eixo a curva é levada, em S, à média dela com o espelho do trecho de depois do eixo: no eixo ela é simétrica exata e cruza de frente. O ponto e o rumo
+ * são os exatos do núcleo (`ponto`, `rumoEm`), e o desvio de cada ponto lido à curva final é medido aqui: fora da tolerância, a receita recusa. O ajuste leva alguns segundos e
  * vem guardado de `ajustes-de-curva.js` (`ajusteGuardado`). */
 export function plantaLisa(T) {
   const L = T.curvaLisa.planta;
@@ -313,8 +313,6 @@ export function plantaLisa(T) {
   if (PLANTAS.has(chave)) return PLANTAS.get(chave);
   const { C, lidos, pontos, opcoes } = entradaDaPlanta(T);
   const a = ajusteGuardado('planta', 'a planta', pontos, opcoes);
-  /* o rumo em s: a integral da curvatura, linear entre joelhos */
-  const rumo = (s) => { let th = a.rumo; for (let i = 1; i < a.joelhos.length; i += 1) { const [p, q] = [a.joelhos[i - 1], a.joelhos[i]]; if (s <= p.s) break; const e = Math.min(s, q.s); th += 0.5 * (p.k + p.k + ((q.k - p.k) * (e - p.s)) / (q.s - p.s)) * (e - p.s); } return th; };
   /* o comprimento de arco em que o ajuste cruza o eixo do carro */
   let lo = 0; let hi = a.comprimento; for (let k = 0; k < 60; k += 1) { const mid = (lo + hi) / 2; if (a.ponto(mid)[1] > 0) lo = mid; else hi = mid; }
   const total = (lo + hi) / 2;
@@ -322,9 +320,9 @@ export function plantaLisa(T) {
   /* o ponto e a tangente em u: o ajuste e, perto do eixo, a média com o espelho do trecho de depois do eixo, com peso w de 1 no eixo a 0 em `faixa` */
   const curva = (u) => {
     const c = Math.min(total, Math.max(0, u)); const t = total - c;
-    const p = a.ponto(c); const th = rumo(c); const dp = [Math.cos(th), Math.sin(th)];
+    const p = a.ponto(c); const th = a.rumoEm(c); const dp = [Math.cos(th), Math.sin(th)];
     if (t >= faixa) return { p, dp };
-    const e = a.ponto(total + t); const the = rumo(total + t);
+    const e = a.ponto(total + t); const the = a.rumoEm(total + t);
     const q = [e[0], -e[1]]; const dq = [-Math.cos(the), Math.sin(the)];
     const v = t / faixa; const w = 1 - suave(v); const dw = (30 * v * v * (1 - v) * (1 - v)) / faixa;
     return { p: [p[0] + (w * (q[0] - p[0])) / 2, p[1] + (w * (q[1] - p[1])) / 2], dp: [dp[0] + (w * (dq[0] - dp[0])) / 2 + (dw * (q[0] - p[0])) / 2, dp[1] + (w * (dq[1] - dp[1])) / 2 + (dw * (q[1] - p[1])) / 2] };
@@ -345,9 +343,8 @@ export function plantaLisa(T) {
 const CURVAS = new Map();
 
 /** A curva lisa de uma tabela [a, b] da prancha, como função b(a): a leitura da tabela (a cúbica monótona pelos pontos, a cada `passo` de a) ajustada pelo núcleo a uma cadeia de
- * clotoides dentro de `tolerancia`; fora dela, a receita recusa. A curva é refeita aqui dos joelhos do ajuste (início, rumo e curvatura linear entre joelhos), integrada por
- * Gauss de três pontos a cada milímetro de arco, para o ponto-chave sair da curva e não da corda entre amostras; `a` cresce ou cai sempre ao longo dela, e b(a) sai por
- * bisseção no arco. Fora do intervalo da tabela vale a ponta. O ajuste vem guardado de `ajustes-de-curva.js` pela `chave` (uma de `tabelasLisas`), e o desvio de cada ponto
+ * clotoides dentro de `tolerancia`; fora dela, a receita recusa. O valor b(a) é o `valorEm` do núcleo, sobre a curva exata do ajuste (sem corda entre amostras), que recusa se `a` não cresce nem cai sempre
+ * ao longo dela. Fora das pontas da curva vale a ponta. O ajuste vem guardado de `ajustes-de-curva.js` pela `chave` (uma de `tabelasLisas`), e o desvio de cada ponto
  * lido à curva refeita é medido aqui. Guardada por tabela e opções. */
 export function curvaLisaDe(tabela, L, nome = 'curva', chave = nome) {
   const memo = JSON.stringify([tabela, L, chave]);
@@ -355,16 +352,9 @@ export function curvaLisaDe(tabela, L, nome = 'curva', chave = nome) {
   const { lidos, opcoes } = entradaDaCurva(tabela, L);
   const aj = ajusteGuardado(chave, nome, lidos, opcoes);
   const J = aj.joelhos; const total = aj.comprimento;
-  /* o rumo em s: a integral exata da curvatura, linear entre joelhos */
-  const rumo = (s) => { let th = aj.rumo; for (let i = 1; i < J.length; i += 1) { const [p, q] = [J[i - 1], J[i]]; if (s <= p.s) break; const e = Math.min(s, q.s); th += (p.k + (0.5 * (q.k - p.k) * (e - p.s)) / (q.s - p.s)) * (e - p.s); } return th; };
-  const G3 = [[0.5 - Math.sqrt(0.15), 5 / 18], [0.5, 8 / 18], [0.5 + Math.sqrt(0.15), 5 / 18]];
-  const passo = (p, de, ate) => { const h = ate - de; let u = p[0]; let v = p[1]; for (const [t, w] of G3) { const th = rumo(de + t * h); u += w * h * Math.cos(th); v += w * h * Math.sin(th); } return [u, v]; };
-  const marcos = [aj.inicio]; for (let s = 1; s <= total; s += 1) marcos.push(passo(marcos[marcos.length - 1], s - 1, s));
-  const ponto = (s) => { const c = Math.min(total, Math.max(0, s)); const i = Math.min(marcos.length - 1, Math.floor(c)); return c > i ? passo(marcos[i], i, c) : marcos[i]; };
-  const sobe = ponto(total)[0] > ponto(0)[0];
-  const de = (a) => { let lo = 0; let hi = total; for (let k = 0; k < 50; k += 1) { const mid = (lo + hi) / 2; if ((ponto(mid)[0] < a) === sobe) lo = mid; else hi = mid; } return ponto((lo + hi) / 2)[1]; };
+  const de = (a) => aj.valorEm(a, { eixo: 0, fora: 'ponta' });
   /* o desvio de cada ponto lido à curva refeita: a distância ao segmento mais perto entre os marcos de 1 mm de arco */
-  const fina = [...marcos, ponto(total)];
+  const fina = []; for (let s = 0; s <= total; s += 1) fina.push(aj.ponto(s)); fina.push(aj.ponto(total));
   const aoSegmento = ([u, v], [au, av], [bu, bv]) => { const du = bu - au; const dv = bv - av; const l2 = du * du + dv * dv; const t = l2 > 0 ? Math.min(1, Math.max(0, ((u - au) * du + (v - av) * dv) / l2)) : 0; return Math.hypot(u - au - t * du, v - av - t * dv); };
   const desvioMaximo = lidos.reduce((pior, p) => { let menor = Infinity; for (let i = 1; i < fina.length; i += 1) menor = Math.min(menor, aoSegmento(p, fina[i - 1], fina[i])); return Math.max(pior, menor); }, 0);
   if (!(desvioMaximo <= L.tolerancia)) throw new Error(`carro-fastback/lataria: ${nome} fica a ${desvioMaximo.toFixed(2)} mm da leitura da tabela, e a tolerância é ${L.tolerancia} mm`);
