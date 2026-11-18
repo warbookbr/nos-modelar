@@ -283,7 +283,8 @@ export const AJUSTES_DE_CURVA = { arquivo: 'ajustes-de-curva.js', pedidos: () =>
 const AVISADOS = new Set();
 
 /** O ajuste de nome `nome`: a curva guardada quando a impressão guardada é a da entrada de agora; senão (uma variante da TABELA, ou a TABELA mudada sem regravar) o ajuste
- * feito na hora, com um aviso por nome que diz o que mudou e o comando que regrava. O ajuste que não cabe recusa, e o dado guardado malformado também: essa recusa leva
+ * feito na hora, com um aviso por nome que diz o que mudou e o comando que regrava. O ajuste que não cabe recusa, como a curva guardada que o núcleo mede fora da
+ * tolerância contra os pontos de agora (`cabe` falso com `doGuardado`), e o dado guardado malformado também: essa recusa leva
  * `ajustesDeCurva` (o arquivo e os pedidos da TABELA), porque a receita que recusa na importação não exporta `AJUSTES_DE_CURVA`, e é dali que a ferramenta que regrava os lê. */
 function ajusteGuardado(nome, descricao, pontos, opcoes) {
   let a;
@@ -296,6 +297,7 @@ function ajusteGuardado(nome, descricao, pontos, opcoes) {
     AVISADOS.add(nome);
     console.warn(`carro-fastback/lataria: o ajuste guardado de ${nome} não é o da entrada de agora (${a.mudou.join('; ')}), e o ajuste foi refeito na hora, o que leva segundos; se a TABELA mudou, regrave o dado com \`${COMANDO_QUE_REGRAVA}\``);
   }
+  if (!a.cabe && a.doGuardado) throw new Error(`carro-fastback/lataria: o ajuste guardado de ${nome} não é a curva da entrada de agora: ${a.motivo}; regrave o dado com \`${COMANDO_QUE_REGRAVA}\``);
   if (!a.cabe) throw new Error(`carro-fastback/lataria: ${descricao} não cabe em ${opcoes.tolerancia} mm com ${opcoes.maximoDeClotoides} clotoides: ${a.motivo}`);
   return a;
 }
@@ -366,7 +368,7 @@ export function curvaLisaDe(tabela, L, nome = 'curva', chave = nome) {
   const aoSegmento = ([u, v], [au, av], [bu, bv]) => { const du = bu - au; const dv = bv - av; const l2 = du * du + dv * dv; const t = l2 > 0 ? Math.min(1, Math.max(0, ((u - au) * du + (v - av) * dv) / l2)) : 0; return Math.hypot(u - au - t * du, v - av - t * dv); };
   const desvioMaximo = lidos.reduce((pior, p) => { let menor = Infinity; for (let i = 1; i < fina.length; i += 1) menor = Math.min(menor, aoSegmento(p, fina[i - 1], fina[i])); return Math.max(pior, menor); }, 0);
   if (!(desvioMaximo <= L.tolerancia)) throw new Error(`carro-fastback/lataria: ${nome} fica a ${desvioMaximo.toFixed(2)} mm da leitura da tabela, e a tolerância é ${L.tolerancia} mm`);
-  de.ajuste = { desvioMaximo, clotoides: aj.clotoides.length, joelhos: J, comprimento: total };
+  de.ajuste = { desvioMaximo, clotoides: aj.clotoides.length, inflexoes: aj.inflexoes, joelhos: J, comprimento: total };
   CURVAS.set(memo, de);
   return de;
 }

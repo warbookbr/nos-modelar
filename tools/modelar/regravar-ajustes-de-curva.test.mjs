@@ -10,7 +10,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { afterAll, describe, expect, it } from 'vitest';
-import { ajustarCurvaLisa, curvaLisaDoGuardado, curvaLisaGuardada, impressaoDoAjuste } from '../../procedural/nucleo/ajuste-de-curva-lisa.js';
+import { VERSAO_DO_AJUSTE, ajustarCurvaLisa, curvaLisaDoGuardado, curvaLisaGuardada, impressaoDoAjuste } from '../../procedural/nucleo/ajuste-de-curva-lisa.js';
 import { REPO } from './resolver-caminho-receita.mjs';
 
 const NUCLEO = pathToFileURL(join(REPO, 'procedural/nucleo/ajuste-de-curva-lisa.js')).href;
@@ -36,6 +36,44 @@ describe('o ajuste guardado, no núcleo', () => {
     expect(c.clotoides).toEqual(aj.clotoides);
     for (let s = 0; s <= aj.comprimento; s += 7.3) expect(c.ponto(s)).toEqual(aj.ponto(s));
     expect(c.amostrar(11)).toEqual(aj.amostrar(11));
+    /* o resultado guardado tem as chaves e as medidas do ajuste feito na hora */
+    expect(Object.keys(c).sort()).toEqual([...Object.keys(aj), 'doGuardado'].sort());
+    for (const chave of ['motivo', 'tolerancia', 'desvioMaximo', 'desvioDaCurva', 'desvios', 'trechos', 'inflexoes', 'guardado']) expect(c[chave], chave).toEqual(aj[chave]);
+    expect(c.pontosDaRede(50, { nome: 'arco' })).toEqual(aj.pontosDaRede(50, { nome: 'arco' }));
+  });
+
+  it('a curva guardada que não é a dos pontos sai com cabe falso: um laço enfiado no meio do arco, com a impressão certa', () => {
+    /* no meio do arco a curvatura sobe a 1/4 em 0,001, dá uma volta inteira (raio 4) e desce: os pontos continuam a 0,14 da curva, e a curva sai 11 dos pontos */
+    const g = guardados.arco.curva; const L = g.comprimento; const K = 1 / 4; const eps = 0.001; const volta = (2 * Math.PI) / K; const Ln = L + volta + 2 * eps;
+    const ss = [0, L / 2, L / 2 + eps, L / 2 + eps + volta, L / 2 + 2 * eps + volta, Ln];
+    const kk = [g.joelhos[0].k, g.joelhos[0].k, K, K, g.joelhos[0].k, g.joelhos[g.joelhos.length - 1].k];
+    const comLaco = { ...g, comprimento: Ln, joelhos: ss.map((s, i) => ({ f: i === ss.length - 1 ? 1 : s / Ln, k: kk[i] })) };
+    const c = pedir({ guardados: { arco: { impressao: guardados.arco.impressao, curva: comLaco } } });
+    expect(c.doGuardado).toBe(true);
+    expect(c.cabe).toBe(false);
+    expect(c.desvioMaximo).toBeLessThan(1);
+    expect(c.desvioDaCurva).toBeGreaterThan(5);
+    expect(c.motivo).toMatch(/o desvio da curva à poligonal dos pontos \(.*\) passa da tolerância 1/);
+    /* e a curva guardada de outros pontos, com a impressão destes: o desvio dos pontos acusa */
+    const outra = pedir({ guardados: { arco: { impressao: guardados.arco.impressao, curva: ajustarCurvaLisa(arco(520), OPCOES).guardado } } });
+    expect(outra.cabe).toBe(false);
+    expect(outra.motivo).toMatch(/o desvio de um ponto à curva \(.*\) passa da tolerância 1/);
+    /* a tolerância de integração trocada no dado recusa */
+    expect(() => pedir({ guardados: { arco: { impressao: guardados.arco.impressao, curva: { ...g, tolerancia: 50 } } } })).toThrow(/o ajuste guardado de arco traz a tolerância de integração 50, e a entrada de agora dá 1/);
+  });
+
+  it('a versão do ajuste entra na impressão: o dado guardado de outra versão não confere, e o ajuste é refeito', () => {
+    const a = impressaoDoAjuste(pontos, OPCOES);
+    expect(a.versao).toBe(VERSAO_DO_AJUSTE);
+    const b = impressaoDoAjuste(pontos, OPCOES, VERSAO_DO_AJUSTE + 1);
+    expect(b).not.toEqual(a);
+    expect({ ...b, versao: a.versao }).toEqual(a);
+    const c = pedir({ guardados: { arco: { impressao: b, curva: guardados.arco.curva } } });
+    expect(c.doGuardado).toBe(false);
+    expect(c.mudou).toEqual([`a versão do ajuste era ${VERSAO_DO_AJUSTE + 1} e agora é ${VERSAO_DO_AJUSTE}`]);
+    /* o dado gravado antes de a versão existir também não confere */
+    const { versao, ...semVersao } = a;
+    expect(pedir({ guardados: { arco: { impressao: semVersao, curva: guardados.arco.curva } } }).mudou[0]).toMatch(/a versão do ajuste era undefined e agora é/);
   });
 
   it('a impressão não muda com o último bit de um ponto, e muda com um milésimo', () => {
@@ -43,6 +81,7 @@ describe('o ajuste guardado, no núcleo', () => {
     expect(impressaoDoAjuste(pontos.map(([u, v]) => [u + 1e-10, v]), OPCOES)).toEqual(a);
     expect(impressaoDoAjuste(pontos.map(([u, v], i) => [u, i === 7 ? v + 0.001 : v]), OPCOES).soma).not.toBe(a.soma);
     expect(a.opcoes).toEqual({ tolerancia: 1, maximoDeClotoides: 4, duros: [], eixos: [0, 1] });
+    expect(Object.keys(a)).toEqual(['versao', 'pontos', 'soma', 'opcoes']);
     expect(() => impressaoDoAjuste([[0, NaN]], OPCOES)).toThrow(/a impressão espera a lista de pontos do ajuste/);
   });
 

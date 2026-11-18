@@ -33,10 +33,12 @@
  *   guardado: { inicio, rumo, comprimento, joelhos: [{ f, k }], tolerancia } o que basta para refazer a mesma curva sem ajustar (`f` é a fração do arco de cada joelho e
  *     `tolerancia`, a do plano, que escolhe o passo da integração); é dado puro, que passa por JSON sem perder um bit.
  * guardar o ajuste: o ajuste leva segundos, e quem o usa na importação de uma receita guarda o resultado como dado versionado. `impressaoDoAjuste(pontos, opcoes)` dá a
- *   impressão da entrada ({ pontos, soma, opcoes }: a contagem, a soma dos pontos em milionésimo da unidade e as opções), `curvaLisaGuardada(guardado)` refaz a curva
- *   ({ inicio, rumo, comprimento, joelhos, clotoides, ponto, amostrar }, os mesmos números do ajuste) e `curvaLisaDoGuardado({ nome, pontos, opcoes, guardados })`
- *   devolve a curva guardada em `guardados[nome]` quando a impressão dela confere com a entrada de agora (`doGuardado: true`) e ajusta na hora quando não confere
- *   (`doGuardado: false`, com `mudou`, a lista do que difere), para quem chama avisar; só o dado guardado malformado recusa.
+ *   impressão da entrada ({ versao, pontos, soma, opcoes }: `VERSAO_DO_AJUSTE`, a contagem, a soma dos pontos em milionésimo da unidade e as opções),
+ *   `curvaLisaGuardada(guardado)` refaz a curva ({ inicio, rumo, comprimento, joelhos, clotoides, ponto, amostrar }, os mesmos números do ajuste, sem medir) e
+ *   `curvaLisaDoGuardado({ nome, pontos, opcoes, guardados })` devolve o resultado de `ajustarCurvaLisa` com `doGuardado`: da curva guardada em `guardados[nome]`, medida
+ *   contra os pontos de agora (`cabe` e os desvios são dessa medida), quando a impressão dela confere com a entrada (`doGuardado: true`), e do ajuste feito na hora
+ *   quando não confere (`doGuardado: false`, com `mudou`, a lista do que difere), para quem chama avisar; só o dado guardado malformado recusa.
+ *   Quem muda o algoritmo soma 1 em `VERSAO_DO_AJUSTE`, e o dado guardado antes deixa de conferir.
  *   Nada aqui lê nem escreve disco: quem guarda é a receita, e quem regrava é `tools/modelar/regravar-ajustes-de-curva.mjs`.
  * peça: procedural/nucleo/ajuste-de-curva-lisa.test.mjs (arco, clotoide, elipse e S analíticos, com ruído, a escala, a ordem e as recusas).
  * FIM DA FICHA
@@ -445,52 +447,72 @@ function montar(ajuste, lido, tolerancia, eixos, original) {
 
 /* ---------- o ajuste guardado ---------- */
 
+/** A versão do ajuste, que entra na impressão. REGRA: quem muda o que `ajustarCurvaLisa` devolve para a mesma entrada (o ajuste, a escolha entre os ajustes, a integração
+ * ou o passo dela, o formato de `guardado`) soma 1 aqui. O dado guardado com a versão antiga deixa de conferir, o ajuste é refeito na hora por quem o usa, e o teste do
+ * comando que regrava (`tools/modelar/regravar-ajustes-de-curva.test.mjs`) reprova até o dado de cada receita ser regravado e a malha, conferida. */
+export const VERSAO_DO_AJUSTE = 1;
+
 const MILIONESIMO = 1e6;
 const opcoesDoAjuste = ({ tolerancia = 1, maximoDeClotoides = 8, duros = [], eixos = [0, 1] } = {}) => ({ tolerancia, maximoDeClotoides, duros, eixos });
 
-/** A impressão da entrada de um ajuste: a contagem dos pontos, a soma deles (cada coordenada em milionésimo da unidade, para o último bit de uma conta não trocar a
- * impressão entre duas máquinas) e as opções com os padrões escritos. Duas entradas com a mesma impressão dão o mesmo ajuste. */
-export function impressaoDoAjuste(pontos, opcoes = {}) {
+/** A impressão da entrada de um ajuste: a versão do ajuste, a contagem dos pontos, a soma deles (cada coordenada em milionésimo da unidade, para o último bit de uma conta
+ * não trocar a impressão entre duas máquinas) e as opções com os padrões escritos. A impressão junta as entradas que diferem abaixo do milionésimo: o ajuste guardado vale
+ * para todas elas, e por isso quem o usa mede a curva guardada contra os pontos de agora (`curvaLisaDoGuardado`). */
+export function impressaoDoAjuste(pontos, opcoes = {}, versao = VERSAO_DO_AJUSTE) {
   if (!Array.isArray(pontos) || !pontos.every((p) => Array.isArray(p) && p.every((c) => Number.isFinite(c)))) erro(`a impressão espera a lista de pontos do ajuste, de números finitos, e veio ${citar(pontos)?.slice(0, 80)}`);
   /* duas somas FNV-1a de 32 bits, uma do texto e outra do texto ao contrário de semente trocada: 64 bits em hexadecimal */
   const texto = pontos.map((p) => p.map((c) => Math.round(c * MILIONESIMO) + 0).join(',')).join(';');
   let a = 0x811c9dc5; let b = 0x01000193;
   for (let i = 0; i < texto.length; i += 1) { a = Math.imul(a ^ texto.charCodeAt(i), 0x01000193); b = Math.imul(b ^ texto.charCodeAt(texto.length - 1 - i), 0x85ebca6b); }
   const hex = (v) => (v >>> 0).toString(16).padStart(8, '0');
-  return { pontos: pontos.length, soma: hex(a) + hex(b), opcoes: opcoesDoAjuste(opcoes) };
+  return { versao, pontos: pontos.length, soma: hex(a) + hex(b), opcoes: opcoesDoAjuste(opcoes) };
 }
 
-/** A curva de um ajuste guardado (`guardado` do resultado de `ajustarCurvaLisa`, como veio ou depois de passar por JSON), refeita sem ajustar: a mesma integração a passo
- * fino, com os mesmos números. Devolve { inicio, rumo, comprimento, joelhos, clotoides, ponto(s), amostrar(passo) }. */
-export function curvaLisaGuardada(guardado) {
+/** lê o dado guardado e devolve os parâmetros da curva, { q: { x0, y0, th0, L, k, fr }, tolerancia }; o dado malformado recusa */
+function lerGuardado(guardado) {
   const g = guardado; const finito = (v) => typeof v === 'number' && Number.isFinite(v);
   const J = g?.joelhos;
   if (!g || !Array.isArray(g.inicio) || g.inicio.length !== 2 || !g.inicio.every(finito) || !finito(g.rumo) || !finito(g.comprimento) || !(g.comprimento > 0) || !finito(g.tolerancia) || !(g.tolerancia > 0)
     || !Array.isArray(J) || J.length < 2 || !J.every((j) => j && finito(j.f) && finito(j.k)) || J[0].f !== 0 || J[J.length - 1].f !== 1 || J.some((j, i) => i > 0 && !(j.f > J[i - 1].f))) {
     erro(`o ajuste guardado espera { inicio: [u, v], rumo, comprimento, joelhos: [{ f, k }, ...] de f 0 a 1 em ordem, tolerancia }, e veio ${citar(g)?.slice(0, 200)}`);
   }
-  const L = g.comprimento; const fr = J.map((j) => j.f); const k = J.map((j) => j.k);
-  const c = integrar({ x0: g.inicio[0], y0: g.inicio[1], th0: g.rumo, L, k }, fr, passosPorTrecho(fr, L, k, g.tolerancia, true));
+  return { q: { x0: g.inicio[0], y0: g.inicio[1], th0: g.rumo, L: g.comprimento, k: J.map((j) => j.k), fr: J.map((j) => j.f) }, tolerancia: g.tolerancia };
+}
+
+/** A curva de um ajuste guardado (`guardado` do resultado de `ajustarCurvaLisa`, como veio ou depois de passar por JSON), refeita sem ajustar: a mesma integração a passo
+ * fino, com os mesmos números. Devolve { inicio, rumo, comprimento, joelhos, clotoides, ponto(s), amostrar(passo) }. Não mede nada contra pontos: quem tem os pontos usa
+ * `curvaLisaDoGuardado`, que mede. */
+export function curvaLisaGuardada(guardado) {
+  const { q, tolerancia } = lerGuardado(guardado); const { L, fr, k } = q;
+  const c = integrar(q, fr, passosPorTrecho(fr, L, k, tolerancia, true));
   const joelhos = fr.map((f, i) => ({ s: f * L, k: k[i] }));
   const clotoides = joelhos.slice(1).map((b, i) => ({ de: joelhos[i].s, ate: b.s, k0: joelhos[i].k, k1: b.k, comprimento: b.s - joelhos[i].s }));
-  return { inicio: [...g.inicio], rumo: g.rumo, comprimento: L, joelhos, clotoides, ...leituraDaCurva(c, L) };
+  return { inicio: [q.x0, q.y0], rumo: q.th0, comprimento: L, joelhos, clotoides, ...leituraDaCurva(c, L) };
 }
 
 /** A curva do ajuste de nome `nome`: a guardada em `guardados` ({ [nome]: { impressao, curva } }), refeita sem ajustar, quando a impressão guardada confere com a da entrada
  * de agora (`pontos`, `opcoes`); quando não confere, ou o nome não está guardado, o ajuste é feito na hora (`ajustarCurvaLisa`, que leva segundos), como para a variante da
- * tabela que o dado guardado não cobre. O resultado leva `doGuardado` (true ou false) e, feito na hora, `mudou`: a lista do que difere do guardado, para quem chama avisar
- * com o comando que regrava. Só o dado guardado malformado recusa (`curvaLisaGuardada`). O resultado guardado traz o que basta para refazer a curva (inicio, rumo,
- * comprimento, joelhos, clotoides, ponto, amostrar) e `cabe: true`; o feito na hora é o de `ajustarCurvaLisa` inteiro, com o `cabe` dele. */
+ * tabela que o dado guardado não cobre. Nos dois casos o resultado é o de `ajustarCurvaLisa`, com as mesmas chaves: a curva guardada é medida contra os pontos de agora
+ * como o ajuste mede a dele (o desvio de cada ponto à curva, o da curva à poligonal dos pontos, a ordem das projeções e o comprimento), e `cabe`, `motivo`, `desvioMaximo`,
+ * `desvios`, `trechos` e `inflexoes` saem dessa medida, de modo que o dado guardado que não é a curva destes pontos sai com `cabe: false`. O resultado leva também
+ * `doGuardado` (true ou false) e, feito na hora, `mudou`: a lista do que difere do guardado, para quem chama avisar com o comando que regrava. O dado guardado malformado
+ * recusa, e também o de tolerância de integração diferente da que a entrada de agora dá. */
 export function curvaLisaDoGuardado({ nome, pontos, opcoes = {}, guardados }) {
   const agora = impressaoDoAjuste(pontos, opcoes);
   const dado = guardados?.[nome]; const antes = dado?.impressao;
   const mudou = [];
   if (!dado || !antes) mudou.push('não há ajuste guardado com este nome');
   else {
+    if (antes.versao !== agora.versao) mudou.push(`a versão do ajuste era ${citar(antes.versao)} e agora é ${agora.versao}`);
     if (antes.pontos !== agora.pontos) mudou.push(`os pontos eram ${citar(antes.pontos)} e agora são ${agora.pontos}`);
     else if (antes.soma !== agora.soma) mudou.push(`os ${agora.pontos} pontos mudaram de valor (a soma era ${citar(antes.soma)} e agora é ${agora.soma})`);
     for (const campo of Object.keys(agora.opcoes)) if (citar(antes.opcoes?.[campo]) !== citar(agora.opcoes[campo])) mudou.push(`a opção ${campo} era ${citar(antes.opcoes?.[campo])} e agora é ${citar(agora.opcoes[campo])}`);
   }
   if (mudou.length) return { ...ajustarCurvaLisa(pontos, opcoes), doGuardado: false, mudou };
-  return { ...curvaLisaGuardada(dado.curva), cabe: true, motivo: null, doGuardado: true };
+  const { tolerancia, maximoDeClotoides, duros, eixos } = agora.opcoes;
+  const lido = lerEntrada(pontos, { tolerancia, maximoDeClotoides, duros, eixos });
+  const { q, tolerancia: guardada } = lerGuardado(dado.curva);
+  /* a tolerância do plano escolhe o passo da integração: a guardada e a da entrada de agora só diferem no último bit (pontos de 3 componentes que diferem abaixo do milionésimo) */
+  if (!(Math.abs(guardada - lido.tolEfetiva) <= 1e-9 * lido.tolEfetiva)) erro(`o ajuste guardado de ${nome} traz a tolerância de integração ${citar(guardada)}, e a entrada de agora dá ${citar(lido.tolEfetiva)}: o dado guardado não é o deste ajuste`);
+  return { ...montar({ q }, lido, guardada, eixos, tolerancia), doGuardado: true };
 }
