@@ -2,6 +2,7 @@
   "formato": "mecanifica.montagem",
   "versao": 5,
   "id": "instalacao-solar",
+  "categoria": "eletronica",
   "instancias": [
     {
       "id": "casa",

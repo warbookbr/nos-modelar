@@ -17,6 +17,10 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { lerHistorico } from './vitest-duracoes.mjs';
 
 export const TESTES_LENTOS = [
+  /* 2026-11-17: a migração do carrinho de mão pelo commit do aceite (extrai a árvore, mede a montagem nela e nela de agora); uns 20 s (plano das etapas pela impressão, fatia 3) */
+  'tools/modelar/migrar-etapas-para-impressao.test.mjs',
+  /* 2026-11-17: cada consumidor do estado das etapas sobre um registro v3 em disco, numa cópia do carrinho de mão; uns 40 s com a máquina dividida (plano das etapas pela impressão, fatia 2) */
+  'tools/modelar/etapas-consumidores-v3.test.mjs',
   /* 2026-11-17: reabrir a base do braço resolve a montagem inteira de doze etapas, com a placa de controle na base; uns 35 s */
   'tools/modelar/etapas-reabrir-braco.test.mjs',
   /* 2026-11-17: o cache por prefixo no conjunto de cobertura (plano do cache por passo, fatia 3): o exemplo de cada operação e sete peças
@@ -133,6 +137,7 @@ export const TESTES_LENTOS = [
   'tools/modelar/vincos-da-rede.test.mjs',
   'tools/modelar/vincos-das-linhas.test.mjs',
   'tools/modelar/vistas-de-superficie.test.mjs',
+  'tools/modelar/vistas-para-critica.test.mjs',
   'tools/oficina/oficina.test.ts',
 ];
 

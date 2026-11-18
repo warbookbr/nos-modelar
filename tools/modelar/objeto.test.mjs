@@ -33,8 +33,7 @@ describe('estado do objeto', () => {
     writeFileSync(join(refs, 'lateral.prancha.png'), '');
     mkdirSync(join(refs, 'lateral.prancha.rodadas'));
     writeFileSync(join(refs, 'lateral.prancha.rodadas', 'rodada-01.json'), JSON.stringify({ ...rodada(1, 9), regioes: undefined, julgado: {} }));
-    writeFileSync(join(pasta, 'montagem.etapas.json'), JSON.stringify({ etapas: [{ instancia: 'a', estado: 'fixa' }, { instancia: 'b', estado: 'aberta' }] }));
-    const estado = estadoDoObjeto('coisa', { acervo });
+    const estado = estadoDoObjeto('coisa', { acervo, registroLido: { etapas: [{ instancia: 'a', estado: 'fixa' }, { instancia: 'b', estado: 'aberta' }] } });
     expect(estado.proxima.etapa).toBe('modelagem por etapa');
     expect(estado.proxima.estado).toMatch(/próxima b/);
     expect(estado.pacotes[0].pronto).toBe(true);

@@ -25,8 +25,9 @@ describe('sem referência nenhuma o veredito diz que não conferiu, e não aprov
     expect(r.resultado).toMatchObject({ g01: null, contornos: null, razoes: null });
   });
 
+  /* o flange, e não a base: desde a placa de controle a base tem 44 mil faces e o descrever dela leva uns 50 s */
   it('a peça de um objeto, cujo contorno mora na pasta do objeto e não na dela, também não confere nada', async () => {
-    const r = await descreverPecaReutilizavel({ peca: 'braco-robotico/base' });
+    const r = await descreverPecaReutilizavel({ peca: 'braco-robotico/flange' });
     expect(r.ok).toBe(true);
     expect(r.stdout).toContain(`  ${SEM_CONTORNO}`);
     expect(r.resultado.contornos).toBeNull();

@@ -121,6 +121,7 @@ const receita = {
   ALIASES,
   TOPO: { origem: 'o eixo do abajur em x 0 e z 0; chão em y 0; y para cima; um dos raios da armação aponta para +z' },
   PLANO: {
+    categoria: 'moveis',
     objeto: 'abajur de mesa de 450 mm: base de metal de dois degraus, haste fina, soquete, armação de arame e cúpula cônica de linho aberta em cima e embaixo',
     referencias: ['referencias/alvo.md'],
     escala: { medida: 'altura total da peça', milimetros: 450 },

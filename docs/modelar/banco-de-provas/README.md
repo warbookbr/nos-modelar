@@ -8,6 +8,7 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
 <!-- indice-do-banco:inicio (gerado por `npm run banco:indice:gerar`; não edite à mão) -->
 - [Abertura de contorno livre — as técnicas medidas, a operação e a lente no lugar](abertura-de-contorno-2026-11-05/README.md) — `abertura-de-contorno-2026-11-05`
 - [Abertura em qualquer direção — a bateria de limites da operação](abertura-em-qualquer-direcao-2026-11-06/README.md) — `abertura-em-qualquer-direcao-2026-11-06`
+- [Abrir peça com filtros, 2026-11-17](abrir-peca-com-filtros-2026-11-17/README.md) — `abrir-peca-com-filtros-2026-11-17`
 - `aparelhos-2026-10-16`
 - [Avião de pequeno porte: alinhamento](aviao-2026-10-11/ALINHAMENTO.md) — `aviao-2026-10-11`
 - [O esboço do avião traduzido para o andaime](aviao-receita-2026-10-15/TRADUCAO.md) — `aviao-receita-2026-10-15`
@@ -34,6 +35,7 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
 - [Empilhadeira — atritos](empilhadeira-2026-11-09/ATRITOS.md) — `empilhadeira-2026-11-09`
   - [Custo por peça da empilhadeira](empilhadeira-2026-11-09/CUSTO-POR-PECA.md) — `empilhadeira-2026-11-09`
 - [Esboço pelo núcleo — inventário da fatia 1 e provas das fatias 2, 3 e 5](esboco-pelo-nucleo-2026-11-05/README.md) — `esboco-pelo-nucleo-2026-11-05`
+- [Etapas pela impressão do aceite: provas](etapas-pela-impressao-2026-11-17/README.md) — `etapas-pela-impressao-2026-11-17`
 - `exportacao-2026-10-19`
 - `familias-2026-10-11`
 - `familias-2026-10-12`

@@ -58,7 +58,7 @@ import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { afastamentoDaParte, normalizarEsbocoDoRefinamento } from '../../src/autoria/refinamento-global.js';
 import { avisoDaDispensa } from '../../src/autoria/lataria.js';
 import { normalizarPlanoDeModelagem } from '../../src/autoria/plano-de-modelagem.js';
-import { comandoDoPacote, pastaDaRodada, superficieDaPeca, superficieDoPacote } from './vistas-de-superficie.mjs';
+import { comandoDoPacote, pastaDaRodada, superficieDaPecaMedida, superficieDoPacote } from './vistas-de-superficie.mjs';
 import { palavras } from './leitura-por-regioes.mjs';
 import { lascasDaReceita } from './lasca.mjs';
 
@@ -200,7 +200,7 @@ const luzDaMedicao = (medicao) => (medicao.luzRasante?.luzRasante ? medicao.luzR
  * lataria (`superficieDaReceita`), `luzRasante` se a peça leva a luz rasante ao pacote (lataria ou emenda sombreada) e `avisos` o que o resumo do laço mostra sem reprovar (a dispensa de `PLANO.lataria`, com o motivo).
  * Peça sem receita resolvível lança.
  */
-export async function medirReceita(peca, { rodadas, pasta } = {}) {
+export async function medirReceita(peca, { rodadas, pasta, registroDasEtapas } = {}) {
   const caminho = resolverCaminhoReceita(peca);
   const texto = readFileSync(caminho, 'utf8');
   const sha256 = `sha256:${createHash('sha256').update(texto).digest('hex')}`;
@@ -230,7 +230,7 @@ export async function medirReceita(peca, { rodadas, pasta } = {}) {
     if (veredito.reprova) falhas.push(veredito.reprova);
   }
   const passou = falhas.length === 0;
-  const { lataria, luzRasante, porque } = superficieDaPeca(peca, receita, plano);
+  const { lataria, luzRasante, porque } = await superficieDaPecaMedida(peca, receita, plano, { registro: registroDasEtapas });
   return { passou, sha256, texto, caminho, relatorio: cortar(passou ? `${feitas.join(', ')}: ok` : falhas.join('\n')), lataria: { lataria, porque }, luzRasante: { luzRasante, porque }, avisos, ...(facesFinas ? { facesFinas } : {}) };
 }
 
@@ -280,15 +280,19 @@ function vereditoDasFacesFinas({ total, porParte }, { base, anteriores, lataria,
   return { aviso };
 }
 
-/* O que do PLANO entra no pedido do crítico: o objeto, a escala, as referências, a forma de cada parte, os critérios e a família que escolhe
-   critérios e perguntas. `lataria`, `dobrasAceitas` e `saliencias` são do texto e das réguas, e trocá-los não muda o que o crítico lê. O PLANO inválido
-   entra inteiro, como era. */
+/* O que do PLANO entra no pedido do crítico: o objeto, a escala, as referências, a forma de cada parte, os critérios, a família que escolhe
+   critérios e perguntas e a espessura mínima. `lataria`, `dobrasAceitas` e `saliencias` são do texto e das réguas, e `categoria` é só o rótulo
+   da janela Abrir; trocá-los não muda o que o crítico lê, e por isso saem da impressão. Todo campo opcional do PLANO está numa das duas listas
+   abaixo, e o teste cobra isso: campo novo que ninguém classificou entraria na impressão e faria o laço perder o julgamento já dado. O PLANO
+   inválido entra inteiro, como era. */
+export const CAMPOS_OPCIONAIS_LIDOS_PELO_CRITICO = Object.freeze(['familia', 'familiaProcedural', 'espessuraMinima']);
+export const CAMPOS_OPCIONAIS_NAO_LIDOS_PELO_CRITICO = Object.freeze(['lataria', 'dobrasAceitas', 'saliencias', 'categoria']);
 export function planoQueOCriticoLe(plano) {
   let normal;
   try { normal = normalizarPlanoDeModelagem(plano); } catch { return plano ?? null; }
   if (normal === null) return null;
-  const { lataria: _lataria, dobrasAceitas: _dobras, saliencias: _saliencias, ...lido } = normal;
-  void _lataria; void _dobras; void _saliencias;
+  const lido = { ...normal };
+  for (const campo of CAMPOS_OPCIONAIS_NAO_LIDOS_PELO_CRITICO) delete lido[campo];
   return lido;
 }
 

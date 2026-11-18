@@ -167,6 +167,7 @@ const receita = {
   MATERIAIS,
   TOPO: { origem: 'centro do fundo, no chão; y para cima, eixo da garrafa em y' },
   PLANO: {
+    categoria: 'utensilios',
     objeto: 'garrafa de vidro de boca larga sem tampa, 160 mm de altura, corpo de 75 mm de diâmetro, gargalo curto com rosca e colar, parede de 2,5 mm',
     referencias: ['referencias/alvo.md'],
     escala: { medida: 'altura total da garrafa', milimetros: 160 },

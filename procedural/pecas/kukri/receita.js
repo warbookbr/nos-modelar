@@ -119,6 +119,7 @@ const receita = {
   },
   get TOPO() { return { origem: 'ponta do cabo em x = 0; x para a ponta da lâmina, y para cima com o chão em 0, o gume para -z', ...derivar(this.PARAMS).lamina.pontos, ...derivar(this.PARAMS).cabo.pontos }; },
   PLANO: {
+    categoria: 'utensilios',
     objeto: 'kukri de desenho moderno, 430 mm de ponta a ponta, deitada: comprimento em x, largura da lâmina em z (dorso para +z, gume para -z) e espessura em y',
     referencias: [
       'referencias/alvo.md',

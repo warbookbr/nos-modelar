@@ -120,6 +120,9 @@ try {
   await pagina.goto(`http://127.0.0.1:${port}${BASE}bancada.html`, { waitUntil: 'load' });
   await pagina.waitForTimeout(2500);
   await pagina.click('#btnMenuAbrir');
+  /* a peça de prova é de ensaio, e a janela de abrir esconde as de ensaio até alguém ligar o filtro delas */
+  const ensaio = pagina.locator('[data-situacao="ensaio"]');
+  if (await ensaio.count() && (await ensaio.getAttribute('aria-pressed')) !== 'true') await ensaio.click({ timeout: 10000 });
   await pagina.locator(`#listaAcervo [data-receita="${PECA}"]`).click({ timeout: 10000 });
   await pagina.waitForTimeout(4000);
 

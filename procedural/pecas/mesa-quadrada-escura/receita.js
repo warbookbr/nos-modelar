@@ -204,6 +204,7 @@ const receita = {
   },
   TOPO: { origem: 'chão, no meio da mesa em x e em z; y para cima e a frente da mesa em +z' },
   PLANO: {
+    categoria: 'moveis',
     objeto: 'mesa quadrada de madeira escura, com 980 por 980 mm de tampo e 720 mm de altura total, quatro pés de 80 mm, quatro saias sob o tampo e oito cantoneiras de reforço',
     referencias: ['referencias/alvo.md'],
     escala: { medida: 'altura total da mesa', milimetros: 720 },

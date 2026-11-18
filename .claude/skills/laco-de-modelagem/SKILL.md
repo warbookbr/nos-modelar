@@ -76,14 +76,11 @@ laço.
 
 Só a pessoa reabre uma etapa fixa, pelo mesmo critério do aceite humano, com
 `npm run etapas -- <montagem.json> --reabrir <instância> --por "<quem, data: motivo>"`.
-A etapa volta a aberta e o aceite e a receita que ela tinha ficam em
-`reaberturas` no registro. O comando reabre também a etapa quebrada pela receita, e deixa fixas as posteriores cuja forma e cujas portas citadas desta são as do aceite.
-Ele recusa sem `--por` completo, etapa aberta e etapa com posterior que mudou,
-dizendo qual e o quê; nesse caso reabra da última para a primeira, cada uma com
-o motivo dela. O registro compara a
-`forma` (a malha que a receita gera), e não o texto: comentário e `PLANO` não
-quebram a etapa fixa. A etapa que quebra por forma ou por junta guarda o aceite
-em `reaberturas`, e ler o registro não o apaga.
+Reabrir só acrescenta um evento, sem medir: o aceite fica no registro e a etapa volta a aberta. O estado nunca é gravado, sai da
+comparação da impressão de agora com a do aceite vigente; a quebrada cuja mudança é desfeita volta a fixa sozinha, e só a reabertura a faz
+aberta. Aceitar uma etapa não refixa as posteriores quebradas (o `--fixar` avisa): reabra e aceite cada uma. O registro antigo recusa e manda rodar
+`migrar-etapas-para-impressao.mjs`. Contrato em
+[`MONTAGENS-SEMANTICAS.md`](../../../docs/modelar/usar/MONTAGENS-SEMANTICAS.md#o-registro-de-etapas-eventos-impressão-e-leitura-derivada).
 
 ## O ciclo de uma etapa
 

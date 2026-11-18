@@ -234,9 +234,9 @@ porta não publica, parâmetro com duas origens e unidade ausente. O resolvedor
 constrói na ordem das etapas, executa a receita com os parâmetros derivados e
 recusa porta ausente e parâmetro que a receita não declara. O giro em torno do
 eixo só fica definido quando as duas portas publicam `referencia`; sem ela o
-resultado diz `giroDefinido: false`. O registro de etapas põe cada junta na
-etapa em que a segunda parte entra e só fixa etapa em ordem, com juntas
-passando e com o aceite da pessoa. A prova mínima está em
+resultado diz `giroDefinido: false`. O registro de etapas (abaixo) põe cada
+junta na etapa em que a segunda parte entra e só fixa etapa em ordem, com
+juntas passando e com o aceite da pessoa. A prova mínima está em
 `tools/fixtures/tres-blocos-vinculados/`.
 
 O leitor também recusa duas instâncias posicionadas na mesma porta, porque
@@ -246,6 +246,19 @@ se apoia publica a borda. Ela confere o eixo, a sobreposição radial e a axial,
 e reprova qualquer fresta entre as faces; fresta só é aceita quando a
 especificação traz `separacaoAxial`, com a mesma forma de faixa das outras
 medidas.
+
+### O registro de etapas: eventos, impressão e leitura derivada
+
+O registro (`<montagem>.etapas.json`, v3) guarda só eventos: aceites e reaberturas. O aceite traz quem aceitou e a impressão do
+aprovado, em valores: hash da forma, parâmetros derivados, pose, medida das juntas, interface das portas de etapa anterior que ela cita (vista de
+quem cita) e a ordem das anteriores. O estado nunca é gravado: `npm run etapas -- <montagem.json>` compara, com 12 algarismos, a impressão de agora com a
+do aceite vigente. Fixa se igual; quebrada se difere; aberta sem aceite vigente; não conferível sem geometria (nunca
+fixa). Reabrir só acrescenta um evento: as posteriores seguem fixas se a impressão delas é a do aceite. Regra da pessoa: a quebrada cuja mudança
+é desfeita volta a fixa sozinha; só a reabertura a faz aberta; `--fixar` avisa das posteriores quebradas.
+
+O registro v1 e v2 recusa e manda rodar `migrar-etapas-para-impressao.mjs <montagem.json>` (ensaio sem `--gravar`), que migra sem novo aceite: pelo
+commit do aceite (a), pela impressão de agora com forma e juntas gravadas como condição (b) ou deixa aberta (c). Os 52 aceites do acervo
+migraram (43 pela história, 9 pela de agora: as oito do avião e o anel da cintura), e a guarda os trava. Sem prova: a porta do `anelCintura`; fora da impressão: porta de submontagem e expectativa de interseção.
 
 ### O apoio no chão e a auditoria da montagem construída
 

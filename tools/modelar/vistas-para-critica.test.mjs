@@ -8,11 +8,12 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, 
 import { tmpdir } from 'node:os';
 import { basename, dirname, join } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
+import { aceitesVigentes } from '../../src/autoria/etapas-pela-impressao.js';
 import { lerPergunta } from '../../src/autoria/perguntas-do-critico.js';
 import {
   ELEVACOES_DA_LUZ_RASANTE, LIMITE_DO_VEREDITO, PERGUNTA_DO_ALVO, PRAZO_DA_CAPTURA_MONTADA_MS, VISTAS_MONTADAS, ladoDaVista, vistaDaPranchaDesenhada, avisoDasReferenciasIgnoradas, referenciasSemLeitura, montagemDaPeca, montarPedido, pastaDaRodada, prefixoDaPeca, referenciasDoPlano,
   DISTANCIA_DE_PERTO_MM, campoDePertoMm, MOTIVO_SEM_MEDIR, ReceitaReprovada, decidirLuzRasante, imprimir, fracaoVisivelDaPeca, lerReferenciasExternas, lerOrientacaoDaReferencia, LIMITE_DA_ORIENTACAO, AJUDA, imagensDoReflexo, LEITURA_DA_FAIXA, LEITURA_DO_REFLEXO, secaoDoReflexo, MINIMO_DO_REFLEXO, luzRasanteDoPacote, primeiraQuePassa, unidadeDoAlvo, vistaDoArquivo, vistasMontadasVisiveis, vistasParaCritica, vistasRepetidas,
-  ARQUIVO_DO_CONTORNO_SOBREPOSTO, contornosParaSobrepor, etapaFixaDaPeca, lerContornosExternos, lerRegioesDoContorno, motivoDaEtapaFixa, registroDasEtapas,
+  ARQUIVO_DO_CONTORNO_SOBREPOSTO, contornosParaSobrepor, etapaFixaDaPeca, lerContornosExternos, lerRegioesDoContorno, motivoDaEtapaFixa,
   ARQUIVO_DAS_PERGUNTAS_FECHADAS, FORMATO_DAS_PERGUNTAS_FECHADAS, NAO_DA_PARA_VER, NAO_VERIFICAVEL, REGRA_DA_NOTA, arquivoDoPedidoFechado, juntarOrdens, lerRespostasFechadas,
   montarPedidoFechado, notaDasRespostas, notaEscrita, normalizarResposta, perguntasFechadas, relatorioDaJuncao, relatorioDasNotas, respostasQueMudaram, variacaoDasNotas,
   ARQUIVO_DOS_DADOS_DO_PEDIDO, afirmacoesDaForma, gravarPedidos, notaPelaRegra, pesosDasPerguntas, refazerPedidos, semMedidas,
@@ -1521,15 +1522,16 @@ describe('o contorno medido sobre o modelo', () => {
     expect(etapaFixaDaPeca({ ...montagem, instancias: ['ombro', 'outro'] }, registro)).toBeNull();
     expect(etapaFixaDaPeca(null, registro)).toBeNull();
     expect(etapaFixaDaPeca(montagem, null)).toBeNull();
-    const lidos = [];
-    expect(registroDasEtapas(montagem, { existe: () => true, ler: (f) => { lidos.push(f); return JSON.stringify(registro); } })).toEqual(registro);
-    expect(lidos).toEqual(['/m/montagem.etapas.json']);
-    expect(registroDasEtapas(montagem, { existe: () => false })).toBeNull();
   });
 
-  it('o ombro do braço robótico está fixo no registro gravado, e o contorno dele fica de fora', () => {
+  it('o ombro do braço robótico tem aceite vigente no registro gravado, e com o registro já medido o contorno dele fica de fora', () => {
+    /* medir a montagem do braço inteira leva uns 26 s: o registro medido entra pronto, e que as doze fixas são fixas pela leitura nova
+       é prova da guarda do acervo (`etapas-do-acervo.test.mjs`) e de `etapas-consumidores-v3.test.mjs`, que medem de verdade */
     const montagem = montagemDaPeca('braco-robotico/ombro');
-    expect(etapaFixaDaPeca(montagem, registroDasEtapas(montagem))?.instancia).toBe('ombro');
+    const gravado = JSON.parse(readFileSync(montagem.arquivo.replace(/\.json$/, '.etapas.json'), 'utf8'));
+    const medido = { etapas: [...aceitesVigentes(gravado)].map(([instancia, aceite]) => ({ instancia, estado: 'fixa', aceite })) };
+    expect(etapaFixaDaPeca(montagem, medido)?.instancia).toBe('ombro');
+    expect(etapaFixaDaPeca(montagem, { etapas: medido.etapas.map((e) => (e.instancia === 'ombro' ? { ...e, estado: 'quebrada' } : e)) })).toBeNull();
   });
 
   it('o pedido sem prancha diz que nenhum contorno foi desenhado, e por quê', () => {

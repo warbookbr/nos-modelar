@@ -2,6 +2,7 @@
   "formato": "mecanifica.montagem",
   "versao": 5,
   "id": "braco-robotico",
+  "categoria": "robotica",
   "instancias": [
     {
       "id": "base",

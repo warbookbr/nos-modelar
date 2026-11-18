@@ -54,17 +54,15 @@ describe('parte planejada que espera a etapa', () => {
 
   it('espera quando está numa etapa ainda não fixa', () => {
     writeFileSync(join(pecas, 'objeto-de-prova/montagem.json'), montagem(['base']));
-    expect(etapaQueEspera('objeto-de-prova/base', { raiz: pecas }))
+    expect(etapaQueEspera('objeto-de-prova/base', { raiz: pecas, semPassos: true }))
       .toEqual({ montagem: 'objeto-de-prova/montagem.json', instancia: 'base' });
   });
 
-  it('não espera quando a etapa já está fixa, nem quando nenhuma etapa a cita', () => {
-    writeFileSync(join(pecas, 'objeto-de-prova/montagem.etapas.json'), JSON.stringify({ etapas: [{ instancia: 'base', estado: 'fixa' }] }));
+  it('não espera quando a receita tem passos (etapa fixa só existe com geometria), nem quando nenhuma etapa a cita', () => {
     expect(etapaQueEspera('objeto-de-prova/base', { raiz: pecas })).toBe(null);
-    rmSync(join(pecas, 'objeto-de-prova/montagem.etapas.json'));
     writeFileSync(join(pecas, 'objeto-de-prova/montagem.json'), montagem([]));
-    expect(etapaQueEspera('objeto-de-prova/base', { raiz: pecas })).toBe(null);
-    expect(etapaQueEspera('objeto-de-prova/anel-cintura', { raiz: pecas })).toBe(null);
+    expect(etapaQueEspera('objeto-de-prova/base', { raiz: pecas, semPassos: true })).toBe(null);
+    expect(etapaQueEspera('objeto-de-prova/anel-cintura', { raiz: pecas, semPassos: true })).toBe(null);
   });
 });
 

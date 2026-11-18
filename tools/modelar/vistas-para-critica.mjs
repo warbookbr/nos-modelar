@@ -112,7 +112,7 @@ import { blocoDasPerguntas, perguntasDaPecaArquivo } from './perguntas-da-peca.m
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 import {
   LADO_DA_VISTA_DE_SUPERFICIE, LIMIAR_DA_LUZ_RASANTE, MANIFESTO_DO_PACOTE, MINIMO_DE_QUINA, PASTA_DA_SUPERFICIE, SAIDA_PADRAO, comandoDasVistasDoBlender, exigirLuzNaSuperficie, gravarManifesto, imagensEscuras,
-  impressaoDoTexto, pastaDaRodada, superficieDaBancada, superficieDaPeca, vistasDeSuperficie,
+  impressaoDoTexto, pastaDaRodada, superficieDaBancada, superficieDaPecaMedida, vistasDeSuperficie,
 } from './vistas-de-superficie.mjs';
 
 const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
@@ -1260,14 +1260,15 @@ export function lerRegioesDoContorno(texto) {
 /* SÓ A PEÇA EM MODELAGEM RECEBE O CONTORNO. Em 2026-11-17 o pacote do ombro do braço robótico desenhou e citou como medida
  * `frontal.contornos.json`, resto de uma foto que saiu do repositório, sobre uma peça que a pessoa já tinha aceitado: o contorno não
  * correspondia à peça aprovada e os críticos leram a diferença como defeito. O sinal gravado de peça aprovada é a etapa fixa no
- * registro de etapas da montagem (`<montagem>.etapas.json`, que só `etapas-da-montagem.mjs --fixar` escreve, com o aceite da pessoa);
+ * registro de etapas da montagem (`<montagem>.etapas.json`, que só `etapas-da-montagem.mjs --fixar` escreve, com o aceite da pessoa), lido pela impressão do aceite;
  * a peça sozinha, fora de montagem, não grava aprovação nenhuma e continua recebendo o contorno. */
 
-/** O registro de etapas gravado ao lado da montagem, ou null sem ele. Lê só o arquivo: não resolve a montagem. */
-export function registroDasEtapas(montagem, { existe = existsSync, ler = (f) => readFileSync(f, 'utf8') } = {}) {
-  const arquivo = montagem?.arquivo?.replace(/\.json$/, '.etapas.json');
-  if (!arquivo || !existe(arquivo)) return null;
-  return JSON.parse(ler(arquivo));
+/** O registro de etapas ao lado da montagem com o estado de cada etapa, pela leitura pela impressão do aceite (mede a montagem de agora); null sem registro. */
+export async function registroDasEtapasMedido(montagem) {
+  const arquivo = montagem?.arquivo;
+  if (!arquivo || !existsSync(arquivo.replace(/\.json$/, '.etapas.json'))) return null;
+  const { registroComEstado } = await import('./etapas-da-montagem.mjs');
+  return registroComEstado(arquivo);
 }
 
 /**
@@ -2237,7 +2238,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
     contornoSobreposto: prancharContorno,
     prancharDesenhadas,
     montagemDaPeca: (p) => montagemDaPeca(p),
-    registroDasEtapas: (m) => registroDasEtapas(m),
+    registroDasEtapas: (m) => registroDasEtapasMedido(m),
     ...dependencias,
   };
   const blender = Object.hasOwn(dependencias, 'blender') ? dependencias.blender : doAmbiente('BLENDER');
@@ -2263,7 +2264,11 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   const contornosDeFora = lerContornosExternos(contornosExternos, { regioes: regioesDosContornos, ...(dependencias.existe ? { existe: dependencias.existe } : {}), ...(dependencias.lerContorno ? { ler: dependencias.lerContorno } : {}) });
   /* a peça de lataria leva a luz rasante e a curvatura da lataria, que saem da bancada; o Blender só roda pedido, como conferência, e
      sem ele o pedido é recusado antes de gastar captura */
-  const lataria = superficieDaPeca(peca, receita, plano);
+  /* o registro de etapas com o estado se mede no máximo uma vez por chamada, e só quando a superfície ou os contornos o pedem */
+  const montagem = dep.montagemDaPeca(peca);
+  let registroMedido;
+  const registroDaMontagem = () => (registroMedido ??= Promise.resolve(montagem ? dep.registroDasEtapas(montagem) : null));
+  const lataria = await superficieDaPecaMedida(peca, receita, plano, { registro: registroDaMontagem });
   if (comBlender && !blender) throw new Error(`--com-blender roda o Blender como conferência e pede MODELAR_BLENDER apontando o executável: \`${comandoDasVistasDoBlender(peca)}\`; sem a conferência, o pacote sai só com a bancada.`);
   const declarado = await dep.esbocoDeclarado(peca);
   /* as formas do esboço que a receita refina e o alvo guardado com elas, conferidos antes de gastar captura */
@@ -2279,7 +2284,6 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
     dados = await dep.formasGuardadas(bruto, declarado.opcao, declarado.esboco);
     alvoDaReceita = alvoGuardado({ declarado, dados });
   }
-  const montagem = dep.montagemDaPeca(peca);
   const avisos = [];
   /* o que o plano cita e o pacote não leva sai no relatório e no pedido, e não em silêncio (rodada 3 do carro: três pranchas SVG ficaram sem leitura) */
   const avisoDasIgnoradas = avisoDasReferenciasIgnoradas(referencias.ignoradas);
@@ -2299,7 +2303,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   }
   let sobrepor = { entradas: [], fora: [] };
   /* a peça com a etapa fixa não recebe contorno: nem desenhado, nem citado como medida do lado */
-  const fixa = montagem && contornosMedidos.length ? etapaFixaDaPeca(montagem, dep.registroDasEtapas(montagem)) : null;
+  const fixa = montagem && contornosMedidos.length ? etapaFixaDaPeca(montagem, await registroDaMontagem()) : null;
   if (fixa) {
     sobrepor.fora.push(motivoDaEtapaFixa(fixa, contornosMedidos, montagem.arquivo));
     contornosDoPedido = [];

@@ -1,68 +1,418 @@
 {
   "formato": "mecanifica.registro-de-etapas",
-  "versao": 2,
+  "versao": 3,
   "montagem": "sedan-chassi-e-lataria",
-  "etapas": [
+  "eventos": [
     {
+      "tipo": "aceite",
       "instancia": "carroceria",
-      "estado": "fixa",
-      "juntas": [],
-      "forma": "sha256:160d3c2ec9060e0a292a2574c20d0a8f55a131034abd7044815aee990eede709",
-      "motivo": "a receita mudou depois do aceite",
       "aceite": {
         "por": "Tiago, 2026-11-13: aceitou travar de novo depois da correção da agulha na costura, que muda duas faces em 174 mil",
         "analise": "ausente"
       },
-      "reaberturas": [
-        {
-          "por": "leitura do registro",
-          "motivo": "a receita mudou depois do aceite",
-          "aceite": {
-            "por": "IA da sessão por delegação da pessoa, 2026-11-13: crítico fechou na rodada 3 com nota 8 e sem defeito; cobertura das 55 partes feita em passadas",
-            "analise": "ausente"
-          },
-          "forma": "sha256:02dd291d4fb7763a8c190590b1fdda49969e997c9422b5eb9dc954a212bbee3b"
-        }
-      ]
+      "impressao": {
+        "forma": "sha256:160d3c2ec9060e0a292a2574c20d0a8f55a131034abd7044815aee990eede709",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0,
+            0
+          ]
+        },
+        "juntas": [],
+        "citadas": [],
+        "anteriores": []
+      },
+      "origem": {
+        "tipo": "migração",
+        "v2": "73a57d9c7c8a9b1c294e49d237d99379da02942e",
+        "reaberturasAntigas": 1,
+        "via": "commit do aceite",
+        "commit": "73a57d9c7c8a9b1c294e49d237d99379da02942e"
+      }
     },
     {
+      "tipo": "aceite",
       "instancia": "vidros",
-      "estado": "fixa",
-      "juntas": [],
-      "forma": "sha256:cbbf4ee2a801d6c0d2825100d23f9802bb5903fd35ca433de2ceff9fffbf4c9e",
       "aceite": {
         "por": "IA da sessão por delegação da pessoa, 2026-11-13: crítico fechou na rodada 3 com nota 8 e sem defeito",
         "analise": "ausente"
+      },
+      "impressao": {
+        "forma": "sha256:cbbf4ee2a801d6c0d2825100d23f9802bb5903fd35ca433de2ceff9fffbf4c9e",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0,
+            0
+          ]
+        },
+        "juntas": [],
+        "citadas": [
+          {
+            "etapa": "carroceria",
+            "porta": "paraOsVidros",
+            "por": [
+              "posição vidrosNaOsVidros"
+            ],
+            "interface": {
+              "forma": "plano",
+              "papel": "recebe",
+              "ponto": [
+                0,
+                0.89,
+                0
+              ],
+              "centro": [
+                0,
+                0.89,
+                0
+              ],
+              "normal": [
+                0,
+                1,
+                0
+              ],
+              "eixo": [
+                0,
+                1,
+                0
+              ],
+              "extensao": [
+                1.72,
+                4.201
+              ],
+              "largura": 1.72,
+              "comprimento": 4.201,
+              "referencia": [
+                1,
+                0,
+                0
+              ]
+            }
+          }
+        ],
+        "anteriores": [
+          "carroceria"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "v2": "73a57d9c7c8a9b1c294e49d237d99379da02942e",
+        "via": "commit do aceite",
+        "commit": "9297f2d37dbb0b4d9021916ef89e65bf5033ef5e"
       }
     },
     {
+      "tipo": "aceite",
       "instancia": "frente-e-traseira",
-      "estado": "fixa",
-      "juntas": [],
-      "forma": "sha256:da94972e13c030159dcb2bce8660c808db9913df20e7476fbb56e9e51522632a",
       "aceite": {
         "por": "IA da sessão por delegação da pessoa, 2026-11-13: crítico fechou a etapa com nota 8 e sem defeito",
         "analise": "ausente"
+      },
+      "impressao": {
+        "forma": "sha256:da94972e13c030159dcb2bce8660c808db9913df20e7476fbb56e9e51522632a",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0,
+            0
+          ]
+        },
+        "juntas": [],
+        "citadas": [
+          {
+            "etapa": "carroceria",
+            "porta": "paraOPainelDianteiro",
+            "por": [
+              "posição frenteETraseiraNaOPainelDianteiro"
+            ],
+            "interface": {
+              "forma": "plano",
+              "papel": "recebe",
+              "ponto": [
+                0,
+                0,
+                2.118
+              ],
+              "centro": [
+                0,
+                0,
+                2.118
+              ],
+              "normal": [
+                0,
+                0,
+                1
+              ],
+              "eixo": [
+                0,
+                0,
+                1
+              ],
+              "extensao": [
+                1.72,
+                0.97
+              ],
+              "largura": 1.72,
+              "comprimento": 0.97,
+              "referencia": [
+                1,
+                0,
+                0
+              ]
+            }
+          }
+        ],
+        "anteriores": [
+          "carroceria",
+          "vidros"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "v2": "73a57d9c7c8a9b1c294e49d237d99379da02942e",
+        "via": "commit do aceite",
+        "commit": "475470477bd62ea73d9e58955fca01cbeb50cbd4"
       }
     },
     {
+      "tipo": "aceite",
       "instancia": "rodas",
-      "estado": "fixa",
-      "juntas": [],
-      "forma": "sha256:938a939f448ccf0e354666a20d2ef567484d19a314d04d8868d79b9a8ae56873",
       "aceite": {
         "por": "IA da sessão por delegação da pessoa, 2026-11-13: crítico fechou a etapa com nota 8 e sem defeito",
         "analise": "ausente"
+      },
+      "impressao": {
+        "forma": "sha256:938a939f448ccf0e354666a20d2ef567484d19a314d04d8868d79b9a8ae56873",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0,
+            0
+          ]
+        },
+        "juntas": [],
+        "citadas": [
+          {
+            "etapa": "carroceria",
+            "porta": "paraAsRodas",
+            "por": [
+              "posição rodasNaAsRodas"
+            ],
+            "interface": {
+              "forma": "plano",
+              "papel": "recebe",
+              "ponto": [
+                0,
+                0.364,
+                0
+              ],
+              "centro": [
+                0,
+                0.364,
+                0
+              ],
+              "normal": [
+                0,
+                1,
+                0
+              ],
+              "eixo": [
+                0,
+                1,
+                0
+              ],
+              "extensao": [
+                1.72,
+                2.43
+              ],
+              "largura": 1.72,
+              "comprimento": 2.43,
+              "referencia": [
+                1,
+                0,
+                0
+              ]
+            }
+          }
+        ],
+        "anteriores": [
+          "carroceria",
+          "vidros",
+          "frente-e-traseira"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "v2": "73a57d9c7c8a9b1c294e49d237d99379da02942e",
+        "via": "commit do aceite",
+        "commit": "475470477bd62ea73d9e58955fca01cbeb50cbd4"
       }
     },
     {
+      "tipo": "aceite",
       "instancia": "acessorios",
-      "estado": "fixa",
-      "juntas": [],
-      "forma": "sha256:2f62717eb8ec61ebbe626efa2ca77301bfabd148af04a8c5ded72377c91edcf7",
       "aceite": {
         "por": "IA da sessão por delegação da pessoa, 2026-11-13: crítico fechou a etapa com nota 8 e sem defeito",
         "analise": "ausente"
+      },
+      "impressao": {
+        "forma": "sha256:2f62717eb8ec61ebbe626efa2ca77301bfabd148af04a8c5ded72377c91edcf7",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0,
+            0
+          ]
+        },
+        "juntas": [],
+        "citadas": [
+          {
+            "etapa": "carroceria",
+            "porta": "paraOsAcessorios",
+            "por": [
+              "posição acessoriosNaOsAcessorios"
+            ],
+            "interface": {
+              "forma": "plano",
+              "papel": "recebe",
+              "ponto": [
+                0,
+                0.89,
+                0
+              ],
+              "centro": [
+                0,
+                0.89,
+                0
+              ],
+              "normal": [
+                0,
+                1,
+                0
+              ],
+              "eixo": [
+                0,
+                1,
+                0
+              ],
+              "extensao": [
+                1.72,
+                3.99
+              ],
+              "largura": 1.72,
+              "comprimento": 3.99,
+              "referencia": [
+                1,
+                0,
+                0
+              ]
+            }
+          }
+        ],
+        "anteriores": [
+          "carroceria",
+          "vidros",
+          "frente-e-traseira",
+          "rodas"
+        ]
+      },
+      "origem": {
+        "tipo": "migração",
+        "v2": "73a57d9c7c8a9b1c294e49d237d99379da02942e",
+        "via": "commit do aceite",
+        "commit": "3caebc96c6e2609c696d556701701b53981470af"
       }
     }
   ]

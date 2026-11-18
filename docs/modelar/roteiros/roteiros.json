@@ -361,6 +361,10 @@
           "quando": "a tarefa pede o mapa dos contratos de uso que o roteiro não cita"
         },
         {
+          "arquivo": "docs/modelar/usar/CACHE-POR-PASSO.md",
+          "quando": "um comando repetido sobre a mesma peça parece lento ou serve um resultado suspeito, para ligar, limpar ou desligar o cache por passo"
+        },
+        {
           "arquivo": "docs/modelar/usar/CONFERIR-CONTRA-REFERENCIA.md",
           "quando": "há foto de referência e não há prancha, para medir a borda em milímetro"
         },
@@ -479,6 +483,10 @@
         {
           "arquivo": "docs/modelar/usar/README.md",
           "quando": "a tarefa pede o mapa dos contratos de uso que o roteiro não cita"
+        },
+        {
+          "arquivo": "docs/modelar/usar/CACHE-POR-PASSO.md",
+          "quando": "um comando repetido sobre a mesma peça parece lento ou serve um resultado suspeito, para ligar, limpar ou desligar o cache por passo"
         },
         {
           "arquivo": "docs/modelar/usar/CONFERIR-CONTRA-REFERENCIA.md",
@@ -601,6 +609,10 @@
         {
           "arquivo": "docs/modelar/usar/README.md",
           "quando": "a tarefa pede o mapa dos contratos de uso que o roteiro não cita"
+        },
+        {
+          "arquivo": "docs/modelar/usar/CACHE-POR-PASSO.md",
+          "quando": "um comando repetido sobre a mesma peça parece lento ou serve um resultado suspeito, para ligar, limpar ou desligar o cache por passo"
         },
         {
           "arquivo": "docs/modelar/usar/CONFERIR-CONTRA-REFERENCIA.md",

@@ -53,6 +53,7 @@ const receita = {
   MATERIAIS: { vidro: { tipo: 'liso', cor: '#d6e8f0' } },
   TOPO: { origem: 'centro da face de baixo do copo, no chao; y para cima, eixo de revolucao em y' },
   PLANO: {
+    categoria: 'utensilios',
     objeto: 'copo baixo de vidro liso, 90 mm de altura, 80 mm de boca e 70 mm de base, parede de 3 mm, fundo maciço de 12 mm',
     referencias: ['referencias/alvo.md'],
     escala: { medida: 'altura total da peça', milimetros: 90 },

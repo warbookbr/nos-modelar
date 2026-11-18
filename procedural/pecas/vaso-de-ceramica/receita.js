@@ -120,6 +120,7 @@ const receita = {
   MATERIAIS,
   TOPO: { origem: 'centro do fundo do pé, no chão; y para cima' },
   PLANO: {
+    categoria: 'utensilios',
     objeto: 'vaso de cerâmica rústica de uma parte: barriga quase esférica, pescoço estreito, boca de lábio virado e pé em saia com quatro arcos',
     referencias: ['referencias/alvo.md'],
     escala: { medida: 'altura total do vaso', milimetros: 200 },
