@@ -47,7 +47,7 @@ import { basename, dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { acaoDaReceita, defeitosAbertos } from '../../src/autoria/laco-de-modelagem.js';
 import { proximaEtapa } from '../../src/autoria/etapas-de-construcao.js';
-import { acaoDaPeca, lerRodadas, limiteDaPeca, medirReceita } from './rodada-de-modelagem.mjs';
+import { acaoDaPeca, decisaoDaPessoa, lerRodadas, medirReceita } from './rodada-de-modelagem.mjs';
 import { pastaDasReferencias } from './objeto.mjs';
 
 const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
@@ -322,12 +322,12 @@ export function moduloComum(pasta, pecas, { rodadasDe = () => [], mudouEm = quan
  * o mesmo que ela julgou, e presumida aprovada quando o texto mudou (`medida: false` diz isso). A mesma forma com texto novo não é
  * reconhecida aqui (pede executar a receita), e sai como `revisar`.
  */
-export function acaoSemMedir(rodadas, textoDaReceita, { limite } = {}) {
+export function acaoSemMedir(rodadas, textoDaReceita, { limite, convergenciaDesde } = {}) {
   const sha256 = sha(textoDaReceita);
   const ultima = rodadas.at(-1);
   const mesmoTexto = Boolean(ultima?.receita?.sha256) && ultima.receita.sha256 === sha256;
   const medicao = mesmoTexto ? { passou: ultima.medidas.passou, relatorio: ultima.medidas.relatorio } : { passou: true, relatorio: 'presumida' };
-  return { ...acaoDaReceita(rodadas, { sha256, medicao }, { limite }), medida: mesmoTexto, mesmoTexto };
+  return { ...acaoDaReceita(rodadas, { sha256, medicao }, { limite, convergenciaDesde }), medida: mesmoTexto, mesmoTexto };
 }
 
 /** A medição de uma peça no `--medir`, com o registro de etapas que o fluxo já mediu, para não medir a montagem outra vez por peça. */
@@ -425,9 +425,10 @@ export async function fluxoDoObjeto(pastaDoObjeto, { medir = null, acervo = ACER
     if (fixa) Object.assign(linha, { estado: 'fixa', acao: null, motivo: 'todas as etapas da peça estão fixas.', defeitos: [] });
     else if (!p.receita) Object.assign(linha, { estado: 'sem receita', acao: 'modelar', motivo: 'a peça não tem receita.', defeitos: [] });
     else {
-      const limite = limiteDaPeca(p.ref, { pasta: pastaRodadas });
-      const d = medir ? { ...(await medir(p.ref, { rodadas, limite, pasta: pastaRodadas, registroLido })), medida: true }
-        : acaoSemMedir(rodadas, readFileSync(p.receita, 'utf8'), { limite });
+      /* a decisão gravada da pessoa (o limite e a rodada a partir da qual a convergência conta), a mesma que `--acao` lê */
+      const { limite, convergenciaDesde } = decisaoDaPessoa(p.ref, { pasta: pastaRodadas });
+      const d = medir ? { ...(await medir(p.ref, { rodadas, limite, convergenciaDesde, pasta: pastaRodadas, registroLido })), medida: true }
+        : acaoSemMedir(rodadas, readFileSync(p.receita, 'utf8'), { limite, convergenciaDesde });
       const abertos = defeitosAbertos(rodadas).map((x) => `${x.parte}: ${x.tipo} ${x.sentido} em ${x.onde}`);
       Object.assign(linha, { estado: 'em aberto', acao: d.acao, motivo: d.motivo, medida: d.medida, defeitos: d.acao === 'modelar' ? abertos : [] });
     }

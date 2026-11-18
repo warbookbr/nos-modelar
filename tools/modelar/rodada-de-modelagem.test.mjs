@@ -12,6 +12,8 @@ import { dirname, join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { proximaAcao } from '../../src/autoria/laco-de-modelagem.js';
+import { conferirRodadasDaEtapa } from './etapas-da-montagem.mjs';
+import { acaoSemMedir } from './fluxo-do-objeto.mjs';
 import { esperadosDosPontos, mudancasDosEsperados, textoDosPontos } from './conferir-pontos.mjs';
 import { CAMPOS_OPCIONAIS_LIDOS_PELO_CRITICO, CAMPOS_OPCIONAIS_NAO_LIDOS_PELO_CRITICO, planoQueOCriticoLe, acaoDaPeca, ajustarImportsDaCopia, blocoDaPeca, contradicoesEntreRodadas, entradaDosArquivos, normalizarRelatoDoModelador, resumoDoLaco, gravarRodada, impressaoDaForma, lerArgumentos, lerRodadas, medirReceita, mudancaDosPontos, pastaDeRodadas, pontosDaMedicao, registrarMedida, convergenciaDaPeca, decisaoDaPessoa, limiteDaPeca, textoFinalDoAssistente, ultimoBlocoJson } from './rodada-de-modelagem.mjs';
 import { CAMPOS_OPCIONAIS_DO_PLANO } from '../../src/autoria/plano-de-modelagem.js';
@@ -203,6 +205,27 @@ describe('a decisão da pessoa sobre as paradas, em rodadas/limite.json', () => 
     expect(await acao()).toBe('modelar');
     julgadas([3, 3]);
     expect(await acao()).toBe('parar-sem-convergencia');
+  });
+
+  it('as três ferramentas que decidem a ação leem a mesma decisão: --acao, o fluxo do objeto e as etapas da montagem', async () => {
+    julgadas([2, 2, 3]);
+    const rodadas = () => lerRodadas(PECA, { pasta: area });
+    const montagem = { instancias: [{ id: 'a', alvo: { ref: PECA } }] };
+    const tres = async () => {
+      const lida = decisaoDaPessoa(PECA, { pasta: area });
+      let dasEtapas;
+      try { conferirRodadasDaEtapa(montagem, 'a', rodadas, (ref) => decisaoDaPessoa(ref, { pasta: area })); } catch (erro) { dasEtapas = /pelo crítico: ([a-z-]+) — /.exec(erro.message)?.[1]; }
+      return [(await acaoDaPeca(PECA, { rodadas: rodadas(), pasta: area, limite: lida.limite, medir })).acao, acaoSemMedir(rodadas(), 'texto da receita', lida).acao, dasEtapas];
+    };
+    expect(await tres()).toEqual(['parar-sem-convergencia', 'parar-sem-convergencia', 'parar-sem-convergencia']);
+    escrever({ limite: 'sem', convergenciaDesde: 3, ...QUEM });
+    expect(await tres()).toEqual(['modelar', 'modelar', 'modelar']);
+    julgadas([3, 3, 3, 3]);
+    expect(await tres()).toEqual(['parar-sem-convergencia', 'parar-sem-convergencia', 'parar-sem-convergencia']);
+    escrever({ limite: 'sem', convergenciaDesde: 8, ...QUEM });
+    expect(await tres()).toEqual(['modelar', 'modelar', 'modelar']);
+    escrever({ convergenciaDesde: 8, ...QUEM });
+    expect(await tres()).toEqual(['parar-limite', 'parar-limite', 'parar-limite']);
   });
 
   it('recusa o formato errado dizendo o recebido, o esperado e o comando', () => {
