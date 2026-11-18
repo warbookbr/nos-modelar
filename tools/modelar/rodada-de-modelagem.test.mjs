@@ -18,7 +18,7 @@ import { acaoSemMedir } from './fluxo-do-objeto.mjs';
 import { conferirPontos, esperadosDosPontos, mudancasDosEsperados, textoDosPontos } from './conferir-pontos.mjs';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { conferirUmaPeca } from './guardas/guarda-referencial.mjs';
-import { CAMPOS_OPCIONAIS_LIDOS_PELO_CRITICO, CAMPOS_OPCIONAIS_NAO_LIDOS_PELO_CRITICO, planoQueOCriticoLe, acaoDaPeca, ajustarImportsDaCopia, blocoDaPeca, contradicoesEntreRodadas, entradaDosArquivos, normalizarRelatoDoModelador, resumoDoLaco, gravarRodada, impressaoDaForma, lerArgumentos, lerRodadas, medirReceita, mudancaDosPontos, pastaDeRodadas, pontosDaMedicao, registrarMedida, convergenciaDaPeca, decisaoDaPessoa, limiteDaPeca, textoFinalDoAssistente, ultimoBlocoJson } from './rodada-de-modelagem.mjs';
+import { nomeDaPastaDoPacote, numeroDaProximaRodada, pastaDoPacoteDaRodada, CAMPOS_OPCIONAIS_LIDOS_PELO_CRITICO, CAMPOS_OPCIONAIS_NAO_LIDOS_PELO_CRITICO, planoQueOCriticoLe, acaoDaPeca, ajustarImportsDaCopia, blocoDaPeca, contradicoesEntreRodadas, entradaDosArquivos, normalizarRelatoDoModelador, resumoDoLaco, gravarRodada, impressaoDaForma, lerArgumentos, lerRodadas, medirReceita, mudancaDosPontos, pastaDeRodadas, pontosDaMedicao, registrarMedida, convergenciaDaPeca, decisaoDaPessoa, limiteDaPeca, textoFinalDoAssistente, ultimoBlocoJson } from './rodada-de-modelagem.mjs';
 import { CAMPOS_OPCIONAIS_DO_PLANO } from '../../src/autoria/plano-de-modelagem.js';
 import { normalizarVeredito } from '../../src/autoria/veredito-de-forma.js';
 import { pecasDoAcervo } from './guardas/guarda-acervo.mjs';
@@ -47,6 +47,24 @@ afterEach(() => rmSync(area, { recursive: true, force: true }));
 const CONFERIDAS = [{ nome: 'corpo', confere: true }];
 
 describe('registro de rodadas', () => {
+  it('o número da próxima rodada a registrar, que dá nome à pasta do pacote do crítico, é o que o registro grava', () => {
+    const pasta = join(area, 'peca-de-ensaio');
+    expect(numeroDaProximaRodada(pasta)).toBe(1);
+    for (const esperado of [1, 2]) {
+      const proximo = numeroDaProximaRodada(pasta);
+      const { rodada } = gravarRodada('peca-de-ensaio', { partes: CONFERIDAS, medidas: { passou: true, relatorio: 'ok' } }, { pasta, receitaTexto: 'const A = 1;\n' });
+      expect(rodada.numero).toBe(esperado);
+      expect(proximo).toBe(rodada.numero);
+    }
+    /* a cópia da receita e o limite.json, que moram na mesma pasta, não contam como rodada */
+    expect(existsSync(join(pasta, 'receita-02.js'))).toBe(true);
+    writeFileSync(join(pasta, 'limite.json'), '{}');
+    expect(numeroDaProximaRodada(pasta)).toBe(3);
+    expect(nomeDaPastaDoPacote(3)).toBe('rodada-03');
+    expect(pastaDoPacoteDaRodada('carro/lataria', 12, '/saida')).toBe(join('/saida', 'critica-carro-lataria', 'rodada-12'));
+    expect(pastaDoPacoteDaRodada('carro/lataria', 3)).toBe(resolve(import.meta.dirname, '../bancadas/out/critica-carro-lataria/rodada-03'));
+  });
+
   it('grava cada rodada num arquivo próprio, numerado e não reescrito', () => {
     const { arquivo } = gravar('peca-de-ensaio', {
       partes: CONFERIDAS,

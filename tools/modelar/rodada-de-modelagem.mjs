@@ -99,6 +99,19 @@ export function pastaDeRodadas(peca, { raiz = REPO } = {}) {
   return join(raiz, 'tmp/rodadas', peca);
 }
 
+/* O NÚMERO DA PRÓXIMA RODADA A REGISTRAR, pela pasta das rodadas: os `rodada-NN.json` gravados mais um, o mesmo que `gravarRodada`
+   dá ao registro. O pacote do crítico (`vistas:critica`) grava as imagens numa pasta com esse número, e o registro do veredito lê o
+   pacote dela: as imagens de uma rodada deixaram de sobrescrever as da anterior (plano das ferramentas das rodadas, fatia 4). */
+export function numeroDaProximaRodada(pasta) {
+  if (!existsSync(pasta)) return 1;
+  return readdirSync(pasta).filter((nome) => /^rodada-\d{2}\.json$/.test(nome)).length + 1;
+}
+export const nomeDaPastaDoPacote = (numero) => `rodada-${String(numero).padStart(2, '0')}`;
+/** A pasta do pacote do crítico da rodada `numero` da peça: `critica-<peça>/rodada-NN`, fora do git, ao lado das capturas da bancada. */
+export function pastaDoPacoteDaRodada(peca, numero, base = undefined) {
+  return join(pastaDaRodada(peca, base), nomeDaPastaDoPacote(numero));
+}
+
 export function lerRodadas(peca, { pasta = pastaDeRodadas(peca) } = {}) {
   /* O nome é conferido mesmo quando a pasta vem por parâmetro. Sem isto, quem
      injeta a pasta — o teste, ou um comando futuro — passa a aceitar nome com
@@ -541,7 +554,7 @@ export async function registrarMedida(peca, entrada, { medir = () => medirReceit
   /* a peça de lataria: o veredito só se registra se o pacote que o crítico julgou trouxe as duas vistas da versão medida */
   let superficie;
   if (entrada.veredito && luzDaMedicao(medicao)) {
-    const pasta = pacote ?? pastaDaRodada(peca);
+    const pasta = pacote ?? pastaDoPacoteDaRodada(peca, numeroDaProximaRodada(opcoes.pasta ?? pastaDeRodadas(peca)));
     const conferido = superficieDoPacote(peca, { pasta, sha256: medicao.sha256 });
     if (!conferido.ok) {
       const lataria = Boolean(medicao.lataria?.lataria);

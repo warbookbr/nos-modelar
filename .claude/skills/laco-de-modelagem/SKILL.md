@@ -118,7 +118,7 @@ parte contra a referência, o defeito é da prancha: corrija-a primeiro e só
 depois a receita.
 
 **revisar** — a ferramenta mediu a receita atual e ela passou. Rode `npm run vistas:critica -- <peça>`, que mede a receita antes de capturar e recusa a que reprova (`--sem-medir` só para quem quer as imagens sem o crítico), e grava as
-imagens e, na pasta da rodada (`tools/bancadas/out/critica-<peça>/`, ou a de `--saida=<pasta>`), o `pedido.md` pronto, tirado
+imagens e, na pasta da rodada (`tools/bancadas/out/critica-<peça>/rodada-NN/`, com NN o número da próxima rodada a registrar, ou a de `--saida=<pasta>`), o `pedido.md` pronto, tirado
 da receita: o texto do despacho do `critico-visual`. Não escreva o pedido à mão, nem copie caminho, promessa de parte ou critério
 do `PLANO`; mande o texto do `pedido.md` como está. Foto de terceiro não entra no repositório, e quem conduz a traz ao pedido com `--referencia=<caminho absoluto da imagem>[@<vista>]` (repetível, o caminho não é gravado). Ele traz, nesta ordem, o objeto, o alvo, as referências, o modelo (as vistas
 da peça sozinha e a malha em arame), as vistas montadas, a sobreposição dos cortes, cada parte com a forma e a técnica que o plano
@@ -127,6 +127,12 @@ promete, os critérios de reprovação, as perguntas e o limite de 240 caractere
 de novo), com o caminho de todas as imagens e o lado de onde cada vista olha. As perguntas são as da família, quando o `PLANO`
 declara `familia` ou `familiaProcedural`, e, quando a receita declara `REFINA.esboco`, a de onde o alvo difere da referência real:
 o para-brisa saliente do avião veio do esboço, passou por dois críticos e só a pessoa o viu.
+
+O pacote inteiro mora nessa pasta, com as capturas da bancada, e ficam a desta rodada e a da anterior. O `pacote.json` grava a
+resolução, fixa por tipo de imagem, e a câmera de cada uma. Para ver o que mudou entre as duas rodadas na mesma câmera, rode
+`npm run vistas:critica -- <peça> --antes-e-depois=<imagem>` (o nome da imagem no `pacote.json` ou um trecho que só uma tenha), que
+grava as duas lado a lado em `antes-e-depois/` da pasta atual; não copie imagem à mão. Ele recusa quando a anterior não existe ou a
+câmera ou a resolução diferem, e avisa quando o enquadramento mudou, porque a bancada enquadra pela caixa da peça.
 
 Na peça com sombreamento suave sobre a emenda de uma fusão (um `liso` cuja seleção alcança o resultado de `unir`, `subtrair`,
 `intersectar` ou `arredondarCostura`), o pacote leva a luz rasante, sem a curvatura, e o `--registrar` cobra essa vista como cobra

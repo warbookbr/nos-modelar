@@ -17,10 +17,12 @@ import {
   ARQUIVO_DAS_PERGUNTAS_FECHADAS, FORMATO_DAS_PERGUNTAS_FECHADAS, NAO_DA_PARA_VER, NAO_VERIFICAVEL, REGRA_DA_NOTA, arquivoDoPedidoFechado, juntarOrdens, lerRespostasFechadas,
   montarPedidoFechado, notaDasRespostas, notaEscrita, normalizarResposta, perguntasFechadas, relatorioDaJuncao, relatorioDasNotas, respostasQueMudaram, variacaoDasNotas,
   ARQUIVO_DOS_DADOS_DO_PEDIDO, afirmacoesDaForma, gravarPedidos, notaPelaRegra, pesosDasPerguntas, refazerPedidos, semMedidas,
+  FOLGA_DO_ENQUADRAMENTO, PASTA_DO_ANTES_E_DEPOIS, RESOLUCAO_POR_TIPO, antesEDepois, apagarPacotesAntigos, imagensDoPacote, pacotesDaPeca, pastasDoAntesEDepois, relatorioDoAntesEDepois, resolucaoDoPng, tipoDaCaptura,
 } from './vistas-para-critica.mjs';
 import { extrairVeredito } from '../../src/autoria/calibracao-do-critico.js';
 import { lerContornos } from './comparar-contornos.mjs';
-import { alvoDoRepositorio } from './rodada-de-modelagem.mjs';
+import { PNG } from 'pngjs';
+import { alvoDoRepositorio, nomeDaPastaDoPacote } from './rodada-de-modelagem.mjs';
 
 const area = mkdtempSync(join(tmpdir(), 'vistas-critica-'));
 /* A medição da receita trocada por uma que passa: o pacote mede antes de capturar, e os testes do pacote não pagam a medição real. */
@@ -1278,7 +1280,7 @@ describe('o reflexo da bancada no pacote da peça de lataria', () => {
     /* a leitura curta do guia vai inteira, item a item, e cabe num pedido */
     for (const linha of LEITURA_DO_REFLEXO) expect(secao).toContain(`- ${linha}`);
     for (const [chave, sufixo] of [['zebra', 'zebra'], ['zebra-em-pe', 'zebra-a90'], ['pintura', 'pintura']]) {
-      for (const vista of ['isometrica', 'frontal']) expect(secao).toContain(`- ${vista}: ${join(resultado.pasta, '..', `${prefixoDaPeca(PECA)}${vista}-visao-${sufixo}-enquadrado.png`)}`);
+      for (const vista of ['isometrica', 'frontal']) expect(secao).toContain(`- ${vista}: ${join(resultado.pasta, `${prefixoDaPeca(PECA)}${vista}-visao-${sufixo}-enquadrado.png`)}`);
       expect(secao).not.toContain(`direita-visao-${sufixo}`);
       expect(manifesto.reflexo[chave]).toEqual({ imagens: resultado.reflexo[chave].imagens.map((i) => i.arquivo), fora: ['direita', 'superior'] });
     }
@@ -1790,5 +1792,372 @@ describe('a forma prometida em afirmações que se veem, sem medida nem contagem
     expect(ps.filter((p) => p.grupo === 'criterio').map((p) => p.texto)).toEqual([
       'As imagens mostram isto: guidão diferente da vista frontal: largura, pontas subindo?', 'As imagens mostram isto: folga de 2 mm?',
     ]);
+  });
+});
+
+/* ---------- a pasta por rodada, a resolução e a câmera no pacote, e o antes e depois (plano das ferramentas das rodadas, fatia 4) ---------- */
+
+/** Um PNG de uma cor só, do tamanho dado. */
+function pngLiso(largura, altura, cor = [10, 200, 30]) {
+  const png = new PNG({ width: largura, height: altura });
+  for (let i = 0; i < png.data.length; i += 4) { png.data[i] = cor[0]; png.data[i + 1] = cor[1]; png.data[i + 2] = cor[2]; png.data[i + 3] = 255; }
+  return PNG.sync.write(png);
+}
+
+/* a bancada falsa que grava PNG de verdade, na resolução pedida (ou na de `forcar`), e devolve a vista e o enquadramento de cada um */
+function bancadaDePng(pasta, peca, { forcar = null } = {}) {
+  const chamadas = [];
+  let feitas = 0;
+  const fazer = async (opcoes) => {
+    chamadas.push(opcoes);
+    const vistas = opcoes.revisar ? ['isometrica', 'frontal', 'direita', 'superior'] : String(opcoes.vistas).split(',');
+    const [largura, altura] = (forcar ?? opcoes.res).split('x').map(Number);
+    const sufixo = [opcoes.selecionadas ? `sel-${opcoes.selecionadas}` : null, opcoes.modo ?? null, opcoes.projecao === 'ortografica' ? 'orto' : null, opcoes.focar ? 'focado' : null,
+      opcoes.arame === 'raio-x' ? 'raio-x' : (opcoes.arame ? 'arame' : null)].filter(Boolean).join('-');
+    const arquivos = vistas.map((vista) => {
+      const arquivo = join(pasta, `${prefixoDaPeca(peca)}${vista}${sufixo ? `-${sufixo}` : ''}.png`);
+      /* cada imagem de uma cor: a ferramenta recusa duas vistas iguais byte a byte */
+      feitas += 1;
+      writeFileSync(arquivo, pngLiso(largura, altura, [feitas, 200, 30]));
+      return arquivo;
+    });
+    return { ok: true, resultado: { arquivos, vistas: vistas.map((nome) => ({ nome, enquadramento: { valida: true, largura: 0.8, altura: 0.5, area: 0.4, cortado: false } })) } };
+  };
+  return { fazer, chamadas };
+}
+
+describe('a pasta do pacote por rodada', () => {
+  const PECA = 'tools/fixtures/referencia-do-plano/presente/receita.js';
+  const montar = (base, extra = {}, bancada = bancadaDePng(base, PECA)) => vistasParaCritica(PECA, {
+    pastaDasCapturas: base, ...extra, dependencias: { medirReceita: medirPassa, olharBancada: bancada.fazer, rodadasAnteriores: () => [], numeroDaRodada: async () => 3, ...(extra.dependencias ?? {}) },
+  }).then((resultado) => ({ resultado, bancada }));
+
+  it('grava o pacote inteiro em critica-<peça>/rodada-NN, guarda a anterior, apaga as mais antigas e não toca no que não é pasta de rodada', async () => {
+    const base = mkdtempSync(join(area, 'numerada-'));
+    const daPeca = pastaDaRodada(PECA, base);
+    for (const n of ['rodada-01', 'rodada-02']) { mkdirSync(join(daPeca, n), { recursive: true }); writeFileSync(join(daPeca, n, 'pedido.md'), n); }
+    /* o que não é pasta de rodada fica: uma pasta de outro nome e um arquivo chamado como rodada */
+    mkdirSync(join(daPeca, 'guardado'));
+    writeFileSync(join(daPeca, 'guardado', 'nota.txt'), 'fica');
+    writeFileSync(join(daPeca, 'rodada-00'), 'arquivo, e não pasta');
+    /* o pacote solto na pasta da peça, de antes da pasta por rodada, e a pasta de outra peça ao lado */
+    writeFileSync(join(daPeca, 'pedido.md'), 'pedido velho');
+    const vizinha = join(base, 'critica-outra-peca', 'rodada-01');
+    mkdirSync(vizinha, { recursive: true });
+    const { resultado } = await montar(base);
+    const pasta = join(daPeca, 'rodada-03');
+    expect(resultado.pasta).toBe(pasta);
+    expect(resultado.rodada).toBe(3);
+    expect(resultado.pedido).toBe(join(pasta, 'pedido.md'));
+    expect(resultado.manifesto).toBe(join(pasta, 'pacote.json'));
+    expect(resultado.pacoteAnterior).toBe(join(daPeca, 'rodada-02'));
+    expect(readdirSync(daPeca).sort()).toEqual(['guardado', 'rodada-00', 'rodada-02', 'rodada-03']);
+    expect(readFileSync(join(daPeca, 'rodada-02', 'pedido.md'), 'utf8')).toBe('rodada-02');
+    expect(existsSync(vizinha)).toBe(true);
+    /* nenhuma captura da peça ficou na pasta comum, e o pedido cita as da pasta da rodada */
+    expect(readdirSync(base).filter((n) => n.startsWith(prefixoDaPeca(PECA)))).toEqual([]);
+    const pedido = readFileSync(resultado.pedido, 'utf8');
+    for (const arquivo of resultado.conjunto.resultado.arquivos) { expect(dirname(arquivo)).toBe(pasta); expect(existsSync(arquivo)).toBe(true); expect(pedido).toContain(arquivo); }
+    const relato = imprimir(resultado);
+    expect(relato).toContain('PASTA DO PACOTE (rodada 3, a próxima a registrar');
+    expect(relato).toContain(`a anterior ficou em ${join(daPeca, 'rodada-02')}`);
+    /* a segunda vez na mesma rodada refaz a pasta dela e não apaga a anterior */
+    const outra = await montar(base);
+    expect(outra.resultado.pasta).toBe(pasta);
+    expect(readdirSync(daPeca).sort()).toEqual(['guardado', 'rodada-00', 'rodada-02', 'rodada-03']);
+  }, 60_000);
+
+  it('a primeira rodada não tem anterior, e a pasta de número maior que a próxima a registrar fica, com aviso', async () => {
+    const base = mkdtempSync(join(area, 'primeira-'));
+    const daPeca = pastaDaRodada(PECA, base);
+    mkdirSync(join(daPeca, 'rodada-07'), { recursive: true });
+    const { resultado } = await montar(base, { dependencias: { numeroDaRodada: async () => 1 } });
+    expect(resultado.pasta).toBe(join(daPeca, 'rodada-01'));
+    expect(resultado.pacoteAnterior).toBeNull();
+    expect(existsSync(join(daPeca, 'rodada-07'))).toBe(true);
+    expect(resultado.avisos.join('\n')).toContain('tem pacote de rodada de número maior que a 1');
+    expect(imprimir(resultado)).toContain('não há pacote de rodada anterior desta peça');
+  }, 60_000);
+
+  it('--saida continua valendo: o pacote inteiro vai para ela, sem número, e nenhuma pasta de rodada é apagada', async () => {
+    const base = mkdtempSync(join(area, 'saida-'));
+    const daPeca = pastaDaRodada(PECA, base);
+    for (const n of ['rodada-01', 'rodada-02', 'rodada-03']) mkdirSync(join(daPeca, n), { recursive: true });
+    const pasta = join(base, 'onde-eu-quis');
+    const { resultado } = await montar(base, { saida: pasta, dependencias: { numeroDaRodada: async () => { throw new Error('com --saida o número não é pedido'); } } });
+    expect(resultado.pasta).toBe(pasta);
+    expect(resultado.rodada).toBeNull();
+    expect(readdirSync(daPeca).sort()).toEqual(['rodada-01', 'rodada-02', 'rodada-03']);
+    expect(readdirSync(base).filter((n) => n.startsWith(prefixoDaPeca(PECA)))).toEqual([]);
+    expect(readdirSync(pasta).filter((n) => n.startsWith(prefixoDaPeca(PECA))).length).toBe(resultado.imagens.filter((i) => i.tipo !== 'outra').length);
+    expect(JSON.parse(readFileSync(resultado.manifesto, 'utf8')).rodada).toBeNull();
+    expect(imprimir(resultado)).toContain('PASTA DO PACOTE (a de --saida');
+  }, 60_000);
+
+  it('apagarPacotesAntigos e pacotesDaPeca só veem pastas rodada-NN', () => {
+    const daPeca = mkdtempSync(join(area, 'antigos-'));
+    for (const n of ['rodada-02', 'rodada-05', 'rodada-06', 'rodada-10', 'rodada-x', 'superficie']) mkdirSync(join(daPeca, n));
+    expect(pacotesDaPeca(daPeca).map((p) => p.numero)).toEqual([2, 5, 6, 10]);
+    expect(pacotesDaPeca(join(daPeca, 'nao-existe'))).toEqual([]);
+    const feito = apagarPacotesAntigos(daPeca, 7);
+    expect(feito.anterior.numero).toBe(6);
+    expect(feito.apagadas.map((p) => p.numero)).toEqual([2, 5]);
+    expect(feito.adiante.map((p) => p.numero)).toEqual([10]);
+    expect(readdirSync(daPeca).sort()).toEqual(['rodada-06', 'rodada-10', 'rodada-x', 'superficie']);
+  });
+});
+
+describe('a resolução e a câmera de cada imagem no pacote', () => {
+  const PECA = 'tools/fixtures/referencia-do-plano/presente/receita.js';
+
+  it('o tipo da captura sai das opções dela, e cada tipo tem uma resolução só', () => {
+    expect(tipoDaCaptura({ revisar: true })).toBe('conjunto');
+    expect(tipoDaCaptura({ vistas: 'traseira', projecao: 'ortografica' })).toBe('conjunto');
+    expect(tipoDaCaptura({ arame: true })).toBe('arame');
+    expect(tipoDaCaptura({ arame: 'raio-x' })).toBe('raio-x');
+    expect(tipoDaCaptura({ selecionadas: 'bloco', modo: 'isolar' })).toBe('parte');
+    expect(tipoDaCaptura({ selecionadas: 'bloco', mirar: [0, 0, 0] })).toBe('de-perto');
+    expect(tipoDaCaptura({ visao: 'zebra' })).toBe('reflexo');
+    expect(tipoDaCaptura({ visao: 'pintura' })).toBe('reflexo');
+    expect(tipoDaCaptura({ visao: 'luz-rasante' })).toBe('superficie');
+    expect(tipoDaCaptura({ visao: 'curvatura' })).toBe('superficie');
+    expect(RESOLUCAO_POR_TIPO).toEqual({ conjunto: '1100x1450', arame: '1100x1450', 'raio-x': '1100x1450', parte: '900x900', 'de-perto': '900x900', reflexo: '900x900', superficie: '900x900', montada: '1200x1000' });
+    expect(Object.isFrozen(RESOLUCAO_POR_TIPO)).toBe(true);
+  });
+
+  it('a resolução é lida do cabeçalho do PNG, e o que não é PNG fica sem ela', () => {
+    expect(resolucaoDoPng(pngLiso(7, 5))).toEqual({ largura: 7, altura: 5 });
+    expect(resolucaoDoPng(Buffer.from('não é imagem, é texto de mais de vinte e quatro bytes'))).toBeNull();
+    expect(resolucaoDoPng(Buffer.alloc(3))).toBeNull();
+  });
+
+  it('cada captura sai na resolução do tipo, e o pacote.json grava a resolução medida e a câmera de cada imagem', async () => {
+    const base = mkdtempSync(join(area, 'resolucao-'));
+    const bancada = bancadaDePng(base, PECA);
+    const resultado = await vistasParaCritica(PECA, { saida: join(base, 'rodada'), pastaDasCapturas: base, dependencias: { medirReceita: medirPassa, olharBancada: bancada.fazer, rodadasAnteriores: () => [] } });
+    for (const c of bancada.chamadas) expect(c.res).toBe(RESOLUCAO_POR_TIPO[tipoDaCaptura(c)]);
+    const manifesto = JSON.parse(readFileSync(resultado.manifesto, 'utf8'));
+    expect(manifesto.resolucoes).toEqual({ ...RESOLUCAO_POR_TIPO });
+    expect(manifesto.imagens).toEqual(resultado.imagens);
+    const capturadas = bancada.chamadas.flatMap((c) => (c.revisar ? ['isometrica', 'frontal', 'direita', 'superior'] : String(c.vistas).split(',')));
+    expect(manifesto.imagens.length).toBe(capturadas.length);
+    for (const i of manifesto.imagens) {
+      expect(existsSync(join(resultado.pasta, i.arquivo))).toBe(true);
+      expect(`${i.resolucao.largura}x${i.resolucao.altura}`).toBe(RESOLUCAO_POR_TIPO[i.tipo]);
+      expect(i.pedida).toBe(RESOLUCAO_POR_TIPO[i.tipo]);
+      expect(i.camera.vista).toBe(i.vista);
+      expect(i.camera.enquadramento).toEqual({ largura: 0.8, altura: 0.5, area: 0.4, cortado: false });
+    }
+    const frontal = manifesto.imagens.find((i) => i.arquivo === `${prefixoDaPeca(PECA)}frontal.png`);
+    expect(frontal).toMatchObject({ tipo: 'conjunto', vista: 'frontal', resolucao: { largura: 1100, altura: 1450 }, camera: { vista: 'frontal', revisar: true } });
+    const arame = manifesto.imagens.find((i) => i.tipo === 'arame' && i.vista === 'traseira');
+    expect(arame.camera).toMatchObject({ projecao: 'ortografica', arame: true });
+    expect(manifesto.imagens.find((i) => i.tipo === 'raio-x').camera.arame).toBe('raio-x');
+    expect(resultado.avisos.filter((a) => a.includes('saiu em'))).toEqual([]);
+  }, 60_000);
+
+  it('a imagem que sai fora da resolução do tipo vira aviso, com as duas resoluções', async () => {
+    const base = mkdtempSync(join(area, 'fora-da-resolucao-'));
+    const bancada = bancadaDePng(base, PECA, { forcar: '8x6' });
+    const resultado = await vistasParaCritica(PECA, { saida: join(base, 'rodada'), pastaDasCapturas: base, dependencias: { medirReceita: medirPassa, olharBancada: bancada.fazer, rodadasAnteriores: () => [] } });
+    expect(resultado.avisos.join('\n')).toContain(`a imagem ${prefixoDaPeca(PECA)}frontal.png saiu em 8x6, e a resolução do tipo 'conjunto' é 1100x1450`);
+  }, 60_000);
+
+  it('as vistas de superfície, as montadas e a conferência do Blender entram com a câmera, e o resto da pasta como outra', () => {
+    const pasta = mkdtempSync(join(area, 'imagens-'));
+    mkdirSync(join(pasta, 'superficie'));
+    mkdirSync(join(pasta, 'conferencia-do-blender', 'superficie'), { recursive: true });
+    mkdirSync(join(pasta, PASTA_DO_ANTES_E_DEPOIS));
+    const por = (nome, l, a) => { const arquivo = join(pasta, nome); writeFileSync(arquivo, pngLiso(l, a)); return arquivo; };
+    const superficie = { rasante: [{ arquivo: por('superficie/peca-lado-rasante-az30.png', 9, 9), vista: 'lado', azimute: 30, elevacao: 10 }], curvatura: [{ arquivo: por('superficie/peca-lado-curvatura-legenda.png', 9, 12), vista: 'lado' }] };
+    const conferenciaDoBlender = { rasante: [{ arquivo: por('conferencia-do-blender/superficie/peca-lado-rasante-az30.png', 16, 12), vista: 'lado', azimute: 30 }], curvatura: [] };
+    const montada = { instancia: 'motor', arquivos: [por('etapas-frontal.png', 12, 10)], enquadramentos: [{ vista: 'frontal', largura: 0.5, altura: 0.4, cortado: false }] };
+    por('sobreposicao-x.png', 5, 4);
+    por(`${PASTA_DO_ANTES_E_DEPOIS}/feita-antes.png`, 5, 4);
+    writeFileSync(join(pasta, 'pedido.md'), 'texto');
+    const imagens = imagensDoPacote({ pasta, peca: 'x/y', superficie, montada, conferenciaDoBlender });
+    expect(imagens).toEqual([
+      { arquivo: 'superficie/peca-lado-rasante-az30.png', tipo: 'superficie', vista: 'lado', camera: { vista: 'lado', visao: 'luz-rasante', azimuteDaLuz: 30, elevacaoDaLuz: 10 }, resolucao: { largura: 9, altura: 9 } },
+      { arquivo: 'superficie/peca-lado-curvatura-legenda.png', tipo: 'superficie', vista: 'lado', camera: { vista: 'lado', visao: 'curvatura' }, resolucao: { largura: 9, altura: 12 } },
+      { arquivo: 'conferencia-do-blender/superficie/peca-lado-rasante-az30.png', tipo: 'blender', vista: 'lado', camera: { vista: 'lado', visao: 'luz-rasante', azimuteDaLuz: 30 }, resolucao: { largura: 16, altura: 12 } },
+      { arquivo: 'etapas-frontal.png', tipo: 'montada', vista: 'frontal', pedida: '1200x1000', camera: { vista: 'frontal', foco: 'motor', enquadramento: { largura: 0.5, altura: 0.4, cortado: false } }, resolucao: { largura: 12, altura: 10 } },
+      { arquivo: 'sobreposicao-x.png', tipo: 'outra', vista: null, camera: null, resolucao: { largura: 5, altura: 4 } },
+    ]);
+  });
+});
+
+describe('o antes e depois de uma imagem entre a rodada atual e a anterior', () => {
+  const PECA = 'carro-de-ensaio/lataria';
+  const IMAGEM = 'bancada-carro-de-ensaio-lataria-direita-visao-zebra-enquadrado.png';
+  const CAMERA = { vista: 'direita', visao: 'zebra', enquadrar: true, enquadramento: { largura: 0.9, altura: 0.4, area: 0.36, cortado: false } };
+  const VERDE = [10, 200, 30];
+  const AZUL = [20, 40, 220];
+
+  /* dois pacotes numerados de uma peça, com a mesma imagem em cores diferentes; `mudar` altera o manifesto de um deles antes de gravar */
+  function pacotes({ mudarAnterior = (d) => d, mudarAtual = (d) => d, tamanhoAnterior = [8, 6], tamanhoAtual = [8, 6] } = {}) {
+    const base = mkdtempSync(join(area, 'par-'));
+    const daPeca = pastaDaRodada(PECA, base);
+    const um = (numero, cor, [l, a], mudar) => {
+      const pasta = join(daPeca, nomeDaPastaDoPacote(numero));
+      mkdirSync(pasta, { recursive: true });
+      writeFileSync(join(pasta, IMAGEM), pngLiso(l, a, cor));
+      writeFileSync(join(pasta, 'outra-direita-visao-zebra.png'), pngLiso(l, a, cor));
+      const dado = mudar({
+        formato: 'modelar.pacote-do-critico', versao: 1, peca: PECA, receita: `sha256:${String(numero).repeat(8)}abcdef`, rodada: numero,
+        imagens: [
+          { arquivo: IMAGEM, tipo: 'reflexo', vista: 'direita', pedida: '900x900', camera: CAMERA, resolucao: { largura: l, altura: a } },
+          { arquivo: 'outra-direita-visao-zebra.png', tipo: 'outra', vista: null, camera: null, resolucao: { largura: l, altura: a } },
+        ],
+      });
+      if (dado !== null) writeFileSync(join(pasta, 'pacote.json'), typeof dado === 'string' ? dado : JSON.stringify(dado));
+      return pasta;
+    };
+    const anterior = um(6, VERDE, tamanhoAnterior, mudarAnterior);
+    const atual = um(7, AZUL, tamanhoAtual, mudarAtual);
+    return { base, daPeca, anterior, atual };
+  }
+  const feito = (p, imagem = IMAGEM) => antesEDepois(PECA, { ...pastasDoAntesEDepois(PECA, { base: p.base }), imagem });
+  const recusa = (p, imagem = IMAGEM) => { try { feito(p, imagem); } catch (erro) { return erro.message; } return null; };
+  const corEm = (png, x, y) => { const i = (y * png.width + x) * 4; return [png.data[i], png.data[i + 1], png.data[i + 2]]; };
+
+  it('põe a anterior à esquerda e a atual à direita, com o nome e a receita de cada uma, e grava no pacote atual', () => {
+    const p = pacotes();
+    expect(pastasDoAntesEDepois(PECA, { base: p.base })).toEqual({ atual: p.atual, anterior: p.anterior });
+    const r = feito(p);
+    expect(r.arquivo).toBe(join(p.atual, PASTA_DO_ANTES_E_DEPOIS, IMAGEM));
+    expect(r.antes).toMatchObject({ pasta: p.anterior, nome: 'rodada-06', receita: 'sha256:66666666abcdef' });
+    expect(r.depois).toMatchObject({ pasta: p.atual, nome: 'rodada-07', receita: 'sha256:77777777abcdef' });
+    expect(r.resolucao).toEqual({ largura: 8, altura: 6 });
+    expect(r.camera).toEqual({ vista: 'direita', visao: 'zebra', enquadrar: true });
+    expect(r.avisos).toEqual([]);
+    const png = PNG.sync.read(readFileSync(r.arquivo));
+    /* duas imagens de 8 por 6, três margens de 16 e a faixa dos nomes de 64 em cima */
+    expect([png.width, png.height]).toEqual([8 + 8 + 3 * 16, 64 + 6 + 16]);
+    expect(corEm(png, 16 + 3, 64 + 3)).toEqual(VERDE);
+    expect(corEm(png, 16 + 8 + 16 + 3, 64 + 3)).toEqual(AZUL);
+    expect(corEm(png, 16 + 8 + 4, 64 + 3)).toEqual([255, 255, 255]);
+    /* os nomes estão escritos: há tinta na faixa de cima, dos dois lados */
+    const tinta = (x0, x1) => { let n = 0; for (let y = 30; y < 60; y++) for (let x = x0; x < x1; x++) if (corEm(png, x, y).join() !== '255,255,255') n += 1; return n; };
+    expect(tinta(16, 24)).toBeGreaterThan(0);
+    expect(tinta(40, 48)).toBeGreaterThan(0);
+    const relato = relatorioDoAntesEDepois(PECA, r);
+    expect(relato).toContain(`antes (à esquerda): ${p.anterior}, receita sha256:66666666abcdef; a peça ocupa 90 % da largura e 40 % da altura do quadro`);
+    expect(relato).toContain(`depois (à direita): ${p.atual}`);
+    expect(relato).toContain('8x6 cada lado');
+    /* o trecho que só uma imagem tem vale como o nome inteiro, e o nome exato ganha do trecho */
+    expect(feito(p, 'lataria-direita').imagem).toBe(IMAGEM);
+    expect(feito(p, 'outra-direita-visao-zebra.png').imagem).toBe('outra-direita-visao-zebra.png');
+  });
+
+  it('as pastas dadas ganham das numeradas, e o antes e depois já feito não entra no pacote seguinte como imagem', () => {
+    const p = pacotes();
+    const fora = mkdtempSync(join(area, 'guardado-'));
+    for (const n of readdirSync(p.anterior)) writeFileSync(join(fora, n), readFileSync(join(p.anterior, n)));
+    expect(pastasDoAntesEDepois(PECA, { base: p.base, anterior: fora })).toEqual({ atual: p.atual, anterior: fora });
+    expect(pastasDoAntesEDepois(PECA, { base: join(p.base, 'vazia'), atual: p.atual, anterior: fora })).toEqual({ atual: p.atual, anterior: fora });
+    const r = antesEDepois(PECA, { atual: p.atual, anterior: fora, imagem: IMAGEM });
+    expect(r.antes.nome).toBe(basename(fora));
+    expect(imagensDoPacote({ pasta: p.atual, peca: PECA }).map((i) => i.arquivo)).toEqual([IMAGEM, 'outra-direita-visao-zebra.png']);
+  });
+
+  it('avisa quando o enquadramento mudou entre as duas, porque a escala das imagens deixa de ser a mesma', () => {
+    const maior = { ...CAMERA, enquadramento: { ...CAMERA.enquadramento, altura: CAMERA.enquadramento.altura + 2 * FOLGA_DO_ENQUADRAMENTO } };
+    const p = pacotes({ mudarAtual: (d) => ({ ...d, imagens: d.imagens.map((i) => (i.camera ? { ...i, camera: maior } : i)) }) });
+    const r = feito(p);
+    expect(r.avisos).toEqual(['a peça ocupava 90 % da largura e 40 % da altura do quadro antes e ocupa 90 % da largura e 42 % da altura depois: a bancada enquadra pela caixa da peça, a caixa mudou, e a escala das duas imagens não é a mesma.']);
+    expect(relatorioDoAntesEDepois(PECA, r)).toContain('AVISO: a peça ocupava');
+  });
+
+  it('recusa quando a anterior não existe, dizendo o que achou e o comando', () => {
+    const p = pacotes();
+    rmSync(p.anterior, { recursive: true });
+    expect(() => pastasDoAntesEDepois(PECA, { base: p.base })).toThrow(`achou só o pacote de ${p.atual}, e a anterior não existe em ${p.daPeca}; esperado dois pacotes`);
+    expect(() => pastasDoAntesEDepois(PECA, { base: p.base })).toThrow(`npm run vistas:critica -- ${PECA} --antes-e-depois=<imagem> --pacote-anterior=<pasta>`);
+    /* a pasta de número maior que a atual dada não serve de anterior */
+    expect(() => pastasDoAntesEDepois(PECA, { base: p.base, atual: join(p.base, 'avulsa') })).not.toThrow();
+  });
+
+  it('recusa quando a peça não tem pacote numerado nenhum', () => {
+    const base = mkdtempSync(join(area, 'sem-pacote-'));
+    expect(() => pastasDoAntesEDepois(PECA, { base })).toThrow(`não achou pacote em ${pastaDaRodada(PECA, base)} (nenhuma pasta rodada-NN); esperado o pacote desta rodada e o da anterior`);
+  });
+
+  it('recusa a pasta sem pacote.json, o pacote.json que não é JSON e o pacote gravado antes de listar as imagens', () => {
+    expect(recusa(pacotes({ mudarAnterior: () => null }))).toContain('como pacote anterior a pasta');
+    expect(recusa(pacotes({ mudarAnterior: () => null }))).toContain('que não tem pacote.json; esperado o pacote que o vistas:critica grava');
+    expect(recusa(pacotes({ mudarAtual: () => '{ quebrado' }))).toContain('que não é JSON válido');
+    const antigo = recusa(pacotes({ mudarAnterior: ({ imagens: _fora, ...resto }) => resto }));
+    expect(antigo).toContain('o pacote anterior em');
+    expect(antigo).toContain('não lista as imagens com a resolução e a câmera');
+    expect(antigo).toContain(`npm run vistas:critica -- ${PECA}`);
+    expect(recusa(pacotes({ mudarAtual: (d) => ({ ...d, formato: 'outro' }) }))).toContain('o pacote atual em');
+  });
+
+  it('recusa o pacote de outra peça', () => {
+    const m = recusa(pacotes({ mudarAnterior: (d) => ({ ...d, peca: 'outra/peca' }) }));
+    expect(m).toContain(`é da peça 'outra/peca', e o antes e depois foi pedido para '${PECA}'; esperado dois pacotes da mesma peça`);
+    expect(m).toContain('--pacote-anterior=<pasta>');
+  });
+
+  it('recusa a imagem que o pacote atual não tem, listando as que tem, e o trecho que casa com mais de uma', () => {
+    const p = pacotes();
+    const falta = recusa(p, 'frontal-visao-zebra');
+    expect(falta).toContain('recebeu a imagem "frontal-visao-zebra", que o pacote atual');
+    expect(falta).toContain(`não tem; esperado o nome de uma destas, ou um trecho que só uma tenha:\n  ${IMAGEM}\n  outra-direita-visao-zebra.png`);
+    const vazia = recusa(p, '');
+    expect(vazia).toContain('recebeu a imagem ""');
+    const duas = recusa(p, 'direita-visao-zebra');
+    expect(duas).toContain('recebeu "direita-visao-zebra", que casa com 2 imagens do pacote atual; esperado um trecho que só uma tenha');
+    expect(duas).toContain(`  ${IMAGEM}\n  outra-direita-visao-zebra.png`);
+  });
+
+  it('recusa a imagem que a rodada anterior não capturou', () => {
+    const m = recusa(pacotes({ mudarAnterior: (d) => ({ ...d, imagens: d.imagens.slice(1) }) }));
+    expect(m).toContain(`recebeu a imagem ${IMAGEM}, e o pacote anterior`);
+    expect(m).toContain('a rodada anterior não capturou essa vista; esperado uma imagem que as duas rodadas tenham');
+  });
+
+  it('recusa quando a câmera difere, dizendo as duas, e o enquadramento medido não conta como câmera', () => {
+    const girada = { ...CAMERA, anguloDaZebra: 90 };
+    const m = recusa(pacotes({ mudarAnterior: (d) => ({ ...d, imagens: d.imagens.map((i) => (i.camera ? { ...i, camera: girada } : i)) }) }));
+    expect(m).toContain(`o antes e depois de ${IMAGEM} recebeu duas câmeras diferentes: a anterior foi tirada com {"anguloDaZebra":90,"enquadrar":true,"visao":"zebra","vista":"direita"} e a atual com {"enquadrar":true,"visao":"zebra","vista":"direita"}`);
+    expect(m).toContain('esperado a mesma câmera nas duas');
+    /* a luz que a bancada escolheu também é câmera */
+    const outraLuz = recusa(pacotes({ mudarAtual: (d) => ({ ...d, imagens: d.imagens.map((i) => (i.camera ? { ...i, camera: { ...CAMERA, azimuteDaLuz: 120 } } : i)) }) }));
+    expect(outraLuz).toContain('recebeu duas câmeras diferentes');
+  });
+
+  it('recusa quando a resolução difere, dizendo as duas e a do tipo', () => {
+    const resolucao = (l, a) => (d) => ({ ...d, imagens: d.imagens.map((i) => ({ ...i, resolucao: { largura: l, altura: a } })) });
+    const m = recusa(pacotes({ tamanhoAnterior: [12, 6], mudarAnterior: resolucao(12, 6) }));
+    expect(m).toContain(`o antes e depois de ${IMAGEM} recebeu duas resoluções diferentes: a anterior tem 12x6 e a atual 8x6; esperado a mesma resolução nas duas (a do tipo 'reflexo', 900x900)`);
+    const semMedida = recusa(pacotes({ mudarAnterior: (d) => ({ ...d, imagens: d.imagens.map((i) => ({ ...i, resolucao: null })) }) }));
+    expect(semMedida).toContain('a anterior tem sem resolução lida e a atual 8x6');
+  });
+
+  it('recusa a imagem que o pacote cita e sumiu do disco', () => {
+    const p = pacotes();
+    rmSync(join(p.anterior, IMAGEM));
+    expect(recusa(p)).toContain(`que o pacote.json de ${p.anterior} cita e não existe mais no disco`);
+  });
+
+  describe('pela linha de comando', () => {
+    const rodar = (...args) => spawnSync(process.execPath, [join(import.meta.dirname, 'vistas-para-critica.mjs'), ...args], { encoding: 'utf8', timeout: 30_000 });
+
+    it('monta o par com as duas pastas dadas e sai com 0; a recusa sai com 1 e o uso errado com 2', () => {
+      const p = pacotes();
+      const r = rodar(PECA, `--antes-e-depois=${IMAGEM}`, `--pacote-atual=${p.atual}`, `--pacote-anterior=${p.anterior}`);
+      expect(r.stderr).toBe('');
+      expect(r.status).toBe(0);
+      expect(r.stdout).toContain(join(p.atual, PASTA_DO_ANTES_E_DEPOIS, IMAGEM));
+      expect(existsSync(join(p.atual, PASTA_DO_ANTES_E_DEPOIS, IMAGEM))).toBe(true);
+      const recusada = rodar(PECA, '--antes-e-depois=nao-ha', `--pacote-atual=${p.atual}`, `--pacote-anterior=${p.anterior}`);
+      expect(recusada.status).toBe(1);
+      expect(recusada.stderr).toContain('que o pacote atual');
+      const errada = rodar(PECA, '--antes-e-depois');
+      expect(errada.status).toBe(2);
+      expect(errada.stderr).toContain('--antes-e-depois=<imagem>');
+      expect(AJUDA).toContain('--antes-e-depois=<imagem> [--pacote-atual=<pasta>] [--pacote-anterior=<pasta>]');
+    }, 90_000);
   });
 });

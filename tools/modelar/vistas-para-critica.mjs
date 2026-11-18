@@ -65,6 +65,12 @@
  * A pasta traz ainda o `pacote.json`, com a impressão do texto da receita que o pacote mostra e as imagens de superfície: é por ele
  * que o registro da rodada sabe se o crítico de peça de lataria recebeu as duas vistas da versão medida.
  *
+ * UMA PASTA POR RODADA (2026-11-18, plano das ferramentas das rodadas, fatia 4). O pacote inteiro, com as capturas da bancada, mora na
+ * pasta de `--saida` ou em `tools/bancadas/out/critica-<peça>/rodada-NN/`, fora do git, com NN o número da próxima rodada a registrar;
+ * ficam essa pasta e a da rodada anterior. O `pacote.json` grava a rodada, a resolução de cada tipo de imagem (`RESOLUCAO_POR_TIPO`, a
+ * mesma em todas as rodadas) e, de cada imagem, a resolução medida no PNG e a câmera. `--antes-e-depois=<imagem>` põe a imagem da rodada
+ * anterior e a desta lado a lado, com o nome de cada uma, e recusa quando a anterior não existe ou a câmera ou a resolução diferem.
+ *
  * A luz rasante que não alcança a peça (cuba aberta em cima vista de cima) não derruba o pacote: a da bancada já sobe sozinha do plano da
  * imagem quando a vista pede, e a imagem que fica abaixo do limiar sai do pedido com uma frase (na conferência do Blender, a vista é
  * refeita com a luz mais alta, 20, 30 e 45 graus); só sem nenhuma imagem de luz rasante o pacote é recusado. A vista montada em que as outras peças tapam a peça em
@@ -81,6 +87,7 @@
  *
  * Uso: node tools/modelar/vistas-para-critica.mjs <peça> [--saida=<pasta da rodada>] [--prazo=<segundos de carga por captura>] [--sem-medir] [--com-blender]
  *      [--referencia=<caminho absoluto da imagem>[@<vista>] [--orientacao-da-referencia=<texto>]]... [--ajuda]
+ *      node tools/modelar/vistas-para-critica.mjs <peça> --antes-e-depois=<imagem> [--pacote-atual=<pasta>] [--pacote-anterior=<pasta>]
  *
  * `--orientacao-da-referencia=<texto>` diz em palavras como a imagem da `--referencia` anterior está girada ou espelhada (foto em
  * diagonal, por exemplo); o pedido a escreve no lugar da frase dos eixos. Sem ela, o pedido avisa que a referência externa pode estar
@@ -91,7 +98,7 @@ import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync,
 import { basename, dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { VISTA_DO_ESBOCO, ladoDaVistaDaBancada, linhaDaVista } from './lados-das-vistas.mjs';
-import { paraPng } from './leitura-por-regioes.mjs';
+import { colar, dePng, paraPng } from './leitura-por-regioes.mjs';
 import { prepararSolido } from '../../src/autoria/contato-de-solidos.js';
 import { doAmbiente } from '../ambiente.mjs';
 import { avisarReferenciasLocaisAusentes, avisoDasReferenciasIgnoradas, mensagemDeReferenciasAusentes, referenciasDoPlano, referenciasSemLeitura } from './referencias-do-plano.mjs';
@@ -111,7 +118,7 @@ import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { blocoDasPerguntas, perguntasDaPecaArquivo } from './perguntas-da-peca.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 import {
-  LADO_DA_VISTA_DE_SUPERFICIE, LIMIAR_DA_LUZ_RASANTE, MANIFESTO_DO_PACOTE, MINIMO_DE_QUINA, PASTA_DA_SUPERFICIE, SAIDA_PADRAO, comandoDasVistasDoBlender, exigirLuzNaSuperficie, gravarManifesto, imagensEscuras,
+  FORMATO_DO_MANIFESTO, LADO_DA_VISTA_DE_SUPERFICIE, LIMIAR_DA_LUZ_RASANTE, MANIFESTO_DO_PACOTE, MINIMO_DE_QUINA, PASTA_DA_SUPERFICIE, RES_DA_SUPERFICIE, SAIDA_PADRAO, comandoDasVistasDoBlender, exigirLuzNaSuperficie, gravarManifesto, imagensEscuras,
   impressaoDoTexto, pastaDaRodada, superficieDaBancada, superficieDaPecaMedida, vistasDeSuperficie,
 } from './vistas-de-superficie.mjs';
 
@@ -214,9 +221,258 @@ function limparPastaDaRodada(pasta) {
   rmSync(join(pasta, 'alvo'), { recursive: true, force: true });
   rmSync(join(pasta, PASTA_DA_SUPERFICIE), { recursive: true, force: true });
   rmSync(join(pasta, PASTA_DA_CONFERENCIA_DO_BLENDER), { recursive: true, force: true });
+  rmSync(join(pasta, PASTA_DO_ANTES_E_DEPOIS), { recursive: true, force: true });
+  rmSync(join(pasta, ARQUIVO_DOS_DADOS_DO_PEDIDO), { force: true });
   for (const nome of readdirSync(pasta)) {
-    if (/^(etapas|sobreposicao|corte)-.*\.png$/.test(nome)) rmSync(join(pasta, nome));
+    if (/^(etapas|sobreposicao|corte)-.*\.png$/.test(nome) || /^(prancha-desenhada|contorno-sobreposto)[-.].*\.(png|json|svg)$/.test(nome)) rmSync(join(pasta, nome));
   }
+}
+
+/* ---------- a pasta por rodada, a resolução e a câmera de cada imagem, e o antes e depois ----------
+ *
+ * Até 2026-11-18 as capturas da bancada iam todas para `tools/bancadas/out/` e o resto do pacote para `critica-<peça>/`, e a rodada
+ * seguinte sobrescrevia as duas: nas rodadas 6 e 7 do quarto traseiro do carro quem conduzia copiou as imagens à mão para comparar o
+ * antes e o depois na mesma câmera, e `--saida` levava só `superficie/` e os pedidos. Agora o pacote inteiro mora numa pasta só, a de
+ * `--saida` ou `critica-<peça>/rodada-NN/`, com NN o número da próxima rodada a registrar (o mesmo que `rodada-de-modelagem.mjs` dá ao
+ * registro, e é dessa pasta que `--registrar` lê o `pacote.json`). Ficam a pasta desta rodada e a da anterior; as mais antigas saem, e só
+ * pastas `rodada-NN` de dentro da pasta da própria peça. O `pacote.json` diz, de cada imagem, a resolução medida no PNG e a câmera
+ * (a vista, a projeção, o que foi selecionado, a visão, a luz e o enquadramento que a bancada mediu), e `--antes-e-depois=<imagem>` monta
+ * as duas rodadas lado a lado, recusando quando a anterior não existe ou a câmera ou a resolução diferem. */
+export const PASTA_DO_ANTES_E_DEPOIS = 'antes-e-depois';
+const PASTA_NUMERADA = /^rodada-(\d{2,})$/;
+const nomeDaPastaNumerada = (numero) => `rodada-${String(numero).padStart(2, '0')}`;
+/* A RESOLUÇÃO É FIXA POR TIPO DE IMAGEM, a mesma em todas as rodadas: a captura do pacote não aceita outra, porque duas rodadas em
+   resoluções diferentes não se comparam ponto a ponto. */
+export const RESOLUCAO_POR_TIPO = Object.freeze({
+  conjunto: RES_CONJUNTO, arame: RES_CONJUNTO, 'raio-x': RES_CONJUNTO, parte: RES_PARTE, 'de-perto': RES_DE_PERTO,
+  reflexo: RES_DO_REFLEXO, superficie: RES_DA_SUPERFICIE, montada: `${QUADRO_MONTADO.largura}x${QUADRO_MONTADO.altura}`,
+});
+const VISOES_DA_SUPERFICIE = Object.freeze(['luz-rasante', 'curvatura']);
+/** O tipo de uma captura da bancada, pelas opções dela: é ele que escolhe a resolução em `RESOLUCAO_POR_TIPO`. */
+export function tipoDaCaptura(opcoes) {
+  if (opcoes.visao) return VISOES_DA_SUPERFICIE.includes(opcoes.visao) ? 'superficie' : 'reflexo';
+  if (opcoes.mirar) return 'de-perto';
+  if (opcoes.selecionadas) return 'parte';
+  if (opcoes.arame === 'raio-x') return 'raio-x';
+  if (opcoes.arame) return 'arame';
+  return 'conjunto';
+}
+
+/** A largura e a altura de um PNG, lidas do cabeçalho; `null` quando o arquivo não é PNG. */
+export function resolucaoDoPng(buffer) {
+  if (!buffer || buffer.length < 24 || buffer.readUInt32BE(0) !== 0x89504e47 || buffer.toString('latin1', 12, 16) !== 'IHDR') return null;
+  return { largura: buffer.readUInt32BE(16), altura: buffer.readUInt32BE(20) };
+}
+const resolucaoDoArquivo = (arquivo) => { try { return resolucaoDoPng(readFileSync(arquivo)); } catch { return null; } };
+const emTexto = (r) => (r ? `${r.largura}x${r.altura}` : 'sem resolução lida');
+
+/* A câmera de uma imagem capturada: o que da chamada decide de onde e como a bancada olha, a luz que a visão de luz rasante escolheu
+   e o enquadramento medido. Só o que foi pedido entra, para duas rodadas com as mesmas opções darem o mesmo texto. */
+const CAMPOS_DA_CAMERA = Object.freeze(['projecao', 'revisar', 'enquadrar', 'selecionadas', 'modo', 'focar', 'arame', 'visao', 'anguloDaZebra', 'azimute', 'mirar', 'distancia']);
+function cameraDaCaptura(opcoes, resposta, indice, vista) {
+  const camera = { vista };
+  for (const campo of CAMPOS_DA_CAMERA) if (opcoes[campo] !== undefined && opcoes[campo] !== null && opcoes[campo] !== false) camera[campo] = opcoes[campo];
+  const luz = opcoes.visao === 'luz-rasante' ? resposta?.resultado?.visao?.dados : null;
+  if (Number.isFinite(Number(luz?.azimute)) && opcoes.azimute == null) camera.azimuteDaLuz = Number(luz.azimute);
+  if (Number.isFinite(Number(luz?.elevacao))) camera.elevacaoDaLuz = Number(luz.elevacao);
+  const e = resposta?.resultado?.vistas?.[indice]?.enquadramento ?? null;
+  if (e) camera.enquadramento = { largura: e.largura, altura: e.altura, area: e.area, cortado: Boolean(e.cortado) };
+  return camera;
+}
+
+/* As capturas da bancada saem em `tools/bancadas/out/`, que é de todas as peças. Cada uma é levada para a pasta do pacote logo depois de
+   feita, e a resposta passa a dizer o caminho novo, que é o que o pedido e o manifesto citam. */
+function levarParaAPasta(resposta, pasta) {
+  const arquivos = resposta?.resultado?.arquivos;
+  if (!Array.isArray(arquivos) || !arquivos.length) return resposta;
+  const levados = arquivos.map((arquivo) => {
+    if (typeof arquivo !== 'string' || !existsSync(arquivo) || resolve(dirname(arquivo)) === pasta) return arquivo;
+    const destino = join(pasta, basename(arquivo));
+    copyFileSync(arquivo, destino);
+    rmSync(arquivo);
+    return destino;
+  });
+  return { ...resposta, resultado: { ...resposta.resultado, arquivos: levados } };
+}
+
+const relativoAoPacote = (pasta, arquivo) => relative(pasta, arquivo).split(/[\\/]/).join('/');
+function pngsDaPasta(pasta, sob = '') {
+  if (!existsSync(join(pasta, sob))) return [];
+  return readdirSync(join(pasta, sob), { withFileTypes: true }).flatMap((e) => {
+    const nome = sob ? `${sob}/${e.name}` : e.name;
+    if (e.isDirectory()) return e.name === PASTA_DO_ANTES_E_DEPOIS ? [] : pngsDaPasta(pasta, nome);
+    return e.name.toLowerCase().endsWith('.png') ? [nome] : [];
+  }).sort();
+}
+
+/**
+ * As imagens do pacote para o `pacote.json`: `[{ arquivo, tipo, vista, resolucao, pedida?, camera }]`, com `arquivo` relativo à pasta do
+ * pacote, `resolucao` medida no PNG e `pedida` a resolução do tipo. Entram as capturas da bancada (`capturas`, como `capturar` as
+ * anota), as vistas de superfície, as montadas e a conferência do Blender; toda outra imagem da pasta entra como `outra`, sem câmera.
+ */
+export function imagensDoPacote({ pasta, peca, capturas = [], superficie = null, montada = null, conferenciaDoBlender = null }) {
+  const imagens = new Map();
+  const por = (arquivo, dado) => {
+    const nome = relativoAoPacote(pasta, arquivo);
+    if (nome.startsWith('..') || isAbsolute(nome)) return;
+    imagens.set(nome, { arquivo: nome, ...dado, resolucao: resolucaoDoArquivo(arquivo) });
+  };
+  for (const { tipo, opcoes, resposta } of capturas) {
+    arquivosDe(resposta).forEach((arquivo, i) => {
+      const vista = resposta?.resultado?.vistas?.[i]?.nome ?? vistaDoArquivo(arquivo, peca) ?? 'vista';
+      por(arquivo, { tipo, vista, pedida: RESOLUCAO_POR_TIPO[tipo], camera: cameraDaCaptura(opcoes, resposta, i, vista) });
+    });
+  }
+  const daSuperficie = (lida, tipo) => {
+    for (const { arquivo, vista, azimute, elevacao } of lida?.rasante ?? []) {
+      por(arquivo, { tipo, vista, camera: { vista, visao: 'luz-rasante', ...(azimute != null ? { azimuteDaLuz: azimute } : {}), ...(elevacao != null ? { elevacaoDaLuz: elevacao } : {}) } });
+    }
+    for (const { arquivo, vista } of lida?.curvatura ?? []) por(arquivo, { tipo, vista, camera: { vista, visao: 'curvatura' } });
+  };
+  daSuperficie(superficie, 'superficie');
+  daSuperficie(conferenciaDoBlender, 'blender');
+  (montada?.arquivos ?? []).forEach((arquivo, i) => {
+    const e = montada.enquadramentos?.[i] ?? {};
+    por(arquivo, {
+      tipo: 'montada', vista: e.vista ?? 'vista', pedida: RESOLUCAO_POR_TIPO.montada,
+      camera: { vista: e.vista ?? 'vista', foco: montada.instancia, ...(e.largura != null ? { enquadramento: { largura: e.largura, altura: e.altura, cortado: Boolean(e.cortado) } } : {}) },
+    });
+  });
+  for (const nome of pngsDaPasta(pasta)) if (!imagens.has(nome)) imagens.set(nome, { arquivo: nome, tipo: 'outra', vista: null, camera: null, resolucao: resolucaoDoArquivo(join(pasta, nome)) });
+  return [...imagens.values()];
+}
+
+/** Os pacotes numerados de uma peça, em ordem: `[{ numero, pasta }]`, só as pastas `rodada-NN` de dentro de `pastaDaPeca`. */
+export function pacotesDaPeca(pastaDaPeca) {
+  if (!existsSync(pastaDaPeca)) return [];
+  return readdirSync(pastaDaPeca, { withFileTypes: true })
+    .filter((e) => e.isDirectory() && PASTA_NUMERADA.test(e.name))
+    .map((e) => ({ numero: Number(PASTA_NUMERADA.exec(e.name)[1]), pasta: join(pastaDaPeca, e.name) }))
+    .sort((a, b) => a.numero - b.numero);
+}
+
+/**
+ * Ficam o pacote da rodada `numero` e o da anterior (o de maior número abaixo dela); os mais antigos são apagados, e nada fora das pastas
+ * `rodada-NN` de `pastaDaPeca` é tocado. A pasta de número maior que `numero` (a peça que perdeu registros de rodada) não é apagada, e
+ * volta em `adiante` para o aviso. Devolve `{ anterior, apagadas, adiante }`.
+ */
+export function apagarPacotesAntigos(pastaDaPeca, numero) {
+  const todos = pacotesDaPeca(pastaDaPeca);
+  const abaixo = todos.filter((p) => p.numero < numero);
+  const anterior = abaixo.at(-1) ?? null;
+  const apagadas = abaixo.slice(0, -1);
+  for (const { pasta } of apagadas) rmSync(pasta, { recursive: true, force: true });
+  return { anterior, apagadas, adiante: todos.filter((p) => p.numero > numero) };
+}
+
+const comandoDoAntesEDepois = (peca, imagem = '<imagem>') => `npm run vistas:critica -- ${peca} --antes-e-depois=${imagem}`;
+
+function lerPacote(pasta, papel, peca) {
+  const arquivo = join(pasta, MANIFESTO_DO_PACOTE);
+  const refazer = `Gere o pacote com \`npm run vistas:critica -- ${peca}\` e peça o antes e depois de novo.`;
+  if (!existsSync(arquivo)) throw new Error(`o antes e depois recebeu como pacote ${papel} a pasta ${pasta}, que não tem ${MANIFESTO_DO_PACOTE}; esperado o pacote que o vistas:critica grava. ${refazer}`);
+  let dado;
+  try { dado = JSON.parse(readFileSync(arquivo, 'utf8')); } catch (erro) { throw new Error(`o antes e depois recebeu ${arquivo}, que não é JSON válido (${erro.message}); esperado o manifesto do pacote ${papel}. ${refazer}`); }
+  if (dado?.formato !== FORMATO_DO_MANIFESTO || !Array.isArray(dado.imagens)) {
+    throw new Error(`o pacote ${papel} em ${pasta} não lista as imagens com a resolução e a câmera (foi gravado antes de 2026-11-18, ou não é o manifesto do pacote); esperado \`imagens\` no ${MANIFESTO_DO_PACOTE}. ${refazer}`);
+  }
+  if (dado.peca !== peca) throw new Error(`o pacote ${papel} em ${pasta} é da peça '${dado.peca}', e o antes e depois foi pedido para '${peca}'; esperado dois pacotes da mesma peça. Rode \`${comandoDoAntesEDepois(dado.peca)}\`, ou aponte a pasta certa em --pacote-${papel}=<pasta>.`);
+  return dado;
+}
+
+/**
+ * As duas pastas do antes e depois de uma peça: as dadas, ou as duas de maior número em `critica-<peça>/`. Recusa quando não há
+ * pacote numerado e quando só há um.
+ */
+export function pastasDoAntesEDepois(peca, { atual = null, anterior = null, base = SAIDA_PADRAO } = {}) {
+  if (atual && anterior) return { atual: resolve(atual), anterior: resolve(anterior) };
+  const pastaDaPeca = pastaDaRodada(peca, base);
+  const numerados = pacotesDaPeca(pastaDaPeca);
+  const aAtual = atual ? { pasta: resolve(atual), numero: null } : numerados.at(-1) ?? null;
+  if (!aAtual) throw new Error(`o antes e depois de '${peca}' não achou pacote em ${pastaDaPeca} (nenhuma pasta rodada-NN); esperado o pacote desta rodada e o da anterior. Gere o desta com \`npm run vistas:critica -- ${peca}\`, ou aponte os dois com --pacote-atual=<pasta> e --pacote-anterior=<pasta>.`);
+  const aAnterior = anterior ? { pasta: resolve(anterior) } : numerados.filter((p) => p.pasta !== aAtual.pasta && (aAtual.numero === null || p.numero < aAtual.numero)).at(-1) ?? null;
+  if (!aAnterior) {
+    throw new Error(`o antes e depois de '${peca}' achou só o pacote de ${aAtual.pasta}, e a anterior não existe em ${pastaDaPeca}; esperado dois pacotes, o desta rodada e o da anterior. `
+      + `A anterior passa a existir quando a rodada for registrada e \`npm run vistas:critica -- ${peca}\` gravar a seguinte; para comparar com um pacote guardado em outra pasta, use \`${comandoDoAntesEDepois(peca)} --pacote-anterior=<pasta>\`.`);
+  }
+  return { atual: aAtual.pasta, anterior: aAnterior.pasta };
+}
+
+const semEnquadramento = (camera) => Object.fromEntries(Object.entries(camera ?? {}).filter(([campo]) => campo !== 'enquadramento'));
+const textoDaCamera = (camera) => JSON.stringify(Object.fromEntries(Object.entries(semEnquadramento(camera)).sort(([a], [b]) => a.localeCompare(b))));
+const ocupacao = (e) => (e ? `${Math.round(e.largura * 100)} % da largura e ${Math.round(e.altura * 100)} % da altura` : null);
+const MARGEM_DO_PAR = 16;
+const FAIXA_DO_PAR = 64;
+const FUNDO_DO_PAR = [255, 255, 255];
+/* a diferença de ocupação do quadro, em fração do quadro, acima da qual o relatório avisa que a escala das duas imagens difere */
+export const FOLGA_DO_ENQUADRAMENTO = 0.01;
+
+/**
+ * O antes e depois de uma imagem: a do pacote `anterior` à esquerda e a do `atual` à direita, cada uma com o nome da pasta e a receita
+ * dela escritos em cima, gravadas em `<atual>/antes-e-depois/<imagem>`. `imagem` é o nome da imagem no `pacote.json` (relativo à
+ * pasta) ou um trecho dele que só uma imagem tenha. Recusa a imagem que não existe ou é ambígua, a que a anterior não tem, e a câmera
+ * ou a resolução que diferem entre as duas. Devolve `{ arquivo, imagem, antes, depois, enquadramento, avisos }`.
+ */
+export function antesEDepois(peca, { atual, anterior, imagem }) {
+  const depois = lerPacote(atual, 'atual', peca);
+  const antes = lerPacote(anterior, 'anterior', peca);
+  const pedido = String(imagem ?? '').trim();
+  const exata = depois.imagens.filter((i) => i.arquivo === pedido);
+  const candidatas = exata.length ? exata : depois.imagens.filter((i) => pedido && i.arquivo.includes(pedido));
+  const lista = (imagens) => imagens.map((i) => `  ${i.arquivo}`).join('\n');
+  if (!candidatas.length) throw new Error(`o antes e depois recebeu a imagem "${pedido}", que o pacote atual (${atual}) não tem; esperado o nome de uma destas, ou um trecho que só uma tenha:\n${lista(depois.imagens)}\nRode \`${comandoDoAntesEDepois(peca)}\` com uma delas.`);
+  if (candidatas.length > 1) throw new Error(`o antes e depois recebeu "${pedido}", que casa com ${candidatas.length} imagens do pacote atual; esperado um trecho que só uma tenha:\n${lista(candidatas)}\nRode \`${comandoDoAntesEDepois(peca)}\` com o nome inteiro de uma delas.`);
+  const [a] = candidatas;
+  const b = antes.imagens.find((i) => i.arquivo === a.arquivo);
+  if (!b) throw new Error(`o antes e depois recebeu a imagem ${a.arquivo}, e o pacote anterior (${anterior}) não a tem: a rodada anterior não capturou essa vista; esperado uma imagem que as duas rodadas tenham. Rode \`${comandoDoAntesEDepois(peca)}\` com outra.`);
+  if (textoDaCamera(a.camera) !== textoDaCamera(b.camera)) {
+    throw new Error(`o antes e depois de ${a.arquivo} recebeu duas câmeras diferentes: a anterior foi tirada com ${textoDaCamera(b.camera)} e a atual com ${textoDaCamera(a.camera)}; esperado a mesma câmera nas duas, porque imagens de câmeras diferentes lado a lado mostram a mudança da câmera como se fosse da peça. `
+      + `Gere os dois pacotes com a mesma versão da ferramenta (\`npm run vistas:critica -- ${peca}\`).`);
+  }
+  if (!a.resolucao || !b.resolucao || a.resolucao.largura !== b.resolucao.largura || a.resolucao.altura !== b.resolucao.altura) {
+    throw new Error(`o antes e depois de ${a.arquivo} recebeu duas resoluções diferentes: a anterior tem ${emTexto(b.resolucao)} e a atual ${emTexto(a.resolucao)}; esperado a mesma resolução nas duas (a do tipo '${a.tipo}'${a.pedida ? `, ${a.pedida}` : ''}). `
+      + `Gere os dois pacotes com a mesma versão da ferramenta (\`npm run vistas:critica -- ${peca}\`).`);
+  }
+  const lados = [{ dado: antes, pasta: anterior, papel: 'antes' }, { dado: depois, pasta: atual, papel: 'depois' }].map(({ dado, pasta, papel }) => {
+    const arquivo = join(pasta, a.arquivo);
+    if (!existsSync(arquivo)) throw new Error(`o antes e depois recebeu ${a.arquivo}, que o ${MANIFESTO_DO_PACOTE} de ${pasta} cita e não existe mais no disco; esperado a imagem na pasta do pacote. Gere o pacote de novo com \`npm run vistas:critica -- ${peca}\`.`);
+    return { papel, pasta, nome: basename(pasta), receita: String(dado.receita ?? '').replace(/^sha256:/, '').slice(0, 8), arquivo, im: dePng(readFileSync(arquivo)) };
+  });
+  const largura = lados.reduce((soma, l) => soma + l.im.largura, 0) + 3 * MARGEM_DO_PAR;
+  const altura = FAIXA_DO_PAR + Math.max(...lados.map((l) => l.im.altura)) + MARGEM_DO_PAR;
+  const im = tela(largura, altura, FUNDO_DO_PAR);
+  escreverNoCorte(im, `${peca}: ${a.arquivo}`, MARGEM_DO_PAR, 10);
+  let x = MARGEM_DO_PAR;
+  for (const l of lados) {
+    escreverNoCorte(im, `${l.papel}: ${l.nome}${l.receita ? ` (receita ${l.receita})` : ''}`, x, 36, l.papel === 'antes' ? [150, 60, 20] : [20, 90, 150]);
+    colar(im, l.im, x, FAIXA_DO_PAR);
+    x += l.im.largura + MARGEM_DO_PAR;
+  }
+  const destino = join(atual, PASTA_DO_ANTES_E_DEPOIS, a.arquivo);
+  mkdirSync(dirname(destino), { recursive: true });
+  writeFileSync(destino, paraPng(im));
+  const eA = b.camera?.enquadramento ?? null;
+  const eD = a.camera?.enquadramento ?? null;
+  const avisos = [];
+  if (eA && eD && (Math.abs(eA.largura - eD.largura) > FOLGA_DO_ENQUADRAMENTO || Math.abs(eA.altura - eD.altura) > FOLGA_DO_ENQUADRAMENTO)) {
+    avisos.push(`a peça ocupava ${ocupacao(eA)} do quadro antes e ocupa ${ocupacao(eD)} depois: a bancada enquadra pela caixa da peça, a caixa mudou, e a escala das duas imagens não é a mesma.`);
+  }
+  return {
+    arquivo: destino, imagem: a.arquivo, resolucao: a.resolucao, camera: semEnquadramento(a.camera),
+    antes: { pasta: anterior, nome: lados[0].nome, receita: antes.receita ?? null, enquadramento: eA },
+    depois: { pasta: atual, nome: lados[1].nome, receita: depois.receita ?? null, enquadramento: eD },
+    avisos,
+  };
+}
+
+/** O relatório do antes e depois, em texto. */
+export function relatorioDoAntesEDepois(peca, feito) {
+  const linhas = [`vistas:critica — antes e depois de ${peca}`, '', `  ${feito.arquivo}`,
+    `  imagem: ${feito.imagem}, ${emTexto(feito.resolucao)} cada lado, câmera ${JSON.stringify(feito.camera)}`,
+    `  antes (à esquerda): ${feito.antes.pasta}, receita ${feito.antes.receita ?? 'não dita'}${feito.antes.enquadramento ? `; a peça ocupa ${ocupacao(feito.antes.enquadramento)} do quadro` : ''}`,
+    `  depois (à direita): ${feito.depois.pasta}, receita ${feito.depois.receita ?? 'não dita'}${feito.depois.enquadramento ? `; a peça ocupa ${ocupacao(feito.depois.enquadramento)} do quadro` : ''}`];
+  for (const aviso of feito.avisos) linhas.push('', `AVISO: ${aviso}`);
+  return `${linhas.join('\n')}\n`;
 }
 
 export function partesDoPlano(receita) {
@@ -2224,6 +2480,8 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   const dep = {
     /* a medição é a de `rodada-de-modelagem.mjs` (a que o registro e `--acao` usam), importada na hora para não criar ciclo de carga */
     medirReceita: async (p) => (await import('./rodada-de-modelagem.mjs')).medirReceita(p),
+    /* o número da próxima rodada a registrar, pela pasta das rodadas da peça: o mesmo que o registro vai gravar */
+    numeroDaRodada: async (pastaDosRegistros) => (await import('./rodada-de-modelagem.mjs')).numeroDaProximaRodada(pastaDosRegistros),
     olharBancada,
     abrirCaptura: abrirCapturaCompartilhada,
     esbocoDeclarado: async (p) => (await import('./forma-do-esboco.mjs')).esbocoDeclarado(p),
@@ -2325,11 +2583,17 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   }
   if (!plano) avisos.push('a receita não declara PLANO: o pedido sai sem objeto, partes e critérios, e sem alvo da forma prometida.');
 
-  const pasta = saida ? resolve(saida) : pastaDaRodada(peca, pastaDasCapturas);
+  /* A PASTA DO PACOTE: a de `--saida`, ou a da próxima rodada a registrar, dentro da pasta da peça. Tudo o que o pacote grava mora nela. */
+  const pastaDaPeca = pastaDaRodada(peca, pastaDasCapturas);
+  const numero = saida ? null : await dep.numeroDaRodada(pastaDasRodadas(peca, caminho));
+  const pasta = saida ? resolve(saida) : join(pastaDaPeca, nomeDaPastaNumerada(numero));
   mkdirSync(pastaDasCapturas, { recursive: true });
   apagarImagensAntigas(peca, pastaDasCapturas);
+  /* o pacote que morava solto na pasta da peça, de antes da pasta por rodada, sai: é imagem mais velha que a receita */
+  if (!saida) limparPastaDaRodada(pastaDaPeca);
   limparPastaDaRodada(pasta);
   mkdirSync(pasta, { recursive: true });
+  apagarImagensAntigas(peca, pasta);
 
   /* O servidor e o navegador sobem uma vez para o pacote inteiro (26 capturas na perua), e a sessão e os contatos da peça são medidos
      uma vez. Com `olharBancada` trocado por um gravador, como nos testes, nada é aberto, a não ser que o teste dê `abrirCaptura`. */
@@ -2342,10 +2606,16 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
     /* a curvatura numa captura de quatro vistas e duas luzes rasantes por vista, no máximo */
     + (lataria.luzRasante ? (lataria.lataria ? 4 : 0) + 8 : 0);
   let feitas = 0;
+  /* cada captura sai na resolução do tipo dela, vai para a pasta do pacote e fica anotada, com as opções, para o `pacote.json` */
+  const capturas = [];
   const capturar = async (quem, opcoes) => {
-    const resposta = await dep.olharBancada({ ...opcoes, logger, ...(prazoDeCargaMs ? { prazoDeCargaMs } : {}), ...(compartilhada ? { compartilhada } : {}) });
-    exigirCaptura(resposta, quem, { feitas, total });
+    const tipo = tipoDaCaptura(opcoes);
+    const pedidas = { ...opcoes, res: RESOLUCAO_POR_TIPO[tipo] };
+    const feita = await dep.olharBancada({ ...pedidas, logger, ...(prazoDeCargaMs ? { prazoDeCargaMs } : {}), ...(compartilhada ? { compartilhada } : {}) });
+    exigirCaptura(feita, quem, { feitas, total });
+    const resposta = levarParaAPasta(feita, pasta);
     feitas += arquivosDe(resposta).length;
+    capturas.push({ tipo, opcoes: pedidas, resposta });
     return resposta;
   };
 
@@ -2541,6 +2811,22 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   };
   const { pedido: arquivoDoPedido, pedidosFechados } = gravarPedidos(pasta, dadosDoPedido);
   const manifesto = gravarManifesto(pasta, { peca, receita: impressao, lataria, superficie, conferenciaDoBlender });
+  /* a rodada, a resolução de cada tipo e, de cada imagem da pasta, a resolução medida e a câmera: é o que o antes e depois confere */
+  const imagens = imagensDoPacote({ pasta, peca, capturas, superficie, montada, conferenciaDoBlender });
+  {
+    const dado = JSON.parse(readFileSync(manifesto, 'utf8'));
+    writeFileSync(manifesto, `${JSON.stringify({ ...dado, rodada: numero, resolucoes: RESOLUCAO_POR_TIPO, imagens }, null, 2)}\n`, 'utf8');
+  }
+  for (const i of imagens) {
+    if (i.pedida && i.resolucao && emTexto(i.resolucao) !== i.pedida) avisos.push(`a imagem ${i.arquivo} saiu em ${emTexto(i.resolucao)}, e a resolução do tipo '${i.tipo}' é ${i.pedida}: ela não se compara ponto a ponto com a de outra rodada.`);
+  }
+  /* ficam este pacote e o da rodada anterior; os mais antigos da peça saem, e só depois de este estar inteiro */
+  let pacoteAnterior = null;
+  if (numero !== null) {
+    const guardados = apagarPacotesAntigos(pastaDaPeca, numero);
+    pacoteAnterior = guardados.anterior;
+    if (guardados.adiante.length) avisos.push(`a pasta da peça tem pacote de rodada de número maior que a ${numero}, a próxima a registrar (${guardados.adiante.map((p) => basename(p.pasta)).join(', ')}): não foi apagado, e o antes e depois o toma como o atual; apague-o se for resto de registro desfeito.`);
+  }
   const temReflexo = Object.keys(reflexo).length > 0;
   if (sobrepor.feita) {
     const dado = JSON.parse(readFileSync(manifesto, 'utf8'));
@@ -2560,7 +2846,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   }
 
   return {
-    peca, partes, conjunto, traseira, esquerda, arame, raioX, porParte, dePerto, contornoSobreposto: sobrepor.feita ?? null, pranchaDesenhada: pranchaDesenhada?.imagens.length ? pranchaDesenhada : null, reflexo: temReflexo ? reflexo : null, pasta, pedido: arquivoDoPedido, pedidosFechados, manifesto, alvo, montada, sobreposicao, superficie, conferenciaDoBlender, lataria, referencias, encaixes, avisos, medicao: medicaoDoPacote,
+    peca, partes, conjunto, traseira, esquerda, arame, raioX, porParte, dePerto, contornoSobreposto: sobrepor.feita ?? null, pranchaDesenhada: pranchaDesenhada?.imagens.length ? pranchaDesenhada : null, reflexo: temReflexo ? reflexo : null, pasta, rodada: numero, pacoteAnterior: pacoteAnterior?.pasta ?? null, imagens, pedido: arquivoDoPedido, pedidosFechados, manifesto, alvo, montada, sobreposicao, superficie, conferenciaDoBlender, lataria, referencias, encaixes, avisos, medicao: medicaoDoPacote,
   };
 }
 
@@ -2840,6 +3126,14 @@ export function imprimir(resultado) {
   if (resultado.contornoSobreposto) linhas.push('', 'CONTORNO MEDIDO SOBRE O MODELO:', `  ${resultado.contornoSobreposto.arquivo}`);
   if (referenciasSemLeitura(resultado.referencias?.ignoradas).length) linhas.push('', `REFERÊNCIAS fora do pedido, porque não são imagem: ${referenciasSemLeitura(resultado.referencias.ignoradas).join(', ')}`);
   for (const aviso of resultado.avisos ?? []) linhas.push('', `AVISO: ${aviso}`);
+  if (resultado.pasta) {
+    linhas.push('', `PASTA DO PACOTE (${resultado.rodada != null ? `rodada ${resultado.rodada}, a próxima a registrar` : 'a de --saida'}; ${resultado.imagens?.length ?? 0} imagens, com a resolução e a câmera de cada uma no pacote.json):`, `  ${resultado.pasta}`);
+    if (resultado.rodada != null) {
+      linhas.push(resultado.pacoteAnterior
+        ? `  a anterior ficou em ${resultado.pacoteAnterior}; o antes e depois de uma imagem: npm run vistas:critica -- ${resultado.peca} --antes-e-depois=<imagem>`
+        : '  não há pacote de rodada anterior desta peça para o antes e depois.');
+    }
+  }
   linhas.push('', 'PEDIDO (o texto pronto para o crítico, com todos os caminhos acima):', `  ${resultado.pedido}`);
   if (resultado.pedidosFechados) {
     const f = resultado.pedidosFechados;
@@ -2905,7 +3199,8 @@ Quando a peça tem contorno medido (*.contornos.json citado no plano, ao lado de
 referencial da peça dá.
 
   <peça>                                    a receita, como nas outras ferramentas (por exemplo aviao/motor)
-  --saida=<pasta da rodada>                 onde o pacote é gravado
+  --saida=<pasta da rodada>                 onde o pacote é gravado, inteiro; sem ela, tools/bancadas/out/critica-<peça>/rodada-NN/, com NN o
+                                            número da próxima rodada a registrar, e ficam essa pasta e a da rodada anterior
   --prazo=<segundos>                        prazo de carga de cada captura, para peça pesada
   --sem-medir                               monta o pacote sem medir a receita (o pedido diz que saiu sem medição)
   --com-blender                             roda também as vistas de superfície do Blender (pede MODELAR_BLENDER), como conferência das
@@ -2931,6 +3226,13 @@ ordem, sem a história, e junte as respostas:
        a nota que o crítico escreveu em cada resposta ao mesmo pedido, e a variação
   uso: node tools/modelar/vistas-para-critica.mjs --refazer-pedidos=<pasta da rodada>
        refaz os três pedidos e as perguntas pelo dados-do-pedido.json que o pacote gravou na pasta, sem capturar nada
+
+O pacote.json grava a resolução medida e a câmera de cada imagem, e a resolução é fixa por tipo de imagem. O antes e depois de uma
+imagem entre o pacote desta rodada e o da anterior, lado a lado, com o nome de cada um:
+
+  uso: node tools/modelar/vistas-para-critica.mjs <peça> --antes-e-depois=<imagem> [--pacote-atual=<pasta>] [--pacote-anterior=<pasta>]
+       <imagem> é o nome da imagem no pacote.json ou um trecho que só uma tenha (zebra-enquadrado, por exemplo, lista as que casam);
+       grava em <pacote atual>/antes-e-depois/ e recusa quando a anterior não existe ou a câmera ou a resolução diferem
 
 Código de saída: 0 pacote montado, 1 recusa (receita reprovada, luz rasante toda escura, --com-blender sem o Blender, captura sem imagem), 2 uso errado.
 `;
@@ -2966,6 +3268,18 @@ async function principal(argv) {
     }
     if (!arquivos.length) { process.stderr.write('uso: node tools/modelar/vistas-para-critica.mjs --notas <resposta>...\nnenhuma resposta veio.\n'); return 2; }
     process.stdout.write(relatorioDasNotas(arquivos.map(ler)));
+    return 0;
+  }
+  if (argv.slice(2).some((a) => a.startsWith('--antes-e-depois'))) {
+    let pedido;
+    try {
+      pedido = lerArgumentos(argv.slice(2), { opcoes: ['antes-e-depois', 'pacote-atual', 'pacote-anterior'], posicional: { nome: 'a peça', obrigatorio: true } });
+    } catch (erro) {
+      process.stderr.write(`uso: node tools/modelar/vistas-para-critica.mjs <peça> --antes-e-depois=<imagem> [--pacote-atual=<pasta>] [--pacote-anterior=<pasta>]\n${erro.message}\n`);
+      return 2;
+    }
+    const pastas = pastasDoAntesEDepois(pedido.posicional, { atual: pedido.opcao('pacote-atual'), anterior: pedido.opcao('pacote-anterior') });
+    process.stdout.write(relatorioDoAntesEDepois(pedido.posicional, antesEDepois(pedido.posicional, { ...pastas, imagem: pedido.opcao('antes-e-depois') })));
     return 0;
   }
   try {

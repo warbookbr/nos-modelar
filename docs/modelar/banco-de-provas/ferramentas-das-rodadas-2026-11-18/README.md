@@ -135,3 +135,39 @@ Aqui o pente vê o que a zebra não conta. Nos seis cortes a curvatura troca de 
 ### Limites conhecidos
 
 O corte guiado conta a seção inteira e separa o que fica perto da ilha pela distância ao ponto dela; ele não recebe a caixa da região, que não está na saída da zebra. O `--lado` escolhe pela normal, e numa carroceria de duas bandas a pele de dentro da outra banda entra junto; a `--caixa` a tira. As ilhas que a zebra escreve são no máximo 12 por direção de cada região.
+
+## Fatia 4: a pasta por rodada, a resolução e a câmera no pacote, e o antes e depois
+
+Até esta fatia as capturas da bancada iam para `tools/bancadas/out/`, o resto do pacote para `tools/bancadas/out/critica-<peça>/`, e a rodada seguinte sobrescrevia as duas. Agora `vistas:critica` grava o pacote inteiro em `tools/bancadas/out/critica-<peça>/rodada-NN/`, fora do git, com NN o número da próxima rodada a registrar (`numeroDaProximaRodada`, em `rodada-de-modelagem.mjs`, o mesmo número que `gravarRodada` dá ao registro), e `--registrar` lê o `pacote.json` dessa pasta. Ficam a pasta da rodada e a da anterior; as mais antigas são apagadas depois de o pacote novo estar inteiro, e só pastas `rodada-NN` de dentro da pasta da peça. Com `--saida=<pasta>` o pacote inteiro vai para ela, sem número e sem apagar nada.
+
+### A prova na lataria do carro
+
+`npm run vistas:critica -- carro-fastback/lataria`, em 2026-11-18, na receita `sha256:546776ad`, com cinco rodadas registradas: 9 min 54 s, dos quais 129 s de medição. O pacote saiu em `tools/bancadas/out/critica-carro-fastback-lataria/rodada-06/`, com 57 imagens e 9,9 MB. Nenhuma captura da peça ficou em `tools/bancadas/out/`, o pacote antigo que morava solto na pasta da peça saiu, e o `pedido.md` cita 41 caminhos, todos dentro de `rodada-06/`.
+
+O `pacote.json` grava `rodada: 6`, a resolução de cada tipo e, de cada imagem, a resolução medida no cabeçalho do PNG e a câmera:
+
+| tipo | imagens | resolução medida | resolução do tipo |
+| --- | --- | --- | --- |
+| conjunto | 6 | 1100x1450 | 1100x1450 |
+| arame | 2 | 1100x1450 | 1100x1450 |
+| raio-x | 1 | 1100x1450 | 1100x1450 |
+| parte | 6 | 900x900 | 900x900 |
+| reflexo (zebra deitada, zebra em pé e pintura) | 12 | 900x900 | 900x900 |
+| superfície, capturas da bancada | 12 | 900x900 | 900x900 |
+| superfície, luz rasante copiada para `superficie/` | 8 | 900x900 | a da captura |
+| superfície, curvatura com a legenda em cima | 4 | 900x1048 | a da captura mais a faixa da legenda |
+| outra (as duas pranchas desenhadas e as quatro curvaturas sem legenda) | 6 | 1283x1423, 1285x1423 e 900x900 | sem tipo |
+
+Nenhuma imagem saiu fora da resolução do tipo (a ferramenta avisa quando sai). A câmera da zebra de lado, como exemplo: `{ vista: "direita", enquadrar: true, visao: "zebra", enquadramento: { largura: 0,92, altura: 0,47, area: 0,43, cortado: false } }`. Na luz rasante entram também o azimute e a elevação que a bancada escolheu.
+
+### O antes e depois
+
+`npm run vistas:critica -- <peça> --antes-e-depois=<imagem>` põe a imagem da rodada anterior à esquerda e a da atual à direita, com o nome da pasta e o começo do hash da receita de cada uma, e grava em `<pacote atual>/antes-e-depois/`. `<imagem>` é o nome no `pacote.json` ou um trecho que só uma tenha. A montagem usa `pngjs` pelos ajudantes de `leitura-por-regioes.mjs`, sem dependência nova.
+
+Na lataria só existe a rodada 6, e o comando recusou com saída 1: "achou só o pacote de .../rodada-06, e a anterior não existe em .../critica-carro-fastback-lataria; esperado dois pacotes", com o comando de `--pacote-anterior=<pasta>`. Para provar a montagem com imagem real, a pasta `rodada-06` foi copiada para fora do repositório e dada em `--pacote-anterior`: saiu `antes-e-depois/bancada-carro-fastback-lataria-direita-visao-zebra-enquadrado.png`, de 1848x980 (duas imagens de 900x900, três margens de 16 e a faixa dos nomes de 64). As duas metades são a mesma imagem, porque a anterior era cópia; o antes e depois entre duas rodadas de verdade só existe depois de a rodada 6 ser registrada e o pacote da 7 ser gerado. O trecho `direita-visao-zebra`, que casa com a zebra deitada e a em pé, foi recusado listando as duas.
+
+As recusas, cada uma com teste em `vistas-para-critica.test.mjs`: a peça sem pacote numerado, a anterior que não existe, a pasta sem `pacote.json`, o `pacote.json` que não é JSON, o pacote gravado antes desta fatia (sem `imagens`), o pacote de outra peça, a imagem que o pacote atual não tem, o trecho ambíguo, a imagem que a anterior não capturou, a câmera diferente, a resolução diferente e a imagem citada que sumiu do disco. O enquadramento medido não conta como câmera, porque a bancada enquadra pela caixa da peça e ele muda quando a peça muda; quando a ocupação do quadro difere em mais de um ponto percentual, o relatório avisa que a escala das duas imagens não é a mesma.
+
+### Limites conhecidos
+
+A conferência do Blender (`--com-blender`) não foi rodada nesta prova e continua na resolução dos scripts do Blender, que moram em `vistas-de-superficie.mjs` e `tools/blender/`, fora do território do plano; as imagens dela entram no `pacote.json` com a resolução medida e o tipo `blender`. As imagens que vão ao crítico saem todas da bancada desde a fatia 6 do plano do reflexo. As capturas intermediárias da prancha desenhada e do contorno sobreposto continuam passando por `tools/bancadas/out/`; o resultado delas é gravado na pasta do pacote. A pasta de número maior que a próxima rodada a registrar não é apagada, sai como aviso, e o antes e depois a toma como a atual.
