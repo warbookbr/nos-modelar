@@ -10,13 +10,20 @@
  *   - montagem persistida (`mecanifica.montagem`): saem as receitas das peças que ela cita, uma por referência.
  * O resultado da montagem (esboço ou receita) fica em `tmp/cache-de-medida/`, com chave pela assinatura do conteúdo que a define (ver
  * `assinaturaDaEntrada`), e a ferramenta que passa `cache: false` (`--sem-cache`) monta de novo; `doCache` diz se a montagem veio dele.
- * `executar()` devolve o `{ entrada, neutro }` da receita, executando uma vez só. Nada é escrito e nenhuma receita é alterada. */
+ * `executar()` devolve o `{ entrada, neutro }` da receita, executando uma vez só. Nada é escrito e nenhuma receita é alterada.
+ *
+ * O CACHE POR PASSO NAS MEDIDAS (plano das ferramentas das rodadas, fatia 2). `executarComCachePorPasso` executa a receita com a memória
+ * por prefixo de `tmp/cache-por-prefixo/` (a mesma do `descrever` e da bancada, sem mudar o que ela guarda nem a chave dela): a medida
+ * recomeça do estado que o comando anterior guardou para o mesmo prefixo de passos. `lerParams` e `receitaComParams` dão a variante de
+ * parâmetros (`--params`), que entra na chave pelo que a chave já encadeia (o dicionário da receita, os aliases e o conteúdo de cada
+ * passo), e recusam a receita que lê a tabela dos parâmetros direto, fora de `this.PARAMS`. */
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readdirSync, readFileSync, renameSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import { basename, dirname, extname, join, relative, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { deserialize, serialize } from 'node:v8';
 import { entradaDaReceita, executarReceita } from '../../src/autoria/executar-receita.js';
+import { pularNaoCodigo } from './conferir-pontos.mjs';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 
@@ -130,6 +137,137 @@ export function executarReceitaGuardada(abs, receita, { cache = true, pastaDoCac
 
 export class ErroDeEntrada extends Error {
   constructor(mensagem) { super(mensagem); this.name = 'ErroDeEntrada'; }
+}
+
+/* ---- o cache por passo e a variante de parâmetros nas medidas ---- */
+
+/**
+ * Executa a receita com o cache por passo (`tmp/cache-por-prefixo/`): a execução recomeça do último estado que um comando anterior guardou
+ * para o mesmo prefixo de passos, e o neutro é o mesmo da execução inteira. `abs` é o caminho do arquivo da receita e dá o rótulo do índice;
+ * `variante` (um texto curto) separa o índice da receita que a ferramenta mudou antes de executar (só os passos `subdivisao`, outros
+ * parâmetros), para a variante não tirar do índice os pontos da receita do arquivo. A chave de cada ponto não leva o rótulo: é a do
+ * conteúdo, de modo que duas ferramentas que executam o mesmo prefixo dividem o ponto. `cache: false` (`--sem-cache`), ou `abs` nulo,
+ * executa inteira, sem ler nem gravar. `soOFim` guarda só o estado final (um ponto por receita, em vez de um por passo caro): é para a
+ * receita que ninguém edita, como a cópia que a rodada guardou, em que o ponto do meio nunca serviria e cada um pesa dezenas de MB numa
+ * chapa de lataria. Devolve `{ executada, cachePorPasso, segundos }`, com `cachePorPasso` nulo sem cache e, com ele,
+ * `{ recomecouDoPasso, total, lidos, guardados }` (`recomecouDoPasso` é quantos passos não rodaram).
+ */
+export async function executarComCachePorPasso(abs, receita, { cache = true, variante = null, soOFim = false, pastaDoCachePorPrefixo = null, execucao = {} } = {}) {
+  let host = null;
+  if (cache && abs) {
+    try {
+      const { memoriaDoHost } = await import('../../procedural/nucleo/planejador/armazem-em-pasta.mjs');
+      /* só o fim: o limiar de custo alto deixa a memória guardar os dois últimos passos, e o máximo de um ponto fica com o último */
+      host = memoriaDoHost({ rotulo: variante ? `${abs}#${variante}` : abs, ...(pastaDoCachePorPrefixo ? { pasta: pastaDoCachePorPrefixo } : {}), ...(soOFim ? { maximo: 1, limiarDeCustoMs: Number.MAX_SAFE_INTEGER } : {}) });
+    } catch { host = null; /* o cache é conveniência: sem disco, a medida executa inteira */ }
+  }
+  const t0 = performance.now();
+  const executada = executarReceita(receita, host ? { ...execucao, memoria: host.memoria } : execucao);
+  const segundos = (performance.now() - t0) / 1000;
+  const e = host?.memoria.estatisticas;
+  const cachePorPasso = e ? { recomecouDoPasso: e.recomecouDoPasso ?? 0, total: executada.entrada?.PASSOS?.length ?? null, lidos: e.lidos, guardados: e.guardados } : null;
+  return { executada, cachePorPasso, segundos };
+}
+
+/** A linha que diz, na saída de erro, de onde a execução recomeçou; vazia sem cache. */
+export function avisoDoCachePorPasso({ cachePorPasso, segundos }, ferramenta) {
+  if (!cachePorPasso) return '';
+  const { recomecouDoPasso: n, total } = cachePorPasso;
+  const oQue = n > 0 ? `recomeçou do estado guardado depois de ${n} de ${total ?? '?'} passo(s)` : 'nenhum estado guardado servia, a receita executou inteira e os pontos ficaram guardados';
+  return `${ferramenta}: cache por passo (tmp/cache-por-prefixo/): ${oQue}, em ${segundos.toFixed(1)} s; --sem-cache executa inteira\n`;
+}
+
+const ehObjetoSimples = (v) => v !== null && typeof v === 'object' && !Array.isArray(v) && (Object.getPrototypeOf(v) === Object.prototype || Object.getPrototypeOf(v) === null);
+
+/** `--params=<json ou caminho de .json>` -> o objeto dos parâmetros da variante, ou null quando a opção não veio. */
+export function lerParams(texto) {
+  if (texto === null || texto === undefined) return null;
+  const bruto = String(texto).trim();
+  let json = bruto;
+  if (!bruto.startsWith('{')) {
+    if (!/\.json$/.test(bruto) || !existsSync(resolve(bruto))) throw new ErroDeEntrada(`--params espera um objeto em JSON ou o caminho de um .json que existe, e veio '${bruto}'`);
+    json = readFileSync(resolve(bruto), 'utf8');
+  }
+  let params;
+  try { params = JSON.parse(json); } catch (e) { throw new ErroDeEntrada(`--params não é JSON válido (${e.message}); espera um objeto como '{"chapa":{"niveis":2}}'`); }
+  if (!ehObjetoSimples(params) || Object.keys(params).length === 0) throw new ErroDeEntrada(`--params espera um objeto com ao menos um parâmetro, e veio ${JSON.stringify(params)}`);
+  return params;
+}
+
+/* o texto só com o código: comentário, texto entre aspas e template viram espaço, e as quebras de linha ficam onde estavam */
+function soCodigo(texto) {
+  let saida = '';
+  for (let k = 0; k < texto.length; k += 1) {
+    const depois = pularNaoCodigo(texto, k);
+    if (depois === k) { saida += texto[k]; continue; }
+    saida += texto.slice(k, depois).replace(/[^\n]/g, ' ');
+    k = depois - 1;
+  }
+  return saida;
+}
+
+/**
+ * Onde o arquivo da receita lê a tabela dos parâmetros direto, pelo nome dela, em vez de `this.PARAMS` ou do argumento de uma função:
+ * `[{ linha, texto }]`. A tabela é o identificador de `PARAMS: <nome>` (ou `PARAMS` abreviado); não contam a declaração dela nem essa
+ * atribuição. Cada leitura dessas usa a tabela do arquivo, na importação (`export const PONTOS = [... TABELA ...]`) ou a cada chamada
+ * (`get PASSOS() { return gerar(TABELA); }`), e não muda com a variante. A leitura é por texto e só do arquivo da receita: o parâmetro de
+ * função com o mesmo nome da tabela é acusado sem ser leitura dela, e o arquivo importado que leia a tabela não é visto.
+ */
+export function leiturasDiretasDaTabela(textoDaReceita) {
+  const codigo = soCodigo(String(textoDaReceita ?? ''));
+  const atribuicao = /(?<![\w$.])PARAMS\s*(?::\s*([A-Za-z_$][\w$]*)\s*)?(?=[,}])/.exec(codigo);
+  if (!atribuicao) return [];
+  const nome = atribuicao[1] ?? 'PARAMS';
+  const linhas = String(textoDaReceita).split('\n');
+  const achadas = [];
+  const usos = new RegExp(`(?<![\\w$.])${nome.replace(/\$/g, '\\$')}(?![\\w$])`, 'g');
+  for (const m of codigo.matchAll(usos)) {
+    if (m.index >= atribuicao.index && m.index < atribuicao.index + atribuicao[0].length) continue;
+    const antes = codigo.slice(Math.max(0, m.index - 40), m.index);
+    if (/(?:const|let|var)\s+$/.test(antes) && /^\s*=(?!=)/.test(codigo.slice(m.index + nome.length))) continue;
+    const linha = codigo.slice(0, m.index).split('\n').length;
+    if (!achadas.some((a) => a.linha === linha)) achadas.push({ linha, texto: linhas[linha - 1].trim().slice(0, 110) });
+  }
+  return achadas;
+}
+
+function descritorDe(objeto, campo) {
+  for (let o = objeto; o && o !== Object.prototype; o = Object.getPrototypeOf(o)) { const d = Object.getOwnPropertyDescriptor(o, campo); if (d) return d; }
+  return null;
+}
+
+function fundirParams(base, novos, caminho = '') {
+  const saida = { ...base };
+  for (const [chave, valor] of Object.entries(novos)) {
+    if (!Object.hasOwn(base, chave)) throw new ErroDeEntrada(`--params traz '${caminho}${chave}', que a receita não declara em PARAMS${caminho ? ` (em ${caminho.slice(0, -1)})` : ''}; os declarados ali são ${Object.keys(base).sort().join(', ') || '(nenhum)'}`);
+    saida[chave] = ehObjetoSimples(valor) && ehObjetoSimples(base[chave]) ? fundirParams(base[chave], valor, `${caminho}${chave}.`) : valor;
+  }
+  return saida;
+}
+
+/**
+ * A receita com outros parâmetros, para medir uma variante sem editar o arquivo: a cópia leva `PARAMS` fundido com `params` (objeto dentro de
+ * objeto funde chave a chave; lista e número trocam inteiros) e mantém os getters, que passam a ler a tabela nova por `this.PARAMS`.
+ * Recusa, com `ErroDeEntrada`: o parâmetro que a receita não declara; a receita sem `PARAMS`; a que traz `PASSOS` (ou
+ * `CHAMADAS_COMPOSICOES`) como lista fixa, em que a variante não mudaria nada; e a que lê a tabela direto (`leiturasDiretasDaTabela`,
+ * sobre `texto`, o texto do arquivo dela), em que a variante teria os passos novos e os dados velhos. `nome` é como a recusa chama a receita.
+ */
+export function receitaComParams(receita, params, { texto = null, nome = 'a receita' } = {}) {
+  if (!ehObjetoSimples(receita?.PARAMS)) throw new ErroDeEntrada(`--params pede uma receita com PARAMS, e ${nome} não declara nenhum (ou não é uma receita em arquivo)`);
+  for (const campo of ['PASSOS', 'CHAMADAS_COMPOSICOES']) {
+    const d = descritorDe(receita, campo);
+    if (d && !d.get) throw new ErroDeEntrada(`--params não muda ${nome}: ${campo} é uma lista fixa, calculada na importação, e não um getter que lê this.PARAMS; escreva \`get ${campo}() { return gerarPassos(this.PARAMS); }\` ou edite a tabela no arquivo`);
+  }
+  const diretas = texto === null ? [] : leiturasDiretasDaTabela(texto);
+  if (diretas.length) {
+    throw new ErroDeEntrada(`--params recusado: ${nome} lê a tabela dos parâmetros direto, fora de this.PARAMS, em ${diretas.length} linha(s):\n${diretas.slice(0, 8).map((d) => `  linha ${d.linha}: ${d.texto}`).join('\n')}${diretas.length > 8 ? `\n  e mais ${diretas.length - 8}` : ''}\n`
+      + 'Esses dados saem da tabela do arquivo e não mudam com --params: a variante teria os passos novos e esses dados velhos. '
+      + 'O esperado é cada leitura por this.PARAMS, num getter da receita (`get PONTOS() { return pontos(this.PARAMS); }`), ou pelo argumento da função. '
+      + 'Enquanto a receita não for assim, meça a variante editando a tabela no arquivo: o cache por passo refaz só do passo que mudar.');
+  }
+  const copia = Object.defineProperties({}, Object.getOwnPropertyDescriptors(receita));
+  Object.defineProperty(copia, 'PARAMS', { value: fundirParams(receita.PARAMS, params), enumerable: true, configurable: true });
+  return copia;
 }
 
 const temPassos = (r) => r && typeof r === 'object' && (Array.isArray(r.PASSOS) || Array.isArray(r.CHAMADAS_COMPOSICOES));

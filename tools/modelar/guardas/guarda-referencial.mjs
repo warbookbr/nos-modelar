@@ -71,7 +71,8 @@ export function primeiraEtapaOuSolta(peca, { raiz = ACERVO } = {}) {
   return montagem.etapas[0] === instancia.id;
 }
 
-export async function conferirUmaPeca(peca, { raiz = REPO } = {}) {
+/* `executar` devolve a execução da receita (`{ neutro }`): quem já a tem (a ferramenta das rodadas, que a faz uma vez com o cache por passo) a passa. */
+export async function conferirUmaPeca(peca, { raiz = REPO, executar = executarReceita } = {}) {
   const receita = receitaDoModulo(await importarReceita(resolverCaminhoReceita(peca, { raiz })));
   const declarada = verticalDeclarada(receita.TOPO);
 
@@ -109,7 +110,7 @@ export async function conferirUmaPeca(peca, { raiz = REPO } = {}) {
      tem o mesmo encaixe da parte, e segue a etapa dela. */
   if (!primeiraEtapaOuSolta(receita.meta?.variacaoDe ?? peca)) return null;
 
-  const { neutro } = executarReceita(receita);
+  const { neutro } = await executar(receita);
   const fundo = fundoDaPeca(neutro);
   if (!Number.isFinite(fundo)) {
     return { peca, motivo: 'PEÇA SEM VÉRTICE\n  A receita não produziu geometria alguma.' };

@@ -29,6 +29,7 @@ import { caminhosDaReferencia, ehReferenciaLocal } from '../../../src/autoria/pl
 import { resolverCaminhoReceita } from '../resolver-caminho-receita.mjs';
 import { ocorrenciasPosicionais, rotularOcorrencias } from '../../../procedural/nucleo/referencia-posicional.js';
 import { nucleo } from '../../../procedural/nucleo/nucleo.js';
+import { memoriaDoHost } from '../../../procedural/nucleo/planejador/armazem-em-pasta.mjs';
 import { REGISTRO_DA_RECEITA } from '../../../src/autoria/executar-receita.js';
 import { conferirPortasNaForma } from '../../../src/autoria/porta-confere-forma.js';
 import { limiteRelativo, medirFaceDegenerada } from '../reguas-de-malha/face-degenerada.mjs';
@@ -219,7 +220,9 @@ export function motivoDeCascaAberta(forma, passos = [], executar = (prefixo) => 
 
 /* Confere UMA peça e devolve o que ela reprovou e se ela espera a etapa. Cada peça é independente das outras (lê o próprio
    arquivo e não escreve nada), e é essa independência que deixa a varredura repartir as peças entre processadores. */
-export async function conferirPeca(peca) {
+/* `cachePorPrefixo` (desligado no gate, ligado pela ferramenta das rodadas): o `descrever` e a execução só dos passos, logo abaixo, recomeçam
+   do estado que o comando anterior guardou em `tmp/cache-por-prefixo/`; o veredito é o mesmo da execução inteira. */
+export async function conferirPeca(peca, { cachePorPrefixo = false } = {}) {
   const reprovadas = [];
   const esperando = [];
   const semPasso = await receitaSemPasso(peca);
@@ -250,7 +253,7 @@ export async function conferirPeca(peca) {
     return { reprovadas, esperando };
   }
   /* o progresso vai ao stderr, uma linha por etapa longa: a guarda roda minutos e não mostrava nada; o stdout e o veredito não mudam */
-  const medida = await descreverPecaReutilizavel({ peca, aoProgredir: (linha) => process.stderr.write(`${peca}: ${linha}\n`) });
+  const medida = await descreverPecaReutilizavel({ peca, cachePorPrefixo, aoProgredir: (linha) => process.stderr.write(`${peca}: ${linha}\n`) });
   if (!medida.ok) { reprovadas.push({ peca, motivo: medida.stderr.trim() }); return { reprovadas, esperando }; }
   /* A medida já validou e canonicalizou o plano, e devolve `null` quando a
      receita não exporta nenhum. Revalidar aqui rejeitaria o próprio resultado
@@ -296,7 +299,10 @@ export async function conferirPeca(peca) {
   }
   /* A porta declarada precisa estar na forma: o resolvedor encaixa pela
      porta e nunca olha a malha. */
-  const forma = nucleo(receita.PASSOS, receita.PARAMS ?? {}, {}, {}, null, [], { registroOperacoes: REGISTRO_DA_RECEITA });
+  /* esta execução é só dos passos, sem o TOPO e os aliases da receita: a chave do prefixo dela é outra, e o índice também */
+  let memoria = null;
+  if (cachePorPrefixo) { try { memoria = memoriaDoHost({ rotulo: `${resolverCaminhoReceita(peca)}#so-passos` }).memoria; } catch { memoria = null; } }
+  const forma = nucleo(receita.PASSOS, receita.PARAMS ?? {}, {}, {}, null, [], { registroOperacoes: REGISTRO_DA_RECEITA, ...(memoria ? { memoria } : {}) });
   const portas = conferirPortasNaForma(forma);
   if (portas.length) {
     reprovadas.push({ peca, motivo: `PORTA FORA DA FORMA\n${portas.map((a) => `  ${a.mensagem}`).join('\n')}` });
@@ -317,9 +323,10 @@ export async function conferirPeca(peca) {
    varredura em fila única. Lista curta (a peça de ensaio de um teste, a rodada de uma peça) roda aqui mesmo, sem fio. */
 const PECAS_PARA_REPARTIR = 6;
 
-export async function conferirAcervo(pecas = pecasDoAcervo(), { fios = Math.min(availableParallelism(), 4) } = {}) {
+export async function conferirAcervo(pecas = pecasDoAcervo(), { fios = Math.min(availableParallelism(), 4), cachePorPrefixo = false } = {}) {
+  /* o cache por prefixo só vale na varredura em fila única, que é a da rodada de uma peça; a repartida segue sem ele */
   const porPeca = pecas.length < PECAS_PARA_REPARTIR || fios < 2
-    ? await sequencial(pecas)
+    ? await sequencial(pecas, { cachePorPrefixo })
     : await repartida(pecas, fios);
   return {
     pecas,
@@ -329,9 +336,9 @@ export async function conferirAcervo(pecas = pecasDoAcervo(), { fios = Math.min(
   };
 }
 
-async function sequencial(pecas) {
+async function sequencial(pecas, opcoes = {}) {
   const resultados = [];
-  for (const peca of pecas) resultados.push(await conferirPeca(peca));
+  for (const peca of pecas) resultados.push(await conferirPeca(peca, opcoes));
   return resultados;
 }
 

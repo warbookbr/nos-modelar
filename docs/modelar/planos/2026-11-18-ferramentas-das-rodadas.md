@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `tools/modelar/rodada-de-modelagem.mjs`, `tools/modelar/rodada-de-modelagem.test.mjs`, `src/autoria/laco-de-modelagem.js`, `src/autoria/laco-de-modelagem.test.js`, `tools/modelar/conferir-pontos.mjs`, `tools/modelar/entrada-de-medida.mjs`, `tools/modelar/entrada-de-medida.test.mjs`, `tools/modelar/pente-de-curvatura.mjs`, `tools/modelar/pente-de-curvatura.test.mjs`, `tools/modelar/vistas-para-critica.mjs`, `tools/modelar/vistas-para-critica.test.mjs`, `tools/modelar/etapas-da-montagem.mjs` e `tools/modelar/fluxo-do-objeto.mjs` (só a leitura da decisão gravada), `docs/modelar/banco-de-provas/ferramentas-das-rodadas-2026-11-18/`.
+**Território:** `tools/modelar/rodada-de-modelagem.mjs`, `tools/modelar/rodada-de-modelagem.test.mjs`, `src/autoria/laco-de-modelagem.js`, `src/autoria/laco-de-modelagem.test.js`, `tools/modelar/conferir-pontos.mjs`, `tools/modelar/entrada-de-medida.mjs`, `tools/modelar/entrada-de-medida.test.mjs`, `tools/modelar/pente-de-curvatura.mjs`, `tools/modelar/pente-de-curvatura.test.mjs`, `tools/modelar/vistas-para-critica.mjs`, `tools/modelar/vistas-para-critica.test.mjs`, `tools/modelar/etapas-da-montagem.mjs` e `tools/modelar/fluxo-do-objeto.mjs` (só a leitura da decisão gravada), `tools/modelar/guardas/guarda-acervo.mjs` e `tools/modelar/guardas/guarda-referencial.mjs` (só a opção de execução pelo cache, desligada por padrão), `docs/modelar/banco-de-provas/ferramentas-das-rodadas-2026-11-18/`.
 
 **Responsável:** a IA da sessão implementa; Tiago aprovou em 2026-11-18 as recomendações do debate das melhorias tiradas das rodadas 6 e 7 do quarto traseiro do carro.
 

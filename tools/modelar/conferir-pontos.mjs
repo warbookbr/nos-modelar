@@ -25,6 +25,7 @@
  * conversão mora aqui, num lugar só, porque duas conversões em dois arquivos
  * divergem no dia em que alguém mexe numa delas.
  */
+import { readFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { caixaDaParte } from '../../src/autoria/descrever-partes.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
@@ -109,14 +110,15 @@ function medirUmPonto(neutro, ponto, indice) {
 
 /**
  * Mede todos os pontos declarados de uma receita já carregada.
- * Devolve `{ ok, pontos }`, sem imprimir nada e sem encerrar o processo.
+ * Devolve `{ ok, pontos }`, sem imprimir nada e sem encerrar o processo. Com `executada` (`{ neutro }`, o resultado de `executarReceita`),
+ * mede sobre a execução que quem chama já tem, sem montar a peça de novo.
  */
-export function conferirPontos(receita, { quem = 'peça' } = {}) {
+export function conferirPontos(receita, { quem = 'peça', executada = null } = {}) {
   const declarados = receita?.PONTOS;
   if (!Array.isArray(declarados) || declarados.length === 0) {
     return { ok: false, semPontos: true, quem, pontos: [] };
   }
-  const { neutro } = executarReceita(receita);
+  const { neutro } = executada ?? executarReceita(receita);
   const pontos = declarados.map((ponto, i) => medirUmPonto(neutro, ponto, i));
   return { ok: pontos.every((p) => p.passou), quem, pontos };
 }
@@ -139,7 +141,7 @@ export function esperadosDosPontos(receita) {
 
 /* Onde termina o que começa em `k` e não é código: o comentário de linha, o de bloco, o texto entre aspas ou o template. Devolve a
    posição logo depois, ou `k` quando ali é código. O template conta as chaves de `${...}` para achar a crase que o fecha. */
-function pularNaoCodigo(t, k) {
+export function pularNaoCodigo(t, k) {
   const c = t[k];
   if (c === '/' && t[k + 1] === '/') { const f = t.indexOf('\n', k); return f < 0 ? t.length : f; }
   if (c === '/' && t[k + 1] === '*') { const f = t.indexOf('*/', k + 2); return f < 0 ? t.length : f + 2; }
@@ -231,30 +233,48 @@ export function formatarPontos(resultado) {
   return `${linhas.join('\n')}\n`;
 }
 
-const AJUDA = `node tools/modelar/conferir-pontos.mjs <peça>
+const AJUDA = `node tools/modelar/conferir-pontos.mjs <peça> [--params=<json | arquivo.json>] [--sem-cache]
 Mede os PONTOS que a receita exporta contra a malha e dá o desvio de cada um em mm, com ✓ ou ✗; sai com código 1 se algum
 passar da tolerância. Cada ponto é { nome, em: [x, y, z] em mm, toleranciaMm } e mais um destes:
   entre: ['a', 'b']               o centro da junta, onde as caixas das duas partes se sobrepõem;
   parte: 'a', medida?             um ponto da caixa da parte: medida 'centro' (padrão), 'minimo' ou 'maximo'.
+A receita executa com o cache por passo (tmp/cache-por-prefixo/), e --sem-cache a executa inteira. --params mede a variante com outros
+parâmetros, e é recusado na receita que calcula PONTOS da tabela na importação, porque o esperado não acompanharia a variante.
 `;
 
 async function principal(argv) {
-  const alvo = argv[2];
-  if (alvo === '--ajuda') {
+  if (argv.slice(2).includes('--ajuda')) {
     process.stdout.write(AJUDA);
     return 0;
   }
-  if (!alvo) {
-    process.stderr.write('uso: node tools/modelar/conferir-pontos.mjs <peça>\n');
+  /* importado aqui, e não no topo: `entrada-de-medida.mjs` importa este arquivo */
+  const [{ lerArgumentos }, { ErroDeEntrada, avisoDoCachePorPasso, executarComCachePorPasso, lerParams, receitaComParams }] = await Promise.all([import('./argumentos.mjs'), import('./entrada-de-medida.mjs')]);
+  let lido;
+  try { lido = lerArgumentos(argv.slice(2), { opcoes: ['params'], bandeiras: ['sem-cache'], posicional: { nome: 'peça', obrigatorio: true } }); } catch (erro) {
+    process.stderr.write(`conferir-pontos: ${erro.message}\nuso: node tools/modelar/conferir-pontos.mjs <peça> [--params=<json | arquivo.json>] [--sem-cache]\n`);
     return 2;
   }
+  const alvo = lido.posicional;
   const caminho = resolverCaminhoReceita(alvo);
   if (!caminho) {
     process.stderr.write(`conferir-pontos: não achei a receita '${alvo}'.\n`);
     return 2;
   }
-  const receita = receitaDoModulo(await importarReceita(caminho));
-  const resultado = conferirPontos(receita, { quem: alvo });
+  let receita = receitaDoModulo(await importarReceita(caminho));
+  let variante = null;
+  try {
+    const params = lerParams(lido.opcao('params'));
+    if (params) { receita = receitaComParams(receita, params, { texto: readFileSync(caminho, 'utf8'), nome: alvo }); variante = 'params'; }
+  } catch (erro) {
+    if (!(erro instanceof ErroDeEntrada)) throw erro;
+    process.stderr.write(`conferir-pontos: ${erro.message}\n`);
+    return 2;
+  }
+  /* a receita sem pontos não tem o que medir, e não paga a execução */
+  const temPontos = Array.isArray(receita?.PONTOS) && receita.PONTOS.length > 0;
+  const executada = temPontos ? await executarComCachePorPasso(caminho, receita, { cache: !lido.bandeira('sem-cache'), variante }) : null;
+  if (executada) process.stderr.write(avisoDoCachePorPasso(executada, 'conferir-pontos'));
+  const resultado = conferirPontos(receita, { quem: alvo, executada: executada?.executada ?? null });
   process.stdout.write(formatarPontos(resultado));
   return resultado.ok ? 0 : 1;
 }

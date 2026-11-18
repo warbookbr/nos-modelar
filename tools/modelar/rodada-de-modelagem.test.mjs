@@ -9,12 +9,15 @@
 import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { proximaAcao } from '../../src/autoria/laco-de-modelagem.js';
 import { conferirRodadasDaEtapa } from './etapas-da-montagem.mjs';
 import { acaoSemMedir } from './fluxo-do-objeto.mjs';
-import { esperadosDosPontos, mudancasDosEsperados, textoDosPontos } from './conferir-pontos.mjs';
+import { conferirPontos, esperadosDosPontos, mudancasDosEsperados, textoDosPontos } from './conferir-pontos.mjs';
+import { executarReceita } from '../../src/autoria/executar-receita.js';
+import { conferirUmaPeca } from './guardas/guarda-referencial.mjs';
 import { CAMPOS_OPCIONAIS_LIDOS_PELO_CRITICO, CAMPOS_OPCIONAIS_NAO_LIDOS_PELO_CRITICO, planoQueOCriticoLe, acaoDaPeca, ajustarImportsDaCopia, blocoDaPeca, contradicoesEntreRodadas, entradaDosArquivos, normalizarRelatoDoModelador, resumoDoLaco, gravarRodada, impressaoDaForma, lerArgumentos, lerRodadas, medirReceita, mudancaDosPontos, pastaDeRodadas, pontosDaMedicao, registrarMedida, convergenciaDaPeca, decisaoDaPessoa, limiteDaPeca, textoFinalDoAssistente, ultimoBlocoJson } from './rodada-de-modelagem.mjs';
 import { CAMPOS_OPCIONAIS_DO_PLANO } from '../../src/autoria/plano-de-modelagem.js';
 import { normalizarVeredito } from '../../src/autoria/veredito-de-forma.js';
@@ -471,6 +474,23 @@ describe('a medição da receita atual trava o laço', () => {
     expect(contorno.relatorio).toContain('a parte "sapata" da peça desvia 29,9 mm da referência');
     expect(await medirReceita(fixture('ok'))).toEqual(ok);
   });
+
+  it('a medição pelo cache por passo é a mesma da execução inteira, na peça que passa e na que reprova, e as medidas dividem uma execução', async () => {
+    for (const variante of ['ok', 'parte-fora']) {
+      const peloCache = await medirReceita(fixture(variante));
+      expect(await medirReceita(fixture(variante), { cache: false })).toEqual(peloCache);
+    }
+    /* os pontos e o referencial medem sobre a execução que quem chama entrega, sem executar a receita de novo */
+    const receita = (await import(pathToFileURL(resolverCaminhoReceita(fixture('ok'))).href)).default;
+    const executada = executarReceita(receita);
+    /* a lista de pontos sozinha, sem PASSOS: só mede se a execução vier de quem chama */
+    const soPontos = { PONTOS: [{ nome: 'a sapata', parte: 'sapata', em: [0, 0, 0], toleranciaMm: 1e6 }] };
+    expect(conferirPontos(soPontos, { executada })).toMatchObject({ ok: true, pontos: [{ nome: 'a sapata', passou: true }] });
+    expect(() => conferirPontos(soPontos, { executada: { neutro: { ...executada.neutro, V: new Map(), F: new Map() } } })).toThrow(/a peça não tem parte 'sapata'/);
+    let chamadas = 0;
+    expect(await conferirUmaPeca(fixture('ok'), { executar: async (r) => { chamadas += 1; return executarReceita(r); } })).toEqual(await conferirUmaPeca(fixture('ok')));
+    expect(chamadas).toBe(1);
+  }, 120000);
 
   it('--acao devolve modelar enquanto a medição da receita atual não passar, ainda que a última rodada tenha fechado', async () => {
     gravar(PECA, entrada({ medidas: { passou: true, relatorio: 'ok' }, veredito: veredito(0, 9) }));

@@ -61,7 +61,7 @@ import { conferirAcervo } from './guardas/guarda-acervo.mjs';
 import { conferirUmaPeca } from './guardas/guarda-referencial.mjs';
 import { conferirPontos, esperadosDosPontos, formatarMudancaDeEsperado, formatarPontos, mudancasDosEsperados, textoDosPontos } from './conferir-pontos.mjs';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
-import { executarReceita } from '../../src/autoria/executar-receita.js';
+import { executarComCachePorPasso } from './entrada-de-medida.mjs';
 import { afastamentoDaParte, normalizarEsbocoDoRefinamento } from '../../src/autoria/refinamento-global.js';
 import { avisoDaDispensa } from '../../src/autoria/lataria.js';
 import { normalizarPlanoDeModelagem } from '../../src/autoria/plano-de-modelagem.js';
@@ -291,29 +291,38 @@ const luzDaMedicao = (medicao) => (medicao.luzRasante?.luzRasante ? medicao.luzR
  * grava), `texto` é esse texto, para a rodada gravar o que foi medido e não o que está no disco depois, `lataria` diz se a peça é de
  * lataria (`superficieDaReceita`), `luzRasante` se a peça leva a luz rasante ao pacote (lataria ou emenda sombreada) e `avisos` o que o resumo do laço mostra sem reprovar (a dispensa de `PLANO.lataria`, com o motivo).
  * Peça sem receita resolvível lança.
+ *
+ * A receita executa uma vez só para o referencial, os pontos e as faces finas, com o cache por passo (`tmp/cache-por-prefixo/`), e a guarda
+ * do acervo recomeça do mesmo cache: a segunda medição da mesma receita não refaz passo nenhum. `cache: false` executa tudo inteiro.
  */
-export async function medirReceita(peca, { rodadas, pasta, registroDasEtapas } = {}) {
+export async function medirReceita(peca, { rodadas, pasta, registroDasEtapas, cache = true } = {}) {
   const caminho = resolverCaminhoReceita(peca);
   const texto = readFileSync(caminho, 'utf8');
   const sha256 = `sha256:${createHash('sha256').update(texto).digest('hex')}`;
   const falhas = [];
   const feitas = ['descrever (veredito)', 'guarda:acervo', 'guarda:referencial'];
-  const acervo = await conferirAcervo([peca]);
+  const acervo = await conferirAcervo([peca], { cachePorPrefixo: cache });
   for (const r of acervo.reprovadas) falhas.push(`guarda:acervo reprovou '${r.peca}':\n${indentar(r.motivo)}`);
   for (const e of acervo.esperando) falhas.push(`'${e.peca}' está planejada sem geometria (espera a etapa '${e.instancia}' de ${e.montagem}): não há o que medir`);
-  const referencial = await conferirUmaPeca(peca);
-  if (referencial) falhas.push(`guarda:referencial reprovou '${peca}':\n${indentar(referencial.motivo)}`);
   const receita = receitaDoModulo(await importarReceita(caminho));
+  /* a execução da receita atual, feita uma vez e dividida entre as medidas abaixo; a guarda do acervo, logo acima, deixou os pontos dela no cache */
+  let dividida;
+  const executar = async () => (dividida ??= (await executarComCachePorPasso(caminho, receita, { cache })).executada);
+  const referencial = await conferirUmaPeca(peca, { executar });
+  if (referencial) falhas.push(`guarda:referencial reprovou '${peca}':\n${indentar(referencial.motivo)}`);
+  /* a receita que não executa sozinha segue como era: cada medida abaixo a executa e diz a própria recusa */
+  let executada = null;
+  try { executada = await executar(); } catch { executada = null; }
   if (Array.isArray(receita?.PONTOS) && receita.PONTOS.length > 0) {
     feitas.push('conferir-pontos');
-    const pontos = conferirPontos(receita, { quem: peca });
+    const pontos = conferirPontos(receita, { quem: peca, executada });
     if (!pontos.ok) falhas.push(indentar(formatarPontos(pontos)));
   }
   /* o PLANO inválido já reprova no `descrever`; aqui ele só não declara a lataria, que então sai dos PASSOS */
   let plano = null;
   try { plano = normalizarPlanoDeModelagem(receita?.PLANO); } catch { plano = null; }
   const avisos = [avisoDaDispensa(plano)].filter(Boolean);
-  const facesFinas = facesFinasDaMalha(receita);
+  const facesFinas = facesFinasDaMalha(receita, { executada });
   if (facesFinas && facesFinas.total > 0) {
     const anteriores = rodadas ?? lerRodadasSeHouver(peca);
     const base = await baseDeFacesFinas(anteriores, pasta ?? pastaSeHouver(peca));
@@ -332,10 +341,11 @@ export async function medirReceita(peca, { rodadas, pasta, registroDasEtapas } =
 /**
  * As faces finas da malha que a receita produz, contadas por parte com a mesma régua de `lasca.mjs` (a topologia do núcleo: área /
  * maior aresta² abaixo de `LIMITE_DE_FACE_FINA`): `{ total, porParte: { parte: n } }`. Receita que não executa sozinha devolve null.
+ * Com `executada`, conta sobre a execução que quem chama já tem.
  */
-export function facesFinasDaMalha(receita) {
+export function facesFinasDaMalha(receita, { executada = null } = {}) {
   let lascas;
-  try { ({ lascas } = lascasDaReceita(receita)); } catch { return null; }
+  try { ({ lascas } = lascasDaReceita(receita, { executada })); } catch { return null; }
   const porParte = {};
   for (const l of lascas) porParte[l.parte ?? '(sem parte)'] = (porParte[l.parte ?? '(sem parte)'] ?? 0) + 1;
   return { total: lascas.length, porParte };
@@ -352,7 +362,11 @@ async function baseDeFacesFinas(rodadas, pasta) {
   if (!pasta) return null;
   const copia = copiaDaReceita(pasta, ultima.numero);
   if (!existsSync(copia)) return null;
-  try { return facesFinasDaMalha(receitaDoModulo(await importarReceita(copia)))?.total ?? null; } catch { return null; }
+  try {
+    /* a cópia da rodada não muda: com o cache por passo, só a primeira leitura dela executa */
+    const receita = receitaDoModulo(await importarReceita(copia));
+    return facesFinasDaMalha(receita, { executada: (await executarComCachePorPasso(copia, receita, { soOFim: true })).executada })?.total ?? null;
+  } catch { return null; }
 }
 
 /**
@@ -396,12 +410,14 @@ export function planoQueOCriticoLe(plano) {
  * o texto mude, como quando a receita ganha o `REFINA` depois de fechar. Receita que não executa sozinha (a que pede o registro de
  * composições de fora) devolve null, e quem compara trata como forma diferente.
  */
-export async function impressaoDaForma(caminho) {
+export async function impressaoDaForma(caminho, { copiaDeRodada = false } = {}) {
   let receita;
   let neutro;
   try {
     receita = receitaDoModulo(await importarReceita(caminho));
-    const execucao = executarReceita(receita);
+    /* com o cache por passo: a receita atual já foi executada pela medição, e a cópia da rodada, que não muda, só executa na primeira vez
+       e guarda só o estado final */
+    const execucao = (await executarComCachePorPasso(caminho, receita, { soOFim: copiaDeRodada })).executada;
     neutro = execucao.neutro ?? execucao;
   } catch {
     return null;
@@ -453,7 +469,7 @@ export async function acaoDaPeca(peca, {
   let mesmaFormaDaRodada;
   if (medicao.passou && medicao.caminho && ultima?.receita?.sha256 && ultima.receita.sha256 !== medicao.sha256
     && existsSync(copiaDaReceita(pasta, ultima.numero))) {
-    const [atual, julgada] = await Promise.all([impressaoDaForma(medicao.caminho), impressaoDaForma(copiaDaReceita(pasta, ultima.numero))]);
+    const [atual, julgada] = await Promise.all([impressaoDaForma(medicao.caminho), impressaoDaForma(copiaDaReceita(pasta, ultima.numero), { copiaDeRodada: true })]);
     if (atual !== null && atual === julgada) mesmaFormaDaRodada = ultima.numero;
   }
   let decisao = acaoDaReceita(rodadas, { sha256: medicao.sha256, medicao, mesmaFormaDaRodada }, { limite, convergenciaDesde, por });

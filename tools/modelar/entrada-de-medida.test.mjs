@@ -6,7 +6,9 @@ import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
-import { ErroDeEntrada, assinaturaDaEntrada, avisoDeCache, lerEntradaDeMedida, opcaoDaLinha } from './entrada-de-medida.mjs';
+import { divergenciaDaImpressao } from '../../procedural/nucleo/planejador/impressao-do-neutro.js';
+import { executarReceita } from '../../src/autoria/executar-receita.js';
+import { ErroDeEntrada, assinaturaDaEntrada, avisoDeCache, avisoDoCachePorPasso, executarComCachePorPasso, leiturasDiretasDaTabela, lerEntradaDeMedida, lerParams, opcaoDaLinha, receitaComParams } from './entrada-de-medida.mjs';
 import { exportarArquivoObj, semFaceSemArea } from './exportar-obj.mjs';
 import { comoCLI as lascas } from './lasca.mjs';
 import { vistasDeSuperficie } from './vistas-de-superficie.mjs';
@@ -243,5 +245,163 @@ describe('a face que a exportação não triangula', () => {
     const r = semFaceSemArea(m);
     expect(r.puladas).toEqual([]);
     expect(r.neutro).toBe(m);
+  });
+});
+
+/* A receita por parâmetro das provas abaixo: a chapa em V de `fixtures/dobra-por-apoio.mjs`, com os passos e o TOPO saindo de `this.PARAMS`.
+   `extra` entra no módulo depois da tabela, para a receita que lê a tabela direto. */
+const FIXTURE_DA_DOBRA = join(AQUI, 'fixtures/dobra-por-apoio.mjs');
+const textoDaParametrica = (extra = '', campos = '') => `import { receitaDaDobra } from ${JSON.stringify(FIXTURE_DA_DOBRA)};
+export const TABELA = { angulo: 90, chapa: { niveis: 1, espessura: 1 } };
+const dobra = (T) => receitaDaDobra({ angulo: T.angulo, niveis: T.chapa.niveis, espessura: T.chapa.espessura });
+${extra}
+const receita = {
+  meta: { nome: 'dobra por parâmetro' },
+  PARAMS: TABELA,
+  get TOPO() { return dobra(this.PARAMS).TOPO; },
+  get PASSOS() { return dobra(this.PARAMS).PASSOS; },${campos}
+};
+export default receita;
+`;
+
+describe('o cache por passo nas medidas', () => {
+  it('a segunda execução recomeça do estado guardado e dá o mesmo neutro da execução direta; sem cache, nada é lido nem gravado', async () => {
+    const pasta = mkdtempSync(join(area, 'prefixo-'));
+    const arquivo = gravar('parametrica-a.mjs', textoDaParametrica());
+    const { default: receita } = await import(arquivo);
+    const direta = executarReceita(receita);
+    const primeira = await executarComCachePorPasso(arquivo, receita, { pastaDoCachePorPrefixo: pasta });
+    expect(primeira.cachePorPasso).toMatchObject({ recomecouDoPasso: 0, total: 2 });
+    expect(primeira.cachePorPasso.guardados).toBeGreaterThan(0);
+    expect(avisoDoCachePorPasso(primeira, 'medida')).toMatch(/nenhum estado guardado servia, a receita executou inteira/);
+    const segunda = await executarComCachePorPasso(arquivo, receita, { pastaDoCachePorPrefixo: pasta });
+    expect(segunda.cachePorPasso).toMatchObject({ recomecouDoPasso: 2, total: 2, guardados: 0 });
+    expect(avisoDoCachePorPasso(segunda, 'medida')).toMatch(/^medida: cache por passo .*recomeçou do estado guardado depois de 2 de 2 passo\(s\).*--sem-cache executa inteira\n$/);
+    expect(divergenciaDaImpressao(direta.neutro, primeira.executada.neutro)).toBeNull();
+    expect(divergenciaDaImpressao(direta.neutro, segunda.executada.neutro)).toBeNull();
+    /* o que a zebra lê do neutro restaurado: a gaiola da chapa, campo que a serialização comum perderia */
+    expect(segunda.executada.neutro.chapas[0].faces.length).toBe(direta.neutro.chapas[0].faces.length);
+    const antes = readdirSync(pasta).length;
+    const semCache = await executarComCachePorPasso(arquivo, receita, { cache: false, pastaDoCachePorPrefixo: pasta });
+    expect(semCache.cachePorPasso).toBeNull();
+    expect(avisoDoCachePorPasso(semCache, 'medida')).toBe('');
+    expect(readdirSync(pasta).length).toBe(antes);
+    expect(divergenciaDaImpressao(direta.neutro, semCache.executada.neutro)).toBeNull();
+  });
+
+  it('com soOFim fica um ponto só na pasta, o do estado final, e a segunda execução recomeça dele', async () => {
+    const pasta = mkdtempSync(join(area, 'prefixo-'));
+    const arquivo = gravar('parametrica-fim.mjs', textoDaParametrica());
+    const { default: receita } = await import(arquivo);
+    const pontos = () => readdirSync(pasta).filter((n) => n.includes('-ponto-')).length;
+    await executarComCachePorPasso(arquivo, receita, { pastaDoCachePorPrefixo: pasta });
+    expect(pontos()).toBe(2);
+    const outra = mkdtempSync(join(area, 'prefixo-'));
+    const primeira = await executarComCachePorPasso(arquivo, receita, { soOFim: true, pastaDoCachePorPrefixo: outra });
+    expect(readdirSync(outra).filter((n) => n.includes('-ponto-')).length).toBe(1);
+    const segunda = await executarComCachePorPasso(arquivo, receita, { soOFim: true, pastaDoCachePorPrefixo: outra });
+    expect(segunda.cachePorPasso.recomecouDoPasso).toBe(2);
+    expect(divergenciaDaImpressao(primeira.executada.neutro, segunda.executada.neutro)).toBeNull();
+  });
+
+  it('os parâmetros entram na chave: a variante não é servida pelo estado da receita do arquivo, e a mesma variante é servida na segunda vez', async () => {
+    const pasta = mkdtempSync(join(area, 'prefixo-'));
+    const arquivo = gravar('parametrica-b.mjs', textoDaParametrica());
+    const texto = readFileSync(arquivo, 'utf8');
+    const { default: receita } = await import(arquivo);
+    await executarComCachePorPasso(arquivo, receita, { pastaDoCachePorPrefixo: pasta });
+    const variante = receitaComParams(receita, { chapa: { niveis: 2 } }, { texto });
+    expect(variante.PARAMS).toEqual({ angulo: 90, chapa: { niveis: 2, espessura: 1 } });
+    expect(receita.PARAMS.chapa.niveis).toBe(1);
+    expect(variante.PASSOS[0][1].niveis).toBe(2);
+    const direta = executarReceita(variante);
+    expect(direta.neutro.F.size).toBeGreaterThan(executarReceita(receita).neutro.F.size);
+    const primeira = await executarComCachePorPasso(arquivo, variante, { variante: 'params', pastaDoCachePorPrefixo: pasta });
+    expect(primeira.cachePorPasso.recomecouDoPasso).toBe(0);
+    expect(divergenciaDaImpressao(direta.neutro, primeira.executada.neutro)).toBeNull();
+    const segunda = await executarComCachePorPasso(arquivo, variante, { variante: 'params', pastaDoCachePorPrefixo: pasta });
+    expect(segunda.cachePorPasso.recomecouDoPasso).toBe(2);
+    expect(divergenciaDaImpressao(direta.neutro, segunda.executada.neutro)).toBeNull();
+    /* a receita do arquivo continua servida pelo estado dela, depois das variantes */
+    const doArquivo = await executarComCachePorPasso(arquivo, receita, { pastaDoCachePorPrefixo: pasta });
+    expect(doArquivo.cachePorPasso.recomecouDoPasso).toBe(2);
+    expect(doArquivo.executada.neutro.F.size).toBe(executarReceita(receita).neutro.F.size);
+  });
+});
+
+describe('--params: a variante de parâmetros e as recusas', () => {
+  it('lê o JSON da linha ou de um arquivo .json, e recusa o que não é objeto com parâmetro', () => {
+    expect(lerParams(null)).toBeNull();
+    expect(lerParams('{"chapa":{"niveis":2}}')).toEqual({ chapa: { niveis: 2 } });
+    expect(lerParams(gravar('variante.json', '{ "angulo": 80 }'))).toEqual({ angulo: 80 });
+    expect(() => lerParams(join(area, 'nao-existe.json'))).toThrow(/--params espera um objeto em JSON ou o caminho de um \.json que existe, e veio/);
+    expect(() => lerParams('{"angulo":')).toThrow(/--params não é JSON válido/);
+    expect(() => lerParams('{}')).toThrow(/--params espera um objeto com ao menos um parâmetro, e veio \{\}/);
+  });
+
+  it('recusa a receita que deriva dados da tabela fora de this.PARAMS, dizendo as linhas, e aceita a que só a lê por this.PARAMS', async () => {
+    const derivada = `export const PONTOS = [\n  { nome: 'quina', parte: 'chapa', em: [0, 0, TABELA.angulo], toleranciaMm: 1 },\n];\nexport const ALIASES = { quina: { origem: { op: 'subdivisao', id: TABELA.chapa.niveis } } };\n/* TABELA num comentário não conta, nem 'TABELA' num texto */`;
+    const arquivo = gravar('derivada.mjs', textoDaParametrica(derivada, '\n  PONTOS,\n  ALIASES,'));
+    const texto = readFileSync(arquivo, 'utf8');
+    expect(leiturasDiretasDaTabela(texto).map((l) => l.texto)).toEqual([
+      "{ nome: 'quina', parte: 'chapa', em: [0, 0, TABELA.angulo], toleranciaMm: 1 },",
+      "export const ALIASES = { quina: { origem: { op: 'subdivisao', id: TABELA.chapa.niveis } } };",
+    ]);
+    const { default: receita } = await import(arquivo);
+    let recusa = null;
+    try { receitaComParams(receita, { angulo: 80 }, { texto, nome: 'derivada.mjs' }); } catch (erro) { recusa = erro; }
+    expect(recusa).toBeInstanceOf(ErroDeEntrada);
+    expect(recusa.message).toMatch(/--params recusado: derivada\.mjs lê a tabela dos parâmetros direto, fora de this\.PARAMS, em 2 linha\(s\)/);
+    expect(recusa.message).toMatch(/linha 7: export const ALIASES/);
+    expect(recusa.message).toMatch(/a variante teria os passos novos e esses dados velhos/);
+    expect(recusa.message).toMatch(/get PONTOS\(\) \{ return pontos\(this\.PARAMS\); \}/);
+    /* a leitura direta dentro de função também usa a tabela do arquivo */
+    expect(leiturasDiretasDaTabela(textoDaParametrica('export const pedidos = () => dobra(TABELA);')).map((l) => l.linha)).toEqual([4]);
+    const limpa = textoDaParametrica();
+    expect(leiturasDiretasDaTabela(limpa)).toEqual([]);
+    expect(leiturasDiretasDaTabela('export default { PARAMS: { a: 1 }, PASSOS: [] };')).toEqual([]);
+  });
+
+  it('recusa o parâmetro que a receita não declara, a receita sem PARAMS e a de PASSOS em lista fixa', async () => {
+    const arquivo = gravar('parametrica-c.mjs', textoDaParametrica());
+    const { default: receita } = await import(arquivo);
+    expect(() => receitaComParams(receita, { anglo: 80 })).toThrow(/--params traz 'anglo', que a receita não declara em PARAMS; os declarados ali são angulo, chapa/);
+    expect(() => receitaComParams(receita, { chapa: { nivel: 2 } })).toThrow(/--params traz 'chapa\.nivel', que a receita não declara em PARAMS \(em chapa\); os declarados ali são espessura, niveis/);
+    expect(() => receitaComParams({ PASSOS: [] }, { a: 1 }, { nome: 'x.mjs' })).toThrow(/--params pede uma receita com PARAMS, e x\.mjs não declara nenhum/);
+    expect(() => receitaComParams(null, { a: 1 }, { nome: 'rede-sem-ruido' })).toThrow(/--params pede uma receita com PARAMS, e rede-sem-ruido não declara nenhum/);
+    expect(() => receitaComParams({ PARAMS: { a: 1 }, PASSOS: [] }, { a: 2 }, { nome: 'fixa.mjs' })).toThrow(/--params não muda fixa\.mjs: PASSOS é uma lista fixa, calculada na importação/);
+  });
+
+  it('a zebra numérica e o conferir-pontos recusam pela linha de comando e medem a variante da receita que só lê this.PARAMS', () => {
+    const rodar = (ferramenta, ...args) => spawnSync(process.execPath, [join(AQUI, ferramenta), ...args], { cwd: REPO, encoding: 'utf8' });
+    const pontos = `const pontos = (T) => [{ nome: 'a chapa', parte: 'chapa', medida: 'minimo', em: [-250, 0, 0], toleranciaMm: 2 * T.chapa.espessura }];`;
+    /* dentro do repositório, em tmp/: o conferir-pontos só resolve receita que mora nele */
+    mkdirSync(join(REPO, 'tmp'), { recursive: true });
+    const dentro = mkdtempSync(join(REPO, 'tmp', 'teste-params-'));
+    const noRepo = (nome, texto) => { const f = join(dentro, nome); writeFileSync(f, texto); return f; };
+    try {
+    const boa = noRepo('receita-boa.mjs', textoDaParametrica(pontos, '\n  get PONTOS() { return pontos(this.PARAMS); },'));
+    const derivada = noRepo('receita-derivada.mjs', textoDaParametrica('export const PONTOS = [{ nome: \'a chapa\', parte: \'chapa\', medida: \'minimo\', em: [-250, 0, 0], toleranciaMm: 2 * TABELA.chapa.espessura }];', '\n  PONTOS,'));
+    const semParams = rodar('zebra-numerica.mjs', boa, '--sem-cache');
+    expect(semParams.status).toBe(0);
+    expect(semParams.stderr).not.toMatch(/cache por passo/);
+    /* a dobra de 20 graus vira a normal média da chapa para outro eixo, e o olhar da região muda com ela */
+    const comParams = rodar('zebra-numerica.mjs', boa, '--sem-cache', '--params={"angulo":20}');
+    expect(comParams.status).toBe(0);
+    expect([JSON.parse(semParams.stdout).regioes[0].olhar, JSON.parse(comParams.stdout).regioes[0].olhar]).toEqual(['-x', '+y']);
+    const recusada = rodar('zebra-numerica.mjs', derivada, '--params={"chapa":{"niveis":2}}');
+    expect(recusada.status).toBe(2);
+    expect(recusada.stdout).toBe('');
+    expect(recusada.stderr).toMatch(/zebra: --params recusado: .*receita-derivada\.mjs lê a tabela dos parâmetros direto, fora de this\.PARAMS, em 1 linha\(s\)/);
+    const deProva = rodar('zebra-numerica.mjs', 'rede-sem-ruido', '--params={"a":1}');
+    expect(deProva.status).toBe(2);
+    expect(deProva.stderr).toMatch(/--params pede uma receita com PARAMS, e rede-sem-ruido não declara nenhum/);
+    const medidos = rodar('conferir-pontos.mjs', boa, '--sem-cache', '--params={"chapa":{"espessura":2}}');
+    expect(medidos.stdout).toMatch(/conferir-pontos — .*receita-boa\.mjs (PASSOU|REPROVOU)/);
+    expect(medidos.stdout).toMatch(/tolerância 4\)/);
+    const pontosRecusados = rodar('conferir-pontos.mjs', derivada, '--params={"chapa":{"espessura":2}}');
+    expect(pontosRecusados.status).toBe(2);
+    expect(pontosRecusados.stderr).toMatch(/conferir-pontos: --params recusado: .*lê a tabela dos parâmetros direto/);
+    } finally { rmSync(dentro, { recursive: true, force: true }); }
   });
 });

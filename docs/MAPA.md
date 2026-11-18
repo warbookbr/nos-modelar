@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2122 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2123 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -342,6 +342,10 @@
 ## docs/modelar/banco-de-provas/familias-de-desenho-2026-10-14/prova/familia/
 
 - `NOTAS.md` — A carcaça da descrição pela família de desenho
+
+## docs/modelar/banco-de-provas/ferramentas-das-rodadas-2026-11-18/
+
+- `README.md` — Ferramentas das rodadas: fatia 2, o cache por passo e `--params` nas medidas
 
 ## docs/modelar/banco-de-provas/forma-exata-2026-11-13/
 

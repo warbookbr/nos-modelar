@@ -28,7 +28,10 @@
  * A medida é da superfície limite da gaiola, antes dos vãos cortados depois, como `onde-ondula.mjs`: roda só os passos `subdivisao`.
  *
  * Uso: node tools/modelar/zebra-numerica.mjs <chapa de prova | caminho da receita> [--passo=<mm>] [--persistencia=<g>] [--frequencia=<f>]
- *        [--faixas=<mm,mm,...>] [--caixas=<json>] [--olhar=<+x|-x|+y|-y|+z|-z>] [--saida=<json>]
+ *        [--faixas=<mm,mm,...>] [--caixas=<json>] [--olhar=<+x|-x|+y|-y|+z|-z>] [--saida=<json>] [--params=<json | arquivo.json>] [--sem-cache]
+ *   A receita em arquivo executa com o cache por passo (`tmp/cache-por-prefixo/`, o do `descrever` e da bancada): a segunda medida da mesma
+ *   receita recomeça do estado guardado, e `--sem-cache` executa inteira. `--params` mede a variante com outros parâmetros sem editar o
+ *   arquivo (`receitaComParams`, em `entrada-de-medida.mjs`, que recusa a receita que lê a tabela dos parâmetros fora de `this.PARAMS`).
  *   (também `npm run zebra -- ...` quando o atalho existir). `--caixas` é um JSON { nome: { x: [min, max], y: [...], z: [...], menos: [...] } } em mm, e
  *   cada caixa é uma região, com `olhar` opcional na própria caixa; sem ele a chapa toda é uma região. O JSON vai para a saída padrão e a
  *   tabela para a saída de erro.
@@ -43,10 +46,10 @@
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { refinarGaiola, superficieLimite } from '../../procedural/nucleo/subdivisao.js';
 import { CHAPAS_DE_PROVA, receitaDeProva } from '../fixtures/correcao-de-superficie/chapas.mjs';
 import { lerArgumentos } from './argumentos.mjs';
+import { avisoDoCachePorPasso, executarComCachePorPasso, lerParams, receitaComParams } from './entrada-de-medida.mjs';
 
 export const PADROES = Object.freeze({ passoMm: 25, persistencia: 0.004, frequencia: 40, faixas: Object.freeze([100, 200, 500]) });
 const EIXOS = ['x', 'y', 'z'];
@@ -227,7 +230,7 @@ export function tabelaDaZebra(res, nome) {
     ...res.regioes.map((r) => `${col(r.nome, larg)}  ${col(r.olhar, 5)}  ${num(r.pontos, 7)}  ${num(r.extremos, 8)}  ${num(r.lacos, 6)}  ${num(r.lacosEsperados, 9)}  ${nomes.map((n) => num(`${r.porFaixa[n].extremos}/${r.porFaixa[n].lacos}`, 9)).join(' ')}`)].join('\n');
 }
 
-export const OPCOES_DA_CLI = ['passo', 'persistencia', 'frequencia', 'faixas', 'caixas', 'olhar', 'saida'];
+export const OPCOES_DA_CLI = ['passo', 'persistencia', 'frequencia', 'faixas', 'caixas', 'olhar', 'saida', 'params'];
 
 function numero(lido, nome, padrao) {
   const t = lido.opcao(nome); if (t === null || t === undefined) return padrao;
@@ -237,10 +240,10 @@ function numero(lido, nome, padrao) {
 
 async function principal(argv) {
   let lido;
-  try { lido = lerArgumentos(argv.slice(2), { opcoes: OPCOES_DA_CLI, bandeiras: ['ajuda'], posicional: { nome: 'chapa', obrigatorio: false } }); } catch (e) { process.stderr.write(`zebra: ${e.message}\n`); return 2; }
+  try { lido = lerArgumentos(argv.slice(2), { opcoes: OPCOES_DA_CLI, bandeiras: ['ajuda', 'sem-cache'], posicional: { nome: 'chapa', obrigatorio: false } }); } catch (e) { process.stderr.write(`zebra: ${e.message}\n`); return 2; }
   const alvo = lido.posicional;
   if (lido.bandeira('ajuda') || !alvo) {
-    process.stderr.write(`uso: node tools/modelar/zebra-numerica.mjs <chapa de prova | caminho da receita> [--${OPCOES_DA_CLI.join('=...] [--')}=...]\n  padrões: passo ${PADROES.passoMm} mm, persistência ${PADROES.persistencia}, frequência ${PADROES.frequencia}, faixas ${PADROES.faixas.join(',')} mm; ver o cabeçalho do arquivo\n`);
+    process.stderr.write(`uso: node tools/modelar/zebra-numerica.mjs <chapa de prova | caminho da receita> [--${OPCOES_DA_CLI.join('=...] [--')}=...] [--sem-cache]\n  padrões: passo ${PADROES.passoMm} mm, persistência ${PADROES.persistencia}, frequência ${PADROES.frequencia}, faixas ${PADROES.faixas.join(',')} mm; ver o cabeçalho do arquivo\n`);
     return lido.bandeira('ajuda') ? 0 : 2;
   }
   let res; let nome;
@@ -248,8 +251,15 @@ async function principal(argv) {
     const faixas = lido.opcao('faixas') ? lido.opcao('faixas').split(',').map(Number) : [...PADROES.faixas];
     if (faixas.some((f) => !Number.isFinite(f))) throw new Error(`--faixas espera mm separados por vírgula, e veio '${lido.opcao('faixas')}'`);
     const caixas = lido.opcao('caixas') ? JSON.parse(readFileSync(resolve(lido.opcao('caixas')), 'utf8')) : null;
-    const receita = CHAPAS_DE_PROVA.includes(alvo) ? receitaDeProva(alvo) : (await import(pathToFileURL(resolve(alvo)).href)).default;
-    const { neutro } = executarReceita({ ...receita, PASSOS: receita.PASSOS.filter(([op]) => op === 'subdivisao'), vaos: undefined });
+    /* a chapa de prova é gerada na hora e não tem arquivo: executa inteira, sem cache, e não aceita --params */
+    const abs = CHAPAS_DE_PROVA.includes(alvo) ? null : resolve(alvo);
+    let receita = abs ? (await import(pathToFileURL(abs).href)).default : receitaDeProva(alvo);
+    const params = lerParams(lido.opcao('params'));
+    if (params) receita = receitaComParams(abs ? receita : null, params, { texto: abs ? readFileSync(abs, 'utf8') : null, nome: alvo });
+    const executada = await executarComCachePorPasso(abs, { ...receita, PASSOS: receita.PASSOS.filter(([op]) => op === 'subdivisao'), vaos: undefined },
+      { cache: !lido.bandeira('sem-cache'), variante: params ? 'so-subdivisao+params' : 'so-subdivisao' });
+    process.stderr.write(avisoDoCachePorPasso(executada, 'zebra'));
+    const { neutro } = executada.executada;
     const chapa = (neutro.chapas ?? [])[0];
     if (!chapa) throw new Error(`${alvo}: nenhum passo subdivisao na receita`);
     nome = alvo;
