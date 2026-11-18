@@ -1,6 +1,6 @@
 # Ferramentas das rodadas: fatia 2, o cache por passo e `--params` nas medidas
 
-Registro das fatias 2 e 3 do plano [ferramentas das rodadas](../../planos/2026-11-18-ferramentas-das-rodadas.md). A fatia 2 foi medida em 2026-11-18 sobre a lataria do carro (`carro-fastback/lataria`, receita de sha256 `bda6950a`, 10 passos, o primeiro deles a `subdivisao` da chapa), numa máquina de 4 núcleos, com Node 22.23.4 e uma medida por vez.
+Registro das fatias 2 e 3 do plano [ferramentas das rodadas](../../decisoes/PLANOS-ENCERRADOS.md). A fatia 2 foi medida em 2026-11-18 sobre a lataria do carro (`carro-fastback/lataria`, receita de sha256 `bda6950a`, 10 passos, o primeiro deles a `subdivisao` da chapa), numa máquina de 4 núcleos, com Node 22.23.4 e uma medida por vez.
 
 ## O que entrou
 
