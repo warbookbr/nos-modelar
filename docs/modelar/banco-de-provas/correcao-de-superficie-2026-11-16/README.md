@@ -192,3 +192,73 @@ Limitação conhecida, sem mudança: os ids das curvas marcadas (`chapas[k].curv
 Uma revisão adversarial achou três defeitos na primeira redação do oráculo e da medida, todos corrigidos acima (a borda livre dentro da inclinação, a catraca que punia a melhora da G2 e não cobrava `distanciaDentroMm`, e a precisão da valência 3), e dois menores: a medida seguia em frente por uma face que não era de quatro lados e dava salto falso, e a nitidez de vinco `null` e o parâmetro `null` entravam como zero. Nenhum deles o processo teria pegado sozinho: o teste do 20 vezes e o do dobro conferiam a conta e não o lugar, e a precisão perto do extraordinário só tinha sido conferida nas valências 5, 6 e 8.
 
 O processo não teria pegado o que o oráculo mostrou: as medidas de antes liam a malha de nível finito por ajuste e não separam crista de rampa nem de salto; o gate analítico e a medida na curva ficam agora como teste (`analiticas.test.mjs`, `medida-na-curva.test.mjs`, `onde-ondula.test.mjs`). Sem as opções novas nada muda: o estado canônico das 21 chapas de prova (malha e rede, por hash), da carenagem de prova, da carroceria do sedã, do kukri, do ombro do braço robótico, da caçamba do carrinho de mão, do banco da empilhadeira, da chapa de prova da rede, da gota, da rodada 1 do quarto traseiro e do quarto traseiro (só os passos `subdivisao`) é o mesmo antes e depois, byte a byte.
+
+## Fatia 5, degrau 3, etapa A: a energia de variação de curvatura como protótipo fora do núcleo (2026-11-18)
+
+A pessoa aprovou em 2026-11-18 começar o degrau 3 por um protótipo fora do núcleo. Ele está em `tools/fixtures/correcao-de-superficie/energia-de-curvatura.mjs`, com o teste ao lado, e não muda nenhum arquivo de `procedural/nucleo/`: monta a gaiola do passo `subdivisao` por `gaiolaDoPasso`, tira dela a gaiola declarada e as medidas, resolve o próprio sistema e devolve a gaiola ajustada, que `superficieLimite`, `medirCurvasDoNeutro` e `ondeOndula` leem como leem a de hoje. As `CONHECIDAS` e o gate de `analiticas.test.mjs` ficaram como estavam.
+
+O ajuste de hoje (`ajustarGaiolaAsMedidasComPeso`) minimiza a soma dos desvios da superfície às cotas com peso mais o quadrado do deslocamento de cada ponto da gaiola, com as cotas exatas como restrição. O protótipo troca o segundo termo pela variação da curvatura do limite e deixa do deslocamento um resto de 1e-9, que só tira a indeterminação. No vértice regular (valência 4, quatro faces de quatro lados, fora da borda, sem canto e sem vinco) as derivadas segundas do limite saem do anel 3×3 pelos estênceis da B-spline bicúbica, divididas pelos comprimentos das arestas da gaiola declarada, que ficam congelados; a energia soma, em cada aresta entre dois vértices regulares, o quadrado da diferença desses três números, com os eixos alinhados pela aresta e o peso (onda/2π)⁶ sobre o quadrado do comprimento da aresta. `onda` é o comprimento de onda em que a energia e a cota de peso 1 pesam o mesmo, e o padrão é quatro arestas medianas da gaiola. Todos os vértices são incógnitas, e o sistema é o mesmo bloco com as restrições, resolvido por `fatorarLU`.
+
+Os comandos, cada um com o número de hoje e o do protótipo na mesma saída:
+
+```
+npx vitest run tools/fixtures/correcao-de-superficie/energia-de-curvatura.test.mjs
+node tools/fixtures/correcao-de-superficie/energia-de-curvatura.mjs analiticas [--onda=<mm>] [--miolo=<peso>]
+node tools/fixtures/correcao-de-superficie/energia-de-curvatura.mjs emendas [--onda=<mm>] [--miolo=<peso>]
+node tools/fixtures/correcao-de-superficie/energia-de-curvatura.mjs rede [--onda=<mm>] [--miolo=<peso>]
+```
+
+Prova 0, por teste. O estêncil confere com `superficieLimite.avaliar(face, 0, 0)` nos 323 cantos de face regulares da rede do toro, com a maior diferença de 2,5e-16 em derivadas de até 4,0e-3. A energia é nula em toda quadrática no parâmetro quando os comprimentos são iguais (a grade plana declarada), e positiva na cúbica. A senoide de comprimento `onda` cotada com peso 1 sai com 0,455 da amplitude a quatro arestas por onda, 0,479 a seis, 0,503 a oito e 0,549 a dezesseis (numa grade de seis ondas, lida nas duas do meio); a metade exata é a do contínuo.
+
+Um limite apareceu já aqui: os comprimentos congelados são os das arestas no espaço, e uma quadrática inclinada amostrada em passo igual no plano tem arestas de comprimentos diferentes, de modo que a energia dela sobre a própria gaiola sai pequena e não nula (o teste cobra que seja menos de um centésimo da cúbica). No toro, em que o passo em volta do eixo vai de 17 a 33 mm ao longo do tubo, é o que sobra de crista.
+
+A crista ganhou uma medida por ponto, `cristaPontual`: em cada vértice regular da curva, a mais de quatro arestas das pontas, a curvatura transversal no vértice menos a média da mesma curvatura nos dois vértices da fileira ao lado. A medida de `medirLinhasNoLimite` compara a mediana da curva inteira com a mediana da faixa, e as duas diferem sem crista nenhuma quando a curvatura varia ao longo da curva: na curva `v1` do toro, em que a curvatura transversal vai de 1,4 a -0,5 1/m, ela dá 0,17 contra 0,33 no protótipo com a fileira do meio plana a 1,00, 1,01 e 1,00. O vértice em que a curva cruza outra curva exata sai à parte, porque ali a curvatura transversal é a da outra curva, que o ajuste não escolhe.
+
+Prova 1, as analíticas (passo de 25 mm, `onda` de 92 a 103 mm). A distância é em mm, na chapa inteira, a mais de 50 e a mais de 100 mm da borda; a crista é a maior e a mediana por ponto, em 1/m, fora do cruzamento, nas curvas `h1` e `v1`; as medianas são as da medida antiga, na curva e a duas arestas dela.
+
+| Superfície | Ajuste | Distância inteira, a 50 e a 100 mm | Crista por ponto, maior e mediana | Medianas na curva e ao lado |
+|---|---|---|---|---|
+| paraboloide | hoje | 0,39, 0,23 e 0,20 | 1,46 e 1,36 | 3,28 e 2,25 |
+| paraboloide | protótipo, miolo de peso 1 | 0,44, 0,44 e 0,23 | 0,024 e 0,017 | 2,37 e 2,36 |
+| paraboloide | protótipo, miolo de peso 0,001 | 0,39, 0,32 e 0,22 | 0,024 e 0,016 | 2,37 e 2,37 |
+| calota | hoje | 0,62, 0,39 e 0,23 | 1,17 e 1,15 | 2,80 e 1,93 |
+| calota | protótipo, miolo de peso 1 | 0,50, 0,14 e 0,02 | 0,027 e 0,016 | 1,99 e 2,01 |
+| calota | protótipo, miolo de peso 0,001 | 0,50, 0,09 e 0,09 | 0,029 e 0,009 | 1,98 e 2,00 |
+| toro | hoje | 1,11, 0,94 e 0,73 | `h1` 1,65 e 1,62; `v1` 2,02 e 1,43 | 6,20 e 4,97; 1,09 e 0,33 |
+| toro | protótipo, miolo de peso 1 | 0,97, 0,75 e 0,46 | `h1` 0,15 e 0,010; `v1` 0,12 e 0,058 | 5,10 e 5,07; 0,17 e 0,33 |
+| toro | protótipo, miolo de peso 0,001 | 0,97, 0,39 e 0,17 | `h1` 0,15 e 0,012; `v1` 0,12 e 0,044 | 5,03 e 5,00; 0,17 e 0,33 |
+
+A crista cai de 1,2 a 2,0 1/m para 0,024 no paraboloide e 0,027 na calota, abaixo do 0,05 do critério de parada. No toro ela cai de onze a dezessete vezes e fica acima de 0,05: 0,15 na `h1` e 0,12 na `v1`, as duas nos dois vértices vizinhos do cruzamento (fora deles a `h1` fica em 0,01 e a `v1` entre 0,003 e 0,07). No cruzamento a crista é 0,42 hoje e no protótipo, igual, porque vem das duas curvas exatas, que ali não concordam; os vizinhos herdam parte dela. Mudar `onda` (50, 100, 200 e 400 mm) e o peso do miolo (10, 1, 0,1, 0,03 e 0,001) não tira esses dois números do toro nem muda os do paraboloide em mais de 0,02. Pelo critério do plano isto é parada para o toro, e fica dito: a energia sozinha não leva a crista do toro a 0,05.
+
+A distância tem três causas que o ajuste não alcança, todas medidas. A chapa inteira (0,39, 0,50 e 0,97) é o segundo ponto das curvas exatas a contar da ponta, que a própria curva declarada põe a 0,39 mm do paraboloide, e o protótipo passa por ele porque é restrição. Longe da borda, com o miolo de peso 1, o protótipo segue a cota do miolo, e a cota do miolo que a `gaiolaPorRede` declara (o preenchimento com o alisamento) está a 0,42 mm do paraboloide a 50 mm da borda e 0,21 a 100 mm, a 0,11 e 0,02 da calota e a 0,75 e 0,37 do toro: é por isso que o paraboloide a 50 mm piora de 0,23 para 0,44, e é a única medida das analíticas que piora. Com `liso: false` a cota do miolo do paraboloide fica a 0,013 mm e o protótipo com peso 1 sai a 0,016 mm a 100 mm da borda (hoje, com a mesma cota, 0,23), mas a da calota fica a 0,28 e o protótipo a 0,33. Com o miolo quase sem peso (0,001) sobra a regra de borda: a fileira da borda é presa pelas cotas exatas e fica a κh²/6 da gaiola da quadrática (0,26 mm no paraboloide, 0,21 na calota, 0,52 através do tubo do toro, com o passo de 25 mm), e a energia espalha esse degrau para dentro até a curva exata seguinte, o que deixa 0,22, 0,09 e 0,17 mm a 100 mm da borda. Tirar o termo dos vértices cujo anel toca a borda (`--longe-da-borda`) não resolve: com peso 1 o paraboloide fica em 0,42 mm a 50 mm e o toro em 0,74, quase os mesmos, e com o miolo de peso 1e-5 o toro vai a 5,7 mm. Os números esperados pela proposta (calota 0,49, 0,09 e 0,09; toro 0,95, 0,33 e 0,08; curvatura do paraboloide 2,41 contra 2,40) batem com o protótipo de miolo 0,001 na calota e na curvatura, e no toro ficam em 0,97, 0,39 e 0,17.
+
+Prova 2, as chapas emendadas (passo de 30 mm, `onda` de 116 a 121 mm, miolo de peso 1), na curva `emenda`: a inclinação da rampa longe da borda (1/m²), a curvatura na curva e a duas arestas de cada lado (1/m), a crista por ponto e a distância à desenhada junto da emenda e na chapa (mm, a diferença em y projetada na normal). O salto fica em zero de máquina nas três.
+
+| Chapa | Ajuste | Inclinação | Curvatura na curva e ao lado | Crista por ponto | Distância junto e na chapa |
+|---|---|---|---|---|---|
+| emenda-g2 (desenhada 0,67) | hoje | 6,61 | 0,81; 0,65 e 0,65 | 0,200 | 0,08 e 0,10 |
+| emenda-g2 | protótipo | 0,056 | 0,669; 0,668 e 0,668 | 0,002 | 0,08 e 0,10 |
+| emenda-dupla (desenhada 1,67) | hoje | 41,2 | 2,31; 1,62 e 1,62 | 1,19 | 1,36 e 1,36 |
+| emenda-dupla | protótipo | 4,2 | 1,62; 1,69 e 1,69 | 0,061 | 1,36 e 1,36 |
+| emenda-g1 (desenhada 2,0 e 0,67) | hoje | 25,7 | 1,63; 0,95 e 1,68 | 0,399 | 1,23 e 1,31 |
+| emenda-g1 | protótipo | 9,0 | 1,35; 0,99 e 1,71 | 0,004 | 1,11 e 1,19 |
+
+A `emenda-g2` sai com a curvatura desenhada (0,667) na curva e ao lado e a rampa cem vezes menor. A `emenda-g1` não se afasta da desenhada além de hoje (1,11 contra 1,23 mm junto da emenda; o 1,24 da fatia 4 era a mesma leitura pela malha) e a curvatura na curva passa a ficar entre as dos dois lados (1,35 entre 0,99 e 1,71), em vez de crista. A `emenda-dupla` fica com crista de 0,061, um pouco acima de 0,05, e a distância dela é a da ponta das curvas exatas, igual. A inclinação na faixa da borda livre não muda (30,0 para 29,6, 94,7 para 94,1 e 92,7 para 91,7): a regra de borda não é tocada.
+
+Prova 3, a `rede-sem-ruido` (passo de 50 mm, `onda` de 201 mm, 395 arestas com termo), por `ondeOndula`, e a distância a `painel(x, z)` na chapa e a mais de 100 mm da borda:
+
+| Ajuste | Viradas por metro: miolo, curva, singular, borda | Energia de variação: miolo, curva | Distância ao painel |
+|---|---|---|---|
+| hoje | 7,5, 13,8, 6,3 e 6,3 | 8570 e 1066 | 4,04 |
+| protótipo, miolo de peso 1 | 5,5, 11,8, 8,1 e 4,0 | 831 e 324 | 3,55 |
+| protótipo, miolo de peso 0,001 | 3,4, 11,5, 6,5 e 4,3 | 181 e 277 | 1,64 |
+| protótipo, `onda` de 400 mm | 3,9, 10,3, 6,4 e 3,7 | 201 e 271 | 1,40 |
+| protótipo, `onda` de 100 mm | 8,7, 15,2, 9,2 e 5,4 | 6424 e 677 | 4,46 |
+
+Com o padrão a rede fica mais perto da forma que hoje (3,55 contra 4,04 mm) e vira menos no miolo e na curva; a energia de variação do miolo cai dez vezes. As viradas da curva caem pouco (13,8 para 11,8) porque a régua de 0,1 1/m conta a amplitude mediana de 0,11, no limiar. Com `onda` de duas arestas (100 mm) a rede fica mais longe que hoje (4,46), e por isso o padrão não deve descer de quatro arestas. Perto do ponto singular as viradas sobem de 6,3 para 8,1 com o peso 1: o extraordinário não tem termo, e é o que a tampa do degrau 5 cobre.
+
+O que recomendo para a etapa B. Levar a energia ao núcleo como opção declarada do ajuste das cotas, desligada por padrão para o acervo sair idêntico, com `onda` em quatro arestas. Antes disso, três coisas que a etapa A mostrou e que a energia não resolve sozinha: o parâmetro por comprimento de aresta, que deixa a crista do toro em 0,12 a 0,15 junto do cruzamento (trocar os comprimentos congelados por um parâmetro que a quadrática respeite, ou iterar os comprimentos); o cruzamento de duas curvas exatas, cuja crista (0,42 no toro) vem das curvas e pede que elas sejam ajustadas juntas ou que o nó deixe de ser cota exata nas duas direções; e a cota do miolo, que hoje é o preenchimento alisado e está a até 0,75 mm da superfície, de modo que com a energia ligada o miolo deveria perder a cota (peso perto de zero) ou recebê-la de um preenchimento que a energia já tenha passado.
+
+Sobre a meta de 0,05 mm. Na chapa inteira ela não é alcançável por nenhum ajuste das cotas: o piso é a ponta das curvas exatas (0,39, 0,50 e 0,97 mm) e o degrau da regra de borda (κh²/6, de 0,21 a 0,52 mm no passo de 25 mm), e os dois estão fora do ajuste. Mantê-la pediria um degrau de borda próprio (a fileira de fora da borda tirada da quadrática, e não da reflexão, e a ponta das curvas corrigida), que é mudança na regra de borda do núcleo e muda todo o acervo. Recomendo trocar a meta pelo par que a etapa A mede: a crista por ponto abaixo de 0,05 1/m fora do cruzamento, e a distância a mais de 100 mm da borda sem piorar contra hoje. Pelo par, o protótipo já passa na calota (0,027 e 0,02 mm) e no paraboloide na crista (0,024, com a distância de 0,23 contra 0,20, presa na cota do miolo), e não passa no toro (0,12 a 0,15 de crista; 0,46 mm contra 0,73). A distância de 0,05 mm a 100 mm da borda só aparece onde a cota do miolo é boa (0,016 no paraboloide com `liso: false`, 0,02 na calota), e por isso ela depende mais da cota do miolo que da energia.
+
+O processo teria pegado sozinho? O efeito da energia sobre a crista, não: nenhuma medida de antes lia a crista por ponto, e a comparação de medianas dava crista falsa onde a curvatura varia ao longo da curva; `cristaPontual` e o teste do protótipo ficam como medida. A piora do paraboloide a 50 mm seria pega pela catraca de `analiticas.test.mjs` no dia em que a energia entrasse no ajuste do núcleo, e a causa dela (a cota do miolo fora da superfície) não tinha medida até aqui.
