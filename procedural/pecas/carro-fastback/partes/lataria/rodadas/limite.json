@@ -1,0 +1,5 @@
+{
+  "limite": 1000,
+  "por": "a pessoa, 2026-11-18: 'o carro é uma modelagem para estudo também, então não usaremos limites de rodadas de modelagem e estudo para ele'",
+  "motivo": "o carro é peça de estudo além de modelagem; sem limite de rodadas (1000 representa sem limite até a ferramenta aceitar a declaração explícita, no plano das ferramentas das rodadas)"
+}
