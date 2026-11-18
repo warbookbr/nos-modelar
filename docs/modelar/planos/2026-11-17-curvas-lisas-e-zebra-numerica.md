@@ -26,6 +26,7 @@ O ajuste é capacidade nova do núcleo (ENVOLVER sobre a curva da gaiola: entram
 - a zebra numérica, com prova nas chapas da fatia 5 da correção de superfície (a `rede-sem-ruido` dá a taxa de base do método) e nas rodadas 4 e 5 do carro, que o crítico já julgou;
 - o aviso de área no índice de suavidade;
 - uma rodada do carro com as duas, como prova, pelo laço de modelagem.
+- emenda aprovada pela pessoa em 2026-11-18, do debate das melhorias das rodadas 6 e 7: as regiões da zebra numérica para a coluna, o teto e a traseira, com exclusão por caixa ou disco para tirar o furo do arco; `ponto`, `rumo` e `valorEm` exatos no ajuste; e o ajuste com objetivo de lisura opcional (entre as cadeias que cabem, a de menor variação de curvatura), independente do sentido dos pontos, com modo de pontos esparsos, trecho mínimo em unidade dos pontos e rumo fixo nas pontas, mantido o padrão atual para as provas da fatia 2 valerem.
 
 ## Excluído
 
@@ -43,7 +44,9 @@ O ajuste é capacidade nova do núcleo (ENVOLVER sobre a curva da gaiola: entram
 
 1. Feita em 2026-11-17: a zebra numérica (`tools/modelar/zebra-numerica.mjs`) e o aviso de área do índice de suavidade (`--area-minima`), medidos nas rodadas 2 a 4 do carro e nas chapas de prova (`docs/modelar/banco-de-provas/curvas-lisas-2026-11-17/`). A medida é estável com a densidade (no máximo 3 extremos e 1 laço de diferença, contra ±5 extremos do protótipo) e conta laço onde o crítico viu laço, mas o gate de saída 2 fica em aberto: nenhuma rodada julgada lisa existe para separar o lisa do reprovado, e a pessoa decide o próximo passo.
 2. Feita em 2026-11-17: o ajuste de curva lisa no núcleo (`procedural/nucleo/ajuste-de-curva-lisa.js`), cadeia de clotoides com as provas analíticas, limpas e com ruído, e a planta do carro-fastback dentro de 3 mm (2,54 mm, 9 clotoides em 2 lóbulos, 1 inflexão, a mesma contagem de 20 a 0,8 mm de espaçamento), no banco de provas desta pasta; a revisão adversarial do núcleo e o uso na receita ficam para a fatia 3.
-3. A rodada do carro com as duas, e o fechamento.
+3. As rodadas do carro com as duas: a 6 (planta pelo ajuste, nota 7) e a 7 (teto, quina e perfil da traseira pelo ajuste) feitas em 2026-11-18; as seguintes depois das fatias 4 e 5.
+4. As regiões novas da zebra numérica e a leitura exata do ajuste, antes de medir a rodada 7 contra a 6.
+5. O ajuste com objetivo de lisura, com revisão adversarial e prova em mais de um comprimento e densidade fora da curva do carro, e o fechamento.
 
 ## Riscos e parada
 
