@@ -30,6 +30,7 @@ export const FONTES_VIGIADAS = [
   { arquivo: 'tools/mcp/perfis/parametros.mjs' },
   { arquivo: 'tools/mcp/perfis/procedural.mjs' },
   { arquivo: 'tools/modelar/zebra-numerica.mjs' },
+  { arquivo: 'tools/modelar/pente-de-curvatura.mjs' },
 ];
 
 /** `arquivo`, depois o texto fixo da mensagem (o mesmo que o gate imprime): o motivo de cada exceção é obrigatório. */
