@@ -30,6 +30,14 @@
  * exemplo:
  *   const aj = ajustarCurvaLisa(pontosDaPrancha, { tolerancia: 3 }); // aj.clotoides.length, aj.inflexoes, aj.desvioMaximo
  *   gaiolaPorRede({ ..., curvas: [aj.pontosDaRede(60, { nome: 'planta' }), ...] })
+ *   guardado: { inicio, rumo, comprimento, joelhos: [{ f, k }], tolerancia } o que basta para refazer a mesma curva sem ajustar (`f` é a fração do arco de cada joelho e
+ *     `tolerancia`, a do plano, que escolhe o passo da integração); é dado puro, que passa por JSON sem perder um bit.
+ * guardar o ajuste: o ajuste leva segundos, e quem o usa na importação de uma receita guarda o resultado como dado versionado. `impressaoDoAjuste(pontos, opcoes)` dá a
+ *   impressão da entrada ({ pontos, soma, opcoes }: a contagem, a soma dos pontos em milionésimo da unidade e as opções), `curvaLisaGuardada(guardado)` refaz a curva
+ *   ({ inicio, rumo, comprimento, joelhos, clotoides, ponto, amostrar }, os mesmos números do ajuste) e `curvaLisaDoGuardado({ nome, pontos, opcoes, guardados })`
+ *   devolve a curva guardada em `guardados[nome]` quando a impressão dela confere com a entrada de agora (`doGuardado: true`) e ajusta na hora quando não confere
+ *   (`doGuardado: false`, com `mudou`, a lista do que difere), para quem chama avisar; só o dado guardado malformado recusa.
+ *   Nada aqui lê nem escreve disco: quem guarda é a receita, e quem regrava é `tools/modelar/regravar-ajustes-de-curva.mjs`.
  * peça: procedural/nucleo/ajuste-de-curva-lisa.test.mjs (arco, clotoide, elipse e S analíticos, com ruído, a escala, a ordem e as recusas).
  * FIM DA FICHA
  *
@@ -358,6 +366,21 @@ export function ajustarCurvaLisa(entrada, { tolerancia: toleranciaPedida = 1, ma
 
 /* ---------- o resultado ---------- */
 
+/** o ponto no comprimento de arco s e a amostra a passo de arco, sobre a curva integrada */
+function leituraDaCurva(c, L) {
+  const ponto = (s) => {
+    const alvo = Math.min(L, Math.max(0, s)); let lo = 0; let hi = c.n;
+    while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (c.s[mid] <= alvo) lo = mid; else hi = mid; }
+    const t = (alvo - c.s[lo]) / (c.s[hi] - c.s[lo] || 1);
+    return [c.x[lo] + (c.x[hi] - c.x[lo]) * t, c.y[lo] + (c.y[hi] - c.y[lo]) * t];
+  };
+  const amostrar = (passoMm) => {
+    if (typeof passoMm !== 'number' || !(passoMm > 0)) erro(`passo espera um número maior que zero (a unidade dos pontos), e veio ${citar(passoMm)}`);
+    const n = Math.max(1, Math.round(L / passoMm)); return Array.from({ length: n + 1 }, (_, i) => ponto((i * L) / n));
+  };
+  return { ponto, amostrar };
+}
+
 function montar(ajuste, lido, tolerancia, eixos, original) {
   const { P, constante, livre, tem3, livres, comprimentoDosPontos } = lido; const { q } = ajuste; const { fr, k, L } = q;
   const joelhos = fr.map((f, i) => ({ s: f * L, k: k[i] }));
@@ -406,16 +429,7 @@ function montar(ajuste, lido, tolerancia, eixos, original) {
   }
   if (corrida) trechos.push(corrida);
   const trechosFinais = trechos.map(({ d, ...t }) => ({ ...t, sentido: d > 0 ? 'cresce' : d < 0 ? 'cai' : 'constante' }));
-  const ponto = (s) => {
-    const alvo = Math.min(L, Math.max(0, s)); let lo = 0; let hi = c.n;
-    while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (c.s[mid] <= alvo) lo = mid; else hi = mid; }
-    const t = (alvo - c.s[lo]) / (c.s[hi] - c.s[lo] || 1);
-    return [c.x[lo] + (c.x[hi] - c.x[lo]) * t, c.y[lo] + (c.y[hi] - c.y[lo]) * t];
-  };
-  const amostrar = (passoMm) => {
-    if (typeof passoMm !== 'number' || !(passoMm > 0)) erro(`passo espera um número maior que zero (a unidade dos pontos), e veio ${citar(passoMm)}`);
-    const n = Math.max(1, Math.round(L / passoMm)); return Array.from({ length: n + 1 }, (_, i) => ponto((i * L) / n));
-  };
+  const { ponto, amostrar } = leituraDaCurva(c, L);
   const para3d = (u, v) => { const r = [0, 0, 0]; r[eixos[0]] = u; r[eixos[1]] = v; r[livre] = constante; return r; };
   /* o desvio 3D: o do plano e o da coordenada livre (a distância dela à constante) em quadratura */
   const d3 = (v, i) => (tem3 ? Math.hypot(v, livres[i] - constante) : v);
@@ -424,6 +438,59 @@ function montar(ajuste, lido, tolerancia, eixos, original) {
     cabe: motivos.length === 0, motivo: motivos.length ? motivos.join('; ') : null, tolerancia: original, desvioMaximo: Math.max(...desvios3.map(Math.abs)),
     desvioDaCurva: tem3 ? Math.hypot(desvioDaCurvaMaximo, Math.max(...livres.map((z) => Math.abs(z - constante)))) : desvioDaCurvaMaximo, desvios: desvios3, comprimento: L,
     joelhos, clotoides, trechos: trechosFinais, inflexoes, inicio: [q.x0, q.y0], rumo: q.th0, ponto, amostrar,
+    guardado: { inicio: [q.x0, q.y0], rumo: q.th0, comprimento: L, joelhos: fr.map((f, i) => ({ f, k: k[i] })), tolerancia },
     pontosDaRede: (passo, { nome = 'curva', completar = tem3 ? para3d : (u, v) => [u, v, constante] } = {}) => ({ nome, pontos: amostrar(passo).map(([u, v]) => completar(u, v)) }),
   };
+}
+
+/* ---------- o ajuste guardado ---------- */
+
+const MILIONESIMO = 1e6;
+const opcoesDoAjuste = ({ tolerancia = 1, maximoDeClotoides = 8, duros = [], eixos = [0, 1] } = {}) => ({ tolerancia, maximoDeClotoides, duros, eixos });
+
+/** A impressão da entrada de um ajuste: a contagem dos pontos, a soma deles (cada coordenada em milionésimo da unidade, para o último bit de uma conta não trocar a
+ * impressão entre duas máquinas) e as opções com os padrões escritos. Duas entradas com a mesma impressão dão o mesmo ajuste. */
+export function impressaoDoAjuste(pontos, opcoes = {}) {
+  if (!Array.isArray(pontos) || !pontos.every((p) => Array.isArray(p) && p.every((c) => Number.isFinite(c)))) erro(`a impressão espera a lista de pontos do ajuste, de números finitos, e veio ${citar(pontos)?.slice(0, 80)}`);
+  /* duas somas FNV-1a de 32 bits, uma do texto e outra do texto ao contrário de semente trocada: 64 bits em hexadecimal */
+  const texto = pontos.map((p) => p.map((c) => Math.round(c * MILIONESIMO) + 0).join(',')).join(';');
+  let a = 0x811c9dc5; let b = 0x01000193;
+  for (let i = 0; i < texto.length; i += 1) { a = Math.imul(a ^ texto.charCodeAt(i), 0x01000193); b = Math.imul(b ^ texto.charCodeAt(texto.length - 1 - i), 0x85ebca6b); }
+  const hex = (v) => (v >>> 0).toString(16).padStart(8, '0');
+  return { pontos: pontos.length, soma: hex(a) + hex(b), opcoes: opcoesDoAjuste(opcoes) };
+}
+
+/** A curva de um ajuste guardado (`guardado` do resultado de `ajustarCurvaLisa`, como veio ou depois de passar por JSON), refeita sem ajustar: a mesma integração a passo
+ * fino, com os mesmos números. Devolve { inicio, rumo, comprimento, joelhos, clotoides, ponto(s), amostrar(passo) }. */
+export function curvaLisaGuardada(guardado) {
+  const g = guardado; const finito = (v) => typeof v === 'number' && Number.isFinite(v);
+  const J = g?.joelhos;
+  if (!g || !Array.isArray(g.inicio) || g.inicio.length !== 2 || !g.inicio.every(finito) || !finito(g.rumo) || !finito(g.comprimento) || !(g.comprimento > 0) || !finito(g.tolerancia) || !(g.tolerancia > 0)
+    || !Array.isArray(J) || J.length < 2 || !J.every((j) => j && finito(j.f) && finito(j.k)) || J[0].f !== 0 || J[J.length - 1].f !== 1 || J.some((j, i) => i > 0 && !(j.f > J[i - 1].f))) {
+    erro(`o ajuste guardado espera { inicio: [u, v], rumo, comprimento, joelhos: [{ f, k }, ...] de f 0 a 1 em ordem, tolerancia }, e veio ${citar(g)?.slice(0, 200)}`);
+  }
+  const L = g.comprimento; const fr = J.map((j) => j.f); const k = J.map((j) => j.k);
+  const c = integrar({ x0: g.inicio[0], y0: g.inicio[1], th0: g.rumo, L, k }, fr, passosPorTrecho(fr, L, k, g.tolerancia, true));
+  const joelhos = fr.map((f, i) => ({ s: f * L, k: k[i] }));
+  const clotoides = joelhos.slice(1).map((b, i) => ({ de: joelhos[i].s, ate: b.s, k0: joelhos[i].k, k1: b.k, comprimento: b.s - joelhos[i].s }));
+  return { inicio: [...g.inicio], rumo: g.rumo, comprimento: L, joelhos, clotoides, ...leituraDaCurva(c, L) };
+}
+
+/** A curva do ajuste de nome `nome`: a guardada em `guardados` ({ [nome]: { impressao, curva } }), refeita sem ajustar, quando a impressão guardada confere com a da entrada
+ * de agora (`pontos`, `opcoes`); quando não confere, ou o nome não está guardado, o ajuste é feito na hora (`ajustarCurvaLisa`, que leva segundos), como para a variante da
+ * tabela que o dado guardado não cobre. O resultado leva `doGuardado` (true ou false) e, feito na hora, `mudou`: a lista do que difere do guardado, para quem chama avisar
+ * com o comando que regrava. Só o dado guardado malformado recusa (`curvaLisaGuardada`). O resultado guardado traz o que basta para refazer a curva (inicio, rumo,
+ * comprimento, joelhos, clotoides, ponto, amostrar) e `cabe: true`; o feito na hora é o de `ajustarCurvaLisa` inteiro, com o `cabe` dele. */
+export function curvaLisaDoGuardado({ nome, pontos, opcoes = {}, guardados }) {
+  const agora = impressaoDoAjuste(pontos, opcoes);
+  const dado = guardados?.[nome]; const antes = dado?.impressao;
+  const mudou = [];
+  if (!dado || !antes) mudou.push('não há ajuste guardado com este nome');
+  else {
+    if (antes.pontos !== agora.pontos) mudou.push(`os pontos eram ${citar(antes.pontos)} e agora são ${agora.pontos}`);
+    else if (antes.soma !== agora.soma) mudou.push(`os ${agora.pontos} pontos mudaram de valor (a soma era ${citar(antes.soma)} e agora é ${agora.soma})`);
+    for (const campo of Object.keys(agora.opcoes)) if (citar(antes.opcoes?.[campo]) !== citar(agora.opcoes[campo])) mudou.push(`a opção ${campo} era ${citar(antes.opcoes?.[campo])} e agora é ${citar(agora.opcoes[campo])}`);
+  }
+  if (mudou.length) return { ...ajustarCurvaLisa(pontos, opcoes), doGuardado: false, mudou };
+  return { ...curvaLisaGuardada(dado.curva), cabe: true, motivo: null, doGuardado: true };
 }

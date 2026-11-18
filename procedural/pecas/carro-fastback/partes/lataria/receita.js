@@ -34,7 +34,8 @@
  * A cadeia: a TABELA em mm; `derivar` calcula a pele, os nós, as curvas e os retalhos; `gerarPassos` converte para metro com `m()`. */
 import { gaiolaPorRede } from '../../../../nucleo/gaiola-por-rede.js';
 import { furoPassante } from '../../../../nucleo/furo-passante.js';
-import { ajustarCurvaLisa } from '../../../../nucleo/ajuste-de-curva-lisa.js';
+import { curvaLisaDoGuardado } from '../../../../nucleo/ajuste-de-curva-lisa.js';
+import AJUSTES_GUARDADOS from './ajustes-de-curva.js';
 
 const m = (mm) => mm / 1000;
 
@@ -234,25 +235,82 @@ export function contornoDaPlanta(planta, sigma) {
 
 const PLANTAS = new Map();
 
-/** A planta lisa, com a mesma leitura de `contornoDaPlanta` (ponto, normal para dentro, deZ, total, zFim): a leitura da prancha ajustada pelo núcleo a uma cadeia de clotoides
- * dentro de `curvaLisa.planta.tolerancia`. O ajuste recebe a meia planta e o começo do espelho dela além do eixo do carro; como o ajuste não tem condição de ponta, nos últimos
- * `alemDoEixo` mm antes do eixo a curva é levada, em S, à média dela com o espelho do trecho de depois do eixo: no eixo ela é simétrica exata e cruza de frente. O rumo sai da
- * integral exata da curvatura dos joelhos, e o desvio de cada ponto lido à curva final é medido aqui: fora da tolerância, a receita recusa. O ajuste leva alguns segundos e fica
- * guardado por TABELA. */
-export function plantaLisa(T) {
+/* OS AJUSTES GUARDADOS. `ajustarCurvaLisa` leva de 1 a 3 s por curva, e a receita precisa de cinco (a planta, o teto, a quina do teto em x e em y e o perfil da traseira) para
+ * ser importada. O resultado de cada ajuste fica em `ajustes-de-curva.js`, ao lado deste arquivo, com a impressão dos pontos e das opções que entraram nele; a receita refaz a
+ * curva do dado guardado quando a impressão confere com a entrada de agora; quando não confere, ajusta na hora e avisa com o comando que regrava (`COMANDO_QUE_REGRAVA`). O
+ * dado vale para a TABELA deste arquivo: quem muda uma tabela lida ou uma opção de `curvaLisa` regrava, e a variante da TABELA em memória paga o ajuste. O desvio de cada ponto lido à curva refeita continua medido aqui a cada importação. */
+const COMANDO_QUE_REGRAVA = 'node tools/modelar/regravar-ajustes-de-curva.mjs procedural/pecas/carro-fastback/partes/lataria/receita.js';
+
+/** A leitura da planta que entra no ajuste: o contorno da prancha, os pontos lidos a cada `passo` e os que o ajuste recebe (com o alargamento e o espelho além do eixo). */
+function entradaDaPlanta(T) {
   const L = T.curvaLisa.planta;
-  const chave = JSON.stringify([T.planta, T.alisamento.planta, L]);
-  if (PLANTAS.has(chave)) return PLANTAS.get(chave);
   const C = contornoDaPlanta(T.planta, T.alisamento.planta);
   const lidos = []; for (let u = 0; u < C.total; u += L.passo) lidos.push(C.ponto(u)); lidos.push(C.ponto(C.total));
   /* o alargamento do para-lama: entre `de` e `ate` o ajuste recebe, no lugar dos dois cantos da leitura, um S só de quinto grau entre as larguras que a leitura tem nesses dois z;
-   * a tolerância continua medida contra a leitura da prancha, mais abaixo */
+   * a tolerância continua medida contra a leitura da prancha, em `plantaLisa` */
   const G = L.alargamento;
   const xDe = G && C.ponto(C.deZ(G.de))[1]; const xAte = G && C.ponto(C.deZ(G.ate))[1];
   const alvo = G ? lidos.map(([z, x]) => (z < G.de && z > G.ate ? [z, xDe + (xAte - xDe) * suave((G.de - z) / (G.de - G.ate))] : [z, x])) : lidos;
   const espelho = alvo.slice(-Math.round(L.alemDoEixo / L.passo) - 1, -1).reverse().map(([z, x]) => [z, -x]);
-  const a = ajustarCurvaLisa([...alvo, ...espelho], { tolerancia: L.tolerancia, maximoDeClotoides: L.maximoDeClotoides });
-  if (!a.cabe) throw new Error(`carro-fastback/lataria: a planta não cabe em ${L.tolerancia} mm com ${L.maximoDeClotoides} clotoides: ${a.motivo}`);
+  return { C, lidos, pontos: [...alvo, ...espelho], opcoes: { tolerancia: L.tolerancia, maximoDeClotoides: L.maximoDeClotoides } };
+}
+
+/** A leitura de uma tabela [a, b] que entra no ajuste: a cúbica monótona pelos pontos, a cada `passo` de a, na ordem da tabela ou na inversa (`sentido`). */
+function entradaDaCurva(tabela, L) {
+  const f = pchip(tabela);
+  const as = tabela.map(([a]) => a); const a0 = Math.min(...as); const a1 = Math.max(...as);
+  const lidos = []; for (let a = a0; a < a1; a += L.passo) lidos.push([a, f(a)]); lidos.push([a1, f(a1)]);
+  if ((tabela[0][0] > tabela[tabela.length - 1][0]) !== (L.sentido === 'inverso')) lidos.reverse();
+  return { lidos, opcoes: { tolerancia: L.tolerancia, maximoDeClotoides: L.maximoDeClotoides } };
+}
+
+/** As tabelas [a, b] que passam pelo ajuste, pela chave com que ficam guardadas. */
+const tabelasLisas = (T) => ({
+  teto: [T.teto, T.curvaLisa.teto], 'quinaDoTeto.x': [T.quinaDoTeto.map(([z, x]) => [z, x]), T.curvaLisa.quinaDoTeto],
+  'quinaDoTeto.y': [T.quinaDoTeto.map(([z, , y]) => [z, y]), T.curvaLisa.quinaDoTeto], traseira: [T.traseira.map(([y, z]) => [y, z]), T.curvaLisa.traseira],
+});
+
+/** Os ajustes de que a receita precisa, [{ nome, pontos, opcoes }]: a entrada de `ajustarCurvaLisa` de cada um, que a ferramenta que regrava lê. */
+export function ajustesDeCurva(T) {
+  const planta = entradaDaPlanta(T);
+  return [{ nome: 'planta', pontos: planta.pontos, opcoes: planta.opcoes },
+    ...Object.entries(tabelasLisas(T)).map(([nome, [tabela, L]]) => { const e = entradaDaCurva(tabela, L); return { nome, pontos: e.lidos, opcoes: e.opcoes }; })];
+}
+
+/** O que `tools/modelar/regravar-ajustes-de-curva.mjs` lê desta receita: o arquivo do dado, ao lado deste, e os ajustes a guardar. */
+export const AJUSTES_DE_CURVA = { arquivo: 'ajustes-de-curva.js', pedidos: () => ajustesDeCurva(TABELA) };
+
+const AVISADOS = new Set();
+
+/** O ajuste de nome `nome`: a curva guardada quando a impressão guardada é a da entrada de agora; senão (uma variante da TABELA, ou a TABELA mudada sem regravar) o ajuste
+ * feito na hora, com um aviso por nome que diz o que mudou e o comando que regrava. O ajuste que não cabe recusa, e o dado guardado malformado também: essa recusa leva
+ * `ajustesDeCurva` (o arquivo e os pedidos da TABELA), porque a receita que recusa na importação não exporta `AJUSTES_DE_CURVA`, e é dali que a ferramenta que regrava os lê. */
+function ajusteGuardado(nome, descricao, pontos, opcoes) {
+  let a;
+  try { a = curvaLisaDoGuardado({ nome, pontos, opcoes, guardados: AJUSTES_GUARDADOS }); } catch (recusa) {
+    recusa.message = `carro-fastback/lataria: ${recusa.message}; regrave o dado com \`${COMANDO_QUE_REGRAVA}\``;
+    recusa.ajustesDeCurva = { arquivo: AJUSTES_DE_CURVA.arquivo, pedidos: AJUSTES_DE_CURVA.pedidos() };
+    throw recusa;
+  }
+  if (!a.doGuardado && !AVISADOS.has(nome)) {
+    AVISADOS.add(nome);
+    console.warn(`carro-fastback/lataria: o ajuste guardado de ${nome} não é o da entrada de agora (${a.mudou.join('; ')}), e o ajuste foi refeito na hora, o que leva segundos; se a TABELA mudou, regrave o dado com \`${COMANDO_QUE_REGRAVA}\``);
+  }
+  if (!a.cabe) throw new Error(`carro-fastback/lataria: ${descricao} não cabe em ${opcoes.tolerancia} mm com ${opcoes.maximoDeClotoides} clotoides: ${a.motivo}`);
+  return a;
+}
+
+/** A planta lisa, com a mesma leitura de `contornoDaPlanta` (ponto, normal para dentro, deZ, total, zFim): a leitura da prancha ajustada pelo núcleo a uma cadeia de clotoides
+ * dentro de `curvaLisa.planta.tolerancia`. O ajuste recebe a meia planta e o começo do espelho dela além do eixo do carro; como o ajuste não tem condição de ponta, nos últimos
+ * `alemDoEixo` mm antes do eixo a curva é levada, em S, à média dela com o espelho do trecho de depois do eixo: no eixo ela é simétrica exata e cruza de frente. O rumo sai da
+ * integral exata da curvatura dos joelhos, e o desvio de cada ponto lido à curva final é medido aqui: fora da tolerância, a receita recusa. O ajuste leva alguns segundos e
+ * vem guardado de `ajustes-de-curva.js` (`ajusteGuardado`). */
+export function plantaLisa(T) {
+  const L = T.curvaLisa.planta;
+  const chave = JSON.stringify([T.planta, T.alisamento.planta, L]);
+  if (PLANTAS.has(chave)) return PLANTAS.get(chave);
+  const { C, lidos, pontos, opcoes } = entradaDaPlanta(T);
+  const a = ajusteGuardado('planta', 'a planta', pontos, opcoes);
   /* o rumo em s: a integral da curvatura, linear entre joelhos */
   const rumo = (s) => { let th = a.rumo; for (let i = 1; i < a.joelhos.length; i += 1) { const [p, q] = [a.joelhos[i - 1], a.joelhos[i]]; if (s <= p.s) break; const e = Math.min(s, q.s); th += 0.5 * (p.k + p.k + ((q.k - p.k) * (e - p.s)) / (q.s - p.s)) * (e - p.s); } return th; };
   /* o comprimento de arco em que o ajuste cruza o eixo do carro */
@@ -287,17 +345,13 @@ const CURVAS = new Map();
 /** A curva lisa de uma tabela [a, b] da prancha, como função b(a): a leitura da tabela (a cúbica monótona pelos pontos, a cada `passo` de a) ajustada pelo núcleo a uma cadeia de
  * clotoides dentro de `tolerancia`; fora dela, a receita recusa. A curva é refeita aqui dos joelhos do ajuste (início, rumo e curvatura linear entre joelhos), integrada por
  * Gauss de três pontos a cada milímetro de arco, para o ponto-chave sair da curva e não da corda entre amostras; `a` cresce ou cai sempre ao longo dela, e b(a) sai por
- * bisseção no arco. Fora do intervalo da tabela vale a ponta. Guardada por tabela e opções. */
-export function curvaLisaDe(tabela, L, nome = 'curva') {
-  const chave = JSON.stringify([tabela, L]);
-  if (CURVAS.has(chave)) return CURVAS.get(chave);
-  const f = pchip(tabela);
-  const as = tabela.map(([a]) => a); const a0 = Math.min(...as); const a1 = Math.max(...as);
-  const lidos = []; for (let a = a0; a < a1; a += L.passo) lidos.push([a, f(a)]); lidos.push([a1, f(a1)]);
-  /* os pontos entram no ajuste na ordem da tabela ou na inversa (`sentido`) */
-  if ((tabela[0][0] > tabela[tabela.length - 1][0]) !== (L.sentido === 'inverso')) lidos.reverse();
-  const aj = ajustarCurvaLisa(lidos, { tolerancia: L.tolerancia, maximoDeClotoides: L.maximoDeClotoides });
-  if (!aj.cabe) throw new Error(`carro-fastback/lataria: ${nome} não cabe em ${L.tolerancia} mm com ${L.maximoDeClotoides} clotoides: ${aj.motivo}`);
+ * bisseção no arco. Fora do intervalo da tabela vale a ponta. O ajuste vem guardado de `ajustes-de-curva.js` pela `chave` (uma de `tabelasLisas`), e o desvio de cada ponto
+ * lido à curva refeita é medido aqui. Guardada por tabela e opções. */
+export function curvaLisaDe(tabela, L, nome = 'curva', chave = nome) {
+  const memo = JSON.stringify([tabela, L, chave]);
+  if (CURVAS.has(memo)) return CURVAS.get(memo);
+  const { lidos, opcoes } = entradaDaCurva(tabela, L);
+  const aj = ajusteGuardado(chave, nome, lidos, opcoes);
   const J = aj.joelhos; const total = aj.comprimento;
   /* o rumo em s: a integral exata da curvatura, linear entre joelhos */
   const rumo = (s) => { let th = aj.rumo; for (let i = 1; i < J.length; i += 1) { const [p, q] = [J[i - 1], J[i]]; if (s <= p.s) break; const e = Math.min(s, q.s); th += (p.k + (0.5 * (q.k - p.k) * (e - p.s)) / (q.s - p.s)) * (e - p.s); } return th; };
@@ -307,8 +361,13 @@ export function curvaLisaDe(tabela, L, nome = 'curva') {
   const ponto = (s) => { const c = Math.min(total, Math.max(0, s)); const i = Math.min(marcos.length - 1, Math.floor(c)); return c > i ? passo(marcos[i], i, c) : marcos[i]; };
   const sobe = ponto(total)[0] > ponto(0)[0];
   const de = (a) => { let lo = 0; let hi = total; for (let k = 0; k < 50; k += 1) { const mid = (lo + hi) / 2; if ((ponto(mid)[0] < a) === sobe) lo = mid; else hi = mid; } return ponto((lo + hi) / 2)[1]; };
-  de.ajuste = { desvioMaximo: aj.desvioMaximo, clotoides: aj.clotoides.length, inflexoes: aj.inflexoes, joelhos: J, comprimento: total };
-  CURVAS.set(chave, de);
+  /* o desvio de cada ponto lido à curva refeita: a distância ao segmento mais perto entre os marcos de 1 mm de arco */
+  const fina = [...marcos, ponto(total)];
+  const aoSegmento = ([u, v], [au, av], [bu, bv]) => { const du = bu - au; const dv = bv - av; const l2 = du * du + dv * dv; const t = l2 > 0 ? Math.min(1, Math.max(0, ((u - au) * du + (v - av) * dv) / l2)) : 0; return Math.hypot(u - au - t * du, v - av - t * dv); };
+  const desvioMaximo = lidos.reduce((pior, p) => { let menor = Infinity; for (let i = 1; i < fina.length; i += 1) menor = Math.min(menor, aoSegmento(p, fina[i - 1], fina[i])); return Math.max(pior, menor); }, 0);
+  if (!(desvioMaximo <= L.tolerancia)) throw new Error(`carro-fastback/lataria: ${nome} fica a ${desvioMaximo.toFixed(2)} mm da leitura da tabela, e a tolerância é ${L.tolerancia} mm`);
+  de.ajuste = { desvioMaximo, clotoides: aj.clotoides.length, joelhos: J, comprimento: total };
+  CURVAS.set(memo, de);
   return de;
 }
 
@@ -326,9 +385,9 @@ export function pele(T) {
   const yBase = nivelDa(T.leis.baseDoRebaixo); const yTopo = nivelDa(T.leis.topoDoRebaixo);
   const yOmbro = nivelDa(T.leis.ombro); const ySoleira = nivelDa(T.leis.soleira);
   const L = T.curvaLisa;
-  const yTeto = curvaLisaDe(T.teto, L.teto, 'o teto');
-  const zx = curvaLisaDe(T.quinaDoTeto.map(([z, x]) => [z, x]), L.quinaDoTeto, 'a quina do teto em x'); const zy = curvaLisaDe(T.quinaDoTeto.map(([z, , y]) => [z, y]), L.quinaDoTeto, 'a quina do teto em y');
-  const zEixo = curvaLisaDe(T.traseira.map(([y, z]) => [y, z]), L.traseira, 'o perfil da traseira');
+  const yTeto = curvaLisaDe(T.teto, L.teto, 'o teto', 'teto');
+  const zx = curvaLisaDe(T.quinaDoTeto.map(([z, x]) => [z, x]), L.quinaDoTeto, 'a quina do teto em x', 'quinaDoTeto.x'); const zy = curvaLisaDe(T.quinaDoTeto.map(([z, , y]) => [z, y]), L.quinaDoTeto, 'a quina do teto em y', 'quinaDoTeto.y');
+  const zEixo = curvaLisaDe(T.traseira.map(([y, z]) => [y, z]), L.traseira, 'o perfil da traseira', 'traseira');
   const { profundidade, cheioAte } = T.rebaixo; const someEm = ondeORebaixoSome(T);
   const fundo = (z) => profundidade * suave((z - someEm) / (cheioAte - someEm));
   const rebaixo = (z, y) => {

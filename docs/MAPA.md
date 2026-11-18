@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2119 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2122 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1623,6 +1623,7 @@
 
 ## procedural/pecas/carro-fastback/partes/lataria/
 
+- `ajustes-de-curva.js` — ajustes-de-curva.js — os ajustes de curva lisa de procedural/pecas/carro-fastback/partes/lataria/receita.js, guardados. ARQUIVO GERADO: não edite à mão.
 - `receita.js` — carro-fastback/lataria — o piloto do quarto traseiro: a chapa contínua de lataria do meio da porta (z 0) para trás, lado +x, com o para-lama traseiro salient…
 
 ## procedural/pecas/carro-fastback/partes/lataria/rodadas/
@@ -3622,6 +3623,8 @@
 - `referencias-do-plano.mjs` — referencias-do-plano.mjs — o que `PLANO.referencias` cita, resolvido em disco.
 - `refinamento-global.mjs` — refinamento-global.mjs — o adaptador de disco do refinamento da forma global.
 - `refinamento-global.test.mjs` — refinamento-global.test.mjs — de ponta a ponta: a receita que declara REFINA passa pelo veredito da peça e pela guarda do acervo. A mesma receita passa intei…
+- `regravar-ajustes-de-curva.mjs` — regravar-ajustes-de-curva.mjs — refaz os ajustes de curva lisa de que uma receita precisa e grava o resultado ao lado dela.
+- `regravar-ajustes-de-curva.test.mjs` — regravar-ajustes-de-curva.test.mjs — o ajuste de curva lisa guardado refaz a mesma curva, a impressão que não confere faz o ajuste na hora e diz o que mudou,…
 - `regularidade-da-crista.mjs` — regularidade-da-crista.mjs — percorre cada crista da superfície de subdivisão e acusa onde o que ela mede varia de repente, com a posição em mm.
 - `regularidade-da-crista.test.mjs` — regularidade-da-crista.test.mjs — a régua da regularidade de uma crista ao longo dela (plano de conferência, fatia 6).
 - `repositorio-autoria.mjs` — repositorio-autoria.mjs — revisões imutáveis com commit como fronteira de visibilidade.
