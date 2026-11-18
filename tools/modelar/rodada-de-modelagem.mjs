@@ -176,8 +176,8 @@ export function gravarRodada(
    decidiu e por quê: `rodadas/limite.json`. `limite` é um inteiro maior que o de sempre (mais rodadas) ou o texto "sem" (sem limite,
    declarado); `convergenciaDesde` é o número da rodada a partir da qual a convergência volta a contar, para a peça que parou sem
    convergência e a pessoa mandou seguir, e vai no máximo até a próxima rodada a registrar. Um dos dois basta, e `por` e `motivo` valem
-   para o arquivo. A declaração de "sem" ou de `convergenciaDesde` pede `por` no formato "quem, AAAA-MM-DD: as palavras dela"; a extensão
-   por inteiro, que é de antes, segue aceitando o `por` que os arquivos antigos têm. Sem o arquivo valem as paradas de sempre. */
+   para o arquivo. Toda declaração pede `por` no formato "quem, AAAA-MM-DD: as palavras dela"
+   (os dois arquivos antigos do braço que não o tinham ganharam as palavras da pessoa em 2026-11-18). Sem o arquivo valem as paradas de sempre. */
 
 /* Quem decidiu, quando e o quê: "a pessoa, 2026-11-18: pode seguir". Vale para o `por` de `limite.json` e para `--motivo-dos-pontos`. */
 const QUEM_DATA_PALAVRAS = /^[^,:]{2,},\s*\d{4}-\d{2}-\d{2}:\s*\S[\s\S]{2,}$/;
@@ -212,8 +212,8 @@ export function decisaoDaPessoa(peca, { pasta = pastaDeRodadas(peca) } = {}) {
       throw new Error(`${arquivo}: '${campo}' recebido: ${JSON.stringify(dado[campo])}; esperado o texto que diz quem decidiu e por quê. ${conserto}`);
     }
   }
-  if ((dado.limite === SEM_LIMITE || temConvergencia) && !QUEM_DATA_PALAVRAS.test(dado.por.trim())) {
-    throw new Error(`${arquivo}: 'por' recebido: ${JSON.stringify(dado.por)}; esperado ${FORMATO_DE_QUEM}, porque o arquivo declara "sem" limite ou 'convergenciaDesde'. ${conserto}`);
+  if (!QUEM_DATA_PALAVRAS.test(dado.por.trim())) {
+    throw new Error(`${arquivo}: 'por' recebido: ${JSON.stringify(dado.por)}; esperado ${FORMATO_DE_QUEM}, com as palavras de quem decidiu. ${conserto}`);
   }
   if (temConvergencia) {
     const numeros = lerRodadas(peca, { pasta }).map((r) => r.numero);

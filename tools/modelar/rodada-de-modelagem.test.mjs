@@ -164,7 +164,7 @@ describe('limite de rodadas estendido por escrito', () => {
     const { LIMITE_DE_RODADAS } = await import('../../src/autoria/laco-de-modelagem.js');
     const { writeFileSync } = await import('node:fs');
     expect(limiteDaPeca('peca-x', { pasta: area })).toBe(LIMITE_DE_RODADAS);
-    writeFileSync(join(area, 'limite.json'), JSON.stringify({ limite: 7, por: 'pessoa', motivo: 'fechar o bico de trás' }));
+    writeFileSync(join(area, 'limite.json'), JSON.stringify({ limite: 7, por: "a pessoa, 2026-11-18: 'mais uma'", motivo: 'fechar o bico de trás' }));
     expect(limiteDaPeca('peca-x', { pasta: area })).toBe(7);
     writeFileSync(join(area, 'limite.json'), JSON.stringify({ limite: 7 }));
     expect(() => limiteDaPeca('peca-x', { pasta: area })).toThrow(/quem decidiu/);
@@ -203,15 +203,19 @@ describe('a decisão da pessoa sobre as paradas, em rodadas/limite.json', () => 
     expect(proximaAcao(lerRodadas(PECA, { pasta: area }), { limite: Infinity }).acao).toBe('parar-sem-convergencia');
   });
 
-  it('a declaração de "sem" ou de convergenciaDesde pede o por com quem, data e palavras; a extensão por inteiro aceita o por antigo', () => {
+  it('toda declaração pede o por com quem, data e palavras, inclusive a extensão por inteiro', () => {
     for (const por of ['eu!', 'abc', 'pessoa, 2026-11-05', 'eu, x: ok ok', 'a pessoa: pode seguir']) {
       escrever({ limite: 'sem', por, motivo: 'peça de estudo' });
-      expect(() => decisaoDaPessoa(PECA, { pasta: area })).toThrow(`'por' recebido: ${JSON.stringify(por)}; esperado "<quem decidiu>, <AAAA-MM-DD>: <as palavras ou o porquê>", porque o arquivo declara "sem" limite ou 'convergenciaDesde'`);
+      expect(() => decisaoDaPessoa(PECA, { pasta: area })).toThrow(`'por' recebido: ${JSON.stringify(por)}; esperado "<quem decidiu>, <AAAA-MM-DD>: <as palavras ou o porquê>", com as palavras de quem decidiu`);
       escrever({ convergenciaDesde: 1, por, motivo: 'peça de estudo' });
       expect(() => decisaoDaPessoa(PECA, { pasta: area })).toThrow("'por' recebido:");
     }
     escrever({ limite: 8, por: 'pessoa', motivo: 'fechar o bico' });
+    expect(() => decisaoDaPessoa(PECA, { pasta: area })).toThrow("'por' recebido: \"pessoa\"");
+    escrever({ limite: 8, por: "a pessoa, 2026-11-18: 'mais uma rodada'", motivo: 'fechar o bico' });
     expect(decisaoDaPessoa(PECA, { pasta: area }).limite).toBe(8);
+    /* os dois arquivos antigos do braço, que ganharam as palavras da pessoa, passam */
+    for (const parte of ['ombro', 'ombro-tambor']) expect(decisaoDaPessoa(`braco-robotico/${parte}`, { pasta: `procedural/pecas/braco-robotico/partes/${parte}/rodadas` }).limite).toBeGreaterThan(6);
     /* o arquivo da lataria do carro, que declara as duas, passa */
     const lataria = 'procedural/pecas/carro-fastback/partes/lataria/rodadas';
     expect(decisaoDaPessoa('carro-fastback/lataria', { pasta: lataria })).toMatchObject({ limite: Infinity, convergenciaDesde: 6 });
