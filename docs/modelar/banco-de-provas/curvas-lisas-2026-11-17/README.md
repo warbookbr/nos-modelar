@@ -109,3 +109,61 @@ Ela bloqueou a contagem de inflexões como métrica geral. A lombada do teste (3
 A pessoa decidiu em 2026-11-17 ("Pode ser sim") seguir a recomendação: a contagem de inflexões fica como diagnóstico, sem aprovar nem reprovar nada, com esta limitação escrita na ficha de `ajustarCurvaLisa`; a correção da contagem (a profundidade do lóbulo contra a ponte entre as faixas vizinhas, travada com a lombada a ±400 e ±800) e a da inserção fora da planta vão para o backlog; e a fatia 3 usa a planta, que é estável.
 
 O processo teria pegado sozinho? Não: o teste só tinha a lombada num comprimento e a densidade só na planta. A instrução que falta vai junto da correção no backlog: toda métrica de contagem do ajuste se prova em mais de um comprimento e mais de uma densidade fora da curva do objeto.
+
+## Fatia 4: as regiões da coluna, do teto e da traseira, e a exclusão do furo do arco
+
+A caixa da zebra numérica ganhou `menos`, uma lista de sub-regiões tiradas dela, cada uma outra caixa `{ x, y, z }` ou um disco `{ centro, normal, raio }`, em mm. O disco tira o que cai dentro do raio medido no plano dele, em qualquer distância ao longo da normal, e a caixa da região limita a profundidade. A exclusão vale pelo centro da face da gaiola refinada, como a própria caixa, e a borda que ela abre conta como borda da região, de modo que a ilha que encosta nela deixa de ser fechada. A região com `menos` traz `excluidas`, o número de faces tiradas. A ferramenta não conhece arco nem vão: quem declara a exclusão é o arquivo de caixas do objeto. O teste prova os dois sentidos na chapa `rede-com-ruido` (o extremo em x 249, z 250 some com um disco de 60 mm em volta dele e o de x 844 fica; com uma caixa em volta do de x 844 é o contrário) e exercita cada recusa de formato.
+
+`tools/fixtures/curvas-lisas/carro-caixas.json` mantém `porta` e `tras` como eram, para a série das fatias 1 e 3 continuar comparável, e ganha seis regiões. `trasSemArco` é a `tras` menos o disco do arco da roda (centro em y 340 e z -1375 e raio de 380 mm, de `TABELA.arco` da receita, com 20 mm de folga: raio 400, normal em x). `ombro` é a caixa de diagnóstico da rodada 7 (y 880 a 1060, z -1300 a -20), que cobre o rolo do ombro e a raiz da coluna. `coluna` vai de y 1025 a 1400 e de z -1840 a -20, com x de 540 em diante para ficar fora do vidro traseiro (que chega a x 532), menos a caixa do vidro lateral (z -1215 a -690, y 1000 a 1262); sobram o trecho sobre a porta e a coluna C atrás do vidro. `teto` é o teto à frente do vidro traseiro (z -950 a -20, x 20 a 560), sem vão dentro. `tampa` é a tampa atrás do vidro traseiro (z -2100 a -1800). `traseira` é a face de trás (z -2500 a -2100, y 320 a 1030, x 20 a 800) menos a caixa da lanterna com 20 mm de folga (x 446 a 780, y 674 a 925). O olhar é +x no lado, +y no teto e na tampa e -z na traseira. As seis pedidas pela emenda são `porta`, `tras`, `trasSemArco`, `coluna`, `teto` e `traseira`; `ombro` e `tampa` entraram porque a primeira medida mostrou que sem elas a raiz da coluna ficava sem região e a tampa dominava o número do teto.
+
+### Os números das rodadas 6 e 7
+
+Comando: `node tools/modelar/zebra-numerica.mjs <receita> --caixas=tools/fixtures/curvas-lisas/carro-caixas.json`, com os padrões (passo pedido de 25 mm, efetivo de 26,4 e 26,6 mm, persistência 0,004, frequência 40). A rodada 6 é a receita de 2580a0bc (sha256 6e7b87a3…, o mesmo do registro `rodadas/rodada-05.json`), gravada numa pasta temporária ao lado de `lataria` e apagada depois; a rodada 7 é a receita atual (sha256 bda6950a…, main em 3ff238d6). Cada célula traz extremos, laços inteiros e laços esperados.
+
+| Região | Rodada 6 (nota 7) | Rodada 7 (nota 6) | O que mudou |
+|---|---|---|---|
+| `porta` | 2; 0; 0,207 | 2; 0; 0,215 | nada |
+| `tras` | 7; 3; 1,898 | 7; 2; 1,528 | caiu |
+| `trasSemArco` | 4; 2; 1,276 | 4; 1; 0,822 | caiu |
+| `ombro` | 16; 4; 6,690 | 14; 3; 6,107 | caiu pouco |
+| `coluna` | 1; 0; 0,147 | 3; 1; 0,321 | subiu |
+| `teto` | 1; 0; 0,082 | 0; 0; 0 | caiu a zero |
+| `tampa` | 7; 10; 10,104 | 6; 13; 12,022 | subiu |
+| `traseira` | 3; 2; 2,730 | 6; 4; 3,781 | subiu |
+
+O disco do arco tira 316 faces da `tras` e, nas duas rodadas, os mesmos 3 extremos, que ficam na boca do arco (y 353 e 361 em z -1663 e -1033, e y 508 em z -1500): 0,62 laço esperado na rodada 6 e 0,71 na 7, um terço e quase metade do número da `tras`, que vinham de superfície que o corte do arco remove ou de ilha fechada só pelo furo.
+
+### Concorda com o crítico, por região?
+
+O crítico deu 7 à rodada 6, com laços no flanco em y 450 a 650 e na coluna C, e 6 à rodada 7, com ondas na lateral do meio da porta ao arco em y 400 a 550 e na raiz da coluna até o teto, além da traseira. Para ele a rodada 7 é pior no flanco e na coluna.
+
+Na `porta` a medida não concorda: dá o mesmo número nas duas rodadas, e os dois extremos que acha ficam em y 729 e 848, acima da faixa de y 400 a 550 em que o crítico viu as ondas da rodada 7. Na `tras` e na `trasSemArco` ela concorda no lugar da rodada 6 e discorda no sentido: a maior ilha fica no flanco entre a porta e o arco (x 919, y 678, z -833), perto da faixa que o crítico apontou, mas a persistência dela cai de 0,075 para 0,032 da rodada 6 para a 7 e o número da região cai, enquanto o crítico viu a rodada 7 pior; a única ilha na faixa de y 400 a 550 (y 381, z -833) tem persistência de 0,011 e 0,009, sem laço. Uma caixa só do flanco (y 380 a 680, z -1000 a -350) dá 1 extremo e 0,062 laço esperado nas duas rodadas.
+
+No `ombro` a medida concorda no lugar e não no sentido: é a região de mais extremos do lado nas duas rodadas, com ilhas na raiz da coluna (y 987 a 1032, em z -266 e -833, persistência de 0,09 a 0,17), e cai pouco da rodada 6 para a 7. Parte dessas ilhas é o degrau do ombro à coluna, que a receita declara com vinco, e a medida não separa o degrau pedido da onda. Na `coluna` ela concorda no sentido: sobe de 1 para 3 extremos e de 0,147 para 0,321, com uma ilha nova na coluna C (x 568, y 1123, z -1400, um laço inteiro de 44 mm de onda). Na rodada 6, em que o crítico viu laços na coluna C, ela acha ali um extremo sem laço (x 606, y 1124, z -1301, persistência 0,012), o que é concordância fraca. Com o olhar +y, a mesma região dá 1 e 2 extremos e nenhum laço, e a coluna C sozinha dá zero nas duas rodadas, ou seja, o número da coluna depende do olhar.
+
+No `teto` não há defeito medido em nenhuma das duas, e o crítico não apontou o teto em si. Na `traseira` a medida concorda com o último veredito: sobe de 3 para 6 extremos e de 2,73 para 3,78 laços esperados. A maior ilha das duas rodadas fica no degrau das lanternas (y 901 a 910, persistência 0,099 na rodada 6 e 0,193 na 7), que é forma declarada na tabela `traseira`, e a da borda da tampa (y 1003) cai de 0,105 para 0,004; as três que só aparecem na rodada 7 são menores (0,015 a 0,049, com onda de 32 a 53 mm). Na `tampa` o número é o maior da peça e sobe na rodada 7, mas vem de três ilhas de persistência 0,09 a 0,51 logo atrás da base do vidro traseiro (z -1864 a -2005), mais de vinte vezes o limiar, ordem de grandeza de dobra e não de ondulação; a medida não diz se é a forma pedida.
+
+No conjunto, a medida acompanha o crítico na coluna e na traseira e não o acompanha no flanco e na porta, que é onde ele ancorou a queda da nota de 7 para 6. As ondas que ele viu em y 400 a 550 não aparecem como ilha fechada de persistência 0,004 ou mais na superfície limite com o olhar +x. Fica por saber se elas são listra torta sem laço fechado, que esta medida não conta por desenho, ou efeito dos vãos e da malha cortada, que ela não lê. Isso depende de comparar com a imagem da zebra que o crítico julgou, e não foi feito nesta fatia.
+
+### Atritos da fatia 4
+
+1. A primeira caixa do `teto`, que ia até a tampa com o vidro traseiro excluído, deu 13 laços, todos na tampa, e escondia que o teto mede zero. Reproduz com `teto` em z -2100 a -20 e `menos` de x 0 a 600 e z -1800 a -950.
+   Custo: uma medida de 1 min e a divisão em `teto` e `tampa`.
+   O processo pegou: não; quem mostrou foi a lista `ilhas` da saída, lida à mão.
+   Destino: instrução, este README: a região se escolhe por painel, e a lista `ilhas` se lê antes de aceitar o número de uma região nova.
+2. A medida não separa a ilha que a forma pede (o degrau do ombro à coluna, o das lanternas, a borda da tampa) da onda, e nas regiões `ombro`, `tampa` e `traseira` a forma domina o número.
+   Custo: nenhum nesta fatia; limita a leitura das três regiões.
+   O processo pegou: não.
+   Destino: backlog, uma exclusão por faixa ao longo de vinco declarado ou a comparação com a medida da forma pedida sem ruído.
+3. O número da `coluna` muda com o olhar (+x: 1 e 3 extremos; +y: 1 e 2, sem laço), porque a coluna C tem a normal mais para cima do que para o lado e o trecho sobre a porta, mais para o lado.
+   Custo: duas medidas a mais, de 1 min cada.
+   O processo pegou: não.
+   Destino: backlog, olhar por região tirado da normal média com aviso quando a região mistura faces de dois eixos dominantes.
+4. Cada medida do carro leva de 60 a 80 s, quase tudo na execução da receita, e a rodada 6 ajusta as curvas na hora. Foram 8 execuções da receita nesta fatia.
+   Custo: uns 10 minutos de espera.
+   O processo pegou: não; é o atrito 2 da fatia 1, ainda aberto.
+   Destino: backlog, a medida sobre o neutro já executado (plano das ferramentas das rodadas).
+5. `tools/modelar/zebra-numerica.mjs` não está em `FONTES_VIGIADAS` de `tools/gates/recusas-exercitadas.mjs`, de modo que o gate não cobraria teste das recusas novas; elas foram testadas uma a uma por decisão de quem escreveu.
+   Custo: nenhum.
+   O processo pegou: não.
+   Destino: gate, incluir a zebra numérica nas fontes vigiadas, que fica fora do território desta fatia e depende de quem conduz.

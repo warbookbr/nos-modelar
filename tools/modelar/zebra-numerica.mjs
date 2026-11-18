@@ -29,9 +29,17 @@
  *
  * Uso: node tools/modelar/zebra-numerica.mjs <chapa de prova | caminho da receita> [--passo=<mm>] [--persistencia=<g>] [--frequencia=<f>]
  *        [--faixas=<mm,mm,...>] [--caixas=<json>] [--olhar=<+x|-x|+y|-y|+z|-z>] [--saida=<json>]
- *   (também `npm run zebra -- ...` quando o atalho existir). `--caixas` é um JSON { nome: { x: [min, max], y: [...], z: [...] } } em mm, e
+ *   (também `npm run zebra -- ...` quando o atalho existir). `--caixas` é um JSON { nome: { x: [min, max], y: [...], z: [...], menos: [...] } } em mm, e
  *   cada caixa é uma região, com `olhar` opcional na própria caixa; sem ele a chapa toda é uma região. O JSON vai para a saída padrão e a
- *   tabela para a saída de erro. */
+ *   tabela para a saída de erro.
+ *
+ * EXCLUSÕES. A caixa aceita `menos`, uma lista de sub-regiões tiradas dela, cada uma de um de dois formatos, em mm: outra caixa
+ * { x: [min, max], y: [...], z: [...] } (ao menos um eixo; o eixo ausente não limita) ou um disco { centro: [x, y, z], normal: [nx, ny, nz],
+ * raio }, que tira o que cai dentro do raio medido no plano do disco, em qualquer distância ao longo da normal (o cilindro do disco; a
+ * caixa da região é que limita a profundidade). Serve para tirar da região o que a peça corta depois (um vão, um furo), que a superfície
+ * limite ainda cobre e onde a medida contaria ilha que ninguém vê. Como a região, a exclusão vale pelo centro da face da gaiola refinada, e a
+ * borda que ela abre é borda da região: a ilha que encosta nela deixa de ser fechada e não conta. A região com `menos` traz `excluidas`, as
+ * faces que a exclusão tirou. */
 import { readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -42,6 +50,7 @@ import { lerArgumentos } from './argumentos.mjs';
 
 export const PADROES = Object.freeze({ passoMm: 25, persistencia: 0.004, frequencia: 40, faixas: Object.freeze([100, 200, 500]) });
 const EIXOS = ['x', 'y', 'z'];
+const CHAVES_DO_DISCO = ['centro', 'normal', 'raio'];
 const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
 const r3 = (x) => Math.round(x * 1000) / 1000;
 
@@ -73,6 +82,36 @@ export function persistencia(valores, vizinhos, naBorda) {
   return pares;
 }
 
+/** exclusoesDe(nome, menos) -> os testes (centro em mm -> excluído?) das sub-regiões `menos` de uma região, com a recusa do formato errado */
+export function exclusoesDe(nome, menos) {
+  if (menos === undefined || menos === null) return [];
+  if (!Array.isArray(menos)) throw new Error(`a região '${nome}' espera em \`menos\` uma lista de caixas e discos, e veio ${JSON.stringify(menos)}`);
+  const numeros = (v, n) => Array.isArray(v) && v.length === n && v.every((x) => typeof x === 'number' && Number.isFinite(x));
+  return menos.map((m, k) => {
+    const onde = `a exclusão ${k + 1} da região '${nome}'`;
+    if (!m || typeof m !== 'object' || Array.isArray(m)) throw new Error(`${onde} espera um objeto de caixa ou de disco, e veio ${JSON.stringify(m)}`);
+    const chaves = Object.keys(m);
+    const deCaixa = chaves.filter((c) => EIXOS.includes(c)); const deDisco = chaves.filter((c) => CHAVES_DO_DISCO.includes(c));
+    const estranhas = chaves.filter((c) => !EIXOS.includes(c) && !CHAVES_DO_DISCO.includes(c));
+    if (estranhas.length) throw new Error(`${onde} tem chave desconhecida (${estranhas.join(', ')}); a caixa usa x, y e z, e o disco usa centro, normal e raio`);
+    if (deCaixa.length && deDisco.length) throw new Error(`${onde} mistura caixa (${deCaixa.join(', ')}) com disco (${deDisco.join(', ')}); declare uma exclusão para cada`);
+    if (!deCaixa.length && !deDisco.length) throw new Error(`${onde} está vazia; a caixa pede ao menos um de x, y e z, e o disco pede centro, normal e raio`);
+    if (deCaixa.length) {
+      for (const e of deCaixa) if (!numeros(m[e], 2) || m[e][0] > m[e][1]) throw new Error(`${onde} espera em ${e} o intervalo [min, max] em mm, com min até max, e veio ${JSON.stringify(m[e])}`);
+      return (c) => EIXOS.every((e, i) => !m[e] || (c[i] >= m[e][0] && c[i] <= m[e][1]));
+    }
+    if (!numeros(m.centro, 3)) throw new Error(`${onde} espera no disco o centro [x, y, z] em mm, e veio ${JSON.stringify(m.centro)}`);
+    const tamanho = numeros(m.normal, 3) ? Math.hypot(...m.normal) : 0;
+    if (!(tamanho > 0)) throw new Error(`${onde} espera no disco a normal [nx, ny, nz] diferente de zero, e veio ${JSON.stringify(m.normal)}`);
+    if (!(typeof m.raio === 'number' && Number.isFinite(m.raio) && m.raio > 0)) throw new Error(`${onde} espera no disco o raio em mm maior que zero, e veio ${JSON.stringify(m.raio)}`);
+    const n = m.normal.map((x) => x / tamanho);
+    return (c) => {
+      const d = [c[0] - m.centro[0], c[1] - m.centro[1], c[2] - m.centro[2]]; const ao = d[0] * n[0] + d[1] * n[1] + d[2] * n[2];
+      return Math.hypot(d[0] - ao * n[0], d[1] - ao * n[1], d[2] - ao * n[2]) <= m.raio;
+    };
+  });
+}
+
 /** a chave canônica de uma amostra (face, i, j) da grade N x N de uma face de quatro lados: o canto, a aresta (com o parâmetro na
  *  orientação da menor ponta) ou o interior; assim duas faces vizinhas dividem a mesma amostra sem comparar posições */
 function chaveDaAmostra(f, fi, i, j, N) {
@@ -86,7 +125,8 @@ function chaveDaAmostra(f, fi, i, j, N) {
 
 /** zebraNumerica(chapa, { passoMm, persistencia, frequencia, faixas, caixas, olhar }) -> { parametros, regioes: [{ nome, olhar, faces, pontos,
  *  direcoes: [{ eixo, extremos, maximos, minimos, lacos, porFaixa, maiorPersistencia }], extremos, lacos, porFaixa }] }
- *  `chapa` é o neutro de um passo `subdivisao` (a gaiola); `caixas` é { nome: { x, y, z, olhar } } em mm, ou null para a chapa toda. */
+ *  `chapa` é o neutro de um passo `subdivisao` (a gaiola); `caixas` é { nome: { x, y, z, olhar, menos } } em mm, ou null para a chapa toda;
+ *  `menos` é a lista de caixas e discos tirados da região (ver EXCLUSÕES no cabeçalho). */
 export function zebraNumerica(chapa, { passoMm = PADROES.passoMm, persistencia: eps = PADROES.persistencia, frequencia = PADROES.frequencia, faixas = PADROES.faixas, caixas = null, olhar = null } = {}) {
   if (!(passoMm > 0)) throw new Error(`--passo espera mm maior que zero, e veio ${passoMm}`);
   if (!(eps > 0)) throw new Error(`--persistencia espera um número maior que zero, e veio ${eps}`);
@@ -115,7 +155,9 @@ export function zebraNumerica(chapa, { passoMm = PADROES.passoMm, persistencia: 
   };
   const regioes = [];
   for (const [nome, cx] of Object.entries(regioesDeclaradas)) {
-    const faces = []; G.faces.forEach((_, fi) => { if (dentro(centros[fi], cx)) faces.push(fi); });
+    const exclusoes = exclusoesDe(nome, cx.menos); let excluidas = 0;
+    const faces = []; G.faces.forEach((_, fi) => { if (!dentro(centros[fi], cx)) return; if (exclusoes.some((fora) => fora(centros[fi]))) excluidas++; else faces.push(fi); });
+    if (!faces.length && excluidas) throw new Error(`a região '${nome}' ficou sem face: as exclusões de \`menos\` tiram as ${excluidas} faces que a caixa cobre`);
     if (!faces.length) throw new Error(`a região '${nome}' não tem face: a caixa não cobre o centro de nenhuma face da gaiola refinada`);
     const tris = [];
     for (const fi of faces) {
@@ -168,7 +210,7 @@ export function zebraNumerica(chapa, { passoMm = PADROES.passoMm, persistencia: 
     }
     const porFaixa = Object.fromEntries(nomes.map((n) => [n, { extremos: direcoes.reduce((s, d) => s + d.porFaixa[n].extremos, 0), lacos: direcoes.reduce((s, d) => s + d.porFaixa[n].lacos, 0), lacosEsperados: r3(direcoes.reduce((s, d) => s + d.porFaixa[n].lacosEsperados, 0)) }]));
     regioes.push({
-      nome, olhar: `${sinal > 0 ? '+' : '-'}${EIXOS[eixoDoOlhar]}`, faces: faces.length, pontos: usados.length,
+      nome, olhar: `${sinal > 0 ? '+' : '-'}${EIXOS[eixoDoOlhar]}`, faces: faces.length, ...(cx.menos ? { excluidas } : {}), pontos: usados.length,
       direcoes, extremos: direcoes.reduce((s, d) => s + d.extremos, 0), lacos: direcoes.reduce((s, d) => s + d.lacos, 0), lacosEsperados: r3(direcoes.reduce((s, d) => s + d.lacosEsperados, 0)), porFaixa,
     });
   }
