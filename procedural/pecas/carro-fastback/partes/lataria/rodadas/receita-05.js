@@ -11,6 +11,10 @@
  * soleira à base da coluna os níveis correm pelo contorno da planta e dão a volta pela traseira até o eixo do carro, misturando suavemente a seção
  * do lado com o perfil da traseira no eixo. O arco, o vidro lateral, a lanterna e o vidro traseiro são vãos abertos na chapa pronta.
  *
+ * RODADA 6 (fatia 3 do plano das curvas lisas). A planta sai de `ajustarCurvaLisa` (`plantaLisa`, 3 mm da leitura da prancha) no lugar do polígono com filete alisado, e a
+ * chapa passa a seguir a pele: sem `alisarCurvas`, sem o alisamento do miolo (`chapa.liso`), com estações a cada 200 mm e mais pontos por vão na seção. A medida de trabalho
+ * foi o desvio da superfície limite à pele (de até 6 mm para 1,5 mm no flanco) e a zebra numérica da própria pele, que dá 0 extremo na porta e 2 no quarto (a ilha do
+ * alargamento do para-lama em z -830, que a planta da prancha pede).
  * RODADA 4. O degrau das lanternas entrou pelo perfil da traseira (`traseira`, recuo no nível `topo`), e a quina do ombro à coluna e a coroa ganharam
  * `alisamento.quina`; `emendaG1` e `chapa.pesoPorCurva` ficam vazios (medidos, sem ganho: README do banco de provas e `rodadas/`).
  * NOTA PARA A PRÓXIMA ETAPA (rodada 3). A rodada 2 tirou a onda das tabelas lidas por pixel (média gaussiana, `alisamento`), adensou o sino do
@@ -25,16 +29,24 @@
  * A cadeia: a TABELA em mm; `derivar` calcula a pele, os nós, as curvas e os retalhos; `gerarPassos` converte para metro com `m()`. */
 import { gaiolaPorRede } from '../../../../../nucleo/gaiola-por-rede.js';
 import { furoPassante } from '../../../../../nucleo/furo-passante.js';
+import { ajustarCurvaLisa } from '../../../../../nucleo/ajuste-de-curva-lisa.js';
 
 const m = (mm) => mm / 1000;
 
 export const TABELA = {
-  /* a chapa e a malha: espessura de chapa de aço, espaçamento da gaiola, níveis de subdivisão e o peso com que a superfície se aproxima das curvas (sem ele, passa por elas) */
-  chapa: { espessura: 2, passo: 70, niveis: 2, anguloMax: 15, pesoDasCurvas: 1 },
+  /* a chapa e a malha: espessura de chapa de aço, espaçamento da gaiola, níveis de subdivisão e o peso com que a superfície se aproxima das curvas (sem ele, passa por elas);
+   * `liso: false` deixa o miolo dos retalhos como o preenchimento o desenhou: com as curvas saindo de leis lisas, o alisamento do miolo afundava o sino do rebaixo até 5,9 mm
+   * entre as estações (medido contra a pele: a porta passou de 0,92 para 0,49 laço esperado na zebra numérica só com isto) */
+  chapa: { espessura: 2, passo: 70, niveis: 2, anguloMax: 15, pesoDasCurvas: 1, liso: false },
   /* a planta, [z, x, raio], a metade da silhueta da prancha superior da frente da porta ao eixo do carro atrás (o polígono com filete por vértice da prancha) */
   planta: [[1000, 915, 200], [300, 912, 5000], [-750, 912, 3000], [-950, 940, 300], [-1300, 950, 2000], [-1700, 930, 800], [-2050, 840, 800], [-2250, 690, 300], [-2340, 400, 400], [-2372, 120, 600], [-2379, 0, 4000]],
-  /* o alisamento das curvas, desvio da média gaussiana em mm: a planta ao longo do contorno, as tabelas ao comprimento, a queda do ombro e o perfil da traseira na altura */
-  alisamento: { planta: 40, comprimento: 120, teto: 100, queda: 20, perfil: 50, quina: 120 },
+  /* o alisamento das curvas, desvio da média gaussiana em mm: a planta ao longo do contorno (1 mm: só refaz o polígono com filete a cada 5 mm de arco, que é a leitura da prancha
+   * que o ajuste de curva lisa recebe), as tabelas ao comprimento, a queda do ombro e o perfil da traseira na altura */
+  alisamento: { planta: 1, comprimento: 120, teto: 100, queda: 20, perfil: 50, quina: 120 },
+  /* RODADA 6. A planta sai do ajuste de curva lisa do núcleo (`ajustarCurvaLisa`, cadeia de clotoides de curvatura contínua) sobre a leitura da prancha: `tolerancia` é o desvio
+   * que a pessoa soltou (mm), `passo` o espaçamento dos pontos lidos que entram no ajuste, `alemDoEixo` quanto do espelho da leitura entra depois do eixo do carro, para a curva
+   * cruzar o eixo de frente, e `maximoDeClotoides` o teto do ajuste. A média gaussiana de 40 mm que havia aqui deixava uma lombada de curvatura em cada filete do polígono. */
+  curvaLisa: { planta: { tolerancia: 3, passo: 10, alemDoEixo: 300, maximoDeClotoides: 14 } },
   /* a queda do ombro: quanto a seção sai para dentro da meia largura da planta em cada altura, [y, mm], lida da seção traseira (952 a y 600, 795 a y 978) */
   queda: [[170, 30], [210, 22], [300, 0], [600, 0], [758, 12], [827, 47], [932, 107], [978, 157], [1010, 160]],
   /* as alturas dos níveis ao comprimento, [z, y]: a soleira (a borda de baixo), a base e o topo do rebaixo e o ombro (cintura na porta, ombro do para-lama atrás) */
@@ -60,8 +72,10 @@ export const TABELA = {
   degrau: { largura: 55, subida: 14, folgaDoVidro: 8 },
   /* as alturas dos níveis no eixo do carro, atrás: o fundo (304, a borda de baixo reta da traseira no nível em que a silhueta da prancha lateral a deixa em z -2282; a prancha traseira a desenha reta em 210, o que a lateral não comporta), a base e o topo do rebaixo, o meio entre eles e a borda da tampa (o ombro) */
   calota: { soleira: 304, base: 700, meio: 800, topo: 900, ombro: 1037 },
-  /* quanto a seção da porta cai mais para dentro que a do para-lama no ombro, mm */
-  ombroDaPorta: 12,
+  /* quanto a seção da porta cai mais para dentro que a do para-lama no ombro (`mm`), e os z entre os quais o efeito some em S, de inteiro em `ate` a nada em `de`.
+   * RODADA 6: `ate` foi de -700 para -200. Em 300 mm o efeito somava 4 graus de giro ao alargamento da planta no mesmo trecho (z -600 a -950), e o ombro sob o vidro lateral
+   * fazia a maior ilha da zebra do flanco (0,265 de persistência em z -833); em 800 mm ela cai a 0,17, e o que sobra é o alargamento da planta, que a prancha pede */
+  ombroDaPorta: { mm: 12, de: -1000, ate: -200 },
   /* o rebaixo côncavo: a profundidade máxima na porta (mm), de onde ela começa a morrer (z), e a folga (mm) entre onde ela some e a boca da
    * frente do arco da roda (z do eixo mais o raio): o rebaixo morre antes do arco, e a região dele acaba onde ele some */
   rebaixo: { profundidade: 20, cheioAte: -300, folgaDoArco: 60 },
@@ -69,8 +83,10 @@ export const TABELA = {
    * ou pelo rebaixo, que a pessoa soltou até 3 mm (o ruído delas passa de 1 mm), e o das outras (`resto`, até 1 mm pela decisão; null as
    * deixa sem alisar). Medido na rodada 3 com a seção partida no ombro: com 1 mm no resto a chapa sai com índice 326 e 10 falhas, sem
    * alisar o resto 304 e 9, e o para-lama e o rebaixo iguais (86 e 25,5); as curvas do resto são as da coluna, da quina, da borda da tampa
-   * e do perfil da traseira, que vão ao limite de 1 mm arredondando a feição, e por isso ficam sem alisar */
-  alisarCurvas: { resto: null, regioes: 3 },
+   * e do perfil da traseira, que vão ao limite de 1 mm arredondando a feição, e por isso ficam sem alisar.
+   * RODADA 6: null, sem alisamento. As curvas já não vêm de pontos lidos (a planta sai do ajuste de curva lisa e os níveis e a queda, das leis), e o alisamento batia nos 3 mm
+   * em 12 curvas, cada seção de um jeito, porque lê o sino do rebaixo como ruído; o que valia era { resto: null, regioes: 3 } */
+  alisarCurvas: null,
   /* a quina do teto e a coluna, [z, x, y]: do teto sobre a porta, o vidro lateral traseiro e a coluna caindo até a tampa */
   quinaDoTeto: [[0, 598, 1262], [-400, 588, 1288], [-800, 595, 1262], [-1200, 630, 1135], [-1600, 520, 1090], [-2050, 430, 1049]],
   /* o eixo do carro, a linha do teto à tampa, [z, y]: o teto sobre a porta, o pico, a queda do fastback e a tampa */
@@ -81,13 +97,16 @@ export const TABELA = {
   traseira: [[1037, -2210], [961, -2224], [900, -2190], [845, -2240], [760, -2321], [629, -2373], [570, -2375], [500, -2375], [416, -2350], [333, -2302], [304, -2282]],
   /* a coroa do teto, expoente da seção entre a quina do teto e o eixo (a seção traseira: 3 mm a 300 de 590, 30 mm a 487, de uma queda de 93 até a quina) */
   coroa: 5.5,
-  /* as estações ao comprimento, z; a última é onde começa a calota da traseira */
-  estacoes: [0, -400, -800, -1200, -1600, -1850],
+  /* as estações ao comprimento, z; a última é onde começa a calota da traseira. A cada 200 mm até o para-lama (eram a cada 400): entre duas estações o retalho mistura as
+   * duas seções em linha reta, e onde um nível sobe em S (o ombro de z -100 a -450, a base do rebaixo de -425 a -1300) a chapa saía até 6 mm da pele no meio do retalho,
+   * a onda de 400 mm da zebra; com 200 fica a 1,5 mm */
+  estacoes: [0, -200, -400, -600, -800, -1000, -1200, -1400, -1600, -1850],
   /* os pontos-chave entre os nós: o espaçamento ao comprimento, na volta da calota e no perfil da traseira (mm), quantos em cada vão da seção,
    * de baixo para cima até a quina, e as frações da quina em que a coroa do teto é lida, mais juntas perto da quina, onde ela cai. Mais
    * densos, o alisamento das curvas anda menos (as linhas, menos de 1,2 mm), mas a seção densa estreita a faixa do vinco do ombro abaixo da
-   * espessura (raio de 1,1 mm) e as linhas densas subiram o índice da chapa de 326 para 364 */
-  pontosChave: { comprimento: 100, calota: 90, perfil: 60, secao: [3, 3, 3, 5, 0, 4], coroa: [0.92, 0.84, 0.75, 0.65, 0.5, 0.33, 0.16] },
+   * espessura (raio de 1,1 mm) e as linhas densas subiram o índice da chapa de 326 para 364. RODADA 6: da soleira ao topo do rebaixo a seção passa de 3 para 7, 5 e 5
+   * pontos por vão: atrás o vão da soleira à base tem 545 mm e o encolhimento da base (130 mm de altura) ficava com um ponto só; do topo ao ombro seguem os 5 */
+  pontosChave: { comprimento: 100, calota: 90, perfil: 60, secao: [7, 5, 5, 5, 0, 4], coroa: [0.92, 0.84, 0.75, 0.65, 0.5, 0.33, 0.16] },
   /* os níveis em que a seção se parte em curvas, para o alisamento não arredondar a dobra do vinco que ela cruza: só o ombro, que tirou o
    * índice do para-lama de 239 para 86 e o da chapa de 373 para 326; partida também na coluna e na quina, a chapa subiu a 454 */
   partirSecaoEm: ['ombro'],
@@ -199,6 +218,51 @@ export function contornoDaPlanta(planta, sigma) {
   return { ponto, normal, deZ, total, zFim: meia[meia.length - 1][0] };
 }
 
+const PLANTAS = new Map();
+
+/** A planta lisa, com a mesma leitura de `contornoDaPlanta` (ponto, normal para dentro, deZ, total, zFim): a leitura da prancha ajustada pelo núcleo a uma cadeia de clotoides
+ * dentro de `curvaLisa.planta.tolerancia`. O ajuste recebe a meia planta e o começo do espelho dela além do eixo do carro; como o ajuste não tem condição de ponta, nos últimos
+ * `alemDoEixo` mm antes do eixo a curva é levada, em S, à média dela com o espelho do trecho de depois do eixo: no eixo ela é simétrica exata e cruza de frente. O rumo sai da
+ * integral exata da curvatura dos joelhos, e o desvio de cada ponto lido à curva final é medido aqui: fora da tolerância, a receita recusa. O ajuste leva alguns segundos e fica
+ * guardado por TABELA. */
+export function plantaLisa(T) {
+  const L = T.curvaLisa.planta;
+  const chave = JSON.stringify([T.planta, T.alisamento.planta, L]);
+  if (PLANTAS.has(chave)) return PLANTAS.get(chave);
+  const C = contornoDaPlanta(T.planta, T.alisamento.planta);
+  const lidos = []; for (let u = 0; u < C.total; u += L.passo) lidos.push(C.ponto(u)); lidos.push(C.ponto(C.total));
+  const espelho = lidos.slice(-Math.round(L.alemDoEixo / L.passo) - 1, -1).reverse().map(([z, x]) => [z, -x]);
+  const a = ajustarCurvaLisa([...lidos, ...espelho], { tolerancia: L.tolerancia, maximoDeClotoides: L.maximoDeClotoides });
+  if (!a.cabe) throw new Error(`carro-fastback/lataria: a planta não cabe em ${L.tolerancia} mm com ${L.maximoDeClotoides} clotoides: ${a.motivo}`);
+  /* o rumo em s: a integral da curvatura, linear entre joelhos */
+  const rumo = (s) => { let th = a.rumo; for (let i = 1; i < a.joelhos.length; i += 1) { const [p, q] = [a.joelhos[i - 1], a.joelhos[i]]; if (s <= p.s) break; const e = Math.min(s, q.s); th += 0.5 * (p.k + p.k + ((q.k - p.k) * (e - p.s)) / (q.s - p.s)) * (e - p.s); } return th; };
+  /* o comprimento de arco em que o ajuste cruza o eixo do carro */
+  let lo = 0; let hi = a.comprimento; for (let k = 0; k < 60; k += 1) { const mid = (lo + hi) / 2; if (a.ponto(mid)[1] > 0) lo = mid; else hi = mid; }
+  const total = (lo + hi) / 2;
+  const faixa = Math.min(L.alemDoEixo, a.comprimento - total);
+  /* o ponto e a tangente em u: o ajuste e, perto do eixo, a média com o espelho do trecho de depois do eixo, com peso w de 1 no eixo a 0 em `faixa` */
+  const curva = (u) => {
+    const c = Math.min(total, Math.max(0, u)); const t = total - c;
+    const p = a.ponto(c); const th = rumo(c); const dp = [Math.cos(th), Math.sin(th)];
+    if (t >= faixa) return { p, dp };
+    const e = a.ponto(total + t); const the = rumo(total + t);
+    const q = [e[0], -e[1]]; const dq = [-Math.cos(the), Math.sin(the)];
+    const v = t / faixa; const w = 1 - suave(v); const dw = (30 * v * v * (1 - v) * (1 - v)) / faixa;
+    return { p: [p[0] + (w * (q[0] - p[0])) / 2, p[1] + (w * (q[1] - p[1])) / 2], dp: [dp[0] + (w * (dq[0] - dp[0])) / 2 + (dw * (q[0] - p[0])) / 2, dp[1] + (w * (dq[1] - dp[1])) / 2 + (dw * (q[1] - p[1])) / 2] };
+  };
+  const ponto = (u) => curva(u).p;
+  /* a normal para dentro é a tangente girada: (-dx, dz) em [z, x] */
+  const normal = (u) => { const { dp } = curva(u); const l = Math.hypot(dp[0], dp[1]); return [-dp[1] / l, dp[0] / l]; };
+  const deZ = (z) => { let i = 0; let f = total; for (let k = 0; k < 60; k += 1) { const mid = (i + f) / 2; if (ponto(mid)[0] > z) i = mid; else f = mid; } return (i + f) / 2; };
+  /* o desvio de cada ponto lido à curva final, amostrada a cada 1 mm */
+  const fina = []; for (let u = 0; u <= total; u += 1) fina.push(ponto(u)); fina.push(ponto(total));
+  const desvioMaximo = lidos.reduce((pior, [z, x]) => Math.max(pior, Math.sqrt(fina.reduce((menor, [fz, fx]) => Math.min(menor, (fz - z) ** 2 + (fx - x) ** 2), Infinity))), 0);
+  if (desvioMaximo > L.tolerancia) throw new Error(`carro-fastback/lataria: a planta lisa fica a ${desvioMaximo.toFixed(2)} mm da leitura da prancha, e a tolerância é ${L.tolerancia} mm`);
+  const O = { ponto, normal, deZ, total, zFim: ponto(total)[0], desvioMaximo, joelhos: a.joelhos, clotoides: a.clotoides.length };
+  PLANTAS.set(chave, O);
+  return O;
+}
+
 /** O z em que o rebaixo some: a folga antes da boca da frente do arco da roda. */
 export const ondeORebaixoSome = (T) => T.arco.z + T.arco.raio + T.rebaixo.folgaDoArco;
 
@@ -208,7 +272,7 @@ export const caixasDasPartes = (T) => ({ paralama: T.partes.paralama, rebaixo: {
 /** A pele analítica da TABELA: as funções de que os pontos-chave das curvas saem. */
 export function pele(T) {
   const A = T.alisamento;
-  const O = contornoDaPlanta(T.planta, A.planta);
+  const O = plantaLisa(T);
   const lisa = (tab, s = A.comprimento) => alisar(pchip(tab), s);
   const nivelDa = ({ a, b, degraus }) => (z) => a + b * z + degraus.reduce((t, [h, za, zb]) => t + h * suave((za - z) / (za - zb)), 0);
   const quedaDe = (y) => { const { base, rola } = T.leis.queda; const u = Math.max(0, (y - rola.desde) / (rola.fim - rola.desde)); const t = suave((y - rola.mistura) / (rola.fim - rola.mistura)); return base.A * suave((base.ate - y) / (base.ate - base.de)) + rola.A * (1 - t) * u ** rola.p + rola.topo * t; };
@@ -227,7 +291,7 @@ export function pele(T) {
     return fundo(z) * s ** 4;
   };
   /* a porta cai um pouco mais para dentro que o para-lama: a base da cabine (745 na seção traseira) fica 12 mm mais para dentro que a do ombro de trás, e o efeito some até z -1000 */
-  const portaExtra = (z, y) => T.ombroDaPorta * suave((y - 850) / 150) * suave((z + 1000) / 300);
+  const portaExtra = (z, y) => T.ombroDaPorta.mm * suave((y - 850) / 150) * suave((z - T.ombroDaPorta.de) / (T.ombroDaPorta.ate - T.ombroDaPorta.de));
   /* quanto o lado sai para dentro do contorno da planta, pela normal, em z e y */
   const recuo = (z, y) => quedaDe(y) + portaExtra(z, y) + rebaixo(z, y);
   const R = (z) => [zx(z), zy(z)];
@@ -381,7 +445,7 @@ export function derivar(T) {
   const comPeso = T.chapa.pesoDasCurvas ? curvas.map((c) => ({ ...c, peso: T.chapa.pesoPorCurva?.[c.nome] ?? T.chapa.pesoDasCurvas })) : curvas;
   const G1 = T.emendaG1.curvas;
   const pesadas = G1.length ? comPeso.map((c) => (G1.includes(c.nome) ? { ...c, continuidade: 'G1' } : c)) : comPeso;
-  const rede = gaiolaPorRede({ passo: T.chapa.passo, anguloMax: T.chapa.anguloMax, fora: [1, 0, 0], simetria: 'x', nos, curvas: pesadas, retalhos, ...(T.chapa.liso ? { liso: T.chapa.liso } : {}), ...(G1.length ? { limitesDaEmenda: { tolerancia: T.emendaG1.tolerancia } } : {}), ...alisamentoDasCurvas(T, curvas, nos) });
+  const rede = gaiolaPorRede({ passo: T.chapa.passo, anguloMax: T.chapa.anguloMax, fora: [1, 0, 0], simetria: 'x', nos, curvas: pesadas, retalhos, ...(T.chapa.liso !== undefined ? { liso: T.chapa.liso } : {}), ...(G1.length ? { limitesDaEmenda: { tolerancia: T.emendaG1.tolerancia } } : {}), ...alisamentoDasCurvas(T, curvas, nos) });
   return { rede, P, zs };
 }
 
@@ -454,9 +518,12 @@ export function gerarPassos(T) {
 
 /* Os extremos da caixa da chapa (o lado de x negativo inteiro e o de x positivo sem as duas regiões de parte): o fundo de trás, a soleira e o teto.
  * O mais largo do lado -x fica na boca da frente do arco, onde a planta tem 940 (z -950): sobre o eixo traseiro, onde ela chega a 950, o arco tira a chapa da altura sem queda. */
+/* RODADA 6. O mais largo da chapa do lado +x fica onde ela encosta na região do para-lama (o z da frente da caixa dele): dali para trás a face é do para-lama. O esperado é a
+ * planta lisa nesse z; antes era a meia largura da boca do arco menos 10 mm, acertado à mão para a chapa que o alisamento encolhia. */
+const larguraDaChapaNaFrenteDoParalama = (T) => { const O = plantaLisa(T); return +O.ponto(O.deZ(T.partes.paralama.max[2]))[1].toFixed(1); };
 export const PONTOS = [
   { nome: 'canto de baixo de trás da chapa: o lado -x, a soleira e o fim da traseira', parte: 'chapa', medida: 'minimo', em: [-TABELA.planta[3][1], TABELA.soleira[0][1], Math.min(...TABELA.traseira.map(([, z]) => z))], toleranciaMm: 6 },
-  { nome: 'canto de cima da frente da chapa: o teto sobre a porta, no corte de z 0', parte: 'chapa', medida: 'maximo', em: [TABELA.planta[3][1] - 10, TABELA.teto[1][1], 0], toleranciaMm: 6 },
+  { nome: 'canto de cima da frente da chapa: o teto sobre a porta, no corte de z 0', parte: 'chapa', medida: 'maximo', em: [larguraDaChapaNaFrenteDoParalama(TABELA), TABELA.teto[1][1], 0], toleranciaMm: 6 },
 ];
 
 /* O que só esta peça diz ao pacote do crítico: as pranchas estão no referencial do carro em mm (o quarto traseiro cai sobre a metade de
