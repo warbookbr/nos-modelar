@@ -241,8 +241,8 @@ export function conferirRodadasDaEtapa(montagem, instancia, rodadasDe = (ref) =>
   const ref = montagem.instancias.find((item) => item.id === instancia)?.alvo.ref;
   const rodadas = ref ? rodadasDe(ref) : [];
   const lida = ref ? limiteDe(ref) : undefined;
-  const { limite, convergenciaDesde } = lida && typeof lida === 'object' ? lida : { limite: lida };
-  const decisao = proximaAcao(rodadas, { limite, convergenciaDesde });
+  const { limite, convergenciaDesde, por } = lida && typeof lida === 'object' ? lida : { limite: lida };
+  const decisao = proximaAcao(rodadas, { limite, convergenciaDesde, por });
   if (aceiteHumano && decisao.acao !== 'parar-fechou') {
     const defeitos = (rodadas.at(-1)?.veredito?.defeitos ?? []).map((d) => `${d.parte}: ${d.tipo} em ${d.onde}`);
     return PARADAS_ACEITAVEIS.has(decisao.acao) ? defeitos

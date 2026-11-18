@@ -322,12 +322,12 @@ export function moduloComum(pasta, pecas, { rodadasDe = () => [], mudouEm = quan
  * o mesmo que ela julgou, e presumida aprovada quando o texto mudou (`medida: false` diz isso). A mesma forma com texto novo não é
  * reconhecida aqui (pede executar a receita), e sai como `revisar`.
  */
-export function acaoSemMedir(rodadas, textoDaReceita, { limite, convergenciaDesde } = {}) {
+export function acaoSemMedir(rodadas, textoDaReceita, { limite, convergenciaDesde, por } = {}) {
   const sha256 = sha(textoDaReceita);
   const ultima = rodadas.at(-1);
   const mesmoTexto = Boolean(ultima?.receita?.sha256) && ultima.receita.sha256 === sha256;
   const medicao = mesmoTexto ? { passou: ultima.medidas.passou, relatorio: ultima.medidas.relatorio } : { passou: true, relatorio: 'presumida' };
-  return { ...acaoDaReceita(rodadas, { sha256, medicao }, { limite, convergenciaDesde }), medida: mesmoTexto, mesmoTexto };
+  return { ...acaoDaReceita(rodadas, { sha256, medicao }, { limite, convergenciaDesde, por }), medida: mesmoTexto, mesmoTexto };
 }
 
 /** A medição de uma peça no `--medir`, com o registro de etapas que o fluxo já mediu, para não medir a montagem outra vez por peça. */
@@ -385,12 +385,19 @@ function proximoDaPeca(p, etapas) {
   if (!etapas || instancias.length === 0) {
     const fora = etapas && p.instancias.length === 0 ? `; a montagem ${montagemRel} não cita a peça` : '';
     if (p.acao === 'parar-fechou') return fora ? `pôr a peça em ${montagemRel}, nas instâncias e nas etapas${fora}` : null;
-    return `decisão da pessoa (${p.acao}): estender o limite em rodadas/limite.json ou aceitar a peça como está${fora}`;
+    return `decisão da pessoa (${p.acao}): ${saidaDaParada(p)} ou aceitar a peça como está${fora}`;
   }
   const fixar = `npm run etapas -- ${montagemRel} --fixar ${instancias[0]} --por "<quem aceitou, data>"`;
   const ordem = etapas.proxima && etapas.proxima !== instancias[0] ? ` (em ordem: antes, a etapa ${etapas.proxima})` : '';
   if (p.acao === 'parar-fechou') return `fixar: ${fixar}${ordem}`;
-  return `decisão da pessoa (${p.acao}): fixar com ${fixar} --aceite-humano${ordem}, ou estender o limite em rodadas/limite.json`;
+  return `decisão da pessoa (${p.acao}): fixar com ${fixar} --aceite-humano${ordem}, ou ${saidaDaParada(p)}`;
+}
+
+/* O que a pessoa grava em `rodadas/limite.json` para a peça seguir, conforme a parada: o limite não tira a peça da parada sem convergência. */
+function saidaDaParada(p) {
+  return p.acao === 'parar-sem-convergencia'
+    ? `declarar em rodadas/limite.json a rodada a partir da qual a convergência volta a contar ("convergenciaDesde": ${p.rodadas + 1}, a próxima a registrar), com "por" e "motivo"`
+    : 'estender o limite em rodadas/limite.json';
 }
 
 /**
@@ -426,9 +433,9 @@ export async function fluxoDoObjeto(pastaDoObjeto, { medir = null, acervo = ACER
     else if (!p.receita) Object.assign(linha, { estado: 'sem receita', acao: 'modelar', motivo: 'a peça não tem receita.', defeitos: [] });
     else {
       /* a decisão gravada da pessoa (o limite e a rodada a partir da qual a convergência conta), a mesma que `--acao` lê */
-      const { limite, convergenciaDesde } = decisaoDaPessoa(p.ref, { pasta: pastaRodadas });
-      const d = medir ? { ...(await medir(p.ref, { rodadas, limite, convergenciaDesde, pasta: pastaRodadas, registroLido })), medida: true }
-        : acaoSemMedir(rodadas, readFileSync(p.receita, 'utf8'), { limite, convergenciaDesde });
+      const { limite, convergenciaDesde, por } = decisaoDaPessoa(p.ref, { pasta: pastaRodadas });
+      const d = medir ? { ...(await medir(p.ref, { rodadas, limite, convergenciaDesde, por, pasta: pastaRodadas, registroLido })), medida: true }
+        : acaoSemMedir(rodadas, readFileSync(p.receita, 'utf8'), { limite, convergenciaDesde, por });
       const abertos = defeitosAbertos(rodadas).map((x) => `${x.parte}: ${x.tipo} ${x.sentido} em ${x.onde}`);
       Object.assign(linha, { estado: 'em aberto', acao: d.acao, motivo: d.motivo, medida: d.medida, defeitos: d.acao === 'modelar' ? abertos : [] });
     }

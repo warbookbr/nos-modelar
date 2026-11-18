@@ -83,6 +83,31 @@ describe('laço de modelagem', () => {
     expect(proximaAcao(historia, { limite: Infinity }).acao).toBe('modelar');
   });
 
+  it('convergenciaDesde além da próxima rodada a registrar é recusado com os números que existem, e não desliga a parada', () => {
+    const historia = Array.from({ length: 10 }, (_, i) => rodada(i + 1, { quantos: 3 }));
+    expect(() => proximaAcao(historia, { limite: Infinity, convergenciaDesde: 99999 }))
+      .toThrow("'convergenciaDesde' recebido: 99999; esperado no máximo 11, o número da próxima rodada a registrar (as registradas são 1, 2, 3, 4, 5, 6, 7, 8, 9, 10).");
+    expect(() => proximaAcao([], { convergenciaDesde: 2 })).toThrow('esperado no máximo 1, o número da próxima rodada a registrar (as registradas são nenhuma)');
+    expect(() => acaoDaReceita(historia.map((r) => ({ ...r, receita: { sha256: HASH_A } })), atual(HASH_B), { limite: Infinity, convergenciaDesde: 12 })).toThrow('esperado no máximo 11');
+    expect(proximaAcao(historia, { limite: Infinity, convergenciaDesde: 11 }).acao).toBe('modelar');
+    expect(proximaAcao(historia, { limite: Infinity }).acao).toBe('parar-sem-convergencia');
+  });
+
+  it('a decisão gravada que evita a parada aparece no motivo, com quem decidiu; sem evitar nada, não aparece', () => {
+    const historia = [rodada(1, { quantos: 4 }), rodada(2, { quantos: 4 }), rodada(3, { quantos: 5 })];
+    const por = "a pessoa, 2026-11-18: 'pode seguir'";
+    expect(proximaAcao(historia, { convergenciaDesde: 3, por }).motivo)
+      .toBe(`5 defeito(s) apontado(s) na rodada 3. Segue por decisão gravada em rodadas/limite.json (por: ${por}); sem ela a ação seria parar-sem-convergencia.`);
+    expect(proximaAcao(historia, { convergenciaDesde: 3 }).motivo).toBe('5 defeito(s) apontado(s) na rodada 3.');
+    expect(proximaAcao(historia, { por }).motivo).not.toContain('Segue por decisão gravada');
+    const longa = [9, 8, 7, 6, 5, 4, 3].map((quantos, i) => rodada(i + 1, { quantos }));
+    expect(proximaAcao(longa, { limite: Infinity, por }).motivo).toContain('sem ela a ação seria parar-limite.');
+    expect(proximaAcao(longa.slice(0, 3), { limite: Infinity, por }).motivo).not.toContain('Segue por decisão gravada');
+    const nova = acaoDaReceita(historia.map((r) => ({ ...r, receita: { sha256: HASH_A } })), atual(HASH_B), { convergenciaDesde: 3, por });
+    expect(nova.acao).toBe('revisar');
+    expect(nova.motivo).toContain(`Segue por decisão gravada em rodadas/limite.json (por: ${por}); sem ela a ação seria parar-sem-convergencia.`);
+  });
+
   it('recusa convergenciaDesde que não é número de rodada, dizendo o recebido e o esperado', () => {
     for (const ruim of [0, 2.5, '6', null]) {
       expect(() => proximaAcao([rodada(1, { quantos: 1 })], { convergenciaDesde: ruim }))

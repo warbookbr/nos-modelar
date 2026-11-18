@@ -234,6 +234,30 @@ describe('as peças e a montagem', () => {
     expect(acaoSemMedir([], RECEITA('y'), {})).toMatchObject({ acao: 'revisar', medida: false });
   });
 
+  it('na parada sem convergência aponta convergenciaDesde, e não o limite; com a decisão gravada a peça segue e o motivo diz por quem', async () => {
+    const parado = objetoDeProva('parado');
+    escrever(join(parado, 'ALINHAMENTO.md'), ALINHAMENTO);
+    escrever(join(parado, 'partes', 'p', 'receita.js'), RECEITA('p'));
+    for (let k = 0; k < 3; k += 1) rodadaDe(parado, 'p', RECEITA('p'), ['ponta de cima do corpo']);
+    let [peca] = (await fluxoDoObjeto(parado)).pecas;
+    expect(peca.acao).toBe('parar-sem-convergencia');
+    expect(peca.proximo).toContain('declarar em rodadas/limite.json a rodada a partir da qual a convergência volta a contar ("convergenciaDesde": 4, a próxima a registrar)');
+    expect(peca.proximo).not.toContain('estender o limite');
+    const por = "a pessoa, 2026-11-18: 'pode seguir'";
+    escrever(join(parado, 'partes', 'p', 'rodadas', 'limite.json'), JSON.stringify({ convergenciaDesde: 4, por, motivo: 'a pessoa mandou seguir' }));
+    [peca] = (await fluxoDoObjeto(parado)).pecas;
+    expect(peca.acao).toBe('modelar');
+    expect(peca.motivo).toContain(`Segue por decisão gravada em rodadas/limite.json (por: ${por}); sem ela a ação seria parar-sem-convergencia.`);
+    /* a parada no limite continua apontando a extensão do limite */
+    const noLimite = objetoDeProva('no-limite');
+    escrever(join(noLimite, 'ALINHAMENTO.md'), ALINHAMENTO);
+    escrever(join(noLimite, 'partes', 'p', 'receita.js'), RECEITA('p'));
+    for (let k = 6; k > 0; k -= 1) rodadaDe(noLimite, 'p', RECEITA('p'), Array.from({ length: k }, (_, i) => `ponta ${i} do corpo`));
+    [peca] = (await fluxoDoObjeto(noLimite)).pecas;
+    expect(peca.acao).toBe('parar-limite');
+    expect(peca.proximo).toContain('estender o limite em rodadas/limite.json');
+  });
+
   it('com todas as etapas fixas é o fechamento, com a auditoria e o custo por peça', async () => {
     const fechado = objetoDeProva('fim');
     escrever(join(fechado, 'ALINHAMENTO.md'), ALINHAMENTO);

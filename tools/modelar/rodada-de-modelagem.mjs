@@ -38,9 +38,10 @@
  *
  * O ESPERADO DOS PONTOS FICA NA RODADA. Em 2026-11-18 um modelador redeclarou o esperado de um ponto de `PONTOS` depois de a medida
  * reprovar, e o esperado de outro ponto, calculado da curva que ele confere, mudou sozinho a cada rodada; nada comparava. A rodada guarda
- * em `pontos` o esperado resolvido de cada ponto e a impressão do texto de `PONTOS` na receita. `--registrar` compara com a rodada
- * anterior: o esperado que mudou junto com o texto de `PONTOS` só se registra com `--motivo-dos-pontos "<quem decidiu, data: por quê>"`,
- * e o que mudou com o texto igual (derivado de outro dado da receita) sai como aviso e fica gravado. `--acao` dá o mesmo aviso antes.
+ * em `pontos` o esperado resolvido de cada ponto e a impressão do texto de `PONTOS` na receita. `--registrar` compara com a última rodada
+ * que tem `pontos` gravado: todo esperado que mudou, e todo ponto que saiu, só se registra com `--motivo-dos-pontos "<quem decidiu, data:
+ * por quê>"`, venha a mudança de `PONTOS` reescrito ou de outro dado da receita (a TABELA, uma função); o texto de `PONTOS` só entra na
+ * mensagem, para dizer de onde a mudança veio. `--acao` avisa antes do registro.
  *
  * Uso:
  *   node tools/modelar/rodada-de-modelagem.mjs <peça> --registrar --modelador modelador.txt --critico critico.jsonl [--atrito "texto"] [--pacote <pasta>] [--motivo-dos-pontos "<quem decidiu, data: por quê>"]...
@@ -174,11 +175,16 @@ export function gravarRodada(
    julgadas, e quem conduz não segue sozinho. Quando a pessoa decide seguir, a decisão mora num arquivo ao lado das rodadas, com quem
    decidiu e por quê: `rodadas/limite.json`. `limite` é um inteiro maior que o de sempre (mais rodadas) ou o texto "sem" (sem limite,
    declarado); `convergenciaDesde` é o número da rodada a partir da qual a convergência volta a contar, para a peça que parou sem
-   convergência e a pessoa mandou seguir. Um dos dois basta, e `por` e `motivo` valem para o arquivo. Sem o arquivo valem as paradas de
-   sempre. */
+   convergência e a pessoa mandou seguir, e vai no máximo até a próxima rodada a registrar. Um dos dois basta, e `por` e `motivo` valem
+   para o arquivo. A declaração de "sem" ou de `convergenciaDesde` pede `por` no formato "quem, AAAA-MM-DD: as palavras dela"; a extensão
+   por inteiro, que é de antes, segue aceitando o `por` que os arquivos antigos têm. Sem o arquivo valem as paradas de sempre. */
+
+/* Quem decidiu, quando e o quê: "a pessoa, 2026-11-18: pode seguir". Vale para o `por` de `limite.json` e para `--motivo-dos-pontos`. */
+const QUEM_DATA_PALAVRAS = /^[^,:]{2,},\s*\d{4}-\d{2}-\d{2}:\s*\S[\s\S]{2,}$/;
+const FORMATO_DE_QUEM = '"<quem decidiu>, <AAAA-MM-DD>: <as palavras ou o porquê>"';
 export const SEM_LIMITE = 'sem';
 
-/** A decisão gravada da pessoa para a peça: `{ limite, convergenciaDesde }`, com `Infinity` no limite declarado "sem". */
+/** A decisão gravada da pessoa para a peça: `{ limite, convergenciaDesde, por? }`, com `Infinity` no limite declarado "sem"; `por` só vem quando há arquivo. */
 export function decisaoDaPessoa(peca, { pasta = pastaDeRodadas(peca) } = {}) {
   const arquivo = join(pasta, 'limite.json');
   if (!existsSync(arquivo)) return { limite: LIMITE_DE_RODADAS, convergenciaDesde: 1 };
@@ -206,9 +212,21 @@ export function decisaoDaPessoa(peca, { pasta = pastaDeRodadas(peca) } = {}) {
       throw new Error(`${arquivo}: '${campo}' recebido: ${JSON.stringify(dado[campo])}; esperado o texto que diz quem decidiu e por quê. ${conserto}`);
     }
   }
+  if ((dado.limite === SEM_LIMITE || temConvergencia) && !QUEM_DATA_PALAVRAS.test(dado.por.trim())) {
+    throw new Error(`${arquivo}: 'por' recebido: ${JSON.stringify(dado.por)}; esperado ${FORMATO_DE_QUEM}, porque o arquivo declara "sem" limite ou 'convergenciaDesde'. ${conserto}`);
+  }
+  if (temConvergencia) {
+    const numeros = lerRodadas(peca, { pasta }).map((r) => r.numero);
+    const proxima = (numeros.length ? numeros[numeros.length - 1] : 0) + 1;
+    if (dado.convergenciaDesde > proxima) {
+      throw new Error(`${arquivo}: 'convergenciaDesde' recebido: ${dado.convergenciaDesde}; esperado no máximo ${proxima}, o número da próxima rodada a registrar `
+        + `(as registradas são ${numeros.length ? numeros.join(', ') : 'nenhuma'}). ${conserto}`);
+    }
+  }
   return {
     limite: !temLimite ? LIMITE_DE_RODADAS : dado.limite === SEM_LIMITE ? Infinity : dado.limite,
     convergenciaDesde: temConvergencia ? dado.convergenciaDesde : 1,
+    por: dado.por.trim(),
   };
 }
 
@@ -229,24 +247,33 @@ export function pontosDaMedicao(receita, textoDaReceita) {
   return { texto: texto === null ? null : impressao(texto), esperados: esperadosDosPontos(receita) };
 }
 
+const SEM_PONTOS = Object.freeze({ texto: null, esperados: [] });
+
 /**
- * A comparação do esperado dos pontos da medição com o da rodada anterior registrada. Devolve `{ mudancas, declarada }`: `declarada` diz
- * que o texto de `PONTOS` na receita também mudou, e então a mudança é de quem escreveu e pede motivo; com o texto igual o esperado é
- * derivado de outro dado e muda sozinho. A rodada anterior sem esperados gravados (as de antes desta guarda) não compara.
+ * A comparação do esperado dos pontos da medição com o da última rodada que tem `pontos` gravado (e não só a anterior: a rodada sem
+ * `PONTOS` no meio não apaga a base). Devolve `{ base, agora, mudancas, origem }`: `base` é a rodada comparada (null quando nenhuma tem
+ * esperados gravados, as de antes desta guarda, e então nada compara); `agora` é o que a rodada grava, com a lista vazia quando a receita
+ * deixou de declarar `PONTOS`, e o ponto que saiu conta como mudança. `origem` diz de onde a mudança veio e só entra na mensagem:
+ * 'declarada' (o texto de `PONTOS` mudou), 'derivada' (o texto é o mesmo, então veio de outro dado da receita, a TABELA ou uma função) ou
+ * 'desconhecida' (o texto não foi achado numa das duas; null não é igual a nada).
  */
-export function mudancaDosPontos(anterior, medicao) {
-  if (!anterior?.pontos?.esperados || !medicao?.pontos) return { mudancas: [], declarada: false };
-  return {
-    mudancas: mudancasDosEsperados(anterior.pontos.esperados, medicao.pontos.esperados),
-    declarada: (anterior.pontos.texto ?? null) !== (medicao.pontos.texto ?? null),
-  };
+export function mudancaDosPontos(rodadas, medicao) {
+  const base = [...(rodadas ?? [])].reverse().find((r) => Array.isArray(r?.pontos?.esperados)) ?? null;
+  const agora = medicao?.pontos ?? (base ? SEM_PONTOS : null);
+  if (!base || !agora) return { base, agora, mudancas: [], origem: null };
+  const antes = base.pontos.texto ?? null;
+  const origem = antes === null || (agora.texto ?? null) === null ? 'desconhecida' : antes === agora.texto ? 'derivada' : 'declarada';
+  return { base, agora, mudancas: mudancasDosEsperados(base.pontos.esperados, agora.esperados), origem };
 }
 
-const avisoDosPontos = (anterior, { mudancas, declarada }, motivo) => `o esperado de ${mudancas.length} ponto(s) de PONTOS mudou desde a rodada ${anterior.numero} `
-  + `${declarada ? `e o texto de PONTOS também${motivo ? ` (motivo: ${motivo})` : ''}` : 'sem o texto de PONTOS mudar (derivado de outro dado da receita)'}: `
-  + `${mudancas.map(formatarMudancaDeEsperado).join('; ')}.`;
+const ORIGEM_DA_MUDANCA = {
+  declarada: 'o texto de PONTOS na receita também mudou',
+  derivada: 'o texto de PONTOS é o mesmo, então o esperado é derivado de outro dado da receita (a TABELA ou uma função)',
+  desconhecida: 'o texto de PONTOS não foi achado na receita de uma das duas rodadas, e a origem da mudança é desconhecida',
+};
 
-const MOTIVO_DOS_PONTOS = /^[^:]{3,}:\s*\S.{2,}$/s;
+const avisoDosPontos = ({ base, mudancas, origem }, motivo) => `o esperado de ${mudancas.length} ponto(s) de PONTOS mudou desde a rodada ${base.numero}: `
+  + `${mudancas.map(formatarMudancaDeEsperado).join('; ')}; ${ORIGEM_DA_MUDANCA[origem]}${motivo ? ` (motivo: ${motivo})` : ''}.`;
 
 const LIMITE_DO_RELATORIO = 2000;
 const cortar = (texto) => (texto.length > LIMITE_DO_RELATORIO ? `${texto.slice(0, LIMITE_DO_RELATORIO - 1)}…` : texto);
@@ -404,21 +431,24 @@ export const linhasDeAviso = (medicao) => (medicao?.avisos ?? []).map((a) => `av
  * receita ainda não existe não tem o que medir e segue a decisão das rodadas, que começa em `modelar`.
  */
 export async function acaoDaPeca(peca, {
-  rodadas = lerRodadas(peca), limite = limiteDaPeca(peca), medir = () => medirReceita(peca), pasta = pastaDeRodadas(peca),
-  convergenciaDesde = convergenciaDaPeca(peca, { pasta }),
+  pasta = pastaDeRodadas(peca), rodadas = lerRodadas(peca, { pasta }), medir = () => medirReceita(peca), limite, convergenciaDesde, por,
 } = {}) {
+  /* a decisão gravada da pessoa sai inteira da mesma pasta das rodadas; o que quem chama passar vale no lugar do que o arquivo diz */
+  if (limite === undefined || convergenciaDesde === undefined) {
+    const lida = decisaoDaPessoa(peca, { pasta });
+    limite ??= lida.limite; convergenciaDesde ??= lida.convergenciaDesde; por ??= lida.por;
+  }
   let medicao = null;
   try { medicao = await medir(); } catch (erro) {
     if (!/^Receita .* não encontrada|Informe o nome/.test(erro.message)) throw erro;
   }
-  if (medicao === null) return { ...proximaAcao(rodadas, { limite, convergenciaDesde }), medicao: null };
+  if (medicao === null) return { ...proximaAcao(rodadas, { limite, convergenciaDesde, por }), medicao: null };
   /* O texto mudou depois da última rodada: a cópia que ela guardou diz se o crítico julgaria outra coisa. */
   const ultima = rodadas[rodadas.length - 1];
   /* o esperado dos pontos que mudou desde a última rodada aparece antes do registro, que é onde ele pede o motivo */
-  const dosPontos = mudancaDosPontos(ultima, medicao);
-  if (dosPontos.mudancas.length && ultima.receita?.sha256 !== medicao.sha256) {
-    medicao = { ...medicao, avisos: [...(medicao.avisos ?? []), avisoDosPontos(ultima, dosPontos)
-      + (dosPontos.declarada ? ' O registro desta rodada vai pedir --motivo-dos-pontos "<quem decidiu, data: por quê>".' : '')] };
+  const dosPontos = mudancaDosPontos(rodadas, medicao);
+  if (dosPontos.mudancas.length) {
+    medicao = { ...medicao, avisos: [...(medicao.avisos ?? []), `${avisoDosPontos(dosPontos)} O registro desta rodada vai pedir --motivo-dos-pontos ${FORMATO_DE_QUEM}.`] };
   }
   let mesmaFormaDaRodada;
   if (medicao.passou && medicao.caminho && ultima?.receita?.sha256 && ultima.receita.sha256 !== medicao.sha256
@@ -426,7 +456,7 @@ export async function acaoDaPeca(peca, {
     const [atual, julgada] = await Promise.all([impressaoDaForma(medicao.caminho), impressaoDaForma(copiaDaReceita(pasta, ultima.numero))]);
     if (atual !== null && atual === julgada) mesmaFormaDaRodada = ultima.numero;
   }
-  let decisao = acaoDaReceita(rodadas, { sha256: medicao.sha256, medicao, mesmaFormaDaRodada }, { limite, convergenciaDesde });
+  let decisao = acaoDaReceita(rodadas, { sha256: medicao.sha256, medicao, mesmaFormaDaRodada }, { limite, convergenciaDesde, por });
   /* o julgamento da rodada vale: do texto só mudou o que a malha e o pedido do crítico (objeto, partes, critérios, referências) não leem */
   if (mesmaFormaDaRodada && decisao.motivo.includes('mas produz a mesma malha')) {
     decisao = { ...decisao, motivo: `${decisao.motivo} Só o texto mudou, e nada do que o crítico lê; o julgamento da rodada ${mesmaFormaDaRodada} vale.` };
@@ -505,25 +535,24 @@ export async function registrarMedida(peca, entrada, { medir = () => medirReceit
     }
     superficie = { lataria: luzDaMedicao(medicao).porque, imagens: conferido.imagens };
   }
-  /* o esperado dos pontos contra o da rodada anterior: a mudança escrita em `PONTOS` pede quem decidiu e por quê, e a derivada avisa */
-  if (motivoDosPontos !== null && !MOTIVO_DOS_PONTOS.test(String(motivoDosPontos).trim())) {
-    throw new Error(`--motivo-dos-pontos recebido: ${JSON.stringify(motivoDosPontos)}; esperado "<quem decidiu, data: por quê>", com os dois-pontos entre quem decidiu e o motivo. `
+  /* o esperado dos pontos contra o da última rodada que o gravou: toda mudança pede quem decidiu e por quê */
+  if (motivoDosPontos !== null && !QUEM_DATA_PALAVRAS.test(String(motivoDosPontos).trim())) {
+    throw new Error(`--motivo-dos-pontos recebido: ${JSON.stringify(motivoDosPontos)}; esperado ${FORMATO_DE_QUEM}. `
       + `Registre de novo com \`node tools/modelar/rodada-de-modelagem.mjs ${peca} --registrar ... --motivo-dos-pontos "a pessoa, 2026-11-18: o alvo era o da prancha antiga"\`.`);
   }
-  const anteriores = lerRodadas(peca, opcoes.pasta ? { pasta: opcoes.pasta } : {});
-  const anterior = anteriores[anteriores.length - 1];
-  const dosPontos = mudancaDosPontos(anterior, medicao);
-  let pontos = medicao.pontos;
+  const dosPontos = mudancaDosPontos(lerRodadas(peca, opcoes.pasta ? { pasta: opcoes.pasta } : {}), medicao);
+  let pontos = dosPontos.agora ?? undefined;
   if (dosPontos.mudancas.length) {
-    if (dosPontos.declarada && motivoDosPontos === null) {
-      throw new Error(`a rodada não se registra: o esperado de ponto de PONTOS mudou desde a rodada ${anterior.numero} e o texto de PONTOS na receita também. `
-        + `Recebido: ${dosPontos.mudancas.map(formatarMudancaDeEsperado).join('; ')}. Esperado: o mesmo alvo da rodada ${anterior.numero}, ou a mudança com quem decidiu e por quê. `
-        + `Desfaça a mudança em PONTOS ou registre com \`node tools/modelar/rodada-de-modelagem.mjs ${peca} --registrar ... --motivo-dos-pontos "<quem decidiu, data: por quê>"\`.`);
+    if (motivoDosPontos === null) {
+      throw new Error(`a rodada não se registra: o esperado de ponto de PONTOS mudou desde a rodada ${dosPontos.base.numero}. `
+        + `Recebido: ${dosPontos.mudancas.map(formatarMudancaDeEsperado).join('; ')}; ${ORIGEM_DA_MUDANCA[dosPontos.origem]}. `
+        + `Esperado: o mesmo alvo da rodada ${dosPontos.base.numero}, ou a mudança com quem decidiu e por quê. `
+        + `Desfaça a mudança ou registre com \`node tools/modelar/rodada-de-modelagem.mjs ${peca} --registrar ... --motivo-dos-pontos ${FORMATO_DE_QUEM}\`.`);
     }
-    const motivo = dosPontos.declarada ? String(motivoDosPontos).trim() : null;
-    pontos = { ...pontos, mudancas: dosPontos.mudancas.map((m) => ({ ...m, derivada: !dosPontos.declarada })), ...(motivo ? { motivoDaMudanca: motivo } : {}) };
-    medicao = { ...medicao, avisos: [...(medicao.avisos ?? []), avisoDosPontos(anterior, dosPontos, motivo)] };
-  }
+    const motivo = String(motivoDosPontos).trim();
+    pontos = { ...pontos, mudancas: dosPontos.mudancas.map((m) => ({ ...m, origem: dosPontos.origem })), motivoDaMudanca: motivo };
+    medicao = { ...medicao, avisos: [...(medicao.avisos ?? []), avisoDosPontos(dosPontos, motivo)] };
+  } else if (!medicao.pontos) pontos = undefined;
   /* `medidas`, `superficie` e `pontos` são da ferramenta, e o que a entrada declara deles sai */
   const { medidas: _declaradas, superficie: _declarada, pontos: _dosPontos, ...resto } = entrada;
   void _declaradas; void _declarada; void _dosPontos;

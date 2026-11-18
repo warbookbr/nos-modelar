@@ -137,25 +137,59 @@ export function esperadosDosPontos(receita) {
   }));
 }
 
+/* Onde termina o que começa em `k` e não é código: o comentário de linha, o de bloco, o texto entre aspas ou o template. Devolve a
+   posição logo depois, ou `k` quando ali é código. O template conta as chaves de `${...}` para achar a crase que o fecha. */
+function pularNaoCodigo(t, k) {
+  const c = t[k];
+  if (c === '/' && t[k + 1] === '/') { const f = t.indexOf('\n', k); return f < 0 ? t.length : f; }
+  if (c === '/' && t[k + 1] === '*') { const f = t.indexOf('*/', k + 2); return f < 0 ? t.length : f + 2; }
+  if (c !== "'" && c !== '"' && c !== '`') return k;
+  let j = k + 1;
+  while (j < t.length && t[j] !== c) {
+    if (t[j] === '\\') { j += 2; continue; }
+    if (c === '`' && t[j] === '$' && t[j + 1] === '{') {
+      let nivel = 0;
+      for (; j < t.length; j += 1) {
+        const depois = pularNaoCodigo(t, j);
+        if (depois !== j) { j = depois - 1; continue; }
+        if (t[j] === '{') nivel += 1; else if (t[j] === '}') { nivel -= 1; if (nivel === 0) break; }
+      }
+    }
+    j += 1;
+  }
+  return j + 1;
+}
+
 /**
- * O texto com que a receita declara `PONTOS` (`PONTOS = [ ... ]` ou `PONTOS: [ ... ]`), do colchete que abre ao que fecha, com os espaços
- * reduzidos a um. Diz se alguém reescreveu a declaração: o esperado que muda com este texto igual é derivado de outro dado da receita.
- * Devolve null quando a receita não tem a lista escrita nela (a importada de outro arquivo, por exemplo).
+ * O texto com que a receita declara `PONTOS` (`PONTOS = [ ... ]` ou `PONTOS: [ ... ]`), do colchete que abre ao que fecha, sem os
+ * comentários e com os espaços reduzidos a um. Só serve para dizer de onde veio a mudança de um esperado (reescrito na lista, ou vindo de
+ * outro dado da receita); não libera nada. A âncora é a primeira declaração no código, e não a palavra num comentário ou num texto.
+ * Devolve null quando não dá para achar a lista com segurança: a receita não a tem escrita, ela vem entre parênteses ou de uma chamada, ou
+ * há mais de uma declaração. Null é "não sei", e nunca "igual".
  */
 export function textoDosPontos(textoDaReceita) {
-  const abre = /\bPONTOS\s*[=:]\s*\[/.exec(String(textoDaReceita ?? ''));
-  if (!abre) return null;
-  const inicio = abre.index + abre[0].length - 1;
-  let nivel = 0;
-  for (let k = inicio; k < textoDaReceita.length; k += 1) {
-    const c = textoDaReceita[k];
-    if (c === "'" || c === '"' || c === '`') {
-      k += 1;
-      while (k < textoDaReceita.length && textoDaReceita[k] !== c) k += textoDaReceita[k] === '\\' ? 2 : 1;
-    } else if (c === '[') nivel += 1;
-    else if (c === ']') { nivel -= 1; if (nivel === 0) return textoDaReceita.slice(inicio, k + 1).replace(/\s+/g, ' '); }
+  const t = String(textoDaReceita ?? '');
+  const achados = [];
+  for (let k = 0; k < t.length; k += 1) {
+    const depois = pularNaoCodigo(t, k);
+    if (depois !== k) { k = depois - 1; continue; }
+    if (!t.startsWith('PONTOS', k) || /[\w$.]/.test(t[k - 1] ?? '') || /[\w$]/.test(t[k + 6] ?? '')) continue;
+    const declara = /^PONTOS\s*(?:=(?![=>])|:)\s*/.exec(t.slice(k, k + 200));
+    if (!declara) continue;
+    const inicio = k + declara[0].length;
+    if (t[inicio] !== '[') return null;
+    let nivel = 0; let limpo = ''; let fim = -1;
+    for (let j = inicio; j < t.length; j += 1) {
+      const pulo = pularNaoCodigo(t, j);
+      if (pulo !== j) { if (t[j] !== '/') limpo += t.slice(j, pulo); else limpo += ' '; j = pulo - 1; continue; }
+      limpo += t[j];
+      if (t[j] === '[') nivel += 1; else if (t[j] === ']') { nivel -= 1; if (nivel === 0) { fim = j; break; } }
+    }
+    if (fim < 0) return null;
+    achados.push(limpo.replace(/\s+/g, ' '));
+    k = fim;
   }
-  return null;
+  return achados.length === 1 ? achados[0] : null;
 }
 
 const mesmoEsperado = (a, b) => JSON.stringify(a) === JSON.stringify(b);

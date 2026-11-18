@@ -165,13 +165,36 @@ function normalizarAtrito(valor) {
  * O que fazer agora, dada a história da peça. Devolve a ação e o motivo em
  * texto, porque parada sem motivo escrito vira "achei que estava bom".
  */
-export function proximaAcao(rodadas, { limite = LIMITE_DE_RODADAS, notaMinima = 8, convergenciaDesde = 1 } = {}) {
+export function proximaAcao(rodadas, opcoes = {}) {
+  return comDecisaoGravada(decidir(rodadas, opcoes), rodadas, opcoes);
+}
+
+const PARADAS_QUE_A_PESSOA_LIBERA = new Set(['parar-limite', 'parar-sem-convergencia']);
+
+/* A DECISÃO GRAVADA APARECE QUANDO MUDA A AÇÃO. Quando a história, sem a decisão da pessoa, pararia no limite ou sem convergência e a
+   decisão gravada (`por`, as palavras dela) faz o laço seguir, o motivo diz isso e qual parada foi evitada: quem lê a ação sabe que
+   a peça segue por decisão escrita, e de quem. Sem `por` (ninguém gravou decisão) o motivo sai como sempre. */
+function comDecisaoGravada(decisao, rodadas, { por, notaMinima } = {}) {
+  if (typeof por !== 'string' || por.trim() === '') return decisao;
+  const semDecisao = decidir(rodadas, { notaMinima });
+  if (!PARADAS_QUE_A_PESSOA_LIBERA.has(semDecisao.acao) || PARADAS_QUE_A_PESSOA_LIBERA.has(decisao.acao)) return decisao;
+  return { ...decisao, motivo: `${decisao.motivo} Segue por decisão gravada em rodadas/limite.json (por: ${por.trim()}); sem ela a ação seria ${semDecisao.acao}.` };
+}
+
+function decidir(rodadas, { limite = LIMITE_DE_RODADAS, notaMinima = 8, convergenciaDesde = 1 } = {}) {
   if (!Array.isArray(rodadas)) falhar('a história da peça é uma lista de rodadas.');
   /* A DECISÃO DA PESSOA DEPOIS DA PARADA. Quando o laço para sem convergência e a pessoa manda seguir, a contagem recomeça na rodada
      que ela declarar (`convergenciaDesde`, gravado por quem chama): as rodadas julgadas antes dela não entram mais na conta, e três
      rodadas julgadas sem queda a partir dela param de novo. Sem a declaração a conta é sobre todas, como sempre. */
   if (!Number.isInteger(convergenciaDesde) || convergenciaDesde < 1) {
     falhar(`'convergenciaDesde' recebido: ${JSON.stringify(convergenciaDesde)}; esperado o número inteiro (1 ou mais) da rodada a partir da qual a convergência volta a contar.`);
+  }
+  /* A rodada declarada existe ou é a próxima a registrar. Um número adiante disso desligaria a parada para sempre, que é o que
+     "sem limite" não diz: sem limite de rodadas, a peça que não converge ainda para. */
+  const proxima = (rodadas.length ? Number(rodadas[rodadas.length - 1].numero) || rodadas.length : 0) + 1;
+  if (convergenciaDesde > proxima) {
+    falhar(`'convergenciaDesde' recebido: ${convergenciaDesde}; esperado no máximo ${proxima}, o número da próxima rodada a registrar `
+      + `(as registradas são ${rodadas.length ? rodadas.map((r) => r.numero).join(', ') : 'nenhuma'}).`);
   }
   if (rodadas.length === 0) return { acao: 'modelar', motivo: 'nenhuma rodada ainda: a peça não existe.' };
 
@@ -242,16 +265,21 @@ export function acaoDaReceita(rodadas, receitaAtual, opcoes = {}) {
       medicaoReprovada: true,
     };
   }
+  return comDecisaoGravada(acaoDaReceitaQuePassa(rodadas, receitaAtual, opcoes), rodadas, opcoes);
+}
+
+function acaoDaReceitaQuePassa(rodadas, receitaAtual, opcoes) {
+  const { sha256 } = receitaAtual;
   const ultima = rodadas[rodadas.length - 1];
   if (!ultima) return { acao: 'revisar', motivo: `a receita existe (sha256:${curto(sha256)}), a medição dela passa e nenhuma rodada a julgou.` };
-  if (!ultima.receita?.sha256) return proximaAcao(rodadas, opcoes);
+  if (!ultima.receita?.sha256) return decidir(rodadas, opcoes);
   if (ultima.receita.sha256 === sha256) {
     if (!ultima.medidas.passou) {
       return { acao: 'revisar', motivo: `a medição da receita atual (sha256:${curto(sha256)}) passa e ainda não foi julgada.` };
     }
-    return proximaAcao(rodadas, opcoes);
+    return decidir(rodadas, opcoes);
   }
-  const decisao = proximaAcao(rodadas, opcoes);
+  const decisao = decidir(rodadas, opcoes);
   if (decisao.acao === 'parar-limite' || decisao.acao === 'parar-sem-convergencia') return decisao;
   /* o texto mudou, mas a malha e o PLANO são os que o crítico julgou na rodada (quem chama compara com a cópia dela) */
   if (receitaAtual.mesmaFormaDaRodada === ultima.numero) {
