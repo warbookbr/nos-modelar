@@ -121,6 +121,63 @@ export function conferirPontos(receita, { quem = 'peça' } = {}) {
   return { ok: pontos.every((p) => p.passou), quem, pontos };
 }
 
+/* ---- o esperado de cada ponto, guardado e comparado entre rodadas ---- */
+
+/**
+ * O esperado de cada ponto de `PONTOS`, já resolvido em número: `{ nome, parte | entre, medida?, em, toleranciaMm }`. É o que a rodada
+ * grava, para a seguinte dizer se o alvo da medida mudou. Não valida: o formato errado é recusado por `conferirPontos`, que mede.
+ */
+export function esperadosDosPontos(receita) {
+  const declarados = Array.isArray(receita?.PONTOS) ? receita.PONTOS : [];
+  return declarados.filter((p) => p && typeof p === 'object').map((p) => ({
+    nome: String(p.nome ?? ''),
+    ...(Array.isArray(p.entre) ? { entre: p.entre.map(String) } : { parte: String(p.parte ?? ''), medida: p.medida ?? 'centro' }),
+    em: Array.isArray(p.em) ? p.em.map(Number) : [],
+    toleranciaMm: Number(p.toleranciaMm),
+  }));
+}
+
+/**
+ * O texto com que a receita declara `PONTOS` (`PONTOS = [ ... ]` ou `PONTOS: [ ... ]`), do colchete que abre ao que fecha, com os espaços
+ * reduzidos a um. Diz se alguém reescreveu a declaração: o esperado que muda com este texto igual é derivado de outro dado da receita.
+ * Devolve null quando a receita não tem a lista escrita nela (a importada de outro arquivo, por exemplo).
+ */
+export function textoDosPontos(textoDaReceita) {
+  const abre = /\bPONTOS\s*[=:]\s*\[/.exec(String(textoDaReceita ?? ''));
+  if (!abre) return null;
+  const inicio = abre.index + abre[0].length - 1;
+  let nivel = 0;
+  for (let k = inicio; k < textoDaReceita.length; k += 1) {
+    const c = textoDaReceita[k];
+    if (c === "'" || c === '"' || c === '`') {
+      k += 1;
+      while (k < textoDaReceita.length && textoDaReceita[k] !== c) k += textoDaReceita[k] === '\\' ? 2 : 1;
+    } else if (c === '[') nivel += 1;
+    else if (c === ']') { nivel -= 1; if (nivel === 0) return textoDaReceita.slice(inicio, k + 1).replace(/\s+/g, ' '); }
+  }
+  return null;
+}
+
+const mesmoEsperado = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+
+/**
+ * O que mudou no esperado dos pontos de uma rodada para a seguinte: o ponto de mesmo nome com outro alvo, outra tolerância ou outra
+ * medida, e o ponto que saiu. O ponto novo não é mudança de esperado. Devolve `[{ nome, de, para }]`, com `para` null no que saiu.
+ */
+export function mudancasDosEsperados(antes, agora) {
+  const novos = new Map((agora ?? []).map((p) => [p.nome, p]));
+  const mudancas = [];
+  for (const velho of antes ?? []) {
+    const novo = novos.get(velho.nome) ?? null;
+    if (!novo || !mesmoEsperado(velho, novo)) mudancas.push({ nome: velho.nome, de: velho, para: novo });
+  }
+  return mudancas;
+}
+
+const alvo = (p) => `[${p.em.join(', ')}] ±${p.toleranciaMm} mm`;
+/** Uma mudança de esperado em uma linha: o nome do ponto, o alvo de antes e o de agora. */
+export const formatarMudancaDeEsperado = (m) => (m.para ? `'${m.nome}': de ${alvo(m.de)} para ${alvo(m.para)}` : `'${m.nome}': saiu de PONTOS (era ${alvo(m.de)})`);
+
 export function formatarPontos(resultado) {
   if (resultado.semPontos) {
     return `conferir-pontos — ${resultado.quem} NÃO DECLARA PONTOS\n`

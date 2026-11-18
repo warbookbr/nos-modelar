@@ -36,8 +36,14 @@
  * rodada (a de `vistas:critica`, ou a de `--pacote <pasta>`) não traz as duas vistas da versão medida, com o comando que as gera, e a
  * rodada gravada guarda as imagens em `superficie`; `--acao` não dá por fechada a peça de lataria cuja última rodada não as tem.
  *
+ * O ESPERADO DOS PONTOS FICA NA RODADA. Em 2026-11-18 um modelador redeclarou o esperado de um ponto de `PONTOS` depois de a medida
+ * reprovar, e o esperado de outro ponto, calculado da curva que ele confere, mudou sozinho a cada rodada; nada comparava. A rodada guarda
+ * em `pontos` o esperado resolvido de cada ponto e a impressão do texto de `PONTOS` na receita. `--registrar` compara com a rodada
+ * anterior: o esperado que mudou junto com o texto de `PONTOS` só se registra com `--motivo-dos-pontos "<quem decidiu, data: por quê>"`,
+ * e o que mudou com o texto igual (derivado de outro dado da receita) sai como aviso e fica gravado. `--acao` dá o mesmo aviso antes.
+ *
  * Uso:
- *   node tools/modelar/rodada-de-modelagem.mjs <peça> --registrar --modelador modelador.txt --critico critico.jsonl [--atrito "texto"] [--pacote <pasta>]...
+ *   node tools/modelar/rodada-de-modelagem.mjs <peça> --registrar --modelador modelador.txt --critico critico.jsonl [--atrito "texto"] [--pacote <pasta>] [--motivo-dos-pontos "<quem decidiu, data: por quê>"]...
  *   node tools/modelar/rodada-de-modelagem.mjs <peça> --registrar rodada.json
  *   node tools/modelar/rodada-de-modelagem.mjs <peça> --acao
  *   node tools/modelar/rodada-de-modelagem.mjs <peça> --perguntas
@@ -52,7 +58,7 @@ import { diferencaDeTexto } from '../../src/autoria/diferenca-de-texto.js';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 import { conferirAcervo } from './guardas/guarda-acervo.mjs';
 import { conferirUmaPeca } from './guardas/guarda-referencial.mjs';
-import { conferirPontos, formatarPontos } from './conferir-pontos.mjs';
+import { conferirPontos, esperadosDosPontos, formatarMudancaDeEsperado, formatarPontos, mudancasDosEsperados, textoDosPontos } from './conferir-pontos.mjs';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { afastamentoDaParte, normalizarEsbocoDoRefinamento } from '../../src/autoria/refinamento-global.js';
@@ -119,7 +125,7 @@ const copiaDaReceita = (pasta, numero) => join(pasta, `receita-${String(numero).
 
 export function gravarRodada(
   peca,
-  { veredito = null, medidas, partes, atrito = [], notaDePassagem, superficie, facesFinas },
+  { veredito = null, medidas, partes, atrito = [], notaDePassagem, superficie, facesFinas, pontos },
   { pasta = pastaDeRodadas(peca), receitaTexto = textoDaReceita(peca), agora = () => new Date().toISOString() } = {},
 ) {
   exigirNome(peca);
@@ -144,6 +150,8 @@ export function gravarRodada(
     registradaEm: agora(),
     /* a contagem de faces finas da malha medida (`facesFinasDaMalha`): a próxima medição da peça compara com ela */
     ...(facesFinas ? { facesFinas } : {}),
+    /* o esperado resolvido de cada ponto de `PONTOS` e o que mudou nele desde a rodada anterior: a próxima rodada compara com este */
+    ...(pontos ? { pontos } : {}),
   };
   mkdirSync(pasta, { recursive: true });
   const arquivo = join(pasta, `rodada-${String(rodada.numero).padStart(2, '0')}.json`);
@@ -162,26 +170,83 @@ export function gravarRodada(
   return { rodada, arquivo };
 }
 
-/* EXTENSÃO DO LIMITE, SÓ POR ESCRITO. O laço para no limite de rodadas e
-   quem conduz não estende sozinho. Quando a pessoa decide dar mais rodadas a
-   uma peça, a decisão mora num arquivo ao lado das rodadas, com quem decidiu
-   e por quê: `rodadas/limite.json`, `{ "limite": 7, "por": "...", "motivo":
-   "..." }`. Sem o arquivo vale o limite de sempre. */
-export function limiteDaPeca(peca, { pasta = pastaDeRodadas(peca) } = {}) {
+/* A DECISÃO DA PESSOA SOBRE AS PARADAS, SÓ POR ESCRITO. O laço para no limite de rodadas e quando os defeitos não caem em três rodadas
+   julgadas, e quem conduz não segue sozinho. Quando a pessoa decide seguir, a decisão mora num arquivo ao lado das rodadas, com quem
+   decidiu e por quê: `rodadas/limite.json`. `limite` é um inteiro maior que o de sempre (mais rodadas) ou o texto "sem" (sem limite,
+   declarado); `convergenciaDesde` é o número da rodada a partir da qual a convergência volta a contar, para a peça que parou sem
+   convergência e a pessoa mandou seguir. Um dos dois basta, e `por` e `motivo` valem para o arquivo. Sem o arquivo valem as paradas de
+   sempre. */
+export const SEM_LIMITE = 'sem';
+
+/** A decisão gravada da pessoa para a peça: `{ limite, convergenciaDesde }`, com `Infinity` no limite declarado "sem". */
+export function decisaoDaPessoa(peca, { pasta = pastaDeRodadas(peca) } = {}) {
   const arquivo = join(pasta, 'limite.json');
-  if (!existsSync(arquivo)) return LIMITE_DE_RODADAS;
-  const dado = JSON.parse(readFileSync(arquivo, 'utf8'));
-  const limite = dado?.limite;
-  if (!Number.isInteger(limite) || limite <= LIMITE_DE_RODADAS) {
-    throw new Error(`${arquivo}: 'limite' precisa ser inteiro maior que ${LIMITE_DE_RODADAS}.`);
+  if (!existsSync(arquivo)) return { limite: LIMITE_DE_RODADAS, convergenciaDesde: 1 };
+  const conserto = `Corrija o arquivo e confira com \`node tools/modelar/rodada-de-modelagem.mjs ${peca} --acao\`.`;
+  let dado;
+  try { dado = JSON.parse(readFileSync(arquivo, 'utf8')); } catch (erro) {
+    throw new Error(`${arquivo}: recebido um texto que não é JSON (${erro.message}); esperado um objeto com 'limite' ou 'convergenciaDesde', 'por' e 'motivo'. ${conserto}`);
+  }
+  if (!dado || typeof dado !== 'object' || Array.isArray(dado)) {
+    throw new Error(`${arquivo}: recebido ${JSON.stringify(dado)}; esperado um objeto com 'limite' ou 'convergenciaDesde', 'por' e 'motivo'. ${conserto}`);
+  }
+  const temLimite = dado.limite !== undefined;
+  const temConvergencia = dado.convergenciaDesde !== undefined;
+  if (!temLimite && !temConvergencia) {
+    throw new Error(`${arquivo}: recebido sem 'limite' e sem 'convergenciaDesde'; esperado ao menos um dos dois, que é a decisão que o arquivo grava. ${conserto}`);
+  }
+  if (temLimite && dado.limite !== SEM_LIMITE && (!Number.isInteger(dado.limite) || dado.limite <= LIMITE_DE_RODADAS)) {
+    throw new Error(`${arquivo}: 'limite' recebido: ${JSON.stringify(dado.limite)}; esperado um inteiro maior que ${LIMITE_DE_RODADAS} ou "${SEM_LIMITE}" (sem limite, declarado). ${conserto}`);
+  }
+  if (temConvergencia && (!Number.isInteger(dado.convergenciaDesde) || dado.convergenciaDesde < 1)) {
+    throw new Error(`${arquivo}: 'convergenciaDesde' recebido: ${JSON.stringify(dado.convergenciaDesde)}; esperado o número inteiro (1 ou mais) da rodada a partir da qual a convergência volta a contar. ${conserto}`);
   }
   for (const campo of ['por', 'motivo']) {
     if (typeof dado[campo] !== 'string' || dado[campo].trim().length < 3) {
-      throw new Error(`${arquivo}: '${campo}' precisa dizer quem decidiu e por quê.`);
+      throw new Error(`${arquivo}: '${campo}' recebido: ${JSON.stringify(dado[campo])}; esperado o texto que diz quem decidiu e por quê. ${conserto}`);
     }
   }
-  return limite;
+  return {
+    limite: !temLimite ? LIMITE_DE_RODADAS : dado.limite === SEM_LIMITE ? Infinity : dado.limite,
+    convergenciaDesde: temConvergencia ? dado.convergenciaDesde : 1,
+  };
 }
+
+/** O limite de rodadas da peça: o de sempre, o que a pessoa estendeu por escrito, ou `Infinity` quando ela declarou "sem". */
+export const limiteDaPeca = (peca, opcoes) => decisaoDaPessoa(peca, opcoes).limite;
+
+/** A rodada a partir da qual a convergência conta para a peça: 1, ou a que a pessoa gravou ao mandar seguir depois da parada. */
+export const convergenciaDaPeca = (peca, opcoes) => decisaoDaPessoa(peca, opcoes).convergenciaDesde;
+
+/* ---- o esperado dos PONTOS entre rodadas ---- */
+
+const impressao = (texto) => `sha256:${createHash('sha256').update(texto).digest('hex')}`;
+
+/** O que a medição guarda dos `PONTOS`: o esperado resolvido de cada um e a impressão do texto que os declara na receita. */
+export function pontosDaMedicao(receita, textoDaReceita) {
+  if (!Array.isArray(receita?.PONTOS) || receita.PONTOS.length === 0) return null;
+  const texto = textoDosPontos(textoDaReceita);
+  return { texto: texto === null ? null : impressao(texto), esperados: esperadosDosPontos(receita) };
+}
+
+/**
+ * A comparação do esperado dos pontos da medição com o da rodada anterior registrada. Devolve `{ mudancas, declarada }`: `declarada` diz
+ * que o texto de `PONTOS` na receita também mudou, e então a mudança é de quem escreveu e pede motivo; com o texto igual o esperado é
+ * derivado de outro dado e muda sozinho. A rodada anterior sem esperados gravados (as de antes desta guarda) não compara.
+ */
+export function mudancaDosPontos(anterior, medicao) {
+  if (!anterior?.pontos?.esperados || !medicao?.pontos) return { mudancas: [], declarada: false };
+  return {
+    mudancas: mudancasDosEsperados(anterior.pontos.esperados, medicao.pontos.esperados),
+    declarada: (anterior.pontos.texto ?? null) !== (medicao.pontos.texto ?? null),
+  };
+}
+
+const avisoDosPontos = (anterior, { mudancas, declarada }, motivo) => `o esperado de ${mudancas.length} ponto(s) de PONTOS mudou desde a rodada ${anterior.numero} `
+  + `${declarada ? `e o texto de PONTOS também${motivo ? ` (motivo: ${motivo})` : ''}` : 'sem o texto de PONTOS mudar (derivado de outro dado da receita)'}: `
+  + `${mudancas.map(formatarMudancaDeEsperado).join('; ')}.`;
+
+const MOTIVO_DOS_PONTOS = /^[^:]{3,}:\s*\S.{2,}$/s;
 
 const LIMITE_DO_RELATORIO = 2000;
 const cortar = (texto) => (texto.length > LIMITE_DO_RELATORIO ? `${texto.slice(0, LIMITE_DO_RELATORIO - 1)}…` : texto);
@@ -230,8 +295,9 @@ export async function medirReceita(peca, { rodadas, pasta, registroDasEtapas } =
     if (veredito.reprova) falhas.push(veredito.reprova);
   }
   const passou = falhas.length === 0;
+  const pontos = pontosDaMedicao(receita, texto);
   const { lataria, luzRasante, porque } = await superficieDaPecaMedida(peca, receita, plano, { registro: registroDasEtapas });
-  return { passou, sha256, texto, caminho, relatorio: cortar(passou ? `${feitas.join(', ')}: ok` : falhas.join('\n')), lataria: { lataria, porque }, luzRasante: { luzRasante, porque }, avisos, ...(facesFinas ? { facesFinas } : {}) };
+  return { passou, sha256, texto, caminho, relatorio: cortar(passou ? `${feitas.join(', ')}: ok` : falhas.join('\n')), lataria: { lataria, porque }, luzRasante: { luzRasante, porque }, avisos, ...(facesFinas ? { facesFinas } : {}), ...(pontos ? { pontos } : {}) };
 }
 
 /* ---- as faces finas da malha ---- */
@@ -339,21 +405,28 @@ export const linhasDeAviso = (medicao) => (medicao?.avisos ?? []).map((a) => `av
  */
 export async function acaoDaPeca(peca, {
   rodadas = lerRodadas(peca), limite = limiteDaPeca(peca), medir = () => medirReceita(peca), pasta = pastaDeRodadas(peca),
+  convergenciaDesde = convergenciaDaPeca(peca, { pasta }),
 } = {}) {
   let medicao = null;
   try { medicao = await medir(); } catch (erro) {
     if (!/^Receita .* não encontrada|Informe o nome/.test(erro.message)) throw erro;
   }
-  if (medicao === null) return { ...proximaAcao(rodadas, { limite }), medicao: null };
+  if (medicao === null) return { ...proximaAcao(rodadas, { limite, convergenciaDesde }), medicao: null };
   /* O texto mudou depois da última rodada: a cópia que ela guardou diz se o crítico julgaria outra coisa. */
   const ultima = rodadas[rodadas.length - 1];
+  /* o esperado dos pontos que mudou desde a última rodada aparece antes do registro, que é onde ele pede o motivo */
+  const dosPontos = mudancaDosPontos(ultima, medicao);
+  if (dosPontos.mudancas.length && ultima.receita?.sha256 !== medicao.sha256) {
+    medicao = { ...medicao, avisos: [...(medicao.avisos ?? []), avisoDosPontos(ultima, dosPontos)
+      + (dosPontos.declarada ? ' O registro desta rodada vai pedir --motivo-dos-pontos "<quem decidiu, data: por quê>".' : '')] };
+  }
   let mesmaFormaDaRodada;
   if (medicao.passou && medicao.caminho && ultima?.receita?.sha256 && ultima.receita.sha256 !== medicao.sha256
     && existsSync(copiaDaReceita(pasta, ultima.numero))) {
     const [atual, julgada] = await Promise.all([impressaoDaForma(medicao.caminho), impressaoDaForma(copiaDaReceita(pasta, ultima.numero))]);
     if (atual !== null && atual === julgada) mesmaFormaDaRodada = ultima.numero;
   }
-  let decisao = acaoDaReceita(rodadas, { sha256: medicao.sha256, medicao, mesmaFormaDaRodada }, { limite });
+  let decisao = acaoDaReceita(rodadas, { sha256: medicao.sha256, medicao, mesmaFormaDaRodada }, { limite, convergenciaDesde });
   /* o julgamento da rodada vale: do texto só mudou o que a malha e o pedido do crítico (objeto, partes, critérios, referências) não leem */
   if (mesmaFormaDaRodada && decisao.motivo.includes('mas produz a mesma malha')) {
     decisao = { ...decisao, motivo: `${decisao.motivo} Só o texto mudou, e nada do que o crítico lê; o julgamento da rodada ${mesmaFormaDaRodada} vale.` };
@@ -404,7 +477,7 @@ export function alvoDoRepositorio(alvo, raiz = RAIZ_DO_REPOSITORIO) {
  * o veredito do crítico quando a medição da receita atual reprovou, e `medidas` declaradas que contradizem a medição. A receita
  * gravada na rodada é a que foi medida.
  */
-export async function registrarMedida(peca, entrada, { medir = () => medirReceita(peca), pacote = null, ...opcoes } = {}) {
+export async function registrarMedida(peca, entrada, { medir = () => medirReceita(peca), pacote = null, motivoDosPontos = null, ...opcoes } = {}) {
   let medicao;
   try { medicao = await medir(); } catch (erro) {
     throw new Error(`não consegui medir a receita de '${peca}' (${erro.message}): sem medição a rodada não se registra, e o veredito do crítico muito menos.`);
@@ -432,10 +505,29 @@ export async function registrarMedida(peca, entrada, { medir = () => medirReceit
     }
     superficie = { lataria: luzDaMedicao(medicao).porque, imagens: conferido.imagens };
   }
-  /* `medidas` e `superficie` são da ferramenta, e o que a entrada declara deles sai */
-  const { medidas: _declaradas, superficie: _declarada, ...resto } = entrada;
-  void _declaradas; void _declarada;
-  const gravada = gravarRodada(peca, { ...resto, superficie, facesFinas: medicao.facesFinas, medidas: { passou: medicao.passou, relatorio: medicao.relatorio } }, { ...opcoes, receitaTexto: medicao.texto });
+  /* o esperado dos pontos contra o da rodada anterior: a mudança escrita em `PONTOS` pede quem decidiu e por quê, e a derivada avisa */
+  if (motivoDosPontos !== null && !MOTIVO_DOS_PONTOS.test(String(motivoDosPontos).trim())) {
+    throw new Error(`--motivo-dos-pontos recebido: ${JSON.stringify(motivoDosPontos)}; esperado "<quem decidiu, data: por quê>", com os dois-pontos entre quem decidiu e o motivo. `
+      + `Registre de novo com \`node tools/modelar/rodada-de-modelagem.mjs ${peca} --registrar ... --motivo-dos-pontos "a pessoa, 2026-11-18: o alvo era o da prancha antiga"\`.`);
+  }
+  const anteriores = lerRodadas(peca, opcoes.pasta ? { pasta: opcoes.pasta } : {});
+  const anterior = anteriores[anteriores.length - 1];
+  const dosPontos = mudancaDosPontos(anterior, medicao);
+  let pontos = medicao.pontos;
+  if (dosPontos.mudancas.length) {
+    if (dosPontos.declarada && motivoDosPontos === null) {
+      throw new Error(`a rodada não se registra: o esperado de ponto de PONTOS mudou desde a rodada ${anterior.numero} e o texto de PONTOS na receita também. `
+        + `Recebido: ${dosPontos.mudancas.map(formatarMudancaDeEsperado).join('; ')}. Esperado: o mesmo alvo da rodada ${anterior.numero}, ou a mudança com quem decidiu e por quê. `
+        + `Desfaça a mudança em PONTOS ou registre com \`node tools/modelar/rodada-de-modelagem.mjs ${peca} --registrar ... --motivo-dos-pontos "<quem decidiu, data: por quê>"\`.`);
+    }
+    const motivo = dosPontos.declarada ? String(motivoDosPontos).trim() : null;
+    pontos = { ...pontos, mudancas: dosPontos.mudancas.map((m) => ({ ...m, derivada: !dosPontos.declarada })), ...(motivo ? { motivoDaMudanca: motivo } : {}) };
+    medicao = { ...medicao, avisos: [...(medicao.avisos ?? []), avisoDosPontos(anterior, dosPontos, motivo)] };
+  }
+  /* `medidas`, `superficie` e `pontos` são da ferramenta, e o que a entrada declara deles sai */
+  const { medidas: _declaradas, superficie: _declarada, pontos: _dosPontos, ...resto } = entrada;
+  void _declaradas; void _declarada; void _dosPontos;
+  const gravada = gravarRodada(peca, { ...resto, superficie, facesFinas: medicao.facesFinas, pontos, medidas: { passou: medicao.passou, relatorio: medicao.relatorio } }, { ...opcoes, receitaTexto: medicao.texto });
   return { ...gravada, medicao };
 }
 
@@ -618,7 +710,7 @@ export function entradaDosArquivos({ modelador, critico = null, atrito = [], pec
   return entrada;
 }
 
-const OPCOES_COM_VALOR = ['--registrar', '--modelador', '--critico', '--atrito', '--pacote'];
+const OPCOES_COM_VALOR = ['--registrar', '--modelador', '--critico', '--atrito', '--pacote', '--motivo-dos-pontos'];
 
 /* Separa a peça, as opções e os valores. `--atrito` repete; `--registrar` aceita valor (o JSON montado) ou nenhum (a forma nova). */
 export function lerArgumentos(argv) {
@@ -655,7 +747,7 @@ async function comoCLI(argv) {
     const entrada = doArquivo
       ? JSON.parse(readFileSync(opcoes.registrar, 'utf8'))
       : entradaDosArquivos({ modelador: opcoes.modelador, critico: opcoes.critico, atrito: opcoes.atrito, peca });
-    const { rodada, arquivo, medicao } = await registrarMedida(peca, entrada, { pacote: opcoes.pacote ?? null });
+    const { rodada, arquivo, medicao } = await registrarMedida(peca, entrada, { pacote: opcoes.pacote ?? null, motivoDosPontos: opcoes['motivo-dos-pontos'] ?? null });
     const decisao = await acaoDaPeca(peca, { medir: async () => medicao });
     return {
       codigo: 0,

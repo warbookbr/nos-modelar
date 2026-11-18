@@ -12,7 +12,8 @@ import { dirname, join, resolve } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { proximaAcao } from '../../src/autoria/laco-de-modelagem.js';
-import { CAMPOS_OPCIONAIS_LIDOS_PELO_CRITICO, CAMPOS_OPCIONAIS_NAO_LIDOS_PELO_CRITICO, planoQueOCriticoLe, acaoDaPeca, ajustarImportsDaCopia, blocoDaPeca, contradicoesEntreRodadas, entradaDosArquivos, normalizarRelatoDoModelador, resumoDoLaco, gravarRodada, impressaoDaForma, lerArgumentos, lerRodadas, medirReceita, pastaDeRodadas, registrarMedida, textoFinalDoAssistente, ultimoBlocoJson } from './rodada-de-modelagem.mjs';
+import { esperadosDosPontos, mudancasDosEsperados, textoDosPontos } from './conferir-pontos.mjs';
+import { CAMPOS_OPCIONAIS_LIDOS_PELO_CRITICO, CAMPOS_OPCIONAIS_NAO_LIDOS_PELO_CRITICO, planoQueOCriticoLe, acaoDaPeca, ajustarImportsDaCopia, blocoDaPeca, contradicoesEntreRodadas, entradaDosArquivos, normalizarRelatoDoModelador, resumoDoLaco, gravarRodada, impressaoDaForma, lerArgumentos, lerRodadas, medirReceita, mudancaDosPontos, pastaDeRodadas, pontosDaMedicao, registrarMedida, convergenciaDaPeca, decisaoDaPessoa, limiteDaPeca, textoFinalDoAssistente, ultimoBlocoJson } from './rodada-de-modelagem.mjs';
 import { CAMPOS_OPCIONAIS_DO_PLANO } from '../../src/autoria/plano-de-modelagem.js';
 import { normalizarVeredito } from '../../src/autoria/veredito-de-forma.js';
 import { pecasDoAcervo } from './guardas/guarda-acervo.mjs';
@@ -166,6 +167,140 @@ describe('limite de rodadas estendido por escrito', () => {
     writeFileSync(join(area, 'limite.json'), JSON.stringify({ limite: 7 }));
     expect(() => limiteDaPeca('peca-x', { pasta: area })).toThrow(/quem decidiu/);
   });
+});
+
+describe('a decisão da pessoa sobre as paradas, em rodadas/limite.json', () => {
+  const PECA = 'peca-x';
+  const escrever = (dado) => writeFileSync(join(area, 'limite.json'), typeof dado === 'string' ? dado : JSON.stringify(dado));
+  const QUEM = { por: "a pessoa, 2026-11-18: 'pode seguir'", motivo: 'peça de estudo' };
+  const medir = async () => ({ passou: true, sha256: `sha256:${'b'.repeat(64)}`, relatorio: 'ok', avisos: [] });
+  const julgadas = (defeitos) => defeitos.forEach((quantos) => gravarRodada(PECA, { partes: CONFERIDAS, medidas: { passou: true, relatorio: 'ok' }, veredito: veredito(quantos) }, { pasta: area, receitaTexto: null }));
+  const acao = async () => (await acaoDaPeca(PECA, { rodadas: lerRodadas(PECA, { pasta: area }), pasta: area, limite: limiteDaPeca(PECA, { pasta: area }), medir })).acao;
+
+  it('"sem" declara a peça sem limite, e o inteiro continua valendo', () => {
+    escrever({ limite: 'sem', ...QUEM });
+    expect(decisaoDaPessoa(PECA, { pasta: area })).toEqual({ limite: Infinity, convergenciaDesde: 1 });
+    escrever({ limite: 9, convergenciaDesde: 4, ...QUEM });
+    expect(decisaoDaPessoa(PECA, { pasta: area })).toEqual({ limite: 9, convergenciaDesde: 4 });
+    escrever({ convergenciaDesde: 4, ...QUEM });
+    expect(limiteDaPeca(PECA, { pasta: area })).toBe(6);
+    expect(convergenciaDaPeca(PECA, { pasta: area })).toBe(4);
+  });
+
+  it('sem a declaração a peça para no limite; com "sem" segue', async () => {
+    julgadas([9, 8, 7, 6, 5, 4, 3]);
+    expect(await acao()).toBe('parar-limite');
+    escrever({ limite: 'sem', ...QUEM });
+    expect(await acao()).toBe('modelar');
+  });
+
+  it('sem a declaração a peça para sem convergência; com convergenciaDesde segue, e para de novo três rodadas julgadas depois', async () => {
+    julgadas([2, 2, 3]);
+    expect(await acao()).toBe('parar-sem-convergencia');
+    escrever({ limite: 'sem', ...QUEM });
+    expect(await acao()).toBe('parar-sem-convergencia');
+    escrever({ limite: 'sem', convergenciaDesde: 3, ...QUEM });
+    expect(await acao()).toBe('modelar');
+    julgadas([3, 3]);
+    expect(await acao()).toBe('parar-sem-convergencia');
+  });
+
+  it('recusa o formato errado dizendo o recebido, o esperado e o comando', () => {
+    const recusa = (dado, texto) => {
+      escrever(dado);
+      expect(() => decisaoDaPessoa(PECA, { pasta: area })).toThrow(texto);
+      expect(() => decisaoDaPessoa(PECA, { pasta: area })).toThrow('confira com `node tools/modelar/rodada-de-modelagem.mjs peca-x --acao`');
+    };
+    recusa({ limite: 'infinito', ...QUEM }, `'limite' recebido: "infinito"; esperado um inteiro maior que 6 ou "sem" (sem limite, declarado)`);
+    recusa({ limite: 6, ...QUEM }, `'limite' recebido: 6; esperado um inteiro maior que 6 ou "sem"`);
+    recusa({ limite: 'sem', convergenciaDesde: '6', ...QUEM }, `'convergenciaDesde' recebido: "6"; esperado o número inteiro (1 ou mais) da rodada a partir da qual a convergência volta a contar`);
+    recusa({ limite: 'sem', convergenciaDesde: 0, ...QUEM }, `'convergenciaDesde' recebido: 0; esperado o número inteiro`);
+    recusa(QUEM, "recebido sem 'limite' e sem 'convergenciaDesde'; esperado ao menos um dos dois");
+    recusa({ limite: 'sem', motivo: 'peça de estudo' }, "'por' recebido: undefined; esperado o texto que diz quem decidiu e por quê");
+    recusa({ limite: 'sem', por: 'a pessoa', motivo: '' }, `'motivo' recebido: ""; esperado o texto que diz quem decidiu e por quê`);
+    recusa('{ limite: sem', 'recebido um texto que não é JSON');
+    recusa([7], "recebido [7]; esperado um objeto com 'limite' ou 'convergenciaDesde', 'por' e 'motivo'");
+  });
+});
+
+describe('o esperado dos PONTOS entre rodadas', () => {
+  const PECA = 'peca-de-pontos';
+  const texto = (em, largura = 900) => `const TABELA = { largura: ${largura} };\nexport const PONTOS = [\n  { nome: 'topo', parte: 'corpo', medida: 'maximo', em: ${em}, toleranciaMm: 6 },\n  { nome: 'junta [a]', entre: ['corpo', 'tampa'], em: [0, 10, 0], toleranciaMm: 2 },\n];\n`;
+  const receitaCom = (em) => ({ PONTOS: [{ nome: 'topo', parte: 'corpo', medida: 'maximo', em, toleranciaMm: 6 }, { nome: 'junta [a]', entre: ['corpo', 'tampa'], em: [0, 10, 0], toleranciaMm: 2 }] });
+  let n = 0;
+  /* a medição injetada: `em` é o esperado resolvido do ponto 'topo', e `fonte` é o texto da receita que o declara */
+  const medir = (em, fonte) => async () => { n += 1; return { passou: true, sha256: `sha256:${String(n).padStart(64, '0')}`, texto: fonte, relatorio: 'ok', avisos: [], pontos: pontosDaMedicao(receitaCom(em), fonte) }; };
+  const registrar = (em, fonte, opcoes = {}) => registrarMedida(PECA, { partes: CONFERIDAS }, { pasta: join(area, PECA), medir: medir(em, fonte), ...opcoes });
+
+  it('resolve o esperado em número, acha o texto de PONTOS e diz o que mudou', () => {
+    expect(esperadosDosPontos(receitaCom([900, 1200, 0]))).toEqual([
+      { nome: 'topo', parte: 'corpo', medida: 'maximo', em: [900, 1200, 0], toleranciaMm: 6 },
+      { nome: 'junta [a]', entre: ['corpo', 'tampa'], em: [0, 10, 0], toleranciaMm: 2 },
+    ]);
+    expect(textoDosPontos(texto('[TABELA.largura, 1200, 0]'))).toMatch(/^\[ \{ nome: 'topo'.*toleranciaMm: 2 \}, \]$/);
+    expect(textoDosPontos(texto('[TABELA.largura, 1200, 0]', 910))).toBe(textoDosPontos(texto('[TABELA.largura,  1200, 0]')));
+    expect(textoDosPontos("import { PONTOS } from './pontos.js';")).toBe(null);
+    const antes = esperadosDosPontos(receitaCom([900, 1200, 0]));
+    expect(mudancasDosEsperados(antes, antes)).toEqual([]);
+    expect(mudancasDosEsperados(antes, esperadosDosPontos(receitaCom([910, 1200, 0]))).map((m) => m.nome)).toEqual(['topo']);
+    expect(mudancasDosEsperados(antes, antes.slice(0, 1))).toEqual([{ nome: 'junta [a]', de: antes[1], para: null }]);
+    expect(mudancasDosEsperados(antes.slice(0, 1), antes)).toEqual([]);
+  });
+
+  it('a rodada guarda o esperado; o mesmo esperado na rodada seguinte não avisa nem recusa', async () => {
+    const { rodada } = await registrar([900, 1200, 0], texto('[900, 1200, 0]'));
+    expect(rodada.pontos.esperados[0]).toEqual({ nome: 'topo', parte: 'corpo', medida: 'maximo', em: [900, 1200, 0], toleranciaMm: 6 });
+    expect(rodada.pontos.texto).toMatch(/^sha256:/);
+    const segunda = await registrar([900, 1200, 0], texto('[900, 1200, 0]'));
+    expect(segunda.rodada.pontos.mudancas).toBeUndefined();
+    expect(segunda.medicao.avisos).toEqual([]);
+  });
+
+  it('o esperado reescrito em PONTOS é recusado sem motivo e passa com ele, gravado', async () => {
+    await registrar([900, 1200, 0], texto('[900, 1200, 0]'));
+    const recusa = registrar([900, 1180, 0], texto('[900, 1180, 0]'));
+    await expect(recusa).rejects.toThrow("a rodada não se registra: o esperado de ponto de PONTOS mudou desde a rodada 1 e o texto de PONTOS na receita também. Recebido: 'topo': de [900, 1200, 0] ±6 mm para [900, 1180, 0] ±6 mm.");
+    await expect(registrar([900, 1180, 0], texto('[900, 1180, 0]'))).rejects.toThrow('--registrar ... --motivo-dos-pontos "<quem decidiu, data: por quê>"`');
+    expect(lerRodadas(PECA, { pasta: join(area, PECA) })).toHaveLength(1);
+    const { rodada, medicao } = await registrar([900, 1180, 0], texto('[900, 1180, 0]'), { motivoDosPontos: 'a pessoa, 2026-11-18: o teto da prancha nova é 20 mm mais baixo' });
+    expect(rodada.pontos.motivoDaMudanca).toBe('a pessoa, 2026-11-18: o teto da prancha nova é 20 mm mais baixo');
+    expect(rodada.pontos.mudancas).toEqual([expect.objectContaining({ nome: 'topo', derivada: false })]);
+    expect(medicao.avisos.join('\n')).toContain('e o texto de PONTOS também (motivo: a pessoa, 2026-11-18:');
+  });
+
+  it('o esperado derivado que muda sem o texto de PONTOS mudar avisa e fica gravado, sem pedir motivo', async () => {
+    await registrar([900, 1200, 0], texto('[TABELA.largura, 1200, 0]', 900));
+    const { rodada, medicao } = await registrar([910, 1200, 0], texto('[TABELA.largura, 1200, 0]', 910));
+    expect(rodada.pontos.mudancas).toEqual([expect.objectContaining({ nome: 'topo', derivada: true })]);
+    expect(rodada.pontos.motivoDaMudanca).toBeUndefined();
+    expect(medicao.avisos).toEqual(["o esperado de 1 ponto(s) de PONTOS mudou desde a rodada 1 sem o texto de PONTOS mudar (derivado de outro dado da receita): 'topo': de [900, 1200, 0] ±6 mm para [910, 1200, 0] ±6 mm."]);
+    /* e `--acao` avisa antes do registro, com a receita já mudada */
+    const fonte = texto('[905, 1200, 0]');
+    const decisao = await acaoDaPeca(PECA, { rodadas: lerRodadas(PECA, { pasta: join(area, PECA) }), pasta: join(area, PECA), limite: 6, medir: medir([905, 1200, 0], fonte) });
+    expect(decisao.medicao.avisos.join('\n')).toContain('O registro desta rodada vai pedir --motivo-dos-pontos');
+  });
+
+  it('a rodada anterior sem esperados gravados não compara', async () => {
+    gravarRodada(PECA, { partes: CONFERIDAS, medidas: { passou: true, relatorio: 'ok' } }, { pasta: join(area, PECA), receitaTexto: null });
+    const { rodada, medicao } = await registrar([900, 1180, 0], texto('[900, 1180, 0]'));
+    expect(rodada.pontos.mudancas).toBeUndefined();
+    expect(medicao.avisos).toEqual([]);
+    expect(mudancaDosPontos({ numero: 1 }, medicao)).toEqual({ mudancas: [], declarada: false });
+  });
+
+  it('recusa o motivo fora do formato, dizendo o recebido, o esperado e o comando', async () => {
+    await registrar([900, 1200, 0], texto('[900, 1200, 0]'));
+    await expect(registrar([900, 1180, 0], texto('[900, 1180, 0]'), { motivoDosPontos: 'porque sim' }))
+      .rejects.toThrow('--motivo-dos-pontos recebido: "porque sim"; esperado "<quem decidiu, data: por quê>", com os dois-pontos entre quem decidiu e o motivo. Registre de novo com `node tools/modelar/rodada-de-modelagem.mjs peca-de-pontos --registrar');
+    expect(lerArgumentos(['x', '--registrar', 'r.json', '--motivo-dos-pontos', 'a pessoa, hoje: mudou']).opcoes['motivo-dos-pontos']).toBe('a pessoa, hoje: mudou');
+    expect(() => lerArgumentos(['x', '--registrar', 'r.json', '--motivo-dos-pontos'])).toThrow('--motivo-dos-pontos pede um valor.');
+  });
+
+  it('a medição da receita com PONTOS traz o esperado, e a sem PONTOS não traz', async () => {
+    expect(pontosDaMedicao({ PONTOS: [] }, '')).toBe(null);
+    expect(pontosDaMedicao({}, 'export const PONTOS = [];')).toBe(null);
+    expect((await medirReceita('tools/fixtures/refina-forma-global/ok/receita.js')).pontos).toBeUndefined();
+  }, 60000);
 });
 
 describe('cópia da receita em rodadas/', () => {

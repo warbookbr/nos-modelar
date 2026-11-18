@@ -65,6 +65,31 @@ describe('laço de modelagem', () => {
     expect(proximaAcao(historia).acao).toBe('modelar');
   });
 
+  it('a convergência volta a contar da rodada que a pessoa declarou, e para de novo três rodadas julgadas depois', () => {
+    const historia = [rodada(1, { quantos: 4 }), rodada(2, { quantos: 4 }), rodada(3, { quantos: 5 })];
+    expect(proximaAcao(historia).acao).toBe('parar-sem-convergencia');
+    expect(proximaAcao(historia, { convergenciaDesde: 3 })).toMatchObject({ acao: 'modelar', motivo: '5 defeito(s) apontado(s) na rodada 3.' });
+    const seguiu = [...historia, rodada(4, { quantos: 5 })];
+    expect(proximaAcao(seguiu, { convergenciaDesde: 3 }).acao).toBe('modelar');
+    const parouDeNovo = proximaAcao([...seguiu, rodada(5, { quantos: 5 })], { convergenciaDesde: 3 });
+    expect(parouDeNovo.acao).toBe('parar-sem-convergencia');
+    expect(parouDeNovo.motivo).toMatch(/5, 5, 5/);
+    expect(acaoDaReceita(historia.map((r) => ({ ...r, receita: { sha256: HASH_A } })), atual(HASH_B), { convergenciaDesde: 3 }).acao).toBe('revisar');
+  });
+
+  it('sem limite declarado (Infinity) o laço não para por limite, e com o limite de sempre para', () => {
+    const historia = [9, 8, 7, 6, 5, 4, 3, 2].map((quantos, i) => rodada(i + 1, { quantos }));
+    expect(proximaAcao(historia).acao).toBe('parar-limite');
+    expect(proximaAcao(historia, { limite: Infinity }).acao).toBe('modelar');
+  });
+
+  it('recusa convergenciaDesde que não é número de rodada, dizendo o recebido e o esperado', () => {
+    for (const ruim of [0, 2.5, '6', null]) {
+      expect(() => proximaAcao([rodada(1, { quantos: 1 })], { convergenciaDesde: ruim }))
+        .toThrow(`'convergenciaDesde' recebido: ${JSON.stringify(ruim)}; esperado o número inteiro (1 ou mais) da rodada`);
+    }
+  });
+
   it('PARA no limite combinado de rodadas, dizendo quantos defeitos ficaram', () => {
     const historia = [5, 4, 3, 2, 2, 1].map((quantos, i) => rodada(i + 1, { quantos }));
     const decisao = proximaAcao(historia, { limite: 6 });

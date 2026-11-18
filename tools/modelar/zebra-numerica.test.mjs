@@ -55,8 +55,8 @@ describe('zebraNumerica', () => {
     expect(zebraNumerica(com, { passoMm: 40 })).toEqual(zebraNumerica(com, { passoMm: 40 }));
     expect(() => zebraNumerica(com, { caixas: { fora: { x: [1e6, 2e6] } } })).toThrow(/região 'fora' não tem face/);
     expect(() => zebraNumerica(com, { passoMm: 0 })).toThrow(/--passo espera/);
-    expect(() => zebraNumerica(com, { faixas: [200, 100] })).toThrow(/--faixas espera/);
-    expect(() => zebraNumerica(com, { olhar: 'w' })).toThrow(/olhar espera/);
+    expect(() => zebraNumerica(com, { faixas: [200, 100] })).toThrow('--faixas espera mm crescentes e maiores que zero, como 100,200,500');
+    expect(() => zebraNumerica(com, { olhar: 'w' })).toThrow("o olhar espera +x, -x, +y, -y, +z ou -z, e veio 'w'");
   });
 
   describe('as exclusões da caixa (`menos`)', () => {
@@ -110,7 +110,7 @@ describe('zebraNumerica', () => {
       expect(com1([7])).toThrow(/exclusão 1 da região 'painel' espera um objeto de caixa ou de disco, e veio 7/);
       expect(com1([{ x: [0, 1] }, [1, 2]])).toThrow(/exclusão 2 da região 'painel' espera um objeto de caixa ou de disco/);
       expect(com1([{ x: [0, 1], diametro: 3 }])).toThrow(/tem chave desconhecida \(diametro\)/);
-      expect(com1([{ x: [0, 1], raio: 3 }])).toThrow(/mistura caixa \(x\) com disco \(raio\)/);
+      expect(com1([{ x: [0, 1], raio: 3 }])).toThrow('mistura caixa (x) com disco (raio); declare uma exclusão para cada');
       expect(com1([{}])).toThrow(/está vazia; a caixa pede ao menos um de x, y e z/);
       expect(com1([{ x: [10, 0] }])).toThrow(/espera em x o intervalo \[min, max\] em mm, com min até max, e veio \[10,0\]/);
       expect(com1([{ z: [0, '1'] }])).toThrow(/espera em z o intervalo \[min, max\]/);
@@ -154,5 +154,8 @@ describe('zebraNumerica', () => {
     expect(ajuda.stderr).toMatch(/uso: node tools\/modelar\/zebra-numerica.mjs/);
     const ruim = spawnSync('node', ['tools/modelar/zebra-numerica.mjs', 'rede-sem-ruido', '--foo=1'], { encoding: 'utf8' });
     expect(ruim.status).toBe(2);
+    const passo = spawnSync('node', ['tools/modelar/zebra-numerica.mjs', 'rede-sem-ruido', '--passo=largo'], { encoding: 'utf8' });
+    expect(passo.status).toBe(2);
+    expect(passo.stderr).toContain("zebra: --passo espera um número, e veio 'largo'");
   });
 });

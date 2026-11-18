@@ -29,10 +29,12 @@ export const FONTES_VIGIADAS = [
   { arquivo: 'src/autoria/contatos-da-peca.js' },
   { arquivo: 'tools/mcp/perfis/parametros.mjs' },
   { arquivo: 'tools/mcp/perfis/procedural.mjs' },
+  { arquivo: 'tools/modelar/zebra-numerica.mjs' },
 ];
 
 /** `arquivo`, depois o texto fixo da mensagem (o mesmo que o gate imprime): o motivo de cada exceção é obrigatório. */
 export const SEM_ENTRADA_QUE_ALCANCE = {
+  'tools/modelar/zebra-numerica.mjs: a gaiola refinada tem face de mais de quatro lados; a zebra numérica pede quadriláteros': 'a gaiola passa por `refinarGaiola` antes, e um passo de Catmull-Clark só devolve quadriláteros, qualquer que seja a face de entrada; a defesa fica para o dia em que o refino mudar',
   'procedural/nucleo/operacoes/friso.js: graus a perna atravessa a dobra; reduza o ângulo ou a largura': 'as duas recusas (a da aba na chapa e a da variação) guardam o perfil de aba que se cruza, e `perfilDaAba` recusa antes, por baixo da chapa: dos 2238 perfis válidos varridos em 2026-11-14 (espessura, raio, largura e ângulo), nenhum se cruza',
   'procedural/nucleo/operacoes/transformacoes.js: não foi possível criar a cópia estrutural: face ou vértice-fonte inexistente': 'a origem resolvida só devolve faces vivas com os vértices vivos; a defesa fica para o dia em que a resolução deixar de garantir isso',
   'procedural/nucleo/operacoes/friso.js: ; o friso lê a borda como o passo da abertura a deixou': 'ainda sem teste: exige uma abertura por contorno cuja borda de fora `ladoDaBorda` não resolve, e as fixtures de abertura do repositório têm todas a borda resolvida',

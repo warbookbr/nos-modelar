@@ -165,8 +165,14 @@ function normalizarAtrito(valor) {
  * O que fazer agora, dada a história da peça. Devolve a ação e o motivo em
  * texto, porque parada sem motivo escrito vira "achei que estava bom".
  */
-export function proximaAcao(rodadas, { limite = LIMITE_DE_RODADAS, notaMinima = 8 } = {}) {
+export function proximaAcao(rodadas, { limite = LIMITE_DE_RODADAS, notaMinima = 8, convergenciaDesde = 1 } = {}) {
   if (!Array.isArray(rodadas)) falhar('a história da peça é uma lista de rodadas.');
+  /* A DECISÃO DA PESSOA DEPOIS DA PARADA. Quando o laço para sem convergência e a pessoa manda seguir, a contagem recomeça na rodada
+     que ela declarar (`convergenciaDesde`, gravado por quem chama): as rodadas julgadas antes dela não entram mais na conta, e três
+     rodadas julgadas sem queda a partir dela param de novo. Sem a declaração a conta é sobre todas, como sempre. */
+  if (!Number.isInteger(convergenciaDesde) || convergenciaDesde < 1) {
+    falhar(`'convergenciaDesde' recebido: ${JSON.stringify(convergenciaDesde)}; esperado o número inteiro (1 ou mais) da rodada a partir da qual a convergência volta a contar.`);
+  }
   if (rodadas.length === 0) return { acao: 'modelar', motivo: 'nenhuma rodada ainda: a peça não existe.' };
 
   const ultima = rodadas[rodadas.length - 1];
@@ -185,7 +191,7 @@ export function proximaAcao(rodadas, { limite = LIMITE_DE_RODADAS, notaMinima = 
     return { acao: 'parar-fechou', motivo: `sem defeitos apontados e nota ${nota} na rodada ${ultima.numero}.` };
   }
 
-  const julgadas = rodadas.filter((r) => r.veredito);
+  const julgadas = rodadas.filter((r) => r.veredito && r.numero >= convergenciaDesde);
   if (julgadas.length >= RODADAS_SEM_PROGRESSO) {
     const ultimas = julgadas.slice(-RODADAS_SEM_PROGRESSO).map((r) => r.veredito.defeitos.length);
     const caiuAlgumaVez = ultimas.some((quantos, i) => i > 0 && quantos < ultimas[i - 1]);

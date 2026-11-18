@@ -162,7 +162,11 @@ declarar o `REFINA` depois de fechar; a ação diz isso no motivo.
 
 **parar-fechou** encerra a etapa e leva o caso à pessoa. **parar-limite** e
 **parar-sem-convergencia** também param e levam o registro à pessoa; não
-estenda o limite por conta própria.
+estenda o limite por conta própria. Quando a pessoa manda seguir, a decisão
+entra em `rodadas/limite.json`, com `por` (as palavras dela e a data) e
+`motivo`: `"limite"` é um inteiro maior que 6 ou `"sem"` (sem limite), e
+`"convergenciaDesde"` é o número da rodada a partir da qual a convergência
+volta a contar depois de uma parada sem convergência.
 
 ## Registrando a rodada
 
@@ -186,6 +190,12 @@ do defeito da seção seguinte, depois do que o modelador declarou. Sem `--criti
 a rodada é gravada sem veredito, que é o caso da receita que a medição reprovou.
 Quando o arquivo não tem bloco, não é JSON válido ou um campo passa do limite, o
 erro diz o arquivo e o campo, e a correção é pedir o bloco de novo ao agente.
+
+A rodada guarda em `pontos` o esperado resolvido de cada ponto de `PONTOS`. O
+esperado que mudou desde a rodada anterior junto com o texto de `PONTOS` só se
+registra com `--motivo-dos-pontos "<quem decidiu, data: por quê>"`; o que mudou
+com o texto igual, derivado de outro dado da receita, sai como aviso e fica
+gravado. `--acao` dá o aviso antes do registro.
 
 Se não houver como obter os arquivos, a alternativa é montar o JSON à mão e
 passá-lo como `--registrar <rodada.json>`. Não se misturam as duas formas.
