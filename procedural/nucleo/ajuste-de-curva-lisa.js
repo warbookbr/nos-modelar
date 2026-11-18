@@ -29,8 +29,9 @@
  *     fechada da curvatura, e o ponto sai dele por Gauss-Legendre de 5 pontos em pedaços de giro até 0,125 rad, a partir do começo do pedaço, sem corda entre amostras
  *     (erro na ordem de 1e-13 do comprimento, em qualquer escala). Fora de 0 a `comprimento` vale a ponta; s que não é número finito recusa. `rumo` (sem o Em) é o
  *     número do rumo no início, o mesmo de `guardado`. `amostrar` e `pontosDaRede` leem de `ponto`.
- *     O desvio, `cabe` e as inflexões continuam medidos na curva integrada a passo fino (ponto médio no rumo, com a flecha da corda abaixo de 1/200 da tolerância),
- *     que não é a leitura exata: as duas diferem por uma fração de centésimo da tolerância.
+ *     O desvio, `cabe` e as inflexões são medidos sobre essa mesma curva: os vértices da curva de passo fino são pontos exatos, o desvio de cada ponto é refinado até
+ *     o pé da perpendicular na curva exata, e onde o refino não vale (o ponto além do centro de curvatura) entra o desvio à corda com a flecha dela somada.
+ *     O laço do ajuste continua na curva integrada de passo grosso, com o alvo 5% abaixo da tolerância.
  *   valorEm(a, { eixo, fora }): a curva lida como função: o valor da outra coordenada onde a coordenada `eixo` (0 ou 1 do plano da curva, 0 por padrão) vale `a`.
  *     Recusa quando a coordenada `eixo` não cresce nem cai sempre ao longo da curva (o rumo fica perpendicular ao eixo ou o cruza, e a recusa diz entre quais arcos),
  *     e quando `a` cai fora das pontas da curva, salvo com `fora: 'ponta'`, que devolve o valor da ponta mais perto (`fora: 'recusa'` é o padrão).
@@ -472,7 +473,28 @@ function montar(ajuste, lido, tolerancia, eixos, original) {
   /* a curva a passo fino, e o desvio de todos os pontos nela */
   const passos = passosPorTrecho(fr, L, k, tolerancia, true);
   const c = integrar(q, fr, passos);
+  /* a medida final é sobre a curva de `ponto`: os vértices da curva de passo fino passam a ser os exatos, e o desvio de cada ponto, achado no segmento mais perto, é
+   * refinado na curva exata (Newton sobre o pé da perpendicular); onde o refino não vale (o ponto além do centro de curvatura, ou um pé pior que o do segmento mais a
+   * flecha), fica o desvio ao segmento com a flecha da corda somada, que é o teto do que a corda esconde */
+  const exata = leituraExata(q);
+  for (let i = 0; i <= c.n; i += 1) { const [x, y] = exata.ponto(c.s[i]); c.x[i] = x; c.y[i] = y; }
   const proj = new Float64Array(P.length); const desvios = desviosDos(P, c, new Array(P.length).fill(-1), proj);
+  const flecha = fr.slice(1).reduce((m, f, j) => Math.max(m, (Math.max(Math.abs(k[j]), Math.abs(k[j + 1])) * (((f - fr[j]) * L) / passos[j]) ** 2) / 8), 0);
+  for (let i = 0; i < P.length; i += 1) {
+    let s = proj[i]; let pe = null;
+    for (let it = 0; it < 12; it += 1) {
+      const [x, y] = exata.ponto(s); const th = exata.rumoEm(s); const dx = P[i][0] - x; const dy = P[i][1] - y;
+      const aoLongo = dx * Math.cos(th) + dy * Math.sin(th); const aoLado = dy * Math.cos(th) - dx * Math.sin(th);
+      pe = { s, d: Math.hypot(dx, dy), aoLado };
+      const den = 1 - curvaturaEm(s / L, fr, k) * aoLado;
+      if (!(den > 0.1)) { pe = null; break; }
+      const novo = Math.min(L, Math.max(0, s + aoLongo / den));
+      if (Math.abs(novo - s) <= 1e-14 * L) break;
+      s = novo;
+    }
+    const corda = Math.abs(desvios[i]);
+    if (pe && pe.d <= corda + flecha) { desvios[i] = pe.aoLado >= 0 ? pe.d : -pe.d; proj[i] = pe.s; } else desvios[i] = desvios[i] >= 0 ? corda + flecha : -(corda + flecha);
+  }
   let desvioMaximo = 0; for (const v of desvios) desvioMaximo = Math.max(desvioMaximo, Math.abs(v));
   const desvioDaCurvaMaximo = desvioDaCurva(P, c).maximo;
   if (![q.x0, q.y0, q.th0, L, ...k, ...fr, desvioMaximo, desvioDaCurvaMaximo].every(Number.isFinite) || !(L > 0)) erro(`o ajuste não convergiu a uma curva finita (comprimento ${citar(L)}, desvio ${citar(desvioMaximo)}); a entrada tem ${P.length} pontos e tolerância ${citar(tolerancia)}`);
@@ -513,7 +535,7 @@ function montar(ajuste, lido, tolerancia, eixos, original) {
   }
   if (corrida) trechos.push(corrida);
   const trechosFinais = trechos.map(({ d, ...t }) => ({ ...t, sentido: d > 0 ? 'cresce' : d < 0 ? 'cai' : 'constante' }));
-  const { ponto, rumoEm, amostrar, valorEm } = leituraExata(q);
+  const { ponto, rumoEm, amostrar, valorEm } = exata;
   const para3d = (u, v) => { const r = [0, 0, 0]; r[eixos[0]] = u; r[eixos[1]] = v; r[livre] = constante; return r; };
   /* o desvio 3D: o do plano e o da coordenada livre (a distância dela à constante) em quadratura */
   const d3 = (v, i) => (tem3 ? Math.hypot(v, livres[i] - constante) : v);
@@ -533,8 +555,10 @@ function montar(ajuste, lido, tolerancia, eixos, original) {
  * ou o passo dela, o formato de `guardado`) soma 1 aqui. O dado guardado com a versão antiga deixa de conferir, o ajuste é refeito na hora por quem o usa, e o teste do
  * comando que regrava (`tools/modelar/regravar-ajustes-de-curva.test.mjs`) reprova até o dado de cada receita ser regravado e a malha, conferida.
  * Versão 2 (2026-11-18): `ponto(s)` passou da corda entre as amostras da curva integrada ao ponto exato, e `amostrar` e `pontosDaRede` leem dele; o ajuste escolhido e o
- * `guardado` são os mesmos da versão 1, e o ponto anda uma fração de centésimo da tolerância (a flecha da corda que havia). */
-export const VERSAO_DO_AJUSTE = 2;
+ * `guardado` são os mesmos da versão 1, e o ponto anda uma fração de centésimo da tolerância (a flecha da corda que havia).
+ * Versão 3 (2026-11-18): o desvio, `cabe` e as inflexões passam a ser medidos sobre a curva de `ponto` (vértices exatos e o pé de cada ponto refinado nela), e não
+ * sobre a integrada de ponto médio; o ajuste escolhido e o `guardado` são os mesmos, e o desvio devolvido anda até a flecha da corda (1/200 da tolerância). */
+export const VERSAO_DO_AJUSTE = 3;
 
 const MILIONESIMO = 1e6;
 const opcoesDoAjuste = ({ tolerancia = 1, maximoDeClotoides = 8, duros = [], eixos = [0, 1] } = {}) => ({ tolerancia, maximoDeClotoides, duros, eixos });
@@ -559,6 +583,10 @@ function lerGuardado(guardado) {
   if (!g || !Array.isArray(g.inicio) || g.inicio.length !== 2 || !g.inicio.every(finito) || !finito(g.rumo) || !finito(g.comprimento) || !(g.comprimento > 0) || !finito(g.tolerancia) || !(g.tolerancia > 0)
     || !Array.isArray(J) || J.length < 2 || !J.every((j) => j && finito(j.f) && finito(j.k)) || J[0].f !== 0 || J[J.length - 1].f !== 1 || J.some((j, i) => i > 0 && !(j.f > J[i - 1].f))) {
     erro(`o ajuste guardado espera { inicio: [u, v], rumo, comprimento, joelhos: [{ f, k }, ...] de f 0 a 1 em ordem, tolerancia }, e veio ${citar(g)?.slice(0, 200)}`);
+  }
+  for (let j = 1; j < J.length; j += 1) {
+    const comprimento = (J[j].f - J[j - 1].f) * g.comprimento; const dk = (J[j].k - J[j - 1].k) / comprimento;
+    if (!(comprimento > 0) || !finito(dk)) erro(`o ajuste guardado tem o trecho ${j - 1} (do joelho de f ${citar(J[j - 1].f)} ao de f ${citar(J[j].f)}) com comprimento ${citar(comprimento)} e variação de curvatura por comprimento ${citar(dk)}: o trecho precisa de comprimento maior que zero e variação finita`);
   }
   return { q: { x0: g.inicio[0], y0: g.inicio[1], th0: g.rumo, L: g.comprimento, k: J.map((j) => j.k), fr: J.map((j) => j.f) }, tolerancia: g.tolerancia };
 }

@@ -2,7 +2,7 @@
  * de inflexões certo e o desvio de cada ponto dentro da tolerância; a curva que `gaiolaPorRede` consome; as recusas; e a planta da lataria do carro-fastback,
  * lida da TABELA da receita (só leitura), dentro dos 3 mm; e a leitura exata (`ponto`, `rumoEm`, `valorEm`) contra a reta, o arco e a clotoide em forma fechada. */
 import { describe, expect, it } from 'vitest';
-import { ajustarCurvaLisa, curvaLisaGuardada } from './ajuste-de-curva-lisa.js';
+import { ajustarCurvaLisa, curvaLisaDoGuardado, curvaLisaGuardada, impressaoDoAjuste } from './ajuste-de-curva-lisa.js';
 import { gaiolaPorRede } from './gaiola-por-rede.js';
 
 const ANGULO_AUREO = Math.PI * (3 - Math.sqrt(5));
@@ -353,6 +353,31 @@ describe('a leitura exata da curva: ponto, rumoEm e valorEm', () => {
     const s = curvaDe({ rumo: -Math.PI / 2 + 0.05, comprimento: 400, joelhos: [{ f: 0, k: -0.001 }, { f: 1, k: 0.002 }] });
     expect(Math.cos(s.rumoEm(0))).toBeGreaterThan(0); expect(Math.cos(s.rumoEm(400))).toBeGreaterThan(0);
     expect(() => s.valorEm(1)).toThrow(/não cresce nem cai sempre/);
+    /* a clotoide de um pedaço só, com as duas pontas do mesmo lado da perpendicular e o vértice do rumo do outro: só a conta do vértice vê */
+    const v = curvaDe({ rumo: -Math.PI / 2 + 0.001, comprimento: 10, joelhos: [{ f: 0, k: -0.01 }, { f: 1, k: 0.01 }] });
+    expect(Math.cos(v.rumoEm(0))).toBeGreaterThan(0); expect(Math.cos(v.rumoEm(10))).toBeGreaterThan(0); expect(Math.cos(v.rumoEm(5))).toBeLessThan(0);
+    expect(() => v.valorEm(v.ponto(10)[0] / 2)).toThrow(/a coordenada 0 não cresce nem cai sempre ao longo da curva.*entre os arcos 0 e 10/);
+  });
+
+  it('cabe e o desvio valem para a curva de ponto: o ponto a 1,0045 da curva exata, pelo lado de dentro, não cabe em 1', () => {
+    const L = 1000; const curva = { inicio: [0, 0], rumo: 0.2, comprimento: L, joelhos: [{ f: 0, k: 0.01 }, { f: 1, k: 0.0001 }], tolerancia: 1 };
+    const c = curvaLisaGuardada(curva); const opcoes = { tolerancia: 1, maximoDeClotoides: 8 };
+    const medir = (d) => {
+      const pontos = Array.from({ length: 1001 }, (_, i) => { const p = c.ponto(i); const th = c.rumoEm(i); const e = i === 11 ? d : 0; return [p[0] - Math.sin(th) * e, p[1] + Math.cos(th) * e]; });
+      return curvaLisaDoGuardado({ nome: 'x', pontos, opcoes, guardados: { x: { impressao: impressaoDoAjuste(pontos, opcoes), curva } } });
+    };
+    const fora = medir(1.0045);
+    expect(fora.doGuardado).toBe(true); expect(fora.cabe).toBe(false); expect(Math.abs(fora.desvioMaximo - 1.0045)).toBeLessThan(1e-9); expect(fora.motivo).toMatch(/passa da tolerância 1/);
+    const dentro = medir(0.9955);
+    expect(dentro.cabe).toBe(true); expect(Math.abs(dentro.desvioMaximo - 0.9955)).toBeLessThan(1e-9);
+    /* e os pontos sobre a curva medem zero, o que a corda entre amostras não dava */
+    expect(medir(0).desvioMaximo).toBeLessThan(1e-9);
+  });
+
+  it('o dado guardado com trecho de comprimento que não dá variação de curvatura finita é recusado', () => {
+    expect(() => curvaLisaGuardada({ inicio: [0, 0], rumo: 0, comprimento: 1e-300, joelhos: [{ f: 0, k: 0 }, { f: 1e-20, k: 1e10 }, { f: 1, k: 0 }], tolerancia: 1e-301 }))
+      .toThrow(/o ajuste guardado tem o trecho 0 \(do joelho de f 0 ao de f 1e-20\) com comprimento .* e variação de curvatura por comprimento Infinity/);
+    expect(() => curvaLisaGuardada({ inicio: [0, 0], rumo: 0, comprimento: 1e-300, joelhos: [{ f: 0, k: 1 }, { f: 1e-30, k: 1 }, { f: 1, k: 1 }], tolerancia: 1e-301 })).toThrow(/com comprimento 0 e variação de curvatura por comprimento NaN/);
   });
 
   it('a leitura recusa o pedido que não entende, dizendo o que recebeu', () => {
