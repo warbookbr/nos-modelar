@@ -1,5 +1,5 @@
 {
- "medido": "2026-10-28, bateria completa local com outras cargas; só a proporção entre os arquivos importa",
+ "medido": "2026-10-28, bateria completa local com outras cargas; só a proporção entre os arquivos importa; em 2026-11-18, guarda-acervo e exportar-gltf-braco remedidos na proporção do CI (425 a 600 s e 100 a 147 s juntos na mesma parte; 33 s sozinho aqui)",
  "segundos": {
   "modulos/exportador-cad/tests/exportador-cad.test.js": 22,
   "modulos/textura/tests/metal-tecido.test.js": 30,
@@ -35,7 +35,7 @@
   "tools/modelar/cilindro-hidraulico-aprovacao.test.mjs": 26,
   "tools/modelar/familia.test.mjs": 175,
   "tools/modelar/forma-do-esboco.test.mjs": 21,
-  "tools/modelar/guardas/guarda-acervo.test.mjs": 310,
+  "tools/modelar/guardas/guarda-acervo.test.mjs": 430,
   "tools/modelar/mcp-degrau-1-preparacao.test.mjs": 2,
   "tools/modelar/olhar-bancada.test.mjs": 3,
   "tools/modelar/ondulacao-aneis.test.mjs": 95,
@@ -48,6 +48,7 @@
   "tools/modelar/vinco-na-imagem.test.mjs": 32,
   "tools/modelar/vincos-da-rede.test.mjs": 142,
   "tools/modelar/vincos-das-linhas.test.mjs": 19,
-  "tools/oficina/oficina.test.ts": 27
+  "tools/oficina/oficina.test.ts": 27,
+  "tools/modelar/exportar-gltf-braco.test.mjs": 45
  }
 }
