@@ -353,3 +353,92 @@ O que entrou na revisão. A `onda` fora de 2 a 64 passos da gaiola (o passo é a
 As chapas novas no gate: `procedural/nucleo/subdivisao-energia-de-curvatura.test.mjs` tem a grade de razão 2 (paraboloide e sela) como CONHECIDA, e `energia-de-curvatura.test.mjs`, as analíticas de meio 0,25 e 0,25 e de meio 0,3 e 0,5, com o paraboloide e o toro cobrados (não pioram) e a calota como CONHECIDA. Cada catraca falha quando a medida passar a caber, para a marca sair.
 
 O processo teria pegado sozinho? Não: as provas da etapa B eram todas de espaçamento igual e cruzamento no centro, e passaram. As duas chapas ficam no gate. A onda sem faixa também não: nenhum teste a variava além de 50 a 400 mm.
+
+## Fatia 5, degrau 3: a curvatura normal linearizada como protótipo fora do núcleo, e por que não serve (2026-11-19)
+
+A pessoa decidiu em 2026-11-19 tentar a curvatura normal linearizada fora do núcleo, com a condição de só seguir se passasse nas analíticas simétricas e assimétricas e na grade de razão 2. O protótipo está em `tools/fixtures/correcao-de-superficie/curvatura-normal.mjs`, com o teste ao lado, e não muda nenhum arquivo de `procedural/nucleo/`. Ele não passa no critério, e esta seção diz onde, com os números. Nenhuma terceira variante foi tentada.
+
+O que o protótipo faz. Em cada vértice regular a gaiola declarada dá as tangentes do limite S_u e S_v pelos estênceis do anel, a normal n e a métrica |S_u|² e |S_v|², e os quatro ficam congelados; as três curvaturas n·S_uu/|S_u|², √2 n·S_uv/(|S_u||S_v|) e n·S_vv/|S_v|² são lineares na gaiola, e a energia soma em cada aresta entre dois regulares o quadrado da diferença delas, com o peso (onda/2π)⁶ sobre o quadrado do comprimento da aresta no espaço. A incógnita é um deslocamento escalar por vértice, na normal do limite da gaiola declarada naquele vértice, e o sistema é um só. As cotas (a gaiola declarada e as medidas) são as do passo que a `gaiolaPorRede` monta com `alisarSuperficie`, o miolo com o preenchimento sem alisar e o peso 0,003, de modo que entre a coluna da etapa B e a nova só mudam a energia e a incógnita. As cotas exatas entram de um de dois modos, medidos lado a lado: `--cota=normal` cobra a cota só na normal, e `--cota=completa` cobra os três eixos e dá ao vértice de cada cota exata duas incógnitas a mais, as duas tangentes.
+
+Os comandos:
+
+```
+npx vitest run tools/fixtures/correcao-de-superficie/curvatura-normal.test.mjs
+node tools/fixtures/correcao-de-superficie/curvatura-normal.mjs energia
+node tools/fixtures/correcao-de-superficie/curvatura-normal.mjs grade [--cota=normal|completa]
+node tools/fixtures/correcao-de-superficie/curvatura-normal.mjs analiticas [--cota=...] [--definicao='{"meio":[0.25,0.25]}' | '{"pontos":16}']
+node tools/fixtures/correcao-de-superficie/curvatura-normal.mjs emendas | rede [--cota=...]
+```
+
+Prova 0, a medida e a energia sobre a própria gaiola. As curvaturas κ_uu e κ_vv conferem com `curvaturaNormal` do oráculo nas direções u e v em 42 vértices de uma grade torta, a menos de 1e-9 (teste). A energia abaixo é a soma nas arestas sem o fator da onda (1/m⁴), em grades de 15 por 15, ao lado da energia da etapa B (a do núcleo) na mesma gaiola, cada uma dividida pela da cúbica de referência (y = 5x³, passo de 30 mm); o salto é a maior diferença de curvatura entre dois vértices vizinhos.
+
+| Gaiola | Curvatura normal, sobre a cúbica | Etapa B, sobre a cúbica | Maior salto (1/m) e maior curvatura |
+|---|---|---|---|
+| plano inclinado, espaçamento desigual e torto | 3e-27 | 3e-27 | 2e-13 e 0 |
+| cilindro de raio 1 m, passo igual no ângulo e no eixo | 3e-26 | 1,1e-3 | 3e-13 e 1,00 |
+| cilindro de raio 1 m, passo igual no plano | 8e-15 | 1,2e-4 | 1e-7 e 1,00 |
+| cilindro de raio 1 m, grade de razão 2 | 0,0027 | 24,7 | 0,110 e 1,00 |
+| esfera de raio 0,5 m, passo igual na latitude e na longitude | 1,6e-8 | 0,088 | 0,0001 e 2,00 |
+| esfera de raio 0,5 m, passo igual no plano, 30 mm | 0,0072 | 0,033 | 0,080 e 2,00 |
+| esfera de raio 0,5 m, passo igual no plano, 15 mm | 0,035 | 0,19 | 0,045 e 2,00 |
+| esfera de raio 0,5 m, grade de razão 2 | 0,032 | 18,7 | 0,308 e 2,02 |
+| quadrática inclinada do teste da etapa B | 2,27 | 4e-27 | 0,98 e 6,00 |
+| paraboloide de raio 0,5 m, passo igual no plano | 0,015 | 1e-27 | 0,092 e 2,00 |
+| paraboloide de raio 0,5 m, grade de razão 2 | 0,025 | 19,7 | 0,276 e 2,00 |
+
+A energia é nula no plano em qualquer espaçamento e no cilindro de passo igual, como se esperava, e a quadrática inclinada tem energia 2,3 vezes a da cúbica, porque a curvatura dela varia de fato (até 0,98 1/m entre dois vizinhos, com a maior em 6,0). Na esfera ela não é nula: a gaiola que amostra a esfera em passo igual no plano tem por limite uma superfície cuja curvatura varia até 0,08 1/m entre vizinhos (4% de 2,0), e na grade de razão 2 o vértice da troca de passo tem 0,31 1/m a mais que o vizinho (0,11 no cilindro). Isso é curvatura real do limite daquela gaiola, e não erro da medida: a superfície limite de uma gaiola amostrada sobre a esfera em passo desigual não é a esfera. A energia da etapa B na grade de razão 2 é de mil a quinze mil vezes maior que a nova, que é o defeito que a revisão achou.
+
+Prova 1, a grade de razão 2 da revisão (15 por 15 sobre 600 mm, a borda e as duas fileiras do meio exatas, o miolo com a cota da própria forma), o desvio em mm a mais de 100 mm da borda, e a mesma grade com a razão 1 como controle:
+
+| Forma e razão | Sem a opção | Etapa B | Normal, cota completa | Normal, cota só na normal | Escorregamento da cota só na normal, fora da borda (mm) |
+|---|---|---|---|---|---|
+| paraboloide, razão 2 | 0,887 | 3,274 | 0,797 | 0,684 | 4,67 |
+| cilindro, razão 2 | 0,320 | 1,648 | 0,365 | 0,229 | 4,76 |
+| sela, razão 2 | 0,330 | 2,283 | 0,482 | 0,300 | 4,80 |
+| paraboloide, razão 1 | 0,636 | 0,329 | 0,629 | 0,568 | 0,55 |
+| cilindro, razão 1 | 0,164 | 0,082 | 0,026 | 0,015 | 0,085 |
+| sela, razão 1 | 0,008 | 0,051 | 0,029 | 0,027 | 0,001 |
+
+A curvatura normal tira o defeito do espaçamento desigual da etapa B (de 3,27, 1,65 e 2,28 mm para menos de 0,8). Com a cota completa, o cilindro e a sela de razão 2 ainda ficam piores que sem a opção (0,365 contra 0,320 e 0,482 contra 0,330), e o critério reprova. Com a cota só na normal as três de razão 2 ficam melhores que sem a opção, ao preço de a cota exata escorregar 4,7 mm na tangente. A sela de passo igual fica pior que sem a opção nos dois modos (0,03 contra 0,008 mm), como já ficava na etapa B.
+
+Prova 2, as analíticas (passo de 25 mm), a distância a mais de 100 mm da borda (mm) e a maior crista por ponto fora do cruzamento (1/m; no toro, a da `h1` e a da `v1`):
+
+| Chapa | Hoje | Etapa B | Normal, cota completa | Normal, cota só na normal |
+|---|---|---|---|---|
+| paraboloide | 0,198; 1,46 | 0,037; 0,024 | 0,035; 0,024 | 0,035; 0,024 |
+| calota | 0,229; 1,17 | 0,160; 0,040 | 0,151; 0,041 | 0,151; 0,041 |
+| toro | 0,732; 1,65 e 2,02 | 0,236; 0,155 e 0,126 | 0,288; 0,149 e 0,149 | 0,286; 0,151 e 0,119 |
+| paraboloide, 16 trechos | 0,214; 1,47 | 0,036; 0,020 | 0,035; 0,019 | 0,035; 0,018 |
+| calota, 16 trechos | 0,307; 1,20 | 0,129; 0,011 | 0,122; 0,010 | 0,122; 0,011 |
+| toro, 16 trechos | 0,765; 1,68 e 2,24 | 0,196; 0,019 e 0,022 | 0,178; 0,007 e 0,039 | 0,175; 0,010 e 0,026 |
+| paraboloide, meio 0,25 e 0,25 | 0,695; 1,80 | 0,497; 0,332 | 0,543; 0,345 | 0,558; 0,366 |
+| calota, meio 0,25 e 0,25 | 0,707; 1,50 | 1,119; 0,236 | 1,144; 0,243 | 1,146; 0,250 |
+| toro, meio 0,25 e 0,25 | 1,571; 4,42 e 2,61 | 1,105; 2,81 e 1,32 | 1,110; 2,31 e 1,43 | 1,113; 2,32 e 1,43 |
+| paraboloide, meio 0,3 e 0,5 | 0,375; 1,84 e 1,97 | 0,355; 0,92 e 0,93 | 0,355; 0,74 e 0,98 | 0,353; 0,71 e 0,98 |
+| calota, meio 0,3 e 0,5 | 0,301; 1,25 e 1,68 | 0,373; 0,62 e 0,76 | 0,341; 0,66 e 0,69 | 0,342; 0,64 e 0,68 |
+| toro, meio 0,3 e 0,5 | 1,051; 1,73 e 2,00 | 0,540; 0,149 e 0,099 | 0,555; 0,144 e 0,091 | 0,553; 0,145 e 0,081 |
+| calota, meio 0,25 e 0,25, 16 trechos | 0,502; 1,25 | 1,205; 0,077 | 1,240; 0,095 | 1,242; 0,090 |
+| toro, meio 0,25 e 0,25, 16 trechos | 1,590; 2,10 e 2,44 | 0,253; 0,64 e 0,45 | 0,193; 0,43 e 0,42 | 0,194; 0,44 e 0,42 |
+| calota, meio 0,3 e 0,5, 16 trechos | 0,267; 1,11 e 1,29 | 0,363; 0,21 e 0,15 | 0,339; 0,18 e 0,14 | 0,340; 0,17 e 0,13 |
+
+Nas simétricas a energia nova dá os mesmos números da etapa B, a menos de 0,01 mm e 0,01 1/m, com o toro de 8 trechos um pouco mais longe (0,288 contra 0,236 mm, ainda melhor que hoje) e a crista dele onde estava. Com 16 trechos, em que a curva declarada é fiel, a crista fica abaixo de 0,05 nas três (0,019, 0,010 e 0,039). Nas assimétricas a calota continua pior que sem a opção nos dois modos: 1,144 contra 0,707 mm com o meio em 0,25 e 0,25 (1,240 contra 0,502 com 16 trechos) e 0,341 contra 0,301 com o meio em 0,3 e 0,5. A causa é a que a revisão mediu, a cota do miolo (o preenchimento sem alisar a 1,26 mm da calota no retalho de 300 mm), e a troca da energia não a alcança. A crista das assimétricas de 8 trechos fica de 0,08 a 2,3 1/m, acima de 0,05. Com 16 trechos ela cai e segue acima nas de meio 0,25 e 0,25 (0,09 a 0,44; ali as duas curvas exatas discordam no cruzamento em 0,46 a 1,5 1/m mesmo com 16 trechos, e os vizinhos herdam) e na calota e no paraboloide de meio 0,3 e 0,5 (0,13 a 0,20); só o toro de meio 0,3 e 0,5 chega ao limite (0,048 e 0,067 com a cota completa, 0,046 e 0,044 com a cota só na normal, a 0,41 mm contra 1,20 de hoje).
+
+Prova 3, as emendas e a `rede-sem-ruido`, como na etapa A:
+
+| Prova | Hoje | Etapa B | Normal, cota completa | Normal, cota só na normal |
+|---|---|---|---|---|
+| emenda-g2: rampa (1/m²), crista (1/m) | 6,61; 0,200 | 0,049; 0,001 | 0,054; 0,002 | 0,054; 0,002 |
+| emenda-dupla: rampa, crista | 41,2; 1,19 | 4,56; 0,066 | 4,56; 0,063 | 4,57; 0,064 |
+| emenda-g1: rampa, crista, distância junto e na chapa (mm) | 25,7; 0,399; 1,23 e 1,31 | 9,99; 0,003; 0,43 e 0,50 | 15,5; 0,023; 0,46 e 0,50 | 13,0; 0,019; 0,46 e 0,50 |
+| rede-sem-ruido: viradas por metro (miolo, curva, singular, borda) | 7,5, 13,8, 6,3 e 6,3 | 3,0, 8,2, 6,1 e 3,4 | 4,9, 12,6, 7,2 e 3,8 | 4,0, 12,7, 6,8 e 3,3 |
+| rede-sem-ruido: energia de variação (miolo, curva), distância ao painel (mm) | 8570 e 1066; 4,04 | 216 e 313; 1,35 | 801 e 868; 0,66 | 264 e 216; 0,65 |
+
+Nenhuma piora contra hoje, a não ser as viradas junto do ponto singular (7,2 e 6,8 contra 6,3). Contra a etapa B, a rede fica mais perto do painel (0,66 contra 1,35 mm) e vira mais junto da curva (12,6 contra 8,2), e a rampa da `emenda-g1` sobe de 10,0 para 15,5 ou 13,0. A crista da `emenda-dupla` segue acima de 0,05. O salto de curvatura na emenda fica em zero de máquina nas três.
+
+O escorregamento e o contrato da cota. Com a cota só na normal, o resíduo na normal fica em 1e-13 mm e o ponto limite da cota exata fica fora do ponto declarado, na tangente, exatamente o quanto o limite da gaiola declarada já ficava (a conta não o muda em mais de 1%, porque o deslocamento na normal quase não move o ponto limite na tangente): 0,09, 0,11 e 0,22 mm nas analíticas simétricas, 0,26 a 0,83 nas assimétricas, 0,08 e 0,16 na `emenda-dupla` e na `emenda-g1`, 3,7 mm na `rede-sem-ruido`, 4,7 a 4,8 mm na fileira da troca de passo da grade de razão 2 (um sexto da diferença dos dois passos), e 10 a 15 mm nos cantos da borda livre da grade. O contrato de hoje, o ponto limite no ponto declarado a 1e-6 m, passaria a valer só na normal; a superfície ainda passaria a menos de κ·e²/2 do ponto (0,02 mm para 4,8 mm de escorregamento e 2 1/m), mas a linha da curva exata sobre a superfície sairia do lugar por milímetros, e é por essa linha que a emenda, a abertura por contorno, a divisão por contorno e a costura em x 0 se posicionam. Não recomendo esse modo. A cota completa evita o escorregamento por inteiro (resíduo de 1e-13 mm nos três eixos em todas as provas) e mantém o contrato, com o sistema maior: no toro, 621 incógnitas e 333 restrições num sistema só, contra 399 incógnitas e 111 restrições por eixo na etapa B; as três analíticas saem em 14 s nos dois modos, com as medidas. O preço dela é a grade de razão 2, em que as tangentes das cotas exatas andam milímetros e a normal e a métrica congeladas na gaiola declarada deixam de valer.
+
+O veredito, pelo critério da decisão. Não serve. A cota completa reprova na grade de razão 2 (cilindro 0,365 contra 0,320 e sela 0,482 contra 0,330) e na calota assimétrica (1,144 contra 0,707 e 0,341 contra 0,301). A cota só na normal passa na grade de razão 2 e reprova na mesma calota, e muda o contrato da cota. A crista só cai abaixo de 0,05 nas simétricas de 16 trechos, como na etapa B. O que a medida nova resolve é o defeito do espaçamento desigual da etapa B (3,27 para 0,80 mm no paraboloide); o que reprova a calota assimétrica é a cota do miolo, que é dos dois e não é da energia.
+
+O que recomendo. Parar o degrau 3 aqui e não levar a curvatura normal ao núcleo: ela custa um sistema novo e não muda o resultado nas chapas que reprovam. A opção `alisarSuperficie` da etapa B fica como está, experimental e desligada. O que as três tentativas apontam em comum é o preenchimento do miolo, que erra a dupla curvatura em 1 mm num retalho de 300 mm, e a curva declarada entre os pontos-chave; se o degrau for retomado, é por eles, e a escolha é da pessoa. Ficou sem medir, por ser a terceira variante que a decisão vedou: congelar a normal e a métrica na gaiola de hoje (a que já passa pelas cotas) em vez da declarada, que é o que a cota completa pede na grade de razão 2.
+
+O processo teria pegado sozinho? A reprovação, sim: as duas chapas que a revisão da etapa B pôs no gate (a grade de razão 2 e as analíticas de meio fora do centro) são as que reprovam o protótipo, e o teste novo guarda a grade com a cota completa como CONHECIDA. O escorregamento da cota só na normal seria pego pela conferência dos resíduos do ajuste no núcleo (o contrato de 1e-6 m), no dia em que o modo entrasse lá; fora do núcleo nada o media, e a saída do protótipo passou a dizê-lo, na chapa e só fora da borda. Que a superfície limite de uma gaiola amostrada sobre a esfera em passo desigual tem curvatura variando 0,3 1/m não tinha medida, e a prova da energia a dá.
