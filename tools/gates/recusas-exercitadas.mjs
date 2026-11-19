@@ -25,6 +25,7 @@ const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 export const FONTES_VIGIADAS = [
   { arquivo: 'procedural/nucleo/operacoes/subdivisao.js' },
   { arquivo: 'procedural/nucleo/operacoes/friso.js' },
+  { arquivo: 'procedural/nucleo/operacoes/divisao-por-contorno.js' },
   { arquivo: 'procedural/nucleo/operacoes/transformacoes.js', trecho: { de: /^ {2}espelha\(st, a, i\) \{/, ate: /^ {2}\/\* arranja \(O-13\)/ } },
   { arquivo: 'src/autoria/contatos-da-peca.js' },
   { arquivo: 'tools/mcp/perfis/parametros.mjs' },
@@ -35,6 +36,7 @@ export const FONTES_VIGIADAS = [
 
 /** `arquivo`, depois o texto fixo da mensagem (o mesmo que o gate imprime): o motivo de cada exceção é obrigatório. */
 export const SEM_ENTRADA_QUE_ALCANCE = {
+  'procedural/nucleo/operacoes/divisao-por-contorno.js: ): o contorno passa rente a um vértice ou a uma aresta da chapa de um jeito que a conta do traço não resolve; mova o desenho uma fração de milímetro ou troque o valor do encaixe': 'a defesa das contas de ponto flutuante do traço (um trecho que entra num triângulo e não sai, um pedaço dos dois lados da borda): nas 360 divisões medidas na fatia 1 (o banco de provas do plano) nenhuma a alcançou, e as entradas degeneradas que a alcançariam são recusadas antes, pelo contorno que se cruza, pela borda da chapa ou pelo pedaço fino',
   'tools/modelar/zebra-numerica.mjs: a gaiola refinada tem face de mais de quatro lados; a zebra numérica pede quadriláteros': 'a gaiola passa por `refinarGaiola` antes, e um passo de Catmull-Clark só devolve quadriláteros, qualquer que seja a face de entrada; a defesa fica para o dia em que o refino mudar',
   'procedural/nucleo/operacoes/friso.js: graus a perna atravessa a dobra; reduza o ângulo ou a largura': 'as duas recusas (a da aba na chapa e a da variação) guardam o perfil de aba que se cruza, e `perfilDaAba` recusa antes, por baixo da chapa: dos 2238 perfis válidos varridos em 2026-11-14 (espessura, raio, largura e ângulo), nenhum se cruza',
   'procedural/nucleo/operacoes/transformacoes.js: não foi possível criar a cópia estrutural: face ou vértice-fonte inexistente': 'a origem resolvida só devolve faces vivas com os vértices vivos; a defesa fica para o dia em que a resolução deixar de garantir isso',

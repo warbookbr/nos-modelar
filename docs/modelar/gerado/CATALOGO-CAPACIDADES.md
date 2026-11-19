@@ -2,9 +2,9 @@
 
 > Gerado por `npm run catalogo:gerar`; não edite à mão. A fonte é o registro explícito do motor e as cinco extensões nativas.
 
-Assinatura do registro: `sha256:1159d78dfdc1272071b1b90ec960b96ac8b73e331565dd27a14c8ee5b8730445`.
+Assinatura do registro: `sha256:8241dff4294a65486b2319c1ebbe87c330c704779c059fd172d3e56a849b33a6`.
 
-Há 42 operações em 1 módulo(s).
+Há 43 operações em 1 módulo(s).
 
 | operação | intenção | entra/sai | interfaces | custo | schema |
 |---|---|---|---|---:|---|
@@ -19,6 +19,7 @@ Há 42 operações em 1 módulo(s).
 | `cone` | Criar cone fechado com base circular. | — → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.cone@1` |
 | `cubo` | Criar uma caixa retangular apoiada em y=0. | — → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.cubo@1` |
 | `displace` | Deslocar seleção ao longo das normais por ruído determinístico. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.displace@1` |
+| `divisaoPorContorno` | Dividir uma chapa em partes pelo contorno desenhado numa vista: as faces são cortadas na curva e a região de dentro vira parte nova, sem sair da peça. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.divisaoPorContorno@1` |
 | `encostar` | Posicionar uma seleção em contato direcional com uma referência. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.encostar@1` |
 | `esfera` | Criar esfera UV apoiada no chão. | — → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.esfera@1` |
 | `espelha` | Duplicar faces refletidas, com modo estrutural opcional. | `mecanifica.malha-poligonal@1` → `mecanifica.malha-poligonal@1` | — → — | 1 | `mecanifica.argumentos.espelha@1` |
@@ -53,7 +54,7 @@ Há 42 operações em 1 módulo(s).
 
 ## Extensões
 
-Há 5 extensões nativas em `procedural/extensoes/`. Elas não estão em `REGISTRO_OPERACOES`: só existem num registro montado por `criarRegistroComExtensoes({ registroBase, extensoes })`, e a receita que as usa precisa ser executada com esse registro. Assinatura do registro com extensões: `sha256:b0655c57b066ecfe81e58f77683bfc8ff455aeb36397109d4fc0589a8e4ba4c1`.
+Há 5 extensões nativas em `procedural/extensoes/`. Elas não estão em `REGISTRO_OPERACOES`: só existem num registro montado por `criarRegistroComExtensoes({ registroBase, extensoes })`, e a receita que as usa precisa ser executada com esse registro. Assinatura do registro com extensões: `sha256:cd9a55dde98ba439d795bbf83bc66c3669761c4f1334ec3e8ab21fd5872cedfa`.
 
 | extensão | intenção | entra/sai | interfaces | custo | schema | liga-se por |
 |---|---|---|---|---:|---|---|

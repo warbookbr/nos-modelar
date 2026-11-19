@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/nucleo/operacoes/divisao-por-contorno.js` e o teste dele, `procedural/nucleo/registro.js` (só a entrada da operação nova), `docs/modelar/banco-de-provas/divisao-por-contorno-2026-11-18/`. A operação reaproveita o corte da operação de abertura por contorno sem mudá-lo, porque ele é do plano da correção de superfície; se precisar mudar, é empréstimo pedido a esse plano. O uso na lataria do carro entra como prova pelo plano do carro.
+**Território:** `procedural/nucleo/operacoes/divisao-por-contorno.js` e o teste dele, `procedural/nucleo/nucleo.js` (só o registro da operação nova), `procedural/nucleo/catalogo.test.mjs` (o teto e o total), `procedural/nucleo/fixtures/motor-r00-baseline.json`, `tools/arquitetura/mapear-motor-procedural.test.mjs` (a dependência nova), `docs/modelar/banco-de-provas/divisao-por-contorno-2026-11-18/`. A operação reaproveita o corte da operação de abertura por contorno sem mudá-lo, porque ele é do plano da correção de superfície; se precisar mudar, é empréstimo pedido a esse plano. A entrada da operação no guia de uso das operações é empréstimo do plano da correção de superfície, dono desse arquivo. O uso na lataria do carro entra como prova pelo plano do carro.
 
 **Responsável:** a IA da sessão implementa e conduz a revisão adversarial; Tiago pediu o plano em 2026-11-18, com permissão para estendê-lo se a operação de abertura não servir, e aprova a borda por imagem.
 
@@ -46,3 +46,5 @@ ENVOLVER sobre o corte de `aberturaPorContorno`: em vez de tirar a região de de
 ## Riscos e parada
 
 Se o corte da abertura não servir para dividir sem tirar (por exemplo, se ele só sabe furar), o plano cresce para um corte próprio, e a pessoa já autorizou a extensão; isso fica escrito aqui antes de começar. Se o corte criar face fina que a malha do carro não aceita, a operação para e volta à pessoa com a medida.
+
+Em 2026-11-19, na fatia 1, o plano cresceu para um corte próprio, no mesmo arquivo da operação: o corte da `aberturaPorContorno` é a booleana de um prisma contra um sólido fechado, que tira a região de dentro e fecha o vão com uma parede nova, e a função que o faz (`cortar`) não é exportada; dividir sem tirar pede a mesma pele com arestas novas sobre ela, sem parede e com a área somada igual. A operação reaproveita da abertura, por importação e sem mudá-la, o quadro da vista (`quadroDaVista`) e a retirada do vértice de valência dois (`tirarValenciaDois`). As provas da fatia 1 estão no [banco de provas](../banco-de-provas/divisao-por-contorno-2026-11-18/README.md).

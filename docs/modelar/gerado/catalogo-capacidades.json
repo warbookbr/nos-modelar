@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.catalogo-capacidades@1",
-  "assinatura": "sha256:1159d78dfdc1272071b1b90ec960b96ac8b73e331565dd27a14c8ee5b8730445",
+  "assinatura": "sha256:8241dff4294a65486b2319c1ebbe87c330c704779c059fd172d3e56a849b33a6",
   "modulos": [
     {
       "id": "mecanifica.motor.nucleo",
@@ -338,6 +338,40 @@
             "intencao": "Deslocar seleção ao longo das normais por ruído determinístico.",
             "schema": "mecanifica.argumentos.displace@1",
             "obrigatorios": []
+          }
+        },
+        {
+          "id": "mecanifica.operacao.divisaoPorContorno",
+          "nome": "divisaoPorContorno",
+          "versao": "1.0.0",
+          "categoria": "procedural",
+          "artefatos": {
+            "entra": [
+              "mecanifica.malha-poligonal@1"
+            ],
+            "sai": [
+              "mecanifica.malha-poligonal@1"
+            ]
+          },
+          "interfaces": {
+            "entra": [],
+            "sai": []
+          },
+          "requisitos": [],
+          "custo": 1,
+          "efeitos": [
+            "transforma-malha"
+          ],
+          "identidade": "preserva-ou-deriva",
+          "uso": {
+            "intencao": "Dividir uma chapa em partes pelo contorno desenhado numa vista: as faces são cortadas na curva e a região de dentro vira parte nova, sem sair da peça.",
+            "schema": "mecanifica.argumentos.divisaoPorContorno@1",
+            "obrigatorios": [
+              "chapa",
+              "contorno",
+              "vista",
+              "nome"
+            ]
           }
         },
         {
@@ -1608,6 +1642,40 @@
       }
     },
     {
+      "id": "mecanifica.operacao.divisaoPorContorno",
+      "nome": "divisaoPorContorno",
+      "versao": "1.0.0",
+      "categoria": "procedural",
+      "artefatos": {
+        "entra": [
+          "mecanifica.malha-poligonal@1"
+        ],
+        "sai": [
+          "mecanifica.malha-poligonal@1"
+        ]
+      },
+      "interfaces": {
+        "entra": [],
+        "sai": []
+      },
+      "requisitos": [],
+      "custo": 1,
+      "efeitos": [
+        "transforma-malha"
+      ],
+      "identidade": "preserva-ou-deriva",
+      "uso": {
+        "intencao": "Dividir uma chapa em partes pelo contorno desenhado numa vista: as faces são cortadas na curva e a região de dentro vira parte nova, sem sair da peça.",
+        "schema": "mecanifica.argumentos.divisaoPorContorno@1",
+        "obrigatorios": [
+          "chapa",
+          "contorno",
+          "vista",
+          "nome"
+        ]
+      }
+    },
+    {
       "id": "mecanifica.operacao.encostar",
       "nome": "encostar",
       "versao": "1.0.0",
@@ -2538,7 +2606,7 @@
       }
     }
   ],
-  "assinaturaComExtensoes": "sha256:b0655c57b066ecfe81e58f77683bfc8ff455aeb36397109d4fc0589a8e4ba4c1",
+  "assinaturaComExtensoes": "sha256:cd9a55dde98ba439d795bbf83bc66c3669761c4f1334ec3e8ab21fd5872cedfa",
   "extensoes": [
     {
       "id": "mecanifica.operacao.articulacao",

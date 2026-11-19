@@ -43,7 +43,8 @@
     "friso",
     "aberturaPorContorno",
     "limparLascas",
-    "aparar"
+    "aparar",
+    "divisaoPorContorno"
   ],
   "casos": [
     {
@@ -464,6 +465,16 @@
       "hashCanonico": "09f90bcb1e559d453d4ba9cd2c0e537e9fe6a27565c165c146caa54160b5741a",
       "vertices": 197,
       "faces": 251,
+      "diagnosticos": 0
+    },
+    {
+      "id": "r00/divisaoPorContorno",
+      "operacoes": [
+        "divisaoPorContorno"
+      ],
+      "hashCanonico": "cdc4aad0f74a8cd23d4c44295662f7f53a3c807e08d9d89baef06d407b79d15c",
+      "vertices": 198,
+      "faces": 212,
       "diagnosticos": 0
     }
   ]

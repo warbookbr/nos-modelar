@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2126 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2129 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -292,6 +292,10 @@
 ## docs/modelar/banco-de-provas/desenho-carcaca-2026-10-14/coordenadas-r2/
 
 - `gera.mjs` — gera.mjs — gera lateral.partes.json da carcaça da empilhadeira (vista lateral, frente à esquerda, base em v = 0) por coordenadas escritas à mão a partir só d…
+
+## docs/modelar/banco-de-provas/divisao-por-contorno-2026-11-18/
+
+- `README.md` — Divisão por contorno: fatia 1, a operação e as provas na chapa de teste
 
 ## docs/modelar/banco-de-provas/empilhadeira-2026-10-09/
 
@@ -1223,6 +1227,8 @@
 - `booleanas.js` — booleanas.js — `unir`, `subtrair` e `intersectar`: dois ou mais SÓLIDOS fechados viram uma superfície fechada só, sem face interna.
 - `booleanas.test.ts` — booleanas.test.ts — fatias 1 a 3 do plano "União de sólidos" (docs/modelar/planos/encerrados/2026-09-28-uniao-de-solidos.md). A fixture é neutra: dois cubos …
 - `cantos-arredondados.js` — cantos-arredondados.js — o remate do vértice onde duas ou três arestas arredondadas (ou chanfradas) se encontram.
+- `divisao-por-contorno.js` — divisao-por-contorno.js (operação) — `divisaoPorContorno`: uma chapa se divide em partes ao longo de um contorno desenhado numa vista. As faces que o contorn…
+- `divisao-por-contorno.test.mjs` — divisao-por-contorno.test.mjs — a operação `divisaoPorContorno` numa chapa de teste (a chapa por grade de `tools/fixtures/aberturas-em-teste/chapas.js`, de d…
 - `edicao-direta.js` — edicao-direta.js — edições locais por identidade, via serviços explícitos do núcleo.
 - `encostar.test.ts` — encostar.test.ts — contato derivado no lugar de coordenada digitada (A-6).
 - `espelha.test.ts` — espelha.test.ts — o passo `espelha` medido por número: a reflexão por plano fora da origem nos três eixos, a ordem e a numeração dos ids novos, a soldagem do…

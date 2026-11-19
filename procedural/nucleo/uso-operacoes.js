@@ -334,6 +334,34 @@ const definicoes = {
     ],
     diagnosticos: [{ quando: 'O aviso lascasRestantes diz que ficaram faces finas.', acao: 'Rode npm run malha:lascas na receita: a lista traz a parte e o passo de cada uma.' }],
   },
+  divisaoPorContorno: {
+    intencao: 'Dividir uma chapa em partes pelo contorno desenhado numa vista: as faces são cortadas na curva e a região de dentro vira parte nova, sem sair da peça.',
+    campos: {
+      chapa: ['selecao', "Seleção das faces que a divisão corta, como { origem: { op: 'subdivisao', id } }."],
+      contorno: ['objeto', 'O contorno da parte, { inicio: [u, v], trechos: [...] } de curva2d, em metros no plano da vista, em qualquer sentido.'],
+      vista: ['eixoOuVetor3', "O eixo ao longo do qual o contorno é projetado, como na aberturaPorContorno: na 'y' o ponto [u, v] é [x, z], na 'x' é [z, y] e na 'z' é [x, y]; ou um vetor [dx, dy, dz]."],
+      nome: ['texto', 'Nome da parte nova, a região de dentro do contorno.'],
+      material: ['texto', 'Material da parte nova, de MATERIAIS.'],
+      substituir: ['booleano', 'true: a região de dentro sai da parte que já tinha.'],
+      sentido: ['texto', "'+' ou '-': no corpo que a reta do eixo atravessa mais de uma vez, divide só a camada vista desse lado."],
+      encaixe: ['escalar', 'Fração da aresta (0 a 0,25, padrão 0,05) abaixo da qual o corte usa o vértice que já existe em vez de criar outro ao lado.'],
+      segmentosArco: ['inteiro', 'Segmentos por quarto de volta nos arcos e nas concordâncias do contorno (padrão 4).'],
+      segmentosSpline: ['inteiro', 'Segmentos por vão de spline do contorno (padrão 8).'],
+    },
+    obrigatorios: ['chapa', 'contorno', 'vista', 'nome'],
+    passos: [
+      ['subdivisao', { origemId: 1, vertices: ['g00', 'g01', 'g02', 'g10', 'g11', 'g12', 'g20', 'g21', 'g22'], faces: [['g00', 'g01', 'g11', 'g10'], ['g01', 'g02', 'g12', 'g11'], ['g10', 'g11', 'g21', 'g20'], ['g11', 'g12', 'g22', 'g21']], niveis: 2, espessura: 0.002 }],
+      ['divisaoPorContorno', { chapa: { origem: { op: 'subdivisao', id: 1 } }, vista: 'y', nome: 'painel', contorno: { inicio: [0.07, 0.08], trechos: [{ reto: [0.13, 0.08] }, { reto: [0.1, 0.13] }, { reto: [0.07, 0.08] }] } }],
+    ],
+    parametros: Object.fromEntries([0, 1, 2].flatMap((i) => [0, 1, 2].map((j) => [`g${i}${j}`, [0.1 * i, i === 1 && j === 1 ? 0.01 : 0, 0.1 * j]]))),
+    precondicoes: ['O contorno cai inteiro sobre a chapa vista do eixo, não se cruza e não cruza a borda da chapa nem a parede de um vão.'],
+    limites: [
+      'A superfície não muda: cada vértice novo fica sobre uma aresta ou sobre um triângulo de antes. A face que o contorno não toca fica com id e cantos, a cortada fica com o id no maior pedaço, e os outros pedaços e os vértices ganham id no bloco do passo.',
+      'A chapa fechada (com espessura) é cortada nas duas peles da camada. A borda se afasta do contorno no máximo a fração do encaixe da aresta mais próxima.',
+      'Gritam, antes de mexer na malha: o contorno que se cruza, o ponto fora da chapa, o que cruza a borda ou a parede de um vão, a chapa atravessada mais de uma vez sem sentido, o contorno que cabe numa face só, o espinho pelo mesmo vértice, o pedaço abaixo do limite de face fina (com a medida) e a região que já é de outra parte sem substituir.',
+    ],
+    diagnosticos: [{ quando: 'O passo grita que o corte deixaria um pedaço fino.', acao: 'Aumente o encaixe ou desloque o contorno uma fração de milímetro; a mensagem diz a face e o lugar.' }],
+  },
   aparar: {
     intencao: 'Aparar um sólido pelo lado de dentro de uma ou mais chapas subdivididas, deixando-o a uma folga da pele de dentro delas.',
     campos: {

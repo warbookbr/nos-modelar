@@ -31,6 +31,7 @@ import { criarOperacoesEstruturais } from './operacoes/estruturais.js';
 import { criarOperacoesAtributos } from './operacoes/atributos.js';
 import { criarOperacoesBooleanas } from './operacoes/booleanas.js';
 import { criarOperacoesAberturaPorContorno } from './operacoes/abertura-por-contorno.js';
+import { criarOperacoesDivisaoPorContorno } from './operacoes/divisao-por-contorno.js';
 import { criarOperacoesLimparLascas } from './operacoes/limpar-lascas.js';
 import { erroDaCargaDaManifold, manifoldCarregada } from './manifold.js';
 import { lerOnde, resolverOnde } from './selecao-geometrica.js';
@@ -3033,6 +3034,7 @@ function resolverAlvosFRastreado(st, a, op, i, opcoes) {
   return alvos;
 }
 const operacoesAtributos = criarOperacoesAtributos({ FORMATO, Face, grita, nomeDeParteInvalido, temNomeDeParte, resolverAlvosF: resolverAlvosFRastreado, resolverSelecao, neutroCanonico });
+const operacoesDivisaoPorContorno = criarOperacoesDivisaoPorContorno({ idDoPasso, grita, addV, addF, resolverSelecao, nomeDeParteInvalido, temNomeDeParte, parte: operacoesAtributos.parte });
 
 const OPS_IMPLEMENTADAS = {
   ...operacoesPrimitivasBasicas,
@@ -3047,6 +3049,7 @@ const OPS_IMPLEMENTADAS = {
   ...operacoesSubdivisao,
   ...operacoesFriso,
   ...operacoesAberturaPorContorno,
+  ...operacoesDivisaoPorContorno,
   ...operacoesLimparLascas,
 };
 
@@ -3059,7 +3062,7 @@ const NOMES_DAS_OPERACOES = [
   'espelha', 'arranja', 'furo', 'arredondarAresta', 'filete', 'unir',
   'subtrair', 'intersectar', 'arredondarCostura', 'pincel',
   'solido', 'liso', 'material', 'parte', 'pesar', 'subdivisao', 'friso',
-  'aberturaPorContorno', 'limparLascas', 'aparar',
+  'aberturaPorContorno', 'limparLascas', 'aparar', 'divisaoPorContorno',
 ];
 export const OPS = Object.freeze(Object.fromEntries(NOMES_DAS_OPERACOES.map((nome) => [nome, OPS_IMPLEMENTADAS[nome]])));
 
