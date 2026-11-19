@@ -32,6 +32,8 @@
  * `procedural/nucleo/subdivisao.js`, a opção `alisarSuperficie` da `gaiolaPorRede`). Este arquivo fica como a bancada das variantes medidas
  * antes da escolha, e cada prova sai com três colunas: `hoje` (a rede sem a opção), `prototipo` (o ajuste daqui, com as opções da linha de
  * comando; sem opção nenhuma é o da etapa A) e `nucleo` (a rede com `alisarSuperficie`, montada pelo passo `subdivisao`).
+ * Desde 2026-11-19 a rede com `alisarSuperficie` tem o miolo preenchido pelas curvas vizinhas, e a coluna `nucleo` o traz; a etapa B como
+ * foi medida (o preenchimento padrão com a energia) sai de `preenchimento-do-miolo.mjs`, na coluna `hoje.comEnergia`.
  *
  * Uso: node tools/fixtures/correcao-de-superficie/energia-de-curvatura.mjs analiticas | emendas | rede  [opções]
  *   --onda=<mm>              o comprimento de onda (no protótipo e no núcleo); --miolo=<peso> troca o peso das cotas de peso finito (protótipo)
@@ -285,6 +287,16 @@ export function cristaPontual(gaiola, cadeia, { afastamento = 4, exatos = null }
   return { maxima: r4(o[o.length - 1] ?? null), mediana: r4(o[o.length >> 1] ?? null), vertices: o.length, noCruzamento: r4(noCruzamento), valores: valores.map(r4) };
 }
 
+/** medirAnalitica(Sa, gaiola, curvas, exatos): a distância (mm) à superfície analítica `Sa` e as cristas das `curvas` ({ nome, gaiola }) */
+export function medirAnalitica(Sa, gaiola, curvas, exatos = null) {
+  let inteira = 0, a50 = 0, a100 = 0;
+  for (const { p } of amostrar(gaiola)) {
+    const d = Math.abs(Sa.distancia(p)); const b = Sa.aBorda(p);
+    inteira = Math.max(inteira, d); if (b >= 50) a50 = Math.max(a50, d); if (b >= 100) a100 = Math.max(a100, d);
+  }
+  return { distanciaMm: r4(inteira), a50Mm: r4(a50), a100Mm: r4(a100), cristas: cristas(gaiola, curvas), cristaPontual: curvas.map((c) => ({ nome: c.nome, ...cristaPontual(gaiola, c.gaiola, { exatos }) })) };
+}
+
 /** provaDasAnaliticas(opcoes) -> por superfície: a distância (mm) na chapa inteira, a 50 e a 100 mm da borda, e a crista das curvas de dentro */
 export function provaDasAnaliticas(opcoes = {}, superficies = Object.keys(SUPERFICIES_ANALITICAS)) {
   return superficies.map((nome) => {
@@ -298,14 +310,7 @@ export function provaDasAnaliticas(opcoes = {}, superficies = Object.keys(SUPERF
     const nucleo = { ...rn.gaiola, borda: 'suave' };
     const indice = new Map(g.passo.vertices.map((v, k) => [typeof v === 'string' ? v : v.nome ?? v[0], k]));
     const curvas = g.passo.curvas.filter((c) => c.nome === 'h1' || c.nome === 'v1').map((c) => ({ nome: c.nome, gaiola: c.pontos.map((p) => indice.get(p)) }));
-    const medir = (gaiola) => {
-      let inteira = 0, a50 = 0, a100 = 0;
-      for (const { p } of amostrar(gaiola)) {
-        const d = Math.abs(Sa.distancia(p)); const b = Sa.aBorda(p);
-        inteira = Math.max(inteira, d); if (b >= 50) a50 = Math.max(a50, d); if (b >= 100) a100 = Math.max(a100, d);
-      }
-      return { distanciaMm: r4(inteira), a50Mm: r4(a50), a100Mm: r4(a100), cristas: cristas(gaiola, curvas), cristaPontual: curvas.map((c) => ({ nome: c.nome, ...cristaPontual(gaiola, c.gaiola, { exatos }) })) };
-    };
+    const medir = (gaiola) => medirAnalitica(Sa, gaiola, curvas, exatos);
     return { residuoAfrouxadoMm: r4(ajuste.residuoAfrouxado * 1000), superficie: nome, ondaMm: r4(ajuste.onda * 1000), deslocamentoDaGaiolaMm: r4(ajuste.deslocamento * 1000), energia: [ajuste.energiaAntes, ajuste.energiaDepois], hoje: medir(hoje), prototipo: medir(prototipo), nucleo: medir(nucleo) };
   });
 }
@@ -334,29 +339,34 @@ function distanciaADesenhada(chapa, altura, perto = () => true) {
   return [r4(pior), r4(pertoPior)];
 }
 
+/** medirEmenda(nome, chapa, exatos): a medida na curva `emenda` da chapa emendada `nome` e a distância (mm) à desenhada */
+export function medirEmenda(nome, chapa, exatos = null) {
+  const m = medirCurvasDoNeutro({ chapas: [chapa] }, { curvas: ['emenda'] })[0].curvas[0];
+  const [inteira, junto] = distanciaADesenhada(chapa, (x, z) => pontoDaEmenda(nome, Math.min(600, Math.max(0, x)), Math.min(400, Math.max(0, z)))[1], (p) => Math.abs(p[0] - EMENDA_X_MM) <= 60);
+  const cadeia = chapa.curvas.find((c) => c.nome === 'emenda').gaiola;
+  return { cristaPontual: cristaPontual({ vertices: chapa.vertices, faces: chapa.faces, vincos: chapa.vincos, cantos: chapa.cantos, borda: chapa.borda }, cadeia, { exatos }), inclinacao: m.inclinacaoForaDosSingulares, inclinacaoNaBorda: m.inclinacaoNaBorda, naCurva: m.curvaturaNaLinha, aoLado: m.curvaturaNaFaixa, salto: m.salto, distanciaMm: inteira, distanciaJuntoMm: junto };
+}
+
 /** provaDasEmendas(opcoes) -> por chapa emendada: a medida na curva `emenda` e a distância à desenhada, hoje e no protótipo */
 export function provaDasEmendas(opcoes = {}, nomes = ['emenda-g2', 'emenda-dupla', 'emenda-g1']) {
   return nomes.map((nome) => {
     const { hoje, prototipo, nucleo, ajuste, exatos } = chapasDaReceita(nome, opcoes);
-    const medir = (chapa) => {
-      const m = medirCurvasDoNeutro({ chapas: [chapa] }, { curvas: ['emenda'] })[0].curvas[0];
-      const [inteira, junto] = distanciaADesenhada(chapa, (x, z) => pontoDaEmenda(nome, Math.min(600, Math.max(0, x)), Math.min(400, Math.max(0, z)))[1], (p) => Math.abs(p[0] - EMENDA_X_MM) <= 60);
-      const cadeia = chapa.curvas.find((c) => c.nome === 'emenda').gaiola;
-      return { cristaPontual: cristaPontual({ vertices: chapa.vertices, faces: chapa.faces, vincos: chapa.vincos, cantos: chapa.cantos, borda: chapa.borda }, cadeia, { exatos }), inclinacao: m.inclinacaoForaDosSingulares, inclinacaoNaBorda: m.inclinacaoNaBorda, naCurva: m.curvaturaNaLinha, aoLado: m.curvaturaNaFaixa, salto: m.salto, distanciaMm: inteira, distanciaJuntoMm: junto };
-    };
+    const medir = (chapa) => medirEmenda(nome, chapa, exatos);
     return { chapa: nome, desenhada: [1000 / EMENDAS[nome].raioEsquerdaMm, 1000 / EMENDAS[nome].raioDireitaMm].map(r4), ondaMm: r4(ajuste.onda * 1000), hoje: medir(hoje), prototipo: medir(prototipo), nucleo: medir(nucleo) };
   });
+}
+
+/** medirRede(chapa): as viradas por metro por classe da `rede-sem-ruido` e a distância (mm) a `painel(x, z)`, na chapa e a 100 mm da borda */
+export function medirRede(chapa) {
+  const o = ondeOndula(chapa).classes;
+  const [inteira, dentro] = distanciaADesenhada(chapa, painel, (p) => Math.min(p[0], 1000 - p[0], p[2], 500 - p[2]) >= 100);
+  return { viradasPorM: Object.fromEntries(Object.entries(o).map(([c, v]) => [c, v.viradasPorM])), amplitude: Object.fromEntries(Object.entries(o).map(([c, v]) => [c, v.amplitudeMediana])), energia: Object.fromEntries(Object.entries(o).map(([c, v]) => [c, v.energia])), distanciaMm: inteira, a100Mm: dentro };
 }
 
 /** provaDaRede(opcoes) -> a `rede-sem-ruido`: as viradas por metro por classe e a distância a `painel(x, z)`, hoje e no protótipo */
 export function provaDaRede(opcoes = {}) {
   const { hoje, prototipo, nucleo, ajuste } = chapasDaReceita('rede-sem-ruido', opcoes);
-  const medir = (chapa) => {
-    const o = ondeOndula(chapa).classes;
-    const [inteira, dentro] = distanciaADesenhada(chapa, painel, (p) => Math.min(p[0], 1000 - p[0], p[2], 500 - p[2]) >= 100);
-    return { viradasPorM: Object.fromEntries(Object.entries(o).map(([c, v]) => [c, v.viradasPorM])), amplitude: Object.fromEntries(Object.entries(o).map(([c, v]) => [c, v.amplitudeMediana])), energia: Object.fromEntries(Object.entries(o).map(([c, v]) => [c, v.energia])), distanciaMm: inteira, a100Mm: dentro };
-  };
-  return { chapa: 'rede-sem-ruido', ondaMm: r4(ajuste.onda * 1000), arestasComTermo: ajuste.arestasComTermo, hoje: medir(hoje), prototipo: medir(prototipo), nucleo: medir(nucleo) };
+  return { chapa: 'rede-sem-ruido', ondaMm: r4(ajuste.onda * 1000), arestasComTermo: ajuste.arestasComTermo, hoje: medirRede(hoje), prototipo: medirRede(prototipo), nucleo: medirRede(nucleo) };
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {

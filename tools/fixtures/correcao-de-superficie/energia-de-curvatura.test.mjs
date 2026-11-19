@@ -97,7 +97,10 @@ describe('a energia de variação de curvatura (protótipo fora do núcleo)', ()
 /* A ETAPA B: a energia no núcleo, pela opção `alisarSuperficie` da `gaiolaPorRede` (o passo sai com `regularizacao`). A coluna `nucleo` das
  * provas é a rede com a opção ligada, montada pelo passo `subdivisao`; `hoje` é a mesma rede sem a opção. O gate é o da decisão da pessoa
  * de 2026-11-18: a crista por ponto abaixo de 0,05 1/m fora dos cruzamentos e a distância a mais de 100 mm da borda nunca pior que hoje.
- * As `CONHECIDAS` de `analiticas.test.mjs` são do gate antigo e não mudam. */
+ * As `CONHECIDAS` de `analiticas.test.mjs` são do gate antigo e não mudam.
+ * Desde 2026-11-19 o miolo da rede com a opção é o preenchimento pelas curvas vizinhas, e a coluna `nucleo` o traz: a calota e o toro
+ * ficam mais perto da forma (0,160 e 0,236 para 0,063 e 0,050 mm a 100 mm da borda), a calota de cruzamento fora do centro deixou de
+ * ser CONHECIDA, e as emendas e a rede não mudam. As dezoito chapas analíticas contra o protótipo estão em `preenchimento-do-miolo.test.mjs`. */
 const CRISTA_MAXIMA = 0.05;
 
 describe('a opção alisarSuperficie no núcleo (etapa B)', () => {
@@ -108,7 +111,11 @@ describe('a opção alisarSuperficie no núcleo (etapa B)', () => {
       expect(p.nucleo.a100Mm, `${p.superficie} a 100 mm da borda`).toBeLessThanOrEqual(p.hoje.a100Mm);
       expect(p.nucleo.distanciaMm, `${p.superficie} na chapa inteira`).toBeLessThanOrEqual(p.hoje.distanciaMm);
       for (const c of p.nucleo.cristaPontual) expect(c.vertices, `${p.superficie} ${c.nome}`).toBeGreaterThanOrEqual(8);
+      p.nucleo.cristaPontual.forEach((c, k) => expect(c.maxima, `${p.superficie}, crista da ${c.nome} contra a rede sem a opção`).toBeLessThanOrEqual(p.hoje.cristaPontual[k].maxima));
     }
+    /* com o miolo pelas curvas vizinhas (2026-11-19) a calota e o toro ficam a 0,063 e 0,050 mm a 100 mm da borda (eram 0,160 e 0,236) */
+    const tetos = { paraboloide: 0.0369, calota: 0.0634, toro: 0.0495 };
+    for (const p of provas) expect(p.nucleo.a100Mm, `${p.superficie} a 100 mm da borda piorou contra a medida`).toBeLessThanOrEqual(tetos[p.superficie] * 1.02 + 0.001);
     for (const p of provas.filter((x) => x.superficie !== 'toro')) for (const c of p.nucleo.cristaPontual) expect(c.maxima, `${p.superficie} ${c.nome}`).toBeLessThan(CRISTA_MAXIMA);
     /* CONHECIDA: no toro com 8 trechos de ponto-chave por curva a crista NÃO cabe em 0,05 (0,155 na h1 e 0,126 na v1, nos vértices
        vizinhos do cruzamento, e até 0,10 nos outros da v1). A causa está fora do ajuste: entre os pontos-chave a curva declarada fica a
@@ -134,18 +141,20 @@ describe('a opção alisarSuperficie no núcleo (etapa B)', () => {
     expect(p.nucleo.distanciaMm).toBeLessThanOrEqual(p.hoje.distanciaMm);
   });
 
-  it('nas analíticas assimétricas (o cruzamento fora do centro), a 100 mm da borda: o paraboloide e o toro não pioram, e a calota é CONHECIDA', () => {
-    /* CONHECIDA, e é o que impede o uso da opção em receita: no retalho grande de dupla curvatura o preenchimento sem alisar fica a mais
-       de 1 mm da calota, e a cota de peso 0,003 segura essa forma longa (o peso p vale no comprimento onda/p^(1/6), umas dez arestas, e
-       o retalho tem doze ou mais). Com 1e-4 as três passam aqui, e com 3e-5 ou 3e-4 uma delas volta a piorar: não há peso que feche.
-       A catraca cobra que a calota não piore além do medido, e falha quando ela passar a caber, para a marca sair. */
-    const conhecidas = { '0.25,0.25': 1.1188, '0.3,0.5': 0.3727 };
+  it('nas analíticas assimétricas (o cruzamento fora do centro), a 100 mm da borda e na crista, nenhuma das três piora contra a rede sem a opção', () => {
+    /* A calota era CONHECIDA até 2026-11-19 (1,119 e 0,373 mm contra 0,707 e 0,301 sem a opção): com o miolo do preenchimento padrão, o
+       retalho grande de dupla curvatura nascia a mais de 1 mm da forma, e a cota de peso 0,003 segurava esse erro. Com o miolo pelas curvas
+       vizinhas ela passa (0,473 e 0,287), e a marca saiu. Os tetos são a medida com 2% de folga: a distância que sobra é a dos pontos das
+       curvas declaradas à forma (0,37 a 1,01 mm com 8 trechos de ponto-chave, junto do nó onde o espaçamento deles muda). */
+    const tetos = { '0.25,0.25': { paraboloide: 0.4974, calota: 0.4726, toro: 1.1054 }, '0.3,0.5': { paraboloide: 0.3551, calota: 0.2869, toro: 0.1993 } };
     for (const meio of [[0.25, 0.25], [0.3, 0.5]]) {
-      const provas = Object.fromEntries(provaDasAnaliticas({ definicao: { meio } }).map((p) => [p.superficie, p]));
-      for (const nome of ['paraboloide', 'toro']) expect(provas[nome].nucleo.a100Mm, `${nome} com o meio em ${meio}`).toBeLessThanOrEqual(provas[nome].hoje.a100Mm);
-      const { hoje, nucleo } = provas.calota;
-      expect(nucleo.a100Mm, `a calota com o meio em ${meio} passou a caber: tire a marca`).toBeGreaterThan(hoje.a100Mm);
-      expect(nucleo.a100Mm, `a calota com o meio em ${meio} piorou`).toBeLessThanOrEqual(conhecidas[String(meio)] * 1.02 + 0.001);
+      const provas = provaDasAnaliticas({ definicao: { meio } });
+      expect(provas.map((p) => p.superficie)).toEqual(['paraboloide', 'calota', 'toro']);
+      for (const { superficie, hoje, nucleo } of provas) {
+        expect(nucleo.a100Mm, `${superficie} com o meio em ${meio}`).toBeLessThanOrEqual(hoje.a100Mm);
+        expect(nucleo.a100Mm, `${superficie} com o meio em ${meio} piorou contra a medida`).toBeLessThanOrEqual(tetos[String(meio)][superficie] * 1.02 + 0.001);
+        nucleo.cristaPontual.forEach((c, k) => expect(c.maxima, `${superficie} com o meio em ${meio}, crista da ${c.nome}`).toBeLessThanOrEqual(hoje.cristaPontual[k].maxima));
+      }
     }
   });
 
@@ -190,11 +199,17 @@ describe('a opção alisarSuperficie no núcleo (etapa B)', () => {
     const com = gaiolaPorRede({ ...base, alisarSuperficie: true });
     expect(com.passo.regularizacao).toEqual({ tipo: 'variacaoDeCurvatura' });
     expect(com.alisamento).toBe(null);
-    /* o miolo fica como o preenchimento o pôs (o da rede com liso: false), com a cota de peso 0,003 */
+    /* o miolo fica como o preenchimento pelas curvas vizinhas o pôs, sem o alisamento pela normal, com a cota de peso 0,003; as curvas
+       são as da rede com liso: false, bit a bit, e no paraboloide, que é aditivo, o miolo também é o dela (a menos de 1e-9 mm) */
     const cotasDoMiolo = com.passo.medidas.filter((m) => typeof m === 'object');
     expect(cotasDoMiolo.length).toBe(sem.passo.medidas.filter((m) => typeof m === 'object').length);
     expect(cotasDoMiolo.every((m) => m.peso === 0.003)).toBe(true);
-    expect(com.pontos).toEqual(gaiolaPorRede({ ...base, liso: false }).pontos);
+    const semAlisar = gaiolaPorRede({ ...base, liso: false });
+    expect(Object.keys(com.pontos)).toEqual(Object.keys(semAlisar.pontos));
+    for (const [nome, p] of Object.entries(com.pontos)) {
+      if (com.origens[nome].tipo !== 'retalho') expect(p, nome).toEqual(semAlisar.pontos[nome]);
+      else expect(Math.hypot(p[0] - semAlisar.pontos[nome][0], p[1] - semAlisar.pontos[nome][1], p[2] - semAlisar.pontos[nome][2]), nome).toBeLessThan(1e-12);
+    }
     expect(gaiolaPorRede({ ...base, alisarSuperficie: { onda: 200 } }).passo.regularizacao).toEqual({ tipo: 'variacaoDeCurvatura', onda: 0.2 });
     expect(gaiolaPorRede({ ...base, alisarSuperficie: true, liso: false }).passo).toEqual(com.passo);
     const comPeso = gaiolaPorRede({ ...base, alisarSuperficie: true, interior: 0.5 });
