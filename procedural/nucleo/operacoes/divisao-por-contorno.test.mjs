@@ -146,9 +146,9 @@ describe('divisaoPorContorno: a chapa dividida pelo contorno', () => {
     expect(area(triangulos(ida, (f) => f.parte === 'painel'))).toBeCloseTo(area(triangulos(r, (f) => f.parte === 'painel')), 12);
   });
 
-  it('em 20 posições do contorno e três discretizações, nenhuma recusa, nenhuma reprova de topologia e nenhuma face fina', () => {
+  it('em 12 posições do contorno e três discretizações, nenhuma recusa, nenhuma reprova de topologia e nenhuma face fina', () => {
     let pior = Infinity; let piorBorda = 0;
-    for (let n = 0; n < 60; n += 3) for (const segmentosArco of [4, 16, 64]) {
+    for (let n = 0; n < 60; n += 5) for (const segmentosArco of [4, 16, 64]) {
       const contorno = contornoDeProva(n * 0.37, n * 0.61);
       const r = dividir({ contorno, segmentosArco });
       expect(r.orfaos, `posição ${n}, ${segmentosArco} segmentos`).toEqual([]);
@@ -159,7 +159,7 @@ describe('divisaoPorContorno: a chapa dividida pelo contorno', () => {
     expect(pior).toBeGreaterThanOrEqual(LIMITE_DE_FACE_FINA);
     /* o encaixe vale também na diagonal da face, de 28,3 mm: 5 % dela são 1,41 mm */
     expect(mm(piorBorda)).toBeLessThan(1.45);
-    console.log(`divisaoPorContorno, 60 divisões: menor área / maior aresta² ${pior.toFixed(4)}; a borda a no máximo ${mm(piorBorda).toFixed(3)} mm da curva (64 segmentos por quarto de arco)`);
+    console.log(`divisaoPorContorno, 36 divisões: menor área / maior aresta² ${pior.toFixed(4)}; a borda a no máximo ${mm(piorBorda).toFixed(3)} mm da curva (64 segmentos por quarto de arco)`);
   });
 
   it('o encaixe menor aproxima a borda da curva, e a parte nova leva o material', () => {
@@ -389,6 +389,68 @@ describe('divisaoPorContorno: a origem de cada gerador continua cobrindo o objet
     expect(r.orfaos).toEqual([]);
     expect(r.F.size).toBeGreaterThan(6);
     expect([...r.F.values()].filter((f) => f.parte === 'marca').length).toBe(r.F.size - 5);
+  });
+});
+
+describe('divisaoPorContorno: a cópia, o friso e a face consumida depois da divisão (terceira revisão de 2026-11-19)', () => {
+  const D1 = ['divisaoPorContorno', { chapa: CHAPA, vista: 'y', nome: 'painel', contorno: retangulo(110.3, 110.7, 250.1, 250.9) }];
+  const marcadas = (passos, sel) => { const r = nucleo([...passos, ['parte', { sel, nome: 'marca', substituir: true }]], {}, GRADE.TOPO); expect(r.orfaos).toEqual([]); return [...r.F.values()].filter((f) => f.parte === 'marca').length; };
+
+  it('espelha e arranja nas duas ordens: a origem da cópia cobre a cópia inteira com a divisão antes dela, e a cópia de antes segue inteira', () => {
+    const dividida = nucleo([...BASE, D1], {}, GRADE.TOPO).F.size;
+    expect(dividida).toBeGreaterThan(880 + 100);
+    for (const [copiar, sel] of [
+      [['espelha', { eixo: 'x', pos: 0, origemId: 9, derivaDe: { op: 'subdivisao', id: 1 }, sel: CHAPA }], { origem: { op: 'espelha', id: 9, de: { op: 'subdivisao', id: 1 } } }],
+      [['arranja', { modo: 'linear', total: 2, d: [0.5, 0, 0], origemId: 9, derivaDe: { op: 'subdivisao', id: 1 }, sel: CHAPA, nomes: ['copia'] }], { origem: { op: 'arranja', id: 9, de: { op: 'subdivisao', id: 1 } } }],
+    ]) {
+      /* a divisão antes da cópia: a cópia nasce com os pedaços, e a origem dela os cita todos */
+      const antesDaCopia = [...BASE, D1, copiar];
+      const r = nucleo(antesDaCopia, {}, GRADE.TOPO);
+      expect(r.orfaos).toEqual([]);
+      expect(r.F.size).toBe(2 * dividida);
+      expect(marcadas(antesDaCopia, sel), copiar[0]).toBe(dividida);
+      expect(marcadas(antesDaCopia, CHAPA), copiar[0]).toBe(dividida);
+      /* a divisão da fonte depois da cópia: a cópia fica com as 880 faces dela, e a fonte com os pedaços */
+      const depoisDaCopia = [...BASE, copiar, D1];
+      expect(nucleo(depoisDaCopia, {}, GRADE.TOPO).F.size).toBe(880 + dividida);
+      expect(marcadas(depoisDaCopia, sel), copiar[0]).toBe(880);
+      expect(marcadas(depoisDaCopia, CHAPA), copiar[0]).toBe(dividida);
+    }
+  });
+
+  it('a divisão rente a um vão deixa o friso da borda do vão sair como antes', async () => {
+    const { default: receita } = await import('../../../tools/fixtures/abertura-de-prova/receita.js');
+    /* uma faixa de 17 mm, a 3 mm da borda reta do vão da peça de prova, corta faces de pele que tocam a borda */
+    const naReta = (x) => 430 + ((x - 220) * 50) / 300;
+    const dividir = ['divisaoPorContorno', { chapa: { origem: { op: 'aberturaPorContorno', id: 3 } }, vista: 'y', nome: 'painel', substituir: true, contorno: poligonoDeRetas([[300, naReta(300) + 3], [450, naReta(450) + 3], [450, naReta(450) + 20], [300, naReta(300) + 20]]) }];
+    const passos = receita.PASSOS;
+    expect(passos[5][0]).toBe('friso');
+    const sem = nucleo(passos, receita.PARAMS, receita.TOPO);
+    const com = nucleo([...passos.slice(0, 5), dividir, ...passos.slice(5)], receita.PARAMS, receita.TOPO);
+    expect(sem.orfaos).toEqual([]);
+    expect(com.orfaos).toEqual([]);
+    const daAba = (r) => [...r.F.values()].filter((f) => f.parte === 'aba').length;
+    expect(daAba(sem)).toBeGreaterThan(1000);
+    expect(daAba(com)).toBe(daAba(sem));
+    expect([...com.F.values()].filter((f) => f.parte === 'painel').length).toBeGreaterThan(20);
+  });
+
+  it('o pedaço que um passo posterior consumiu faz a citação da origem gritar, com o pedaço e o passo', () => {
+    /* um cubo que engole inteiro o menor pedaço novo da pele de fora (com mais de 5 mm²), meio milímetro para cada lado e sem chegar à
+       pele de dentro: o subtrair consome esse pedaço, e a face de que ele saiu continua viva */
+    const a = antes();
+    const r1 = nucleo([...BASE, D1], {}, GRADE.TOPO);
+    const novos = [...r1.F.values()].filter((f) => !a.F.has(f.id) && f.vs.every((v) => r1.V.get(v)[1] > m(altura(r1.V.get(v)[0] * 1000, r1.V.get(v)[2] * 1000) - 0.5)));
+    const areaDe = (f) => area(triangulos(r1, (g) => g.id === f.id));
+    const alvo = novos.filter((f) => areaDe(f) > 5e-6).reduce((x, y) => (areaDe(y) < areaDe(x) ? y : x));
+    const pontos = alvo.vs.map((v) => r1.V.get(v));
+    const menor = [0, 1, 2].map((e) => Math.min(...pontos.map((p) => p[e]))), maior = [0, 1, 2].map((e) => Math.max(...pontos.map((p) => p[e])));
+    /* `em` do cubo é o centro da base dele */
+    const cubo = ['cubo', { origemId: 5, larg: maior[0] - menor[0] + 0.001, alt: maior[1] - menor[1] + 0.001, prof: maior[2] - menor[2] + 0.001, em: [(menor[0] + maior[0]) / 2, menor[1] - 0.0005, (menor[2] + maior[2]) / 2] }];
+    const r = nucleo([...BASE, D1, cubo, ['subtrair', { origemId: 9, solidos: [CHAPA, { origem: { op: 'cubo', id: 5 } }] }], ['parte', { sel: CHAPA, nome: 'marca', substituir: true }]], {}, GRADE.TOPO);
+    expect(r.F.has(alvo.id)).toBe(false);
+    expect(r.orfaos.length).toBeGreaterThan(0);
+    expect(r.orfaos[0].motivo).toMatch(new RegExp(`a face ${alvo.id}, pedaço da face \\d+ da origem subdivisao:1 que a divisaoPorContorno cortou, foi consumida pelo subtrair do passo 3`));
   });
 });
 

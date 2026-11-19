@@ -86,6 +86,7 @@ import { diagnosticarContorno } from '../contorno.js';
 import { ErroDePerfil, triangularPerfil } from '../perfil2d.js';
 import { convexo, fundir, melhorInicio, pedacosConvexos } from '../pedacos-convexos.js';
 import { LIMITE_DE_FACE_FINA } from '../topologia.js';
+import { comOsPedacosDaDivisao } from '../pedacos-da-divisao.js';
 
 /** As vistas: o eixo ao longo do qual o contorno é projetado e os eixos de u e v no plano do desenho. */
 export const VISTAS = Object.freeze({ x: Object.freeze({ eixo: 0, u: 2, v: 1 }), y: Object.freeze({ eixo: 1, u: 0, v: 2 }), z: Object.freeze({ eixo: 2, u: 0, v: 1 }) });
@@ -1687,7 +1688,7 @@ export function bordaDaAbertura(st, origem, { espelho = false } = {}) {
   const parede = new Set(registro.parede);
   const volta = espelho ? registro.espelho.borda.fora : registro.borda.fora;
   const naVolta = new Set(volta);
-  const pele = registro.faces.filter((f) => st.F.has(f) && !parede.has(f) && st.F.get(f).vs.some((v) => naVolta.has(v)));
+  const pele = comOsPedacosDaDivisao(st, registro.faces).filter((f) => st.F.has(f) && !parede.has(f) && st.F.get(f).vs.some((v) => naVolta.has(v)));
   const pontos = []; const normais = [];
   for (const v of volta) {
     const p = st.V.get(v);

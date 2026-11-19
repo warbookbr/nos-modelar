@@ -39,7 +39,10 @@
    e a resolução de origem do núcleo (`comPedacosDaDivisao`, em `nucleo.js`) entrega os pedaços logo depois da face, qualquer que seja o
    jeito de o gerador guardar as faces (a lista da subdivisão, a grade do plano, o mapa de cópias do espelha, a face nomeada de um cubo).
    A seleção pela origem continua cobrindo o objeto inteiro, e uma segunda divisão acha as faces da primeira. A origem citada dentro
-   de outra (o `de` de uma cópia) resolve sem os pedaços, porque a cópia conhece as faces da fonte como eram.
+   de outra (o `de` de uma cópia) resolve com os pedaços também: a cópia feita depois da divisão copiou os pedaços, e a feita antes
+   pula o pedaço que não conhece, nos resolvedores do `espelha` e do `arranja`. Os leitores que leem o registro direto (a borda de uma
+   abertura para o friso, a costura de uma booleana) passam a lista pelos mesmos pedaços (`pedacos-da-divisao.js`), e o pedaço que um
+   passo posterior consumiu faz a citação da origem gritar.
 
    AS FACES QUE O CONTORNO SÓ ENCOSTA. A face cujos pedaços caem todos do mesmo lado, sem vértice novo, fica como estava, com o id e os
    cantos na mesma ordem: o contorno que corre sobre as arestas dela não a corta.

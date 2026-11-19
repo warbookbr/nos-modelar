@@ -76,6 +76,7 @@ import { moldeDeDentro, ErroDoMolde } from '../molde-de-dentro.js';
 import { refinarFaixaDaCostura } from './refino-da-costura.js';
 import { memoizarPura } from '../memoria-de-pura.js';
 import { areaMinimaDe, limparNoEstado } from './limpar-lascas.js';
+import { comOsPedacosDaDivisao } from '../pedacos-da-divisao.js';
 
 /* Fusão dos pedaços coplanares da booleana comum: o quanto, em fração do tamanho da peça, o polígono fundido pode sair do
    próprio plano, e o seno da curva para dentro que ainda se aceita num canto dele. */
@@ -1467,7 +1468,7 @@ export function criarOperacoesBooleanas(servicos) {
         ? `a face ${f} da origem ${de.op}:${de.id} foi consumida pelo ${c.op} do passo ${c.passo}, e o sólido dessa origem ficou aberto; arredonde a costura antes do passo ${c.passo}`
         : `a face ${f} da origem ${de.op}:${de.id} foi removida depois que ela nasceu, e o sólido dessa origem ficou aberto; arredonde a costura antes de remover a face`);
     }
-    const faces = registro.faces.filter((f) => st.F.has(f));
+    const faces = comOsPedacosDaDivisao(st, registro.faces).filter((f) => st.F.has(f));
     if (!faces.length) return grita(st, i, op, 'de', `origem ${de.op}:${de.id} não tem face viva`);
     {
       /* sólido que um passo posterior abriu (um `subtrair` que cortou a

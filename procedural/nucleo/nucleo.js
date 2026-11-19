@@ -32,6 +32,7 @@ import { criarOperacoesAtributos } from './operacoes/atributos.js';
 import { criarOperacoesBooleanas } from './operacoes/booleanas.js';
 import { criarOperacoesAberturaPorContorno } from './operacoes/abertura-por-contorno.js';
 import { criarOperacoesDivisaoPorContorno } from './operacoes/divisao-por-contorno.js';
+import { comOsPedacosDaDivisao, ehPedacoDaDivisao, faceDeAntesDaDivisao } from './pedacos-da-divisao.js';
 import { criarOperacoesLimparLascas } from './operacoes/limpar-lascas.js';
 import { erroDaCargaDaManifold, manifoldCarregada } from './manifold.js';
 import { lerOnde, resolverOnde } from './selecao-geometrica.js';
@@ -1308,6 +1309,8 @@ const CONTRATOS_ORIGEM = {
       const faces = [];
       for (const original of fonte.faces) {
         const copia = registro.copias.get(original);
+        /* o pedaço que a divisão por contorno tirou da fonte depois do espelho não tem cópia: a cópia é a da face de antes */
+        if (copia == null && ehPedacoDaDivisao(st, original)) continue;
         if (copia == null || !st.F.has(copia)) return { erro: `cópia da face ${original} da origem derivada não existe` };
         faces.push(copia);
       }
@@ -1410,6 +1413,8 @@ const CONTRATOS_ORIGEM = {
         const mapa = registro.copias[k];
         for (const original of fonte.faces) {
           const copia = mapa.get(original);
+          /* o pedaço que a divisão por contorno tirou da fonte depois do arranjo não tem cópia: a cópia é a da face de antes */
+          if (copia == null && ehPedacoDaDivisao(st, original)) continue;
           /* PERTINÊNCIA: a face citada por `de` tem de ser uma face da fonte
              DESTE arranjo. `de` que aponta para outra primitiva cai aqui. */
           if (copia == null) return { erro: `a face ${original}, citada por de, não pertence à fonte da origem arranja:${origem.id} (a fonte declarada é ${JSON.stringify(registro.derivaDe)}) — este arranjo não copiou face nenhuma dela` };
@@ -1985,23 +1990,25 @@ function resolverOrigemBruta(st, origem) {
   if (!registros.length) return { erro: `origem ${origem.op}:${origem.id} inexistente ou ainda não criada` };
   if (registros.length !== 1) return { erro: `origem ${origem.id} ambígua: ${registros.length} geradores declararam esta identidade` };
   if (registros[0].op !== origem.op) return { erro: `origem ${origem.id} foi declarada por '${registros[0].op}', não por '${origem.op}'` };
-  /* a origem citada dentro de outra (o `de` de uma cópia) resolve sem os pedaços: a cópia conhece as faces da fonte como eram */
-  profundidadeDaOrigem++;
-  let resolvida;
-  try { resolvida = validacao.contrato.resolver(st, registros[0], origem); } finally { profundidadeDaOrigem--; }
-  return profundidadeDaOrigem === 0 ? comPedacosDaDivisao(st, resolvida) : resolvida;
+  return comPedacosDaDivisao(st, validacao.contrato.resolver(st, registros[0], origem), origem);
 }
-let profundidadeDaOrigem = 0;
 
 /* A face que a `divisaoPorContorno` cortou continua sendo a mesma superfície, em pedaços: quem cita a face por origem cita os pedaços
    dela, logo depois dela, qualquer que seja o jeito de o gerador guardar as faces (lista, grade, mapa de cópias ou endereço de uma face
-   só). `st.pedacosDaDivisao` leva a face cortada aos pedaços novos, e o pedaço cortado de novo aos dele. */
-function comPedacosDaDivisao(st, resolvida) {
-  const pedacos = st.pedacosDaDivisao;
-  if (!pedacos?.size || !Array.isArray(resolvida?.faces) || !resolvida.faces.some((f) => pedacos.has(f))) return resolvida;
-  const faces = []; const postas = new Set();
-  const poe = (f) => { if (postas.has(f)) return; postas.add(f); faces.push(f); for (const p of pedacos.get(f) ?? []) if (st.F.has(p)) poe(p); };
-  for (const f of resolvida.faces) poe(f);
+   só). Vale também para a origem citada dentro de outra (o `de` de uma cópia): a cópia feita depois da divisão copiou os pedaços, e a
+   feita antes pula o pedaço que não conhece (`ehPedacoDaDivisao`, nos resolvedores do `espelha` e do `arranja`). O pedaço que um passo
+   posterior consumiu grita, como a face consumida de qualquer origem; o que foi só apagado sai da lista. */
+function comPedacosDaDivisao(st, resolvida, origem) {
+  if (!Array.isArray(resolvida?.faces)) return resolvida;
+  const todas = comOsPedacosDaDivisao(st, resolvida.faces);
+  if (todas === resolvida.faces) return resolvida;
+  const daOrigem = new Set(resolvida.faces);
+  const faces = [];
+  for (const f of todas) {
+    if (daOrigem.has(f) || st.F.has(f)) { faces.push(f); continue; }
+    const consumo = conferirConsumo(st, f, `a face ${f}, pedaço da face ${faceDeAntesDaDivisao(st, f)} da origem ${origem.op}:${origem.id} que a divisaoPorContorno cortou,`);
+    if (consumo) return { erro: consumo };
+  }
   return { ...resolvida, faces };
 }
 

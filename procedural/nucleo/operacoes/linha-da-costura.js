@@ -15,8 +15,10 @@
    a pessoa escolheu por imagem em 2026-11-15, depois do arco, da borda tangente e das escamas na malha (o registro está no
    banco de provas da costura em nó de tubos). Por baixo, o perfil fecha por dentro do material. */
 
+import { comOsPedacosDaDivisao, faceDeAntesDaDivisao } from '../pedacos-da-divisao.js';
+
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
-const soma = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
+const soma =(a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
 const mult = (a, k) => [a[0] * k, a[1] * k, a[2] * k];
 const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 const cruz = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
@@ -181,10 +183,12 @@ export function linhaDaCostura(st, costura, { passo, passoFino = passo, alcance,
   const lida = lerCostura(st, costura);
   if (lida.erro) return lida;
   const { registro, de, entre } = lida;
-  const faces = registro.faces.filter((f) => st.F.has(f));
-  const perdidas = registro.faces.length - faces.length;
+  /* a face que a divisão por contorno cortou vale com os pedaços dela, e cada pedaço é do operando da face de antes */
+  const faces = comOsPedacosDaDivisao(st, registro.faces).filter((f) => st.F.has(f));
+  const perdidas = registro.faces.filter((f) => !st.F.has(f)).length;
   if (perdidas) return { erro: ['costura', `${perdidas} face(s) da origem unir:${de.id} foram removidas ou consumidas por um passo posterior; ponha o friso logo depois do unir`] };
-  const donos = registro.donos ?? {};
+  let donos = registro.donos ?? {};
+  if (faces.some((f) => donos[f] == null)) { donos = { ...donos }; for (const f of faces) if (donos[f] == null) donos[f] = donos[faceDeAntesDaDivisao(st, f)]; }
   const facesDaAresta = new Map();
   for (const fid of faces) {
     const vs = st.F.get(fid).vs;

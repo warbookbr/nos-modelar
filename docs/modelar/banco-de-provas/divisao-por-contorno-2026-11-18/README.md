@@ -20,7 +20,7 @@ A chapa por grade de `tools/fixtures/aberturas-em-teste/chapas.js`: 400 por 400 
 
 ## As medidas
 
-Saída de `npx vitest run procedural/nucleo/operacoes/divisao-por-contorno.test.mjs` (24 testes, 9 s):
+Saída de `npx vitest run procedural/nucleo/operacoes/divisao-por-contorno.test.mjs` (35 testes, 10 s):
 
 | Prova | Medida |
 |---|---|
@@ -37,7 +37,7 @@ Com `encaixe: 0.02` a borda fica a menos de 0,5 mm da curva na mesma chapa.
 
 ## A bateria de posições
 
-O contorno deslocado de 0,37 mm em x e 0,61 mm em z a cada passo, em 60 posições, com 4, 16 e 64 segmentos por quarto de arco, são 180 divisões por valor de encaixe (medido por script fora do repositório; o teste trava 20 posições, 60 divisões).
+O contorno deslocado de 0,37 mm em x e 0,61 mm em z a cada passo, em 60 posições, com 4, 16 e 64 segmentos por quarto de arco, são 180 divisões por valor de encaixe (medido por script fora do repositório; o teste trava 12 posições, 36 divisões).
 
 | Encaixe | Recusas | Reprovas de topologia | Menor área / maior aresta² |
 |---|---|---|---|
@@ -67,11 +67,19 @@ Depois das correções, a bateria de 180 posições continua com 0 recusas e 0 r
 
 ## A segunda revisão, de 2026-11-19
 
-A lista de campos de origem feita à mão cobria a subdivisão e deixava de fora a grade do plano, as faixas do lathe, as laterais do cilindro e o mapa de cópias do espelha e do arranja: sobre um plano a seleção pela origem perdia 15 de 51 faces, e sobre a cópia de um espelha 181 de 1056. A lista saiu. O passo anota em `st.pedacosDaDivisao` os pedaços de cada face cortada, e a resolução de origem do núcleo (`comPedacosDaDivisao`, em `procedural/nucleo/nucleo.js`) entrega os pedaços logo depois da face, para qualquer gerador. O registro de cada gerador não é alterado, e por isso o endereço de uma face só (a face nomeada de um cubo) e o mapa de cópias, que não são listas, também funcionam sem recusa. A origem citada dentro de outra (o `de` de uma cópia) resolve sem os pedaços, de modo que dividir a fonte depois do espelho não quebra a cópia. Há um teste por gerador (subdivisão, plano, lathe, cilindro, espelha, arranja e a face de um cubo): a seleção pela origem marca as faces de antes mais todos os pedaços novos, e a segunda divisão, por um contorno que contém o primeiro, não deixa face da primeira parte para trás.
+A lista de campos de origem feita à mão cobria a subdivisão e deixava de fora a grade do plano, as faixas do lathe, as laterais do cilindro e o mapa de cópias do espelha e do arranja: sobre um plano a seleção pela origem perdia 15 de 51 faces, e sobre a cópia de um espelha 181 de 1056. A lista saiu. O passo anota em `st.pedacosDaDivisao` os pedaços de cada face cortada, e a resolução de origem do núcleo (`comPedacosDaDivisao`, em `procedural/nucleo/nucleo.js`) entrega os pedaços logo depois da face, para qualquer gerador. O registro de cada gerador não é alterado, e por isso o endereço de uma face só (a face nomeada de um cubo) e o mapa de cópias, que não são listas, também funcionam sem recusa. A origem citada dentro de outra (o `de` de uma cópia) resolvia sem os pedaços nesta volta, o que a terceira revisão derrubou (a seção seguinte). Há um teste por gerador (subdivisão, plano, lathe, cilindro, espelha, arranja e a face de um cubo): a seleção pela origem marca as faces de antes mais todos os pedaços novos, e a segunda divisão, por um contorno que contém o primeiro, não deixa face da primeira parte para trás.
 
 O contorno exatamente sobre as arestas mudava faces que só encostava: girava os cantos na chapa plana e partia quadriláteros não planos em dois triângulos do mesmo lado. A face cujos pedaços caem todos do mesmo lado, sem vértice novo, agora fica como estava. No teste, o contorno pelas arestas de um bloco de faces da pele de fora deixa a malha inteira igual à de antes, vértices e cantos, nas chapas plana e curva. Nos oito casos do ataque (bloco e L, pelas arestas da pele de fora e da de dentro, nas chapas curva e plana) nenhuma face de antes muda e nenhuma face nova aparece (880 faces antes e depois).
 
 A recusa da borda diz "toca ou cruza".
+
+## A terceira revisão, de 2026-11-19
+
+Com a divisão antes da cópia (subdivisão, divisão, espelha ou arranja, e depois a citação da cópia), a cópia perdia os pedaços: 832 de 1000 faces marcadas num ataque e 880 de 1048 no outro. A fonte citada dentro da cópia resolvia sem os pedaços, por um contador de profundidade, e a cópia tinha copiado os pedaços. O contador saiu, por decisão da pessoa: a fonte aninhada resolve com os pedaços, e os resolvedores do `espelha` e do `arranja` pulam o pedaço que não está no mapa da cópia, porque nasceu depois dela. O teste cobre as duas ordens nos dois geradores: com a divisão antes, a origem da cópia marca as 1048 faces dela; com a divisão depois, a cópia fica com as 880 e a fonte com as 1048.
+
+O friso da borda de um vão lia `registro.faces` da abertura direto e, com uma divisão rente ao vão, gritava que nenhuma face tinha o trecho da borda. Os três leitores diretos do registro passam a lista pelos pedaços, por `comOsPedacosDaDivisao` de `procedural/nucleo/pedacos-da-divisao.js`: `bordaDaAbertura` (`abertura-por-contorno.js`, a linha do import e a da lista `pele`), `arredondarCostura` (`booleanas.js`, a linha do import e a da lista `faces`) e `linhaDaCostura` (`linha-da-costura.js`, o import, a lista de faces, a conta das perdidas e o operando de cada pedaço, que é o da face de antes). As duas primeiras são empréstimo ao plano da correção de superfície. No teste, a faixa de 17 mm a 3 mm da borda reta do vão da peça de prova da abertura deixa a aba com as mesmas 1356 faces, sem recusa.
+
+O pedaço que um passo posterior consumiu saía calado da lista; agora a citação da origem grita com o pedaço, a face de que ele saiu e o passo que o consumiu, como a face consumida de qualquer origem.
 
 ## As recusas
 
