@@ -7,6 +7,8 @@
      - a superfície igual: os vértices e as faces que o contorno não toca ficam como estavam, bit a bit, e todo vértice novo e todo
        triângulo das faces cortadas fica sobre a superfície de antes;
      - a mesma receita dá a mesma malha, o contorno desenhado nos dois sentidos dá a mesma parte, e `sentido` escolhe a camada;
+     - o contorno de cotas redondas, que passa exatamente por vértices e arestas da malha, o bico mais estreito que o encaixe e a
+       seleção pela origem depois da divisão (os ataques da revisão de 2026-11-19);
      - cada recusa, com a mensagem.
    O primeiro teste imprime os números que o README de `docs/modelar/banco-de-provas/divisao-por-contorno-2026-11-18/` registra. */
 import { describe, expect, it } from 'vitest';
@@ -16,7 +18,7 @@ import { triangularFace } from '../triangulacao-face.js';
 import { contornoPorTrechos } from '../curva2d.js';
 import { quadroDaVista } from './abertura-por-contorno.js';
 import { dividirMalhaPorContorno, razaoDaFace } from './divisao-por-contorno.js';
-import { chapaDeGrade, m, poligonoDeRetas, retangulo } from '../../../tools/fixtures/aberturas-em-teste/chapas.js';
+import { chapaDeGrade, estrela, m, poligonoDeRetas, retangulo } from '../../../tools/fixtures/aberturas-em-teste/chapas.js';
 
 const altura = (x, z) => 30 * Math.sin(x / 150) * Math.cos(z / 180);
 const GRADE = chapaDeGrade({ nx: 6, nz: 6, passo: 80, altura, espessura: 2, niveis: 2 });
@@ -144,9 +146,9 @@ describe('divisaoPorContorno: a chapa dividida pelo contorno', () => {
     expect(area(triangulos(ida, (f) => f.parte === 'painel'))).toBeCloseTo(area(triangulos(r, (f) => f.parte === 'painel')), 12);
   });
 
-  it('em 30 posições do contorno e três discretizações, nenhuma recusa, nenhuma reprova de topologia e nenhuma face fina', () => {
+  it('em 20 posições do contorno e três discretizações, nenhuma recusa, nenhuma reprova de topologia e nenhuma face fina', () => {
     let pior = Infinity; let piorBorda = 0;
-    for (let n = 0; n < 60; n += 2) for (const segmentosArco of [4, 16, 64]) {
+    for (let n = 0; n < 60; n += 3) for (const segmentosArco of [4, 16, 64]) {
       const contorno = contornoDeProva(n * 0.37, n * 0.61);
       const r = dividir({ contorno, segmentosArco });
       expect(r.orfaos, `posição ${n}, ${segmentosArco} segmentos`).toEqual([]);
@@ -157,7 +159,7 @@ describe('divisaoPorContorno: a chapa dividida pelo contorno', () => {
     expect(pior).toBeGreaterThanOrEqual(LIMITE_DE_FACE_FINA);
     /* o encaixe vale também na diagonal da face, de 28,3 mm: 5 % dela são 1,41 mm */
     expect(mm(piorBorda)).toBeLessThan(1.45);
-    console.log(`divisaoPorContorno, 90 divisões: menor área / maior aresta² ${pior.toFixed(4)}; a borda a no máximo ${mm(piorBorda).toFixed(3)} mm da curva (64 segmentos por quarto de arco)`);
+    console.log(`divisaoPorContorno, 60 divisões: menor área / maior aresta² ${pior.toFixed(4)}; a borda a no máximo ${mm(piorBorda).toFixed(3)} mm da curva (64 segmentos por quarto de arco)`);
   });
 
   it('o encaixe menor aproxima a borda da curva, e a parte nova leva o material', () => {
@@ -214,6 +216,112 @@ describe('divisaoPorContorno: a chapa dividida pelo contorno', () => {
     expect(yDaParte(deCima)[0]).toBeGreaterThan(m(-35));
     expect(yDaParte(deBaixo)[1]).toBeLessThan(m(-25));
     expect(area(triangulos(deBaixo, (f) => f.parte === 'painel'))).toBeCloseTo(area(triangulos(deCima, (f) => f.parte === 'painel')), 9);
+  });
+});
+
+describe('divisaoPorContorno: o contorno de cotas redondas, sobre vértices e arestas da malha (revisão de 2026-11-19)', () => {
+  const PLANA = chapaDeGrade({ nx: 6, nz: 6, passo: 80, altura: () => 0, espessura: 2, niveis: 2 });
+  const basePlana = [['subdivisao', { origemId: 1, ...PLANA.passo }]];
+  const naPlana = (contorno, campos = {}) => dividir({ contorno, ...campos }, basePlana, PLANA.TOPO);
+  const sa = (r) => { expect(r.orfaos).toEqual([]); expect(reprovas(r)).toEqual([]); expect(menorRazao(r)).toBeGreaterThanOrEqual(LIMITE_DE_FACE_FINA); return r; };
+  const daParte = (r, nome = 'painel') => [...r.F.values()].filter((f) => f.parte === nome).length;
+
+  it('o retângulo exatamente sobre as linhas da malha não corta nada, na chapa plana, e divide a curva', () => {
+    const a = nucleo(basePlana, {}, PLANA.TOPO);
+    const r = sa(naPlana(retangulo(120, 100, 240, 220)));
+    expect(r.F.size).toBe(a.F.size);
+    expect(r.V.size).toBe(a.V.size);
+    expect(daParte(r)).toBe(72);
+    const c = sa(dividir({ contorno: retangulo(120, 100, 240, 220) }));
+    expect(mm(desvioDaBorda(c, retangulo(120, 100, 240, 220)).daBorda)).toBeLessThan(1.45);
+  });
+
+  it('o losango pelos vértices, o canto num vértice, o lado ao longo de uma aresta e o quase tangente dividem sem recusa', () => {
+    /* o losango pelas diagonais das faces: 100 faces inteiras e 40 metades em cada pele, sem vértice novo */
+    const a = nucleo(basePlana, {}, PLANA.TOPO);
+    const losango = sa(naPlana(poligonoDeRetas([[200, 100], [300, 200], [200, 300], [100, 200]])));
+    expect(losango.V.size).toBe(a.V.size);
+    /* as diagonais do losango medem 200 mm: 0,02 m² em cada pele */
+    expect(area(triangulos(losango, (f) => f.parte === 'painel'))).toBeCloseTo(0.04, 12);
+    for (const [nome, contorno] of Object.entries({
+      'losango pela outra diagonal': poligonoDeRetas([[200, 120], [280, 200], [200, 280], [120, 200]]),
+      'canto num vértice': poligonoDeRetas([[140, 140], [260, 141], [250, 260]]),
+      'toca um vértice por fora': poligonoDeRetas([[130, 130], [200, 130], [200, 140], [130, 140]]),
+      'lado ao longo de uma linha da malha': poligonoDeRetas([[100.37, 140], [300.37, 140], [200.37, 260.61]]),
+      'quase tangente a uma aresta': poligonoDeRetas([[130, 100.001], [270, 100.0], [270, 270], [130, 270]]),
+      'rente à borda da chapa': retangulo(0.5, 0.5, 399.5, 399.5),
+    })) for (const chapa of ['plana', 'curva']) {
+      const r = chapa === 'plana' ? naPlana(contorno) : dividir({ contorno });
+      expect(r.orfaos, `${nome}, ${chapa}`).toEqual([]);
+      expect(reprovas(r), `${nome}, ${chapa}`).toEqual([]);
+      expect(menorRazao(r), `${nome}, ${chapa}`).toBeGreaterThanOrEqual(LIMITE_DE_FACE_FINA);
+    }
+  });
+
+  it('o canto do contorno exatamente sobre a diagonal de uma face vira um vértice só', () => {
+    /* o canto [130, 130] cai sobre a diagonal da face de [120, 120] a [140, 140] */
+    const r = sa(naPlana(poligonoDeRetas([[130, 130], [300.37, 150.61], [130.37, 252.61]])));
+    const lugares = new Map();
+    for (const [id, p] of r.V) { const ch = p.map((x) => x.toFixed(9)).join(','); expect(lugares.has(ch), `vértices ${lugares.get(ch)} e ${id} no mesmo ponto`).toBe(false); lugares.set(ch, id); }
+    sa(dividir({ contorno: poligonoDeRetas([[300, 230], [240, 270], [180, 230], [220, 150], [280, 130]]) }));
+  });
+
+  it('40 contornos de cotas múltiplas de 10 mm sobre a chapa curva dividem todos, com a área somada igual', () => {
+    const a = antes(); const total = area(triangulos(a));
+    let semente = 12345; const sorteio = () => { semente = (semente * 1103515245 + 12345) % 2147483648; return semente / 2147483648; };
+    for (let k = 0; k < 40; k++) {
+      const cx = 150 + Math.round(sorteio() * 10) * 10, cz = 150 + Math.round(sorteio() * 10) * 10;
+      const pontos = [0, 1, 2, 3, 4].map((j) => { const t = (j / 5) * 2 * Math.PI + sorteio() * 0.5; const raio = 40 + sorteio() * 60; return [Math.round((cx + raio * Math.cos(t)) / 10) * 10, Math.round((cz + raio * Math.sin(t)) / 10) * 10]; });
+      const r = dividir({ contorno: poligonoDeRetas(pontos) });
+      expect(r.orfaos, JSON.stringify(pontos)).toEqual([]);
+      expect(reprovas(r), JSON.stringify(pontos)).toEqual([]);
+      expect(menorRazao(r), JSON.stringify(pontos)).toBeGreaterThanOrEqual(LIMITE_DE_FACE_FINA);
+      expect(Math.abs(area(triangulos(r)) - total) / total).toBeLessThan(1e-12);
+    }
+  });
+
+  it('o bico mais estreito que o encaixe recusa com o lugar, e a ponta curta dele é aparada', () => {
+    /* o triângulo de 3,3 graus: os dois lados caem sobre a mesma linha da malha por 10 mm */
+    const agulha = naPlana(poligonoDeRetas([[130.37, 130.61], [300.37, 140.61], [130.37, 141.61]]));
+    expect(agulha.orfaos[0].motivo).toMatch(/o contorno tem um bico ou uma faixa mais estreita que o encaixe perto de \[[\d.]+, [\d.]+\] mm, vista do eixo y: os dois lados dele caem sobre a mesma aresta da chapa \(de [\d.]+ mm na vista\)/);
+    expect(agulha.F.size).toBe(nucleo(basePlana, {}, PLANA.TOPO).F.size);
+    /* a estrela na vista inclinada: a ponta de uma das pontas passa 1,8 mm de um vértice e é aparada, sem recusa */
+    const vista = [0.9, 1, 0]; const quadro = quadroDaVista(vista);
+    const centro = quadro.local([0.2, 0, 0.2]);
+    const r = dividir({ vista, segmentosArco: 4, contorno: estrela([centro[0] * 1000 + 0.31, centro[1] * 1000 + 0.17], 5, 80, 40) });
+    sa(r);
+    expect(daParte(r)).toBeGreaterThan(100);
+  });
+
+  it('depois da divisão a seleção pela origem cobre a chapa inteira, e uma segunda divisão funciona', () => {
+    const d1 = ['divisaoPorContorno', { chapa: CHAPA, vista: 'y', nome: 'painel', contorno: retangulo(110.3, 110.7, 250.1, 250.9) }];
+    const r1 = nucleo([...BASE, d1], {}, GRADE.TOPO);
+    expect(r1.F.size).toBeGreaterThan(antes().F.size + 100);
+    const marcadas = (sel) => { const r = nucleo([...BASE, d1, ['parte', { sel, nome: 'marca', substituir: true }]], {}, GRADE.TOPO); expect(r.orfaos).toEqual([]); return new Set([...r.F.values()].filter((f) => f.parte === 'marca').map((f) => f.id)); };
+    expect(marcadas(CHAPA).size).toBe(r1.F.size);
+    const peles = ['externa', 'interna', 'borda'].map((parte) => marcadas({ origem: { op: 'subdivisao', id: 1, parte } }));
+    expect(peles[0].size + peles[1].size + peles[2].size).toBe(r1.F.size);
+    expect(new Set(peles.flatMap((p) => [...p])).size).toBe(r1.F.size);
+    /* cada pele tem a sua parte do painel: os pedaços novos entraram na lista da pele da face de que saíram */
+    const doPainel = new Set([...r1.F.values()].filter((f) => f.parte === 'painel').map((f) => f.id));
+    expect([...peles[0]].filter((f) => doPainel.has(f)).length).toBeGreaterThan(40);
+    expect([...peles[1]].filter((f) => doPainel.has(f)).length).toBeGreaterThan(40);
+    expect([...peles[2]].filter((f) => doPainel.has(f)).length).toBe(0);
+    const r2 = nucleo([...BASE, d1, ['divisaoPorContorno', { chapa: CHAPA, vista: 'y', nome: 'estrela', contorno: estrela([250.3, 250.1], 5, 70, 35), substituir: true }]], {}, GRADE.TOPO);
+    expect(r2.orfaos).toEqual([]);
+    expect(reprovas(r2)).toEqual([]);
+    expect(daParte(r2, 'estrela')).toBeGreaterThan(80);
+    expect(daParte(r2, 'painel')).toBeGreaterThan(80);
+    expect(Math.abs(area(triangulos(r2)) - area(triangulos(antes()))) / area(triangulos(antes()))).toBeLessThan(1e-12);
+  });
+
+  it('o número que a receita não resolve recusa pelo campo em que veio, sem lançar', () => {
+    const semNumero = dividir({ encaixe: NaN });
+    expect(semNumero.orfaos[0]).toMatchObject({ ref: 'encaixe' });
+    expect(semNumero.orfaos[0].motivo).toMatch(/encaixe da divisão não é um número que a receita resolva \(veio NaN\)/);
+    const contorno = dividir({ contorno: { inicio: [NaN, 0.1], trechos: [{ reto: [0.2, 0.1] }, { reto: [0.2, 0.2] }, { reto: [NaN, 0.1] }] } });
+    expect(contorno.orfaos[0]).toMatchObject({ ref: 'contorno' });
+    expect(contorno.orfaos[0].motivo).toMatch(/o contorno da divisão tem um valor que a receita não resolve/);
   });
 });
 

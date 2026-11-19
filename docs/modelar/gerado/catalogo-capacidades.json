@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.catalogo-capacidades@1",
-  "assinatura": "sha256:8241dff4294a65486b2319c1ebbe87c330c704779c059fd172d3e56a849b33a6",
+  "assinatura": "sha256:f29e99febfb1e043c477460f62eb67d969b571c148f8770405fc823e7922e6d9",
   "modulos": [
     {
       "id": "mecanifica.motor.nucleo",
@@ -2606,7 +2606,7 @@
       }
     }
   ],
-  "assinaturaComExtensoes": "sha256:cd9a55dde98ba439d795bbf83bc66c3669761c4f1334ec3e8ab21fd5872cedfa",
+  "assinaturaComExtensoes": "sha256:d2f674be3edc7fa65cef7d06a20caaf62fef84a8fe0db8bd1dd36cc7c5b1524a",
   "extensoes": [
     {
       "id": "mecanifica.operacao.articulacao",

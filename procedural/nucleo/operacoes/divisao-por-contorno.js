@@ -26,12 +26,27 @@
    mesma, porque nenhum vértice de antes se move. O pedaço que ainda assim sai abaixo do limite de face fina do projeto
    (`LIMITE_DE_FACE_FINA`) faz a operação recusar com a medida, sem mexer na malha.
 
+   OS EMPATES. O contorno de cotas redondas passa exatamente por vértices e arestas da malha. O sinal zero é decidido como se a malha
+   estivesse deslocada de uma distância menor que qualquer outra (`ladoDoVertice`, `ladoDoPonto`), sem mudar coordenada nenhuma, e o
+   cruzamento que cai sobre um vértice usa o vértice. O canto do contorno sobre uma aresta é um vértice só, e as passagens que caem no
+   mesmo lugar do contorno são postas na ordem que alterna entrar e sair (`alternar`).
+
+   O BICO. Onde os dois lados de um bico mais estreito que o encaixe caem sobre a mesma aresta, a borda passaria por ela nos dois
+   sentidos e a parte não teria largura. O trecho de até duas vezes o encaixe da maior aresta do triângulo sai da borda (a ponta do
+   bico é aparada), e o mais longo recusa com o lugar.
+
+   AS ORIGENS. Os pedaços novos de uma face cortada entram nas listas de faces das origens publicadas que citam a face
+   (`herdarNasOrigens`), como na booleana: `{ origem: { op: 'subdivisao', id } }`, com ou sem `parte`, continua cobrindo a chapa inteira,
+   e uma segunda divisão acha as faces da primeira. As origens de endereço posicional (as faces nomeadas de um cubo) não são listas e
+   não recebem os pedaços.
+
    A CAMADA (`sentido: '+'` ou `'-'`), como na abertura: no corpo que a reta do eixo atravessa mais de uma vez, corta só a camada
    vista desse lado. A chapa fechada (com espessura) tem duas peles por camada, e as duas são cortadas; a seleção aberta tem uma.
 
    AS RECUSAS, todas antes de mexer na malha: contorno que se cruza, ponto do contorno fora da chapa na vista, contorno que cruza a
    borda da chapa ou a parede de um vão, chapa atravessada mais de uma vez sem `sentido`, contorno que cabe inteiro numa face,
-   espinho que entra e sai pelo mesmo vértice, pedaço fino e face que já é de outra parte sem `substituir: true`. */
+   espinho que entra e sai pelo mesmo vértice, bico mais estreito que o encaixe, pedaço fino e face que já é de outra parte sem
+   `substituir: true`. */
 import { contornoPorTrechos, ErroDeCurva } from '../curva2d.js';
 import { diagnosticarContorno, limparContorno } from '../contorno.js';
 import { convexo, desvioDoPlano, fundir, lequeDe, melhorInicio, pedacosConvexos } from '../pedacos-convexos.js';
@@ -54,6 +69,15 @@ const cruz = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[
 const tamanho = (a) => Math.hypot(a[0], a[1], a[2]);
 const orient = (a, b, c) => (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
 const dist2 = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+/* OS EMPATES. O contorno de cotas redondas passa exatamente por vértices e por arestas da malha, e o sinal zero decidido caso a caso
+   dava respostas que não cabem juntas (um trecho entrava num triângulo e não saía). Os dois predicados abaixo decidem o zero como se
+   a malha inteira estivesse deslocada de [e, e²] na vista, com e menor que qualquer distância: é uma posição de verdade, então todas
+   as respostas cabem juntas, e nenhuma coordenada muda. O cruzamento que essa decisão põe a distância nula de um vértice usa o
+   vértice, pelo encaixe. */
+const ladoDoVertice = (p, q, A) => { const v = orient(p, q, A); if (v !== 0) return v > 0; const dy = q[1] - p[1]; return dy !== 0 ? dy < 0 : q[0] - p[0] > 0; };
+const ladoDoPonto = (A, B, p) => { const v = orient(A, B, p); if (v !== 0) return v > 0; const dy = B[1] - A[1]; return dy !== 0 ? dy > 0 : B[0] - A[0] < 0; };
+/* dois pontos do contorno a menos disto, em comprimento de lado, são o mesmo lugar */
+const MESMO_LUGAR = 1e-9;
 const chave = (a, b) => (a < b ? `${a}:${b}` : `${b}:${a}`);
 const mm = (x) => (x * 1000).toFixed(2);
 const texto2 = (p) => `[${mm(p[0])}, ${mm(p[1])}] mm`;
@@ -123,6 +147,36 @@ function melhorTriangulacao(ids, p2, p3, sinal) {
   const desce = (i, j) => { if (j - i < 2) return; const k = apice[i][j]; tri.push([ids[i], ids[k], ids[j]]); desce(i, k); desce(k, j); };
   desce(0, n - 1);
   return tri;
+}
+
+/* Põe as passagens do contorno por um triângulo na ordem em que ele as faz: pela posição no contorno e, entre as que caem no mesmo
+   lugar dele (as que o encaixe leva ao mesmo vértice), na ordem que alterna entrar e sair com as vizinhas. Devolve false quando
+   nenhuma ordem alterna. */
+function alternar(eventos) {
+  if (!eventos.length) return true;
+  eventos.sort((m, n) => m.s - n.s);
+  const grupos = [];
+  for (const ev of eventos) { const g = grupos[grupos.length - 1]; if (g && ev.s - g[g.length - 1].s <= MESMO_LUGAR) g.push(ev); else grupos.push([ev]); }
+  const saldo = grupos.map((g) => g.reduce((n, ev) => n + (ev.entra ? 1 : -1), 0));
+  if (saldo.some((n) => Math.abs(n) > 1)) return false;
+  const ancora = saldo.findIndex((n) => n !== 0);
+  /* o grupo com uma passagem a mais começa e termina por ela; o grupo par começa pelo contrário do fim do anterior, e, sem âncora, por entrar */
+  const comeca = new Array(grupos.length);
+  let fim = ancora < 0 ? false : null;
+  for (let j = 0; j < grupos.length; j++) {
+    const k = ancora < 0 ? j : (ancora + j) % grupos.length;
+    if (saldo[k] !== 0) { const tipo = saldo[k] > 0; if (fim !== null && fim === tipo) return false; comeca[k] = tipo; fim = tipo; } else { comeca[k] = !fim; }
+  }
+  if (ancora >= 0 && fim === comeca[ancora]) return false;
+  const ordenados = [];
+  grupos.forEach((g, k) => {
+    const entram = g.filter((ev) => ev.entra), saem = g.filter((ev) => !ev.entra);
+    let tipo = comeca[k];
+    while (entram.length || saem.length) { const fonte = tipo ? entram : saem; if (!fonte.length) return; ordenados.push(fonte.shift()); tipo = !tipo; }
+  });
+  if (ordenados.length !== eventos.length) return false;
+  eventos.splice(0, eventos.length, ...ordenados);
+  return eventos.length % 2 === 0;
 }
 
 /**
@@ -218,48 +272,53 @@ export function dividirMalhaPorContorno({ V, F, ids, quadro, poligono, sentido =
   const T = tri.filter((t) => candidatas.has(t.f));
 
   /* ---- os cruzamentos: cada aresta dos triângulos contra cada lado do contorno ---- */
+  const semBorda = (q0, quadroNome) => ({ ref: 'contorno', erro: `o contorno cruza a borda da chapa ou a parede de um vão em ${texto2(q0)}, vista ${quadroNome}: a divisão corta só a pele da chapa, e o contorno precisa ficar inteiro sobre ela` });
   const reais = new Map();
   for (const f of candidatas) { const vs = F.get(f).vs; for (let k = 0; k < vs.length; k++) { const ch = chave(vs[k], vs[(k + 1) % vs.length]); reais.set(ch, (reais.get(ch) ?? 0) + 1); } }
   const lados = P.map((p, k) => { const q = P[(k + 1) % N]; return [p, q, Math.min(p[0], q[0]), Math.min(p[1], q[1]), Math.max(p[0], q[0]), Math.max(p[1], q[1])]; });
   const nosDaAresta = new Map();
   const cantoUsado = new Uint16Array(N); const cantoNaAresta = new Uint8Array(N);
-  const medidas = { cruzamentos: 0, encaixados: 0, cantos: 0, cantosEncaixados: 0, facesCortadas: 0, pedacos: 0, desvioDoEncaixe: 0 };
+  const medidas = { cruzamentos: 0, encaixados: 0, cantos: 0, cantosEncaixados: 0, bicosAparados: 0, facesCortadas: 0, pedacos: 0, desvioDoEncaixe: 0 };
   for (const t of T) for (let e = 0; e < 3; e++) {
     const x = t.v[e], y = t.v[(e + 1) % 3];
     const ch = chave(x, y);
     if (nosDaAresta.has(ch)) continue;
     const u = Math.min(x, y), v = Math.max(x, y);
     const A = p2(u), B = p2(v);
-    const nos = [];
+    const nos = []; const doCanto = new Map();
     nosDaAresta.set(ch, nos);
     const a0 = Math.min(A[0], B[0]), a1 = Math.max(A[0], B[0]), b0 = Math.min(A[1], B[1]), b1 = Math.max(A[1], B[1]);
     if (a1 < caixa[0] || a0 > caixa[2] || b1 < caixa[1] || b0 > caixa[3]) continue;
     for (let k = 0; k < N; k++) {
       const [p, q, u0, v0, u1, v1] = lados[k];
       if (a1 < u0 || a0 > u1 || b1 < v0 || b0 > v1) continue;
-      const d1 = orient(p, q, A), d2 = orient(p, q, B);
-      if ((d1 >= 0) === (d2 >= 0)) continue;
-      const d3 = orient(A, B, p), d4 = orient(A, B, q);
-      if ((d3 >= 0) === (d4 >= 0)) continue;
+      if (ladoDoVertice(p, q, A) === ladoDoVertice(p, q, B)) continue;
+      const para = ladoDoPonto(A, B, q);
+      if (ladoDoPonto(A, B, p) === para) continue;
+      const d1 = orient(p, q, A), d2 = orient(p, q, B), d3 = orient(A, B, p), d4 = orient(A, B, q);
       const t1 = d1 / (d1 - d2);
       const onde = [A[0] + (B[0] - A[0]) * t1, A[1] + (B[1] - A[1]) * t1];
-      if (reais.has(ch) && reais.get(ch) !== 2) return { ref: 'contorno', erro: `o contorno cruza a borda da chapa ou a parede de um vão em ${texto2(onde)}, vista ${quadro.nome}: a divisão corta só a pele da chapa, e o contorno precisa ficar inteiro sobre ela` };
-      let id;
-      if (t1 <= encaixe) id = u; else if (t1 >= 1 - encaixe) id = v;
-      else { const a3 = V.get(u), b3 = V.get(v); id = criar([0, 1, 2].map((c) => a3[c] + (b3[c] - a3[c]) * t1), [onde[0], onde[1], A[2] + (B[2] - A[2]) * t1]); }
-      medidas.cruzamentos++;
-      if (id >= 0) { medidas.encaixados++; medidas.desvioDoEncaixe = Math.max(medidas.desvioDoEncaixe, dist2(onde, p2(id))); }
-      /* o canto do contorno que cai sobre a aresta é o próprio cruzamento */
+      if (reais.has(ch) && reais.get(ch) !== 2) return semBorda(onde, quadro.nome);
+      /* o canto do contorno que cai sobre a aresta é o próprio cruzamento: um vértice só, para os dois lados que chegam a ele */
       const tc = d3 / (d3 - d4);
-      if (tc <= 1e-9) cantoNaAresta[k] = 1;
-      if (tc >= 1 - 1e-9) cantoNaAresta[(k + 1) % N] = 1;
-      nos.push({ s: k + tc, t: t1, id, para: d4 >= 0 });
+      const canto = tc <= MESMO_LUGAR ? k : tc >= 1 - MESMO_LUGAR ? (k + 1) % N : null;
+      if (canto != null) cantoNaAresta[canto] = 1;
+      let id = canto != null ? doCanto.get(canto) : undefined;
+      if (id === undefined) {
+        if (t1 <= encaixe) id = u; else if (t1 >= 1 - encaixe) id = v;
+        else { const a3 = V.get(u), b3 = V.get(v); id = criar([0, 1, 2].map((c) => a3[c] + (b3[c] - a3[c]) * t1), [onde[0], onde[1], A[2] + (B[2] - A[2]) * t1]); }
+        if (canto != null) doCanto.set(canto, id);
+        if (id >= 0) { medidas.encaixados++; medidas.desvioDoEncaixe = Math.max(medidas.desvioDoEncaixe, dist2(onde, p2(id))); }
+      }
+      medidas.cruzamentos++;
+      let sNo = canto != null ? canto : k + tc;
+      if (sNo >= N - MESMO_LUGAR) sNo = 0;
+      nos.push({ s: sNo, t: t1, id, para });
     }
     nos.sort((m, n) => m.t - n.t || m.s - n.s);
   }
 
   /* ---- cada triângulo: os trechos do contorno que passam por ele ---- */
-  const semBorda = (q0, quadroNome) => ({ ref: 'contorno', erro: `o contorno cruza a borda da chapa ou a parede de um vão em ${texto2(q0)}, vista ${quadroNome}: a divisão corta só a pele da chapa, e o contorno precisa ficar inteiro sobre ela` });
   const trechosDe = new Map();   // índice do triângulo -> as sequências de ids de cada trecho, da entrada à saída
   for (let ti = 0; ti < T.length; ti++) {
     const t = T[ti];
@@ -271,18 +330,17 @@ export function dividirMalhaPorContorno({ V, F, ids, quadro, poligono, sentido =
     const eventos = [];
     for (let e = 0; e < 3; e++) {
       const x = t.v[e], y = t.v[(e + 1) % 3], z = t.v[(e + 2) % 3];
-      const ladoDoTerceiro = orient(p2(Math.min(x, y)), p2(Math.max(x, y)), p2(z)) >= 0;
+      const ladoDoTerceiro = orient(p2(Math.min(x, y)), p2(Math.max(x, y)), p2(z)) > 0;
       for (const no of arestas[e]) if (!no.apoio) eventos.push({ s: no.s, id: no.id, entra: no.para === ladoDoTerceiro });
     }
-    eventos.sort((m, n) => m.s - n.s || (m.entra === n.entra ? 0 : m.entra ? -1 : 1));
+    if (!alternar(eventos)) return incoerente(`as passagens do contorno pelo triângulo em ${texto2(q[0])} não alternam entre entrar e sair`);
     const curto = encaixe * Math.min(dist2(q[0], q[1]), dist2(q[1], q[2]), dist2(q[2], q[0]));
     const seqs = [];
     for (let j = 0; j < eventos.length; j++) {
       const de = eventos[j];
       if (!de.entra) continue;
       const ate = eventos[(j + 1) % eventos.length];
-      if (ate.entra || eventos.length < 2) return incoerente('um trecho do contorno entra num triângulo e não sai');
-      let vao = ate.s - de.s; if (vao < 0) vao += N;
+      let vao = ate.s - de.s; if (Math.abs(vao) <= MESMO_LUGAR) vao = 0; else if (vao < 0) vao += N;
       /* os cantos do contorno neste trecho; o que fica a menos do encaixe do ponto anterior da borda, ou do fim do trecho, sai
          (a borda segue reta por ali, e o leque que ele abriria para um vértice distante seria uma lasca) */
       const cantos = []; let anterior = p2(de.id);
@@ -337,7 +395,14 @@ export function dividirMalhaPorContorno({ V, F, ids, quadro, poligono, sentido =
   /* ---- cada triângulo: o laço dele com os vértices novos das arestas, e os pedaços que os trechos deixam ---- */
   const direcao = new Set();     // 'a>b': a borda nova passa de a para b no sentido do contorno
   const barreira = new Set();    // a mesma aresta, sem sentido
-  const marca = (a, b) => { direcao.add(`${a}>${b}`); barreira.add(chave(a, b)); };
+  /* a aresta por onde a borda passa nos dois sentidos (um bico mais estreito que o encaixe, fechado sobre ela) não separa nada: o trecho
+     de até duas vezes o encaixe da maior aresta do triângulo sai da borda (a ponta do bico é aparada), e o mais longo recusa, com o lugar */
+  let bicoFechado = null; let aparo = 0;
+  const marca = (a, b) => {
+    if (!direcao.delete(`${b}>${a}`)) { direcao.add(`${a}>${b}`); barreira.add(chave(a, b)); return; }
+    barreira.delete(chave(a, b));
+    if (dist2(p2(a), p2(b)) > aparo) bicoFechado ??= [a, b]; else medidas.bicosAparados++;
+  };
   const pedacosDe = new Map();   // face -> [{ vs, sinal }]
   const inteiros = [];
   for (let ti = 0; ti < T.length; ti++) {
@@ -354,7 +419,7 @@ export function dividirMalhaPorContorno({ V, F, ids, quadro, poligono, sentido =
       laco.push(x); poe(x, e); poe(y, e);
       for (let j = 0; j < nos.length; j++) {
         const no = nos[crescente ? j : nos.length - 1 - j];
-        if (no.id < 0) { laco.push(no.id); poe(no.id, e); }
+        if (no.id < 0 && !arestaDe.has(no.id)) { laco.push(no.id); poe(no.id, e); }
       }
     }
     /* o trecho que passa por um ponto da borda do triângulo (um vértice dele ou um vértice novo de aresta) se parte nele */
@@ -368,6 +433,7 @@ export function dividirMalhaPorContorno({ V, F, ids, quadro, poligono, sentido =
       cadeias.push(atual);
     }
     let pedacos = [laco];
+    { const q = t.v.map(p2); aparo = 2 * encaixe * Math.max(dist2(q[0], q[1]), dist2(q[1], q[2]), dist2(q[2], q[0])); }
     for (const c of cadeias) {
       if (c.length < 2) continue;
       const x0 = c[0], x1 = c[c.length - 1];
@@ -406,6 +472,10 @@ export function dividirMalhaPorContorno({ V, F, ids, quadro, poligono, sentido =
       for (const C of pedacosConvexos(p3, tris, n)) pedacosDe.get(t.f).push({ vs: C, sinal: t.sinal });
     }
   }
+  if (bicoFechado) {
+    const [a, b] = bicoFechado.map(p2);
+    return { ref: 'contorno', erro: `o contorno tem um bico ou uma faixa mais estreita que o encaixe perto de ${texto2([(a[0] + b[0]) / 2, (a[1] + b[1]) / 2])}, vista ${quadro.nome}: os dois lados dele caem sobre a mesma aresta da chapa (de ${mm(dist2(a, b))} mm na vista), e a parte ali não teria largura; alargue o bico, reduza o encaixe (${encaixe}) ou use uma chapa de faces menores` };
+  }
   /* os triângulos que o contorno não tocou, de uma face que ele tocou, entram inteiros como pedaços */
   for (const t of inteiros) if (pedacosDe.has(t.f)) pedacosDe.get(t.f).push({ vs: [...t.v], sinal: t.sinal });
   for (let k = 0; k < N; k++) {
@@ -427,14 +497,18 @@ export function dividirMalhaPorContorno({ V, F, ids, quadro, poligono, sentido =
   const voto = new Int8Array(nosDoGrafo.length);
   for (const ch of barreira) for (const k of vizinhos.get(ch) ?? []) {
     const no = nosDoGrafo[k];
-    if (!no.sinal) continue;
+    if (!no.sinal || voto[k]) continue;
+    let aFavor = false; let contra = false;
     for (let j = 0; j < no.vs.length; j++) {
       const a = no.vs[j], b = no.vs[(j + 1) % no.vs.length];
       const v = direcao.has(`${a}>${b}`) ? no.sinal : direcao.has(`${b}>${a}`) ? -no.sinal : 0;
-      if (!v) continue;
-      if (voto[k] && voto[k] !== v) return incoerente('um pedaço ficou dos dois lados da borda');
-      voto[k] = v;
+      if (v > 0) aFavor = true; else if (v < 0) contra = true;
     }
+    if (aFavor !== contra) { voto[k] = aFavor ? 1 : -1; continue; }
+    /* a face mais estreita na vista que o encaixe (a parede da borda da chapa, vista quase de perfil) fica entre duas bordas que o
+       encaixe levou para as arestas dela, e os sentidos delas se contradizem: vale o lado em que o centro dela cai no contorno */
+    const centro = no.vs.map(p2).reduce((c, x) => [c[0] + x[0] / no.vs.length, c[1] + x[1] / no.vs.length], [0, 0]);
+    voto[k] = pontoNoLaco(centro, P) ? 1 : -1;
   }
   const dentroDoGrafo = new Uint8Array(nosDoGrafo.length);
   const fila = [];
@@ -496,6 +570,28 @@ export function dividirMalhaPorContorno({ V, F, ids, quadro, poligono, sentido =
   return { faces, dentro, vertices: novos, medidas };
 }
 
+/* Os campos de um registro de origem que são listas de faces: a face cortada que está numa delas leva os pedaços novos para lá. */
+const LISTAS_DE_FACES = ['faces', 'externa', 'interna', 'borda', 'parede', 'lente', 'lateral', 'pontas', 'costura'];
+
+/** Os pedaços novos de uma face cortada entram nas origens publicadas que citam a face, como na booleana: a seleção por origem
+ *  (`{ origem: { op: 'subdivisao', id } }`, com ou sem `parte`, e os grupos dela) continua cobrindo a chapa inteira depois da divisão. */
+function herdarNasOrigens(st, novasDe) {
+  if (!novasDe.size) return;
+  const herdar = (lista) => {
+    if (!Array.isArray(lista) || !lista.every(Number.isInteger)) return;
+    const acrescimo = lista.flatMap((f) => novasDe.get(f) ?? []);
+    if (!acrescimo.length) return;
+    let crescente = true; for (let k = 1; k < lista.length && crescente; k++) crescente = lista[k - 1] < lista[k];
+    lista.push(...acrescimo);
+    if (crescente) lista.sort((x, y) => x - y);
+  };
+  for (const registros of st.origens.values()) for (const registro of registros) {
+    for (const campo of LISTAS_DE_FACES) herdar(registro[campo]);
+    if (registro.grupos && typeof registro.grupos === 'object') for (const lista of Object.values(registro.grupos)) herdar(lista);
+    if (registro.espelho && typeof registro.espelho === 'object') for (const campo of LISTAS_DE_FACES) herdar(registro.espelho[campo]);
+  }
+}
+
 export function criarOperacoesDivisaoPorContorno(servicos) {
   const { idDoPasso, grita, addV, addF, resolverSelecao, nomeDeParteInvalido, temNomeDeParte, parte } = servicos;
   const OP = 'divisaoPorContorno';
@@ -510,12 +606,12 @@ export function criarOperacoesDivisaoPorContorno(servicos) {
     if (material !== null && (typeof material !== 'string' || !Object.hasOwn(st.materiais, material))) return grita(st, i, OP, 'material', `o material '${material}' da parte nova não existe em MATERIAIS (${Object.keys(st.materiais).map((n) => `'${n}'`).join(', ') || 'nenhum declarado'})`);
     if (a.substituir != null && a.substituir !== true) return grita(st, i, OP, 'substituir', `substituir só aceita o literal true (a região de dentro sai da parte que já tinha e passa à parte nova); veio ${JSON.stringify(a.substituir)}`);
     if (a.sentido != null && a.sentido !== '+' && a.sentido !== '-') return grita(st, i, OP, 'sentido', `sentido só aceita '+' ou '-', o lado do eixo da vista de onde se olha a camada que se divide, num corpo que a reta do eixo atravessa mais de uma vez; veio ${JSON.stringify(a.sentido)}`);
-    let segmentosArco; let segmentosSpline; let encaixe;
-    try {
-      segmentosArco = a.segmentosArco == null ? SEGMENTOS_ARCO_PADRAO : st.num(a.segmentosArco);
-      segmentosSpline = a.segmentosSpline == null ? undefined : st.num(a.segmentosSpline);
-      encaixe = a.encaixe == null ? ENCAIXE_PADRAO : st.num(a.encaixe);
-    } catch (e) { return grita(st, i, OP, 'segmentosArco', String(e.message)); }
+    /* cada número no campo dele: o valor que `st.num` não resolve (um NaN, um nome que não existe) recusa pelo campo em que veio */
+    const lido = {};
+    for (const [campo, padrao] of [['segmentosArco', SEGMENTOS_ARCO_PADRAO], ['segmentosSpline', undefined], ['encaixe', ENCAIXE_PADRAO]]) {
+      try { lido[campo] = a[campo] == null ? padrao : st.num(a[campo]); } catch (e) { return grita(st, i, OP, campo, `${campo} da divisão não é um número que a receita resolva (veio ${String(a[campo])}): ${e.message}`); }
+    }
+    const { segmentosArco, segmentosSpline, encaixe } = lido;
     for (const [campo, n] of [['segmentosArco', segmentosArco], ['segmentosSpline', segmentosSpline]]) {
       if (n != null && (!Number.isInteger(n) || n < 1 || n > SEGMENTOS_MAXIMOS)) return grita(st, i, OP, campo, `${campo} da divisão precisa ser inteiro de 1 a ${SEGMENTOS_MAXIMOS}, e veio ${n}`);
     }
@@ -525,8 +621,10 @@ export function criarOperacoesDivisaoPorContorno(servicos) {
     let poligono;
     try { poligono = contornoPorTrechos(contorno, { campo: 'contorno', num: (x) => st.num(x), segmentosArco, segmentosSpline }); } catch (e) {
       if (e instanceof ErroDeCurva) return grita(st, i, OP, e.campo, `${e.message}`);
-      throw e;
+      return grita(st, i, OP, 'contorno', `o contorno da divisão tem um valor que a receita não resolve: ${e.message}`);
     }
+    const semNumero = poligono.findIndex((p) => !Number.isFinite(p[0]) || !Number.isFinite(p[1]));
+    if (semNumero >= 0) return grita(st, i, OP, 'contorno', `o ponto ${semNumero} do contorno da divisão tem coordenada que não é número finito ([${poligono[semNumero]}]); confira o início e os trechos`);
     const diagnostico = diagnosticarContorno(poligono);
     if (diagnostico) return grita(st, i, OP, 'contorno', `o contorno da divisão se cruza: ${diagnostico.mensagem}; a parte precisa de um contorno simples, que não toque a si mesmo`);
 
@@ -551,7 +649,7 @@ export function criarOperacoesDivisaoPorContorno(servicos) {
       if (!idDe.has(v)) { const id = idDoPasso(i, proximoV++); addV(st, id, r.vertices[-1 - v]); idDe.set(v, id); }
       return idDe.get(v);
     };
-    const daParte = [...r.dentro];
+    const daParte = [...r.dentro]; const novasDe = new Map();
     for (const f of [...r.faces.keys()].sort((x, y) => x - y)) {
       const face = st.F.get(f); const pedacos = r.faces.get(f);
       pedacos.forEach((p, k) => {
@@ -564,10 +662,13 @@ export function criarOperacoesDivisaoPorContorno(servicos) {
           nf.cor = face.cor; nf.material = face.material; nf.parte = face.parte; nf.liso = face.liso; nf.solido = face.solido;
           if (st.parteAtribuidaEm?.has(f)) st.parteAtribuidaEm.set(id, st.parteAtribuidaEm.get(f));
           (st.pedacosDe ??= new Map()).set(id, f);
+          if (!novasDe.has(f)) novasDe.set(f, []);
+          novasDe.get(f).push(id);
         }
         if (p.dentro) daParte.push(id);
       });
     }
+    herdarNasOrigens(st, novasDe);
     parte(st, { nome: a.nome, ...(material !== null ? { material } : {}), ...(a.substituir === true ? { substituir: true } : {}), faces: daParte.sort((x, y) => x - y) }, i);
   }
 

@@ -12,7 +12,7 @@ O corte da `aberturaPorContorno` é a booleana de um prisma contra um sólido fe
 
 O corte traça o contorno sobre os triângulos que o adaptador desenha em cada face (`triangularFace`), que são a superfície dela. Cada aresta cruzada ganha um vértice no cruzamento, usado pelas duas faces da aresta, e cada canto do contorno ganha um vértice no plano do triângulo em que cai. Cada triângulo é dividido pelos trechos que passam por ele, e os pedaços côncavos se partem em convexos pela triangulação cujo pior triângulo é o melhor possível. O lado de cada pedaço sai do sentido do contorno, e as faces inteiras de dentro são alcançadas a partir dos pedaços de dentro sem atravessar a borda nova; se essa busca alcança um pedaço de fora, a operação recusa.
 
-O encaixe (padrão 0,05) faz o cruzamento a menos dessa fração da aresta de uma ponta usar o vértice da ponta, e o canto do contorno a menos disso de um vértice ou de uma aresta do triângulo ir para cima dele. A borda se afasta da curva no máximo essa fração da maior aresta do triângulo, e nenhum vértice de antes se move.
+O encaixe (padrão 0,05) faz o cruzamento a menos dessa fração da aresta de uma ponta usar o vértice da ponta, e o canto do contorno a menos disso de um vértice ou de uma aresta do triângulo ir para cima dele. A borda se afasta da curva no máximo essa fração da maior aresta do triângulo de antes por onde passa (a diagonal, nas faces quadradas), salvo na ponta aparada de um bico mais estreito que o encaixe, e nenhum vértice de antes se move.
 
 ## A chapa de teste
 
@@ -20,7 +20,7 @@ A chapa por grade de `tools/fixtures/aberturas-em-teste/chapas.js`: 400 por 400 
 
 ## As medidas
 
-Saída de `npx vitest run procedural/nucleo/operacoes/divisao-por-contorno.test.mjs` (17 testes, 9 s):
+Saída de `npx vitest run procedural/nucleo/operacoes/divisao-por-contorno.test.mjs` (24 testes, 9 s):
 
 | Prova | Medida |
 |---|---|
@@ -37,7 +37,7 @@ Com `encaixe: 0.02` a borda fica a menos de 0,5 mm da curva na mesma chapa.
 
 ## A bateria de posições
 
-O contorno deslocado de 0,37 mm em x e 0,61 mm em z a cada passo, em 60 posições, com 4, 16 e 64 segmentos por quarto de arco, são 180 divisões por valor de encaixe (medido por script fora do repositório; o teste trava 30 posições, 90 divisões).
+O contorno deslocado de 0,37 mm em x e 0,61 mm em z a cada passo, em 60 posições, com 4, 16 e 64 segmentos por quarto de arco, são 180 divisões por valor de encaixe (medido por script fora do repositório; o teste trava 20 posições, 60 divisões).
 
 | Encaixe | Recusas | Reprovas de topologia | Menor área / maior aresta² |
 |---|---|---|---|
@@ -49,9 +49,25 @@ Antes do encaixe de canto em aresta e da triangulação de melhor pior triângul
 
 Numa chapa de 13120 faces (quatro níveis) a divisão leva 0,33 s e sai sem reprova.
 
+## A revisão adversarial de 2026-11-19
+
+A revisão bloqueou a primeira versão com dez ataques, e as correções estão no mesmo arquivo da operação, cada uma com teste de regressão.
+
+O contorno de cotas redondas passa exatamente por vértices e arestas da malha, e a operação recusava como borda que não fechou: 29 de 40 contornos de cotas múltiplas de 10 mm, o retângulo exato sobre as linhas e o losango pelos vértices. O sinal zero era decidido caso a caso e as respostas não cabiam juntas. Agora os dois predicados do traço decidem o zero como se a malha estivesse deslocada de uma distância menor que qualquer outra, sem mudar coordenada, o cruzamento que cai sobre um vértice usa o vértice, e as passagens que caem no mesmo lugar do contorno são ordenadas para alternar entrar e sair. Os 40 contornos dividem, sem reprova de topologia nem face fina e com a área somada igual a 1e-12, e o retângulo exato na chapa plana não cria face nem vértice (72 faces na parte).
+
+O canto do contorno exatamente sobre a diagonal de triangulação de uma face criava dois vértices no mesmo ponto e um triângulo degenerado, sem recusa. O canto sobre uma aresta passou a ser um vértice só para os dois lados que chegam a ele, e o teste confere que nenhum par de vértices ocupa o mesmo ponto.
+
+Os pedaços novos não entravam nas listas de faces da origem da subdivisão, e a seleção `{ origem: { op: 'subdivisao', id: 1, parte: 'externa' } }` perdia 168 de 1048 faces depois da divisão. Os pedaços agora entram em toda lista de faces de origem que cita a face cortada (`faces`, as peles e os grupos da subdivisão, a parede e a lente da abertura, as do friso e a costura da booleana). No teste, as três peles somam as 1048 faces sem repetição e uma segunda divisão sobre a primeira sai sem reprova.
+
+O triângulo de 3,3 graus era recusado como túnel, e o lado ao longo de uma linha da malha como espinho. O lado ao longo da linha agora divide. O bico mais estreito que o encaixe, cujos dois lados caem sobre a mesma aresta, recusa com essa causa e o lugar quando o trecho passa de duas vezes o encaixe da maior aresta do triângulo (10 mm no triângulo de 3,3 graus); abaixo disso a ponta é aparada (a estrela na vista inclinada perde 1,8 mm de uma ponta). A face mais estreita na vista que o encaixe, como a parede da borda da chapa curva vista quase de perfil, recebia votos contrários das duas bordas e recusava; agora vale o lado em que o centro dela cai.
+
+`encaixe: NaN` recusava no campo `segmentosArco` e o contorno com NaN lançava exceção. Cada número recusa pelo campo em que veio, e o contorno que a receita não resolve recusa em `contorno`.
+
+Depois das correções, a bateria de 180 posições continua com 0 recusas e 0 reprovas com encaixe 0,05 (menor razão 0,0047) e 0,02 (0,0032).
+
 ## As recusas
 
-Cada uma tem teste que confere a mensagem, e `node tools/gates/recusas-exercitadas.mjs` passou a vigiar o arquivo: argumentos inválidos (`chapa`, `vista`, `nome`, `material`, `substituir`, `sentido`, `segmentosArco`, `encaixe`, `contorno`), o contorno que se cruza, o ponto do contorno fora da chapa, o contorno que cruza a borda da chapa ou uma face de perfil, a chapa furada mais de uma vez sem `sentido`, as camadas que se sobrepõem em profundidade, o contorno que cabe num triângulo só, o espinho pelo mesmo vértice, o pedaço fino com a medida, a região de dentro que se liga à de fora por trás da camada e a região que já é de outra parte sem `substituir: true`. A defesa das contas de ponto flutuante do traço não tem entrada que a alcance e está nas exceções do gate, com o motivo.
+Cada uma tem teste que confere a mensagem, e `node tools/gates/recusas-exercitadas.mjs` passou a vigiar o arquivo: argumentos inválidos (`chapa`, `vista`, `nome`, `material`, `substituir`, `sentido`, `segmentosArco`, `encaixe`, `contorno`), o contorno que se cruza, o ponto do contorno fora da chapa, o contorno que cruza a borda da chapa ou uma face de perfil, a chapa furada mais de uma vez sem `sentido`, as camadas que se sobrepõem em profundidade, o contorno que cabe num triângulo só, o espinho pelo mesmo vértice, o bico mais estreito que o encaixe, o número que a receita não resolve, o pedaço fino com a medida, a região de dentro que se liga à de fora por trás da camada e a região que já é de outra parte sem `substituir: true`. A defesa das contas de ponto flutuante do traço não tem entrada que a alcance e está nas exceções do gate, com o motivo.
 
 ## O que fica para a fatia 2
 
