@@ -20,7 +20,7 @@ A chapa por grade de `tools/fixtures/aberturas-em-teste/chapas.js`: 400 por 400 
 
 ## As medidas
 
-Saída de `npx vitest run procedural/nucleo/operacoes/divisao-por-contorno.test.mjs` (35 testes, 10 s):
+Saída de `npx vitest run procedural/nucleo/operacoes/divisao-por-contorno.test.mjs` (25 testes, 8 s; mais 12 em `divisao-por-contorno-origens.test.mjs`):
 
 | Prova | Medida |
 |---|---|
@@ -80,6 +80,18 @@ Com a divisão antes da cópia (subdivisão, divisão, espelha ou arranja, e dep
 O friso da borda de um vão lia `registro.faces` da abertura direto e, com uma divisão rente ao vão, gritava que nenhuma face tinha o trecho da borda. Os três leitores diretos do registro passam a lista pelos pedaços, por `comOsPedacosDaDivisao` de `procedural/nucleo/pedacos-da-divisao.js`: `bordaDaAbertura` (`abertura-por-contorno.js`, a linha do import e a da lista `pele`), `arredondarCostura` (`booleanas.js`, a linha do import e a da lista `faces`) e `linhaDaCostura` (`linha-da-costura.js`, o import, a lista de faces, a conta das perdidas e o operando de cada pedaço, que é o da face de antes). As duas primeiras são empréstimo ao plano da correção de superfície. No teste, a faixa de 17 mm a 3 mm da borda reta do vão da peça de prova da abertura deixa a aba com as mesmas 1356 faces, sem recusa.
 
 O pedaço que um passo posterior consumiu saía calado da lista; agora a citação da origem grita com o pedaço, a face de que ele saiu e o passo que o consumiu, como a face consumida de qualquer origem.
+
+## A quarta revisão, de 2026-11-19
+
+O `arredondarCostura` e o `limparLascas` tiram faces da malha e reescrevem as listas de faces das origens, e não tratavam o mapa de pedaços: depois de uma divisão, a citação da origem da união gritava "pedaço consumido" numa receita legítima, e a citação da subdivisão gritava pela lasca que a limpeza tinha desfeito (11 de 12 posições de um ataque). As duas operações passam a chamar `tirarDosPedacosDaDivisao` (`procedural/nucleo/pedacos-da-divisao.js`): o pedaço que saiu deixa o mapa, os pedaços dele sobem para o lugar dele, e os pedaços vivos de uma face cortada que saiu inteira entram na lista da origem no lugar dela, com o operando da face. Nos testes, a união e a concordância juntas somam a peça inteira depois de divisão e arredondamento, e a origem da subdivisão e as três peles dela somam a chapa inteira depois de divisão e limpeza, em três regulagens.
+
+A procura por outra operação do núcleo que reescreva a lista de faces de um registro de origem já publicado não achou nenhuma: fora dessas duas, só há a criação do registro pelo próprio passo e a marca `arredondadaEm`. As booleanas (o `aparar` entre elas) consomem faces sem reescrever o registro de quem as publicou, e a citação da origem com face ou pedaço consumido grita, como antes. Por isso nenhuma recusa nova entrou.
+
+A normal da borda do vão para o friso soma agora a face cortada inteira, por todos os pedaços dela, e a aba sai no mesmo lugar: o desvio dos vértices da aba com a divisão rente ao vão caiu de 0,072 mm para abaixo de 1e-9 m, e o teste confere os vértices. Em `abertura-por-contorno.js` o empréstimo cresceu para o import, a parede com os pedaços e a soma da normal em `bordaDaAbertura`; em `booleanas.js`, o import e o `aoAplicar` do `arredondarCostura`.
+
+A costura de uma união com pedaço morto grita na conta das faces perdidas, como a face morta do registro.
+
+Os testes de quem cita as faces depois da divisão passaram para `procedural/nucleo/operacoes/divisao-por-contorno-origens.test.mjs`, para cada arquivo ficar abaixo de 12 s (7,6 s e 5,2 s sozinhos).
 
 ## As recusas
 

@@ -18,6 +18,7 @@
 import { somarFacesTocadas } from '../somas-do-rastreio.js';
 import { LIMITE_DE_FACE_FINA } from '../topologia.js';
 import { limparLascas } from '../limpar-lascas.js';
+import { tirarDosPedacosDaDivisao } from '../pedacos-da-divisao.js';
 
 const OP = 'limparLascas';
 
@@ -86,6 +87,8 @@ export function limparNoEstado(st, faces, { tolerancia, limite = LIMITE_DE_FACE_
   for (const [para, de] of [...fundidos].sort((x, y) => x[0] - y[0])) st.merges.push({ de: de.sort((x, y) => x - y), para });
   for (const v of res.verticesRemovidos) st.V.delete(v);
   /* as origens que citam o que sumiu: o par de vértices da costura segue a fusão, e o dono da face que saiu deixa a lista */
+  /* os pedaços da divisão por contorno: a lasca que era pedaço sai do mapa de pedaços, e os pedaços vivos de uma face que saiu inteira entram nas listas no lugar dela */
+  const ficam = tirarDosPedacosDaDivisao(st, res.facesRemovidas);
   for (const registros of st.origens.values()) {
     for (const reg of registros) {
       if (Array.isArray(reg.arestas) && reg.arestas.every((p) => Array.isArray(p) && p.length === 2)) {
@@ -99,9 +102,9 @@ export function limparNoEstado(st, faces, { tolerancia, limite = LIMITE_DE_FACE_
         }
         reg.arestas = novas.sort((x, y) => x[0] - y[0] || x[1] - y[1]);
       }
-      if (reg.donos && typeof reg.donos === 'object') for (const fid of res.facesRemovidas) delete reg.donos[fid];
+      if (reg.donos && typeof reg.donos === 'object') for (const fid of res.facesRemovidas) { if (reg.donos[fid] != null) for (const p of ficam(fid)) reg.donos[p] ??= reg.donos[fid]; delete reg.donos[fid]; }
       /* a lista de faces do gerador deixa de ter a que sumiu: a citação da origem inteira (a união) segue valendo sem a lasca, e só a citação explícita da face diz que o passo a desfez */
-      const tira = (lista) => lista.filter((x) => !(Number.isSafeInteger(x) && res.facesRemovidas.has(x)));
+      const tira = (lista) => lista.flatMap((x) => (Number.isSafeInteger(x) && res.facesRemovidas.has(x) ? ficam(x) : [x]));
       for (const [k, v] of Object.entries(reg)) {
         if (Array.isArray(v) && v.length && v.every(Number.isSafeInteger)) reg[k] = tira(v);
         else if (v && typeof v === 'object' && !Array.isArray(v) && !(v instanceof Map) && k !== 'donos') for (const [k2, w] of Object.entries(v)) if (Array.isArray(w) && w.length && w.every(Number.isSafeInteger)) v[k2] = tira(w);

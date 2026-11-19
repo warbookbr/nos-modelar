@@ -11,3 +11,4 @@ Vale além do contrato da raiz, para quem muda arquivo de `procedural/nucleo/`.
 - Teste que leva mais de 12 s sozinho entra em `TESTES_LENTOS`, em `tools/testes-lentos.mjs`.
 - Antes de usar um ajudante de gaiola, `npm run capacidade -- <nome>` dá a ficha dele.
 - Quem muda o que `ajustarCurvaLisa` devolve para a mesma entrada soma 1 em `VERSAO_DO_AJUSTE` (`ajuste-de-curva-lisa.js`): a versão entra na impressão do ajuste guardado pelas receitas, e o dado antigo deixa de conferir até ser regravado com `node tools/modelar/regravar-ajustes-de-curva.mjs <receita>`.
+- Operação que corta faces ou que reescreve a lista de faces de uma origem já publicada trata os pedaços da divisão por contorno (`procedural/nucleo/pedacos-da-divisao.js`): quem lê `registro.faces` direto passa por `comOsPedacosDaDivisao`, e quem tira face de uma origem chama `tirarDosPedacosDaDivisao`.

@@ -18,7 +18,7 @@
 import { comOsPedacosDaDivisao, faceDeAntesDaDivisao } from '../pedacos-da-divisao.js';
 
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
-const soma =(a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
+const soma = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
 const mult = (a, k) => [a[0] * k, a[1] * k, a[2] * k];
 const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 const cruz = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
@@ -184,8 +184,9 @@ export function linhaDaCostura(st, costura, { passo, passoFino = passo, alcance,
   if (lida.erro) return lida;
   const { registro, de, entre } = lida;
   /* a face que a divisão por contorno cortou vale com os pedaços dela, e cada pedaço é do operando da face de antes */
-  const faces = comOsPedacosDaDivisao(st, registro.faces).filter((f) => st.F.has(f));
-  const perdidas = registro.faces.filter((f) => !st.F.has(f)).length;
+  const comPedacos = comOsPedacosDaDivisao(st, registro.faces);
+  const faces = comPedacos.filter((f) => st.F.has(f));
+  const perdidas = comPedacos.length - faces.length;
   if (perdidas) return { erro: ['costura', `${perdidas} face(s) da origem unir:${de.id} foram removidas ou consumidas por um passo posterior; ponha o friso logo depois do unir`] };
   let donos = registro.donos ?? {};
   if (faces.some((f) => donos[f] == null)) { donos = { ...donos }; for (const f of faces) if (donos[f] == null) donos[f] = donos[faceDeAntesDaDivisao(st, f)]; }

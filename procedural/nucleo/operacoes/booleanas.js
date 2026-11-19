@@ -76,7 +76,7 @@ import { moldeDeDentro, ErroDoMolde } from '../molde-de-dentro.js';
 import { refinarFaixaDaCostura } from './refino-da-costura.js';
 import { memoizarPura } from '../memoria-de-pura.js';
 import { areaMinimaDe, limparNoEstado } from './limpar-lascas.js';
-import { comOsPedacosDaDivisao } from '../pedacos-da-divisao.js';
+import { comOsPedacosDaDivisao, tirarDosPedacosDaDivisao } from '../pedacos-da-divisao.js';
 
 /* Fusão dos pedaços coplanares da booleana comum: o quanto, em fração do tamanho da peça, o polígono fundido pode sair do
    próprio plano, e o seno da curva para dentro que ainda se aceita num canto dele. */
@@ -2511,7 +2511,10 @@ export function criarOperacoesBooleanas(servicos) {
        união não deixam pedaço sem nome nem gritam pela face coberta. */
     const aoAplicar = ({ pedacosDeEntrada, consumidas }) => {
       const fora = new Set(consumidas);
-      registro.faces = [...registro.faces.filter((f) => !fora.has(f)), ...pedacosDeEntrada].sort((x, y) => x - y);
+      /* os pedaços da divisão por contorno: o que o arredondamento consumiu sai do mapa de pedaços, e os vivos de uma face que saiu inteira entram na lista no lugar dela */
+      const ficam = tirarDosPedacosDaDivisao(st, fora);
+      const soltos = registro.faces.filter((f) => fora.has(f)).flatMap((f) => { const p = ficam(f); if (registro.donos?.[f] != null) for (const x of p) registro.donos[x] ??= registro.donos[f]; return p; });
+      registro.faces = [...registro.faces.filter((f) => !fora.has(f)), ...pedacosDeEntrada, ...soltos].sort((x, y) => x - y);
       registro.costura = registro.costura.filter((f) => !fora.has(f));
     };
     const rodar = (tentativa) => nucleoBooleano(st, i, op, wasm, a.origemId, facesDoMolde ? [faces, facesDoMolde] : [faces], { calcular, herdaDe, liso: 45, ref: 'de', aoAplicar, estrito: restrito, centro: curvo?.centro, grade: curvo?.grade, tentativa, registroExtra: curvo ? { eixos: curvo.cadeias.map((c) => c.centros) } : {} });

@@ -86,7 +86,7 @@ import { diagnosticarContorno } from '../contorno.js';
 import { ErroDePerfil, triangularPerfil } from '../perfil2d.js';
 import { convexo, fundir, melhorInicio, pedacosConvexos } from '../pedacos-convexos.js';
 import { LIMITE_DE_FACE_FINA } from '../topologia.js';
-import { comOsPedacosDaDivisao } from '../pedacos-da-divisao.js';
+import { comOsPedacosDaDivisao, faceDeAntesDaDivisao } from '../pedacos-da-divisao.js';
 
 /** As vistas: o eixo ao longo do qual o contorno é projetado e os eixos de u e v no plano do desenho. */
 export const VISTAS = Object.freeze({ x: Object.freeze({ eixo: 0, u: 2, v: 1 }), y: Object.freeze({ eixo: 1, u: 0, v: 2 }), z: Object.freeze({ eixo: 2, u: 0, v: 1 }) });
@@ -1685,15 +1685,20 @@ export function bordaDaAbertura(st, origem, { espelho = false } = {}) {
   const registro = (st.origens.get(origem.id) ?? []).find((r) => r.op === 'aberturaPorContorno');
   if (!registro) return { erro: `o passo aberturaPorContorno da origem ${origem.id} ainda não foi executado ou gritou; ele precisa vir antes do friso` };
   if (espelho && !registro.espelho) return { erro: `o passo aberturaPorContorno da origem ${origem.id} não tem vão espelhado (simetria: 'x')` };
-  const parede = new Set(registro.parede);
+  const parede = new Set(comOsPedacosDaDivisao(st, registro.parede));
   const volta = espelho ? registro.espelho.borda.fora : registro.borda.fora;
   const naVolta = new Set(volta);
-  const pele = comOsPedacosDaDivisao(st, registro.faces).filter((f) => st.F.has(f) && !parede.has(f) && st.F.get(f).vs.some((v) => naVolta.has(v)));
+  const daChapa = comOsPedacosDaDivisao(st, registro.faces);
+  const pele = daChapa.filter((f) => st.F.has(f) && !parede.has(f) && st.F.get(f).vs.some((v) => naVolta.has(v)));
+  /* a face de pele que a divisão por contorno cortou entra na normal inteira, por todos os pedaços dela: a soma dá a normal da face de antes */
+  const pedacosDaFace = daChapa === registro.faces ? null : new Map();
+  if (pedacosDaFace) for (const f of daChapa) if (st.F.has(f) && !parede.has(f)) { const r = faceDeAntesDaDivisao(st, f); if (!pedacosDaFace.has(r)) pedacosDaFace.set(r, []); pedacosDaFace.get(r).push(f); }
   const pontos = []; const normais = [];
   for (const v of volta) {
     const p = st.V.get(v);
     if (!p) return { erro: `o vértice ${v} da borda do vão não existe mais; o friso lê a borda como o passo ${registro.passo} a deixou` };
-    const n = pele.filter((f) => st.F.get(f).vs.includes(v)).reduce((s, f) => soma(s, newell(st.F.get(f).vs.map((x) => st.V.get(x)))), [0, 0, 0]);
+    const tocam = pele.filter((f) => st.F.get(f).vs.includes(v));
+    const n = (pedacosDaFace ? [...new Set(tocam.map((f) => faceDeAntesDaDivisao(st, f)))].flatMap((r) => pedacosDaFace.get(r)) : tocam).reduce((s, f) => soma(s, newell(st.F.get(f).vs.map((x) => st.V.get(x)))), [0, 0, 0]);
     pontos.push(p); normais.push(n);
   }
   return { pontos, normais, faces: pele.map((f) => st.F.get(f).vs), cadeia: [...volta, volta[0]], espessura: espelho ? registro.espelho.espessura : registro.espessura, passo: registro.passo, temEspelho: !!registro.espelho };
