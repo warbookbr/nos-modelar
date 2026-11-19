@@ -3,8 +3,9 @@
  * (`docs/modelar/banco-de-provas/correcao-de-superficie-2026-11-16/README.md`), com o que NÃO passou marcado como CONHECIDA. */
 import { describe, expect, it } from 'vitest';
 import { gaiolaPorRede } from '../../../procedural/nucleo/gaiola-por-rede.js';
-import { definicaoDaEmenda, definicaoDaRede } from './chapas.mjs';
-import { gradeDoRetalho, pesosDaMistura, preencherGrades, preencherRede, provaDasAnaliticas } from './preenchimento-do-miolo.mjs';
+import { definicao as definicaoDaChapaLateral } from '../../../procedural/nucleo/fixtures/gaiola-por-rede-prova.js';
+import { definicaoDaChapaSimetrica, definicaoDaEmenda, definicaoDaRede, definicaoTresNoNo } from './chapas.mjs';
+import { contraPrototipo, gradeDoRetalho, pesosDaMistura, preencherGrades, preencherRede, provaDaRede, provaDasAnaliticas, provaDasEmendas } from './preenchimento-do-miolo.mjs';
 
 const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
 
@@ -63,4 +64,62 @@ describe('o preenchimento do miolo pelas curvas vizinhas, fora do núcleo', () =
       expect(p.vizinhas.comEnergia.a100Mm, JSON.stringify(definicao)).toBeLessThan(teto * p.hoje.semEnergia.a100Mm);
     }
   }, 240000);
+});
+
+/* A `vizinhas` NO NÚCLEO (2026-11-19): a `gaiolaPorRede` com `alisarSuperficie` preenche o miolo dos retalhos de quatro lados pelas curvas
+ * vizinhas. O protótipo é a conta independente: os pontos da rede com a opção ficam a menos de 1e-9 mm dos dele, a tabela pelo núcleo é a
+ * dele, e o gate da opção ligada (a distância a mais de 100 mm da borda e a crista por ponto nunca piores que sem a opção) vale nas
+ * dezoito chapas analíticas. A grade de razão 2 segue CONHECIDA em `procedural/nucleo/subdivisao-energia-de-curvatura.test.mjs`: o
+ * defeito dela é da energia no espaçamento desigual, e o preenchimento não o alcança. */
+const maiorDiferencaDeNumero = (a, b) => {
+  if (typeof a === 'number' && typeof b === 'number') return Math.abs(a - b);
+  if (a === null || typeof a !== 'object') return a === b ? 0 : Infinity;
+  return Object.keys(a).reduce((m, k) => Math.max(m, maiorDiferencaDeNumero(a[k], b?.[k])), 0);
+};
+
+describe('o preenchimento pelas curvas vizinhas no núcleo, contra o protótipo', () => {
+  it('nas dezoito chapas analíticas o núcleo dá os pontos e a tabela do protótipo, e a opção ligada nunca fica pior que sem ela', () => {
+    /* a distância a 100 mm da borda medida em 2026-11-19, com a opção, na ordem paraboloide, calota e toro */
+    const casos = [[{}, [0.0369, 0.0634, 0.0495]], [{ pontos: 16 }, [0.0358, 0.0314, 0.019]], [{ meio: [0.25, 0.25] }, [0.4974, 0.4726, 1.1054]], [{ meio: [0.25, 0.25], pontos: 16 }, [0.2358, 0.0631, 0.2285]], [{ meio: [0.3, 0.5] }, [0.3551, 0.2869, 0.1993]], [{ meio: [0.3, 0.5], pontos: 16 }, [0.0773, 0.0857, 0.0278]]];
+    let linhas = 0;
+    for (const [definicao, medidas] of casos) {
+      const provas = provaDasAnaliticas({ definicao, modos: ['vizinhas'] });
+      expect(provas.map((p) => p.superficie)).toEqual(['paraboloide', 'calota', 'toro']);
+      provas.forEach((p, k) => {
+        const onde = `${p.superficie} ${JSON.stringify(definicao)}`; const { nucleo, hoje, vizinhas } = p; linhas++;
+        expect(nucleo.contraPrototipoMm, `${onde}: os pontos do núcleo contra os do protótipo`).toBeLessThan(1e-9);
+        expect(maiorDiferencaDeNumero(vizinhas.comEnergia, nucleo.comEnergia), `${onde}: a tabela`).toBeLessThan(1e-9);
+        expect(maiorDiferencaDeNumero(vizinhas.cotaMm, nucleo.cotaMm), `${onde}: a cota do miolo`).toBeLessThan(1e-9);
+        /* o gate: nunca pior que sem a opção, nem que a opção com o preenchimento padrão (a etapa B), e não pior que a medida */
+        expect(nucleo.comEnergia.a100Mm, `${onde}: a 100 mm da borda contra a rede sem a opção`).toBeLessThanOrEqual(hoje.semEnergia.a100Mm);
+        expect(nucleo.comEnergia.a100Mm, `${onde}: a 100 mm da borda contra a etapa B`).toBeLessThanOrEqual(hoje.comEnergia.a100Mm + 1e-4);
+        expect(nucleo.comEnergia.a100Mm, `${onde}: a 100 mm da borda contra a medida`).toBeLessThanOrEqual(medidas[k] * 1.02 + 0.001);
+        for (const curva of ['h1', 'v1']) expect(nucleo.comEnergia.crista[curva], `${onde}: a crista da ${curva} contra a rede sem a opção`).toBeLessThanOrEqual(hoje.semEnergia.crista[curva]);
+      });
+    }
+    expect(linhas).toBe(18);
+  }, 600000);
+
+  it('nas chapas emendadas e na rede-sem-ruido o núcleo dá os pontos e a tabela do protótipo, e as medidas ficam as da etapa B', () => {
+    for (const p of [...provaDasEmendas({ modos: ['vizinhas'] }), provaDaRede({ modos: ['vizinhas'] })]) {
+      expect(p.nucleo.contraPrototipoMm, p.chapa).toBeLessThan(1e-9);
+      expect(maiorDiferencaDeNumero(p.vizinhas.comEnergia, p.nucleo.comEnergia), p.chapa).toBeLessThan(1e-9);
+      /* as chapas emendadas e o painel da rede são de curvatura numa direção só ou aditivos: o miolo quase não se mexe (0 e 0,003 mm) e
+         as medidas com a opção ficam as do preenchimento padrão com a energia, a menos da quarta casa */
+      expect(p.vizinhas.andouMm, p.chapa).toBeLessThan(0.01);
+      expect(maiorDiferencaDeNumero(p.hoje.comEnergia, p.nucleo.comEnergia), p.chapa).toBeLessThan(0.02);
+    }
+  }, 240000);
+
+  it('nas redes com vinco, simetria, nó em T e retalho de três e de cinco lados ao lado, os pontos do núcleo são os do protótipo', () => {
+    const redes = { 'rede-com-ruido': definicaoDaRede({}), 'chapa-simetrica': definicaoDaChapaSimetrica({}), 'rede-tres-no-no': definicaoTresNoNo(), 'emenda-g0': definicaoDaEmenda('emenda-g0'), 'chapa lateral': definicaoDaChapaLateral({}) };
+    for (const [nome, def] of Object.entries(redes)) {
+      const curvas = def.curvas.map(({ continuidade, ...c }) => c);
+      const g0 = gaiolaPorRede({ ...def, curvas, liso: false }); const gE = gaiolaPorRede({ ...def, curvas, alisarSuperficie: true });
+      expect(contraPrototipo(g0, gE) * 1000, nome).toBeLessThan(1e-9);
+    }
+    /* e ali o miolo se mexe de fato: 0,88, 0,71, 0,46 e 4,6 mm (na emenda-g0, de curvatura numa direção só, não) */
+    const lateral = definicaoDaChapaLateral({});
+    expect(preencherRede(gaiolaPorRede({ ...lateral, liso: false }), 'vizinhas').andou * 1000).toBeGreaterThan(1);
+  });
 });

@@ -28,9 +28,10 @@
  *   marcarCurvas: true põe as curvas em `passo.curvas`, e o passo `subdivisao` marca no neutro (`chapas[k].curvas`) as arestas que descendem
  *     de cada uma, para a medida da emenda ler a curva declarada; a malha não muda.
  *   alisarSuperficie: true | { onda?: mm } liga, no ajuste das cotas do passo, a energia de variação de curvatura da superfície limite: a
- *     curva de cota exata deixa de ser crista de curvatura contra o miolo. O miolo fica sem o `liso`, com a cota de peso 0,003 (`interior`
- *     junto troca o peso, e `interior: false` é recusado); a onda vale de 2 a 64 passos da gaiola; não vale com `liso` nem com curva com
- *     `continuidade`. Desligada por padrão, e experimental: não use em receita enquanto o espaçamento desigual não estiver corrigido.
+ *     curva de cota exata deixa de ser crista de curvatura contra o miolo. O miolo dos retalhos de quatro lados é preenchido pelas curvas
+ *     vizinhas (a curva seguinte da rede de cada lado; sem a opção o preenchimento não muda), fica sem o `liso` e tem a cota de peso 0,003
+ *     (`interior` junto troca o peso, e `interior: false` é recusado); a onda vale de 2 a 64 passos da gaiola; não vale com `liso` nem com
+ *     curva com `continuidade`. Desligada por padrão, e experimental: não use em receita enquanto o espaçamento desigual não estiver corrigido.
  * devolve: { pontos, passo, linha(curva), pontoDaCurva, linhas, nos, curvas, retalhos, densidades, extraordinarios, avisos, emendas?, ... }.
  * exemplo:
  *   gaiolaPorRede({ passo: 50, fora: [0, 1, 0], nos: { A: [0, 0, 0], B: [200, 0, 0], C: [200, 0, 200], D: [0, 0, 200] },
@@ -99,15 +100,17 @@
  * alisarSuperficie: true | { onda: mm }: o passo sai com `regularizacao: { tipo: 'variacaoDeCurvatura', onda? }`, e o ajuste das cotas da
  *   subdivisão troca o custo do deslocamento de cada ponto da gaiola pela energia de variação de curvatura da superfície limite
  *   (`energiaDeVariacaoDeCurvatura`, em `subdivisao.js`). A curva de cota exata deixa de ser crista de curvatura contra o miolo, que é o
- *   que a cota exata ao lado do miolo de peso 1 deixa sem a opção. Com ela o miolo dos retalhos fica como o preenchimento o pôs, sem o
+ *   que a cota exata ao lado do miolo de peso 1 deixa sem a opção. Com ela o miolo dos retalhos de quatro lados sai do preenchimento pelas
+ *   curvas vizinhas (abaixo, em O PREENCHIMENTO), fica sem o
  *   alisamento pela normal (`liso`), e a cota dele passa a ter o peso INTERIOR_COM_ENERGIA (0,003) no lugar de 1: a energia leva o miolo
  *   para onde a curvatura varia menos entre as curvas, e a cota só o segura na forma mais longa que umas dez arestas (o peso p pesa o
  *   mesmo que a energia no comprimento onda/p^(1/6)). `interior` declarado junto troca esse peso, e `interior: false` é recusado, porque
  *   sem a cota do miolo a energia tem liberdade que as curvas não tiram. `onda` é o comprimento em que a energia e a cota de peso 1 pesam
  *   o mesmo (padrão: quatro arestas medianas da gaiola; fora de 2 a 64 passos, recusa); a cota exata é restrição, e a onda não a afrouxa.
  *   Não vale junto com `liso` nem com curva com `continuidade` (recusa), nesta etapa. AINDA NÃO SERVE A RECEITA: onde o espaçamento da
- *   gaiola muda de um retalho para o outro, e no retalho grande de dupla curvatura, a superfície se afasta da forma mais que sem a opção
- *   (os números estão em `energiaDeVariacaoDeCurvatura` e no banco de provas da correção de superfície). O vinco, o
+ *   gaiola muda de um retalho para o outro a superfície se afasta da forma mais que sem a opção
+ *   (os números estão em `energiaDeVariacaoDeCurvatura` e no banco de provas da correção de superfície). O retalho grande de dupla
+ *   curvatura, que também reprovava, passou com o preenchimento pelas curvas vizinhas (as dezoito chapas analíticas do banco de provas). O vinco, o
  *   canto, a borda livre e o vértice extraordinário não têm termo na energia. A curva que não está na forma entre os pontos-chave (a
  *   interpolação dela) continua cota exata, e a superfície passa por ela: o erro da curva vira crista junto dela, e o remédio é o
  *   ponto-chave a mais. Sem a opção (o padrão), a rede e o passo são os de sempre.
@@ -119,6 +122,23 @@
  * cantos e dos meios dos lados, mais a flecha média dos meios fora da superfície sobre 1/sen²(π/n) (exata para uma forma quadrática e um
  * polígono regular); cada raio do centro ao meio de um lado é a parábola da flecha do lado, escalada pelo quadrado do comprimento, e os
  * n quadriláteros são retalhos de Coons de dois lados de curva e dois raios.
+ *
+ * O PREENCHIMENTO PELAS CURVAS VIZINHAS, só com `alisarSuperficie`. A interpolação de Coons acima mistura os dois lados opostos pela reta,
+ * e o erro dela é o produto dos dois erros de interpolação linear: nulo na forma aditiva, 0,25 mm na calota de raio 0,5 m com o retalho de
+ * 200 mm e mais de 1 mm com o de 300 mm. Com a opção, o miolo do retalho de quatro lados troca a reta de cada direção pela mistura que usa
+ * a curva seguinte da rede de cada lado (`preencherPelasVizinhas`): no ponto i de um lado, o ponto oposto do retalho de quatro lados
+ * vizinho dá um terceiro ponto, e a derivada transversal ali é a da parábola pelos três, com as cordas como parâmetro. Com vizinho dos
+ * dois lados a mistura é a cúbica de Hermite com as duas derivadas; com vizinho de um lado só, a parábola pelos três; sem vizinho, a reta,
+ * e o retalho sai igual ao de sempre. A derivada no lado compartilhado é a mesma para os dois retalhos. Não dão vizinho a borda livre, a
+ * curva vinco (de nitidez maior que zero), o retalho de n lados e o lado dividido com mais de um retalho; o plano de simetria é borda
+ * livre para esta conta (a metade espelhada não entra). O vizinho que divide só parte do lado dá a derivada às fileiras, e não entra
+ * como fileira de fora. Só os pontos das curvas entram na conta, não há sistema a resolver, e o resultado não depende da ordem dos
+ * retalhos. O preenchimento padrão continua sendo feito antes (a recusa da dobra dele vale igual), e a dobra é conferida de novo com os
+ * pontos novos. Limites medidos: o parâmetro da mistura é a corda entre as curvas, e a forma quadrática numa direção só sai exata quando
+ * as cordas são proporcionais ao parâmetro dela (sobram 0,75 mm na calota de 600 mm com retalhos de 300 mm); o miolo passa a depender da
+ * curva seguinte do vizinho, e onde a forma quebra sem vinco declarado, ou a curva vizinha tem ruído, ele pode nascer mais longe da forma
+ * que o preenchimento padrão (na chapa lateral de prova, dois dos oito retalhos de quatro lados: 1,54 contra 1,21 mm e 0,71 contra 0,45).
+ * Sem a energia por cima ele não entra: com o alisamento pela normal o ganho se desfaz, e por isso o padrão não mudou.
  *
  * A CONTINUIDADE. Os pontos da borda são compartilhados, e a superfície limite da subdivisão é C1 em toda aresta que não é vinco, de modo
  * que a tangente não quebra no lado compartilhado, salvo na curva declarada vinco. Mas dois preenchimentos de Coons só se encontram em
@@ -825,6 +845,87 @@ function resolverSistema(variaveis, linhas, alvos, pesos, minimos, nomeDe) {
   return final;
 }
 
+/* ------------------------------------------------- o preenchimento pelas curvas vizinhas (o miolo de `alisarSuperficie`) */
+
+/* os pesos, no parâmetro t de [0, 1], dos quatro pontos em −h0, 0, h e h + h1 de uma linha (h0 ou h1 null quando o ponto de fora não
+   existe). Com os dois de fora, a cúbica de Hermite com a derivada da parábola por três pontos em cada ponta; com um, a parábola pelos
+   três; sem nenhum, a reta, que é a mistura do preenchimento padrão. */
+function pesosDaMisturaPelasVizinhas(t, h0, h, h1) {
+  let m0 = null; let m1 = null; const secante = [0, -1, 1, 0];
+  if (h0 != null) { const a = (h * h) / (h0 * (h0 + h)); const b = h0 / (h0 + h); m0 = [-a, a - b, b, 0]; }
+  if (h1 != null) { const a = h1 / (h + h1); const b = (h * h) / (h1 * (h + h1)); m1 = [0, -a, a - b, b]; }
+  if (!m0 && !m1) { m0 = secante; m1 = secante; } else if (!m0) m0 = secante.map((x, q) => 2 * x - m1[q]); else if (!m1) m1 = secante.map((x, q) => 2 * x - m0[q]);
+  const H00 = 2 * t ** 3 - 3 * t * t + 1; const H10 = t ** 3 - 2 * t * t + t; const H01 = -2 * t ** 3 + 3 * t * t; const H11 = t ** 3 - t * t;
+  return [H10 * m0[0] + H11 * m1[0], H00 + H10 * m0[1] + H11 * m1[1], H01 + H10 * m0[2] + H11 * m1[2], H10 * m0[3] + H11 * m1[3]];
+}
+
+/* preencherPelasVizinhas(grades, pos, vincos) -> Map nome -> ponto: o miolo de cada retalho de quatro lados pela soma de Coons em que a
+   mistura de cada direção usa, de cada lado, o ponto oposto do retalho de quatro lados vizinho (a curva seguinte da rede), com as cordas
+   como parâmetro. `grades` são { id, lados, nU, nV, nome(i, j) } (os quatro lados em volta, cada um começando onde o anterior termina),
+   `pos(nome)` a posição de um ponto de borda e `vincos` as arestas de vinco (`chaveDeAresta`), que não dão vizinho, como a borda livre,
+   o retalho de n lados e o lado dividido com mais de um retalho. A fileira de fora (o lado oposto do vizinho que divide o lado inteiro)
+   entra com o resíduo dela pela MESMA mistura das fileiras do retalho, e fica de fora quando não tem os mesmos pontos de fora: a soma de
+   Coons pede uma mistura só ao longo de cada direção. A soma é feita nas duas ordens e tirada a média. Só os pontos das bordas entram
+   na conta: não há sistema, e o resultado não depende da ordem dos retalhos. Sem vizinho nenhum é o preenchimento padrão. */
+function preencherPelasVizinhas(grades, pos, vincos) {
+  const comb = (pesos, pts) => { const r = [0, 0, 0]; pesos.forEach((w, k) => { if (w !== 0 && pts[k]) { r[0] += w * pts[k][0]; r[1] += w * pts[k][1]; r[2] += w * pts[k][2]; } }); return r; };
+  const porAresta = new Map();
+  for (const gr of grades) gr.lados.forEach((l, s) => { for (let k = 0; k + 1 < l.length; k++) { const c = chaveDeAresta(l[k], l[k + 1]); if (!porAresta.has(c)) porAresta.set(c, []); porAresta.get(c).push({ gr, s, k }); } });
+  /* o ponto oposto ao ponto i do lado s, no retalho de quatro lados do outro lado desse lado, ou null */
+  const fora = (gr, s, i) => {
+    const l = gr.lados[s]; const n = l.length - 1; const k = i < n ? i : n - 1; const c = chaveDeAresta(l[k], l[k + 1]);
+    if (vincos.has(c)) return null;
+    const outros = (porAresta.get(c) ?? []).filter((e) => e.gr !== gr);
+    if (outros.length !== 1) return null;
+    const o = outros[0]; const lq = o.gr.lados[o.s]; const kx = lq[o.k] === l[i] ? o.k : o.k + 1;
+    if (lq[kx] !== l[i]) return null;
+    const so = (o.s + 2) % 4; const ko = lq.length - 1 - kx;
+    /* `inteiro`: o vizinho divide o lado inteiro, de canto a canto; `mesmo`: o lado oposto dele corre no sentido do nosso */
+    const inteiro = lq.length === l.length && ((lq[0] === l[n] && lq[n] === l[0]) || (lq[0] === l[0] && lq[n] === l[n]));
+    return { gr: o.gr, s: so, k: ko, p: pos(o.gr.lados[so][ko]), inteiro, mesmo: lq[0] === l[n] };
+  };
+  /* a mistura de uma linha: os pontos de fora (ou null), as duas pontas, e os pesos em t pelas cordas */
+  const linha = (Fm, P0, P1, Fp) => { const h = norma(sub(P0, P1)); const h0 = Fm ? norma(sub(Fm.p, P0)) : null; const h1 = Fp ? norma(sub(P1, Fp.p)) : null; return (t) => pesosDaMisturaPelasVizinhas(t, h0 || null, h, h1 || null); };
+  /* o resíduo de um lado: cada ponto dele menos a mistura das duas pontas e, se `usaM` e `usaP`, dos pontos de fora de cada ponta ao longo
+     da mesma curva; null quando o ponto de fora pedido não existe */
+  const residuos = new Map();
+  const residuoDoLado = (gr, s, usaM, usaP) => {
+    const c = `${gr.id}\u0000${s}\u0000${usaM ? 1 : 0}${usaP ? 1 : 0}`; if (residuos.has(c)) return residuos.get(c);
+    const l = gr.lados[s]; const n = l.length - 1; const P0 = pos(l[0]); const P1 = pos(l[n]);
+    const Fm = usaM ? fora(gr, (s + 3) % 4, gr.lados[(s + 3) % 4].length - 1) : null; const Fp = usaP ? fora(gr, (s + 1) % 4, 0) : null;
+    let r = null;
+    if ((!usaM || Fm) && (!usaP || Fp)) { const w = linha(Fm, P0, P1, Fp); r = l.map((nome, k) => sub(pos(nome), comb(w(k / n), [Fm?.p, P0, P1, Fp?.p]))); }
+    residuos.set(c, r); return r;
+  };
+  const saida = new Map();
+  for (const gr of grades) {
+    const { nU, nV } = gr; const P = (i, j) => pos(gr.nome(i, j));
+    /* uma ordem: `d` 0 mistura primeiro ao longo de u (a é i), 1 ao longo de v (a é j) */
+    const ordem = (d) => {
+      const n1 = d === 0 ? nU : nV; const n2 = d === 0 ? nV : nU; const pt = (a, b) => (d === 0 ? P(a, b) : P(b, a));
+      const foraDaLinha = (b) => (d === 0 ? [fora(gr, 3, nV - b), fora(gr, 1, b)] : [fora(gr, 0, b), fora(gr, 2, nU - b)]);
+      const foraDaColuna = (a) => (d === 0 ? [fora(gr, 0, a), fora(gr, 2, nU - a)] : [fora(gr, 3, nV - a), fora(gr, 1, a)]);
+      const P1 = (a, b) => { const [Fm, Fp] = foraDaLinha(b); return comb(linha(Fm, pt(0, b), pt(n1, b), Fp)(a / n1), [Fm?.p, pt(0, b), pt(n1, b), Fp?.p]); };
+      return (a, b) => {
+        let [Fm, Fp] = foraDaColuna(a);
+        const r0 = sub(pt(a, 0), P1(a, 0)); const rN = sub(pt(a, n2), P1(a, n2));
+        /* a fileira de fora entra com o resíduo dela pela mistura da nossa fileira vizinha (b = 0 ou n2): os mesmos pontos de fora */
+        const residuoDeFora = (F, b, aoContrario) => { if (!F || !F.inteiro) return null; const [m, p] = foraDaLinha(b).map(Boolean); const igual = F.mesmo !== aoContrario; const r = residuoDoLado(F.gr, F.s, igual ? m : p, igual ? p : m); return r ? r[F.k] : null; };
+        /* o lado 2 e o lado 3 do retalho correm ao contrário de a (i ou j crescente), e `mesmo` é contado no sentido do lado */
+        const rm = residuoDeFora(Fm, 0, d === 1); const rp = residuoDeFora(Fp, n2, d === 0);
+        if (!rm) Fm = null;
+        if (!rp) Fp = null;
+        const w = linha(Fm, pt(a, 0), pt(a, n2), Fp)(b / n2);
+        const p = P1(a, b); const q = comb(w, [rm, r0, rN, rp]);
+        return [p[0] + q[0], p[1] + q[1], p[2] + q[2]];
+      };
+    };
+    const F0 = ordem(0); const F1 = ordem(1);
+    for (let j = 1; j < nV; j++) for (let i = 1; i < nU; i++) { const a = F0(i, j); const b = F1(j, i); saida.set(gr.nome(i, j), [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2]); }
+  }
+  return saida;
+}
+
 /* ----------------------------------------------------------------- função */
 
 export function gaiolaPorRede(definicaoDada) {
@@ -1280,6 +1381,7 @@ export function gaiolaPorRede(definicaoDada) {
   const avisos = [...avisosDoAlisamento, ...juncoes.avisos]; const angulosDosCantos = new Map();
   const facesDoRetalho = new Map(); const interiorDoRetalho = new Map(); const centros = new Map();
   const novoInterior = (retalho, id, p) => { novoVertice(id, p); interiorDoRetalho.get(retalho).push(id); };
+  const gradesDeQuatroLados = []; // só com `alisarSuperficie`: o que `preencherPelasVizinhas` lê
   for (const r of retalhos) {
     interiorDoRetalho.set(r.nome, []);
     const lados = r.cadeia.map(ladoEmVertices);
@@ -1307,6 +1409,7 @@ export function gaiolaPorRede(definicaoDada) {
         }
       }
       for (let j = 0; j < nV; j++) for (let i = 0; i < nU; i++) faces.push([id(i, j), id(i + 1, j), id(i + 1, j + 1), id(i, j + 1)]);
+      if (alisarSuperficie) gradesDeQuatroLados.push({ id: r.nome, lados, nU, nV, nome: id });
     } else {
       const n = lados.length;
       const metade = (lados[0].length - 1) / 2;
@@ -1388,6 +1491,30 @@ export function gaiolaPorRede(definicaoDada) {
       }
     });
     facesDoRetalho.set(r.nome, faces);
+  }
+
+  /* ---- com `alisarSuperficie`, o miolo dos retalhos de quatro lados pelas curvas vizinhas ---- */
+  if (alisarSuperficie && gradesDeQuatroLados.length) {
+    /* o preenchimento padrão acima fica como a primeira conferência (a dobra dele recusa antes); aqui só os pontos de dentro dos retalhos
+       de quatro lados trocam de lugar, a partir dos pontos das curvas, e a dobra é conferida de novo com os pontos novos */
+    const arestasDeVinco = new Set();
+    for (const a of usados) {
+      if (!curvas.get(a.curva).decl.vinco) continue;
+      const v = verticesDoArco.get(a.id);
+      for (let k = 0; k + 1 < v.length; k++) arestasDeVinco.add(chaveDeAresta(v[k], v[k + 1]));
+    }
+    const novos = preencherPelasVizinhas(gradesDeQuatroLados, (id) => posicao.get(id), arestasDeVinco);
+    for (const [id, p] of novos) {
+      if (!finito3(p)) falha(`o preenchimento pelas curvas vizinhas (alisarSuperficie) deu o ponto ${citar(id)} sem posição finita (${JSON.stringify(p)}); tire alisarSuperficie e relate a rede`);
+      posicao.set(id, p);
+    }
+    const nf = (g) => { const m = [0, 0, 0]; for (let k = 0; k < g.length; k++) { const a = posicao.get(g[k]); const b = posicao.get(g[(k + 1) % g.length]); m[0] += (a[1] - b[1]) * (a[2] + b[2]); m[1] += (a[2] - b[2]) * (a[0] + b[0]); m[2] += (a[0] - b[0]) * (a[1] + b[1]); } return m; };
+    for (const gr of gradesDeQuatroLados) {
+      const facesDele = facesDoRetalho.get(gr.id);
+      const normais = facesDele.map(nf); const media = normais.reduce(soma, [0, 0, 0]);
+      const dobradas = normais.filter((n) => dot(n, media) <= 0);
+      if (dobradas.length) falha(`o preenchimento pelas curvas vizinhas (alisarSuperficie) dobra ${dobradas.length} face(s) do retalho ${citar(gr.id)}, que o preenchimento padrão não dobra: a curva seguinte de um dos retalhos vizinhos puxa o miolo dele para fora; ponha uma curva a mais dentro do retalho ou do vizinho, ou tire alisarSuperficie`);
+    }
   }
 
   /* ---- o sentido das faces ---- */

@@ -32,6 +32,8 @@
  * `procedural/nucleo/subdivisao.js`, a opção `alisarSuperficie` da `gaiolaPorRede`). Este arquivo fica como a bancada das variantes medidas
  * antes da escolha, e cada prova sai com três colunas: `hoje` (a rede sem a opção), `prototipo` (o ajuste daqui, com as opções da linha de
  * comando; sem opção nenhuma é o da etapa A) e `nucleo` (a rede com `alisarSuperficie`, montada pelo passo `subdivisao`).
+ * Desde 2026-11-19 a rede com `alisarSuperficie` tem o miolo preenchido pelas curvas vizinhas, e a coluna `nucleo` o traz; a etapa B como
+ * foi medida (o preenchimento padrão com a energia) sai de `preenchimento-do-miolo.mjs`, na coluna `hoje.comEnergia`.
  *
  * Uso: node tools/fixtures/correcao-de-superficie/energia-de-curvatura.mjs analiticas | emendas | rede  [opções]
  *   --onda=<mm>              o comprimento de onda (no protótipo e no núcleo); --miolo=<peso> troca o peso das cotas de peso finito (protótipo)

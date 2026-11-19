@@ -379,3 +379,64 @@ describe('é bit a bit', () => {
     expect(impressao(redonda)).toBe(impressao(outra));
   });
 });
+
+/* O MIOLO DE `alisarSuperficie`: o preenchimento pelas curvas vizinhas. Quatro retalhos sobre uma calota de raio 500 mm, com o cruzamento
+ * das curvas de dentro fora do centro (os retalhos têm tamanhos diferentes), e cada curva com um ponto-chave por 25 mm, na calota. */
+describe('com alisarSuperficie, o miolo dos retalhos de quatro lados sai das curvas vizinhas', () => {
+  const RAIO = 500; const xs = [-200, -80, 200]; const zs = [-200, 40, 200];
+  const calota = (x, z) => [x, Math.sqrt(RAIO * RAIO - x * x - z * z) - RAIO, z];
+  const foraDaCalota = (p) => Math.abs(Math.hypot(p[0] * MM, p[1] * MM + RAIO, p[2] * MM) - RAIO);
+  const trecho = (a, b, n) => Array.from({ length: n - 1 }, (_, k) => a + ((b - a) * (k + 1)) / n);
+  const rede = ({ umSo = false, vinco = null, aoContrario = false, extra = {} } = {}) => {
+    const nos = {}; const curvas = [];
+    for (const i of [0, 1, 2]) for (const j of [0, 1, 2]) if (!umSo || (i !== 1 && j !== 1)) nos[`N${i}${j}`] = calota(xs[i], zs[j]);
+    const meio = (i, j) => (umSo ? [calota(xs[i], zs[j])] : [`N${i}${j}`]);
+    for (const j of [0, 1, 2]) if (!umSo || j !== 1) curvas.push({ nome: `h${j}`, pontos: [`N0${j}`, ...trecho(xs[0], xs[1], 5).map((x) => calota(x, zs[j])), ...meio(1, j), ...trecho(xs[1], xs[2], 11).map((x) => calota(x, zs[j])), `N2${j}`], ...(vinco != null && j === 1 ? { vinco } : {}) });
+    for (const i of [0, 1, 2]) if (!umSo || i !== 1) curvas.push({ nome: `v${i}`, pontos: [`N${i}0`, ...trecho(zs[0], zs[1], 10).map((z) => calota(xs[i], z)), ...meio(i, 1), ...trecho(zs[1], zs[2], 6).map((z) => calota(xs[i], z)), `N${i}2`], ...(vinco != null && i === 1 ? { vinco } : {}) });
+    const q = (i, j) => ({ nome: `q${i}${j}`, borda: [{ curva: `h${j}`, de: `N${i}${j}`, ate: `N${i + 1}${j}` }, { curva: `v${i + 1}`, de: `N${i + 1}${j}`, ate: `N${i + 1}${j + 1}` }, { curva: `h${j + 1}`, de: `N${i + 1}${j + 1}`, ate: `N${i}${j + 1}` }, { curva: `v${i}`, de: `N${i}${j + 1}`, ate: `N${i}${j}` }] });
+    const retalhos = umSo ? [{ nome: 'q', borda: ['h0', 'v2', 'h2', 'v0'] }] : [q(0, 0), q(1, 0), q(0, 1), q(1, 1)];
+    return { passo: 25, fora: [0, 1, 0], nos, curvas, retalhos: aoContrario ? [...retalhos].reverse() : retalhos, ...extra };
+  };
+  const deDentro = (g) => Object.keys(g.pontos).filter((p) => g.origens[p].tipo === 'retalho');
+  const pior = (g, nomes) => nomes.reduce((m, p) => Math.max(m, foraDaCalota(g.pontos[p])), 0);
+  const maiorDiferenca = (a, b, nomes) => nomes.reduce((m, p) => Math.max(m, d3(a.pontos[p], b.pontos[p]) * MM), 0);
+  /* as impressões dos pontos da rede sem a opção (com `liso: false` e com o padrão), tiradas do núcleo de antes da mudança (o commit 228dd162) */
+  const IMPRESSAO_SEM_ALISAR = 'ce0882b06139155cf8d40aefe422d469e1da465bded2e9ab93f2d0bf32f8d7cf'; const IMPRESSAO_PADRAO = '74eb0b48580ee011511fd0ba7f33d524bd6ab2bf7664a3916b6ff241ef5b0652';
+
+  it('o miolo fica a menos de um décimo da distância do preenchimento padrão à calota, e as curvas não se mexem', () => {
+    const padrao = gaiolaPorRede(rede({ extra: { liso: false } })); const novo = gaiolaPorRede(rede({ extra: { alisarSuperficie: true } }));
+    const dentro = deDentro(padrao);
+    expect(Object.keys(novo.pontos)).toEqual(Object.keys(padrao.pontos)); expect(novo.passo.faces).toEqual(padrao.passo.faces);
+    expect(dentro.length).toBeGreaterThan(150);
+    for (const p of Object.keys(padrao.pontos)) if (!dentro.includes(p)) expect(novo.pontos[p], p).toEqual(padrao.pontos[p]);
+    /* medido em 2026-11-19: 0,725 mm no preenchimento padrão e 0,039 mm no novo, com os pontos das curvas a até 0,025 mm da calota */
+    expect(pior(padrao, dentro)).toBeGreaterThan(0.4);
+    expect(pior(novo, dentro)).toBeLessThan(0.1 * pior(padrao, dentro));
+  });
+
+  it('o retalho sem vizinho e o retalho cercado de vinco saem iguais ao preenchimento padrão', () => {
+    for (const opcoes of [{ umSo: true }, { vinco: 'viva' }, { vinco: 0.5 }]) {
+      const padrao = gaiolaPorRede(rede({ ...opcoes, extra: { liso: false } })); const novo = gaiolaPorRede(rede({ ...opcoes, extra: { alisarSuperficie: true } }));
+      expect(deDentro(padrao).length, JSON.stringify(opcoes)).toBeGreaterThan(150);
+      expect(maiorDiferenca(padrao, novo, Object.keys(padrao.pontos)), JSON.stringify(opcoes)).toBeLessThan(1e-9);
+    }
+    /* o vinco de nitidez 0 não dobra nada, e o vizinho do outro lado dele conta */
+    const padrao = gaiolaPorRede(rede({ vinco: 0, extra: { liso: false } })); const novo = gaiolaPorRede(rede({ vinco: 0, extra: { alisarSuperficie: true } }));
+    expect(maiorDiferenca(padrao, novo, deDentro(padrao))).toBeGreaterThan(0.3);
+  });
+
+  it('o resultado não depende da ordem em que os retalhos são declarados, e duas chamadas dão os mesmos bits', () => {
+    const a = gaiolaPorRede(rede({ extra: { alisarSuperficie: true } })); const b = gaiolaPorRede(rede({ extra: { alisarSuperficie: true } })); const c = gaiolaPorRede(rede({ aoContrario: true, extra: { alisarSuperficie: true } }));
+    expect(JSON.stringify(a.pontos)).toBe(JSON.stringify(b.pontos));
+    expect(Object.keys(c.pontos).sort()).toEqual(Object.keys(a.pontos).sort());
+    expect(maiorDiferenca(a, c, Object.keys(a.pontos))).toBeLessThan(1e-9);
+  });
+
+  it('sem a opção, e com ela desligada, a rede é a de sempre: o miolo novo só entra com alisarSuperficie', () => {
+    const sem = gaiolaPorRede(rede()); const desligada = gaiolaPorRede(rede({ extra: { alisarSuperficie: false } }));
+    expect(JSON.stringify(desligada.pontos)).toBe(JSON.stringify(sem.pontos)); expect(desligada.passo).toEqual(sem.passo);
+    /* impressão da rede sem a opção, gravada antes da mudança de 2026-11-19 (o preenchimento padrão e o alisamento pela normal) */
+    expect(sha256Hex(JSON.stringify(gaiolaPorRede(rede({ extra: { liso: false } })).pontos))).toBe(IMPRESSAO_SEM_ALISAR);
+    expect(sha256Hex(JSON.stringify(sem.pontos))).toBe(IMPRESSAO_PADRAO);
+  });
+});

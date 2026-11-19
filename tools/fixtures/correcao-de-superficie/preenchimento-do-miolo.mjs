@@ -25,9 +25,15 @@
  * retalho declarou primeiro. O retalho de n lados, o lado de vinco e a borda livre não dão vizinho. A terceira família do pedido, a
  * energia só no miolo com as curvas fixas, já está medida na etapa B (a linha "sem cota" da correção c) e não foi refeita.
  *
- * NADA DISTO MUDA O NÚCLEO: o protótipo lê a rede montada com `liso: false` (ou com `alisarSuperficie`, que também não alisa o miolo),
- * confere que o Coons refeito aqui é o da rede ponto a ponto, troca os pontos de dentro dos retalhos de quatro lados e devolve os pontos
- * novos, que o mesmo passo `subdivisao` da rede ajusta (a cota do miolo com o peso que a rede pôs: 1, ou 0,003 com a energia).
+ * O PROTÓTIPO NÃO USA O PREENCHIMENTO DO NÚCLEO: lê a rede montada com `liso: false`, confere que o Coons refeito aqui é o da rede ponto a
+ * ponto, troca os pontos de dentro dos retalhos de quatro lados e devolve os pontos novos, que o passo `subdivisao` da rede ajusta (a
+ * cota do miolo com o peso que a rede pôs: 1, ou 0,003 no passo da rede com `alisarSuperficie`).
+ *
+ * DESDE 2026-11-19 A `vizinhas` ESTÁ NO NÚCLEO, como o miolo da `gaiolaPorRede` com `alisarSuperficie` (decisão da pessoa, no plano). Este
+ * arquivo fica como a conta independente dela: cada prova traz a coluna `nucleo` (a rede com a opção, como o núcleo a monta) ao lado da
+ * `vizinhas.comEnergia` (os pontos do protótipo no passo da mesma rede), e `nucleo.contraPrototipoMm`, a maior distância entre os pontos
+ * das duas, que o teste cobra abaixo de 1e-9. `hoje.comEnergia` continua sendo a etapa B (o Coons com a energia), que o núcleo já não
+ * monta e só sai daqui, com os pontos da rede de `liso: false` no passo da rede com a opção.
  *
  * Uso: node tools/fixtures/correcao-de-superficie/preenchimento-do-miolo.mjs analiticas | grade | emendas | rede  [opções]
  *   --definicao=<json>   opções de `definicaoAnalitica`, como {"meio":[0.25,0.25]} ou {"pontos":16}
@@ -78,7 +84,7 @@ export function gradeDoRetalho(id, lados, nomeDeDentro) {
   return { id, lados, nU, nV, nome };
 }
 
-/** gradesDaRede(g) -> as grades dos retalhos de quatro lados da rede `g` (montada com `liso: false` ou com `alisarSuperficie`), com a
+/** gradesDaRede(g) -> as grades dos retalhos de quatro lados da rede `g` (montada com `liso: false`), com a
  *  volta e o começo em que os nomes dos pontos de dentro reproduzem o Coons da rede ponto a ponto (a conferência do protótipo). */
 export function gradesDaRede(g) {
   const dentro = new Map();
@@ -102,7 +108,7 @@ export function gradesDaRede(g) {
       for (let j = 1; j < gr.nV && confere; j++) for (let i = 1; i < gr.nU && confere; i++) { const p = P(i, j); contados++; if (!p || !(dist(p, c(i, j)) < 1e-9)) confere = false; }
       if (confere && contados === nomes.length) { achada = gr; break; }
     }
-    if (!achada) throw new Error(`preenchimento: o miolo do retalho '${nomeDoRetalho}' não é o Coons da rede; monte a rede com liso: false ou com alisarSuperficie`);
+    if (!achada) throw new Error(`preenchimento: o miolo do retalho '${nomeDoRetalho}' não é o Coons da rede; monte a rede com liso: false`);
     grades.push(achada);
   }
   const vincos = new Set();
@@ -226,6 +232,14 @@ const maiorDiferenca = (A, B) => Object.keys(A).reduce((m, k) => Math.max(m, dis
 
 /* ---------- as provas ---------- */
 
+/* a maior distância (na unidade da rede, o metro) entre os pontos da rede `gE`, montada pelo núcleo com `alisarSuperficie`, e os da
+   `vizinhas` do protótipo sobre a rede `g0` (a mesma definição com `liso: false`); recusa se as duas não têm os mesmos pontos e faces */
+export function contraPrototipo(g0, gE) {
+  const a = Object.keys(g0.pontos), b = Object.keys(gE.pontos);
+  if (a.length !== b.length || a.some((nome, k) => nome !== b[k]) || JSON.stringify(g0.passo.faces) !== JSON.stringify(gE.passo.faces)) throw new Error('preenchimento: a rede com alisarSuperficie não tem os mesmos pontos e faces da rede com liso: false');
+  return maiorDiferenca(preencherRede(g0, 'vizinhas').pontos, gE.pontos);
+}
+
 const contexto = (pontos) => ({ vec: (p) => (typeof p === 'string' ? pontos[p] : p), num: Number });
 /* a gaiola ajustada pelo passo `subdivisao` da rede, com os pontos dados (o ajuste do núcleo, com ou sem a energia, como o passo disser) */
 function ajustar(passo, pontos) {
@@ -271,12 +285,13 @@ export function provaDasAnaliticas({ definicao = {}, modos = MODOS, superficies 
     /* os pontos das curvas (as cotas exatas) contra a forma: o erro deles o preenchimento herda, qualquer que seja */
     const nasCurvas = Object.keys(g0.pontos).filter((p) => g0.origens[p] && g0.origens[p].tipo !== 'retalho');
     const saida = { superficie: nome, definicao, coonsRefeitoMm: r4(coonsDaRede.andou * 1000), curvasMm: cotaDoMiolo(g0.pontos, nasCurvas, Sa.distancia, Sa.aBorda), lisoRefeitoMm: r4(maiorDiferenca(gHoje.pontos, alisarRede(g0, g0.pontos)) * 1000),
-      hoje: { cotaMm: cota(gHoje.pontos), cotaSemAlisarMm: cota(g0.pontos), semEnergia: medir(gHoje.passo, gHoje.pontos), semAlisarSemEnergia: medir(g0.passo, g0.pontos), comEnergia: medir(gE.passo, gE.pontos) } };
+      hoje: { cotaMm: cota(gHoje.pontos), cotaSemAlisarMm: cota(g0.pontos), semEnergia: medir(gHoje.passo, gHoje.pontos), semAlisarSemEnergia: medir(g0.passo, g0.pontos), comEnergia: medir(gE.passo, g0.pontos) } };
     for (const modo of modos) {
-      const n0 = preencherRede(g0, modo), nE = preencherRede(gE, modo);
+      const n0 = preencherRede(g0, modo);
       const liso = alisarRede(g0, n0.pontos);
-      saida[modo] = { cotaMm: cota(n0.pontos), cotaAlisadaMm: cota(liso), andouMm: r4(n0.andou * 1000), semEnergia: medir(g0.passo, liso), semAlisarSemEnergia: medir(g0.passo, n0.pontos), comEnergia: medir(gE.passo, nE.pontos) };
+      saida[modo] = { cotaMm: cota(n0.pontos), cotaAlisadaMm: cota(liso), andouMm: r4(n0.andou * 1000), semEnergia: medir(g0.passo, liso), semAlisarSemEnergia: medir(g0.passo, n0.pontos), comEnergia: medir(gE.passo, n0.pontos) };
     }
+    saida.nucleo = { contraPrototipoMm: contraPrototipo(g0, gE) * 1000, cotaMm: cota(gE.pontos), comEnergia: medir(gE.passo, gE.pontos) };
     return saida;
   });
 }
@@ -320,19 +335,21 @@ export function provaDaGrade({ modos = MODOS, razoes = [1, 2] } = {}) {
 /* as chapas do neutro de uma chapa de prova por receita: hoje, hoje com a energia, e cada modo sem a energia e com ela */
 function chapasDaReceita(nome, modos) {
   const neutro = (receita) => executarReceita({ ...receita, PASSOS: receita.PASSOS.filter(([op]) => op === 'subdivisao'), vaos: undefined }).neutro.chapas[0];
-  const hoje = neutro(receitaDeProva(nome, { marcarCurvas: true })); const etapaB = neutro(receitaDeProva(nome, { marcarCurvas: true, alisarSuperficie: true }));
+  const hoje = neutro(receitaDeProva(nome, { marcarCurvas: true })); const nucleo = neutro(receitaDeProva(nome, { marcarCurvas: true, alisarSuperficie: true }));
   const def = { ...(nome === 'rede-sem-ruido' ? definicaoDaRede({ ruido: false }) : definicaoDaEmenda(nome)), marcarCurvas: true };
   const gHoje = gaiolaPorRede(def), g0 = gaiolaPorRede({ ...def, liso: false }), gE = gaiolaPorRede({ ...def, alisarSuperficie: true });
   const refeita = ajustar(gE.passo, gE.pontos); let dif = 0;
-  refeita.gaiola.vertices.forEach((p, k) => { dif = Math.max(dif, dist(p, etapaB.vertices[k])); });
-  if (!(dif < 1e-12) || refeita.gaiola.vertices.length !== etapaB.vertices.length || hoje.vertices.length !== etapaB.vertices.length) throw new Error(`${nome}: a gaiola refeita difere da do passo em ${dif}`);
+  refeita.gaiola.vertices.forEach((p, k) => { dif = Math.max(dif, dist(p, nucleo.vertices[k])); });
+  if (!(dif < 1e-12) || refeita.gaiola.vertices.length !== nucleo.vertices.length || hoje.vertices.length !== nucleo.vertices.length) throw new Error(`${nome}: a gaiola refeita difere da do passo em ${dif}`);
+  const etapaB = { ...nucleo, vertices: ajustar(gE.passo, g0.pontos).gaiola.vertices };
   const porModo = {};
   for (const modo of modos) {
-    const n0 = preencherRede(g0, modo), nE = preencherRede(gE, modo);
+    const n0 = preencherRede(g0, modo);
     const liso = alisarRede(g0, n0.pontos);
-    porModo[modo] = { pontos: n0.pontos, liso, dentro: n0.dentro, andouMm: r4(n0.andou * 1000), semEnergia: { ...hoje, vertices: ajustar(g0.passo, liso).gaiola.vertices }, semAlisarSemEnergia: { ...hoje, vertices: ajustar(g0.passo, n0.pontos).gaiola.vertices }, comEnergia: { ...etapaB, vertices: ajustar(gE.passo, nE.pontos).gaiola.vertices } };
+    porModo[modo] = { pontos: n0.pontos, liso, dentro: n0.dentro, andouMm: r4(n0.andou * 1000), semEnergia: { ...hoje, vertices: ajustar(g0.passo, liso).gaiola.vertices }, semAlisarSemEnergia: { ...hoje, vertices: ajustar(g0.passo, n0.pontos).gaiola.vertices }, comEnergia: { ...etapaB, vertices: ajustar(gE.passo, n0.pontos).gaiola.vertices } };
   }
-  return { hoje, etapaB, porModo, exatos: refeita.exatos, gHoje, g0, dentro: preencherRede(g0, 'coons').dentro, lisoRefeitoMm: r4(maiorDiferenca(gHoje.pontos, alisarRede(g0, g0.pontos)) * 1000) };
+  /* `nucleo` é a chapa do neutro da receita com a opção, como o núcleo a monta; `etapaB`, o Coons da rede com a energia, que só sai daqui */
+  return { hoje, nucleo, etapaB, porModo, exatos: refeita.exatos, gHoje, g0, gE, contraPrototipoMm: contraPrototipo(g0, gE) * 1000, dentro: preencherRede(g0, 'coons').dentro, lisoRefeitoMm: r4(maiorDiferenca(gHoje.pontos, alisarRede(g0, g0.pontos)) * 1000) };
 }
 
 /** provaDasEmendas({ modos }) -> por chapa emendada: a cota do miolo contra a desenhada (mm, em y) e a medida na curva `emenda` */
@@ -343,6 +360,7 @@ export function provaDasEmendas({ modos = MODOS, nomes = ['emenda-g2', 'emenda-d
     const cota = (pontos) => cotaDoMiolo(pontos, c.dentro, (p) => p[1] - pontoDaEmenda(nome, p[0], p[2])[1], (p) => Math.min(p[0], 600 - p[0], p[2], 400 - p[2]));
     const saida = { chapa: nome, lisoRefeitoMm: c.lisoRefeitoMm, hoje: { cotaMm: cota(c.gHoje.pontos), cotaSemAlisarMm: cota(c.g0.pontos), semEnergia: medir(c.hoje), comEnergia: medir(c.etapaB) } };
     for (const modo of modos) saida[modo] = { cotaMm: cota(c.porModo[modo].pontos), cotaAlisadaMm: cota(c.porModo[modo].liso), andouMm: c.porModo[modo].andouMm, semEnergia: medir(c.porModo[modo].semEnergia), semAlisarSemEnergia: medir(c.porModo[modo].semAlisarSemEnergia), comEnergia: medir(c.porModo[modo].comEnergia) };
+    saida.nucleo = { contraPrototipoMm: c.contraPrototipoMm, cotaMm: cota(c.gE.pontos), comEnergia: medir(c.nucleo) };
     return saida;
   });
 }
@@ -353,6 +371,7 @@ export function provaDaRede({ modos = MODOS } = {}) {
   const cota = (pontos) => cotaDoMiolo(pontos, c.dentro, (p) => p[1] - painel(p[0], p[2]), (p) => Math.min(p[0], 1000 - p[0], p[2], 500 - p[2]));
   const saida = { chapa: 'rede-sem-ruido', lisoRefeitoMm: c.lisoRefeitoMm, hoje: { cotaMm: cota(c.gHoje.pontos), cotaSemAlisarMm: cota(c.g0.pontos), semEnergia: medirRede(c.hoje), comEnergia: medirRede(c.etapaB) } };
   for (const modo of modos) saida[modo] = { cotaMm: cota(c.porModo[modo].pontos), cotaAlisadaMm: cota(c.porModo[modo].liso), andouMm: c.porModo[modo].andouMm, semEnergia: medirRede(c.porModo[modo].semEnergia), semAlisarSemEnergia: medirRede(c.porModo[modo].semAlisarSemEnergia), comEnergia: medirRede(c.porModo[modo].comEnergia) };
+  saida.nucleo = { contraPrototipoMm: c.contraPrototipoMm, cotaMm: cota(c.gE.pontos), comEnergia: medirRede(c.nucleo) };
   return saida;
 }
 

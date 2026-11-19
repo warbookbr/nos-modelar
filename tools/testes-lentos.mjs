@@ -41,6 +41,9 @@ export const TESTES_LENTOS = [
      analíticas (com o cruzamento no centro e fora dele), nas três chapas emendadas e na rede sem ruído, com o oráculo da superfície
      limite; 66 s com a máquina livre */
   'tools/fixtures/correcao-de-superficie/energia-de-curvatura.test.mjs',
+  /* 2026-11-19: o preenchimento do miolo pelas curvas vizinhas, o núcleo (alisarSuperficie) contra o protótipo nas dezoito chapas
+     analíticas, nas três emendadas e na rede sem ruído; 62 s com a máquina livre */
+  'tools/fixtures/correcao-de-superficie/preenchimento-do-miolo.test.mjs',
   /* 2026-11-15: a ondulação da saliência declarada da lataria do carro; 14,1 e 14,8 s sozinho no CI, em duas execuções seguidas */
   'tools/modelar/ondulacao-saliencia-declarada.test.mjs',
   /* 2026-11-15: a leitura por regiões; 14,8 e 15,3 s sozinho no CI, com dois avisos seguidos de três */

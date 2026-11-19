@@ -539,3 +539,62 @@ O que recomendo. Não trocar o preenchimento padrão da `gaiolaPorRede`: sem a e
 Limites do protótipo. O parâmetro da mistura é a corda entre as curvas, e por isso a forma quadrática numa direção só sai exata quando as cordas são proporcionais ao parâmetro dela; na calota de 600 mm da grade sobram 0,75 mm. O vizinho que divide só parte do lado (o nó em T) dá a derivada às fileiras, mas não entra como fileira de fora. O retalho de n lados continua com o preenchimento de hoje e não dá vizinho. A curva com `continuidade` declarada não foi provada com o preenchimento novo.
 
 O processo teria pegado sozinho? O erro da mistura diferente na fileira de fora, sim: a prova da `rede-sem-ruido`, que o pedido exigia, mostrou os 0,98 mm, e o teste novo guarda a rede com o retalho de cinco lados ao lado. Que a curva declarada está a 0,4 a 1,0 mm da forma nas chapas de cruzamento fora do centro, não: nenhuma prova media os pontos das curvas contra a forma, e a revisão da etapa B atribuiu o 1,26 mm inteiro ao preenchimento; a saída da prova passou a trazer `curvasMm`. Que sem a energia o alisamento pela normal desfaz a cota do preenchimento (0,004 para 0,014 mm, e 0,013 para 0,206 no paraboloide), também não: a etapa A tinha medido a cota alisada, mas nenhuma prova a punha ao lado da superfície final com e sem o alisamento; a saída traz `cotaAlisadaMm` e as duas colunas.
+
+## Fatia 5: o preenchimento pelas curvas vizinhas no núcleo, como o miolo de `alisarSuperficie` (2026-11-19)
+
+A pessoa decidiu em 2026-11-19 levar a `vizinhas` ao núcleo só como o miolo de quando `alisarSuperficie` está ligada, com o preenchimento padrão intocado. Esta seção diz o que entrou e o que as provas mediram.
+
+O que entrou. Em `procedural/nucleo/gaiola-por-rede.js`, `preencherPelasVizinhas` é a conta da variante `vizinhas` do protótipo, e a `gaiolaPorRede` a chama depois do preenchimento de sempre, só com `alisarSuperficie`, para trocar os pontos de dentro dos retalhos de quatro lados; a dobra das faces é conferida de novo com os pontos novos, com recusa própria. Sem a opção nenhuma linha da conta de antes muda: o laço do preenchimento ganhou só a guarda das grades, que não roda sem a opção. A ficha do arquivo descreve o preenchimento novo e os limites, e a nota de uso do catálogo (`uso-operacoes.js`) diz o que a opção faz ao miolo. A opção continua experimental e desligada.
+
+O protótipo ficou como a conta independente. Ele não usa o preenchimento do núcleo: parte da rede com `liso: false`, refaz o Coons e a `vizinhas`, e cada prova ganhou a coluna `nucleo` (a rede com a opção, como o núcleo a monta) e `nucleo.contraPrototipoMm`, a maior distância entre os pontos das duas. A etapa B como foi medida (o preenchimento padrão com a energia) já não sai do núcleo, e continua saindo da coluna `hoje.comEnergia` dele.
+
+Os comandos:
+
+```
+npx vitest run procedural/nucleo/gaiola-por-rede.test.mjs
+npx vitest run tools/fixtures/correcao-de-superficie/preenchimento-do-miolo.test.mjs tools/fixtures/correcao-de-superficie/energia-de-curvatura.test.mjs
+node tools/fixtures/correcao-de-superficie/preenchimento-do-miolo.mjs analiticas --modos=vizinhas [--definicao='{"meio":[0.25,0.25],"pontos":16}']
+node tools/fixtures/correcao-de-superficie/preenchimento-do-miolo.mjs emendas | rede --modos=vizinhas
+```
+
+Prova 1, o núcleo contra o protótipo. A tabela do protótipo foi tirada antes da mudança, numa cópia do commit 228dd162, e de novo depois. Nas dezoito chapas analíticas, nas três emendadas e na `rede-sem-ruido`, todo número que a saída de antes trazia saiu igual depois, e a coluna `nucleo` é igual à `vizinhas` com a energia de antes da mudança na quarta casa (a maior diferença é 2e-15, no salto de curvatura da `emenda-dupla`). Os pontos da rede com a opção ficam a menos de 6e-13 mm dos do protótipo nessas vinte e duas chapas e em mais dez redes (a `rede-com-ruido`, a `chapa-simetrica`, a fila, as três curvas no nó e a ponta com ponta sem as declarações de continuidade, a `emenda-g0`, com vinco, a `emenda-inflexao`, a `emenda-inflexao-lisa`, e a chapa lateral de prova com passo de 40 e de 25 mm, com dois vincos e dois retalhos de cinco lados).
+
+Prova 2, a tabela pelo núcleo: a distância a mais de 100 mm da borda (mm) e a maior crista por ponto fora do cruzamento (1/m; com dois números, a da `h1` e a da `v1`).
+
+| Chapa | Sem a opção | Com a opção e o preenchimento padrão (a etapa B) | Com a opção, pelo núcleo |
+|---|---|---|---|
+| paraboloide | 0,198; 1,46 | 0,037; 0,024 | 0,037; 0,024 |
+| calota | 0,229; 1,17 | 0,160; 0,040 | 0,063; 0,026 |
+| toro | 0,732; 1,65 e 2,02 | 0,236; 0,155 e 0,126 | 0,050; 0,154 e 0,126 |
+| paraboloide, 16 trechos | 0,214; 1,47 | 0,036; 0,020 | 0,036; 0,020 |
+| calota, 16 trechos | 0,307; 1,20 | 0,129; 0,011 | 0,031; 0,003 |
+| toro, 16 trechos | 0,765; 1,68 e 2,24 | 0,196; 0,019 e 0,022 | 0,019; 0,014 e 0,013 |
+| paraboloide, meio 0,25 e 0,25 | 0,695; 1,80 | 0,497; 0,332 | 0,497; 0,332 |
+| calota, meio 0,25 e 0,25 | 0,707; 1,50 | 1,119; 0,236 | 0,473; 0,241 |
+| toro, meio 0,25 e 0,25 | 1,571; 4,42 e 2,61 | 1,105; 2,81 e 1,32 | 1,105; 2,81 e 1,32 |
+| paraboloide, meio 0,25 e 0,25, 16 trechos | 0,612; 1,44 | 0,236; 0,168 | 0,236; 0,168 |
+| calota, meio 0,25 e 0,25, 16 trechos | 0,502; 1,25 | 1,205; 0,077 | 0,063; 0,088 |
+| toro, meio 0,25 e 0,25, 16 trechos | 1,590; 2,10 e 2,44 | 0,253; 0,64 e 0,45 | 0,229; 0,64 e 0,45 |
+| paraboloide, meio 0,3 e 0,5 | 0,375; 1,84 e 1,97 | 0,355; 0,92 e 0,93 | 0,355; 0,92 e 0,93 |
+| calota, meio 0,3 e 0,5 | 0,301; 1,25 e 1,68 | 0,373; 0,62 e 0,76 | 0,287; 0,61 e 0,76 |
+| toro, meio 0,3 e 0,5 | 1,051; 1,73 e 2,00 | 0,540; 0,149 e 0,099 | 0,199; 0,150 e 0,107 |
+| paraboloide, meio 0,3 e 0,5, 16 trechos | 0,283; 1,60 e 1,38 | 0,077; 0,30 e 0,18 | 0,077; 0,30 e 0,18 |
+| calota, meio 0,3 e 0,5, 16 trechos | 0,267; 1,11 e 1,29 | 0,363; 0,21 e 0,15 | 0,086; 0,21 e 0,15 |
+| toro, meio 0,3 e 0,5, 16 trechos | 1,200; 1,71 e 2,21 | 0,435; 0,045 e 0,066 | 0,028; 0,047 e 0,065 |
+| emenda-g2: rampa, crista | 6,61; 0,200 | 0,049; 0,001 | 0,049; 0,001 |
+| emenda-dupla: rampa, crista | 41,2; 1,19 | 4,56; 0,066 | 4,56; 0,066 |
+| emenda-g1: rampa, crista, distância na chapa | 25,7; 0,399; 1,31 | 9,99; 0,003; 0,50 | 9,99; 0,003; 0,50 |
+| rede-sem-ruido: viradas (miolo, curva, singular, borda), distância | 7,5, 13,8, 6,3 e 6,3; 4,04 | 3,0, 8,2, 6,1 e 3,4; 1,35 | 3,0, 8,2, 6,1 e 3,4; 1,35 |
+
+O gate da opção ligada, a distância a mais de 100 mm da borda e a crista por ponto nunca piores que sem a opção, é cumprido nas dezoito analíticas, e em nenhuma a distância é pior que a da etapa B. Contra a etapa B a crista sobe um pouco em oito das doze linhas de cruzamento fora do centro (as maiores: a calota de meio 0,25 e 0,25, de 0,236 para 0,241 e, com 16 trechos, de 0,077 para 0,088; o toro de meio 0,3 e 0,5, a `v1` de 0,099 para 0,107), sempre muito abaixo da crista sem a opção, e cai na calota e no toro simétricos. A meta da crista abaixo de 0,05 1/m segue cumprida só nas simétricas, fora o toro de 8 trechos, e no toro de meio 0,3 e 0,5 com 16 trechos a `v1` fica em 0,065: é a curva declarada, como a correção b da etapa B mediu.
+
+O gate nos testes. `preenchimento-do-miolo.test.mjs` cobra, nas dezoito, os pontos do núcleo a menos de 1e-9 mm dos do protótipo, a tabela igual, a distância e a crista não piores que sem a opção, a distância não pior que a da etapa B e não pior que a medida com 2% de folga; nas emendas e na rede, os pontos e a tabela; e os pontos em cinco redes com vinco, simetria e retalhos de três e de cinco lados. Em `energia-de-curvatura.test.mjs` a calota de cruzamento fora do centro deixou de ser CONHECIDA e passou a ser cobrada com teto, e as simétricas ganharam o teto da medida nova. Seguem CONHECIDAS, com a catraca de antes: a crista do toro de 8 trechos (0,154 e 0,126) e a grade de razão 2 em `procedural/nucleo/subdivisao-energia-de-curvatura.test.mjs`, que não passa pela rede e cujo defeito é da energia no espaçamento desigual. `procedural/nucleo/gaiola-por-rede.test.mjs` tem a calota de quatro retalhos de tamanhos diferentes (o miolo a 0,039 mm contra 0,725 do padrão, com os pontos das curvas a 0,025), o retalho sem vizinho e o cercado de vinco iguais ao padrão a 1e-9 mm, o vinco de nitidez zero dando vizinho, a ordem dos retalhos sem efeito e a impressão dos pontos sem a opção, tirada do núcleo de antes.
+
+O acervo sem a opção. O mesmo roteiro rodou numa cópia do commit 228dd162 e no núcleo de agora, e as 126 impressões saíram iguais (três delas são a mesma recusa dos dois lados, a continuidade com `liso: false`): o neutro de doze receitas (a carenagem de prova, o freezer horizontal, o balcão de bar, o kukri, os pés, o chassi e a caçamba do carrinho de mão, o ombro do braço robótico, o banco da empilhadeira, a chapa lateral de prova, a rede do teste de alisamento e a chapa por rede das aberturas), o neutro das vinte chapas de prova desta pasta com e sem `marcarCurvas`, e os pontos, o passo, os avisos e as origens de 74 redes montadas direto (as analíticas com as opções de continuidade, `liso: false`, `alisarSuperficie: false` e `interior`, as emendas, a fila, a chapa simétrica e a lateral). Os dezessete arquivos de teste desta pasta, da rede no núcleo e da energia no núcleo passam (170 testes). O carro não foi medido, e a guarda do acervo não foi rodada: nenhuma peça fora do carro chama a `gaiolaPorRede`.
+
+O que a chapa lateral de prova mostrou, fora das provas pedidas. Nela o preenchimento novo move o miolo até 4,6 mm contra o padrão, e a cota do miolo contra a forma desenhada não melhora em todos os retalhos de quatro lados: melhora em três (0,92 para 0,78 mm, 0,50 para 0,46 e 0,79 para 0,78), fica igual em três e piora em dois (1,21 para 1,54 no retalho `baixo` e 0,45 para 0,71 no `coluna`). A forma dessa chapa tem a quina atrás da coluna, que entra por `max(0, …)` e não é vinco declarado, e a parábola pela curva seguinte do vizinho pode atravessá-la; essa é a suspeita, e a causa não foi isolada. Na `rede-com-ruido` o miolo também muda (0,88 mm), porque o ruído da curva vizinha entra na derivada. Nada disso foi medido com a energia por cima nem na superfície final, e fica para a revisão e para a medida do quarto traseiro.
+
+Limites, sem mudança. O plano de simetria é borda livre para o preenchimento: a metade espelhada não dá vizinho. O retalho de n lados continua com o preenchimento de antes e não dá vizinho. A curva com `continuidade` segue recusada junto com a opção. As recusas novas (a dobra com os pontos novos e o ponto sem posição finita) não têm teste, porque nenhuma rede de prova as provoca. O defeito do espaçamento desigual (a grade de razão 2) e a curva declarada entre os pontos-chave continuam como estavam.
+
+O processo teria pegado sozinho? Que o teste da etapa B comparava os pontos da rede com a opção aos da rede com `liso: false`, e que a catraca da calota assimétrica falharia ao passar a caber, sim: os dois testes falharam na primeira execução e foram reescritos. Que o protótipo deixaria de reproduzir a etapa B quando o núcleo mudasse, sim: a conferência dele contra o Coons da rede recusa a rede com a opção, e ele passou a partir da rede com `liso: false`. Que a bancada da curvatura normal passa a trazer o miolo novo na coluna da etapa B, não: o teste dela passa com os números novos e nada avisa; o cabeçalho dela diz agora. Que o preenchimento novo pode nascer mais longe da forma onde ela quebra sem vinco, não: as provas pedidas são todas de forma lisa, e a medida da chapa lateral saiu de uma conferência a mais; ela não virou teste.
+

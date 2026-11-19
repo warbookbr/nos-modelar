@@ -24,6 +24,8 @@
  *   'completa'  L_k(x) = a_k nos três eixos, com duas incógnitas a mais (as duas tangentes) no vértice de cada cota exata: o contrato da
  *               cota fica o de hoje, e o sistema cresce de duas incógnitas e duas restrições por cota exata.
  *
+ * DESDE 2026-11-19 a rede com `alisarSuperficie` tem o miolo preenchido pelas curvas vizinhas, e as colunas daqui que saem dela (a etapa B e
+ * as cotas da curvatura normal) passaram a trazê-lo: os números desta bancada nas analíticas não são mais os do banco de provas de antes.
  * NADA DISTO MUDA O NÚCLEO. As cotas (a gaiola declarada e as medidas) são as do passo que a `gaiolaPorRede` monta com `alisarSuperficie`
  * (o miolo com o preenchimento sem alisar e o peso 0,003, a escolha da etapa B), de modo que entre a coluna `etapaB` e a `normal` só muda
  * a energia e a incógnita.
