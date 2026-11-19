@@ -35,10 +35,14 @@
    sentidos e a parte não teria largura. O trecho de até duas vezes o encaixe da maior aresta do triângulo sai da borda (a ponta do
    bico é aparada), e o mais longo recusa com o lugar.
 
-   AS ORIGENS. Os pedaços novos de uma face cortada entram nas listas de faces das origens publicadas que citam a face
-   (`herdarNasOrigens`), como na booleana: `{ origem: { op: 'subdivisao', id } }`, com ou sem `parte`, continua cobrindo a chapa inteira,
-   e uma segunda divisão acha as faces da primeira. As origens de endereço posicional (as faces nomeadas de um cubo) não são listas e
-   não recebem os pedaços.
+   AS ORIGENS. A face cortada continua sendo a mesma superfície: o passo anota em `st.pedacosDaDivisao` os pedaços novos de cada face,
+   e a resolução de origem do núcleo (`comPedacosDaDivisao`, em `nucleo.js`) entrega os pedaços logo depois da face, qualquer que seja o
+   jeito de o gerador guardar as faces (a lista da subdivisão, a grade do plano, o mapa de cópias do espelha, a face nomeada de um cubo).
+   A seleção pela origem continua cobrindo o objeto inteiro, e uma segunda divisão acha as faces da primeira. A origem citada dentro
+   de outra (o `de` de uma cópia) resolve sem os pedaços, porque a cópia conhece as faces da fonte como eram.
+
+   AS FACES QUE O CONTORNO SÓ ENCOSTA. A face cujos pedaços caem todos do mesmo lado, sem vértice novo, fica como estava, com o id e os
+   cantos na mesma ordem: o contorno que corre sobre as arestas dela não a corta.
 
    A CAMADA (`sentido: '+'` ou `'-'`), como na abertura: no corpo que a reta do eixo atravessa mais de uma vez, corta só a camada
    vista desse lado. A chapa fechada (com espessura) tem duas peles por camada, e as duas são cortadas; a seleção aberta tem uma.
@@ -272,7 +276,7 @@ export function dividirMalhaPorContorno({ V, F, ids, quadro, poligono, sentido =
   const T = tri.filter((t) => candidatas.has(t.f));
 
   /* ---- os cruzamentos: cada aresta dos triângulos contra cada lado do contorno ---- */
-  const semBorda = (q0, quadroNome) => ({ ref: 'contorno', erro: `o contorno cruza a borda da chapa ou a parede de um vão em ${texto2(q0)}, vista ${quadroNome}: a divisão corta só a pele da chapa, e o contorno precisa ficar inteiro sobre ela` });
+  const semBorda = (q0, quadroNome) => ({ ref: 'contorno', erro: `o contorno toca ou cruza a borda da chapa ou a parede de um vão em ${texto2(q0)}, vista ${quadroNome}: a divisão corta só a pele da chapa, e o contorno precisa ficar inteiro sobre ela` });
   const reais = new Map();
   for (const f of candidatas) { const vs = F.get(f).vs; for (let k = 0; k < vs.length; k++) { const ch = chave(vs[k], vs[(k + 1) % vs.length]); reais.set(ch, (reais.get(ch) ?? 0) + 1); } }
   const lados = P.map((p, k) => { const q = P[(k + 1) % N]; return [p, q, Math.min(p[0], q[0]), Math.min(p[1], q[1]), Math.max(p[0], q[0]), Math.max(p[1], q[1])]; });
@@ -551,6 +555,15 @@ export function dividirMalhaPorContorno({ V, F, ids, quadro, poligono, sentido =
   const antigos = new Set();
   for (const p of juntos.values()) for (const v of p.vs) if (v >= 0) antigos.add(v);
   const limpas = tirarValenciaDois(new Map([...juntos].map(([k, p]) => [k, p.vs])), antigos).faces;
+  /* a face cujos pedaços ficaram todos do mesmo lado, sem vértice novo (depois de sair o que sobrava no meio de uma aresta), não foi
+     cortada: fica como estava, com o id e os cantos */
+  for (const f of pedacosDe.keys()) {
+    const chaves = [...juntos.keys()].filter((k) => k.startsWith(`${f}/`));
+    const lado = juntos.get(chaves[0]).dentro;
+    if (!chaves.every((k) => juntos.get(k).dentro === lado && limpas.get(k)?.every((v) => v >= 0))) continue;
+    for (const k of chaves) juntos.delete(k);
+    if (lado) dentro.push(f);
+  }
   const faces = new Map();
   for (const [k, p] of juntos) {
     const vs = limpas.get(k);
@@ -568,28 +581,6 @@ export function dividirMalhaPorContorno({ V, F, ids, quadro, poligono, sentido =
   for (const lista of faces.values()) { lista.sort((a, b) => b.area - a.area); medidas.pedacos += lista.length; }
   medidas.facesCortadas = faces.size;
   return { faces, dentro, vertices: novos, medidas };
-}
-
-/* Os campos de um registro de origem que são listas de faces: a face cortada que está numa delas leva os pedaços novos para lá. */
-const LISTAS_DE_FACES = ['faces', 'externa', 'interna', 'borda', 'parede', 'lente', 'lateral', 'pontas', 'costura'];
-
-/** Os pedaços novos de uma face cortada entram nas origens publicadas que citam a face, como na booleana: a seleção por origem
- *  (`{ origem: { op: 'subdivisao', id } }`, com ou sem `parte`, e os grupos dela) continua cobrindo a chapa inteira depois da divisão. */
-function herdarNasOrigens(st, novasDe) {
-  if (!novasDe.size) return;
-  const herdar = (lista) => {
-    if (!Array.isArray(lista) || !lista.every(Number.isInteger)) return;
-    const acrescimo = lista.flatMap((f) => novasDe.get(f) ?? []);
-    if (!acrescimo.length) return;
-    let crescente = true; for (let k = 1; k < lista.length && crescente; k++) crescente = lista[k - 1] < lista[k];
-    lista.push(...acrescimo);
-    if (crescente) lista.sort((x, y) => x - y);
-  };
-  for (const registros of st.origens.values()) for (const registro of registros) {
-    for (const campo of LISTAS_DE_FACES) herdar(registro[campo]);
-    if (registro.grupos && typeof registro.grupos === 'object') for (const lista of Object.values(registro.grupos)) herdar(lista);
-    if (registro.espelho && typeof registro.espelho === 'object') for (const campo of LISTAS_DE_FACES) herdar(registro.espelho[campo]);
-  }
 }
 
 export function criarOperacoesDivisaoPorContorno(servicos) {
@@ -649,7 +640,7 @@ export function criarOperacoesDivisaoPorContorno(servicos) {
       if (!idDe.has(v)) { const id = idDoPasso(i, proximoV++); addV(st, id, r.vertices[-1 - v]); idDe.set(v, id); }
       return idDe.get(v);
     };
-    const daParte = [...r.dentro]; const novasDe = new Map();
+    const daParte = [...r.dentro];
     for (const f of [...r.faces.keys()].sort((x, y) => x - y)) {
       const face = st.F.get(f); const pedacos = r.faces.get(f);
       pedacos.forEach((p, k) => {
@@ -662,13 +653,13 @@ export function criarOperacoesDivisaoPorContorno(servicos) {
           nf.cor = face.cor; nf.material = face.material; nf.parte = face.parte; nf.liso = face.liso; nf.solido = face.solido;
           if (st.parteAtribuidaEm?.has(f)) st.parteAtribuidaEm.set(id, st.parteAtribuidaEm.get(f));
           (st.pedacosDe ??= new Map()).set(id, f);
-          if (!novasDe.has(f)) novasDe.set(f, []);
-          novasDe.get(f).push(id);
+          /* quem cita a face por origem cita os pedaços dela: `comPedacosDaDivisao`, no núcleo, lê este mapa */
+          const irmaos = (st.pedacosDaDivisao ??= new Map()).get(f) ?? [];
+          irmaos.push(id); st.pedacosDaDivisao.set(f, irmaos);
         }
         if (p.dentro) daParte.push(id);
       });
     }
-    herdarNasOrigens(st, novasDe);
     parte(st, { nome: a.nome, ...(material !== null ? { material } : {}), ...(a.substituir === true ? { substituir: true } : {}), faces: daParte.sort((x, y) => x - y) }, i);
   }
 

@@ -1985,7 +1985,24 @@ function resolverOrigemBruta(st, origem) {
   if (!registros.length) return { erro: `origem ${origem.op}:${origem.id} inexistente ou ainda não criada` };
   if (registros.length !== 1) return { erro: `origem ${origem.id} ambígua: ${registros.length} geradores declararam esta identidade` };
   if (registros[0].op !== origem.op) return { erro: `origem ${origem.id} foi declarada por '${registros[0].op}', não por '${origem.op}'` };
-  return validacao.contrato.resolver(st, registros[0], origem);
+  /* a origem citada dentro de outra (o `de` de uma cópia) resolve sem os pedaços: a cópia conhece as faces da fonte como eram */
+  profundidadeDaOrigem++;
+  let resolvida;
+  try { resolvida = validacao.contrato.resolver(st, registros[0], origem); } finally { profundidadeDaOrigem--; }
+  return profundidadeDaOrigem === 0 ? comPedacosDaDivisao(st, resolvida) : resolvida;
+}
+let profundidadeDaOrigem = 0;
+
+/* A face que a `divisaoPorContorno` cortou continua sendo a mesma superfície, em pedaços: quem cita a face por origem cita os pedaços
+   dela, logo depois dela, qualquer que seja o jeito de o gerador guardar as faces (lista, grade, mapa de cópias ou endereço de uma face
+   só). `st.pedacosDaDivisao` leva a face cortada aos pedaços novos, e o pedaço cortado de novo aos dele. */
+function comPedacosDaDivisao(st, resolvida) {
+  const pedacos = st.pedacosDaDivisao;
+  if (!pedacos?.size || !Array.isArray(resolvida?.faces) || !resolvida.faces.some((f) => pedacos.has(f))) return resolvida;
+  const faces = []; const postas = new Set();
+  const poe = (f) => { if (postas.has(f)) return; postas.add(f); faces.push(f); for (const p of pedacos.get(f) ?? []) if (st.F.has(p)) poe(p); };
+  for (const f of resolvida.faces) poe(f);
+  return { ...resolvida, faces };
 }
 
 /* UMA face, endereçada por origem estrutural. É o que o `furo` exige de `de` e

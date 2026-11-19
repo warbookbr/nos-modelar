@@ -65,6 +65,14 @@ O triângulo de 3,3 graus era recusado como túnel, e o lado ao longo de uma lin
 
 Depois das correções, a bateria de 180 posições continua com 0 recusas e 0 reprovas com encaixe 0,05 (menor razão 0,0047) e 0,02 (0,0032).
 
+## A segunda revisão, de 2026-11-19
+
+A lista de campos de origem feita à mão cobria a subdivisão e deixava de fora a grade do plano, as faixas do lathe, as laterais do cilindro e o mapa de cópias do espelha e do arranja: sobre um plano a seleção pela origem perdia 15 de 51 faces, e sobre a cópia de um espelha 181 de 1056. A lista saiu. O passo anota em `st.pedacosDaDivisao` os pedaços de cada face cortada, e a resolução de origem do núcleo (`comPedacosDaDivisao`, em `procedural/nucleo/nucleo.js`) entrega os pedaços logo depois da face, para qualquer gerador. O registro de cada gerador não é alterado, e por isso o endereço de uma face só (a face nomeada de um cubo) e o mapa de cópias, que não são listas, também funcionam sem recusa. A origem citada dentro de outra (o `de` de uma cópia) resolve sem os pedaços, de modo que dividir a fonte depois do espelho não quebra a cópia. Há um teste por gerador (subdivisão, plano, lathe, cilindro, espelha, arranja e a face de um cubo): a seleção pela origem marca as faces de antes mais todos os pedaços novos, e a segunda divisão, por um contorno que contém o primeiro, não deixa face da primeira parte para trás.
+
+O contorno exatamente sobre as arestas mudava faces que só encostava: girava os cantos na chapa plana e partia quadriláteros não planos em dois triângulos do mesmo lado. A face cujos pedaços caem todos do mesmo lado, sem vértice novo, agora fica como estava. No teste, o contorno pelas arestas de um bloco de faces da pele de fora deixa a malha inteira igual à de antes, vértices e cantos, nas chapas plana e curva. Nos oito casos do ataque (bloco e L, pelas arestas da pele de fora e da de dentro, nas chapas curva e plana) nenhuma face de antes muda e nenhuma face nova aparece (880 faces antes e depois).
+
+A recusa da borda diz "toca ou cruza".
+
 ## As recusas
 
 Cada uma tem teste que confere a mensagem, e `node tools/gates/recusas-exercitadas.mjs` passou a vigiar o arquivo: argumentos inválidos (`chapa`, `vista`, `nome`, `material`, `substituir`, `sentido`, `segmentosArco`, `encaixe`, `contorno`), o contorno que se cruza, o ponto do contorno fora da chapa, o contorno que cruza a borda da chapa ou uma face de perfil, a chapa furada mais de uma vez sem `sentido`, as camadas que se sobrepõem em profundidade, o contorno que cabe num triângulo só, o espinho pelo mesmo vértice, o bico mais estreito que o encaixe, o número que a receita não resolve, o pedaço fino com a medida, a região de dentro que se liga à de fora por trás da camada e a região que já é de outra parte sem `substituir: true`. A defesa das contas de ponto flutuante do traço não tem entrada que a alcance e está nas exceções do gate, com o motivo.

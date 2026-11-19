@@ -325,6 +325,104 @@ describe('divisaoPorContorno: o contorno de cotas redondas, sobre vértices e ar
   });
 });
 
+describe('divisaoPorContorno: a origem de cada gerador continua cobrindo o objeto depois da divisão (segunda revisão de 2026-11-19)', () => {
+  /* Para a seleção `sel` de um gerador: depois da primeira divisão a seleção pela origem marca as faces de antes mais todos os pedaços
+     novos, e a segunda divisão, por um contorno que contém o primeiro, não deixa face da primeira parte para trás. */
+  function conferir(base, topo, sel, campos, contorno1, contorno2) {
+    const marcadas = (passos) => { const r = nucleo([...passos, ['parte', { sel, nome: 'marca', substituir: true }]], {}, topo); expect(r.orfaos).toEqual([]); return [...r.F.values()].filter((f) => f.parte === 'marca').length; };
+    const a = nucleo(base, {}, topo);
+    expect(a.orfaos).toEqual([]);
+    const d1 = ['divisaoPorContorno', { chapa: sel, nome: 'painel', contorno: contorno1, ...campos }];
+    const r1 = nucleo([...base, d1], {}, topo);
+    expect(r1.orfaos).toEqual([]);
+    const novas = r1.F.size - a.F.size;
+    expect(novas).toBeGreaterThan(0);
+    expect([...r1.F.values()].filter((f) => f.parte === 'painel').length).toBeGreaterThan(0);
+    expect(marcadas([...base, d1])).toBe(marcadas(base) + novas);
+    const r2 = nucleo([...base, d1, ['divisaoPorContorno', { chapa: sel, nome: 'maior', contorno: contorno2, substituir: true, ...campos }]], {}, topo);
+    expect(r2.orfaos).toEqual([]);
+    expect([...r2.F.values()].filter((f) => f.parte === 'painel').length).toBe(0);
+    expect([...r2.F.values()].filter((f) => f.parte === 'maior').length).toBeGreaterThan([...r1.F.values()].filter((f) => f.parte === 'painel').length);
+    expect(reprovas(r2).length).toBe(reprovas(a).length);
+    expect(Math.abs(area(triangulos(r2)) - area(triangulos(a))) / area(triangulos(a))).toBeLessThan(1e-12);
+    return r2;
+  }
+
+  it('subdivisao', () => {
+    conferir(BASE, GRADE.TOPO, CHAPA, { vista: 'y' }, retangulo(110.3, 110.7, 250.1, 250.9), retangulo(90.3, 90.7, 290.1, 290.9));
+  });
+
+  it('plano, que guarda as faces em grade', () => {
+    conferir([['plano', { origemId: 7, largura: 0.4, profundidade: 0.4, seg: 6 }]], {}, { origem: { op: 'plano', id: 7 } }, { vista: 'y' }, retangulo(-110.3, -90.7, 50.1, 80.9), retangulo(-150.3, -150.7, 150.1, 150.9));
+  });
+
+  it('lathe, em faixas e lados', () => {
+    conferir([['lathe', { origemId: 3, perfil: [[0.3, 0], [0.3, 0.5], [0.3, 1]], lados: 16, superficie: true }]], {}, { origem: { op: 'lathe', id: 3 } }, { vista: 'x', sentido: '+' }, retangulo(-80.3, 300.7, 90.1, 700.9), retangulo(-150.3, 200.7, 160.1, 800.9));
+  });
+
+  it('cilindro, pelas laterais', () => {
+    const base = [['cilindro', { origemId: 4, raio: 0.3, altura: 1, lados: 16 }]];
+    const ys = [...nucleo(base, {}, {}).V.values()].map((p) => p[1]); const y0 = Math.min(...ys) * 1000;
+    conferir(base, {}, { origem: { op: 'cilindro', id: 4 } }, { vista: 'x', sentido: '+' }, retangulo(-80.3, y0 + 300.7, 90.1, y0 + 700.9), retangulo(-150.3, y0 + 200.7, 160.1, y0 + 800.9));
+  });
+
+  it('espelha, que guarda a cópia de cada face num mapa', () => {
+    const base = [...BASE, ['espelha', { eixo: 'x', pos: 0, origemId: 9, derivaDe: { op: 'subdivisao', id: 1 }, sel: CHAPA }]];
+    const copia = { origem: { op: 'espelha', id: 9, de: { op: 'subdivisao', id: 1 } } };
+    conferir(base, GRADE.TOPO, copia, { vista: 'y' }, retangulo(-250.1, 110.7, -110.3, 250.9), retangulo(-300.1, 60.7, -60.3, 300.9));
+    /* a fonte dividida depois do espelho: a cópia continua inteira, e a fonte continua coberta pela origem dela */
+    const r = nucleo([...base, ['divisaoPorContorno', { chapa: CHAPA, vista: 'y', nome: 'painel', contorno: retangulo(110.3, 110.7, 250.1, 250.9) }], ['parte', { sel: copia, nome: 'copia' }], ['parte', { sel: CHAPA, nome: 'fonte', substituir: true }]], {}, GRADE.TOPO);
+    expect(r.orfaos).toEqual([]);
+    expect([...r.F.values()].filter((f) => f.parte === 'copia').length).toBe(880);
+    expect([...r.F.values()].filter((f) => f.parte === 'fonte').length).toBe(r.F.size - 880);
+  });
+
+  it('arranja', () => {
+    const base = [...BASE, ['arranja', { modo: 'linear', total: 2, d: [0.5, 0, 0], origemId: 9, derivaDe: { op: 'subdivisao', id: 1 }, sel: CHAPA, nomes: ['copia'] }]];
+    conferir(base, GRADE.TOPO, { origem: { op: 'arranja', id: 9, de: { op: 'subdivisao', id: 1 } } }, { vista: 'y' }, retangulo(610.3, 110.7, 750.1, 250.9), retangulo(590.3, 90.7, 790.1, 290.9));
+  });
+
+  it('a face nomeada de um cubo, endereço de uma face só, entrega a face e os pedaços dela', () => {
+    const base = [['cubo', { origemId: 1, larg: 1, alt: 1, prof: 1 }]];
+    const topo = { origem: { op: 'cubo', id: 1, face: 'topo' } };
+    const r = nucleo([...base, ['divisaoPorContorno', { chapa: topo, vista: 'y', nome: 'painel', contorno: retangulo(-300.3, -200.7, 200.1, 300.9) }], ['parte', { sel: topo, nome: 'marca', substituir: true }]], {}, {});
+    expect(r.orfaos).toEqual([]);
+    expect(r.F.size).toBeGreaterThan(6);
+    expect([...r.F.values()].filter((f) => f.parte === 'marca').length).toBe(r.F.size - 5);
+  });
+});
+
+describe('divisaoPorContorno: o contorno sobre as arestas não muda as faces que só encosta (segunda revisão de 2026-11-19)', () => {
+  it('o contorno pelas arestas de um bloco de faces da pele de fora deixa todas as faces de antes com o id e os cantos', () => {
+    for (const alturaDaChapa of [altura, () => 0]) {
+      const grade = chapaDeGrade({ nx: 6, nz: 6, passo: 80, altura: alturaDaChapa, espessura: 2, niveis: 2 });
+      const base = [['subdivisao', { origemId: 1, ...grade.passo }]];
+      const a = nucleo(base, {}, grade.TOPO);
+      /* a volta das arestas de fora do bloco de faces da pele de fora com o centro de 110 a 250 mm em x e de 110 a 210 mm em z */
+      const pele = nucleo([...base, ['parte', { sel: { origem: { op: 'subdivisao', id: 1, parte: 'externa' } }, nome: 'x' }]], {}, grade.TOPO);
+      const bloco = [...pele.F.values()].filter((f) => { if (f.parte !== 'x') return false; const c = f.vs.map((v) => a.V.get(v)).reduce((s, p) => [s[0] + p[0] / f.vs.length, s[1] + p[2] / f.vs.length], [0, 0]); return c[0] > 0.11 && c[0] < 0.25 && c[1] > 0.11 && c[1] < 0.21; });
+      expect(bloco.length).toBeGreaterThan(30);
+      const usos = new Map();
+      for (const f of bloco) f.vs.forEach((v, k) => { const w = f.vs[(k + 1) % f.vs.length]; const ch = v < w ? `${v}:${w}` : `${w}:${v}`; usos.set(ch, (usos.get(ch) ?? 0) + 1); });
+      const seguinte = new Map();
+      for (const f of bloco) f.vs.forEach((v, k) => { const w = f.vs[(k + 1) % f.vs.length]; if (usos.get(v < w ? `${v}:${w}` : `${w}:${v}`) === 1) seguinte.set(v, w); });
+      const volta = [seguinte.keys().next().value];
+      while (seguinte.get(volta[volta.length - 1]) !== volta[0]) volta.push(seguinte.get(volta[volta.length - 1]));
+      expect(volta.length).toBeGreaterThan(20);
+      const pontos = volta.map((v) => [a.V.get(v)[0], a.V.get(v)[2]]);
+      const r = nucleo([...base, ['divisaoPorContorno', { chapa: CHAPA, vista: 'y', nome: 'painel', contorno: { inicio: pontos[0], trechos: [...pontos.slice(1), pontos[0]].map((p) => ({ reto: p })) } }]], {}, grade.TOPO);
+      expect(r.orfaos).toEqual([]);
+      /* nenhuma face nem vértice novo, e cada face de antes com os mesmos cantos na mesma ordem (o mesmo texto canônico sem as partes) */
+      const semPartes = (x) => JSON.stringify([[...x.V].sort((p, q) => p[0] - q[0]), [...x.F.values()].sort((p, q) => p.id - q.id).map((f) => [f.id, f.vs])]);
+      expect(semPartes(r)).toBe(semPartes(a));
+      const daParte = new Set([...r.F.values()].filter((f) => f.parte === 'painel').map((f) => f.id));
+      for (const f of bloco) expect(daParte.has(f.id)).toBe(true);
+      /* a pele de dentro, sob o bloco, entra com o mesmo número de faces inteiras */
+      expect(daParte.size).toBe(2 * bloco.length);
+    }
+  });
+});
+
 describe('divisaoPorContorno: as recusas', () => {
   const motivo = (campos, base, topo) => { const r = dividir(campos, base, topo); expect(r.orfaos.length, JSON.stringify(campos)).toBeGreaterThan(0); expect(r.F.size).toBe((base ? nucleo(base, {}, topo ?? GRADE.TOPO) : antes()).F.size); return `${r.orfaos[0].ref}: ${r.orfaos[0].motivo}`; };
 
@@ -377,12 +475,12 @@ describe('divisaoPorContorno: as recusas', () => {
     const furada = peleDeCima.filter((id) => { const [x, z] = xz(a.F.get(id)); return !(Math.abs(x - m(190)) < m(1) && Math.abs(z - m(130)) < m(1)); });
     expect(furada.length).toBe(peleDeCima.length - 1);
     const semFace = dividirMalhaPorContorno({ V: a.V, F: a.F, ids: furada, quadro, poligono });
-    expect(semFace.erro).toMatch(/o contorno cruza a borda da chapa ou a parede de um vão em \[[\d.]+, [\d.]+\] mm/);
+    expect(semFace.erro).toMatch(/o contorno toca ou cruza a borda da chapa ou a parede de um vão em \[[\d.]+, [\d.]+\] mm/);
     /* um degrau: dois patamares ligados por uma face vertical, que a vista de cima vê de perfil */
     const V = new Map([[0, [0, 0, 0]], [1, [0.1, 0, 0]], [2, [0.1, 0, 0.1]], [3, [0, 0, 0.1]], [4, [0.1, 0.05, 0]], [5, [0.2, 0.05, 0]], [6, [0.2, 0.05, 0.1]], [7, [0.1, 0.05, 0.1]]]);
     const F = new Map([[0, { vs: [0, 3, 2, 1] }], [1, { vs: [4, 7, 6, 5] }], [2, { vs: [1, 2, 7, 4] }]]);
     const degrau = dividirMalhaPorContorno({ V, F, ids: [0, 1, 2], quadro, poligono: [[0.03, 0.03], [0.17, 0.03], [0.17, 0.07], [0.03, 0.07]] });
-    expect(degrau.erro).toMatch(/o contorno cruza a borda da chapa ou a parede de um vão/);
+    expect(degrau.erro).toMatch(/o contorno toca ou cruza a borda da chapa ou a parede de um vão/);
   });
 
   it('as duas camadas que se sobrepõem em profundidade', () => {
