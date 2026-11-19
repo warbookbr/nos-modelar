@@ -147,7 +147,8 @@ describe('divisaoPorContorno: a cópia, o friso e a face consumida depois da div
     const arredondar = ['arredondarCostura', { origemId: 4, de: { op: 'unir', id: 3 }, raio: m(8) }];
     const marcar = ['parte', { sel: uniao, nome: 'marca', substituir: true }];
     const contar = (passos) => { const r = nucleo(passos, {}, {}); expect(r.orfaos).toEqual([]); return { faces: r.F.size, marcadas: [...r.F.values()].filter((f) => f.parte === 'marca').length, painel: [...r.F.values()].filter((f) => f.parte === 'painel').length }; };
-    /* o contorno passa sobre a costura: o arredondamento consome pedaços da divisão e corta outros */
+    /* o contorno passa a 2,3 mm da costura (que fica em x = 10 mm), dentro da faixa de 8 mm que o arredondamento refaz, sem cruzá-la:
+       o arredondamento consome pedaços da divisão e corta outros. O contorno que cruza a costura recusa (o teste seguinte). */
     const dividir = ['divisaoPorContorno', { chapa: uniao, vista: 'y', nome: 'painel', contorno: retangulo(12.3, -25.7, 30.1, 25.9) }];
     const sem = contar([...base, arredondar, marcar]);
     const soDivisao = contar([...base, dividir]);
@@ -159,6 +160,44 @@ describe('divisaoPorContorno: a cópia, o friso e a face consumida depois da div
     const daConcordancia = (passos) => { const r = nucleo([...passos, ['parte', { sel: { origem: { op: 'arredondarCostura', id: 4 } }, nome: 'concordancia' }]], {}, {}); expect(r.orfaos).toEqual([]); return [...r.F.values()].filter((f) => f.parte === 'concordancia').length; };
     expect(sem.marcadas + daConcordancia([...base, arredondar])).toBe(sem.faces);
     expect(com.marcadas + daConcordancia([...base, dividir, arredondar])).toBe(com.faces);
+  });
+
+  it('o contorno que corta uma aresta da costura de uma booleana recusa, com a origem e o ponto; dentro da costura, divide', () => {
+    /* a esfera cravada no cubo: a costura é um círculo de 32 arestas na face de baixo do cubo, de 15 mm de raio */
+    const base = [
+      ['cubo', { origemId: 1, larg: m(100), alt: m(20), prof: m(100), em: [0, 0, 0] }],
+      ['esfera', { origemId: 2, raio: m(25), aneis: 12, lados: 16, em: [0, m(-20), 0] }],
+      ['unir', { origemId: 3, solidos: [{ origem: { op: 'cubo', id: 1 } }, { origem: { op: 'esfera', id: 2 } }] }],
+    ];
+    const uniao = { origem: { op: 'unir', id: 3 } };
+    const dividir = (contorno) => ['divisaoPorContorno', { chapa: uniao, vista: 'y', nome: 'painel', contorno }];
+    const arredondar = ['arredondarCostura', { origemId: 4, de: { op: 'unir', id: 3 }, raio: m(4) }];
+    const friso = ['friso', { origemId: 4, linha: { nome: 'x' }, costura: { de: { op: 'unir', id: 3 } }, perfil: { circulo: { raio: m(1) } } }];
+    const daOrigem = (passos, op) => { const r = nucleo([...passos, ['parte', { sel: { origem: { op, id: 4 } }, nome: 'x4' }]], {}, {}); return { orfaos: r.orfaos, faces: [...r.F.values()].filter((f) => f.parte === 'x4').length }; };
+    const antesDaDivisao = nucleo(base, {}, {});
+    const cruza = retangulo(10.3, -6.7, 40.1, 6.9);
+    const recusada = nucleo([...base, dividir(cruza)], {}, {});
+    expect(recusada.orfaos.length).toBe(1);
+    expect(recusada.orfaos[0]).toMatchObject({ op: 'divisaoPorContorno', ref: 'contorno' });
+    expect(recusada.orfaos[0].motivo).toMatch(/o contorno corta a aresta \d+-\d+ da costura da origem unir:3, em \[[\d.-]+, [\d.-]+\] mm, vista do eixo y: a origem guarda as arestas da costura, e o arredondarCostura e o friso pela costura perderiam esse trecho sem aviso; desloque o contorno para não cruzar a costura, ou ponha a divisão antes do passo unir/);
+    /* nada foi cortado: a malha é a de antes, e as 32 arestas da costura existem todas */
+    expect(recusada.F.size).toBe(antesDaDivisao.F.size);
+    expect(recusada.V.size).toBe(antesDaDivisao.V.size);
+    /* o arredondamento e o friso depois do passo recusado saem inteiros, como sem a divisão */
+    const concordancia = daOrigem([...base, arredondar], 'arredondarCostura');
+    const cordao = daOrigem([...base, friso], 'friso');
+    expect(concordancia.orfaos).toEqual([]);
+    expect(cordao.orfaos).toEqual([]);
+    expect(daOrigem([...base, dividir(cruza), arredondar], 'arredondarCostura').faces).toBe(concordancia.faces);
+    expect(daOrigem([...base, dividir(cruza), friso], 'friso').faces).toBe(cordao.faces);
+    /* o contorno inteiro dentro do círculo da costura não corta aresta dela: divide, e a concordância sai com as mesmas faces */
+    const dentro = retangulo(1.3, -6.7, 8.1, 6.9);
+    const dividida = nucleo([...base, dividir(dentro)], {}, {});
+    expect(dividida.orfaos).toEqual([]);
+    expect([...dividida.F.values()].filter((f) => f.parte === 'painel').length).toBeGreaterThan(0);
+    const comDivisao = daOrigem([...base, dividir(dentro), arredondar], 'arredondarCostura');
+    expect(comDivisao.orfaos).toEqual([]);
+    expect(comDivisao.faces).toBe(concordancia.faces);
   });
 
   it('a divisão seguida do limparLascas: a lasca que era pedaço sai sem a origem gritar, e a origem cobre a chapa inteira', () => {

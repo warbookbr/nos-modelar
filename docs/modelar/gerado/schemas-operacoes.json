@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:de6661cb575311a6c4daff724068650d2c0bc4607cd5b86106fc32c42ec478ea",
+  "assinatura": "sha256:2f678d83fb79b7171d071fa07467f7e76dd79da5f35402bb30e5b1c8e7220d94",
   "total": 43,
   "operacoes": [
     {
@@ -1870,7 +1870,7 @@
         "limites": [
           "A superfície não muda: cada vértice novo fica sobre uma aresta ou sobre um triângulo de antes. A face que o contorno não toca fica com id e cantos, a cortada fica com o id no maior pedaço, e os outros pedaços e os vértices ganham id no bloco do passo. Quem cita a face cortada por origem recebe os pedaços dela, em qualquer gerador, e a seleção pela origem continua cobrindo o objeto inteiro. A face que o contorno só encosta, pelas arestas, fica com id e cantos.",
           "A chapa fechada (com espessura) é cortada nas duas peles da camada. A borda se afasta do contorno no máximo a fração do encaixe da maior aresta do triângulo de antes por onde passa (com faces quadradas, a diagonal).",
-          "Gritam, antes de mexer na malha: o contorno que se cruza, o ponto fora da chapa, o que toca ou cruza a borda ou a parede de um vão, a chapa atravessada mais de uma vez sem sentido, o contorno que cabe numa face só, o espinho pelo mesmo vértice, o bico mais estreito que o encaixe (a ponta de até duas vezes o encaixe é aparada sem recusa), o pedaço abaixo do limite de face fina (com a medida) e a região que já é de outra parte sem substituir."
+          "Gritam, antes de mexer na malha: o contorno que se cruza, o ponto fora da chapa, o que toca ou cruza a borda ou a parede de um vão, a chapa atravessada mais de uma vez sem sentido, o contorno que cabe numa face só, o espinho pelo mesmo vértice, o contorno que corta uma aresta da costura de uma booleana (divida antes dela, ou desloque o contorno), o bico mais estreito que o encaixe (a ponta de até duas vezes o encaixe é aparada sem recusa), o pedaço abaixo do limite de face fina (com a medida) e a região que já é de outra parte sem substituir."
         ],
         "diagnosticos": [
           {
@@ -5430,7 +5430,7 @@
       }
     }
   ],
-  "assinaturaComExtensoes": "sha256:b52a0c250bb715c9fba37307fbf5caec20f0ca7044910bb3e51731d2861d215a",
+  "assinaturaComExtensoes": "sha256:af4c7722e8177e05199a9c19ce3da466a73b5be5d0075e6f4697287aa4b14fda",
   "totalExtensoes": 5,
   "extensoes": [
     {

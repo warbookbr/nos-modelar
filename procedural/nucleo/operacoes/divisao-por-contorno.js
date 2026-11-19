@@ -52,7 +52,7 @@
 
    AS RECUSAS, todas antes de mexer na malha: contorno que se cruza, ponto do contorno fora da chapa na vista, contorno que cruza a
    borda da chapa ou a parede de um vão, chapa atravessada mais de uma vez sem `sentido`, contorno que cabe inteiro numa face,
-   espinho que entra e sai pelo mesmo vértice, bico mais estreito que o encaixe, pedaço fino e face que já é de outra parte sem
+   espinho que entra e sai pelo mesmo vértice, bico mais estreito que o encaixe, aresta cortada da costura de uma booleana, pedaço fino e face que já é de outra parte sem
    `substituir: true`. */
 import { contornoPorTrechos, ErroDeCurva } from '../curva2d.js';
 import { diagnosticarContorno, limparContorno } from '../contorno.js';
@@ -583,7 +583,21 @@ export function dividirMalhaPorContorno({ V, F, ids, quadro, poligono, sentido =
   }
   for (const lista of faces.values()) { lista.sort((a, b) => b.area - a.area); medidas.pedacos += lista.length; }
   medidas.facesCortadas = faces.size;
-  return { faces, dentro, vertices: novos, medidas };
+  /* as arestas de antes que deixaram de existir: as que ganharam vértice novo e que nenhuma face tem mais inteira (a face que ficou
+     como estava ainda a tem). Quem guarda arestas por par de vértices, como a costura de uma booleana, perderia o trecho. */
+  const inteiras = new Set();
+  const comAsArestasDe = (vs) => vs.forEach((v, k) => inteiras.add(chave(v, vs[(k + 1) % vs.length])));
+  for (const lista of faces.values()) for (const p of lista) comAsArestasDe(p.vs);
+  for (const f of pedacosDe.keys()) if (!faces.has(f)) comAsArestasDe(F.get(f).vs);
+  const arestasCortadas = [];
+  for (const [ch, nos] of nosDaAresta) {
+    if (!reais.has(ch) || inteiras.has(ch)) continue;
+    const no = nos.find((n) => n.id < 0);
+    if (!no) continue;
+    const [u, v] = ch.split(':').map(Number);
+    arestasCortadas.push({ u, v, em: p2(no.id).slice(0, 2) });
+  }
+  return { faces, dentro, vertices: novos, medidas, arestasCortadas };
 }
 
 export function criarOperacoesDivisaoPorContorno(servicos) {
@@ -630,6 +644,18 @@ export function criarOperacoesDivisaoPorContorno(servicos) {
 
     const r = dividirMalhaPorContorno({ V: st.V, F: st.F, ids, quadro, poligono, sentido: a.sentido ?? null, encaixe });
     if (r.erro) return grita(st, i, OP, r.ref, r.erro);
+    /* a costura de uma booleana guarda as arestas dela por par de vértices (`arestas` do registro da origem), e o arredondarCostura e o
+       friso pela costura pulam calados a aresta que não existe mais: o contorno que corta uma delas recusa, antes de qualquer corte */
+    if (r.arestasCortadas.length) {
+      const cortadas = new Map(r.arestasCortadas.map((c) => [chave(c.u, c.v), c]));
+      for (const [id, registros] of st.origens) for (const registro of registros) {
+        if (!Array.isArray(registro.arestas)) continue;
+        for (const par of registro.arestas) {
+          const c = Array.isArray(par) && par.length === 2 ? cortadas.get(chave(par[0], par[1])) : undefined;
+          if (c) return grita(st, i, OP, 'contorno', `o contorno corta a aresta ${c.u}-${c.v} da costura da origem ${registro.op}:${id}, em ${texto2(c.em)}, vista ${quadro.nome}: a origem guarda as arestas da costura, e o arredondarCostura e o friso pela costura perderiam esse trecho sem aviso; desloque o contorno para não cruzar a costura, ou ponha a divisão antes do passo ${registro.op}`);
+        }
+      }
+    }
     /* a face que já é de outra parte só muda de parte com `substituir: true`: conferido antes de qualquer corte */
     if (a.substituir !== true) {
       const alheia = [...r.dentro, ...[...r.faces].filter(([, pedacos]) => pedacos.some((p) => p.dentro)).map(([f]) => f)].sort((x, y) => x - y).find((f) => temNomeDeParte(st.F.get(f).parte) && st.F.get(f).parte !== a.nome);
