@@ -29,7 +29,8 @@
  *     de cada uma, para a medida da emenda ler a curva declarada; a malha não muda.
  *   alisarSuperficie: true | { onda?: mm } liga, no ajuste das cotas do passo, a energia de variação de curvatura da superfície limite: a
  *     curva de cota exata deixa de ser crista de curvatura contra o miolo. O miolo fica sem o `liso`, com a cota de peso 0,003 (`interior`
- *     junto troca o peso); não vale com `liso` nem com curva com `continuidade`. Desligada por padrão.
+ *     junto troca o peso, e `interior: false` é recusado); a onda vale de 2 a 64 passos da gaiola; não vale com `liso` nem com curva com
+ *     `continuidade`. Desligada por padrão, e experimental: não use em receita enquanto o espaçamento desigual não estiver corrigido.
  * devolve: { pontos, passo, linha(curva), pontoDaCurva, linhas, nos, curvas, retalhos, densidades, extraordinarios, avisos, emendas?, ... }.
  * exemplo:
  *   gaiolaPorRede({ passo: 50, fora: [0, 1, 0], nos: { A: [0, 0, 0], B: [200, 0, 0], C: [200, 0, 200], D: [0, 0, 200] },
@@ -101,9 +102,12 @@
  *   que a cota exata ao lado do miolo de peso 1 deixa sem a opção. Com ela o miolo dos retalhos fica como o preenchimento o pôs, sem o
  *   alisamento pela normal (`liso`), e a cota dele passa a ter o peso INTERIOR_COM_ENERGIA (0,003) no lugar de 1: a energia leva o miolo
  *   para onde a curvatura varia menos entre as curvas, e a cota só o segura na forma mais longa que umas dez arestas (o peso p pesa o
- *   mesmo que a energia no comprimento onda/p^(1/6)). `interior` declarado junto troca esse peso, e `interior: false` tira a cota. `onda` é
- *   o comprimento em que a energia e a cota de peso 1 pesam o mesmo (padrão: quatro arestas medianas da gaiola); a cota exata é
- *   restrição, e a onda não a afrouxa. Não vale junto com `liso` nem com curva com `continuidade` (recusa), nesta etapa. O vinco, o
+ *   mesmo que a energia no comprimento onda/p^(1/6)). `interior` declarado junto troca esse peso, e `interior: false` é recusado, porque
+ *   sem a cota do miolo a energia tem liberdade que as curvas não tiram. `onda` é o comprimento em que a energia e a cota de peso 1 pesam
+ *   o mesmo (padrão: quatro arestas medianas da gaiola; fora de 2 a 64 passos, recusa); a cota exata é restrição, e a onda não a afrouxa.
+ *   Não vale junto com `liso` nem com curva com `continuidade` (recusa), nesta etapa. AINDA NÃO SERVE A RECEITA: onde o espaçamento da
+ *   gaiola muda de um retalho para o outro, e no retalho grande de dupla curvatura, a superfície se afasta da forma mais que sem a opção
+ *   (os números estão em `energiaDeVariacaoDeCurvatura` e no banco de provas da correção de superfície). O vinco, o
  *   canto, a borda livre e o vértice extraordinário não têm termo na energia. A curva que não está na forma entre os pontos-chave (a
  *   interpolação dela) continua cota exata, e a superfície passa por ela: o erro da curva vira crista junto dela, e o remédio é o
  *   ponto-chave a mais. Sem a opção (o padrão), a rede e o passo são os de sempre.
@@ -235,7 +239,7 @@ import { curvaCentripeta } from './gaiola-interpolada.js';
 import { extraordinarios as extraordinariosDa } from './gaiola-aneis.js';
 import { alisarMioloNaNormal, LONGE_DA_FILEIRA, INCLINACAO_DA_FILEIRA } from './gaiola-por-rede-liso.js';
 import { alisarPontosDaCurva, conferirTolerancia, lerOpcoesDoAlisamento } from './alisar-curvas.js';
-import { REGULARIZACAO_DE_CURVATURA } from './subdivisao.js';
+import { REGULARIZACAO_DE_CURVATURA, ONDA_MINIMA_EM_PASSOS, ONDA_MAXIMA_EM_PASSOS, passoDaGaiola } from './subdivisao.js';
 
 const MM = 1000;
 const AMOSTRAS_POR_TRECHO = 96;
@@ -859,6 +863,7 @@ export function gaiolaPorRede(definicaoDada) {
     exigirCampos(x, ['onda'], 'alisarSuperficie');
     if (x.onda != null && !(typeof x.onda === 'number' && Number.isFinite(x.onda) && x.onda > 0)) falha(`alisarSuperficie.onda é ${JSON.stringify(x.onda)}; precisa ser comprimento em mm, finito e maior que zero (sem ela, quatro arestas medianas da gaiola)`);
     alisarSuperficie = { onda: x.onda ?? null };
+    if (definicao.interior === false || definicao.interior === null) falha(`alisarSuperficie e interior: ${JSON.stringify(definicao.interior)} foram declarados juntos; sem a cota do miolo a energia tem liberdade que as curvas não tiram (numa chapa só com a borda exata o paraboloide cede 11 mm, medido), e a superfície deixa de ser a desenhada: tire interior, ou declare o peso dele (o padrão com alisarSuperficie é ${String(INTERIOR_COM_ENERGIA).replace('.', ',')})`);
     if (definicao.liso != null && definicao.liso !== false) falha(`alisarSuperficie e liso: ${JSON.stringify(definicao.liso)} foram declarados juntos; com alisarSuperficie a energia do ajuste das cotas alisa a superfície inteira e o miolo não passa pelo alisamento pela normal: tire liso (ou declare liso: false)`);
   }
   let interior = definicao.interior === undefined ? (alisarSuperficie ? INTERIOR_COM_ENERGIA : INTERIOR_PADRAO) : definicao.interior;
@@ -1696,6 +1701,12 @@ export function gaiolaPorRede(definicaoDada) {
   if (cantos.size) passo.cantos = vertices.filter((v) => cantos.has(v));
   if (medidas.length) passo.medidas = medidas;
   if (marcarCurvas) passo.curvas = curvasMarcadas;
+  if (alisarSuperficie && alisarSuperficie.onda !== null) {
+    /* a mesma faixa que o ajuste cobra, dita aqui em mm e com o passo da rede (a metade declarada, na simetria) */
+    const indiceDoPonto = new Map(vertices.map((id, k) => [id, k]));
+    const h = passoDaGaiola(vertices.map((id) => posicao.get(id)), faces.map((f) => f.map((id) => indiceDoPonto.get(id))));
+    if (!(alisarSuperficie.onda >= ONDA_MINIMA_EM_PASSOS * h && alisarSuperficie.onda <= ONDA_MAXIMA_EM_PASSOS * h)) falha(`alisarSuperficie.onda é ${br(alisarSuperficie.onda)} mm, fora da faixa de ${br(ONDA_MINIMA_EM_PASSOS * h)} a ${br(ONDA_MAXIMA_EM_PASSOS * h)} mm: de ${ONDA_MINIMA_EM_PASSOS} a ${ONDA_MAXIMA_EM_PASSOS} passos da gaiola, cujo passo (a mediana das arestas) é ${br(h)} mm; sem onda, o ajuste usa quatro passos`);
+  }
   if (alisarSuperficie && medidas.length) passo.regularizacao = { tipo: REGULARIZACAO_DE_CURVATURA, ...(alisarSuperficie.onda === null ? {} : { onda: alisarSuperficie.onda / MM }) };
   if (simetria) {
     const negativos = vertices.filter((p) => pontos[p][0] < -1e-9);

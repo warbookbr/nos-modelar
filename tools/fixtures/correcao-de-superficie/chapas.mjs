@@ -431,22 +431,28 @@ export const SUPERFICIES_ANALITICAS = Object.freeze({
   },
 });
 
-/** definicaoAnalitica(nome, { continuidade, passo, pontos }): a rede de quatro retalhos sobre a superfície analítica `nome`, com as curvas
+/** definicaoAnalitica(nome, { continuidade, passo, pontos, meio }): a rede de quatro retalhos sobre a superfície analítica `nome`, com as curvas
  *  h0 a h2 (b constante) e v0 a v2 (a constante) a cada meio do parâmetro e `pontos` trechos por curva, os pontos-chave tirados da
  *  função; com `continuidade`, as duas curvas de dentro (h1 e v1, que se cruzam no nó N11) a declaram. */
-export function definicaoAnalitica(nome, { continuidade = null, passo = 25, pontos = 8 } = {}) {
+export function definicaoAnalitica(nome, { continuidade = null, passo = 25, pontos = 8, meio = null } = {}) {
   const S = SUPERFICIES_ANALITICAS[nome];
   if (!S) throw new Error(`superfície analítica '${nome}' não existe; use ${Object.keys(SUPERFICIES_ANALITICAS).join(', ')}`);
   const nos = {};
-  for (const i of [0, 1, 2]) for (const j of [0, 1, 2]) nos[`N${i}${j}`] = S.ponto(i / 2, j / 2);
-  const curva = (nomeDaCurva, fixo, aoLongoDeA) => ({
+  /* `meio: [a, b]` põe o cruzamento das curvas de dentro fora do centro (os retalhos ficam de tamanhos diferentes), com metade dos trechos
+     de cada curva de cada lado dele; sem `meio` a rede é a de sempre, com o cruzamento em [0,5, 0,5] */
+  const cortes = meio ? [[0, meio[0], 1], [0, meio[1], 1]] : [[0, 0.5, 1], [0, 0.5, 1]];
+  const parametro = (k, T) => (meio ? (k <= pontos / 2 ? T[1] * (k / (pontos / 2)) : T[1] + (1 - T[1]) * ((k - pontos / 2) / (pontos / 2))) : k / pontos);
+  for (const i of [0, 1, 2]) for (const j of [0, 1, 2]) nos[`N${i}${j}`] = S.ponto(meio ? cortes[0][i] : i / 2, meio ? cortes[1][j] : j / 2);
+  /* `qual` é 0, 1 ou 2: a curva da borda de baixo, a de dentro e a da borda de cima, no parâmetro fixo cortes[·][qual] */
+  const curva = (nomeDaCurva, qual, aoLongoDeA) => ({
     nome: nomeDaCurva,
     pontos: Array.from({ length: pontos + 1 }, (_, k) => {
-      const s = k / pontos;
-      if (k % (pontos / 2) === 0) return aoLongoDeA ? `N${2 * s}${2 * fixo}` : `N${2 * fixo}${2 * s}`;
+      const fixo = cortes[aoLongoDeA ? 1 : 0][qual];
+      const s = parametro(k, cortes[aoLongoDeA ? 0 : 1]);
+      if (k % (pontos / 2) === 0) return aoLongoDeA ? `N${k / (pontos / 2)}${qual}` : `N${qual}${k / (pontos / 2)}`;
       return aoLongoDeA ? S.ponto(s, fixo) : S.ponto(fixo, s);
     }),
-    ...(continuidade && fixo === 0.5 ? { continuidade } : {}),
+    ...(continuidade && qual === 1 ? { continuidade } : {}),
   });
   const q = (i, j) => ({
     nome: `q${i}${j}`,
@@ -455,7 +461,7 @@ export function definicaoAnalitica(nome, { continuidade = null, passo = 25, pont
   });
   return {
     passo, fora: S.fora, nos,
-    curvas: [0, 0.5, 1].map((b, k) => curva(`h${k}`, b, true)).concat([0, 0.5, 1].map((a, k) => curva(`v${k}`, a, false))),
+    curvas: [0, 1, 2].map((k) => curva(`h${k}`, k, true)).concat([0, 1, 2].map((k) => curva(`v${k}`, k, false))),
     retalhos: [q(0, 0), q(1, 0), q(0, 1), q(1, 1)],
   };
 }

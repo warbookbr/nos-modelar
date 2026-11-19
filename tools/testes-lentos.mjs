@@ -38,7 +38,8 @@ export const TESTES_LENTOS = [
      38 s com a máquina livre */
   'tools/modelar/olhar-bancada-visoes.test.mjs',
   /* 2026-11-19: a energia de variação de curvatura (o protótipo da etapa A e a opção alisarSuperficie do núcleo) nas três superfícies
-     analíticas, nas três chapas emendadas e na rede sem ruído, com o oráculo da superfície limite; 38 s com a máquina livre */
+     analíticas (com o cruzamento no centro e fora dele), nas três chapas emendadas e na rede sem ruído, com o oráculo da superfície
+     limite; 66 s com a máquina livre */
   'tools/fixtures/correcao-de-superficie/energia-de-curvatura.test.mjs',
   /* 2026-11-15: a ondulação da saliência declarada da lataria do carro; 14,1 e 14,8 s sozinho no CI, em duas execuções seguidas */
   'tools/modelar/ondulacao-saliencia-declarada.test.mjs',

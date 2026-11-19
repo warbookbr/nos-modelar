@@ -10,7 +10,7 @@
    mesmo onde o diedro cai abaixo do ângulo, nas pontas do vinco. `quebraNosVincos: 'todos'` quebra também nos vincos de
    nitidez fracionária, e `'nenhum'` deixa só o ângulo; `liso: false` devolve as faces chapadas. Só a marca de sombra
    muda: as posições e as faces são as mesmas com qualquer opção. */
-import { subdividirCatmullClark, espelharGaiolaEmX, costuraEmXExata, ajustarGaiolaAsMedidas, ajustarGaiolaAsMedidasComPeso, nitidezDoVinco, descendenciaDasLinhas, REGULARIZACAO_DE_CURVATURA, ARESTAS_POR_ONDA } from '../subdivisao.js';
+import { subdividirCatmullClark, espelharGaiolaEmX, costuraEmXExata, ajustarGaiolaAsMedidas, ajustarGaiolaAsMedidasComPeso, nitidezDoVinco, descendenciaDasLinhas, REGULARIZACAO_DE_CURVATURA, ARESTAS_POR_ONDA, ErroDaOnda, ONDA_MINIMA_EM_PASSOS, ONDA_MAXIMA_EM_PASSOS } from '../subdivisao.js';
 import { espessarSuperficie, ErroDaEspessura } from '../espessura.js';
 import { valorDoLiso } from '../liso-por-angulo.js';
 
@@ -372,6 +372,7 @@ export function gaiolaDoPasso(a, { vec, num }) {
         gaiola = { ...gaiola, vertices: ajustarGaiolaAsMedidasComPeso({ ...gaiola, borda: a.borda ?? 'suave' }, marcados).vertices };
       }
     } catch (e) {
+      if (e instanceof ErroDaOnda) return erro('regularizacao', `regularizacao.onda é ${e.onda} m, fora da faixa de ${e.minima} a ${e.maxima} m: de ${ONDA_MINIMA_EM_PASSOS} a ${ONDA_MAXIMA_EM_PASSOS} passos da gaiola, cujo passo (a mediana das arestas) é ${e.passo} m; sem onda, o ajuste usa ${ARESTAS_POR_ONDA} passos`);
       if (!e.indices) return erro('medidas', String(e.message));
       const nomes = [...new Set(e.indices.map((k) => origem[k]))].map((k) => (typeof declarados[k] === 'string' ? `'${declarados[k]}'` : `[${gaiola.vertices[k].join(', ')}]`));
       return erro('medidas', `${e.motivo}: ${nomes.join(', ')}`);

@@ -134,6 +134,21 @@ describe('a opção alisarSuperficie no núcleo (etapa B)', () => {
     expect(p.nucleo.distanciaMm).toBeLessThanOrEqual(p.hoje.distanciaMm);
   });
 
+  it('nas analíticas assimétricas (o cruzamento fora do centro), a 100 mm da borda: o paraboloide e o toro não pioram, e a calota é CONHECIDA', () => {
+    /* CONHECIDA, e é o que impede o uso da opção em receita: no retalho grande de dupla curvatura o preenchimento sem alisar fica a mais
+       de 1 mm da calota, e a cota de peso 0,003 segura essa forma longa (o peso p vale no comprimento onda/p^(1/6), umas dez arestas, e
+       o retalho tem doze ou mais). Com 1e-4 as três passam aqui, e com 3e-5 ou 3e-4 uma delas volta a piorar: não há peso que feche.
+       A catraca cobra que a calota não piore além do medido, e falha quando ela passar a caber, para a marca sair. */
+    const conhecidas = { '0.25,0.25': 1.1188, '0.3,0.5': 0.3727 };
+    for (const meio of [[0.25, 0.25], [0.3, 0.5]]) {
+      const provas = Object.fromEntries(provaDasAnaliticas({ definicao: { meio } }).map((p) => [p.superficie, p]));
+      for (const nome of ['paraboloide', 'toro']) expect(provas[nome].nucleo.a100Mm, `${nome} com o meio em ${meio}`).toBeLessThanOrEqual(provas[nome].hoje.a100Mm);
+      const { hoje, nucleo } = provas.calota;
+      expect(nucleo.a100Mm, `a calota com o meio em ${meio} passou a caber: tire a marca`).toBeGreaterThan(hoje.a100Mm);
+      expect(nucleo.a100Mm, `a calota com o meio em ${meio} piorou`).toBeLessThanOrEqual(conhecidas[String(meio)] * 1.02 + 0.001);
+    }
+  });
+
   it('nas chapas emendadas, a rampa e a crista caem e a superfície não se afasta da desenhada mais que hoje', () => {
     const provas = Object.fromEntries(provaDasEmendas().map((e) => [e.chapa, e]));
     /* os tetos são a medida de 2026-11-19 com 2% de folga. A etapa A dava, com o miolo de peso 1 sobre o preenchimento alisado, a rampa
@@ -184,7 +199,12 @@ describe('a opção alisarSuperficie no núcleo (etapa B)', () => {
     expect(gaiolaPorRede({ ...base, alisarSuperficie: true, liso: false }).passo).toEqual(com.passo);
     const comPeso = gaiolaPorRede({ ...base, alisarSuperficie: true, interior: 0.5 });
     expect(comPeso.passo.medidas.filter((m) => typeof m === 'object').every((m) => m.peso === 0.5)).toBe(true);
-    expect(gaiolaPorRede({ ...base, alisarSuperficie: true, interior: false }).passo.medidas.every((m) => typeof m === 'string')).toBe(true);
+    /* sem a cota do miolo a energia tem liberdade que as curvas não tiram: a combinação é recusada */
+    expect(() => gaiolaPorRede({ ...base, alisarSuperficie: true, interior: false })).toThrow(/alisarSuperficie e interior: false foram declarados juntos.*o padrão com alisarSuperficie é 0,003/);
+    /* a onda fora de 2 a 64 passos da gaiola (o passo desta rede é 23,1 mm) é recusada com o valor, a faixa e o passo */
+    for (const onda of [0.2, 40, 2000, 20000]) expect(() => gaiolaPorRede({ ...base, alisarSuperficie: { onda } }), `onda ${onda}`).toThrow(/alisarSuperficie\.onda é [\d,]+ mm, fora da faixa de 46,\d+ a 14\d\d,?\d* mm: de 2 a 64 passos da gaiola, cujo passo \(a mediana das arestas\) é 23,\d+ mm/);
+    expect(gaiolaPorRede({ ...base, alisarSuperficie: { onda: 50 } }).passo.regularizacao.onda).toBe(0.05);
+    expect(gaiolaPorRede({ ...base, alisarSuperficie: { onda: 1400 } }).passo.regularizacao.onda).toBe(1.4);
     expect(() => gaiolaPorRede({ ...base, alisarSuperficie: true, liso: true })).toThrow(/alisarSuperficie e liso: true foram declarados juntos/);
     expect(() => gaiolaPorRede({ ...base, alisarSuperficie: true, liso: { iteracoes: 3 } })).toThrow(/alisarSuperficie e liso/);
     expect(() => gaiolaPorRede({ ...definicaoAnalitica('paraboloide', { continuidade: 'G1' }), alisarSuperficie: true })).toThrow(/alisarSuperficie e a continuidade 'G1' da curva 'h1'/);

@@ -486,11 +486,36 @@ export function ajustarGaiolaAsMedidas(gaiola, medidas) {
  * gaiola que é imagem quadrática da grade inteira (a quadrática inclinada amostrada em passo igual no plano, cujas arestas têm
  * comprimentos diferentes no espaço, inclusive), e h só dá a escala. O vinco, a borda, o canto e o extraordinário não têm termo próprio:
  * entram como pontos do anel dos vizinhos regulares. `onda` é o comprimento de onda em que a energia e a cota de peso 1 pesam o mesmo (a
- * senoide de comprimento `onda` cotada com peso 1 sai com metade da amplitude no contínuo); o padrão é ARESTAS_POR_ONDA passos.
- * Como a energia cobra a derivada segunda do vetor posição, o esticamento do parâmetro ao longo da superfície (o passo que muda de um
- * retalho para o outro) conta como curvatura. */
+ * senoide de comprimento `onda` cotada com peso 1 sai com metade da amplitude no contínuo); o padrão é ARESTAS_POR_ONDA passos, e a onda
+ * declarada fora de ONDA_MINIMA_EM_PASSOS a ONDA_MAXIMA_EM_PASSOS passos é recusada (`ErroDaOnda`).
+ * LIMITE MEDIDO, QUE IMPEDE O USO EM RECEITA: a energia cobra a derivada segunda do vetor posição no parâmetro, e o esticamento do
+ * parâmetro ao longo da superfície conta como curvatura. Onde o espaçamento da gaiola muda de um lado de uma curva para o outro, a
+ * superfície se afasta da forma (com a razão 2 entre os espaçamentos, o paraboloide de raio 0,5 m vai de 0,99 para 3,27 mm). A medida
+ * no espaço que continua linear nos três eixos separados (as diferenças divididas pelos comprimentos das arestas) corrige isso em parte e
+ * deixa de ser nula na quadrática inclinada; a que é exata (a curvatura normal, n · S_uu / |S_u|²) junta os três eixos num sistema só.
+ * Os números estão no banco de provas da correção de superfície. */
 export const REGULARIZACAO_DE_CURVATURA = 'variacaoDeCurvatura';
 export const ARESTAS_POR_ONDA = 4;
+/** a faixa aceita da onda, em passos da gaiola (a mediana das arestas). Abaixo de duas arestas a gaiola não representa a onda e a energia
+ *  deixa de pesar (com 0,01 passo o termo cai abaixo do resto do deslocamento, e o ponto sem cota fica sem nada que o segure); acima de
+ *  64 o peso passa de um milhão de vezes o da cota de peso 1, e de umas centenas de passos em diante o sistema perde o pivô. */
+export const ONDA_MINIMA_EM_PASSOS = 2;
+export const ONDA_MAXIMA_EM_PASSOS = 64;
+
+export class ErroDaOnda extends TypeError {
+  constructor(onda, passo) {
+    super(`subdivisão: a onda da regularizacao é ${onda}, fora da faixa de ${ONDA_MINIMA_EM_PASSOS * passo} a ${ONDA_MAXIMA_EM_PASSOS * passo} (de ${ONDA_MINIMA_EM_PASSOS} a ${ONDA_MAXIMA_EM_PASSOS} passos da gaiola, cujo passo, a mediana das arestas, é ${passo}), na unidade da gaiola`);
+    this.onda = onda; this.passo = passo; this.minima = ONDA_MINIMA_EM_PASSOS * passo; this.maxima = ONDA_MAXIMA_EM_PASSOS * passo;
+  }
+}
+
+/** passoDaGaiola(vertices, faces) -> a mediana dos comprimentos das arestas, contadas face a face: a escala da energia e da faixa da onda */
+export function passoDaGaiola(vertices, faces) {
+  const comprimentos = [];
+  for (const f of faces) for (let k = 0; k < f.length; k++) { const a = vertices[f[k]], b = vertices[f[(k + 1) % f.length]]; comprimentos.push(Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2])); }
+  comprimentos.sort((x, y) => x - y);
+  return comprimentos[comprimentos.length >> 1];
+}
 /** o resto do termo de deslocamento que fica com a energia ligada: só tira a indeterminação do vértice que nenhum termo alcança */
 export const RESTO_DO_DESLOCAMENTO = 1e-9;
 const MASSA_DO_ANEL = [1 / 6, 4 / 6, 1 / 6]; const SEGUNDA_DO_ANEL = [1, -2, 1]; const PRIMEIRA_DO_ANEL = [-0.5, 0, 0.5];
@@ -518,16 +543,15 @@ export function energiaDeVariacaoDeCurvatura(gaiola, { onda = null } = {}) {
   const { nitidez, C } = prepararLimite(gaiola);
   const n = P.length;
   const { arestas } = arestasDa(F);
-  const grau = new Array(n).fill(0); const fora = new Set(C); const comprimentos = [];
+  const grau = new Array(n).fill(0); const fora = new Set(C);
   for (const { a, b, faces } of arestas) {
     grau[a]++; grau[b]++;
     if (faces.length !== 2) { fora.add(a); fora.add(b); }
     if ((nitidez.get(chave(a, b)) ?? 0) > 0) { fora.add(a); fora.add(b); }
   }
-  for (const f of F) for (let k = 0; k < f.length; k++) { const a = P[f[k]], b = P[f[(k + 1) % f.length]]; comprimentos.push(Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2])); }
-  comprimentos.sort((x, y) => x - y);
-  const passo = comprimentos[comprimentos.length >> 1];
+  const passo = passoDaGaiola(P, F);
   if (!(passo > 0)) throw new TypeError('subdivisão: a regularizacao pede uma gaiola com arestas de comprimento maior que zero');
+  if (onda !== null && !(onda >= ONDA_MINIMA_EM_PASSOS * passo && onda <= ONDA_MAXIMA_EM_PASSOS * passo)) throw new ErroDaOnda(onda, passo);
   const ondaUsada = onda ?? ARESTAS_POR_ONDA * passo;
   const facesDoV = facesPorVertice(n, F);
   /* a volta do vértice regular: os quatro vizinhos em ordem, do menor índice, e o canto oposto de cada face entre dois seguidos */
@@ -723,7 +747,11 @@ export const ajustarGaiolaAsMedidasComPeso = memoizarPura(ajustarComPesoSemMemor
  * que esse campo causa na gaiola ajustada: quem edita pontos declarados lê, sem refatorar nem refazer a superfície, quanto
  * a gaiola ajustada se move. `medidas` é a lista de { indice, peso } da gaiola, com peso Infinity para a medida exata, como
  * o passo `subdivisao` as monta, e `regularizacao` a do passo (a que `gaiolaDoPasso` devolve), ou nada. Não confere o ganho nem os
- * resíduos, que as duas funções acima conferem na primeira vez.
+ * resíduos, que as duas funções acima conferem na primeira vez. Com a regularização e a `onda` DECLARADA o ajuste não é linear na
+ * gaiola declarada: os coeficientes da energia valem (onda/passo)⁶, e o passo (a mediana das arestas) sai da gaiola. O operador é o
+ * sistema montado sobre a gaiola recebida, com o passo dela congelado: `aplicar(vertices)` refaz o ajuste dela, e `aplicar(delta)` dá o
+ * deslocamento da ajustada só enquanto o campo não mudar a mediana das arestas. Sem `onda` declarada ela acompanha o passo, os
+ * coeficientes não dependem das posições e o operador é linear como sem a regularização.
  */
 export function operadorDasMedidas(gaiola, medidas, regularizacao = null) {
   const energia = lerRegularizacao(regularizacao);

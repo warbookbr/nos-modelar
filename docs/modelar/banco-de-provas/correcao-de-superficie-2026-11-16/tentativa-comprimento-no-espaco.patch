@@ -1,0 +1,52 @@
+diff --git a/procedural/nucleo/subdivisao.js b/procedural/nucleo/subdivisao.js
+index e0df074e..120d4eb1 100644
+--- a/procedural/nucleo/subdivisao.js
++++ b/procedural/nucleo/subdivisao.js
+@@ -557,20 +557,41 @@ export function energiaDeVariacaoDeCurvatura(gaiola, { onda = null } = {}) {
+     }
+     return [uu, uv, vv];
+   };
+-  const escala = [1 / (passo * passo), Math.SQRT2 / (passo * passo), 1 / (passo * passo)];
+-  const peso = (ondaUsada / (2 * Math.PI)) ** 6 / (passo * passo);
++  /* As mesmas três derivadas NO ESPAÇO: as diferenças divididas com os comprimentos das quatro arestas do vértice na gaiola declarada,
++     congelados. Com l₊ e l₋ os comprimentos para a frente e para trás numa direção, a segunda derivada pesa 2/(l₊(l₊+l₋)), −2/(l₊l₋) e
++     2/(l₋(l₊+l₋)), e a primeira, l₋/(l₊(l₊+l₋)), (l₊−l₋)/(l₊l₋) e −l₊/(l₋(l₊+l₋)): as duas são exatas na quadrática de um parâmetro cujos
++     nós têm esses espaçamentos, e com l₊ = l₋ = l são o estêncil do limite dividido por l². */
++  const comprimento = (a, b) => Math.hypot(P[a][0] - P[b][0], P[a][1] - P[b][1], P[a][2] - P[b][2]);
++  const pesosDaDirecao = (lm, lp) => ({
++    segunda: [2 / (lm * (lp + lm)), -2 / (lp * lm), 2 / (lp * (lp + lm))],
++    primeira: [-lp / (lm * (lp + lm)), (lp - lm) / (lp * lm), lm / (lp * (lp + lm))],
++  });
++  const linhasNoEspaco = (i, k) => {
++    const { viz, diag } = volta(i); const v = (j) => viz[(k + j) % 4]; const q = (j) => diag[(k + j) % 4];
++    const anel = [[q(2), v(2), q(1)], [v(3), i, v(1)], [q(3), v(0), q(0)]];
++    const U = pesosDaDirecao(comprimento(i, v(2)), comprimento(i, v(0))); const W = pesosDaDirecao(comprimento(i, v(3)), comprimento(i, v(1)));
++    const uu = new Map(), uv = new Map(), vv = new Map();
++    const soma = (m, j, w) => { if (w !== 0) m.set(j, (m.get(j) ?? 0) + w); };
++    for (let a = 0; a < 3; a++) for (let b = 0; b < 3; b++) {
++      const j = anel[a][b];
++      soma(uu, j, U.segunda[a] * MASSA_DO_ANEL[b]); soma(vv, j, MASSA_DO_ANEL[a] * W.segunda[b]); soma(uv, j, Math.SQRT2 * U.primeira[a] * W.primeira[b]);
++    }
++    return [uu, uv, vv];
++  };
++  const K = (ondaUsada / (2 * Math.PI)) ** 6;
+   const termos = [];
+   for (const [s, t] of arestas.map(({ a, b }) => (a < b ? [a, b] : [b, a])).sort((x, y) => x[0] - y[0] || x[1] - y[1])) {
+     if (!volta(s) || !volta(t)) continue;
+     /* em s, +u é t; em t, +u é o vizinho oposto a s, e o +v dos dois cai do mesmo lado porque a malha é orientada */
+-    const Ds = linhasDoAnel(s, volta(s).viz.indexOf(t)); const Dt = linhasDoAnel(t, (volta(t).viz.indexOf(s) + 2) % 4);
++    const Ds = linhasNoEspaco(s, volta(s).viz.indexOf(t)); const Dt = linhasNoEspaco(t, (volta(t).viz.indexOf(s) + 2) % 4);
+     const linhas = Ds.map((ls, c) => {
+       const m = new Map();
+-      for (const [j, w] of ls) m.set(j, (m.get(j) ?? 0) + w * escala[c]);
+-      for (const [j, w] of Dt[c]) m.set(j, (m.get(j) ?? 0) - w * escala[c]);
++      for (const [j, w] of ls) m.set(j, (m.get(j) ?? 0) + w);
++      for (const [j, w] of Dt[c]) m.set(j, (m.get(j) ?? 0) - w);
+       return [...m].sort((x, y) => x[0] - y[0]);
+     });
+-    termos.push({ aresta: [s, t], peso, linhas });
++    const l = comprimento(s, t);
++    termos.push({ aresta: [s, t], peso: K / (l * l), linhas });
+   }
+   const derivadas = (i, paraU) => {
+     const k = volta(i)?.viz.indexOf(paraU) ?? -1;
