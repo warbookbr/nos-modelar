@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2128 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2130 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2840,6 +2840,8 @@
 - `medida-na-curva.test.mjs` — medida-na-curva.test.mjs — a medida da emenda na curva declarada (fatia 5 do plano das ferramentas de correção de superfície), pelo neutro marcado (`marcarCu…
 - `onde-ondula.mjs` — onde-ondula.mjs — onde a curvatura da superfície limite oscila, por classe de lugar (fatia 5 do plano das ferramentas de correção de superfície): perto de um…
 - `onde-ondula.test.mjs` — onde-ondula.test.mjs — a régua de onde a curvatura da superfície limite oscila (fatia 5): o ruído das curvas digitadas sobe as viradas do miolo sobre as da r…
+- `preenchimento-do-miolo.mjs` — preenchimento-do-miolo.mjs — PROTÓTIPO, fora do núcleo, da frente que a pessoa abriu em 2026-11-19 na fatia 5 do plano das ferramentas de correção de superfí…
+- `preenchimento-do-miolo.test.mjs` — preenchimento-do-miolo.test.mjs — o protótipo do preenchimento do miolo (`preenchimento-do-miolo.mjs`), fora do núcleo: a mistura, a conferência contra o Coo…
 
 ## tools/fixtures/correcao-de-superficie/chapa-simetrica/
 
