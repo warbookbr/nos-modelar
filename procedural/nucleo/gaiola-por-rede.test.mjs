@@ -440,3 +440,52 @@ describe('com alisarSuperficie, o miolo dos retalhos de quatro lados sai das cur
     expect(sha256Hex(JSON.stringify(sem.pontos))).toBe(IMPRESSAO_PADRAO);
   });
 });
+
+/* O VIZINHO ESTREITO E AS RECUSAS do preenchimento pelas curvas vizinhas (a revisão de 2026-11-19). Um retalho plano de 300 × 300 mm com um
+ * vizinho de largura `lar` à direita, cuja curva de fora (`longe`) sai do plano em `ampY` mm, em onda de período 2π `per` × 1,3 mm. */
+describe('com alisarSuperficie, o vizinho estreito não entra no miolo, e as recusas do preenchimento pelas curvas vizinhas', () => {
+  const faixaFina = (lar, per, ampY) => {
+    const P = (x, z) => [x, 0, z]; const n = 30; const X = 300 + lar;
+    const reta = (a, b) => Array.from({ length: n - 1 }, (_, k) => { const t = (k + 1) / n; return P(a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t); });
+    const longe = Array.from({ length: n - 1 }, (_, k) => { const z = (300 * (k + 1)) / n; return [X, ampY * Math.sin((z / per) * 1.3), z]; });
+    return {
+      passo: 25, fora: [0, 1, 0], nos: { A: P(0, 0), B: P(300, 0), C: P(300, 300), D: P(0, 300), E: P(X, 0), F: P(X, 300) },
+      curvas: [{ nome: 'baixo', pontos: ['A', ...reta([0, 0], [300, 0]), 'B'] }, { nome: 'meio', pontos: ['B', ...reta([300, 0], [300, 300]), 'C'] }, { nome: 'cima', pontos: ['C', ...reta([300, 300], [0, 300]), 'D'] }, { nome: 'esq', pontos: ['D', ...reta([0, 300], [0, 0]), 'A'] },
+        { nome: 'b2', pontos: ['B', 'E'] }, { nome: 'longe', pontos: ['E', ...longe, 'F'] }, { nome: 'c2', pontos: ['F', 'C'] }],
+      retalhos: [{ nome: 'grande', borda: ['baixo', 'meio', 'cima', 'esq'] }, { nome: 'fino', borda: ['b2', 'longe', 'c2', 'meio'] }],
+    };
+  };
+  /* a maior distância (mm) do miolo do retalho grande ao plano dele */
+  const foraDoPlano = (g) => Object.keys(g.pontos).filter((p) => g.origens[p].tipo === 'retalho' && g.origens[p].retalho === 'grande').reduce((m, p) => Math.max(m, Math.abs(g.pontos[p][1]) * MM), 0);
+
+  it('o vizinho de corda abaixo de um quarto da do retalho não entra: o desvio da curva de fora dele não chega ao miolo', () => {
+    /* sem o limite, 0,3 mm de desvio na curva a 2 mm punham o miolo a 10,9 mm do plano, e a 10 mm, a 2,15 */
+    for (const lar of [2, 10, 50, 74]) expect(foraDoPlano(gaiolaPorRede({ ...faixaFina(lar, 30, 0.3), alisarSuperficie: true })), `largura ${lar}`).toBeLessThan(1e-9);
+    /* acima de um quarto o vizinho entra, e o desvio chega ao miolo menor do que é: 0,78 mm de 1 mm com a razão 3,95, e 0,56 com a razão 3 */
+    const quase = foraDoPlano(gaiolaPorRede({ ...faixaFina(76, 30, 1), alisarSuperficie: true })); const tres = foraDoPlano(gaiolaPorRede({ ...faixaFina(100, 30, 1), alisarSuperficie: true }));
+    expect(quase).toBeGreaterThan(0.5); expect(quase).toBeLessThan(0.8);
+    expect(tres).toBeGreaterThan(0.3); expect(tres).toBeLessThan(quase);
+    /* o corte vale para o retalho largo: o estreito continua usando o largo, e o miolo dele não é o do preenchimento padrão */
+    const fino = (g) => Object.keys(g.pontos).filter((p) => g.origens[p].tipo === 'retalho' && g.origens[p].retalho === 'fino');
+    const d = faixaFina(50, 30, 5); const padrao = gaiolaPorRede({ ...d, liso: false }); const novo = gaiolaPorRede({ ...d, alisarSuperficie: true });
+    expect(fino(padrao).length).toBeGreaterThan(10);
+    expect(fino(padrao).reduce((m, p) => Math.max(m, d3(padrao.pontos[p], novo.pontos[p]) * MM), 0)).toBeGreaterThan(0.01);
+  });
+
+  it('recusa quando a curva seguinte do vizinho dobra o miolo que o preenchimento padrão não dobra, e manda tirar a opção ou engrossar o vizinho', () => {
+    const d = faixaFina(100, 5, 200);
+    expect(() => gaiolaPorRede({ ...d, liso: false })).not.toThrow();
+    expect(grito(() => gaiolaPorRede({ ...d, alisarSuperficie: true }))).toMatch(/o preenchimento pelas curvas vizinhas \(alisarSuperficie\) dobra \d+ face\(s\) do retalho 'grande', que o preenchimento padrão não dobra.*tire alisarSuperficie, alise essa curva ou engrosse o retalho vizinho/);
+  });
+
+  it('recusa o ponto sem posição finita, numa rede cujas coordenadas estouram o quadrado da corda', () => {
+    const s = 1e154; const P = (x, z) => [x * s, ((x * x + z * z) / 2000) * s, z * s];
+    const d = {
+      passo: 100 * s, fora: [0, 1, 0], nos: { A: P(0, 0), B: P(300, 0), C: P(300, 300), D: P(0, 300), E: P(600, 0), F: P(600, 300) },
+      curvas: [{ nome: 'b1', pontos: ['A', P(150, 0), 'B'] }, { nome: 'm', pontos: ['B', P(300, 150), 'C'] }, { nome: 'c1', pontos: ['C', P(150, 300), 'D'] }, { nome: 'e', pontos: ['D', P(0, 150), 'A'] }, { nome: 'b2', pontos: ['B', P(450, 0), 'E'] }, { nome: 'l', pontos: ['E', P(600, 150), 'F'] }, { nome: 'c2', pontos: ['F', P(450, 300), 'C'] }],
+      retalhos: [{ nome: 'q1', borda: ['b1', 'm', 'c1', 'e'] }, { nome: 'q2', borda: ['b2', 'l', 'c2', 'm'] }],
+    };
+    expect(() => gaiolaPorRede({ ...d, liso: false })).not.toThrow();
+    expect(grito(() => gaiolaPorRede({ ...d, alisarSuperficie: true }))).toMatch(/o preenchimento pelas curvas vizinhas \(alisarSuperficie\) deu o ponto 'q1\.1\.1' sem posição finita/);
+  });
+});

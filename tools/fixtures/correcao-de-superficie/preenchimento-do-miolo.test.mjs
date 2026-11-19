@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 import { gaiolaPorRede } from '../../../procedural/nucleo/gaiola-por-rede.js';
 import { definicao as definicaoDaChapaLateral } from '../../../procedural/nucleo/fixtures/gaiola-por-rede-prova.js';
 import { definicaoDaChapaSimetrica, definicaoDaEmenda, definicaoDaRede, definicaoTresNoNo } from './chapas.mjs';
-import { contraPrototipo, gradeDoRetalho, pesosDaMistura, preencherGrades, preencherRede, provaDaRede, provaDasAnaliticas, provaDasEmendas } from './preenchimento-do-miolo.mjs';
+import { contraPrototipo, gradeDoRetalho, pesosDaMistura, preencherGrades, preencherRede, provaDaChapaLateral, provaDaRede, provaDasAnaliticas, provaDasEmendas } from './preenchimento-do-miolo.mjs';
 
 const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
 
@@ -118,8 +118,29 @@ describe('o preenchimento pelas curvas vizinhas no núcleo, contra o protótipo'
       const g0 = gaiolaPorRede({ ...def, curvas, liso: false }); const gE = gaiolaPorRede({ ...def, curvas, alisarSuperficie: true });
       expect(contraPrototipo(g0, gE) * 1000, nome).toBeLessThan(1e-9);
     }
-    /* e ali o miolo se mexe de fato: 0,88, 0,71, 0,46 e 4,6 mm (na emenda-g0, de curvatura numa direção só, não) */
+    /* e ali o miolo se mexe de fato: 0,88, 0,71, 0,46 e 4,2 mm (na emenda-g0, de curvatura numa direção só, não) */
     const lateral = definicaoDaChapaLateral({});
     expect(preencherRede(gaiolaPorRede({ ...lateral, liso: false }), 'vizinhas').andou * 1000).toBeGreaterThan(1);
+  });
+
+  it('na chapa lateral de prova, na superfície final: o vizinho estreito cortado tira a piora do retalho baixo, e quatro retalhos seguem CONHECIDOS', () => {
+    const { contraPrototipoMm, retalhos } = provaDaChapaLateral();
+    expect(contraPrototipoMm).toBeLessThan(1e-9);
+    expect(Object.keys(retalhos)).toHaveLength(10);
+    /* O `baixo` era a piora da revisão de 2026-11-19: com o vizinho `ponta` (estreito, de fileiras que viram uns 100 graus em volta da ponta
+       da gota) entrando no miolo, a superfície ficava a 1,112 mm da forma, contra 1,054 sem a opção e 0,941 com o preenchimento padrão.
+       Com o lado cortado pela razão das cordas ela fica a 0,765. */
+    expect(retalhos.baixo.nucleoMm).toBeLessThan(0.78); expect(retalhos.baixo.etapaBMm).toBeGreaterThan(0.93); expect(retalhos.baixo.semAOpcaoMm).toBeGreaterThan(1.04);
+    /* o preenchimento novo não deixa nenhum retalho mais longe que o padrão com a mesma energia, além da quarta casa (o `coluna`: 0,4811 contra 0,4804) */
+    for (const [nome, r] of Object.entries(retalhos)) expect(r.nucleoMm, `${nome} contra a etapa B`).toBeLessThanOrEqual(r.etapaBMm + 0.002);
+    /* CONHECIDOS: com a opção, quatro retalhos ficam mais longe da forma que sem ela. Em três o número é o do preenchimento padrão com a
+       energia (é a energia, e não o miolo), e no `ponta` o miolo novo melhora o da etapa B (0,499) sem chegar ao de sem a opção. A catraca
+       cobra que não piorem além da medida, e falha quando um passar a caber, para a marca sair. */
+    const conhecidos = { ponta: 0.4566, sobreOArco: 0.5432, coluna: 0.4811, atrasDaColuna: 0.4715 };
+    for (const [nome, r] of Object.entries(retalhos)) {
+      if (conhecidos[nome] === undefined) { expect(r.nucleoMm, `${nome} contra a chapa sem a opção`).toBeLessThanOrEqual(r.semAOpcaoMm); continue; }
+      expect(r.nucleoMm, `${nome} passou a caber: tire a marca`).toBeGreaterThan(r.semAOpcaoMm);
+      expect(r.nucleoMm, `${nome} piorou contra a medida`).toBeLessThanOrEqual(conhecidos[nome] * 1.02 + 0.001);
+    }
   });
 });

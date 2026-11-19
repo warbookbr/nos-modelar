@@ -35,7 +35,7 @@
  * das duas, que o teste cobra abaixo de 1e-9. `hoje.comEnergia` continua sendo a etapa B (o Coons com a energia), que o núcleo já não
  * monta e só sai daqui, com os pontos da rede de `liso: false` no passo da rede com a opção.
  *
- * Uso: node tools/fixtures/correcao-de-superficie/preenchimento-do-miolo.mjs analiticas | grade | emendas | rede  [opções]
+ * Uso: node tools/fixtures/correcao-de-superficie/preenchimento-do-miolo.mjs analiticas | grade | emendas | rede | lateral  [opções]
  *   --definicao=<json>   opções de `definicaoAnalitica`, como {"meio":[0.25,0.25]} ou {"pontos":16}
  *   --superficie=<nome>  só uma das analíticas (paraboloide, calota ou toro)
  *   --modos=<a,b>        as variantes a medir (padrão vizinhas,fitas)
@@ -43,6 +43,7 @@
 import { pathToFileURL } from 'node:url';
 import { executarReceita } from '../../../src/autoria/executar-receita.js';
 import { gaiolaPorRede } from '../../../procedural/nucleo/gaiola-por-rede.js';
+import { altura as alturaDaChapaLateral, definicao as definicaoDaChapaLateral } from '../../../procedural/nucleo/fixtures/gaiola-por-rede-prova.js';
 import { alisarMioloNaNormal } from '../../../procedural/nucleo/gaiola-por-rede-liso.js';
 import { gaiolaDoPasso } from '../../../procedural/nucleo/operacoes/subdivisao.js';
 import { ajustarGaiolaAsMedidasComPeso, superficieLimite } from '../../../procedural/nucleo/subdivisao.js';
@@ -50,6 +51,9 @@ import { SUPERFICIES_ANALITICAS, definicaoAnalitica, definicaoDaEmenda, definica
 import { cristaPontual, medirEmenda, medirRede } from './energia-de-curvatura.mjs';
 
 export const MODOS = Object.freeze(['vizinhas', 'fitas']);
+/* o mesmo limite do núcleo (`RAZAO_MAXIMA_DO_VIZINHO`, em `gaiola-por-rede.js`), escrito aqui de novo para a conta ficar independente;
+   `razaoMaxima: Infinity` em `preencherGrades` dá a `vizinhas` como foi medida antes da revisão */
+export const RAZAO_MAXIMA = 4;
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 const dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2]);
 const comb = (pesos, pts) => { const r = [0, 0, 0]; pesos.forEach((w, k) => { if (w !== 0 && pts[k]) { r[0] += w * pts[k][0]; r[1] += w * pts[k][1]; r[2] += w * pts[k][2]; } }); return r; };
@@ -119,11 +123,11 @@ export function gradesDaRede(g) {
 /** preencherGrades(grades, pos, { modo, vincos }) -> Map nome -> ponto: os pontos de dentro de cada grade pelo `modo` ('coons', 'vizinhas'
  *  ou 'fitas'), com `pos(nome)` a posição dos pontos da borda. Só os pontos das bordas entram na conta: o resultado não depende da ordem
  *  dos retalhos. */
-export function preencherGrades(grades, pos, { modo = 'vizinhas', vincos = new Set() } = {}) {
+export function preencherGrades(grades, pos, { modo = 'vizinhas', vincos = new Set(), razaoMaxima = RAZAO_MAXIMA } = {}) {
   const porAresta = new Map();
   for (const gr of grades) gr.lados.forEach((l, s) => { for (let k = 0; k + 1 < l.length; k++) { const c = chave(l[k], l[k + 1]); if (!porAresta.has(c)) porAresta.set(c, []); porAresta.get(c).push({ gr, s, k }); } });
   /* o ponto oposto ao ponto i do lado s, no retalho de quatro lados do outro lado desse lado: { gr, s, k, p } ou null */
-  const fora = (gr, s, i) => {
+  const foraSemCorte = (gr, s, i) => {
     const l = gr.lados[s]; const n = l.length - 1; const k = i < n ? i : n - 1; const c = chave(l[k], l[k + 1]);
     if (vincos.has(c)) return null;
     const outros = (porAresta.get(c) ?? []).filter((e) => e.gr !== gr);
@@ -135,6 +139,16 @@ export function preencherGrades(grades, pos, { modo = 'vizinhas', vincos = new S
     const inteiro = lq.length === l.length && ((lq[0] === l[n] && lq[n] === l[0]) || (lq[0] === l[0] && lq[n] === l[n]));
     return { gr: o.gr, s: so, k: ko, p: pos(o.gr.lados[so][ko]), inteiro, mesmo: lq[0] === l[n] };
   };
+  /* o corte da revisão de 2026-11-19: o lado em que, em algum ponto, a corda que atravessa o retalho passa de `razaoMaxima` vezes a corda
+     até o ponto de fora fica inteiro sem vizinho (o ponto de fora entra na derivada multiplicado por perto dessa razão) */
+  const cortes = new Map();
+  const cortado = (gr, s) => {
+    const c = `${gr.id}\u0000${s}`; if (cortes.has(c)) return cortes.get(c);
+    const l = gr.lados[s]; const n = l.length - 1; const oposto = gr.lados[(s + 2) % 4];
+    const corta = l.some((nome, i) => { const F = foraSemCorte(gr, s, i); return F ? !(dist(pos(nome), pos(oposto[n - i])) <= razaoMaxima * dist(F.p, pos(nome))) : false; });
+    cortes.set(c, corta); return corta;
+  };
+  const fora = (gr, s, i) => (cortado(gr, s) ? null : foraSemCorte(gr, s, i));
   /* a mistura de uma linha: os pontos de fora (ou null), as duas pontas, e os pesos em t pelas cordas */
   const linha = (Fm, P0, P1, Fp) => { const h = dist(P0, P1); const h0 = Fm ? dist(Fm.p, P0) : null; const h1 = Fp ? dist(P1, Fp.p) : null; return (t) => pesosDaMistura(t, h0 || null, h, h1 || null); };
   /* o resíduo de um lado: cada ponto dele menos a mistura das duas pontas e, se `usaM` e `usaP`, dos pontos de fora de cada ponta ao longo
@@ -198,9 +212,9 @@ export function preencherGrades(grades, pos, { modo = 'vizinhas', vincos = new S
 
 /** preencherRede(g, modo) -> { pontos, dentro, andou }: os pontos da rede `g` com o miolo dos retalhos de quatro lados refeito pelo `modo`;
  *  `dentro` são os nomes trocados e `andou` o maior deslocamento contra o Coons da rede (na unidade da rede, o metro). */
-export function preencherRede(g, modo = 'vizinhas') {
+export function preencherRede(g, modo = 'vizinhas', opcoes = {}) {
   const { grades, vincos } = gradesDaRede(g);
-  const novos = preencherGrades(grades, (nome) => g.pontos[nome], { modo, vincos });
+  const novos = preencherGrades(grades, (nome) => g.pontos[nome], { modo, vincos, ...opcoes });
   const pontos = { ...g.pontos }; let andou = 0;
   for (const [nome, p] of novos) { andou = Math.max(andou, dist(p, g.pontos[nome])); pontos[nome] = p; }
   return { pontos, dentro: [...novos.keys()], andou };
@@ -375,11 +389,31 @@ export function provaDaRede({ modos = MODOS } = {}) {
   return saida;
 }
 
+/** provaDaChapaLateral({ passo }) -> por retalho da chapa lateral de prova (`procedural/nucleo/fixtures/gaiola-por-rede-prova.js`, com dois
+ *  vincos, a janela em gota e dois retalhos de cinco lados): a maior distância (mm) da superfície limite à forma desenhada (`altura`), em
+ *  nove amostras por face da gaiola, sem a opção, com a opção e o preenchimento padrão (a etapa B) e com a opção como o núcleo a monta;
+ *  e a cota do miolo com o preenchimento padrão e com o do núcleo. A face é do retalho do primeiro ponto de dentro que ela tem. */
+export function provaDaChapaLateral({ passo = 40 } = {}) {
+  const gHoje = gaiolaPorRede(definicaoDaChapaLateral({ passo })), g0 = gaiolaPorRede(definicaoDaChapaLateral({ passo, extra: { liso: false } })), gE = gaiolaPorRede(definicaoDaChapaLateral({ passo, extra: { alisarSuperficie: true } }));
+  const fora = (p) => Math.abs(p[1] * 1000 - alturaDaChapaLateral(p[0] * 1000, p[2] * 1000));
+  const final = (g, pontos) => {
+    const sup = superficieLimite(ajustar(g.passo, pontos).gaiola); const m = {};
+    g.passo.faces.forEach((f, fi) => {
+      const dentro = f.find((v) => g.origens[v]?.tipo === 'retalho'); if (!dentro) return; const r = g.origens[dentro].retalho;
+      for (const u of [0.25, 0.5, 0.75]) for (const v of [0.25, 0.5, 0.75]) m[r] = Math.max(m[r] ?? 0, fora(sup.avaliar(fi, u, v, { canto: 0 }).ponto));
+    });
+    return m;
+  };
+  const cota = (pontos) => { const m = {}; for (const [p, o] of Object.entries(g0.origens)) if (o.tipo === 'retalho') m[o.retalho] = Math.max(m[o.retalho] ?? 0, fora(pontos[p])); return m; };
+  const sem = final(gHoje, gHoje.pontos), etapaB = final(gE, g0.pontos), nucleo = final(gE, gE.pontos), c0 = cota(g0.pontos), cE = cota(gE.pontos);
+  return { contraPrototipoMm: contraPrototipo(g0, gE) * 1000, retalhos: Object.fromEntries(Object.keys(sem).map((r) => [r, { lados: g0.retalhos[r].lados, semAOpcaoMm: r4(sem[r]), etapaBMm: r4(etapaB[r]), nucleoMm: r4(nucleo[r]), cotaPadraoMm: r4(c0[r]), cotaDoNucleoMm: r4(cE[r]) }])) };
+}
+
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
   const args = process.argv.slice(2); const qual = args.find((a) => !a.startsWith('--'));
   const opcao = (nome) => { const a = args.find((x) => x.startsWith(`--${nome}=`)); return a == null ? null : a.slice(nome.length + 3); };
   const opcoes = { ...(opcao('modos') ? { modos: opcao('modos').split(',') } : {}), ...(opcao('definicao') ? { definicao: JSON.parse(opcao('definicao')) } : {}), ...(opcao('superficie') ? { superficies: [opcao('superficie')] } : {}) };
-  const provas = { analiticas: provaDasAnaliticas, grade: provaDaGrade, emendas: provaDasEmendas, rede: provaDaRede };
-  if (!provas[qual]) { console.error('uso: preenchimento-do-miolo.mjs analiticas | grade | emendas | rede [--definicao=<json>] [--superficie=<nome>] [--modos=vizinhas,fitas]'); process.exit(2); }
+  const provas = { analiticas: provaDasAnaliticas, grade: provaDaGrade, emendas: provaDasEmendas, rede: provaDaRede, lateral: provaDaChapaLateral };
+  if (!provas[qual]) { console.error('uso: preenchimento-do-miolo.mjs analiticas | grade | emendas | rede | lateral [--definicao=<json>] [--superficie=<nome>] [--modos=vizinhas,fitas]'); process.exit(2); }
   process.stdout.write(`${JSON.stringify(provas[qual](opcoes), null, 1)}\n`);
 }

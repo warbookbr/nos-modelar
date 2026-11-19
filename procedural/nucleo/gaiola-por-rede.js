@@ -129,15 +129,26 @@
  * a curva seguinte da rede de cada lado (`preencherPelasVizinhas`): no ponto i de um lado, o ponto oposto do retalho de quatro lados
  * vizinho dá um terceiro ponto, e a derivada transversal ali é a da parábola pelos três, com as cordas como parâmetro. Com vizinho dos
  * dois lados a mistura é a cúbica de Hermite com as duas derivadas; com vizinho de um lado só, a parábola pelos três; sem vizinho, a reta,
- * e o retalho sai igual ao de sempre. A derivada no lado compartilhado é a mesma para os dois retalhos. Não dão vizinho a borda livre, a
- * curva vinco (de nitidez maior que zero), o retalho de n lados e o lado dividido com mais de um retalho; o plano de simetria é borda
- * livre para esta conta (a metade espelhada não entra). O vizinho que divide só parte do lado dá a derivada às fileiras, e não entra
+ * e o retalho sai igual ao de sempre. A derivada no lado compartilhado é a mesma para os dois retalhos, quando os dois a usam. Não dão
+ * vizinho a borda livre, a curva vinco, o retalho de n lados e o lado dividido com mais de um retalho; o plano de simetria é borda
+ * livre para esta conta (a metade espelhada não entra). O vinco de nitidez 0 em número não corta; o declarado por nome de PARAMS corta
+ * qualquer que seja o valor, porque este ajudante não conhece PARAMS (quem resolve o nome é o passo `subdivisao`).
+ * O VIZINHO ESTREITO NÃO ENTRA. O ponto de fora entra na derivada multiplicado por h² / (h0 (h0 + h)), com h a corda que atravessa o
+ * retalho e h0 a corda até a curva seguinte do vizinho: o desvio dessa curva chega ao miolo amplificado por perto de h / h0 (com a razão
+ * 150, 0,3 mm viram 10,9 mm). Por isso o lado em que, em algum ponto, h passa de 4 vezes h0 (RAZAO_MAXIMA_DO_VIZINHO) fica inteiro sem
+ * vizinho, como a borda livre; o lado inteiro, e não ponto a ponto, porque a soma de Coons pede uma mistura só ao longo de cada direção
+ * (o corte ponto a ponto e o teto no peso foram medidos e pioram a chapa lateral de prova). O corte vale para o retalho largo; o
+ * estreito continua usando o largo. Até a razão 4 o desvio de 1 mm da curva de fora chega ao miolo como 0,8 mm, no máximo. O vizinho que divide só parte do lado dá a derivada às fileiras, e não entra
  * como fileira de fora. Só os pontos das curvas entram na conta, não há sistema a resolver, e o resultado não depende da ordem dos
  * retalhos. O preenchimento padrão continua sendo feito antes (a recusa da dobra dele vale igual), e a dobra é conferida de novo com os
  * pontos novos. Limites medidos: o parâmetro da mistura é a corda entre as curvas, e a forma quadrática numa direção só sai exata quando
  * as cordas são proporcionais ao parâmetro dela (sobram 0,75 mm na calota de 600 mm com retalhos de 300 mm); o miolo passa a depender da
- * curva seguinte do vizinho, e onde a forma quebra sem vinco declarado, ou a curva vizinha tem ruído, ele pode nascer mais longe da forma
- * que o preenchimento padrão (na chapa lateral de prova, dois dos oito retalhos de quatro lados: 1,54 contra 1,21 mm e 0,71 contra 0,45).
+ * curva seguinte do vizinho, e o ruído dela entra nele. Na chapa lateral de prova o retalho `baixo` nascia a 1,54 mm da forma contra 1,21
+ * do padrão, e a superfície final dele ficava a 1,112 mm contra 1,054 sem a opção e 0,941 com a opção e o preenchimento padrão: a causa
+ * era o vizinho `ponta`, estreito, cujas fileiras viram uns 100 graus em volta da ponta da gota (a mesma piora sai na forma lisa). Com
+ * o corte do vizinho estreito o `baixo` fica a 0,765 mm na superfície final. Sobra o retalho `coluna`, cujo miolo nasce a 0,71 mm contra
+ * 0,45 do padrão, com a superfície final igual (0,481 contra 0,480). Na mesma chapa a opção deixa quatro retalhos mais longe da forma
+ * que sem ela (o `sobreOArco`, 0,543 contra 0,369), três deles iguais com o preenchimento padrão: é a energia, e não o miolo.
  * Sem a energia por cima ele não entra: com o alisamento pela normal o ganho se desfaz, e por isso o padrão não mudou.
  *
  * A CONTINUIDADE. Os pontos da borda são compartilhados, e a superfície limite da subdivisão é C1 em toda aresta que não é vinco, de modo
@@ -278,6 +289,10 @@ const LEITURA_PADRAO = Object.freeze({ peso: 1, erro: 2, inclinacao: 0.1, estrit
    preenchimento volta a pôr crista na curva) */
 const INTERIOR_COM_ENERGIA = 0.003;
 const INTERIOR_PADRAO = 1;
+/* a maior razão entre a corda que atravessa o retalho e a corda até a curva seguinte do vizinho com que o vizinho ainda entra no preenchimento
+   pelas curvas vizinhas. Medido em 2026-11-19: as chapas analíticas de cruzamento fora do centro têm razão 3, e de 3,5 a 5 a chapa lateral
+   de prova e a calota de cruzamento fora do centro não mudam; com 4 o desvio de 1 mm da curva de fora chega ao miolo como 0,8 mm, no máximo (sem o limite, 36 mm com a razão 150) */
+const RAZAO_MAXIMA_DO_VIZINHO = 4;
 const ITERACOES_DO_LISO = 2;
 const RAZAO_DO_AVISO = 3;
 const ANGULO_QUASE_RETO = 160;
@@ -872,7 +887,7 @@ function preencherPelasVizinhas(grades, pos, vincos) {
   const porAresta = new Map();
   for (const gr of grades) gr.lados.forEach((l, s) => { for (let k = 0; k + 1 < l.length; k++) { const c = chaveDeAresta(l[k], l[k + 1]); if (!porAresta.has(c)) porAresta.set(c, []); porAresta.get(c).push({ gr, s, k }); } });
   /* o ponto oposto ao ponto i do lado s, no retalho de quatro lados do outro lado desse lado, ou null */
-  const fora = (gr, s, i) => {
+  const foraSemCorte = (gr, s, i) => {
     const l = gr.lados[s]; const n = l.length - 1; const k = i < n ? i : n - 1; const c = chaveDeAresta(l[k], l[k + 1]);
     if (vincos.has(c)) return null;
     const outros = (porAresta.get(c) ?? []).filter((e) => e.gr !== gr);
@@ -884,6 +899,21 @@ function preencherPelasVizinhas(grades, pos, vincos) {
     const inteiro = lq.length === l.length && ((lq[0] === l[n] && lq[n] === l[0]) || (lq[0] === l[0] && lq[n] === l[n]));
     return { gr: o.gr, s: so, k: ko, p: pos(o.gr.lados[so][ko]), inteiro, mesmo: lq[0] === l[n] };
   };
+  /* o lado cortado: em algum ponto dele a corda que atravessa o retalho passa de RAZAO_MAXIMA_DO_VIZINHO vezes a corda até o ponto de
+     fora. O ponto de fora entra na derivada multiplicado por perto dessa razão, e o desvio dele chegaria ao miolo amplificado; o lado
+     inteiro fica então sem vizinho, como a borda livre, e não ponto a ponto, para a mistura ser uma só ao longo dele. */
+  const cortes = new Map();
+  const cortado = (gr, s) => {
+    const c = `${gr.id}\u0000${s}`; if (cortes.has(c)) return cortes.get(c);
+    const l = gr.lados[s]; const n = l.length - 1; const oposto = gr.lados[(s + 2) % 4]; let corta = false;
+    for (let i = 0; i <= n && !corta; i++) {
+      const F = foraSemCorte(gr, s, i); if (!F) continue;
+      const h = norma(sub(pos(l[i]), pos(oposto[n - i]))); const h0 = norma(sub(F.p, pos(l[i])));
+      if (!(h <= RAZAO_MAXIMA_DO_VIZINHO * h0)) corta = true;
+    }
+    cortes.set(c, corta); return corta;
+  };
+  const fora = (gr, s, i) => (cortado(gr, s) ? null : foraSemCorte(gr, s, i));
   /* a mistura de uma linha: os pontos de fora (ou null), as duas pontas, e os pesos em t pelas cordas */
   const linha = (Fm, P0, P1, Fp) => { const h = norma(sub(P0, P1)); const h0 = Fm ? norma(sub(Fm.p, P0)) : null; const h1 = Fp ? norma(sub(P1, Fp.p)) : null; return (t) => pesosDaMisturaPelasVizinhas(t, h0 || null, h, h1 || null); };
   /* o resíduo de um lado: cada ponto dele menos a mistura das duas pontas e, se `usaM` e `usaP`, dos pontos de fora de cada ponta ao longo
@@ -1513,7 +1543,7 @@ export function gaiolaPorRede(definicaoDada) {
       const facesDele = facesDoRetalho.get(gr.id);
       const normais = facesDele.map(nf); const media = normais.reduce(soma, [0, 0, 0]);
       const dobradas = normais.filter((n) => dot(n, media) <= 0);
-      if (dobradas.length) falha(`o preenchimento pelas curvas vizinhas (alisarSuperficie) dobra ${dobradas.length} face(s) do retalho ${citar(gr.id)}, que o preenchimento padrão não dobra: a curva seguinte de um dos retalhos vizinhos puxa o miolo dele para fora; ponha uma curva a mais dentro do retalho ou do vizinho, ou tire alisarSuperficie`);
+      if (dobradas.length) falha(`o preenchimento pelas curvas vizinhas (alisarSuperficie) dobra ${dobradas.length} face(s) do retalho ${citar(gr.id)}, que o preenchimento padrão não dobra: a curva seguinte de um dos retalhos vizinhos entra na inclinação do miolo dele com peso que cresce quando o vizinho é estreito, e o desvio dela o puxa para fora; tire alisarSuperficie, alise essa curva ou engrosse o retalho vizinho (uma curva a mais dentro do vizinho o estreita e piora)`);
     }
   }
 
