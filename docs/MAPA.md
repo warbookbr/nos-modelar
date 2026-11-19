@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2125 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2126 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1145,6 +1145,7 @@
 - `selecao-nas-edicoes.test.mjs` — selecao-nas-edicoes.test.mjs — `sel` no lugar do id em moveV, moveF, moveA, vira, mescla, pesar e filete.
 - `sha256.js` — sha256.js — SHA-256 síncrono, portátil e sem dependência de Node.
 - `somas-do-rastreio.js` — somas-do-rastreio.js — a soma que uma operação faz ao conjunto de ids "tocados" do passo, para o rastreio declarado do retrato (nível 'tocados' em `ESCRITA_D…
+- `subdivisao-energia-de-curvatura.test.mjs` — subdivisao-energia-de-curvatura.test.mjs — a energia de variação de curvatura como regularização do ajuste das cotas com peso (`regularizacao: { tipo: 'varia…
 - `subdivisao-grupos.test.ts` — subdivisao-grupos.test.ts — os grupos de faces da gaiola do passo `subdivisao` (campo `grupos`): cada grupo é uma lista de nomes de ponto, as faces dele são …
 - `subdivisao-limite-exato.test.mjs` — subdivisao-limite-exato.test.mjs — o oráculo da superfície limite (`superficieLimite`), a descendência das linhas e a medida na linha (`descendenciaDasLinhas…
 - `subdivisao-ponto-repetido.test.mjs` — subdivisao-ponto-repetido.test.mjs — a recusa geral do ponto que dois passos `subdivisao` gravam sem declaração (ciclo 5 do sedã, atrito 2). O nome de ponto …

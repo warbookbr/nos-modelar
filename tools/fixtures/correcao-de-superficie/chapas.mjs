@@ -487,10 +487,11 @@ function planoDeProva(objeto, milimetros, partes) {
   };
 }
 
-/** receitaDeProva(nome, { marcarCurvas }): a receita da chapa de prova `nome`; com `marcarCurvas: true`, a rede leva as curvas ao passo
- *  (`marcarCurvas` de `gaiolaPorRede`) e o neutro marca as arestas delas, para `medida-na-curva.mjs`; sem ela, a receita é a de sempre. */
-export function receitaDeProva(nome, { marcarCurvas = false } = {}) {
-  const m = marcarCurvas ? { marcarCurvas: true } : {};
+/** receitaDeProva(nome, { marcarCurvas, alisarSuperficie }): a receita da chapa de prova `nome`; com `marcarCurvas: true`, a rede leva as
+ *  curvas ao passo (`marcarCurvas` de `gaiolaPorRede`) e o neutro marca as arestas delas, para `medida-na-curva.mjs`; `alisarSuperficie`
+ *  (true ou { onda }) vai à rede como está, para a prova da energia de variação de curvatura; sem as duas, a receita é a de sempre. */
+export function receitaDeProva(nome, { marcarCurvas = false, alisarSuperficie = null } = {}) {
+  const m = { ...(marcarCurvas ? { marcarCurvas: true } : {}), ...(alisarSuperficie ? { alisarSuperficie } : {}) };
   if (nome === 'rede-com-ruido') return receitaDeRede(nome, { ruido: true }, m);
   if (nome === 'rede-sem-ruido') return receitaDeRede(nome, { ruido: false }, m);
   if (nome === 'rede-alisada') return receitaDeRede(nome, { ruido: true, alisarCurvas: ALISAMENTO_DE_PROVA }, m);

@@ -27,6 +27,9 @@
  *     declaração pode mover a gaiola (mm, 1 por padrão) e o ângulo (0,5 grau) e a razão de curvatura (1,5, na G2) medidos nela.
  *   marcarCurvas: true põe as curvas em `passo.curvas`, e o passo `subdivisao` marca no neutro (`chapas[k].curvas`) as arestas que descendem
  *     de cada uma, para a medida da emenda ler a curva declarada; a malha não muda.
+ *   alisarSuperficie: true | { onda?: mm } liga, no ajuste das cotas do passo, a energia de variação de curvatura da superfície limite: a
+ *     curva de cota exata deixa de ser crista de curvatura contra o miolo. O miolo fica sem o `liso`, com a cota de peso 0,003 (`interior`
+ *     junto troca o peso); não vale com `liso` nem com curva com `continuidade`. Desligada por padrão.
  * devolve: { pontos, passo, linha(curva), pontoDaCurva, linhas, nos, curvas, retalhos, densidades, extraordinarios, avisos, emendas?, ... }.
  * exemplo:
  *   gaiolaPorRede({ passo: 50, fora: [0, 1, 0], nos: { A: [0, 0, 0], B: [200, 0, 0], C: [200, 0, 200], D: [0, 0, 200] },
@@ -92,6 +95,18 @@
  * marcarCurvas: true acrescenta ao passo `curvas`, um { nome, pontos, continuidade? } por trecho usado de cada curva (os nomes de ponto ao
  *   longo dele, como os de `vincos`), que o passo `subdivisao` leva à malha e grava no neutro, em `chapas[k].curvas`, sem mudar a geometria:
  *   é o que deixa a medida da emenda achar a curva declarada, que a malha sozinha não carrega. Sem ela (o padrão), o passo é o de sempre.
+ * alisarSuperficie: true | { onda: mm }: o passo sai com `regularizacao: { tipo: 'variacaoDeCurvatura', onda? }`, e o ajuste das cotas da
+ *   subdivisão troca o custo do deslocamento de cada ponto da gaiola pela energia de variação de curvatura da superfície limite
+ *   (`energiaDeVariacaoDeCurvatura`, em `subdivisao.js`). A curva de cota exata deixa de ser crista de curvatura contra o miolo, que é o
+ *   que a cota exata ao lado do miolo de peso 1 deixa sem a opção. Com ela o miolo dos retalhos fica como o preenchimento o pôs, sem o
+ *   alisamento pela normal (`liso`), e a cota dele passa a ter o peso INTERIOR_COM_ENERGIA (0,003) no lugar de 1: a energia leva o miolo
+ *   para onde a curvatura varia menos entre as curvas, e a cota só o segura na forma mais longa que umas dez arestas (o peso p pesa o
+ *   mesmo que a energia no comprimento onda/p^(1/6)). `interior` declarado junto troca esse peso, e `interior: false` tira a cota. `onda` é
+ *   o comprimento em que a energia e a cota de peso 1 pesam o mesmo (padrão: quatro arestas medianas da gaiola); a cota exata é
+ *   restrição, e a onda não a afrouxa. Não vale junto com `liso` nem com curva com `continuidade` (recusa), nesta etapa. O vinco, o
+ *   canto, a borda livre e o vértice extraordinário não têm termo na energia. A curva que não está na forma entre os pontos-chave (a
+ *   interpolação dela) continua cota exata, e a superfície passa por ela: o erro da curva vira crista junto dela, e o remédio é o
+ *   ponto-chave a mais. Sem a opção (o padrão), a rede e o passo são os de sempre.
  *
  * O PREENCHIMENTO. Os pontos da borda de cada retalho são os das curvas, à mesma distância de arco um do outro em cada arco.
  * No retalho de quatro lados o interior é a interpolação transfinita de Coons: P(u, v) = (1-v) A(u) + v C(u) + (1-u) D(v) + u B(v)
@@ -220,6 +235,7 @@ import { curvaCentripeta } from './gaiola-interpolada.js';
 import { extraordinarios as extraordinariosDa } from './gaiola-aneis.js';
 import { alisarMioloNaNormal, LONGE_DA_FILEIRA, INCLINACAO_DA_FILEIRA } from './gaiola-por-rede-liso.js';
 import { alisarPontosDaCurva, conferirTolerancia, lerOpcoesDoAlisamento } from './alisar-curvas.js';
+import { REGULARIZACAO_DE_CURVATURA } from './subdivisao.js';
 
 const MM = 1000;
 const AMOSTRAS_POR_TRECHO = 96;
@@ -233,6 +249,10 @@ const MAIOR_RETALHO = 8;
 const ANGULO_MAX_PADRAO = 15;
 const ANGULO_DE_CANTO_PADRAO = 35;
 const LEITURA_PADRAO = Object.freeze({ peso: 1, erro: 2, inclinacao: 0.1, estrito: false });
+/* o peso da cota do miolo com `alisarSuperficie`: o preenchimento sem o alisamento pela normal segura só a forma longa (medido nas chapas de prova:
+   de 0,001 a 0,005 os números pouco mudam; sem cota a chapa de duas curvaturas se afasta da desenhada, e de 0,01 para cima a cota do
+   preenchimento volta a pôr crista na curva) */
+const INTERIOR_COM_ENERGIA = 0.003;
 const INTERIOR_PADRAO = 1;
 const ITERACOES_DO_LISO = 2;
 const RAZAO_DO_AVISO = 3;
@@ -818,7 +838,7 @@ export function gaiolaPorRede(definicaoDada) {
       retalhos: definicaoDada.retalhos.flatMap((r) => (r && alt.acrescentar?.retalhos?.[r.nome] ? alt.acrescentar.retalhos[r.nome] : [r])),
     }
     : definicaoDada;
-  exigirCampos(definicao, ['curvas', 'nos', 'retalhos', 'passo', 'anguloMax', 'fora', 'leitura', 'interior', 'liso', 'anguloDeCanto', 'cantos', 'simetria', 'prefixo', 'alisarCurvas', 'limitesDaEmenda', 'marcarCurvas'], 'a definição da rede');
+  exigirCampos(definicao, ['curvas', 'nos', 'retalhos', 'passo', 'anguloMax', 'fora', 'leitura', 'interior', 'liso', 'anguloDeCanto', 'cantos', 'simetria', 'prefixo', 'alisarCurvas', 'limitesDaEmenda', 'marcarCurvas', 'alisarSuperficie'], 'a definição da rede');
   const marcarCurvas = definicao.marcarCurvas ?? false;
   if (marcarCurvas !== true && marcarCurvas !== false) falha(`marcarCurvas é ${JSON.stringify(marcarCurvas)}; precisa ser true (as curvas vão ao passo e o neutro marca as arestas que descendem delas) ou false`);
   const { simetria = null, prefixo = '' } = definicao;
@@ -830,10 +850,21 @@ export function gaiolaPorRede(definicaoDada) {
   if (!(typeof anguloMax === 'number' && Number.isFinite(anguloMax) && anguloMax > 0)) falha(`anguloMax é ${JSON.stringify(anguloMax)}; precisa ser número finito maior que zero, em graus`);
   const anguloDeCanto = definicao.anguloDeCanto === undefined ? ANGULO_DE_CANTO_PADRAO : definicao.anguloDeCanto;
   if (anguloDeCanto !== null && anguloDeCanto !== false && !(typeof anguloDeCanto === 'number' && anguloDeCanto > 0 && anguloDeCanto < 180)) falha(`anguloDeCanto é ${JSON.stringify(anguloDeCanto)}; precisa ser graus entre 0 e 180, ou false`);
-  let interior = definicao.interior === undefined ? INTERIOR_PADRAO : definicao.interior;
+  /* A opção `alisarSuperficie`: true, ou { onda: mm }. Com ela o ajuste das cotas do passo usa a energia de variação de curvatura, e o
+     miolo dos retalhos fica como o preenchimento o pôs, sem o alisamento pela normal, com a cota de peso INTERIOR_COM_ENERGIA. */
+  let alisarSuperficie = null;
+  if (definicao.alisarSuperficie != null && definicao.alisarSuperficie !== false) {
+    const x = definicao.alisarSuperficie === true ? {} : definicao.alisarSuperficie;
+    if (typeof x !== 'object' || Array.isArray(x)) falha(`alisarSuperficie é ${JSON.stringify(definicao.alisarSuperficie)}; use true ou { onda: mm }`);
+    exigirCampos(x, ['onda'], 'alisarSuperficie');
+    if (x.onda != null && !(typeof x.onda === 'number' && Number.isFinite(x.onda) && x.onda > 0)) falha(`alisarSuperficie.onda é ${JSON.stringify(x.onda)}; precisa ser comprimento em mm, finito e maior que zero (sem ela, quatro arestas medianas da gaiola)`);
+    alisarSuperficie = { onda: x.onda ?? null };
+    if (definicao.liso != null && definicao.liso !== false) falha(`alisarSuperficie e liso: ${JSON.stringify(definicao.liso)} foram declarados juntos; com alisarSuperficie a energia do ajuste das cotas alisa a superfície inteira e o miolo não passa pelo alisamento pela normal: tire liso (ou declare liso: false)`);
+  }
+  let interior = definicao.interior === undefined ? (alisarSuperficie ? INTERIOR_COM_ENERGIA : INTERIOR_PADRAO) : definicao.interior;
   if (interior === null || interior === false) interior = null;
   else if (!(typeof interior === 'number' && Number.isFinite(interior) && interior > 0)) falha(`interior é ${JSON.stringify(interior)}; precisa ser peso maior que zero, ou false`);
-  let liso = definicao.liso === undefined ? true : definicao.liso;
+  let liso = definicao.liso === undefined ? !alisarSuperficie : definicao.liso;
   if (liso === false || liso === null) liso = null;
   else if (liso === true) liso = { iteracoes: ITERACOES_DO_LISO };
   else {
@@ -847,6 +878,10 @@ export function gaiolaPorRede(definicaoDada) {
   const declaradas = lerCurvasDeclaradas(definicao.curvas);
   const nosDeclarados = lerNosDeclarados(definicao.nos, declaradas);
   const alisarCurvas = lerAlisarCurvas(definicao.alisarCurvas, declaradas);
+  if (alisarSuperficie) {
+    const emendada = [...declaradas.values()].find((c) => c.continuidade != null);
+    if (emendada) falha(`alisarSuperficie e a continuidade ${citar(emendada.continuidade)} da curva ${citar(emendada.nome)} foram declarados juntos; a emenda declarada se impõe no alisamento do miolo, que alisarSuperficie desliga: tire a continuidade das curvas ou tire alisarSuperficie`);
+  }
   const limitesDaEmenda = lerLimitesDaEmenda(definicao.limitesDaEmenda, declaradas);
   const cantosDeclarados = new Set(Array.isArray(definicao.cantos) ? definicao.cantos : []);
   const juncoes = juncoesDasEmendas(declaradas, nosDeclarados, cantosDeclarados, anguloDeCanto);
@@ -1661,6 +1696,7 @@ export function gaiolaPorRede(definicaoDada) {
   if (cantos.size) passo.cantos = vertices.filter((v) => cantos.has(v));
   if (medidas.length) passo.medidas = medidas;
   if (marcarCurvas) passo.curvas = curvasMarcadas;
+  if (alisarSuperficie && medidas.length) passo.regularizacao = { tipo: REGULARIZACAO_DE_CURVATURA, ...(alisarSuperficie.onda === null ? {} : { onda: alisarSuperficie.onda / MM }) };
   if (simetria) {
     const negativos = vertices.filter((p) => pontos[p][0] < -1e-9);
     if (negativos.length) {

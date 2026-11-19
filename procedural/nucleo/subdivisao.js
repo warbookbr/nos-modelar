@@ -474,6 +474,118 @@ export function ajustarGaiolaAsMedidas(gaiola, medidas) {
   return { vertices: V, ganho, residuos };
 }
 
+/* A ENERGIA DE VARIAÇÃO DE CURVATURA (`regularizacao: { tipo: 'variacaoDeCurvatura' }` do ajuste com peso). No vértice regular (valência
+ * 4, quatro faces de quatro lados, fora da borda livre, sem canto declarado e sem aresta de vinco) as derivadas segundas da superfície
+ * limite, no parâmetro da gaiola (uma aresta é uma unidade), saem do anel 3×3 P_ab (a, b em −1, 0, 1) pelos estênceis da B-spline bicúbica:
+ *
+ *   S_uu = Σ s_a m_b P_ab,   S_vv = Σ m_a s_b P_ab,   S_uv = Σ d_a d_b P_ab,     m = (1/6, 4/6, 1/6), s = (1, −2, 1), d = (−1/2, 0, 1/2),
+ *
+ * e D_i = (S_uu, √2 S_uv, S_vv)/h², com h o passo da gaiola declarada (a mediana das arestas), um só para a gaiola inteira. A energia
+ * soma, em cada aresta (s, t) entre dois vértices regulares, (onda/2π)⁶/h² ‖D_s − D_t‖², com os eixos dos dois alinhados pela aresta (u
+ * ao longo dela, v para o mesmo lado). O comprimento é o do parâmetro, e não o da aresta no espaço: por isso a energia é nula em toda
+ * gaiola que é imagem quadrática da grade inteira (a quadrática inclinada amostrada em passo igual no plano, cujas arestas têm
+ * comprimentos diferentes no espaço, inclusive), e h só dá a escala. O vinco, a borda, o canto e o extraordinário não têm termo próprio:
+ * entram como pontos do anel dos vizinhos regulares. `onda` é o comprimento de onda em que a energia e a cota de peso 1 pesam o mesmo (a
+ * senoide de comprimento `onda` cotada com peso 1 sai com metade da amplitude no contínuo); o padrão é ARESTAS_POR_ONDA passos.
+ * Como a energia cobra a derivada segunda do vetor posição, o esticamento do parâmetro ao longo da superfície (o passo que muda de um
+ * retalho para o outro) conta como curvatura. */
+export const REGULARIZACAO_DE_CURVATURA = 'variacaoDeCurvatura';
+export const ARESTAS_POR_ONDA = 4;
+/** o resto do termo de deslocamento que fica com a energia ligada: só tira a indeterminação do vértice que nenhum termo alcança */
+export const RESTO_DO_DESLOCAMENTO = 1e-9;
+const MASSA_DO_ANEL = [1 / 6, 4 / 6, 1 / 6]; const SEGUNDA_DO_ANEL = [1, -2, 1]; const PRIMEIRA_DO_ANEL = [-0.5, 0, 0.5];
+
+/* a regularização como o ajuste a lê: null, ou { tipo: 'variacaoDeCurvatura', onda: comprimento na unidade da gaiola, ou null } */
+function lerRegularizacao(regularizacao) {
+  if (regularizacao == null) return null;
+  const campos = regularizacao && typeof regularizacao === 'object' && !Array.isArray(regularizacao) ? Object.keys(regularizacao) : null;
+  if (!campos || regularizacao.tipo !== REGULARIZACAO_DE_CURVATURA || campos.some((c) => c !== 'tipo' && c !== 'onda')) throw new TypeError(`subdivisão: regularizacao precisa ser { tipo: '${REGULARIZACAO_DE_CURVATURA}', onda? }, e veio ${JSON.stringify(regularizacao)}`);
+  const onda = regularizacao.onda ?? null;
+  if (onda !== null && !(typeof onda === 'number' && Number.isFinite(onda) && onda > 0)) throw new TypeError(`subdivisão: a onda da regularizacao precisa ser comprimento finito maior que zero, na unidade da gaiola, e veio ${JSON.stringify(onda)}`);
+  return { tipo: REGULARIZACAO_DE_CURVATURA, onda };
+}
+
+/**
+ * energiaDeVariacaoDeCurvatura(gaiola, { onda }) -> { onda, passo, termos, derivadas(i, paraU), valor(vertices) }
+ * gaiola: { vertices, faces, vincos, cantos } como DECLARADA (o passo sai dela). `termos` é a lista, em ordem fixa (a das arestas por
+ * índice), de { aresta: [s, t], peso, linhas }: as três linhas esparsas [[vértice, coeficiente], ...] de D_s − D_t, de modo que a energia
+ * é Σ peso Σ_linha ‖linha · x‖². `derivadas(i, paraU)` devolve as linhas { uu, uv, vv } das derivadas segundas do limite no vértice
+ * regular i, com +u no vizinho `paraU` e +v no seguinte dele na volta (o lado da face [i, paraU, ·, v]), ou null se i não é regular ou
+ * `paraU` não é vizinho. `valor(vertices)` é a energia de uma lista de posições sobre a mesma topologia.
+ */
+export function energiaDeVariacaoDeCurvatura(gaiola, { onda = null } = {}) {
+  const { vertices: P, faces: F } = gaiola;
+  const { nitidez, C } = prepararLimite(gaiola);
+  const n = P.length;
+  const { arestas } = arestasDa(F);
+  const grau = new Array(n).fill(0); const fora = new Set(C); const comprimentos = [];
+  for (const { a, b, faces } of arestas) {
+    grau[a]++; grau[b]++;
+    if (faces.length !== 2) { fora.add(a); fora.add(b); }
+    if ((nitidez.get(chave(a, b)) ?? 0) > 0) { fora.add(a); fora.add(b); }
+  }
+  for (const f of F) for (let k = 0; k < f.length; k++) { const a = P[f[k]], b = P[f[(k + 1) % f.length]]; comprimentos.push(Math.hypot(a[0] - b[0], a[1] - b[1], a[2] - b[2])); }
+  comprimentos.sort((x, y) => x - y);
+  const passo = comprimentos[comprimentos.length >> 1];
+  if (!(passo > 0)) throw new TypeError('subdivisão: a regularizacao pede uma gaiola com arestas de comprimento maior que zero');
+  const ondaUsada = onda ?? ARESTAS_POR_ONDA * passo;
+  const facesDoV = facesPorVertice(n, F);
+  /* a volta do vértice regular: os quatro vizinhos em ordem, do menor índice, e o canto oposto de cada face entre dois seguidos */
+  const voltas = new Array(n).fill(undefined);
+  const volta = (i) => {
+    if (voltas[i] !== undefined) return voltas[i];
+    let r = null;
+    if (!fora.has(i) && grau[i] === 4 && facesDoV[i].length === 4 && facesDoV[i].every((fi) => F[fi].length === 4)) {
+      const seguinte = new Map();
+      for (const fi of facesDoV[i]) { const f = F[fi]; const k = f.indexOf(i); seguinte.set(f[(k + 1) % 4], { b: f[(k + 3) % 4], d: f[(k + 2) % 4] }); }
+      const viz = [Math.min(...seguinte.keys())]; const diag = [];
+      for (let k = 0; k < 4; k++) { const s = seguinte.get(viz[k]); if (!s) break; diag.push(s.d); if (k < 3) viz.push(s.b); }
+      if (diag.length === 4 && new Set(viz).size === 4 && seguinte.get(viz[3]).b === viz[0]) r = { viz, diag };
+    }
+    voltas[i] = r;
+    return r;
+  };
+  /* as linhas de S_uu, S_uv e S_vv sobre o anel [a + 1][b + 1], com +u no k-ésimo vizinho da volta e +v no seguinte */
+  const linhasDoAnel = (i, k) => {
+    const { viz, diag } = volta(i); const v = (j) => viz[(k + j) % 4]; const q = (j) => diag[(k + j) % 4];
+    const anel = [[q(2), v(2), q(1)], [v(3), i, v(1)], [q(3), v(0), q(0)]];
+    const uu = new Map(), uv = new Map(), vv = new Map();
+    const soma = (m, j, w) => { if (w !== 0) m.set(j, (m.get(j) ?? 0) + w); };
+    for (let a = 0; a < 3; a++) for (let b = 0; b < 3; b++) {
+      const j = anel[a][b];
+      soma(uu, j, SEGUNDA_DO_ANEL[a] * MASSA_DO_ANEL[b]); soma(vv, j, MASSA_DO_ANEL[a] * SEGUNDA_DO_ANEL[b]); soma(uv, j, PRIMEIRA_DO_ANEL[a] * PRIMEIRA_DO_ANEL[b]);
+    }
+    return [uu, uv, vv];
+  };
+  const escala = [1 / (passo * passo), Math.SQRT2 / (passo * passo), 1 / (passo * passo)];
+  const peso = (ondaUsada / (2 * Math.PI)) ** 6 / (passo * passo);
+  const termos = [];
+  for (const [s, t] of arestas.map(({ a, b }) => (a < b ? [a, b] : [b, a])).sort((x, y) => x[0] - y[0] || x[1] - y[1])) {
+    if (!volta(s) || !volta(t)) continue;
+    /* em s, +u é t; em t, +u é o vizinho oposto a s, e o +v dos dois cai do mesmo lado porque a malha é orientada */
+    const Ds = linhasDoAnel(s, volta(s).viz.indexOf(t)); const Dt = linhasDoAnel(t, (volta(t).viz.indexOf(s) + 2) % 4);
+    const linhas = Ds.map((ls, c) => {
+      const m = new Map();
+      for (const [j, w] of ls) m.set(j, (m.get(j) ?? 0) + w * escala[c]);
+      for (const [j, w] of Dt[c]) m.set(j, (m.get(j) ?? 0) - w * escala[c]);
+      return [...m].sort((x, y) => x[0] - y[0]);
+    });
+    termos.push({ aresta: [s, t], peso, linhas });
+  }
+  const derivadas = (i, paraU) => {
+    const k = volta(i)?.viz.indexOf(paraU) ?? -1;
+    if (k < 0) return null;
+    const [uu, uv, vv] = linhasDoAnel(i, k).map((m) => [...m].sort((x, y) => x[0] - y[0]));
+    return { uu, uv, vv };
+  };
+  const valor = (V) => {
+    let E = 0;
+    for (const { peso: p, linhas } of termos) for (const l of linhas) { let x = 0, y = 0, z = 0; for (const [j, w] of l) { x += w * V[j][0]; y += w * V[j][1]; z += w * V[j][2]; } E += p * (x * x + y * y + z * z); }
+    return E;
+  };
+  return { onda: ondaUsada, passo, termos, derivadas, valor };
+}
+
 /* Medidas com peso: a superfície limite se aproxima das cotas por mínimos quadrados, sem ser forçada a passar por elas,
  * para que muitas cotas lidas de imagem, cada uma com o seu erro, não ondulem a chapa. A medida exata (peso infinito)
  * continua restrição. As incógnitas são as posições x_U de U, os vértices das estrelas dos pontos com peso e os pontos
@@ -497,8 +609,19 @@ export function ajustarGaiolaAsMedidas(gaiola, medidas) {
  * em que μ são os multiplicadores das restrições. Ele se resolve pela mesma eliminação de Gauss em ordem fixa (U e os
  * pontos em ordem crescente de índice), bit a bit. O ganho é o mesmo das medidas exatas: o maior fator pelo qual um erro
  * nas cotas vira deslocamento de um ponto da gaiola, ‖∂x_U/∂a‖∞, calculado resolvendo o sistema para cada cota; acima de
- * GANHO_MAXIMO_DAS_MEDIDAS falha com os pontos que mais pesam, e o sistema singular falha com os pontos do vetor nulo. */
-function ajustarComPesoSemMemoria(gaiola, medidas) {
+ * GANHO_MAXIMO_DAS_MEDIDAS falha com os pontos que mais pesam, e o sistema singular falha com os pontos do vetor nulo.
+ *
+ * Com `regularizacao: { tipo: 'variacaoDeCurvatura', onda? }` o segundo termo deixa de ser o deslocamento e passa a ser a energia de
+ * variação de curvatura da superfície limite (`energiaDeVariacaoDeCurvatura`, com os termos tirados da gaiola declarada), e do
+ * deslocamento fica o resto RESTO_DO_DESLOCAMENTO, que só segura o vértice que nenhum termo nem cota alcança:
+ *
+ *   E(x) = Σ p_i ‖L_i(x) − a_i‖² + E_curvatura(x) + 1e-9 Σ_j ‖x_j − c_j‖²     sujeita às mesmas cotas exatas.
+ *
+ * Todos os vértices da gaiola são incógnitas, a lista só de cotas exatas é aceita (o ajuste exato de `ajustarGaiolaAsMedidas` não tem
+ * regularização), e a saída ganha `regularizacao: { tipo, onda, passo, arestasComTermo, energiaAntes, energiaDepois }`. Sem o argumento
+ * (ou null) a conta é a de sempre, operação por operação. */
+function ajustarComPesoSemMemoria(gaiola, medidas, regularizacao = null) {
+  const energia = lerRegularizacao(regularizacao);
   const { nitidez, C, facesDoV } = prepararLimite(gaiola);
   const borda = gaiola.borda ?? 'suave'; const P = gaiola.vertices; const F = gaiola.faces;
   if (!Array.isArray(medidas)) throw new TypeError('subdivisão: medidas precisa ser lista de { indice, peso }');
@@ -520,6 +643,8 @@ function ajustarComPesoSemMemoria(gaiola, medidas) {
   }));
   const emU = new Set(exatos);
   for (const i of comPeso) for (const j of linhaDe.get(i).globais) emU.add(j);
+  /* com a energia todo vértice é incógnita: os termos dela ligam os vértices que nenhuma cota alcança */
+  if (energia) for (let j = 0; j < P.length; j++) emU.add(j);
   const U = [...emU].sort((a, b) => a - b); const col = new Map(U.map((j, k) => [j, k]));
   const nU = U.length; const nE = exatos.length; const n = nU + nE;
   /* cada ponto medido como linha esparsa sobre U ([coluna, peso]) e a parte fixa b_i fora de U */
@@ -534,8 +659,14 @@ function ajustarComPesoSemMemoria(gaiola, medidas) {
     return { termos, b };
   };
   const A = Array.from({ length: n }, () => new Array(n).fill(0));
-  const rhs = [0, 1, 2].map((ax) => U.map((j) => P[j][ax]).concat(new Array(nE).fill(0)));
-  for (let k = 0; k < nU; k++) A[k][k] = 1;
+  const rhs = [0, 1, 2].map((ax) => U.map((j) => (energia ? RESTO_DO_DESLOCAMENTO * P[j][ax] : P[j][ax])).concat(new Array(nE).fill(0)));
+  for (let k = 0; k < nU; k++) A[k][k] = energia ? RESTO_DO_DESLOCAMENTO : 1;
+  let curvatura = null;
+  if (energia) {
+    /* U é a lista de todos os vértices, e a coluna de cada um é o próprio índice */
+    curvatura = energiaDeVariacaoDeCurvatura(gaiola, { onda: energia.onda });
+    for (const { peso, linhas } of curvatura.termos) for (const l of linhas) for (const [r, wr] of l) for (const [c, wc] of l) A[r][c] += peso * wr * wc;
+  }
   const sensibilidade = []; // a coluna do lado direito que cada cota move, para o ganho
   for (const i of comPeso) {
     const { termos, b } = esparsa(i); const p = pesoDe.get(i);
@@ -576,6 +707,7 @@ function ajustarComPesoSemMemoria(gaiola, medidas) {
   });
   const fora = M.filter((i, r) => pesoDe.get(i) === Infinity && residuos[r] > TOLERANCIA_DAS_MEDIDAS);
   if (fora.length) throw new ErroDasMedidas(`a superfície limite não chegou a ${TOLERANCIA_DAS_MEDIDAS} m das medidas exatas`, fora);
+  if (curvatura) return { vertices: V, ganho, residuos, medidas: M, regularizacao: { tipo: energia.tipo, onda: curvatura.onda, passo: curvatura.passo, arestasComTermo: curvatura.termos.length, energiaAntes: curvatura.valor(P), energiaDepois: curvatura.valor(V) } };
   return { vertices: V, ganho, residuos, medidas: M };
 }
 
@@ -590,15 +722,18 @@ export const ajustarGaiolaAsMedidasComPeso = memoizarPura(ajustarComPesoSemMemor
  * deslocamentos [x, y, z] por vértice da gaiola (a lista toda, com [0, 0, 0] onde nada se move) e devolve o deslocamento
  * que esse campo causa na gaiola ajustada: quem edita pontos declarados lê, sem refatorar nem refazer a superfície, quanto
  * a gaiola ajustada se move. `medidas` é a lista de { indice, peso } da gaiola, com peso Infinity para a medida exata, como
- * o passo `subdivisao` as monta. Não confere o ganho nem os resíduos, que as duas funções acima conferem na primeira vez.
+ * o passo `subdivisao` as monta, e `regularizacao` a do passo (a que `gaiolaDoPasso` devolve), ou nada. Não confere o ganho nem os
+ * resíduos, que as duas funções acima conferem na primeira vez.
  */
-export function operadorDasMedidas(gaiola, medidas) {
+export function operadorDasMedidas(gaiola, medidas, regularizacao = null) {
+  const energia = lerRegularizacao(regularizacao);
   const { nitidez, C, facesDoV } = prepararLimite(gaiola);
   const borda = gaiola.borda ?? 'suave'; const P = gaiola.vertices; const F = gaiola.faces;
   const pesoDe = new Map();
   for (const m of medidas) pesoDe.set(m.indice, m.peso);
   const M = [...pesoDe.keys()].sort((a, b) => a - b);
-  const exato = M.every((i) => pesoDe.get(i) === Infinity);
+  /* com a regularização o ajuste é o com peso mesmo quando todas as cotas são exatas, como no passo */
+  const exato = !energia && M.every((i) => pesoDe.get(i) === Infinity);
   const nV = P.length;
   const linhaDe = new Map(M.map((i) => {
     const est = estrelaDe(P, F, facesDoV[i], nitidez, i);
@@ -627,6 +762,7 @@ export function operadorDasMedidas(gaiola, medidas) {
   const exatos = M.filter((i) => pesoDe.get(i) === Infinity); const comPeso = M.filter((i) => pesoDe.get(i) !== Infinity);
   const emU = new Set(exatos);
   for (const i of comPeso) for (const j of linhaDe.get(i).globais) emU.add(j);
+  if (energia) for (let j = 0; j < nV; j++) emU.add(j);
   const U = [...emU].sort((a, b) => a - b); const col = new Map(U.map((j, k) => [j, k]));
   const nU = U.length; const nE = exatos.length; const n = nU + nE;
   const esparsa = (i) => {
@@ -639,7 +775,8 @@ export function operadorDasMedidas(gaiola, medidas) {
     return { termos, fora };
   };
   const A = Array.from({ length: n }, () => new Array(n).fill(0));
-  for (let k = 0; k < nU; k++) A[k][k] = 1;
+  for (let k = 0; k < nU; k++) A[k][k] = energia ? RESTO_DO_DESLOCAMENTO : 1;
+  if (energia) for (const { peso, linhas } of energiaDeVariacaoDeCurvatura(gaiola, { onda: energia.onda }).termos) for (const l of linhas) for (const [r, wr] of l) for (const [c, wc] of l) A[r][c] += peso * wr * wc;
   const linhasComPeso = comPeso.map((i) => {
     const e = esparsa(i); const p = pesoDe.get(i);
     for (const [r, wr] of e.termos) for (const [c, wc] of e.termos) A[r][c] += p * wr * wc;
@@ -653,7 +790,7 @@ export function operadorDasMedidas(gaiola, medidas) {
   const lu = fatorarLU(A);
   if (lu.singularEm >= 0) throw new ErroDasMedidas('as medidas formam sistema singular, porque a superfície limite não separa estes pontos', M);
   const aplicar = (D) => {
-    const rhs = [0, 1, 2].map((ax) => U.map((j) => D[j][ax]).concat(new Array(nE).fill(0)));
+    const rhs = [0, 1, 2].map((ax) => U.map((j) => (energia ? RESTO_DO_DESLOCAMENTO * D[j][ax] : D[j][ax])).concat(new Array(nE).fill(0)));
     for (const { i, p, termos, fora } of linhasComPeso) {
       const b = somar(D, fora);
       for (const [r, wr] of termos) for (let ax = 0; ax < 3; ax++) rhs[ax][r] += p * wr * (D[i][ax] - b[ax]);

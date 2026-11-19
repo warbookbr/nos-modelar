@@ -28,9 +28,21 @@
  * medidas, resolve o próprio sistema e devolve a gaiola ajustada, para as medidas existentes (`superficieLimite`, `medirCurvasDoNeutro`,
  * `ondeOndula`) lerem. Os pesos do ponto limite saem de `limitesDaGaiola` aplicada à base, e o sistema, de `fatorarLU` e `resolverLU`.
  *
- * Uso: node tools/fixtures/correcao-de-superficie/energia-de-curvatura.mjs analiticas | emendas | rede  [--onda=<mm>] [--miolo=<peso>] [--longe-da-borda]
- *   `--longe-da-borda` tira o termo dos vértices cujo anel toca a borda livre (variante medida, que não melhorou a distância).
- *   Cada prova sai com o número de hoje e o do protótipo, em JSON na saída padrão. */
+ * A ETAPA B (2026-11-19) levou a energia ao núcleo (`energiaDeVariacaoDeCurvatura` e o argumento `regularizacao` em
+ * `procedural/nucleo/subdivisao.js`, a opção `alisarSuperficie` da `gaiolaPorRede`). Este arquivo fica como a bancada das variantes medidas
+ * antes da escolha, e cada prova sai com três colunas: `hoje` (a rede sem a opção), `prototipo` (o ajuste daqui, com as opções da linha de
+ * comando; sem opção nenhuma é o da etapa A) e `nucleo` (a rede com `alisarSuperficie`, montada pelo passo `subdivisao`).
+ *
+ * Uso: node tools/fixtures/correcao-de-superficie/energia-de-curvatura.mjs analiticas | emendas | rede  [opções]
+ *   --onda=<mm>              o comprimento de onda (no protótipo e no núcleo); --miolo=<peso> troca o peso das cotas de peso finito (protótipo)
+ *   --longe-da-borda         tira o termo dos vértices cujo anel toca a borda livre (variante da etapa A, que não melhorou a distância)
+ *   --comprimento=parametro  o comprimento por aresta no parâmetro (um passo só, a mediana), como no núcleo; o padrão `espaco` é o da etapa A
+ *   --curvatura=limite | limiteNaBorda   as derivadas pelas diferenças dos pontos limite do anel, em todo vértice ou só junto da borda
+ *   --cruzamento=semTermo [--corte=anel] tira os termos que tocam o cruzamento de duas curvas exatas (a aresta, ou o anel)
+ *   --cruzamento=<peso> [--vizinhanca=<n>] troca por esse peso a cota exata das curvas a até n arestas do cruzamento
+ *   --rede=<json>            opções a mais da `gaiolaPorRede` nas analíticas do protótipo, como {"liso":false} ou {"interior":false}
+ *   --definicao=<json>       opções de `definicaoAnalitica`, como {"pontos":16} (um ponto-chave por ponto da gaiola)
+ *   A saída é JSON na saída padrão. */
 import { pathToFileURL } from 'node:url';
 import { executarReceita } from '../../../src/autoria/executar-receita.js';
 import { gaiolaPorRede } from '../../../procedural/nucleo/gaiola-por-rede.js';
@@ -98,12 +110,26 @@ const aplicar = (linha, P) => { const r = [0, 0, 0]; for (const [j, w] of linha)
 export function termosDaEnergia(gaiola, onda, opcoes = {}) {
   const P = gaiola.vertices; const T = topologiaRegular(gaiola, opcoes);
   const K = (onda / (2 * Math.PI)) ** 6;
+  const h = opcoes.comprimento === 'parametro' ? medianaDasArestas(gaiola) : null;
+  const solto = opcoes.semTermoEm ?? null; const alcance = opcoes.alcanceDoCorte ?? 'aresta';
+  /* `curvatura: 'limite'` tira as derivadas das diferenças dos PONTOS LIMITE do anel (a média da derivada segunda do limite na vizinhança
+     do vértice), e não dos pontos da gaiola; 'limiteNaBorda', só no vértice cujo anel toca a borda livre */
+  const modo = opcoes.curvatura ?? 'gaiola'; const W = modo === 'gaiola' ? null : pesosDoLimite(gaiola);
+  const bordas = new Set();
+  if (modo === 'limiteNaBorda') { const usos = new Map(); for (const f of gaiola.faces) f.forEach((a, k) => { const c = chave(a, f[(k + 1) % f.length]); usos.set(c, (usos.get(c) ?? 0) + 1); }); for (const [c, q] of usos) if (q !== 2) for (const a of c.split(',')) bordas.add(Number(a)); }
+  const peloLimite = (A) => {
+    const uu = new Map(), uv = new Map(), vv = new Map();
+    const soma = (m, j, w) => { if (w !== 0) for (const [c, wc] of W[j]) m.set(c, (m.get(c) ?? 0) + w * wc); };
+    for (let a = 0; a < 3; a++) { soma(uu, A[a][1], S[a]); soma(vv, A[1][a], S[a]); for (let b = 0; b < 3; b++) soma(uv, A[a][b], D[a] * D[b]); }
+    return { uu, uv, vv };
+  };
   const D3 = (i, k) => {
-    const A = T.anel(i, k); const e = estenceisDoAnel(A);
-    const lu = (dist(P[i], P[A[2][1]]) + dist(P[i], P[A[0][1]])) / 2; const lv = (dist(P[i], P[A[1][2]]) + dist(P[i], P[A[1][0]])) / 2;
+    const A = T.anel(i, k); const e = modo === 'limite' || (modo === 'limiteNaBorda' && A.flat().some((j) => bordas.has(j))) ? peloLimite(A) : estenceisDoAnel(A);
+    const lu = h ?? (dist(P[i], P[A[2][1]]) + dist(P[i], P[A[0][1]])) / 2; const lv = h ?? (dist(P[i], P[A[1][2]]) + dist(P[i], P[A[1][0]])) / 2;
     return [[e.uu, 1 / (lu * lu)], [e.uv, Math.SQRT2 / (lu * lv)], [e.vv, 1 / (lv * lv)]];
   };
-  return T.arestas.map(([s, t]) => {
+  const tocaOCorte = (s, t) => solto && (alcance === 'aresta' ? solto.has(s) || solto.has(t) : [s, t].some((i) => T.anel(i, 0).flat().some((j) => solto.has(j))));
+  return T.arestas.filter(([s, t]) => !tocaOCorte(s, t)).map(([s, t]) => {
     /* em s, +u é t; em t, +u é o vizinho oposto a s, e o +v dos dois cai do mesmo lado porque a malha é orientada */
     const ks = T.vizinhos(s).indexOf(t); const kt = (T.vizinhos(t).indexOf(s) + 2) % 4;
     const Ds = D3(s, ks), Dt = D3(t, kt);
@@ -113,7 +139,7 @@ export function termosDaEnergia(gaiola, onda, opcoes = {}) {
       for (const [j, w] of lt) m.set(j, (m.get(j) ?? 0) - w * et);
       return m;
     });
-    const l = dist(P[s], P[t]);
+    const l = h ?? dist(P[s], P[t]);
     return { aresta: [s, t], peso: K / (l * l), linhas };
   });
 }
@@ -151,11 +177,20 @@ const medianaDasArestas = ({ vertices, faces }) => {
  * { indice, peso } do passo, com peso Infinity para a cota exata. `onda` na unidade da gaiola (padrão: quatro arestas medianas);
  * `pesoDoMiolo` troca o peso de toda cota de peso finito. Todos os vértices são incógnitas.
  */
-export function ajustarComEnergia(gaiola, medidas, { onda = null, pesoDoMiolo = null, longeDaBorda = false, epsilon = EPSILON_DO_DESLOCAMENTO } = {}) {
+export function ajustarComEnergia(gaiola, medidas, { onda = null, pesoDoMiolo = null, longeDaBorda = false, epsilon = EPSILON_DO_DESLOCAMENTO, comprimento = 'espaco', curvatura = 'gaiola', cruzamento = null, alcanceDoCorte = 'aresta', vizinhanca = 1 } = {}) {
   const P = gaiola.vertices; const nV = P.length;
   const ondaUsada = onda ?? 4 * medianaDasArestas(gaiola);
   const pesoDe = new Map();
   for (const { indice, peso } of medidas) pesoDe.set(indice, peso === Infinity ? Infinity : (pesoDoMiolo ?? peso));
+  /* o cruzamento de duas curvas exatas: o vértice regular exato com os quatro vizinhos exatos. `cruzamento: 'semTermo'` tira da energia
+     os termos que o tocam; um número troca por esse peso a cota exata dos vértices das curvas a até `vizinhanca` arestas dele */
+  let semTermoEm = null; const afrouxados = [];
+  if (cruzamento != null) {
+    const T0 = topologiaRegular(gaiola); const ex = (i) => pesoDe.get(i) === Infinity;
+    const nos = [...pesoDe.keys()].filter((i) => ex(i) && T0.regular(i) && T0.vizinhos(i).every(ex)).sort((a, b) => a - b);
+    if (cruzamento === 'semTermo') semTermoEm = new Set(nos);
+    else for (const x of nos) for (let k = 0; k < 4; k++) { let ant = x; let v = T0.vizinhos(x)[k]; for (let d = 1; d <= vizinhanca && v != null && ex(v); d++) { pesoDe.set(v, cruzamento); afrouxados.push(v); const viz = T0.vizinhos(v); if (!viz) break; const prox = viz[(viz.indexOf(ant) + 2) % 4]; ant = v; v = prox; } }
+  }
   const ordem = [...pesoDe.keys()].sort((a, b) => a - b);
   const exatos = ordem.filter((i) => pesoDe.get(i) === Infinity); const comPeso = ordem.filter((i) => pesoDe.get(i) !== Infinity);
   const W = pesosDoLimite(gaiola);
@@ -167,7 +202,7 @@ export function ajustarComEnergia(gaiola, medidas, { onda = null, pesoDoMiolo = 
     const p = pesoDe.get(i);
     for (const [r, wr] of W[i]) { for (const [c, wc] of W[i]) A[r][c] += p * wr * wc; for (let ax = 0; ax < 3; ax++) rhs[ax][r] += p * wr * P[i][ax]; }
   }
-  const termos = termosDaEnergia(gaiola, ondaUsada, { longeDaBorda });
+  const termos = termosDaEnergia(gaiola, ondaUsada, { longeDaBorda, comprimento, curvatura, semTermoEm, alcanceDoCorte });
   for (const { peso, linhas } of termos) for (const l of linhas) for (const [r, wr] of l) for (const [c, wc] of l) A[r][c] += peso * wr * wc;
   exatos.forEach((i, s) => {
     const r = nV + s;
@@ -182,7 +217,8 @@ export function ajustarComEnergia(gaiola, medidas, { onda = null, pesoDoMiolo = 
   let residuoExato = 0, deslocamento = 0;
   for (const i of exatos) residuoExato = Math.max(residuoExato, dist(L[i], P[i]));
   for (let j = 0; j < nV; j++) deslocamento = Math.max(deslocamento, dist(V[j], P[j]));
-  return { vertices: V, onda: ondaUsada, arestasComTermo: termos.length, energiaAntes: energiaDaGaiola(termos, P), energiaDepois: energiaDaGaiola(termos, V), deslocamento, residuoExato };
+  let residuoAfrouxado = 0; for (const i of afrouxados) residuoAfrouxado = Math.max(residuoAfrouxado, dist(L[i], P[i]));
+  return { residuoAfrouxado, vertices: V, onda: ondaUsada, arestasComTermo: termos.length, energiaAntes: energiaDaGaiola(termos, P), energiaDepois: energiaDaGaiola(termos, V), deslocamento, residuoExato };
 }
 
 /** gaiolasDoPasso(passo, pontos, opcoes) -> { hoje, prototipo, ajuste }: a gaiola ajustada pelo núcleo e a do protótipo, do mesmo passo */
@@ -253,8 +289,13 @@ export function cristaPontual(gaiola, cadeia, { afastamento = 4, exatos = null }
 export function provaDasAnaliticas(opcoes = {}, superficies = Object.keys(SUPERFICIES_ANALITICAS)) {
   return superficies.map((nome) => {
     const Sa = SUPERFICIES_ANALITICAS[nome];
-    const g = gaiolaPorRede({ ...definicaoAnalitica(nome), marcarCurvas: true });
+    const g = gaiolaPorRede({ ...definicaoAnalitica(nome, opcoes.definicao ?? {}), marcarCurvas: true, ...(opcoes.rede ?? {}) });
     const { hoje, prototipo, ajuste, exatos } = gaiolasDoPasso(g.passo, g.pontos, opcoes);
+    /* o núcleo com a opção ligada (`alisarSuperficie` na rede), sobre a mesma definição: a mesma topologia e os mesmos nomes de ponto */
+    const gn = gaiolaPorRede({ ...definicaoAnalitica(nome, opcoes.definicao ?? {}), marcarCurvas: true, alisarSuperficie: opcoes.onda ? { onda: opcoes.onda * 1000 } : true });
+    const rn = gaiolaDoPasso(gn.passo, { vec: (p) => (typeof p === 'string' ? gn.pontos[p] : p), num: Number });
+    if (rn.erro) throw new Error(rn.erro.join(': '));
+    const nucleo = { ...rn.gaiola, borda: 'suave' };
     const indice = new Map(g.passo.vertices.map((v, k) => [typeof v === 'string' ? v : v.nome ?? v[0], k]));
     const curvas = g.passo.curvas.filter((c) => c.nome === 'h1' || c.nome === 'v1').map((c) => ({ nome: c.nome, gaiola: c.pontos.map((p) => indice.get(p)) }));
     const medir = (gaiola) => {
@@ -265,7 +306,7 @@ export function provaDasAnaliticas(opcoes = {}, superficies = Object.keys(SUPERF
       }
       return { distanciaMm: r4(inteira), a50Mm: r4(a50), a100Mm: r4(a100), cristas: cristas(gaiola, curvas), cristaPontual: curvas.map((c) => ({ nome: c.nome, ...cristaPontual(gaiola, c.gaiola, { exatos }) })) };
     };
-    return { superficie: nome, ondaMm: r4(ajuste.onda * 1000), deslocamentoDaGaiolaMm: r4(ajuste.deslocamento * 1000), energia: [ajuste.energiaAntes, ajuste.energiaDepois], hoje: medir(hoje), prototipo: medir(prototipo) };
+    return { residuoAfrouxadoMm: r4(ajuste.residuoAfrouxado * 1000), superficie: nome, ondaMm: r4(ajuste.onda * 1000), deslocamentoDaGaiolaMm: r4(ajuste.deslocamento * 1000), energia: [ajuste.energiaAntes, ajuste.energiaDepois], hoje: medir(hoje), prototipo: medir(prototipo), nucleo: medir(nucleo) };
   });
 }
 
@@ -278,7 +319,9 @@ function chapasDaReceita(nome, opcoes) {
   let dif = 0;
   hoje.vertices.forEach((p, k) => { dif = Math.max(dif, dist(p, chapa.vertices[k])); });
   if (!(dif < 1e-12) || hoje.vertices.length !== chapa.vertices.length) throw new Error(`${nome}: a gaiola refeita difere da do passo em ${dif}`);
-  return { hoje: chapa, prototipo: { ...chapa, vertices: prototipo.vertices }, ajuste, exatos };
+  const comOpcao = receitaDeProva(nome, { marcarCurvas: true, alisarSuperficie: opcoes.onda ? { onda: opcoes.onda * 1000 } : true });
+  const [nucleo] = executarReceita({ ...comOpcao, PASSOS: comOpcao.PASSOS.filter(([op]) => op === 'subdivisao'), vaos: undefined }).neutro.chapas;
+  return { hoje: chapa, prototipo: { ...chapa, vertices: prototipo.vertices }, nucleo, ajuste, exatos };
 }
 
 /* a distância (mm) da superfície limite à altura desenhada y(x, z), pela diferença em y projetada na normal */
@@ -294,32 +337,33 @@ function distanciaADesenhada(chapa, altura, perto = () => true) {
 /** provaDasEmendas(opcoes) -> por chapa emendada: a medida na curva `emenda` e a distância à desenhada, hoje e no protótipo */
 export function provaDasEmendas(opcoes = {}, nomes = ['emenda-g2', 'emenda-dupla', 'emenda-g1']) {
   return nomes.map((nome) => {
-    const { hoje, prototipo, ajuste, exatos } = chapasDaReceita(nome, opcoes);
+    const { hoje, prototipo, nucleo, ajuste, exatos } = chapasDaReceita(nome, opcoes);
     const medir = (chapa) => {
       const m = medirCurvasDoNeutro({ chapas: [chapa] }, { curvas: ['emenda'] })[0].curvas[0];
       const [inteira, junto] = distanciaADesenhada(chapa, (x, z) => pontoDaEmenda(nome, Math.min(600, Math.max(0, x)), Math.min(400, Math.max(0, z)))[1], (p) => Math.abs(p[0] - EMENDA_X_MM) <= 60);
       const cadeia = chapa.curvas.find((c) => c.nome === 'emenda').gaiola;
       return { cristaPontual: cristaPontual({ vertices: chapa.vertices, faces: chapa.faces, vincos: chapa.vincos, cantos: chapa.cantos, borda: chapa.borda }, cadeia, { exatos }), inclinacao: m.inclinacaoForaDosSingulares, inclinacaoNaBorda: m.inclinacaoNaBorda, naCurva: m.curvaturaNaLinha, aoLado: m.curvaturaNaFaixa, salto: m.salto, distanciaMm: inteira, distanciaJuntoMm: junto };
     };
-    return { chapa: nome, desenhada: [1000 / EMENDAS[nome].raioEsquerdaMm, 1000 / EMENDAS[nome].raioDireitaMm].map(r4), ondaMm: r4(ajuste.onda * 1000), hoje: medir(hoje), prototipo: medir(prototipo) };
+    return { chapa: nome, desenhada: [1000 / EMENDAS[nome].raioEsquerdaMm, 1000 / EMENDAS[nome].raioDireitaMm].map(r4), ondaMm: r4(ajuste.onda * 1000), hoje: medir(hoje), prototipo: medir(prototipo), nucleo: medir(nucleo) };
   });
 }
 
 /** provaDaRede(opcoes) -> a `rede-sem-ruido`: as viradas por metro por classe e a distância a `painel(x, z)`, hoje e no protótipo */
 export function provaDaRede(opcoes = {}) {
-  const { hoje, prototipo, ajuste } = chapasDaReceita('rede-sem-ruido', opcoes);
+  const { hoje, prototipo, nucleo, ajuste } = chapasDaReceita('rede-sem-ruido', opcoes);
   const medir = (chapa) => {
     const o = ondeOndula(chapa).classes;
     const [inteira, dentro] = distanciaADesenhada(chapa, painel, (p) => Math.min(p[0], 1000 - p[0], p[2], 500 - p[2]) >= 100);
     return { viradasPorM: Object.fromEntries(Object.entries(o).map(([c, v]) => [c, v.viradasPorM])), amplitude: Object.fromEntries(Object.entries(o).map(([c, v]) => [c, v.amplitudeMediana])), energia: Object.fromEntries(Object.entries(o).map(([c, v]) => [c, v.energia])), distanciaMm: inteira, a100Mm: dentro };
   };
-  return { chapa: 'rede-sem-ruido', ondaMm: r4(ajuste.onda * 1000), arestasComTermo: ajuste.arestasComTermo, hoje: medir(hoje), prototipo: medir(prototipo) };
+  return { chapa: 'rede-sem-ruido', ondaMm: r4(ajuste.onda * 1000), arestasComTermo: ajuste.arestasComTermo, hoje: medir(hoje), prototipo: medir(prototipo), nucleo: medir(nucleo) };
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
   const args = process.argv.slice(2); const qual = args.find((a) => !a.startsWith('--'));
   const opcao = (nome) => args.find((a) => a.startsWith(`--${nome}=`))?.split('=')[1];
-  const opcoes = { onda: opcao('onda') != null ? Number(opcao('onda')) / 1000 : null, pesoDoMiolo: opcao('miolo') != null ? Number(opcao('miolo')) : null, longeDaBorda: args.includes('--longe-da-borda') };
+  const opcoes = { onda: opcao('onda') != null ? Number(opcao('onda')) / 1000 : null, pesoDoMiolo: opcao('miolo') != null ? Number(opcao('miolo')) : null, longeDaBorda: args.includes('--longe-da-borda'),
+    comprimento: opcao('comprimento') ?? 'espaco', curvatura: opcao('curvatura') ?? 'gaiola', cruzamento: opcao('cruzamento') == null ? null : (opcao('cruzamento') === 'semTermo' ? 'semTermo' : Number(opcao('cruzamento'))), alcanceDoCorte: opcao('corte') ?? 'aresta', vizinhanca: Number(opcao('vizinhanca') ?? 1), ...(opcao('rede') ? { rede: JSON.parse(opcao('rede')) } : {}), ...(opcao('definicao') ? { definicao: JSON.parse(opcao('definicao')) } : {}) };
   const provas = { analiticas: provaDasAnaliticas, emendas: provaDasEmendas, rede: provaDaRede };
   if (!provas[qual]) { console.error('uso: energia-de-curvatura.mjs analiticas | emendas | rede [--onda=<mm>] [--miolo=<peso>] [--longe-da-borda]'); process.exit(2); }
   process.stdout.write(`${JSON.stringify(provas[qual](opcoes), null, 1)}\n`);

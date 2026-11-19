@@ -10,7 +10,7 @@
    mesmo onde o diedro cai abaixo do ângulo, nas pontas do vinco. `quebraNosVincos: 'todos'` quebra também nos vincos de
    nitidez fracionária, e `'nenhum'` deixa só o ângulo; `liso: false` devolve as faces chapadas. Só a marca de sombra
    muda: as posições e as faces são as mesmas com qualquer opção. */
-import { subdividirCatmullClark, espelharGaiolaEmX, costuraEmXExata, ajustarGaiolaAsMedidas, ajustarGaiolaAsMedidasComPeso, nitidezDoVinco, descendenciaDasLinhas } from '../subdivisao.js';
+import { subdividirCatmullClark, espelharGaiolaEmX, costuraEmXExata, ajustarGaiolaAsMedidas, ajustarGaiolaAsMedidasComPeso, nitidezDoVinco, descendenciaDasLinhas, REGULARIZACAO_DE_CURVATURA, ARESTAS_POR_ONDA } from '../subdivisao.js';
 import { espessarSuperficie, ErroDaEspessura } from '../espessura.js';
 import { valorDoLiso } from '../liso-por-angulo.js';
 
@@ -233,7 +233,7 @@ function lugaresDaEspessura(lugares, malha, gaiola, declarados, tipo = 'raio', n
   return `, perto de ${textos.join(', ')} (${lugares.length} par(es) de vértices da malha ao todo); reduza a espessura abaixo do raio, abra a curva ali ou troque o lado; no vinco vivo o raio local é a largura da faixa de faces ao lado dele e cai pela metade a cada nível`;
 }
 
-/** gaiolaDoPasso(a, { vec, num }) -> { gaiola, declarados, declaradaCheia, medidas } ou { erro: [campo, mensagem] }
+/** gaiolaDoPasso(a, { vec, num }) -> { gaiola, declarados, declaradaCheia, medidas, regularizacao } ou { erro: [campo, mensagem] }
  *  A gaiola que o passo `subdivisao` subdivide, resolvida dos argumentos do passo: os nomes traduzidos em índices, a
  *  simetria aplicada (com `imagem`, o índice da imagem espelhada de cada ponto) e, com `medidas`, os pontos ajustados
  *  para a superfície limite passar pelas cotas. `vec` e `num` resolvem ponto e número pelo dicionário da peça. O passo
@@ -241,7 +241,7 @@ function lugaresDaEspessura(lugares, malha, gaiola, declarados, tipo = 'raio', n
  *  Com `medidas`, `declaradaCheia` é a gaiola como foi declarada (com a simetria aplicada, antes do ajuste) e `medidas` a
  *  lista de { indice, peso } da gaiola cheia (peso Infinity para a medida exata, as imagens espelhadas incluídas), que
  *  `operadorDasMedidas` de `subdivisao.js` lê para dizer como a gaiola ajustada acompanha a declarada; sem `medidas`, os
- *  dois são null. */
+ *  dois são null. `regularizacao` é a do passo como o ajuste a recebeu ({ tipo, onda? }, ou null), o terceiro argumento do operador. */
 export function gaiolaDoPasso(a, { vec, num }) {
   const erro = (campo, mensagem) => ({ erro: [campo, mensagem] });
   let gaiola; let soltos = [];
@@ -294,6 +294,24 @@ export function gaiolaDoPasso(a, { vec, num }) {
      `pesoPadrao` declara que os pontos da gaiola vêm de leitura de imagem: o nome escrito sozinho ganha esse peso em vez de
      ser cota exata, e a cota de projeto que a peça precisa acertar se escreve { ponto, exata: true }. A declaração de um
      ponto (peso ou exata) vence o padrão sobre ele. Sem `pesoPadrao`, o nome sozinho continua a cota exata. */
+  /* regularizacao: { tipo: 'variacaoDeCurvatura', onda? } troca, no ajuste das cotas, o custo do deslocamento da gaiola pela energia de
+     variação de curvatura da superfície limite; `onda` é comprimento em metro, como os pontos do passo. Vale só com medidas. */
+  let regularizacao = null;
+  if (a.regularizacao != null) {
+    const r = a.regularizacao;
+    const exemplo = `{ tipo: '${REGULARIZACAO_DE_CURVATURA}', onda: 0.2 }`;
+    if (typeof r !== 'object' || Array.isArray(r)) return erro('regularizacao', `regularizacao precisa ser objeto como ${exemplo}, e veio ${JSON.stringify(r)}`);
+    const extra = Object.keys(r).filter((k) => k !== 'tipo' && k !== 'onda');
+    if (extra.length) return erro('regularizacao', `regularizacao tem campo desconhecido ${extra.map(citar).join(', ')}; os campos são tipo e onda, como ${exemplo}`);
+    if (r.tipo !== REGULARIZACAO_DE_CURVATURA) return erro('regularizacao', `regularizacao.tipo é ${JSON.stringify(r.tipo)}; o único tipo é '${REGULARIZACAO_DE_CURVATURA}', como ${exemplo}`);
+    regularizacao = { tipo: REGULARIZACAO_DE_CURVATURA };
+    if (r.onda != null) {
+      const onda = num(r.onda);
+      if (!Number.isFinite(onda) || onda <= 0) return erro('regularizacao', `regularizacao.onda é ${JSON.stringify(r.onda)}; precisa ser comprimento em metro, finito e maior que zero (sem ela, ${ARESTAS_POR_ONDA} arestas medianas da gaiola)`);
+      regularizacao.onda = onda;
+    }
+    if (a.medidas == null) return erro('regularizacao', 'regularizacao vale com medidas: ela é o segundo termo do ajuste das cotas, e sem cota não há ajuste; declare as medidas ou tire regularizacao');
+  }
   if (a.medidas != null) {
     if (!Array.isArray(a.medidas) || !a.medidas.length) return erro('medidas', `medidas precisa ser lista não vazia de nomes de ponto da gaiola ou de ${EXEMPLO_DE_MEDIDA}`);
     let pesoPadrao = null;
@@ -335,7 +353,13 @@ export function gaiolaDoPasso(a, { vec, num }) {
     if (gaiola.imagem) gaiola.imagem.forEach((k, j) => { origem[k] = j; });
     declaradaCheia = gaiola;
     try {
-      if (lidas.every((m) => m.peso === Infinity)) {
+      if (regularizacao) {
+        /* com a regularização o ajuste é o com peso também quando todas as cotas são exatas */
+        const marcados = lidas.map(({ indice, peso }) => ({ indice, peso }));
+        if (gaiola.imagem) marcados.push(...lidas.map(({ indice, peso }) => ({ indice: gaiola.imagem[indice], peso })));
+        medidasLidas = marcados;
+        gaiola = { ...gaiola, vertices: ajustarGaiolaAsMedidasComPeso({ ...gaiola, borda: a.borda ?? 'suave' }, marcados, regularizacao).vertices };
+      } else if (lidas.every((m) => m.peso === Infinity)) {
         /* só medidas exatas: o caminho de sempre, que a saída das fixtures guarda bit a bit */
         const indices = lidas.map((m) => m.indice);
         const marcados = gaiola.imagem ? [...indices, ...indices.map((k) => gaiola.imagem[k])] : indices;
@@ -353,7 +377,7 @@ export function gaiolaDoPasso(a, { vec, num }) {
       return erro('medidas', `${e.motivo}: ${nomes.join(', ')}`);
     }
   }
-  return { gaiola, declarados, declaradaCheia, medidas: medidasLidas };
+  return { gaiola, declarados, declaradaCheia, medidas: medidasLidas, regularizacao };
 }
 
 export function criarOperacoesSubdivisao({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confereId, grita, addV, addF, registraOrigem }) {
