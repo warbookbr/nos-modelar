@@ -24,6 +24,7 @@ ENVOLVER sobre o corte de `aberturaPorContorno`: em vez de tirar a região de de
 
 - a operação `divisaoPorContorno` (contorno projetado na chapa, faces cortadas na curva, parte nova com nome e material), com recusa clara de contorno que não cai na chapa ou se cruza;
 - a prova em chapa de teste: área das partes somada igual à da chapa, nenhuma aresta livre nova fora da borda da chapa, nenhuma face abaixo do limite de face fina, e a borda a menos de uma tolerância da curva;
+- a parte que encosta na borda da chapa ou na parede de um vão: o contorno pode sair da chapa, e a parte se fecha pela borda da chapa ou pela boca do vão, com a parede de espessura dividida no ponto em que o contorno cruza a borda, e a recusa do contorno que encosta na borda diz que a causa é a borda e em que ponto;
 - a prova na lataria do carro pelo plano do carro: as duas partes com a borda na curva, a malha da chapa somada igual à de antes em forma, e a imagem das partes isoladas à pessoa.
 
 ## Excluído
@@ -33,7 +34,7 @@ ENVOLVER sobre o corte de `aberturaPorContorno`: em vez de tirar a região de de
 
 ## Gate de saída
 
-1. Testes da operação nos dois sentidos e de cada recusa.
+1. Testes da operação nos dois sentidos e de cada recusa, inclusive da parte fechada pela borda e pela boca do vão.
 2. As partes do carro com a borda na curva, sem face fina, e a forma da chapa igual.
 3. Imagem das partes isoladas aprovada pela pessoa.
 4. Revisão adversarial sem bloqueio.
@@ -41,7 +42,8 @@ ENVOLVER sobre o corte de `aberturaPorContorno`: em vez de tirar a região de de
 ## Fatias
 
 1. A operação sobre o corte da abertura, com a chapa de teste.
-2. A prova no carro e o fechamento.
+2. A parte fechada pela borda da chapa ou pela boca do vão, provada na chapa de teste com uma parte que sai pela borda e outra que sai por um furo.
+3. A prova no carro e o fechamento.
 
 ## Riscos e parada
 
@@ -54,3 +56,5 @@ Em 2026-11-19, na fatia 1, o plano cresceu para um corte próprio, no mesmo arqu
 Decidido pela pessoa em 2026-11-19 ("vamos fazer conforme você recomendou"), depois da terceira revisão adversarial, que bloqueou porque a cópia feita depois da divisão (espelha, arranja) perdia os pedaços: uma quarta volta com a correção que a revisão descreveu (sem o contador de profundidade, com o espelha e o arranja pulando o pedaço que nasceu depois deles, teste nas duas ordens, e os leitores diretos do registro, como a aba do vão, passando pelos pedaços); se ela não fechar, a operação recusa a chapa dividida que for depois espelhada ou copiada, como trava. A causa de fundo, o registro de origem não marcar se uma lista é de faces ou de vértices, vai ao backlog.
 
 Decidido pela pessoa em 2026-11-19 ("pode ser sim"), depois da quarta revisão, que bloqueou porque as operações que reescrevem a lista de faces de uma origem (o arredondamento da costura e a limpeza de lascas) não tratam os pedaços da divisão: essas duas passam a atualizar os pedaços, e toda outra operação que reescreva lista de faces de origem recusa, com a causa, quando vier depois de uma divisão; a normal da aba rente à divisão volta a ser a de antes.
+
+Em 2026-11-19, a primeira tentativa da prova no carro parou antes de mudar a receita: as duas partes chegam à borda da chapa (o rebaixo na borda do meio da porta, o para-lama na boca do arco da roda e na soleira) e a operação só divide região inteira dentro da chapa. Recuar o contorno deixa uma tira de 1 mm de chapa na borda da porta, e no para-lama todo recuo de 2 a 5 mm da boca do arco deixa pedaço fino (razão de área por aresta ao quadrado de 1,22e-3 a 1,84e-3, contra o limite de 3e-3). As bordas internas das duas partes já dividem sem pedaço fino. A dependência estava prevista no banco de provas da fatia 1 e faltava no plano. Decidido pela pessoa em 2026-11-19 ("De momento apenas atualize e envie o plano"), dentro da permissão de estender o plano dada quando ele foi pedido: o plano ganha a fatia 2, da parte fechada pela borda e pela boca do vão, antes da prova no carro, e a implementação dela espera o sim da pessoa.
