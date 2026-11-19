@@ -617,3 +617,52 @@ Limites, sem mudança. O plano de simetria é borda livre para o preenchimento: 
 
 O processo teria pegado sozinho? Que o teste da etapa B comparava os pontos da rede com a opção aos da rede com `liso: false`, e que a catraca da calota assimétrica falharia ao passar a caber, sim: os dois testes falharam na primeira execução e foram reescritos. Que o protótipo deixaria de reproduzir a etapa B quando o núcleo mudasse, sim: a conferência dele contra o Coons da rede recusa a rede com a opção, e ele passou a partir da rede com `liso: false`. Que a bancada da curvatura normal passa a trazer o miolo novo na coluna da etapa B, não: o teste dela passa com os números novos e nada avisa; o cabeçalho dela diz agora. Que o preenchimento novo deixava um retalho da chapa lateral pior que sem a opção, não: as provas pedidas são todas de forma lisa e de retalhos de largura parecida, a medida saiu de uma conferência a mais, só da cota do miolo, e a causa que escrevi estava errada; a chapa entrou no teste, medida na superfície final. Que o vizinho estreito amplificava o desvio da curva dele sem teto, também não: nenhuma chapa de prova tinha razão de cordas acima de 3, e foi a revisão adversarial que montou o caso; ele está no teste do núcleo, com as duas recusas.
 
+
+## Diagnóstico no quarto traseiro (2026-11-19)
+
+A pessoa decidiu em 2026-11-19 medir a lataria do carro (`procedural/pecas/carro-fastback/partes/lataria/receita.js`, commit a18a646f) com e sem `alisarSuperficie`, como diagnóstico e sem mudar a receita. A receita não repassa a opção à `gaiolaPorRede`, e por isso a medida saiu de cópias dela em `tmp/diag-quarto/`, fora do versionado, com uma linha a mais que repassa `chapa.alisarSuperficie`; a cópia sem a opção gera os mesmos PASSOS da receita (a mesma impressão). As variantes são quatro: sem a opção, com a onda padrão (quatro passos da gaiola, 213 mm com o passo mediano de 53,2 mm), com a onda de 400 mm e com a onda de 110 mm. A receita tem `liso: false` e `pesoDasCurvas: 1`, de modo que as curvas são cota de peso 1, e não cota exata, e o miolo cai do peso 1 para 0,003 com a opção.
+
+A rede é aceita nas quatro, sem recusa de dobra, de vizinho nem de onda, e a execução da subdivisão passa de 57 s para 95 s (115 s com a onda de 400 mm). O preenchimento pelas vizinhas conta 68 retalhos de quatro lados e 272 lados: 172 com vizinho, 8 cortados pela razão 4, 59 sem vizinho por vinco e 33 por borda livre, plano de simetria ou retalho de três lados. Os oito cortados são o lado de cima de seis retalhos da soleira (razão de 4,7 a 7,4, porque a faixa da soleira é estreita contra a faixa de cima), um lado do `c_soleira` e um do `c_base`, na calota. Dos 172 lados com vizinho, 164 têm razão de cordas até 1,5, um entre 1,5 e 2, quatro entre 2 e 3 e três entre 3 e 4 (os três na calota). Dezesseis retalhos têm vizinho nos quatro lados, treze em três, trinta e um em dois, sete em um, e o `c_soleira` em nenhum. Os vincos do ombro e da coluna tiram o vizinho de cima ou de baixo de todas as faixas do topo do rebaixo para cima, e por isso as faixas `topo`, `ombro`, `coluna` e `quina` só têm vizinho ao comprimento. Na gaiola ajustada sem a opção, a razão entre arestas opostas num vértice regular tem mediana 1,02, 90% até 1,47 e máximo de 5,53 na chapa toda (68 de 4236 pares acima de 2, sete acima de 3); no flanco da porta o máximo é 1,72 e no do quarto 2,98, com 12 pares acima de 2. O espaçamento desigual pesa pouco no flanco e concentra-se na soleira e na calota da traseira.
+
+A distância à pele é x da superfície limite menos x da pele (a planta lisa menos o recuo), em nove pontos por face da gaiola refinada uma vez, entre a soleira e o ombro e de z -5 a -1845, fora do arco; é a conta que o modelador da rodada 6 fez num roteiro de rascunho, e a última coluna repete a leitura dele (a maior média por célula de 50 mm até z -1000, de onde saiu o 1,5 mm arredondado). Cada casa traz o máximo, o percentil 95 e a raiz da média dos quadrados, em mm.
+
+| Região | Sem a opção | Onda de 110 mm | Onda padrão | Onda de 400 mm |
+|---|---|---|---|---|
+| flanco inteiro | 3,36; 1,26; 0,66 | 3,21; 1,03; 0,46 | 4,74; 2,26; 1,03 | 8,59; 5,27; 2,61 |
+| porta (z -690 a -20) | 2,33; 1,34; 0,76 | 3,21; 1,26; 0,55 | 4,74; 3,18; 1,35 | 8,07; 5,76; 3,07 |
+| rebaixo da porta | 1,80; 1,32; 0,84 | 3,21; 1,73; 0,77 | 4,74; 3,95; 2,14 | 6,84; 6,32; 3,87 |
+| quarto (z -1850 a -720) | 3,36; 0,99; 0,58 | 3,14; 0,73; 0,40 | 4,69; 1,47; 0,75 | 8,59; 4,06; 2,20 |
+| quarto acima do arco | 1,09; 0,83; 0,42 | 1,09; 0,58; 0,28 | 2,35; 1,31; 0,63 | 5,43; 3,84; 2,04 |
+| maior célula de 50 mm até z -1000 | 2,02 (y 950, z -275) | -2,48 (y 500, z -75) | -3,92 (y 700, z -125) | 6,39 (y 600, z -375) |
+
+O máximo de 3,36 mm sem a opção está na soleira (y 202, z -1005), abaixo da caixa que a zebra mede. Com a onda padrão a porta afunda de 3 a 3,9 mm para dentro em duas faixas ao comprimento, em y 450 a 500 e em y 700, que são os dois flancos do sino do rebaixo: a pele tem ali curvatura de -4,5 a 4,7 1/m em 400 mm de altura, uma feição do tamanho da onda, e a energia a achata.
+
+A zebra numérica (`node tools/modelar/zebra-numerica.mjs <receita> --caixas=tools/fixtures/curvas-lisas/carro-caixas.json`), em extremos, laços e laços esperados:
+
+| Região | Sem a opção | Onda de 110 mm | Onda padrão | Onda de 400 mm |
+|---|---|---|---|---|
+| porta | 2; 0; 0,215 | 17; 3; 5,513 | 8; 2; 1,061 | 2; 0; 0,129 |
+| tras | 7; 2; 1,528 | 11; 3; 2,712 | 4; 1; 0,771 | 1; 0; 0,281 |
+| trasSemArco | 4; 1; 0,823 | 6; 2; 0,924 | 2; 1; 0,561 | 1; 0; 0,281 |
+| ombro | 14; 3; 6,108 | 22; 12; 12,624 | 17; 12; 11,271 | 13; 5; 4,862 |
+| coluna | 3; 1; 0,321 | 6; 0; 1,094 | 3; 0; 0,628 | 2; 0; 0,402 |
+| teto | 0; 0; 0 | 0; 0; 0 | 1; 0; 0,065 | 0; 0; 0 |
+| tampa | 6; 13; 12,023 | 8; 19; 20,369 | 5; 18; 17,455 | 4; 6; 6,059 |
+| traseira | 6; 4; 3,781 | 5; 4; 4,500 | 5; 4; 5,028 | 4; 5; 5,320 |
+
+O pente na grade vertical do flanco da porta (`--grade=z:-600:-100:100 --lado=+x --caixa=x:600:2000,y:250:880`):
+
+| Medida | Sem a opção | Onda de 110 mm | Onda padrão | Onda de 400 mm |
+|---|---|---|---|---|
+| saltos e trocas de sinal nos seis cortes | 43 e 16 | 46 e 22 | 29 e 12 | 16 e 10 |
+| trocas de sinal do rebaixo, y | 526 a 543 e 650 a 653 | 526 a 543 e 650 a 655 | 505 a 527 e 650 a 658 | 457 a 484 e 614 a 656 (nenhuma em z -600) |
+| curvatura em y 400 a 800, z -100 (1/m) | -3,93 a 4,31 | -3,99 a 3,79 | -2,39 a 3,67 | -0,49 a 5,03 |
+| soma das variações da curvatura em y 400 a 800, z -100 a -600 (1/m) | 18,0 a 9,3 | 14,7 a 11,6 (21,4 em z -200) | 9,6 a 6,3 | 6,4 a 4,9 |
+
+As duas trocas de sinal de hoje são da pele: a conta analítica dá a troca em y 529 a 547 e em 650 a 657, com curvatura de -4,56 a 4,70 1/m em z -100. Sem a opção a superfície já tem o côncavo mais raso que a pele (-3,93), e com a onda padrão a troca de baixo desce uns 20 mm e o côncavo cai a -2,39: a faixa do pente diminui porque o rebaixo desenhado é achatado. Sem a opção há mais duas trocas em y 336 a 384, em z -500 e -600, que a onda padrão tira e a de 110 mm estende a cinco dos seis cortes (y 319 a 401). No pente guiado pela zebra, com os mesmos 24 cortes da zebra sem a opção, os saltos vão de 461 para 352 com a onda padrão e 284 com a de 400 mm, e as trocas de sinal de 223 para 236 e 207.
+
+A silhueta. A caixa da superfície limite passa de x ±947,95, y 171,77 a 1378,91 e z até -2374,81 para ±949,06, 171,66 a 1379,67 e -2376,85 com a onda padrão (±950,52 e -2378,32 com 400 mm): a chapa incha 1,1 mm de cada lado, 0,8 mm no teto e 2 mm atrás. A planta do flanco (o maior x por faixa de 50 mm de z) sai até 1,9 mm para fora, 0,8 mm em média. O desvio às pranchas não foi medido: `silhueta:desvio` pede um contorno de referência em JSON que o carro não tem guardado e leva mais de 100 s por vista.
+
+A leitura, pelo critério dado (nenhuma região da zebra sobe, a distância à pele não passa de 1,5 mm, a faixa do pente diminui): a opção não serve ao carro em nenhuma das três ondas. Com a onda padrão o quarto melhora na zebra (`tras` de 1,53 para 0,77 laço esperado, `trasSemArco` de 0,82 para 0,56), e sobem a porta (0,22 para 1,06), o ombro (6,1 para 11,3), a coluna, a tampa e a traseira, com a distância do flanco de 3,4 para 4,7 mm. Com 400 mm a zebra cai ou empata na porta, no quarto, no ombro e na tampa, sobe na coluna e na traseira, e a chapa sai até 8,6 mm da pele, isto é, o rebaixo e o alargamento do para-lama são alisados para fora da forma. Com 110 mm a chapa fica mais perto da pele que sem a opção na média (0,46 contra 0,66 mm) e a zebra piora em todas as regiões do flanco: o miolo de peso 0,003 fica solto na onda curta, e as curvas de peso 1 a cada 200 mm aparecem como ilhas. A causa da piora da porta é a troca que a opção faz entre seguir a forma e alisar, numa chapa cuja feição desenhada (o sino do rebaixo, o S do alargamento) tem o comprimento da onda, e não o espaçamento desigual, que no flanco não passa de 1,7 na porta e 3 no quarto. No ombro, na coluna e na tampa pesam os limites já escritos: o vinco e a borda não têm termo na energia e tiram o vizinho do preenchimento, e a calota da traseira tem os lados cortados e as razões de 3 a 4.
+
+O processo teria pegado sozinho? Que a receita não repassa `alisarSuperficie`, não: a opção é experimental e a ficha manda não usar em receita, de modo que quem mede precisa de cópia. Que o desvio à pele não tem ferramenta, não: o registro da rodada 5 já dizia isso, e a medida saiu de novo de um roteiro de rascunho (`tmp/diag-quarto/medir.mjs`). Que o preenchimento não diz quantos lados ficaram sem vizinho nem por quê, não: a contagem saiu de uma cópia instrumentada do núcleo, e um campo de diagnóstico na saída da rede a daria. Que a zebra lateral de uma variante fora da pasta das peças não sai da bancada, não: as duas imagens foram desenhadas pela fórmula da zebra numérica sobre a superfície limite. Que o critério de zebra sozinho aprovaria a onda de 400 mm na porta e no quarto enquanto a chapa sai 8,6 mm da forma, não: nenhum gate junta a zebra à distância à forma desenhada na peça real, só nas chapas de prova analíticas.
