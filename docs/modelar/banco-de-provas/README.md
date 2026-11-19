@@ -28,6 +28,7 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
 - [Carcaça da empilhadeira, vista lateral: a descrição](desenho-carcaca-2026-10-14/DESCRICAO.md) — `desenho-carcaca-2026-10-14`
   - [Carcaça da empilhadeira, vista lateral: o resultado da prova](desenho-carcaca-2026-10-14/RESULTADO.md) — `desenho-carcaca-2026-10-14`
 - `desenho-das-linhas`
+- [Divisão por contorno: fatia 1, a operação e as provas na chapa de teste](divisao-por-contorno-2026-11-18/README.md) — `divisao-por-contorno-2026-11-18`
 - [Carcaça da empilhadeira: alinhamento](empilhadeira-2026-10-09/ALINHAMENTO.md) — `empilhadeira-2026-10-09`
   - [Roteiro da análise](empilhadeira-2026-10-09/referencias/carcaca_lateral.pacote/roteiro.md) — `empilhadeira-2026-10-09/referencias/carcaca_lateral.pacote`
 - `empilhadeira-2026-10-14`
