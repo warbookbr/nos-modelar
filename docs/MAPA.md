@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2135 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2143 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -423,6 +423,10 @@
 
 - `README.md` — Linha de base da porta de entrada dos agentes, 2026-11-05
 
+## docs/modelar/banco-de-provas/prancha-apoio-ia-2026-11-20/
+
+- `README.md` — Banco de provas — ferramentas de prancha para IA (2026-11-20)
+
 ## docs/modelar/banco-de-provas/receitas-externas-2026-10-19/
 
 - `README.md` — Receitas do projeto externo da pessoa no esboço do Mecanifica (2026-10-19)
@@ -632,6 +636,7 @@
 - `2026-11-17-curvas-lisas-e-zebra-numerica.md` — Curvas lisas e zebra numérica: a curva lida da prancha vira poucos trechos de curvatura monótona, e a ondulação longa que o crítico vê vira número
 - `2026-11-17-trilhas-e-validacao-da-placa.md` — Trilhas de cobre e validação elétrica da placa declarada: a lista de ligações vira cobre conferido por regra e por conectividade
 - `2026-11-18-divisao-por-contorno.md` — Divisão por contorno: a parte de uma chapa sai com a borda na curva declarada, e não em dentes de serra
+- `2026-11-20-ferramentas-de-prancha-para-ia.md` — Ferramentas de prancha para IA: grade calibrada sobre a foto, coerência entre vistas e sobreposição limpa com desvio
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
@@ -3791,6 +3796,8 @@
 ## tools/modelar/prancha/
 
 - `prancha-autoria.mjs` — Contrato curto entre a intenção declarada e o vetor que o motor desenha. Ele não tenta adivinhar confiança: exige que a IA exponha fonte, limite e bloqueio p…
+- `prancha-coerencia.mjs` — prancha-coerencia.mjs — confere coerência geométrica entre pranchas parciais do mesmo objeto (lateral, frontal, traseira, planta/topo): envelope compartilhad…
+- `prancha-coerencia.test.mjs` — Testes de prancha-coerencia.mjs: conjunto coerente de quatro pranchas parciais e detecção de divergências injetadas em envelope, landmark, camada e medida M.
 - `prancha-conferencias.mjs` — prancha-conferencias.mjs — as conferências gerais que uma regra de desenho de família nomeia (campo `conferencia` de `procedural/criterios/<família>.json`), …
 - `prancha-dos-contornos.mjs` — prancha-dos-contornos.mjs — a prancha de uma vista desenhada com os contornos que `npm run contorno` tirou da imagem de referência, em milímetro.
 - `prancha-dos-contornos.test.mjs` — prancha-dos-contornos.test.mjs — a prancha da lateral do braço sai dos contornos gravados, sem parte fora da silhueta e sem a parte fora do modelo.
@@ -3798,8 +3805,12 @@
 - `prancha-referencia.mjs` — prancha-referencia.mjs — lê uma prancha rasterizada de referência, calibra pixel→milímetro por duas medidas conhecidas e extrai a silhueta como polilinha em …
 - `prancha-referencia.test.mjs` — Testes do leitor de referência: decodificação PNG sem dependência, calibração por rodas, simplificação e comparação de silhueta. A prancha real não vive no r…
 - `prancha-regras.test.mjs` — As regras de desenho da família ligadas às conferências da prancha (fatia 2 do plano docs/modelar/planos/encerrados/2026-11-03-regras-de-desenho-por-familia.…
+- `prancha-sobrepor.mjs` — prancha-sobrepor.mjs — projeta apenas a geometria limpa de uma ou mais pranchas (sem título, cotas ou legenda) em alto contraste sobre as imagens de referênc…
+- `prancha-sobrepor.test.mjs` — Testes de prancha-sobrepor.mjs: extração limpa só da geometria (sem título/legenda), modos escala-rigida e proporcao-foto, quadro 2×2 e medida de desvio cont…
 - `prancha.mjs` — prancha.mjs — motor de prancha ortográfica alvo. Recebe especificação declarativa em milímetros e devolve SVG determinístico MAIS um relatório medido da próp…
 - `prancha.test.mjs` — Testes do motor de prancha: filete, âncora proporcional e métrica. O que se prova aqui é o que o plano 2026-08-19-motor-de-prancha-medida pediu — que o desen…
+- `referencia-grade.mjs` — referencia-grade.mjs — estampa uma grade numerada em milímetros e pixels sobre uma imagem de referência calibrada, com recortes ampliados opcionais, para lei…
+- `referencia-grade.test.mjs` — Testes de referencia-grade.mjs: leitura de dimensões PNG/JPEG, conversão pixel↔milímetro (normal e espelhada) e geração de SVG com grade calibrada e recorte.
 
 ## tools/modelar/reguas-de-malha/
 

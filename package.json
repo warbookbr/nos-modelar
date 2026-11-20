@@ -151,6 +151,9 @@
     "esboco:nucleo": "node --import ./tools/modelar/resolucao-da-raiz.mjs tools/modelar/esboco-nucleo.mjs",
     "variantes": "node tools/modelar/variantes.mjs",
     "contorno:prancha": "node tools/modelar/prancha/prancha-dos-contornos.mjs",
+    "referencia:grade": "node tools/modelar/prancha/referencia-grade.mjs",
+    "prancha:coerencia": "node tools/modelar/prancha/prancha-coerencia.mjs",
+    "prancha:sobrepor": "node tools/modelar/prancha/prancha-sobrepor.mjs",
     "objeto": "node tools/modelar/objeto.mjs"
   },
   "dependencies": {

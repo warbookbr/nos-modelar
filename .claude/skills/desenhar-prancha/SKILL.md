@@ -272,11 +272,22 @@ Todos já aconteceram. Confira antes de entregar:
 
 - relatório sem alerta;
 - todas as vistas fechadas;
+- coerência entre vistas parciais conferida com `npm run prancha:coerencia -- <pasta-referencias/>`;
+- sobreposição limpa sobre as fotos de referência conferida com `npm run prancha:sobrepor` (modos `proporcao-foto` e `escala-rigida`);
 - diferenças contra a referência escritas, com causa apontada;
 - gates de documentação verdes se a saída entrou em `docs/`.
 
 Se a prancha for referência vinculante de um plano, diga explicitamente que ela
 é **derivada** da tabela de medidas: divergiu, a tabela manda.
+
+## Apoio de leitura e conferência de pranchas (`referencia:grade`, `prancha:coerencia`, `prancha:sobrepor`)
+
+Quando a prancha nasce de imagens de referência, evite ler coordenadas a olho numa foto lisa:
+
+1. Estampe a grade calibrada em milímetros sobre cada foto (e recortes ampliados por região) com `npm run referencia:grade -- --imagem=<foto> --caixa=x0,y0,x1,y1 --eixo-h=min,max --eixo-v=min,max --saida=<grade.svg> --png=<grade.png>` (use `--espelhar-x` quando a lateral ou a planta na foto apontar para a esquerda). Antes de ler qualquer coordenada, inspecione a moldura amarela tracejada no PNG gerado para garantir que ela encosta na chapa e nos pneus sem engolir sombra do chão, rack de teto nem retrovisores.
+2. Ao fechar as vistas parciais (`lateral`, `frontal`, `traseira`, `superior`), rode `npm run prancha:coerencia -- <pasta/>` para pegar divergências de envelope, alturas compartilhadas, posições longitudinais e larguras entre as quatro vistas.
+3. Antes de levar a prancha à pessoa, rode `npm run prancha:sobrepor -- --config=<quadro.json> --modo=proporcao-foto --saida=<quadro.svg> --png=<quadro.png>` (e repita com `--modo=escala-rigida`) para projetar só a geometria limpa sobre as fotos calibradas sem deslocamento por título, cotas ou legenda.
+4. Despache o crítico visual sem contexto (`.claude/agents/critico-visual.md`) entregando apenas a imagem gerada por `prancha:sobrepor` (sem código, sem medidas nem histórico) e pedindo a lista de desvios entre as linhas coloridas e a foto em cada vista. Corrija os achados, rode novamente `prancha:coerencia` e `prancha:sobrepor` e só então leve o resultado à pessoa.
 
 ## Sobrepor ao alvo e os limites do método
 
