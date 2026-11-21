@@ -20,6 +20,7 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
 - [Atritos](carrinho-refeito-2026-10-08/ATRITOS.md) — `carrinho-refeito-2026-10-08`
 - [Comparar com a referência: a linha de base dos comandos repetidos e onde a prancha é montada](comparar-com-a-referencia-2026-11-16/README.md) — `comparar-com-a-referencia-2026-11-16`
 - [Componentes eletrônicos (2026-11-16): provas do gate de saída e limitações conhecidas](componentes-eletronicos-2026-11-16/README.md) — `componentes-eletronicos-2026-11-16`
+- [Banco de provas — conformação na chapa e sobreposição 3D (2026-11-20)](conformacao-e-sobreposicao-3d-2026-11-20/README.md) — `conformacao-e-sobreposicao-3d-2026-11-20`
 - [Correção de superfície: chapas de prova, linha de base, corte com simetria, alisamento e emenda declarada](correcao-de-superficie-2026-11-16/README.md) — `correcao-de-superficie-2026-11-16`
 - [Cordão de solda na costura de tubos: rodadas de forma e medidas](costura-em-no-de-tubos-2026-11-15/README.md) — `costura-em-no-de-tubos-2026-11-15`
 - [Curvas lisas e zebra numérica: fatia 1, a zebra numérica e o aviso de área](curvas-lisas-2026-11-17/README.md) — `curvas-lisas-2026-11-17`

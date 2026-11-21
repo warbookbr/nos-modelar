@@ -154,6 +154,7 @@
     "referencia:grade": "node tools/modelar/prancha/referencia-grade.mjs",
     "prancha:coerencia": "node tools/modelar/prancha/prancha-coerencia.mjs",
     "prancha:sobrepor": "node tools/modelar/prancha/prancha-sobrepor.mjs",
+    "modelo:sobrepor": "node tools/modelar/modelo-sobrepor.mjs",
     "objeto": "node tools/modelar/objeto.mjs"
   },
   "dependencies": {

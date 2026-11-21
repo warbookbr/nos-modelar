@@ -1,6 +1,6 @@
 # Conformação sobre a casca e sobreposição ortográfica 3D: peças coladas à curvatura da lataria e desvio 3D medido desde a rodada 1
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `procedural/nucleo/conformar-na-chapa.js`, `procedural/nucleo/conformar-na-chapa.test.mjs`, `tools/modelar/modelo-sobrepor.mjs`, `tools/modelar/modelo-sobrepor.test.mjs`, `tools/fixtures/conformacao-e-sobreposicao-3d/`, `docs/modelar/banco-de-provas/conformacao-e-sobreposicao-3d-2026-11-20/`
 
@@ -52,9 +52,9 @@ Com `conformarNaChapa`, uma receita declara um contorno ou trilho numa vista, um
 
 ## Fatias
 
-1. `modelo:sobrepor` (projeção ortográfica 3D sobre prancha e foto calibrada, quadro 2×2 e medida de desvio), com testes em fixture sintética.
-2. `conformarNaChapa` para trilho aberto (para-choque envolvente e friso lateral sobre chapa curva) e contorno fechado (vidro e lente recuada), com testes e revisão adversarial.
-3. Prova prática no carro quadrado, nota de uso nas skills/catálogo e fechamento.
+1. Feita: `modelo:sobrepor` (projeção ortográfica 3D via Manifold `CrossSection.union` sobre prancha e foto calibrada, quadro 2×2 e medida de desvio), com 4 testes verdes em fixture sintética e prova inicial no carro quadrado.
+2. Feita: `conformarNaChapa` em [conformar-na-chapa.js](procedural/nucleo/conformar-na-chapa.js) para trilho aberto e contorno fechado com `simetria: 'x'`, `unidade: 'm' | 'mm'` e recusa explícita de dobra/curvatura; 10 testes verdes em `conformar-na-chapa.test.mjs`, `arquitetura:check` ok e segunda revisão adversarial concluída com **SEM BLOQUEIOS**.
+3. Feita: Prova prática no carro quadrado, nota de uso nas skills/catálogo e fechamento.
 
 ## Riscos e parada
 
@@ -62,4 +62,4 @@ Se a amostragem de normal em cantos vivos da chapa subdividida gerar auto-inters
 
 ## Fechamento
 
-A preencher.
+Concluído em 2026-11-21. `conformarNaChapa` e `npm run modelo:sobrepor` entregues com 14 testes verdes (10 em `conformar-na-chapa.test.mjs` + 4 em `modelo-sobrepor.test.mjs`), segunda revisão adversarial **SEM BLOQUEIOS** e `arquitetura:check` verde. Na prova prática sobre `carro-quadrado/lataria`, os dois trechos de `frisoLateral` foram conformados diretamente na chapa via `conformarNaChapa` (`14 partes`, `0` órfãos, `0` contatos não declarados), `escapamento` e `placaTraseira` foram corrigidos, e `modelo:sobrepor` mediu o desvio 3D nas quatro vistas contra as pranchas (`lateral` mediana `8.25 mm`, `frontal` `29.98 mm`, `traseira` `29.23 mm`, `planta` `52.53 mm`). Registro completo em [docs/modelar/banco-de-provas/conformacao-e-sobreposicao-3d-2026-11-20/README.md](../banco-de-provas/conformacao-e-sobreposicao-3d-2026-11-20/README.md).

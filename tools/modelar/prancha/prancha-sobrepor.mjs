@@ -26,7 +26,7 @@ import { criarConversor, lerDimensoesImagem } from './referencia-grade.mjs';
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const OLHAR = join(AQUI, '..', 'olhar.mjs');
 
-const COR_POR_CLASSE = {
+export const COR_POR_CLASSE = {
   contorno: '#00f0ff',
   vidro: '#4dff88',
   painel: '#ff8c42',

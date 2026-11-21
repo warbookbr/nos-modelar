@@ -57,9 +57,9 @@ export const TABELA = {
     avanco: 55, saia: 20, recuo: -12, frisoY: 465, frisoAlt: 12, frisoSaida: 5,
   },
   frisoLateral: {
-    y0: 485, y1: 545, saida: 18, embute: 5,
-    xEntreArcos: 835, entreArcos: [-755, 865],
-    xTrasIni: 822, xTrasFim: 826, traseiro: [-1495, -1960],
+    yCentro: 515, largura: 56, altura: 18, chanfro: 4, deslocamentoMm: -2,
+    entreArcos: [-755, 865],
+    traseiro: [-1495, -1920],
   },
   frentePecas: {
     grade: { meiaLarg: 442, y0: 545, y1: 715, zFundo0: 1935, zFundo1: 1985, zMoldura: 2005, zLamina: 2008, laminas: 7, lamY0: 556, lamY1: 696, lamAlt: 8 },
@@ -70,10 +70,10 @@ export const TABELA = {
   },
   traseiraPecas: {
     lanterna: { x0: 655, x1: 776, yRe: [540, 610], yFreio: [610, 735], ySeta: [735, 810], zCarc0: -1955, zCarc1: -1918, zFrente: -1972, zTras: -1924 },
-    placa: { larg: 340, alt: 135, yCentro: 695, z0: -2016, z1: -1997 },
+    placa: { larg: 340, alt: 135, yCentro: 695, z0: -2024, z1: -2005 },
     puxador: { larg: 460, alt: 30, yCentro: 795, z0: -2008, z1: -1980 },
     fechadura: { yCentro: 580, raio: 18, z0: -2032, z1: -2017 },
-    escapamento: { x: -540, y: 215, raio: 28, z0: -2065, z1: -1880 },
+    escapamento: { x: 540, y: 215, raio: 28, z0: -2065, z1: -1880 },
   },
 };
 
@@ -110,7 +110,7 @@ export function gerarPassos(T) {
   let nid = 12;
   const proxId = () => { const atual = nid; nid += 1; return atual; };
 
-  return [
+  const passosChapa = [
     ['subdivisao', { origemId: 1, ...passoRede, borda: 'cantos', niveis: T.chapa.niveis, espessura: m(T.chapa.espessura) }],
     ...arcoD.passos,
     ...arcoT.passos,
@@ -120,9 +120,15 @@ export function gerarPassos(T) {
     ['aberturaPorContorno', { origemId: 9, chapa: { origem: { op: 'aberturaPorContorno', id: 8 } }, vista: T.vidros.traseiroVista, sentido: '+', contorno: contornoComFilete(projetarVista(T.vidros.traseiroVista, T.vidros.traseiro)) }],
     ['aberturaPorContorno', { origemId: 10, chapa: { origem: { op: 'aberturaPorContorno', id: 9 } }, vista: 'z', sentido: '+', contorno: contornoComFilete(T.aberturas.frontal) }],
     ['aberturaPorContorno', { origemId: 11, chapa: { origem: { op: 'aberturaPorContorno', id: 10 } }, vista: 'z', sentido: '-', simetria: 'x', contorno: contornoComFilete(T.aberturas.lanternaTraseira) }],
+  ];
+
+  const aliasesChapa = [...arcoD.aliases, ...arcoT.aliases];
+
+  return [
+    ...passosChapa,
     ['parte', { nome: 'chapa', sel: selFinal }],
     ['material', { usa: 'lataria', sel: selFinal }],
-    ...passosParachoques(varridos, proxId),
+    ...passosParachoques(T, varridos, proxId, passosChapa, rede.pontos, aliasesChapa),
     ...passosFrenteTraseira(T, proxId),
   ];
 }
@@ -162,8 +168,6 @@ const receita = {
       ...d.varridos.pcDFriso.pontos,
       ...d.varridos.pcT.pontos,
       ...d.varridos.pcTFriso.pontos,
-      ...d.varridos.frisoMeio.pontos,
-      ...d.varridos.frisoTras.pontos,
     };
   },
   PLANO: {
@@ -179,7 +183,7 @@ const receita = {
       { nome: 'chapa', forma: 'Casco contínuo com arcos de roda, vãos dos vidros, vão frontal e vãos das lanternas', tecnica: 'Subdivisão de gaiolaPorRede com furoPassante e aberturaPorContorno' },
       { nome: 'parachoqueDianteiro', forma: 'Corpo envolvente preto na frente com friso claro horizontal em y 455', tecnica: 'Subdivisão de gaiolaVarrida fechada contornando a frente até o arco dianteiro' },
       { nome: 'parachoqueTraseiro', forma: 'Corpo envolvente preto na traseira com friso claro horizontal em y 465', tecnica: 'Subdivisão de gaiolaVarrida fechada contornando a traseira até o arco traseiro' },
-      { nome: 'frisoLateral', forma: 'Barras pretas laterais em y 485 a 545 entre os arcos e atrás do arco traseiro', tecnica: 'Subdivisão de gaiolaVarrida espelhada em x' },
+      { nome: 'frisoLateral', forma: 'Barras pretas laterais em y 515 entre os arcos e atrás do arco traseiro', tecnica: 'conformarNaChapa em trilho sobre a chapa com simetria em x' },
       { nome: 'gradeFrontal', forma: 'Caixa escura recuada com 7 lâminas horizontais no centro do vão frontal', tecnica: 'Cubos com arranja linear em plástico preto fosco' },
       { nome: 'farol', forma: 'Par de faróis retangulares com carcaça recuada e lente clara', tecnica: 'Cubo e chamferBox espelhados em x' },
       { nome: 'setaDianteira', forma: 'Par de setas âmbar nos cantos externos da frente', tecnica: 'chamferBox espelhada em x' },
@@ -189,7 +193,7 @@ const receita = {
       { nome: 'placaTraseira', forma: 'Placa retangular clara de 340 por 135 mm na tampa traseira', tecnica: 'chamferBox centrada em y 695' },
       { nome: 'puxadorTampa', forma: 'Barra preta horizontal acima da placa traseira em y 795', tecnica: 'chamferBox centrada acima da placa' },
       { nome: 'fechaduraTampa', forma: 'Cilindro pequeno preto abaixo da placa traseira em y 580', tecnica: 'Cilindro em z com tampas' },
-      { nome: 'escapamento', forma: 'Tubo metálico sob o para-choque traseiro no lado esquerdo', tecnica: 'Cilindro em z em x -540 e y 215' },
+      { nome: 'escapamento', forma: 'Tubo metálico sob o para-choque traseiro no lado esquerdo', tecnica: 'Cilindro em z em x +540 e y 215' },
     ],
     criteriosDeReprovacao: [
       'Dimensões da chapa fora de 4050 x 1670 x 1390 mm além da tolerância',

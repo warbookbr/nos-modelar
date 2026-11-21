@@ -9,7 +9,6 @@
 3. [curvas lisas e zebra numérica](2026-11-17-curvas-lisas-e-zebra-numerica.md). Território: o que o plano declara (o ajuste de curva lisa no núcleo, a zebra numérica e o aviso de área do índice de suavidade). Em aberto: tudo, a começar pela fatia 1 (a zebra numérica, para ter a medida antes da mudança).
 4. [divisão por contorno](2026-11-18-divisao-por-contorno.md). Território: a operação nova de divisão por contorno e o teste dela, a entrada dela no registro e a pasta de provas do plano.
 5. [rebaixo por contorno](2026-11-10-rebaixo-por-contorno.md). Território: `procedural/nucleo/rebaixo-por-contorno.js`, `procedural/nucleo/rebaixo-por-contorno.test.mjs`, `tools/fixtures/rebaixo-por-contorno/`, `docs/modelar/banco-de-provas/rebaixo-por-contorno-2026-11-20/`. Em aberto: tudo, a começar pela fatia 1.
-6. [conformação sobre a casca e sobreposição ortográfica 3D](2026-11-20-conformacao-na-chapa-e-sobreposicao-3d.md). Território: `procedural/nucleo/conformar-na-chapa.js`, `procedural/nucleo/conformar-na-chapa.test.mjs`, `tools/modelar/modelo-sobrepor.mjs`, `tools/modelar/modelo-sobrepor.test.mjs`, `tools/fixtures/conformacao-e-sobreposicao-3d/`, `docs/modelar/banco-de-provas/conformacao-e-sobreposicao-3d-2026-11-20/`. Em aberto: fatia 1 (`modelo:sobrepor`) e fatia 2 (`conformarNaChapa`).
 
 A lista está em ordem de prioridade. A ordem desempata quando dois planos precisam do mesmo arquivo: o de menor prioridade espera ou pede à pessoa que mude o território.
 

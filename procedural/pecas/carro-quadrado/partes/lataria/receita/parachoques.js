@@ -1,5 +1,8 @@
-/* carro-quadrado/lataria/receita/parachoques.js — para-choques envolventes com friso claro e frisos laterais. */
+/* carro-quadrado/lataria/receita/parachoques.js — para-choques envolventes com friso claro e frisos laterais conformados na chapa. */
+import { m } from './chapa.js';
+import { nucleo } from '../../../../../nucleo/nucleo.js';
 import { gaiolaVarrida } from '../../../../../nucleo/gaiola-varrida.js';
+import { conformarNaChapa } from '../../../../../nucleo/conformar-na-chapa.js';
 
 export function derivarParachoques(T) {
   const pd = T.parachoqueDianteiro;
@@ -132,50 +135,10 @@ export function derivarParachoques(T) {
     estacoes: { passo: 120, graus: 15, flecha: 1.5 },
   });
 
-  const fl = T.frisoLateral;
-  const yfl = (fl.y0 + fl.y1) / 2;
-  const hfl = (fl.y1 - fl.y0) / 2;
-  const secaoFriso = [
-    { u: -fl.embute, v: -hfl, nome: 'bIn' },
-    { u: fl.saida - 5, v: -hfl, nome: 'bChanf' },
-    { u: fl.saida, v: -hfl + 7, nome: 'bOut' },
-    { u: fl.saida, v: hfl - 7, nome: 'tOut' },
-    { u: fl.saida - 5, v: hfl, nome: 'tChanf' },
-    { u: -fl.embute, v: hfl, nome: 'tIn' },
-  ];
-  const vincosFriso = [
-    { linha: 'bOut', nitidez: 0.7 },
-    { linha: 'tOut', nitidez: 0.7 },
-    { linha: 'bChanf', nitidez: 0.7 },
-    { linha: 'tChanf', nitidez: 0.7 },
-  ];
-
-  const frisoMeio = gaiolaVarrida({
-    nome: 'frisoMeio',
-    trilho: [{ reta: { de: [fl.xEntreArcos, yfl, fl.entreArcos[0]], ate: [fl.xEntreArcos, yfl, fl.entreArcos[1]] } }],
-    quadro: { v: [0, 1, 0] },
-    secao: secaoFriso,
-    fechada: true,
-    tampas: true,
-    vincos: vincosFriso,
-    estacoes: [{ fracao: 0 }, { passo: 250 }, { fracao: 1 }],
-  });
-
-  const frisoTras = gaiolaVarrida({
-    nome: 'frisoTras',
-    trilho: [{ reta: { de: [fl.xTrasIni, yfl, fl.traseiro[1]], ate: [fl.xTrasFim, yfl, fl.traseiro[0]] } }],
-    quadro: { v: [0, 1, 0] },
-    secao: secaoFriso,
-    fechada: true,
-    tampas: true,
-    vincos: vincosFriso,
-    estacoes: [{ fracao: 0 }, { passo: 160 }, { fracao: 1 }],
-  });
-
-  return { pcD, pcDFriso, pcT, pcTFriso, frisoMeio, frisoTras };
+  return { pcD, pcDFriso, pcT, pcTFriso };
 }
 
-export function passosParachoques(varridos, proxId) {
+export function passosParachoques(T, varridos, proxId, passosChapa, pontosChapa, aliasesChapa = []) {
   const passos = [];
   const sub = (g, niveis = 1) => {
     const id = proxId();
@@ -195,20 +158,33 @@ export function passosParachoques(varridos, proxId) {
   passos.push(['parte', { nome: 'parachoqueTraseiro', sel: { origem: oPcT }, material: 'plasticoPreto' }]);
   passos.push(['parte', { nome: 'parachoqueTraseiro', sel: { origem: oPcTFriso }, material: 'frisoClaro' }]);
 
-  const oFm = sub(varridos.frisoMeio, 1);
-  const idFmE = proxId();
-  passos.push(['espelha', { eixo: 'x', origemId: idFmE, derivaDe: oFm, sel: { origem: oFm } }]);
-  const oFt = sub(varridos.frisoTras, 1);
-  const idFtE = proxId();
-  passos.push(['espelha', { eixo: 'x', origemId: idFtE, derivaDe: oFt, sel: { origem: oFt } }]);
-  for (const sel of [
-    { origem: oFm },
-    { origem: { op: 'espelha', id: idFmE, de: oFm } },
-    { origem: oFt },
-    { origem: { op: 'espelha', id: idFtE, de: oFt } },
-  ]) {
-    passos.push(['parte', { nome: 'frisoLateral', sel, material: 'plasticoPreto' }]);
-  }
+  const fl = T.frisoLateral;
+  const secaoFriso = { largura: fl.largura, altura: fl.altura, chanfro: fl.chanfro };
+  const stChapa = nucleo(passosChapa, {}, pontosChapa, {}, null, aliasesChapa);
+  const baseFriso = {
+    malha: { st: stChapa },
+    vista: 'x',
+    sentido: '+',
+    simetria: 'x',
+    unidade: 'm',
+    secao: secaoFriso,
+    deslocamentoMm: fl.deslocamentoMm,
+    parte: 'frisoLateral',
+    material: 'plasticoPreto',
+  };
+  const frisoMeio = conformarNaChapa({
+    ...baseFriso,
+    nome: 'frisoMeio',
+    trilho: [[m(fl.yCentro), m(fl.entreArcos[0])], [m(fl.yCentro), m(fl.entreArcos[1])]],
+    origemId: proxId(),
+  });
+  const frisoTras = conformarNaChapa({
+    ...baseFriso,
+    nome: 'frisoTras',
+    trilho: [[m(fl.yCentro), m(fl.traseiro[0])], [m(fl.yCentro), m(fl.traseiro[1])]],
+    origemId: proxId(),
+  });
+  passos.push(...frisoMeio.passos, ...frisoTras.passos);
 
   return passos;
 }

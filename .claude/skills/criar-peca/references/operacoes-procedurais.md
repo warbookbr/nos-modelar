@@ -1697,3 +1697,7 @@ A seleção `sel:{tudo:true}` veio na Rodada B da Fase 3.5.
 A seleção `faixa`/`lado` de `lathe` e `loft` veio na Rodada A da Fase 3.5 (D-130).
 
 O filtro de progressão `{passo,fase}` veio na Rodada C da Fase 3.5 (D-130).
+
+### Conformação na chapa: `conformarNaChapa`
+
+`conformarNaChapa` (`procedural/nucleo/conformar-na-chapa.js`) projeta um `trilho` aberto (com `secao: { largura, altura, chanfro? }`) ou um `contorno` fechado (com `espessuraMm`) sobre uma malha-alvo na `vista` (`'x'|'y'|'z'|[vx,vy,vz]`) e `sentido` (`'+'|'-'`), emitindo o passo `subdivisao` (+ `parte` e `material`) já colado à superfície real com `deslocamentoMm` ao longo da normal. Aceita `unidade: 'mm'|'m'`, `simetria: 'x'` e `malha: { passos, origem, topo?, aliases? }`, recusando raio local menor que a meia-seção em vez de gerar auto-interseção.

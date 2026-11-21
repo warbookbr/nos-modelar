@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2152 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2157 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -255,6 +255,10 @@
 ## docs/modelar/banco-de-provas/componentes-eletronicos-2026-11-16/
 
 - `README.md` — Componentes eletrônicos (2026-11-16): provas do gate de saída e limitações conhecidas
+
+## docs/modelar/banco-de-provas/conformacao-e-sobreposicao-3d-2026-11-20/
+
+- `README.md` — Banco de provas — conformação na chapa e sobreposição 3D (2026-11-20)
 
 ## docs/modelar/banco-de-provas/correcao-de-superficie-2026-11-16/
 
@@ -1040,6 +1044,8 @@
 - `composicoes.js` — composicoes.js — subgrafos procedurais declarativos, sem estado global ou I/O.
 - `composicoes.test.mjs` — composicoes-procedurais.test.mjs — R06: subgrafos declarativos e reutilizáveis.
 - `concordancia-por-ponto.test.ts` — concordancia-por-ponto.test.ts — A-35: cada curva de um mesmo passo pode declarar seu próprio custo sem obrigar todas as outras a usarem o maior.
+- `conformar-na-chapa.js` — conformar-na-chapa.js — conforma peças em trilho aberto ou contorno fechado sobre a superfície real de uma malha
+- `conformar-na-chapa.test.mjs` — conformar-na-chapa.test.mjs — provas numéricas de conformação sobre chapa curva sintética (trilho aberto, contorno fechado, adaptação automática à mudança de…
 - `contorno.js` — contorno.js — contorno 2D puro: retângulo de cantos arredondados, recuo por meia-esquadria, área com sinal e convexidade.
 - `contorno.test.mjs` — contorno.test.mjs — retângulo arredondado, recuo por meia-esquadria, área e convexidade do contorno 2D.
 - `corpo-de-secao-variavel.js` — corpo-de-secao-variavel.js — o corpo fechado cuja seção (superelipse) muda ao longo de um eixo, com sulcos e tampas
@@ -1683,7 +1689,7 @@
 
 - `chapa.js` — carro-quadrado/lataria/receita/chapa.js — gaiola da chapa contínua, arcos de roda e helpers de abertura.
 - `frente-traseira.js` — carro-quadrado/lataria/receita/frente-traseira.js — grade, faróis, setas, lanternas, placas, puxador, fechadura e escapamento.
-- `parachoques.js` — carro-quadrado/lataria/receita/parachoques.js — para-choques envolventes com friso claro e frisos laterais.
+- `parachoques.js` — carro-quadrado/lataria/receita/parachoques.js — para-choques envolventes com friso claro e frisos laterais conformados na chapa.
 
 ## procedural/pecas/carro-quadrado/referencias/
 
@@ -3605,6 +3611,8 @@
 - `modelo-aberto.mjs` — modelo-aberto.mjs — a entrada comum das ferramentas de vista: abre um esboço OU uma receita de peça e devolve a mesma estrutura.
 - `modelo-aberto.test.mjs` — modelo-aberto.test.mjs — as ferramentas de vista da empilhadeira abrindo receita de peça, e não só esboço (plano de conferência, fatia 6).
 - `modelo-de-referencia.mjs` — modelo-de-referencia.mjs — estuda uma malha de terceiros (OBJ, FBX ou glTF) como REFERÊNCIA de forma, sem a levar ao repositório.
+- `modelo-sobrepor.mjs` — modelo-sobrepor.mjs — projeta a silhueta ortográfica 3D da malha neutra sobre a prancha e/ou sobre a imagem de referência calibrada, montando vista individua…
+- `modelo-sobrepor.test.mjs` — Testes de modelo-sobrepor.mjs: projeção ortográfica 3D nas quatro vistas, medida de desvio contra prancha com erro < 2 mm, SVG individual, sobreposição sobre…
 - `montagem-da-familia.mjs` — montagem-da-familia.mjs — a montagem v5 que uma família de objeto gera, conferida pela aprovação mecânica.
 - `montagem-persistida.test.ts` — @ts-expect-error — módulo neutro JavaScript, exercitado pelo contrato público.
 - `navegador.mjs` — navegador.mjs — os argumentos e o lançamento do Chromium sem tela que as capturas da bancada, do esboço e do contorno usam.

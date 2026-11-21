@@ -111,9 +111,9 @@ Cada imagem responde uma pergunta: `--modo=isolar` para a superfície,
 partes para a leitura geral. A bancada investiga; o pacote do crítico sai de
 `npm run vistas:critica`.
 
-`npm run malha:conferir -- <peça>` pega fechamento e face de área nula, e
-`npm run conferir:referencia` mede a borda contra a foto. Prancha modelo e foto,
-recusas, saída, cópia de parte repetida e crítico em duas ordens:
+`npm run malha:conferir -- <peça>` pega fechamento e face nula;
+`npm run modelo:sobrepor` e `npm run conferir:referencia` medem contra prancha
+e foto. Prancha, recusas, saída, cópia e crítico em duas ordens:
 [`comparar-com-a-referencia.md`](references/comparar-com-a-referencia.md).
 
 De perto, `--mirar=x,y,z` em vez de recortar captura de 3.200 px; só a chapa, com `npm run vista:rapida -- <peça> --vista=<vista> --saida=<png> --ate-passo=N`; `--sem-contatos` se só se quer a imagem; mais em [`PARE-E-ANALISE.md`](../../../docs/modelar/usar/PARE-E-ANALISE.md#olhar-de-perto-sem-recortar-captura).
