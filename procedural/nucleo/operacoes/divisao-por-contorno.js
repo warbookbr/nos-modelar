@@ -50,9 +50,15 @@
    A CAMADA (`sentido: '+'` ou `'-'`), como na abertura: no corpo que a reta do eixo atravessa mais de uma vez, corta só a camada
    vista desse lado. A chapa fechada (com espessura) tem duas peles por camada, e as duas são cortadas; a seleção aberta tem uma.
 
-   AS RECUSAS, todas antes de mexer na malha: contorno que se cruza, ponto do contorno fora da chapa na vista, contorno que cruza a
-   borda da chapa ou a parede de um vão, chapa atravessada mais de uma vez sem `sentido`, contorno que cabe inteiro numa face,
-   espinho que entra e sai pelo mesmo vértice, bico mais estreito que o encaixe, aresta cortada da costura de uma booleana, pedaço fino e face que já é de outra parte sem
+   A BORDA DA CHAPA E A BOCA DE UM VÃO. O contorno pode sair para fora da chapa (ou entrar num vão) e voltar por outro ponto: a
+   parte se fecha pela borda da chapa ou pela boca do vão, e a parede de espessura de perfil é dividida no plano do corte no ponto
+   em que o contorno a atravessa. O contorno que encosta na borda sem atravessá-la (canto ou lado sobre ela) ou que atravessa uma
+   face de perfil interna (degrau entre faces do mesmo lado) continua recusado, dizendo a causa e o ponto.
+
+   AS RECUSAS, todas antes de mexer na malha: contorno que se cruza, contorno inteiro fora da chapa ou que envolve a chapa inteira
+   sem cortar aresta, contorno que encosta na borda da chapa ou cruza face de perfil fora da parede de espessura, chapa atravessada
+   mais de uma vez sem `sentido`, contorno que cabe inteiro numa face, espinho que entra e sai pelo mesmo vértice, bico mais
+   estreito que o encaixe, aresta cortada da costura de uma booleana, pedaço fino e face que já é de outra parte sem
    `substituir: true`. */
 import { contornoPorTrechos, ErroDeCurva } from '../curva2d.js';
 import { diagnosticarContorno, limparContorno } from '../contorno.js';
@@ -235,54 +241,260 @@ export function dividirMalhaPorContorno({ V, F, ids, quadro, poligono, sentido =
     tri.push({ f, v: t, sinal: Math.abs(s) <= PERFIL * maior * maior ? 0 : Math.sign(s) });
   }
 
-  /* a chapa fechada tem duas peles por camada; a seleção aberta tem uma */
+  /* a chapa fechada tem duas peles por camada; a seleção aberta tem uma. Contamos também os usos na malha inteira F para não
+     confundir a fronteira de uma seleção parcial (como só a pele externa de uma chapa fechada) com uma borda livre real */
   const usosDaAresta = new Map();
   for (const f of ids) { const vs = F.get(f).vs; for (let k = 0; k < vs.length; k++) { const ch = chave(vs[k], vs[(k + 1) % vs.length]); usosDaAresta.set(ch, (usosDaAresta.get(ch) ?? 0) + 1); } }
+  const usosNaMalha = new Map();
+  for (const face of F.values()) { const vs = face.vs; for (let k = 0; k < vs.length; k++) { const ch = chave(vs[k], vs[(k + 1) % vs.length]); usosNaMalha.set(ch, (usosNaMalha.get(ch) ?? 0) + 1); } }
   let fechada = true;
   for (const n of usosDaAresta.values()) if (n !== 2) { fechada = false; break; }
   const pelesPorCamada = fechada ? 2 : 1;
 
-  /* onde a reta do eixo de cada ponto do contorno fura a chapa, do lado de quem olha para o outro */
+  /* classificação das paredes de espessura (borda da chapa e boca de vão) sobre `perto`, antes da sondagem de camadas:
+     uma parede de espessura é um componente coplanar (dot > 0,95) de faces estreitas na vista (|n·eixo| < 0,5) que liga, por
+     dobras (|dot| < 0,85), duas peles de normais opostas (dot < -0,75) e sinais opostos cujas projeções 2D se sobrepõem
+     (o que exclui flancos dobrados, mesmo com vinco vivo, e qualquer degrau interno) */
+  const paredeDeBorda = new Set();
+  if (fechada) {
+    const area2DaFace = new Map();
+    const norm3DaFace = new Map();
+    const nwDaFace = new Map();
+    const pertoFacesPorAresta = new Map();
+    for (const f of perto) {
+      const vs = F.get(f).vs;
+      let s = 0; let maior = 0;
+      for (let k = 0; k < vs.length; k++) {
+        const u = vs[k], v = vs[(k + 1) % vs.length];
+        const a = p2(u), b = p2(v);
+        s += a[0] * b[1] - b[0] * a[1];
+        maior = Math.max(maior, dist2(a, b));
+        const ch = chave(u, v);
+        if (!pertoFacesPorAresta.has(ch)) pertoFacesPorAresta.set(ch, []);
+        pertoFacesPorAresta.get(ch).push(f);
+      }
+      area2DaFace.set(f, Math.abs(s) <= PERFIL * maior * maior ? 0 : Math.sign(s));
+      const pts = vs.map((v) => V.get(v));
+      const n3 = newell(pts); const l3 = tamanho(n3);
+      norm3DaFace.set(f, l3 > 0 ? n3.map((x) => x / l3) : [0, 0, 0]);
+      const ptsL = vs.map((v) => { const p = V.get(v); return quadro.identidade ? p : quadro.local(p); });
+      const nL = newell(ptsL); const lL = tamanho(nL);
+      nwDaFace.set(f, lL > 0 ? Math.abs(nL[quadro.eixo]) / lL : 0);
+    }
+    const dot3 = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+    const visitadas = new Set();
+    for (const f of perto) {
+      if (visitadas.has(f) || nwDaFace.get(f) >= 0.5) continue;
+      const comp = []; const pilha = [f]; visitadas.add(f);
+      const compSet = new Set([f]);
+      while (pilha.length) {
+        const cur = pilha.pop(); comp.push(cur);
+        const nCur = norm3DaFace.get(cur);
+        const vs = F.get(cur).vs;
+        for (let k = 0; k < vs.length; k++) {
+          for (const viz of pertoFacesPorAresta.get(chave(vs[k], vs[(k + 1) % vs.length])) ?? []) {
+            if (viz === cur || visitadas.has(viz) || nwDaFace.get(viz) >= 0.5) continue;
+            if (dot3(nCur, norm3DaFace.get(viz)) > 0.95) { visitadas.add(viz); compSet.add(viz); pilha.push(viz); }
+          }
+        }
+      }
+      const posViz = []; const negViz = [];
+      for (const cur of comp) {
+        const nCur = norm3DaFace.get(cur);
+        const vs = F.get(cur).vs;
+        for (let k = 0; k < vs.length; k++) {
+          const u = vs[k], v = vs[(k + 1) % vs.length];
+          for (const viz of pertoFacesPorAresta.get(chave(u, v)) ?? []) {
+            if (compSet.has(viz)) continue;
+            if (Math.abs(dot3(nCur, norm3DaFace.get(viz))) >= 0.85) continue;
+            const s = area2DaFace.get(viz);
+            if (s > 0) posViz.push(viz);
+            else if (s < 0) negViz.push(viz);
+          }
+        }
+      }
+      if (!posViz.length || !negViz.length) continue;
+      let opostos = false;
+      const caixa2De = (fi) => {
+        let u0 = Infinity, v0 = Infinity, u1 = -Infinity, v1 = -Infinity;
+        for (const v of F.get(fi).vs) { const q = p2(v); if (q[0] < u0) u0 = q[0]; if (q[1] < v0) v0 = q[1]; if (q[0] > u1) u1 = q[0]; if (q[1] > v1) v1 = q[1]; }
+        return [u0 - 1e-5, v0 - 1e-5, u1 + 1e-5, v1 + 1e-5];
+      };
+      for (const a of posViz) {
+        const na = norm3DaFace.get(a);
+        const ca = caixa2De(a);
+        for (const b of negViz) {
+          if (dot3(na, norm3DaFace.get(b)) >= -0.75) continue;
+          const cb = caixa2De(b);
+          if (ca[2] >= cb[0] && cb[2] >= ca[0] && ca[3] >= cb[1] && cb[3] >= ca[1]) { opostos = true; break; }
+        }
+        if (opostos) break;
+      }
+      if (opostos) for (const cur of comp) paredeDeBorda.add(cur);
+    }
+  }
+
+  /* onde a reta do eixo fura a chapa (ignorando paredes de borda inclinadas), do lado de quem olha para o outro: nos cantos do
+     contorno e, quando o contorno sai da chapa, em todos os triângulos de dentro com busca em grade espacial */
   let escalaW = 0;
   for (const t of tri) for (const v of t.v) escalaW = Math.max(escalaW, Math.abs(p2(v)[2]));
   const deQuemOlha = sentido === '-' ? (x, y) => x - y : (x, y) => y - x;
-  let limite = null; let seguinte = null;
-  const peles = new Uint16Array(N);   // quantas peles da camada a reta de cada canto do contorno fura
-  for (let k = 0; k < N; k++) {
-    const p = P[k]; const furos = [];
-    for (const t of tri) {
-      if (!t.sinal) continue;
+  const GRADE_N = 16;
+  const gx0 = caixa[0], gy0 = caixa[1];
+  const gdx = Math.max(1e-9, caixa[2] - caixa[0]) / GRADE_N;
+  const gdy = Math.max(1e-9, caixa[3] - caixa[1]) / GRADE_N;
+  const grade = Array.from({ length: GRADE_N * GRADE_N }, () => []);
+  const celula = (x, y) => {
+    const ix = Math.max(0, Math.min(GRADE_N - 1, Math.floor((x - gx0) / gdx)));
+    const iy = Math.max(0, Math.min(GRADE_N - 1, Math.floor((y - gy0) / gdy)));
+    return iy * GRADE_N + ix;
+  };
+  for (const t of tri) {
+    if (!t.sinal || paredeDeBorda.has(t.f)) continue;
+    const [a, b, c] = t.v.map(p2);
+    const ix0 = Math.max(0, Math.min(GRADE_N - 1, Math.floor((Math.min(a[0], b[0], c[0]) - gx0) / gdx)));
+    const ix1 = Math.max(0, Math.min(GRADE_N - 1, Math.floor((Math.max(a[0], b[0], c[0]) - gx0) / gdx)));
+    const iy0 = Math.max(0, Math.min(GRADE_N - 1, Math.floor((Math.min(a[1], b[1], c[1]) - gy0) / gdy)));
+    const iy1 = Math.max(0, Math.min(GRADE_N - 1, Math.floor((Math.max(a[1], b[1], c[1]) - gy0) / gdy)));
+    for (let iy = iy0; iy <= iy1; iy++) for (let ix = ix0; ix <= ix1; ix++) grade[iy * GRADE_N + ix].push(t);
+  }
+  const furosEm = (p, filtro = null) => {
+    const furos = [];
+    for (const t of grade[celula(p[0], p[1])]) {
+      if (filtro && !filtro.has(t.f)) continue;
       const [a, b, c] = t.v.map(p2);
       const wa = orient(b, c, p) * t.sinal, wb = orient(c, a, p) * t.sinal, wc = orient(a, b, p) * t.sinal;
       if (wa < 0 || wb < 0 || wc < 0) continue;
       furos.push((wa * a[2] + wb * b[2] + wc * c[2]) / (wa + wb + wc));
     }
     furos.sort(deQuemOlha);
-    const unicos = furos.filter((w, j) => j === 0 || Math.abs(w - furos[j - 1]) > 1e-9 * (1 + escalaW));
-    if (!unicos.length) return { ref: 'contorno', erro: `o ponto ${texto2(p)} do contorno fica fora da chapa vista ${quadro.nome}: a reta do eixo por ele não toca nenhuma face da seleção; desenhe o contorno inteiro sobre a chapa` };
-    if (sentido == null) {
-      if (unicos.length > pelesPorCamada) return { ref: 'sentido', erro: `a reta do eixo pelo ponto ${texto2(p)} do contorno fura a chapa ${unicos.length} vezes, e uma camada dela tem ${pelesPorCamada} pele(s): a divisão cortaria todas as camadas; declare sentido ('+' ou '-'), o lado do eixo de onde se olha a camada que se divide` };
-      peles[k] = unicos.length;
-      continue;
+    return furos.filter((w, j) => j === 0 || Math.abs(w - furos[j - 1]) > 1e-9 * (1 + escalaW));
+  };
+  let limite = null; let seguinte = null;
+  const soloProfundidades = [];
+  const registrarSonda = (p, unicos) => {
+    if (unicos.length <= pelesPorCamada) {
+      if (sentido != null && unicos.length) soloProfundidades.push(unicos[unicos.length - 1]);
+      return null;
     }
-    peles[k] = Math.min(pelesPorCamada, unicos.length);
-    const daCamada = unicos[Math.min(pelesPorCamada, unicos.length) - 1];
+    if (sentido == null) return { ref: 'sentido', erro: `a reta do eixo pelo ponto ${texto2(p)} do contorno fura a chapa ${unicos.length} vezes, e uma camada dela tem ${pelesPorCamada} pele(s): a divisão cortaria todas as camadas; declare sentido ('+' ou '-'), o lado do eixo de onde se olha a camada que se divide` };
+    const daCamada = unicos[pelesPorCamada - 1];
     if (limite == null || deQuemOlha(limite, daCamada) < 0) limite = daCamada;
-    if (unicos.length > pelesPorCamada && (seguinte == null || deQuemOlha(seguinte, unicos[pelesPorCamada]) > 0)) seguinte = unicos[pelesPorCamada];
+    if (seguinte == null || deQuemOlha(seguinte, unicos[pelesPorCamada]) > 0) seguinte = unicos[pelesPorCamada];
+    return null;
+  };
+  const peles = new Uint16Array(N);   // quantas peles da camada a reta de cada canto do contorno fura (0 quando o canto está fora da chapa)
+  let algumCantoFora = false; let tocouChapa = false;
+  for (let k = 0; k < N; k++) {
+    const unicos = furosEm(P[k]);
+    if (!unicos.length) { algumCantoFora = true; continue; }
+    tocouChapa = true;
+    const erroSonda = registrarSonda(P[k], unicos);
+    if (erroSonda) return erroSonda;
+    peles[k] = Math.min(pelesPorCamada, unicos.length);
+  }
+  const lados = P.map((p, k) => { const q = P[(k + 1) % N]; return [p, q, Math.min(p[0], q[0]), Math.min(p[1], q[1]), Math.max(p[0], q[0]), Math.max(p[1], q[1])]; });
+  if (algumCantoFora) {
+    /* quando o contorno sai da chapa, sondamos todos os triângulos de pele dentro de P (custo O(1) pela grade) para achar qualquer camada */
+    for (const t of tri) {
+      if (!t.sinal || paredeDeBorda.has(t.f)) continue;
+      const [a, b, c] = t.v.map(p2);
+      const m = [(a[0] + b[0] + c[0]) / 3, (a[1] + b[1] + c[1]) / 3];
+      if (!pontoNoLaco(m, P)) continue;
+      const unicos = furosEm(m);
+      if (!unicos.length) continue;
+      tocouChapa = true;
+      const erroSonda = registrarSonda(m, unicos);
+      if (erroSonda) return erroSonda;
+    }
+    if (!tocouChapa) {
+      /* um contorno fino pode atravessar triângulos grandes sem conter nenhum baricentro nem canto sobre a chapa */
+      for (const t of tri) {
+        if (!t.sinal || paredeDeBorda.has(t.f)) continue;
+        for (let e = 0; e < 3; e++) {
+          const A = p2(t.v[e]), B = p2(t.v[(e + 1) % 3]);
+          const a0 = Math.min(A[0], B[0]), a1 = Math.max(A[0], B[0]), b0 = Math.min(A[1], B[1]), b1 = Math.max(A[1], B[1]);
+          for (let k = 0; k < N; k++) {
+            const [p, q, u0, v0, u1, v1] = lados[k];
+            if (a1 < u0 || a0 > u1 || b1 < v0 || b0 > v1) continue;
+            if (ladoDoVertice(p, q, A) === ladoDoVertice(p, q, B) || ladoDoPonto(A, B, p) === ladoDoPonto(A, B, q)) continue;
+            const d1 = orient(p, q, A), d2 = orient(p, q, B); const t1 = d1 / (d1 - d2);
+            const onde = [A[0] + (B[0] - A[0]) * t1, A[1] + (B[1] - A[1]) * t1];
+            const unicos = furosEm(onde);
+            if (!unicos.length) continue;
+            tocouChapa = true;
+            const erroSonda = registrarSonda(onde, unicos);
+            if (erroSonda) return erroSonda;
+          }
+        }
+      }
+    }
+    if (!tocouChapa) return { ref: 'contorno', erro: `o contorno fica fora da chapa vista ${quadro.nome}: a reta do eixo não toca nenhuma face da seleção; desenhe o contorno sobre a chapa` };
   }
   let candidatas = new Set(perto);
   if (sentido != null && seguinte != null) {
+    /* pontos com 1 camada à frente da segunda camada pertencem à primeira e ampliam o limite dela */
+    for (const w of soloProfundidades) if (deQuemOlha(w, seguinte) < 0 && (limite == null || deQuemOlha(limite, w) < 0)) limite = w;
     if (!(deQuemOlha(limite, seguinte) < 0)) return { ref: 'sentido', erro: `as duas camadas da chapa se sobrepõem em profundidade nos pontos do contorno (a de trás da primeira chega a ${mm(limite)} mm e a da frente da seguinte a ${mm(seguinte)} mm no eixo): não há plano que separe a camada que se divide; divida por outra vista` };
     const corte = (limite + seguinte) / 2;
     candidatas = new Set(perto.filter((f) => F.get(f).vs.every((v) => deQuemOlha(p2(v)[2], corte) < 0)));
+    for (let k = 0; k < N; k++) peles[k] = Math.min(pelesPorCamada, furosEm(P[k], candidatas).length);
   }
   const T = tri.filter((t) => candidatas.has(t.f));
 
-  /* ---- os cruzamentos: cada aresta dos triângulos contra cada lado do contorno ---- */
-  const semBorda = (q0, quadroNome) => ({ ref: 'contorno', erro: `o contorno toca ou cruza a borda da chapa ou a parede de um vão em ${texto2(q0)}, vista ${quadroNome}: a divisão corta só a pele da chapa, e o contorno precisa ficar inteiro sobre ela` });
+  /* ---- borda da chapa e paredes de vão: conferência de contorno que encosta sem atravessar ---- */
+  const semBorda = (q0, quadroNome) => ({ ref: 'contorno', erro: `o contorno toca ou cruza uma face de perfil fora da borda da chapa ou a fronteira de uma seleção parcial em ${texto2(q0)}, vista ${quadroNome}: a divisão corta só a pele da chapa e a parede de espessura da borda ou de um vão` });
+  const encostaNaBorda = (q0) => ({ ref: 'contorno', erro: `o contorno encosta na borda da chapa ou na parede de um vão em ${texto2(q0)}, vista ${quadro.nome}: para fechar a parte pela borda, o contorno precisa atravessá-la para fora da chapa e voltar a entrar por outro ponto` });
   const reais = new Map();
-  for (const f of candidatas) { const vs = F.get(f).vs; for (let k = 0; k < vs.length; k++) { const ch = chave(vs[k], vs[(k + 1) % vs.length]); reais.set(ch, (reais.get(ch) ?? 0) + 1); } }
-  const lados = P.map((p, k) => { const q = P[(k + 1) % N]; return [p, q, Math.min(p[0], q[0]), Math.min(p[1], q[1]), Math.max(p[0], q[0]), Math.max(p[1], q[1])]; });
+  const reaisFaces = new Map();
+  for (const f of candidatas) {
+    const vs = F.get(f).vs;
+    for (let k = 0; k < vs.length; k++) {
+      const ch = chave(vs[k], vs[(k + 1) % vs.length]);
+      reais.set(ch, (reais.get(ch) ?? 0) + 1);
+      if (!reaisFaces.has(ch)) reaisFaces.set(ch, []);
+      reaisFaces.get(ch).push(f);
+    }
+  }
+  const arestaDeBorda = (ch) => usosNaMalha.get(ch) === 1 || (reaisFaces.get(ch)?.some((f) => paredeDeBorda.has(f)) ?? false);
+  /* tolerância de 0,01 mm para acusar canto ou lado colinear sobre a borda (cobre jitter submicrométrico de booleanas sem tocar contornos a 0,5 mm) */
+  const TOL_BORDA = 1e-5;
+  const aoSegmento2 = (p, a, b) => {
+    const l2 = (b[0] - a[0]) ** 2 + (b[1] - a[1]) ** 2;
+    if (!(l2 > 1e-18)) return dist2(p, a);
+    const t = Math.max(0, Math.min(1, ((p[0] - a[0]) * (b[0] - a[0]) + (p[1] - a[1]) * (b[1] - a[1])) / l2));
+    return Math.hypot(p[0] - a[0] - (b[0] - a[0]) * t, p[1] - a[1] - (b[1] - a[1]) * t);
+  };
+  const bordas2 = [];
+  for (const [ch, fs] of reaisFaces) {
+    if (!arestaDeBorda(ch)) continue;
+    /* ignora arestas transversais entre duas faces de parede de espessura (que projetam < 0,01 mm na vista) */
+    if (!fs.some((f) => !paredeDeBorda.has(f))) continue;
+    const [u, v] = ch.split(':').map(Number);
+    const A = p2(u), B = p2(v);
+    const len = dist2(A, B);
+    if (len <= 1e-9) continue;
+    bordas2.push([A, B, len, Math.min(A[0], B[0]) - TOL_BORDA, Math.max(A[0], B[0]) + TOL_BORDA, Math.min(A[1], B[1]) - TOL_BORDA, Math.max(A[1], B[1]) + TOL_BORDA]);
+  }
+  for (let k = 0; k < N; k++) {
+    const p = P[k];
+    for (const [A, B, , a0, a1, b0, b1] of bordas2) {
+      if (p[0] >= a0 && p[0] <= a1 && p[1] >= b0 && p[1] <= b1 && aoSegmento2(p, A, B) <= TOL_BORDA) return encostaNaBorda(p);
+    }
+  }
+  for (let k = 0; k < N; k++) {
+    const [p, q, u0, v0, u1, v1] = lados[k];
+    const lp = dist2(p, q);
+    if (!(lp > 1e-9)) continue;
+    for (const [A, B, len, a0, a1, b0, b1] of bordas2) {
+      if (len <= 2 * TOL_BORDA) continue;
+      if (a1 < u0 - TOL_BORDA || a0 > u1 + TOL_BORDA || b1 < v0 - TOL_BORDA || b0 > v1 + TOL_BORDA) continue;
+      const cos = Math.abs(((B[0] - A[0]) * (q[0] - p[0]) + (B[1] - A[1]) * (q[1] - p[1])) / (len * lp));
+      if (cos > 0.99 && aoSegmento2(A, p, q) <= TOL_BORDA && aoSegmento2(B, p, q) <= TOL_BORDA) return encostaNaBorda([(A[0] + B[0]) / 2, (A[1] + B[1]) / 2]);
+    }
+  }
+
+  /* ---- os cruzamentos: cada aresta dos triângulos contra cada lado do contorno ---- */
   const nosDaAresta = new Map();
   const cantoUsado = new Uint16Array(N); const cantoNaAresta = new Uint8Array(N);
   const medidas = { cruzamentos: 0, encaixados: 0, cantos: 0, cantosEncaixados: 0, bicosAparados: 0, facesCortadas: 0, pedacos: 0, desvioDoEncaixe: 0 };
@@ -305,10 +517,11 @@ export function dividirMalhaPorContorno({ V, F, ids, quadro, poligono, sentido =
       const d1 = orient(p, q, A), d2 = orient(p, q, B), d3 = orient(A, B, p), d4 = orient(A, B, q);
       const t1 = d1 / (d1 - d2);
       const onde = [A[0] + (B[0] - A[0]) * t1, A[1] + (B[1] - A[1]) * t1];
-      if (reais.has(ch) && reais.get(ch) !== 2) return semBorda(onde, quadro.nome);
+      if (reais.has(ch) && reais.get(ch) !== 2 && usosNaMalha.get(ch) !== 1) return semBorda(onde, quadro.nome);
       /* o canto do contorno que cai sobre a aresta é o próprio cruzamento: um vértice só, para os dois lados que chegam a ele */
       const tc = d3 / (d3 - d4);
       const canto = tc <= MESMO_LUGAR ? k : tc >= 1 - MESMO_LUGAR ? (k + 1) % N : null;
+      if (canto != null && arestaDeBorda(ch)) return encostaNaBorda(onde);
       if (canto != null) cantoNaAresta[canto] = 1;
       let id = canto != null ? doCanto.get(canto) : undefined;
       if (id === undefined) {
@@ -327,13 +540,34 @@ export function dividirMalhaPorContorno({ V, F, ids, quadro, poligono, sentido =
 
   /* ---- cada triângulo: os trechos do contorno que passam por ele ---- */
   const trechosDe = new Map();   // índice do triângulo -> as sequências de ids de cada trecho, da entrada à saída
+  const perfilCortado = new Set();   // triângulos de parede de espessura de perfil cortados pelo plano do contorno
   for (let ti = 0; ti < T.length; ti++) {
     const t = T[ti];
     const chaves = [0, 1, 2].map((e) => chave(t.v[e], t.v[(e + 1) % 3]));
     const arestas = chaves.map((ch) => nosDaAresta.get(ch));
     if (arestas.every((nos) => nos.every((no) => no.apoio))) continue;
     const q = t.v.map(p2);
-    if (!t.sinal) return semBorda(q[0], quadro.nome);
+    if (!t.sinal) {
+      if (!paredeDeBorda.has(t.f)) return semBorda(q[0], quadro.nome);
+      const evs = [];
+      for (let e = 0; e < 3; e++) for (const no of arestas[e]) if (!no.apoio) evs.push(no);
+      evs.sort((m, n) => m.s - n.s);
+      const grupos = [];
+      for (const ev of evs) {
+        const g = grupos[grupos.length - 1];
+        if (g && ev.s - g[g.length - 1].s <= MESMO_LUGAR) g.push(ev);
+        else grupos.push([ev]);
+      }
+      if (grupos.length > 1 && (N - grupos[grupos.length - 1][0].s) + grupos[0][0].s <= MESMO_LUGAR) grupos[0].push(...grupos.pop());
+      const seqs = [];
+      for (const g of grupos) {
+        if (g.length !== 2) return encostaNaBorda(p2(g[0].id));
+        if (g[0].id !== g[1].id) seqs.push([g[0].id, g[1].id]);
+      }
+      trechosDe.set(ti, seqs);
+      perfilCortado.add(ti);
+      continue;
+    }
     const eventos = [];
     for (let e = 0; e < 3; e++) {
       const x = t.v[e], y = t.v[(e + 1) % 3], z = t.v[(e + 2) % 3];
@@ -440,6 +674,17 @@ export function dividirMalhaPorContorno({ V, F, ids, quadro, poligono, sentido =
       cadeias.push(atual);
     }
     let pedacos = [laco];
+    const ehPerfil = perfilCortado.has(ti);
+    const n3 = cruz(sub(p3(t.v[1]), p3(t.v[0])), sub(p3(t.v[2]), p3(t.v[0])));
+    const ln = tamanho(n3); const n = n3.map((x) => x / ln);
+    let pLocal = p2;
+    if (ehPerfil) {
+      const o0 = p3(t.v[0]);
+      const eU0 = sub(p3(t.v[1]), o0); const lu = tamanho(eU0);
+      const eU = eU0.map((x) => x / lu); const eV = cruz(n, eU);
+      pLocal = (v) => { const d = sub(p3(v), o0); return [d[0] * eU[0] + d[1] * eU[1] + d[2] * eU[2], d[0] * eV[0] + d[1] * eV[1] + d[2] * eV[2]]; };
+    }
+    const marcaBorda = ehPerfil ? (a, b) => { barreira.add(chave(a, b)); } : marca;
     { const q = t.v.map(p2); aparo = 2 * encaixe * Math.max(dist2(q[0], q[1]), dist2(q[1], q[2]), dist2(q[2], q[0])); }
     for (const c of cadeias) {
       if (c.length < 2) continue;
@@ -451,30 +696,28 @@ export function dividirMalhaPorContorno({ V, F, ids, quadro, poligono, sentido =
           /* o trecho corre sobre uma aresta do triângulo: a borda é a própria aresta, e nada se divide */
           const i0 = laco.indexOf(x0), i1 = laco.indexOf(x1);
           const naAresta = (de, ate) => { for (let k = de; ; k = (k + 1) % laco.length) { if (!arestaDe.get(laco[k]).has(comum)) return false; if (k === ate) return true; } };
-          if (naAresta(i0, i1)) for (let k = i0; k !== i1; k = (k + 1) % laco.length) marca(laco[k], laco[(k + 1) % laco.length]);
-          else for (let k = i0; k !== i1; k = (k - 1 + laco.length) % laco.length) marca(laco[k], laco[(k - 1 + laco.length) % laco.length]);
+          if (naAresta(i0, i1)) for (let k = i0; k !== i1; k = (k + 1) % laco.length) marcaBorda(laco[k], laco[(k + 1) % laco.length]);
+          else for (let k = i0; k !== i1; k = (k - 1 + laco.length) % laco.length) marcaBorda(laco[k], laco[(k - 1 + laco.length) % laco.length]);
           continue;
         }
       }
       let donos = pedacos.filter((L) => L.includes(x0) && L.includes(x1));
       if (donos.length > 1) {
-        const a = p2(c[0]), b = p2(c[1]); const meio = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
-        donos = donos.filter((L) => pontoNoLaco(meio, L.map(p2)));
+        const a = pLocal(c[0]), b = pLocal(c[1]); const meio = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+        donos = donos.filter((L) => pontoNoLaco(meio, L.map(pLocal)));
       }
       if (donos.length !== 1) return incoerente('um trecho do contorno não cabe num pedaço só do triângulo');
       const L = donos[0]; const i0 = L.indexOf(x0), i1 = L.indexOf(x1);
       const caminho = (de, ate) => { const r = []; for (let k = de; ; k = (k + 1) % L.length) { r.push(L[k]); if (k === ate) return r; } };
       const meioDaCadeia = c.slice(1, -1);
       pedacos.splice(pedacos.indexOf(L), 1, [...caminho(i1, i0), ...meioDaCadeia], [...caminho(i0, i1), ...meioDaCadeia.slice().reverse()]);
-      for (let k = 0; k + 1 < c.length; k++) marca(c[k], c[k + 1]);
+      for (let k = 0; k + 1 < c.length; k++) marcaBorda(c[k], c[k + 1]);
     }
     /* o pedaço côncavo se parte em convexos, pela normal do triângulo */
-    const n3 = cruz(sub(p3(t.v[1]), p3(t.v[0])), sub(p3(t.v[2]), p3(t.v[0])));
-    const ln = tamanho(n3); const n = n3.map((x) => x / ln);
     for (const L of pedacos) {
       if (L.length < 3) return incoerente('um pedaço ficou com menos de três cantos');
       if (convexo(p3, L, n)) { pedacosDe.get(t.f).push({ vs: L, sinal: t.sinal }); continue; }
-      const tris = melhorTriangulacao(L, p2, p3, t.sinal);
+      const tris = melhorTriangulacao(L, pLocal, p3, ehPerfil ? 1 : t.sinal);
       if (!tris) return incoerente('um pedaço côncavo não se partiu em convexos');
       for (const C of pedacosConvexos(p3, tris, n)) pedacosDe.get(t.f).push({ vs: C, sinal: t.sinal });
     }
@@ -504,7 +747,7 @@ export function dividirMalhaPorContorno({ V, F, ids, quadro, poligono, sentido =
   const voto = new Int8Array(nosDoGrafo.length);
   for (const ch of barreira) for (const k of vizinhos.get(ch) ?? []) {
     const no = nosDoGrafo[k];
-    if (!no.sinal || voto[k]) continue;
+    if (voto[k] || !no.sinal || paredeDeBorda.has(no.f)) continue;
     let aFavor = false; let contra = false;
     for (let j = 0; j < no.vs.length; j++) {
       const a = no.vs[j], b = no.vs[(j + 1) % no.vs.length];
@@ -520,6 +763,7 @@ export function dividirMalhaPorContorno({ V, F, ids, quadro, poligono, sentido =
   const dentroDoGrafo = new Uint8Array(nosDoGrafo.length);
   const fila = [];
   voto.forEach((v, k) => { if (v > 0) { dentroDoGrafo[k] = 1; fila.push(k); } });
+  if (!barreira.size) return { ref: 'contorno', erro: `o contorno envolve a chapa inteira vista ${quadro.nome} sem cruzar nenhuma aresta dela: não há borda nova para dividir a parte` };
   if (!fila.length) return incoerente('nenhum pedaço ficou do lado de dentro');
   while (fila.length) {
     const k = fila.pop(); const no = nosDoGrafo[k];

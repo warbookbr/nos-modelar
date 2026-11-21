@@ -1,6 +1,6 @@
 # Divisão por contorno: a parte de uma chapa sai com a borda na curva declarada, e não em dentes de serra
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `procedural/nucleo/operacoes/divisao-por-contorno.js` e o teste dele, `procedural/nucleo/nucleo.js` (o registro da operação nova e a entrega dos pedaços da divisão na resolução de origem), `procedural/nucleo/catalogo.test.mjs` (o teto e o total), `procedural/nucleo/fixtures/motor-r00-baseline.json`, `tools/arquitetura/mapear-motor-procedural.test.mjs` (a dependência nova), `tools/mcp/procedural.test.mjs` (o total de operações), `procedural/nucleo/pedacos-da-divisao.js`, `procedural/nucleo/operacoes/linha-da-costura.js` (só a leitura dos pedaços), `docs/modelar/banco-de-provas/divisao-por-contorno-2026-11-18/`. A operação reaproveita o corte da operação de abertura por contorno sem mudá-lo, porque ele é do plano da correção de superfície; se precisar mudar, é empréstimo pedido a esse plano. A entrada da operação no guia de uso das operações e a leitura dos pedaços na borda da abertura e no arredondamento da costura são empréstimo do plano da correção de superfície, dono desse arquivo. O uso na lataria do carro entra como prova pelo plano do carro.
 

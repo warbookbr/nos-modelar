@@ -1,4 +1,4 @@
-/* carro-fastback/lataria — o piloto do quarto traseiro: a chapa contínua de lataria do meio da porta (z 0) para trás, lado +x, com o para-lama
+﻿/* carro-fastback/lataria — o piloto do quarto traseiro: a chapa contínua de lataria do meio da porta (z 0) para trás, lado +x, com o para-lama
  * traseiro saliente, o rebaixo côncavo da lateral, a coluna que cai até a tampa, o arco da roda de trás, o vão do vidro lateral traseiro e o
  * vão da lanterna na quina. Fatia 2 de `docs/modelar/planos/2026-11-14-modelagem-de-carro.md`; as medidas vêm de `../../ALINHAMENTO.md`, do
  * `../../andaime.json` e das pranchas de `../../referencias/` (os pontos da TABELA são lidos delas, em mm, no referencial do carro: x para a
@@ -590,6 +590,19 @@ const vidroTraseiroInteiro = (T) => {
   return [...meia, ...meia.slice(1, -1).reverse().map(([x, z, r]) => [-x, z, r])];
 };
 
+/** O contorno [z, y] do para-lama na vista de +x: de baixo (y 100, abaixo da soleira, fora da chapa) até a linha do ombro, que a curva da lataria desenha, entre as caixas de z da parte. */
+const contornoDoParalama = (T, P) => {
+  const z0 = T.partes.paralama.min[2] + 0.37, z1 = T.partes.paralama.max[2] + 0.37; const y0 = 100;
+  const zs = []; for (let z = z0; z < z1 - 1; z += 50) zs.push(z); zs.push(z1);
+  return [[z0, y0], ...zs.map((z) => [z, P.yOmbro(z) - 1.3]), [z1, y0]];
+};
+
+/** O contorno [z, y] do rebaixo na vista de +x: a base e o topo do rebaixo da lei de cada altura, de onde ele some até o corte de z 0, que o contorno ultrapassa (z 50) para fechar a parte pela borda da chapa. */
+const contornoDoRebaixo = (T, P) => {
+  const z0 = ondeORebaixoSome(T) + 0.37; const zs = []; for (let z = z0; z < -31; z += 50) zs.push(z); zs.push(-30);
+  return [...zs.map((z) => [z, P.yBase(z)]), [50, P.yBase(0)], [50, P.yTopo(0)], ...zs.slice().reverse().map((z) => [z, P.yTopo(z)])];
+};
+
 const ARCO = { origem: { op: 'subtrair', id: 3 } };
 const VIDRO = { origem: { op: 'aberturaPorContorno', id: 4 } };
 const LANTERNA = { origem: { op: 'aberturaPorContorno', id: 5 } };
@@ -610,8 +623,8 @@ export function gerarPassos(T) {
     ['aberturaPorContorno', { origemId: 5, chapa: VIDRO, vista: 'z', simetria: 'x', contorno: contornoDe(retanguloArredondado(L.x0, L.x1, L.y0, L.y1, L.raio)) }],
     ['aberturaPorContorno', { origemId: 6, chapa: LANTERNA, vista: 'y', sentido: '+', contorno: contornoComFilete(vidroTraseiroInteiro(T)) }],
     ['parte', { nome: 'chapa', sel: VIDRO_TRASEIRO }],
-    ['parte', { nome: 'paralamaTraseiro', substituir: true, sel: { regiao: caixa(caixasDasPartes(T).paralama) } }],
-    ['parte', { nome: 'rebaixoLateral', substituir: true, sel: { regiao: caixa(caixasDasPartes(T).rebaixo) } }],
+    ['divisaoPorContorno', { chapa: VIDRO_TRASEIRO, vista: 'x', sentido: '+', nome: 'paralamaTraseiro', substituir: true, contorno: contornoDe(contornoDoParalama(T, P)) }],
+    ['divisaoPorContorno', { chapa: VIDRO_TRASEIRO, vista: 'x', sentido: '+', nome: 'rebaixoLateral', substituir: true, contorno: contornoDe(contornoDoRebaixo(T, P)) }],
   ];
 }
 

@@ -103,6 +103,28 @@ Pendência: a mensagem do `arredondarAresta` para a aresta de um pedaço de tamp
 
 Cada uma tem teste que confere a mensagem, e `node tools/gates/recusas-exercitadas.mjs` passou a vigiar o arquivo: argumentos inválidos (`chapa`, `vista`, `nome`, `material`, `substituir`, `sentido`, `segmentosArco`, `encaixe`, `contorno`), o contorno que se cruza, o ponto do contorno fora da chapa, o contorno que cruza a borda da chapa ou uma face de perfil, a chapa furada mais de uma vez sem `sentido`, as camadas que se sobrepõem em profundidade, o contorno que cabe num triângulo só, o espinho pelo mesmo vértice, o bico mais estreito que o encaixe, a aresta cortada da costura de uma booleana, o número que a receita não resolve, o pedaço fino com a medida, a região de dentro que se liga à de fora por trás da camada e a região que já é de outra parte sem `substituir: true`. A defesa das contas de ponto flutuante do traço não tem entrada que a alcance e está nas exceções do gate, com o motivo.
 
-## O que fica para a fatia 2
+## Fatia 2: parte fechada pela borda da chapa ou pela boca de um vão
 
-O contorno que passa sobre um vão já aberto na chapa (a borda da parte que cruza o arco de uma roda, por exemplo) é recusado, porque a divisão não atravessa parede de vão nem aceita ponto do contorno fora da chapa; se as partes do carro pedirem isso, a operação precisa crescer. O piso de segmentos do bico da abertura não foi reaproveitado: o canto vivo sai do polígono do contorno como desenhado. O passo não declara o que escreve em `ESCRITA_DAS_OPERACOES` nem o que lê em `LEITURA_DAS_OPERACOES`, de modo que o retrato e o cache o tratam pelo caminho completo; a medida de tempo no carro diz se vale declarar. A borda da parte não é publicada como origem citável.
+Em 2026-11-21, a operação `divisaoPorContorno` passou a aceitar contornos que saem da chapa ou cruzam a boca de um vão (`furoPassante` ou `aberturaPorContorno`) e voltam a entrar por outro ponto, fechando a parte pela borda real da chapa ou do vão.
+
+A classificação `paredeDeBorda` identifica sobre `perto` os componentes coplanares estreitos na vista (`|n·eixo| < 0,5`) ligados por dobras (`|dot| < 0,85`) a duas peles de sinais e normais opostos (`dot < -0,75`). Essas paredes ficam fora da sondagem de camadas (evitando camadas falsas em bordas inclinadas ou paredes de furo), têm sua aresta cortada no plano do contorno sem votação conflitante pelo encaixe, e não deixam aresta livre nem face fina.
+
+Contornos que apenas encostam ou correm colinearmente sobre a borda da chapa ou a parede de um vão sem atravessá-la recusam com a causa e o ponto na vista (`o contorno encosta na borda da chapa ou na parede de um vão em [u, v] mm`). Seleções parciais em malha fechada (como só a pele externa) que tentam cruzar sua fronteira interna recusam sem alterar a malha.
+
+### Revisões adversariais da fatia 2 (2026-11-21)
+
+- **1ª rodada (6 bloqueios corrigidos):** seleção parcial em malha fechada (B1); borda inclinada em `x = 0` e camadas escalonadas na sondagem em grade 16×16 (B2); parede de `aberturaPorContorno` com jitter submicrométrico (B3); flanco inclinado a 68,2° não confundido com parede de borda (B4); faixa fina encaixada na borda sem falso túnel (B5); lados colineares à borda com cantos fora e cantos sobre vão com jitter recusados com `encostaNaBorda` (B6).
+- **2ª rodada (5 bloqueios corrigidos):** `aberturaPorContorno` em chapa inclinada até 45° (R2-1); cruzamento perpendicular em borda levemente curva sem falso `encostaNaBorda` (R2-2); camada superior inclinada sobre camada inferior menor com `sentido: '+'` (R2-3); remoção do ponto cego em faces inclinadas acima de 60° na sondagem de camadas (R2-4); paredes de espessura em 2 ou mais faixas com vértices intermediários (R2-5).
+
+## Fatia 3: prova no `carro-fastback`
+
+Em `procedural/pecas/carro-fastback/partes/lataria/receita.js`, as duas seleções por caixa (`paralamaTraseiro` e `rebaixoLateral`) foram trocadas por `divisaoPorContorno` (`vista: 'x', sentido: '+', substituir: true`) seguindo as curvas analíticas da lataria (`P.yOmbro`, `P.yBase` e `P.yTopo`), com fechamento pela boca do arco da roda, pela soleira e pela borda da porta em `z = 0`.
+
+| Verificação | Resultado |
+|---|---|
+| `npx vitest run procedural/nucleo/operacoes/divisao-por-contorno.test.mjs procedural/nucleo/operacoes/divisao-por-contorno-origens.test.mjs` | 43/43 testes verdes (8,25 s) |
+| `carro-fastback/lataria` (`orfaos` e áreas) | 0 órfãos; `chapa` 12 140 943,6 mm² + `paralamaTraseiro` 1 115 231,1 mm² + `rebaixoLateral` 696 934,7 mm² = 13 953 109,4 mm² (mesma área da chapa antes da divisão) |
+| `node tools/modelar/guardas/guarda-acervo.mjs carro-fastback/lataria` | ok, zero reprovas de topologia, face fina, dobra/vinco, vãos ou referência |
+| `node tools/modelar/medir-importar-receita.mjs` | 0,31 s (teto de 12 s) |
+| `npm run guarda:referencial`, `npm run recusas:check`, `npm run arquitetura:check` | todos verdes |
+| Revisão visual na bancada (`--cores` e partes isoladas) | aprovada pela pessoa em 2026-11-21 |
