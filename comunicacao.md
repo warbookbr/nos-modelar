@@ -26,16 +26,14 @@ Status possíveis: `aberta` → `em andamento` → `feita` | `bloqueada`.
 
 ## Tarefas
 
-### Tarefa 1 — Concluir `2026-11-17-curvas-lisas-e-zebra-numerica` (fatias 4 e 5)
+### Tarefa 3 — Rodada 8 do quarto traseiro do `carro-fastback` (`2026-11-14-modelagem-de-carro`)
 
 - **Status:** aberta
-- **Branch:** `envio/curvas-lisas-e-zebra-numerica` (a partir da `main` atual, sem misturar com `envio/divisao-por-contorno` nem `envio/rebaixo-por-contorno`)
-- **Roteiro inicial:** rodar `npm run comecar -- nucleo` e ler antes `CLAUDE.md`, `docs/modelar/planos/2026-11-17-curvas-lisas-e-zebra-numerica.md` e o banco de provas citado no plano.
-- **Escopo e território:** concluir as fatias 4 e 5 do plano `2026-11-17-curvas-lisas-e-zebra-numerica.md` (novas regiões da zebra numérica, leitura exata no ajuste de curva lisa, modo opcional de lisura e revisão adversarial sem bloqueios), respeitando estritamente o território declarado no plano (`tools/modelar/zebra-numerica.mjs`, `procedural/nucleo/ajuste-de-curva-lisa.js`, seus testes e seu banco de provas). Não alterar `procedural/nucleo/operacoes/divisao-por-contorno.js`, `procedural/nucleo/rebaixo-por-contorno.js`, nem `procedural/pecas/carro-quadrado/` (que ficam na frente paralela da outra IA).
-- **Verificação:** rodar os testes unitários da zebra numérica e do ajuste de curva lisa, `npm run recusas:check`, `npm run arquitetura:check`, `npm run planos:check` e `npm run docs:links:check`, colando os resultados reais em Relatório. Gerar comparativo visual (zebra e pintura brilhante no `carro-fastback`) para aprovação da pessoa antes de rodar `npm run planos:encerrar`.
-- **Coordenação de índice:** não alterar `docs/modelar/planos/README.md` antes de a branch da outra frente integrar na `main` (ou alinhar aqui antes do encerramento) para evitar conflito de merge.
-- **Commit e push:** commitar localmente na branch `envio/curvas-lisas-e-zebra-numerica` e avisar a pessoa para subir quando o marco visual estiver pronto.
-- **Próxima da fila desta frente (após aprovação da Tarefa 1):** `docs/modelar/planos/2026-11-16-ferramentas-de-correcao-de-superficie.md` (revisão adversarial de `preencherPelasVizinhas`, fechamento do relatório de G2 na fatia 5 e documentação/encerramento na fatia 6).
+- **Branch:** `envio/fastback-rodada-8` (criada a partir da `main` assim que `envio/divisao-por-contorno` entrar na `main`)
+- **Roteiro inicial:** rodar `npm run comecar -- carro` e ler antes `CLAUDE.md`, `docs/modelar/planos/2026-11-14-modelagem-de-carro.md` e `procedural/pecas/carro-fastback/partes/lataria/receita.js`.
+- **Escopo:** conduzir a rodada 8 do quarto traseiro do `carro-fastback` usando o arsenal novo já na `main`: `divisaoPorContorno` (já aplicada em `paralamaTraseiro` e `rebaixoLateral`), ajuste de curva lisa com objetivo de lisura, `alisarCurvas`, emenda G1 por curva e vão espelhado (`simetria: 'x'`), mantendo a disciplina de medida antes/depois (zebra numérica, ondulação, pente e pacote do crítico).
+- **Não tocar:** `procedural/pecas/carro-quadrado/` (que segue na nossa frente paralela `envio/carro-quadrado-forma`).
+- **Commit e push:** commitar localmente em `envio/fastback-rodada-8` e apresentar o comparativo visual à pessoa para aprovação antes de integrar.
 
 #### Relatório
 
