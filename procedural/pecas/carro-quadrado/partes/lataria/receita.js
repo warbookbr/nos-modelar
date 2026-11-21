@@ -51,12 +51,12 @@ export const TABELA = {
     lanternaTraseira: [[655, 535, 10], [770, 535, 10], [750, 815, 10], [655, 815, 10]],
   },
   parachoqueDianteiro: {
-    y0: 215, y1: 515, xTrilho: 785, zFrente: 2025, zLateral: 1585, raioCanto: 95,
-    avanco: 60, saia: 22, recuo: 90, frisoY: 455, frisoAlt: 12, frisoSaida: 5,
+    y0: 215, y1: 515, xTrilho: 785, zFrente: 2025, zLateral: 1625, raioCanto: 95,
+    avanco: 60, saia: 22, recuo: 25, frisoY: 455, frisoAlt: 12, frisoSaida: 5,
   },
   parachoqueTraseiro: {
-    y0: 250, y1: 515, xTrilho: 790, zTras: -2025, zLateral: -1480, raioCanto: 90,
-    avanco: 55, saia: 20, recuo: 45, frisoY: 465, frisoAlt: 12, frisoSaida: 5,
+    y0: 250, y1: 515, xTrilho: 790, zTras: -2025, zLateral: -1515, raioCanto: 90,
+    avanco: 55, saia: 20, recuo: 25, frisoY: 465, frisoAlt: 12, frisoSaida: 5,
   },
   frisoLateral: {
     yCentro: 515, largura: 56, altura: 18, chanfro: 4, deslocamentoMm: -2,
@@ -158,7 +158,6 @@ export const CONTATOS = [
   { par: ['chapa', 'parachoqueDianteiro'], motivo: 'para-choque dianteiro envolve e apoia na chapa frontal e lateral' },
   { par: ['chapa', 'parachoqueTraseiro'], motivo: 'para-choque traseiro envolve e apoia na chapa traseira e lateral' },
   { par: ['chapa', 'frisoLateral'], motivo: 'friso lateral embute na chapa da lateral' },
-  { par: ['frisoLateral', 'parachoqueTraseiro'], motivo: 'friso lateral traseiro encosta no topo do para-choque traseiro' },
   { par: ['chapa', 'gradeFrontal'], motivo: 'fundo da grade encosta na borda interna do vão frontal' },
   { par: ['chapa', 'farol'], motivo: 'carcaça do farol encosta na borda interna do vão frontal' },
   { par: ['chapa', 'setaDianteira'], motivo: 'seta dianteira assenta no canto externo do vão frontal' },

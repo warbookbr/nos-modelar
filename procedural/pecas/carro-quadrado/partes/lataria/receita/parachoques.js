@@ -178,13 +178,7 @@ export function passosParachoques(T, varridos, proxId, passosChapa, pontosChapa,
     trilho: [[m(fl.yCentro), m(fl.entreArcos[0])], [m(fl.yCentro), m(fl.entreArcos[1])]],
     origemId: proxId(),
   });
-  const frisoTras = conformarNaChapa({
-    ...baseFriso,
-    nome: 'frisoTras',
-    trilho: [[m(fl.yCentro), m(fl.traseiro[0])], [m(fl.yCentro), m(fl.traseiro[1])]],
-    origemId: proxId(),
-  });
-  passos.push(...frisoMeio.passos, ...frisoTras.passos);
+  passos.push(...frisoMeio.passos);
 
   return passos;
 }

@@ -101,7 +101,7 @@ export function passosFrenteTraseira(T, proxId) {
   passos.push(caixa('chamferBox', idPlacaD, -pD.larg / 2, pD.larg / 2, pD.yCentro - pD.alt / 2, pD.yCentro + pD.alt / 2, pD.z0, pD.z1, 3));
   marcar('placaDianteira', 'placa', { origem: { op: 'chamferBox', id: idPlacaD } });
 
-  // --- FARÓIS DE NEBLINA ---
+  // --- FARÓIS DE NEBLINA + ENTRADA DE AR INFERIOR ---
   const idNeb = proxId();
   const oNeb = { op: 'chamferBox', id: idNeb };
   const neb = f.neblina;
@@ -110,6 +110,17 @@ export function passosFrenteTraseira(T, proxId) {
   passos.push(['espelha', { eixo: 'x', origemId: idNebE, derivaDe: oNeb, sel: { origem: oNeb } }]);
   marcar('farolNeblina', 'lenteNeblina', { origem: oNeb });
   marcar('farolNeblina', 'lenteNeblina', { origem: { op: 'espelha', id: idNebE, de: oNeb } });
+
+  const idEntFundo = proxId();
+  passos.push(caixa('cubo', idEntFundo, -(neb.xCentro - neb.larg / 2 - 6), neb.xCentro - neb.larg / 2 - 6, neb.yCentro - 26, neb.yCentro + 26, neb.z0 - 4, neb.z1 - 4));
+  marcar('parachoqueDianteiro', 'plasticoFosco', { origem: { op: 'cubo', id: idEntFundo } });
+  const idEntLam = proxId();
+  const oEntLam = { op: 'cubo', id: idEntLam };
+  passos.push(caixa('cubo', idEntLam, -(neb.xCentro - neb.larg / 2 - 12), neb.xCentro - neb.larg / 2 - 12, neb.yCentro - 16, neb.yCentro - 10, neb.z1 - 6, neb.z1 + 1));
+  const idEntLams = proxId();
+  passos.push(['arranja', { modo: 'linear', total: 3, d: [0, m(14), 0], origemId: idEntLams, derivaDe: oEntLam, sel: { origem: oEntLam } }]);
+  marcar('parachoqueDianteiro', 'plasticoPreto', { origem: oEntLam });
+  marcar('parachoqueDianteiro', 'plasticoPreto', { origem: { op: 'arranja', id: idEntLams, de: oEntLam } });
 
   // --- LANTERNAS TRASEIRAS (3 faixas empilhadas + carcaça recuada) ---
   const lt = t.lanterna;
