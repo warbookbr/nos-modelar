@@ -8,7 +8,6 @@
 2. [modelagem de carro de passeio](2026-11-14-modelagem-de-carro.md). Território: `procedural/pecas/carro-fastback/`, `docs/modelar/banco-de-provas/carro-fastback-2026-11-14/`, `tools/modelar/ondulacao-da-superficie.mjs`, `procedural/criterios/veiculo.json`, `procedural/familias/roda-pneu/`. Em aberto: a fatia 2 (o quarto traseiro como piloto); a fatia 1 fechou com a prancha das quatro vistas e o alinhamento aceitos.
 3. [curvas lisas e zebra numérica](2026-11-17-curvas-lisas-e-zebra-numerica.md). Território: o que o plano declara (o ajuste de curva lisa no núcleo, a zebra numérica e o aviso de área do índice de suavidade). Em aberto: tudo, a começar pela fatia 1 (a zebra numérica, para ter a medida antes da mudança).
 4. [divisão por contorno](2026-11-18-divisao-por-contorno.md). Território: a operação nova de divisão por contorno e o teste dela, a entrada dela no registro e a pasta de provas do plano.
-5. [rebaixo por contorno](2026-11-10-rebaixo-por-contorno.md). Território: `procedural/nucleo/rebaixo-por-contorno.js`, `procedural/nucleo/rebaixo-por-contorno.test.mjs`, `tools/fixtures/rebaixo-por-contorno/`, `docs/modelar/banco-de-provas/rebaixo-por-contorno-2026-11-20/`. Em aberto: tudo, a começar pela fatia 1.
 
 A lista está em ordem de prioridade. A ordem desempata quando dois planos precisam do mesmo arquivo: o de menor prioridade espera ou pede à pessoa que mude o território.
 
