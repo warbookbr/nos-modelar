@@ -37,7 +37,7 @@ export const PECAS_DA_COBERTURA = Object.freeze([
   'sedan-chassi-e-lataria/partes/frente-e-traseira/receita.js', // 3,8 s: cubo, friso, parte, pincel, publicarPorta, subdivisao
 ]);
 /* as operações do acervo que só peça cara usa, cobertas aqui pelo exemplo do registro */
-const SO_EM_PECA_CARA = Object.freeze(['aparar', 'aberturaPorContorno', 'limparLascas']);
+const SO_EM_PECA_CARA = Object.freeze(['aparar', 'aberturaPorContorno', 'limparLascas', 'divisaoPorContorno']);
 
 function receitasDoAcervo() {
   const receitas = [];
