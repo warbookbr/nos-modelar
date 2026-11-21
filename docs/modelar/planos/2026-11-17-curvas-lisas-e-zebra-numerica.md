@@ -1,6 +1,6 @@
 # Curvas lisas e zebra numérica: a curva lida da prancha vira poucos trechos de curvatura monótona, e a ondulação longa que o crítico vê vira número
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `procedural/nucleo/ajuste-de-curva-lisa.js` e o teste dele, `tools/modelar/zebra-numerica.mjs` e o teste dele, `tools/modelar/suavidade-por-regiao.mjs` (só o aviso de área), `tools/fixtures/curvas-lisas/`, `docs/modelar/banco-de-provas/curvas-lisas-2026-11-17/`. A lataria do carro entra como prova pelo plano do carro, e a medida nova pode ler o oráculo e as chapas de prova da correção de superfície sem mudá-las, porque são do plano da correção de superfície.
 
@@ -46,8 +46,18 @@ O ajuste é capacidade nova do núcleo (ENVOLVER sobre a curva da gaiola: entram
 2. Feita em 2026-11-17: o ajuste de curva lisa no núcleo (`procedural/nucleo/ajuste-de-curva-lisa.js`), cadeia de clotoides com as provas analíticas, limpas e com ruído, e a planta do carro-fastback dentro de 3 mm (2,54 mm, 9 clotoides em 2 lóbulos, 1 inflexão, a mesma contagem de 20 a 0,8 mm de espaçamento), no banco de provas desta pasta; a revisão adversarial do núcleo e o uso na receita ficam para a fatia 3.
 3. As rodadas do carro com as duas: a 6 (planta pelo ajuste, nota 7) e a 7 (teto, quina e perfil da traseira pelo ajuste) feitas em 2026-11-18; as seguintes depois das fatias 4 e 5.
 4. Feita em 2026-11-18: as regiões novas da zebra numérica (a coluna, o teto, a tampa, a traseira, o ombro e o quarto traseiro sem o arco, com exclusão por caixa ou disco) e a leitura exata do ajuste (`ponto`, `rumoEm` e `valorEm`), com a rodada 7 medida contra a 6, no banco de provas desta pasta.
-5. O ajuste com objetivo de lisura, com revisão adversarial e prova em mais de um comprimento e densidade fora da curva do carro, e o fechamento. Implementado em 2026-11-21 (`objetivo`, `esparsos`, `trechoMinimo`, `rumoInicio` e `rumoFim`, com o padrão igual bit a bit), com a revisão adversarial sem bloqueio e o comparativo da lataria no banco de provas; o fechamento espera a aprovação da pessoa nas imagens.
+5. Feita em 2026-11-21: o ajuste com objetivo de lisura, com revisão adversarial e prova em mais de um comprimento e densidade fora da curva do carro, e o fechamento. Implementado (`objetivo`, `esparsos`, `trechoMinimo`, `rumoInicio` e `rumoFim`, com o padrão igual bit a bit), com a revisão adversarial sem bloqueio e o comparativo da lataria no banco de provas; a pessoa aprovou pelas imagens em 2026-11-21 ("Aprovo, encerre").
 
 ## Riscos e parada
 
 Se a zebra numérica não concordar com o crítico nas rodadas já julgadas, ela não serve de critério, e o plano para na fatia 1 e volta à pessoa. Se a planta não couber em 3 mm com poucos trechos, a tolerância é decisão da pessoa, com a imagem das duas opções.
+
+## Fechamento
+
+Concluído em 2026-11-21, no ramo `envio/curvas-lisas-e-zebra-numerica`, com a aprovação da pessoa pelas imagens do comparativo da lataria.
+
+Os gates de saída ficaram assim. O gate 1 fechou: o ajuste recupera as curvas analíticas com desvio dentro da tolerância, e a planta do carro cabe em 3 mm (2,54 mm, 9 clotoides). A contagem de inflexões ficou como diagnóstico, por decisão da pessoa em 2026-11-17. O gate 2 fechou em parte: a zebra numérica é estável com a densidade e conta laço onde o crítico viu laço na coluna e na traseira, mas no flanco e na porta, entre as rodadas 6 e 7, ela não acompanha o crítico, como registra o banco de provas da fatia 4. O gate 3 fechou pela segunda via: as rodadas 6 e 7 do carro não passaram o critério de lisura do crítico (notas 7 e 6), a medida mostrou onde está o que falta, e a pessoa decidiu pausar o carro, que está congelado pela outra frente. O gate 4 fechou: a revisão adversarial do núcleo terminou sem bloqueio nas fatias 2, 4 e 5.
+
+O resultado observado: `ajustarCurvaLisa` no núcleo (cadeia de clotoides, leitura exata, ajuste guardado, objetivo de lisura, pontos esparsos, trecho mínimo e rumo fixo nas pontas), a zebra numérica com regiões e exclusões, e o aviso de área do índice de suavidade. A lisura com trecho mínimo tira de 14% a 35% da variação de curvatura das cinco curvas da lataria; adotá-la na receita é decisão do plano do carro.
+
+Ficam no backlog: a contagem de inflexões medida contra a ponte entre as faixas, a inserção de joelho instável fora da planta, a ficha de `ajustarCurvaLisa` fora de `npm run capacidade`, a zebra numérica que não separa a ilha da forma pedida da onda nem tem olhar por região com aviso, a medida sobre o neutro já executado e o caminho com barra do Windows no cabeçalho de `ajustes-de-curva.js`.
