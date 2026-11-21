@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2157 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2156 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -640,7 +640,6 @@
 - `2026-11-17-curvas-lisas-e-zebra-numerica.md` — Curvas lisas e zebra numérica: a curva lida da prancha vira poucos trechos de curvatura monótona, e a ondulação longa que o crítico vê vira número
 - `2026-11-17-trilhas-e-validacao-da-placa.md` — Trilhas de cobre e validação elétrica da placa declarada: a lista de ligações vira cobre conferido por regra e por conectividade
 - `2026-11-18-divisao-por-contorno.md` — Divisão por contorno: a parte de uma chapa sai com a borda na curva declarada, e não em dentes de serra
-- `2026-11-20-conformacao-na-chapa-e-sobreposicao-3d.md` — Conformação sobre a casca e sobreposição ortográfica 3D: peças coladas à curvatura da lataria e desvio 3D medido desde a rodada 1
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
