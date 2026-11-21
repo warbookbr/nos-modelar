@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2156 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2157 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1020,6 +1020,7 @@
 
 - `CLAUDE.md` — Núcleo: o que só vale nesta pasta
 - `adaptador.js` — adaptador.js — projeção visual do neutro; não conhece receitas nem execução.
+- `ajuste-de-curva-lisa-lisura.test.mjs` — ajuste-de-curva-lisa-lisura.test.mjs — o objetivo de lisura de `ajustarCurvaLisa` e as opções da forma (pontos esparsos, trecho mínimo, rumo fixo nas pontas)…
 - `ajuste-de-curva-lisa-planta.test.mjs` — ajuste-de-curva-lisa-planta.test.mjs — a planta da lataria do carro-fastback (a TABELA da receita, só leitura, o contorno do polígono com filete da prancha) …
 - `ajuste-de-curva-lisa.js` — ajuste-de-curva-lisa.js — a curva lida de pontos (da prancha, de uma imagem) ajustada a poucos trechos de curvatura monótona, com o desvio de cada ponto medido
 - `ajuste-de-curva-lisa.test.mjs` — ajuste-de-curva-lisa.test.mjs — o ajuste de curva lisa em curvas analíticas conhecidas (arco, clotoide, elipse, S), limpas e com ruído de leitura, com o núme…

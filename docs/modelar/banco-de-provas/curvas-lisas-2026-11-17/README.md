@@ -175,3 +175,67 @@ O resultado de `ajustarCurvaLisa`, o de `curvaLisaDoGuardado` e o de `curvaLisaG
 Os testes novos medem `ponto` e `rumoEm` contra a reta, o arco e a clotoide pura (série de Fresnel) a menos de 1e-9 do comprimento, nas escalas de 1e-3, 1 e 1e3, e contra uma integração independente numa cadeia de três clotoides; `valorEm` nos dois eixos, nos dois sentidos e nas recusas.
 
 A receita da lataria trocou as cópias pelas funções do núcleo: saíram o rumo escrito duas vezes, a integração por Gauss de três pontos a cada milímetro e a bisseção de b(a). A malha não saiu idêntica, por duas causas medidas em separado (`node tools/modelar/assinatura-da-malha.mjs carro-fastback/lataria --contra=<antes>`, a assinatura em nanômetro). A primeira é o `ponto` exato na planta, que antes vinha da corda: a curva anda até 0,0097 mm (0,0040 a 0,0095 mm nas outras quatro curvas, que a receita já não lia pela corda), a chapa passa de 117451 a 117454 faces, o para-lama traseiro de 8726 a 8728, o rebaixo fica com 4034, e as caixas mudam em até 0,001 mm. A segunda é a cópia da receita, que integrava de milímetro em milímetro sem quebrar o passo nos joelhos, onde a curvatura tem quina: ela diferia da curva exata em 4e-9 a 7,5e-7 mm conforme a curva (o maior no perfil da traseira), e com o `ponto` da corda mantido na planta por experimento a chapa e o para-lama ainda mudam de assinatura, com as mesmas contagens de faces e as mesmas caixas, e o rebaixo fica idêntico. O rumo da cópia e o `rumoEm` diferem em até 2e-15 rad.
+
+## Fatia 5: o objetivo de lisura e as opções da forma
+
+`ajustarCurvaLisa` ganhou cinco opções, todas fora do padrão. O padrão dá o mesmo ajuste de antes, bit a bit: a revisão conferiu onze casos contra a versão da main, e eu conferi quatro contra um registro gravado antes da mudança. As cinco curvas guardadas da lataria do carro-fastback continuam conferindo, com os mesmos desvios. Com `objetivo: 'lisura'`, entre os ajustes que cabem fica o de menor variação total de curvatura, que é a soma de |Δk| entre os joelhos e sai em `variacaoDaCurvatura`. Os três de menor variação são refeitos com o peso da variação dobrado enquanto cabem; quando um falha, tenta-se a média geométrica entre o último que coube e o que falhou, até os dois ficarem a 20% um do outro. A mesma busca corre nos pontos invertidos, com os duros e os rumos acompanhando, e por isso os pontos na ordem inversa dão a mesma curva percorrida ao contrário. Com `esparsos: true`, o desvio da curva à poligonal e o teto de comprimento saem, porque a poligonal de poucos pontos é corda, e `cabe` passa a cobrar que a curva gire menos de pi entre dois pontos seguidos. `trechoMinimo` é o comprimento mínimo de cada clotoide na unidade dos pontos, no lugar do piso de 1% do arco. `rumoInicio` e `rumoFim` dão o rumo exato nas pontas: o do início é o próprio parâmetro, e o do fim sai da última curvatura pela conta do giro. As opções da forma entram na impressão do ajuste guardado só quando fogem do padrão, e por isso `VERSAO_DO_AJUSTE` ficou em 3.
+
+As provas, em `procedural/nucleo/ajuste-de-curva-lisa-lisura.test.mjs`, usam curvas fora do carro, a ×1e-3, ×1 e ×1e3 e em mais de uma densidade: o quarto de elipse limpo e com ruído, e o filete de 90 graus entre retas, com pontos a cada 1,5, 2 e 0,5 mm. Em todos os casos a lisura cabe, a variação dela não passa da do padrão, e a curva dos pontos invertidos fica a menos de 1e-9 do comprimento da outra (a revisão mediu de 2e-16 a 2e-15). No filete com ruído a variação, adimensional (vezes o comprimento), cai de 55,5 para 47,5, e na elipse com ruído cai de 5,21 para 5,09. A meia volta de raio 300 dada por 5 pontos não cabe como pontos densos, porque a corda fica a 22,8 mm da curva, e cabe como esparsos num arco só de raio 300. O rumo fixo sai exato no início e a 1e-12 no fim, inclusive quando é declarado com uma volta a mais ou a menos.
+
+### A lataria do carro-fastback com a lisura
+
+A medida foi feita numa cópia temporária da lataria, com os mesmos pontos e tolerâncias da receita, e a cópia foi apagada depois, porque a geometria do carro está congelada pela outra frente. A tabela dá a variação de curvatura das cinco curvas no padrão e com a lisura:
+
+| Curva | Padrão | Lisura | Lisura com trecho mínimo |
+|---|---|---|---|
+| planta | 9 clotoides, 8,59 1/m, trecho mais curto 43 mm, 2,3 s | 12, 7,05 1/m, 43 mm, 15,4 s | 40 mm: 12, 7,24 1/m |
+| teto | 4, 4,48 1/m, 282 mm | 4, 3,16 1/m, 215 mm | 40 mm: 4, 3,06 1/m |
+| quinaDoTeto.x | 4, 6,86 1/m, 226 mm | 4, 6,02 1/m, 250 mm | 40 mm: 5, 4,97 1/m |
+| quinaDoTeto.y | 5, 7,62 1/m, 38 mm | 7, 4,48 1/m, 21 mm | 40 mm: 6, 5,52 1/m, 102 mm |
+| traseira | 7, 126,1 1/m, 41 mm | 9, 100,5 1/m, 8 mm | 30 mm: 10, 108,0 1/m; com 40 mm não cabe (3,65 mm) |
+
+A lisura tira de 12% a 41% da variação total em todas as curvas. Na quina em y e no perfil da traseira, porém, ela a concentra num trecho curto (21 e 8 mm), que é o defeito que o campo `sentido` da receita contornava. Com `trechoMinimo` de 40 mm (30 na traseira) os trechos curtos somem e a variação fica de 14% a 35% abaixo da do padrão.
+
+A zebra numérica, com as regiões de `carro-caixas.json` e os padrões da ferramenta, dá em cada célula os extremos, os laços inteiros e os laços esperados:
+
+| Região | Padrão | Lisura com trecho mínimo |
+|---|---|---|
+| `porta` | 2; 0; 0,215 | 2; 0; 0,218 |
+| `tras` | 7; 2; 1,528 | 8; 2; 1,483 |
+| `trasSemArco` | 4; 1; 0,823 | 4; 0; 0,371 |
+| `ombro` | 14; 3; 6,108 | 14; 4; 5,936 |
+| `coluna` | 3; 1; 0,321 | 3; 0; 0,308 |
+| `teto` | 0; 0; 0 | 0; 0; 0 |
+| `tampa` | 6; 13; 12,023 | 7; 12; 11,697 |
+| `traseira` | 6; 4; 3,781 | 6; 5; 4,029 |
+
+O flanco atrás da porta, sem o furo do arco, perde o laço inteiro e mais da metade dos laços esperados; a coluna perde o laço, e a traseira ganha um. As imagens de zebra e de pintura brilhante das duas versões, lado a lado nas vistas de lado, três quartos e traseira, foram para a pessoa aprovar. Nelas a diferença é pequena e fica no flanco junto do arco. Passar a receita para a lisura é decisão do plano do carro, hoje congelado.
+
+### Revisão adversarial
+
+A revisão não achou bloqueio no núcleo. Ela confirmou o padrão bit a bit, a invariância ao sentido em 25 casos e nenhum `cabe` verdadeiro acima da tolerância em 1721 combinações. Achou cinco pontos, todos corrigidos e cobertos por teste:
+
+- O rumo do início contrário aos pontos (pi, ou 3,5 rad num arco de 90 graus) levava o comprimento a negativo, e a chamada recusava em vez de dar `cabe` falso. Agora, quando a forma é declarada, o comprimento vale o positivo.
+- A curva de uma clotoide só podia sair mais curta que `trechoMinimo` com `cabe` verdadeiro. Agora o motivo diz isso.
+- O rumo de módulo gigante (1e17) era trocado em silêncio. Agora, acima de 1000 voltas, ele é recusado.
+- A ficha dizia que a lisura custa de 2 a 5 vezes o padrão, e o medido vai de 1,3 a 7 vezes (na planta, 17 s contra 2,4 s).
+- O teste novo leva 30 s e entrou em `TESTES_LENTOS`.
+
+### Atritos da fatia 5
+
+1. O primeiro passo da lisura multiplicava o peso da variação por 4 de uma vez, e no filete com ruído nenhum ajuste cabia já nesse passo, de modo que a lisura devolvia o mesmo que o padrão.
+   Custo: uma rodada de medida.
+   O processo pegou: não; quem mostrou foi a comparação da variação dos dois objetivos, medida à mão.
+   Destino: ferramenta e teste. O peso agora dobra, com bisseção, e o teste cobra que a lisura tire variação no filete com ruído.
+2. Quando havia duros, os rumos virados para a busca nos pontos invertidos caíam uma volta fora do giro desses pontos, e a curva dos pontos invertidos saía a 0,6 mm da outra.
+   Custo: uma rodada de correção.
+   O processo pegou: sim, o teste da invariância com duros e rumos.
+   Destino: ferramenta; os rumos da volta são normalizados pelos pontos invertidos.
+3. `tools/modelar/regravar-ajustes-de-curva.test.mjs` já reprovava no Windows antes desta mudança. O dado regravado é o mesmo, e muda só a barra do caminho no cabeçalho do arquivo gerado.
+   Custo: uns 5 minutos para descartar a causa.
+   O processo pegou: não, porque o CI roda em Linux.
+   Destino: backlog, o caminho do cabeçalho gravado em barra normal.
+4. O roteiro `nucleo` pedido na tarefa não existe em `npm run comecar`; o roteiro certo é `mudar/plano`.
+   Custo: nenhum.
+   O processo pegou: sim, o `comecar` recusou e listou os roteiros.
+   Destino: instrução, no relatório da tarefa em `comunicacao.md`.

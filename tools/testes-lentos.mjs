@@ -17,6 +17,9 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { lerHistorico } from './vitest-duracoes.mjs';
 
 export const TESTES_LENTOS = [
+  /* 2026-11-21: o objetivo de lisura de `ajustarCurvaLisa` em três escalas e duas densidades, cada caso ajustado nos dois sentidos dos pontos; uns 30 s
+     (plano das curvas lisas, fatia 5) */
+  'procedural/nucleo/ajuste-de-curva-lisa-lisura.test.mjs',
   /* 2026-11-18: o dado guardado dos ajustes de curva lisa conferido em cada receita do acervo que os declara (hoje a lataria do carro, cinco ajustes): refaz os ajustes,
      11 s com a máquina livre e o dobro ou o triplo no CI */
   'tools/modelar/regravar-ajustes-de-curva.test.mjs',
