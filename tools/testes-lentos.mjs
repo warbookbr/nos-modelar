@@ -17,6 +17,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { lerHistorico } from './vitest-duracoes.mjs';
 
 export const TESTES_LENTOS = [
+  /* 2026-11-21: a porta de autoria confere a forma pedida montando a peça; 19 s sozinho e 43 s na bateria do CI */
+  'src/autoria/porta-confere-forma.test.js',
   /* 2026-11-21: o objetivo de lisura de `ajustarCurvaLisa` em três escalas e duas densidades, cada caso ajustado nos dois sentidos dos pontos; uns 30 s
      (plano das curvas lisas, fatia 5) */
   'procedural/nucleo/ajuste-de-curva-lisa-lisura.test.mjs',
