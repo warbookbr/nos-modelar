@@ -4,9 +4,8 @@
 
 **Planos ativos:**
 
-1. [ferramentas de correção de superfície](2026-11-16-ferramentas-de-correcao-de-superficie.md). Território: `procedural/nucleo/gaiola-por-rede.js`, `procedural/nucleo/gaiola-por-rede-liso.js`, `procedural/nucleo/curva-da-gaiola.js`, `procedural/nucleo/operacoes/abertura-por-contorno.js`, `procedural/nucleo/subdivisao.js`, `procedural/nucleo/alisar-curvas.js`, `tools/fixtures/correcao-de-superficie/`, `docs/modelar/banco-de-provas/correcao-de-superficie-2026-11-16/` e os testes deles. Em aberto: tudo, a começar pela fatia 1 (chapas de prova e linha de base, incluindo o quarto traseiro da rodada 2). O plano do robô humanoide foi congelado em 2026-11-16 para dar este lugar.
-2. [modelagem de carro de passeio](2026-11-14-modelagem-de-carro.md). Território: `procedural/pecas/carro-fastback/`, `docs/modelar/banco-de-provas/carro-fastback-2026-11-14/`, `tools/modelar/ondulacao-da-superficie.mjs`, `procedural/criterios/veiculo.json`, `procedural/familias/roda-pneu/`. Em aberto: a fatia 2 (o quarto traseiro como piloto); a fatia 1 fechou com a prancha das quatro vistas e o alinhamento aceitos.
-3. [divisão por contorno](2026-11-18-divisao-por-contorno.md). Território: a operação nova de divisão por contorno e o teste dela, a entrada dela no registro e a pasta de provas do plano.
+1. [modelagem de carro de passeio](2026-11-14-modelagem-de-carro.md). Território: `procedural/pecas/carro-fastback/`, `docs/modelar/banco-de-provas/carro-fastback-2026-11-14/`, `tools/modelar/ondulacao-da-superficie.mjs`, `procedural/criterios/veiculo.json`, `procedural/familias/roda-pneu/`. Em aberto: a fatia 2 (o quarto traseiro como piloto); a fatia 1 fechou com a prancha das quatro vistas e o alinhamento aceitos.
+2. [divisão por contorno](2026-11-18-divisao-por-contorno.md). Território: a operação nova de divisão por contorno e o teste dela, a entrada dela no registro e a pasta de provas do plano.
 
 A lista está em ordem de prioridade. A ordem desempata quando dois planos precisam do mesmo arquivo: o de menor prioridade espera ou pede à pessoa que mude o território.
 
