@@ -1,6 +1,6 @@
-# Curvas lisas e zebra numérica: fatia 1, a zebra numérica e o aviso de área
+# Curvas lisas e zebra numérica: a zebra numérica, o ajuste de curva lisa e o objetivo de lisura
 
-Registro da fatia 1 do plano [curvas lisas e zebra numérica](../../planos/2026-11-17-curvas-lisas-e-zebra-numerica.md), medida em 2026-11-17, antes de qualquer mudança de forma.
+Registro das fatias 1 a 5 do plano [curvas lisas e zebra numérica](../../decisoes/PLANOS-ENCERRADOS.md), medida em 2026-11-17, antes de qualquer mudança de forma.
 
 ## O que entrou
 

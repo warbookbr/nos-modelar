@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2157 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2156 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -272,7 +272,7 @@
 
 ## docs/modelar/banco-de-provas/curvas-lisas-2026-11-17/
 
-- `README.md` — Curvas lisas e zebra numérica: fatia 1, a zebra numérica e o aviso de área
+- `README.md` — Curvas lisas e zebra numérica: a zebra numérica, o ajuste de curva lisa e o objetivo de lisura
 
 ## docs/modelar/banco-de-provas/desenho-braco-2026-10-14/
 
@@ -637,7 +637,6 @@
 - `2026-11-16-eletronica-no-modelar.md` — O lado Modelar da mecatrônica: plano-raiz que gera a família de componentes e a ponte
 - `2026-11-16-ferramentas-de-correcao-de-superficie.md` — Ferramentas de correção de superfície: alisar as curvas pela medida, cortar com simetria e emendar com continuidade declarada, rumo ao G2 de produção
 - `2026-11-16-ponte-com-a-mecatronica.md` — Ponte com a mecatrônica: a ficha do objeto exportada, as portas elétricas declaradas e o pedido que volta conferido
-- `2026-11-17-curvas-lisas-e-zebra-numerica.md` — Curvas lisas e zebra numérica: a curva lida da prancha vira poucos trechos de curvatura monótona, e a ondulação longa que o crítico vê vira número
 - `2026-11-17-trilhas-e-validacao-da-placa.md` — Trilhas de cobre e validação elétrica da placa declarada: a lista de ligações vira cobre conferido por regra e por conectividade
 - `2026-11-18-divisao-por-contorno.md` — Divisão por contorno: a parte de uma chapa sai com a borda na curva declarada, e não em dentes de serra
 - `BACKLOG.md` — Backlog aberto
