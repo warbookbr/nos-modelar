@@ -1,0 +1,38 @@
+{
+  "formato": "mecanifica.andaime-global@2",
+  "id": "andaime-carro-quadrado",
+  "objetivo": "esqueleto-da-carroceria",
+  "alvo": "alvo-carro-quadrado",
+  "familia": "veiculo",
+  "intencao": "Pontos duros da perua quadrada de duas portas (4050 x 1620 x 1390 mm, entre-eixos 2360 mm) tirados das quatro pranchas lidas pela grade calibrada e revisadas pelo crítico visual.",
+  "unidade": "mm",
+  "eixos": {
+    "direita": "+x",
+    "cima": "+y",
+    "frente": "+z"
+  },
+  "envelope": {
+    "min": [-835, 0, -2025],
+    "max": [835, 1390, 2025]
+  },
+  "landmarks": [
+    { "id": "labio-dianteiro", "posicao": [0, 185, 1915] },
+    { "id": "nariz", "posicao": [0, 765, 1970] },
+    { "id": "eixo-dianteiro", "posicao": [0, 290, 1235] },
+    { "id": "eixo-traseiro", "posicao": [0, 290, -1125] },
+    { "id": "base-do-para-brisa", "posicao": [0, 935, 845] },
+    { "id": "topo-do-para-brisa", "posicao": [0, 1378, 310] },
+    { "id": "pico-do-teto", "posicao": [0, 1390, -300] },
+    { "id": "topo-traseiro", "posicao": [0, 1384, -1510] },
+    { "id": "base-da-tampa", "posicao": [0, 955, -1955] },
+    { "id": "base-traseira", "posicao": [0, 230, -1945] }
+  ],
+  "volumes": [
+    { "id": "corpo-de-baixo", "min": [-810, 185, -2025], "max": [810, 955, 2025] },
+    { "id": "cabine", "min": [-660, 935, -1955], "max": [660, 1390, 845] },
+    { "id": "roda-dianteira-esq", "centro": [682.5, 290, 1235], "raio": 290, "largura": 205 },
+    { "id": "roda-dianteira-dir", "centro": [-682.5, 290, 1235], "raio": 290, "largura": 205 },
+    { "id": "roda-traseira-esq", "centro": [682.5, 290, -1125], "raio": 290, "largura": 205 },
+    { "id": "roda-traseira-dir", "centro": [-682.5, 290, -1125], "raio": 290, "largura": 205 }
+  ]
+}
