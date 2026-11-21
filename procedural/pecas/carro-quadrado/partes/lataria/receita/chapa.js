@@ -60,7 +60,7 @@ export function derivarChapa(T) {
     const b = nos[`f_${NIVEIS[j]}`];
     curvas.push({ nome: `F${j}`, pontos: [nome(0, j), fixo(interpArco(a, b, 0.33)), fixo(interpArco(a, b, 0.67)), `f_${NIVEIS[j]}`], peso: 0.05 });
   }
-  curvas.push({ nome: 'F3', pontos: [nome(0, 3), fixo(interpArco(nos[nome(0, 3)], nos.f_quina, 0.5)), 'f_quina', 'f_cintura'], peso: 0.05 });
+  curvas.push({ nome: 'F3', pontos: [nome(0, 3), fixo(interpArco(nos[nome(0, 3)], nos.f_quina, 0.5)), 'f_quina', fixo([220, nos.f_cintura[1], nos.f_cintura[2]]), 'f_cintura'], peso: 0.05 });
   curvas.push({ nome: 'Fquina', pontos: [nome(0, 4), 'f_quina'], peso: 0.05 });
   curvas.push({ nome: 'perfilFrente', pontos: Array.from({ length: LADO }, (_, k) => `f_${NIVEIS[LADO - 1 - k]}`), peso: 0.05 });
   const fe = nos[nome(0, 5)];

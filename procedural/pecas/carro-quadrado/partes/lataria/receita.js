@@ -8,7 +8,7 @@ import { ALIASES_FRENTE_TRASEIRA, passosFrenteTraseira } from './receita/frente-
 
 export const TABELA = {
   chapa: { espessura: 8, passo: 200, niveis: 2, anguloMax: 20, liso: false },
-  estacoes: [1910, 1550, 1235, 845, 310, -300, -1125, -1530, -1900],
+  estacoes: [1910, 1550, 1235, 845, 310, -300, -1125, -1530, -1715, -1900],
   secoes: {
     1910:    [[775, 255], [800, 425], [800, 595], [760, 775], [650, 785], 790],
     1550:    [[795, 255], [815, 425], [815, 595], [775, 815], [680, 835], 842],
@@ -18,13 +18,14 @@ export const TABELA = {
     '-300':  [[810, 255], [835, 425], [835, 595], [775, 945], [580, 1378], 1390],
     '-1125': [[810, 255], [835, 425], [835, 595], [775, 945], [580, 1376], 1388],
     '-1530': [[805, 255], [825, 425], [825, 595], [775, 945], [580, 1375], 1386],
+    '-1715': [[792, 262], [815, 425], [815, 590], [770, 948], [648, 1192], 1198],
     '-1900': [[780, 270], [805, 425], [805, 585], [765, 950], [715, 1009], 1011],
   },
   frente: [
     [0, 255, 1940],
     [0, 425, 2005],
     [0, 595, 2020],
-    [0, 765, 1970],
+    [0, 780, 1966],
   ],
   traseira: [
     [0, 315, -1945],
@@ -51,11 +52,11 @@ export const TABELA = {
   },
   parachoqueDianteiro: {
     y0: 215, y1: 515, xTrilho: 785, zFrente: 2025, zLateral: 1585, raioCanto: 95,
-    avanco: 60, saia: 22, recuo: -12, frisoY: 455, frisoAlt: 12, frisoSaida: 5,
+    avanco: 60, saia: 22, recuo: 90, frisoY: 455, frisoAlt: 12, frisoSaida: 5,
   },
   parachoqueTraseiro: {
     y0: 250, y1: 515, xTrilho: 790, zTras: -2025, zLateral: -1480, raioCanto: 90,
-    avanco: 55, saia: 20, recuo: -12, frisoY: 465, frisoAlt: 12, frisoSaida: 5,
+    avanco: 55, saia: 20, recuo: 45, frisoY: 465, frisoAlt: 12, frisoSaida: 5,
   },
   frisoLateral: {
     yCentro: 515, largura: 56, altura: 18, chanfro: 4, deslocamentoMm: -2,
