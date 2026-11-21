@@ -106,7 +106,8 @@ export function gerarPassos(T) {
   const { rede, varridos } = derivar(T);
   const arcoD = fazerArcoD(T);
   const arcoT = fazerArcoT(T);
-  const { medidas: _, ...passoRede } = rede.passo;
+  const { medidas: _, cantos: cantosRede, ...passoRede } = rede.passo;
+  const cantosChapa = (cantosRede ?? []).filter((c) => c !== 'f_cintura' && c !== 't_cintura');
 
   let nid = 12;
   const proxId = () => { const atual = nid; nid += 1; return atual; };
@@ -130,7 +131,7 @@ export function gerarPassos(T) {
   const selFinal = { origem: rebaixoPlaca.origem };
 
   const passosChapa = [
-    ['subdivisao', { origemId: 1, ...passoRede, borda: 'cantos', niveis: T.chapa.niveis, espessura: m(T.chapa.espessura), costuraExata: true }],
+    ['subdivisao', { origemId: 1, ...passoRede, cantos: cantosChapa, borda: 'cantos', niveis: T.chapa.niveis, espessura: m(T.chapa.espessura), costuraExata: true }],
     ...arcoD.passos,
     ...arcoT.passos,
     ['aberturaPorContorno', { origemId: 6, chapa: { origem: { op: 'subtrair', id: 5 } }, vista: 'x', sentido: '+', simetria: 'x', contorno: contornoComFilete(T.vidros.porta) }],
