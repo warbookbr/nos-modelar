@@ -1,8 +1,10 @@
 # Rebaixo por contorno: o degrau, o sulco e a borda rebaixada num corpo
 
-**Estado:** rascunho
+**Estado:** ativo
 
-**Território:** nenhum (aguarda aprovação)
+**Território:** `procedural/nucleo/rebaixo-por-contorno.js`, `procedural/nucleo/rebaixo-por-contorno.test.mjs`, `tools/fixtures/rebaixo-por-contorno/`, `docs/modelar/banco-de-provas/rebaixo-por-contorno-2026-11-20/`
+
+Ativado pela pessoa em 2026-11-20 para cobrir rebaixo de placa, concha de maçaneta, tomadas do capô e degraus estampados em carroceria sem furar a chapa inteira.
 
 **Responsável:** a definir; proposta: a IA da sessão da empilhadeira conduz e
 mede, e a pessoa julga a forma por imagem.

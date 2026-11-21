@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2142 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2152 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -636,6 +636,7 @@
 - `2026-11-17-curvas-lisas-e-zebra-numerica.md` — Curvas lisas e zebra numérica: a curva lida da prancha vira poucos trechos de curvatura monótona, e a ondulação longa que o crítico vê vira número
 - `2026-11-17-trilhas-e-validacao-da-placa.md` — Trilhas de cobre e validação elétrica da placa declarada: a lista de ligações vira cobre conferido por regra e por conectividade
 - `2026-11-18-divisao-por-contorno.md` — Divisão por contorno: a parte de uma chapa sai com a borda na curva declarada, e não em dentes de serra
+- `2026-11-20-conformacao-na-chapa-e-sobreposicao-3d.md` — Conformação sobre a casca e sobreposição ortográfica 3D: peças coladas à curvatura da lataria e desvio 3D medido desde a rodada 1
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
@@ -1669,6 +1670,27 @@
 ## procedural/pecas/carro-policia/referencias/
 
 - `alvo.md` — Alvo: carro-policia
+
+## procedural/pecas/carro-quadrado/
+
+- `ALINHAMENTO.md` — Carro quadrado: alinhamento
+
+## procedural/pecas/carro-quadrado/partes/lataria/
+
+- `receita.js` — carro-quadrado/lataria — lataria completa da perua quadrada de duas portas (4.050 × 1.670 × 1.390 mm). As medidas vêm de `../../andaime.json` e das quatro fo…
+
+## procedural/pecas/carro-quadrado/partes/lataria/receita/
+
+- `chapa.js` — carro-quadrado/lataria/receita/chapa.js — gaiola da chapa contínua, arcos de roda e helpers de abertura.
+- `frente-traseira.js` — carro-quadrado/lataria/receita/frente-traseira.js — grade, faróis, setas, lanternas, placas, puxador, fechadura e escapamento.
+- `parachoques.js` — carro-quadrado/lataria/receita/parachoques.js — para-choques envolventes com friso claro e frisos laterais.
+
+## procedural/pecas/carro-quadrado/referencias/
+
+- `frontal.prancha.mjs` — frontal.prancha.mjs — rodada 2 após achados do crítico visual sem contexto
+- `lateral.prancha.mjs` — lateral.prancha.mjs — rodada 2 após achados do crítico visual sem contexto
+- `superior.prancha.mjs` — superior.prancha.mjs — rodada 2 após achados do crítico visual sem contexto
+- `traseira.prancha.mjs` — traseira.prancha.mjs — rodada 2 após achados do crítico visual sem contexto
 
 ## procedural/pecas/carro-sedan-angular/
 
