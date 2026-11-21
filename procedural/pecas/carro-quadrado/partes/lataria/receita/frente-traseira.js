@@ -122,25 +122,37 @@ export function passosFrenteTraseira(T, proxId) {
   marcar('parachoqueDianteiro', 'plasticoPreto', { origem: oEntLam });
   marcar('parachoqueDianteiro', 'plasticoPreto', { origem: { op: 'arranja', id: idEntLams, de: oEntLam } });
 
-  // --- LANTERNAS TRASEIRAS (3 faixas empilhadas + carcaça recuada) ---
+  // --- LANTERNAS TRASEIRAS (moldura trapezoidal contínua sem fresta + lentes niveladas na inclinação do vão) ---
   const lt = t.lanterna;
+  const xExt = (y) => lt.x1 - 20 * ((y - 535) / 280);
+  const trapZ = (id, x0, y0, y1, x1a, x1b, z0, z1) => [
+    'extrusao',
+    {
+      origemId: id,
+      eixo: 'z',
+      altura: m(z1 - z0),
+      em: [0, 0, m(z0)],
+      perfil: [[m(x0), m(-y0)], [m(x1a), m(-y0)], [m(x1b), m(-y1)], [m(x0), m(-y1)]],
+    },
+  ];
   const idLtCarc = proxId();
-  const oLtCarc = { op: 'cubo', id: idLtCarc };
-  passos.push(caixa('cubo', idLtCarc, lt.x0, lt.x1 - 12, lt.yRe[0] - 2, lt.ySeta[1] + 2, lt.zCarc0, lt.zCarc1));
+  const oLtCarc = { op: 'extrusao', id: idLtCarc };
+  passos.push(trapZ(idLtCarc, lt.x0 - 6, lt.yRe[0] - 8, lt.ySeta[1] + 8, xExt(lt.yRe[0] - 8) + 6, xExt(lt.ySeta[1] + 8) + 6, lt.zCarc0, lt.zCarc1));
   const idLtCarcE = proxId();
   passos.push(['espelha', { eixo: 'x', origemId: idLtCarcE, derivaDe: oLtCarc, sel: { origem: oLtCarc } }]);
   marcar('lanternaTraseira', 'plasticoFosco', { origem: oLtCarc });
   marcar('lanternaTraseira', 'plasticoFosco', { origem: { op: 'espelha', id: idLtCarcE, de: oLtCarc } });
 
   const faixas = [
-    { y: lt.yRe, x1: lt.x1, z0: lt.zFrente, mat: 'lanternaRe' },
-    { y: lt.yFreio, x1: lt.x1 - 4, z0: lt.zFrente, mat: 'lanternaFreio' },
-    { y: lt.ySeta, x1: lt.x1 - 10, z0: lt.zFrente + 4, mat: 'lanternaSeta' },
+    { x0: lt.x0, y0: lt.yRe[0], y1: lt.yRe[1] - 1, x1a: lt.x0 + 56, x1b: lt.x0 + 56, mat: 'lanternaRe' },
+    { x0: lt.x0 + 57, y0: lt.yRe[0], y1: lt.yRe[1] - 1, x1a: xExt(lt.yRe[0]), x1b: xExt(lt.yRe[1]), mat: 'lanternaFreio' },
+    { x0: lt.x0, y0: lt.yFreio[0] + 1, y1: lt.yFreio[1] - 1, x1a: xExt(lt.yFreio[0]), x1b: xExt(lt.yFreio[1]), mat: 'lanternaFreio' },
+    { x0: lt.x0, y0: lt.ySeta[0] + 1, y1: lt.ySeta[1], x1a: xExt(lt.ySeta[0]), x1b: xExt(lt.ySeta[1]), mat: 'lanternaSeta' },
   ];
   for (const fx of faixas) {
     const id = proxId();
-    const oFx = { op: 'chamferBox', id };
-    passos.push(caixa('chamferBox', id, lt.x0 + 1, fx.x1, fx.y[0], fx.y[1], fx.z0, lt.zTras, 4));
+    const oFx = { op: 'extrusao', id };
+    passos.push(trapZ(id, fx.x0, fx.y0, fx.y1, fx.x1a, fx.x1b, lt.zFrente, lt.zTras));
     const idE = proxId();
     passos.push(['espelha', { eixo: 'x', origemId: idE, derivaDe: oFx, sel: { origem: oFx } }]);
     marcar('lanternaTraseira', fx.mat, { origem: oFx });

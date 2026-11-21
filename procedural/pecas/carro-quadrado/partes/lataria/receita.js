@@ -121,10 +121,10 @@ export function gerarPassos(T) {
     centroDaVista: -2000,
     comprimento: 600,
     contorno: contornoComFilete([
-      [-(plT.larg / 2 + 25), plT.yCentro - plT.alt / 2 - 22, 15],
-      [plT.larg / 2 + 25, plT.yCentro - plT.alt / 2 - 22, 15],
-      [plT.larg / 2 + 25, plT.yCentro + plT.alt / 2 + 22, 15],
-      [-(plT.larg / 2 + 25), plT.yCentro + plT.alt / 2 + 22, 15],
+      [-232, plT.yCentro - plT.alt / 2 - 20, 14],
+      [232, plT.yCentro - plT.alt / 2 - 20, 14],
+      [252, plT.yCentro + plT.alt / 2 + 24, 14],
+      [-252, plT.yCentro + plT.alt / 2 + 24, 14],
     ]),
     ids: { copia: proxId(), prisma: proxId(), ferramenta: proxId(), subtrair: proxId() },
   });
