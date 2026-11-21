@@ -38,7 +38,7 @@ export function derivarChapa(T) {
     nos[`t_${NIVEIS[j]}`] = fixo(T.traseira[j]);
   }
   nos.f_quina = fixo([650, 775, 1962]);
-  nos.t_quina = fixo([700, 955, -1950]);
+  nos.t_quina = fixo([745, 955, -2005]);
 
   const curvas = [];
   zs.forEach((z, i) => {
@@ -70,9 +70,12 @@ export function derivarChapa(T) {
   for (let j = 0; j < LADO - 1; j += 1) {
     const a = nos[nome(iJ, j)];
     const b = nos[`t_${NIVEIS[j]}`];
-    curvas.push({ nome: `Q${j}`, pontos: [nome(iJ, j), fixo(interpArco(a, b, 0.33)), fixo(interpArco(a, b, 0.67)), `t_${NIVEIS[j]}`], peso: 0.05 });
+    /* traseira quadrada: dobra firme no canto e chega reta até o centro x = 0 */
+    const p1 = fixo([a[0] * 0.96, a[1] + (b[1] - a[1]) * 0.4, b[2] + 18]);
+    const p2 = fixo([a[0] * 0.55, a[1] + (b[1] - a[1]) * 0.85, b[2] + 3]);
+    curvas.push({ nome: `Q${j}`, pontos: [nome(iJ, j), p1, p2, `t_${NIVEIS[j]}`], peso: 0.05 });
   }
-  curvas.push({ nome: 'Q3', pontos: [nome(iJ, 3), fixo(interpArco(nos[nome(iJ, 3)], nos.t_quina, 0.5)), 't_quina', 't_cintura'], peso: 0.05 });
+  curvas.push({ nome: 'Q3', pontos: [nome(iJ, 3), fixo([760, 952, -1985]), 't_quina', fixo([380, nos.t_cintura[1], nos.t_cintura[2]]), 't_cintura'], peso: 0.05 });
   curvas.push({ nome: 'Qquina', pontos: [nome(iJ, 4), 't_quina'], peso: 0.05 });
   curvas.push({ nome: 'perfilTraseira', pontos: Array.from({ length: LADO }, (_, k) => `t_${NIVEIS[LADO - 1 - k]}`), peso: 0.05 });
   const te = nos[nome(iJ, 5)];

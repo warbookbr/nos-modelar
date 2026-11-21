@@ -71,7 +71,7 @@ export const TABELA = {
     neblina: { xCentro: 520, yCentro: 290, larg: 150, alt: 68, z0: 2036, z1: 2078 },
   },
   traseiraPecas: {
-    lanterna: { x0: 655, x1: 776, yRe: [540, 610], yFreio: [610, 735], ySeta: [735, 810], zCarc0: -1955, zCarc1: -1918, zFrente: -1972, zTras: -1924 },
+    lanterna: { x0: 655, x1: 776, yRe: [540, 610], yFreio: [610, 735], ySeta: [735, 810], zCarc0: -2008, zCarc1: -1918, zFrente: -2020, zTras: -1924 },
     placa: { larg: 340, alt: 135, yCentro: 695, z0: -2024, z1: -2005 },
     puxador: { larg: 460, alt: 30, yCentro: 795, z0: -2008, z1: -1980 },
     fechadura: { yCentro: 580, raio: 18, z0: -2032, z1: -2017 },
