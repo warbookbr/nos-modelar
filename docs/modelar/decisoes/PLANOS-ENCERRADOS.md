@@ -4,6 +4,7 @@ O texto inteiro de cada plano está no git, no commit `a60c067b`, em `docs/model
 
 Plano encerrado não governa trabalho novo: não abre implementação, não reabre escopo e não autoriza nada por analogia. As decisões que continuam valendo estão em `registros/`, nesta pasta; o plano em jogo mora em `../planos/README.md`, e o que saiu de cena por mudança de rota e pode voltar, em `../planos/congelados/README.md`.
 
+- `2026-11-18-divisao-por-contorno.md`: divisaoPorContorno fecha partes na curva (inclusive pela borda da chapa e boca de vao), provada no paralamaTraseiro e rebaixoLateral do carro-fastback. O texto está no commit `367c0300`, em `docs/modelar/planos/2026-11-18-divisao-por-contorno.md`.
 - `2026-11-20-conformacao-na-chapa-e-sobreposicao-3d.md`: entregou modelo:sobrepor e conformarNaChapa no núcleo com 14 testes, revisão adversarial sem bloqueios e prova no carro quadrado. O texto está no commit `681870c9`, em `docs/modelar/planos/2026-11-20-conformacao-na-chapa-e-sobreposicao-3d.md`.
 - `2026-11-20-ferramentas-de-prancha-para-ia.md`: entregou referencia:grade, prancha:coerencia e prancha:sobrepor com 12 testes e atualização da skill desenhar-prancha. O texto está no commit `8f135105`, em `docs/modelar/planos/2026-11-20-ferramentas-de-prancha-para-ia.md`.
 - `2026-11-18-ferramentas-das-rodadas.md`: as guardas da decisão da pessoa e do esperado dos pontos, o cache nas medidas, o pente guiado pela zebra e o pacote por rodada com antes e depois. O texto está no commit `b2b97f02`, em `docs/modelar/planos/2026-11-18-ferramentas-das-rodadas.md`.
