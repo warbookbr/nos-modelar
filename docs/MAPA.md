@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2155 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2158 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -272,7 +272,7 @@
 
 ## docs/modelar/banco-de-provas/curvas-lisas-2026-11-17/
 
-- `README.md` — Curvas lisas e zebra numérica: fatia 1, a zebra numérica e o aviso de área
+- `README.md` — Curvas lisas e zebra numérica: a zebra numérica, o ajuste de curva lisa e o objetivo de lisura
 
 ## docs/modelar/banco-de-provas/desenho-braco-2026-10-14/
 
@@ -430,6 +430,10 @@
 ## docs/modelar/banco-de-provas/prancha-apoio-ia-2026-11-20/
 
 - `README.md` — Banco de provas — ferramentas de prancha para IA (2026-11-20)
+
+## docs/modelar/banco-de-provas/rebaixo-por-contorno-2026-11-20/
+
+- `README.md` — Rebaixo por contorno: provas do ajudante e aplicação no `carro-quadrado`
 
 ## docs/modelar/banco-de-provas/receitas-externas-2026-10-19/
 
@@ -631,13 +635,11 @@
 ## docs/modelar/planos/
 
 - `2026-11-08-ferramenta-de-material.md` — Ferramenta de material para o agente: ver, compor e reaproveitar materiais sem rodar a peça inteira
-- `2026-11-10-rebaixo-por-contorno.md` — Rebaixo por contorno: o degrau, o sulco e a borda rebaixada num corpo
 - `2026-11-14-modelagem-de-carro.md` — Modelagem de carro de passeio: o que já serve, onde a carroceria travou antes e por onde começar
 - `2026-11-14-prancha-menos-manual.md` — Prancha menos manual: desvio medido, leitura combinada de um comando e o que ficou de fora declarado
 - `2026-11-16-eletronica-no-modelar.md` — O lado Modelar da mecatrônica: plano-raiz que gera a família de componentes e a ponte
 - `2026-11-16-ferramentas-de-correcao-de-superficie.md` — Ferramentas de correção de superfície: alisar as curvas pela medida, cortar com simetria e emendar com continuidade declarada, rumo ao G2 de produção
 - `2026-11-16-ponte-com-a-mecatronica.md` — Ponte com a mecatrônica: a ficha do objeto exportada, as portas elétricas declaradas e o pedido que volta conferido
-- `2026-11-17-curvas-lisas-e-zebra-numerica.md` — Curvas lisas e zebra numérica: a curva lida da prancha vira poucos trechos de curvatura monótona, e a ondulação longa que o crítico vê vira número
 - `2026-11-17-trilhas-e-validacao-da-placa.md` — Trilhas de cobre e validação elétrica da placa declarada: a lista de ligações vira cobre conferido por regra e por conectividade
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
@@ -1019,6 +1021,7 @@
 
 - `CLAUDE.md` — Núcleo: o que só vale nesta pasta
 - `adaptador.js` — adaptador.js — projeção visual do neutro; não conhece receitas nem execução.
+- `ajuste-de-curva-lisa-lisura.test.mjs` — ajuste-de-curva-lisa-lisura.test.mjs — o objetivo de lisura de `ajustarCurvaLisa` e as opções da forma (pontos esparsos, trecho mínimo, rumo fixo nas pontas)…
 - `ajuste-de-curva-lisa-planta.test.mjs` — ajuste-de-curva-lisa-planta.test.mjs — a planta da lataria do carro-fastback (a TABELA da receita, só leitura, o contorno do polígono com filete da prancha) …
 - `ajuste-de-curva-lisa.js` — ajuste-de-curva-lisa.js — a curva lida de pontos (da prancha, de uma imagem) ajustada a poucos trechos de curvatura monótona, com o desvio de cada ponto medido
 - `ajuste-de-curva-lisa.test.mjs` — ajuste-de-curva-lisa.test.mjs — o ajuste de curva lisa em curvas analíticas conhecidas (arco, clotoide, elipse, S), limpas e com ruído de leitura, com o núme…
@@ -1148,6 +1151,8 @@
 - `pose-de-criacao.test.ts` — pose-de-criacao.test.ts — a prova de `em` e `eixo` nos geradores (A-4 / O-7).
 - `rastreio-ataque.test.ts` — rastreio-ataque.test.ts — casos de ataque ao rastreio declarado do retrato ('tocados'), trazidos da revisão adversarial de 2026-11-14: booleanas coincidentes…
 - `rastreio-do-retrato.test.ts` — rastreio-do-retrato.test.ts — o atalho do retrato da procedência devolve exatamente a procedência da conta completa.
+- `rebaixo-por-contorno.js` — rebaixo-por-contorno.js — os passos de um rebaixo, faixa em volta ou sulco estampado num sólido sem atravessá-lo
+- `rebaixo-por-contorno.test.mjs` — rebaixo-por-contorno.test.mjs — provas do ajudante rebaixoPorContorno (rebaixo fechado, faixa em volta, sulco, raio e recusas).
 - `recortar-arco.test.mjs` — recortar-arco.test.mjs — `recortarArcoNoPerfil`: o arco poligonal recortado na borda de baixo do contorno, com a fusão do corte que cai perto de um vértice.
 - `referencia-posicional.js` — referencia-posicional.js — A REGRA ÚNICA de "isto é referência por id posicional?", para o formato salvo da Oficina.
 - `referencia-posicional.test.ts` — referencia-posicional.test.ts — prova do A-22: a regra de "isto é referência por id posicional?" é UMA SÓ, e ela distingue as duas coisas que a chave `de` ca…
@@ -3156,6 +3161,10 @@
 ## tools/fixtures/proporcoes/estante/pecas/prateleira/
 
 - `receita.js` — prateleira da estante de prova: fixture neutra da conferência de proporções.
+
+## tools/fixtures/rebaixo-por-contorno/
+
+- `corpo-de-prova.js` — corpo-de-prova.js — corpo de prova neutro (sem domínio) para o plano de rebaixo por contorno.
 
 ## tools/fixtures/referencia-do-plano/ausente/
 

@@ -23,7 +23,7 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
 - [Banco de provas — conformação na chapa e sobreposição 3D (2026-11-20)](conformacao-e-sobreposicao-3d-2026-11-20/README.md) — `conformacao-e-sobreposicao-3d-2026-11-20`
 - [Correção de superfície: chapas de prova, linha de base, corte com simetria, alisamento e emenda declarada](correcao-de-superficie-2026-11-16/README.md) — `correcao-de-superficie-2026-11-16`
 - [Cordão de solda na costura de tubos: rodadas de forma e medidas](costura-em-no-de-tubos-2026-11-15/README.md) — `costura-em-no-de-tubos-2026-11-15`
-- [Curvas lisas e zebra numérica: fatia 1, a zebra numérica e o aviso de área](curvas-lisas-2026-11-17/README.md) — `curvas-lisas-2026-11-17`
+- [Curvas lisas e zebra numérica: a zebra numérica, o ajuste de curva lisa e o objetivo de lisura](curvas-lisas-2026-11-17/README.md) — `curvas-lisas-2026-11-17`
 - [Braço robótico, vista lateral: a descrição](desenho-braco-2026-10-14/DESCRICAO.md) — `desenho-braco-2026-10-14`
   - [Braço robótico, vista lateral: o resultado da prova](desenho-braco-2026-10-14/RESULTADO.md) — `desenho-braco-2026-10-14`
 - [Carcaça da empilhadeira, vista lateral: a descrição](desenho-carcaca-2026-10-14/DESCRICAO.md) — `desenho-carcaca-2026-10-14`
@@ -59,6 +59,7 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
 - [Organização dos documentos: o levantamento das decisões em vigor](organizacao-dos-documentos-2026-11-13/README.md) — `organizacao-dos-documentos-2026-11-13`
 - [Linha de base da porta de entrada dos agentes, 2026-11-05](porta-de-entrada-2026-11-05/README.md) — `porta-de-entrada-2026-11-05`
 - [Banco de provas — ferramentas de prancha para IA (2026-11-20)](prancha-apoio-ia-2026-11-20/README.md) — `prancha-apoio-ia-2026-11-20`
+- [Rebaixo por contorno: provas do ajudante e aplicação no `carro-quadrado`](rebaixo-por-contorno-2026-11-20/README.md) — `rebaixo-por-contorno-2026-11-20`
 - [Receitas do projeto externo da pessoa no esboço do Mecanifica (2026-10-19)](receitas-externas-2026-10-19/README.md) — `receitas-externas-2026-10-19`
   - [Cadeiras ajustadas (2026-10-19)](receitas-externas-2026-10-19/cadeiras-ajustadas/README.md) — `receitas-externas-2026-10-19/cadeiras-ajustadas`
   - [cadeira_ripada_simples: remodelagem em PASSOS](receitas-externas-2026-10-19/remodelagem-cadeira-ripada-simples/RELATORIO.md) — `receitas-externas-2026-10-19/remodelagem-cadeira-ripada-simples`

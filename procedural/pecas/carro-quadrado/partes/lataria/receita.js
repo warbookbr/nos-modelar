@@ -2,6 +2,7 @@
  * As medidas vêm de `../../andaime.json` e das quatro fotos em `../../referencias/locais/`.
  * Referencial: x para a direita, y para cima com o chão em 0, z para a frente (-2025 a +2025). */
 import { m, derivarChapa, projetarVista, contornoComFilete, fazerArcoD, fazerArcoT } from './receita/chapa.js';
+import { rebaixoPorContorno } from '../../../../nucleo/rebaixo-por-contorno.js';
 import { derivarParachoques, passosParachoques } from './receita/parachoques.js';
 import { ALIASES_FRENTE_TRASEIRA, passosFrenteTraseira } from './receita/frente-traseira.js';
 
@@ -105,10 +106,27 @@ export function gerarPassos(T) {
   const arcoD = fazerArcoD(T);
   const arcoT = fazerArcoT(T);
   const { medidas: _, ...passoRede } = rede.passo;
-  const selFinal = { origem: { op: 'aberturaPorContorno', id: 11 } };
 
   let nid = 12;
   const proxId = () => { const atual = nid; nid += 1; return atual; };
+
+  const plT = T.traseiraPecas.placa;
+  const rebaixoPlaca = rebaixoPorContorno({
+    corpo: { origem: { op: 'aberturaPorContorno', id: 11 } },
+    vista: 'z',
+    sentido: '-',
+    profundidade: 4,
+    centroDaVista: -2000,
+    comprimento: 600,
+    contorno: contornoComFilete([
+      [-(plT.larg / 2 + 25), plT.yCentro - plT.alt / 2 - 22, 15],
+      [plT.larg / 2 + 25, plT.yCentro - plT.alt / 2 - 22, 15],
+      [plT.larg / 2 + 25, plT.yCentro + plT.alt / 2 + 22, 15],
+      [-(plT.larg / 2 + 25), plT.yCentro + plT.alt / 2 + 22, 15],
+    ]),
+    ids: { copia: proxId(), prisma: proxId(), ferramenta: proxId(), subtrair: proxId() },
+  });
+  const selFinal = { origem: rebaixoPlaca.origem };
 
   const passosChapa = [
     ['subdivisao', { origemId: 1, ...passoRede, borda: 'cantos', niveis: T.chapa.niveis, espessura: m(T.chapa.espessura) }],
@@ -120,6 +138,7 @@ export function gerarPassos(T) {
     ['aberturaPorContorno', { origemId: 9, chapa: { origem: { op: 'aberturaPorContorno', id: 8 } }, vista: T.vidros.traseiroVista, sentido: '+', contorno: contornoComFilete(projetarVista(T.vidros.traseiroVista, T.vidros.traseiro)) }],
     ['aberturaPorContorno', { origemId: 10, chapa: { origem: { op: 'aberturaPorContorno', id: 9 } }, vista: 'z', sentido: '+', contorno: contornoComFilete(T.aberturas.frontal) }],
     ['aberturaPorContorno', { origemId: 11, chapa: { origem: { op: 'aberturaPorContorno', id: 10 } }, vista: 'z', sentido: '-', simetria: 'x', contorno: contornoComFilete(T.aberturas.lanternaTraseira) }],
+    ...rebaixoPlaca.passos,
   ];
 
   const aliasesChapa = [...arcoD.aliases, ...arcoT.aliases];
