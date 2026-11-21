@@ -1,6 +1,6 @@
 # Rebaixo por contorno: o degrau, o sulco e a borda rebaixada num corpo
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `procedural/nucleo/rebaixo-por-contorno.js`, `procedural/nucleo/rebaixo-por-contorno.test.mjs`, `tools/fixtures/rebaixo-por-contorno/`, `docs/modelar/banco-de-provas/rebaixo-por-contorno-2026-11-20/`
 
