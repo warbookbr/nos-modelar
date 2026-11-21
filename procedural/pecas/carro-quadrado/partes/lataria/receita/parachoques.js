@@ -160,7 +160,7 @@ export function passosParachoques(T, varridos, proxId, passosChapa, pontosChapa,
 
   const fl = T.frisoLateral;
   const secaoFriso = { largura: fl.largura, altura: fl.altura, chanfro: fl.chanfro };
-  const stChapa = nucleo(passosChapa, {}, pontosChapa, {}, null, aliasesChapa);
+  const stChapa = nucleo([passosChapa[0]], {}, pontosChapa, {}, null, []);
   const baseFriso = {
     malha: { st: stChapa },
     vista: 'x',

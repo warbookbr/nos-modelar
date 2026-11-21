@@ -162,7 +162,7 @@ const receita = {
   get TOPO() {
     const d = derivar(this.PARAMS);
     return {
-      origem: 'centro do carro no chão: +x direita, +y cima, +z frente',
+      origem: 'centro do carro no chão: x para a direita, y para cima, frente em +z',
       ...d.rede.pontos,
       ...d.varridos.pcD.pontos,
       ...d.varridos.pcDFriso.pontos,
@@ -205,14 +205,19 @@ const receita = {
     { contem: 'escapamento', motivo: 'tubo do escapamento fica sob o para-choque traseiro e liga ao chassi em etapa futura' },
   ],
   PONTOS,
-  vaos: [
-    { nome: 'vidroDaPorta', superficie: { op: 'aberturaPorContorno', id: 6 }, semMoldura: { motivo: 'vidro e borracha da porta são da etapa de vidros' } },
-    { nome: 'vidroLateralTraseiro', superficie: { op: 'aberturaPorContorno', id: 7 }, semMoldura: { motivo: 'vidro e borracha lateral traseiro são da etapa de vidros' } },
-    { nome: 'paraBrisa', superficie: { op: 'aberturaPorContorno', id: 8 }, semMoldura: { motivo: 'para-brisa e borracha são da etapa de vidros' } },
-    { nome: 'vidroTraseiro', superficie: { op: 'aberturaPorContorno', id: 9 }, semMoldura: { motivo: 'vidro traseiro e borracha são da etapa de vidros' } },
-    { nome: 'vaoFrontal', superficie: { op: 'aberturaPorContorno', id: 10 }, semMoldura: { motivo: 'grade, faróis e setas fecham o vão frontal diretamente' } },
-    { nome: 'vaoLanternaTraseira', superficie: { op: 'aberturaPorContorno', id: 11 }, semMoldura: { motivo: 'as lanternas traseiras fecham o vão diretamente' } },
-  ],
+  get vaos() {
+    const { rede } = derivar(this.PARAMS);
+    const bordaInferior = [...rede.linha('F0').slice().reverse(), ...rede.linha('L0').slice(1), ...rede.linha('Q0').slice(1)];
+    return [
+      { nome: 'aberturaInferior', superficie: { op: 'subdivisao', id: 1 }, borda: bordaInferior, semMoldura: { motivo: 'a abertura inferior do casco recebe o assoalho em etapa futura' } },
+      { nome: 'vidroDaPorta', superficie: { op: 'aberturaPorContorno', id: 6 }, semMoldura: { motivo: 'vidro e borracha da porta são da etapa de vidros' } },
+      { nome: 'vidroLateralTraseiro', superficie: { op: 'aberturaPorContorno', id: 7 }, semMoldura: { motivo: 'vidro e borracha lateral traseiro são da etapa de vidros' } },
+      { nome: 'paraBrisa', superficie: { op: 'aberturaPorContorno', id: 8 }, semMoldura: { motivo: 'para-brisa e borracha são da etapa de vidros' } },
+      { nome: 'vidroTraseiro', superficie: { op: 'aberturaPorContorno', id: 9 }, semMoldura: { motivo: 'vidro traseiro e borracha são da etapa de vidros' } },
+      { nome: 'vaoFrontal', superficie: { op: 'aberturaPorContorno', id: 10 }, semMoldura: { motivo: 'grade, faróis e setas fecham o vão frontal diretamente' } },
+      { nome: 'vaoLanternaTraseira', superficie: { op: 'aberturaPorContorno', id: 11 }, semMoldura: { motivo: 'as lanternas traseiras fecham o vão diretamente' } },
+    ];
+  },
   get PASSOS() { return gerarPassos(this.PARAMS); },
 };
 
