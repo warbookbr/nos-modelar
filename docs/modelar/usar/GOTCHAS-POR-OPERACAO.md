@@ -218,3 +218,10 @@ segunda: num rebaixo girado, o modo plano falha a casca e o modo por fatias
 deixa os vértices do canto do fundo a 22% a 41% do raio do eixo esperado; o
 passo grita quando sobra lasca, e os raios que passam mudam a contagem de
 faces de dezenas para milhares de um valor para o vizinho.
+
+
+## `gaiolaPorRede` + `subdivisao` (`borda: 'cantos'` e `simetria: 'x'`): losango/beliscão no centro da costura `x = 0`
+
+Quando uma rede com `simetria: 'x'` tem nós sobre o plano de simetria `x = 0` com apenas duas faces na meia-rede (por exemplo, o encontro do capô com a frente em `f_cintura` ou da tampa traseira em `t_cintura`), `gaiolaPorRede` inclui esses nós em `rede.passo.cantos`. Ao passar `...rede.passo` para `subdivisao` com `borda: 'cantos'`, esses pontos viram cantos vivos travados no meio da chapa já espelhada, criando um beliscão/losango visível exatamente sobre `x = 0`.
+
+**Conserto:** filtrar de `rede.passo.cantos` os nós que ficam no interior da chapa sobre o plano de simetria `x = 0` (mantendo em `cantos` apenas os cantos reais da borda livre) e ligar `costuraExata: true` na `subdivisao`. Medido em `carro-quadrado/lataria` (2026-11-21): remover `f_cintura` e `t_cintura` de `cantos` eliminou por completo o beliscão no meio do capô e no meio da tampa traseira.
