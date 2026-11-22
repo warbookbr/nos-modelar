@@ -400,10 +400,11 @@ export function passosFrenteTraseira(T, proxId) {
   };
 
   /* 1. Vedação/carcaça fina preta do pisca (recuada atrás da lente para nunca vazar pela frente!) */
-  emitirParFrente('setaDianteira', (id) => faixaCurvaFrente(id, 0.0, 0.96, stD.y0 - 2, stD.y1 + 2, 0.4, -24, 0.01, 0.5, 10, 6), 'plasticoFosco');
-  /* 2. Refletor cromado interno atrás da lente âmbar */
-  emitirParFrente('setaDianteira', (id) => faixaCurvaFrente(id, 0.04, 0.80, stD.y0 + 5, stD.y1 - 5, 1.0, -6, 0.015, 1.0, 8, 4), 'refletorFarol');
-  /* 3. Lente âmbar translúcida com ESTRIAS HORIZONTAIS reais rente ao para-lama */
+  emitirParFrente('setaDianteira', (id) => faixaCurvaFrente(id, 0.0, 0.96, stD.y0 - 2, stD.y1 + 2, 0.2, -24, 0.01, 0.5, 10, 6), 'plasticoFosco');
+  /* 2. Refletor cromado brilhante atrás da lente transparente âmbar + bulbo central luminoso */
+  emitirParFrente('setaDianteira', (id) => faixaCurvaFrente(id, 0.03, 0.86, stD.y0 + 4, stD.y1 - 4, 1.4, -8, 0.015, 1.0, 10, 6), 'refletorFarol');
+  emitirParFrente('setaDianteira', (id) => faixaCurvaFrente(id, 0.18, 0.54, stD.y0 + 42, stD.y1 - 42, 2.2, -3, 0.02, 4.0, 6, 4), 'refletorNucleo');
+  /* 3. Lente âmbar transparente com ESTRIAS HORIZONTAIS reais revelando o brilho interno do refletor */
   emitirParFrente('setaDianteira', (id) => faixaCurvaFrente(id, 0.012, 1.0, stD.y0 + 0.5, stD.y1 - 0.5, 3.2, -5, 0.018, 2.5, 14, 16), 'setaAmbar');
 
   // --- PLACA DIANTEIRA (mais alta sob o friso claro, cantos arredondados e moldura preta fina) ---
@@ -496,9 +497,47 @@ export function passosFrenteTraseira(T, proxId) {
     }
     return ['subdivisao', { origemId: id, niveis: 0, vertices: verts, faces }];
   };
-  emitirParFrente('farolNeblina', (id) => nebTrap(id, -4, -4, -3, -3, neb.z0 - 8, neb.z1 - 6, false), 'plasticoFosco');
-  emitirParFrente('farolNeblina', (id) => nebTrap(id, 3, 3, 3, 3, neb.z0, neb.z1 - 4, false), 'refletorFarol');
-  emitirParFrente('farolNeblina', (id) => nebTrap(id, 0, 0, 0, 0, neb.z1 - 4, neb.z1 + 2, true), 'lenteFarol');
+  /* 1. Carcaça escura recuada (atrás da bacia refletora do neblina) */
+  emitirParFrente('farolNeblina', (id) => nebTrap(id, -4, -4, -3, -3, neb.z0 - 10, neb.z0 - 2, false), 'plasticoFosco');
+  /* 2. Bacia refletora côncava cromada 3D dentro do neblina + mini-bulbo central brilhante */
+  emitirParFrente('farolNeblina', (id) => {
+    const x0 = neb.xCentro - neb.larg / 2 + 3;
+    const x1T = neb.xCentro + neb.larg / 2 - 3;
+    const x1B = x1T - 16;
+    const y0 = neb.yCentro - neb.alt / 2 + 3;
+    const y1 = neb.yCentro + neb.alt / 2 - 3;
+    const cx = (x0 + (x1T + x1B) / 2) / 2;
+    const cy = neb.yCentro;
+    const zF = neb.z1 - 4;
+    const zM = neb.z0 + 10;
+    const zB = neb.z0;
+    const zT = neb.z0 - 3;
+    const pExt = [[x0, y0], [x1B, y0], [x1T, y1], [x0, y1]];
+    const pMid = pExt.map(([x, y]) => [cx + (x - cx) * 0.55, cy + (y - cy) * 0.55]);
+    const verts = [
+      ...pExt.map(([x, y]) => [m(x), m(y), m(zF)]), // 0..3 borda frente
+      ...pMid.map(([x, y]) => [m(x), m(y), m(zM)]), // 4..7 meio côncavo
+      ...pExt.map(([x, y]) => [m(x), m(y), m(zT)]), // 8..11 borda trás
+      [m(cx), m(cy), m(zB)], // 12 fundo centro
+      [m(cx), m(cy), m(zT)], // 13 trás centro
+    ];
+    const faces = [];
+    for (let i = 0; i < 4; i += 1) {
+      const j = (i + 1) % 4;
+      faces.push([i, j, 4 + j, 4 + i]);
+      faces.push([4 + i, 4 + j, 12]);
+      faces.push([i, 8 + i, 8 + j, j]);
+      faces.push([8 + j, 8 + i, 13]);
+    }
+    return ['subdivisao', { origemId: id, niveis: 0, vertices: verts, faces }];
+  }, 'refletorFarol');
+  emitirParFrente('farolNeblina', (id) => {
+    const cx = neb.xCentro - 4;
+    const cy = neb.yCentro;
+    return caixa('cubo', id, cx - 10, cx + 10, cy - 8, cy + 8, neb.z0 + 4, neb.z1 - 8);
+  }, 'refletorNucleo');
+  /* 3. Lente de vidro transparente estriada vertical do neblina */
+  emitirParFrente('farolNeblina', (id) => nebTrap(id, 0, 0, 0, 0, neb.z1 - 4, neb.z1 + 2, true), 'lenteNeblina');
 
   const idEntFundo = proxId();
   passos.push(caixa('cubo', idEntFundo, -(neb.xCentro - neb.larg / 2 - 4), neb.xCentro - neb.larg / 2 - 4, neb.yCentro - 20, neb.yCentro + 20, neb.z0 - 8, neb.z1 - 6));
@@ -687,11 +726,11 @@ export function passosFrenteTraseira(T, proxId) {
       ],
     }];
   };
-  /* base escura da grade esquerda/direita + 9 aletas finas longitudinais em cada lado */
-  emitirParFrente('churrasqueira', (id) => blocoCowl(id, 95, 435, 852, 896, -5, 1.5), 'plasticoFosco');
-  for (let k = 0; k < 9; k += 1) {
-    const xA = 112 + k * 35;
-    emitirParFrente('churrasqueira', (id) => blocoCowl(id, xA, xA + 14, 856, 892, 0.5, 4.0), 'plasticoPreto');
+  /* base escura da grade esquerda/direita + 16 ranhuras finas densas por lado (dentro do capô, como na vista superior) */
+  emitirParFrente('churrasqueira', (id) => blocoCowl(id, 85, 445, 854, 898, -5, 1.2), 'plasticoFosco');
+  for (let k = 0; k < 16; k += 1) {
+    const xA = 95 + k * 21.5;
+    emitirParFrente('churrasqueira', (id) => blocoCowl(id, xA, xA + 8.5, 858, 894, 0.5, 3.6), 'plasticoPreto');
   }
 
   // --- ESCAPAMENTO ---

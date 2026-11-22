@@ -180,7 +180,7 @@ export function passosParachoques(T, varridos, proxId, passosChapa, pontosChapa,
   });
   passos.push(...frisoMeio.passos);
 
-  /* fenda do capô (sai exatamente da junção farol/pisca até a base da coluna A, englobando os respiros dentro do capô) */
+  /* fenda do capô: mais larga (700 -> 748), englobando os respiros atrás (z=842) e descendo pela dobra frontal até a divisão farol/pisca */
   const baseFenda = {
     malha: { st: stChapa },
     vista: 'y',
@@ -195,17 +195,32 @@ export function passosParachoques(T, varridos, proxId, passosChapa, pontosChapa,
     ...baseFenda,
     nome: 'fendaCapoLat',
     simetria: 'x',
-    trilho: [[m(696), m(1976)], [m(708), m(1450)], [m(720), m(842)]],
+    trilho: [[m(700), m(1972)], [m(725), m(1450)], [m(748), m(842)]],
     origemId: proxId(),
   });
   passos.push(...fendaLat.passos);
   const fendaTras = conformarNaChapa({
     ...baseFenda,
     nome: 'fendaCapoTras',
-    trilho: [[m(-720), m(842)], [m(0), m(842)], [m(720), m(842)]],
+    trilho: [[m(-748), m(842)], [m(0), m(842)], [m(748), m(842)]],
     origemId: proxId(),
   });
   passos.push(...fendaTras.passos);
+  const fendaFrente = conformarNaChapa({
+    malha: { st: stChapa },
+    vista: 'z',
+    sentido: '+',
+    simetria: 'x',
+    unidade: 'm',
+    secao: { largura: 5.0, altura: 3.6, chanfro: 0.8 },
+    deslocamentoMm: -1.8,
+    parte: 'fendaCapo',
+    material: 'plasticoFosco',
+    nome: 'fendaCapoFrente',
+    trilho: [[m(698), m(700)], [m(700), m(726)]],
+    origemId: proxId(),
+  });
+  passos.push(...fendaFrente.passos);
 
   return passos;
 }

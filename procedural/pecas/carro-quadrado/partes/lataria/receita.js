@@ -9,12 +9,12 @@ import { ALIASES_FRENTE_TRASEIRA, passosFrenteTraseira } from './receita/frente-
 export const TABELA = {
   chapa: { espessura: 8, passo: 200, niveis: 2, anguloMax: 20, liso: false },
   estacoes: [1910, 1550, 1235, 845, 310, -300, -1125, -1530, -1730, -1935],
-  /* cada seção tem 7 níveis: soleira, baixo, meio (Curva 3 bojo), vinco (ombro/vinco horizontal nítido), cintura, quina, eixo */
+  /* cada seção tem 7 níveis: soleira, baixo, meio (Curva 3), vinco (lateral), cintura (topo do chanfro), quina (vinco do capô / coluna A), eixo */
   secoes: {
-    1910:    [[760, 255], [795, 425], [810, 610], [802, 718], [776, 748], [718, 760], 766],
-    1550:    [[780, 255], [810, 425], [825, 615], [818, 738], [786, 796], [730, 814], 822],
-    1235:    [[790, 255], [820, 425], [835, 620], [830, 754], [792, 844], [738, 864], 872],
-    845:     [[795, 255], [825, 425], [840, 625], [838, 770], [790, 904], [744, 926], 934],
+    1910:    [[760, 290], [795, 425], [810, 610], [798, 708], [748, 738], [535, 749], 756],
+    1550:    [[780, 255], [810, 425], [825, 615], [818, 732], [762, 792], [560, 808], 816],
+    1235:    [[790, 255], [820, 425], [835, 620], [830, 750], [768, 844], [588, 862], 870],
+    845:     [[795, 255], [825, 425], [840, 625], [838, 770], [772, 908], [615, 926], 935],
     310:     [[795, 255], [825, 425], [840, 630], [838, 778], [775, 945], [622, 1362], 1374],
     '-300':  [[795, 255], [825, 425], [840, 632], [838, 785], [775, 945], [622, 1384], 1396],
     '-1125': [[795, 255], [825, 425], [840, 632], [838, 792], [775, 945], [622, 1382], 1394],
@@ -23,11 +23,11 @@ export const TABELA = {
     '-1935': [[762, 285], [792, 430], [810, 625], [808, 800], [755, 932], [716, 962], 966],
   },
   frente: [
-    [0, 255, 1945],
+    [0, 290, 1945],
     [0, 425, 2000],
     [0, 610, 2018],
-    [0, 718, 2014],
-    [0, 756, 1994],
+    [0, 712, 2018],
+    [0, 744, 2002],
   ],
   /* Curva 1 (tuck-under traseiro): vertical no âmbar/vinco (-2022) e tombando para frente em direção ao para-choque (-1982) */
   traseira: [
@@ -37,7 +37,7 @@ export const TABELA = {
     [0, 800, -2022],
     [0, 930, -2008],
   ],
-  vincos: { lateral: 0.85, cintura: 0.22, quina: 0.30 },
+  vincos: { lateral: 0.85, cintura: 0.45, quina: 0.38 },
   arcos: {
     dianteiro: { z: 1235, y: 290, raio: 350, lados: 32 },
     traseiro: { z: -1125, y: 290, raio: 350, lados: 32 },
@@ -57,8 +57,8 @@ export const TABELA = {
     lanternaTraseira: [[634, 530, 8], [776, 530, 10], [758, 842, 16], [664, 842, 10]],
   },
   parachoqueDianteiro: {
-    y0: 256, y1: 498, xTrilho: 785, zFrente: 2022, zLateral: 1625, raioCanto: 98,
-    avanco: 46, saia: 4, recuo: 25, frisoY: 458, frisoAlt: 7, frisoSaida: 3.5,
+    y0: 282, y1: 524, xTrilho: 785, zFrente: 2022, zLateral: 1625, raioCanto: 98,
+    avanco: 46, saia: 4, recuo: 25, frisoY: 484, frisoAlt: 7, frisoSaida: 3.5,
   },
   parachoqueTraseiro: {
     y0: 250, y1: 515, xTrilho: 790, zTras: -2025, zLateral: -1515, raioCanto: 90,
@@ -70,11 +70,11 @@ export const TABELA = {
     traseiro: [-1495, -1920],
   },
   frentePecas: {
-    grade: { meiaLarg: 446, y0: 570, y1: 700, zFundo0: 1950, zFundo1: 1986, zMoldura: 2006, zLamina: 2010, laminas: 7, lamY0: 578, lamY1: 688, lamAlt: 4.8 },
+    grade: { meiaLarg: 446, y0: 568, y1: 702, zFundo0: 1950, zFundo1: 1988, zMoldura: 2009, zLamina: 2012, laminas: 7, lamY0: 578, lamY1: 688, lamAlt: 4.8 },
     farol: { x0Base: 432, x0Topo: 444, x1: 696, y0: 568, y1: 702, zCarc0: 1948, zCarc1: 1998, zLente0: 1994, zLente1: 2008 },
     seta: { x0: 700, x1: 792, y0: 570, y1: 700, z0: 1924, z1: 2002 },
-    placa: { larg: 356, alt: 120, yCentro: 368, z0: 2054, z1: 2070 },
-    neblina: { xCentro: 510, yCentro: 306, larg: 158, alt: 44, z0: 2024, z1: 2058 },
+    placa: { larg: 356, alt: 120, yCentro: 394, z0: 2054, z1: 2070 },
+    neblina: { xCentro: 510, yCentro: 332, larg: 158, alt: 44, z0: 2024, z1: 2058 },
   },
   traseiraPecas: {
     lanterna: { x0: 655, x1: 776, yRe: [540, 610], yFreio: [610, 735], ySeta: [735, 810], zCarc0: -2008, zCarc1: -1918, zFrente: -2020, zTras: -1924 },
@@ -91,24 +91,22 @@ export const MATERIAIS = {
   plasticoPreto: { cor: '#22262b', metalicidade: 0.05, aspereza: 0.72 },
   frisoClaro: { cor: '#b8bec6', metalicidade: 0.55, aspereza: 0.35 },
   lenteFarol: {
-    cor: '#dce4ec', metalicidade: 0.04, aspereza: 0.05, mistura: 'transparente', opacidade: 0.42,
+    cor: '#eef5fb', metalicidade: 0.03, aspereza: 0.03, mistura: 'transparente', opacidade: 0.32,
     verniz: 1.0, asperezaDoVerniz: 0.015, indiceDeRefracao: 1.52,
   },
   lenteNeblina: {
-    cor: '#dce5ed', metalicidade: 0.02, aspereza: 0.08, mistura: 'transparente', opacidade: 0.46,
-    verniz: 0.96, asperezaDoVerniz: 0.02, indiceDeRefracao: 1.52,
-    relevo: { tipo: 'prismas', escala: 2.8, intensidade: 0.62, projecao: 'caixa' },
+    cor: '#e8f0f6', metalicidade: 0.02, aspereza: 0.04, mistura: 'transparente', opacidade: 0.34,
+    verniz: 0.98, asperezaDoVerniz: 0.02, indiceDeRefracao: 1.52,
   },
   setaAmbar: {
-    cor: '#e88208', metalicidade: 0.04, aspereza: 0.08,
-    verniz: 0.96, asperezaDoVerniz: 0.03, transmissao: 0.64, tomDoVidro: '#f28a0a', indiceDeRefracao: 1.49,
-    relevo: { tipo: 'prismas', escala: 2.8, intensidade: 0.22, projecao: 'caixa' },
+    cor: '#e86800', metalicidade: 0.03, aspereza: 0.05, mistura: 'transparente', opacidade: 0.68, emissivo: 0.08,
+    verniz: 1.0, asperezaDoVerniz: 0.02, indiceDeRefracao: 1.49,
   },
-  mascaraPrataFarol: { cor: '#dce4ec', metalicidade: 0.80, aspereza: 0.14, verniz: 0.85 },
-  refletorFarol: { cor: '#66707c', metalicidade: 0.96, aspereza: 0.11 },
-  refletorNucleo: { cor: '#9aa4b0', metalicidade: 0.94, aspereza: 0.12 },
-  calotaLampada: { cor: '#4a525c', metalicidade: 0.88, aspereza: 0.20 },
-  bordaVidroFarol: { cor: '#aab4be', metalicidade: 0.30, aspereza: 0.18, verniz: 0.90 },
+  mascaraPrataFarol: { cor: '#e4ecf4', metalicidade: 0.85, aspereza: 0.10, verniz: 0.90 },
+  refletorFarol: { cor: '#dce6f0', metalicidade: 0.96, aspereza: 0.06 },
+  refletorNucleo: { cor: '#f4f8fc', metalicidade: 0.96, aspereza: 0.05 },
+  calotaLampada: { cor: '#5a6470', metalicidade: 0.90, aspereza: 0.14 },
+  bordaVidroFarol: { cor: '#b4bec8', metalicidade: 0.30, aspereza: 0.16, verniz: 0.92 },
   lanternaRe: {
     cor: '#e6ecf2', metalicidade: 0.04, aspereza: 0.10,
     verniz: 0.95, asperezaDoVerniz: 0.04, transmissao: 0.66, tomDoVidro: '#dfe6ee', indiceDeRefracao: 1.49,

@@ -37,9 +37,9 @@ export function derivarChapa(T) {
     nos[`f_${NIVEIS[j]}`] = fixo(T.frente[j]);
     nos[`t_${NIVEIS[j]}`] = fixo(T.traseira[j]);
   }
-  /* quinas quad sem retalho triangular: f_canto/f_quina na frente (nariz mais baixo/fino) e t_canto/t_quina atrás */
-  nos.f_canto = fixo([742, 746, 1962]);
-  nos.f_quina = fixo([680, 754, 1986]);
+  /* quinas quad sem retalho triangular: f_canto/f_quina na frente (nariz fino com chanfro e vinco do capô em x=535) */
+  nos.f_canto = fixo([736, 736, 1968]);
+  nos.f_quina = fixo([535, 742, 1996]);
   nos.t_canto = fixo([742, 926, -1968]);
   nos.t_quina = fixo([680, 928, -2002]);
 
