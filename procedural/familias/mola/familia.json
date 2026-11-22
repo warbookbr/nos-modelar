@@ -1,0 +1,43 @@
+{
+  "formato": "mecanifica.familia@1",
+  "id": "mola",
+  "versao": "1.0.0",
+  "nivel": "componente",
+  "parametros": {
+    "forma": { "tipo": "inteiro", "unidade": "contagem", "padrao": 1, "minimo": 1, "maximo": 3, "medio": 2 },
+    "diametroDoFio": { "tipo": "numero", "unidade": "mm", "padrao": 2, "minimo": 0.5, "maximo": 10, "medio": 3 },
+    "diametroExterno": { "tipo": "numero", "unidade": "mm", "padrao": 20, "minimo": 4, "maximo": 150, "medio": 40 },
+    "comprimentoLivre": { "tipo": "numero", "unidade": "mm", "padrao": 50, "minimo": 5, "maximo": 500, "medio": 120 },
+    "espiras": { "tipo": "inteiro", "unidade": "contagem", "padrao": 8, "minimo": 3, "maximo": 40, "medio": 12 },
+    "comprimentoDoBraco": { "tipo": "numero", "unidade": "mm", "padrao": 30, "minimo": 5, "maximo": 200, "medio": 40 }
+  },
+  "restricoes": [
+    {
+      "id": "fio-cabe-na-espira",
+      "expressao": "diametroExterno >= 5 * diametroDoFio",
+      "motivo": "o diâmetro externo precisa ser ao menos cinco vezes o do fio: abaixo disso o fio não dobra na espira sem se esmagar, e o gancho da mola de tração encosta na própria perna"
+    },
+    {
+      "id": "compressao-com-folga-entre-espiras",
+      "expressao": "max(0, 2 - forma) * (3.625 * diametroDoFio + 1.1 * diametroDoFio * (espiras - 2.5) - comprimentoLivre) <= 0",
+      "motivo": "na mola de compressão (forma 1) as espiras do meio precisam de um passo de ao menos 1,1 vez o diâmetro do fio, além da volta encostada de cada ponta; aumente o comprimento livre ou use menos espiras ou um fio mais fino"
+    }
+  ],
+  "portas": [],
+  "ferramentas": ["helice", "mola"],
+  "perguntas": {
+    "espiras": [
+      "As espiras têm o mesmo diâmetro e o mesmo passo ao longo do corpo, sem se atravessarem?",
+      "Na mola de compressão, a última espira de cada ponta fica encostada na vizinha, fechando a ponta?"
+    ],
+    "pontas": [
+      "Na mola de tração, cada ponta termina num gancho fechado no plano do eixo, acima da última espira?",
+      "Na mola de torção, cada ponta sai num braço reto, tangente à espira, sem degrau na junta?"
+    ]
+  },
+  "perfis": {
+    "compressao": { "descricao": "mola de compressão de espiras abertas e pontas fechadas", "parametros": { "forma": 1, "diametroDoFio": 2, "diametroExterno": 20, "comprimentoLivre": 50, "espiras": 8 } },
+    "tracao": { "descricao": "mola de tração de espiras encostadas com um gancho em cada ponta", "parametros": { "forma": 2, "diametroDoFio": 1.5, "diametroExterno": 12, "espiras": 20 } },
+    "torcao": { "descricao": "mola de torção de espiras encostadas com dois braços retos", "parametros": { "forma": 3, "diametroDoFio": 2, "diametroExterno": 16, "espiras": 6, "comprimentoDoBraco": 30 } }
+  }
+}

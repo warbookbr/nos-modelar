@@ -47,10 +47,10 @@ passaram pelas verificações automáticas. Nenhuma peça é um modelo final par
 fora do projeto: cada uma existe para provar uma capacidade do núcleo e pode
 mudar ou sair sem aviso.
 
-Há 7 [famílias](modelar/decisoes/FAMILIAS-DE-OBJETOS.md) registradas, cada uma um código que
+Há 9 [famílias](modelar/decisoes/FAMILIAS-DE-OBJETOS.md) registradas, cada uma um código que
 gera objetos parecidos a partir de poucos números: roda com pneu, dobradiça,
-cilindro hidráulico, móvel de caixa, superfície aerodinâmica, aparelho de caixa
-e cadeira. A família de aparelho de caixa, por exemplo, gera o forno elétrico,
+cilindro hidráulico, móvel de caixa, superfície aerodinâmica, aparelho de caixa,
+cadeira, componente eletrônico e mola. A família de aparelho de caixa, por exemplo, gera o forno elétrico,
 o micro-ondas, a fritadeira de forno e a lava-louças compacta, cada um com as
 suas medidas, sem receita escrita do zero.
 

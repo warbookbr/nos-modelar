@@ -1,0 +1,141 @@
+{
+  "formato": "mecanifica.aprovacao-da-familia@1",
+  "familia": "mola",
+  "versao": "1.0.0",
+  "mecanica": {
+    "data": "2026-11-22",
+    "pontos": {
+      "minimo": {
+        "parametros": {
+          "comprimentoDoBraco": 5,
+          "comprimentoLivre": 5,
+          "diametroDoFio": 0.5,
+          "diametroExterno": 4,
+          "espiras": 3,
+          "forma": 1
+        },
+        "hash": "sha256:d0f8fe4148dab96a6364c38c224ee68c18abcf00acb3056d4316b12a5321b494",
+        "medidas": []
+      },
+      "medio": {
+        "parametros": {
+          "comprimentoDoBraco": 40,
+          "comprimentoLivre": 120,
+          "diametroDoFio": 3,
+          "diametroExterno": 40,
+          "espiras": 12,
+          "forma": 2
+        },
+        "hash": "sha256:3c57c937b77112ce85161ad73553b5dfff6a30ef087cc8561e2298bdc0fe9599",
+        "medidas": []
+      },
+      "maximo": {
+        "parametros": {
+          "comprimentoDoBraco": 200,
+          "comprimentoLivre": 500,
+          "diametroDoFio": 10,
+          "diametroExterno": 150,
+          "espiras": 40,
+          "forma": 3
+        },
+        "hash": "sha256:beb56bbac86dc5d241604ecccc95f8431697a395dcdc960639a2270a96f1f7e5",
+        "medidas": []
+      }
+    },
+    "varredura": {
+      "sondas": 12,
+      "recusasDeclaradas": [
+        {
+          "ponto": "comprimentoLivre=5",
+          "restricao": "compressao-com-folga-entre-espiras"
+        },
+        {
+          "ponto": "diametroDoFio=10",
+          "restricao": "compressao-com-folga-entre-espiras"
+        },
+        {
+          "ponto": "diametroExterno=4",
+          "restricao": "fio-cabe-na-espira"
+        },
+        {
+          "ponto": "espiras=40",
+          "restricao": "compressao-com-folga-entre-espiras"
+        }
+      ]
+    },
+    "portas": [],
+    "perfis": {
+      "compressao": {
+        "parametros": {
+          "comprimentoDoBraco": 30,
+          "comprimentoLivre": 50,
+          "diametroDoFio": 2,
+          "diametroExterno": 20,
+          "espiras": 8,
+          "forma": 1
+        },
+        "hash": "sha256:75baed9dff3fd51b08216f0e5b6ae6d1a6b69fa5ce077c525291be3cf78aa689",
+        "medidas": []
+      },
+      "torcao": {
+        "parametros": {
+          "comprimentoDoBraco": 30,
+          "comprimentoLivre": 50,
+          "diametroDoFio": 2,
+          "diametroExterno": 16,
+          "espiras": 6,
+          "forma": 3
+        },
+        "hash": "sha256:96be30df904db65cb690866f5edb63665a013901e4deecbe6a52d3ee1df5aa57",
+        "medidas": []
+      },
+      "tracao": {
+        "parametros": {
+          "comprimentoDoBraco": 30,
+          "comprimentoLivre": 50,
+          "diametroDoFio": 1.5,
+          "diametroExterno": 12,
+          "espiras": 20,
+          "forma": 2
+        },
+        "hash": "sha256:ebf07cc727659b730ae54718a4894ae16e1aadc571873715796aa1f6380ded18",
+        "medidas": []
+      }
+    },
+    "escalasDosPerfis": {
+      "sondas": 24,
+      "recusasDeclaradas": [
+        {
+          "ponto": "compressao: comprimentoLivre=5",
+          "restricao": "compressao-com-folga-entre-espiras"
+        },
+        {
+          "ponto": "compressao: diametroDoFio=10",
+          "restricao": "compressao-com-folga-entre-espiras"
+        },
+        {
+          "ponto": "compressao: diametroExterno=4",
+          "restricao": "fio-cabe-na-espira"
+        },
+        {
+          "ponto": "torcao: diametroDoFio=10",
+          "restricao": "fio-cabe-na-espira"
+        },
+        {
+          "ponto": "torcao: diametroExterno=4",
+          "restricao": "fio-cabe-na-espira"
+        },
+        {
+          "ponto": "tracao: diametroDoFio=10",
+          "restricao": "fio-cabe-na-espira"
+        },
+        {
+          "ponto": "tracao: diametroExterno=4",
+          "restricao": "fio-cabe-na-espira"
+        }
+      ]
+    }
+  },
+  "critico": null,
+  "pessoa": null
+}

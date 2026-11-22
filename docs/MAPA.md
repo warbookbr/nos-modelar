@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2177 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2183 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1009,6 +1009,14 @@
 
 - `exemplo.test.js` — O exemplo de peça de família que o ramo `modelar/peca/familia` entrega: ele executa, cada parte da família sai com material, o PLANO é válido e o referencial…
 - `receita.js` — exemplo/receita.js — a receita mínima de uma peça que sai de uma família, para copiar.
+
+## procedural/familias/mola/
+
+- `composicoes.js` — composicoes.js — as três composições da família `mola`, uma por forma, porque a composição v1 só substitui valores e o número de passos muda com a forma (o g…
+- `derivar.js` — derivar.js — dos parâmetros da mola (milímetro) à chamada de composição (metro). A forma escolhe a composição.
+- `geometria.js` — geometria.js — as medidas da mola em milímetro, a partir dos parâmetros da família.
+- `index.js` — index.js — a família `mola`: mola de compressão, de tração com ganchos e de torção com braços, varrida ao longo do caminho helicoidal do núcleo. `chamar(MOLA…
+- `mola.test.mjs` — mola.test.mjs — a família `mola`: as três formas saem com as partes certas e sem órfão, a compressão ocupa o comprimento livre com as pontas encostadas, e as…
 
 ## procedural/familias/movel-de-caixa/
 
@@ -3374,6 +3382,7 @@
 - `descricoes.test.mjs` — descricoes.test.mjs — a descrição do cabeçalho entra em toda sessão.
 - `estrutura-docs.mjs` — estrutura-docs.mjs — sustenta a separação da documentação por quem a lê.
 - `estrutura-docs.test.mjs` — estrutura-docs.test.mjs — cada gate é visto REPROVANDO antes de ser aceito.
+- `familias-no-comece-aqui.test.mjs` — familias-no-comece-aqui.test.mjs — a página de entrada conta e nomeia as famílias registradas: ela disse "7 famílias" com oito no registro, e só a leitura de…
 - `gates-bateria-curta.test.mjs` — gates-bateria-curta.test.mjs — a bateria curta só roda quando tudo o que mudou é peça ou documento; qualquer outro arquivo, ou não saber o que mudou, roda to…
 - `gates-espelham-ci.test.mjs` — gates-espelham-ci.test.mjs — o comando local `npm run gates` cobre tudo o que o CI executa.
 - `gates-lentos.test.mjs` — gates-lentos.test.mjs — depois do gate `test`, o resumo lista os cinco arquivos de teste mais lentos e avisa o que passa do teto, lendo a duração que o repór…
