@@ -6,6 +6,7 @@ import { rebaixoPorContorno } from '../../../../nucleo/rebaixo-por-contorno.js';
 import { derivarParachoques, passosParachoques } from './receita/parachoques.js';
 import { ALIASES_FRENTE_TRASEIRA, passosFrenteTraseira } from './receita/frente-traseira.js';
 import { derivarCapo, passosCapo, passoVaoCapoNaChapa } from './receita/capo.js';
+import { passosAcabamentos } from './receita/acabamentos.js';
 
 export const TABELA = {
   chapa: { espessura: 8, passo: 200, niveis: 2, anguloMax: 20, liso: false },
@@ -61,6 +62,8 @@ export const TABELA = {
     frontal: [[-742, 568, 12], [742, 568, 12], [742, 700, 12], [-742, 700, 12]],
     /* Curva 4: borda interna acompanha o trapézio da tampa (634 embaixo subindo para 664 em cima) */
     lanternaTraseira: [[634, 530, 8], [776, 530, 10], [758, 842, 16], [664, 842, 10]],
+    /* portinhola real do tanque de combustível na lateral traseira direita (+x) com cantos arredondados */
+    tampaTanque: [[-1355, 655, 16], [-1505, 655, 16], [-1505, 795, 16], [-1355, 795, 16]],
   },
   parachoqueDianteiro: {
     y0: 282, y1: 524, xTrilho: 785, zFrente: 2022, zLateral: 1625, raioCanto: 98,
@@ -152,10 +155,10 @@ export function gerarPassos(T) {
   const { medidas: _, cantos: cantosRede, ...passoRede } = rede.passo;
   const cantosChapa = (cantosRede ?? []).filter((c) => c !== 'f_cintura' && c !== 't_cintura');
 
-  let nid = 15;
+  let nid = 16;
   const proxId = () => { const atual = nid; nid += 1; return atual; };
 
-  const vaoCapo = passoVaoCapoNaChapa(proxId, { op: 'aberturaPorContorno', id: 11 });
+  const vaoCapo = passoVaoCapoNaChapa(proxId, { op: 'aberturaPorContorno', id: 15 });
   const selFinal = { origem: vaoCapo.origem };
 
   const plT = T.traseiraPecas.placa;
@@ -187,10 +190,11 @@ export function gerarPassos(T) {
     ['aberturaPorContorno', { origemId: 9, chapa: { origem: { op: 'aberturaPorContorno', id: 8 } }, vista: T.vidros.paraBrisaVista, sentido: '+', contorno: contornoComFilete(projetarVista(T.vidros.paraBrisaVista, T.vidros.paraBrisa)) }],
     ['aberturaPorContorno', { origemId: 10, chapa: { origem: { op: 'aberturaPorContorno', id: 9 } }, vista: 'z', sentido: '-', lente: true, recuoDaLente: m(4), contorno: contornoComFilete(T.aberturas.tampaTraseira) }],
     ['aberturaPorContorno', { origemId: 11, chapa: { origem: { op: 'aberturaPorContorno', id: 10 } }, vista: 'z', sentido: '-', simetria: 'x', contorno: contornoComFilete(T.aberturas.lanternaTraseira) }],
+    ['aberturaPorContorno', { origemId: 15, chapa: { origem: { op: 'aberturaPorContorno', id: 11 } }, vista: 'x', sentido: '+', lente: true, recuoDaLente: m(2.5), contorno: contornoComFilete(T.aberturas.tampaTanque) }],
     ...vaoCapo.passos,
   ];
 
-  /* abre o vão do vidro dentro de cada porta independente (quadro completo) + vidro traseiro e rebaixo da placa na tampaTraseira */
+  /* abre o vão do vidro dentro de cada porta independente (quadro completo) + vidro traseiro e rebaixo da placa na tampaTraseira + portinhola do tanque */
   const passosPortas = [
     ['aberturaPorContorno', { origemId: 12, chapa: { origem: { op: 'aberturaPorContorno', id: 6, parte: 'lente' } }, vista: 'x', contorno: contornoComFilete(T.vidros.porta) }],
     ['parte', { nome: 'portaDireita', material: 'lataria', sel: { origem: { op: 'aberturaPorContorno', id: 12 } } }],
@@ -199,6 +203,7 @@ export function gerarPassos(T) {
     ['aberturaPorContorno', { origemId: 14, chapa: { origem: { op: 'aberturaPorContorno', id: 10, parte: 'lente' } }, vista: T.vidros.traseiroVista, contorno: contornoComFilete(projetarVista(T.vidros.traseiroVista, T.vidros.traseiro)) }],
     ...rebaixoPlaca.passos,
     ['parte', { nome: 'tampaTraseira', material: 'lataria', sel: { origem: rebaixoPlaca.origem } }],
+    ['parte', { nome: 'tampaTanque', material: 'lataria', sel: { origem: { op: 'aberturaPorContorno', id: 15, parte: 'lente' } } }],
   ];
 
   const aliasesChapa = [...arcoD.aliases, ...arcoT.aliases];
@@ -211,6 +216,7 @@ export function gerarPassos(T) {
     ...passosCapo(capo, proxId),
     ...passosParachoques(T, varridos, proxId, passosChapa, rede.pontos, aliasesChapa),
     ...passosFrenteTraseira(T, proxId),
+    ...passosAcabamentos(T, proxId),
   ];
 }
 
@@ -225,7 +231,7 @@ export const CONTATOS = [
   { par: ['parachoqueDianteiro', 'placaDianteira'], motivo: 'placa dianteira apoia na face frontal do para-choque' },
   { par: ['parachoqueDianteiro', 'farolNeblina'], motivo: 'faróis de neblina embutem na saia inferior do para-choque dianteiro' },
   { par: ['chapa', 'lanternaTraseira'], motivo: 'lanternas traseiras assentam nos vãos traseiros da chapa' },
-  { par: ['chapa', 'tampaTanque'], motivo: 'contorno da tampa do tanque conforma sobre a lateral traseira direita da chapa' },
+  { par: ['chapa', 'arcosEstampados'], motivo: 'abas estampadas dos 4 arcos de roda embutem e apoiam na borda dos arcos da chapa' },
   { par: ['tampaTraseira', 'placaTraseira'], motivo: 'placa traseira apoia no rebaixo da tampa traseira' },
   { par: ['tampaTraseira', 'puxadorTampa'], motivo: 'puxador apoia na tampa traseira acima da placa' },
   { par: ['tampaTraseira', 'fechaduraTampa'], motivo: 'fechadura embute na tampa traseira abaixo da placa' },
@@ -267,7 +273,8 @@ const receita = {
       { nome: 'portaDireita', forma: 'Porta direita de quadro completo recortada da chapa com fenda física de 4 mm, friso lateral e maçaneta', tecnica: 'lente de aberturaPorContorno (+x, recuoDaLente 4 mm) com vão do vidro recortado, friso conformado e maçaneta' },
       { nome: 'portaEsquerda', forma: 'Porta esquerda de quadro completo recortada da chapa com fenda física de 4 mm, friso lateral e maçaneta', tecnica: 'lente de aberturaPorContorno (-x, recuoDaLente 4 mm) com vão do vidro recortado, friso conformado e maçaneta' },
       { nome: 'tampaTraseira', forma: 'Tampa traseira (porta-malas) separada com fenda física de 4 mm, vão do vidro traseiro e rebaixo trapezoidal da placa', tecnica: 'lente de aberturaPorContorno (-z, recuoDaLente 4 mm) com vão do vidro traseiro e rebaixoPorContorno da placa' },
-      { nome: 'tampaTanque', forma: 'Contorno da portinhola de combustível na lateral traseira direita', tecnica: 'conformarNaChapa fechado sobre a chapa (+x)' },
+      { nome: 'tampaTanque', forma: 'Portinhola real do tanque de combustível recortada na lateral traseira direita com cantos arredondados e fenda de 2,5 mm', tecnica: 'lente de aberturaPorContorno (+x, recuoDaLente 2,5 mm)' },
+      { nome: 'arcosEstampados', forma: 'Abas circulares estampadas salientes na cor da lataria em volta dos 4 arcos de roda', tecnica: 'Subdivisão paramétrica amostrando a pele lateral da chapa e espelhada em x' },
       { nome: 'capo', forma: 'Capô como peça separada com dois vincos longitudinais, dobra frontal de lombada e 24 rasgos reais de respiro', tecnica: 'Subdivisão própria de gaiolaPorRede com espessura e subtrair dos rasgos de ventilação' },
       { nome: 'parachoqueDianteiro', forma: 'Corpo envolvente preto na frente com friso claro horizontal', tecnica: 'Subdivisão de gaiolaVarrida fechada contornando a frente até o arco dianteiro' },
       { nome: 'parachoqueTraseiro', forma: 'Corpo envolvente preto na traseira com friso claro horizontal', tecnica: 'Subdivisão de gaiolaVarrida fechada contornando a traseira até o arco traseiro' },
@@ -293,6 +300,7 @@ const receita = {
     { contem: 'portaDireita', motivo: 'porta direita é peça móvel separada com fenda física real de 4 mm em relação à carroceria' },
     { contem: 'portaEsquerda', motivo: 'porta esquerda é peça móvel separada com fenda física real de 4 mm em relação à carroceria' },
     { contem: 'tampaTraseira', motivo: 'tampa traseira é peça móvel separada com fenda física real de 4 mm em relação à carroceria' },
+    { contem: 'tampaTanque', motivo: 'portinhola do tanque é peça móvel separada com fenda física real de 2,5 mm no lado direito' },
     { contem: 'capo', motivo: 'capô é peça móvel separada com fenda física real de 4 mm em relação à lataria' },
     { contem: 'escapamento', motivo: 'tubo do escapamento fica sob o para-choque traseiro e liga ao chassi em etapa futura' },
   ],
@@ -308,6 +316,7 @@ const receita = {
       { nome: 'vidroPortaDireita', superficie: { op: 'aberturaPorContorno', id: 12 }, semMoldura: { motivo: 'vidro e borracha da porta direita são da etapa de vidros' } },
       { nome: 'vidroPortaEsquerda', superficie: { op: 'aberturaPorContorno', id: 13 }, semMoldura: { motivo: 'vidro e borracha da porta esquerda são da etapa de vidros' } },
       { nome: 'vidroTraseiro', superficie: { op: 'aberturaPorContorno', id: 14 }, semMoldura: { motivo: 'vidro traseiro e borracha são da etapa de vidros' } },
+      { nome: 'vaoTampaTanque', superficie: { op: 'aberturaPorContorno', id: 15 }, semMoldura: { motivo: 'a portinhola separada fecha o vão do tanque com fenda física real de 2,5 mm' } },
     ];
   },
   get PASSOS() { return gerarPassos(this.PARAMS); },
