@@ -56,8 +56,13 @@ O adaptador (`src/autoria/adaptar-three.js`) já suporta `MeshPhysicalMaterial` 
   - **Nunca usar cubo maciço na carcaça** até a frente (ele tampa a parábola e o bulbo!): usar placa traseira recuada + moldura externa **oca**.
   - Camadas internas: máscara prata com recorte circular cortado no topo/base (criando os arcos `(` `)` laterais) → parábola circular côncava profunda → conjunto óptico central da lâmpada.
   - Lente frontal: usar `mistura: 'transparente'` (`opacidade: 0.40..0.45`) + `verniz: 1.0` + estrias verticais reais na geometria (evitar `transmission` puro em malha fechada dupla quando se quer ver o refletor com nitidez no estúdio da bancada).
-- **Fendas de painel e frisos (`fendaCapo`, `frisoLateral`):**
-  - Usar `conformarNaChapa` sobre `stChapa` (calculado uma vez só em `parachoques.js`) — executa em fração de segundo, acompanha qualquer curvatura 3D e evita booleanas pesadas.
+- **Capô como peça separada real (`capo` + `cofreCapo` em `receita/capo.js`) em vez de fitas `conformarNaChapa`:**
+  - **Nunca colocar os vincos longitudinais do capô na coluna `L5` (`quina`) da `chapa`:** `L5` forma a coluna A; puxá-la para dentro em `z = 845` torce a base da coluna A em "S" e cria bicos nos cantos do teto.
+  - **Solução definitiva:** deixar `L5` livre para formar uma coluna A reta e uniforme (`~62 mm`) com teto abobadado suave, recortar o vão real do capô + vão frontal na `chapa` via `subtrair` dedicado (`passoVaoCapoNaChapa`), e construir o `capo` com sua própria `gaiolaPorRede` (`espessura: 6 mm`, vincos longitudinais próprios e dobra frontal de lombada) deixando **fenda física real de 4 mm** contínua até a divisão farol/pisca.
+  - **Rasgos de respiro reais no capô:** cortar diretamente na malha do `capo` com um único bloco `subtrair` de 24 prismas verticais sobre uma bandeja escura (`cofreCapo`) 14–20 mm abaixo — elimina qualquer bloco colado/torto ("churrasqueira") e mostra a espessura real da chapa nos rasgos.
+  - **Atenção nas calhas do `cofreCapo`:** manter as calhas laterais `16–22 mm` abaixo da pele externa (e acima de `y = 706` na frente) para nunca aflorarem na fenda nem encostarem nos faróis/setas, usando a calha traseira (`y = 921`) encostada na face interna do capô para fechar o grafo de contatos (`chapa ↔ cofreCapo ↔ capo`).
+- **Frisos laterais (`frisoLateral`):**
+  - Usar `conformarNaChapa` sobre `stChapa` (calculado uma vez só em `parachoques.js`) — executa em fração de segundo e acompanha a curvatura 3D da lateral.
 
 ---
 
@@ -67,10 +72,12 @@ O adaptador (`src/autoria/adaptar-three.js`) já suporta `MeshPhysicalMaterial` 
 - **Fatia A (`26423358`):** casco 100% quad sem estrela na coluna D, vinco horizontal lateral contínuo, Curvas 1/3/4, colunas A/B/D corrigidas.
 - **Fatia B (`d6226993`):** lanternas traseiras envolventes 3D com lentes prismáticas translúcidas, sulco em V contínuo, refletor interno e ré embutida no vermelho.
 - **Fatia C (`9311007d`, `a6e0ef2e`):** conjunto óptico dianteiro com altura real, farol trapezoidal com parábola 3D + máscara prata + lente transparente, pisca embutido curvo em "D" e grade trapezoidal de 7 lâminas.
-- **Bloco 1 (`f3dd95ec`):** nariz mais fino sem ombros "balão", colunas A mais verticais com teto mais largo e para-brisa arredondado, fenda do capô (`fendaCapo`) e churrasqueira de ventilação (`churrasqueira`).
+- **Bloco 1 (`f3dd95ec`):** nariz mais fino sem ombros "balão", colunas A mais verticais com teto mais largo e para-brisa arredondado.
 - **Bloco 2 (`40952942`):** recesso horizontal sob o lábio do capô, borda interna dos faróis mais suave (`12 mm`, cantos `r = 16 mm`), aro vítreo fino (`3.5 mm`), 32 estrias verticais reais na lente sem telinha quadriculada nem "alvo" concêntrico, estrias horizontais nos piscas dianteiros e grade de 7 lâminas mais profunda e contrastada.
-- **Bloco 3 (`903ed6a8`):** respiros (`churrasqueira`) movidos para dentro da fenda do capô, para-choque dianteiro esbelto e afunilado (`y = 256..498`) com friso claro fino (`7 mm`), faróis de neblina trapezoidais com estrias verticais e placa dianteira mais alta com cantos arredondados.
-- **Bloco 3B:** chanfro superior nos para-lamas, nariz mais fino (`y = 756`) com dobra fechada de "lombada", relevo longitudinal geométrico real no capô (`±615 → ±535`), fenda mais larga descendo pela dobra frontal até a divisão farol/pisca, 16 ranhuras finas por lado nos respiros, para-choque dianteiro subido `+26 mm` sem espichar afinando o bigode, e brilho óptico interno (cromo vivo nos faróis, bacia côncava 3D + bulbo nos neblinas e lente âmbar transparente com refletor nos piscas).
+- **Bloco 3 (`903ed6a8`):** para-choque dianteiro esbelto e afunilado (`y = 256..498`) com friso claro fino (`7 mm`), faróis de neblina trapezoidais com estrias verticais e placa dianteira mais alta com cantos arredondados.
+- **Bloco 3B (`01ff1bd4`):** chanfro superior nos para-lamas, para-choque dianteiro subido `+26 mm` sem espichar afinando o bigode, e brilho óptico interno (cromo vivo nos faróis, bacia côncava 3D + bulbo nos neblinas e lente âmbar transparente com refletor nos piscas).
+- **Bloco 4A:** colunas A corrigidas (retas, uniformes `~62 mm`, cantos do teto suavemente arredondados, sem torção em S), `capo` como peça separada real com fenda física contínua de `4 mm` envolvendo a dobra frontal até a divisão farol/pisca, vincos longitudinais próprios, 24 rasgos reais de respiro cortados na malha do capô sobre bandeja escura (`cofreCapo`), e remoção definitiva das fitas `fendaCapo` e blocos `churrasqueira`.
 
 ### Próximos blocos planejados
-- **Bloco 4:** para-choque traseiro esbelto com balanço traseiro ascendente, rebaixo trapezoidal mais profundo da placa traseira, fechadura detalhada, escapamento inclinado, maçaneta da porta e auditoria final (`guarda:acervo`, `guarda:referencial`, tempo de importação).
+- **Bloco 4B:** recorte real do alojamento da `setaDianteira` no canto do para-lama (sem chapa fechada por trás do pisca) e carcaça preta 100% contida atrás da lente âmbar.
+- **Bloco 4C:** para-choque traseiro esbelto com balanço traseiro ascendente, rebaixo trapezoidal mais profundo da placa traseira, fechadura detalhada, escapamento inclinado, maçaneta da porta e auditoria final (`guarda:acervo`, `guarda:referencial`, tempo de importação).

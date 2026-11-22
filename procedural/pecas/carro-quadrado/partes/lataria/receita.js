@@ -5,29 +5,30 @@ import { m, derivarChapa, projetarVista, contornoComFilete, fazerArcoD, fazerArc
 import { rebaixoPorContorno } from '../../../../nucleo/rebaixo-por-contorno.js';
 import { derivarParachoques, passosParachoques } from './receita/parachoques.js';
 import { ALIASES_FRENTE_TRASEIRA, passosFrenteTraseira } from './receita/frente-traseira.js';
+import { derivarCapo, passosCapo, passoVaoCapoNaChapa } from './receita/capo.js';
 
 export const TABELA = {
   chapa: { espessura: 8, passo: 200, niveis: 2, anguloMax: 20, liso: false },
   estacoes: [1910, 1550, 1235, 845, 310, -300, -1125, -1530, -1730, -1935],
-  /* cada seção tem 7 níveis: soleira, baixo, meio (Curva 3), vinco (lateral), cintura (topo do chanfro), quina (vinco do capô / coluna A), eixo */
+  /* cada seção tem 7 níveis: soleira, baixo, meio (Curva 3), vinco (lateral), cintura (topo do chanfro), quina (coluna A / borda do teto), eixo */
   secoes: {
-    1910:    [[760, 290], [795, 425], [810, 610], [798, 708], [748, 738], [535, 749], 756],
-    1550:    [[780, 255], [810, 425], [825, 615], [818, 732], [762, 792], [560, 808], 816],
-    1235:    [[790, 255], [820, 425], [835, 620], [830, 750], [768, 844], [588, 862], 870],
-    845:     [[795, 255], [825, 425], [840, 625], [838, 770], [772, 908], [615, 926], 935],
-    310:     [[795, 255], [825, 425], [840, 630], [838, 778], [775, 945], [622, 1362], 1374],
-    '-300':  [[795, 255], [825, 425], [840, 632], [838, 785], [775, 945], [622, 1384], 1396],
-    '-1125': [[795, 255], [825, 425], [840, 632], [838, 792], [775, 945], [622, 1382], 1394],
-    '-1530': [[790, 255], [820, 425], [835, 632], [833, 796], [775, 945], [622, 1364], 1376],
-    '-1730': [[778, 265], [808, 428], [824, 628], [822, 798], [768, 942], [668, 1170], 1178],
-    '-1935': [[762, 285], [792, 430], [810, 625], [808, 800], [755, 932], [716, 962], 966],
+    1910:    [[760, 290], [795, 425], [810, 610], [798, 708], [752, 740], [696, 746], 750],
+    1550:    [[780, 255], [810, 425], [825, 615], [818, 732], [766, 794], [708, 804], 810],
+    1235:    [[790, 255], [820, 425], [835, 620], [830, 750], [774, 846], [718, 856], 864],
+    845:     [[795, 255], [825, 425], [840, 625], [838, 770], [776, 908], [728, 922], 932],
+    310:     [[795, 255], [825, 425], [840, 630], [838, 778], [775, 945], [612, 1362], 1380],
+    '-300':  [[795, 255], [825, 425], [840, 632], [838, 785], [775, 945], [612, 1382], 1398],
+    '-1125': [[795, 255], [825, 425], [840, 632], [838, 792], [775, 945], [612, 1380], 1396],
+    '-1530': [[790, 255], [820, 425], [835, 632], [833, 796], [775, 945], [612, 1364], 1380],
+    '-1730': [[778, 265], [808, 428], [824, 628], [822, 798], [768, 942], [664, 1170], 1180],
+    '-1935': [[762, 285], [792, 430], [810, 625], [808, 800], [755, 932], [714, 962], 968],
   },
   frente: [
     [0, 290, 1945],
     [0, 425, 2000],
     [0, 610, 2018],
     [0, 712, 2018],
-    [0, 744, 2002],
+    [0, 744, 2000],
   ],
   /* Curva 1 (tuck-under traseiro): vertical no âmbar/vinco (-2022) e tombando para frente em direção ao para-choque (-1982) */
   traseira: [
@@ -37,21 +38,22 @@ export const TABELA = {
     [0, 800, -2022],
     [0, 930, -2008],
   ],
-  vincos: { lateral: 0.85, cintura: 0.45, quina: 0.38 },
+  vincos: { lateral: 0.85, cintura: 0.28, quina: 0.14 },
   arcos: {
     dianteiro: { z: 1235, y: 290, raio: 350, lados: 32 },
     traseiro: { z: -1125, y: 290, raio: 350, lados: 32 },
   },
   vidros: {
-    /* Coluna A mais vertical e fina, para-brisa mais largo/alto com testa do teto fina e cantos arredondados */
+    /* Coluna A reta e uniforme (~62 mm do pé ao teto), arco do teto suave e cantos arredondados */
     porta: [[665, 960, 18], [295, 1348, 145], [-355, 1354, 16], [-368, 960, 16]],
     lateralTraseiro: [[-412, 1354, 18], [-1435, 1345, 24], [-1805, 974, 18], [-1770, 960, 18], [-456, 960, 24]],
     paraBrisaVista: [0, 0.77, 0.63],
-    paraBrisa: [[-708, 948, 830, 32], [708, 948, 830, 32], [568, 1346, 365, 36], [-568, 1346, 365, 36]],
+    paraBrisa: [[-678, 948, 830, 34], [678, 948, 830, 34], [548, 1344, 365, 38], [-548, 1344, 365, 38]],
     traseiroVista: [0, 0.70, -0.71],
-    traseiro: [[-555, 1325, -1590, 24], [555, 1325, -1590, 24], [655, 985, -1945, 24], [-655, 985, -1945, 24]],
+    traseiro: [[-545, 1325, -1590, 24], [545, 1325, -1590, 24], [655, 985, -1945, 24], [-655, 985, -1945, 24]],
   },
   aberturas: {
+    /* vão frontal para grade + faróis; o recorte do capô (topo + lábio até y = 700) entra via subtrair dedicado */
     frontal: [[-742, 568, 12], [742, 568, 12], [742, 700, 12], [-742, 700, 12]],
     /* Curva 4: borda interna acompanha o trapézio da tampa (634 embaixo subindo para 664 em cima) */
     lanternaTraseira: [[634, 530, 8], [776, 530, 10], [758, 842, 16], [664, 842, 10]],
@@ -133,24 +135,27 @@ export const MATERIAIS = {
 export function derivar(T) {
   const { rede, zs } = derivarChapa(T);
   const varridos = derivarParachoques(T);
-  return { rede, zs, varridos };
+  const capo = derivarCapo();
+  return { rede, zs, varridos, capo };
 }
 
 export const ALIASES = [...fazerArcoD(TABELA).aliases, ...fazerArcoT(TABELA).aliases, ...ALIASES_FRENTE_TRASEIRA];
 
 export function gerarPassos(T) {
-  const { rede, varridos } = derivar(T);
+  const { rede, varridos, capo } = derivar(T);
   const arcoD = fazerArcoD(T);
   const arcoT = fazerArcoT(T);
   const { medidas: _, cantos: cantosRede, ...passoRede } = rede.passo;
   const cantosChapa = (cantosRede ?? []).filter((c) => c !== 'f_cintura' && c !== 't_cintura');
 
-  let nid = 12;
+  let nid = 11;
   const proxId = () => { const atual = nid; nid += 1; return atual; };
+
+  const vaoCapo = passoVaoCapoNaChapa(proxId, { op: 'aberturaPorContorno', id: 10 });
 
   const plT = T.traseiraPecas.placa;
   const rebaixoPlaca = rebaixoPorContorno({
-    corpo: { origem: { op: 'aberturaPorContorno', id: 11 } },
+    corpo: { origem: vaoCapo.origem },
     vista: 'z',
     sentido: '-',
     profundidade: 4,
@@ -174,8 +179,8 @@ export function gerarPassos(T) {
     ['aberturaPorContorno', { origemId: 7, chapa: { origem: { op: 'aberturaPorContorno', id: 6 } }, vista: 'x', sentido: '+', simetria: 'x', contorno: contornoComFilete(T.vidros.lateralTraseiro) }],
     ['aberturaPorContorno', { origemId: 8, chapa: { origem: { op: 'aberturaPorContorno', id: 7 } }, vista: T.vidros.paraBrisaVista, sentido: '+', contorno: contornoComFilete(projetarVista(T.vidros.paraBrisaVista, T.vidros.paraBrisa)) }],
     ['aberturaPorContorno', { origemId: 9, chapa: { origem: { op: 'aberturaPorContorno', id: 8 } }, vista: T.vidros.traseiroVista, sentido: '+', contorno: contornoComFilete(projetarVista(T.vidros.traseiroVista, T.vidros.traseiro)) }],
-    ['aberturaPorContorno', { origemId: 10, chapa: { origem: { op: 'aberturaPorContorno', id: 9 } }, vista: 'z', sentido: '+', contorno: contornoComFilete(T.aberturas.frontal) }],
-    ['aberturaPorContorno', { origemId: 11, chapa: { origem: { op: 'aberturaPorContorno', id: 10 } }, vista: 'z', sentido: '-', simetria: 'x', contorno: contornoComFilete(T.aberturas.lanternaTraseira) }],
+    ['aberturaPorContorno', { origemId: 10, chapa: { origem: { op: 'aberturaPorContorno', id: 9 } }, vista: 'z', sentido: '-', simetria: 'x', contorno: contornoComFilete(T.aberturas.lanternaTraseira) }],
+    ...vaoCapo.passos,
     ...rebaixoPlaca.passos,
   ];
 
@@ -185,6 +190,7 @@ export function gerarPassos(T) {
     ...passosChapa,
     ['parte', { nome: 'chapa', sel: selFinal }],
     ['material', { usa: 'lataria', sel: selFinal }],
+    ...passosCapo(capo, proxId),
     ...passosParachoques(T, varridos, proxId, passosChapa, rede.pontos, aliasesChapa),
     ...passosFrenteTraseira(T, proxId),
   ];
@@ -204,8 +210,8 @@ export const CONTATOS = [
   { par: ['chapa', 'placaTraseira'], motivo: 'placa traseira apoia na tampa traseira' },
   { par: ['chapa', 'puxadorTampa'], motivo: 'puxador apoia na tampa traseira acima da placa' },
   { par: ['chapa', 'fechaduraTampa'], motivo: 'fechadura embute na tampa traseira abaixo da placa' },
-  { par: ['chapa', 'fendaCapo'], motivo: 'fenda do capô conforma sobre a chapa nas bordas laterais e traseira do capô' },
-  { par: ['chapa', 'churrasqueira'], motivo: 'entradas de ventilação assentam no painel do torpedo à frente do para-brisa' },
+  { par: ['chapa', 'cofreCapo'], motivo: 'calhas e bandeja do cofre apoiam nas bordas internas do vão do capô na chapa' },
+  { par: ['capo', 'cofreCapo'], motivo: 'capô separado apoia sobre as calhas do cofre mantendo fenda física real de 4 mm' },
 ];
 
 export const PONTOS = [
@@ -214,7 +220,7 @@ export const PONTOS = [
 ];
 
 const receita = {
-  meta: { nome: 'carro-quadrado/lataria', desc: 'Lataria, frente, traseira, para-choques e friso lateral da perua quadrada' },
+  meta: { nome: 'carro-quadrado/lataria', desc: 'Lataria, capô, frente, traseira, para-choques e friso lateral da perua quadrada' },
   PARAMS: TABELA,
   ALIASES,
   MATERIAIS,
@@ -223,6 +229,7 @@ const receita = {
     return {
       origem: 'centro do carro no chão: x para a direita, y para cima, frente em +z',
       ...d.rede.pontos,
+      ...d.capo.rede.pontos,
       ...d.varridos.pcD.pontos,
       ...d.varridos.pcDFriso.pontos,
       ...d.varridos.pcT.pontos,
@@ -230,7 +237,7 @@ const receita = {
     };
   },
   PLANO: {
-    objeto: 'Lataria, frente, traseira, para-choques e friso lateral da perua quadrada (4050 x 1670 x 1390 mm)',
+    objeto: 'Lataria, capô separado, frente, traseira, para-choques e friso lateral da perua quadrada (4050 x 1670 x 1390 mm)',
     referencias: [
       '../../referencias/frontal.prancha.svg',
       '../../referencias/lateral.prancha.svg',
@@ -239,22 +246,22 @@ const receita = {
     ],
     escala: { medida: 'comprimento total da chapa, de z -2025 a +2025 mm', milimetros: 4050 },
     partes: [
-      { nome: 'chapa', forma: 'Casco contínuo com arcos de roda, vãos dos vidros, vão frontal e vãos das lanternas', tecnica: 'Subdivisão de gaiolaPorRede com furoPassante e aberturaPorContorno' },
-      { nome: 'parachoqueDianteiro', forma: 'Corpo envolvente preto na frente com friso claro horizontal em y 455', tecnica: 'Subdivisão de gaiolaVarrida fechada contornando a frente até o arco dianteiro' },
-      { nome: 'parachoqueTraseiro', forma: 'Corpo envolvente preto na traseira com friso claro horizontal em y 465', tecnica: 'Subdivisão de gaiolaVarrida fechada contornando a traseira até o arco traseiro' },
-      { nome: 'frisoLateral', forma: 'Barras pretas laterais em y 515 entre os arcos e atrás do arco traseiro', tecnica: 'conformarNaChapa em trilho sobre a chapa com simetria em x' },
-      { nome: 'gradeFrontal', forma: 'Caixa escura recuada com 7 lâminas horizontais no centro do vão frontal', tecnica: 'Cubos com arranja linear em plástico preto fosco' },
-      { nome: 'farol', forma: 'Par de faróis retangulares com carcaça recuada e lente clara', tecnica: 'Cubo e chamferBox espelhados em x' },
-      { nome: 'setaDianteira', forma: 'Par de setas âmbar nos cantos externos da frente', tecnica: 'chamferBox espelhada em x' },
-      { nome: 'placaDianteira', forma: 'Placa retangular clara de 340 por 135 mm no centro do para-choque dianteiro', tecnica: 'chamferBox apoiada na face frontal do para-choque' },
-      { nome: 'farolNeblina', forma: 'Par de faróis de neblina retangulares embutidos na saia dianteira', tecnica: 'chamferBox espelhada em x' },
-      { nome: 'lanternaTraseira', forma: 'Par de lanternas verticais de três faixas empilhadas nos cantos traseiros', tecnica: 'Cubo de fundo e três chamferBox por lado espelhadas em x' },
+      { nome: 'chapa', forma: 'Casco contínuo com arcos de roda, vãos dos vidros, vão do capô, vão frontal e vãos das lanternas', tecnica: 'Subdivisão de gaiolaPorRede com furoPassante e aberturaPorContorno' },
+      { nome: 'capo', forma: 'Capô como peça separada com dois vincos longitudinais, dobra frontal de lombada e 24 rasgos reais de respiro', tecnica: 'Subdivisão própria de gaiolaPorRede com espessura e subtrair dos rasgos de ventilação' },
+      { nome: 'cofreCapo', forma: 'Calhas laterais/traseira sob a fenda real do capô e bandeja escura de caixa de ar sob os rasgos', tecnica: 'Subdivisão fechada em plástico preto fosco' },
+      { nome: 'parachoqueDianteiro', forma: 'Corpo envolvente preto na frente com friso claro horizontal', tecnica: 'Subdivisão de gaiolaVarrida fechada contornando a frente até o arco dianteiro' },
+      { nome: 'parachoqueTraseiro', forma: 'Corpo envolvente preto na traseira com friso claro horizontal', tecnica: 'Subdivisão de gaiolaVarrida fechada contornando a traseira até o arco traseiro' },
+      { nome: 'frisoLateral', forma: 'Barras pretas laterais em y 515 entre os arcos', tecnica: 'conformarNaChapa em trilho sobre a chapa com simetria em x' },
+      { nome: 'gradeFrontal', forma: 'Caixa escura recuada com 7 lâminas horizontais no centro do vão frontal', tecnica: 'Subdivisão trapezoidal acompanhando a inclinação dos faróis' },
+      { nome: 'farol', forma: 'Par de faróis trapezoidais com máscara prata, parábola refletora 3D e lente estriada vertical', tecnica: 'Subdivisão espelhada em x com lente transparente estriada' },
+      { nome: 'setaDianteira', forma: 'Par de setas âmbar curvas nos cantos externos da frente com estrias horizontais', tecnica: 'Subdivisão curva envolvente espelhada em x' },
+      { nome: 'placaDianteira', forma: 'Placa retangular clara com cantos arredondados apoiada no para-choque dianteiro', tecnica: 'Subdivisão com cantos arredondados e moldura preta fina' },
+      { nome: 'farolNeblina', forma: 'Par de faróis de neblina trapezoidais com bacia refletora 3D e lente estriada', tecnica: 'Subdivisão trapezoidal espelhada em x' },
+      { nome: 'lanternaTraseira', forma: 'Par de lanternas envolventes de faixas empilhadas nos cantos traseiros', tecnica: 'Subdivisão curva envolvente 3D com lentes prismáticas translúcidas' },
       { nome: 'placaTraseira', forma: 'Placa retangular clara de 340 por 135 mm na tampa traseira', tecnica: 'chamferBox centrada em y 695' },
       { nome: 'puxadorTampa', forma: 'Barra preta horizontal acima da placa traseira em y 795', tecnica: 'chamferBox centrada acima da placa' },
       { nome: 'fechaduraTampa', forma: 'Cilindro pequeno preto abaixo da placa traseira em y 580', tecnica: 'Cilindro em z com tampas' },
       { nome: 'escapamento', forma: 'Tubo metálico sob o para-choque traseiro no lado esquerdo', tecnica: 'Cilindro em z em x +540 e y 215' },
-      { nome: 'fendaCapo', forma: 'Fenda escura contornando as bordas laterais e traseira do capô', tecnica: 'conformarNaChapa na vista superior sobre a chapa' },
-      { nome: 'churrasqueira', forma: 'Par de grades de ventilação com aletas escuras no torpedo à frente do para-brisa', tecnica: 'Subdivisão de blocos inclinados espelhados em x' },
     ],
     criteriosDeReprovacao: [
       'Dimensões da chapa fora de 4050 x 1670 x 1390 mm além da tolerância',
@@ -272,8 +279,7 @@ const receita = {
       { nome: 'vidroLateralTraseiro', superficie: { op: 'aberturaPorContorno', id: 7 }, semMoldura: { motivo: 'vidro e borracha lateral traseiro são da etapa de vidros' } },
       { nome: 'paraBrisa', superficie: { op: 'aberturaPorContorno', id: 8 }, semMoldura: { motivo: 'para-brisa e borracha são da etapa de vidros' } },
       { nome: 'vidroTraseiro', superficie: { op: 'aberturaPorContorno', id: 9 }, semMoldura: { motivo: 'vidro traseiro e borracha são da etapa de vidros' } },
-      { nome: 'vaoFrontal', superficie: { op: 'aberturaPorContorno', id: 10 }, semMoldura: { motivo: 'grade, faróis e setas fecham o vão frontal diretamente' } },
-      { nome: 'vaoLanternaTraseira', superficie: { op: 'aberturaPorContorno', id: 11 }, semMoldura: { motivo: 'as lanternas traseiras fecham o vão diretamente' } },
+      { nome: 'vaoLanternaTraseira', superficie: { op: 'aberturaPorContorno', id: 10 }, semMoldura: { motivo: 'as lanternas traseiras fecham o vão diretamente' } },
     ];
   },
   get PASSOS() { return gerarPassos(this.PARAMS); },
