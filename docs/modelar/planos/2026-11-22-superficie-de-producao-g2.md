@@ -73,6 +73,10 @@ Desligada, a opção dá a mesma gaiola de hoje, bit a bit. As cotas exatas cont
 
 Se na fatia 2 nenhuma das duas formas passar nas chapas da revisão de 2026-11-19, parar e levar à pessoa antes da tampa. Se a tampa da fatia 4 não ficar dentro de 0,1 mm da gaiola regular fora da zona do extraordinário, parar. Se o quarto traseiro melhorar na zebra e sair da pele mais de 1,5 mm, a opção continua experimental: é o caso da onda de 400 mm, e o gate da fatia 1 existe para pegá-lo.
 
+## Andamento
+
+Fatia 1, primeira parte, feita em 2026-11-22, com as medidas em `docs/modelar/banco-de-provas/superficie-g2-2026-11-22/`. A distância à pele é a ferramenta `tools/modelar/distancia-a-pele.mjs`, que mede a superfície limite contra a pele que a receita exporta em `PELE(PARAMS)`, e com `--zebra --contra` dá o veredito que junta as duas medidas contra uma linha de base. O carro-fastback exporta a pele do flanco, e a linha de base do quarto traseiro está gravada: no flanco, longe da borda da soleira e sem o arco, a chapa fica a até 1,79 mm da pele, acima do 1,5 mm do gate 3, que a receita registrava com roteiro de rascunho sobre outra faixa. A decisão de manter o 1,5 mm ou medi-lo contra a linha de base fica para a fatia 5, com a pessoa. O diagnóstico do preenchimento espera `gaiola-por-rede.js` entrar no território.
+
 ## Fechamento
 
 Preencher ao concluir ou cancelar: estado final, commit e PR, gates, resultado observado e candidatos devolvidos ao backlog.

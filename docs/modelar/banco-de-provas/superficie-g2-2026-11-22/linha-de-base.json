@@ -1,0 +1,1337 @@
+{
+ "alvo": "procedural/pecas/carro-fastback/partes/lataria/receita.js",
+ "distancia": {
+  "parametros": {
+   "passoMm": 25,
+   "passoEfetivoMm": 27.072,
+   "alcanceMm": 30
+  },
+  "peles": [
+   {
+    "nome": "flanco",
+    "espelho": "x",
+    "regioes": [
+     {
+      "nome": "flanco",
+      "faces": 1638,
+      "pontos": 1638,
+      "medidos": 1638,
+      "foraDaPele": 0,
+      "longe": 0,
+      "maxMm": 1.79,
+      "p95Mm": 1.076,
+      "medianaMm": 0.347,
+      "paraForaMm": 1.369,
+      "paraDentroMm": 1.79,
+      "onde": [
+       898,
+       721,
+       -483
+      ]
+     },
+     {
+      "nome": "porta",
+      "faces": 1200,
+      "pontos": 1200,
+      "medidos": 1200,
+      "foraDaPele": 0,
+      "longe": 0,
+      "maxMm": 2.802,
+      "p95Mm": 1.198,
+      "medianaMm": 0.431,
+      "paraForaMm": 2.263,
+      "paraDentroMm": 2.802,
+      "onde": [
+       927,
+       276,
+       -883
+      ]
+     },
+     {
+      "nome": "paralama",
+      "faces": 966,
+      "pontos": 966,
+      "medidos": 963,
+      "foraDaPele": 3,
+      "longe": 0,
+      "maxMm": 2.934,
+      "p95Mm": 0.673,
+      "medianaMm": 0.259,
+      "paraForaMm": 2.546,
+      "paraDentroMm": 2.934,
+      "onde": [
+       929,
+       270,
+       -916
+      ]
+     },
+     {
+      "nome": "ombro",
+      "faces": 1504,
+      "pontos": 1504,
+      "medidos": 301,
+      "foraDaPele": 181,
+      "longe": 1022,
+      "maxMm": 1.418,
+      "p95Mm": 0.977,
+      "medianaMm": 0.267,
+      "paraForaMm": 1.418,
+      "paraDentroMm": 0.45,
+      "onde": [
+       747,
+       957,
+       -283
+      ]
+     },
+     {
+      "nome": "coluna",
+      "faces": 1363,
+      "pontos": 1363,
+      "medidos": 0,
+      "foraDaPele": 0,
+      "longe": 1363,
+      "maxMm": null,
+      "p95Mm": null,
+      "medianaMm": null,
+      "paraForaMm": 0,
+      "paraDentroMm": 0,
+      "onde": null
+     },
+     {
+      "nome": "traseira",
+      "faces": 2940,
+      "pontos": 2940,
+      "medidos": 0,
+      "foraDaPele": 51,
+      "longe": 2889,
+      "maxMm": null,
+      "p95Mm": null,
+      "medianaMm": null,
+      "paraForaMm": 0,
+      "paraDentroMm": 0,
+      "onde": null
+     }
+    ]
+   }
+  ]
+ },
+ "zebra": {
+  "parametros": {
+   "passoMm": 25,
+   "passoEfetivoMm": 27.072,
+   "persistencia": 0.004,
+   "frequencia": 40,
+   "faixas": [
+    100,
+    200,
+    500
+   ]
+  },
+  "regioes": [
+   {
+    "nome": "flanco",
+    "olhar": "+x",
+    "faces": 1638,
+    "excluidas": 317,
+    "pontos": 1752,
+    "direcoes": [
+     {
+      "eixo": "y",
+      "extremos": 4,
+      "maximos": 3,
+      "minimos": 1,
+      "lacos": 1,
+      "lacosEsperados": 0.322,
+      "porFaixa": {
+       "<100": {
+        "extremos": 0,
+        "lacos": 0,
+        "lacosEsperados": 0
+       },
+       "100-200": {
+        "extremos": 0,
+        "lacos": 0,
+        "lacosEsperados": 0
+       },
+       "200-500": {
+        "extremos": 1,
+        "lacos": 1,
+        "lacosEsperados": 0.08
+       },
+       ">=500": {
+        "extremos": 3,
+        "lacos": 0,
+        "lacosEsperados": 0.243
+       }
+      },
+      "maiorPersistencia": 0.007,
+      "ilhas": [
+       {
+        "tipo": "maximo",
+        "persistencia": 0.007,
+        "lacos": 0,
+        "ondaMm": 735,
+        "ponto": [
+         816,
+         918,
+         -1233
+        ]
+       },
+       {
+        "tipo": "maximo",
+        "persistencia": 0.007,
+        "lacos": 0,
+        "ondaMm": 669,
+        "ponto": [
+         883,
+         859,
+         -1200
+        ]
+       },
+       {
+        "tipo": "minimo",
+        "persistencia": 0.006,
+        "lacos": 1,
+        "ondaMm": 224,
+        "ponto": [
+         917,
+         473,
+         -736
+        ]
+       },
+       {
+        "tipo": "maximo",
+        "persistencia": 0.005,
+        "lacos": 0,
+        "ondaMm": 600,
+        "ponto": [
+         922,
+         362,
+         -800
+        ]
+       }
+      ]
+     },
+     {
+      "eixo": "z",
+      "extremos": 5,
+      "maximos": 3,
+      "minimos": 2,
+      "lacos": 1,
+      "lacosEsperados": 0.95,
+      "porFaixa": {
+       "<100": {
+        "extremos": 0,
+        "lacos": 0,
+        "lacosEsperados": 0
+       },
+       "100-200": {
+        "extremos": 2,
+        "lacos": 0,
+        "lacosEsperados": 0.18
+       },
+       "200-500": {
+        "extremos": 2,
+        "lacos": 0,
+        "lacosEsperados": 0.252
+       },
+       ">=500": {
+        "extremos": 1,
+        "lacos": 1,
+        "lacosEsperados": 0.517
+       }
+      },
+      "maiorPersistencia": 0.041,
+      "ilhas": [
+       {
+        "tipo": "maximo",
+        "persistencia": 0.041,
+        "lacos": 1,
+        "ondaMm": 711,
+        "ponto": [
+         920,
+         678,
+         -833
+        ]
+       },
+       {
+        "tipo": "minimo",
+        "persistencia": 0.011,
+        "lacos": 0,
+        "ondaMm": 200,
+        "ponto": [
+         898,
+         729,
+         -433
+        ]
+       },
+       {
+        "tipo": "minimo",
+        "persistencia": 0.009,
+        "lacos": 0,
+        "ondaMm": 160,
+        "ponto": [
+         857,
+         847,
+         -233
+        ]
+       },
+       {
+        "tipo": "maximo",
+        "persistencia": 0.009,
+        "lacos": 0,
+        "ondaMm": 405,
+        "ponto": [
+         926,
+         381,
+         -833
+        ]
+       },
+       {
+        "tipo": "maximo",
+        "persistencia": 0.005,
+        "lacos": 0,
+        "ondaMm": 134,
+        "ponto": [
+         768,
+         924,
+         -167
+        ]
+       }
+      ]
+     }
+    ],
+    "extremos": 9,
+    "lacos": 2,
+    "lacosEsperados": 1.272,
+    "porFaixa": {
+     "<100": {
+      "extremos": 0,
+      "lacos": 0,
+      "lacosEsperados": 0
+     },
+     "100-200": {
+      "extremos": 2,
+      "lacos": 0,
+      "lacosEsperados": 0.18
+     },
+     "200-500": {
+      "extremos": 3,
+      "lacos": 1,
+      "lacosEsperados": 0.332
+     },
+     ">=500": {
+      "extremos": 4,
+      "lacos": 1,
+      "lacosEsperados": 0.76
+     }
+    }
+   },
+   {
+    "nome": "porta",
+    "olhar": "+x",
+    "faces": 1200,
+    "pontos": 1275,
+    "direcoes": [
+     {
+      "eixo": "y",
+      "extremos": 4,
+      "maximos": 1,
+      "minimos": 3,
+      "lacos": 1,
+      "lacosEsperados": 0.667,
+      "porFaixa": {
+       "<100": {
+        "extremos": 0,
+        "lacos": 0,
+        "lacosEsperados": 0
+       },
+       "100-200": {
+        "extremos": 0,
+        "lacos": 0,
+        "lacosEsperados": 0
+       },
+       "200-500": {
+        "extremos": 2,
+        "lacos": 1,
+        "lacosEsperados": 0.216
+       },
+       ">=500": {
+        "extremos": 2,
+        "lacos": 0,
+        "lacosEsperados": 0.451
+       }
+      },
+      "maiorPersistencia": 0.031,
+      "ilhas": [
+       {
+        "tipo": "minimo",
+        "persistencia": 0.031,
+        "lacos": 0,
+        "ondaMm": 1401,
+        "ponto": [
+         904,
+         232,
+         -767
+        ]
+       },
+       {
+        "tipo": "minimo",
+        "persistencia": 0.011,
+        "lacos": 0,
+        "ondaMm": 268,
+        "ponto": [
+         898,
+         234,
+         -500
+        ]
+       },
+       {
+        "tipo": "minimo",
+        "persistencia": 0.006,
+        "lacos": 1,
+        "ondaMm": 224,
+        "ponto": [
+         917,
+         473,
+         -736
+        ]
+       },
+       {
+        "tipo": "maximo",
+        "persistencia": 0.005,
+        "lacos": 0,
+        "ondaMm": 600,
+        "ponto": [
+         922,
+         362,
+         -800
+        ]
+       }
+      ]
+     },
+     {
+      "eixo": "z",
+      "extremos": 8,
+      "maximos": 5,
+      "minimos": 3,
+      "lacos": 2,
+      "lacosEsperados": 1.448,
+      "porFaixa": {
+       "<100": {
+        "extremos": 0,
+        "lacos": 0,
+        "lacosEsperados": 0
+       },
+       "100-200": {
+        "extremos": 5,
+        "lacos": 1,
+        "lacosEsperados": 0.8
+       },
+       "200-500": {
+        "extremos": 3,
+        "lacos": 1,
+        "lacosEsperados": 0.648
+       },
+       ">=500": {
+        "extremos": 0,
+        "lacos": 0,
+        "lacosEsperados": 0
+       }
+      },
+      "maiorPersistencia": 0.031,
+      "ilhas": [
+       {
+        "tipo": "maximo",
+        "persistencia": 0.031,
+        "lacos": 1,
+        "ondaMm": 305,
+        "ponto": [
+         920,
+         678,
+         -833
+        ]
+       },
+       {
+        "tipo": "maximo",
+        "persistencia": 0.019,
+        "lacos": 0,
+        "ondaMm": 152,
+        "ponto": [
+         906,
+         257,
+         -433
+        ]
+       },
+       {
+        "tipo": "maximo",
+        "persistencia": 0.018,
+        "lacos": 0,
+        "ondaMm": 135,
+        "ponto": [
+         902,
+         204,
+         -833
+        ]
+       },
+       {
+        "tipo": "minimo",
+        "persistencia": 0.011,
+        "lacos": 1,
+        "ondaMm": 179,
+        "ponto": [
+         903,
+         245,
+         -534
+        ]
+       },
+       {
+        "tipo": "minimo",
+        "persistencia": 0.011,
+        "lacos": 0,
+        "ondaMm": 200,
+        "ponto": [
+         898,
+         729,
+         -433
+        ]
+       },
+       {
+        "tipo": "minimo",
+        "persistencia": 0.009,
+        "lacos": 0,
+        "ondaMm": 160,
+        "ponto": [
+         857,
+         847,
+         -233
+        ]
+       },
+       {
+        "tipo": "maximo",
+        "persistencia": 0.009,
+        "lacos": 0,
+        "ondaMm": 405,
+        "ponto": [
+         926,
+         381,
+         -833
+        ]
+       },
+       {
+        "tipo": "maximo",
+        "persistencia": 0.005,
+        "lacos": 0,
+        "ondaMm": 134,
+        "ponto": [
+         768,
+         924,
+         -167
+        ]
+       }
+      ]
+     }
+    ],
+    "extremos": 12,
+    "lacos": 3,
+    "lacosEsperados": 2.115,
+    "porFaixa": {
+     "<100": {
+      "extremos": 0,
+      "lacos": 0,
+      "lacosEsperados": 0
+     },
+     "100-200": {
+      "extremos": 5,
+      "lacos": 1,
+      "lacosEsperados": 0.8
+     },
+     "200-500": {
+      "extremos": 5,
+      "lacos": 2,
+      "lacosEsperados": 0.864
+     },
+     ">=500": {
+      "extremos": 2,
+      "lacos": 0,
+      "lacosEsperados": 0.451
+     }
+    }
+   },
+   {
+    "nome": "paralama",
+    "olhar": "+x",
+    "faces": 966,
+    "excluidas": 422,
+    "pontos": 1067,
+    "direcoes": [
+     {
+      "eixo": "y",
+      "extremos": 2,
+      "maximos": 2,
+      "minimos": 0,
+      "lacos": 0,
+      "lacosEsperados": 0.173,
+      "porFaixa": {
+       "<100": {
+        "extremos": 0,
+        "lacos": 0,
+        "lacosEsperados": 0
+       },
+       "100-200": {
+        "extremos": 0,
+        "lacos": 0,
+        "lacosEsperados": 0
+       },
+       "200-500": {
+        "extremos": 0,
+        "lacos": 0,
+        "lacosEsperados": 0
+       },
+       ">=500": {
+        "extremos": 2,
+        "lacos": 0,
+        "lacosEsperados": 0.173
+       }
+      },
+      "maiorPersistencia": 0.007,
+      "ilhas": [
+       {
+        "tipo": "maximo",
+        "persistencia": 0.007,
+        "lacos": 0,
+        "ondaMm": 668,
+        "ponto": [
+         816,
+         918,
+         -1233
+        ]
+       },
+       {
+        "tipo": "maximo",
+        "persistencia": 0.007,
+        "lacos": 0,
+        "ondaMm": 602,
+        "ponto": [
+         883,
+         859,
+         -1200
+        ]
+       }
+      ]
+     },
+     {
+      "eixo": "z",
+      "extremos": 0,
+      "maximos": 0,
+      "minimos": 0,
+      "lacos": 0,
+      "lacosEsperados": 0,
+      "porFaixa": {
+       "<100": {
+        "extremos": 0,
+        "lacos": 0,
+        "lacosEsperados": 0
+       },
+       "100-200": {
+        "extremos": 0,
+        "lacos": 0,
+        "lacosEsperados": 0
+       },
+       "200-500": {
+        "extremos": 0,
+        "lacos": 0,
+        "lacosEsperados": 0
+       },
+       ">=500": {
+        "extremos": 0,
+        "lacos": 0,
+        "lacosEsperados": 0
+       }
+      },
+      "maiorPersistencia": 0,
+      "ilhas": []
+     }
+    ],
+    "extremos": 2,
+    "lacos": 0,
+    "lacosEsperados": 0.173,
+    "porFaixa": {
+     "<100": {
+      "extremos": 0,
+      "lacos": 0,
+      "lacosEsperados": 0
+     },
+     "100-200": {
+      "extremos": 0,
+      "lacos": 0,
+      "lacosEsperados": 0
+     },
+     "200-500": {
+      "extremos": 0,
+      "lacos": 0,
+      "lacosEsperados": 0
+     },
+     ">=500": {
+      "extremos": 2,
+      "lacos": 0,
+      "lacosEsperados": 0.173
+     }
+    }
+   },
+   {
+    "nome": "ombro",
+    "olhar": "+y",
+    "faces": 1504,
+    "pontos": 1601,
+    "direcoes": [
+     {
+      "eixo": "x",
+      "extremos": 8,
+      "maximos": 5,
+      "minimos": 3,
+      "lacos": 1,
+      "lacosEsperados": 2.219,
+      "porFaixa": {
+       "<100": {
+        "extremos": 1,
+        "lacos": 0,
+        "lacosEsperados": 0.085
+       },
+       "100-200": {
+        "extremos": 1,
+        "lacos": 0,
+        "lacosEsperados": 0.052
+       },
+       "200-500": {
+        "extremos": 2,
+        "lacos": 0,
+        "lacosEsperados": 0.248
+       },
+       ">=500": {
+        "extremos": 4,
+        "lacos": 1,
+        "lacosEsperados": 1.833
+       }
+      },
+      "maiorPersistencia": 0.099,
+      "ilhas": [
+       {
+        "tipo": "maximo",
+        "persistencia": 0.099,
+        "lacos": 1,
+        "ondaMm": 871,
+        "ponto": [
+         743,
+         989,
+         -467
+        ]
+       },
+       {
+        "tipo": "maximo",
+        "persistencia": 0.019,
+        "lacos": 0,
+        "ondaMm": 667,
+        "ponto": [
+         726,
+         1021,
+         -1233
+        ]
+       },
+       {
+        "tipo": "minimo",
+        "persistencia": 0.019,
+        "lacos": 0,
+        "ondaMm": 802,
+        "ponto": [
+         731,
+         985,
+         -400
+        ]
+       },
+       {
+        "tipo": "minimo",
+        "persistencia": 0.014,
+        "lacos": 0,
+        "ondaMm": 251,
+        "ponto": [
+         760,
+         996,
+         -1726
+        ]
+       },
+       {
+        "tipo": "maximo",
+        "persistencia": 0.007,
+        "lacos": 0,
+        "ondaMm": 535,
+        "ponto": [
+         787,
+         1000,
+         -1133
+        ]
+       },
+       {
+        "tipo": "maximo",
+        "persistencia": 0.007,
+        "lacos": 0,
+        "ondaMm": 67,
+        "ponto": [
+         726,
+         1016,
+         -1033
+        ]
+       },
+       {
+        "tipo": "minimo",
+        "persistencia": 0.005,
+        "lacos": 0,
+        "ondaMm": 200,
+        "ponto": [
+         782,
+         989,
+         -1000
+        ]
+       },
+       {
+        "tipo": "maximo",
+        "persistencia": 0.004,
+        "lacos": 0,
+        "ondaMm": 134,
+        "ponto": [
+         728,
+         1018,
+         -1133
+        ]
+       }
+      ]
+     },
+     {
+      "eixo": "z",
+      "extremos": 4,
+      "maximos": 3,
+      "minimos": 1,
+      "lacos": 4,
+      "lacosEsperados": 3.914,
+      "porFaixa": {
+       "<100": {
+        "extremos": 0,
+        "lacos": 0,
+        "lacosEsperados": 0
+       },
+       "100-200": {
+        "extremos": 0,
+        "lacos": 0,
+        "lacosEsperados": 0
+       },
+       "200-500": {
+        "extremos": 3,
+        "lacos": 2,
+        "lacosEsperados": 1.924
+       },
+       ">=500": {
+        "extremos": 1,
+        "lacos": 2,
+        "lacosEsperados": 1.99
+       }
+      },
+      "maiorPersistencia": 0.156,
+      "ilhas": [
+       {
+        "tipo": "maximo",
+        "persistencia": 0.156,
+        "lacos": 2,
+        "ondaMm": 968,
+        "ponto": [
+         731,
+         978,
+         -333
+        ]
+       },
+       {
+        "tipo": "maximo",
+        "persistencia": 0.067,
+        "lacos": 1,
+        "ondaMm": 468,
+        "ponto": [
+         765,
+         997,
+         -833
+        ]
+       },
+       {
+        "tipo": "maximo",
+        "persistencia": 0.065,
+        "lacos": 1,
+        "ondaMm": 401,
+        "ponto": [
+         710,
+         1012,
+         -833
+        ]
+       },
+       {
+        "tipo": "minimo",
+        "persistencia": 0.019,
+        "lacos": 0,
+        "ondaMm": 334,
+        "ponto": [
+         740,
+         998,
+         -667
+        ]
+       }
+      ]
+     }
+    ],
+    "extremos": 12,
+    "lacos": 5,
+    "lacosEsperados": 6.133,
+    "porFaixa": {
+     "<100": {
+      "extremos": 1,
+      "lacos": 0,
+      "lacosEsperados": 0.085
+     },
+     "100-200": {
+      "extremos": 1,
+      "lacos": 0,
+      "lacosEsperados": 0.052
+     },
+     "200-500": {
+      "extremos": 5,
+      "lacos": 2,
+      "lacosEsperados": 2.172
+     },
+     ">=500": {
+      "extremos": 5,
+      "lacos": 3,
+      "lacosEsperados": 3.823
+     }
+    }
+   },
+   {
+    "nome": "coluna",
+    "olhar": "+y",
+    "faces": 1363,
+    "pontos": 1446,
+    "direcoes": [
+     {
+      "eixo": "x",
+      "extremos": 4,
+      "maximos": 3,
+      "minimos": 1,
+      "lacos": 0,
+      "lacosEsperados": 0.477,
+      "porFaixa": {
+       "<100": {
+        "extremos": 0,
+        "lacos": 0,
+        "lacosEsperados": 0
+       },
+       "100-200": {
+        "extremos": 0,
+        "lacos": 0,
+        "lacosEsperados": 0
+       },
+       "200-500": {
+        "extremos": 3,
+        "lacos": 0,
+        "lacosEsperados": 0.355
+       },
+       ">=500": {
+        "extremos": 1,
+        "lacos": 0,
+        "lacosEsperados": 0.122
+       }
+      },
+      "maiorPersistencia": 0.012,
+      "ilhas": [
+       {
+        "tipo": "minimo",
+        "persistencia": 0.012,
+        "lacos": 0,
+        "ondaMm": 497,
+        "ponto": [
+         78,
+         1317,
+         -900
+        ]
+       },
+       {
+        "tipo": "maximo",
+        "persistencia": 0.01,
+        "lacos": 0,
+        "ondaMm": 335,
+        "ponto": [
+         594,
+         1265,
+         -767
+        ]
+       },
+       {
+        "tipo": "maximo",
+        "persistencia": 0.01,
+        "lacos": 0,
+        "ondaMm": 536,
+        "ponto": [
+         585,
+         1291,
+         -267
+        ]
+       },
+       {
+        "tipo": "maximo",
+        "persistencia": 0.006,
+        "lacos": 0,
+        "ondaMm": 352,
+        "ponto": [
+         628,
+         1145,
+         -1166
+        ]
+       }
+      ]
+     },
+     {
+      "eixo": "z",
+      "extremos": 2,
+      "maximos": 0,
+      "minimos": 2,
+      "lacos": 0,
+      "lacosEsperados": 0.602,
+      "porFaixa": {
+       "<100": {
+        "extremos": 0,
+        "lacos": 0,
+        "lacosEsperados": 0
+       },
+       "100-200": {
+        "extremos": 0,
+        "lacos": 0,
+        "lacosEsperados": 0
+       },
+       "200-500": {
+        "extremos": 1,
+        "lacos": 0,
+        "lacosEsperados": 0.151
+       },
+       ">=500": {
+        "extremos": 1,
+        "lacos": 0,
+        "lacosEsperados": 0.451
+       }
+      },
+      "maiorPersistencia": 0.035,
+      "ilhas": [
+       {
+        "tipo": "minimo",
+        "persistencia": 0.035,
+        "lacos": 0,
+        "ondaMm": 619,
+        "ponto": [
+         411,
+         1278,
+         -1033
+        ]
+       },
+       {
+        "tipo": "minimo",
+        "persistencia": 0.012,
+        "lacos": 0,
+        "ondaMm": 417,
+        "ponto": [
+         376,
+         1227,
+         -1267
+        ]
+       }
+      ]
+     }
+    ],
+    "extremos": 6,
+    "lacos": 0,
+    "lacosEsperados": 1.079,
+    "porFaixa": {
+     "<100": {
+      "extremos": 0,
+      "lacos": 0,
+      "lacosEsperados": 0
+     },
+     "100-200": {
+      "extremos": 0,
+      "lacos": 0,
+      "lacosEsperados": 0
+     },
+     "200-500": {
+      "extremos": 4,
+      "lacos": 0,
+      "lacosEsperados": 0.506
+     },
+     ">=500": {
+      "extremos": 2,
+      "lacos": 0,
+      "lacosEsperados": 0.573
+     }
+    }
+   },
+   {
+    "nome": "traseira",
+    "olhar": "-z",
+    "faces": 2940,
+    "pontos": 3047,
+    "direcoes": [
+     {
+      "eixo": "x",
+      "extremos": 7,
+      "maximos": 5,
+      "minimos": 2,
+      "lacos": 8,
+      "lacosEsperados": 8.752,
+      "porFaixa": {
+       "<100": {
+        "extremos": 2,
+        "lacos": 4,
+        "lacosEsperados": 3.952
+       },
+       "100-200": {
+        "extremos": 1,
+        "lacos": 0,
+        "lacosEsperados": 0.097
+       },
+       "200-500": {
+        "extremos": 2,
+        "lacos": 0,
+        "lacosEsperados": 0.878
+       },
+       ">=500": {
+        "extremos": 2,
+        "lacos": 4,
+        "lacosEsperados": 3.825
+       }
+      },
+      "maiorPersistencia": 0.306,
+      "ilhas": [
+       {
+        "tipo": "maximo",
+        "persistencia": 0.306,
+        "lacos": 4,
+        "ondaMm": 94,
+        "ponto": [
+         588,
+         944,
+         -2174
+        ]
+       },
+       {
+        "tipo": "minimo",
+        "persistencia": 0.266,
+        "lacos": 4,
+        "ondaMm": 532,
+        "ponto": [
+         320,
+         901,
+         -2208
+        ]
+       },
+       {
+        "tipo": "maximo",
+        "persistencia": 0.064,
+        "lacos": 0,
+        "ondaMm": 432,
+        "ponto": [
+         53,
+         979,
+         -2222
+        ]
+       },
+       {
+        "tipo": "maximo",
+        "persistencia": 0.034,
+        "lacos": 0,
+        "ondaMm": 510,
+        "ponto": [
+         713,
+         513,
+         -2216
+        ]
+       },
+       {
+        "tipo": "maximo",
+        "persistencia": 0.008,
+        "lacos": 0,
+        "ondaMm": 103,
+        "ponto": [
+         595,
+         1007,
+         -2156
+        ]
+       },
+       {
+        "tipo": "minimo",
+        "persistencia": 0.005,
+        "lacos": 0,
+        "ondaMm": 250,
+        "ponto": [
+         515,
+         1043,
+         -2003
+        ]
+       },
+       {
+        "tipo": "maximo",
+        "persistencia": 0.005,
+        "lacos": 0,
+        "ondaMm": 59,
+        "ponto": [
+         582,
+         973,
+         -2175
+        ]
+       }
+      ]
+     },
+     {
+      "eixo": "y",
+      "extremos": 7,
+      "maximos": 5,
+      "minimos": 2,
+      "lacos": 1,
+      "lacosEsperados": 1.673,
+      "porFaixa": {
+       "<100": {
+        "extremos": 5,
+        "lacos": 0,
+        "lacosEsperados": 0.7
+       },
+       "100-200": {
+        "extremos": 1,
+        "lacos": 0,
+        "lacosEsperados": 0.066
+       },
+       "200-500": {
+        "extremos": 1,
+        "lacos": 1,
+        "lacosEsperados": 0.906
+       },
+       ">=500": {
+        "extremos": 0,
+        "lacos": 0,
+        "lacosEsperados": 0
+       }
+      },
+      "maiorPersistencia": 0.071,
+      "ilhas": [
+       {
+        "tipo": "maximo",
+        "persistencia": 0.071,
+        "lacos": 1,
+        "ondaMm": 212,
+        "ponto": [
+         397,
+         1029,
+         -2213
+        ]
+       },
+       {
+        "tipo": "maximo",
+        "persistencia": 0.021,
+        "lacos": 0,
+        "ondaMm": 93,
+        "ponto": [
+         600,
+         901,
+         -2181
+        ]
+       },
+       {
+        "tipo": "maximo",
+        "persistencia": 0.012,
+        "lacos": 0,
+        "ondaMm": 16,
+        "ponto": [
+         458,
+         1034,
+         -2193
+        ]
+       },
+       {
+        "tipo": "maximo",
+        "persistencia": 0.009,
+        "lacos": 0,
+        "ondaMm": 75,
+        "ponto": [
+         475,
+         1061,
+         -1883
+        ]
+       },
+       {
+        "tipo": "minimo",
+        "persistencia": 0.007,
+        "lacos": 0,
+        "ondaMm": 35,
+        "ponto": [
+         429,
+         1061,
+         -1885
+        ]
+       },
+       {
+        "tipo": "minimo",
+        "persistencia": 0.007,
+        "lacos": 0,
+        "ondaMm": 36,
+        "ponto": [
+         515,
+         1043,
+         -2003
+        ]
+       },
+       {
+        "tipo": "maximo",
+        "persistencia": 0.005,
+        "lacos": 0,
+        "ondaMm": 116,
+        "ponto": [
+         424,
+         1044,
+         -2118
+        ]
+       }
+      ]
+     }
+    ],
+    "extremos": 14,
+    "lacos": 9,
+    "lacosEsperados": 10.425,
+    "porFaixa": {
+     "<100": {
+      "extremos": 7,
+      "lacos": 4,
+      "lacosEsperados": 4.652
+     },
+     "100-200": {
+      "extremos": 2,
+      "lacos": 0,
+      "lacosEsperados": 0.163
+     },
+     "200-500": {
+      "extremos": 3,
+      "lacos": 1,
+      "lacosEsperados": 1.784
+     },
+     ">=500": {
+      "extremos": 2,
+      "lacos": 4,
+      "lacosEsperados": 3.825
+     }
+    }
+   }
+  ]
+ },
+ "veredito": {
+  "aprovada": true,
+  "problemas": []
+ }
+}

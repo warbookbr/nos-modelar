@@ -412,6 +412,20 @@ export function pele(T) {
   return { O, quedaDe, yBase, yTopo, yOmbro, ySoleira, yTeto, R, fundo, rebaixo, recuo, coroa, zEixo, sobre };
 }
 
+/** A pele declarada para a distância à pele (`tools/modelar/distancia-a-pele.mjs`): o flanco, da soleira ao ombro, do começo do contorno
+ * da planta até a última estação, onde a calota começa a misturar o lado com o eixo. u é o arco do contorno e v vai de 0 na soleira a 1 no
+ * ombro, na altura de cada z; o ponto é o mesmo de que os pontos-chave das curvas do lado saem. A chapa cobre os dois lados, e o espelho
+ * em x mede o lado de x negativo contra a mesma pele. */
+export function PELE(T) {
+  const P = pele(T);
+  const { O } = P;
+  const ponto = (u, v) => {
+    const z = O.ponto(u)[0]; const s = P.ySoleira(z); const y = s + v * (P.yOmbro(z) - s);
+    return P.sobre(u, P.recuo(z, y), y, 0);
+  };
+  return { flanco: { u: [0, O.deZ(T.estacoes[T.estacoes.length - 1])], v: [0, 1], ponto, espelho: 'x' } };
+}
+
 const NIVEIS = ['soleira', 'base', 'meio', 'topo', 'ombro', 'coluna', 'quina', 'eixo'];
 const LADO = 6; /* os níveis que correm pelo contorno da planta e dão a volta pela traseira: da soleira à coluna */
 

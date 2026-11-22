@@ -230,6 +230,23 @@ export function tabelaDaZebra(res, nome) {
     ...res.regioes.map((r) => `${col(r.nome, larg)}  ${col(r.olhar, 5)}  ${num(r.pontos, 7)}  ${num(r.extremos, 8)}  ${num(r.lacos, 6)}  ${num(r.lacosEsperados, 9)}  ${nomes.map((n) => num(`${r.porFaixa[n].extremos}/${r.porFaixa[n].lacos}`, 9)).join(' ')}`)].join('\n');
 }
 
+/** chapaDaReceita(alvo, { params, cache, rotulo }) -> { chapa, receita, modulo }: a gaiola do primeiro passo `subdivisao` de uma receita em
+ *  arquivo (com o cache por passo e a variante de `params`) ou de uma chapa de prova, executando só os passos `subdivisao`. `modulo` é o
+ *  módulo importado da receita em arquivo (null na chapa de prova), para quem lê dele outra exportação, e `receita` é a variante executada. */
+export async function chapaDaReceita(alvo, { params = null, cache = true, rotulo = 'medida' } = {}) {
+  /* a chapa de prova é gerada na hora e não tem arquivo: executa inteira, sem cache, e não aceita --params */
+  const abs = CHAPAS_DE_PROVA.includes(alvo) ? null : resolve(alvo);
+  const modulo = abs ? await import(pathToFileURL(abs).href) : null;
+  let receita = abs ? modulo.default : receitaDeProva(alvo);
+  if (params) receita = receitaComParams(abs ? receita : null, params, { texto: abs ? readFileSync(abs, 'utf8') : null, nome: alvo });
+  const executada = await executarComCachePorPasso(abs, { ...receita, PASSOS: receita.PASSOS.filter(([op]) => op === 'subdivisao'), vaos: undefined },
+    { cache, variante: params ? 'so-subdivisao+params' : 'so-subdivisao' });
+  process.stderr.write(avisoDoCachePorPasso(executada, rotulo));
+  const chapa = (executada.executada.neutro.chapas ?? [])[0];
+  if (!chapa) throw new Error(`${alvo}: nenhum passo subdivisao na receita`);
+  return { chapa, receita, modulo };
+}
+
 export const OPCOES_DA_CLI = ['passo', 'persistencia', 'frequencia', 'faixas', 'caixas', 'olhar', 'saida', 'params'];
 
 function numero(lido, nome, padrao) {
@@ -251,17 +268,7 @@ async function principal(argv) {
     const faixas = lido.opcao('faixas') ? lido.opcao('faixas').split(',').map(Number) : [...PADROES.faixas];
     if (faixas.some((f) => !Number.isFinite(f))) throw new Error(`--faixas espera mm separados por vírgula, e veio '${lido.opcao('faixas')}'`);
     const caixas = lido.opcao('caixas') ? JSON.parse(readFileSync(resolve(lido.opcao('caixas')), 'utf8')) : null;
-    /* a chapa de prova é gerada na hora e não tem arquivo: executa inteira, sem cache, e não aceita --params */
-    const abs = CHAPAS_DE_PROVA.includes(alvo) ? null : resolve(alvo);
-    let receita = abs ? (await import(pathToFileURL(abs).href)).default : receitaDeProva(alvo);
-    const params = lerParams(lido.opcao('params'));
-    if (params) receita = receitaComParams(abs ? receita : null, params, { texto: abs ? readFileSync(abs, 'utf8') : null, nome: alvo });
-    const executada = await executarComCachePorPasso(abs, { ...receita, PASSOS: receita.PASSOS.filter(([op]) => op === 'subdivisao'), vaos: undefined },
-      { cache: !lido.bandeira('sem-cache'), variante: params ? 'so-subdivisao+params' : 'so-subdivisao' });
-    process.stderr.write(avisoDoCachePorPasso(executada, 'zebra'));
-    const { neutro } = executada.executada;
-    const chapa = (neutro.chapas ?? [])[0];
-    if (!chapa) throw new Error(`${alvo}: nenhum passo subdivisao na receita`);
+    const { chapa } = await chapaDaReceita(alvo, { params: lerParams(lido.opcao('params')), cache: !lido.bandeira('sem-cache'), rotulo: 'zebra' });
     nome = alvo;
     res = zebraNumerica(chapa, { passoMm: numero(lido, 'passo', PADROES.passoMm), persistencia: numero(lido, 'persistencia', PADROES.persistencia), frequencia: numero(lido, 'frequencia', PADROES.frequencia), faixas, caixas, olhar: lido.opcao('olhar') ?? null });
   } catch (e) { process.stderr.write(`zebra: ${e.message}\n`); return 2; }
