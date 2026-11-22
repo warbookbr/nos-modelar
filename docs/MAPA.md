@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2161 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2162 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -641,6 +641,7 @@
 - `2026-11-16-ponte-com-a-mecatronica.md` — Ponte com a mecatrônica: a ficha do objeto exportada, as portas elétricas declaradas e o pedido que volta conferido
 - `2026-11-17-trilhas-e-validacao-da-placa.md` — Trilhas de cobre e validação elétrica da placa declarada: a lista de ligações vira cobre conferido por regra e por conectividade
 - `2026-11-22-formas-que-faltavam.md` — Formas que faltavam: o anel, o toro e a bacia provados, a haste no esboço e a curva paralela na rede
+- `2026-11-22-helice-mola-rosca-e-fixador.md` — Hélice, mola, rosca e fixador: um caminho helicoidal que serve a quatro ferramentas que faltam
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
