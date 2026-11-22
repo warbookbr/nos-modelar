@@ -2,7 +2,7 @@
 
 **Estado:** rascunho
 
-**Território:** a declarar ao ativar, depois que o plano do [ajuste esparso da gaiola](2026-11-22-ajuste-esparso-da-gaiola.md) fechar, porque os dois mudam `procedural/nucleo/subdivisao.js`: esse arquivo, `procedural/nucleo/gaiola-por-rede.js`, os testes de subdivisão e de energia de curvatura em `procedural/nucleo/`, `tools/fixtures/correcao-de-superficie/`, a ferramenta nova da distância à pele em `tools/modelar/`, `tools/modelar/zebra-numerica.mjs` e `docs/modelar/banco-de-provas/superficie-g2-2026-11-22/`.
+**Território:** a confirmar ao ativar, depois que o plano do [ajuste esparso da gaiola](2026-11-22-ajuste-esparso-da-gaiola.md) fechar, porque os dois mudam `procedural/nucleo/subdivisao.js`. O plano muda `procedural/nucleo/gaiola-por-rede.js` na fatia 1 (o diagnóstico do preenchimento na saída) e na fatia 2 (a opção `alisarSuperficie`), e esse arquivo é usado antes pela fatia 3 do plano `2026-11-22-formas-que-faltavam` (a curva paralela na rede de curvas), que o libera antes desta ativação. A lista: `procedural/nucleo/subdivisao.js`, `procedural/nucleo/gaiola-por-rede.js`, os testes de subdivisão e de energia de curvatura em `procedural/nucleo/`, `tools/fixtures/correcao-de-superficie/`, a ferramenta nova da distância à pele em `tools/modelar/`, `tools/modelar/zebra-numerica.mjs` e `docs/modelar/banco-de-provas/superficie-g2-2026-11-22/`.
 
 **Responsável:** a IA da sessão implementa e mede; a pessoa ativa o plano, decide os pontos marcados nas fatias e julga a forma por imagem.
 
