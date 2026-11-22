@@ -161,7 +161,7 @@ export function passosParachoques(T, varridos, proxId, passosChapa, pontosChapa,
   const fl = T.frisoLateral;
   const secaoFriso = { largura: fl.largura, altura: fl.altura, chanfro: fl.chanfro };
   const stChapa = nucleo([passosChapa[0]], {}, pontosChapa, {}, null, []);
-  const baseFriso = {
+  const baseFrisoChapa = {
     malha: { st: stChapa },
     vista: 'x',
     sentido: '+',
@@ -172,13 +172,53 @@ export function passosParachoques(T, varridos, proxId, passosChapa, pontosChapa,
     parte: 'frisoLateral',
     material: 'plasticoPreto',
   };
-  const frisoMeio = conformarNaChapa({
-    ...baseFriso,
-    nome: 'frisoMeio',
-    trilho: [[m(fl.yCentro), m(fl.entreArcos[0])], [m(fl.yCentro), m(fl.entreArcos[1])]],
+  /* friso lateral dividido nas fendas reais da porta: para-lama dianteiro (chapa), folha da porta (portaDireita/Esquerda) e lateral traseira (chapa) */
+  const frisoParalamaD = conformarNaChapa({
+    ...baseFrisoChapa,
+    nome: 'frisoParalamaD',
+    trilho: [[m(fl.yCentro), m(825)], [m(fl.yCentro), m(fl.entreArcos[1])]],
     origemId: proxId(),
   });
-  passos.push(...frisoMeio.passos);
+  const frisoLateralT = conformarNaChapa({
+    ...baseFrisoChapa,
+    nome: 'frisoLateralT',
+    trilho: [[m(fl.yCentro), m(fl.entreArcos[0])], [m(fl.yCentro), m(-396)]],
+    origemId: proxId(),
+  });
+  const frisoPortaD = conformarNaChapa({
+    malha: { st: stChapa },
+    vista: 'x',
+    sentido: '+',
+    unidade: 'm',
+    secao: secaoFriso,
+    deslocamentoMm: fl.deslocamentoMm,
+    parte: 'portaDireita',
+    material: 'plasticoPreto',
+    nome: 'frisoPortaD',
+    trilho: [[m(fl.yCentro), m(-384)], [m(fl.yCentro), m(814)]],
+    origemId: proxId(),
+  });
+  const frisoPortaE = conformarNaChapa({
+    malha: { st: stChapa },
+    vista: 'x',
+    sentido: '-',
+    unidade: 'm',
+    secao: secaoFriso,
+    deslocamentoMm: fl.deslocamentoMm,
+    parte: 'portaEsquerda',
+    material: 'plasticoPreto',
+    nome: 'frisoPortaE',
+    trilho: [[m(fl.yCentro), m(-384)], [m(fl.yCentro), m(814)]],
+    origemId: proxId(),
+  });
+  passos.push(...frisoParalamaD.passos, ...frisoLateralT.passos, ...frisoPortaD.passos, ...frisoPortaE.passos);
+
+  /* maçanetas pretas horizontais montadas em cada porta (logo à frente da fenda traseira e abaixo da cintura) */
+  for (const [sinal, partePorta] of [[1, 'portaDireita'], [-1, 'portaEsquerda']]) {
+    const idMac = proxId();
+    passos.push(['chamferBox', { origemId: idMac, larg: m(26), alt: m(32), prof: m(148), chanfro: m(5), em: [m(sinal * 816), m(852), m(-285)] }]);
+    passos.push(['parte', { nome: partePorta, material: 'plasticoFosco', sel: { origem: { op: 'chamferBox', id: idMac } } }]);
+  }
 
   return passos;
 }

@@ -12,7 +12,7 @@ export const TABELA = {
   estacoes: [1910, 1550, 1235, 845, 310, -300, -1125, -1530, -1730, -1935],
   /* cada seção tem 7 níveis: soleira, baixo, meio (Curva 3), vinco (lateral), cintura (topo do chanfro), quina (coluna A / borda do teto), eixo */
   secoes: {
-    1910:    [[760, 290], [795, 425], [810, 610], [798, 708], [752, 740], [696, 746], 750],
+    1910:    [[760, 290], [795, 425], [810, 610], [804, 708], [768, 738], [696, 746], 750],
     1550:    [[780, 255], [810, 425], [825, 615], [818, 732], [766, 794], [708, 804], 810],
     1235:    [[790, 255], [820, 425], [835, 620], [830, 750], [774, 846], [718, 856], 864],
     845:     [[795, 255], [825, 425], [840, 625], [838, 770], [776, 908], [728, 922], 932],
@@ -44,15 +44,17 @@ export const TABELA = {
     traseiro: { z: -1125, y: 290, raio: 350, lados: 32 },
   },
   vidros: {
-    /* Coluna A reta e uniforme (~62 mm do pé ao teto), arco do teto suave e cantos arredondados */
-    porta: [[665, 960, 18], [295, 1348, 145], [-355, 1354, 16], [-368, 960, 16]],
-    lateralTraseiro: [[-412, 1354, 18], [-1435, 1345, 24], [-1805, 974, 18], [-1770, 960, 18], [-456, 960, 24]],
+    /* Coluna A fixa intacta no para-brisa + quadro completo da porta + Coluna B mais larga e paralela (~98 mm total) */
+    porta: [[635, 962, 18], [255, 1310, 105], [-346, 1312, 16], [-356, 962, 16]],
+    lateralTraseiro: [[-442, 1342, 18], [-1435, 1342, 24], [-1805, 974, 18], [-1770, 960, 18], [-456, 960, 24]],
     paraBrisaVista: [0, 0.77, 0.63],
     paraBrisa: [[-678, 948, 830, 34], [678, 948, 830, 34], [548, 1344, 365, 38], [-548, 1344, 365, 38]],
     traseiroVista: [0, 0.70, -0.71],
     traseiro: [[-545, 1325, -1590, 24], [545, 1325, -1590, 24], [655, 985, -1945, 24], [-655, 985, -1945, 24]],
   },
   aberturas: {
+    /* contorno real da porta (vista x): soleira contínua em y = 255..328, coluna A fixa na frente, calha do teto em y = 1342 e coluna B fixa atrás */
+    porta: [[820, 328, 16], [818, 918, 18], [745, 938, 18], [295, 1342, 24], [-388, 1342, 16], [-398, 945, 14], [-390, 328, 16]],
     /* vão frontal para grade + faróis; o recorte do capô (topo + lábio até y = 700) entra via subtrair dedicado */
     frontal: [[-742, 568, 12], [742, 568, 12], [742, 700, 12], [-742, 700, 12]],
     /* Curva 4: borda interna acompanha o trapézio da tampa (634 embaixo subindo para 664 em cima) */
@@ -74,7 +76,7 @@ export const TABELA = {
   frentePecas: {
     grade: { meiaLarg: 446, y0: 568, y1: 702, zFundo0: 1950, zFundo1: 1988, zMoldura: 2009, zLamina: 2012, laminas: 7, lamY0: 578, lamY1: 688, lamAlt: 4.8 },
     farol: { x0Base: 432, x0Topo: 444, x1: 696, y0: 568, y1: 702, zCarc0: 1948, zCarc1: 1998, zLente0: 1994, zLente1: 2008 },
-    seta: { x0: 700, x1: 792, y0: 570, y1: 700, z0: 1924, z1: 2002 },
+    seta: { x0: 700, x1: 792, y0: 567.5, y1: 702.5, z0: 1924, z1: 2002 },
     placa: { larg: 356, alt: 120, yCentro: 394, z0: 2054, z1: 2070 },
     neblina: { xCentro: 510, yCentro: 332, larg: 158, alt: 44, z0: 2024, z1: 2058 },
   },
@@ -148,10 +150,10 @@ export function gerarPassos(T) {
   const { medidas: _, cantos: cantosRede, ...passoRede } = rede.passo;
   const cantosChapa = (cantosRede ?? []).filter((c) => c !== 'f_cintura' && c !== 't_cintura');
 
-  let nid = 11;
+  let nid = 14;
   const proxId = () => { const atual = nid; nid += 1; return atual; };
 
-  const vaoCapo = passoVaoCapoNaChapa(proxId, { op: 'aberturaPorContorno', id: 10 });
+  const vaoCapo = passoVaoCapoNaChapa(proxId, { op: 'aberturaPorContorno', id: 11 });
 
   const plT = T.traseiraPecas.placa;
   const rebaixoPlaca = rebaixoPorContorno({
@@ -175,13 +177,24 @@ export function gerarPassos(T) {
     ['subdivisao', { origemId: 1, ...passoRede, cantos: cantosChapa, borda: 'cantos', niveis: T.chapa.niveis, espessura: m(T.chapa.espessura), costuraExata: true }],
     ...arcoD.passos,
     ...arcoT.passos,
-    ['aberturaPorContorno', { origemId: 6, chapa: { origem: { op: 'subtrair', id: 5 } }, vista: 'x', sentido: '+', simetria: 'x', contorno: contornoComFilete(T.vidros.porta) }],
-    ['aberturaPorContorno', { origemId: 7, chapa: { origem: { op: 'aberturaPorContorno', id: 6 } }, vista: 'x', sentido: '+', simetria: 'x', contorno: contornoComFilete(T.vidros.lateralTraseiro) }],
-    ['aberturaPorContorno', { origemId: 8, chapa: { origem: { op: 'aberturaPorContorno', id: 7 } }, vista: T.vidros.paraBrisaVista, sentido: '+', contorno: contornoComFilete(projetarVista(T.vidros.paraBrisaVista, T.vidros.paraBrisa)) }],
-    ['aberturaPorContorno', { origemId: 9, chapa: { origem: { op: 'aberturaPorContorno', id: 8 } }, vista: T.vidros.traseiroVista, sentido: '+', contorno: contornoComFilete(projetarVista(T.vidros.traseiroVista, T.vidros.traseiro)) }],
-    ['aberturaPorContorno', { origemId: 10, chapa: { origem: { op: 'aberturaPorContorno', id: 9 } }, vista: 'z', sentido: '-', simetria: 'x', contorno: contornoComFilete(T.aberturas.lanternaTraseira) }],
+    /* recorta as duas portas como peças próprias (lente: true com recuoDaLente: 4 mm = fenda física real preservando 100% da curvatura da lataria) */
+    ['aberturaPorContorno', { origemId: 6, chapa: { origem: { op: 'subtrair', id: 5 } }, vista: 'x', sentido: '+', lente: true, recuoDaLente: m(4), contorno: contornoComFilete(T.aberturas.porta) }],
+    ['aberturaPorContorno', { origemId: 7, chapa: { origem: { op: 'aberturaPorContorno', id: 6 } }, vista: 'x', sentido: '-', lente: true, recuoDaLente: m(4), contorno: contornoComFilete(T.aberturas.porta) }],
+    /* abre os demais vãos na carroceria fixa (chapa) */
+    ['aberturaPorContorno', { origemId: 8, chapa: { origem: { op: 'aberturaPorContorno', id: 7 } }, vista: 'x', sentido: '+', simetria: 'x', contorno: contornoComFilete(T.vidros.lateralTraseiro) }],
+    ['aberturaPorContorno', { origemId: 9, chapa: { origem: { op: 'aberturaPorContorno', id: 8 } }, vista: T.vidros.paraBrisaVista, sentido: '+', contorno: contornoComFilete(projetarVista(T.vidros.paraBrisaVista, T.vidros.paraBrisa)) }],
+    ['aberturaPorContorno', { origemId: 10, chapa: { origem: { op: 'aberturaPorContorno', id: 9 } }, vista: T.vidros.traseiroVista, sentido: '+', contorno: contornoComFilete(projetarVista(T.vidros.traseiroVista, T.vidros.traseiro)) }],
+    ['aberturaPorContorno', { origemId: 11, chapa: { origem: { op: 'aberturaPorContorno', id: 10 } }, vista: 'z', sentido: '-', simetria: 'x', contorno: contornoComFilete(T.aberturas.lanternaTraseira) }],
     ...vaoCapo.passos,
     ...rebaixoPlaca.passos,
+  ];
+
+  /* abre o vão do vidro dentro de cada porta independente (quadro completo) */
+  const passosPortas = [
+    ['aberturaPorContorno', { origemId: 12, chapa: { origem: { op: 'aberturaPorContorno', id: 6, parte: 'lente' } }, vista: 'x', contorno: contornoComFilete(T.vidros.porta) }],
+    ['parte', { nome: 'portaDireita', material: 'lataria', sel: { origem: { op: 'aberturaPorContorno', id: 12 } } }],
+    ['aberturaPorContorno', { origemId: 13, chapa: { origem: { op: 'aberturaPorContorno', id: 7, parte: 'lente' } }, vista: 'x', contorno: contornoComFilete(T.vidros.porta) }],
+    ['parte', { nome: 'portaEsquerda', material: 'lataria', sel: { origem: { op: 'aberturaPorContorno', id: 13 } } }],
   ];
 
   const aliasesChapa = [...arcoD.aliases, ...arcoT.aliases];
@@ -190,6 +203,7 @@ export function gerarPassos(T) {
     ...passosChapa,
     ['parte', { nome: 'chapa', sel: selFinal }],
     ['material', { usa: 'lataria', sel: selFinal }],
+    ...passosPortas,
     ...passosCapo(capo, proxId),
     ...passosParachoques(T, varridos, proxId, passosChapa, rede.pontos, aliasesChapa),
     ...passosFrenteTraseira(T, proxId),
@@ -244,7 +258,9 @@ const receita = {
     ],
     escala: { medida: 'comprimento total da chapa, de z -2025 a +2025 mm', milimetros: 4050 },
     partes: [
-      { nome: 'chapa', forma: 'Casco contínuo com arcos de roda, vãos dos vidros, vão do capô, vão frontal e vãos das lanternas', tecnica: 'Subdivisão de gaiolaPorRede com furoPassante e aberturaPorContorno' },
+      { nome: 'chapa', forma: 'Casco contínuo com arcos de roda, vãos das portas, vãos dos vidros, vão do capô, vão frontal e vãos das lanternas', tecnica: 'Subdivisão de gaiolaPorRede com furoPassante, aberturaPorContorno e subtrair' },
+      { nome: 'portaDireita', forma: 'Porta direita de quadro completo recortada da chapa com fenda física de 4 mm, friso lateral e maçaneta', tecnica: 'lente de aberturaPorContorno (+x, recuoDaLente 4 mm) com vão do vidro recortado, friso conformado e maçaneta' },
+      { nome: 'portaEsquerda', forma: 'Porta esquerda de quadro completo recortada da chapa com fenda física de 4 mm, friso lateral e maçaneta', tecnica: 'lente de aberturaPorContorno (-x, recuoDaLente 4 mm) com vão do vidro recortado, friso conformado e maçaneta' },
       { nome: 'capo', forma: 'Capô como peça separada com dois vincos longitudinais, dobra frontal de lombada e 24 rasgos reais de respiro', tecnica: 'Subdivisão própria de gaiolaPorRede com espessura e subtrair dos rasgos de ventilação' },
       { nome: 'parachoqueDianteiro', forma: 'Corpo envolvente preto na frente com friso claro horizontal', tecnica: 'Subdivisão de gaiolaVarrida fechada contornando a frente até o arco dianteiro' },
       { nome: 'parachoqueTraseiro', forma: 'Corpo envolvente preto na traseira com friso claro horizontal', tecnica: 'Subdivisão de gaiolaVarrida fechada contornando a traseira até o arco traseiro' },
@@ -267,17 +283,22 @@ const receita = {
   },
   contatos: CONTATOS,
   ilhas: [
+    { contem: 'portaDireita', motivo: 'porta direita é peça móvel separada com fenda física real de 4 mm em relação à carroceria' },
+    { contem: 'portaEsquerda', motivo: 'porta esquerda é peça móvel separada com fenda física real de 4 mm em relação à carroceria' },
     { contem: 'capo', motivo: 'capô é peça móvel separada com fenda física real de 4 mm em relação à lataria' },
     { contem: 'escapamento', motivo: 'tubo do escapamento fica sob o para-choque traseiro e liga ao chassi em etapa futura' },
   ],
   PONTOS,
   get vaos() {
     return [
-      { nome: 'vidroDaPorta', superficie: { op: 'aberturaPorContorno', id: 6 }, semMoldura: { motivo: 'vidro e borracha da porta são da etapa de vidros' } },
-      { nome: 'vidroLateralTraseiro', superficie: { op: 'aberturaPorContorno', id: 7 }, semMoldura: { motivo: 'vidro e borracha lateral traseiro são da etapa de vidros' } },
-      { nome: 'paraBrisa', superficie: { op: 'aberturaPorContorno', id: 8 }, semMoldura: { motivo: 'para-brisa e borracha são da etapa de vidros' } },
-      { nome: 'vidroTraseiro', superficie: { op: 'aberturaPorContorno', id: 9 }, semMoldura: { motivo: 'vidro traseiro e borracha são da etapa de vidros' } },
-      { nome: 'vaoLanternaTraseira', superficie: { op: 'aberturaPorContorno', id: 10 }, semMoldura: { motivo: 'as lanternas traseiras fecham o vão diretamente' } },
+      { nome: 'vaoPortaDireita', superficie: { op: 'aberturaPorContorno', id: 6 }, semMoldura: { motivo: 'a porta direita separada fecha o vão com fenda física real de 4 mm' } },
+      { nome: 'vaoPortaEsquerda', superficie: { op: 'aberturaPorContorno', id: 7 }, semMoldura: { motivo: 'a porta esquerda separada fecha o vão com fenda física real de 4 mm' } },
+      { nome: 'vidroLateralTraseiro', superficie: { op: 'aberturaPorContorno', id: 8 }, semMoldura: { motivo: 'vidro e borracha lateral traseiro são da etapa de vidros' } },
+      { nome: 'paraBrisa', superficie: { op: 'aberturaPorContorno', id: 9 }, semMoldura: { motivo: 'para-brisa e borracha são da etapa de vidros' } },
+      { nome: 'vidroTraseiro', superficie: { op: 'aberturaPorContorno', id: 10 }, semMoldura: { motivo: 'vidro traseiro e borracha são da etapa de vidros' } },
+      { nome: 'vaoLanternaTraseira', superficie: { op: 'aberturaPorContorno', id: 11 }, semMoldura: { motivo: 'as lanternas traseiras fecham o vão diretamente' } },
+      { nome: 'vidroPortaDireita', superficie: { op: 'aberturaPorContorno', id: 12 }, semMoldura: { motivo: 'vidro e borracha da porta direita são da etapa de vidros' } },
+      { nome: 'vidroPortaEsquerda', superficie: { op: 'aberturaPorContorno', id: 13 }, semMoldura: { motivo: 'vidro e borracha da porta esquerda são da etapa de vidros' } },
     ];
   },
   get PASSOS() { return gerarPassos(this.PARAMS); },

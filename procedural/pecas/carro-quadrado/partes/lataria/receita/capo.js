@@ -9,8 +9,8 @@ export function derivarCapo() {
   /* estações longitudinais: 0 = lábio frontal (dobra de lombada), 1 = topo frontal, 2..5 = corpo do capô até a base do para-brisa.
      borda externa segue reta exata de x = 694 (z = 2016) até x = 740 (z = 852), mantendo fenda física uniforme de 4 mm com a chapa. */
   const est = [
-    { z: 1994, borda: [694, 704],   canal: [580, 706], vinco: [530, 708], eixo: 710 }, // lábio inferior frontal alinhado com a testa dos para-lamas
-    { z: 1984, borda: [694.5, 738], canal: [580, 742], vinco: [532, 748], eixo: 754 }, // dobra frontal de lombada
+    { z: 2002, borda: [694, 704],   canal: [580, 706], vinco: [530, 708], eixo: 710 }, // lábio inferior frontal alinhado com a testa dos para-lamas
+    { z: 1994, borda: [694.5, 738], canal: [580, 742], vinco: [532, 748], eixo: 754 }, // dobra frontal de lombada
     { z: 1910, borda: [698.2, 746], canal: [586, 750], vinco: [538, 758], eixo: 764 }, // início do plano do capô
     { z: 1550, borda: [712.4, 804], canal: [612, 808], vinco: [564, 818], eixo: 825 },
     { z: 1235, borda: [724.9, 856], canal: [634, 860], vinco: [590, 870], eixo: 878 },
@@ -22,8 +22,8 @@ export function derivarCapo() {
   const fixo = (p) => p.map((c) => +c.toFixed(3));
 
   est.forEach((s, i) => {
-    /* flecha frontal convexa no centro (+18 mm no lábio, +16 mm na dobra) igual ao contorno frontal da chapa */
-    const flecha = i === 0 ? 18 : i === 1 ? 16 : i === 2 ? 6 : 0;
+    /* flecha frontal convexa no centro (+14 mm no lábio, +12 mm na dobra) igual ao contorno frontal da chapa */
+    const flecha = i === 0 ? 14 : i === 1 ? 12 : i === 2 ? 6 : 0;
     nos[nome(i, 0)] = fixo([s.borda[0], s.borda[1], s.z]);
     nos[nome(i, 1)] = fixo([s.canal[0], s.canal[1], s.z + flecha * 0.35]);
     nos[nome(i, 2)] = fixo([s.vinco[0], s.vinco[1], s.z + flecha * 0.65]);

@@ -37,9 +37,9 @@ export function derivarChapa(T) {
     nos[`f_${NIVEIS[j]}`] = fixo(T.frente[j]);
     nos[`t_${NIVEIS[j]}`] = fixo(T.traseira[j]);
   }
-  /* quinas quad sem retalho triangular: f_canto/f_quina na frente (alinhado com para-lama/coluna A) */
-  nos.f_canto = fixo([742, 738, 1968]);
-  nos.f_quina = fixo([690, 744, 1988]);
+  /* quinas quad sem retalho triangular: f_canto/f_quina na frente (canto quase quadrado visto de cima cobrindo o pisca) */
+  nos.f_canto = fixo([760, 738, 1982]);
+  nos.f_quina = fixo([694, 742, 1998]);
   nos.t_canto = fixo([742, 926, -1968]);
   nos.t_quina = fixo([680, 928, -2002]);
 
@@ -62,7 +62,7 @@ export function derivarChapa(T) {
   for (let j = 0; j < LADO - 1; j += 1) {
     const a = nos[nome(0, j)];
     const b = nos[`f_${NIVEIS[j]}`];
-    const p1 = fixo([a[0] * 0.93, a[1] + (b[1] - a[1]) * 0.45, b[2] - 24]);
+    const p1 = fixo([a[0] * 0.955, a[1] + (b[1] - a[1]) * 0.45, b[2] - 20]);
     const p2 = fixo([a[0] * 0.52, a[1] + (b[1] - a[1]) * 0.9, b[2] - 3]);
     curvas.push({ nome: `F${j}`, pontos: [nome(0, j), p1, p2, `f_${NIVEIS[j]}`], peso: 0.05 });
   }

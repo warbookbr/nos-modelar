@@ -317,13 +317,13 @@ export function passosFrenteTraseira(T, proxId) {
   const amostrarPeleFrente = (u, y, offsetMm = 0) => {
     const tY = Math.max(0, Math.min(1, (y - stD.y0) / (stD.y1 - stD.y0)));
     const curvY = Math.sin(Math.PI * tY); // 0 nos extremos, 1 no meio
-    const zF = 2007 - 6.5 * tY;
-    /* casa ao milímetro com a chapa real medida em z=1950 (784 em y=570, 790 em y=636, 786 em y=702) */
-    const xS = 784 + 6.5 * curvY + 1.5 * tY;
-    const zS = 1944 + 6 * tY;
+    /* casa rente sob a nova aba superior quadrada do para-lama (vista de cima sem saliência laranja) */
+    const zF = 2004 - 5.5 * tY;
+    const xS = 782 + 4.5 * curvY - 4.0 * tY;
+    const zS = 1942 + 3.0 * tY;
     const x0 = stD.x0;
-    const xC = xS - 44;
-    const zC = zF - 40;
+    const xC = xS - 32;
+    const zC = zF - 30;
     let x; let z; let nx; let nz;
     if (u <= 0.30) {
       const s = u / 0.30;
@@ -400,7 +400,7 @@ export function passosFrenteTraseira(T, proxId) {
   };
 
   /* 1. Carcaça preta interna do pisca (100% contida atrás e dentro da altura da lente âmbar, nunca vaza por cima) */
-  emitirParFrente('setaDianteira', (id) => faixaCurvaFrente(id, 0.0, 0.99, stD.y0 + 1.0, stD.y1 - 1.0, -1.5, -28, 0.01, 1.0, 10, 6), 'plasticoFosco');
+  emitirParFrente('setaDianteira', (id) => faixaCurvaFrente(id, 0.0, 0.99, stD.y0 + 3.0, stD.y1 - 3.0, -3.0, -28, 0.01, 1.0, 10, 6), 'plasticoFosco');
   /* 2. Refletor cromado brilhante atrás da lente transparente âmbar + bulbo central luminoso */
   emitirParFrente('setaDianteira', (id) => faixaCurvaFrente(id, 0.03, 0.90, stD.y0 + 4, stD.y1 - 4, 1.4, -8, 0.015, 1.0, 10, 6), 'refletorFarol');
   emitirParFrente('setaDianteira', (id) => faixaCurvaFrente(id, 0.18, 0.54, stD.y0 + 42, stD.y1 - 42, 2.2, -3, 0.02, 4.0, 6, 4), 'refletorNucleo');
