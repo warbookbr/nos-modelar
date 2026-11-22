@@ -30,4 +30,4 @@ O tempo cresce com expoente 3,1 sobre os vértices e a memória com 2,0. O carro
 
 O ensaio confirma o achado da análise de 2026-11-21 e o deixa pior na memória. A estimativa de antes dava de 3,5 a 7,5 minutos e de 2,6 a 4,0 GB.
 
-O perfil de CPU da execução de 2.161 vértices (`node --cpu-prof`) põe 55% do tempo em `resolverLU` e 23% no laço que soma as colunas, os dois na conferência do ganho, que resolve o sistema uma vez por medida; a fatoração leva 10%. A pessoa escolheu em 2026-11-22 o solver esparso, no plano [ajuste esparso da gaiola](../../planos/2026-11-22-ajuste-esparso-da-gaiola.md).
+O perfil de CPU da execução de 2.161 vértices (`node --cpu-prof`) põe 55% do tempo em `resolverLU` e 23% no laço que soma as colunas, os dois na conferência do ganho, que resolve o sistema uma vez por medida; a fatoração leva 10%. A pessoa escolheu em 2026-11-22 o solver esparso, no plano [ajuste esparso da gaiola](../../decisoes/PLANOS-ENCERRADOS.md).

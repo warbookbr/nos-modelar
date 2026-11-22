@@ -1,6 +1,6 @@
 # Ajuste esparso da gaiola: a linha de base do solver denso
 
-Pasta do plano [ajuste esparso da gaiola](../../planos/2026-11-22-ajuste-esparso-da-gaiola.md). Fatia 1 medida em 2026-11-22 numa máquina de 20 núcleos lógicos e 32 GB, com Node 22.23.2, sem outra medida rodando.
+Pasta do plano [ajuste esparso da gaiola](../../decisoes/PLANOS-ENCERRADOS.md). Fatia 1 medida em 2026-11-22 numa máquina de 20 núcleos lógicos e 32 GB, com Node 22.23.2, sem outra medida rodando.
 
 ## A gaiola de prova
 
