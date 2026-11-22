@@ -84,4 +84,5 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
 - [Superfície de produção (G2): os instrumentos e a linha de base do quarto traseiro](superficie-g2-2026-11-22/README.md) — `superficie-g2-2026-11-22`
 - [Suporte de tubo sem identificador numérico](suporte-tubo-2026-10-10/README.md) — `suporte-tubo-2026-10-10`
 - [Madeira em Node ao lado da do Blender (2026-10-19)](textura-2026-10-19/README.md) — `textura-2026-10-19`
+- [Tolerância do STEP: o acervo exportado antes e depois da tolerância em milímetro](tolerancia-do-step-2026-11-22/README.md) — `tolerancia-do-step-2026-11-22`
 <!-- indice-do-banco:fim -->

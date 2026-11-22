@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2192 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2195 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -565,6 +565,12 @@
 ## docs/modelar/banco-de-provas/textura-2026-10-19/
 
 - `README.md` — Madeira em Node ao lado da do Blender (2026-10-19)
+
+## docs/modelar/banco-de-provas/tolerancia-do-step-2026-11-22/
+
+- `README.md` — Tolerância do STEP: o acervo exportado antes e depois da tolerância em milímetro
+- `comparar.mjs` — comparar.mjs — compara duas medidas de `medir.mjs` peça a peça e imprime a tabela em markdown.
+- `medir.mjs` — medir.mjs — exporta cada peça do acervo em STEP, em memória, com as opções padrão do comando, e grava o resultado.
 
 ## docs/modelar/blender/
 

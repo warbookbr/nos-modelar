@@ -1,10 +1,10 @@
 # Tolerância do STEP em milímetro: a peça pequena exporta sem bandeira
 
-**Estado:** rascunho
+**Estado:** ativo
 
-**Território:** a declarar ao ativar: `modulos/exportador-cad/`, `tools/modelar/exportar-step.mjs` e o teste dele, `docs/modelar/banco-de-provas/tolerancia-do-step-2026-11-22/`.
+**Território:** `modulos/exportador-cad/`, `tools/modelar/exportar-step.mjs` e o teste dele, `docs/modelar/banco-de-provas/tolerancia-do-step-2026-11-22/`.
 
-**Responsável:** a IA da sessão na nuvem.
+**Responsável:** a IA da sessão na nuvem. A pessoa aprovou e ativou o plano em 2026-11-22.
 
 **Repositório e base:** `warbookbr/nos-modelar`, main de 2026-11-22.
 
