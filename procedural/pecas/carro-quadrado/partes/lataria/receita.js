@@ -137,6 +137,11 @@ export const MATERIAIS = {
   refletorLanterna: { cor: '#cfd6de', metalicidade: 0.92, aspereza: 0.14 },
   placa: { cor: '#e8eaed', metalicidade: 0.1, aspereza: 0.35 },
   escapamento: { cor: '#8c929a', metalicidade: 0.75, aspereza: 0.3 },
+  borrachaVidro: { cor: '#181b1f', metalicidade: 0.03, aspereza: 0.85 },
+  vidroAutomotivo: {
+    cor: '#8cb4ae', metalicidade: 0.04, aspereza: 0.03, mistura: 'transparente', opacidade: 0.28,
+    verniz: 1.0, asperezaDoVerniz: 0.015, indiceDeRefracao: 1.52,
+  },
 };
 
 export function derivar(T) {
@@ -178,6 +183,15 @@ export function gerarPassos(T) {
     ids: { copia: proxId(), prisma: proxId(), ferramenta: proxId(), subtrair: proxId() },
   });
 
+  /* borrachas de vedação (friso nativo sobre cada aberturaPorContorno) + vidros translúcidos (lente: true) */
+  const perfBorracha = { retangulo: { largura: m(22), profundidade: m(9), centro: [0, m(-1.5)], cantos: m(2) } };
+  const perfBorrachaPorta = { retangulo: { largura: m(18), profundidade: m(8.5), centro: [0, m(-1.5)], cantos: m(2) } };
+  const idFrLat = proxId();
+  const idFrPb = proxId();
+  const idFrPd = proxId();
+  const idFrPe = proxId();
+  const idFrTr = proxId();
+
   const passosChapa = [
     ['subdivisao', { origemId: 1, ...passoRede, cantos: cantosChapa, borda: 'cantos', niveis: T.chapa.niveis, espessura: m(T.chapa.espessura), costuraExata: true }],
     ...arcoD.passos,
@@ -186,8 +200,10 @@ export function gerarPassos(T) {
     ['aberturaPorContorno', { origemId: 6, chapa: { origem: { op: 'subtrair', id: 5 } }, vista: 'x', sentido: '+', lente: true, recuoDaLente: m(4), contorno: contornoComFilete(T.aberturas.porta) }],
     ['aberturaPorContorno', { origemId: 7, chapa: { origem: { op: 'aberturaPorContorno', id: 6 } }, vista: 'x', sentido: '-', lente: true, recuoDaLente: m(4), contorno: contornoComFilete(T.aberturas.porta) }],
     /* abre os demais vãos na carroceria fixa (chapa) + recorta o porta-malas como peça separada (id: 10) */
-    ['aberturaPorContorno', { origemId: 8, chapa: { origem: { op: 'aberturaPorContorno', id: 7 } }, vista: 'x', sentido: '+', simetria: 'x', contorno: contornoComFilete(T.vidros.lateralTraseiro) }],
-    ['aberturaPorContorno', { origemId: 9, chapa: { origem: { op: 'aberturaPorContorno', id: 8 } }, vista: T.vidros.paraBrisaVista, sentido: '+', contorno: contornoComFilete(projetarVista(T.vidros.paraBrisaVista, T.vidros.paraBrisa)) }],
+    ['aberturaPorContorno', { origemId: 8, chapa: { origem: { op: 'aberturaPorContorno', id: 7 } }, vista: 'x', sentido: '+', simetria: 'x', lente: true, recuoDaLente: m(7), contorno: contornoComFilete(T.vidros.lateralTraseiro) }],
+    ['aberturaPorContorno', { origemId: 9, chapa: { origem: { op: 'aberturaPorContorno', id: 8 } }, vista: T.vidros.paraBrisaVista, sentido: '+', lente: true, recuoDaLente: m(7), contorno: contornoComFilete(projetarVista(T.vidros.paraBrisaVista, T.vidros.paraBrisa)) }],
+    /* gera a borracha do para-brisa logo após a abertura 9, antes de vaoCapo tocar as faces vizinhas */
+    ['friso', { origemId: idFrPb, superficie: { op: 'aberturaPorContorno', id: 9 }, linha: { nome: 'borrachaParaBrisa' }, perfil: perfBorracha }],
     ['aberturaPorContorno', { origemId: 10, chapa: { origem: { op: 'aberturaPorContorno', id: 9 } }, vista: 'z', sentido: '-', lente: true, recuoDaLente: m(4), contorno: contornoComFilete(T.aberturas.tampaTraseira) }],
     ['aberturaPorContorno', { origemId: 11, chapa: { origem: { op: 'aberturaPorContorno', id: 10 } }, vista: 'z', sentido: '-', simetria: 'x', contorno: contornoComFilete(T.aberturas.lanternaTraseira) }],
     ['aberturaPorContorno', { origemId: 15, chapa: { origem: { op: 'aberturaPorContorno', id: 11 } }, vista: 'x', sentido: '+', lente: true, recuoDaLente: m(2.5), contorno: contornoComFilete(T.aberturas.tampaTanque) }],
@@ -196,14 +212,33 @@ export function gerarPassos(T) {
 
   /* abre o vão do vidro dentro de cada porta independente (quadro completo) + vidro traseiro e rebaixo da placa na tampaTraseira + portinhola do tanque */
   const passosPortas = [
-    ['aberturaPorContorno', { origemId: 12, chapa: { origem: { op: 'aberturaPorContorno', id: 6, parte: 'lente' } }, vista: 'x', contorno: contornoComFilete(T.vidros.porta) }],
+    ['aberturaPorContorno', { origemId: 12, chapa: { origem: { op: 'aberturaPorContorno', id: 6, parte: 'lente' } }, vista: 'x', lente: true, recuoDaLente: m(6), contorno: contornoComFilete(T.vidros.porta) }],
     ['parte', { nome: 'portaDireita', material: 'lataria', sel: { origem: { op: 'aberturaPorContorno', id: 12 } } }],
-    ['aberturaPorContorno', { origemId: 13, chapa: { origem: { op: 'aberturaPorContorno', id: 7, parte: 'lente' } }, vista: 'x', contorno: contornoComFilete(T.vidros.porta) }],
+    ['parte', { nome: 'portaDireita', material: 'vidroAutomotivo', sel: { origem: { op: 'aberturaPorContorno', id: 12, parte: 'lente' } } }],
+    ['friso', { origemId: idFrPd, superficie: { op: 'aberturaPorContorno', id: 12 }, linha: { nome: 'borrachaPortaDireita' }, perfil: perfBorrachaPorta }],
+    ['parte', { nome: 'portaDireita', material: 'borrachaVidro', sel: { origem: { op: 'friso', id: idFrPd } } }],
+
+    ['aberturaPorContorno', { origemId: 13, chapa: { origem: { op: 'aberturaPorContorno', id: 7, parte: 'lente' } }, vista: 'x', lente: true, recuoDaLente: m(6), contorno: contornoComFilete(T.vidros.porta) }],
     ['parte', { nome: 'portaEsquerda', material: 'lataria', sel: { origem: { op: 'aberturaPorContorno', id: 13 } } }],
-    ['aberturaPorContorno', { origemId: 14, chapa: { origem: { op: 'aberturaPorContorno', id: 10, parte: 'lente' } }, vista: T.vidros.traseiroVista, contorno: contornoComFilete(projetarVista(T.vidros.traseiroVista, T.vidros.traseiro)) }],
+    ['parte', { nome: 'portaEsquerda', material: 'vidroAutomotivo', sel: { origem: { op: 'aberturaPorContorno', id: 13, parte: 'lente' } } }],
+    ['friso', { origemId: idFrPe, superficie: { op: 'aberturaPorContorno', id: 13 }, linha: { nome: 'borrachaPortaEsquerda' }, perfil: perfBorrachaPorta }],
+    ['parte', { nome: 'portaEsquerda', material: 'borrachaVidro', sel: { origem: { op: 'friso', id: idFrPe } } }],
+
+    ['aberturaPorContorno', { origemId: 14, chapa: { origem: { op: 'aberturaPorContorno', id: 10, parte: 'lente' } }, vista: T.vidros.traseiroVista, lente: true, recuoDaLente: m(7), contorno: contornoComFilete(projetarVista(T.vidros.traseiroVista, T.vidros.traseiro)) }],
     ...rebaixoPlaca.passos,
     ['parte', { nome: 'tampaTraseira', material: 'lataria', sel: { origem: rebaixoPlaca.origem } }],
+    ['parte', { nome: 'tampaTraseira', material: 'vidroAutomotivo', sel: { origem: { op: 'aberturaPorContorno', id: 14, parte: 'lente' } } }],
+    ['friso', { origemId: idFrTr, superficie: { op: 'aberturaPorContorno', id: 14 }, linha: { nome: 'borrachaVidroTraseiro' }, perfil: perfBorracha }],
+    ['parte', { nome: 'tampaTraseira', material: 'borrachaVidro', sel: { origem: { op: 'friso', id: idFrTr } } }],
+
     ['parte', { nome: 'tampaTanque', material: 'lataria', sel: { origem: { op: 'aberturaPorContorno', id: 15, parte: 'lente' } } }],
+
+    /* vidros e borrachas fixos na carroceria (para-brisa e laterais traseiros) */
+    ['parte', { nome: 'vidros', material: 'vidroAutomotivo', sel: { origem: { op: 'aberturaPorContorno', id: 8, parte: 'lente' } } }],
+    ['parte', { nome: 'vidros', material: 'vidroAutomotivo', sel: { origem: { op: 'aberturaPorContorno', id: 9, parte: 'lente' } } }],
+    ['friso', { origemId: idFrLat, superficie: { op: 'aberturaPorContorno', id: 8 }, linha: { nome: 'borrachaLateralTraseiro' }, perfil: perfBorracha }],
+    ['parte', { nome: 'borrachaVidros', material: 'borrachaVidro', sel: { origem: { op: 'friso', id: idFrLat } } }],
+    ['parte', { nome: 'borrachaVidros', material: 'borrachaVidro', sel: { origem: { op: 'friso', id: idFrPb } } }],
   ];
 
   const aliasesChapa = [...arcoD.aliases, ...arcoT.aliases];
@@ -232,6 +267,8 @@ export const CONTATOS = [
   { par: ['parachoqueDianteiro', 'farolNeblina'], motivo: 'faróis de neblina embutem na saia inferior do para-choque dianteiro' },
   { par: ['chapa', 'lanternaTraseira'], motivo: 'lanternas traseiras assentam nos vãos traseiros da chapa' },
   { par: ['chapa', 'arcosEstampados'], motivo: 'abas estampadas dos 4 arcos de roda embutem e apoiam na borda dos arcos da chapa' },
+  { par: ['chapa', 'borrachaVidros'], motivo: 'guarnições de borracha abraçam as bordas dos vãos do para-brisa e vidros laterais traseiros' },
+  { par: ['borrachaVidros', 'vidros'], motivo: 'vidros fixos assentam dentro das guarnições de borracha preta' },
   { par: ['tampaTraseira', 'placaTraseira'], motivo: 'placa traseira apoia no rebaixo da tampa traseira' },
   { par: ['tampaTraseira', 'puxadorTampa'], motivo: 'puxador apoia na tampa traseira acima da placa' },
   { par: ['tampaTraseira', 'fechaduraTampa'], motivo: 'fechadura embute na tampa traseira abaixo da placa' },
@@ -275,6 +312,8 @@ const receita = {
       { nome: 'tampaTraseira', forma: 'Tampa traseira (porta-malas) separada com fenda física de 4 mm, vão do vidro traseiro e rebaixo trapezoidal da placa', tecnica: 'lente de aberturaPorContorno (-z, recuoDaLente 4 mm) com vão do vidro traseiro e rebaixoPorContorno da placa' },
       { nome: 'tampaTanque', forma: 'Portinhola real do tanque de combustível recortada na lateral traseira direita com cantos arredondados e fenda de 2,5 mm', tecnica: 'lente de aberturaPorContorno (+x, recuoDaLente 2,5 mm)' },
       { nome: 'arcosEstampados', forma: 'Abas circulares estampadas salientes na cor da lataria em volta dos 4 arcos de roda', tecnica: 'Subdivisão paramétrica amostrando a pele lateral da chapa e espelhada em x' },
+      { nome: 'borrachaVidros', forma: 'Guarnições de borracha preta fosca contornando o para-brisa e os vidros laterais traseiros', tecnica: 'friso nativo sobre aberturaPorContorno com perfil retangular arredondado' },
+      { nome: 'vidros', forma: 'Para-brisa e vidros laterais traseiros translúcidos levemente esverdeados', tecnica: 'lente de aberturaPorContorno em material vidroAutomotivo' },
       { nome: 'capo', forma: 'Capô como peça separada com dois vincos longitudinais, dobra frontal de lombada e 24 rasgos reais de respiro', tecnica: 'Subdivisão própria de gaiolaPorRede com espessura e subtrair dos rasgos de ventilação' },
       { nome: 'parachoqueDianteiro', forma: 'Corpo envolvente preto na frente com friso claro horizontal', tecnica: 'Subdivisão de gaiolaVarrida fechada contornando a frente até o arco dianteiro' },
       { nome: 'parachoqueTraseiro', forma: 'Corpo envolvente preto na traseira com friso claro horizontal', tecnica: 'Subdivisão de gaiolaVarrida fechada contornando a traseira até o arco traseiro' },
@@ -309,13 +348,13 @@ const receita = {
     return [
       { nome: 'vaoPortaDireita', superficie: { op: 'aberturaPorContorno', id: 6 }, semMoldura: { motivo: 'a porta direita separada fecha o vão com fenda física real de 4 mm' } },
       { nome: 'vaoPortaEsquerda', superficie: { op: 'aberturaPorContorno', id: 7 }, semMoldura: { motivo: 'a porta esquerda separada fecha o vão com fenda física real de 4 mm' } },
-      { nome: 'vidroLateralTraseiro', superficie: { op: 'aberturaPorContorno', id: 8 }, semMoldura: { motivo: 'vidro e borracha lateral traseiro são da etapa de vidros' } },
-      { nome: 'paraBrisa', superficie: { op: 'aberturaPorContorno', id: 9 }, semMoldura: { motivo: 'para-brisa e borracha são da etapa de vidros' } },
+      { nome: 'vidroLateralTraseiro', superficie: { op: 'aberturaPorContorno', id: 8 }, frisos: ['borrachaLateralTraseiro'] },
+      { nome: 'paraBrisa', superficie: { op: 'aberturaPorContorno', id: 9 }, frisos: ['borrachaParaBrisa'] },
       { nome: 'vaoTampaTraseira', superficie: { op: 'aberturaPorContorno', id: 10 }, semMoldura: { motivo: 'a tampa traseira separada fecha o vão com fenda física real de 4 mm' } },
       { nome: 'vaoLanternaTraseira', superficie: { op: 'aberturaPorContorno', id: 11 }, semMoldura: { motivo: 'as lanternas traseiras fecham o vão diretamente' } },
-      { nome: 'vidroPortaDireita', superficie: { op: 'aberturaPorContorno', id: 12 }, semMoldura: { motivo: 'vidro e borracha da porta direita são da etapa de vidros' } },
-      { nome: 'vidroPortaEsquerda', superficie: { op: 'aberturaPorContorno', id: 13 }, semMoldura: { motivo: 'vidro e borracha da porta esquerda são da etapa de vidros' } },
-      { nome: 'vidroTraseiro', superficie: { op: 'aberturaPorContorno', id: 14 }, semMoldura: { motivo: 'vidro traseiro e borracha são da etapa de vidros' } },
+      { nome: 'vidroPortaDireita', superficie: { op: 'aberturaPorContorno', id: 12 }, frisos: ['borrachaPortaDireita'] },
+      { nome: 'vidroPortaEsquerda', superficie: { op: 'aberturaPorContorno', id: 13 }, frisos: ['borrachaPortaEsquerda'] },
+      { nome: 'vidroTraseiro', superficie: { op: 'aberturaPorContorno', id: 14 }, frisos: ['borrachaVidroTraseiro'] },
       { nome: 'vaoTampaTanque', superficie: { op: 'aberturaPorContorno', id: 15 }, semMoldura: { motivo: 'a portinhola separada fecha o vão do tanque com fenda física real de 2,5 mm' } },
     ];
   },
