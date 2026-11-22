@@ -239,9 +239,10 @@ export function criarOperacoesPrimitivasSuperficie({ BLOCO, FAIXA_ESTENDIDA, idD
      [0,h]]` — polo embaixo -> anel -> anel -> polo em cima). Nenhum conceito
      de "cap" à parte.
 
-     Perfil é só ABERTO (polilinha): não fecha loop mesmo se o último ponto ==
-     o primeiro (pneu/torus fica FORA do escopo do P2 — um perfil assim só
-     produz dois pontos normais, sem segmento extra ligando o fim ao começo).
+     O perfil que repete o primeiro ponto no fim volta ao começo e fecha: é
+     assim que sai o toro, o anel de vedação e o tubo de parede grossa (a
+     prova está em `lathe-fechado.test.ts`). A comparação é exata: ponto quase
+     igual não fecha.
 
      Guarda de overflow (D3, por-passo): soma EXATA de vértices e de faces
      (segmento polo<->polo não conta face nenhuma) calculada ANTES de inserir

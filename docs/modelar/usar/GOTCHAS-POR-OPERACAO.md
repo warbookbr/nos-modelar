@@ -9,6 +9,10 @@ Fonte dos limites: `procedural/nucleo/uso-operacoes.js`. Alterar um
 limite aqui não muda nada: mude lá, rode `npm run catalogo:gerar`, e o gate
 `catalogo:check` confere.
 
+## Formas ocas: anel, toro e bacia saem das operações que já existem
+
+O backlog chegou a pedir primitivas novas para estas formas, e nenhuma faltava. O tubo de parede grossa e o anel são o `lathe` da seção que repete o primeiro ponto no fim. O toro é o `lathe` do círculo fora do eixo, também fechado. A bacia redonda é o `lathe` com `espessura`, com o perfil como parede de fora. A bandeja de parede reta é a `extrusao` com a `casca` aberta na tampa de cima (`abertas: { origem: { op: 'extrusao', id, tampa: 'topo' } }`). A bacia de parede inclinada e de seção qualquer é o `loft` entre duas seções `contorno`, fechado por um polo (`raio: 0`) a 0,1 mm de cada uma, com a `casca` aberta na última faixa (`faixa: 'ultima'`). Com `faixa: { passo: 2, fase: 0 }` as duas pontas abrem e sai o tubo de seção variável. Todas saem como sólido fechado, com cada aresta em duas faces, e a prova, escrita como no esboço 2.0, está em `modulos/esboco-nucleo/tests/formas-ocas.test.js`. A `casca` entrou no registro da receita comum em 2026-11-22. Antes disso, só as famílias a tinham.
+
 ## `loft` ou `inflate`: a escolha que nenhuma medida denuncia
 
 Esta é a armadilha mais cara desta rodada, e ela não aparece em número nenhum.
