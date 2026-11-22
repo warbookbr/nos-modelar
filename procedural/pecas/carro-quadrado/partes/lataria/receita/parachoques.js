@@ -180,5 +180,32 @@ export function passosParachoques(T, varridos, proxId, passosChapa, pontosChapa,
   });
   passos.push(...frisoMeio.passos);
 
+  /* fenda do capô (sai exatamente da junção farol/pisca até a base da coluna A e fecha na traseira antes da churrasqueira) */
+  const baseFenda = {
+    malha: { st: stChapa },
+    vista: 'y',
+    sentido: '+',
+    unidade: 'm',
+    secao: { largura: 5.5, altura: 3.6, chanfro: 0.8 },
+    deslocamentoMm: -1.8,
+    parte: 'fendaCapo',
+    material: 'plasticoFosco',
+  };
+  const fendaLat = conformarNaChapa({
+    ...baseFenda,
+    nome: 'fendaCapoLat',
+    simetria: 'x',
+    trilho: [[m(696), m(1976)], [m(708), m(1450)], [m(718), m(918)]],
+    origemId: proxId(),
+  });
+  passos.push(...fendaLat.passos);
+  const fendaTras = conformarNaChapa({
+    ...baseFenda,
+    nome: 'fendaCapoTras',
+    trilho: [[m(-718), m(918)], [m(0), m(918)], [m(718), m(918)]],
+    origemId: proxId(),
+  });
+  passos.push(...fendaTras.passos);
+
   return passos;
 }

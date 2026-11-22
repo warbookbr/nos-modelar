@@ -11,23 +11,23 @@ export const TABELA = {
   estacoes: [1910, 1550, 1235, 845, 310, -300, -1125, -1530, -1730, -1935],
   /* cada seção tem 7 níveis: soleira, baixo, meio (Curva 3 bojo), vinco (ombro/vinco horizontal nítido), cintura, quina, eixo */
   secoes: {
-    1910:    [[760, 255], [795, 425], [810, 610], [808, 748], [755, 796], [645, 804], 810],
-    1550:    [[780, 255], [810, 425], [825, 615], [824, 755], [772, 830], [675, 846], 852],
-    1235:    [[790, 255], [820, 425], [835, 620], [834, 762], [782, 864], [705, 882], 888],
-    845:     [[795, 255], [825, 425], [840, 625], [838, 770], [786, 910], [735, 930], 936],
-    310:     [[795, 255], [825, 425], [840, 630], [838, 778], [772, 945], [580, 1358], 1370],
-    '-300':  [[795, 255], [825, 425], [840, 632], [838, 785], [772, 945], [580, 1384], 1396],
-    '-1125': [[795, 255], [825, 425], [840, 632], [838, 792], [772, 945], [580, 1382], 1394],
-    '-1530': [[790, 255], [820, 425], [835, 632], [833, 796], [772, 945], [580, 1364], 1376],
-    '-1730': [[778, 265], [808, 428], [824, 628], [822, 798], [765, 942], [642, 1170], 1178],
-    '-1935': [[762, 285], [792, 430], [810, 625], [808, 800], [755, 932], [705, 962], 966],
+    1910:    [[760, 255], [795, 425], [810, 610], [802, 718], [776, 748], [718, 760], 766],
+    1550:    [[780, 255], [810, 425], [825, 615], [818, 738], [786, 796], [730, 814], 822],
+    1235:    [[790, 255], [820, 425], [835, 620], [830, 754], [792, 844], [738, 864], 872],
+    845:     [[795, 255], [825, 425], [840, 625], [838, 770], [790, 904], [744, 926], 934],
+    310:     [[795, 255], [825, 425], [840, 630], [838, 778], [775, 945], [622, 1362], 1374],
+    '-300':  [[795, 255], [825, 425], [840, 632], [838, 785], [775, 945], [622, 1384], 1396],
+    '-1125': [[795, 255], [825, 425], [840, 632], [838, 792], [775, 945], [622, 1382], 1394],
+    '-1530': [[790, 255], [820, 425], [835, 632], [833, 796], [775, 945], [622, 1364], 1376],
+    '-1730': [[778, 265], [808, 428], [824, 628], [822, 798], [768, 942], [668, 1170], 1178],
+    '-1935': [[762, 285], [792, 430], [810, 625], [808, 800], [755, 932], [716, 962], 966],
   },
   frente: [
     [0, 255, 1945],
     [0, 425, 2000],
     [0, 610, 2018],
-    [0, 742, 2008],
-    [0, 796, 1986],
+    [0, 718, 2014],
+    [0, 756, 1994],
   ],
   /* Curva 1 (tuck-under traseiro): vertical no âmbar/vinco (-2022) e tombando para frente em direção ao para-choque (-1982) */
   traseira: [
@@ -37,22 +37,22 @@ export const TABELA = {
     [0, 800, -2022],
     [0, 930, -2008],
   ],
-  vincos: { lateral: 0.85, cintura: 0.18, quina: 0.15 },
+  vincos: { lateral: 0.85, cintura: 0.22, quina: 0.30 },
   arcos: {
     dianteiro: { z: 1235, y: 290, raio: 350, lados: 32 },
     traseiro: { z: -1125, y: 290, raio: 350, lados: 32 },
   },
   vidros: {
-    /* Coluna A proporcional com canto superior arredondado (r=145), coluna B inclinada e coluna D larga e constante */
+    /* Coluna A mais vertical e fina, para-brisa mais largo/alto com testa do teto fina e cantos arredondados */
     porta: [[665, 960, 18], [295, 1348, 145], [-355, 1354, 16], [-368, 960, 16]],
     lateralTraseiro: [[-412, 1354, 18], [-1435, 1345, 24], [-1805, 974, 18], [-1770, 960, 18], [-456, 960, 24]],
     paraBrisaVista: [0, 0.77, 0.63],
-    paraBrisa: [[-675, 952, 830, 20], [675, 952, 830, 20], [520, 1329, 370, 20], [-520, 1329, 370, 20]],
+    paraBrisa: [[-708, 948, 830, 32], [708, 948, 830, 32], [568, 1346, 365, 36], [-568, 1346, 365, 36]],
     traseiroVista: [0, 0.70, -0.71],
-    traseiro: [[-520, 1325, -1590, 20], [520, 1325, -1590, 20], [640, 985, -1945, 20], [-640, 985, -1945, 20]],
+    traseiro: [[-555, 1325, -1590, 24], [555, 1325, -1590, 24], [655, 985, -1945, 24], [-655, 985, -1945, 24]],
   },
   aberturas: {
-    frontal: [[-768, 566, 10], [768, 566, 10], [768, 706, 10], [-768, 706, 10]],
+    frontal: [[-742, 568, 12], [742, 568, 12], [742, 700, 12], [-742, 700, 12]],
     /* Curva 4: borda interna acompanha o trapézio da tampa (634 embaixo subindo para 664 em cima) */
     lanternaTraseira: [[634, 530, 8], [776, 530, 10], [758, 842, 16], [664, 842, 10]],
   },
@@ -207,6 +207,8 @@ export const CONTATOS = [
   { par: ['chapa', 'placaTraseira'], motivo: 'placa traseira apoia na tampa traseira' },
   { par: ['chapa', 'puxadorTampa'], motivo: 'puxador apoia na tampa traseira acima da placa' },
   { par: ['chapa', 'fechaduraTampa'], motivo: 'fechadura embute na tampa traseira abaixo da placa' },
+  { par: ['chapa', 'fendaCapo'], motivo: 'fenda do capô conforma sobre a chapa nas bordas laterais e traseira do capô' },
+  { par: ['chapa', 'churrasqueira'], motivo: 'entradas de ventilação assentam no painel do torpedo à frente do para-brisa' },
 ];
 
 export const PONTOS = [
@@ -254,6 +256,8 @@ const receita = {
       { nome: 'puxadorTampa', forma: 'Barra preta horizontal acima da placa traseira em y 795', tecnica: 'chamferBox centrada acima da placa' },
       { nome: 'fechaduraTampa', forma: 'Cilindro pequeno preto abaixo da placa traseira em y 580', tecnica: 'Cilindro em z com tampas' },
       { nome: 'escapamento', forma: 'Tubo metálico sob o para-choque traseiro no lado esquerdo', tecnica: 'Cilindro em z em x +540 e y 215' },
+      { nome: 'fendaCapo', forma: 'Fenda escura contornando as bordas laterais e traseira do capô', tecnica: 'conformarNaChapa na vista superior sobre a chapa' },
+      { nome: 'churrasqueira', forma: 'Par de grades de ventilação com aletas escuras no torpedo à frente do para-brisa', tecnica: 'Subdivisão de blocos inclinados espelhados em x' },
     ],
     criteriosDeReprovacao: [
       'Dimensões da chapa fora de 4050 x 1670 x 1390 mm além da tolerância',

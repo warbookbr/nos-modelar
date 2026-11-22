@@ -615,6 +615,34 @@ export function passosFrenteTraseira(T, proxId) {
   }]);
   marcar('fechaduraTampa', 'plasticoPreto', { alias: 'fechaduraTampaInteiro' });
 
+  // --- CHURRASQUEIRA / ENTRADAS DE VENTILAÇÃO NA BASE DO PARA-BRISA (duas grades simétricas com aletas escuras) ---
+  const yCowl = (x, z) => 931.5 - 0.23 * (z - 848) - 0.008 * Math.abs(x);
+  const blocoCowl = (id, x0, x1, z0, z1, dyBot, dyTop) => {
+    const verts = [
+      [m(x0), m(yCowl(x0, z0) + dyBot), m(z0)],
+      [m(x1), m(yCowl(x1, z0) + dyBot), m(z0)],
+      [m(x1), m(yCowl(x1, z1) + dyBot), m(z1)],
+      [m(x0), m(yCowl(x0, z1) + dyBot), m(z1)],
+      [m(x0), m(yCowl(x0, z0) + dyTop), m(z0)],
+      [m(x1), m(yCowl(x1, z0) + dyTop), m(z0)],
+      [m(x1), m(yCowl(x1, z1) + dyTop), m(z1)],
+      [m(x0), m(yCowl(x0, z1) + dyTop), m(z1)],
+    ];
+    return ['subdivisao', {
+      origemId: id, niveis: 0, vertices: verts,
+      faces: [
+        [0, 1, 2, 3], [7, 6, 5, 4],
+        [0, 4, 5, 1], [1, 5, 6, 2], [2, 6, 7, 3], [3, 7, 4, 0],
+      ],
+    }];
+  };
+  /* base escura da grade esquerda/direita + 9 aletas finas longitudinais em cada lado */
+  emitirParFrente('churrasqueira', (id) => blocoCowl(id, 95, 435, 852, 896, -5, 1.5), 'plasticoFosco');
+  for (let k = 0; k < 9; k += 1) {
+    const xA = 112 + k * 35;
+    emitirParFrente('churrasqueira', (id) => blocoCowl(id, xA, xA + 14, 856, 892, 0.5, 4.0), 'plasticoPreto');
+  }
+
   // --- ESCAPAMENTO ---
   const esc = t.escapamento;
   passos.push(['cilindro', {
