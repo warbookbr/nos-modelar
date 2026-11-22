@@ -57,8 +57,8 @@ export const TABELA = {
     lanternaTraseira: [[634, 530, 8], [776, 530, 10], [758, 842, 16], [664, 842, 10]],
   },
   parachoqueDianteiro: {
-    y0: 215, y1: 515, xTrilho: 785, zFrente: 2025, zLateral: 1625, raioCanto: 95,
-    avanco: 60, saia: 22, recuo: 25, frisoY: 455, frisoAlt: 12, frisoSaida: 5,
+    y0: 256, y1: 498, xTrilho: 785, zFrente: 2022, zLateral: 1625, raioCanto: 98,
+    avanco: 46, saia: 4, recuo: 25, frisoY: 458, frisoAlt: 7, frisoSaida: 3.5,
   },
   parachoqueTraseiro: {
     y0: 250, y1: 515, xTrilho: 790, zTras: -2025, zLateral: -1515, raioCanto: 90,
@@ -73,8 +73,8 @@ export const TABELA = {
     grade: { meiaLarg: 446, y0: 570, y1: 700, zFundo0: 1950, zFundo1: 1986, zMoldura: 2006, zLamina: 2010, laminas: 7, lamY0: 578, lamY1: 688, lamAlt: 4.8 },
     farol: { x0Base: 432, x0Topo: 444, x1: 696, y0: 568, y1: 702, zCarc0: 1948, zCarc1: 1998, zLente0: 1994, zLente1: 2008 },
     seta: { x0: 700, x1: 792, y0: 570, y1: 700, z0: 1924, z1: 2002 },
-    placa: { larg: 340, alt: 135, yCentro: 352, z0: 2076, z1: 2092 },
-    neblina: { xCentro: 515, yCentro: 292, larg: 156, alt: 60, z0: 2036, z1: 2076 },
+    placa: { larg: 356, alt: 120, yCentro: 368, z0: 2054, z1: 2070 },
+    neblina: { xCentro: 510, yCentro: 306, larg: 158, alt: 44, z0: 2024, z1: 2058 },
   },
   traseiraPecas: {
     lanterna: { x0: 655, x1: 776, yRe: [540, 610], yFreio: [610, 735], ySeta: [735, 810], zCarc0: -2008, zCarc1: -1918, zFrente: -2020, zTras: -1924 },

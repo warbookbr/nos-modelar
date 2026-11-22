@@ -406,26 +406,108 @@ export function passosFrenteTraseira(T, proxId) {
   /* 3. Lente âmbar translúcida com ESTRIAS HORIZONTAIS reais rente ao para-lama */
   emitirParFrente('setaDianteira', (id) => faixaCurvaFrente(id, 0.012, 1.0, stD.y0 + 0.5, stD.y1 - 0.5, 3.2, -5, 0.018, 2.5, 14, 16), 'setaAmbar');
 
-  // --- PLACA DIANTEIRA ---
-  const idPlacaD = proxId();
+  // --- PLACA DIANTEIRA (mais alta sob o friso claro, cantos arredondados e moldura preta fina) ---
   const pD = f.placa;
-  passos.push(caixa('chamferBox', idPlacaD, -pD.larg / 2, pD.larg / 2, pD.yCentro - pD.alt / 2, pD.yCentro + pD.alt / 2, pD.z0, pD.z1, 3));
-  marcar('placaDianteira', 'placa', { origem: { op: 'chamferBox', id: idPlacaD } });
+  const placaArred = (id, larg, alt, yC, z0, z1, rCanto) => {
+    const N = 24;
+    const hw = larg / 2; const hh = alt / 2;
+    const cantos = [[hw, yC - hh], [hw, yC + hh], [-hw, yC + hh], [-hw, yC - hh]];
+    const pts = [];
+    for (let k = 0; k < 4; k += 1) {
+      const pPrev = cantos[(k + 3) % 4];
+      const pCurr = cantos[k];
+      const pNext = cantos[(k + 1) % 4];
+      const d1x = pPrev[0] - pCurr[0]; const d1y = pPrev[1] - pCurr[1];
+      const l1 = Math.hypot(d1x, d1y);
+      const d2x = pNext[0] - pCurr[0]; const d2y = pNext[1] - pCurr[1];
+      const l2 = Math.hypot(d2x, d2y);
+      const r = Math.min(rCanto, l1 * 0.3, l2 * 0.3);
+      const ax = pCurr[0] + (d1x / l1) * r; const ay = pCurr[1] + (d1y / l1) * r;
+      const bx = pCurr[0] + (d2x / l2) * r; const by = pCurr[1] + (d2y / l2) * r;
+      for (let s = 0; s < 6; s += 1) {
+        const t = s / 5; const om = 1 - t;
+        pts.push([om * om * ax + 2 * om * t * pCurr[0] + t * t * bx, om * om * ay + 2 * om * t * pCurr[1] + t * t * by]);
+      }
+    }
+    const verts = [];
+    for (const [x, y] of pts) verts.push([m(x), m(y), m(z0)]);
+    for (const [x, y] of pts) verts.push([m(x), m(y), m(z1)]);
+    const idxB = verts.length; verts.push([0, m(yC), m(z0)]);
+    const idxF = verts.length; verts.push([0, m(yC), m(z1)]);
+    const faces = [];
+    for (let i = 0; i < N; i += 1) {
+      const j = (i + 1) % N;
+      faces.push([j, i, idxB]);
+      faces.push([i, j, N + j, N + i]);
+      faces.push([N + i, N + j, idxF]);
+    }
+    return ['subdivisao', { origemId: id, niveis: 0, vertices: verts, faces }];
+  };
+  const idPlacaDMold = proxId();
+  passos.push(placaArred(idPlacaDMold, pD.larg + 8, pD.alt + 8, pD.yCentro, pD.z0 - 6, pD.z1 - 4, 12));
+  marcar('placaDianteira', 'plasticoFosco', { origem: { op: 'subdivisao', id: idPlacaDMold } });
+  const idPlacaD = proxId();
+  passos.push(placaArred(idPlacaD, pD.larg, pD.alt, pD.yCentro, pD.z0, pD.z1, 10));
+  marcar('placaDianteira', 'placa', { origem: { op: 'subdivisao', id: idPlacaD } });
 
-  // --- FARÓIS DE NEBLINA (moldura escura + refletor cromado + lente prismática translúcida) + ENTRADA DE AR INFERIOR ---
+  // --- FARÓIS DE NEBLINA TRAPEZOIDAIS ESTRIADOS + ENTRADA DE AR INFERIOR CONTÍNUA ---
   const neb = f.neblina;
-  emitirParFrente('farolNeblina', (id) => caixa('cubo', id, neb.xCentro - neb.larg / 2 - 4, neb.xCentro + neb.larg / 2 + 4, neb.yCentro - neb.alt / 2 - 4, neb.yCentro + neb.alt / 2 + 4, neb.z0 - 6, neb.z1 - 8), 'plasticoFosco');
-  emitirParFrente('farolNeblina', (id) => caixa('cubo', id, neb.xCentro - neb.larg / 2 + 4, neb.xCentro + neb.larg / 2 - 4, neb.yCentro - neb.alt / 2 + 4, neb.yCentro + neb.alt / 2 - 4, neb.z0, neb.z1 - 6), 'refletorFarol');
-  emitirParFrente('farolNeblina', (id) => caixa('chamferBox', id, neb.xCentro - neb.larg / 2, neb.xCentro + neb.larg / 2, neb.yCentro - neb.alt / 2, neb.yCentro + neb.alt / 2, neb.z1 - 7, neb.z1 + 2, 3), 'lenteNeblina');
+  const nebTrap = (id, dx0, dx1, dy0, dy1, z0, z1, estriado = false) => {
+    const x0 = neb.xCentro - neb.larg / 2 + dx0;
+    const x1T = neb.xCentro + neb.larg / 2 - dx1;
+    const x1B = x1T - 18; // canto inferior externo chanfrado acompanhando o afunilamento do para-choque!
+    const y0 = neb.yCentro - neb.alt / 2 + dy0;
+    const y1 = neb.yCentro + neb.alt / 2 - dy1;
+    const COLS = estriado ? 24 : 2;
+    const ROWS = 2;
+    const pt = (c, r, frente) => {
+      const u = c / COLS; const v = r / ROWS;
+      const y = y0 + (y1 - y0) * v;
+      const xR = x1B + (x1T - x1B) * v;
+      const x = x0 + (xR - x0) * u;
+      const borda = Math.min(u, 1 - u, v, 1 - v);
+      const estria = estriado && frente ? (c % 2 === 1 ? 1.1 : -0.4) * Math.min(1, borda * 8) : 0;
+      const recuoExt = -5 * u * u; // acompanha a curvatura frontal do para-choque
+      return [m(x), m(y), m((frente ? z1 : z0) + recuoExt + estria)];
+    };
+    const verts = [];
+    for (let k = 0; k < 2; k += 1) {
+      for (let r = 0; r <= ROWS; r += 1) {
+        for (let c = 0; c <= COLS; c += 1) verts.push(pt(c, r, k === 1));
+      }
+    }
+    const stride = COLS + 1;
+    const cSize = (ROWS + 1) * stride;
+    const idV = (k, r, c) => k * cSize + r * stride + c;
+    const faces = [];
+    for (let r = 0; r < ROWS; r += 1) {
+      for (let c = 0; c < COLS; c += 1) {
+        faces.push([idV(0, r, c), idV(0, r + 1, c), idV(0, r + 1, c + 1), idV(0, r, c + 1)]);
+        faces.push([idV(1, r, c), idV(1, r, c + 1), idV(1, r + 1, c + 1), idV(1, r + 1, c)]);
+      }
+    }
+    for (let c = 0; c < COLS; c += 1) {
+      faces.push([idV(0, 0, c), idV(0, 0, c + 1), idV(1, 0, c + 1), idV(1, 0, c)]);
+      faces.push([idV(0, ROWS, c), idV(1, ROWS, c), idV(1, ROWS, c + 1), idV(0, ROWS, c + 1)]);
+    }
+    for (let r = 0; r < ROWS; r += 1) {
+      faces.push([idV(0, r, 0), idV(1, r, 0), idV(1, r + 1, 0), idV(0, r + 1, 0)]);
+      faces.push([idV(0, r, COLS), idV(0, r + 1, COLS), idV(1, r + 1, COLS), idV(1, r, COLS)]);
+    }
+    return ['subdivisao', { origemId: id, niveis: 0, vertices: verts, faces }];
+  };
+  emitirParFrente('farolNeblina', (id) => nebTrap(id, -4, -4, -3, -3, neb.z0 - 8, neb.z1 - 6, false), 'plasticoFosco');
+  emitirParFrente('farolNeblina', (id) => nebTrap(id, 3, 3, 3, 3, neb.z0, neb.z1 - 4, false), 'refletorFarol');
+  emitirParFrente('farolNeblina', (id) => nebTrap(id, 0, 0, 0, 0, neb.z1 - 4, neb.z1 + 2, true), 'lenteFarol');
 
   const idEntFundo = proxId();
-  passos.push(caixa('cubo', idEntFundo, -(neb.xCentro - neb.larg / 2 - 4), neb.xCentro - neb.larg / 2 - 4, neb.yCentro - 25, neb.yCentro + 25, neb.z0 - 6, neb.z1 - 4));
+  passos.push(caixa('cubo', idEntFundo, -(neb.xCentro - neb.larg / 2 - 4), neb.xCentro - neb.larg / 2 - 4, neb.yCentro - 20, neb.yCentro + 20, neb.z0 - 8, neb.z1 - 6));
   marcar('parachoqueDianteiro', 'plasticoFosco', { origem: { op: 'cubo', id: idEntFundo } });
   const idEntLam = proxId();
   const oEntLam = { op: 'cubo', id: idEntLam };
-  passos.push(caixa('cubo', idEntLam, -(neb.xCentro - neb.larg / 2 - 10), neb.xCentro - neb.larg / 2 - 10, neb.yCentro - 16, neb.yCentro - 11, neb.z1 - 6, neb.z1));
+  passos.push(caixa('cubo', idEntLam, -(neb.xCentro - neb.larg / 2 - 8), neb.xCentro - neb.larg / 2 - 8, neb.yCentro - 12, neb.yCentro - 8, neb.z1 - 8, neb.z1 - 1));
   const idEntLams = proxId();
-  passos.push(['arranja', { modo: 'linear', total: 3, d: [0, m(13), 0], origemId: idEntLams, derivaDe: oEntLam, sel: { origem: oEntLam } }]);
+  passos.push(['arranja', { modo: 'linear', total: 3, d: [0, m(10), 0], origemId: idEntLams, derivaDe: oEntLam, sel: { origem: oEntLam } }]);
   marcar('parachoqueDianteiro', 'plasticoPreto', { origem: oEntLam });
   marcar('parachoqueDianteiro', 'plasticoPreto', { origem: { op: 'arranja', id: idEntLams, de: oEntLam } });
 
