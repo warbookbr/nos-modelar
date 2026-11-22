@@ -394,6 +394,19 @@ export function limitesDaGaiola(gaiola) {
   return limitesInternos(gaiola.vertices, gaiola.faces, nitidez, C, gaiola.borda ?? 'suave', facesDoV);
 }
 
+/** linhasDoLimite(gaiola, indices) -> para cada índice, a linha esparsa do ponto limite dele, [[vértice, peso], ...] sem os pesos nulos:
+ *  o ponto limite do vértice i é Σ peso · gaiola[vértice]. É a linha W_i do ajuste às medidas, exposta para medir a estrutura do sistema
+ *  (não nulos, banda e preenchimento) sem montá-lo. */
+export function linhasDoLimite(gaiola, indices) {
+  const { nitidez, C, facesDoV } = prepararLimite(gaiola);
+  const borda = gaiola.borda ?? 'suave';
+  return indices.map((i) => {
+    const est = estrelaDe(gaiola.vertices, gaiola.faces, facesDoV[i], nitidez, i);
+    const w = pesosDaEstrela(est, C.has(i), borda);
+    return est.globais.map((j, c) => [j, w[c]]).filter(([, p]) => p !== 0);
+  });
+}
+
 /* Pesos do ponto limite: o ponto limite é linear nas posições da estrela, e os pesos saem do próprio cálculo aplicado à
  * base, três vértices por vez (um em cada eixo). O resultado é o mesmo nos três eixos. */
 function pesosDaEstrela(estrela, canto, borda) {

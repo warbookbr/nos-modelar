@@ -9,6 +9,7 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
 - [Abertura de contorno livre — as técnicas medidas, a operação e a lente no lugar](abertura-de-contorno-2026-11-05/README.md) — `abertura-de-contorno-2026-11-05`
 - [Abertura em qualquer direção — a bateria de limites da operação](abertura-em-qualquer-direcao-2026-11-06/README.md) — `abertura-em-qualquer-direcao-2026-11-06`
 - [Abrir peça com filtros, 2026-11-17](abrir-peca-com-filtros-2026-11-17/README.md) — `abrir-peca-com-filtros-2026-11-17`
+- [Ajuste esparso da gaiola: a linha de base do solver denso](ajuste-esparso-2026-11-22/README.md) — `ajuste-esparso-2026-11-22`
 - `aparelhos-2026-10-16`
 - [Avião de pequeno porte: alinhamento](aviao-2026-10-11/ALINHAMENTO.md) — `aviao-2026-10-11`
 - [O esboço do avião traduzido para o andaime](aviao-receita-2026-10-15/TRADUCAO.md) — `aviao-receita-2026-10-15`

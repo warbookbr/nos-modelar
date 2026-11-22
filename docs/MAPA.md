@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2161 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2164 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -107,6 +107,11 @@
 ## docs/modelar/banco-de-provas/abrir-peca-com-filtros-2026-11-17/
 
 - `README.md` — Abrir peça com filtros, 2026-11-17
+
+## docs/modelar/banco-de-provas/ajuste-esparso-2026-11-22/
+
+- `README.md` — Ajuste esparso da gaiola: a linha de base do solver denso
+- `ensaio-denso.mjs` — ensaio-denso.mjs — a linha de base do plano do ajuste esparso (fatia 1): o custo do ajuste denso de hoje na gaiola grande neutra (`tools/fixtures/ajuste-espa…
 
 ## docs/modelar/banco-de-provas/aviao-2026-10-11/
 
@@ -2833,6 +2838,10 @@
 
 - `receita.js` — peca-de-prova/receita.js — a peça que as guardas de navegador usam.
 - `receita.test.mjs` — receita.test.mjs — a peça de prova cumpre o que as guardas exigem dela.
+
+## tools/fixtures/ajuste-esparso/
+
+- `gaiola-grande.mjs` — gaiola-grande.mjs — a gaiola grande e escalável do plano do ajuste esparso, sem objeto: a casca simétrica neutra das chapas de prova (`definicaoDaChapaSimetr…
 
 ## tools/fixtures/comparar-com-prancha/
 

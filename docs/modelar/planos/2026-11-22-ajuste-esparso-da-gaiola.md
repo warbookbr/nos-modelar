@@ -70,6 +70,10 @@ As recusas por ganho e por cota fora da tolerância nomeiam os mesmos pontos. A 
 
 A parada pelo preenchimento é calibrada na fatia 1: se no ponto de sela o fator passar de três vezes a razão medida no caso positivo definido, a fatia 3 usa complemento de Schur. Se a igualdade com o denso não chegar à tolerância declarada numa peça do acervo, parar e levar o caso à pessoa, sem relaxar a tolerância. Se a memória do quarto com passo 35 passar do limite com o fator esparso, parar antes da fatia 3 e medir onde está o pico. O CI roda de duas a três vezes mais devagar que a máquina local, e o teste de escala conta operações para não depender do relógio.
 
+## Andamento
+
+Fatia 1 feita em 2026-11-22, com as medidas em `docs/modelar/banco-de-provas/ajuste-esparso-2026-11-22/`. A gaiola de prova gerada pela rede reproduz a banda do carro, que cresce na proporção das incógnitas, e o custo absoluto dele (26,7 s com 4.845 incógnitas). O expoente do ajuste dá 2,6 a 2,8 contra o 3,1 que o carro mediu no passo inteiro da subdivisão. Como o gate mede o carro direto, a diferença fica registrada sem mudar a fatia 2. O preenchimento da eliminação de hoje vai de 17 a 41 vezes os não nulos de H. Os testes do piso de ruído pela ordem e dos dois cubos estão em `procedural/nucleo/subdivisao.test.mjs`, e o retrato das doze peças com subdivisão está gravado. A linha do limite (`linhasDoLimite`) passou a ser exportada pelo núcleo, para medir a estrutura do sistema.
+
 ## Fechamento
 
 Preencher ao concluir ou cancelar: estado final, commit e PR, gates, resultado observado e candidatos devolvidos ao backlog.

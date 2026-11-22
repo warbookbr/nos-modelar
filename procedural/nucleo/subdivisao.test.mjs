@@ -1,7 +1,7 @@
 /* subdivisao.test.mjs — a subdivisão Catmull-Clark e a operação `subdivisao` contra a saída congelada do oráculo, com determinismo, ponto limite, interpolação, vincos nomeados e vértice sem face. */
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { subdividirCatmullClark, espelharGaiolaEmX, nitidezDoVinco, limitesDaGaiola, refinarGaiola, ajustarGaiolaAsMedidas, ErroDasMedidas, GANHO_MAXIMO_DAS_MEDIDAS, NITIDEZ_VIVA, fatorarLU, resolverLU } from './subdivisao.js';
+import { subdividirCatmullClark, espelharGaiolaEmX, nitidezDoVinco, limitesDaGaiola, refinarGaiola, ajustarGaiolaAsMedidas, ErroDasMedidas, GANHO_MAXIMO_DAS_MEDIDAS, NITIDEZ_VIVA, fatorarLU, resolverLU, ajustarGaiolaAsMedidasComPeso, passoDaGaiola } from './subdivisao.js';
 import { enderecosPorIndice } from './operacoes/subdivisao.js';
 import { neutroCanonico, nucleo } from './entrada.js';
 
@@ -500,5 +500,57 @@ describe('subdivisão Catmull-Clark com vincos', () => {
       expect(neutro.orfaos).toHaveLength(1);
       expect(neutro.orfaos[0].motivo).toContain("'pontoSolto'");
     });
+  });
+});
+
+/* O que o plano do ajuste esparso (2026-11-22) precisa saber do solver denso antes de trocá-lo: quanto a gaiola ajustada muda quando só a
+   ordem dos vértices muda, que é a referência que o esparso tem de cumprir (ele elimina noutra ordem), e o que a recusa do sistema singular
+   nomeia. Os números de cada caso estão no banco de provas `ajuste-esparso-2026-11-22`. */
+describe('o ajuste denso diante da ordem dos vértices', () => {
+  const grade = (nx, nz, ponto) => {
+    const vertices = []; const faces = [];
+    for (let j = 0; j < nz; j++) for (let i = 0; i < nx; i++) vertices.push(ponto(i, j));
+    for (let j = 0; j + 1 < nz; j++) for (let i = 0; i + 1 < nx; i++) { const a = j * nx + i; faces.push([a, a + nx, a + nx + 1, a + 1]); }
+    return { vertices, faces, vincos: [], cantos: [], borda: 'suave' };
+  };
+  /* a grade de 24 por 20 com 50 mm de passo e uma ondulação, e a mesma renumerada por uma permutação fixa (congruencial, sem sorteio) */
+  const g = grade(24, 20, (i, j) => [i * 0.05, 0.02 * Math.sin(0.9 * i) * Math.cos(0.6 * j) + 0.001 * ((i * 7 + j * 13) % 5), j * 0.05]);
+  const n = g.vertices.length;
+  const perm = [...Array(n).keys()];
+  let s = 12345; const proximo = () => (s = (s * 1103515245 + 12345) % 2147483648) / 2147483648;
+  for (let k = n - 1; k > 0; k--) { const r = Math.floor(proximo() * (k + 1)); [perm[k], perm[r]] = [perm[r], perm[k]]; }
+  const novo = new Array(n); perm.forEach((p, k) => { novo[p] = k; });
+  const gr = { ...g, vertices: perm.map((p) => g.vertices[p]), faces: g.faces.map((f) => f.map((p) => novo[p])) };
+  const medidas = (comExatas) => g.vertices.map((_, i) => i).filter((i) => i % 3 === 0).map((i) => ({ indice: i, peso: comExatas && i % 9 === 0 ? Infinity : 0.003 }));
+  const renumeradas = (ms) => ms.map((m) => ({ indice: novo[m.indice], peso: m.peso }));
+  const diferenca = (A, B) => { let d = 0; for (let k = 0; k < n; k++) for (let x = 0; x < 3; x++) d = Math.max(d, Math.abs(A[k][x] - B[novo[k]][x])); return d; };
+  const pelaOrdem = (comExatas, regularizacao) => diferenca(ajustarGaiolaAsMedidasComPeso(g, medidas(comExatas), regularizacao).vertices, ajustarGaiolaAsMedidasComPeso(gr, renumeradas(medidas(comExatas)), regularizacao).vertices);
+  const passo = passoDaGaiola(g.vertices, g.faces);
+
+  it('sem a energia de curvatura, a ordem muda a gaiola só no arredondamento, abaixo de 1e-12 m: é onde o esparso cumpre 1e-9 m', () => {
+    expect(pelaOrdem(false, null)).toBeLessThan(1e-12);
+    expect(pelaOrdem(true, null)).toBeLessThan(1e-12);
+  });
+
+  it('com a energia de curvatura e a onda longa, o próprio denso muda além de 1e-9 m só pela ordem: a referência do esparso é o piso medido', () => {
+    /* o resto de 1e-9 do deslocamento contra o peso (onda/2π)⁶ da energia deixa o sistema mal condicionado; a tolerância do esparso nesses
+       casos é dez vezes este piso, medido no mesmo caso */
+    expect(pelaOrdem(false, { tipo: 'variacaoDeCurvatura' })).toBeLessThan(1e-11);
+    expect(pelaOrdem(false, { tipo: 'variacaoDeCurvatura', onda: 64 * passo })).toBeGreaterThan(1e-9);
+  });
+
+  it('CONHECIDA: a recusa do sistema singular nomeia pontos que dependem da ordem quando o núcleo do sistema tem mais de uma dimensão', () => {
+    /* dois cubos lisos com todos os vértices exatos: cada cubo sozinho já é singular. Na ordem natural a recusa nomeia o primeiro cubo, e com
+       o segundo cubo numerado antes ela nomeia o segundo. A fatia 3 do plano passa a nomear a base inteira do núcleo, os dois cubos nas duas
+       ordens, e então esta catraca falha para a marca sair. */
+    const cubo = (o, l) => ({ v: [[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0], [0, 0, 1], [1, 0, 1], [1, 1, 1], [0, 1, 1]].map((p) => p.map((c, k) => c * l + o[k])), f: [[0, 3, 2, 1], [4, 5, 6, 7], [0, 1, 5, 4], [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7]] });
+    const a = cubo([0, 0, 0], 1); const b = cubo([5, 0, 0], 2);
+    const dois = { vertices: [...a.v, ...b.v], faces: [...a.f, ...b.f.map((f) => f.map((i) => i + 8))], vincos: [], cantos: [] };
+    const todos = dois.vertices.map((_, k) => k);
+    const ordem = [...todos.slice(8), ...todos.slice(0, 8)]; const posicao = []; ordem.forEach((p, k) => { posicao[p] = k; });
+    const trocados = { vertices: ordem.map((p) => dois.vertices[p]), faces: dois.faces.map((f) => f.map((p) => posicao[p])), vincos: [], cantos: [] };
+    const nomeados = (gaiola, volta) => { try { ajustarGaiolaAsMedidas(gaiola, todos); } catch (e) { return e.indices.map(volta).sort((x, y) => x - y); } return null; };
+    expect(nomeados(dois, (k) => k)).toEqual([0, 1, 2, 3, 4, 5, 6, 7]);
+    expect(nomeados(trocados, (k) => ordem[k])).toEqual([8, 9, 10, 11, 12, 13, 14, 15]);
   });
 });
