@@ -157,6 +157,11 @@ describe('o passo seguinte lido do estado', () => {
     expect(r.texto).toContain('nenhum plano ativo: o backlog não autoriza implementação');
   });
 
+  it('a tarefa com título por extenso (### Tarefa 3 — …) também é lida', () => {
+    const raiz = repositorio({ tarefas: '### Tarefa 3 — Rodada 8\n\n- **Status:** aberta\n' });
+    expect(tarefasAbertas(raiz)).toEqual([{ id: 'Tarefa 3', titulo: 'Rodada 8', status: 'aberta' }]);
+  });
+
   it('uma tarefa em comunicacao.md vem antes do plano, com o passo de cada status', () => {
     const tarefa = (status) => `### T020 — Algo\n\n- **Status:** ${status}\n- **Objetivo:** x\n`;
     for (const [status, esperado] of [['aberta', 'está com a outra IA (aberta)'], ['feita', 'Revise o relatório da T020'], ['bloqueada', 'Resolva o bloqueio da T020']]) {

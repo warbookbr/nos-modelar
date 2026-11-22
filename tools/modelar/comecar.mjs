@@ -48,12 +48,12 @@ export function planosAtivos(raiz = RAIZ) {
   return ativos.sort((x, y) => posicao(x) - posicao(y)).map(({ nome, ...resto }) => resto);
 }
 
-/* As tarefas da seção "Tarefas" de `comunicacao.md`: [{ id, titulo, status }]. */
+/* As tarefas da seção "Tarefas" de `comunicacao.md`, com o título `### T3 — …` ou `### Tarefa 3 — …`: [{ id, titulo, status }]. */
 export function tarefasAbertas(raiz = RAIZ) {
   const caminho = join(raiz, 'comunicacao.md');
   if (!existsSync(caminho)) return [];
   const secao = readFileSync(caminho, 'utf8').split(/^## Tarefas\s*$/m)[1] ?? '';
-  return [...secao.matchAll(/^### (T\d+)\s*[—-]\s*(.+)$([\s\S]*?)(?=^### |(?![\s\S]))/gm)].map((m) => ({
+  return [...secao.matchAll(/^### (T\d+|Tarefa \d+)\s*[—-]\s*(.+)$([\s\S]*?)(?=^### |(?![\s\S]))/gm)].map((m) => ({
     id: m[1],
     titulo: m[2].trim(),
     status: /\*\*Status:\*\*\s*([^\n]+)/.exec(m[3])?.[1].trim() ?? 'sem status',
