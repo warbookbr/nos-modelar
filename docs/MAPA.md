@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2160 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2161 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -3573,6 +3573,7 @@
 - `familia.mjs` — familia.mjs — a aprovação mecânica das famílias e o gate que a confere.
 - `familia.test.mjs` — familia.test.mjs — o comando `npm run familia -- aprovar <id>` e o gate `familias:check`.
 - `ferramentas-por-objeto.mjs` — Gera docs/modelar/pesquisas/FERRAMENTAS-POR-OBJETO.md a partir de docs/modelar/ferramentas-por-objeto.json e confere que o JSON cobre a fase atual de FAMILIA…
+- `ferramentas-por-objeto.test.mjs` — ferramentas-por-objeto.test.mjs — a conferência do mapa de ferramentas recusa o estado fora de não, parcial e tem.
 - `ferramentas-sobre-uniao.test.ts` — ferramentas-sobre-uniao.test.ts — fatia 5 do plano "União de sólidos": as ferramentas que leem a peça funcionam sobre uma malha unida. A fixture é neutra (`f…
 - `fluxo-do-objeto.mjs` — fluxo-do-objeto.mjs — em que passo um objeto está, da referência à etapa fixa, e o comando exato que vem agora.
 - `fluxo-do-objeto.test.mjs` — fluxo-do-objeto.test.mjs — o passo do objeto e o próximo comando de cada peça, em fixtures montadas num diretório temporário, sem executar receita nenhuma.

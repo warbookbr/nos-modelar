@@ -17,22 +17,22 @@ Os tipos são três. O modificador age sobre uma forma que já existe; o gerador
 | 3 | estrutura de barras (`barras`) | gerador | 72 (20%) | 19 | parcial | faz uma rede de nós e barras com perfil, juntas nos nós e padrões de treliça prontos (quadro tubular, treliça, andaime, torre, grade de arame) |
 | 4 | repetição em série (`repete`) | modificador | 69 (19%) | 24 | parcial | copia uma forma em linha, em grade NxM, em círculo ou ao longo de um caminho, com contagem e passo |
 | 5 | chapa dobrada (`chapa`) | gerador | 62 (17%) | 16 | parcial | faz peça de chapa por abas e dobras com raio, alívio de canto e espessura constante (suporte, carroceria de caminhão, eletrocalha, gabinete metálico) |
-| 6 | gabinete (`gabinete`) | gerador | 57 (15%) | 16 | não | faz caixa de equipamento com tampa, encaixe entre as metades, ressaltos, grade de ventilação e recortes de painel |
+| 6 | gabinete (`gabinete`) | gerador | 57 (15%) | 16 | parcial | faz caixa de equipamento com tampa, encaixe entre as metades, ressaltos, grade de ventilação e recortes de painel |
 | 7 | cabo ou mangueira entre pontos (`cabo`) | gerador | 49 (13%) | 19 | parcial | liga dois pontos com caimento e raio mínimo de curva, com terminal em cada ponta, e feixes de vários cabos |
-| 8 | roda e pneu (`rodaPneu`) | especializado | 49 (13%) | 11 | sim | gera aro, disco ou raios, cubo com furação e pneu com seção e banda, que encaixam por aro |
+| 8 | roda e pneu (`rodaPneu`) | especializado | 49 (13%) | 11 | tem | gera aro, disco ou raios, cubo com furação e pneu com seção e banda, que encaixam por aro |
 | 9 | superfície suave por seções (`loftSuave`) | gerador | 46 (12%) | 15 | parcial | faz carenagem, casco e fuselagem por seções com transição curva, em vez de troncos planos entre seções |
 | 10 | furação em padrão (`furos`) | modificador | 43 (12%) | 16 | parcial | fura em grade, em círculo (PCD) ou em favo, com escareado, rebaixo ou rosca, em qualquer face |
 | 11 | perfil estrutural (`perfil`) | gerador | 43 (12%) | 18 | parcial | estende uma seção normalizada (I, H, U, L, tubo, alumínio ranhurado) ao longo de uma linha, com cortes de ponta |
-| 12 | manopla e botão (`manopla`) | especializado | 42 (11%) | 14 | não | gera botão rotativo, manípulo, volante e cabo ergonômico com furo de eixo e estrias |
+| 12 | manopla e botão (`manopla`) | especializado | 42 (11%) | 14 | parcial | gera botão rotativo, manípulo, volante e cabo ergonômico com furo de eixo e estrias |
 | 13 | guia linear (`guia`) | especializado | 32 (9%) | 13 | parcial | gera trilho e carro, corrediça de gaveta e guia em V por tamanho e curso |
 | 14 | tubulação com conexões (`tubulacao`) | gerador | 27 (7%) | 11 | não | traça uma rede de tubos e põe sozinha as curvas, tês, reduções, flanges e válvulas por bitola |
-| 15 | engrenagens (`engrenagem`) | especializado | 26 (7%) | 11 | parcial | gera engrenagem reta, helicoidal, cônica, sem-fim, cremalheira e catraca com dente evolvente por módulo e número de dentes, e diz a distância entre centros do par |
-| 16 | molas (`mola`) | especializado | 26 (7%) | 10 | parcial | gera mola de compressão, tração com ganchos e torção com braços, com espiras fechadas nas pontas e comprimento entre dois pontos |
+| 15 | engrenagens (`engrenagem`) | especializado | 26 (7%) | 11 | não | gera engrenagem reta, helicoidal, cônica, sem-fim, cremalheira e catraca com dente evolvente por módulo e número de dentes, e diz a distância entre centros do par |
+| 16 | molas (`mola`) | especializado | 26 (7%) | 10 | não | gera mola de compressão, tração com ganchos e torção com braços, com espiras fechadas nas pontas e comprimento entre dois pontos |
 | 17 | rosca (`rosca`) | especializado | 26 (7%) | 13 | não | faz rosca macho ou fêmea métrica, trapezoidal ou de tampa, em qualquer cilindro ou furo |
 | 18 | tecido e estofado (`tecido`) | gerador | 26 (7%) | 11 | não | faz almofada inflada com costura, lona esticada, vela e rede a partir de contorno e pressão |
 | 19 | atuador linear (`atuador`) | especializado | 25 (7%) | 10 | parcial | gera cilindro hidráulico ou pneumático e fuso com camisa, haste, olhais e portas, por curso e diâmetro, ligado entre dois pontos |
 | 20 | móvel modular (`movel`) | gerador | 23 (6%) | 6 | parcial | faz caixaria de móvel com laterais, prateleiras, portas e gavetas por vãos |
-| 21 | fixadores normalizados (`fixador`) | especializado | 21 (6%) | 9 | parcial | gera parafuso, porca, arruela, rebite e pino por norma e bitola |
+| 21 | fixadores normalizados (`fixador`) | especializado | 21 (6%) | 9 | não | gera parafuso, porca, arruela, rebite e pino por norma e bitola |
 | 22 | relevo funcional (`textura`) | modificador | 21 (6%) | 10 | parcial | aplica recartilhado, estrias de pega, piso antiderrapante ou chapa ondulada numa face |
 | 23 | elos ao longo de caminho fechado (`elos`) | gerador | 19 (5%) | 8 | não | distribui elos articulados num contorno fechado em volta de rodas (corrente, esteira de trator, porta-cabos, degraus de escada rolante, correia dentada) |
 | 24 | texto e escala gravados (`texto`) | modificador | 19 (5%) | 9 | não | grava ou põe em relevo letras, números e escalas graduadas (paquímetro, mostrador, placa) |
@@ -41,11 +41,11 @@ Os tipos são três. O modificador age sobre uma forma que já existe; o gerador
 | 27 | elementos de construção (`arquitetura`) | gerador | 13 (4%) | 6 | não | faz parede com aberturas, laje, telhado de águas e escada por espelho e piso |
 | 28 | corte e união gerais (`booleana`) | modificador | 11 (3%) | 9 | parcial | subtrai, une ou intersecta formas quaisquer, para rasgos, janelas, cavidades e peças fundidas |
 | 29 | dobrar, torcer e afunilar (`deforma`) | modificador | 11 (3%) | 9 | não | deforma uma forma pronta ao longo de um eixo (shape de skate, lâmina curva, escudo abaulado, cabide) |
-| 30 | rolamentos e buchas (`rolamento`) | especializado | 11 (3%) | 4 | parcial | gera rolamento por série com anéis, corpos rolantes, gaiola e vedação, e bucha e mancal com furação |
+| 30 | rolamentos e buchas (`rolamento`) | especializado | 11 (3%) | 4 | não | gera rolamento por série com anéis, corpos rolantes, gaiola e vedação, e bucha e mancal com furação |
 | 31 | lâmina e dentes de corte (`lamina`) | especializado | 10 (3%) | 6 | não | gera gume afiado, serrilha e dentes de serra ao longo de uma borda |
-| 32 | hélice (`helice`) | gerador | 9 (2%) | 3 | parcial | gera o caminho e o sólido helicoidal de passo, raio e voltas quaisquer (mola, rosca, caracol transportador, bobina, escada caracol) |
+| 32 | hélice (`helice`) | gerador | 9 (2%) | 3 | não | gera o caminho e o sólido helicoidal de passo, raio e voltas quaisquer (mola, rosca, caracol transportador, bobina, escada caracol) |
 | 33 | encaixe por pressão (`encaixe`) | especializado | 8 (2%) | 4 | não | gera clipe, gancho elástico e engate entre duas peças, com a folga certa |
-| 34 | placa de circuito (`pcb`) | gerador | 8 (2%) | 7 | não | faz a placa com furos de fixação e componentes por encapsulamento padrão |
+| 34 | placa de circuito (`pcb`) | gerador | 8 (2%) | 7 | parcial | faz a placa com furos de fixação e componentes por encapsulamento padrão |
 | 35 | varredura de perfil (`varre`) | gerador | 8 (2%) | 6 | parcial | passa um perfil qualquer ao longo de um caminho 3D, com seção que pode mudar no percurso (duto, trompete, armação de óculos) |
 | 36 | vedação (`vedacao`) | especializado | 7 (2%) | 2 | não | gera o-ring, retentor e junta plana, com a canaleta de alojamento cortada na peça |
 | 37 | arredondar e chanfrar arestas escolhidas (`arredonda`) | modificador | 6 (2%) | 2 | parcial | arredonda ou chanfra as arestas que a IA nomeia, em qualquer forma, e não só na caixa |
@@ -59,62 +59,61 @@ Os tipos são três. O modificador age sobre uma forma que já existe; o gerador
 
 As ferramentas que não existem ou existem em parte, na mesma ordem, com o que já há.
 
-- casca com espessura (`parcial`, 125 objetos): a extensão nativa `casca` do núcleo esvazia sólido convexo ou de três faces por vértice, só para dentro; o esboço só tem o anel (cilindro oco); casca de forma livre e lado de fora não existem.
+- casca com espessura (`parcial`, 125 objetos): a operação `casca` esvazia sólido convexo ou de três faces por vértice, só para dentro, com as faces abertas escolhidas, na receita comum, nas famílias e no esboço 2.0 (desde 2026-11-22); o `lathe` com `espessura` faz a casca de revolução; casca de forma livre e lado de fora não existem.
 - articulações (`parcial`, 95 objetos): extensão nativa de articulação (revolução e prismática, curso conferido contra as peças por `conferirArticulacao`) e família `dobradica` de abas; rótula de esfera e olhal fora do cilindro não.
-- estrutura de barras (`parcial`, 72 objetos): extensão nativa `estruturaDeBarras` do núcleo: barras de tubo ou perfil maciço entre nós, com corte de ponta e massa; juntas soldadas e padrões não; tubo do esboço.
-- repetição em série (`parcial`, 69 objetos): arranja linear e radial no esboço e no núcleo, e ao longo de tubo no esboço; grade 2D não.
+- estrutura de barras (`parcial`, 72 objetos): extensão `estruturaDeBarras` na receita comum e nas famílias: barras de tubo ou perfil maciço entre nós nomeados, com corte de ponta e união num sólido; no esboço 2.0, a `haste` entre dois pontos; juntas soldadas e padrões não.
+- repetição em série (`parcial`, 69 objetos): núcleo: arranja linear e radial, também no esboço 2.0 pelo campo `repete`; grade 2D e cópia ao longo de caminho não.
 - chapa dobrada (`parcial`, 62 objetos): extensão nativa `chapaDobrada` do núcleo: abas, dobras com raio, tampas e origem estrutural; alívio de canto e planificado de peça qualquer não.
-- gabinete (`não`, 57 objetos): nem esboço nem núcleo.
-- cabo ou mangueira entre pontos (`parcial`, 49 objetos): tubo do esboço, sem caimento nem terminais.
-- roda e pneu (`sim`, 49 objetos): família `roda-pneu` 2.0: de 50 a 2000 mm, pneumático, maciço, sem pneu e com garra, disco, raiada de um plano e de duas flanges, sete perfis prontos e portas de eixo, assento e furos.
-- superfície suave por seções (`parcial`, 46 objetos): esboço: loft e revolução com `suave: true`, curva de tangente contínua pelas seções com estações, lados e normal escolhidos pelo módulo; núcleo: loft com faces planas entre seções e inflate.
-- furação em padrão (`parcial`, 43 objetos): esboço: furos na caixa; núcleo: furo com centros; escareado, rebaixo e furo fora da caixa não.
-- perfil estrutural (`parcial`, 43 objetos): componente perfil do esboço: L, U e tubo retangular.
-- manopla e botão (`não`, 42 objetos): nem esboço nem núcleo.
+- gabinete (`parcial`, 57 objetos): família `aparelho-de-caixa` (forninho elétrico, micro-ondas, air-fryer de forno, lava-louças compacta): caixa com porta, painel de comando e pés; encaixe entre metades, ressaltos, grade de ventilação e recortes de painel não.
+- cabo ou mangueira entre pontos (`parcial`, 49 objetos): a `haste` reta do esboço 2.0 e o friso de seção circular ao longo de polilinha; caimento, raio mínimo, terminais e feixe não.
+- superfície suave por seções (`parcial`, 46 objetos): núcleo: loft de faces planas entre seções, inflate e as gaiolas de subdivisão (gaiolaPorEstacoes, gaiolaPorLacos, gaiolaVarrida), que dão a superfície lisa; o loft de tangente contínua do esboço antigo saiu com ele em 2026-11-05.
+- furação em padrão (`parcial`, 43 objetos): núcleo: furo com centros, passante ou cego, e furos de perfil na extrusao e no lathe; escareado, rebaixo, rosca e padrão em grade, círculo ou favo não.
+- perfil estrutural (`parcial`, 43 objetos): extensão `estruturaDeBarras`: tubo redondo, quadrado, retangular e cantoneira entre nós; I, H, U e alumínio ranhurado não.
+- manopla e botão (`parcial`, 42 objetos): os botões giratórios e de pressão e os puxadores dentro das famílias `aparelho-de-caixa` e `movel-de-caixa`; manopla avulsa, volante e cabo ergonômico com furo de eixo e estrias não.
 - guia linear (`parcial`, 32 objetos): trilho simples de gaveta e de porta de correr dentro da família `movel-de-caixa`, com articulação prismática; trilho e carro avulsos e guia em V não.
 - tubulação com conexões (`não`, 27 objetos): nem esboço nem núcleo.
-- engrenagens (`parcial`, 26 objetos): componente engrenagem do esboço, com dente trapezoidal.
-- molas (`parcial`, 26 objetos): componente mola do esboço, só compressão e três voltas.
+- engrenagens (`não`, 26 objetos): nenhum gerador; o componente engrenagem do esboço antigo saiu com ele em 2026-11-05.
+- molas (`não`, 26 objetos): nenhum gerador; o componente mola do esboço antigo saiu com ele em 2026-11-05.
 - rosca (`não`, 26 objetos): nem esboço nem núcleo.
 - tecido e estofado (`não`, 26 objetos): nem esboço nem núcleo.
 - atuador linear (`parcial`, 25 objetos): família `cilindro-hidraulico`: camisa, haste, êmbolo, cabeça e olhais liso e com rótula, curso conferido; cilindro de haste dupla e telescópico não.
-- móvel modular (`parcial`, 23 objetos): família `movel-de-caixa`: nove perfis (roupeiro, guarda-roupa, de correr, armário aéreo e de chão, cômoda, criado-mudo, estante, gaveteiro) com portas embutidas, sobrepostas e de correr, gavetas e curso conferido; cadeira, mesa e sofá não.
-- fixadores normalizados (`parcial`, 21 objetos): componente parafuso do esboço, sem norma nem porca.
+- móvel modular (`parcial`, 23 objetos): família `movel-de-caixa`, com nove perfis de roupeiro, guarda-roupa, armários, cômoda, criado-mudo, estante e gaveteiro, portas embutidas, sobrepostas e de correr e gavetas com curso conferido, e família `cadeira`, com cinco perfis; mesa e sofá não.
+- fixadores normalizados (`não`, 21 objetos): nenhum gerador; o componente parafuso do esboço antigo saiu com ele em 2026-11-05.
 - relevo funcional (`parcial`, 21 objetos): núcleo: displace com ruído; padrão regular não existe.
 - elos ao longo de caminho fechado (`não`, 19 objetos): nem esboço nem núcleo.
 - texto e escala gravados (`não`, 19 objetos): nem esboço nem núcleo.
 - polia e correia (`não`, 18 objetos): nem esboço nem núcleo.
 - perfil aerodinâmico e pás (`parcial`, 17 objetos): família `superficie-aerodinamica`: asa, estabilizador, deriva, pá de hélice e hélice de até 9 pás por perfil de quatro dígitos, corda, espessura, torção, enflechamento, diedro e ponta levantada, com a superfície de comando (flap, aileron, leme) em vão com fresta e deflexão; rotor de turbina, ventoinha carenada e perfil de catálogo não.
 - elementos de construção (`não`, 13 objetos): nem esboço nem núcleo.
-- corte e união gerais (`parcial`, 11 objetos): núcleo: subtrair, unir, intersectar; esboço: furo na caixa e recorte de uma forma por outra (`subtrai`, com folga e profundidade, também em forma de família); unir e intersectar no esboço não.
+- corte e união gerais (`parcial`, 11 objetos): núcleo: subtrair, unir, intersectar e aparar, também no esboço 2.0 pelos passos crus; o esboço 2.0 não tem atalho de recorte entre formas.
 - dobrar, torcer e afunilar (`não`, 11 objetos): nem esboço nem núcleo.
-- rolamentos e buchas (`parcial`, 11 objetos): componentes rolamento e mancal do esboço, sem pista nem gaiola.
+- rolamentos e buchas (`não`, 11 objetos): nenhum gerador; os componentes rolamento e mancal do esboço antigo saíram com ele em 2026-11-05.
 - lâmina e dentes de corte (`não`, 10 objetos): nem esboço nem núcleo.
-- hélice (`parcial`, 9 objetos): componente mola do esboço, com três voltas fixas.
+- hélice (`não`, 9 objetos): nenhum gerador; a hélice sai só como friso ao longo de uma polilinha helicoidal calculada na receita, e o componente mola do esboço antigo saiu com ele em 2026-11-05.
 - encaixe por pressão (`não`, 8 objetos): nem esboço nem núcleo.
-- placa de circuito (`não`, 8 objetos): nem esboço nem núcleo.
-- varredura de perfil (`parcial`, 8 objetos): esboço: tubo de seção circular e envolve; núcleo: loft ao longo de caminho.
+- placa de circuito (`parcial`, 8 objetos): família `componente-eletronico`: dezenove encapsulamentos (resistor, capacitores, TO-220, TO-92, DIP, SOIC, LED, borne, jack, módulos) assentados na placa de prova; trilhas e furação de fixação por projeto não.
+- varredura de perfil (`parcial`, 8 objetos): núcleo: loft ao longo de caminho, com seção que muda, e friso de perfil declarado ao longo de polilinha.
 - vedação (`não`, 7 objetos): nem esboço nem núcleo.
-- arredondar e chanfrar arestas escolhidas (`parcial`, 6 objetos): esboço: raio e chanfro só na caixa; núcleo: arredondarAresta, arredondarCostura, chamferBox.
+- arredondar e chanfrar arestas escolhidas (`parcial`, 6 objetos): núcleo: arredondarAresta, arredondarCadeia, arredondarCanto, arredondarCostura e chamferBox, também no esboço 2.0 pelos passos crus; cada caso pede a operação certa, e não há um arredondar de aresta escolhida que sirva a qualquer forma.
 - came (`não`, 5 objetos): nem esboço nem núcleo.
-- eixo escalonado (`parcial`, 5 objetos): cilindro e revolução do esboço; chaveta e ranhura não.
+- eixo escalonado (`parcial`, 5 objetos): núcleo: cilindro e lathe por trechos; chaveta, ranhura de anel e ponta roscada não.
 - nervura de reforço (`não`, 4 objetos): nem esboço nem núcleo.
 - bobina e núcleo (`não`, 3 objetos): nem esboço nem núcleo.
 - ressalto para parafuso (`não`, 1 objetos): nem esboço nem núcleo.
 
 ## Cada ferramenta
 
-### gabinete (`gabinete`)
-
-Faz caixa de equipamento com tampa, encaixe entre as metades, ressaltos, grade de ventilação e recortes de painel. Parâmetros: dimensões, parede, divisão, recortes. Referências: BOSL2; geradores de caixa de projeto paramétrica. Aqui: não, nem esboço nem núcleo. Atende 57 objetos em 16 famílias.
-
-### manopla e botão (`manopla`)
-
-Gera botão rotativo, manípulo, volante e cabo ergonômico com furo de eixo e estrias. Parâmetros: tipo, diâmetro, eixo, pega. Referências: BOSL2; bibliotecas de knob paramétrico. Aqui: não, nem esboço nem núcleo. Atende 42 objetos em 14 famílias.
-
 ### tubulação com conexões (`tubulacao`)
 
 Traça uma rede de tubos e põe sozinha as curvas, tês, reduções, flanges e válvulas por bitola. Parâmetros: traçado, bitola, tipo de conexão. Referências: FreeCAD: Dodo e Flamingo; Plant 3D (conceito de catálogo de conexões). Aqui: não, nem esboço nem núcleo. Atende 27 objetos em 11 famílias.
+
+### engrenagens (`engrenagem`)
+
+Gera engrenagem reta, helicoidal, cônica, sem-fim, cremalheira e catraca com dente evolvente por módulo e número de dentes, e diz a distância entre centros do par. Parâmetros: tipo, módulo, dentes, ângulo de pressão, largura. Referências: FreeCAD Gears; BOSL2: gears; Blender: Extra Objects (gears). Aqui: não, nenhum gerador; o componente engrenagem do esboço antigo saiu com ele em 2026-11-05. Atende 26 objetos em 11 famílias.
+
+### molas (`mola`)
+
+Gera mola de compressão, tração com ganchos e torção com braços, com espiras fechadas nas pontas e comprimento entre dois pontos. Parâmetros: tipo, diâmetro do arame, diâmetro médio, voltas, comprimento livre. Referências: BOSL2; FreeCAD: Spring; Blender: Extra Objects. Aqui: não, nenhum gerador; o componente mola do esboço antigo saiu com ele em 2026-11-05. Atende 26 objetos em 10 famílias.
 
 ### rosca (`rosca`)
 
@@ -124,33 +123,9 @@ Faz rosca macho ou fêmea métrica, trapezoidal ou de tampa, em qualquer cilindr
 
 Faz almofada inflada com costura, lona esticada, vela e rede a partir de contorno e pressão. Parâmetros: contorno, espessura, pressão, costuras, pontos de amarra. Referências: Blender: Cloth e pressão; Marvelous Designer (conceito). Aqui: não, nem esboço nem núcleo. Atende 26 objetos em 11 famílias.
 
-### casca com espessura (`casca`)
+### fixadores normalizados (`fixador`)
 
-Transforma um sólido fechado numa parede de espessura constante, com faces abertas escolhidas (carenagem, tanque, gabinete, panela, capacete). Parâmetros: espessura, faces abertas, lado (dentro ou fora). Referências: Blender: modificador Solidify; CadQuery e build123d: shell; Onshape e FreeCAD: Shell/Thickness. Aqui: parcial, a extensão nativa `casca` do núcleo esvazia sólido convexo ou de três faces por vértice, só para dentro; o esboço só tem o anel (cilindro oco); casca de forma livre e lado de fora não existem. Atende 125 objetos em 25 famílias.
-
-### articulações (`articula`)
-
-Gera dobradiça, olhal, garfo com pino, rótula e tesoura com o eixo de giro publicado como porta. Parâmetros: tipo, diâmetro do pino, abas, ângulo. Referências: BOSL2: hinges; Onshape e Fusion: juntas de montagem. Aqui: parcial, extensão nativa de articulação (revolução e prismática, curso conferido contra as peças por `conferirArticulacao`) e família `dobradica` de abas; rótula de esfera e olhal fora do cilindro não. Atende 95 objetos em 25 famílias.
-
-### estrutura de barras (`barras`)
-
-Faz uma rede de nós e barras com perfil, juntas nos nós e padrões de treliça prontos (quadro tubular, treliça, andaime, torre, grade de arame). Parâmetros: nós, barras ou padrão de treliça, perfil da barra, tipo de junta. Referências: Blender: modificador Skin e Wireframe; Onshape: Frame; FreeCAD: Frame. Aqui: parcial, extensão nativa `estruturaDeBarras` do núcleo: barras de tubo ou perfil maciço entre nós, com corte de ponta e massa; juntas soldadas e padrões não; tubo do esboço. Atende 72 objetos em 19 famílias.
-
-### repetição em série (`repete`)
-
-Copia uma forma em linha, em grade NxM, em círculo ou ao longo de um caminho, com contagem e passo. Parâmetros: modo, contagem, passo ou ângulo, caminho. Referências: Blender: modificadores Array e Curve; BOSL2: grid_copies, rot_copies, path_copies. Aqui: parcial, arranja linear e radial no esboço e no núcleo, e ao longo de tubo no esboço; grade 2D não. Atende 69 objetos em 24 famílias.
-
-### chapa dobrada (`chapa`)
-
-Faz peça de chapa por abas e dobras com raio, alívio de canto e espessura constante (suporte, carroceria de caminhão, eletrocalha, gabinete metálico). Parâmetros: espessura, abas, ângulo e raio de cada dobra, alívio. Referências: FreeCAD: SheetMetal; Onshape: Sheet Metal. Aqui: parcial, extensão nativa `chapaDobrada` do núcleo: abas, dobras com raio, tampas e origem estrutural; alívio de canto e planificado de peça qualquer não. Atende 62 objetos em 16 famílias.
-
-### cabo ou mangueira entre pontos (`cabo`)
-
-Liga dois pontos com caimento e raio mínimo de curva, com terminal em cada ponta, e feixes de vários cabos. Parâmetros: pontas, comprimento ou folga, diâmetro, terminais. Referências: Blender: curva com Bevel e física de corda; Blender Geometry Nodes: cabos entre pontos. Aqui: parcial, tubo do esboço, sem caimento nem terminais. Atende 49 objetos em 19 famílias.
-
-### roda e pneu (`rodaPneu`)
-
-Gera aro, disco ou raios, cubo com furação e pneu com seção e banda, que encaixam por aro. Parâmetros: aro, largura, seção, raios ou disco, furação, banda. Referências: Blender: modelagem por Screw e Array (técnica). Aqui: sim, família `roda-pneu` 2.0: de 50 a 2000 mm, pneumático, maciço, sem pneu e com garra, disco, raiada de um plano e de duas flanges, sete perfis prontos e portas de eixo, assento e furos. Atende 49 objetos em 11 famílias.
+Gera parafuso, porca, arruela, rebite e pino por norma e bitola. Parâmetros: tipo, norma, bitola, comprimento. Referências: Blender: Bolt Factory; FreeCAD: Fasteners; BOSL2: screws. Aqui: não, nenhum gerador; o componente parafuso do esboço antigo saiu com ele em 2026-11-05. Atende 21 objetos em 9 famílias.
 
 ### elos ao longo de caminho fechado (`elos`)
 
@@ -172,17 +147,21 @@ Faz parede com aberturas, laje, telhado de águas e escada por espelho e piso. P
 
 Deforma uma forma pronta ao longo de um eixo (shape de skate, lâmina curva, escudo abaulado, cabide). Parâmetros: eixo, ângulo de dobra ou de torção, fator de afunilamento. Referências: Blender: modificador Simple Deform. Aqui: não, nem esboço nem núcleo. Atende 11 objetos em 9 famílias.
 
+### rolamentos e buchas (`rolamento`)
+
+Gera rolamento por série com anéis, corpos rolantes, gaiola e vedação, e bucha e mancal com furação. Parâmetros: série e tamanho, tipo. Referências: FreeCAD: Fasteners e Parts Library; catálogos de fabricantes em STEP. Aqui: não, nenhum gerador; os componentes rolamento e mancal do esboço antigo saíram com ele em 2026-11-05. Atende 11 objetos em 4 famílias.
+
 ### lâmina e dentes de corte (`lamina`)
 
 Gera gume afiado, serrilha e dentes de serra ao longo de uma borda. Parâmetros: ângulo do gume, dentes, passo, travamento. Referências: BOSL2 (técnica por perfil). Aqui: não, nem esboço nem núcleo. Atende 10 objetos em 6 famílias.
 
+### hélice (`helice`)
+
+Gera o caminho e o sólido helicoidal de passo, raio e voltas quaisquer (mola, rosca, caracol transportador, bobina, escada caracol). Parâmetros: raio, passo, voltas, perfil, sentido. Referências: Blender: modificador Screw; CadQuery: Wire.makeHelix; BOSL2: helix e spiral_sweep. Aqui: não, nenhum gerador; a hélice sai só como friso ao longo de uma polilinha helicoidal calculada na receita, e o componente mola do esboço antigo saiu com ele em 2026-11-05. Atende 9 objetos em 3 famílias.
+
 ### encaixe por pressão (`encaixe`)
 
 Gera clipe, gancho elástico e engate entre duas peças, com a folga certa. Parâmetros: tipo, deflexão, interferência. Referências: BOSL2: joiners; Fusion: Snap Fit. Aqui: não, nem esboço nem núcleo. Atende 8 objetos em 4 famílias.
-
-### placa de circuito (`pcb`)
-
-Faz a placa com furos de fixação e componentes por encapsulamento padrão. Parâmetros: contorno, furos, componentes e posição. Referências: KiCad e KiCad StepUp: modelos 3D por encapsulamento. Aqui: não, nem esboço nem núcleo. Atende 8 objetos em 7 famílias.
 
 ### vedação (`vedacao`)
 
@@ -204,29 +183,53 @@ Gera enrolamento sobre carretel e núcleo de lâminas para motor, transformador 
 
 Cria o pino oco de fixação dentro de um gabinete, com furo, rebaixo e raiz arredondada. Parâmetros: diâmetro, altura, furo, rosca. Referências: Fusion: Boss. Aqui: não, nem esboço nem núcleo. Atende 1 objetos em 1 famílias.
 
+### casca com espessura (`casca`)
+
+Transforma um sólido fechado numa parede de espessura constante, com faces abertas escolhidas (carenagem, tanque, gabinete, panela, capacete). Parâmetros: espessura, faces abertas, lado (dentro ou fora). Referências: Blender: modificador Solidify; CadQuery e build123d: shell; Onshape e FreeCAD: Shell/Thickness. Aqui: parcial, a operação `casca` esvazia sólido convexo ou de três faces por vértice, só para dentro, com as faces abertas escolhidas, na receita comum, nas famílias e no esboço 2.0 (desde 2026-11-22); o `lathe` com `espessura` faz a casca de revolução; casca de forma livre e lado de fora não existem. Atende 125 objetos em 25 famílias.
+
+### articulações (`articula`)
+
+Gera dobradiça, olhal, garfo com pino, rótula e tesoura com o eixo de giro publicado como porta. Parâmetros: tipo, diâmetro do pino, abas, ângulo. Referências: BOSL2: hinges; Onshape e Fusion: juntas de montagem. Aqui: parcial, extensão nativa de articulação (revolução e prismática, curso conferido contra as peças por `conferirArticulacao`) e família `dobradica` de abas; rótula de esfera e olhal fora do cilindro não. Atende 95 objetos em 25 famílias.
+
+### estrutura de barras (`barras`)
+
+Faz uma rede de nós e barras com perfil, juntas nos nós e padrões de treliça prontos (quadro tubular, treliça, andaime, torre, grade de arame). Parâmetros: nós, barras ou padrão de treliça, perfil da barra, tipo de junta. Referências: Blender: modificador Skin e Wireframe; Onshape: Frame; FreeCAD: Frame. Aqui: parcial, extensão `estruturaDeBarras` na receita comum e nas famílias: barras de tubo ou perfil maciço entre nós nomeados, com corte de ponta e união num sólido; no esboço 2.0, a `haste` entre dois pontos; juntas soldadas e padrões não. Atende 72 objetos em 19 famílias.
+
+### repetição em série (`repete`)
+
+Copia uma forma em linha, em grade NxM, em círculo ou ao longo de um caminho, com contagem e passo. Parâmetros: modo, contagem, passo ou ângulo, caminho. Referências: Blender: modificadores Array e Curve; BOSL2: grid_copies, rot_copies, path_copies. Aqui: parcial, núcleo: arranja linear e radial, também no esboço 2.0 pelo campo `repete`; grade 2D e cópia ao longo de caminho não. Atende 69 objetos em 24 famílias.
+
+### chapa dobrada (`chapa`)
+
+Faz peça de chapa por abas e dobras com raio, alívio de canto e espessura constante (suporte, carroceria de caminhão, eletrocalha, gabinete metálico). Parâmetros: espessura, abas, ângulo e raio de cada dobra, alívio. Referências: FreeCAD: SheetMetal; Onshape: Sheet Metal. Aqui: parcial, extensão nativa `chapaDobrada` do núcleo: abas, dobras com raio, tampas e origem estrutural; alívio de canto e planificado de peça qualquer não. Atende 62 objetos em 16 famílias.
+
+### gabinete (`gabinete`)
+
+Faz caixa de equipamento com tampa, encaixe entre as metades, ressaltos, grade de ventilação e recortes de painel. Parâmetros: dimensões, parede, divisão, recortes. Referências: BOSL2; geradores de caixa de projeto paramétrica. Aqui: parcial, família `aparelho-de-caixa` (forninho elétrico, micro-ondas, air-fryer de forno, lava-louças compacta): caixa com porta, painel de comando e pés; encaixe entre metades, ressaltos, grade de ventilação e recortes de painel não. Atende 57 objetos em 16 famílias.
+
+### cabo ou mangueira entre pontos (`cabo`)
+
+Liga dois pontos com caimento e raio mínimo de curva, com terminal em cada ponta, e feixes de vários cabos. Parâmetros: pontas, comprimento ou folga, diâmetro, terminais. Referências: Blender: curva com Bevel e física de corda; Blender Geometry Nodes: cabos entre pontos. Aqui: parcial, a `haste` reta do esboço 2.0 e o friso de seção circular ao longo de polilinha; caimento, raio mínimo, terminais e feixe não. Atende 49 objetos em 19 famílias.
+
 ### superfície suave por seções (`loftSuave`)
 
-Faz carenagem, casco e fuselagem por seções com transição curva, em vez de troncos planos entre seções. Parâmetros: seções, curvatura entre elas, densidade. Referências: Blender: Subdivision Surface; OpenVSP; FreeCAD Ship; CadQuery: loft com ruled=False. Aqui: parcial, esboço: loft e revolução com `suave: true`, curva de tangente contínua pelas seções com estações, lados e normal escolhidos pelo módulo; núcleo: loft com faces planas entre seções e inflate. Atende 46 objetos em 15 famílias.
+Faz carenagem, casco e fuselagem por seções com transição curva, em vez de troncos planos entre seções. Parâmetros: seções, curvatura entre elas, densidade. Referências: Blender: Subdivision Surface; OpenVSP; FreeCAD Ship; CadQuery: loft com ruled=False. Aqui: parcial, núcleo: loft de faces planas entre seções, inflate e as gaiolas de subdivisão (gaiolaPorEstacoes, gaiolaPorLacos, gaiolaVarrida), que dão a superfície lisa; o loft de tangente contínua do esboço antigo saiu com ele em 2026-11-05. Atende 46 objetos em 15 famílias.
 
 ### furação em padrão (`furos`)
 
-Fura em grade, em círculo (PCD) ou em favo, com escareado, rebaixo ou rosca, em qualquer face. Parâmetros: padrão, diâmetro, passo, tipo de furo, face. Referências: Onshape e FreeCAD: Hole com padrão; BOSL2: grid_copies com screw_hole. Aqui: parcial, esboço: furos na caixa; núcleo: furo com centros; escareado, rebaixo e furo fora da caixa não. Atende 43 objetos em 16 famílias.
+Fura em grade, em círculo (PCD) ou em favo, com escareado, rebaixo ou rosca, em qualquer face. Parâmetros: padrão, diâmetro, passo, tipo de furo, face. Referências: Onshape e FreeCAD: Hole com padrão; BOSL2: grid_copies com screw_hole. Aqui: parcial, núcleo: furo com centros, passante ou cego, e furos de perfil na extrusao e no lathe; escareado, rebaixo, rosca e padrão em grade, círculo ou favo não. Atende 43 objetos em 16 famílias.
 
 ### perfil estrutural (`perfil`)
 
-Estende uma seção normalizada (I, H, U, L, tubo, alumínio ranhurado) ao longo de uma linha, com cortes de ponta. Parâmetros: seção e tamanho, comprimento, corte de ponta. Referências: FreeCAD: Frame/BIM Profile; Onshape: Frame. Aqui: parcial, componente perfil do esboço: L, U e tubo retangular. Atende 43 objetos em 18 famílias.
+Estende uma seção normalizada (I, H, U, L, tubo, alumínio ranhurado) ao longo de uma linha, com cortes de ponta. Parâmetros: seção e tamanho, comprimento, corte de ponta. Referências: FreeCAD: Frame/BIM Profile; Onshape: Frame. Aqui: parcial, extensão `estruturaDeBarras`: tubo redondo, quadrado, retangular e cantoneira entre nós; I, H, U e alumínio ranhurado não. Atende 43 objetos em 18 famílias.
+
+### manopla e botão (`manopla`)
+
+Gera botão rotativo, manípulo, volante e cabo ergonômico com furo de eixo e estrias. Parâmetros: tipo, diâmetro, eixo, pega. Referências: BOSL2; bibliotecas de knob paramétrico. Aqui: parcial, os botões giratórios e de pressão e os puxadores dentro das famílias `aparelho-de-caixa` e `movel-de-caixa`; manopla avulsa, volante e cabo ergonômico com furo de eixo e estrias não. Atende 42 objetos em 14 famílias.
 
 ### guia linear (`guia`)
 
 Gera trilho e carro, corrediça de gaveta e guia em V por tamanho e curso. Parâmetros: tamanho, curso, tipo. Referências: catálogos de fabricantes em STEP (conceito). Aqui: parcial, trilho simples de gaveta e de porta de correr dentro da família `movel-de-caixa`, com articulação prismática; trilho e carro avulsos e guia em V não. Atende 32 objetos em 13 famílias.
-
-### engrenagens (`engrenagem`)
-
-Gera engrenagem reta, helicoidal, cônica, sem-fim, cremalheira e catraca com dente evolvente por módulo e número de dentes, e diz a distância entre centros do par. Parâmetros: tipo, módulo, dentes, ângulo de pressão, largura. Referências: FreeCAD Gears; BOSL2: gears; Blender: Extra Objects (gears). Aqui: parcial, componente engrenagem do esboço, com dente trapezoidal. Atende 26 objetos em 11 famílias.
-
-### molas (`mola`)
-
-Gera mola de compressão, tração com ganchos e torção com braços, com espiras fechadas nas pontas e comprimento entre dois pontos. Parâmetros: tipo, diâmetro do arame, diâmetro médio, voltas, comprimento livre. Referências: BOSL2; FreeCAD: Spring; Blender: Extra Objects. Aqui: parcial, componente mola do esboço, só compressão e três voltas. Atende 26 objetos em 10 famílias.
 
 ### atuador linear (`atuador`)
 
@@ -234,11 +237,7 @@ Gera cilindro hidráulico ou pneumático e fuso com camisa, haste, olhais e port
 
 ### móvel modular (`movel`)
 
-Faz caixaria de móvel com laterais, prateleiras, portas e gavetas por vãos. Parâmetros: dimensões, vãos, tipo de cada vão, espessura do painel. Referências: Blender: Archimesh (armários). Aqui: parcial, família `movel-de-caixa`: nove perfis (roupeiro, guarda-roupa, de correr, armário aéreo e de chão, cômoda, criado-mudo, estante, gaveteiro) com portas embutidas, sobrepostas e de correr, gavetas e curso conferido; cadeira, mesa e sofá não. Atende 23 objetos em 6 famílias.
-
-### fixadores normalizados (`fixador`)
-
-Gera parafuso, porca, arruela, rebite e pino por norma e bitola. Parâmetros: tipo, norma, bitola, comprimento. Referências: Blender: Bolt Factory; FreeCAD: Fasteners; BOSL2: screws. Aqui: parcial, componente parafuso do esboço, sem norma nem porca. Atende 21 objetos em 9 famílias.
+Faz caixaria de móvel com laterais, prateleiras, portas e gavetas por vãos. Parâmetros: dimensões, vãos, tipo de cada vão, espessura do painel. Referências: Blender: Archimesh (armários). Aqui: parcial, família `movel-de-caixa`, com nove perfis de roupeiro, guarda-roupa, armários, cômoda, criado-mudo, estante e gaveteiro, portas embutidas, sobrepostas e de correr e gavetas com curso conferido, e família `cadeira`, com cinco perfis; mesa e sofá não. Atende 23 objetos em 6 famílias.
 
 ### relevo funcional (`textura`)
 
@@ -250,27 +249,27 @@ Gera asa, empenagem, pá de hélice, rotor e ventoinha por perfil NACA, corda, t
 
 ### corte e união gerais (`booleana`)
 
-Subtrai, une ou intersecta formas quaisquer, para rasgos, janelas, cavidades e peças fundidas. Parâmetros: operandos, operação. Referências: Blender: modificador Boolean; Manifold; CadQuery: cut, union. Aqui: parcial, núcleo: subtrair, unir, intersectar; esboço: furo na caixa e recorte de uma forma por outra (`subtrai`, com folga e profundidade, também em forma de família); unir e intersectar no esboço não. Atende 11 objetos em 9 famílias.
+Subtrai, une ou intersecta formas quaisquer, para rasgos, janelas, cavidades e peças fundidas. Parâmetros: operandos, operação. Referências: Blender: modificador Boolean; Manifold; CadQuery: cut, union. Aqui: parcial, núcleo: subtrair, unir, intersectar e aparar, também no esboço 2.0 pelos passos crus; o esboço 2.0 não tem atalho de recorte entre formas. Atende 11 objetos em 9 famílias.
 
-### rolamentos e buchas (`rolamento`)
+### placa de circuito (`pcb`)
 
-Gera rolamento por série com anéis, corpos rolantes, gaiola e vedação, e bucha e mancal com furação. Parâmetros: série e tamanho, tipo. Referências: FreeCAD: Fasteners e Parts Library; catálogos de fabricantes em STEP. Aqui: parcial, componentes rolamento e mancal do esboço, sem pista nem gaiola. Atende 11 objetos em 4 famílias.
-
-### hélice (`helice`)
-
-Gera o caminho e o sólido helicoidal de passo, raio e voltas quaisquer (mola, rosca, caracol transportador, bobina, escada caracol). Parâmetros: raio, passo, voltas, perfil, sentido. Referências: Blender: modificador Screw; CadQuery: Wire.makeHelix; BOSL2: helix e spiral_sweep. Aqui: parcial, componente mola do esboço, com três voltas fixas. Atende 9 objetos em 3 famílias.
+Faz a placa com furos de fixação e componentes por encapsulamento padrão. Parâmetros: contorno, furos, componentes e posição. Referências: KiCad e KiCad StepUp: modelos 3D por encapsulamento. Aqui: parcial, família `componente-eletronico`: dezenove encapsulamentos (resistor, capacitores, TO-220, TO-92, DIP, SOIC, LED, borne, jack, módulos) assentados na placa de prova; trilhas e furação de fixação por projeto não. Atende 8 objetos em 7 famílias.
 
 ### varredura de perfil (`varre`)
 
-Passa um perfil qualquer ao longo de um caminho 3D, com seção que pode mudar no percurso (duto, trompete, armação de óculos). Parâmetros: perfil, caminho, escala ou rotação ao longo do caminho. Referências: Blender: curva com Bevel e Taper; CadQuery e build123d: sweep; BOSL2: path_sweep. Aqui: parcial, esboço: tubo de seção circular e envolve; núcleo: loft ao longo de caminho. Atende 8 objetos em 6 famílias.
+Passa um perfil qualquer ao longo de um caminho 3D, com seção que pode mudar no percurso (duto, trompete, armação de óculos). Parâmetros: perfil, caminho, escala ou rotação ao longo do caminho. Referências: Blender: curva com Bevel e Taper; CadQuery e build123d: sweep; BOSL2: path_sweep. Aqui: parcial, núcleo: loft ao longo de caminho, com seção que muda, e friso de perfil declarado ao longo de polilinha. Atende 8 objetos em 6 famílias.
 
 ### arredondar e chanfrar arestas escolhidas (`arredonda`)
 
-Arredonda ou chanfra as arestas que a IA nomeia, em qualquer forma, e não só na caixa. Parâmetros: arestas por nome ou por seleção, raio ou distância. Referências: Blender: modificador Bevel; CadQuery e build123d: fillet e chamfer; BOSL2: rounding. Aqui: parcial, esboço: raio e chanfro só na caixa; núcleo: arredondarAresta, arredondarCostura, chamferBox. Atende 6 objetos em 2 famílias.
+Arredonda ou chanfra as arestas que a IA nomeia, em qualquer forma, e não só na caixa. Parâmetros: arestas por nome ou por seleção, raio ou distância. Referências: Blender: modificador Bevel; CadQuery e build123d: fillet e chamfer; BOSL2: rounding. Aqui: parcial, núcleo: arredondarAresta, arredondarCadeia, arredondarCanto, arredondarCostura e chamferBox, também no esboço 2.0 pelos passos crus; cada caso pede a operação certa, e não há um arredondar de aresta escolhida que sirva a qualquer forma. Atende 6 objetos em 2 famílias.
 
 ### eixo escalonado (`eixo`)
 
-Gera eixo por trechos com diâmetro, rasgo de chaveta, ranhura de anel elástico, chanfro e ponta roscada. Parâmetros: trechos, chavetas, ranhuras, pontas. Referências: FreeCAD PartDesign: Shaft Design Wizard. Aqui: parcial, cilindro e revolução do esboço; chaveta e ranhura não. Atende 5 objetos em 2 famílias.
+Gera eixo por trechos com diâmetro, rasgo de chaveta, ranhura de anel elástico, chanfro e ponta roscada. Parâmetros: trechos, chavetas, ranhuras, pontas. Referências: FreeCAD PartDesign: Shaft Design Wizard. Aqui: parcial, núcleo: cilindro e lathe por trechos; chaveta, ranhura de anel e ponta roscada não. Atende 5 objetos em 2 famílias.
+
+### roda e pneu (`rodaPneu`)
+
+Gera aro, disco ou raios, cubo com furação e pneu com seção e banda, que encaixam por aro. Parâmetros: aro, largura, seção, raios ou disco, furação, banda. Referências: Blender: modelagem por Screw e Array (técnica). Aqui: tem, família `roda-pneu` 2.0: de 50 a 2000 mm, pneumático, maciço, sem pneu e com garra, disco, raiada de um plano e de duas flanges, sete perfis prontos e portas de eixo, assento e furos. Atende 49 objetos em 11 famílias.
 
 ## Objetos
 

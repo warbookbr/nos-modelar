@@ -29,6 +29,8 @@ export function familiasDaFaseAtual(texto) {
   return familias;
 }
 
+const ORDEM_AQUI = { não: 0, parcial: 1, tem: 2 };
+
 export function conferir(dados, familias) {
   const erros = [];
   const ids = new Set(Object.keys(dados.ferramentas));
@@ -47,10 +49,11 @@ export function conferir(dados, familias) {
     }
   }
   for (const id of ids) if (!usadas.has(id)) erros.push(`ferramenta que nenhum objeto usa: ${id}`);
+  /* "aqui" é não, parcial ou tem: a roda gravada com "sim" saía na lista do que falta e sem lugar na ordem por estado */
+  for (const [id, f] of Object.entries(dados.ferramentas)) if (!(f.aqui in ORDEM_AQUI)) erros.push(`ferramenta ${id}: "aqui" é ${Object.keys(ORDEM_AQUI).join(', ')} (veio ${JSON.stringify(f.aqui)})`);
   return erros;
 }
 
-const ORDEM_AQUI = { não: 0, parcial: 1, tem: 2 };
 
 export function gerar(dados) {
   const uso = {};

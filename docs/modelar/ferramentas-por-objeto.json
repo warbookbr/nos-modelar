@@ -1,6 +1,6 @@
 {
   "versao": 1,
-  "data": "2026-10-11",
+  "data": "2026-11-22",
   "fonte": "docs/modelar/decisoes/FAMILIAS-DE-OBJETOS.md",
   "criterio": "Cada objeto da fase atual recebe as ferramentas que tirariam da IA a maior parte do trabalho de modelá-lo. Uma ferramenta entra no objeto quando sem ela a IA teria de reconstruir a forma a partir de primitivas; operações que todo objeto usa um pouco (espelho, arredondar uma aresta) só entram quando definem o objeto.",
   "ferramentas": {
@@ -11,7 +11,7 @@
       "parametros": "espessura, faces abertas, lado (dentro ou fora)",
       "referencias": ["Blender: modificador Solidify", "CadQuery e build123d: shell", "Onshape e FreeCAD: Shell/Thickness"],
       "aqui": "parcial",
-      "onde": "a extensão nativa `casca` do núcleo esvazia sólido convexo ou de três faces por vértice, só para dentro; o esboço só tem o anel (cilindro oco); casca de forma livre e lado de fora não existem"
+      "onde": "a operação `casca` esvazia sólido convexo ou de três faces por vértice, só para dentro, com as faces abertas escolhidas, na receita comum, nas famílias e no esboço 2.0 (desde 2026-11-22); o `lathe` com `espessura` faz a casca de revolução; casca de forma livre e lado de fora não existem"
     },
     "arredonda": {
       "nome": "arredondar e chanfrar arestas escolhidas",
@@ -20,7 +20,7 @@
       "parametros": "arestas por nome ou por seleção, raio ou distância",
       "referencias": ["Blender: modificador Bevel", "CadQuery e build123d: fillet e chamfer", "BOSL2: rounding"],
       "aqui": "parcial",
-      "onde": "esboço: raio e chanfro só na caixa; núcleo: arredondarAresta, arredondarCostura, chamferBox"
+      "onde": "núcleo: arredondarAresta, arredondarCadeia, arredondarCanto, arredondarCostura e chamferBox, também no esboço 2.0 pelos passos crus; cada caso pede a operação certa, e não há um arredondar de aresta escolhida que sirva a qualquer forma"
     },
     "booleana": {
       "nome": "corte e união gerais",
@@ -29,7 +29,7 @@
       "parametros": "operandos, operação",
       "referencias": ["Blender: modificador Boolean", "Manifold", "CadQuery: cut, union"],
       "aqui": "parcial",
-      "onde": "núcleo: subtrair, unir, intersectar; esboço: furo na caixa e recorte de uma forma por outra (`subtrai`, com folga e profundidade, também em forma de família); unir e intersectar no esboço não"
+      "onde": "núcleo: subtrair, unir, intersectar e aparar, também no esboço 2.0 pelos passos crus; o esboço 2.0 não tem atalho de recorte entre formas"
     },
     "repete": {
       "nome": "repetição em série",
@@ -38,7 +38,7 @@
       "parametros": "modo, contagem, passo ou ângulo, caminho",
       "referencias": ["Blender: modificadores Array e Curve", "BOSL2: grid_copies, rot_copies, path_copies"],
       "aqui": "parcial",
-      "onde": "arranja linear e radial no esboço e no núcleo, e ao longo de tubo no esboço; grade 2D não"
+      "onde": "núcleo: arranja linear e radial, também no esboço 2.0 pelo campo `repete`; grade 2D e cópia ao longo de caminho não"
     },
     "deforma": {
       "nome": "dobrar, torcer e afunilar",
@@ -92,7 +92,7 @@
       "parametros": "padrão, diâmetro, passo, tipo de furo, face",
       "referencias": ["Onshape e FreeCAD: Hole com padrão", "BOSL2: grid_copies com screw_hole"],
       "aqui": "parcial",
-      "onde": "esboço: furos na caixa; núcleo: furo com centros; escareado, rebaixo e furo fora da caixa não"
+      "onde": "núcleo: furo com centros, passante ou cego, e furos de perfil na extrusao e no lathe; escareado, rebaixo, rosca e padrão em grade, círculo ou favo não"
     },
     "varre": {
       "nome": "varredura de perfil",
@@ -101,7 +101,7 @@
       "parametros": "perfil, caminho, escala ou rotação ao longo do caminho",
       "referencias": ["Blender: curva com Bevel e Taper", "CadQuery e build123d: sweep", "BOSL2: path_sweep"],
       "aqui": "parcial",
-      "onde": "esboço: tubo de seção circular e envolve; núcleo: loft ao longo de caminho"
+      "onde": "núcleo: loft ao longo de caminho, com seção que muda, e friso de perfil declarado ao longo de polilinha"
     },
     "loftSuave": {
       "nome": "superfície suave por seções",
@@ -110,7 +110,7 @@
       "parametros": "seções, curvatura entre elas, densidade",
       "referencias": ["Blender: Subdivision Surface", "OpenVSP", "FreeCAD Ship", "CadQuery: loft com ruled=False"],
       "aqui": "parcial",
-      "onde": "esboço: loft e revolução com `suave: true`, curva de tangente contínua pelas seções com estações, lados e normal escolhidos pelo módulo; núcleo: loft com faces planas entre seções e inflate"
+      "onde": "núcleo: loft de faces planas entre seções, inflate e as gaiolas de subdivisão (gaiolaPorEstacoes, gaiolaPorLacos, gaiolaVarrida), que dão a superfície lisa; o loft de tangente contínua do esboço antigo saiu com ele em 2026-11-05"
     },
     "helice": {
       "nome": "hélice",
@@ -118,8 +118,8 @@
       "automatiza": "gera o caminho e o sólido helicoidal de passo, raio e voltas quaisquer (mola, rosca, caracol transportador, bobina, escada caracol)",
       "parametros": "raio, passo, voltas, perfil, sentido",
       "referencias": ["Blender: modificador Screw", "CadQuery: Wire.makeHelix", "BOSL2: helix e spiral_sweep"],
-      "aqui": "parcial",
-      "onde": "componente mola do esboço, com três voltas fixas"
+      "aqui": "não",
+      "onde": "nenhum gerador; a hélice sai só como friso ao longo de uma polilinha helicoidal calculada na receita, e o componente mola do esboço antigo saiu com ele em 2026-11-05"
     },
     "chapa": {
       "nome": "chapa dobrada",
@@ -137,7 +137,7 @@
       "parametros": "seção e tamanho, comprimento, corte de ponta",
       "referencias": ["FreeCAD: Frame/BIM Profile", "Onshape: Frame"],
       "aqui": "parcial",
-      "onde": "componente perfil do esboço: L, U e tubo retangular"
+      "onde": "extensão `estruturaDeBarras`: tubo redondo, quadrado, retangular e cantoneira entre nós; I, H, U e alumínio ranhurado não"
     },
     "barras": {
       "nome": "estrutura de barras",
@@ -146,7 +146,7 @@
       "parametros": "nós, barras ou padrão de treliça, perfil da barra, tipo de junta",
       "referencias": ["Blender: modificador Skin e Wireframe", "Onshape: Frame", "FreeCAD: Frame"],
       "aqui": "parcial",
-      "onde": "extensão nativa `estruturaDeBarras` do núcleo: barras de tubo ou perfil maciço entre nós, com corte de ponta e massa; juntas soldadas e padrões não; tubo do esboço"
+      "onde": "extensão `estruturaDeBarras` na receita comum e nas famílias: barras de tubo ou perfil maciço entre nós nomeados, com corte de ponta e união num sólido; no esboço 2.0, a `haste` entre dois pontos; juntas soldadas e padrões não"
     },
     "cabo": {
       "nome": "cabo ou mangueira entre pontos",
@@ -155,7 +155,7 @@
       "parametros": "pontas, comprimento ou folga, diâmetro, terminais",
       "referencias": ["Blender: curva com Bevel e física de corda", "Blender Geometry Nodes: cabos entre pontos"],
       "aqui": "parcial",
-      "onde": "tubo do esboço, sem caimento nem terminais"
+      "onde": "a `haste` reta do esboço 2.0 e o friso de seção circular ao longo de polilinha; caimento, raio mínimo, terminais e feixe não"
     },
     "tubulacao": {
       "nome": "tubulação com conexões",
@@ -209,7 +209,7 @@
       "parametros": "dimensões, vãos, tipo de cada vão, espessura do painel",
       "referencias": ["Blender: Archimesh (armários)"],
       "aqui": "parcial",
-      "onde": "família `movel-de-caixa`: nove perfis (roupeiro, guarda-roupa, de correr, armário aéreo e de chão, cômoda, criado-mudo, estante, gaveteiro) com portas embutidas, sobrepostas e de correr, gavetas e curso conferido; cadeira, mesa e sofá não"
+      "onde": "família `movel-de-caixa`, com nove perfis de roupeiro, guarda-roupa, armários, cômoda, criado-mudo, estante e gaveteiro, portas embutidas, sobrepostas e de correr e gavetas com curso conferido, e família `cadeira`, com cinco perfis; mesa e sofá não"
     },
     "gabinete": {
       "nome": "gabinete",
@@ -217,8 +217,8 @@
       "automatiza": "faz caixa de equipamento com tampa, encaixe entre as metades, ressaltos, grade de ventilação e recortes de painel",
       "parametros": "dimensões, parede, divisão, recortes",
       "referencias": ["BOSL2", "geradores de caixa de projeto paramétrica"],
-      "aqui": "não",
-      "onde": "nem esboço nem núcleo"
+      "aqui": "parcial",
+      "onde": "família `aparelho-de-caixa` (forninho elétrico, micro-ondas, air-fryer de forno, lava-louças compacta): caixa com porta, painel de comando e pés; encaixe entre metades, ressaltos, grade de ventilação e recortes de painel não"
     },
     "pcb": {
       "nome": "placa de circuito",
@@ -226,8 +226,8 @@
       "automatiza": "faz a placa com furos de fixação e componentes por encapsulamento padrão",
       "parametros": "contorno, furos, componentes e posição",
       "referencias": ["KiCad e KiCad StepUp: modelos 3D por encapsulamento"],
-      "aqui": "não",
-      "onde": "nem esboço nem núcleo"
+      "aqui": "parcial",
+      "onde": "família `componente-eletronico`: dezenove encapsulamentos (resistor, capacitores, TO-220, TO-92, DIP, SOIC, LED, borne, jack, módulos) assentados na placa de prova; trilhas e furação de fixação por projeto não"
     },
     "fixador": {
       "nome": "fixadores normalizados",
@@ -235,8 +235,8 @@
       "automatiza": "gera parafuso, porca, arruela, rebite e pino por norma e bitola",
       "parametros": "tipo, norma, bitola, comprimento",
       "referencias": ["Blender: Bolt Factory", "FreeCAD: Fasteners", "BOSL2: screws"],
-      "aqui": "parcial",
-      "onde": "componente parafuso do esboço, sem norma nem porca"
+      "aqui": "não",
+      "onde": "nenhum gerador; o componente parafuso do esboço antigo saiu com ele em 2026-11-05"
     },
     "rosca": {
       "nome": "rosca",
@@ -253,8 +253,8 @@
       "automatiza": "gera engrenagem reta, helicoidal, cônica, sem-fim, cremalheira e catraca com dente evolvente por módulo e número de dentes, e diz a distância entre centros do par",
       "parametros": "tipo, módulo, dentes, ângulo de pressão, largura",
       "referencias": ["FreeCAD Gears", "BOSL2: gears", "Blender: Extra Objects (gears)"],
-      "aqui": "parcial",
-      "onde": "componente engrenagem do esboço, com dente trapezoidal"
+      "aqui": "não",
+      "onde": "nenhum gerador; o componente engrenagem do esboço antigo saiu com ele em 2026-11-05"
     },
     "mola": {
       "nome": "molas",
@@ -262,8 +262,8 @@
       "automatiza": "gera mola de compressão, tração com ganchos e torção com braços, com espiras fechadas nas pontas e comprimento entre dois pontos",
       "parametros": "tipo, diâmetro do arame, diâmetro médio, voltas, comprimento livre",
       "referencias": ["BOSL2", "FreeCAD: Spring", "Blender: Extra Objects"],
-      "aqui": "parcial",
-      "onde": "componente mola do esboço, só compressão e três voltas"
+      "aqui": "não",
+      "onde": "nenhum gerador; o componente mola do esboço antigo saiu com ele em 2026-11-05"
     },
     "rolamento": {
       "nome": "rolamentos e buchas",
@@ -271,8 +271,8 @@
       "automatiza": "gera rolamento por série com anéis, corpos rolantes, gaiola e vedação, e bucha e mancal com furação",
       "parametros": "série e tamanho, tipo",
       "referencias": ["FreeCAD: Fasteners e Parts Library", "catálogos de fabricantes em STEP"],
-      "aqui": "parcial",
-      "onde": "componentes rolamento e mancal do esboço, sem pista nem gaiola"
+      "aqui": "não",
+      "onde": "nenhum gerador; os componentes rolamento e mancal do esboço antigo saíram com ele em 2026-11-05"
     },
     "eixo": {
       "nome": "eixo escalonado",
@@ -281,7 +281,7 @@
       "parametros": "trechos, chavetas, ranhuras, pontas",
       "referencias": ["FreeCAD PartDesign: Shaft Design Wizard"],
       "aqui": "parcial",
-      "onde": "cilindro e revolução do esboço; chaveta e ranhura não"
+      "onde": "núcleo: cilindro e lathe por trechos; chaveta, ranhura de anel e ponta roscada não"
     },
     "polia": {
       "nome": "polia e correia",
@@ -298,7 +298,7 @@
       "automatiza": "gera aro, disco ou raios, cubo com furação e pneu com seção e banda, que encaixam por aro",
       "parametros": "aro, largura, seção, raios ou disco, furação, banda",
       "referencias": ["Blender: modelagem por Screw e Array (técnica)"],
-      "aqui": "sim",
+      "aqui": "tem",
       "onde": "família `roda-pneu` 2.0: de 50 a 2000 mm, pneumático, maciço, sem pneu e com garra, disco, raiada de um plano e de duas flanges, sete perfis prontos e portas de eixo, assento e furos"
     },
     "articula": {
@@ -370,8 +370,8 @@
       "automatiza": "gera botão rotativo, manípulo, volante e cabo ergonômico com furo de eixo e estrias",
       "parametros": "tipo, diâmetro, eixo, pega",
       "referencias": ["BOSL2", "bibliotecas de knob paramétrico"],
-      "aqui": "não",
-      "onde": "nem esboço nem núcleo"
+      "aqui": "parcial",
+      "onde": "os botões giratórios e de pressão e os puxadores dentro das famílias `aparelho-de-caixa` e `movel-de-caixa`; manopla avulsa, volante e cabo ergonômico com furo de eixo e estrias não"
     },
     "bobina": {
       "nome": "bobina e núcleo",
