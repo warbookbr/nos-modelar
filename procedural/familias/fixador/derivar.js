@@ -38,7 +38,7 @@ export function derivar(parametros) {
     });
     f.perfil.forEach(([u, v], k) => { a[`fileteU${k}`] = m(u); a[`fileteV${k}`] = m(v); });
   }
-  const haste = !g.roscada ? 'lisa' : g.haste ? 'parcial' : 'roscada';
+  const haste = !g.roscada ? 'lisa' : `${g.haste ? 'parcial' : 'roscada'}${g.fundida ? '-fundida' : ''}`;
   if (!HASTES.includes(haste)) throw new Error(`fixador: haste ${haste} sem composição`);
   return { composicao: idDoParafuso(c.tipo, haste), argumentos: a };
 }

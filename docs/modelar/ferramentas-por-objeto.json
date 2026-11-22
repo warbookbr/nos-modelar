@@ -245,7 +245,7 @@
       "parametros": "tipo, passo, diâmetro, comprimento, sentido",
       "referencias": ["BOSL2: threading e bottlecaps", "Blender: Bolt Factory", "FreeCAD: Thread"],
       "aqui": "parcial",
-      "onde": "a rosca cosmética externa do parafuso da família `fixador`: o filete de perfil trapezoidal varrido pela `helice` do `friso` sobre o núcleo no diâmetro menor, como sólido à parte; rosca interna, rosca fina e rosca fundida num sólido só não"
+      "onde": "a rosca externa do parafuso da família `fixador`: o filete de perfil trapezoidal varrido pela `helice` do `friso` sobre o núcleo no diâmetro menor, cosmética (sólido à parte, `rosca` 1) ou fundida num corpo só que passa no STEP (`rosca` 2, cerca de 1 s por parafuso); rosca interna e rosca fina não"
     },
     "engrenagem": {
       "nome": "engrenagens",

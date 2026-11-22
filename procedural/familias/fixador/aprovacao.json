@@ -33,7 +33,7 @@
           "comprimento": 240,
           "diametroNominal": 24,
           "peca": 3,
-          "rosca": 1
+          "rosca": 2
         },
         "hash": "sha256:445927fb9f14afd6559cf175402ebfc095a255b5568dc21c06239cda1e10a90f",
         "medidas": []
@@ -98,6 +98,17 @@
         "hash": "sha256:1e4e91bb2a0c815c111db679bc5f4c4df42d66eb5fed9f84d765d4628ebb797e",
         "medidas": []
       },
+      "parafuso-sextavado-m8x30-fundido": {
+        "parametros": {
+          "cabeca": 1,
+          "comprimento": 30,
+          "diametroNominal": 8,
+          "peca": 1,
+          "rosca": 2
+        },
+        "hash": "sha256:1dfa3ec8a8e18f85c5b7055f88acbc3c9559f361b74b8c5d039f93c383d5653a",
+        "medidas": []
+      },
       "porca-m8": {
         "parametros": {
           "cabeca": 1,
@@ -111,7 +122,7 @@
       }
     },
     "escalasDosPerfis": {
-      "sondas": 20,
+      "sondas": 24,
       "recusasDeclaradas": [
         {
           "ponto": "parafuso-abaulado-m5x12: comprimento=5",
@@ -131,6 +142,14 @@
         },
         {
           "ponto": "parafuso-sextavado-m8x30: diametroNominal=24",
+          "restricao": "haste-mais-longa-que-a-bitola"
+        },
+        {
+          "ponto": "parafuso-sextavado-m8x30-fundido: comprimento=5",
+          "restricao": "haste-mais-longa-que-a-bitola"
+        },
+        {
+          "ponto": "parafuso-sextavado-m8x30-fundido: diametroNominal=24",
           "restricao": "haste-mais-longa-que-a-bitola"
         }
       ]

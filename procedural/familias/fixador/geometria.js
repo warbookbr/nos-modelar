@@ -13,6 +13,7 @@ export const PECAS = Object.freeze({ 1: 'parafuso', 2: 'porca', 3: 'arruela' });
 export const CABECAS = Object.freeze({ 1: 'sextavada', 2: 'allen', 3: 'abaulada' });
 export const ALTURA_DO_FILETE = 0.6134;
 export const PONTOS_POR_VOLTA_DA_ROSCA = 24;
+export const SOBREPOSICAO = 0.1;
 
 /** Os seis cantos do sextavado de chave `s` (a distância entre faces), com duas faces paralelas a x. */
 export function sextavado(s) {
@@ -35,18 +36,21 @@ export function geometriaDoFixador(p) {
   else if (cabeca === 'allen') geoCabeca = { tipo: cabeca, raio: iso.dkAllen / 2, altura: d, chaveInterna: iso.chaveAllen, fundo: 0.6 * d };
   else geoCabeca = { tipo: cabeca, raio: 0.875 * d, altura: 0.55 * d, chaveInterna: 0.8 * iso.chaveAllen, fundo: 0.35 * d };
 
-  const roscada = p.rosca === 1;
+  const roscada = p.rosca >= 1;
+  const fundida = p.rosca === 2;
+  /* fundida, cada cilindro entra SOBREPOSICAO na peça de cima, para `unir` cruzar volumes e não faces encostadas */
+  const sob = fundida ? SOBREPOSICAO : 0;
   const b = Math.min(L, 2 * d + 6);
-  const geo = { peca, iso, cabeca: geoCabeca, comprimento: L, roscada, comprimentoRoscado: roscada ? b : 0 };
+  const geo = { peca, iso, cabeca: geoCabeca, comprimento: L, roscada, fundida, comprimentoRoscado: roscada ? b : 0 };
   if (roscada) {
     const nucleo = d / 2 - ALTURA_DO_FILETE * P;
-    geo.nucleo = { raio: nucleo, de: -L, ate: -L + b };
+    geo.nucleo = { raio: nucleo, de: -L, ate: -L + b + sob };
     geo.filete = {
       raio: nucleo, passo: P, voltas: (b - P) / P, centro: [0, -L + P / 2, 0],
       perfil: [[-0.42 * P, -0.05 * P], [0.42 * P, -0.05 * P], [0.06 * P, ALTURA_DO_FILETE * P], [-0.06 * P, ALTURA_DO_FILETE * P]],
       fechamento: P,
     };
-    geo.haste = b < L ? { raio: d / 2, de: -L + b, ate: 0 } : null;
+    geo.haste = b < L ? { raio: d / 2, de: -L + b, ate: sob } : null;
   } else {
     geo.haste = { raio: d / 2, de: -L, ate: 0 };
   }

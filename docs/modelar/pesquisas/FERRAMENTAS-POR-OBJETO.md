@@ -74,7 +74,7 @@ As ferramentas que não existem ou existem em parte, na mesma ordem, com o que j
 - tubulação com conexões (`não`, 27 objetos): nem esboço nem núcleo.
 - engrenagens (`não`, 26 objetos): nenhum gerador; o componente engrenagem do esboço antigo saiu com ele em 2026-11-05.
 - molas (`parcial`, 26 objetos): família `mola`: compressão de pontas encostadas, tração com gancho em cada ponta e torção com braços retos, por fio, diâmetro externo, comprimento livre e espiras; ponta retificada, gancho de outros tipos e mola montada entre dois pontos não.
-- rosca (`parcial`, 26 objetos): a rosca cosmética externa do parafuso da família `fixador`: o filete de perfil trapezoidal varrido pela `helice` do `friso` sobre o núcleo no diâmetro menor, como sólido à parte; rosca interna, rosca fina e rosca fundida num sólido só não.
+- rosca (`parcial`, 26 objetos): a rosca externa do parafuso da família `fixador`: o filete de perfil trapezoidal varrido pela `helice` do `friso` sobre o núcleo no diâmetro menor, cosmética (sólido à parte, `rosca` 1) ou fundida num corpo só que passa no STEP (`rosca` 2, cerca de 1 s por parafuso); rosca interna e rosca fina não.
 - tecido e estofado (`não`, 26 objetos): nem esboço nem núcleo.
 - atuador linear (`parcial`, 25 objetos): família `cilindro-hidraulico`: camisa, haste, êmbolo, cabeça e olhais liso e com rótula, curso conferido; cilindro de haste dupla e telescópico não.
 - móvel modular (`parcial`, 23 objetos): família `movel-de-caixa`, com nove perfis de roupeiro, guarda-roupa, armários, cômoda, criado-mudo, estante e gaveteiro, portas embutidas, sobrepostas e de correr e gavetas com curso conferido, e família `cadeira`, com cinco perfis; mesa e sofá não.
@@ -221,7 +221,7 @@ Gera mola de compressão, tração com ganchos e torção com braços, com espir
 
 ### rosca (`rosca`)
 
-Faz rosca macho ou fêmea métrica, trapezoidal ou de tampa, em qualquer cilindro ou furo. Parâmetros: tipo, passo, diâmetro, comprimento, sentido. Referências: BOSL2: threading e bottlecaps; Blender: Bolt Factory; FreeCAD: Thread. Aqui: parcial, a rosca cosmética externa do parafuso da família `fixador`: o filete de perfil trapezoidal varrido pela `helice` do `friso` sobre o núcleo no diâmetro menor, como sólido à parte; rosca interna, rosca fina e rosca fundida num sólido só não. Atende 26 objetos em 13 famílias.
+Faz rosca macho ou fêmea métrica, trapezoidal ou de tampa, em qualquer cilindro ou furo. Parâmetros: tipo, passo, diâmetro, comprimento, sentido. Referências: BOSL2: threading e bottlecaps; Blender: Bolt Factory; FreeCAD: Thread. Aqui: parcial, a rosca externa do parafuso da família `fixador`: o filete de perfil trapezoidal varrido pela `helice` do `friso` sobre o núcleo no diâmetro menor, cosmética (sólido à parte, `rosca` 1) ou fundida num corpo só que passa no STEP (`rosca` 2, cerca de 1 s por parafuso); rosca interna e rosca fina não. Atende 26 objetos em 13 famílias.
 
 ### atuador linear (`atuador`)
 

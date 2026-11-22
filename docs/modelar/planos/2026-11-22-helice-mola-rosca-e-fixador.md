@@ -48,7 +48,7 @@ O núcleo não ganha nome de objeto: o ajudante se chama pelo que gera, o caminh
 1. Feita em 2026-11-22: o caminho helicoidal (`caminhoHelicoidal`, com ficha em `npm run capacidade`) e as `normais` do friso, provados na peça neutra `tools/fixtures/helice/`.
 2. Feita em 2026-11-22: a família `mola` (compressão, tração e torção), com a camada mecânica gravada e a forma aprovada pela pessoa por imagem; o friso ganhou a `helice` declarada, para a composição passar só números.
 3. Feita em 2026-11-22: a família `fixador` (parafuso sextavado, allen e abaulado, porca e arruela, de M3 a M24 pela tabela ISO) com a rosca cosmética, a camada mecânica gravada e a forma aprovada pela pessoa por imagem.
-4. A rosca fundida como opção da família `fixador`: o filete unido ao núcleo num sólido só, para o STEP de uma peça (decisão da pessoa em 2026-11-22), com a medida do tempo e do sólido.
+4. Feita em 2026-11-22: a rosca fundida como opção da família `fixador` (`rosca` 2): a cabeça, a haste, o núcleo e o filete unidos por `unir` num corpo só, com `limparLascas` de área mínima igual ao quadrado de 0,01 mm, que passa na validação do STEP nas três cabeças de M3 a M24 em até 1,3 s. A pessoa autorizou gravar de novo a camada mecânica com a opção fundida e o perfil novo.
 5. Fechamento: a montagem do parafuso na porca e da mola entre dois pontos, o mapa, o backlog e o encerramento.
 
 ## Decisão da pessoa
@@ -68,4 +68,4 @@ Preencher somente ao concluir ou cancelar.
 
 ## Andamento
 
-Em 2026-11-22 as fatias 1, 2 e 3 foram entregues; a pessoa aprovou a forma dos cinco perfis do fixador e autorizou gravar a camada mecânica dele. A pessoa aprovou a forma das três molas pelas imagens isométricas da bancada e autorizou gravar a camada mecânica do `aprovacao.json`, que deixa as camadas do crítico e da pessoa em null como nas outras famílias. Na fatia 1, o fio de uma mola de 6 voltas sai sólido fechado em cerca de 45 ms e o filete de 12 voltas em cerca de 10 ms.
+Em 2026-11-22 as fatias 1, 2 e 3 foram entregues; a pessoa aprovou a forma dos cinco perfis do fixador e autorizou gravar a camada mecânica dele. A pessoa aprovou a forma das três molas pelas imagens isométricas da bancada e autorizou gravar a camada mecânica do `aprovacao.json`, que deixa as camadas do crítico e da pessoa em null como nas outras famílias. Na fatia 4, a primeira união deixava uma lasca de razão 0,0031, logo acima do limite padrão do `limparLascas` (0,003), e a validação do STEP a recusava; a área mínima declarada resolve. A validação do STEP com a tolerância padrão do exportador (0,001, aplicada antes da escala para mm, logo 1 mm² de área mínima) recusa toda peça pequena, cosmética ou fundida; os testes usam 0,00001, e o exportador fica fora deste território. Na fatia 1, o fio de uma mola de 6 voltas sai sólido fechado em cerca de 45 ms e o filete de 12 voltas em cerca de 10 ms.

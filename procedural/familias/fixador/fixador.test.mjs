@@ -5,6 +5,7 @@ import { chamar, criarRegistroDeFamilias } from '../index.js';
 import { executarReceita } from '../../../src/autoria/executar-receita.js';
 import { medidasIso, TABELA_ISO } from './tabela.js';
 import { geometriaDoFixador } from './geometria.js';
+import { validarMalha } from '../../../modulos/exportador-cad/src/validar-malha.js';
 
 const registro = criarRegistroDeFamilias();
 const FIXADOR = registro.obter('fixador');
@@ -65,6 +66,22 @@ describe('família fixador', () => {
     const rosca = raioMaximo(parafuso, 'rosca');
     expect(rosca).toBeLessThanOrEqual(furoDaPorca / Math.cos(Math.PI / 32) + 1e-6);
     expect(rosca).toBeLessThan(furoDaArruela);
+  });
+
+  it('a rosca fundida dá um corpo só, que passa na validação do STEP a 0,01 mm, nas três cabeças', () => {
+    const corpos = (n) => {
+      const pai = new Map([...n.V.keys()].map((v) => [v, v]));
+      const raiz = (x) => { while (pai.get(x) !== x) x = pai.get(x); return x; };
+      for (const f of n.F.values()) for (const v of f.vs) pai.set(raiz(v), raiz(f.vs[0]));
+      return new Set([...n.F.values()].flatMap((f) => f.vs).map(raiz)).size;
+    };
+    for (const cabeca of [1, 2, 3]) {
+      const n = executar({ cabeca, diametroNominal: 8, comprimento: 30, rosca: 2 });
+      expect((n.orfaos ?? []).map((o) => o.motivo), `cabeça ${cabeca}`).toEqual([]);
+      expect(partes(n), `cabeça ${cabeca}`).toEqual(['parafuso']);
+      expect(corpos(n), `cabeça ${cabeca}`).toBe(1);
+      expect(() => validarMalha(n, { tolerancia: 0.00001 }), `cabeça ${cabeca}`).not.toThrow();
+    }
   });
 
   it('recusa a haste mais curta que 1,5 vez a bitola, só no parafuso', () => {

@@ -8,7 +8,7 @@
     "cabeca": { "tipo": "inteiro", "unidade": "contagem", "padrao": 1, "minimo": 1, "maximo": 3, "medio": 2 },
     "diametroNominal": { "tipo": "numero", "unidade": "mm", "padrao": 8, "minimo": 3, "maximo": 24, "medio": 12 },
     "comprimento": { "tipo": "numero", "unidade": "mm", "padrao": 30, "minimo": 5, "maximo": 240, "medio": 60 },
-    "rosca": { "tipo": "inteiro", "unidade": "contagem", "padrao": 1, "minimo": 0, "maximo": 1, "medio": 1 }
+    "rosca": { "tipo": "inteiro", "unidade": "contagem", "padrao": 1, "minimo": 0, "maximo": 2, "medio": 1 }
   },
   "restricoes": [
     {
@@ -34,6 +34,7 @@
   "perfis": {
     "parafuso-sextavado-m8x30": { "descricao": "parafuso de cabeça sextavada M8 x 30, com 22 mm de rosca na ponta", "parametros": { "peca": 1, "cabeca": 1, "diametroNominal": 8, "comprimento": 30, "rosca": 1 } },
     "parafuso-allen-m6x40": { "descricao": "parafuso allen de cabeça cilíndrica M6 x 40, com 18 mm de rosca na ponta", "parametros": { "peca": 1, "cabeca": 2, "diametroNominal": 6, "comprimento": 40, "rosca": 1 } },
+    "parafuso-sextavado-m8x30-fundido": { "descricao": "parafuso de cabeça sextavada M8 x 30 com a rosca fundida, um sólido só para o STEP", "parametros": { "peca": 1, "cabeca": 1, "diametroNominal": 8, "comprimento": 30, "rosca": 2 } },
     "parafuso-abaulado-m5x12": { "descricao": "parafuso de cabeça abaulada com sextavado interno M5 x 12, roscado até a cabeça", "parametros": { "peca": 1, "cabeca": 3, "diametroNominal": 5, "comprimento": 12, "rosca": 1 } },
     "porca-m8": { "descricao": "porca sextavada M8", "parametros": { "peca": 2, "diametroNominal": 8 } },
     "arruela-m8": { "descricao": "arruela lisa M8", "parametros": { "peca": 3, "diametroNominal": 8 } }
