@@ -1,6 +1,6 @@
 # Superfície de produção (G2): os instrumentos e a linha de base do quarto traseiro
 
-Pasta do plano [superfície de produção (G2)](../../planos/2026-11-22-superficie-de-producao-g2.md). Fatia 1, primeira parte, medida em 2026-11-22.
+Pasta do plano [superfície de produção (G2)](../../planos/2026-11-22-superficie-de-producao-g2.md). Fatia 1, medida em 2026-11-22.
 
 ## Os instrumentos
 
@@ -8,12 +8,16 @@ A distância à pele é a ferramenta [`distancia-a-pele.mjs`](../../../../tools/
 
 Com `--zebra`, a mesma execução mede a zebra numérica nas mesmas regiões, e com `--contra` o veredito compara com uma linha de base. Ele reprova quando os laços esperados de uma região sobem mais que a folga de 0,05, ou quando a chapa sai da pele além do limite do retalho. É o gate que junta a zebra à distância: a onda de 400 mm do diagnóstico antigo, que limpava a zebra e levava a chapa 8,6 mm para fora, reprova pela distância.
 
-O diagnóstico do preenchimento, a outra parte da fatia 1, mora em `gaiola-por-rede.js` e espera a fatia 3 do plano das formas que faltavam soltar o arquivo.
+O diagnóstico do preenchimento é a ferramenta [`preenchimento-da-rede.mjs`](../../../../tools/modelar/preenchimento-da-rede.mjs). Com `alisarSuperficie`, a `gaiolaPorRede` publica `preenchimento`: de cada lado de cada retalho de quatro lados, se a curva seguinte da rede entrou no miolo e, se não, por quê. A ferramenta liga a opção em todas as redes só para medir, sem mudar a receita e sem rodar a subdivisão, e o resultado do quarto está em [`preenchimento.json`](preenchimento.json).
 
 ## Como se refaz
 
 ```
 node tools/modelar/distancia-a-pele.mjs procedural/pecas/carro-fastback/partes/lataria/receita.js --zebra --caixas=docs/modelar/banco-de-provas/superficie-g2-2026-11-22/caixas.json --saida=docs/modelar/banco-de-provas/superficie-g2-2026-11-22/linha-de-base.json
+```
+
+```
+node tools/modelar/preenchimento-da-rede.mjs procedural/pecas/carro-fastback/partes/lataria/receita.js --retalhos --saida=docs/modelar/banco-de-provas/superficie-g2-2026-11-22/preenchimento.json
 ```
 
 Uma variante da receita se compara à linha de base com `--params=<json> --contra=docs/modelar/banco-de-provas/superficie-g2-2026-11-22/linha-de-base.json --limite=1.5`. As regiões estão em [`caixas.json`](caixas.json), todas do lado de x positivo, e a pele do flanco tem espelho em x. O `flanco` é a faixa de 310 a 950 mm de altura, que fica fora das duas arestas da gaiola junto da soleira, onde a regra de borda da subdivisão afasta a chapa da pele; ele e o `paralama` tiram o disco de 430 mm em volta do arco da roda, que a peça corta depois.
@@ -41,3 +45,7 @@ A zebra numérica, nas mesmas regiões (extremos, laços e laços esperados):
 | traseira | 14 | 9 | 10,43 |
 
 No flanco a chapa já fica a 1,79 mm da pele, acima do 1,5 mm que o gate 3 do plano pede com a opção ligada. O máximo está no rebaixo, a meia altura da porta. O comentário da receita registra 1,5 mm no flanco, medido com roteiro de rascunho sobre outra faixa, e a diferença fica dita aqui sem mudar o gate: a decisão de manter o 1,5 mm ou medi-lo contra esta linha de base é da pessoa, quando a opção chegar ao quarto na fatia 5.
+
+## O preenchimento do quarto
+
+São 69 retalhos de quatro lados e 276 lados. Têm vizinho 174 lados, e 166 deles com razão de cordas até 1,5. Ficam sem vizinho 61 lados por vinco, 17 por borda livre, 15 no plano de simetria, 1 por retalho de n lados ao lado (o `r8_coluna`, junto do `S9ombro`) e 8 cortados pela razão de cordas acima de 4: o lado de cima de cinco retalhos da soleira (`r4_soleira` a `r8_soleira`, razão de 4,9 a 7,4, porque a faixa da soleira é estreita contra a de cima) e três lados na calota da traseira (`c_base` e `c_soleira`, de 4,0 a 4,7). Dezesseis retalhos têm vizinho nos quatro lados, treze em três, trinta e dois em dois, sete em um e um em nenhum. É o mesmo quadro que a cópia instrumentada do núcleo deu em 2026-11-21 (68 retalhos, 172 lados com vizinho, 8 cortados, 59 por vinco e 33 pelos outros motivos), com o retalho e os lados que a receita ganhou desde então.

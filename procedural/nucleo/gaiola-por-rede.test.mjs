@@ -432,6 +432,19 @@ describe('com alisarSuperficie, o miolo dos retalhos de quatro lados sai das cur
     expect(maiorDiferenca(a, c, Object.keys(a.pontos))).toBeLessThan(1e-9);
   });
 
+  it('o diagnóstico do preenchimento diz o motivo de cada lado: o vizinho, a borda livre e o vinco, e só sai com a opção', () => {
+    const novo = gaiolaPorRede(rede({ extra: { alisarSuperficie: true } })).preenchimento;
+    expect(novo.retalhos).toBe(4); expect(novo.lados).toBe(16);
+    expect(novo.porMotivo).toMatchObject({ vizinho: 8, borda: 8, vinco: 0, cortado: 0, misto: 0 });
+    expect(novo.retalhosPorLadosComVizinho).toEqual({ 0: 0, 1: 0, 2: 4, 3: 0, 4: 0 });
+    expect(novo.porRetalho.q00).toEqual([{ curva: 'h0', motivo: 'borda' }, { curva: 'v1', motivo: 'vizinho', razao: expect.any(Number), inteiro: true }, { curva: 'h1', motivo: 'vizinho', razao: expect.any(Number), inteiro: true }, { curva: 'v0', motivo: 'borda' }]);
+    /* a razão de cordas do q00 pelo lado v1: a corda de 120 mm que o atravessa contra a de perto de 280 mm até v2, a maior ao longo do lado */
+    expect(novo.porRetalho.q00[1].razao).toBeGreaterThan(0.4); expect(novo.porRetalho.q00[1].razao).toBeLessThan(0.5);
+    expect(gaiolaPorRede(rede({ vinco: 'viva', extra: { alisarSuperficie: true } })).preenchimento.porMotivo).toMatchObject({ vizinho: 0, vinco: 8, borda: 8 });
+    expect(gaiolaPorRede(rede({ umSo: true, extra: { alisarSuperficie: true } })).preenchimento.porMotivo).toMatchObject({ vizinho: 0, borda: 4 });
+    expect(gaiolaPorRede(rede({ extra: { liso: false } }))).not.toHaveProperty('preenchimento');
+  });
+
   it('sem a opção, e com ela desligada, a rede é a de sempre: o miolo novo só entra com alisarSuperficie', () => {
     const sem = gaiolaPorRede(rede()); const desligada = gaiolaPorRede(rede({ extra: { alisarSuperficie: false } }));
     expect(JSON.stringify(desligada.pontos)).toBe(JSON.stringify(sem.pontos)); expect(desligada.passo).toEqual(sem.passo);
@@ -461,6 +474,11 @@ describe('com alisarSuperficie, o vizinho estreito não entra no miolo, e as rec
   it('o vizinho de corda abaixo de um quarto da do retalho não entra: o desvio da curva de fora dele não chega ao miolo', () => {
     /* sem o limite, 0,3 mm de desvio na curva a 2 mm punham o miolo a 10,9 mm do plano, e a 10 mm, a 2,15 */
     for (const lar of [2, 10, 50, 74]) expect(foraDoPlano(gaiolaPorRede({ ...faixaFina(lar, 30, 0.3), alisarSuperficie: true })), `largura ${lar}`).toBeLessThan(1e-9);
+    /* o diagnóstico diz o corte e a razão: 300 / 50 no lado meio do grande, e o fino com o grande de vizinho */
+    const cortado = gaiolaPorRede({ ...faixaFina(50, 30, 0.3), alisarSuperficie: true }).preenchimento;
+    expect(cortado.porRetalho.grande[1]).toEqual({ curva: 'meio', motivo: 'cortado', razao: 6 });
+    expect(cortado.porRetalho.fino[3]).toMatchObject({ curva: 'meio', motivo: 'vizinho', inteiro: true });
+    expect(gaiolaPorRede({ ...faixaFina(100, 30, 0.3), alisarSuperficie: true }).preenchimento.porRetalho.grande[1]).toMatchObject({ motivo: 'vizinho', razao: 3 });
     /* acima de um quarto o vizinho entra, e o desvio chega ao miolo menor do que é: 0,78 mm de 1 mm com a razão 3,95, e 0,56 com a razão 3 */
     const quase = foraDoPlano(gaiolaPorRede({ ...faixaFina(76, 30, 1), alisarSuperficie: true })); const tres = foraDoPlano(gaiolaPorRede({ ...faixaFina(100, 30, 1), alisarSuperficie: true }));
     expect(quase).toBeGreaterThan(0.5); expect(quase).toBeLessThan(0.8);

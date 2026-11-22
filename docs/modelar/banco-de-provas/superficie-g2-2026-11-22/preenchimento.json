@@ -1,0 +1,1637 @@
+{
+ "alvo": "procedural/pecas/carro-fastback/partes/lataria/receita.js",
+ "redes": [
+  {
+   "rede": 0,
+   "preenchimento": {
+    "retalhos": 69,
+    "lados": 276,
+    "porMotivo": {
+     "vizinho": 174,
+     "cortado": 8,
+     "vinco": 61,
+     "borda": 17,
+     "simetria": 15,
+     "nLados": 1,
+     "dividido": 0,
+     "desencontrado": 0,
+     "misto": 0
+    },
+    "vizinhoQueNaoCobreOLado": 0,
+    "razaoDoVizinho": {
+     "ate 1,5": 166,
+     "ate 2": 2,
+     "ate 3": 3,
+     "ate 4": 3
+    },
+    "retalhosPorLadosComVizinho": {
+     "0": 1,
+     "1": 7,
+     "2": 32,
+     "3": 13,
+     "4": 16
+    },
+    "porRetalho": {
+     "c_base": [
+      {
+       "curva": "Q1",
+       "motivo": "vizinho",
+       "razao": 0.3,
+       "inteiro": true
+      },
+      {
+       "curva": "perfilDaTraseira",
+       "motivo": "simetria"
+      },
+      {
+       "curva": "Q2",
+       "motivo": "vizinho",
+       "razao": 0.94,
+       "inteiro": true
+      },
+      {
+       "curva": "S9",
+       "motivo": "cortado",
+       "razao": 4.03
+      }
+     ],
+     "c_meio": [
+      {
+       "curva": "Q2",
+       "motivo": "vizinho",
+       "razao": 1.24,
+       "inteiro": true
+      },
+      {
+       "curva": "perfilDaTraseira",
+       "motivo": "simetria"
+      },
+      {
+       "curva": "Q3",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S9",
+       "motivo": "vizinho",
+       "razao": 3.82,
+       "inteiro": true
+      }
+     ],
+     "c_ombro": [
+      {
+       "curva": "Q4",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "perfilDaTraseira",
+       "motivo": "simetria"
+      },
+      {
+       "curva": "Q5",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S9ombro",
+       "motivo": "vizinho",
+       "razao": 3.23,
+       "inteiro": true
+      }
+     ],
+     "c_soleira": [
+      {
+       "curva": "Q0",
+       "motivo": "borda"
+      },
+      {
+       "curva": "perfilDaTraseira",
+       "motivo": "simetria"
+      },
+      {
+       "curva": "Q1",
+       "motivo": "cortado",
+       "razao": 4.73
+      },
+      {
+       "curva": "S9",
+       "motivo": "cortado",
+       "razao": 4.08
+      }
+     ],
+     "c_tampa": [
+      {
+       "curva": "S9ombro",
+       "motivo": "vizinho",
+       "razao": 1.33,
+       "inteiro": true
+      },
+      {
+       "curva": "Qeixo",
+       "motivo": "simetria"
+      },
+      {
+       "curva": "Q5",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "Qquina",
+       "motivo": "vinco"
+      }
+     ],
+     "c_topo": [
+      {
+       "curva": "Q3",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "perfilDaTraseira",
+       "motivo": "simetria"
+      },
+      {
+       "curva": "Q4",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S9",
+       "motivo": "vizinho",
+       "razao": 3.36,
+       "inteiro": true
+      }
+     ],
+     "r0_base": [
+      {
+       "curva": "L1",
+       "motivo": "vizinho",
+       "razao": 0.87,
+       "inteiro": true
+      },
+      {
+       "curva": "S1",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "L2",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "S0",
+       "motivo": "borda"
+      }
+     ],
+     "r0_coluna": [
+      {
+       "curva": "L5",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S1ombro",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "L6",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S0ombro",
+       "motivo": "borda"
+      }
+     ],
+     "r0_meio": [
+      {
+       "curva": "L2",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "S1",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "L3",
+       "motivo": "vizinho",
+       "razao": 0.91,
+       "inteiro": true
+      },
+      {
+       "curva": "S0",
+       "motivo": "borda"
+      }
+     ],
+     "r0_ombro": [
+      {
+       "curva": "L4",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S1ombro",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "L5",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S0ombro",
+       "motivo": "borda"
+      }
+     ],
+     "r0_quina": [
+      {
+       "curva": "L6",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S1ombro",
+       "motivo": "vizinho",
+       "razao": 1.01,
+       "inteiro": true
+      },
+      {
+       "curva": "L7",
+       "motivo": "simetria"
+      },
+      {
+       "curva": "S0ombro",
+       "motivo": "borda"
+      }
+     ],
+     "r0_soleira": [
+      {
+       "curva": "L0",
+       "motivo": "borda"
+      },
+      {
+       "curva": "S1",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "L1",
+       "motivo": "vizinho",
+       "razao": 1.15,
+       "inteiro": true
+      },
+      {
+       "curva": "S0",
+       "motivo": "borda"
+      }
+     ],
+     "r0_topo": [
+      {
+       "curva": "L3",
+       "motivo": "vizinho",
+       "razao": 1.11,
+       "inteiro": true
+      },
+      {
+       "curva": "S1",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "L4",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S0",
+       "motivo": "borda"
+      }
+     ],
+     "r1_base": [
+      {
+       "curva": "L1",
+       "motivo": "vizinho",
+       "razao": 0.88,
+       "inteiro": true
+      },
+      {
+       "curva": "S2",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "L2",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "S1",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      }
+     ],
+     "r1_coluna": [
+      {
+       "curva": "L5",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S2ombro",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "L6",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S1ombro",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      }
+     ],
+     "r1_meio": [
+      {
+       "curva": "L2",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "S2",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "L3",
+       "motivo": "vizinho",
+       "razao": 0.9,
+       "inteiro": true
+      },
+      {
+       "curva": "S1",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      }
+     ],
+     "r1_ombro": [
+      {
+       "curva": "L4",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S2ombro",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "L5",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S1ombro",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      }
+     ],
+     "r1_quina": [
+      {
+       "curva": "L6",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S2ombro",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "L7",
+       "motivo": "simetria"
+      },
+      {
+       "curva": "S1ombro",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      }
+     ],
+     "r1_soleira": [
+      {
+       "curva": "L0",
+       "motivo": "borda"
+      },
+      {
+       "curva": "S2",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "L1",
+       "motivo": "vizinho",
+       "razao": 1.14,
+       "inteiro": true
+      },
+      {
+       "curva": "S1",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      }
+     ],
+     "r1_topo": [
+      {
+       "curva": "L3",
+       "motivo": "vizinho",
+       "razao": 1.16,
+       "inteiro": true
+      },
+      {
+       "curva": "S2",
+       "motivo": "vizinho",
+       "razao": 1.01,
+       "inteiro": true
+      },
+      {
+       "curva": "L4",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S1",
+       "motivo": "vizinho",
+       "razao": 1.01,
+       "inteiro": true
+      }
+     ],
+     "r2_base": [
+      {
+       "curva": "L1",
+       "motivo": "vizinho",
+       "razao": 0.88,
+       "inteiro": true
+      },
+      {
+       "curva": "S3",
+       "motivo": "vizinho",
+       "razao": 0.96,
+       "inteiro": true
+      },
+      {
+       "curva": "L2",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "S2",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      }
+     ],
+     "r2_coluna": [
+      {
+       "curva": "L5",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S3ombro",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "L6",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S2ombro",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      }
+     ],
+     "r2_meio": [
+      {
+       "curva": "L2",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "S3",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "L3",
+       "motivo": "vizinho",
+       "razao": 0.86,
+       "inteiro": true
+      },
+      {
+       "curva": "S2",
+       "motivo": "vizinho",
+       "razao": 1.01,
+       "inteiro": true
+      }
+     ],
+     "r2_ombro": [
+      {
+       "curva": "L4",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S3ombro",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "L5",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S2ombro",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      }
+     ],
+     "r2_quina": [
+      {
+       "curva": "L6",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S3ombro",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "L7",
+       "motivo": "simetria"
+      },
+      {
+       "curva": "S2ombro",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      }
+     ],
+     "r2_soleira": [
+      {
+       "curva": "L0",
+       "motivo": "borda"
+      },
+      {
+       "curva": "S3",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "L1",
+       "motivo": "vizinho",
+       "razao": 1.27,
+       "inteiro": true
+      },
+      {
+       "curva": "S2",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      }
+     ],
+     "r2_topo": [
+      {
+       "curva": "L3",
+       "motivo": "vizinho",
+       "razao": 1.19,
+       "inteiro": true
+      },
+      {
+       "curva": "S3",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "L4",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S2",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      }
+     ],
+     "r3_base": [
+      {
+       "curva": "L1",
+       "motivo": "vizinho",
+       "razao": 0.79,
+       "inteiro": true
+      },
+      {
+       "curva": "S4",
+       "motivo": "vizinho",
+       "razao": 0.98,
+       "inteiro": true
+      },
+      {
+       "curva": "L2",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "S3",
+       "motivo": "vizinho",
+       "razao": 1.11,
+       "inteiro": true
+      }
+     ],
+     "r3_coluna": [
+      {
+       "curva": "L5",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S4ombro",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "L6",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S3ombro",
+       "motivo": "vizinho",
+       "razao": 1.01,
+       "inteiro": true
+      }
+     ],
+     "r3_meio": [
+      {
+       "curva": "L2",
+       "motivo": "vizinho",
+       "razao": 1.02,
+       "inteiro": true
+      },
+      {
+       "curva": "S4",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "L3",
+       "motivo": "vizinho",
+       "razao": 0.84,
+       "inteiro": true
+      },
+      {
+       "curva": "S3",
+       "motivo": "vizinho",
+       "razao": 1.04,
+       "inteiro": true
+      }
+     ],
+     "r3_ombro": [
+      {
+       "curva": "L4",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S4ombro",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "L5",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S3ombro",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      }
+     ],
+     "r3_quina": [
+      {
+       "curva": "L6",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S4ombro",
+       "motivo": "vizinho",
+       "razao": 0.99,
+       "inteiro": true
+      },
+      {
+       "curva": "L7",
+       "motivo": "simetria"
+      },
+      {
+       "curva": "S3ombro",
+       "motivo": "vizinho",
+       "razao": 1.01,
+       "inteiro": true
+      }
+     ],
+     "r3_soleira": [
+      {
+       "curva": "L0",
+       "motivo": "borda"
+      },
+      {
+       "curva": "S4",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "L1",
+       "motivo": "vizinho",
+       "razao": 2.27,
+       "inteiro": true
+      },
+      {
+       "curva": "S3",
+       "motivo": "vizinho",
+       "razao": 1.11,
+       "inteiro": true
+      }
+     ],
+     "r3_topo": [
+      {
+       "curva": "L3",
+       "motivo": "vizinho",
+       "razao": 1.41,
+       "inteiro": true
+      },
+      {
+       "curva": "S4",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "L4",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S3",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      }
+     ],
+     "r4_base": [
+      {
+       "curva": "L1",
+       "motivo": "vizinho",
+       "razao": 0.44,
+       "inteiro": true
+      },
+      {
+       "curva": "S5",
+       "motivo": "vizinho",
+       "razao": 1.13,
+       "inteiro": true
+      },
+      {
+       "curva": "L2",
+       "motivo": "vizinho",
+       "razao": 0.98,
+       "inteiro": true
+      },
+      {
+       "curva": "S4",
+       "motivo": "vizinho",
+       "razao": 1.07,
+       "inteiro": true
+      }
+     ],
+     "r4_coluna": [
+      {
+       "curva": "L5",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S5ombro",
+       "motivo": "vizinho",
+       "razao": 1.02,
+       "inteiro": true
+      },
+      {
+       "curva": "L6",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S4ombro",
+       "motivo": "vizinho",
+       "razao": 1.05,
+       "inteiro": true
+      }
+     ],
+     "r4_meio": [
+      {
+       "curva": "L2",
+       "motivo": "vizinho",
+       "razao": 1.05,
+       "inteiro": true
+      },
+      {
+       "curva": "S5",
+       "motivo": "vizinho",
+       "razao": 1.04,
+       "inteiro": true
+      },
+      {
+       "curva": "L3",
+       "motivo": "vizinho",
+       "razao": 0.71,
+       "inteiro": true
+      },
+      {
+       "curva": "S4",
+       "motivo": "vizinho",
+       "razao": 1.02,
+       "inteiro": true
+      }
+     ],
+     "r4_ombro": [
+      {
+       "curva": "L4",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S5ombro",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "L5",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S4ombro",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      }
+     ],
+     "r4_quina": [
+      {
+       "curva": "L6",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S5ombro",
+       "motivo": "vizinho",
+       "razao": 1.01,
+       "inteiro": true
+      },
+      {
+       "curva": "L7",
+       "motivo": "simetria"
+      },
+      {
+       "curva": "S4ombro",
+       "motivo": "vizinho",
+       "razao": 1.04,
+       "inteiro": true
+      }
+     ],
+     "r4_soleira": [
+      {
+       "curva": "L0",
+       "motivo": "borda"
+      },
+      {
+       "curva": "S5",
+       "motivo": "vizinho",
+       "razao": 1.13,
+       "inteiro": true
+      },
+      {
+       "curva": "L1",
+       "motivo": "cortado",
+       "razao": 4.92
+      },
+      {
+       "curva": "S4",
+       "motivo": "vizinho",
+       "razao": 1.16,
+       "inteiro": true
+      }
+     ],
+     "r4_topo": [
+      {
+       "curva": "L3",
+       "motivo": "vizinho",
+       "razao": 2,
+       "inteiro": true
+      },
+      {
+       "curva": "S5",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "L4",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S4",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      }
+     ],
+     "r5_base": [
+      {
+       "curva": "L1",
+       "motivo": "vizinho",
+       "razao": 0.2,
+       "inteiro": true
+      },
+      {
+       "curva": "S6",
+       "motivo": "vizinho",
+       "razao": 1.05,
+       "inteiro": true
+      },
+      {
+       "curva": "L2",
+       "motivo": "vizinho",
+       "razao": 0.96,
+       "inteiro": true
+      },
+      {
+       "curva": "S5",
+       "motivo": "vizinho",
+       "razao": 0.96,
+       "inteiro": true
+      }
+     ],
+     "r5_coluna": [
+      {
+       "curva": "L5",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S6ombro",
+       "motivo": "vizinho",
+       "razao": 1.06,
+       "inteiro": true
+      },
+      {
+       "curva": "L6",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S5ombro",
+       "motivo": "vizinho",
+       "razao": 1.02,
+       "inteiro": true
+      }
+     ],
+     "r5_meio": [
+      {
+       "curva": "L2",
+       "motivo": "vizinho",
+       "razao": 1.08,
+       "inteiro": true
+      },
+      {
+       "curva": "S6",
+       "motivo": "vizinho",
+       "razao": 1.02,
+       "inteiro": true
+      },
+      {
+       "curva": "L3",
+       "motivo": "vizinho",
+       "razao": 0.5,
+       "inteiro": true
+      },
+      {
+       "curva": "S5",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      }
+     ],
+     "r5_ombro": [
+      {
+       "curva": "L4",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S6ombro",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "L5",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S5ombro",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      }
+     ],
+     "r5_quina": [
+      {
+       "curva": "L6",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S6ombro",
+       "motivo": "vizinho",
+       "razao": 1.02,
+       "inteiro": true
+      },
+      {
+       "curva": "L7",
+       "motivo": "simetria"
+      },
+      {
+       "curva": "S5ombro",
+       "motivo": "vizinho",
+       "razao": 1.02,
+       "inteiro": true
+      }
+     ],
+     "r5_soleira": [
+      {
+       "curva": "L0",
+       "motivo": "borda"
+      },
+      {
+       "curva": "S6",
+       "motivo": "vizinho",
+       "razao": 1.13,
+       "inteiro": true
+      },
+      {
+       "curva": "L1",
+       "motivo": "cortado",
+       "razao": 7.4
+      },
+      {
+       "curva": "S5",
+       "motivo": "vizinho",
+       "razao": 1.04,
+       "inteiro": true
+      }
+     ],
+     "r5_topo": [
+      {
+       "curva": "L3",
+       "motivo": "vizinho",
+       "razao": 2.33,
+       "inteiro": true
+      },
+      {
+       "curva": "S6",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "L4",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S5",
+       "motivo": "vizinho",
+       "razao": 1.01,
+       "inteiro": true
+      }
+     ],
+     "r6_base": [
+      {
+       "curva": "L1",
+       "motivo": "vizinho",
+       "razao": 0.15,
+       "inteiro": true
+      },
+      {
+       "curva": "S7",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "L2",
+       "motivo": "vizinho",
+       "razao": 0.93,
+       "inteiro": true
+      },
+      {
+       "curva": "S6",
+       "motivo": "vizinho",
+       "razao": 0.98,
+       "inteiro": true
+      }
+     ],
+     "r6_coluna": [
+      {
+       "curva": "L5",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S7ombro",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "L6",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S6ombro",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      }
+     ],
+     "r6_meio": [
+      {
+       "curva": "L2",
+       "motivo": "vizinho",
+       "razao": 1.14,
+       "inteiro": true
+      },
+      {
+       "curva": "S7",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "L3",
+       "motivo": "vizinho",
+       "razao": 0.57,
+       "inteiro": true
+      },
+      {
+       "curva": "S6",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      }
+     ],
+     "r6_ombro": [
+      {
+       "curva": "L4",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S7ombro",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "L5",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S6ombro",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      }
+     ],
+     "r6_quina": [
+      {
+       "curva": "L6",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S7ombro",
+       "motivo": "vizinho",
+       "razao": 0.99,
+       "inteiro": true
+      },
+      {
+       "curva": "L7",
+       "motivo": "simetria"
+      },
+      {
+       "curva": "S6ombro",
+       "motivo": "vizinho",
+       "razao": 1.01,
+       "inteiro": true
+      }
+     ],
+     "r6_soleira": [
+      {
+       "curva": "L0",
+       "motivo": "borda"
+      },
+      {
+       "curva": "S7",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      },
+      {
+       "curva": "L1",
+       "motivo": "cortado",
+       "razao": 7.4
+      },
+      {
+       "curva": "S6",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      }
+     ],
+     "r6_topo": [
+      {
+       "curva": "L3",
+       "motivo": "vizinho",
+       "razao": 2.31,
+       "inteiro": true
+      },
+      {
+       "curva": "S7",
+       "motivo": "vizinho",
+       "razao": 1.01,
+       "inteiro": true
+      },
+      {
+       "curva": "L4",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S6",
+       "motivo": "vizinho",
+       "razao": 1.01,
+       "inteiro": true
+      }
+     ],
+     "r7_base": [
+      {
+       "curva": "L1",
+       "motivo": "vizinho",
+       "razao": 0.18,
+       "inteiro": true
+      },
+      {
+       "curva": "S8",
+       "motivo": "vizinho",
+       "razao": 0.79,
+       "inteiro": true
+      },
+      {
+       "curva": "L2",
+       "motivo": "vizinho",
+       "razao": 0.88,
+       "inteiro": true
+      },
+      {
+       "curva": "S7",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      }
+     ],
+     "r7_coluna": [
+      {
+       "curva": "L5",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S8ombro",
+       "motivo": "vizinho",
+       "razao": 0.82,
+       "inteiro": true
+      },
+      {
+       "curva": "L6",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S7ombro",
+       "motivo": "vizinho",
+       "razao": 1.05,
+       "inteiro": true
+      }
+     ],
+     "r7_meio": [
+      {
+       "curva": "L2",
+       "motivo": "vizinho",
+       "razao": 1.2,
+       "inteiro": true
+      },
+      {
+       "curva": "S8",
+       "motivo": "vizinho",
+       "razao": 0.79,
+       "inteiro": true
+      },
+      {
+       "curva": "L3",
+       "motivo": "vizinho",
+       "razao": 0.74,
+       "inteiro": true
+      },
+      {
+       "curva": "S7",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      }
+     ],
+     "r7_ombro": [
+      {
+       "curva": "L4",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S8ombro",
+       "motivo": "vizinho",
+       "razao": 0.79,
+       "inteiro": true
+      },
+      {
+       "curva": "L5",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S7ombro",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      }
+     ],
+     "r7_quina": [
+      {
+       "curva": "L6",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S8ombro",
+       "motivo": "vizinho",
+       "razao": 0.85,
+       "inteiro": true
+      },
+      {
+       "curva": "L7",
+       "motivo": "simetria"
+      },
+      {
+       "curva": "S7ombro",
+       "motivo": "vizinho",
+       "razao": 1.06,
+       "inteiro": true
+      }
+     ],
+     "r7_soleira": [
+      {
+       "curva": "L0",
+       "motivo": "borda"
+      },
+      {
+       "curva": "S8",
+       "motivo": "vizinho",
+       "razao": 0.8,
+       "inteiro": true
+      },
+      {
+       "curva": "L1",
+       "motivo": "cortado",
+       "razao": 6.57
+      },
+      {
+       "curva": "S7",
+       "motivo": "vizinho",
+       "razao": 1.01,
+       "inteiro": true
+      }
+     ],
+     "r7_topo": [
+      {
+       "curva": "L3",
+       "motivo": "vizinho",
+       "razao": 1.76,
+       "inteiro": true
+      },
+      {
+       "curva": "S8",
+       "motivo": "vizinho",
+       "razao": 0.79,
+       "inteiro": true
+      },
+      {
+       "curva": "L4",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S7",
+       "motivo": "vizinho",
+       "razao": 1,
+       "inteiro": true
+      }
+     ],
+     "r8_base": [
+      {
+       "curva": "L1",
+       "motivo": "vizinho",
+       "razao": 0.21,
+       "inteiro": true
+      },
+      {
+       "curva": "S9",
+       "motivo": "vizinho",
+       "razao": 0.26,
+       "inteiro": true
+      },
+      {
+       "curva": "L2",
+       "motivo": "vizinho",
+       "razao": 0.84,
+       "inteiro": true
+      },
+      {
+       "curva": "S8",
+       "motivo": "vizinho",
+       "razao": 1.26,
+       "inteiro": true
+      }
+     ],
+     "r8_coluna": [
+      {
+       "curva": "L5",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S9ombro",
+       "motivo": "nLados"
+      },
+      {
+       "curva": "L6",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S8ombro",
+       "motivo": "vizinho",
+       "razao": 1.27,
+       "inteiro": true
+      }
+     ],
+     "r8_meio": [
+      {
+       "curva": "L2",
+       "motivo": "vizinho",
+       "razao": 1.24,
+       "inteiro": true
+      },
+      {
+       "curva": "S9",
+       "motivo": "vizinho",
+       "razao": 0.3,
+       "inteiro": true
+      },
+      {
+       "curva": "L3",
+       "motivo": "vizinho",
+       "razao": 0.95,
+       "inteiro": true
+      },
+      {
+       "curva": "S8",
+       "motivo": "vizinho",
+       "razao": 1.27,
+       "inteiro": true
+      }
+     ],
+     "r8_ombro": [
+      {
+       "curva": "L4",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S9ombro",
+       "motivo": "vizinho",
+       "razao": 0.34,
+       "inteiro": true
+      },
+      {
+       "curva": "L5",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S8ombro",
+       "motivo": "vizinho",
+       "razao": 1.27,
+       "inteiro": true
+      }
+     ],
+     "r8_quina": [
+      {
+       "curva": "L6",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S9ombro",
+       "motivo": "vizinho",
+       "razao": 0.86,
+       "inteiro": true
+      },
+      {
+       "curva": "L7",
+       "motivo": "simetria"
+      },
+      {
+       "curva": "S8ombro",
+       "motivo": "vizinho",
+       "razao": 1.24,
+       "inteiro": true
+      }
+     ],
+     "r8_soleira": [
+      {
+       "curva": "L0",
+       "motivo": "borda"
+      },
+      {
+       "curva": "S9",
+       "motivo": "vizinho",
+       "razao": 0.26,
+       "inteiro": true
+      },
+      {
+       "curva": "L1",
+       "motivo": "cortado",
+       "razao": 5.6
+      },
+      {
+       "curva": "S8",
+       "motivo": "vizinho",
+       "razao": 1.31,
+       "inteiro": true
+      }
+     ],
+     "r8_topo": [
+      {
+       "curva": "L3",
+       "motivo": "vizinho",
+       "razao": 1.35,
+       "inteiro": true
+      },
+      {
+       "curva": "S9",
+       "motivo": "vizinho",
+       "razao": 0.31,
+       "inteiro": true
+      },
+      {
+       "curva": "L4",
+       "motivo": "vinco"
+      },
+      {
+       "curva": "S8",
+       "motivo": "vizinho",
+       "razao": 1.27,
+       "inteiro": true
+      }
+     ]
+    }
+   }
+  }
+ ]
+}

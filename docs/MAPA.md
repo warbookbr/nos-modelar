@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2191 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2193 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -3719,6 +3719,8 @@
 - `portas-espelho-arranja.test.ts` — portas-espelho-arranja.test.ts — prova adversarial de AUT-2026-15: uma interface não pode permanecer no espaço da fonte quando a sua geometria foi copiada. C…
 - `prancha-de-referencia.mjs` — prancha-de-referencia.mjs — a prancha modelo e foto: a vista da peça (ou de uma parte isolada) ao lado da foto de referência, as duas na mesma escala em mm, …
 - `prancha-de-referencia.test.mjs` — Testes da prancha modelo e foto (régua, região, plano, pedido, montagem no navegador) e da cópia de parte repetida da bancada.
+- `preenchimento-da-rede.mjs` — preenchimento-da-rede.mjs — diz, de cada rede de curvas de uma receita, como o preenchimento do miolo pelas curvas vizinhas usou os vizinhos: quantos lados d…
+- `preenchimento-da-rede.test.mjs` — preenchimento-da-rede.test.mjs — o diagnóstico do preenchimento pelas curvas vizinhas, medido nas chapas de prova e pela linha de comando.
 - `procedencia-check.mjs` — Gate N3: contrato reduzido e explícito de procedência da fonte de restrições.
 - `procedencia-check.test.mjs` — Provas do gate N3 para procedência de valores estruturais.
 - `proporcoes.mjs` — proporcoes.mjs — a fonte única das medidas de uma montagem, e a conferência de que os outros lugares a seguem.

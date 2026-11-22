@@ -4,7 +4,7 @@
 
 **Território:** `modulos/esboco-nucleo/`, `src/autoria/executar-receita.js`, `docs/modelar/usar/GOTCHAS-POR-OPERACAO.md`, `procedural/nucleo/operacoes/primitivas-superficie.js`
 
-A fatia 3 mexe em `procedural/nucleo/gaiola-por-rede.js` e só entra no território depois que o plano do G2 de produção na lataria declarar o dele, porque os dois trabalham no núcleo de superfície.
+A fatia 3 mexe em `procedural/nucleo/gaiola-por-rede.js` e só entra no território depois que o plano do G2 de produção na lataria fechar, porque os dois trabalham no núcleo de superfície e a pessoa decidiu em 2026-11-22 que o G2 vai antes.
 
 **Responsável:** a IA da sessão na nuvem. A pessoa aprovou e ativou o plano em 2026-11-22.
 
@@ -58,4 +58,4 @@ Preencher somente ao concluir ou cancelar.
 
 ## Andamento
 
-Em 2026-11-22 as fatias 1 e 2 foram entregues, e a fatia 3 espera o território do G2.
+Em 2026-11-22 as fatias 1 e 2 foram entregues, e a fatia 3 espera o fechamento do G2.

@@ -260,7 +260,9 @@
  * à rede para ela sair com a mesma malha depois de mexer nas entradas. `capturarGaiolas(fn)` (`gaiola-captura.js`) devolve as saídas montadas durante `fn`.
  *
  * gaiolaPorRede(definicao) -> { pontos, passo, linha(curva, de?, ate?), pontoDaCurva(curva, fracao), linhas, nos, curvas, retalhos, densidades, extraordinarios,
- *                               cantos, continuidade, alisamento, avisos, origens, entradas, estrutura, emendas? }
+ *                               cantos, continuidade, alisamento, avisos, origens, entradas, estrutura, emendas?, preenchimento? }
+ * `preenchimento` só sai com `alisarSuperficie`: o diagnóstico do preenchimento pelas curvas vizinhas, com o motivo de cada lado de cada
+ * retalho de quatro lados (`diagnosticoDoPreenchimento`), que `node tools/modelar/preenchimento-da-rede.mjs <receita>` mostra.
  * `pontos` vai para TOPO e `passo` se espalha no passo `subdivisao`. `linha(curva, de, ate)` devolve os nomes dos pontos ao longo da
  * curva (da fechada inteira, com o primeiro repetido no fim): é a linha que o `friso` percorre. Os nomes dos pontos de dentro de um arco
  * dependem da densidade, e por isso a receita não os cita: cita a curva, o nó ou o retalho. */
@@ -881,8 +883,11 @@ function pesosDaMisturaPelasVizinhas(t, h0, h, h1) {
    o retalho de n lados e o lado dividido com mais de um retalho. A fileira de fora (o lado oposto do vizinho que divide o lado inteiro)
    entra com o resíduo dela pela MESMA mistura das fileiras do retalho, e fica de fora quando não tem os mesmos pontos de fora: a soma de
    Coons pede uma mistura só ao longo de cada direção. A soma é feita nas duas ordens e tirada a média. Só os pontos das bordas entram
-   na conta: não há sistema, e o resultado não depende da ordem dos retalhos. Sem vizinho nenhum é o preenchimento padrão. */
-function preencherPelasVizinhas(grades, pos, vincos) {
+   na conta: não há sistema, e o resultado não depende da ordem dos retalhos. Sem vizinho nenhum é o preenchimento padrão.
+   Devolve { pontos, diagnostico }: `diagnostico` diz, de cada lado de cada retalho, se ele teve vizinho e, se não teve, por quê
+   (`diagnosticoDoPreenchimento`); `donos` é o Map aresta -> nomes de todos os retalhos que a têm na borda, inclusive os de n lados, e
+   `simetria` diz se a borda em x = 0 é o plano de simetria. */
+function preencherPelasVizinhas(grades, pos, vincos, donos = new Map(), simetria = false) {
   const comb = (pesos, pts) => { const r = [0, 0, 0]; pesos.forEach((w, k) => { if (w !== 0 && pts[k]) { r[0] += w * pts[k][0]; r[1] += w * pts[k][1]; r[2] += w * pts[k][2]; } }); return r; };
   const porAresta = new Map();
   for (const gr of grades) gr.lados.forEach((l, s) => { for (let k = 0; k + 1 < l.length; k++) { const c = chaveDeAresta(l[k], l[k + 1]); if (!porAresta.has(c)) porAresta.set(c, []); porAresta.get(c).push({ gr, s, k }); } });
@@ -953,13 +958,76 @@ function preencherPelasVizinhas(grades, pos, vincos) {
     const F0 = ordem(0); const F1 = ordem(1);
     for (let j = 1; j < nV; j++) for (let i = 1; i < nU; i++) { const a = F0(i, j); const b = F1(j, i); saida.set(gr.nome(i, j), [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2, (a[2] + b[2]) / 2]); }
   }
-  return saida;
+  /* o diagnóstico: o motivo de cada ponto de cada lado sem ponto de fora, pela mesma conta de `foraSemCorte` */
+  const motivoDoPonto = (gr, s, i) => {
+    const l = gr.lados[s]; const n = l.length - 1; const k = i < n ? i : n - 1; const c = chaveDeAresta(l[k], l[k + 1]);
+    if (vincos.has(c)) return 'vinco';
+    const outros = (porAresta.get(c) ?? []).filter((e) => e.gr !== gr);
+    if (outros.length > 1) return 'dividido';
+    if (outros.length === 1) return 'desencontrado';
+    const alheios = [...(donos.get(c) ?? [])].filter((nome) => nome !== gr.id);
+    if (alheios.length) return 'nLados';
+    return simetria && Math.abs(pos(l[k])[0]) < 1e-9 && Math.abs(pos(l[k + 1])[0]) < 1e-9 ? 'simetria' : 'borda';
+  };
+  const razaoDoLado = (gr, s) => {
+    const l = gr.lados[s]; const n = l.length - 1; const oposto = gr.lados[(s + 2) % 4]; let maior = 0;
+    for (let i = 0; i <= n; i++) {
+      const F = foraSemCorte(gr, s, i); if (!F) continue;
+      const h0 = norma(sub(F.p, pos(l[i]))); if (h0 > 0) maior = Math.max(maior, norma(sub(pos(l[i]), pos(oposto[n - i]))) / h0);
+    }
+    return Math.round(maior * 100) / 100;
+  };
+  const porRetalho = {};
+  for (const gr of [...grades].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))) {
+    porRetalho[gr.id] = gr.lados.map((l, s) => {
+      const curva = gr.curvas?.[s] ?? null; const base = curva ? { curva } : {};
+      if (cortado(gr, s)) return { ...base, motivo: 'cortado', razao: razaoDoLado(gr, s) };
+      const contas = {}; let comFora = 0; let inteiro = true;
+      for (let i = 0; i < l.length; i++) {
+        const F = foraSemCorte(gr, s, i);
+        if (F) { comFora++; if (!F.inteiro) inteiro = false; } else { const m = motivoDoPonto(gr, s, i); contas[m] = (contas[m] ?? 0) + 1; }
+      }
+      if (comFora === l.length) return { ...base, motivo: 'vizinho', razao: razaoDoLado(gr, s), inteiro };
+      const motivos = Object.keys(contas);
+      if (!comFora && motivos.length === 1) return { ...base, motivo: motivos[0] };
+      return { ...base, motivo: 'misto', pontos: { ...(comFora ? { vizinho: comFora } : {}), ...contas } };
+    });
+  }
+  return { pontos: saida, diagnostico: diagnosticoDoPreenchimento(porRetalho) };
+}
+
+/* os motivos de um lado, na ordem em que o resumo os conta */
+export const MOTIVOS_DO_PREENCHIMENTO = ['vizinho', 'cortado', 'vinco', 'borda', 'simetria', 'nLados', 'dividido', 'desencontrado', 'misto'];
+
+/* diagnosticoDoPreenchimento(porRetalho) -> o resumo do preenchimento pelas curvas vizinhas: quantos retalhos de quatro lados e quantos
+   lados, os lados por motivo (`vizinho`; `cortado` pela razão de cordas, RAZAO_MAXIMA_DO_VIZINHO; `vinco`; `borda` livre; `simetria`,
+   no plano x = 0; `nLados`, o retalho do outro lado não tem quatro lados; `dividido`, mais de um retalho de quatro lados na mesma aresta;
+   `desencontrado`, o vizinho não tem o ponto do lado; `misto`, pontos de motivos diferentes), a razão de cordas dos lados com vizinho
+   em faixas, os retalhos pelo número de lados com vizinho e o motivo de cada lado de cada retalho. */
+function diagnosticoDoPreenchimento(porRetalho) {
+  const lados = Object.fromEntries(MOTIVOS_DO_PREENCHIMENTO.map((m) => [m, 0]));
+  const tetos = [1.5, 2, 3, RAZAO_MAXIMA_DO_VIZINHO];
+  const faixas = tetos.map((x) => `ate ${String(x).replace('.', ',')}`);
+  const razoes = Object.fromEntries(faixas.map((x) => [x, 0]));
+  const comVizinho = { 0: 0, 1: 0, 2: 0, 3: 0, 4: 0 }; let parciais = 0; let total = 0;
+  for (const ls of Object.values(porRetalho)) {
+    let k = 0;
+    for (const l of ls) {
+      total++; lados[l.motivo]++;
+      if (l.motivo !== 'vizinho') continue;
+      k++; if (!l.inteiro) parciais++;
+      const q = tetos.findIndex((x) => l.razao <= x); razoes[faixas[q < 0 ? faixas.length - 1 : q]]++;
+    }
+    comVizinho[k]++;
+  }
+  return { retalhos: Object.keys(porRetalho).length, lados: total, porMotivo: lados, vizinhoQueNaoCobreOLado: parciais, razaoDoVizinho: razoes, retalhosPorLadosComVizinho: comVizinho, porRetalho };
 }
 
 /* ----------------------------------------------------------------- função */
 
 export function gaiolaPorRede(definicaoDada) {
-  /* uma alteração de teste (a ferramenta de vincos) põe vinco em curvas e canto em nós da definição sem escrever na receita */
+  /* uma alteração de teste põe vinco em curvas e canto em nós da definição sem escrever na receita (a ferramenta de vincos), ou liga
+     alisarSuperficie (a ferramenta do preenchimento, com { alisarSuperficie: true | { onda } }) */
   const alt = alteracoesDaRede();
   const definicao = alt && definicaoDada && Array.isArray(definicaoDada.curvas) && Array.isArray(definicaoDada.retalhos)
     ? {
@@ -971,6 +1039,8 @@ export function gaiolaPorRede(definicaoDada) {
       ...(alt.cantos?.length ? { cantos: [...new Set([...(definicaoDada.cantos ?? []), ...alt.cantos.filter((n) => definicaoDada.nos && n in definicaoDada.nos)])] } : {}),
       ...(alt.acrescentar?.nos ? { nos: { ...(definicaoDada.nos ?? {}), ...alt.acrescentar.nos } } : {}),
       retalhos: definicaoDada.retalhos.flatMap((r) => (r && alt.acrescentar?.retalhos?.[r.nome] ? alt.acrescentar.retalhos[r.nome] : [r])),
+      /* a ferramenta do preenchimento liga a opção para medir a rede sem a receita a repassar; o alisamento pela normal sai junto */
+      ...(alt.alisarSuperficie ? { alisarSuperficie: alt.alisarSuperficie, liso: false } : {}),
     }
     : definicaoDada;
   exigirCampos(definicao, ['curvas', 'nos', 'retalhos', 'passo', 'anguloMax', 'fora', 'leitura', 'interior', 'liso', 'anguloDeCanto', 'cantos', 'simetria', 'prefixo', 'alisarCurvas', 'limitesDaEmenda', 'marcarCurvas', 'alisarSuperficie'], 'a definição da rede');
@@ -1412,9 +1482,11 @@ export function gaiolaPorRede(definicaoDada) {
   const facesDoRetalho = new Map(); const interiorDoRetalho = new Map(); const centros = new Map();
   const novoInterior = (retalho, id, p) => { novoVertice(id, p); interiorDoRetalho.get(retalho).push(id); };
   const gradesDeQuatroLados = []; // só com `alisarSuperficie`: o que `preencherPelasVizinhas` lê
+  const donosDasArestas = new Map(); // só com `alisarSuperficie`: aresta da borda -> os retalhos que a têm, para o diagnóstico
   for (const r of retalhos) {
     interiorDoRetalho.set(r.nome, []);
     const lados = r.cadeia.map(ladoEmVertices);
+    if (alisarSuperficie) for (const l of lados) for (let k = 0; k + 1 < l.length; k++) { const c = chaveDeAresta(l[k], l[k + 1]); if (!donosDasArestas.has(c)) donosDasArestas.set(c, new Set()); donosDasArestas.get(c).add(r.nome); }
     const P = (id) => posicao.get(id);
     const faces = [];
     if (r.cadeia.length === 4) {
@@ -1439,7 +1511,7 @@ export function gaiolaPorRede(definicaoDada) {
         }
       }
       for (let j = 0; j < nV; j++) for (let i = 0; i < nU; i++) faces.push([id(i, j), id(i + 1, j), id(i + 1, j + 1), id(i, j + 1)]);
-      if (alisarSuperficie) gradesDeQuatroLados.push({ id: r.nome, lados, nU, nV, nome: id });
+      if (alisarSuperficie) gradesDeQuatroLados.push({ id: r.nome, lados, nU, nV, nome: id, curvas: r.cadeia.map((l) => l.curva) });
     } else {
       const n = lados.length;
       const metade = (lados[0].length - 1) / 2;
@@ -1524,6 +1596,7 @@ export function gaiolaPorRede(definicaoDada) {
   }
 
   /* ---- com `alisarSuperficie`, o miolo dos retalhos de quatro lados pelas curvas vizinhas ---- */
+  let preenchimento = null;
   if (alisarSuperficie && gradesDeQuatroLados.length) {
     /* o preenchimento padrão acima fica como a primeira conferência (a dobra dele recusa antes); aqui só os pontos de dentro dos retalhos
        de quatro lados trocam de lugar, a partir dos pontos das curvas, e a dobra é conferida de novo com os pontos novos */
@@ -1533,7 +1606,8 @@ export function gaiolaPorRede(definicaoDada) {
       const v = verticesDoArco.get(a.id);
       for (let k = 0; k + 1 < v.length; k++) arestasDeVinco.add(chaveDeAresta(v[k], v[k + 1]));
     }
-    const novos = preencherPelasVizinhas(gradesDeQuatroLados, (id) => posicao.get(id), arestasDeVinco);
+    const { pontos: novos, diagnostico } = preencherPelasVizinhas(gradesDeQuatroLados, (id) => posicao.get(id), arestasDeVinco, donosDasArestas, simetria === 'x');
+    preenchimento = diagnostico;
     for (const [id, p] of novos) {
       if (!finito3(p)) falha(`o preenchimento pelas curvas vizinhas (alisarSuperficie) deu o ponto ${citar(id)} sem posição finita (${JSON.stringify(p)}); tire alisarSuperficie e relate a rede`);
       posicao.set(id, p);
@@ -2212,6 +2286,7 @@ export function gaiolaPorRede(definicaoDada) {
     extraordinarios: extra, cantos: cantosAchados, continuidade, alisamento, avisos, origens: ordenadas, entradas, estrutura, fixacao,
   };
   if (emendasDeclaradas.length) saida.emendas = emendasSaida;
+  if (preenchimento) saida.preenchimento = preenchimento;
   if (alisarCurvas) {
     const curvasDoRelatorio = Object.fromEntries([...relatorioDoAlisamento].sort((a, b) => (a[0] < b[0] ? -1 : 1)));
     saida.alisamentoDasCurvas = {
