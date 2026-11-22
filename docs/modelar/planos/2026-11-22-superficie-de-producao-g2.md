@@ -1,8 +1,10 @@
 # Superfície de produção (G2): a chapa de subdivisão sem a ondulação que o crítico acusa, sem sair da forma
 
-**Estado:** rascunho
+**Estado:** ativo
 
-**Território:** a confirmar ao ativar, depois que o plano do [ajuste esparso da gaiola](../decisoes/PLANOS-ENCERRADOS.md) fechar, porque os dois mudam `procedural/nucleo/subdivisao.js`. O plano muda `procedural/nucleo/gaiola-por-rede.js` na fatia 1 (o diagnóstico do preenchimento na saída) e na fatia 2 (a opção `alisarSuperficie`), e esse arquivo é usado antes pela fatia 3 do plano `2026-11-22-formas-que-faltavam` (a curva paralela na rede de curvas), que o libera antes desta ativação. A lista: `procedural/nucleo/subdivisao.js`, `procedural/nucleo/gaiola-por-rede.js`, os testes de subdivisão e de energia de curvatura em `procedural/nucleo/`, `tools/fixtures/correcao-de-superficie/`, a ferramenta nova da distância à pele em `tools/modelar/`, `tools/modelar/zebra-numerica.mjs` e `docs/modelar/banco-de-provas/superficie-g2-2026-11-22/`.
+**Território:** `procedural/nucleo/subdivisao.js`, `procedural/nucleo/subdivisao.test.mjs`, `procedural/nucleo/subdivisao-energia-de-curvatura.test.mjs`, `tools/fixtures/correcao-de-superficie/`, `tools/modelar/distancia-a-pele.mjs`, `tools/modelar/distancia-a-pele.test.mjs`, `tools/modelar/zebra-numerica.mjs`, `tools/modelar/zebra-numerica.test.mjs`, `docs/modelar/banco-de-provas/superficie-g2-2026-11-22/`
+
+Ativado pela pessoa em 2026-11-22, depois do fechamento do plano do ajuste esparso. A energia de curvatura (`alisarSuperficie`) e o preenchimento do miolo moram em `procedural/nucleo/gaiola-por-rede.js`, que a fatia 3 do plano das formas que faltavam (a curva paralela na rede de curvas) usa antes. Por isso o território começa sem esse arquivo, e a fatia 1 começa pelos instrumentos que não dependem dele: a distância à pele e o gate que junta a zebra à distância, com a linha de base do quarto traseiro. O diagnóstico do preenchimento e as fatias 2 e 3 esperam a fatia 3 das formas soltar o arquivo, e então ele entra neste território. A ficha da `gaiolaPorRede` em `procedural/nucleo/uso-operacoes.js` entra do mesmo modo quando o plano da hélice soltar o arquivo.
 
 **Responsável:** a IA da sessão implementa e mede; a pessoa ativa o plano, decide os pontos marcados nas fatias e julga a forma por imagem.
 
