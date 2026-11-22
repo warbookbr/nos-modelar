@@ -68,8 +68,8 @@ O adaptador (`src/autoria/adaptar-three.js`) já suporta `MeshPhysicalMaterial` 
 - **Fatia B (`d6226993`):** lanternas traseiras envolventes 3D com lentes prismáticas translúcidas, sulco em V contínuo, refletor interno e ré embutida no vermelho.
 - **Fatia C (`9311007d`, `a6e0ef2e`):** conjunto óptico dianteiro com altura real, farol trapezoidal com parábola 3D + máscara prata + lente transparente, pisca embutido curvo em "D" e grade trapezoidal de 7 lâminas.
 - **Bloco 1 (`f3dd95ec`):** nariz mais fino sem ombros "balão", colunas A mais verticais com teto mais largo e para-brisa arredondado, fenda do capô (`fendaCapo`) e churrasqueira de ventilação (`churrasqueira`).
+- **Bloco 2:** recesso horizontal sob o lábio do capô, borda interna dos faróis mais suave (`12 mm`, cantos `r = 16 mm`), aro vítreo fino (`3.5 mm`), 32 estrias verticais reais na lente sem telinha quadriculada nem "alvo" concêntrico, estrias horizontais nos piscas dianteiros e grade de 7 lâminas mais profunda e contrastada.
 
 ### Próximos blocos planejados
-- **Bloco 2:** recesso horizontal superior/inferior do conjunto óptico, borda interna dos faróis mais suave/curvada, estrias verticais limpas sem efeito "alvo", piscas com estrias horizontais e grade de 7 lâminas mais profunda.
 - **Bloco 3:** para-choque dianteiro mais esbelto e afunilado (`y = 258..496`), friso claro fino (`7 mm`), faróis de neblina trapezoidais estriados integrados à grade inferior e placa reposicionada com cantos arredondados.
 - **Bloco 4:** para-choque traseiro esbelto com balanço traseiro ascendente, rebaixo trapezoidal mais profundo da placa traseira, fechadura detalhada, escapamento inclinado, maçaneta da porta e auditoria final (`guarda:acervo`, `guarda:referencial`, tempo de importação).

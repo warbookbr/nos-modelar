@@ -60,23 +60,18 @@ export function passosFrenteTraseira(T, proxId) {
   const idGradeFundo = proxId();
   passos.push(barraTrap(idGradeFundo, f.grade.y0 - 6, f.grade.y1 + 6, f.grade.zFundo0, f.grade.zFundo1, -2));
   const idGradeTopo = proxId();
-  passos.push(barraTrap(idGradeTopo, f.grade.y1 - 8, f.grade.y1 + 2, f.grade.zFundo1, f.grade.zMoldura, 1));
+  passos.push(barraTrap(idGradeTopo, f.grade.y1 - 5, f.grade.y1 + 1, f.grade.zFundo1, f.grade.zMoldura, 1));
   const idGradeBase = proxId();
-  passos.push(barraTrap(idGradeBase, f.grade.y0 - 2, f.grade.y0 + 8, f.grade.zFundo1, f.grade.zMoldura, 1));
-  const origensGrade = [
-    { op: 'subdivisao', id: idGradeFundo },
-    { op: 'subdivisao', id: idGradeTopo },
-    { op: 'subdivisao', id: idGradeBase },
-  ];
+  passos.push(barraTrap(idGradeBase, f.grade.y0 - 1, f.grade.y0 + 5, f.grade.zFundo1, f.grade.zMoldura, 1));
+  marcar('gradeFrontal', 'plasticoFosco', { origem: { op: 'subdivisao', id: idGradeFundo } });
+  marcar('gradeFrontal', 'plasticoPreto', { origem: { op: 'subdivisao', id: idGradeTopo } });
+  marcar('gradeFrontal', 'plasticoPreto', { origem: { op: 'subdivisao', id: idGradeBase } });
   const passoLam = (f.grade.lamY1 - f.grade.lamY0) / (f.grade.laminas - 1);
   for (let k = 0; k < f.grade.laminas; k += 1) {
     const idL = proxId();
     const yL = f.grade.lamY0 + passoLam * k;
     passos.push(barraTrap(idL, yL, yL + f.grade.lamAlt, f.grade.zFundo1, f.grade.zLamina, 2));
-    origensGrade.push({ op: 'subdivisao', id: idL });
-  }
-  for (const origem of origensGrade) {
-    marcar('gradeFrontal', 'plasticoFosco', { origem });
+    marcar('gradeFrontal', 'plasticoPreto', { origem: { op: 'subdivisao', id: idL } });
   }
 
   /* helper para emitir par espelhado em X numa parte frontal */
@@ -150,10 +145,10 @@ export function passosFrenteTraseira(T, proxId) {
   /* 1. Fundo traseiro da carcaça preta (atrás da parábola, sem tampar o interior) */
   emitirParFrente('farol', (id) => caixa('cubo', id, fr.x0Base - 2, fr.x1 + 3, fr.y0 - 6, fr.y1 + 6, fr.zCarc0 - 4, fr.zCarc0 + 4), 'plasticoFosco');
 
-  /* 2. Moldura/guarnição externa trapezoidal OCO (encaixa no vão frontal e acompanha a inclinação da grade) */
+  /* 2. Moldura/aro vítreo externo fino (3.5 mm) com cantos arredondados mais suaves (rCanto = 16) */
   emitirParFrente('farol', (id) => {
-    const pExt = pontosTrapezio(-2, 13);
-    const pInt = pontosTrapezio(5.5, 11);
+    const pExt = pontosTrapezio(-1.0, 16);
+    const pInt = pontosTrapezio(2.8, 14);
     const zB = fr.zCarc0 + 2;
     const verts = [];
     for (const [x, y] of pExt) verts.push([m(x), m(y), m(zB)]);
@@ -238,36 +233,11 @@ export function passosFrenteTraseira(T, proxId) {
     return ['subdivisao', { origemId: id, niveis: 0, vertices: verts, faces }];
   }, 'refletorFarol');
 
-  /* 5. Conjunto óptico central da lâmpada H4 com diâmetro MAIOR (coroa refletora clara + bulbo central + farolete lateral) */
-  emitirParFrente('farol', (id) => {
-    const N = 20;
-    const rBase = 34; const rFrente = 24;
-    const z0 = fr.zCarc0 + 9; const z1 = fr.zCarc0 + 30;
-    const verts = [];
-    for (let i = 0; i < N; i += 1) {
-      const a = (2 * Math.PI * i) / N;
-      verts.push([m(frCx + rBase * Math.cos(a)), m(frCy + rBase * Math.sin(a)), m(z0)]);
-    }
-    for (let i = 0; i < N; i += 1) {
-      const a = (2 * Math.PI * i) / N;
-      verts.push([m(frCx + rFrente * Math.cos(a)), m(frCy + rFrente * Math.sin(a)), m(z1)]);
-    }
-    const idxB = verts.length; verts.push([m(frCx), m(frCy), m(z0)]);
-    const idxF = verts.length; verts.push([m(frCx), m(frCy), m(z1 + 5)]);
-    const faces = [];
-    for (let i = 0; i < N; i += 1) {
-      const j = (i + 1) % N;
-      faces.push([j, i, idxB]);
-      faces.push([i, j, N + j, N + i]);
-      faces.push([N + i, N + j, idxF]);
-    }
-    return ['subdivisao', { origemId: id, niveis: 0, vertices: verts, faces }];
-  }, 'refletorNucleo');
-
+  /* 5. Defletor central discreto da lâmpada H4 (sem efeito "alvo" concêntrico artificial) */
   emitirParFrente('farol', (id) => {
     const N = 16;
-    const r = 15;
-    const z0 = fr.zCarc0 + 26; const z1 = fr.zCarc0 + 42;
+    const r = 13;
+    const z0 = fr.zCarc0 + 14; const z1 = fr.zCarc0 + 34;
     const verts = [];
     for (let i = 0; i < N; i += 1) {
       const a = (2 * Math.PI * i) / N;
@@ -275,7 +245,7 @@ export function passosFrenteTraseira(T, proxId) {
     }
     for (let i = 0; i < N; i += 1) {
       const a = (2 * Math.PI * i) / N;
-      verts.push([m(frCx + r * 0.78 * Math.cos(a)), m(frCy - 2 + r * 0.78 * Math.sin(a)), m(z1)]);
+      verts.push([m(frCx + r * 0.72 * Math.cos(a)), m(frCy - 2 + r * 0.72 * Math.sin(a)), m(z1)]);
     }
     const idxB = verts.length; verts.push([m(frCx), m(frCy - 2), m(z0)]);
     const idxF = verts.length; verts.push([m(frCx), m(frCy - 2), m(z1 + 4)]);
@@ -289,25 +259,23 @@ export function passosFrenteTraseira(T, proxId) {
     return ['subdivisao', { origemId: id, niveis: 0, vertices: verts, faces }];
   }, 'calotaLampada');
 
-  /* 6. Lente de vidro trapezoidal com ESTRIAS VERTICAIS REAIS em relevo (fluted glass) + transparência prismática */
+  /* 6. Lente de vidro trapezoidal com 32 ESTRIAS VERTICAIS REAIS finas (fluted glass puro, sem telinha quadriculada) */
   emitirParFrente('farol', (id) => {
-    const COLS = 44; // 22 caneluras verticais nítidas ao longo da largura do farol!
+    const COLS = 64; // 32 caneluras verticais finas ao longo da largura do farol!
     const ROWS = 6;
-    const yMin = fr.y0 + 5.5;
-    const yMax = fr.y1 - 5.5;
+    const yMin = fr.y0 + 3.0;
+    const yMax = fr.y1 - 3.0;
     const ptGrade = (c, r, frente) => {
       const v = r / ROWS;
       const u = c / COLS;
       const y = yMin + (yMax - yMin) * v;
-      const xL = xIntFarol(y) + 5.5;
-      const xR = fr.x1 - 5.5;
+      const xL = xIntFarol(y) + 3.0;
+      const xR = fr.x1 - 3.0;
       const x = xL + (xR - xL) * u;
-      /* chanfro suave nas bordas superior/inferior e laterais */
       const bordaU = Math.min(u, 1 - u);
       const bordaV = Math.min(v, 1 - v);
       const domo = Math.min(1, bordaU * 14) * Math.min(1, bordaV * 6);
-      /* estria vertical bem marcada (fluted glass clássico) */
-      const estria = frente ? (c % 2 === 1 ? 1.9 : -0.8) * domo : 0;
+      const estria = frente ? (c % 2 === 1 ? 1.5 : -0.6) * domo : 0;
       const dz = frente ? (1.4 * domo + estria) : -3.2;
       return [m(x), m(y), m(zFarolFrente(x, y, dz))];
     };
@@ -407,7 +375,8 @@ export function passosFrenteTraseira(T, proxId) {
           const yTop = y1 - dy - arred(u, 7);
           const y = yBot + (yTop - yBot) * vr;
           const domo = Math.min(1, bordaU * 5) * Math.min(1, bordaV * 4);
-          const off = frente ? (offFora * (0.65 + 0.35 * domo)) : offTras;
+          const estriaH = frente && rows >= 12 ? (r % 2 === 1 ? 0.85 : -0.3) * domo : 0;
+          const off = frente ? (offFora * (0.65 + 0.35 * domo) + estriaH) : offTras;
           verts.push(amostrarPeleFrente(u, y, off));
         }
       }
@@ -434,8 +403,8 @@ export function passosFrenteTraseira(T, proxId) {
   emitirParFrente('setaDianteira', (id) => faixaCurvaFrente(id, 0.0, 0.96, stD.y0 - 2, stD.y1 + 2, 0.4, -24, 0.01, 0.5, 10, 6), 'plasticoFosco');
   /* 2. Refletor cromado interno atrás da lente âmbar */
   emitirParFrente('setaDianteira', (id) => faixaCurvaFrente(id, 0.04, 0.80, stD.y0 + 5, stD.y1 - 5, 1.0, -6, 0.015, 1.0, 8, 4), 'refletorFarol');
-  /* 3. Lente âmbar prismática translúcida rente ao para-lama e curva em "D" */
-  emitirParFrente('setaDianteira', (id) => faixaCurvaFrente(id, 0.012, 1.0, stD.y0 + 0.5, stD.y1 - 0.5, 3.4, -5, 0.018, 2.5, 14, 8), 'setaAmbar');
+  /* 3. Lente âmbar translúcida com ESTRIAS HORIZONTAIS reais rente ao para-lama */
+  emitirParFrente('setaDianteira', (id) => faixaCurvaFrente(id, 0.012, 1.0, stD.y0 + 0.5, stD.y1 - 0.5, 3.2, -5, 0.018, 2.5, 14, 16), 'setaAmbar');
 
   // --- PLACA DIANTEIRA ---
   const idPlacaD = proxId();
