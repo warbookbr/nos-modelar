@@ -1,7 +1,7 @@
 /* subdivisao.test.mjs — a subdivisão Catmull-Clark e a operação `subdivisao` contra a saída congelada do oráculo, com determinismo, ponto limite, interpolação, vincos nomeados e vértice sem face. */
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { subdividirCatmullClark, espelharGaiolaEmX, nitidezDoVinco, limitesDaGaiola, refinarGaiola, ajustarGaiolaAsMedidas, ErroDasMedidas, GANHO_MAXIMO_DAS_MEDIDAS, NITIDEZ_VIVA, fatorarLU, resolverLU } from './subdivisao.js';
+import { subdividirCatmullClark, espelharGaiolaEmX, nitidezDoVinco, limitesDaGaiola, refinarGaiola, ajustarGaiolaAsMedidas, ErroDasMedidas, GANHO_MAXIMO_DAS_MEDIDAS, NITIDEZ_VIVA, fatorarLU, resolverLU, ajustarGaiolaAsMedidasComPeso, ajustarGaiolaAsMedidasComPesoDenso, passoDaGaiola } from './subdivisao.js';
 import { enderecosPorIndice } from './operacoes/subdivisao.js';
 import { neutroCanonico, nucleo } from './entrada.js';
 
@@ -500,5 +500,99 @@ describe('subdivisão Catmull-Clark com vincos', () => {
       expect(neutro.orfaos).toHaveLength(1);
       expect(neutro.orfaos[0].motivo).toContain("'pontoSolto'");
     });
+  });
+});
+
+/* O que o plano do ajuste esparso (2026-11-22) precisa saber do solver denso antes de trocá-lo: quanto a gaiola ajustada muda quando só a
+   ordem dos vértices muda, que é a referência que o esparso tem de cumprir (ele elimina noutra ordem), e o que a recusa do sistema singular
+   nomeia. Os números de cada caso estão no banco de provas `ajuste-esparso-2026-11-22`. */
+describe('o ajuste denso diante da ordem dos vértices, e o esparso contra ele', () => {
+  const grade = (nx, nz, ponto) => {
+    const vertices = []; const faces = [];
+    for (let j = 0; j < nz; j++) for (let i = 0; i < nx; i++) vertices.push(ponto(i, j));
+    for (let j = 0; j + 1 < nz; j++) for (let i = 0; i + 1 < nx; i++) { const a = j * nx + i; faces.push([a, a + nx, a + nx + 1, a + 1]); }
+    return { vertices, faces, vincos: [], cantos: [], borda: 'suave' };
+  };
+  /* a grade de 24 por 20 com 50 mm de passo e uma ondulação, e a mesma renumerada por uma permutação fixa (congruencial, sem sorteio) */
+  const g = grade(24, 20, (i, j) => [i * 0.05, 0.02 * Math.sin(0.9 * i) * Math.cos(0.6 * j) + 0.001 * ((i * 7 + j * 13) % 5), j * 0.05]);
+  const n = g.vertices.length;
+  const perm = [...Array(n).keys()];
+  let s = 12345; const proximo = () => (s = (s * 1103515245 + 12345) % 2147483648) / 2147483648;
+  for (let k = n - 1; k > 0; k--) { const r = Math.floor(proximo() * (k + 1)); [perm[k], perm[r]] = [perm[r], perm[k]]; }
+  const novo = new Array(n); perm.forEach((p, k) => { novo[p] = k; });
+  const gr = { ...g, vertices: perm.map((p) => g.vertices[p]), faces: g.faces.map((f) => f.map((p) => novo[p])) };
+  const medidas = (comExatas) => g.vertices.map((_, i) => i).filter((i) => i % 3 === 0).map((i) => ({ indice: i, peso: comExatas && i % 9 === 0 ? Infinity : 0.003 }));
+  const renumeradas = (ms) => ms.map((m) => ({ indice: novo[m.indice], peso: m.peso }));
+  const diferenca = (A, B) => { let d = 0; for (let k = 0; k < n; k++) for (let x = 0; x < 3; x++) d = Math.max(d, Math.abs(A[k][x] - B[novo[k]][x])); return d; };
+  const pelaOrdem = (comExatas, regularizacao) => diferenca(ajustarGaiolaAsMedidasComPesoDenso(g, medidas(comExatas), regularizacao).vertices, ajustarGaiolaAsMedidasComPesoDenso(gr, renumeradas(medidas(comExatas)), regularizacao).vertices);
+  const passo = passoDaGaiola(g.vertices, g.faces);
+  /* o esparso contra o denso na mesma numeração, com o mesmo diferenca (a gaiola renumerada volta pela permutação) */
+  const contraODenso = (gaiola, ms, regularizacao) => {
+    const e = ajustarGaiolaAsMedidasComPeso(gaiola, ms, regularizacao); const d = ajustarGaiolaAsMedidasComPesoDenso(gaiola, ms, regularizacao);
+    let dif = 0; e.vertices.forEach((v, k) => { for (let x = 0; x < 3; x++) dif = Math.max(dif, Math.abs(v[x] - d.vertices[k][x])); });
+    return { dif, e, d };
+  };
+
+  it('sem cota exata, o Cholesky esparso dá a gaiola do denso a 1e-9 m, e o ganho pela cota de Varah fica acima do exato', () => {
+    const ms = medidas(false).map((m) => ({ ...m, peso: 1 }));
+    const { dif, e, d } = contraODenso(g, ms, null);
+    expect(dif).toBeLessThan(1e-9);
+    expect(e.ganhoPelaCota).toBe(true);
+    expect(d.ganhoPelaCota).toBe(false);
+    expect(e.ganho).toBeGreaterThanOrEqual(d.ganho);
+    expect(contraODenso(gr, renumeradas(ms), null).dif).toBeLessThan(1e-9);
+  });
+
+  it('com a energia de curvatura, o esparso fica a dez vezes o piso do denso renumerado, e o ganho é o exato porque a cota não vale', () => {
+    for (const regularizacao of [{ tipo: 'variacaoDeCurvatura' }, { tipo: 'variacaoDeCurvatura', onda: 16 * passo }, { tipo: 'variacaoDeCurvatura', onda: 64 * passo }]) {
+      const piso = Math.max(pelaOrdem(false, regularizacao), 1e-13);
+      const { dif, e } = contraODenso(g, medidas(false), regularizacao);
+      expect(dif).toBeLessThan(10 * piso);
+      expect(e.ganhoPelaCota).toBe(false);
+    }
+  });
+
+  it('sem a energia de curvatura, a ordem muda a gaiola só no arredondamento, abaixo de 1e-12 m: é onde o esparso cumpre 1e-9 m', () => {
+    expect(pelaOrdem(false, null)).toBeLessThan(1e-12);
+    expect(pelaOrdem(true, null)).toBeLessThan(1e-12);
+  });
+
+  it('com a energia de curvatura e a onda longa, o próprio denso muda além de 1e-9 m só pela ordem: a referência do esparso é o piso medido', () => {
+    /* o resto de 1e-9 do deslocamento contra o peso (onda/2π)⁶ da energia deixa o sistema mal condicionado; a tolerância do esparso nesses
+       casos é dez vezes este piso, medido no mesmo caso */
+    expect(pelaOrdem(false, { tipo: 'variacaoDeCurvatura' })).toBeLessThan(1e-11);
+    expect(pelaOrdem(false, { tipo: 'variacaoDeCurvatura', onda: 64 * passo })).toBeGreaterThan(1e-9);
+  });
+
+  it('com cotas exatas, o complemento de Schur dá a gaiola do denso a 1e-9 m sem a energia e a dez vezes o piso com ela', () => {
+    expect(contraODenso(g, medidas(true), null).dif).toBeLessThan(1e-9);
+    expect(contraODenso(gr, renumeradas(medidas(true)), null).dif).toBeLessThan(1e-9);
+    for (const regularizacao of [{ tipo: 'variacaoDeCurvatura' }, { tipo: 'variacaoDeCurvatura', onda: 16 * passo }]) {
+      const piso = Math.max(pelaOrdem(true, regularizacao), 1e-13);
+      expect(contraODenso(g, medidas(true), regularizacao).dif).toBeLessThan(10 * piso);
+    }
+  });
+
+  it('o ajuste só com exatas pelo LU esparso dá a gaiola do ponto de sela denso a 1e-9 m', () => {
+    const exatas = g.vertices.map((_, i) => i).filter((i) => i % 2 === 0);
+    const e = ajustarGaiolaAsMedidas(g, exatas).vertices;
+    const d = ajustarGaiolaAsMedidasComPesoDenso(g, exatas.map((indice) => ({ indice, peso: Infinity }))).vertices;
+    let dif = 0; e.forEach((v, k) => { for (let x = 0; x < 3; x++) dif = Math.max(dif, Math.abs(v[x] - d[k][x])); });
+    expect(dif).toBeLessThan(1e-9);
+  });
+
+  it('a recusa do sistema singular nomeia a base inteira do núcleo, a mesma em qualquer ordem dos vértices', () => {
+    /* dois cubos lisos com todos os vértices exatos: cada cubo sozinho já é singular. A eliminação densa nomeava só o primeiro cubo que
+       eliminava (o primeiro na ordem natural, o segundo na trocada); o LU esparso nomeia a união dos suportes da base do núcleo, que não
+       depende da ordem, e por isso os dois cubos nas duas ordens. */
+    const cubo = (o, l) => ({ v: [[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0], [0, 0, 1], [1, 0, 1], [1, 1, 1], [0, 1, 1]].map((p) => p.map((c, k) => c * l + o[k])), f: [[0, 3, 2, 1], [4, 5, 6, 7], [0, 1, 5, 4], [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7]] });
+    const a = cubo([0, 0, 0], 1); const b = cubo([5, 0, 0], 2);
+    const dois = { vertices: [...a.v, ...b.v], faces: [...a.f, ...b.f.map((f) => f.map((i) => i + 8))], vincos: [], cantos: [] };
+    const todos = dois.vertices.map((_, k) => k);
+    const ordem = [...todos.slice(8), ...todos.slice(0, 8)]; const posicao = []; ordem.forEach((p, k) => { posicao[p] = k; });
+    const trocados = { vertices: ordem.map((p) => dois.vertices[p]), faces: dois.faces.map((f) => f.map((p) => posicao[p])), vincos: [], cantos: [] };
+    const nomeados = (gaiola, volta) => { try { ajustarGaiolaAsMedidas(gaiola, todos); } catch (e) { return e.indices.map(volta).sort((x, y) => x - y); } return null; };
+    expect(nomeados(dois, (k) => k)).toEqual(todos);
+    expect(nomeados(trocados, (k) => ordem[k])).toEqual(todos);
   });
 });

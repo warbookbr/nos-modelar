@@ -6,6 +6,7 @@
 > algum arquivo-fonte estiver sem cabeçalho.
 
 2177 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2183 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -107,6 +108,15 @@
 ## docs/modelar/banco-de-provas/abrir-peca-com-filtros-2026-11-17/
 
 - `README.md` — Abrir peça com filtros, 2026-11-17
+
+## docs/modelar/banco-de-provas/ajuste-esparso-2026-11-22/
+
+- `README.md` — Ajuste esparso da gaiola: a linha de base do solver denso
+- `ensaio-denso-contra-esparso.mjs` — ensaio-denso-contra-esparso.mjs — o gate 4 do plano do ajuste esparso: na lataria do carro-fastback, a mesma receita pelo ajuste esparso (o do núcleo) e pela…
+- `ensaio-denso.mjs` — ensaio-denso.mjs — a linha de base do plano do ajuste esparso (fatia 1): o custo do ajuste denso de hoje na gaiola grande neutra (`tools/fixtures/ajuste-espa…
+- `ensaio-do-carro.mjs` — ensaio-do-carro.mjs — o gate 1 do plano do ajuste esparso: a subdivisão da lataria do quarto traseiro do carro-fastback com a rede mais densa, pela variante …
+- `ensaio-esparso.mjs` — ensaio-esparso.mjs — a fatia 2 do plano do ajuste esparso na gaiola de prova: o tempo do ajuste com peso pelo Cholesky esparso, a estrutura do fator (não nul…
+- `ensaio-sela.mjs` — ensaio-sela.mjs — a medida que decide a fatia 3 do plano do ajuste esparso: o preenchimento do LU esparso no sistema de ponto de sela da gaiola de prova, com…
 
 ## docs/modelar/banco-de-provas/aviao-2026-10-11/
 
@@ -245,6 +255,11 @@
 ## docs/modelar/banco-de-provas/carrinho-refeito-2026-10-08/
 
 - `ATRITOS.md` — Atritos
+
+## docs/modelar/banco-de-provas/carro-fastback-2026-11-14/
+
+- `README.md` — Carro fastback: quanto custa o ajuste da chapa quando ela cresce
+- `ensaio-de-escala.mjs` — ensaio-de-escala.mjs — quanto custa o ajuste da gaiola da lataria do carro-fastback quando a rede cresce até o tamanho do carro inteiro. A rede do quarto tra…
 
 ## docs/modelar/banco-de-provas/comparar-com-a-referencia-2026-11-16/
 
@@ -642,6 +657,7 @@
 - `2026-11-17-trilhas-e-validacao-da-placa.md` — Trilhas de cobre e validação elétrica da placa declarada: a lista de ligações vira cobre conferido por regra e por conectividade
 - `2026-11-22-formas-que-faltavam.md` — Formas que faltavam: o anel, o toro e a bacia provados, a haste no esboço e a curva paralela na rede
 - `2026-11-22-helice-mola-rosca-e-fixador.md` — Hélice, mola, rosca e fixador: um caminho helicoidal que serve a quatro ferramentas que faltam
+- `2026-11-22-superficie-de-producao-g2.md` — Superfície de produção (G2): a chapa de subdivisão sem a ondulação que o crítico acusa, sem sair da forma
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
@@ -1045,6 +1061,8 @@
 - `ajuste-de-curva-lisa-planta.test.mjs` — ajuste-de-curva-lisa-planta.test.mjs — a planta da lataria do carro-fastback (a TABELA da receita, só leitura, o contorno do polígono com filete da prancha) …
 - `ajuste-de-curva-lisa.js` — ajuste-de-curva-lisa.js — a curva lida de pontos (da prancha, de uma imagem) ajustada a poucos trechos de curvatura monótona, com o desvio de cada ponto medido
 - `ajuste-de-curva-lisa.test.mjs` — ajuste-de-curva-lisa.test.mjs — o ajuste de curva lisa em curvas analíticas conhecidas (arco, clotoide, elipse, S), limpas e com ruído de leitura, com o núme…
+- `algebra-esparsa.js` — Álgebra esparsa do núcleo: a matriz simétrica montada por soma de termos, a ordenação de grau mínimo, o Cholesky esparso e a substituição. Tudo é determiníst…
+- `algebra-esparsa.test.mjs` — a matriz de uma grade nx × ny com o estêncil de cinco pontos mais a diagonal, positiva definida e diagonal dominante
 - `alisar-curvas.js` — alisar-curvas.js — os pontos-chave de uma curva declarada alisados pelo resíduo do ajuste polinomial local, sem mexer na forma
 - `alisar-curvas.test.mjs` — alisar-curvas.test.mjs — o alisamento pelo resíduo do ajuste polinomial local: não mexe no arco, no círculo nem na parábola, tira o ruído, deixa os pontos du…
 - `animacao.js` — animacao.js — animação rígida e skinning sobre lotes já adaptados.
@@ -2848,6 +2866,10 @@
 
 - `receita.js` — peca-de-prova/receita.js — a peça que as guardas de navegador usam.
 - `receita.test.mjs` — receita.test.mjs — a peça de prova cumpre o que as guardas exigem dela.
+
+## tools/fixtures/ajuste-esparso/
+
+- `gaiola-grande.mjs` — gaiola-grande.mjs — a gaiola grande e escalável do plano do ajuste esparso, sem objeto: a casca simétrica neutra das chapas de prova (`definicaoDaChapaSimetr…
 
 ## tools/fixtures/comparar-com-prancha/
 

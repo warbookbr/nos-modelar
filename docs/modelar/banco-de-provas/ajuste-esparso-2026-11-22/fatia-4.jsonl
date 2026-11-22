@@ -1,0 +1,3 @@
+{"ensaio":"ensaio-denso-contra-esparso.mjs","passo":"receita","verticesDaGaiola":4255,"medidas":4322,"gaiola":1.02e-14,"malha":5.77e-15,"segundosDoPassoEsparso":0.42,"segundosDoAjusteDenso":26.75}
+{"ensaio":"rodada-de-modelagem.mjs carro-fastback/lataria --acao","medicao":"passou","malhaEPlano":"os mesmos que o crítico julgou na rodada 7"}
+{"ensaio":"retrato-do-acervo.mjs --comparar retrato-antes.json","pecas":12,"iguais":12}

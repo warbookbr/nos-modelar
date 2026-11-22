@@ -1,0 +1,7 @@
+{"ensaio":"ensaio-esparso.mjs","passo":34,"incognitas":1457,"naoNulosH":34121,"naoNulosL":84289,"preenchimento":4.74,"segundosDaFatoracao":0.07,"segundosDoAjuste":0.15,"ganho":3,"ganhoPelaCota":true,"diferencaParaODenso":4.55e-18,"ganhoDenso":0.6801}
+{"ensaio":"ensaio-esparso.mjs","passo":21,"incognitas":3577,"naoNulosH":85801,"naoNulosL":269245,"preenchimento":6.02,"segundosDaFatoracao":0.2,"segundosDoAjuste":0.29,"ganho":3,"ganhoPelaCota":true,"diferencaParaODenso":4.66e-18,"ganhoDenso":0.6801}
+{"ensaio":"ensaio-esparso.mjs","passo":16,"incognitas":6305,"naoNulosH":152801,"naoNulosL":546541,"preenchimento":6.87,"segundosDaFatoracao":0.3,"segundosDoAjuste":0.52,"ganho":3,"ganhoPelaCota":true,"diferencaParaODenso":5.1e-18,"ganhoDenso":0.6801}
+{"ensaio":"ensaio-esparso.mjs","passo":12,"incognitas":10795,"naoNulosH":263551,"naoNulosL":1158191,"preenchimento":8.44,"segundosDaFatoracao":1.28,"segundosDoAjuste":1.8,"ganho":3,"ganhoPelaCota":true}
+{"ensaio":"ensaio-do-carro.mjs","passo":70,"semMedidas":false,"verticesDaGaiola":2161,"medidas":2161,"segundosDaSubdivisao":3.28,"picoMb":588}
+{"ensaio":"ensaio-do-carro.mjs","passo":35,"semMedidas":true,"verticesDaGaiola":5162,"medidas":0,"segundosDaSubdivisao":6.79,"picoMb":1223}
+{"ensaio":"ensaio-do-carro.mjs","passo":35,"semMedidas":false,"verticesDaGaiola":5162,"medidas":5162,"segundosDaSubdivisao":10.63,"picoMb":1087}

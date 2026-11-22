@@ -288,8 +288,9 @@ export function ajustesDeCurva(T) {
     ...Object.entries(tabelasLisas(T)).map(([nome, [tabela, L]]) => { const e = entradaDaCurva(tabela, L); return { nome, pontos: e.lidos, opcoes: e.opcoes }; })];
 }
 
-/** O que `tools/modelar/regravar-ajustes-de-curva.mjs` lê desta receita: o arquivo do dado, ao lado deste, e os ajustes a guardar. */
-export const AJUSTES_DE_CURVA = { arquivo: 'ajustes-de-curva.js', pedidos: () => ajustesDeCurva(TABELA) };
+/** O que `tools/modelar/regravar-ajustes-de-curva.mjs` lê desta receita: o arquivo do dado, ao lado deste, e os ajustes a guardar, os da tabela do arquivo
+ * (`receita.PARAMS`, lida na chamada, e não na importação). */
+export const AJUSTES_DE_CURVA = { arquivo: 'ajustes-de-curva.js', pedidos: () => ajustesDeCurva(receita.PARAMS) };
 
 const AVISADOS = new Set();
 
@@ -642,7 +643,6 @@ const LANTERNA = { origem: { op: 'aberturaPorContorno', id: 5 } };
 const VIDRO_TRASEIRO = { origem: { op: 'aberturaPorContorno', id: 6 } };
 
 const furoDoArco = (T) => furoPassante({ solido: { origem: { op: 'subdivisao', id: 1 } }, posicao: [0, T.arco.y, T.arco.z], direcao: 'x', raio: T.arco.raio, comprimento: 2 * T.planta[3][1] + 300, lados: T.arco.lados, ids: { cilindro: 2, subtrair: 3 }, nome: 'arco' });
-export const ALIASES = furoDoArco(TABELA).aliases;
 
 /** Os PASSOS, em metro: a chapa subdividida com espessura e os quatro vãos abertos nela, o arco, o vidro lateral, a lanterna e o vidro traseiro. */
 export function gerarPassos(T) {
@@ -666,9 +666,14 @@ export function gerarPassos(T) {
 /* RODADA 6. O mais largo da chapa do lado +x fica onde ela encosta na região do para-lama (o z da frente da caixa dele): dali para trás a face é do para-lama. O esperado é a
  * planta lisa nesse z; antes era a meia largura da boca do arco menos 10 mm, acertado à mão para a chapa que o alisamento encolhia. */
 const larguraDaChapaNaFrenteDoParalama = (T) => { const O = plantaLisa(T); return +O.ponto(O.deZ(T.partes.paralama.max[2]))[1].toFixed(1); };
-export const PONTOS = [
-  { nome: 'canto de baixo de trás da chapa: o lado -x, a soleira e o fim da traseira', parte: 'chapa', medida: 'minimo', em: [-TABELA.planta[3][1], TABELA.soleira[0][1], Math.min(...TABELA.traseira.map(([, z]) => z))], toleranciaMm: 6 },
-  { nome: 'canto de cima da frente da chapa: o teto sobre a porta, no corte de z 0', parte: 'chapa', medida: 'maximo', em: [larguraDaChapaNaFrenteDoParalama(TABELA), TABELA.teto[1][1], 0], toleranciaMm: 6 },
+/* Os PONTOS, as saliências e os aliases saem da tabela dada, e a receita os lê por getters de this.PARAMS: a variante de --params os leva junto com os passos. */
+export const pontos = (T) => [
+  { nome: 'canto de baixo de trás da chapa: o lado -x, a soleira e o fim da traseira', parte: 'chapa', medida: 'minimo', em: [-T.planta[3][1], T.soleira[0][1], Math.min(...T.traseira.map(([, z]) => z))], toleranciaMm: 6 },
+  { nome: 'canto de cima da frente da chapa: o teto sobre a porta, no corte de z 0', parte: 'chapa', medida: 'maximo', em: [larguraDaChapaNaFrenteDoParalama(T), T.teto[1][1], 0], toleranciaMm: 6 },
+];
+const saliencias = (T) => [
+  { regiao: { min: [780, 250, -1950], max: [960, 1010, -700] }, sentido: 'fora', amplitudeMm: 38, motivo: 'o para-lama traseiro sai 38 mm sobre a linha da porta (950 contra 912 de meia largura, vista de cima), sem moldura, por desenho' },
+  { regiao: caixasDasPartes(T).rebaixo, sentido: 'dentro', amplitudeMm: T.rebaixo.profundidade, motivo: 'o rebaixo côncavo em cunha da lateral, da porta até morrer antes do arco traseiro, sob o vinco do ombro, é feição de dupla curvatura desenhada' },
 ];
 
 /* O que só esta peça diz ao pacote do crítico: as pranchas estão no referencial do carro em mm (o quarto traseiro cai sobre a metade de
@@ -683,36 +688,36 @@ export const CRITICA = {
   referencias: { 'lateral.png': 'direita', 'traseira.png': 'traseira' },
 };
 
+/** O PLANO da tabela dada: as saliências leem a profundidade do rebaixo dela. */
+const plano = (T) => ({
+  objeto: 'o quarto traseiro de um cupê fastback de 4750 mm, do meio da porta para trás, lado +x',
+  referencias: ['../../referencias/lateral.prancha.svg', '../../referencias/traseira.prancha.svg', '../../referencias/superior.prancha.svg', '../../referencias/locais/lateral.png', '../../referencias/locais/traseira.png'],
+  escala: { medida: 'comprimento total do carro, de z -2375 a 2375', milimetros: 4750 },
+  partes: [
+    { nome: 'chapa', forma: 'chapa contínua de 2 mm do meio da porta à traseira, lisa, com teto, coluna até a tampa, quina, arco, degrau do ombro, degrau das lanternas (aba da tampa sobre a faixa recuada) e os vãos de vidro e lanterna', tecnica: 'subdivisao de uma gaiolaPorRede cujas arestas seguem as curvas da prancha, com os vãos por furoPassante e aberturaPorContorno' },
+    { nome: 'paralamaTraseiro', forma: 'a faixa da chapa do para-lama traseiro, que sai 38 mm sobre a linha da porta vista de cima, sem moldura de arco', tecnica: 'região da mesma chapa, da pele analítica da planta (meia largura 950 contra 912)' },
+    { nome: 'rebaixoLateral', forma: 'o rebaixo côncavo em cunha da lateral, do meio da porta até morrer antes do arco, sob o vinco do ombro', tecnica: 'região da mesma chapa, com um sino de profundidade entre a base e o topo do rebaixo' },
+  ],
+  criteriosDeReprovacao: [
+    'a chapa não vai de z 0 a -2375, ou a silhueta de lado, de cima ou de trás sai da prancha além da tolerância da rodada',
+    'o para-lama traseiro não sai cerca de 40 mm sobre a linha da porta, ou ganha moldura de arco',
+    'o rebaixo da lateral é convexo, ou continua além do arco traseiro, ou some antes da porta',
+    'falha de ondulação fora das saliências declaradas, quina do ombro sem raio, ou aresta facetada',
+    'o vão do vidro lateral, o arco da roda ou o vão da lanterna ausentes, ou a coluna sem cair até a tampa',
+    'a traseira sem o degrau das lanternas: a tampa que não termina em aba sobre a faixa recuada dos vãos, ou a chapa que não volta para fora abaixo dela',
+  ],
+  /* as três partes são a mesma chapa: a curvatura da lataria as lê juntas (só com 'chapa', o para-lama e o rebaixo saíam cinza, sem dado) */
+  lataria: { partes: ['chapa', 'paralamaTraseiro', 'rebaixoLateral'] },
+  saliencias: saliencias(T),
+});
+
 const receita = {
   meta: { nome: 'carro-fastback/lataria', desc: 'o quarto traseiro do cupê fastback: chapa contínua do meio da porta para trás, com para-lama saliente, rebaixo, coluna, arco e vãos' },
   PARAMS: TABELA,
-  ALIASES,
+  get ALIASES() { return furoDoArco(this.PARAMS).aliases; },
   get TOPO() { return { origem: 'o centro do carro no chão: x para a direita, y para cima, a frente em +z', ...derivar(this.PARAMS).rede.pontos }; },
-  PLANO: {
-    objeto: 'o quarto traseiro de um cupê fastback de 4750 mm, do meio da porta para trás, lado +x',
-    referencias: ['../../referencias/lateral.prancha.svg', '../../referencias/traseira.prancha.svg', '../../referencias/superior.prancha.svg', '../../referencias/locais/lateral.png', '../../referencias/locais/traseira.png'],
-    escala: { medida: 'comprimento total do carro, de z -2375 a 2375', milimetros: 4750 },
-    partes: [
-      { nome: 'chapa', forma: 'chapa contínua de 2 mm do meio da porta à traseira, lisa, com teto, coluna até a tampa, quina, arco, degrau do ombro, degrau das lanternas (aba da tampa sobre a faixa recuada) e os vãos de vidro e lanterna', tecnica: 'subdivisao de uma gaiolaPorRede cujas arestas seguem as curvas da prancha, com os vãos por furoPassante e aberturaPorContorno' },
-      { nome: 'paralamaTraseiro', forma: 'a faixa da chapa do para-lama traseiro, que sai 38 mm sobre a linha da porta vista de cima, sem moldura de arco', tecnica: 'região da mesma chapa, da pele analítica da planta (meia largura 950 contra 912)' },
-      { nome: 'rebaixoLateral', forma: 'o rebaixo côncavo em cunha da lateral, do meio da porta até morrer antes do arco, sob o vinco do ombro', tecnica: 'região da mesma chapa, com um sino de profundidade entre a base e o topo do rebaixo' },
-    ],
-    criteriosDeReprovacao: [
-      'a chapa não vai de z 0 a -2375, ou a silhueta de lado, de cima ou de trás sai da prancha além da tolerância da rodada',
-      'o para-lama traseiro não sai cerca de 40 mm sobre a linha da porta, ou ganha moldura de arco',
-      'o rebaixo da lateral é convexo, ou continua além do arco traseiro, ou some antes da porta',
-      'falha de ondulação fora das saliências declaradas, quina do ombro sem raio, ou aresta facetada',
-      'o vão do vidro lateral, o arco da roda ou o vão da lanterna ausentes, ou a coluna sem cair até a tampa',
-      'a traseira sem o degrau das lanternas: a tampa que não termina em aba sobre a faixa recuada dos vãos, ou a chapa que não volta para fora abaixo dela',
-    ],
-    /* as três partes são a mesma chapa: a curvatura da lataria as lê juntas (só com 'chapa', o para-lama e o rebaixo saíam cinza, sem dado) */
-    lataria: { partes: ['chapa', 'paralamaTraseiro', 'rebaixoLateral'] },
-    saliencias: [
-      { regiao: { min: [780, 250, -1950], max: [960, 1010, -700] }, sentido: 'fora', amplitudeMm: 38, motivo: 'o para-lama traseiro sai 38 mm sobre a linha da porta (950 contra 912 de meia largura, vista de cima), sem moldura, por desenho' },
-      { regiao: caixasDasPartes(TABELA).rebaixo, sentido: 'dentro', amplitudeMm: TABELA.rebaixo.profundidade, motivo: 'o rebaixo côncavo em cunha da lateral, da porta até morrer antes do arco traseiro, sob o vinco do ombro, é feição de dupla curvatura desenhada' },
-    ],
-  },
-  PONTOS,
+  get PLANO() { return plano(this.PARAMS); },
+  get PONTOS() { return pontos(this.PARAMS); },
   contatos: [],
   /* Os três vãos por contorno ficam sem moldura nesta etapa: o vidro e a borracha são da etapa de vidros e a lanterna é peça de borda, que a fatia 5 põe atrás do vão. */
   vaos: [

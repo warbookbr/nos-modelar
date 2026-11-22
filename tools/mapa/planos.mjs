@@ -2,7 +2,7 @@
    sobreposição, e que nenhum plano executivo ultrapassa o limite curto acordado. */
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
-import { dirname, join, relative } from 'node:path';
+import { dirname, join, relative, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '../..');
@@ -336,7 +336,7 @@ export function acrescentarNaCronica(cronica, nome, linha, commit) {
 export function trocarLinksDoPlano(texto, arquivo, plano, cronica) {
   const pasta = dirname(arquivo);
   return texto.replace(/(\]\()([^)#\s]+)(#[^)\s]*)?\)/g, (tudo, abre, alvo) => {
-    if (alvo.includes('://') || join(pasta, alvo) !== plano) return tudo;
+    if (alvo.includes('://') || join(pasta, alvo).split(sep).join('/') !== plano) return tudo;
     return `${abre}${relative(pasta, cronica).replace(/\\/g, '/') || cronica.split('/').pop()})`;
   });
 }
