@@ -53,8 +53,8 @@ export const TABELA = {
     traseiro: [[-545, 1325, -1590, 24], [545, 1325, -1590, 24], [655, 985, -1945, 24], [-655, 985, -1945, 24]],
   },
   aberturas: {
-    /* contorno real da porta (vista x): soleira contínua em y = 255..328, coluna A fixa na frente, calha do teto em y = 1342 e coluna B fixa atrás */
-    porta: [[820, 328, 16], [818, 918, 18], [745, 938, 18], [295, 1342, 24], [-388, 1342, 16], [-398, 945, 14], [-390, 328, 16]],
+    /* contorno real da porta (vista x): soleira contínua em y = 255..328, coluna A fixa na frente com curva ampla (r = 135 mm concêntrica ao vidro), calha do teto em y = 1342 e coluna B fixa atrás */
+    porta: [[820, 328, 16], [818, 918, 18], [745, 938, 18], [280, 1342, 135], [-388, 1342, 16], [-398, 945, 14], [-390, 328, 16]],
     /* vão frontal para grade + faróis; o recorte do capô (topo + lábio até y = 700) entra via subtrair dedicado */
     frontal: [[-742, 568, 12], [742, 568, 12], [742, 700, 12], [-742, 700, 12]],
     /* Curva 4: borda interna acompanha o trapézio da tampa (634 embaixo subindo para 664 em cima) */
