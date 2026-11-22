@@ -46,7 +46,7 @@ O núcleo não ganha nome de objeto: o ajudante se chama pelo que gera, o caminh
 ## Fatias
 
 1. Feita em 2026-11-22: o caminho helicoidal (`caminhoHelicoidal`, com ficha em `npm run capacidade`) e as `normais` do friso, provados na peça neutra `tools/fixtures/helice/`.
-2. A família `mola`, com as imagens à pessoa.
+2. Feita em 2026-11-22: a família `mola` (compressão, tração e torção), com a camada mecânica gravada e a forma aprovada pela pessoa por imagem; o friso ganhou a `helice` declarada, para a composição passar só números.
 3. A rosca sobre cilindro e a família `fixador`, com as imagens à pessoa.
 4. Fechamento: mapa, backlog e encerramento.
 
@@ -67,4 +67,4 @@ Preencher somente ao concluir ou cancelar.
 
 ## Andamento
 
-Em 2026-11-22 a fatia 1 foi entregue; o fio de uma mola de 6 voltas sai sólido fechado em cerca de 45 ms e o filete de 12 voltas em cerca de 10 ms.
+Em 2026-11-22 as fatias 1 e 2 foram entregues. A pessoa aprovou a forma das três molas pelas imagens isométricas da bancada e autorizou gravar a camada mecânica do `aprovacao.json`, que deixa as camadas do crítico e da pessoa em null como nas outras famílias. Na fatia 1, o fio de uma mola de 6 voltas sai sólido fechado em cerca de 45 ms e o filete de 12 voltas em cerca de 10 ms.

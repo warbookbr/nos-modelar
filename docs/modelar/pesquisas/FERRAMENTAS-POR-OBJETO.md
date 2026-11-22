@@ -27,7 +27,7 @@ Os tipos são três. O modificador age sobre uma forma que já existe; o gerador
 | 13 | guia linear (`guia`) | especializado | 32 (9%) | 13 | parcial | gera trilho e carro, corrediça de gaveta e guia em V por tamanho e curso |
 | 14 | tubulação com conexões (`tubulacao`) | gerador | 27 (7%) | 11 | não | traça uma rede de tubos e põe sozinha as curvas, tês, reduções, flanges e válvulas por bitola |
 | 15 | engrenagens (`engrenagem`) | especializado | 26 (7%) | 11 | não | gera engrenagem reta, helicoidal, cônica, sem-fim, cremalheira e catraca com dente evolvente por módulo e número de dentes, e diz a distância entre centros do par |
-| 16 | molas (`mola`) | especializado | 26 (7%) | 10 | não | gera mola de compressão, tração com ganchos e torção com braços, com espiras fechadas nas pontas e comprimento entre dois pontos |
+| 16 | molas (`mola`) | especializado | 26 (7%) | 10 | parcial | gera mola de compressão, tração com ganchos e torção com braços, com espiras fechadas nas pontas e comprimento entre dois pontos |
 | 17 | rosca (`rosca`) | especializado | 26 (7%) | 13 | não | faz rosca macho ou fêmea métrica, trapezoidal ou de tampa, em qualquer cilindro ou furo |
 | 18 | tecido e estofado (`tecido`) | gerador | 26 (7%) | 11 | não | faz almofada inflada com costura, lona esticada, vela e rede a partir de contorno e pressão |
 | 19 | atuador linear (`atuador`) | especializado | 25 (7%) | 10 | parcial | gera cilindro hidráulico ou pneumático e fuso com camisa, haste, olhais e portas, por curso e diâmetro, ligado entre dois pontos |
@@ -43,7 +43,7 @@ Os tipos são três. O modificador age sobre uma forma que já existe; o gerador
 | 29 | dobrar, torcer e afunilar (`deforma`) | modificador | 11 (3%) | 9 | não | deforma uma forma pronta ao longo de um eixo (shape de skate, lâmina curva, escudo abaulado, cabide) |
 | 30 | rolamentos e buchas (`rolamento`) | especializado | 11 (3%) | 4 | não | gera rolamento por série com anéis, corpos rolantes, gaiola e vedação, e bucha e mancal com furação |
 | 31 | lâmina e dentes de corte (`lamina`) | especializado | 10 (3%) | 6 | não | gera gume afiado, serrilha e dentes de serra ao longo de uma borda |
-| 32 | hélice (`helice`) | gerador | 9 (2%) | 3 | não | gera o caminho e o sólido helicoidal de passo, raio e voltas quaisquer (mola, rosca, caracol transportador, bobina, escada caracol) |
+| 32 | hélice (`helice`) | gerador | 9 (2%) | 3 | parcial | gera o caminho e o sólido helicoidal de passo, raio e voltas quaisquer (mola, rosca, caracol transportador, bobina, escada caracol) |
 | 33 | encaixe por pressão (`encaixe`) | especializado | 8 (2%) | 4 | não | gera clipe, gancho elástico e engate entre duas peças, com a folga certa |
 | 34 | placa de circuito (`pcb`) | gerador | 8 (2%) | 7 | parcial | faz a placa com furos de fixação e componentes por encapsulamento padrão |
 | 35 | varredura de perfil (`varre`) | gerador | 8 (2%) | 6 | parcial | passa um perfil qualquer ao longo de um caminho 3D, com seção que pode mudar no percurso (duto, trompete, armação de óculos) |
@@ -73,7 +73,7 @@ As ferramentas que não existem ou existem em parte, na mesma ordem, com o que j
 - guia linear (`parcial`, 32 objetos): trilho simples de gaveta e de porta de correr dentro da família `movel-de-caixa`, com articulação prismática; trilho e carro avulsos e guia em V não.
 - tubulação com conexões (`não`, 27 objetos): nem esboço nem núcleo.
 - engrenagens (`não`, 26 objetos): nenhum gerador; o componente engrenagem do esboço antigo saiu com ele em 2026-11-05.
-- molas (`não`, 26 objetos): nenhum gerador; o componente mola do esboço antigo saiu com ele em 2026-11-05.
+- molas (`parcial`, 26 objetos): família `mola`: compressão de pontas encostadas, tração com gancho em cada ponta e torção com braços retos, por fio, diâmetro externo, comprimento livre e espiras; ponta retificada, gancho de outros tipos e mola montada entre dois pontos não.
 - rosca (`não`, 26 objetos): nem esboço nem núcleo.
 - tecido e estofado (`não`, 26 objetos): nem esboço nem núcleo.
 - atuador linear (`parcial`, 25 objetos): família `cilindro-hidraulico`: camisa, haste, êmbolo, cabeça e olhais liso e com rótula, curso conferido; cilindro de haste dupla e telescópico não.
@@ -89,7 +89,7 @@ As ferramentas que não existem ou existem em parte, na mesma ordem, com o que j
 - dobrar, torcer e afunilar (`não`, 11 objetos): nem esboço nem núcleo.
 - rolamentos e buchas (`não`, 11 objetos): nenhum gerador; os componentes rolamento e mancal do esboço antigo saíram com ele em 2026-11-05.
 - lâmina e dentes de corte (`não`, 10 objetos): nem esboço nem núcleo.
-- hélice (`não`, 9 objetos): nenhum gerador; a hélice sai só como friso ao longo de uma polilinha helicoidal calculada na receita, e o componente mola do esboço antigo saiu com ele em 2026-11-05.
+- hélice (`parcial`, 9 objetos): o ajudante `caminhoHelicoidal` do núcleo (raio, passo, voltas, sentido e passo próprio nas pontas) e a `helice` declarada no `friso`, que varre um perfil ao longo dela com a normal radial; o caracol transportador e a escada caracol não têm gerador próprio.
 - encaixe por pressão (`não`, 8 objetos): nem esboço nem núcleo.
 - placa de circuito (`parcial`, 8 objetos): família `componente-eletronico`: dezenove encapsulamentos (resistor, capacitores, TO-220, TO-92, DIP, SOIC, LED, borne, jack, módulos) assentados na placa de prova; trilhas e furação de fixação por projeto não.
 - varredura de perfil (`parcial`, 8 objetos): núcleo: loft ao longo de caminho, com seção que muda, e friso de perfil declarado ao longo de polilinha.
@@ -110,10 +110,6 @@ Traça uma rede de tubos e põe sozinha as curvas, tês, reduções, flanges e v
 ### engrenagens (`engrenagem`)
 
 Gera engrenagem reta, helicoidal, cônica, sem-fim, cremalheira e catraca com dente evolvente por módulo e número de dentes, e diz a distância entre centros do par. Parâmetros: tipo, módulo, dentes, ângulo de pressão, largura. Referências: FreeCAD Gears; BOSL2: gears; Blender: Extra Objects (gears). Aqui: não, nenhum gerador; o componente engrenagem do esboço antigo saiu com ele em 2026-11-05. Atende 26 objetos em 11 famílias.
-
-### molas (`mola`)
-
-Gera mola de compressão, tração com ganchos e torção com braços, com espiras fechadas nas pontas e comprimento entre dois pontos. Parâmetros: tipo, diâmetro do arame, diâmetro médio, voltas, comprimento livre. Referências: BOSL2; FreeCAD: Spring; Blender: Extra Objects. Aqui: não, nenhum gerador; o componente mola do esboço antigo saiu com ele em 2026-11-05. Atende 26 objetos em 10 famílias.
 
 ### rosca (`rosca`)
 
@@ -154,10 +150,6 @@ Gera rolamento por série com anéis, corpos rolantes, gaiola e vedação, e buc
 ### lâmina e dentes de corte (`lamina`)
 
 Gera gume afiado, serrilha e dentes de serra ao longo de uma borda. Parâmetros: ângulo do gume, dentes, passo, travamento. Referências: BOSL2 (técnica por perfil). Aqui: não, nem esboço nem núcleo. Atende 10 objetos em 6 famílias.
-
-### hélice (`helice`)
-
-Gera o caminho e o sólido helicoidal de passo, raio e voltas quaisquer (mola, rosca, caracol transportador, bobina, escada caracol). Parâmetros: raio, passo, voltas, perfil, sentido. Referências: Blender: modificador Screw; CadQuery: Wire.makeHelix; BOSL2: helix e spiral_sweep. Aqui: não, nenhum gerador; a hélice sai só como friso ao longo de uma polilinha helicoidal calculada na receita, e o componente mola do esboço antigo saiu com ele em 2026-11-05. Atende 9 objetos em 3 famílias.
 
 ### encaixe por pressão (`encaixe`)
 
@@ -231,6 +223,10 @@ Gera botão rotativo, manípulo, volante e cabo ergonômico com furo de eixo e e
 
 Gera trilho e carro, corrediça de gaveta e guia em V por tamanho e curso. Parâmetros: tamanho, curso, tipo. Referências: catálogos de fabricantes em STEP (conceito). Aqui: parcial, trilho simples de gaveta e de porta de correr dentro da família `movel-de-caixa`, com articulação prismática; trilho e carro avulsos e guia em V não. Atende 32 objetos em 13 famílias.
 
+### molas (`mola`)
+
+Gera mola de compressão, tração com ganchos e torção com braços, com espiras fechadas nas pontas e comprimento entre dois pontos. Parâmetros: tipo, diâmetro do arame, diâmetro médio, voltas, comprimento livre. Referências: BOSL2; FreeCAD: Spring; Blender: Extra Objects. Aqui: parcial, família `mola`: compressão de pontas encostadas, tração com gancho em cada ponta e torção com braços retos, por fio, diâmetro externo, comprimento livre e espiras; ponta retificada, gancho de outros tipos e mola montada entre dois pontos não. Atende 26 objetos em 10 famílias.
+
 ### atuador linear (`atuador`)
 
 Gera cilindro hidráulico ou pneumático e fuso com camisa, haste, olhais e portas, por curso e diâmetro, ligado entre dois pontos. Parâmetros: diâmetro, curso, extensão, montagem das pontas. Referências: catálogos de fabricantes em STEP (conceito). Aqui: parcial, família `cilindro-hidraulico`: camisa, haste, êmbolo, cabeça e olhais liso e com rótula, curso conferido; cilindro de haste dupla e telescópico não. Atende 25 objetos em 10 famílias.
@@ -250,6 +246,10 @@ Gera asa, empenagem, pá de hélice, rotor e ventoinha por perfil NACA, corda, t
 ### corte e união gerais (`booleana`)
 
 Subtrai, une ou intersecta formas quaisquer, para rasgos, janelas, cavidades e peças fundidas. Parâmetros: operandos, operação. Referências: Blender: modificador Boolean; Manifold; CadQuery: cut, union. Aqui: parcial, núcleo: subtrair, unir, intersectar e aparar, também no esboço 2.0 pelos passos crus; o esboço 2.0 não tem atalho de recorte entre formas. Atende 11 objetos em 9 famílias.
+
+### hélice (`helice`)
+
+Gera o caminho e o sólido helicoidal de passo, raio e voltas quaisquer (mola, rosca, caracol transportador, bobina, escada caracol). Parâmetros: raio, passo, voltas, perfil, sentido. Referências: Blender: modificador Screw; CadQuery: Wire.makeHelix; BOSL2: helix e spiral_sweep. Aqui: parcial, o ajudante `caminhoHelicoidal` do núcleo (raio, passo, voltas, sentido e passo próprio nas pontas) e a `helice` declarada no `friso`, que varre um perfil ao longo dela com a normal radial; o caracol transportador e a escada caracol não têm gerador próprio. Atende 9 objetos em 3 famílias.
 
 ### placa de circuito (`pcb`)
 
