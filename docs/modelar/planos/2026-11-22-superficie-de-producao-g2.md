@@ -53,7 +53,7 @@ Desligada, a opção dá a mesma gaiola de hoje, bit a bit. As cotas exatas cont
 
 ## Gate de saída
 
-1. Nas chapas analíticas e nas de prova, com a opção ligada, o desvio a mais de 100 mm da borda é igual ou menor que sem a opção, inclusive na grade de razão 2 e na calota assimétrica, e as marcas CONHECIDAS saem dos testes.
+1. Nas chapas analíticas e nas de prova, com a opção ligada, o desvio a mais de 100 mm da borda é igual ou menor que sem a opção, com folga de 0,05 mm (decisão da pessoa em 2026-11-22), inclusive na grade de razão 2 e na calota assimétrica, e as marcas CONHECIDAS saem dos testes.
 2. A quadrática inclinada na própria gaiola tem energia nula, e a esfera, o cilindro e o plano também.
 3. No quarto traseiro a zebra não sobe em nenhuma região, a distância à pele no flanco fica até 1,5 mm e a silhueta não incha mais que 0,5 mm, medidas pelas ferramentas novas.
 4. O custo da subdivisão com a opção ligada fica dentro do dobro do custo sem ela, medido no ensaio de escala.
@@ -76,6 +76,8 @@ Se na fatia 2 nenhuma das duas formas passar nas chapas da revisão de 2026-11-1
 ## Andamento
 
 Fatia 1, primeira parte, feita em 2026-11-22, com as medidas em `docs/modelar/banco-de-provas/superficie-g2-2026-11-22/`. A distância à pele é a ferramenta `tools/modelar/distancia-a-pele.mjs`, que mede a superfície limite contra a pele que a receita exporta em `PELE(PARAMS)`, e com `--zebra --contra` dá o veredito que junta as duas medidas contra uma linha de base. O carro-fastback exporta a pele do flanco, e a linha de base do quarto traseiro está gravada: no flanco, longe da borda da soleira e sem o arco, a chapa fica a até 1,79 mm da pele, acima do 1,5 mm do gate 3, que a receita registrava com roteiro de rascunho sobre outra faixa. A decisão de manter o 1,5 mm ou medi-lo contra a linha de base fica para a fatia 5, com a pessoa. A segunda parte, o diagnóstico do preenchimento, foi feita no mesmo dia: com `alisarSuperficie`, a `gaiolaPorRede` publica `preenchimento`, o motivo de cada lado de cada retalho de quatro lados, e `tools/modelar/preenchimento-da-rede.mjs` o mostra de qualquer receita, ligando a opção só para medir. No quarto traseiro de hoje são 69 retalhos e 276 lados: 174 com vizinho, 8 cortados pela razão de cordas, 61 por vinco, 17 por borda livre, 15 no plano de simetria e 1 por retalho de n lados ao lado, o mesmo quadro da cópia instrumentada de 2026-11-21 com a receita de hoje. A fatia 1 está feita.
+
+Fatia 2, decisão da pessoa em 2026-11-22, com as medidas do protótipo no banco de provas: a cota completa, refeita sobre a gaiola do ajuste anterior (quatro iterações), e não a cota só na normal, que tira a cota exata do lugar. Na mesma recomendação aceita, o gate 1 ganha folga de 0,05 mm, porque a sela, cuja curvatura normal varia de fato no espaço, fica até 0,021 mm pior que sem a opção com qualquer forma. O gate 2 cobra energia nula na quadrática inclinada, que é a propriedade da energia de hoje e não a da curvatura normal (nula na esfera, no cilindro e no plano, e não na inclinada, cuja curvatura varia de fato); a correção do texto vai à pessoa.
 
 ## Fechamento
 
