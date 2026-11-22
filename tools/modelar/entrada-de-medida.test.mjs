@@ -4,7 +4,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { divergenciaDaImpressao } from '../../procedural/nucleo/planejador/impressao-do-neutro.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
@@ -250,7 +250,7 @@ describe('a face que a exportação não triangula', () => {
 
 /* A receita por parâmetro das provas abaixo: a chapa em V de `fixtures/dobra-por-apoio.mjs`, com os passos e o TOPO saindo de `this.PARAMS`.
    `extra` entra no módulo depois da tabela, para a receita que lê a tabela direto. */
-const FIXTURE_DA_DOBRA = join(AQUI, 'fixtures/dobra-por-apoio.mjs');
+const FIXTURE_DA_DOBRA = pathToFileURL(join(AQUI, 'fixtures/dobra-por-apoio.mjs')).href;
 const textoDaParametrica = (extra = '', campos = '') => `import { receitaDaDobra } from ${JSON.stringify(FIXTURE_DA_DOBRA)};
 export const TABELA = { angulo: 90, chapa: { niveis: 1, espessura: 1 } };
 const dobra = (T) => receitaDaDobra({ angulo: T.angulo, niveis: T.chapa.niveis, espessura: T.chapa.espessura });
