@@ -46,7 +46,7 @@ export const TABELA = {
   vidros: {
     /* Coluna A fixa intacta no para-brisa + quadro completo da porta + Coluna B mais larga e paralela (~98 mm total) */
     porta: [[635, 962, 18], [255, 1310, 105], [-346, 1312, 16], [-356, 962, 16]],
-    lateralTraseiro: [[-442, 1342, 18], [-1435, 1342, 24], [-1805, 974, 18], [-1770, 960, 18], [-456, 960, 24]],
+    lateralTraseiro: [[-442, 1312, 18], [-1435, 1312, 24], [-1805, 974, 18], [-1770, 960, 18], [-456, 960, 24]],
     paraBrisaVista: [0, 0.77, 0.63],
     paraBrisa: [[-678, 948, 830, 34], [678, 948, 830, 34], [548, 1344, 365, 38], [-548, 1344, 365, 38]],
     traseiroVista: [0, 0.70, -0.71],
