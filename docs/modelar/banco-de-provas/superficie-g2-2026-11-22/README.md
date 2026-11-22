@@ -49,3 +49,28 @@ No flanco a chapa já fica a 1,79 mm da pele, acima do 1,5 mm que o gate 3 do pl
 ## O preenchimento do quarto
 
 São 69 retalhos de quatro lados e 276 lados. Têm vizinho 174 lados, e 166 deles com razão de cordas até 1,5. Ficam sem vizinho 61 lados por vinco, 17 por borda livre, 15 no plano de simetria, 1 por retalho de n lados ao lado (o `r8_coluna`, junto do `S9ombro`) e 8 cortados pela razão de cordas acima de 4: o lado de cima de cinco retalhos da soleira (`r4_soleira` a `r8_soleira`, razão de 4,9 a 7,4, porque a faixa da soleira é estreita contra a de cima) e três lados na calota da traseira (`c_base` e `c_soleira`, de 4,0 a 4,7). Dezesseis retalhos têm vizinho nos quatro lados, treze em três, trinta e dois em dois, sete em um e um em nenhum. É o mesmo quadro que a cópia instrumentada do núcleo deu em 2026-11-21 (68 retalhos, 172 lados com vizinho, 8 cortados, 59 por vinco e 33 pelos outros motivos), com o retalho e os lados que a receita ganhou desde então.
+
+## Fatia 2: as formas da curvatura normal, medidas antes do núcleo
+
+O protótipo [`curvatura-normal.mjs`](../../../../tools/fixtures/correcao-de-superficie/curvatura-normal.mjs) já media em 2026-11-19 as duas formas que a fatia 2 põe à pessoa: a cota completa, com a cota exata nos três eixos e duas incógnitas a mais por cota, e a cota só na normal, mais barata, em que o ponto limite da cota escorrega na tangente (4,7 mm na grade de razão 2, 3,7 mm na `rede-sem-ruido`). A cota completa reprovava no cilindro e na sela da grade de razão 2. Ganhou agora `--iteracoes=<n>`, a terceira forma que ficara sem medir: a normal, a métrica e a direção das incógnitas saem da gaiola do ajuste anterior, e não da desenhada, com as cotas e as medidas de sempre. A mudança entre um ajuste e o seguinte cai abaixo de 0,001 mm na quinta iteração em todas as provas.
+
+```
+node tools/fixtures/correcao-de-superficie/curvatura-normal.mjs grade --cota=completa --iteracoes=4
+node tools/fixtures/correcao-de-superficie/curvatura-normal.mjs analiticas --cota=completa --iteracoes=4 [--definicao='{"meio":[0.25,0.25]}' | '{"meio":[0.3,0.5]}' | '{"pontos":16}']
+node tools/fixtures/correcao-de-superficie/curvatura-normal.mjs emendas | rede --iteracoes=4
+```
+
+A grade de 15 por 15, o desvio a mais de 100 mm da borda, em mm (o escorregamento da cota exata fica em 1e-13 mm nas duas colunas da cota completa):
+
+| Forma | Sem a opção | Etapa B | Cota completa, uma vez | Cota completa, quatro vezes |
+|---|---|---|---|---|
+| paraboloide, razão 1 | 0,636 | 0,329 | 0,629 | 0,608 |
+| paraboloide, razão 2 | 0,887 | 3,274 | 0,797 | 0,724 |
+| cilindro, razão 1 | 0,164 | 0,082 | 0,026 | 0,025 |
+| cilindro, razão 2 | 0,320 | 1,648 | 0,365 | 0,268 |
+| sela, razão 1 | 0,008 | 0,051 | 0,029 | 0,029 |
+| sela, razão 2 | 0,330 | 2,283 | 0,482 | 0,338 |
+
+Nas analíticas, com o miolo pelas curvas vizinhas de hoje, as duas colunas da cota completa ficam abaixo de sem a opção em todas as doze, inclusive na calota assimétrica (0,475 contra 0,707 mm com o meio em 0,25 e 0,25, e 0,287 contra 0,301 com o meio em 0,3 e 0,5), que em 2026-11-19 reprovava pela cota do miolo; a iteração muda as analíticas em menos de 0,02 mm. Nas emendas a iteração muda pouco (a rampa da `emenda-g1` de 15,5 para 14,9, contra 9,98 da etapa B e 25,7 sem a opção). Na `rede-sem-ruido` a distância ao painel vai de 0,66 mm com um ajuste para 1,10 com quatro, contra 1,35 da etapa B e 4,04 sem a opção.
+
+O que sobra contra o gate 1 é a sela: com qualquer forma ela fica pior que sem a opção na grade de razão 1 (0,029 contra 0,008 mm), e com quatro iterações, por 0,008 mm na de razão 2. A curvatura normal da sela varia de fato no espaço, e a energia que cobra a variação a puxa; sem a opção a amostra de uma quadrática em passo igual já cai quase em cima dela. A decisão da fatia 2 vai à pessoa com estes números.

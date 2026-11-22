@@ -135,14 +135,28 @@ function pesosDoLimite(gaiola) {
  * são o maior desvio do ponto limite de uma cota exata ao ponto declarado, na normal e na tangente (unidade da gaiola), e `residuoExato`
  * a distância inteira; `escorregamentoDentro`, o da tangente só nas cotas exatas fora da borda livre. `escorregamentoDaDeclarada` é o mesmo desvio na tangente antes do ajuste (o limite da gaiola declarada).
  */
-export function ajustarPelaNormal(gaiola, medidas, { onda = null, cota = 'completa', pesoDoMiolo = null, epsilon = EPSILON_DO_DESLOCAMENTO } = {}) {
+export function ajustarPelaNormal(gaiola, medidas, opcoes = {}) {
+  const iteracoes = opcoes.iteracoes ?? 1;
+  if (!Number.isInteger(iteracoes) || iteracoes < 1) throw new Error(`curvatura normal: iteracoes é ${JSON.stringify(iteracoes)}; use um inteiro de 1 para cima`);
+  let r = ajustarUmaVez(gaiola, medidas, opcoes, null); const mudancas = [];
+  for (let k = 1; k < iteracoes; k++) {
+    const antes = r.vertices; r = ajustarUmaVez(gaiola, medidas, opcoes, antes);
+    let m = 0; for (let j = 0; j < antes.length; j++) m = Math.max(m, dist(antes[j], r.vertices[j])); mudancas.push(m);
+  }
+  return { ...r, iteracoes, mudancas };
+}
+
+/* um ajuste, linearizado em `base` (null: a gaiola declarada): a normal, a métrica, a direção de cada incógnita e o comprimento das arestas
+   saem de `base`, e as cotas e as medidas continuam as da gaiola declarada. Com `iteracoes` acima de 1, cada ajuste lineariza no anterior. */
+function ajustarUmaVez(gaiola, medidas, { onda = null, cota = 'completa', pesoDoMiolo = null, epsilon = EPSILON_DO_DESLOCAMENTO } = {}, base = null) {
   if (cota !== 'normal' && cota !== 'completa') throw new Error(`curvatura normal: cota é ${JSON.stringify(cota)}; use 'normal' ou 'completa'`);
   const P = gaiola.vertices; const nV = P.length; const ondaUsada = onda ?? 4 * medianaDasArestas(gaiola);
+  const B = base ?? P; const gB = { ...gaiola, vertices: B };
   const pesoDe = new Map();
   for (const { indice, peso } of medidas) pesoDe.set(indice, peso === Infinity ? Infinity : (pesoDoMiolo ?? peso));
   const ordem = [...pesoDe.keys()].sort((a, b) => a - b);
   const exatos = ordem.filter((i) => pesoDe.get(i) === Infinity); const comPeso = ordem.filter((i) => pesoDe.get(i) !== Infinity);
-  const N = normaisDoLimite(gaiola); const W = pesosDoLimite(gaiola);
+  const N = normaisDoLimite(gB); const W = pesosDoLimite(gaiola);
   /* as incógnitas: a normal de cada vértice e, com a cota completa, as duas tangentes do vértice de cada cota exata */
   const direcoes = N.map((n, j) => ({ j, vec: n })); const doVertice = N.map((_, j) => [j]);
   if (cota === 'completa') for (const i of exatos) {
@@ -152,7 +166,7 @@ export function ajustarPelaNormal(gaiola, medidas, { onda = null, cota = 'comple
   }
   const nZ = direcoes.length;
   /* uma linha Σ g_j · x_j vira constante + Σ coef_k z_k, com x_j = P_j + Σ z_k vec_k */
-  const emZ = (linha) => { let c0 = 0; const coef = []; for (const [j, g] of linha) { c0 += dot(g, P[j]); for (const k of doVertice[j]) { const w = dot(g, direcoes[k].vec); if (w !== 0) coef.push([k, w]); } } return { c0, coef }; };
+  const emZ = (linha) => { let c0 = 0; const coef = []; for (const [j, g] of linha) { c0 += dot(g, B[j]); for (const k of doVertice[j]) { const w = dot(g, direcoes[k].vec); if (w !== 0) coef.push([k, w]); } } return { c0, coef }; };
   const doLimite = (i, eixo) => W[i].map(([c, w]) => [c, [w * eixo[0], w * eixo[1], w * eixo[2]]]);
   const restricoes = [];
   for (const i of exatos) for (const eixo of cota === 'normal' ? [N[i]] : [[1, 0, 0], [0, 1, 0], [0, 0, 1]]) { const { c0, coef } = emZ(doLimite(i, eixo)); restricoes.push({ coef, alvo: dot(eixo, P[i]) - c0 }); }
@@ -161,13 +175,13 @@ export function ajustarPelaNormal(gaiola, medidas, { onda = null, cota = 'comple
   for (let k = 0; k < nZ; k++) A[k][k] = epsilon;
   const quadrado = (peso, { c0, coef }, alvo) => { for (const [r, wr] of coef) { for (const [c, wc] of coef) A[r][c] += peso * wr * wc; rhs[r] += peso * wr * (alvo - c0); } };
   for (const i of comPeso) quadrado(pesoDe.get(i), emZ(doLimite(i, N[i])), dot(N[i], P[i]));
-  const termos = termosDaCurvaturaNormal(gaiola, ondaUsada);
+  const termos = termosDaCurvaturaNormal(gB, ondaUsada);
   for (const { peso, linhas } of termos) for (const l of linhas) quadrado(peso, emZ(l), 0);
   restricoes.forEach(({ coef, alvo }, s) => { const r = nZ + s; for (const [c, w] of coef) { A[r][c] += w; A[c][r] += w; } rhs[r] = alvo; });
   const lu = fatorarLU(A);
   if (lu.singularEm >= 0) throw new Error(`curvatura normal: sistema singular na coluna ${lu.singularEm} de ${n}`);
   const z = resolverLU(lu, rhs);
-  const V = P.map((p) => [...p]);
+  const V = B.map((p) => [...p]);
   direcoes.forEach(({ j, vec }, k) => { for (let x = 0; x < 3; x++) V[j][x] += z[k] * vec[x]; });
   /* a borda livre: os vértices das arestas de uma face só. O escorregamento sai também só nas cotas exatas de dentro (`dentro`) */
   const usos = new Map(); const naBorda = new Set();
@@ -190,7 +204,7 @@ export function ajustarPelaNormal(gaiola, medidas, { onda = null, cota = 'comple
 /* ---------- as provas: hoje, a etapa B (o núcleo com `alisarSuperficie`) e a curvatura normal, nas mesmas cotas da etapa B ---------- */
 
 const contexto = (pontos) => ({ vec: (p) => (typeof p === 'string' ? pontos[p] : p), num: Number });
-const resumoDoAjuste = (a) => ({ cota: a.cota, incognitas: a.incognitas, restricoes: a.restricoes, ondaMm: r4(a.onda * 1000), deslocamentoDaGaiolaMm: r4(a.deslocamento * 1000), residuoNaNormalMm: sig(a.residuoNaNormal * 1000),
+const resumoDoAjuste = (a) => ({ cota: a.cota, iteracoes: a.iteracoes, mudancasMm: (a.mudancas ?? []).map((m) => sig(m * 1000)), incognitas: a.incognitas, restricoes: a.restricoes, ondaMm: r4(a.onda * 1000), deslocamentoDaGaiolaMm: r4(a.deslocamento * 1000), residuoNaNormalMm: sig(a.residuoNaNormal * 1000),
   escorregamentoMm: sig(a.escorregamento * 1000), escorregamentoDentroMm: sig(a.escorregamentoDentro * 1000), residuoExatoMm: sig(a.residuoExato * 1000), escorregamentoDaDeclaradaMm: sig(a.escorregamentoDaDeclarada * 1000), energia: [sig(a.energiaAntes), sig(a.energiaDepois)] });
 
 /** provaDasAnaliticas(opcoes, superficies) -> por superfície: a distância (mm) e a crista de `hoje`, `etapaB` e `normal`, e o ajuste */
@@ -309,8 +323,8 @@ export function provaDaRede(opcoes = {}) {
 if (import.meta.url === pathToFileURL(process.argv[1] ?? '').href) {
   const args = process.argv.slice(2); const qual = args.find((a) => !a.startsWith('--'));
   const opcao = (nome) => args.find((a) => a.startsWith(`--${nome}=`))?.slice(nome.length + 3);
-  const opcoes = { cota: opcao('cota') ?? 'completa', onda: opcao('onda') != null ? Number(opcao('onda')) / 1000 : null, pesoDoMiolo: opcao('miolo') != null ? Number(opcao('miolo')) : null, ...(opcao('definicao') ? { definicao: JSON.parse(opcao('definicao')) } : {}) };
+  const opcoes = { cota: opcao('cota') ?? 'completa', onda: opcao('onda') != null ? Number(opcao('onda')) / 1000 : null, pesoDoMiolo: opcao('miolo') != null ? Number(opcao('miolo')) : null, iteracoes: opcao('iteracoes') != null ? Number(opcao('iteracoes')) : 1, ...(opcao('definicao') ? { definicao: JSON.parse(opcao('definicao')) } : {}) };
   const provas = { analiticas: provaDasAnaliticas, grade: provaDaGrade, energia: provaDaEnergia, emendas: provaDasEmendas, rede: provaDaRede };
-  if (!provas[qual]) { console.error('uso: curvatura-normal.mjs analiticas | grade | energia | emendas | rede [--cota=normal|completa] [--onda=<mm>] [--miolo=<peso>] [--definicao=<json>]'); process.exit(2); }
+  if (!provas[qual]) { console.error('uso: curvatura-normal.mjs analiticas | grade | energia | emendas | rede [--cota=normal|completa] [--onda=<mm>] [--miolo=<peso>] [--iteracoes=<n>] [--definicao=<json>]'); process.exit(2); }
   process.stdout.write(`${JSON.stringify(provas[qual](opcoes), null, 1)}\n`);
 }
