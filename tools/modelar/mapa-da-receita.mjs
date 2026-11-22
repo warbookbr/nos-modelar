@@ -390,10 +390,22 @@ function entradasDoPlano(arquivos, planoCarregado) {
   for (const arquivo of arquivos) {
     const { itens } = arquivo;
     /* `PLANO: { ... }` dentro da receita, ou `const PLANO = { ... }` citado pela forma curta (`PLANO,`), como nas partes do robô */
-    const kPlano = itens.findIndex((it, k) => ehId(it, 'PLANO') && (ehP(itens[proximo(itens, k + 1)], ':') || ehP(itens[proximo(itens, k + 1)], '='))
+    let kPlano = itens.findIndex((it, k) => ehId(it, 'PLANO') && (ehP(itens[proximo(itens, k + 1)], ':') || ehP(itens[proximo(itens, k + 1)], '='))
       && ehP(itens[proximo(itens, proximo(itens, k + 1) + 1)], '{'));
-    if (kPlano < 0) continue;
-    const aPlano = proximo(itens, proximo(itens, kPlano + 1) + 1);
+    let aPlano = kPlano < 0 ? -1 : proximo(itens, proximo(itens, kPlano + 1) + 1);
+    if (kPlano < 0) {
+      /* `get PLANO() { return plano(this.PARAMS); }` com `const plano = (T) => ({ ... })`, a receita cujo PLANO lê os PARAMS da variante:
+         a linha do PLANO é a do getter, e as entradas são as do objeto que a função devolve */
+      const kGet = itens.findIndex((it, k) => ehId(it, 'PLANO') && ehId(itens[k - 1], 'get'));
+      const kRet = kGet < 0 ? -1 : itens.findIndex((it, k) => k > kGet && ehId(it, 'return'));
+      const funcao = kRet < 0 ? null : itens[proximo(itens, kRet + 1)];
+      const kDecl = ehId(funcao) ? itens.findIndex((it, k) => ehId(it, funcao.valor) && ehId(itens[k - 1], 'const') && ehP(itens[proximo(itens, k + 1)], '=')) : -1;
+      const kSeta = kDecl < 0 ? -1 : itens.findIndex((it, k) => k > kDecl && ehP(it, '=>'));
+      const kParen = kSeta < 0 ? -1 : proximo(itens, kSeta + 1);
+      const kChave = ehP(itens[kParen], '(') ? proximo(itens, kParen + 1) : -1;
+      if (!ehP(itens[kChave], '{')) continue;
+      kPlano = kGet; aPlano = kChave;
+    }
     const { chaves } = chavesDoObjeto(itens, aPlano);
     const partes = chaves.find((c) => c.nome === 'partes')
       ?? (() => {
