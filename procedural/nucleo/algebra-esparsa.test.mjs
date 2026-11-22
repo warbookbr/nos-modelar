@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { matrizSimetrica, porColunas, cotaDeVarah, ordemDeGrauMinimo, fatorarCholesky, resolverCholesky } from './algebra-esparsa.js';
+import { matrizPorLinhas, porColunas, cotaDeVarah, ordemDeGrauMinimo, fatorarCholesky, resolverCholesky, fatorarLUEsparso, resolverLUEsparso, resolverLUEsparsoTransposta, baseDoNucleo } from './algebra-esparsa.js';
 import { fatorarLU, resolverLU } from './subdivisao.js';
 
 /* a matriz de uma grade nx × ny com o estêncil de cinco pontos mais a diagonal, positiva definida e diagonal dominante */
 function grade(nx, ny, diag = 5) {
-  const n = nx * ny; const m = matrizSimetrica(n); const id = (i, j) => j * nx + i;
+  const n = nx * ny; const m = matrizPorLinhas(n); const id = (i, j) => j * nx + i;
   for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) {
     const k = id(i, j); m.somar(k, k, diag);
     for (const [di, dj] of [[1, 0], [0, 1]]) {
@@ -55,7 +55,7 @@ describe('álgebra esparsa', () => {
   });
 
   it('a matriz que não é positiva definida para a fatoração no índice original', () => {
-    const m = matrizSimetrica(3);
+    const m = matrizPorLinhas(3);
     m.somar(0, 0, 1); m.somar(1, 1, 1); m.somar(2, 2, 1); m.somar(0, 1, 2); m.somar(1, 0, 2);
     const f = fatorarCholesky(m);
     expect([0, 1]).toContain(f.naoPositivaEm);
@@ -72,9 +72,53 @@ describe('álgebra esparsa', () => {
   });
 
   it('a montagem por colunas ordena as linhas e soma na ordem dos termos', () => {
-    const m = matrizSimetrica(3); m.somar(2, 0, 0.1); m.somar(2, 0, 0.2); m.somar(2, 2, 1); m.somar(2, 1, 3);
+    const m = matrizPorLinhas(3); m.somar(2, 0, 0.1); m.somar(2, 0, 0.2); m.somar(2, 2, 1); m.somar(2, 1, 3);
     const c = porColunas(m);
     expect([...c.indices.subarray(c.inicio[2], c.inicio[3])]).toEqual([0, 1, 2]);
     expect(c.valores[c.inicio[2]]).toBe(0.1 + 0.2);
+  });
+});
+
+describe('LU esparso', () => {
+  /* uma matriz não simétrica de grade com uma coluna a mais de ligação, determinística */
+  const naoSimetrica = (nx, ny) => {
+    const m = grade(nx, ny, 4.2);
+    for (let k = 0; k + 3 < m.n; k += 5) m.somar(k, k + 3, 0.7);
+    for (let k = 7; k < m.n; k += 11) m.somar(k, k - 7, -0.4);
+    return m;
+  };
+  it('resolve A x = b e Aᵀ x = b como a eliminação densa', () => {
+    const m = naoSimetrica(8, 9); const n = m.n; const A = densa(m);
+    const b = Array.from({ length: n }, (_, k) => Math.cos(k * 0.9) + 0.05 * k);
+    const f = fatorarLUEsparso(m);
+    expect(f.deficientes).toEqual([]);
+    const x = resolverLUEsparso(f, b); const xd = resolverLU(fatorarLU(A), b);
+    for (let k = 0; k < n; k++) expect(Math.abs(x[k] - xd[k])).toBeLessThan(1e-12);
+    const AT = A[0].map((_, c) => A.map((l) => l[c]));
+    const xt = resolverLUEsparsoTransposta(f, b); const xtd = resolverLU(fatorarLU(AT), b);
+    for (let k = 0; k < n; k++) expect(Math.abs(xt[k] - xtd[k])).toBeLessThan(1e-12);
+  });
+
+  it('o ponto de sela, com a diagonal nula nas linhas das restrições, pivota fora da diagonal', () => {
+    const nU = 30; const m = matrizPorLinhas(nU + 3);
+    for (let k = 0; k < nU; k++) { m.somar(k, k, 2); if (k + 1 < nU) { m.somar(k, k + 1, -0.5); m.somar(k + 1, k, -0.5); } }
+    [[0, 1, 2], [10, 11], [20, 25, 29]].forEach((cols, s) => cols.forEach((c, t) => { m.somar(nU + s, c, 1 + t); m.somar(c, nU + s, 1 + t); }));
+    const b = Array.from({ length: nU + 3 }, (_, k) => k % 4 - 1);
+    const f = fatorarLUEsparso(m);
+    expect(f.deficientes).toEqual([]);
+    const x = resolverLUEsparso(f, b); const xd = resolverLU(fatorarLU(densa(m)), b);
+    for (let k = 0; k < nU + 3; k++) expect(Math.abs(x[k] - xd[k])).toBeLessThan(1e-12);
+  });
+
+  it('a base do núcleo nomeia a união dos suportes, a mesma em qualquer ordem de colunas', () => {
+    /* dois blocos singulares independentes (cada um com linhas que somam zero) e um bloco regular */
+    const m = matrizPorLinhas(9);
+    const bloco = (i0) => { for (let a = 0; a < 3; a++) for (let b = 0; b < 3; b++) m.somar(i0 + a, i0 + b, a === b ? 2 : -1); };
+    bloco(0); bloco(3); for (let k = 6; k < 9; k++) m.somar(k, k, 1);
+    const natural = Int32Array.from({ length: 9 }, (_, k) => k); const trocada = Int32Array.from([8, 5, 4, 3, 7, 2, 1, 0, 6]);
+    const a = fatorarLUEsparso(m, { ordem: natural }); const b = fatorarLUEsparso(m, { ordem: trocada });
+    expect(a.deficientes.length).toBe(2); expect(b.deficientes.length).toBe(2);
+    expect(baseDoNucleo(a)).toEqual([0, 1, 2, 3, 4, 5]);
+    expect(baseDoNucleo(b)).toEqual([0, 1, 2, 3, 4, 5]);
   });
 });

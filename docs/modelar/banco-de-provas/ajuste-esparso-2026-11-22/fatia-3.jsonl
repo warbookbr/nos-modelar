@@ -1,0 +1,8 @@
+{"ensaio":"ensaio-sela.mjs","passo":34,"incognitas":1457,"exatas":162,"razaoPositiva":4.74,"razaoSela":30.83,"vezes":6.51,"deficientes":0,"segundosCholesky":0.08,"segundosLU":0.82}
+{"ensaio":"ensaio-sela.mjs","passo":21,"incognitas":3577,"exatas":398,"razaoPositiva":6.02,"razaoSela":69.84,"vezes":11.59,"deficientes":0,"segundosCholesky":0.21,"segundosLU":13.6}
+{"ensaio":"ensaio-sela.mjs","passo":16,"incognitas":6305,"exatas":701,"razaoPositiva":6.87,"razaoSela":138.53,"vezes":20.16,"deficientes":0,"segundosCholesky":0.53,"segundosLU":103.77}
+{"medida":"so-exatas","passo":34,"incognitas":1457,"razaoLU":3.84,"segundosDaFatoracao":0.05,"segundosDoAjuste":0.15}
+{"medida":"so-exatas","passo":21,"incognitas":3577,"razaoLU":5.2,"segundosDaFatoracao":0.12,"segundosDoAjuste":0.6}
+{"medida":"so-exatas","passo":16,"incognitas":6305,"razaoLU":5.85,"segundosDaFatoracao":0.16}
+{"medida":"sela-por-schur","passo":34,"incognitas":1457,"exatas":162,"segundosDoAjuste":0.71,"ganho":2.901}
+{"medida":"sela-por-schur","passo":21,"incognitas":3577,"exatas":398,"segundosDoAjuste":4.63,"ganho":3.257}

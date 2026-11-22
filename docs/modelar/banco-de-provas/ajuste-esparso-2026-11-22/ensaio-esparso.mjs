@@ -8,7 +8,7 @@ import { resolve } from 'node:path';
 const RAIZ = resolve(fileURLToPath(import.meta.url), '../../../../..');
 const { gaiolaGrande } = await import(pathToFileURL(resolve(RAIZ, 'tools/fixtures/ajuste-esparso/gaiola-grande.mjs')).href);
 const { ajustarGaiolaAsMedidasComPeso, ajustarGaiolaAsMedidasComPesoDenso, linhasDoLimite } = await import(pathToFileURL(resolve(RAIZ, 'procedural/nucleo/subdivisao.js')).href);
-const { matrizSimetrica, fatorarCholesky } = await import(pathToFileURL(resolve(RAIZ, 'procedural/nucleo/algebra-esparsa.js')).href);
+const { matrizPorLinhas, fatorarCholesky } = await import(pathToFileURL(resolve(RAIZ, 'procedural/nucleo/algebra-esparsa.js')).href);
 
 const args = process.argv.slice(2); const comDenso = args.includes('--denso');
 const passos = args.filter((a) => !a.startsWith('--')).map(Number);
@@ -16,7 +16,7 @@ for (const passo of passos.length ? passos : [34, 21, 16, 12]) {
   const { gaiola, medidas } = gaiolaGrande({ passo });
   const n = gaiola.vertices.length;
   /* a estrutura de H sem os valores do ajuste: todo vértice é medido, e U é a gaiola inteira */
-  const H = matrizSimetrica(n); for (let k = 0; k < n; k++) H.somar(k, k, 1);
+  const H = matrizPorLinhas(n); for (let k = 0; k < n; k++) H.somar(k, k, 1);
   for (const linha of linhasDoLimite(gaiola, medidas.map((m) => m.indice))) for (const [r, a] of linha) for (const [c, b] of linha) H.somar(r, c, a * b);
   let naoNulosH = 0; for (const l of H.linhas) naoNulosH += l.size;
   const t0 = performance.now(); const fator = fatorarCholesky(H); const tFator = (performance.now() - t0) / 1000;

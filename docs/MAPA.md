@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2173 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2174 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -114,6 +114,7 @@
 - `ensaio-denso.mjs` — ensaio-denso.mjs — a linha de base do plano do ajuste esparso (fatia 1): o custo do ajuste denso de hoje na gaiola grande neutra (`tools/fixtures/ajuste-espa…
 - `ensaio-do-carro.mjs` — ensaio-do-carro.mjs — o gate 1 do plano do ajuste esparso: a subdivisão da lataria do quarto traseiro do carro-fastback com a rede mais densa, pela variante …
 - `ensaio-esparso.mjs` — ensaio-esparso.mjs — a fatia 2 do plano do ajuste esparso na gaiola de prova: o tempo do ajuste com peso pelo Cholesky esparso, a estrutura do fator (não nul…
+- `ensaio-sela.mjs` — ensaio-sela.mjs — a medida que decide a fatia 3 do plano do ajuste esparso: o preenchimento do LU esparso no sistema de ponto de sela da gaiola de prova, com…
 
 ## docs/modelar/banco-de-provas/aviao-2026-10-11/
 

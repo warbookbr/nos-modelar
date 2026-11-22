@@ -564,10 +564,27 @@ describe('o ajuste denso diante da ordem dos vértices, e o esparso contra ele',
     expect(pelaOrdem(false, { tipo: 'variacaoDeCurvatura', onda: 64 * passo })).toBeGreaterThan(1e-9);
   });
 
-  it('CONHECIDA: a recusa do sistema singular nomeia pontos que dependem da ordem quando o núcleo do sistema tem mais de uma dimensão', () => {
-    /* dois cubos lisos com todos os vértices exatos: cada cubo sozinho já é singular. Na ordem natural a recusa nomeia o primeiro cubo, e com
-       o segundo cubo numerado antes ela nomeia o segundo. A fatia 3 do plano passa a nomear a base inteira do núcleo, os dois cubos nas duas
-       ordens, e então esta catraca falha para a marca sair. */
+  it('com cotas exatas, o complemento de Schur dá a gaiola do denso a 1e-9 m sem a energia e a dez vezes o piso com ela', () => {
+    expect(contraODenso(g, medidas(true), null).dif).toBeLessThan(1e-9);
+    expect(contraODenso(gr, renumeradas(medidas(true)), null).dif).toBeLessThan(1e-9);
+    for (const regularizacao of [{ tipo: 'variacaoDeCurvatura' }, { tipo: 'variacaoDeCurvatura', onda: 16 * passo }]) {
+      const piso = Math.max(pelaOrdem(true, regularizacao), 1e-13);
+      expect(contraODenso(g, medidas(true), regularizacao).dif).toBeLessThan(10 * piso);
+    }
+  });
+
+  it('o ajuste só com exatas pelo LU esparso dá a gaiola do ponto de sela denso a 1e-9 m', () => {
+    const exatas = g.vertices.map((_, i) => i).filter((i) => i % 2 === 0);
+    const e = ajustarGaiolaAsMedidas(g, exatas).vertices;
+    const d = ajustarGaiolaAsMedidasComPesoDenso(g, exatas.map((indice) => ({ indice, peso: Infinity }))).vertices;
+    let dif = 0; e.forEach((v, k) => { for (let x = 0; x < 3; x++) dif = Math.max(dif, Math.abs(v[x] - d[k][x])); });
+    expect(dif).toBeLessThan(1e-9);
+  });
+
+  it('a recusa do sistema singular nomeia a base inteira do núcleo, a mesma em qualquer ordem dos vértices', () => {
+    /* dois cubos lisos com todos os vértices exatos: cada cubo sozinho já é singular. A eliminação densa nomeava só o primeiro cubo que
+       eliminava (o primeiro na ordem natural, o segundo na trocada); o LU esparso nomeia a união dos suportes da base do núcleo, que não
+       depende da ordem, e por isso os dois cubos nas duas ordens. */
     const cubo = (o, l) => ({ v: [[0, 0, 0], [1, 0, 0], [1, 1, 0], [0, 1, 0], [0, 0, 1], [1, 0, 1], [1, 1, 1], [0, 1, 1]].map((p) => p.map((c, k) => c * l + o[k])), f: [[0, 3, 2, 1], [4, 5, 6, 7], [0, 1, 5, 4], [1, 2, 6, 5], [2, 3, 7, 6], [3, 0, 4, 7]] });
     const a = cubo([0, 0, 0], 1); const b = cubo([5, 0, 0], 2);
     const dois = { vertices: [...a.v, ...b.v], faces: [...a.f, ...b.f.map((f) => f.map((i) => i + 8))], vincos: [], cantos: [] };
@@ -575,7 +592,7 @@ describe('o ajuste denso diante da ordem dos vértices, e o esparso contra ele',
     const ordem = [...todos.slice(8), ...todos.slice(0, 8)]; const posicao = []; ordem.forEach((p, k) => { posicao[p] = k; });
     const trocados = { vertices: ordem.map((p) => dois.vertices[p]), faces: dois.faces.map((f) => f.map((p) => posicao[p])), vincos: [], cantos: [] };
     const nomeados = (gaiola, volta) => { try { ajustarGaiolaAsMedidas(gaiola, todos); } catch (e) { return e.indices.map(volta).sort((x, y) => x - y); } return null; };
-    expect(nomeados(dois, (k) => k)).toEqual([0, 1, 2, 3, 4, 5, 6, 7]);
-    expect(nomeados(trocados, (k) => ordem[k])).toEqual([8, 9, 10, 11, 12, 13, 14, 15]);
+    expect(nomeados(dois, (k) => k)).toEqual(todos);
+    expect(nomeados(trocados, (k) => ordem[k])).toEqual(todos);
   });
 });
