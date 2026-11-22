@@ -6,7 +6,8 @@
    A rosca é cosmética (decisão da pessoa em 2026-11-22): o filete é um friso ao longo da hélice, de perfil trapezoidal com
    a altura de 0,6134 passo da norma, sobre um núcleo no diâmetro menor, e encosta nele como sólido à parte. O comprimento
    roscado é o da norma para parafuso de haste parcial, 2d + 6 mm, ou a haste inteira quando ela é mais curta. As duas pontas
-   do filete se fecham em um passo. */
+   do filete se fecham em um passo. Com `rosca` 2 a rosca é fundida (pedido da pessoa no mesmo dia, para quem precisar do
+   parafuso como sólido único no STEP): a haste e o núcleo entram 0,1 mm na peça de cima, e a composição une tudo. */
 import { medidasIso } from './tabela.js';
 
 export const PECAS = Object.freeze({ 1: 'parafuso', 2: 'porca', 3: 'arruela' });

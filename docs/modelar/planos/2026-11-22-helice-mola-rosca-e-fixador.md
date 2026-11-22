@@ -1,6 +1,6 @@
 # Hélice, mola, rosca e fixador: um caminho helicoidal que serve a quatro ferramentas que faltam
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `procedural/nucleo/caminho-helicoidal.js`, `procedural/nucleo/operacoes/friso.js`, `procedural/nucleo/uso-operacoes.js`, `procedural/familias/mola/`, `procedural/familias/fixador/`, `procedural/familias/index.js`, `tools/fixtures/helice/`, `docs/modelar/ferramentas-por-objeto.json`, `tools/modelar/capacidade.mjs`
 
@@ -49,7 +49,7 @@ O núcleo não ganha nome de objeto: o ajudante se chama pelo que gera, o caminh
 2. Feita em 2026-11-22: a família `mola` (compressão, tração e torção), com a camada mecânica gravada e a forma aprovada pela pessoa por imagem; o friso ganhou a `helice` declarada, para a composição passar só números.
 3. Feita em 2026-11-22: a família `fixador` (parafuso sextavado, allen e abaulado, porca e arruela, de M3 a M24 pela tabela ISO) com a rosca cosmética, a camada mecânica gravada e a forma aprovada pela pessoa por imagem.
 4. Feita em 2026-11-22: a rosca fundida como opção da família `fixador` (`rosca` 2): a cabeça, a haste, o núcleo e o filete unidos por `unir` num corpo só, com `limparLascas` de área mínima igual ao quadrado de 0,01 mm, que passa na validação do STEP nas três cabeças de M3 a M24 em até 1,3 s. A pessoa autorizou gravar de novo a camada mecânica com a opção fundida e o perfil novo.
-5. Fechamento: a montagem do parafuso na porca e da mola entre dois pontos, o mapa, o backlog e o encerramento.
+5. Fechamento em 2026-11-22, por decisão da pessoa, sem a montagem: o item 3 do gate de saída foi ao backlog.
 
 ## Decisão da pessoa
 
@@ -64,7 +64,7 @@ Se as `normais` por ponto mudarem a malha de alguma peça do acervo, a fatia 1 v
 
 ## Fechamento
 
-Preencher somente ao concluir ou cancelar.
+Concluído em 2026-11-22. Entregues o ajudante `caminhoHelicoidal`, as `normais` por ponto e a `helice` declarada no `friso`, a família `mola` (compressão, tração e torção) e a família `fixador` (parafuso sextavado, allen e abaulado, porca e arruela, de M3 a M24, com a rosca cosmética e a fundida), cada uma com teste, camada mecânica gravada e a forma aprovada pela pessoa por imagem; o mapa de ferramentas registra hélice, mola, rosca e fixador como parciais. Os itens 1, 2 e 4 do gate de saída passaram, com o CI verde em cada envio. O item 3, a montagem do parafuso na porca e da mola entre dois pontos com o contato medido, não foi feito: as chamadas de família na mesma receita colidem nos ids de origem, e a montagem v5 pede portas nas duas famílias e uma opção nova na mola, com reaprovação das duas; a pessoa decidiu fechar o plano e levar o item ao backlog. Também fica fora a tolerância do exportador STEP, aplicada antes da escala para mm, que recusa face menor que 1 mm² em qualquer peça pequena; foi ao backlog com a medida.
 
 ## Andamento
 
