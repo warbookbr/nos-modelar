@@ -371,8 +371,8 @@ export function passosFrenteTraseira(T, proxId) {
           const bordaU = Math.min(g, 1 - g);
           const u = u0 + (u1 - u0) * g;
           const dy = frente ? chanfroY * (1 - Math.min(1, bordaV * 4)) : 0;
-          const yBot = y0 + dy + arred(u, 6);
-          const yTop = y1 - dy - arred(u, 7);
+          const yBot = y0 + dy;
+          const yTop = y1 - dy;
           const y = yBot + (yTop - yBot) * vr;
           const domo = Math.min(1, bordaU * 5) * Math.min(1, bordaV * 4);
           const estriaH = frente && rows >= 12 ? (r % 2 === 1 ? 0.85 : -0.3) * domo : 0;
@@ -399,10 +399,10 @@ export function passosFrenteTraseira(T, proxId) {
     return ['subdivisao', { origemId: id, niveis: 0, vertices: verts, faces }];
   };
 
-  /* 1. Vedação/carcaça fina preta do pisca (recuada atrás da lente para nunca vazar pela frente!) */
-  emitirParFrente('setaDianteira', (id) => faixaCurvaFrente(id, 0.0, 0.96, stD.y0 - 2, stD.y1 + 2, 0.2, -24, 0.01, 0.5, 10, 6), 'plasticoFosco');
+  /* 1. Carcaça preta interna do pisca (100% contida atrás e dentro da altura da lente âmbar, nunca vaza por cima) */
+  emitirParFrente('setaDianteira', (id) => faixaCurvaFrente(id, 0.0, 0.99, stD.y0 + 1.0, stD.y1 - 1.0, -1.5, -28, 0.01, 1.0, 10, 6), 'plasticoFosco');
   /* 2. Refletor cromado brilhante atrás da lente transparente âmbar + bulbo central luminoso */
-  emitirParFrente('setaDianteira', (id) => faixaCurvaFrente(id, 0.03, 0.86, stD.y0 + 4, stD.y1 - 4, 1.4, -8, 0.015, 1.0, 10, 6), 'refletorFarol');
+  emitirParFrente('setaDianteira', (id) => faixaCurvaFrente(id, 0.03, 0.90, stD.y0 + 4, stD.y1 - 4, 1.4, -8, 0.015, 1.0, 10, 6), 'refletorFarol');
   emitirParFrente('setaDianteira', (id) => faixaCurvaFrente(id, 0.18, 0.54, stD.y0 + 42, stD.y1 - 42, 2.2, -3, 0.02, 4.0, 6, 4), 'refletorNucleo');
   /* 3. Lente âmbar transparente com ESTRIAS HORIZONTAIS reais revelando o brilho interno do refletor */
   emitirParFrente('setaDianteira', (id) => faixaCurvaFrente(id, 0.012, 1.0, stD.y0 + 0.5, stD.y1 - 0.5, 3.2, -5, 0.018, 2.5, 14, 16), 'setaAmbar');

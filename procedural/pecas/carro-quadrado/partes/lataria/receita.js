@@ -210,8 +210,6 @@ export const CONTATOS = [
   { par: ['chapa', 'placaTraseira'], motivo: 'placa traseira apoia na tampa traseira' },
   { par: ['chapa', 'puxadorTampa'], motivo: 'puxador apoia na tampa traseira acima da placa' },
   { par: ['chapa', 'fechaduraTampa'], motivo: 'fechadura embute na tampa traseira abaixo da placa' },
-  { par: ['chapa', 'cofreCapo'], motivo: 'calhas e bandeja do cofre apoiam nas bordas internas do vão do capô na chapa' },
-  { par: ['capo', 'cofreCapo'], motivo: 'capô separado apoia sobre as calhas do cofre mantendo fenda física real de 4 mm' },
 ];
 
 export const PONTOS = [
@@ -248,7 +246,6 @@ const receita = {
     partes: [
       { nome: 'chapa', forma: 'Casco contínuo com arcos de roda, vãos dos vidros, vão do capô, vão frontal e vãos das lanternas', tecnica: 'Subdivisão de gaiolaPorRede com furoPassante e aberturaPorContorno' },
       { nome: 'capo', forma: 'Capô como peça separada com dois vincos longitudinais, dobra frontal de lombada e 24 rasgos reais de respiro', tecnica: 'Subdivisão própria de gaiolaPorRede com espessura e subtrair dos rasgos de ventilação' },
-      { nome: 'cofreCapo', forma: 'Calhas laterais/traseira sob a fenda real do capô e bandeja escura de caixa de ar sob os rasgos', tecnica: 'Subdivisão fechada em plástico preto fosco' },
       { nome: 'parachoqueDianteiro', forma: 'Corpo envolvente preto na frente com friso claro horizontal', tecnica: 'Subdivisão de gaiolaVarrida fechada contornando a frente até o arco dianteiro' },
       { nome: 'parachoqueTraseiro', forma: 'Corpo envolvente preto na traseira com friso claro horizontal', tecnica: 'Subdivisão de gaiolaVarrida fechada contornando a traseira até o arco traseiro' },
       { nome: 'frisoLateral', forma: 'Barras pretas laterais em y 515 entre os arcos', tecnica: 'conformarNaChapa em trilho sobre a chapa com simetria em x' },
@@ -270,6 +267,7 @@ const receita = {
   },
   contatos: CONTATOS,
   ilhas: [
+    { contem: 'capo', motivo: 'capô é peça móvel separada com fenda física real de 4 mm em relação à lataria' },
     { contem: 'escapamento', motivo: 'tubo do escapamento fica sob o para-choque traseiro e liga ao chassi em etapa futura' },
   ],
   PONTOS,

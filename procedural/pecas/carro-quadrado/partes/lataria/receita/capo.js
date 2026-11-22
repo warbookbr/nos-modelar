@@ -116,12 +116,12 @@ export function passoVaoCapoNaChapa(proxId, origemChapa) {
     [0, 1, 2, 3], [7, 6, 5, 4],
     [0, 4, 5, 1], [1, 5, 6, 2], [2, 6, 7, 3], [3, 7, 4, 0],
   ];
-  /* 1) vão frontal (grade + faróis + borda interna da seta: x = ±742, y = 568..702, z = 1930..2040) */
+  /* 1) vão frontal completo (grade + faróis + alojamento envolvente das setas nos cantos: x = ±840, y = 568..702, z = 1946..2040) */
   const idFerrF = proxId();
   const idSubF = proxId();
   const vF = [
-    [m(-742), m(568), m(1930)], [m(742), m(568), m(1930)], [m(742), m(568), m(2040)], [m(-742), m(568), m(2040)],
-    [m(-742), m(702), m(1930)], [m(742), m(702), m(1930)], [m(742), m(702), m(2040)], [m(-742), m(702), m(2040)],
+    [m(-840), m(568), m(1946)], [m(840), m(568), m(1946)], [m(840), m(568), m(2040)], [m(-840), m(568), m(2040)],
+    [m(-840), m(702), m(1946)], [m(840), m(702), m(1946)], [m(840), m(702), m(2040)], [m(-840), m(702), m(2040)],
   ];
   /* 2) vão real do capô (topo + lábio frontal até y = 700, fenda física de 4 mm em volta de `capo`) */
   const idFerrC = proxId();
@@ -165,51 +165,6 @@ export function passosCapo(capoDerivado, proxId) {
   const rasgos = passosRasgosRespiro(proxId, oBase);
   passos.push(...rasgos.passos);
   passos.push(['parte', { nome: 'capo', material: 'lataria', sel: { origem: rasgos.origem } }]);
-
-  /* bandeja escura de caixa de ar 10 mm abaixo dos rasgos + calhas laterais/traseira sob a fenda real de 4 mm
-     (vedam 100% da luz branca sob a fenda e conectam estruturalmente chapa <-> cofreCapo <-> capo) */
-  const addBloco = (x0, x1, y0, y1, z0, z1, dyFrente = 0, dyTras = 0) => {
-    const id = proxId();
-    const verts = [
-      [m(x0), m(y0 + dyTras), m(z0)], [m(x1), m(y0 + dyTras), m(z0)], [m(x1), m(y0 + dyFrente), m(z1)], [m(x0), m(y0 + dyFrente), m(z1)],
-      [m(x0), m(y1 + dyTras), m(z0)], [m(x1), m(y1 + dyTras), m(z0)], [m(x1), m(y1 + dyFrente), m(z1)], [m(x0), m(y1 + dyFrente), m(z1)],
-    ];
-    passos.push(['subdivisao', {
-      origemId: id, niveis: 0, vertices: verts,
-      faces: [
-        [0, 1, 2, 3], [7, 6, 5, 4],
-        [0, 4, 5, 1], [1, 5, 6, 2], [2, 6, 7, 3], [3, 7, 4, 0],
-      ],
-    }]);
-    passos.push(['parte', { nome: 'cofreCapo', material: 'plasticoFosco', sel: { origem: { op: 'subdivisao', id } } }]);
-  };
-
-  /* bandeja escura sob os rasgos de respiro (fecha o fundo dos rasgos em preto profundo, 14 mm abaixo da pele externa) */
-  addBloco(-465, 465, 898, 916, 842, 932, -14, 0);
-  /* calha traseira escura sob a fenda entre capô e para-brisa (toca apenas a face interna da chapa e do capô) */
-  addBloco(-756, 756, 896, 921, 838, 868, -3, 0);
-  /* calhas laterais escuras 16–22 mm abaixo da pele externa sob a fenda de 4 mm (acima de farol/seta em y = 702) */
-  const addCalhaLat = (sinal) => {
-    const id = proxId();
-    const xA = 678 * sinal; const xB = 716 * sinal;
-    const xC = 724 * sinal; const xD = 760 * sinal;
-    const x0F = Math.min(xA, xB); const x1F = Math.max(xA, xB);
-    const x0T = Math.min(xC, xD); const x1T = Math.max(xC, xD);
-    const verts = [
-      [m(x0T), m(886), m(842)], [m(x1T), m(886), m(842)], [m(x1F), m(706), m(1974)], [m(x0F), m(706), m(1974)],
-      [m(x0T), m(906), m(842)], [m(x1T), m(906), m(842)], [m(x1F), m(720), m(1974)], [m(x0F), m(720), m(1974)],
-    ];
-    passos.push(['subdivisao', {
-      origemId: id, niveis: 0, vertices: verts,
-      faces: [
-        [0, 1, 2, 3], [7, 6, 5, 4],
-        [0, 4, 5, 1], [1, 5, 6, 2], [2, 6, 7, 3], [3, 7, 4, 0],
-      ],
-    }]);
-    passos.push(['parte', { nome: 'cofreCapo', material: 'plasticoFosco', sel: { origem: { op: 'subdivisao', id } } }]);
-  };
-  addCalhaLat(1);
-  addCalhaLat(-1);
 
   return passos;
 }
