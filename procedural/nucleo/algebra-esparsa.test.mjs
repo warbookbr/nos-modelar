@@ -100,6 +100,14 @@ describe('LU esparso', () => {
     for (let k = 0; k < n; k++) expect(Math.abs(xt[k] - xtd[k])).toBeLessThan(1e-12);
   });
 
+  it('com comoADensa, o fator e a resolução dão os números da eliminação densa bit a bit, empates de pivô incluídos', () => {
+    /* a grade simétrica tem pivôs empatados; a densa troca linhas e desempata pela posição de cima */
+    for (const m of [naoSimetrica(8, 9), grade(7, 6, 2.5)]) {
+      const n = m.n; const b = Array.from({ length: n }, (_, k) => Math.sin(k * 1.3) - 0.2 * (k % 3));
+      expect(resolverLUEsparso(fatorarLUEsparso(m, { comoADensa: true }), b)).toEqual(resolverLU(fatorarLU(densa(m)), b));
+    }
+  });
+
   it('o ponto de sela, com a diagonal nula nas linhas das restrições, pivota fora da diagonal', () => {
     const nU = 30; const m = matrizPorLinhas(nU + 3);
     for (let k = 0; k < nU; k++) { m.somar(k, k, 2); if (k + 1 < nU) { m.somar(k, k + 1, -0.5); m.somar(k + 1, k, -0.5); } }

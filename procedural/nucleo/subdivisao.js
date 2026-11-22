@@ -28,7 +28,7 @@
  */
 
 import { memoizarPura } from './memoria-de-pura.js';
-import { matrizPorLinhas, paraDensa, cotaDeVarah, fatorarCholesky, resolverCholesky, fatorarLUEsparso, resolverLUEsparso, resolverLUEsparsoTransposta, baseDoNucleo, fatorarSelaPorSchur } from './algebra-esparsa.js';
+import { matrizPorLinhas, paraDensa, cotaDeVarah, fatorarCholesky, resolverCholesky, fatorarLUEsparso, resolverLUEsparso, baseDoNucleo, fatorarSelaPorSchur } from './algebra-esparsa.js';
 
 export const NITIDEZ_INFINITA = Infinity;
 export const NITIDEZ_VIVA = 10;
@@ -463,15 +463,18 @@ export function ajustarGaiolaAsMedidas(gaiola, medidas) {
     });
     return b;
   });
-  const lu = fatorarLUEsparso(A);
+  /* o LU esparso que repete a aritmética da eliminação densa: o ajuste só com exatas guarda a saída das fixtures bit a bit */
+  const lu = fatorarLUEsparso(A, { comoADensa: true });
   if (lu.deficientes.length) throw new ErroDasMedidas('as medidas formam sistema singular, porque a superfície limite não separa estes pontos', baseDoNucleo(lu).map((r) => M[r]));
-  /* o ganho ‖W_MM⁻¹‖∞ pelas colunas da inversa, uma resolução por vez, sem guardá-las; a linha do pior vértice sai da transposta */
+  /* o ganho ‖W_MM⁻¹‖∞ pelas colunas da inversa, uma resolução por vez, sem guardá-las; na recusa, a linha do pior vértice sai das mesmas
+     colunas, resolvidas de novo */
   const somas = new Float64Array(n); const e = new Array(n).fill(0);
-  for (let c = 0; c < n; c++) { e[c] = 1; const col = resolverLUEsparso(lu, e); e[c] = 0; for (let r = 0; r < n; r++) somas[r] += Math.abs(col[r]); }
+  const coluna = (c) => { e[c] = 1; const col = resolverLUEsparso(lu, e); e[c] = 0; return col; };
+  for (let c = 0; c < n; c++) { const col = coluna(c); for (let r = 0; r < n; r++) somas[r] += Math.abs(col[r]); }
   let ganho = 0, pior = 0;
   for (let r = 0; r < n; r++) if (somas[r] > ganho) { ganho = somas[r]; pior = r; }
   if (ganho > GANHO_MAXIMO_DAS_MEDIDAS) {
-    e[pior] = 1; const linhaDoPior = resolverLUEsparsoTransposta(lu, e).map(Math.abs);
+    const linhaDoPior = M.map((_, c) => Math.abs(coluna(c)[pior]));
     const maior = Math.max(...linhaDoPior);
     throw new ErroDasMedidas(`as medidas formam sistema mal condicionado (ganho ${ganho.toPrecision(3)}, acima de ${GANHO_MAXIMO_DAS_MEDIDAS})`, M.filter((_, c) => linhaDoPior[c] >= 0.01 * maior));
   }
@@ -897,7 +900,7 @@ export function operadorDasMedidas(gaiola, medidas, regularizacao = null) {
       globais.forEach((j, c) => { const k = linha.get(j); if (k !== undefined) { if (w[c] !== 0) A.somar(r, k, w[c]); } else termos.push([j, w[c]]); });
       return termos;
     });
-    const lu = fatorarLUEsparso(A);
+    const lu = fatorarLUEsparso(A, { comoADensa: true });
     if (lu.deficientes.length) throw new ErroDasMedidas('as medidas formam sistema singular, porque a superfície limite não separa estes pontos', M);
     const aplicar = (D) => {
       const B = M.map((i, r) => { const b = somar(D, fora[r]); return [D[i][0] - b[0], D[i][1] - b[1], D[i][2] - b[2]]; });

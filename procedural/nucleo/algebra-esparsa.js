@@ -237,14 +237,20 @@ export function estruturaSimetrica({ n, linhas }) {
   return s;
 }
 
-/** fatorarLUEsparso(matriz, { ordem, limiar, pivoNulo }) -> { n, ordem, pinv, Lp, Li, Lx, Up, Ui, Ux, naoNulos, deficientes }
+/** fatorarLUEsparso(matriz, { ordem, limiar, pivoNulo, comoADensa }) -> { n, ordem, pinv, Lp, Li, Lx, Up, Ui, Ux, naoNulos, deficientes }
  *  P A Q = L U por colunas (Gilbert e Peierls), com Q a ordem de colunas (a de grau mínimo sobre A + Aᵀ quando omitida) e P escolhida
  *  coluna a coluna: o pivô é a diagonal da coluna quando ela tem pelo menos `limiar` vezes o maior candidato, e senão o maior candidato,
  *  com o menor índice de linha no empate. A coluna cujos candidatos ficam todos até `pivoNulo` não ganha pivô e entra em `deficientes`
- *  (posições na ordem), e a fatoração segue: com `deficientes` vazio a matriz é inversível. */
-export function fatorarLUEsparso(matriz, { ordem = null, limiar = 0.1, pivoNulo = 1e-12 } = {}) {
+ *  (posições na ordem), e a fatoração segue: com `deficientes` vazio a matriz é inversível. A eliminação de cada coluna soma as colunas
+ *  anteriores de L na ordem dos pivôs, a mesma da eliminação densa por linhas. Com `comoADensa`, a ordem das colunas é a natural, o pivô
+ *  é sempre o maior candidato e o empate vai à linha que a eliminação densa de `fatorarLU` (que troca linhas) teria na posição de cima:
+ *  o fator e as resoluções dão os mesmos números que ela, bit a bit, para o caminho que guarda a saída das fixtures. */
+export function fatorarLUEsparso(matriz, { ordem = null, limiar = 0.1, pivoNulo = 1e-12, comoADensa = false } = {}) {
   const n = matriz.n;
-  const q = ordem ?? ordemDeGrauMinimo(estruturaSimetrica(matriz));
+  const q = comoADensa ? Int32Array.from({ length: n }, (_, k) => k) : ordem ?? ordemDeGrauMinimo(estruturaSimetrica(matriz));
+  /* com comoADensa, a posição de cada linha na matriz densa que troca linhas, para o desempate */
+  const posicaoDaLinha = comoADensa ? Int32Array.from({ length: n }, (_, k) => k) : null;
+  const linhaNaPosicao = comoADensa ? Int32Array.from({ length: n }, (_, k) => k) : null;
   /* as colunas de A, com as linhas em ordem crescente */
   const colunas = Array.from({ length: n }, () => []);
   for (let r = 0; r < n; r++) for (const [c, v] of matriz.linhas[r]) colunas[c].push([r, v]);
@@ -277,17 +283,22 @@ export function fatorarLUEsparso(matriz, { ordem = null, limiar = 0.1, pivoNulo 
     }
     for (let p = topo; p < n; p++) x[xi[p]] = 0;
     for (const [i, v] of col) x[i] = v;
-    /* x = L \ A(:, q_k), com L de diagonal 1 guardada primeiro em cada coluna */
-    for (let p = topo; p < n; p++) {
-      const j = xi[p]; const jj = pinv[j]; if (jj < 0) continue;
-      const v = x[j];
+    /* x = L \ A(:, q_k), com L de diagonal 1 guardada primeiro em cada coluna, pelas colunas de L na ordem dos pivôs (uma ordem
+       topológica, porque a coluna j de L só toca linhas de pivô posterior), e sem a coluna cujo valor é zero, como a densa pula */
+    const comPivo = [];
+    for (let p = topo; p < n; p++) if (pinv[xi[p]] >= 0) comPivo.push(pinv[xi[p]]);
+    comPivo.sort((a, b) => a - b);
+    for (const jj of comPivo) {
+      const v = x[Li[Lp[jj]]]; if (v === 0) continue;
       for (let t = Lp[jj] + 1; t < Lp[jj + 1]; t++) x[Li[t]] -= Lx[t] * v;
     }
-    /* o pivô: entre as linhas ainda sem pivô, a diagonal se passar do limiar, senão a maior, com a menor linha no empate */
+    /* o pivô: entre as linhas ainda sem pivô, a diagonal se passar do limiar, senão a maior, com a menor linha no empate (com
+       comoADensa, a de posição menor na densa) */
     let ipiv = -1; let a = -1;
+    const antes = comoADensa ? (i, j) => posicaoDaLinha[i] < posicaoDaLinha[j] : (i, j) => i < j;
     for (let p = topo; p < n; p++) {
       const i = xi[p];
-      if (pinv[i] < 0) { const t = Math.abs(x[i]); if (t > a || (t === a && i < ipiv)) { a = t; ipiv = i; } }
+      if (pinv[i] < 0) { const t = Math.abs(x[i]); if (t > a || (t === a && antes(i, ipiv))) { a = t; ipiv = i; } }
       else if (x[i] !== 0) { Ui.push(pinv[i]); Ux.push(x[i]); }
     }
     if (!(a > pivoNulo)) {
@@ -296,7 +307,11 @@ export function fatorarLUEsparso(matriz, { ordem = null, limiar = 0.1, pivoNulo 
       continue;
     }
     const diag = q[k];
-    if (pinv[diag] < 0 && marca[diag] === k && Math.abs(x[diag]) >= limiar * a) ipiv = diag;
+    if (!comoADensa && pinv[diag] < 0 && marca[diag] === k && Math.abs(x[diag]) >= limiar * a) ipiv = diag;
+    if (comoADensa) {
+      const p = posicaoDaLinha[ipiv]; const outra = linhaNaPosicao[k];
+      linhaNaPosicao[p] = outra; posicaoDaLinha[outra] = p; linhaNaPosicao[k] = ipiv; posicaoDaLinha[ipiv] = k;
+    }
     const pivo = x[ipiv];
     Ui.push(k); Ux.push(pivo); Up.push(Ui.length);
     pinv[ipiv] = k; Li.push(ipiv); Lx.push(1);
@@ -307,7 +322,13 @@ export function fatorarLUEsparso(matriz, { ordem = null, limiar = 0.1, pivoNulo 
   let d = 0;
   for (let i = 0; i < n; i++) if (pinv[i] < 0) pinv[i] = deficientes[d++];
   for (let t = 0; t < Li.length; t++) Li[t] = pinv[Li[t]];
-  return { n, ordem: q, pinv, Lp: Int32Array.from(Lp), Li: Int32Array.from(Li), Lx: Float64Array.from(Lx), Up: Int32Array.from(Up), Ui: Int32Array.from(Ui), Ux: Float64Array.from(Ux), naoNulos: Li.length + Ui.length, deficientes };
+  /* U também por linhas, com as colunas em ordem crescente e sem a diagonal, para a substituição para trás somar como a densa */
+  const contaDaLinha = new Int32Array(n + 1); const diagonal = new Float64Array(n);
+  for (let c = 0; c < n; c++) for (let p = Up[c]; p < Up[c + 1]; p++) { if (Ui[p] === c) diagonal[c] = Ux[p]; else contaDaLinha[Ui[p] + 1]++; }
+  for (let r = 0; r < n; r++) contaDaLinha[r + 1] += contaDaLinha[r];
+  const Urp = Int32Array.from(contaDaLinha); const Urc = new Int32Array(Urp[n]); const Urx = new Float64Array(Urp[n]); const livre = Int32Array.from(Urp.subarray(0, n));
+  for (let c = 0; c < n; c++) for (let p = Up[c]; p < Up[c + 1]; p++) { const r = Ui[p]; if (r !== c) { const t = livre[r]++; Urc[t] = c; Urx[t] = Ux[p]; } }
+  return { n, ordem: q, pinv, Lp: Int32Array.from(Lp), Li: Int32Array.from(Li), Lx: Float64Array.from(Lx), Up: Int32Array.from(Up), Ui: Int32Array.from(Ui), Ux: Float64Array.from(Ux), Urp, Urc, Urx, diagonal, naoNulos: Li.length + Ui.length, deficientes };
 }
 
 /* a diagonal de U na coluna k é a última entrada dela, porque a linha do pivô entra depois das de cima */
@@ -315,13 +336,15 @@ function diagonalDeU({ Up, Ui, Ux }, k) { const p = Up[k + 1] - 1; return p >= U
 
 /** resolverLUEsparso(fator, b) -> x com A x = b. Pede o fator sem colunas deficientes. */
 export function resolverLUEsparso(f, b) {
-  const { n, ordem, pinv, Lp, Li, Lx, Up, Ui, Ux } = f;
+  const { n, ordem, pinv, Lp, Li, Lx, Urp, Urc, Urx, diagonal } = f;
   const y = new Float64Array(n);
   for (let i = 0; i < n; i++) y[pinv[i]] = b[i];
-  for (let j = 0; j < n; j++) { const v = y[j]; if (v === 0) continue; for (let p = Lp[j] + 1; p < Lp[j + 1]; p++) y[Li[p]] -= Lx[p] * v; }
-  for (let j = n - 1; j >= 0; j--) {
-    const v = (y[j] /= diagonalDeU(f, j)); if (v === 0) continue;
-    for (let p = Up[j]; p < Up[j + 1] - 1; p++) y[Ui[p]] -= Ux[p] * v;
+  /* as duas substituições somam na ordem da eliminação densa por linhas: cada y[r] perde os termos em ordem crescente de coluna */
+  for (let j = 0; j < n; j++) { const v = y[j]; for (let p = Lp[j] + 1; p < Lp[j + 1]; p++) y[Li[p]] -= Lx[p] * v; }
+  for (let r = n - 1; r >= 0; r--) {
+    let t = y[r];
+    for (let p = Urp[r]; p < Urp[r + 1]; p++) t -= Urx[p] * y[Urc[p]];
+    y[r] = t / diagonal[r];
   }
   const xs = new Array(n);
   for (let k = 0; k < n; k++) xs[ordem[k]] = y[k];
