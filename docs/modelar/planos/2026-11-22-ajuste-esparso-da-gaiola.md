@@ -33,7 +33,7 @@ USAR DIRETO a assinatura de `ajustarGaiolaAsMedidas`, `ajustarGaiolaAsMedidasCom
 - a conferência do ganho pela cota superior rigorosa de Varah para matriz estritamente diagonal dominante, ‖A⁻¹‖∞ ≤ 1/minₖ(|aₖₖ| − Σⱼ|aₖⱼ|), em tempo linear nos não nulos. Com a cota até `GANHO_MAXIMO_DAS_MEDIDAS`, a recusa é impossível e a conta exata é dispensada; acima dela roda a conta exata, e os pontos da recusa saem de uma resolução com a transposta na linha do pior vértice. No carro com passo 70 a cota dá 3,25, contra o ganho exato de 0,716 e o limite de 100. O campo `ganho` devolvido passa a ser a cota quando a conta exata não roda, e isso é declarado na ficha;
 - o sistema de ponto de sela (cotas exatas, sem diagonal nas linhas delas) e o ajuste só com cotas exatas, não simétrico, por LU esparso com pivô por limiar ou por complemento de Schur, decidido pela medida da fatia 3;
 - a fixture neutra de gaiola grande gerada pela própria `gaiolaPorRede`, com `simetria: 'x'` e todo ponto medido com peso, que reproduz a ordem e a banda do carro;
-- o teste de escala, que conta operações (não nulos do fator vezes resoluções) entre dois tamanhos da fixture e reprova acima do expoente declarado de 2,3, o gate que faltou e que pegaria o problema;
+- o teste de escala, que conta operações (as visitas da ordenação e os não nulos do fator vezes as resoluções) entre dois tamanhos da fixture e reprova acima do expoente declarado de 2,3, o gate que faltou e que pegaria o problema;
 - o ensaio do carro refeito.
 
 ## Excluído
@@ -73,6 +73,10 @@ A parada pelo preenchimento é calibrada na fatia 1: se no ponto de sela o fator
 ## Andamento
 
 Fatia 1 feita em 2026-11-22, com as medidas em `docs/modelar/banco-de-provas/ajuste-esparso-2026-11-22/`. A gaiola de prova gerada pela rede reproduz a banda do carro, que cresce na proporção das incógnitas, e o custo absoluto dele (26,7 s com 4.845 incógnitas). O expoente do ajuste dá 2,6 a 2,8 contra o 3,1 que o carro mediu no passo inteiro da subdivisão. Como o gate mede o carro direto, a diferença fica registrada sem mudar a fatia 2. O preenchimento da eliminação de hoje vai de 17 a 41 vezes os não nulos de H. Os testes do piso de ruído pela ordem e dos dois cubos estão em `procedural/nucleo/subdivisao.test.mjs`, e o retrato das doze peças com subdivisão está gravado. A linha do limite (`linhasDoLimite`) passou a ser exportada pelo núcleo, para medir a estrutura do sistema.
+
+Fatia 2 feita em 2026-11-22. O ajuste com peso sem cota exata e o operador no mesmo caso passaram ao Cholesky esparso de `procedural/nucleo/algebra-esparsa.js`, com a eliminação densa como reserva quando o Cholesky para. A ordenação é o grau mínimo aproximado do AMD, sem supervariáveis, porque a de grau exato levava 95% do ajuste com 10.795 incógnitas e crescia com expoente perto de 2,8. O ganho sai da cota de Varah quando ela fica até o limite, e o resultado traz `ganhoPelaCota`. A referência densa ficou exportada como `ajustarGaiolaAsMedidasComPesoDenso`, para os testes e para o teste de escala da fatia 5. A gaiola difere da densa em até 5e-18 m na gaiola de prova, os testes de igualdade com e sem energia estão em `subdivisao.test.mjs` e o retrato das doze peças comparou igual. No carro com passo 35 a subdivisão leva 10,6 s e o pico não sobe, e o gate 1 passa. O preenchimento do caso positivo definido, que calibra a parada da fatia 3, vai de 4,7 a 8,4 vezes a metade de baixo de H.
+
+O custo da ordenação de grau exato não seria pego pelo teste de escala como a fatia 5 o descrevia, porque ele contava só os não nulos do fator vezes as resoluções. O teste passa a contar também o trabalho da ordenação (as visitas às listas de variáveis e de elementos), além das operações do fator.
 
 ## Fechamento
 

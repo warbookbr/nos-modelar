@@ -40,3 +40,26 @@ Os testes novos em `procedural/nucleo/subdivisao.test.mjs` ("o ajuste denso dian
 ## O retrato do acervo
 
 O [`retrato-antes.json`](retrato-antes.json) guarda as doze peças do acervo com passo `subdivisao`, gravadas antes da fatia 2 com `npm run retrato:acervo -- --pecas=... --gravar`. A fatia 4 as compara com `--comparar`.
+
+## Fatia 2: o caminho positivo definido
+
+O ajuste com peso sem cota exata passou ao Cholesky esparso (`procedural/nucleo/algebra-esparsa.js`), com a ordenação de grau mínimo aproximado e o ganho pela cota de Varah. As medidas estão em [`fatia-2.jsonl`](fatia-2.jsonl) e se refazem com:
+
+```
+node --max-old-space-size=8192 docs/modelar/banco-de-provas/ajuste-esparso-2026-11-22/ensaio-esparso.mjs 34 21 16 --denso
+node --max-old-space-size=8192 docs/modelar/banco-de-provas/ajuste-esparso-2026-11-22/ensaio-esparso.mjs 12
+node --max-old-space-size=8192 docs/modelar/banco-de-provas/ajuste-esparso-2026-11-22/ensaio-do-carro.mjs 35 [--sem-medidas]
+```
+
+| incógnitas | não nulos de L | preenchimento | fatoração (s) | ajuste esparso (s) | ajuste denso (s) |
+|---|---|---|---|---|---|
+| 1.457 | 84.289 | 4,7 | 0,07 | 0,15 | 1,1 |
+| 3.577 | 269.245 | 6,0 | 0,20 | 0,29 | 12,0 |
+| 6.305 | 546.541 | 6,9 | 0,30 | 0,52 | 52,6 |
+| 10.795 | 1.158.191 | 8,4 | 1,28 | 1,8 | não medido |
+
+O preenchimento aqui é a razão entre os não nulos de L e os da metade de baixo de H com a diagonal, e é a régua da parada da fatia 3. A gaiola ajustada difere da densa em até 5e-18 m. O ganho pela cota fica em 3,0 contra o exato de 0,680, e a conta exata não roda.
+
+A primeira ordenação, pelo grafo de eliminação explícito, levava 7,4 s com 10.795 incógnitas, 95% do ajuste, e crescia com expoente perto de 2,8. O grafo quociente com o grau exato dava a mesma ordem em 3,5 s. O grau aproximado do AMD, cota superior do exato, leva 0,5 s e deu o mesmo fator na gaiola de prova. Na grade com ligações longas do teste ele enche até 10% mais que o exato, que é a tolerância travada.
+
+No carro, a subdivisão do quarto traseiro com passo 70 caiu de 30,2 s para 3,3 s. Com passo 35, que tem 5.162 vértices na meia gaiola e 10.220 incógnitas, ela leva 10,6 s com as medidas e 6,8 s sem elas, e o pico de memória fica em 1.087 MB contra 1.223 MB sem as medidas. A diferença do pico está dentro do ruído do coletor de memória, e o gate 1 do plano (60 s e 400 MB a mais) passa com folga. O tempo que sobra do ajuste no carro, cerca de 4 s, não está no solver, que leva 1,8 s na gaiola de prova do mesmo tamanho. Fica para a fatia 4 medir onde está.

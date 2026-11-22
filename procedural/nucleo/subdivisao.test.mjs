@@ -1,7 +1,7 @@
 /* subdivisao.test.mjs — a subdivisão Catmull-Clark e a operação `subdivisao` contra a saída congelada do oráculo, com determinismo, ponto limite, interpolação, vincos nomeados e vértice sem face. */
 import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { subdividirCatmullClark, espelharGaiolaEmX, nitidezDoVinco, limitesDaGaiola, refinarGaiola, ajustarGaiolaAsMedidas, ErroDasMedidas, GANHO_MAXIMO_DAS_MEDIDAS, NITIDEZ_VIVA, fatorarLU, resolverLU, ajustarGaiolaAsMedidasComPeso, passoDaGaiola } from './subdivisao.js';
+import { subdividirCatmullClark, espelharGaiolaEmX, nitidezDoVinco, limitesDaGaiola, refinarGaiola, ajustarGaiolaAsMedidas, ErroDasMedidas, GANHO_MAXIMO_DAS_MEDIDAS, NITIDEZ_VIVA, fatorarLU, resolverLU, ajustarGaiolaAsMedidasComPeso, ajustarGaiolaAsMedidasComPesoDenso, passoDaGaiola } from './subdivisao.js';
 import { enderecosPorIndice } from './operacoes/subdivisao.js';
 import { neutroCanonico, nucleo } from './entrada.js';
 
@@ -506,7 +506,7 @@ describe('subdivisão Catmull-Clark com vincos', () => {
 /* O que o plano do ajuste esparso (2026-11-22) precisa saber do solver denso antes de trocá-lo: quanto a gaiola ajustada muda quando só a
    ordem dos vértices muda, que é a referência que o esparso tem de cumprir (ele elimina noutra ordem), e o que a recusa do sistema singular
    nomeia. Os números de cada caso estão no banco de provas `ajuste-esparso-2026-11-22`. */
-describe('o ajuste denso diante da ordem dos vértices', () => {
+describe('o ajuste denso diante da ordem dos vértices, e o esparso contra ele', () => {
   const grade = (nx, nz, ponto) => {
     const vertices = []; const faces = [];
     for (let j = 0; j < nz; j++) for (let i = 0; i < nx; i++) vertices.push(ponto(i, j));
@@ -524,8 +524,33 @@ describe('o ajuste denso diante da ordem dos vértices', () => {
   const medidas = (comExatas) => g.vertices.map((_, i) => i).filter((i) => i % 3 === 0).map((i) => ({ indice: i, peso: comExatas && i % 9 === 0 ? Infinity : 0.003 }));
   const renumeradas = (ms) => ms.map((m) => ({ indice: novo[m.indice], peso: m.peso }));
   const diferenca = (A, B) => { let d = 0; for (let k = 0; k < n; k++) for (let x = 0; x < 3; x++) d = Math.max(d, Math.abs(A[k][x] - B[novo[k]][x])); return d; };
-  const pelaOrdem = (comExatas, regularizacao) => diferenca(ajustarGaiolaAsMedidasComPeso(g, medidas(comExatas), regularizacao).vertices, ajustarGaiolaAsMedidasComPeso(gr, renumeradas(medidas(comExatas)), regularizacao).vertices);
+  const pelaOrdem = (comExatas, regularizacao) => diferenca(ajustarGaiolaAsMedidasComPesoDenso(g, medidas(comExatas), regularizacao).vertices, ajustarGaiolaAsMedidasComPesoDenso(gr, renumeradas(medidas(comExatas)), regularizacao).vertices);
   const passo = passoDaGaiola(g.vertices, g.faces);
+  /* o esparso contra o denso na mesma numeração, com o mesmo diferenca (a gaiola renumerada volta pela permutação) */
+  const contraODenso = (gaiola, ms, regularizacao) => {
+    const e = ajustarGaiolaAsMedidasComPeso(gaiola, ms, regularizacao); const d = ajustarGaiolaAsMedidasComPesoDenso(gaiola, ms, regularizacao);
+    let dif = 0; e.vertices.forEach((v, k) => { for (let x = 0; x < 3; x++) dif = Math.max(dif, Math.abs(v[x] - d.vertices[k][x])); });
+    return { dif, e, d };
+  };
+
+  it('sem cota exata, o Cholesky esparso dá a gaiola do denso a 1e-9 m, e o ganho pela cota de Varah fica acima do exato', () => {
+    const ms = medidas(false).map((m) => ({ ...m, peso: 1 }));
+    const { dif, e, d } = contraODenso(g, ms, null);
+    expect(dif).toBeLessThan(1e-9);
+    expect(e.ganhoPelaCota).toBe(true);
+    expect(d.ganhoPelaCota).toBe(false);
+    expect(e.ganho).toBeGreaterThanOrEqual(d.ganho);
+    expect(contraODenso(gr, renumeradas(ms), null).dif).toBeLessThan(1e-9);
+  });
+
+  it('com a energia de curvatura, o esparso fica a dez vezes o piso do denso renumerado, e o ganho é o exato porque a cota não vale', () => {
+    for (const regularizacao of [{ tipo: 'variacaoDeCurvatura' }, { tipo: 'variacaoDeCurvatura', onda: 16 * passo }, { tipo: 'variacaoDeCurvatura', onda: 64 * passo }]) {
+      const piso = Math.max(pelaOrdem(false, regularizacao), 1e-13);
+      const { dif, e } = contraODenso(g, medidas(false), regularizacao);
+      expect(dif).toBeLessThan(10 * piso);
+      expect(e.ganhoPelaCota).toBe(false);
+    }
+  });
 
   it('sem a energia de curvatura, a ordem muda a gaiola só no arredondamento, abaixo de 1e-12 m: é onde o esparso cumpre 1e-9 m', () => {
     expect(pelaOrdem(false, null)).toBeLessThan(1e-12);

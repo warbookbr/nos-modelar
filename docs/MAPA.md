@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2164 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2168 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -112,6 +112,8 @@
 
 - `README.md` — Ajuste esparso da gaiola: a linha de base do solver denso
 - `ensaio-denso.mjs` — ensaio-denso.mjs — a linha de base do plano do ajuste esparso (fatia 1): o custo do ajuste denso de hoje na gaiola grande neutra (`tools/fixtures/ajuste-espa…
+- `ensaio-do-carro.mjs` — ensaio-do-carro.mjs — o gate 1 do plano do ajuste esparso: a subdivisão da lataria do quarto traseiro do carro-fastback com a rede mais densa, pela variante …
+- `ensaio-esparso.mjs` — ensaio-esparso.mjs — a fatia 2 do plano do ajuste esparso na gaiola de prova: o tempo do ajuste com peso pelo Cholesky esparso, a estrutura do fator (não nul…
 
 ## docs/modelar/banco-de-provas/aviao-2026-10-11/
 
@@ -1036,6 +1038,8 @@
 - `ajuste-de-curva-lisa-planta.test.mjs` — ajuste-de-curva-lisa-planta.test.mjs — a planta da lataria do carro-fastback (a TABELA da receita, só leitura, o contorno do polígono com filete da prancha) …
 - `ajuste-de-curva-lisa.js` — ajuste-de-curva-lisa.js — a curva lida de pontos (da prancha, de uma imagem) ajustada a poucos trechos de curvatura monótona, com o desvio de cada ponto medido
 - `ajuste-de-curva-lisa.test.mjs` — ajuste-de-curva-lisa.test.mjs — o ajuste de curva lisa em curvas analíticas conhecidas (arco, clotoide, elipse, S), limpas e com ruído de leitura, com o núme…
+- `algebra-esparsa.js` — Álgebra esparsa do núcleo: a matriz simétrica montada por soma de termos, a ordenação de grau mínimo, o Cholesky esparso e a substituição. Tudo é determiníst…
+- `algebra-esparsa.test.mjs` — a matriz de uma grade nx × ny com o estêncil de cinco pontos mais a diagonal, positiva definida e diagonal dominante
 - `alisar-curvas.js` — alisar-curvas.js — os pontos-chave de uma curva declarada alisados pelo resíduo do ajuste polinomial local, sem mexer na forma
 - `alisar-curvas.test.mjs` — alisar-curvas.test.mjs — o alisamento pelo resíduo do ajuste polinomial local: não mexe no arco, no círculo nem na parábola, tira o ruído, deixa os pontos du…
 - `animacao.js` — animacao.js — animação rígida e skinning sobre lotes já adaptados.

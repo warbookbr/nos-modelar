@@ -28,6 +28,7 @@
  */
 
 import { memoizarPura } from './memoria-de-pura.js';
+import { matrizSimetrica, paraDensa, cotaDeVarah, fatorarCholesky, resolverCholesky } from './algebra-esparsa.js';
 
 export const NITIDEZ_INFINITA = Infinity;
 export const NITIDEZ_VIVA = 10;
@@ -623,6 +624,53 @@ export function energiaDeVariacaoDeCurvatura(gaiola, { onda = null } = {}) {
   return { onda: ondaUsada, passo, termos, derivadas, valor };
 }
 
+/* O ajuste com peso sem cota exata, pelo Cholesky esparso: H = Σ p_i W̃_iᵀ W̃_i + I (ou a energia mais o resto) é simétrica positiva
+ * definida, montada por soma na mesma ordem da matriz densa e fatorada na ordem de grau mínimo. O ganho ‖H⁻¹ S‖∞, com S as colunas
+ * p_i W̃_iᵀ que cada cota move, tem a cota ‖H⁻¹‖∞ ‖S‖∞, e ‖H⁻¹‖∞ a cota de Varah quando H é estritamente diagonal dominante (o caso sem
+ * energia: a diagonal 1 mais a soma dos quadrados passa a soma dos produtos cruzados). Com a cota até GANHO_MAXIMO_DAS_MEDIDAS a recusa
+ * é impossível, a conta exata não roda e o ganho devolvido é a cota (`ganhoPelaCota`). Acima dela roda a conta exata, uma resolução por
+ * cota, e os pontos da recusa saem da resolução na linha do pior vértice (H é simétrica, e a linha dele em H⁻¹ S é Sᵀ H⁻¹ e_pior).
+ * Devolve null quando o Cholesky para, e quem chama cai na eliminação densa, com as recusas dela. */
+function ajustePositivoEsparso({ P, U, energia, curvatura, comPeso, pesoDe, esparsa }) {
+  const nU = U.length; const H = matrizSimetrica(nU);
+  const rhs = [0, 1, 2].map((ax) => U.map((j) => (energia ? RESTO_DO_DESLOCAMENTO * P[j][ax] : P[j][ax])));
+  for (let k = 0; k < nU; k++) H.somar(k, k, energia ? RESTO_DO_DESLOCAMENTO : 1);
+  if (curvatura) for (const { peso, linhas } of curvatura.termos) for (const l of linhas) for (const [r, wr] of l) for (const [c, wc] of l) H.somar(r, c, peso * wr * wc);
+  const sensibilidade = []; const normaDeS = new Float64Array(nU);
+  for (const i of comPeso) {
+    const { termos, b } = esparsa(i); const p = pesoDe.get(i);
+    for (const [r, wr] of termos) for (const [c, wc] of termos) H.somar(r, c, p * wr * wc);
+    for (const [r, wr] of termos) for (let ax = 0; ax < 3; ax++) rhs[ax][r] += p * wr * (P[i][ax] - b[ax]);
+    const e = new Map(); for (const [r, wr] of termos) e.set(r, (e.get(r) ?? 0) + p * wr);
+    for (const [r, v] of e) normaDeS[r] += Math.abs(v);
+    sensibilidade.push(e);
+  }
+  const fator = fatorarCholesky(H);
+  if (fator.naoPositivaEm !== undefined) return null;
+  let maiorS = 0; for (const v of normaDeS) maiorS = Math.max(maiorS, v);
+  const cota = cotaDeVarah(H) * maiorS;
+  let ganho = cota; let ganhoPelaCota = true;
+  if (!(cota <= GANHO_MAXIMO_DAS_MEDIDAS)) {
+    ganhoPelaCota = false;
+    const somas = new Float64Array(nU); const e = new Array(nU).fill(0);
+    for (const s of sensibilidade) {
+      for (const [r, v] of s) e[r] = v;
+      const coluna = resolverCholesky(fator, e);
+      for (const [r] of s) e[r] = 0;
+      for (let r = 0; r < nU; r++) somas[r] += Math.abs(coluna[r]);
+    }
+    ganho = 0; let pior = 0;
+    for (let r = 0; r < nU; r++) if (somas[r] > ganho) { ganho = somas[r]; pior = r; }
+    if (ganho > GANHO_MAXIMO_DAS_MEDIDAS) {
+      e[pior] = 1; const z = resolverCholesky(fator, e);
+      const linha = sensibilidade.map((s) => { let v = 0; for (const [r, w] of s) v += w * z[r]; return Math.abs(v); });
+      const maior = Math.max(...linha);
+      throw new ErroDasMedidas(`as medidas formam sistema mal condicionado (ganho ${ganho.toPrecision(3)}, acima de ${GANHO_MAXIMO_DAS_MEDIDAS})`, comPeso.filter((_, t) => linha[t] >= 0.01 * maior).sort((a, b) => a - b));
+    }
+  }
+  return { eixos: rhs.map((b) => resolverCholesky(fator, b)), ganho, ganhoPelaCota };
+}
+
 /* Medidas com peso: a superfície limite se aproxima das cotas por mínimos quadrados, sem ser forçada a passar por elas,
  * para que muitas cotas lidas de imagem, cada uma com o seu erro, não ondulem a chapa. A medida exata (peso infinito)
  * continua restrição. As incógnitas são as posições x_U de U, os vértices das estrelas dos pontos com peso e os pontos
@@ -643,10 +691,13 @@ export function energiaDeVariacaoDeCurvatura(gaiola, { onda = null } = {}) {
  *   [ H  Gᵀ ] [ x_U ]   [ Σ p_i W̃_iᵀ (a_i − b_i) + c_U ]        H = Σ p_i W̃_iᵀ W̃_i + I,
  *   [ G  0  ] [  μ  ] = [ a_E − b_E                     ]        G = as linhas W̃_k dos pontos exatos,
  *
- * em que μ são os multiplicadores das restrições. Ele se resolve pela mesma eliminação de Gauss em ordem fixa (U e os
- * pontos em ordem crescente de índice), bit a bit. O ganho é o mesmo das medidas exatas: o maior fator pelo qual um erro
- * nas cotas vira deslocamento de um ponto da gaiola, ‖∂x_U/∂a‖∞, calculado resolvendo o sistema para cada cota; acima de
- * GANHO_MAXIMO_DAS_MEDIDAS falha com os pontos que mais pesam, e o sistema singular falha com os pontos do vetor nulo.
+ * em que μ são os multiplicadores das restrições. Sem cota exata não há μ, H é positiva definida e se resolve pelo Cholesky esparso
+ * (`ajustePositivoEsparso`); com cotas exatas, ou quando o Cholesky para, pela eliminação de Gauss em ordem fixa (U e os pontos em ordem
+ * crescente de índice). As duas são determinísticas bit a bit. O ganho é o mesmo das medidas exatas: o maior fator pelo qual um erro
+ * nas cotas vira deslocamento de um ponto da gaiola, ‖∂x_U/∂a‖∞. Sem cota exata e sem a energia, a cota de Varah o limita sem resolver
+ * nada e, quando ela fica até o limite, o ganho devolvido é a cota (`ganhoPelaCota: true`); nos outros casos ele é calculado resolvendo
+ * o sistema para cada cota. Acima de GANHO_MAXIMO_DAS_MEDIDAS falha com os pontos que mais pesam, e o sistema singular falha com os pontos
+ * do vetor nulo.
  *
  * Com `regularizacao: { tipo: 'variacaoDeCurvatura', onda? }` o segundo termo deixa de ser o deslocamento e passa a ser a energia de
  * variação de curvatura da superfície limite (`energiaDeVariacaoDeCurvatura`, com os termos tirados da gaiola declarada), e do
@@ -657,7 +708,7 @@ export function energiaDeVariacaoDeCurvatura(gaiola, { onda = null } = {}) {
  * Todos os vértices da gaiola são incógnitas, a lista só de cotas exatas é aceita (o ajuste exato de `ajustarGaiolaAsMedidas` não tem
  * regularização), e a saída ganha `regularizacao: { tipo, onda, passo, arestasComTermo, energiaAntes, energiaDepois }`. Sem o argumento
  * (ou null) a conta é a de sempre, operação por operação. */
-function ajustarComPesoSemMemoria(gaiola, medidas, regularizacao = null) {
+function ajustarComPesoSemMemoria(gaiola, medidas, regularizacao = null, { denso = false } = {}) {
   const energia = lerRegularizacao(regularizacao);
   const { nitidez, C, facesDoV } = prepararLimite(gaiola);
   const borda = gaiola.borda ?? 'suave'; const P = gaiola.vertices; const F = gaiola.faces;
@@ -695,46 +746,48 @@ function ajustarComPesoSemMemoria(gaiola, medidas, regularizacao = null) {
     });
     return { termos, b };
   };
-  const A = Array.from({ length: n }, () => new Array(n).fill(0));
-  const rhs = [0, 1, 2].map((ax) => U.map((j) => (energia ? RESTO_DO_DESLOCAMENTO * P[j][ax] : P[j][ax])).concat(new Array(nE).fill(0)));
-  for (let k = 0; k < nU; k++) A[k][k] = energia ? RESTO_DO_DESLOCAMENTO : 1;
-  let curvatura = null;
-  if (energia) {
-    /* U é a lista de todos os vértices, e a coluna de cada um é o próprio índice */
-    curvatura = energiaDeVariacaoDeCurvatura(gaiola, { onda: energia.onda });
-    for (const { peso, linhas } of curvatura.termos) for (const l of linhas) for (const [r, wr] of l) for (const [c, wc] of l) A[r][c] += peso * wr * wc;
+  /* U é a lista de todos os vértices com a energia, e a coluna de cada um é o próprio índice */
+  const curvatura = energia ? energiaDeVariacaoDeCurvatura(gaiola, { onda: energia.onda }) : null;
+  /* sem cota exata o sistema é positivo definido e vai ao Cholesky esparso; com elas, ou quando o Cholesky para, à eliminação densa */
+  const positivo = nE === 0 && !denso ? ajustePositivoEsparso({ P, U, energia, curvatura, comPeso, pesoDe, esparsa }) : null;
+  const { eixos, ganho, ganhoPelaCota } = positivo ?? ajusteDenso();
+  function ajusteDenso() {
+    const A = Array.from({ length: n }, () => new Array(n).fill(0));
+    const rhs = [0, 1, 2].map((ax) => U.map((j) => (energia ? RESTO_DO_DESLOCAMENTO * P[j][ax] : P[j][ax])).concat(new Array(nE).fill(0)));
+    for (let k = 0; k < nU; k++) A[k][k] = energia ? RESTO_DO_DESLOCAMENTO : 1;
+    if (curvatura) for (const { peso, linhas } of curvatura.termos) for (const l of linhas) for (const [r, wr] of l) for (const [c, wc] of l) A[r][c] += peso * wr * wc;
+    const sensibilidade = []; // a coluna do lado direito que cada cota move, para o ganho
+    for (const i of comPeso) {
+      const { termos, b } = esparsa(i); const p = pesoDe.get(i);
+      for (const [r, wr] of termos) for (const [c, wc] of termos) A[r][c] += p * wr * wc;
+      for (const [r, wr] of termos) for (let ax = 0; ax < 3; ax++) rhs[ax][r] += p * wr * (P[i][ax] - b[ax]);
+      const e = new Array(n).fill(0); for (const [r, wr] of termos) e[r] += p * wr;
+      sensibilidade.push(e);
+    }
+    exatos.forEach((i, s) => {
+      const { termos, b } = esparsa(i); const r = nU + s;
+      for (const [c, wc] of termos) { A[r][c] += wc; A[c][r] += wc; }
+      for (let ax = 0; ax < 3; ax++) rhs[ax][r] = P[i][ax] - b[ax];
+      const e = new Array(n).fill(0); e[r] = 1;
+      sensibilidade.push(e);
+    });
+    const quem = [...comPeso, ...exatos];
+    const lu = fatorarLU(A);
+    if (lu.singularEm >= 0) {
+      const x = vetorNulo(lu, lu.singularEm); const maior = Math.max(...x.map(Math.abs));
+      const envolvidos = new Set();
+      x.forEach((v, r) => { if (Math.abs(v) > 1e-9 * maior) envolvidos.add(r < nU ? U[r] : exatos[r - nU]); });
+      throw new ErroDasMedidas('as medidas formam sistema singular, porque a superfície limite não separa estes pontos', [...envolvidos].sort((a, b) => a - b));
+    }
+    const colunas = sensibilidade.map((e) => resolverLU(lu, e));
+    let ganho = 0, pior = 0;
+    for (let r = 0; r < nU; r++) { let s = 0; for (const c of colunas) s += Math.abs(c[r]); if (s > ganho) { ganho = s; pior = r; } }
+    if (ganho > GANHO_MAXIMO_DAS_MEDIDAS) {
+      const maior = Math.max(...colunas.map((c) => Math.abs(c[pior])));
+      throw new ErroDasMedidas(`as medidas formam sistema mal condicionado (ganho ${ganho.toPrecision(3)}, acima de ${GANHO_MAXIMO_DAS_MEDIDAS})`, quem.filter((_, t) => Math.abs(colunas[t][pior]) >= 0.01 * maior).sort((a, b) => a - b));
+    }
+    return { eixos: rhs.map((b) => resolverLU(lu, b)), ganho, ganhoPelaCota: false };
   }
-  const sensibilidade = []; // a coluna do lado direito que cada cota move, para o ganho
-  for (const i of comPeso) {
-    const { termos, b } = esparsa(i); const p = pesoDe.get(i);
-    for (const [r, wr] of termos) for (const [c, wc] of termos) A[r][c] += p * wr * wc;
-    for (const [r, wr] of termos) for (let ax = 0; ax < 3; ax++) rhs[ax][r] += p * wr * (P[i][ax] - b[ax]);
-    const e = new Array(n).fill(0); for (const [r, wr] of termos) e[r] += p * wr;
-    sensibilidade.push(e);
-  }
-  exatos.forEach((i, s) => {
-    const { termos, b } = esparsa(i); const r = nU + s;
-    for (const [c, wc] of termos) { A[r][c] += wc; A[c][r] += wc; }
-    for (let ax = 0; ax < 3; ax++) rhs[ax][r] = P[i][ax] - b[ax];
-    const e = new Array(n).fill(0); e[r] = 1;
-    sensibilidade.push(e);
-  });
-  const quem = [...comPeso, ...exatos];
-  const lu = fatorarLU(A);
-  if (lu.singularEm >= 0) {
-    const x = vetorNulo(lu, lu.singularEm); const maior = Math.max(...x.map(Math.abs));
-    const envolvidos = new Set();
-    x.forEach((v, r) => { if (Math.abs(v) > 1e-9 * maior) envolvidos.add(r < nU ? U[r] : exatos[r - nU]); });
-    throw new ErroDasMedidas('as medidas formam sistema singular, porque a superfície limite não separa estes pontos', [...envolvidos].sort((a, b) => a - b));
-  }
-  const colunas = sensibilidade.map((e) => resolverLU(lu, e));
-  let ganho = 0, pior = 0;
-  for (let r = 0; r < nU; r++) { let s = 0; for (const c of colunas) s += Math.abs(c[r]); if (s > ganho) { ganho = s; pior = r; } }
-  if (ganho > GANHO_MAXIMO_DAS_MEDIDAS) {
-    const maior = Math.max(...colunas.map((c) => Math.abs(c[pior])));
-    throw new ErroDasMedidas(`as medidas formam sistema mal condicionado (ganho ${ganho.toPrecision(3)}, acima de ${GANHO_MAXIMO_DAS_MEDIDAS})`, quem.filter((_, t) => Math.abs(colunas[t][pior]) >= 0.01 * maior).sort((a, b) => a - b));
-  }
-  const eixos = rhs.map((b) => resolverLU(lu, b));
   const V = P.map((p) => [...p]);
   U.forEach((j, r) => { V[j] = [eixos[0][r], eixos[1][r], eixos[2][r]]; });
   /* conferência pela geometria da gaiola nova: o exato passa a TOLERANCIA_DAS_MEDIDAS, o com peso só relata o desvio */
@@ -744,12 +797,15 @@ function ajustarComPesoSemMemoria(gaiola, medidas, regularizacao = null) {
   });
   const fora = M.filter((i, r) => pesoDe.get(i) === Infinity && residuos[r] > TOLERANCIA_DAS_MEDIDAS);
   if (fora.length) throw new ErroDasMedidas(`a superfície limite não chegou a ${TOLERANCIA_DAS_MEDIDAS} m das medidas exatas`, fora);
-  if (curvatura) return { vertices: V, ganho, residuos, medidas: M, regularizacao: { tipo: energia.tipo, onda: curvatura.onda, passo: curvatura.passo, arestasComTermo: curvatura.termos.length, energiaAntes: curvatura.valor(P), energiaDepois: curvatura.valor(V) } };
-  return { vertices: V, ganho, residuos, medidas: M };
+  if (curvatura) return { vertices: V, ganho, ganhoPelaCota, residuos, medidas: M, regularizacao: { tipo: energia.tipo, onda: curvatura.onda, passo: curvatura.passo, arestasComTermo: curvatura.termos.length, energiaAntes: curvatura.valor(P), energiaDepois: curvatura.valor(V) } };
+  return { vertices: V, ganho, ganhoPelaCota, residuos, medidas: M };
 }
 
 /* O mesmo ajuste com os mesmos argumentos sai da memória (ver `subdividirCatmullClark`): é a conta mais cara da leitura da superfície. */
 export const ajustarGaiolaAsMedidasComPeso = memoizarPura(ajustarComPesoSemMemoria);
+
+/** O mesmo ajuste sempre pela eliminação densa, sem memória: a referência contra a qual os testes e o ensaio medem o caminho esparso. */
+export const ajustarGaiolaAsMedidasComPesoDenso = (gaiola, medidas, regularizacao = null) => ajustarComPesoSemMemoria(gaiola, medidas, regularizacao, { denso: true });
 
 /**
  * operadorDasMedidas(gaiola, medidas) -> { aplicar(delta), exato }
@@ -815,21 +871,30 @@ export function operadorDasMedidas(gaiola, medidas, regularizacao = null) {
     });
     return { termos, fora };
   };
-  const A = Array.from({ length: n }, () => new Array(n).fill(0));
-  for (let k = 0; k < nU; k++) A[k][k] = energia ? RESTO_DO_DESLOCAMENTO : 1;
-  if (energia) for (const { peso, linhas } of energiaDeVariacaoDeCurvatura(gaiola, { onda: energia.onda }).termos) for (const l of linhas) for (const [r, wr] of l) for (const [c, wc] of l) A[r][c] += peso * wr * wc;
+  /* sem cota exata o sistema é positivo definido e vai ao Cholesky esparso, como no ajuste; com elas, à eliminação densa */
+  const H = nE === 0 ? matrizSimetrica(n) : null;
+  const A = H ? null : Array.from({ length: n }, () => new Array(n).fill(0));
+  const acumular = H ? (r, c, v) => H.somar(r, c, v) : (r, c, v) => { A[r][c] += v; };
+  for (let k = 0; k < nU; k++) acumular(k, k, energia ? RESTO_DO_DESLOCAMENTO : 1);
+  if (energia) for (const { peso, linhas } of energiaDeVariacaoDeCurvatura(gaiola, { onda: energia.onda }).termos) for (const l of linhas) for (const [r, wr] of l) for (const [c, wc] of l) acumular(r, c, peso * wr * wc);
   const linhasComPeso = comPeso.map((i) => {
     const e = esparsa(i); const p = pesoDe.get(i);
-    for (const [r, wr] of e.termos) for (const [c, wc] of e.termos) A[r][c] += p * wr * wc;
+    for (const [r, wr] of e.termos) for (const [c, wc] of e.termos) acumular(r, c, p * wr * wc);
     return { i, p, ...e };
   });
   const linhasExatas = exatos.map((i, s) => {
     const e = esparsa(i); const r = nU + s;
-    for (const [c, wc] of e.termos) { A[r][c] += wc; A[c][r] += wc; }
+    for (const [c, wc] of e.termos) { acumular(r, c, wc); acumular(c, r, wc); }
     return { i, r, ...e };
   });
-  const lu = fatorarLU(A);
-  if (lu.singularEm >= 0) throw new ErroDasMedidas('as medidas formam sistema singular, porque a superfície limite não separa estes pontos', M);
+  const fator = H ? fatorarCholesky(H) : null;
+  let resolver;
+  if (fator && fator.naoPositivaEm === undefined) resolver = (b) => resolverCholesky(fator, b);
+  else {
+    const lu = fatorarLU(A ?? paraDensa(H));
+    if (lu.singularEm >= 0) throw new ErroDasMedidas('as medidas formam sistema singular, porque a superfície limite não separa estes pontos', M);
+    resolver = (b) => resolverLU(lu, b);
+  }
   const aplicar = (D) => {
     const rhs = [0, 1, 2].map((ax) => U.map((j) => (energia ? RESTO_DO_DESLOCAMENTO * D[j][ax] : D[j][ax])).concat(new Array(nE).fill(0)));
     for (const { i, p, termos, fora } of linhasComPeso) {
@@ -840,7 +905,7 @@ export function operadorDasMedidas(gaiola, medidas, regularizacao = null) {
       const b = somar(D, fora);
       for (let ax = 0; ax < 3; ax++) rhs[ax][r] = D[i][ax] - b[ax];
     }
-    const eixos = rhs.map((b) => resolverLU(lu, b));
+    const eixos = rhs.map(resolver);
     const V = D.map((d) => [...d]);
     U.forEach((j, r) => { V[j] = [eixos[0][r], eixos[1][r], eixos[2][r]]; });
     return V;
