@@ -1,6 +1,6 @@
 # Formas que faltavam: o anel, o toro e a bacia provados, a haste no esboço e a curva paralela na rede
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `modulos/esboco-nucleo/`, `src/autoria/executar-receita.js`, `docs/modelar/usar/GOTCHAS-POR-OPERACAO.md`, `procedural/nucleo/operacoes/primitivas-superficie.js`
 
@@ -46,7 +46,7 @@ O núcleo não ganha operação nem muda a malha de nenhuma peça. O acervo sai 
 
 1. Feita em 2026-11-22: formas ocas provadas, `casca` no registro da receita comum, guia e backlog.
 2. Feita em 2026-11-22: a `haste` no esboço 2.0.
-3. A curva paralela na rede de curvas, depois do território do G2.
+3. Separada em 2026-11-22, por decisão da pessoa, no plano em rascunho [curva paralela na rede](2026-11-22-curva-paralela-na-rede.md), que se ativa depois do G2; o arquivo da rede fica livre para o G2.
 
 ## Riscos e parada
 
@@ -54,7 +54,7 @@ Se a `casca` no registro da receita mudar a malha ou o tempo de alguma peça do 
 
 ## Fechamento
 
-Preencher somente ao concluir ou cancelar.
+Concluído em 2026-11-22. A fatia 1 provou o anel, o toro, a bacia e o tubo oco com as operações existentes, pôs a `casca` no registro da receita comum e tirou os três itens do backlog; a fatia 2 deu a `haste` no esboço 2.0. Os itens 1 a 3 do gate de saída passaram, com o CI verde. A fatia 3, a curva paralela na rede de curvas, foi separada no plano em rascunho [curva paralela na rede](2026-11-22-curva-paralela-na-rede.md), por decisão da pessoa, para o G2 usar já o arquivo da rede e a curva paralela seguir depois dele sem voltar ao backlog.
 
 ## Andamento
 
