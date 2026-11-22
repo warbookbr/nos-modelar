@@ -1,10 +1,10 @@
 # Hélice, mola, rosca e fixador: um caminho helicoidal que serve a quatro ferramentas que faltam
 
-**Estado:** rascunho
+**Estado:** ativo
 
-**Território:** a declarar ao ativar: `procedural/nucleo/caminho-helicoidal.js`, `procedural/nucleo/operacoes/friso.js`, `procedural/nucleo/uso-operacoes.js`, `procedural/familias/mola/`, `procedural/familias/fixador/`, `procedural/familias/index.js`, `tools/fixtures/helice/`, `docs/modelar/ferramentas-por-objeto.json`
+**Território:** `procedural/nucleo/caminho-helicoidal.js`, `procedural/nucleo/operacoes/friso.js`, `procedural/nucleo/uso-operacoes.js`, `procedural/familias/mola/`, `procedural/familias/fixador/`, `procedural/familias/index.js`, `tools/fixtures/helice/`, `docs/modelar/ferramentas-por-objeto.json`, `tools/modelar/capacidade.mjs`
 
-**Responsável:** a IA da sessão na nuvem, com a pessoa aprovando a forma de cada família por imagem.
+**Responsável:** a IA da sessão na nuvem, com a pessoa aprovando a forma de cada família por imagem. A pessoa aprovou e ativou o plano em 2026-11-22 e decidiu a rosca cosmética.
 
 **Repositório e base:** `warbookbr/nos-modelar`, main de 2026-11-22.
 
@@ -45,12 +45,15 @@ O núcleo não ganha nome de objeto: o ajudante se chama pelo que gera, o caminh
 
 ## Fatias
 
-1. O caminho helicoidal e as `normais` do friso.
+1. Feita em 2026-11-22: o caminho helicoidal (`caminhoHelicoidal`, com ficha em `npm run capacidade`) e as `normais` do friso, provados na peça neutra `tools/fixtures/helice/`.
 2. A família `mola`, com as imagens à pessoa.
 3. A rosca sobre cilindro e a família `fixador`, com as imagens à pessoa.
 4. Fechamento: mapa, backlog e encerramento.
 
-## Decisão da pessoa antes da fatia 3
+## Decisão da pessoa
+
+Decidido em 2026-11-22: a rosca sai cosmética, com o fundido como opção depois se um uso pedir o sólido único. O texto da escolha segue abaixo.
+
 
 A rosca pode sair de dois jeitos. No primeiro, cosmético, o filete é um `friso` que encosta no núcleo do parafuso como sólido à parte, com o contato declarado: é rápido, determinístico e dá a imagem certa, mas o parafuso não é um sólido só no STEP. No segundo, fundido, o filete se une ao núcleo por `unir`: o STEP sai com um sólido só, a operação custa muito mais tempo por peça, e a booleana em superfície helicoidal pode pedir correção no núcleo. A recomendação é o cosmético, com o fundido como opção depois, se um uso pedir o sólido único.
 
@@ -61,3 +64,7 @@ Se as `normais` por ponto mudarem a malha de alguma peça do acervo, a fatia 1 v
 ## Fechamento
 
 Preencher somente ao concluir ou cancelar.
+
+## Andamento
+
+Em 2026-11-22 a fatia 1 foi entregue; o fio de uma mola de 6 voltas sai sólido fechado em cerca de 45 ms e o filete de 12 voltas em cerca de 10 ms.

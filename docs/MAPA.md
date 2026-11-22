@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2175 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2178 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1057,6 +1057,7 @@
 - `arrumacao.test.mjs` — arrumacao.test.mjs — segura a arrumação do plano "o núcleo mora num lugar só" (2026-09-22). Antes dele, os testes do núcleo moravam espalhados por `tools/` e…
 - `artefatos.js` — artefatos.js — contrato neutro e procedência determinística da execução procedural.
 - `artefatos.test.mjs` — artefatos-procedencia.test.mjs — prova o artefato neutro e a origem das entidades finais.
+- `caminho-helicoidal.js` — caminho-helicoidal.js — os pontos e as normais de uma hélice, para o friso varrer um perfil ao longo dela.
 - `casca.js` — casca.js — casca com espessura constante de um sólido facetado: função pura sobre posições e listas de vértices.
 - `casca.test.mjs` — casca.test.mjs — a extensão `casca` medida sobre a malha que ela devolve, não sobre a conta que a produz. A espessura é conferida por uma medida independente…
 - `catalogo.js` — catálogo.js — projeções puras e determinísticas do registro de operações. Não executa receita, não lê arquivos e não conhece visor, MCP ou domínio.
@@ -3150,6 +3151,11 @@
 ## tools/fixtures/forma-exata/
 
 - `chapa-por-lacos.js` — chapa-por-lacos.js — a peça de comparação do caso A do estudo do método (plano "forma exata antes da malha", fatia 3): uma chapa de contorno curvo de 290 por…
+
+## tools/fixtures/helice/
+
+- `helice.test.mjs` — helice.test.mjs — o caminho helicoidal: raio, passo, voltas, sentido e pontas medidos nos pontos, e o friso que ele dá sai sólido fechado, com o perfil giran…
+- `receita.js` — helice — a peça de teste neutra do caminho helicoidal: o fio redondo de uma mola de espiras encostadas nas pontas e o filete triangular de uma rosca sobre um…
 
 ## tools/fixtures/lataria-com-vinco/
 

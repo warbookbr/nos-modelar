@@ -141,7 +141,8 @@ describe('passo friso', () => {
     const motivo = (extra) => nucleo(prova.passos({ extra: { nervura: extra } }), P).orfaos.map((o) => o.motivo);
     expect(motivo({ linha: { nome: 'nervura', pontos: ['p1_7', 'p2_6'] } })[0]).toBe("a linha 'nervura' liga 'p1_7' a 'p2_6', que não formam aresta da gaiola; a linha segue as arestas da gaiola, como o vinco");
     expect(motivo({ linha: { nome: 'nervura', pontos: ['p1_7', 'p4_4'] } })[0]).toBe("a linha 'nervura' cita o ponto 'p4_4', que não é ponto nomeado da gaiola da superfície");
-    expect(motivo({ normal: [0, 1, 0] })[0]).toMatch(/^normal só vale na polilinha/);
+    expect(motivo({ normal: [0, 1, 0] })[0]).toMatch(/^normal e normais só valem na polilinha/);
+    expect(motivo({ normais: [[0, 1, 0]] })[0]).toMatch(/^normal e normais só valem na polilinha/);
     expect(motivo({ superficie: { op: 'subdivisao', id: 9 } })[0]).toMatch(/^superficie: nenhum passo subdivisao declara a origem 9/);
     expect(motivo({ superficie: { op: 'cubo', id: 1 } })[0]).toMatch(/^superficie precisa ser a origem de um passo subdivisao/);
     expect(motivo({ perfil: { retangulo: { largura: 0.008, profundidade: 0.004, centro: [0, 0.002] } } })[0]).toMatch(/^o perfil não entra na chapa \(v vai de 0 a 0\.004\)/);

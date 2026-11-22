@@ -22,7 +22,7 @@ diz o commit onde está; não governa trabalho novo.
 
 ## Estado atual
 
-- Planos ativos: <!-- planos-ativos:inicio -->[modelagem de carro de passeio](planos/2026-11-14-modelagem-de-carro.md), [ajuste esparso da gaiola](planos/2026-11-22-ajuste-esparso-da-gaiola.md) e [formas que faltavam](planos/2026-11-22-formas-que-faltavam.md).<!-- planos-ativos:fim -->
+- Planos ativos: <!-- planos-ativos:inicio -->[modelagem de carro de passeio](planos/2026-11-14-modelagem-de-carro.md), [ajuste esparso da gaiola](planos/2026-11-22-ajuste-esparso-da-gaiola.md), [formas que faltavam](planos/2026-11-22-formas-que-faltavam.md) e [hélice, mola, rosca e fixador](planos/2026-11-22-helice-mola-rosca-e-fixador.md).<!-- planos-ativos:fim -->
 - Encerrados recentes: [abertura em qualquer direção](./decisoes/PLANOS-ENCERRADOS.md), [limites do sólido por laços](./decisoes/PLANOS-ENCERRADOS.md), [esboço pelo núcleo](./decisoes/PLANOS-ENCERRADOS.md) e [sólido por laços](./decisoes/PLANOS-ENCERRADOS.md); os outros na [crônica](./decisoes/PLANOS-ENCERRADOS.md).
 - A [exportação CAD/STEP modular](./decisoes/PLANOS-ENCERRADOS.md)
   entregou `modulos/exportador-cad/`, `modulos/exportador-obj/` e as CLIs
