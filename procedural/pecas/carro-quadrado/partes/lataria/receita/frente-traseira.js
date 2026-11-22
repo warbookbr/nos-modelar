@@ -697,20 +697,44 @@ export function passosFrenteTraseira(T, proxId) {
   passos.push(caixa('chamferBox', idPux, -pux.larg / 2, pux.larg / 2, pux.yCentro - pux.alt / 2, pux.yCentro + pux.alt / 2, pux.z0, pux.z1, 4));
   marcar('puxadorTampa', 'plasticoPreto', { origem: { op: 'chamferBox', id: idPux } });
 
-  // --- FECHADURA DA TAMPA ---
+  // --- FECHADURA DA TAMPA (aro preto fosco + miolo metálico prateado) ---
   const fech = t.fechadura;
   passos.push(['cilindro', {
     origemId: ID_FECHADURA, raio: m(fech.raio), altura: m(fech.z1 - fech.z0), lados: 20, eixo: 'z',
     em: [0, m(fech.yCentro), m(fech.z0)],
   }]);
-  marcar('fechaduraTampa', 'plasticoPreto', { alias: 'fechaduraTampaInteiro' });
+  marcar('fechaduraTampa', 'plasticoFosco', { alias: 'fechaduraTampaInteiro' });
+  const idMiolo = proxId();
+  const N_M = 12;
+  const rM = 9.5;
+  const vM = [];
+  for (let i = 0; i < N_M; i += 1) {
+    const a = (2 * Math.PI * i) / N_M;
+    vM.push([m(rM * Math.cos(a)), m(fech.yCentro + rM * Math.sin(a)), m(fech.z0 - 1.5)]);
+  }
+  for (let i = 0; i < N_M; i += 1) {
+    const a = (2 * Math.PI * i) / N_M;
+    vM.push([m(rM * Math.cos(a)), m(fech.yCentro + rM * Math.sin(a)), m(fech.z0 + 4)]);
+  }
+  const iF = vM.length; vM.push([0, m(fech.yCentro), m(fech.z0 - 1.5)]);
+  const iB = vM.length; vM.push([0, m(fech.yCentro), m(fech.z0 + 4)]);
+  const fM = [];
+  for (let i = 0; i < N_M; i += 1) {
+    const j = (i + 1) % N_M;
+    fM.push([j, i, iF]);
+    fM.push([i, j, N_M + j, N_M + i]);
+    fM.push([N_M + i, N_M + j, iB]);
+  }
+  passos.push(['subdivisao', { origemId: idMiolo, niveis: 0, vertices: vM, faces: fM }]);
+  marcar('fechaduraTampa', 'frisoClaro', { origem: { op: 'subdivisao', id: idMiolo } });
 
-  // --- ESCAPAMENTO ---
+  // --- ESCAPAMENTO (ponteira metálica levemente inclinada para baixo) ---
   const esc = t.escapamento;
   passos.push(['cilindro', {
     origemId: ID_ESCAPAMENTO, raio: m(esc.raio), altura: m(esc.z1 - esc.z0), lados: 20, eixo: 'z',
     em: [m(esc.x), m(esc.y), m(esc.z0)],
   }]);
+  passos.push(['rotaciona', { eixo: 'x', graus: -5, pivo: [m(esc.x), m(esc.y), m(esc.z1)], sel: { alias: 'escapamentoInteiro' } }]);
   marcar('escapamento', 'escapamento', { alias: 'escapamentoInteiro' });
 
   return passos;

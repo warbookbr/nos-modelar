@@ -220,5 +220,25 @@ export function passosParachoques(T, varridos, proxId, passosChapa, pontosChapa,
     passos.push(['parte', { nome: partePorta, material: 'plasticoFosco', sel: { origem: { op: 'chamferBox', id: idMac } } }]);
   }
 
+  /* contorno da tampa do tanque de combustível apenas no lado direito (+x), acima/atrás do arco traseiro */
+  const tampaTanque = conformarNaChapa({
+    malha: { st: stChapa },
+    vista: 'x',
+    sentido: '+',
+    unidade: 'm',
+    secao: { largura: 3.5, altura: 3.0, chanfro: 0.5 },
+    deslocamentoMm: -1.5,
+    parte: 'tampaTanque',
+    material: 'plasticoFosco',
+    nome: 'tampaTanque',
+    fechada: true,
+    trilho: [
+      [m(655), m(-1355)], [m(655), m(-1500)], [m(790), m(-1500)], [m(790), m(-1355)],
+    ],
+    raios: 14,
+    origemId: proxId(),
+  });
+  passos.push(...tampaTanque.passos);
+
   return passos;
 }
