@@ -80,6 +80,8 @@ O custo da ordenação de grau exato não seria pego pelo teste de escala como a
 
 Fatia 3 feita em 2026-11-22. A medida da parada decidiu o complemento de Schur para o ponto de sela, porque o LU esparso do sistema inteiro encheu de 6,5 a 20 vezes a razão do caso positivo definido. O ajuste só com exatas e o operador exato passaram ao LU esparso com pivô por limiar, que ali enche como o Cholesky. Com a energia de curvatura o Schur pedia dois passos de refinamento iterativo para ficar nas tolerâncias. A recusa do singular nomeia a base do núcleo, e o teste dos dois cubos perdeu a marca CONHECIDA. A eliminação densa ficou só como reserva para quando o Cholesky de H para e como referência dos testes. Só duas peças do acervo usam o ajuste, o carro e a carenagem de prova, e nenhuma usa o ponto de sela, cujo ganho exato é o próximo gargalo (4,6 s com 3.577 incógnitas), medido no banco de provas e não atacado.
 
+Fatia 4 feita em 2026-11-22. Na lataria do carro, a mesma receita pelo esparso e pelo denso dá gaiolas a 1e-14 m e malhas a 6e-15 m, a medição da rodada passou sem mudar os `PONTOS` e a ferramenta reconhece a malha que o crítico julgou na rodada 7. O retrato das doze peças comparou igual. O ponto de decisão da pessoa não chegou a ser preciso, porque nada mudou além da tolerância.
+
 ## Fechamento
 
 Preencher ao concluir ou cancelar: estado final, commit e PR, gates, resultado observado e candidatos devolvidos ao backlog.

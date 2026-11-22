@@ -76,8 +76,10 @@ function heapDePares() {
  *  como grafo quociente: a variável eliminada vira um elemento, a lista das vizinhas dela, que representa a clique que a eliminação
  *  criaria, e absorve os elementos vizinhos e os que ficam contidos nela. O grau é a cota superior do AMD, a soma das variáveis vizinhas
  *  com o que cada elemento vizinho tem fora do novo, sem a união exata, que custava a maior parte do tempo e crescia mal. Sem
- *  supervariáveis. A estrutura vem da matriz montada; valores nulos contam como posição (a montagem não guarda o que nunca somou). */
-export function ordemDeGrauMinimo({ n, linhas }) {
+ *  supervariáveis. A estrutura vem da matriz montada; valores nulos contam como posição (a montagem não guarda o que nunca somou). Com
+ *  `contagem`, grava nela `visitas`, as entradas de listas que a ordenação percorreu: o trabalho dela, que o teste de escala conta. */
+export function ordemDeGrauMinimo({ n, linhas }, contagem = null) {
+  let visitas = 0;
   const vars = linhas.map((l, k) => { const a = []; for (const c of l.keys()) if (c !== k) a.push(c); return a; });
   const elems = Array.from({ length: n }, () => []); const doElemento = new Array(n).fill(null);
   const viva = new Uint8Array(n).fill(1); const elementoVivo = new Uint8Array(n);
@@ -91,9 +93,11 @@ export function ordemDeGrauMinimo({ n, linhas }) {
     viva[p] = 0; ordem[t++] = p;
     /* o elemento novo: as variáveis vizinhas de p e as dos elementos vizinhos, que ele absorve */
     const marcaDoElemento = ++tag; marca[p] = tag; const Lp = [];
+    visitas += vars[p].length;
     for (const v of vars[p]) if (viva[v] && marca[v] !== tag) { marca[v] = tag; Lp.push(v); }
     for (const e of elems[p]) {
       if (!elementoVivo[e]) continue;
+      visitas += doElemento[e].length;
       for (const v of doElemento[e]) if (viva[v] && marca[v] !== tag) { marca[v] = tag; Lp.push(v); }
       elementoVivo[e] = 0; doElemento[e] = null;
     }
@@ -101,6 +105,7 @@ export function ordemDeGrauMinimo({ n, linhas }) {
     /* cada vizinha deixa de ter como variável vizinha quem já está em p, e w(e) = |e \ p| para cada outro elemento vizinho delas */
     const tocados = [];
     for (const i of Lp) {
+      visitas += vars[i].length + 2 * elems[i].length;
       vars[i] = vars[i].filter((v) => viva[v] && marca[v] !== marcaDoElemento);
       for (const e of elems[i]) {
         if (!elementoVivo[e]) continue;
@@ -124,14 +129,13 @@ export function ordemDeGrauMinimo({ n, linhas }) {
     }
     for (const e of tocados) fora[e] = -1;
   }
+  if (contagem) contagem.visitas = visitas;
   return ordem;
 }
 
-/** fatorarCholesky(matriz, ordem) -> { n, ordem, posicao, Lp, Li, Lx, naoNulos } ou { naoPositivaEm }
- *  O fator L de P A Pᵀ = L Lᵀ, com P a ordem dada (a de `ordemDeGrauMinimo` quando omitida), guardado por colunas, cada coluna com a
- *  diagonal primeiro. Usa a árvore de eliminação para achar a estrutura de cada linha de L (o Cholesky por linhas). Pivô de valor até
- *  `pivoMinimo` vezes a diagonal original para a fatoração e devolve a posição, na ordem original, em que ela parou. */
-export function fatorarCholesky(matriz, ordem = ordemDeGrauMinimo(matriz), { pivoMinimo = 1e-14 } = {}) {
+/* A parte simbólica do Cholesky: a matriz permutada por colunas, a árvore de eliminação, o alcance de cada linha de L e a contagem das
+ * colunas de L. */
+function estruturaDoCholesky(matriz, ordem) {
   const n = matriz.n;
   const posicao = new Int32Array(n); for (let k = 0; k < n; k++) posicao[ordem[k]] = k;
   /* a matriz permutada por colunas, só a parte de cima (linha ≤ coluna), com as linhas em ordem crescente */
@@ -167,6 +171,24 @@ export function fatorarCholesky(matriz, ordem = ordemDeGrauMinimo(matriz), { piv
   const conta = new Int32Array(n).fill(1);
   for (let k = 0; k < n; k++) { const topo = alcance(k); for (let t = topo; t < n; t++) conta[pilha[t]]++; }
   marca.fill(-1);
+  return { n, posicao, ap, ai, ax, conta, alcance, pilha };
+}
+
+/** contarCholesky(matriz, ordem) -> { naoNulos, operacoes } : o tamanho do fator e a ordem das multiplicações da fatoração na ordem dada,
+ *  sem fatorar: a régua do teste de escala, que mede também o custo da eliminação na ordem da rede, a do solver denso. */
+export function contarCholesky(matriz, ordem) {
+  const { n, conta } = estruturaDoCholesky(matriz, ordem);
+  let naoNulos = 0, operacoes = 0; for (let k = 0; k < n; k++) { naoNulos += conta[k]; operacoes += conta[k] * conta[k]; }
+  return { naoNulos, operacoes };
+}
+
+/** fatorarCholesky(matriz, ordem) -> { n, ordem, posicao, Lp, Li, Lx, naoNulos } ou { naoPositivaEm }
+ *  O fator L de P A Pᵀ = L Lᵀ, com P a ordem dada (a de `ordemDeGrauMinimo` quando omitida), guardado por colunas, cada coluna com a
+ *  diagonal primeiro. Usa a árvore de eliminação para achar a estrutura de cada linha de L (o Cholesky por linhas). Pivô de valor até
+ *  `pivoMinimo` vezes a diagonal original para a fatoração e devolve a posição, na ordem original, em que ela parou. `operacoes` é Σ c_k²,
+ *  com c_k os não nulos da coluna k de L: a ordem das multiplicações da fatoração. */
+export function fatorarCholesky(matriz, ordem = ordemDeGrauMinimo(matriz), { pivoMinimo = 1e-14 } = {}) {
+  const { n, posicao, ap, ai, ax, conta, alcance, pilha } = estruturaDoCholesky(matriz, ordem);
   const Lp = new Int32Array(n + 1); for (let k = 0; k < n; k++) Lp[k + 1] = Lp[k] + conta[k];
   const Li = new Int32Array(Lp[n]); const Lx = new Float64Array(Lp[n]); const livre = Int32Array.from(Lp.subarray(0, n));
   const x = new Float64Array(n);
@@ -184,7 +206,8 @@ export function fatorarCholesky(matriz, ordem = ordemDeGrauMinimo(matriz), { piv
     if (!(d > pivoMinimo * Math.abs(diag0))) return { naoPositivaEm: ordem[k] };
     const p = livre[k]++; Li[p] = k; Lx[p] = Math.sqrt(d);
   }
-  return { n, ordem, posicao, Lp, Li, Lx, naoNulos: Lp[n] };
+  let operacoes = 0; for (let k = 0; k < n; k++) operacoes += conta[k] * conta[k];
+  return { n, ordem, posicao, Lp, Li, Lx, naoNulos: Lp[n], operacoes };
 }
 
 /** resolverCholesky(fator, b) -> x com A x = b. O lado direito pode ser esparso: a substituição para frente pula a coluna cujo valor

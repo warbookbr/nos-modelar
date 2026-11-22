@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { matrizPorLinhas, porColunas, cotaDeVarah, ordemDeGrauMinimo, fatorarCholesky, resolverCholesky, fatorarLUEsparso, resolverLUEsparso, resolverLUEsparsoTransposta, baseDoNucleo } from './algebra-esparsa.js';
-import { fatorarLU, resolverLU } from './subdivisao.js';
+import { matrizPorLinhas, porColunas, cotaDeVarah, ordemDeGrauMinimo, fatorarCholesky, contarCholesky, resolverCholesky, fatorarLUEsparso, resolverLUEsparso, resolverLUEsparsoTransposta, baseDoNucleo } from './algebra-esparsa.js';
+import { fatorarLU, resolverLU, linhasDoLimite, ajustarGaiolaAsMedidasComPeso } from './subdivisao.js';
+import { gaiolaGrande } from '../../tools/fixtures/ajuste-esparso/gaiola-grande.mjs';
 
 /* a matriz de uma grade nx × ny com o estêncil de cinco pontos mais a diagonal, positiva definida e diagonal dominante */
 function grade(nx, ny, diag = 5) {
@@ -120,5 +121,40 @@ describe('LU esparso', () => {
     expect(a.deficientes.length).toBe(2); expect(b.deficientes.length).toBe(2);
     expect(baseDoNucleo(a)).toEqual([0, 1, 2, 3, 4, 5]);
     expect(baseDoNucleo(b)).toEqual([0, 1, 2, 3, 4, 5]);
+  });
+});
+
+describe('a lei de custo do ajuste da gaiola (o teste de escala do plano do ajuste esparso)', () => {
+  /* O custo é contado em operações, e não no relógio, que no CI anda de duas a três vezes mais devagar: as visitas da ordenação, as
+     multiplicações da fatoração (Σ c_k² sobre as colunas de L) e os não nulos de L vezes as resoluções. O caminho esparso resolve três
+     vezes (os eixos), porque o ganho sai da cota de Varah; o solver denso eliminava na ordem da rede e resolvia uma vez por medida para o
+     ganho, mais os três eixos. O expoente entre dois tamanhos da gaiola de prova, que tem a ordem e a banda da lataria do carro, reprova
+     acima de EXPOENTE_MAXIMO. Foi o gate que faltou: o denso crescia com expoente perto de 3 e nada o mediu antes do ensaio de escala. */
+  const EXPOENTE_MAXIMO = 2.3;
+  const medir = (passo) => {
+    const { gaiola, medidas } = gaiolaGrande({ passo });
+    const n = gaiola.vertices.length;
+    const H = matrizPorLinhas(n); for (let k = 0; k < n; k++) H.somar(k, k, 1);
+    for (const l of linhasDoLimite(gaiola, medidas.map((m) => m.indice))) for (const [r, a] of l) for (const [c, b] of l) H.somar(r, c, a * b);
+    const contagem = {}; const ordem = ordemDeGrauMinimo(H, contagem);
+    const esparso = contarCholesky(H, ordem);
+    const natural = contarCholesky(H, Int32Array.from({ length: n }, (_, k) => k));
+    return {
+      n, gaiola, medidas,
+      esparso: contagem.visitas + esparso.operacoes + 3 * esparso.naoNulos,
+      denso: natural.operacoes + (medidas.length + 3) * natural.naoNulos,
+    };
+  };
+  const pequena = medir(34); const grande = medir(21);
+  const expoente = (chave) => Math.log(grande[chave] / pequena[chave]) / Math.log(grande.n / pequena.n);
+
+  it(`o caminho esparso cresce com expoente até ${EXPOENTE_MAXIMO}, e o solver denso, na ordem da rede, passa dele`, () => {
+    expect(grande.n / pequena.n).toBeGreaterThan(2);
+    expect(expoente('esparso')).toBeLessThanOrEqual(EXPOENTE_MAXIMO);
+    expect(expoente('denso')).toBeGreaterThan(EXPOENTE_MAXIMO);
+  });
+
+  it('o ajuste da gaiola de prova usa o caminho contado: o ganho pela cota, sem a conta exata', () => {
+    expect(ajustarGaiolaAsMedidasComPeso(pequena.gaiola, pequena.medidas).ganhoPelaCota).toBe(true);
   });
 });
