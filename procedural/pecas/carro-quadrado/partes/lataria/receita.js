@@ -52,7 +52,7 @@ export const TABELA = {
     traseiro: [[-520, 1325, -1590, 20], [520, 1325, -1590, 20], [640, 985, -1945, 20], [-640, 985, -1945, 20]],
   },
   aberturas: {
-    frontal: [[-765, 542, 10], [765, 542, 10], [765, 720, 10], [-765, 720, 10]],
+    frontal: [[-768, 566, 10], [768, 566, 10], [768, 706, 10], [-768, 706, 10]],
     /* Curva 4: borda interna acompanha o trapézio da tampa (634 embaixo subindo para 664 em cima) */
     lanternaTraseira: [[634, 530, 8], [776, 530, 10], [758, 842, 16], [664, 842, 10]],
   },
@@ -70,11 +70,11 @@ export const TABELA = {
     traseiro: [-1495, -1920],
   },
   frentePecas: {
-    grade: { meiaLarg: 442, y0: 545, y1: 715, zFundo0: 1965, zFundo1: 2006, zMoldura: 2016, zLamina: 2018, laminas: 7, lamY0: 556, lamY1: 696, lamAlt: 8 },
-    farol: { x0: 445, x1: 670, y0: 545, y1: 715, zCarc0: 1960, zCarc1: 2006, zLente0: 1988, zLente1: 2012 },
-    seta: { x0: 675, x1: 778, y0: 545, y1: 715, z0: 1935, z1: 1995 },
+    grade: { meiaLarg: 428, y0: 568, y1: 704, zFundo0: 1966, zFundo1: 2002, zMoldura: 2014, zLamina: 2016, laminas: 7, lamY0: 578, lamY1: 690, lamAlt: 6.5 },
+    farol: { x0: 432, x1: 696, y0: 568, y1: 704, zCarc0: 1954, zCarc1: 2004, zLente0: 1999, zLente1: 2014 },
+    seta: { x0: 700, x1: 800, y0: 570, y1: 702, z0: 1922, z1: 2008 },
     placa: { larg: 340, alt: 135, yCentro: 352, z0: 2076, z1: 2092 },
-    neblina: { xCentro: 520, yCentro: 290, larg: 150, alt: 68, z0: 2036, z1: 2078 },
+    neblina: { xCentro: 515, yCentro: 292, larg: 156, alt: 60, z0: 2036, z1: 2076 },
   },
   traseiraPecas: {
     lanterna: { x0: 655, x1: 776, yRe: [540, 610], yFreio: [610, 735], ySeta: [735, 810], zCarc0: -2008, zCarc1: -1918, zFrente: -2020, zTras: -1924 },
@@ -90,9 +90,24 @@ export const MATERIAIS = {
   plasticoFosco: { cor: '#1b1e22', metalicidade: 0.05, aspereza: 0.8 },
   plasticoPreto: { cor: '#22262b', metalicidade: 0.05, aspereza: 0.72 },
   frisoClaro: { cor: '#b8bec6', metalicidade: 0.55, aspereza: 0.35 },
-  lenteFarol: { cor: '#dce4ec', metalicidade: 0.1, aspereza: 0.12 },
-  lenteNeblina: { cor: '#cfd8e0', metalicidade: 0.1, aspereza: 0.15 },
-  setaAmbar: { cor: '#e08a1e', metalicidade: 0.05, aspereza: 0.2 },
+  lenteFarol: {
+    cor: '#eef4fa', metalicidade: 0.02, aspereza: 0.05, mistura: 'transparente', opacidade: 0.34,
+    verniz: 1.0, asperezaDoVerniz: 0.02, indiceDeRefracao: 1.52,
+    relevo: { tipo: 'prismas', escala: 3.8, intensidade: 0.38, projecao: 'caixa' },
+  },
+  lenteNeblina: {
+    cor: '#e4ecf2', metalicidade: 0.02, aspereza: 0.07, mistura: 'transparente', opacidade: 0.44,
+    verniz: 0.96, asperezaDoVerniz: 0.03, indiceDeRefracao: 1.52,
+    relevo: { tipo: 'prismas', escala: 3.0, intensidade: 0.50, projecao: 'caixa' },
+  },
+  setaAmbar: {
+    cor: '#e88208', metalicidade: 0.04, aspereza: 0.08,
+    verniz: 0.96, asperezaDoVerniz: 0.03, transmissao: 0.60, tomDoVidro: '#f28a0a', indiceDeRefracao: 1.49,
+    relevo: { tipo: 'prismas', escala: 2.8, intensidade: 0.52, projecao: 'caixa' },
+  },
+  refletorFarol: { cor: '#dce4ec', metalicidade: 0.96, aspereza: 0.08 },
+  calotaLampada: { cor: '#4a525c', metalicidade: 0.85, aspereza: 0.22 },
+  bordaVidroFarol: { cor: '#cfd7df', metalicidade: 0.25, aspereza: 0.18, verniz: 0.85 },
   lanternaRe: {
     cor: '#e6ecf2', metalicidade: 0.04, aspereza: 0.10,
     verniz: 0.95, asperezaDoVerniz: 0.04, transmissao: 0.66, tomDoVidro: '#dfe6ee', indiceDeRefracao: 1.49,
