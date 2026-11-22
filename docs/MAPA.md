@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2171 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2177 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -994,6 +994,15 @@
 
 - `exemplo.test.js` — O exemplo de peça de família que o ramo `modelar/peca/familia` entrega: ele executa, cada parte da família sai com material, o PLANO é válido e o referencial…
 - `receita.js` — exemplo/receita.js — a receita mínima de uma peça que sai de uma família, para copiar.
+
+## procedural/familias/fixador/
+
+- `composicoes.js` — composicoes.js — as composições da família `fixador`: o parafuso de cada cabeça em três hastes (lisa, roscada até a cabeça e roscada só na ponta), a porca e …
+- `derivar.js` — derivar.js — dos parâmetros do fixador (milímetro) à chamada de composição (metro). A peça, a cabeça e a haste escolhem a composição.
+- `fixador.test.mjs` — fixador.test.mjs — a família `fixador`: cada perfil sai sem órfão e com as partes certas, as medidas seguem a tabela ISO, a rosca cosmética chega ao diâmetro…
+- `geometria.js` — geometria.js — as medidas do fixador em milímetro, a partir dos parâmetros da família e da tabela ISO.
+- `index.js` — index.js — a família `fixador`: parafuso de cabeça sextavada, allen ou abaulada, porca sextavada e arruela lisa, de M3 a M24 pela tabela ISO de rosca grossa,…
+- `tabela.js` — tabela.js — as medidas métricas de rosca grossa, em mm, por diâmetro nominal: passo (ISO 261), sextavado da cabeça e da porca (ISO 4017 e ISO 4032: chave s, …
 
 ## procedural/familias/mola/
 

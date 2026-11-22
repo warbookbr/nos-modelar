@@ -235,8 +235,8 @@
       "automatiza": "gera parafuso, porca, arruela, rebite e pino por norma e bitola",
       "parametros": "tipo, norma, bitola, comprimento",
       "referencias": ["Blender: Bolt Factory", "FreeCAD: Fasteners", "BOSL2: screws"],
-      "aqui": "não",
-      "onde": "nenhum gerador; o componente parafuso do esboço antigo saiu com ele em 2026-11-05"
+      "aqui": "parcial",
+      "onde": "família `fixador`: parafuso de cabeça sextavada, allen ou abaulada, porca sextavada e arruela lisa, de M3 a M24 pela tabela ISO de rosca grossa; rebite, pino, porca de outros tipos e normas além da ISO métrica não"
     },
     "rosca": {
       "nome": "rosca",
@@ -244,8 +244,8 @@
       "automatiza": "faz rosca macho ou fêmea métrica, trapezoidal ou de tampa, em qualquer cilindro ou furo",
       "parametros": "tipo, passo, diâmetro, comprimento, sentido",
       "referencias": ["BOSL2: threading e bottlecaps", "Blender: Bolt Factory", "FreeCAD: Thread"],
-      "aqui": "não",
-      "onde": "nem esboço nem núcleo"
+      "aqui": "parcial",
+      "onde": "a rosca cosmética externa do parafuso da família `fixador`: o filete de perfil trapezoidal varrido pela `helice` do `friso` sobre o núcleo no diâmetro menor, como sólido à parte; rosca interna, rosca fina e rosca fundida num sólido só não"
     },
     "engrenagem": {
       "nome": "engrenagens",

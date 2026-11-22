@@ -1,0 +1,141 @@
+{
+  "formato": "mecanifica.aprovacao-da-familia@1",
+  "familia": "fixador",
+  "versao": "1.0.0",
+  "mecanica": {
+    "data": "2026-11-22",
+    "pontos": {
+      "minimo": {
+        "parametros": {
+          "cabeca": 1,
+          "comprimento": 5,
+          "diametroNominal": 3,
+          "peca": 1,
+          "rosca": 0
+        },
+        "hash": "sha256:c269b6aa25086e809b129d56baa0d2ff2089c82e09f33bd3598833f7d12f05fa",
+        "medidas": []
+      },
+      "medio": {
+        "parametros": {
+          "cabeca": 2,
+          "comprimento": 60,
+          "diametroNominal": 12,
+          "peca": 2,
+          "rosca": 1
+        },
+        "hash": "sha256:86c201315fd76b305cd774b4036874a152810ccbc65a45377f5b163f1095cccb",
+        "medidas": []
+      },
+      "maximo": {
+        "parametros": {
+          "cabeca": 3,
+          "comprimento": 240,
+          "diametroNominal": 24,
+          "peca": 3,
+          "rosca": 1
+        },
+        "hash": "sha256:445927fb9f14afd6559cf175402ebfc095a255b5568dc21c06239cda1e10a90f",
+        "medidas": []
+      }
+    },
+    "varredura": {
+      "sondas": 10,
+      "recusasDeclaradas": [
+        {
+          "ponto": "comprimento=5",
+          "restricao": "haste-mais-longa-que-a-bitola"
+        },
+        {
+          "ponto": "diametroNominal=24",
+          "restricao": "haste-mais-longa-que-a-bitola"
+        }
+      ]
+    },
+    "portas": [],
+    "perfis": {
+      "arruela-m8": {
+        "parametros": {
+          "cabeca": 1,
+          "comprimento": 30,
+          "diametroNominal": 8,
+          "peca": 3,
+          "rosca": 1
+        },
+        "hash": "sha256:16636a901cbff2c43f643d05a1c635a9b17c569ee81b0c0f13b02a77bc705857",
+        "medidas": []
+      },
+      "parafuso-abaulado-m5x12": {
+        "parametros": {
+          "cabeca": 3,
+          "comprimento": 12,
+          "diametroNominal": 5,
+          "peca": 1,
+          "rosca": 1
+        },
+        "hash": "sha256:fa151c6163fd7218967af9751dac827dfea794a2120170154c41dd573f4686c5",
+        "medidas": []
+      },
+      "parafuso-allen-m6x40": {
+        "parametros": {
+          "cabeca": 2,
+          "comprimento": 40,
+          "diametroNominal": 6,
+          "peca": 1,
+          "rosca": 1
+        },
+        "hash": "sha256:b2b71bf12c0231af4062121dc4e962220401b96b0cbf63ea15736f9824466ca5",
+        "medidas": []
+      },
+      "parafuso-sextavado-m8x30": {
+        "parametros": {
+          "cabeca": 1,
+          "comprimento": 30,
+          "diametroNominal": 8,
+          "peca": 1,
+          "rosca": 1
+        },
+        "hash": "sha256:1e4e91bb2a0c815c111db679bc5f4c4df42d66eb5fed9f84d765d4628ebb797e",
+        "medidas": []
+      },
+      "porca-m8": {
+        "parametros": {
+          "cabeca": 1,
+          "comprimento": 30,
+          "diametroNominal": 8,
+          "peca": 2,
+          "rosca": 1
+        },
+        "hash": "sha256:172a050956196ece45aeb785158b375a16e77dc502f9fd37748b32268550d238",
+        "medidas": []
+      }
+    },
+    "escalasDosPerfis": {
+      "sondas": 20,
+      "recusasDeclaradas": [
+        {
+          "ponto": "parafuso-abaulado-m5x12: comprimento=5",
+          "restricao": "haste-mais-longa-que-a-bitola"
+        },
+        {
+          "ponto": "parafuso-abaulado-m5x12: diametroNominal=24",
+          "restricao": "haste-mais-longa-que-a-bitola"
+        },
+        {
+          "ponto": "parafuso-allen-m6x40: comprimento=5",
+          "restricao": "haste-mais-longa-que-a-bitola"
+        },
+        {
+          "ponto": "parafuso-sextavado-m8x30: comprimento=5",
+          "restricao": "haste-mais-longa-que-a-bitola"
+        },
+        {
+          "ponto": "parafuso-sextavado-m8x30: diametroNominal=24",
+          "restricao": "haste-mais-longa-que-a-bitola"
+        }
+      ]
+    }
+  },
+  "critico": null,
+  "pessoa": null
+}

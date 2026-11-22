@@ -28,11 +28,11 @@ Os tipos são três. O modificador age sobre uma forma que já existe; o gerador
 | 14 | tubulação com conexões (`tubulacao`) | gerador | 27 (7%) | 11 | não | traça uma rede de tubos e põe sozinha as curvas, tês, reduções, flanges e válvulas por bitola |
 | 15 | engrenagens (`engrenagem`) | especializado | 26 (7%) | 11 | não | gera engrenagem reta, helicoidal, cônica, sem-fim, cremalheira e catraca com dente evolvente por módulo e número de dentes, e diz a distância entre centros do par |
 | 16 | molas (`mola`) | especializado | 26 (7%) | 10 | parcial | gera mola de compressão, tração com ganchos e torção com braços, com espiras fechadas nas pontas e comprimento entre dois pontos |
-| 17 | rosca (`rosca`) | especializado | 26 (7%) | 13 | não | faz rosca macho ou fêmea métrica, trapezoidal ou de tampa, em qualquer cilindro ou furo |
+| 17 | rosca (`rosca`) | especializado | 26 (7%) | 13 | parcial | faz rosca macho ou fêmea métrica, trapezoidal ou de tampa, em qualquer cilindro ou furo |
 | 18 | tecido e estofado (`tecido`) | gerador | 26 (7%) | 11 | não | faz almofada inflada com costura, lona esticada, vela e rede a partir de contorno e pressão |
 | 19 | atuador linear (`atuador`) | especializado | 25 (7%) | 10 | parcial | gera cilindro hidráulico ou pneumático e fuso com camisa, haste, olhais e portas, por curso e diâmetro, ligado entre dois pontos |
 | 20 | móvel modular (`movel`) | gerador | 23 (6%) | 6 | parcial | faz caixaria de móvel com laterais, prateleiras, portas e gavetas por vãos |
-| 21 | fixadores normalizados (`fixador`) | especializado | 21 (6%) | 9 | não | gera parafuso, porca, arruela, rebite e pino por norma e bitola |
+| 21 | fixadores normalizados (`fixador`) | especializado | 21 (6%) | 9 | parcial | gera parafuso, porca, arruela, rebite e pino por norma e bitola |
 | 22 | relevo funcional (`textura`) | modificador | 21 (6%) | 10 | parcial | aplica recartilhado, estrias de pega, piso antiderrapante ou chapa ondulada numa face |
 | 23 | elos ao longo de caminho fechado (`elos`) | gerador | 19 (5%) | 8 | não | distribui elos articulados num contorno fechado em volta de rodas (corrente, esteira de trator, porta-cabos, degraus de escada rolante, correia dentada) |
 | 24 | texto e escala gravados (`texto`) | modificador | 19 (5%) | 9 | não | grava ou põe em relevo letras, números e escalas graduadas (paquímetro, mostrador, placa) |
@@ -74,11 +74,11 @@ As ferramentas que não existem ou existem em parte, na mesma ordem, com o que j
 - tubulação com conexões (`não`, 27 objetos): nem esboço nem núcleo.
 - engrenagens (`não`, 26 objetos): nenhum gerador; o componente engrenagem do esboço antigo saiu com ele em 2026-11-05.
 - molas (`parcial`, 26 objetos): família `mola`: compressão de pontas encostadas, tração com gancho em cada ponta e torção com braços retos, por fio, diâmetro externo, comprimento livre e espiras; ponta retificada, gancho de outros tipos e mola montada entre dois pontos não.
-- rosca (`não`, 26 objetos): nem esboço nem núcleo.
+- rosca (`parcial`, 26 objetos): a rosca cosmética externa do parafuso da família `fixador`: o filete de perfil trapezoidal varrido pela `helice` do `friso` sobre o núcleo no diâmetro menor, como sólido à parte; rosca interna, rosca fina e rosca fundida num sólido só não.
 - tecido e estofado (`não`, 26 objetos): nem esboço nem núcleo.
 - atuador linear (`parcial`, 25 objetos): família `cilindro-hidraulico`: camisa, haste, êmbolo, cabeça e olhais liso e com rótula, curso conferido; cilindro de haste dupla e telescópico não.
 - móvel modular (`parcial`, 23 objetos): família `movel-de-caixa`, com nove perfis de roupeiro, guarda-roupa, armários, cômoda, criado-mudo, estante e gaveteiro, portas embutidas, sobrepostas e de correr e gavetas com curso conferido, e família `cadeira`, com cinco perfis; mesa e sofá não.
-- fixadores normalizados (`não`, 21 objetos): nenhum gerador; o componente parafuso do esboço antigo saiu com ele em 2026-11-05.
+- fixadores normalizados (`parcial`, 21 objetos): família `fixador`: parafuso de cabeça sextavada, allen ou abaulada, porca sextavada e arruela lisa, de M3 a M24 pela tabela ISO de rosca grossa; rebite, pino, porca de outros tipos e normas além da ISO métrica não.
 - relevo funcional (`parcial`, 21 objetos): núcleo: displace com ruído; padrão regular não existe.
 - elos ao longo de caminho fechado (`não`, 19 objetos): nem esboço nem núcleo.
 - texto e escala gravados (`não`, 19 objetos): nem esboço nem núcleo.
@@ -111,17 +111,9 @@ Traça uma rede de tubos e põe sozinha as curvas, tês, reduções, flanges e v
 
 Gera engrenagem reta, helicoidal, cônica, sem-fim, cremalheira e catraca com dente evolvente por módulo e número de dentes, e diz a distância entre centros do par. Parâmetros: tipo, módulo, dentes, ângulo de pressão, largura. Referências: FreeCAD Gears; BOSL2: gears; Blender: Extra Objects (gears). Aqui: não, nenhum gerador; o componente engrenagem do esboço antigo saiu com ele em 2026-11-05. Atende 26 objetos em 11 famílias.
 
-### rosca (`rosca`)
-
-Faz rosca macho ou fêmea métrica, trapezoidal ou de tampa, em qualquer cilindro ou furo. Parâmetros: tipo, passo, diâmetro, comprimento, sentido. Referências: BOSL2: threading e bottlecaps; Blender: Bolt Factory; FreeCAD: Thread. Aqui: não, nem esboço nem núcleo. Atende 26 objetos em 13 famílias.
-
 ### tecido e estofado (`tecido`)
 
 Faz almofada inflada com costura, lona esticada, vela e rede a partir de contorno e pressão. Parâmetros: contorno, espessura, pressão, costuras, pontos de amarra. Referências: Blender: Cloth e pressão; Marvelous Designer (conceito). Aqui: não, nem esboço nem núcleo. Atende 26 objetos em 11 famílias.
-
-### fixadores normalizados (`fixador`)
-
-Gera parafuso, porca, arruela, rebite e pino por norma e bitola. Parâmetros: tipo, norma, bitola, comprimento. Referências: Blender: Bolt Factory; FreeCAD: Fasteners; BOSL2: screws. Aqui: não, nenhum gerador; o componente parafuso do esboço antigo saiu com ele em 2026-11-05. Atende 21 objetos em 9 famílias.
 
 ### elos ao longo de caminho fechado (`elos`)
 
@@ -227,6 +219,10 @@ Gera trilho e carro, corrediça de gaveta e guia em V por tamanho e curso. Parâ
 
 Gera mola de compressão, tração com ganchos e torção com braços, com espiras fechadas nas pontas e comprimento entre dois pontos. Parâmetros: tipo, diâmetro do arame, diâmetro médio, voltas, comprimento livre. Referências: BOSL2; FreeCAD: Spring; Blender: Extra Objects. Aqui: parcial, família `mola`: compressão de pontas encostadas, tração com gancho em cada ponta e torção com braços retos, por fio, diâmetro externo, comprimento livre e espiras; ponta retificada, gancho de outros tipos e mola montada entre dois pontos não. Atende 26 objetos em 10 famílias.
 
+### rosca (`rosca`)
+
+Faz rosca macho ou fêmea métrica, trapezoidal ou de tampa, em qualquer cilindro ou furo. Parâmetros: tipo, passo, diâmetro, comprimento, sentido. Referências: BOSL2: threading e bottlecaps; Blender: Bolt Factory; FreeCAD: Thread. Aqui: parcial, a rosca cosmética externa do parafuso da família `fixador`: o filete de perfil trapezoidal varrido pela `helice` do `friso` sobre o núcleo no diâmetro menor, como sólido à parte; rosca interna, rosca fina e rosca fundida num sólido só não. Atende 26 objetos em 13 famílias.
+
 ### atuador linear (`atuador`)
 
 Gera cilindro hidráulico ou pneumático e fuso com camisa, haste, olhais e portas, por curso e diâmetro, ligado entre dois pontos. Parâmetros: diâmetro, curso, extensão, montagem das pontas. Referências: catálogos de fabricantes em STEP (conceito). Aqui: parcial, família `cilindro-hidraulico`: camisa, haste, êmbolo, cabeça e olhais liso e com rótula, curso conferido; cilindro de haste dupla e telescópico não. Atende 25 objetos em 10 famílias.
@@ -234,6 +230,10 @@ Gera cilindro hidráulico ou pneumático e fuso com camisa, haste, olhais e port
 ### móvel modular (`movel`)
 
 Faz caixaria de móvel com laterais, prateleiras, portas e gavetas por vãos. Parâmetros: dimensões, vãos, tipo de cada vão, espessura do painel. Referências: Blender: Archimesh (armários). Aqui: parcial, família `movel-de-caixa`, com nove perfis de roupeiro, guarda-roupa, armários, cômoda, criado-mudo, estante e gaveteiro, portas embutidas, sobrepostas e de correr e gavetas com curso conferido, e família `cadeira`, com cinco perfis; mesa e sofá não. Atende 23 objetos em 6 famílias.
+
+### fixadores normalizados (`fixador`)
+
+Gera parafuso, porca, arruela, rebite e pino por norma e bitola. Parâmetros: tipo, norma, bitola, comprimento. Referências: Blender: Bolt Factory; FreeCAD: Fasteners; BOSL2: screws. Aqui: parcial, família `fixador`: parafuso de cabeça sextavada, allen ou abaulada, porca sextavada e arruela lisa, de M3 a M24 pela tabela ISO de rosca grossa; rebite, pino, porca de outros tipos e normas além da ISO métrica não. Atende 21 objetos em 9 famílias.
 
 ### relevo funcional (`textura`)
 

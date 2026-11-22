@@ -47,12 +47,13 @@ O núcleo não ganha nome de objeto: o ajudante se chama pelo que gera, o caminh
 
 1. Feita em 2026-11-22: o caminho helicoidal (`caminhoHelicoidal`, com ficha em `npm run capacidade`) e as `normais` do friso, provados na peça neutra `tools/fixtures/helice/`.
 2. Feita em 2026-11-22: a família `mola` (compressão, tração e torção), com a camada mecânica gravada e a forma aprovada pela pessoa por imagem; o friso ganhou a `helice` declarada, para a composição passar só números.
-3. A rosca sobre cilindro e a família `fixador`, com as imagens à pessoa.
-4. Fechamento: mapa, backlog e encerramento.
+3. Feita em 2026-11-22: a família `fixador` (parafuso sextavado, allen e abaulado, porca e arruela, de M3 a M24 pela tabela ISO) com a rosca cosmética, a camada mecânica gravada e a forma aprovada pela pessoa por imagem.
+4. A rosca fundida como opção da família `fixador`: o filete unido ao núcleo num sólido só, para o STEP de uma peça (decisão da pessoa em 2026-11-22), com a medida do tempo e do sólido.
+5. Fechamento: a montagem do parafuso na porca e da mola entre dois pontos, o mapa, o backlog e o encerramento.
 
 ## Decisão da pessoa
 
-Decidido em 2026-11-22: a rosca sai cosmética, com o fundido como opção depois se um uso pedir o sólido único. O texto da escolha segue abaixo.
+Decidido em 2026-11-22: a rosca sai cosmética, com o fundido como opção depois se um uso pedir o sólido único. O texto da escolha segue abaixo. Depois de aprovar o fixador, a pessoa pediu o fundido já neste plano, como opção pronta para quem precisar (fatia 4).
 
 
 A rosca pode sair de dois jeitos. No primeiro, cosmético, o filete é um `friso` que encosta no núcleo do parafuso como sólido à parte, com o contato declarado: é rápido, determinístico e dá a imagem certa, mas o parafuso não é um sólido só no STEP. No segundo, fundido, o filete se une ao núcleo por `unir`: o STEP sai com um sólido só, a operação custa muito mais tempo por peça, e a booleana em superfície helicoidal pode pedir correção no núcleo. A recomendação é o cosmético, com o fundido como opção depois, se um uso pedir o sólido único.
@@ -67,4 +68,4 @@ Preencher somente ao concluir ou cancelar.
 
 ## Andamento
 
-Em 2026-11-22 as fatias 1 e 2 foram entregues. A pessoa aprovou a forma das três molas pelas imagens isométricas da bancada e autorizou gravar a camada mecânica do `aprovacao.json`, que deixa as camadas do crítico e da pessoa em null como nas outras famílias. Na fatia 1, o fio de uma mola de 6 voltas sai sólido fechado em cerca de 45 ms e o filete de 12 voltas em cerca de 10 ms.
+Em 2026-11-22 as fatias 1, 2 e 3 foram entregues; a pessoa aprovou a forma dos cinco perfis do fixador e autorizou gravar a camada mecânica dele. A pessoa aprovou a forma das três molas pelas imagens isométricas da bancada e autorizou gravar a camada mecânica do `aprovacao.json`, que deixa as camadas do crítico e da pessoa em null como nas outras famílias. Na fatia 1, o fio de uma mola de 6 voltas sai sólido fechado em cerca de 45 ms e o filete de 12 voltas em cerca de 10 ms.
