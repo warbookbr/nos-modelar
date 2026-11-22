@@ -4,7 +4,7 @@
 
 **Planos ativos:**
 
-1. [modelagem de carro de passeio](2026-11-14-modelagem-de-carro.md). Território: `procedural/pecas/carro-fastback/`, `docs/modelar/banco-de-provas/carro-fastback-2026-11-14/`, `tools/modelar/ondulacao-da-superficie.mjs`, `procedural/criterios/veiculo.json`, `procedural/familias/roda-pneu/`. Em aberto: a fatia 3 (o ponto de decisão entre a lataria numa chapa só ou em dois andares); a fatia 2 fechou em 2026-11-21 com o piloto do quarto traseiro aprovado pela pessoa.
+1. [modelagem de carro de passeio](2026-11-14-modelagem-de-carro.md). Território: `procedural/pecas/carro-fastback/`, `docs/modelar/banco-de-provas/carro-fastback-2026-11-14/`, `tools/modelar/ondulacao-da-superficie.mjs`, `procedural/criterios/veiculo.json`, `procedural/familias/roda-pneu/`. Em aberto: a fatia 4 (a lataria inteira numa chapa só, com simetria e painéis por vãos), que espera a decisão da pessoa de seguir; as fatias 2 e 3 fecharam em 2026-11-21, com o piloto aprovado e a chapa só decidida.
 
 A lista está em ordem de prioridade. A ordem desempata quando dois planos precisam do mesmo arquivo: o de menor prioridade espera ou pede à pessoa que mude o território.
 
