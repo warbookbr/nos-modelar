@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2159 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2160 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -645,6 +645,7 @@
 - `2026-11-16-eletronica-no-modelar.md` — O lado Modelar da mecatrônica: plano-raiz que gera a família de componentes e a ponte
 - `2026-11-16-ponte-com-a-mecatronica.md` — Ponte com a mecatrônica: a ficha do objeto exportada, as portas elétricas declaradas e o pedido que volta conferido
 - `2026-11-17-trilhas-e-validacao-da-placa.md` — Trilhas de cobre e validação elétrica da placa declarada: a lista de ligações vira cobre conferido por regra e por conectividade
+- `2026-11-22-ajuste-esparso-da-gaiola.md` — Ajuste esparso da gaiola: a subdivisão de uma chapa grande em segundos e sem estourar a memória
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar

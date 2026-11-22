@@ -29,3 +29,5 @@ As cinco medidas estão em [`medidas.jsonl`](medidas.jsonl). Os vértices são o
 O tempo cresce com expoente 3,1 sobre os vértices e a memória com 2,0. O carro inteiro, com o mesmo passo, deve ter de 4.300 a 5.000 vértices na meia gaiola. Pela lei medida, só a subdivisão levaria de 4,3 a 6,8 minutos, com pico de 3,8 a 5,1 GB, a cada execução que muda a forma, fora os vãos e as regiões, que hoje somam outro tanto. O limite padrão de memória do Node fica perto de 4,3 GB, então a chapa inteira pede `--max-old-space-size` maior em toda ferramenta que a executa.
 
 O ensaio confirma o achado da análise de 2026-11-21 e o deixa pior na memória. A estimativa de antes dava de 3,5 a 7,5 minutos e de 2,6 a 4,0 GB.
+
+O perfil de CPU da execução de 2.161 vértices (`node --cpu-prof`) põe 55% do tempo em `resolverLU` e 23% no laço que soma as colunas, os dois na conferência do ganho, que resolve o sistema uma vez por medida; a fatoração leva 10%. A pessoa escolheu em 2026-11-22 o solver esparso, no plano [ajuste esparso da gaiola](../../planos/2026-11-22-ajuste-esparso-da-gaiola.md).
