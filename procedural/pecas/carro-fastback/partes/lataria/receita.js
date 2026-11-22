@@ -11,6 +11,14 @@
  * soleira à base da coluna os níveis correm pelo contorno da planta e dão a volta pela traseira até o eixo do carro, misturando suavemente a seção
  * do lado com o perfil da traseira no eixo. O arco, o vidro lateral, a lanterna e o vidro traseiro são vãos abertos na chapa pronta.
  *
+ * RODADA 8 (série 8, registro 7). O teto, a quina e o perfil da traseira passam a ajustar pela lisura (`objetivo: 'lisura'` em `curvaLisa`, com `trechoMinimo` só no teto: o perfil
+ * da traseira não cabe em 3 mm com trecho mínimo acima de 25 mm, porque o degrau das lanternas tem 34 mm em 60), e a planta fica no objetivo padrão (a lisura na planta deu 13 clotoides,
+ * o alargamento a 0,131 de persistência contra 0,144, mas dobrou os laços do degrau da traseira). A lei do ombro passa a subir de z 0 a -650 (S de 35,4 mm, reta de 955 a 1008), no lugar de
+ * -100 a -450: as duas ilhas do ombro em z -266 saíram da zebra (persistência de 0,10 e 0,09 para menos de 0,04) e a lei fica a 2 mm dos pontos. A tampa deixa de ser um retalho de três lados
+ * só: a quina do teto continua por ela (`Qquina`, com o vinco da quina, de `e9_quina` ao nó `q5q` que a volta da coluna ganha na altura x da ponta da tabela) e parte a tampa em dois retalhos
+ * (`c_tampa`, de quatro lados, e `c_canto`, de três); o preenchimento do retalho inteiro levantava uma crista de até 16 mm sobre a pele em z -1864 (persistência da zebra de 0,47 para 0,01).
+ * `vincos.bordaDaTampa` vai de 0,2 a 0,5, o do ombro que ela continua (a zebra em y da traseira saiu de 0,02 para 0). Medido e descartado: `continuidade: 'G1'` exige `liso` ligado,
+ * que deixa a porta com 19 extremos em z contra 1; alargar o S da planta (-450 a -1250) sai a 6,5 mm da leitura, contra 3 mm de tolerância; estação em -2050 move a crista e piora a aba.
  * RODADA 7. O teto, a quina do teto e o perfil da traseira saem também de `ajustarCurvaLisa` (`curvaLisaDe`, 3 mm da leitura de cada tabela), no lugar da cúbica com média
  * gaussiana; com isso a quina e o perfil ficam mais perto da tabela do que estavam (a quina saía até 11,6 mm dela, e o degrau das lanternas, que a média de 50 mm apagava no
  * eixo do carro, passa a recuar os 34 mm que a tabela `traseira` dá). O alargamento do para-lama entra no ajuste da planta como um S só (`curvaLisa.planta.alargamento`), no
@@ -63,9 +71,9 @@ export const TABELA = {
      * um trecho no piso de 1% do arco em que a curvatura salta. Medido, a maior variação de curvatura por comprimento (1/m por m) e o trecho mais curto: o teto 5,8 e 282 mm na
      * ordem da tabela contra 80,9 e 23 mm na inversa; a quina em y 53,6 e 38 mm na inversa contra 172,6 e 21 mm na da tabela (em x as duas dão o mesmo); o perfil da traseira
      * 41 mm na inversa contra 8 mm na da tabela, com a mesma variação */
-    teto: { tolerancia: 3, passo: 10, maximoDeClotoides: 8, sentido: 'tabela' },
-    quinaDoTeto: { tolerancia: 3, passo: 10, maximoDeClotoides: 8, sentido: 'inverso' },
-    traseira: { tolerancia: 3, passo: 10, maximoDeClotoides: 12, sentido: 'inverso' },
+    teto: { tolerancia: 3, passo: 10, maximoDeClotoides: 8, sentido: 'tabela', objetivo: 'lisura', trechoMinimo: 300 },
+    quinaDoTeto: { tolerancia: 3, passo: 10, maximoDeClotoides: 8, sentido: 'inverso', objetivo: 'lisura' },
+    traseira: { tolerancia: 3, passo: 10, maximoDeClotoides: 12, sentido: 'inverso', objetivo: 'lisura' },
   },
   /* a queda do ombro: quanto a seção sai para dentro da meia largura da planta em cada altura, [y, mm], lida da seção traseira (952 a y 600, 795 a y 978) */
   queda: [[170, 30], [210, 22], [300, 0], [600, 0], [758, 12], [827, 47], [932, 107], [978, 157], [1010, 160]],
@@ -84,7 +92,7 @@ export const TABELA = {
     soleira: { a: 170.2127, b: 0.0008, degraus: [[87.1059, -1100, -1925], [6.7404, -1900, -2100]] },
     baseDoRebaixo: { a: 395.6249, b: -0.004, degraus: [[312.3619, -425, -1300], [-15.9175, -1625, -2100]] },
     topoDoRebaixo: { a: 789.3445, b: -0.0182, degraus: [[72.4024, -200, -2100]] },
-    ombro: { a: 957.0491, b: -0.0098, degraus: [[32.6342, -100, -450]] },
+    ombro: { a: 955, b: -0.0086, degraus: [[35.4, 0, -650]] },
     queda: { base: { A: 28.568, de: 170, ate: 300 }, rola: { A: 182.189, desde: 550, fim: 1004, p: 3, mistura: 820, topo: 159.353 } },
   },
   /* o degrau da seção traseira entre o ombro e a base da coluna (805 a y 1000 para 745 a y 1014): uma faixa de chapa própria da rede, de `largura` para dentro e `subida` para cima,
@@ -135,7 +143,7 @@ export const TABELA = {
   emendaG1: { curvas: [], tolerancia: 1 },
   /* topoDaCalota: o vinco da quina do degrau das lanternas, no nível `topo` da volta da traseira (só a calota, o lado da porta não tem); medido: sem ele o
    * índice da caixa da traseira vai de 345 a 1025, com ele (0,3 ou 0,5) a 418 */
-  vincos: { ombro: 0.5, coluna: 0.3, quinaDoTeto: 0.4, bordaDaTampa: 0.2, topoDaCalota: 0.3 },
+  vincos: { ombro: 0.5, coluna: 0.3, quinaDoTeto: 0.4, bordaDaTampa: 0.5, topoDaCalota: 0.3 },
   /* o arco da roda traseira: centro no eixo traseiro, raio da prancha (pneu de 340 mais 40), e os lados do polígono do corte (com 96, um vértice
    * dele caía a 0,4 mm de um da chapa perto do topo do arco e deixava uma face fina em cada lado) */
   arco: { z: -1375, y: 340, raio: 380, lados: 102 },
@@ -241,6 +249,9 @@ const PLANTAS = new Map();
  * dado vale para a TABELA deste arquivo: quem muda uma tabela lida ou uma opção de `curvaLisa` regrava, e a variante da TABELA em memória paga o ajuste. O desvio de cada ponto lido à curva refeita continua medido aqui a cada importação. */
 const COMANDO_QUE_REGRAVA = 'node tools/modelar/regravar-ajustes-de-curva.mjs procedural/pecas/carro-fastback/partes/lataria/receita.js';
 
+/** As opções de `ajustarCurvaLisa` de um bloco de `curvaLisa`: a tolerância e o teto de clotoides, e só o que o bloco declara de `objetivo`, `trechoMinimo`, `rumoInicio` e `rumoFim`. */
+const opcoesDoAjuste = (L) => ({ tolerancia: L.tolerancia, maximoDeClotoides: L.maximoDeClotoides, ...Object.fromEntries(['objetivo', 'trechoMinimo', 'rumoInicio', 'rumoFim'].filter((k) => L[k] != null).map((k) => [k, L[k]])) });
+
 /** A leitura da planta que entra no ajuste: o contorno da prancha, os pontos lidos a cada `passo` e os que o ajuste recebe (com o alargamento e o espelho além do eixo). */
 function entradaDaPlanta(T) {
   const L = T.curvaLisa.planta;
@@ -252,7 +263,7 @@ function entradaDaPlanta(T) {
   const xDe = G && C.ponto(C.deZ(G.de))[1]; const xAte = G && C.ponto(C.deZ(G.ate))[1];
   const alvo = G ? lidos.map(([z, x]) => (z < G.de && z > G.ate ? [z, xDe + (xAte - xDe) * suave((G.de - z) / (G.de - G.ate))] : [z, x])) : lidos;
   const espelho = alvo.slice(-Math.round(L.alemDoEixo / L.passo) - 1, -1).reverse().map(([z, x]) => [z, -x]);
-  return { C, lidos, pontos: [...alvo, ...espelho], opcoes: { tolerancia: L.tolerancia, maximoDeClotoides: L.maximoDeClotoides } };
+  return { C, lidos, pontos: [...alvo, ...espelho], opcoes: opcoesDoAjuste(L) };
 }
 
 /** A leitura de uma tabela [a, b] que entra no ajuste: a cúbica monótona pelos pontos, a cada `passo` de a, na ordem da tabela ou na inversa (`sentido`). */
@@ -261,7 +272,7 @@ function entradaDaCurva(tabela, L) {
   const as = tabela.map(([a]) => a); const a0 = Math.min(...as); const a1 = Math.max(...as);
   const lidos = []; for (let a = a0; a < a1; a += L.passo) lidos.push([a, f(a)]); lidos.push([a1, f(a1)]);
   if ((tabela[0][0] > tabela[tabela.length - 1][0]) !== (L.sentido === 'inverso')) lidos.reverse();
-  return { lidos, opcoes: { tolerancia: L.tolerancia, maximoDeClotoides: L.maximoDeClotoides } };
+  return { lidos, opcoes: opcoesDoAjuste(L) };
 }
 
 /** As tabelas [a, b] que passam pelo ajuste, pela chave com que ficam guardadas. */
@@ -508,6 +519,12 @@ export function derivar(T) {
     const pts = [nome(iJ, j)];
     for (let q = 1; q < nVolta; q += 1) pts.push(nivel(j, uJ + ((uFim - uJ) * q) / nVolta));
     pts.push(`t_${NIVEIS[j]}`);
+    /* a coluna dá a volta e, no ponto da volta mais perto da quina do teto (x da ponta da tabela), ganha o nó `q5q`, onde a quina continua pela tampa até a aba */
+    if (j === 5) {
+      const xq = P.R(T.quinaDoTeto[T.quinaDoTeto.length - 1][0])[0];
+      let melhor = 1; for (let q = 1; q < nVolta; q += 1) if (Math.abs(nivel(j, uJ + ((uFim - uJ) * q) / nVolta)[0] - xq) < Math.abs(nivel(j, uJ + ((uFim - uJ) * melhor) / nVolta)[0] - xq)) melhor = q;
+      nos.q5q = fixo(nivel(j, uJ + ((uFim - uJ) * melhor) / nVolta)); pts[melhor] = 'q5q';
+    }
     const vinco = j === 4 ? T.vincos.bordaDaTampa : j === 3 ? T.vincos.topoDaCalota : vincosDe[j];
     curvas.push({ nome: `Q${j}`, pontos: pts, ...(vinco ? { vinco } : {}) });
   }
@@ -528,6 +545,21 @@ export function derivar(T) {
   const salto = tc[1] - P.yTeto(tc[2]);
   curvas.push({ nome: 'Qeixo', pontos: [nome(iJ, 7), ...[0.25, 0.5, 0.75].map((f) => { const z = zJ + (tc[2] - zJ) * f; return [0, P.yTeto(z) + salto * f * f, z]; }), 't_coluna'] });
 
+  /* a quina do teto continua pela tampa, da estação da traseira ao nó da coluna: parte a tampa em dois retalhos, e o de três lados que a cobria inteira (o preenchimento
+   * levantava uma crista de 16 mm sobre a pele em z -1864, na altura da quina) fica só com o canto da coluna */
+  const nq = nos.q5q; const zq0 = zs[iJ]; const xq0 = nos[nome(iJ, 6)];
+  const nQ = Math.max(1, Math.round((zq0 - nq[2]) / T.pontosChave.comprimento) - 1);
+  const zFimQ = T.quinaDoTeto[T.quinaDoTeto.length - 1][0];
+  const pontosDaQuina = [nome(iJ, 6)];
+  for (let q = 1; q <= nQ; q += 1) {
+    const f = q / (nQ + 1); const z = zq0 + (nq[2] - zq0) * f;
+    const [xr, yr] = P.R(Math.max(z, zFimQ)); const t = z < zFimQ ? suave((zFimQ - z) / (zFimQ - nq[2])) : 0;
+    pontosDaQuina.push([xr + (nq[0] - xr) * t, yr + (nq[1] - yr) * t, z]);
+  }
+  pontosDaQuina.push('q5q');
+  curvas.push({ nome: 'Qquina', pontos: pontosDaQuina, vinco: T.vincos.quinaDoTeto });
+  void xq0;
+
   const retalhos = [];
   const lado = (curva, de, ate) => ({ curva, de, ate });
   for (let i = 0; i < iJ; i += 1) {
@@ -538,7 +570,8 @@ export function derivar(T) {
   for (let j = 0; j < LADO - 1; j += 1) {
     retalhos.push({ nome: `c_${NIVEIS[j]}`, borda: [lado(`Q${j}`, nome(iJ, j), `t_${NIVEIS[j]}`), lado('perfilDaTraseira', `t_${NIVEIS[j]}`, `t_${NIVEIS[j + 1]}`), lado(`Q${j + 1}`, `t_${NIVEIS[j + 1]}`, nome(iJ, j + 1)), lado(secaoDoVao(iJ, j), nome(iJ, j + 1), nome(iJ, j))] });
   }
-  retalhos.push({ nome: 'c_tampa', borda: [lado(secaoDoVao(iJ, 5), nome(iJ, 5), nome(iJ, 7)), lado('Qeixo', nome(iJ, 7), 't_coluna'), lado('Q5', 't_coluna', nome(iJ, 5))] });
+  retalhos.push({ nome: 'c_tampa', borda: [lado(secaoDoVao(iJ, 6), nome(iJ, 6), nome(iJ, 7)), lado('Qeixo', nome(iJ, 7), 't_coluna'), lado('Q5', 't_coluna', 'q5q'), lado('Qquina', 'q5q', nome(iJ, 6))] });
+  retalhos.push({ nome: 'c_canto', borda: [lado(secaoDoVao(iJ, 5), nome(iJ, 5), nome(iJ, 6)), lado('Qquina', nome(iJ, 6), 'q5q'), lado('Q5', 'q5q', nome(iJ, 5))] });
 
   /* com `pesoDasCurvas`, a superfície só se aproxima dos pontos das curvas por mínimos quadrados, em vez de passar por eles: a interpolação exata de muitos pontos ondula */
   const comPeso = T.chapa.pesoDasCurvas ? curvas.map((c) => ({ ...c, peso: T.chapa.pesoPorCurva?.[c.nome] ?? T.chapa.pesoDasCurvas })) : curvas;

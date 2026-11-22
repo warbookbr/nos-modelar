@@ -1,0 +1,388 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "carro-fastback/lataria",
+  "numero": 7,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/carro-fastback/referencias/lateral.prancha.svg",
+    "nota": 6,
+    "defeitos": [
+      {
+        "parte": "chapa",
+        "tipo": "posicao",
+        "onde": "borda inferior do arco traseiro, y≈100 a 130 mm",
+        "sentido": "alta",
+        "evidencia": "Sobreposta lateral: a chapa termina reta em y≈170, e o desenho desce uns 50 a 70 mm mais, perto do fundo do arco."
+      },
+      {
+        "parte": "chapa",
+        "tipo": "superficie",
+        "onde": "flanco da porta ao arco, z 0 a -900, y 150 a 500",
+        "sentido": "segmentado",
+        "evidencia": "Zebra direita: laços fechados e faixas alternadas. Curvatura lado: bandas vermelho e azul horizontais num painel que devia ser liso."
+      },
+      {
+        "parte": "chapa",
+        "tipo": "superficie",
+        "onde": "ponta da tampa, z≈-2300, y≈1000 a 1050",
+        "sentido": "anguloso",
+        "evidencia": "Direita orto: enrugado e aba saliente na ponta da tampa. Curvatura lado: pico vermelho concentrado no mesmo ponto."
+      },
+      {
+        "parte": "chapa",
+        "tipo": "superficie",
+        "onde": "quina do ombro sob o vão de vidro, em toda a extensão",
+        "sentido": "anguloso",
+        "evidencia": "Zebra direita: faixa amontoada e quebrada em y≈900 a 1000. Curvatura lado: faixa azul larga logo abaixo do vinco do ombro."
+      },
+      {
+        "parte": "rebaixoLateral",
+        "tipo": "superficie",
+        "onde": "borda dianteira e trecho médio da cunha",
+        "sentido": "segmentado",
+        "evidencia": "Isolada isométrica: ondulado irregular na borda esquerda, sem sino limpo. Concavidade não se confirma na vista."
+      }
+    ],
+    "observacao": "Silhueta e partes principais batem com a prancha nas três vistas, mas a ondulação do flanco e a quina quebrada do ombro mostram chapa que não está lisa."
+  },
+  "partes": [
+    {
+      "nome": "chapa",
+      "confere": true,
+      "observacao": "Soleira em y 170 (prancha aceita); o crítico a quer em ~30 mm, e isso não é desta peça. Resta a ilha do alargamento em z -833 no ombro."
+    },
+    {
+      "nome": "paralamaTraseiro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "rebaixoLateral",
+      "confere": true,
+      "observacao": "20 mm de profundidade, a saliência declarada; o crítico vê concavidade fraca, e mais profundidade contradiz o PLANO."
+    }
+  ],
+  "atrito": [
+    "O regravar-ajustes-de-curva recusa sem gravar quando a variante não cabe na tolerância, e testar trechoMinimo custou várias tentativas de 20 s; falta modo que teste variante sem importar a receita.",
+    "A rodada-de-modelagem imprime 4 avisos de ajuste guardado diferente porque compara a cópia da receita anterior com o dado novo; o aviso assusta e a medição vai a 150 s.",
+    "Continuidade G1 exige liso ligado e só aceita curvas entre dois retalhos sem vinco; na lataria isso exclui quase toda curva útil, e nenhuma mensagem diz de antemão quais aceitam.",
+    "A zebra por região não tem região de canto da tampa nem de aba; a crista só apareceu pela vista rápida, e falta medir a distância da superfície à pele analítica.",
+    "A ilha do alargamento (0,144 em z -833) só cairia com um S mais largo que a tolerância de 3 mm da planta permite; falta decidir se o S pode sair mais da prancha.",
+    "As referências locais do carro não estão neste worktree (aviso de referência local ausente).",
+    "A nota caiu de 7 a 6 com a zebra numérica igual ou melhor em toda região; o crítico único varia. Processo não pegou: os pedidos fechados A e B, que medem a variação, não são cobrados.",
+    "Atribuição: soleira e fundo do arco em y 170 vêm da prancha lateral aceita; o crítico compara com o desenho, que desce mais. Defeito da prancha ou da etapa da saia; vai à pessoa.",
+    "O hand-back do agente não chega à transcrição JSONL como último texto, e quem conduz transcreveu os blocos sem mudança. Processo não pegou: o --registrar não lê o hand-back."
+  ],
+  "notaDePassagem": "Retalhar a tampa pela quina foi o que mais valeu: a crista vinha do preenchimento do retalho de três lados, e nenhuma curva guia nem alisamento a tirava. O ombro S de 0 a -650 respeita os dois pontos da prancha a 2 mm. Fica aberta a ilha do alargamento em z -833, decisão da pessoa. A soleira em 170 é da prancha lateral; saia a 30 mm seria outra parte. Não mude o vinco da quina na tampa sem medir c_tampa e c_canto.",
+  "receita": {
+    "sha256": "sha256:7ce157c28b9b97c258021fe816657f17d188367c397dbc59b9742820c9151560",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 8,
+      "acrescentadas": 41,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * RODADA 8 (série 8, registro 7). O teto, a quina e o perfil da traseira passam a ajustar pela lisura (`objetivo: 'lisura'` em `curvaLisa`, com `trechoMinimo` só no teto: o perfil"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " * da traseira não cabe em 3 mm com trecho mínimo acima de 25 mm, porque o degrau das lanternas tem 34 mm em 60), e a planta fica no objetivo padrão (a lisura na planta deu 13 clotoides,"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " * o alargamento a 0,131 de persistência contra 0,144, mas dobrou os laços do degrau da traseira). A lei do ombro passa a subir de z 0 a -650 (S de 35,4 mm, reta de 955 a 1008), no lugar de"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * -100 a -450: as duas ilhas do ombro em z -266 saíram da zebra (persistência de 0,10 e 0,09 para menos de 0,04) e a lei fica a 2 mm dos pontos. A tampa deixa de ser um retalho de três lados"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * só: a quina do teto continua por ela (`Qquina`, com o vinco da quina, de `e9_quina` ao nó `q5q` que a volta da coluna ganha na altura x da ponta da tabela) e parte a tampa em dois retalhos"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " * (`c_tampa`, de quatro lados, e `c_canto`, de três); o preenchimento do retalho inteiro levantava uma crista de até 16 mm sobre a pele em z -1864 (persistência da zebra de 0,47 para 0,01)."
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": " * `vincos.bordaDaTampa` vai de 0,2 a 0,5, o do ombro que ela continua (a zebra em y da traseira saiu de 0,02 para 0). Medido e descartado: `continuidade: 'G1'` exige `liso` ligado,"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": " * que deixa a porta com 19 extremos em z contra 1; alargar o S da planta (-450 a -1250) sai a 6,5 mm da leitura, contra 3 mm de tolerância; estação em -2050 move a crista e piora a aba."
+        },
+        {
+          "tipo": "-",
+          "linha": 66,
+          "texto": "    teto: { tolerancia: 3, passo: 10, maximoDeClotoides: 8, sentido: 'tabela' },"
+        },
+        {
+          "tipo": "-",
+          "linha": 67,
+          "texto": "    quinaDoTeto: { tolerancia: 3, passo: 10, maximoDeClotoides: 8, sentido: 'inverso' },"
+        },
+        {
+          "tipo": "-",
+          "linha": 68,
+          "texto": "    traseira: { tolerancia: 3, passo: 10, maximoDeClotoides: 12, sentido: 'inverso' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "    teto: { tolerancia: 3, passo: 10, maximoDeClotoides: 8, sentido: 'tabela', objetivo: 'lisura', trechoMinimo: 300 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "    quinaDoTeto: { tolerancia: 3, passo: 10, maximoDeClotoides: 8, sentido: 'inverso', objetivo: 'lisura' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "    traseira: { tolerancia: 3, passo: 10, maximoDeClotoides: 12, sentido: 'inverso', objetivo: 'lisura' },"
+        },
+        {
+          "tipo": "-",
+          "linha": 87,
+          "texto": "    ombro: { a: 957.0491, b: -0.0098, degraus: [[32.6342, -100, -450]] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "    ombro: { a: 955, b: -0.0086, degraus: [[35.4, 0, -650]] },"
+        },
+        {
+          "tipo": "-",
+          "linha": 138,
+          "texto": "  vincos: { ombro: 0.5, coluna: 0.3, quinaDoTeto: 0.4, bordaDaTampa: 0.2, topoDaCalota: 0.3 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 146,
+          "texto": "  vincos: { ombro: 0.5, coluna: 0.3, quinaDoTeto: 0.4, bordaDaTampa: 0.5, topoDaCalota: 0.3 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 252,
+          "texto": "/** As opções de `ajustarCurvaLisa` de um bloco de `curvaLisa`: a tolerância e o teto de clotoides, e só o que o bloco declara de `objetivo`, `trechoMinimo`, `rumoInicio` e `rumoFim`. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 253,
+          "texto": "const opcoesDoAjuste = (L) => ({ tolerancia: L.tolerancia, maximoDeClotoides: L.maximoDeClotoides, ...Object.fromEntries(['objetivo', 'trechoMinimo', 'rumoInicio', 'rumoFim'].filter((k) => L[k] != null).map((k) => [k, L[k]])) });"
+        },
+        {
+          "tipo": "+",
+          "linha": 254,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 255,
+          "texto": "  return { C, lidos, pontos: [...alvo, ...espelho], opcoes: { tolerancia: L.tolerancia, maximoDeClotoides: L.maximoDeClotoides } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 266,
+          "texto": "  return { C, lidos, pontos: [...alvo, ...espelho], opcoes: opcoesDoAjuste(L) };"
+        },
+        {
+          "tipo": "-",
+          "linha": 264,
+          "texto": "  return { lidos, opcoes: { tolerancia: L.tolerancia, maximoDeClotoides: L.maximoDeClotoides } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 275,
+          "texto": "  return { lidos, opcoes: opcoesDoAjuste(L) };"
+        },
+        {
+          "tipo": "+",
+          "linha": 522,
+          "texto": "    /* a coluna dá a volta e, no ponto da volta mais perto da quina do teto (x da ponta da tabela), ganha o nó `q5q`, onde a quina continua pela tampa até a aba */"
+        },
+        {
+          "tipo": "+",
+          "linha": 523,
+          "texto": "    if (j === 5) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 524,
+          "texto": "      const xq = P.R(T.quinaDoTeto[T.quinaDoTeto.length - 1][0])[0];"
+        },
+        {
+          "tipo": "+",
+          "linha": 525,
+          "texto": "      let melhor = 1; for (let q = 1; q < nVolta; q += 1) if (Math.abs(nivel(j, uJ + ((uFim - uJ) * q) / nVolta)[0] - xq) < Math.abs(nivel(j, uJ + ((uFim - uJ) * melhor) / nVolta)[0] - xq)) melhor = q;"
+        },
+        {
+          "tipo": "+",
+          "linha": 526,
+          "texto": "      nos.q5q = fixo(nivel(j, uJ + ((uFim - uJ) * melhor) / nVolta)); pts[melhor] = 'q5q';"
+        },
+        {
+          "tipo": "+",
+          "linha": 527,
+          "texto": "    }"
+        },
+        {
+          "tipo": "+",
+          "linha": 548,
+          "texto": "  /* a quina do teto continua pela tampa, da estação da traseira ao nó da coluna: parte a tampa em dois retalhos, e o de três lados que a cobria inteira (o preenchimento"
+        },
+        {
+          "tipo": "+",
+          "linha": 549,
+          "texto": "   * levantava uma crista de 16 mm sobre a pele em z -1864, na altura da quina) fica só com o canto da coluna */"
+        },
+        {
+          "tipo": "+",
+          "linha": 550,
+          "texto": "  const nq = nos.q5q; const zq0 = zs[iJ]; const xq0 = nos[nome(iJ, 6)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 551,
+          "texto": "  const nQ = Math.max(1, Math.round((zq0 - nq[2]) / T.pontosChave.comprimento) - 1);"
+        },
+        {
+          "tipo": "+",
+          "linha": 552,
+          "texto": "  const zFimQ = T.quinaDoTeto[T.quinaDoTeto.length - 1][0];"
+        },
+        {
+          "tipo": "+",
+          "linha": 553,
+          "texto": "  const pontosDaQuina = [nome(iJ, 6)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 554,
+          "texto": "  for (let q = 1; q <= nQ; q += 1) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 555,
+          "texto": "    const f = q / (nQ + 1); const z = zq0 + (nq[2] - zq0) * f;"
+        },
+        {
+          "tipo": "+",
+          "linha": 556,
+          "texto": "    const [xr, yr] = P.R(Math.max(z, zFimQ)); const t = z < zFimQ ? suave((zFimQ - z) / (zFimQ - nq[2])) : 0;"
+        },
+        {
+          "tipo": "+",
+          "linha": 557,
+          "texto": "    pontosDaQuina.push([xr + (nq[0] - xr) * t, yr + (nq[1] - yr) * t, z]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 558,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 559,
+          "texto": "  pontosDaQuina.push('q5q');"
+        },
+        {
+          "tipo": "+",
+          "linha": 560,
+          "texto": "  curvas.push({ nome: 'Qquina', pontos: pontosDaQuina, vinco: T.vincos.quinaDoTeto });"
+        },
+        {
+          "tipo": "+",
+          "linha": 561,
+          "texto": "  void xq0;"
+        },
+        {
+          "tipo": "+",
+          "linha": 562,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 541,
+          "texto": "  retalhos.push({ nome: 'c_tampa', borda: [lado(secaoDoVao(iJ, 5), nome(iJ, 5), nome(iJ, 7)), lado('Qeixo', nome(iJ, 7), 't_coluna'), lado('Q5', 't_coluna', nome(iJ, 5))] });"
+        },
+        {
+          "tipo": "+",
+          "linha": 573,
+          "texto": "  retalhos.push({ nome: 'c_tampa', borda: [lado(secaoDoVao(iJ, 6), nome(iJ, 6), nome(iJ, 7)), lado('Qeixo', nome(iJ, 7), 't_coluna'), lado('Q5', 't_coluna', 'q5q'), lado('Qquina', 'q5q', nome(iJ, 6))] });"
+        },
+        {
+          "tipo": "+",
+          "linha": 574,
+          "texto": "  retalhos.push({ nome: 'c_canto', borda: [lado(secaoDoVao(iJ, 5), nome(iJ, 5), nome(iJ, 6)), lado('Qquina', nome(iJ, 6), 'q5q'), lado('Q5', 'q5q', nome(iJ, 5))] });"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes chapa, paralamaTraseiro, rebaixoLateral",
+    "imagens": [
+      "peca-frente-rasante-az0.png",
+      "peca-frente-rasante-az270.png",
+      "peca-lado-rasante-az180.png",
+      "peca-lado-rasante-az90.png",
+      "peca-topo-rasante-az270.png",
+      "peca-topo-rasante-az180.png",
+      "peca-tresquartos-rasante-az20.png",
+      "peca-tresquartos-rasante-az290.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  },
+  "registradaEm": "2026-11-22T01:19:15.165Z",
+  "facesFinas": {
+    "total": 0,
+    "porParte": {}
+  },
+  "pontos": {
+    "texto": "sha256:1b62b26280b943d8c96ea32e4e766ce79b14d33dde654a110216d5ffe9614d8b",
+    "esperados": [
+      {
+        "nome": "canto de baixo de trás da chapa: o lado -x, a soleira e o fim da traseira",
+        "parte": "chapa",
+        "medida": "minimo",
+        "em": [
+          -940,
+          170,
+          -2375
+        ],
+        "toleranciaMm": 6
+      },
+      {
+        "nome": "canto de cima da frente da chapa: o teto sobre a porta, no corte de z 0",
+        "parte": "chapa",
+        "medida": "maximo",
+        "em": [
+          932.7,
+          1381,
+          0
+        ],
+        "toleranciaMm": 6
+      }
+    ]
+  }
+}

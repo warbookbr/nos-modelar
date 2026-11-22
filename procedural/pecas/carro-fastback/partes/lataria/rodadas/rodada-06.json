@@ -1,0 +1,1030 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "carro-fastback/lataria",
+  "numero": 6,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/carro-fastback/referencias/lateral.prancha.svg",
+    "nota": 7,
+    "defeitos": [
+      {
+        "parte": "chapa",
+        "tipo": "posicao",
+        "onde": "borda inferior da soleira, z -700 a 0",
+        "sentido": "alta",
+        "evidencia": "Sobreposta lateral: borda do modelo em y ≈ 170 mm, desenho desce a ≈ 30 mm; ≈ 100 a 140 mm mais alta."
+      },
+      {
+        "parte": "chapa",
+        "tipo": "superficie",
+        "onde": "canto da cauda sobre a lanterna, z ≈ -2350, y ≈ 1000",
+        "sentido": "segmentado",
+        "evidencia": "Zebra da direita mostra redemoinho no canto da tampa; pintura/direita mostra calombo na aba da cauda."
+      },
+      {
+        "parte": "chapa",
+        "tipo": "superficie",
+        "onde": "flanco traseiro entre vinco do ombro e arco, e flanco dianteiro z 0 a -900, y 400-600",
+        "sentido": "segmentado",
+        "evidencia": "Zebra deitada da direita: ovais fechadas e ondas no flanco; pintura isométrica: 2-3 cristas paralelas no ombro. Painel devia ser liso fora do rebaixo."
+      },
+      {
+        "parte": "rebaixoLateral",
+        "tipo": "superficie",
+        "onde": "cunha sob o vinco do ombro, z 0 a -900",
+        "sentido": "anguloso",
+        "evidencia": "Vista isolada isométrica: depressão rasa, quase plana; só a curvatura do lado mostra faixa azul. Concavidade fraca."
+      }
+    ],
+    "observacao": "Silhueta fiel nas três vistas, partes prometidas presentes; o que pesa é a ondulação de chapa no flanco e na cauda e a soleira alta. Não vi as vistas de luz rasante nem de frente/topo da curvatura."
+  },
+  "partes": [
+    {
+      "nome": "chapa",
+      "confere": true,
+      "observacao": "silhueta fiel nas três vistas; ondulação no flanco e na cauda e soleira alta pelo crítico"
+    },
+    {
+      "nome": "paralamaTraseiro",
+      "confere": true,
+      "observacao": "painel com recorte de arco, borda pela divisão por contorno"
+    },
+    {
+      "nome": "rebaixoLateral",
+      "confere": true,
+      "observacao": "cunha rasa, concavidade fraca pelo crítico"
+    }
+  ],
+  "atrito": [
+    "rodada de base da série 8: a receita mudou fora do laço, pela fatia 3 do plano da divisão por contorno (bordas de paralamaTraseiro e rebaixoLateral pela curva), sem modelador; o crítico julgou a versão da main",
+    "o serrilhado das bordas das duas regiões, defeito da rodada 5, não voltou no veredito: a divisão por contorno o resolveu",
+    "as referências locais do carro não estão neste worktree; o pacote recebeu as fotos por --referencia de outra pasta local. Processo não pegou: o pacote avisa a ausência, mas não diz onde procurar"
+  ],
+  "notaDePassagem": "Receita da main em cd153459, com a divisão por contorno nas duas regiões; nenhuma mudança de forma nesta rodada, que é a linha de base da rodada 8.",
+  "receita": {
+    "sha256": "sha256:4a926c2a80162556478a31f48267868549ba33bd9388b7736c0358384fad9b1c",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 34,
+      "acrescentadas": 146,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 1,
+          "texto": "/* carro-fastback/lataria — o piloto do quarto traseiro: a chapa contínua de lataria do meio da porta (z 0) para trás, lado +x, com o para-lama"
+        },
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "﻿/* carro-fastback/lataria — o piloto do quarto traseiro: a chapa contínua de lataria do meio da porta (z 0) para trás, lado +x, com o para-lama"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * RODADA 7. O teto, a quina do teto e o perfil da traseira saem também de `ajustarCurvaLisa` (`curvaLisaDe`, 3 mm da leitura de cada tabela), no lugar da cúbica com média"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " * gaussiana; com isso a quina e o perfil ficam mais perto da tabela do que estavam (a quina saía até 11,6 mm dela, e o degrau das lanternas, que a média de 50 mm apagava no"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " * eixo do carro, passa a recuar os 34 mm que a tabela `traseira` dá). O alargamento do para-lama entra no ajuste da planta como um S só (`curvaLisa.planta.alargamento`), no"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * lugar dos dois cantos da leitura: a inclinação máxima da planta cai de 0,147 para 0,114 e a curvatura do S, de -1,20 e 0,71 para -0,62 e 0,43 1/m, com a planta inteira a"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * 2,76 mm da leitura da prancha e a mesma largura atrás (947 em z -1300)."
+        },
+        {
+          "tipo": "-",
+          "linha": 32,
+          "texto": "import { ajustarCurvaLisa } from '../../../../../nucleo/ajuste-de-curva-lisa.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "import { curvaLisaDoGuardado } from '../../../../../nucleo/ajuste-de-curva-lisa.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "import AJUSTES_GUARDADOS from '.././ajustes-de-curva.js';"
+        },
+        {
+          "tipo": "-",
+          "linha": 43,
+          "texto": "  /* o alisamento das curvas, desvio da média gaussiana em mm: a planta ao longo do contorno (1 mm: só refaz o polígono com filete a cada 5 mm de arco, que é a leitura da prancha"
+        },
+        {
+          "tipo": "-",
+          "linha": 44,
+          "texto": "   * que o ajuste de curva lisa recebe), as tabelas ao comprimento, a queda do ombro e o perfil da traseira na altura */"
+        },
+        {
+          "tipo": "-",
+          "linha": 45,
+          "texto": "  alisamento: { planta: 1, comprimento: 120, teto: 100, queda: 20, perfil: 50, quina: 120 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "  /* o alisamento da leitura da planta, desvio da média gaussiana em mm ao longo do contorno: 1 mm só refaz o polígono com filete a cada 5 mm de arco, que é a leitura da prancha"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "   * que o ajuste de curva lisa recebe */"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "  alisamento: { planta: 1 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 48,
+          "texto": "   * cruzar o eixo de frente, e `maximoDeClotoides` o teto do ajuste. A média gaussiana de 40 mm que havia aqui deixava uma lombada de curvatura em cada filete do polígono. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 49,
+          "texto": "  curvaLisa: { planta: { tolerancia: 3, passo: 10, alemDoEixo: 300, maximoDeClotoides: 14 } },"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "   * cruzar o eixo de frente, e `maximoDeClotoides` o teto do ajuste. A média gaussiana de 40 mm que havia aqui deixava uma lombada de curvatura em cada filete do polígono."
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "   * RODADA 7. O teto, a quina do teto (x e y ao comprimento, cada um uma curva plana) e o perfil da traseira saem do mesmo ajuste, sobre a leitura que as tabelas `teto`,"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "   * `quinaDoTeto` e `traseira` dão (a cúbica monótona pelos pontos, a cada `passo` mm), no lugar da média gaussiana de 100, 120 e 50 mm, que arredondava cada curva de um jeito"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "   * (a quina saía até 11,6 mm dos pontos da prancha e o degrau das lanternas, 25 mm mais raso que a tabela) */"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "  curvaLisa: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "    /* `alargamento`: os z entre os quais o ajuste da planta recebe o alargamento do para-lama como um S só, da largura que a leitura tem em `de` à que tem em `ate`; a leitura"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "     * faz o mesmo alargamento em dois cantos (z -750 e -950) com 28 mm em 200, que a rasante mostrava como uma faixa escura estreita na frente do para-lama */"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "    planta: { tolerancia: 3, passo: 10, alemDoEixo: 300, maximoDeClotoides: 14, alargamento: { de: -550, ate: -1200 } },"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "    /* `sentido`: a ordem em que os pontos lidos entram no ajuste, a da tabela ou a inversa. O ajuste do núcleo dá cadeias diferentes nos dois sentidos, e uma delas pode trazer"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "     * um trecho no piso de 1% do arco em que a curvatura salta. Medido, a maior variação de curvatura por comprimento (1/m por m) e o trecho mais curto: o teto 5,8 e 282 mm na"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "     * ordem da tabela contra 80,9 e 23 mm na inversa; a quina em y 53,6 e 38 mm na inversa contra 172,6 e 21 mm na da tabela (em x as duas dão o mesmo); o perfil da traseira"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "     * 41 mm na inversa contra 8 mm na da tabela, com a mesma variação */"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "    teto: { tolerancia: 3, passo: 10, maximoDeClotoides: 8, sentido: 'tabela' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "    quinaDoTeto: { tolerancia: 3, passo: 10, maximoDeClotoides: 8, sentido: 'inverso' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "    traseira: { tolerancia: 3, passo: 10, maximoDeClotoides: 12, sentido: 'inverso' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "  },"
+        },
+        {
+          "tipo": "-",
+          "linha": 71,
+          "texto": "   * que dá a volta pela traseira como a borda da tampa; `folgaDoVidro` é quanto a borda de baixo do vidro lateral fica acima da base da coluna */"
+        },
+        {
+          "tipo": "-",
+          "linha": 72,
+          "texto": "  degrau: { largura: 55, subida: 14, folgaDoVidro: 8 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "   * que dá a volta pela traseira como a borda da tampa; `folgaDoVidro` é quanto a borda de baixo do vidro lateral fica acima da base da coluna"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "   * (RODADA 7: de 8 para 10, porque com a quina nova o corte passava a 0,15 mm de um vértice da chapa em z -1017 e deixava uma face fina) */"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "  degrau: { largura: 55, subida: 14, folgaDoVidro: 10 },"
+        },
+        {
+          "tipo": "-",
+          "linha": 158,
+          "texto": "/* os pesos da média gaussiana, em 41 amostras de -2,5 a 2,5 desvios */"
+        },
+        {
+          "tipo": "-",
+          "linha": 159,
+          "texto": "const GAUSS = (() => { const k = []; for (let i = -20; i <= 20; i += 1) { const t = (i / 20) * 2.5; k.push([t, Math.exp(-0.5 * t * t)]); } const soma = k.reduce((a, [, w]) => a + w, 0); return k.map(([t, w]) => [t, w / soma]); })();"
+        },
+        {
+          "tipo": "-",
+          "linha": 160,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 161,
+          "texto": "/** A função alisada por média gaussiana de desvio `sigma` (mm): tira a quebra de curvatura que a interpolação deixa em cada ponto da tabela, que a chapa brilhante mostra como onda. */"
+        },
+        {
+          "tipo": "-",
+          "linha": 162,
+          "texto": "export const alisar = (f, sigma) => (x) => GAUSS.reduce((a, [t, w]) => a + w * f(x + sigma * t), 0);"
+        },
+        {
+          "tipo": "-",
+          "linha": 163,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 238,
+          "texto": "/* OS AJUSTES GUARDADOS. `ajustarCurvaLisa` leva de 1 a 3 s por curva, e a receita precisa de cinco (a planta, o teto, a quina do teto em x e em y e o perfil da traseira) para"
+        },
+        {
+          "tipo": "+",
+          "linha": 239,
+          "texto": " * ser importada. O resultado de cada ajuste fica em `ajustes-de-curva.js`, ao lado deste arquivo, com a impressão dos pontos e das opções que entraram nele; a receita refaz a"
+        },
+        {
+          "tipo": "+",
+          "linha": 240,
+          "texto": " * curva do dado guardado quando a impressão confere com a entrada de agora; quando não confere, ajusta na hora e avisa com o comando que regrava (`COMANDO_QUE_REGRAVA`). O"
+        },
+        {
+          "tipo": "+",
+          "linha": 241,
+          "texto": " * dado vale para a TABELA deste arquivo: quem muda uma tabela lida ou uma opção de `curvaLisa` regrava, e a variante da TABELA em memória paga o ajuste. O desvio de cada ponto lido à curva refeita continua medido aqui a cada importação. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 242,
+          "texto": "const COMANDO_QUE_REGRAVA = 'node tools/modelar/regravar-ajustes-de-curva.mjs procedural/pecas/carro-fastback/partes/lataria/receita.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 243,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 244,
+          "texto": "/** A leitura da planta que entra no ajuste: o contorno da prancha, os pontos lidos a cada `passo` e os que o ajuste recebe (com o alargamento e o espelho além do eixo). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 245,
+          "texto": "function entradaDaPlanta(T) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 246,
+          "texto": "  const L = T.curvaLisa.planta;"
+        },
+        {
+          "tipo": "+",
+          "linha": 247,
+          "texto": "  const C = contornoDaPlanta(T.planta, T.alisamento.planta);"
+        },
+        {
+          "tipo": "+",
+          "linha": 248,
+          "texto": "  const lidos = []; for (let u = 0; u < C.total; u += L.passo) lidos.push(C.ponto(u)); lidos.push(C.ponto(C.total));"
+        },
+        {
+          "tipo": "+",
+          "linha": 249,
+          "texto": "  /* o alargamento do para-lama: entre `de` e `ate` o ajuste recebe, no lugar dos dois cantos da leitura, um S só de quinto grau entre as larguras que a leitura tem nesses dois z;"
+        },
+        {
+          "tipo": "+",
+          "linha": 250,
+          "texto": "   * a tolerância continua medida contra a leitura da prancha, em `plantaLisa` */"
+        },
+        {
+          "tipo": "+",
+          "linha": 251,
+          "texto": "  const G = L.alargamento;"
+        },
+        {
+          "tipo": "+",
+          "linha": 252,
+          "texto": "  const xDe = G && C.ponto(C.deZ(G.de))[1]; const xAte = G && C.ponto(C.deZ(G.ate))[1];"
+        },
+        {
+          "tipo": "+",
+          "linha": 253,
+          "texto": "  const alvo = G ? lidos.map(([z, x]) => (z < G.de && z > G.ate ? [z, xDe + (xAte - xDe) * suave((G.de - z) / (G.de - G.ate))] : [z, x])) : lidos;"
+        },
+        {
+          "tipo": "+",
+          "linha": 254,
+          "texto": "  const espelho = alvo.slice(-Math.round(L.alemDoEixo / L.passo) - 1, -1).reverse().map(([z, x]) => [z, -x]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 255,
+          "texto": "  return { C, lidos, pontos: [...alvo, ...espelho], opcoes: { tolerancia: L.tolerancia, maximoDeClotoides: L.maximoDeClotoides } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 256,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 257,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 258,
+          "texto": "/** A leitura de uma tabela [a, b] que entra no ajuste: a cúbica monótona pelos pontos, a cada `passo` de a, na ordem da tabela ou na inversa (`sentido`). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 259,
+          "texto": "function entradaDaCurva(tabela, L) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 260,
+          "texto": "  const f = pchip(tabela);"
+        },
+        {
+          "tipo": "+",
+          "linha": 261,
+          "texto": "  const as = tabela.map(([a]) => a); const a0 = Math.min(...as); const a1 = Math.max(...as);"
+        },
+        {
+          "tipo": "+",
+          "linha": 262,
+          "texto": "  const lidos = []; for (let a = a0; a < a1; a += L.passo) lidos.push([a, f(a)]); lidos.push([a1, f(a1)]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 263,
+          "texto": "  if ((tabela[0][0] > tabela[tabela.length - 1][0]) !== (L.sentido === 'inverso')) lidos.reverse();"
+        },
+        {
+          "tipo": "+",
+          "linha": 264,
+          "texto": "  return { lidos, opcoes: { tolerancia: L.tolerancia, maximoDeClotoides: L.maximoDeClotoides } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 265,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 266,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 267,
+          "texto": "/** As tabelas [a, b] que passam pelo ajuste, pela chave com que ficam guardadas. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 268,
+          "texto": "const tabelasLisas = (T) => ({"
+        },
+        {
+          "tipo": "+",
+          "linha": 269,
+          "texto": "  teto: [T.teto, T.curvaLisa.teto], 'quinaDoTeto.x': [T.quinaDoTeto.map(([z, x]) => [z, x]), T.curvaLisa.quinaDoTeto],"
+        },
+        {
+          "tipo": "+",
+          "linha": 270,
+          "texto": "  'quinaDoTeto.y': [T.quinaDoTeto.map(([z, , y]) => [z, y]), T.curvaLisa.quinaDoTeto], traseira: [T.traseira.map(([y, z]) => [y, z]), T.curvaLisa.traseira],"
+        },
+        {
+          "tipo": "+",
+          "linha": 271,
+          "texto": "});"
+        },
+        {
+          "tipo": "+",
+          "linha": 272,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 273,
+          "texto": "/** Os ajustes de que a receita precisa, [{ nome, pontos, opcoes }]: a entrada de `ajustarCurvaLisa` de cada um, que a ferramenta que regrava lê. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 274,
+          "texto": "export function ajustesDeCurva(T) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 275,
+          "texto": "  const planta = entradaDaPlanta(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 276,
+          "texto": "  return [{ nome: 'planta', pontos: planta.pontos, opcoes: planta.opcoes },"
+        },
+        {
+          "tipo": "+",
+          "linha": 277,
+          "texto": "    ...Object.entries(tabelasLisas(T)).map(([nome, [tabela, L]]) => { const e = entradaDaCurva(tabela, L); return { nome, pontos: e.lidos, opcoes: e.opcoes }; })];"
+        },
+        {
+          "tipo": "+",
+          "linha": 278,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 279,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 280,
+          "texto": "/** O que `tools/modelar/regravar-ajustes-de-curva.mjs` lê desta receita: o arquivo do dado, ao lado deste, e os ajustes a guardar. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 281,
+          "texto": "export const AJUSTES_DE_CURVA = { arquivo: 'ajustes-de-curva.js', pedidos: () => ajustesDeCurva(TABELA) };"
+        },
+        {
+          "tipo": "+",
+          "linha": 282,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 283,
+          "texto": "const AVISADOS = new Set();"
+        },
+        {
+          "tipo": "+",
+          "linha": 284,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 285,
+          "texto": "/** O ajuste de nome `nome`: a curva guardada quando a impressão guardada é a da entrada de agora; senão (uma variante da TABELA, ou a TABELA mudada sem regravar) o ajuste"
+        },
+        {
+          "tipo": "+",
+          "linha": 286,
+          "texto": " * feito na hora, com um aviso por nome que diz o que mudou e o comando que regrava. O ajuste que não cabe recusa, como a curva guardada que o núcleo mede fora da"
+        },
+        {
+          "tipo": "+",
+          "linha": 287,
+          "texto": " * tolerância contra os pontos de agora (`cabe` falso com `doGuardado`), e o dado guardado malformado também: essa recusa leva"
+        },
+        {
+          "tipo": "+",
+          "linha": 288,
+          "texto": " * `ajustesDeCurva` (o arquivo e os pedidos da TABELA), porque a receita que recusa na importação não exporta `AJUSTES_DE_CURVA`, e é dali que a ferramenta que regrava os lê. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 289,
+          "texto": "function ajusteGuardado(nome, descricao, pontos, opcoes) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 290,
+          "texto": "  let a;"
+        },
+        {
+          "tipo": "+",
+          "linha": 291,
+          "texto": "  try { a = curvaLisaDoGuardado({ nome, pontos, opcoes, guardados: AJUSTES_GUARDADOS }); } catch (recusa) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 292,
+          "texto": "    recusa.message = `carro-fastback/lataria: ${recusa.message}; regrave o dado com \\`${COMANDO_QUE_REGRAVA}\\``;"
+        },
+        {
+          "tipo": "+",
+          "linha": 293,
+          "texto": "    recusa.ajustesDeCurva = { arquivo: AJUSTES_DE_CURVA.arquivo, pedidos: AJUSTES_DE_CURVA.pedidos() };"
+        },
+        {
+          "tipo": "+",
+          "linha": 294,
+          "texto": "    throw recusa;"
+        },
+        {
+          "tipo": "+",
+          "linha": 295,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 296,
+          "texto": "  if (!a.doGuardado && !AVISADOS.has(nome)) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 297,
+          "texto": "    AVISADOS.add(nome);"
+        },
+        {
+          "tipo": "+",
+          "linha": 298,
+          "texto": "    console.warn(`carro-fastback/lataria: o ajuste guardado de ${nome} não é o da entrada de agora (${a.mudou.join('; ')}), e o ajuste foi refeito na hora, o que leva segundos; se a TABELA mudou, regrave o dado com \\`${COMANDO_QUE_REGRAVA}\\``);"
+        },
+        {
+          "tipo": "+",
+          "linha": 299,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 300,
+          "texto": "  if (!a.cabe && a.doGuardado) throw new Error(`carro-fastback/lataria: o ajuste guardado de ${nome} não é a curva da entrada de agora: ${a.motivo}; regrave o dado com \\`${COMANDO_QUE_REGRAVA}\\``);"
+        },
+        {
+          "tipo": "+",
+          "linha": 301,
+          "texto": "  if (!a.cabe) throw new Error(`carro-fastback/lataria: ${descricao} não cabe em ${opcoes.tolerancia} mm com ${opcoes.maximoDeClotoides} clotoides: ${a.motivo}`);"
+        },
+        {
+          "tipo": "+",
+          "linha": 302,
+          "texto": "  return a;"
+        },
+        {
+          "tipo": "+",
+          "linha": 303,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 304,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 225,
+          "texto": " * `alemDoEixo` mm antes do eixo a curva é levada, em S, à média dela com o espelho do trecho de depois do eixo: no eixo ela é simétrica exata e cruza de frente. O rumo sai da"
+        },
+        {
+          "tipo": "-",
+          "linha": 226,
+          "texto": " * integral exata da curvatura dos joelhos, e o desvio de cada ponto lido à curva final é medido aqui: fora da tolerância, a receita recusa. O ajuste leva alguns segundos e fica"
+        },
+        {
+          "tipo": "-",
+          "linha": 227,
+          "texto": " * guardado por TABELA. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 307,
+          "texto": " * `alemDoEixo` mm antes do eixo a curva é levada, em S, à média dela com o espelho do trecho de depois do eixo: no eixo ela é simétrica exata e cruza de frente. O ponto e o rumo"
+        },
+        {
+          "tipo": "+",
+          "linha": 308,
+          "texto": " * são os exatos do núcleo (`ponto`, `rumoEm`), e o desvio de cada ponto lido à curva final é medido aqui: fora da tolerância, a receita recusa. O ajuste leva alguns segundos e"
+        },
+        {
+          "tipo": "+",
+          "linha": 309,
+          "texto": " * vem guardado de `ajustes-de-curva.js` (`ajusteGuardado`). */"
+        },
+        {
+          "tipo": "-",
+          "linha": 232,
+          "texto": "  const C = contornoDaPlanta(T.planta, T.alisamento.planta);"
+        },
+        {
+          "tipo": "-",
+          "linha": 233,
+          "texto": "  const lidos = []; for (let u = 0; u < C.total; u += L.passo) lidos.push(C.ponto(u)); lidos.push(C.ponto(C.total));"
+        },
+        {
+          "tipo": "-",
+          "linha": 234,
+          "texto": "  const espelho = lidos.slice(-Math.round(L.alemDoEixo / L.passo) - 1, -1).reverse().map(([z, x]) => [z, -x]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 235,
+          "texto": "  const a = ajustarCurvaLisa([...lidos, ...espelho], { tolerancia: L.tolerancia, maximoDeClotoides: L.maximoDeClotoides });"
+        },
+        {
+          "tipo": "-",
+          "linha": 236,
+          "texto": "  if (!a.cabe) throw new Error(`carro-fastback/lataria: a planta não cabe em ${L.tolerancia} mm com ${L.maximoDeClotoides} clotoides: ${a.motivo}`);"
+        },
+        {
+          "tipo": "-",
+          "linha": 237,
+          "texto": "  /* o rumo em s: a integral da curvatura, linear entre joelhos */"
+        },
+        {
+          "tipo": "-",
+          "linha": 238,
+          "texto": "  const rumo = (s) => { let th = a.rumo; for (let i = 1; i < a.joelhos.length; i += 1) { const [p, q] = [a.joelhos[i - 1], a.joelhos[i]]; if (s <= p.s) break; const e = Math.min(s, q.s); th += 0.5 * (p.k + p.k + ((q.k - p.k) * (e - p.s)) / (q.s - p.s)) * (e - p.s); } return th; };"
+        },
+        {
+          "tipo": "+",
+          "linha": 314,
+          "texto": "  const { C, lidos, pontos, opcoes } = entradaDaPlanta(T);"
+        },
+        {
+          "tipo": "+",
+          "linha": 315,
+          "texto": "  const a = ajusteGuardado('planta', 'a planta', pontos, opcoes);"
+        },
+        {
+          "tipo": "-",
+          "linha": 246,
+          "texto": "    const p = a.ponto(c); const th = rumo(c); const dp = [Math.cos(th), Math.sin(th)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 323,
+          "texto": "    const p = a.ponto(c); const th = a.rumoEm(c); const dp = [Math.cos(th), Math.sin(th)];"
+        },
+        {
+          "tipo": "-",
+          "linha": 248,
+          "texto": "    const e = a.ponto(total + t); const the = rumo(total + t);"
+        },
+        {
+          "tipo": "+",
+          "linha": 325,
+          "texto": "    const e = a.ponto(total + t); const the = a.rumoEm(total + t);"
+        },
+        {
+          "tipo": "+",
+          "linha": 343,
+          "texto": "const CURVAS = new Map();"
+        },
+        {
+          "tipo": "+",
+          "linha": 344,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 345,
+          "texto": "/** A curva lisa de uma tabela [a, b] da prancha, como função b(a): a leitura da tabela (a cúbica monótona pelos pontos, a cada `passo` de a) ajustada pelo núcleo a uma cadeia de"
+        },
+        {
+          "tipo": "+",
+          "linha": 346,
+          "texto": " * clotoides dentro de `tolerancia`; fora dela, a receita recusa. O valor b(a) é o `valorEm` do núcleo, sobre a curva exata do ajuste (sem corda entre amostras), que recusa se `a` não cresce nem cai sempre"
+        },
+        {
+          "tipo": "+",
+          "linha": 347,
+          "texto": " * ao longo dela. Fora das pontas da curva vale a ponta. O ajuste vem guardado de `ajustes-de-curva.js` pela `chave` (uma de `tabelasLisas`), e o desvio de cada ponto"
+        },
+        {
+          "tipo": "+",
+          "linha": 348,
+          "texto": " * lido à curva refeita é medido aqui. Guardada por tabela e opções. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 349,
+          "texto": "export function curvaLisaDe(tabela, L, nome = 'curva', chave = nome) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 350,
+          "texto": "  const memo = JSON.stringify([tabela, L, chave]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 351,
+          "texto": "  if (CURVAS.has(memo)) return CURVAS.get(memo);"
+        },
+        {
+          "tipo": "+",
+          "linha": 352,
+          "texto": "  const { lidos, opcoes } = entradaDaCurva(tabela, L);"
+        },
+        {
+          "tipo": "+",
+          "linha": 353,
+          "texto": "  const aj = ajusteGuardado(chave, nome, lidos, opcoes);"
+        },
+        {
+          "tipo": "+",
+          "linha": 354,
+          "texto": "  const J = aj.joelhos; const total = aj.comprimento;"
+        },
+        {
+          "tipo": "+",
+          "linha": 355,
+          "texto": "  const de = (a) => aj.valorEm(a, { eixo: 0, fora: 'ponta' });"
+        },
+        {
+          "tipo": "+",
+          "linha": 356,
+          "texto": "  /* o desvio de cada ponto lido à curva refeita: a distância ao segmento mais perto entre os marcos de 1 mm de arco */"
+        },
+        {
+          "tipo": "+",
+          "linha": 357,
+          "texto": "  const fina = []; for (let s = 0; s <= total; s += 1) fina.push(aj.ponto(s)); fina.push(aj.ponto(total));"
+        },
+        {
+          "tipo": "+",
+          "linha": 358,
+          "texto": "  const aoSegmento = ([u, v], [au, av], [bu, bv]) => { const du = bu - au; const dv = bv - av; const l2 = du * du + dv * dv; const t = l2 > 0 ? Math.min(1, Math.max(0, ((u - au) * du + (v - av) * dv) / l2)) : 0; return Math.hypot(u - au - t * du, v - av - t * dv); };"
+        },
+        {
+          "tipo": "+",
+          "linha": 359,
+          "texto": "  const desvioMaximo = lidos.reduce((pior, p) => { let menor = Infinity; for (let i = 1; i < fina.length; i += 1) menor = Math.min(menor, aoSegmento(p, fina[i - 1], fina[i])); return Math.max(pior, menor); }, 0);"
+        },
+        {
+          "tipo": "+",
+          "linha": 360,
+          "texto": "  if (!(desvioMaximo <= L.tolerancia)) throw new Error(`carro-fastback/lataria: ${nome} fica a ${desvioMaximo.toFixed(2)} mm da leitura da tabela, e a tolerância é ${L.tolerancia} mm`);"
+        },
+        {
+          "tipo": "+",
+          "linha": 361,
+          "texto": "  de.ajuste = { desvioMaximo, clotoides: aj.clotoides.length, inflexoes: aj.inflexoes, joelhos: J, comprimento: total };"
+        },
+        {
+          "tipo": "+",
+          "linha": 362,
+          "texto": "  CURVAS.set(memo, de);"
+        },
+        {
+          "tipo": "+",
+          "linha": 363,
+          "texto": "  return de;"
+        },
+        {
+          "tipo": "+",
+          "linha": 364,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 365,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 274,
+          "texto": "  const A = T.alisamento;"
+        },
+        {
+          "tipo": "-",
+          "linha": 276,
+          "texto": "  const lisa = (tab, s = A.comprimento) => alisar(pchip(tab), s);"
+        },
+        {
+          "tipo": "-",
+          "linha": 281,
+          "texto": "  const yTeto = lisa(T.teto, A.teto);"
+        },
+        {
+          "tipo": "-",
+          "linha": 282,
+          "texto": "  const zx = lisa(T.quinaDoTeto.map(([z, x]) => [z, x]), A.quina ?? A.comprimento); const zy = lisa(T.quinaDoTeto.map(([z, , y]) => [z, y]), A.quina ?? A.comprimento);"
+        },
+        {
+          "tipo": "-",
+          "linha": 283,
+          "texto": "  const zEixo = alisar(pchip(T.traseira.map(([y, z]) => [y, z])), A.perfil);"
+        },
+        {
+          "tipo": "+",
+          "linha": 379,
+          "texto": "  const L = T.curvaLisa;"
+        },
+        {
+          "tipo": "+",
+          "linha": 380,
+          "texto": "  const yTeto = curvaLisaDe(T.teto, L.teto, 'o teto', 'teto');"
+        },
+        {
+          "tipo": "+",
+          "linha": 381,
+          "texto": "  const zx = curvaLisaDe(T.quinaDoTeto.map(([z, x]) => [z, x]), L.quinaDoTeto, 'a quina do teto em x', 'quinaDoTeto.x'); const zy = curvaLisaDe(T.quinaDoTeto.map(([z, , y]) => [z, y]), L.quinaDoTeto, 'a quina do teto em y', 'quinaDoTeto.y');"
+        },
+        {
+          "tipo": "+",
+          "linha": 382,
+          "texto": "  const zEixo = curvaLisaDe(T.traseira.map(([y, z]) => [y, z]), L.traseira, 'o perfil da traseira', 'traseira');"
+        },
+        {
+          "tipo": "+",
+          "linha": 593,
+          "texto": "/** O contorno [z, y] do para-lama na vista de +x: de baixo (y 100, abaixo da soleira, fora da chapa) até a linha do ombro, que a curva da lataria desenha, entre as caixas de z da parte. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 594,
+          "texto": "const contornoDoParalama = (T, P) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 595,
+          "texto": "  const z0 = T.partes.paralama.min[2] + 0.37, z1 = T.partes.paralama.max[2] + 0.37; const y0 = 100;"
+        },
+        {
+          "tipo": "+",
+          "linha": 596,
+          "texto": "  const zs = []; for (let z = z0; z < z1 - 1; z += 50) zs.push(z); zs.push(z1);"
+        },
+        {
+          "tipo": "+",
+          "linha": 597,
+          "texto": "  return [[z0, y0], ...zs.map((z) => [z, P.yOmbro(z) - 1.3]), [z1, y0]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 598,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 599,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 600,
+          "texto": "/** O contorno [z, y] do rebaixo na vista de +x: a base e o topo do rebaixo da lei de cada altura, de onde ele some até o corte de z 0, que o contorno ultrapassa (z 50) para fechar a parte pela borda da chapa. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 601,
+          "texto": "const contornoDoRebaixo = (T, P) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 602,
+          "texto": "  const z0 = ondeORebaixoSome(T) + 0.37; const zs = []; for (let z = z0; z < -31; z += 50) zs.push(z); zs.push(-30);"
+        },
+        {
+          "tipo": "+",
+          "linha": 603,
+          "texto": "  return [...zs.map((z) => [z, P.yBase(z)]), [50, P.yBase(0)], [50, P.yTopo(0)], ...zs.slice().reverse().map((z) => [z, P.yTopo(z)])];"
+        },
+        {
+          "tipo": "+",
+          "linha": 604,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 605,
+          "texto": ""
+        },
+        {
+          "tipo": "-",
+          "linha": 514,
+          "texto": "    ['parte', { nome: 'paralamaTraseiro', substituir: true, sel: { regiao: caixa(caixasDasPartes(T).paralama) } }],"
+        },
+        {
+          "tipo": "-",
+          "linha": 515,
+          "texto": "    ['parte', { nome: 'rebaixoLateral', substituir: true, sel: { regiao: caixa(caixasDasPartes(T).rebaixo) } }],"
+        },
+        {
+          "tipo": "+",
+          "linha": 626,
+          "texto": "    ['divisaoPorContorno', { chapa: VIDRO_TRASEIRO, vista: 'x', sentido: '+', nome: 'paralamaTraseiro', substituir: true, contorno: contornoDe(contornoDoParalama(T, P)) }],"
+        },
+        {
+          "tipo": "+",
+          "linha": 627,
+          "texto": "    ['divisaoPorContorno', { chapa: VIDRO_TRASEIRO, vista: 'x', sentido: '+', nome: 'rebaixoLateral', substituir: true, contorno: contornoDe(contornoDoRebaixo(T, P)) }],"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "superficie": {
+    "lataria": "PLANO.lataria declara as partes chapa, paralamaTraseiro, rebaixoLateral",
+    "imagens": [
+      "peca-frente-rasante-az0.png",
+      "peca-frente-rasante-az270.png",
+      "peca-lado-rasante-az180.png",
+      "peca-lado-rasante-az90.png",
+      "peca-topo-rasante-az270.png",
+      "peca-topo-rasante-az180.png",
+      "peca-tresquartos-rasante-az20.png",
+      "peca-tresquartos-rasante-az290.png",
+      "peca-frente-curvatura-legenda.png",
+      "peca-lado-curvatura-legenda.png",
+      "peca-topo-curvatura-legenda.png",
+      "peca-tresquartos-curvatura-legenda.png"
+    ]
+  },
+  "registradaEm": "2026-11-22T00:29:01.404Z",
+  "facesFinas": {
+    "total": 0,
+    "porParte": {}
+  },
+  "pontos": {
+    "texto": "sha256:1b62b26280b943d8c96ea32e4e766ce79b14d33dde654a110216d5ffe9614d8b",
+    "esperados": [
+      {
+        "nome": "canto de baixo de trás da chapa: o lado -x, a soleira e o fim da traseira",
+        "parte": "chapa",
+        "medida": "minimo",
+        "em": [
+          -940,
+          170,
+          -2375
+        ],
+        "toleranciaMm": 6
+      },
+      {
+        "nome": "canto de cima da frente da chapa: o teto sobre a porta, no corte de z 0",
+        "parte": "chapa",
+        "medida": "maximo",
+        "em": [
+          932.7,
+          1381,
+          0
+        ],
+        "toleranciaMm": 6
+      }
+    ]
+  }
+}
