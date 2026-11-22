@@ -1,10 +1,10 @@
-/* ajustes-de-curva.js — os ajustes de curva lisa de procedural\pecas\carro-fastback\partes\lataria\receita.js, guardados. ARQUIVO GERADO: não edite à mão.
+/* ajustes-de-curva.js — os ajustes de curva lisa de procedural/pecas/carro-fastback/partes/lataria/receita.js, guardados. ARQUIVO GERADO: não edite à mão.
  *
  * Cada entrada é o resultado de `ajustarCurvaLisa` (núcleo) para um ajuste de que a receita precisa: `impressao` é a dos pontos e das opções que entraram no ajuste,
  * `curva` é o que refaz a mesma curva sem ajustar (`curvaLisaGuardada`) e `medido`, o que o ajuste mediu. Quando a impressão não confere com a entrada dela, a
  * receita ajusta na hora e avisa; quem muda a tabela ou a opção de um ajuste regrava este arquivo com
  *
- *   node tools/modelar/regravar-ajustes-de-curva.mjs procedural\pecas\carro-fastback\partes\lataria\receita.js
+ *   node tools/modelar/regravar-ajustes-de-curva.mjs procedural/pecas/carro-fastback/partes/lataria/receita.js
  *
  * e confere a malha, porque o ajuste refeito de outra entrada muda a forma. */
 export default {

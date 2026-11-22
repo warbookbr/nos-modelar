@@ -20,7 +20,7 @@
  * cabe ou o conferido difere, e com 2 quando o comando foi mal usado ou a receita não declara ajustes. Depois de regravar, confira a malha
  * (`npm run malha:assinatura -- <peça> --contra=<assinatura de antes>`): o ajuste refeito de uma entrada que mudou muda a forma. */
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { basename, dirname, isAbsolute, join, relative, resolve } from 'node:path';
+import { basename, dirname, isAbsolute, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { ajustarCurvaLisa, impressaoDoAjuste } from '../../procedural/nucleo/ajuste-de-curva-lisa.js';
 import { lerArgumentos } from './argumentos.mjs';
@@ -109,7 +109,8 @@ async function principal(argv) {
   const arquivo = arquivoDaReceita(lido.posicional);
   const { destino, pedidos, recusa } = await ajustesDaReceita(arquivo);
   const raiz = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
-  const rel = (p) => { const r = relative(raiz, p); return r.startsWith('..') || isAbsolute(r) ? p : r; };
+  /* o caminho sai com a barra do POSIX em todo sistema: o cabeçalho do dado guardado entra na conferência, e a barra do Windows o fazia diferir no CI */
+  const rel = (p) => { const r = relative(raiz, p); return r.startsWith('..') || isAbsolute(r) ? p : r.split(sep).join('/'); };
   if (recusa) console.log(`a receita recusou na importação, e os pedidos vieram da recusa:\n  ${recusa}`);
   const { dado, linhas, naoCabem } = refazerAjustes(pedidos);
   console.log(linhas.join('\n'));
