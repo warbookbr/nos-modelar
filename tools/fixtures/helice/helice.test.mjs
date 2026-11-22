@@ -99,4 +99,23 @@ describe('o friso ao longo da hélice', () => {
     expect(motivo({ ...args, normal: [0, 1, 0] })).toContain('declare normal (uma para a linha toda) ou normais (uma por ponto), não os dois');
     expect(motivo({ ...args, normais: args.normais.slice(1) })).toMatch(/uma normal por ponto da linha, 9 \(veio 8\)/);
   });
+
+  it('a hélice declarada no friso dá a mesma malha que os pontos e as normais do ajudante', () => {
+    const passo = (args) => executarReceita({ meta: { nome: 'x' }, PASSOS: [['friso', args]] }).neutro;
+    const h = caminhoHelicoidal({ raio: 20, passo: 8, voltas: 4, pontas: { voltas: 1, passo: 3 } });
+    const [, args] = h.friso({ origemId: 1, perfil: { circulo: { raio: 1.5 } }, nome: 'fio' });
+    const declarada = passo({ origemId: 1, linha: { nome: 'fio' }, perfil: args.perfil, helice: { raio: 0.02, passo: 0.008, voltas: 4, pontas: { voltas: 1, passo: 0.003 } } });
+    const daAjuda = passo(args);
+    expect(declarada.F.size).toBe(daAjuda.F.size);
+    expect([...declarada.V.values()].flat().map((x) => x.toFixed(12))).toEqual([...daAjuda.V.values()].flat().map((x) => x.toFixed(12)));
+  });
+
+  it('a hélice declarada recusa o que ela mesma dá e a hélice malformada', () => {
+    const motivo = (a) => (executarReceita({ meta: { nome: 'x' }, PASSOS: [['friso', { origemId: 1, linha: { nome: 'l' }, perfil: { circulo: { raio: 0.001 } }, ...a }]] }).neutro.orfaos ?? []).map((o) => o.motivo).join(' ');
+    const helice = { raio: 0.02, passo: 0.008, voltas: 3 };
+    expect(motivo({ helice, normal: [0, 1, 0] })).toContain('a hélice dá a linha e as normais; tire normal');
+    expect(motivo({ helice, linha: { nome: 'l', pontos: [[0, 0, 0], [1, 0, 0]] } })).toContain('a hélice dá os pontos da linha; escreva só linha: { nome }');
+    expect(motivo({ helice: 3 })).toContain('helice é { raio, passo, voltas, eixo?, centro?, sentido?, pontosPorVolta?, inicio?, pontas? }, em metro');
+    expect(motivo({ helice: { ...helice, voltas: -1 } })).toMatch(/voltas é um número maior que zero/);
+  });
 });

@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:ff0aa73fef0a7fdca5f9779eb61b3477ea232926ab658d4f68c0576015760e9d",
+  "assinatura": "sha256:8df60af42ea64bbfea1d2e39b3ab96f594ababfa5ce2ef794bae24f980854085",
   "total": 43,
   "operacoes": [
     {
@@ -2610,6 +2610,10 @@
                 }
               ],
               "description": "Só na polilinha, sem superficie: a direção para onde v aponta em todos os pontos."
+            },
+            "helice": {
+              "type": "object",
+              "description": "No lugar dos pontos da linha e das normais: { raio, passo, voltas, eixo?, centro?, sentido?, pontosPorVolta?, inicio?, pontas?: { voltas, passo } }, em metro; a linha é a hélice de caminhoHelicoidal, com a normal radial em cada ponto, e linha leva só o nome. O perfil fica com v para fora do eixo, como o fio de uma mola ou o filete de uma rosca."
             },
             "normais": {
               "type": "array",
@@ -5434,7 +5438,7 @@
       }
     }
   ],
-  "assinaturaComExtensoes": "sha256:402c3aa5cde889d1451887ac028af480d535cc15fd2bb546a65df0353efca187",
+  "assinaturaComExtensoes": "sha256:baf9a379c53faf44c075ad1d46f01220cafe485780fe0fc9f67402a498c8ee19",
   "totalExtensoes": 5,
   "extensoes": [
     {

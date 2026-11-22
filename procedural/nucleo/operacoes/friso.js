@@ -41,6 +41,7 @@
    curto que o recuo da esquadria nas duas pontas dele (o de `varrerPerfil`, com folga de metade) sai da linha (`afinarNosCantos`),
    e o friso segue a corda até o canto. A espessura é a que o passo da abertura mediu na borda. Com `simetria: 'x'` no passo da
    abertura, o friso segue também a borda de fora do vão espelhado, a que o corte deixou do outro lado do plano. */
+import { caminhoHelicoidal } from '../caminho-helicoidal.js';
 import { ANGULO_MAXIMO_DA_ABA, ErroDoFriso, TRECHO_MAXIMO_EM_ARESTAS, cadeiaRefinada, ladoDaBorda, menorArestaDoPerfil, passosDoArcoDaAba, perfilDaAba, perfilDaPeleDaAba, posicoesDaLinha, tampaDaAba, varrerPerfil } from '../friso.js';
 import { valorDoLiso } from '../liso-por-angulo.js';
 import { espelharGaiolaEmX } from '../subdivisao.js';
@@ -419,6 +420,25 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
   friso(st, a, i) {
     confereId(st, i, 'friso', a);
     if (a.origemId != null && (!Number.isSafeInteger(a.origemId) || a.origemId < 0)) return grita(st, i, 'friso', 'origemId', 'origemId precisa ser inteiro não-negativo');
+    /* a hélice declarada vira a polilinha e as normais radiais de `caminhoHelicoidal`: a linha só dá o nome */
+    if (a.helice != null) {
+      for (const campo of ['superficie', 'costura', 'normal', 'normais']) if (a[campo] != null) return grita(st, i, 'friso', 'helice', `a hélice dá a linha e as normais; tire ${campo}`);
+      if (a.linha?.pontos != null) return grita(st, i, 'friso', 'helice', 'a hélice dá os pontos da linha; escreva só linha: { nome }');
+      const h = a.helice;
+      if (!h || typeof h !== 'object' || Array.isArray(h)) return grita(st, i, 'friso', 'helice', `helice é { raio, passo, voltas, eixo?, centro?, sentido?, pontosPorVolta?, inicio?, pontas? }, em metro (veio ${JSON.stringify(h)})`);
+      let caminho;
+      try {
+        const mm = (v) => st.num(v) * 1000;
+        caminho = caminhoHelicoidal({
+          ...h,
+          raio: mm(h.raio), passo: mm(h.passo), voltas: st.num(h.voltas),
+          ...(h.centro != null ? { centro: st.vec(h.centro).map((x) => x * 1000) } : {}),
+          ...(h.pontas != null ? { pontas: { ...h.pontas, ...(h.pontas.passo != null ? { passo: mm(h.pontas.passo) } : {}) } } : {}),
+        });
+      } catch (e) { return grita(st, i, 'friso', 'helice', String(e.message).replace(/^caminhoHelicoidal: /, '')); }
+      a = { ...a, linha: { nome: a.linha?.nome ?? 'helice', pontos: caminho.pontos }, normais: caminho.normais };
+      delete a.helice;
+    }
     const linha = a.linha;
     if (!linha || typeof linha !== 'object' || Array.isArray(linha)) return grita(st, i, 'friso', 'linha', `linha precisa ser a linha nomeada, como ${EXEMPLO_DE_LINHA}`);
     const extra = Object.keys(linha).filter((k) => k !== 'nome' && k !== 'pontos');
