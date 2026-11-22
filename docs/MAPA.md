@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2157 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2159 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -245,6 +245,11 @@
 ## docs/modelar/banco-de-provas/carrinho-refeito-2026-10-08/
 
 - `ATRITOS.md` — Atritos
+
+## docs/modelar/banco-de-provas/carro-fastback-2026-11-14/
+
+- `README.md` — Carro fastback: quanto custa o ajuste da chapa quando ela cresce
+- `ensaio-de-escala.mjs` — ensaio-de-escala.mjs — quanto custa o ajuste da gaiola da lataria do carro-fastback quando a rede cresce até o tamanho do carro inteiro. A rede do quarto tra…
 
 ## docs/modelar/banco-de-provas/comparar-com-a-referencia-2026-11-16/
 
