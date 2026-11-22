@@ -1,66 +1,74 @@
 # Ajuste esparso da gaiola: a subdivisão de uma chapa grande em segundos e sem estourar a memória
 
-**Estado:** rascunho
+**Estado:** ativo
 
-**Território:** a declarar ao ativar: `procedural/nucleo/subdivisao.js`, `procedural/nucleo/algebra-esparsa.js`, `procedural/nucleo/algebra-esparsa.test.mjs`, `procedural/nucleo/subdivisao.test.mjs`, `procedural/nucleo/operador-das-medidas.test.mjs`, `tools/fixtures/ajuste-esparso/`, `docs/modelar/banco-de-provas/ajuste-esparso-2026-11-22/`.
+**Território:** `procedural/nucleo/subdivisao.js`, `procedural/nucleo/algebra-esparsa.js`, `procedural/nucleo/algebra-esparsa.test.mjs`, `procedural/nucleo/subdivisao.test.mjs`, `procedural/nucleo/medidas-com-peso.test.mjs`, `procedural/nucleo/operador-das-medidas.test.mjs`, `procedural/nucleo/subdivisao-energia-de-curvatura.test.mjs`, `procedural/nucleo/memoria-de-pura.test.mjs`, `procedural/nucleo/operacoes/subdivisao.js`, `procedural/nucleo/uso-operacoes.js`, `tools/testes-lentos.mjs`, `tools/fixtures/ajuste-esparso/`, `docs/modelar/banco-de-provas/ajuste-esparso-2026-11-22/`
 
-**Responsável:** a IA da sessão implementa e mede; a pessoa ativa o plano e decide os dois pontos marcados nas fatias.
+Ativado pela pessoa em 2026-11-22, depois da revisão adversarial do rascunho, cujas correções estão no texto. O plano da [superfície de produção (G2)](2026-11-22-superficie-de-producao-g2.md) vem depois deste, porque muda o mesmo arquivo do núcleo.
+
+**Responsável:** a IA da sessão implementa e mede; a pessoa decide os pontos marcados nas fatias.
 
 **Repositório e base:** `warbookbr/nos-modelar`, main de 2026-11-22.
 
 ## Problema observado
 
-A `subdivisao` ajusta a gaiola às medidas das curvas num sistema linear montado e fatorado como matriz densa (`ajustarComPesoSemMemoria`, `ajustarGaiolaAsMedidas` e `operadorDasMedidas` em `procedural/nucleo/subdivisao.js`, com `fatorarLU` e `resolverLU`). O ensaio de escala do carro (`docs/modelar/banco-de-provas/carro-fastback-2026-11-14/`) mediu o custo na lataria do quarto traseiro com a rede cada vez mais densa: o tempo cresce com expoente 3,1 sobre os vértices e a memória com 2,0. A chapa do carro inteiro, de 4.300 a 5.000 vértices na meia gaiola, levaria de 4,3 a 6,8 minutos e de 3,8 a 5,1 GB só na subdivisão, a cada execução que muda a forma. A pessoa escolheu em 2026-11-22 manter a chapa só e trocar o ajuste por um solver esparso, em vez de partir a lataria nas frestas.
+A `subdivisao` ajusta a gaiola às medidas das curvas num sistema linear montado e fatorado como matriz densa (`ajustarComPesoSemMemoria`, `ajustarGaiolaAsMedidas` e `operadorDasMedidas` em `procedural/nucleo/subdivisao.js`, com `fatorarLU` e `resolverLU`). O ensaio de escala do carro (`docs/modelar/banco-de-provas/carro-fastback-2026-11-14/`) mediu, na lataria do quarto traseiro com a rede cada vez mais densa, o tempo crescendo com expoente 3,1 sobre os vértices e a memória com 2,0. A pessoa escolheu em 2026-11-22 manter a chapa só e trocar o ajuste por um solver esparso, em vez de partir a lataria nas frestas.
 
-O perfil de CPU da execução de 2.161 vértices (30 s) diz onde vai o tempo: 55% em `resolverLU` e 23% no laço que soma as colunas, os dois na conferência do ganho, que resolve o sistema uma vez por medida para achar o pior vértice; a fatoração leva 10%. A matriz `A` é montada cheia, n por n, e as colunas da conferência ficam guardadas inteiras, medida por vértice: as duas dão a memória quadrática. A matriz já é esparsa (cada medida só pesa a estrela do seu ponto, e a energia de curvatura só liga vizinhos), e a fatoração atual pula os zeros, mas elimina na ordem dos índices, sem ordenação que reduza o preenchimento.
+O perfil da execução com passo 70 (30 s) põe 55% do tempo em `resolverLU` e 23% no laço que soma as colunas, os dois na conferência do ganho, que resolve o sistema uma vez por medida; a fatoração leva 10%. A revisão mediu a estrutura desse sistema. Com passo 70 são 4.255 incógnitas na gaiola espelhada, 4.255 medidas, todas com peso 1, e nenhuma cota exata nem energia de curvatura. A matriz é H = I + Σ W̃ᵀW̃, simétrica, com 24 não nulos por linha, estritamente diagonal dominante (margem mínima 0,475), e o pivô parcial não troca nenhuma linha: ela é positiva definida.
+
+O expoente 3,1 vem da ordem dos vértices que a `gaiolaPorRede` entrega, com as imagens do espelho no fim, o que deixa a banda em 4.107 de 4.255. Uma grade comum do mesmo tamanho resolve em 5,8 s contra 27 s. A memória quadrática vem da matriz montada cheia, do vetor denso de `sensibilidade` guardado por medida, das colunas guardadas da conferência, da `inversa` do ajuste exato e das matrizes densas do operador.
 
 ## Resultado
 
-A subdivisão da lataria do carro inteiro, com 5.000 vértices na meia gaiola, executa em menos de 60 s e com pico abaixo de 1,5 GB, com a mesma gaiola ajustada que o solver denso dá, a 1e-9 m, e as mesmas recusas de sistema singular, mal condicionado e fora da tolerância.
+O quarto traseiro com passo 35 (5.162 vértices na meia gaiola, 10.220 incógnitas), que tem o tamanho que o carro inteiro terá com o passo de hoje, executa a subdivisão em menos de 60 s. O ajuste acrescenta menos de 400 MB ao pico da mesma execução sem medidas, que é de 1.208 MB. A gaiola ajustada é a do solver denso dentro da tolerância declarada abaixo, e as recusas são as mesmas.
 
 ## Filtro Agent-First
 
-USAR DIRETO a assinatura de `ajustarGaiolaAsMedidas`, `ajustarGaiolaAsMedidasComPeso` e `operadorDasMedidas`: quem escreve receita não muda nada, e a troca fica dentro do núcleo. REFATORAR a montagem e a fatoração, para uma álgebra esparsa num módulo próprio do núcleo, determinística, sem dependência nova, testada contra a densa. ADIAR qualquer opção nova de receita (escolher solver, ligar ou desligar a conferência): a conferência do ganho continua obrigatória. ADIAR o estimador da norma no lugar da conta exata do ganho, que é o segundo ponto de decisão da pessoa.
+USAR DIRETO a assinatura de `ajustarGaiolaAsMedidas`, `ajustarGaiolaAsMedidasComPeso` e `operadorDasMedidas`: quem escreve receita não muda nada. REFATORAR a montagem e a fatoração para uma álgebra esparsa num módulo próprio do núcleo, determinística e sem dependência nova. `fatorarLU` e `resolverLU` continuam exportados, porque `limiteDoDardo`, as fixtures de correção de superfície e um teste bit a bit os usam. ADIAR qualquer opção nova de receita: a conferência do ganho continua obrigatória e com as mesmas recusas.
 
 ## Incluído
 
-- a álgebra esparsa do núcleo: matriz por linhas, ordenação que reduz o preenchimento (determinística, por índice no empate), fatoração LU com pivô parcial por limiar e substituição;
-- a montagem esparsa nas três funções do ajuste e no sistema da energia de curvatura;
-- a conferência do ganho sem guardar as colunas, com a soma das linhas feita enquanto cada coluna sai, e a segunda passada só quando ela reprova, para nomear os pontos;
-- uma fixture neutra de gaiola grande e escalável (uma rede de retalhos sobre uma superfície curva, sem objeto), com o teste que compara o esparso ao denso;
-- o teste de escala, que reprova quando o custo entre dois tamanhos da fixture cresce mais que o expoente combinado: é o gate que faltou, porque nenhum gate media como o custo cresce;
-- o ensaio de escala do carro refeito com o solver novo.
+- a álgebra esparsa: matriz por linhas, ordenação de grau mínimo com desempate por índice, Cholesky esparso para o sistema positivo definido e substituição que aproveita o lado direito esparso;
+- a montagem esparsa e a `sensibilidade` esparsa (as linhas p·W̃ᵢ e os vetores unitários) nas três funções do ajuste;
+- a conferência do ganho pela cota superior rigorosa de Varah para matriz estritamente diagonal dominante, ‖A⁻¹‖∞ ≤ 1/minₖ(|aₖₖ| − Σⱼ|aₖⱼ|), em tempo linear nos não nulos. Com a cota até `GANHO_MAXIMO_DAS_MEDIDAS`, a recusa é impossível e a conta exata é dispensada; acima dela roda a conta exata, e os pontos da recusa saem de uma resolução com a transposta na linha do pior vértice. No carro com passo 70 a cota dá 3,25, contra o ganho exato de 0,716 e o limite de 100. O campo `ganho` devolvido passa a ser a cota quando a conta exata não roda, e isso é declarado na ficha;
+- o sistema de ponto de sela (cotas exatas, sem diagonal nas linhas delas) e o ajuste só com cotas exatas, não simétrico, por LU esparso com pivô por limiar ou por complemento de Schur, decidido pela medida da fatia 3;
+- a fixture neutra de gaiola grande gerada pela própria `gaiolaPorRede`, com `simetria: 'x'` e todo ponto medido com peso, que reproduz a ordem e a banda do carro;
+- o teste de escala, que conta operações (não nulos do fator vezes resoluções) entre dois tamanhos da fixture e reprova acima do expoente declarado de 2,3, o gate que faltou e que pegaria o problema;
+- o ensaio do carro refeito.
 
 ## Excluído
 
 - partir a lataria nas frestas e qualquer mudança na receita do carro, que segue no plano do carro;
-- a ondulação da chapa de subdivisão (o G2 de produção), que é outra linha do backlog;
-- os vãos e as regiões da lataria, que refazem a booleana da chapa inteira e somam outro tanto de tempo: ficam medidos no ensaio e, se forem o próximo gargalo, voltam ao backlog com o número;
-- trocar o algoritmo do ajuste (outro funcional, outra energia): o sistema resolvido é o mesmo.
+- a ondulação da chapa (G2), que é do plano da superfície de produção;
+- os vãos e as regiões da lataria, que refazem a booleana da chapa inteira: ficam medidos no ensaio e, se forem o próximo gargalo, vão ao backlog com o número;
+- trocar o funcional do ajuste, porque o sistema resolvido é o mesmo;
+- converter as fixtures de protótipo que usam `fatorarLU`, que continuam densas.
 
 ## Invariantes
 
-A gaiola ajustada é a do solver denso a 1e-9 m em toda fixture e peça do acervo que usa subdivisão. As recusas continuam as mesmas, com os mesmos pontos nomeados: singular, ganho acima de `GANHO_MAXIMO_DAS_MEDIDAS` e medida exata fora de `TOLERANCIA_DAS_MEDIDAS`. A saída é determinística: a mesma entrada dá os mesmos números, bit a bit, em qualquer máquina com o mesmo Node. A memoização por argumentos (`memoizarPura`) continua.
+Sem energia de curvatura, a gaiola ajustada é a do denso a 1e-9 m em toda fixture, teste e peça do acervo com subdivisão. Com energia, o próprio denso muda além disso quando só a ordem dos índices muda: renumerando uma grade de 24 por 20, a diferença foi 7,3e-13 m com a onda padrão, 1,3e-9 m com 16 passos e 6,2e-6 m com 64 passos. A tolerância ali é dez vezes o piso medido do denso contra o denso renumerado no mesmo caso, e as cotas exatas continuam a `TOLERANCIA_DAS_MEDIDAS`.
+
+As recusas por ganho e por cota fora da tolerância nomeiam os mesmos pontos. A recusa por sistema singular passa a nomear a união de uma base inteira do núcleo do sistema. Hoje os pontos nomeados dependem da ordem de eliminação: com dois cubos de vértices todos exatos, a ordem natural nomeia de 0 a 7 e a trocada de 8 a 15. A mudança é declarada na ficha e travada pelo teste dos dois cubos. A saída é determinística, bit a bit, em qualquer máquina com o mesmo Node, porque o desempate da ordenação é por índice e não há soma paralela. A memoização por argumentos (`memoizarPura`) continua.
 
 ## Gate de saída
 
-1. A subdivisão da fixture grande e a do carro inteiro (pelo ensaio com `--params`) executam com 5.000 vértices na meia gaiola em menos de 60 s e pico abaixo de 1,5 GB, medidas no banco de provas.
-2. O teste que compara o esparso ao denso passa a 1e-9 m em todos os testes da subdivisão, do friso, do operador das medidas e da energia de curvatura, e o `guarda:acervo` passa.
-3. O teste de escala entra no gate e reprova o solver denso, como prova de que pegaria o problema.
-4. A lataria do carro fica com as mesmas imagens: a medida da rodada passa sem mudar os `PONTOS`, e a conferência de refino contra a rodada 7 dá deslocamento abaixo de 0,01 mm.
+1. No quarto traseiro com passo 35 (pelo ensaio com a variante da receita) a subdivisão executa em menos de 60 s, e o ajuste acrescenta menos de 400 MB sobre o pico da mesma execução sem medidas, medidos no banco de provas.
+2. A igualdade com o denso, nas tolerâncias das invariantes, passa nos testes da subdivisão, das medidas com peso, do operador, da energia de curvatura e do friso. O `retrato:acervo` gravado antes da fatia 2 compara igual depois, nas peças com subdivisão e medidas.
+3. O teste de escala entra no gate, contando operações, e reprova o solver denso.
+4. Na lataria do carro com passo 70, o denso e o esparso dão a mesma superfície na mesma receita: a medida da rodada passa sem mudar os `PONTOS`, e a malha difere abaixo de 1e-9 m.
 5. `npm run gates` verde e o CI verde.
 
 ## Fatias
 
-1. Linha de base. A fixture neutra de gaiola grande, o ensaio de escala dela no banco de provas com o solver denso, e o teste de escala, que nesta fatia fica marcado como falha esperada. Saída: a lei de custo da fixture, que deve bater com a do carro.
-2. A álgebra esparsa e a montagem esparsa nas três funções, com a densa mantida só no teste como referência. Saída: o teste de igualdade a 1e-9 m verde e a fatoração medida na fixture.
-3. A conferência do ganho sem guardar colunas. Ponto de decisão da pessoa, só se depois dela a conferência ainda passar de metade do tempo com 5.000 vértices: trocar a conta exata por um estimador da norma (que pode subestimar o ganho por um fator pequeno), ou aceitar o tempo medido.
-4. A prova no carro: o ensaio de escala refeito, a medida da rodada da lataria e a conferência de refino contra a rodada 7. Ponto de decisão da pessoa se a lataria mudar além de 0,01 mm em algum lugar.
-5. Fechamento: o teste de escala sai de falha esperada, o banco de provas registra antes e depois, a ficha do catálogo da subdivisão diz o custo, e o plano do carro é avisado de que a chapa inteira cabe.
+1. Linha de base. A fixture gerada pela `gaiolaPorRede`, com o expoente medido perto de 3,1 no denso. O teste do piso de ruído por renumeração e o dos dois cubos. A razão entre os não nulos do fator e os da matriz, medida para calibrar a parada. O `retrato:acervo --gravar`. Saída: a lei de custo da fixture e o retrato gravado.
+2. O caminho positivo definido, que é o do carro: montagem e sensibilidade esparsas, Cholesky esparso com ordenação de grau mínimo e o ganho pela cota de Varah, com a conta exata e a resolução pela transposta quando a cota passa do limite. Saída: a igualdade a 1e-9 m e o quarto traseiro com passo 35 medido.
+3. O ponto de sela e o ajuste só com exatas: LU com pivô por limiar ou complemento de Schur, pela medida do preenchimento na fixture com cotas exatas. A `inversa`, as matrizes do operador e o `vetorNulo` passam a esparsos, e a recusa do singular passa a nomear a base do núcleo.
+4. A prova no carro: o ensaio refeito, o denso contra o esparso na mesma receita e o retrato comparado. Ponto de decisão da pessoa se a lataria mudar além da tolerância em algum lugar.
+5. Fechamento: o teste de escala no gate, antes e depois no banco de provas, a ficha da subdivisão com o custo e com o novo sentido do `ganho` e da recusa do singular, e o plano do carro avisado de que a chapa inteira cabe.
 
 ## Riscos e parada
 
-O sistema com medidas exatas é de ponto de sela (as linhas das cotas exatas têm zero na diagonal), e o pivô parcial pode trocar linhas e desfazer a ordenação, enchendo a fatoração. Se na fixture a fatoração esparsa com pivô por limiar passar de 10 vezes os não nulos da matriz, parar e propor eliminar as cotas exatas por complemento de Schur antes de seguir. Se a igualdade com o denso não chegar a 1e-9 m numa peça do acervo, parar e levar o caso à pessoa, sem relaxar a tolerância. Se o retrato do acervo mudar na última casa decimal, ele é regravado só com o desvio medido junto.
+A parada pelo preenchimento é calibrada na fatia 1: se no ponto de sela o fator passar de três vezes a razão medida no caso positivo definido, a fatia 3 usa complemento de Schur. Se a igualdade com o denso não chegar à tolerância declarada numa peça do acervo, parar e levar o caso à pessoa, sem relaxar a tolerância. Se a memória do quarto com passo 35 passar do limite com o fator esparso, parar antes da fatia 3 e medir onde está o pico. O CI roda de duas a três vezes mais devagar que a máquina local, e o teste de escala conta operações para não depender do relógio.
 
 ## Fechamento
 
