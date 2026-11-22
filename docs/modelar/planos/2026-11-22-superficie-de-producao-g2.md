@@ -1,8 +1,10 @@
 # Superfície de produção (G2): a chapa de subdivisão sem a ondulação que o crítico acusa, sem sair da forma
 
-**Estado:** rascunho
+**Estado:** ativo
 
-**Território:** a confirmar ao ativar, depois que o plano do [ajuste esparso da gaiola](../decisoes/PLANOS-ENCERRADOS.md) fechar, porque os dois mudam `procedural/nucleo/subdivisao.js`. O plano muda `procedural/nucleo/gaiola-por-rede.js` na fatia 1 (o diagnóstico do preenchimento na saída) e na fatia 2 (a opção `alisarSuperficie`), e esse arquivo é usado antes pela fatia 3 do plano `2026-11-22-formas-que-faltavam` (a curva paralela na rede de curvas), que o libera antes desta ativação. A lista: `procedural/nucleo/subdivisao.js`, `procedural/nucleo/gaiola-por-rede.js`, os testes de subdivisão e de energia de curvatura em `procedural/nucleo/`, `tools/fixtures/correcao-de-superficie/`, a ferramenta nova da distância à pele em `tools/modelar/`, `tools/modelar/zebra-numerica.mjs` e `docs/modelar/banco-de-provas/superficie-g2-2026-11-22/`.
+**Território:** `procedural/nucleo/subdivisao.js`, `procedural/nucleo/subdivisao.test.mjs`, `procedural/nucleo/subdivisao-energia-de-curvatura.test.mjs`, `tools/fixtures/correcao-de-superficie/`, `tools/modelar/distancia-a-pele.mjs`, `tools/modelar/distancia-a-pele.test.mjs`, `tools/modelar/zebra-numerica.mjs`, `tools/modelar/zebra-numerica.test.mjs`, `docs/modelar/banco-de-provas/superficie-g2-2026-11-22/`
+
+Ativado pela pessoa em 2026-11-22, depois do fechamento do plano do ajuste esparso. A energia de curvatura (`alisarSuperficie`) e o preenchimento do miolo moram em `procedural/nucleo/gaiola-por-rede.js`, que a fatia 3 do plano das formas que faltavam (a curva paralela na rede de curvas) usa antes. Por isso o território começa sem esse arquivo, e a fatia 1 começa pelos instrumentos que não dependem dele: a distância à pele e o gate que junta a zebra à distância, com a linha de base do quarto traseiro. O diagnóstico do preenchimento e as fatias 2 e 3 esperam a fatia 3 das formas soltar o arquivo, e então ele entra neste território. A ficha da `gaiolaPorRede` em `procedural/nucleo/uso-operacoes.js` entra do mesmo modo quando o plano da hélice soltar o arquivo.
 
 **Responsável:** a IA da sessão implementa e mede; a pessoa ativa o plano, decide os pontos marcados nas fatias e julga a forma por imagem.
 
@@ -70,6 +72,10 @@ Desligada, a opção dá a mesma gaiola de hoje, bit a bit. As cotas exatas cont
 ## Riscos e parada
 
 Se na fatia 2 nenhuma das duas formas passar nas chapas da revisão de 2026-11-19, parar e levar à pessoa antes da tampa. Se a tampa da fatia 4 não ficar dentro de 0,1 mm da gaiola regular fora da zona do extraordinário, parar. Se o quarto traseiro melhorar na zebra e sair da pele mais de 1,5 mm, a opção continua experimental: é o caso da onda de 400 mm, e o gate da fatia 1 existe para pegá-lo.
+
+## Andamento
+
+Fatia 1, primeira parte, feita em 2026-11-22, com as medidas em `docs/modelar/banco-de-provas/superficie-g2-2026-11-22/`. A distância à pele é a ferramenta `tools/modelar/distancia-a-pele.mjs`, que mede a superfície limite contra a pele que a receita exporta em `PELE(PARAMS)`, e com `--zebra --contra` dá o veredito que junta as duas medidas contra uma linha de base. O carro-fastback exporta a pele do flanco, e a linha de base do quarto traseiro está gravada: no flanco, longe da borda da soleira e sem o arco, a chapa fica a até 1,79 mm da pele, acima do 1,5 mm do gate 3, que a receita registrava com roteiro de rascunho sobre outra faixa. A decisão de manter o 1,5 mm ou medi-lo contra a linha de base fica para a fatia 5, com a pessoa. O diagnóstico do preenchimento espera `gaiola-por-rede.js` entrar no território.
 
 ## Fechamento
 

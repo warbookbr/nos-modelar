@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2189 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2192 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -551,6 +551,10 @@
 ## docs/modelar/banco-de-provas/solido-por-lacos-2026-11-05/
 
 - `README.md` — Sólido por laços — provas das fatias 1 a 3
+
+## docs/modelar/banco-de-provas/superficie-g2-2026-11-22/
+
+- `README.md` — Superfície de produção (G2): os instrumentos e a linha de base do quarto traseiro
 
 ## docs/modelar/banco-de-provas/suporte-tubo-2026-10-10/
 
@@ -3585,6 +3589,8 @@
 - `descrever-separados.test.mjs` — descrever-separados.test.mjs — `separados` da receita no `descrever`: a peça com a folga pedida passa, e a que fica abaixo dela, ou se toca, reprova citando …
 - `diario.mjs` — diario.mjs — registra o que as ferramentas do laço fizeram, sem pedir nada a quem as usa.
 - `diario.test.mjs` — diario.test.mjs — o instrumento não pode mudar o que ele mede.
+- `distancia-a-pele.mjs` — distancia-a-pele.mjs — a distância da superfície limite da chapa à pele analítica que a receita declara, por região, e o veredito que junta essa distância à …
+- `distancia-a-pele.test.mjs` — pontos perto da superfície, dentro do domínio, por uma sequência fixa (sem sorteio)
 - `dobra-aceita-pela-cadeia.test.mjs` — dobra-aceita-pela-cadeia.test.mjs — a região de `PLANO.dobrasAceitas` vale pela cadeia inteira, e a ruga na ponta dela não some junto (plano de conferência, …
 - `dobra-da-superficie.mjs` — dobra-da-superficie.mjs — acha onde a superfície de subdivisão de uma receita dobra com diedro agudo fora de vinco declarado, e diz a parte, o lugar e o ângulo.
 - `dobra-da-superficie.test.mjs` — dobra-da-superficie.test.mjs — a régua de dobra sobre superfícies pequenas feitas aqui: duas faces que se dobram num ângulo conhecido. O diedro é 180 graus m…

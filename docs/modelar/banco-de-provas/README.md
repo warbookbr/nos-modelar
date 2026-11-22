@@ -81,6 +81,7 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
   - [Sedã em alta definição, ciclo 4: a cabine sem contornos, e a frente e a traseira até o eixo](sedan-chassi-e-lataria-2026-11-11/alta-definicao/CICLO-4.md) — `sedan-chassi-e-lataria-2026-11-11/alta-definicao`
   - [Sedã em alta definição, ciclo 5: o carro inteiro](sedan-chassi-e-lataria-2026-11-11/alta-definicao/CICLO-5.md) — `sedan-chassi-e-lataria-2026-11-11/alta-definicao`
 - [Sólido por laços — provas das fatias 1 a 3](solido-por-lacos-2026-11-05/README.md) — `solido-por-lacos-2026-11-05`
+- [Superfície de produção (G2): os instrumentos e a linha de base do quarto traseiro](superficie-g2-2026-11-22/README.md) — `superficie-g2-2026-11-22`
 - [Suporte de tubo sem identificador numérico](suporte-tubo-2026-10-10/README.md) — `suporte-tubo-2026-10-10`
 - [Madeira em Node ao lado da do Blender (2026-10-19)](textura-2026-10-19/README.md) — `textura-2026-10-19`
 <!-- indice-do-banco:fim -->
