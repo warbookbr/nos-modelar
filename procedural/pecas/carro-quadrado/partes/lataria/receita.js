@@ -87,9 +87,9 @@ export const MATERIAIS = {
   lenteFarol: { cor: '#dce4ec', metalicidade: 0.1, aspereza: 0.12 },
   lenteNeblina: { cor: '#cfd8e0', metalicidade: 0.1, aspereza: 0.15 },
   setaAmbar: { cor: '#e08a1e', metalicidade: 0.05, aspereza: 0.2 },
-  lanternaRe: { cor: '#dde3e8', metalicidade: 0.05, aspereza: 0.18 },
-  lanternaFreio: { cor: '#a81c1c', metalicidade: 0.05, aspereza: 0.2 },
-  lanternaSeta: { cor: '#d98218', metalicidade: 0.05, aspereza: 0.2 },
+  lanternaRe: { cor: '#cfd8e2', metalicidade: 0.28, aspereza: 0.08 },
+  lanternaFreio: { cor: '#8c0e14', metalicidade: 0.18, aspereza: 0.08 },
+  lanternaSeta: { cor: '#d97208', metalicidade: 0.16, aspereza: 0.09 },
   placa: { cor: '#e8eaed', metalicidade: 0.1, aspereza: 0.35 },
   escapamento: { cor: '#8c929a', metalicidade: 0.75, aspereza: 0.3 },
 };
