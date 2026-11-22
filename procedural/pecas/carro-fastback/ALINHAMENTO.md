@@ -76,3 +76,7 @@ O carro é simétrico, sem exceção declarada.
 ## Aceite
 
 - alinhamento: aceito pela pessoa em 2026-11-14, "Aceito as quatro", depois de ver as quatro recomendações; as medidas, o nível e as partes vêm das decisões dela no plano.
+
+## Veredito da pessoa por rodada
+
+- lataria, rodada 7 (registro `rodadas/rodada-07.json`, rodada 8 do quarto traseiro no plano): aprovada pela pessoa em 2026-11-21, "Aprovo esta versão", depois de ver a zebra lateral e a pintura isométrica e lateral, antes e depois. O crítico cego deu 6, com a ondulação do flanco, a quina do ombro, a ponta da tampa e a soleira em 170 mm; a medida tirou a crista da tampa (de 9 laços para 0) e as ilhas do ombro perto da porta. Seguem em aberto, com a recomendação levada a ela: manter a soleira em 170 mm e fazer a descida como a etapa da saia, manter a tolerância de 3 mm da planta, e não insistir na ondulação do flanco antes de ferramenta nova de superfície.
