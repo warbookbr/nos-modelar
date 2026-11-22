@@ -8,47 +8,53 @@ import { ALIASES_FRENTE_TRASEIRA, passosFrenteTraseira } from './receita/frente-
 
 export const TABELA = {
   chapa: { espessura: 8, passo: 200, niveis: 2, anguloMax: 20, liso: false },
-  estacoes: [1910, 1550, 1235, 845, 310, -300, -1125, -1530, -1715, -1900],
+  estacoes: [1910, 1550, 1235, 845, 310, -300, -1125, -1530, -1730, -1935],
+  /* cada seção tem 7 níveis: soleira, baixo, meio (Curva 3 bojo), vinco (ombro/vinco horizontal nítido), cintura, quina, eixo */
   secoes: {
-    1910:    [[775, 255], [800, 425], [800, 595], [760, 775], [650, 785], 790],
-    1550:    [[795, 255], [815, 425], [815, 595], [775, 815], [680, 835], 842],
-    1235:    [[805, 255], [825, 425], [825, 595], [785, 850], [710, 875], 885],
-    845:     [[810, 255], [835, 425], [835, 595], [790, 905], [740, 935], 940],
-    310:     [[810, 255], [835, 425], [835, 595], [775, 945], [580, 1358], 1370],
-    '-300':  [[810, 255], [835, 425], [835, 595], [775, 945], [580, 1384], 1396],
-    '-1125': [[810, 255], [835, 425], [835, 595], [775, 945], [580, 1382], 1394],
-    '-1530': [[805, 255], [825, 425], [825, 595], [775, 945], [580, 1362], 1374],
-    '-1715': [[792, 262], [815, 425], [815, 590], [770, 948], [648, 1185], 1192],
-    '-1900': [[780, 270], [805, 425], [805, 585], [765, 950], [715, 1002], 1006],
+    1910:    [[760, 255], [795, 425], [810, 610], [808, 748], [755, 796], [645, 804], 810],
+    1550:    [[780, 255], [810, 425], [825, 615], [824, 755], [772, 830], [675, 846], 852],
+    1235:    [[790, 255], [820, 425], [835, 620], [834, 762], [782, 864], [705, 882], 888],
+    845:     [[795, 255], [825, 425], [840, 625], [838, 770], [786, 910], [735, 930], 936],
+    310:     [[795, 255], [825, 425], [840, 630], [838, 778], [772, 945], [580, 1358], 1370],
+    '-300':  [[795, 255], [825, 425], [840, 632], [838, 785], [772, 945], [580, 1384], 1396],
+    '-1125': [[795, 255], [825, 425], [840, 632], [838, 792], [772, 945], [580, 1382], 1394],
+    '-1530': [[790, 255], [820, 425], [835, 632], [833, 796], [772, 945], [580, 1364], 1376],
+    '-1730': [[778, 265], [808, 428], [824, 628], [822, 798], [765, 942], [642, 1170], 1178],
+    '-1935': [[762, 285], [792, 430], [810, 625], [808, 800], [755, 932], [705, 962], 966],
   },
   frente: [
-    [0, 255, 1940],
-    [0, 425, 2005],
-    [0, 595, 2020],
-    [0, 780, 1966],
+    [0, 255, 1945],
+    [0, 425, 2000],
+    [0, 610, 2018],
+    [0, 742, 2008],
+    [0, 796, 1986],
   ],
+  /* Curva 1 (tuck-under traseiro): vertical no âmbar/vinco (-2022) e tombando para frente em direção ao para-choque (-1982) */
   traseira: [
-    [0, 315, -1945],
-    [0, 430, -2025],
-    [0, 560, -2025],
-    [0, 955, -1955],
+    [0, 295, -1940],
+    [0, 430, -1982],
+    [0, 625, -2012],
+    [0, 800, -2022],
+    [0, 930, -2008],
   ],
-  vincos: { cintura: 0.2, quina: 0.15 },
+  vincos: { lateral: 0.85, cintura: 0.18, quina: 0.15 },
   arcos: {
     dianteiro: { z: 1235, y: 290, raio: 350, lados: 32 },
     traseiro: { z: -1125, y: 290, raio: 350, lados: 32 },
   },
   vidros: {
-    porta: [[600, 965, 15], [245, 1335, 30], [-335, 1345, 25], [-335, 965, 15]],
-    lateralTraseiro: [[-440, 965, 15], [-440, 1340, 25], [-1445, 1335, 25], [-1795, 975, 15], [-1760, 965, 15]],
+    /* Coluna A proporcional com canto superior arredondado (r=145), coluna B inclinada e coluna D larga e constante */
+    porta: [[665, 960, 18], [295, 1348, 145], [-355, 1354, 16], [-368, 960, 16]],
+    lateralTraseiro: [[-412, 1354, 18], [-1435, 1345, 24], [-1805, 974, 18], [-1770, 960, 18], [-456, 960, 24]],
     paraBrisaVista: [0, 0.77, 0.63],
     paraBrisa: [[-675, 952, 830, 20], [675, 952, 830, 20], [520, 1329, 370, 20], [-520, 1329, 370, 20]],
     traseiroVista: [0, 0.70, -0.71],
-    traseiro: [[-520, 1325, -1590, 20], [520, 1325, -1590, 20], [640, 1011, -1900, 20], [-640, 1011, -1900, 20]],
+    traseiro: [[-520, 1325, -1590, 20], [520, 1325, -1590, 20], [640, 985, -1945, 20], [-640, 985, -1945, 20]],
   },
   aberturas: {
-    frontal: [[-765, 535, 12], [765, 535, 12], [765, 725, 12], [-765, 725, 12]],
-    lanternaTraseira: [[655, 535, 10], [770, 535, 10], [750, 815, 10], [655, 815, 10]],
+    frontal: [[-765, 542, 10], [765, 542, 10], [765, 720, 10], [-765, 720, 10]],
+    /* Curva 4: borda interna inclinada acompanhando a abertura da tampa traseira */
+    lanternaTraseira: [[655, 535, 8], [782, 535, 8], [765, 830, 10], [635, 830, 10]],
   },
   parachoqueDianteiro: {
     y0: 215, y1: 515, xTrilho: 785, zFrente: 2025, zLateral: 1625, raioCanto: 95,
@@ -64,17 +70,17 @@ export const TABELA = {
     traseiro: [-1495, -1920],
   },
   frentePecas: {
-    grade: { meiaLarg: 442, y0: 545, y1: 715, zFundo0: 1935, zFundo1: 1985, zMoldura: 2005, zLamina: 2008, laminas: 7, lamY0: 556, lamY1: 696, lamAlt: 8 },
-    farol: { x0: 445, x1: 670, y0: 545, y1: 715, zCarc0: 1925, zCarc1: 1966, zLente0: 1950, zLente1: 1982 },
-    seta: { x0: 675, x1: 778, y0: 545, y1: 715, z0: 1920, z1: 1962 },
+    grade: { meiaLarg: 442, y0: 545, y1: 715, zFundo0: 1965, zFundo1: 2006, zMoldura: 2016, zLamina: 2018, laminas: 7, lamY0: 556, lamY1: 696, lamAlt: 8 },
+    farol: { x0: 445, x1: 670, y0: 545, y1: 715, zCarc0: 1960, zCarc1: 2006, zLente0: 1988, zLente1: 2012 },
+    seta: { x0: 675, x1: 778, y0: 545, y1: 715, z0: 1935, z1: 1995 },
     placa: { larg: 340, alt: 135, yCentro: 352, z0: 2076, z1: 2092 },
     neblina: { xCentro: 520, yCentro: 290, larg: 150, alt: 68, z0: 2036, z1: 2078 },
   },
   traseiraPecas: {
     lanterna: { x0: 655, x1: 776, yRe: [540, 610], yFreio: [610, 735], ySeta: [735, 810], zCarc0: -2008, zCarc1: -1918, zFrente: -2020, zTras: -1924 },
-    placa: { larg: 340, alt: 135, yCentro: 695, z0: -2024, z1: -2005 },
-    puxador: { larg: 460, alt: 30, yCentro: 795, z0: -2008, z1: -1980 },
-    fechadura: { yCentro: 580, raio: 18, z0: -2032, z1: -2017 },
+    placa: { larg: 340, alt: 135, yCentro: 695, z0: -2026, z1: -2008 },
+    puxador: { larg: 460, alt: 30, yCentro: 795, z0: -2030, z1: -1998 },
+    fechadura: { yCentro: 580, raio: 18, z0: -2016, z1: -1990 },
     escapamento: { x: 540, y: 215, raio: 28, z0: -2065, z1: -1880 },
   },
 };
@@ -226,10 +232,7 @@ const receita = {
   ],
   PONTOS,
   get vaos() {
-    const { rede } = derivar(this.PARAMS);
-    const bordaInferior = [...rede.linha('F0').slice().reverse(), ...rede.linha('L0').slice(1), ...rede.linha('Q0').slice(1)];
     return [
-      { nome: 'aberturaInferior', superficie: { op: 'subdivisao', id: 1 }, borda: bordaInferior, semMoldura: { motivo: 'a abertura inferior do casco recebe o assoalho em etapa futura' } },
       { nome: 'vidroDaPorta', superficie: { op: 'aberturaPorContorno', id: 6 }, semMoldura: { motivo: 'vidro e borracha da porta são da etapa de vidros' } },
       { nome: 'vidroLateralTraseiro', superficie: { op: 'aberturaPorContorno', id: 7 }, semMoldura: { motivo: 'vidro e borracha lateral traseiro são da etapa de vidros' } },
       { nome: 'paraBrisa', superficie: { op: 'aberturaPorContorno', id: 8 }, semMoldura: { motivo: 'para-brisa e borracha são da etapa de vidros' } },
