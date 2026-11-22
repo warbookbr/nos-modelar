@@ -1,6 +1,6 @@
 # Correção de superfície: chapas de prova, linha de base, corte com simetria, alisamento e emenda declarada
 
-Registro das fatias 1 e 2 do plano [ferramentas de correção de superfície](../../planos/2026-11-16-ferramentas-de-correcao-de-superficie.md), medidas em 2026-11-16. Os números completos estão em `linha-de-base.json`, gerado por
+Registro das fatias 1 e 2 do plano [ferramentas de correção de superfície](../../decisoes/PLANOS-ENCERRADOS.md), medidas em 2026-11-16. Os números completos estão em `linha-de-base.json`, gerado por
 
 ```
 node tools/fixtures/correcao-de-superficie/linha-de-base.mjs --com=carro-fastback/lataria --saida=docs/modelar/banco-de-provas/correcao-de-superficie-2026-11-16/linha-de-base.json

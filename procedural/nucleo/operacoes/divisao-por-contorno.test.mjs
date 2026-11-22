@@ -13,6 +13,7 @@
    O primeiro teste imprime os números que o README de `docs/modelar/banco-de-provas/divisao-por-contorno-2026-11-18/` registra. */
 import { describe, expect, it } from 'vitest';
 import { nucleo } from '../nucleo.js';
+import { furoPassante } from '../furo-passante.js';
 import { analisarTopologia, LIMITE_DE_FACE_FINA } from '../topologia.js';
 import { triangularFace } from '../triangulacao-face.js';
 import { contornoPorTrechos } from '../curva2d.js';
@@ -377,9 +378,15 @@ describe('divisaoPorContorno: as recusas', () => {
     expect(motivo({ contorno: poligonoDeRetas([[120, 100], [300, 300], [300, 100], [120, 300]]) })).toMatch(/o contorno da divisão se cruza/);
   });
 
-  it('o contorno que não cai na chapa', () => {
-    expect(motivo({ contorno: retangulo(300, 300, 500, 500) })).toMatch(/do contorno fica fora da chapa vista do eixo y: a reta do eixo por ele não toca nenhuma face da seleção/);
-    expect(motivo({ contorno: retangulo(900, 900, 950, 950) })).toMatch(/fica fora da chapa/);
+  it('o contorno que não cai na chapa, o que envolve a chapa inteira e o que encosta na borda', () => {
+    expect(motivo({ contorno: retangulo(900, 900, 950, 950) })).toMatch(/o contorno fica fora da chapa vista do eixo y: a reta do eixo não toca nenhuma face da seleção/);
+    expect(motivo({ contorno: retangulo(-50, -50, 450, 450) })).toMatch(/o contorno envolve a chapa inteira vista do eixo y sem cruzar nenhuma aresta dela/);
+    /* lado ou canto exatamente sobre a borda da chapa (plana e curva): encosta sem atravessar */
+    const plana = chapaDeGrade({ nx: 6, nz: 6, passo: 80, altura: () => 0, espessura: 2, niveis: 2 });
+    const basePlana = [['subdivisao', { origemId: 1, ...plana.passo }]];
+    expect(motivo({ contorno: retangulo(200, 100, 400, 300) }, basePlana, plana.TOPO)).toMatch(/o contorno encosta na borda da chapa ou na parede de um vão em \[400\.00, 100\.00\] mm, vista do eixo y/);
+    expect(motivo({ contorno: poligonoDeRetas([[0, 200], [150, 100], [150, 300]]) }, basePlana, plana.TOPO)).toMatch(/o contorno encosta na borda da chapa ou na parede de um vão em \[0\.00, 200\.00\] mm, vista do eixo y/);
+    expect(motivo({ contorno: retangulo(200, 100, 400, 300) })).toMatch(/o contorno encosta na borda da chapa ou na parede de um vão em \[400\.00, 100\.00\] mm, vista do eixo y/);
   });
 
   it('o contorno que cabe inteiro numa face', () => {
@@ -398,22 +405,13 @@ describe('divisaoPorContorno: as recusas', () => {
     expect(texto).toMatch(/aumente o encaixe \(0\) ou desloque o contorno/);
   });
 
-  it('o contorno que cruza a borda da seleção, e o que cruza uma face de perfil', () => {
-    const a = antes();
+  it('o contorno que cruza uma face de perfil fora da borda da chapa (degrau interno)', () => {
     const quadro = quadroDaVista('y');
-    const poligono = contornoPorTrechos(retangulo(130, 130, 270, 270), {});
-    /* a seleção sem uma face sob um lado do contorno (e nenhuma sob um canto dele): o lado cruza a borda da seleção */
-    const xz = (f) => { const ps = f.vs.map((v) => a.V.get(v)); return [ps.reduce((s, p) => s + p[0], 0) / ps.length, ps.reduce((s, p) => s + p[2], 0) / ps.length, ps.reduce((s, p) => s + p[1], 0) / ps.length]; };
-    const peleDeCima = [...a.F.values()].filter((f) => { const [x, z, y] = xz(f); return y > m(altura(x * 1000, z * 1000) - 0.5); }).map((f) => f.id);
-    const furada = peleDeCima.filter((id) => { const [x, z] = xz(a.F.get(id)); return !(Math.abs(x - m(190)) < m(1) && Math.abs(z - m(130)) < m(1)); });
-    expect(furada.length).toBe(peleDeCima.length - 1);
-    const semFace = dividirMalhaPorContorno({ V: a.V, F: a.F, ids: furada, quadro, poligono });
-    expect(semFace.erro).toMatch(/o contorno toca ou cruza a borda da chapa ou a parede de um vão em \[[\d.]+, [\d.]+\] mm/);
-    /* um degrau: dois patamares ligados por uma face vertical, que a vista de cima vê de perfil */
+    /* um degrau: dois patamares ligados por uma face vertical, que a vista de cima vê de perfil entre faces do mesmo sinal */
     const V = new Map([[0, [0, 0, 0]], [1, [0.1, 0, 0]], [2, [0.1, 0, 0.1]], [3, [0, 0, 0.1]], [4, [0.1, 0.05, 0]], [5, [0.2, 0.05, 0]], [6, [0.2, 0.05, 0.1]], [7, [0.1, 0.05, 0.1]]]);
     const F = new Map([[0, { vs: [0, 3, 2, 1] }], [1, { vs: [4, 7, 6, 5] }], [2, { vs: [1, 2, 7, 4] }]]);
     const degrau = dividirMalhaPorContorno({ V, F, ids: [0, 1, 2], quadro, poligono: [[0.03, 0.03], [0.17, 0.03], [0.17, 0.07], [0.03, 0.07]] });
-    expect(degrau.erro).toMatch(/o contorno toca ou cruza a borda da chapa ou a parede de um vão/);
+    expect(degrau.erro).toMatch(/o contorno toca ou cruza uma face de perfil fora da borda da chapa/);
   });
 
   it('as duas camadas que se sobrepõem em profundidade', () => {
@@ -446,5 +444,198 @@ describe('divisaoPorContorno: as recusas', () => {
     const a = antes();
     const r = dividirMalhaPorContorno({ V: a.V, F: a.F, ids: [...a.F.keys()], quadro: quadroDaVista('y'), poligono: [[0.1, 0.1], [0.2, 0.1]] });
     expect(r.erro).toMatch(/o contorno não tem forma/);
+  });
+});
+
+describe('divisaoPorContorno: parte fechada pela borda da chapa ou pela boca do vão (fatia 2)', () => {
+  const conferir = (r, a, rotulo) => {
+    expect(r.orfaos, rotulo).toEqual([]);
+    expect(reprovas(r), rotulo).toEqual([]);
+    expect(menorRazao(r), rotulo).toBeGreaterThanOrEqual(LIMITE_DE_FACE_FINA);
+    const areaAntes = area(triangulos(a));
+    const areaDepois = area(triangulos(r));
+    expect(Math.abs(areaDepois - areaAntes) / areaAntes, rotulo).toBeLessThan(1e-12);
+    const daParte = area(triangulos(r, (f) => f.parte === 'painel'));
+    const doResto = area(triangulos(r, (f) => f.parte !== 'painel'));
+    expect(daParte, rotulo).toBeGreaterThan(0);
+    expect(doResto, rotulo).toBeGreaterThan(0);
+    expect(Math.abs(daParte + doResto - areaAntes) / areaAntes, rotulo).toBeLessThan(1e-12);
+    /* todo vértice novo fica sobre a superfície de antes */
+    const sup = triangulos(a);
+    for (const [id, p] of r.V) if (!a.V.has(id)) expect(distanciaASuperficie(p, sup), rotulo).toBeLessThan(1e-12);
+  };
+
+  it('parte fechada pela borda da chapa (1 borda, canto e faixa com 4 cantos fora) divide a parede de espessura no cruzamento', () => {
+    const plana = chapaDeGrade({ nx: 6, nz: 6, passo: 80, altura: () => 0, espessura: 2, niveis: 2 });
+    const basePlana = [['subdivisao', { origemId: 1, ...plana.passo }]];
+    for (const [nomeChapa, base, topo] of [['plana', basePlana, plana.TOPO], ['curva', BASE, GRADE.TOPO]]) {
+      const a = nucleo(base, {}, topo);
+      for (const [caso, contorno] of [
+        ['1 borda', retangulo(280.3, 107.7, 460, 273.4)],
+        ['canto', retangulo(290.3, 290.7, 460, 460)],
+        ['faixa (4 cantos fora)', retangulo(-50, 127.3, 450, 253.7)],
+      ]) {
+        const r = dividir({ contorno }, base, topo);
+        conferir(r, a, `${nomeChapa} / ${caso}`);
+        /* a parede de espessura da borda (origem parte: 'borda') foi dividida entre a parte nova e o resto */
+        const borda = nucleo([...base, ['divisaoPorContorno', { chapa: CHAPA, vista: 'y', nome: 'painel', contorno }], ['parte', { sel: { origem: { op: 'subdivisao', id: 1, parte: 'borda' } }, nome: 'soBorda', substituir: true }]], {}, topo);
+        const idsBorda = new Set([...borda.F.values()].filter((f) => f.parte === 'soBorda').map((f) => f.id));
+        const bordaNaParte = [...r.F.values()].filter((f) => idsBorda.has(f.id) && f.parte === 'painel').length;
+        const bordaNoResto = [...r.F.values()].filter((f) => idsBorda.has(f.id) && f.parte !== 'painel').length;
+        expect(bordaNaParte, `${nomeChapa} / ${caso}: parede na parte`).toBeGreaterThan(0);
+        expect(bordaNoResto, `${nomeChapa} / ${caso}: parede no resto`).toBeGreaterThan(0);
+      }
+    }
+  });
+
+  it('parte fechada pela boca de um vão (abertura por contorno e furo circular) divide a parede do vão', () => {
+    const baseAb = [...BASE, ['aberturaPorContorno', { origemId: 2, chapa: CHAPA, vista: 'y', contorno: retangulo(150, 150, 250, 250) }]];
+    const chAb = { origem: { op: 'aberturaPorContorno', id: 2 } };
+    const aAb = nucleo(baseAb, {}, GRADE.TOPO);
+    for (const [caso, contorno] of [
+      ['canto no vão', retangulo(200.3, 200.7, 330.4, 330.2)],
+      ['abraça metade do vão', retangulo(120.3, 200.7, 280.4, 330.2)],
+      ['sai pelo vão e pela borda', retangulo(200.3, 200.7, 460, 330.2)],
+    ]) {
+      const r = dividir({ chapa: chAb, contorno }, baseAb, GRADE.TOPO);
+      conferir(r, aAb, `abertura / ${caso}`);
+    }
+    const furo = furoPassante({ solido: CHAPA, posicao: [m(200), 0, m(200)], direcao: 'y', raio: m(70), comprimento: m(200), lados: 32, ids: { cilindro: 2, subtrair: 3 }, nome: 'furo' });
+    const baseFuro = [...BASE, ...furo.passos];
+    const chFuro = { origem: { op: 'subtrair', id: 3 } };
+    const aFuro = nucleo(baseFuro, {}, GRADE.TOPO, undefined, null, furo.aliases);
+    const rFuro = nucleo([...baseFuro, ['divisaoPorContorno', { chapa: chFuro, vista: 'y', nome: 'painel', contorno: retangulo(185.3, 185.7, 335.4, 335.2) }]], {}, GRADE.TOPO, undefined, null, furo.aliases);
+    conferir(rFuro, aFuro, 'furo circular');
+  });
+
+  it('bateria de posições deslocadas na borda e no furo circular da chapa curva, sem recusa nem face fina', () => {
+    const furo = furoPassante({ solido: CHAPA, posicao: [m(200), 0, m(200)], direcao: 'y', raio: m(70), comprimento: m(200), lados: 32, ids: { cilindro: 2, subtrair: 3 }, nome: 'furo' });
+    const baseFuro = [...BASE, ...furo.passos];
+    const chFuro = { origem: { op: 'subtrair', id: 3 } };
+    let pior = Infinity;
+    for (let k = 0; k < 10; k++) {
+      const rB = dividir({ contorno: retangulo(270 + k * 1.42, 90 + k * 2.26, 460, 270 + k * 2.26) });
+      expect(rB.orfaos, `borda ${k}`).toEqual([]);
+      expect(reprovas(rB), `borda ${k}`).toEqual([]);
+      pior = Math.min(pior, menorRazao(rB));
+      const rF = nucleo([...baseFuro, ['divisaoPorContorno', { chapa: chFuro, vista: 'y', nome: 'painel', contorno: retangulo(180 + k * 2.74, 180 + k * 3.46, 330 + k * 1.1, 330 + k * 1.1) }]], {}, GRADE.TOPO, undefined, null, furo.aliases);
+      expect(rF.orfaos, `furo ${k}`).toEqual([]);
+      expect(reprovas(rF), `furo ${k}`).toEqual([]);
+      pior = Math.min(pior, menorRazao(rF));
+    }
+    expect(pior).toBeGreaterThanOrEqual(LIMITE_DE_FACE_FINA);
+  });
+
+  it('com duas camadas na reta do eixo, sentido escolhe a camada mesmo quando todos os cantos saem da chapa', () => {
+    const baixo = chapaDeGrade({ prefixo: 'q', nx: 6, nz: 6, passo: 80, altura: (x, z) => altura(x, z) - 60, espessura: 2, niveis: 2 });
+    const base = [...BASE, ['subdivisao', { origemId: 2, ...baixo.passo }]];
+    const topo = { ...GRADE.TOPO, ...baixo.TOPO };
+    const faixa = retangulo(-50, 127.3, 450, 253.7);
+    const semSentido = dividir({ chapa: { tudo: true }, contorno: faixa }, base, topo);
+    expect(semSentido.orfaos[0].motivo).toMatch(/fura a chapa 4 vezes/);
+    const deCima = dividir({ chapa: { tudo: true }, sentido: '+', contorno: faixa }, base, topo);
+    const deBaixo = dividir({ chapa: { tudo: true }, sentido: '-', contorno: faixa }, base, topo);
+    expect(deCima.orfaos).toEqual([]);
+    expect(deBaixo.orfaos).toEqual([]);
+    expect(reprovas(deCima)).toEqual([]);
+    expect(reprovas(deBaixo)).toEqual([]);
+    const ys = (r) => [...r.F.values()].filter((f) => f.parte === 'painel').flatMap((f) => f.vs.map((v) => r.V.get(v)[1]));
+    expect(Math.min(...ys(deCima))).toBeGreaterThan(m(-35));
+    expect(Math.max(...ys(deBaixo))).toBeLessThan(m(-25));
+  });
+
+  it('regressões da revisão adversarial da fatia 2 (seleção parcial, borda inclinada x=0, camadas escalonadas, jitter de vão, flanco 68°, encaixe na borda e lado colinear)', () => {
+    const plana = chapaDeGrade({ nx: 6, nz: 6, passo: 80, altura: () => 0, espessura: 2, niveis: 2 });
+    const basePlana = [['subdivisao', { origemId: 1, ...plana.passo }]];
+    /* B1: seleção parcial da pele externa de chapa fechada saindo pela borda recusa sem corromper a malha */
+    const b1 = dividir({ chapa: { origem: { op: 'subdivisao', id: 1, parte: 'externa' } }, contorno: retangulo(253.1, 107.3, 450, 293.7) });
+    expect(b1.orfaos[0].motivo).toMatch(/fronteira de uma seleção parcial/);
+    expect(reprovas(b1)).toEqual([]);
+    /* B2: borda inclinada x=0 na chapa curva divide sem deadlock (com e sem sentido) */
+    const cB2 = retangulo(-50, 203.3, 130.3, 343.7);
+    for (const sentido of [undefined, '+', '-']) {
+      const r = dividir({ ...(sentido ? { sentido } : {}), contorno: cB2 });
+      expect(r.orfaos, `B2 sentido=${sentido}`).toEqual([]);
+      expect(reprovas(r), `B2 sentido=${sentido}`).toEqual([]);
+    }
+    /* B2b: duas camadas escalonadas com contorno saindo pela borda da camada superior sobre a inferior */
+    const g1 = chapaDeGrade({ prefixo: 'e1', nx: 4, nz: 4, passo: 100, altura: () => 0, espessura: 2, niveis: 1 });
+    const g2 = chapaDeGrade({ prefixo: 'e2', nx: 4, nz: 4, passo: 100, altura: () => -60, espessura: 2, niveis: 1 });
+    const topoEsc = { ...g1.TOPO, ...Object.fromEntries(Object.entries(g2.TOPO).map(([k, p]) => [k, [p[0] + 0.1, p[1], p[2]]])) };
+    const b2b = dividir({ chapa: { tudo: true }, sentido: '+', contorno: retangulo(250.3, 100.3, 450, 300.7) }, [['subdivisao', { origemId: 1, ...g1.passo }], ['subdivisao', { origemId: 2, ...g2.passo }]], topoEsc);
+    expect(b2b.orfaos).toEqual([]);
+    expect(reprovas(b2b)).toEqual([]);
+    /* B3: vão de aberturaPorContorno com jitter numérico na parede sul divide sem falsa recusa */
+    const baseAb = [...BASE, ['aberturaPorContorno', { origemId: 2, chapa: CHAPA, vista: 'y', contorno: retangulo(150, 150, 250, 250) }]];
+    const chAb = { origem: { op: 'aberturaPorContorno', id: 2 } };
+    const b3 = dividir({ chapa: chAb, contorno: retangulo(155.3, 80.3, 205.3, 200.7) }, baseAb, GRADE.TOPO);
+    expect(b3.orfaos).toEqual([]);
+    expect(reprovas(b3)).toEqual([]);
+    /* B4: flanco inclinado a 68,2° com contorno 100% interno não é confundido com parede de borda */
+    const gf = chapaDeGrade({ nx: 6, nz: 6, passo: 80, altura: (x) => (x <= 160 ? 0 : -(x - 160) * 2.5), espessura: 2, niveis: 1 });
+    const b4 = dividir({ contorno: retangulo(120, 80, 360, 320) }, [['subdivisao', { origemId: 1, ...gf.passo }]], gf.TOPO);
+    expect(b4.orfaos).toEqual([]);
+    expect(reprovas(b4)).toEqual([]);
+    /* B5: faixa estreita encaixada na borda não gera falso túnel no voto da parede */
+    const b5 = dividir({ contorno: retangulo(382, 100.95, 460, 101.85) }, basePlana, plana.TOPO);
+    expect(b5.orfaos).toEqual([]);
+    expect(reprovas(b5)).toEqual([]);
+    /* B6: lado colinear à borda (nos dois extremos, com cantos fora) e canto sobre vão com jitter recusam com encostaNaBorda */
+    expect(dividir({ contorno: retangulo(-50, 200, 450, 400) }, basePlana, plana.TOPO).orfaos[0].motivo).toMatch(/o contorno encosta na borda da chapa ou na parede de um vão/);
+    expect(dividir({ contorno: retangulo(-50, 0, 450, 200) }, basePlana, plana.TOPO).orfaos[0].motivo).toMatch(/o contorno encosta na borda da chapa ou na parede de um vão/);
+    expect(dividir({ chapa: chAb, contorno: retangulo(150, 200, 320.4, 320.2) }, baseAb, GRADE.TOPO).orfaos[0].motivo).toMatch(/o contorno encosta na borda da chapa ou na parede de um vão/);
+    /* R2-1: vão de aberturaPorContorno em chapa inclinada a 45° divide sem falsa recusa */
+    const gInc = chapaDeGrade({ nx: 6, nz: 6, passo: 80, altura: (x) => -x, espessura: 2, niveis: 1 });
+    const baseInc = [['subdivisao', { origemId: 1, ...gInc.passo }], ['aberturaPorContorno', { origemId: 2, chapa: CHAPA, vista: 'y', contorno: retangulo(150, 150, 250, 250) }]];
+    const r21 = dividir({ chapa: chAb, contorno: retangulo(200.3, 200.7, 330.4, 330.2) }, baseInc, gInc.TOPO);
+    expect(r21.orfaos).toEqual([]);
+    expect(reprovas(r21)).toEqual([]);
+    /* R2-2: cruzamento perpendicular (90°) em borda levemente curva não acusa encostaNaBorda */
+    const gLeve = chapaDeGrade({ nx: 6, nz: 6, passo: 80, altura: (x) => 0.1 * Math.sin(x / 100), espessura: 2, niveis: 1 });
+    const r22 = dividir({ contorno: retangulo(280.3, 100.7, 460, 200) }, [['subdivisao', { origemId: 1, ...gLeve.passo }]], gLeve.TOPO);
+    expect(r22.orfaos).toEqual([]);
+    expect(reprovas(r22)).toEqual([]);
+    /* R2-3: camada superior inclinada sobre camada inferior menor separa corretamente com sentido '+' */
+    const gSup = chapaDeGrade({ nx: 6, nz: 6, passo: 80, altura: (x) => -16 + x * 0.04, espessura: 2, niveis: 1 });
+    const gInf = chapaDeGrade({ prefixo: 'q', nx: 4, nz: 4, passo: 60, altura: () => -20, espessura: 2, niveis: 1 });
+    const topoR23 = { ...gSup.TOPO, ...Object.fromEntries(Object.entries(gInf.TOPO).map(([k, p]) => [k, [p[0] + m(240), p[1], p[2] + m(80)]])) };
+    const r23 = dividir({ chapa: { tudo: true }, sentido: '+', contorno: retangulo(50.3, 100.7, 350.4, 300.2) }, [['subdivisao', { origemId: 1, ...gSup.passo }], ['subdivisao', { origemId: 2, ...gInf.passo }]], topoR23);
+    expect(r23.orfaos).toEqual([]);
+    expect(reprovas(r23)).toEqual([]);
+    /* R2-4: duas camadas abertas inclinadas a 65° com canto fora da chapa recusam sem sentido */
+    const slope65 = Math.tan((65 * Math.PI) / 180);
+    const g65a = chapaDeGrade({ nx: 6, nz: 6, passo: 80, altura: (x) => -x * slope65, espessura: 2, niveis: 1 });
+    const g65b = chapaDeGrade({ prefixo: 'r', nx: 6, nz: 6, passo: 80, altura: (x) => -x * slope65 - 50, espessura: 2, niveis: 1 });
+    const p65a = { ...g65a.passo }; delete p65a.espessura;
+    const p65b = { ...g65b.passo }; delete p65b.espessura;
+    const topoR24 = { ...g65a.TOPO, ...Object.fromEntries(Object.entries(g65b.TOPO).map(([k, p]) => [k, [p[0] + m(100), p[1], p[2]]])) };
+    const r24 = dividir({ chapa: { tudo: true }, contorno: retangulo(40.3, 80.7, 520, 220.2) }, [['subdivisao', { origemId: 1, ...p65a }], ['subdivisao', { origemId: 2, ...p65b }]], topoR24);
+    expect(r24.orfaos[0].ref).toBe('sentido');
+    /* R2-5: parede de espessura em 2 faixas (vértice intermediário na borda) divide sem recusa */
+    const V2 = new Map(); const F2 = new Map(); let fid2 = 0;
+    const id2 = (i, j, c) => c * 25 + i * 5 + j; const mid2 = (j) => 100 + j;
+    for (const c of [0, 1]) for (let i = 0; i < 5; i++) for (let j = 0; j < 5; j++) V2.set(id2(i, j, c), [0.1 * i, c ? -0.002 : 0.002, 0.1 * j]);
+    for (let j = 0; j < 5; j++) V2.set(mid2(j), [0.4, 0, 0.1 * j]);
+    for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) {
+      F2.set(fid2++, { vs: [id2(i, j, 0), id2(i, j + 1, 0), id2(i + 1, j + 1, 0), id2(i + 1, j, 0)] });
+      F2.set(fid2++, { vs: [id2(i, j, 1), id2(i + 1, j, 1), id2(i + 1, j + 1, 1), id2(i, j + 1, 1)] });
+    }
+    for (let j = 0; j < 4; j++) {
+      F2.set(fid2++, { vs: [id2(0, j, 0), id2(0, j, 1), id2(0, j + 1, 1), id2(0, j + 1, 0)] });
+      F2.set(fid2++, { vs: [id2(4, j, 0), id2(4, j + 1, 0), mid2(j + 1), mid2(j)] });
+      F2.set(fid2++, { vs: [mid2(j), mid2(j + 1), id2(4, j + 1, 1), id2(4, j, 1)] });
+    }
+    for (let i = 0; i < 4; i++) {
+      F2.set(fid2++, { vs: i === 3 ? [id2(i, 0, 0), id2(i + 1, 0, 0), mid2(0), id2(i + 1, 0, 1), id2(i, 0, 1)] : [id2(i, 0, 0), id2(i + 1, 0, 0), id2(i + 1, 0, 1), id2(i, 0, 1)] });
+      F2.set(fid2++, { vs: i === 3 ? [id2(i, 4, 0), id2(i, 4, 1), id2(i + 1, 4, 1), mid2(4), id2(i + 1, 4, 0)] : [id2(i, 4, 0), id2(i, 4, 1), id2(i + 1, 4, 1), id2(i + 1, 4, 0)] });
+    }
+    expect(dividirMalhaPorContorno({ V: V2, F: F2, ids: [...F2.keys()], quadro: quadroDaVista('y'), poligono: [[0.25, 0.15], [0.45, 0.15], [0.45, 0.25], [0.25, 0.25]] }).erro).toBeUndefined();
+    /* R3-1: flanco inclinado a 75° com vinco vivo não entra em paredeDeBorda */
+    const slope75 = Math.tan((75 * Math.PI) / 180);
+    const gf75 = chapaDeGrade({ nx: 6, nz: 6, passo: 80, altura: (x) => (x <= 160 ? 0 : -(x - 160) * slope75), espessura: 2, niveis: 1 });
+    const ptsVinco = Object.entries(gf75.TOPO).filter(([, p]) => Math.abs(p[0] - m(160)) < 1e-6).sort((a, b) => a[1][2] - b[1][2]).map(([k]) => k);
+    const r31 = dividir({ contorno: retangulo(120, 80, 360, 320) }, [['subdivisao', { origemId: 1, ...gf75.passo, vincos: [{ nome: 'dobra', pontos: ptsVinco, nitidez: 'viva' }] }]], gf75.TOPO);
+    expect(r31.orfaos).toEqual([]);
+    expect(reprovas(r31)).toEqual([]);
   });
 });

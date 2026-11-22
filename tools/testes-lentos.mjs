@@ -17,6 +17,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { lerHistorico } from './vitest-duracoes.mjs';
 
 export const TESTES_LENTOS = [
+  /* 2026-11-21: a divisão por contorno com as chapas de prova da fatia 2 e 3; 13 s sozinho e 33 s na bateria do CI */
+  'procedural/nucleo/operacoes/divisao-por-contorno.test.mjs',
   /* 2026-11-21: a porta de autoria confere a forma pedida montando a peça; 19 s sozinho e 43 s na bateria do CI */
   'src/autoria/porta-confere-forma.test.js',
   /* 2026-11-21: o objetivo de lisura de `ajustarCurvaLisa` em três escalas e duas densidades, cada caso ajustado nos dois sentidos dos pontos; uns 30 s
