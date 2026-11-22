@@ -179,7 +179,20 @@ export async function exportarArquivoStep(opcoesArg) {
   };
 }
 
+export const AJUDA = `npm run exportar:step -- <receita> [opções]  (node tools/modelar/exportar-step.mjs)
+Exporta a peça em STEP facetado, um corpo fechado por pedaço conexo de cada parte.
+
+  --unidade=<mm|cm|m>     unidade do arquivo (padrão mm)
+  --escala=<n>            do neutro, em metro, à unidade de saída (padrão: 1000 em mm, 100 em cm, 1 em m)
+  --tolerancia=<n>        na unidade de saída (padrão 0,001): a área mínima de triângulo é o quadrado dela, e a costura
+                          dos corpos junta pontos até essa distância
+  --saida=<arquivo.step>  onde gravar (padrão: exportacoes/cad/<peça>.step)
+  --sobrescrever          grava por cima de um arquivo que já existe
+  --somente-validar       só valida a malha, sem gerar o arquivo
+  --diagnostico=json      imprime o diagnóstico em JSON`;
+
 async function main() {
+  if (process.argv.includes('--ajuda') || process.argv.includes('-h')) { console.log(AJUDA); return; }
   const opcoes = parseArgs(process.argv.slice(2));
 
   try {

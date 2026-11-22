@@ -368,4 +368,29 @@ describe('R04 — ida e volta e receita real de campo', () => {
       kernel[Symbol.dispose]();
     }
   });
+
+  /* A tolerância vale na unidade de saída (2026-11-22): a peça pequena, que a comparação no neutro em metro recusava com a
+     tolerância padrão, valida e exporta sem bandeira, e a mesma peça dá a mesma decisão em mm e em m com tolerâncias iguais. */
+  it('valida e exporta a peça pequena com a tolerância padrão em mm', async () => {
+    const cubinho = executarReceita({
+      meta: { nome: 'cubinho' },
+      PASSOS: [['cubo', { origemId: 1, lado: 0.001 }], ['parte', { nome: 'cubinho', sel: { origem: { op: 'cubo', id: 1 } } }]],
+    }).neutro;
+    expect(() => validarMalha(cubinho, { tolerancia: 0.001, escala: 1000 })).not.toThrow();
+    const out = await exportarCad({ nome: 'cubinho', neutro: cubinho, formato: 'step', estrategia: 'facetada', unidade: 'mm', escala: 1000, tolerancia: 0.001 });
+    expect(out.diagnostico.corpos.length).toBe(1);
+    expect(out.diagnostico.corpos[0].volume).toBeCloseTo(1, 6);
+  });
+
+  it('a tolerância é da unidade de saída: a mesma peça dá a mesma decisão em mm e em m', () => {
+    /* um triângulo de 0,1 mm × 0,1 mm (área 0,005 mm²) numa caixa fina: passa com 0,01 mm e é recusado com 1 mm, nas duas unidades */
+    const fina = executarReceita({
+      meta: { nome: 'fina' },
+      PASSOS: [['cubo', { origemId: 1, larg: 0.0001, alt: 0.0001, prof: 0.01 }], ['parte', { nome: 'fina', sel: { origem: { op: 'cubo', id: 1 } } }]],
+    }).neutro;
+    expect(() => validarMalha(fina, { tolerancia: 0.01, escala: 1000 })).not.toThrow();
+    expect(() => validarMalha(fina, { tolerancia: 0.00001, escala: 1 })).not.toThrow();
+    expect(() => validarMalha(fina, { tolerancia: 1, escala: 1000 })).toThrowError(/área abaixo da tolerância/);
+    expect(() => validarMalha(fina, { tolerancia: 0.001, escala: 1 })).toThrowError(/área abaixo da tolerância/);
+  });
 });

@@ -119,6 +119,14 @@ describe('R03 — CLI exportar-step e escrita atômica', () => {
     expect(existsSync(saida)).toBe(false);
   });
 
+  /* a peça pequena valida com as opções padrão desde 2026-11-22, quando a tolerância passou a valer na unidade de saída:
+     antes o fio da mola e o filete de rosca da peça neutra da hélice eram recusados por área abaixo de 1 mm² */
+  it('valida a peça pequena da hélice com as opções padrão, sem --tolerancia', async () => {
+    const res = await exportarArquivoStep({ arquivo: join(REPO, 'tools/fixtures/helice/receita.js'), somenteValidar: true });
+    expect(res.diagnostico.valido).toBe(true);
+    expect(res.diagnostico.tolerancia).toBe(0.001);
+  });
+
   it('recusa receita fora do repositório por violação de confinamento', async () => {
     await expect(
       exportarArquivoStep({

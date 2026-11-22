@@ -1,6 +1,6 @@
 # Tolerância do STEP em milímetro: a peça pequena exporta sem bandeira
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `modulos/exportador-cad/`, `tools/modelar/exportar-step.mjs` e o teste dele, `docs/modelar/banco-de-provas/tolerancia-do-step-2026-11-22/`.
 
@@ -53,4 +53,4 @@ Se a costura a 0,001 mm deixar de fechar alguma peça do acervo que fechava a 1 
 
 ## Fechamento
 
-Preencher somente ao concluir ou cancelar.
+Concluído em 2026-11-22. A tolerância passou a valer na unidade de saída: `validarMalha` mede a área já na saída, pela escala, e o backend costura com a tolerância vezes só o fator da unidade. O comando ganhou `--ajuda`, que diz a unidade, e não respondia a ela, contra a instrução da pasta `tools`. Os testes novos são a peça de 1 mm exportada com o padrão, a mesma decisão em mm e em m e a peça neutra da hélice validada sem bandeira. A medida está em `docs/modelar/banco-de-provas/tolerancia-do-step-2026-11-22/`: 49 peças do acervo passaram a exportar e nenhuma que exportava deixou de exportar, com o gate de saída cumprido. O processo não pegaria o defeito, porque nenhum teste exportava peça pequena nem o acervo inteiro; a medida do acervo fica como script reexecutável no banco de provas. Ao backlog foram as oito peças que agora param na costura do OCCT, cinco por sólido inválido com qualquer tolerância e três por estouro de memória do OCCT em WebAssembly.
