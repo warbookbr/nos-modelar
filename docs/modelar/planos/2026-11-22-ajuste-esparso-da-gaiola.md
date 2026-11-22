@@ -1,6 +1,6 @@
 # Ajuste esparso da gaiola: a subdivisão de uma chapa grande em segundos e sem estourar a memória
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `procedural/nucleo/subdivisao.js`, `procedural/nucleo/algebra-esparsa.js`, `procedural/nucleo/algebra-esparsa.test.mjs`, `procedural/nucleo/subdivisao.test.mjs`, `procedural/nucleo/medidas-com-peso.test.mjs`, `procedural/nucleo/operador-das-medidas.test.mjs`, `procedural/nucleo/subdivisao-energia-de-curvatura.test.mjs`, `procedural/nucleo/memoria-de-pura.test.mjs`, `procedural/nucleo/operacoes/subdivisao.js`, `procedural/nucleo/uso-operacoes.js`, `tools/testes-lentos.mjs`, `tools/fixtures/ajuste-esparso/`, `docs/modelar/banco-de-provas/ajuste-esparso-2026-11-22/`
 
@@ -82,6 +82,8 @@ Fatia 3 feita em 2026-11-22. A medida da parada decidiu o complemento de Schur p
 
 Fatia 4 feita em 2026-11-22. Na lataria do carro, a mesma receita pelo esparso e pelo denso dá gaiolas a 1e-14 m e malhas a 6e-15 m, a medição da rodada passou sem mudar os `PONTOS` e a ferramenta reconhece a malha que o crítico julgou na rodada 7. O retrato das doze peças comparou igual. O ponto de decisão da pessoa não chegou a ser preciso, porque nada mudou além da tolerância.
 
+Fatia 5 feita em 2026-11-22. O teste de escala ("a lei de custo do ajuste da gaiola", em `algebra-esparsa.test.mjs`) conta as visitas da ordenação, o trabalho do fator e os não nulos do fator vezes as resoluções, e dá expoente 1,65 ao esparso e 2,59 ao denso, contra o limite de 2,3, de modo que reprova o solver denso. O banco de provas traz o antes e depois das fatias 2 a 4, a ficha da subdivisão em `uso-operacoes.js` diz o custo, o novo sentido do `ganho` e a recusa que nomeia a base do núcleo, e o plano do carro registra que a chapa inteira cabe.
+
 ## Fechamento
 
-Preencher ao concluir ou cancelar: estado final, commit e PR, gates, resultado observado e candidatos devolvidos ao backlog.
+Concluído em 2026-11-22, no envio `envio/carro-escala-e-parametros`. Os cinco itens do gate de saída passaram: o quarto traseiro com passo 35 subdivide em 10,6 s com o pico abaixo do da mesma execução sem medidas, o passo 70 caiu de 30,2 s para 3,3 s, a igualdade com o denso passa nos testes e no retrato das doze peças, o teste de escala reprova o denso, a lataria do carro dá a mesma malha a 6e-15 m e o `npm run gates` local passa até onde o Windows chega, com o resto no CI do envio. Dois envios reprovaram no CI antes deste: o mapa da receita não achava o `PLANO` devolvido por getter, corrigido na ferramenta, e o ajuste só com exatas mudava o arredondamento de três fixtures, corrigido pelo modo que repete a eliminação densa. Voltam ao backlog o ganho exato do ponto de sela, que é o próximo gargalo quando uma peça usar cotas exatas com peso (4,6 s com 3.577 incógnitas), e as supervariáveis do AMD, que não fizeram falta nas medidas.

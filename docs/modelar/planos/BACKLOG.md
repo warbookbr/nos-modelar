@@ -28,6 +28,7 @@ Candidatos ligados à direção de autoria precisam respeitar as invariantes de
 | Seleção ausente sem leitura dinâmica | `resolverSelecao` com `sel` nulo devolve a peça inteira, e `leituraDosArgumentos` não marca o passo como dinâmico; decidir se a ausência grita ou se conta como leitura da malha inteira |
 | Deleção e ausência fora do registro | a procedência não lista a entrada que o passo apagou (`apagaFace` sai com `faces: []`), e o registro de leitura descarta o `get` e o `has` de entrada ausente; os dois escondem a dependência de quem apagou |
 | Execução paralela de partes independentes | só depois do cache por passo; medir o custo de clonar o estado contra o ganho |
+| Ganho exato do ajuste com ponto de sela | a conta exata do `ganho` com cotas exatas e peso leva 4,6 s com 3.577 incógnitas (banco de provas do ajuste esparso, fatia 3) e passa a gargalo quando uma peça usar o ponto de sela; medir uma cota que dispense a conta, como o Varah faz no caso positivo definido |
 | Conferência do retrato do acervo no CI | `conferir-retrato-do-acervo --acervo` leva cerca de 20 min e só roda por comando; decidir se vira gate do CI ou roda quando se mexe em `nucleoBooleano` ou no rastreio |
 | `etapas-do-acervo.test.mjs` acima de 120 s | 175 a 207 s nos gates, dominado pelo sedã; medir por etapa e dividir |
 | Movimento e espaço varrido | exige montagem, pose e relações persistidas antes de solver ou cinemática geral |
