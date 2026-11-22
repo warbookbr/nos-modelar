@@ -53,8 +53,8 @@ export const TABELA = {
   },
   aberturas: {
     frontal: [[-765, 542, 10], [765, 542, 10], [765, 720, 10], [-765, 720, 10]],
-    /* Curva 4: borda interna inclinada acompanhando a abertura da tampa traseira */
-    lanternaTraseira: [[655, 535, 8], [782, 535, 8], [765, 830, 10], [635, 830, 10]],
+    /* Curva 4: borda interna acompanha o trapézio da tampa (634 embaixo subindo para 664 em cima) */
+    lanternaTraseira: [[634, 530, 8], [776, 530, 10], [758, 842, 16], [664, 842, 10]],
   },
   parachoqueDianteiro: {
     y0: 215, y1: 515, xTrilho: 785, zFrente: 2025, zLateral: 1625, raioCanto: 95,
@@ -93,9 +93,25 @@ export const MATERIAIS = {
   lenteFarol: { cor: '#dce4ec', metalicidade: 0.1, aspereza: 0.12 },
   lenteNeblina: { cor: '#cfd8e0', metalicidade: 0.1, aspereza: 0.15 },
   setaAmbar: { cor: '#e08a1e', metalicidade: 0.05, aspereza: 0.2 },
-  lanternaRe: { cor: '#cfd8e2', metalicidade: 0.28, aspereza: 0.08 },
-  lanternaFreio: { cor: '#8c0e14', metalicidade: 0.18, aspereza: 0.08 },
-  lanternaSeta: { cor: '#d97208', metalicidade: 0.16, aspereza: 0.09 },
+  lanternaRe: {
+    cor: '#e6ecf2', metalicidade: 0.04, aspereza: 0.10,
+    verniz: 0.95, asperezaDoVerniz: 0.04, transmissao: 0.66, tomDoVidro: '#dfe6ee', indiceDeRefracao: 1.49,
+    relevo: { tipo: 'prismas', escala: 2.8, intensidade: 0.48, projecao: 'caixa' },
+  },
+  lanternaFreio: {
+    cor: '#9c0c14', metalicidade: 0.04, aspereza: 0.08,
+    verniz: 0.96, asperezaDoVerniz: 0.03, transmissao: 0.60, tomDoVidro: '#b80c16', indiceDeRefracao: 1.49,
+    relevo: { tipo: 'prismas', escala: 3.0, intensidade: 0.45, projecao: 'caixa' },
+  },
+  lanternaSeta: {
+    cor: '#e27806', metalicidade: 0.04, aspereza: 0.08,
+    verniz: 0.96, asperezaDoVerniz: 0.03, transmissao: 0.62, tomDoVidro: '#ee8208', indiceDeRefracao: 1.49,
+    relevo: { tipo: 'prismas', escala: 3.0, intensidade: 0.45, projecao: 'caixa' },
+  },
+  lanternaSulco: {
+    cor: '#3a1b04', metalicidade: 0.06, aspereza: 0.35, verniz: 0.6, asperezaDoVerniz: 0.12,
+  },
+  refletorLanterna: { cor: '#cfd6de', metalicidade: 0.92, aspereza: 0.14 },
   placa: { cor: '#e8eaed', metalicidade: 0.1, aspereza: 0.35 },
   escapamento: { cor: '#8c929a', metalicidade: 0.75, aspereza: 0.3 },
 };

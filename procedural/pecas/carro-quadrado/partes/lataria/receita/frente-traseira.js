@@ -122,54 +122,108 @@ export function passosFrenteTraseira(T, proxId) {
   marcar('parachoqueDianteiro', 'plasticoPreto', { origem: oEntLam });
   marcar('parachoqueDianteiro', 'plasticoPreto', { origem: { op: 'arranja', id: idEntLams, de: oEntLam } });
 
-  // --- LANTERNAS TRASEIRAS (acompanham a inclinação da tampa e envolvem o canto, com moldura, divisórias e frisos de lente) ---
-  const lt = t.lanterna;
-  /* posição Z aproximada da pele traseira em função de (x, y), acompanhando a rampa da tampa e a curva do canto */
-  const zPele = (x, y) => {
-    const tY = Math.max(0, (y - 560) / 395);
-    const zBase = -2024 + 70 * tY;
-    const tX = Math.max(0, (x - 715) / 65);
-    return zBase + 16 * tX * tX;
-  };
-  const xExt = (y) => 772 - 22 * Math.max(0, Math.min(1, (y - 535) / 280));
-
-  /* gera um bloco trapezoidal chanfrado que segue a inclinação zPele(x, y) da tampa, sem sobrar no topo nem abrir fresta */
-  const blocoInclinado = (id, x0, x1a, x1b, y0, y1, avancoMm, recuoMm, chanfroMm = 0) => {
-    const pt = (x, y, dz) => [m(x), m(y), m(zPele(x, y) + dz)];
-    /* 0..3: traseira (enterrada dentro da chapa); 4..7: face frontal */
-    const verts = [
-      pt(x0, y0, recuoMm), pt(x1a, y0, recuoMm), pt(x1b, y1, recuoMm), pt(x0, y1, recuoMm),
-      pt(x0, y0, -avancoMm), pt(x1a, y0, -avancoMm), pt(x1b, y1, -avancoMm), pt(x0, y1, -avancoMm),
-    ];
-    if (chanfroMm > 0) {
-      const c = chanfroMm;
-      verts.push(
-        pt(x0 + c, y0 + c, -(avancoMm + c * 0.7)),
-        pt(x1a - c, y0 + c, -(avancoMm + c * 0.7)),
-        pt(x1b - c, y1 - c, -(avancoMm + c * 0.7)),
-        pt(x0 + c, y1 - c, -(avancoMm + c * 0.7)),
-      );
-      return ['subdivisao', {
-        origemId: id,
-        niveis: 0,
-        vertices: verts,
-        faces: [
-          [0, 1, 2, 3],
-          [11, 10, 9, 8],
-          [0, 4, 5, 1], [1, 5, 6, 2], [2, 6, 7, 3], [3, 7, 4, 0],
-          [4, 8, 9, 5], [5, 9, 10, 6], [6, 10, 11, 7], [7, 11, 8, 4],
-        ],
-      }];
+  // --- LANTERNAS TRASEIRAS (envolventes 3D na lateral, sem moldura preta grossa, 2 faixas âmbar + sulco em V + rubi + ré embutida) ---
+  const interpTabela = (tab, y) => {
+    if (y <= tab[0][0]) return tab[0][1];
+    for (let i = 1; i < tab.length; i += 1) {
+      if (y <= tab[i][0]) {
+        const f = (y - tab[i - 1][0]) / (tab[i][0] - tab[i - 1][0]);
+        return tab[i - 1][1] + (tab[i][1] - tab[i - 1][1]) * f;
+      }
     }
-    return ['subdivisao', {
-      origemId: id,
-      niveis: 0,
-      vertices: verts,
-      faces: [
-        [0, 1, 2, 3], [7, 6, 5, 4],
-        [0, 4, 5, 1], [1, 5, 6, 2], [2, 6, 7, 3], [3, 7, 4, 0],
-      ],
-    }];
+    return tab[tab.length - 1][1];
+  };
+  /* curvas reais medidas na pele da chapa (Curva 1 traseira, Curva 3 bojo lateral, Curva 4 inclinação interna) */
+  const tabZRear = [[526, -1996.5], [620, -2011.6], [735, -2021.1], [795, -2022.4], [848, -2019.0]];
+  const tabXSide = [[526, 792.0], [620, 799.0], [735, 802.0], [795, 797.0], [848, 785.0]];
+  const tabZSide = [[526, -1928.0], [620, -1941.0], [735, -1954.0], [795, -1961.0], [848, -1968.0]];
+  const xInt = (y) => 632 + 32 * Math.max(0, Math.min(1, (y - 526) / (848 - 526)));
+
+  const amostrarPele = (u, y, offsetMm = 0) => {
+    const zR = interpTabela(tabZRear, y);
+    const xS = interpTabela(tabXSide, y);
+    const zS = interpTabela(tabZSide, y);
+    const x0 = xInt(y);
+    const xC = xS - 54;
+    const zC = zR + 42;
+    let x; let z; let nx; let nz;
+    if (u <= 0.50) {
+      const s = u / 0.50;
+      x = x0 + (xC - x0) * s;
+      z = zR + 10 * s * s;
+      const len = Math.hypot(0.14 * s, -1);
+      nx = (0.14 * s) / len;
+      nz = -1 / len;
+    } else if (u <= 0.80) {
+      const a = ((u - 0.50) / 0.30) * (Math.PI / 2);
+      x = xC + (xS - xC) * Math.sin(a);
+      z = zC - (zC - (zR + 10)) * Math.cos(a);
+      nx = Math.sin(a);
+      nz = -Math.cos(a);
+    } else {
+      const s = (u - 0.80) / 0.20;
+      x = xS;
+      z = zC + (zS - zC) * s;
+      nx = 1;
+      nz = 0;
+    }
+    /* na borda dianteira da lateral (u -> 1), suaviza o offset para a lente morrer rente à lataria */
+    const taper = offsetMm > 0 && u > 0.86 ? 1 - 0.45 * ((u - 0.86) / 0.14) : 1;
+    const off = offsetMm * taper;
+    return [m(x + nx * off), m(y), m(z + nz * off)];
+  };
+
+  /* gera uma faixa curva fechada em 3 camadas (trás, ombro, frente chanfrada), 100% quad e manifold */
+  const faixaCurva = (id, u0, u1, y0, y1, offFora, offTras, chanfroU = 0.015, chanfroY = 2.0, cols = 8, curvaTopo = false) => {
+    const verts = [];
+    const usBase = [];
+    const usFrente = [];
+    for (let i = 0; i <= cols; i += 1) {
+      const f = i / cols;
+      usBase.push(u0 + (u1 - u0) * f);
+      const uF0 = u0 + chanfroU;
+      const uF1 = u1 - chanfroU;
+      usFrente.push(uF0 + (uF1 - uF0) * f);
+    }
+    const yTopo = (u, yBase) => {
+      if (!curvaTopo || u <= 0.72) return yBase;
+      const k = (u - 0.72) / 0.28;
+      return yBase - 14 * k * k;
+    };
+    const offBase = offFora > 0 ? Math.max(0.6, offFora - 2.4) : offFora;
+    const idx = (camada, linha, col) => (camada * 2 + linha) * (cols + 1) + col;
+    const camadas = [
+      { us: usBase, dy0: 0, dy1: 0, off: offTras },
+      { us: usBase, dy0: 0, dy1: 0, off: offBase },
+      { us: usFrente, dy0: chanfroY, dy1: -chanfroY, off: offFora },
+    ];
+    for (const c of camadas) {
+      for (let linha = 0; linha < 2; linha += 1) {
+        for (let i = 0; i <= cols; i += 1) {
+          const u = c.us[i];
+          const y = linha === 0 ? y0 + c.dy0 : yTopo(u, y1) + c.dy1;
+          verts.push(amostrarPele(u, y, c.off));
+        }
+      }
+    }
+    const faces = [];
+    for (let i = 0; i < cols; i += 1) {
+      /* face traseira (enterrada) */
+      faces.push([idx(0, 0, i), idx(0, 0, i + 1), idx(0, 1, i + 1), idx(0, 1, i)]);
+      /* face frontal/externa (visível) */
+      faces.push([idx(2, 0, i), idx(2, 1, i), idx(2, 1, i + 1), idx(2, 0, i + 1)]);
+      /* bordas inferior e superior entre camadas 0->1 e 1->2 */
+      for (let k = 0; k < 2; k += 1) {
+        faces.push([idx(k, 0, i), idx(k + 1, 0, i), idx(k + 1, 0, i + 1), idx(k, 0, i + 1)]);
+        faces.push([idx(k, 1, i), idx(k, 1, i + 1), idx(k + 1, 1, i + 1), idx(k + 1, 1, i)]);
+      }
+    }
+    /* borda interna (i = 0) e borda lateral dianteira (i = cols) */
+    for (let k = 0; k < 2; k += 1) {
+      faces.push([idx(k, 0, 0), idx(k, 1, 0), idx(k + 1, 1, 0), idx(k + 1, 0, 0)]);
+      faces.push([idx(k, 0, cols), idx(k + 1, 0, cols), idx(k + 1, 1, cols), idx(k, 1, cols)]);
+    }
+    return ['subdivisao', { origemId: id, niveis: 0, vertices: verts, faces }];
   };
 
   const emitirPar = (passoFn, mat) => {
@@ -183,25 +237,25 @@ export function passosFrenteTraseira(T, proxId) {
     marcar('lanternaTraseira', mat, { origem: { op: 'espelha', id: idE, de: o } });
   };
 
-  /* 1. Moldura/guarnição preta perimetral acompanhando a inclinação da tampa (veda 100% do vão) */
-  emitirPar((id) => blocoInclinado(id, lt.x0 - 6, xExt(lt.yRe[0] - 6) + 5, xExt(lt.ySeta[1] + 6) + 5, lt.yRe[0] - 6, lt.ySeta[1] + 6, 4, 28, 2.5), 'plasticoPreto');
+  /* 1. Carcaça interna preta e vedação perimetral ultrafina (sem moldura grossa na lateral) */
+  emitirPar((id) => faixaCurva(id, 0.0, 0.995, 526, 847, 1.8, -24, 0.008, 1.0, 10, true), 'plasticoPreto');
 
-  /* 2. Quatro câmaras de lente chanfradas e niveladas com a rampa da tampa */
-  const camaras = [
-    { x0: lt.x0 + 1, x1a: lt.x0 + 54, x1b: lt.x0 + 54, y0: lt.yRe[0] + 1, y1: lt.yRe[1] - 2.5, mat: 'lanternaRe' },
-    { x0: lt.x0 + 57, x1a: xExt(lt.yRe[0]) - 1, x1b: xExt(lt.yRe[1]) - 1, y0: lt.yRe[0] + 1, y1: lt.yRe[1] - 2.5, mat: 'lanternaFreio' },
-    { x0: lt.x0 + 1, x1a: xExt(lt.yFreio[0]) - 1, x1b: xExt(lt.yFreio[1]) - 1, y0: lt.yFreio[0] + 2, y1: lt.yFreio[1] - 2.5, mat: 'lanternaFreio' },
-    { x0: lt.x0 + 1, x1a: xExt(lt.ySeta[0]) - 1, x1b: xExt(lt.ySeta[1]) - 1, y0: lt.ySeta[0] + 2, y1: lt.ySeta[1] - 1, mat: 'lanternaSeta' },
-  ];
-  for (const cm of camaras) {
-    emitirPar((id) => blocoInclinado(id, cm.x0, cm.x1a, cm.x1b, cm.y0, cm.y1, 9, 10, 3), cm.mat);
-  }
+  /* 2. Refletor metálico cromado atrás das lentes translúcidas (dá profundidade óptica real através dos prismas) */
+  emitirPar((id) => faixaCurva(id, 0.04, 0.72, 534, 839, 1.9, -4, 0.01, 1.0, 6, true), 'refletorLanterna');
 
-  /* 3. Frisos horizontais finos nas lentes (textura prismática clássica de lanterna) */
-  const frisosY = [572, 642, 672, 702, 760, 785];
-  for (const fy of frisosY) {
-    emitirPar((id) => blocoInclinado(id, lt.x0 + 4, xExt(fy) - 4, xExt(fy + 2) - 4, fy, fy + 2, 11.2, 4, 0), 'plasticoFosco');
-  }
+  /* 3. Duas faixas âmbar no topo separadas pelo sulco contínuo em V alinhado ao vinco horizontal da lateral (y = 794..800) */
+  emitirPar((id) => faixaCurva(id, 0.012, 1.0, 800, 845, 5.2, -6, 0.014, 2.2, 14, true), 'lanternaSeta');
+  emitirPar((id) => faixaCurva(id, 0.012, 1.0, 793.5, 800.5, 2.8, -6, 0.008, 0.5, 10, false), 'lanternaSulco');
+  emitirPar((id) => faixaCurva(id, 0.012, 1.0, 736, 794, 5.2, -6, 0.014, 2.0, 10, false), 'lanternaSeta');
+
+  /* 4. Faixa vermelha central (freio/posição) envolvendo todo o canto até a lateral */
+  emitirPar((id) => faixaCurva(id, 0.012, 1.0, 621, 734, 5.2, -6, 0.014, 2.0, 10, false), 'lanternaFreio');
+
+  /* 5. Faixa inferior: vermelho envolvendo a lateral, a base sob a ré e a borda interna, com a luz de ré cristal embutida */
+  emitirPar((id) => faixaCurva(id, 0.012, 1.0, 528, 543, 5.2, -6, 0.014, 1.6, 10, false), 'lanternaFreio');
+  emitirPar((id) => faixaCurva(id, 0.012, 0.095, 542, 619, 5.2, -6, 0.008, 1.6, 2, false), 'lanternaFreio');
+  emitirPar((id) => faixaCurva(id, 0.44, 1.0, 542, 619, 5.2, -6, 0.014, 1.8, 7, false), 'lanternaFreio');
+  emitirPar((id) => faixaCurva(id, 0.10, 0.435, 544, 617, 5.1, -6, 0.010, 1.8, 4, false), 'lanternaRe');
 
   // --- PLACA TRASEIRA ---
   const idPlacaT = proxId();
