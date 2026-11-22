@@ -69,11 +69,11 @@ const POR_QUE_NAO = {
   cortador: 'o cortador não é traduzido; no núcleo ele é o segundo sólido de `subtrair`, escrito em "passos"',
   encosta: 'o `encosta` do esboço antigo não é traduzido; no 2.0 ele é `encosta: { id, lado }`, até a malha tocar',
   alinha: 'o `alinha` do esboço antigo não é traduzido; no 2.0 ele é `alinha: { "<lado>": "<id>" }`',
-  de: 'a haste por `de`/`para` não é traduzida; o 2.0 posiciona por centro, sobre, ponta, desloca e rotacao',
-  para: 'a haste por `de`/`para` não é traduzida; o 2.0 posiciona por centro, sobre, ponta, desloca e rotacao',
+  de: 'a haste por `de`/`para` não é traduzida; no 2.0 ela é a forma `haste: { de, para, raio | secao }`',
+  para: 'a haste por `de`/`para` não é traduzida; no 2.0 ela é a forma `haste: { de, para, raio | secao }`',
   encaixa: '`encaixa` (âncora com giro) não é traduzido; o 2.0 posiciona pela caixa da malha',
   unidade: 'as unidades do Condutor não existem no 2.0',
-  casca: 'a casca do loft não é traduzida; no núcleo ela é `subtrair` do loft recuado, escrito em "passos"',
+  casca: 'a casca do loft não é traduzida; no núcleo ela é a operação `casca` (sólido, faces abertas e espessura), escrita em "passos"',
 };
 
 const erro = (motivo) => { throw new RecusaDoEsboco(motivo); };

@@ -14,14 +14,21 @@ import {
 import { confiarNaMemoriaDoRegistro } from '../../procedural/nucleo/memoria-de-execucao.js';
 import { MANIFESTO as MANIFESTO_BARRAS } from '../../procedural/extensoes/estrutura-de-barras/manifesto.js';
 import { implementar as implementarBarras } from '../../procedural/extensoes/estrutura-de-barras/implementacao.js';
+import { MANIFESTO as MANIFESTO_CASCA } from '../../procedural/extensoes/casca/manifesto.js';
+import { implementar as implementarCasca } from '../../procedural/extensoes/casca/implementacao.js';
 import { normalizarIntencaoPeca } from './intencao-peca.js';
 
 /* O registro de operações da receita de peça: as operações do núcleo e a `estruturaDeBarras`, o tubo entre dois pontos. A estrutura de
    barras só carregava no registro com extensões das famílias, e a receita comum montava cada tubo como um loft de duas seções com o polo
-   escrito à mão. A operação fecha as pontas do tubo por conta própria. Quem passa `registroOperacoes` escolhe o seu. */
+   escrito à mão. A operação fecha as pontas do tubo por conta própria. A `casca`, a parede de espessura constante de um sólido com as
+   faces abertas escolhidas, estava no mesmo caso até 2026-11-22: só as famílias a tinham, e a bacia e o tubo oco de uma receita comum
+   não tinham como sair fechados. Quem passa `registroOperacoes` escolhe o seu. */
 export const REGISTRO_DA_RECEITA = criarRegistroComExtensoes({
   registroBase: REGISTRO_OPERACOES,
-  extensoes: [Object.freeze({ manifesto: MANIFESTO_BARRAS, implementacao: implementarBarras })],
+  extensoes: [
+    Object.freeze({ manifesto: MANIFESTO_BARRAS, implementacao: implementarBarras }),
+    Object.freeze({ manifesto: MANIFESTO_CASCA, implementacao: implementarCasca }),
+  ],
 });
 confiarNaMemoriaDoRegistro(REGISTRO_DA_RECEITA);
 

@@ -23,7 +23,7 @@ const SEMPRE_LIVRES = new Set(['origemId', 'id', 'faces', 'nome', 'pai', 'substi
   'segmentosArco', 'segmentosSpline', 'segmentosCurva', 'aneis', 'seg', 'orientacao', 'direcao', 'de', 'saida', 'aresta', 'chapa', 'superficie',
   'tampa', 'linha', 'ponta', 'paineis', 'cadeia', 'vincos', 'cantos', 'medidas', 'v', 'f', 'face', 'a', 'b', 'para', 'interface', 'rotulo', 'angulo',
   'divisoes', 'estacoes', 'expoenteSecao', 'limite', 'refinar']);
-const SELECOES = new Set(['sel', 'referencia', 'selPara']);
+const SELECOES = new Set(['sel', 'referencia', 'selPara', 'abertas']);
 
 /** Os campos de medida de cada operação. */
 export const TABELA_DE_MEDIDAS = Object.freeze({
@@ -34,7 +34,8 @@ export const TABELA_DE_MEDIDAS = Object.freeze({
   esfera: ['raio', 'em'],
   plano: ['largura', 'profundidade', 'em'],
   extrusao: ['perfil', 'furos', 'deslocar', 'altura', 'em'],
-  lathe: ['perfil', 'furos', 'deslocar', 'em'],
+  lathe: ['perfil', 'furos', 'deslocar', 'espessura', 'em'],
+  casca: ['espessura'],
   loft: ['secoes'],
   inflate: ['contornoLado', 'contornoTopo'],
   transladar: ['d'],

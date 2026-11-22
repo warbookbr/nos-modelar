@@ -49,6 +49,11 @@
  * cujas faces não ficam todas na parte, a que cita forma inexistente, a referência circular, os dois modos de posição juntos, o
  * campo desconhecido, a forma que não toca a outra e o gerador que o núcleo recusa.
  *
+ * A HASTE. `haste: { de, para, raio, lados? }` ou `{ de, para, secao: [larg, alt] }` é a barra entre dois pontos, gerador e posição
+ * juntos: o `cilindro` (ou o `cubo` da seção) de comprimento igual à distância, girado do eixo y para a direção de `de` a `para` e
+ * levado até `de`. Cada ponta é [x, y, z] em mm ou "<id>.<âncora>" de outra forma. A haste não aceita outro modo de posição, `rotacao`,
+ * `alinha` nem `desloca`, porque as duas pontas já a fixam; aceita `repete`, `espelha`, `contato` e `cor`.
+ *
  * A OPÇÃO SÓ DE PASSOS CRUS é executada uma vez: sem formas, a receita final é a dos próprios passos crus, e a execução que acha as
  * partes dos crus para o atalho não tem a quem servir.
  *
@@ -73,7 +78,7 @@ const CORES_POR_NOME = Object.freeze({
   cinza: '#8a9096', preto: '#1c1d20', branco: '#e8eae6', azul: '#3f63b8', verde: '#4f8a52', vermelho: '#b8433b',
   amarelo: '#d8b43a', laranja: '#d97a2b', roxo: '#7a55a8',
 });
-const CHAVES_DA_FORMA = new Set(['id', 'op', 'args', 'ajudante', 'subdivisao', 'centro', 'por', 'sobre', 'ponta', 'encosta', 'alinha', 'desloca', 'rotacao', 'repete', 'espelha', 'contato', 'oculto', 'cor', 'rotulo']);
+const CHAVES_DA_FORMA = new Set(['id', 'op', 'args', 'ajudante', 'haste', 'subdivisao', 'centro', 'por', 'sobre', 'ponta', 'encosta', 'alinha', 'desloca', 'rotacao', 'repete', 'espelha', 'contato', 'oculto', 'cor', 'rotulo']);
 const CHAVES_DA_OPCAO = new Set(['titulo', 'nota', 'passos', 'topo', 'aliases', 'formas', 'legendas', 'contatos', 'apoia']);
 const CHAVES_DO_CONTATO = new Set(['par', 'relacao', 'motivo', 'folga']);
 export const RELACOES = Object.freeze(['encosta', 'atravessa', 'folga']);
@@ -178,6 +183,42 @@ function lerApoiaDaOpcao(lista, rotulo) {
 }
 
 /** Os passos que geram a forma (em metro), na origem do gerador, e o TOPO que ela acrescenta. */
+const CHAVES_DA_HASTE = new Set(['de', 'para', 'raio', 'lados', 'secao']);
+const CAMPOS_QUE_A_HASTE_FIXA = ['op', 'args', 'ajudante', 'subdivisao', 'centro', 'por', 'sobre', 'ponta', 'encosta', 'alinha', 'desloca', 'rotacao'];
+
+/* Os giros, em torno da origem, que levam o eixo +y à direção unitária `u`: primeiro em z (o ângulo entre y e u), depois em y (o
+   azimute), na convenção de `girarPonto`, que é a do `rotaciona` do núcleo. */
+export function girosDaHaste(u) {
+  const graus = (r) => (r * 180) / Math.PI;
+  const theta = Math.acos(Math.max(-1, Math.min(1, u[1])));
+  const giros = [];
+  if (theta > 1e-12) giros.push({ eixo: 'z', graus: graus(theta) });
+  if (Math.hypot(u[0], u[2]) > 1e-12) {
+    const psi = Math.atan2(u[2], -u[0]);
+    if (Math.abs(psi) > 1e-12) giros.push({ eixo: 'y', graus: graus(psi) });
+  }
+  return giros;
+}
+
+/* O gerador da haste, já girado em torno da origem, com a ponta `de` na origem: o comprimento e a direção vêm das pontas resolvidas. */
+function geradorDaHaste(h, de, para, origemId, onde) {
+  const v = para.map((x, k) => x - de[k]);
+  const comprimento = Math.hypot(...v);
+  if (!(comprimento > 0)) recusar('"haste": "de" e "para" são o mesmo ponto; a haste precisa de comprimento', onde);
+  if ((h.raio === undefined) === (h.secao === undefined)) recusar('"haste" leva "raio" (a barra redonda) ou "secao": [larg, alt] (a barra retangular), um dos dois', onde);
+  let gerador;
+  if (h.raio !== undefined) {
+    if (!(Number.isFinite(h.raio) && h.raio > 0)) recusar(`"haste.raio" é um número positivo em mm (veio ${JSON.stringify(h.raio)})`, onde);
+    gerador = ['cilindro', { origemId, raio: h.raio / MM, altura: comprimento, ...(h.lados !== undefined ? { lados: h.lados } : {}) }];
+  } else {
+    if (h.lados !== undefined) recusar('"haste.lados" vale só para a barra redonda ("raio")', onde);
+    if (!(Array.isArray(h.secao) && h.secao.length === 2 && h.secao.every((x) => Number.isFinite(x) && x > 0))) recusar(`"haste.secao" é [larg, alt] em mm, os dois positivos (veio ${JSON.stringify(h.secao)})`, onde);
+    gerador = ['cubo', { origemId, larg: h.secao[0] / MM, alt: comprimento, prof: h.secao[1] / MM }];
+  }
+  const giros = girosDaHaste(v.map((x) => x / comprimento));
+  return { gerador, giros };
+}
+
 function geradorDaForma(f, origemId, onde) {
   if (f.ajudante !== undefined) {
     const ajudante = AJUDANTES[f.ajudante];
@@ -254,8 +295,27 @@ export function receitaDaOpcao(opcao, { nome = null } = {}) {
   /* cada forma, uma vez: o gerador, a parte, o giro sem pivô, e a malha local medida no núcleo */
   const locais = new Map();
   let proximaOrigem = ORIGEM_DO_ATALHO;
+  const origemDaHaste = new Map();
+  const prepararHaste = (f, de, para) => {
+    const onde = `${rotulo}, forma "${f.id}"`;
+    const { gerador, giros } = geradorDaHaste(f.haste, de, para, origemDaHaste.get(f.id), onde);
+    const passos = [gerador, ...selecoesDaParte(gerador[0], origemDaHaste.get(f.id)).map((sel) => ['parte', { nome: f.id, sel }])];
+    for (const r of giros) passos.push(['rotaciona', { eixo: r.eixo, graus: r.graus, pivo: [0, 0, 0], sel: { grupo: f.id } }]);
+    const neutro0 = executar({ meta: { nome: 'forma' }, PASSOS: passos, ALIASES: aliases }, onde);
+    const malha = malhaDoNeutro(neutro0);
+    locais.set(f.id, { passos, malha, local: caixaDosPontos(malha.pts), op: gerador[0], origemId: origemDaHaste.get(f.id), rot: { giros: [], pivo: null }, haste: true });
+  };
   for (const f of formas) {
     const onde = `${rotulo}, forma "${f.id}"`;
+    if (f.haste !== undefined) {
+      if (!f.haste || typeof f.haste !== 'object' || Array.isArray(f.haste)) recusar('"haste" é { de, para, raio, lados? } ou { de, para, secao: [larg, alt] }', onde);
+      for (const k of Object.keys(f.haste)) if (!CHAVES_DA_HASTE.has(k)) recusar(`campo "${k}" não existe em "haste" (aceitos: ${[...CHAVES_DA_HASTE].join(', ')})`, onde);
+      const fixados = CAMPOS_QUE_A_HASTE_FIXA.filter((k) => f[k] !== undefined);
+      if (fixados.length) recusar(`a haste se posiciona pelas duas pontas e não aceita ${fixados.map((k) => `"${k}"`).join(', ')}`, onde);
+      origemDaHaste.set(f.id, proximaOrigem);
+      proximaOrigem += 1;
+      continue;
+    }
     const g = geradorDaForma(f, proximaOrigem, onde);
     proximaOrigem += 1;
     for (const nomeDoPonto of Object.keys(g.topo)) {
@@ -288,17 +348,30 @@ export function receitaDaOpcao(opcao, { nome = null } = {}) {
     const onde = `${rotulo}, forma "${id}"`;
     if (visitando.has(id)) recusar('referência circular de posição', onde);
     visitando.add(id);
-    const L = locais.get(id);
-    const { local } = L;
     const pontoDe = (texto, padrao, campo) => {
       const ref = lerReferencia(texto, padrao, `${onde}, ${campo}`);
       return pontoDaAncora(resolver(ref.id, id).caixa, ref.lados);
     };
+    let pontaDe = null;
+    if (f.haste !== undefined) {
+      const ponta = (campo) => {
+        const p = f.haste[campo];
+        if (typeof p === 'string') return pontoDe(p, 'centro', `haste.${campo}`);
+        if (vetor3(p)) return pontoEmMetro(p);
+        return recusar(`"haste.${campo}" é [x, y, z] em mm ou "<id>.<âncora>" (veio ${JSON.stringify(p)})`, onde);
+      };
+      pontaDe = ponta('de');
+      prepararHaste(f, pontaDe, ponta('para'));
+    }
+    const L = locais.get(id);
+    const { local } = L;
     const modos = ['centro', 'sobre', 'ponta', 'encosta'].filter((k) => f[k] !== undefined);
     if (modos.length > 1) recusar('use só um entre "centro", "sobre", "ponta" e "encosta"', onde);
     if (f.por !== undefined && f.centro === undefined) recusar('"por" acompanha "centro": é a âncora da própria forma que vai ao ponto', onde);
     let alvo = [...local.centro]; // onde vai o centro da caixa
     let toque = null;
+    /* a haste foi gerada com a ponta `de` na origem: anda até `de` */
+    if (pontaDe) alvo = local.centro.map((x, k) => x + pontaDe[k]);
     if (f.centro !== undefined) {
       const ponto = typeof f.centro === 'string' ? pontoDe(f.centro, 'centro', 'centro') : (vetor3(f.centro) ? pontoEmMetro(f.centro) : recusar('"centro" é [x, y, z] em mm ou "<id>.<âncora>"', onde));
       const por = f.por === undefined ? {} : lerSufixo(f.por);

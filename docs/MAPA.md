@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2168 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2173 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -653,6 +653,8 @@
 - `2026-11-16-ponte-com-a-mecatronica.md` — Ponte com a mecatrônica: a ficha do objeto exportada, as portas elétricas declaradas e o pedido que volta conferido
 - `2026-11-17-trilhas-e-validacao-da-placa.md` — Trilhas de cobre e validação elétrica da placa declarada: a lista de ligações vira cobre conferido por regra e por conectividade
 - `2026-11-22-ajuste-esparso-da-gaiola.md` — Ajuste esparso da gaiola: a subdivisão de uma chapa grande em segundos e sem estourar a memória
+- `2026-11-22-formas-que-faltavam.md` — Formas que faltavam: o anel, o toro e a bacia provados, a haste no esboço e a curva paralela na rede
+- `2026-11-22-helice-mola-rosca-e-fixador.md` — Hélice, mola, rosca e fixador: um caminho helicoidal que serve a quatro ferramentas que faltam
 - `2026-11-22-superficie-de-producao-g2.md` — Superfície de produção (G2): a chapa de subdivisão sem a ondulação que o crítico acusa, sem sair da forma
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
@@ -776,6 +778,8 @@
 - `conexo-em-metro.test.js` — conexo-em-metro.test.js — o conversor de mm para metro do esboço e os passos `parte` com `onde.conexo` que `paineisPorVaos` devolve: `de` e `ate` são medidas…
 - `contatos-declarados.test.js` — contatos-declarados.test.js — a opção só de passos crus executada uma vez, com o mesmo neutro do caminho de antes, e o contato declarado na opção (`contatos`…
 - `espelhados.test.js` — espelhados.test.js — o par de partes Dir e Esq que medem diferente aparece como assimetria no relato de contatos. O sedã de alta definição chegou ao modo est…
+- `formas-ocas.test.js` — formas-ocas.test.js — o anel, o toro e a bacia saem fechados pelas operações que já existem, escritos como o agente os escreve no esboço 2.0, em mm. O backlo…
+- `haste.test.js` — haste.test.js — a barra entre dois pontos do esboço 2.0 (`haste: { de, para, raio | secao }`): as pontas da malha caem nos dois pontos pedidos em qualquer di…
 - `leitor.test.js` — leitor.test.js — o leitor dos esboços antigos: cada `.esboco.json` versionado abre no esboço 2.0 ou é recusado com o motivo, as treze opções de forma de peça…
 - `montar-sem-relato.test.js` — montar-sem-relato.test.js — `montarOpcoes` com `relato: false` não calcula o relato de contatos e devolve o mesmo neutro, as mesmas partes e o resto do paine…
 - `posicao.test.js` — posicao.test.js — a fatia 5 do esboço 2.0: a posição sem conta (âncora, encosta até a malha tocar, alinha, pivô do giro), a cópia pelo arranja e pelo espelha…
@@ -3590,6 +3594,7 @@
 - `familia.mjs` — familia.mjs — a aprovação mecânica das famílias e o gate que a confere.
 - `familia.test.mjs` — familia.test.mjs — o comando `npm run familia -- aprovar <id>` e o gate `familias:check`.
 - `ferramentas-por-objeto.mjs` — Gera docs/modelar/pesquisas/FERRAMENTAS-POR-OBJETO.md a partir de docs/modelar/ferramentas-por-objeto.json e confere que o JSON cobre a fase atual de FAMILIA…
+- `ferramentas-por-objeto.test.mjs` — ferramentas-por-objeto.test.mjs — a conferência do mapa de ferramentas recusa o estado fora de não, parcial e tem.
 - `ferramentas-sobre-uniao.test.ts` — ferramentas-sobre-uniao.test.ts — fatia 5 do plano "União de sólidos": as ferramentas que leem a peça funcionam sobre uma malha unida. A fixture é neutra (`f…
 - `fluxo-do-objeto.mjs` — fluxo-do-objeto.mjs — em que passo um objeto está, da referência à etapa fixa, e o comando exato que vem agora.
 - `fluxo-do-objeto.test.mjs` — fluxo-do-objeto.test.mjs — o passo do objeto e o próximo comando de cada peça, em fixtures montadas num diretório temporário, sem executar receita nenhuma.
