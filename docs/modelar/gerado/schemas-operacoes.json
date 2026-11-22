@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:38bdb452c0789eb6dbd772a8f2a12441b1135a1f51559c4b48f4dc7eb1062c3f",
+  "assinatura": "sha256:ff0aa73fef0a7fdca5f9779eb61b3477ea232926ab658d4f68c0576015760e9d",
   "total": 43,
   "operacoes": [
     {
@@ -2610,6 +2610,10 @@
                 }
               ],
               "description": "Só na polilinha, sem superficie: a direção para onde v aponta em todos os pontos."
+            },
+            "normais": {
+              "type": "array",
+              "description": "Só na polilinha, sem superficie, no lugar de normal: uma direção por ponto da linha (o mesmo número de pontos, com o repetido do fim na linha fechada), para o perfil que gira com a linha, como o filete de uma hélice."
             },
             "perfil": {
               "anyOf": [
@@ -5430,7 +5434,7 @@
       }
     }
   ],
-  "assinaturaComExtensoes": "sha256:1d1e052ddb5063806bda2363baba66f204d80bcc0c74e2202a272625453ab293",
+  "assinaturaComExtensoes": "sha256:402c3aa5cde889d1451887ac028af480d535cc15fd2bb546a65df0353efca187",
   "totalExtensoes": 5,
   "extensoes": [
     {

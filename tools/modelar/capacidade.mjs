@@ -53,6 +53,7 @@ export const CAPACIDADES = Object.freeze({
   corpoDeSecaoVariavel: { arquivo: 'procedural/nucleo/corpo-de-secao-variavel.js', funcao: 'corpoDeSecaoVariavel', de: 'procedural/nucleo/corpo-de-secao-variavel.js' },
   corpoPorFatias: { arquivo: 'procedural/nucleo/corpo-por-fatias.js', funcao: 'corpoPorFatias', de: 'procedural/nucleo/corpo-por-fatias.js' },
   furoPassante: { arquivo: 'procedural/nucleo/furo-passante.js', funcao: 'furoPassante', de: 'procedural/nucleo/furo-passante.js' },
+  caminhoHelicoidal: { arquivo: 'procedural/nucleo/caminho-helicoidal.js', funcao: 'caminhoHelicoidal', de: 'procedural/nucleo/caminho-helicoidal.js' },
   recortarArcoNoPerfil: { arquivo: 'procedural/nucleo/curva2d.js', funcao: 'recortarArcoNoPerfil', de: 'procedural/nucleo/curva2d.js' },
   retanguloArredondado: { arquivo: 'procedural/nucleo/contorno.js', funcao: 'retanguloArredondado', de: 'procedural/nucleo/contorno.js' },
   areaDoContorno: { arquivo: 'procedural/nucleo/contorno.js', funcao: 'areaDoContorno', de: 'procedural/nucleo/contorno.js' },

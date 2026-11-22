@@ -432,7 +432,7 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
     if (comCordao && !daCostura) return grita(st, i, 'friso', 'perfil', `o perfil cordao se põe no canto entre dois sólidos e só vale com a linha numa costura: ${EXEMPLO_DE_CORDAO}, com costura: { de: { op: 'unir', id } }`);
     if (daCostura) {
       if (a.superficie != null) return grita(st, i, 'friso', 'costura', 'costura e superficie são duas fontes de linha: escolha uma');
-      if (a.normal != null) return grita(st, i, 'friso', 'normal', 'sobre a costura a normal é a bissetriz das duas superfícies em cada ponto; tire normal');
+      if (a.normal != null || a.normais != null) return grita(st, i, 'friso', a.normal != null ? 'normal' : 'normais', 'sobre a costura a normal é a bissetriz das duas superfícies em cada ponto; tire normal e normais');
       if (linha.pontos != null) return grita(st, i, 'friso', 'linha', `sobre a costura a linha ${citar(linha.nome)} é a costura inteira, e não leva pontos; escreva só { nome: ${citar(linha.nome)} }`);
       if (a.variacao != null) return grita(st, i, 'friso', 'variacao', 'a variacao cita pontos nomeados da linha, e a costura não tem nomes; tire variacao');
       if (a.ponta != null) return grita(st, i, 'friso', 'ponta', 'sobre a costura as pontas do friso são as da costura; tire ponta');
@@ -502,7 +502,7 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
 
     let cadeias; let espessuraDaChapa = null; let passoDaChapa = null; let gaiolaDaChapa = null;
     if (a.superficie != null) {
-      if (a.normal != null) return grita(st, i, 'friso', 'normal', 'normal só vale na polilinha; sobre a superfície o friso segue a normal da chapa');
+      if (a.normal != null || a.normais != null) return grita(st, i, 'friso', a.normal != null ? 'normal' : 'normais', 'normal e normais só valem na polilinha; sobre a superfície o friso segue a normal da chapa');
       let r;
       try { r = daAbertura ? linhaNaAbertura(st, a) : linhaNaSuperficie(st, a, linha.pontos, fechada); } catch (e) { return grita(st, i, 'friso', 'superficie', String(e.message)); }
       if (r.erro) return grita(st, i, 'friso', r.erro[0], r.erro[1]);
@@ -532,14 +532,17 @@ export function criarOperacoesFriso({ BLOCO, FAIXA_ESTENDIDA, idDoPasso, confere
       cadeias = r.cadeias;
     } else {
       if (comAba) return grita(st, i, 'friso', 'aba', "a aba dobra a borda da chapa: cite a superfície por superficie: { op: 'subdivisao', id } e a borda de um vão pelos nomes da gaiola");
-      if (a.normal == null) return grita(st, i, 'friso', 'normal', "a polilinha precisa de normal, o vetor para onde v aponta; ou cite a superfície por superficie: { op: 'subdivisao', id } com os nomes da gaiola");
-      let normal; let pontos;
+      if (a.normal != null && a.normais != null) return grita(st, i, 'friso', 'normais', 'declare normal (uma para a linha toda) ou normais (uma por ponto), não os dois');
+      if (a.normal == null && a.normais == null) return grita(st, i, 'friso', 'normal', "a polilinha precisa de normal, o vetor para onde v aponta (ou normais, uma por ponto); ou cite a superfície por superficie: { op: 'subdivisao', id } com os nomes da gaiola");
+      if (a.normais != null && (!Array.isArray(a.normais) || a.normais.length !== linha.pontos.length)) return grita(st, i, 'friso', 'normais', `normais é uma lista com uma normal por ponto da linha, ${linha.pontos.length} (veio ${Array.isArray(a.normais) ? a.normais.length : JSON.stringify(a.normais)})`);
+      let normais; let pontos;
       try {
-        normal = st.vec(a.normal);
+        const n = fechada ? linha.pontos.length - 1 : linha.pontos.length;
+        normais = a.normais != null ? a.normais.slice(0, n).map((v) => st.vec(v)) : Array.from({ length: n }, () => st.vec(a.normal));
         pontos = (fechada ? linha.pontos.slice(0, -1) : linha.pontos).map((p) => st.vec(p));
-      } catch (e) { return grita(st, i, 'friso', 'linha', String(e.message)); }
+      } catch (e) { return grita(st, i, 'friso', a.normais != null ? 'normais' : 'linha', String(e.message)); }
       const nome = (j) => (typeof linha.pontos[j] === 'string' ? citar(linha.pontos[j]) : `o ponto ${j} [${linha.pontos[j]}]`);
-      cadeias = [{ pontos, normais: pontos.map(() => normal), fechada, espelhada: false, nomeDoIndice: nome, nomes: (fechada ? linha.pontos.slice(0, -1) : linha.pontos).map((p) => ({ nome: p, inverte: false, noPlano: false })), passo: 1 }];
+      cadeias = [{ pontos, normais, fechada, espelhada: false, nomeDoIndice: nome, nomes: (fechada ? linha.pontos.slice(0, -1) : linha.pontos).map((p) => ({ nome: p, inverte: false, noPlano: false })), passo: 1 }];
     }
 
     /* a variação numa cadeia: o perfil de referência (o do primeiro ponto), a função que dá o perfil de cada estação e o
