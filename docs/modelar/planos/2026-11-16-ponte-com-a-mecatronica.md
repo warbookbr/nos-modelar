@@ -1,6 +1,6 @@
 # Ponte com a mecatrônica: a ficha do objeto exportada, as portas elétricas declaradas e o pedido que volta conferido
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `modulos/ficha-do-objeto/`, `procedural/familias/componente-eletronico/portas-eletricas.js`, `procedural/familias/componente-eletronico/portas-eletricas.test.js`, `procedural/pecas/braco-robotico/ponte.json`, `tools/modelar/exportar-ficha.mjs`, `tools/modelar/exportar-ficha.test.mjs`, `tools/modelar/conferir-pedido.mjs`, `tools/modelar/conferir-pedido.test.mjs`, `docs/modelar/banco-de-provas/ponte-mecatronica-2026-11-23/`. A placa e a base do braço ficam com o plano das trilhas.
 
@@ -75,7 +75,7 @@ Os pinos de componente passivo (resistor, capacitor, LED, cerâmico) não cabiam
 2. Feita em 2026-11-23. A tabela da família (`portas-eletricas.js`) dá passivo aos terminais de resistor, capacitor e LED, nenhuma porta ao dissipador e a pinagem padrão à placa portadora do driver de passo; o que depende do circuito (microcontrolador, regulador, conectores) foi declarado em `placas[].portas` da ponte do braço, como estimativa tirada da lista de redes de exemplo. Os 27 componentes da placa de controle entram na ficha como peças próprias, no conjunto da base e com nó próprio na malha, e a ficha sai com 39 peças e 161 portas; os 22 pinos do microcontrolador que nenhuma rede usa ficam fora, e o comando os lista. O pedido de ligações da placa (47 redes) passa no conferidor da mecatrônica contra a ficha exportada. A proposta do tipo `passivo` deixou de ser texto: a 1.1 já o trouxe.
 3. Feita em 2026-11-23. A massa, o centro de massa e a inércia de cada peça pela malha (`modulos/ficha-do-objeto/src/massa.js`, conferido contra o cubo e o cilindro), com as densidades que a pessoa aceitou na recomendação da IA: PLA impresso a 0,62 g/cm³ (1,24 com uns 30% de preenchimento) no corpo, alumínio a 2,70 nos cinco anéis, e 1,8 nos componentes da placa. O braço dá 47 kg, e cada conjunto soma as peças dele. A ficha passa no `ponte:conferir` de lá e o MJCF dela carregou no MuJoCo (instalado só na prova, fora do repositório), com 47 corpos e 6 juntas; o torque de gravidade na pose de repouso é de 56,6 N·m no ombro e no cotovelo e zero nas outras, a primeira medida que a camada física de lá pode conferir.
 4. Feita em 2026-11-23. O leitor e o conferidor do pedido (`modulos/ficha-do-objeto/src/pedido.js` e `npm run conferir:pedido`), que responde cada tipo de item medindo a forma, provado em formas de teste e no pedido de prova do braço (`docs/modelar/banco-de-provas/ponte-mecatronica-2026-11-23/`): três itens cumpridos, quatro não cumpridos com o motivo e um pedido recusado sem resposta.
-5. O primeiro pedido real da mecatrônica para o braço, se chegar; senão, o fechamento com o pedido de prova, a documentação e o banco de provas.
+5. Feita em 2026-11-23. Nenhum pedido real chegou, e o fechamento foi com o pedido de prova, a nota no guia de montagens (`docs/modelar/usar/MONTAGENS-SEMANTICAS.md`), a linha do módulo na página dos mecanismos e o banco de provas.
 
 ## Riscos e parada
 
@@ -83,4 +83,10 @@ Se algum campo obrigatório da ficha só puder sair conhecendo a simulação, o 
 
 ## Fechamento
 
-A preencher.
+Concluído em 2026-11-23, com as cinco fatias no mesmo dia e os gates verdes em cada envio. O Modelar exporta a ficha do braço robótico por `npm run exportar:ficha -- braco-robotico`, na versão 1.1 do contrato, igual byte a byte em duas exportações e aceita pela cópia conferida do esquema e pelo `ponte:conferir` da mecatrônica: 39 peças com nó próprio na malha, 7 conjuntos, 6 juntas com o eixo medido no anel, 161 portas elétricas e a massa, o centro de massa e a inércia de cada peça e conjunto (47 kg no total). A ficha convertida carregou no MuJoCo, e a primeira medida que ela dá é o torque de gravidade de 56,6 N·m no ombro e no cotovelo, na pose de repouso. `npm run conferir:pedido` responde o pedido item a item, e o de prova saiu com três itens cumpridos, quatro não cumpridos com o motivo e o recusado sem resposta. O gate 5 vale porque nenhuma receita, nenhuma etapa do braço e nenhum arquivo do núcleo mudou; a eletrônica ficou na família de componentes e no módulo.
+
+O contrato mudou do lado de lá pelo plano da 1.1, aprovado pela pessoa: o tipo de porta `passivo` e o item `ligacoes` entraram na versão 1.1, com a 1.0 ainda aceita, e a cópia daqui é a 1.1.
+
+Dois achados que o processo não teria pego sozinho viraram regra. O CI ficou duas vezes com uma máquina presa mais de meia hora na instalação, e a instalação ganhou o teto de 15 minutos em `.github/workflows/ci.yml`. A conferência do espaço aceitaria uma caixa inteira dentro de um sólido, porque ela não corta triângulo nenhum, e o conferidor passou a exigir que o centro não esteja dentro de sólido, com teste. Ficam para a pessoa: o eixo do punho 4 aponta para a frente, paralelo ao ombro, e não ao longo do antebraço, que é o comum num braço de seis eixos; e os tipos dos pinos do microcontrolador, do regulador e dos conectores são estimativa tirada da lista de redes de exemplo, até a mecatrônica escrever o circuito real.
+
+Voltam ao backlog: o chicote modelado e a passagem conferida pela geometria; os volumes livres medidos; o motor e o redutor modelados em cada junta, que tiram o `acionadaPor` nulo; e a varredura do acervo que estourou o tempo numa máquina lenta do CI, ligada à medida de contatos que o backlog já tem.
