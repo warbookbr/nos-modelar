@@ -5,7 +5,6 @@
 **Planos ativos:**
 
 1. [modelagem de carro de passeio](2026-11-14-modelagem-de-carro.md). Território: `procedural/pecas/carro-fastback/`, `docs/modelar/banco-de-provas/carro-fastback-2026-11-14/`, `tools/modelar/ondulacao-da-superficie.mjs`, `procedural/criterios/veiculo.json`, `procedural/familias/roda-pneu/`. Em aberto: a fatia 4 (a lataria inteira numa chapa só, com simetria e painéis por vãos), que espera a decisão da pessoa de seguir; as fatias 2 e 3 fecharam em 2026-11-21, com o piloto aprovado e a chapa só decidida.
-2. [relevo de contorno na chapa](2026-11-22-relevo-de-contorno-na-chapa.md). Território: `procedural/nucleo/faixa-de-contorno-na-rede.js`, `procedural/nucleo/faixa-de-contorno-na-rede.test.mjs`, `procedural/nucleo/conformar-na-chapa.js`, `procedural/nucleo/conformar-na-chapa.test.mjs`, `procedural/nucleo/fixtures/`, `tools/modelar/capacidade.mjs`, `docs/modelar/guias/modelar-carroceria.md`. Em aberto: fatia 5 (prova visual em produto na bancada) e fechamento; fatias 1 a 4 concluídas em 2026-11-23.
 
 A lista está em ordem de prioridade. A ordem desempata quando dois planos precisam do mesmo arquivo: o de menor prioridade espera ou pede à pessoa que mude o território.
 
