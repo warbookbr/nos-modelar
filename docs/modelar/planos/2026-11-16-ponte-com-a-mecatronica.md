@@ -1,8 +1,10 @@
 # Ponte com a mecatrônica: a ficha do objeto exportada, as portas elétricas declaradas e o pedido que volta conferido
 
-**Estado:** rascunho
+**Estado:** ativo
 
-**Território:** a declarar ao ativar: `modulos/ficha-do-objeto/` (a cópia dos esquemas, a exportação da ficha e a leitura e conferência do pedido), `procedural/familias/componente-eletronico/portas-eletricas.js` e o teste dele (o tipo de cada pino por encapsulamento), `procedural/pecas/braco-robotico/ponte.json` (os conjuntos, as juntas e as densidades do braço), `tools/modelar/exportar-ficha.mjs` e `tools/modelar/conferir-pedido.mjs` com os testes, `docs/modelar/banco-de-provas/ponte-mecatronica-<data>/`. A placa e a base do braço ficam com o plano das trilhas.
+**Território:** `modulos/ficha-do-objeto/`, `procedural/familias/componente-eletronico/portas-eletricas.js`, `procedural/familias/componente-eletronico/portas-eletricas.test.js`, `procedural/pecas/braco-robotico/ponte.json`, `tools/modelar/exportar-ficha.mjs`, `tools/modelar/exportar-ficha.test.mjs`, `tools/modelar/conferir-pedido.mjs`, `tools/modelar/conferir-pedido.test.mjs`, `docs/modelar/banco-de-provas/ponte-mecatronica-2026-11-23/`. A placa e a base do braço ficam com o plano das trilhas.
+
+Ativado pela pessoa em 2026-11-23, que deixou o curso e a redução das juntas do braço à recomendação da IA, como estimativa.
 
 **Responsável:** a IA da sessão implementa; a pessoa decide o que muda o contrato com a mecatrônica, os valores declarados do braço (curso e redução das juntas, densidades) e o que fazer com pedido que mude forma aprovada.
 
@@ -69,7 +71,7 @@ Os pinos de componente passivo (resistor, capacitor, LED, cerâmico) não cabem 
 
 ## Fatias
 
-1. A cópia dos esquemas com o SHA-256 e o validador; a declaração da ponte do braço (conjuntos e juntas, com o curso e a redução decididos pela pessoa); a ficha mínima (malha, conjuntos, peças, juntas com o eixo medido, portas vazias, massa ausente) e o teste de reprodução.
+1. A cópia dos esquemas com o SHA-256 e o validador; a declaração da ponte do braço (conjuntos e juntas, com o curso e a redução recomendados pela IA e marcados como estimativa); a ficha mínima (malha, conjuntos, peças, juntas com o eixo medido, portas vazias, massa ausente) e o teste de reprodução.
 2. As portas elétricas: a tabela por encapsulamento, as portas dos componentes da placa na ficha pela pose dela, e o texto da proposta do tipo `passivo`.
 3. A massa, o centro de massa e a inércia, com as densidades declaradas pela pessoa.
 4. O leitor e o conferidor do pedido, com o pedido de prova.
