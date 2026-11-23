@@ -219,7 +219,8 @@ export function gerarPassos(T) {
     ['friso', { origemId: idFrPd, superficie: { op: 'aberturaPorContorno', id: 12 }, linha: { nome: 'borrachaPortaDireita' }, perfil: perfBorrachaPorta }],
     ['parte', { nome: 'portaDireita', material: 'borrachaVidro', sel: { origem: { op: 'friso', id: idFrPd } } }],
 
-    ['aberturaPorContorno', { origemId: 13, chapa: { origem: { op: 'aberturaPorContorno', id: 7, parte: 'lente' } }, vista: 'x', sentido: '-', lente: true, recuoDaLente: m(6), contorno: contornoComFilete(T.vidros.porta) }],
+    /* vista [-1, 0, 0] tem exatamente u=+z, v=+y e eixo apontando para -x (fora da porta esquerda!), garantindo borda.fora na pele externa */
+    ['aberturaPorContorno', { origemId: 13, chapa: { origem: { op: 'aberturaPorContorno', id: 7, parte: 'lente' } }, vista: [-1, 0, 0], sentido: '+', lente: true, recuoDaLente: m(6), contorno: contornoComFilete(T.vidros.porta) }],
     ['parte', { nome: 'portaEsquerda', material: 'lataria', sel: { origem: { op: 'aberturaPorContorno', id: 13 } } }],
     ['parte', { nome: 'portaEsquerda', material: 'vidroAutomotivo', sel: { origem: { op: 'aberturaPorContorno', id: 13, parte: 'lente' } } }],
     ['friso', { origemId: idFrPe, superficie: { op: 'aberturaPorContorno', id: 13 }, linha: { nome: 'borrachaPortaEsquerda' }, perfil: perfBorrachaPorta }],
