@@ -12,11 +12,14 @@ const MONTAGEM = fileURLToPath(new URL('../../procedural/pecas/braco-robotico/mo
 describe('reabrir a base do braço pela impressão do aceite', () => {
   it('reabrir a base acrescenta um evento e a leitura devolve as onze fixas; fixar de novo devolve as doze', async () => {
     const v3 = JSON.parse(readFileSync(arquivoDoRegistro(MONTAGEM), 'utf8'));
-    const ordem = v3.eventos.map((e) => e.instancia);
-    expect(v3.eventos).toHaveLength(12);
+    /* a contagem parte do registro de agora: uma reabertura legítima da pessoa (a base, com o cobre da placa, em 2026-11-23)
+       acrescenta eventos, e o teste prova que reabrir e fixar somam um cada, não um número gravado */
+    const ordem = [...new Set(v3.eventos.map((e) => e.instancia))];
+    const n = v3.eventos.length;
+    expect(ordem).toHaveLength(12);
     const reaberto = await reabrir(MONTAGEM, 'base', 'pessoa, 2026-11-17: prova da fatia 2', { anterior: v3 });
-    expect(reaberto.eventos).toHaveLength(13);
-    expect(reaberto.eventos.slice(0, 12)).toEqual(v3.eventos);
+    expect(reaberto.eventos).toHaveLength(n + 1);
+    expect(reaberto.eventos.slice(0, n)).toEqual(v3.eventos);
     const depois = await estadoDasEtapas(MONTAGEM, { anterior: reaberto });
     expect(depois.leitura.etapas.map((e) => [e.instancia, e.estado])).toEqual(ordem.map((id) => [id, id === 'base' ? 'aberta' : 'fixa']));
     const rodada = (peca) => registrarRodada({ peca, numero: 1, medidas: { passou: true, relatorio: 'ok' }, partes: [{ nome: 'corpo', confere: true }],
@@ -24,7 +27,7 @@ describe('reabrir a base do braço pela impressão do aceite', () => {
     const refeito = await fixarComLeitura(MONTAGEM, 'base', { por: 'pessoa, 2026-11-17' }, { anterior: reaberto, rodadasDe: (ref) => [rodada(ref)] });
     expect(refeito.leitura.etapas.every((e) => e.estado === 'fixa')).toBe(true);
     expect(refeito.avisos).toEqual([]);
-    expect(refeito.registro.eventos).toHaveLength(14);
+    expect(refeito.registro.eventos).toHaveLength(n + 2);
   }, 400_000);
 });
 
