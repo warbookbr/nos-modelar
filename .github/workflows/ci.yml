@@ -48,6 +48,9 @@ jobs:
 
       - name: Node, dependências e navegador
         uses: ./.github/actions/preparar
+        # A instalação leva de meio a quatro minutos; presa (duas vezes em 2026-11-23, mais de meia hora no npm ci ou no
+        # playwright), ela segurava o envio até o teto de seis horas do job. Com o teto, falha logo e se refaz só ela.
+        timeout-minutes: 15
 
       # O histórico das durações desta bateria: o do ramo, e na falta dele o da main. Sem cache, o teto fixo vale.
       - name: Restaura o histórico das durações dos testes
@@ -221,6 +224,9 @@ jobs:
 
       - name: Node, dependências e navegador
         uses: ./.github/actions/preparar
+        # A instalação leva de meio a quatro minutos; presa (duas vezes em 2026-11-23, mais de meia hora no npm ci ou no
+        # playwright), ela segurava o envio até o teto de seis horas do job. Com o teto, falha logo e se refaz só ela.
+        timeout-minutes: 15
 
       # O histórico das durações desta bateria e desta parte: o do ramo, e na falta dele o da main. Sem cache, o teto fixo vale.
       - name: Restaura o histórico das durações dos testes
@@ -262,6 +268,9 @@ jobs:
 
       - name: Node, dependências e navegador
         uses: ./.github/actions/preparar
+        # A instalação leva de meio a quatro minutos; presa (duas vezes em 2026-11-23, mais de meia hora no npm ci ou no
+        # playwright), ela segurava o envio até o teto de seis horas do job. Com o teto, falha logo e se refaz só ela.
+        timeout-minutes: 15
 
       - name: Build do Modelar
         if: ${{ !cancelled() }}
@@ -313,6 +322,9 @@ jobs:
 
       - name: Node, dependências e navegador
         uses: ./.github/actions/preparar
+        # A instalação leva de meio a quatro minutos; presa (duas vezes em 2026-11-23, mais de meia hora no npm ci ou no
+        # playwright), ela segurava o envio até o teto de seis horas do job. Com o teto, falha logo e se refaz só ela.
+        timeout-minutes: 15
 
       # A variante visual é um SCRIPT NOMEADO, não a mesma linha com uma
       # variável de ambiente. Com `env:` no passo, o espelho local via nome de
