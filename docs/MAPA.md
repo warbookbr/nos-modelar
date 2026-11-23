@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2227 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2232 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1084,6 +1084,14 @@
 - `index.js` — index.js — a família `movel-de-caixa` carregada: o contrato `familia.json`, as composições, o `derivar` e o gerador da montagem v5. A família é o objeto de `…
 - `montagem.js` — montagem.js — a montagem v5 que a família gera: o corpo, as portas, as gavetas e os guias e as duas metades de cada dobradiça como peças soltas, com uma arti…
 - `movel-de-caixa.test.mjs` — movel-de-caixa.test.mjs — a família `movel-de-caixa`: contrato, recusas, os perfis, o roupeiro como antes, a malha medida contra as contas (zonas, frentes em…
+
+## procedural/familias/polia-e-correia/
+
+- `composicoes.js` — composicoes.js — as composições da família `polia-e-correia`, uma por número de pontos do perfil, porque a composição v1 só substitui valores: a dentada de v…
+- `derivar.js` — derivar.js — dos parâmetros da polia (milímetro) à chamada de composição (metro). O tipo, as flanges e os canais escolhem a composição.
+- `geometria.js` — geometria.js — as medidas de uma polia da família `polia-e-correia`, em milímetro, a partir dos parâmetros.
+- `index.js` — index.js — a família `polia-e-correia`: polia dentada (GT2, HTD 3M, HTD 5M e T5), em V (Z, A e B, de um a quatro canais) e lisa, com cubo e furo. `chamar(POL…
+- `polia-e-correia.test.mjs` — polia-e-correia.test.mjs — a família `polia-e-correia`: cada perfil sai numa parte só e sem órfão, a dentada tem o externo e a raiz que o passo e os dentes p…
 
 ## procedural/familias/roda-pneu/
 

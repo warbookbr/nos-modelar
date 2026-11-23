@@ -1,0 +1,259 @@
+{
+  "formato": "mecanifica.aprovacao-da-familia@1",
+  "familia": "polia-e-correia",
+  "versao": "1.0.0",
+  "mecanica": {
+    "data": "2026-11-23",
+    "pontos": {
+      "minimo": {
+        "parametros": {
+          "canais": 1,
+          "comprimentoDoCubo": 1,
+          "correia": 1,
+          "dentes": 12,
+          "diametro": 20,
+          "diametroDoCubo": 6,
+          "flanges": 0,
+          "furo": 2,
+          "largura": 3,
+          "tipo": 1
+        },
+        "hash": "sha256:1a4db822b6e3dbc9a2b6214ca9072b167bc638a08ed3a864238cc17ead557a71",
+        "medidas": []
+      },
+      "medio": {
+        "parametros": {
+          "canais": 2,
+          "comprimentoDoCubo": 20,
+          "correia": 2,
+          "dentes": 40,
+          "diametro": 150,
+          "diametroDoCubo": 40,
+          "flanges": 1,
+          "furo": 20,
+          "largura": 25,
+          "tipo": 2
+        },
+        "hash": "sha256:9d2638d03bd593433521c7415b3b59d6b938671a7e952a68fa93c3cc0858d398",
+        "medidas": []
+      },
+      "maximo": {
+        "parametros": {
+          "canais": 4,
+          "comprimentoDoCubo": 80,
+          "correia": 4,
+          "dentes": 150,
+          "diametro": 500,
+          "diametroDoCubo": 120,
+          "flanges": 1,
+          "furo": 50,
+          "largura": 100,
+          "tipo": 3
+        },
+        "hash": "sha256:3a9773804b068fed9541fa88434f0af592c17a849d3d259d7f9a96c6d53c630d",
+        "medidas": []
+      }
+    },
+    "varredura": {
+      "sondas": 20,
+      "recusasDeclaradas": [
+        {
+          "ponto": "dentes=12",
+          "restricao": "furo-cabe-na-dentada"
+        },
+        {
+          "ponto": "diametroDoCubo=6",
+          "restricao": "cubo-maior-que-o-furo"
+        },
+        {
+          "ponto": "furo=50",
+          "restricao": "cubo-maior-que-o-furo"
+        }
+      ]
+    },
+    "portas": [
+      "eixo"
+    ],
+    "perfis": {
+      "gt2-20": {
+        "parametros": {
+          "canais": 1,
+          "comprimentoDoCubo": 7,
+          "correia": 1,
+          "dentes": 20,
+          "diametro": 100,
+          "diametroDoCubo": 16,
+          "flanges": 1,
+          "furo": 5,
+          "largura": 6,
+          "tipo": 1
+        },
+        "hash": "sha256:9f6e9a704273901c2b8f32ed6ac7ea814e57bcf65759a2ddd89c11fc4d516d10",
+        "medidas": []
+      },
+      "gt2-80": {
+        "parametros": {
+          "canais": 1,
+          "comprimentoDoCubo": 8,
+          "correia": 1,
+          "dentes": 80,
+          "diametro": 100,
+          "diametroDoCubo": 22,
+          "flanges": 0,
+          "furo": 8,
+          "largura": 6,
+          "tipo": 1
+        },
+        "hash": "sha256:0625c8cf6c7805b6a881ef808dc33f06f50413fcef0d0a8f31cb6919afddcd77",
+        "medidas": []
+      },
+      "htd-5m": {
+        "parametros": {
+          "canais": 1,
+          "comprimentoDoCubo": 15,
+          "correia": 3,
+          "dentes": 30,
+          "diametro": 100,
+          "diametroDoCubo": 30,
+          "flanges": 1,
+          "furo": 12,
+          "largura": 15,
+          "tipo": 1
+        },
+        "hash": "sha256:a58e6edd483077de747ef24f4f90f2366a0b64e770e9482ddc684dbfd3a15114",
+        "medidas": []
+      },
+      "lisa": {
+        "parametros": {
+          "canais": 1,
+          "comprimentoDoCubo": 10,
+          "correia": 1,
+          "dentes": 20,
+          "diametro": 80,
+          "diametroDoCubo": 30,
+          "flanges": 1,
+          "furo": 12,
+          "largura": 30,
+          "tipo": 3
+        },
+        "hash": "sha256:b03249cc09fe369562c7647871364f38427e75ac8dfa44b15d778cc665283d2f",
+        "medidas": []
+      },
+      "t5": {
+        "parametros": {
+          "canais": 1,
+          "comprimentoDoCubo": 12,
+          "correia": 4,
+          "dentes": 24,
+          "diametro": 100,
+          "diametroDoCubo": 25,
+          "flanges": 1,
+          "furo": 8,
+          "largura": 10,
+          "tipo": 1
+        },
+        "hash": "sha256:ef845cea73b45853370a83351cb46199452168ed89a37df745e85d657dcd027d",
+        "medidas": []
+      },
+      "v-a": {
+        "parametros": {
+          "canais": 1,
+          "comprimentoDoCubo": 20,
+          "correia": 2,
+          "dentes": 20,
+          "diametro": 120,
+          "diametroDoCubo": 40,
+          "flanges": 1,
+          "furo": 20,
+          "largura": 6,
+          "tipo": 2
+        },
+        "hash": "sha256:e9e4e72e89f2eb713d7b53c290385731e402fbd2cf27edb0342ef062c1112701",
+        "medidas": []
+      },
+      "v-b-dupla": {
+        "parametros": {
+          "canais": 2,
+          "comprimentoDoCubo": 25,
+          "correia": 3,
+          "dentes": 20,
+          "diametro": 200,
+          "diametroDoCubo": 60,
+          "flanges": 1,
+          "furo": 30,
+          "largura": 6,
+          "tipo": 2
+        },
+        "hash": "sha256:8b534b1ea430156a117c74e4e381b2c42a9d17d5c89b869aa0954b6038ffc8ba",
+        "medidas": []
+      }
+    },
+    "escalasDosPerfis": {
+      "sondas": 70,
+      "recusasDeclaradas": [
+        {
+          "ponto": "gt2-20: diametroDoCubo=6",
+          "restricao": "cubo-maior-que-o-furo"
+        },
+        {
+          "ponto": "gt2-20: furo=50",
+          "restricao": "cubo-maior-que-o-furo"
+        },
+        {
+          "ponto": "gt2-80: diametroDoCubo=6",
+          "restricao": "cubo-maior-que-o-furo"
+        },
+        {
+          "ponto": "gt2-80: furo=50",
+          "restricao": "cubo-maior-que-o-furo"
+        },
+        {
+          "ponto": "htd-5m: diametroDoCubo=6",
+          "restricao": "cubo-maior-que-o-furo"
+        },
+        {
+          "ponto": "htd-5m: furo=50",
+          "restricao": "cubo-maior-que-o-furo"
+        },
+        {
+          "ponto": "lisa: diametroDoCubo=6",
+          "restricao": "cubo-maior-que-o-furo"
+        },
+        {
+          "ponto": "lisa: furo=50",
+          "restricao": "cubo-maior-que-o-furo"
+        },
+        {
+          "ponto": "t5: diametroDoCubo=6",
+          "restricao": "cubo-maior-que-o-furo"
+        },
+        {
+          "ponto": "t5: furo=50",
+          "restricao": "cubo-maior-que-o-furo"
+        },
+        {
+          "ponto": "v-a: diametro=20",
+          "restricao": "diametro-minimo-da-v"
+        },
+        {
+          "ponto": "v-a: diametroDoCubo=6",
+          "restricao": "cubo-maior-que-o-furo"
+        },
+        {
+          "ponto": "v-a: furo=50",
+          "restricao": "cubo-maior-que-o-furo"
+        },
+        {
+          "ponto": "v-b-dupla: diametro=20",
+          "restricao": "diametro-minimo-da-v"
+        },
+        {
+          "ponto": "v-b-dupla: diametroDoCubo=6",
+          "restricao": "cubo-maior-que-o-furo"
+        }
+      ]
+    }
+  },
+  "critico": null,
+  "pessoa": null
+}

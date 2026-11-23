@@ -1,0 +1,66 @@
+{
+  "formato": "mecanifica.familia@1",
+  "id": "polia-e-correia",
+  "versao": "1.0.0",
+  "nivel": "componente",
+  "parametros": {
+    "tipo": { "tipo": "inteiro", "unidade": "contagem", "padrao": 1, "minimo": 1, "maximo": 3, "medio": 2 },
+    "correia": { "tipo": "inteiro", "unidade": "contagem", "padrao": 1, "minimo": 1, "maximo": 4, "medio": 2 },
+    "dentes": { "tipo": "inteiro", "unidade": "contagem", "padrao": 20, "minimo": 12, "maximo": 150, "medio": 40 },
+    "diametro": { "tipo": "numero", "unidade": "mm", "padrao": 100, "minimo": 20, "maximo": 500, "medio": 150 },
+    "largura": { "tipo": "numero", "unidade": "mm", "padrao": 6, "minimo": 3, "maximo": 100, "medio": 25 },
+    "canais": { "tipo": "inteiro", "unidade": "contagem", "padrao": 1, "minimo": 1, "maximo": 4, "medio": 2 },
+    "flanges": { "tipo": "inteiro", "unidade": "contagem", "padrao": 1, "minimo": 0, "maximo": 1, "medio": 1 },
+    "furo": { "tipo": "numero", "unidade": "mm", "padrao": 5, "minimo": 2, "maximo": 50, "medio": 20 },
+    "diametroDoCubo": { "tipo": "numero", "unidade": "mm", "padrao": 16, "minimo": 6, "maximo": 120, "medio": 40 },
+    "comprimentoDoCubo": { "tipo": "numero", "unidade": "mm", "padrao": 7, "minimo": 1, "maximo": 80, "medio": 20 }
+  },
+  "restricoes": [
+    {
+      "id": "cubo-maior-que-o-furo",
+      "expressao": "diametroDoCubo >= furo + 4",
+      "motivo": "o cubo precisa de ao menos 2 mm de parede em volta do furo; aumente o diâmetro do cubo ou diminua o furo"
+    },
+    {
+      "id": "furo-cabe-na-dentada",
+      "expressao": "max(0, 2 - tipo) * (furo + 2 - (dentes * (2 + min(1, correia - 1) + 2 * max(0, min(1, correia - 2))) / 3.14159265 - 1.2 * (2 + min(1, correia - 1) + 2 * max(0, min(1, correia - 2))))) <= 0",
+      "motivo": "na polia dentada (tipo 1) o furo precisa deixar ao menos 1 mm de parede até a raiz dos dentes; use mais dentes, um passo maior ou um furo menor"
+    },
+    {
+      "id": "furo-cabe-na-v-e-na-lisa",
+      "expressao": "max(0, min(1, tipo - 1)) * (furo + 4 + 22 * max(0, 3 - tipo) - diametro) <= 0",
+      "motivo": "na polia em V (tipo 2) o furo precisa deixar ao menos 2 mm de parede abaixo do fundo do canal mais fundo (10,8 mm abaixo do diâmetro de referência na seção B), e na lisa (tipo 3) 2 mm até a faixa; aumente o diâmetro ou diminua o furo"
+    },
+    {
+      "id": "diametro-minimo-da-v",
+      "expressao": "max(0, 1 - abs(tipo - 2)) * (50 + 25 * min(1, correia - 1) + 50 * max(0, min(1, correia - 2)) - diametro) <= 0",
+      "motivo": "na polia em V (tipo 2) o diâmetro de referência mínimo da ISO 4183 é 50 mm na seção Z, 75 mm na A e 125 mm na B"
+    },
+    {
+      "id": "secao-da-v",
+      "expressao": "max(0, 1 - abs(tipo - 2)) * (correia - 3) <= 0",
+      "motivo": "a polia em V (tipo 2) tem as seções 1 (Z), 2 (A) e 3 (B); a correia 4 só existe na dentada (T5)"
+    }
+  ],
+  "portas": [
+    { "id": "eixo", "tipo": "anel", "papel": "recebe" }
+  ],
+  "ferramentas": ["polia"],
+  "perguntas": {
+    "polia": [
+      "O corpo é redondo e coaxial com o furo, com o cubo de um lado só e a faixa da correia acima dele?",
+      "Na dentada, os dentes são iguais, igualmente espaçados em volta e cabem entre as duas flanges, sem invadi-las?",
+      "Na polia em V, cada canal é um V simétrico, com as paredes retas e o fundo abaixo da borda?",
+      "Na T5, o vão de cada dente é um trapézio de paredes retas, e na GT2 e na HTD o vão é curvo, com o fundo redondo?"
+    ]
+  },
+  "perfis": {
+    "gt2-20": { "descricao": "polia GT2 de 20 dentes, correia de 6 mm, furo de 5 mm, com flanges", "parametros": { "tipo": 1, "correia": 1, "dentes": 20, "largura": 6, "flanges": 1, "furo": 5, "diametroDoCubo": 16, "comprimentoDoCubo": 7 } },
+    "gt2-80": { "descricao": "polia GT2 de 80 dentes, correia de 6 mm, furo de 8 mm, sem flanges", "parametros": { "tipo": 1, "correia": 1, "dentes": 80, "largura": 6, "flanges": 0, "furo": 8, "diametroDoCubo": 22, "comprimentoDoCubo": 8 } },
+    "htd-5m": { "descricao": "polia HTD 5M de 30 dentes, correia de 15 mm, com flanges", "parametros": { "tipo": 1, "correia": 3, "dentes": 30, "largura": 15, "flanges": 1, "furo": 12, "diametroDoCubo": 30, "comprimentoDoCubo": 15 } },
+    "t5": { "descricao": "polia T5 de 24 dentes, correia de 10 mm, com flanges", "parametros": { "tipo": 1, "correia": 4, "dentes": 24, "largura": 10, "flanges": 1, "furo": 8, "diametroDoCubo": 25, "comprimentoDoCubo": 12 } },
+    "v-a": { "descricao": "polia em V de um canal da seção A, diâmetro de referência de 120 mm", "parametros": { "tipo": 2, "correia": 2, "diametro": 120, "canais": 1, "furo": 20, "diametroDoCubo": 40, "comprimentoDoCubo": 20 } },
+    "v-b-dupla": { "descricao": "polia em V de dois canais da seção B, diâmetro de referência de 200 mm", "parametros": { "tipo": 2, "correia": 3, "diametro": 200, "canais": 2, "furo": 30, "diametroDoCubo": 60, "comprimentoDoCubo": 25 } },
+    "lisa": { "descricao": "polia lisa de 80 mm com face de 30 mm", "parametros": { "tipo": 3, "diametro": 80, "largura": 30, "furo": 12, "diametroDoCubo": 30, "comprimentoDoCubo": 10 } }
+  }
+}

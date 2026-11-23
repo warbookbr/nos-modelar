@@ -36,7 +36,7 @@ Os tipos são três. O modificador age sobre uma forma que já existe; o gerador
 | 22 | relevo funcional (`textura`) | modificador | 21 (6%) | 10 | parcial | aplica recartilhado, estrias de pega, piso antiderrapante ou chapa ondulada numa face |
 | 23 | elos ao longo de caminho fechado (`elos`) | gerador | 19 (5%) | 8 | não | distribui elos articulados num contorno fechado em volta de rodas (corrente, esteira de trator, porta-cabos, degraus de escada rolante, correia dentada) |
 | 24 | texto e escala gravados (`texto`) | modificador | 19 (5%) | 9 | não | grava ou põe em relevo letras, números e escalas graduadas (paquímetro, mostrador, placa) |
-| 25 | polia e correia (`polia`) | especializado | 18 (5%) | 7 | não | gera polias em V ou dentadas e a correia fechada que as envolve na posição certa |
+| 25 | polia e correia (`polia`) | especializado | 18 (5%) | 7 | parcial | gera polias em V ou dentadas e a correia fechada que as envolve na posição certa |
 | 26 | perfil aerodinâmico e pás (`aerofolio`) | gerador | 17 (5%) | 6 | parcial | gera asa, empenagem, pá de hélice, rotor e ventoinha por perfil NACA, corda, torção, enflechamento e número de pás |
 | 27 | elementos de construção (`arquitetura`) | gerador | 13 (4%) | 6 | não | faz parede com aberturas, laje, telhado de águas e escada por espelho e piso |
 | 28 | corte e união gerais (`booleana`) | modificador | 11 (3%) | 9 | parcial | subtrai, une ou intersecta formas quaisquer, para rasgos, janelas, cavidades e peças fundidas |
@@ -82,7 +82,7 @@ As ferramentas que não existem ou existem em parte, na mesma ordem, com o que j
 - relevo funcional (`parcial`, 21 objetos): núcleo: displace com ruído; padrão regular não existe.
 - elos ao longo de caminho fechado (`não`, 19 objetos): nem esboço nem núcleo.
 - texto e escala gravados (`não`, 19 objetos): nem esboço nem núcleo.
-- polia e correia (`não`, 18 objetos): nem esboço nem núcleo.
+- polia e correia (`parcial`, 18 objetos): família `polia-e-correia`: polia dentada GT2, HTD 3M, HTD 5M e T5 por dentes, com ou sem flanges, polia em V das seções Z, A e B da ISO 4183 de um a quatro canais e polia lisa, com cubo, furo e a porta do eixo; a correia fechada entre duas polias não.
 - perfil aerodinâmico e pás (`parcial`, 17 objetos): família `superficie-aerodinamica`: asa, estabilizador, deriva, pá de hélice e hélice de até 9 pás por perfil de quatro dígitos, corda, espessura, torção, enflechamento, diedro e ponta levantada, com a superfície de comando (flap, aileron, leme) em vão com fresta e deflexão; rotor de turbina, ventoinha carenada e perfil de catálogo não.
 - elementos de construção (`não`, 13 objetos): nem esboço nem núcleo.
 - corte e união gerais (`parcial`, 11 objetos): núcleo: subtrair, unir, intersectar e aparar, também no esboço 2.0 pelos passos crus; o esboço 2.0 não tem atalho de recorte entre formas.
@@ -122,10 +122,6 @@ Distribui elos articulados num contorno fechado em volta de rodas (corrente, est
 ### texto e escala gravados (`texto`)
 
 Grava ou põe em relevo letras, números e escalas graduadas (paquímetro, mostrador, placa). Parâmetros: texto ou divisões, fonte, altura, profundidade. Referências: BOSL2: text3d; CadQuery: text; Blender: objeto Text. Aqui: não, nem esboço nem núcleo. Atende 19 objetos em 9 famílias.
-
-### polia e correia (`polia`)
-
-Gera polias em V ou dentadas e a correia fechada que as envolve na posição certa. Parâmetros: perfil, diâmetros, centros, largura. Referências: FreeCAD Gears: timing gear; BOSL2. Aqui: não, nem esboço nem núcleo. Atende 18 objetos em 7 famílias.
 
 ### elementos de construção (`arquitetura`)
 
@@ -238,6 +234,10 @@ Gera parafuso, porca, arruela, rebite e pino por norma e bitola. Parâmetros: ti
 ### relevo funcional (`textura`)
 
 Aplica recartilhado, estrias de pega, piso antiderrapante ou chapa ondulada numa face. Parâmetros: padrão, passo, profundidade, face. Referências: BOSL2: knurling e textures; Blender: Displace com textura de imagem. Aqui: parcial, núcleo: displace com ruído; padrão regular não existe. Atende 21 objetos em 10 famílias.
+
+### polia e correia (`polia`)
+
+Gera polias em V ou dentadas e a correia fechada que as envolve na posição certa. Parâmetros: perfil, diâmetros, centros, largura. Referências: FreeCAD Gears: timing gear; BOSL2. Aqui: parcial, família `polia-e-correia`: polia dentada GT2, HTD 3M, HTD 5M e T5 por dentes, com ou sem flanges, polia em V das seções Z, A e B da ISO 4183 de um a quatro canais e polia lisa, com cubo, furo e a porta do eixo; a correia fechada entre duas polias não. Atende 18 objetos em 7 famílias.
 
 ### perfil aerodinâmico e pás (`aerofolio`)
 
