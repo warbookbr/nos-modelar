@@ -43,12 +43,12 @@ export function passosRetrovisores(proxId) {
   /* 2. Pedestal articulado curto e encorpado (4 anéis elípticos suaves de x = 754 até x = 808) */
   emitirPar((id) => {
     const N = 16;
-    /* estações [x, yCentro, zCentro, ry, rz] em mm — alinhadas coaxialmente entre a base triangular e o centro da concha */
+    /* estações [x, yCentro, zCentro, ry, rz] em mm — 100% contido dentro da base triangular e alinhado à concha */
     const est = [
-      [750, 998, 574, 28, 32],
-      [768, 1001, 570, 24, 28],
-      [788, 1003, 566, 22, 26],
-      [808, 1004, 564, 24, 28],
+      [750, 998, 578, 25, 26],
+      [768, 1001, 582, 23, 25],
+      [788, 1003, 586, 22, 24],
+      [808, 1004, 588, 24, 26],
     ];
     const verts = [];
     for (const [x, yc, zc, ry, rz] of est) {
@@ -78,7 +78,7 @@ export function passosRetrovisores(proxId) {
   /* 3. Carcaça aerodinâmica OCA varrida para trás (~15°), com borda de 6 mm e cavidade real de 14 mm */
   const xMin = 796; const xMax = 938;
   const xMid = (xMin + xMax) / 2; const rxBase = (xMax - xMin) / 2; // 71 mm -> 142 mm largura
-  const zBoca = (u) => 532 - 36 * ((u + 1) / 2); // varredura ~15° voltada ao motorista (532 interno -> 496 externo)
+  const zBoca = (u) => 562 - 28 * ((u + 1) / 2); // alinhado à base triangular (528..636): boca em 562..534 e nariz em 636..584!
   const yCentro = (u) => 1004 + 1 * ((u + 1) / 2); // base da concha em y = 958 alinhada à base triangular (y = 956)
   const ryLocal = (u) => 46 - 4 * ((u + 1) / 2); // altura 92 mm interno -> 84 mm na ponta externa
   const profLocal = (u) => 74 - 24 * ((u + 1) / 2); // gota aerodinâmica: 74 mm interno -> 50 mm na ponta externa
