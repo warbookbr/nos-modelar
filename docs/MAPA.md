@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2218 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2220 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -863,11 +863,13 @@
 
 - `ficha.js` — ficha.js — monta a ficha do objeto (contrato da ponte com a mecatrônica, esquema 1.1) a partir do que o Modelar sabe: as instâncias da montagem resolvida, co…
 - `index.js` — index.js — a porta pública do módulo da ficha do objeto: a ponte do Modelar com o nos-mecatronica.
+- `massa.js` — massa.js — a massa, o centro de massa e o tensor de inércia de um sólido de densidade uniforme, pela malha triangulada dele.
 - `validar.js` — validar.js — confere uma ficha ou um pedido da ponte com a mecatrônica: o esquema da versão que o arquivo declara, pela cópia conferida em `../esquemas/` (de…
 
 ## modulos/ficha-do-objeto/tests/
 
 - `ficha.test.js` — ficha.test.js — a ficha montada de um objeto de prova de duas peças e uma junta: sai em milímetro, passa na cópia do esquema, igual em duas montagens, com o …
+- `massa.test.js` — massa.test.js — as propriedades de massa pela malha batem com as fórmulas fechadas do cubo deslocado e do cilindro facetado, e a malha virada para dentro dá …
 - `validar.test.js` — validar.test.js — a cópia dos esquemas da ponte confere com o SHA-256 da última versão do `versoes.json` copiado junto (decisão 0004 do nos-mecatronica), e o…
 
 ## modulos/manual/

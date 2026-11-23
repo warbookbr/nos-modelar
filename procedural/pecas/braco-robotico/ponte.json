@@ -375,5 +375,31 @@
         ]
       }
     }
-  ]
+  ],
+  "materiais": {
+    "pla-impresso": {
+      "densidade": 0.62,
+      "origem": "estimativa",
+      "nota": "PLA de 1,24 g/cm³ impresso com paredes e uns 30% de preenchimento, cerca de metade do sólido; recomendado pela IA e aceito pela pessoa em 2026-11-23"
+    },
+    "aluminio": {
+      "densidade": 2.7,
+      "origem": "estimativa",
+      "nota": "liga de alumínio comum, 2,70 g/cm³; recomendado pela IA e aceito pela pessoa em 2026-11-23"
+    },
+    "eletronica": {
+      "densidade": 1.8,
+      "origem": "estimativa",
+      "nota": "média de laminado FR-4 (1,85 g/cm³), plástico e metal dos componentes, contada no volume da malha de cada um"
+    }
+  },
+  "materialDasInstancias": {
+    "padrao": "pla-impresso",
+    "anelCintura": "aluminio",
+    "anelAntebraco": "aluminio",
+    "anelPunho4": "aluminio",
+    "anelPunho5": "aluminio",
+    "anelPunho6": "aluminio"
+  },
+  "materialDasPlacas": "eletronica"
 }

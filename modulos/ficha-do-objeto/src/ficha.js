@@ -6,6 +6,8 @@
    Puro e determinístico: a entrada em metro (a unidade da malha neutra) sai em milímetro, arredondada a 1 µm, e a ordem segue a
    montagem e a declaração. O que o Modelar não sabe sai como `{ ausente: true, motivo }`, que o contrato aceita. */
 
+import { girar, inerciaDoConjunto } from './validar.js';
+
 export class ErroFicha extends Error {
   constructor(mensagem) { super(mensagem); this.name = 'ErroFicha'; }
 }
@@ -48,17 +50,36 @@ const produto = (a, b) => a.map((linha) => [0, 1, 2].map((j) => linha[0] * b[0][
 
 const ausente = (motivo) => ({ ausente: true, motivo });
 const SEM_DENSIDADE = 'o material da peça ainda não tem densidade declarada na ponte do objeto';
+const sig = (x) => { const v = Number(x.toPrecision(9)); return Object.is(v, -0) ? 0 : v; };
+const transposta = (m) => [0, 1, 2].map((i) => [0, 1, 2].map((j) => m[j][i]));
+
+/* a massa, o centro e a inércia de uma peça no referencial dela: `r` e `p` levam o referencial da peça ao da instância em que a
+   massa foi medida (identidade e zero para a própria instância) */
+function massaNaPeca(m, r = null, p = [0, 0, 0]) {
+  if (!m) return { massa: ausente(SEM_DENSIDADE), centroDeMassa: ausente(SEM_DENSIDADE), inercia: ausente(SEM_DENSIDADE) };
+  const rt = r ? transposta(r) : null;
+  const centro = rt ? aplicar(rt, m.centro.map((x, k) => x - p[k])) : m.centro;
+  const T = rt ? produto(produto(rt, m.tensor), r) : m.tensor;
+  const nota = m.nota ? { nota: m.nota } : {};
+  return {
+    massa: { valor: sig(m.massa), origem: 'estimativa', ...nota },
+    centroDeMassa: { valor: centro.map((x) => arredondar(x)), origem: 'estimativa', nota: 'centro do volume da malha, no referencial da peça' },
+    inercia: { valor: { ixx: sig(T[0][0]), iyy: sig(T[1][1]), izz: sig(T[2][2]), ixy: sig(T[0][1]), ixz: sig(T[0][2]), iyz: sig(T[1][2]) }, origem: 'estimativa', nota: 'pela malha com densidade uniforme, no centro de massa e nos eixos da peça' },
+  };
+}
 
 /**
  * @param {{ declaracao: object, instancias: Array<{ id: string, ref: string, pose: { rotacao: number[][], deslocamento: number[] },
  *   portas: Array<{ id: string, interface?: { eixo: number[], centro: number[] } }> }>, malha: { caminho: string, caixa: { min: number[], max: number[] }, faces: number },
  *   componentes?: Array<{ id: string, instancia: string, nome?: string, familia: string, variante: string, posicao: number[], orientacao: { eixo: number[], angulo: number } }>,
- *   portasEletricas?: Array<object> }} entrada
+ *   portasEletricas?: Array<object>, massas?: Record<string, { massa: number, centro: number[], tensor: number[][], nota?: string }> }} entrada
  *   a pose e as portas das instâncias em metro; a caixa da malha já em milímetro, medida no arquivo exportado. Os componentes são as
  *   peças que uma instância carrega dentro dela (os da placa declarada), com a posição em mm e a orientação no referencial da
- *   instância; eles entram como peças da ficha, no conjunto da instância. As portas elétricas já vêm no formato da ficha.
+ *   instância; eles entram como peças da ficha, no conjunto da instância. As portas elétricas já vêm no formato da ficha. As
+ *   massas, por identificador da ficha, vêm em g, com o centro (mm) e o tensor (g·mm²) no referencial da instância que carrega a
+ *   peça; a peça que não tem massa sai ausente, e o conjunto soma as peças quando todas têm.
  */
-export function montarFicha({ declaracao, instancias, malha, componentes = [], portasEletricas = [] }) {
+export function montarFicha({ declaracao, instancias, malha, componentes = [], portasEletricas = [], massas = {} }) {
   const d = declaracao;
   if (d?.formato !== 'modelar.ponte' || d.versao !== 1) {
     throw new ErroFicha(`ponte.json: formato '${d?.formato}' versão ${d?.versao}; esperado 'modelar.ponte' versão 1.`);
@@ -80,9 +101,7 @@ export function montarFicha({ declaracao, instancias, malha, componentes = [], p
     conjunto: conjuntoDe.get(i.id),
     posicao: { valor: mm(i.pose.deslocamento), origem: 'medido', nota: 'origem da peça na pose de repouso da montagem resolvida' },
     orientacao: { valor: eixoEAngulo(i.pose.rotacao), origem: 'medido' },
-    massa: ausente(SEM_DENSIDADE),
-    centroDeMassa: ausente(SEM_DENSIDADE),
-    inercia: ausente(SEM_DENSIDADE),
+    ...massaNaPeca(massas[idDaFicha(i.id)]),
   }));
 
   const ids = new Set(pecas.map((p) => p.id));
@@ -101,9 +120,7 @@ export function montarFicha({ declaracao, instancias, malha, componentes = [], p
       conjunto: conjuntoDe.get(c.instancia),
       posicao: { valor: posicao, origem: 'medido', nota: `origem do componente, posto pela placa declarada de '${c.instancia}'` },
       orientacao: { valor: eixoEAngulo(produto(rotacao, matrizDe(c.orientacao))), origem: 'medido' },
-      massa: ausente(SEM_DENSIDADE),
-      centroDeMassa: ausente(SEM_DENSIDADE),
-      inercia: ausente(SEM_DENSIDADE),
+      ...massaNaPeca(massas[c.id], matrizDe(c.orientacao), c.posicao),
     });
   }
 
@@ -132,13 +149,25 @@ export function montarFicha({ declaracao, instancias, malha, componentes = [], p
     };
   });
 
-  const conjuntos = d.conjuntos.map((c) => ({
-    id: c.id,
-    movel: c.movel,
-    massa: ausente(SEM_DENSIDADE),
-    centroDeMassa: ausente(SEM_DENSIDADE),
-    inercia: ausente(SEM_DENSIDADE),
-  }));
+  /* o conjunto soma as peças dele, pelos valores já arredondados da ficha, como o conferidor refaz a conta */
+  const conjuntos = d.conjuntos.map((c) => {
+    const suas = pecas.filter((p) => p.conjunto === c.id);
+    if (!suas.length || suas.some((p) => p.massa.ausente)) {
+      const motivo = 'alguma peça do conjunto não tem massa (o material dela não tem densidade declarada na ponte do objeto)';
+      return { id: c.id, movel: c.movel, massa: ausente(motivo), centroDeMassa: ausente(motivo), inercia: ausente(motivo) };
+    }
+    const total = suas.reduce((s, p) => s + p.massa.valor, 0);
+    const centros = suas.map((p) => girar(p.orientacao.valor, p.centroDeMassa.valor).map((x, k) => x + p.posicao.valor[k]));
+    const centro = [0, 1, 2].map((k) => suas.reduce((s, p, n) => s + p.massa.valor * centros[n][k], 0) / total);
+    const [ixx, iyy, izz, ixy, ixz, iyz] = inerciaDoConjunto(suas, centros, centro).map(sig);
+    return {
+      id: c.id,
+      movel: c.movel,
+      massa: { valor: sig(total), origem: 'estimativa', nota: 'soma das massas estimadas das peças do conjunto' },
+      centroDeMassa: { valor: centro.map((x) => arredondar(x)), origem: 'estimativa', nota: 'média das peças pesada pela massa, no referencial da montagem' },
+      inercia: { valor: { ixx, iyy, izz, ixy, ixz, iyz }, origem: 'estimativa', nota: 'das peças em torno do centro do conjunto, nos eixos da montagem' },
+    };
+  });
 
   return {
     tipo: 'ficha',

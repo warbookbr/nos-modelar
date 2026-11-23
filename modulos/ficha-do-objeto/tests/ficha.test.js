@@ -67,6 +67,20 @@ describe('componentes carregados por uma instância', () => {
     expect(r1.orientacao.valor).toEqual({ eixo: [0, 1, 0], angulo: 180 });
   });
 
+  it('leva a massa medida no referencial da instância ao da peça, e o conjunto soma as peças e passa no conferidor', () => {
+    const tensor = [[10, 1, 0], [1, 20, 0], [0, 0, 30]];
+    const massas = { r1: { massa: 2, centro: [10, 0, 5], tensor }, pe: { massa: 3, centro: [0, 1, 0], tensor }, 'braco-longo-2': { massa: 1, centro: [0, 0, 0], tensor } };
+    const f = montarFicha({ declaracao, instancias, malha, componentes, portasEletricas, massas });
+    expect(conferirDocumento(f).erros).toEqual([]);
+    const r1 = f.pecas.find((p) => p.id === 'r1');
+    /* o componente está a 10 mm em x da instância, girado 90 graus em y: o centro (10, 0, 5) da instância fica a (0, 0, 5) da
+       origem dele, que nos eixos dele é (-5, 0, 0), e o tensor troca os eixos x e z */
+    r1.centroDeMassa.valor.forEach((x, k) => expect(x).toBeCloseTo([-5, 0, 0][k], 9));
+    expect(r1.inercia.valor).toMatchObject({ ixx: 30, iyy: 20, izz: 10 });
+    expect(f.conjuntos.find((c) => c.id === 'giro').massa).toMatchObject({ valor: 3, origem: 'estimativa' });
+    expect(f.conjuntos.find((c) => c.id === 'fixo').massa.valor).toBe(3);
+  });
+
   it('recusa o componente com o identificador de outra peça', () => {
     expect(() => montarFicha({ declaracao, instancias, malha, componentes: [{ ...componentes[0], id: 'pe' }] })).toThrow(/já é de outra peça/);
   });

@@ -49,8 +49,9 @@ export function girar({ eixo, angulo }, v) {
   return [x, y, z].map((e, k) => v[k] * c + cruz[k] * s + e * ponto * (1 - c));
 }
 
-/* O tensor de inércia das peças em torno de `centro`, no referencial da montagem. */
-function inerciaDoConjunto(pecas, centros, centro) {
+/** O tensor de inércia `[ixx, iyy, izz, ixy, ixz, iyz]` das peças da ficha em torno de `centro`, com o centro de massa de cada
+ *  uma em `centros`, no referencial da montagem. */
+export function inerciaDoConjunto(pecas, centros, centro) {
   const total = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
   pecas.forEach((p, n) => {
     const { ixx, iyy, izz, ixy, ixz, iyz } = p.inercia.valor;

@@ -33,6 +33,13 @@ describe('exportar:ficha', () => {
     expect(a.semTipo).toHaveLength(22);
     expect(ficha.portas.filter((p) => p.peca === 'a1').map((p) => p.tipo)).toContain('fase-de-motor');
     expect(ficha.portas.find((p) => p.peca === 'r1')).toMatchObject({ tipo: 'passivo', tensao: { ausente: true } });
+    /* toda peça tem massa estimada pela malha e pela densidade da ponte, e cada conjunto soma as peças dele */
+    expect(ficha.pecas.every((p) => p.massa.origem === 'estimativa' && p.inercia.valor.ixx > 0)).toBe(true);
+    for (const c of ficha.conjuntos) {
+      const soma = ficha.pecas.filter((p) => p.conjunto === c.id).reduce((s, p) => s + p.massa.valor, 0);
+      expect(c.massa.valor, c.id).toBeCloseTo(soma, 3);
+    }
+    expect(ficha.pecas.find((p) => p.id === 'anel-cintura').massa.nota).toMatch(/aluminio/);
     /* o pedido de ligações da placa (47 redes) cita só portas que a ficha tem */
     expect(conferirDocumento(pedidoDaPlaca, { ficha }).erros).toEqual([]);
     expect(ficha.juntas.map((j) => j.id)).toEqual(['cintura', 'ombro', 'cotovelo', 'punho-4', 'punho-5', 'punho-6']);

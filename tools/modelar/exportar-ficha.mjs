@@ -6,7 +6,8 @@ import { dirname, isAbsolute, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { exportarMontagemGltf } from '../../modulos/exportador-gltf/src/index.js';
 import { portasPublicadas } from '../../src/autoria/descrever-partes.js';
-import { conferirDocumento, idDaFicha, montarFicha, textoDosErros } from '../../modulos/ficha-do-objeto/src/index.js';
+import { conferirDocumento, idDaFicha, montarFicha, propriedadesDeMassa, textoDosErros } from '../../modulos/ficha-do-objeto/src/index.js';
+import { validarMalhaObj } from '../../modulos/exportador-obj/src/validar-malha.js';
 import { portasDoComponente } from '../../procedural/familias/componente-eletronico/portas-eletricas.js';
 import { REPO, instanciasDaMontagem, resolverMontagemDeArquivo } from './exportar-gltf.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
@@ -82,6 +83,31 @@ function separarPorParte(instancias, partes) {
   return saida;
 }
 
+/* A massa de cada peça da malha separada, pela densidade do material que a ponte do objeto dá à instância (ou às placas), com o
+   centro e o tensor no referencial da instância, em mm, g e g·mm². Sem `materiais` na ponte, nenhuma massa. */
+function massasDasPecas(separadas, partes, declaracao) {
+  const { materiais, materialDasInstancias = {}, materialDasPlacas = null } = declaracao;
+  if (!materiais) return {};
+  const ler = (nome, onde) => {
+    const m = materiais[nome];
+    if (!m || typeof m.densidade !== 'number' || m.densidade <= 0) throw new Error(`ponte.json: ${onde} cita o material '${nome}', que não está em materiais com densidade em g/cm³.`);
+    return m;
+  };
+  const porFicha = new Map(Object.entries(materialDasInstancias).filter(([k]) => k !== 'padrao').map(([k, v]) => [idDaFicha(k), v]));
+  const massas = {};
+  for (const s of separadas) {
+    const nome = partes.has(s.nome) ? materialDasPlacas : (porFicha.get(s.nome) ?? materialDasInstancias.padrao);
+    if (!nome) continue;
+    const material = ler(nome, partes.has(s.nome) ? 'materialDasPlacas' : `materialDasInstancias (${s.nome})`);
+    const malha = validarMalhaObj(s.neutro, { tolerancia: 0.001 });
+    const ponto = (id) => malha.vertices.get(id).map((x) => x * 1000);
+    const triangulos = malha.faces.flatMap((f) => f.triangulos.map((tri) => tri.map(ponto)));
+    const m = propriedadesDeMassa(triangulos, material.densidade / 1000);
+    if (m) massas[s.nome] = { ...m, nota: `volume da malha (${Number(m.volume.toFixed(0))} mm³) vezes ${material.densidade} g/cm³ (${nome})` };
+  }
+  return massas;
+}
+
 /** Exporta a ficha e a malha do objeto. Devolve `{ ficha, caminhoFicha, caminhoMalha, semTipo }`; recusa a ficha que a cópia do esquema recusa. */
 export async function exportarFicha({ objeto, ponte = null, saida = null }) {
   if (!objeto) throw new Error(`Informe o objeto.\n${USO}`);
@@ -103,7 +129,9 @@ export async function exportarFicha({ objeto, ponte = null, saida = null }) {
 
   /* a malha: um nó por peça da ficha, com o identificador dela */
   const nomeDaMalha = `${objeto}.glb`;
-  const { bytes, diagnostico } = exportarMontagemGltf({ nome: resolvida.id, instancias: separarPorParte(instancias, partes) });
+  const separadas = separarPorParte(instancias, partes);
+  const { bytes, diagnostico } = exportarMontagemGltf({ nome: resolvida.id, instancias: separadas });
+  const massas = massasDasPecas(separadas, partes, declaracao);
   const min = [Infinity, Infinity, Infinity]; const max = [-Infinity, -Infinity, -Infinity];
   for (const inst of instancias) {
     const { rotacao, deslocamento } = inst.pose;
@@ -127,6 +155,7 @@ export async function exportarFicha({ objeto, ponte = null, saida = null }) {
     malha: { caminho: nomeDaMalha, caixa: { min, max }, faces: diagnostico.triangulos },
     componentes,
     portasEletricas,
+    massas,
   });
   const conferida = conferirDocumento(ficha);
   if (conferida.erros.length) throw new Error(`a ficha montada não passa na cópia do esquema:\n${textoDosErros(conferida)}`);
