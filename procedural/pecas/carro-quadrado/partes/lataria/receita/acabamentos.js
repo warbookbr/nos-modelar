@@ -95,9 +95,9 @@ export function passosAcabamentos(T, proxId) {
   /* a janela da porta sobe em tumblehome de x = 772 (em y = 956) até x = 626 (em y = 1312) */
   const xVidroPorta = (y) => 772 - ((y - 956) / (1312 - 956)) * (772 - 626);
   for (const [sinal, partePorta] of [[1, 'portaDireita'], [-1, 'portaEsquerda']]) {
-    /* 1. Coluna vertical fina do quebra-vento (z = 440..456, y = 956..1138) acompanhando o tumblehome do vidro */
+    /* 1. Coluna vertical fina do quebra-vento (z = 440..456, y = 956..1132) acompanhando o tumblehome do vidro */
     const idQV = proxId();
-    const y0 = 956; const y1 = 1138;
+    const y0 = 956; const y1 = 1132;
     const x0Out = xVidroPorta(y0) + 4; const x0In = xVidroPorta(y0) - 9;
     const x1Out = xVidroPorta(y1) + 4; const x1In = xVidroPorta(y1) - 9;
     const z0 = 440; const z1 = 456;
@@ -127,6 +127,30 @@ export function passosAcabamentos(T, proxId) {
       : [[3, 2, 1, 0], [1, 5, 4, 0], [2, 5, 1], [3, 4, 5, 2], [0, 4, 3]];
     passos.push(['subdivisao', { origemId: idTri, niveis: 0, vertices: vTri, faces: fTri }]);
     passos.push(['parte', { nome: partePorta, material: 'borrachaVidro', sel: { origem: { op: 'subdivisao', id: idTri } } }]);
+
+    /* 3. Retrovisor externo acoplado ao triângulo da porta (braço + carcaça clássica quadrada chanfrada + espelho embutido) */
+    const idBraco = proxId();
+    passos.push(['chamferBox', {
+      origemId: idBraco, larg: m(96), alt: m(42), prof: m(48), chanfro: m(8),
+      em: [m(sinal * 796), m(1002), m(572)],
+    }]);
+    passos.push(['parte', { nome: partePorta, material: 'plasticoFosco', sel: { origem: { op: 'chamferBox', id: idBraco } } }]);
+
+    /* carcaça clássica anos 80/90 quadrada com cantos chanfrados limpos (sem encolher em seixo) */
+    const idCarc = proxId();
+    passos.push(['chamferBox', {
+      origemId: idCarc, larg: m(152), alt: m(102), prof: m(84), chanfro: m(14),
+      em: [m(sinal * 908), m(1020), m(556)],
+    }]);
+    passos.push(['parte', { nome: partePorta, material: 'plasticoFosco', sel: { origem: { op: 'chamferBox', id: idCarc } } }]);
+
+    /* espelho refletivo prateado assentado dentro da face traseira (-z) da carcaça */
+    const idEsp = proxId();
+    passos.push(['chamferBox', {
+      origemId: idEsp, larg: m(130), alt: m(80), prof: m(8), chanfro: m(3),
+      em: [m(sinal * 908), m(1020), m(515)],
+    }]);
+    passos.push(['parte', { nome: partePorta, material: 'espelhoRetrovisor', sel: { origem: { op: 'chamferBox', id: idEsp } } }]);
   }
 
   return passos;

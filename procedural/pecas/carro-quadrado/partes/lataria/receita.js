@@ -138,6 +138,7 @@ export const MATERIAIS = {
   placa: { cor: '#e8eaed', metalicidade: 0.1, aspereza: 0.35 },
   escapamento: { cor: '#8c929a', metalicidade: 0.75, aspereza: 0.3 },
   borrachaVidro: { cor: '#181b1f', metalicidade: 0.03, aspereza: 0.85 },
+  espelhoRetrovisor: { cor: '#dce6ee', metalicidade: 0.98, aspereza: 0.04 },
   vidroAutomotivo: {
     cor: '#8cb4ae', metalicidade: 0.04, aspereza: 0.03, mistura: 'transparente', opacidade: 0.28,
     verniz: 1.0, asperezaDoVerniz: 0.015, indiceDeRefracao: 1.52,
@@ -212,13 +213,13 @@ export function gerarPassos(T) {
 
   /* abre o vão do vidro dentro de cada porta independente (quadro completo) + vidro traseiro e rebaixo da placa na tampaTraseira + portinhola do tanque */
   const passosPortas = [
-    ['aberturaPorContorno', { origemId: 12, chapa: { origem: { op: 'aberturaPorContorno', id: 6, parte: 'lente' } }, vista: 'x', lente: true, recuoDaLente: m(6), contorno: contornoComFilete(T.vidros.porta) }],
+    ['aberturaPorContorno', { origemId: 12, chapa: { origem: { op: 'aberturaPorContorno', id: 6, parte: 'lente' } }, vista: 'x', sentido: '+', lente: true, recuoDaLente: m(6), contorno: contornoComFilete(T.vidros.porta) }],
     ['parte', { nome: 'portaDireita', material: 'lataria', sel: { origem: { op: 'aberturaPorContorno', id: 12 } } }],
     ['parte', { nome: 'portaDireita', material: 'vidroAutomotivo', sel: { origem: { op: 'aberturaPorContorno', id: 12, parte: 'lente' } } }],
     ['friso', { origemId: idFrPd, superficie: { op: 'aberturaPorContorno', id: 12 }, linha: { nome: 'borrachaPortaDireita' }, perfil: perfBorrachaPorta }],
     ['parte', { nome: 'portaDireita', material: 'borrachaVidro', sel: { origem: { op: 'friso', id: idFrPd } } }],
 
-    ['aberturaPorContorno', { origemId: 13, chapa: { origem: { op: 'aberturaPorContorno', id: 7, parte: 'lente' } }, vista: 'x', lente: true, recuoDaLente: m(6), contorno: contornoComFilete(T.vidros.porta) }],
+    ['aberturaPorContorno', { origemId: 13, chapa: { origem: { op: 'aberturaPorContorno', id: 7, parte: 'lente' } }, vista: 'x', sentido: '-', lente: true, recuoDaLente: m(6), contorno: contornoComFilete(T.vidros.porta) }],
     ['parte', { nome: 'portaEsquerda', material: 'lataria', sel: { origem: { op: 'aberturaPorContorno', id: 13 } } }],
     ['parte', { nome: 'portaEsquerda', material: 'vidroAutomotivo', sel: { origem: { op: 'aberturaPorContorno', id: 13, parte: 'lente' } } }],
     ['friso', { origemId: idFrPe, superficie: { op: 'aberturaPorContorno', id: 13 }, linha: { nome: 'borrachaPortaEsquerda' }, perfil: perfBorrachaPorta }],
