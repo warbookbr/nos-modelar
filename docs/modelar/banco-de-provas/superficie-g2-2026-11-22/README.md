@@ -89,3 +89,16 @@ O custo, pelo script [`custo-da-opcao.mjs`](custo-da-opcao.mjs), mede só a subd
 | 35 (o carro inteiro) | 5.162 | 9,6 | 77,6 | 8,1 | 24,0 |
 
 A etapa B custava 9,8 s no passo 70, 3,8 vezes o custo sem a opção. O gate 4 (até o dobro) reprova. Dois terços do tempo no passo 35 vão para a conferência do ganho, que resolve o sistema uma vez por cota, e o resto para as quatro contas, cada uma com a normal, a energia, a montagem e a fatoração refeitas. A última coluna é uma medida com a conferência desligada à mão, que não existe como opção.
+
+## O custo baixado
+
+No mesmo dia a pessoa mandou baixar o custo. Sem cota exata, o ganho passou a sair da estimativa de Hager e Higham (`estimarNorma1` em `procedural/nucleo/algebra-esparsa.js`, a do xLACON do LAPACK), que precisa de umas vinte resoluções em vez de uma por cota. A estimativa é sempre uma soma que o sistema atinge, então nunca passa do ganho exato. Nas dezoito grades de prova ela acerta o exato em treze e fica acima de 92% dele nas outras. A conta exata só roda quando a estimativa passa de 10, um décimo do limite de 100. No carro o ganho é 4,2 no passo 70 e 4,4 no passo 35. Com cota exata a conta continua exata, uma resolução por cota, agora pela sela sem o refinamento iterativo, que triplicava a conta e muda o ganho a 1e-8 relativo; com isso o teste das chapas de prova cai de 218 s no CI para 73 s na máquina local. Quando a estimativa sem cota exata passa da margem, a conta exata vai em blocos de oito colunas (`somaDasColunasAbsolutas`, os mesmos números bit a bit). Além disso, a ordem de eliminação e a análise simbólica da primeira conta servem às outras três, a matriz se monta só na parte de cima e se espelha, e a normal do vértice regular sai da fórmula fechada do anel, com o oráculo só nos outros.
+
+O script passou a medir cada caso três vezes, alternando com e sem a opção, e a valer o menor tempo, porque no Windows a mesma medida variou de 2,2 a 3,6 s sem a opção:
+
+| passo da chapa (mm) | sem a opção (s) | com a opção (s) | razão |
+|---|---|---|---|
+| 70 | 2,21 | 3,90 | 1,76 |
+| 35 | 8,25 | 14,54 | 1,76 |
+
+O ajuste sozinho, no passo 70, leva 1,5 s com a opção, contra 0,4 a 0,6 s sem ela: 0,27 s na energia, 0,30 nas normais dos vértices que não são regulares, 0,38 na montagem e 0,46 nas quatro fatorações.

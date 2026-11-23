@@ -4,13 +4,15 @@
  * como no ensaio de escala do carro (`../carro-fastback-2026-11-14/ensaio-de-escala.mjs`).
  * Uso, da raiz do repositório:
  *   node docs/modelar/banco-de-provas/superficie-g2-2026-11-22/custo-da-opcao.mjs [passo em mm ...]
- * Sem passo, mede 70 (o da receita) e 35 (o tamanho do carro inteiro). Cada caso roda num processo filho, para o pico de memória ser o dele,
- * e sai uma linha JSON por caso e a razão entre com e sem a opção. Nada no repositório versionado é escrito. */
+ * Sem passo, mede 70 (o da receita) e 35 (o tamanho do carro inteiro). Cada caso roda REPETICOES vezes, alternando com e sem a opção, cada
+ * vez num processo filho, para o pico de memória ser o dele; vale o menor tempo de cada caso, porque o ruído da máquina só soma. Sai uma
+ * linha JSON por caso, com os tempos de cada vez, e a razão entre os menores. Nada no repositório versionado é escrito. */
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';
 
 const RAIZ = resolve(fileURLToPath(import.meta.url), '../../../../..');
+const REPETICOES = 3;
 const imp = (p) => import(pathToFileURL(resolve(RAIZ, p)).href);
 
 async function medir(passo, com) {
@@ -35,12 +37,15 @@ if (modo === '--um') {
   const passos = [modo, ...resto].filter((x) => x != null).map(Number);
   for (const passo of passos.length ? passos : [70, 35]) {
     const r = {};
-    for (const com of ['sem', 'com']) {
+    for (let vez = 0; vez < REPETICOES; vez++) for (const com of ['sem', 'com']) {
       const p = spawnSync(process.execPath, ['--max-old-space-size=8192', fileURLToPath(import.meta.url), '--um', String(passo), com], { cwd: RAIZ, encoding: 'utf8', maxBuffer: 1 << 26 });
       const ultima = p.stdout.trim().split('\n').filter((l) => l.startsWith('{')).pop();
       if (p.status !== 0 || !ultima) throw new Error(`passo ${passo}, ${com} a opção: ${p.stderr.trim().split('\n').slice(-3).join(' | ')}`);
-      console.log(ultima); r[com] = JSON.parse(ultima);
+      const m = JSON.parse(ultima);
+      if (!r[com]) r[com] = { ...m, vezes: [] };
+      r[com].vezes.push(m.segundos); r[com].segundos = Math.min(...r[com].vezes); r[com].picoMb = Math.max(r[com].picoMb, m.picoMb);
     }
-    console.log(JSON.stringify({ passo, razao: +(r.com.segundos / r.sem.segundos).toFixed(1) }));
+    for (const com of ['sem', 'com']) console.log(JSON.stringify(r[com]));
+    console.log(JSON.stringify({ passo, razao: +(r.com.segundos / r.sem.segundos).toFixed(2) }));
   }
 }

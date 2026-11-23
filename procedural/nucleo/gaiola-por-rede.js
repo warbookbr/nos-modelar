@@ -31,7 +31,7 @@
  *     curva de cota exata deixa de ser crista de curvatura contra o miolo. O miolo dos retalhos de quatro lados é preenchido pelas curvas
  *     vizinhas (a curva seguinte da rede de cada lado; sem a opção o preenchimento não muda), fica sem o `liso` e tem a cota de peso 0,003
  *     (`interior` junto troca o peso, e `interior: false` é recusado); a onda vale de 2 a 64 passos da gaiola; não vale com `liso` nem com
- *     curva com `continuidade`. Desligada por padrão, e experimental: não use em receita enquanto o custo passar do dobro do de sem ela.
+ *     curva com `continuidade`. Desligada por padrão, e experimental: não use em receita antes de a forma que ela dá ser aprovada numa lataria.
  * devolve: { pontos, passo, linha(curva), pontoDaCurva, linhas, nos, curvas, retalhos, densidades, extraordinarios, avisos, emendas?, ... }.
  * exemplo:
  *   gaiolaPorRede({ passo: 50, fora: [0, 1, 0], nos: { A: [0, 0, 0], B: [200, 0, 0], C: [200, 0, 200], D: [0, 0, 200] },

@@ -28,7 +28,7 @@
  */
 
 import { memoizarPura } from './memoria-de-pura.js';
-import { matrizPorLinhas, paraDensa, cotaDeVarah, fatorarCholesky, resolverCholesky, fatorarLUEsparso, resolverLUEsparso, baseDoNucleo, fatorarSelaPorSchur } from './algebra-esparsa.js';
+import { matrizPorLinhas, paraDensa, cotaDeVarah, fatorarCholesky, resolverCholesky, somaDasColunasAbsolutas, estimarNorma1, ordemDeGrauMinimo, fatorarLUEsparso, resolverLUEsparso, baseDoNucleo, fatorarSelaPorSchur } from './algebra-esparsa.js';
 
 export const NITIDEZ_INFINITA = Infinity;
 export const NITIDEZ_VIVA = 10;
@@ -432,6 +432,9 @@ function pesosDaEstrela(estrela, canto, borda) {
  * não é o que limita, porque com ganho 100 o erro dele fica perto de 1e-14 da escala da peça. Pivô nulo é sistema
  * singular e falha com os pontos do vetor nulo. */
 export const GANHO_MAXIMO_DAS_MEDIDAS = 100;
+/** no ajuste com a curvatura normal sem cota exata, o ganho estimado (uma cota inferior, de Hager e Higham) só dispensa a conta exata
+ *  quando fica abaixo do limite dividido por esta margem: o estimador erra para menos raramente mais que 3 vezes */
+export const MARGEM_DA_ESTIMATIVA_DO_GANHO = 10;
 export const TOLERANCIA_DAS_MEDIDAS = 1e-6;
 
 export class ErroDasMedidas extends TypeError {
@@ -672,8 +675,8 @@ export function energiaDeCurvaturaNormal(gaiola, base = gaiola.vertices, { onda 
     voltas[i] = r;
     return r;
   };
-  /* as três curvaturas no vértice i com +u no k-ésimo vizinho, como listas [vértice, vetor] (o vetor já multiplicado pela normal) */
-  const curvaturas = (i, k) => {
+  /* o anel 3×3 do vértice i com +u no k-ésimo vizinho, as tangentes do limite na base e a normal */
+  const quadro = (i, k) => {
     const { viz, diag } = volta(i); const v = (j) => viz[(k + j) % 4]; const q = (j) => diag[(k + j) % 4];
     const anel = [[q(2), v(2), q(1)], [v(3), i, v(1)], [q(3), v(0), q(0)]];
     const Su = [0, 0, 0]; const Sv = [0, 0, 0];
@@ -682,7 +685,12 @@ export function energiaDeCurvaturaNormal(gaiola, base = gaiola.vertices, { onda 
       for (let x = 0; x < 3; x++) { Su[x] += wu * p[x]; Sv[x] += wv * p[x]; }
     }
     const c = [Su[1] * Sv[2] - Su[2] * Sv[1], Su[2] * Sv[0] - Su[0] * Sv[2], Su[0] * Sv[1] - Su[1] * Sv[0]];
-    const lc = Math.hypot(c[0], c[1], c[2]); const nn = [c[0] / lc, c[1] / lc, c[2] / lc];
+    const lc = Math.hypot(c[0], c[1], c[2]);
+    return { anel, Su, Sv, nn: [c[0] / lc, c[1] / lc, c[2] / lc] };
+  };
+  /* as três curvaturas no vértice i com +u no k-ésimo vizinho, como listas [vértice, vetor] (o vetor já multiplicado pela normal) */
+  const curvaturas = (i, k) => {
+    const { anel, Su, Sv, nn } = quadro(i, k);
     const E = Su[0] * Su[0] + Su[1] * Su[1] + Su[2] * Su[2]; const G = Sv[0] * Sv[0] + Sv[1] * Sv[1] + Sv[2] * Sv[2]; const raiz = Math.sqrt(E * G);
     const uu = []; const uv = []; const vv = [];
     for (let a = 0; a < 3; a++) for (let b = 0; b < 3; b++) {
@@ -713,21 +721,28 @@ export function energiaDeCurvaturaNormal(gaiola, base = gaiola.vertices, { onda 
     for (const { peso, linhas } of termos) for (const l of linhas) { let r = 0; for (const [j, g] of l) r += g[0] * V[j][0] + g[1] * V[j][1] + g[2] * V[j][2]; soma += peso * r * r; }
     return soma;
   };
-  return { onda: ondaUsada, passo, termos, valor };
+  /* a normal do limite na base em cada vértice regular, a mesma de qualquer vizinho como +u (girar o anel gira S_u e S_v juntos) */
+  const normais = Array.from({ length: n }, (_, i) => (volta(i) ? quadro(i, 0).nn : null));
+  return { onda: ondaUsada, passo, termos, valor, normais };
 }
 
 /** as vezes que o ajuste com a curvatura normal refaz a conta, cada uma linearizada na gaiola da anterior: na grade de razão 2 a mudança
  *  entre duas seguidas cai de 0,26 mm na segunda para 0,001 mm na quinta, e o cilindro passa de 0,365 para 0,268 mm na quarta */
 export const ITERACOES_DA_CURVATURA = 4;
 
-/* a normal do limite em cada vértice da gaiola, pelo oráculo: o canto de uma face que o tem */
-function normaisDoLimite(gaiola) {
-  const sup = superficieLimite(gaiola); const L = limitesDaGaiola(gaiola); const CANTO = [[0, 0], [1, 0], [1, 1], [0, 1]];
-  const N = new Array(gaiola.vertices.length).fill(null);
+/* a normal do limite em cada vértice da gaiola: a dada (a fórmula fechada do vértice regular) ou, no que falta, a do oráculo, o canto de
+   uma face que o tem */
+function normaisDoLimite(gaiola, dadas) {
+  const N = dadas.slice();
+  if (!gaiola.faces.some((f) => f.some((v) => !N[v]))) return N;
+  /* o ponto limite só dos vértices que faltam, para conferir o canto que o oráculo avaliou */
+  const sup = superficieLimite(gaiola); const { nitidez, C, facesDoV } = prepararLimite(gaiola); const CANTO = [[0, 0], [1, 0], [1, 1], [0, 1]];
+  const L = new Map(); const limite = (v) => { if (!L.has(v)) L.set(v, limiteDaEstrela(estrelaDe(gaiola.vertices, gaiola.faces, facesDoV[v], nitidez, v), C.has(v), gaiola.borda ?? 'suave')); return L.get(v); };
   gaiola.faces.forEach((f, fi) => f.forEach((v, k) => {
     if (N[v]) return;
     const a = f.length === 4 ? sup.avaliar(fi, ...CANTO[k]) : sup.avaliar(fi, 0, 0, { canto: k });
-    if (a.normal && Math.hypot(a.ponto[0] - L[v][0], a.ponto[1] - L[v][1], a.ponto[2] - L[v][2]) < 1e-9) N[v] = a.normal;
+    const l = limite(v);
+    if (a.normal && Math.hypot(a.ponto[0] - l[0], a.ponto[1] - l[1], a.ponto[2] - l[2]) < 1e-9) N[v] = a.normal;
   }));
   const falta = N.findIndex((nn, j) => !nn && gaiola.faces.some((f) => f.includes(j)));
   if (falta >= 0) throw new TypeError(`subdivisão: a curvatura normal não achou a normal do limite no vértice ${falta}`);
@@ -743,13 +758,21 @@ function normaisDoLimite(gaiola) {
  * cota exata fica o contrato de sempre, o ponto limite no ponto declarado a TOLERANCIA_DAS_MEDIDAS. A primeira conta usa a gaiola
  * declarada como base, e cada uma das ITERACOES_DA_CURVATURA − 1 seguintes usa a gaiola da anterior, com as mesmas cotas: a normal e a
  * métrica congeladas na declarada deixam de valer onde a conta move as tangentes (a grade de razão 2). Sem cota exata o sistema vai ao
- * Cholesky esparso; com elas, ao complemento de Schur; quando o Cholesky para, à eliminação densa, que `denso` força. O ganho é o da
- * última conta, a maior soma, por vértice, do quanto a gaiola anda por unidade de cota, uma resolução por cota. */
+ * Cholesky esparso; com elas, ao complemento de Schur; quando o Cholesky para, à eliminação densa, que `denso` força. A ordem de
+ * eliminação e a análise simbólica da primeira conta servem às seguintes, e H se monta só na parte de cima e se espelha. O ganho é o da
+ * última conta, a maior soma, por vértice, do quanto a gaiola anda por unidade de cota. Sem cota exata ele sai da estimativa de Hager e
+ * Higham (`estimarNorma1`, umas vinte resoluções, `ganhoEstimado: true`), e a conta exata, uma resolução por cota, só roda quando a
+ * estimativa passa de GANHO_MAXIMO_DAS_MEDIDAS / MARGEM_DA_ESTIMATIVA_DO_GANHO; com cota exata ela roda sempre, pela sela sem o refinamento iterativo (o
+ * ganho muda a 1e-8 relativo e custa um terço). No quarto traseiro de uma
+ * lataria, com 4.255 e 10.220 incógnitas, a conta exata levava dois terços do ajuste. */
 function ajusteDaCurvaturaNormal({ gaiola, energia, M, exatos, comPeso, pesoDe, linhaDe, denso }) {
   const P = gaiola.vertices; const nV = P.length;
+  /* a ordem de eliminação sai da primeira conta e serve às seguintes: a estrutura de H é a mesma, e qualquer ordem dá o fator certo */
+  let ordem = null; let simbolico = null;
   const umaConta = (B, comGanho) => {
     const gB = { ...gaiola, vertices: B };
-    const N = normaisDoLimite(gB);
+    const curvatura = energiaDeCurvaturaNormal(gaiola, B, { onda: energia.onda });
+    const N = normaisDoLimite(gB, curvatura.normais);
     const direcoes = []; const doVertice = Array.from({ length: nV }, () => []);
     for (let j = 0; j < nV; j++) { if (!N[j]) continue; doVertice[j].push(direcoes.length); direcoes.push({ j, d: N[j] }); }
     for (const i of exatos) {
@@ -768,25 +791,31 @@ function ajusteDaCurvaturaNormal({ gaiola, energia, M, exatos, comPeso, pesoDe, 
     const doLimite = (i, e) => { const { globais, w } = linhaDe.get(i); const l = []; globais.forEach((j, c) => { if (w[c] !== 0) l.push([j, [w[c] * e[0], w[c] * e[1], w[c] * e[2]]]); }); return l; };
     const H = matrizPorLinhas(nZ); const rhs = new Array(nZ).fill(0);
     for (let k = 0; k < nZ; k++) H.somar(k, k, RESTO_DO_DESLOCAMENTO);
-    const quadrado = (peso, { c0, coef }, alvo) => { for (const [r, wr] of coef) { for (const [c, wc] of coef) H.somar(r, c, peso * wr * wc); rhs[r] += peso * wr * (alvo - c0); } };
+    /* só a parte de cima (r ≤ c, com coef em ordem de coluna), espelhada depois: H sai simétrica bit a bit e a montagem custa a metade */
+    const quadrado = (peso, { c0, coef }, alvo) => {
+      for (let a = 0; a < coef.length; a++) { const [r, wr] = coef[a]; const pw = peso * wr; for (let b = a; b < coef.length; b++) H.somar(r, coef[b][0], pw * coef[b][1]); rhs[r] += pw * (alvo - c0); }
+    };
     const sensibilidade = [];
     for (const i of comPeso) {
       const p = pesoDe.get(i); const l = emZ(doLimite(i, N[i])); quadrado(p, l, N[i][0] * P[i][0] + N[i][1] * P[i][1] + N[i][2] * P[i][2]);
       sensibilidade.push(new Map(l.coef.map(([r, w]) => [r, p * w])));
     }
-    const curvatura = energiaDeCurvaturaNormal(gaiola, B, { onda: energia.onda });
     for (const { peso, linhas } of curvatura.termos) for (const l of linhas) quadrado(peso, emZ(l), 0);
+    for (let r = 0; r < nZ; r++) for (const [c, v] of H.linhas[r]) if (c > r) H.linhas[c].set(r, v);
     const restricoes = [];
     for (const i of exatos) for (const e of [[1, 0, 0], [0, 1, 0], [0, 0, 1]]) { const { c0, coef } = emZ(doLimite(i, e)); restricoes.push({ i, coef, alvo: e[0] * P[i][0] + e[1] * P[i][1] + e[2] * P[i][2] - c0 }); }
     const nR = restricoes.length;
-    let resolver = null;
+    let resolver = null; let fator = null; let resolverDoGanho = null;
     if (!denso && nR === 0) {
-      const fator = fatorarCholesky(H);
-      if (fator.naoPositivaEm === undefined) resolver = (b) => ({ x: resolverCholesky(fator, b), mu: [] });
+      ordem ??= ordemDeGrauMinimo(H);
+      fator = fatorarCholesky(H, ordem, { simbolico });
+      if (fator.naoPositivaEm === undefined) { simbolico = fator.simbolico; resolver = (b) => ({ x: resolverCholesky(fator, b), mu: [] }); } else fator = null;
     } else if (!denso) {
-      const sela = fatorarSelaPorSchur(H, restricoes.map((r) => r.coef));
+      ordem ??= ordemDeGrauMinimo(H);
+      const sela = fatorarSelaPorSchur(H, restricoes.map((r) => r.coef), { ordem });
       if (sela?.nucleo) throw new ErroDasMedidas('as medidas formam sistema singular, porque a superfície limite não separa estes pontos', [...new Set(sela.nucleo.map((s) => restricoes[s].i))].sort((a, b) => a - b));
-      if (sela) resolver = (b, g) => sela.resolver(b, g, { refinar: PASSOS_DE_REFINAMENTO });
+      /* o ganho é um tamanho, comparado com 100: as colunas dele dispensam o refinamento, que triplica a conta */
+      if (sela) { resolver = (b, g) => sela.resolver(b, g, { refinar: PASSOS_DE_REFINAMENTO }); resolverDoGanho = (b, g) => sela.resolver(b, g); }
     }
     if (!resolver) {
       const n = nZ + nR;
@@ -799,17 +828,34 @@ function ajusteDaCurvaturaNormal({ gaiola, energia, M, exatos, comPeso, pesoDe, 
     const { x: z } = resolver(rhs, restricoes.map((r) => r.alvo));
     const V = B.map((p) => [...p]);
     direcoes.forEach(({ j, d }, k) => { V[j][0] += z[k] * d[0]; V[j][1] += z[k] * d[1]; V[j][2] += z[k] * d[2]; });
-    let ganho = 0;
-    if (comGanho) {
-      const somas = new Float64Array(nV); const zeroX = new Array(nZ).fill(0); const zeroG = new Array(nR).fill(0);
-      const acumular = (x) => { for (let k = 0; k < nZ; k++) somas[direcoes[k].j] += Math.abs(x[k]); };
-      for (const s of sensibilidade) { for (const [r, v] of s) zeroX[r] = v; acumular(resolver(zeroX, zeroG).x); for (const [r] of s) zeroX[r] = 0; }
-      for (let t = 0; t < nR; t++) { zeroG[t] = 1; acumular(resolver(zeroX, zeroG).x); zeroG[t] = 0; }
+    let ganho = 0; let ganhoEstimado = false;
+    /* sem cota exata, o ganho é ‖H⁻¹ S‖∞ (uma direção por vértice), igual a ‖(H⁻¹ S)ᵀ‖₁, e o estimador o tira de umas vinte resoluções;
+       ele é uma soma que o sistema atinge, e a conta exata, uma resolução por cota, só roda quando ele passa do limite sobre a margem */
+    if (comGanho && fator && sensibilidade.length) {
+      const colunas = sensibilidade.map((s) => [...s]);
+      const est = estimarNorma1({
+        n: nZ,
+        aplicar: (x) => { const h = resolverCholesky(fator, x); return colunas.map((c) => { let v = 0; for (const [r, w] of c) v += w * h[r]; return v; }); },
+        aplicarTransposta: (xi) => { const u = new Array(nZ).fill(0); colunas.forEach((c, t) => { for (const [r, w] of c) u[r] += w * xi[t]; }); return resolverCholesky(fator, u); },
+      });
+      if (est.estimativa * MARGEM_DA_ESTIMATIVA_DO_GANHO <= GANHO_MAXIMO_DAS_MEDIDAS) { ganho = est.estimativa; ganhoEstimado = true; }
+    }
+    if (comGanho && !ganhoEstimado) {
+      let somas;
+      /* sem cota exata, as colunas vão em blocos pelo fator (os mesmos números que uma a uma); com elas, uma a uma pela sela */
+      if (fator) somas = somaDasColunasAbsolutas(fator, sensibilidade.map((s) => [...s]), { grupo: Int32Array.from(direcoes, (d) => d.j), tamanho: nV });
+      else {
+        somas = new Float64Array(nV); const zeroX = new Array(nZ).fill(0); const zeroG = new Array(nR).fill(0);
+        const acumular = (x) => { for (let k = 0; k < nZ; k++) somas[direcoes[k].j] += Math.abs(x[k]); };
+        const umaColuna = resolverDoGanho ?? resolver;
+        for (const s of sensibilidade) { for (const [r, v] of s) zeroX[r] = v; acumular(umaColuna(zeroX, zeroG).x); for (const [r] of s) zeroX[r] = 0; }
+        for (let t = 0; t < nR; t++) { zeroG[t] = 1; acumular(umaColuna(zeroX, zeroG).x); zeroG[t] = 0; }
+      }
       let pior = 0;
       for (let j = 0; j < nV; j++) if (somas[j] > ganho) { ganho = somas[j]; pior = j; }
       if (ganho > GANHO_MAXIMO_DAS_MEDIDAS) throw new ErroDasMedidas(`as medidas formam sistema mal condicionado (ganho ${ganho.toPrecision(3)}, acima de ${GANHO_MAXIMO_DAS_MEDIDAS}), com o pior no vértice ${pior}`, M);
     }
-    return { V, ganho, curvatura };
+    return { V, ganho, ganhoEstimado, curvatura };
   };
   let B = P; let r = null; const mudancas = [];
   for (let it = 0; it < ITERACOES_DA_CURVATURA; it++) {
@@ -817,7 +863,7 @@ function ajusteDaCurvaturaNormal({ gaiola, energia, M, exatos, comPeso, pesoDe, 
     if (it > 0) { let m = 0; for (let j = 0; j < nV; j++) m = Math.max(m, Math.hypot(r.V[j][0] - B[j][0], r.V[j][1] - B[j][1], r.V[j][2] - B[j][2])); mudancas.push(m); }
     B = r.V;
   }
-  return { vertices: r.V, ganho: r.ganho, curvatura: r.curvatura, mudancas };
+  return { vertices: r.V, ganho: r.ganho, ganhoEstimado: r.ganhoEstimado, curvatura: r.curvatura, mudancas };
 }
 
 /* O ajuste com peso sem cota exata, pelo Cholesky esparso: H = Σ p_i W̃_iᵀ W̃_i + I (ou a energia mais o resto) é simétrica positiva
@@ -980,7 +1026,7 @@ function ajustarComPesoSemMemoria(gaiola, medidas, regularizacao = null, { denso
     const fora = M.filter((i, k) => pesoDe.get(i) === Infinity && residuos[k] > TOLERANCIA_DAS_MEDIDAS);
     if (fora.length) throw new ErroDasMedidas(`a superfície limite não chegou a ${TOLERANCIA_DAS_MEDIDAS} m das medidas exatas`, fora);
     const c = r.curvatura;
-    return { vertices: V, ganho: r.ganho, ganhoPelaCota: false, residuos, medidas: M, regularizacao: { tipo: energia.tipo, onda: c.onda, passo: c.passo, arestasComTermo: c.termos.length, energiaAntes: c.valor(P), energiaDepois: c.valor(V), iteracoes: ITERACOES_DA_CURVATURA, mudancas: r.mudancas } };
+    return { vertices: V, ganho: r.ganho, ganhoPelaCota: false, ganhoEstimado: r.ganhoEstimado, residuos, medidas: M, regularizacao: { tipo: energia.tipo, onda: c.onda, passo: c.passo, arestasComTermo: c.termos.length, energiaAntes: c.valor(P), energiaDepois: c.valor(V), iteracoes: ITERACOES_DA_CURVATURA, mudancas: r.mudancas } };
   }
   const emU = new Set(exatos);
   for (const i of comPeso) for (const j of linhaDe.get(i).globais) emU.add(j);

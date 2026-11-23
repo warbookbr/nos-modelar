@@ -17,6 +17,9 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { lerHistorico } from './vitest-duracoes.mjs';
 
 export const TESTES_LENTOS = [
+  /* 2026-11-22: o ajuste da subdivisão contra o denso de referência, que com a curvatura normal refaz a conta quatro vezes (plano do G2, fatia 2);
+     16,7 s sozinho no CI, 14 s dos 16 nas três comparações com o denso */
+  'procedural/nucleo/subdivisao.test.mjs',
   /* 2026-11-21: a divisão por contorno com as chapas de prova da fatia 2 e 3; 13 s sozinho e 33 s na bateria do CI */
   'procedural/nucleo/operacoes/divisao-por-contorno.test.mjs',
   /* 2026-11-21: a porta de autoria confere a forma pedida montando a peça; 19 s sozinho e 43 s na bateria do CI */
