@@ -543,12 +543,12 @@ describe('o ajuste denso diante da ordem dos vértices, e o esparso contra ele',
     expect(contraODenso(gr, renumeradas(ms), null).dif).toBeLessThan(1e-9);
   });
 
-  it('com a energia de curvatura, o esparso fica a dez vezes o piso do denso renumerado, e o ganho é o exato porque a cota não vale', () => {
+  it('com a energia de curvatura, o esparso fica a dez vezes o piso do denso renumerado, e o ganho é o estimado, porque a cota de Varah não vale', () => {
     for (const regularizacao of [{ tipo: 'variacaoDeCurvatura' }, { tipo: 'variacaoDeCurvatura', onda: 16 * passo }, { tipo: 'variacaoDeCurvatura', onda: 64 * passo }]) {
       const piso = Math.max(pelaOrdem(false, regularizacao), 1e-13);
       const { dif, e } = contraODenso(g, medidas(false), regularizacao);
       expect(dif).toBeLessThan(10 * piso);
-      expect(e.ganhoPelaCota).toBe(false);
+      expect(e.ganhoPelaCota).toBe(false); expect(e.ganhoEstimado).toBe(true);
     }
   });
 

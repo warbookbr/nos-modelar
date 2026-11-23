@@ -762,7 +762,8 @@ function normaisDoLimite(gaiola, dadas) {
  * eliminação e a análise simbólica da primeira conta servem às seguintes, e H se monta só na parte de cima e se espelha. O ganho é o da
  * última conta, a maior soma, por vértice, do quanto a gaiola anda por unidade de cota. Sem cota exata ele sai da estimativa de Hager e
  * Higham (`estimarNorma1`, umas vinte resoluções, `ganhoEstimado: true`), e a conta exata, uma resolução por cota, só roda quando a
- * estimativa passa de GANHO_MAXIMO_DAS_MEDIDAS / MARGEM_DA_ESTIMATIVA_DO_GANHO; com cota exata ela roda sempre. No quarto traseiro de uma
+ * estimativa passa de GANHO_MAXIMO_DAS_MEDIDAS / MARGEM_DA_ESTIMATIVA_DO_GANHO; com cota exata ela roda sempre, pela sela sem o refinamento iterativo (o
+ * ganho muda a 1e-8 relativo e custa um terço). No quarto traseiro de uma
  * lataria, com 4.255 e 10.220 incógnitas, a conta exata levava dois terços do ajuste. */
 function ajusteDaCurvaturaNormal({ gaiola, energia, M, exatos, comPeso, pesoDe, linhaDe, denso }) {
   const P = gaiola.vertices; const nV = P.length;
@@ -804,7 +805,7 @@ function ajusteDaCurvaturaNormal({ gaiola, energia, M, exatos, comPeso, pesoDe, 
     const restricoes = [];
     for (const i of exatos) for (const e of [[1, 0, 0], [0, 1, 0], [0, 0, 1]]) { const { c0, coef } = emZ(doLimite(i, e)); restricoes.push({ i, coef, alvo: e[0] * P[i][0] + e[1] * P[i][1] + e[2] * P[i][2] - c0 }); }
     const nR = restricoes.length;
-    let resolver = null; let fator = null;
+    let resolver = null; let fator = null; let resolverDoGanho = null;
     if (!denso && nR === 0) {
       ordem ??= ordemDeGrauMinimo(H);
       fator = fatorarCholesky(H, ordem, { simbolico });
@@ -813,7 +814,8 @@ function ajusteDaCurvaturaNormal({ gaiola, energia, M, exatos, comPeso, pesoDe, 
       ordem ??= ordemDeGrauMinimo(H);
       const sela = fatorarSelaPorSchur(H, restricoes.map((r) => r.coef), { ordem });
       if (sela?.nucleo) throw new ErroDasMedidas('as medidas formam sistema singular, porque a superfície limite não separa estes pontos', [...new Set(sela.nucleo.map((s) => restricoes[s].i))].sort((a, b) => a - b));
-      if (sela) resolver = (b, g) => sela.resolver(b, g, { refinar: PASSOS_DE_REFINAMENTO });
+      /* o ganho é um tamanho, comparado com 100: as colunas dele dispensam o refinamento, que triplica a conta */
+      if (sela) { resolver = (b, g) => sela.resolver(b, g, { refinar: PASSOS_DE_REFINAMENTO }); resolverDoGanho = (b, g) => sela.resolver(b, g); }
     }
     if (!resolver) {
       const n = nZ + nR;
@@ -845,8 +847,9 @@ function ajusteDaCurvaturaNormal({ gaiola, energia, M, exatos, comPeso, pesoDe, 
       else {
         somas = new Float64Array(nV); const zeroX = new Array(nZ).fill(0); const zeroG = new Array(nR).fill(0);
         const acumular = (x) => { for (let k = 0; k < nZ; k++) somas[direcoes[k].j] += Math.abs(x[k]); };
-        for (const s of sensibilidade) { for (const [r, v] of s) zeroX[r] = v; acumular(resolver(zeroX, zeroG).x); for (const [r] of s) zeroX[r] = 0; }
-        for (let t = 0; t < nR; t++) { zeroG[t] = 1; acumular(resolver(zeroX, zeroG).x); zeroG[t] = 0; }
+        const umaColuna = resolverDoGanho ?? resolver;
+        for (const s of sensibilidade) { for (const [r, v] of s) zeroX[r] = v; acumular(umaColuna(zeroX, zeroG).x); for (const [r] of s) zeroX[r] = 0; }
+        for (let t = 0; t < nR; t++) { zeroG[t] = 1; acumular(umaColuna(zeroX, zeroG).x); zeroG[t] = 0; }
       }
       let pior = 0;
       for (let j = 0; j < nV; j++) if (somas[j] > ganho) { ganho = somas[j]; pior = j; }
