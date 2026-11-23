@@ -1,7 +1,7 @@
 /* carro-quadrado/lataria — lataria completa da perua quadrada de duas portas (4.050 × 1.670 × 1.390 mm).
  * As medidas vêm de `../../andaime.json` e das quatro fotos em `../../referencias/locais/`.
  * Referencial: x para a direita, y para cima com o chão em 0, z para a frente (-2025 a +2025). */
-import { m, derivarChapa, projetarVista, contornoComFilete, fazerArcoD, fazerArcoT } from './receita/chapa.js';
+import { m, derivarChapa, projetarVista, contornoComFilete } from './receita/chapa.js';
 import { rebaixoPorContorno } from '../../../../nucleo/rebaixo-por-contorno.js';
 import { derivarParachoques, passosParachoques } from './receita/parachoques.js';
 import { ALIASES_FRENTE_TRASEIRA, passosFrenteTraseira } from './receita/frente-traseira.js';
@@ -11,17 +11,16 @@ import { passosRetrovisores } from './receita/retrovisor.js';
 
 export const TABELA = {
   chapa: { espessura: 8, passo: 200, niveis: 2, anguloMax: 20, liso: false },
-  estacoes: [1910, 1550, 1235, 845, 310, -300, -1125, -1530, -1730, -1935],
+  estacoes: [1910, 1660, 810, 310, -300, -700, -1560, -1730, -1935],
   /* cada seção tem 7 níveis: soleira, baixo, meio (Curva 3), vinco (lateral), cintura (topo do chanfro), quina (coluna A / borda do teto), eixo */
   secoes: {
     1910:    [[760, 290], [795, 425], [810, 610], [804, 708], [768, 738], [696, 746], 750],
-    1550:    [[780, 255], [810, 425], [825, 615], [818, 732], [766, 794], [708, 804], 810],
-    1235:    [[790, 255], [820, 425], [835, 620], [830, 750], [774, 846], [718, 856], 864],
-    845:     [[795, 255], [825, 425], [840, 625], [838, 770], [776, 908], [728, 922], 932],
+    1660:    [[774, 255], [805, 425], [820, 613], [814, 725], [767, 777], [704, 786], 792],
+    810:     [[795, 255], [825, 425], [840, 625], [838, 771], [776, 911], [726, 932], 942],
     310:     [[795, 255], [825, 425], [840, 630], [838, 778], [775, 945], [612, 1362], 1380],
     '-300':  [[795, 255], [825, 425], [840, 632], [838, 785], [775, 945], [612, 1382], 1398],
-    '-1125': [[795, 255], [825, 425], [840, 632], [838, 792], [775, 945], [612, 1380], 1396],
-    '-1530': [[790, 255], [820, 425], [835, 632], [833, 796], [775, 945], [612, 1364], 1380],
+    '-700':  [[795, 255], [825, 425], [840, 632], [838, 788], [775, 945], [612, 1381], 1397],
+    '-1560': [[788, 255], [818, 425], [833, 631], [831, 796], [774, 945], [620, 1335], 1350],
     '-1730': [[778, 265], [808, 428], [824, 628], [822, 798], [768, 942], [664, 1170], 1180],
     '-1935': [[762, 285], [792, 430], [810, 625], [808, 800], [755, 932], [714, 962], 968],
   },
@@ -67,11 +66,11 @@ export const TABELA = {
     tampaTanque: [[-1355, 655, 16], [-1505, 655, 16], [-1505, 795, 16], [-1355, 795, 16]],
   },
   parachoqueDianteiro: {
-    y0: 282, y1: 524, xTrilho: 785, zFrente: 2022, zLateral: 1625, raioCanto: 98,
+    y0: 282, y1: 524, xTrilho: 785, zFrente: 2022, zLateral: 1635, raioCanto: 98,
     avanco: 46, saia: 4, recuo: 25, frisoY: 484, frisoAlt: 7, frisoSaida: 3.5,
   },
   parachoqueTraseiro: {
-    y0: 278, y1: 515, xTrilho: 790, zTras: -2025, zLateral: -1515, raioCanto: 90,
+    y0: 278, y1: 515, xTrilho: 790, zTras: -2025, zLateral: -1525, raioCanto: 90,
     avanco: 50, saia: 10, recuo: 25, frisoY: 480, frisoAlt: 7, frisoSaida: 3.5,
   },
   frisoLateral: {
@@ -153,12 +152,10 @@ export function derivar(T) {
   return { rede, zs, varridos, capo };
 }
 
-export const ALIASES = [...fazerArcoD(TABELA).aliases, ...fazerArcoT(TABELA).aliases, ...ALIASES_FRENTE_TRASEIRA];
+export const ALIASES = [...ALIASES_FRENTE_TRASEIRA];
 
 export function gerarPassos(T) {
   const { rede, varridos, capo } = derivar(T);
-  const arcoD = fazerArcoD(T);
-  const arcoT = fazerArcoT(T);
   const { medidas: _, cantos: cantosRede, ...passoRede } = rede.passo;
   const cantosChapa = (cantosRede ?? []).filter((c) => c !== 'f_cintura' && c !== 't_cintura');
 
@@ -196,10 +193,8 @@ export function gerarPassos(T) {
 
   const passosChapa = [
     ['subdivisao', { origemId: 1, ...passoRede, cantos: cantosChapa, borda: 'cantos', niveis: T.chapa.niveis, espessura: m(T.chapa.espessura), costuraExata: true }],
-    ...arcoD.passos,
-    ...arcoT.passos,
     /* recorta as duas portas como peças próprias (lente: true com recuoDaLente: 4 mm = fenda física real preservando 100% da curvatura da lataria) */
-    ['aberturaPorContorno', { origemId: 6, chapa: { origem: { op: 'subtrair', id: 5 } }, vista: 'x', sentido: '+', lente: true, recuoDaLente: m(4), contorno: contornoComFilete(T.aberturas.porta) }],
+    ['aberturaPorContorno', { origemId: 6, chapa: { origem: { op: 'subdivisao', id: 1 } }, vista: 'x', sentido: '+', lente: true, recuoDaLente: m(4), contorno: contornoComFilete(T.aberturas.porta) }],
     ['aberturaPorContorno', { origemId: 7, chapa: { origem: { op: 'aberturaPorContorno', id: 6 } }, vista: 'x', sentido: '-', lente: true, recuoDaLente: m(4), contorno: contornoComFilete(T.aberturas.porta) }],
     /* abre os demais vãos na carroceria fixa (chapa) + recorta o porta-malas como peça separada (id: 10) */
     ['aberturaPorContorno', { origemId: 8, chapa: { origem: { op: 'aberturaPorContorno', id: 7 } }, vista: 'x', sentido: '+', simetria: 'x', lente: true, recuoDaLente: m(7), contorno: contornoComFilete(T.vidros.lateralTraseiro) }],
@@ -244,7 +239,7 @@ export function gerarPassos(T) {
     ['parte', { nome: 'borrachaVidros', material: 'borrachaVidro', sel: { origem: { op: 'friso', id: idFrPb } } }],
   ];
 
-  const aliasesChapa = [...arcoD.aliases, ...arcoT.aliases];
+  const aliasesChapa = [];
 
   return [
     ...passosChapa,
@@ -270,7 +265,6 @@ export const CONTATOS = [
   { par: ['parachoqueDianteiro', 'placaDianteira'], motivo: 'placa dianteira apoia na face frontal do para-choque' },
   { par: ['parachoqueDianteiro', 'farolNeblina'], motivo: 'faróis de neblina embutem na saia inferior do para-choque dianteiro' },
   { par: ['chapa', 'lanternaTraseira'], motivo: 'lanternas traseiras assentam nos vãos traseiros da chapa' },
-  { par: ['chapa', 'arcosEstampados'], motivo: 'abas estampadas dos 4 arcos de roda embutem e apoiam na borda dos arcos da chapa' },
   { par: ['chapa', 'borrachaVidros'], motivo: 'guarnições de borracha abraçam as bordas dos vãos do para-brisa e vidros laterais traseiros' },
   { par: ['borrachaVidros', 'vidros'], motivo: 'vidros fixos assentam dentro das guarnições de borracha preta' },
   { par: ['portaDireita', 'retrovisorDireito'], motivo: 'base triangular do retrovisor direito encaixa no canto dianteiro da janela da porta direita' },

@@ -1,9 +1,8 @@
-/* carro-quadrado/lataria/receita/chapa.js — gaiola 100% quad da chapa contínua (com vinco horizontal lateral e sem polos val:3 nas quinas). */
+/* carro-quadrado/lataria/receita/chapa.js — gaiola 100% quad da chapa contínua com arcos de roda estampados na própria malha via faixaDeContornoNaRede. */
 import { gaiolaPorRede } from '../../../../../nucleo/gaiola-por-rede.js';
-import { furoPassante } from '../../../../../nucleo/furo-passante.js';
+import { faixaDeContornoNaRede } from '../../../../../nucleo/faixa-de-contorno-na-rede.js';
 
 export const m = (mm) => mm / 1000;
-const suave = (t) => { const u = Math.max(0, Math.min(1, t)); return u * u * u * (u * (6 * u - 15) + 10); };
 
 const NIVEIS = ['soleira', 'baixo', 'meio', 'vinco', 'cintura', 'quina', 'eixo'];
 const LADO = 5; // soleira..cintura (0..4) fecham a frente e a traseira; quina (5) e eixo (6) formam teto/capô/vidro traseiro
@@ -14,13 +13,35 @@ function pontoSecao(T, z, j) {
   return [0, s[6], z];
 }
 
-function interpArco(a, b, f) {
-  const t = suave(f);
-  const ang = (Math.PI / 2) * f;
-  const x = a[0] * Math.cos(ang) + b[0] * (1 - Math.cos(ang));
-  const z = a[2] + (b[2] - a[2]) * Math.sin(ang);
-  const y = a[1] + (b[1] - a[1]) * t;
-  return [x, y, z];
+/* interpola x(z, y) da pele externa da lateral a partir de TABELA.secoes (em mm) */
+function xPeleLateral(T, z, y) {
+  const zs = T.estacoes;
+  let i0 = 0;
+  for (let i = 0; i < zs.length - 1; i += 1) {
+    if (z <= zs[i] && z >= zs[i + 1]) { i0 = i; break; }
+  }
+  const zA = zs[i0];
+  const zB = zs[i0 + 1];
+  const tz = zA === zB ? 0 : Math.max(0, Math.min(1, (zA - z) / (zA - zB)));
+  const xEmSecao = (sec) => {
+    for (let j = 0; j < 4; j += 1) {
+      const [x0, y0] = sec[j];
+      const [x1, y1] = sec[j + 1];
+      if (y <= y1 || j === 3) {
+        const ty = y1 === y0 ? 0 : Math.max(0, Math.min(1, (y - y0) / (y1 - y0)));
+        return x0 + (x1 - x0) * ty;
+      }
+    }
+    return sec[0][0];
+  };
+  return xEmSecao(T.secoes[String(zA)]) + (xEmSecao(T.secoes[String(zB)]) - xEmSecao(T.secoes[String(zA)])) * tz;
+}
+
+function normalLateral(T, z, y) {
+  const dxdy = (xPeleLateral(T, z, y + 4) - xPeleLateral(T, z, y - 4)) / 8;
+  const dxdz = (xPeleLateral(T, z + 4, y) - xPeleLateral(T, z - 4, y)) / 8;
+  const l = Math.hypot(1, dxdy, dxdz);
+  return [1 / l, -dxdy / l, -dxdz / l];
 }
 
 export function derivarChapa(T) {
@@ -52,11 +73,28 @@ export function derivarChapa(T) {
   });
   const curvaS = (i, j) => (j < 4 ? `S${i}_baixo` : j === 4 ? `S${i}_pilar` : `S${i}_teto`);
 
+  /* L0 (soleira) pula os dois vãos de arco (i = 1 dianteiro, i = 5 traseiro); L1 e L2 também pulam esses dois vãos */
+  const VAO_ARCO_D = 1;
+  const VAO_ARCO_T = 5;
+  const vaosArco = new Set([VAO_ARCO_D, VAO_ARCO_T]);
+
   NIVEIS.forEach((_, j) => {
-    const pts = zs.map((_, i) => nome(i, j));
     const vinco = j === 3 ? T.vincos.lateral : j === 4 ? T.vincos.cintura : j === 5 ? T.vincos.quina : undefined;
-    curvas.push({ nome: `L${j}`, pontos: pts, ...(vinco ? { vinco } : {}) });
+    if (j >= 3) {
+      curvas.push({ nome: `L${j}`, pontos: zs.map((_, i) => nome(i, j)), ...(vinco ? { vinco } : {}) });
+    } else {
+      /* níveis inferiores (soleira, baixo, meio) são divididos em 3 trechos contínuos fora dos dois arcos */
+      curvas.push({ nome: `L${j}_f`, pontos: [nome(0, j), nome(1, j)] });
+      curvas.push({ nome: `L${j}_m`, pontos: [2, 3, 4, 5].map((i) => nome(i, j)) });
+      curvas.push({ nome: `L${j}_t`, pontos: [6, 7, 8].map((i) => nome(i, j)) });
+    }
   });
+  const curvaL = (i, j) => {
+    if (j >= 3) return `L${j}`;
+    if (i < VAO_ARCO_D) return `L${j}_f`;
+    if (i < VAO_ARCO_T) return `L${j}_m`;
+    return `L${j}_t`;
+  };
 
   /* frente: curvas horizontais F0..F4 com frente reta e canto arredondado limpo (compatível com carro quadrado) */
   for (let j = 0; j < LADO - 1; j += 1) {
@@ -92,17 +130,101 @@ export function derivarChapa(T) {
   const lado = (curva, de, ate) => ({ curva, de, ate });
   for (let i = 0; i < iJ; i += 1) {
     for (let j = 0; j < NIVEIS.length - 1; j += 1) {
+      if (vaosArco.has(i) && j < 3) continue; // substituído pelos anéis concêntricos do arco estampado na malha
       retalhos.push({
         nome: `r${i}_${NIVEIS[j]}`,
         borda: [
-          lado(`L${j}`, nome(i, j), nome(i + 1, j)),
+          lado(curvaL(i, j), nome(i, j), nome(i + 1, j)),
           lado(curvaS(i + 1, j), nome(i + 1, j), nome(i + 1, j + 1)),
-          lado(`L${j + 1}`, nome(i + 1, j + 1), nome(i, j + 1)),
+          lado(curvaL(i, j + 1), nome(i + 1, j + 1), nome(i, j + 1)),
           lado(curvaS(i, j), nome(i, j + 1), nome(i, j)),
         ],
       });
     }
   }
+
+  /* arcos de roda dianteiro (vão i = 1) e traseiro (vão i = 5) estampados na própria malha via faixaDeContornoNaRede */
+  const cantosArcos = [];
+  const linhaLateral = (nomeA, nomeB, nInt = 2) => {
+    const a = nos[nomeA];
+    const b = nos[nomeB];
+    const pts = [nomeA];
+    for (let k = 1; k <= nInt; k += 1) {
+      const t = k / (nInt + 1);
+      const y = a[1] + (b[1] - a[1]) * t;
+      const z = a[2] + (b[2] - a[2]) * t;
+      pts.push(fixo([xPeleLateral(T, z, y), y, z]));
+    }
+    pts.push(nomeB);
+    return pts;
+  };
+
+  const montarVaoArco = (pref, iVao, arco) => {
+    const { z: zC, y: yC, raio: R } = arco;
+    const yBase = 255;
+    const angMin = Math.asin((yBase - yC) / R); // ~ -0.10 rad para encostar exatamente em y = 255
+    const angMax = Math.PI - angMin;
+    const N = 13;
+    const ptsArco = [];
+    for (let k = 0; k < N; k += 1) {
+      const ang = angMin + ((angMax - angMin) * k) / (N - 1);
+      const z = zC + R * Math.cos(ang);
+      const y = k === 0 || k === N - 1 ? yBase : yC + R * Math.sin(ang);
+      ptsArco.push(fixo([xPeleLateral(T, z, y), y, z]));
+    }
+
+    const faixa = faixaDeContornoNaRede({
+      nome: pref,
+      contorno: ptsArco,
+      fora: [1, 0, 0],
+      projetar: ([, y, z]) => ({
+        ponto: [xPeleLateral(T, z, y), y, z],
+        normal: normalLateral(T, z, y),
+      }),
+      lado: 'fora',
+      deslocamentoBaseMm: 8,
+      vincoBase: 0.35,
+      faixas: [
+        { larguraMm: 18, deslocamentoMm: 12 },
+        { larguraMm: 26, deslocamentoMm: 0, vinco: 0.55 },
+      ],
+      modulacao: [[0, 0.30], [0.18, 1], [0.82, 1], [1, 0.30]],
+      ancoras: [0, 3, 9, 12],
+    });
+
+    Object.assign(nos, faixa.nos);
+    curvas.push(...faixa.curvas);
+    retalhos.push(...faixa.retalhos);
+
+    const [n0, n1, n2, n3] = faixa.nosExternos;
+    cantosArcos.push(`${pref}_a0_n0`, `${pref}_a0_n3`, n0, n3);
+
+    const solF = nome(iVao, 0);
+    const vinF = nome(iVao, 3);
+    const solT = nome(iVao + 1, 0);
+    const vinT = nome(iVao + 1, 3);
+
+    curvas.push({ nome: `${pref}_solF`, pontos: linhaLateral(solF, n0, 1) });
+    curvas.push({ nome: `${pref}_solT`, pontos: linhaLateral(n3, solT, 1) });
+    curvas.push({ nome: `${pref}_ligF`, pontos: linhaLateral(n1, vinF, 2) });
+    curvas.push({ nome: `${pref}_ligT`, pontos: linhaLateral(n2, vinT, 2) });
+
+    retalhos.push({
+      nome: `${pref}_pFrente`,
+      borda: [`${pref}_solF`, lado(faixa.curvaExterna, n0, n1), `${pref}_ligF`, lado(`S${iVao}_baixo`, vinF, solF)],
+    });
+    retalhos.push({
+      nome: `${pref}_pTopo`,
+      borda: [lado(faixa.curvaExterna, n1, n2), `${pref}_ligT`, lado('L3', vinT, vinF), `${pref}_ligF`],
+    });
+    retalhos.push({
+      nome: `${pref}_pTras`,
+      borda: [lado(faixa.curvaExterna, n2, n3), `${pref}_solT`, lado(`S${iVao + 1}_baixo`, solT, vinT), `${pref}_ligT`],
+    });
+  };
+
+  montarVaoArco('arcoD', VAO_ARCO_D, T.arcos.dianteiro);
+  montarVaoArco('arcoT', VAO_ARCO_T, T.arcos.traseiro);
   for (let j = 0; j < LADO - 1; j += 1) {
     retalhos.push({
       nome: `f_${NIVEIS[j]}`,
@@ -149,6 +271,7 @@ export function derivarChapa(T) {
     nos,
     curvas,
     retalhos,
+    cantos: cantosArcos,
     interior: false,
     liso: T.chapa.liso,
   });
@@ -192,25 +315,3 @@ export function contornoComFilete(pontos) {
   trechos.push({ reto: [m(pontos[0][0]), m(pontos[0][1])] });
   return { inicio: [m(pontos[0][0]), m(pontos[0][1])], trechos };
 }
-
-export const fazerArcoD = (T) => furoPassante({
-  solido: { origem: { op: 'subdivisao', id: 1 } },
-  posicao: [0, T.arcos.dianteiro.y, T.arcos.dianteiro.z],
-  direcao: 'x',
-  raio: T.arcos.dianteiro.raio,
-  comprimento: 2000,
-  lados: T.arcos.dianteiro.lados,
-  ids: { cilindro: 2, subtrair: 3 },
-  nome: 'arcoDianteiro',
-});
-
-export const fazerArcoT = (T) => furoPassante({
-  solido: { origem: { op: 'subtrair', id: 3 } },
-  posicao: [0, T.arcos.traseiro.y, T.arcos.traseiro.z],
-  direcao: 'x',
-  raio: T.arcos.traseiro.raio,
-  comprimento: 2000,
-  lados: T.arcos.traseiro.lados,
-  ids: { cilindro: 4, subtrair: 5 },
-  nome: 'arcoTraseiro',
-});
