@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2199 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2204 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1010,6 +1010,12 @@
 - `prancha-2.js` — prancha-2.js — a peça de prova da fatia 2 da família `componente-eletronico`: os encapsulamentos restantes e o dissipador lado a lado numa placa, para a pran…
 - `prancha.js` — prancha.js — a peça de prova da família `componente-eletronico`: os cinco encapsulamentos da fatia 1 lado a lado numa placa, para a prancha que a pessoa apro…
 - `terminais.js` — terminais.js — onde cada terminal de um encapsulamento encontra a placa, no referencial do componente, em milímetro.
+
+## procedural/familias/componente-eletronico/cobre/
+
+- `conferir.js` — conferir.js — o conferidor do cobre de uma placa declarada: as regras de projeto e a conectividade, medidas pelo cobre.
+- `conferir.test.js` — conferir.test.js — o conferidor do cobre sobre o traçado declarado à mão na placa de prova: o certo passa sem violação, cada traçado errado é recusado pela r…
+- `geometria.js` — geometria.js — o cobre traçado de uma placa declarada, em mm, no plano [x, z] da placa: os polígonos de cada trecho e de cada via, e a união de polígonos de …
 
 ## procedural/familias/dobradica/
 
@@ -3564,6 +3570,8 @@
 - `conferir-juntas.mjs` — conferir-juntas.mjs — ferramenta de medição e diagnóstico de interfaces de contato entre componentes de uma peça procedural.
 - `conferir-juntas.test.ts` — conferir-juntas.test.ts — testes para a ferramenta de medição e diagnóstico de juntas.
 - `conferir-malha.mjs` — conferir-malha.mjs — a topologia da malha de uma receita, com os gritos do motor: casca aberta, não-manifold, orientação, face de área nula, face fina, face …
+- `conferir-placa.mjs` — conferir-placa.mjs — confere o cobre traçado de uma placa declarada e desenha o mapa das redes.
+- `conferir-placa.test.mjs` — conferir-placa.test.mjs — o comando que confere o cobre de uma placa declarada e desenha o mapa das redes.
 - `conferir-pontos.mjs` — conferir-pontos.mjs — mede os PONTOS DECLARADOS de uma peça contra a malha que a receita produz, e devolve o desvio de cada um em milímetro.
 - `conferir-retrato-do-acervo.mjs` — conferir-retrato-do-acervo.mjs — prova que o rastreio declarado do retrato (`ESCRITA_DAS_OPERACOES`) não muda nada na malha.
 - `conferir-retrato-do-acervo.test.mjs` — conferir-retrato-do-acervo.test.mjs — prova que a conferência do retrato acha igual a receita mínima e a peça pequena, e que o hash distingue malhas.
