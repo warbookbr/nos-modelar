@@ -74,3 +74,18 @@ A grade de 15 por 15, o desvio a mais de 100 mm da borda, em mm (o escorregament
 Nas analíticas, com o miolo pelas curvas vizinhas de hoje, as duas colunas da cota completa ficam abaixo de sem a opção em todas as doze, inclusive na calota assimétrica (0,475 contra 0,707 mm com o meio em 0,25 e 0,25, e 0,287 contra 0,301 com o meio em 0,3 e 0,5), que em 2026-11-19 reprovava pela cota do miolo; a iteração muda as analíticas em menos de 0,02 mm. Nas emendas a iteração muda pouco (a rampa da `emenda-g1` de 15,5 para 14,9, contra 9,98 da etapa B e 25,7 sem a opção). Na `rede-sem-ruido` a distância ao painel vai de 0,66 mm com um ajuste para 1,10 com quatro, contra 1,35 da etapa B e 4,04 sem a opção.
 
 O que sobra contra o gate 1 é a sela: com qualquer forma ela fica pior que sem a opção na grade de razão 1 (0,029 contra 0,008 mm), e com quatro iterações, por 0,008 mm na de razão 2. A curvatura normal da sela varia de fato no espaço, e a energia que cobra a variação a puxa; sem a opção a amostra de uma quadrática em passo igual já cai quase em cima dela. A decisão da fatia 2 vai à pessoa com estes números.
+
+## Fatia 2: a curvatura normal no núcleo
+
+Desde 2026-11-22 o ajuste das cotas com `regularizacao: { tipo: 'variacaoDeCurvatura' }`, que a `alisarSuperficie` liga, é a cota completa refeita quatro vezes (`energiaDeCurvaturaNormal` e `ITERACOES_DA_CURVATURA` em `procedural/nucleo/subdivisao.js`). Ele dá a mesma gaiola do protótipo com quatro iterações a 1e-16 m na grade, e o caminho esparso a mesma do denso. A grade de 15 por 15 tem os números da última coluna da tabela acima, todos dentro da folga de 0,05 mm do gate 1. A esfera, o cilindro e o plano têm energia nula, e a quadrática inclinada não. A energia anterior, `energiaDeVariacaoDeCurvatura`, ficou só como medida.
+
+Nas dezoito analíticas a distância a 100 mm da borda fica abaixo da de sem a opção em todas. Contra a etapa B ela fica igual ou melhor, salvo o toro com o meio em 0,25 e 0,25, por 0,0003 mm, e o toro sem cota de miolo, que vai de 0,050 para 0,128 mm. Na chapa lateral de prova oito dos dez retalhos ficam mais perto da forma que sem a opção, e o `baixo` cai de 0,765 para 0,665 mm. Dois seguem mais longe, o `coluna` (0,476 contra 0,456 mm) e o `atrasDaColuna` (0,464 contra 0,443), com o mesmo número do preenchimento padrão com a mesma energia, e ficam marcados nos testes.
+
+O custo, pelo script [`custo-da-opcao.mjs`](custo-da-opcao.mjs), mede só a subdivisão do quarto traseiro com a opção e sem ela:
+
+| passo da chapa (mm) | pontos da meia gaiola | sem a opção (s) | com a opção (s) | razão | com a opção, sem a conferência do ganho (s) |
+|---|---|---|---|---|---|
+| 70 (o da receita) | 2.161 | 2,6 | 13,5 | 5,2 | 6,8 |
+| 35 (o carro inteiro) | 5.162 | 9,6 | 77,6 | 8,1 | 24,0 |
+
+A etapa B custava 9,8 s no passo 70, 3,8 vezes o custo sem a opção. O gate 4 (até o dobro) reprova. Dois terços do tempo no passo 35 vão para a conferência do ganho, que resolve o sistema uma vez por cota, e o resto para as quatro contas, cada uma com a normal, a energia, a montagem e a fatoração refeitas. A última coluna é uma medida com a conferência desligada à mão, que não existe como opção.

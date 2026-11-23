@@ -1,7 +1,8 @@
 /* curvatura-normal.test.mjs — o protótipo da curvatura normal linearizada (`curvatura-normal.mjs`): a medida contra o oráculo, a energia
  * nula no plano e no cilindro de passo igual, o contrato da cota nos dois modos, e a grade de razão 2 como o banco de provas a mediu
- * (`docs/modelar/banco-de-provas/correcao-de-superficie-2026-11-16/README.md`). O protótipo NÃO passou no critério da decisão de
- * 2026-11-19, e os números daqui guardam o que foi medido, para quem retomar a ideia. */
+ * (`docs/modelar/banco-de-provas/correcao-de-superficie-2026-11-16/README.md`). Com uma conta só, o protótipo não passou no critério da
+ * decisão de 2026-11-19; com a conta refeita quatro vezes (`iteracoes`), a forma que a pessoa escolheu em 2026-11-22, ele é o que o núcleo
+ * faz com a regularização, e a coluna `etapaB` das provas, que é o núcleo, passou a ser essa conta. */
 import { describe, expect, it } from 'vitest';
 import { curvaturaNormal, superficieLimite } from '../../../procedural/nucleo/subdivisao.js';
 import { topologiaRegular } from './energia-de-curvatura.mjs';
@@ -46,8 +47,11 @@ describe('a curvatura normal linearizada, fora do núcleo', () => {
     /* CONHECIDA: com a cota completa o cilindro e a sela ficam piores que sem a opção (0,365 contra 0,320 e 0,482 contra 0,330 mm) */
     const de = (lista, forma) => lista.find((p) => p.forma === forma);
     for (const forma of ['cilindro', 'sela']) expect(de(completa, forma).normalMm, `${forma} passou a caber com a cota completa: tire a marca`).toBeGreaterThan(de(completa, forma).semAOpcaoMm);
-    /* nas três formas a curvatura normal fica longe do desvio da etapa B (3,27, 1,65 e 2,28 mm) */
-    for (const p of [...completa, ...normal]) expect(p.normalMm, p.forma).toBeLessThan(0.3 * p.etapaBMm);
     for (const p of normal) expect(p.normalMm, p.forma).toBeLessThan(p.semAOpcaoMm);
+    /* refeita quatro vezes, a cota completa é a conta do núcleo (a coluna etapaB) e fica dentro da folga de 0,05 mm do gate 1 do G2 */
+    for (const p of provaDaGrade({ cota: 'completa', iteracoes: 4 }, [2])) {
+      expect(Math.abs(p.normalMm - p.etapaBMm), p.forma).toBeLessThan(1e-3);
+      expect(p.normalMm, p.forma).toBeLessThanOrEqual(p.semAOpcaoMm + 0.05);
+    }
   });
 });
