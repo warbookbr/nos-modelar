@@ -7,6 +7,7 @@ import { derivarParachoques, passosParachoques } from './receita/parachoques.js'
 import { ALIASES_FRENTE_TRASEIRA, passosFrenteTraseira } from './receita/frente-traseira.js';
 import { derivarCapo, passosCapo, passoVaoCapoNaChapa } from './receita/capo.js';
 import { passosAcabamentos } from './receita/acabamentos.js';
+import { passosRetrovisores } from './receita/retrovisor.js';
 
 export const TABELA = {
   chapa: { espessura: 8, passo: 200, niveis: 2, anguloMax: 20, liso: false },
@@ -254,6 +255,7 @@ export function gerarPassos(T) {
     ...passosParachoques(T, varridos, proxId, passosChapa, rede.pontos, aliasesChapa),
     ...passosFrenteTraseira(T, proxId),
     ...passosAcabamentos(T, proxId),
+    ...passosRetrovisores(proxId),
   ];
 }
 
@@ -271,6 +273,8 @@ export const CONTATOS = [
   { par: ['chapa', 'arcosEstampados'], motivo: 'abas estampadas dos 4 arcos de roda embutem e apoiam na borda dos arcos da chapa' },
   { par: ['chapa', 'borrachaVidros'], motivo: 'guarnições de borracha abraçam as bordas dos vãos do para-brisa e vidros laterais traseiros' },
   { par: ['borrachaVidros', 'vidros'], motivo: 'vidros fixos assentam dentro das guarnições de borracha preta' },
+  { par: ['portaDireita', 'retrovisorDireito'], motivo: 'base triangular do retrovisor direito encaixa no canto dianteiro da janela da porta direita' },
+  { par: ['portaEsquerda', 'retrovisorEsquerdo'], motivo: 'base triangular do retrovisor esquerdo encaixa no canto dianteiro da janela da porta esquerda' },
   { par: ['tampaTraseira', 'placaTraseira'], motivo: 'placa traseira apoia no rebaixo da tampa traseira' },
   { par: ['tampaTraseira', 'puxadorTampa'], motivo: 'puxador apoia na tampa traseira acima da placa' },
   { par: ['tampaTraseira', 'fechaduraTampa'], motivo: 'fechadura embute na tampa traseira abaixo da placa' },
@@ -316,6 +320,8 @@ const receita = {
       { nome: 'arcosEstampados', forma: 'Abas circulares estampadas salientes na cor da lataria em volta dos 4 arcos de roda', tecnica: 'Subdivisão paramétrica amostrando a pele lateral da chapa e espelhada em x' },
       { nome: 'borrachaVidros', forma: 'Guarnições de borracha preta fosca contornando o para-brisa e os vidros laterais traseiros', tecnica: 'friso nativo sobre aberturaPorContorno com perfil retangular arredondado' },
       { nome: 'vidros', forma: 'Para-brisa e vidros laterais traseiros translúcidos levemente esverdeados', tecnica: 'lente de aberturaPorContorno em material vidroAutomotivo' },
+      { nome: 'retrovisorDireito', forma: 'Retrovisor externo direito com base triangular, pedestal curto, concha aerodinâmica oca varrida e espelho embutido', tecnica: 'Malha paramétrica superelíptica em subdivisao + espelho recuado na cavidade' },
+      { nome: 'retrovisorEsquerdo', forma: 'Retrovisor externo esquerdo espelhado com base triangular, pedestal curto, concha aerodinâmica oca varrida e espelho embutido', tecnica: 'Espelho em x do retrovisorDireito' },
       { nome: 'capo', forma: 'Capô como peça separada com dois vincos longitudinais, dobra frontal de lombada e 24 rasgos reais de respiro', tecnica: 'Subdivisão própria de gaiolaPorRede com espessura e subtrair dos rasgos de ventilação' },
       { nome: 'parachoqueDianteiro', forma: 'Corpo envolvente preto na frente com friso claro horizontal', tecnica: 'Subdivisão de gaiolaVarrida fechada contornando a frente até o arco dianteiro' },
       { nome: 'parachoqueTraseiro', forma: 'Corpo envolvente preto na traseira com friso claro horizontal', tecnica: 'Subdivisão de gaiolaVarrida fechada contornando a traseira até o arco traseiro' },

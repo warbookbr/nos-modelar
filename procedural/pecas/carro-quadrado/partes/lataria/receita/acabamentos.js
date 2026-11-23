@@ -110,47 +110,6 @@ export function passosAcabamentos(T, proxId) {
       : [[3, 2, 1, 0], [4, 5, 6, 7], [1, 5, 4, 0], [2, 6, 5, 1], [3, 7, 6, 2], [0, 4, 7, 3]];
     passos.push(['subdivisao', { origemId: idQV, niveis: 0, vertices: vQV, faces: fBox }]);
     passos.push(['parte', { nome: partePorta, material: 'borrachaVidro', sel: { origem: { op: 'subdivisao', id: idQV } } }]);
-
-    /* 2. Triângulo plástico preto na base da coluna A (z = 528..636, y = 956..1064) servindo de base do retrovisor */
-    const idTri = proxId();
-    const ty0 = 956; const ty1 = 1062;
-    const tzF = 636; const tzT = 528;
-    const xt0Out = xVidroPorta(ty0) + 4; const xt0In = xVidroPorta(ty0) - 9;
-    const xt1Out = xVidroPorta(ty1) + 4; const xt1In = xVidroPorta(ty1) - 9;
-    const vTri = [
-      [m(sinal * xt0In), m(ty0), m(tzT)], [m(sinal * xt0Out), m(ty0), m(tzT)],
-      [m(sinal * xt0Out), m(ty0), m(tzF)], [m(sinal * xt0In), m(ty0), m(tzF)],
-      [m(sinal * xt1In), m(ty1), m(tzT)], [m(sinal * xt1Out), m(ty1), m(tzT)],
-    ];
-    const fTri = sinal > 0
-      ? [[0, 1, 2, 3], [0, 4, 5, 1], [1, 5, 2], [2, 5, 4, 3], [3, 4, 0]]
-      : [[3, 2, 1, 0], [1, 5, 4, 0], [2, 5, 1], [3, 4, 5, 2], [0, 4, 3]];
-    passos.push(['subdivisao', { origemId: idTri, niveis: 0, vertices: vTri, faces: fTri }]);
-    passos.push(['parte', { nome: partePorta, material: 'borrachaVidro', sel: { origem: { op: 'subdivisao', id: idTri } } }]);
-
-    /* 3. Retrovisor externo acoplado ao triângulo da porta (braço + carcaça clássica quadrada chanfrada + espelho embutido) */
-    const idBraco = proxId();
-    passos.push(['chamferBox', {
-      origemId: idBraco, larg: m(96), alt: m(42), prof: m(48), chanfro: m(8),
-      em: [m(sinal * 796), m(1002), m(572)],
-    }]);
-    passos.push(['parte', { nome: partePorta, material: 'plasticoFosco', sel: { origem: { op: 'chamferBox', id: idBraco } } }]);
-
-    /* carcaça clássica anos 80/90 quadrada com cantos chanfrados limpos (sem encolher em seixo) */
-    const idCarc = proxId();
-    passos.push(['chamferBox', {
-      origemId: idCarc, larg: m(152), alt: m(102), prof: m(84), chanfro: m(14),
-      em: [m(sinal * 908), m(1020), m(556)],
-    }]);
-    passos.push(['parte', { nome: partePorta, material: 'plasticoFosco', sel: { origem: { op: 'chamferBox', id: idCarc } } }]);
-
-    /* espelho refletivo prateado assentado dentro da face traseira (-z) da carcaça */
-    const idEsp = proxId();
-    passos.push(['chamferBox', {
-      origemId: idEsp, larg: m(130), alt: m(80), prof: m(8), chanfro: m(3),
-      em: [m(sinal * 908), m(1020), m(515)],
-    }]);
-    passos.push(['parte', { nome: partePorta, material: 'espelhoRetrovisor', sel: { origem: { op: 'chamferBox', id: idEsp } } }]);
   }
 
   return passos;
