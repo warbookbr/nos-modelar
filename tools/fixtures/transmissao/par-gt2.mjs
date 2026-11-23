@@ -6,18 +6,18 @@ import { instanciaDeFamilia } from '../../modelar/instancia-de-familia.mjs';
 import { POLIA_E_CORREIA } from '../../../procedural/familias/polia-e-correia/index.js';
 import { geometriaDaCorreia, passosDaCorreia, transmissaoDentada } from '../../../procedural/familias/polia-e-correia/correia.js';
 
-const completos = (perfil) => ({
+const completos = (perfil, extra = {}) => ({
   ...Object.fromEntries(Object.entries(POLIA_E_CORREIA.contrato.parametros).map(([nome, d]) => [nome, d.padrao])),
-  ...POLIA_E_CORREIA.contrato.perfis[perfil].parametros,
+  ...POLIA_E_CORREIA.contrato.perfis[perfil].parametros, ...extra,
 });
 
-export function receitaDoPar(distancia = 150, perfis = ['gt2-20', 'gt2-80'], { desvioDoGiro = 0 } = {}) {
-  const transmissao = transmissaoDentada(completos(perfis[0]), completos(perfis[1]), distancia);
+export function receitaDoPar(distancia = 150, perfis = ['gt2-20', 'gt2-80'], { desvioDoGiro = 0, parametros2 = {} } = {}) {
+  const transmissao = transmissaoDentada(completos(perfis[0]), completos(perfis[1], parametros2), distancia);
   const correia = geometriaDaCorreia(transmissao);
   const m = (mm) => mm / 1000;
   const motora = instanciaDeFamilia({ familia: 'polia-e-correia', perfil: perfis[0], nomes: 'motora', id: 'motora', portaPrefixo: 'motora', portas: true, pose: { posicao: [0, 0, 0], giro: { eixo: 'y', graus: correia.giro1 } } });
   const movida = instanciaDeFamilia({
-    familia: 'polia-e-correia', perfil: perfis[1], nomes: 'movida', id: 'movida', portaPrefixo: 'movida', portas: true, base: motora.origem,
+    familia: 'polia-e-correia', perfil: perfis[1], parametros: parametros2, nomes: 'movida', id: 'movida', portaPrefixo: 'movida', portas: true, base: motora.origem,
     pose: { posicao: [m(transmissao.distanciaEntreCentros), m(correia.alturaDaSegunda), 0], giro: { eixo: 'y', graus: correia.giro2 + desvioDoGiro } },
   });
   const PASSOS = [...motora.passos, ...movida.passos, ...passosDaCorreia(correia, { origemId: movida.origem + 1 })];

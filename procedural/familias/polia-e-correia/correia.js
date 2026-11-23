@@ -14,7 +14,7 @@
 
    A altura da correia e a do dente vêm da tabela "Timing Belt Tooth Profiles and Pitches" da Pfeifer Industries (GT2 2 mm,
    HTD 3M e 5M e T5); a GT2 é perfil do fabricante, sem norma pública. */
-import { CORREIAS_DENTADAS, geometriaDaPolia } from './geometria.js';
+import { CORREIAS_DENTADAS, SECOES_V, geometriaDaPolia } from './geometria.js';
 
 /* altura total da correia e altura do dente, em mm, por correia da família */
 export const CORREIAS = Object.freeze({
@@ -127,7 +127,9 @@ export function geometriaDaCorreia(t) {
   const perfil = CORREIAS_DENTADAS[t.correia];
   const correia = CORREIAS[t.correia];
   const pld = (t.g1.diametroPrimitivo - t.g1.diametroExterno) / 2;
-  const dentro0 = -pld + FOLGA;
+  /* a corda entre duas amostras do arco afunda a flecha para dentro do círculo: a face de dentro sobe isso */
+  const flecha = Math.max(t.r1, t.r2) * (1 - Math.cos(((GRAUS_POR_SEGMENTO / 2) * Math.PI) / 180));
+  const dentro0 = -pld + FOLGA + flecha;
   const dorso = dentro0 + correia.altura - correia.dente;
   const l = laco(t);
   /* o primeiro dente no meio do arco da primeira polia (ângulo π) */
@@ -193,4 +195,90 @@ export function passosDaCorreia(geometria, { origemId, nome = 'correia' }) {
     ['extrusao', { origemId: origemId + k, perfil: xz(contorno), altura: m(geometria.larguraDaCorreia), em: [0, m(geometria.baseDaCorreia), 0] }],
     ['parte', { nome, sel: { origem: { op: 'extrusao', id: origemId + k } } }],
   ]);
+}
+
+/* ---- correia por atrito: em V e lisa ----
+
+   A correia em V e a lisa têm seção constante: o `friso` varre a seção ao longo do laço fechado em volta das duas polias,
+   uma volta por canal. O laço da polia em V passa pelo diâmetro de referência, e o da lisa pelo externo. A correia não tem
+   dentes, então o comprimento não precisa ser múltiplo de passo e a distância entre centros fica a pedida; o comprimento
+   comercial da ISO 4184 não entra, porque a tabela dela não está no repositório.
+
+   A seção da correia clássica em V é a da DIN 2215 (largura no topo, altura e largura na base de Z, A e B, da ficha
+   "V-Belts DIN 2215" da Mädler), com a largura de referência da ISO 4183 na altura em que a correia tem essa largura. A
+   correia assenta com a largura de referência no diâmetro de referência; onde a cunha da correia é mais aberta que o canal
+   (o canal de 34 graus), ela sobe o necessário para ficar a FOLGA das paredes. A correia lisa não tem norma: espessura de
+   ESPESSURA_DA_LISA, largura da face menos 2 mm de cada lado, assentada a FOLGA acima da face. */
+export const SECOES_DA_CORREIA_V = Object.freeze({
+  1: Object.freeze({ nome: 'Z', topo: 10, altura: 6, base: 5.9 }),
+  2: Object.freeze({ nome: 'A', topo: 13, altura: 8, base: 7.5 }),
+  3: Object.freeze({ nome: 'B', topo: 17, altura: 11, base: 9.4 }),
+});
+export const ESPESSURA_DA_LISA = 3;
+
+/** A transmissão por atrito de duas polias em V (mesma seção e canais) ou duas lisas (mesma largura), na distância pedida, em mm. */
+export function transmissaoPorAtrito(parametros1, parametros2, distancia) {
+  const g1 = geometriaDaPolia(parametros1);
+  const g2 = geometriaDaPolia(parametros2);
+  if (g1.tipo !== g2.tipo || g1.tipo === 1) throw new ErroDaCorreia('as duas polias precisam ser em V (tipo 2) ou as duas lisas (tipo 3); a dentada vai por transmissaoDentada');
+  if (g1.tipo === 2 && (parametros1.correia !== parametros2.correia || parametros1.canais !== parametros2.canais)) throw new ErroDaCorreia(`as duas polias em V precisam da mesma seção e do mesmo número de canais (vieram ${g1.correia} com ${parametros1.canais} e ${g2.correia} com ${parametros2.canais})`);
+  if (g1.tipo === 3 && parametros1.largura !== parametros2.largura) throw new ErroDaCorreia(`as duas polias lisas precisam da mesma largura (vieram ${parametros1.largura} e ${parametros2.largura} mm)`);
+  const raio = (g) => (g.tipo === 2 ? g.diametroDeReferencia : g.diametroExterno) / 2;
+  const r1 = raio(g1);
+  const r2 = raio(g2);
+  if (r2 < r1) throw new ErroDaCorreia('a primeira polia é a menor: passe a de diâmetro menor primeiro');
+  const minima = (Math.max(g1.diametroExterno, g2.diametroExterno) / 2) + Math.min(g1.diametroExterno, g2.diametroExterno) / 2 + 2;
+  if (!(distancia > minima)) throw new ErroDaCorreia(`a distância entre centros ${distancia} mm não passa da soma dos raios externos (${minima.toFixed(2)} mm)`);
+  return { g1, g2, r1, r2, distanciaEntreCentros: distancia, comprimento: comprimentoPrimitivo(r1, r2, distancia), relacao: r2 / r1, tipo: g1.tipo, correia: parametros1.correia, canais: parametros1.canais, largura: parametros1.largura, comprimentoDoCubo: [parametros1.comprimentoDoCubo, parametros2.comprimentoDoCubo] };
+}
+
+/* a seção da correia em V em [u, v] (mm): u na largura, v para fora do diâmetro de referência, afastada das paredes do canal */
+function secaoDaCorreiaV(t, g) {
+  const c = SECOES_DA_CORREIA_V[t.correia];
+  const canal = SECOES_V[t.correia];
+  const kb = (c.topo - c.base) / 2 / c.altura;
+  const kg = Math.tan(((g.angulo / 2) * Math.PI) / 180);
+  /* a altura acima da linha de referência em que a correia tem a largura de referência */
+  let topo = ((c.topo - canal.wd) / (c.topo - c.base)) * c.altura;
+  const larguraDaCorreia = (v) => c.topo / 2 - (topo - v) * kb;
+  const larguraDoCanal = (v) => canal.wd / 2 + v * kg;
+  const cabe = () => [topo - c.altura, Math.min(topo, canal.b)].every((v) => larguraDaCorreia(v) <= larguraDoCanal(v) - FOLGA);
+  for (let k = 0; k < 400 && !cabe(); k += 1) topo += 0.01;
+  return { pontos: [[-c.topo / 2, topo], [-c.base / 2, topo - c.altura], [c.base / 2, topo - c.altura], [c.topo / 2, topo]], topo, fundo: topo - c.altura };
+}
+
+/** Os passos das correias por atrito (metro), uma volta por canal, a partir de `origemId`, e a altura da segunda polia. */
+export function passosDaCorreiaPorAtrito(t, { origemId, nome = 'correia' }) {
+  const l = laco(t);
+  const amostrasDoLaco = amostras(l, t);
+  const linha = amostrasDoLaco.map((q) => l.ponto(q, 0));
+  const m = (mm) => mm / 1000;
+  /* a corda entre duas amostras do arco afunda a flecha R·(1 − cos(meio passo)) para dentro do círculo: a seção sobe isso */
+  const flecha = Math.max(t.r1, t.r2) * (1 - Math.cos(((GRAUS_POR_SEGMENTO / 2) * Math.PI) / 180));
+  const canais = [];
+  let secao;
+  let alturaDaSegunda;
+  if (t.tipo === 2) {
+    const s = SECOES_V[t.correia];
+    secao = secaoDaCorreiaV(t, t.g1);
+    const secao2 = secaoDaCorreiaV(t, t.g2);
+    secao = secao.topo >= secao2.topo ? secao : secao2;
+    for (let k = 0; k < t.canais; k += 1) canais.push(t.comprimentoDoCubo[0] + s.f + k * s.e);
+    alturaDaSegunda = t.comprimentoDoCubo[0] - t.comprimentoDoCubo[1];
+  } else {
+    const meia = t.largura / 2 - 2;
+    secao = { pontos: [[-meia, FOLGA], [-meia, FOLGA + ESPESSURA_DA_LISA], [meia, FOLGA + ESPESSURA_DA_LISA], [meia, FOLGA]] };
+    canais.push(t.comprimentoDoCubo[0] + t.largura / 2);
+    alturaDaSegunda = t.comprimentoDoCubo[0] - t.comprimentoDoCubo[1];
+  }
+  secao = { ...secao, pontos: secao.pontos.map(([u, v]) => [u, v + flecha]) };
+  const passos = canais.flatMap((y, k) => {
+    const pontos = [...linha, linha[0]].map(({ p }) => [m(p[0]), m(y), m(p[1])]);
+    const normais = [...linha, linha[0]].map(({ n }) => [n[0], 0, n[1]]);
+    return [
+      ['friso', { origemId: origemId + k, linha: { nome: `${nome}${k}`, pontos }, normais, perfil: secao.pontos.map(([u, v]) => [m(u), m(v)]) }],
+      ['parte', { nome, sel: { origem: { op: 'friso', id: origemId + k } } }],
+    ];
+  });
+  return { passos, alturaDaSegunda, secao };
 }

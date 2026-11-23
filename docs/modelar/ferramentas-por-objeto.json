@@ -290,7 +290,7 @@
       "parametros": "perfil, diâmetros, centros, largura",
       "referencias": ["FreeCAD Gears: timing gear", "BOSL2"],
       "aqui": "parcial",
-      "onde": "família `polia-e-correia`: polia dentada GT2, HTD 3M, HTD 5M e T5 por dentes, com ou sem flanges, polia em V das seções Z, A e B da ISO 4183 de um a quatro canais e polia lisa, com cubo, furo e a porta do eixo; a correia dentada fechada entre duas polias dentadas (`transmissaoDentada`, `geometriaDaCorreia` e `passosDaCorreia` em `correia.js`), com número inteiro de dentes e a distância entre centros recalculada; a correia em V, a lisa e o tensor não"
+      "onde": "família `polia-e-correia`: polia dentada GT2, HTD 3M, HTD 5M e T5 por dentes, com ou sem flanges, polia em V das seções Z, A e B da ISO 4183 de um a quatro canais e polia lisa, com cubo, furo e a porta do eixo; a correia dentada fechada entre duas polias dentadas (`transmissaoDentada`, `geometriaDaCorreia` e `passosDaCorreia` em `correia.js`), com número inteiro de dentes e a distância entre centros recalculada, e a correia em V (seção da DIN 2215, uma volta por canal) e a lisa entre duas polias do mesmo tipo (`transmissaoPorAtrito` e `passosDaCorreiaPorAtrito`); o comprimento comercial da correia em V, o tensor e mais de duas polias não"
     },
     "rodaPneu": {
       "nome": "roda e pneu",

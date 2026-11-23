@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2235 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2237 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -3409,6 +3409,8 @@
 - `duas-instancias.test.mjs` — duas-instancias.test.mjs — duas instâncias da mesma família numa receita, a prova da fatia 1 do plano de engrenagem, polia e correia.
 - `par-gt2.mjs` — par-gt2.mjs — o par GT2 de 20 e 80 dentes com a correia fechada, a prova da fatia 3 do plano de engrenagem, polia e correia. As duas polias entram pelo `inst…
 - `par-gt2.test.mjs` — par-gt2.test.mjs — o par GT2 de 20 e 80 dentes com a correia fechada: a correia tem número inteiro de dentes e a distância entre centros sai da conta do comp…
+- `par-por-atrito.mjs` — par-por-atrito.mjs — duas polias em V ou duas lisas com a correia fechada, a prova da fatia 3 para as correias sem dentes. `receitaDoParPorAtrito(perfis, dis…
+- `par-por-atrito.test.mjs` — par-por-atrito.test.mjs — as correias sem dentes: a em V assenta no canal pela largura de referência da ISO 4183 com a seção da DIN 2215, uma volta por canal…
 
 ## tools/fixtures/tres-blocos-vinculados/
 

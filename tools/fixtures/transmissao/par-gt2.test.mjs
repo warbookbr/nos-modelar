@@ -58,3 +58,12 @@ describe('par GT2 de 20 e 80 dentes com a correia', () => {
     expect(() => transmissaoDentada(completos('gt2-20'), completos('gt2-80'), 20)).toThrow(/não passa da soma dos raios/);
   });
 });
+
+describe('correia dentada em polias grandes', () => {
+  it('o par T5 de 24 e 150 dentes sai sem contato, com a face de dentro acima da flecha das cordas', () => {
+    const par = receitaDoPar(600, ['t5', 't5'], { parametros2: { dentes: 150, flanges: 0, furo: 20, diametroDoCubo: 40 } });
+    const c = contatosDaPeca(executar(par.receita), par.receita);
+    expect(c.cobertura.completa).toBe(true);
+    expect(c.paresEmContato).toEqual([]);
+  });
+});
