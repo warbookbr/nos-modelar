@@ -1457,6 +1457,53 @@
         "via": "commit do aceite",
         "commit": "69ffcff15cf14d63402e93325770c10b42ced17e"
       }
+    },
+    {
+      "tipo": "reabertura",
+      "instancia": "base",
+      "por": "pessoa",
+      "quando": "2026-11-23",
+      "motivo": "cobre traçado na placa de controle (plano das trilhas), aprovado pelas imagens do mapa das redes e da base"
+    },
+    {
+      "tipo": "aceite",
+      "instancia": "base",
+      "aceite": {
+        "por": "pessoa, 2026-11-23",
+        "observacao": "placa de controle com as 47 redes de exemplo traçadas e conferidas sem violação; a pessoa aprovou o mapa das redes e a base pela janela da caixa",
+        "analise": "ausente"
+      },
+      "impressao": {
+        "forma": "sha256:a972db0b0cb7437b23d2b7e05d99ed1266b0896f8068974ec9832b07d41d1630",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0,
+            0
+          ]
+        },
+        "juntas": [],
+        "citadas": [],
+        "anteriores": []
+      }
     }
   ]
 }

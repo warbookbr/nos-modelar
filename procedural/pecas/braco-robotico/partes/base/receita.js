@@ -27,6 +27,10 @@
  */
 import { placaDeclarada } from '../../../../familias/componente-eletronico/placa.js';
 import { MATERIAIS as CORES_DOS_COMPONENTES } from '../../../../familias/componente-eletronico/placa-de-prova.js';
+/* o cobre da placa de controle: a cópia do pedido com a lista de redes (exemplo até a mecatrônica escrever a lista real) e o
+   traçado que `tools/modelar/tracar-placa.mjs` gravou dela, com a chave das entradas que a placa confere */
+import pedidoDaPlaca from './placa.pedido.json' with { type: 'json' };
+import tracadoDaPlaca from './placa.tracado.json' with { type: 'json' };
 
 export const TABELA = {
   raioDoCorpo: 105,
@@ -203,6 +207,7 @@ export function declaracaoDaPlaca(t = TABELA) {
     furos: [[meioX, meioZ], [-meioX, meioZ], [-meioX, -meioZ], [meioX, -meioZ]].map((centro) => ({ centro, diametro: t.diametroDoFuroDaPlaca })),
     pecas: COMPONENTES_DA_PLACA,
     pose: { rotacoes: [{ eixo: 'z', graus: 90 }], posicao: [-(t.raioDoCorpo + t.folgaDaPlacaAoCorpo + espessura), ((C.y0 + C.y1) / 2) * 1000, 0] },
+    cobre: { tracado: tracadoDaPlaca, redes: pedidoDaPlaca.itens.find((i) => i.tipo === 'ligacoes').redes },
   };
 }
 
