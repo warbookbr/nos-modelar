@@ -16,5 +16,14 @@ têm medidas típicas declaradas como estimativa, com a fonte em `familia.json` 
 `procedural/familias/componente-eletronico/geometria.js`; um componente de medida própria entra como parâmetro com faixa
 da família, e não como forma feita à mão na receita. Exemplos executados: a placa
 de prova (`procedural/familias/componente-eletronico/placa-de-prova.js`) e a placa de controle do braço robótico
-(`procedural/pecas/braco-robotico/partes/base/receita.js`). Trilhas de cobre e
-ligações elétricas ficam fora da família.
+(`procedural/pecas/braco-robotico/partes/base/receita.js`).
+
+O cobre traçado entra pelo campo `cobre: { tracado, redes }` da placa declarada:
+`redes` é a lista de ligações no formato do item `ligacoes` do pedido da ponte, e
+`tracado` é o arquivo salvo que `node tools/modelar/tracar-placa.mjs` escreve a
+partir da placa, da lista e das regras de `PLACA`. A placa recusa o traçado cuja
+chave não é a das entradas de agora (trace de novo depois de mover componente) e o
+que o conferidor de cobre recusa (rede aberta, curto, trilha estreita, cobre perto
+da borda). `node tools/modelar/conferir-placa.mjs` dá o relatório e o mapa das
+redes das duas faces para a pessoa aprovar. A netlist e o circuito são da
+mecatrônica; a família só traça e confere o cobre que a lista pede.

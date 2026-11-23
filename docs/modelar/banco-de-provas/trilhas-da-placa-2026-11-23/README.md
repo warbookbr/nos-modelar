@@ -33,3 +33,8 @@ O tempo da base com o cobre passou primeiro de dez minutos para três gerações
 Dois achados de processo. A chave das entradas incluía a pose da placa na peça hospedeira, que não muda o cobre, e passou a deixá-la de fora, com o `pai`. E a receita da base gera a placa ao ser importada, então um traçado salvo com chave velha barra o próprio `tracar-placa` que o refaria: para traçar de novo, tira-se a `chave` do arquivo salvo antes, e a placa sem chave não confere.
 
 Com o cobre, a descrição da base do braço passou de 43 para 84 s, na medida de contatos entre as partes, pelos triângulos finos das trilhas; o custo é da ferramenta de contatos e foi ao backlog. A varredura do acervo no CI estourou o teto de 600 s uma vez, numa parte dos testes lentos que juntava ela, o teste das etapas e o do traçador, e passou ao rodar de novo.
+
+## A resposta no pedido
+
+A mecatrônica publicou em 2026-11-23 a versão 1.1 do contrato da ponte, com o item `ligacoes` no formato da [proposta](PROPOSTA-DO-ITEM.md) e o tipo de porta `passivo`. A lista da placa do braço passa no conferidor de lá contra a ficha que o Modelar exporta, e `npm run conferir:pedido -- procedural/pecas/braco-robotico/partes/base/placa.pedido.json --escrever` gravou nela a resposta `cumprido` com a revisão 1 da ficha, porque o cobre foi traçado com a mesma lista. A lista da placa de prova continua sem resposta: a placa de prova é peça da família e não objeto com ficha, e a lista dela serve só aos testes.
+

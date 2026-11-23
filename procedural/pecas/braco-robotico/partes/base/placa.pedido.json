@@ -856,6 +856,10 @@
           "unidade": "redes",
           "origem": "declarado"
         }
+      },
+      "resposta": {
+        "estado": "cumprido",
+        "revisaoDaFicha": 1
       }
     }
   ]

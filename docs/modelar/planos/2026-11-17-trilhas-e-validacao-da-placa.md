@@ -1,6 +1,6 @@
 # Trilhas de cobre e validação elétrica da placa declarada: a lista de ligações vira cobre conferido por regra e por conectividade
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `procedural/familias/componente-eletronico/cobre/`, `procedural/familias/componente-eletronico/placa.js`, `procedural/familias/componente-eletronico/placa.test.js`, `procedural/familias/componente-eletronico/placa-de-prova.js`, `tools/modelar/tracar-placa.mjs`, `tools/modelar/conferir-placa.mjs`, `tools/modelar/tracar-placa.test.mjs`, `tools/modelar/conferir-placa.test.mjs`, `procedural/pecas/braco-robotico/partes/base/`, `docs/modelar/banco-de-provas/trilhas-da-placa-2026-11-23/`
 
@@ -83,7 +83,7 @@ Lá, pelo fluxo daquele repositório e pela 0004, o item de ligações entra no 
 2. Feita em 2026-11-23: o conferidor (`cobre/conferir.js`), a geometria do cobre (`cobre/geometria.js`, com a união pela CrossSection da Manifold) e a placa gerando trilhas e vias pelo campo `cobre`, sobre o traçado à mão de três redes da placa de prova (`cobre/placa-de-prova.tracado.json`), com um teste por regra, o teste da troca de rótulo e o comando `conferir-placa`, que desenha o mapa das redes. O plano previa: sobre um traçado declarado à mão na placa de prova: a placa gera trilhas e vias, as camadas das faces abrem onde há cobre, o conferidor passa o certo e recusa cada fixture errada, e o mapa das redes sai para a pessoa.
 3. Feita em 2026-11-23: o traçador (`cobre/tracador.js`), a chave das entradas (`cobre/chave.js`, SHA-256 em JavaScript puro) e o comando `tracar-placa`; as oito redes da placa de prova fecham sem violação em 4 s, em retas com curvas de 45 graus, e o traçado sai igual byte a byte. O plano previa: com o comando, o relatório das redes traçadas e não traçadas e o teste de determinismo, conferido pelo conferidor da fatia 2.
 4. Feita em 2026-11-23, com a placa aprovada pela pessoa pelas imagens do mapa das redes e da base, e a etapa `base` da montagem do braço reaberta e aceita de novo por ela, porque o cobre muda a forma da etapa: as 47 redes do braço traçadas e conferidas sem violação, a base com o cobre em 8 s (limite de 28 s) depois de as camadas das faces passarem a ir em faixas que recortam o cobre, e a guarda do acervo passando na base. O plano previa: com a medida de tempo, o retrato do acervo e as imagens para a pessoa.
-5. A resposta no item do pedido, a documentação, o banco de provas e o fechamento.
+5. Feita em 2026-11-23: a resposta `cumprido` no item `ligacoes` do pedido da placa do braço, gravada pelo `conferir:pedido` do plano da ponte depois que a mecatrônica publicou a 1.1; a nota de uso na referência de eletrônica da skill de criar peça; e o banco de provas.
 
 ## Riscos e parada
 
@@ -91,4 +91,8 @@ A pessoa aceitou a emenda do invariante em 2026-11-17: o Modelar guarda a cópia
 
 ## Fechamento
 
-A preencher.
+Concluído em 2026-11-23, com as cinco fatias no mesmo dia. A placa declarada gera o cobre traçado (trilhas e vias nas duas faces) a partir de um traçado salvo, que o `tracar-placa` escreve em grade A* com custo por curva e que a placa recusa quando a chave das entradas mudou; o conferidor mede pelo cobre, sem ler o rótulo de rede, e acusa rede aberta, curto, largura, distância, borda, furo e anel.
+
+Os gates: (1) as oito redes da placa de prova e as 47 da placa do braço fecham com zero rede aberta e zero curto, com os mínimos medidos no relatório acima das regras; (2) cada fixture errada é recusada pela regra dela com a rede, a face, o ponto e o valor, e o teste da troca de rótulo acha o mesmo curto; (3) o traçado e a base saem iguais em duas gerações; (4) a base com o cobre gera em 8 s, contra o limite de 28 s; (5) a pessoa aprovou o mapa das redes e a base por imagem e aceitou de novo a etapa `base` reaberta; (6) a guarda do acervo passa e o retrato só mudou na base; (7) nenhum arquivo do núcleo mudou neste plano; (8) a nota de uso está na referência de eletrônica da skill de criar peça e no cabeçalho de `placa.js`, e a proposta do item virou a versão 1.1 do contrato da mecatrônica, publicada no mesmo dia, com a resposta `cumprido` gravada no pedido do braço; (9) o Filtro Agent-First foi seguido, salvo as áreas proibidas ao cobre, que não foram feitas porque nenhuma placa precisou delas.
+
+Dois achados que o processo não pegava viraram regra durante o plano: a união de polígonos deixava pontos a 1 µm que a extrusão recusa, e o teste da placa passou a executar os passos; e a chave do traçado incluía a pose da placa, e passou a excluí-la. Voltam ao backlog: as áreas proibidas ao cobre declaradas na placa, a medida de contatos com triângulos finos (a base foi de 43 para 84 s na descrição) e o que o Filtro já adiava (máscara de solda, serigrafia, Gerber, plano de terra e barril do furo).
