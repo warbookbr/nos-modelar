@@ -336,10 +336,6 @@ com a montagem em `procedural/pecas/<objeto>/montagem.json`, e é citada por
 ortográfica, as etapas que já têm geometria, e grava as imagens em
 `tools/bancadas/out/etapas-<montagem>-<vista>-orto.png`.
 
-## A ficha para a mecatrônica
-
-O objeto montado que vai ser simulado no nos-mecatronica declara em `procedural/pecas/<objeto>/ponte.json` o que a montagem não diz: quais instâncias giram juntas (`conjuntos`), as juntas com a porta que dá o eixo, o curso, a redução e o motor, as densidades dos materiais e as placas declaradas que alguma instância carrega, com os tipos elétricos dos pinos que o componente não fixa sozinho. `npm run exportar:ficha -- <objeto>` grava a malha e a ficha conferida em `exportacoes/ficha/<objeto>/`, e `npm run conferir:pedido -- <pedido.json>` responde o pedido que volta de lá. O formato, as medidas e as regras estão no [README do módulo](../../../modulos/ficha-do-objeto/README.md); o braço robótico é o exemplo, e o banco de provas [ponte-mecatronica-2026-11-23](../banco-de-provas/ponte-mecatronica-2026-11-23/README.md) mostra a ficha dele e o pedido de prova respondido.
-
 ## O que não existe
 
 Ainda não há:

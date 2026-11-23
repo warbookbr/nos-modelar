@@ -65,7 +65,7 @@ Escrito em 2026-11-16: [família de componentes eletrônicos](../decisoes/PLANOS
 
 ### 2. Ponte com a mecatrônica
 
-Escrito em 2026-11-16: [ponte com a mecatrônica](2026-11-16-ponte-com-a-mecatronica.md). A exportação da ficha do objeto (peças, identificadores, posições, massa quando houver, portas), a declaração de portas elétricas nas peças e a leitura e conferência do pedido que volta (espaço, posição, passagem), num módulo em `modulos/` e na autoria, com nome geral.
+Escrito em 2026-11-16: [ponte com a mecatrônica](../decisoes/PLANOS-ENCERRADOS.md). A exportação da ficha do objeto (peças, identificadores, posições, massa quando houver, portas), a declaração de portas elétricas nas peças e a leitura e conferência do pedido que volta (espaço, posição, passagem), num módulo em `modulos/` e na autoria, com nome geral.
 
 ### Os planos que migraram
 

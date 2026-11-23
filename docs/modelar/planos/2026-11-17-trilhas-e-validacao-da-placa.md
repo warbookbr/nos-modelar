@@ -8,7 +8,7 @@
 
 **Repositório e base:** `warbookbr/nos-modelar`, main na ativação, depois do fechamento do [plano da família de componentes eletrônicos](../decisoes/PLANOS-ENCERRADOS.md), como a pessoa decidiu em 2026-11-17. O outro lado é `warbookbr/nos-mecatronica`, pelo contrato da ponte (`ponte/README.md` de lá) e pelas decisões 0001 e 0004 de lá.
 
-Pedido pela pessoa em 2026-11-17, ao perguntar se a placa de controle do braço "vai ter os trilhos de cobre e ser validada". É plano próprio, fora dos dois que o [plano-raiz da mecatrônica](2026-11-16-eletronica-no-modelar.md) gerou, e depende da [ponte com a mecatrônica](2026-11-16-ponte-com-a-mecatronica.md) para a lista real chegar.
+Pedido pela pessoa em 2026-11-17, ao perguntar se a placa de controle do braço "vai ter os trilhos de cobre e ser validada". É plano próprio, fora dos dois que o [plano-raiz da mecatrônica](2026-11-16-eletronica-no-modelar.md) gerou, e depende da [ponte com a mecatrônica](../decisoes/PLANOS-ENCERRADOS.md) para a lista real chegar.
 
 ## Problema observado
 
