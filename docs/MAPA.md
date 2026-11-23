@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2226 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2227 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -3394,6 +3394,10 @@
 - `compensada.js` — compensada — a peça de teste do sólido por laços com os cantos da seção compensados (tabela em `variantes.js`).
 - `poucos-planos-na-quina.js` — poucos-planos-na-quina — a peça de teste do sólido por laços no limite 4, metade dos planos por quarto de quina em planta (tabela em `variantes.js`).
 - `variantes.js` — variantes.js — as tabelas que, sobre a tabela de referência de `../forma.js`, levam a peça de teste do sólido por laços aos limites que a gaiola de laços esc…
+
+## tools/fixtures/transmissao/
+
+- `duas-instancias.test.mjs` — duas-instancias.test.mjs — duas instâncias da mesma família numa receita, a prova da fatia 1 do plano de engrenagem, polia e correia.
 
 ## tools/fixtures/tres-blocos-vinculados/
 

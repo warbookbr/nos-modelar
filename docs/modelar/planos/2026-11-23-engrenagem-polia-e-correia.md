@@ -26,7 +26,7 @@ Par como composição: ENVOLVER. O par (engrenagem com engrenagem, polia com pol
 
 Tabela de norma: USAR DIRETO a forma da tabela da família `fixador`, com os módulos da série ISO 54 e os perfis de correia (GT2 de 2 mm, HTD de 3 e 5 mm, T5 e as seções em V Z, A e B) como dado da família. O catálogo de normas único que a [análise de 2026-10](../pesquisas/ANALISES-DE-2026-10.md) propõe fica ADIAR, para quando uma terceira família pedir a mesma tabela.
 
-Colisão de ids de origem entre duas chamadas de família na mesma receita: o backlog a registra desde o plano da hélice ("Portas e montagem do fixador e da mola"). O par depende disso. A fatia 1 reproduz a colisão e, se ela existir, REFATORAR o `chamar` para dar prefixo próprio a cada chamada. A correção é geral e serve também à mola e ao fixador.
+Colisão de ids de origem entre duas chamadas de família na mesma receita: o backlog a registra desde o plano da hélice ("Portas e montagem do fixador e da mola"). A fatia 1 mediu que ela só acontece com duas chamadas cruas em `CHAMADAS_COMPOSICOES` e que `instanciaDeFamilia` já a resolve: USAR DIRETO, sem mudar o `chamar`.
 
 ## Incluído
 
@@ -55,7 +55,7 @@ O núcleo não ganha nome de objeto nem operação nova. O acervo sai igual, com
 
 ## Fatias
 
-1. A receita neutra com duas chamadas da mesma família, a colisão de ids reproduzida ou descartada, e a correção no `chamar`, se for o caso.
+1. Feita em 2026-11-23: a colisão reproduzida e descartada como defeito do caminho certo, em `tools/fixtures/transmissao/duas-instancias.test.mjs`.
 2. A família `polia-e-correia` com as polias dentadas, em V e lisa, e a aprovação da pessoa por imagem.
 3. O conjunto de duas polias com a correia fechada, com o par GT2 de 20 e 80 dentes medido.
 4. A família `engrenagem` com a reta, a helicoidal, a cremalheira e a catraca, e a aprovação da pessoa por imagem.
@@ -71,5 +71,7 @@ Decidido em 2026-11-23: a polia e a correia vêm antes da engrenagem, porque o b
 Se o contorno do dente evolvente com muitos dentes (acima de 150) passar de dois segundos ou der lasca na `extrusao`, a família reduz os pontos por flanco e mede de novo, e se ainda assim não passar, a fatia volta à pessoa com a medida. Se a helicoidal pedir uma varredura com giro que o núcleo não tem, ela sai do plano e vai ao backlog com a medida, sem operação nova. Se a correção do `chamar` mudar a malha de alguma peça do acervo, a fatia 1 para e volta à pessoa antes de seguir.
 
 ## Andamento
+
+Fatia 1, em 2026-11-23. Duas chamadas cruas da família `mola` em `CHAMADAS_COMPOSICOES` dão 7 órfãos com origem ambígua (52 com o `fixador`), porque a composição declara ids de origem fixos e a expansão não os separa por chamada. Pelo `instanciaDeFamilia`, que soma a base aos ids e renomeia as partes, as duas molas saem com 6.200 faces, nenhum órfão e as partes `aEspiras` e `bEspiras`, tanto pelas `poses` de uma chamada quanto por duas chamadas com a `base` encadeada; sem a base, a colisão volta. O `chamar` e o núcleo não mudam, e o acervo fica igual. O processo pegaria a colisão numa peça, porque os órfãos aparecem no `descrever` e reprovam a guarda do acervo, mas o caminho certo não estava escrito no contrato da família e o backlog o dava como defeito: o contrato ganhou a frase que manda duas instâncias para o `instanciaDeFamilia`, com a prova. O par de polias e o de engrenagens seguem por ele.
 
 ## Fechamento
