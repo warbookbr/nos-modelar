@@ -4,7 +4,7 @@ Evidência do plano do braço de prova de duas juntas, ativado em 2026-11-23.
 
 ## Decisões do alinhamento
 
-A pessoa decidiu, por recomendação da IA: o motor do cotovelo na ponta do primeiro elo, ligado ao cotovelo pelas polias GT2 de 20 e 80 dentes; a base redonda e baixa, com a eletrônica dentro e o motor do ombro deitado numa torre em cima dela; e o ombro em garfo, com o primeiro elo apoiado de um lado pelo eixo da planetária e do outro por um rolamento.
+A pessoa decidiu, por recomendação da IA: o motor do cotovelo na ponta do primeiro elo, ligado ao cotovelo pelas polias GT2 de 20 e 80 dentes; a base redonda e baixa, com a eletrônica dentro e o motor do ombro deitado numa torre em cima dela; o ombro em garfo, com o primeiro elo apoiado de um lado pelo eixo da planetária e do outro por um rolamento; e o botão de parada, de cogumelo vermelho de uns 22 mm, no topo da base, na frente, longe do caminho do braço.
 
 ## O formato dos elos
 
