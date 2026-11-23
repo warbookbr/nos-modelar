@@ -27,11 +27,11 @@
  *     declaração pode mover a gaiola (mm, 1 por padrão) e o ângulo (0,5 grau) e a razão de curvatura (1,5, na G2) medidos nela.
  *   marcarCurvas: true põe as curvas em `passo.curvas`, e o passo `subdivisao` marca no neutro (`chapas[k].curvas`) as arestas que descendem
  *     de cada uma, para a medida da emenda ler a curva declarada; a malha não muda.
- *   alisarSuperficie: true | { onda?: mm } liga, no ajuste das cotas do passo, a energia de variação de curvatura da superfície limite: a
+ *   alisarSuperficie: true | { onda?: mm } liga, no ajuste das cotas do passo, a variação da curvatura normal da superfície limite: a
  *     curva de cota exata deixa de ser crista de curvatura contra o miolo. O miolo dos retalhos de quatro lados é preenchido pelas curvas
  *     vizinhas (a curva seguinte da rede de cada lado; sem a opção o preenchimento não muda), fica sem o `liso` e tem a cota de peso 0,003
  *     (`interior` junto troca o peso, e `interior: false` é recusado); a onda vale de 2 a 64 passos da gaiola; não vale com `liso` nem com
- *     curva com `continuidade`. Desligada por padrão, e experimental: não use em receita enquanto o espaçamento desigual não estiver corrigido.
+ *     curva com `continuidade`. Desligada por padrão, e experimental: não use em receita enquanto o custo passar do dobro do de sem ela.
  * devolve: { pontos, passo, linha(curva), pontoDaCurva, linhas, nos, curvas, retalhos, densidades, extraordinarios, avisos, emendas?, ... }.
  * exemplo:
  *   gaiolaPorRede({ passo: 50, fora: [0, 1, 0], nos: { A: [0, 0, 0], B: [200, 0, 0], C: [200, 0, 200], D: [0, 0, 200] },
@@ -98,8 +98,8 @@
  *   longo dele, como os de `vincos`), que o passo `subdivisao` leva à malha e grava no neutro, em `chapas[k].curvas`, sem mudar a geometria:
  *   é o que deixa a medida da emenda achar a curva declarada, que a malha sozinha não carrega. Sem ela (o padrão), o passo é o de sempre.
  * alisarSuperficie: true | { onda: mm }: o passo sai com `regularizacao: { tipo: 'variacaoDeCurvatura', onda? }`, e o ajuste das cotas da
- *   subdivisão troca o custo do deslocamento de cada ponto da gaiola pela energia de variação de curvatura da superfície limite
- *   (`energiaDeVariacaoDeCurvatura`, em `subdivisao.js`). A curva de cota exata deixa de ser crista de curvatura contra o miolo, que é o
+ *   subdivisão troca o custo do deslocamento de cada ponto da gaiola pela variação da curvatura normal da superfície limite
+ *   (`energiaDeCurvaturaNormal`, em `subdivisao.js`). A curva de cota exata deixa de ser crista de curvatura contra o miolo, que é o
  *   que a cota exata ao lado do miolo de peso 1 deixa sem a opção. Com ela o miolo dos retalhos de quatro lados sai do preenchimento pelas
  *   curvas vizinhas (abaixo, em O PREENCHIMENTO), fica sem o
  *   alisamento pela normal (`liso`), e a cota dele passa a ter o peso INTERIOR_COM_ENERGIA (0,003) no lugar de 1: a energia leva o miolo
@@ -1055,7 +1055,7 @@ export function gaiolaPorRede(definicaoDada) {
   if (!(typeof anguloMax === 'number' && Number.isFinite(anguloMax) && anguloMax > 0)) falha(`anguloMax é ${JSON.stringify(anguloMax)}; precisa ser número finito maior que zero, em graus`);
   const anguloDeCanto = definicao.anguloDeCanto === undefined ? ANGULO_DE_CANTO_PADRAO : definicao.anguloDeCanto;
   if (anguloDeCanto !== null && anguloDeCanto !== false && !(typeof anguloDeCanto === 'number' && anguloDeCanto > 0 && anguloDeCanto < 180)) falha(`anguloDeCanto é ${JSON.stringify(anguloDeCanto)}; precisa ser graus entre 0 e 180, ou false`);
-  /* A opção `alisarSuperficie`: true, ou { onda: mm }. Com ela o ajuste das cotas do passo usa a energia de variação de curvatura, e o
+  /* A opção `alisarSuperficie`: true, ou { onda: mm }. Com ela o ajuste das cotas do passo usa a variação da curvatura normal, e o
      miolo dos retalhos fica como o preenchimento o pôs, sem o alisamento pela normal, com a cota de peso INTERIOR_COM_ENERGIA. */
   let alisarSuperficie = null;
   if (definicao.alisarSuperficie != null && definicao.alisarSuperficie !== false) {

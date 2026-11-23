@@ -79,6 +79,8 @@ Fatia 1, primeira parte, feita em 2026-11-22, com as medidas em `docs/modelar/ba
 
 Fatia 2, decisão da pessoa em 2026-11-22, com as medidas do protótipo no banco de provas: a cota completa, refeita sobre a gaiola do ajuste anterior (quatro iterações), e não a cota só na normal, que tira a cota exata do lugar. Na mesma recomendação aceita, o gate 1 ganha folga de 0,05 mm, porque a sela, cuja curvatura normal varia de fato no espaço, fica até 0,021 mm pior que sem a opção com qualquer forma. O gate 2 cobra energia nula na quadrática inclinada, que é a propriedade da energia de hoje e não a da curvatura normal (nula na esfera, no cilindro e no plano, e não na inclinada, cuja curvatura varia de fato); a correção do texto vai à pessoa.
 
+Fatia 2 levada ao núcleo em 2026-11-22: a opção usa a cota completa refeita quatro vezes, igual ao protótipo, e as dezoito analíticas, a grade de razão 2 e oito dos dez retalhos da chapa lateral de prova ficam dentro do gate 1; os retalhos `coluna` e `atrasDaColuna` seguem CONHECIDOS, por 0,02 mm. O custo no quarto traseiro reprova o gate 4: 5,2 vezes o de sem a opção no passo 70 e 8,1 no passo 35, com dois terços na conferência do ganho, uma resolução por cota. As medidas estão no banco de provas. Baixar o custo fica antes da fatia 5.
+
 ## Fechamento
 
 Preencher ao concluir ou cancelar: estado final, commit e PR, gates, resultado observado e candidatos devolvidos ao backlog.

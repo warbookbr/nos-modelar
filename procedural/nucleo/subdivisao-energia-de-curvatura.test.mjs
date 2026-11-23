@@ -1,11 +1,11 @@
 /* subdivisao-energia-de-curvatura.test.mjs — a energia de variação de curvatura como regularização do ajuste das cotas com peso
  * (`regularizacao: { tipo: 'variacaoDeCurvatura', onda? }` em `ajustarGaiolaAsMedidasComPeso`, em `operadorDasMedidas` e no passo
  * `subdivisao`): o estêncil do anel contra o oráculo da superfície limite, a energia nula em toda quadrática do parâmetro, a calibração
- * da onda, as cotas exatas no lugar, o operador igual ao ajuste sobre a gaiola recebida, as recusas, a faixa da onda, e a conta de sempre sem o argumento. */
+ * da onda, as cotas exatas no lugar, o operador igual ao ajuste sobre a gaiola recebida, as recusas, a faixa da onda, a conta de sempre sem o argumento, e a curvatura normal que o ajuste usa desde 2026-11-22. */
 import { describe, expect, it } from 'vitest';
 import { gaiolaDoPasso } from './operacoes/subdivisao.js';
 import {
-  ARESTAS_POR_ONDA, ErroDaOnda, ONDA_MAXIMA_EM_PASSOS, ONDA_MINIMA_EM_PASSOS, RESTO_DO_DESLOCAMENTO, passoDaGaiola, ajustarGaiolaAsMedidas, ajustarGaiolaAsMedidasComPeso, energiaDeVariacaoDeCurvatura, limitesDaGaiola, operadorDasMedidas, superficieLimite,
+  ARESTAS_POR_ONDA, ErroDaOnda, ITERACOES_DA_CURVATURA, ONDA_MAXIMA_EM_PASSOS, ONDA_MINIMA_EM_PASSOS, RESTO_DO_DESLOCAMENTO, passoDaGaiola, ajustarGaiolaAsMedidas, ajustarGaiolaAsMedidasComPeso, energiaDeCurvaturaNormal, energiaDeVariacaoDeCurvatura, limitesDaGaiola, operadorDasMedidas, superficieLimite,
 } from './subdivisao.js';
 
 /* a grade de nx por nz vértices, com o ponto de cada um dado por ponto(i, j) */
@@ -112,10 +112,11 @@ describe('a energia de variação de curvatura no ajuste das cotas', () => {
     expect(Math.max(...r.residuos)).toBeLessThan(1e-12);
     expect(r.regularizacao.arestasComTermo).toBe((nx - 3) * (nz - 2) + (nx - 2) * (nz - 3));
     expect(r.regularizacao.energiaDepois).toBeLessThan(0.01 * r.regularizacao.energiaAntes);
-    /* a superfície limite do miolo, que foi declarado a até 45 mm da calha, fica a menos de 0,6 mm dela (o que sobra é o degrau da regra
-       de borda, κh²/6 = 0,42 mm aqui, que a energia espalha); o ajuste de sempre, sem a regularização, deixa o miolo onde foi declarado */
+    /* a superfície limite do miolo, que foi declarado a até 45 mm da calha, fica a menos de 0,6 mm dela, medida no x do próprio ponto
+       limite, que a conta move junto, porque cada ponto anda na normal (o que sobra é o degrau da regra de borda, κh²/6 = 0,42 mm aqui,
+       que a energia espalha; 0,48 mm, medido); o ajuste de sempre, sem a regularização, deixa o miolo onde foi declarado */
     const L = limitesDaGaiola({ ...declarada, vertices: r.vertices });
-    let desvio = 0; for (let j = 2; j < nz - 2; j++) for (let i = 2; i < nx - 2; i++) desvio = Math.max(desvio, Math.abs(L[j * nx + i][1] - f(i * h)));
+    let desvio = 0; for (let j = 2; j < nz - 2; j++) for (let i = 2; i < nx - 2; i++) desvio = Math.max(desvio, Math.abs(L[j * nx + i][1] - f(L[j * nx + i][0])));
     expect(desvio).toBeLessThan(0.0006);
     const semEnergia = ajustarGaiolaAsMedidas(declarada, medidas.map((m) => m.indice));
     const L0 = limitesDaGaiola({ ...declarada, vertices: semEnergia.vertices });
@@ -124,15 +125,19 @@ describe('a energia de variação de curvatura no ajuste das cotas', () => {
     expect(RESTO_DO_DESLOCAMENTO).toBe(1e-9);
   });
 
-  it('CONHECIDA: com o espaçamento desigual entre os dois lados de uma curva exata, a superfície se afasta da forma mais que sem a energia', () => {
-    /* É o limite que impede o uso em receita. A grade de 15 por 15 sobre 600 mm tem o espaçamento em x duas vezes maior de um lado da
-       curva do meio; a borda e as duas fileiras do meio são cota exata e o miolo tem a cota da própria forma (peso 1 sem a energia, 0,003
-       com ela). A energia cobra a derivada segunda no parâmetro, o degrau do espaçamento conta como curvatura, e o desvio a mais de
-       100 mm da borda vai de 0,89 para 3,27 mm no paraboloide e de 0,33 para 2,28 na sela. A catraca cobra que não piore, e falha quando
-       a energia deixar de ser pior que o ajuste de sempre, para a marca sair. */
-    const nx = 15; const a = 0.6 / (7 + 7 * 2); const xs = (i) => -0.3 + (i <= 7 ? i * a : 7 * a + (i - 7) * a * 2); const zs = (j) => -0.3 + (0.6 * j) / 14;
-    const conhecidas = { paraboloide: [(x, z) => x * x + z * z, 3.273], sela: [(x, z) => (x * x - z * z) / 1.5, 2.283] };
-    for (const [nome, [f, medido]] of Object.entries(conhecidas)) {
+  it('com o espaçamento desigual entre os dois lados de uma curva exata, a superfície não se afasta da forma mais que sem a energia, com a folga de 0,05 mm', () => {
+    /* A grade de 15 por 15 sobre 600 mm tem o espaçamento em x `razao` vezes maior de um lado da curva do meio; a borda e as duas fileiras
+       do meio são cota exata e o miolo tem a cota da própria forma (peso 1 sem a energia, 0,003 com ela). A energia da derivada no
+       parâmetro contava o degrau do espaçamento como curvatura e levava o paraboloide de 0,89 para 3,27 mm na razão 2; a curvatura normal
+       o leva a 0,73. A sela, cuja curvatura normal varia de fato, fica pior que sem a energia por 0,021 mm na razão 1 e 0,008 na razão 2,
+       dentro da folga de 0,05 mm que a pessoa aceitou no gate 1 do plano do G2 (2026-11-22). Medido: paraboloide 0,608 e 0,727, cilindro
+       0,025 e 0,268, sela 0,029 e 0,338, contra 0,636 e 0,887, 0,164 e 0,320, 0,008 e 0,330 sem a energia; a catraca cobra o medido. */
+    const formas = {
+      paraboloide: [(x, z) => x * x + z * z, [0.608, 0.727]], cilindro: [(x) => 1 - Math.sqrt(1 - x * x), [0.025, 0.268]], sela: [(x, z) => (x * x - z * z) / 1.5, [0.029, 0.338]],
+    };
+    for (const [nome, [f, medidos]] of Object.entries(formas)) for (const [q, razao] of [1, 2].entries()) {
+      const medido = medidos[q];
+      const nx = 15; const a = 0.6 / (7 + 7 * razao); const xs = (i) => -0.3 + (i <= 7 ? i * a : 7 * a + (i - 7) * a * razao); const zs = (j) => -0.3 + (0.6 * j) / 14;
       const g = grade(nx, nx, (i, j) => [xs(i), f(xs(i), zs(j)), zs(j)]);
       const exata = (k) => { const i = k % nx, j = Math.floor(k / nx); return i === 0 || j === 0 || i === nx - 1 || j === nx - 1 || i === 7 || j === 7; };
       const desvio = (regularizacao, peso) => {
@@ -145,9 +150,31 @@ describe('a energia de variação de curvatura no ajuste das cotas', () => {
         return pior * 1000;
       };
       const sem = desvio(null, 1), com = desvio(REG, 0.003);
-      expect(com, `${nome}: a energia deixou de ser pior com o espaçamento desigual: tire a marca`).toBeGreaterThan(sem);
-      expect(com, `${nome} piorou`).toBeLessThanOrEqual(medido * 1.02);
+      expect(com, `${nome}, razão ${razao}: a energia afastou a superfície da forma além da folga`).toBeLessThanOrEqual(sem + 0.05);
+      expect(com, `${nome}, razão ${razao} piorou`).toBeLessThanOrEqual(medido * 1.02 + 1e-3);
     }
+  });
+
+  it('a curvatura normal é nula na esfera, no cilindro e no plano, não na quadrática inclinada, e o ajuste refaz a conta até a mudança cair', () => {
+    const R = 0.5;
+    const esfera = grade(15, 15, (i, j) => { const lon = (i - 7) * 0.06, lat = (j - 7) * 0.06; return [R * Math.cos(lat) * Math.sin(lon), R - R * Math.cos(lat) * Math.cos(lon), R * Math.sin(lat)]; });
+    const cilindro = grade(15, 15, (i, j) => { const t = (i - 7) * 0.03; return [Math.sin(t), 1 - Math.cos(t), (j - 7) * 0.03]; });
+    const plano = grade(15, 15, (i, j) => { const x = 0.03 * i + 0.002 * i * i + 0.001 * j, z = 0.025 * j + 0.0015 * j * j - 0.0007 * i; return [x, 0.3 * x - 0.2 * z + 0.05, z]; });
+    const inclinada = altura(15, 15, 0.03, (x, z) => 3 * x * x - 4 * x * z + 2 * z * z + 0.2 * x - 0.1);
+    const energia = (g) => { const e = energiaDeCurvaturaNormal(g); return e.valor(g.vertices) / (e.onda / (2 * Math.PI)) ** 6; };
+    /* a da cúbica de referência dá a escala: a das três formas de curvatura constante fica abaixo de um milionésimo dela */
+    const cubica = energia(altura(15, 15, 0.03, (x) => 5 * x * x * x));
+    for (const [nome, g] of Object.entries({ esfera, cilindro, plano })) expect(energia(g), nome).toBeLessThan(1e-6 * cubica);
+    expect(energia(inclinada)).toBeGreaterThan(1e-3 * cubica);
+    /* a mudança entre duas contas seguidas cai a cada vez, e a cota exata fica no lugar */
+    const nx = 15; const a = 0.6 / 21; const xs = (i) => -0.3 + (i <= 7 ? i * a : 7 * a + (i - 7) * a * 2); const zs = (j) => -0.3 + (0.6 * j) / 14;
+    const g = grade(nx, nx, (i, j) => [xs(i), 1 - Math.sqrt(1 - xs(i) ** 2), zs(j)]);
+    const exata = (k) => { const i = k % nx, j = Math.floor(k / nx); return i === 0 || j === 0 || i === nx - 1 || j === nx - 1 || i === 7 || j === 7; };
+    const r = ajustarGaiolaAsMedidasComPeso(g, g.vertices.map((_, indice) => ({ indice, peso: exata(indice) ? Infinity : 0.003 })), REG);
+    expect(r.regularizacao.iteracoes).toBe(ITERACOES_DA_CURVATURA);
+    expect(r.regularizacao.mudancas).toHaveLength(ITERACOES_DA_CURVATURA - 1);
+    r.regularizacao.mudancas.forEach((m, k) => { if (k) expect(m).toBeLessThan(0.5 * r.regularizacao.mudancas[k - 1]); });
+    expect(Math.max(...r.residuos.filter((_, k) => exata(r.medidas[k])))).toBeLessThan(1e-12);
   });
 
   it('sem o argumento a conta é a de sempre, e a memória separa as duas chamadas', () => {
@@ -164,32 +191,21 @@ describe('a energia de variação de curvatura no ajuste das cotas', () => {
     expect(ajustarGaiolaAsMedidasComPeso(g, medidas, REG)).toEqual(d);
   });
 
-  it('o operador com a regularização refaz o ajuste da gaiola recebida, e com a onda declarada não é linear nela', () => {
+  it('o operador com a regularização refaz o ajuste das posições que recebe, porque a curvatura normal não é linear na gaiola', () => {
     const g = altura(9, 8, 0.03, (x, z) => 0.02 * Math.sin(20 * x) * Math.cos(15 * z));
+    const esticada = { ...g, vertices: g.vertices.map((p) => [3 * p[0], p[1], p[2]]) };
     for (const medidas of [
       g.vertices.map((_, indice) => ({ indice, peso: indice % 7 === 0 ? Infinity : 2 })),
       g.vertices.map((_, indice) => ({ indice, peso: Infinity })).filter((m) => m.indice % 3 === 0),
-    ]) {
-      const reg = { ...REG, onda: 0.2 };
-      const r = ajustarGaiolaAsMedidasComPeso(g, medidas, reg);
+    ]) for (const reg of [REG, { ...REG, onda: 0.2 }]) {
       const op = operadorDasMedidas(g, medidas, reg);
-      expect(op.exato).toBe(false);
-      /* o operador é o sistema montado sobre a gaiola recebida: aplicado às posições dela, devolve a gaiola ajustada */
-      expect(maior(op.aplicar(g.vertices), r.vertices)).toBeLessThan(1e-10);
-      /* e sem a regularização o operador é outro */
-      expect(maior(operadorDasMedidas(g, medidas).aplicar(g.vertices), r.vertices)).toBeGreaterThan(1e-6);
-    }
-    /* com a onda declarada os coeficientes da energia valem (onda/passo)⁶, e o passo (a mediana das arestas) sai da gaiola: a gaiola
-       esticada em x tem outro passo, e o operador da original aplicado à esticada não é o ajuste dela. Sem a onda declarada ela
-       acompanha o passo, os coeficientes não dependem das posições, e o operador é linear */
-    const medidas = g.vertices.map((_, indice) => ({ indice, peso: indice % 7 === 0 ? Infinity : 2 }));
-    const esticada = { ...g, vertices: g.vertices.map((p) => [3 * p[0], p[1], p[2]]) };
-    for (const [reg, linear] of [[{ ...REG, onda: 0.2 }, false], [REG, true]]) {
-      const daEsticada = ajustarGaiolaAsMedidasComPeso(esticada, medidas, reg);
-      expect(daEsticada.regularizacao.passo).not.toBeCloseTo(ajustarGaiolaAsMedidasComPeso(g, medidas, reg).regularizacao.passo, 6);
-      expect(maior(operadorDasMedidas(esticada, medidas, reg).aplicar(esticada.vertices), daEsticada.vertices)).toBeLessThan(1e-10);
-      const peloDaOriginal = maior(operadorDasMedidas(g, medidas, reg).aplicar(esticada.vertices), daEsticada.vertices);
-      if (linear) expect(peloDaOriginal).toBeLessThan(1e-10); else expect(peloDaOriginal).toBeGreaterThan(1e-6);
+      expect(op.exato).toBe(false); expect(op.linear).toBe(false);
+      expect(maior(op.aplicar(g.vertices), ajustarGaiolaAsMedidasComPeso(g, medidas, reg).vertices)).toBeLessThan(1e-12);
+      expect(maior(op.aplicar(esticada.vertices), ajustarGaiolaAsMedidasComPeso(esticada, medidas, reg).vertices)).toBeLessThan(1e-12);
+      /* sem a regularização o operador é outro, e linear */
+      const semReg = operadorDasMedidas(g, medidas);
+      expect(semReg.linear).toBe(true);
+      expect(maior(semReg.aplicar(g.vertices), op.aplicar(g.vertices))).toBeGreaterThan(1e-6);
     }
   });
 
@@ -200,7 +216,7 @@ describe('a energia de variação de curvatura no ajuste das cotas', () => {
     const passo = passoDaGaiola(g.vertices, g.faces);
     expect(energiaDeVariacaoDeCurvatura(g).passo).toBe(passo);
     for (const onda of [0.0002, 0.99 * 2 * passo, 1.01 * 64 * passo, 20]) {
-      for (const chamada of [() => energiaDeVariacaoDeCurvatura(g, { onda }), () => ajustarGaiolaAsMedidasComPeso(g, medidas, { ...REG, onda }), () => operadorDasMedidas(g, medidas, { ...REG, onda })]) {
+      for (const chamada of [() => energiaDeVariacaoDeCurvatura(g, { onda }), () => energiaDeCurvaturaNormal(g, g.vertices, { onda }), () => ajustarGaiolaAsMedidasComPeso(g, medidas, { ...REG, onda }), () => operadorDasMedidas(g, medidas, { ...REG, onda })]) {
         let erro = null; try { chamada(); } catch (e) { erro = e; }
         expect(erro, `onda ${onda}`).toBeInstanceOf(ErroDaOnda);
         expect(erro.message).toContain(`a onda da regularizacao é ${onda}, fora da faixa de ${2 * passo} a ${64 * passo}`);

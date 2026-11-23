@@ -69,8 +69,8 @@ describe('o preenchimento do miolo pelas curvas vizinhas, fora do núcleo', () =
 /* A `vizinhas` NO NÚCLEO (2026-11-19): a `gaiolaPorRede` com `alisarSuperficie` preenche o miolo dos retalhos de quatro lados pelas curvas
  * vizinhas. O protótipo é a conta independente: os pontos da rede com a opção ficam a menos de 1e-9 mm dos dele, a tabela pelo núcleo é a
  * dele, e o gate da opção ligada (a distância a mais de 100 mm da borda e a crista por ponto nunca piores que sem a opção) vale nas
- * dezoito chapas analíticas. A grade de razão 2 segue CONHECIDA em `procedural/nucleo/subdivisao-energia-de-curvatura.test.mjs`: o
- * defeito dela é da energia no espaçamento desigual, e o preenchimento não o alcança. */
+ * dezoito chapas analíticas. Desde 2026-11-22 a energia é a curvatura normal refeita quatro vezes (plano do G2, fatia 2), que tirou o
+ * defeito da grade de razão 2 (`procedural/nucleo/subdivisao-energia-de-curvatura.test.mjs`), e as medidas daqui são as dela. */
 const maiorDiferencaDeNumero = (a, b) => {
   if (typeof a === 'number' && typeof b === 'number') return Math.abs(a - b);
   if (a === null || typeof a !== 'object') return a === b ? 0 : Infinity;
@@ -79,8 +79,8 @@ const maiorDiferencaDeNumero = (a, b) => {
 
 describe('o preenchimento pelas curvas vizinhas no núcleo, contra o protótipo', () => {
   it('nas dezoito chapas analíticas o núcleo dá os pontos e a tabela do protótipo, e a opção ligada nunca fica pior que sem ela', () => {
-    /* a distância a 100 mm da borda medida em 2026-11-19, com a opção, na ordem paraboloide, calota e toro */
-    const casos = [[{}, [0.0369, 0.0634, 0.0495]], [{ pontos: 16 }, [0.0358, 0.0314, 0.019]], [{ meio: [0.25, 0.25] }, [0.4974, 0.4726, 1.1054]], [{ meio: [0.25, 0.25], pontos: 16 }, [0.2358, 0.0631, 0.2285]], [{ meio: [0.3, 0.5] }, [0.3551, 0.2869, 0.1993]], [{ meio: [0.3, 0.5], pontos: 16 }, [0.0773, 0.0857, 0.0278]]];
+    /* a distância a 100 mm da borda medida em 2026-11-22 com a curvatura normal, com a opção, na ordem paraboloide, calota e toro */
+    const casos = [[{}, [0.034, 0.0553, 0.1279]], [{ pontos: 16 }, [0.035, 0.0272, 0.0425]], [{ meio: [0.25, 0.25] }, [0.5573, 0.4787, 1.1121]], [{ meio: [0.25, 0.25], pontos: 16 }, [0.1301, 0.0675, 0.1931]], [{ meio: [0.3, 0.5] }, [0.3551, 0.2869, 0.2148]], [{ meio: [0.3, 0.5], pontos: 16 }, [0.0557, 0.0472, 0.0439]]];
     let linhas = 0;
     for (const [definicao, medidas] of casos) {
       const provas = provaDasAnaliticas({ definicao, modos: ['vizinhas'] });
@@ -92,7 +92,7 @@ describe('o preenchimento pelas curvas vizinhas no núcleo, contra o protótipo'
         expect(maiorDiferencaDeNumero(vizinhas.cotaMm, nucleo.cotaMm), `${onde}: a cota do miolo`).toBeLessThan(1e-9);
         /* o gate: nunca pior que sem a opção, nem que a opção com o preenchimento padrão (a etapa B), e não pior que a medida */
         expect(nucleo.comEnergia.a100Mm, `${onde}: a 100 mm da borda contra a rede sem a opção`).toBeLessThanOrEqual(hoje.semEnergia.a100Mm);
-        expect(nucleo.comEnergia.a100Mm, `${onde}: a 100 mm da borda contra a etapa B`).toBeLessThanOrEqual(hoje.comEnergia.a100Mm + 1e-4);
+        expect(nucleo.comEnergia.a100Mm, `${onde}: a 100 mm da borda contra a etapa B`).toBeLessThanOrEqual(hoje.comEnergia.a100Mm + 1e-3);
         expect(nucleo.comEnergia.a100Mm, `${onde}: a 100 mm da borda contra a medida`).toBeLessThanOrEqual(medidas[k] * 1.02 + 0.001);
         for (const curva of ['h1', 'v1']) expect(nucleo.comEnergia.crista[curva], `${onde}: a crista da ${curva} contra a rede sem a opção`).toBeLessThanOrEqual(hoje.semEnergia.crista[curva]);
       });
@@ -123,20 +123,21 @@ describe('o preenchimento pelas curvas vizinhas no núcleo, contra o protótipo'
     expect(preencherRede(gaiolaPorRede({ ...lateral, liso: false }), 'vizinhas').andou * 1000).toBeGreaterThan(1);
   });
 
-  it('na chapa lateral de prova, na superfície final: o vizinho estreito cortado tira a piora do retalho baixo, e quatro retalhos seguem CONHECIDOS', () => {
+  it('na chapa lateral de prova, na superfície final: o vizinho estreito cortado tira a piora do retalho baixo, e dois retalhos seguem CONHECIDOS', () => {
     const { contraPrototipoMm, retalhos } = provaDaChapaLateral();
     expect(contraPrototipoMm).toBeLessThan(1e-9);
     expect(Object.keys(retalhos)).toHaveLength(10);
     /* O `baixo` era a piora da revisão de 2026-11-19: com o vizinho `ponta` (estreito, de fileiras que viram uns 100 graus em volta da ponta
        da gota) entrando no miolo, a superfície ficava a 1,112 mm da forma, contra 1,054 sem a opção e 0,941 com o preenchimento padrão.
-       Com o lado cortado pela razão das cordas ela fica a 0,765. */
-    expect(retalhos.baixo.nucleoMm).toBeLessThan(0.78); expect(retalhos.baixo.etapaBMm).toBeGreaterThan(0.93); expect(retalhos.baixo.semAOpcaoMm).toBeGreaterThan(1.04);
-    /* o preenchimento novo não deixa nenhum retalho mais longe que o padrão com a mesma energia, além da quarta casa (o `coluna`: 0,4811 contra 0,4804) */
-    for (const [nome, r] of Object.entries(retalhos)) expect(r.nucleoMm, `${nome} contra a etapa B`).toBeLessThanOrEqual(r.etapaBMm + 0.002);
-    /* CONHECIDOS: com a opção, quatro retalhos ficam mais longe da forma que sem ela. Em três o número é o do preenchimento padrão com a
-       energia (é a energia, e não o miolo), e no `ponta` o miolo novo melhora o da etapa B (0,499) sem chegar ao de sem a opção. A catraca
-       cobra que não piorem além da medida, e falha quando um passar a caber, para a marca sair. */
-    const conhecidos = { ponta: 0.4566, sobreOArco: 0.5432, coluna: 0.4811, atrasDaColuna: 0.4715 };
+       Com o lado cortado pela razão das cordas ela fica a 0,765, e com a curvatura normal (2026-11-22) a 0,665, contra 0,851 do
+       preenchimento padrão com a mesma energia. */
+    expect(retalhos.baixo.nucleoMm).toBeLessThan(0.68); expect(retalhos.baixo.etapaBMm).toBeGreaterThan(0.84); expect(retalhos.baixo.semAOpcaoMm).toBeGreaterThan(1.04);
+    /* o preenchimento novo não deixa nenhum retalho mais longe que o padrão com a mesma energia, além de 3 milésimos (o `ponta`: 0,4178 contra 0,4151, com a curvatura normal) */
+    for (const [nome, r] of Object.entries(retalhos)) expect(r.nucleoMm, `${nome} contra a etapa B`).toBeLessThanOrEqual(r.etapaBMm + 0.003);
+    /* CONHECIDOS: com a opção, dois retalhos ficam mais longe da forma que sem ela (0,476 contra 0,456 e 0,464 contra 0,443), com o
+       número do preenchimento padrão com a mesma energia: é a energia, e não o miolo. O `ponta` e o `sobreOArco` passaram a caber com a
+       curvatura normal (2026-11-22). A catraca cobra que não piorem além da medida, e falha quando um passar a caber, para a marca sair. */
+    const conhecidos = { coluna: 0.4757, atrasDaColuna: 0.4643 };
     for (const [nome, r] of Object.entries(retalhos)) {
       if (conhecidos[nome] === undefined) { expect(r.nucleoMm, `${nome} contra a chapa sem a opção`).toBeLessThanOrEqual(r.semAOpcaoMm); continue; }
       expect(r.nucleoMm, `${nome} passou a caber: tire a marca`).toBeGreaterThan(r.semAOpcaoMm);

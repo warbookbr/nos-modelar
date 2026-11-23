@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2194 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2195 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -555,6 +555,7 @@
 ## docs/modelar/banco-de-provas/superficie-g2-2026-11-22/
 
 - `README.md` — Superfície de produção (G2): os instrumentos e a linha de base do quarto traseiro
+- `custo-da-opcao.mjs` — custo-da-opcao.mjs — quanto a opção `alisarSuperficie` da gaiolaPorRede custa na subdivisão do quarto traseiro do carro-fastback (gate 4 do plano do G2: até …
 
 ## docs/modelar/banco-de-provas/suporte-tubo-2026-10-10/
 
