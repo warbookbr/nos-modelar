@@ -8,4 +8,4 @@ A pessoa decidiu, por recomendação da IA: o motor do cotovelo na ponta do prim
 
 ## O formato dos elos
 
-[`elos-opcoes.esboco.mjs`](elos-opcoes.esboco.mjs) desenha três formatos com o mesmo mecanismo e as medidas do catálogo da mecatrônica: caixas retas de cantos chanfrados, tubos redondos com discos nas juntas e perfil em U aberto com a correia à mostra. As imagens estão em [`elos-opcoes.png`](elos-opcoes.png) e [`elos-opcoes-tras.png`](elos-opcoes-tras.png); a escolha da pessoa entra aqui.
+[`elos-opcoes.esboco.mjs`](elos-opcoes.esboco.mjs) desenha três formatos com o mesmo mecanismo e as medidas do catálogo da mecatrônica: caixas retas de cantos chanfrados, tubos redondos com discos nas juntas e perfil em U aberto com a correia à mostra. As imagens estão em [`elos-opcoes.png`](elos-opcoes.png) e [`elos-opcoes-tras.png`](elos-opcoes-tras.png). A pessoa escolheu em 2026-11-23 a opção C, o perfil em U aberto com a correia à mostra, recomendada porque o braço é de estudo e demonstração e o ajuste da correia fica à mão.
