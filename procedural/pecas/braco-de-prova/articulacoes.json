@@ -1,5 +1,5 @@
 {
-  "nota": "Declarações no formato da extensão de articulação (mecanifica.articulacao@1), lidas por conferirArticulacao sobre a montagem resolvida. O curso é o do dimensionamento da mecatrônica, ombro de -90 a +90 graus e cotovelo de -140 a +140, com o zero no braço esticado na horizontal e o sentido positivo para cima (regra da mão direita em +z). Conferido em 2026-11-23 com a montagem desta pasta: o ombro fica livre de -28 a +90 graus (e até +180), e abaixo disso o primeiro elo bate na base (de -29) e o NEMA 17 no garfo (de -38); o cotovelo fica livre de cerca de -103 a +131 graus com o ombro em 0, e o segundo elo bate no NEMA 17 de +132 e de -132, no primeiro elo e no pino do ombro de -116 e na base de -104 (só com o ombro em 0). A redução do curso ou a troca do zero do ombro está pendente da pessoa.",
+  "nota": "Declarações no formato da extensão de articulação (mecanifica.articulacao@1), lidas por conferirArticulacao sobre a montagem resolvida, com o ângulo medido a partir da pose da montagem (o braço esticado na horizontal) e o positivo para cima (mão direita em +z). A pessoa decidiu em 2026-11-23: o zero do ombro na ficha passa a ser o braço em pé, e o curso de -90 a +90 graus em torno dele é, aqui, de 0 a 180 graus a partir da horizontal; o cotovelo fica de -100 a +130 graus, abaixo dos ±140 do dimensionamento, porque de -104 o segundo elo bate na base e de +132 no NEMA 17. Conferido em 2026-11-23: livre nos dois cursos.",
   "articulacoes": [
     {
       "id": "ombro",
@@ -32,8 +32,8 @@
       ],
       "unidade": "graus",
       "curso": {
-        "minimo": -90,
-        "maximo": 90
+        "minimo": 0,
+        "maximo": 180
       },
       "passos": 36,
       "folga": {
@@ -63,8 +63,8 @@
       ],
       "unidade": "graus",
       "curso": {
-        "minimo": -140,
-        "maximo": 140
+        "minimo": -100,
+        "maximo": 130
       },
       "passos": 70,
       "folga": {
