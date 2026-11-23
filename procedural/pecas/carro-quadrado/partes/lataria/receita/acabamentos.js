@@ -1,4 +1,5 @@
 /* carro-quadrado/lataria/receita/acabamentos.js — abas estampadas dos 4 arcos de roda (Bloco 5A), borrachas/plásticos dos vidros (5B) e retrovisores (5C). */
+import { conformarNaChapa } from '../../../../../nucleo/conformar-na-chapa.js';
 import { m } from './chapa.js';
 
 /* interpola x(z, y) da pele externa da chapa a partir de TABELA.secoes (em mm) */
@@ -27,53 +28,58 @@ function xPeleLateral(T, z, y) {
   return xA + (xB - xA) * tz;
 }
 
-/* gera uma aba estampada circular fechada (sólido manifold) ao redor de um arco de roda no lado +x */
+/* gera uma aba estampada larga e suave ao redor de um arco de roda no lado +x via conformarNaChapa (perfil 2D livre + modulação) */
 function passoAbaArco(T, id, zC, yC, R) {
-  const SEG = 28;
-  /* seção transversal de 6 pontos [dr, dxRelativo] em mm:
-     0 = borda externa enterrada na chapa, 1 = dobra/ombro externo, 2 = crista saliente da aba,
-     3 = quina da boca do arco, 4 = dobra interna para dentro da caixa de roda, 5 = fechamento traseiro oculto */
-  const N_PROF = 6;
-  const verts = [];
-  const faces = [];
-
+  const SEG = 24;
+  const rCentro = R + 24;
+  const trilho = [];
   for (let s = 0; s <= SEG; s += 1) {
     const t = s / SEG;
-    const ang = -0.06 + (Math.PI + 0.12) * t; // leve extensão abaixo do centro até y = 258
-    const cos = Math.cos(ang);
-    const sin = Math.sin(ang);
-    /* relevo pleno (+14 mm) no topo e ombros do arco, afinando suavemente nas pontas inferiores junto aos para-choques/soleira */
-    const sinPos = Math.max(0.05, Math.sin(Math.max(0.05, Math.min(Math.PI - 0.05, ang))));
-    const fade = Math.pow(sinPos, 0.45);
-    const perfil = [
-      [38, -4.0],
-      [27, 4.5 * fade],
-      [13, 14.0 * fade],
-      [0.5, 11.5 * fade],
-      [-1.0, -18.0],
-      [20, -16.0],
-    ];
-    for (let k = 0; k < N_PROF; k += 1) {
-      const r = R + perfil[k][0];
-      const z = zC + r * cos;
-      const y = Math.max(258, yC + r * sin);
-      const x = xPeleLateral(T, z, y) + perfil[k][1];
-      verts.push([m(x), m(y), m(z)]);
-    }
+    const ang = -0.05 + (Math.PI + 0.10) * t;
+    const z = zC + rCentro * Math.cos(ang);
+    const y = Math.max(258, yC + rCentro * Math.sin(ang));
+    trilho.push([y, z]);
   }
 
-  const idx = (s, k) => s * N_PROF + k;
-  for (let s = 0; s < SEG; s += 1) {
-    for (let k = 0; k < N_PROF; k += 1) {
-      const kNext = (k + 1) % N_PROF;
-      faces.push([idx(s, k), idx(s + 1, k), idx(s + 1, kNext), idx(s, kNext)]);
-    }
-  }
-  /* tampas nas duas pontas (s = 0 e s = SEG) */
-  faces.push([idx(0, 0), idx(0, 5), idx(0, 4), idx(0, 3), idx(0, 2), idx(0, 1)]);
-  faces.push([idx(SEG, 0), idx(SEG, 1), idx(SEG, 2), idx(SEG, 3), idx(SEG, 4), idx(SEG, 5)]);
+  /* amostrador analítico da pele externa da lateral com normal suavizada por diferenças finitas */
+  const malha = ([y, z]) => {
+    const x = xPeleLateral(T, z, y);
+    const dxdy = (xPeleLateral(T, z, y + 4) - xPeleLateral(T, z, y - 4)) / 8;
+    const dxdz = (xPeleLateral(T, z + 4, y) - xPeleLateral(T, z - 4, y)) / 8;
+    return { ponto: [x, y, z], normal: [1, -dxdy, -dxdz] };
+  };
 
-  return ['subdivisao', { origemId: id, niveis: 1, vertices: verts, faces, liso: 35 }];
+  /* perfil 2D [su (normal +x), sv (radial para dentro do arco)] em mm:
+     faixa larga de 58 mm, transição suave na borda externa, ombro pleno (+12.5 mm) e aba interna (-16 mm) */
+  const perfil = [
+    [-2.5, -34],
+    [4.5, -18],
+    [12.5, 2],
+    [10.5, 22],
+    [-16.0, 24],
+    [-14.0, -2],
+  ];
+
+  const res = conformarNaChapa({
+    malha,
+    vista: 'x',
+    sentido: '+',
+    trilho,
+    perfil,
+    modulacao: [[0, 0.35], [0.16, 1], [0.84, 1], [1, 0.35]],
+    amostragemMm: 35,
+    niveis: 1,
+    origemId: id,
+    nome: `arco_${id}`,
+    parte: false,
+  });
+
+  /* converte a gaiola nomeada para vértices/faces inline (compatível com passosAcabamentos sem TOPO externo) */
+  const nomesV = Object.keys(res.pontos);
+  const mapaV = new Map(nomesV.map((nome, idx) => [nome, idx]));
+  const vertices = nomesV.map((nome) => res.pontos[nome].map(m));
+  const faces = res.gaiola.faces.map((f) => f.map((nome) => mapaV.get(nome)));
+  return ['subdivisao', { origemId: id, niveis: 1, vertices, faces, liso: 35 }];
 }
 
 export function passosAcabamentos(T, proxId) {
