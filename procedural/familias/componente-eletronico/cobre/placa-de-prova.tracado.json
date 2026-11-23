@@ -1,0 +1,24 @@
+{
+  "versao": 1,
+  "placa": "placa",
+  "redes": [
+    {
+      "id": "led-verde",
+      "trechos": [{ "face": "cima", "largura": 0.25, "pontos": [[0.08, 8], [0.08, 3], [29.27, 3], [29.27, 8]], "origem": "declarado" }],
+      "vias": []
+    },
+    {
+      "id": "led-vermelho",
+      "trechos": [{ "face": "baixo", "largura": 0.25, "pontos": [[32, 18.92], [32, 12], [36.9, 12], [36.9, 7.1]], "origem": "declarado" }],
+      "vias": []
+    },
+    {
+      "id": "sinal-1",
+      "trechos": [
+        { "face": "cima", "largura": 0.25, "pontos": [[-28.73, 11.81], [-28.73, 16]], "origem": "declarado" },
+        { "face": "baixo", "largura": 0.25, "pontos": [[-28.73, 16], [-33.89, 16], [-33.89, 26]], "origem": "declarado" }
+      ],
+      "vias": [{ "centro": [-28.73, 16], "furo": 0.3, "anel": 0.15 }]
+    }
+  ]
+}

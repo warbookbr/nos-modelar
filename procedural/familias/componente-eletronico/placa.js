@@ -38,6 +38,8 @@ import { chamar, criarRegistroDeFamilias } from '../index.js';
 import { ENCAPSULAMENTOS, idDoComponente, varianteDe } from './composicoes.js';
 import { COMPONENTE_ELETRONICO, comMateriais } from './index.js';
 import { alturaDoAssento, terminaisDoComponente } from './terminais.js';
+import { pecasDoTracado, uniaoDePoligonos } from './cobre/geometria.js';
+import { conferirCobre } from './cobre/conferir.js';
 
 /* As regras do cobre traçado (plano das trilhas, 2026-11-23), também estimativa de fabricação comum de placa de duas faces: a
    trilha mínima de 0,15 mm e a padrão de 0,25 mm, a via com furo de 0,3 mm e anel de 0,15 mm (0,6 mm de diâmetro), a capacidade
@@ -247,6 +249,34 @@ function matrizDaRotacao(eixo, graus) {
 }
 
 /* a pose da placa na peça hospedeira: a lista de rotações, aplicadas em ordem, e a posição da origem da placa, em mm */
+/* o cobre traçado declarado: `{ tracado, redes }`, com o traçado salvo (formato em `cobre/geometria.js`) e a lista de redes do
+   item `ligacoes` do pedido; cada campo malformado é recusado com o caminho e o que é aceito */
+const FACES_DO_COBRE = new Set(['cima', 'baixo']);
+const ID_DE_REDE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+const par = (v) => Array.isArray(v) && v.length === 2 && v.every(numero);
+function lerCobre(cobre) {
+  if (!cobre || typeof cobre !== 'object' || !cobre.tracado || !Array.isArray(cobre.redes)) recusar('placa.cobre', cobre, '{ tracado, redes }: o traçado salvo e a lista de redes');
+  const { tracado, redes } = cobre;
+  if (tracado.versao !== 1 || !Array.isArray(tracado.redes)) recusar('placa.cobre.tracado', tracado.versao, 'o traçado salvo na versão 1, com a lista de redes');
+  tracado.redes.forEach((r, k) => {
+    const onde = `placa.cobre.tracado.redes[${k}]`;
+    if (!ID_DE_REDE.test(r?.id ?? '')) recusar(`${onde}.id`, r?.id, 'id de rede em minúsculas, dígitos e hífen');
+    if (!Array.isArray(r.trechos)) recusar(`${onde}.trechos`, r.trechos, 'lista de trechos');
+    r.trechos.forEach((t, j) => {
+      if (!FACES_DO_COBRE.has(t?.face)) recusar(`${onde}.trechos[${j}].face`, t?.face, "'cima' ou 'baixo'");
+      if (!numero(t.largura) || t.largura <= 0) recusar(`${onde}.trechos[${j}].largura`, t.largura, 'largura em mm maior que zero');
+      if (!Array.isArray(t.pontos) || t.pontos.length < 2 || !t.pontos.every(par)) recusar(`${onde}.trechos[${j}].pontos`, t.pontos, 'dois pontos [x, z] em mm ou mais');
+    });
+    (r.vias ?? []).forEach((v, j) => {
+      if (!par(v?.centro) || !numero(v.furo) || v.furo <= 0 || !numero(v.anel) || v.anel <= 0) recusar(`${onde}.vias[${j}]`, v, '{ centro: [x, z], furo, anel } em mm, furo e anel maiores que zero');
+    });
+  });
+  redes.forEach((r, k) => {
+    if (!ID_DE_REDE.test(r?.id ?? '') || !Array.isArray(r.terminais) || r.terminais.length < 2) recusar(`placa.cobre.redes[${k}]`, r?.id, '{ id, terminais: [{ peca, porta }, ...] } com dois terminais ou mais');
+  });
+  return { tracado, redes };
+}
+
 function lerPose(pose) {
   if (pose === undefined) return null;
   const aceito = '{ rotacoes?: [{ eixo: \'x\' | \'y\' | \'z\', graus }], posicao: [x, y, z] } em graus e mm, no referencial da peça hospedeira';
@@ -424,6 +454,30 @@ export function placaDeclarada(declaracao, { base = 0 } = {}) {
     }
   }
 
+  /* O COBRE TRAÇADO. Com `cobre: { tracado, redes }`, a placa confere o traçado contra as redes e as regras antes de gerar, e o
+     cobre de cada face passa a ser a união das ilhas, das trilhas e dos anéis das vias: cada pedaço unido é uma extrusão com os
+     furos dos terminais e das vias que caem nele, e a camada da face abre onde ele está. Sem `cobre`, nada muda. */
+  const cobreTracado = declaracao.cobre === undefined ? null : lerCobre(declaracao.cobre);
+  let regioes = null; let furosDasVias = [];
+  if (cobreTracado) {
+    const pecasDoCobre = pecasDoTracado(cobreTracado.tracado);
+    const atravessam = new Set(cobre.filter((c) => c.furo).map((c) => `${c.peca}.${c.terminal}`));
+    const conferencia = conferirCobre({ contorno, ilhas: ilhas.map((i) => ({ ...i, atravessa: atravessam.has(`${i.peca}.${i.terminal}`) })), pecas: pecasDoCobre, lista: cobreTracado.redes, regras: P });
+    if (conferencia.violacoes.length) {
+      const v = conferencia.violacoes[0];
+      recusar(`placa.cobre (${v.regra})`, v.ponto ?? v.terminais, `${v.mensagem}${conferencia.violacoes.length > 1 ? `; e mais ${conferencia.violacoes.length - 1} violação(ões)` : ''}`);
+    }
+    furosDasVias = pecasDoCobre.filter((q) => q.tipo === 'via' && q.face === 'cima').map((q) => q.furo);
+    const furosDoCobre = [...cobre.filter((c) => c.furo).map((c) => c.furo), ...furosDasVias];
+    regioes = LADOS.flatMap((face) => uniaoDePoligonos([
+      ...ilhas.filter((i) => i.face === face).map((i) => i.poligono),
+      ...pecasDoCobre.filter((q) => q.face === face).map((q) => q.poligono),
+    ]).map((r, k) => {
+      if (r.furos.length) recusar(`placa.cobre.tracado`, `face de ${face}, pedaço ${k}`, 'um traçado em que nenhum cobre cerca uma ilha de laminado; a extrusão não faz o cobre em anel em volta do laminado');
+      return { face, externo: r.externo, furos: furosDoCobre.filter((f) => dentroDoPoligono(f[0], r.externo)) };
+    }));
+  }
+
   /* os contatos que a placa declara à receita: o componente que assenta toca a face da placa, e o que encosta noutro toca esse
      outro; o grupo de componentes que não chega à placa por esses contatos fica preso só pelos terminais, que passam com folga
      pelos furos (a solda não é modelada), e vira ilha declarada */
@@ -465,16 +519,21 @@ export function placaDeclarada(declaracao, { base = 0 } = {}) {
      encoste (na camada ou na ilha) */
   /* cada camada numa extrusão, ou em faixas quando tem furos demais; a primeira faixa fica com o id de sempre (base + 1, + 2 e + 3)
      e as outras vêm de base + 100, três por faixa */
+  const doCobreDaFace = (face) => (regioes ? regioes.filter((r) => r.face === face).map((r) => r.externo) : ilhas.filter((i) => i.face === face).map((i) => i.poligono));
   const camadas = [
-    { furos: [...furosDosTerminais.map((c) => c.furo), ...fixacao.map((f) => f.poligono)], altura: espessura - 2 * P.cobre, y: -espessura + P.cobre },
-    ...LADOS.map((face) => ({ furos: [...ilhas.filter((i) => i.face === face).map((i) => i.poligono), ...fixacao.map((f) => f.poligono)], altura: P.cobre, y: face === 'cima' ? -P.cobre : -espessura })),
+    { furos: [...furosDosTerminais.map((c) => c.furo), ...furosDasVias, ...fixacao.map((f) => f.poligono)], altura: espessura - 2 * P.cobre, y: -espessura + P.cobre },
+    ...LADOS.map((face) => ({ furos: [...doCobreDaFace(face), ...fixacao.map((f) => f.poligono)], altura: P.cobre, y: face === 'cima' ? -P.cobre : -espessura })),
   ];
   camadas.forEach((camada, k) => faixasDaCamada(contorno, camada.furos).forEach((faixa, j) => elemento('extrusao', j === 0 ? base + 1 + k : base + 100 + 3 * (j - 1) + k, {
     perfil: m2(faixa.contorno), furos: faixa.furos.map(m2),
     altura: metro(camada.altura), em: [0, metro(camada.y), 0],
   }, nomes.placa)));
   const baseDasIlhas = base + 1000 * (pecas.length + 1);
-  ilhas.forEach((ilha, k) => {
+  if (regioes) {
+    regioes.forEach((r, k) => elemento('extrusao', baseDasIlhas + k, {
+      perfil: m2(r.externo), ...(r.furos.length ? { furos: r.furos.map(m2) } : {}), altura: metro(P.cobre), em: [0, metro(r.face === 'cima' ? -P.cobre : -espessura), 0],
+    }, nomes.ilha));
+  } else ilhas.forEach((ilha, k) => {
     const doTerminal = cobre.find((c) => c.peca === ilha.peca && c.terminal === ilha.terminal);
     const y = ilha.face === 'cima' ? -P.cobre : -espessura;
     elemento('extrusao', baseDasIlhas + k, {
