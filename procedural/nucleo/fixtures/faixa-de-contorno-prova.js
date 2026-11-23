@@ -62,9 +62,10 @@ export const PERFIS = {
   bojo: {
     deslocamentoBaseMm: 12,
     faixas: [
-      { larguraMm: 26, deslocamentoMm: 22 },
-      { larguraMm: 34, deslocamentoMm: 10 },
-      { larguraMm: 34, deslocamentoMm: 0, continuidade: 'G1' },
+      { larguraMm: 24, deslocamentoMm: 22 },
+      { larguraMm: 30, deslocamentoMm: 10 },
+      { larguraMm: 26, deslocamentoMm: 0 },
+      { larguraMm: 22, deslocamentoMm: 0 },
     ],
     modulacao: [[0, 0.3], [0.22, 1], [0.78, 1], [1, 0.3]],
   },
@@ -80,8 +81,18 @@ export function montarChapaDeProva(modo = 'ombro', { passo = 45 } = {}) {
     E1: P(0, ALTURA),
     D1: P(LARGURA, ALTURA),
     D0: P(LARGURA, 0),
-    T1: P(200, ALTURA),
-    T2: P(600, ALTURA),
+  };
+
+  const linhaNaChapa = (nomeA, nomeB, nInt = 3) => {
+    const a = nos[nomeA];
+    const b = nos[nomeB];
+    const pts = [nomeA];
+    for (let i = 1; i <= nInt; i += 1) {
+      const t = i / (nInt + 1);
+      pts.push(P(a[0] + (b[0] - a[0]) * t, a[2] + (b[2] - a[2]) * t));
+    }
+    pts.push(nomeB);
+    return pts;
   };
 
   let curvas;
@@ -95,35 +106,19 @@ export function montarChapaDeProva(modo = 'ombro', { passo = 45 } = {}) {
     nos.A3 = ptsArco[12];
     const arcoPts = ptsArco.map((p, k) => (k === 0 ? 'A0' : k === 3 ? 'A1' : k === 9 ? 'A2' : k === 12 ? 'A3' : p));
     curvas = [
-      { nome: 'esq', pontos: ['E0', P(0, 225), 'E1'] },
-      { nome: 'dir', pontos: ['D0', P(LARGURA, 225), 'D1'] },
-      { nome: 'topo', pontos: ['E1', 'T1', P(400, ALTURA), 'T2', 'D1'] },
-      { nome: 'baseEsq', pontos: ['E0', P(130, 0), 'A0'] },
-      { nome: 'baseDir', pontos: ['A3', P(670, 0), 'D0'] },
+      { nome: 'esq', pontos: linhaNaChapa('E0', 'E1', 3) },
+      { nome: 'dir', pontos: linhaNaChapa('D0', 'D1', 3) },
+      { nome: 'topo', pontos: linhaNaChapa('E1', 'D1', 5) },
+      { nome: 'baseEsq', pontos: linhaNaChapa('E0', 'A0', 2) },
+      { nome: 'baseDir', pontos: linhaNaChapa('A3', 'D0', 2) },
       { nome: 'arco', pontos: arcoPts },
-      { nome: 'lig1', pontos: ['A1', 'T1'] },
-      { nome: 'lig2', pontos: ['A2', 'T2'] },
+      { nome: 'lig1', pontos: linhaNaChapa('A1', 'E1', 3) },
+      { nome: 'lig2', pontos: linhaNaChapa('A2', 'D1', 3) },
     ];
     retalhos = [
-      { nome: 'pEsq', borda: ['baseEsq', { curva: 'arco', de: 'A0', ate: 'A1' }, 'lig1', { curva: 'topo', de: 'T1', ate: 'E1' }, 'esq'].slice(0, 4) },
-    ];
-    /* retalhos 4 lados limpos: E0-A0-A1-E1, A1-A2-T2-T1, A2-A3-D0-D1... ajustando com T1/T2 */
-    curvas = [
-      { nome: 'esq', pontos: ['E0', P(0, 225), 'E1'] },
-      { nome: 'dir', pontos: ['D0', P(LARGURA, 225), 'D1'] },
-      { nome: 'topoEsq', pontos: ['E1', 'T1'] },
-      { nome: 'topoMeio', pontos: ['T1', P(400, ALTURA), 'T2'] },
-      { nome: 'topoDir', pontos: ['T2', 'D1'] },
-      { nome: 'baseEsq', pontos: ['E0', P(130, 0), 'A0'] },
-      { nome: 'baseDir', pontos: ['A3', P(670, 0), 'D0'] },
-      { nome: 'arco', pontos: arcoPts },
-      { nome: 'lig1', pontos: ['A1', 'T1'] },
-      { nome: 'lig2', pontos: ['A2', 'T2'] },
-    ];
-    retalhos = [
-      { nome: 'pEsq', borda: ['baseEsq', { curva: 'arco', de: 'A0', ate: 'A1' }, 'lig1', 'topoEsq', 'esq'] },
-      { nome: 'pMeio', borda: [{ curva: 'arco', de: 'A1', ate: 'A2' }, 'lig2', 'topoMeio', 'lig1'] },
-      { nome: 'pDir', borda: [{ curva: 'arco', de: 'A2', ate: 'A3' }, 'baseDir', 'dir', 'topoDir', 'lig2'] },
+      { nome: 'pEsq', borda: ['baseEsq', { curva: 'arco', de: 'A0', ate: 'A1' }, 'lig1', 'esq'] },
+      { nome: 'pMeio', borda: [{ curva: 'arco', de: 'A1', ate: 'A2' }, 'lig2', 'topo', 'lig1'] },
+      { nome: 'pDir', borda: [{ curva: 'arco', de: 'A2', ate: 'A3' }, 'baseDir', 'dir', 'lig2'] },
     ];
   } else {
     const spec = PERFIS[modo];
@@ -141,21 +136,19 @@ export function montarChapaDeProva(modo = 'ombro', { passo = 45 } = {}) {
     const [n0, n1, n2, n3] = faixa.nosExternos;
     curvas = [
       ...faixa.curvas,
-      { nome: 'esq', pontos: ['E0', P(0, 225), 'E1'] },
-      { nome: 'dir', pontos: ['D0', P(LARGURA, 225), 'D1'] },
-      { nome: 'topoEsq', pontos: ['E1', 'T1'] },
-      { nome: 'topoMeio', pontos: ['T1', P(400, ALTURA), 'T2'] },
-      { nome: 'topoDir', pontos: ['T2', 'D1'] },
-      { nome: 'baseEsq', pontos: ['E0', n0] },
-      { nome: 'baseDir', pontos: [n3, 'D0'] },
-      { nome: 'lig1', pontos: [n1, 'T1'] },
-      { nome: 'lig2', pontos: [n2, 'T2'] },
+      { nome: 'esq', pontos: linhaNaChapa('E0', 'E1', 3) },
+      { nome: 'dir', pontos: linhaNaChapa('D0', 'D1', 3) },
+      { nome: 'topo', pontos: linhaNaChapa('E1', 'D1', 5) },
+      { nome: 'baseEsq', pontos: linhaNaChapa('E0', n0, 2) },
+      { nome: 'baseDir', pontos: linhaNaChapa(n3, 'D0', 2) },
+      { nome: 'lig1', pontos: linhaNaChapa(n1, 'E1', 3) },
+      { nome: 'lig2', pontos: linhaNaChapa(n2, 'D1', 3) },
     ];
     retalhos = [
       ...faixa.retalhos,
-      { nome: 'pEsq', borda: ['baseEsq', { curva: faixa.curvaExterna, de: n0, ate: n1 }, 'lig1', 'topoEsq', 'esq'] },
-      { nome: 'pMeio', borda: [{ curva: faixa.curvaExterna, de: n1, ate: n2 }, 'lig2', 'topoMeio', 'lig1'] },
-      { nome: 'pDir', borda: [{ curva: faixa.curvaExterna, de: n2, ate: n3 }, 'baseDir', 'dir', 'topoDir', 'lig2'] },
+      { nome: 'pEsq', borda: ['baseEsq', { curva: faixa.curvaExterna, de: n0, ate: n1 }, 'lig1', 'esq'] },
+      { nome: 'pMeio', borda: [{ curva: faixa.curvaExterna, de: n1, ate: n2 }, 'lig2', 'topo', 'lig1'] },
+      { nome: 'pDir', borda: [{ curva: faixa.curvaExterna, de: n2, ate: n3 }, 'baseDir', 'dir', 'lig2'] },
     ];
   }
 

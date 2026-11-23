@@ -96,9 +96,20 @@ function normalLocal(ponto, foraUnit, projetar) {
 
 function tangenteNoIndice(pts, k, fechada) {
   const n = pts.length;
-  const prev = fechada ? pts[(k - 1 + n) % n] : (k > 0 ? pts[k - 1] : pts[k]);
-  const next = fechada ? pts[(k + 1) % n] : (k < n - 1 ? pts[k + 1] : pts[k]);
-  const t = unit(sub(next, prev));
+  let dir;
+  if (fechada) {
+    dir = sub(pts[(k + 1) % n], pts[(k - 1 + n) % n]);
+  } else if (k === 0 && n >= 3) {
+    /* derivada unilateral de 2ª ordem: -3*p0 + 4*p1 - p2 (tangente exata em arcos sem inclinar a borda) */
+    dir = sub(sub(esc(pts[1], 4), esc(pts[0], 3)), pts[2]);
+  } else if (k === n - 1 && n >= 3) {
+    dir = sub(sub(esc(pts[n - 1], 3), esc(pts[n - 2], 4)), esc(pts[n - 3], -1));
+  } else {
+    const prev = k > 0 ? pts[k - 1] : pts[k];
+    const next = k < n - 1 ? pts[k + 1] : pts[k];
+    dir = sub(next, prev);
+  }
+  const t = unit(dir);
   if (!t) throw new ErroFaixaDeContorno(`contorno tem pontos coincidentes perto do índice ${k}`, { motivo: 'ponto-repetido', indice: k });
   return t;
 }

@@ -108,7 +108,7 @@ describe('faixaDeContornoNaRede', () => {
 
     const bojo = executarChapa('bojo');
     expect(bojo.res.orfaos ?? []).toHaveLength(0);
-    expect(bojo.faixa.estatisticas.numeroAneis).toBe(3);
+    expect(bojo.faixa.estatisticas.numeroAneis).toBe(4);
     const dBojo = medirDeslocamentoNoTopo(bojo.res, 26);
     expect(dBojo).not.toBeNull();
     expect(dBojo).toBeGreaterThan(16);
