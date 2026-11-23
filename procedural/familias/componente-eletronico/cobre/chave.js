@@ -51,8 +51,9 @@ export function canonico(valor) {
   return JSON.stringify(valor);
 }
 
-/** A chave das entradas de um traçado: a placa sem o cobre, a lista de redes e as regras. */
+/** A chave das entradas de um traçado: a placa sem o cobre, sem a pose e sem o pai (onde a placa fica na peça hospedeira não
+ *  muda o cobre no plano dela), a lista de redes e as regras. */
 export function chaveDasEntradas(declaracao, redes, regras) {
-  const { cobre: _, ...placa } = declaracao;
+  const { cobre: _, pose: __, pai: ___, ...placa } = declaracao;
   return sha256(canonico({ placa, redes, regras }));
 }

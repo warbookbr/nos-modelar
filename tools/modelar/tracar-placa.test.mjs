@@ -45,6 +45,15 @@ describe('tracar-placa', () => {
     expect(() => placaDeclarada({ ...movida, cobre: { tracado, redes } })).toThrow(/placa\.cobre\.tracado\.chave.*trace de novo/);
   });
 
+  it('o traçado salvo da placa de controle do braço fecha as 47 redes sem violação, com a chave das entradas de agora', async () => {
+    const { conferirPlaca } = await import('./conferir-placa.mjs');
+    const BASE = 'procedural/pecas/braco-robotico/partes/base';
+    const r = await conferirPlaca({ placa: `${BASE}/receita.js#declaracaoDaPlaca`, tracado: `${BASE}/placa.tracado.json`, pedido: `${BASE}/placa.pedido.json` });
+    expect(r.violacoes).toEqual([]);
+    expect(r.redes.length).toBe(47);
+    expect(r.redes.every((x) => x.fechada)).toBe(true);
+  });
+
   it('responde à ajuda com as opções', () => {
     expect(AJUDA).toMatch(/--placa=.*--pedido=.*--saida=/s);
   });

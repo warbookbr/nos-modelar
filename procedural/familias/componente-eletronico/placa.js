@@ -38,7 +38,7 @@ import { chamar, criarRegistroDeFamilias } from '../index.js';
 import { ENCAPSULAMENTOS, idDoComponente, varianteDe } from './composicoes.js';
 import { COMPONENTE_ELETRONICO, comMateriais } from './index.js';
 import { alturaDoAssento, terminaisDoComponente } from './terminais.js';
-import { pecasDoTracado, uniaoDePoligonos } from './cobre/geometria.js';
+import { camadaEmFaixas, pecasDoTracado, uniaoDePoligonos } from './cobre/geometria.js';
 import { conferirCobre } from './cobre/conferir.js';
 import { chaveDasEntradas } from './cobre/chave.js';
 
@@ -529,7 +529,13 @@ export function placaDeclarada(declaracao, { base = 0 } = {}) {
     { furos: [...furosDosTerminais.map((c) => c.furo), ...furosDasVias, ...fixacao.map((f) => f.poligono)], altura: espessura - 2 * P.cobre, y: -espessura + P.cobre },
     ...LADOS.map((face) => ({ furos: [...doCobreDaFace(face), ...fixacao.map((f) => f.poligono)], altura: P.cobre, y: face === 'cima' ? -P.cobre : -espessura })),
   ];
-  camadas.forEach((camada, k) => faixasDaCamada(contorno, camada.furos).forEach((faixa, j) => elemento('extrusao', j === 0 ? base + 1 + k : base + 100 + 3 * (j - 1) + k, {
+  /* com o cobre traçado, as camadas das faces vão em faixas que recortam o cobre (`camadaEmFaixas`); sem ele, como sempre */
+  const faixasDe = (camada, k) => (regioes && k > 0 ? camadaEmFaixas(contorno, camada.furos).map((p) => ({ contorno: p.externo, furos: p.furos })) : faixasDaCamada(contorno, camada.furos));
+  /* os ids das faixas vão de base + 100 a base + 999, três por faixa; acima disso colidiriam com os dos componentes */
+  const MAIS_FAIXAS = 300;
+  const faixasPorCamada = camadas.map((camada, k) => faixasDe(camada, k));
+  faixasPorCamada.forEach((l, k) => { if (l.length > MAIS_FAIXAS) recusar('placa.cobre', `${l.length} pedaços na camada ${k}`, `no máximo ${MAIS_FAIXAS} pedaços de faixa por camada; o cobre picou a camada demais`); });
+  camadas.forEach((camada, k) => faixasPorCamada[k].forEach((faixa, j) => elemento('extrusao', j === 0 ? base + 1 + k : base + 100 + 3 * (j - 1) + k, {
     perfil: m2(faixa.contorno), furos: faixa.furos.map(m2),
     altura: metro(camada.altura), em: [0, metro(camada.y), 0],
   }, nomes.placa)));

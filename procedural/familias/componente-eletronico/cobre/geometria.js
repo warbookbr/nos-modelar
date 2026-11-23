@@ -103,3 +103,40 @@ export function uniaoDePoligonos(poligonos) {
   } finally { secao.delete(); }
   return componentes.sort((a, b) => comparar(a.externo[0], b.externo[0]));
 }
+
+/** A camada de uma face com o cobre traçado, em faixas: o contorno menos os furos (o cobre e os furos de fixação), cortado em
+ *  faixas de x de até `largura` mm. A trilha atravessa a placa e não deixa vão entre os furos para a faixa passar, então a faixa
+ *  recorta o que cruza a borda dela: cada pedaço é `{ externo, furos }`, com o externo côncavo onde o cobre entra. Cada pedaço
+ *  vira uma extrusão pequena; a camada inteira numa extrusão só, com centenas de furos, levava 100 s na placa do braço. */
+export function camadaEmFaixas(contorno, furos, largura = 10) {
+  const wasm = manifoldCarregada();
+  if (!wasm) throw new Error('cobre: a camada em faixas precisa da biblioteca Manifold, que não carregou');
+  const ccw = (p) => (area(p) < 0 ? [...p].reverse() : p);
+  const xs = contorno.map((p) => p[0]); const zs = contorno.map((p) => p[1]);
+  const [x0, x1, z0, z1] = [Math.min(...xs), Math.max(...xs), Math.min(...zs) - 1, Math.max(...zs) + 1];
+  const placa = new wasm.CrossSection([ccw(contorno)], 'Positive');
+  const buracos = new wasm.CrossSection(furos.map(ccw), 'Positive');
+  const resto = placa.subtract(buracos);
+  const pecas = [];
+  try {
+    const n = Math.max(1, Math.ceil((x1 - x0) / largura));
+    for (let k = 0; k < n; k += 1) {
+      const a = x0 + ((x1 - x0) * k) / n - (k === 0 ? 1 : 0); const b = x0 + ((x1 - x0) * (k + 1)) / n + (k === n - 1 ? 1 : 0);
+      const faixa = new wasm.CrossSection([[[a, z0], [b, z0], [b, z1], [a, z1]]], 'Positive');
+      const corte = resto.intersect(faixa);
+      for (const parte of corte.decompose()) {
+        const externos = []; const internos = [];
+        for (const poligono of parte.toPolygons()) {
+          const pontos = semPontosColados(poligono.map(([x, z]) => [arredondar(x), arredondar(z)]));
+          if (pontos.length < 3) continue;
+          const s = area(pontos);
+          if (s > 0) externos.push(iniciarNoMenor(pontos)); else if (s < 0) internos.push(iniciarNoMenor(pontos));
+        }
+        parte.delete();
+        for (const externo of externos) pecas.push({ externo, furos: internos.sort((p, q) => comparar(p[0], q[0])) });
+      }
+      corte.delete(); faixa.delete();
+    }
+  } finally { placa.delete(); buracos.delete(); resto.delete(); }
+  return pecas.sort((p, q) => comparar(p.externo[0], q.externo[0]));
+}
