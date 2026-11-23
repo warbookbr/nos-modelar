@@ -42,7 +42,7 @@ Os dois planos se provam no braço robótico, escolhido pela pessoa em 2026-11-1
 
 - O núcleo não conhece eletrônica nem simulação. A família mora em `procedural/familias/`, a ponte em `modulos/`, como os exportadores e a textura, e o que precisar da autoria (o tipo de uma porta) entra como capacidade geral com nome geral.
 - Tudo é gerado por script e determinístico; o que é estimativa (corpo de peça, altura, massa) fica declarado como estimativa na peça e na ficha.
-- O Modelar não lê código da mecatrônica nem guarda ligação, circuito ou resultado de simulação; o que atravessa é só a ficha e o pedido. Emenda aceita pela pessoa em 2026-11-17 e aplicada na ativação do [plano das trilhas](2026-11-17-trilhas-e-validacao-da-placa.md), em 2026-11-23: o Modelar guarda a cópia do pedido recebido, sem editá-la, como entrada da receita da placa, e dela lê só a topologia das redes e as exigências de forma, sem circuito.
+- O Modelar não lê código da mecatrônica nem guarda ligação, circuito ou resultado de simulação; o que atravessa é só a ficha e o pedido. Emenda aceita pela pessoa em 2026-11-17 e aplicada na ativação do [plano das trilhas](../decisoes/PLANOS-ENCERRADOS.md), em 2026-11-23: o Modelar guarda a cópia do pedido recebido, sem editá-la, como entrada da receita da placa, e dela lê só a topologia das redes e as exigências de forma, sem circuito.
 - Um pedido nunca muda forma sozinho: cumpri-lo é mudar a receita pelo fluxo da bancada, e a pessoa aprova a forma.
 - Material e cor das peças eletrônicas entram como escolha por peça na receita; paleta nova só com o plano que a pedir.
 - Imagem de terceiro (foto de componente com marca) não entra no repositório.
