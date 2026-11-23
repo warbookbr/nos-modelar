@@ -9,6 +9,8 @@ import { pecasDoTracado } from './geometria.js';
 import { PLACA, placaDeclarada } from '../placa.js';
 import { PLACA_DE_PROVA } from '../placa-de-prova.js';
 import { ErroFamilia } from '../../../../src/autoria/familia.js';
+import { executarReceita } from '../../../../src/autoria/executar-receita.js';
+import { MATERIAIS } from '../placa-de-prova.js';
 
 const semCobre = placaDeclarada(PLACA_DE_PROVA);
 const atravessam = new Set(semCobre.furos.filter((f) => f.terminal).map((f) => `${f.peca}.${f.terminal}`));
@@ -102,6 +104,9 @@ describe('a placa com o cobre traçado', () => {
     const a = comCobre(tracadoDeProva); const b = comCobre(tracadoDeProva);
     expect(JSON.stringify(a.passos)).toBe(JSON.stringify(b.passos));
     expect(a.passos.length).toBeGreaterThan(semCobre.passos.length - semCobre.ilhas.length * 3);
+    /* os passos executam: a união dos polígonos deixava pontos a 1 µm que a extrusão recusa, e só a execução mostra */
+    const { neutro } = executarReceita({ meta: { nome: 'prova-com-cobre' }, MATERIAIS, PASSOS: a.passos });
+    expect((neutro.orfaos ?? []).map((o) => o.motivo)).toEqual([]);
   });
 
   it('recusa o traçado com violação, dizendo a regra e a mensagem do conferidor', () => {

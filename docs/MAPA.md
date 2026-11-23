@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2204 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2208 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1013,9 +1013,11 @@
 
 ## procedural/familias/componente-eletronico/cobre/
 
+- `chave.js` — chave.js — a chave das entradas de um traçado: o SHA-256 da declaração da placa (sem o cobre), da lista de redes e das regras, em forma canônica (as chaves d…
 - `conferir.js` — conferir.js — o conferidor do cobre de uma placa declarada: as regras de projeto e a conectividade, medidas pelo cobre.
 - `conferir.test.js` — conferir.test.js — o conferidor do cobre sobre o traçado declarado à mão na placa de prova: o certo passa sem violação, cada traçado errado é recusado pela r…
 - `geometria.js` — geometria.js — o cobre traçado de uma placa declarada, em mm, no plano [x, z] da placa: os polígonos de cada trecho e de cada via, e a união de polígonos de …
+- `tracador.js` — tracador.js — o traçador automático do cobre de uma placa declarada: um roteador em grade sobre as duas faces, com via onde troca de face.
 
 ## procedural/familias/dobradica/
 
@@ -3793,6 +3795,8 @@
 - `sobreposicao-de-cortes.test.mjs` — sobreposicao-de-cortes.test.mjs — os cortes do modelo sobre os do sólido do esboço: o corte de uma malha, o desvio entre as duas linhas, o desenho e, de pont…
 - `suavidade-por-regiao.mjs` — suavidade-por-regiao.mjs — o índice de suavidade de cada região da chapa: quanto a curvatura varia por área, um número por região, para comparar uma rodada c…
 - `suavidade-por-regiao.test.mjs` — suavidade-por-regiao.test.mjs — o índice de suavidade nas chapas de calibração do reflexo (`tools/fixtures/reflexo-calibracao/`): a lisa (um arco de raio con…
+- `tracar-placa.mjs` — tracar-placa.mjs — traça o cobre de uma placa declarada pela lista de redes do pedido e grava o traçado salvo.
+- `tracar-placa.test.mjs` — tracar-placa.test.mjs — o traçador automático na placa de prova: fecha as oito redes do exemplo sem violação, grava o mesmo arquivo em duas rodadas, mantém o…
 - `transformacao-rigida.test.ts` — @ts-expect-error — módulo neutro JavaScript, exercitado pelo contrato público.
 - `triangulos-da-receita.mjs` — triangulos-da-receita.mjs — os triângulos de uma receita em milímetro, com a parte de cada um, pela mesma triangulação que a cena usa (`adaptarThree`).
 - `universo-autoria.mjs` — universo-autoria.mjs — adaptador confinado do snapshot do universo.

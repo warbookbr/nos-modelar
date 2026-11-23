@@ -40,6 +40,7 @@ import { COMPONENTE_ELETRONICO, comMateriais } from './index.js';
 import { alturaDoAssento, terminaisDoComponente } from './terminais.js';
 import { pecasDoTracado, uniaoDePoligonos } from './cobre/geometria.js';
 import { conferirCobre } from './cobre/conferir.js';
+import { chaveDasEntradas } from './cobre/chave.js';
 
 /* As regras do cobre traçado (plano das trilhas, 2026-11-23), também estimativa de fabricação comum de placa de duas faces: a
    trilha mínima de 0,15 mm e a padrão de 0,25 mm, a via com furo de 0,3 mm e anel de 0,15 mm (0,6 mm de diâmetro), a capacidade
@@ -458,6 +459,10 @@ export function placaDeclarada(declaracao, { base = 0 } = {}) {
      cobre de cada face passa a ser a união das ilhas, das trilhas e dos anéis das vias: cada pedaço unido é uma extrusão com os
      furos dos terminais e das vias que caem nele, e a camada da face abre onde ele está. Sem `cobre`, nada muda. */
   const cobreTracado = declaracao.cobre === undefined ? null : lerCobre(declaracao.cobre);
+  /* o traçado que o traçador escreveu leva a chave das entradas; a que não bate é de outra placa, outra lista ou outra regra */
+  if (cobreTracado?.tracado.chave !== undefined && cobreTracado.tracado.chave !== chaveDasEntradas(declaracao, cobreTracado.redes, P)) {
+    recusar('placa.cobre.tracado.chave', cobreTracado.tracado.chave, 'a chave das entradas de agora: a placa, a lista de redes ou as regras mudaram depois do traçado; trace de novo com tools/modelar/tracar-placa.mjs');
+  }
   let regioes = null; let furosDasVias = [];
   if (cobreTracado) {
     const pecasDoCobre = pecasDoTracado(cobreTracado.tracado);

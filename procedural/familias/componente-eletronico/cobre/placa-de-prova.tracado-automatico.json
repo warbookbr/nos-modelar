@@ -1,0 +1,554 @@
+{
+  "versao": 1,
+  "placa": "placa",
+  "chave": "4190bb50a9f105b8526184226fa7bd2329bb70b4c1b918280d1317644a9099bb",
+  "passo": 0.25,
+  "redes": [
+    {
+      "id": "vin",
+      "trechos": [
+        {
+          "face": "cima",
+          "largura": 0.8,
+          "pontos": [
+            [
+              34.25,
+              -21.5
+            ],
+            [
+              25.5,
+              -21.5
+            ],
+            [
+              18.5,
+              -28.5
+            ]
+          ],
+          "origem": "tracado"
+        },
+        {
+          "face": "cima",
+          "largura": 0.8,
+          "pontos": [
+            [
+              23.75,
+              -22.75
+            ],
+            [
+              -5.25,
+              6.25
+            ],
+            [
+              -14.75,
+              6.25
+            ],
+            [
+              -16.25,
+              7.75
+            ]
+          ],
+          "origem": "tracado"
+        },
+        {
+          "face": "cima",
+          "largura": 0.8,
+          "pontos": [
+            [
+              -14,
+              6
+            ],
+            [
+              -30.5,
+              -10.5
+            ]
+          ],
+          "origem": "tracado"
+        }
+      ],
+      "vias": []
+    },
+    {
+      "id": "terra",
+      "trechos": [
+        {
+          "face": "cima",
+          "largura": 0.8,
+          "pontos": [
+            [
+              40.75,
+              -22
+            ],
+            [
+              38.75,
+              -24
+            ]
+          ],
+          "origem": "tracado"
+        },
+        {
+          "face": "baixo",
+          "largura": 0.8,
+          "pontos": [
+            [
+              36,
+              -24.75
+            ],
+            [
+              17.25,
+              -24.75
+            ],
+            [
+              13.5,
+              -28.5
+            ]
+          ],
+          "origem": "tracado"
+        },
+        {
+          "face": "cima",
+          "largura": 0.8,
+          "pontos": [
+            [
+              40.75,
+              -18
+            ],
+            [
+              35.25,
+              -12.5
+            ],
+            [
+              35.25,
+              8.25
+            ]
+          ],
+          "origem": "tracado"
+        },
+        {
+          "face": "cima",
+          "largura": 0.8,
+          "pontos": [
+            [
+              35,
+              9.75
+            ],
+            [
+              28.5,
+              9.75
+            ],
+            [
+              27.25,
+              8.5
+            ]
+          ],
+          "origem": "tracado"
+        },
+        {
+          "face": "cima",
+          "largura": 0.8,
+          "pontos": [
+            [
+              26,
+              7.75
+            ],
+            [
+              24.5,
+              6.25
+            ],
+            [
+              12.75,
+              6.25
+            ],
+            [
+              11.25,
+              7.75
+            ]
+          ],
+          "origem": "tracado"
+        },
+        {
+          "face": "baixo",
+          "largura": 0.8,
+          "pontos": [
+            [
+              10.75,
+              8.75
+            ],
+            [
+              16.75,
+              14.75
+            ],
+            [
+              16.75,
+              20.75
+            ]
+          ],
+          "origem": "tracado"
+        },
+        {
+          "face": "cima",
+          "largura": 0.8,
+          "pontos": [
+            [
+              9.75,
+              8.25
+            ],
+            [
+              8.25,
+              9.75
+            ],
+            [
+              -17.5,
+              9.75
+            ],
+            [
+              -18.75,
+              8.5
+            ]
+          ],
+          "origem": "tracado"
+        },
+        {
+          "face": "cima",
+          "largura": 0.8,
+          "pontos": [
+            [
+              -20,
+              8
+            ],
+            [
+              -23.5,
+              11.5
+            ],
+            [
+              -25.5,
+              11.5
+            ]
+          ],
+          "origem": "tracado"
+        },
+        {
+          "face": "baixo",
+          "largura": 0.8,
+          "pontos": [
+            [
+              -19.25,
+              7.25
+            ],
+            [
+              -19.25,
+              -2.25
+            ],
+            [
+              -27.5,
+              -10.5
+            ]
+          ],
+          "origem": "tracado"
+        }
+      ],
+      "vias": []
+    },
+    {
+      "id": "vcc",
+      "trechos": [
+        {
+          "face": "cima",
+          "largura": 0.4,
+          "pontos": [
+            [
+              -26,
+              -10.5
+            ],
+            [
+              -26,
+              -7.5
+            ]
+          ],
+          "origem": "tracado"
+        },
+        {
+          "face": "baixo",
+          "largura": 0.4,
+          "pontos": [
+            [
+              -26,
+              -7.5
+            ],
+            [
+              -33.5,
+              0
+            ],
+            [
+              -33.5,
+              3.5
+            ]
+          ],
+          "origem": "tracado"
+        },
+        {
+          "face": "baixo",
+          "largura": 0.4,
+          "pontos": [
+            [
+              -25,
+              -10.5
+            ],
+            [
+              -10.25,
+              4.25
+            ],
+            [
+              -10.25,
+              7.25
+            ]
+          ],
+          "origem": "tracado"
+        },
+        {
+          "face": "baixo",
+          "largura": 0.4,
+          "pontos": [
+            [
+              -10.25,
+              6.5
+            ],
+            [
+              3.5,
+              6.5
+            ],
+            [
+              4.75,
+              7.75
+            ]
+          ],
+          "origem": "tracado"
+        },
+        {
+          "face": "baixo",
+          "largura": 0.4,
+          "pontos": [
+            [
+              -2.5,
+              6.5
+            ],
+            [
+              -2.5,
+              25.75
+            ]
+          ],
+          "origem": "tracado"
+        },
+        {
+          "face": "cima",
+          "largura": 0.4,
+          "pontos": [
+            [
+              -2,
+              26
+            ],
+            [
+              0.75,
+              28.75
+            ],
+            [
+              31.25,
+              28.75
+            ]
+          ],
+          "origem": "tracado"
+        }
+      ],
+      "vias": [
+        {
+          "centro": [
+            -26,
+            -7.5
+          ],
+          "furo": 0.3,
+          "anel": 0.15
+        },
+        {
+          "centro": [
+            -2.5,
+            25.75
+          ],
+          "furo": 0.3,
+          "anel": 0.15
+        }
+      ]
+    },
+    {
+      "id": "led-verde",
+      "trechos": [
+        {
+          "face": "cima",
+          "largura": 0.25,
+          "pontos": [
+            [
+              0.75,
+              7.5
+            ],
+            [
+              3,
+              5.25
+            ],
+            [
+              26.25,
+              5.25
+            ],
+            [
+              28.75,
+              7.75
+            ]
+          ],
+          "origem": "tracado"
+        }
+      ],
+      "vias": []
+    },
+    {
+      "id": "led-vermelho",
+      "trechos": [
+        {
+          "face": "cima",
+          "largura": 0.25,
+          "pontos": [
+            [
+              32.25,
+              18.25
+            ],
+            [
+              36.5,
+              14
+            ],
+            [
+              36.5,
+              7.75
+            ]
+          ],
+          "origem": "tracado"
+        }
+      ],
+      "vias": []
+    },
+    {
+      "id": "sinal-1",
+      "trechos": [
+        {
+          "face": "cima",
+          "largura": 0.25,
+          "pontos": [
+            [
+              -29,
+              12.5
+            ],
+            [
+              -29,
+              20.75
+            ],
+            [
+              -33.5,
+              25.25
+            ]
+          ],
+          "origem": "tracado"
+        }
+      ],
+      "vias": []
+    },
+    {
+      "id": "sinal-2",
+      "trechos": [
+        {
+          "face": "cima",
+          "largura": 0.25,
+          "pontos": [
+            [
+              2,
+              26
+            ],
+            [
+              -1.25,
+              22.75
+            ],
+            [
+              -1.25,
+              21.5
+            ],
+            [
+              -1.5,
+              21.25
+            ],
+            [
+              -26.5,
+              21.25
+            ],
+            [
+              -30.75,
+              25.5
+            ]
+          ],
+          "origem": "tracado"
+        }
+      ],
+      "vias": []
+    },
+    {
+      "id": "sinal-entre-faces",
+      "trechos": [
+        {
+          "face": "cima",
+          "largura": 0.25,
+          "pontos": [
+            [
+              -3.25,
+              22.25
+            ],
+            [
+              -3.5,
+              22.5
+            ]
+          ],
+          "origem": "tracado"
+        },
+        {
+          "face": "baixo",
+          "largura": 0.25,
+          "pontos": [
+            [
+              -3.5,
+              22.5
+            ],
+            [
+              -3.5,
+              26
+            ],
+            [
+              -1.75,
+              27.75
+            ],
+            [
+              16.5,
+              27.75
+            ],
+            [
+              17,
+              27.25
+            ]
+          ],
+          "origem": "tracado"
+        }
+      ],
+      "vias": [
+        {
+          "centro": [
+            -3.5,
+            22.5
+          ],
+          "furo": 0.3,
+          "anel": 0.15
+        }
+      ]
+    }
+  ]
+}

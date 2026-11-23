@@ -70,6 +70,17 @@ function iniciarNoMenor(pontos) {
   return [...pontos.slice(i), ...pontos.slice(0, i)];
 }
 
+/* A união devolve pontos a ~1 µm um do outro onde uma cápsula cruza a borda de uma ilha, e a tampa da extrusão não distingue
+   pontos a menos de 4 µm. O ponto a menos de `COLADO` do último que ficou sai (também na volta do fim ao começo): a borda
+   muda no máximo isso, abaixo da precisão que as regras medem. */
+const COLADO = 0.005;
+function semPontosColados(pontos) {
+  const saida = [];
+  for (const p of pontos) if (!saida.length || Math.hypot(p[0] - saida.at(-1)[0], p[1] - saida.at(-1)[1]) >= COLADO) saida.push(p);
+  while (saida.length > 3 && Math.hypot(saida[0][0] - saida.at(-1)[0], saida[0][1] - saida.at(-1)[1]) < COLADO) saida.pop();
+  return saida;
+}
+
 /** A união dos polígonos simples `poligonos` (qualquer orientação), em componentes `{ externo, furos }` canônicos: o externo
  *  anti-horário, os furos horários. */
 export function uniaoDePoligonos(poligonos) {
@@ -82,7 +93,7 @@ export function uniaoDePoligonos(poligonos) {
     for (const parte of secao.decompose()) {
       const externos = []; const furos = [];
       for (const poligono of parte.toPolygons()) {
-        const pontos = poligono.map(([x, z]) => [arredondar(x), arredondar(z)]).filter((q, k, l) => k === 0 || comparar(q, l[k - 1]) !== 0);
+        const pontos = semPontosColados(poligono.map(([x, z]) => [arredondar(x), arredondar(z)]));
         const a = area(pontos);
         if (a > 0) externos.push(iniciarNoMenor(pontos)); else if (a < 0) furos.push(iniciarNoMenor(pontos));
       }
