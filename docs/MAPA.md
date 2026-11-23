@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2220 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2225 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -437,6 +437,10 @@
 - `decisoes-planos-encerrados-1.md` — Decisões em vigor, lote 1
 - `decisoes-planos-encerrados-2.md` — Decisões em vigor, lote 2
 
+## docs/modelar/banco-de-provas/ponte-mecatronica-2026-11-23/
+
+- `README.md` — Ponte com a mecatrônica: a ficha do braço e o pedido de prova
+
 ## docs/modelar/banco-de-provas/porta-de-entrada-2026-11-05/
 
 - `README.md` — Linha de base da porta de entrada dos agentes, 2026-11-05
@@ -864,12 +868,14 @@
 - `ficha.js` — ficha.js — monta a ficha do objeto (contrato da ponte com a mecatrônica, esquema 1.1) a partir do que o Modelar sabe: as instâncias da montagem resolvida, co…
 - `index.js` — index.js — a porta pública do módulo da ficha do objeto: a ponte do Modelar com o nos-mecatronica.
 - `massa.js` — massa.js — a massa, o centro de massa e o tensor de inércia de um sólido de densidade uniforme, pela malha triangulada dele.
+- `pedido.js` — pedido.js — lê um pedido da mecatrônica contra a ficha a que ele responde e escreve a resposta de cada item, medindo a forma do Modelar. O pedido nunca muda …
 - `validar.js` — validar.js — confere uma ficha ou um pedido da ponte com a mecatrônica: o esquema da versão que o arquivo declara, pela cópia conferida em `../esquemas/` (de…
 
 ## modulos/ficha-do-objeto/tests/
 
 - `ficha.test.js` — ficha.test.js — a ficha montada de um objeto de prova de duas peças e uma junta: sai em milímetro, passa na cópia do esquema, igual em duas montagens, com o …
 - `massa.test.js` — massa.test.js — as propriedades de massa pela malha batem com as fórmulas fechadas do cubo deslocado e do cilindro facetado, e a malha virada para dentro dá …
+- `pedido.test.js` — pedido.test.js — a resposta de cada item do pedido em formas de prova: uma caixa oca para o espaço, uma chapa com furo quadrado para a saída de ar, a posição…
 - `validar.test.js` — validar.test.js — a cópia dos esquemas da ponte confere com o SHA-256 da última versão do `versoes.json` copiado junto (decisão 0004 do nos-mecatronica), e o…
 
 ## modulos/manual/
@@ -3591,6 +3597,8 @@
 - `conferir-juntas.mjs` — conferir-juntas.mjs — ferramenta de medição e diagnóstico de interfaces de contato entre componentes de uma peça procedural.
 - `conferir-juntas.test.ts` — conferir-juntas.test.ts — testes para a ferramenta de medição e diagnóstico de juntas.
 - `conferir-malha.mjs` — conferir-malha.mjs — a topologia da malha de uma receita, com os gritos do motor: casca aberta, não-manifold, orientação, face de área nula, face fina, face …
+- `conferir-pedido.mjs` — conferir-pedido.mjs — CLI que lê um pedido da mecatrônica, exporta a ficha do objeto a que ele responde e escreve a resposta de cada item medindo a forma de …
+- `conferir-pedido.test.mjs` — conferir-pedido.test.mjs — LENTO (está em `TESTES_LENTOS`: exporta a ficha do braço inteiro duas vezes, uns 70 s). Plano da ponte com a mecatrônica, gate 4: …
 - `conferir-placa.mjs` — conferir-placa.mjs — confere o cobre traçado de uma placa declarada e desenha o mapa das redes.
 - `conferir-placa.test.mjs` — conferir-placa.test.mjs — o comando que confere o cobre de uma placa declarada e desenha o mapa das redes.
 - `conferir-pontos.mjs` — conferir-pontos.mjs — mede os PONTOS DECLARADOS de uma peça contra a malha que a receita produz, e devolve o desvio de cada um em milímetro.

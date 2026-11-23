@@ -42,13 +42,14 @@ const gravar = (caminho, conteudo) => { writeFileSync(`${caminho}.tmp`, conteudo
    da instância devolve a placa gerada (`{ pecas }`, como `placaDeclarada`); cada peça dela vira um componente da ficha, e as
    portas elétricas saem da tabela da família com os blocos declarados em `portas`. */
 async function placasDaPonte(declaracao, porNome) {
-  const componentes = []; const portas = []; const semTipo = []; const partes = new Map();
+  const componentes = []; const portas = []; const semTipo = []; const partes = new Map(); const cobre = {};
   for (const [k, pl] of (declaracao.placas ?? []).entries()) {
     const inst = porNome.get(pl.instancia);
     if (!inst) throw new Error(`ponte.json: placas[${k}].instancia é '${pl.instancia}', que a montagem não tem.`);
     const modulo = await import(pathToFileURL(resolverCaminhoReceita(inst.alvo.ref, { raiz: REPO })).href);
     if (typeof modulo[pl.exportacao] !== 'function') throw new Error(`ponte.json: placas[${k}].exportacao '${pl.exportacao}' não é função exportada pela receita '${inst.alvo.ref}'.`);
-    const { pecas } = modulo[pl.exportacao]();
+    const { pecas, declaracao: daPlaca } = modulo[pl.exportacao]();
+    if (daPlaca?.cobre?.redes) cobre[daPlaca.id ?? 'placa'] = { redes: daPlaca.cobre.redes };
     const F = inst.definicao.neutro.F;
     const nomesDasPartes = new Set([...(F instanceof Map ? F.values() : Object.values(F))].map((f) => f.parte));
     const declaradas = { ...(pl.portas ?? {}) };
@@ -65,7 +66,7 @@ async function placasDaPonte(declaracao, porNome) {
     const sobra = Object.keys(declaradas);
     if (sobra.length) throw new Error(`ponte.json: placas[${k}].portas cita ${sobra.join(', ')}, que a placa de '${pl.instancia}' não tem.`);
   }
-  return { componentes, portas, semTipo, partes };
+  return { componentes, portas, semTipo, partes, cobre };
 }
 
 /* A malha de cada instância que carrega componentes, separada por parte: um nó por componente, com a pose da instância, e o resto
@@ -108,7 +109,19 @@ function massasDasPecas(separadas, partes, declaracao) {
   return massas;
 }
 
-/** Exporta a ficha e a malha do objeto. Devolve `{ ficha, caminhoFicha, caminhoMalha, semTipo }`; recusa a ficha que a cópia do esquema recusa. */
+/** Os triângulos de cada peça da ficha no referencial da montagem, em mm, a partir das instâncias separadas por parte. */
+export function malhasNaMontagem(separadas) {
+  const malhas = new Map();
+  for (const s of separadas) {
+    const malha = validarMalhaObj(s.neutro, { tolerancia: 0.001 });
+    const { rotacao: r, deslocamento: d } = s.pose;
+    const mundo = new Map([...malha.vertices].map(([id, p]) => [id, [0, 1, 2].map((k) => (r[k][0] * p[0] + r[k][1] * p[1] + r[k][2] * p[2] + d[k]) * 1000)]));
+    malhas.set(s.nome, malha.faces.flatMap((f) => f.triangulos.map((tri) => tri.map((id) => mundo.get(id)))));
+  }
+  return malhas;
+}
+
+/** Exporta a ficha e a malha do objeto. Devolve `{ ficha, caminhoFicha, caminhoMalha, semTipo, separadas, placas }`; recusa a ficha que a cópia do esquema recusa. */
 export async function exportarFicha({ objeto, ponte = null, saida = null }) {
   if (!objeto) throw new Error(`Informe o objeto.\n${USO}`);
   const pasta = resolve(REPO, 'procedural/pecas', objeto);
@@ -125,7 +138,7 @@ export async function exportarFicha({ objeto, ponte = null, saida = null }) {
   const percorrer = (m) => { for (const i of m.instancias) { if (i.alvo.tipo === 'montagem') percorrer(i.montagem); else porNome.set(i.caminho.join('/'), i); } };
   percorrer(resolvida);
 
-  const { componentes, portas: portasEletricas, semTipo, partes } = await placasDaPonte(declaracao, porNome);
+  const { componentes, portas: portasEletricas, semTipo, partes, cobre } = await placasDaPonte(declaracao, porNome);
 
   /* a malha: um nó por peça da ficha, com o identificador dela */
   const nomeDaMalha = `${objeto}.glb`;
@@ -165,7 +178,7 @@ export async function exportarFicha({ objeto, ponte = null, saida = null }) {
   const caminhoFicha = resolve(destino, `${objeto}.ficha.json`);
   gravar(caminhoMalha, bytes);
   gravar(caminhoFicha, `${JSON.stringify(ficha, null, 2)}\n`);
-  return { ficha, caminhoFicha, caminhoMalha, semTipo };
+  return { ficha, caminhoFicha, caminhoMalha, semTipo, separadas, placas: cobre };
 }
 
 async function main() {

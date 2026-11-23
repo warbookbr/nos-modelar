@@ -1,0 +1,43 @@
+{
+  "tipo": "pedido",
+  "versao": "1.1",
+  "objeto": "braco-robotico",
+  "ficha": {
+    "caminho": "braco-robotico.ficha.json",
+    "revisao": 1
+  },
+  "itens": [
+    {
+      "id": "posicao-motor-inexistente",
+      "tipo": "posicao",
+      "alvo": "motor-ombro",
+      "posicao": [
+        -110,
+        176.5,
+        -33
+      ],
+      "orientacao": {
+        "eixo": [
+          0,
+          0,
+          1
+        ],
+        "angulo": 90
+      },
+      "tolerancia": {
+        "posicao": 1,
+        "angulo": 1
+      },
+      "motivo": {
+        "linhaDaMatriz": "ponte-espaco-placa-e-chicote",
+        "texto": "pedido de prova: o driver da junta 1 onde ele já está",
+        "resultado": {
+          "grandeza": "distância ao conector do motor",
+          "valor": 13,
+          "unidade": "mm",
+          "origem": "estimativa"
+        }
+      }
+    }
+  ]
+}

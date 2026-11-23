@@ -1,0 +1,1046 @@
+{
+  "tipo": "pedido",
+  "versao": "1.1",
+  "objeto": "braco-robotico",
+  "ficha": {
+    "caminho": "braco-robotico.ficha.json",
+    "revisao": 1
+  },
+  "itens": [
+    {
+      "id": "espaco-sensor-na-caixa",
+      "tipo": "espaco",
+      "dentroDe": "base",
+      "conteudo": "sensor de corrente de 10 × 20 × 20 mm entre a placa de controle e a parede da caixa lateral",
+      "caixaMinima": [
+        10,
+        20,
+        20
+      ],
+      "centro": [
+        -140,
+        110,
+        0
+      ],
+      "tolerancia": 8,
+      "motivo": {
+        "linhaDaMatriz": "ponte-espaco-placa-e-chicote",
+        "texto": "pedido de prova escrito à mão pelo Modelar: um espaço que a forma de hoje já tem",
+        "resultado": {
+          "grandeza": "volume do sensor",
+          "valor": 4000,
+          "unidade": "mm³",
+          "origem": "estimativa"
+        }
+      }
+    },
+    {
+      "id": "espaco-bateria-no-corpo",
+      "tipo": "espaco",
+      "dentroDe": "base",
+      "conteudo": "bateria de 30 × 30 × 30 mm no meio do corpo da base",
+      "caixaMinima": [
+        30,
+        30,
+        30
+      ],
+      "centro": [
+        0,
+        110,
+        0
+      ],
+      "tolerancia": 10,
+      "motivo": {
+        "linhaDaMatriz": "ponte-espaco-placa-e-chicote",
+        "texto": "pedido de prova escrito à mão pelo Modelar: um espaço que o corpo maciço da base não tem",
+        "resultado": {
+          "grandeza": "volume da bateria",
+          "valor": 27000,
+          "unidade": "mm³",
+          "origem": "estimativa"
+        }
+      }
+    },
+    {
+      "id": "posicao-driver-1",
+      "tipo": "posicao",
+      "alvo": "a1",
+      "posicao": [
+        -110,
+        176.5,
+        -33
+      ],
+      "orientacao": {
+        "eixo": [
+          0,
+          0,
+          1
+        ],
+        "angulo": 90
+      },
+      "tolerancia": {
+        "posicao": 1,
+        "angulo": 1
+      },
+      "motivo": {
+        "linhaDaMatriz": "ponte-espaco-placa-e-chicote",
+        "texto": "pedido de prova: o driver da junta 1 onde ele já está",
+        "resultado": {
+          "grandeza": "distância ao conector do motor",
+          "valor": 13,
+          "unidade": "mm",
+          "origem": "estimativa"
+        }
+      }
+    },
+    {
+      "id": "posicao-microcontrolador",
+      "tipo": "posicao",
+      "alvo": "u1",
+      "posicao": [
+        -110,
+        144.5,
+        30
+      ],
+      "orientacao": {
+        "eixo": [
+          0,
+          0,
+          1
+        ],
+        "angulo": 90
+      },
+      "tolerancia": {
+        "posicao": 5,
+        "angulo": 5
+      },
+      "motivo": {
+        "linhaDaMatriz": "ponte-espaco-placa-e-chicote",
+        "texto": "pedido de prova: o microcontrolador 30 mm abaixo de onde está",
+        "resultado": {
+          "grandeza": "distância à antena",
+          "valor": 30,
+          "unidade": "mm",
+          "origem": "estimativa"
+        }
+      }
+    },
+    {
+      "id": "saida-de-ar-caixa",
+      "tipo": "saidaDeAr",
+      "em": "base",
+      "areaMinima": 400,
+      "centro": [
+        -157,
+        110,
+        0
+      ],
+      "normal": [
+        -1,
+        0,
+        0
+      ],
+      "tolerancia": 10,
+      "motivo": {
+        "linhaDaMatriz": "ponte-saida-de-ar",
+        "texto": "pedido de prova: uma abertura de 400 mm² na face de fora da caixa lateral",
+        "resultado": {
+          "grandeza": "calor dos drivers",
+          "valor": 6,
+          "unidade": "W",
+          "origem": "estimativa"
+        }
+      }
+    },
+    {
+      "id": "passagem-motor-ombro",
+      "tipo": "passagem",
+      "de": [
+        {
+          "peca": "j2",
+          "porta": "1"
+        },
+        {
+          "peca": "j2",
+          "porta": "2"
+        }
+      ],
+      "para": [
+        {
+          "peca": "j2",
+          "porta": "3"
+        },
+        {
+          "peca": "j2",
+          "porta": "4"
+        }
+      ],
+      "atravessa": [
+        "cintura"
+      ],
+      "diametroMinimo": 6,
+      "raioDeCurvaturaMinimo": 30,
+      "motivo": {
+        "linhaDaMatriz": "lig-chicote",
+        "texto": "pedido de prova: o chicote do motor do ombro atravessando a cintura",
+        "resultado": {
+          "grandeza": "diâmetro do chicote",
+          "valor": 6,
+          "unidade": "mm",
+          "origem": "estimativa"
+        }
+      }
+    },
+    {
+      "id": "ligacoes-placa",
+      "tipo": "ligacoes",
+      "placa": "placa",
+      "redes": [
+        {
+          "id": "vin-12v",
+          "terminais": [
+            {
+              "peca": "j7",
+              "porta": "1"
+            },
+            {
+              "peca": "c7",
+              "porta": "positivo"
+            },
+            {
+              "peca": "u2",
+              "porta": "1"
+            },
+            {
+              "peca": "a1",
+              "porta": "16"
+            },
+            {
+              "peca": "c1",
+              "porta": "positivo"
+            },
+            {
+              "peca": "a2",
+              "porta": "16"
+            },
+            {
+              "peca": "c2",
+              "porta": "positivo"
+            },
+            {
+              "peca": "a3",
+              "porta": "16"
+            },
+            {
+              "peca": "c3",
+              "porta": "positivo"
+            },
+            {
+              "peca": "a4",
+              "porta": "16"
+            },
+            {
+              "peca": "c4",
+              "porta": "positivo"
+            },
+            {
+              "peca": "a5",
+              "porta": "16"
+            },
+            {
+              "peca": "c5",
+              "porta": "positivo"
+            },
+            {
+              "peca": "a6",
+              "porta": "16"
+            },
+            {
+              "peca": "c6",
+              "porta": "positivo"
+            }
+          ],
+          "larguraMinima": 1
+        },
+        {
+          "id": "terra",
+          "terminais": [
+            {
+              "peca": "j7",
+              "porta": "2"
+            },
+            {
+              "peca": "c7",
+              "porta": "negativo"
+            },
+            {
+              "peca": "u2",
+              "porta": "2"
+            },
+            {
+              "peca": "c8",
+              "porta": "2"
+            },
+            {
+              "peca": "d1",
+              "porta": "catodo"
+            },
+            {
+              "peca": "u1",
+              "porta": "14"
+            },
+            {
+              "peca": "u1",
+              "porta": "20"
+            },
+            {
+              "peca": "a1",
+              "porta": "9"
+            },
+            {
+              "peca": "a1",
+              "porta": "15"
+            },
+            {
+              "peca": "c1",
+              "porta": "negativo"
+            },
+            {
+              "peca": "a2",
+              "porta": "9"
+            },
+            {
+              "peca": "a2",
+              "porta": "15"
+            },
+            {
+              "peca": "c2",
+              "porta": "negativo"
+            },
+            {
+              "peca": "a3",
+              "porta": "9"
+            },
+            {
+              "peca": "a3",
+              "porta": "15"
+            },
+            {
+              "peca": "c3",
+              "porta": "negativo"
+            },
+            {
+              "peca": "a4",
+              "porta": "9"
+            },
+            {
+              "peca": "a4",
+              "porta": "15"
+            },
+            {
+              "peca": "c4",
+              "porta": "negativo"
+            },
+            {
+              "peca": "a5",
+              "porta": "9"
+            },
+            {
+              "peca": "a5",
+              "porta": "15"
+            },
+            {
+              "peca": "c5",
+              "porta": "negativo"
+            },
+            {
+              "peca": "a6",
+              "porta": "9"
+            },
+            {
+              "peca": "a6",
+              "porta": "15"
+            },
+            {
+              "peca": "c6",
+              "porta": "negativo"
+            }
+          ],
+          "larguraMinima": 1
+        },
+        {
+          "id": "vcc-5v",
+          "terminais": [
+            {
+              "peca": "u2",
+              "porta": "3"
+            },
+            {
+              "peca": "c8",
+              "porta": "1"
+            },
+            {
+              "peca": "u1",
+              "porta": "19"
+            },
+            {
+              "peca": "r1",
+              "porta": "1"
+            },
+            {
+              "peca": "a1",
+              "porta": "10"
+            },
+            {
+              "peca": "a2",
+              "porta": "10"
+            },
+            {
+              "peca": "a3",
+              "porta": "10"
+            },
+            {
+              "peca": "a4",
+              "porta": "10"
+            },
+            {
+              "peca": "a5",
+              "porta": "10"
+            },
+            {
+              "peca": "a6",
+              "porta": "10"
+            }
+          ],
+          "larguraMinima": 0.5
+        },
+        {
+          "id": "led",
+          "terminais": [
+            {
+              "peca": "r1",
+              "porta": "2"
+            },
+            {
+              "peca": "d1",
+              "porta": "anodo"
+            }
+          ]
+        },
+        {
+          "id": "habilita",
+          "terminais": [
+            {
+              "peca": "u1",
+              "porta": "32"
+            },
+            {
+              "peca": "a1",
+              "porta": "1"
+            },
+            {
+              "peca": "a2",
+              "porta": "1"
+            },
+            {
+              "peca": "a3",
+              "porta": "1"
+            },
+            {
+              "peca": "a4",
+              "porta": "1"
+            },
+            {
+              "peca": "a5",
+              "porta": "1"
+            },
+            {
+              "peca": "a6",
+              "porta": "1"
+            }
+          ]
+        },
+        {
+          "id": "reinicio-1",
+          "terminais": [
+            {
+              "peca": "a1",
+              "porta": "5"
+            },
+            {
+              "peca": "a1",
+              "porta": "6"
+            }
+          ]
+        },
+        {
+          "id": "passo-1",
+          "terminais": [
+            {
+              "peca": "u1",
+              "porta": "7"
+            },
+            {
+              "peca": "a1",
+              "porta": "7"
+            }
+          ]
+        },
+        {
+          "id": "direcao-1",
+          "terminais": [
+            {
+              "peca": "u1",
+              "porta": "8"
+            },
+            {
+              "peca": "a1",
+              "porta": "8"
+            }
+          ]
+        },
+        {
+          "id": "motor-1-1b",
+          "terminais": [
+            {
+              "peca": "a1",
+              "porta": "11"
+            },
+            {
+              "peca": "j1",
+              "porta": "1"
+            }
+          ],
+          "larguraMinima": 0.6
+        },
+        {
+          "id": "motor-1-1a",
+          "terminais": [
+            {
+              "peca": "a1",
+              "porta": "12"
+            },
+            {
+              "peca": "j1",
+              "porta": "2"
+            }
+          ],
+          "larguraMinima": 0.6
+        },
+        {
+          "id": "motor-1-2a",
+          "terminais": [
+            {
+              "peca": "a1",
+              "porta": "13"
+            },
+            {
+              "peca": "j1",
+              "porta": "3"
+            }
+          ],
+          "larguraMinima": 0.6
+        },
+        {
+          "id": "motor-1-2b",
+          "terminais": [
+            {
+              "peca": "a1",
+              "porta": "14"
+            },
+            {
+              "peca": "j1",
+              "porta": "4"
+            }
+          ],
+          "larguraMinima": 0.6
+        },
+        {
+          "id": "reinicio-2",
+          "terminais": [
+            {
+              "peca": "a2",
+              "porta": "5"
+            },
+            {
+              "peca": "a2",
+              "porta": "6"
+            }
+          ]
+        },
+        {
+          "id": "passo-2",
+          "terminais": [
+            {
+              "peca": "u1",
+              "porta": "9"
+            },
+            {
+              "peca": "a2",
+              "porta": "7"
+            }
+          ]
+        },
+        {
+          "id": "direcao-2",
+          "terminais": [
+            {
+              "peca": "u1",
+              "porta": "10"
+            },
+            {
+              "peca": "a2",
+              "porta": "8"
+            }
+          ]
+        },
+        {
+          "id": "motor-2-1b",
+          "terminais": [
+            {
+              "peca": "a2",
+              "porta": "11"
+            },
+            {
+              "peca": "j2",
+              "porta": "1"
+            }
+          ],
+          "larguraMinima": 0.6
+        },
+        {
+          "id": "motor-2-1a",
+          "terminais": [
+            {
+              "peca": "a2",
+              "porta": "12"
+            },
+            {
+              "peca": "j2",
+              "porta": "2"
+            }
+          ],
+          "larguraMinima": 0.6
+        },
+        {
+          "id": "motor-2-2a",
+          "terminais": [
+            {
+              "peca": "a2",
+              "porta": "13"
+            },
+            {
+              "peca": "j2",
+              "porta": "3"
+            }
+          ],
+          "larguraMinima": 0.6
+        },
+        {
+          "id": "motor-2-2b",
+          "terminais": [
+            {
+              "peca": "a2",
+              "porta": "14"
+            },
+            {
+              "peca": "j2",
+              "porta": "4"
+            }
+          ],
+          "larguraMinima": 0.6
+        },
+        {
+          "id": "reinicio-3",
+          "terminais": [
+            {
+              "peca": "a3",
+              "porta": "5"
+            },
+            {
+              "peca": "a3",
+              "porta": "6"
+            }
+          ]
+        },
+        {
+          "id": "passo-3",
+          "terminais": [
+            {
+              "peca": "u1",
+              "porta": "11"
+            },
+            {
+              "peca": "a3",
+              "porta": "7"
+            }
+          ]
+        },
+        {
+          "id": "direcao-3",
+          "terminais": [
+            {
+              "peca": "u1",
+              "porta": "12"
+            },
+            {
+              "peca": "a3",
+              "porta": "8"
+            }
+          ]
+        },
+        {
+          "id": "motor-3-1b",
+          "terminais": [
+            {
+              "peca": "a3",
+              "porta": "11"
+            },
+            {
+              "peca": "j3",
+              "porta": "1"
+            }
+          ],
+          "larguraMinima": 0.6
+        },
+        {
+          "id": "motor-3-1a",
+          "terminais": [
+            {
+              "peca": "a3",
+              "porta": "12"
+            },
+            {
+              "peca": "j3",
+              "porta": "2"
+            }
+          ],
+          "larguraMinima": 0.6
+        },
+        {
+          "id": "motor-3-2a",
+          "terminais": [
+            {
+              "peca": "a3",
+              "porta": "13"
+            },
+            {
+              "peca": "j3",
+              "porta": "3"
+            }
+          ],
+          "larguraMinima": 0.6
+        },
+        {
+          "id": "motor-3-2b",
+          "terminais": [
+            {
+              "peca": "a3",
+              "porta": "14"
+            },
+            {
+              "peca": "j3",
+              "porta": "4"
+            }
+          ],
+          "larguraMinima": 0.6
+        },
+        {
+          "id": "reinicio-4",
+          "terminais": [
+            {
+              "peca": "a4",
+              "porta": "5"
+            },
+            {
+              "peca": "a4",
+              "porta": "6"
+            }
+          ]
+        },
+        {
+          "id": "passo-4",
+          "terminais": [
+            {
+              "peca": "u1",
+              "porta": "21"
+            },
+            {
+              "peca": "a4",
+              "porta": "7"
+            }
+          ]
+        },
+        {
+          "id": "direcao-4",
+          "terminais": [
+            {
+              "peca": "u1",
+              "porta": "22"
+            },
+            {
+              "peca": "a4",
+              "porta": "8"
+            }
+          ]
+        },
+        {
+          "id": "motor-4-1b",
+          "terminais": [
+            {
+              "peca": "a4",
+              "porta": "11"
+            },
+            {
+              "peca": "j4",
+              "porta": "1"
+            }
+          ],
+          "larguraMinima": 0.6
+        },
+        {
+          "id": "motor-4-1a",
+          "terminais": [
+            {
+              "peca": "a4",
+              "porta": "12"
+            },
+            {
+              "peca": "j4",
+              "porta": "2"
+            }
+          ],
+          "larguraMinima": 0.6
+        },
+        {
+          "id": "motor-4-2a",
+          "terminais": [
+            {
+              "peca": "a4",
+              "porta": "13"
+            },
+            {
+              "peca": "j4",
+              "porta": "3"
+            }
+          ],
+          "larguraMinima": 0.6
+        },
+        {
+          "id": "motor-4-2b",
+          "terminais": [
+            {
+              "peca": "a4",
+              "porta": "14"
+            },
+            {
+              "peca": "j4",
+              "porta": "4"
+            }
+          ],
+          "larguraMinima": 0.6
+        },
+        {
+          "id": "reinicio-5",
+          "terminais": [
+            {
+              "peca": "a5",
+              "porta": "5"
+            },
+            {
+              "peca": "a5",
+              "porta": "6"
+            }
+          ]
+        },
+        {
+          "id": "passo-5",
+          "terminais": [
+            {
+              "peca": "u1",
+              "porta": "25"
+            },
+            {
+              "peca": "a5",
+              "porta": "7"
+            }
+          ]
+        },
+        {
+          "id": "direcao-5",
+          "terminais": [
+            {
+              "peca": "u1",
+              "porta": "27"
+            },
+            {
+              "peca": "a5",
+              "porta": "8"
+            }
+          ]
+        },
+        {
+          "id": "motor-5-1b",
+          "terminais": [
+            {
+              "peca": "a5",
+              "porta": "11"
+            },
+            {
+              "peca": "j5",
+              "porta": "1"
+            }
+          ],
+          "larguraMinima": 0.6
+        },
+        {
+          "id": "motor-5-1a",
+          "terminais": [
+            {
+              "peca": "a5",
+              "porta": "12"
+            },
+            {
+              "peca": "j5",
+              "porta": "2"
+            }
+          ],
+          "larguraMinima": 0.6
+        },
+        {
+          "id": "motor-5-2a",
+          "terminais": [
+            {
+              "peca": "a5",
+              "porta": "13"
+            },
+            {
+              "peca": "j5",
+              "porta": "3"
+            }
+          ],
+          "larguraMinima": 0.6
+        },
+        {
+          "id": "motor-5-2b",
+          "terminais": [
+            {
+              "peca": "a5",
+              "porta": "14"
+            },
+            {
+              "peca": "j5",
+              "porta": "4"
+            }
+          ],
+          "larguraMinima": 0.6
+        },
+        {
+          "id": "reinicio-6",
+          "terminais": [
+            {
+              "peca": "a6",
+              "porta": "5"
+            },
+            {
+              "peca": "a6",
+              "porta": "6"
+            }
+          ]
+        },
+        {
+          "id": "passo-6",
+          "terminais": [
+            {
+              "peca": "u1",
+              "porta": "28"
+            },
+            {
+              "peca": "a6",
+              "porta": "7"
+            }
+          ]
+        },
+        {
+          "id": "direcao-6",
+          "terminais": [
+            {
+              "peca": "u1",
+              "porta": "29"
+            },
+            {
+              "peca": "a6",
+              "porta": "8"
+            }
+          ]
+        },
+        {
+          "id": "motor-6-1b",
+          "terminais": [
+            {
+              "peca": "a6",
+              "porta": "11"
+            },
+            {
+              "peca": "j6",
+              "porta": "1"
+            }
+          ],
+          "larguraMinima": 0.6
+        },
+        {
+          "id": "motor-6-1a",
+          "terminais": [
+            {
+              "peca": "a6",
+              "porta": "12"
+            },
+            {
+              "peca": "j6",
+              "porta": "2"
+            }
+          ],
+          "larguraMinima": 0.6
+        },
+        {
+          "id": "motor-6-2a",
+          "terminais": [
+            {
+              "peca": "a6",
+              "porta": "13"
+            },
+            {
+              "peca": "j6",
+              "porta": "3"
+            }
+          ],
+          "larguraMinima": 0.6
+        },
+        {
+          "id": "motor-6-2b",
+          "terminais": [
+            {
+              "peca": "a6",
+              "porta": "14"
+            },
+            {
+              "peca": "j6",
+              "porta": "4"
+            }
+          ],
+          "larguraMinima": 0.6
+        }
+      ],
+      "motivo": {
+        "linhaDaMatriz": "lig-cobre-confere",
+        "texto": "Exemplo escrito à mão no Modelar em 2026-11-23, no formato proposto para a versão 1.1 do pedido, até a camada de ligações da mecatrônica escrever a lista real; as funções dos pinos e as larguras são suposições de exemplo, e o valor do resultado é o número de redes. A placa de controle liga a entrada de 12 V, o regulador de 5 V, o microcontrolador e os seis drivers aos conectores dos motores.",
+        "resultado": {
+          "grandeza": "redes da placa",
+          "valor": 47,
+          "unidade": "redes",
+          "origem": "declarado"
+        }
+      }
+    }
+  ]
+}
