@@ -1,6 +1,6 @@
 # Relevo de contorno na chapa: anéis concêntricos na rede de curvas e moldura conformada multipainel
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `procedural/nucleo/faixa-de-contorno-na-rede.js`, `procedural/nucleo/faixa-de-contorno-na-rede.test.mjs`, `procedural/nucleo/conformar-na-chapa.js`, `procedural/nucleo/conformar-na-chapa.test.mjs`, `procedural/nucleo/fixtures/`, `tools/modelar/capacidade.mjs`, `docs/modelar/guias/modelar-carroceria.md`
 
@@ -107,4 +107,7 @@ Na evolução de `conformarNaChapa`:
 
 ## Fechamento
 
-Preencher somente ao concluir ou cancelar.
+- **Estado final:** concluído em 2026-11-23 na branch `envio/carro-quadrado-forma`.
+- **Entregas:** `procedural/nucleo/faixa-de-contorno-na-rede.js` (anéis concêntricos de quadriláteros sobre `gaiolaPorRede` com perfil transversal livre, vincos, modulação longitudinal, aba interna, tangente unilateral de 2ª ordem nas pontas e recusa diagnóstica de raio côncavo), fixture neutra `procedural/nucleo/fixtures/faixa-de-contorno-prova.js` com corte multipainel contínuo, evolução retrocompatível de `procedural/nucleo/conformar-na-chapa.js` (`perfil` 2D livre, `modulacao` ancorada na largura por padrão, `malhas` com `frestaMaximaMm`), ficha registrada em `tools/modelar/capacidade.mjs`, guia atualizado em `docs/modelar/guias/modelar-carroceria.md` e prova visual aprovada pela pessoa na bancada (pintura brilhante, zebra, luz rasante e raio-x).
+- **Gates:** 126/126 testes verdes (`faixa-de-contorno-na-rede`, `conformar-na-chapa`, `capacidade`), `planos:check`, `docs:links:check` e `nome:check` verdes.
+- **Devolvido ao backlog:** nenhum bloqueio restante.

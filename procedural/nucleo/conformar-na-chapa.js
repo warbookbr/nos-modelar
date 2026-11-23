@@ -584,10 +584,11 @@ function executarTrilho(o, amostrador, base, escala, origemId) {
     if (!vDir) continue;
     const sNorm = sAcum > EPS ? marcos[i].em / sAcum : 0;
     const fator = avaliarModulacaoTrilho(o.modulacao, sNorm);
+    const modularLargura = o.modularLargura === true;
     for (let j = 0; j < secao2d.length; j += 1) {
       const [suBase, svBase] = secao2d[j];
       const su = deslocamentoMm + (suBase - deslocamentoMm) * fator;
-      const sv = svBase * fator;
+      const sv = modularLargura ? svBase * fator : svBase;
       const nomeV = g.nomeDe(i, j);
       const posReal = soma(s.c, soma(esc(uDir, su), esc(vDir, sv)));
       g.posicoes.set(nomeV, posReal);
