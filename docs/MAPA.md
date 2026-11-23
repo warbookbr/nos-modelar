@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2227 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2229 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -234,6 +234,11 @@
 ## docs/modelar/banco-de-provas/aviao-receita-2026-10-15/
 
 - `TRADUCAO.md` — O esboço do avião traduzido para o andaime
+
+## docs/modelar/banco-de-provas/braco-de-prova-2026-11-23/
+
+- `README.md` — Braço de prova de duas juntas: o alinhamento da forma
+- `elos-opcoes.esboco.mjs` — elos-opcoes.esboco.mjs — o braço de prova de duas juntas, com o mesmo mecanismo nas três opções (base redonda, ombro em garfo com o NEMA 23 e a planetária de…
 
 ## docs/modelar/banco-de-provas/cache-por-passo-2026-11-16/
 
