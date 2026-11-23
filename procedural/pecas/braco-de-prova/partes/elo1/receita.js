@@ -6,14 +6,14 @@
  * correia dentro do U até o cotovelo.
  *
  * O U tem duas paredes de 6 mm (faces de fora em z = ±26) e o fundo de 6 mm por baixo; o vão de dentro, de 40 mm, deixa
- * 17 mm de folga de cada lado da correia de 6 mm, e o fundo fica 3 mm abaixo do ponto mais baixo da correia. A parede da
- * frente encosta na ponta do eixo de saída da planetária; da parede de trás sai o pino de 8 mm que passa pelo garfo e gira
+ * 17 mm de folga de cada lado da correia de 6 mm, e o fundo fica 3 mm abaixo do ponto mais baixo da correia. Na face de fora da parede
+ * da frente, o cubo do ombro recebe 12 mm do eixo de saída da planetária, preso por um M3 radial; da parede de trás sai o pino de 8 mm que passa pelo garfo e gira
  * no rolamento. A parede de trás tem o furo de 23 mm onde assenta o ressalto do NEMA 17, com os quatro M3 da flange, e as duas paredes têm o furo de
  * 10 mm do eixo do cotovelo, que é do segundo elo.
  *
  * Referencial: o da montagem (ver `../../comum/blocos.mjs`); o braço esticado na horizontal, ao longo de +x.
  *
- * Portas: `juntaDoOmbro` (cilindro interno, eixo +z, no eixo do ombro, na face de fora da parede da frente), onde o eixo de
+ * Portas: `juntaDoOmbro` (cilindro interno, eixo +z, no eixo do ombro, o furo do cubo a partir da face de fora da parede da frente), onde o eixo de
  * saída da planetária se prende; `assentoDoMotor` (plano, recebe, normal −z, na face de fora da parede de trás, no eixo do
  * NEMA 17) e `juntaDoCotovelo` (cilindro interno, eixo +z, centro no eixo do cotovelo na face de fora da parede de trás).
  */
@@ -47,6 +47,13 @@ export const TABELA = {
   raioDoPino: 4,
   fimDoPino: -58,
   chanfro: 2,
+  /* Cubo do ombro, na face de fora da parede da frente: recebe o eixo de saída de 14 mm da planetária com 0,05 mm de folga
+     no raio, parede de 3,95 mm, e abraça 12 mm do eixo, parando a 1 mm da face de dentro do garfo (z = 39). O furo radial
+     de 2,5 mm, de cima, é o do parafuso de aperto M3 (rosca no cubo), no meio do comprimento. */
+  raioDoFuroDoCubo: 7.05,
+  raioDoCubo: 11,
+  comprimentoDoCubo: 12,
+  raioDoFuroDeAperto: 1.25,
 };
 
 export const MATERIAIS = CORES;
@@ -67,6 +74,9 @@ export function derivar(t = TABELA) {
         })))] },
     { nome: 'abaDaFrente', material: 'estrutura', chanfro: 1, caixa: [...x, t.alto - t.aba, t.alto, t.meioVao - t.aba, t.meioVao] },
     { nome: 'abaDeTras', material: 'estrutura', chanfro: 1, caixa: [...x, t.alto - t.aba, t.alto, -t.meioVao, -t.meioVao + t.aba] },
+    { nome: 'cuboDoOmbro', material: 'aco', eixo: 'z', base: [0, y, fora], comprimento: t.comprimentoDoCubo, raio: t.raioDoCubo, lados: 36,
+      furos: [{ eixo: 'z', base: [0, y, fora - 1], comprimento: t.comprimentoDoCubo + 2, raio: t.raioDoFuroDoCubo, lados: 36 },
+        { eixo: 'y', base: [0, y + t.raioDoFuroDoCubo - 1, fora + t.comprimentoDoCubo / 2], comprimento: t.raioDoCubo - t.raioDoFuroDoCubo + 2, raio: t.raioDoFuroDeAperto, lados: 12 }] },
     { nome: 'pino', material: 'aco', eixo: 'z', base: [0, y, t.fimDoPino], comprimento: -fora - t.fimDoPino, raio: t.raioDoPino, lados: 18 },
   ];
 }
@@ -77,8 +87,8 @@ export function gerarPassos(t = TABELA) {
   const formas = derivar(t);
   const { passos } = passosDasFormas(formas);
   const fora = t.meioVao + t.parede;
-  passos.push(porta('juntaDoOmbro', origemDa(formas, 'paredeDaFrente'), {
-    forma: 'cilindro', papel: 'interna', eixo: [0, 0, 1], centro: [0, t.alturaDoEixo, fora], raio: 7, inicio: -t.parede, fim: 0,
+  passos.push(porta('juntaDoOmbro', origemDa(formas, 'cuboDoOmbro'), {
+    forma: 'cilindro', papel: 'interna', eixo: [0, 0, 1], centro: [0, t.alturaDoEixo, fora], raio: t.raioDoFuroDoCubo, inicio: 0, fim: t.comprimentoDoCubo,
   }));
   passos.push(porta('assentoDoMotor', origemDa(formas, 'paredeDeTras'), { forma: 'plano', papel: 'recebe', ponto: [t.eixoDoMotor, t.alturaDoEixo, -fora], normal: [0, 0, -1], extensao: [42.3, 42.3] }));
   passos.push(porta('juntaDoCotovelo', origemDa(formas, 'paredeDeTras'), {
@@ -103,6 +113,7 @@ const receita = {
       { nome: 'paredeDeTras', forma: 'parede de 210 × 66 × 6 mm, de z −26 a −20, com o furo do cotovelo, o furo de 23 mm do ressalto do NEMA 17 e os quatro M3 dele', tecnica: 'caixa chanfrada com furos por subtração' },
       { nome: 'abaDaFrente', forma: 'aba de 210 × 6 × 6 mm no alto da parede da frente, por dentro', tecnica: 'caixa chanfrada' },
       { nome: 'abaDeTras', forma: 'aba de 210 × 6 × 6 mm no alto da parede de trás, por dentro', tecnica: 'caixa chanfrada' },
+      { nome: 'cuboDoOmbro', forma: 'cubo de 22 × 12 mm na face de fora da parede da frente, no eixo do ombro, com o furo de 14,1 mm do eixo de saída da planetária e o furo radial M3 do parafuso de aperto, parando a 1 mm da parede do garfo', tecnica: 'cilindro com furos por subtração' },
       { nome: 'pino', forma: 'pino de 8 mm no eixo do ombro, da parede de trás até a face de fora do rolamento', tecnica: 'cilindro' },
     ],
     criteriosDeReprovacao: [
@@ -118,6 +129,7 @@ const receita = {
     { par: ['fundo', 'paredeDeTras'], motivo: 'a parede sobe do fundo do U' },
     { par: ['abaDaFrente', 'paredeDaFrente'], motivo: 'a aba endurece o alto da parede, por dentro' },
     { par: ['abaDeTras', 'paredeDeTras'], motivo: 'a aba endurece o alto da parede, por dentro' },
+    { par: ['cuboDoOmbro', 'paredeDaFrente'], motivo: 'o cubo do ombro sai da face de fora da parede da frente' },
     { par: ['paredeDeTras', 'pino'], motivo: 'o pino sai da face de fora da parede de trás' },
   ],
   get PASSOS() { return gerarPassos(this.PARAMS); },

@@ -6,7 +6,7 @@
  * NEMA 23 de 57 × 57 × 76 mm com eixo de 8 × 21 mm; planetária de 57 × 57 × 55 mm com eixo de saída de 14 × 25 mm.
  *
  * Referencial: o da montagem (ver `../../comum/blocos.mjs`). A face de saída da planetária (a flange) se apoia na face de fora da
- * parede da frente do garfo; o eixo de saída atravessa o furo da parede e encosta na parede da frente do primeiro elo. O
+ * parede da frente do garfo; o eixo de saída atravessa o furo da parede e entra 12 mm no cubo do primeiro elo. O
  * eixo do NEMA 23 entra num furo cego da planetária, do tamanho dele, e não atravessa nada.
  *
  * Portas: `flange` (plano, apoia, normal −z, na face de saída da planetária) e `eixoDeSaida` (cilindro externo, eixo +z, com o

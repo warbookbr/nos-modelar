@@ -70,6 +70,32 @@
   ],
   "relacoes": [
     {
+      "id": "eixoDeSaidaNoCuboDoElo1",
+      "tipo": "encaixaCilindrico",
+      "referencia": {
+        "caminho": [
+          "motorOmbro"
+        ],
+        "porta": "eixoDeSaida"
+      },
+      "movel": {
+        "caminho": [
+          "elo1"
+        ],
+        "porta": "juntaDoOmbro"
+      },
+      "especificacao": {
+        "folgaRadial": {
+          "nominal": 5e-05,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "toleranciaNumerica": 1e-06
+      }
+    },
+    {
       "id": "poliaPequenaNoEixoDoMotor",
       "tipo": "encaixaCilindrico",
       "referencia": {
@@ -239,6 +265,95 @@
         "caminho": [
           "base"
         ]
+      }
+    ]
+  },
+  "auditoriaIntersecoes": {
+    "toleranciaNumerica": 1e-09,
+    "expectativas": [
+      {
+        "id": "garfoSobreABase",
+        "a": {
+          "caminho": [
+            "garfo"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "base"
+          ]
+        },
+        "motivo": "o pé das paredes do garfo assenta na tampa da base, onde é preso por dois M3 de baixo para cima em cada parede"
+      },
+      {
+        "id": "planetariaNoGarfo",
+        "a": {
+          "caminho": [
+            "motorOmbro"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "garfo"
+          ]
+        },
+        "motivo": "a face de saída da planetária assenta na face de fora da parede da frente do garfo, presa pelos quatro M5"
+      },
+      {
+        "id": "rolamentoNoGarfo",
+        "a": {
+          "caminho": [
+            "rolamento"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "garfo"
+          ]
+        },
+        "motivo": "a face do rolamento assenta na face de fora da parede de trás do garfo"
+      },
+      {
+        "id": "eixoDeSaidaNoCuboDoElo1",
+        "a": {
+          "caminho": [
+            "motorOmbro"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "elo1"
+          ]
+        },
+        "motivo": "o eixo de saída da planetária entra 12 mm no cubo do ombro do primeiro elo, com 0,05 mm de folga no raio, e a ponta dele encosta na face de fora da parede da frente do elo; o aperto é o parafuso M3 radial do cubo"
+      },
+      {
+        "id": "motorDoCotoveloNoElo1",
+        "a": {
+          "caminho": [
+            "motorCotovelo"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "elo1"
+          ]
+        },
+        "motivo": "a flange do NEMA 17 assenta na face de fora da parede de trás do primeiro elo, presa pelos quatro M3"
+      },
+      {
+        "id": "garraNaPontaDoElo2",
+        "a": {
+          "caminho": [
+            "garra"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "elo2"
+          ]
+        },
+        "motivo": "o apoio da garra assenta na placa da ponta do segundo elo, onde é parafusado"
       }
     ]
   }
