@@ -15,7 +15,11 @@ function areaTriangular(a, b, c) {
 
 function aresta(a, b) { return a < b ? `${a}:${b}` : `${b}:${a}`; }
 
-export function validarMalha(neutro, { tolerancia }) {
+/* A tolerância vale na unidade de saída, como diz o contrato: a área de cada triângulo é medida no neutro e levada à saída pelo
+   quadrado da escala antes de comparar com o quadrado da tolerância. Até 2026-11-22 a comparação era no neutro, em metro, e
+   a tolerância padrão de 0,001 mm virava 1 mm² de área mínima, que recusava toda peça pequena. Sem `escala`, o neutro já
+   está na unidade de saída. */
+export function validarMalha(neutro, { tolerancia, escala = 1 }) {
   if (!neutro || !(neutro.V instanceof Map) || !(neutro.F instanceof Map)) {
     erro('malha-invalida', 'Malha neutra precisa fornecer Map V e Map F.');
   }
@@ -40,7 +44,7 @@ export function validarMalha(neutro, { tolerancia }) {
     });
     /* A face vale se alguma triangulação dela tem todos os triângulos acima da tolerância: o leque do canto 0, que o corpo de
        sempre usa, e só quando ele tem triângulo sem área, o leque de outro canto ou as orelhas. */
-    const triangulos = triangulosDaFace({ vs }, vertices, (a, b, c) => areaTriangular(a, b, c) <= tolerancia * tolerancia);
+    const triangulos = triangulosDaFace({ vs }, vertices, (a, b, c) => areaTriangular(a, b, c) * escala * escala <= tolerancia * tolerancia);
     if (!triangulos) erro('face-degenerada', 'Face tem área abaixo da tolerância.', { face: id });
     for (let i = 0; i < vs.length; i++) {
       const a = vs[i], b = vs[(i + 1) % vs.length], chave = aresta(a, b);

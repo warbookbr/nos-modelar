@@ -39,7 +39,9 @@ export async function escreverStepFacetado({ nome, malha, corpos, unidade, escal
           return kernel.makeFace(kernel.makeWire(edges));
         }),
       );
-      const forma = kernel.sewAndSolidify(faces, tolerancia * fator);
+      /* as coordenadas vão ao OCCT em mm (fator = escala até a unidade de saída × unidade em mm), e a tolerância, que é da
+         unidade de saída, só passa pela unidade: até 2026-11-22 ela passava também pela escala, e a costura padrão era de 1 mm */
+      const forma = kernel.sewAndSolidify(faces, tolerancia * fatorUnidade[unidade]);
       if (!kernel.isValid(forma) || !kernel.subShapeCount(forma, 'solid')) {
         throw new ErroExportacaoCad(
           'corpo-nao-fechado',

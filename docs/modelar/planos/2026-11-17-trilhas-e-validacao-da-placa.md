@@ -1,10 +1,10 @@
 # Trilhas de cobre e validação elétrica da placa declarada: a lista de ligações vira cobre conferido por regra e por conectividade
 
-**Estado:** rascunho
+**Estado:** ativo
 
-**Território:** a declarar ao ativar. O provável é uma pasta nova `procedural/familias/componente-eletronico/cobre/` (o leitor da lista, o traçador, o conferidor e o mapa das redes), `procedural/familias/componente-eletronico/placa.js` (a placa passa a ler o traçado salvo e a abrir as camadas das faces onde há cobre), `tools/modelar/tracar-placa.mjs` e `tools/modelar/conferir-placa.mjs` com os testes deles, `procedural/pecas/braco-robotico/partes/base/` (a lista, o traçado salvo e a receita) e `docs/modelar/banco-de-provas/trilhas-da-placa-<data>/`.
+**Território:** `procedural/familias/componente-eletronico/cobre/`, `procedural/familias/componente-eletronico/placa.js`, `procedural/familias/componente-eletronico/placa.test.js`, `procedural/familias/componente-eletronico/placa-de-prova.js`, `tools/modelar/tracar-placa.mjs`, `tools/modelar/conferir-placa.mjs`, `tools/modelar/tracar-placa.test.mjs`, `tools/modelar/conferir-placa.test.mjs`, `procedural/pecas/braco-robotico/partes/base/`, `docs/modelar/banco-de-provas/trilhas-da-placa-2026-11-23/`
 
-**Responsável:** a IA da sessão implementa; Tiago decide a emenda do invariante descrita abaixo, aprova o formato da lista pelo exemplo e aprova a forma por imagem.
+**Responsável:** a IA da sessão na nuvem implementa, ativado pela pessoa em 2026-11-23; Tiago decide a emenda do invariante descrita abaixo, aprova o formato da lista pelo exemplo e aprova a forma por imagem.
 
 **Repositório e base:** `warbookbr/nos-modelar`, main na ativação, depois do fechamento do [plano da família de componentes eletrônicos](../decisoes/PLANOS-ENCERRADOS.md), como a pessoa decidiu em 2026-11-17. O outro lado é `warbookbr/nos-mecatronica`, pelo contrato da ponte (`ponte/README.md` de lá) e pelas decisões 0001 e 0004 de lá.
 
@@ -79,7 +79,7 @@ Lá, pelo fluxo daquele repositório e pela 0004, o item de ligações entra no 
 
 ## Fatias
 
-1. A linha de base e o contrato: medir o tempo de geração da placa de prova e da base do braço como estão, fixar o limite do item 4 do gate, declarar as regras em `PLACA` com a fonte, e escrever o exemplo à mão da lista das duas placas e o texto da proposta para a mecatrônica; a pessoa lê o exemplo e aprova o formato.
+1. Feita em 2026-11-23, com o formato da lista aprovado pela pessoa no mesmo dia: a linha de base (placa de prova 13 s, base do braço 14 s, limite de 28 s para a base com cobre), as regras em `PLACA`, as listas de exemplo das duas placas e a proposta do item em `docs/modelar/banco-de-provas/trilhas-da-placa-2026-11-23/`. O plano previa: medir o tempo de geração da placa de prova e da base do braço como estão, fixar o limite do item 4 do gate, declarar as regras em `PLACA` com a fonte, e escrever o exemplo à mão da lista das duas placas e o texto da proposta para a mecatrônica; a pessoa lê o exemplo e aprova o formato.
 2. O conferidor e a geometria primeiro, sobre um traçado declarado à mão na placa de prova: a placa gera trilhas e vias, as camadas das faces abrem onde há cobre, o conferidor passa o certo e recusa cada fixture errada, e o mapa das redes sai para a pessoa.
 3. O traçador automático na placa de prova, com o comando, o relatório das redes traçadas e não traçadas e o teste de determinismo, conferido pelo conferidor da fatia 2.
 4. A placa de controle do braço traçada e conferida, com a medida de tempo, o retrato do acervo e as imagens para a pessoa.

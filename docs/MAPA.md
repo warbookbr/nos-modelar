@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2195 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2199 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -567,6 +567,17 @@
 
 - `README.md` — Madeira em Node ao lado da do Blender (2026-10-19)
 
+## docs/modelar/banco-de-provas/tolerancia-do-step-2026-11-22/
+
+- `README.md` — Tolerância do STEP: o acervo exportado antes e depois da tolerância em milímetro
+- `comparar.mjs` — comparar.mjs — compara duas medidas de `medir.mjs` peça a peça e imprime a tabela em markdown.
+- `medir.mjs` — medir.mjs — exporta cada peça do acervo em STEP, em memória, com as opções padrão do comando, e grava o resultado.
+
+## docs/modelar/banco-de-provas/trilhas-da-placa-2026-11-23/
+
+- `PROPOSTA-DO-ITEM.md` — Proposta para o nos-mecatronica: o item `ligacoes` no pedido 1.1
+- `README.md` — Trilhas da placa: a linha de base, as regras e a lista de exemplo
+
 ## docs/modelar/blender/
 
 - `COMO-COMECAR.md` — Como começar com o Blender
@@ -661,7 +672,6 @@
 - `2026-11-17-trilhas-e-validacao-da-placa.md` — Trilhas de cobre e validação elétrica da placa declarada: a lista de ligações vira cobre conferido por regra e por conectividade
 - `2026-11-22-curva-paralela-na-rede.md` — Curva paralela na rede de curvas: os anéis em volta de um vão sem desenhar ponto a ponto
 - `2026-11-22-superficie-de-producao-g2.md` — Superfície de produção (G2): a chapa de subdivisão sem a ondulação que o crítico acusa, sem sair da forma
-- `2026-11-22-tolerancia-do-step-em-milimetro.md` — Tolerância do STEP em milímetro: a peça pequena exporta sem bandeira
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
