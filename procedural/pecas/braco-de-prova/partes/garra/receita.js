@@ -17,6 +17,10 @@ export const TABELA = {
   altura: 45,
   largura: 40,
   chanfro: 4,
+  /* Os quatro M3 da placa da ponta do segundo elo, cegos de 10 mm, no quadrado de 24 mm. */
+  passoDosFurosM3: 24,
+  raioDoFuroM3: 1.4,
+  fundoDoFuroM3: 10,
 };
 
 export const MATERIAIS = CORES;
@@ -24,7 +28,10 @@ export const MATERIAIS = CORES;
 export function derivar(t = TABELA) {
   return [
     { nome: 'garra', material: 'estrutura', chanfro: t.chanfro,
-      caixa: [t.ponta, t.ponta + t.comprimento, t.alturaDoEixo - t.altura / 2, t.alturaDoEixo + t.altura / 2, -t.largura / 2, t.largura / 2] },
+      caixa: [t.ponta, t.ponta + t.comprimento, t.alturaDoEixo - t.altura / 2, t.alturaDoEixo + t.altura / 2, -t.largura / 2, t.largura / 2],
+      furos: [-1, 1].flatMap((sy) => [-1, 1].map((sz) => ({
+        eixo: 'x', base: [t.ponta - 1, t.alturaDoEixo + (sy * t.passoDosFurosM3) / 2, (sz * t.passoDosFurosM3) / 2], comprimento: t.fundoDoFuroM3 + 1, raio: t.raioDoFuroM3, lados: 12,
+      }))) },
   ];
 }
 
@@ -48,7 +55,7 @@ const receita = {
     referencias: ['../../../../../docs/modelar/banco-de-provas/braco-de-prova-2026-11-23/elos-opcoes.png'],
     escala: { medida: 'altura do bloco', milimetros: 45 },
     partes: [
-      { nome: 'garra', forma: 'bloco de 40 × 45 × 40 mm com chanfro de 4 mm, centrado no plano do braço, encostado na placa da ponta', tecnica: 'caixa chanfrada' },
+      { nome: 'garra', forma: 'bloco de 40 × 45 × 40 mm com chanfro de 4 mm e quatro furos M3 cegos (2,8 mm, para rosca na peça impressa), centrado no plano do braço, encostado na placa da ponta', tecnica: 'caixa chanfrada com furos por subtração' },
     ],
     criteriosDeReprovacao: [
       'bloco com medida diferente de 40 × 45 × 40 mm',

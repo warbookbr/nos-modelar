@@ -22,14 +22,29 @@ export const TABELA = {
   raioDoEixo: 2.5,
   comprimentoDoEixo: 24,
   chanfro: 2,
+  /* A flange do NEMA 17 (NEMA ICS 16): quatro furos M3 no quadrado de 31 mm, 4,5 mm de fundo, e o ressalto de 22 mm por
+     2 mm em volta do eixo. */
+  passoDosFuros: 31,
+  raioDoFuroM3: 1.5,
+  fundoDoFuro: 4.5,
+  raioDoRessalto: 11,
+  alturaDoRessalto: 2,
 };
 
 export const MATERIAIS = CORES;
 
+/* Os quatro furos cegos da flange, abertos na face do eixo. */
+const furosDaFlange = (t) => [-1, 1].flatMap((sx) => [-1, 1].map((sy) => ({
+  eixo: 'z', base: [t.eixoDoMotor + (sx * t.passoDosFuros) / 2, t.alturaDoEixo + (sy * t.passoDosFuros) / 2, t.faceDoElo - t.fundoDoFuro],
+  comprimento: t.fundoDoFuro + 1, raio: t.raioDoFuroM3, lados: 12,
+})));
+
 export function derivar(t = TABELA) {
   const h = t.lado / 2;
   return [
-    { nome: 'motor', material: 'motor', chanfro: t.chanfro, caixa: [t.eixoDoMotor - h, t.eixoDoMotor + h, t.alturaDoEixo - h, t.alturaDoEixo + h, t.faceDoElo - t.comprimento, t.faceDoElo] },
+    { nome: 'motor', material: 'motor', chanfro: t.chanfro, caixa: [t.eixoDoMotor - h, t.eixoDoMotor + h, t.alturaDoEixo - h, t.alturaDoEixo + h, t.faceDoElo - t.comprimento, t.faceDoElo],
+      furos: furosDaFlange(t) },
+    { nome: 'ressalto', material: 'motor', eixo: 'z', base: [t.eixoDoMotor, t.alturaDoEixo, t.faceDoElo], comprimento: t.alturaDoRessalto, raio: t.raioDoRessalto, lados: 36 },
     { nome: 'eixo', material: 'aco', eixo: 'z', base: [t.eixoDoMotor, t.alturaDoEixo, t.faceDoElo], comprimento: t.comprimentoDoEixo, raio: t.raioDoEixo, lados: 18 },
   ];
 }
@@ -57,7 +72,8 @@ const receita = {
     referencias: ['../../../../../docs/modelar/banco-de-provas/braco-de-prova-2026-11-23/elos-opcoes.png'],
     escala: { medida: 'lado da caixa do NEMA 17', milimetros: 42.3 },
     partes: [
-      { nome: 'motor', forma: 'bloco de 42,3 × 42,3 × 40 mm encostado na parede de trás do primeiro elo', tecnica: 'caixa chanfrada' },
+      { nome: 'motor', forma: 'bloco de 42,3 × 42,3 × 40 mm encostado na parede de trás do primeiro elo, com os quatro furos M3 da flange no quadrado de 31 mm', tecnica: 'caixa chanfrada com furos cegos por subtração' },
+      { nome: 'ressalto', forma: 'ressalto de 22 × 2 mm em volta do eixo, dentro do furo da parede do elo', tecnica: 'cilindro' },
       { nome: 'eixo', forma: 'eixo de 5 × 24 mm, pelo furo da parede, até dentro da polia pequena', tecnica: 'cilindro' },
     ],
     criteriosDeReprovacao: [
@@ -68,6 +84,8 @@ const receita = {
   },
   contatos: [
     { par: ['eixo', 'motor'], motivo: 'o eixo sai da face do motor' },
+    { par: ['eixo', 'ressalto'], motivo: 'o eixo passa pelo meio do ressalto da flange' },
+    { par: ['motor', 'ressalto'], motivo: 'o ressalto sai da face do motor' },
   ],
   get PASSOS() { return gerarPassos(this.PARAMS); },
 };

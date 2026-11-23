@@ -8,7 +8,7 @@
  * O U tem duas paredes de 6 mm (faces de fora em z = ±26) e o fundo de 6 mm por baixo; o vão de dentro, de 40 mm, deixa
  * 17 mm de folga de cada lado da correia de 6 mm, e o fundo fica 3 mm abaixo do ponto mais baixo da correia. A parede da
  * frente encosta na ponta do eixo de saída da planetária; da parede de trás sai o pino de 8 mm que passa pelo garfo e gira
- * no rolamento. A parede de trás tem o furo de 8 mm por onde o eixo do NEMA 17 entra no U, e as duas paredes têm o furo de
+ * no rolamento. A parede de trás tem o furo de 23 mm onde assenta o ressalto do NEMA 17, com os quatro M3 da flange, e as duas paredes têm o furo de
  * 10 mm do eixo do cotovelo, que é do segundo elo.
  *
  * Referencial: o da montagem (ver `../../comum/blocos.mjs`); o braço esticado na horizontal, ao longo de +x.
@@ -34,12 +34,19 @@ export const TABELA = {
   alto: 176,
   /* Eixo do NEMA 17, a 80 mm do ombro, e o furo por onde o eixo de 5 mm dele entra no U. */
   eixoDoMotor: 80,
-  raioDaPassagemDoMotor: 4,
+  /* A passagem recebe o ressalto de 22 mm do NEMA 17, com 0,5 mm de folga no raio; os quatro M3 da flange, no quadrado de
+     31 mm, atravessam a parede. */
+  raioDaPassagemDoMotor: 11.5,
+  passoDosFurosM3: 31,
+  raioDoFuroM3: 1.7,
+  /* As nervuras de dentro: uma aba de 6 × 6 mm no alto de cada parede, de ponta a ponta do perfil, que endurece a chapa
+     longa; a 14 mm da correia em z. */
+  aba: 6,
   raioDaPassagemDoCotovelo: 5,
   /* Pino do lado de trás do ombro: 8 mm, da parede até a face de fora do rolamento. */
   raioDoPino: 4,
   fimDoPino: -58,
-  chanfro: 1.5,
+  chanfro: 2,
 };
 
 export const MATERIAIS = CORES;
@@ -54,7 +61,12 @@ export function derivar(t = TABELA) {
     { nome: 'paredeDaFrente', material: 'estrutura', chanfro: t.chanfro, caixa: [...x, t.baixo + t.fundo, t.alto, t.meioVao, fora],
       furos: [furo(t.entreEixos, t.meioVao - 1, t.raioDaPassagemDoCotovelo)] },
     { nome: 'paredeDeTras', material: 'estrutura', chanfro: t.chanfro, caixa: [...x, t.baixo + t.fundo, t.alto, -fora, -t.meioVao],
-      furos: [furo(t.entreEixos, -fora - 1, t.raioDaPassagemDoCotovelo), furo(t.eixoDoMotor, -fora - 1, t.raioDaPassagemDoMotor)] },
+      furos: [furo(t.entreEixos, -fora - 1, t.raioDaPassagemDoCotovelo), { ...furo(t.eixoDoMotor, -fora - 1, t.raioDaPassagemDoMotor), lados: 36 },
+        ...[-1, 1].flatMap((sx) => [-1, 1].map((sy) => ({
+          eixo: 'z', base: [t.eixoDoMotor + (sx * t.passoDosFurosM3) / 2, y + (sy * t.passoDosFurosM3) / 2, -fora - 1], comprimento: t.parede + 2, raio: t.raioDoFuroM3, lados: 12,
+        })))] },
+    { nome: 'abaDaFrente', material: 'estrutura', chanfro: 1, caixa: [...x, t.alto - t.aba, t.alto, t.meioVao - t.aba, t.meioVao] },
+    { nome: 'abaDeTras', material: 'estrutura', chanfro: 1, caixa: [...x, t.alto - t.aba, t.alto, -t.meioVao, -t.meioVao + t.aba] },
     { nome: 'pino', material: 'aco', eixo: 'z', base: [0, y, t.fimDoPino], comprimento: -fora - t.fimDoPino, raio: t.raioDoPino, lados: 18 },
   ];
 }
@@ -88,7 +100,9 @@ const receita = {
     partes: [
       { nome: 'fundo', forma: 'fundo de 210 × 6 × 52 mm sob as paredes, 3 mm abaixo da correia', tecnica: 'caixa chanfrada' },
       { nome: 'paredeDaFrente', forma: 'parede de 210 × 66 × 6 mm, de z 20 a 26, com o furo de 10 mm do eixo do cotovelo', tecnica: 'caixa chanfrada com furo por subtração' },
-      { nome: 'paredeDeTras', forma: 'parede de 210 × 66 × 6 mm, de z −26 a −20, com o furo do cotovelo e o furo de 8 mm do eixo do NEMA 17', tecnica: 'caixa chanfrada com furos por subtração' },
+      { nome: 'paredeDeTras', forma: 'parede de 210 × 66 × 6 mm, de z −26 a −20, com o furo do cotovelo, o furo de 23 mm do ressalto do NEMA 17 e os quatro M3 dele', tecnica: 'caixa chanfrada com furos por subtração' },
+      { nome: 'abaDaFrente', forma: 'aba de 210 × 6 × 6 mm no alto da parede da frente, por dentro', tecnica: 'caixa chanfrada' },
+      { nome: 'abaDeTras', forma: 'aba de 210 × 6 × 6 mm no alto da parede de trás, por dentro', tecnica: 'caixa chanfrada' },
       { nome: 'pino', forma: 'pino de 8 mm no eixo do ombro, da parede de trás até a face de fora do rolamento', tecnica: 'cilindro' },
     ],
     criteriosDeReprovacao: [
@@ -102,6 +116,8 @@ const receita = {
   contatos: [
     { par: ['fundo', 'paredeDaFrente'], motivo: 'a parede sobe do fundo do U' },
     { par: ['fundo', 'paredeDeTras'], motivo: 'a parede sobe do fundo do U' },
+    { par: ['abaDaFrente', 'paredeDaFrente'], motivo: 'a aba endurece o alto da parede, por dentro' },
+    { par: ['abaDeTras', 'paredeDeTras'], motivo: 'a aba endurece o alto da parede, por dentro' },
     { par: ['paredeDeTras', 'pino'], motivo: 'o pino sai da face de fora da parede de trás' },
   ],
   get PASSOS() { return gerarPassos(this.PARAMS); },

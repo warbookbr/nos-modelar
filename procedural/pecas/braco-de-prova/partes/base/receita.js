@@ -27,6 +27,10 @@ export const TABELA = {
   alturaDoCogumelo: 8,
   raioDaHaste: 8,
   alturaDaHaste: 10,
+  /* Os dois M3 de cada parede do garfo passam pela tampa (x ±25, no meio de cada parede, z ±45). */
+  xDosFurosM3: 25,
+  zDosFurosM3: 45,
+  raioDoFuroM3: 1.7,
   /* Componentes, cantos [x0, x1, z0, z1] no fundo e altura. */
   fonte: { x: [-55.5, 55.5], z: [-60, 18], altura: 36 },
   arduino: { x: [-34.3, 34.3], z: [22, 75.4], altura: 15 },
@@ -43,7 +47,10 @@ export function derivar(t = TABELA) {
   return [
     { nome: 'casco', material: 'estrutura', eixo: 'y', base: [0, 0, 0], comprimento: topo - t.tampa, raio: t.raio, lados: 72, oca: { espessura: t.parede } },
     { nome: 'tampa', material: 'estrutura', eixo: 'y', base: [0, topo - t.tampa, 0], comprimento: t.tampa, raio: t.raio, lados: 72,
-      furos: [{ eixo: 'y', base: [t.botaoX, topo - t.tampa - 1, t.botaoZ], comprimento: t.tampa + 2, raio: t.raioDaHaste }] },
+      furos: [
+        { eixo: 'y', base: [t.botaoX, topo - t.tampa - 1, t.botaoZ], comprimento: t.tampa + 2, raio: t.raioDaHaste },
+        ...[-1, 1].flatMap((sx) => [-1, 1].map((sz) => ({ eixo: 'y', base: [sx * t.xDosFurosM3, topo - t.tampa - 1, sz * t.zDosFurosM3], comprimento: t.tampa + 2, raio: t.raioDoFuroM3, lados: 12 }))),
+      ] },
     naBase(t, t.fonte, 'fonte', 'fonte'),
     naBase(t, t.arduino, 'arduino', 'placaArduino'),
     naBase(t, t.driverOmbro, 'driverOmbro', 'placaDriver'),
@@ -74,7 +81,7 @@ const receita = {
     escala: { medida: 'diâmetro da base', milimetros: 180 },
     partes: [
       { nome: 'casco', forma: 'cilindro de 90 mm de raio e 47 mm de altura, oco, parede e fundo de 3 mm, aberto em cima', tecnica: 'cilindro esvaziado pela casca' },
-      { nome: 'tampa', forma: 'disco de 3 mm no topo do casco, com o furo de 16 mm da haste do botão', tecnica: 'cilindro com furo por subtração' },
+      { nome: 'tampa', forma: 'disco de 3 mm no topo do casco, com o furo de 16 mm da haste do botão e os quatro M3 do garfo', tecnica: 'cilindro com furo por subtração' },
       { nome: 'fonte', forma: 'bloco de 111 × 36 × 78 mm no fundo do casco', tecnica: 'caixa' },
       { nome: 'arduino', forma: 'bloco de 68,6 × 15 × 53,4 mm no fundo, na frente', tecnica: 'caixa' },
       { nome: 'driverOmbro', forma: 'bloco de 15,2 × 12 × 20,3 mm no fundo', tecnica: 'caixa' },

@@ -28,12 +28,15 @@ export const TABELA = {
   baixo: 115,
   alto: 165,
   fundo: 5,
-  /* O fundo começa a 6 mm da ponta do primeiro elo (x = 180). */
-  inicioDoFundo: 186,
+  /* O fundo começa a 50 mm do eixo do cotovelo, fora do círculo que a ponta do primeiro elo varre ao dobrar (46,9 mm). */
+  inicioDoFundo: 200,
   raioDoEixo: 4,
   raioDaTampa: 18,
   espessuraDaTampa: 3,
-  chanfro: 1.5,
+  chanfro: 2,
+  /* Os quatro M3 que prendem a garra, passantes na placa da ponta, no quadrado de 24 mm em volta do eixo do braço. */
+  passoDosFurosM3: 24,
+  raioDoFuroM3: 1.7,
 };
 
 export const MATERIAIS = CORES;
@@ -47,7 +50,10 @@ export function derivar(t = TABELA) {
     { nome: 'paredeDaFrente', material: 'estrutura', chanfro: t.chanfro, caixa: [t.cotovelo - t.sobraAtras, fim, t.baixo, t.alto, t.meioVao, fora], furos: [passagem(t.meioVao - 1)] },
     { nome: 'paredeDeTras', material: 'estrutura', chanfro: t.chanfro, caixa: [t.cotovelo - t.sobraAtras, fim, t.baixo, t.alto, -fora, -t.meioVao], furos: [passagem(-fora - 1)] },
     { nome: 'fundo', material: 'estrutura', chanfro: t.chanfro, caixa: [t.inicioDoFundo, fim, t.baixo, t.baixo + t.fundo, -t.meioVao, t.meioVao] },
-    { nome: 'placaDaPonta', material: 'estrutura', chanfro: t.chanfro, caixa: [fim, fim + t.placa, t.baixo, t.alto, -fora, fora] },
+    { nome: 'placaDaPonta', material: 'estrutura', chanfro: t.chanfro, caixa: [fim, fim + t.placa, t.baixo, t.alto, -fora, fora],
+      furos: [-1, 1].flatMap((sy) => [-1, 1].map((sz) => ({
+        eixo: 'x', base: [fim - 1, y + (sy * t.passoDosFurosM3) / 2, (sz * t.passoDosFurosM3) / 2], comprimento: t.placa + 2, raio: t.raioDoFuroM3, lados: 12,
+      }))) },
     { nome: 'eixoDoCotovelo', material: 'aco', eixo: 'z', base: [t.cotovelo, y, -fora], comprimento: 2 * fora, raio: t.raioDoEixo, lados: 18 },
     { nome: 'tampaDaFrente', material: 'laranja', eixo: 'z', base: [t.cotovelo, y, fora], comprimento: t.espessuraDaTampa, raio: t.raioDaTampa, lados: 36 },
     { nome: 'tampaDeTras', material: 'laranja', eixo: 'z', base: [t.cotovelo, y, -fora - t.espessuraDaTampa], comprimento: t.espessuraDaTampa, raio: t.raioDaTampa, lados: 36 },
@@ -84,8 +90,8 @@ const receita = {
     partes: [
       { nome: 'paredeDaFrente', forma: 'parede de 180 × 50 × 5 mm, de z 27 a 32, com o furo do eixo do cotovelo', tecnica: 'caixa chanfrada com furo por subtração' },
       { nome: 'paredeDeTras', forma: 'parede de 180 × 50 × 5 mm, de z −32 a −27, com o furo do eixo do cotovelo', tecnica: 'caixa chanfrada com furo por subtração' },
-      { nome: 'fundo', forma: 'fundo de 5 mm entre as paredes, de x 186 até a placa da ponta', tecnica: 'caixa chanfrada' },
-      { nome: 'placaDaPonta', forma: 'placa de 5 × 50 × 64 mm que fecha a ponta e recebe a garra', tecnica: 'caixa chanfrada' },
+      { nome: 'fundo', forma: 'fundo de 5 mm entre as paredes, de x 200 até a placa da ponta', tecnica: 'caixa chanfrada' },
+      { nome: 'placaDaPonta', forma: 'placa de 5 × 50 × 64 mm que fecha a ponta e recebe a garra por quatro M3', tecnica: 'caixa chanfrada com furos por subtração' },
       { nome: 'eixoDoCotovelo', forma: 'eixo de 8 mm no eixo do cotovelo, de uma tampa à outra', tecnica: 'cilindro' },
       { nome: 'tampaDaFrente', forma: 'tampa laranja de 36 mm por 3 mm na ponta da frente do eixo', tecnica: 'cilindro' },
       { nome: 'tampaDeTras', forma: 'tampa laranja de 36 mm por 3 mm na ponta de trás do eixo', tecnica: 'cilindro' },

@@ -26,7 +26,20 @@ export const TABELA = {
   raioDoEixoDoMotor: 4,
   comprimentoDoEixoDoMotor: 21,
   chanfro: 2,
+  /* As duas flanges no quadrado de 47,14 mm (NEMA 23): a da planetária, presa na parede do garfo por quatro M5 (furos cegos
+     de 10 mm) e com o ressalto de saída de 32 × 2 mm dentro do furo do garfo; a do NEMA 23, com os quatro furos de 5,1 mm
+     (passantes, simplificação dos parafusos longos) e o ressalto de 38,1 × 1,6 mm encaixado na face de entrada da planetária. */
+  passoDosFuros: 47.14,
+  raioDoFuroM5: 2.75,
+  fundoDoFuroM5: 10,
+  raioDoFuroDoMotor: 2.55,
+  raioDoRessaltoDeSaida: 16,
+  alturaDoRessaltoDeSaida: 2,
+  raioDoRessaltoDoMotor: 19.05,
+  alturaDoRessaltoDoMotor: 1.6,
 };
+
+const noQuadrado = (t, f) => [-1, 1].flatMap((sx) => [-1, 1].map((sy) => f((sx * t.passoDosFuros) / 2, t.alturaDoEixo + (sy * t.passoDosFuros) / 2)));
 
 export const MATERIAIS = CORES;
 
@@ -38,8 +51,16 @@ export function derivar(t = TABELA) {
   const baseDoEixoDoMotor = zPlanetaria[1] - t.comprimentoDoEixoDoMotor;
   return [
     { nome: 'planetaria', material: 'motor', chanfro: t.chanfro, caixa: [-h, h, ...y, ...zPlanetaria],
-      furos: [{ eixo: 'z', base: [0, t.alturaDoEixo, baseDoEixoDoMotor], comprimento: t.comprimentoDoEixoDoMotor + 1, raio: t.raioDoEixoDoMotor, lados: 18 }] },
-    { nome: 'motor', material: 'motor', chanfro: t.chanfro, caixa: [-h, h, ...y, ...zMotor] },
+      furos: [
+        { eixo: 'z', base: [0, t.alturaDoEixo, baseDoEixoDoMotor], comprimento: t.comprimentoDoEixoDoMotor + 1, raio: t.raioDoEixoDoMotor, lados: 18 },
+        { eixo: 'z', base: [0, t.alturaDoEixo, zPlanetaria[1] - t.alturaDoRessaltoDoMotor], comprimento: t.alturaDoRessaltoDoMotor + 1, raio: t.raioDoRessaltoDoMotor, lados: 36 },
+        ...noQuadrado(t, (x, yy) => ({ eixo: 'z', base: [x, yy, zPlanetaria[0] - 1], comprimento: t.fundoDoFuroM5 + 1, raio: t.raioDoFuroM5, lados: 12 })),
+      ] },
+    { nome: 'motor', material: 'motor', chanfro: t.chanfro, caixa: [-h, h, ...y, ...zMotor],
+      furos: noQuadrado(t, (x, yy) => ({ eixo: 'z', base: [x, yy, zMotor[0] - 1], comprimento: t.comprimentoDoMotor + 2, raio: t.raioDoFuroDoMotor, lados: 12 })) },
+    { nome: 'ressaltoDoMotor', material: 'motor', eixo: 'z', base: [0, t.alturaDoEixo, zPlanetaria[1] - t.alturaDoRessaltoDoMotor], comprimento: t.alturaDoRessaltoDoMotor, raio: t.raioDoRessaltoDoMotor, lados: 36 },
+    { nome: 'ressaltoDeSaida', material: 'motor', eixo: 'z', base: [0, t.alturaDoEixo, t.faceDoGarfo - t.alturaDoRessaltoDeSaida], comprimento: t.alturaDoRessaltoDeSaida, raio: t.raioDoRessaltoDeSaida, lados: 36,
+      furos: [{ eixo: 'z', base: [0, t.alturaDoEixo, t.faceDoGarfo - t.alturaDoRessaltoDeSaida - 1], comprimento: t.alturaDoRessaltoDeSaida + 2, raio: t.raioDoEixoDeSaida, lados: 18 }] },
     { nome: 'eixoDeSaida', material: 'aco', eixo: 'z', base: [0, t.alturaDoEixo, t.faceDoGarfo - t.comprimentoDoEixoDeSaida], comprimento: t.comprimentoDoEixoDeSaida, raio: t.raioDoEixoDeSaida, lados: 18 },
     { nome: 'eixoDoMotor', material: 'aco', eixo: 'z', base: [0, t.alturaDoEixo, baseDoEixoDoMotor], comprimento: t.comprimentoDoEixoDoMotor, raio: t.raioDoEixoDoMotor, lados: 18 },
   ];
@@ -69,8 +90,10 @@ const receita = {
     referencias: ['../../../../../docs/modelar/banco-de-provas/braco-de-prova-2026-11-23/elos-opcoes.png'],
     escala: { medida: 'lado da caixa do NEMA 23', milimetros: 57 },
     partes: [
-      { nome: 'planetaria', forma: 'bloco de 57 × 57 × 55 mm, face de saída (flange) apoiada na parede da frente do garfo, com furo cego para o eixo do motor', tecnica: 'caixa chanfrada com furo por subtração' },
-      { nome: 'motor', forma: 'bloco de 57 × 57 × 76 mm atrás da planetária', tecnica: 'caixa chanfrada' },
+      { nome: 'planetaria', forma: 'bloco de 57 × 57 × 55 mm, face de saída (flange) apoiada na parede da frente do garfo, com furo cego para o eixo do motor, o rebaixo do ressalto do NEMA 23 e os quatro furos cegos M5 da flange', tecnica: 'caixa chanfrada com furo por subtração' },
+      { nome: 'motor', forma: 'bloco de 57 × 57 × 76 mm atrás da planetária, com os quatro furos de 5,1 mm da flange no quadrado de 47,14 mm', tecnica: 'caixa chanfrada com furos por subtração' },
+      { nome: 'ressaltoDoMotor', forma: 'ressalto de 38,1 × 1,6 mm do NEMA 23, encaixado na face de entrada da planetária', tecnica: 'cilindro' },
+      { nome: 'ressaltoDeSaida', forma: 'ressalto de 32 × 2 mm da planetária em volta do eixo de saída, dentro do furo do garfo', tecnica: 'cilindro com furo por subtração' },
       { nome: 'eixoDeSaida', forma: 'eixo de 14 × 25 mm no eixo do ombro, pela passagem do garfo até o primeiro elo', tecnica: 'cilindro' },
       { nome: 'eixoDoMotor', forma: 'eixo de 8 × 21 mm dentro do furo cego da planetária', tecnica: 'cilindro' },
     ],
@@ -86,6 +109,11 @@ const receita = {
     { par: ['eixoDoMotor', 'motor'], motivo: 'o eixo sai da face do motor' },
     { par: ['eixoDoMotor', 'planetaria'], motivo: 'o eixo do motor entra justo no furo cego da planetária' },
     { par: ['motor', 'planetaria'], motivo: 'o motor é aparafusado na face de entrada da planetária' },
+    { par: ['motor', 'ressaltoDoMotor'], motivo: 'o ressalto sai da face da flange do motor' },
+    { par: ['planetaria', 'ressaltoDoMotor'], motivo: 'o ressalto do motor encaixa no rebaixo da face de entrada' },
+    { par: ['eixoDoMotor', 'ressaltoDoMotor'], motivo: 'o eixo do motor passa pelo meio do ressalto' },
+    { par: ['planetaria', 'ressaltoDeSaida'], motivo: 'o ressalto sai da face de saída da planetária' },
+    { par: ['eixoDeSaida', 'ressaltoDeSaida'], motivo: 'o eixo de saída passa pelo meio do ressalto' },
   ],
   get PASSOS() { return gerarPassos(this.PARAMS); },
 };
