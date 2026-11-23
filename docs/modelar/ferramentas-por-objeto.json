@@ -289,8 +289,8 @@
       "automatiza": "gera polias em V ou dentadas e a correia fechada que as envolve na posição certa",
       "parametros": "perfil, diâmetros, centros, largura",
       "referencias": ["FreeCAD Gears: timing gear", "BOSL2"],
-      "aqui": "não",
-      "onde": "nem esboço nem núcleo"
+      "aqui": "parcial",
+      "onde": "família `polia-e-correia`: polia dentada GT2, HTD 3M, HTD 5M e T5 por dentes, com ou sem flanges, polia em V das seções Z, A e B da ISO 4183 de um a quatro canais e polia lisa, com cubo, furo e a porta do eixo; a correia fechada entre duas polias não"
     },
     "rodaPneu": {
       "nome": "roda e pneu",

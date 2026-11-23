@@ -56,7 +56,7 @@ O núcleo não ganha nome de objeto nem operação nova. O acervo sai igual, com
 ## Fatias
 
 1. Feita em 2026-11-23: a colisão reproduzida e descartada como defeito do caminho certo, em `tools/fixtures/transmissao/duas-instancias.test.mjs`.
-2. A família `polia-e-correia` com as polias dentadas, em V e lisa, e a aprovação da pessoa por imagem.
+2. Feita em 2026-11-23: a família `polia-e-correia` com as polias dentadas, em V e lisa, aprovada pela pessoa por imagem.
 3. O conjunto de duas polias com a correia fechada, com o par GT2 de 20 e 80 dentes medido.
 4. A família `engrenagem` com a reta, a helicoidal, a cremalheira e a catraca, e a aprovação da pessoa por imagem.
 5. O par engrenado, com a fase e a medida de folga nas posições amostradas.
@@ -73,5 +73,7 @@ Se o contorno do dente evolvente com muitos dentes (acima de 150) passar de dois
 ## Andamento
 
 Fatia 1, em 2026-11-23. Duas chamadas cruas da família `mola` em `CHAMADAS_COMPOSICOES` dão 7 órfãos com origem ambígua (52 com o `fixador`), porque a composição declara ids de origem fixos e a expansão não os separa por chamada. Pelo `instanciaDeFamilia`, que soma a base aos ids e renomeia as partes, as duas molas saem com 6.200 faces, nenhum órfão e as partes `aEspiras` e `bEspiras`, tanto pelas `poses` de uma chamada quanto por duas chamadas com a `base` encadeada; sem a base, a colisão volta. O `chamar` e o núcleo não mudam, e o acervo fica igual. O processo pegaria a colisão numa peça, porque os órfãos aparecem no `descrever` e reprovam a guarda do acervo, mas o caminho certo não estava escrito no contrato da família e o backlog o dava como defeito: o contrato ganhou a frase que manda duas instâncias para o `instanciaDeFamilia`, com a prova. O par de polias e o de engrenagens seguem por ele.
+
+Fatia 2, em 2026-11-23. A família `polia-e-correia` gera a polia dentada GT2, HTD 3M, HTD 5M e T5 por número de dentes, com ou sem flanges, a polia em V das seções Z, A e B de um a quatro canais e a polia lisa, todas com cubo, furo e a porta `eixo`, numa parte só, em menos de meio segundo cada. O corpo é um `lathe`; os vãos dos dentes são uma `extrusao` repetida por `arranja` radial e tirada por `subtrair`, sem operação nova. O canal em V segue a ISO 4183:1989 (largura de referência, alturas, distância entre canais, borda, ângulo de 34 ou 38 graus pelo diâmetro e diâmetro mínimo), e o diâmetro da polia em V é o de referência. As dentadas usam a profundidade e a largura do vão e a diferença da linha primitiva do gerador aberto "Parametric Pulley" (2012), porque a ISO 13050 (HTD) e a DIN 7721 (T5) completas são pagas e a GT2 não tem norma pública; o vão da GT2 e das HTD é curvo e o da T5 é trapezoidal de 40 graus. Flange, cubo, parede em volta do furo e a polia lisa não seguem norma. A primeira versão aproximou as medidas de canal sem fonte, e a pessoa pediu os valores de norma antes de aprovar; o processo não exigia a fonte de uma tabela de norma usada por família, e o contrato da família passou a pedir (seção "Medidas de norma"). A camada mecânica foi gravada depois de a pessoa aprovar as sete polias por imagem.
 
 ## Fechamento
