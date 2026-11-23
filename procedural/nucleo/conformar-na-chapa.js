@@ -46,13 +46,13 @@ import { triangularRegiao } from './forma-exata/triangular-regiao.js';
 
 export const FICHA = Object.freeze({
   nome: 'conformarNaChapa',
-  serve: 'gera os passos de uma peça em trilho aberto ou contorno fechado conformada à superfície real de uma malha-alvo, com deslocamento normal em mm',
-  quando: 'peças externas ou recuadas sobre superfícies curvas que precisam acompanhar automaticamente alterações da malha-alvo',
+  serve: 'gera os passos de uma peça em trilho aberto ou contorno fechado conformada à superfície real de uma ou mais malhas-alvo, com deslocamento normal em mm',
+  quando: 'peças externas, molduras multipainel ou placas recuadas sobre superfícies curvas que precisam acompanhar automaticamente alterações da malha-alvo',
   unidades: {
-    parametros: 'mm (deslocamentoMm, espessuraMm, secao, amostragemMm, gradeMm)',
+    parametros: 'mm (deslocamentoMm, espessuraMm, secao, perfil, frestaMaximaMm, amostragemMm, gradeMm)',
     malha: "definida por `unidade` ('mm' padrão ou 'm')",
   },
-  campos: ['malha', 'chapa', 'vista', 'sentido', 'trilho', 'contorno', 'secao', 'deslocamentoMm', 'espessuraMm', 'nome', 'parte', 'material', 'origemId', 'amostragemMm', 'gradeMm', 'suavizarNormal', 'niveis', 'simetria', 'unidade'],
+  campos: ['malha', 'chapa', 'malhas', 'vista', 'sentido', 'trilho', 'contorno', 'secao', 'perfil', 'modulacao', 'frestaMaximaMm', 'deslocamentoMm', 'espessuraMm', 'nome', 'parte', 'material', 'origemId', 'amostragemMm', 'gradeMm', 'suavizarNormal', 'niveis', 'simetria', 'unidade'],
   devolve: '{ modo, passos, pontos, origem, gaiola, estatisticas }',
 });
 
@@ -295,7 +295,57 @@ function amostrarPolilinha2d(pontos, amostragemMm, fechada) {
   return saida;
 }
 
-function refinarAmostrasNaSuperficie(pts2d, amostrar, vistaVec) {
+function prepararAmostradorMultiplo(malhas, base, sentido, escala) {
+  if (!Array.isArray(malhas) || malhas.length === 0) {
+    falha('malhas precisa ser uma lista não vazia de malhas-alvo');
+  }
+  const lista = malhas.map((m) => prepararAmostrador(m, base, sentido, escala));
+  const origemSugerida = Math.max(...lista.map((a) => a.origemSugerida));
+  return {
+    origemSugerida,
+    amostrar: (u, v) => {
+      let melhor = null;
+      let melhorScore = -Infinity;
+      for (const a of lista) {
+        const hit = a.amostrar(u, v);
+        if (!hit) continue;
+        const score = dot(hit.ponto, base.w) * base.sinal;
+        if (score > melhorScore) {
+          melhorScore = score;
+          melhor = hit;
+        }
+      }
+      return melhor;
+    },
+  };
+}
+
+function avaliarModulacaoTrilho(modulacao, s) {
+  if (modulacao === undefined || modulacao === null) return 1;
+  if (typeof modulacao === 'function') {
+    const v = modulacao(s);
+    if (!finito(v) || v <= 0) falha(`modulacao(${br(s)}) precisa devolver número finito > 0`);
+    return v;
+  }
+  if (!Array.isArray(modulacao) || modulacao.length === 0) {
+    falha('modulacao precisa ser função ou lista não vazia de pares [s, fator]');
+  }
+  if (s <= modulacao[0][0]) return modulacao[0][1];
+  const ult = modulacao[modulacao.length - 1];
+  if (s >= ult[0]) return ult[1];
+  for (let i = 0; i < modulacao.length - 1; i += 1) {
+    const [s0, f0] = modulacao[i];
+    const [s1, f1] = modulacao[i + 1];
+    if (s >= s0 && s <= s1) {
+      const t = s1 === s0 ? 0 : (s - s0) / (s1 - s0);
+      const smooth = t * t * (3 - 2 * t);
+      return f0 + (f1 - f0) * smooth;
+    }
+  }
+  return ult[1];
+}
+
+function refinarAmostrasNaSuperficie(pts2d, amostrar, vistaVec, frestaMaximaMm = 0) {
   const lidos = pts2d.map((q) => {
     const hit = amostrar(q[0], q[1]);
     return { q, hit };
@@ -305,8 +355,38 @@ function refinarAmostrasNaSuperficie(pts2d, amostrar, vistaVec) {
     falha(`nenhum ponto do traçado atingiu a malha-alvo na vista (primeiro ponto [${br(lidos[0].q[0])}, ${br(lidos[0].q[1])}])`);
   }
   if (misses.length > 0) {
-    const m = misses[0];
-    falha(`o ponto [${br(m.q[0])}, ${br(m.q[1])}] não atingiu a malha-alvo na vista`);
+    if (!(frestaMaximaMm > 0)) {
+      const m = misses[0];
+      falha(`o ponto [${br(m.q[0])}, ${br(m.q[1])}] não atingiu a malha-alvo na vista`);
+    }
+    /* ponteia frestas internas até frestaMaximaMm por interpolação suave entre os apoios vizinhos */
+    let i = 0;
+    while (i < lidos.length) {
+      if (lidos[i].hit) { i += 1; continue; }
+      const ini = i;
+      while (i < lidos.length && !lidos[i].hit) i += 1;
+      const fim = i - 1;
+      if (ini === 0 || fim === lidos.length - 1) {
+        const m = lidos[ini];
+        falha(`o ponto extremo [${br(m.q[0])}, ${br(m.q[1])}] não atingiu a malha-alvo na vista`);
+      }
+      const ant = lidos[ini - 1];
+      const dep = lidos[fim + 1];
+      const vao = Math.hypot(dep.q[0] - ant.q[0], dep.q[1] - ant.q[1]);
+      if (vao > frestaMaximaMm) {
+        falha(`fresta de ${br(vao)} mm entre [${br(ant.q[0])}, ${br(ant.q[1])}] e [${br(dep.q[0])}, ${br(dep.q[1])}] excede frestaMaximaMm (${br(frestaMaximaMm)} mm)`);
+      }
+      for (let k = ini; k <= fim; k += 1) {
+        const t = (k - (ini - 1)) / (fim + 1 - (ini - 1));
+        const ponto = [
+          ant.hit.ponto[0] + (dep.hit.ponto[0] - ant.hit.ponto[0]) * t,
+          ant.hit.ponto[1] + (dep.hit.ponto[1] - ant.hit.ponto[1]) * t,
+          ant.hit.ponto[2] + (dep.hit.ponto[2] - ant.hit.ponto[2]) * t,
+        ];
+        const nInterp = unit(soma(esc(ant.hit.normal, 1 - t), esc(dep.hit.normal, t))) ?? ant.hit.normal;
+        lidos[k].hit = { ponto, normal: nInterp };
+      }
+    }
   }
 
   for (const s of lidos) {
@@ -420,17 +500,36 @@ function executarTrilho(o, amostrador, base, escala, origemId) {
   if (!Array.isArray(o.trilho) || o.trilho.length < 2 || o.trilho.some((p) => !Array.isArray(p) || p.length !== 2 || !p.every(finito))) {
     falha('trilho precisa ser lista de pelo menos 2 pontos [[u, v], ...] com números finitos');
   }
+  const temPerfil = o.perfil != null;
   const sec = o.secao;
-  if (!sec || typeof sec !== 'object' || !finito(sec.largura) || !(sec.largura > 0) || !finito(sec.altura) || !(sec.altura > 0)) {
-    falha(`secao precisa informar { largura > 0, altura > 0, chanfro? } em mm, e veio ${JSON.stringify(sec)}`);
-  }
-  const chanfro = sec.chanfro ?? 0;
-  if (!finito(chanfro) || chanfro < 0 || chanfro >= Math.min(sec.largura, sec.altura) / 2) {
-    falha(`secao.chanfro precisa ser >= 0 e menor que metade de largura e altura (${br(Math.min(sec.largura, sec.altura) / 2)} mm), e veio ${JSON.stringify(chanfro)}`);
-  }
-
+  let secao2d;
+  let caixaSecao;
   const deslocamentoMm = o.deslocamentoMm ?? 0;
   if (!finito(deslocamentoMm)) falha(`deslocamentoMm precisa ser número finito, e veio ${JSON.stringify(o.deslocamentoMm)}`);
+
+  if (temPerfil) {
+    if (!Array.isArray(o.perfil) || o.perfil.length < 3 || o.perfil.some((p) => !Array.isArray(p) || p.length !== 2 || !p.every(finito))) {
+      falha('perfil precisa ser lista de pelo menos 3 pontos [[u, v], ...] em mm');
+    }
+    secao2d = o.perfil.map(([u, v]) => [u + deslocamentoMm, v]);
+    const us = o.perfil.map(([u]) => u);
+    const vs = o.perfil.map(([, v]) => v);
+    caixaSecao = {
+      largura: Math.max(...vs) - Math.min(...vs),
+      altura: Math.max(...us) - Math.min(...us),
+      chanfro: 0,
+    };
+  } else {
+    if (!sec || typeof sec !== 'object' || !finito(sec.largura) || !(sec.largura > 0) || !finito(sec.altura) || !(sec.altura > 0)) {
+      falha(`secao precisa informar { largura > 0, altura > 0, chanfro? } em mm, e veio ${JSON.stringify(sec)}`);
+    }
+    const chanfro = sec.chanfro ?? 0;
+    if (!finito(chanfro) || chanfro < 0 || chanfro >= Math.min(sec.largura, sec.altura) / 2) {
+      falha(`secao.chanfro precisa ser >= 0 e menor que metade de largura e altura (${br(Math.min(sec.largura, sec.altura) / 2)} mm), e veio ${JSON.stringify(chanfro)}`);
+    }
+    secao2d = construirSecao(sec.largura, sec.altura, chanfro, deslocamentoMm);
+    caixaSecao = { largura: sec.largura, altura: sec.altura, chanfro };
+  }
 
   const amostragemMm = o.amostragemMm ?? 10;
   if (!finito(amostragemMm) || !(amostragemMm > 0)) falha(`amostragemMm precisa ser > 0, e veio ${JSON.stringify(o.amostragemMm)}`);
@@ -440,14 +539,17 @@ function executarTrilho(o, amostrador, base, escala, origemId) {
     falha(`suavizarNormal precisa ser booleano ou inteiro >= 0, e veio ${JSON.stringify(o.suavizarNormal)}`);
   }
 
+  const frestaMaximaMm = o.frestaMaximaMm ?? (Array.isArray(o.malhas) ? 12 : 0);
+  if (!finito(frestaMaximaMm) || frestaMaximaMm < 0) {
+    falha(`frestaMaximaMm precisa ser número >= 0, e veio ${JSON.stringify(o.frestaMaximaMm)}`);
+  }
+
   const trilhoMm = o.trilho.map(([u, v]) => [u / escala, v / escala]);
   const pts2d = amostrarPolilinha2d(trilhoMm, amostragemMm, false);
-  const amostradas = refinarAmostrasNaSuperficie(pts2d, amostrador.amostrar, base.w);
+  const amostradas = refinarAmostrasNaSuperficie(pts2d, amostrador.amostrar, base.w, frestaMaximaMm);
   const estacoes = suavizarNormais(amostradas, suavizarPassagens);
 
-  conferirCurvaturaEAbaixoDaMeiaSecao(estacoes, { largura: sec.largura, altura: sec.altura, chanfro }, deslocamentoMm);
-
-  const secao2d = construirSecao(sec.largura, sec.altura, chanfro, deslocamentoMm);
+  conferirCurvaturaEAbaixoDaMeiaSecao(estacoes, caixaSecao, deslocamentoMm);
   const pontos3d = estacoes.map((s) => s.c);
   const marcos = [];
   let sAcum = 0;
@@ -480,8 +582,12 @@ function executarTrilho(o, amostrador, base, escala, origemId) {
     const uDir = s.n;
     const vDir = unit(cruz(T, uDir));
     if (!vDir) continue;
+    const sNorm = sAcum > EPS ? marcos[i].em / sAcum : 0;
+    const fator = avaliarModulacaoTrilho(o.modulacao, sNorm);
     for (let j = 0; j < secao2d.length; j += 1) {
-      const [su, sv] = secao2d[j];
+      const [suBase, svBase] = secao2d[j];
+      const su = deslocamentoMm + (suBase - deslocamentoMm) * fator;
+      const sv = svBase * fator;
       const nomeV = g.nomeDe(i, j);
       const posReal = soma(s.c, soma(esc(uDir, su), esc(vDir, sv)));
       g.posicoes.set(nomeV, posReal);
@@ -724,7 +830,9 @@ export function conformarNaChapa(opcoes) {
 
   const sentido = opcoes.sentido ?? '+';
   const base = resolverBaseVista(opcoes.vista, sentido);
-  const amostrador = prepararAmostrador(opcoes.malha ?? opcoes.chapa, base, sentido, escala);
+  const amostrador = Array.isArray(opcoes.malhas)
+    ? prepararAmostradorMultiplo(opcoes.malhas, base, sentido, escala)
+    : prepararAmostrador(opcoes.malha ?? opcoes.chapa, base, sentido, escala);
 
   const origemId = opcoes.origemId ?? amostrador.origemSugerida;
   if (!Number.isSafeInteger(origemId) || origemId < 1) {

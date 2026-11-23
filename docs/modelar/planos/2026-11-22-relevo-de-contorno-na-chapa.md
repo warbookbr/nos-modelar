@@ -1,8 +1,8 @@
 # Relevo de contorno na chapa: anéis concêntricos na rede de curvas e moldura conformada multipainel
 
-**Estado:** rascunho
+**Estado:** ativo
 
-**Território:** nenhum (aguarda aprovação)
+**Território:** `procedural/nucleo/faixa-de-contorno-na-rede.js`, `procedural/nucleo/faixa-de-contorno-na-rede.test.mjs`, `procedural/nucleo/conformar-na-chapa.js`, `procedural/nucleo/conformar-na-chapa.test.mjs`, `procedural/nucleo/fixtures/`, `tools/modelar/capacidade.mjs`, `docs/modelar/guias/modelar-carroceria.md`
 
 **Responsável:** a definir na ativação; a pessoa valida as provas visuais na bancada (pintura brilhante, zebra e luz rasante).
 

@@ -455,4 +455,70 @@ describe('conformarNaChapa — modo contorno fechado', () => {
     expect(Math.min(...xs)).toBeLessThan(-100);
     expect(Math.max(...xs)).toBeGreaterThan(100);
   });
+
+  it('suporta perfil 2D livre e modulação longitudinal no modo trilho', () => {
+    const chapa = criarChapaCurvaSintetica(40);
+    const perfil = [
+      [0, -10],
+      [12, -6],
+      [14, 4],
+      [4, 10],
+      [-4, 8],
+    ];
+    const res = conformarNaChapa({
+      malha: chapa,
+      vista: 'z',
+      sentido: '+',
+      trilho: [[-100, 0], [0, 0], [100, 0]],
+      perfil,
+      modulacao: [[0, 0.3], [0.25, 1], [0.75, 1], [1, 0.3]],
+      deslocamentoMm: 1,
+      amostragemMm: 10,
+      nome: 'molduraPerfil',
+    });
+
+    const st = nucleo(res.passos, {}, res.pontos);
+    expect(st.orfaos).toHaveLength(0);
+    conferirMalhaFechada(st, 'molduraPerfil');
+
+    /* no centro (x ~ 0) a seção tem altura plena (~14 mm); nas pontas (x ~ ±100) encolhe para ~30% */
+    const zsCentro = [...st.V.values()].filter((p) => Math.abs(p[0]) < 5).map((p) => p[2]);
+    const zsPonta = [...st.V.values()].filter((p) => p[0] > 95).map((p) => p[2]);
+    const ampCentro = Math.max(...zsCentro) - Math.min(...zsCentro);
+    const ampPonta = Math.max(...zsPonta) - Math.min(...zsPonta);
+    expect(ampCentro).toBeGreaterThan(ampPonta * 2);
+  });
+
+  it('projeta continuamente sobre múltiplas malhas-alvo (malhas) atravessando fresta dentro de frestaMaximaMm e recusa acima do teto', () => {
+    /* dois painéis planos separados por uma fresta de 6 mm em x = [-3, +3] */
+    const painelEsq = ([u, v]) => (u <= -3 ? { ponto: [u, v, 20], normal: [0, 0, 1] } : null);
+    const painelDir = ([u, v]) => (u >= 3 ? { ponto: [u, v, 20], normal: [0, 0, 1] } : null);
+
+    const res = conformarNaChapa({
+      malhas: [painelEsq, painelDir],
+      vista: 'z',
+      sentido: '+',
+      trilho: [[-60, 0], [60, 0]],
+      secao: { largura: 16, altura: 8 },
+      frestaMaximaMm: 15,
+      amostragemMm: 4,
+      nome: 'molduraMultipainel',
+    });
+
+    const st = nucleo(res.passos, {}, res.pontos);
+    expect(st.orfaos).toHaveLength(0);
+    conferirMalhaFechada(st, 'molduraMultipainel');
+
+    /* recusa quando a fresta excede frestaMaximaMm */
+    expect(() => conformarNaChapa({
+      malhas: [painelEsq, painelDir],
+      vista: 'z',
+      sentido: '+',
+      trilho: [[-60, 0], [60, 0]],
+      secao: { largura: 16, altura: 8 },
+      frestaMaximaMm: 5,
+      amostragemMm: 4,
+      nome: 'molduraFrestaGrande',
+    })).toThrow(/frestaMaximaMm/);
+  });
 });

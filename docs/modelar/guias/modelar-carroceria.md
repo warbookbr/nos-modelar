@@ -333,3 +333,9 @@ Quando comparava só a caixa e a contagem, chamava de inertes 7 dos 27 parâmetr
 ### Nível oficial de carroceria
 
 Nos testes cegos medidos até 2026-10-25, esse nível chegou à forma geral a 1,3 a 2,3 mm e à nota 7 do crítico no trecho inteiro, e os detalhes finos de borda ficaram em 5 na região deles, sem chegar a 7 com mais rodadas.
+
+## Relevo de contorno na chapa versus moldura à parte
+
+Quando um relevo em volta de abertura ou linha de caráter é estampado ou moldado na própria pele contínua (chanfro para dentro, ombro saliente com vinco externo ou bojo amplo em G1), ele deve nascer na malha da superfície-mestre antes do corte de painéis, usando `faixaDeContornoNaRede` (`procedural/nucleo/faixa-de-contorno-na-rede.js`) sobre `gaiolaPorRede`. Os anéis concêntricos de quadriláteros mantêm o fluxo da malha alinhado ao contorno, aceitam modulação longitudinal e aba interna, e preservam continuidade através das frestas quando `aberturaPorContorno`, `paineisPorVaos` ou `divisaoPorContorno` dividem os painéis depois.
+
+Reserve a peça à parte para molduras, borrachas e alargadores fisicamente separados da chapa. Nesse caso, `conformarNaChapa` (`procedural/nucleo/conformar-na-chapa.js`) aceita `perfil` 2D livre, `modulacao` ao longo do trilho e `malhas` (lista de sólidos-alvo com `frestaMaximaMm`) para atravessar continuamente a junta entre dois painéis vizinhos.

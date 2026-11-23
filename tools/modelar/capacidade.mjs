@@ -36,6 +36,7 @@ const ESTACOES = 'procedural/nucleo/gaiola-por-estacoes.js';
 export const CAPACIDADES = Object.freeze({
   gaiolaPorEstacoes: { arquivo: ESTACOES, funcao: 'gaiolaPorEstacoes', de: ESTACOES },
   gaiolaPorRede: { arquivo: 'procedural/nucleo/gaiola-por-rede.js', funcao: 'gaiolaPorRede', de: 'procedural/nucleo/gaiola-por-rede.js' },
+  faixaDeContornoNaRede: { arquivo: 'procedural/nucleo/faixa-de-contorno-na-rede.js', funcao: 'faixaDeContornoNaRede', de: 'procedural/nucleo/faixa-de-contorno-na-rede.js' },
   gaiolaVarrida: { arquivo: 'procedural/nucleo/gaiola-varrida.js', funcao: 'gaiolaVarrida', de: 'procedural/nucleo/gaiola-varrida.js' },
   gaiolaInterpolada: { arquivo: 'procedural/nucleo/gaiola-interpolada.js', funcao: 'gaiolaPorEstacoes', de: ESTACOES },
   gaiolaAneis: { arquivo: 'procedural/nucleo/gaiola-aneis.js', funcao: 'gaiolaPorEstacoes', de: ESTACOES },
