@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2196 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2198 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -571,6 +571,11 @@
 - `README.md` — Tolerância do STEP: o acervo exportado antes e depois da tolerância em milímetro
 - `comparar.mjs` — comparar.mjs — compara duas medidas de `medir.mjs` peça a peça e imprime a tabela em markdown.
 - `medir.mjs` — medir.mjs — exporta cada peça do acervo em STEP, em memória, com as opções padrão do comando, e grava o resultado.
+
+## docs/modelar/banco-de-provas/trilhas-da-placa-2026-11-23/
+
+- `PROPOSTA-DO-ITEM.md` — Proposta para o nos-mecatronica: o item `ligacoes` no pedido 1.1
+- `README.md` — Trilhas da placa: a linha de base, as regras e a lista de exemplo
 
 ## docs/modelar/blender/
 

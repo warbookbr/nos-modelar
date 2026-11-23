@@ -1,0 +1,191 @@
+{
+  "tipo": "pedido",
+  "versao": "1.1",
+  "objeto": "placa-de-prova",
+  "ficha": {
+    "caminho": "placa-de-prova.ficha.json",
+    "revisao": 1
+  },
+  "itens": [
+    {
+      "id": "ligacoes-placa",
+      "tipo": "ligacoes",
+      "placa": "placa",
+      "redes": [
+        {
+          "id": "vin",
+          "terminais": [
+            {
+              "peca": "j3",
+              "porta": "1"
+            },
+            {
+              "peca": "c1",
+              "porta": "positivo"
+            },
+            {
+              "peca": "u1",
+              "porta": "1"
+            },
+            {
+              "peca": "j2",
+              "porta": "1"
+            }
+          ],
+          "larguraMinima": 0.8
+        },
+        {
+          "id": "terra",
+          "terminais": [
+            {
+              "peca": "j3",
+              "porta": "2"
+            },
+            {
+              "peca": "j3",
+              "porta": "3"
+            },
+            {
+              "peca": "c1",
+              "porta": "negativo"
+            },
+            {
+              "peca": "u1",
+              "porta": "2"
+            },
+            {
+              "peca": "c2",
+              "porta": "2"
+            },
+            {
+              "peca": "u2",
+              "porta": "4"
+            },
+            {
+              "peca": "d1",
+              "porta": "catodo"
+            },
+            {
+              "peca": "d2",
+              "porta": "catodo"
+            },
+            {
+              "peca": "j2",
+              "porta": "2"
+            },
+            {
+              "peca": "u4",
+              "porta": "4"
+            }
+          ],
+          "larguraMinima": 0.8
+        },
+        {
+          "id": "vcc",
+          "terminais": [
+            {
+              "peca": "u1",
+              "porta": "3"
+            },
+            {
+              "peca": "c2",
+              "porta": "1"
+            },
+            {
+              "peca": "u2",
+              "porta": "8"
+            },
+            {
+              "peca": "r1",
+              "porta": "1"
+            },
+            {
+              "peca": "u3",
+              "porta": "8"
+            },
+            {
+              "peca": "r2",
+              "porta": "1"
+            }
+          ],
+          "larguraMinima": 0.4
+        },
+        {
+          "id": "led-verde",
+          "terminais": [
+            {
+              "peca": "r1",
+              "porta": "2"
+            },
+            {
+              "peca": "d1",
+              "porta": "anodo"
+            }
+          ]
+        },
+        {
+          "id": "led-vermelho",
+          "terminais": [
+            {
+              "peca": "r2",
+              "porta": "2"
+            },
+            {
+              "peca": "d2",
+              "porta": "anodo"
+            }
+          ]
+        },
+        {
+          "id": "sinal-1",
+          "terminais": [
+            {
+              "peca": "u2",
+              "porta": "3"
+            },
+            {
+              "peca": "j1",
+              "porta": "1"
+            }
+          ]
+        },
+        {
+          "id": "sinal-2",
+          "terminais": [
+            {
+              "peca": "u3",
+              "porta": "1"
+            },
+            {
+              "peca": "j1",
+              "porta": "2"
+            }
+          ]
+        },
+        {
+          "id": "sinal-entre-faces",
+          "terminais": [
+            {
+              "peca": "u3",
+              "porta": "5"
+            },
+            {
+              "peca": "u4",
+              "porta": "5"
+            }
+          ]
+        }
+      ],
+      "motivo": {
+        "linhaDaMatriz": "lig-cobre-confere",
+        "texto": "Exemplo escrito à mão no Modelar em 2026-11-23, no formato proposto para a versão 1.1 do pedido, até a camada de ligações da mecatrônica escrever a lista real; as funções dos pinos e as larguras são suposições de exemplo, e o valor do resultado é o número de redes. A placa de prova tem redes de alimentação, de terra e de sinal, uma delas entre componentes das duas faces.",
+        "resultado": {
+          "grandeza": "redes da placa",
+          "valor": 8,
+          "unidade": "redes",
+          "origem": "declarado"
+        }
+      }
+    }
+  ]
+}

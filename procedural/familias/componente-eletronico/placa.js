@@ -39,9 +39,15 @@ import { ENCAPSULAMENTOS, idDoComponente, varianteDe } from './composicoes.js';
 import { COMPONENTE_ELETRONICO, comMateriais } from './index.js';
 import { alturaDoAssento, terminaisDoComponente } from './terminais.js';
 
+/* As regras do cobre traçado (plano das trilhas, 2026-11-23), também estimativa de fabricação comum de placa de duas faces: a
+   trilha mínima de 0,15 mm e a padrão de 0,25 mm, a via com furo de 0,3 mm e anel de 0,15 mm (0,6 mm de diâmetro), a capacidade
+   de 6/6 mil que os fabricantes de protótipo oferecem como padrão e a IPC-2221 aceita para nível B. A distância entre cobres e
+   até a borda é a `folga` e a `borda` de cima, a mesma das ilhas. A largura e a distância de uma rede no pedido valem acima
+   destas, nunca abaixo. */
 export const PLACA = Object.freeze({
   espessura: 1.6, cobre: 0.035, folgaDoFuro: 0.25, anel: 0.4, ilhaDeSuperficie: Object.freeze({ largura: 0.2, comprimento: 0.6 }),
   folga: 0.15, borda: 0.3, alongado: 2.5, ladosDoFuro: 12,
+  trilhaMinima: 0.15, trilhaPadrao: 0.25, via: Object.freeze({ furo: 0.3, anel: 0.15 }),
 });
 
 const FAMILIA = 'componente-eletronico';

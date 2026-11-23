@@ -44,7 +44,7 @@ O esquema JSON da ficha e do pedido é do contrato e se escreve junto com a meca
 
 ## Excluído
 
-- ligação entre portas, netlist, esquemático, circuito, programa e física, que são do nos-mecatronica;
+- ligação entre portas, netlist, esquemático, circuito, programa e física, que são do nos-mecatronica; a lista de redes de uma placa chega no item `ligacoes` do pedido e o Modelar guarda a cópia do pedido, pela emenda aplicada pelo [plano das trilhas](2026-11-17-trilhas-e-validacao-da-placa.md) em 2026-11-23;
 - a saída de ar calculada pelo calor, salvo a conferência do item de abertura quando o pedido o trouxer;
 - inércia de conjunto móvel e eixos de junta na ficha, que entram em fatia própria se a camada física da mecatrônica pedir;
 - mudar a forma aprovada do braço para cumprir pedido sem a aprovação da pessoa.
