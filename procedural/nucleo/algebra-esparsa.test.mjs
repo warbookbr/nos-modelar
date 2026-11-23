@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { matrizPorLinhas, porColunas, cotaDeVarah, ordemDeGrauMinimo, fatorarCholesky, contarCholesky, resolverCholesky, fatorarLUEsparso, resolverLUEsparso, resolverLUEsparsoTransposta, baseDoNucleo } from './algebra-esparsa.js';
+import { matrizPorLinhas, porColunas, cotaDeVarah, ordemDeGrauMinimo, fatorarCholesky, contarCholesky, resolverCholesky, fatorarLUEsparso, resolverLUEsparso, resolverLUEsparsoTransposta, baseDoNucleo, somaDasColunasAbsolutas, estimarNorma1 } from './algebra-esparsa.js';
 import { fatorarLU, resolverLU, linhasDoLimite, ajustarGaiolaAsMedidasComPeso } from './subdivisao.js';
 import { gaiolaGrande } from '../../tools/fixtures/ajuste-esparso/gaiola-grande.mjs';
 
@@ -164,5 +164,51 @@ describe('a lei de custo do ajuste da gaiola (o teste de escala do plano do ajus
 
   it('o ajuste da gaiola de prova usa o caminho contado: o ganho pela cota, sem a conta exata', () => {
     expect(ajustarGaiolaAsMedidasComPeso(pequena.gaiola, pequena.medidas).ganhoPelaCota).toBe(true);
+  });
+});
+
+describe('as contas do ganho com a curvatura normal', () => {
+  /* uma matriz que não é diagonal dominante: o quadrado do estêncil de cinco pontos mais pouco da diagonal, como a energia mais o resto */
+  const quadradoDaGrade = (nx, diag) => {
+    const g = grade(nx, nx, 4); const n = g.n; const m = matrizPorLinhas(n);
+    for (let r = 0; r < n; r++) for (const [k, a] of g.linhas[r]) for (const [c, b] of g.linhas[k]) m.somar(r, c, a * b);
+    for (let k = 0; k < n; k++) m.somar(k, k, diag);
+    return m;
+  };
+  const colunas = (n) => Array.from({ length: n }, (_, k) => [[k, 1], [(k * 7 + 3) % n, -0.4]].filter(([r], i, l) => i === 0 || r !== l[0][0]));
+  const umaAUma = (f, cols, n) => { const s = new Float64Array(n); const e = new Array(n).fill(0); for (const c of cols) { for (const [r, v] of c) e[r] += v; const x = resolverCholesky(f, e); for (const [r] of c) e[r] = 0; for (let r = 0; r < n; r++) s[r] += Math.abs(x[r]); } return s; };
+
+  it('a soma das colunas em blocos dá os números da resolução uma a uma, bit a bit, com e sem grupo', () => {
+    const m = quadradoDaGrade(9, 0.01); const n = m.n; const f = fatorarCholesky(m); const cols = colunas(n);
+    const ref = umaAUma(f, cols, n);
+    for (const bloco of [1, 3, 8]) expect([...somaDasColunasAbsolutas(f, cols, { bloco })]).toEqual([...ref]);
+    const grupo = Int32Array.from({ length: n }, (_, r) => r >> 1); const agrupado = new Float64Array((n + 1) >> 1);
+    /* a mesma ordem de soma da conta uma a uma: coluna a coluna, e em cada uma na ordem de r */
+    { const e = new Array(n).fill(0); for (const c of cols) { for (const [r, v] of c) e[r] += v; const x = resolverCholesky(f, e); for (const [r] of c) e[r] = 0; for (let r = 0; r < n; r++) agrupado[grupo[r]] += Math.abs(x[r]); } }
+    expect([...somaDasColunasAbsolutas(f, cols, { grupo, tamanho: agrupado.length })]).toEqual([...agrupado]);
+  });
+
+  it('o fator com o simbólico de outro, na mesma ordem, é o do zero bit a bit, e a estrutura diferente fatora do zero', () => {
+    const a = quadradoDaGrade(8, 0.01); const b = quadradoDaGrade(8, 0.3); const ordem = ordemDeGrauMinimo(a);
+    const fa = fatorarCholesky(a, ordem); const fb = fatorarCholesky(b, ordem, { simbolico: fa.simbolico }); const zero = fatorarCholesky(b, ordem);
+    expect([...fb.Lx]).toEqual([...zero.Lx]); expect([...fb.Li]).toEqual([...zero.Li]);
+    const c = quadradoDaGrade(8, 0.3); c.somar(0, 63, 1e-3); c.somar(63, 0, 1e-3);
+    const fc = fatorarCholesky(c, ordem, { simbolico: fa.simbolico }); const zc = fatorarCholesky(c, ordem);
+    expect([...fc.Lx]).toEqual([...zc.Lx]); expect(fc.naoNulos).toBe(zc.naoNulos);
+  });
+
+  it('a estimativa de Hager e Higham de ‖(A⁻¹ S)ᵀ‖₁ é uma soma que o sistema atinge, até a exata, e acerta a exata nestas matrizes', () => {
+    for (const [nx, diag] of [[7, 0.01], [9, 0.3], [10, 3]]) {
+      const m = quadradoDaGrade(nx, diag); const n = m.n; const f = fatorarCholesky(m); const cols = colunas(n);
+      const exata = Math.max(...umaAUma(f, cols, n));
+      const est = estimarNorma1({
+        n,
+        aplicar: (x) => { const h = resolverCholesky(f, x); return cols.map((c) => c.reduce((s, [r, w]) => s + w * h[r], 0)); },
+        aplicarTransposta: (xi) => { const u = new Array(n).fill(0); cols.forEach((c, t) => { for (const [r, w] of c) u[r] += w * xi[t]; }); return resolverCholesky(f, u); },
+      });
+      expect(est.estimativa).toBeLessThanOrEqual(exata * (1 + 1e-12));
+      expect(est.estimativa).toBeGreaterThan(0.999 * exata);
+      expect(est.coluna).toBeGreaterThanOrEqual(0);
+    }
   });
 });

@@ -140,13 +140,16 @@ function estruturaDoCholesky(matriz, ordem) {
   const posicao = new Int32Array(n); for (let k = 0; k < n; k++) posicao[ordem[k]] = k;
   /* a matriz permutada por colunas, só a parte de cima (linha ≤ coluna), com as linhas em ordem crescente */
   const ap = new Int32Array(n + 1); const colunas = new Array(n);
+  /* chaves[k] e destino[k]: as colunas da linha ordem[k] na ordem em que o Map as guarda e a posição de cada uma em ai/ax (−1 fora da
+     parte de cima), para `recarregar` tirar os valores de outra matriz de mesma estrutura sem ordenar de novo */
+  const chaves = new Array(n); const destino = new Array(n);
   for (let k = 0; k < n; k++) {
-    const pares = [];
-    for (const [c, v] of matriz.linhas[ordem[k]]) { const r = posicao[c]; if (r <= k) pares.push([r, v]); }
-    pares.sort((a, b) => a[0] - b[0]); colunas[k] = pares; ap[k + 1] = ap[k] + pares.length;
+    const pares = []; const l = matriz.linhas[ordem[k]]; const ch = new Int32Array(l.size); let t = 0;
+    for (const [c, v] of l) { ch[t] = c; const r = posicao[c]; if (r <= k) pares.push([r, v, t]); t++; }
+    pares.sort((a, b) => a[0] - b[0]); colunas[k] = pares; ap[k + 1] = ap[k] + pares.length; chaves[k] = ch;
   }
   const ai = new Int32Array(ap[n]); const ax = new Float64Array(ap[n]);
-  colunas.forEach((pares, k) => pares.forEach(([r, v], j) => { ai[ap[k] + j] = r; ax[ap[k] + j] = v; }));
+  colunas.forEach((pares, k) => { const d = new Int32Array(chaves[k].length).fill(-1); pares.forEach(([r, v, t], j) => { ai[ap[k] + j] = r; ax[ap[k] + j] = v; d[t] = ap[k] + j; }); destino[k] = d; });
   /* a árvore de eliminação */
   const pai = new Int32Array(n).fill(-1); const ancestral = new Int32Array(n).fill(-1);
   for (let k = 0; k < n; k++) {
@@ -171,7 +174,19 @@ function estruturaDoCholesky(matriz, ordem) {
   const conta = new Int32Array(n).fill(1);
   for (let k = 0; k < n; k++) { const topo = alcance(k); for (let t = topo; t < n; t++) conta[pilha[t]]++; }
   marca.fill(-1);
-  return { n, posicao, ap, ai, ax, conta, alcance, pilha };
+  /* os valores de outra matriz com a mesma estrutura, guardada nos Maps na mesma ordem; null quando ela difere */
+  const recarregar = (outra) => {
+    const bx = new Float64Array(ap[n]);
+    for (let k = 0; k < n; k++) {
+      const l = outra.linhas[ordem[k]]; const ch = chaves[k]; const d = destino[k];
+      if (l.size !== ch.length) return null;
+      let t = 0;
+      for (const [c, v] of l) { if (c !== ch[t]) return null; if (d[t] >= 0) bx[d[t]] = v; t++; }
+    }
+    marca.fill(-1);
+    return { n, posicao, ap, ai, ax: bx, conta, alcance, pilha, recarregar };
+  };
+  return { n, posicao, ap, ai, ax, conta, alcance, pilha, recarregar };
 }
 
 /** contarCholesky(matriz, ordem) -> { naoNulos, operacoes } : o tamanho do fator e a ordem das multiplicações da fatoração na ordem dada,
@@ -186,9 +201,12 @@ export function contarCholesky(matriz, ordem) {
  *  O fator L de P A Pᵀ = L Lᵀ, com P a ordem dada (a de `ordemDeGrauMinimo` quando omitida), guardado por colunas, cada coluna com a
  *  diagonal primeiro. Usa a árvore de eliminação para achar a estrutura de cada linha de L (o Cholesky por linhas). Pivô de valor até
  *  `pivoMinimo` vezes a diagonal original para a fatoração e devolve a posição, na ordem original, em que ela parou. `operacoes` é Σ c_k²,
- *  com c_k os não nulos da coluna k de L: a ordem das multiplicações da fatoração. */
-export function fatorarCholesky(matriz, ordem = ordemDeGrauMinimo(matriz), { pivoMinimo = 1e-14 } = {}) {
-  const { n, posicao, ap, ai, ax, conta, alcance, pilha } = estruturaDoCholesky(matriz, ordem);
+ *  com c_k os não nulos da coluna k de L: a ordem das multiplicações da fatoração. `simbolico` é o de um fator anterior, na mesma ordem: a
+ *  matriz de mesma estrutura, guardada nos Maps na mesma ordem, reaproveita a estrutura e a árvore de eliminação dele e dá o mesmo fator,
+ *  bit a bit, que a fatoração do zero; com a estrutura diferente, fatora do zero. */
+export function fatorarCholesky(matriz, ordem = ordemDeGrauMinimo(matriz), { pivoMinimo = 1e-14, simbolico = null } = {}) {
+  const estrutura = (simbolico && simbolico.ordem === ordem && simbolico.estrutura.recarregar(matriz)) || estruturaDoCholesky(matriz, ordem);
+  const { n, posicao, ap, ai, ax, conta, alcance, pilha } = estrutura;
   const Lp = new Int32Array(n + 1); for (let k = 0; k < n; k++) Lp[k + 1] = Lp[k] + conta[k];
   const Li = new Int32Array(Lp[n]); const Lx = new Float64Array(Lp[n]); const livre = Int32Array.from(Lp.subarray(0, n));
   const x = new Float64Array(n);
@@ -207,7 +225,7 @@ export function fatorarCholesky(matriz, ordem = ordemDeGrauMinimo(matriz), { piv
     const p = livre[k]++; Li[p] = k; Lx[p] = Math.sqrt(d);
   }
   let operacoes = 0; for (let k = 0; k < n; k++) operacoes += conta[k] * conta[k];
-  return { n, ordem, posicao, Lp, Li, Lx, naoNulos: Lp[n], operacoes };
+  return { n, ordem, posicao, Lp, Li, Lx, naoNulos: Lp[n], operacoes, simbolico: { ordem, estrutura } };
 }
 
 /** resolverCholesky(fator, b) -> x com A x = b. O lado direito pode ser esparso: a substituição para frente pula a coluna cujo valor
@@ -228,6 +246,74 @@ export function resolverCholesky({ n, ordem, Lp, Li, Lx }, b) {
   const xs = new Array(n);
   for (let k = 0; k < n; k++) xs[ordem[k]] = y[k];
   return xs;
+}
+
+/** somaDasColunasAbsolutas(fator, colunas, { grupo, tamanho, bloco }) -> Float64Array s, com s[grupo[r]] += |x_c[r]| para cada coluna
+ *  esparsa b_c = [[r, v], ...] e x_c = A⁻¹ b_c, somadas na ordem das colunas e, em cada coluna, na ordem crescente de r: os mesmos números,
+ *  bit a bit, que resolver coluna a coluna com `resolverCholesky` e somar. Sem `grupo`, s[r] (tamanho n). As colunas vão em blocos de
+ *  `bloco`, e cada passagem pelo fator resolve o bloco inteiro: a leitura de L, que é o que custa, se divide pelo bloco. */
+export function somaDasColunasAbsolutas({ n, ordem, posicao, Lp, Li, Lx }, colunas, { grupo = null, tamanho = n, bloco = 8 } = {}) {
+  const s = new Float64Array(tamanho); const B = bloco;
+  const y = new Float64Array(n * B); const v = new Float64Array(B);
+  for (let c0 = 0; c0 < colunas.length; c0 += B) {
+    const nb = Math.min(B, colunas.length - c0);
+    y.fill(0);
+    let primeira = n;
+    for (let b = 0; b < nb; b++) for (const [r, w] of colunas[c0 + b]) { const k = posicao[r]; y[k * B + b] += w; if (k < primeira) primeira = k; }
+    for (let j = primeira; j < n; j++) {
+      const base = j * B; let algum = false; const d = Lx[Lp[j]];
+      for (let b = 0; b < nb; b++) { const yj = y[base + b]; if (yj !== 0) { v[b] = (y[base + b] = yj / d); algum = true; } else v[b] = 0; }
+      if (!algum) continue;
+      for (let p = Lp[j] + 1; p < Lp[j + 1]; p++) {
+        const l = Lx[p]; const alvo = Li[p] * B;
+        for (let b = 0; b < nb; b++) y[alvo + b] -= l * v[b];
+      }
+    }
+    for (let j = n - 1; j >= 0; j--) {
+      const base = j * B;
+      for (let b = 0; b < nb; b++) v[b] = y[base + b];
+      for (let p = Lp[j] + 1; p < Lp[j + 1]; p++) { const l = Lx[p]; const de = Li[p] * B; for (let b = 0; b < nb; b++) v[b] -= l * y[de + b]; }
+      const d = Lx[Lp[j]];
+      for (let b = 0; b < nb; b++) y[base + b] = v[b] / d;
+    }
+    for (let b = 0; b < nb; b++) for (let r = 0; r < n; r++) { const x = Math.abs(y[posicao[r] * B + b]); s[grupo ? grupo[r] : r] += x; }
+  }
+  return s;
+}
+
+/** estimarNorma1({ n, aplicar, aplicarTransposta, candidatos, iteracoes }) -> { estimativa, coluna }: a estimativa de ‖B‖₁, a maior soma
+ *  dos módulos de uma coluna, de um operador B de n colunas dado só pelos produtos B x e Bᵀ y, pelo método de Hager e Higham (o xLACON do
+ *  LAPACK): parte do vetor constante, vai à coluna j de maior |(Bᵀ sinal(B x))_j| e para quando a soma não cresce ou o sinal se repete.
+ *  No fim prova também as `candidatos` colunas seguintes de maior |Bᵀ sinal| e o vetor alternado de Higham. A estimativa é uma cota
+ *  inferior de ‖B‖₁: cada valor provado é ‖B x‖₁ com ‖x‖₁ ≤ 1 (a coluna j é ‖B e_j‖₁, que B atinge, e `coluna` diz qual; o vetor alternado,
+ *  2‖B x‖₁/(3n), dá `coluna` −1). Custa cerca de 2 `iteracoes` + `candidatos` + 3 produtos, contra n para a conta exata. Determinística. */
+export function estimarNorma1({ n, aplicar, aplicarTransposta, candidatos = 8, iteracoes = 5 }) {
+  const norma1 = (y) => { let s = 0; for (const v of y) s += Math.abs(v); return s; };
+  const sinal = (y) => Array.from(y, (v) => (v >= 0 ? 1 : -1));
+  let melhor = { estimativa: 0, coluna: -1 };
+  const provadas = new Set();
+  const provar = (j) => {
+    provadas.add(j); const x = new Array(n).fill(0); x[j] = 1;
+    const y = aplicar(x); const s = norma1(y);
+    if (s > melhor.estimativa) melhor = { estimativa: s, coluna: j };
+    return { y, s };
+  };
+  const maiores = (z, quantas) => [...z.keys()].filter((j) => !provadas.has(j)).sort((a, b) => Math.abs(z[b]) - Math.abs(z[a]) || a - b).slice(0, quantas);
+  let y = aplicar(new Array(n).fill(1 / n));
+  if (norma1(y) > melhor.estimativa) melhor = { estimativa: norma1(y), coluna: -1 };
+  let xi = sinal(y); let z = aplicarTransposta(xi);
+  for (let it = 0; it < iteracoes; it++) {
+    const [j] = maiores(z, 1); if (j === undefined) break;
+    const antes = melhor.estimativa; const r = provar(j);
+    if (r.s <= antes) break;
+    const novo = sinal(r.y); if (novo.every((s, k) => s === xi[k])) break;
+    xi = novo; z = aplicarTransposta(xi);
+  }
+  for (const j of maiores(z, candidatos)) provar(j);
+  const alternado = aplicar(Array.from({ length: n }, (_, i) => (i % 2 ? -1 : 1) * (1 + i / Math.max(1, n - 1))));
+  const a = (2 * norma1(alternado)) / (3 * n);
+  if (a > melhor.estimativa) melhor = { estimativa: a, coluna: -1 };
+  return melhor;
 }
 
 /** estruturaSimetrica(matriz) -> a estrutura de A + Aᵀ, no formato da matriz montada, para ordenar uma matriz que não é simétrica */
@@ -403,9 +489,9 @@ export function baseDoNucleo(f, { relativo = 1e-9 } = {}) {
  *  do sistema inteiro enche demais, porque as linhas das restrições não têm diagonal (medido no banco de provas do ajuste esparso).
  *  `resolver(f, g, { refinar })` faz `refinar` passos de refinamento iterativo sobre o sistema inteiro. Devolve null quando o Cholesky de H para. Quando S é singular, as restrições não são independentes, o núcleo do sistema é
  *  {(0, μ) : Gᵀ μ = 0} e `nucleo` traz os índices das restrições na união dos suportes da base dele. */
-export function fatorarSelaPorSchur(H, linhasDeG, { pivoNulo = 1e-12 } = {}) {
+export function fatorarSelaPorSchur(H, linhasDeG, { pivoNulo = 1e-12, ordem = undefined } = {}) {
   const n = H.n; const m = linhasDeG.length;
-  const fator = fatorarCholesky(H);
+  const fator = fatorarCholesky(H, ordem);
   if (fator.naoPositivaEm !== undefined) return null;
   const e = new Array(n).fill(0);
   const Y = linhasDeG.map((l) => { for (const [c, w] of l) e[c] += w; const y = resolverCholesky(fator, e); for (const [c] of l) e[c] = 0; return y; });

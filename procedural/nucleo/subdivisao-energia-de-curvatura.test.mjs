@@ -1,11 +1,11 @@
 /* subdivisao-energia-de-curvatura.test.mjs — a energia de variação de curvatura como regularização do ajuste das cotas com peso
  * (`regularizacao: { tipo: 'variacaoDeCurvatura', onda? }` em `ajustarGaiolaAsMedidasComPeso`, em `operadorDasMedidas` e no passo
  * `subdivisao`): o estêncil do anel contra o oráculo da superfície limite, a energia nula em toda quadrática do parâmetro, a calibração
- * da onda, as cotas exatas no lugar, o operador igual ao ajuste sobre a gaiola recebida, as recusas, a faixa da onda, a conta de sempre sem o argumento, e a curvatura normal que o ajuste usa desde 2026-11-22. */
+ * da onda, as cotas exatas no lugar, o operador igual ao ajuste sobre a gaiola recebida, as recusas, a faixa da onda, a conta de sempre sem o argumento, a curvatura normal que o ajuste usa desde 2026-11-22, e o ganho estimado sem cota exata. */
 import { describe, expect, it } from 'vitest';
 import { gaiolaDoPasso } from './operacoes/subdivisao.js';
 import {
-  ARESTAS_POR_ONDA, ErroDaOnda, ITERACOES_DA_CURVATURA, ONDA_MAXIMA_EM_PASSOS, ONDA_MINIMA_EM_PASSOS, RESTO_DO_DESLOCAMENTO, passoDaGaiola, ajustarGaiolaAsMedidas, ajustarGaiolaAsMedidasComPeso, energiaDeCurvaturaNormal, energiaDeVariacaoDeCurvatura, limitesDaGaiola, operadorDasMedidas, superficieLimite,
+  ARESTAS_POR_ONDA, ErroDaOnda, ITERACOES_DA_CURVATURA, ONDA_MAXIMA_EM_PASSOS, ONDA_MINIMA_EM_PASSOS, RESTO_DO_DESLOCAMENTO, passoDaGaiola, ajustarGaiolaAsMedidas, ajustarGaiolaAsMedidasComPeso, ajustarGaiolaAsMedidasComPesoDenso, GANHO_MAXIMO_DAS_MEDIDAS, MARGEM_DA_ESTIMATIVA_DO_GANHO, energiaDeCurvaturaNormal, energiaDeVariacaoDeCurvatura, limitesDaGaiola, operadorDasMedidas, superficieLimite,
 } from './subdivisao.js';
 
 /* a grade de nx por nz vértices, com o ponto de cada um dado por ponto(i, j) */
@@ -175,6 +175,20 @@ describe('a energia de variação de curvatura no ajuste das cotas', () => {
     expect(r.regularizacao.mudancas).toHaveLength(ITERACOES_DA_CURVATURA - 1);
     r.regularizacao.mudancas.forEach((m, k) => { if (k) expect(m).toBeLessThan(0.5 * r.regularizacao.mudancas[k - 1]); });
     expect(Math.max(...r.residuos.filter((_, k) => exata(r.medidas[k])))).toBeLessThan(1e-12);
+  });
+
+  it('sem cota exata o ganho é a estimativa de Hager e Higham, até o exato e acima de 90% dele, e com cota exata é o exato', () => {
+    const g = grade(15, 15, (i, j) => { const x = -0.3 + (i <= 7 ? i * 0.02 : 0.14 + (i - 7) * 0.04 * 0.9), z = -0.3 + (0.6 * j) / 14; return [x, x * z, z]; });
+    for (const peso of [0.003, 0.3, 30]) {
+      const medidas = g.vertices.map((_, indice) => ({ indice, peso }));
+      const e = ajustarGaiolaAsMedidasComPeso(g, medidas, REG); const d = ajustarGaiolaAsMedidasComPesoDenso(g, medidas, REG);
+      expect(e.ganhoEstimado).toBe(true); expect(d.ganhoEstimado).toBe(false);
+      expect(e.ganho).toBeLessThanOrEqual(d.ganho * (1 + 1e-9)); expect(e.ganho).toBeGreaterThan(0.9 * d.ganho);
+      expect(e.ganho * MARGEM_DA_ESTIMATIVA_DO_GANHO).toBeLessThanOrEqual(GANHO_MAXIMO_DAS_MEDIDAS);
+      expect(maior(e.vertices, d.vertices)).toBeLessThan(1e-9);
+    }
+    const exatas = g.vertices.map((_, indice) => ({ indice, peso: indice % 15 === 7 ? Infinity : 0.003 }));
+    expect(ajustarGaiolaAsMedidasComPeso(g, exatas, REG).ganhoEstimado).toBe(false);
   });
 
   it('sem o argumento a conta é a de sempre, e a memória separa as duas chamadas', () => {
