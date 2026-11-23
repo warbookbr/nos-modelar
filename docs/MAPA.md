@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2232 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2235 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1088,6 +1088,7 @@
 ## procedural/familias/polia-e-correia/
 
 - `composicoes.js` — composicoes.js — as composições da família `polia-e-correia`, uma por número de pontos do perfil, porque a composição v1 só substitui valores: a dentada de v…
+- `correia.js` — correia.js — a correia dentada fechada em volta de duas polias dentadas da família, em milímetro, e os passos que a desenham, em metro.
 - `derivar.js` — derivar.js — dos parâmetros da polia (milímetro) à chamada de composição (metro). O tipo, as flanges e os canais escolhem a composição.
 - `geometria.js` — geometria.js — as medidas de uma polia da família `polia-e-correia`, em milímetro, a partir dos parâmetros.
 - `index.js` — index.js — a família `polia-e-correia`: polia dentada (GT2, HTD 3M, HTD 5M e T5), em V (Z, A e B, de um a quatro canais) e lisa, com cubo e furo. `chamar(POL…
@@ -3406,6 +3407,8 @@
 ## tools/fixtures/transmissao/
 
 - `duas-instancias.test.mjs` — duas-instancias.test.mjs — duas instâncias da mesma família numa receita, a prova da fatia 1 do plano de engrenagem, polia e correia.
+- `par-gt2.mjs` — par-gt2.mjs — o par GT2 de 20 e 80 dentes com a correia fechada, a prova da fatia 3 do plano de engrenagem, polia e correia. As duas polias entram pelo `inst…
+- `par-gt2.test.mjs` — par-gt2.test.mjs — o par GT2 de 20 e 80 dentes com a correia fechada: a correia tem número inteiro de dentes e a distância entre centros sai da conta do comp…
 
 ## tools/fixtures/tres-blocos-vinculados/
 
