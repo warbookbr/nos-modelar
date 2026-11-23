@@ -43,12 +43,12 @@ export function passosRetrovisores(proxId) {
   /* 2. Pedestal articulado curto e encorpado (4 anéis elípticos suaves de x = 754 até x = 808) */
   emitirPar((id) => {
     const N = 16;
-    /* estações [x, yCentro, zCentro, ry, rz] em mm — 100% contido dentro da base triangular e alinhado à concha */
+    /* estações [x, yCentro, zCentro, ry, rz] em mm — 100% contido dentro da face externa do triângulo (nunca vaza atrás nem na borda inclinada) */
     const est = [
-      [750, 998, 578, 25, 26],
-      [768, 1001, 582, 23, 25],
-      [788, 1003, 586, 22, 24],
-      [808, 1004, 588, 24, 26],
+      [760, 982, 558, 20, 22],
+      [774, 988, 562, 20, 22],
+      [790, 994, 566, 21, 23],
+      [806, 998, 570, 22, 24],
     ];
     const verts = [];
     for (const [x, yc, zc, ry, rz] of est) {
