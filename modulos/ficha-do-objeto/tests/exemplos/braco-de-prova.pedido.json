@@ -1,0 +1,99 @@
+{
+  "tipo": "pedido",
+  "versao": "1.1",
+  "objeto": "braco-de-prova",
+  "ficha": { "caminho": "braco-de-prova.ficha.json", "revisao": 3 },
+  "itens": [
+    {
+      "id": "espaco-capacitor-12v",
+      "tipo": "espaco",
+      "dentroDe": "base",
+      "conteudo": "capacitor de reservatório do trilho de 12 V, ao lado dos dois drivers",
+      "caixaMinima": [20, 30, 20],
+      "centro": [65, 25, -40],
+      "tolerancia": 15,
+      "motivo": {
+        "linhaDaMatriz": "ele-capacitor-de-reservatorio",
+        "texto": "O pico de corrente dos dois motores na partida derruba o trilho de 12 V abaixo do mínimo dos drivers sem um capacitor de reservatório perto deles.",
+        "resultado": { "grandeza": "tensão mínima do trilho na partida", "valor": 9.6, "unidade": "V", "limite": 10.5, "origem": "estimativa" }
+      },
+      "resposta": { "estado": "cumprido", "revisaoDaFicha": 4 }
+    },
+    {
+      "id": "posicao-fonte",
+      "tipo": "posicao",
+      "alvo": "fonte",
+      "posicao": [0, 3, 62],
+      "orientacao": { "eixo": [0, 1, 0], "angulo": 0 },
+      "tolerancia": { "posicao": 5, "angulo": 5 },
+      "motivo": {
+        "linhaDaMatriz": "fis-calor-no-involucro",
+        "texto": "A fonte e os drivers aquecem o mesmo canto da base; afastar a fonte baixa a temperatura do ar em volta dos drivers.",
+        "resultado": { "grandeza": "temperatura do ar junto aos drivers", "valor": 58, "unidade": "°C", "limite": 50, "origem": "estimativa" }
+      },
+      "resposta": {
+        "estado": "nao-cumprido",
+        "motivo": "Na posição pedida a fonte avança 4 mm além da parede interna da base, em z = 87; caber pede uma base pelo menos 4 mm mais funda, que muda a forma aprovada e volta para a pessoa decidir."
+      }
+    },
+    {
+      "id": "passagem-motor-cotovelo",
+      "tipo": "passagem",
+      "de": [
+        { "peca": "motor-cotovelo", "porta": "a1" },
+        { "peca": "motor-cotovelo", "porta": "a2" },
+        { "peca": "motor-cotovelo", "porta": "b1" },
+        { "peca": "motor-cotovelo", "porta": "b2" }
+      ],
+      "para": [
+        { "peca": "driver-cotovelo", "porta": "1a" },
+        { "peca": "driver-cotovelo", "porta": "1b" },
+        { "peca": "driver-cotovelo", "porta": "2a" },
+        { "peca": "driver-cotovelo", "porta": "2b" }
+      ],
+      "atravessa": ["ombro"],
+      "diametroMinimo": 6,
+      "raioDeCurvaturaMinimo": 30,
+      "motivo": {
+        "linhaDaMatriz": "fis-chicote-na-junta",
+        "texto": "O chicote de quatro fios do motor do cotovelo desce pelo elo-1 e entra na base pela junta do ombro, que gira de -90 a 90 graus.",
+        "resultado": { "grandeza": "raio de curvatura mínimo do chicote no curso do ombro", "valor": 30, "unidade": "mm", "origem": "declarado" }
+      }
+    },
+    {
+      "id": "saida-de-ar-drivers",
+      "tipo": "saidaDeAr",
+      "em": "base",
+      "areaMinima": 600,
+      "centro": [32, 35, -90],
+      "normal": [0, 0, -1],
+      "tolerancia": 20,
+      "motivo": {
+        "linhaDaMatriz": "ponte-saida-de-ar",
+        "texto": "Os dois drivers dissipam dentro da base fechada; a abertura na parede de trás, na altura deles, deixa o ar sair.",
+        "resultado": { "grandeza": "potência dissipada pelos dois drivers", "valor": 2.4, "unidade": "W", "origem": "estimativa" }
+      }
+    },
+    {
+      "id": "ligacoes-placa-de-controle",
+      "tipo": "ligacoes",
+      "placa": "placa-de-controle",
+      "redes": [
+        { "id": "12v-motores", "terminais": [{ "peca": "driver-ombro", "porta": "vmot" }, { "peca": "driver-cotovelo", "porta": "vmot" }], "larguraMinima": 1.0, "distanciaMinima": 0.3 },
+        { "id": "gnd", "terminais": [{ "peca": "driver-ombro", "porta": "gnd" }, { "peca": "driver-cotovelo", "porta": "gnd" }, { "peca": "modulo-microcontrolador", "porta": "gnd" }, { "peca": "placa-de-controle", "porta": "d1-catodo" }], "larguraMinima": 1.0 },
+        { "id": "3v3", "terminais": [{ "peca": "modulo-microcontrolador", "porta": "3v3" }, { "peca": "driver-ombro", "porta": "vdd" }, { "peca": "driver-cotovelo", "porta": "vdd" }] },
+        { "id": "step-ombro", "terminais": [{ "peca": "modulo-microcontrolador", "porta": "gpio25" }, { "peca": "driver-ombro", "porta": "step" }] },
+        { "id": "dir-ombro", "terminais": [{ "peca": "modulo-microcontrolador", "porta": "gpio26" }, { "peca": "driver-ombro", "porta": "dir" }] },
+        { "id": "step-cotovelo", "terminais": [{ "peca": "modulo-microcontrolador", "porta": "gpio32" }, { "peca": "driver-cotovelo", "porta": "step" }] },
+        { "id": "dir-cotovelo", "terminais": [{ "peca": "modulo-microcontrolador", "porta": "gpio33" }, { "peca": "driver-cotovelo", "porta": "dir" }] },
+        { "id": "led-estado", "terminais": [{ "peca": "modulo-microcontrolador", "porta": "gpio15" }, { "peca": "placa-de-controle", "porta": "r1-1" }] },
+        { "id": "led-anodo", "terminais": [{ "peca": "placa-de-controle", "porta": "r1-2" }, { "peca": "placa-de-controle", "porta": "d1-anodo" }] }
+      ],
+      "motivo": {
+        "linhaDaMatriz": "lig-cobre-confere",
+        "texto": "A placa de controle liga o microcontrolador aos dois drivers, o trilho de 12 V dos motores e o LED de estado; o Modelar traça o cobre destas redes e confere que cada uma fecha sem tocar outra. A largura e a distância do trilho de 12 V e do terra são de exemplo.",
+        "resultado": { "grandeza": "redes da placa de controle", "valor": 9, "unidade": "redes", "origem": "declarado" }
+      }
+    }
+  ]
+}

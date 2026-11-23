@@ -92,6 +92,7 @@
     "exportar:step": "node tools/modelar/exportar-step.mjs",
     "exportar:obj": "node tools/modelar/exportar-obj.mjs",
     "exportar:gltf": "node tools/modelar/exportar-gltf.mjs",
+    "exportar:ficha": "node tools/modelar/exportar-ficha.mjs",
     "ativar:bancada": "node tools/modelar/ativar-bancada.mjs",
     "malha:conferir": "node tools/modelar/conferir-malha.mjs",
     "malha:lascas": "node tools/modelar/lasca.mjs",

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2208 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2216 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -854,6 +854,21 @@
 - `exportador-obj.test.js` — exportador-obj.test.js — suíte de testes do exportador Wavefront OBJ.
 - `textura.test.js` — textura.test.js — material por parte, arquivo .mtl, usemtl, coordenadas vt em mapeamento planar e recusas.
 - `tolerancia.test.js` — tolerancia.test.js — tolerância de triângulo degenerado e regressão de saída sem texturas.
+
+## modulos/ficha-do-objeto/
+
+- `README.md` — Ficha do objeto
+
+## modulos/ficha-do-objeto/src/
+
+- `ficha.js` — ficha.js — monta a ficha do objeto (contrato da ponte com a mecatrônica, esquema 1.1) a partir do que o Modelar sabe: as instâncias da montagem resolvida, co…
+- `index.js` — index.js — a porta pública do módulo da ficha do objeto: a ponte do Modelar com o nos-mecatronica.
+- `validar.js` — validar.js — confere uma ficha ou um pedido da ponte com a mecatrônica: o esquema da versão que o arquivo declara, pela cópia conferida em `../esquemas/` (de…
+
+## modulos/ficha-do-objeto/tests/
+
+- `ficha.test.js` — ficha.test.js — a ficha montada de um objeto de prova de duas peças e uma junta: sai em milímetro, passa na cópia do esquema, igual em duas montagens, com o …
+- `validar.test.js` — validar.test.js — a cópia dos esquemas da ponte confere com o SHA-256 da última versão do `versoes.json` copiado junto (decisão 0004 do nos-mecatronica), e o…
 
 ## modulos/manual/
 
@@ -3633,6 +3648,8 @@
 - `etapas-reabrir-braco.test.mjs` — etapas-reabrir-braco.test.mjs — reabrir a base do braço robótico sobre o registro v3 do acervo (migrado das impressões dos commits dos aceites): reabrir só a…
 - `executar-receita.test.ts` — executar-receita.test.ts — prova a fronteira pura sem carregar catálogo.
 - `exemplo-canonico.test.mjs` — exemplo-canonico.test.mjs — o exemplo de receita que a documentação ensina precisa passar pelo mesmo caminho que o acervo.
+- `exportar-ficha.mjs` — exportar-ficha.mjs — CLI que exporta a ficha de um objeto montado para a ponte com o nos-mecatronica: a malha em .glb, com um nó por instância no identificad…
+- `exportar-ficha.test.mjs` — exportar-ficha.test.mjs — LENTO (está em `TESTES_LENTOS`: resolve o braço inteiro duas vezes, uns 60 s). Plano da ponte com a mecatrônica, gate 2: a ficha do…
 - `exportar-gltf-braco.test.mjs` — exportar-gltf-braco.test.mjs — LENTO (está em `TESTES_LENTOS`: resolve o braço inteiro, uns 15 s). Plano as partes do braço, fatia 2, gate 4: o braço montado…
 - `exportar-gltf.mjs` — exportar-gltf.mjs — CLI que grava uma receita procedural como glTF 2.0 binário (.glb), com os materiais dela. Uso: npm run exportar:gltf -- <peça ou montagem…
 - `exportar-obj.mjs` — exportar-obj.mjs — CLI para exportação atômica e segura de receitas procedurais em Wavefront OBJ (.obj).

@@ -1,0 +1,53 @@
+{
+  "formato": "modelar.ponte",
+  "versao": 1,
+  "objeto": "braco-robotico",
+  "revisao": 1,
+  "referencial": {
+    "frente": "+z",
+    "origem": "centro do fundo da base, no chão",
+    "poseZero": "a pose de repouso da montagem: a coluna em pé, o antebraço deitado para a direita e o punho para baixo, todas as juntas em 0 grau"
+  },
+  "conjuntos": [
+    { "id": "base", "movel": false, "instancias": ["base"] },
+    { "id": "cintura", "movel": true, "instancias": ["anelCintura", "ombro"] },
+    { "id": "coluna", "movel": true, "instancias": ["braco"] },
+    { "id": "antebraco", "movel": true, "instancias": ["anelAntebraco", "antebraco"] },
+    { "id": "punho-4", "movel": true, "instancias": ["anelPunho4", "eloPunho4"] },
+    { "id": "punho-5", "movel": true, "instancias": ["anelPunho5", "eloPunho5"] },
+    { "id": "punho-6", "movel": true, "instancias": ["anelPunho6", "flange"] }
+  ],
+  "juntas": [
+    {
+      "id": "cintura", "pai": "base", "filho": "anelCintura", "eixoDe": { "instancia": "anelCintura", "porta": "apoio" }, "acionadaPor": null,
+      "curso": { "min": -170, "max": 170, "origem": "estimativa", "nota": "valor típico da junta 1 de braço de seis eixos, recomendado pela IA e aceito pela pessoa em 2026-11-23" },
+      "reducao": { "valor": 100, "origem": "estimativa", "nota": "redutor harmônico típico das juntas grandes, recomendado pela IA e aceito pela pessoa em 2026-11-23" }
+    },
+    {
+      "id": "ombro", "pai": "ombro", "filho": "braco", "eixoDe": { "instancia": "ombro", "porta": "juntaDoOmbro" }, "acionadaPor": null,
+      "curso": { "min": -90, "max": 90, "origem": "estimativa", "nota": "a coluna deita até a horizontal para os dois lados; recomendado pela IA e aceito pela pessoa em 2026-11-23" },
+      "reducao": { "valor": 100, "origem": "estimativa", "nota": "redutor harmônico típico das juntas grandes, recomendado pela IA e aceito pela pessoa em 2026-11-23" }
+    },
+    {
+      "id": "cotovelo", "pai": "braco", "filho": "anelAntebraco", "eixoDe": { "instancia": "anelAntebraco", "porta": "apoio" }, "acionadaPor": null,
+      "curso": { "min": -140, "max": 140, "origem": "estimativa", "nota": "valor típico da junta 3, recomendado pela IA e aceito pela pessoa em 2026-11-23" },
+      "reducao": { "valor": 100, "origem": "estimativa", "nota": "redutor harmônico típico das juntas grandes, recomendado pela IA e aceito pela pessoa em 2026-11-23" }
+    },
+    {
+      "id": "punho-4", "pai": "antebraco", "filho": "anelPunho4", "eixoDe": { "instancia": "anelPunho4", "porta": "apoio" }, "acionadaPor": null,
+      "curso": { "min": -180, "max": 180, "origem": "estimativa", "nota": "valor típico da junta 4, recomendado pela IA e aceito pela pessoa em 2026-11-23" },
+      "reducao": { "valor": 80, "origem": "estimativa", "nota": "redutor harmônico típico do punho, recomendado pela IA e aceito pela pessoa em 2026-11-23" }
+    },
+    {
+      "id": "punho-5", "pai": "eloPunho4", "filho": "anelPunho5", "eixoDe": { "instancia": "anelPunho5", "porta": "apoio" }, "acionadaPor": null,
+      "curso": { "min": -120, "max": 120, "origem": "estimativa", "nota": "valor típico da junta 5, recomendado pela IA e aceito pela pessoa em 2026-11-23" },
+      "reducao": { "valor": 80, "origem": "estimativa", "nota": "redutor harmônico típico do punho, recomendado pela IA e aceito pela pessoa em 2026-11-23" }
+    },
+    {
+      "id": "punho-6", "pai": "eloPunho5", "filho": "anelPunho6", "eixoDe": { "instancia": "anelPunho6", "porta": "apoio" }, "acionadaPor": null,
+      "curso": { "min": -360, "max": 360, "origem": "estimativa", "nota": "o flange dá uma volta inteira para cada lado; recomendado pela IA e aceito pela pessoa em 2026-11-23" },
+      "reducao": { "valor": 50, "origem": "estimativa", "nota": "redutor harmônico pequeno da última junta, recomendado pela IA e aceito pela pessoa em 2026-11-23" }
+    }
+  ],
+  "semMotor": "o braço não modela motor nem redutor; a junta sai sem a peça que a aciona até um plano os modelar"
+}

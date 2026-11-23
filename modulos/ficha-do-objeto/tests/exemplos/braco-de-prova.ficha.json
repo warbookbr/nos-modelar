@@ -1,0 +1,302 @@
+{
+  "tipo": "ficha",
+  "versao": "1.1",
+  "objeto": "braco-de-prova",
+  "revisao": 3,
+  "unidades": {
+    "comprimento": "mm",
+    "area": "mm²",
+    "massa": "g",
+    "inercia": "g·mm²",
+    "angulo": "grau",
+    "tensao": "V"
+  },
+  "referencial": {
+    "cima": "+y",
+    "frente": "+z",
+    "origem": "centro da base, no chão",
+    "poseZero": "todas as juntas em 0 grau, com os dois elos em pé"
+  },
+  "malha": {
+    "caminho": "braco-de-prova.glb",
+    "formato": "glb",
+    "caixa": { "valor": { "min": [-90, 0, -90], "max": [54, 440, 90] }, "origem": "medido" },
+    "faces": { "valor": 24816, "origem": "medido" }
+  },
+  "conjuntos": [
+    {
+      "id": "fixo",
+      "movel": false,
+      "massa": { "valor": 903, "origem": "estimativa", "nota": "soma das peças; inclui massas estimadas" },
+      "centroDeMassa": { "valor": [3.0, 68.4, 6.0], "origem": "estimativa", "nota": "média das peças pesada pela massa" },
+      "inercia": { "ausente": true, "motivo": "o conjunto fixo não entra na dinâmica" }
+    },
+    {
+      "id": "elo-1",
+      "movel": true,
+      "massa": { "valor": 375, "origem": "estimativa", "nota": "soma das peças; inclui massas estimadas" },
+      "centroDeMassa": { "valor": [18.3, 288.5, 0], "origem": "estimativa" },
+      "inercia": {
+        "valor": { "ixx": 799800, "iyy": 132300, "izz": 834300, "ixy": 150700, "ixz": 0, "iyz": 0 },
+        "origem": "estimativa"
+      }
+    },
+    {
+      "id": "elo-2",
+      "movel": true,
+      "massa": { "valor": 70, "origem": "estimativa", "nota": "uma peça só, elo-2" },
+      "centroDeMassa": { "valor": [49, 370, 0], "origem": "medido", "nota": "centroide da malha, densidade uniforme" },
+      "inercia": {
+        "valor": { "ixx": 99000, "iyy": 4000, "izz": 97000, "ixy": 0, "ixz": 0, "iyz": 0 },
+        "origem": "estimativa"
+      }
+    }
+  ],
+  "pecas": [
+    {
+      "id": "base",
+      "nome": "Base com torre",
+      "familia": null,
+      "conjunto": "fixo",
+      "posicao": { "valor": [0, 0, 0], "origem": "declarado" },
+      "orientacao": { "valor": { "eixo": [0, 1, 0], "angulo": 0 }, "origem": "declarado" },
+      "massa": { "valor": 420, "origem": "estimativa", "nota": "volume medido de 339 cm³ vezes 1,24 g/cm³ de PLA" },
+      "centroDeMassa": { "valor": [0, 38, 0], "origem": "medido", "nota": "centroide da malha, densidade uniforme" },
+      "inercia": {
+        "valor": { "ixx": 1305500, "iyy": 2268000, "izz": 1305500, "ixy": 0, "ixz": 0, "iyz": 0 },
+        "origem": "estimativa"
+      }
+    },
+    {
+      "id": "motor-ombro",
+      "nome": "Motor de passo do ombro",
+      "familia": "motor-de-passo",
+      "variante": "nema17-40mm",
+      "conjunto": "fixo",
+      "posicao": { "valor": [30, 150, 0], "origem": "declarado" },
+      "orientacao": { "valor": { "eixo": [0, 1, 0], "angulo": 90 }, "origem": "declarado" },
+      "massa": { "valor": 280, "origem": "declarado", "nota": "valor da família de componentes" },
+      "centroDeMassa": { "valor": [0, 0, -20], "origem": "estimativa", "nota": "centro do corpo, densidade uniforme" },
+      "inercia": {
+        "valor": { "ixx": 78500, "iyy": 78500, "izz": 82300, "ixy": 0, "ixz": 0, "iyz": 0 },
+        "origem": "estimativa"
+      }
+    },
+    {
+      "id": "elo-1",
+      "nome": "Elo do ombro ao cotovelo",
+      "familia": null,
+      "conjunto": "elo-1",
+      "posicao": { "valor": [32, 150, 0], "origem": "declarado" },
+      "orientacao": { "valor": { "eixo": [0, 1, 0], "angulo": 0 }, "origem": "declarado" },
+      "massa": { "valor": 95, "origem": "estimativa", "nota": "volume medido de 76,6 cm³ vezes 1,24 g/cm³ de PLA" },
+      "centroDeMassa": { "valor": [5, 75, 0], "origem": "medido", "nota": "centroide da malha, densidade uniforme" },
+      "inercia": {
+        "valor": { "ixx": 205000, "iyy": 9500, "izz": 199000, "ixy": 0, "ixz": 0, "iyz": 0 },
+        "origem": "estimativa"
+      }
+    },
+    {
+      "id": "motor-cotovelo",
+      "nome": "Motor de passo do cotovelo",
+      "familia": "motor-de-passo",
+      "variante": "nema17-40mm",
+      "conjunto": "elo-1",
+      "posicao": { "valor": [32, 310, 0], "origem": "declarado" },
+      "orientacao": { "valor": { "eixo": [0, 1, 0], "angulo": 90 }, "origem": "declarado" },
+      "massa": { "valor": 280, "origem": "declarado", "nota": "valor da família de componentes" },
+      "centroDeMassa": { "valor": [0, 0, -20], "origem": "estimativa", "nota": "centro do corpo, densidade uniforme" },
+      "inercia": {
+        "valor": { "ixx": 78500, "iyy": 78500, "izz": 82300, "ixy": 0, "ixz": 0, "iyz": 0 },
+        "origem": "estimativa"
+      }
+    },
+    {
+      "id": "elo-2",
+      "nome": "Elo do cotovelo à ponta",
+      "familia": null,
+      "conjunto": "elo-2",
+      "posicao": { "valor": [44, 310, 0], "origem": "declarado" },
+      "orientacao": { "valor": { "eixo": [0, 1, 0], "angulo": 0 }, "origem": "declarado" },
+      "massa": { "valor": 70, "origem": "estimativa", "nota": "volume medido de 56,5 cm³ vezes 1,24 g/cm³ de PLA" },
+      "centroDeMassa": { "valor": [5, 60, 0], "origem": "medido", "nota": "centroide da malha, densidade uniforme" },
+      "inercia": {
+        "valor": { "ixx": 99000, "iyy": 4000, "izz": 97000, "ixy": 0, "ixz": 0, "iyz": 0 },
+        "origem": "estimativa"
+      }
+    },
+    {
+      "id": "placa-de-controle",
+      "nome": "Placa de controle",
+      "familia": "placa-de-circuito",
+      "conjunto": "fixo",
+      "posicao": { "valor": [0, 10, -40], "origem": "declarado" },
+      "orientacao": { "valor": { "eixo": [0, 1, 0], "angulo": 0 }, "origem": "declarado" },
+      "massa": { "valor": 22, "origem": "estimativa", "nota": "7000 mm² vezes 1,6 mm de FR-4 a 1,85 g/cm³, mais 1,3 g de componentes" },
+      "centroDeMassa": { "valor": [0, 0.8, 0], "origem": "medido", "nota": "centroide do contorno da placa" },
+      "inercia": {
+        "valor": { "ixx": 9000, "iyy": 27300, "izz": 18300, "ixy": 0, "ixz": 0, "iyz": 0 },
+        "origem": "estimativa"
+      }
+    },
+    {
+      "id": "modulo-microcontrolador",
+      "nome": "Módulo do microcontrolador (3,3 V)",
+      "familia": "modulo-de-placa",
+      "variante": "rp2040",
+      "conjunto": "fixo",
+      "posicao": { "valor": [-22, 20, -40], "origem": "declarado" },
+      "orientacao": { "valor": { "eixo": [0, 1, 0], "angulo": 0 }, "origem": "declarado" },
+      "massa": { "valor": 10, "origem": "declarado", "nota": "valor da família de componentes" },
+      "centroDeMassa": { "valor": [0, 2.5, 0], "origem": "estimativa", "nota": "centro da caixa do módulo" },
+      "inercia": {
+        "valor": { "ixx": 674, "iyy": 2821, "izz": 2188, "ixy": 0, "ixz": 0, "iyz": 0 },
+        "origem": "estimativa"
+      }
+    },
+    {
+      "id": "driver-ombro",
+      "nome": "Driver de passo do ombro",
+      "familia": "modulo-de-placa",
+      "variante": "driver-de-motor-de-passo",
+      "conjunto": "fixo",
+      "posicao": { "valor": [22, 20, -40], "origem": "declarado" },
+      "orientacao": { "valor": { "eixo": [0, 1, 0], "angulo": 0 }, "origem": "declarado" },
+      "massa": { "valor": 4, "origem": "estimativa", "nota": "módulo com dissipador, sem medida" },
+      "centroDeMassa": { "valor": [0, 6.5, 0], "origem": "estimativa", "nota": "centro da caixa do módulo com dissipador" },
+      "inercia": {
+        "valor": { "ixx": 194, "iyy": 214, "izz": 133, "ixy": 0, "ixz": 0, "iyz": 0 },
+        "origem": "estimativa"
+      }
+    },
+    {
+      "id": "driver-cotovelo",
+      "nome": "Driver de passo do cotovelo",
+      "familia": "modulo-de-placa",
+      "variante": "driver-de-motor-de-passo",
+      "conjunto": "fixo",
+      "posicao": { "valor": [42, 20, -40], "origem": "declarado" },
+      "orientacao": { "valor": { "eixo": [0, 1, 0], "angulo": 0 }, "origem": "declarado" },
+      "massa": { "valor": 4, "origem": "estimativa", "nota": "módulo com dissipador, sem medida" },
+      "centroDeMassa": { "valor": [0, 6.5, 0], "origem": "estimativa", "nota": "centro da caixa do módulo com dissipador" },
+      "inercia": {
+        "valor": { "ixx": 194, "iyy": 214, "izz": 133, "ixy": 0, "ixz": 0, "iyz": 0 },
+        "origem": "estimativa"
+      }
+    },
+    {
+      "id": "fonte",
+      "nome": "Fonte chaveada de 12 V",
+      "familia": "fonte-chaveada",
+      "variante": "12v-2a-aberta",
+      "conjunto": "fixo",
+      "posicao": { "valor": [0, 3, 45], "origem": "declarado" },
+      "orientacao": { "valor": { "eixo": [0, 1, 0], "angulo": 0 }, "origem": "declarado" },
+      "massa": { "valor": 160, "origem": "declarado", "nota": "valor da família de componentes" },
+      "centroDeMassa": { "valor": [0, 16.5, 0], "origem": "estimativa", "nota": "centro da caixa da fonte" },
+      "inercia": {
+        "valor": { "ixx": 59373, "iyy": 141187, "izz": 110853, "ixy": 0, "ixz": 0, "iyz": 0 },
+        "origem": "estimativa"
+      }
+    },
+    {
+      "id": "borne-de-entrada",
+      "nome": "Borne de entrada de 12 V na placa",
+      "familia": "borne",
+      "variante": "2-vias-5mm",
+      "conjunto": "fixo",
+      "posicao": { "valor": [-40, 11.6, -70], "origem": "declarado" },
+      "orientacao": { "valor": { "eixo": [0, 1, 0], "angulo": 0 }, "origem": "declarado" },
+      "massa": { "valor": 3, "origem": "declarado", "nota": "valor da família de componentes" },
+      "centroDeMassa": { "valor": [0, 5, 0], "origem": "estimativa", "nota": "centro da caixa do borne" },
+      "inercia": { "ausente": true, "motivo": "a família não declara e a peça é pequena demais para pesar na dinâmica" }
+    }
+  ],
+  "portas": [
+    { "peca": "motor-ombro", "id": "a1", "tipo": "fase-de-motor", "posicao": { "valor": [-3.75, 21, -37], "origem": "declarado" }, "tensao": { "ausente": true, "motivo": "a fase não tem tensão nominal; quem a define é o driver" } },
+    { "peca": "motor-ombro", "id": "a2", "tipo": "fase-de-motor", "posicao": { "valor": [-1.25, 21, -37], "origem": "declarado" }, "tensao": { "ausente": true, "motivo": "a fase não tem tensão nominal; quem a define é o driver" } },
+    { "peca": "motor-ombro", "id": "b1", "tipo": "fase-de-motor", "posicao": { "valor": [1.25, 21, -37], "origem": "declarado" }, "tensao": { "ausente": true, "motivo": "a fase não tem tensão nominal; quem a define é o driver" } },
+    { "peca": "motor-ombro", "id": "b2", "tipo": "fase-de-motor", "posicao": { "valor": [3.75, 21, -37], "origem": "declarado" }, "tensao": { "ausente": true, "motivo": "a fase não tem tensão nominal; quem a define é o driver" } },
+
+    { "peca": "motor-cotovelo", "id": "a1", "tipo": "fase-de-motor", "posicao": { "valor": [-3.75, 21, -37], "origem": "declarado" }, "tensao": { "ausente": true, "motivo": "a fase não tem tensão nominal; quem a define é o driver" } },
+    { "peca": "motor-cotovelo", "id": "a2", "tipo": "fase-de-motor", "posicao": { "valor": [-1.25, 21, -37], "origem": "declarado" }, "tensao": { "ausente": true, "motivo": "a fase não tem tensão nominal; quem a define é o driver" } },
+    { "peca": "motor-cotovelo", "id": "b1", "tipo": "fase-de-motor", "posicao": { "valor": [1.25, 21, -37], "origem": "declarado" }, "tensao": { "ausente": true, "motivo": "a fase não tem tensão nominal; quem a define é o driver" } },
+    { "peca": "motor-cotovelo", "id": "b2", "tipo": "fase-de-motor", "posicao": { "valor": [3.75, 21, -37], "origem": "declarado" }, "tensao": { "ausente": true, "motivo": "a fase não tem tensão nominal; quem a define é o driver" } },
+
+    { "peca": "driver-ombro", "id": "vmot", "tipo": "alimentacao", "posicao": { "valor": [6.35, 0, -8.89], "origem": "declarado" }, "tensao": { "valor": 12, "origem": "declarado" } },
+    { "peca": "driver-ombro", "id": "gnd", "tipo": "terra", "posicao": { "valor": [6.35, 0, -6.35], "origem": "declarado" }, "tensao": { "valor": 0, "origem": "declarado" } },
+    { "peca": "driver-ombro", "id": "2b", "tipo": "fase-de-motor", "posicao": { "valor": [6.35, 0, -3.81], "origem": "declarado" }, "tensao": { "ausente": true, "motivo": "a fase não tem tensão nominal; segue a de vmot" } },
+    { "peca": "driver-ombro", "id": "2a", "tipo": "fase-de-motor", "posicao": { "valor": [6.35, 0, -1.27], "origem": "declarado" }, "tensao": { "ausente": true, "motivo": "a fase não tem tensão nominal; segue a de vmot" } },
+    { "peca": "driver-ombro", "id": "1a", "tipo": "fase-de-motor", "posicao": { "valor": [6.35, 0, 1.27], "origem": "declarado" }, "tensao": { "ausente": true, "motivo": "a fase não tem tensão nominal; segue a de vmot" } },
+    { "peca": "driver-ombro", "id": "1b", "tipo": "fase-de-motor", "posicao": { "valor": [6.35, 0, 3.81], "origem": "declarado" }, "tensao": { "ausente": true, "motivo": "a fase não tem tensão nominal; segue a de vmot" } },
+    { "peca": "driver-ombro", "id": "vdd", "tipo": "alimentacao", "posicao": { "valor": [6.35, 0, 6.35], "origem": "declarado" }, "tensao": { "valor": 3.3, "origem": "declarado" } },
+    { "peca": "driver-ombro", "id": "step", "tipo": "sinal-digital", "posicao": { "valor": [-6.35, 0, 6.35], "origem": "declarado" }, "tensao": { "valor": 3.3, "origem": "declarado" } },
+    { "peca": "driver-ombro", "id": "dir", "tipo": "sinal-digital", "posicao": { "valor": [-6.35, 0, 8.89], "origem": "declarado" }, "tensao": { "valor": 3.3, "origem": "declarado" } },
+
+    { "peca": "driver-cotovelo", "id": "vmot", "tipo": "alimentacao", "posicao": { "valor": [6.35, 0, -8.89], "origem": "declarado" }, "tensao": { "valor": 12, "origem": "declarado" } },
+    { "peca": "driver-cotovelo", "id": "gnd", "tipo": "terra", "posicao": { "valor": [6.35, 0, -6.35], "origem": "declarado" }, "tensao": { "valor": 0, "origem": "declarado" } },
+    { "peca": "driver-cotovelo", "id": "2b", "tipo": "fase-de-motor", "posicao": { "valor": [6.35, 0, -3.81], "origem": "declarado" }, "tensao": { "ausente": true, "motivo": "a fase não tem tensão nominal; segue a de vmot" } },
+    { "peca": "driver-cotovelo", "id": "2a", "tipo": "fase-de-motor", "posicao": { "valor": [6.35, 0, -1.27], "origem": "declarado" }, "tensao": { "ausente": true, "motivo": "a fase não tem tensão nominal; segue a de vmot" } },
+    { "peca": "driver-cotovelo", "id": "1a", "tipo": "fase-de-motor", "posicao": { "valor": [6.35, 0, 1.27], "origem": "declarado" }, "tensao": { "ausente": true, "motivo": "a fase não tem tensão nominal; segue a de vmot" } },
+    { "peca": "driver-cotovelo", "id": "1b", "tipo": "fase-de-motor", "posicao": { "valor": [6.35, 0, 3.81], "origem": "declarado" }, "tensao": { "ausente": true, "motivo": "a fase não tem tensão nominal; segue a de vmot" } },
+    { "peca": "driver-cotovelo", "id": "vdd", "tipo": "alimentacao", "posicao": { "valor": [6.35, 0, 6.35], "origem": "declarado" }, "tensao": { "valor": 3.3, "origem": "declarado" } },
+    { "peca": "driver-cotovelo", "id": "step", "tipo": "sinal-digital", "posicao": { "valor": [-6.35, 0, 6.35], "origem": "declarado" }, "tensao": { "valor": 3.3, "origem": "declarado" } },
+    { "peca": "driver-cotovelo", "id": "dir", "tipo": "sinal-digital", "posicao": { "valor": [-6.35, 0, 8.89], "origem": "declarado" }, "tensao": { "valor": 3.3, "origem": "declarado" } },
+
+    { "peca": "modulo-microcontrolador", "id": "vin", "tipo": "alimentacao", "posicao": { "valor": [-24.1, 0, 12.7], "origem": "declarado" }, "tensao": { "valor": 5, "origem": "declarado" } },
+    { "peca": "modulo-microcontrolador", "id": "gnd", "tipo": "terra", "posicao": { "valor": [-21.6, 0, 12.7], "origem": "declarado" }, "tensao": { "valor": 0, "origem": "declarado" } },
+    { "peca": "modulo-microcontrolador", "id": "3v3", "tipo": "alimentacao", "posicao": { "valor": [-24.1, 0, -12.7], "origem": "declarado" }, "tensao": { "valor": 3.3, "origem": "declarado" } },
+    { "peca": "modulo-microcontrolador", "id": "gpio25", "tipo": "sinal-digital", "posicao": { "valor": [-6.3, 0, -12.7], "origem": "declarado" }, "tensao": { "valor": 3.3, "origem": "declarado" } },
+    { "peca": "modulo-microcontrolador", "id": "gpio26", "tipo": "sinal-digital", "posicao": { "valor": [-3.8, 0, -12.7], "origem": "declarado" }, "tensao": { "valor": 3.3, "origem": "declarado" } },
+    { "peca": "modulo-microcontrolador", "id": "gpio32", "tipo": "sinal-digital", "posicao": { "valor": [-11.4, 0, -12.7], "origem": "declarado" }, "tensao": { "valor": 3.3, "origem": "declarado" } },
+    { "peca": "modulo-microcontrolador", "id": "gpio33", "tipo": "sinal-digital", "posicao": { "valor": [-8.9, 0, -12.7], "origem": "declarado" }, "tensao": { "valor": 3.3, "origem": "declarado" } },
+    { "peca": "modulo-microcontrolador", "id": "gpio34", "tipo": "sinal-analogico", "posicao": { "valor": [-16.5, 0, -12.7], "origem": "declarado" }, "tensao": { "valor": 3.3, "origem": "declarado", "nota": "fundo de escala do ADC" } },
+    { "peca": "modulo-microcontrolador", "id": "gpio15", "tipo": "sinal-digital", "posicao": { "valor": [-1.3, 0, -12.7], "origem": "declarado" }, "tensao": { "valor": 3.3, "origem": "declarado" } },
+    { "peca": "modulo-microcontrolador", "id": "usb", "tipo": "barramento", "posicao": { "valor": [-25.5, 2.5, 0], "origem": "declarado" }, "tensao": { "valor": 5, "origem": "declarado" } },
+
+    { "peca": "fonte", "id": "entrada-rede", "tipo": "alimentacao", "posicao": { "valor": [-38, 12, -22], "origem": "declarado" }, "tensao": { "ausente": true, "motivo": "a receita não declara se a rede é de 127 V ou de 220 V" } },
+    { "peca": "fonte", "id": "saida-positivo", "tipo": "alimentacao", "posicao": { "valor": [38, 12, -22], "origem": "declarado" }, "tensao": { "valor": 12, "origem": "declarado" } },
+    { "peca": "fonte", "id": "saida-negativo", "tipo": "terra", "posicao": { "valor": [38, 12, -12], "origem": "declarado" }, "tensao": { "valor": 0, "origem": "declarado" } },
+
+    { "peca": "borne-de-entrada", "id": "positivo", "tipo": "alimentacao", "posicao": { "valor": [-2.5, 6, 0], "origem": "declarado" }, "tensao": { "valor": 12, "origem": "declarado" } },
+    { "peca": "borne-de-entrada", "id": "negativo", "tipo": "terra", "posicao": { "valor": [2.5, 6, 0], "origem": "declarado" }, "tensao": { "valor": 0, "origem": "declarado" } },
+    { "peca": "placa-de-controle", "id": "r1-1", "tipo": "passivo", "posicao": { "valor": [10, 1.6, 25], "origem": "declarado", "nota": "resistor do LED de estado, soldado na placa e contado na massa dela" }, "tensao": { "ausente": true, "motivo": "terminal passivo; a tensão é a da rede a que ele se liga" } },
+    { "peca": "placa-de-controle", "id": "r1-2", "tipo": "passivo", "posicao": { "valor": [12.5, 1.6, 25], "origem": "declarado" }, "tensao": { "ausente": true, "motivo": "terminal passivo; a tensão é a da rede a que ele se liga" } },
+    { "peca": "placa-de-controle", "id": "d1-anodo", "tipo": "passivo", "posicao": { "valor": [16, 1.6, 25], "origem": "declarado", "nota": "LED de estado, soldado na placa e contado na massa dela" }, "tensao": { "ausente": true, "motivo": "terminal passivo; a tensão é a da rede a que ele se liga" } },
+    { "peca": "placa-de-controle", "id": "d1-catodo", "tipo": "passivo", "posicao": { "valor": [18.5, 1.6, 25], "origem": "declarado" }, "tensao": { "ausente": true, "motivo": "terminal passivo; a tensão é a da rede a que ele se liga" } }
+  ],
+  "juntas": [
+    {
+      "id": "ombro",
+      "tipo": "rotativa",
+      "pai": "base",
+      "filho": "elo-1",
+      "acionadaPor": "motor-ombro",
+      "eixo": { "valor": { "ponto": [32, 150, 0], "direcao": [1, 0, 0] }, "origem": "declarado" },
+      "curso": { "valor": { "min": -90, "max": 90 }, "origem": "declarado" },
+      "reducao": { "valor": 1, "origem": "declarado", "nota": "acionamento direto pelo eixo do motor" }
+    },
+    {
+      "id": "cotovelo",
+      "tipo": "rotativa",
+      "pai": "elo-1",
+      "filho": "elo-2",
+      "acionadaPor": "motor-cotovelo",
+      "eixo": { "valor": { "ponto": [44, 310, 0], "direcao": [1, 0, 0] }, "origem": "declarado" },
+      "curso": { "valor": { "min": -135, "max": 135 }, "origem": "declarado" },
+      "reducao": { "valor": 1, "origem": "declarado", "nota": "acionamento direto pelo eixo do motor" }
+    }
+  ],
+  "volumesLivres": [
+    {
+      "id": "acima-da-placa",
+      "dentroDe": "base",
+      "caixa": { "valor": { "min": [-84, 36, -84], "max": [84, 64, -5] }, "origem": "declarado" }
+    },
+    {
+      "id": "dentro-da-torre",
+      "dentroDe": "base",
+      "caixa": { "valor": { "min": [-27, 72, -27], "max": [27, 125, 27] }, "origem": "declarado" }
+    }
+  ]
+}

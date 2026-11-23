@@ -17,6 +17,8 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import { lerHistorico } from './vitest-duracoes.mjs';
 
 export const TESTES_LENTOS = [
+  /* 2026-11-23: a ficha do braço exportada duas vezes, cada uma resolvendo a montagem inteira; uns 60 s (plano da ponte, fatia 1) */
+  'tools/modelar/exportar-ficha.test.mjs',
   /* 2026-11-22: o ajuste da subdivisão contra o denso de referência, que com a curvatura normal refaz a conta quatro vezes (plano do G2, fatia 2);
      16,7 s sozinho no CI, 14 s dos 16 nas três comparações com o denso */
   'procedural/nucleo/subdivisao.test.mjs',

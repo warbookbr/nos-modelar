@@ -20,7 +20,7 @@ A ficha 1.0 pede mais do que o rascunho previa: as juntas com eixo, curso, redu�
 
 ## Resultado
 
-O Modelar exporta por comando a ficha do braço robótico, igual byte a byte em duas exportações e aceita pela cópia conferida do esquema 1.0 e pelas regras de referência do contrato, e lê um pedido da mecatrônica, escrevendo em cada item a resposta (`cumprido` com a revisão da ficha, ou `nao-cumprido` com o motivo).
+O Modelar exporta por comando a ficha do braço robótico, igual byte a byte em duas exportações e aceita pela cópia conferida do esquema de lá e pelas regras de referência do contrato, e lê um pedido da mecatrônica, escrevendo em cada item a resposta (`cumprido` com a revisão da ficha, ou `nao-cumprido` com o motivo).
 
 ## Filtro Agent-First
 
@@ -42,11 +42,11 @@ Os esquemas são da mecatrônica, e o Modelar só copia e confere a cópia; camp
 
 ## O que precisa mudar no contrato (decisão da pessoa, lá)
 
-Os pinos de componente passivo (resistor, capacitor, LED, cerâmico) não cabem em nenhum tipo de porta da ficha 1.0, que só tem alimentação, terra, sinal digital, sinal analógico, barramento e fase de motor. Sem eles na ficha, o conferidor de lá recusaria a lista de ligações das trilhas, que os cita. A proposta é um tipo `passivo` na versão 1.1, junto com o item `ligacoes` que o plano das trilhas já propôs, num envio só de lá. Até a 1.1 sair, a ficha daqui leva só as portas que cabem na 1.0 e diz no relatório quantas ficaram de fora.
+Os pinos de componente passivo (resistor, capacitor, LED, cerâmico) não cabiam em nenhum tipo de porta da ficha 1.0, e o pedido 1.0 não tinha onde levar a lista de redes das trilhas. A pessoa aprovou em 2026-11-23 o plano da versão 1.1 lá, com o tipo de porta `passivo` e o item `ligacoes`, e a 1.1 entrou na main da mecatrônica no mesmo dia, aceitando também arquivo 1.0. A fatia 1 copiou a 1.1.
 
 ## Incluído
 
-- a cópia dos esquemas 1.0 com o SHA-256 conferido, e o validador (esquema e referências);
+- a cópia dos esquemas da última versão de lá (1.1) com o SHA-256 conferido, e o validador (esquema e referências);
 - o comando `exportar-ficha` e a ficha do braço: a malha glTF, os conjuntos e as peças (as instâncias da montagem e os componentes da placa, com família e variante), a posição e a orientação em eixo e ângulo no referencial da montagem, as juntas com o eixo medido no anel, as portas, e `volumesLivres` vazio;
 - a tabela das portas elétricas por encapsulamento na família de componentes;
 - a massa, o centro de massa e a inércia por peça e por conjunto onde houver densidade, como estimativa;
@@ -62,7 +62,7 @@ Os pinos de componente passivo (resistor, capacitor, LED, cerâmico) não cabem 
 
 ## Gate de saída
 
-1. A cópia dos esquemas confere com o SHA-256 da versão 1.0 de lá, e um teste falha se um byte mudar.
+1. A cópia dos esquemas confere com o SHA-256 da última versão de lá, e um teste falha se um byte mudar.
 2. A ficha do braço exportada duas vezes sai igual byte a byte e passa no esquema e nas regras de referência; uma ficha com campo ausente, versão desconhecida ou porta de peça inexistente é recusada com o caminho do campo e a versão.
 3. A ficha do braço passa também no `ponte:conferir` de lá, rodado sobre uma cópia local do outro repositório, e o relatório diz quantas portas ficaram de fora por falta de tipo.
 4. O pedido de prova é lido e respondido item a item, com o motivo de cada não cumprido e o identificador de cada recusado.
@@ -71,7 +71,7 @@ Os pinos de componente passivo (resistor, capacitor, LED, cerâmico) não cabem 
 
 ## Fatias
 
-1. A cópia dos esquemas com o SHA-256 e o validador; a declaração da ponte do braço (conjuntos e juntas, com o curso e a redução recomendados pela IA e marcados como estimativa); a ficha mínima (malha, conjuntos, peças, juntas com o eixo medido, portas vazias, massa ausente) e o teste de reprodução.
+1. Feita em 2026-11-23. A cópia dos esquemas 1.1 com o SHA-256 e o validador (`modulos/ficha-do-objeto/`); a declaração da ponte do braço (`procedural/pecas/braco-robotico/ponte.json`, sete conjuntos e seis juntas, com o curso e a redução recomendados pela IA e marcados como estimativa); a ficha mínima por `npm run exportar:ficha -- braco-robotico` (malha com um nó por peça, 12 peças, juntas com o eixo medido na porta do anel, portas vazias, massa ausente com o motivo), igual em duas exportações, aceita pela cópia do esquema e pelo `ponte:conferir` da mecatrônica na 1.1, que também a converteu para o MuJoCo.
 2. As portas elétricas: a tabela por encapsulamento, as portas dos componentes da placa na ficha pela pose dela, e o texto da proposta do tipo `passivo`.
 3. A massa, o centro de massa e a inércia, com as densidades declaradas pela pessoa.
 4. O leitor e o conferidor do pedido, com o pedido de prova.
@@ -79,7 +79,7 @@ Os pinos de componente passivo (resistor, capacitor, LED, cerâmico) não cabem 
 
 ## Riscos e parada
 
-Se algum campo obrigatório da ficha só puder sair conhecendo a simulação, o plano para e a pergunta volta à decisão 0001 de lá. Se o exportador glTF não der um nó por peça com o identificador da ficha, o plano para antes de mudar o exportador, que é de outro módulo. Se a mecatrônica não publicar a 1.1, o plano fecha com as portas que cabem na 1.0 e deixa o tipo `passivo` no relatório, sem inventar campo fora do contrato.
+Se algum campo obrigatório da ficha só puder sair conhecendo a simulação, o plano para e a pergunta volta à decisão 0001 de lá. Se o exportador glTF não der um nó por peça com o identificador da ficha, o plano para antes de mudar o exportador, que é de outro módulo. 
 
 ## Fechamento
 

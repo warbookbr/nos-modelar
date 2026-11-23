@@ -1,0 +1,291 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ponte/esquemas/ficha.schema.json",
+  "title": "Ficha do objeto, versão 1.1",
+  "description": "A ficha que o Modelar exporta e a Mecatrônica lê. Unidades fixas (mm, mm², g, g·mm², grau, V); posição de peça e eixo de junta no referencial da montagem, na pose zero; posição de porta, centro de massa e inércia de peça no referencial da peça. Todo valor numérico vem com a origem, e campo ausente se escreve como ausente com o motivo. A porta passiva, desde a 1.1, é o terminal de componente sem papel elétrico fixo (resistor, capacitor, LED, cristal) e tem a tensão ausente; um arquivo 1.0 não a usa.",
+  "$comment": "Regra de versão: campo novo opcional sobe a versão menor e acrescenta a nova à lista de versao; campo novo obrigatório ou campo mudado sobe a maior, e a versão anterior continua conferida pelo esquema dela. As referências entre campos (porta que cita peça, junta que cita peças, massa do conjunto igual à soma das peças) ficam fora do JSON Schema e são conferidas por tools/ponte/conferir.mjs.",
+  "type": "object",
+  "required": ["tipo", "versao", "objeto", "revisao", "unidades", "referencial", "malha", "conjuntos", "pecas", "portas", "juntas", "volumesLivres"],
+  "additionalProperties": false,
+  "if": { "required": ["versao"], "properties": { "versao": { "const": "1.0" } } },
+  "then": { "properties": { "portas": { "items": { "properties": { "tipo": { "enum": ["alimentacao", "terra", "sinal-digital", "sinal-analogico", "barramento", "fase-de-motor"] } } } } } },
+  "properties": {
+    "tipo": { "const": "ficha" },
+    "versao": { "enum": ["1.0", "1.1"] },
+    "objeto": { "$ref": "#/$defs/id" },
+    "revisao": { "type": "integer", "minimum": 1 },
+    "unidades": {
+      "type": "object",
+      "required": ["comprimento", "area", "massa", "inercia", "angulo", "tensao"],
+      "additionalProperties": false,
+      "properties": {
+        "comprimento": { "const": "mm" },
+        "area": { "const": "mm²" },
+        "massa": { "const": "g" },
+        "inercia": { "const": "g·mm²" },
+        "angulo": { "const": "grau" },
+        "tensao": { "const": "V" }
+      }
+    },
+    "referencial": {
+      "type": "object",
+      "required": ["cima", "frente", "origem", "poseZero"],
+      "additionalProperties": false,
+      "properties": {
+        "cima": { "const": "+y" },
+        "frente": { "enum": ["+z", "-z", "+x", "-x"] },
+        "origem": { "$ref": "#/$defs/texto" },
+        "poseZero": { "$ref": "#/$defs/texto" }
+      }
+    },
+    "malha": {
+      "type": "object",
+      "required": ["caminho", "formato", "caixa", "faces"],
+      "additionalProperties": false,
+      "properties": {
+        "caminho": { "$ref": "#/$defs/texto" },
+        "formato": { "const": "glb" },
+        "caixa": { "$ref": "#/$defs/medidaCaixa" },
+        "faces": { "$ref": "#/$defs/medidaContagem" }
+      }
+    },
+    "conjuntos": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "movel", "massa", "centroDeMassa", "inercia"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "movel": { "type": "boolean" },
+          "massa": { "$ref": "#/$defs/medidaMassa" },
+          "centroDeMassa": { "$ref": "#/$defs/medidaVetor" },
+          "inercia": { "$ref": "#/$defs/medidaInercia" }
+        }
+      }
+    },
+    "pecas": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "nome", "familia", "conjunto", "posicao", "orientacao", "massa", "centroDeMassa", "inercia"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "nome": { "$ref": "#/$defs/texto" },
+          "familia": { "$ref": "#/$defs/idOuNulo" },
+          "variante": { "$ref": "#/$defs/id" },
+          "conjunto": { "$ref": "#/$defs/id" },
+          "posicao": { "$ref": "#/$defs/medidaVetor" },
+          "orientacao": { "$ref": "#/$defs/medidaOrientacao" },
+          "massa": { "$ref": "#/$defs/medidaMassa" },
+          "centroDeMassa": { "$ref": "#/$defs/medidaVetor" },
+          "inercia": { "$ref": "#/$defs/medidaInercia" }
+        }
+      }
+    },
+    "portas": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["peca", "id", "tipo", "posicao", "tensao"],
+        "additionalProperties": false,
+        "properties": {
+          "peca": { "$ref": "#/$defs/id" },
+          "id": { "$ref": "#/$defs/id" },
+          "tipo": { "enum": ["alimentacao", "terra", "sinal-digital", "sinal-analogico", "barramento", "fase-de-motor", "passivo"] },
+          "posicao": { "$ref": "#/$defs/medidaVetor" },
+          "tensao": { "$ref": "#/$defs/medidaNumero" }
+        },
+        "if": { "required": ["tipo"], "properties": { "tipo": { "const": "passivo" } } },
+        "then": { "properties": { "tensao": { "$ref": "#/$defs/ausente" } } }
+      }
+    },
+    "juntas": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "tipo", "pai", "filho", "acionadaPor", "eixo", "curso", "reducao"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "tipo": { "enum": ["rotativa"] },
+          "pai": { "$ref": "#/$defs/id" },
+          "filho": { "$ref": "#/$defs/id" },
+          "acionadaPor": { "$ref": "#/$defs/idOuNulo" },
+          "eixo": { "$ref": "#/$defs/medidaEixo" },
+          "curso": { "$ref": "#/$defs/medidaFaixa" },
+          "reducao": { "$ref": "#/$defs/medidaPositiva" }
+        }
+      }
+    },
+    "volumesLivres": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "dentroDe", "caixa"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "$ref": "#/$defs/id" },
+          "dentroDe": { "$ref": "#/$defs/id" },
+          "caixa": { "$ref": "#/$defs/medidaCaixa" }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+    "idOuNulo": { "type": ["string", "null"], "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+    "texto": { "type": "string", "minLength": 1 },
+    "origem": { "enum": ["medido", "declarado", "estimativa"] },
+    "vetor": { "type": "array", "minItems": 3, "maxItems": 3, "items": { "type": "number" } },
+    "caixa": {
+      "type": "object",
+      "required": ["min", "max"],
+      "additionalProperties": false,
+      "properties": { "min": { "$ref": "#/$defs/vetor" }, "max": { "$ref": "#/$defs/vetor" } }
+    },
+    "ausente": {
+      "type": "object",
+      "required": ["ausente", "motivo"],
+      "additionalProperties": false,
+      "properties": { "ausente": { "const": true }, "motivo": { "$ref": "#/$defs/texto" } }
+    },
+    "medidaNumero": {
+      "if": { "required": ["ausente"] },
+      "then": { "$ref": "#/$defs/ausente" },
+      "else": {
+        "type": "object",
+        "required": ["valor", "origem"],
+        "additionalProperties": false,
+        "properties": { "valor": { "type": "number" }, "origem": { "$ref": "#/$defs/origem" }, "nota": { "$ref": "#/$defs/texto" } }
+      }
+    },
+    "medidaPositiva": {
+      "if": { "required": ["ausente"] },
+      "then": { "$ref": "#/$defs/ausente" },
+      "else": {
+        "type": "object",
+        "required": ["valor", "origem"],
+        "additionalProperties": false,
+        "properties": { "valor": { "type": "number", "exclusiveMinimum": 0 }, "origem": { "$ref": "#/$defs/origem" }, "nota": { "$ref": "#/$defs/texto" } }
+      }
+    },
+    "medidaMassa": { "$ref": "#/$defs/medidaPositiva" },
+    "medidaContagem": {
+      "if": { "required": ["ausente"] },
+      "then": { "$ref": "#/$defs/ausente" },
+      "else": {
+        "type": "object",
+        "required": ["valor", "origem"],
+        "additionalProperties": false,
+        "properties": { "valor": { "type": "integer", "minimum": 0 }, "origem": { "$ref": "#/$defs/origem" }, "nota": { "$ref": "#/$defs/texto" } }
+      }
+    },
+    "medidaVetor": {
+      "if": { "required": ["ausente"] },
+      "then": { "$ref": "#/$defs/ausente" },
+      "else": {
+        "type": "object",
+        "required": ["valor", "origem"],
+        "additionalProperties": false,
+        "properties": { "valor": { "$ref": "#/$defs/vetor" }, "origem": { "$ref": "#/$defs/origem" }, "nota": { "$ref": "#/$defs/texto" } }
+      }
+    },
+    "medidaCaixa": {
+      "if": { "required": ["ausente"] },
+      "then": { "$ref": "#/$defs/ausente" },
+      "else": {
+        "type": "object",
+        "required": ["valor", "origem"],
+        "additionalProperties": false,
+        "properties": { "valor": { "$ref": "#/$defs/caixa" }, "origem": { "$ref": "#/$defs/origem" }, "nota": { "$ref": "#/$defs/texto" } }
+      }
+    },
+    "medidaOrientacao": {
+      "if": { "required": ["ausente"] },
+      "then": { "$ref": "#/$defs/ausente" },
+      "else": {
+        "type": "object",
+        "required": ["valor", "origem"],
+        "additionalProperties": false,
+        "properties": {
+          "valor": {
+            "type": "object",
+            "required": ["eixo", "angulo"],
+            "additionalProperties": false,
+            "properties": { "eixo": { "$ref": "#/$defs/vetor" }, "angulo": { "type": "number" } }
+          },
+          "origem": { "$ref": "#/$defs/origem" },
+          "nota": { "$ref": "#/$defs/texto" }
+        }
+      }
+    },
+    "medidaInercia": {
+      "if": { "required": ["ausente"] },
+      "then": { "$ref": "#/$defs/ausente" },
+      "else": {
+        "type": "object",
+        "required": ["valor", "origem"],
+        "additionalProperties": false,
+        "properties": {
+          "valor": {
+            "type": "object",
+            "required": ["ixx", "iyy", "izz", "ixy", "ixz", "iyz"],
+            "additionalProperties": false,
+            "properties": {
+              "ixx": { "type": "number", "exclusiveMinimum": 0 },
+              "iyy": { "type": "number", "exclusiveMinimum": 0 },
+              "izz": { "type": "number", "exclusiveMinimum": 0 },
+              "ixy": { "type": "number" },
+              "ixz": { "type": "number" },
+              "iyz": { "type": "number" }
+            }
+          },
+          "origem": { "$ref": "#/$defs/origem" },
+          "nota": { "$ref": "#/$defs/texto" }
+        }
+      }
+    },
+    "medidaEixo": {
+      "if": { "required": ["ausente"] },
+      "then": { "$ref": "#/$defs/ausente" },
+      "else": {
+        "type": "object",
+        "required": ["valor", "origem"],
+        "additionalProperties": false,
+        "properties": {
+          "valor": {
+            "type": "object",
+            "required": ["ponto", "direcao"],
+            "additionalProperties": false,
+            "properties": { "ponto": { "$ref": "#/$defs/vetor" }, "direcao": { "$ref": "#/$defs/vetor" } }
+          },
+          "origem": { "$ref": "#/$defs/origem" },
+          "nota": { "$ref": "#/$defs/texto" }
+        }
+      }
+    },
+    "medidaFaixa": {
+      "if": { "required": ["ausente"] },
+      "then": { "$ref": "#/$defs/ausente" },
+      "else": {
+        "type": "object",
+        "required": ["valor", "origem"],
+        "additionalProperties": false,
+        "properties": {
+          "valor": {
+            "type": "object",
+            "required": ["min", "max"],
+            "additionalProperties": false,
+            "properties": { "min": { "type": "number" }, "max": { "type": "number" } }
+          },
+          "origem": { "$ref": "#/$defs/origem" },
+          "nota": { "$ref": "#/$defs/texto" }
+        }
+      }
+    }
+  }
+}

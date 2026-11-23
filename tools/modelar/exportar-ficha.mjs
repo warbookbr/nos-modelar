@@ -1,0 +1,107 @@
+/* exportar-ficha.mjs — CLI que exporta a ficha de um objeto montado para a ponte com o nos-mecatronica: a malha em .glb, com um
+   nó por instância no identificador da ficha, e a ficha em JSON (esquema 1.1), conferida pela cópia do esquema antes de gravar.
+   Uso: npm run exportar:ficha -- <objeto> [--ponte=<arquivo>] [--saida=<pasta>] */
+import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
+import { dirname, isAbsolute, relative, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { exportarMontagemGltf } from '../../modulos/exportador-gltf/src/index.js';
+import { portasPublicadas } from '../../src/autoria/descrever-partes.js';
+import { conferirDocumento, idDaFicha, montarFicha, textoDosErros } from '../../modulos/ficha-do-objeto/src/index.js';
+import { REPO, instanciasDaMontagem, resolverMontagemDeArquivo } from './exportar-gltf.mjs';
+
+const USO = 'Uso: npm run exportar:ficha -- <objeto> [--ponte=<arquivo>] [--saida=<pasta>]\n'
+  + '  <objeto>            o objeto montado: a pasta de procedural/pecas/<objeto> com montagem.json e ponte.json\n'
+  + '  --ponte=<arquivo>   a declaração da ponte (padrão: procedural/pecas/<objeto>/ponte.json)\n'
+  + '  --saida=<pasta>     onde gravar <objeto>.glb e <objeto>.ficha.json (padrão: exportacoes/ficha/<objeto>/)\n';
+
+export function parseArgs(args = process.argv.slice(2)) {
+  const opcoes = { objeto: null, ponte: null, saida: null, ajuda: false };
+  for (let i = 0; i < args.length; i += 1) {
+    const arg = args[i];
+    const [nome, valor] = arg.includes('=') ? [arg.slice(0, arg.indexOf('=')), arg.slice(arg.indexOf('=') + 1)] : [arg, undefined];
+    if (nome === '--ajuda' || nome === '--help') opcoes.ajuda = true;
+    else if (nome === '--ponte' || nome === '--saida') {
+      const v = valor ?? args[i + 1];
+      if (v === undefined || v.startsWith('--')) throw new Error(`${nome} pede um valor.\n${USO}`);
+      if (valor === undefined) i += 1;
+      opcoes[nome.slice(2)] = v;
+    } else if (arg.startsWith('--')) throw new Error(`opção desconhecida '${arg}'.\n${USO}`);
+    else if (!opcoes.objeto) opcoes.objeto = arg;
+    else throw new Error(`argumento a mais '${arg}'.\n${USO}`);
+  }
+  return opcoes;
+}
+
+const absoluto = (p) => (isAbsolute(p) ? resolve(p) : resolve(process.cwd(), p));
+const gravar = (caminho, conteudo) => { writeFileSync(`${caminho}.tmp`, conteudo); renameSync(`${caminho}.tmp`, caminho); };
+
+/** Exporta a ficha e a malha do objeto. Devolve `{ ficha, caminhoFicha, caminhoMalha }`; recusa a ficha que a cópia do esquema recusa. */
+export async function exportarFicha({ objeto, ponte = null, saida = null }) {
+  if (!objeto) throw new Error(`Informe o objeto.\n${USO}`);
+  const pasta = resolve(REPO, 'procedural/pecas', objeto);
+  const caminhoMontagem = resolve(pasta, 'montagem.json');
+  if (!existsSync(caminhoMontagem)) throw new Error(`o objeto '${objeto}' não tem montagem.json em ${relative(REPO, pasta)}; a ficha sai de um objeto montado.`);
+  const caminhoPonte = ponte ? absoluto(ponte) : resolve(pasta, 'ponte.json');
+  if (!existsSync(caminhoPonte)) throw new Error(`falta a declaração da ponte em ${relative(REPO, caminhoPonte)}: os conjuntos e as juntas do objeto (veja modulos/ficha-do-objeto/README.md).`);
+  const declaracao = JSON.parse(readFileSync(caminhoPonte, 'utf8'));
+  const destino = saida ? absoluto(saida) : resolve(REPO, 'exportacoes/ficha', objeto);
+
+  const resolvida = await resolverMontagemDeArquivo(caminhoMontagem);
+  const instancias = instanciasDaMontagem(resolvida);
+  const porNome = new Map();
+  const percorrer = (m) => { for (const i of m.instancias) { if (i.alvo.tipo === 'montagem') percorrer(i.montagem); else porNome.set(i.caminho.join('/'), i); } };
+  percorrer(resolvida);
+
+  /* a malha: um nó por instância, com o identificador da ficha */
+  const nomeDaMalha = `${objeto}.glb`;
+  const { bytes, diagnostico } = exportarMontagemGltf({ nome: resolvida.id, instancias: instancias.map((i) => ({ ...i, nome: idDaFicha(i.nome) })) });
+  const min = [Infinity, Infinity, Infinity]; const max = [-Infinity, -Infinity, -Infinity];
+  for (const inst of instancias) {
+    const { rotacao, deslocamento } = inst.pose;
+    const vs = inst.neutro.V instanceof Map ? inst.neutro.V.values() : Object.values(inst.neutro.V);
+    for (const p of vs) {
+      for (let k = 0; k < 3; k += 1) {
+        const x = (rotacao[k][0] * p[0] + rotacao[k][1] * p[1] + rotacao[k][2] * p[2] + deslocamento[k]) * 1000;
+        if (x < min[k]) min[k] = x; if (x > max[k]) max[k] = x;
+      }
+    }
+  }
+
+  const ficha = montarFicha({
+    declaracao,
+    instancias: instancias.map((i) => ({
+      id: i.nome,
+      ref: porNome.get(i.nome).alvo.ref,
+      pose: i.pose,
+      portas: portasPublicadas(porNome.get(i.nome).definicao.neutro).map((p) => ({ id: p.id, interface: p.interface })),
+    })),
+    malha: { caminho: nomeDaMalha, caixa: { min, max }, faces: diagnostico.triangulos },
+  });
+  const conferida = conferirDocumento(ficha);
+  if (conferida.erros.length) throw new Error(`a ficha montada não passa na cópia do esquema:\n${textoDosErros(conferida)}`);
+
+  mkdirSync(destino, { recursive: true });
+  const caminhoMalha = resolve(destino, nomeDaMalha);
+  const caminhoFicha = resolve(destino, `${objeto}.ficha.json`);
+  gravar(caminhoMalha, bytes);
+  gravar(caminhoFicha, `${JSON.stringify(ficha, null, 2)}\n`);
+  return { ficha, caminhoFicha, caminhoMalha };
+}
+
+async function main() {
+  try {
+    const opcoes = parseArgs();
+    if (opcoes.ajuda || !opcoes.objeto) { process.stdout.write(USO); process.exit(opcoes.ajuda ? 0 : 1); }
+    const { ficha, caminhoFicha, caminhoMalha } = await exportarFicha(opcoes);
+    const ausentes = JSON.stringify(ficha).match(/"ausente":true/g)?.length ?? 0;
+    process.stdout.write(`Ficha ${ficha.objeto} revisão ${ficha.revisao} (esquema ${ficha.versao}), conferida pela cópia do esquema.\n`);
+    process.stdout.write(`Ficha:   ${relative(REPO, caminhoFicha)}\nMalha:   ${relative(REPO, caminhoMalha)} (${ficha.malha.faces.valor} triângulos)\n`);
+    process.stdout.write(`Peças ${ficha.pecas.length}, conjuntos ${ficha.conjuntos.length}, juntas ${ficha.juntas.length}, portas ${ficha.portas.length}; ${ausentes} valor(es) ausente(s), com o motivo.\n`);
+  } catch (err) {
+    process.stderr.write(`Erro: ${err.message}\n`);
+    process.exit(1);
+  }
+}
+
+const executadoDireto = process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1]);
+if (executadoDireto) main();

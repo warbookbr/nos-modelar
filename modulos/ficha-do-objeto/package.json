@@ -1,0 +1,7 @@
+{
+  "private": true,
+  "description": "A ficha do objeto para a ponte com o nos-mecatronica: a exportação, a cópia conferida dos esquemas e o conferidor.",
+  "name": "@modelar/ficha-do-objeto",
+  "version": "1.0.0",
+  "type": "module"
+}
