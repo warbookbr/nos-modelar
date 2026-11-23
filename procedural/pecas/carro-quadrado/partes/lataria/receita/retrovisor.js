@@ -43,12 +43,12 @@ export function passosRetrovisores(proxId) {
   /* 2. Pedestal articulado curto e encorpado (4 anéis elípticos suaves de x = 754 até x = 808) */
   emitirPar((id) => {
     const N = 16;
-    /* estações [x, yCentro, zCentro, ry, rz] em mm */
+    /* estações [x, yCentro, zCentro, ry, rz] em mm — alinhadas coaxialmente entre a base triangular e o centro da concha */
     const est = [
-      [750, 996, 578, 28, 32],
-      [768, 1002, 572, 24, 28],
-      [788, 1008, 562, 22, 26],
-      [808, 1012, 554, 24, 28],
+      [750, 998, 574, 28, 32],
+      [768, 1001, 570, 24, 28],
+      [788, 1003, 566, 22, 26],
+      [808, 1004, 564, 24, 28],
     ];
     const verts = [];
     for (const [x, yc, zc, ry, rz] of est) {
@@ -79,8 +79,8 @@ export function passosRetrovisores(proxId) {
   const xMin = 796; const xMax = 938;
   const xMid = (xMin + xMax) / 2; const rxBase = (xMax - xMin) / 2; // 71 mm -> 142 mm largura
   const zBoca = (u) => 532 - 36 * ((u + 1) / 2); // varredura ~15° voltada ao motorista (532 interno -> 496 externo)
-  const yCentro = (u) => 1019 + 2 * ((u + 1) / 2);
-  const ryLocal = (u) => 47 - 4 * ((u + 1) / 2); // altura 94 mm interno -> 86 mm na ponta externa
+  const yCentro = (u) => 1004 + 1 * ((u + 1) / 2); // base da concha em y = 958 alinhada à base triangular (y = 956)
+  const ryLocal = (u) => 46 - 4 * ((u + 1) / 2); // altura 92 mm interno -> 84 mm na ponta externa
   const profLocal = (u) => 74 - 24 * ((u + 1) / 2); // gota aerodinâmica: 74 mm interno -> 50 mm na ponta externa
 
   emitirPar((id) => {
