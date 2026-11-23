@@ -53,6 +53,25 @@ describe('montarFicha', () => {
   });
 });
 
+describe('componentes carregados por uma instância', () => {
+  const componentes = [{ id: 'r1', instancia: 'bracoLongo2', familia: 'componente-eletronico', variante: 'resistor-1-4w', posicao: [10, 0, 0], orientacao: { eixo: [0, 1, 0], angulo: 90 } }];
+  const portasEletricas = [{ peca: 'r1', id: '1', tipo: 'passivo', posicao: { valor: [-5, 0, 0], origem: 'medido' }, tensao: { ausente: true, motivo: 'passivo' } }];
+
+  it('entram como peças no conjunto da instância, com a pose composta, e as portas passam no esquema', () => {
+    const f = montarFicha({ declaracao, instancias, malha, componentes, portasEletricas });
+    expect(conferirDocumento(f).erros).toEqual([]);
+    const r1 = f.pecas.find((p) => p.id === 'r1');
+    expect(r1).toMatchObject({ conjunto: 'giro', familia: 'componente-eletronico', variante: 'resistor-1-4w' });
+    /* 10 mm em x da instância, que está girada um quarto de volta em y: vai a -10 em z, somado ao deslocamento dela */
+    expect(r1.posicao.valor).toEqual([0, 100, 10]);
+    expect(r1.orientacao.valor).toEqual({ eixo: [0, 1, 0], angulo: 180 });
+  });
+
+  it('recusa o componente com o identificador de outra peça', () => {
+    expect(() => montarFicha({ declaracao, instancias, malha, componentes: [{ ...componentes[0], id: 'pe' }] })).toThrow(/já é de outra peça/);
+  });
+});
+
 describe('eixoEAngulo', () => {
   it('reconstrói a rotação pela fórmula de Rodrigues, inclusive meia volta e identidade', () => {
     const matrizes = [quarto, [[1, 0, 0], [0, -1, 0], [0, 0, -1]], [[1, 0, 0], [0, 1, 0], [0, 0, 1]], [[0, -1, 0], [1, 0, 0], [0, 0, 1]]];

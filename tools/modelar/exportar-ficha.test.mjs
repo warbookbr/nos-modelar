@@ -7,6 +7,7 @@ import { join } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
 import { lerGlb } from '../../modulos/exportador-gltf/src/index.js';
 import { conferirDocumento } from '../../modulos/ficha-do-objeto/src/index.js';
+import pedidoDaPlaca from '../../procedural/pecas/braco-robotico/partes/base/placa.pedido.json' with { type: 'json' };
 import { exportarFicha, parseArgs } from './exportar-ficha.mjs';
 
 const pasta = mkdtempSync(join(tmpdir(), 'ficha-braco-'));
@@ -19,14 +20,21 @@ describe('exportar:ficha', () => {
     expect(() => parseArgs(['--outra'])).toThrow(/opção desconhecida/);
   });
 
-  it('a ficha do braço sai igual em duas exportações, passa no esquema e a malha tem um nó por peça', async () => {
+  it('a ficha do braço sai igual em duas exportações, passa no esquema, e a malha tem um nó por peça e as portas da placa fecham o pedido de ligações', async () => {
     const a = await exportarFicha({ objeto: 'braco-robotico', saida: join(pasta, 'a') });
     const b = await exportarFicha({ objeto: 'braco-robotico', saida: join(pasta, 'b') });
     expect(readFileSync(a.caminhoFicha).equals(readFileSync(b.caminhoFicha))).toBe(true);
     expect(readFileSync(a.caminhoMalha).equals(readFileSync(b.caminhoMalha))).toBe(true);
     const ficha = JSON.parse(readFileSync(a.caminhoFicha, 'utf8'));
     expect(conferirDocumento(ficha).erros).toEqual([]);
-    expect(ficha.pecas).toHaveLength(12);
+    /* as 12 instâncias e as 27 peças da placa de controle (a placa e os componentes), no conjunto da base */
+    expect(ficha.pecas).toHaveLength(39);
+    expect(ficha.pecas.filter((p) => p.familia === 'componente-eletronico').every((p) => p.conjunto === 'base')).toBe(true);
+    expect(a.semTipo).toHaveLength(22);
+    expect(ficha.portas.filter((p) => p.peca === 'a1').map((p) => p.tipo)).toContain('fase-de-motor');
+    expect(ficha.portas.find((p) => p.peca === 'r1')).toMatchObject({ tipo: 'passivo', tensao: { ausente: true } });
+    /* o pedido de ligações da placa (47 redes) cita só portas que a ficha tem */
+    expect(conferirDocumento(pedidoDaPlaca, { ficha }).erros).toEqual([]);
     expect(ficha.juntas.map((j) => j.id)).toEqual(['cintura', 'ombro', 'cotovelo', 'punho-4', 'punho-5', 'punho-6']);
     expect(ficha.juntas[0].eixo.valor).toEqual({ ponto: [0, 220, 0], direcao: [0, 1, 0] });
     const { json } = lerGlb(readFileSync(a.caminhoMalha));

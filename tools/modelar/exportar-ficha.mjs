@@ -3,11 +3,13 @@
    Uso: npm run exportar:ficha -- <objeto> [--ponte=<arquivo>] [--saida=<pasta>] */
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from 'node:fs';
 import { dirname, isAbsolute, relative, resolve } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { exportarMontagemGltf } from '../../modulos/exportador-gltf/src/index.js';
 import { portasPublicadas } from '../../src/autoria/descrever-partes.js';
 import { conferirDocumento, idDaFicha, montarFicha, textoDosErros } from '../../modulos/ficha-do-objeto/src/index.js';
+import { portasDoComponente } from '../../procedural/familias/componente-eletronico/portas-eletricas.js';
 import { REPO, instanciasDaMontagem, resolverMontagemDeArquivo } from './exportar-gltf.mjs';
+import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 
 const USO = 'Uso: npm run exportar:ficha -- <objeto> [--ponte=<arquivo>] [--saida=<pasta>]\n'
   + '  <objeto>            o objeto montado: a pasta de procedural/pecas/<objeto> com montagem.json e ponte.json\n'
@@ -35,7 +37,52 @@ export function parseArgs(args = process.argv.slice(2)) {
 const absoluto = (p) => (isAbsolute(p) ? resolve(p) : resolve(process.cwd(), p));
 const gravar = (caminho, conteudo) => { writeFileSync(`${caminho}.tmp`, conteudo); renameSync(`${caminho}.tmp`, caminho); };
 
-/** Exporta a ficha e a malha do objeto. Devolve `{ ficha, caminhoFicha, caminhoMalha }`; recusa a ficha que a cópia do esquema recusa. */
+/* As placas declaradas que a ponte do objeto cita (`placas: [{ instancia, exportacao, portas }]`): a função `exportacao` da receita
+   da instância devolve a placa gerada (`{ pecas }`, como `placaDeclarada`); cada peça dela vira um componente da ficha, e as
+   portas elétricas saem da tabela da família com os blocos declarados em `portas`. */
+async function placasDaPonte(declaracao, porNome) {
+  const componentes = []; const portas = []; const semTipo = []; const partes = new Map();
+  for (const [k, pl] of (declaracao.placas ?? []).entries()) {
+    const inst = porNome.get(pl.instancia);
+    if (!inst) throw new Error(`ponte.json: placas[${k}].instancia é '${pl.instancia}', que a montagem não tem.`);
+    const modulo = await import(pathToFileURL(resolverCaminhoReceita(inst.alvo.ref, { raiz: REPO })).href);
+    if (typeof modulo[pl.exportacao] !== 'function') throw new Error(`ponte.json: placas[${k}].exportacao '${pl.exportacao}' não é função exportada pela receita '${inst.alvo.ref}'.`);
+    const { pecas } = modulo[pl.exportacao]();
+    const F = inst.definicao.neutro.F;
+    const nomesDasPartes = new Set([...(F instanceof Map ? F.values() : Object.values(F))].map((f) => f.parte));
+    const declaradas = { ...(pl.portas ?? {}) };
+    for (const p of pecas) {
+      if (!nomesDasPartes.has(p.id)) throw new Error(`a placa de '${pl.instancia}' tem a peça '${p.id}', que a malha da instância não tem como parte; a receita e a montagem divergem.`);
+      componentes.push({ id: p.id, instancia: pl.instancia, ...(p.nome ? { nome: p.nome } : {}), familia: p.familia, variante: p.variante, posicao: p.posicao, orientacao: p.orientacao });
+      partes.set(p.id, pl.instancia);
+      if (!p.terminais) continue;
+      const r = portasDoComponente(p, declaradas[p.id]);
+      delete declaradas[p.id];
+      portas.push(...r.portas);
+      semTipo.push(...r.semTipo.map((t) => `${p.id}.${t}`));
+    }
+    const sobra = Object.keys(declaradas);
+    if (sobra.length) throw new Error(`ponte.json: placas[${k}].portas cita ${sobra.join(', ')}, que a placa de '${pl.instancia}' não tem.`);
+  }
+  return { componentes, portas, semTipo, partes };
+}
+
+/* A malha de cada instância que carrega componentes, separada por parte: um nó por componente, com a pose da instância, e o resto
+   no nó da instância. O exportador não muda; ele só recebe mais instâncias. */
+function separarPorParte(instancias, partes) {
+  const saida = [];
+  for (const inst of instancias) {
+    const minhas = [...partes].filter(([, dona]) => dona === inst.nome).map(([id]) => id);
+    if (!minhas.length) { saida.push({ ...inst, nome: idDaFicha(inst.nome) }); continue; }
+    const F = inst.neutro.F instanceof Map ? [...inst.neutro.F] : Object.entries(inst.neutro.F);
+    const grupos = new Map([[idDaFicha(inst.nome), []], ...minhas.map((id) => [id, []])]);
+    for (const [chave, f] of F) grupos.get(minhas.includes(f.parte) ? f.parte : idDaFicha(inst.nome)).push([chave, f]);
+    for (const [nome, faces] of grupos) if (faces.length) saida.push({ ...inst, nome, neutro: { ...inst.neutro, F: new Map(faces) } });
+  }
+  return saida;
+}
+
+/** Exporta a ficha e a malha do objeto. Devolve `{ ficha, caminhoFicha, caminhoMalha, semTipo }`; recusa a ficha que a cópia do esquema recusa. */
 export async function exportarFicha({ objeto, ponte = null, saida = null }) {
   if (!objeto) throw new Error(`Informe o objeto.\n${USO}`);
   const pasta = resolve(REPO, 'procedural/pecas', objeto);
@@ -52,9 +99,11 @@ export async function exportarFicha({ objeto, ponte = null, saida = null }) {
   const percorrer = (m) => { for (const i of m.instancias) { if (i.alvo.tipo === 'montagem') percorrer(i.montagem); else porNome.set(i.caminho.join('/'), i); } };
   percorrer(resolvida);
 
-  /* a malha: um nó por instância, com o identificador da ficha */
+  const { componentes, portas: portasEletricas, semTipo, partes } = await placasDaPonte(declaracao, porNome);
+
+  /* a malha: um nó por peça da ficha, com o identificador dela */
   const nomeDaMalha = `${objeto}.glb`;
-  const { bytes, diagnostico } = exportarMontagemGltf({ nome: resolvida.id, instancias: instancias.map((i) => ({ ...i, nome: idDaFicha(i.nome) })) });
+  const { bytes, diagnostico } = exportarMontagemGltf({ nome: resolvida.id, instancias: separarPorParte(instancias, partes) });
   const min = [Infinity, Infinity, Infinity]; const max = [-Infinity, -Infinity, -Infinity];
   for (const inst of instancias) {
     const { rotacao, deslocamento } = inst.pose;
@@ -76,6 +125,8 @@ export async function exportarFicha({ objeto, ponte = null, saida = null }) {
       portas: portasPublicadas(porNome.get(i.nome).definicao.neutro).map((p) => ({ id: p.id, interface: p.interface })),
     })),
     malha: { caminho: nomeDaMalha, caixa: { min, max }, faces: diagnostico.triangulos },
+    componentes,
+    portasEletricas,
   });
   const conferida = conferirDocumento(ficha);
   if (conferida.erros.length) throw new Error(`a ficha montada não passa na cópia do esquema:\n${textoDosErros(conferida)}`);
@@ -85,18 +136,19 @@ export async function exportarFicha({ objeto, ponte = null, saida = null }) {
   const caminhoFicha = resolve(destino, `${objeto}.ficha.json`);
   gravar(caminhoMalha, bytes);
   gravar(caminhoFicha, `${JSON.stringify(ficha, null, 2)}\n`);
-  return { ficha, caminhoFicha, caminhoMalha };
+  return { ficha, caminhoFicha, caminhoMalha, semTipo };
 }
 
 async function main() {
   try {
     const opcoes = parseArgs();
     if (opcoes.ajuda || !opcoes.objeto) { process.stdout.write(USO); process.exit(opcoes.ajuda ? 0 : 1); }
-    const { ficha, caminhoFicha, caminhoMalha } = await exportarFicha(opcoes);
+    const { ficha, caminhoFicha, caminhoMalha, semTipo } = await exportarFicha(opcoes);
     const ausentes = JSON.stringify(ficha).match(/"ausente":true/g)?.length ?? 0;
     process.stdout.write(`Ficha ${ficha.objeto} revisão ${ficha.revisao} (esquema ${ficha.versao}), conferida pela cópia do esquema.\n`);
     process.stdout.write(`Ficha:   ${relative(REPO, caminhoFicha)}\nMalha:   ${relative(REPO, caminhoMalha)} (${ficha.malha.faces.valor} triângulos)\n`);
     process.stdout.write(`Peças ${ficha.pecas.length}, conjuntos ${ficha.conjuntos.length}, juntas ${ficha.juntas.length}, portas ${ficha.portas.length}; ${ausentes} valor(es) ausente(s), com o motivo.\n`);
+    process.stdout.write(semTipo.length ? `Terminais sem tipo, fora da ficha (${semTipo.length}): ${semTipo.join(', ')}. Declare-os em placas[].portas da ponte do objeto.\n` : 'Todos os terminais elétricos têm tipo.\n');
   } catch (err) {
     process.stderr.write(`Erro: ${err.message}\n`);
     process.exit(1);

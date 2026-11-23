@@ -38,15 +38,27 @@ export function eixoEAngulo(r) {
   return { eixo: normalizar(eixo).map((x) => arredondar(x, 9)), angulo: arredondar((angulo * 180) / Math.PI, 6) };
 }
 
+/** A matriz de rotação (linhas) da orientação `{ eixo, angulo }` (grau, mão direita). */
+export function matrizDe({ eixo, angulo }) {
+  const [x, y, z] = normalizar(eixo);
+  const a = (angulo * Math.PI) / 180; const c = Math.cos(a); const s = Math.sin(a); const t = 1 - c;
+  return [[c + x * x * t, x * y * t - z * s, x * z * t + y * s], [y * x * t + z * s, c + y * y * t, y * z * t - x * s], [z * x * t - y * s, z * y * t + x * s, c + z * z * t]];
+}
+const produto = (a, b) => a.map((linha) => [0, 1, 2].map((j) => linha[0] * b[0][j] + linha[1] * b[1][j] + linha[2] * b[2][j]));
+
 const ausente = (motivo) => ({ ausente: true, motivo });
 const SEM_DENSIDADE = 'o material da peça ainda não tem densidade declarada na ponte do objeto';
 
 /**
  * @param {{ declaracao: object, instancias: Array<{ id: string, ref: string, pose: { rotacao: number[][], deslocamento: number[] },
- *   portas: Array<{ id: string, interface?: { eixo: number[], centro: number[] } }> }>, malha: { caminho: string, caixa: { min: number[], max: number[] }, faces: number } }} entrada
- *   a pose e as portas em metro; a caixa da malha já em milímetro, medida no arquivo exportado.
+ *   portas: Array<{ id: string, interface?: { eixo: number[], centro: number[] } }> }>, malha: { caminho: string, caixa: { min: number[], max: number[] }, faces: number },
+ *   componentes?: Array<{ id: string, instancia: string, nome?: string, familia: string, variante: string, posicao: number[], orientacao: { eixo: number[], angulo: number } }>,
+ *   portasEletricas?: Array<object> }} entrada
+ *   a pose e as portas das instâncias em metro; a caixa da malha já em milímetro, medida no arquivo exportado. Os componentes são as
+ *   peças que uma instância carrega dentro dela (os da placa declarada), com a posição em mm e a orientação no referencial da
+ *   instância; eles entram como peças da ficha, no conjunto da instância. As portas elétricas já vêm no formato da ficha.
  */
-export function montarFicha({ declaracao, instancias, malha }) {
+export function montarFicha({ declaracao, instancias, malha, componentes = [], portasEletricas = [] }) {
   const d = declaracao;
   if (d?.formato !== 'modelar.ponte' || d.versao !== 1) {
     throw new ErroFicha(`ponte.json: formato '${d?.formato}' versão ${d?.versao}; esperado 'modelar.ponte' versão 1.`);
@@ -72,6 +84,28 @@ export function montarFicha({ declaracao, instancias, malha }) {
     centroDeMassa: ausente(SEM_DENSIDADE),
     inercia: ausente(SEM_DENSIDADE),
   }));
+
+  const ids = new Set(pecas.map((p) => p.id));
+  for (const c of componentes) {
+    const inst = porId.get(c.instancia);
+    if (!inst) throw new ErroFicha(`componente '${c.id}': a instância '${c.instancia}' que o carrega não existe na montagem.`);
+    if (ids.has(c.id)) throw new ErroFicha(`componente '${c.id}' da instância '${c.instancia}': o identificador já é de outra peça da ficha; mude o designador na placa.`);
+    ids.add(c.id);
+    const { rotacao, deslocamento } = inst.pose;
+    const posicao = aplicar(rotacao, c.posicao).map((x, n) => arredondar(x + deslocamento[n] * 1000));
+    pecas.push({
+      id: c.id,
+      nome: c.nome ?? `${c.variante} em ${c.instancia}`,
+      familia: c.familia,
+      variante: c.variante,
+      conjunto: conjuntoDe.get(c.instancia),
+      posicao: { valor: posicao, origem: 'medido', nota: `origem do componente, posto pela placa declarada de '${c.instancia}'` },
+      orientacao: { valor: eixoEAngulo(produto(rotacao, matrizDe(c.orientacao))), origem: 'medido' },
+      massa: ausente(SEM_DENSIDADE),
+      centroDeMassa: ausente(SEM_DENSIDADE),
+      inercia: ausente(SEM_DENSIDADE),
+    });
+  }
 
   const juntas = d.juntas.map((j, k) => {
     for (const lado of ['pai', 'filho']) {
@@ -121,7 +155,7 @@ export function montarFicha({ declaracao, instancias, malha }) {
     },
     conjuntos,
     pecas,
-    portas: [],
+    portas: portasEletricas,
     juntas,
     volumesLivres: [],
   };
