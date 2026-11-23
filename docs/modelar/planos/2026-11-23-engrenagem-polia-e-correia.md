@@ -2,9 +2,9 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/familias/polia-e-correia/`, `procedural/familias/engrenagem/`, `tools/fixtures/transmissao/`, `src/autoria/chamar-familia.js`, `docs/modelar/banco-de-provas/transmissao-2026-11-23/`.
+**Território:** `procedural/familias/polia-e-correia/`, `procedural/familias/engrenagem/`, `tools/fixtures/transmissao/`, `src/autoria/chamar-familia.js`, `docs/modelar/banco-de-provas/transmissao-2026-11-23/`, `procedural/familias/index.js`, `docs/modelar/ferramentas-por-objeto.json`, `tools/modelar/capacidade.mjs`.
 
-Ativado pela pessoa em 2026-11-23, começando pela polia. O registro das famílias em `procedural/familias/index.js`, o mapa de ferramentas e a ficha em `tools/modelar/capacidade.mjs` estão no território da tubulação, que tem prioridade; este plano espera por eles ou pede à pessoa que mude o território, pela regra do índice de planos.
+Ativado pela pessoa em 2026-11-23, começando pela polia. Os três últimos caminhos do território são compartilhados entre os planos desde a mesma data, por decisão da pessoa, porque todo plano de família nova passa por eles.
 
 **Responsável:** a IA da sessão, com a pessoa aprovando a forma de cada família por imagem.
 

@@ -65,6 +65,9 @@ export const CAMINHOS_COMPARTILHADOS = [
   '.github/workflows/',
   'package.json',
   'package-lock.json',
+  'procedural/familias/index.js',
+  'docs/modelar/ferramentas-por-objeto.json',
+  'tools/modelar/capacidade.mjs',
 ];
 
 /* O território de um plano: { caminhos } (vazio quando espera aprovação) ou { problema }. */
