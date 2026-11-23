@@ -71,7 +71,7 @@ Cada fatia cabe numa sessão de agente despachado, entrega o teste dela e deixa 
 
 ## Decisão da pessoa
 
-Duas escolhas ficam com a pessoa antes da fatia 2. A primeira é se a rede sai oca, com a parede visível nas pontas, ou maciça, mais leve de executar; a recomendação é oca, porque a boca do tubo é o que se vê numa ponta livre e o `lathe` com `espessura` já a faz sem custo de união. A segunda é se as duas normas da tabela bastam para começar; a recomendação é que sim, aço carbono e PVC soldável, com o cobre depois se um objeto pedir.
+Decidido em 2026-11-23: a rede sai oca, com a parede visível nas pontas, e a tabela começa com aço carbono e PVC soldável; o cobre entra depois, se um objeto pedir.
 
 ## Riscos e parada
 

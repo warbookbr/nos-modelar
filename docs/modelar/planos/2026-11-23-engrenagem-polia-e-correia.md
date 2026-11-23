@@ -1,8 +1,10 @@
 # Engrenagem, polia e correia: o par que transmite movimento por poucos números
 
-**Estado:** rascunho
+**Estado:** ativo
 
-**Território:** a declarar ao ativar. Previsto: `procedural/familias/engrenagem/`, `procedural/familias/polia-e-correia/`, `procedural/familias/index.js`, `tools/fixtures/transmissao/`, `docs/modelar/ferramentas-por-objeto.json`, `tools/modelar/capacidade.mjs`, e, se a fatia 1 confirmar a colisão, o arquivo do `chamar` da família em `src/autoria/`.
+**Território:** `procedural/familias/polia-e-correia/`, `procedural/familias/engrenagem/`, `tools/fixtures/transmissao/`, `src/autoria/chamar-familia.js`, `docs/modelar/banco-de-provas/transmissao-2026-11-23/`.
+
+Ativado pela pessoa em 2026-11-23, começando pela polia. O registro das famílias em `procedural/familias/index.js`, o mapa de ferramentas e a ficha em `tools/modelar/capacidade.mjs` estão no território da tubulação, que tem prioridade; este plano espera por eles ou pede à pessoa que mude o território, pela regra do índice de planos.
 
 **Responsável:** a IA da sessão, com a pessoa aprovando a forma de cada família por imagem.
 
@@ -54,17 +56,20 @@ O núcleo não ganha nome de objeto nem operação nova. O acervo sai igual, com
 ## Fatias
 
 1. A receita neutra com duas chamadas da mesma família, a colisão de ids reproduzida ou descartada, e a correção no `chamar`, se for o caso.
-2. A família `engrenagem` com a reta, a helicoidal, a cremalheira e a catraca, e a aprovação da pessoa por imagem.
-3. O par engrenado, com a fase e a medida de folga nas posições amostradas.
-4. A família `polia-e-correia` com as polias e o conjunto com a correia, e a aprovação da pessoa por imagem.
-5. O mapa de ferramentas, as fichas e o fechamento.
+2. A família `polia-e-correia` com as polias dentadas, em V e lisa, e a aprovação da pessoa por imagem.
+3. O conjunto de duas polias com a correia fechada, com o par GT2 de 20 e 80 dentes medido.
+4. A família `engrenagem` com a reta, a helicoidal, a cremalheira e a catraca, e a aprovação da pessoa por imagem.
+5. O par engrenado, com a fase e a medida de folga nas posições amostradas.
+6. O registro das famílias, o mapa de ferramentas, as fichas e o fechamento.
 
 ## Decisão da pessoa
 
-Antes de ativar, a pessoa decide a ordem. A recomendação é polia e correia antes da engrenagem, porque o braço de prova já pede o par GT2 de 20 e 80 dentes e a polia é a peça mais simples das duas. Nesse caso as fatias 4 e 2 trocam de lugar, e o dente evolvente vem depois.
+Decidido em 2026-11-23: a polia e a correia vêm antes da engrenagem, porque o braço de prova já pede o par GT2 de 20 e 80 dentes e a polia é a peça mais simples das duas.
 
 ## Riscos e parada
 
 Se o contorno do dente evolvente com muitos dentes (acima de 150) passar de dois segundos ou der lasca na `extrusao`, a família reduz os pontos por flanco e mede de novo, e se ainda assim não passar, a fatia volta à pessoa com a medida. Se a helicoidal pedir uma varredura com giro que o núcleo não tem, ela sai do plano e vai ao backlog com a medida, sem operação nova. Se a correção do `chamar` mudar a malha de alguma peça do acervo, a fatia 1 para e volta à pessoa antes de seguir.
+
+## Andamento
 
 ## Fechamento
