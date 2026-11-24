@@ -17,7 +17,7 @@
      posicaoDoCarro: o começo do carro ao longo do trilho.
    devolve: os parâmetros completos da família; o trilho vai ao longo de y com a base em z = 0, e as portas `base` e `mesa`.
    exemplo:
-     chamar(registro.obter('guia-linear'), 'guia', parametrosDaGuia(15, { comprimento: 600, posicaoDoCarro: 200 }))
+     parametrosDaGuia(15, { comprimento: 600, posicaoDoCarro: 200 })
    peça: tools/fixtures/elementos-de-maquina/mesa-linear.mjs (as duas guias 15 sobre os perfis).
    FIM DA FICHA */
 
@@ -31,8 +31,8 @@ export const GUIAS = Object.freeze({
 });
 
 /** Os parâmetros da família para o tamanho da guia, com o comprimento do trilho e a posição do carro; recusa o tamanho que não existe. */
-export function parametrosDaGuia(nome, { comprimento, posicaoDoCarro = 0 } = {}) {
-  const g = GUIAS[String(nome)];
-  if (!g) throw new Error(`guia linear: o tamanho '${nome}' não existe; aceitos: ${Object.keys(GUIAS).join(', ')}`);
+export function parametrosDaGuia(tamanho, { comprimento, posicaoDoCarro = 0 } = {}) {
+  const g = GUIAS[String(tamanho)];
+  if (!g) throw new Error(`guia linear: o tamanho '${tamanho}' não existe; aceitos: ${Object.keys(GUIAS).join(', ')}`);
   return { ...g, comprimento, posicaoDoCarro };
 }

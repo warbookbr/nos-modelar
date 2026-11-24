@@ -16,7 +16,7 @@
      forma: 1 aberto, 2 vedado, 3 no mancal.
    devolve: os parâmetros completos da família; o eixo é y, de 0 à largura, e as portas `furo` e `apoio`.
    exemplo:
-     chamar(registro.obter('rolamento'), 'mancal', parametrosDoRolamento(6204, 3))
+     parametrosDoRolamento(6204, 3)
    peça: tools/fixtures/elementos-de-maquina/mesa-linear.mjs (os dois mancais 6000 do fuso).
    FIM DA FICHA */
 
@@ -29,8 +29,8 @@ export const ROLAMENTOS = Object.freeze({
 });
 
 /** Os parâmetros da família pela designação ('6204'), com a forma (1 aberto, 2 vedado, 3 no mancal); recusa a que não existe. */
-export function parametrosDoRolamento(nome, forma = 1) {
-  const b = ROLAMENTOS[String(nome)];
-  if (!b) throw new Error(`rolamento: '${nome}' não existe; aceitos: ${Object.keys(ROLAMENTOS).join(', ')}`);
+export function parametrosDoRolamento(designacao, forma = 1) {
+  const b = ROLAMENTOS[String(designacao)];
+  if (!b) throw new Error(`rolamento: '${designacao}' não existe; aceitos: ${Object.keys(ROLAMENTOS).join(', ')}`);
   return { forma, furo: b.d, diametroExterno: b.D, largura: b.B, chanfro: b.chanfro };
 }

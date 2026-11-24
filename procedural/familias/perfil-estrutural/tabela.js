@@ -21,7 +21,7 @@
      corte: 0 reto, 1 a ponta final a 45°, 2 as duas pontas.
    devolve: os parâmetros completos da família; a seção fica em [x, z] e o perfil vai ao longo de y.
    exemplo:
-     chamar(registro.obter('perfil-estrutural'), 'viga', parametrosDoPerfil('IPE', 200, { comprimento: 1000 }))
+     parametrosDoPerfil('IPE', 200, { comprimento: 1000 })
    peça: tools/fixtures/elementos-de-maquina/mesa-linear.mjs (os dois perfis de alumínio 40 da base).
    FIM DA FICHA */
 

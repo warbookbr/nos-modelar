@@ -17,7 +17,7 @@
      posicaoDaCastanha: o começo da castanha (a face do flange) ao longo do fuso.
    devolve: os parâmetros completos da família; o eixo é y, de 0 ao comprimento, e as portas `ponta` e `flange`.
    exemplo:
-     chamar(registro.obter('fuso'), 'fuso', parametrosDoFuso('Tr20x4', { comprimento: 400, posicaoDaCastanha: 150 }))
+     parametrosDoFuso('Tr20x4', { comprimento: 400, posicaoDaCastanha: 150 })
    peça: tools/fixtures/elementos-de-maquina/mesa-linear.mjs (o fuso Tr10x2 que move a mesa).
    FIM DA FICHA */
 
