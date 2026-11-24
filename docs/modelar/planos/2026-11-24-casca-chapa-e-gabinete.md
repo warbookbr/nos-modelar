@@ -1,6 +1,10 @@
 # Casca, chapa dobrada e gabinete: a parede fina de forma livre, a chapa com abas em várias bordas e a caixa de equipamento
 
-**Estado:** rascunho
+**Estado:** ativo
+
+**Território:** `procedural/familias/gabinete/`, `procedural/familias/index.js`, `procedural/extensoes/chapa-dobrada/`, `procedural/nucleo/casca.js`, `procedural/nucleo/casca.test.mjs`, `procedural/nucleo/casca-pela-receita.js`, `procedural/nucleo/casca-pela-receita.test.mjs`, `tools/fixtures/casca-chapa-e-gabinete/`, `docs/modelar/banco-de-provas/casca-chapa-e-gabinete-2026-11-24/`, `docs/modelar/ferramentas-por-objeto.json`, `tools/modelar/capacidade.mjs`.
+
+Ativado pela pessoa em 2026-11-24, para que agentes despachados avancem nas fatias uma a uma.
 
 **Responsável:** a IA da sessão ou o agente despachado de cada fatia; a pessoa aprova a forma por imagem e decide o que está em Decisão da pessoa. As fatias que mudam o núcleo passam pelo `revisor-adversarial` antes do envio.
 
