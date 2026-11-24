@@ -2116,6 +2116,55 @@ export function gaiolaPorRede(definicaoDada) {
         texto: `${nomeDoArco(a)} ficou com ${a.n} divisões (${br(a.comprimento / a.n)} mm cada) e o alvo era ${br(a.alvo)}: os lados opostos dos retalhos em volta o forçaram; declare divisoes nesses retalhos, ou acerte os nós, se a diferença atrapalhar`,
       });
     }
+    if (a.n === 1) {
+      const c = curvas.get(a.curva);
+      const p0 = c.em(a.f0);
+      const p1 = c.em(a.f1);
+      const pMeio = c.em((a.f0 + a.f1) / 2);
+      const flechaMm = Math.hypot(
+        pMeio[0] - (p0[0] + p1[0]) / 2,
+        pMeio[1] - (p0[1] + p1[1]) / 2,
+        pMeio[2] - (p0[2] + p1[2]) / 2,
+      );
+      if (flechaMm > 1) {
+        avisos.push({
+          ref: 'cordaLongaEmTransicao',
+          curva: a.curva,
+          de: a.de,
+          ate: a.ate,
+          comprimentoMm: Math.round(a.comprimento * 100) / 100,
+          flechaMm: Math.round(flechaMm * 100) / 100,
+          texto: `${nomeDoArco(a)} ficou com 1 divisão (${br(a.comprimento)} mm) e flecha de ${br(flechaMm)} mm contra a curva desenhada: uma aresta reta longa afunda a curvatura na subdivisão; aumente as divisões desse trecho ou ajuste o passo`,
+        });
+      }
+    }
+  }
+  const pontosEmVinco = new Map();
+  for (const [nome, c] of curvas) {
+    if (c.decl.vinco == null) continue;
+    const { arcos: listaV } = arcosDaCurva.get(nome);
+    for (const a of listaV) {
+      const vs = verticesDoArco.get(a.id);
+      if (!vs) continue;
+      for (const p of vs) {
+        if (!pontosEmVinco.has(p)) pontosEmVinco.set(p, []);
+        const arr = pontosEmVinco.get(p);
+        if (!arr.includes(nome)) arr.push(nome);
+      }
+    }
+  }
+  for (const e of extra) {
+    if (e.borda) continue;
+    const cs = pontosEmVinco.get(e.ponto);
+    if (cs && cs.length) {
+      avisos.push({
+        ref: 'extraordinarioEmVinco',
+        ponto: e.ponto,
+        valencia: e.valencia,
+        curvas: cs,
+        texto: `vértice extraordinário ${citar(e.ponto)} (valência ${e.valencia}) cai sobre curva com vinco (${lista(cs)}): isso distorce a nitidez do vinco e causa amassado na subdivisão; interponha uma faixa de apoio uniforme ao lado do vinco`,
+      });
+    }
   }
   const nosSaida = {};
   for (const [id] of nos) if (posicao.has(nomeDoNo(id)) && !id.includes('@') && !id.includes('^')) nosSaida[id] = nomeDoNo(id);

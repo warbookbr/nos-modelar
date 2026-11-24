@@ -1,12 +1,16 @@
 import { describe, it, expect } from 'vitest';
 import { nucleo } from './nucleo.js';
+import { gaiolaPorRede } from './gaiola-por-rede.js';
 import { faixaDeContornoNaRede, ErroFaixaDeContorno, FICHA } from './faixa-de-contorno-na-rede.js';
 import {
   montarChapaDeProva,
   alturaSuperficie,
   normalSuperficie,
   projetarNaChapa,
+  pontosDoArco,
   ARCO,
+  LARGURA,
+  ALTURA,
 } from './fixtures/faixa-de-contorno-prova.js';
 
 function executarChapa(modo, { espessura = 0.003, cortarPainel = false } = {}) {
@@ -191,5 +195,109 @@ describe('faixaDeContornoNaRede', () => {
     const maxEsq = Math.max(...yEsq);
     const maxDir = Math.max(...yDir);
     expect(Math.abs(maxEsq - maxDir)).toBeLessThan(1.5);
+  });
+
+  it('costura automaticamente num vão retangular (vao) com anelDeAmortecimentoMm e divisoes radiais >= 2, recusando topoTemVinco', () => {
+    const P = (x, z) => [x, alturaSuperficie(x, z), z];
+    const nosBase = {
+      E0: P(0, 0),
+      E1: P(0, ALTURA),
+      D1: P(LARGURA, ALTURA),
+      D0: P(LARGURA, 0),
+    };
+    const faixa = faixaDeContornoNaRede({
+      nome: 'vaoAuto',
+      contorno: pontosDoArco(13),
+      fora: [0, 1, 0],
+      projetar: projetarNaChapa,
+      lado: 'dentro',
+      deslocamentoBaseMm: 8,
+      faixas: [
+        { larguraMm: 18, deslocamentoMm: 12 },
+        { larguraMm: 22, deslocamentoMm: 0, vinco: 0.65 },
+      ],
+      ancoras: [0, 3, 9, 12],
+      vao: {
+        baseFrente: 'E0',
+        topoFrente: 'E1',
+        topoTras: 'D1',
+        baseTras: 'D0',
+        curvaFrente: 'esq',
+        curvaTopo: 'topo',
+        curvaTras: 'dir',
+        nosDoVao: nosBase,
+        passoTransicaoMm: 90,
+      },
+    });
+    expect(faixa.estatisticas.anelDeAmortecimentoMm).toBe(20);
+    expect(faixa.cantos).toHaveLength(2);
+
+    const rede = gaiolaPorRede({
+      passo: 180,
+      fora: [0, 1, 0],
+      nos: { ...nosBase, ...faixa.nos },
+      curvas: [
+        ...faixa.curvas,
+        { nome: 'esq', pontos: ['E0', P(0, 225), 'E1'] },
+        { nome: 'dir', pontos: ['D0', P(LARGURA, 225), 'D1'] },
+        { nome: 'topo', pontos: ['E1', P(400, ALTURA), 'D1'] },
+      ],
+      retalhos: faixa.retalhos,
+      cantos: faixa.cantos,
+    });
+    const dLigF = Object.entries(rede.densidades).find(([k]) => k.startsWith('vaoAuto_ligF:'))?.[1];
+    expect(dLigF?.divisoes).toBeGreaterThanOrEqual(2);
+    expect(rede.avisos.filter((a) => a.ref === 'cordaLongaEmTransicao')).toHaveLength(0);
+
+    expect(() => faixaDeContornoNaRede({
+      nome: 'emVinco',
+      contorno: pontosDoArco(13),
+      fora: [0, 1, 0],
+      lado: 'dentro',
+      faixas: [{ larguraMm: 20, deslocamentoMm: 0, vinco: 0.5 }],
+      ancoras: [0, 3, 9, 12],
+      vao: {
+        baseFrente: 'E0', topoFrente: 'E1', topoTras: 'D1', baseTras: 'D0',
+        curvaFrente: 'esq', curvaTopo: 'topo', curvaTras: 'dir',
+        nosDoVao: nosBase, topoTemVinco: true,
+      },
+    })).toThrow(/vinco/);
+  });
+
+  it('gaiolaPorRede emite avisos extraordinarioEmVinco e cordaLongaEmTransicao quando presentes', () => {
+    /* rede com polo valência 5 exatamente sobre curva com vinco e curva arqueada travada em 1 divisão */
+    const rede = gaiolaPorRede({
+      passo: 400,
+      fora: [0, 1, 0],
+      nos: {
+        A: [0, 0, 0], B: [200, 0, 0], C: [400, 0, 0],
+        D: [0, 0, 200], E: [200, 0, 200], F: [400, 0, 200],
+        G: [0, 0, 400], H: [200, 0, 400], I: [400, 0, 400],
+        M: [100, 18, 100],
+      },
+      curvas: [
+        { nome: 'v', pontos: ['D', 'E', 'F'], vinco: 0.8 },
+        { nome: 'b1', pontos: ['A', 'B'] },
+        { nome: 'b2', pontos: ['B', 'C'] },
+        { nome: 't1', pontos: ['G', 'H'] },
+        { nome: 't2', pontos: ['H', 'I'] },
+        { nome: 'l1', pontos: ['A', 'D'] },
+        { nome: 'l2', pontos: ['D', 'G'] },
+        { nome: 'r1', pontos: ['C', 'F'] },
+        { nome: 'r2', pontos: ['F', 'I'] },
+        { nome: 'm1', pontos: ['B', 'E'] },
+        { nome: 'm2', pontos: ['E', 'H'] },
+        { nome: 'diag', pontos: ['A', 'M', 'E'] },
+      ],
+      retalhos: [
+        { nome: 'q1', borda: ['b1', 'm1', 'diag'] },
+        { nome: 'q2', borda: ['l1', { curva: 'v', de: 'D', ate: 'E' }, 'diag'] },
+        { nome: 'q3', borda: ['b2', 'r1', { curva: 'v', de: 'F', ate: 'E' }, 'm1'] },
+        { nome: 'q4', borda: [{ curva: 'v', de: 'D', ate: 'E' }, 'm2', 't1', 'l2'] },
+        { nome: 'q5', borda: [{ curva: 'v', de: 'E', ate: 'F' }, 'r2', 't2', 'm2'] },
+      ],
+    });
+    expect(rede.avisos.some((a) => a.ref === 'extraordinarioEmVinco' && a.ponto === 'E')).toBe(true);
+    expect(rede.avisos.some((a) => a.ref === 'cordaLongaEmTransicao' && a.curva === 'diag')).toBe(true);
   });
 });

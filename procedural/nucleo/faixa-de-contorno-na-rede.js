@@ -19,8 +19,10 @@
  *   vincoBase?: número | 'viva' — nitidez de vinco opcional na curva base.
  *   modulacao?: (s) => fator | [[s, fator], ...] — modulação longitudinal do deslocamento normal ao longo de s em [0, 1].
  *   abaInterna?: { profundidadeMm, anguloGraus?, vinco? } — aba dobrada para o lado interno a partir da curva base.
+ *   anelDeAmortecimentoMm?: número — largura em mm de um anel externo neutro (deslocamento 0, sem vinco) isolando o estêncil da subdivisão.
+ *   vao?: { baseFrente, topoFrente, topoTras, baseTras, curvaFrente, curvaTopo, curvaTras, nosDoVao, passoTransicaoMm?, divisoesRadiais?, topoTemVinco? } — costura automática da faixa num vão retangular de 4 lados sem travamento em divisoes=1.
  *   ancoras?: [indice, ...] — índices de `contorno` onde se criam nós e ligações radiais (padrão: pontas na aberta; 4 quadrantes na fechada).
- * devolve: { nos, curvas, retalhos, curvaBase, curvaExterna, curvaAba, nosExternos, estatisticas, avisos }.
+ * devolve: { nos, curvas, retalhos, cantos, curvaBase, curvaExterna, curvaAba, nosExternos, estatisticas, avisos }.
  * exemplo:
  *   faixaDeContornoNaRede({ nome: 'borda', contorno: [[0, 0, 0], [50, 0, 50], [100, 0, 0]], fora: [0, 1, 0], lado: 'dentro', faixas: [{ larguraMm: 18, deslocamentoMm: 14 }, { larguraMm: 22, deslocamentoMm: 0, vinco: 0.7 }], deslocamentoBaseMm: 10, abaInterna: { profundidadeMm: 14 } })
  * peça: procedural/nucleo/fixtures/faixa-de-contorno-prova.js (chapa curva neutra com chanfro, ombro vincado, bojo G1 e corte multipainel).
@@ -29,11 +31,11 @@
 
 export const FICHA = Object.freeze({
   nome: 'faixaDeContornoNaRede',
-  serve: 'gera anéis concêntricos de quadriláteros com perfil transversal livre, vincos, modulação longitudinal e aba interna para composição em gaiolaPorRede',
+  serve: 'gera anéis concêntricos de quadriláteros com perfil transversal livre, vincos, modulação longitudinal, aba interna e costura opcional de vão para composição em gaiolaPorRede',
   quando: 'relevos estampados ou moldados na própria chapa em volta de aberturas ou curvas de caráter antes do corte de painéis',
   unidades: 'mm (entrada e saída compatíveis com gaiolaPorRede)',
-  campos: ['nome', 'contorno', 'fechada', 'fora', 'projetar', 'lado', 'faixas', 'deslocamentoBaseMm', 'vincoBase', 'modulacao', 'abaInterna', 'ancoras'],
-  devolve: '{ nos, curvas, retalhos, curvaBase, curvaExterna, curvaAba, nosExternos, estatisticas, avisos }',
+  campos: ['nome', 'contorno', 'fechada', 'fora', 'projetar', 'lado', 'faixas', 'deslocamentoBaseMm', 'vincoBase', 'modulacao', 'abaInterna', 'anelDeAmortecimentoMm', 'vao', 'ancoras'],
+  devolve: '{ nos, curvas, retalhos, cantos, curvaBase, curvaExterna, curvaAba, nosExternos, estatisticas, avisos }',
 });
 
 export class ErroFaixaDeContorno extends RangeError {
@@ -170,6 +172,8 @@ export function faixaDeContornoNaRede({
   vincoBase = undefined,
   modulacao = null,
   abaInterna = null,
+  anelDeAmortecimentoMm = undefined,
+  vao = null,
   ancoras = null,
 } = {}) {
   if (!Array.isArray(contorno) || contorno.length < (fechada ? 3 : 2)) {
@@ -185,9 +189,19 @@ export function faixaDeContornoNaRede({
   }
   const sinalLado = lado === 'dentro' || lado === -1 ? -1 : 1;
 
+  const ultimaFaixa = faixas[faixas.length - 1];
+  const amortPadrao = vao && (ultimaFaixa?.vinco !== undefined || ultimaFaixa?.deslocamentoMm !== 0) ? 20 : 0;
+  const amortMm = anelDeAmortecimentoMm === undefined ? amortPadrao : anelDeAmortecimentoMm;
+  if (!finito(amortMm) || amortMm < 0) {
+    throw new ErroFaixaDeContorno('anelDeAmortecimentoMm deve ser número >= 0', { motivo: 'amortecimento-invalido' });
+  }
+  const faixasEfetivas = amortMm > 0
+    ? [...faixas, { larguraMm: amortMm, deslocamentoMm: 0 }]
+    : faixas;
+
   let larguraTotalMm = 0;
-  for (let i = 0; i < faixas.length; i += 1) {
-    const f = faixas[i];
+  for (let i = 0; i < faixasEfetivas.length; i += 1) {
+    const f = faixasEfetivas[i];
     if (!f || !finito(f.larguraMm) || f.larguraMm <= 0) {
       throw new ErroFaixaDeContorno(`faixas[${i}].larguraMm deve ser > 0`, { motivo: 'largura-invalida', indice: i });
     }
@@ -271,8 +285,8 @@ export function faixaDeContornoNaRede({
 
   /* anéis 1..K */
   let larguraAcum = 0;
-  for (let i = 0; i < faixas.length; i += 1) {
-    const f = faixas[i];
+  for (let i = 0; i < faixasEfetivas.length; i += 1) {
+    const f = faixasEfetivas[i];
     larguraAcum += f.larguraMm;
     const ptsAnel = quadros.map((q) => {
       const pBruto = soma(q.ponto, esc(q.dirOff, larguraAcum));
@@ -367,17 +381,89 @@ export function faixaDeContornoNaRede({
 
   const ultimoIdx = todosAneis.length - 1;
   const nosExternos = listaAncoras.map((_, j) => nomeNo(ultimoIdx, j));
+  const curvaExterna = `${nome}_anel${faixasEfetivas.length}`;
+  const idxBase = anelAba ? 1 : 0;
+  const cantos = fechada ? [] : [nomeNo(idxBase, 0), nomeNo(idxBase, listaAncoras.length - 1)];
+
+  /* costura automática opcional num vão retangular de 4 lados */
+  if (vao) {
+    if (fechada) throw new ErroFaixaDeContorno('vao não suporta contorno fechado', { motivo: 'vao-fechado' });
+    if (vao.topoTemVinco === true) {
+      throw new ErroFaixaDeContorno(
+        'topo do vão não pode ser diretamente uma curva com vinco (gera polo valência 5 sobre o vinco); interponha uma faixa de apoio uniforme abaixo do vinco',
+        { motivo: 'vao-em-vinco' },
+      );
+    }
+    if (nosExternos.length !== 4) {
+      throw new ErroFaixaDeContorno('vao exige exatamente 4 âncoras no contorno (ex.: [0, 3, 9, 12])', { motivo: 'vao-ancoras' });
+    }
+    const {
+      baseFrente, topoFrente, topoTras, baseTras,
+      curvaFrente, curvaTopo, curvaTras, nosDoVao,
+      passoTransicaoMm = 85,
+      divisoesRadiais = null,
+    } = vao;
+    if (!nosDoVao || !nosDoVao[baseFrente] || !nosDoVao[topoFrente] || !nosDoVao[topoTras] || !nosDoVao[baseTras]) {
+      throw new ErroFaixaDeContorno('vao.nosDoVao precisa fornecer coordenadas dos 4 cantos (baseFrente, topoFrente, topoTras, baseTras)', { motivo: 'vao-nos-ausentes' });
+    }
+    const [n0, n1, n2, n3] = nosExternos;
+    const coord = (id) => nos[id] ?? nosDoVao[id];
+    const lenLigF = norm(sub(coord(topoFrente), coord(n1)));
+    const lenLigT = norm(sub(coord(topoTras), coord(n2)));
+    const lenSolF = norm(sub(coord(n0), coord(baseFrente)));
+    const lenSolT = norm(sub(coord(baseTras), coord(n3)));
+    const nRad = divisoesRadiais ?? Math.max(2, Math.ceil(Math.max(lenLigF, lenLigT) / passoTransicaoMm));
+
+    const amostrarNaSuperficie = (idA, idB, nInt) => {
+      const a = coord(idA);
+      const b = coord(idB);
+      const pts = [idA];
+      for (let k = 1; k <= nInt; k += 1) {
+        const t = k / (nInt + 1);
+        const pLin = [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
+        pts.push(arredP(normalLocal(pLin, foraUnit, projetar).ponto));
+      }
+      pts.push(idB);
+      return pts;
+    };
+
+    /* passo calibrado em solF/solT/ligF/ligT para o sistema inteiro escolher divisoes = nRad nos lados radiais */
+    const passoSolF = Math.max(1, lenSolF / nRad);
+    const passoSolT = Math.max(1, lenSolT / nRad);
+    const passoLigF = Math.max(1, lenLigF / nRad);
+    const passoLigT = Math.max(1, lenLigT / nRad);
+
+    curvas.push({ nome: `${nome}_solF`, pontos: amostrarNaSuperficie(baseFrente, n0, Math.max(1, nRad - 1)), passo: arred(passoSolF) });
+    curvas.push({ nome: `${nome}_solT`, pontos: amostrarNaSuperficie(n3, baseTras, Math.max(1, nRad - 1)), passo: arred(passoSolT) });
+    curvas.push({ nome: `${nome}_ligF`, pontos: amostrarNaSuperficie(n1, topoFrente, Math.max(2, nRad)), passo: arred(passoLigF) });
+    curvas.push({ nome: `${nome}_ligT`, pontos: amostrarNaSuperficie(n2, topoTras, Math.max(2, nRad)), passo: arred(passoLigT) });
+
+    retalhos.push({
+      nome: `${nome}_pFrente`,
+      borda: [`${nome}_solF`, { curva: curvaExterna, de: n0, ate: n1 }, `${nome}_ligF`, curvaFrente],
+    });
+    retalhos.push({
+      nome: `${nome}_pTopo`,
+      borda: [{ curva: curvaExterna, de: n1, ate: n2 }, `${nome}_ligT`, curvaTopo, `${nome}_ligF`],
+    });
+    retalhos.push({
+      nome: `${nome}_pTras`,
+      borda: [{ curva: curvaExterna, de: n2, ate: n3 }, `${nome}_solT`, curvaTras, `${nome}_ligT`],
+    });
+  }
 
   return {
     nos,
     curvas,
     retalhos,
+    cantos,
     curvaBase: `${nome}_anel0`,
-    curvaExterna: `${nome}_anel${faixas.length}`,
+    curvaExterna,
     curvaAba: anelAba ? anelAba.nome : null,
     nosExternos,
     estatisticas: {
-      numeroAneis: faixas.length,
+      numeroAneis: faixasEfetivas.length,
+      anelDeAmortecimentoMm: arred(amortMm),
       larguraTotalMm: arred(larguraTotalMm),
       raioMinimoConcavoMm: Number.isFinite(raioMinimoConcavoMm) ? arred(raioMinimoConcavoMm) : null,
       deslocamentoMaximoMm: arred(deslocamentoMaximoMm),

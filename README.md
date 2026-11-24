@@ -74,7 +74,7 @@ robótico, e `npm run comecar -- modelar/peca/corrigir` lista as peças. Os gate
 vez por `npm run gates`, e `reguas:check` reprova quando a lista local e a do CI
 divergem.
 
-Planos ativos: <!-- planos-ativos:inicio -->[modelagem de carro de passeio](docs/modelar/planos/2026-11-14-modelagem-de-carro.md).<!-- planos-ativos:fim -->
+Planos ativos: <!-- planos-ativos:inicio -->[modelagem de carro de passeio](docs/modelar/planos/2026-11-14-modelagem-de-carro.md) e [costura de vão e guardas na rede](docs/modelar/planos/2026-11-23-costura-de-vao-e-guardas-na-rede.md).<!-- planos-ativos:fim -->
 
 Já fecharam [ajustes no núcleo dos veículos](./docs/modelar/decisoes/PLANOS-ENCERRADOS.md) em 2026-10-30;
 Já fecharam [veículos de referência livre](./docs/modelar/decisoes/PLANOS-ENCERRADOS.md) em 2026-10-20; [objetos externos

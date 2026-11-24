@@ -4,13 +4,36 @@ import { faixaDeContornoNaRede } from '../../../../../nucleo/faixa-de-contorno-n
 
 export const m = (mm) => mm / 1000;
 
-const NIVEIS = ['soleira', 'baixo', 'meio', 'vinco', 'cintura', 'quina', 'eixo'];
-const LADO = 5; // soleira..cintura (0..4) fecham a frente e a traseira; quina (5) e eixo (6) formam teto/capô/vidro traseiro
+const NIVEIS = ['soleira', 'baixo', 'meio', 'apoio', 'vinco', 'cintura', 'quina', 'eixo'];
+const LADO = 6; // soleira..cintura (0..5) fecham a frente e a traseira; quina (6) e eixo (7) formam teto/capô/vidro traseiro
 
+/* deriva o nível auxiliar 'apoio' (~38 mm abaixo de 'vinco') a partir da seção de 7 níveis de TABELA.secoes,
+   garantindo faixa uniforme em valência 4 ao longo de todo o vinco L4 */
 function pontoSecao(T, z, j) {
   const s = T.secoes[String(z)];
-  if (j < 6) return [s[j][0], s[j][1], z];
+  if (j < 3) return [s[j][0], s[j][1], z];
+  if (j === 3) {
+    /* apoio: 38 mm abaixo de vinco (s[3]), interpolado na superfície entre meio (s[2]) e vinco (s[3]) */
+    const [x2, y2] = s[2];
+    const [x3, y3] = s[3];
+    const yAp = y3 - 40;
+    const t = y3 === y2 ? 1 : Math.max(0, Math.min(1, (yAp - y2) / (y3 - y2)));
+    return [x2 + (x3 - x2) * t, yAp, z];
+  }
+  if (j < 7) return [s[j - 1][0], s[j - 1][1], z];
   return [0, s[6], z];
+}
+
+function pontoFrenteOuTraseira(arr, j) {
+  if (j < 3) return arr[j];
+  if (j === 3) {
+    const a = arr[2];
+    const b = arr[3];
+    const yAp = b[1] - 40;
+    const t = b[1] === a[1] ? 1 : Math.max(0, Math.min(1, (yAp - a[1]) / (b[1] - a[1])));
+    return [a[0] + (b[0] - a[0]) * t, yAp, a[2] + (b[2] - a[2]) * t];
+  }
+  return arr[j - 1];
 }
 
 /* interpola x(z, y) da pele externa da lateral a partir de TABELA.secoes (em mm) */
@@ -55,8 +78,8 @@ export function derivarChapa(T) {
     NIVEIS.forEach((_, j) => { nos[nome(i, j)] = fixo(pontoSecao(T, z, j)); });
   });
   for (let j = 0; j < LADO; j += 1) {
-    nos[`f_${NIVEIS[j]}`] = fixo(T.frente[j]);
-    nos[`t_${NIVEIS[j]}`] = fixo(T.traseira[j]);
+    nos[`f_${NIVEIS[j]}`] = fixo(pontoFrenteOuTraseira(T.frente, j));
+    nos[`t_${NIVEIS[j]}`] = fixo(pontoFrenteOuTraseira(T.traseira, j));
   }
   /* quinas quad sem retalho triangular: f_canto/f_quina na frente (canto quase quadrado visto de cima cobrindo o pisca) */
   nos.f_canto = fixo([760, 738, 1982]);
@@ -67,21 +90,52 @@ export function derivarChapa(T) {
   const curvas = [];
   zs.forEach((z, i) => {
     const p = i === 0 || i === iJ ? { peso: 0.05 } : {};
-    curvas.push({ nome: `S${i}_baixo`, pontos: [0, 1, 2, 3, 4].map((j) => nome(i, j)), ...p });
-    curvas.push({ nome: `S${i}_pilar`, pontos: [nome(i, 4), nome(i, 5)], ...p });
-    curvas.push({ nome: `S${i}_teto`, pontos: [nome(i, 5), nome(i, 6)], ...p });
+    curvas.push({ nome: `S${i}_baixo`, pontos: [0, 1, 2, 3, 4, 5].map((j) => nome(i, j)), ...p });
+    curvas.push({ nome: `S${i}_pilar`, pontos: [nome(i, 5), nome(i, 6)], ...p });
+    curvas.push({ nome: `S${i}_teto`, pontos: [nome(i, 6), nome(i, 7)], ...p });
   });
-  const curvaS = (i, j) => (j < 4 ? `S${i}_baixo` : j === 4 ? `S${i}_pilar` : `S${i}_teto`);
+  const curvaS = (i, j) => (j < 5 ? `S${i}_baixo` : j === 5 ? `S${i}_pilar` : `S${i}_teto`);
 
-  /* L0 (soleira) pula os dois vãos de arco (i = 1 dianteiro, i = 5 traseiro); L1 e L2 também pulam esses dois vãos */
+  /* níveis inferiores (soleira, baixo, meio) pulam os dois vãos de arco (i = 1 dianteiro, i = 5 traseiro);
+     apoio (j = 3) forma a borda superior dos vãos de arco, mantendo vinco (j = 4) 100% em valência 4 com faixa uniforme de 38 mm;
+     nos vãos de arco, apoio..eixo preservam as estações intermediárias 1550, 1235 e -1125 como pontos-chave para zero afundamento do capô */
   const VAO_ARCO_D = 1;
   const VAO_ARCO_T = 5;
   const vaosArco = new Set([VAO_ARCO_D, VAO_ARCO_T]);
+  const pontosIntermediarios = T.secoesIntermediarias ?? {};
+
+  const pontoIntermediario = (zStr, j) => {
+    const s = pontosIntermediarios[zStr];
+    if (!s) return null;
+    const z = Number(zStr);
+    if (j === 3) {
+      const [x2, y2] = s[2];
+      const [x3, y3] = s[3];
+      const yAp = y3 - 40;
+      const t = y3 === y2 ? 1 : Math.max(0, Math.min(1, (yAp - y2) / (y3 - y2)));
+      return fixo([x2 + (x3 - x2) * t, yAp, z]);
+    }
+    if (j < 7) return fixo([s[j - 1][0], s[j - 1][1], z]);
+    return fixo([0, s[6], z]);
+  };
 
   NIVEIS.forEach((_, j) => {
-    const vinco = j === 3 ? T.vincos.lateral : j === 4 ? T.vincos.cintura : j === 5 ? T.vincos.quina : undefined;
+    const vinco = j === 4 ? T.vincos.lateral : j === 5 ? T.vincos.cintura : j === 6 ? T.vincos.quina : undefined;
     if (j >= 3) {
-      curvas.push({ nome: `L${j}`, pontos: zs.map((_, i) => nome(i, j)), ...(vinco ? { vinco } : {}) });
+      const pts = [];
+      for (let i = 0; i < zs.length; i += 1) {
+        pts.push(nome(i, j));
+        if (i === VAO_ARCO_D) {
+          for (const zStr of ['1550', '1235']) {
+            const pi = pontoIntermediario(zStr, j);
+            if (pi) pts.push(pi);
+          }
+        } else if (i === VAO_ARCO_T) {
+          const pi = pontoIntermediario('-1125', j);
+          if (pi) pts.push(pi);
+        }
+      }
+      curvas.push({ nome: `L${j}`, pontos: pts, ...(vinco ? { vinco } : {}) });
     } else {
       /* níveis inferiores (soleira, baixo, meio) são divididos em 3 trechos contínuos fora dos dois arcos */
       curvas.push({ nome: `L${j}_f`, pontos: [nome(0, j), nome(1, j)] });
@@ -96,7 +150,7 @@ export function derivarChapa(T) {
     return `L${j}_t`;
   };
 
-  /* frente: curvas horizontais F0..F4 com frente reta e canto arredondado limpo (compatível com carro quadrado) */
+  /* frente: curvas horizontais F0..F5 com frente reta e canto arredondado limpo (compatível com carro quadrado) */
   for (let j = 0; j < LADO - 1; j += 1) {
     const a = nos[nome(0, j)];
     const b = nos[`f_${NIVEIS[j]}`];
@@ -104,12 +158,12 @@ export function derivarChapa(T) {
     const p2 = fixo([a[0] * 0.52, a[1] + (b[1] - a[1]) * 0.9, b[2] - 3]);
     curvas.push({ nome: `F${j}`, pontos: [nome(0, j), p1, p2, `f_${NIVEIS[j]}`], peso: 0.05 });
   }
-  curvas.push({ nome: 'F4', pontos: [nome(0, 4), 'f_canto', 'f_quina', fixo([260, nos.f_cintura[1], nos.f_cintura[2]]), 'f_cintura'], peso: 0.05 });
-  curvas.push({ nome: 'Fquina', pontos: [nome(0, 5), 'f_quina'], peso: 0.05 });
+  curvas.push({ nome: `F${LADO - 1}`, pontos: [nome(0, 5), 'f_canto', 'f_quina', fixo([260, nos.f_cintura[1], nos.f_cintura[2]]), 'f_cintura'], peso: 0.05 });
+  curvas.push({ nome: 'Fquina', pontos: [nome(0, 6), 'f_quina'], peso: 0.05 });
   curvas.push({ nome: 'perfilFrente', pontos: Array.from({ length: LADO }, (_, k) => `f_${NIVEIS[LADO - 1 - k]}`), peso: 0.05 });
-  const fe = nos[nome(0, 6)];
+  const fe = nos[nome(0, 7)];
   const fc = nos.f_cintura;
-  curvas.push({ nome: 'Feixo', pontos: [nome(0, 6), fixo([0, (fe[1] + fc[1]) / 2, (fe[2] + fc[2]) / 2]), 'f_cintura'], peso: 0.05 });
+  curvas.push({ nome: 'Feixo', pontos: [nome(0, 7), fixo([0, (fe[1] + fc[1]) / 2, (fe[2] + fc[2]) / 2]), 'f_cintura'], peso: 0.05 });
 
   /* traseira: Curva 1 (tuck-under) e traseira plana de ponta a ponta com canto suave (~15 mm) */
   for (let j = 0; j < LADO - 1; j += 1) {
@@ -119,12 +173,12 @@ export function derivarChapa(T) {
     const p2 = fixo([a[0] * 0.52, a[1] + (b[1] - a[1]) * 0.9, b[2] + 2]);
     curvas.push({ nome: `Q${j}`, pontos: [nome(iJ, j), p1, p2, `t_${NIVEIS[j]}`], peso: 0.05 });
   }
-  curvas.push({ nome: 'Q4', pontos: [nome(iJ, 4), 't_canto', 't_quina', fixo([340, nos.t_cintura[1], nos.t_cintura[2]]), 't_cintura'], peso: 0.05 });
-  curvas.push({ nome: 'Qquina', pontos: [nome(iJ, 5), 't_quina'], peso: 0.05 });
+  curvas.push({ nome: `Q${LADO - 1}`, pontos: [nome(iJ, 5), 't_canto', 't_quina', fixo([340, nos.t_cintura[1], nos.t_cintura[2]]), 't_cintura'], peso: 0.05 });
+  curvas.push({ nome: 'Qquina', pontos: [nome(iJ, 6), 't_quina'], peso: 0.05 });
   curvas.push({ nome: 'perfilTraseira', pontos: Array.from({ length: LADO }, (_, k) => `t_${NIVEIS[LADO - 1 - k]}`), peso: 0.05 });
-  const te = nos[nome(iJ, 6)];
+  const te = nos[nome(iJ, 7)];
   const tc = nos.t_cintura;
-  curvas.push({ nome: 'Teixo', pontos: [nome(iJ, 6), fixo([0, (te[1] + tc[1]) / 2, (te[2] + tc[2]) / 2]), 't_cintura'], peso: 0.05 });
+  curvas.push({ nome: 'Teixo', pontos: [nome(iJ, 7), fixo([0, (te[1] + tc[1]) / 2, (te[2] + tc[2]) / 2]), 't_cintura'], peso: 0.05 });
 
   const retalhos = [];
   const lado = (curva, de, ate) => ({ curva, de, ate });
@@ -143,26 +197,12 @@ export function derivarChapa(T) {
     }
   }
 
-  /* arcos de roda dianteiro (vão i = 1) e traseiro (vão i = 5) estampados na própria malha via faixaDeContornoNaRede */
+  /* arcos de roda dianteiro (vão i = 1) e traseiro (vão i = 5) estampados na própria malha via faixaDeContornoNaRede (modo vao + anelDeAmortecimentoMm) */
   const cantosArcos = [];
-  const linhaLateral = (nomeA, nomeB, nInt = 2) => {
-    const a = nos[nomeA];
-    const b = nos[nomeB];
-    const pts = [nomeA];
-    for (let k = 1; k <= nInt; k += 1) {
-      const t = k / (nInt + 1);
-      const y = a[1] + (b[1] - a[1]) * t;
-      const z = a[2] + (b[2] - a[2]) * t;
-      pts.push(fixo([xPeleLateral(T, z, y), y, z]));
-    }
-    pts.push(nomeB);
-    return pts;
-  };
-
   const montarVaoArco = (pref, iVao, arco) => {
     const { z: zC, y: yC, raio: R } = arco;
     const yBase = 255;
-    const angMin = Math.asin((yBase - yC) / R); // ~ -0.10 rad para encostar exatamente em y = 255
+    const angMin = Math.asin((yBase - yC) / R);
     const angMax = Math.PI - angMin;
     const N = 13;
     const ptsArco = [];
@@ -172,6 +212,11 @@ export function derivarChapa(T) {
       const y = k === 0 || k === N - 1 ? yBase : yC + R * Math.sin(ang);
       ptsArco.push(fixo([xPeleLateral(T, z, y), y, z]));
     }
+
+    const solF = nome(iVao, 0);
+    const apF = nome(iVao, 3);
+    const solT = nome(iVao + 1, 0);
+    const apT = nome(iVao + 1, 3);
 
     const faixa = faixaDeContornoNaRede({
       nome: pref,
@@ -185,42 +230,30 @@ export function derivarChapa(T) {
       deslocamentoBaseMm: 8,
       vincoBase: 0.35,
       faixas: [
-        { larguraMm: 18, deslocamentoMm: 12 },
-        { larguraMm: 26, deslocamentoMm: 0, vinco: 0.55 },
+        { larguraMm: 15, deslocamentoMm: 11 },
+        { larguraMm: 21, deslocamentoMm: 0, vinco: 0.50 },
       ],
+      anelDeAmortecimentoMm: 10,
       modulacao: [[0, 0.30], [0.18, 1], [0.82, 1], [1, 0.30]],
       ancoras: [0, 3, 9, 12],
+      vao: {
+        baseFrente: solF,
+        topoFrente: apF,
+        topoTras: apT,
+        baseTras: solT,
+        curvaFrente: lado(`S${iVao}_baixo`, apF, solF),
+        curvaTopo: lado('L3', apT, apF),
+        curvaTras: lado(`S${iVao + 1}_baixo`, solT, apT),
+        nosDoVao: nos,
+        passoTransicaoMm: 85,
+        divisoesRadiais: 3,
+      },
     });
 
     Object.assign(nos, faixa.nos);
     curvas.push(...faixa.curvas);
     retalhos.push(...faixa.retalhos);
-
-    const [n0, n1, n2, n3] = faixa.nosExternos;
-    cantosArcos.push(`${pref}_a0_n0`, `${pref}_a0_n3`, n0, n3);
-
-    const solF = nome(iVao, 0);
-    const vinF = nome(iVao, 3);
-    const solT = nome(iVao + 1, 0);
-    const vinT = nome(iVao + 1, 3);
-
-    curvas.push({ nome: `${pref}_solF`, pontos: linhaLateral(solF, n0, 1) });
-    curvas.push({ nome: `${pref}_solT`, pontos: linhaLateral(n3, solT, 1) });
-    curvas.push({ nome: `${pref}_ligF`, pontos: linhaLateral(n1, vinF, 2) });
-    curvas.push({ nome: `${pref}_ligT`, pontos: linhaLateral(n2, vinT, 2) });
-
-    retalhos.push({
-      nome: `${pref}_pFrente`,
-      borda: [`${pref}_solF`, lado(faixa.curvaExterna, n0, n1), `${pref}_ligF`, lado(`S${iVao}_baixo`, vinF, solF)],
-    });
-    retalhos.push({
-      nome: `${pref}_pTopo`,
-      borda: [lado(faixa.curvaExterna, n1, n2), `${pref}_ligT`, lado('L3', vinT, vinF), `${pref}_ligF`],
-    });
-    retalhos.push({
-      nome: `${pref}_pTras`,
-      borda: [lado(faixa.curvaExterna, n2, n3), `${pref}_solT`, lado(`S${iVao + 1}_baixo`, solT, vinT), `${pref}_ligT`],
-    });
+    cantosArcos.push(...faixa.cantos);
   };
 
   montarVaoArco('arcoD', VAO_ARCO_D, T.arcos.dianteiro);
@@ -248,19 +281,19 @@ export function derivarChapa(T) {
   /* 4 retalhos 100% QUAD nas quinas do capô e da coluna D (elimina os polos val:3 de retalho triangular!) */
   retalhos.push({
     nome: 'f_capo_canto',
-    borda: [lado('S0_pilar', nome(0, 4), nome(0, 5)), lado('Fquina', nome(0, 5), 'f_quina'), lado('F4', 'f_quina', 'f_canto'), lado('F4', 'f_canto', nome(0, 4))],
+    borda: [lado('S0_pilar', nome(0, 5), nome(0, 6)), lado('Fquina', nome(0, 6), 'f_quina'), lado(`F${LADO - 1}`, 'f_quina', 'f_canto'), lado(`F${LADO - 1}`, 'f_canto', nome(0, 5))],
   });
   retalhos.push({
     nome: 'f_capo_centro',
-    borda: [lado('S0_teto', nome(0, 5), nome(0, 6)), lado('Feixo', nome(0, 6), 'f_cintura'), lado('F4', 'f_cintura', 'f_quina'), lado('Fquina', 'f_quina', nome(0, 5))],
+    borda: [lado('S0_teto', nome(0, 6), nome(0, 7)), lado('Feixo', nome(0, 7), 'f_cintura'), lado(`F${LADO - 1}`, 'f_cintura', 'f_quina'), lado('Fquina', 'f_quina', nome(0, 6))],
   });
   retalhos.push({
     nome: 'c_tampa_canto',
-    borda: [lado(`S${iJ}_pilar`, nome(iJ, 4), nome(iJ, 5)), lado('Qquina', nome(iJ, 5), 't_quina'), lado('Q4', 't_quina', 't_canto'), lado('Q4', 't_canto', nome(iJ, 4))],
+    borda: [lado(`S${iJ}_pilar`, nome(iJ, 5), nome(iJ, 6)), lado('Qquina', nome(iJ, 6), 't_quina'), lado(`Q${LADO - 1}`, 't_quina', 't_canto'), lado(`Q${LADO - 1}`, 't_canto', nome(iJ, 5))],
   });
   retalhos.push({
     nome: 'c_tampa_centro',
-    borda: [lado(`S${iJ}_teto`, nome(iJ, 5), nome(iJ, 6)), lado('Teixo', nome(iJ, 6), 't_cintura'), lado('Q4', 't_cintura', 't_quina'), lado('Qquina', 't_quina', nome(iJ, 5))],
+    borda: [lado(`S${iJ}_teto`, nome(iJ, 6), nome(iJ, 7)), lado('Teixo', nome(iJ, 7), 't_cintura'), lado(`Q${LADO - 1}`, 't_cintura', 't_quina'), lado('Qquina', 't_quina', nome(iJ, 6))],
   });
 
   const rede = gaiolaPorRede({
