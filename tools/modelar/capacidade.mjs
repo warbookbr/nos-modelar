@@ -63,6 +63,10 @@ export const CAPACIDADES = Object.freeze({
   transmissaoPorAtrito: { arquivo: 'procedural/familias/polia-e-correia/correia.js', funcao: 'transmissaoPorAtrito', de: 'procedural/familias/polia-e-correia/correia.js' },
   parDeEngrenagens: { arquivo: 'procedural/familias/engrenagem/engrenamento.js', funcao: 'parDeEngrenagens', de: 'procedural/familias/engrenagem/engrenamento.js' },
   pecasDaRede: { arquivo: 'procedural/familias/tubulacao/rede.js', funcao: 'pecasDaRede', de: 'procedural/familias/tubulacao/rede.js' },
+  parametrosDoPerfil: { arquivo: 'procedural/familias/perfil-estrutural/tabela.js', funcao: 'parametrosDoPerfil', de: 'procedural/familias/perfil-estrutural/tabela.js' },
+  parametrosDaGuia: { arquivo: 'procedural/familias/guia-linear/tabela.js', funcao: 'parametrosDaGuia', de: 'procedural/familias/guia-linear/tabela.js' },
+  parametrosDoRolamento: { arquivo: 'procedural/familias/rolamento/tabela.js', funcao: 'parametrosDoRolamento', de: 'procedural/familias/rolamento/tabela.js' },
+  parametrosDoFuso: { arquivo: 'procedural/familias/fuso/tabela.js', funcao: 'parametrosDoFuso', de: 'procedural/familias/fuso/tabela.js' },
   pinhaoECremalheira: { arquivo: 'procedural/familias/engrenagem/engrenamento.js', funcao: 'pinhaoECremalheira', de: 'procedural/familias/engrenagem/engrenamento.js' },
 });
 

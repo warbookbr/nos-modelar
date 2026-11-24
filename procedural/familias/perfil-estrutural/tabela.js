@@ -7,7 +7,23 @@
    largura.
 
    O perfil de alumínio ranhurado não tem norma pública: os lados de 20, 30, 40 e 45 mm e as aberturas de ranhura de 6, 8, 8
-   e 10 mm são os usuais do mercado, e a forma da ranhura e do furo central segue regra da família (`geometria.js`). */
+   e 10 mm são os usuais do mercado, e a forma da ranhura e do furo central segue regra da família (`geometria.js`).
+
+   FICHA parametrosDoPerfil
+   serve: os parâmetros da família `perfil-estrutural` por série e tamanho de tabela (IPE, HEA e UPN da EN 10365 e o
+     alumínio ranhurado), para pôr um perfil cortado no comprimento, reto ou a 45° nas pontas.
+   quando: quadro, base ou coluna de máquina com perfil laminado europeu ou alumínio ranhurado de 20 a 45 mm.
+   unidades: mm.
+   campos:
+     serie: 'IPE', 'HEA', 'UPN' ou 'ALUMINIO'.
+     tamanho: o número da tabela (200, 40...).
+     comprimento: o comprimento na linha do meio.
+     corte: 0 reto, 1 a ponta final a 45°, 2 as duas pontas.
+   devolve: os parâmetros completos da família; a seção fica em [x, z] e o perfil vai ao longo de y.
+   exemplo:
+     chamar(registro.obter('perfil-estrutural'), 'viga', parametrosDoPerfil('IPE', 200, { comprimento: 1000 }))
+   peça: tools/fixtures/elementos-de-maquina/mesa-linear.mjs (os dois perfis de alumínio 40 da base).
+   FIM DA FICHA */
 
 const perfil = (h, b, tw, tf, r, r2 = 0, inclinacao = 0) => Object.freeze({ h, b, tw, tf, r, r2, inclinacao });
 

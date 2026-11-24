@@ -137,7 +137,7 @@
       "parametros": "seção e tamanho, comprimento, corte de ponta",
       "referencias": ["FreeCAD: Frame/BIM Profile", "Onshape: Frame"],
       "aqui": "parcial",
-      "onde": "extensão `estruturaDeBarras`: tubo redondo, quadrado, retangular e cantoneira entre nós; I, H, U e alumínio ranhurado não"
+      "onde": "família `perfil-estrutural`: IPE, HE A e UPN da EN 10365 e alumínio ranhurado de 20 a 45 mm, cortados no comprimento, retos ou a 45° nas pontas; a extensão `estruturaDeBarras` faz tubo redondo, quadrado, retangular e cantoneira entre nós; os perfis novos na `estruturaDeBarras` não"
     },
     "barras": {
       "nome": "estrutura de barras",
@@ -271,8 +271,8 @@
       "automatiza": "gera rolamento por série com anéis, corpos rolantes, gaiola e vedação, e bucha e mancal com furação",
       "parametros": "série e tamanho, tipo",
       "referencias": ["FreeCAD: Fasteners e Parts Library", "catálogos de fabricantes em STEP"],
-      "aqui": "não",
-      "onde": "nenhum gerador; os componentes rolamento e mancal do esboço antigo saíram com ele em 2026-11-05"
+      "aqui": "parcial",
+      "onde": "família `rolamento`: rígido de esferas das séries 60 e 62 da ISO 15, aberto, vedado ou no mancal de pedestal; rolos, axial, agulhas e bucha não"
     },
     "eixo": {
       "nome": "eixo escalonado",
@@ -317,7 +317,7 @@
       "parametros": "diâmetro, curso, extensão, montagem das pontas",
       "referencias": ["catálogos de fabricantes em STEP (conceito)"],
       "aqui": "parcial",
-      "onde": "família `cilindro-hidraulico`: camisa, haste, êmbolo, cabeça e olhais liso e com rótula, curso conferido; cilindro de haste dupla e telescópico não"
+      "onde": "família `cilindro-hidraulico`: camisa, haste, êmbolo, cabeça e olhais liso e com rótula, curso conferido; cilindro de haste dupla e telescópico não; família `fuso`: fuso trapezoidal (ISO 2904) e de esferas (ISO 3408-2, só o volume de fora) com a castanha flangeada"
     },
     "guia": {
       "nome": "guia linear",
@@ -326,7 +326,7 @@
       "parametros": "tamanho, curso, tipo",
       "referencias": ["catálogos de fabricantes em STEP (conceito)"],
       "aqui": "parcial",
-      "onde": "trilho simples de gaveta e de porta de correr dentro da família `movel-de-caixa`, com articulação prismática; trilho e carro avulsos e guia em V não"
+      "onde": "família `guia-linear`: trilho de perfil com a furação e carro de esferas, tamanhos 15 a 30, com as portas da base e da mesa; o trilho de gaveta e de porta de correr na família `movel-de-caixa`; guia em V não"
     },
     "vedacao": {
       "nome": "vedação",

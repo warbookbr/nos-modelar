@@ -4,7 +4,21 @@
    As medidas de contorno são as da ISO 15, lidas no extrato público da JIS B 1512 que a Miki Pulley publica ("Ball Bearing
    Standard Dimensions Table — Excerpt from JIS"); o 6200, que o extrato não traz, foi conferido nas fichas abertas de dois
    fabricantes. O 6009, o 6207 e o 6209 ficam fora, porque o extrato não os traz. O número e o diâmetro das esferas não são
-   de norma e seguem regra da família (`geometria.js`). */
+   de norma e seguem regra da família (`geometria.js`).
+
+   FICHA parametrosDoRolamento
+   serve: os parâmetros da família `rolamento` pela designação (séries 60 e 62 da ISO 15): o rolamento aberto, vedado ou
+     alojado no mancal de pedestal.
+   quando: apoio de eixo de máquina, polia, roda ou fuso.
+   unidades: mm.
+   campos:
+     designacao: '6000' a '6010' ou '6200' a '6210' (sem 6009, 6207 e 6209).
+     forma: 1 aberto, 2 vedado, 3 no mancal.
+   devolve: os parâmetros completos da família; o eixo é y, de 0 à largura, e as portas `furo` e `apoio`.
+   exemplo:
+     chamar(registro.obter('rolamento'), 'mancal', parametrosDoRolamento(6204, 3))
+   peça: tools/fixtures/elementos-de-maquina/mesa-linear.mjs (os dois mancais 6000 do fuso).
+   FIM DA FICHA */
 
 const r = (d, D, B, chanfro) => Object.freeze({ d, D, B, chanfro });
 export const ROLAMENTOS = Object.freeze({

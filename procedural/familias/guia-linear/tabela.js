@@ -4,7 +4,22 @@
    fabricante. Os valores abaixo são as medidas de intercâmbio usuais do mercado para a série de carro estreito de flange
    reto, comuns a vários fabricantes, e entram como regra da família: a largura e a altura do trilho, o passo da furação e o
    furo com rebaixo dele; a largura, a altura de montagem (da base do trilho ao topo do carro), o comprimento, a folga de
-   baixo do carro, a distância entre os furos do carro (em x e em y) e a rosca deles. */
+   baixo do carro, a distância entre os furos do carro (em x e em y) e a rosca deles.
+
+   FICHA parametrosDaGuia
+   serve: os parâmetros da família `guia-linear` pelo tamanho (15, 20, 25 e 30): o trilho com a furação e o carro de
+     esferas montado sobre ele numa posição.
+   quando: movimento linear de mesa, carro ou eixo de máquina sobre trilho de perfil.
+   unidades: mm.
+   campos:
+     tamanho: 15, 20, 25 ou 30.
+     comprimento: o comprimento do trilho.
+     posicaoDoCarro: o começo do carro ao longo do trilho.
+   devolve: os parâmetros completos da família; o trilho vai ao longo de y com a base em z = 0, e as portas `base` e `mesa`.
+   exemplo:
+     chamar(registro.obter('guia-linear'), 'guia', parametrosDaGuia(15, { comprimento: 600, posicaoDoCarro: 200 }))
+   peça: tools/fixtures/elementos-de-maquina/mesa-linear.mjs (as duas guias 15 sobre os perfis).
+   FIM DA FICHA */
 
 const tamanho = (larguraDoTrilho, alturaDoTrilho, passo, diametroDoFuro, diametroDoRebaixo, profundidadeDoRebaixo, larguraDoCarro, alturaDeMontagem, comprimentoDoCarro, folgaDeBaixo, furosDoCarroX, furosDoCarroY, rosca) => Object.freeze({ larguraDoTrilho, alturaDoTrilho, passo, diametroDoFuro, diametroDoRebaixo, profundidadeDoRebaixo, larguraDoCarro, alturaDeMontagem, comprimentoDoCarro, folgaDeBaixo, furosDoCarroX, furosDoCarroY, rosca });
 

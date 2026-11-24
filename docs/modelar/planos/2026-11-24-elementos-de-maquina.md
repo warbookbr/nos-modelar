@@ -1,6 +1,6 @@
 # Elementos de máquina: perfil estrutural, guia linear, rolamento com mancal e fuso com castanha
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `procedural/familias/perfil-estrutural/`, `procedural/familias/guia-linear/`, `procedural/familias/rolamento/`, `procedural/familias/fuso/`, `procedural/familias/index.js`, `tools/fixtures/elementos-de-maquina/`, `docs/modelar/banco-de-provas/elementos-de-maquina-2026-11-24/`, `docs/modelar/ferramentas-por-objeto.json`, `tools/modelar/capacidade.mjs`.
 
@@ -62,7 +62,7 @@ Cada fatia cabe numa sessão de agente despachado, entrega o teste dela e deixa 
 2. Feita em 2026-11-24: a guia linear, trilho e carro, com a aprovação da pessoa.
 3. Feita em 2026-11-24: o rolamento e o mancal de pedestal, com a aprovação da pessoa.
 4. Feita em 2026-11-24: o fuso e a castanha, com a aprovação da pessoa.
-5. A mesa linear de prova, o banco de provas, o mapa de ferramentas, as fichas e o fechamento.
+5. Feita em 2026-11-24: a mesa linear de prova, o banco de provas, o mapa de ferramentas, as fichas e o fechamento.
 
 ## Decisão da pessoa
 
@@ -80,3 +80,5 @@ Fatia 3, em 2026-11-24. A família `rolamento` faz o rolamento rígido de esfera
 Fatia 4, em 2026-11-24. A família `fuso` faz o trapezoidal Tr10x2 a Tr40x7 da ISO 2904 (diâmetro e passo da série preferida, 30° de flanco, altura P/2 + ac e diâmetro menor d3 da norma, crista de 0,366 P do perfil básico) e o de esferas 16x5 a 40x10 da ISO 3408-2 só com o volume de fora, com a crista larga entre as pistas por regra da família; a castanha flangeada de quatro furos, com 0,1 mm de folga sobre o filete, também é regra da família. O filete é o `friso` pela hélice, à parte do núcleo como a rosca cosmética do `fixador`, porque unir os dois custou de 7,5 s a 63 s por fuso; as facetas se cruzam na base do filete sem atravessar, e o contato é declarado. A pessoa perguntou se o CAD de máquina modela a rosca por norma; a resposta, que em máquina grande a rosca é dado e a hélice é opção, foi para o backlog. A camada mecânica foi gravada depois da aprovação da pessoa por imagem.
 
 ## Fechamento
+
+Concluído em 2026-11-24. O gate de saída está cumprido: as quatro famílias (`perfil-estrutural`, `guia-linear`, `rolamento` e `fuso`) têm tabela, teste de cada recusa, perfis, conferência e o veredito da pessoa por imagem em `aprovacao.json`; a mesa linear de prova (`tools/fixtures/elementos-de-maquina/mesa-linear.mjs`) monta em cerca de 2 s com as quatro famílias, cada um dos 21 encaixes tem contato medido e declarado e nada atravessa, e ela sai em STEP e OBJ com as partes nomeadas. Na mesa, a crista do filete do fuso apoia no furo do rolamento, porque o fuso não tem a ponta usinada; o contato é declarado com esse motivo. As fichas `parametrosDoPerfil`, `parametrosDaGuia`, `parametrosDoRolamento` e `parametrosDoFuso` estão em `npm run capacidade`, o mapa de ferramentas registra as quatro famílias e o banco de provas está em `docs/modelar/banco-de-provas/elementos-de-maquina-2026-11-24/`. Ficaram fora, como o plano exclui, os rolamentos de rolos, axial e de agulhas, a guia em V, os perfis novos na `estruturaDeBarras` e a ponta usinada do fuso; a rosca como dado com a hélice opcional foi para o backlog. Com sete famílias com tabela própria, o catálogo de normas único volta à pessoa como decisão: a forma da tabela se repetiu sem atrito, e a recomendação é seguir adiando.

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2291 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2294 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -314,6 +314,10 @@
 ## docs/modelar/banco-de-provas/divisao-por-contorno-2026-11-18/
 
 - `README.md` — Divisão por contorno: fatia 1, a operação e as provas na chapa de teste
+
+## docs/modelar/banco-de-provas/elementos-de-maquina-2026-11-24/
+
+- `README.md` — Elementos de máquina: perfil, guia, rolamento e fuso
 
 ## docs/modelar/banco-de-provas/empilhadeira-2026-10-09/
 
@@ -3218,6 +3222,11 @@
 ## tools/fixtures/descrever-sem-calar/orfao/referencias/
 
 - `alvo.md` — Alvo
+
+## tools/fixtures/elementos-de-maquina/
+
+- `mesa-linear.mjs` — mesa-linear.mjs — a mesa linear de prova do plano de elementos de máquina, em milímetro na montagem e metro na receita.
+- `mesa-linear.test.mjs` — mesa-linear.test.mjs — o gate de saída do plano de elementos de máquina: a mesa linear de prova sai com as quatro famílias (perfil, guia, rolamento no mancal…
 
 ## tools/fixtures/faces-finas/
 
