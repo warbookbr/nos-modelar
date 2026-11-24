@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2244 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2252 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1539,6 +1539,10 @@
 
 - `receita.js` — braco-de-prova/base — a base redonda e baixa do braço de prova, oca, com a eletrônica dentro e o botão de parada no topo.
 
+## procedural/pecas/braco-de-prova/partes/base/rodadas/
+
+- `receita-01.js` — braco-de-prova/base — a base redonda e baixa do braço de prova, oca, com a eletrônica dentro e o botão de parada no topo.
+
 ## procedural/pecas/braco-de-prova/partes/elo1/
 
 - `receita.js` — braco-de-prova/elo1 — o primeiro elo, um perfil em U aberto em cima, cinza-escuro, de 150 mm entre o eixo do ombro e o do cotovelo, girando entre as paredes …
@@ -1547,29 +1551,57 @@
 
 - `receita.js` — braco-de-prova/elo2 — o segundo elo, outro perfil em U cinza-escuro, de 150 mm do eixo do cotovelo até a ponta, com o eixo do cotovelo e as tampas laranja da…
 
+## procedural/pecas/braco-de-prova/partes/elo2/rodadas/
+
+- `receita-01.js` — braco-de-prova/elo2 — o segundo elo, outro perfil em U cinza-escuro, de 150 mm do eixo do cotovelo até a ponta, com o eixo do cotovelo e as tampas laranja da…
+
 ## procedural/pecas/braco-de-prova/partes/garfo/
 
 - `receita.js` — braco-de-prova/garfo — o garfo do ombro: duas paredes laranja de 12 mm, a 90 mm uma da outra, presas no topo da base.
+
+## procedural/pecas/braco-de-prova/partes/garfo/rodadas/
+
+- `receita-01.js` — braco-de-prova/garfo — o garfo do ombro: duas paredes laranja de 12 mm, a 90 mm uma da outra, presas no topo da base.
 
 ## procedural/pecas/braco-de-prova/partes/garra/
 
 - `receita.js` — braco-de-prova/garra — a garra como volume, um bloco de 40 × 45 × 40 mm na ponta do segundo elo.
 
+## procedural/pecas/braco-de-prova/partes/garra/rodadas/
+
+- `receita-01.js` — braco-de-prova/garra — a garra como volume, um bloco de 40 × 45 × 40 mm na ponta do segundo elo.
+
 ## procedural/pecas/braco-de-prova/partes/motor-cotovelo/
 
 - `receita.js` — braco-de-prova/motor-cotovelo — o NEMA 17 do cotovelo, preso do lado de fora da parede de trás do primeiro elo, perto do ombro, com o eixo entrando no U.
+
+## procedural/pecas/braco-de-prova/partes/motor-cotovelo/rodadas/
+
+- `receita-01.js` — braco-de-prova/motor-cotovelo — o NEMA 17 do cotovelo, preso do lado de fora da parede de trás do primeiro elo, perto do ombro, com o eixo entrando no U.
 
 ## procedural/pecas/braco-de-prova/partes/motor-ombro/
 
 - `receita.js` — braco-de-prova/motor-ombro — o NEMA 23 com a redução planetária de 5:1, deitados no eixo do ombro, do lado de fora da parede da frente do garfo.
 
+## procedural/pecas/braco-de-prova/partes/motor-ombro/rodadas/
+
+- `receita-01.js` — braco-de-prova/motor-ombro — o NEMA 23 com a redução planetária de 5:1, deitados no eixo do ombro, do lado de fora da parede da frente do garfo.
+
 ## procedural/pecas/braco-de-prova/partes/rolamento/
 
 - `receita.js` — braco-de-prova/rolamento — o rolamento do lado de trás do ombro, na face de fora da parede de trás do garfo.
 
+## procedural/pecas/braco-de-prova/partes/rolamento/rodadas/
+
+- `receita-01.js` — braco-de-prova/rolamento — o rolamento do lado de trás do ombro, na face de fora da parede de trás do garfo.
+
 ## procedural/pecas/braco-de-prova/partes/transmissao/
 
 - `receita.js` — braco-de-prova/transmissao — as polias GT2 de 20 e 80 dentes e a correia de 6 mm do cotovelo, à mostra dentro do U do primeiro elo.
+
+## procedural/pecas/braco-de-prova/partes/transmissao/rodadas/
+
+- `receita-02.js` — braco-de-prova/transmissao — as polias GT2 de 20 e 80 dentes e a correia de 6 mm do cotovelo, à mostra dentro do U do primeiro elo.
 
 ## procedural/pecas/braco-robotico/
 

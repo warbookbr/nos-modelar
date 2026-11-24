@@ -1,0 +1,705 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "braco-de-prova/motor-ombro",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "docs/modelar/banco-de-provas/braco-de-prova-2026-11-23/elos-opcoes.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "eixoDeSaida",
+        "tipo": "superficie",
+        "onde": "corpo cilíndrico, laterais",
+        "sentido": "facetado",
+        "evidencia": "Isométrica isolada: o cilindro mostra cerca de 16 faixas planas e a borda da tampa em polígono, o que lê como prisma."
+      },
+      {
+        "parte": "eixoDoMotor",
+        "tipo": "superficie",
+        "onde": "corpo cilíndrico, laterais",
+        "sentido": "facetado",
+        "evidencia": "Isométrica isolada: lados planos visíveis e tampa poligonal, no mesmo grau do eixo de saída."
+      },
+      {
+        "parte": "motor",
+        "tipo": "posicao",
+        "onde": "quatro furos da flange, vistos na face +z (externa)",
+        "sentido": "atrasada",
+        "evidencia": "Vista isométrica isolada do motor: furos só no topo +z, longe da planetária. A flange prometida encosta em -z. Se atravessam, o raio X traseiro é compatível; as vistas não decidem."
+      }
+    ],
+    "observacao": "Conjunto fiel em medida e posição e coerente com o caráter de caixas chanfradas da opção A. O eixo de saída toca o elo1 a 0,00 mm sem contato declarado. Os furos M5 da planetária não aparecem nas vistas."
+  },
+  "partes": [
+    {
+      "nome": "planetaria",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "motor",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "ressaltoDoMotor",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "ressaltoDeSaida",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoDeSaida",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoDoMotor",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "aviso de 6 faces finas na malha (planetaria 4, motor 2), vindas dos furos e chanfros; a medição passa"
+  ],
+  "notaDePassagem": "O conjunto é a planetária 5:1 de 57×57×55 mm com a flange na parede da frente do garfo e o NEMA 23 de 57×57×76 mm atrás dela, com os ressaltos de 38,1 e 32 mm e os eixos de 8 e 14 mm; o eixo de saída fica no eixo do ombro.",
+  "receita": {
+    "sha256": "sha256:ee6f92feb2c9f441caa1fda8806abfbfb7c4e1cd922d09e1e30aa69e74e24445",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 122,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* braco-de-prova/motor-ombro — o NEMA 23 com a redução planetária de 5:1, deitados no eixo do ombro, do lado de fora da"
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " * parede da frente do garfo."
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * Terceira etapa da montagem `braco-de-prova/montagem.json`. Componentes comprados, como blocos com o eixo (filtro do plano"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * do braço de prova: a caixa e o eixo do item `componente`, sem família nova). Medidas do pedido inicial da mecatrônica:"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * NEMA 23 de 57 × 57 × 76 mm com eixo de 8 × 21 mm; planetária de 57 × 57 × 55 mm com eixo de saída de 14 × 25 mm."
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * Referencial: o da montagem (ver `../../comum/blocos.mjs`). A face de saída da planetária (a flange) se apoia na face de fora da"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * parede da frente do garfo; o eixo de saída atravessa o furo da parede e entra 12 mm no cubo do primeiro elo. O"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * eixo do NEMA 23 entra num furo cego da planetária, do tamanho dele, e não atravessa nada."
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " * Portas: `flange` (plano, apoia, normal −z, na face de saída da planetária) e `eixoDeSaida` (cilindro externo, eixo +z, com o"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " * centro na ponta do eixo de saída), onde o primeiro elo se prende."
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " */"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": "import { passosDasFormas, aliasesDasFormas, porta, origemDa, MATERIAIS as CORES } from '../../../comum/blocos.mjs';"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": "  alturaDoEixo: 140,"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": "  /* Face de fora da parede da frente do garfo, onde a flange da planetária se apoia. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": "  faceDoGarfo: 51,"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": "  ladoDaCaixa: 57,"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": "  comprimentoDaPlanetaria: 55,"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": "  comprimentoDoMotor: 76,"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": "  raioDoEixoDeSaida: 7,"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": "  comprimentoDoEixoDeSaida: 25,"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": "  raioDoEixoDoMotor: 4,"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": "  comprimentoDoEixoDoMotor: 21,"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": "  chanfro: 2,"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": "  /* As duas flanges no quadrado de 47,14 mm (NEMA 23): a da planetária, presa na parede do garfo por quatro M5 (furos cegos"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "     de 10 mm) e com o ressalto de saída de 32 × 2 mm dentro do furo do garfo; a do NEMA 23, com os quatro furos de 5,1 mm"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "     (passantes, simplificação dos parafusos longos) e o ressalto de 38,1 × 1,6 mm encaixado na face de entrada da planetária. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "  passoDosFuros: 47.14,"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "  raioDoFuroM5: 2.75,"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "  fundoDoFuroM5: 10,"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "  raioDoFuroDoMotor: 2.55,"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "  raioDoRessaltoDeSaida: 16,"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "  alturaDoRessaltoDeSaida: 2,"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "  raioDoRessaltoDoMotor: 19.05,"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "  alturaDoRessaltoDoMotor: 1.6,"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "const noQuadrado = (t, f) => [-1, 1].flatMap((sx) => [-1, 1].map((sy) => f((sx * t.passoDosFuros) / 2, t.alturaDoEixo + (sy * t.passoDosFuros) / 2)));"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "export const MATERIAIS = CORES;"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "export function derivar(t = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "  const h = t.ladoDaCaixa / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "  const y = [t.alturaDoEixo - h, t.alturaDoEixo + h];"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "  const zPlanetaria = [t.faceDoGarfo, t.faceDoGarfo + t.comprimentoDaPlanetaria];"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "  const zMotor = [zPlanetaria[1], zPlanetaria[1] + t.comprimentoDoMotor];"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "  const baseDoEixoDoMotor = zPlanetaria[1] - t.comprimentoDoEixoDoMotor;"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "  return ["
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "    { nome: 'planetaria', material: 'motor', chanfro: t.chanfro, caixa: [-h, h, ...y, ...zPlanetaria],"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "      furos: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "        { eixo: 'z', base: [0, t.alturaDoEixo, baseDoEixoDoMotor], comprimento: t.comprimentoDoEixoDoMotor + 1, raio: t.raioDoEixoDoMotor, lados: 18 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "        { eixo: 'z', base: [0, t.alturaDoEixo, zPlanetaria[1] - t.alturaDoRessaltoDoMotor], comprimento: t.alturaDoRessaltoDoMotor + 1, raio: t.raioDoRessaltoDoMotor, lados: 36 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "        ...noQuadrado(t, (x, yy) => ({ eixo: 'z', base: [x, yy, zPlanetaria[0] - 1], comprimento: t.fundoDoFuroM5 + 1, raio: t.raioDoFuroM5, lados: 12 })),"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "      ] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "    { nome: 'motor', material: 'motor', chanfro: t.chanfro, caixa: [-h, h, ...y, ...zMotor],"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "      furos: noQuadrado(t, (x, yy) => ({ eixo: 'z', base: [x, yy, zMotor[0] - 1], comprimento: t.comprimentoDoMotor + 2, raio: t.raioDoFuroDoMotor, lados: 12 })) },"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "    { nome: 'ressaltoDoMotor', material: 'motor', eixo: 'z', base: [0, t.alturaDoEixo, zPlanetaria[1] - t.alturaDoRessaltoDoMotor], comprimento: t.alturaDoRessaltoDoMotor, raio: t.raioDoRessaltoDoMotor, lados: 36 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "    { nome: 'ressaltoDeSaida', material: 'motor', eixo: 'z', base: [0, t.alturaDoEixo, t.faceDoGarfo - t.alturaDoRessaltoDeSaida], comprimento: t.alturaDoRessaltoDeSaida, raio: t.raioDoRessaltoDeSaida, lados: 36,"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "      furos: [{ eixo: 'z', base: [0, t.alturaDoEixo, t.faceDoGarfo - t.alturaDoRessaltoDeSaida - 1], comprimento: t.alturaDoRessaltoDeSaida + 2, raio: t.raioDoEixoDeSaida, lados: 18 }] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "    { nome: 'eixoDeSaida', material: 'aco', eixo: 'z', base: [0, t.alturaDoEixo, t.faceDoGarfo - t.comprimentoDoEixoDeSaida], comprimento: t.comprimentoDoEixoDeSaida, raio: t.raioDoEixoDeSaida, lados: 18 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "    { nome: 'eixoDoMotor', material: 'aco', eixo: 'z', base: [0, t.alturaDoEixo, baseDoEixoDoMotor], comprimento: t.comprimentoDoEixoDoMotor, raio: t.raioDoEixoDoMotor, lados: 18 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "  ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "export const ALIASES = aliasesDasFormas(derivar(TABELA));"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "export function gerarPassos(t = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "  const formas = derivar(t);"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "  const { passos } = passosDasFormas(formas);"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "  passos.push(porta('flange', origemDa(formas, 'planetaria'), { forma: 'plano', papel: 'apoia', ponto: [0, t.alturaDoEixo, t.faceDoGarfo], normal: [0, 0, -1], extensao: [57, 57] }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "  passos.push(porta('eixoDeSaida', origemDa(formas, 'eixoDeSaida'), {"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "    forma: 'cilindro', papel: 'externa', eixo: [0, 0, 1], centro: [0, t.alturaDoEixo, t.faceDoGarfo - t.comprimentoDoEixoDeSaida],"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "    raio: t.raioDoEixoDeSaida, inicio: 0, fim: t.comprimentoDoEixoDeSaida,"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "  }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "  return passos;"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "const receita = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "  meta: { nome: 'braco-de-prova/motor-ombro', desc: 'motor do ombro do braço de prova: NEMA 23 de 57 × 57 × 76 mm com a planetária de 5:1 de 57 × 57 × 55 mm, como blocos com os eixos, do lado de fora da parede da frente do garfo' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "  PARAMS: TABELA,"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "  MATERIAIS,"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "  ALIASES,"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "  TOPO: { origem: 'chão, sob o eixo do ombro; y para cima, x ao longo do braço esticado, +z para a frente' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "  PLANO: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "    objeto: 'NEMA 23 com redução planetária de 5:1 no eixo do ombro, como blocos com flange e eixo',"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "    referencias: ['../../../../../docs/modelar/banco-de-provas/braco-de-prova-2026-11-23/elos-opcoes.png'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "    escala: { medida: 'lado da caixa do NEMA 23', milimetros: 57 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "    partes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "      { nome: 'planetaria', forma: 'bloco de 57 × 57 × 55 mm, face de saída (flange) apoiada na parede da frente do garfo, com furo cego para o eixo do motor, o rebaixo do ressalto do NEMA 23 e os quatro furos cegos M5 da flange', tecnica: 'caixa chanfrada com furo por subtração' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "      { nome: 'motor', forma: 'bloco de 57 × 57 × 76 mm atrás da planetária, com os quatro furos de 5,1 mm da flange no quadrado de 47,14 mm', tecnica: 'caixa chanfrada com furos por subtração' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "      { nome: 'ressaltoDoMotor', forma: 'ressalto de 38,1 × 1,6 mm do NEMA 23, encaixado na face de entrada da planetária', tecnica: 'cilindro' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "      { nome: 'ressaltoDeSaida', forma: 'ressalto de 32 × 2 mm da planetária em volta do eixo de saída, dentro do furo do garfo', tecnica: 'cilindro com furo por subtração' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "      { nome: 'eixoDeSaida', forma: 'eixo de 14 × 25 mm no eixo do ombro, pela passagem do garfo até o primeiro elo', tecnica: 'cilindro' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "      { nome: 'eixoDoMotor', forma: 'eixo de 8 × 21 mm dentro do furo cego da planetária', tecnica: 'cilindro' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "    criteriosDeReprovacao: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "      'caixa ou eixo com medida diferente da folha do pedido inicial',"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "      'eixo de saída fora do eixo do ombro',"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "      'planetária solta da parede do garfo ou atravessando-a',"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "      'motor em outra cor que não o preto',"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "  contatos: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "    { par: ['eixoDeSaida', 'planetaria'], motivo: 'o eixo de saída sai da face da planetária' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "    { par: ['eixoDoMotor', 'motor'], motivo: 'o eixo sai da face do motor' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "    { par: ['eixoDoMotor', 'planetaria'], motivo: 'o eixo do motor entra justo no furo cego da planetária' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "    { par: ['motor', 'planetaria'], motivo: 'o motor é aparafusado na face de entrada da planetária' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "    { par: ['motor', 'ressaltoDoMotor'], motivo: 'o ressalto sai da face da flange do motor' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "    { par: ['planetaria', 'ressaltoDoMotor'], motivo: 'o ressalto do motor encaixa no rebaixo da face de entrada' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "    { par: ['eixoDoMotor', 'ressaltoDoMotor'], motivo: 'o eixo do motor passa pelo meio do ressalto' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "    { par: ['planetaria', 'ressaltoDeSaida'], motivo: 'o ressalto sai da face de saída da planetária' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "    { par: ['eixoDeSaida', 'ressaltoDeSaida'], motivo: 'o eixo de saída passa pelo meio do ressalto' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "  ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "  get PASSOS() { return gerarPassos(this.PARAMS); },"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "export default receita;"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": ""
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "registradaEm": "2026-11-23T23:34:16.031Z",
+  "facesFinas": {
+    "total": 6,
+    "porParte": {
+      "planetaria": 4,
+      "motor": 2
+    }
+  }
+}

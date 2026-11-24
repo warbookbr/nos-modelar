@@ -1,0 +1,401 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "braco-de-prova/garra",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "docs/modelar/banco-de-provas/braco-de-prova-2026-11-23/elos-opcoes.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "garra",
+        "tipo": "uniao",
+        "onde": "face -x da garra contra a placa da ponta do elo2",
+        "sentido": "atravessando",
+        "evidencia": "corte-garra-elo2.png, painel ampliado: face contra face, 0,00 mm, linha fina da placa avançando poucos pixels na garra; sem contato declarado para o par."
+      }
+    ],
+    "observacao": "Bloco 40x45x40 com chanfro de 4 mm, centrado e encostado na placa, como prometido; só o toque sem contato declarado e a contagem dos furos, que as vistas não permitem, ficam em aberto."
+  },
+  "partes": [
+    {
+      "nome": "garra",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [],
+  "notaDePassagem": "Bloco de 40×45×40 mm com chanfro de 4 mm e quatro furos cegos de 2,8 mm para rosca na peça impressa, centrado no plano do braço e encostado na placa da ponta do elo 2.",
+  "receita": {
+    "sha256": "sha256:5d810bf18547cb45e1ec698af92e4b2382188cce58f41d95b81e9e936743fd62",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 70,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* braco-de-prova/garra — a garra como volume, um bloco de 40 × 45 × 40 mm na ponta do segundo elo."
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " * Última etapa da montagem `braco-de-prova/montagem.json`. O plano do braço de prova exclui a garra em detalhe: ela entra"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * como volume, com a massa de 80 g dos requisitos (a massa é da ficha, não desta receita)."
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * Referencial: o da montagem (ver `../../comum/blocos.mjs`)."
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * Portas: `apoio` (plano, apoia, normal −x, na face de trás do bloco), que se apoia na `ponta` do segundo elo."
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " */"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": "import { passosDasFormas, aliasesDasFormas, porta, origemDa, MATERIAIS as CORES } from '../../../comum/blocos.mjs';"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": "  alturaDoEixo: 140,"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": "  /* Face de fora da placa da ponta do segundo elo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": "  ponta: 305,"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": "  comprimento: 40,"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": "  altura: 45,"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": "  largura: 40,"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": "  chanfro: 4,"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": "  /* Os quatro M3 da placa da ponta do segundo elo, cegos de 10 mm, no quadrado de 24 mm. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": "  passoDosFurosM3: 24,"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": "  raioDoFuroM3: 1.4,"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": "  fundoDoFuroM3: 10,"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": "export const MATERIAIS = CORES;"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": "export function derivar(t = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": "  return ["
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "    { nome: 'garra', material: 'estrutura', chanfro: t.chanfro,"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "      caixa: [t.ponta, t.ponta + t.comprimento, t.alturaDoEixo - t.altura / 2, t.alturaDoEixo + t.altura / 2, -t.largura / 2, t.largura / 2],"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "      furos: [-1, 1].flatMap((sy) => [-1, 1].map((sz) => ({"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "        eixo: 'x', base: [t.ponta - 1, t.alturaDoEixo + (sy * t.passoDosFurosM3) / 2, (sz * t.passoDosFurosM3) / 2], comprimento: t.fundoDoFuroM3 + 1, raio: t.raioDoFuroM3, lados: 12,"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "      }))) },"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "  ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "export const ALIASES = aliasesDasFormas(derivar(TABELA));"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "export function gerarPassos(t = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "  const formas = derivar(t);"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "  const { passos } = passosDasFormas(formas);"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "  passos.push(porta('apoio', origemDa(formas, 'garra'), { forma: 'plano', papel: 'apoia', ponto: [t.ponta, t.alturaDoEixo, 0], normal: [-1, 0, 0], extensao: [40, 40] }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "  return passos;"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "const receita = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "  meta: { nome: 'braco-de-prova/garra', desc: 'garra do braço de prova como volume: bloco chanfrado de 40 × 45 × 40 mm na ponta do segundo elo' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "  PARAMS: TABELA,"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "  MATERIAIS,"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "  ALIASES,"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "  TOPO: { origem: 'chão, sob o eixo do ombro; y para cima, x ao longo do braço esticado, +z para a frente' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "  PLANO: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "    objeto: 'garra do braço de prova como volume, sem detalhe',"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "    referencias: ['../../../../../docs/modelar/banco-de-provas/braco-de-prova-2026-11-23/elos-opcoes.png'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "    escala: { medida: 'altura do bloco', milimetros: 45 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "    partes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "      { nome: 'garra', forma: 'bloco de 40 × 45 × 40 mm com chanfro de 4 mm e quatro furos M3 cegos (2,8 mm, para rosca na peça impressa), centrado no plano do braço, encostado na placa da ponta', tecnica: 'caixa chanfrada com furos por subtração' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "    criteriosDeReprovacao: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "      'bloco com medida diferente de 40 × 45 × 40 mm',"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "      'garra solta da ponta do segundo elo ou fora do plano do braço',"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "  contatos: [],"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "  get PASSOS() { return gerarPassos(this.PARAMS); },"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "export default receita;"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": ""
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "registradaEm": "2026-11-23T23:34:20.402Z",
+  "facesFinas": {
+    "total": 0,
+    "porParte": {}
+  }
+}

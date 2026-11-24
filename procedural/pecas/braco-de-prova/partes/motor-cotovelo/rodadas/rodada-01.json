@@ -1,0 +1,531 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "braco-de-prova/motor-cotovelo",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "docs/modelar/banco-de-provas/braco-de-prova-2026-11-23/elos-opcoes.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "eixo",
+        "tipo": "superficie",
+        "onde": "toda a lateral cilíndrica do eixo",
+        "sentido": "facetado",
+        "evidencia": "No corte da transmissão (painel ampliado) e na isométrica isolada o eixo lê como polígono de cerca de 16 lados, com arestas visíveis, e não como cilindro."
+      }
+    ],
+    "observacao": "Forma, medidas e cor batem; o toque de 0,00 mm com elo1 está sem contato declarado, e o ressalto não aparece dentro do furo da parede no corte, então a imagem não o confirma."
+  },
+  "partes": [
+    {
+      "nome": "motor",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "ressalto",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixo",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [],
+  "notaDePassagem": "NEMA 17 de 42,3×42,3×40 mm encostado na face de fora da parede de trás do elo 1, com o ressalto de 22×2 mm no furo da parede e o eixo de 5×24 mm entrando na polia pequena.",
+  "receita": {
+    "sha256": "sha256:3fb97e4359b3cf950780ea4c7228b680fc686d09170efe546336c4c52a72b7ba",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 94,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* braco-de-prova/motor-cotovelo — o NEMA 17 do cotovelo, preso do lado de fora da parede de trás do primeiro elo, perto do"
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " * ombro, com o eixo entrando no U."
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * Sexta etapa da montagem `braco-de-prova/montagem.json`. Componente comprado como bloco com o eixo (filtro do plano: a"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * caixa e o eixo do item `componente`). Medidas do pedido inicial da mecatrônica: 42,3 × 42,3 × 40 mm, eixo de 5 × 24 mm."
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * Posição do alinhamento: na ponta de trás do primeiro elo, a 80 mm do ombro, como no esboço escolhido (opção C)."
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * Referencial: o da montagem (ver `../../comum/blocos.mjs`)."
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * Portas: `face` (plano, apoia, normal +z, na face do eixo) e `eixo` (cilindro externo, eixo +z, com o centro na face do"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * motor), onde a polia pequena se prende."
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " */"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": "import { passosDasFormas, aliasesDasFormas, porta, origemDa, MATERIAIS as CORES } from '../../../comum/blocos.mjs';"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": "  alturaDoEixo: 140,"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": "  eixoDoMotor: 80,"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": "  /* Face de fora da parede de trás do primeiro elo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": "  faceDoElo: -26,"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": "  lado: 42.3,"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": "  comprimento: 40,"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": "  raioDoEixo: 2.5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": "  comprimentoDoEixo: 24,"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": "  chanfro: 2,"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": "  /* A flange do NEMA 17 (NEMA ICS 16): quatro furos M3 no quadrado de 31 mm, 4,5 mm de fundo, e o ressalto de 22 mm por"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": "     2 mm em volta do eixo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": "  passoDosFuros: 31,"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": "  raioDoFuroM3: 1.5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": "  fundoDoFuro: 4.5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "  raioDoRessalto: 11,"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "  alturaDoRessalto: 2,"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "export const MATERIAIS = CORES;"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "/* Os quatro furos cegos da flange, abertos na face do eixo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "const furosDaFlange = (t) => [-1, 1].flatMap((sx) => [-1, 1].map((sy) => ({"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "  eixo: 'z', base: [t.eixoDoMotor + (sx * t.passoDosFuros) / 2, t.alturaDoEixo + (sy * t.passoDosFuros) / 2, t.faceDoElo - t.fundoDoFuro],"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "  comprimento: t.fundoDoFuro + 1, raio: t.raioDoFuroM3, lados: 12,"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "})));"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "export function derivar(t = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "  const h = t.lado / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "  return ["
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "    { nome: 'motor', material: 'motor', chanfro: t.chanfro, caixa: [t.eixoDoMotor - h, t.eixoDoMotor + h, t.alturaDoEixo - h, t.alturaDoEixo + h, t.faceDoElo - t.comprimento, t.faceDoElo],"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "      furos: furosDaFlange(t) },"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "    { nome: 'ressalto', material: 'motor', eixo: 'z', base: [t.eixoDoMotor, t.alturaDoEixo, t.faceDoElo], comprimento: t.alturaDoRessalto, raio: t.raioDoRessalto, lados: 36 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "    { nome: 'eixo', material: 'aco', eixo: 'z', base: [t.eixoDoMotor, t.alturaDoEixo, t.faceDoElo], comprimento: t.comprimentoDoEixo, raio: t.raioDoEixo, lados: 18 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "  ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "export const ALIASES = aliasesDasFormas(derivar(TABELA));"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "export function gerarPassos(t = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "  const formas = derivar(t);"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "  const { passos } = passosDasFormas(formas);"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "  passos.push(porta('face', origemDa(formas, 'motor'), { forma: 'plano', papel: 'apoia', ponto: [t.eixoDoMotor, t.alturaDoEixo, t.faceDoElo], normal: [0, 0, 1], extensao: [42.3, 42.3] }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "  passos.push(porta('eixo', origemDa(formas, 'eixo'), {"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "    forma: 'cilindro', papel: 'externa', eixo: [0, 0, 1], centro: [t.eixoDoMotor, t.alturaDoEixo, t.faceDoElo], raio: t.raioDoEixo, inicio: 0, fim: t.comprimentoDoEixo,"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "  }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "  return passos;"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "const receita = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "  meta: { nome: 'braco-de-prova/motor-cotovelo', desc: 'motor do cotovelo do braço de prova: NEMA 17 de 42,3 × 42,3 × 40 mm com eixo de 5 × 24 mm, preso fora da parede de trás do primeiro elo, a 80 mm do ombro' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "  PARAMS: TABELA,"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "  MATERIAIS,"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "  ALIASES,"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "  TOPO: { origem: 'chão, sob o eixo do ombro; y para cima, x ao longo do braço esticado, +z para a frente' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "  PLANO: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "    objeto: 'NEMA 17 do cotovelo, como bloco com o eixo, preso no primeiro elo perto do ombro',"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "    referencias: ['../../../../../docs/modelar/banco-de-provas/braco-de-prova-2026-11-23/elos-opcoes.png'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "    escala: { medida: 'lado da caixa do NEMA 17', milimetros: 42.3 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "    partes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "      { nome: 'motor', forma: 'bloco de 42,3 × 42,3 × 40 mm encostado na parede de trás do primeiro elo, com os quatro furos M3 da flange no quadrado de 31 mm', tecnica: 'caixa chanfrada com furos cegos por subtração' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "      { nome: 'ressalto', forma: 'ressalto de 22 × 2 mm em volta do eixo, dentro do furo da parede do elo', tecnica: 'cilindro' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "      { nome: 'eixo', forma: 'eixo de 5 × 24 mm, pelo furo da parede, até dentro da polia pequena', tecnica: 'cilindro' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "    criteriosDeReprovacao: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "      'caixa ou eixo com medida diferente da folha do pedido inicial',"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "      'motor solto da parede do elo ou atravessando-a',"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "      'motor em outra cor que não o preto',"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "  contatos: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "    { par: ['eixo', 'motor'], motivo: 'o eixo sai da face do motor' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "    { par: ['eixo', 'ressalto'], motivo: 'o eixo passa pelo meio do ressalto da flange' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "    { par: ['motor', 'ressalto'], motivo: 'o ressalto sai da face do motor' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "  ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "  get PASSOS() { return gerarPassos(this.PARAMS); },"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "export default receita;"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": ""
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "registradaEm": "2026-11-23T23:34:16.874Z",
+  "facesFinas": {
+    "total": 0,
+    "porParte": {}
+  }
+}
