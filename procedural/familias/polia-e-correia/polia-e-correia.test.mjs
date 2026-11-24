@@ -4,6 +4,7 @@
 import { describe, expect, it } from 'vitest';
 import { chamar, criarRegistroDeFamilias } from '../index.js';
 import { executarReceita } from '../../../src/autoria/executar-receita.js';
+import { pedacosDaMalha } from '../../../tools/fixtures/transmissao/pedacos.mjs';
 import { geometriaDaPolia } from './geometria.js';
 
 const registro = criarRegistroDeFamilias();
@@ -22,6 +23,10 @@ function raios(neutro, y0, y1) {
 }
 
 describe('família polia-e-correia', () => {
+  it('cada perfil sai numa malha de um pedaço só, sem lasca solta', () => {
+    for (const perfil of Object.keys(POLIA.contrato.perfis)) expect(pedacosDaMalha(executar({ perfil })), perfil).toBe(1);
+  });
+
   it('cada perfil sai numa parte só, sem órfão', () => {
     for (const perfil of Object.keys(POLIA.contrato.perfis)) {
       const n = executar({ perfil });

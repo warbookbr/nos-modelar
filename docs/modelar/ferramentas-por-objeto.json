@@ -253,8 +253,8 @@
       "automatiza": "gera engrenagem reta, helicoidal, cônica, sem-fim, cremalheira e catraca com dente evolvente por módulo e número de dentes, e diz a distância entre centros do par",
       "parametros": "tipo, módulo, dentes, ângulo de pressão, largura",
       "referencias": ["FreeCAD Gears", "BOSL2: gears", "Blender: Extra Objects (gears)"],
-      "aqui": "não",
-      "onde": "nenhum gerador; o componente engrenagem do esboço antigo saiu com ele em 2026-11-05"
+      "aqui": "parcial",
+      "onde": "família `engrenagem`: a reta de dente evolvente pelo perfil de referência tipo A da ISO 53 (de 17 a 200 dentes, módulo de 0,5 a 10) e a catraca de dente de serra, com cubo, furo e a porta do eixo; família `cremalheira`: a cremalheira reta do mesmo perfil, até 60 dentes; a helicoidal, a cônica, o sem-fim e o par montado não"
     },
     "mola": {
       "nome": "molas",

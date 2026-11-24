@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2237 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2248 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1045,6 +1045,14 @@
 - `geometria.js` — geometria.js — o cobre traçado de uma placa declarada, em mm, no plano [x, z] da placa: os polígonos de cada trecho e de cada via, e a união de polígonos de …
 - `tracador.js` — tracador.js — o traçador automático do cobre de uma placa declarada: um roteador em grade sobre as duas faces, com via onde troca de face.
 
+## procedural/familias/cremalheira/
+
+- `composicoes.js` — composicoes.js — a composição da família `cremalheira`: a barra é uma `extrusao` do retângulo em [x, z], ao longo de y; o vão de um dente é outra `extrusao`,…
+- `cremalheira.test.mjs` — cremalheira.test.mjs — a família `cremalheira`: cada perfil sai numa parte só e sem órfão, a barra tem dentes × passo de comprimento, a cabeça 1 módulo acima…
+- `derivar.js` — derivar.js — dos parâmetros da cremalheira (milímetro) à chamada de composição (metro).
+- `geometria.js` — geometria.js — as medidas de uma cremalheira da família `cremalheira`, em milímetro.
+- `index.js` — index.js — a família `cremalheira`: a cremalheira reta pelo perfil de referência da ISO 53, que engrena com a engrenagem reta de mesmo módulo. `chamar(CREMAL…
+
 ## procedural/familias/dobradica/
 
 - `composicoes.js` — composicoes.js — as composições procedurais da família `dobradica`, geradas por laço porque o número de nós e de furos muda a quantidade de passos e a compos…
@@ -1053,6 +1061,14 @@
 - `geometria.js` — geometria.js — as medidas da dobradiça de abas a partir dos parâmetros da família, em metro.
 - `index.js` — index.js — a família `dobradica` carregada: o contrato `familia.json`, as composições, o `derivar` e o gerador da montagem v5. A família é o objeto de `defin…
 - `montagem.js` — montagem.js — a mini-montagem v5 que a família gera: o pino e as duas folhas como peças soltas, ligadas por uma articulação de revolução com o curso declarad…
+
+## procedural/familias/engrenagem/
+
+- `composicoes.js` — composicoes.js — as composições da família `engrenagem`, uma por número de pontos do vão: a reta (vão evolvente) e a catraca (vão de dente de serra). O corpo…
+- `derivar.js` — derivar.js — dos parâmetros da engrenagem (milímetro) à chamada de composição (metro). O tipo escolhe a composição.
+- `engrenagem.test.mjs` — engrenagem.test.mjs — a família `engrenagem`: cada perfil sai numa parte só e sem órfão, a reta tem os diâmetros de cabeça e de pé da ISO 53 e o dente com me…
+- `geometria.js` — geometria.js — as medidas de uma engrenagem da família `engrenagem`, em milímetro, a partir dos parâmetros.
+- `index.js` — index.js — a família `engrenagem`: a engrenagem reta de dente evolvente pelo perfil de referência da ISO 53 e a catraca de dente de serra, com cubo e furo. `…
 
 ## procedural/familias/exemplo/
 
@@ -3411,6 +3427,7 @@
 - `par-gt2.test.mjs` — par-gt2.test.mjs — o par GT2 de 20 e 80 dentes com a correia fechada: a correia tem número inteiro de dentes e a distância entre centros sai da conta do comp…
 - `par-por-atrito.mjs` — par-por-atrito.mjs — duas polias em V ou duas lisas com a correia fechada, a prova da fatia 3 para as correias sem dentes. `receitaDoParPorAtrito(perfis, dis…
 - `par-por-atrito.test.mjs` — par-por-atrito.test.mjs — as correias sem dentes: a em V assenta no canal pela largura de referência da ISO 4183 com a seção da DIN 2215, uma volta por canal…
+- `pedacos.mjs` — pedacos.mjs — quantos pedaços separados a malha tem: as faces que dividem vértice (na mesma posição, a 0,1 µm) ficam no mesmo pedaço. Uma peça de família sai…
 
 ## tools/fixtures/tres-blocos-vinculados/
 

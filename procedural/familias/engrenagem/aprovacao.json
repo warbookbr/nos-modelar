@@ -1,0 +1,187 @@
+{
+  "formato": "mecanifica.aprovacao-da-familia@1",
+  "familia": "engrenagem",
+  "versao": "1.0.0",
+  "mecanica": {
+    "data": "2026-11-24",
+    "pontos": {
+      "minimo": {
+        "parametros": {
+          "comprimentoDoCubo": 1,
+          "dentes": 17,
+          "diametroDoCubo": 6,
+          "furo": 2,
+          "largura": 2,
+          "modulo": 0.5,
+          "tipo": 1
+        },
+        "hash": "sha256:0dcb720df89604b030de549f277375fa375545103dd2db5aace1ba59e17b4266",
+        "medidas": []
+      },
+      "medio": {
+        "parametros": {
+          "comprimentoDoCubo": 15,
+          "dentes": 40,
+          "diametroDoCubo": 40,
+          "furo": 20,
+          "largura": 30,
+          "modulo": 3,
+          "tipo": 1
+        },
+        "hash": "sha256:c3e48b6901f8f75cce3a0c35ef02dbc3ac29f2628e74f1631d8902122ae71d74",
+        "medidas": []
+      },
+      "maximo": {
+        "parametros": {
+          "comprimentoDoCubo": 100,
+          "dentes": 200,
+          "diametroDoCubo": 200,
+          "furo": 100,
+          "largura": 200,
+          "modulo": 10,
+          "tipo": 2
+        },
+        "hash": "sha256:fb339699b95fda35a51041dcc1d4181edffe154b7527e7108e3f8da9aed5208f",
+        "medidas": []
+      }
+    },
+    "varredura": {
+      "sondas": 14,
+      "recusasDeclaradas": [
+        {
+          "ponto": "diametroDoCubo=6",
+          "restricao": "cubo-maior-que-o-furo"
+        },
+        {
+          "ponto": "furo=100",
+          "restricao": "cubo-maior-que-o-furo"
+        }
+      ]
+    },
+    "portas": [
+      "eixo"
+    ],
+    "perfis": {
+      "catraca-z24": {
+        "parametros": {
+          "comprimentoDoCubo": 6,
+          "dentes": 24,
+          "diametroDoCubo": 22,
+          "furo": 10,
+          "largura": 10,
+          "modulo": 2,
+          "tipo": 2
+        },
+        "hash": "sha256:00d24fcbc87c7a661a26c8441b848008883c302b6227eddd0bad5fb35a9384ac",
+        "medidas": []
+      },
+      "reta-m1-z20": {
+        "parametros": {
+          "comprimentoDoCubo": 5,
+          "dentes": 20,
+          "diametroDoCubo": 14,
+          "furo": 5,
+          "largura": 10,
+          "modulo": 1,
+          "tipo": 1
+        },
+        "hash": "sha256:d781472df59fecc2a307157fc8847c749eb3ce460f51825121c64d1c6b1acc39",
+        "medidas": []
+      },
+      "reta-m1-z40": {
+        "parametros": {
+          "comprimentoDoCubo": 5,
+          "dentes": 40,
+          "diametroDoCubo": 20,
+          "furo": 8,
+          "largura": 10,
+          "modulo": 1,
+          "tipo": 1
+        },
+        "hash": "sha256:c6251306d8fbe4849cf28b542a73fdd86c515a25dd5c8f2d517d2cc937a86e7a",
+        "medidas": []
+      },
+      "reta-m2-z30": {
+        "parametros": {
+          "comprimentoDoCubo": 12,
+          "dentes": 30,
+          "diametroDoCubo": 35,
+          "furo": 15,
+          "largura": 20,
+          "modulo": 2,
+          "tipo": 1
+        },
+        "hash": "sha256:e3bd16b1171076c6e7e3c67f17b64288ece1bb6853ebd97fc549fcc1c868f76e",
+        "medidas": []
+      },
+      "reta-m3-z80": {
+        "parametros": {
+          "comprimentoDoCubo": 20,
+          "dentes": 80,
+          "diametroDoCubo": 60,
+          "furo": 30,
+          "largura": 30,
+          "modulo": 3,
+          "tipo": 1
+        },
+        "hash": "sha256:824708844c7c099ff3463f602fdf84117b688eff44768f9cf797683a2c95f212",
+        "medidas": []
+      }
+    },
+    "escalasDosPerfis": {
+      "sondas": 50,
+      "recusasDeclaradas": [
+        {
+          "ponto": "catraca-z24: diametroDoCubo=6",
+          "restricao": "cubo-maior-que-o-furo"
+        },
+        {
+          "ponto": "catraca-z24: furo=100",
+          "restricao": "cubo-maior-que-o-furo"
+        },
+        {
+          "ponto": "catraca-z24: modulo=0.5",
+          "restricao": "furo-cabe-no-pe"
+        },
+        {
+          "ponto": "reta-m1-z20: diametroDoCubo=6",
+          "restricao": "cubo-maior-que-o-furo"
+        },
+        {
+          "ponto": "reta-m1-z20: furo=100",
+          "restricao": "cubo-maior-que-o-furo"
+        },
+        {
+          "ponto": "reta-m1-z40: diametroDoCubo=6",
+          "restricao": "cubo-maior-que-o-furo"
+        },
+        {
+          "ponto": "reta-m1-z40: furo=100",
+          "restricao": "cubo-maior-que-o-furo"
+        },
+        {
+          "ponto": "reta-m2-z30: diametroDoCubo=6",
+          "restricao": "cubo-maior-que-o-furo"
+        },
+        {
+          "ponto": "reta-m2-z30: furo=100",
+          "restricao": "cubo-maior-que-o-furo"
+        },
+        {
+          "ponto": "reta-m2-z30: modulo=0.5",
+          "restricao": "furo-cabe-no-pe"
+        },
+        {
+          "ponto": "reta-m3-z80: diametroDoCubo=6",
+          "restricao": "cubo-maior-que-o-furo"
+        },
+        {
+          "ponto": "reta-m3-z80: furo=100",
+          "restricao": "cubo-maior-que-o-furo"
+        }
+      ]
+    }
+  },
+  "critico": null,
+  "pessoa": null
+}

@@ -1,0 +1,73 @@
+{
+  "formato": "mecanifica.aprovacao-da-familia@1",
+  "familia": "cremalheira",
+  "versao": "1.0.0",
+  "mecanica": {
+    "data": "2026-11-23",
+    "pontos": {
+      "minimo": {
+        "parametros": {
+          "alturaDaBase": 1,
+          "dentes": 3,
+          "largura": 2,
+          "modulo": 0.5
+        },
+        "hash": "sha256:009400100f15715a51871ef61b00c8fa3e142f49aa75247eb2e4f63c7dc79c57",
+        "medidas": []
+      },
+      "medio": {
+        "parametros": {
+          "alturaDaBase": 20,
+          "dentes": 30,
+          "largura": 30,
+          "modulo": 3
+        },
+        "hash": "sha256:abda23d78acc8db9b09220f50e55cb75bf0ea44d456d2c1f20aab62c0857f0ba",
+        "medidas": []
+      },
+      "maximo": {
+        "parametros": {
+          "alturaDaBase": 100,
+          "dentes": 60,
+          "largura": 200,
+          "modulo": 10
+        },
+        "hash": "sha256:67b857f6faebeb86e775811f46c33c156e602ae0e9869d64b2fa657152dd189b",
+        "medidas": []
+      }
+    },
+    "varredura": {
+      "sondas": 8,
+      "recusasDeclaradas": []
+    },
+    "portas": [],
+    "perfis": {
+      "m1-30": {
+        "parametros": {
+          "alturaDaBase": 8,
+          "dentes": 30,
+          "largura": 10,
+          "modulo": 1
+        },
+        "hash": "sha256:c2bb8d3c05d9a99701a61ab055907b681daad169584be674b5acc3d6ebcba01b",
+        "medidas": []
+      },
+      "m2-20": {
+        "parametros": {
+          "alturaDaBase": 15,
+          "dentes": 20,
+          "largura": 20,
+          "modulo": 2
+        },
+        "hash": "sha256:3523d7110dd422aa1af012c1f99487f5d9382538b62a305feb03c799a70d7932",
+        "medidas": []
+      }
+    },
+    "escalasDosPerfis": {
+      "sondas": 12,
+      "recusasDeclaradas": []
+    }
+  },
+  "critico": null,
+  "pessoa": null
+}
