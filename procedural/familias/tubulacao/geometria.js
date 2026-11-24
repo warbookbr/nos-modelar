@@ -11,7 +11,7 @@ export const PONTOS_DO_ARCO = 13;
 /* os lados do tubo (o `lathe` da composição) e da seção da curva, iguais para as bocas casarem */
 export const LADOS_DA_SECAO = 48;
 
-export function geometriaDaPeca({ forma, diametroExterno: de, parede, comprimento, raio, angulo, fase, comprimentoDoTampao: e }) {
+export function geometriaDaPeca({ forma, diametroExterno: de, parede, comprimento, raio, angulo, fase, comprimentoDoTampao: e, centroABoca: cab, diametroMenor: dm, paredeMenor: pm, comprimentoDaReducao: h }) {
   const ro = de / 2;
   const ri = ro - parede;
   if (forma === 1) return { forma, ro, ri, perfil: [[ri, 0], [ro, 0], [ro, comprimento], [ri, comprimento], [ri, 0]], altura: comprimento };
@@ -36,6 +36,23 @@ export function geometriaDaPeca({ forma, diametroExterno: de, parede, compriment
       return [raioDaSecao * Math.cos(t), raioDaSecao * Math.sin(t)];
     });
     return { forma, ro, ri, fora, dentro, secaoDeFora: secao(ro), secaoDeDentro: secao(ri), toco, raioDoArco: r, saida: { centro: ao(toco), eixo: fimT } };
+  }
+  if (forma === 4) {
+    /* o tê reto: a passagem ao longo de y, de 0 a 2·C, e a derivação ao longo de +x, do eixo da passagem até C; os dois
+       cilindros maciços unidos, menos os dois furos, que passam das bocas */
+    const passa = Math.max(1, parede);
+    return {
+      forma, ro, ri, altura: 2 * cab,
+      passagem: [[0, 0], [ro, 0], [ro, 2 * cab], [0, 2 * cab]], derivacao: [[0, 0], [ro, 0], [ro, cab], [0, cab]],
+      furoDaPassagem: [[0, -passa], [ri, -passa], [ri, 2 * cab + passa], [0, 2 * cab + passa]], furoDaDerivacao: [[0, 0], [ri, 0], [ri, cab + passa], [0, cab + passa]],
+      emDerivacao: [0, cab, 0],
+    };
+  }
+  if (forma === 5) {
+    /* a redução concêntrica: o tronco de cone oco da boca maior (y = 0) à menor (y = h) */
+    const rom = dm / 2;
+    const rim = rom - pm;
+    return { forma, ro, ri, altura: h, perfil: [[ri, 0], [ro, 0], [rom, h], [rim, h], [ri, 0]] };
   }
   const c = Math.min(1.5 * parede, e / 4, ro / 2);
   /* a linha aberta toca o eixo só nas duas pontas (o fundo de fora e o de dentro), como o lathe pede */

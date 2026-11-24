@@ -5,10 +5,11 @@
    tabela, com a boca de entrada onde termina o tubo que chega; para cada ponta com `fim: 'tampao'`, o tampão com a boca no
    nó, voltado para fora; e, para cada ponta aberta, a porta da boca (centro, eixo para fora e raios). A peça da família tem a
    boca no plano y = 0 com o eixo em +y (e a curva dobra para +x); a pose gira esse quadro para o do traçado por três giros,
-   em x, em y e em z, aplicados nessa ordem, e o leva à posição. O tê e a redução vêm na fatia 3 do plano da tubulação; os
-   nós deles ficam sem peça e aparecem em `pendentes`. `encostos` lista os pares de peças que se tocam de topo na boca de uma
-   conexão: as seções de 48 lados da curva e do tubo têm fases diferentes e se sobrepõem um pouco na face comum, e a receita
-   declara esse contato. Quem põe as peças na receita é o `instanciaDeFamilia`, uma chamada por
+   em x, em y e em z, aplicados nessa ordem, e o leva à posição. O tê tem a passagem em y, com a boca de entrada no nó menos
+   o centro à boca, e a derivação em +x; a redução tem a boca maior a meio comprimento antes do nó. Os vértices das seções de
+   48 lados casam de peça em peça: o tê fixa o ângulo dos três tubos dele, e daí a rede passa o ângulo adiante; quando dois
+   tês pedem ângulos diferentes ao mesmo tubo, o par vai para `desencontros`. `encostos` lista os pares de peças que se
+   tocam de topo na boca de uma conexão, e a receita declara esse contato. Quem põe as peças na receita é o `instanciaDeFamilia`, uma chamada por
    peça com a base encadeada. */
 import { lerTracado } from './tracado.js';
 
@@ -56,7 +57,6 @@ export function pecasDaRede(tracado) {
   const noPorNome = Object.fromEntries(lido.nos.map((n) => [n.nome, n]));
   const pecas = [];
   const portas = [];
-  const pendentes = [];
   const encostos = [];
   const ligadosA = (nome) => lido.trechos.filter((t) => t.de === nome || t.para === nome);
   const outro = (t, nome) => (t.de === nome ? t.para : t.de);
@@ -64,14 +64,34 @@ export function pecasDaRede(tracado) {
      partir de uma ponta e passa esse ângulo do tubo para a curva e da curva para o tubo seguinte, para as bocas casarem */
   const eixoX = new Map();
   const curvas = new Map();
-  const inicio = lido.nos.find((n) => n.tipo === 'ponta') ?? lido.nos[0];
+  const tes = new Map();
+  const desencontros = [];
+  /* o quadro do tê: y ao longo da passagem, x para a derivação; o tubo da passagem tem o x na derivação, e o da derivação, na passagem */
+  const quadroDoTe = (no) => {
+    if (!tes.has(no.nome)) {
+      const ligados = ligadosA(no.nome);
+      const derivacao = ligados.find((t) => t.indice === no.derivacao);
+      const [a, b] = ligados.filter((t) => t !== derivacao);
+      const y = unit(sub(posicao[outro(b, no.nome)], posicao[outro(a, no.nome)]));
+      const x = unit(sub(posicao[outro(derivacao, no.nome)], no.posicao));
+      tes.set(no.nome, { derivacao, passagem: [a, b], x, y });
+    }
+    return tes.get(no.nome);
+  };
+  const xDoTuboNoTe = (no, t) => { const q = quadroDoTe(no); return t === q.derivacao ? q.y : q.x; };
+  const paralelo = (a, b) => Math.abs(Math.abs(dot(a, b)) - 1) < 1e-6;
   const fila = [];
-  for (const t of ligadosA(inicio.nome)) { const dir = unit(sub(posicao[t.para], posicao[t.de])); eixoX.set(t, perpendicular(dir)); fila.push([t, outro(t, inicio.nome)]); }
-  while (fila.length) {
+  const semear = (no) => {
+    for (const t of ligadosA(no.nome)) if (!eixoX.has(t)) { eixoX.set(t, no.tipo === 'te' ? xDoTuboNoTe(no, t) : perpendicular(unit(sub(posicao[t.para], posicao[t.de])))); fila.push([t, outro(t, no.nome)]); }
+  };
+  const fontes = [...lido.nos.filter((n) => n.tipo === 'te'), lido.nos.find((n) => n.tipo === 'ponta') ?? lido.nos[0]];
+  for (const fonte of fontes) { semear(fonte); while (fila.length) {
     const [chegou, nome] = fila.shift();
     const no = noPorNome[nome];
+    if (no.tipo === 'te' && !paralelo(eixoX.get(chegou), xDoTuboNoTe(no, chegou))) desencontros.push([`te${nome}`, `tubo${chegou.indice}`]);
     for (const t of ligadosA(nome)) {
-      if (t === chegou || eixoX.has(t)) continue;
+      if (t === chegou) continue;
+      if (eixoX.has(t)) continue;
       const dirT = unit(sub(posicao[t.para], posicao[t.de]));
       const X = eixoX.get(chegou);
       if (no.tipo === 'curva') {
@@ -86,12 +106,14 @@ export function pecasDaRede(tracado) {
         const Xt = girarNoPlano(xFim, z, -fase);
         eixoX.set(t, unit(sub(Xt, vezes(dirT, dot(Xt, dirT)))));
         curvas.set(nome, { chegou, saiu: t, u, dobra, fase });
+      } else if (no.tipo === 'te') {
+        eixoX.set(t, xDoTuboNoTe(no, t));
       } else {
         eixoX.set(t, unit(sub(X, vezes(dirT, dot(X, dirT)))));
       }
       fila.push([t, outro(t, nome)]);
     }
-  }
+  } }
   for (const t of lido.trechos) {
     const p = posicao[t.de];
     const dir = unit(sub(posicao[t.para], p));
@@ -120,9 +142,24 @@ export function pecasDaRede(tracado) {
       } else {
         portas.push({ no: no.nome, centro: no.posicao, eixo: fora, raioInterno: ro - t.parede, raioExterno: ro });
       }
-    } else if (no.tipo === 'te' || no.tipo === 'reducao') pendentes.push({ no: no.nome, tipo: no.tipo });
+    } else if (no.tipo === 'te') {
+      const q = quadroDoTe(no);
+      const t = q.derivacao;
+      for (const l of ligados) encostos.push([`te${no.nome}`, `tubo${l.indice}`]);
+      const entrada = sub(no.posicao, vezes(q.y, no.centroABoca));
+      pecas.push({ nome: `te${no.nome}`, parametros: { forma: 4, diametroExterno: t.diametroExterno, parede: t.parede, centroABoca: no.centroABoca }, pose: { posicao: entrada.map(m), giro: girosDoQuadro(q.x, q.y) } });
+    } else if (no.tipo === 'reducao') {
+      const maior = ligados.find((l) => l.bitola === no.maior);
+      const menor = ligados.find((l) => l !== maior);
+      const dir = unit(sub(posicao[outro(menor, no.nome)], posicao[outro(maior, no.nome)]));
+      const X0 = eixoX.get(maior) ?? perpendicular(dir);
+      const X = unit(sub(X0, vezes(dir, dot(X0, dir))));
+      for (const l of ligados) encostos.push([`reducao${no.nome}`, `tubo${l.indice}`]);
+      const entrada = sub(no.posicao, vezes(dir, no.comprimento / 2));
+      pecas.push({ nome: `reducao${no.nome}`, parametros: { forma: 5, diametroExterno: maior.diametroExterno, parede: maior.parede, diametroMenor: menor.diametroExterno, paredeMenor: menor.parede, comprimentoDaReducao: no.comprimento }, pose: { posicao: entrada.map(m), giro: girosDoQuadro(X, dir) } });
+    }
   }
-  return { material: lido.material, trechos: lido.trechos, nos: lido.nos, pecas, portas, pendentes, encostos };
+  return { material: lido.material, trechos: lido.trechos, nos: lido.nos, pecas, portas, encostos, desencontros };
 }
 
 /* o comprimento do tampão da tabela da bitola */

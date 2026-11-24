@@ -4,7 +4,7 @@
 import { FORMATO_COMPOSICAO_PROCEDURAL } from '../../nucleo/entrada.js';
 import { LADOS_DA_SECAO, PONTOS_DO_ARCO } from './geometria.js';
 
-export const ID_POR_FORMA = Object.freeze({ 1: 'tubulacao.trecho', 2: 'tubulacao.curva', 3: 'tubulacao.tampao' });
+export const ID_POR_FORMA = Object.freeze({ 1: 'tubulacao.trecho', 2: 'tubulacao.curva', 3: 'tubulacao.tampao', 4: 'tubulacao.te', 5: 'tubulacao.reducao' });
 export const LADOS = LADOS_DA_SECAO;
 const p = (nome) => ({ parametro: nome });
 const sai = ['mecanifica.malha-poligonal@1', 'mecanifica.parte@1', 'mecanifica.porta@1'];
@@ -27,4 +27,17 @@ const curva = composicao(ID_POR_FORMA[2], [['ri', 'numero'], ['ro', 'numero'], [
   porta({ op: 'subtrair', id: 20 }),
 ]);
 
-export const COMPOSICOES = Object.freeze([torneada(ID_POR_FORMA[1], 'tubo', 5), curva, torneada(ID_POR_FORMA[3], 'tampao', 7)]);
+const perfil4 = (prefixo) => Array.from({ length: 4 }, (_, k) => [p(`${prefixo}r${k}`), p(`${prefixo}y${k}`)]);
+const nomes4 = (prefixo) => Array.from({ length: 4 }, (_, k) => [[`${prefixo}r${k}`, 'numero'], [`${prefixo}y${k}`, 'numero']]).flat();
+const te = composicao(ID_POR_FORMA[4], [['ri', 'numero'], ['ro', 'numero'], ['altura', 'numero'], ['emDerivacao', 'vetor3'], ...nomes4('p'), ...nomes4('d'), ...nomes4('fp'), ...nomes4('fd')], [
+  { id: 'passagem', operacao: 'lathe', argumentos: { origemId: 10, lados: LADOS, perfil: perfil4('p') } },
+  { id: 'derivacao', operacao: 'lathe', argumentos: { origemId: 11, lados: LADOS, eixo: 'x', perfil: perfil4('d'), em: p('emDerivacao') } },
+  { id: 'cheio', operacao: 'unir', argumentos: { origemId: 12, solidos: [{ origem: { op: 'lathe', id: 10 } }, { origem: { op: 'lathe', id: 11 } }] } },
+  { id: 'furo-da-passagem', operacao: 'lathe', argumentos: { origemId: 13, lados: LADOS, perfil: perfil4('fp') } },
+  { id: 'furo-da-derivacao', operacao: 'lathe', argumentos: { origemId: 14, lados: LADOS, eixo: 'x', perfil: perfil4('fd'), em: p('emDerivacao') } },
+  { id: 'oco', operacao: 'subtrair', argumentos: { origemId: 20, solidos: [{ origem: { op: 'unir', id: 12 } }, { origem: { op: 'lathe', id: 13 } }, { origem: { op: 'lathe', id: 14 } }] } },
+  { id: 'parte', operacao: 'parte', argumentos: { nome: 'te', sel: { origem: { op: 'subtrair', id: 20 } } } },
+  porta({ op: 'subtrair', id: 20 }),
+]);
+
+export const COMPOSICOES = Object.freeze([torneada(ID_POR_FORMA[1], 'tubo', 5), curva, torneada(ID_POR_FORMA[3], 'tampao', 7), te, torneada(ID_POR_FORMA[5], 'reducao', 5)]);

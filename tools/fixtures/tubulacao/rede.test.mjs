@@ -1,10 +1,11 @@
 /* rede.test.mjs — a fatia 2 do plano da tubulação: o zigue-zague de aço de 2" com três curvas de raio longo e o tampão sai
  * com cada peça no lugar, os tubos no comprimento de corte, as bocas casadas (curva e tubo com os mesmos 48 vértices, só
  * encostando) e nenhum outro contato,
+ * a rede de aço com o tê e a redução sai com as bocas casadas do mesmo jeito,
  * e a família `tubulacao` sai oca e num pedaço só em cada perfil. */
 import { describe, expect, it } from 'vitest';
 import { receitaDaRede } from './rede.mjs';
-import { ZIGUE_ZAGUE } from './tracados.mjs';
+import { REDE_DE_ACO, ZIGUE_ZAGUE } from './tracados.mjs';
 import { girosDoQuadro } from '../../../procedural/familias/tubulacao/rede.js';
 import { chamar, criarRegistroDeFamilias } from '../../../procedural/familias/index.js';
 import { executarReceita } from '../../../src/autoria/executar-receita.js';
@@ -67,6 +68,31 @@ describe('rede em zigue-zague', () => {
     expect(c.paresEmContato).toHaveLength(7);
     expect(c.paresEmContato.every((p) => p.estado === 'encostam')).toBe(true);
     expect(c.cobertura.completa).toBe(true);
+    expect(c.naoDeclarados).toEqual([]);
+    expect(c.declaradosSemContato).toEqual([]);
+    expect(c.atravessados).toEqual([]);
+  });
+});
+
+describe('rede de aço com tê e redução', () => {
+  const { receita, rede } = receitaDaRede(REDE_DE_ACO);
+  const neutro = executar(receita);
+
+  it('sai com o tê e a redução no lugar, sem órfão nem desencontro de ângulo', () => {
+    expect((neutro.orfaos ?? []).map((o) => o.motivo)).toEqual([]);
+    expect(rede.pecas.map((p) => p.nome).filter((n) => /^(te|reducao)/.test(n))).toEqual(['tete', 'reducaoreducao']);
+    expect(rede.desencontros).toEqual([]);
+    /* o tê de 2" tem a passagem ao longo de z, de 500 − 64 a 500 + 64, e a derivação até x = 600 + 64 */
+    const t = caixa(neutro, 'teteTe');
+    expect(t.min[2]).toBeCloseTo(436, 6);
+    expect(t.max[2]).toBeCloseTo(564, 6);
+    expect(t.max[0]).toBeCloseTo(664, 6);
+  });
+
+  it('cada encontro só encosta, e só os declarados', () => {
+    const c = contatosDaPeca(neutro, receita);
+    expect(c.paresEmContato).toHaveLength(rede.encostos.length);
+    expect(c.paresEmContato.every((p) => p.estado === 'encostam'), JSON.stringify(c.paresEmContato.filter((p) => p.estado !== 'encostam'))).toBe(true);
     expect(c.naoDeclarados).toEqual([]);
     expect(c.declaradosSemContato).toEqual([]);
     expect(c.atravessados).toEqual([]);

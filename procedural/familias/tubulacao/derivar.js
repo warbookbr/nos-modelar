@@ -14,6 +14,10 @@ export function derivar(parametros) {
     g.dentro.forEach((pt, k) => { argumentos[`d${k}`] = vm(pt); });
     g.secaoDeFora.forEach(([u, v], k) => { argumentos[`fu${k}`] = m(u); argumentos[`fv${k}`] = m(v); });
     g.secaoDeDentro.forEach(([u, v], k) => { argumentos[`iu${k}`] = m(u); argumentos[`iv${k}`] = m(v); });
+  } else if (g.forma === 4) {
+    argumentos.altura = m(g.altura);
+    argumentos.emDerivacao = vm(g.emDerivacao);
+    for (const [prefixo, perfil] of [['p', g.passagem], ['d', g.derivacao], ['fp', g.furoDaPassagem], ['fd', g.furoDaDerivacao]]) perfil.forEach(([r, y], k) => { argumentos[`${prefixo}r${k}`] = m(r); argumentos[`${prefixo}y${k}`] = m(y); });
   } else {
     argumentos.altura = m(g.altura);
     g.perfil.forEach(([r, y], k) => { argumentos[`r${k}`] = m(r); argumentos[`y${k}`] = m(y); });
