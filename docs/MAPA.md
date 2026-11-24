@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2252 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2253 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1546,6 +1546,10 @@
 ## procedural/pecas/braco-de-prova/partes/elo1/
 
 - `receita.js` — braco-de-prova/elo1 — o primeiro elo, um perfil em U aberto em cima, cinza-escuro, de 150 mm entre o eixo do ombro e o do cotovelo, girando entre as paredes …
+
+## procedural/pecas/braco-de-prova/partes/elo1/rodadas/
+
+- `receita-01.js` — braco-de-prova/elo1 — o primeiro elo, um perfil em U aberto em cima, cinza-escuro, de 150 mm entre o eixo do ombro e o do cotovelo, girando entre as paredes …
 
 ## procedural/pecas/braco-de-prova/partes/elo2/
 
