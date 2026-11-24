@@ -67,7 +67,7 @@ Cada fatia cabe numa sessão de agente despachado, entrega o teste dela e deixa 
 
 ## Decisão da pessoa
 
-Pendente: se a ordem é gabinete, chapa e casca, do menor risco ao maior, como o plano propõe; se o gabinete começa só de plástico (paredes finas, cantos arredondados, ressaltos) ou também de chapa, o que o faria esperar a fatia 3; e se a casca para fora entra já, ou só a para dentro, que é o caso das carenagens.
+Decidido em 2026-11-24: a ordem é gabinete, chapa e casca, do menor risco ao maior; a casca para fora entra junto da para dentro. Pendente: se o gabinete começa só de plástico ou também de chapa; a pessoa perguntou se a chapa está em algum plano ativo, e não está (a "lataria numa chapa só" do plano do carro é a superfície da carroceria, outra coisa).
 
 ## Riscos e parada
 
