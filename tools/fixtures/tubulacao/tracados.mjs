@@ -26,3 +26,21 @@ export const L_DE_PVC = Object.freeze({
   nos: [{ nome: 'a', posicao: [0, 0, 0] }, { nome: 'b', posicao: [400, 0, 0] }, { nome: 'c', posicao: [400, 300, 0] }],
   trechos: [{ de: 'a', para: 'b', bitola: '50' }, { de: 'b', para: 'c', bitola: '50' }],
 });
+
+/* a rede só de curvas e tampão, para a fatia 2: um zigue-zague em três dimensões, de 2", com o fim fechado */
+export const ZIGUE_ZAGUE = Object.freeze({
+  material: 'aco',
+  nos: [
+    { nome: 'a', posicao: [0, 0, 0] },
+    { nome: 'b', posicao: [500, 0, 0] },
+    { nome: 'c', posicao: [500, 400, 0] },
+    { nome: 'd', posicao: [500, 400, 600] },
+    { nome: 'e', posicao: [900, 800, 600], fim: 'tampao' },
+  ],
+  trechos: [
+    { de: 'a', para: 'b', bitola: '2' },
+    { de: 'b', para: 'c', bitola: '2' },
+    { de: 'c', para: 'd', bitola: '2' },
+    { de: 'd', para: 'e', bitola: '2' },
+  ],
+});

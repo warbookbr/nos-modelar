@@ -49,7 +49,8 @@ export function lerTracado({ material, nos, trechos } = {}) {
     if (typeof no?.nome !== 'string' || !no.nome) recusar(`nó sem nome: ${JSON.stringify(no)}`);
     if (porNome.has(no.nome)) recusar(`o nó '${no.nome}' aparece duas vezes`);
     if (!Array.isArray(no.posicao) || no.posicao.length !== 3 || !no.posicao.every(Number.isFinite)) recusar(`o nó '${no.nome}' precisa de posicao [x, y, z] em mm`);
-    porNome.set(no.nome, { nome: no.nome, posicao: no.posicao, trechos: [] });
+    if (no.fim !== undefined && !['aberta', 'tampao'].includes(no.fim)) recusar(`o nó '${no.nome}' tem fim '${no.fim}'; aceitos: aberta, tampao`);
+    porNome.set(no.nome, { nome: no.nome, posicao: no.posicao, fim: no.fim ?? 'aberta', trechos: [] });
   }
   const lidos = trechos.map((t, i) => {
     const onde = `o trecho ${i} (${t?.de} → ${t?.para})`;
@@ -76,7 +77,8 @@ export function lerTracado({ material, nos, trechos } = {}) {
     const onde = `o nó '${no.nome}'`;
     if (ts.length === 0) recusar(`${onde} não tem trecho`);
     if (ts.length > 3) recusar(`${onde} tem ${ts.length} trechos; a cruzeta fica fora, e o nó aceita até três`);
-    if (ts.length === 1) { conexoes.set(no.nome, { tipo: 'ponta' }); continue; }
+    if (no.fim === 'tampao' && ts.length !== 1) recusar(`${onde} tem tampão e ${ts.length} trechos; o tampão vai só na ponta`);
+    if (ts.length === 1) { conexoes.set(no.nome, { tipo: 'ponta', fim: no.fim }); continue; }
     if (ts.length === 2) {
       const [a, b] = ts;
       const desvio = 180 - graus(a.direcao, b.direcao);

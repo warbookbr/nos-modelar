@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2258 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2265 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1132,6 +1132,11 @@
 
 ## procedural/familias/tubulacao/
 
+- `composicoes.js` — composicoes.js — as composições da família `tubulacao`: o trecho e o tampão por `lathe` da seção fechada, e a curva por dois `friso` de seção circular ao lon…
+- `derivar.js` — derivar.js — dos parâmetros da peça de tubulação (milímetro) à chamada de composição (metro). A forma escolhe a composição.
+- `geometria.js` — geometria.js — as medidas de uma peça da família `tubulacao`, em milímetro: o trecho reto, a curva e o tampão, ocos.
+- `index.js` — index.js — a família `tubulacao`: o trecho reto, a curva e o tampão ocos, por diâmetro externo e parede. A rede inteira, do traçado às peças, sai de `rede.js…
+- `rede.js` — rede.js — a rede de tubos de um traçado, como a lista das peças da família `tubulacao` com a pose de cada uma, em metro.
 - `tabela.js` — tabela.js — as bitolas da tubulação, em milímetro, por material.
 - `tracado.js` — tracado.js — a leitura e a conferência do traçado de uma rede de tubos, em milímetro.
 
@@ -3451,6 +3456,8 @@
 
 ## tools/fixtures/tubulacao/
 
+- `rede.mjs` — rede.mjs — a receita de uma rede de tubos: as peças de `pecasDaRede` postas pelo `instanciaDeFamilia`, uma chamada por peça, com a base encadeada e o nome de…
+- `rede.test.mjs` — rede.test.mjs — a fatia 2 do plano da tubulação: o zigue-zague de aço de 2" com três curvas de raio longo e o tampão sai com cada peça no lugar, os tubos no …
 - `tracado.test.mjs` — tracado.test.mjs — a fatia 1 do plano da tubulação: a tabela de bitolas e a leitura do traçado, com a conexão de cada nó, o comprimento de corte de cada trec…
 - `tracados.mjs` — tracados.mjs — os traçados neutros da prova da tubulação: a rede de aço de 2" com duas curvas, um tê e uma redução para 1 1/2", e a de PVC de 50 mm em L. Em …
 

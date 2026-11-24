@@ -1,0 +1,273 @@
+{
+  "formato": "mecanifica.aprovacao-da-familia@1",
+  "familia": "tubulacao",
+  "versao": "1.0.0",
+  "mecanica": {
+    "data": "2026-11-24",
+    "pontos": {
+      "minimo": {
+        "parametros": {
+          "angulo": 15,
+          "comprimento": 10,
+          "comprimentoDoTampao": 10,
+          "diametroExterno": 15,
+          "fase": 0,
+          "forma": 1,
+          "parede": 1,
+          "raio": 15
+        },
+        "hash": "sha256:1fff0f957357e863aa1ef48b1d63ed47880881ba6718cdd2ac9a09f7b35a6611",
+        "medidas": []
+      },
+      "medio": {
+        "parametros": {
+          "angulo": 45,
+          "comprimento": 1000,
+          "comprimentoDoTampao": 51,
+          "diametroExterno": 88.9,
+          "fase": 3.75,
+          "forma": 2,
+          "parede": 5.49,
+          "raio": 114
+        },
+        "hash": "sha256:443c376cb1d13b756f58f06ab7a76ee09106563f2fecf9d2752f362ce3becb67",
+        "medidas": []
+      },
+      "maximo": {
+        "parametros": {
+          "angulo": 90,
+          "comprimento": 6000,
+          "comprimentoDoTampao": 150,
+          "diametroExterno": 250,
+          "fase": 7.5,
+          "forma": 3,
+          "parede": 15,
+          "raio": 500
+        },
+        "hash": "sha256:90a27deb4798aef13c37d0d93327396b378c8ab27e5019c35b4ff3e23fefeee8",
+        "medidas": []
+      }
+    },
+    "varredura": {
+      "sondas": 16,
+      "recusasDeclaradas": [
+        {
+          "ponto": "comprimentoDoTampao=10",
+          "restricao": "tampao-mais-fundo-que-a-parede"
+        },
+        {
+          "ponto": "diametroExterno=15",
+          "restricao": "parede-cabe-no-tubo"
+        },
+        {
+          "ponto": "diametroExterno=250",
+          "restricao": "curva-mais-larga-que-o-tubo"
+        },
+        {
+          "ponto": "parede=15",
+          "restricao": "tampao-mais-fundo-que-a-parede"
+        },
+        {
+          "ponto": "raio=15",
+          "restricao": "curva-mais-larga-que-o-tubo"
+        }
+      ]
+    },
+    "portas": [
+      "boca"
+    ],
+    "perfis": {
+      "curva-aco-2-90": {
+        "parametros": {
+          "angulo": 90,
+          "comprimento": 500,
+          "comprimentoDoTampao": 38,
+          "diametroExterno": 60.3,
+          "fase": 0,
+          "forma": 2,
+          "parede": 3.91,
+          "raio": 76
+        },
+        "hash": "sha256:83b1fbf855893cedfdf2ee15ae1b5f288c44b6b03ad18a7e782513901b692b1e",
+        "medidas": []
+      },
+      "curva-aco-4-45": {
+        "parametros": {
+          "angulo": 45,
+          "comprimento": 500,
+          "comprimentoDoTampao": 38,
+          "diametroExterno": 114.3,
+          "fase": 0,
+          "forma": 2,
+          "parede": 6.02,
+          "raio": 152
+        },
+        "hash": "sha256:319d634a5dd0acf17d310b063ad6ca0cada1f091bcb5f665ffde256cfcc7aa02",
+        "medidas": []
+      },
+      "joelho-pvc-50": {
+        "parametros": {
+          "angulo": 90,
+          "comprimento": 500,
+          "comprimentoDoTampao": 38,
+          "diametroExterno": 50,
+          "fase": 0,
+          "forma": 2,
+          "parede": 3,
+          "raio": 50
+        },
+        "hash": "sha256:30e518f67802982865160166d1f1f426360efe8b5c7c2da6b2be6b0fec183a0f",
+        "medidas": []
+      },
+      "tampao-aco-2": {
+        "parametros": {
+          "angulo": 90,
+          "comprimento": 500,
+          "comprimentoDoTampao": 38,
+          "diametroExterno": 60.3,
+          "fase": 0,
+          "forma": 3,
+          "parede": 3.91,
+          "raio": 76
+        },
+        "hash": "sha256:28960c8c8eec3938dbaeada2994b968a60b03392032a49971f64b08f4f1daea4",
+        "medidas": []
+      },
+      "trecho-aco-2": {
+        "parametros": {
+          "angulo": 90,
+          "comprimento": 500,
+          "comprimentoDoTampao": 38,
+          "diametroExterno": 60.3,
+          "fase": 0,
+          "forma": 1,
+          "parede": 3.91,
+          "raio": 76
+        },
+        "hash": "sha256:67ede8215ccbfc64f1c7788f8b40fda3eae36489f8b872b4ff47030b8e993627",
+        "medidas": []
+      },
+      "trecho-pvc-50": {
+        "parametros": {
+          "angulo": 90,
+          "comprimento": 300,
+          "comprimentoDoTampao": 38,
+          "diametroExterno": 50,
+          "fase": 0,
+          "forma": 1,
+          "parede": 3,
+          "raio": 76
+        },
+        "hash": "sha256:bd8eb5f676ea5d20a8e032fc23d25827f729b815310a73a8719a6826d2233e8d",
+        "medidas": []
+      }
+    },
+    "escalasDosPerfis": {
+      "sondas": 60,
+      "recusasDeclaradas": [
+        {
+          "ponto": "curva-aco-2-90: comprimentoDoTampao=10",
+          "restricao": "tampao-mais-fundo-que-a-parede"
+        },
+        {
+          "ponto": "curva-aco-2-90: diametroExterno=15",
+          "restricao": "parede-cabe-no-tubo"
+        },
+        {
+          "ponto": "curva-aco-2-90: diametroExterno=250",
+          "restricao": "curva-mais-larga-que-o-tubo"
+        },
+        {
+          "ponto": "curva-aco-2-90: parede=15",
+          "restricao": "tampao-mais-fundo-que-a-parede"
+        },
+        {
+          "ponto": "curva-aco-2-90: raio=15",
+          "restricao": "curva-mais-larga-que-o-tubo"
+        },
+        {
+          "ponto": "curva-aco-4-45: comprimentoDoTampao=10",
+          "restricao": "tampao-mais-fundo-que-a-parede"
+        },
+        {
+          "ponto": "curva-aco-4-45: diametroExterno=15",
+          "restricao": "parede-cabe-no-tubo"
+        },
+        {
+          "ponto": "curva-aco-4-45: parede=15",
+          "restricao": "tampao-mais-fundo-que-a-parede"
+        },
+        {
+          "ponto": "curva-aco-4-45: raio=15",
+          "restricao": "curva-mais-larga-que-o-tubo"
+        },
+        {
+          "ponto": "joelho-pvc-50: diametroExterno=250",
+          "restricao": "curva-mais-larga-que-o-tubo"
+        },
+        {
+          "ponto": "joelho-pvc-50: parede=15",
+          "restricao": "parede-cabe-no-tubo"
+        },
+        {
+          "ponto": "joelho-pvc-50: raio=15",
+          "restricao": "curva-mais-larga-que-o-tubo"
+        },
+        {
+          "ponto": "tampao-aco-2: comprimentoDoTampao=10",
+          "restricao": "tampao-mais-fundo-que-a-parede"
+        },
+        {
+          "ponto": "tampao-aco-2: diametroExterno=15",
+          "restricao": "parede-cabe-no-tubo"
+        },
+        {
+          "ponto": "tampao-aco-2: diametroExterno=250",
+          "restricao": "curva-mais-larga-que-o-tubo"
+        },
+        {
+          "ponto": "tampao-aco-2: parede=15",
+          "restricao": "tampao-mais-fundo-que-a-parede"
+        },
+        {
+          "ponto": "tampao-aco-2: raio=15",
+          "restricao": "curva-mais-larga-que-o-tubo"
+        },
+        {
+          "ponto": "trecho-aco-2: comprimentoDoTampao=10",
+          "restricao": "tampao-mais-fundo-que-a-parede"
+        },
+        {
+          "ponto": "trecho-aco-2: diametroExterno=15",
+          "restricao": "parede-cabe-no-tubo"
+        },
+        {
+          "ponto": "trecho-aco-2: diametroExterno=250",
+          "restricao": "curva-mais-larga-que-o-tubo"
+        },
+        {
+          "ponto": "trecho-aco-2: parede=15",
+          "restricao": "tampao-mais-fundo-que-a-parede"
+        },
+        {
+          "ponto": "trecho-aco-2: raio=15",
+          "restricao": "curva-mais-larga-que-o-tubo"
+        },
+        {
+          "ponto": "trecho-pvc-50: diametroExterno=250",
+          "restricao": "curva-mais-larga-que-o-tubo"
+        },
+        {
+          "ponto": "trecho-pvc-50: parede=15",
+          "restricao": "parede-cabe-no-tubo"
+        },
+        {
+          "ponto": "trecho-pvc-50: raio=15",
+          "restricao": "curva-mais-larga-que-o-tubo"
+        }
+      ]
+    }
+  },
+  "critico": null,
+  "pessoa": null
+}
