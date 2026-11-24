@@ -59,7 +59,7 @@ O núcleo não ganha nome de objeto nem operação nova, e o acervo sai igual. C
 Cada fatia cabe numa sessão de agente despachado, entrega o teste dela e deixa o andamento escrito abaixo antes de passar à seguinte.
 
 1. Feita em 2026-11-24: o perfil estrutural (I, H, U e alumínio ranhurado), com a aprovação da pessoa.
-2. A guia linear, trilho e carro, com a aprovação da pessoa.
+2. Feita em 2026-11-24: a guia linear, trilho e carro, com a aprovação da pessoa.
 3. O rolamento e o mancal de pedestal, com a aprovação da pessoa.
 4. O fuso e a castanha, com a aprovação da pessoa.
 5. A mesa linear de prova, o banco de provas, o mapa de ferramentas, as fichas e o fechamento.
@@ -75,5 +75,6 @@ Se a tabela de um elemento pedir valor que não é de norma pública (a altura d
 ## Andamento
 
 Fatia 1, em 2026-11-24. A família `perfil-estrutural` faz o IPE (80 a 600), o HE A (100 a 600) e o UPN (50 a 400) pela EN 10365, lidos nas tabelas da ArcelorMittal, e o alumínio ranhurado de 20, 30, 40 e 45 mm, com a ranhura em T e o furo central por regra da família, porque não há norma pública. A seção é uma `extrusao` com as concordâncias em quatro segmentos (o raio nulo vira 0,2 mm, para o número de pontos não mudar) e o corte a 45° são prismas triangulares extrudados em x tirados por `subtrair`, com o lado de cima mais comprido; as portas `inicio` e `fim` são os planos das pontas. O teste confere que os 59 tamanhos saem num pedaço só e que a área da seção bate com a massa por metro da tabela até 2 %. A camada mecânica foi gravada depois da aprovação da pessoa por imagem.
+Fatia 2, em 2026-11-24. A família `guia-linear` faz o trilho e o carro numa chamada, nos tamanhos 15, 20, 25 e 30: o trilho por `extrusao` com o canal das esferas nos dois lados e os furos com rebaixo a cada passo, centrados no comprimento, por `lathe` em z repetido por `arranja` linear; o carro como U invertido apoiado no topo do trilho, com o vão de 1 mm dos lados e quatro furos roscados, na posição pedida. As portas `base` e `mesa` são o plano de baixo do trilho e o de cima do carro. A ISO 12090-1 não tem texto público, e as medidas são as de intercâmbio usuais do mercado, como regra declarada da família. O teste confere os quatro tamanhos em dois pedaços, o carro só encostando no trilho e os furos centrados. A camada mecânica foi gravada depois da aprovação da pessoa por imagem.
 
 ## Fechamento

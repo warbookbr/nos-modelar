@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2273 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2279 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1091,6 +1091,15 @@
 - `geometria.js` — geometria.js — as medidas do fixador em milímetro, a partir dos parâmetros da família e da tabela ISO.
 - `index.js` — index.js — a família `fixador`: parafuso de cabeça sextavada, allen ou abaulada, porca sextavada e arruela lisa, de M3 a M24 pela tabela ISO de rosca grossa,…
 - `tabela.js` — tabela.js — as medidas métricas de rosca grossa, em mm, por diâmetro nominal: passo (ISO 261), sextavado da cabeça e da porca (ISO 4017 e ISO 4032: chave s, …
+
+## procedural/familias/guia-linear/
+
+- `composicoes.js` — composicoes.js — a composição da família `guia-linear`: o trilho por `extrusao` da seção com os furos com rebaixo tirados por `subtrair` (um `lathe` em z rep…
+- `derivar.js` — derivar.js — dos parâmetros da guia (milímetro) à chamada de composição (metro).
+- `geometria.js` — geometria.js — o trilho e o carro da guia linear, em milímetro.
+- `guia-linear.test.mjs` — guia-linear.test.mjs — a família `guia-linear`: cada tamanho sai com o trilho e o carro, cada um num pedaço só; o carro apoia no topo do trilho só encostando…
+- `index.js` — index.js — a família `guia-linear`: o trilho de perfil com a furação e o carro de esferas montado sobre ele, por tamanho (15, 20, 25 e 30). A tabela está em …
+- `tabela.js` — tabela.js — a guia linear de esferas de perfil, por tamanho, em milímetro.
 
 ## procedural/familias/mola/
 

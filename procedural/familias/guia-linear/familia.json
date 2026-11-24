@@ -1,0 +1,272 @@
+{
+  "formato": "mecanifica.familia@1",
+  "id": "guia-linear",
+  "versao": "1.0.0",
+  "nivel": "componente",
+  "parametros": {
+    "larguraDoTrilho": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 20,
+      "minimo": 10,
+      "maximo": 40,
+      "medio": 20
+    },
+    "alturaDoTrilho": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 18,
+      "minimo": 10,
+      "maximo": 40,
+      "medio": 18
+    },
+    "passo": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 60,
+      "minimo": 30,
+      "maximo": 120,
+      "medio": 60
+    },
+    "diametroDoFuro": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 6,
+      "minimo": 3,
+      "maximo": 14,
+      "medio": 6
+    },
+    "diametroDoRebaixo": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 9.5,
+      "minimo": 5,
+      "maximo": 22,
+      "medio": 9.5
+    },
+    "profundidadeDoRebaixo": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 8.5,
+      "minimo": 3,
+      "maximo": 20,
+      "medio": 8.5
+    },
+    "larguraDoCarro": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 44,
+      "minimo": 25,
+      "maximo": 90,
+      "medio": 44
+    },
+    "alturaDeMontagem": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 30,
+      "minimo": 18,
+      "maximo": 60,
+      "medio": 30
+    },
+    "comprimentoDoCarro": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 77.5,
+      "minimo": 40,
+      "maximo": 150,
+      "medio": 77.5
+    },
+    "folgaDeBaixo": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 4.6,
+      "minimo": 2,
+      "maximo": 10,
+      "medio": 4.6
+    },
+    "furosDoCarroX": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 32,
+      "minimo": 15,
+      "maximo": 70,
+      "medio": 32
+    },
+    "furosDoCarroY": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 36,
+      "minimo": 15,
+      "maximo": 80,
+      "medio": 36
+    },
+    "rosca": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 5,
+      "minimo": 3,
+      "maximo": 12,
+      "medio": 5
+    },
+    "comprimento": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 500,
+      "minimo": 100,
+      "maximo": 4000,
+      "medio": 500
+    },
+    "posicaoDoCarro": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 100,
+      "minimo": 0,
+      "maximo": 3800,
+      "medio": 200
+    }
+  },
+  "restricoes": [
+    {
+      "id": "carro-no-trilho",
+      "expressao": "posicaoDoCarro + comprimentoDoCarro - comprimento <= 0",
+      "motivo": "o carro passa da ponta do trilho; diminua a posição do carro ou aumente o trilho"
+    },
+    {
+      "id": "dois-furos-no-trilho",
+      "expressao": "passo + diametroDoRebaixo - comprimento <= 0",
+      "motivo": "o trilho precisa de ao menos dois furos: o comprimento passa do passo mais o rebaixo"
+    },
+    {
+      "id": "rebaixo-maior-que-o-furo",
+      "expressao": "diametroDoFuro + 1 - diametroDoRebaixo <= 0",
+      "motivo": "o rebaixo do furo do trilho precisa ser mais largo que o furo"
+    },
+    {
+      "id": "rebaixo-cabe-no-trilho",
+      "expressao": "diametroDoRebaixo + 0.2 * larguraDoTrilho + 1 - larguraDoTrilho <= 0",
+      "motivo": "o rebaixo do furo come os canais das esferas do trilho"
+    },
+    {
+      "id": "furo-nao-vara-o-trilho",
+      "expressao": "profundidadeDoRebaixo + 2 - alturaDoTrilho <= 0",
+      "motivo": "o rebaixo é mais fundo que o trilho"
+    },
+    {
+      "id": "carro-mais-largo-que-o-trilho",
+      "expressao": "larguraDoTrilho + 8 - larguraDoCarro <= 0",
+      "motivo": "o carro precisa de parede dos dois lados do trilho"
+    },
+    {
+      "id": "carro-acima-do-trilho",
+      "expressao": "alturaDoTrilho + 3 - alturaDeMontagem <= 0",
+      "motivo": "o topo do carro precisa ficar acima do trilho"
+    },
+    {
+      "id": "folga-abaixo-do-canal",
+      "expressao": "folgaDeBaixo - 0.5 * alturaDoTrilho <= 0",
+      "motivo": "a folga de baixo do carro passa da metade da altura do trilho"
+    },
+    {
+      "id": "furos-do-carro-fora-do-trilho",
+      "expressao": "larguraDoTrilho + 2 + 0.85 * rosca - furosDoCarroX <= 0",
+      "motivo": "os furos roscados do carro caem em cima do trilho"
+    },
+    {
+      "id": "furos-do-carro-dentro-x",
+      "expressao": "furosDoCarroX + rosca + 2 - larguraDoCarro <= 0",
+      "motivo": "os furos roscados do carro passam da largura dele"
+    },
+    {
+      "id": "furos-do-carro-dentro-y",
+      "expressao": "furosDoCarroY + rosca + 2 - comprimentoDoCarro <= 0",
+      "motivo": "os furos roscados do carro passam do comprimento dele"
+    },
+    {
+      "id": "furo-roscado-cabe-no-carro",
+      "expressao": "folgaDeBaixo + 1.5 * rosca + 2 - alturaDeMontagem <= 0",
+      "motivo": "o fundo dos furos roscados passa da altura da parede do carro"
+    }
+  ],
+  "portas": [
+    {
+      "id": "base",
+      "tipo": "plano",
+      "papel": "apoia"
+    },
+    {
+      "id": "mesa",
+      "tipo": "plano",
+      "papel": "apoia"
+    }
+  ],
+  "ferramentas": [
+    "guia"
+  ],
+  "perguntas": {
+    "guia": [
+      "O trilho tem os canais das esferas nos dois lados e os furos com rebaixo a cada passo, e o carro monta sobre ele como um U invertido, com os quatro furos roscados em cima?"
+    ]
+  },
+  "perfis": {
+    "guia-15": {
+      "descricao": "guia de tamanho 15, trilho de 300 mm",
+      "parametros": {
+        "larguraDoTrilho": 15,
+        "alturaDoTrilho": 15,
+        "passo": 60,
+        "diametroDoFuro": 4.5,
+        "diametroDoRebaixo": 7.5,
+        "profundidadeDoRebaixo": 5.3,
+        "larguraDoCarro": 34,
+        "alturaDeMontagem": 24,
+        "comprimentoDoCarro": 61.4,
+        "folgaDeBaixo": 4.3,
+        "furosDoCarroX": 26,
+        "furosDoCarroY": 26,
+        "rosca": 4,
+        "comprimento": 300,
+        "posicaoDoCarro": 60
+      }
+    },
+    "guia-20": {
+      "descricao": "guia de tamanho 20, trilho de 500 mm",
+      "parametros": {
+        "larguraDoTrilho": 20,
+        "alturaDoTrilho": 18,
+        "passo": 60,
+        "diametroDoFuro": 6,
+        "diametroDoRebaixo": 9.5,
+        "profundidadeDoRebaixo": 8.5,
+        "larguraDoCarro": 44,
+        "alturaDeMontagem": 30,
+        "comprimentoDoCarro": 77.5,
+        "folgaDeBaixo": 4.6,
+        "furosDoCarroX": 32,
+        "furosDoCarroY": 36,
+        "rosca": 5,
+        "comprimento": 500,
+        "posicaoDoCarro": 200
+      }
+    },
+    "guia-30": {
+      "descricao": "guia de tamanho 30, trilho de 800 mm",
+      "parametros": {
+        "larguraDoTrilho": 28,
+        "alturaDoTrilho": 26,
+        "passo": 80,
+        "diametroDoFuro": 9,
+        "diametroDoRebaixo": 14,
+        "profundidadeDoRebaixo": 12,
+        "larguraDoCarro": 60,
+        "alturaDeMontagem": 42,
+        "comprimentoDoCarro": 97.4,
+        "folgaDeBaixo": 6,
+        "furosDoCarroX": 40,
+        "furosDoCarroY": 40,
+        "rosca": 8,
+        "comprimento": 800,
+        "posicaoDoCarro": 0
+      }
+    }
+  }
+}
