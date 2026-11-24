@@ -254,7 +254,7 @@
       "parametros": "tipo, módulo, dentes, ângulo de pressão, largura",
       "referencias": ["FreeCAD Gears", "BOSL2: gears", "Blender: Extra Objects (gears)"],
       "aqui": "parcial",
-      "onde": "família `engrenagem`: a reta de dente evolvente pelo perfil de referência tipo A da ISO 53 (de 17 a 200 dentes, módulo de 0,5 a 10) e a catraca de dente de serra, com cubo, furo e a porta do eixo; família `cremalheira`: a cremalheira reta do mesmo perfil, até 60 dentes; a helicoidal, a cônica, o sem-fim e o par montado não"
+      "onde": "família `engrenagem`: a reta de dente evolvente pelo perfil de referência tipo A da ISO 53 (de 17 a 200 dentes, módulo de 0,5 a 10) e a catraca de dente de serra, com cubo, furo e a porta do eixo; família `cremalheira`: a cremalheira reta do mesmo perfil, até 60 dentes; e o par engrenado e o pinhão sobre a cremalheira, com a distância entre centros, a folga entre flancos e a fase (`parDeEngrenagens` e `pinhaoECremalheira` em `engrenamento.js`); a helicoidal, a cônica e o sem-fim não"
     },
     "mola": {
       "nome": "molas",
