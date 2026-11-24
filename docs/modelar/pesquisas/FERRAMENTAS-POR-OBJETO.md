@@ -34,7 +34,7 @@ Os tipos são três. O modificador age sobre uma forma que já existe; o gerador
 | 20 | móvel modular (`movel`) | gerador | 23 (6%) | 6 | parcial | faz caixaria de móvel com laterais, prateleiras, portas e gavetas por vãos |
 | 21 | fixadores normalizados (`fixador`) | especializado | 21 (6%) | 9 | parcial | gera parafuso, porca, arruela, rebite e pino por norma e bitola |
 | 22 | relevo funcional (`textura`) | modificador | 21 (6%) | 10 | parcial | aplica recartilhado, estrias de pega, piso antiderrapante ou chapa ondulada numa face |
-| 23 | elos ao longo de caminho fechado (`elos`) | gerador | 19 (5%) | 8 | não | distribui elos articulados num contorno fechado em volta de rodas (corrente, esteira de trator, porta-cabos, degraus de escada rolante, correia dentada) |
+| 23 | elos ao longo de caminho fechado (`elos`) | gerador | 19 (5%) | 8 | parcial | distribui elos articulados num contorno fechado em volta de rodas (corrente, esteira de trator, porta-cabos, degraus de escada rolante, correia dentada) |
 | 24 | texto e escala gravados (`texto`) | modificador | 19 (5%) | 9 | não | grava ou põe em relevo letras, números e escalas graduadas (paquímetro, mostrador, placa) |
 | 25 | polia e correia (`polia`) | especializado | 18 (5%) | 7 | parcial | gera polias em V ou dentadas e a correia fechada que as envolve na posição certa |
 | 26 | perfil aerodinâmico e pás (`aerofolio`) | gerador | 17 (5%) | 6 | parcial | gera asa, empenagem, pá de hélice, rotor e ventoinha por perfil NACA, corda, torção, enflechamento e número de pás |
@@ -79,7 +79,7 @@ As ferramentas que não existem ou existem em parte, na mesma ordem, com o que j
 - móvel modular (`parcial`, 23 objetos): família `movel-de-caixa`, com nove perfis de roupeiro, guarda-roupa, armários, cômoda, criado-mudo, estante e gaveteiro, portas embutidas, sobrepostas e de correr e gavetas com curso conferido, e família `cadeira`, com cinco perfis; mesa e sofá não.
 - fixadores normalizados (`parcial`, 21 objetos): família `fixador`: parafuso de cabeça sextavada, allen ou abaulada, porca sextavada e arruela lisa, de M3 a M24 pela tabela ISO de rosca grossa; rebite, pino, porca de outros tipos e normas além da ISO métrica não.
 - relevo funcional (`parcial`, 21 objetos): núcleo: displace com ruído; padrão regular não existe.
-- elos ao longo de caminho fechado (`não`, 19 objetos): nem esboço nem núcleo.
+- elos ao longo de caminho fechado (`parcial`, 19 objetos): famílias `roda-dentada` (ISO 606 série B), `corrente` (corrente de rolos fechada em volta de duas rodas, com `transmissaoPorCorrente`) e `esteira` (sapatas de aço com garra em volta da motriz e da guia, com roletes); corrente dupla, série A, esteira de borracha, porta-cabos e degraus de escada rolante não.
 - texto e escala gravados (`não`, 19 objetos): nem esboço nem núcleo.
 - polia e correia (`parcial`, 18 objetos): família `polia-e-correia`: polia dentada GT2, HTD 3M, HTD 5M e T5 por dentes, com ou sem flanges, polia em V das seções Z, A e B da ISO 4183 de um a quatro canais e polia lisa, com cubo, furo e a porta do eixo; a correia dentada fechada entre duas polias dentadas (`transmissaoDentada`, `geometriaDaCorreia` e `passosDaCorreia` em `correia.js`), com número inteiro de dentes e a distância entre centros recalculada, e a correia em V (seção da DIN 2215, uma volta por canal) e a lisa entre duas polias do mesmo tipo (`transmissaoPorAtrito` e `passosDaCorreiaPorAtrito`); o comprimento comercial da correia em V, o tensor e mais de duas polias não.
 - perfil aerodinâmico e pás (`parcial`, 17 objetos): família `superficie-aerodinamica`: asa, estabilizador, deriva, pá de hélice e hélice de até 9 pás por perfil de quatro dígitos, corda, espessura, torção, enflechamento, diedro e ponta levantada, com a superfície de comando (flap, aileron, leme) em vão com fresta e deflexão; rotor de turbina, ventoinha carenada e perfil de catálogo não.
@@ -105,10 +105,6 @@ As ferramentas que não existem ou existem em parte, na mesma ordem, com o que j
 ### tecido e estofado (`tecido`)
 
 Faz almofada inflada com costura, lona esticada, vela e rede a partir de contorno e pressão. Parâmetros: contorno, espessura, pressão, costuras, pontos de amarra. Referências: Blender: Cloth e pressão; Marvelous Designer (conceito). Aqui: não, nem esboço nem núcleo. Atende 26 objetos em 11 famílias.
-
-### elos ao longo de caminho fechado (`elos`)
-
-Distribui elos articulados num contorno fechado em volta de rodas (corrente, esteira de trator, porta-cabos, degraus de escada rolante, correia dentada). Parâmetros: elo, passo, rodas ou caminho, tensão. Referências: Blender: Array com Curve (técnica de esteira); FreeCAD Gears: sprocket. Aqui: não, nem esboço nem núcleo. Atende 19 objetos em 8 famílias.
 
 ### texto e escala gravados (`texto`)
 
@@ -225,6 +221,10 @@ Gera parafuso, porca, arruela, rebite e pino por norma e bitola. Parâmetros: ti
 ### relevo funcional (`textura`)
 
 Aplica recartilhado, estrias de pega, piso antiderrapante ou chapa ondulada numa face. Parâmetros: padrão, passo, profundidade, face. Referências: BOSL2: knurling e textures; Blender: Displace com textura de imagem. Aqui: parcial, núcleo: displace com ruído; padrão regular não existe. Atende 21 objetos em 10 famílias.
+
+### elos ao longo de caminho fechado (`elos`)
+
+Distribui elos articulados num contorno fechado em volta de rodas (corrente, esteira de trator, porta-cabos, degraus de escada rolante, correia dentada). Parâmetros: elo, passo, rodas ou caminho, tensão. Referências: Blender: Array com Curve (técnica de esteira); FreeCAD Gears: sprocket. Aqui: parcial, famílias `roda-dentada` (ISO 606 série B), `corrente` (corrente de rolos fechada em volta de duas rodas, com `transmissaoPorCorrente`) e `esteira` (sapatas de aço com garra em volta da motriz e da guia, com roletes); corrente dupla, série A, esteira de borracha, porta-cabos e degraus de escada rolante não. Atende 19 objetos em 8 famílias.
 
 ### polia e correia (`polia`)
 

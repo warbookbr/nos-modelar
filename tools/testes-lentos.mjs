@@ -21,6 +21,7 @@ export const TESTES_LENTOS = [
   'tools/fixtures/transmissao/exportacao.test.mjs',
   'tools/fixtures/tubulacao/exportacao.test.mjs',
   'tools/fixtures/elementos-de-maquina/mesa-linear.test.mjs',
+  'tools/fixtures/corrente-e-esteira/exportacao.test.mjs',
   /* 2026-11-23: o pedido de prova do braço respondido e o recusado, cada um exportando a ficha do braço inteiro; uns 70 s (plano da ponte, fatia 4) */
   'tools/modelar/conferir-pedido.test.mjs',
   /* 2026-11-23: a ficha do braço exportada duas vezes, cada uma resolvendo a montagem inteira; uns 60 s (plano da ponte, fatia 1) */

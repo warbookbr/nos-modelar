@@ -2,7 +2,23 @@
    largura entre as placas internas b1, lidos na tabela aberta de corrente BS/ISO da BEP ("BS Roller Chain") e conferidos
    numa segunda fonte para o 10B e o 16B; o 06B e o 08B pela ficha de catálogo de roda dentada citada no plano.
 
-   A largura do dente da roda é a da ISO 606: 0,93 b1 até o passo de 12,7 mm e 0,95 b1 acima. */
+   A largura do dente da roda é a da ISO 606: 0,93 b1 até o passo de 12,7 mm e 0,95 b1 acima.
+
+   FICHA parametrosDaRoda
+   serve: os parâmetros da família `roda-dentada` pela corrente da ISO 606 série B e o número de dentes, com o cubo e o furo.
+   quando: roda dentada simples de corrente de rolos 06B a 16B, de 9 a 80 dentes.
+   unidades: mm.
+   campos:
+     corrente: '06B', '08B', '10B', '12B' ou '16B'.
+     dentes: o número de dentes.
+     furo: o diâmetro do furo (padrão pela regra da família).
+     diametroDoCubo: o diâmetro do cubo (padrão pela regra da família).
+     comprimentoDoCubo: o comprimento do cubo (padrão pela regra da família).
+   devolve: os parâmetros completos da família; o eixo é y, os dentes de 0 à largura e o cubo além dela, e a porta `furo`.
+   exemplo:
+     parametrosDaRoda('08B', 18)
+   peça: tools/fixtures/corrente-e-esteira/transmissao.mjs (as rodas de 18 e 36 dentes da 08B).
+   FIM DA FICHA */
 
 const corrente = (passo, diametroDoRolo, larguraInterna) => Object.freeze({ passo, diametroDoRolo, larguraInterna });
 export const CORRENTES = Object.freeze({

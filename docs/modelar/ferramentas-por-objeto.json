@@ -172,8 +172,8 @@
       "automatiza": "distribui elos articulados num contorno fechado em volta de rodas (corrente, esteira de trator, porta-cabos, degraus de escada rolante, correia dentada)",
       "parametros": "elo, passo, rodas ou caminho, tensão",
       "referencias": ["Blender: Array com Curve (técnica de esteira)", "FreeCAD Gears: sprocket"],
-      "aqui": "não",
-      "onde": "nem esboço nem núcleo"
+      "aqui": "parcial",
+      "onde": "famílias `roda-dentada` (ISO 606 série B), `corrente` (corrente de rolos fechada em volta de duas rodas, com `transmissaoPorCorrente`) e `esteira` (sapatas de aço com garra em volta da motriz e da guia, com roletes); corrente dupla, série A, esteira de borracha, porta-cabos e degraus de escada rolante não"
     },
     "aerofolio": {
       "nome": "perfil aerodinâmico e pás",

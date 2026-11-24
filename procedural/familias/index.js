@@ -38,6 +38,7 @@ import { ROLAMENTO } from './rolamento/index.js';
 import { FUSO } from './fuso/index.js';
 import { RODA_DENTADA } from './roda-dentada/index.js';
 import { CORRENTE } from './corrente/index.js';
+import { ESTEIRA } from './esteira/index.js';
 
 export { ErroChamadaDeFamilia, chamar, definirFamilia } from '../../src/autoria/chamar-familia.js';
 
@@ -50,7 +51,7 @@ export const EXTENSOES_NATIVAS = Object.freeze([
 ]);
 
 /* As famílias do produto. Cada família real (tarefas 6 a 10 da fatia 9) entra aqui por import explícito. */
-export const FAMILIAS = Object.freeze([RODA_PNEU, DOBRADICA, CILINDRO_HIDRAULICO, MOVEL_DE_CAIXA, SUPERFICIE_AERODINAMICA, APARELHO_DE_CAIXA, CADEIRA, COMPONENTE_ELETRONICO, MOLA, FIXADOR, POLIA_E_CORREIA, ENGRENAGEM, CREMALHEIRA, TUBULACAO, PERFIL_ESTRUTURAL, GUIA_LINEAR, ROLAMENTO, FUSO, RODA_DENTADA, CORRENTE]);
+export const FAMILIAS = Object.freeze([RODA_PNEU, DOBRADICA, CILINDRO_HIDRAULICO, MOVEL_DE_CAIXA, SUPERFICIE_AERODINAMICA, APARELHO_DE_CAIXA, CADEIRA, COMPONENTE_ELETRONICO, MOLA, FIXADOR, POLIA_E_CORREIA, ENGRENAGEM, CREMALHEIRA, TUBULACAO, PERFIL_ESTRUTURAL, GUIA_LINEAR, ROLAMENTO, FUSO, RODA_DENTADA, CORRENTE, ESTEIRA]);
 
 /**
  * Monta os registros de uma lista de famílias carregadas por `definirFamilia`. Devolve `{ familias, obter,

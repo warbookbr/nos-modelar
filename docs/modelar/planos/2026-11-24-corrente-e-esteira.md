@@ -1,6 +1,6 @@
 # Corrente e esteira: roda dentada, corrente de rolos e esteira de sapatas em volta de rodas
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `procedural/familias/roda-dentada/`, `procedural/familias/corrente/`, `procedural/familias/esteira/`, `procedural/familias/index.js`, `tools/fixtures/corrente-e-esteira/`, `docs/modelar/banco-de-provas/corrente-e-esteira-2026-11-24/`, `docs/modelar/ferramentas-por-objeto.json`, `tools/modelar/capacidade.mjs`.
 
@@ -61,8 +61,8 @@ Cada fatia cabe numa sessão de agente despachado, entrega o teste dela e deixa 
 
 1. Feita em 2026-11-24: a roda dentada da ISO 606, com a aprovação da pessoa.
 2. Feita em 2026-11-24: a corrente de rolos e `transmissaoPorCorrente`, com a transmissão de prova e a aprovação da pessoa.
-3. A esteira de sapatas com a roda motriz, a guia e os roletes, com a aprovação da pessoa.
-4. O trem de esteira de prova, o banco de provas, o mapa de ferramentas, as fichas e o fechamento.
+3. Feita em 2026-11-24: a esteira de sapatas com a roda motriz, a guia e os roletes, com a aprovação da pessoa.
+4. Feita em 2026-11-24: o trem de esteira de prova, o banco de provas, o mapa de ferramentas, as fichas e o fechamento.
 
 ## Decisão da pessoa
 
@@ -76,5 +76,10 @@ Se a corrente de cem elos passar de dez segundos com placas, pino e rolo, o elo 
 
 Fatia 1, em 2026-11-24. A família `roda-dentada` faz a roda simples das correntes 06B a 16B, de 9 a 80 dentes, com a forma de vão mínimo da ISO 606 (assento de 0,505 d1 abrindo 140° − 90°/z, flanco de 0,12 d1 (z + 2), ponta no meio da faixa da norma, largura de 0,93 ou 0,95 b1), pelas fórmulas reproduzidas no guia aberto da Planichapa e no catálogo DIN 8187 / ISO 606 da Top Machinery; p, d1 e b1 da tabela aberta BS/ISO da BEP. O cubo e o furo padrão são regra da família. A coroa é torneada e o vão de um dente sai repetido por `arranja` radial, como na `engrenagem`; com a tampa do vão larga, os vãos vizinhos se tocavam fora da ponta e a roda de 80 dentes custava 38 s, e com a tampa no setor do dente custa 0,5 s, que o teste cobra abaixo de 2 s. A camada mecânica foi gravada depois da aprovação da pessoa por imagem.
 Fatia 2, em 2026-11-24. A família `corrente` faz a corrente de rolos simples 06B a 16B (passo, rolo, largura interna, pino, altura e espessura das placas da tabela aberta BS/ISO da BEP) fechada em volta de duas rodas: o polígono de N elos tem os rolos nos vértices, sobre o círculo primitivo de cada roda nos enrolamentos e a cada passo nos trechos retos, e cada um dos quatro trechos é um rolo, um pino e quatro placas repetidos por `arranja`, de modo que a corrente de 74 elos monta em 1,3 s. `transmissaoPorCorrente` acha os elos abraçados e os do trecho reto por uma busca pequena em volta da tangente comum, com N par e o primeiro rolo de cada trecho reto fora do círculo primitivo, e dá a distância exata e o giro de cada roda. A medição pegou três defeitos antes da imagem: os abraços das rodas trocados (o rolo entrava 2,9 mm no dente da roda grande), o arredondamento que deixava o trecho reto entrar no círculo primitivo e o assento de 7 pontos, cuja corda entrava 0,04 mm no rolo, mais que a folga de 0,005 d1 da norma; a roda dentada passou a 13 pontos no assento e foi regravada. O rolo fica com a folga de 0,02 mm no vão ou entra até 0,08 mm no flanco onde a corrente sai da roda, e o pino entra 0,01 a 0,02 mm na placa nas voltas, porque a placa gira de dois em dois elos e as facetas não casam; nada atravessa, e o teste cobra isso. A camada mecânica foi gravada depois da aprovação da pessoa por imagem.
+Fatia 3, em 2026-11-24. A família `esteira` monta numa chamada a esteira de sapatas de aço com garra em volta da motriz (com o dente da roda dentada da ISO 606, decisão da pessoa) e da guia do mesmo tamanho, com os roletes por baixo, nos passos 101,6, 135 e 171, por regra da família, porque não há norma pública de esteira de trator. A disposição dos elos é a da corrente; cada trecho é a bucha, os dois trilhos e a sapata repetidos por `arranja`, e a esteira de passo 135 monta em 0,5 s. A medição pegou três defeitos antes da imagem: a ponta do dente da motriz furava a sapata (passou a ficar 3 mm abaixo do lado de fora dos trilhos no meio da corda do elo), a guia e os roletes ficavam entre os trilhos com 3,75 mm de vão (passaram à largura dos trilhos) e, na conferência mecânica, a bucha fina para o passo cruzava os flancos do dente (restrição de 0,33 passo). Todos os encontros só encostam, e a bucha fica no vão com 0,13 mm de folga. A camada mecânica foi gravada depois da aprovação da pessoa por imagem.
+
+Fatia 4, em 2026-11-24. A transmissão por corrente e a esteira de prova saem abaixo de dez segundos e em STEP e OBJ com as partes nomeadas (`tools/fixtures/corrente-e-esteira/exportacao.test.mjs`), as fichas `parametrosDaRoda`, `transmissaoPorCorrente` e `parametrosDaEsteira` estão em `npm run capacidade`, e o mapa de ferramentas dá os elos como parciais.
 
 ## Fechamento
+
+Concluído em 2026-11-24. O gate de saída está cumprido: as três famílias têm tabela, teste das recusas, perfis, conferência e o veredito da pessoa por imagem; a transmissão de prova tem os rolos nos vãos sem atravessar e a esteira de prova tem cada encontro só encostando; as duas provas saem abaixo de dez segundos e exportáveis com as partes nomeadas. O banco de provas está em `docs/modelar/banco-de-provas/corrente-e-esteira-2026-11-24/`. Ficaram fora, como o plano exclui, a corrente dupla e tripla, a série A, a esteira de borracha, o porta-cabos, os degraus de escada rolante e o tensionador. A corrente da bicicleta, que foi feita dentro da receita dela, pode passar para a família `corrente`; a migração mexe em peça aceita e fica para a pessoa decidir.

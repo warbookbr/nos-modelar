@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2309 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2317 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -277,6 +277,10 @@
 ## docs/modelar/banco-de-provas/correcao-de-superficie-2026-11-16/
 
 - `README.md` — Correção de superfície: chapas de prova, linha de base, corte com simetria, alisamento e emenda declarada
+
+## docs/modelar/banco-de-provas/corrente-e-esteira-2026-11-24/
+
+- `README.md` — Corrente e esteira: roda dentada, corrente de rolos e esteira de sapatas
 
 ## docs/modelar/banco-de-provas/costura-em-no-de-tubos-2026-11-15/
 
@@ -1091,6 +1095,15 @@
 - `engrenamento.js` — engrenamento.js — o par de engrenagens retas da família e o pinhão com a cremalheira, em milímetro e graus.
 - `geometria.js` — geometria.js — as medidas de uma engrenagem da família `engrenagem`, em milímetro, a partir dos parâmetros.
 - `index.js` — index.js — a família `engrenagem`: a engrenagem reta de dente evolvente pelo perfil de referência da ISO 53 e a catraca de dente de serra, com cubo e furo. `…
+
+## procedural/familias/esteira/
+
+- `composicoes.js` — composicoes.js — a composição da família `esteira`: para cada um dos quatro trechos, a bucha por `lathe` em y, os dois trilhos e a sapata por `extrusao` em y…
+- `derivar.js` — derivar.js — dos parâmetros da esteira (milímetro) à chamada de composição (metro). O vão do dente da motriz sai girado para cair na primeira bucha do enrola…
+- `esteira.test.mjs` — esteira.test.mjs — a família `esteira`: cada passo da tabela fecha em volta da motriz e da guia sem órfão; as buchas, as sapatas, a guia e os roletes só enco…
+- `geometria.js` — geometria.js — a esteira de sapatas em volta da roda motriz e da roda guia, com os roletes por baixo, em milímetro.
+- `index.js` — index.js — a família `esteira`: a esteira de sapatas de aço em volta da roda motriz (com o dente da roda dentada da ISO 606) e da roda guia, com os roletes p…
+- `tabela.js` — tabela.js — a esteira de sapatas de aço, por passo, em milímetro. Não há norma pública de esteira de trator; os valores são regra da família, na proporção da…
 
 ## procedural/familias/exemplo/
 
@@ -3161,6 +3174,7 @@
 
 ## tools/fixtures/corrente-e-esteira/
 
+- `exportacao.test.mjs` — exportacao.test.mjs — o gate 4 do plano de corrente e esteira: a transmissão por corrente de prova e a esteira de prova saem abaixo de dez segundos e em STEP…
 - `transmissao.mjs` — transmissao.mjs — a transmissão por corrente de prova: as duas rodas dentadas e a corrente da `transmissaoPorCorrente`, postas pelo `instanciaDeFamilia`, com…
 - `transmissao.test.mjs` — transmissao.test.mjs — a fatia 2 do plano de corrente e esteira: a corrente 08B entre rodas de 18 e 36 dentes fecha com um número par de elos, cada trecho re…
 
