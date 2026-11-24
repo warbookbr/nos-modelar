@@ -61,13 +61,13 @@ Cada fatia cabe numa sessão de agente despachado, entrega o teste dela e deixa 
 
 1. A família `gabinete` com a caixa, a tampa, o encaixe e os ressaltos, com a aprovação da pessoa.
 2. A grade de ventilação e os recortes de painel no gabinete, e o gabinete de prova, com a aprovação da pessoa.
-3. O modo de base com abas da `chapaDobrada`, com o alívio de canto e o planificado, a caixa de chapa de prova e a aprovação da pessoa; passa pelo revisor adversarial.
+3. O modo de base com abas da `chapaDobrada`, com o alívio de canto e o planificado, a caixa de chapa de prova, o gabinete de chapa como opção da família e a aprovação da pessoa; passa pelo revisor adversarial.
 4. A casca pela receita para `loft`, `extrusao` e `lathe`, para dentro e para fora, a casca côncava de prova e a aprovação da pessoa; passa pelo revisor adversarial.
 5. O banco de provas, o mapa de ferramentas, as fichas e o fechamento.
 
 ## Decisão da pessoa
 
-Decidido em 2026-11-24: a ordem é gabinete, chapa e casca, do menor risco ao maior; a casca para fora entra junto da para dentro. Pendente: se o gabinete começa só de plástico ou também de chapa; a pessoa perguntou se a chapa está em algum plano ativo, e não está (a "lataria numa chapa só" do plano do carro é a superfície da carroceria, outra coisa).
+Decidido em 2026-11-24: a ordem é gabinete, chapa e casca, do menor risco ao maior; a casca para fora entra junto da para dentro; e o gabinete começa só de plástico, com o gabinete de chapa entrando como opção da família na fatia 3, depois do modo de base com abas da `chapaDobrada`. A chapa não está em outro plano ativo (a "lataria numa chapa só" do plano do carro é a superfície da carroceria, outra coisa).
 
 ## Riscos e parada
 
