@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2248 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2250 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -3733,6 +3733,8 @@
 - `lados-das-vistas.mjs` — lados-das-vistas.mjs — de que lado cada vista olha, em texto, para o brief do crítico cego.
 - `lasca.mjs` — lasca.mjs — lista cada face fina de uma receita: a parte, a razão, os cantos em milímetro e o passo que criou a face.
 - `lasca.test.mjs` — lasca.test.mjs — a lista de faces finas acha a lateral de uma aresta de 2,8 mm no perfil de uma perua, e diz a parte, a razão, os cantos em milímetro e o pas…
+- `lascas-da-malha.mjs` — lascas-da-malha.mjs — os pedaços finos demais para serem de propósito: a lasca que uma subtração deixa solta.
+- `lascas-da-malha.test.mjs` — lascas-da-malha.test.mjs — a lasca de 0,01 mm solta ao lado de um cubo é acusada, o cubo não, e a placa de 0,05 mm passa.
 - `leitura-por-regioes.mjs` — leitura-por-regioes.mjs — a vista de referência e a captura do rascunho cortadas na mesma grade, região por região, ampliadas lado a lado, com a resposta de …
 - `leitura-por-regioes.test.mjs` — leitura-por-regioes.test.mjs — a leitura por regiões: a captura alinhada à caixa da referência, a grade que cobre a vista inteira, as folhas iguais a cada ex…
 - `ler-diario.mjs` — ler-diario.mjs — lê o diário da oficina e responde onde o tempo foi e onde o trabalho emperrou.

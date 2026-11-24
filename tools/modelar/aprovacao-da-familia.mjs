@@ -31,6 +31,7 @@ import { availableParallelism } from 'node:os';
 import { basename, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { analisarTopologia } from '../../procedural/nucleo/topologia.js';
+import { ESPESSURA_MINIMA, lascasDaMalha } from './lascas-da-malha.mjs';
 import {
   REGISTRO_OPERACOES, criarRegistroComExtensoes, criarRegistroComposicoes, expandirChamadasDeComposicao, neutroCanonico,
 } from '../../procedural/nucleo/entrada.js';
@@ -344,6 +345,12 @@ export function medirPonto(familia, parametros, rotulo = 'ponto', { montagem = '
   if (invariantes.facesSemParte > 0) problemas.push(problema('face-sem-parte', `${invariantes.facesSemParte} face(s) sem parte: ${descricao.facesSemParte.slice(0, 5).join(', ')}`));
   const abertos = analisarTopologia({ vertices: neutro.V, faces: neutro.F }).achados.filter((a) => CODIGOS_DE_MALHA_ABERTA.includes(a.codigo));
   if (abertos.length) problemas.push(problema('malha-aberta', `a malha não fecha: ${abertos.length} achado(s); o primeiro: ${abertos[0].mensagem}`));
+  const lascas = lascasDaMalha(neutro);
+  if (lascas.length) {
+    const [fina] = lascas;
+    const mm = (x) => x.toFixed(3);
+    problemas.push(problema('lasca-solta', `${lascas.length} pedaço(s) da malha mais fino(s) que ${ESPESSURA_MINIMA} mm, soltos do resto; o mais fino tem ${fina.espessura.toFixed(4)} mm (2 × volume / área) e fica na caixa de [${fina.caixa.min.map(mm).join(', ')}] a [${fina.caixa.max.map(mm).join(', ')}] mm: a ferramenta de uma subtração não cobre a borda que devia tirar`));
+  }
   const hash = hashDe(neutro);
   if (hash !== hashDe(repetido.neutro)) problemas.push(problema('nao-deterministico', 'duas execuções com os mesmos parâmetros deram geometrias diferentes'));
   const portas = conferirPortas(familia.contrato, neutro);
