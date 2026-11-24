@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2253 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2254 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -577,6 +577,10 @@
 - `comparar.mjs` — comparar.mjs — compara duas medidas de `medir.mjs` peça a peça e imprime a tabela em markdown.
 - `medir.mjs` — medir.mjs — exporta cada peça do acervo em STEP, em memória, com as opções padrão do comando, e grava o resultado.
 
+## docs/modelar/banco-de-provas/transmissao-2026-11-23/
+
+- `README.md` — Transmissão: polias, correias, engrenagens e cremalheira
+
 ## docs/modelar/banco-de-provas/trilhas-da-placa-2026-11-23/
 
 - `PROPOSTA-DO-ITEM.md` — Proposta para o nos-mecatronica: o item `ligacoes` no pedido 1.1
@@ -675,7 +679,6 @@
 - `2026-11-22-curva-paralela-na-rede.md` — Curva paralela na rede de curvas: os anéis em volta de um vão sem desenhar ponto a ponto
 - `2026-11-22-superficie-de-producao-g2.md` — Superfície de produção (G2): a chapa de subdivisão sem a ondulação que o crítico acusa, sem sair da forma
 - `2026-11-23-braco-de-prova-duas-juntas.md` — Braço de prova de duas juntas: a forma com os componentes escolhidos na mecatrônica dentro
-- `2026-11-23-engrenagem-polia-e-correia.md` — Engrenagem, polia e correia: o par que transmite movimento por poucos números
 - `2026-11-23-tubulacao-com-conexoes.md` — Tubulação com conexões: a rede de tubos por traçado e bitola, com as conexões postas sozinhas
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
@@ -3424,6 +3427,7 @@
 ## tools/fixtures/transmissao/
 
 - `duas-instancias.test.mjs` — duas-instancias.test.mjs — duas instâncias da mesma família numa receita, a prova da fatia 1 do plano de engrenagem, polia e correia.
+- `exportacao.test.mjs` — exportacao.test.mjs — cada perfil das famílias polia-e-correia, engrenagem e cremalheira sai em STEP facetado e em OBJ pelos exportadores do projeto, com a t…
 - `par-de-engrenagens.mjs` — par-de-engrenagens.mjs — o par de retas de módulo 1 com 20 e 40 dentes e o pinhão de 20 dentes sobre a cremalheira, a prova da fatia 5 do plano de engrenagem…
 - `par-de-engrenagens.test.mjs` — par-de-engrenagens.test.mjs — o par de retas de módulo 1 com 20 e 40 dentes e o pinhão sobre a cremalheira: a distância entre centros medida na malha é a cal…
 - `par-gt2.mjs` — par-gt2.mjs — o par GT2 de 20 e 80 dentes com a correia fechada, a prova da fatia 3 do plano de engrenagem, polia e correia. As duas polias entram pelo `inst…
