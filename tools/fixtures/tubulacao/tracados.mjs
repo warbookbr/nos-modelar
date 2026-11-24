@@ -44,3 +44,32 @@ export const ZIGUE_ZAGUE = Object.freeze({
     { de: 'd', para: 'e', bitola: '2' },
   ],
 });
+
+/* a rede de prova do plano: dez nós de aço de 2", com o flange na entrada e na ponta do ramal, a válvula de esfera na
+   linha e a de gaveta no ramal, três curvas, o tê e a redução para 1 1/2" */
+export const REDE_DE_PROVA = Object.freeze({
+  material: 'aco',
+  nos: [
+    { nome: 'entrada', posicao: [0, 0, 0], fim: 'flange' },
+    { nome: 'esfera', posicao: [700, 0, 0], valvula: 'esfera' },
+    { nome: 'curva1', posicao: [1400, 0, 0] },
+    { nome: 'te', posicao: [1400, 0, 700] },
+    { nome: 'gaveta', posicao: [1800, 0, 700], valvula: 'gaveta' },
+    { nome: 'ramal', posicao: [2400, 0, 700], fim: 'flange' },
+    { nome: 'curva2', posicao: [1400, 0, 1500] },
+    { nome: 'reducao', posicao: [1400, 800, 1500] },
+    { nome: 'curva3', posicao: [1400, 1300, 1500] },
+    { nome: 'saida', posicao: [1900, 1300, 1500] },
+  ],
+  trechos: [
+    { de: 'entrada', para: 'esfera', bitola: '2' },
+    { de: 'esfera', para: 'curva1', bitola: '2' },
+    { de: 'curva1', para: 'te', bitola: '2' },
+    { de: 'te', para: 'gaveta', bitola: '2' },
+    { de: 'gaveta', para: 'ramal', bitola: '2' },
+    { de: 'te', para: 'curva2', bitola: '2' },
+    { de: 'curva2', para: 'reducao', bitola: '2' },
+    { de: 'reducao', para: 'curva3', bitola: '1.1/2' },
+    { de: 'curva3', para: 'saida', bitola: '1.1/2' },
+  ],
+});

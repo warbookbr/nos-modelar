@@ -11,7 +11,8 @@ export const PONTOS_DO_ARCO = 13;
 /* os lados do tubo (o `lathe` da composição) e da seção da curva, iguais para as bocas casarem */
 export const LADOS_DA_SECAO = 48;
 
-export function geometriaDaPeca({ forma, diametroExterno: de, parede, comprimento, raio, angulo, fase, comprimentoDoTampao: e, centroABoca: cab, diametroMenor: dm, paredeMenor: pm, comprimentoDaReducao: h }) {
+export function geometriaDaPeca({ forma, diametroExterno: de, parede, comprimento, raio, angulo, fase, comprimentoDoTampao: e, centroABoca: cab, diametroMenor: dm, paredeMenor: pm, comprimentoDaReducao: h, ...acessorio }) {
+  if (forma >= 6) return geometriaDoAcessorio(forma, de, parede, acessorio);
   const ro = de / 2;
   const ri = ro - parede;
   if (forma === 1) return { forma, ro, ri, perfil: [[ri, 0], [ro, 0], [ro, comprimento], [ri, comprimento], [ri, 0]], altura: comprimento };
@@ -57,4 +58,65 @@ export function geometriaDaPeca({ forma, diametroExterno: de, parede, compriment
   const c = Math.min(1.5 * parede, e / 4, ro / 2);
   /* a linha aberta toca o eixo só nas duas pontas (o fundo de fora e o de dentro), como o lathe pede */
   return { forma, ro, ri, perfil: [[0, e], [ro - c, e], [ro, e - c], [ro, 0], [ri, 0], [ri, e - parede], [0, e - parede]], altura: e };
+}
+
+/* Os acessórios de aço (formas 6 a 8) como uma lista de sólidos: os `cheios` se unem, e as `ferramentas` (o furo e os
+   furos dos parafusos, cada um repetido em volta do eixo y por `arranja` radial) saem deles. O número de pontos de cada
+   sólido é fixo por forma, e a composição sai dessa lista. */
+const torno = (perfil, eixo = 'y', em = [0, 0, 0]) => ({ op: 'lathe', eixo, perfil, em });
+const caixa = (x0, x1, z0, z1, y0, comprimento) => ({ op: 'extrusao', perfil: [[x0, z0], [x1, z0], [x1, z1], [x0, z1]], altura: comprimento, em: [0, y0, 0] });
+const furoDeParafuso = (circulo, furo, furos, giro, y0, y1) => {
+  const a = (giro * Math.PI) / 180;
+  return { ...torno([[0, y0], [furo / 2, y0], [furo / 2, y1], [0, y1]], 'y', [(circulo / 2) * Math.cos(a), 0, (circulo / 2) * Math.sin(a)]), copias: { total: furos, graus: 360 / furos } };
+};
+
+function geometriaDoAcessorio(forma, de, parede, q) {
+  const ro = de / 2;
+  const ri = ro - parede;
+  const rF = q.diametroDoFlange / 2;
+  const T = q.espessuraDoFlange;
+  const rH = q.diametroDoCubo / 2;
+  if (forma === 6) {
+    /* o flange de pescoço: a boca de solda em y = 0, o cubo afinando até o disco e a face em y = comprimento pelo pescoço */
+    const Y = q.comprimentoDoPescoco;
+    return {
+      forma, ro, ri, altura: Y, parte: 'flange',
+      cheios: [torno([[0, 0], [ro, 0], [rH, Y - T], [rF, Y - T], [rF, Y], [0, Y]])],
+      ferramentas: [torno([[0, -1], [ri, -1], [ri, Y + 1], [0, Y + 1]]), furoDeParafuso(q.circuloDeFuracao, q.diametroDoFuro, q.furos, q.giroDosFuros, Y - T - 1, Y + 1)],
+    };
+  }
+  /* a válvula flangeada: a face de entrada em y = 0 e a de saída em y = face a face; o corpo é um torneado com os dois
+     flanges, o pescoço do diâmetro do cubo e o bojo no meio; a haste sobe em +x, com a alavanca (esfera) ou o castelo e o
+     volante (gaveta) */
+  const L = q.faceAFace;
+  const Rb = Math.max(rH + 2, q.circuloDeFuracao / 2 - q.diametroDoFuro / 2 - 2);
+  const ay = L / 2 - T - 3;
+  const f0 = Math.acos(Math.min(1, rH / Rb));
+  const bojo = Array.from({ length: 9 }, (_, k) => { const f = -f0 + (2 * f0 * k) / 8; return [Rb * Math.cos(f), L / 2 + ay * Math.sin(f) * (forma === 8 ? 0.8 : 1)]; });
+  const corpo = torno([[0, 0], [rF, 0], [rF, T], [rH, T], ...bojo, [rH, L - T], [rF, L - T], [rF, L], [0, L]]);
+  const rs = Math.max(2, 0.2 * rH);
+  const meio = [0, L / 2, 0];
+  const comum = [torno([[0, -1], [ri, -1], [ri, L + 1], [0, L + 1]]), furoDeParafuso(q.circuloDeFuracao, q.diametroDoFuro, q.furos, q.giroDosFuros, -1, T + 1), furoDeParafuso(q.circuloDeFuracao, q.diametroDoFuro, q.furos, q.giroDosFuros, L - T - 1, L + 1)];
+  if (forma === 7) {
+    const topo = rF + 0.15 * L;
+    const w = Math.max(6, 0.25 * rF);
+    const e = Math.max(3, 0.08 * rF);
+    return {
+      forma, ro: rF, ri, altura: L, parte: 'valvula',
+      cheios: [corpo, torno([[0, 0], [rs, 0], [rs, topo + e / 2], [0, topo + e / 2]], 'x', meio), caixa(topo, topo + e, -w / 2, w / 2, L / 2 - w / 2, 1.5 * L)],
+      ferramentas: comum,
+    };
+  }
+  const rC = 0.5 * Rb;
+  const hC = Rb + 0.5 * L;
+  const topo = hC + 0.35 * L;
+  const Rw = 0.45 * L;
+  const tw = 0.04 * L + 1;
+  const anel = Array.from({ length: 13 }, (_, k) => { const a = (k * 2 * Math.PI) / 12; return [Rw + tw * Math.cos(a), topo - tw + tw * Math.sin(a)]; });
+  return {
+    forma, ro: rF, ri, altura: L, parte: 'valvula',
+    cheios: [corpo, torno([[0, 0], [rC, 0], [rC, hC], [0, hC]], 'x', meio), torno([[0, 0], [rs, 0], [rs, topo], [0, topo]], 'x', meio), torno(anel, 'x', meio),
+      caixa(topo - 2 * tw, topo, -Rw, Rw, L / 2 - tw, 2 * tw), caixa(topo - 2 * tw, topo, -tw, tw, L / 2 - Rw, 2 * Rw)],
+    ferramentas: comum,
+  };
 }

@@ -9,7 +9,10 @@
    o centro à boca, e a derivação em +x; a redução tem a boca maior a meio comprimento antes do nó. Os vértices das seções de
    48 lados casam de peça em peça: o tê fixa o ângulo dos três tubos dele, e daí a rede passa o ângulo adiante; quando dois
    tês pedem ângulos diferentes ao mesmo tubo, o par vai para `desencontros`. `encostos` lista os pares de peças que se
-   tocam de topo na boca de uma conexão, e a receita declara esse contato. Quem põe as peças na receita é o `instanciaDeFamilia`, uma chamada por
+   tocam de topo na boca de uma conexão, e a receita declara esse contato. A ponta com flange ganha o flange de pescoço com
+   a face no nó, e a porta fica na face; o nó com válvula ganha a válvula com a haste para cima (+y do mundo, ou +x quando o
+   trecho é vertical), no múltiplo de 7,5° mais perto, e um flange de cada lado, com os furos dos três alinhados.
+   Quem põe as peças na receita é o `instanciaDeFamilia`, uma chamada por
    peça com a base encadeada. */
 import { lerTracado } from './tracado.js';
 
@@ -131,11 +134,41 @@ export function pecasDaRede(tracado) {
       const comeco = sub(no.posicao, vezes(u, no.avanco));
       for (const t of ligados) encostos.push([`curva${no.nome}`, `tubo${t.indice}`]);
       pecas.push({ nome: `curva${no.nome}`, parametros: { forma: 2, diametroExterno: a.diametroExterno, parede: a.parede, raio: no.raio, angulo: no.desvio, fase: c ? c.fase : 0 }, pose: { posicao: comeco.map(m), giro: girosDoQuadro(dobra, u) } });
+    } else if (no.tipo === 'valvula') {
+      const [a, b] = ligados;
+      const dir = unit(sub(posicao[outro(b, no.nome)], posicao[outro(a, no.nome)]));
+      const X0 = eixoX.get(a) ?? perpendicular(dir);
+      const X = unit(sub(X0, vezes(dir, dot(X0, dir))));
+      const Z = cruz(X, dir);
+      const cima0 = Math.abs(dir[1]) > 0.9 ? [1, 0, 0] : [0, 1, 0];
+      const cima = unit(sub(cima0, vezes(dir, dot(cima0, dir))));
+      const passo = Math.round((Math.atan2(dot(cima, Z), dot(cima, X)) * 180) / Math.PI / LADO) * LADO;
+      const U = girarNoPlano(X, Z, passo);
+      const f = no.flange;
+      const L = no.faceAFace;
+      const furo1 = girarNoPlano(U, cruz(U, dir), 180 / f.furos);
+      const medidas = (forma) => ({ forma, diametroExterno: a.diametroExterno, parede: a.parede, diametroDoFlange: f.diametro, espessuraDoFlange: f.espessura, circuloDeFuracao: f.circulo, furos: f.furos, diametroDoFuro: f.furo, diametroDoCubo: f.cubo });
+      const giroNoQuadro = (x, y) => { const z = cruz(x, y); return mod((Math.atan2(dot(furo1, z), dot(furo1, x)) * 180) / Math.PI, 360 / f.furos); };
+      pecas.push({ nome: `valvula${no.nome}`, parametros: { ...medidas(no.valvula === 'esfera' ? 7 : 8), faceAFace: L, giroDosFuros: giroNoQuadro(U, dir) }, pose: { posicao: sub(no.posicao, vezes(dir, L / 2)).map(m), giro: girosDoQuadro(U, dir) } });
+      for (const [t, sentido] of [[a, -1], [b, 1]]) {
+        const y = vezes(dir, -sentido);
+        const nome = `flange${no.nome}${sentido < 0 ? 'A' : 'B'}`;
+        const xF = unit(sub(X, vezes(y, dot(X, y))));
+        pecas.push({ nome, parametros: { ...medidas(6), comprimentoDoPescoco: f.pescoco, giroDosFuros: giroNoQuadro(xF, y) }, pose: { posicao: soma(no.posicao, vezes(dir, sentido * (L / 2 + f.pescoco))).map(m), giro: girosDoQuadro(xF, y) } });
+        encostos.push([nome, `tubo${t.indice}`], [nome, `valvula${no.nome}`]);
+      }
     } else if (no.tipo === 'ponta') {
       const [t] = ligados;
       const fora = unit(sub(no.posicao, posicao[outro(t, no.nome)]));
       const ro = t.diametroExterno / 2;
-      if (no.fim === 'tampao') {
+      if (no.fim === 'flange') {
+        const f = no.flange;
+        const X0 = eixoX.get(t) ?? perpendicular(fora);
+        const X = unit(sub(X0, vezes(fora, dot(X0, fora))));
+        encostos.push([`flange${no.nome}`, `tubo${t.indice}`]);
+        pecas.push({ nome: `flange${no.nome}`, parametros: { forma: 6, diametroExterno: t.diametroExterno, parede: t.parede, diametroDoFlange: f.diametro, espessuraDoFlange: f.espessura, circuloDeFuracao: f.circulo, furos: f.furos, diametroDoFuro: f.furo, diametroDoCubo: f.cubo, comprimentoDoPescoco: f.pescoco, giroDosFuros: 180 / f.furos }, pose: { posicao: sub(no.posicao, vezes(fora, f.pescoco)).map(m), giro: girosDoQuadro(X, fora) } });
+        portas.push({ no: no.nome, centro: no.posicao, eixo: fora, raioInterno: ro - t.parede, raioExterno: f.diametro / 2 });
+      } else if (no.fim === 'tampao') {
         encostos.push([`tampao${no.nome}`, `tubo${t.indice}`]);
         const X = eixoX.get(t) ?? perpendicular(fora);
         pecas.push({ nome: `tampao${no.nome}`, parametros: { forma: 3, diametroExterno: t.diametroExterno, parede: t.parede, comprimentoDoTampao: tampaoDe(lido.material, t) }, pose: { posicao: no.posicao.map(m), giro: girosDoQuadro(unit(sub(X, vezes(fora, dot(X, fora)))), fora) } });

@@ -9,13 +9,22 @@
         "parametros": {
           "angulo": 15,
           "centroABoca": 10,
+          "circuloDeFuracao": 40,
           "comprimento": 10,
           "comprimentoDaReducao": 10,
+          "comprimentoDoPescoco": 30,
           "comprimentoDoTampao": 10,
+          "diametroDoCubo": 20,
+          "diametroDoFlange": 60,
+          "diametroDoFuro": 6,
           "diametroExterno": 15,
           "diametroMenor": 10,
+          "espessuraDoFlange": 5,
+          "faceAFace": 80,
           "fase": 0,
           "forma": 1,
+          "furos": 4,
+          "giroDosFuros": 0,
           "parede": 1,
           "paredeMenor": 1,
           "raio": 15
@@ -27,41 +36,59 @@
         "parametros": {
           "angulo": 45,
           "centroABoca": 86,
+          "circuloDeFuracao": 152.4,
           "comprimento": 1000,
           "comprimentoDaReducao": 89,
+          "comprimentoDoPescoco": 68.2,
           "comprimentoDoTampao": 51,
+          "diametroDoCubo": 108,
+          "diametroDoFlange": 190.5,
+          "diametroDoFuro": 19.1,
           "diametroExterno": 88.9,
           "diametroMenor": 60.3,
+          "espessuraDoFlange": 22.3,
+          "faceAFace": 203,
           "fase": 3.75,
-          "forma": 3,
+          "forma": 4,
+          "furos": 8,
+          "giroDosFuros": 45,
           "parede": 5.49,
           "paredeMenor": 3.91,
           "raio": 114
         },
-        "hash": "sha256:822a937ef9b6dd6e504dfd6b2812b1242d9b3a17e850024eec33ef2f28094fa3",
+        "hash": "sha256:e7fdbd6805cf8683939bcc8b026da998a966f39925d14df62d2cc8b36283444c",
         "medidas": []
       },
       "maximo": {
         "parametros": {
           "angulo": 90,
           "centroABoca": 300,
+          "circuloDeFuracao": 360,
           "comprimento": 6000,
           "comprimentoDaReducao": 300,
+          "comprimentoDoPescoco": 120,
           "comprimentoDoTampao": 150,
+          "diametroDoCubo": 300,
+          "diametroDoFlange": 400,
+          "diametroDoFuro": 30,
           "diametroExterno": 250,
           "diametroMenor": 240,
+          "espessuraDoFlange": 40,
+          "faceAFace": 500,
           "fase": 7.5,
-          "forma": 5,
+          "forma": 8,
+          "furos": 12,
+          "giroDosFuros": 360,
           "parede": 15,
           "paredeMenor": 15,
           "raio": 500
         },
-        "hash": "sha256:a50633eda627af7750d7ba6a086da566585f2ddf9a54eaeec597521f0135f859",
+        "hash": "sha256:3bbe3209ac9d77a66d8239e96d019b205d6660d2a92139af7cbeefde436eefe2",
         "medidas": []
       }
     },
     "varredura": {
-      "sondas": 24,
+      "sondas": 42,
       "recusasDeclaradas": [
         {
           "ponto": "comprimentoDoTampao=10",
@@ -101,13 +128,22 @@
         "parametros": {
           "angulo": 90,
           "centroABoca": 64,
+          "circuloDeFuracao": 120.7,
           "comprimento": 500,
           "comprimentoDaReducao": 76,
+          "comprimentoDoPescoco": 61.9,
           "comprimentoDoTampao": 38,
+          "diametroDoCubo": 77.7,
+          "diametroDoFlange": 152.4,
+          "diametroDoFuro": 19.1,
           "diametroExterno": 60.3,
           "diametroMenor": 48.3,
+          "espessuraDoFlange": 17.5,
+          "faceAFace": 178,
           "fase": 0,
           "forma": 2,
+          "furos": 4,
+          "giroDosFuros": 45,
           "parede": 3.91,
           "paredeMenor": 3.68,
           "raio": 76
@@ -119,13 +155,22 @@
         "parametros": {
           "angulo": 45,
           "centroABoca": 64,
+          "circuloDeFuracao": 120.7,
           "comprimento": 500,
           "comprimentoDaReducao": 76,
+          "comprimentoDoPescoco": 61.9,
           "comprimentoDoTampao": 38,
+          "diametroDoCubo": 77.7,
+          "diametroDoFlange": 152.4,
+          "diametroDoFuro": 19.1,
           "diametroExterno": 114.3,
           "diametroMenor": 48.3,
+          "espessuraDoFlange": 17.5,
+          "faceAFace": 178,
           "fase": 0,
           "forma": 2,
+          "furos": 4,
+          "giroDosFuros": 45,
           "parede": 6.02,
           "paredeMenor": 3.68,
           "raio": 152
@@ -133,17 +178,80 @@
         "hash": "sha256:319d634a5dd0acf17d310b063ad6ca0cada1f091bcb5f665ffde256cfcc7aa02",
         "medidas": []
       },
+      "flange-aco-2": {
+        "parametros": {
+          "angulo": 90,
+          "centroABoca": 64,
+          "circuloDeFuracao": 120.7,
+          "comprimento": 500,
+          "comprimentoDaReducao": 76,
+          "comprimentoDoPescoco": 61.9,
+          "comprimentoDoTampao": 38,
+          "diametroDoCubo": 77.7,
+          "diametroDoFlange": 152.4,
+          "diametroDoFuro": 19.1,
+          "diametroExterno": 60.3,
+          "diametroMenor": 48.3,
+          "espessuraDoFlange": 17.5,
+          "faceAFace": 178,
+          "fase": 0,
+          "forma": 6,
+          "furos": 4,
+          "giroDosFuros": 45,
+          "parede": 3.91,
+          "paredeMenor": 3.68,
+          "raio": 76
+        },
+        "hash": "sha256:a5a6483edff5bd6034f9b88db4672f102d525bb305d9ca8956266d6efcd41d48",
+        "medidas": []
+      },
+      "flange-aco-4": {
+        "parametros": {
+          "angulo": 90,
+          "centroABoca": 64,
+          "circuloDeFuracao": 190.5,
+          "comprimento": 500,
+          "comprimentoDaReducao": 76,
+          "comprimentoDoPescoco": 74.6,
+          "comprimentoDoTampao": 38,
+          "diametroDoCubo": 134.9,
+          "diametroDoFlange": 228.6,
+          "diametroDoFuro": 19.1,
+          "diametroExterno": 114.3,
+          "diametroMenor": 48.3,
+          "espessuraDoFlange": 22.3,
+          "faceAFace": 178,
+          "fase": 0,
+          "forma": 6,
+          "furos": 8,
+          "giroDosFuros": 22.5,
+          "parede": 6.02,
+          "paredeMenor": 3.68,
+          "raio": 76
+        },
+        "hash": "sha256:6b21fe55e1639ab45e6066fcc69ff59ea30843f979075b08aa861bbd666e2a00",
+        "medidas": []
+      },
       "joelho-pvc-50": {
         "parametros": {
           "angulo": 90,
           "centroABoca": 64,
+          "circuloDeFuracao": 120.7,
           "comprimento": 500,
           "comprimentoDaReducao": 76,
+          "comprimentoDoPescoco": 61.9,
           "comprimentoDoTampao": 38,
+          "diametroDoCubo": 77.7,
+          "diametroDoFlange": 152.4,
+          "diametroDoFuro": 19.1,
           "diametroExterno": 50,
           "diametroMenor": 48.3,
+          "espessuraDoFlange": 17.5,
+          "faceAFace": 178,
           "fase": 0,
           "forma": 2,
+          "furos": 4,
+          "giroDosFuros": 45,
           "parede": 3,
           "paredeMenor": 3.68,
           "raio": 50
@@ -155,13 +263,22 @@
         "parametros": {
           "angulo": 90,
           "centroABoca": 64,
+          "circuloDeFuracao": 120.7,
           "comprimento": 500,
           "comprimentoDaReducao": 76,
+          "comprimentoDoPescoco": 61.9,
           "comprimentoDoTampao": 38,
+          "diametroDoCubo": 77.7,
+          "diametroDoFlange": 152.4,
+          "diametroDoFuro": 19.1,
           "diametroExterno": 60.3,
           "diametroMenor": 48.3,
+          "espessuraDoFlange": 17.5,
+          "faceAFace": 178,
           "fase": 0,
           "forma": 5,
+          "furos": 4,
+          "giroDosFuros": 45,
           "parede": 3.91,
           "paredeMenor": 3.68,
           "raio": 76
@@ -173,13 +290,22 @@
         "parametros": {
           "angulo": 90,
           "centroABoca": 64,
+          "circuloDeFuracao": 120.7,
           "comprimento": 500,
           "comprimentoDaReducao": 76,
+          "comprimentoDoPescoco": 61.9,
           "comprimentoDoTampao": 38,
+          "diametroDoCubo": 77.7,
+          "diametroDoFlange": 152.4,
+          "diametroDoFuro": 19.1,
           "diametroExterno": 60.3,
           "diametroMenor": 48.3,
+          "espessuraDoFlange": 17.5,
+          "faceAFace": 178,
           "fase": 0,
           "forma": 3,
+          "furos": 4,
+          "giroDosFuros": 45,
           "parede": 3.91,
           "paredeMenor": 3.68,
           "raio": 76
@@ -191,13 +317,22 @@
         "parametros": {
           "angulo": 90,
           "centroABoca": 64,
+          "circuloDeFuracao": 120.7,
           "comprimento": 500,
           "comprimentoDaReducao": 76,
+          "comprimentoDoPescoco": 61.9,
           "comprimentoDoTampao": 38,
+          "diametroDoCubo": 77.7,
+          "diametroDoFlange": 152.4,
+          "diametroDoFuro": 19.1,
           "diametroExterno": 60.3,
           "diametroMenor": 48.3,
+          "espessuraDoFlange": 17.5,
+          "faceAFace": 178,
           "fase": 0,
           "forma": 4,
+          "furos": 4,
+          "giroDosFuros": 45,
           "parede": 3.91,
           "paredeMenor": 3.68,
           "raio": 76
@@ -209,13 +344,22 @@
         "parametros": {
           "angulo": 90,
           "centroABoca": 50,
+          "circuloDeFuracao": 120.7,
           "comprimento": 500,
           "comprimentoDaReducao": 76,
+          "comprimentoDoPescoco": 61.9,
           "comprimentoDoTampao": 38,
+          "diametroDoCubo": 77.7,
+          "diametroDoFlange": 152.4,
+          "diametroDoFuro": 19.1,
           "diametroExterno": 50,
           "diametroMenor": 48.3,
+          "espessuraDoFlange": 17.5,
+          "faceAFace": 178,
           "fase": 0,
           "forma": 4,
+          "furos": 4,
+          "giroDosFuros": 45,
           "parede": 3,
           "paredeMenor": 3.68,
           "raio": 76
@@ -227,13 +371,22 @@
         "parametros": {
           "angulo": 90,
           "centroABoca": 64,
+          "circuloDeFuracao": 120.7,
           "comprimento": 500,
           "comprimentoDaReducao": 76,
+          "comprimentoDoPescoco": 61.9,
           "comprimentoDoTampao": 38,
+          "diametroDoCubo": 77.7,
+          "diametroDoFlange": 152.4,
+          "diametroDoFuro": 19.1,
           "diametroExterno": 60.3,
           "diametroMenor": 48.3,
+          "espessuraDoFlange": 17.5,
+          "faceAFace": 178,
           "fase": 0,
           "forma": 1,
+          "furos": 4,
+          "giroDosFuros": 45,
           "parede": 3.91,
           "paredeMenor": 3.68,
           "raio": 76
@@ -245,23 +398,86 @@
         "parametros": {
           "angulo": 90,
           "centroABoca": 64,
+          "circuloDeFuracao": 120.7,
           "comprimento": 300,
           "comprimentoDaReducao": 76,
+          "comprimentoDoPescoco": 61.9,
           "comprimentoDoTampao": 38,
+          "diametroDoCubo": 77.7,
+          "diametroDoFlange": 152.4,
+          "diametroDoFuro": 19.1,
           "diametroExterno": 50,
           "diametroMenor": 48.3,
+          "espessuraDoFlange": 17.5,
+          "faceAFace": 178,
           "fase": 0,
           "forma": 1,
+          "furos": 4,
+          "giroDosFuros": 45,
           "parede": 3,
           "paredeMenor": 3.68,
           "raio": 76
         },
         "hash": "sha256:bd8eb5f676ea5d20a8e032fc23d25827f729b815310a73a8719a6826d2233e8d",
         "medidas": []
+      },
+      "valvula-de-esfera-aco-2": {
+        "parametros": {
+          "angulo": 90,
+          "centroABoca": 64,
+          "circuloDeFuracao": 120.7,
+          "comprimento": 500,
+          "comprimentoDaReducao": 76,
+          "comprimentoDoPescoco": 61.9,
+          "comprimentoDoTampao": 38,
+          "diametroDoCubo": 77.7,
+          "diametroDoFlange": 152.4,
+          "diametroDoFuro": 19.1,
+          "diametroExterno": 60.3,
+          "diametroMenor": 48.3,
+          "espessuraDoFlange": 17.5,
+          "faceAFace": 178,
+          "fase": 0,
+          "forma": 7,
+          "furos": 4,
+          "giroDosFuros": 45,
+          "parede": 3.91,
+          "paredeMenor": 3.68,
+          "raio": 76
+        },
+        "hash": "sha256:0c1c912849d05e49f7348a8f10c4d2dc4e1d11716e7c5bf5eb9997e129904454",
+        "medidas": []
+      },
+      "valvula-de-gaveta-aco-2": {
+        "parametros": {
+          "angulo": 90,
+          "centroABoca": 64,
+          "circuloDeFuracao": 120.7,
+          "comprimento": 500,
+          "comprimentoDaReducao": 76,
+          "comprimentoDoPescoco": 61.9,
+          "comprimentoDoTampao": 38,
+          "diametroDoCubo": 77.7,
+          "diametroDoFlange": 152.4,
+          "diametroDoFuro": 19.1,
+          "diametroExterno": 60.3,
+          "diametroMenor": 48.3,
+          "espessuraDoFlange": 17.5,
+          "faceAFace": 178,
+          "fase": 0,
+          "forma": 8,
+          "furos": 4,
+          "giroDosFuros": 45,
+          "parede": 3.91,
+          "paredeMenor": 3.68,
+          "raio": 76
+        },
+        "hash": "sha256:833c581e7fabc3253d2643ffa308cd3a0d2bbb380e526bd71f5000f816b90041",
+        "medidas": []
       }
     },
     "escalasDosPerfis": {
-      "sondas": 162,
+      "sondas": 416,
       "recusasDeclaradas": [
         {
           "ponto": "curva-aco-2-90: comprimentoDoTampao=10",
@@ -313,6 +529,106 @@
         },
         {
           "ponto": "curva-aco-4-45: raio=15",
+          "restricao": "curva-mais-larga-que-o-tubo"
+        },
+        {
+          "ponto": "flange-aco-2: circuloDeFuracao=40",
+          "restricao": "cubo-entre-tubo-e-furos"
+        },
+        {
+          "ponto": "flange-aco-2: circuloDeFuracao=360",
+          "restricao": "furos-dentro-do-flange"
+        },
+        {
+          "ponto": "flange-aco-2: comprimentoDoTampao=10",
+          "restricao": "tampao-mais-fundo-que-a-parede"
+        },
+        {
+          "ponto": "flange-aco-2: diametroDoCubo=20",
+          "restricao": "cubo-cobre-o-tubo"
+        },
+        {
+          "ponto": "flange-aco-2: diametroDoCubo=300",
+          "restricao": "cubo-entre-tubo-e-furos"
+        },
+        {
+          "ponto": "flange-aco-2: diametroDoFlange=60",
+          "restricao": "furos-dentro-do-flange"
+        },
+        {
+          "ponto": "flange-aco-2: diametroDoFuro=30",
+          "restricao": "furos-dentro-do-flange"
+        },
+        {
+          "ponto": "flange-aco-2: diametroExterno=15",
+          "restricao": "parede-cabe-no-tubo"
+        },
+        {
+          "ponto": "flange-aco-2: diametroExterno=250",
+          "restricao": "cubo-cobre-o-tubo"
+        },
+        {
+          "ponto": "flange-aco-2: diametroMenor=10",
+          "restricao": "parede-menor-cabe"
+        },
+        {
+          "ponto": "flange-aco-2: parede=15",
+          "restricao": "tampao-mais-fundo-que-a-parede"
+        },
+        {
+          "ponto": "flange-aco-2: paredeMenor=15",
+          "restricao": "parede-menor-cabe"
+        },
+        {
+          "ponto": "flange-aco-2: raio=15",
+          "restricao": "curva-mais-larga-que-o-tubo"
+        },
+        {
+          "ponto": "flange-aco-4: circuloDeFuracao=40",
+          "restricao": "cubo-entre-tubo-e-furos"
+        },
+        {
+          "ponto": "flange-aco-4: circuloDeFuracao=360",
+          "restricao": "furos-dentro-do-flange"
+        },
+        {
+          "ponto": "flange-aco-4: comprimentoDoTampao=10",
+          "restricao": "tampao-mais-fundo-que-a-parede"
+        },
+        {
+          "ponto": "flange-aco-4: diametroDoCubo=20",
+          "restricao": "cubo-cobre-o-tubo"
+        },
+        {
+          "ponto": "flange-aco-4: diametroDoCubo=300",
+          "restricao": "cubo-entre-tubo-e-furos"
+        },
+        {
+          "ponto": "flange-aco-4: diametroDoFlange=60",
+          "restricao": "furos-dentro-do-flange"
+        },
+        {
+          "ponto": "flange-aco-4: diametroExterno=15",
+          "restricao": "parede-cabe-no-tubo"
+        },
+        {
+          "ponto": "flange-aco-4: diametroExterno=250",
+          "restricao": "cubo-cobre-o-tubo"
+        },
+        {
+          "ponto": "flange-aco-4: diametroMenor=10",
+          "restricao": "parede-menor-cabe"
+        },
+        {
+          "ponto": "flange-aco-4: parede=15",
+          "restricao": "tampao-mais-fundo-que-a-parede"
+        },
+        {
+          "ponto": "flange-aco-4: paredeMenor=15",
+          "restricao": "parede-menor-cabe"
+        },
+        {
+          "ponto": "flange-aco-4: raio=15",
           "restricao": "curva-mais-larga-que-o-tubo"
         },
         {
@@ -497,6 +813,110 @@
         },
         {
           "ponto": "trecho-pvc-50: raio=15",
+          "restricao": "curva-mais-larga-que-o-tubo"
+        },
+        {
+          "ponto": "valvula-de-esfera-aco-2: circuloDeFuracao=40",
+          "restricao": "cubo-entre-tubo-e-furos"
+        },
+        {
+          "ponto": "valvula-de-esfera-aco-2: circuloDeFuracao=360",
+          "restricao": "furos-dentro-do-flange"
+        },
+        {
+          "ponto": "valvula-de-esfera-aco-2: comprimentoDoTampao=10",
+          "restricao": "tampao-mais-fundo-que-a-parede"
+        },
+        {
+          "ponto": "valvula-de-esfera-aco-2: diametroDoCubo=20",
+          "restricao": "cubo-cobre-o-tubo"
+        },
+        {
+          "ponto": "valvula-de-esfera-aco-2: diametroDoCubo=300",
+          "restricao": "cubo-entre-tubo-e-furos"
+        },
+        {
+          "ponto": "valvula-de-esfera-aco-2: diametroDoFlange=60",
+          "restricao": "furos-dentro-do-flange"
+        },
+        {
+          "ponto": "valvula-de-esfera-aco-2: diametroDoFuro=30",
+          "restricao": "furos-dentro-do-flange"
+        },
+        {
+          "ponto": "valvula-de-esfera-aco-2: diametroExterno=15",
+          "restricao": "parede-cabe-no-tubo"
+        },
+        {
+          "ponto": "valvula-de-esfera-aco-2: diametroExterno=250",
+          "restricao": "cubo-cobre-o-tubo"
+        },
+        {
+          "ponto": "valvula-de-esfera-aco-2: diametroMenor=10",
+          "restricao": "parede-menor-cabe"
+        },
+        {
+          "ponto": "valvula-de-esfera-aco-2: parede=15",
+          "restricao": "tampao-mais-fundo-que-a-parede"
+        },
+        {
+          "ponto": "valvula-de-esfera-aco-2: paredeMenor=15",
+          "restricao": "parede-menor-cabe"
+        },
+        {
+          "ponto": "valvula-de-esfera-aco-2: raio=15",
+          "restricao": "curva-mais-larga-que-o-tubo"
+        },
+        {
+          "ponto": "valvula-de-gaveta-aco-2: circuloDeFuracao=40",
+          "restricao": "cubo-entre-tubo-e-furos"
+        },
+        {
+          "ponto": "valvula-de-gaveta-aco-2: circuloDeFuracao=360",
+          "restricao": "furos-dentro-do-flange"
+        },
+        {
+          "ponto": "valvula-de-gaveta-aco-2: comprimentoDoTampao=10",
+          "restricao": "tampao-mais-fundo-que-a-parede"
+        },
+        {
+          "ponto": "valvula-de-gaveta-aco-2: diametroDoCubo=20",
+          "restricao": "cubo-cobre-o-tubo"
+        },
+        {
+          "ponto": "valvula-de-gaveta-aco-2: diametroDoCubo=300",
+          "restricao": "cubo-entre-tubo-e-furos"
+        },
+        {
+          "ponto": "valvula-de-gaveta-aco-2: diametroDoFlange=60",
+          "restricao": "furos-dentro-do-flange"
+        },
+        {
+          "ponto": "valvula-de-gaveta-aco-2: diametroDoFuro=30",
+          "restricao": "furos-dentro-do-flange"
+        },
+        {
+          "ponto": "valvula-de-gaveta-aco-2: diametroExterno=15",
+          "restricao": "parede-cabe-no-tubo"
+        },
+        {
+          "ponto": "valvula-de-gaveta-aco-2: diametroExterno=250",
+          "restricao": "cubo-cobre-o-tubo"
+        },
+        {
+          "ponto": "valvula-de-gaveta-aco-2: diametroMenor=10",
+          "restricao": "parede-menor-cabe"
+        },
+        {
+          "ponto": "valvula-de-gaveta-aco-2: parede=15",
+          "restricao": "tampao-mais-fundo-que-a-parede"
+        },
+        {
+          "ponto": "valvula-de-gaveta-aco-2: paredeMenor=15",
+          "restricao": "parede-menor-cabe"
+        },
+        {
+          "ponto": "valvula-de-gaveta-aco-2: raio=15",
           "restricao": "curva-mais-larga-que-o-tubo"
         }
       ]

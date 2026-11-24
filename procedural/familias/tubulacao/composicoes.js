@@ -2,9 +2,9 @@
    dois `friso` de seção circular ao longo do arco, o de dentro tirado do de fora por `subtrair`. A parte é `tubo`, `curva` ou
    `tampao`, e a porta `boca` é o anel da entrada, no plano y = 0. */
 import { FORMATO_COMPOSICAO_PROCEDURAL } from '../../nucleo/entrada.js';
-import { LADOS_DA_SECAO, PONTOS_DO_ARCO } from './geometria.js';
+import { LADOS_DA_SECAO, PONTOS_DO_ARCO, geometriaDaPeca } from './geometria.js';
 
-export const ID_POR_FORMA = Object.freeze({ 1: 'tubulacao.trecho', 2: 'tubulacao.curva', 3: 'tubulacao.tampao', 4: 'tubulacao.te', 5: 'tubulacao.reducao' });
+export const ID_POR_FORMA = Object.freeze({ 1: 'tubulacao.trecho', 2: 'tubulacao.curva', 3: 'tubulacao.tampao', 4: 'tubulacao.te', 5: 'tubulacao.reducao', 6: 'tubulacao.flange', 7: 'tubulacao.valvula-de-esfera', 8: 'tubulacao.valvula-de-gaveta' });
 export const LADOS = LADOS_DA_SECAO;
 const p = (nome) => ({ parametro: nome });
 const sai = ['mecanifica.malha-poligonal@1', 'mecanifica.parte@1', 'mecanifica.porta@1'];
@@ -40,4 +40,36 @@ const te = composicao(ID_POR_FORMA[4], [['ri', 'numero'], ['ro', 'numero'], ['al
   porta({ op: 'subtrair', id: 20 }),
 ]);
 
-export const COMPOSICOES = Object.freeze([torneada(ID_POR_FORMA[1], 'tubo', 5), curva, torneada(ID_POR_FORMA[3], 'tampao', 7), te, torneada(ID_POR_FORMA[5], 'reducao', 5)]);
+/* os acessórios: a composição sai da lista de sólidos da geometria de uma peça de exemplo, porque o número de pontos de
+   cada sólido é fixo por forma; os nomes dos argumentos são `s<k>r<i>`/`s<k>y<i>` (perfil), `s<k>em`, `s<k>altura` */
+export const EXEMPLO_DO_ACESSORIO = Object.freeze({ diametroExterno: 60.3, parede: 3.91, diametroDoFlange: 152.4, espessuraDoFlange: 17.5, circuloDeFuracao: 120.7, furos: 4, diametroDoFuro: 19.1, diametroDoCubo: 77.7, comprimentoDoPescoco: 61.9, faceAFace: 178, giroDosFuros: 45 });
+export const solidosDoAcessorio = (g) => [...g.cheios.map((s) => ({ ...s, cheio: true })), ...g.ferramentas];
+function acessorio(forma) {
+  const g = geometriaDaPeca({ forma, ...EXEMPLO_DO_ACESSORIO });
+  const nomes = [['ri', 'numero'], ['ro', 'numero'], ['altura', 'numero']];
+  const nos = [];
+  const cheios = [];
+  const ferramentas = [];
+  solidosDoAcessorio(g).forEach((s, k) => {
+    const id = 10 + 2 * k;
+    nomes.push([`s${k}em`, 'vetor3'], ...s.perfil.map((_, i) => [[`s${k}r${i}`, 'numero'], [`s${k}y${i}`, 'numero']]).flat());
+    const perfil = s.perfil.map((_, i) => [p(`s${k}r${i}`), p(`s${k}y${i}`)]);
+    if (s.op === 'lathe') nos.push({ id: `solido-${k}`, operacao: 'lathe', argumentos: { origemId: id, lados: LADOS, eixo: s.eixo, perfil, em: p(`s${k}em`) } });
+    else { nomes.push([`s${k}altura`, 'numero']); nos.push({ id: `solido-${k}`, operacao: 'extrusao', argumentos: { origemId: id, perfil, altura: p(`s${k}altura`), em: p(`s${k}em`) } }); }
+    const fonte = { op: s.op, id };
+    (s.cheio ? cheios : ferramentas).push({ origem: fonte });
+    if (s.copias) {
+      nomes.push([`s${k}total`, 'inteiro'], [`s${k}graus`, 'numero']);
+      nos.push({ id: `copias-${k}`, operacao: 'arranja', argumentos: { modo: 'radial', total: p(`s${k}total`), graus: p(`s${k}graus`), eixo: 'y', pivo: [0, 0, 0], origemId: id + 1, derivaDe: fonte, sel: { origem: fonte } } });
+      ferramentas.push({ origem: { op: 'arranja', id: id + 1, de: fonte } });
+    }
+  });
+  let base = cheios[0];
+  if (cheios.length > 1) { nos.push({ id: 'cheio', operacao: 'unir', argumentos: { origemId: 90, solidos: cheios } }); base = { origem: { op: 'unir', id: 90 } }; }
+  nos.push({ id: 'oco', operacao: 'subtrair', argumentos: { origemId: 95, solidos: [base, ...ferramentas] } });
+  nos.push({ id: 'parte', operacao: 'parte', argumentos: { nome: g.parte, sel: { origem: { op: 'subtrair', id: 95 } } } });
+  nos.push(porta({ op: 'subtrair', id: 95 }));
+  return composicao(ID_POR_FORMA[forma], nomes, nos);
+}
+
+export const COMPOSICOES = Object.freeze([torneada(ID_POR_FORMA[1], 'tubo', 5), curva, torneada(ID_POR_FORMA[3], 'tampao', 7), te, torneada(ID_POR_FORMA[5], 'reducao', 5), acessorio(6), acessorio(7), acessorio(8)]);

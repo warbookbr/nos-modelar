@@ -4,7 +4,7 @@
   "versao": "1.0.0",
   "nivel": "componente",
   "parametros": {
-    "forma": { "tipo": "inteiro", "unidade": "contagem", "padrao": 1, "minimo": 1, "maximo": 5, "medio": 3 },
+    "forma": { "tipo": "inteiro", "unidade": "contagem", "padrao": 1, "minimo": 1, "maximo": 8, "medio": 4 },
     "diametroExterno": { "tipo": "numero", "unidade": "mm", "padrao": 60.3, "minimo": 15, "maximo": 250, "medio": 88.9 },
     "parede": { "tipo": "numero", "unidade": "mm", "padrao": 3.91, "minimo": 1, "maximo": 15, "medio": 5.49 },
     "comprimento": { "tipo": "numero", "unidade": "mm", "padrao": 500, "minimo": 10, "maximo": 6000, "medio": 1000 },
@@ -15,7 +15,16 @@
     "centroABoca": { "tipo": "numero", "unidade": "mm", "padrao": 64, "minimo": 10, "maximo": 300, "medio": 86 },
     "diametroMenor": { "tipo": "numero", "unidade": "mm", "padrao": 48.3, "minimo": 10, "maximo": 240, "medio": 60.3 },
     "paredeMenor": { "tipo": "numero", "unidade": "mm", "padrao": 3.68, "minimo": 1, "maximo": 15, "medio": 3.91 },
-    "comprimentoDaReducao": { "tipo": "numero", "unidade": "mm", "padrao": 76, "minimo": 10, "maximo": 300, "medio": 89 }
+    "comprimentoDaReducao": { "tipo": "numero", "unidade": "mm", "padrao": 76, "minimo": 10, "maximo": 300, "medio": 89 },
+    "diametroDoFlange": { "tipo": "numero", "unidade": "mm", "padrao": 152.4, "minimo": 60, "maximo": 400, "medio": 190.5 },
+    "espessuraDoFlange": { "tipo": "numero", "unidade": "mm", "padrao": 17.5, "minimo": 5, "maximo": 40, "medio": 22.3 },
+    "circuloDeFuracao": { "tipo": "numero", "unidade": "mm", "padrao": 120.7, "minimo": 40, "maximo": 360, "medio": 152.4 },
+    "furos": { "tipo": "inteiro", "unidade": "contagem", "padrao": 4, "minimo": 4, "maximo": 12, "medio": 8 },
+    "diametroDoFuro": { "tipo": "numero", "unidade": "mm", "padrao": 19.1, "minimo": 6, "maximo": 30, "medio": 19.1 },
+    "diametroDoCubo": { "tipo": "numero", "unidade": "mm", "padrao": 77.7, "minimo": 20, "maximo": 300, "medio": 108 },
+    "comprimentoDoPescoco": { "tipo": "numero", "unidade": "mm", "padrao": 61.9, "minimo": 30, "maximo": 120, "medio": 68.2 },
+    "faceAFace": { "tipo": "numero", "unidade": "mm", "padrao": 178, "minimo": 80, "maximo": 500, "medio": 203 },
+    "giroDosFuros": { "tipo": "numero", "unidade": "graus", "padrao": 45, "minimo": 0, "maximo": 360, "medio": 45 }
   },
   "restricoes": [
     { "id": "parede-cabe-no-tubo", "expressao": "parede * 4 <= diametroExterno", "motivo": "a parede passa de um quarto do diâmetro externo; o furo fica estreito demais para um tubo" },
@@ -23,16 +32,21 @@
     { "id": "derivacao-sai-da-passagem", "expressao": "max(0, 1 - abs(forma - 4)) * (0.55 * diametroExterno - centroABoca) <= 0", "motivo": "no tê (forma 4) o centro à boca precisa passar de 0,55 diâmetro externo, senão a boca da derivação fica dentro da passagem" },
     { "id": "reducao-diminui", "expressao": "max(0, 1 - abs(forma - 5)) * (diametroMenor + 1 - diametroExterno) <= 0", "motivo": "na redução (forma 5) o diâmetro menor precisa ser menor que o externo da boca maior" },
     { "id": "parede-menor-cabe", "expressao": "paredeMenor * 4 <= diametroMenor", "motivo": "a parede da boca menor passa de um quarto do diâmetro menor" },
+    { "id": "cubo-entre-tubo-e-furos", "expressao": "max(0, min(1, forma - 5)) * (diametroDoCubo - circuloDeFuracao + diametroDoFuro + 4) <= 0", "motivo": "no flange e na válvula (formas 6 a 8) o cubo precisa ficar por dentro dos furos dos parafusos" },
+    { "id": "cubo-cobre-o-tubo", "expressao": "max(0, min(1, forma - 5)) * (diametroExterno - diametroDoCubo) <= 0", "motivo": "no flange e na válvula o cubo precisa ser ao menos do diâmetro do tubo" },
+    { "id": "furos-dentro-do-flange", "expressao": "max(0, min(1, forma - 5)) * (circuloDeFuracao + diametroDoFuro + 4 - diametroDoFlange) <= 0", "motivo": "os furos dos parafusos precisam caber no disco do flange" },
+    { "id": "pescoco-maior-que-o-disco", "expressao": "max(0, 1 - abs(forma - 6)) * (espessuraDoFlange + 5 - comprimentoDoPescoco) <= 0", "motivo": "no flange (forma 6) o comprimento pelo pescoço precisa passar da espessura do disco" },
+    { "id": "valvula-cabe-entre-os-flanges", "expressao": "max(0, min(1, forma - 6)) * (2 * espessuraDoFlange + 20 - faceAFace) <= 0", "motivo": "na válvula (formas 7 e 8) a face a face precisa passar das duas espessuras de flange" },
     { "id": "tampao-mais-fundo-que-a-parede", "expressao": "comprimentoDoTampao >= 3 * parede", "motivo": "o tampão precisa de ao menos três paredes de comprimento para o fundo e o chanfro caberem" }
   ],
   "portas": [ { "id": "boca", "tipo": "anel", "papel": "recebe" } ],
   "ferramentas": ["tubulacao"],
   "perguntas": {
     "tubulacao": [
-      "Os tubos são ocos, de parede constante, com a boca aberta mostrando a espessura?",
+      "Os tubos são ocos, de parede constante, e o tampão fecha a ponta com o mesmo diâmetro, sem passar para dentro?",
       "A curva é um arco liso de raio constante, sem achatar a seção, e emenda nos dois tubos sem degrau?",
-      "O tampão fecha a ponta do tubo com o mesmo diâmetro, sem passar para dentro?",
-      "O tê tem a derivação a 90° no meio da passagem, aberta para dentro dela, e a redução afina sem degrau, oca dos dois lados?"
+      "O tê tem a derivação a 90° no meio da passagem, aberta para dentro dela, e a redução afina sem degrau, oca dos dois lados?",
+      "O flange tem o cubo afinando até o tubo e os furos dos parafusos no disco, e a válvula tem os dois flanges, o corpo, a haste e a alavanca ou o volante?"
     ]
   },
   "perfis": {
@@ -44,6 +58,10 @@
     "te-aco-2": { "descricao": "tê reto de aço de 2\"", "parametros": { "forma": 4, "diametroExterno": 60.3, "parede": 3.91, "centroABoca": 64 } },
     "reducao-aco-2-para-1-meia": { "descricao": "redução concêntrica de aço de 2\" para 1 1/2\"", "parametros": { "forma": 5, "diametroExterno": 60.3, "parede": 3.91, "diametroMenor": 48.3, "paredeMenor": 3.68, "comprimentoDaReducao": 76 } },
     "te-pvc-50": { "descricao": "tê de PVC de 50 mm", "parametros": { "forma": 4, "diametroExterno": 50, "parede": 3, "centroABoca": 50 } },
+    "flange-aco-2": { "descricao": "flange de pescoço de aço de 2\", classe 150", "parametros": { "forma": 6, "diametroExterno": 60.3, "parede": 3.91, "diametroDoFlange": 152.4, "espessuraDoFlange": 17.5, "circuloDeFuracao": 120.7, "furos": 4, "diametroDoFuro": 19.1, "diametroDoCubo": 77.7, "comprimentoDoPescoco": 61.9, "giroDosFuros": 45 } },
+    "flange-aco-4": { "descricao": "flange de pescoço de aço de 4\", classe 150, oito furos", "parametros": { "forma": 6, "diametroExterno": 114.3, "parede": 6.02, "diametroDoFlange": 228.6, "espessuraDoFlange": 22.3, "circuloDeFuracao": 190.5, "furos": 8, "diametroDoFuro": 19.1, "diametroDoCubo": 134.9, "comprimentoDoPescoco": 74.6, "giroDosFuros": 22.5 } },
+    "valvula-de-esfera-aco-2": { "descricao": "válvula de esfera flangeada de aço de 2\", classe 150", "parametros": { "forma": 7, "diametroExterno": 60.3, "parede": 3.91, "diametroDoFlange": 152.4, "espessuraDoFlange": 17.5, "circuloDeFuracao": 120.7, "furos": 4, "diametroDoFuro": 19.1, "diametroDoCubo": 77.7, "faceAFace": 178, "giroDosFuros": 45 } },
+    "valvula-de-gaveta-aco-2": { "descricao": "válvula de gaveta flangeada de aço de 2\", classe 150", "parametros": { "forma": 8, "diametroExterno": 60.3, "parede": 3.91, "diametroDoFlange": 152.4, "espessuraDoFlange": 17.5, "circuloDeFuracao": 120.7, "furos": 4, "diametroDoFuro": 19.1, "diametroDoCubo": 77.7, "faceAFace": 178, "giroDosFuros": 45 } },
     "joelho-pvc-50": { "descricao": "joelho de 90° de PVC de 50 mm", "parametros": { "forma": 2, "diametroExterno": 50, "parede": 3, "raio": 50, "angulo": 90 } }
   }
 }

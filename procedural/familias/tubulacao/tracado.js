@@ -9,8 +9,13 @@
 
    A recusa diz o nó ou o trecho e o motivo: nome repetido ou que não existe, bitola fora da tabela, trecho curto demais
    para as conexões das pontas, dois trechos que se cruzam, nó com mais de três trechos, desvio entre 1° e 15° (sem conexão),
-   curva acima de 90°, curva ou tê entre bitolas diferentes e tê que não é reto. */
-import { MATERIAIS, bitola } from './tabela.js';
+   curva acima de 90°, curva ou tê entre bitolas diferentes e tê que não é reto.
+
+   Os acessórios de aço: a ponta com `fim: 'flange'` ganha o flange de pescoço, que avança o comprimento pelo pescoço, e a
+   boca livre fica na face dele; o nó de continuação com `valvula: 'esfera'` ou `'gaveta'` ganha a válvula flangeada com um
+   flange de pescoço de cada lado, que avança meia face a face mais o pescoço. A válvula fora de nó reto de uma bitola só, o
+   acessório em PVC e a bitola sem a medida são recusados. */
+import { MATERIAIS, bitola, flangeDe } from './tabela.js';
 
 export const ALINHADO = 1;
 export const DESVIO_MINIMO = 15;
@@ -49,8 +54,9 @@ export function lerTracado({ material, nos, trechos } = {}) {
     if (typeof no?.nome !== 'string' || !no.nome) recusar(`nó sem nome: ${JSON.stringify(no)}`);
     if (porNome.has(no.nome)) recusar(`o nó '${no.nome}' aparece duas vezes`);
     if (!Array.isArray(no.posicao) || no.posicao.length !== 3 || !no.posicao.every(Number.isFinite)) recusar(`o nó '${no.nome}' precisa de posicao [x, y, z] em mm`);
-    if (no.fim !== undefined && !['aberta', 'tampao'].includes(no.fim)) recusar(`o nó '${no.nome}' tem fim '${no.fim}'; aceitos: aberta, tampao`);
-    porNome.set(no.nome, { nome: no.nome, posicao: no.posicao, fim: no.fim ?? 'aberta', trechos: [] });
+    if (no.fim !== undefined && !['aberta', 'tampao', 'flange'].includes(no.fim)) recusar(`o nó '${no.nome}' tem fim '${no.fim}'; aceitos: aberta, tampao, flange`);
+    if (no.valvula !== undefined && !['esfera', 'gaveta'].includes(no.valvula)) recusar(`o nó '${no.nome}' tem valvula '${no.valvula}'; aceitas: esfera, gaveta`);
+    porNome.set(no.nome, { nome: no.nome, posicao: no.posicao, fim: no.fim ?? 'aberta', valvula: no.valvula, trechos: [] });
   }
   const lidos = trechos.map((t, i) => {
     const onde = `o trecho ${i} (${t?.de} → ${t?.para})`;
@@ -77,8 +83,23 @@ export function lerTracado({ material, nos, trechos } = {}) {
     const onde = `o nó '${no.nome}'`;
     if (ts.length === 0) recusar(`${onde} não tem trecho`);
     if (ts.length > 3) recusar(`${onde} tem ${ts.length} trechos; a cruzeta fica fora, e o nó aceita até três`);
-    if (no.fim === 'tampao' && ts.length !== 1) recusar(`${onde} tem tampão e ${ts.length} trechos; o tampão vai só na ponta`);
-    if (ts.length === 1) { conexoes.set(no.nome, { tipo: 'ponta', fim: no.fim }); continue; }
+    if (no.fim !== 'aberta' && ts.length !== 1) recusar(`${onde} tem fim '${no.fim}' e ${ts.length} trechos; o ${no.fim === 'tampao' ? 'tampão' : 'flange'} vai só na ponta`);
+    const flangeDoNo = (t) => { try { return flangeDe(material, t.trecho.bitola); } catch (erro) { return recusar(`${onde}: ${erro.message.replace('tubulação: ', '')}`); } };
+    if (ts.length === 1) {
+      if (no.valvula) recusar(`${onde} tem válvula e um trecho só; a válvula vai num nó reto entre dois trechos`);
+      if (no.fim === 'flange') { const f = flangeDoNo(ts[0]); ts[0].trecho.avancos[ts[0].ponta] = f.pescoco; conexoes.set(no.nome, { tipo: 'ponta', fim: no.fim, flange: f }); continue; }
+      conexoes.set(no.nome, { tipo: 'ponta', fim: no.fim }); continue;
+    }
+    if (no.valvula) {
+      const [a, b] = ts;
+      if (ts.length !== 2 || 180 - graus(a.direcao, b.direcao) >= ALINHADO || a.trecho.bitola !== b.trecho.bitola) recusar(`${onde} tem válvula, mas não é um nó reto entre dois trechos da mesma bitola`);
+      const f = flangeDoNo(a);
+      const faceAFace = f.valvula[no.valvula];
+      if (!faceAFace) recusar(`${onde}: a válvula de ${no.valvula} de ${a.trecho.bitola}" não tem a face a face na tabela`);
+      for (const t of ts) t.trecho.avancos[t.ponta] = faceAFace / 2 + f.pescoco;
+      conexoes.set(no.nome, { tipo: 'valvula', valvula: no.valvula, faceAFace, flange: f });
+      continue;
+    }
     if (ts.length === 2) {
       const [a, b] = ts;
       const desvio = 180 - graus(a.direcao, b.direcao);

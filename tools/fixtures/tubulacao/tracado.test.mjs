@@ -53,6 +53,10 @@ describe('leitura do traçado', () => {
       [comTrocado(REDE_DE_ACO, (t) => { t.nos[2].posicao = [100, 0, 300]; }), /acima de|vai até 90°/],
       [comTrocado(REDE_DE_ACO, (t) => { t.trechos[1].bitola = '3'; }), /bitolas 2 e 3|bitolas 3 e 2|tê entre bitolas/],
       [comTrocado(REDE_DE_ACO, (t) => { t.nos[3].posicao = [1000, 0, 800]; }), /derivação a/],
+      [comTrocado(REDE_DE_ACO, (t) => { t.nos[1].valvula = 'esfera'; }), /'curva1' tem válvula, mas não é um nó reto/],
+      [comTrocado(REDE_DE_ACO, (t) => { t.nos[2].fim = 'flange'; }), /'te' tem fim 'flange' e 3 trechos/],
+      [comTrocado(L_DE_PVC, (t) => { t.nos[0].fim = 'flange'; }), /'a': o flange e a válvula só existem em aço/],
+      [{ material: 'aco', nos: [{ nome: 'a', posicao: [0, 0, 0] }, { nome: 'b', posicao: [600, 0, 0], valvula: 'esfera' }, { nome: 'c', posicao: [1200, 0, 0] }], trechos: [{ de: 'a', para: 'b', bitola: '5' }, { de: 'b', para: 'c', bitola: '5' }] }, /esfera de 5" não tem a face a face/],
       [{ material: 'aco', nos: ['a', 'b', 'c', 'd', 'e'].map((nome, i) => ({ nome, posicao: [[0, 0, 0], [500, 0, 0], [-500, 0, 0], [0, 0, 500], [0, 0, -500]][i] })), trechos: ['b', 'c', 'd', 'e'].map((para) => ({ de: 'a', para, bitola: '1' })) }, /4 trechos/],
     ];
     for (const [tracado, motivo] of casos) expect(() => lerTracado(tracado)).toThrow(motivo);

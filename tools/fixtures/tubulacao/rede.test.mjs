@@ -5,7 +5,7 @@
  * e a família `tubulacao` sai oca e num pedaço só em cada perfil. */
 import { describe, expect, it } from 'vitest';
 import { receitaDaRede } from './rede.mjs';
-import { REDE_DE_ACO, ZIGUE_ZAGUE } from './tracados.mjs';
+import { REDE_DE_ACO, REDE_DE_PROVA, ZIGUE_ZAGUE } from './tracados.mjs';
 import { girosDoQuadro } from '../../../procedural/familias/tubulacao/rede.js';
 import { chamar, criarRegistroDeFamilias } from '../../../procedural/familias/index.js';
 import { executarReceita } from '../../../src/autoria/executar-receita.js';
@@ -87,6 +87,33 @@ describe('rede de aço com tê e redução', () => {
     expect(t.min[2]).toBeCloseTo(436, 6);
     expect(t.max[2]).toBeCloseTo(564, 6);
     expect(t.max[0]).toBeCloseTo(664, 6);
+  });
+
+  it('cada encontro só encosta, e só os declarados', () => {
+    const c = contatosDaPeca(neutro, receita);
+    expect(c.paresEmContato).toHaveLength(rede.encostos.length);
+    expect(c.paresEmContato.every((p) => p.estado === 'encostam'), JSON.stringify(c.paresEmContato.filter((p) => p.estado !== 'encostam'))).toBe(true);
+    expect(c.naoDeclarados).toEqual([]);
+    expect(c.declaradosSemContato).toEqual([]);
+    expect(c.atravessados).toEqual([]);
+  });
+});
+
+describe('rede de prova com flanges e válvulas', () => {
+  const { receita, rede } = receitaDaRede(REDE_DE_PROVA);
+  const neutro = executar(receita);
+
+  it('sai com os flanges e as duas válvulas, sem órfão, e a porta da ponta com flange fica na face', () => {
+    expect((neutro.orfaos ?? []).map((o) => o.motivo)).toEqual([]);
+    expect(rede.pecas.map((p) => p.nome).filter((n) => /^(flange|valvula)/.test(n)).sort()).toEqual(['flangeentrada', 'flangeesferaA', 'flangeesferaB', 'flangegavetaA', 'flangegavetaB', 'flangeramal', 'valvulaesfera', 'valvulagaveta']);
+    const f = caixa(neutro, 'flangeentradaFlange');
+    expect(f.min[0]).toBeCloseTo(0, 6);
+    expect(f.max[0]).toBeCloseTo(61.9, 6);
+    expect(rede.portas.find((p) => p.no === 'entrada').raioExterno).toBeCloseTo(76.2, 6);
+  });
+
+  it('o corte de cada trecho é a distância menos os avanços: o primeiro perde o pescoço e meia válvula com o outro pescoço', () => {
+    expect(rede.trechos[0].corte).toBeCloseTo(700 - 61.9 - (178 / 2 + 61.9), 9);
   });
 
   it('cada encontro só encosta, e só os declarados', () => {
