@@ -1,0 +1,311 @@
+{
+  "formato": "mecanifica.registro-de-etapas",
+  "versao": 3,
+  "montagem": "braco-de-prova",
+  "eventos": [
+    {
+      "tipo": "aceite",
+      "instancia": "base",
+      "aceite": {
+        "por": "Tiago, 2026-11-24",
+        "observacao": "Aceite humano: 'aceito as nove etapas com os defeitos de acabamento em aberto que deverão ser corrigidos e detalhados em uma etapa posterior!'",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — 3 defeito(s) apontado(s) na rodada 1.",
+          "botaoDeParada: superficie em aresta superior e lateral do botão",
+          "hasteDoBotao: superficie em perímetro lateral do cilindro",
+          "tampa: uniao em borda superior da tampa, na quina chanfrada do garfo, lado esquerdo"
+        ],
+        "analise": "ausente"
+      },
+      "impressao": {
+        "forma": "sha256:90f3ac73a5cb68b2e9491db5f71d254f1a2c387d17aa53a47812204d350a1f59",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0,
+            0
+          ]
+        },
+        "juntas": [],
+        "citadas": [],
+        "anteriores": []
+      }
+    },
+    {
+      "tipo": "aceite",
+      "instancia": "garfo",
+      "aceite": {
+        "por": "Tiago, 2026-11-24",
+        "observacao": "Aceite humano: 'aceito as nove etapas com os defeitos de acabamento em aberto que deverão ser corrigidos e detalhados em uma etapa posterior!'",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — 2 defeito(s) apontado(s) na rodada 1.",
+          "paredeDaFrente: ausencia em parte baixa da parede, os dois M3 prometidos",
+          "paredeDeTras: ausencia em parte baixa da parede, os dois M3 prometidos"
+        ],
+        "analise": "ausente"
+      },
+      "impressao": {
+        "forma": "sha256:905dd5582aefda5e87f5f7709ee3698ae691f250a766dd5d8b79de7aa68507db",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0,
+            0
+          ]
+        },
+        "juntas": [],
+        "citadas": [
+          {
+            "etapa": "base",
+            "porta": "topo",
+            "por": [
+              "posição garfoSobreABase"
+            ],
+            "interface": {
+              "forma": "plano",
+              "papel": "recebe",
+              "ponto": [
+                0,
+                0.05,
+                0
+              ],
+              "centro": [
+                0,
+                0.05,
+                0
+              ],
+              "normal": [
+                0,
+                1,
+                0
+              ],
+              "eixo": [
+                0,
+                1,
+                0
+              ],
+              "extensao": [
+                0.12,
+                0.12
+              ],
+              "largura": 0.12,
+              "comprimento": 0.12
+            }
+          }
+        ],
+        "anteriores": [
+          "base"
+        ]
+      }
+    },
+    {
+      "tipo": "aceite",
+      "instancia": "motorOmbro",
+      "aceite": {
+        "por": "Tiago, 2026-11-24",
+        "observacao": "Aceite humano: 'aceito as nove etapas com os defeitos de acabamento em aberto que deverão ser corrigidos e detalhados em uma etapa posterior!'",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — 3 defeito(s) apontado(s) na rodada 1.",
+          "eixoDeSaida: superficie em corpo cilíndrico, laterais",
+          "eixoDoMotor: superficie em corpo cilíndrico, laterais",
+          "motor: posicao em quatro furos da flange, vistos na face +z (externa)"
+        ],
+        "analise": "ausente"
+      },
+      "impressao": {
+        "forma": "sha256:996bb6057239f25a8b496b54bb29378ed152089dd08e7292d9c8b2518fae1fe2",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0,
+            0
+          ]
+        },
+        "juntas": [],
+        "citadas": [
+          {
+            "etapa": "garfo",
+            "porta": "faceDoMotor",
+            "por": [
+              "posição motorNaFaceDoGarfo"
+            ],
+            "interface": {
+              "forma": "plano",
+              "papel": "recebe",
+              "ponto": [
+                0,
+                0.14,
+                0.051
+              ],
+              "centro": [
+                0,
+                0.14,
+                0.051
+              ],
+              "normal": [
+                0,
+                0,
+                1
+              ],
+              "eixo": [
+                0,
+                0,
+                1
+              ],
+              "extensao": [
+                0.057,
+                0.057
+              ],
+              "largura": 0.057,
+              "comprimento": 0.057
+            }
+          }
+        ],
+        "anteriores": [
+          "base",
+          "garfo"
+        ]
+      }
+    },
+    {
+      "tipo": "aceite",
+      "instancia": "rolamento",
+      "aceite": {
+        "por": "Tiago, 2026-11-24",
+        "observacao": "Aceite humano: 'aceito as nove etapas com os defeitos de acabamento em aberto que deverão ser corrigidos e detalhados em uma etapa posterior!'",
+        "defeitosAceitos": [
+          "crítico não fechou: modelar — 1 defeito(s) apontado(s) na rodada 1.",
+          "rolamento: superficie em furo central, parede interna"
+        ],
+        "analise": "ausente"
+      },
+      "impressao": {
+        "forma": "sha256:0b63f20de838099af59b6a4b4a83b40e170ad07eeebfefd986a2a585f40c69ce",
+        "parametros": [],
+        "pose": {
+          "rotacao": [
+            [
+              1,
+              0,
+              0
+            ],
+            [
+              0,
+              1,
+              0
+            ],
+            [
+              0,
+              0,
+              1
+            ]
+          ],
+          "deslocamento": [
+            0,
+            0,
+            0
+          ]
+        },
+        "juntas": [],
+        "citadas": [
+          {
+            "etapa": "garfo",
+            "porta": "faceDoRolamento",
+            "por": [
+              "posição rolamentoNaFaceDoGarfo"
+            ],
+            "interface": {
+              "forma": "plano",
+              "papel": "recebe",
+              "ponto": [
+                0,
+                0.14,
+                -0.051
+              ],
+              "centro": [
+                0,
+                0.14,
+                -0.051
+              ],
+              "normal": [
+                0,
+                0,
+                -1
+              ],
+              "eixo": [
+                0,
+                0,
+                -1
+              ],
+              "extensao": [
+                0.028,
+                0.028
+              ],
+              "largura": 0.028,
+              "comprimento": 0.028
+            }
+          }
+        ],
+        "anteriores": [
+          "base",
+          "garfo",
+          "motorOmbro"
+        ]
+      }
+    }
+  ]
+}
