@@ -1,0 +1,237 @@
+{
+  "formato": "mecanifica.aprovacao-da-familia@1",
+  "familia": "gabinete",
+  "versao": "1.0.0",
+  "mecanica": {
+    "data": "2026-11-24",
+    "pontos": {
+      "minimo": {
+        "parametros": {
+          "altura": 20,
+          "alturaDaBase": 10,
+          "alturaDoEncaixe": 1,
+          "diametroDoFuro": 1.5,
+          "diametroDoRessalto": 4,
+          "folgaDoRessalto": 0.5,
+          "largura": 40,
+          "parede": 1,
+          "profundidade": 40,
+          "raioDoCanto": 1.5
+        },
+        "hash": "sha256:6891117f71ae8b6223579d8e26590cc3a091aa6355ad177ede25d2cb45733b0f",
+        "medidas": []
+      },
+      "medio": {
+        "parametros": {
+          "altura": 90,
+          "alturaDaBase": 50,
+          "alturaDoEncaixe": 3,
+          "diametroDoFuro": 3.5,
+          "diametroDoRessalto": 9,
+          "folgaDoRessalto": 2,
+          "largura": 240,
+          "parede": 2.5,
+          "profundidade": 160,
+          "raioDoCanto": 8
+        },
+        "hash": "sha256:e8e2ec81b168be3b2268c17f4188b86ac185305f8fa2dc5c12cb876d5e0a2146",
+        "medidas": []
+      },
+      "maximo": {
+        "parametros": {
+          "altura": 400,
+          "alturaDaBase": 300,
+          "alturaDoEncaixe": 8,
+          "diametroDoFuro": 8,
+          "diametroDoRessalto": 20,
+          "folgaDoRessalto": 10,
+          "largura": 800,
+          "parede": 6,
+          "profundidade": 600,
+          "raioDoCanto": 25
+        },
+        "hash": "sha256:f88b56320770f4a0d647f584aa24413c793f5a7bb7e64e1b197114488918cae4",
+        "medidas": []
+      }
+    },
+    "varredura": {
+      "sondas": 20,
+      "recusasDeclaradas": [
+        {
+          "ponto": "altura=20",
+          "restricao": "base-abaixo-do-topo"
+        },
+        {
+          "ponto": "alturaDaBase=300",
+          "restricao": "base-abaixo-do-topo"
+        },
+        {
+          "ponto": "diametroDoFuro=8",
+          "restricao": "furo-dentro-do-ressalto"
+        },
+        {
+          "ponto": "diametroDoRessalto=4",
+          "restricao": "furo-dentro-do-ressalto"
+        },
+        {
+          "ponto": "parede=6",
+          "restricao": "canto-maior-que-a-parede"
+        },
+        {
+          "ponto": "raioDoCanto=1.5",
+          "restricao": "canto-maior-que-a-parede"
+        },
+        {
+          "ponto": "raioDoCanto=25",
+          "restricao": "canto-nao-come-o-ressalto"
+        }
+      ]
+    },
+    "portas": [
+      "apoio",
+      "fixacao",
+      "topo"
+    ],
+    "perfis": {
+      "caixa-baixa": {
+        "parametros": {
+          "altura": 30,
+          "alturaDaBase": 18,
+          "alturaDoEncaixe": 2,
+          "diametroDoFuro": 2.7,
+          "diametroDoRessalto": 7,
+          "folgaDoRessalto": 1,
+          "largura": 120,
+          "parede": 2,
+          "profundidade": 80,
+          "raioDoCanto": 4
+        },
+        "hash": "sha256:396333a5cf744bc01cc5ffeff810835e1855321530d55f9012fa20e0026b0859",
+        "medidas": []
+      },
+      "caixa-de-painel": {
+        "parametros": {
+          "altura": 120,
+          "alturaDaBase": 80,
+          "alturaDoEncaixe": 4,
+          "diametroDoFuro": 4.2,
+          "diametroDoRessalto": 10,
+          "folgaDoRessalto": 4,
+          "largura": 300,
+          "parede": 3,
+          "profundidade": 200,
+          "raioDoCanto": 10
+        },
+        "hash": "sha256:2d8768b0ed36d7e7c5fa9800ff93114a47f3e054bb6446065d28d6c69e8832f7",
+        "medidas": []
+      },
+      "caixa-pequena": {
+        "parametros": {
+          "altura": 60,
+          "alturaDaBase": 35,
+          "alturaDoEncaixe": 3,
+          "diametroDoFuro": 3.2,
+          "diametroDoRessalto": 8,
+          "folgaDoRessalto": 1.5,
+          "largura": 160,
+          "parede": 2.5,
+          "profundidade": 110,
+          "raioDoCanto": 6
+        },
+        "hash": "sha256:933dfa80b327a2ba2c825ed6024fb945f6f7de162f89ee835b0dac23c98ee0bb",
+        "medidas": []
+      }
+    },
+    "escalasDosPerfis": {
+      "sondas": 60,
+      "recusasDeclaradas": [
+        {
+          "ponto": "caixa-baixa: altura=20",
+          "restricao": "base-abaixo-do-topo"
+        },
+        {
+          "ponto": "caixa-baixa: alturaDaBase=300",
+          "restricao": "base-abaixo-do-topo"
+        },
+        {
+          "ponto": "caixa-baixa: alturaDoEncaixe=8",
+          "restricao": "base-abaixo-do-topo"
+        },
+        {
+          "ponto": "caixa-baixa: diametroDoFuro=8",
+          "restricao": "furo-dentro-do-ressalto"
+        },
+        {
+          "ponto": "caixa-baixa: diametroDoRessalto=4",
+          "restricao": "furo-dentro-do-ressalto"
+        },
+        {
+          "ponto": "caixa-baixa: parede=6",
+          "restricao": "base-abaixo-do-topo"
+        },
+        {
+          "ponto": "caixa-baixa: raioDoCanto=1.5",
+          "restricao": "canto-maior-que-a-parede"
+        },
+        {
+          "ponto": "caixa-baixa: raioDoCanto=25",
+          "restricao": "canto-nao-come-o-ressalto"
+        },
+        {
+          "ponto": "caixa-de-painel: altura=20",
+          "restricao": "base-abaixo-do-topo"
+        },
+        {
+          "ponto": "caixa-de-painel: alturaDaBase=300",
+          "restricao": "base-abaixo-do-topo"
+        },
+        {
+          "ponto": "caixa-de-painel: diametroDoRessalto=4",
+          "restricao": "canto-nao-come-o-ressalto"
+        },
+        {
+          "ponto": "caixa-de-painel: folgaDoRessalto=0.5",
+          "restricao": "canto-nao-come-o-ressalto"
+        },
+        {
+          "ponto": "caixa-de-painel: raioDoCanto=1.5",
+          "restricao": "canto-maior-que-a-parede"
+        },
+        {
+          "ponto": "caixa-de-painel: raioDoCanto=25",
+          "restricao": "canto-nao-come-o-ressalto"
+        },
+        {
+          "ponto": "caixa-pequena: altura=20",
+          "restricao": "base-abaixo-do-topo"
+        },
+        {
+          "ponto": "caixa-pequena: alturaDaBase=300",
+          "restricao": "base-abaixo-do-topo"
+        },
+        {
+          "ponto": "caixa-pequena: diametroDoFuro=8",
+          "restricao": "furo-dentro-do-ressalto"
+        },
+        {
+          "ponto": "caixa-pequena: diametroDoRessalto=4",
+          "restricao": "furo-dentro-do-ressalto"
+        },
+        {
+          "ponto": "caixa-pequena: parede=6",
+          "restricao": "canto-maior-que-a-parede"
+        },
+        {
+          "ponto": "caixa-pequena: raioDoCanto=1.5",
+          "restricao": "canto-maior-que-a-parede"
+        },
+        {
+          "ponto": "caixa-pequena: raioDoCanto=25",
+          "restricao": "canto-nao-come-o-ressalto"
+        }
+      ]
+    }
+  },
+  "critico": null,
+  "pessoa": null
+}

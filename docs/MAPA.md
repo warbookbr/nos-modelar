@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2316 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2321 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1126,6 +1126,14 @@
 - `geometria.js` — geometria.js — o fuso e a castanha, em milímetro, com o eixo em y, de 0 ao comprimento.
 - `index.js` — index.js — a família `fuso`: o fuso trapezoidal (ISO 2904) e o de esferas (ISO 3408-2, só o volume de fora), com a castanha flangeada numa posição ao longo d…
 - `tabela.js` — tabela.js — os fusos, em milímetro.
+
+## procedural/familias/gabinete/
+
+- `composicoes.js` — composicoes.js — a composição da família `gabinete`: cada metade é a extrusão em y do retângulo de cantos arredondados menos o vão de dentro; a base ganha o …
+- `derivar.js` — derivar.js — dos parâmetros do gabinete (milímetro) à chamada de composição (metro).
+- `gabinete.test.mjs` — gabinete.test.mjs — a família `gabinete`: cada perfil sai com a base e a tampa, cada uma num pedaço só e sem órfão; a tampa só encosta na base (borda e encai…
+- `geometria.js` — geometria.js — o gabinete de plástico, em milímetro: a caixa de cantos arredondados partida em base e tampa num plano horizontal, com o encaixe entre as duas…
+- `index.js` — index.js — a família `gabinete`: a caixa de equipamento de plástico, partida em base e tampa, com o encaixe entre as duas e os ressaltos para parafuso. A geo…
 
 ## procedural/familias/guia-linear/
 
