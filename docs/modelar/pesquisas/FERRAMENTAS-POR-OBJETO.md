@@ -25,7 +25,7 @@ Os tipos são três. O modificador age sobre uma forma que já existe; o gerador
 | 11 | perfil estrutural (`perfil`) | gerador | 43 (12%) | 18 | parcial | estende uma seção normalizada (I, H, U, L, tubo, alumínio ranhurado) ao longo de uma linha, com cortes de ponta |
 | 12 | manopla e botão (`manopla`) | especializado | 42 (11%) | 14 | parcial | gera botão rotativo, manípulo, volante e cabo ergonômico com furo de eixo e estrias |
 | 13 | guia linear (`guia`) | especializado | 32 (9%) | 13 | parcial | gera trilho e carro, corrediça de gaveta e guia em V por tamanho e curso |
-| 14 | tubulação com conexões (`tubulacao`) | gerador | 27 (7%) | 11 | não | traça uma rede de tubos e põe sozinha as curvas, tês, reduções, flanges e válvulas por bitola |
+| 14 | tubulação com conexões (`tubulacao`) | gerador | 27 (7%) | 11 | tem | traça uma rede de tubos e põe sozinha as curvas, tês, reduções, flanges e válvulas por bitola |
 | 15 | engrenagens (`engrenagem`) | especializado | 26 (7%) | 11 | parcial | gera engrenagem reta, helicoidal, cônica, sem-fim, cremalheira e catraca com dente evolvente por módulo e número de dentes, e diz a distância entre centros do par |
 | 16 | molas (`mola`) | especializado | 26 (7%) | 10 | parcial | gera mola de compressão, tração com ganchos e torção com braços, com espiras fechadas nas pontas e comprimento entre dois pontos |
 | 17 | rosca (`rosca`) | especializado | 26 (7%) | 13 | parcial | faz rosca macho ou fêmea métrica, trapezoidal ou de tampa, em qualquer cilindro ou furo |
@@ -71,7 +71,6 @@ As ferramentas que não existem ou existem em parte, na mesma ordem, com o que j
 - perfil estrutural (`parcial`, 43 objetos): extensão `estruturaDeBarras`: tubo redondo, quadrado, retangular e cantoneira entre nós; I, H, U e alumínio ranhurado não.
 - manopla e botão (`parcial`, 42 objetos): os botões giratórios e de pressão e os puxadores dentro das famílias `aparelho-de-caixa` e `movel-de-caixa`; manopla avulsa, volante e cabo ergonômico com furo de eixo e estrias não.
 - guia linear (`parcial`, 32 objetos): trilho simples de gaveta e de porta de correr dentro da família `movel-de-caixa`, com articulação prismática; trilho e carro avulsos e guia em V não.
-- tubulação com conexões (`não`, 27 objetos): nem esboço nem núcleo.
 - engrenagens (`parcial`, 26 objetos): família `engrenagem`: a reta de dente evolvente pelo perfil de referência tipo A da ISO 53 (de 17 a 200 dentes, módulo de 0,5 a 10) e a catraca de dente de serra, com cubo, furo e a porta do eixo; família `cremalheira`: a cremalheira reta do mesmo perfil, até 60 dentes; e o par engrenado e o pinhão sobre a cremalheira, com a distância entre centros, a folga entre flancos e a fase (`parDeEngrenagens` e `pinhaoECremalheira` em `engrenamento.js`); a helicoidal, a cônica e o sem-fim não.
 - molas (`parcial`, 26 objetos): família `mola`: compressão de pontas encostadas, tração com gancho em cada ponta e torção com braços retos, por fio, diâmetro externo, comprimento livre e espiras; ponta retificada, gancho de outros tipos e mola montada entre dois pontos não.
 - rosca (`parcial`, 26 objetos): a rosca externa do parafuso da família `fixador`: o filete de perfil trapezoidal varrido pela `helice` do `friso` sobre o núcleo no diâmetro menor, cosmética (sólido à parte, `rosca` 1) ou fundida num corpo só que passa no STEP (`rosca` 2, cerca de 1 s por parafuso); rosca interna e rosca fina não.
@@ -102,10 +101,6 @@ As ferramentas que não existem ou existem em parte, na mesma ordem, com o que j
 - ressalto para parafuso (`não`, 1 objetos): nem esboço nem núcleo.
 
 ## Cada ferramenta
-
-### tubulação com conexões (`tubulacao`)
-
-Traça uma rede de tubos e põe sozinha as curvas, tês, reduções, flanges e válvulas por bitola. Parâmetros: traçado, bitola, tipo de conexão. Referências: FreeCAD: Dodo e Flamingo; Plant 3D (conceito de catálogo de conexões). Aqui: não, nem esboço nem núcleo. Atende 27 objetos em 11 famílias.
 
 ### tecido e estofado (`tecido`)
 
@@ -270,6 +265,10 @@ Gera eixo por trechos com diâmetro, rasgo de chaveta, ranhura de anel elástico
 ### roda e pneu (`rodaPneu`)
 
 Gera aro, disco ou raios, cubo com furação e pneu com seção e banda, que encaixam por aro. Parâmetros: aro, largura, seção, raios ou disco, furação, banda. Referências: Blender: modelagem por Screw e Array (técnica). Aqui: tem, família `roda-pneu` 2.0: de 50 a 2000 mm, pneumático, maciço, sem pneu e com garra, disco, raiada de um plano e de duas flanges, sete perfis prontos e portas de eixo, assento e furos. Atende 49 objetos em 11 famílias.
+
+### tubulação com conexões (`tubulacao`)
+
+Traça uma rede de tubos e põe sozinha as curvas, tês, reduções, flanges e válvulas por bitola. Parâmetros: traçado, bitola, tipo de conexão. Referências: FreeCAD: Dodo e Flamingo; Plant 3D (conceito de catálogo de conexões). Aqui: tem, a família `tubulacao` (trecho, curva, tampão, tê, redução, flange de pescoço e válvulas de esfera e de gaveta) e `pecasDaRede`, que lê o traçado de nós e trechos com bitola de aço (ASME) ou PVC (NBR 5648), corta cada trecho e põe cada conexão com as bocas casadas; tê inclinado, cruzeta e cobre não. Atende 27 objetos em 11 famílias.
 
 ## Objetos
 

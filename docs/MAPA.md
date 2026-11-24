@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2265 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2267 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -585,6 +585,10 @@
 
 - `PROPOSTA-DO-ITEM.md` — Proposta para o nos-mecatronica: o item `ligacoes` no pedido 1.1
 - `README.md` — Trilhas da placa: a linha de base, as regras e a lista de exemplo
+
+## docs/modelar/banco-de-provas/tubulacao-2026-11-23/
+
+- `README.md` — Tubulação com conexões
 
 ## docs/modelar/blender/
 
@@ -3456,6 +3460,7 @@
 
 ## tools/fixtures/tubulacao/
 
+- `exportacao.test.mjs` — exportacao.test.mjs — o gate 4 do plano da tubulação: a rede de prova sai abaixo de dez segundos e em STEP facetado e em OBJ pelos exportadores do projeto, c…
 - `rede.mjs` — rede.mjs — a receita de uma rede de tubos: as peças de `pecasDaRede` postas pelo `instanciaDeFamilia`, uma chamada por peça, com a base encadeada e o nome de…
 - `rede.test.mjs` — rede.test.mjs — a fatia 2 do plano da tubulação: o zigue-zague de aço de 2" com três curvas de raio longo e o tampão sai com cada peça no lugar, os tubos no …
 - `tracado.test.mjs` — tracado.test.mjs — a fatia 1 do plano da tubulação: a tabela de bitolas e a leitura do traçado, com a conexão de cada nó, o comprimento de corte de cada trec…

@@ -1,6 +1,6 @@
 # Tubulação com conexões: a rede de tubos por traçado e bitola, com as conexões postas sozinhas
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `procedural/familias/tubulacao/`, `procedural/familias/index.js`, `tools/fixtures/tubulacao/`, `docs/modelar/banco-de-provas/tubulacao-2026-11-23/`, `docs/modelar/ferramentas-por-objeto.json`, `tools/modelar/capacidade.mjs`.
 
@@ -67,7 +67,7 @@ Cada fatia cabe numa sessão de agente despachado, entrega o teste dela e deixa 
 2. Feita em 2026-11-24: os trechos cortados, as curvas e os tampões, com as portas, e a aprovação da pessoa por imagem.
 3. Feita em 2026-11-24: o tê de 90 graus e a redução, com a medida da versão oca do tê, e a aprovação da pessoa.
 4. Feita em 2026-11-24: o flange e a válvula como acessórios no nó, e a aprovação da pessoa.
-5. A rede de prova, o banco de provas, o mapa de ferramentas, a ficha e o fechamento.
+5. Feita em 2026-11-24: a rede de prova, o banco de provas, o mapa de ferramentas, a ficha e o fechamento.
 
 ## Decisão da pessoa
 
@@ -86,3 +86,5 @@ Fatia 3, em 2026-11-24. A família ganhou o tê reto (forma 4: a passagem e a de
 Fatia 4, em 2026-11-24. A tabela ganhou o flange de pescoço de aço da ASME B16.5 classe 150 (diâmetro, espessura sem o ressalto, círculo, número e diâmetro dos furos, cubo e comprimento pelo pescoço, lidos na projectmaterials.com) e a face a face da válvula flangeada classe 150 da ASME B16.10 (esfera de passagem curta e gaveta). A família faz o flange (forma 6) e as válvulas de esfera (7) e de gaveta (8) como uma lista de sólidos torneados e extrudados, com os furos dos parafusos por `arranja` radial. No traçado, a ponta com `fim: 'flange'` ganha o flange, com a porta na face, e o nó reto com `valvula` ganha a válvula entre dois flanges, com a haste para cima e os furos dos três alinhados. A válvula de esfera de 5" é recusada, porque a B16.10 não a define; o corpo, a alavanca e o volante saem de proporções da família, porque nenhuma norma os mede. A rede de prova de dez nós monta em 2,5 s com os 21 encontros só encostando. A camada mecânica foi gravada depois da aprovação da pessoa por imagem.
 
 ## Fechamento
+
+Concluído em 2026-11-24. O gate de saída está cumprido: a tabela e o traçado têm teste com cada recusa; as oito formas da família `tubulacao` têm perfil, conferência e o veredito da pessoa por imagem em `aprovacao.json`; a rede de prova `REDE_DE_PROVA` tem dez nós, três curvas, um tê, uma redução, dois flanges de ponta e duas válvulas, cada encaixe só encosta (21) e o corte de cada trecho é a distância menos os avanços; ela monta em cerca de 2,5 s e sai em STEP e OBJ com as partes nomeadas (`tools/fixtures/tubulacao/exportacao.test.mjs`). A ficha `pecasDaRede` está em `npm run capacidade`, o mapa de ferramentas dá a tubulação como existente e o banco de provas está em `docs/modelar/banco-de-provas/tubulacao-2026-11-23/`. Ficaram fora, como o plano exclui, o tê inclinado, a cruzeta, a curva em gomos e o cobre; a válvula de esfera de 5" é recusada porque a norma não a define, e o corpo, a alavanca e o volante saem de proporção da família.

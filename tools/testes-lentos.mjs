@@ -19,6 +19,7 @@ import { lerHistorico } from './vitest-duracoes.mjs';
 export const TESTES_LENTOS = [
   /* 2026-11-24: os 14 perfis de polia, engrenagem e cremalheira exportados em STEP e OBJ; uns 27 s sozinho (plano de engrenagem, polia e correia, fatia 6) */
   'tools/fixtures/transmissao/exportacao.test.mjs',
+  'tools/fixtures/tubulacao/exportacao.test.mjs',
   /* 2026-11-23: o pedido de prova do braço respondido e o recusado, cada um exportando a ficha do braço inteiro; uns 70 s (plano da ponte, fatia 4) */
   'tools/modelar/conferir-pedido.test.mjs',
   /* 2026-11-23: a ficha do braço exportada duas vezes, cada uma resolvendo a montagem inteira; uns 60 s (plano da ponte, fatia 1) */

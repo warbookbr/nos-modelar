@@ -163,8 +163,8 @@
       "automatiza": "traça uma rede de tubos e põe sozinha as curvas, tês, reduções, flanges e válvulas por bitola",
       "parametros": "traçado, bitola, tipo de conexão",
       "referencias": ["FreeCAD: Dodo e Flamingo", "Plant 3D (conceito de catálogo de conexões)"],
-      "aqui": "não",
-      "onde": "nem esboço nem núcleo"
+      "aqui": "tem",
+      "onde": "a família `tubulacao` (trecho, curva, tampão, tê, redução, flange de pescoço e válvulas de esfera e de gaveta) e `pecasDaRede`, que lê o traçado de nós e trechos com bitola de aço (ASME) ou PVC (NBR 5648), corta cada trecho e põe cada conexão com as bocas casadas; tê inclinado, cruzeta e cobre não"
     },
     "elos": {
       "nome": "elos ao longo de caminho fechado",

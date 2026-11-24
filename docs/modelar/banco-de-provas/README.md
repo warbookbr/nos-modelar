@@ -88,4 +88,5 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
 - [Tolerância do STEP: o acervo exportado antes e depois da tolerância em milímetro](tolerancia-do-step-2026-11-22/README.md) — `tolerancia-do-step-2026-11-22`
 - [Transmissão: polias, correias, engrenagens e cremalheira](transmissao-2026-11-23/README.md) — `transmissao-2026-11-23`
 - [Trilhas da placa: a linha de base, as regras e a lista de exemplo](trilhas-da-placa-2026-11-23/README.md) — `trilhas-da-placa-2026-11-23`
+- [Tubulação com conexões](tubulacao-2026-11-23/README.md) — `tubulacao-2026-11-23`
 <!-- indice-do-banco:fim -->

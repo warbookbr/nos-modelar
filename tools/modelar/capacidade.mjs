@@ -62,6 +62,7 @@ export const CAPACIDADES = Object.freeze({
   transmissaoDentada: { arquivo: 'procedural/familias/polia-e-correia/correia.js', funcao: 'transmissaoDentada', de: 'procedural/familias/polia-e-correia/correia.js' },
   transmissaoPorAtrito: { arquivo: 'procedural/familias/polia-e-correia/correia.js', funcao: 'transmissaoPorAtrito', de: 'procedural/familias/polia-e-correia/correia.js' },
   parDeEngrenagens: { arquivo: 'procedural/familias/engrenagem/engrenamento.js', funcao: 'parDeEngrenagens', de: 'procedural/familias/engrenagem/engrenamento.js' },
+  pecasDaRede: { arquivo: 'procedural/familias/tubulacao/rede.js', funcao: 'pecasDaRede', de: 'procedural/familias/tubulacao/rede.js' },
   pinhaoECremalheira: { arquivo: 'procedural/familias/engrenagem/engrenamento.js', funcao: 'pinhaoECremalheira', de: 'procedural/familias/engrenagem/engrenamento.js' },
 });
 

@@ -13,7 +13,24 @@
    a face no nó, e a porta fica na face; o nó com válvula ganha a válvula com a haste para cima (+y do mundo, ou +x quando o
    trecho é vertical), no múltiplo de 7,5° mais perto, e um flange de cada lado, com os furos dos três alinhados.
    Quem põe as peças na receita é o `instanciaDeFamilia`, uma chamada por
-   peça com a base encadeada. */
+   peça com a base encadeada.
+
+   FICHA pecasDaRede
+   serve: a rede de tubos de um traçado: cada trecho cortado no comprimento certo e cada curva, tê, redução, tampão, flange e
+     válvula posta sozinha no nó, com as bocas casadas, como a lista de peças da família `tubulacao` com a pose de cada uma.
+   quando: tubulação de aço (ASME, 1/2" a 8") ou PVC soldável (NBR 5648, 20 a 110 mm) com curvas de 15° a 90°, tê reto,
+     redução concêntrica; flange e válvula só em aço. Tê inclinado, cruzeta e curva em gomos ficam fora.
+   unidades: posições do traçado e medidas em mm; a pose sai em metro, com giros em graus.
+   campos:
+     material: 'aco' ou 'pvc'.
+     nos: [{ nome, posicao: [x, y, z], fim?: 'aberta' | 'tampao' | 'flange', valvula?: 'esfera' | 'gaveta' }].
+     trechos: [{ de, para, bitola }], com a bitola pelo nome da tabela ('2', '1.1/2', '50').
+   devolve: { pecas: [{ nome, parametros, pose }], portas, encostos, desencontros, trechos (com o corte), nos } e recusa
+     dizendo o nó ou o trecho quando o traçado não tem conexão.
+   exemplo:
+     pecasDaRede({ material: 'aco', nos: [{ nome: 'a', posicao: [0, 0, 0], fim: 'flange' }, { nome: 'b', posicao: [500, 0, 0] }, { nome: 'c', posicao: [500, 400, 0] }], trechos: [{ de: 'a', para: 'b', bitola: '2' }, { de: 'b', para: 'c', bitola: '2' }] })
+   peça: tools/fixtures/tubulacao/rede.mjs (`receitaDaRede` põe cada peça pelo `instanciaDeFamilia` e declara os encostos).
+   FIM DA FICHA */
 import { lerTracado } from './tracado.js';
 
 const sub = (a, b) => a.map((x, k) => x - b[k]);
