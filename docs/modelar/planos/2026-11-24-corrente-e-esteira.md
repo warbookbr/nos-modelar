@@ -1,6 +1,10 @@
 # Corrente e esteira: roda dentada, corrente de rolos e esteira de sapatas em volta de rodas
 
-**Estado:** rascunho
+**Estado:** ativo
+
+**Território:** `procedural/familias/roda-dentada/`, `procedural/familias/corrente/`, `procedural/familias/esteira/`, `procedural/familias/index.js`, `tools/fixtures/corrente-e-esteira/`, `docs/modelar/banco-de-provas/corrente-e-esteira-2026-11-24/`, `docs/modelar/ferramentas-por-objeto.json`, `tools/modelar/capacidade.mjs`.
+
+Ativado pela pessoa em 2026-11-24, para que agentes despachados avancem nas fatias uma a uma.
 
 **Responsável:** a IA da sessão ou o agente despachado de cada fatia; a pessoa aprova a forma de cada família por imagem e decide o que está em Decisão da pessoa.
 
