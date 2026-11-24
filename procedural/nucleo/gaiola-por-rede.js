@@ -745,6 +745,7 @@ function semCoordenadasDa(definicao) {
   return {
     ...definicao,
     curvas: definicao.curvas.map((c) => ({ ...c, pontos: c.pontos.map((p) => (typeof p === 'string' ? p : null)) })),
+    ...(Array.isArray(definicao.retalhos) ? { retalhos: definicao.retalhos.map(({ superficie: _, ...resto }) => resto) } : {}),
     ...(definicao.nos ? { nos: Object.fromEntries(Object.entries(definicao.nos).map(([n, d]) => [n, Array.isArray(d) ? null : d])) } : {}),
   };
 }
@@ -1202,7 +1203,8 @@ export function gaiolaPorRede(definicaoDada) {
   const retalhos = [];
   const nomesDeRetalho = new Set();
   for (const [k, r] of definicao.retalhos.entries()) {
-    exigirCampos(r, ['nome', 'borda', 'divisoes'], `o retalho ${k}`);
+    exigirCampos(r, ['nome', 'borda', 'divisoes', 'superficie'], `o retalho ${k}`);
+    if (r.superficie != null && typeof r.superficie !== 'function') falha(`o retalho ${citar(r.nome ?? k)} declara superficie que não é função`);
     if (typeof r.nome !== 'string' || !r.nome) falha(`o retalho ${k} precisa de nome (texto não vazio)`);
     if (nomesDeRetalho.has(r.nome)) falha(`o nome de retalho ${citar(r.nome)} aparece mais de uma vez`);
     nomesDeRetalho.add(r.nome);
@@ -1232,7 +1234,7 @@ export function gaiolaPorRede(definicaoDada) {
       if (de === ate) falha(`o lado ${j + 1} do retalho ${citar(r.nome)} começa e termina no nó ${citar(de)}; o lado precisa ir de um nó a outro`);
       return { curva: l.curva, de, ate };
     });
-    retalhos.push({ nome: r.nome, lados, divisoes: r.divisoes ?? null });
+    retalhos.push({ nome: r.nome, lados, divisoes: r.divisoes ?? null, superficie: r.superficie ?? null });
   }
 
   /* ---- os arcos: a curva partida nos nós ---- */
@@ -1435,7 +1437,7 @@ export function gaiolaPorRede(definicaoDada) {
           const a = P(s0[i]); const b = P(s1[j]); const c = P(s2[nU - i]); const d = P(s3[nV - j]);
           const p = [0, 1, 2].map((q) => (1 - v) * a[q] + v * c[q] + (1 - u) * d[q] + u * b[q]
             - ((1 - u) * (1 - v) * c00[q] + u * (1 - v) * c10[q] + u * v * c11[q] + (1 - u) * v * c01[q]));
-          novoInterior(r.nome, id(i, j), p);
+          novoInterior(r.nome, id(i, j), r.superficie ? r.superficie(p) : p);
         }
       }
       for (let j = 0; j < nV; j++) for (let i = 0; i < nU; i++) faces.push([id(i, j), id(i + 1, j), id(i + 1, j + 1), id(i, j + 1)]);

@@ -300,4 +300,45 @@ describe('faixaDeContornoNaRede', () => {
     expect(rede.avisos.some((a) => a.ref === 'extraordinarioEmVinco' && a.ponto === 'E')).toBe(true);
     expect(rede.avisos.some((a) => a.ref === 'cordaLongaEmTransicao' && a.curva === 'diag')).toBe(true);
   });
+
+  it('retalho.superficie projeta o miolo do retalho na superfície curva real sem afundamento de Coons', () => {
+    const P = (x, z) => [x, alturaSuperficie(x, z), z];
+    const nosBase = { E0: P(0, 0), E1: P(0, ALTURA), D1: P(LARGURA, ALTURA), D0: P(LARGURA, 0) };
+    const faixa = faixaDeContornoNaRede({
+      nome: 'proj',
+      contorno: pontosDoArco(13),
+      fora: [0, 1, 0],
+      projetar: projetarNaChapa,
+      lado: 'dentro',
+      deslocamentoBaseMm: 8,
+      faixas: [{ larguraMm: 18, deslocamentoMm: 12 }, { larguraMm: 22, deslocamentoMm: 0, vinco: 0.6 }],
+      ancoras: [0, 3, 9, 12],
+      vao: {
+        baseFrente: 'E0', topoFrente: 'E1', topoTras: 'D1', baseTras: 'D0',
+        curvaFrente: 'esq', curvaTopo: 'topo', curvaTras: 'dir',
+        nosDoVao: nosBase, divisoesRadiais: 2,
+      },
+    });
+    const rede = gaiolaPorRede({
+      passo: 180,
+      fora: [0, 1, 0],
+      nos: { ...nosBase, ...faixa.nos },
+      curvas: [
+        ...faixa.curvas,
+        { nome: 'esq', pontos: ['E0', P(0, 225), 'E1'] },
+        { nome: 'dir', pontos: ['D0', P(LARGURA, 225), 'D1'] },
+        { nome: 'topo', pontos: ['E1', P(400, ALTURA), 'D1'] },
+      ],
+      retalhos: faixa.retalhos,
+      interior: false,
+      liso: false,
+    });
+    const internos = Object.entries(rede.origens)
+      .filter(([, o]) => o.tipo === 'retalho' && o.retalho === 'proj_pFrente')
+      .map(([id]) => rede.pontos[id].map((v) => v * 1000));
+    expect(internos.length).toBeGreaterThan(0);
+    for (const [x, y, z] of internos) {
+      expect(Math.abs(y - alturaSuperficie(x, z))).toBeLessThan(0.05);
+    }
+  });
 });

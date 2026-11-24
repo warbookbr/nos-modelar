@@ -438,17 +438,24 @@ export function faixaDeContornoNaRede({
     curvas.push({ nome: `${nome}_ligF`, pontos: amostrarNaSuperficie(n1, topoFrente, Math.max(2, nRad)), passo: arred(passoLigF) });
     curvas.push({ nome: `${nome}_ligT`, pontos: amostrarNaSuperficie(n2, topoTras, Math.max(2, nRad)), passo: arred(passoLigT) });
 
+    const superficieRetalho = projetar
+      ? (p) => arredP(normalLocal(p, foraUnit, projetar).ponto)
+      : undefined;
+
     retalhos.push({
       nome: `${nome}_pFrente`,
       borda: [`${nome}_solF`, { curva: curvaExterna, de: n0, ate: n1 }, `${nome}_ligF`, curvaFrente],
+      ...(superficieRetalho ? { superficie: superficieRetalho } : {}),
     });
     retalhos.push({
       nome: `${nome}_pTopo`,
       borda: [{ curva: curvaExterna, de: n1, ate: n2 }, `${nome}_ligT`, curvaTopo, `${nome}_ligF`],
+      ...(superficieRetalho ? { superficie: superficieRetalho } : {}),
     });
     retalhos.push({
       nome: `${nome}_pTras`,
       borda: [{ curva: curvaExterna, de: n2, ate: n3 }, `${nome}_solT`, curvaTras, `${nome}_ligT`],
+      ...(superficieRetalho ? { superficie: superficieRetalho } : {}),
     });
   }
 

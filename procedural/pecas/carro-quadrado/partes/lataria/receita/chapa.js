@@ -1,5 +1,6 @@
 /* carro-quadrado/lataria/receita/chapa.js — gaiola 100% quad da chapa contínua com arcos de roda estampados na própria malha via faixaDeContornoNaRede. */
 import { gaiolaPorRede } from '../../../../../nucleo/gaiola-por-rede.js';
+import { curvaCentripeta } from '../../../../../nucleo/gaiola-interpolada.js';
 import { faixaDeContornoNaRede } from '../../../../../nucleo/faixa-de-contorno-na-rede.js';
 
 export const m = (mm) => mm / 1000;
@@ -36,35 +37,52 @@ function pontoFrenteOuTraseira(arr, j) {
   return arr[j - 1];
 }
 
-/* interpola x(z, y) da pele externa da lateral a partir de TABELA.secoes (em mm) */
-function xPeleLateral(T, z, y) {
+/* interpola x(z, y) da pele externa da lateral usando a mesma Catmull-Rom centrípeta de gaiolaPorRede (zero degrau entre seções e anéis) */
+function criarAvaliadorLateral(T) {
   const zs = T.estacoes;
-  let i0 = 0;
-  for (let i = 0; i < zs.length - 1; i += 1) {
-    if (z <= zs[i] && z >= zs[i + 1]) { i0 = i; break; }
-  }
-  const zA = zs[i0];
-  const zB = zs[i0 + 1];
-  const tz = zA === zB ? 0 : Math.max(0, Math.min(1, (zA - z) / (zA - zB)));
-  const xEmSecao = (sec) => {
-    for (let j = 0; j < 4; j += 1) {
-      const [x0, y0] = sec[j];
-      const [x1, y1] = sec[j + 1];
-      if (y <= y1 || j === 3) {
-        const ty = y1 === y0 ? 0 : Math.max(0, Math.min(1, (y - y0) / (y1 - y0)));
-        return x0 + (x1 - x0) * ty;
-      }
-    }
-    return sec[0][0];
-  };
-  return xEmSecao(T.secoes[String(zA)]) + (xEmSecao(T.secoes[String(zB)]) - xEmSecao(T.secoes[String(zA)])) * tz;
-}
+  const curvasSec = zs.map((z) => {
+    const pts = [0, 1, 2, 3, 4, 5].map((j) => {
+      const p = pontoSecao(T, z, j);
+      return [p[0], p[1]];
+    });
+    return { pts, curva: curvaCentripeta(pts, `sec_${z}`) };
+  });
 
-function normalLateral(T, z, y) {
-  const dxdy = (xPeleLateral(T, z, y + 4) - xPeleLateral(T, z, y - 4)) / 8;
-  const dxdz = (xPeleLateral(T, z + 4, y) - xPeleLateral(T, z - 4, y)) / 8;
-  const l = Math.hypot(1, dxdy, dxdz);
-  return [1 / l, -dxdy / l, -dxdz / l];
+  const xEmCurva = ({ pts, curva }, y) => {
+    if (y <= pts[0][1]) return pts[0][0];
+    const ult = pts[pts.length - 1];
+    if (y >= ult[1]) return ult[0];
+    let lo = 0;
+    let hi = 1;
+    for (let it = 0; it < 16; it += 1) {
+      const mid = (lo + hi) / 2;
+      if (curva.naFracao(mid)[1] < y) lo = mid;
+      else hi = mid;
+    }
+    return curva.naFracao((lo + hi) / 2)[0];
+  };
+
+  const xPele = (z, y) => {
+    let i0 = 0;
+    for (let i = 0; i < zs.length - 1; i += 1) {
+      if (z <= zs[i] && z >= zs[i + 1]) { i0 = i; break; }
+    }
+    const zA = zs[i0];
+    const zB = zs[i0 + 1];
+    const tz = zA === zB ? 0 : Math.max(0, Math.min(1, (zA - z) / (zA - zB)));
+    const xA = xEmCurva(curvasSec[i0], y);
+    const xB = xEmCurva(curvasSec[i0 + 1], y);
+    return xA + (xB - xA) * tz;
+  };
+
+  const normalPele = (z, y) => {
+    const dxdy = (xPele(z, y + 4) - xPele(z, y - 4)) / 8;
+    const dxdz = (xPele(z + 4, y) - xPele(z - 4, y)) / 8;
+    const l = Math.hypot(1, dxdy, dxdz);
+    return [1 / l, -dxdy / l, -dxdz / l];
+  };
+
+  return { xPele, normalPele };
 }
 
 export function derivarChapa(T) {
@@ -197,7 +215,8 @@ export function derivarChapa(T) {
     }
   }
 
-  /* arcos de roda dianteiro (vão i = 1) e traseiro (vão i = 5) estampados na própria malha via faixaDeContornoNaRede (modo vao + anelDeAmortecimentoMm) */
+  /* arcos de roda dianteiro (vão i = 1) e traseiro (vão i = 5) estampados na própria malha via faixaDeContornoNaRede (modo vao + superficie Catmull-Rom exata) */
+  const { xPele, normalPele } = criarAvaliadorLateral(T);
   const cantosArcos = [];
   const montarVaoArco = (pref, iVao, arco) => {
     const { z: zC, y: yC, raio: R } = arco;
@@ -210,7 +229,7 @@ export function derivarChapa(T) {
       const ang = angMin + ((angMax - angMin) * k) / (N - 1);
       const z = zC + R * Math.cos(ang);
       const y = k === 0 || k === N - 1 ? yBase : yC + R * Math.sin(ang);
-      ptsArco.push(fixo([xPeleLateral(T, z, y), y, z]));
+      ptsArco.push(fixo([xPele(z, y), y, z]));
     }
 
     const solF = nome(iVao, 0);
@@ -222,10 +241,13 @@ export function derivarChapa(T) {
       nome: pref,
       contorno: ptsArco,
       fora: [1, 0, 0],
-      projetar: ([, y, z]) => ({
-        ponto: [xPeleLateral(T, z, y), y, z],
-        normal: normalLateral(T, z, y),
-      }),
+      projetar: ([, y, z]) => {
+        const yCl = Math.max(yBase, y);
+        return {
+          ponto: [xPele(z, yCl), yCl, z],
+          normal: normalPele(z, yCl),
+        };
+      },
       lado: 'fora',
       deslocamentoBaseMm: 8,
       vincoBase: 0.35,
