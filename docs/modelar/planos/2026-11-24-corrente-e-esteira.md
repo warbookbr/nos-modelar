@@ -32,7 +32,7 @@ Migrar a corrente da bicicleta para a família: ADIAR. O plano não mexe em peç
 
 1. A roda dentada simples da ISO 606, série B europeia, para as correntes 06B, 08B, 10B, 12B e 16B, de 9 a 80 dentes, com o perfil do dente da norma (raio de assento do rolo, raio do flanco e chanfro lateral), o cubo e o furo.
 2. A corrente de rolos simples das mesmas séries, com placa interna, placa externa, pino e rolo como volume, e `transmissaoPorCorrente` com o número par de elos, a distância recalculada e o giro de cada roda.
-3. A esteira de sapatas de aço com garra, em volta de uma roda motriz e de uma roda guia, com dois ou mais roletes por baixo, por passo e largura de sapata declarados, e o ajudante que calcula o número de sapatas e a tensão por distância.
+3. A esteira de sapatas de aço com garra, em volta de uma roda motriz com o dente da roda dentada da ISO 606 e de uma roda guia, com dois ou mais roletes por baixo, por passo e largura de sapata declarados, e o ajudante que calcula o número de sapatas e a tensão por distância.
 4. Uma transmissão por corrente e um trem de esteira de prova na bancada e no banco de provas, o mapa de ferramentas atualizado e as fichas.
 
 ## Excluído
@@ -62,7 +62,7 @@ Cada fatia cabe numa sessão de agente despachado, entrega o teste dela e deixa 
 
 ## Decisão da pessoa
 
-Pendente: se a série B europeia (06B a 16B) é a certa para começar, ou se a série A (ANSI 40 a 80) vem junto; se a esteira começa pela sapata de aço de trator ou pela esteira de robô pequeno, de borracha; e se a roda motriz da esteira usa o dente da roda dentada ou um dente próprio de esteira.
+Decidido em 2026-11-24: a corrente começa pela série B europeia (06B a 16B); a esteira começa pela sapata de aço de trator; e a roda motriz da esteira usa o mesmo dente da roda dentada da ISO 606.
 
 ## Riscos e parada
 
