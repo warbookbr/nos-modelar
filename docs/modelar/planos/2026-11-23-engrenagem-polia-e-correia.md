@@ -1,6 +1,6 @@
 # Engrenagem, polia e correia: o par que transmite movimento por poucos números
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `procedural/familias/polia-e-correia/`, `procedural/familias/engrenagem/`, `tools/fixtures/transmissao/`, `src/autoria/chamar-familia.js`, `docs/modelar/banco-de-provas/transmissao-2026-11-23/`, `procedural/familias/cremalheira/`, `tools/modelar/aprovacao-da-familia.mjs`, `tools/modelar/lascas-da-malha.mjs`, `tools/modelar/lascas-da-malha.test.mjs`, `procedural/familias/index.js`, `docs/modelar/ferramentas-por-objeto.json`, `tools/modelar/capacidade.mjs`.
 
@@ -60,7 +60,7 @@ O núcleo não ganha nome de objeto nem operação nova. O acervo sai igual, com
 3. Feita em 2026-11-23: o conjunto de duas polias dentadas com a correia fechada, com o par GT2 de 20 e 80 dentes medido.
 4. Feita em 2026-11-23: a família `engrenagem` com a reta e a catraca e a família `cremalheira`; a helicoidal saiu para o backlog.
 5. Feita em 2026-11-24: o par engrenado e o pinhão sobre a cremalheira, com a fase e a medida de folga nas posições amostradas.
-6. O registro das famílias, o mapa de ferramentas, as fichas e o fechamento.
+6. Feita em 2026-11-24: o registro das famílias, o mapa de ferramentas, as fichas, a exportação e o fechamento.
 
 ## Decisão da pessoa
 
@@ -83,3 +83,9 @@ Fatia 4, em 2026-11-23. A família `engrenagem` gera a reta de dente evolvente e
 Fatia 5, em 2026-11-24. `engrenamento.js` da família `engrenagem` dá o par de retas, na distância a = m·(z1 + z2)/2 afastada de j / (2·tan 20°) para a folga entre flancos j (0,05 módulo por padrão, regra da família, porque o dente de meio passo dá folga nula na distância nominal), com a motora de dente voltado para a movida e a movida de vão voltado para a motora, e o pinhão sobre a cremalheira, com o centro a rp mais o mesmo afastamento acima da linha primitiva. O par de módulo 1 com 20 e 40 dentes sai a 30,069 mm, medidos na malha até 0,01 mm; nenhum dente atravessa o outro em quatro posições de um passo da motora (os dentes são iguais, e o engrenamento se repete a cada passo) nem em três posições de um passo da cremalheira; a medida de contatos acusa o par apertado, a motora meio dente fora de fase e o pinhão girando ao contrário (`tools/fixtures/transmissao/par-de-engrenagens.test.mjs`).
 
 ## Fechamento
+
+Concluído em 2026-11-24. Entregues as famílias `polia-e-correia` (dentada GT2, HTD 3M, HTD 5M e T5, em V das seções Z, A e B da ISO 4183 e lisa), `engrenagem` (reta de dente evolvente pela ISO 53 e catraca) e `cremalheira` (o perfil da ISO 53 em linha, até 60 dentes), cada uma com perfis, teste, camada mecânica gravada e a forma aprovada pela pessoa por imagem; a correia dentada, em V e lisa entre duas polias (`correia.js`); o par de engrenagens e o pinhão sobre a cremalheira (`engrenamento.js`); as fichas `transmissaoDentada`, `transmissaoPorAtrito`, `parDeEngrenagens` e `pinhaoECremalheira` em `npm run capacidade`; o mapa de ferramentas com a polia e a engrenagem como parciais; e, fora do recorte inicial, a reprovação de lasca solta abaixo de 0,02 mm na aprovação de toda família.
+
+O gate de saída passou. 1: a colisão de ids foi descartada com a prova, porque duas instâncias passam pelo `instanciaDeFamilia`, e o núcleo e o acervo não mudaram. 2: cada família com perfis, conferência pelo contrato, teste e o veredito da pessoa. 3: o par de módulo 1 com 20 e 40 dentes e o par GT2 de 20 e 80 dentes com a correia, montados, com a distância entre centros medida igual à calculada até 0,01 mm e nenhum dente atravessando o outro nas posições amostradas. 4: cada perfil abaixo de 2 s, e os 14 exportados em STEP e OBJ com a tolerância de 0,01 mm (`tools/fixtures/transmissao/exportacao.test.mjs`, na lista dos lentos, uns 27 s). 5: gates e CI verdes em cada envio.
+
+Fica fora e foi ao backlog: a engrenagem helicoidal, que pede extrusão com giro no núcleo, e a medida da cremalheira longa no item de `pedacosConvexos`. Ficam para outro plano a cônica, o sem-fim e a coroa, a engrenagem interna, o trem planetário, o tensor e a correia de mais de duas polias, o comprimento comercial da correia em V (ISO 4184) e o uso das polias GT2 no braço de prova, que é decisão do plano dele. As imagens estão em `docs/modelar/banco-de-provas/transmissao-2026-11-23/`.

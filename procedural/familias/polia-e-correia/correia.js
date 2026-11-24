@@ -13,7 +13,41 @@
    em y até a faixa dela ficar na altura da faixa da primeira.
 
    A altura da correia e a do dente vêm da tabela "Timing Belt Tooth Profiles and Pitches" da Pfeifer Industries (GT2 2 mm,
-   HTD 3M e 5M e T5); a GT2 é perfil do fabricante, sem norma pública. */
+   HTD 3M e 5M e T5); a GT2 é perfil do fabricante, sem norma pública.
+
+   FICHA transmissaoDentada
+   serve: a correia dentada fechada entre duas polias dentadas da família `polia-e-correia`: o número inteiro de dentes da
+     correia mais próximo da distância pedida, a distância entre centros recalculada e, com `geometriaDaCorreia` e
+     `passosDaCorreia`, os passos da correia e o giro de cada polia para os dentes caírem nos vãos.
+   quando: duas polias dentadas da mesma correia e largura (GT2, HTD 3M, HTD 5M ou T5); a polia em V e a lisa vão por
+     `transmissaoPorAtrito`. As polias entram pelo `instanciaDeFamilia`, a segunda em x = distanciaEntreCentros.
+   unidades: parâmetros e distância em mm; os passos da correia em metro.
+   campos:
+     parametros1: os parâmetros completos da polia menor (a família com os padrões e o perfil).
+     parametros2: os da polia maior, de mesma correia e largura.
+     distancia: a distância entre centros pedida, em mm, maior que a soma dos raios com a correia.
+   devolve: { distanciaEntreCentros, dentesDaCorreia, comprimento, relacao, ... }; `geometriaDaCorreia(t)` dá giro1, giro2,
+     alturaDaSegunda e os trechos, e `passosDaCorreia(g, { origemId })` os passos.
+   exemplo:
+     transmissaoDentada({ tipo: 1, correia: 1, dentes: 20, diametro: 100, largura: 6, canais: 1, flanges: 1, furo: 5, diametroDoCubo: 16, comprimentoDoCubo: 7 }, { tipo: 1, correia: 1, dentes: 80, diametro: 100, largura: 6, canais: 1, flanges: 0, furo: 8, diametroDoCubo: 22, comprimentoDoCubo: 8 }, 150)
+   peça: tools/fixtures/transmissao/par-gt2.mjs (o par GT2 de 20 e 80 dentes com a correia de 201 dentes).
+   FIM DA FICHA
+
+   FICHA transmissaoPorAtrito
+   serve: a correia em V (seção da DIN 2215, uma volta por canal) ou a lisa entre duas polias da família `polia-e-correia`,
+     na distância pedida, e com `passosDaCorreiaPorAtrito` os passos da correia e a altura da segunda polia.
+   quando: duas polias em V da mesma seção e número de canais, ou duas lisas da mesma largura; a dentada vai por
+     `transmissaoDentada`. O comprimento comercial da ISO 4184 não entra.
+   unidades: parâmetros e distância em mm; os passos em metro.
+   campos:
+     parametros1: os parâmetros completos da polia menor.
+     parametros2: os da polia maior, do mesmo tipo.
+     distancia: a distância entre centros, em mm.
+   devolve: { distanciaEntreCentros, comprimento, relacao, ... }; `passosDaCorreiaPorAtrito(t, { origemId })` dá { passos, alturaDaSegunda, secao }.
+   exemplo:
+     transmissaoPorAtrito({ tipo: 2, correia: 2, dentes: 20, diametro: 120, largura: 6, canais: 1, flanges: 1, furo: 20, diametroDoCubo: 40, comprimentoDoCubo: 20 }, { tipo: 2, correia: 2, dentes: 20, diametro: 200, largura: 6, canais: 1, flanges: 1, furo: 20, diametroDoCubo: 40, comprimentoDoCubo: 20 }, 300)
+   peça: tools/fixtures/transmissao/par-por-atrito.mjs (os pares em V das seções A e B e o par liso).
+   FIM DA FICHA */
 import { CORREIAS_DENTADAS, SECOES_V, geometriaDaPolia } from './geometria.js';
 
 /* altura total da correia e altura do dente, em mm, por correia da família */

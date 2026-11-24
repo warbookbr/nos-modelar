@@ -59,6 +59,10 @@ export const CAPACIDADES = Object.freeze({
   areaDoContorno: { arquivo: 'procedural/nucleo/contorno.js', funcao: 'areaDoContorno', de: 'procedural/nucleo/contorno.js' },
   deslocarContorno: { arquivo: 'procedural/nucleo/contorno.js', funcao: 'deslocarContorno', de: 'procedural/nucleo/contorno.js' },
   contornoComArcos: { arquivo: 'procedural/nucleo/arcos-do-contorno.js', funcao: 'contornoComArcos', de: 'procedural/nucleo/arcos-do-contorno.js' },
+  transmissaoDentada: { arquivo: 'procedural/familias/polia-e-correia/correia.js', funcao: 'transmissaoDentada', de: 'procedural/familias/polia-e-correia/correia.js' },
+  transmissaoPorAtrito: { arquivo: 'procedural/familias/polia-e-correia/correia.js', funcao: 'transmissaoPorAtrito', de: 'procedural/familias/polia-e-correia/correia.js' },
+  parDeEngrenagens: { arquivo: 'procedural/familias/engrenagem/engrenamento.js', funcao: 'parDeEngrenagens', de: 'procedural/familias/engrenagem/engrenamento.js' },
+  pinhaoECremalheira: { arquivo: 'procedural/familias/engrenagem/engrenamento.js', funcao: 'pinhaoECremalheira', de: 'procedural/familias/engrenagem/engrenamento.js' },
 });
 
 export const LIMITE_DE_LINHAS = 60;
