@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2253 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2254 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -682,6 +682,7 @@
 - `2026-11-23-braco-de-prova-duas-juntas.md` — Braço de prova de duas juntas: a forma com os componentes escolhidos na mecatrônica dentro
 - `2026-11-23-engrenagem-polia-e-correia.md` — Engrenagem, polia e correia: o par que transmite movimento por poucos números
 - `2026-11-23-tubulacao-com-conexoes.md` — Tubulação com conexões: a rede de tubos por traçado e bitola, com as conexões postas sozinhas
+- `2026-11-24-encaixe-cilindrico-parcial.md` — Encaixe cilíndrico parcial: o eixo que entra só em parte no furo
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
