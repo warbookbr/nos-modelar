@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2285 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2291 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1091,6 +1091,15 @@
 - `geometria.js` — geometria.js — as medidas do fixador em milímetro, a partir dos parâmetros da família e da tabela ISO.
 - `index.js` — index.js — a família `fixador`: parafuso de cabeça sextavada, allen ou abaulada, porca sextavada e arruela lisa, de M3 a M24 pela tabela ISO de rosca grossa,…
 - `tabela.js` — tabela.js — as medidas métricas de rosca grossa, em mm, por diâmetro nominal: passo (ISO 261), sextavado da cabeça e da porca (ISO 4017 e ISO 4032: chave s, …
+
+## procedural/familias/fuso/
+
+- `composicoes.js` — composicoes.js — a composição da família `fuso`: o núcleo por `lathe`, o filete por `friso` com `helice` (como a rosca do `fixador`) e a castanha flangeada p…
+- `derivar.js` — derivar.js — dos parâmetros do fuso (milímetro) à chamada de composição (metro). O filete do trapezoidal tem quatro pontos e repete o último para chegar aos …
+- `fuso.test.mjs` — fuso.test.mjs — a família `fuso`: cada fuso da tabela sai com o núcleo, o filete e a castanha, sem órfão; o filete cosmético assenta no núcleo como a rosca d…
+- `geometria.js` — geometria.js — o fuso e a castanha, em milímetro, com o eixo em y, de 0 ao comprimento.
+- `index.js` — index.js — a família `fuso`: o fuso trapezoidal (ISO 2904) e o de esferas (ISO 3408-2, só o volume de fora), com a castanha flangeada numa posição ao longo d…
+- `tabela.js` — tabela.js — os fusos, em milímetro.
 
 ## procedural/familias/guia-linear/
 
