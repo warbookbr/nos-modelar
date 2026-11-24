@@ -1,6 +1,10 @@
 # Elementos de máquina: perfil estrutural, guia linear, rolamento com mancal e fuso com castanha
 
-**Estado:** rascunho
+**Estado:** ativo
+
+**Território:** `procedural/familias/perfil-estrutural/`, `procedural/familias/guia-linear/`, `procedural/familias/rolamento/`, `procedural/familias/fuso/`, `procedural/familias/index.js`, `tools/fixtures/elementos-de-maquina/`, `docs/modelar/banco-de-provas/elementos-de-maquina-2026-11-24/`, `docs/modelar/ferramentas-por-objeto.json`, `tools/modelar/capacidade.mjs`.
+
+Ativado pela pessoa em 2026-11-24, para que agentes despachados avancem nas fatias uma a uma.
 
 **Responsável:** a IA da sessão ou o agente despachado de cada fatia; a pessoa aprova a forma de cada família por imagem e decide o que está em Decisão da pessoa.
 
@@ -28,10 +32,10 @@ Perfil estrutural na `estruturaDeBarras`: ADIAR. O plano faz o perfil reto corta
 
 ## Incluído
 
-1. O perfil estrutural reto, com corte reto ou a 45° nas pontas: I e H de abas paralelas e U pelas tabelas públicas de perfis laminados, e o alumínio ranhurado de 20, 30, 40 e 45 mm com a ranhura de cada um.
+1. O perfil estrutural reto, com corte reto ou a 45° nas pontas: I e H de abas paralelas (IPE e HEA) e U pelas tabelas públicas europeias de perfis laminados, e o alumínio ranhurado de 20, 30, 40 e 45 mm com a ranhura de cada um.
 2. A guia linear de esferas, trilho e carro, pelos tamanhos 15, 20, 25 e 30, com a furação do trilho e do carro.
 3. O rolamento rígido de esferas das séries 60 e 62 (furo, diâmetro externo e largura da norma ISO 15), com anéis, esferas e vedação como volume, e o mancal de pedestal com o rolamento alojado.
-4. O fuso trapezoidal (Tr 10 a Tr 40, pela ISO 2904) e o de esferas como volume, com a castanha flangeada.
+4. O fuso trapezoidal (Tr 10 a Tr 40, pela ISO 2904) e o de esferas só com o volume de fora, com a castanha flangeada.
 5. A montagem de prova da mesa linear na bancada e no banco de provas, o mapa de ferramentas atualizado e as fichas em `npm run capacidade`.
 
 ## Excluído
@@ -62,11 +66,11 @@ Cada fatia cabe numa sessão de agente despachado, entrega o teste dela e deixa 
 
 ## Decisão da pessoa
 
-Pendente: se o plano entra com as quatro famílias ou começa pelo perfil e pela guia, que são as mais pedidas; se o fuso de esferas entra só como volume, com as esferas fora; e se as tabelas abertas de perfil laminado em polegada (série americana) ou métrica (europeia, IPE e HEA) vêm primeiro.
+Decidido em 2026-11-24: o plano entra com as quatro famílias; o fuso de esferas sai só com o volume de fora, sem as esferas de dentro; os perfis I, H e U seguem a série europeia em milímetro (IPE e HEA, e o U europeu).
 
 ## Riscos e parada
 
-Se a tabela de um elemento pedir valor que não é de norma pública (a altura do carro da guia, o mancal de pedestal), ele sai por regra declarada da família e a fatia diz qual. Se as esferas do rolamento e do fuso de esferas passarem de dois segundos por peça, elas saem como anel cheio e a fatia volta à pessoa com a medida antes de seguir.
+Se a tabela de um elemento pedir valor que não é de norma pública (a altura do carro da guia, o mancal de pedestal), ele sai por regra declarada da família e a fatia diz qual. Se as esferas do rolamento passarem de dois segundos por peça, elas saem como anel cheio e a fatia volta à pessoa com a medida antes de seguir.
 
 ## Andamento
 
