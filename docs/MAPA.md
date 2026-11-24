@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2254 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2258 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1129,6 +1129,11 @@
 - `index.js` — index.js — a família `superficie-aerodinamica` carregada: o contrato `familia.json`, as composições e o `derivar`. O registro do produto (`procedural/familia…
 - `superficie-aerodinamica.test.js` — superficie-aerodinamica.test.js — a família `superficie-aerodinamica` medida na malha e nos argumentos que o `derivar` entrega. O perfil NACA (o bordo de fug…
 - `superficie.js` — superficie.js — as seções do `loft` de uma superfície aerodinâmica: a parte fixa, o comando de cada lado e as portas, em metro.
+
+## procedural/familias/tubulacao/
+
+- `tabela.js` — tabela.js — as bitolas da tubulação, em milímetro, por material.
+- `tracado.js` — tracado.js — a leitura e a conferência do traçado de uma rede de tubos, em milímetro.
 
 ## procedural/nucleo/
 
@@ -3443,6 +3448,11 @@
 ## tools/fixtures/tres-blocos-vinculados/receitas/
 
 - `bloco.js` — bloco.js — o bloco da fixture neutra "três blocos vinculados", nas três variações que ela usa: só pino, furo e pino, e só furo. Um arquivo só gera as três, p…
+
+## tools/fixtures/tubulacao/
+
+- `tracado.test.mjs` — tracado.test.mjs — a fatia 1 do plano da tubulação: a tabela de bitolas e a leitura do traçado, com a conexão de cada nó, o comprimento de corte de cada trec…
+- `tracados.mjs` — tracados.mjs — os traçados neutros da prova da tubulação: a rede de aço de 2" com duas curvas, um tê e uma redução para 1 1/2", e a de PVC de 50 mm em L. Em …
 
 ## tools/fixtures/uniao-de-tubos/
 

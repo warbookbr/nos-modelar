@@ -63,7 +63,7 @@ O núcleo não ganha nome de objeto nem operação nova, e o acervo sai igual. A
 
 Cada fatia cabe numa sessão de agente despachado, entrega o teste dela e deixa o andamento escrito abaixo antes de passar à seguinte.
 
-1. A tabela de bitolas, a leitura e a conferência do traçado, com a fixture neutra `tools/fixtures/tubulacao/` e as recusas.
+1. Feita em 2026-11-24: a tabela de bitolas, a leitura e a conferência do traçado, com a fixture neutra `tools/fixtures/tubulacao/` e as recusas.
 2. Os trechos cortados, as curvas e os tampões, com as portas, e a aprovação da pessoa por imagem.
 3. O tê de 90 graus e a redução, com a medida da versão oca do tê, e a aprovação da pessoa.
 4. O flange e a válvula como acessórios no nó, e a aprovação da pessoa.
@@ -78,5 +78,7 @@ Decidido em 2026-11-23: a rede sai oca, com a parede visível nas pontas, e a ta
 Se o tê oco por `juncaoDeTubos` não sair sólido fechado, ou passar de dois segundos, ele sai maciço com a boca aberta só nas três pontas, e a fatia volta à pessoa com a medida antes de seguir. Se a curva de toro parcial der lasca na junta com o trecho reto, a fatia mede o número de segmentos que a resolve e o custo, e para se o custo passar do gate 4. Se a tabela pedir um valor de norma que não seja público, ele sai da tabela.
 
 ## Andamento
+
+Fatia 1, em 2026-11-24. `procedural/familias/tubulacao/tabela.js` traz o aço carbono de 1/2" a 8" (diâmetro externo e parede da série 40 da ASME B36.10M, lidos na tabela métrica da Engineering Toolbox; centro à boca da curva de raio longo, do tê, comprimento da redução concêntrica e do tampão da ASME B16.9-2018, lidos no extrato público das tabelas 6.1-1, 6.1-7, 6.1-11 e 6.1-10) e o PVC soldável de 20 a 110 mm (diâmetro externo e parede da NBR 5648/99, lidos no catálogo da Plastubos). 10" e 12" ficaram fora, porque a tabela aberta da parede não os traz, e as conexões de PVC seguem regras da família, porque as fontes abertas não dão a medida delas. `tracado.js` lê o traçado, dá a cada nó a ponta, a curva (de 15° a 90°, avanço R·tan(desvio/2)), a continuação, a redução ou o tê reto, calcula o corte de cada trecho e recusa, dizendo o nó ou o trecho, o nome repetido ou que falta, a bitola fora da tabela, o trecho curto, o cruzamento, o nó de quatro trechos, o desvio de 1° a 15°, a curva acima de 90°, a curva ou o tê entre bitolas e o tê inclinado (`tools/fixtures/tubulacao/tracado.test.mjs`). Uma mudança de desenho: a família do contrato só recebe números, e o traçado é uma lista; a rede passa a ser um ajudante que lê o traçado e põe as peças, e as conexões e os trechos vêm de uma família de números, como a correia sobre as polias.
 
 ## Fechamento
