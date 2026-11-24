@@ -1,0 +1,197 @@
+{
+  "formato": "mecanifica.aprovacao-da-familia@1",
+  "familia": "corrente",
+  "versao": "1.0.0",
+  "mecanica": {
+    "data": "2026-11-24",
+    "pontos": {
+      "minimo": {
+        "parametros": {
+          "alturaDaPlaca": 8.2,
+          "dentes1": 9,
+          "dentes2": 9,
+          "diametroDoPino": 3.28,
+          "diametroDoRolo": 6.35,
+          "distancia": 100,
+          "espessuraExterna": 1.3,
+          "espessuraInterna": 1.3,
+          "larguraInterna": 5.72,
+          "passo": 9.525
+        },
+        "hash": "sha256:f46e2d84778afde14cdbf2bf9f07fdd06120afbd52940c6f80a3064f492d21c6",
+        "medidas": []
+      },
+      "medio": {
+        "parametros": {
+          "alturaDaPlaca": 14.7,
+          "dentes1": 25,
+          "dentes2": 40,
+          "diametroDoPino": 5.08,
+          "diametroDoRolo": 10.16,
+          "distancia": 600,
+          "espessuraExterna": 1.7,
+          "espessuraInterna": 1.7,
+          "larguraInterna": 9.65,
+          "passo": 15.875
+        },
+        "hash": "sha256:c33003aff7044d257ed311e246921ed8c850e32969cd8551f41a9d66aac9f6db",
+        "medidas": []
+      },
+      "maximo": {
+        "parametros": {
+          "alturaDaPlaca": 21,
+          "dentes1": 80,
+          "dentes2": 80,
+          "diametroDoPino": 8.28,
+          "diametroDoRolo": 15.88,
+          "distancia": 3000,
+          "espessuraExterna": 4.15,
+          "espessuraInterna": 3.1,
+          "larguraInterna": 17.02,
+          "passo": 25.4
+        },
+        "hash": "sha256:891dec689fc81d9722871591bd388fafb8548dc5de8fe86ed88e18d21a80cf12",
+        "medidas": []
+      }
+    },
+    "varredura": {
+      "sondas": 20,
+      "recusasDeclaradas": [
+        {
+          "ponto": "alturaDaPlaca=8.2",
+          "restricao": "rolo-dentro-da-placa"
+        },
+        {
+          "ponto": "dentes1=80",
+          "restricao": "distancia-cabe-as-rodas"
+        },
+        {
+          "ponto": "diametroDoPino=8.28",
+          "restricao": "pino-dentro-do-rolo"
+        },
+        {
+          "ponto": "diametroDoRolo=15.88",
+          "restricao": "rolo-dentro-da-placa"
+        },
+        {
+          "ponto": "distancia=100",
+          "restricao": "distancia-cabe-as-rodas"
+        },
+        {
+          "ponto": "passo=25.4",
+          "restricao": "distancia-cabe-as-rodas"
+        }
+      ]
+    },
+    "portas": [],
+    "perfis": {
+      "corrente-06b-12-12": {
+        "parametros": {
+          "alturaDaPlaca": 8.2,
+          "dentes1": 12,
+          "dentes2": 12,
+          "diametroDoPino": 3.28,
+          "diametroDoRolo": 6.35,
+          "distancia": 200,
+          "espessuraExterna": 1.3,
+          "espessuraInterna": 1.3,
+          "larguraInterna": 5.72,
+          "passo": 9.525
+        },
+        "hash": "sha256:2e19ab883741c057ad0f7c18d1ea7a581c6703566293b4483085cfbf7abe2485",
+        "medidas": []
+      },
+      "corrente-08b-18-36": {
+        "parametros": {
+          "alturaDaPlaca": 11.8,
+          "dentes1": 18,
+          "dentes2": 36,
+          "diametroDoPino": 4.45,
+          "diametroDoRolo": 8.51,
+          "distancia": 300,
+          "espessuraExterna": 1.6,
+          "espessuraInterna": 1.6,
+          "larguraInterna": 7.75,
+          "passo": 12.7
+        },
+        "hash": "sha256:5ef951fce4870f56511dbe5cc03edd8a2aec10ca85253b3d6390e24fdec1d808",
+        "medidas": []
+      },
+      "corrente-16b-15-40": {
+        "parametros": {
+          "alturaDaPlaca": 21,
+          "dentes1": 15,
+          "dentes2": 40,
+          "diametroDoPino": 8.28,
+          "diametroDoRolo": 15.88,
+          "distancia": 800,
+          "espessuraExterna": 4.15,
+          "espessuraInterna": 3.1,
+          "larguraInterna": 17.02,
+          "passo": 25.4
+        },
+        "hash": "sha256:635ae093f7d8c04b75a5a89593257cfcbec9e3d3d4613317cce9142e621e0b98",
+        "medidas": []
+      }
+    },
+    "escalasDosPerfis": {
+      "sondas": 48,
+      "recusasDeclaradas": [
+        {
+          "ponto": "corrente-06b-12-12: alturaDaPlaca=21",
+          "restricao": "placa-cabe-no-passo"
+        },
+        {
+          "ponto": "corrente-06b-12-12: diametroDoPino=8.28",
+          "restricao": "pino-dentro-do-rolo"
+        },
+        {
+          "ponto": "corrente-06b-12-12: diametroDoRolo=15.88",
+          "restricao": "rolo-dentro-da-placa"
+        },
+        {
+          "ponto": "corrente-06b-12-12: passo=25.4",
+          "restricao": "distancia-cabe-as-rodas"
+        },
+        {
+          "ponto": "corrente-08b-18-36: alturaDaPlaca=8.2",
+          "restricao": "rolo-dentro-da-placa"
+        },
+        {
+          "ponto": "corrente-08b-18-36: diametroDoPino=8.28",
+          "restricao": "pino-dentro-do-rolo"
+        },
+        {
+          "ponto": "corrente-08b-18-36: diametroDoRolo=15.88",
+          "restricao": "rolo-dentro-da-placa"
+        },
+        {
+          "ponto": "corrente-08b-18-36: distancia=100",
+          "restricao": "distancia-cabe-as-rodas"
+        },
+        {
+          "ponto": "corrente-08b-18-36: passo=25.4",
+          "restricao": "distancia-cabe-as-rodas"
+        },
+        {
+          "ponto": "corrente-16b-15-40: alturaDaPlaca=8.2",
+          "restricao": "rolo-dentro-da-placa"
+        },
+        {
+          "ponto": "corrente-16b-15-40: diametroDoRolo=6.35",
+          "restricao": "pino-dentro-do-rolo"
+        },
+        {
+          "ponto": "corrente-16b-15-40: distancia=100",
+          "restricao": "distancia-cabe-as-rodas"
+        },
+        {
+          "ponto": "corrente-16b-15-40: passo=9.525",
+          "restricao": "placa-cabe-no-passo"
+        }
+      ]
+    }
+  },
+  "critico": null,
+  "pessoa": null
+}

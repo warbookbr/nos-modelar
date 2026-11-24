@@ -12,7 +12,8 @@
    raio de cada flanco, porque com a tampa larga os vãos vizinhos se tocavam fora da ponta e a roda de 80 dentes custava
    38 s (medido em 2026-11-24). */
 
-export const PONTOS_DO_ASSENTO = 7;
+/* 13 pontos no assento: com 7, a corda do arco entrava 0,04 mm no rolo da corrente, mais que a folga de 0,005 d1 da norma */
+export const PONTOS_DO_ASSENTO = 13;
 export const PONTOS_DO_FLANCO = 5;
 export const PONTOS_DO_VAO = PONTOS_DO_ASSENTO + 2 * PONTOS_DO_FLANCO + 3;
 export const LADOS_DA_COROA = 128;

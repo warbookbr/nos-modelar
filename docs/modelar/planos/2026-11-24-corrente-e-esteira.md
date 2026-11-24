@@ -60,7 +60,7 @@ O núcleo não ganha nome de objeto nem operação nova, e o acervo sai igual. C
 Cada fatia cabe numa sessão de agente despachado, entrega o teste dela e deixa o andamento escrito abaixo antes de passar à seguinte.
 
 1. Feita em 2026-11-24: a roda dentada da ISO 606, com a aprovação da pessoa.
-2. A corrente de rolos e `transmissaoPorCorrente`, com a transmissão de prova e a aprovação da pessoa.
+2. Feita em 2026-11-24: a corrente de rolos e `transmissaoPorCorrente`, com a transmissão de prova e a aprovação da pessoa.
 3. A esteira de sapatas com a roda motriz, a guia e os roletes, com a aprovação da pessoa.
 4. O trem de esteira de prova, o banco de provas, o mapa de ferramentas, as fichas e o fechamento.
 
@@ -75,5 +75,6 @@ Se a corrente de cem elos passar de dez segundos com placas, pino e rolo, o elo 
 ## Andamento
 
 Fatia 1, em 2026-11-24. A família `roda-dentada` faz a roda simples das correntes 06B a 16B, de 9 a 80 dentes, com a forma de vão mínimo da ISO 606 (assento de 0,505 d1 abrindo 140° − 90°/z, flanco de 0,12 d1 (z + 2), ponta no meio da faixa da norma, largura de 0,93 ou 0,95 b1), pelas fórmulas reproduzidas no guia aberto da Planichapa e no catálogo DIN 8187 / ISO 606 da Top Machinery; p, d1 e b1 da tabela aberta BS/ISO da BEP. O cubo e o furo padrão são regra da família. A coroa é torneada e o vão de um dente sai repetido por `arranja` radial, como na `engrenagem`; com a tampa do vão larga, os vãos vizinhos se tocavam fora da ponta e a roda de 80 dentes custava 38 s, e com a tampa no setor do dente custa 0,5 s, que o teste cobra abaixo de 2 s. A camada mecânica foi gravada depois da aprovação da pessoa por imagem.
+Fatia 2, em 2026-11-24. A família `corrente` faz a corrente de rolos simples 06B a 16B (passo, rolo, largura interna, pino, altura e espessura das placas da tabela aberta BS/ISO da BEP) fechada em volta de duas rodas: o polígono de N elos tem os rolos nos vértices, sobre o círculo primitivo de cada roda nos enrolamentos e a cada passo nos trechos retos, e cada um dos quatro trechos é um rolo, um pino e quatro placas repetidos por `arranja`, de modo que a corrente de 74 elos monta em 1,3 s. `transmissaoPorCorrente` acha os elos abraçados e os do trecho reto por uma busca pequena em volta da tangente comum, com N par e o primeiro rolo de cada trecho reto fora do círculo primitivo, e dá a distância exata e o giro de cada roda. A medição pegou três defeitos antes da imagem: os abraços das rodas trocados (o rolo entrava 2,9 mm no dente da roda grande), o arredondamento que deixava o trecho reto entrar no círculo primitivo e o assento de 7 pontos, cuja corda entrava 0,04 mm no rolo, mais que a folga de 0,005 d1 da norma; a roda dentada passou a 13 pontos no assento e foi regravada. O rolo fica com a folga de 0,02 mm no vão ou entra até 0,08 mm no flanco onde a corrente sai da roda, e o pino entra 0,01 a 0,02 mm na placa nas voltas, porque a placa gira de dois em dois elos e as facetas não casam; nada atravessa, e o teste cobra isso. A camada mecânica foi gravada depois da aprovação da pessoa por imagem.
 
 ## Fechamento

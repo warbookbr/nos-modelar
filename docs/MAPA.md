@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2301 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2309 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1056,6 +1056,15 @@
 - `conferir.test.js` — conferir.test.js — o conferidor do cobre sobre o traçado declarado à mão na placa de prova: o certo passa sem violação, cada traçado errado é recusado pela r…
 - `geometria.js` — geometria.js — o cobre traçado de uma placa declarada, em mm, no plano [x, z] da placa: os polígonos de cada trecho e de cada via, e a união de polígonos de …
 - `tracador.js` — tracador.js — o traçador automático do cobre de uma placa declarada: um roteador em grade sobre as duas faces, com via onde troca de face.
+
+## procedural/familias/corrente/
+
+- `composicoes.js` — composicoes.js — a composição da família `corrente`: para cada um dos quatro trechos (reto de cima, volta da roda 2, reto de baixo e volta da roda 1), o rolo…
+- `derivar.js` — derivar.js — dos parâmetros da corrente (milímetro) à chamada de composição (metro).
+- `geometria.js` — geometria.js — a corrente de rolos fechada em volta de duas rodas dentadas, em milímetro.
+- `index.js` — index.js — a família `corrente`: a corrente de rolos simples da ISO 606, série B, fechada em volta de duas rodas dentadas, com rolos, pinos e placas internas…
+- `tabela.js` — tabela.js — a corrente de rolos simples da ISO 606, série B, em milímetro: passo, diâmetro do rolo, largura entre as placas internas, diâmetro do pino, altur…
+- `transmissao.js` — transmissao.js — a transmissão por corrente: as duas rodas dentadas da família `roda-dentada` e a corrente da família `corrente` entre elas, com a distância …
 
 ## procedural/familias/cremalheira/
 
@@ -3149,6 +3158,11 @@
 ## tools/fixtures/correcao-de-superficie/rede-tres-no-no/
 
 - `receita.js` — correcao-de-superficie/rede-tres-no-no/receita.js — a chapa de prova 'rede-tres-no-no' de `../chapas.mjs`, onde estão a forma e a continuidade declarada.
+
+## tools/fixtures/corrente-e-esteira/
+
+- `transmissao.mjs` — transmissao.mjs — a transmissão por corrente de prova: as duas rodas dentadas e a corrente da `transmissaoPorCorrente`, postas pelo `instanciaDeFamilia`, com…
+- `transmissao.test.mjs` — transmissao.test.mjs — a fatia 2 do plano de corrente e esteira: a corrente 08B entre rodas de 18 e 36 dentes fecha com um número par de elos, cada trecho re…
 
 ## tools/fixtures/costuras-e-furos/
 

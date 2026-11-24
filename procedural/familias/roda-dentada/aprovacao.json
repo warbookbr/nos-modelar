@@ -15,7 +15,7 @@
           "larguraInterna": 5.72,
           "passo": 9.525
         },
-        "hash": "sha256:d040e6250bfa4fe7e7921b6f7ec6036a25dca86d76d8c459af379b523590048f",
+        "hash": "sha256:facbf5811f0f2afbf50522a52f490eb4aeaf8e6de613c5cedc0f497ac8cbdb8a",
         "medidas": []
       },
       "medio": {
@@ -28,7 +28,7 @@
           "larguraInterna": 9.65,
           "passo": 15.875
         },
-        "hash": "sha256:0b26b1ade254d92f56778ea4efcd626cb6ad3ca7ba4fe98136899ad386371045",
+        "hash": "sha256:e79fce285e072cc5c8135e22d76e2cbfed06adcf48921eca6d93068c3b20bfbe",
         "medidas": []
       },
       "maximo": {
@@ -41,7 +41,7 @@
           "larguraInterna": 17.02,
           "passo": 25.4
         },
-        "hash": "sha256:528a35c3b0f93d7fc4380c87ae31ae78fcac23f949a6709cb912f9128ae6e810",
+        "hash": "sha256:1d4278c7c8576e61e2f8e3605122028ee6f5c576c653f9b68c914d3f83a96d7f",
         "medidas": []
       }
     },
@@ -88,7 +88,7 @@
           "larguraInterna": 5.72,
           "passo": 9.525
         },
-        "hash": "sha256:9801f0c1e3668590b1c9ed4b6942ae8cc0942d988331dee19989b6045f87259d",
+        "hash": "sha256:299bc130d77a8172f31ec9be32bff743554afa654d25d8f2cd216486c7a14bc4",
         "medidas": []
       },
       "roda-08b-18": {
@@ -101,7 +101,7 @@
           "larguraInterna": 7.75,
           "passo": 12.7
         },
-        "hash": "sha256:c8b7de855a28ab462b690bc898c7f07397c6211a1cfe27c269a9f2b0445e42fd",
+        "hash": "sha256:2c8d9151a18d9be29886a9715f35f5f52c3d750b03c370abe8a97e38aee70913",
         "medidas": []
       },
       "roda-08b-9": {
@@ -114,7 +114,7 @@
           "larguraInterna": 7.75,
           "passo": 12.7
         },
-        "hash": "sha256:ed1e410c2fd570e6a3b54465773d73d8603f2a98bb47ee0387d8295557906bd5",
+        "hash": "sha256:3237136442c20a225ba57c6bdaa5ee4c35a6b9b3d0f1d59cdfa946797cb74bb2",
         "medidas": []
       },
       "roda-10b-40": {
@@ -127,7 +127,7 @@
           "larguraInterna": 9.65,
           "passo": 15.875
         },
-        "hash": "sha256:bf40f1e7ab860a4576f21dc5dcd1a6af960bc43636f45add32a9edf787f1c997",
+        "hash": "sha256:4b2d455600462616fc4e2932a90ea0c5868680e72e0b215a706e59193fa1ac57",
         "medidas": []
       },
       "roda-16b-25": {
@@ -140,7 +140,7 @@
           "larguraInterna": 17.02,
           "passo": 25.4
         },
-        "hash": "sha256:4d5e37bfad7bb048ea6380eb12158d8bb0b5b9d0f27adea123d5af37280db10c",
+        "hash": "sha256:30023142673eb47255c8580db88ca0d9b6d3ff1c5f8caf271667f367bdeed8e6",
         "medidas": []
       }
     },
