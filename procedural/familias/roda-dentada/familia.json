@@ -1,0 +1,159 @@
+{
+  "formato": "mecanifica.familia@1",
+  "id": "roda-dentada",
+  "versao": "1.0.0",
+  "nivel": "componente",
+  "parametros": {
+    "passo": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 12.7,
+      "minimo": 9.525,
+      "maximo": 25.4,
+      "medio": 15.875
+    },
+    "diametroDoRolo": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 8.51,
+      "minimo": 6.35,
+      "maximo": 15.88,
+      "medio": 10.16
+    },
+    "larguraInterna": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 7.75,
+      "minimo": 5.72,
+      "maximo": 17.02,
+      "medio": 9.65
+    },
+    "dentes": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 18,
+      "minimo": 9,
+      "maximo": 80,
+      "medio": 25
+    },
+    "furo": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 14,
+      "minimo": 5,
+      "maximo": 150,
+      "medio": 20
+    },
+    "diametroDoCubo": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 28,
+      "minimo": 10,
+      "maximo": 250,
+      "medio": 40
+    },
+    "comprimentoDoCubo": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 9,
+      "minimo": 3,
+      "maximo": 60,
+      "medio": 12
+    }
+  },
+  "restricoes": [
+    {
+      "id": "rolo-cabe-no-passo",
+      "expressao": "diametroDoRolo + 2 - passo <= 0",
+      "motivo": "o rolo precisa ser menor que o passo da corrente"
+    },
+    {
+      "id": "cubo-dentro-da-raiz",
+      "expressao": "diametroDoCubo + passo - passo / sin(180 / dentes) + diametroDoRolo <= 0",
+      "motivo": "o cubo passa da raiz dos dentes menos um passo, onde passam as placas da corrente; diminua o cubo ou aumente os dentes"
+    },
+    {
+      "id": "furo-dentro-do-cubo",
+      "expressao": "furo + 4 - diametroDoCubo <= 0",
+      "motivo": "o furo precisa deixar parede de 2 mm no cubo"
+    }
+  ],
+  "portas": [
+    {
+      "id": "furo",
+      "tipo": "anel",
+      "papel": "recebe"
+    }
+  ],
+  "ferramentas": [
+    "elos",
+    "engrenagem"
+  ],
+  "perguntas": {
+    "elos": [
+      "Os dentes têm o assento redondo do rolo e os flancos curvos da ISO 606, iguais em toda a volta, com o cubo de um lado e o furo no centro?"
+    ]
+  },
+  "perfis": {
+    "roda-08b-18": {
+      "descricao": "roda dentada 08B de 18 dentes",
+      "parametros": {
+        "passo": 12.7,
+        "diametroDoRolo": 8.51,
+        "larguraInterna": 7.75,
+        "dentes": 18,
+        "furo": 21,
+        "diametroDoCubo": 43,
+        "comprimentoDoCubo": 9
+      }
+    },
+    "roda-08b-9": {
+      "descricao": "roda dentada 08B de 9 dentes",
+      "parametros": {
+        "passo": 12.7,
+        "diametroDoRolo": 8.51,
+        "larguraInterna": 7.75,
+        "dentes": 9,
+        "furo": 7,
+        "diametroDoCubo": 15,
+        "comprimentoDoCubo": 9
+      }
+    },
+    "roda-10b-40": {
+      "descricao": "roda dentada 10B de 40 dentes",
+      "parametros": {
+        "passo": 15.875,
+        "diametroDoRolo": 10.16,
+        "larguraInterna": 9.65,
+        "dentes": 40,
+        "furo": 41,
+        "diametroDoCubo": 82,
+        "comprimentoDoCubo": 12
+      }
+    },
+    "roda-16b-25": {
+      "descricao": "roda dentada 16B de 25 dentes",
+      "parametros": {
+        "passo": 25.4,
+        "diametroDoRolo": 15.88,
+        "larguraInterna": 17.02,
+        "dentes": 25,
+        "furo": 50,
+        "diametroDoCubo": 101,
+        "comprimentoDoCubo": 20
+      }
+    },
+    "roda-06b-80": {
+      "descricao": "roda dentada 06B de 80 dentes",
+      "parametros": {
+        "passo": 9.525,
+        "diametroDoRolo": 6.35,
+        "larguraInterna": 5.72,
+        "dentes": 80,
+        "furo": 39,
+        "diametroDoCubo": 79,
+        "comprimentoDoCubo": 7
+      }
+    }
+  }
+}

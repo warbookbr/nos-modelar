@@ -59,7 +59,7 @@ O núcleo não ganha nome de objeto nem operação nova, e o acervo sai igual. C
 
 Cada fatia cabe numa sessão de agente despachado, entrega o teste dela e deixa o andamento escrito abaixo antes de passar à seguinte.
 
-1. A roda dentada da ISO 606, com a aprovação da pessoa.
+1. Feita em 2026-11-24: a roda dentada da ISO 606, com a aprovação da pessoa.
 2. A corrente de rolos e `transmissaoPorCorrente`, com a transmissão de prova e a aprovação da pessoa.
 3. A esteira de sapatas com a roda motriz, a guia e os roletes, com a aprovação da pessoa.
 4. O trem de esteira de prova, o banco de provas, o mapa de ferramentas, as fichas e o fechamento.
@@ -73,5 +73,7 @@ Decidido em 2026-11-24: a corrente começa pela série B europeia (06B a 16B); a
 Se a corrente de cem elos passar de dez segundos com placas, pino e rolo, o elo sai com menos detalhe (placa sem a cintura) e a fatia volta à pessoa com a medida. Se a tabela da ISO 606 não tiver extrato público com o perfil do dente, o perfil segue as fórmulas abertas da norma citadas pelas fontes, e a fatia diz quais. Se o rolo assentado no vão der contato atravessado pela faceta, a fatia mede o número de lados que resolve e o custo.
 
 ## Andamento
+
+Fatia 1, em 2026-11-24. A família `roda-dentada` faz a roda simples das correntes 06B a 16B, de 9 a 80 dentes, com a forma de vão mínimo da ISO 606 (assento de 0,505 d1 abrindo 140° − 90°/z, flanco de 0,12 d1 (z + 2), ponta no meio da faixa da norma, largura de 0,93 ou 0,95 b1), pelas fórmulas reproduzidas no guia aberto da Planichapa e no catálogo DIN 8187 / ISO 606 da Top Machinery; p, d1 e b1 da tabela aberta BS/ISO da BEP. O cubo e o furo padrão são regra da família. A coroa é torneada e o vão de um dente sai repetido por `arranja` radial, como na `engrenagem`; com a tampa do vão larga, os vãos vizinhos se tocavam fora da ponta e a roda de 80 dentes custava 38 s, e com a tampa no setor do dente custa 0,5 s, que o teste cobra abaixo de 2 s. A camada mecânica foi gravada depois da aprovação da pessoa por imagem.
 
 ## Fechamento

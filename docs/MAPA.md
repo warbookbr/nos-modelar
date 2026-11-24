@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2295 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2301 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1149,6 +1149,15 @@
 - `geometria.js` — geometria.js — as medidas de uma polia da família `polia-e-correia`, em milímetro, a partir dos parâmetros.
 - `index.js` — index.js — a família `polia-e-correia`: polia dentada (GT2, HTD 3M, HTD 5M e T5), em V (Z, A e B, de um a quatro canais) e lisa, com cubo e furo. `chamar(POL…
 - `polia-e-correia.test.mjs` — polia-e-correia.test.mjs — a família `polia-e-correia`: cada perfil sai numa parte só e sem órfão, a dentada tem o externo e a raiz que o passo e os dentes p…
+
+## procedural/familias/roda-dentada/
+
+- `composicoes.js` — composicoes.js — a composição da família `roda-dentada`: a coroa por `lathe` da seção com o furo e o cubo, e o vão de um dente por `extrusao` em [x, z], repe…
+- `derivar.js` — derivar.js — dos parâmetros da roda dentada (milímetro) à chamada de composição (metro).
+- `geometria.js` — geometria.js — a roda dentada de corrente de rolos pela forma de dente da ISO 606, em milímetro, com o eixo em y.
+- `index.js` — index.js — a família `roda-dentada`: a roda dentada simples de corrente de rolos com a forma de dente da ISO 606, série B europeia (06B a 16B), com o cubo e …
+- `roda-dentada.test.mjs` — roda-dentada.test.mjs — a família `roda-dentada`: cada corrente da tabela, de 9 a 80 dentes, sai num pedaço só e sem órfão; o diâmetro de raiz é d − 2 ri da …
+- `tabela.js` — tabela.js — as correntes de rolos simples da ISO 606, série B europeia, em milímetro: passo p, diâmetro do rolo d1 e largura entre as placas internas b1, lid…
 
 ## procedural/familias/roda-pneu/
 
