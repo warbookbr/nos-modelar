@@ -1,0 +1,132 @@
+{
+  "formato": "mecanifica.familia@1",
+  "id": "rolamento",
+  "versao": "1.0.0",
+  "nivel": "componente",
+  "parametros": {
+    "forma": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 1,
+      "minimo": 1,
+      "maximo": 3,
+      "medio": 2
+    },
+    "furo": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 20,
+      "minimo": 10,
+      "maximo": 50,
+      "medio": 25
+    },
+    "diametroExterno": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 47,
+      "minimo": 26,
+      "maximo": 90,
+      "medio": 52
+    },
+    "largura": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 14,
+      "minimo": 8,
+      "maximo": 20,
+      "medio": 15
+    },
+    "chanfro": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 1,
+      "minimo": 0.3,
+      "maximo": 1.1,
+      "medio": 1
+    }
+  },
+  "restricoes": [
+    {
+      "id": "anel-com-espessura",
+      "expressao": "furo * 1.25 + 6 - diametroExterno <= 0",
+      "motivo": "o diâmetro externo precisa passar do furo o bastante para os dois anéis e as esferas"
+    },
+    {
+      "id": "anel-nao-largo-demais",
+      "expressao": "diametroExterno - furo * 3.2 - 1 <= 0",
+      "motivo": "a seção do anel passa da série 62: o diâmetro externo é grande demais para o furo"
+    },
+    {
+      "id": "esfera-cabe-na-largura",
+      "expressao": "0.3 * (diametroExterno - furo) + 0.16 * largura + 0.5 - largura <= 0",
+      "motivo": "a esfera, de 0,3 (D − d), não cabe na largura com as vedações"
+    },
+    {
+      "id": "chanfro-pequeno",
+      "expressao": "chanfro * 8 - largura <= 0",
+      "motivo": "o chanfro passa de um oitavo da largura"
+    }
+  ],
+  "portas": [
+    {
+      "id": "furo",
+      "tipo": "anel",
+      "papel": "recebe"
+    },
+    {
+      "id": "apoio",
+      "tipo": "plano",
+      "papel": "apoia"
+    }
+  ],
+  "ferramentas": [
+    "rolamento"
+  ],
+  "perguntas": {
+    "rolamento": [
+      "O rolamento tem os dois anéis com a pista e as esferas entre eles, a vedação cobrindo as esferas no vedado, e o mancal aloja o rolamento com o pé e os dois furos de fixação?"
+    ]
+  },
+  "perfis": {
+    "rolamento-6204": {
+      "descricao": "rolamento 6204 aberto",
+      "parametros": {
+        "forma": 1,
+        "furo": 20,
+        "diametroExterno": 47,
+        "largura": 14,
+        "chanfro": 1
+      }
+    },
+    "rolamento-6000": {
+      "descricao": "rolamento 6000 aberto",
+      "parametros": {
+        "forma": 1,
+        "furo": 10,
+        "diametroExterno": 26,
+        "largura": 8,
+        "chanfro": 0.3
+      }
+    },
+    "rolamento-6210-vedado": {
+      "descricao": "rolamento 6210 vedado",
+      "parametros": {
+        "forma": 2,
+        "furo": 50,
+        "diametroExterno": 90,
+        "largura": 20,
+        "chanfro": 1.1
+      }
+    },
+    "mancal-6205": {
+      "descricao": "mancal de pedestal com o rolamento 6205 vedado",
+      "parametros": {
+        "forma": 3,
+        "furo": 25,
+        "diametroExterno": 52,
+        "largura": 15,
+        "chanfro": 1
+      }
+    }
+  }
+}

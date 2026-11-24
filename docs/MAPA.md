@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2279 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2285 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1142,6 +1142,15 @@
 - `derivar.js` — derivar.js — dos parâmetros da família `roda-pneu` (o diâmetro em milímetro, as medidas em proporção do diâmetro, as contagens em contagem) aos argumentos da…
 - `index.js` — index.js — a família `roda-pneu` carregada: o contrato `familia.json`, as composições e o `derivar`. O registro do produto (`procedural/familias/index.js`) i…
 - `roda-pneu.test.js` — roda-pneu.test.js — a família `roda-pneu` medida na malha. As quatro partes (pneu, aro, cubo, disco) e o volume de cada uma contra a fórmula; a banda (pneumá…
+
+## procedural/familias/rolamento/
+
+- `composicoes.js` — composicoes.js — as composições da família `rolamento`: cada peça (anel externo, anel interno, esferas e, na forma 3, o mancal) é uma lista de sólidos tornea…
+- `derivar.js` — derivar.js — dos parâmetros do rolamento (milímetro) à chamada de composição (metro). A forma escolhe a composição.
+- `geometria.js` — geometria.js — o rolamento rígido de esferas e o mancal de pedestal, em milímetro, com o eixo do rolamento em y, de 0 à largura B.
+- `index.js` — index.js — a família `rolamento`: o rolamento rígido de esferas das séries 60 e 62, aberto, vedado ou alojado no mancal de pedestal. A tabela está em `tabela…
+- `rolamento.test.mjs` — rolamento.test.mjs — a família `rolamento`: cada designação da tabela sai com os dois anéis e as esferas, sem órfão; as esferas ficam soltas na folga das pis…
+- `tabela.js` — tabela.js — o rolamento rígido de uma carreira de esferas das séries 60 e 62, em milímetro: furo d, diâmetro externo D, largura B e chanfro mínimo r.
 
 ## procedural/familias/superficie-aerodinamica/
 
