@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2267 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2273 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1108,6 +1108,15 @@
 - `index.js` — index.js — a família `movel-de-caixa` carregada: o contrato `familia.json`, as composições, o `derivar` e o gerador da montagem v5. A família é o objeto de `…
 - `montagem.js` — montagem.js — a montagem v5 que a família gera: o corpo, as portas, as gavetas e os guias e as duas metades de cada dobradiça como peças soltas, com uma arti…
 - `movel-de-caixa.test.mjs` — movel-de-caixa.test.mjs — a família `movel-de-caixa`: contrato, recusas, os perfis, o roupeiro como antes, a malha medida contra as contas (zonas, frentes em…
+
+## procedural/familias/perfil-estrutural/
+
+- `composicoes.js` — composicoes.js — as composições da família `perfil-estrutural`: a seção extrudada em y, com o furo central no alumínio, e um ou dois prismas triangulares ext…
+- `derivar.js` — derivar.js — dos parâmetros do perfil (milímetro) à chamada de composição (metro). O tipo e o corte escolhem a composição.
+- `geometria.js` — geometria.js — a seção e o comprimento do perfil estrutural, em milímetro.
+- `index.js` — index.js — a família `perfil-estrutural`: o perfil I e H (IPE, HE A), o U (UPN) e o alumínio ranhurado, reto ou com corte a 45° nas pontas. A tabela de norma…
+- `perfil-estrutural.test.mjs` — perfil-estrutural.test.mjs — a família `perfil-estrutural`: cada perfil da tabela sai num pedaço só; a área da seção do IPE, do HE A e do UPN bate com a mass…
+- `tabela.js` — tabela.js — os perfis estruturais da série europeia, em milímetro: altura h, largura b, alma tw, aba tf, raio de concordância r (e, no U, o raio da ponta da …
 
 ## procedural/familias/polia-e-correia/
 

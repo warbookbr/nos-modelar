@@ -1,0 +1,222 @@
+{
+  "formato": "mecanifica.familia@1",
+  "id": "perfil-estrutural",
+  "versao": "1.0.0",
+  "nivel": "componente",
+  "parametros": {
+    "tipo": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 1,
+      "minimo": 1,
+      "maximo": 3,
+      "medio": 2
+    },
+    "altura": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 200,
+      "minimo": 20,
+      "maximo": 600,
+      "medio": 190
+    },
+    "largura": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 100,
+      "minimo": 20,
+      "maximo": 300,
+      "medio": 100
+    },
+    "alma": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 5.6,
+      "minimo": 2,
+      "maximo": 20,
+      "medio": 7
+    },
+    "aba": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 8.5,
+      "minimo": 2,
+      "maximo": 30,
+      "medio": 11
+    },
+    "raio": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 12,
+      "minimo": 0,
+      "maximo": 30,
+      "medio": 12
+    },
+    "raioDaPonta": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 0,
+      "minimo": 0,
+      "maximo": 15,
+      "medio": 0
+    },
+    "inclinacao": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0,
+      "minimo": 0,
+      "maximo": 10,
+      "medio": 0
+    },
+    "comprimento": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 1000,
+      "minimo": 30,
+      "maximo": 12000,
+      "medio": 1000
+    },
+    "corte": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 0,
+      "minimo": 0,
+      "maximo": 2,
+      "medio": 1
+    },
+    "aberturaDaRanhura": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 8,
+      "minimo": 4,
+      "maximo": 14,
+      "medio": 8
+    }
+  },
+  "restricoes": [
+    {
+      "id": "alma-cabe-na-largura",
+      "expressao": "max(0, 1 - max(0, tipo - 2)) * (alma + 2 * raio + 2 - largura) <= 0",
+      "motivo": "no I e no U a alma com as duas concordâncias precisa caber na largura das abas"
+    },
+    {
+      "id": "abas-cabem-na-altura",
+      "expressao": "max(0, 1 - max(0, tipo - 2)) * (2 * aba + 2 * raio + 2 - altura) <= 0",
+      "motivo": "no I e no U as duas abas com as concordâncias precisam caber na altura"
+    },
+    {
+      "id": "ponta-da-aba-do-u",
+      "expressao": "max(0, 1 - abs(tipo - 2)) * (inclinacao / 100 * largura / 2 + raioDaPonta + 1 - aba) <= 0",
+      "motivo": "no U (tipo 2) a aba fica fina demais na ponta: a inclinação e o raio da ponta comem a espessura"
+    },
+    {
+      "id": "ranhura-cabe-no-lado",
+      "expressao": "max(0, tipo - 2) * (aberturaDaRanhura - 0.3 * altura) <= 0",
+      "motivo": "a abertura da ranhura passa de 0,3 do lado do alumínio"
+    },
+    {
+      "id": "comprimento-passa-do-corte",
+      "expressao": "corte * altura / 2 + 10 - comprimento <= 0",
+      "motivo": "com o corte a 45° o comprimento precisa passar da metade da altura em cada ponta cortada"
+    }
+  ],
+  "portas": [
+    {
+      "id": "inicio",
+      "tipo": "plano",
+      "papel": "apoia"
+    },
+    {
+      "id": "fim",
+      "tipo": "plano",
+      "papel": "apoia"
+    }
+  ],
+  "ferramentas": [
+    "perfil"
+  ],
+  "perguntas": {
+    "perfil": [
+      "A seção é a do perfil pedido (I, H, U ou alumínio ranhurado), com as concordâncias e a aba inclinada do U, sem degrau?",
+      "O corte a 45° é plano e deixa o lado de cima mais comprido, como no canto de um quadro?"
+    ]
+  },
+  "perfis": {
+    "ipe-200": {
+      "descricao": "IPE 200, 1 m, reto",
+      "parametros": {
+        "tipo": 1,
+        "altura": 200,
+        "largura": 100,
+        "alma": 5.6,
+        "aba": 8.5,
+        "raio": 12,
+        "comprimento": 1000,
+        "corte": 0
+      }
+    },
+    "hea-200-esquadria": {
+      "descricao": "HE 200 A, 1 m, com as duas pontas a 45°",
+      "parametros": {
+        "tipo": 1,
+        "altura": 190,
+        "largura": 200,
+        "alma": 6.5,
+        "aba": 10,
+        "raio": 18,
+        "comprimento": 1000,
+        "corte": 2
+      }
+    },
+    "upn-200": {
+      "descricao": "UPN 200, 1 m, reto",
+      "parametros": {
+        "tipo": 2,
+        "altura": 200,
+        "largura": 75,
+        "alma": 8.5,
+        "aba": 11.5,
+        "raio": 11.5,
+        "raioDaPonta": 6,
+        "inclinacao": 8,
+        "comprimento": 1000,
+        "corte": 0
+      }
+    },
+    "upn-100-um-corte": {
+      "descricao": "UPN 100, 600 mm, com a ponta final a 45°",
+      "parametros": {
+        "tipo": 2,
+        "altura": 100,
+        "largura": 50,
+        "alma": 6,
+        "aba": 8.5,
+        "raio": 8.5,
+        "raioDaPonta": 4.5,
+        "inclinacao": 8,
+        "comprimento": 600,
+        "corte": 1
+      }
+    },
+    "aluminio-40": {
+      "descricao": "alumínio ranhurado 40 × 40, 500 mm",
+      "parametros": {
+        "tipo": 3,
+        "altura": 40,
+        "aberturaDaRanhura": 8,
+        "comprimento": 500,
+        "corte": 0
+      }
+    },
+    "aluminio-20-esquadria": {
+      "descricao": "alumínio ranhurado 20 × 20, 300 mm, com as duas pontas a 45°",
+      "parametros": {
+        "tipo": 3,
+        "altura": 20,
+        "aberturaDaRanhura": 6,
+        "comprimento": 300,
+        "corte": 2
+      }
+    }
+  }
+}

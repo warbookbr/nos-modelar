@@ -58,7 +58,7 @@ O núcleo não ganha nome de objeto nem operação nova, e o acervo sai igual. C
 
 Cada fatia cabe numa sessão de agente despachado, entrega o teste dela e deixa o andamento escrito abaixo antes de passar à seguinte.
 
-1. O perfil estrutural (I, H, U e alumínio ranhurado), com a aprovação da pessoa.
+1. Feita em 2026-11-24: o perfil estrutural (I, H, U e alumínio ranhurado), com a aprovação da pessoa.
 2. A guia linear, trilho e carro, com a aprovação da pessoa.
 3. O rolamento e o mancal de pedestal, com a aprovação da pessoa.
 4. O fuso e a castanha, com a aprovação da pessoa.
@@ -73,5 +73,7 @@ Decidido em 2026-11-24: o plano entra com as quatro famílias; o fuso de esferas
 Se a tabela de um elemento pedir valor que não é de norma pública (a altura do carro da guia, o mancal de pedestal), ele sai por regra declarada da família e a fatia diz qual. Se as esferas do rolamento passarem de dois segundos por peça, elas saem como anel cheio e a fatia volta à pessoa com a medida antes de seguir.
 
 ## Andamento
+
+Fatia 1, em 2026-11-24. A família `perfil-estrutural` faz o IPE (80 a 600), o HE A (100 a 600) e o UPN (50 a 400) pela EN 10365, lidos nas tabelas da ArcelorMittal, e o alumínio ranhurado de 20, 30, 40 e 45 mm, com a ranhura em T e o furo central por regra da família, porque não há norma pública. A seção é uma `extrusao` com as concordâncias em quatro segmentos (o raio nulo vira 0,2 mm, para o número de pontos não mudar) e o corte a 45° são prismas triangulares extrudados em x tirados por `subtrair`, com o lado de cima mais comprido; as portas `inicio` e `fim` são os planos das pontas. O teste confere que os 59 tamanhos saem num pedaço só e que a área da seção bate com a massa por metro da tabela até 2 %. A camada mecânica foi gravada depois da aprovação da pessoa por imagem.
 
 ## Fechamento
