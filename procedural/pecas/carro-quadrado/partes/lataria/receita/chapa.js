@@ -245,8 +245,8 @@ export function derivarChapa(T) {
         curvaTopo: lado('L3', apT, apF),
         curvaTras: lado(`S${iVao + 1}_baixo`, solT, apT),
         nosDoVao: nos,
-        passoTransicaoMm: 85,
-        divisoesRadiais: 3,
+        passoTransicaoMm: 110,
+        divisoesRadiais: 2,
       },
     });
 

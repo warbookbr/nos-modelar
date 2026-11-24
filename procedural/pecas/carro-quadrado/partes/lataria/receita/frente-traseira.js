@@ -562,8 +562,8 @@ export function passosFrenteTraseira(T, proxId) {
     return tab[tab.length - 1][1];
   };
   /* curvas reais medidas na pele da chapa (Curva 1 traseira, Curva 3 bojo lateral, Curva 4 inclinação interna) */
-  const tabZRear = [[526, -1996.5], [620, -2011.6], [735, -2021.1], [795, -2022.4], [848, -2019.0]];
-  const tabXSide = [[526, 792.0], [620, 799.0], [735, 802.0], [795, 797.0], [848, 785.0]];
+  const tabZRear = [[526, -1996.5], [620, -2011.6], [735, -2020.5], [795, -2021.0], [848, -2014.0]];
+  const tabXSide = [[526, 789.0], [620, 796.0], [735, 796.0], [795, 786.0], [848, 770.0]];
   const tabZSide = [[526, -1928.0], [620, -1941.0], [735, -1954.0], [795, -1961.0], [848, -1968.0]];
   const xInt = (y) => 632 + 32 * Math.max(0, Math.min(1, (y - 526) / (848 - 526)));
 
