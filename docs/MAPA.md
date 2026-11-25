@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2330 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2336 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1024,6 +1024,15 @@
 - `derivar.js` — derivar.js — dos parâmetros do aparelho de caixa (milímetro) à chamada de composição (metro).
 - `geometria.js` — geometria.js — as medidas do aparelho de caixa a partir dos parâmetros da família, em milímetro.
 - `index.js` — index.js — a família `aparelho-de-caixa` carregada: o contrato `familia.json`, as composições e o `derivar`.
+
+## procedural/familias/atuador-de-junta/
+
+- `atuador-de-junta.test.mjs` — atuador-de-junta.test.mjs — a família `atuador-de-junta`: cada tamanho da tabela sai com a carcaça e a flange de saída, cada uma num pedaço só; a saída só en…
+- `composicoes.js` — composicoes.js — a composição da família `atuador-de-junta` (forma 1, cilíndrico): a carcaça por `lathe` unida à saída do cabo (`lathe` em x), menos os furos…
+- `derivar.js` — derivar.js — dos parâmetros do atuador (milímetro) à chamada de composição (metro).
+- `geometria.js` — geometria.js — o atuador de junta cilíndrico, em milímetro, com o eixo da junta em y.
+- `index.js` — index.js — a família `atuador-de-junta`: o atuador cilíndrico de junta de robô (carcaça com motor e redutor como volume, flange de fixação atrás, flange de s…
+- `tabela.js` — tabela.js — os atuadores de junta cilíndricos, por diâmetro da carcaça, em milímetro. Não há norma pública de atuador de robô; os tamanhos são regra da famíl…
 
 ## procedural/familias/cadeira/
 

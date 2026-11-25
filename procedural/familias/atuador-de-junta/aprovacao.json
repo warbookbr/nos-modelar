@@ -1,0 +1,488 @@
+{
+  "formato": "mecanifica.aprovacao-da-familia@1",
+  "familia": "atuador-de-junta",
+  "versao": "1.0.0",
+  "mecanica": {
+    "data": "2026-11-25",
+    "pontos": {
+      "minimo": {
+        "parametros": {
+          "chanfro": 0.3,
+          "circuloDaSaida": 12,
+          "circuloDoFlange": 36,
+          "comprimento": 20,
+          "diametro": 30,
+          "diametroDaSaida": 18,
+          "diametroDoCabo": 4,
+          "diametroDoFlange": 40,
+          "diametroDoFuroDaSaida": 1.5,
+          "diametroDoFuroDoFlange": 2,
+          "espessuraDaSaida": 3,
+          "espessuraDoFlange": 3,
+          "furosDaSaida": 4,
+          "furosDoFlange": 4
+        },
+        "hash": "sha256:fa243cc6a32965acc36e2362c6efeb17e2505a3d54e00bc058db93679bc6e21c",
+        "medidas": []
+      },
+      "medio": {
+        "parametros": {
+          "chanfro": 2.4,
+          "circuloDaSaida": 35,
+          "circuloDoFlange": 90,
+          "comprimento": 55,
+          "diametro": 80,
+          "diametroDaSaida": 50,
+          "diametroDoCabo": 10,
+          "diametroDoFlange": 100,
+          "diametroDoFuroDaSaida": 3.3,
+          "diametroDoFuroDoFlange": 4.5,
+          "espessuraDaSaida": 7,
+          "espessuraDoFlange": 8,
+          "furosDaSaida": 8,
+          "furosDoFlange": 8
+        },
+        "hash": "sha256:1e19ac3fa9f98b9dc5c482c1475e7d8cd98332b525952232756303968489d185",
+        "medidas": []
+      },
+      "maximo": {
+        "parametros": {
+          "chanfro": 5,
+          "circuloDaSaida": 70,
+          "circuloDoFlange": 180,
+          "comprimento": 120,
+          "diametro": 160,
+          "diametroDaSaida": 100,
+          "diametroDoCabo": 20,
+          "diametroDoFlange": 200,
+          "diametroDoFuroDaSaida": 7,
+          "diametroDoFuroDoFlange": 9,
+          "espessuraDaSaida": 12,
+          "espessuraDoFlange": 16,
+          "furosDaSaida": 16,
+          "furosDoFlange": 16
+        },
+        "hash": "sha256:eeb5b7e6654f42743fc55aafb5efa3f2e235ada4f6dcde00aadb685b9bec5bdc",
+        "medidas": []
+      }
+    },
+    "varredura": {
+      "sondas": 28,
+      "recusasDeclaradas": [
+        {
+          "ponto": "chanfro=5",
+          "restricao": "chanfro-cabe-na-saida"
+        },
+        {
+          "ponto": "circuloDaSaida=70",
+          "restricao": "furos-da-saida-dentro-dela"
+        },
+        {
+          "ponto": "circuloDoFlange=36",
+          "restricao": "furos-do-flange-fora-do-corpo"
+        },
+        {
+          "ponto": "circuloDoFlange=180",
+          "restricao": "furos-do-flange-dentro-dela"
+        },
+        {
+          "ponto": "diametro=30",
+          "restricao": "saida-dentro-do-corpo"
+        },
+        {
+          "ponto": "diametro=160",
+          "restricao": "flange-maior-que-o-corpo"
+        },
+        {
+          "ponto": "diametroDaSaida=18",
+          "restricao": "furos-da-saida-dentro-dela"
+        },
+        {
+          "ponto": "diametroDaSaida=100",
+          "restricao": "saida-dentro-do-corpo"
+        },
+        {
+          "ponto": "diametroDoFlange=40",
+          "restricao": "flange-maior-que-o-corpo"
+        },
+        {
+          "ponto": "diametroDoFuroDaSaida=7",
+          "restricao": "furos-da-saida-dentro-dela"
+        },
+        {
+          "ponto": "diametroDoFuroDoFlange=9",
+          "restricao": "flange-maior-que-o-corpo"
+        },
+        {
+          "ponto": "espessuraDaSaida=3",
+          "restricao": "chanfro-cabe-na-saida"
+        },
+        {
+          "ponto": "espessuraDoFlange=3",
+          "restricao": "chanfro-cabe-no-flange"
+        }
+      ]
+    },
+    "portas": [
+      "fixacao",
+      "saida"
+    ],
+    "perfis": {
+      "atuador-100": {
+        "parametros": {
+          "chanfro": 3,
+          "circuloDaSaida": 43.4,
+          "circuloDoFlange": 112,
+          "comprimento": 65,
+          "diametro": 100,
+          "diametroDaSaida": 62,
+          "diametroDoCabo": 12,
+          "diametroDoFlange": 124,
+          "diametroDoFuroDaSaida": 4.2,
+          "diametroDoFuroDoFlange": 5.5,
+          "espessuraDaSaida": 8,
+          "espessuraDoFlange": 10,
+          "furosDaSaida": 8,
+          "furosDoFlange": 8
+        },
+        "hash": "sha256:cd82982b7c3db257b908960ae942a63746638c7bec920c8074013671bf2363cd",
+        "medidas": []
+      },
+      "atuador-120": {
+        "parametros": {
+          "chanfro": 3.6,
+          "circuloDaSaida": 51.8,
+          "circuloDoFlange": 134,
+          "comprimento": 75,
+          "diametro": 120,
+          "diametroDaSaida": 74,
+          "diametroDoCabo": 14,
+          "diametroDoFlange": 148,
+          "diametroDoFuroDaSaida": 5,
+          "diametroDoFuroDoFlange": 6.6,
+          "espessuraDaSaida": 9,
+          "espessuraDoFlange": 12,
+          "furosDaSaida": 12,
+          "furosDoFlange": 12
+        },
+        "hash": "sha256:14de48dd6a9e572a31d922604a6dafcdc301645ddcd3365e5aece176854dcbac",
+        "medidas": []
+      },
+      "atuador-40": {
+        "parametros": {
+          "chanfro": 1.2,
+          "circuloDaSaida": 18.2,
+          "circuloDoFlange": 46,
+          "comprimento": 32,
+          "diametro": 40,
+          "diametroDaSaida": 26,
+          "diametroDoCabo": 6,
+          "diametroDoFlange": 52,
+          "diametroDoFuroDaSaida": 2.5,
+          "diametroDoFuroDoFlange": 3.4,
+          "espessuraDaSaida": 4,
+          "espessuraDoFlange": 5,
+          "furosDaSaida": 4,
+          "furosDoFlange": 4
+        },
+        "hash": "sha256:0eeadab36f056bb8057512eafcb8dd65d152f93e1c94fc86b07bfea6ae30d196",
+        "medidas": []
+      },
+      "atuador-60": {
+        "parametros": {
+          "chanfro": 1.8,
+          "circuloDaSaida": 26.599999999999998,
+          "circuloDoFlange": 68,
+          "comprimento": 45,
+          "diametro": 60,
+          "diametroDaSaida": 38,
+          "diametroDoCabo": 8,
+          "diametroDoFlange": 76,
+          "diametroDoFuroDaSaida": 2.5,
+          "diametroDoFuroDoFlange": 3.4,
+          "espessuraDaSaida": 6,
+          "espessuraDoFlange": 7,
+          "furosDaSaida": 6,
+          "furosDoFlange": 6
+        },
+        "hash": "sha256:68ccbde7fa730af43ebff03676c8aea9990c3d9a57c688d8104176596e806957",
+        "medidas": []
+      },
+      "atuador-80": {
+        "parametros": {
+          "chanfro": 2.4,
+          "circuloDaSaida": 35,
+          "circuloDoFlange": 90,
+          "comprimento": 55,
+          "diametro": 80,
+          "diametroDaSaida": 50,
+          "diametroDoCabo": 10,
+          "diametroDoFlange": 100,
+          "diametroDoFuroDaSaida": 3.3,
+          "diametroDoFuroDoFlange": 4.5,
+          "espessuraDaSaida": 7,
+          "espessuraDoFlange": 8,
+          "furosDaSaida": 8,
+          "furosDoFlange": 8
+        },
+        "hash": "sha256:1e19ac3fa9f98b9dc5c482c1475e7d8cd98332b525952232756303968489d185",
+        "medidas": []
+      }
+    },
+    "escalasDosPerfis": {
+      "sondas": 120,
+      "recusasDeclaradas": [
+        {
+          "ponto": "atuador-100: chanfro=5",
+          "restricao": "chanfro-cabe-na-saida"
+        },
+        {
+          "ponto": "atuador-100: circuloDaSaida=70",
+          "restricao": "furos-da-saida-dentro-dela"
+        },
+        {
+          "ponto": "atuador-100: circuloDoFlange=36",
+          "restricao": "furos-do-flange-fora-do-corpo"
+        },
+        {
+          "ponto": "atuador-100: circuloDoFlange=180",
+          "restricao": "furos-do-flange-dentro-dela"
+        },
+        {
+          "ponto": "atuador-100: comprimento=20",
+          "restricao": "corpo-mais-longo-que-o-flange"
+        },
+        {
+          "ponto": "atuador-100: diametro=30",
+          "restricao": "saida-dentro-do-corpo"
+        },
+        {
+          "ponto": "atuador-100: diametro=160",
+          "restricao": "flange-maior-que-o-corpo"
+        },
+        {
+          "ponto": "atuador-100: diametroDaSaida=18",
+          "restricao": "furos-da-saida-dentro-dela"
+        },
+        {
+          "ponto": "atuador-100: diametroDaSaida=100",
+          "restricao": "saida-dentro-do-corpo"
+        },
+        {
+          "ponto": "atuador-100: diametroDoFlange=40",
+          "restricao": "flange-maior-que-o-corpo"
+        },
+        {
+          "ponto": "atuador-100: espessuraDaSaida=3",
+          "restricao": "chanfro-cabe-na-saida"
+        },
+        {
+          "ponto": "atuador-100: espessuraDoFlange=3",
+          "restricao": "chanfro-cabe-no-flange"
+        },
+        {
+          "ponto": "atuador-120: chanfro=5",
+          "restricao": "chanfro-cabe-na-saida"
+        },
+        {
+          "ponto": "atuador-120: circuloDaSaida=70",
+          "restricao": "furos-da-saida-dentro-dela"
+        },
+        {
+          "ponto": "atuador-120: circuloDoFlange=36",
+          "restricao": "furos-do-flange-fora-do-corpo"
+        },
+        {
+          "ponto": "atuador-120: circuloDoFlange=180",
+          "restricao": "furos-do-flange-dentro-dela"
+        },
+        {
+          "ponto": "atuador-120: comprimento=20",
+          "restricao": "corpo-mais-longo-que-o-flange"
+        },
+        {
+          "ponto": "atuador-120: diametro=30",
+          "restricao": "saida-dentro-do-corpo"
+        },
+        {
+          "ponto": "atuador-120: diametro=160",
+          "restricao": "flange-maior-que-o-corpo"
+        },
+        {
+          "ponto": "atuador-120: diametroDaSaida=18",
+          "restricao": "furos-da-saida-dentro-dela"
+        },
+        {
+          "ponto": "atuador-120: diametroDoFlange=40",
+          "restricao": "flange-maior-que-o-corpo"
+        },
+        {
+          "ponto": "atuador-120: espessuraDaSaida=3",
+          "restricao": "chanfro-cabe-na-saida"
+        },
+        {
+          "ponto": "atuador-120: espessuraDoFlange=3",
+          "restricao": "chanfro-cabe-no-flange"
+        },
+        {
+          "ponto": "atuador-40: chanfro=5",
+          "restricao": "chanfro-cabe-na-saida"
+        },
+        {
+          "ponto": "atuador-40: circuloDaSaida=70",
+          "restricao": "furos-da-saida-dentro-dela"
+        },
+        {
+          "ponto": "atuador-40: circuloDoFlange=36",
+          "restricao": "furos-do-flange-fora-do-corpo"
+        },
+        {
+          "ponto": "atuador-40: circuloDoFlange=180",
+          "restricao": "furos-do-flange-dentro-dela"
+        },
+        {
+          "ponto": "atuador-40: diametro=30",
+          "restricao": "saida-dentro-do-corpo"
+        },
+        {
+          "ponto": "atuador-40: diametro=160",
+          "restricao": "flange-maior-que-o-corpo"
+        },
+        {
+          "ponto": "atuador-40: diametroDaSaida=18",
+          "restricao": "furos-da-saida-dentro-dela"
+        },
+        {
+          "ponto": "atuador-40: diametroDaSaida=100",
+          "restricao": "saida-dentro-do-corpo"
+        },
+        {
+          "ponto": "atuador-40: diametroDoFlange=40",
+          "restricao": "flange-maior-que-o-corpo"
+        },
+        {
+          "ponto": "atuador-40: diametroDoFuroDaSaida=7",
+          "restricao": "furos-da-saida-dentro-dela"
+        },
+        {
+          "ponto": "atuador-40: diametroDoFuroDoFlange=9",
+          "restricao": "flange-maior-que-o-corpo"
+        },
+        {
+          "ponto": "atuador-40: espessuraDaSaida=3",
+          "restricao": "chanfro-cabe-na-saida"
+        },
+        {
+          "ponto": "atuador-40: espessuraDoFlange=3",
+          "restricao": "chanfro-cabe-no-flange"
+        },
+        {
+          "ponto": "atuador-60: chanfro=5",
+          "restricao": "chanfro-cabe-na-saida"
+        },
+        {
+          "ponto": "atuador-60: circuloDaSaida=70",
+          "restricao": "furos-da-saida-dentro-dela"
+        },
+        {
+          "ponto": "atuador-60: circuloDoFlange=36",
+          "restricao": "furos-do-flange-fora-do-corpo"
+        },
+        {
+          "ponto": "atuador-60: circuloDoFlange=180",
+          "restricao": "furos-do-flange-dentro-dela"
+        },
+        {
+          "ponto": "atuador-60: diametro=30",
+          "restricao": "saida-dentro-do-corpo"
+        },
+        {
+          "ponto": "atuador-60: diametro=160",
+          "restricao": "flange-maior-que-o-corpo"
+        },
+        {
+          "ponto": "atuador-60: diametroDaSaida=18",
+          "restricao": "furos-da-saida-dentro-dela"
+        },
+        {
+          "ponto": "atuador-60: diametroDaSaida=100",
+          "restricao": "saida-dentro-do-corpo"
+        },
+        {
+          "ponto": "atuador-60: diametroDoFlange=40",
+          "restricao": "flange-maior-que-o-corpo"
+        },
+        {
+          "ponto": "atuador-60: diametroDoFuroDaSaida=7",
+          "restricao": "furos-da-saida-dentro-dela"
+        },
+        {
+          "ponto": "atuador-60: diametroDoFuroDoFlange=9",
+          "restricao": "flange-maior-que-o-corpo"
+        },
+        {
+          "ponto": "atuador-60: espessuraDaSaida=3",
+          "restricao": "chanfro-cabe-na-saida"
+        },
+        {
+          "ponto": "atuador-60: espessuraDoFlange=3",
+          "restricao": "chanfro-cabe-no-flange"
+        },
+        {
+          "ponto": "atuador-80: chanfro=5",
+          "restricao": "chanfro-cabe-na-saida"
+        },
+        {
+          "ponto": "atuador-80: circuloDaSaida=70",
+          "restricao": "furos-da-saida-dentro-dela"
+        },
+        {
+          "ponto": "atuador-80: circuloDoFlange=36",
+          "restricao": "furos-do-flange-fora-do-corpo"
+        },
+        {
+          "ponto": "atuador-80: circuloDoFlange=180",
+          "restricao": "furos-do-flange-dentro-dela"
+        },
+        {
+          "ponto": "atuador-80: comprimento=20",
+          "restricao": "corpo-mais-longo-que-o-flange"
+        },
+        {
+          "ponto": "atuador-80: diametro=30",
+          "restricao": "saida-dentro-do-corpo"
+        },
+        {
+          "ponto": "atuador-80: diametro=160",
+          "restricao": "flange-maior-que-o-corpo"
+        },
+        {
+          "ponto": "atuador-80: diametroDaSaida=18",
+          "restricao": "furos-da-saida-dentro-dela"
+        },
+        {
+          "ponto": "atuador-80: diametroDaSaida=100",
+          "restricao": "saida-dentro-do-corpo"
+        },
+        {
+          "ponto": "atuador-80: diametroDoFlange=40",
+          "restricao": "flange-maior-que-o-corpo"
+        },
+        {
+          "ponto": "atuador-80: diametroDoFuroDoFlange=9",
+          "restricao": "flange-maior-que-o-corpo"
+        },
+        {
+          "ponto": "atuador-80: espessuraDaSaida=3",
+          "restricao": "chanfro-cabe-na-saida"
+        },
+        {
+          "ponto": "atuador-80: espessuraDoFlange=3",
+          "restricao": "chanfro-cabe-no-flange"
+        }
+      ]
+    }
+  },
+  "critico": null,
+  "pessoa": null
+}

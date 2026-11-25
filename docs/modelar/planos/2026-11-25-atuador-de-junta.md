@@ -54,7 +54,7 @@ O núcleo não ganha nome de objeto nem operação nova, e o acervo sai igual. A
 
 ## Fatias
 
-1. O atuador cilíndrico, com a aprovação da pessoa.
+1. Feita em 2026-11-25: o atuador cilíndrico, com a aprovação da pessoa.
 2. O atuador de caixa, com a aprovação da pessoa.
 3. As portas, a articulação e a montagem de prova de duas juntas.
 4. O banco de provas, o mapa de ferramentas, a ficha e o fechamento.
@@ -68,5 +68,7 @@ Decidido em 2026-11-25, pela recomendação: o cilíndrico de 40, 60, 80, 100 e 
 Se a articulação de revolução não conferir o curso com a carcaça do atuador vizinho por causa da faceta, a fatia mede a folga mínima e volta à pessoa.
 
 ## Andamento
+
+Fatia 1, em 2026-11-25. A família `atuador-de-junta` faz o atuador cilíndrico de 40, 60, 80, 100 e 120 mm: a carcaça torneada com a flange de fixação atrás (furos passantes em círculo, por `arranja` radial), o corpo com as bordas chanfradas e a saída do cabo de lado, unida; e a flange de saída que gira, peça à parte sobre a face da frente, com os furos cegos. As portas `fixacao` e `saida` são o padrão dos furos de cada flange. A conferência pegou duas coisas: o padrão circular da porta mede o ângulo no quadro do plano de apoio, que para a normal de trás e para a da frente gira diferente, e o furo 0 passou a ser declarado em 90° + 180°/n atrás e em −90° − 180°/n na frente; e, com três furos, a porta de fixação acusou peça junto do furo maior que o furo, caso que não ficou explicado e que levou o mínimo a quatro furos, o que os atuadores reais usam. A camada mecânica foi gravada depois da aprovação da pessoa por imagem.
 
 ## Fechamento
