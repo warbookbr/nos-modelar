@@ -1,6 +1,6 @@
 # Costura automática de vão em faixaDeContornoNaRede e guardas de rede
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `procedural/nucleo/faixa-de-contorno-na-rede.js`, `procedural/nucleo/faixa-de-contorno-na-rede.test.mjs`, `procedural/nucleo/gaiola-por-rede.js`, `procedural/nucleo/gaiola-por-rede.test.mjs`, `procedural/nucleo/fixtures/faixa-de-contorno-prova.js`, `procedural/pecas/carro-quadrado/`
 
@@ -68,4 +68,9 @@ Se manter as estações `1550`/`1235` em `L3..L6` com faixa de apoio gerar salto
 
 ## Fechamento
 
-Preencher somente ao concluir ou cancelar.
+Concluído em 2026-11-24 na branch `envio/carro-quadrado-forma`.
+
+- Entregou em `procedural/nucleo/faixa-de-contorno-na-rede.js`: `anelDeAmortecimentoMm`, modo `vao`, `cantos` automáticos, herança de `superficie` no anel neutro e avisos `vaoEstreito` / `amortecimentoEstreito`.
+- Entregou em `procedural/nucleo/gaiola-por-rede.js`: `retalho.superficie`, `alinharSuperficie` (interpolação progressiva / PIA na zona neutra + propagação automática de gradação entre curvas colineares) e avisos `extraordinarioEmVinco`, `cordaLongaEmTransicao`, `desvioDeSuperficie` e `gradacaoBrusca` entre curvas distintas (`165/165` testes verdes).
+- Reescreveu `carro-quadrado/lataria` sem peça separada de arco (`desvioMaximoMm` na zona neutra reduzido de `1,439 mm` para `0,009 mm`, `23` corpos, `0` faces órfãs, `0` contatos) e criou a bancada isolada `procedural/pecas/carro-quadrado/partes/estudo-arcos/receita.js` com três opções de arco lado a lado.
+- Na inspeção ortográfica em arame de `estudo-arcos`, a pessoa identificou que o leque de transição atual de `vao` cisalha as linhas horizontais para baixo ao cruzar a fronteira vertical e concentra mais subdivisões nas laterais do arco que no topo; essa evolução topológica do `vao` segue em plano próprio (`2026-11-24-topologia-ortogonal-de-vao-em-contorno.md`).
