@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2157 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2166 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -640,6 +640,7 @@
 - `2026-11-16-eletronica-no-modelar.md` — O lado Modelar da mecatrônica: plano-raiz que gera a família de componentes e a ponte
 - `2026-11-16-ponte-com-a-mecatronica.md` — Ponte com a mecatrônica: a ficha do objeto exportada, as portas elétricas declaradas e o pedido que volta conferido
 - `2026-11-17-trilhas-e-validacao-da-placa.md` — Trilhas de cobre e validação elétrica da placa declarada: a lista de ligações vira cobre conferido por regra e por conectividade
+- `2026-11-24-topologia-ortogonal-de-vao-em-contorno.md` — Topologia ortogonal e bem distribuída na costura de vão em faixaDeContornoNaRede
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
@@ -1068,6 +1069,8 @@
 - `extensao-estrutura-de-barras.test.mjs` — estrutura-de-barras.test.mjs — a extensão estruturaDeBarras: quadro plano, treliça triangular, cubo de 12 barras, juntas sem fresta, comprimentos de corte, p…
 - `extensoes.js` — extensoes.js — SDK nativo: manifesta, limita e combina extensões sem estado global.
 - `extensoes.test.mjs` — extensoes-nativas.test.mjs — R07: SDK confinado, prova e ausência explícita.
+- `faixa-de-contorno-na-rede.js` — faixa-de-contorno-na-rede.js — gera anéis concêntricos de relevo (chanfro, ombro vincado, bojo suave e aba interna) para composição direta em `gaiolaPorRede`…
+- `faixa-de-contorno-na-rede.test.mjs` — faixa-de-contorno-na-rede.test.mjs — testes unitários e de integração de faixaDeContornoNaRede e guardas de vão/superfície em gaiolaPorRede.
 - `friso-aba-pele.test.mjs` — friso-aba-pele.test.mjs — a aba numa chapa sem espessura (fatia 3 do plano da gaiola que segue as feições). O pacote cego entrega só a pele externa da carroc…
 - `friso-aba.test.mjs` — friso-aba.test.mjs — a aba que dobra a borda livre de um vão (fatia 25, item 6 do plano da carroceria por subdivisão). A chapa de referência dobra uns 90 gra…
 - `friso-contato.test.mjs` — friso-contato.test.mjs — o contato declarado do gate da fatia 13 do plano da carroceria por subdivisão (e o da aba da fatia 25): na chapa curva com vão de `f…
@@ -1185,6 +1188,7 @@
 - `aba-prova.js` — aba-prova.js — a chapa curva com um vão de janela nomeado e a aba que dobra a borda dele, desenhadas por código.
 - `borda-enrolada.js` — borda-enrolada.js — a borda enrolada de prova da gaiola local, desenhada só por código
 - `chapa-em-l-prova.js` — chapa-em-l-prova.js — a chapa de prova da curva sobre a quina arredondada, sem domínio
+- `faixa-de-contorno-prova.js` — faixa-de-contorno-prova.js — fixture neutra (sem domínio de veículo) para provar `faixaDeContornoNaRede`: chapa curva de 800 × 450 mm com abertura semicircul…
 - `friso-prova.js` — friso-prova.js — a chapa curva com vão e os frisos desenhados por código para o teste do passo `friso`.
 - `gaiola-aneis-prova.js` — gaiola-aneis-prova.js — a chapa curva com um vão de janela de cantos arredondados e um arco recortado na borda, desenhada por código
 - `gaiola-borda-livre-prova.js` — gaiola-borda-livre-prova.js — a metade de uma chapa curva com um vão aberto pelas colunas que terminam e começam
@@ -1682,6 +1686,11 @@
 ## procedural/pecas/carro-quadrado/
 
 - `ALINHAMENTO.md` — Carro quadrado: alinhamento
+- `GUIA-DE-MODELAGEM.md` — Guia de Modelagem — `carro-quadrado/lataria` (Referência Otimizada para Agentes)
+
+## procedural/pecas/carro-quadrado/partes/estudo-arcos/
+
+- `receita.js` — carro-quadrado/estudo-arcos — chapa curva isolada (perfil da lateral traseira com abaulamento vertical, afunilamento longitudinal e vinco de ombro) comparand…
 
 ## procedural/pecas/carro-quadrado/partes/lataria/
 
@@ -1689,9 +1698,12 @@
 
 ## procedural/pecas/carro-quadrado/partes/lataria/receita/
 
-- `chapa.js` — carro-quadrado/lataria/receita/chapa.js — gaiola da chapa contínua, arcos de roda e helpers de abertura.
+- `acabamentos.js` — carro-quadrado/lataria/receita/acabamentos.js — acabamentos das portas (coluna do quebra-vento). Os arcos de roda são estampados na própria malha em chapa.js.
+- `capo.js` — carro-quadrado/lataria/receita/capo.js — capô como peça separada real (gaiola quad com vincos longitudinais, dobra frontal de lombada e rasgos de respiro cor…
+- `chapa.js` — carro-quadrado/lataria/receita/chapa.js — gaiola 100% quad da chapa contínua com arcos de roda estampados na própria malha via faixaDeContornoNaRede.
 - `frente-traseira.js` — carro-quadrado/lataria/receita/frente-traseira.js — grade, faróis, setas, lanternas, placas, puxador, fechadura e escapamento.
 - `parachoques.js` — carro-quadrado/lataria/receita/parachoques.js — para-choques envolventes com friso claro e frisos laterais conformados na chapa.
+- `retrovisor.js` — carro-quadrado/lataria/receita/retrovisor.js — retrovisores externos realistas (base triangular, pedestal curto encorpado, concha aerodinâmica oca varrida e …
 
 ## procedural/pecas/carro-quadrado/referencias/
 
