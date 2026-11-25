@@ -1,0 +1,669 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "braco-de-prova/base",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "docs/modelar/banco-de-provas/braco-de-prova-2026-11-23/elos-opcoes.png",
+    "nota": 7,
+    "defeitos": [
+      {
+        "parte": "botaoDeParada",
+        "tipo": "superficie",
+        "onde": "aresta superior e lateral do botão",
+        "sentido": "anguloso",
+        "evidencia": "isométrica isolada do botão: cilindro reto com aresta viva e leve segmentação, sem o raio de cogumelo da forma prometida."
+      },
+      {
+        "parte": "hasteDoBotao",
+        "tipo": "superficie",
+        "onde": "perímetro lateral do cilindro",
+        "sentido": "facetado",
+        "evidencia": "isométrica isolada da haste: poucos lados, faces largas visíveis, lê como prisma."
+      },
+      {
+        "parte": "tampa",
+        "tipo": "uniao",
+        "onde": "borda superior da tampa, na quina chanfrada do garfo, lado esquerdo",
+        "sentido": "atravessando",
+        "evidencia": "corte-base-garfo.png, painel ampliado: o chanfro do garfo encosta na face da tampa, 0,00 mm entre malhas, sem contato declarado para o par."
+      }
+    ],
+    "observacao": "Silhueta e medidas batem com o alvo e com os critérios; o botão fica na frente, mas com folga de cerca de 4,5 mm até o motor do ombro, e o toque garfo-tampa precisa de decisão."
+  },
+  "partes": [
+    {
+      "nome": "casco",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "tampa",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "fonte",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "arduino",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "driverOmbro",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "driverCotovelo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "hasteDoBotao",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "botaoDeParada",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "aviso de 32 faces finas na malha, todas na tampa (os furos M3 e o do botão); a medição passa e o aviso não separa lasca de furo intencional"
+  ],
+  "notaDePassagem": "Casco de 47 mm mais tampa de 3 mm dão os 50 mm do plano; o botão fica em x −45, z 60, na frente e fora do caminho do garfo e do motor do ombro; os quatro M3 do garfo passam pela tampa em x ±25, z ±45.",
+  "receita": {
+    "sha256": "sha256:849edd86dfdcd85c4f4117476b23f1a2fab564d064bec57ef79d9c2e30817f51",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 113,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* braco-de-prova/base — a base redonda e baixa do braço de prova, oca, com a eletrônica dentro e o botão de parada no topo."
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " * Primeira etapa da montagem `braco-de-prova/montagem.json`. O combinado com a pessoa está no banco de provas"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * `docs/modelar/banco-de-provas/braco-de-prova-2026-11-23/README.md` (base redonda de 90 mm de raio e 50 de altura, a fonte,"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * o Arduino e os dois drivers dentro, o botão de parada de cogumelo vermelho de uns 22 mm no topo, na frente, longe do"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * caminho do braço). As medidas dos componentes são as do pedido inicial da mecatrônica: fonte 111 × 78 × 36, Arduino Uno"
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " * 68,6 × 53,4 × 15 e DRV8825 15,2 × 20,3 (a altura de 12 mm com o dissipador é estimativa)."
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * Referencial: o da montagem (ver `../../comum/blocos.mjs`): origem no chão, sob o eixo do ombro; y para cima, +z é a frente."
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * Técnica: o casco é um cilindro esvaziado pela `casca`, aberto em cima; a tampa é um disco de 3 mm com o furo do botão;"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * os componentes são caixas apoiadas no fundo do casco."
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " * Portas: `topo` — plano que recebe, no centro da face de cima da tampa, normal +y; o garfo do ombro se apoia nele."
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " */"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": "import { passosDasFormas, aliasesDasFormas, porta, origemDa, MATERIAIS as CORES } from '../../../comum/blocos.mjs';"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": "  raio: 90,"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": "  altura: 50,"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": "  /* Parede e fundo do casco, e a tampa; o mínimo impresso é 2 mm. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": "  parede: 3,"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": "  tampa: 3,"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": "  /* Botão de parada: centro no topo, na frente e à esquerda do motor do ombro; cogumelo de 22 mm, haste de 16 mm. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": "  botaoX: -45,"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": "  botaoZ: 60,"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": "  raioDoCogumelo: 11,"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": "  alturaDoCogumelo: 8,"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": "  raioDaHaste: 8,"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": "  alturaDaHaste: 10,"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "  /* Os dois M3 de cada parede do garfo passam pela tampa (x ±25, no meio de cada parede, z ±45). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "  xDosFurosM3: 25,"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "  zDosFurosM3: 45,"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "  raioDoFuroM3: 1.7,"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "  /* Componentes, cantos [x0, x1, z0, z1] no fundo e altura. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "  fonte: { x: [-55.5, 55.5], z: [-60, 18], altura: 36 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "  arduino: { x: [-34.3, 34.3], z: [22, 75.4], altura: 15 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "  driverOmbro: { x: [38, 53.2], z: [22, 42.3], altura: 12 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "  driverCotovelo: { x: [38, 53.2], z: [46, 66.3], altura: 12 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "export const MATERIAIS = CORES;"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "const naBase = (t, c, nome, material) => ({ nome, material, caixa: [c.x[0], c.x[1], t.parede, t.parede + c.altura, c.z[0], c.z[1]] });"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "export function derivar(t = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "  const topo = t.altura;"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "  return ["
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "    { nome: 'casco', material: 'estrutura', eixo: 'y', base: [0, 0, 0], comprimento: topo - t.tampa, raio: t.raio, lados: 72, oca: { espessura: t.parede } },"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "    { nome: 'tampa', material: 'estrutura', eixo: 'y', base: [0, topo - t.tampa, 0], comprimento: t.tampa, raio: t.raio, lados: 72,"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "      furos: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "        { eixo: 'y', base: [t.botaoX, topo - t.tampa - 1, t.botaoZ], comprimento: t.tampa + 2, raio: t.raioDaHaste },"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "        ...[-1, 1].flatMap((sx) => [-1, 1].map((sz) => ({ eixo: 'y', base: [sx * t.xDosFurosM3, topo - t.tampa - 1, sz * t.zDosFurosM3], comprimento: t.tampa + 2, raio: t.raioDoFuroM3, lados: 12 }))),"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "      ] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "    naBase(t, t.fonte, 'fonte', 'fonte'),"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "    naBase(t, t.arduino, 'arduino', 'placaArduino'),"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "    naBase(t, t.driverOmbro, 'driverOmbro', 'placaDriver'),"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "    naBase(t, t.driverCotovelo, 'driverCotovelo', 'placaDriver'),"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "    { nome: 'hasteDoBotao', material: 'vermelho', eixo: 'y', base: [t.botaoX, topo - t.alturaDaHaste, t.botaoZ], comprimento: t.alturaDaHaste, raio: t.raioDaHaste, lados: 18 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "    { nome: 'botaoDeParada', material: 'vermelho', eixo: 'y', base: [t.botaoX, topo, t.botaoZ], comprimento: t.alturaDoCogumelo, raio: t.raioDoCogumelo, lados: 36, chanfro: 0 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "  ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "export const ALIASES = aliasesDasFormas(derivar(TABELA));"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "export function gerarPassos(t = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "  const formas = derivar(t);"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "  const { passos } = passosDasFormas(formas);"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "  passos.push(porta('topo', origemDa(formas, 'tampa'), { forma: 'plano', papel: 'recebe', ponto: [0, t.altura, 0], normal: [0, 1, 0], extensao: [120, 120] }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "  return passos;"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "const receita = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "  meta: { nome: 'braco-de-prova/base', desc: 'base redonda do braço de prova: casco oco de 90 mm de raio e 50 de altura, com a fonte, o Arduino e os dois drivers dentro e o botão de parada vermelho no topo, na frente' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "  PARAMS: TABELA,"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "  MATERIAIS,"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "  ALIASES,"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "  TOPO: { origem: 'chão, sob o eixo do ombro; y para cima, x ao longo do braço esticado, +z para a frente' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "  PLANO: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "    objeto: 'base redonda e baixa do braço de prova, oca, com a eletrônica dentro e o botão de parada no topo',"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "    referencias: ['../../../../../docs/modelar/banco-de-provas/braco-de-prova-2026-11-23/elos-opcoes.png'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "    escala: { medida: 'diâmetro da base', milimetros: 180 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "    partes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "      { nome: 'casco', forma: 'cilindro de 90 mm de raio e 47 mm de altura, oco, parede e fundo de 3 mm, aberto em cima', tecnica: 'cilindro esvaziado pela casca' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "      { nome: 'tampa', forma: 'disco de 3 mm no topo do casco, com o furo de 16 mm da haste do botão e os quatro M3 do garfo', tecnica: 'cilindro com furo por subtração' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "      { nome: 'fonte', forma: 'bloco de 111 × 36 × 78 mm no fundo do casco', tecnica: 'caixa' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "      { nome: 'arduino', forma: 'bloco de 68,6 × 15 × 53,4 mm no fundo, na frente', tecnica: 'caixa' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "      { nome: 'driverOmbro', forma: 'bloco de 15,2 × 12 × 20,3 mm no fundo', tecnica: 'caixa' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "      { nome: 'driverCotovelo', forma: 'bloco de 15,2 × 12 × 20,3 mm no fundo', tecnica: 'caixa' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "      { nome: 'hasteDoBotao', forma: 'haste de 16 mm de diâmetro que passa pelo furo da tampa', tecnica: 'cilindro' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "      { nome: 'botaoDeParada', forma: 'cogumelo vermelho de 22 mm de diâmetro e 8 mm de altura sobre a tampa, na frente', tecnica: 'cilindro' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "    criteriosDeReprovacao: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "      'raio diferente de 90 mm ou altura diferente de 50 mm',"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "      'parede, fundo ou tampa com menos de 2 mm',"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "      'fonte, Arduino ou driver atravessando a parede, a tampa ou outro componente',"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "      'botão de parada fora da frente da base ou embaixo do braço ou do motor do ombro',"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "  contatos: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "    { par: ['arduino', 'casco'], motivo: 'a placa assenta no fundo do casco' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "    { par: ['botaoDeParada', 'hasteDoBotao'], motivo: 'o cogumelo fica no topo da haste' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "    { par: ['botaoDeParada', 'tampa'], motivo: 'o cogumelo assenta na tampa' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "    { par: ['casco', 'driverCotovelo'], motivo: 'o driver assenta no fundo do casco' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "    { par: ['casco', 'driverOmbro'], motivo: 'o driver assenta no fundo do casco' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "    { par: ['casco', 'fonte'], motivo: 'a fonte assenta no fundo do casco' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "    { par: ['casco', 'tampa'], motivo: 'a tampa fecha o topo do casco' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "    { par: ['hasteDoBotao', 'tampa'], motivo: 'a haste passa justa pelo furo da tampa' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "  ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "  get PASSOS() { return gerarPassos(this.PARAMS); },"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "export default receita;"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": ""
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "registradaEm": "2026-11-23T23:34:14.786Z",
+  "facesFinas": {
+    "total": 32,
+    "porParte": {
+      "tampa": 32
+    }
+  }
+}

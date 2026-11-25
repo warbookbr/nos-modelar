@@ -1,0 +1,653 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "braco-de-prova/garfo",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "docs/modelar/banco-de-provas/braco-de-prova-2026-11-23/elos-opcoes.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "paredeDaFrente",
+        "tipo": "ausencia",
+        "onde": "parte baixa da parede, os dois M3 prometidos",
+        "sentido": "faltando",
+        "evidencia": "Na isométrica isolada só aparecem o furo grande e os 4 M5, e a parte baixa está lisa. Os M3 têm menos de 10 mm e não há vista de perto, então não se confirma o defeito nem a feição."
+      },
+      {
+        "parte": "paredeDeTras",
+        "tipo": "ausencia",
+        "onde": "parte baixa da parede, os dois M3 prometidos",
+        "sentido": "faltando",
+        "evidencia": "Na isométrica isolada só aparece o furo de 10 mm, e a parte baixa está lisa. Os M3 são menores que 10 mm e não há vista de perto, então não se confirma o defeito nem a feição."
+      }
+    ],
+    "observacao": "Forma e proporção batem com o caráter da opção A do alvo. A vista frontal isolada repete a traseira e não mostra o furo grande, o que parece falha de captura; os toques de 0,00 mm com base, motor e rolamento ficam para quem orquestra."
+  },
+  "partes": [
+    {
+      "nome": "paredeDaFrente",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "paredeDeTras",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "nervuraDaFrente",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "nervuraDeTras",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "aviso de 21 faces finas na malha (paredeDeTras 17, paredeDaFrente 4), vindas dos furos e chanfros; a medição passa"
+  ],
+  "notaDePassagem": "As paredes ficam em z 39 a 51 e −51 a −39, a 90 mm entre centros, com 12 mm de espessura; o furo de 33 mm da frente recebe o ressalto da planetária e o de 10 mm de trás recebe o pino do elo. As paredes só se ligam pela base, por isso a ilha declarada.",
+  "receita": {
+    "sha256": "sha256:ecc65e3c3a212c74f50492a1d4f0e39ad3fd5eaea8d4832c0b8478d6253862e3",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 115,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* braco-de-prova/garfo — o garfo do ombro: duas paredes laranja de 12 mm, a 90 mm uma da outra, presas no topo da base."
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " * Segunda etapa da montagem `braco-de-prova/montagem.json`. Do alinhamento (banco de provas braco-de-prova-2026-11-23): o"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * ombro em garfo, com o primeiro elo apoiado de um lado pelo eixo da planetária e do outro por um rolamento; medidas do"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * esboço escolhido (opção C de `elos-opcoes.esboco.mjs`): paredes de 70 × 122 × 12 mm, centros em z = ±45, eixo do ombro a"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * 140 mm do chão."
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * Referencial: o da montagem (ver `../../comum/blocos.mjs`). A parede da frente (+z) leva o furo de passagem do eixo de 14 mm da"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * planetária (folga de 1 mm no raio); a de trás, o furo do pino do elo, que gira no rolamento (folga de 1 mm no raio)."
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * Portas: `apoio` (plano, apoia, no chão do garfo, normal −y), `faceDoMotor` (plano, recebe, face de fora da parede da"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " * frente, normal +z) e `faceDoRolamento` (plano, recebe, face de fora da parede de trás, normal −z)."
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " */"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": "import { passosDasFormas, aliasesDasFormas, porta, origemDa, MATERIAIS as CORES } from '../../../comum/blocos.mjs';"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": "  /* Topo da base, onde o garfo se apoia. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": "  apoio: 50,"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": "  alturaDoEixo: 140,"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": "  largura: 70,"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": "  /* 122 mm: os M5 de cima da planetária (a 23,6 mm acima do eixo) ficam a 5,7 mm da borda de cima. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": "  altura: 122,"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": "  espessura: 12,"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": "  /* Face de dentro de cada parede; as paredes ficam de 39 a 51 mm do plano do braço, centros a 90 mm. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": "  vaoInterno: 39,"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": "  /* A passagem da frente recebe o ressalto de saída da planetária (32 mm), com 0,5 mm de folga no raio. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": "  raioDaPassagemDoMotor: 16.5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": "  raioDaPassagemDoPino: 5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": "  chanfro: 3,"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "  /* Os quatro M5 da planetária no quadrado de 47,14 mm, passantes na parede da frente. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "  passoDosFurosM5: 47.14,"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "  raioDoFuroM5: 2.75,"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "  /* Dois M3 de baixo para cima em cada parede, cegos de 12 mm, que prendem o garfo na tampa da base. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "  xDosFurosM3: 25,"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "  raioDoFuroM3: 1.7,"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "  fundoDoFuroM3: 12,"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "  /* As nervuras: uma no meio de cada parede, por fora, do apoio até 50 mm de altura, de 12 mm de largura e 14 mm de saída,"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "     abaixo da planetária e do rolamento e longe do botão de parada. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "  alturaDaNervura: 50,"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "  larguraDaNervura: 12,"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "  saidaDaNervura: 14,"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "  chanfroDaNervura: 1.5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "export const MATERIAIS = CORES;"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "export function derivar(t = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "  const x = [-t.largura / 2, t.largura / 2];"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "  const y = [t.apoio, t.apoio + t.altura];"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "  const fora = t.vaoInterno + t.espessura;"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "  const passagem = (z0, raio) => ({ eixo: 'z', base: [0, t.alturaDoEixo, z0], comprimento: t.espessura + 2, raio, lados: 36 });"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "  const m5 = [-1, 1].flatMap((sx) => [-1, 1].map((sy) => ({"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "    eixo: 'z', base: [(sx * t.passoDosFurosM5) / 2, t.alturaDoEixo + (sy * t.passoDosFurosM5) / 2, t.vaoInterno - 1], comprimento: t.espessura + 2, raio: t.raioDoFuroM5, lados: 12,"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "  })));"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "  const m3 = (zc) => [-1, 1].map((sx) => ({ eixo: 'y', base: [sx * t.xDosFurosM3, t.apoio - 1, zc], comprimento: t.fundoDoFuroM3 + 1, raio: t.raioDoFuroM3, lados: 12 }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "  const meio = t.vaoInterno + t.espessura / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "  const nervura = (nome, sz) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "    const xs = [-t.larguraDaNervura / 2, t.larguraDaNervura / 2];"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "    const zs = sz > 0 ? [fora, fora + t.saidaDaNervura] : [-fora - t.saidaDaNervura, -fora];"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "    return { nome, material: 'laranja', chanfro: t.chanfroDaNervura, caixa: [...xs, t.apoio, t.apoio + t.alturaDaNervura, ...zs] };"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "  return ["
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "    { nome: 'paredeDaFrente', material: 'laranja', chanfro: t.chanfro, caixa: [...x, ...y, t.vaoInterno, fora], furos: [passagem(t.vaoInterno - 1, t.raioDaPassagemDoMotor), ...m5, ...m3(meio)] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "    { nome: 'paredeDeTras', material: 'laranja', chanfro: t.chanfro, caixa: [...x, ...y, -fora, -t.vaoInterno], furos: [passagem(-fora - 1, t.raioDaPassagemDoPino), ...m3(-meio)] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "    nervura('nervuraDaFrente', 1),"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "    nervura('nervuraDeTras', -1),"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "  ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "export const ALIASES = aliasesDasFormas(derivar(TABELA));"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "export function gerarPassos(t = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "  const formas = derivar(t);"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "  const { passos } = passosDasFormas(formas);"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "  const fora = t.vaoInterno + t.espessura;"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "  passos.push(porta('apoio', origemDa(formas, 'paredeDaFrente'), { forma: 'plano', papel: 'apoia', ponto: [0, t.apoio, 0], normal: [0, -1, 0], extensao: [120, 120] }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "  passos.push(porta('faceDoMotor', origemDa(formas, 'paredeDaFrente'), { forma: 'plano', papel: 'recebe', ponto: [0, t.alturaDoEixo, fora], normal: [0, 0, 1], extensao: [57, 57] }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "  passos.push(porta('faceDoRolamento', origemDa(formas, 'paredeDeTras'), { forma: 'plano', papel: 'recebe', ponto: [0, t.alturaDoEixo, -fora], normal: [0, 0, -1], extensao: [28, 28] }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "  return passos;"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "const receita = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "  meta: { nome: 'braco-de-prova/garfo', desc: 'garfo do ombro do braço de prova: duas paredes laranja de 70 × 122 × 12 mm, a 90 mm uma da outra, com a passagem do eixo da planetária na da frente e a do pino do elo na de trás' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "  PARAMS: TABELA,"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "  MATERIAIS,"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "  ALIASES,"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "  TOPO: { origem: 'chão, sob o eixo do ombro; y para cima, x ao longo do braço esticado, +z para a frente' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "  PLANO: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "    objeto: 'garfo do ombro do braço de prova, duas paredes paralelas presas no topo da base',"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "    referencias: ['../../../../../docs/modelar/banco-de-provas/braco-de-prova-2026-11-23/elos-opcoes.png'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "    escala: { medida: 'distância entre os centros das paredes', milimetros: 90 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "    partes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "      { nome: 'paredeDaFrente', forma: 'parede de 70 × 122 × 12 mm, de z 39 a 51, com o furo de 33 mm do ressalto da planetária no eixo do ombro, os quatro M5 dela e dois M3 de baixo', tecnica: 'caixa chanfrada com furos por subtração' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "      { nome: 'paredeDeTras', forma: 'parede de 70 × 122 × 12 mm, de z −51 a −39, com o furo de 10 mm do pino do elo no eixo do ombro e dois M3 de baixo', tecnica: 'caixa chanfrada com furos por subtração' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "      { nome: 'nervuraDaFrente', forma: 'nervura de 12 × 50 × 14 mm no meio da parede da frente, por fora, abaixo da planetária', tecnica: 'caixa chanfrada' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "      { nome: 'nervuraDeTras', forma: 'nervura de 12 × 50 × 14 mm no meio da parede de trás, por fora, abaixo do rolamento', tecnica: 'caixa chanfrada' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "    criteriosDeReprovacao: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "      'paredes com espessura diferente de 12 mm ou a outra distância entre elas',"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "      'parede fora do topo da base ou solta dela',"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "      'furo da parede fora do eixo do ombro, ou sem folga para o eixo que passa nele',"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "      'garfo em outra cor que não o laranja',"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "  contatos: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "    { par: ['nervuraDaFrente', 'paredeDaFrente'], motivo: 'a nervura escora a parede por fora' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "    { par: ['nervuraDeTras', 'paredeDeTras'], motivo: 'a nervura escora a parede por fora' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "  ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "  /* As duas paredes só se ligam pela base, na montagem. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "  ilhas: [{ contem: 'paredeDeTras', motivo: 'as paredes do garfo são presas uma a uma no topo da base, e só a base as liga' }],"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "  get PASSOS() { return gerarPassos(this.PARAMS); },"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "export default receita;"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": ""
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "registradaEm": "2026-11-23T23:34:15.408Z",
+  "facesFinas": {
+    "total": 21,
+    "porParte": {
+      "paredeDaFrente": 4,
+      "paredeDeTras": 17
+    }
+  }
+}

@@ -1,0 +1,87 @@
+{
+  "nota": "Declarações no formato da extensão de articulação (mecanifica.articulacao@1), lidas por conferirArticulacao sobre a montagem resolvida, com o ângulo medido a partir da pose da montagem (o braço esticado na horizontal) e o positivo para cima (mão direita em +z). A pessoa decidiu em 2026-11-23: o zero do ombro na ficha passa a ser o braço em pé, e o curso de -90 a +90 graus em torno dele é, aqui, de 0 a 180 graus a partir da horizontal; o cotovelo fica de -100 a +130 graus, abaixo dos ±140 do dimensionamento, porque de -104 o segundo elo bate na base e de +132 no NEMA 17. Conferido em 2026-11-23: livre nos dois cursos.",
+  "articulacoes": [
+    {
+      "id": "ombro",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "motorOmbro"
+        ],
+        "porta": "eixoDeSaida"
+      },
+      "movel": {
+        "caminho": [
+          "elo1"
+        ],
+        "porta": "juntaDoOmbro"
+      },
+      "acompanham": [
+        [
+          "motorCotovelo"
+        ],
+        [
+          "transmissao"
+        ],
+        [
+          "elo2"
+        ],
+        [
+          "garra"
+        ]
+      ],
+      "unidade": "graus",
+      "curso": {
+        "minimo": 0,
+        "maximo": 180
+      },
+      "passos": 36,
+      "folga": {
+        "valor": 0.05,
+        "unidade": "mm"
+      }
+    },
+    {
+      "id": "cotovelo",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "elo1"
+        ],
+        "porta": "juntaDoCotovelo"
+      },
+      "movel": {
+        "caminho": [
+          "elo2"
+        ],
+        "porta": "juntaNoCotovelo"
+      },
+      "acompanham": [
+        [
+          "garra"
+        ]
+      ],
+      "unidade": "graus",
+      "curso": {
+        "minimo": -100,
+        "maximo": 130
+      },
+      "passos": 70,
+      "folga": {
+        "valor": 0.05,
+        "unidade": "mm"
+      },
+      "permitidos": [
+        {
+          "movel": [
+            "elo2"
+          ],
+          "fixo": [
+            "transmissao"
+          ],
+          "motivo": "a polia grande gira presa ao eixo do cotovelo, e o eixo de 18 lados girando no furo de 18 lados dela só cruza arestas, sem penetração medida"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "braco-de-prova/transmissao",
+  "numero": 2,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "docs/modelar/banco-de-provas/braco-de-prova-2026-11-23/elos-opcoes.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "correia",
+        "tipo": "superficie",
+        "onde": "anel grande, arco sobre a polia de 80 dentes",
+        "sentido": "facetado",
+        "evidencia": "Na frontal e na isométrica o contorno externo do anel grande mostra quebras de polígono visíveis, com cerca de 36 lados em raio de 27 mm. A referência pede arco contínuo."
+      }
+    ],
+    "observacao": "Não houve alvo comparável, pois a referência mostra só os elos. As formas prometidas aparecem e as folgas passam: 3,14 mm ao fundo do elo, maior que o mínimo de 2 mm, e cerca de 16 mm às paredes. Só há facetamento de baixa gravidade."
+  },
+  "partes": [
+    {
+      "nome": "poliaPequena",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "poliaGrande",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "correia",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "aviso de 87 faces finas na malha (poliaGrande 70, correia 13, poliaPequena 4), dos dentes e da correia facetada; a medição passa"
+  ],
+  "notaDePassagem": "A correia facetada de 36 lados assenta a até 0,05 mm da ponta dos dentes, porque a face reta do anel entraria nos dentes da polia de 96 lados. Cada polia é presa no eixo dela e só a montagem as liga, por isso as duas ilhas declaradas.",
+  "receita": {
+    "sha256": "sha256:6d59316c5008419414c51fceb9e62bbe7d3fbc76471aeeaca18f2306574300ad",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 0,
+      "acrescentadas": 0,
+      "linhas": [],
+      "cortada": false
+    }
+  },
+  "registradaEm": "2026-11-24T23:00:14.128Z",
+  "facesFinas": {
+    "total": 87,
+    "porParte": {
+      "poliaPequena": 4,
+      "poliaGrande": 70,
+      "correia": 13
+    }
+  }
+}

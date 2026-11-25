@@ -1,0 +1,784 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "braco-de-prova/elo1",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "docs/modelar/banco-de-provas/braco-de-prova-2026-11-23/elos-opcoes.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "cuboDoOmbro",
+        "tipo": "superficie",
+        "onde": "casca cilíndrica externa e furo interno",
+        "sentido": "facetado",
+        "evidencia": "Vista isométrica isolada: a casca do cilindro mostra faixas planas bem marcadas, e o cubo lê como prisma de muitos lados."
+      },
+      {
+        "parte": "pino",
+        "tipo": "superficie",
+        "onde": "corpo cilíndrico inteiro",
+        "sentido": "facetado",
+        "evidencia": "Vista isométrica isolada: o corpo mostra faixas planas. No corte do rolamento, a seção do pino é um polígono de cerca de 16 lados."
+      }
+    ],
+    "observacao": "U aberto com correia à mostra, como a opção C. Só detalhe de superfície; cubo e pino em cinza-claro divergem do critério de cinza-escuro, e a traseira sombreada não mostra os furos da parede de trás."
+  },
+  "partes": [
+    {
+      "nome": "fundo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "paredeDaFrente",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "paredeDeTras",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaDaFrente",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "abaDeTras",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pino",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "aviso de 23 faces finas na malha (paredeDeTras 21, paredeDaFrente 2), vindas dos furos do NEMA 17; a medição passa"
+  ],
+  "notaDePassagem": "O U fica aberto em cima, com abas por dentro no alto das paredes para endurecê-las; o fundo fica 3 mm abaixo da correia, e as paredes em z 20 a 26 e −26 a −20 deixam o elo entre as paredes do garfo sem tocá-las. A distância entre os eixos do ombro e do cotovelo é de 150 mm.",
+  "receita": {
+    "sha256": "sha256:ec2df09c817570fc1faf35f47df0f122c580bd79cb5a1ea058de07f1a447d810",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 139,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* braco-de-prova/elo1 — o primeiro elo, um perfil em U aberto em cima, cinza-escuro, de 150 mm entre o eixo do ombro e o do"
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " * cotovelo, girando entre as paredes do garfo."
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * Quinta etapa da montagem `braco-de-prova/montagem.json`. Do alinhamento (banco de provas braco-de-prova-2026-11-23): a"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * opção C, perfil em U aberto com a correia à mostra; o NEMA 17 preso perto do ombro, com as polias GT2 de 20 e 80 dentes e a"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * correia dentro do U até o cotovelo."
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * O U tem duas paredes de 6 mm (faces de fora em z = ±26) e o fundo de 6 mm por baixo; o vão de dentro, de 40 mm, deixa"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * 17 mm de folga de cada lado da correia de 6 mm, e o fundo fica 3 mm abaixo do ponto mais baixo da correia. Na face de fora da parede"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * da frente, o cubo do ombro recebe 12 mm do eixo de saída da planetária, preso por um M3 radial; da parede de trás sai o pino de 8 mm que passa pelo garfo e gira"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * no rolamento. A parede de trás tem o furo de 23 mm onde assenta o ressalto do NEMA 17, com os quatro M3 da flange, e as duas paredes têm o furo de"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " * 10 mm do eixo do cotovelo, que é do segundo elo."
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * Referencial: o da montagem (ver `../../comum/blocos.mjs`); o braço esticado na horizontal, ao longo de +x."
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " * Portas: `juntaDoOmbro` (cilindro interno, eixo +z, no eixo do ombro, o furo do cubo a partir da face de fora da parede da frente), onde o eixo de"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * saída da planetária se prende; `assentoDoMotor` (plano, recebe, normal −z, na face de fora da parede de trás, no eixo do"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * NEMA 17) e `juntaDoCotovelo` (cilindro interno, eixo +z, centro no eixo do cotovelo na face de fora da parede de trás)."
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " */"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": "import { passosDasFormas, aliasesDasFormas, porta, origemDa, MATERIAIS as CORES } from '../../../comum/blocos.mjs';"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": "  alturaDoEixo: 140,"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": "  entreEixos: 150,"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": "  /* Quanto o perfil passa do eixo do ombro para trás e do eixo do cotovelo para a frente. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": "  sobraAtras: 30,"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": "  sobraAFrente: 30,"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": "  /* Metade do vão de dentro do U, espessura das paredes e do fundo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": "  meioVao: 20,"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "  parede: 6,"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "  fundo: 6,"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "  /* Faixa vertical do perfil: o fundo começa em y = 104 e as paredes sobem até y = 176. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "  baixo: 104,"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "  alto: 176,"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "  /* Eixo do NEMA 17, a 80 mm do ombro, e o furo por onde o eixo de 5 mm dele entra no U. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "  eixoDoMotor: 80,"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "  /* A passagem recebe o ressalto de 22 mm do NEMA 17, com 0,5 mm de folga no raio; os quatro M3 da flange, no quadrado de"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "     31 mm, atravessam a parede. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "  raioDaPassagemDoMotor: 11.5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "  passoDosFurosM3: 31,"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "  raioDoFuroM3: 1.7,"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "  /* As nervuras de dentro: uma aba de 6 × 6 mm no alto de cada parede, de ponta a ponta do perfil, que endurece a chapa"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "     longa; a 14 mm da correia em z. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "  aba: 6,"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "  raioDaPassagemDoCotovelo: 5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "  /* Pino do lado de trás do ombro: 8 mm, da parede até a face de fora do rolamento. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "  raioDoPino: 4,"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "  fimDoPino: -58,"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "  chanfro: 2,"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "  /* Cubo do ombro, na face de fora da parede da frente: recebe o eixo de saída de 14 mm da planetária com 0,05 mm de folga"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "     no raio, parede de 3,95 mm, e abraça 12 mm do eixo, parando a 1 mm da face de dentro do garfo (z = 39). O furo radial"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "     de 2,5 mm, de cima, é o do parafuso de aperto M3 (rosca no cubo), no meio do comprimento. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "  raioDoFuroDoCubo: 7.05,"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "  raioDoCubo: 11,"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "  comprimentoDoCubo: 12,"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "  raioDoFuroDeAperto: 1.25,"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "export const MATERIAIS = CORES;"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "export function derivar(t = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "  const x = [-t.sobraAtras, t.entreEixos + t.sobraAFrente];"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "  const fora = t.meioVao + t.parede;"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "  const y = t.alturaDoEixo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "  const furo = (cx, z0, raio) => ({ eixo: 'z', base: [cx, y, z0], comprimento: t.parede + 2, raio });"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "  return ["
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "    { nome: 'fundo', material: 'estrutura', chanfro: t.chanfro, caixa: [...x, t.baixo, t.baixo + t.fundo, -fora, fora] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "    { nome: 'paredeDaFrente', material: 'estrutura', chanfro: t.chanfro, caixa: [...x, t.baixo + t.fundo, t.alto, t.meioVao, fora],"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "      furos: [furo(t.entreEixos, t.meioVao - 1, t.raioDaPassagemDoCotovelo)] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "    { nome: 'paredeDeTras', material: 'estrutura', chanfro: t.chanfro, caixa: [...x, t.baixo + t.fundo, t.alto, -fora, -t.meioVao],"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "      furos: [furo(t.entreEixos, -fora - 1, t.raioDaPassagemDoCotovelo), { ...furo(t.eixoDoMotor, -fora - 1, t.raioDaPassagemDoMotor), lados: 36 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "        ...[-1, 1].flatMap((sx) => [-1, 1].map((sy) => ({"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "          eixo: 'z', base: [t.eixoDoMotor + (sx * t.passoDosFurosM3) / 2, y + (sy * t.passoDosFurosM3) / 2, -fora - 1], comprimento: t.parede + 2, raio: t.raioDoFuroM3, lados: 12,"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "        })))] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "    { nome: 'abaDaFrente', material: 'estrutura', chanfro: 1, caixa: [...x, t.alto - t.aba, t.alto, t.meioVao - t.aba, t.meioVao] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "    { nome: 'abaDeTras', material: 'estrutura', chanfro: 1, caixa: [...x, t.alto - t.aba, t.alto, -t.meioVao, -t.meioVao + t.aba] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "    { nome: 'cuboDoOmbro', material: 'aco', eixo: 'z', base: [0, y, fora], comprimento: t.comprimentoDoCubo, raio: t.raioDoCubo, lados: 36,"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "      furos: [{ eixo: 'z', base: [0, y, fora - 1], comprimento: t.comprimentoDoCubo + 2, raio: t.raioDoFuroDoCubo, lados: 36 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "        { eixo: 'y', base: [0, y + t.raioDoFuroDoCubo - 1, fora + t.comprimentoDoCubo / 2], comprimento: t.raioDoCubo - t.raioDoFuroDoCubo + 2, raio: t.raioDoFuroDeAperto, lados: 12 }] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "    { nome: 'pino', material: 'aco', eixo: 'z', base: [0, y, t.fimDoPino], comprimento: -fora - t.fimDoPino, raio: t.raioDoPino, lados: 18 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "  ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "export const ALIASES = aliasesDasFormas(derivar(TABELA));"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "export function gerarPassos(t = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "  const formas = derivar(t);"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "  const { passos } = passosDasFormas(formas);"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "  const fora = t.meioVao + t.parede;"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "  passos.push(porta('juntaDoOmbro', origemDa(formas, 'cuboDoOmbro'), {"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "    forma: 'cilindro', papel: 'interna', eixo: [0, 0, 1], centro: [0, t.alturaDoEixo, fora], raio: t.raioDoFuroDoCubo, inicio: 0, fim: t.comprimentoDoCubo,"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "  }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "  passos.push(porta('assentoDoMotor', origemDa(formas, 'paredeDeTras'), { forma: 'plano', papel: 'recebe', ponto: [t.eixoDoMotor, t.alturaDoEixo, -fora], normal: [0, 0, -1], extensao: [42.3, 42.3] }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "  passos.push(porta('juntaDoCotovelo', origemDa(formas, 'paredeDeTras'), {"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "    forma: 'cilindro', papel: 'interna', eixo: [0, 0, 1], centro: [t.entreEixos, t.alturaDoEixo, -fora], raio: t.raioDaPassagemDoCotovelo, inicio: 0, fim: 2 * fora,"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "  }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "  return passos;"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "const receita = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "  meta: { nome: 'braco-de-prova/elo1', desc: 'primeiro elo do braço de prova: perfil em U aberto em cima, cinza-escuro, 150 mm entre o ombro e o cotovelo, com o NEMA 17 preso atrás e a correia à mostra dentro' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "  PARAMS: TABELA,"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "  MATERIAIS,"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "  ALIASES,"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "  TOPO: { origem: 'chão, sob o eixo do ombro; y para cima, x ao longo do braço esticado, +z para a frente' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "  PLANO: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "    objeto: 'primeiro elo do braço de prova, perfil em U aberto em cima, entre as paredes do garfo do ombro e o cotovelo',"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "    referencias: ['../../../../../docs/modelar/banco-de-provas/braco-de-prova-2026-11-23/elos-opcoes.png'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "    escala: { medida: 'distância entre o eixo do ombro e o do cotovelo', milimetros: 150 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "    partes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "      { nome: 'fundo', forma: 'fundo de 210 × 6 × 52 mm sob as paredes, 3 mm abaixo da correia', tecnica: 'caixa chanfrada' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "      { nome: 'paredeDaFrente', forma: 'parede de 210 × 66 × 6 mm, de z 20 a 26, com o furo de 10 mm do eixo do cotovelo', tecnica: 'caixa chanfrada com furo por subtração' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "      { nome: 'paredeDeTras', forma: 'parede de 210 × 66 × 6 mm, de z −26 a −20, com o furo do cotovelo, o furo de 23 mm do ressalto do NEMA 17 e os quatro M3 dele', tecnica: 'caixa chanfrada com furos por subtração' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "      { nome: 'abaDaFrente', forma: 'aba de 210 × 6 × 6 mm no alto da parede da frente, por dentro', tecnica: 'caixa chanfrada' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "      { nome: 'abaDeTras', forma: 'aba de 210 × 6 × 6 mm no alto da parede de trás, por dentro', tecnica: 'caixa chanfrada' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "      { nome: 'cuboDoOmbro', forma: 'cubo de 22 × 12 mm na face de fora da parede da frente, no eixo do ombro, com o furo de 14,1 mm do eixo de saída da planetária e o furo radial M3 do parafuso de aperto, parando a 1 mm da parede do garfo', tecnica: 'cilindro com furos por subtração' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "      { nome: 'pino', forma: 'pino de 8 mm no eixo do ombro, da parede de trás até a face de fora do rolamento', tecnica: 'cilindro' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "    criteriosDeReprovacao: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "      'distância entre o eixo do ombro e o do cotovelo diferente de 150 mm',"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "      'parede ou fundo com menos de 2 mm',"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "      'correia com menos de 2 mm de folga até as paredes ou o fundo',"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "      'elo encostando no garfo, ou o U fechado em cima escondendo a correia',"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "      'elo em outra cor que não o cinza-escuro',"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "  contatos: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "    { par: ['fundo', 'paredeDaFrente'], motivo: 'a parede sobe do fundo do U' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": "    { par: ['fundo', 'paredeDeTras'], motivo: 'a parede sobe do fundo do U' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": "    { par: ['abaDaFrente', 'paredeDaFrente'], motivo: 'a aba endurece o alto da parede, por dentro' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 131,
+          "texto": "    { par: ['abaDeTras', 'paredeDeTras'], motivo: 'a aba endurece o alto da parede, por dentro' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 132,
+          "texto": "    { par: ['cuboDoOmbro', 'paredeDaFrente'], motivo: 'o cubo do ombro sai da face de fora da parede da frente' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 133,
+          "texto": "    { par: ['paredeDeTras', 'pino'], motivo: 'o pino sai da face de fora da parede de trás' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 134,
+          "texto": "  ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 135,
+          "texto": "  get PASSOS() { return gerarPassos(this.PARAMS); },"
+        },
+        {
+          "tipo": "+",
+          "linha": 136,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 137,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 138,
+          "texto": "export default receita;"
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": ""
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "registradaEm": "2026-11-24T23:06:20.052Z",
+  "facesFinas": {
+    "total": 25,
+    "porParte": {
+      "paredeDaFrente": 2,
+      "paredeDeTras": 21,
+      "cuboDoOmbro": 2
+    }
+  }
+}

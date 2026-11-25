@@ -338,3 +338,11 @@ os operandos são maiores (medido no chassi de três receitas de veículo).
   - Sobreposição ortográfica 3D contra prancha e foto (`modelo:sobrepor`): estender a lógica de `prancha:sobrepor` para projetar as quatro vistas ortográficas da malha 3D sobre a prancha e sobre a foto calibrada, devolvendo imagem limpa e desvio em mm por trecho já na rodada 1 da lataria.
   - Quina partida e diagnóstico de espessura na `gaiolaPorRede` com `subdivisao`: permitir declarar quebras de seção em quina (como a transição coluna/teto) sem partir manualmente cada curva na receita para evitar overshoot em M da Catmull-Rom, e diagnosticar qual nó tem raio local menor que a espessura da chapa.
   - Calibração por pontos internos em `referencia:grade` e `prancha:sobrepor`: aceitar dois marcos internos conhecidos (ex.: centros dos dois eixos ou distância entre pneus) no lugar da caixa externa `--caixa`, evitando deslocamento por sombra no chão ou rack de teto.
+
+## Do braço de prova, 2026-11-25
+
+O acabamento das nove partes do braço de prova, que a pessoa aceitou em aberto em 2026-11-24 para uma etapa posterior: o botão de parada sem a forma de cogumelo, os eixos, furos e a correia facetados, o cubo e o pino em cinza-claro, a dúvida de 5 mm no segundo elo e o meio milímetro do eixo do cotovelo além da polia grande. Pede reabrir as etapas com o motivo e passar pelo laço de novo.
+
+Um comando que leia `articulacoes.json` da peça e confira o curso pela linha de comando, porque hoje a declaração só é lida por quem chama a extensão de articulação.
+
+O caminho para corrigir uma forma aprovada fora do laço de modelagem: a peça aprovada antes do laço não tem como passar pelo crítico sem reabrir tudo, e o braço de prova pediu isso.

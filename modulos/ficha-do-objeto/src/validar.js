@@ -133,6 +133,26 @@ export function regrasDaFicha(f) {
   return erros;
 }
 
+/* As regras do pedido que não dependem da ficha (1.2): o acopla de um item componente cita outro item componente do mesmo
+   pedido. Valem também no pedido inicial, que ainda não tem ficha; o identificador repetido sai aqui só nele. */
+export function regrasProprias(p) {
+  const erros = [];
+  const falha = (caminho, regra, valor) => erros.push({ caminho, regra, valor });
+  if (p.ficha.revisao === 0) {
+    const vistos = new Map();
+    p.itens.forEach((item, i) => {
+      if (vistos.has(item.id)) falha(`$.itens[${i}].id`, `identificador repetido, já usado em $.itens[${vistos.get(item.id)}]`, item.id);
+      else vistos.set(item.id, i);
+    });
+  }
+  p.itens.forEach((item, i) => {
+    if (item.tipo !== 'componente' || item.acopla === undefined) return;
+    const alvo = p.itens.find((x) => x.id === item.acopla);
+    if (!alvo || alvo.tipo !== 'componente' || alvo === item) falha(`$.itens[${i}].acopla`, 'cita um item componente que não existe no pedido', item.acopla);
+  });
+  return erros;
+}
+
 /** As regras de referência de um pedido contra a ficha a que ele responde. */
 export function regrasDoPedido(p, f) {
   const erros = [];
@@ -203,7 +223,9 @@ export function conferirDocumento(dado, { ficha } = {}) {
   }
   const erros = errosDoEsquema(tipo, dado);
   if (!erros.length && tipo === 'ficha') erros.push(...regrasDaFicha(dado));
-  if (!erros.length && tipo === 'pedido' && ficha) {
+  if (!erros.length && tipo === 'pedido') erros.push(...regrasProprias(dado));
+  /* O pedido inicial (ficha.revisao 0, versão 1.2) responde a uma ficha que ainda não existe e não é conferido contra nenhuma. */
+  if (!erros.length && tipo === 'pedido' && ficha && dado.ficha.revisao > 0) {
     const daFicha = conferirDocumento(ficha);
     if (daFicha.tipo !== 'ficha' || daFicha.erros.length) erros.push({ caminho: '$.ficha', regra: `a ficha citada é recusada (${daFicha.erros.length} problema(s)); confira-a antes`, valor: dado.ficha?.caminho });
     else erros.push(...regrasDoPedido(dado, ficha));

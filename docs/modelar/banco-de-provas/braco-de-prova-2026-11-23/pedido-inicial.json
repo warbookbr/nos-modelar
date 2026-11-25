@@ -1,0 +1,297 @@
+{
+  "tipo": "pedido",
+  "versao": "1.2",
+  "objeto": "braco-de-prova",
+  "ficha": {
+    "caminho": "braco-de-prova.ficha.json",
+    "revisao": 0
+  },
+  "itens": [
+    {
+      "id": "motor-23hs30-2804s",
+      "tipo": "componente",
+      "componente": "motor-23hs30-2804s",
+      "nome": "Motor de passo NEMA 23 de 76 mm, 1,9 N·m",
+      "familia": "motor-de-passo",
+      "caixa": [
+        57,
+        57,
+        76
+      ],
+      "massa": {
+        "valor": 1000,
+        "origem": "estimativa"
+      },
+      "serve": {
+        "junta": "junta-1"
+      },
+      "eixoDeSaida": {
+        "diametro": 8,
+        "comprimento": 21
+      },
+      "motivo": {
+        "linhaDaMatriz": "fis-torque-gravidade",
+        "texto": "componente escolhido pela pessoa em 2026-11-25",
+        "resultado": {
+          "grandeza": "massa",
+          "valor": 1000,
+          "unidade": "g",
+          "origem": "estimativa"
+        }
+      },
+      "resposta": {
+        "estado": "cumprido",
+        "revisaoDaFicha": 1,
+        "peca": "motor-ombro"
+      }
+    },
+    {
+      "id": "reducao-planetaria-nema23-5-precisao",
+      "tipo": "componente",
+      "componente": "reducao-planetaria-nema23-5-precisao",
+      "nome": "Redução planetária de folga baixa para NEMA 23, 5:1",
+      "familia": "peca-mecanica",
+      "caixa": [
+        57,
+        57,
+        55
+      ],
+      "massa": {
+        "valor": 550,
+        "origem": "estimativa"
+      },
+      "serve": {
+        "junta": "junta-1"
+      },
+      "eixoDeSaida": {
+        "diametro": 14,
+        "comprimento": 25
+      },
+      "acopla": "motor-23hs30-2804s",
+      "motivo": {
+        "linhaDaMatriz": "fis-torque-gravidade",
+        "texto": "componente escolhido pela pessoa em 2026-11-25",
+        "resultado": {
+          "grandeza": "massa",
+          "valor": 550,
+          "unidade": "g",
+          "origem": "estimativa"
+        }
+      },
+      "resposta": {
+        "estado": "cumprido",
+        "revisaoDaFicha": 1,
+        "peca": "motor-ombro"
+      }
+    },
+    {
+      "id": "motor-17hs4401",
+      "tipo": "componente",
+      "componente": "motor-17hs4401",
+      "nome": "Motor de passo NEMA 17 de 40 mm, 0,40 N·m",
+      "familia": "motor-de-passo",
+      "caixa": [
+        42.3,
+        42.3,
+        40
+      ],
+      "massa": {
+        "valor": 280,
+        "origem": "declarado"
+      },
+      "serve": {
+        "junta": "junta-2"
+      },
+      "eixoDeSaida": {
+        "diametro": 5,
+        "comprimento": 24
+      },
+      "motivo": {
+        "linhaDaMatriz": "fis-torque-gravidade",
+        "texto": "componente escolhido pela pessoa em 2026-11-25",
+        "resultado": {
+          "grandeza": "massa",
+          "valor": 280,
+          "unidade": "g",
+          "origem": "declarado"
+        }
+      },
+      "resposta": {
+        "estado": "cumprido",
+        "revisaoDaFicha": 1,
+        "peca": "motor-cotovelo"
+      }
+    },
+    {
+      "id": "reducao-gt2-20-80",
+      "tipo": "componente",
+      "componente": "reducao-gt2-20-80",
+      "nome": "Redução por polia e correia GT2, 20 para 80 dentes (4:1)",
+      "familia": "peca-mecanica",
+      "caixa": [
+        55,
+        16,
+        120
+      ],
+      "massa": {
+        "valor": 80,
+        "origem": "estimativa"
+      },
+      "serve": {
+        "junta": "junta-2"
+      },
+      "acopla": "motor-17hs4401",
+      "motivo": {
+        "linhaDaMatriz": "fis-torque-gravidade",
+        "texto": "componente escolhido pela pessoa em 2026-11-25",
+        "resultado": {
+          "grandeza": "massa",
+          "valor": 80,
+          "unidade": "g",
+          "origem": "estimativa"
+        }
+      },
+      "resposta": {
+        "estado": "cumprido",
+        "revisaoDaFicha": 1,
+        "peca": "transmissao"
+      }
+    },
+    {
+      "id": "driver-junta-1",
+      "tipo": "componente",
+      "componente": "driver-drv8825",
+      "nome": "Driver de passo DRV8825 em placa portadora",
+      "familia": "modulo-de-placa",
+      "caixa": [
+        15.2,
+        20.3,
+        12
+      ],
+      "massa": {
+        "valor": 2,
+        "origem": "estimativa"
+      },
+      "serve": {
+        "peca": "base"
+      },
+      "motivo": {
+        "linhaDaMatriz": "fis-torque-gravidade",
+        "texto": "componente escolhido pela pessoa em 2026-11-25",
+        "resultado": {
+          "grandeza": "massa",
+          "valor": 2,
+          "unidade": "g",
+          "origem": "estimativa"
+        }
+      },
+      "resposta": {
+        "estado": "cumprido",
+        "revisaoDaFicha": 1,
+        "peca": "base"
+      }
+    },
+    {
+      "id": "driver-junta-2",
+      "tipo": "componente",
+      "componente": "driver-drv8825",
+      "nome": "Driver de passo DRV8825 em placa portadora",
+      "familia": "modulo-de-placa",
+      "caixa": [
+        15.2,
+        20.3,
+        12
+      ],
+      "massa": {
+        "valor": 2,
+        "origem": "estimativa"
+      },
+      "serve": {
+        "peca": "base"
+      },
+      "motivo": {
+        "linhaDaMatriz": "fis-torque-gravidade",
+        "texto": "componente escolhido pela pessoa em 2026-11-25",
+        "resultado": {
+          "grandeza": "massa",
+          "valor": 2,
+          "unidade": "g",
+          "origem": "estimativa"
+        }
+      },
+      "resposta": {
+        "estado": "cumprido",
+        "revisaoDaFicha": 1,
+        "peca": "base"
+      }
+    },
+    {
+      "id": "placa-arduino-uno",
+      "tipo": "componente",
+      "componente": "placa-arduino-uno",
+      "nome": "Placa Arduino Uno",
+      "familia": "modulo-de-placa",
+      "caixa": [
+        68.6,
+        53.4,
+        15
+      ],
+      "massa": {
+        "valor": 25,
+        "origem": "declarado"
+      },
+      "serve": {
+        "peca": "base"
+      },
+      "motivo": {
+        "linhaDaMatriz": "fis-torque-gravidade",
+        "texto": "componente escolhido pela pessoa em 2026-11-25",
+        "resultado": {
+          "grandeza": "massa",
+          "valor": 25,
+          "unidade": "g",
+          "origem": "declarado"
+        }
+      },
+      "resposta": {
+        "estado": "cumprido",
+        "revisaoDaFicha": 1,
+        "peca": "base"
+      }
+    },
+    {
+      "id": "fonte-12v-5a",
+      "tipo": "componente",
+      "componente": "fonte-12v-5a",
+      "nome": "Fonte chaveada de 12 V e 5 A",
+      "familia": "fonte-chaveada",
+      "caixa": [
+        111,
+        78,
+        36
+      ],
+      "massa": {
+        "valor": 300,
+        "origem": "estimativa"
+      },
+      "serve": {
+        "peca": "base"
+      },
+      "motivo": {
+        "linhaDaMatriz": "fis-torque-gravidade",
+        "texto": "componente escolhido pela pessoa em 2026-11-25",
+        "resultado": {
+          "grandeza": "massa",
+          "valor": 300,
+          "unidade": "g",
+          "origem": "estimativa"
+        }
+      },
+      "resposta": {
+        "estado": "cumprido",
+        "revisaoDaFicha": 1,
+        "peca": "base"
+      }
+    }
+  ]
+}

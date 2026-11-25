@@ -1,0 +1,706 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "braco-de-prova/elo2",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "docs/modelar/banco-de-provas/braco-de-prova-2026-11-23/elos-opcoes.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "placaDaPonta",
+        "tipo": "comprimento",
+        "onde": "face externa da placa, extremidade da ponta",
+        "sentido": "maior",
+        "evidencia": "Frontal: eixo a ~30 mm da borda da parede de 180 mm; borda das paredes a ~150 mm do eixo, face externa da placa a ~155 mm. Só vale se a ponta for a face da garra."
+      }
+    ],
+    "observacao": "U aberto de partes simples, forma fiel à opção C; a distância à ponta tem 5 mm de dúvida e a garra toca a placa sem contato declarado (0,00 mm no corte), o que o pedido trata como achado."
+  },
+  "partes": [
+    {
+      "nome": "paredeDaFrente",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "paredeDeTras",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "fundo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "placaDaPonta",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "eixoDoCotovelo",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "tampaDaFrente",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "tampaDeTras",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "aviso de 6 faces finas na malha (paredeDaFrente 3, paredeDeTras 3), vindas dos furos do eixo; a medição passa"
+  ],
+  "notaDePassagem": "As paredes em z 27 a 32 e −32 a −27 ficam por fora das do elo 1 (z 20 a 26), sem tocá-las; o eixo de 8 mm no eixo do cotovelo é fechado por duas tampas laranja, e a placa da ponta de 5×50×64 mm recebe a garra por quatro M3.",
+  "receita": {
+    "sha256": "sha256:c96e4543c777fc1abb7b865d0656f8d9b15a67119dcdfb4d98b0ff3d4255562f",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 124,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* braco-de-prova/elo2 — o segundo elo, outro perfil em U cinza-escuro, de 150 mm do eixo do cotovelo até a ponta, com o"
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " * eixo do cotovelo e as tampas laranja das juntas."
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * Sétima etapa da montagem `braco-de-prova/montagem.json`. Do alinhamento (opção C do esboço): perfil em U de 150 mm até a"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * ponta. As paredes do segundo elo abraçam o primeiro pelo lado de fora no cotovelo (faces de dentro em z = ±27, 1 mm de"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * folga até as paredes do primeiro elo), e o fundo só começa depois da ponta do primeiro elo, para os dois não se tocarem."
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " * O eixo de 8 mm do cotovelo atravessa as quatro paredes e a polia grande; as tampas laranja cobrem as pontas dele."
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * Referencial: o da montagem (ver `../../comum/blocos.mjs`)."
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " * Portas: `juntaNoCotovelo` (cilindro externo, eixo +z, centro na ponta de trás do eixo do cotovelo), que vai na `juntaDoCotovelo` do primeiro elo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " * `eixoDaPolia` (cilindro externo, eixo +z, o trecho do eixo dentro da polia grande) e `ponta` (plano, recebe, normal +x, na"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " * face de fora da placa da ponta), onde a garra se apoia."
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " */"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": "import { passosDasFormas, aliasesDasFormas, porta, origemDa, MATERIAIS as CORES } from '../../../comum/blocos.mjs';"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": "  alturaDoEixo: 140,"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": "  cotovelo: 150,"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": "  /* Do eixo do cotovelo até a face de dentro da placa da ponta; a placa tem 5 mm. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": "  comprimento: 150,"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": "  placa: 5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": "  /* Quanto a parede passa do eixo do cotovelo para trás. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": "  sobraAtras: 30,"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": "  /* Faces de dentro das paredes e espessura delas. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": "  meioVao: 27,"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": "  parede: 5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": "  baixo: 115,"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": "  alto: 165,"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "  fundo: 5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "  /* O fundo começa a 50 mm do eixo do cotovelo, fora do círculo que a ponta do primeiro elo varre ao dobrar (46,9 mm). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "  inicioDoFundo: 200,"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "  raioDoEixo: 4,"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "  raioDaTampa: 18,"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "  espessuraDaTampa: 3,"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "  chanfro: 2,"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "  /* Os quatro M3 que prendem a garra, passantes na placa da ponta, no quadrado de 24 mm em volta do eixo do braço. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "  passoDosFurosM3: 24,"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "  raioDoFuroM3: 1.7,"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "export const MATERIAIS = CORES;"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "export function derivar(t = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "  const fim = t.cotovelo + t.comprimento;"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "  const fora = t.meioVao + t.parede;"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "  const y = t.alturaDoEixo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "  const passagem = (z0) => ({ eixo: 'z', base: [t.cotovelo, y, z0], comprimento: t.parede + 2, raio: t.raioDoEixo, lados: 18 });"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "  return ["
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "    { nome: 'paredeDaFrente', material: 'estrutura', chanfro: t.chanfro, caixa: [t.cotovelo - t.sobraAtras, fim, t.baixo, t.alto, t.meioVao, fora], furos: [passagem(t.meioVao - 1)] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "    { nome: 'paredeDeTras', material: 'estrutura', chanfro: t.chanfro, caixa: [t.cotovelo - t.sobraAtras, fim, t.baixo, t.alto, -fora, -t.meioVao], furos: [passagem(-fora - 1)] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "    { nome: 'fundo', material: 'estrutura', chanfro: t.chanfro, caixa: [t.inicioDoFundo, fim, t.baixo, t.baixo + t.fundo, -t.meioVao, t.meioVao] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "    { nome: 'placaDaPonta', material: 'estrutura', chanfro: t.chanfro, caixa: [fim, fim + t.placa, t.baixo, t.alto, -fora, fora],"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "      furos: [-1, 1].flatMap((sy) => [-1, 1].map((sz) => ({"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "        eixo: 'x', base: [fim - 1, y + (sy * t.passoDosFurosM3) / 2, (sz * t.passoDosFurosM3) / 2], comprimento: t.placa + 2, raio: t.raioDoFuroM3, lados: 12,"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "      }))) },"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "    { nome: 'eixoDoCotovelo', material: 'aco', eixo: 'z', base: [t.cotovelo, y, -fora], comprimento: 2 * fora, raio: t.raioDoEixo, lados: 18 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "    { nome: 'tampaDaFrente', material: 'laranja', eixo: 'z', base: [t.cotovelo, y, fora], comprimento: t.espessuraDaTampa, raio: t.raioDaTampa, lados: 36 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "    { nome: 'tampaDeTras', material: 'laranja', eixo: 'z', base: [t.cotovelo, y, -fora - t.espessuraDaTampa], comprimento: t.espessuraDaTampa, raio: t.raioDaTampa, lados: 36 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "  ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "export const ALIASES = aliasesDasFormas(derivar(TABELA));"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "export function gerarPassos(t = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "  const formas = derivar(t);"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "  const { passos } = passosDasFormas(formas);"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "  const fora = t.meioVao + t.parede;"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "  const fim = t.cotovelo + t.comprimento;"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "  passos.push(porta('juntaNoCotovelo', origemDa(formas, 'eixoDoCotovelo'), {"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "    forma: 'cilindro', papel: 'externa', eixo: [0, 0, 1], centro: [t.cotovelo, t.alturaDoEixo, -fora], raio: t.raioDoEixo, inicio: 0, fim: 2 * fora,"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "  }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "  passos.push(porta('eixoDaPolia', origemDa(formas, 'eixoDoCotovelo'), {"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "    forma: 'cilindro', papel: 'externa', eixo: [0, 0, 1], centro: [t.cotovelo, t.alturaDoEixo, -fora], raio: t.raioDoEixo, inicio: fora - 4, fim: fora + 4,"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "  }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "  passos.push(porta('ponta', origemDa(formas, 'placaDaPonta'), { forma: 'plano', papel: 'recebe', ponto: [fim + t.placa, t.alturaDoEixo, 0], normal: [1, 0, 0], extensao: [40, 40] }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "  return passos;"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "const receita = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "  meta: { nome: 'braco-de-prova/elo2', desc: 'segundo elo do braço de prova: perfil em U cinza-escuro de 150 mm do cotovelo até a ponta, abraçando o primeiro elo no cotovelo, com o eixo de 8 mm e as tampas laranja da junta' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "  PARAMS: TABELA,"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": "  MATERIAIS,"
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "  ALIASES,"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "  TOPO: { origem: 'chão, sob o eixo do ombro; y para cima, x ao longo do braço esticado, +z para a frente' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "  PLANO: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "    objeto: 'segundo elo do braço de prova, perfil em U do cotovelo até a ponta, onde a garra se prende',"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "    referencias: ['../../../../../docs/modelar/banco-de-provas/braco-de-prova-2026-11-23/elos-opcoes.png'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "    escala: { medida: 'distância do eixo do cotovelo à ponta', milimetros: 150 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "    partes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "      { nome: 'paredeDaFrente', forma: 'parede de 180 × 50 × 5 mm, de z 27 a 32, com o furo do eixo do cotovelo', tecnica: 'caixa chanfrada com furo por subtração' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "      { nome: 'paredeDeTras', forma: 'parede de 180 × 50 × 5 mm, de z −32 a −27, com o furo do eixo do cotovelo', tecnica: 'caixa chanfrada com furo por subtração' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "      { nome: 'fundo', forma: 'fundo de 5 mm entre as paredes, de x 200 até a placa da ponta', tecnica: 'caixa chanfrada' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "      { nome: 'placaDaPonta', forma: 'placa de 5 × 50 × 64 mm que fecha a ponta e recebe a garra por quatro M3', tecnica: 'caixa chanfrada com furos por subtração' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "      { nome: 'eixoDoCotovelo', forma: 'eixo de 8 mm no eixo do cotovelo, de uma tampa à outra', tecnica: 'cilindro' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "      { nome: 'tampaDaFrente', forma: 'tampa laranja de 36 mm por 3 mm na ponta da frente do eixo', tecnica: 'cilindro' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "      { nome: 'tampaDeTras', forma: 'tampa laranja de 36 mm por 3 mm na ponta de trás do eixo', tecnica: 'cilindro' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "    criteriosDeReprovacao: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "      'distância do eixo do cotovelo à ponta diferente de 150 mm',"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "      'parede, fundo ou placa com menos de 2 mm',"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "      'segundo elo encostando no primeiro, no NEMA 17 ou na correia',"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "      'eixo do cotovelo fora do eixo da polia grande',"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "      'tampas em outra cor que não o laranja',"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "  contatos: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "    { par: ['eixoDoCotovelo', 'paredeDaFrente'], motivo: 'o eixo passa justo pelo furo da parede' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "    { par: ['eixoDoCotovelo', 'paredeDeTras'], motivo: 'o eixo passa justo pelo furo da parede' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "    { par: ['eixoDoCotovelo', 'tampaDaFrente'], motivo: 'a tampa cobre a ponta do eixo' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "    { par: ['eixoDoCotovelo', 'tampaDeTras'], motivo: 'a tampa cobre a ponta do eixo' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "    { par: ['fundo', 'paredeDaFrente'], motivo: 'o fundo fica entre as paredes' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "    { par: ['fundo', 'paredeDeTras'], motivo: 'o fundo fica entre as paredes' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "    { par: ['fundo', 'placaDaPonta'], motivo: 'o fundo chega na placa da ponta' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "    { par: ['paredeDaFrente', 'placaDaPonta'], motivo: 'a placa fecha a ponta das paredes' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "    { par: ['paredeDaFrente', 'tampaDaFrente'], motivo: 'a tampa assenta na face de fora da parede' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "    { par: ['paredeDeTras', 'placaDaPonta'], motivo: 'a placa fecha a ponta das paredes' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "    { par: ['paredeDeTras', 'tampaDeTras'], motivo: 'a tampa assenta na face de fora da parede' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "  ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "  get PASSOS() { return gerarPassos(this.PARAMS); },"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "export default receita;"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": ""
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "registradaEm": "2026-11-23T23:34:19.993Z",
+  "facesFinas": {
+    "total": 6,
+    "porParte": {
+      "paredeDaFrente": 3,
+      "paredeDeTras": 3
+    }
+  }
+}

@@ -167,6 +167,7 @@ function declararEncaixeCilindrico(relacao) {
     referencia: `referencia.${relacao.referencia.porta}`,
     movel: `movel.${relacao.movel.porta}`,
     folgaRadial: relacao.especificacao.folgaRadial,
+    ...(relacao.especificacao.encaixeAxial ? { encaixeAxial: relacao.especificacao.encaixeAxial } : {}),
     toleranciaNumerica: relacao.especificacao.toleranciaNumerica,
   };
 }

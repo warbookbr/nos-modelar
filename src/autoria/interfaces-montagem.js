@@ -672,7 +672,14 @@ export function validarEncaixeCilindrico(declaracao, portas) {
   const sobraFim = fimMovel - fimReferencia;
   const sobreposicaoAxial = Math.max(0, Math.min(fimReferencia, fimMovel) - Math.max(inicioReferencia, inicioMovel));
   const separacaoAxial = Math.max(0, Math.max(inicioReferencia, inicioMovel) - Math.min(fimReferencia, fimMovel));
-  if (sobraInicio < -tolerancia || sobraFim < -tolerancia) {
+  const encaixeAxial = encaixeAxialDe(declaracao, `${quem}.${id}`);
+  if (encaixeAxial) {
+    /* parcial: os dois cilindros se sobrepõem no mínimo declarado, e qualquer um pode passar da ponta do outro (o eixo
+       que atravessa uma parede antes do cubo, a ponta do eixo que para no meio do furo da polia) */
+    if (sobreposicaoAxial < encaixeAxial.sobreposicaoMinima - tolerancia) {
+      diagnosticos.push({ codigo: 'sobreposicao-insuficiente', observado: sobreposicaoAxial, minimo: encaixeAxial.sobreposicaoMinima, tolerancia });
+    }
+  } else if (sobraInicio < -tolerancia || sobraFim < -tolerancia) {
     diagnosticos.push({ codigo: 'intervalo-axial-fora', sobraInicio, sobraFim, tolerancia });
   }
 
@@ -683,6 +690,7 @@ export function validarEncaixeCilindrico(declaracao, portas) {
       disponiveis: true, alinhamento, descentro, folgaRadial, folgaRadialMinima: minimo,
       folgaRadialMaxima: maximo, tolerancia, toleranciaNumerica: tolerancia, especificacaoFolgaRadial, inicioReferencia, fimReferencia, inicioMovel,
       fimMovel, sobraInicio, sobraFim, sobreposicaoAxial, separacaoAxial,
+      ...(encaixeAxial ? { encaixeAxial } : {}),
     },
     diagnosticos,
   };
@@ -740,6 +748,13 @@ export function diagnosticarEncaixeCilindrico(declaracao, instancias) {
     contatoLocal: encaixe.medidas.disponiveis === false ? null : classificarContatoLocalCilindrico(encaixe),
     alertaGlobal: relacaoEntreCaixas(caixaReferencia, caixaMovel),
   };
+}
+
+function encaixeAxialDe(declaracao, quem) {
+  const valor = declaracao.encaixeAxial;
+  if (valor === undefined) return null;
+  if (!valor || typeof valor !== 'object' || valor.modo !== 'parcial') falhar(quem, "encaixeAxial precisa ser { modo: 'parcial', sobreposicaoMinima }.");
+  return { modo: 'parcial', sobreposicaoMinima: escalar(valor.sobreposicaoMinima, `${quem}.encaixeAxial.sobreposicaoMinima`, { naoNegativo: true }) };
 }
 
 function toleranciaNumericaDe(declaracao, quem) {

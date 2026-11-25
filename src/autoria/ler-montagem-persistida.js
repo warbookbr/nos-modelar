@@ -125,15 +125,29 @@ function lerFaixa(valor, caminho) {
   return { nominal, toleranciaFabricacao: { menos, mais } };
 }
 
+function lerEncaixeAxial(valor, caminho) {
+  if (!ehObjetoSimples(valor)) falhar('especificacao-invalida', caminho, "precisa ser { modo: 'parcial', sobreposicaoMinima }.");
+  chavesExatas(valor, ['modo', 'sobreposicaoMinima'], caminho);
+  if (valor.modo !== 'parcial') falhar('especificacao-invalida', `${caminho}.modo`, `recebido ${JSON.stringify(valor.modo)}; o único modo é 'parcial'.`);
+  const sobreposicaoMinima = numeroFinitoNaoNegativo(valor.sobreposicaoMinima, `${caminho}.sobreposicaoMinima`);
+  if (!(sobreposicaoMinima > 0)) falhar('especificacao-invalida', `${caminho}.sobreposicaoMinima`, 'precisa ser maior que zero, em metro.');
+  return { modo: 'parcial', sobreposicaoMinima };
+}
+
 function lerEspecificacao(valor, tipo, caminho) {
   if (!ehObjetoSimples(valor)) falhar('especificacao-invalida', caminho, 'precisa ser objeto simples.');
   const chaves = tipo === 'encaixaCilindrico'
-    ? ['folgaRadial', 'toleranciaNumerica']
+    ? ['folgaRadial', 'encaixeAxial', 'toleranciaNumerica']
     : ['sobreposicaoRadial', 'sobreposicaoAxial', 'separacaoAxial', 'toleranciaNumerica'];
-  chavesExatas(valor, chaves, caminho);
+  chavesExatas(valor, chaves.filter((chave) => chave !== 'encaixeAxial' || valor.encaixeAxial !== undefined), caminho);
   const especificacao = {
     ...(tipo === 'encaixaCilindrico'
-      ? { folgaRadial: lerFaixa(valor.folgaRadial, `${caminho}.folgaRadial`) }
+      ? {
+        folgaRadial: lerFaixa(valor.folgaRadial, `${caminho}.folgaRadial`),
+        /* Sem o campo, o interno cobre o externo de ponta a ponta; com o modo parcial, basta a sobreposição alcançar o mínimo
+           declarado (o eixo que atravessa uma parede antes do cubo, a ponta do eixo que para no meio do furo da polia). */
+        ...(valor.encaixeAxial === undefined ? {} : { encaixeAxial: lerEncaixeAxial(valor.encaixeAxial, `${caminho}.encaixeAxial`) }),
+      }
       : {
         sobreposicaoRadial: lerFaixa(valor.sobreposicaoRadial, `${caminho}.sobreposicaoRadial`),
         sobreposicaoAxial: lerFaixa(valor.sobreposicaoAxial, `${caminho}.sobreposicaoAxial`),

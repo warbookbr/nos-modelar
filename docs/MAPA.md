@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2336 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2357 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -234,6 +234,11 @@
 ## docs/modelar/banco-de-provas/aviao-receita-2026-10-15/
 
 - `TRADUCAO.md` — O esboço do avião traduzido para o andaime
+
+## docs/modelar/banco-de-provas/braco-de-prova-2026-11-23/
+
+- `README.md` — Braço de prova de duas juntas: o alinhamento da forma
+- `elos-opcoes.esboco.mjs` — elos-opcoes.esboco.mjs — o braço de prova de duas juntas, com o mesmo mecanismo nas três opções (base redonda, ombro em garfo com o NEMA 23 e a planetária de…
 
 ## docs/modelar/banco-de-provas/cache-por-passo-2026-11-16/
 
@@ -694,7 +699,6 @@
 - `2026-11-16-eletronica-no-modelar.md` — O lado Modelar da mecatrônica: plano-raiz que gera a família de componentes e a ponte
 - `2026-11-22-curva-paralela-na-rede.md` — Curva paralela na rede de curvas: os anéis em volta de um vão sem desenhar ponto a ponto
 - `2026-11-22-superficie-de-producao-g2.md` — Superfície de produção (G2): a chapa de subdivisão sem a ondulação que o crítico acusa, sem sair da forma
-- `2026-11-23-braco-de-prova-duas-juntas.md` — Braço de prova de duas juntas: a forma com os componentes escolhidos na mecatrônica dentro
 - `2026-11-25-acabamento-hard-surface.md` — Acabamento de hard surface: chanfro e arredondamento em qualquer aresta, linhas de painel e recortes na casca
 - `2026-11-25-atuador-de-junta.md` — Atuador de junta: o motor com redutor numa carcaça, com as flanges de saída e de fixação e o eixo da junta
 - `2026-11-25-elo-entre-juntas.md` — Elo entre juntas: a carenagem oca do membro, de uma flange de atuador à outra
@@ -1658,6 +1662,82 @@
 ## procedural/pecas/bicicleta-urbana/referencias/
 
 - `alvo.md` — Alvo da bicicleta urbana
+
+## procedural/pecas/braco-de-prova/comum/
+
+- `blocos.mjs` — blocos.js — o tradutor comum das partes do braço de prova: cada forma da TABELA de uma parte, em milímetros, vira os passos do núcleo (caixa chanfrada ou cil…
+
+## procedural/pecas/braco-de-prova/partes/base/
+
+- `receita.js` — braco-de-prova/base — a base redonda e baixa do braço de prova, oca, com a eletrônica dentro e o botão de parada no topo.
+
+## procedural/pecas/braco-de-prova/partes/base/rodadas/
+
+- `receita-01.js` — braco-de-prova/base — a base redonda e baixa do braço de prova, oca, com a eletrônica dentro e o botão de parada no topo.
+
+## procedural/pecas/braco-de-prova/partes/elo1/
+
+- `receita.js` — braco-de-prova/elo1 — o primeiro elo, um perfil em U aberto em cima, cinza-escuro, de 150 mm entre o eixo do ombro e o do cotovelo, girando entre as paredes …
+
+## procedural/pecas/braco-de-prova/partes/elo1/rodadas/
+
+- `receita-01.js` — braco-de-prova/elo1 — o primeiro elo, um perfil em U aberto em cima, cinza-escuro, de 150 mm entre o eixo do ombro e o do cotovelo, girando entre as paredes …
+
+## procedural/pecas/braco-de-prova/partes/elo2/
+
+- `receita.js` — braco-de-prova/elo2 — o segundo elo, outro perfil em U cinza-escuro, de 150 mm do eixo do cotovelo até a ponta, com o eixo do cotovelo e as tampas laranja da…
+
+## procedural/pecas/braco-de-prova/partes/elo2/rodadas/
+
+- `receita-01.js` — braco-de-prova/elo2 — o segundo elo, outro perfil em U cinza-escuro, de 150 mm do eixo do cotovelo até a ponta, com o eixo do cotovelo e as tampas laranja da…
+
+## procedural/pecas/braco-de-prova/partes/garfo/
+
+- `receita.js` — braco-de-prova/garfo — o garfo do ombro: duas paredes laranja de 12 mm, a 90 mm uma da outra, presas no topo da base.
+
+## procedural/pecas/braco-de-prova/partes/garfo/rodadas/
+
+- `receita-01.js` — braco-de-prova/garfo — o garfo do ombro: duas paredes laranja de 12 mm, a 90 mm uma da outra, presas no topo da base.
+
+## procedural/pecas/braco-de-prova/partes/garra/
+
+- `receita.js` — braco-de-prova/garra — a garra como volume, um bloco de 40 × 45 × 40 mm na ponta do segundo elo.
+
+## procedural/pecas/braco-de-prova/partes/garra/rodadas/
+
+- `receita-01.js` — braco-de-prova/garra — a garra como volume, um bloco de 40 × 45 × 40 mm na ponta do segundo elo.
+
+## procedural/pecas/braco-de-prova/partes/motor-cotovelo/
+
+- `receita.js` — braco-de-prova/motor-cotovelo — o NEMA 17 do cotovelo, preso do lado de fora da parede de trás do primeiro elo, perto do ombro, com o eixo entrando no U.
+
+## procedural/pecas/braco-de-prova/partes/motor-cotovelo/rodadas/
+
+- `receita-01.js` — braco-de-prova/motor-cotovelo — o NEMA 17 do cotovelo, preso do lado de fora da parede de trás do primeiro elo, perto do ombro, com o eixo entrando no U.
+
+## procedural/pecas/braco-de-prova/partes/motor-ombro/
+
+- `receita.js` — braco-de-prova/motor-ombro — o NEMA 23 com a redução planetária de 5:1, deitados no eixo do ombro, do lado de fora da parede da frente do garfo.
+
+## procedural/pecas/braco-de-prova/partes/motor-ombro/rodadas/
+
+- `receita-01.js` — braco-de-prova/motor-ombro — o NEMA 23 com a redução planetária de 5:1, deitados no eixo do ombro, do lado de fora da parede da frente do garfo.
+
+## procedural/pecas/braco-de-prova/partes/rolamento/
+
+- `receita.js` — braco-de-prova/rolamento — o rolamento do lado de trás do ombro, na face de fora da parede de trás do garfo.
+
+## procedural/pecas/braco-de-prova/partes/rolamento/rodadas/
+
+- `receita-01.js` — braco-de-prova/rolamento — o rolamento do lado de trás do ombro, na face de fora da parede de trás do garfo.
+
+## procedural/pecas/braco-de-prova/partes/transmissao/
+
+- `receita.js` — braco-de-prova/transmissao — as polias GT2 de 20 e 80 dentes e a correia de 6 mm do cotovelo, à mostra dentro do U do primeiro elo.
+
+## procedural/pecas/braco-de-prova/partes/transmissao/rodadas/
+
+- `receita-02.js` — braco-de-prova/transmissao — as polias GT2 de 20 e 80 dentes e a correia de 6 mm do cotovelo, à mostra dentro do U do primeiro elo.
 
 ## procedural/pecas/braco-robotico/
 
@@ -2635,6 +2715,7 @@
 - `diferenca-de-texto.test.js` — diferenca-de-texto.test.js — a diferença por linha que o registro de rodada guarda: vazia sem mudança, toda acréscimo na primeira versão, cortada no teto.
 - `dobras-aceitas.js` — dobras-aceitas.js — a dobra, o vinco e o chanfro que a peça declara de propósito, com o motivo.
 - `dobras-aceitas.test.js` — dobras-aceitas.test.js — `PLANO.dobrasAceitas`: o normalizador recusa o que o campo não admite, o plano sem o campo mantém a forma canônica de antes, e a ace…
+- `encaixe-cilindrico-parcial.test.mjs` — Encaixe cilíndrico parcial: o eixo que atravessa uma parede e só depois entra num cubo curto. Sem `encaixeAxial`, o interno precisa cobrir o externo de ponta…
 - `encosto-da-peca.test.mjs` — encosto-da-peca.test.mjs — uma tolerância de "encosta" só para a peça, e a distância do par declarado que não acontece (atrito 5 do RECEITA.md do sedã).
 - `etapas-de-construcao.js` — etapas-de-construcao.js — o que há de comum ao registro de etapas de uma montagem v5: o formato, o erro, as juntas medidas em cada etapa e a próxima etapa a …
 - `etapas-pela-impressao.js` — etapas-pela-impressao.js — o estado de cada etapa de uma montagem v5 como função pura do registro de eventos e do medido agora.

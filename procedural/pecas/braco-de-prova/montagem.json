@@ -1,0 +1,372 @@
+{
+  "formato": "mecanifica.montagem",
+  "versao": 5,
+  "id": "braco-de-prova",
+  "categoria": "robotica",
+  "instancias": [
+    {
+      "id": "base",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "braco-de-prova/base"
+      }
+    },
+    {
+      "id": "garfo",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "braco-de-prova/garfo"
+      }
+    },
+    {
+      "id": "motorOmbro",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "braco-de-prova/motor-ombro"
+      }
+    },
+    {
+      "id": "rolamento",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "braco-de-prova/rolamento"
+      }
+    },
+    {
+      "id": "elo1",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "braco-de-prova/elo1"
+      }
+    },
+    {
+      "id": "motorCotovelo",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "braco-de-prova/motor-cotovelo"
+      }
+    },
+    {
+      "id": "transmissao",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "braco-de-prova/transmissao"
+      }
+    },
+    {
+      "id": "elo2",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "braco-de-prova/elo2"
+      }
+    },
+    {
+      "id": "garra",
+      "alvo": {
+        "tipo": "peca",
+        "ref": "braco-de-prova/garra"
+      }
+    }
+  ],
+  "relacoes": [
+    {
+      "id": "eixoDeSaidaNoCuboDoElo1",
+      "tipo": "encaixaCilindrico",
+      "referencia": {
+        "caminho": [
+          "motorOmbro"
+        ],
+        "porta": "eixoDeSaida"
+      },
+      "movel": {
+        "caminho": [
+          "elo1"
+        ],
+        "porta": "juntaDoOmbro"
+      },
+      "especificacao": {
+        "folgaRadial": {
+          "nominal": 5e-05,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "encaixeAxial": {
+          "modo": "parcial",
+          "sobreposicaoMinima": 0.012
+        },
+        "toleranciaNumerica": 1e-06
+      }
+    },
+    {
+      "id": "poliaPequenaNoEixoDoMotor",
+      "tipo": "encaixaCilindrico",
+      "referencia": {
+        "caminho": [
+          "motorCotovelo"
+        ],
+        "porta": "eixo"
+      },
+      "movel": {
+        "caminho": [
+          "transmissao"
+        ],
+        "porta": "furoDaPoliaPequena"
+      },
+      "especificacao": {
+        "folgaRadial": {
+          "nominal": 5e-05,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "encaixeAxial": {
+          "modo": "parcial",
+          "sobreposicaoMinima": 0.0095
+        },
+        "toleranciaNumerica": 1e-06
+      }
+    },
+    {
+      "id": "poliaGrandeNoEixoDoCotovelo",
+      "tipo": "encaixaCilindrico",
+      "referencia": {
+        "caminho": [
+          "elo2"
+        ],
+        "porta": "eixoDaPolia"
+      },
+      "movel": {
+        "caminho": [
+          "transmissao"
+        ],
+        "porta": "furoDaPoliaGrande"
+      },
+      "especificacao": {
+        "folgaRadial": {
+          "nominal": 5e-05,
+          "toleranciaFabricacao": {
+            "menos": 0,
+            "mais": 0
+          }
+        },
+        "encaixeAxial": {
+          "modo": "parcial",
+          "sobreposicaoMinima": 0.0075
+        },
+        "toleranciaNumerica": 1e-06
+      }
+    }
+  ],
+  "etapas": [
+    "base",
+    "garfo",
+    "motorOmbro",
+    "rolamento",
+    "elo1",
+    "motorCotovelo",
+    "transmissao",
+    "elo2",
+    "garra"
+  ],
+  "vinculos": [],
+  "posicoes": [
+    {
+      "id": "garfoSobreABase",
+      "instancia": "garfo",
+      "porta": "apoio",
+      "em": {
+        "instancia": "base",
+        "porta": "topo"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "motorNaFaceDoGarfo",
+      "instancia": "motorOmbro",
+      "porta": "flange",
+      "em": {
+        "instancia": "garfo",
+        "porta": "faceDoMotor"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "rolamentoNaFaceDoGarfo",
+      "instancia": "rolamento",
+      "porta": "face",
+      "em": {
+        "instancia": "garfo",
+        "porta": "faceDoRolamento"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "elo1NoEixoDaPlanetaria",
+      "instancia": "elo1",
+      "porta": "juntaDoOmbro",
+      "em": {
+        "instancia": "motorOmbro",
+        "porta": "eixoDeSaida"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "motorDoCotoveloNoElo1",
+      "instancia": "motorCotovelo",
+      "porta": "face",
+      "em": {
+        "instancia": "elo1",
+        "porta": "assentoDoMotor"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "poliaPequenaNoEixoDoMotor",
+      "instancia": "transmissao",
+      "porta": "furoDaPoliaPequena",
+      "em": {
+        "instancia": "motorCotovelo",
+        "porta": "eixo"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    },
+    {
+      "id": "elo2NoCotovelo",
+      "instancia": "elo2",
+      "porta": "juntaNoCotovelo",
+      "em": {
+        "instancia": "elo1",
+        "porta": "juntaDoCotovelo"
+      },
+      "unidade": "mm",
+      "afastamento": -6
+    },
+    {
+      "id": "garraNaPonta",
+      "instancia": "garra",
+      "porta": "apoio",
+      "em": {
+        "instancia": "elo2",
+        "porta": "ponta"
+      },
+      "unidade": "mm",
+      "afastamento": 0
+    }
+  ],
+  "apoioNoChao": {
+    "plano": {
+      "normal": [
+        0,
+        1,
+        0
+      ],
+      "altura": 0
+    },
+    "toleranciaNumerica": 0.001,
+    "apoiam": [
+      {
+        "caminho": [
+          "base"
+        ]
+      }
+    ]
+  },
+  "auditoriaIntersecoes": {
+    "toleranciaNumerica": 1e-09,
+    "expectativas": [
+      {
+        "id": "garfoSobreABase",
+        "a": {
+          "caminho": [
+            "garfo"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "base"
+          ]
+        },
+        "motivo": "o pé das paredes do garfo assenta na tampa da base, onde é preso por dois M3 de baixo para cima em cada parede"
+      },
+      {
+        "id": "planetariaNoGarfo",
+        "a": {
+          "caminho": [
+            "motorOmbro"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "garfo"
+          ]
+        },
+        "motivo": "a face de saída da planetária assenta na face de fora da parede da frente do garfo, presa pelos quatro M5"
+      },
+      {
+        "id": "rolamentoNoGarfo",
+        "a": {
+          "caminho": [
+            "rolamento"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "garfo"
+          ]
+        },
+        "motivo": "a face do rolamento assenta na face de fora da parede de trás do garfo"
+      },
+      {
+        "id": "eixoDeSaidaNoCuboDoElo1",
+        "a": {
+          "caminho": [
+            "motorOmbro"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "elo1"
+          ]
+        },
+        "motivo": "o eixo de saída da planetária entra 12 mm no cubo do ombro do primeiro elo, com 0,05 mm de folga no raio, e a ponta dele encosta na face de fora da parede da frente do elo; o aperto é o parafuso M3 radial do cubo"
+      },
+      {
+        "id": "motorDoCotoveloNoElo1",
+        "a": {
+          "caminho": [
+            "motorCotovelo"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "elo1"
+          ]
+        },
+        "motivo": "a flange do NEMA 17 assenta na face de fora da parede de trás do primeiro elo, presa pelos quatro M3"
+      },
+      {
+        "id": "garraNaPontaDoElo2",
+        "a": {
+          "caminho": [
+            "garra"
+          ]
+        },
+        "b": {
+          "caminho": [
+            "elo2"
+          ]
+        },
+        "motivo": "o apoio da garra assenta na placa da ponta do segundo elo, onde é parafusado"
+      }
+    ]
+  }
+}

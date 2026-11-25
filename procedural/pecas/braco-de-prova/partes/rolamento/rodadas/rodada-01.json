@@ -1,0 +1,396 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "braco-de-prova/rolamento",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "docs/modelar/banco-de-provas/braco-de-prova-2026-11-23/elos-opcoes.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "rolamento",
+        "tipo": "superficie",
+        "onde": "furo central, parede interna",
+        "sentido": "facetado",
+        "evidencia": "Frontal e traseira: o furo tem cerca de 16 lados e lê como polígono, enquanto o contorno externo tem mais lados e lê como cilindro."
+      }
+    ],
+    "observacao": "Anel com medidas e furo conforme o prometido e sem cruzamento com o pino; o alvo não mostra o rolamento isolado, então não houve comparação de forma, e o toque de 0,00 mm com o garfo é achado do pedido."
+  },
+  "partes": [
+    {
+      "nome": "rolamento",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [],
+  "notaDePassagem": "Anel de 28 mm por 7 mm com furo de 8,1 mm no eixo do ombro, fora da parede de trás do garfo; o furo de 8,1 mm dá folga ao pino de 8 mm do elo 1.",
+  "receita": {
+    "sha256": "sha256:3405a7d8fd94e77077b4e2340bd054818c3afdd1c7ac59cd23859629eb4dbc18",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 69,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* braco-de-prova/rolamento — o rolamento do lado de trás do ombro, na face de fora da parede de trás do garfo."
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " * Quarta etapa da montagem `braco-de-prova/montagem.json`. Do alinhamento: o primeiro elo apoiado de um lado pelo eixo da"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * planetária e do outro por um rolamento. Medida do esboço escolhido (opção C): 28 mm de diâmetro e 7 mm de largura; o furo"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * de 8 mm recebe o pino do primeiro elo (folga de 0,05 mm no raio). O rolamento não está no pedido inicial e a medida é"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * estimativa (um 608 tem 22 mm; o de 28 mm é o do esboço)."
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * Referencial: o da montagem (ver `../../comum/blocos.mjs`)."
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * Portas: `face` (plano, apoia, normal +z, na face de dentro do rolamento) e `furo` (cilindro interno, eixo +z)."
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " */"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": "import { passosDasFormas, aliasesDasFormas, porta, origemDa, MATERIAIS as CORES } from '../../../comum/blocos.mjs';"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": "  alturaDoEixo: 140,"
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": "  /* Face de fora da parede de trás do garfo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": "  faceDoGarfo: -51,"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": "  raioExterno: 14,"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": "  largura: 7,"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": "  raioDoFuro: 4.05,"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": "export const MATERIAIS = CORES;"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": "export function derivar(t = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": "  const z0 = t.faceDoGarfo - t.largura;"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": "  return ["
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": "    { nome: 'rolamento', material: 'aco', eixo: 'z', base: [0, t.alturaDoEixo, z0], comprimento: t.largura, raio: t.raioExterno, lados: 36,"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": "      furos: [{ eixo: 'z', base: [0, t.alturaDoEixo, z0 - 1], comprimento: t.largura + 2, raio: t.raioDoFuro, lados: 18 }] },"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "  ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "export const ALIASES = aliasesDasFormas(derivar(TABELA));"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "export function gerarPassos(t = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "  const formas = derivar(t);"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "  const { passos } = passosDasFormas(formas);"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "  passos.push(porta('face', origemDa(formas, 'rolamento'), { forma: 'plano', papel: 'apoia', ponto: [0, t.alturaDoEixo, t.faceDoGarfo], normal: [0, 0, 1], extensao: [28, 28] }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "  passos.push(porta('furo', origemDa(formas, 'rolamento'), {"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "    forma: 'cilindro', papel: 'interna', eixo: [0, 0, 1], centro: [0, t.alturaDoEixo, t.faceDoGarfo - t.largura], raio: t.raioDoFuro, inicio: 0, fim: t.largura,"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "  }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "  return passos;"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "const receita = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "  meta: { nome: 'braco-de-prova/rolamento', desc: 'rolamento do ombro do braço de prova: anel de aço de 28 mm por 7 mm com furo de 8 mm, na face de fora da parede de trás do garfo' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "  PARAMS: TABELA,"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "  MATERIAIS,"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "  ALIASES,"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "  TOPO: { origem: 'chão, sob o eixo do ombro; y para cima, x ao longo do braço esticado, +z para a frente' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "  PLANO: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "    objeto: 'rolamento do lado de trás do ombro, onde gira o pino do primeiro elo',"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "    referencias: ['../../../../../docs/modelar/banco-de-provas/braco-de-prova-2026-11-23/elos-opcoes.png'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "    escala: { medida: 'diâmetro externo', milimetros: 28 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "    partes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "      { nome: 'rolamento', forma: 'anel de 28 mm de diâmetro, 7 mm de largura e furo de 8,1 mm, no eixo do ombro, fora da parede de trás', tecnica: 'cilindro com furo por subtração' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "    criteriosDeReprovacao: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "      'rolamento fora do eixo do ombro',"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "      'rolamento solto da parede de trás do garfo ou atravessando-a',"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "      'furo menor que o pino do elo',"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "  contatos: [],"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "  get PASSOS() { return gerarPassos(this.PARAMS); },"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "export default receita;"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": ""
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "registradaEm": "2026-11-23T23:34:16.443Z",
+  "facesFinas": {
+    "total": 0,
+    "porParte": {}
+  }
+}

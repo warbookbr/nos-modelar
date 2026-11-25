@@ -1,0 +1,1067 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "braco-de-prova/transmissao",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "docs/modelar/banco-de-provas/braco-de-prova-2026-11-23/elos-opcoes.png",
+    "nota": 8,
+    "defeitos": [
+      {
+        "parte": "correia",
+        "tipo": "superficie",
+        "onde": "anel grande, arco sobre a polia de 80 dentes",
+        "sentido": "facetado",
+        "evidencia": "Na frontal e na isométrica o contorno externo do anel grande mostra quebras de polígono visíveis, com cerca de 36 lados em raio de 27 mm. A referência pede arco contínuo."
+      }
+    ],
+    "observacao": "Não houve alvo comparável, pois a referência mostra só os elos. As formas prometidas aparecem e as folgas passam: 3,14 mm ao fundo do elo, maior que o mínimo de 2 mm, e cerca de 16 mm às paredes. Só há facetamento de baixa gravidade."
+  },
+  "partes": [
+    {
+      "nome": "poliaPequena",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "poliaGrande",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "correia",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "aviso de 87 faces finas na malha (poliaGrande 70, correia 13, poliaPequena 4), dos dentes e da correia facetada; a medição passa"
+  ],
+  "notaDePassagem": "A correia facetada de 36 lados assenta a até 0,05 mm da ponta dos dentes, porque a face reta do anel entraria nos dentes da polia de 96 lados. Cada polia é presa no eixo dela e só a montagem as liga, por isso as duas ilhas declaradas.",
+  "receita": {
+    "sha256": "sha256:6d59316c5008419414c51fceb9e62bbe7d3fbc76471aeeaca18f2306574300ad",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 202,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* braco-de-prova/transmissao — as polias GT2 de 20 e 80 dentes e a correia de 6 mm do cotovelo, à mostra dentro do U do"
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " * primeiro elo."
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * Oitava etapa da montagem `braco-de-prova/montagem.json`. Componentes do pedido inicial da mecatrônica: polias GT2 de 20 e"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * 80 dentes, com diâmetros primitivos de 12,73 e 50,93 mm, e correia de 6 mm. A polia pequena vai no eixo de 5 mm do NEMA 17"
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " * (furo de 5,1 mm), a grande no eixo de 8 mm do cotovelo (furo de 8,1 mm), com a faixa da correia centrada no plano do braço;"
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " * a distância entre os eixos é de 70 mm (do NEMA 17 a 80 mm do ombro até o cotovelo a 150). As polias saem da família"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * `polia-e-correia`, perfis `gt2-20` (com flanges, cubo de 16 × 7 mm) e `gt2-80` (sem flanges, cubo de 22 × 8 mm), com os"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * dentes; só o furo muda do perfil, para a folga do encaixe. A família não tem correia: a correia, de 1,5 mm de espessura"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * (estimativa), assenta no diâmetro externo das polias e segue as duas tangentes externas."
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " * Referencial: o da montagem (ver `../../comum/blocos.mjs`)."
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * Técnica: as polias são a chamada da família, giradas e levadas ao eixo; a correia é a união de dois anéis (cilindro menos cilindro) com"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " * as duas tangentes (caixas giradas no ângulo da tangente e levadas ao meio dela)."
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": " * Portas: `furoDaPoliaPequena` (cilindro interno, eixo +z, centro na face do NEMA 17), que vai no `eixo` do motor do"
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": " * cotovelo, e `furoDaPoliaGrande` (cilindro interno, eixo +z), onde passa o eixo do cotovelo."
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": " */"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": "import { m, porta, MATERIAIS as CORES } from '../../../comum/blocos.mjs';"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": "import { chamar, criarRegistroDeFamilias } from '../../../../../familias/index.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": "import { expandirChamadasDeComposicao } from '../../../../../nucleo/composicoes.js';"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": "  alturaDoEixo: 140,"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": "  eixoDoMotor: 80,"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": "  cotovelo: 150,"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": "  /* Face do NEMA 17 (face de fora da parede de trás do primeiro elo), de onde sai o eixo dele. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": "  faceDoMotor: -26,"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "  diametroDaPoliaPequena: 12.73,"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "  diametroDaPoliaGrande: 50.93,"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "  /* Os perfis aprovados da família `polia-e-correia`; o furo leva a folga de 0,05 mm no raio do encaixe da montagem. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "  perfilPequena: 'gt2-20',"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "  perfilGrande: 'gt2-80',"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "  furoPequeno: 5.1,"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "  furoGrande: 8.1,"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "  /* Diferença da linha primitiva da GT2 (a da família): a correia assenta no externo, 0,254 mm dentro do primitivo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "  diferencaPrimitiva: 0.254,"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "  larguraDaCorreia: 6,"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "  espessuraDaCorreia: 1.5,"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "export const MATERIAIS = CORES;"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": "const ID_CORREIA = 900;"
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": "let registro = null;"
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "const familias = () => { registro ??= criarRegistroDeFamilias(); return registro; };"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "/* A polia da família é um corpo de revolução em torno de y, com o cubo de y 0 ao comprimento do cubo e a faixa da correia"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "   acima dele; a faixa é centrada no plano do braço (z 0) por um quarto de volta em x (y vira +z) e uma translação, com o cubo para trás, do lado do motor. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "function polia(t, id, perfil, furo, x) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "  const familia = familias().obter('polia-e-correia');"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": "  const p = familia.contrato.perfis[perfil].parametros;"
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "  const chamada = chamar(familia, id, p);"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "  const passos = expandirChamadasDeComposicao(familias().registroComposicoes, [chamada]).passos;"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "  /* O comprimento é o topo do perfil da revolução; a faixa (com as flanges, se houver) fica entre o cubo e o topo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "  const perfilDoTorno = passos.find(([op]) => op === 'lathe')[1].perfil;"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "  const comprimento = Math.max(...perfilDoTorno.map(([, yy]) => yy)) * 1000;"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "  const meioDaFaixa = (p.comprimentoDoCubo + comprimento) / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": "  return { p, passos, meioDaFaixa, comprimento, x, furo, primitivo: (p.dentes * 2) / Math.PI };"
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "export function derivar(t = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "  const pequena = polia(t, 'polia-pequena', t.perfilPequena, t.furoPequeno, t.eixoDoMotor);"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "  const grande = polia(t, 'polia-grande', t.perfilGrande, t.furoGrande, t.cotovelo);"
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "  /* As tangentes externas: com r1 < r2 e d entre os centros, sen(a) = (r2 − r1)/d; o ponto de tangência de cima é o centro"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "     mais r·(−sen a, cos a) e o de baixo o centro mais r·(−sen a, −cos a). A correia assenta no diâmetro externo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "  const y = t.alturaDoEixo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "  const r1 = pequena.primitivo / 2 - t.diferencaPrimitiva;"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "  const r2 = grande.primitivo / 2 - t.diferencaPrimitiva;"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "  const d = t.cotovelo - t.eixoDoMotor;"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "  const a = Math.asin((r2 - r1) / d);"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "  const comprimento = Math.sqrt(d * d - (r2 - r1) ** 2);"
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "  const meio = (sinal) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "    const p1 = [t.eixoDoMotor - r1 * Math.sin(a), y + sinal * r1 * Math.cos(a)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "    const p2 = [t.cotovelo - r2 * Math.sin(a), y + sinal * r2 * Math.cos(a)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "    return [(p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2];"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "  const correia = { r1, r2, a, comprimento, meioDeCima: meio(1), meioDeBaixo: meio(-1) };"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "  return { polias: { poliaPequena: pequena, poliaGrande: grande }, correia };"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "/* Os ids locais da família (de 10 a 30) somam a base de cada polia. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "const comBase = (v, base) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "  if (Array.isArray(v)) return v.map((x) => comBase(x, base));"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "  if (v && typeof v === 'object') return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, k === 'origemId' || (k === 'id' && typeof v.op === 'string') ? x + base : comBase(x, base)]));"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "  return v;"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "const BASE = { poliaPequena: 100, poliaGrande: 200 };"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "export const ALIASES = ["
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "  ...Object.entries(BASE).map(([nome, base]) => [`furo${nome}`, { unir: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "    { origem: { op: 'cilindro', id: base + 40 } },"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "    { origem: { op: 'cilindro', id: base + 40, tampa: 'fundo' } },"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "    { origem: { op: 'cilindro', id: base + 40, tampa: 'topo' } },"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "  ] }]),"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "  ...[1, 2, 3, 4].map((k) => [`correia${k}`, { unir: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": "    { origem: { op: 'cilindro', id: ID_CORREIA + k } },"
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "    { origem: { op: 'cilindro', id: ID_CORREIA + k, tampa: 'fundo' } },"
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "    { origem: { op: 'cilindro', id: ID_CORREIA + k, tampa: 'topo' } },"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "  ] }]),"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "];"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "export function gerarPassos(t = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "  const { polias, correia } = derivar(t);"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "  const passos = [];"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "  const y = t.alturaDoEixo;"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "  const origens = {};"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "  for (const [nome, pol] of Object.entries(polias)) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "    let sel = null;"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "    for (const passo of pol.passos) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "      const [op, args] = comBase(passo, BASE[nome]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "      if (op === 'publicarPorta') continue;"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "      if (op === 'parte') {"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "        passos.push(['rotaciona', { sel: args.sel, eixo: 'x', graus: 90, pivo: [0, 0, 0] }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "        passos.push(['transladar', { sel: args.sel, d: [m(pol.x), m(y), m(-pol.meioDaFaixa)] }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "        /* O furo do perfil é o nominal; o da folga do encaixe é tirado depois, e é dele que sai a porta. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "        const idFuro = BASE[nome] + 40;"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "        passos.push(['cilindro', { origemId: idFuro, raio: m(pol.furo / 2), altura: m(pol.comprimento + 2), lados: 18, eixo: 'z', em: [m(pol.x), m(y), m(-pol.meioDaFaixa - 1)] }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "        passos.push(['subtrair', { origemId: idFuro + 1, solidos: [args.sel, { alias: `furo${nome}` }] }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "        sel = { origem: { op: 'subtrair', id: idFuro + 1 } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "        passos.push(['parte', { nome, sel }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "        passos.push(['material', { usa: 'aluminio', sel }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "        continue;"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "      }"
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "      passos.push([op, args]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "    }"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": "    origens[nome] = sel.origem;"
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 131,
+          "texto": "  const w = t.larguraDaCorreia;"
+        },
+        {
+          "tipo": "+",
+          "linha": 132,
+          "texto": "  const e = t.espessuraDaCorreia;"
+        },
+        {
+          "tipo": "+",
+          "linha": 133,
+          "texto": "  /* O anel de 36 lados circunscreve o externo da polia, para o meio de cada lado não entrar nos dentes. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 134,
+          "texto": "  const anel = (k, x, rExterno) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 135,
+          "texto": "    const r = rExterno / Math.cos(Math.PI / 36) + 0.05;"
+        },
+        {
+          "tipo": "+",
+          "linha": 136,
+          "texto": "    passos.push(['cilindro', { origemId: ID_CORREIA + k, raio: m(r + e), altura: m(w), lados: 36, eixo: 'z', em: [m(x), m(y), m(-w / 2)] }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 137,
+          "texto": "    passos.push(['cilindro', { origemId: ID_CORREIA + k + 1, raio: m(r), altura: m(w + 2), lados: 36, eixo: 'z', em: [m(x), m(y), m(-w / 2 - 1)] }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 138,
+          "texto": "    passos.push(['subtrair', { origemId: ID_CORREIA + 10 + k, solidos: [{ alias: `correia${k}` }, { alias: `correia${k + 1}` }] }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": "    return { origem: { op: 'subtrair', id: ID_CORREIA + 10 + k } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 140,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 141,
+          "texto": "  const anelPequeno = anel(1, t.eixoDoMotor, correia.r1);"
+        },
+        {
+          "tipo": "+",
+          "linha": 142,
+          "texto": "  const anelGrande = anel(3, t.cotovelo, correia.r2);"
+        },
+        {
+          "tipo": "+",
+          "linha": 143,
+          "texto": "  const tangente = (id, sinal, centro) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 144,
+          "texto": "    const sel = { origem: { op: 'cubo', id } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 145,
+          "texto": "    passos.push(['cubo', { origemId: id, larg: m(correia.comprimento), alt: m(e), prof: m(w), em: [0, sinal > 0 ? 0 : m(-e), 0] }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 146,
+          "texto": "    passos.push(['rotaciona', { sel, eixo: 'z', graus: (sinal * correia.a * 180) / Math.PI, pivo: [0, 0, 0] }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 147,
+          "texto": "    passos.push(['transladar', { sel, d: [m(centro[0]), m(centro[1]), 0] }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 148,
+          "texto": "    return sel;"
+        },
+        {
+          "tipo": "+",
+          "linha": 149,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 150,
+          "texto": "  const deCima = tangente(ID_CORREIA + 20, 1, correia.meioDeCima);"
+        },
+        {
+          "tipo": "+",
+          "linha": 151,
+          "texto": "  const deBaixo = tangente(ID_CORREIA + 21, -1, correia.meioDeBaixo);"
+        },
+        {
+          "tipo": "+",
+          "linha": 152,
+          "texto": "  const sel = { origem: { op: 'unir', id: ID_CORREIA + 30 } };"
+        },
+        {
+          "tipo": "+",
+          "linha": 153,
+          "texto": "  passos.push(['unir', { origemId: ID_CORREIA + 30, solidos: [anelPequeno, anelGrande, deCima, deBaixo] }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 154,
+          "texto": "  passos.push(['parte', { nome: 'correia', sel }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 155,
+          "texto": "  passos.push(['material', { usa: 'correia', sel }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 156,
+          "texto": "  /* Depois do quarto de volta em x, o y da família vira +z: a polia vai de −meioDaFaixa (o lado do cubo, atrás) até"
+        },
+        {
+          "tipo": "+",
+          "linha": 157,
+          "texto": "     comprimento − meioDaFaixa, e o furo cobre esse trecho todo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 158,
+          "texto": "  const pp = polias.poliaPequena;"
+        },
+        {
+          "tipo": "+",
+          "linha": 159,
+          "texto": "  const pg = polias.poliaGrande;"
+        },
+        {
+          "tipo": "+",
+          "linha": 160,
+          "texto": "  passos.push(porta('furoDaPoliaPequena', origens.poliaPequena, {"
+        },
+        {
+          "tipo": "+",
+          "linha": 161,
+          "texto": "    forma: 'cilindro', papel: 'interna', eixo: [0, 0, 1], centro: [t.eixoDoMotor, y, t.faceDoMotor], raio: t.furoPequeno / 2,"
+        },
+        {
+          "tipo": "+",
+          "linha": 162,
+          "texto": "    inicio: -pp.meioDaFaixa - t.faceDoMotor, fim: pp.comprimento - pp.meioDaFaixa - t.faceDoMotor,"
+        },
+        {
+          "tipo": "+",
+          "linha": 163,
+          "texto": "  }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 164,
+          "texto": "  passos.push(porta('furoDaPoliaGrande', origens.poliaGrande, {"
+        },
+        {
+          "tipo": "+",
+          "linha": 165,
+          "texto": "    forma: 'cilindro', papel: 'interna', eixo: [0, 0, 1], centro: [t.cotovelo, y, -pg.meioDaFaixa], raio: t.furoGrande / 2, inicio: 0, fim: pg.comprimento,"
+        },
+        {
+          "tipo": "+",
+          "linha": 166,
+          "texto": "  }));"
+        },
+        {
+          "tipo": "+",
+          "linha": 167,
+          "texto": "  return passos;"
+        },
+        {
+          "tipo": "+",
+          "linha": 168,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 169,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 170,
+          "texto": "const receita = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 171,
+          "texto": "  meta: { nome: 'braco-de-prova/transmissao', desc: 'transmissão do cotovelo do braço de prova: polias GT2 de 20 e 80 dentes (12,73 e 50,93 mm primitivos) a 70 mm uma da outra e a correia de 6 mm, à mostra dentro do primeiro elo' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 172,
+          "texto": "  PARAMS: TABELA,"
+        },
+        {
+          "tipo": "+",
+          "linha": 173,
+          "texto": "  MATERIAIS,"
+        },
+        {
+          "tipo": "+",
+          "linha": 174,
+          "texto": "  ALIASES,"
+        },
+        {
+          "tipo": "+",
+          "linha": 175,
+          "texto": "  TOPO: { origem: 'chão, sob o eixo do ombro; y para cima, x ao longo do braço esticado, +z para a frente' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 176,
+          "texto": "  PLANO: {"
+        },
+        {
+          "tipo": "+",
+          "linha": 177,
+          "texto": "    objeto: 'polias GT2 de 20 e 80 dentes e correia de 6 mm entre o NEMA 17 e o eixo do cotovelo',"
+        },
+        {
+          "tipo": "+",
+          "linha": 178,
+          "texto": "    referencias: ['../../../../../docs/modelar/banco-de-provas/braco-de-prova-2026-11-23/elos-opcoes.png'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 179,
+          "texto": "    escala: { medida: 'diâmetro primitivo da polia grande', milimetros: 50.93 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 180,
+          "texto": "    partes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 181,
+          "texto": "      { nome: 'poliaPequena', forma: 'polia GT2 de 20 dentes (12,73 mm primitivos) com flanges, no eixo do NEMA 17, furo de 5,1 mm', tecnica: 'família polia-e-correia, perfil gt2-20' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 182,
+          "texto": "      { nome: 'poliaGrande', forma: 'polia GT2 de 80 dentes (50,93 mm primitivos) no eixo do cotovelo, furo de 8,1 mm', tecnica: 'família polia-e-correia, perfil gt2-80' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 183,
+          "texto": "      { nome: 'correia', forma: 'correia de 6 × 1,5 mm abraçando as duas polias pelas tangentes externas', tecnica: 'união de dois anéis e duas caixas giradas' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 184,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 185,
+          "texto": "    criteriosDeReprovacao: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 186,
+          "texto": "      'polia com diâmetro primitivo diferente do pedido inicial',"
+        },
+        {
+          "tipo": "+",
+          "linha": 187,
+          "texto": "      'correia fora das polias, ou com menos de 2 mm de folga até as paredes e o fundo do primeiro elo',"
+        },
+        {
+          "tipo": "+",
+          "linha": 188,
+          "texto": "      'polias ou correia em outra cor que não a do alumínio e a preta',"
+        },
+        {
+          "tipo": "+",
+          "linha": 189,
+          "texto": "    ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 190,
+          "texto": "  },"
+        },
+        {
+          "tipo": "+",
+          "linha": 191,
+          "texto": "  contatos: [],"
+        },
+        {
+          "tipo": "+",
+          "linha": 192,
+          "texto": "  /* A correia de 36 lados fica a até 0,05 mm da ponta dos dentes, porque a face reta do anel facetado entraria nos dentes"
+        },
+        {
+          "tipo": "+",
+          "linha": 193,
+          "texto": "     da polia de 96 lados; cada polia é presa no eixo dela, e só a montagem as liga. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 194,
+          "texto": "  ilhas: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 195,
+          "texto": "    { contem: 'poliaPequena', motivo: 'a polia pequena se prende no eixo do NEMA 17, e a correia assenta nela com 0,05 mm de folga' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 196,
+          "texto": "    { contem: 'poliaGrande', motivo: 'a polia grande se prende no eixo do cotovelo, e a correia assenta nela com 0,05 mm de folga' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 197,
+          "texto": "  ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 198,
+          "texto": "  get PASSOS() { return gerarPassos(this.PARAMS); },"
+        },
+        {
+          "tipo": "+",
+          "linha": 199,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 200,
+          "texto": ""
+        }
+      ],
+      "cortada": true
+    }
+  },
+  "registradaEm": "2026-11-23T23:34:19.468Z",
+  "facesFinas": {
+    "total": 87,
+    "porParte": {
+      "poliaPequena": 4,
+      "poliaGrande": 70,
+      "correia": 13
+    }
+  }
+}

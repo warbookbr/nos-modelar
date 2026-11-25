@@ -106,6 +106,15 @@ function massasDasPecas(separadas, partes, declaracao) {
     const m = propriedadesDeMassa(triangulos, material.densidade / 1000);
     if (m) massas[s.nome] = { ...m, nota: `volume da malha (${Number(m.volume.toFixed(0))} mm³) vezes ${material.densidade} g/cm³ (${nome})` };
   }
+  /* A peça comprada leva a massa da folha de dados (`massaDasInstancias`): a malha dá só a distribuição, e a massa e a inércia
+     escalam até o valor declarado. */
+  for (const [instancia, d] of Object.entries(declaracao.massaDasInstancias ?? {})) {
+    const id = idDaFicha(instancia); const m = massas[id];
+    if (!m) throw new Error(`ponte.json: massaDasInstancias cita '${instancia}', que não é instância medida da montagem.`);
+    if (!(d?.valor > 0) || !['medido', 'declarado', 'estimativa'].includes(d.origem)) throw new Error(`ponte.json: massaDasInstancias.${instancia} precisa de { valor (g, maior que zero), origem: medido|declarado|estimativa, nota }.`);
+    const k = d.valor / m.massa;
+    massas[id] = { ...m, massa: d.valor, tensor: m.tensor.map((linha) => linha.map((x) => x * k)), origem: d.origem, nota: d.nota ?? 'massa declarada na ponte do objeto' };
+  }
   return massas;
 }
 
@@ -121,7 +130,7 @@ export function malhasNaMontagem(separadas) {
   return malhas;
 }
 
-/** Exporta a ficha e a malha do objeto. Devolve `{ ficha, caminhoFicha, caminhoMalha, semTipo, separadas, placas }`; recusa a ficha que a cópia do esquema recusa. */
+/** Exporta a ficha e a malha do objeto. Devolve `{ ficha, caminhoFicha, caminhoMalha, semTipo, separadas, placas, declaracao }`; recusa a ficha que a cópia do esquema recusa. */
 export async function exportarFicha({ objeto, ponte = null, saida = null }) {
   if (!objeto) throw new Error(`Informe o objeto.\n${USO}`);
   const pasta = resolve(REPO, 'procedural/pecas', objeto);
@@ -178,7 +187,7 @@ export async function exportarFicha({ objeto, ponte = null, saida = null }) {
   const caminhoFicha = resolve(destino, `${objeto}.ficha.json`);
   gravar(caminhoMalha, bytes);
   gravar(caminhoFicha, `${JSON.stringify(ficha, null, 2)}\n`);
-  return { ficha, caminhoFicha, caminhoMalha, semTipo, separadas, placas: cobre };
+  return { ficha, caminhoFicha, caminhoMalha, semTipo, separadas, placas: cobre, declaracao };
 }
 
 async function main() {

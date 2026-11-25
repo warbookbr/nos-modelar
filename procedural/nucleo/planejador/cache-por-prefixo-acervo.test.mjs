@@ -35,6 +35,7 @@ export const PECAS_DA_COBERTURA = Object.freeze([
   'braco-robotico/partes/flange/receita.js', // 1,3 s: arredondarAresta, cilindro, furo, parte, publicarPorta
   'braco-robotico/partes/elo-punho-4/receita.js', // 2,0 s: arredondarCostura, lathe, parte, publicarPorta, unir
   'sedan-chassi-e-lataria/partes/frente-e-traseira/receita.js', // 3,8 s: cubo, friso, parte, pincel, publicarPorta, subdivisao
+  'braco-de-prova/partes/base/receita.js', // casca
 ]);
 /* as operações do acervo que só peça cara usa, cobertas aqui pelo exemplo do registro */
 const SO_EM_PECA_CARA = Object.freeze(['aparar', 'aberturaPorContorno', 'limparLascas', 'divisaoPorContorno']);

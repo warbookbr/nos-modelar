@@ -1,0 +1,157 @@
+{
+  "formato": "modelar.ponte",
+  "versao": 1,
+  "objeto": "braco-de-prova",
+  "revisao": 1,
+  "referencial": {
+    "frente": "+z",
+    "origem": "no chão, sob o eixo do ombro",
+    "poseZero": "a pose da montagem: o braço esticado na horizontal; o zero do ombro da ficha é o braço em pé (90 graus a partir desta pose), como a pessoa decidiu em 2026-11-23"
+  },
+  "conjuntos": [
+    {
+      "id": "base",
+      "movel": false,
+      "instancias": [
+        "base",
+        "garfo",
+        "motorOmbro",
+        "rolamento"
+      ]
+    },
+    {
+      "id": "elo-1",
+      "movel": true,
+      "instancias": [
+        "elo1",
+        "motorCotovelo",
+        "transmissao"
+      ]
+    },
+    {
+      "id": "elo-2",
+      "movel": true,
+      "instancias": [
+        "elo2",
+        "garra"
+      ]
+    }
+  ],
+  "juntas": [
+    {
+      "id": "junta-1",
+      "pai": "base",
+      "filho": "elo1",
+      "eixoDe": {
+        "instancia": "motorOmbro",
+        "porta": "eixoDeSaida"
+      },
+      "acionadaPor": "motor-ombro",
+      "curso": {
+        "min": 0,
+        "max": 180,
+        "origem": "declarado",
+        "nota": "conferido livre pela articulação em 2026-11-23, medido a partir do braço na horizontal; de -90 a +90 em torno do braço em pé, como a pessoa decidiu"
+      },
+      "reducao": {
+        "valor": 5,
+        "origem": "declarado",
+        "nota": "redução planetária de 5:1 do pedido inicial"
+      }
+    },
+    {
+      "id": "junta-2",
+      "pai": "elo1",
+      "filho": "elo2",
+      "eixoDe": {
+        "instancia": "elo1",
+        "porta": "juntaDoCotovelo"
+      },
+      "acionadaPor": "motor-cotovelo",
+      "curso": {
+        "min": -100,
+        "max": 130,
+        "origem": "declarado",
+        "nota": "conferido livre pela articulação em 2026-11-23: de -104 o segundo elo bate na base e de +132 no NEMA 17"
+      },
+      "reducao": {
+        "valor": 4,
+        "origem": "declarado",
+        "nota": "polias GT2 de 20 e 80 dentes do pedido inicial"
+      }
+    }
+  ],
+  "materiais": {
+    "pla-impresso": {
+      "densidade": 0.62,
+      "origem": "estimativa",
+      "nota": "PLA de 1,24 g/cm³ impresso com paredes e uns 30% de preenchimento, cerca de metade do sólido, o mesmo valor aceito pela pessoa no braço robótico em 2026-11-23"
+    },
+    "aco": {
+      "densidade": 7.85,
+      "origem": "estimativa",
+      "nota": "aço comum, 7,85 g/cm³"
+    }
+  },
+  "materialDasInstancias": {
+    "padrao": "pla-impresso",
+    "rolamento": "aco",
+    "motorOmbro": "aco",
+    "motorCotovelo": "aco",
+    "transmissao": "pla-impresso",
+    "garra": "pla-impresso"
+  },
+  "massaDasInstancias": {
+    "base": {
+      "valor": 470,
+      "origem": "estimativa",
+      "nota": "casco e tampa impressos, cerca de 143 g (230 cm³ a 0,62 g/cm³), mais a fonte de 300 g, o Arduino de 25 g e os dois drivers de 2 g do pedido inicial; as caixas da eletrônica não contam como PLA"
+    },
+    "motorOmbro": {
+      "valor": 1550,
+      "origem": "estimativa",
+      "nota": "NEMA 23 de 1000 g mais a planetária de 550 g, as massas do pedido inicial"
+    },
+    "motorCotovelo": {
+      "valor": 280,
+      "origem": "declarado",
+      "nota": "NEMA 17 de 280 g, do pedido inicial"
+    },
+    "transmissao": {
+      "valor": 80,
+      "origem": "estimativa",
+      "nota": "polias GT2 e correia, 80 g do pedido inicial"
+    },
+    "garra": {
+      "valor": 80,
+      "origem": "estimativa",
+      "nota": "a garra como volume de 80 g, dos requisitos; a carga de 130 a 150 g na ponta fica fora da ficha"
+    }
+  },
+  "componentesDoPedido": {
+    "motor-23hs30-2804s": {
+      "peca": "motor-ombro"
+    },
+    "reducao-planetaria-nema23-5-precisao": {
+      "peca": "motor-ombro"
+    },
+    "motor-17hs4401": {
+      "peca": "motor-cotovelo"
+    },
+    "reducao-gt2-20-80": {
+      "peca": "transmissao"
+    },
+    "driver-junta-1": {
+      "peca": "base"
+    },
+    "driver-junta-2": {
+      "peca": "base"
+    },
+    "placa-arduino-uno": {
+      "peca": "base"
+    },
+    "fonte-12v-5a": {
+      "peca": "base"
+    }
+  }
+}

@@ -68,7 +68,7 @@ declara a relação, e termina em uma instância de peça.
 
 Os tipos suportados são:
 
-- `encaixaCilindrico`: `folgaRadial { nominal, toleranciaFabricacao { menos, mais } }` e `toleranciaNumerica`;
+- `encaixaCilindrico`: `folgaRadial { nominal, toleranciaFabricacao { menos, mais } }`, `toleranciaNumerica` e, opcional, `encaixeAxial { modo: 'parcial', sobreposicaoMinima }` em metro. Sem ele, o cilindro interno cobre o externo de ponta a ponta; com ele, basta a sobreposição alcançar o mínimo, e qualquer um pode passar da ponta do outro, como o eixo que atravessa uma parede antes do cubo ou a ponta do eixo que para no meio do furo da polia, e a falta sai como `sobreposicao-insuficiente`;
 - `assentaAnular`: `sobreposicaoRadial`, `sobreposicaoAxial` e `toleranciaNumerica`, usando a mesma forma de faixa.
 
 Todos os números devem ser finitos e não negativos; a faixa nominal menos a

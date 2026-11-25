@@ -62,7 +62,7 @@ function massaNaPeca(m, r = null, p = [0, 0, 0]) {
   const T = rt ? produto(produto(rt, m.tensor), r) : m.tensor;
   const nota = m.nota ? { nota: m.nota } : {};
   return {
-    massa: { valor: sig(m.massa), origem: 'estimativa', ...nota },
+    massa: { valor: sig(m.massa), origem: m.origem ?? 'estimativa', ...nota },
     centroDeMassa: { valor: centro.map((x) => arredondar(x)), origem: 'estimativa', nota: 'centro do volume da malha, no referencial da peça' },
     inercia: { valor: { ixx: sig(T[0][0]), iyy: sig(T[1][1]), izz: sig(T[2][2]), ixy: sig(T[0][1]), ixz: sig(T[0][2]), iyz: sig(T[1][2]) }, origem: 'estimativa', nota: 'pela malha com densidade uniforme, no centro de massa e nos eixos da peça' },
   };

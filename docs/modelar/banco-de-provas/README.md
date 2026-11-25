@@ -13,6 +13,7 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
 - `aparelhos-2026-10-16`
 - [Avião de pequeno porte: alinhamento](aviao-2026-10-11/ALINHAMENTO.md) — `aviao-2026-10-11`
 - [O esboço do avião traduzido para o andaime](aviao-receita-2026-10-15/TRADUCAO.md) — `aviao-receita-2026-10-15`
+- [Braço de prova de duas juntas: o alinhamento da forma](braco-de-prova-2026-11-23/README.md) — `braco-de-prova-2026-11-23`
 - [Cache por passo: a linha de base do laço e onde o cache rende mais](cache-por-passo-2026-11-16/README.md) — `cache-por-passo-2026-11-16`
 - [Cadeira: regras construtivas e medida de proporção contra o alvo](cadeiras-2026-10-19/medidas.md) — `cadeiras-2026-10-19`
 - `calibracao-do-critico`

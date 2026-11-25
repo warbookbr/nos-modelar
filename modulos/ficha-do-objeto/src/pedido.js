@@ -185,7 +185,17 @@ function conferirLigacoes(item, placas) {
  * dá, por id de peça da ficha, as redes com que o cobre da placa foi traçado. Devolve `{ recusa }` quando o pedido não passa no
  * esquema ou nas referências, ou `{ pedido, itens: [{ id, tipo, estado, motivo? }] }` com a resposta escrita em cada item.
  */
-export function responderPedido({ pedido, ficha, malhas = new Map(), placas = {} }) {
+/* O componente comprado: cumprido quando a ponte do objeto diz a instância que o representa e ela é peça da ficha; senão, o
+   motivo que a ponte declara (por que ele não coube ou ainda não está na forma). */
+function conferirComponente(item, ficha, componentes) {
+  const d = componentes[item.id];
+  if (!d) return { estado: 'nao-cumprido', motivo: `a ponte do objeto não diz que peça representa o componente '${item.id}'` };
+  if (d.naoCumprido) return { estado: 'nao-cumprido', motivo: d.naoCumprido };
+  if (!ficha.pecas.some((p) => p.id === d.peca)) return { estado: 'nao-cumprido', motivo: `a peça '${d.peca}' que a ponte do objeto dá ao componente não está na ficha` };
+  return { estado: 'cumprido', peca: d.peca };
+}
+
+export function responderPedido({ pedido, ficha, malhas = new Map(), placas = {}, componentes = {} }) {
   const conferido = conferirDocumento(pedido, { ficha });
   if (conferido.erros.length) return { recusa: textoDosErros(conferido), erros: conferido.erros };
   const respondido = structuredClone(pedido);
@@ -195,9 +205,10 @@ export function responderPedido({ pedido, ficha, malhas = new Map(), placas = {}
     else if (item.tipo === 'posicao') r = conferirPosicao(item, ficha);
     else if (item.tipo === 'saidaDeAr') r = conferirSaidaDeAr(item, malhas);
     else if (item.tipo === 'ligacoes') r = conferirLigacoes(item, placas);
+    else if (item.tipo === 'componente') r = conferirComponente(item, ficha, componentes);
     else r = { estado: 'nao-cumprido', motivo: 'o Modelar ainda não modela chicote, e a passagem não é conferida pela geometria' };
     item.resposta = r.estado === 'cumprido'
-      ? { estado: 'cumprido', revisaoDaFicha: ficha.revisao }
+      ? { estado: 'cumprido', revisaoDaFicha: ficha.revisao, ...(r.peca ? { peca: r.peca } : {}) }
       : { estado: 'nao-cumprido', motivo: r.motivo, ...(item.tipo === 'ligacoes' && r.redes ? { redes: r.redes } : {}) };
     return { id: item.id, tipo: item.tipo, estado: r.estado, ...(r.motivo ? { motivo: r.motivo } : {}), ...(r.centro ? { centro: r.centro } : {}) };
   });
