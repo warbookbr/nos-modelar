@@ -1,6 +1,6 @@
 # Encaixe cilíndrico parcial: o eixo que entra só em parte no furo
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `src/autoria/interfaces-montagem.js`, `src/autoria/ler-montagem-persistida.js`, `src/autoria/resolver-montagem-persistida.js`, `src/autoria/encaixe-cilindrico-parcial.test.mjs`, `docs/modelar/contratos/MONTAGEM-PERSISTIDA.md`.
 
@@ -56,4 +56,4 @@ Se o campo novo mudar a impressão de alguma etapa já fixada em outro objeto, o
 
 ## Fechamento
 
-A preencher.
+Concluído em 2026-11-25. A especificação do `encaixaCilindrico` aceita `encaixeAxial { modo: 'parcial', sobreposicaoMinima }`, lido e validado na montagem persistida, com o diagnóstico `sobreposicao-insuficiente` e o contrato `MONTAGEM-PERSISTIDA.md` atualizado. A segunda junta do braço de prova mostrou o caso inverso ao do plano, o furo da polia mais longo que a ponta do eixo, e o modo parcial ficou só com a sobreposição mínima, sem exigir que um cilindro fique dentro do outro. O teste `src/autoria/encaixe-cilindrico-parcial.test.mjs` cobre o cubo curto, o furo que passa da ponta, a sobreposição insuficiente e a leitura do campo; as montagens que já existiam não mudaram, e as nove etapas do braço de prova ficaram fixas. O processo pegou o defeito sozinho, na recusa da fixação da etapa (`etapa-com-junta-reprovada`). Volta ao backlog o mesmo modo para outras relações, se outro objeto pedir.

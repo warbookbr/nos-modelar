@@ -1,6 +1,6 @@
 # Braço de prova de duas juntas: a forma com os componentes escolhidos na mecatrônica dentro
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `procedural/pecas/braco-de-prova/`, `modulos/ficha-do-objeto/`, `tools/modelar/exportar-ficha.mjs`, `tools/modelar/conferir-pedido.mjs`, `docs/modelar/banco-de-provas/braco-de-prova-2026-11-23/`.
 
@@ -61,4 +61,4 @@ Se o NEMA 23 com a planetária não couber de forma aceitável no ombro de um br
 
 ## Fechamento
 
-A preencher.
+Concluído em 2026-11-25. A pessoa aceitou as nove etapas da montagem por imagem em 2026-11-24, com os defeitos de acabamento em aberto para uma etapa posterior, e elas estão fixas; as vistas aprovadas estão no banco de provas como `aprovado-*.png`. A ficha sai de `npm run exportar:ficha -- braco-de-prova` com 9 peças, 3 conjuntos e 2 juntas, igual em duas exportações, e passa nos conferidores daqui e de lá; as peças compradas levam a massa do pedido inicial por `massaDasInstancias`. O pedido inicial, na versão 1.2 e com a planetária de folga baixa que a pessoa escolheu depois da simulação, volta com os oito componentes cumpridos e passa no conferidor de lá. A guarda do acervo passa com a peça nova, e o núcleo não mudou além do encaixe parcial, que teve plano próprio. Três achados não seriam pegos pelo processo sozinho: o eixo do ombro sem encaixe no elo, que o crítico visual achou e agora a relação de encaixe confere; a operação de casca fora da cobertura do cache, que só o CI pegou, e a base entrou na lista; e a folga da planetária contra a precisão, que o crítico da simulação achou e a simulação de lá agora confere. Voltam ao backlog o acabamento das nove partes (botão de cogumelo, eixos e furos facetados, correia, meio milímetro do eixo do cotovelo além da polia grande), o comando que lê `articulacoes.json` e o caminho para corrigir uma forma aprovada fora do laço.
