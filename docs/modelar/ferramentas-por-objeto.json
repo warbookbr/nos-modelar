@@ -311,13 +311,13 @@
       "onde": "extensão nativa de articulação (revolução e prismática, curso conferido contra as peças por `conferirArticulacao`) e família `dobradica` de abas; rótula de esfera e olhal fora do cilindro não"
     },
     "atuador": {
-      "nome": "atuador linear",
+      "nome": "atuador linear e de junta",
       "tipo": "especializado",
       "automatiza": "gera cilindro hidráulico ou pneumático e fuso com camisa, haste, olhais e portas, por curso e diâmetro, ligado entre dois pontos",
       "parametros": "diâmetro, curso, extensão, montagem das pontas",
       "referencias": ["catálogos de fabricantes em STEP (conceito)"],
       "aqui": "parcial",
-      "onde": "família `cilindro-hidraulico`: camisa, haste, êmbolo, cabeça e olhais liso e com rótula, curso conferido; cilindro de haste dupla e telescópico não; família `fuso`: fuso trapezoidal (ISO 2904) e de esferas (ISO 3408-2, só o volume de fora) com a castanha flangeada"
+      "onde": "família `cilindro-hidraulico`: camisa, haste, êmbolo, cabeça e olhais liso e com rótula, curso conferido; cilindro de haste dupla e telescópico não; família `fuso`: fuso trapezoidal (ISO 2904) e de esferas (ISO 3408-2, só o volume de fora) com a castanha flangeada; família `atuador-de-junta`: atuador rotativo de junta de robô, cilíndrico de 40 a 120 mm e de caixa (servo pequeno, médio e grande), com as flanges furadas, o eixo publicado e a junta de revolução conferida, por `parametrosDoAtuador` e `parametrosDoServo`; motor, redutor e encoder por dentro não"
     },
     "guia": {
       "nome": "guia linear",
@@ -477,7 +477,7 @@
       "robô delta": ["barras", "articula", "casca"],
       "robô móvel com rodas": ["gabinete", "rodaPneu", "pcb"],
       "robô de esteira": ["elos", "gabinete", "rodaPneu"],
-      "humanoide": ["loftSuave", "casca", "articula", "cabo"],
+      "humanoide": ["loftSuave", "casca", "articula", "atuador", "cabo"],
       "quadrúpede": ["loftSuave", "casca", "articula"],
       "garra": ["articula", "engrenagem", "mola", "textura"],
       "efetuador": ["articula", "atuador", "furos"],

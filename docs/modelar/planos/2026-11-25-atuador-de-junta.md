@@ -1,6 +1,6 @@
 # Atuador de junta: o motor com redutor numa carcaça, com as flanges de saída e de fixação e o eixo da junta
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `procedural/familias/atuador-de-junta/`, `procedural/familias/index.js`, `tools/fixtures/atuador-de-junta/`, `docs/modelar/banco-de-provas/atuador-de-junta-2026-11-25/`, `docs/modelar/ferramentas-por-objeto.json`, `tools/modelar/capacidade.mjs`.
 
@@ -57,7 +57,7 @@ O núcleo não ganha nome de objeto nem operação nova, e o acervo sai igual. A
 1. Feita em 2026-11-25: o atuador cilíndrico, com a aprovação da pessoa.
 2. Feita em 2026-11-25: o atuador de caixa, com a aprovação da pessoa.
 3. Feita em 2026-11-25: as portas, a articulação e a montagem de prova de duas juntas.
-4. O banco de provas, o mapa de ferramentas, a ficha e o fechamento.
+4. Feita em 2026-11-25: o banco de provas, o mapa de ferramentas, a ficha e o fechamento.
 
 ## Decisão da pessoa
 
@@ -75,4 +75,8 @@ Fatia 2, em 2026-11-25. A forma 2 da mesma família é o atuador de caixa, o ser
 
 Fatia 3, em 2026-11-25. Cada forma sai também em duas composições, a carcaça e a saída, da mesma lista de nós da inteira, e a família ganhou `montar`, a montagem v5 com as duas ligadas pela junta de revolução de −180° a 180°, conferida pela aprovação. As portas novas são o eixo da junta, um anel na face da carcaça e outro na face de baixo da saída, e as portas de furos ganharam a referência em +x para a posição por porta definir o giro. A montagem de prova (`tools/fixtures/atuador-de-junta/duas-juntas.mjs`) prende um atuador menor, fora da tabela, pela flange de fixação na saída do de 100 mm, com os oito furos casando, as peças só encostando e cada junta livre no curso inteiro. A conferência das aberturas simultâneas recusa uma junta que move a outra, então a cadeia é conferida uma junta por vez, como o braço de prova fez. A junta em ângulo, com o elo entre as duas, fica com o plano do elo entre juntas.
 
+Fatia 4, em 2026-11-25. O banco de provas está em `docs/modelar/banco-de-provas/atuador-de-junta-2026-11-25/`, com as três imagens aprovadas; as fichas `parametrosDoAtuador` e `parametrosDoServo` entraram na capacidade; o mapa de ferramentas diz o atuador de junta na ferramenta `atuador` e no humanoide; e `tools/fixtures/atuador-de-junta/exportacao.test.mjs` mede a montagem de prova abaixo de dez segundos e exporta cada peça dela e o servo médio em STEP e em OBJ com as partes nomeadas.
+
 ## Fechamento
+
+Concluído em 2026-11-25. O gate de saída está cumprido: a família `atuador-de-junta` tem o cilíndrico de 40 a 120 mm e o servo pequeno, médio e grande, com a tabela e a recusa de cada tamanho que não existe, cada forma aprovada pela pessoa por imagem em `aprovacao.json`; a família gera a montagem da carcaça e da saída ligadas pela junta de revolução; a montagem de prova de duas juntas prende um atuador na saída do outro com os furos casando, as peças só encostando e cada junta livre de −180° a 180°, sai em cerca de 5 s e exporta em STEP e OBJ. Ficaram fora o motor, o redutor e o encoder por dentro, a junta em ângulo com o elo entre as duas (o plano do elo entre juntas), a conferência simultânea de juntas em cadeia (a ferramenta pede juntas que movam peças diferentes, e a cadeia é conferida uma junta por vez) e o caso de três furos na flange, que acusou peça junto do furo sem explicação e levou o mínimo a quatro.

@@ -2,7 +2,21 @@
    robô; os tamanhos são regra da família (decisão da pessoa em 2026-11-25: 40, 60, 80, 100 e 120 mm), na proporção dos
    atuadores de mercado, sem marca. Cada tamanho dá o comprimento da carcaça, a flange de fixação de trás (diâmetro,
    espessura, círculo, furos e diâmetro do furo), a flange de saída da frente (as mesmas medidas, com o furo cego para
-   parafuso), o diâmetro da saída do cabo e o chanfro das bordas. */
+   parafuso), o diâmetro da saída do cabo e o chanfro das bordas.
+
+   FICHA parametrosDoAtuador
+   serve: os parâmetros da família `atuador-de-junta` pelo diâmetro: o atuador cilíndrico de junta de robô, com a carcaça,
+     a flange de fixação atrás, a flange de saída que gira na frente, as furações e a saída do cabo, numa chamada só.
+   quando: junta de robô humanoide, braço ou perna, em que o membro prende na flange de saída e a carcaça no membro anterior.
+   unidades: mm.
+   campos:
+     diametro: 40, 60, 80, 100 ou 120.
+   devolve: os parâmetros completos da forma 1 da família, com o eixo da junta em y; `montar` da família dá a carcaça e a
+     saída soltas, ligadas pela junta de revolução.
+   exemplo:
+     parametrosDoAtuador(100)
+   peça: tools/fixtures/atuador-de-junta/duas-juntas.mjs (o atuador de 100 mm com um menor preso na saída).
+   FIM DA FICHA */
 
 const atuador = (diametro, comprimento, flange, saida, furo, furoDaSaida, furos, cabo) => Object.freeze({
   diametro, comprimento,
@@ -22,5 +36,5 @@ export const ATUADORES = Object.freeze({
 export function parametrosDoAtuador(diametro) {
   const a = ATUADORES[String(diametro)];
   if (!a) throw new Error(`atuador de junta: o diâmetro ${diametro} não existe; aceitos: ${Object.keys(ATUADORES).join(', ')}`);
-  return { ...a };
+  return { forma: 1, ...a };
 }

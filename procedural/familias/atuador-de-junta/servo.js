@@ -4,7 +4,20 @@
    altura da caixa. As orelhas de fixação são uma placa mais comprida que a caixa, na altura da aba, com dois furos
    passantes em cada ponta. A torre redonda do eixo fica em cima, deslocada do centro para +x, e a saída do cabo sai da
    ponta −x, abaixo das orelhas. O horn é a peça que gira: um disco sobre a torre, com quatro furos cegos em cruz para os
-   parafusos do membro. Regra da família, na proporção dos servos de mercado, sem marca. */
+   parafusos do membro. Regra da família, na proporção dos servos de mercado, sem marca.
+
+   FICHA parametrosDoServo
+   serve: os parâmetros da família `atuador-de-junta` pelo tamanho do servo: o atuador de caixa, com as orelhas de fixação
+     furadas, a torre do eixo, a saída do cabo e o horn que gira, numa chamada só.
+   quando: junta de robô pequeno, de mesa ou de estudo, em que o membro prende no horn e a caixa nas orelhas.
+   unidades: mm.
+   campos:
+     tamanho: 'pequeno', 'medio' ou 'grande' (caixa de 23, 40 e 60 mm).
+   devolve: os parâmetros completos da forma 2 da família, com o eixo da saída em y, deslocado para +x.
+   exemplo:
+     parametrosDoServo('medio')
+   peça: tools/fixtures/atuador-de-junta/exportacao.test.mjs (o servo médio).
+   FIM DA FICHA */
 
 export function geometriaDoServo(q) {
   const L = q.comprimentoDaCaixa; const W = q.larguraDaCaixa; const H = q.alturaDaCaixa;

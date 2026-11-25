@@ -69,6 +69,8 @@ export const CAPACIDADES = Object.freeze({
   parametrosDoFuso: { arquivo: 'procedural/familias/fuso/tabela.js', funcao: 'parametrosDoFuso', de: 'procedural/familias/fuso/tabela.js' },
   parametrosDaRoda: { arquivo: 'procedural/familias/roda-dentada/tabela.js', funcao: 'parametrosDaRoda', de: 'procedural/familias/roda-dentada/tabela.js' },
   parametrosDaEsteira: { arquivo: 'procedural/familias/esteira/tabela.js', funcao: 'parametrosDaEsteira', de: 'procedural/familias/esteira/tabela.js' },
+  parametrosDoAtuador: { arquivo: 'procedural/familias/atuador-de-junta/tabela.js', funcao: 'parametrosDoAtuador', de: 'procedural/familias/atuador-de-junta/tabela.js' },
+  parametrosDoServo: { arquivo: 'procedural/familias/atuador-de-junta/servo.js', funcao: 'parametrosDoServo', de: 'procedural/familias/atuador-de-junta/servo.js' },
   transmissaoPorCorrente: { arquivo: 'procedural/familias/corrente/transmissao.js', funcao: 'transmissaoPorCorrente', de: 'procedural/familias/corrente/transmissao.js' },
   passosDaCaixaDeChapa: { arquivo: 'procedural/extensoes/chapa-dobrada/caixa.js', funcao: 'passosDaCaixaDeChapa', de: 'procedural/extensoes/chapa-dobrada/caixa.js' },
   passosDaCascaDoLoft: { arquivo: 'procedural/nucleo/casca-pela-receita.js', funcao: 'passosDaCascaDoLoft', de: 'procedural/nucleo/casca-pela-receita.js' },

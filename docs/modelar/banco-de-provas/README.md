@@ -11,6 +11,7 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
 - [Abrir peça com filtros, 2026-11-17](abrir-peca-com-filtros-2026-11-17/README.md) — `abrir-peca-com-filtros-2026-11-17`
 - [Ajuste esparso da gaiola: a linha de base do solver denso](ajuste-esparso-2026-11-22/README.md) — `ajuste-esparso-2026-11-22`
 - `aparelhos-2026-10-16`
+- [Atuador de junta: cilíndrico, de caixa e montagem de duas juntas](atuador-de-junta-2026-11-25/README.md) — `atuador-de-junta-2026-11-25`
 - [Avião de pequeno porte: alinhamento](aviao-2026-10-11/ALINHAMENTO.md) — `aviao-2026-10-11`
 - [O esboço do avião traduzido para o andaime](aviao-receita-2026-10-15/TRADUCAO.md) — `aviao-receita-2026-10-15`
 - [Braço de prova de duas juntas: o alinhamento da forma](braco-de-prova-2026-11-23/README.md) — `braco-de-prova-2026-11-23`

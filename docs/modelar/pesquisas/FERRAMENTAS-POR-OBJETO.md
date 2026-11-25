@@ -26,11 +26,11 @@ Os tipos são três. O modificador age sobre uma forma que já existe; o gerador
 | 12 | manopla e botão (`manopla`) | especializado | 42 (11%) | 14 | parcial | gera botão rotativo, manípulo, volante e cabo ergonômico com furo de eixo e estrias |
 | 13 | guia linear (`guia`) | especializado | 32 (9%) | 13 | parcial | gera trilho e carro, corrediça de gaveta e guia em V por tamanho e curso |
 | 14 | tubulação com conexões (`tubulacao`) | gerador | 27 (7%) | 11 | tem | traça uma rede de tubos e põe sozinha as curvas, tês, reduções, flanges e válvulas por bitola |
-| 15 | engrenagens (`engrenagem`) | especializado | 26 (7%) | 11 | parcial | gera engrenagem reta, helicoidal, cônica, sem-fim, cremalheira e catraca com dente evolvente por módulo e número de dentes, e diz a distância entre centros do par |
-| 16 | molas (`mola`) | especializado | 26 (7%) | 10 | parcial | gera mola de compressão, tração com ganchos e torção com braços, com espiras fechadas nas pontas e comprimento entre dois pontos |
-| 17 | rosca (`rosca`) | especializado | 26 (7%) | 13 | parcial | faz rosca macho ou fêmea métrica, trapezoidal ou de tampa, em qualquer cilindro ou furo |
-| 18 | tecido e estofado (`tecido`) | gerador | 26 (7%) | 11 | não | faz almofada inflada com costura, lona esticada, vela e rede a partir de contorno e pressão |
-| 19 | atuador linear (`atuador`) | especializado | 25 (7%) | 10 | parcial | gera cilindro hidráulico ou pneumático e fuso com camisa, haste, olhais e portas, por curso e diâmetro, ligado entre dois pontos |
+| 15 | atuador linear e de junta (`atuador`) | especializado | 26 (7%) | 10 | parcial | gera cilindro hidráulico ou pneumático e fuso com camisa, haste, olhais e portas, por curso e diâmetro, ligado entre dois pontos |
+| 16 | engrenagens (`engrenagem`) | especializado | 26 (7%) | 11 | parcial | gera engrenagem reta, helicoidal, cônica, sem-fim, cremalheira e catraca com dente evolvente por módulo e número de dentes, e diz a distância entre centros do par |
+| 17 | molas (`mola`) | especializado | 26 (7%) | 10 | parcial | gera mola de compressão, tração com ganchos e torção com braços, com espiras fechadas nas pontas e comprimento entre dois pontos |
+| 18 | rosca (`rosca`) | especializado | 26 (7%) | 13 | parcial | faz rosca macho ou fêmea métrica, trapezoidal ou de tampa, em qualquer cilindro ou furo |
+| 19 | tecido e estofado (`tecido`) | gerador | 26 (7%) | 11 | não | faz almofada inflada com costura, lona esticada, vela e rede a partir de contorno e pressão |
 | 20 | móvel modular (`movel`) | gerador | 23 (6%) | 6 | parcial | faz caixaria de móvel com laterais, prateleiras, portas e gavetas por vãos |
 | 21 | fixadores normalizados (`fixador`) | especializado | 21 (6%) | 9 | parcial | gera parafuso, porca, arruela, rebite e pino por norma e bitola |
 | 22 | relevo funcional (`textura`) | modificador | 21 (6%) | 10 | parcial | aplica recartilhado, estrias de pega, piso antiderrapante ou chapa ondulada numa face |
@@ -71,11 +71,11 @@ As ferramentas que não existem ou existem em parte, na mesma ordem, com o que j
 - perfil estrutural (`parcial`, 43 objetos): família `perfil-estrutural`: IPE, HE A e UPN da EN 10365 e alumínio ranhurado de 20 a 45 mm, cortados no comprimento, retos ou a 45° nas pontas; a extensão `estruturaDeBarras` faz tubo redondo, quadrado, retangular e cantoneira entre nós; os perfis novos na `estruturaDeBarras` não.
 - manopla e botão (`parcial`, 42 objetos): os botões giratórios e de pressão e os puxadores dentro das famílias `aparelho-de-caixa` e `movel-de-caixa`; manopla avulsa, volante e cabo ergonômico com furo de eixo e estrias não.
 - guia linear (`parcial`, 32 objetos): família `guia-linear`: trilho de perfil com a furação e carro de esferas, tamanhos 15 a 30, com as portas da base e da mesa; o trilho de gaveta e de porta de correr na família `movel-de-caixa`; guia em V não.
+- atuador linear e de junta (`parcial`, 26 objetos): família `cilindro-hidraulico`: camisa, haste, êmbolo, cabeça e olhais liso e com rótula, curso conferido; cilindro de haste dupla e telescópico não; família `fuso`: fuso trapezoidal (ISO 2904) e de esferas (ISO 3408-2, só o volume de fora) com a castanha flangeada; família `atuador-de-junta`: atuador rotativo de junta de robô, cilíndrico de 40 a 120 mm e de caixa (servo pequeno, médio e grande), com as flanges furadas, o eixo publicado e a junta de revolução conferida, por `parametrosDoAtuador` e `parametrosDoServo`; motor, redutor e encoder por dentro não.
 - engrenagens (`parcial`, 26 objetos): família `engrenagem`: a reta de dente evolvente pelo perfil de referência tipo A da ISO 53 (de 17 a 200 dentes, módulo de 0,5 a 10) e a catraca de dente de serra, com cubo, furo e a porta do eixo; família `cremalheira`: a cremalheira reta do mesmo perfil, até 60 dentes; e o par engrenado e o pinhão sobre a cremalheira, com a distância entre centros, a folga entre flancos e a fase (`parDeEngrenagens` e `pinhaoECremalheira` em `engrenamento.js`); a helicoidal, a cônica e o sem-fim não.
 - molas (`parcial`, 26 objetos): família `mola`: compressão de pontas encostadas, tração com gancho em cada ponta e torção com braços retos, por fio, diâmetro externo, comprimento livre e espiras; ponta retificada, gancho de outros tipos e mola montada entre dois pontos não.
 - rosca (`parcial`, 26 objetos): a rosca externa do parafuso da família `fixador`: o filete de perfil trapezoidal varrido pela `helice` do `friso` sobre o núcleo no diâmetro menor, cosmética (sólido à parte, `rosca` 1) ou fundida num corpo só que passa no STEP (`rosca` 2, cerca de 1 s por parafuso); rosca interna e rosca fina não.
 - tecido e estofado (`não`, 26 objetos): nem esboço nem núcleo.
-- atuador linear (`parcial`, 25 objetos): família `cilindro-hidraulico`: camisa, haste, êmbolo, cabeça e olhais liso e com rótula, curso conferido; cilindro de haste dupla e telescópico não; família `fuso`: fuso trapezoidal (ISO 2904) e de esferas (ISO 3408-2, só o volume de fora) com a castanha flangeada.
 - móvel modular (`parcial`, 23 objetos): família `movel-de-caixa`, com nove perfis de roupeiro, guarda-roupa, armários, cômoda, criado-mudo, estante e gaveteiro, portas embutidas, sobrepostas e de correr e gavetas com curso conferido, e família `cadeira`, com cinco perfis; mesa e sofá não.
 - fixadores normalizados (`parcial`, 21 objetos): família `fixador`: parafuso de cabeça sextavada, allen ou abaulada, porca sextavada e arruela lisa, de M3 a M24 pela tabela ISO de rosca grossa; rebite, pino, porca de outros tipos e normas além da ISO métrica não.
 - relevo funcional (`parcial`, 21 objetos): núcleo: displace com ruído; padrão regular não existe.
@@ -194,6 +194,10 @@ Gera botão rotativo, manípulo, volante e cabo ergonômico com furo de eixo e e
 
 Gera trilho e carro, corrediça de gaveta e guia em V por tamanho e curso. Parâmetros: tamanho, curso, tipo. Referências: catálogos de fabricantes em STEP (conceito). Aqui: parcial, família `guia-linear`: trilho de perfil com a furação e carro de esferas, tamanhos 15 a 30, com as portas da base e da mesa; o trilho de gaveta e de porta de correr na família `movel-de-caixa`; guia em V não. Atende 32 objetos em 13 famílias.
 
+### atuador linear e de junta (`atuador`)
+
+Gera cilindro hidráulico ou pneumático e fuso com camisa, haste, olhais e portas, por curso e diâmetro, ligado entre dois pontos. Parâmetros: diâmetro, curso, extensão, montagem das pontas. Referências: catálogos de fabricantes em STEP (conceito). Aqui: parcial, família `cilindro-hidraulico`: camisa, haste, êmbolo, cabeça e olhais liso e com rótula, curso conferido; cilindro de haste dupla e telescópico não; família `fuso`: fuso trapezoidal (ISO 2904) e de esferas (ISO 3408-2, só o volume de fora) com a castanha flangeada; família `atuador-de-junta`: atuador rotativo de junta de robô, cilíndrico de 40 a 120 mm e de caixa (servo pequeno, médio e grande), com as flanges furadas, o eixo publicado e a junta de revolução conferida, por `parametrosDoAtuador` e `parametrosDoServo`; motor, redutor e encoder por dentro não. Atende 26 objetos em 10 famílias.
+
 ### engrenagens (`engrenagem`)
 
 Gera engrenagem reta, helicoidal, cônica, sem-fim, cremalheira e catraca com dente evolvente por módulo e número de dentes, e diz a distância entre centros do par. Parâmetros: tipo, módulo, dentes, ângulo de pressão, largura. Referências: FreeCAD Gears; BOSL2: gears; Blender: Extra Objects (gears). Aqui: parcial, família `engrenagem`: a reta de dente evolvente pelo perfil de referência tipo A da ISO 53 (de 17 a 200 dentes, módulo de 0,5 a 10) e a catraca de dente de serra, com cubo, furo e a porta do eixo; família `cremalheira`: a cremalheira reta do mesmo perfil, até 60 dentes; e o par engrenado e o pinhão sobre a cremalheira, com a distância entre centros, a folga entre flancos e a fase (`parDeEngrenagens` e `pinhaoECremalheira` em `engrenamento.js`); a helicoidal, a cônica e o sem-fim não. Atende 26 objetos em 11 famílias.
@@ -205,10 +209,6 @@ Gera mola de compressão, tração com ganchos e torção com braços, com espir
 ### rosca (`rosca`)
 
 Faz rosca macho ou fêmea métrica, trapezoidal ou de tampa, em qualquer cilindro ou furo. Parâmetros: tipo, passo, diâmetro, comprimento, sentido. Referências: BOSL2: threading e bottlecaps; Blender: Bolt Factory; FreeCAD: Thread. Aqui: parcial, a rosca externa do parafuso da família `fixador`: o filete de perfil trapezoidal varrido pela `helice` do `friso` sobre o núcleo no diâmetro menor, cosmética (sólido à parte, `rosca` 1) ou fundida num corpo só que passa no STEP (`rosca` 2, cerca de 1 s por parafuso); rosca interna e rosca fina não. Atende 26 objetos em 13 famílias.
-
-### atuador linear (`atuador`)
-
-Gera cilindro hidráulico ou pneumático e fuso com camisa, haste, olhais e portas, por curso e diâmetro, ligado entre dois pontos. Parâmetros: diâmetro, curso, extensão, montagem das pontas. Referências: catálogos de fabricantes em STEP (conceito). Aqui: parcial, família `cilindro-hidraulico`: camisa, haste, êmbolo, cabeça e olhais liso e com rótula, curso conferido; cilindro de haste dupla e telescópico não; família `fuso`: fuso trapezoidal (ISO 2904) e de esferas (ISO 3408-2, só o volume de fora) com a castanha flangeada. Atende 25 objetos em 10 famílias.
 
 ### móvel modular (`movel`)
 
@@ -300,8 +300,8 @@ Traça uma rede de tubos e põe sozinha as curvas, tês, reduções, flanges e v
 
 | Objeto | Ferramentas |
 |---|---|
-| avião comercial | perfil aerodinâmico e pás, superfície suave por seções, casca com espessura, roda e pneu, repetição em série, atuador linear, articulações, corte e união gerais |
-| avião de pequeno porte | perfil aerodinâmico e pás, superfície suave por seções, casca com espessura, roda e pneu, articulações, atuador linear, corte e união gerais |
+| avião comercial | perfil aerodinâmico e pás, superfície suave por seções, casca com espessura, roda e pneu, repetição em série, atuador linear e de junta, articulações, corte e união gerais |
+| avião de pequeno porte | perfil aerodinâmico e pás, superfície suave por seções, casca com espessura, roda e pneu, articulações, atuador linear e de junta, corte e união gerais |
 | planador | perfil aerodinâmico e pás, superfície suave por seções, casca com espessura |
 | helicóptero | perfil aerodinâmico e pás, superfície suave por seções, casca com espessura, estrutura de barras, articulações |
 | drone multirrotor | perfil aerodinâmico e pás, gabinete, perfil estrutural, repetição em série, placa de circuito |
@@ -335,18 +335,18 @@ Traça uma rede de tubos e põe sozinha as curvas, tês, reduções, flanges e v
 
 | Objeto | Ferramentas |
 |---|---|
-| escavadeira | chapa dobrada, elos ao longo de caminho fechado, atuador linear, articulações, cabo ou mangueira entre pontos, casca com espessura |
-| retroescavadeira | chapa dobrada, atuador linear, articulações, roda e pneu, cabo ou mangueira entre pontos, casca com espessura |
-| pá carregadeira | chapa dobrada, atuador linear, articulações, roda e pneu, cabo ou mangueira entre pontos |
-| trator de esteira | elos ao longo de caminho fechado, chapa dobrada, atuador linear, articulações, casca com espessura |
-| motoniveladora | chapa dobrada, perfil estrutural, atuador linear, articulações, roda e pneu |
+| escavadeira | chapa dobrada, elos ao longo de caminho fechado, atuador linear e de junta, articulações, cabo ou mangueira entre pontos, casca com espessura |
+| retroescavadeira | chapa dobrada, atuador linear e de junta, articulações, roda e pneu, cabo ou mangueira entre pontos, casca com espessura |
+| pá carregadeira | chapa dobrada, atuador linear e de junta, articulações, roda e pneu, cabo ou mangueira entre pontos |
+| trator de esteira | elos ao longo de caminho fechado, chapa dobrada, atuador linear e de junta, articulações, casca com espessura |
+| motoniveladora | chapa dobrada, perfil estrutural, atuador linear e de junta, articulações, roda e pneu |
 | rolo compactador | chapa dobrada, casca com espessura, articulações, roda e pneu |
-| guindaste | estrutura de barras, cabo ou mangueira entre pontos, polia e correia, perfil estrutural, roda e pneu, atuador linear |
+| guindaste | estrutura de barras, cabo ou mangueira entre pontos, polia e correia, perfil estrutural, roda e pneu, atuador linear e de junta |
 | grua | estrutura de barras, cabo ou mangueira entre pontos, polia e correia, perfil estrutural, repetição em série |
-| empilhadeira | perfil estrutural, elos ao longo de caminho fechado, atuador linear, roda e pneu, chapa dobrada, guia linear |
+| empilhadeira | perfil estrutural, elos ao longo de caminho fechado, atuador linear e de junta, roda e pneu, chapa dobrada, guia linear |
 | caminhão betoneira | hélice, casca com espessura, chapa dobrada, roda e pneu, perfil estrutural |
-| perfuratriz | estrutura de barras, hélice, atuador linear, guia linear, perfil estrutural |
-| trator agrícola | casca com espessura, chapa dobrada, roda e pneu, articulações, atuador linear |
+| perfuratriz | estrutura de barras, hélice, atuador linear e de junta, guia linear, perfil estrutural |
+| trator agrícola | casca com espessura, chapa dobrada, roda e pneu, articulações, atuador linear e de junta |
 | colheitadeira | chapa dobrada, hélice, roda e pneu, repetição em série, lâmina e dentes de corte, casca com espessura |
 | pulverizador | estrutura de barras, tubulação com conexões, cabo ou mangueira entre pontos, articulações, roda e pneu |
 | plantadeira | chapa dobrada, perfil estrutural, repetição em série, roda e pneu, elos ao longo de caminho fechado |
@@ -359,11 +359,11 @@ Traça uma rede de tubos e põe sozinha as curvas, tês, reduções, flanges e v
 | torno | chapa dobrada, gabinete, guia linear, rosca, manopla e botão, engrenagens, texto e escala gravados |
 | fresadora | gabinete, guia linear, rosca, manopla e botão, chapa dobrada |
 | furadeira de bancada | casca com espessura, polia e correia, guia linear, manopla e botão, molas |
-| prensa | chapa dobrada, atuador linear, guia linear, perfil estrutural |
-| dobradeira | chapa dobrada, atuador linear, guia linear, perfil estrutural |
+| prensa | chapa dobrada, atuador linear e de junta, guia linear, perfil estrutural |
+| dobradeira | chapa dobrada, atuador linear e de junta, guia linear, perfil estrutural |
 | serra de fita | chapa dobrada, casca com espessura, polia e correia, lâmina e dentes de corte |
 | retífica | gabinete, guia linear, manopla e botão, casca com espessura |
-| injetora | gabinete, chapa dobrada, atuador linear, guia linear, hélice, tubulação com conexões |
+| injetora | gabinete, chapa dobrada, atuador linear e de junta, guia linear, hélice, tubulação com conexões |
 | extrusora | hélice, tubulação com conexões, gabinete, repetição em série |
 | esteira transportadora | perfil estrutural, polia e correia, rolamentos e buchas, repetição em série |
 | linha de montagem | perfil estrutural, estrutura de barras, repetição em série, guia linear |
@@ -383,10 +383,10 @@ Traça uma rede de tubos e põe sozinha as curvas, tês, reduções, flanges e v
 | robô delta | estrutura de barras, articulações, casca com espessura |
 | robô móvel com rodas | gabinete, roda e pneu, placa de circuito |
 | robô de esteira | elos ao longo de caminho fechado, gabinete, roda e pneu |
-| humanoide | superfície suave por seções, casca com espessura, articulações, cabo ou mangueira entre pontos |
+| humanoide | superfície suave por seções, casca com espessura, articulações, atuador linear e de junta, cabo ou mangueira entre pontos |
 | quadrúpede | superfície suave por seções, casca com espessura, articulações |
 | garra | articulações, engrenagens, molas, relevo funcional |
-| efetuador | articulações, atuador linear, furação em padrão |
+| efetuador | articulações, atuador linear e de junta, furação em padrão |
 | exoesqueleto | casca com espessura, articulações, tecido e estofado, estrutura de barras |
 | robô aspirador | casca com espessura, gabinete, roda e pneu, repetição em série |
 | drone terrestre | gabinete, roda e pneu, elos ao longo de caminho fechado, estrutura de barras |
@@ -405,11 +405,11 @@ Traça uma rede de tubos e põe sozinha as curvas, tês, reduções, flanges e v
 | diferencial | engrenagens, casca com espessura, rolamentos e buchas, fixadores normalizados |
 | embreagem | molas, repetição em série, furação em padrão, rolamentos e buchas |
 | freio | furação em padrão, repetição em série, casca com espessura |
-| suspensão | molas, atuador linear, articulações, estrutura de barras |
+| suspensão | molas, atuador linear e de junta, articulações, estrutura de barras |
 | direção | engrenagens, articulações, manopla e botão, estrutura de barras |
-| atuador linear | atuador linear, rosca, guia linear |
-| cilindro hidráulico | atuador linear, articulações, tubulação com conexões, cabo ou mangueira entre pontos, vedação |
-| cilindro pneumático | atuador linear, articulações, tubulação com conexões |
+| atuador linear | atuador linear e de junta, rosca, guia linear |
+| cilindro hidráulico | atuador linear e de junta, articulações, tubulação com conexões, cabo ou mangueira entre pontos, vedação |
+| cilindro pneumático | atuador linear e de junta, articulações, tubulação com conexões |
 | bomba | casca com espessura, tubulação com conexões, perfil aerodinâmico e pás, vedação |
 | came e seguidor | came, molas, articulações |
 | biela e manivela | articulações, furação em padrão, superfície suave por seções |
@@ -466,7 +466,7 @@ Traça uma rede de tubos e põe sozinha as curvas, tês, reduções, flanges e v
 | tupia | casca com espessura, manopla e botão, rosca |
 | morsa | rosca, guia linear, relevo funcional, manopla e botão |
 | grampo | rosca, manopla e botão |
-| macaco hidráulico | atuador linear, articulações, manopla e botão |
+| macaco hidráulico | atuador linear e de junta, articulações, manopla e botão |
 | torquímetro | texto e escala gravados, manopla e botão, relevo funcional |
 | paquímetro | texto e escala gravados, guia linear, lâmina e dentes de corte |
 
@@ -492,7 +492,7 @@ Traça uma rede de tubos e põe sozinha as curvas, tês, reduções, flanges e v
 | elevador | chapa dobrada, guia linear, cabo ou mangueira entre pontos, polia e correia |
 | escada rolante | elos ao longo de caminho fechado, perfil estrutural, repetição em série, guia linear |
 | esteira rolante | elos ao longo de caminho fechado, perfil estrutural, repetição em série |
-| plataforma elevatória | articulações, atuador linear, chapa dobrada |
+| plataforma elevatória | articulações, atuador linear e de junta, chapa dobrada |
 | monta-carga | chapa dobrada, guia linear, cabo ou mangueira entre pontos, polia e correia |
 | teleférico | cabo ou mangueira entre pontos, polia e correia, casca com espessura, estrutura de barras |
 
@@ -590,7 +590,7 @@ Traça uma rede de tubos e põe sozinha as curvas, tês, reduções, flanges e v
 | berço | móvel modular, repetição em série |
 | rack | móvel modular |
 | gaveteiro | móvel modular, guia linear |
-| cadeira de escritório | tecido e estofado, atuador linear, roda e pneu, estrutura de barras, articulações |
+| cadeira de escritório | tecido e estofado, atuador linear e de junta, roda e pneu, estrutura de barras, articulações |
 
 ### Construção e estruturas
 
@@ -634,8 +634,8 @@ Traça uma rede de tubos e põe sozinha as curvas, tês, reduções, flanges e v
 | Objeto | Ferramentas |
 |---|---|
 | maca | estrutura de barras, tecido e estofado, roda e pneu, articulações |
-| cadeira odontológica | tecido e estofado, articulações, atuador linear, superfície suave por seções |
-| cama hospitalar | estrutura de barras, móvel modular, articulações, atuador linear, roda e pneu |
+| cadeira odontológica | tecido e estofado, articulações, atuador linear e de junta, superfície suave por seções |
+| cama hospitalar | estrutura de barras, móvel modular, articulações, atuador linear e de junta, roda e pneu |
 | prótese | superfície suave por seções, articulações, casca com espessura |
 | órtese | casca com espessura, articulações, tecido e estofado |
 | muleta | estrutura de barras, manopla e botão, furação em padrão |
@@ -778,5 +778,5 @@ Traça uma rede de tubos e põe sozinha as curvas, tês, reduções, flanges e v
 | bordadeira | gabinete, guia linear, placa de circuito |
 | envasadora | perfil estrutural, tubulação com conexões, repetição em série, guia linear |
 | rotuladora | perfil estrutural, polia e correia, guia linear |
-| seladora | gabinete, atuador linear, articulações |
+| seladora | gabinete, atuador linear e de junta, articulações |
 | embaladora | perfil estrutural, polia e correia, guia linear, gabinete |
