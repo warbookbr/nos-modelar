@@ -59,7 +59,7 @@ O núcleo não ganha nome de objeto nem operação nova, e o acervo sai igual. A
 
 ## Decisão da pessoa
 
-Pendente: a seção padrão do membro (a proposta é a elíptica de cantos suaves, mais parecida com braço e perna) e a espessura padrão da parede (a proposta é 2 mm).
+Decidido em 2026-11-25, pela recomendação: a seção padrão do membro é a elíptica de cantos suaves e a parede padrão é de 2 mm, as duas trocáveis por parâmetro. As linhas de painel ficam para o plano de acabamento de hard surface.
 
 ## Riscos e parada
 

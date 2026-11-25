@@ -61,7 +61,7 @@ O núcleo não ganha nome de objeto nem operação nova, e o acervo sai igual. A
 
 ## Decisão da pessoa
 
-Pendente: os tamanhos da tabela (a proposta é o cilíndrico de 40, 60, 80, 100 e 120 mm de diâmetro e o de caixa nos tamanhos de servo pequeno, médio e grande); e se a flange de saída é a face toda ou um anel.
+Decidido em 2026-11-25, pela recomendação: o cilíndrico de 40, 60, 80, 100 e 120 mm de diâmetro, o de caixa nos tamanhos de servo pequeno, médio e grande (caixa de uns 23, 40 e 60 mm), e a flange de saída como a face toda girando. O chanfro nas bordas das flanges e da carcaça sai do próprio perfil torneado, como opção da família.
 
 ## Riscos e parada
 
