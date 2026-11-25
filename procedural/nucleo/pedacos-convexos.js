@@ -73,7 +73,51 @@ export function melhorInicio(pos, P) {
   return [...P.slice(melhor), ...P.slice(0, melhor)];
 }
 
+/* A fusão segue a ordem de sempre: varre os pedaços na ordem em que estão, e para cada um os de depois, e une o primeiro par que
+   serve; depois recomeça. Só um par que divide uma aresta (u→v num, v→u no outro) pode servir, e por isso os candidatos de cada
+   pedaço saem do mapa das arestas, na mesma ordem. Depois de unir p com q, todo par antes de p que não toca p já tinha falhado
+   e continua igual, e a varredura recomeça no menor entre p e os vizinhos dele: o resultado é o da varredura do começo, sem o
+   custo cúbico (a chapa de 44 furos da junta do cabeçote levava 41 s). */
 export function pedacosConvexos(pos, triangulos, n, piso = 0) {
+  const pecas = triangulos.map((t) => t.slice());
+  const vivo = pecas.map(() => true);
+  const donos = new Map();
+  const chave = (u, v) => `${u},${v}`;
+  const arestas = (P) => P.map((u, k) => chave(u, P[(k + 1) % P.length]));
+  const por = (P, i) => { for (const a of arestas(P)) { let d = donos.get(a); if (!d) donos.set(a, d = new Set()); d.add(i); } };
+  const tirar = (P, i) => { for (const a of arestas(P)) donos.get(a)?.delete(i); };
+  pecas.forEach((P, i) => por(P, i));
+  const vizinhos = (i) => {
+    const P = pecas[i]; const saida = new Set();
+    for (let k = 0; k < P.length; k++) for (const j of donos.get(chave(P[(k + 1) % P.length], P[k])) ?? []) if (j !== i && vivo[j]) saida.add(j);
+    return [...saida].sort((a, b) => a - b);
+  };
+  let inicio = 0;
+  for (;;) {
+    let unido = -1;
+    for (let p = inicio; p < pecas.length && unido < 0; p++) {
+      if (!vivo[p]) continue;
+      for (const q of vizinhos(p)) {
+        if (q <= p) continue;
+        const m = fundir(pecas[p], pecas[q]);
+        /* pedaço sem área (lasca) se funde mesmo sem convexidade exata: ele não
+           ocupa área, e sozinho sairia degenerado na tela */
+        if (m && (convexo(pos, m, n) || areaDe(pos, pecas[p]) < piso || areaDe(pos, pecas[q]) < piso)) {
+          tirar(pecas[p], p); tirar(pecas[q], q);
+          pecas[p] = m; vivo[q] = false; por(m, p);
+          unido = p;
+          break;
+        }
+      }
+    }
+    if (unido < 0) break;
+    inicio = Math.min(unido, ...vizinhos(unido));
+  }
+  return pecas.filter((_, i) => vivo[i]).map((P) => melhorInicio(pos, P));
+}
+
+/* A varredura de antes, que recomeça do primeiro pedaço a cada fusão; fica para o teste provar que a nova dá o mesmo. */
+export function pedacosConvexosPorVarredura(pos, triangulos, n, piso = 0) {
   const pecas = triangulos.map((t) => t.slice());
   let mudou = true;
   while (mudou) {
@@ -81,8 +125,6 @@ export function pedacosConvexos(pos, triangulos, n, piso = 0) {
     for (let p = 0; p < pecas.length && !mudou; p++) {
       for (let q = p + 1; q < pecas.length; q++) {
         const m = fundir(pecas[p], pecas[q]);
-        /* pedaço sem área (lasca) se funde mesmo sem convexidade exata: ele não
-           ocupa área, e sozinho sairia degenerado na tela */
         if (m && (convexo(pos, m, n) || areaDe(pos, pecas[p]) < piso || areaDe(pos, pecas[q]) < piso)) { pecas[p] = m; pecas.splice(q, 1); mudou = true; break; }
       }
     }

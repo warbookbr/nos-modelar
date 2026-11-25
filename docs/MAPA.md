@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2364 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2375 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1384,6 +1384,7 @@
 - `paineis-por-vaos.js` — paineis-por-vaos.js — uma chapa partida em painéis por linhas de vão desenhadas em vistas, com o vão medido ao longo da chapa
 - `paineis-por-vaos.test.ts` — paineis-por-vaos.test.ts — o ajudante `paineisPorVaos` em peças de teste sem domínio: uma caixa de chapa de 1 mm com uma face a 38 graus da vista, cortada po…
 - `pedacos-convexos.js` — pedacos-convexos.js — de triângulos coplanares a faces convexas.
+- `pedacos-convexos.test.mjs` — pedacos-convexos.test.mjs — a fusão pelos vizinhos dá os mesmos pedaços, na mesma ordem e com o mesmo canto de partida, que a varredura que recomeçava do pri…
 - `pedacos-da-divisao.js` — pedacos-da-divisao.js — os pedaços que a `divisaoPorContorno` deixa de cada face que corta, para quem lê faces por origem.
 - `perfil2d.js` — perfil2d.js — perfil 2D com furos e deslocamento de contorno, sobre a CrossSection da Manifold (Clipper2).
 - `perfil2d.test.mjs` — perfil2d.test.mjs — perfil 2D com furos e deslocamento de contorno sobre a CrossSection da Manifold.
@@ -1556,6 +1557,14 @@
 ## procedural/pecas/abajur-de-mesa/referencias/
 
 - `alvo.md` — Alvo do abajur de mesa
+
+## procedural/pecas/alternador/
+
+- `receita.js` — alternador: alternador automotivo de 12 V, peça inteira. Referencial do acervo: Y para cima, chão em y 0 (o fundo da bucha do pé de baixo), eixo do rotor em …
+
+## procedural/pecas/alternador/referencias/
+
+- `alvo.md` — Alvo do alternador
 
 ## procedural/pecas/ambulancia/
 
@@ -2075,6 +2084,14 @@
 
 - `alvo.md` — Alvo do copo de vidro
 
+## procedural/pecas/disco-de-embreagem/
+
+- `receita.js` — disco-de-embreagem: disco de embreagem com amortecedor de torção, peça inteira de cinco partes (revestimento, chapaDeArraste, cubo, molas, placas). REFERENCI…
+
+## procedural/pecas/disco-de-embreagem/referencias/
+
+- `alvo.md` — Alvo do disco de embreagem
+
 ## procedural/pecas/empilhadeira/
 
 - `ALINHAMENTO.md` — Empilhadeira — alinhamento
@@ -2373,6 +2390,14 @@
 
 - `alvo.md` — Alvo do jipe-aberto
 
+## procedural/pecas/junta-do-cabecote/
+
+- `receita.js` — junta-do-cabecote — junta de cabeçote multicamada de aço para motor de quatro cilindros em linha, peça inteira.
+
+## procedural/pecas/junta-do-cabecote/referencias/
+
+- `alvo.md` — Alvo da junta do cabeçote
+
 ## procedural/pecas/kukri/
 
 - `receita.js` — kukri — faca de lâmina curva de desenho moderno, deitada, em duas partes: `lamina` e `cabo`. A lâmina é uma `chapaDeContorno` (o contorno da foto, o chanfro …
@@ -2488,6 +2513,14 @@
 ## procedural/pecas/prato-fundo/referencias/
 
 - `alvo.md` — Alvo do prato fundo
+
+## procedural/pecas/radiador/
+
+- `receita.js` — radiador: radiador de alumínio de fluxo cruzado, núcleo de 600 x 400 x 40 mm entre dois tanques de 50 mm, peça inteira. Referencial do acervo: Y para cima, c…
+
+## procedural/pecas/radiador/referencias/
+
+- `alvo.md` — Alvo do radiador
 
 ## procedural/pecas/robo-humanoide/
 
@@ -2646,6 +2679,14 @@
 ## procedural/pecas/trator/referencias/
 
 - `alvo.md` — trator — alvo
+
+## procedural/pecas/turbocompressor/
+
+- `receita.js` — turbocompressor — turbocompressor de carro de passeio de uma peça só, com seis partes: carcacaCompressor, rotorCompressor, miolo, carcacaTurbina, linhas e ab…
+
+## procedural/pecas/turbocompressor/referencias/
+
+- `alvo.md` — Alvo do turbocompressor
 
 ## procedural/pecas/vaso-de-ceramica/
 
