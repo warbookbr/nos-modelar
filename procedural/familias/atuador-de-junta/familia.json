@@ -300,6 +300,16 @@
       "id": "saida",
       "tipo": "padraoFuros",
       "papel": "recebe"
+    },
+    {
+      "id": "eixo",
+      "tipo": "anel",
+      "papel": "recebe"
+    },
+    {
+      "id": "eixo-da-saida",
+      "tipo": "anel",
+      "papel": "recebe"
     }
   ],
   "ferramentas": [

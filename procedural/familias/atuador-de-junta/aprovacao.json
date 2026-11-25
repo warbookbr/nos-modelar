@@ -34,8 +34,43 @@
           "furosDoFlange": 4,
           "larguraDaCaixa": 8
         },
-        "hash": "sha256:fa243cc6a32965acc36e2362c6efeb17e2505a3d54e00bc058db93679bc6e21c",
-        "medidas": []
+        "hash": "sha256:6b1ebbabc4900512c64887ac7ea1b67e2c7b1723fdac6b7ecbbd9c6570a1577f",
+        "medidas": [],
+        "montagem": {
+          "hash": "sha256:e8ee55af75d3a80f4370daf5b4986d4679b93a887e311b4f5e4bbf31ff4a6ffb",
+          "pecas": [
+            "atuador-de-junta.carcaca",
+            "atuador-de-junta.saida"
+          ],
+          "conferido": true,
+          "articulacoes": [
+            {
+              "id": "junta",
+              "tipo": "revolucao",
+              "curso": {
+                "minimo": -180,
+                "maximo": 180,
+                "unidade": "graus"
+              },
+              "passos": 24,
+              "posicoes": 25,
+              "colisoes": 0,
+              "paresConferidos": 1,
+              "pares": [
+                {
+                  "movel": [
+                    "saida"
+                  ],
+                  "fixo": [
+                    "carcaca"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                }
+              ],
+              "conferido": true
+            }
+          ]
+        }
       },
       "medio": {
         "parametros": {
@@ -66,8 +101,43 @@
           "furosDoFlange": 8,
           "larguraDaCaixa": 20
         },
-        "hash": "sha256:aed5df9f858e8638afe908da459b2db50c63d433d3c835df82dc8ad03081dbdb",
-        "medidas": []
+        "hash": "sha256:a75b4c995a052dfa74d25675da0d210eb454ab890025ba02c439d33a0ea9515f",
+        "medidas": [],
+        "montagem": {
+          "hash": "sha256:7dbdcc3c3a62a740a9a2045f6d7012f32f00f49fc8d255bb48e2a6591c5740cd",
+          "pecas": [
+            "atuador-de-junta.carcaca",
+            "atuador-de-junta.saida"
+          ],
+          "conferido": true,
+          "articulacoes": [
+            {
+              "id": "junta",
+              "tipo": "revolucao",
+              "curso": {
+                "minimo": -180,
+                "maximo": 180,
+                "unidade": "graus"
+              },
+              "passos": 24,
+              "posicoes": 25,
+              "colisoes": 0,
+              "paresConferidos": 1,
+              "pares": [
+                {
+                  "movel": [
+                    "saida"
+                  ],
+                  "fixo": [
+                    "carcaca"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                }
+              ],
+              "conferido": true
+            }
+          ]
+        }
       },
       "maximo": {
         "parametros": {
@@ -98,8 +168,43 @@
           "furosDoFlange": 16,
           "larguraDaCaixa": 60
         },
-        "hash": "sha256:6197ba48ab6de3cc392ae7a9723193e41ae7ecd48d380d44d6fceba7eea64dc9",
-        "medidas": []
+        "hash": "sha256:2a304a9bd141f9fa4af82da053eca6ce66e7c5f9ba44f22df02cd048c3470ec1",
+        "medidas": [],
+        "montagem": {
+          "hash": "sha256:b96d9a4613ca7ce5b3de6a2b0de5f3effaf016053963fe20599414cc6bc2c798",
+          "pecas": [
+            "atuador-de-junta.carcaca",
+            "atuador-de-junta.saida"
+          ],
+          "conferido": true,
+          "articulacoes": [
+            {
+              "id": "junta",
+              "tipo": "revolucao",
+              "curso": {
+                "minimo": -180,
+                "maximo": 180,
+                "unidade": "graus"
+              },
+              "passos": 24,
+              "posicoes": 25,
+              "colisoes": 0,
+              "paresConferidos": 1,
+              "pares": [
+                {
+                  "movel": [
+                    "saida"
+                  ],
+                  "fixo": [
+                    "carcaca"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                }
+              ],
+              "conferido": true
+            }
+          ]
+        }
       }
     },
     "varredura": {
@@ -160,6 +265,8 @@
       ]
     },
     "portas": [
+      "eixo",
+      "eixo-da-saida",
       "fixacao",
       "saida"
     ],
@@ -193,8 +300,43 @@
           "furosDoFlange": 8,
           "larguraDaCaixa": 20
         },
-        "hash": "sha256:cd82982b7c3db257b908960ae942a63746638c7bec920c8074013671bf2363cd",
-        "medidas": []
+        "hash": "sha256:6045df7321befc93ff27340196b6230db1689790b82e36c26b513cc432d5d924",
+        "medidas": [],
+        "montagem": {
+          "hash": "sha256:86ac021df699bc4a60e2c7ca42f121998589e090cf4385490a1e9c727caa570a",
+          "pecas": [
+            "atuador-de-junta.carcaca",
+            "atuador-de-junta.saida"
+          ],
+          "conferido": true,
+          "articulacoes": [
+            {
+              "id": "junta",
+              "tipo": "revolucao",
+              "curso": {
+                "minimo": -180,
+                "maximo": 180,
+                "unidade": "graus"
+              },
+              "passos": 24,
+              "posicoes": 25,
+              "colisoes": 0,
+              "paresConferidos": 1,
+              "pares": [
+                {
+                  "movel": [
+                    "saida"
+                  ],
+                  "fixo": [
+                    "carcaca"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                }
+              ],
+              "conferido": true
+            }
+          ]
+        }
       },
       "atuador-120": {
         "parametros": {
@@ -225,8 +367,43 @@
           "furosDoFlange": 12,
           "larguraDaCaixa": 20
         },
-        "hash": "sha256:14de48dd6a9e572a31d922604a6dafcdc301645ddcd3365e5aece176854dcbac",
-        "medidas": []
+        "hash": "sha256:0200175b8f0bf336741bab8cc54f545ee6625da9292d425be8fb368aeedc7840",
+        "medidas": [],
+        "montagem": {
+          "hash": "sha256:4e2066ff09d73833ddc5bc3273aa8659b22f775be3a35719d6a80190d22b7848",
+          "pecas": [
+            "atuador-de-junta.carcaca",
+            "atuador-de-junta.saida"
+          ],
+          "conferido": true,
+          "articulacoes": [
+            {
+              "id": "junta",
+              "tipo": "revolucao",
+              "curso": {
+                "minimo": -180,
+                "maximo": 180,
+                "unidade": "graus"
+              },
+              "passos": 24,
+              "posicoes": 25,
+              "colisoes": 0,
+              "paresConferidos": 1,
+              "pares": [
+                {
+                  "movel": [
+                    "saida"
+                  ],
+                  "fixo": [
+                    "carcaca"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                }
+              ],
+              "conferido": true
+            }
+          ]
+        }
       },
       "atuador-40": {
         "parametros": {
@@ -257,8 +434,43 @@
           "furosDoFlange": 4,
           "larguraDaCaixa": 20
         },
-        "hash": "sha256:0eeadab36f056bb8057512eafcb8dd65d152f93e1c94fc86b07bfea6ae30d196",
-        "medidas": []
+        "hash": "sha256:58af441aa0a224ce0a9e82f1b72a37f08379cb16d818ea038b850dab8c3ce554",
+        "medidas": [],
+        "montagem": {
+          "hash": "sha256:ce5fec812388e1cad894e951b24d4c508551b893e0d94470137df25def0bc1da",
+          "pecas": [
+            "atuador-de-junta.carcaca",
+            "atuador-de-junta.saida"
+          ],
+          "conferido": true,
+          "articulacoes": [
+            {
+              "id": "junta",
+              "tipo": "revolucao",
+              "curso": {
+                "minimo": -180,
+                "maximo": 180,
+                "unidade": "graus"
+              },
+              "passos": 24,
+              "posicoes": 25,
+              "colisoes": 0,
+              "paresConferidos": 1,
+              "pares": [
+                {
+                  "movel": [
+                    "saida"
+                  ],
+                  "fixo": [
+                    "carcaca"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                }
+              ],
+              "conferido": true
+            }
+          ]
+        }
       },
       "atuador-60": {
         "parametros": {
@@ -289,8 +501,43 @@
           "furosDoFlange": 6,
           "larguraDaCaixa": 20
         },
-        "hash": "sha256:68ccbde7fa730af43ebff03676c8aea9990c3d9a57c688d8104176596e806957",
-        "medidas": []
+        "hash": "sha256:58bdc40e92f357e749f6c08aa4f7f7a65c1be24362f03a21dfdb96c64b44f536",
+        "medidas": [],
+        "montagem": {
+          "hash": "sha256:d86aac01a6072b7c6689d8261306f8443c2a7c56b6a596b5e9cab1b56f414408",
+          "pecas": [
+            "atuador-de-junta.carcaca",
+            "atuador-de-junta.saida"
+          ],
+          "conferido": true,
+          "articulacoes": [
+            {
+              "id": "junta",
+              "tipo": "revolucao",
+              "curso": {
+                "minimo": -180,
+                "maximo": 180,
+                "unidade": "graus"
+              },
+              "passos": 24,
+              "posicoes": 25,
+              "colisoes": 0,
+              "paresConferidos": 1,
+              "pares": [
+                {
+                  "movel": [
+                    "saida"
+                  ],
+                  "fixo": [
+                    "carcaca"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                }
+              ],
+              "conferido": true
+            }
+          ]
+        }
       },
       "atuador-80": {
         "parametros": {
@@ -321,8 +568,43 @@
           "furosDoFlange": 8,
           "larguraDaCaixa": 20
         },
-        "hash": "sha256:1e19ac3fa9f98b9dc5c482c1475e7d8cd98332b525952232756303968489d185",
-        "medidas": []
+        "hash": "sha256:878c01cdf7fce1dbf2250915065b87c04018e9c50abae3f2529cad1e3fedd449",
+        "medidas": [],
+        "montagem": {
+          "hash": "sha256:c9180298540ae9c40f2f3416bc59f2db56407bba3d1c133781145b130f1203bd",
+          "pecas": [
+            "atuador-de-junta.carcaca",
+            "atuador-de-junta.saida"
+          ],
+          "conferido": true,
+          "articulacoes": [
+            {
+              "id": "junta",
+              "tipo": "revolucao",
+              "curso": {
+                "minimo": -180,
+                "maximo": 180,
+                "unidade": "graus"
+              },
+              "passos": 24,
+              "posicoes": 25,
+              "colisoes": 0,
+              "paresConferidos": 1,
+              "pares": [
+                {
+                  "movel": [
+                    "saida"
+                  ],
+                  "fixo": [
+                    "carcaca"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                }
+              ],
+              "conferido": true
+            }
+          ]
+        }
       },
       "servo-grande": {
         "parametros": {
@@ -353,8 +635,43 @@
           "furosDoFlange": 6,
           "larguraDaCaixa": 30
         },
-        "hash": "sha256:5ec30a64ae565c00b69d864309bda7dccf69297602b8697c18e1796663f46c38",
-        "medidas": []
+        "hash": "sha256:7c5134d6a9b0db2554ed0cdc50339a2e39ba8412514f5d9f0929558ac33348af",
+        "medidas": [],
+        "montagem": {
+          "hash": "sha256:a6c251b07434fee7bb898c602f3d27c5070e45dcf3bce244ff718e2a82026ce6",
+          "pecas": [
+            "atuador-de-junta.carcaca",
+            "atuador-de-junta.saida"
+          ],
+          "conferido": true,
+          "articulacoes": [
+            {
+              "id": "junta",
+              "tipo": "revolucao",
+              "curso": {
+                "minimo": -180,
+                "maximo": 180,
+                "unidade": "graus"
+              },
+              "passos": 24,
+              "posicoes": 25,
+              "colisoes": 0,
+              "paresConferidos": 1,
+              "pares": [
+                {
+                  "movel": [
+                    "saida"
+                  ],
+                  "fixo": [
+                    "carcaca"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                }
+              ],
+              "conferido": true
+            }
+          ]
+        }
       },
       "servo-medio": {
         "parametros": {
@@ -385,8 +702,43 @@
           "furosDoFlange": 6,
           "larguraDaCaixa": 20
         },
-        "hash": "sha256:aed5df9f858e8638afe908da459b2db50c63d433d3c835df82dc8ad03081dbdb",
-        "medidas": []
+        "hash": "sha256:a75b4c995a052dfa74d25675da0d210eb454ab890025ba02c439d33a0ea9515f",
+        "medidas": [],
+        "montagem": {
+          "hash": "sha256:7dbdcc3c3a62a740a9a2045f6d7012f32f00f49fc8d255bb48e2a6591c5740cd",
+          "pecas": [
+            "atuador-de-junta.carcaca",
+            "atuador-de-junta.saida"
+          ],
+          "conferido": true,
+          "articulacoes": [
+            {
+              "id": "junta",
+              "tipo": "revolucao",
+              "curso": {
+                "minimo": -180,
+                "maximo": 180,
+                "unidade": "graus"
+              },
+              "passos": 24,
+              "posicoes": 25,
+              "colisoes": 0,
+              "paresConferidos": 1,
+              "pares": [
+                {
+                  "movel": [
+                    "saida"
+                  ],
+                  "fixo": [
+                    "carcaca"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                }
+              ],
+              "conferido": true
+            }
+          ]
+        }
       },
       "servo-pequeno": {
         "parametros": {
@@ -417,8 +769,43 @@
           "furosDoFlange": 6,
           "larguraDaCaixa": 12.5
         },
-        "hash": "sha256:548ab37f0fa6b93109fc1bd916b91e0df074f99152cd42b8bfaf3021967c44b0",
-        "medidas": []
+        "hash": "sha256:685472aaad8ae77a3faaeb6ffc76a3165f5b5336dc237d25dcf759a891150d12",
+        "medidas": [],
+        "montagem": {
+          "hash": "sha256:eb3fa98a606372ed788f053c4165e85307a1aa3131f41599d262d2d2289f6c76",
+          "pecas": [
+            "atuador-de-junta.carcaca",
+            "atuador-de-junta.saida"
+          ],
+          "conferido": true,
+          "articulacoes": [
+            {
+              "id": "junta",
+              "tipo": "revolucao",
+              "curso": {
+                "minimo": -180,
+                "maximo": 180,
+                "unidade": "graus"
+              },
+              "passos": 24,
+              "posicoes": 25,
+              "colisoes": 0,
+              "paresConferidos": 1,
+              "pares": [
+                {
+                  "movel": [
+                    "saida"
+                  ],
+                  "fixo": [
+                    "carcaca"
+                  ],
+                  "estadoMaisGrave": "encostam"
+                }
+              ],
+              "conferido": true
+            }
+          ]
+        }
       }
     },
     "escalasDosPerfis": {

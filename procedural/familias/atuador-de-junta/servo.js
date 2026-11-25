@@ -25,6 +25,7 @@ export function geometriaDoServo(q) {
     cabo: { em: [-L / 2 + 0.5 - lc, 0.25 * H, 0], perfil: [[0, 0], [rc, 0], [rc, lc], [0, lc]] },
     horn: { em: [xs, H + ht, 0], perfil: [[0, 0], [rh, 0], [rh, th], [0, th]] },
     furoDoHorn: { em: [xs + cFuroHorn, topo - th / 2, 0], perfil: [[0, 0], [rFuroHorn, 0], [rFuroHorn, th / 2 + 1], [0, th / 2 + 1]], raio: cFuroHorn, diametro: 2 * rFuroHorn },
+    eixo: { y: H + ht, raio: rt },
     centrosDaAba, topo, xs,
   };
 }

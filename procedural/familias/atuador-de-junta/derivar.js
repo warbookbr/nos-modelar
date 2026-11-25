@@ -15,7 +15,8 @@ export function derivar(q) {
     diametroS: m(q.diametroDoFuroDaSaida), raioS: m(q.circuloDaSaida / 2), anguloS: g.furosDaSaida.anguloInicial, topo: [0, m(g.topo), 0],
   };
   for (const [prefixo, pts] of [['c', g.carcaca], ['s', g.saida], ['k', g.cabo.perfil], ['ff', g.furosDoFlange.perfil], ['fs', g.furosDaSaida.perfil]]) pts.forEach(([r, y], k) => { a[`${prefixo}r${k}`] = m(r); a[`${prefixo}y${k}`] = m(y); });
-  return { composicao: ID_POR_FORMA[q.forma ?? 1], argumentos: a };
+  Object.assign(a, { centroDoEixo: [0, m(q.comprimento), 0], raioDoEixo: m(q.diametro / 2), raioDoEixoDaSaida: m(q.diametroDaSaida / 2), inicioDoEixo: -m(q.comprimento - q.espessuraDoFlange), fimDoEixoDaSaida: m(q.espessuraDaSaida) });
+  return { composicao: ID_POR_FORMA[1], argumentos: a };
 }
 
 function derivarServo(q) {
@@ -27,5 +28,6 @@ function derivarServo(q) {
   for (const [nome, b] of [['caixa', g.caixa], ['aba', g.aba]]) Object.assign(a, { [`${nome}Largura`]: m(b.largura), [`${nome}Profundidade`]: m(b.profundidade), [`${nome}Cantos`]: m(b.cantos), [`${nome}Altura`]: m(b.altura), [`${nome}Em`]: [0, m(b.y ?? 0), 0] });
   g.furosDaAba.forEach((f, k) => { a[`emFuroA${k}`] = f.em.map(m); a[`centroA${k}`] = g.centrosDaAba[k].map(m); });
   for (const [prefixo, pts] of [['t', g.torre.perfil], ['k', g.cabo.perfil], ['h', g.horn.perfil], ['fh', g.furoDoHorn.perfil], ['fa', g.furosDaAba[0].perfil]]) pts.forEach(([r, y], k) => { a[`${prefixo}r${k}`] = m(r); a[`${prefixo}y${k}`] = m(y); });
+  Object.assign(a, { centroDoEixo: [m(g.xs), m(g.eixo.y), 0], raioDoEixo: m(g.eixo.raio), raioDoEixoDaSaida: m(q.diametroDoHorn / 2), inicioDoEixo: -m(g.eixo.y - q.alturaDaCaixa), fimDoEixoDaSaida: m(q.espessuraDoHorn) });
   return { composicao: ID_POR_FORMA[2], argumentos: a };
 }

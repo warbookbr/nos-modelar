@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2358 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2361 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1032,10 +1032,11 @@
 ## procedural/familias/atuador-de-junta/
 
 - `atuador-de-junta.test.mjs` — atuador-de-junta.test.mjs — a família `atuador-de-junta`: cada tamanho da tabela sai com a carcaça e a flange de saída, cada uma num pedaço só; a saída só en…
-- `composicoes.js` — composicoes.js — a composição da família `atuador-de-junta` (forma 1, cilíndrico): a carcaça por `lathe` unida à saída do cabo (`lathe` em x), menos os furos…
+- `composicoes.js` — composicoes.js — as composições da família `atuador-de-junta`, três por forma: o atuador inteiro (o id da forma, que a família chama) e cada peça sozinha (`<…
 - `derivar.js` — derivar.js — dos parâmetros do atuador (milímetro) à chamada de composição (metro).
 - `geometria.js` — geometria.js — o atuador de junta cilíndrico, em milímetro, com o eixo da junta em y.
 - `index.js` — index.js — a família `atuador-de-junta`: o atuador cilíndrico de junta de robô (carcaça com motor e redutor como volume, flange de fixação atrás, flange de s…
+- `montagem.js` — montagem.js — a montagem v5 que a família gera: a carcaça e a saída do atuador, peças soltas no mesmo referencial, ligadas por uma articulação de revolução e…
 - `servo.js` — servo.js — o atuador de caixa (forma 2, o servo de robô pequeno), em milímetro, com o eixo da saída em y.
 - `tabela.js` — tabela.js — os atuadores de junta cilíndricos, por diâmetro da carcaça, em milímetro. Não há norma pública de atuador de robô; os tamanhos são regra da famíl…
 
@@ -3141,6 +3142,11 @@
 ## tools/fixtures/ajuste-esparso/
 
 - `gaiola-grande.mjs` — gaiola-grande.mjs — a gaiola grande e escalável do plano do ajuste esparso, sem objeto: a casca simétrica neutra das chapas de prova (`definicaoDaChapaSimetr…
+
+## tools/fixtures/atuador-de-junta/
+
+- `duas-juntas.mjs` — duas-juntas.mjs — a montagem de prova de duas juntas do atuador de junta: o atuador B preso pela flange de fixação na flange de saída do atuador A, com os fu…
+- `duas-juntas.test.mjs` — duas-juntas.test.mjs — a montagem de prova de duas juntas do atuador de junta: a furação de B casa com a da saída de A, as peças só encostam onde assentam, e…
 
 ## tools/fixtures/casca-chapa-e-gabinete/
 
