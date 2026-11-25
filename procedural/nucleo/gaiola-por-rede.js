@@ -1333,6 +1333,76 @@ export function gaiolaPorRede(definicaoDada) {
     a.alvo = Math.max(1, c.monitor.integral(a.f1) - c.monitor.integral(a.f0));
     a.minimo = Math.max(1, Math.ceil(doGiro - 1e-9));
   }
+  /* pares de arcos colineares que se encontram num mesmo nó (na mesma curva ou em curvas diferentes) */
+  const vizinhasDaCurva = [];
+  for (const { arcos: lista2 } of arcosDaCurva.values()) {
+    for (let k = 0; k < lista2.length; k++) {
+      const a = lista2[k]; const b = lista2[(k + 1) % lista2.length];
+      if (a === b || a.ate !== b.de || !a.usos.length || !b.usos.length) continue;
+      vizinhasDaCurva.push({ a: a.id, b: b.id, la: a.comprimento, lb: b.comprimento, no: a.ate, mesmaCurva: true });
+    }
+  }
+  const vizinhasColineares = [];
+  {
+    const porNo = new Map();
+    const tangenteSaida = (a, noInicio) => {
+      const c = curvas.get(a.curva);
+      const eps = Math.min(1e-3, (a.f1 - a.f0) * 0.25);
+      const p0 = c.em(noInicio ? a.f0 : a.f1);
+      const p1 = c.em(noInicio ? a.f0 + eps : a.f1 - eps);
+      const u = sub(p1, p0);
+      const l = norma(u);
+      return l > 0 ? vezes(u, 1 / l) : null;
+    };
+    for (const a of usados) {
+      for (const [noId, noInicio] of [[a.de, true], [a.ate, false]]) {
+        if (!porNo.has(noId)) porNo.set(noId, []);
+        porNo.get(noId).push({ arco: a, noInicio, dir: tangenteSaida(a, noInicio) });
+      }
+    }
+    const cosLimiteColinear = -Math.cos((30 * Math.PI) / 180);
+    for (const [noId, listaN] of porNo) {
+      for (let i = 0; i < listaN.length; i++) {
+        for (let j = i + 1; j < listaN.length; j++) {
+          const x = listaN[i]; const y = listaN[j];
+          if (x.arco.curva === y.arco.curva || !x.dir || !y.dir) continue;
+          if (dot(x.dir, y.dir) <= cosLimiteColinear) {
+            vizinhasColineares.push({
+              a: x.arco.id, b: y.arco.id,
+              aNoInicio: x.noInicio, bNoInicio: y.noInicio,
+              la: x.arco.comprimento, lb: y.arco.comprimento,
+              no: noId, mesmaCurva: false,
+            });
+          }
+        }
+      }
+    }
+  }
+  if (alinharSuperficie) {
+    /* propaga espaçamento fino suavemente através de curvas colineares (razão <= 1,8x) para eliminar saltos bruscos de densidade na malha */
+    const RAZAO_GRADACAO = 1.8;
+    const arcoPorIdGrad = new Map(usados.map((a) => [a.id, a]));
+    const todosPares = [...vizinhasDaCurva, ...vizinhasColineares];
+    for (let it = 0; it < 6; it++) {
+      let mudou = false;
+      for (const par of todosPares) {
+        const A1 = arcoPorIdGrad.get(par.a); const B1 = arcoPorIdGrad.get(par.b);
+        if (!A1 || !B1) continue;
+        const espA = A1.comprimento / A1.alvo;
+        const espB = B1.comprimento / B1.alvo;
+        const fixoA = curvas.get(A1.curva).decl.passo != null;
+        const fixoB = curvas.get(B1.curva).decl.passo != null;
+        if (!fixoA && espA > RAZAO_GRADACAO * espB) {
+          A1.alvo = A1.comprimento / (RAZAO_GRADACAO * espB);
+          mudou = true;
+        } else if (!fixoB && espB > RAZAO_GRADACAO * espA) {
+          B1.alvo = B1.comprimento / (RAZAO_GRADACAO * espA);
+          mudou = true;
+        }
+      }
+      if (!mudou) break;
+    }
+  }
   const A = arcos.length;
   const linhas = []; const alvos = new Map(); const variaveis = [];
   for (const a of usados) { alvos.set(a.id, a.alvo); variaveis.push(a.id); }
@@ -1371,14 +1441,6 @@ export function gaiolaPorRede(definicaoDada) {
   const nomeDaVariavel = (v) => (v < A ? nomeDoArco(arcos[v]) : `o retalho ${citar(retalhos[v - A].nome)}`);
   const pesosDoCusto = new Map(usados.map((a) => [a.id, 1]));
   const minimosDosArcos = new Map(usados.map((a) => [a.id, a.minimo]));
-  const vizinhasDaCurva = [];
-  for (const { arcos: lista2 } of arcosDaCurva.values()) {
-    for (let k = 0; k < lista2.length; k++) {
-      const a = lista2[k]; const b = lista2[(k + 1) % lista2.length];
-      if (a === b || a.ate !== b.de || !a.usos.length || !b.usos.length) continue;
-      vizinhasDaCurva.push({ a: a.id, b: b.id, la: a.comprimento, lb: b.comprimento });
-    }
-  }
   const chaveDoArco = (a) => `${a.curva}:${a.de}>${a.ate}`;
   const semCoordenadas = semCoordenadasDa(definicao);
   /* a ferramenta que mede o que um ponto-chave move fixa as divisões de cada arco e a posição relativa de cada ponto dentro do arco: a
@@ -2215,7 +2277,7 @@ export function gaiolaPorRede(definicaoDada) {
       }
     }
   }
-  /* o espaçamento que salta de um arco para o vizinho na mesma curva: a subdivisão ondula ali e a linha do friso se desfaz */
+  /* o espaçamento que salta de um arco para o vizinho na mesma curva ou entre curvas colineares: a subdivisão ondula ali e a linha do friso se desfaz */
   const arcoPorId = new Map(arcos.map((a) => [a.id, a]));
   for (const { a, b } of vizinhasDaCurva) {
     const A1 = arcoPorId.get(a);
@@ -2226,6 +2288,23 @@ export function gaiolaPorRede(definicaoDada) {
       avisos.push({
         ref: 'gradacaoBrusca', curva: A1.curva, no: A1.ate, espacamentosMm: [Math.round(ea * 100) / 100, Math.round(eb * 100) / 100], razao: Math.round(razao * 10) / 10,
         texto: `na curva ${citar(A1.curva)}, no nó ${citar(A1.ate)}, o espaçamento salta de ${br(ea)} para ${br(eb)} mm (${br(razao)} vezes); a subdivisão ondula onde o intervalo passa do dobro do vizinho e a linha do friso fica com trechos curtos: o arco tem divisões de menos para o trecho de espaçamento fino que o vizinho pede, e os lados opostos dos retalhos o forçaram; ponha nós na curva ou declare divisoes nos retalhos em volta`,
+      });
+    }
+  }
+  for (const { a, b, aNoInicio, bNoInicio, no } of vizinhasColineares) {
+    const A1 = arcoPorId.get(a); const B1 = arcoPorId.get(b);
+    const va = verticesDoArco.get(a); const vb = verticesDoArco.get(b);
+    const ea = aNoInicio
+      ? norma(sub(posicao.get(va[1]), posicao.get(va[0])))
+      : norma(sub(posicao.get(va[va.length - 1]), posicao.get(va[va.length - 2])));
+    const eb = bNoInicio
+      ? norma(sub(posicao.get(vb[1]), posicao.get(vb[0])))
+      : norma(sub(posicao.get(vb[vb.length - 1]), posicao.get(vb[vb.length - 2])));
+    const razao = Math.max(ea / eb, eb / ea);
+    if (razao > RAZAO_DO_AVISO) {
+      avisos.push({
+        ref: 'gradacaoBrusca', curva: A1.curva, curvaVizinha: B1.curva, no, espacamentosMm: [Math.round(ea * 100) / 100, Math.round(eb * 100) / 100], razao: Math.round(razao * 10) / 10,
+        texto: `no nó ${citar(no)}, entre as curvas colineares ${citar(A1.curva)} e ${citar(B1.curva)}, o espaçamento salta de ${br(ea)} para ${br(eb)} mm (${br(razao)} vezes): ative alinharSuperficie: true para propagar a gradação automaticamente ou ajuste o passo dos trechos vizinhos`,
       });
     }
   }

@@ -26,7 +26,7 @@ Uma receita encaixa qualquer relevo de contorno em um vão retangular de `gaiola
 ## Filtro Agent-First
 
 - `faixaDeContornoNaRede`: **REFATORAR** (extensão retrocompatível) — adicionar `anelDeAmortecimentoMm` (anel neutro externo com `superficie` herdada de `projetar`), `vao` (gera `solF`/`solT`/`ligF`/`ligT` projetadas na superfície, retalhos de transição com `superficie` e `divisoes` radiais `>= 2` calculadas por `passoTransicaoMm` e lista `cantos` pronta) e avisos automáticos `vaoEstreito` e `amortecimentoEstreito`.
-- `gaiolaPorRede`: **REFATORAR / GUARDAR** (extensão retrocompatível) — suportar `retalho.superficie` (projeção do miolo sobre a superfície real), `alinharSuperficie` (interpolação progressiva / PIA na zona lisa pertencente apenas a retalhos com `superficie`, preservando vincos, cantos e relevo) e emitir avisos diagnósticos `extraordinarioEmVinco`, `cordaLongaEmTransicao` e `desvioDeSuperficie`, sem alterar nenhuma malha existente do acervo.
+- `gaiolaPorRede`: **REFATORAR / GUARDAR** (extensão retrocompatível) — suportar `retalho.superficie` (projeção do miolo sobre a superfície real), `alinharSuperficie` (interpolação progressiva / PIA na zona lisa pertencente apenas a retalhos com `superficie`, preservando vincos, cantos e relevo, somada à propagação automática de gradação de densidade entre curvas colineares que se encontram num nó) e emitir avisos diagnósticos `extraordinarioEmVinco`, `cordaLongaEmTransicao`, `desvioDeSuperficie` e `gradacaoBrusca` (incluindo emendas colineares entre curvas distintas), sem alterar nenhuma malha existente do acervo.
 - `subdivisao` e `aberturaPorContorno`: **USAR DIRETO** — `gaiolaPorRede` reutiliza `limitesDaGaiola` já existente em `subdivisao.js`.
 
 ## Incluído

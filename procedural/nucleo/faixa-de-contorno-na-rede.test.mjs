@@ -440,4 +440,38 @@ describe('faixaDeContornoNaRede', () => {
     expect(faixa.avisos.some((a) => a.ref === 'amortecimentoEstreito')).toBe(true);
     expect(faixa.avisos.some((a) => a.ref === 'vaoEstreito')).toBe(true);
   });
+
+  it('gaiolaPorRede propaga gradação entre curvas colineares com alinharSuperficie e acusa gradacaoBrusca sem ela', () => {
+    const sup = ([x, , z]) => [x, 0, z];
+    const cfgBase = {
+      passo: 200,
+      fora: [0, 1, 0],
+      nos: {
+        A0: [0, 0, 0], B0: [60, 0, 0], C0: [460, 0, 0],
+        A1: [0, 0, 200], B1: [60, 0, 200], C1: [460, 0, 200],
+      },
+      curvas: [
+        { nome: 'finoB', pontos: ['A0', 'B0'], passo: 20 },
+        { nome: 'finoT', pontos: ['A1', 'B1'], passo: 20 },
+        { nome: 'largoB', pontos: ['B0', 'C0'] },
+        { nome: 'largoT', pontos: ['B1', 'C1'] },
+        { nome: 'esq', pontos: ['A0', 'A1'] },
+        { nome: 'meio', pontos: ['B0', 'B1'] },
+        { nome: 'dir', pontos: ['C0', 'C1'] },
+      ],
+      retalhos: [
+        { nome: 'rFino', borda: ['finoB', 'meio', 'finoT', 'esq'], superficie: sup },
+        { nome: 'rLargo', borda: ['largoB', 'dir', 'largoT', 'meio'], superficie: sup },
+      ],
+      interior: false,
+      liso: false,
+    };
+    const semGrad = gaiolaPorRede(cfgBase);
+    expect(semGrad.densidades['largoB:B0>C0'].divisoes).toBe(2);
+    expect(semGrad.avisos.some((a) => a.ref === 'gradacaoBrusca' && a.curvaVizinha && a.no === 'B0')).toBe(true);
+
+    const comGrad = gaiolaPorRede({ ...cfgBase, alinharSuperficie: true });
+    expect(comGrad.densidades['largoB:B0>C0'].divisoes).toBeGreaterThan(semGrad.densidades['largoB:B0>C0'].divisoes);
+    expect(comGrad.avisos.some((a) => a.ref === 'gradacaoBrusca' && a.no === 'B0')).toBe(false);
+  });
 });
