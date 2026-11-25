@@ -2,7 +2,7 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/nucleo/subdivisao.js`, `procedural/nucleo/subdivisao.test.mjs`, `procedural/nucleo/algebra-esparsa.js`, `procedural/nucleo/algebra-esparsa.test.mjs`, `procedural/nucleo/subdivisao-energia-de-curvatura.test.mjs`, `tools/fixtures/correcao-de-superficie/`, `tools/modelar/distancia-a-pele.mjs`, `tools/modelar/distancia-a-pele.test.mjs`, `tools/modelar/zebra-numerica.mjs`, `tools/modelar/zebra-numerica.test.mjs`, `procedural/nucleo/gaiola-por-rede.js`, `procedural/nucleo/gaiola-por-rede.test.mjs`, `procedural/nucleo/uso-operacoes.js`, `tools/modelar/preenchimento-da-rede.mjs`, `tools/modelar/preenchimento-da-rede.test.mjs`, `docs/modelar/banco-de-provas/superficie-g2-2026-11-22/`
+**Território:** `procedural/nucleo/subdivisao.js`, `procedural/nucleo/subdivisao.test.mjs`, `procedural/nucleo/algebra-esparsa.js`, `procedural/nucleo/algebra-esparsa.test.mjs`, `procedural/nucleo/subdivisao-energia-de-curvatura.test.mjs`, `tools/fixtures/correcao-de-superficie/`, `tools/modelar/distancia-a-pele.mjs`, `tools/modelar/distancia-a-pele.test.mjs`, `tools/modelar/zebra-numerica.mjs`, `tools/modelar/zebra-numerica.test.mjs`, `procedural/nucleo/gaiola-por-rede.js`, `procedural/nucleo/gaiola-por-rede.test.mjs`, `tools/modelar/preenchimento-da-rede.mjs`, `tools/modelar/preenchimento-da-rede.test.mjs`, `docs/modelar/banco-de-provas/superficie-g2-2026-11-22/`
 
 Ativado pela pessoa em 2026-11-22, depois do fechamento do plano do ajuste esparso. A energia de curvatura (`alisarSuperficie`) e o preenchimento do miolo moram em `procedural/nucleo/gaiola-por-rede.js`, que a fatia 3 do plano das formas que faltavam (a curva paralela na rede de curvas) também usa. A pessoa decidiu no mesmo dia que o G2 vai antes: o arquivo entra neste território, e a curva paralela espera o fechamento deste plano. A ficha da `gaiolaPorRede` em `procedural/nucleo/uso-operacoes.js` entra junto, porque o plano da hélice, que tinha o arquivo, fechou.
 
@@ -84,6 +84,8 @@ Fatia 2 levada ao núcleo em 2026-11-22: a opção usa a cota completa refeita q
 O custo baixou no mesmo dia, por decisão da pessoa ("baixar o custo"): sem cota exata, o ganho sai da estimativa de Hager e Higham, uma cota inferior que acerta o exato ou fica acima de 92% dele nas grades de prova, e a conta exata só roda quando ela passa de 10, um décimo do limite; a ordem de eliminação e a análise simbólica da primeira conta servem às outras três, a matriz se monta pela metade, e a normal do vértice regular sai da fórmula fechada. Pelo menor de três tempos, a subdivisão com a opção custa 1,76 vez a de sem ela no passo 70 e no passo 35, e o gate 4 passa.
 
 Fatia 3 feita em 2026-11-25, por medida: o preenchimento pelas curvas vizinhas, já no núcleo, erra o miolo em no máximo 0,38 mm na calota e no toro com o cruzamento fora do centro, com as curvas sobre a forma (16 trechos), contra 1,26 mm do preenchimento padrão na calota; nenhum passa de 1 mm. A tabela está no banco de provas e o teste em `preenchimento-do-miolo.test.mjs`. A cota do miolo não precisou trocar. O que o toro assimétrico com 8 trechos ainda erra a 100 mm da borda é das curvas declaradas, e não do miolo. Segue a fatia 4, a tampa G2 nos extraordinários.
+
+Em 2026-11-25 a pessoa pausou este plano para o resgate dos ramos antigos, e `procedural/nucleo/uso-operacoes.js` passou ao território daquele plano; a fatia 4 espera também o ramo `envio/carro-quadrado-forma`, que muda `gaiola-por-rede.js`, juntar à main.
 
 ## Fechamento
 

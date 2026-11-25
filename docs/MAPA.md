@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2362 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2364 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -531,6 +531,10 @@
 - `medir-paridade.mjs` — medir-paridade.mjs — a luz rasante e a curvatura da bancada medidas contra as do Blender na mesma peça e na mesma vista (fatia 5 do plano do reflexo na banca…
 - `preparar-prova-cega.mjs` — preparar-prova-cega.mjs — os pedidos da prova cega da leitura do reflexo (plano do reflexo na bancada, fatia 7).
 
+## docs/modelar/banco-de-provas/resgate-dos-ramos-2026-11-25/
+
+- `README.md` — Resgate dos ramos antigos: o inventário de 2026-11-25
+
 ## docs/modelar/banco-de-provas/revisao-das-verificacoes-2026-11-13/
 
 - `ESTRAGOS.md` — A medida por estrago de código, ampliada (passo 2)
@@ -705,6 +709,7 @@
 - `2026-11-22-superficie-de-producao-g2.md` — Superfície de produção (G2): a chapa de subdivisão sem a ondulação que o crítico acusa, sem sair da forma
 - `2026-11-25-acabamento-hard-surface.md` — Acabamento de hard surface: chanfro e arredondamento em qualquer aresta, linhas de painel e recortes na casca
 - `2026-11-25-elo-entre-juntas.md` — Elo entre juntas: a carenagem oca do membro, de uma flange de atuador à outra
+- `2026-11-25-resgate-dos-ramos-antigos.md` — Resgate dos ramos antigos: as peças, as ferramentas e o núcleo que nunca entraram na main
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
