@@ -61,7 +61,7 @@ export const TABELA = {
   },
   aberturas: {
     /* contorno real da porta (vista x): soleira contínua em y = 255..328, coluna A fixa na frente com curva ampla (r = 135 mm concêntrica ao vidro), calha do teto em y = 1342 e coluna B fixa atrás */
-    porta: [[820, 328, 16], [818, 918, 18], [745, 938, 18], [280, 1342, 135], [-388, 1342, 16], [-398, 945, 14], [-390, 328, 16]],
+    porta: [[820, 338, 16], [818, 918, 18], [745, 938, 18], [280, 1342, 135], [-388, 1342, 16], [-398, 945, 14], [-390, 338, 16]],
     /* contorno real do porta-malas (vista z '-'): acima do para-choque, acompanhando Curva 4 interna das lanternas e preservando colunas D fixas */
     tampaTraseira: [[-628, 524, 14], [628, 524, 14], [656, 842, 18], [570, 1348, 28], [-570, 1348, 28], [-656, 842, 18]],
     /* vão frontal para grade + faróis; o recorte do capô (topo + lábio até y = 700) entra via subtrair dedicado */
@@ -69,7 +69,7 @@ export const TABELA = {
     /* Curva 4: borda interna acompanha o trapézio da tampa (634 embaixo subindo para 664 em cima) */
     lanternaTraseira: [[634, 530, 8], [776, 530, 10], [758, 842, 16], [664, 842, 10]],
     /* portinhola real do tanque de combustível na lateral traseira direita (+x) com cantos arredondados */
-    tampaTanque: [[-1355, 655, 16], [-1505, 655, 16], [-1505, 795, 16], [-1355, 795, 16]],
+    tampaTanque: [[-1346, 655, 16], [-1496, 655, 16], [-1496, 795, 16], [-1346, 795, 16]],
   },
   parachoqueDianteiro: {
     y0: 282, y1: 524, xTrilho: 785, zFrente: 2022, zLateral: 1635, raioCanto: 98,
