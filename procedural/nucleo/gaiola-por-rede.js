@@ -10,7 +10,11 @@
  *     continuidade: 'G1' | 'G2' declara a curva entre dois retalhos emenda lisa de tangente comum (G1) ou de curvatura igual (G2, experimental:
  *     muda a forma de toda superfície de dupla curvatura e sai com aviso).
  *   nos: { nome: [x, y, z] | { curva, fracao } } ponto nomeado onde curvas se encontram; o nó { curva, fracao } fica sobre uma curva.
- *   retalhos: [{ nome, borda, divisoes? }] borda são as curvas (ou { curva, de?, ate? }) que fecham o retalho, de três a oito lados.
+ *   retalhos: [{ nome, borda, divisoes?, superficie? }] borda são as curvas (ou { curva, de?, ate? }) que fecham o retalho, de três a oito lados;
+ *     superficie: (pontoMm) => [x, y, z] projeta o miolo do retalho na superfície-guia real em vez do interpolador bilinear de Coons.
+ *   alinharSuperficie: true | { iteracoes?, fator?, toleranciaMm?, limiteDeslocamentoMm? } aplica interpolação progressiva (PIA) nos vértices lisos
+ *     pertencentes apenas a retalhos com `superficie` declarada (sem tocar vincos, cantos nem a simetria), compensando o encolhimento desigual de
+ *     Catmull-Clark entre malhas de densidades diferentes; fora dela, `retalho.superficie` ainda mede o desvio na superfície limite e avisa em `desvioDeSuperficie`.
  *   passo: espaçamento alvo da rede em mm, de onde saem as divisões que o retalho não declara.
  *   anguloMax: maior desvio de direção, em graus, entre duas arestas seguidas de uma curva (15 por padrão).
  *   fora: [x, y, z] o sentido para onde a chapa olha, que vira as faces.
@@ -270,7 +274,7 @@ import { curvaCentripeta } from './gaiola-interpolada.js';
 import { extraordinarios as extraordinariosDa } from './gaiola-aneis.js';
 import { alisarMioloNaNormal, LONGE_DA_FILEIRA, INCLINACAO_DA_FILEIRA } from './gaiola-por-rede-liso.js';
 import { alisarPontosDaCurva, conferirTolerancia, lerOpcoesDoAlisamento } from './alisar-curvas.js';
-import { REGULARIZACAO_DE_CURVATURA, ONDA_MINIMA_EM_PASSOS, ONDA_MAXIMA_EM_PASSOS, passoDaGaiola } from './subdivisao.js';
+import { REGULARIZACAO_DE_CURVATURA, ONDA_MINIMA_EM_PASSOS, ONDA_MAXIMA_EM_PASSOS, passoDaGaiola, limitesDaGaiola, NITIDEZ_VIVA } from './subdivisao.js';
 
 const MM = 1000;
 const AMOSTRAS_POR_TRECHO = 96;
@@ -974,7 +978,7 @@ export function gaiolaPorRede(definicaoDada) {
       retalhos: definicaoDada.retalhos.flatMap((r) => (r && alt.acrescentar?.retalhos?.[r.nome] ? alt.acrescentar.retalhos[r.nome] : [r])),
     }
     : definicaoDada;
-  exigirCampos(definicao, ['curvas', 'nos', 'retalhos', 'passo', 'anguloMax', 'fora', 'leitura', 'interior', 'liso', 'anguloDeCanto', 'cantos', 'simetria', 'prefixo', 'alisarCurvas', 'limitesDaEmenda', 'marcarCurvas', 'alisarSuperficie'], 'a definição da rede');
+  exigirCampos(definicao, ['curvas', 'nos', 'retalhos', 'passo', 'anguloMax', 'fora', 'leitura', 'interior', 'liso', 'anguloDeCanto', 'cantos', 'simetria', 'prefixo', 'alisarCurvas', 'limitesDaEmenda', 'marcarCurvas', 'alisarSuperficie', 'alinharSuperficie'], 'a definição da rede');
   const marcarCurvas = definicao.marcarCurvas ?? false;
   if (marcarCurvas !== true && marcarCurvas !== false) falha(`marcarCurvas é ${JSON.stringify(marcarCurvas)}; precisa ser true (as curvas vão ao passo e o neutro marca as arestas que descendem delas) ou false`);
   const { simetria = null, prefixo = '' } = definicao;
@@ -997,6 +1001,21 @@ export function gaiolaPorRede(definicaoDada) {
     alisarSuperficie = { onda: x.onda ?? null };
     if (definicao.interior === false || definicao.interior === null) falha(`alisarSuperficie e interior: ${JSON.stringify(definicao.interior)} foram declarados juntos; sem a cota do miolo a energia tem liberdade que as curvas não tiram (numa chapa só com a borda exata o paraboloide cede 11 mm, medido), e a superfície deixa de ser a desenhada: tire interior, ou declare o peso dele (o padrão com alisarSuperficie é ${String(INTERIOR_COM_ENERGIA).replace('.', ',')})`);
     if (definicao.liso != null && definicao.liso !== false) falha(`alisarSuperficie e liso: ${JSON.stringify(definicao.liso)} foram declarados juntos; com alisarSuperficie a energia do ajuste das cotas alisa a superfície inteira e o miolo não passa pelo alisamento pela normal: tire liso (ou declare liso: false)`);
+  }
+  let alinharSuperficie = null;
+  if (definicao.alinharSuperficie != null && definicao.alinharSuperficie !== false) {
+    const x = definicao.alinharSuperficie === true ? {} : definicao.alinharSuperficie;
+    if (typeof x !== 'object' || Array.isArray(x)) falha(`alinharSuperficie é ${JSON.stringify(definicao.alinharSuperficie)}; use true ou { iteracoes, fator, toleranciaMm, limiteDeslocamentoMm }`);
+    exigirCampos(x, ['iteracoes', 'fator', 'toleranciaMm', 'limiteDeslocamentoMm'], 'alinharSuperficie');
+    const iteracoes = x.iteracoes ?? 10;
+    const fator = x.fator ?? 1;
+    const toleranciaMm = x.toleranciaMm ?? 0.5;
+    const limiteDeslocamentoMm = x.limiteDeslocamentoMm ?? 12;
+    if (!Number.isInteger(iteracoes) || iteracoes < 1 || iteracoes > 32) falha(`alinharSuperficie.iteracoes é ${JSON.stringify(iteracoes)}; precisa ser inteiro de 1 a 32`);
+    if (typeof fator !== 'number' || !Number.isFinite(fator) || !(fator > 0 && fator <= 1)) falha(`alinharSuperficie.fator é ${JSON.stringify(fator)}; precisa estar em (0, 1]`);
+    if (typeof toleranciaMm !== 'number' || !Number.isFinite(toleranciaMm) || !(toleranciaMm > 0)) falha(`alinharSuperficie.toleranciaMm é ${JSON.stringify(toleranciaMm)}; precisa ser número > 0`);
+    if (typeof limiteDeslocamentoMm !== 'number' || !Number.isFinite(limiteDeslocamentoMm) || !(limiteDeslocamentoMm > 0)) falha(`alinharSuperficie.limiteDeslocamentoMm é ${JSON.stringify(limiteDeslocamentoMm)}; precisa ser número > 0`);
+    alinharSuperficie = { iteracoes, fator, toleranciaMm, limiteDeslocamentoMm };
   }
   let interior = definicao.interior === undefined ? (alisarSuperficie ? INTERIOR_COM_ENERGIA : INTERIOR_PADRAO) : definicao.interior;
   if (interior === null || interior === false) interior = null;
@@ -1851,6 +1870,107 @@ export function gaiolaPorRede(definicaoDada) {
     if (leitura.estrito && avisos.length) falha(`a leitura é estrita e ${avisos.length} par(es) de pontos-chave estão mais perto do que o erro sustenta: ${avisos.map((x) => x.texto).join('; ')}`);
   }
 
+  /* ---- alinhamento progressivo (PIA) e diagnóstico de desvio nos retalhos com `superficie` ---- */
+  const retalhosComSuperficie = retalhos.filter((r) => r.superficie != null);
+  if (alinharSuperficie && !retalhosComSuperficie.length) {
+    falha('alinharSuperficie pede pelo menos um retalho com superficie declarada');
+  }
+  let superficiesSaida = null;
+  if (retalhosComSuperficie.length) {
+    const retalhoPorNome = new Map(retalhos.map((r) => [r.nome, r]));
+    const idxDoVertice = new Map(ordemDosVertices.map((id, i) => [id, i]));
+    const facesIdx = faces.map((f) => f.map((id) => idxDoVertice.get(id)));
+    const vincosIdx = [];
+    for (const v of vincos) {
+      const nit = v.nitidez === 'viva' ? NITIDEZ_VIVA : (typeof v.nitidez === 'number' ? v.nitidez : 0.5);
+      for (let k = 0; k < v.pontos.length - 1; k++) {
+        const a = v.pontos[k];
+        const b = v.pontos[k + 1];
+        if (!contagem.has(chaveDeAresta(a, b))) continue;
+        vincosIdx.push([idxDoVertice.get(a), idxDoVertice.get(b), nit]);
+      }
+    }
+    const cantosIdx = [...cantos].map((id) => idxDoVertice.get(id)).filter((i) => i !== undefined);
+    const elegiveis = [];
+    for (let i = 0; i < ordemDosVertices.length; i++) {
+      const id = ordemDosVertices[i];
+      if (foraDaFileira.has(id)) continue;
+      if (simetria === 'x' && Math.abs(posicao.get(id)[0]) < 1e-6) continue;
+      const fs = facesPorVertice.get(id);
+      if (!fs || !fs.length) continue;
+      const rNomes = [...new Set(fs.map((fi) => retalhoDaFace[fi]))];
+      if (!rNomes.every((rn) => retalhoPorNome.get(rn)?.superficie != null)) continue;
+      const fns = [...new Set(rNomes.map((rn) => retalhoPorNome.get(rn).superficie))];
+      elegiveis.push({ id, idx: i, retalho: rNomes[0], fns });
+    }
+    const avaliarAlvo = (lp, fns, retalhoNome) => {
+      let sx = 0; let sy = 0; let sz = 0;
+      for (const fn of fns) {
+        const q = fn(lp);
+        if (!finito3(q)) falha(`superficie do retalho ${citar(retalhoNome)} devolveu ${JSON.stringify(q)}; precisa ser [x, y, z] finito em mm`);
+        sx += q[0]; sy += q[1]; sz += q[2];
+      }
+      const k = 1 / fns.length;
+      return [sx * k, sy * k, sz * k];
+    };
+    const medirDesvio = (verts) => {
+      const lim = limitesDaGaiola({ vertices: verts, faces: facesIdx, vincos: vincosIdx, cantos: cantosIdx });
+      let maior = 0; let ponto = null; let retalho = null; let coord = null;
+      for (const e of elegiveis) {
+        const lp = lim[e.idx];
+        const alvo = avaliarAlvo(lp, e.fns, e.retalho);
+        const d = norma(sub(alvo, lp));
+        if (d > maior) { maior = d; ponto = e.id; retalho = e.retalho; coord = lp.map((c) => Math.round(c * 10) / 10); }
+      }
+      return { desvioMaximoMm: maior, ponto, retalho, coordenadaMm: coord, lim };
+    };
+    const verts = ordemDosVertices.map((id) => [...posicao.get(id)]);
+    const medidaAntes = elegiveis.length ? medirDesvio(verts) : { desvioMaximoMm: 0, ponto: null, retalho: null, coordenadaMm: null, lim: null };
+    if (alinharSuperficie && elegiveis.length) {
+      const v0 = verts.map((p) => [...p]);
+      let lim = medidaAntes.lim;
+      for (let it = 0; it < alinharSuperficie.iteracoes; it++) {
+        if (it > 0) lim = limitesDaGaiola({ vertices: verts, faces: facesIdx, vincos: vincosIdx, cantos: cantosIdx });
+        for (const e of elegiveis) {
+          const lp = lim[e.idx];
+          const alvo = avaliarAlvo(lp, e.fns, e.retalho);
+          const delta = sub(alvo, lp);
+          let novo = soma(verts[e.idx], vezes(delta, alinharSuperficie.fator));
+          const desloc = sub(novo, v0[e.idx]);
+          const dist = norma(desloc);
+          if (dist > alinharSuperficie.limiteDeslocamentoMm) {
+            novo = soma(v0[e.idx], vezes(desloc, alinharSuperficie.limiteDeslocamentoMm / dist));
+          }
+          verts[e.idx] = novo;
+        }
+      }
+      for (const e of elegiveis) posicao.set(e.id, verts[e.idx]);
+    }
+    const medidaDepois = (alinharSuperficie && elegiveis.length) ? medirDesvio(verts) : medidaAntes;
+    const toleranciaMm = alinharSuperficie?.toleranciaMm ?? 0.5;
+    superficiesSaida = {
+      alinhada: Boolean(alinharSuperficie),
+      pontosElegiveis: elegiveis.length,
+      desvioAntesMm: Math.round(medidaAntes.desvioMaximoMm * 1000) / 1000,
+      desvioMaximoMm: Math.round(medidaDepois.desvioMaximoMm * 1000) / 1000,
+      pontoDoDesvio: medidaDepois.ponto,
+      retalhoDoDesvio: medidaDepois.retalho,
+      coordenadaMm: medidaDepois.coordenadaMm,
+      toleranciaMm,
+    };
+    if (elegiveis.length && medidaDepois.desvioMaximoMm > toleranciaMm) {
+      avisos.push({
+        ref: 'desvioDeSuperficie',
+        retalho: medidaDepois.retalho,
+        ponto: medidaDepois.ponto,
+        desvioMaximoMm: superficiesSaida.desvioMaximoMm,
+        toleranciaMm,
+        coordenadaMm: medidaDepois.coordenadaMm,
+        texto: `no retalho ${citar(medidaDepois.retalho)} (ponto ${citar(medidaDepois.ponto)}, perto de [${medidaDepois.coordenadaMm.map((x) => br(x)).join(', ')}] mm), a superfície limite desvia ${br(medidaDepois.desvioMaximoMm)} mm da superficie declarada (acima de ${br(toleranciaMm)} mm): ${alinharSuperficie ? 'o encolhimento ou a transição de densidade excedeu o ajuste; aumente iteracoes/divisões ou suavize a gradação' : 'ative alinharSuperficie: true na rede para compensar automaticamente o encolhimento de Catmull-Clark'}`,
+      });
+    }
+  }
+
   /* ---- saída ---- */
   const pontos = {};
   const vertices = [];
@@ -2262,6 +2382,7 @@ export function gaiolaPorRede(definicaoDada) {
     pontos, passo, linha, pontoDaCurva, linhas: linhasDasCurvas, nos: nosSaida, curvas: curvasSaida, retalhos: retalhosSaida, densidades,
     extraordinarios: extra, cantos: cantosAchados, continuidade, alisamento, avisos, origens: ordenadas, entradas, estrutura, fixacao,
   };
+  if (superficiesSaida) saida.superficies = superficiesSaida;
   if (emendasDeclaradas.length) saida.emendas = emendasSaida;
   if (alisarCurvas) {
     const curvasDoRelatorio = Object.fromEntries([...relatorioDoAlisamento].sort((a, b) => (a[0] < b[0] ? -1 : 1)));

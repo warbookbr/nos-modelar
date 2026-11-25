@@ -351,10 +351,23 @@ export function faixaDeContornoNaRede({
   }
 
   /* ligações radiais entre anéis consecutivos em cada âncora + retalhos de 4 lados */
+  const superficieRetalho = projetar
+    ? (p) => arredP(normalLocal(p, foraUnit, projetar).ponto)
+    : undefined;
+  const anelAmortNeutro = amortMm > 0 && ultimaFaixa.deslocamentoMm === 0;
+  if (amortMm > 0 && ultimaFaixa.larguraMm > 0 && amortMm < 0.5 * ultimaFaixa.larguraMm) {
+    avisos.push({
+      ref: 'amortecimentoEstreito',
+      anelDeAmortecimentoMm: arred(amortMm),
+      larguraUltimaFaixaMm: arred(ultimaFaixa.larguraMm),
+      texto: `anelDeAmortecimentoMm (${amortMm} mm) é menor que metade da última faixa (${ultimaFaixa.larguraMm} mm): uma tira muito estreita cria salto brusco de tamanho de quad na transição; aproxime anelDeAmortecimentoMm da largura da última faixa`,
+    });
+  }
   const nTrechosAnc = fechada ? listaAncoras.length : listaAncoras.length - 1;
   for (let aIdx = 0; aIdx < todosAneis.length - 1; aIdx += 1) {
     const anelA = todosAneis[aIdx];
     const anelB = todosAneis[aIdx + 1];
+    const ehAnelDeAmortecimento = anelAmortNeutro && aIdx === todosAneis.length - 2;
     for (let j = 0; j < listaAncoras.length; j += 1) {
       curvas.push({
         nome: `${nome}_lig_${aIdx}_${j}`,
@@ -375,6 +388,7 @@ export function faixaDeContornoNaRede({
       retalhos.push({
         nome: `${nome}_ret_${aIdx}_${t}`,
         borda: [bordaA, lig1, bordaB, lig0],
+        ...(ehAnelDeAmortecimento && superficieRetalho ? { superficie: superficieRetalho } : {}),
       });
     }
   }
@@ -414,6 +428,21 @@ export function faixaDeContornoNaRede({
     const lenSolT = norm(sub(coord(baseTras), coord(n3)));
     const nRad = divisoesRadiais ?? Math.max(2, Math.ceil(Math.max(lenLigF, lenLigT) / passoTransicaoMm));
 
+    for (const [ladoNome, compBase, compTopo] of [['frente', lenSolF, lenLigF], ['tras', lenSolT, lenLigT]]) {
+      const menor = Math.min(compBase, compTopo);
+      const razao = Math.max(compBase, compTopo) / Math.max(1e-6, menor);
+      if (menor < 15 || razao > 8) {
+        avisos.push({
+          ref: 'vaoEstreito',
+          lado: ladoNome,
+          comprimentoBaseMm: arred(compBase),
+          comprimentoTopoMm: arred(compTopo),
+          razaoAfunilamento: Math.round(razao * 10) / 10,
+          texto: `o lado '${ladoNome}' do vão ficou espremido (base ${compBase.toFixed(1)} mm, topo ${compTopo.toFixed(1)} mm, razão ${razao.toFixed(1)}x): quads muito estreitos causam salto de normal na fronteira do vão; afaste a estação lateral do vão ou reduza a largura total das faixas`,
+        });
+      }
+    }
+
     const amostrarNaSuperficie = (idA, idB, nInt) => {
       const a = coord(idA);
       const b = coord(idB);
@@ -437,10 +466,6 @@ export function faixaDeContornoNaRede({
     curvas.push({ nome: `${nome}_solT`, pontos: amostrarNaSuperficie(n3, baseTras, Math.max(1, nRad - 1)), passo: arred(passoSolT) });
     curvas.push({ nome: `${nome}_ligF`, pontos: amostrarNaSuperficie(n1, topoFrente, Math.max(2, nRad)), passo: arred(passoLigF) });
     curvas.push({ nome: `${nome}_ligT`, pontos: amostrarNaSuperficie(n2, topoTras, Math.max(2, nRad)), passo: arred(passoLigT) });
-
-    const superficieRetalho = projetar
-      ? (p) => arredP(normalLocal(p, foraUnit, projetar).ponto)
-      : undefined;
 
     retalhos.push({
       nome: `${nome}_pFrente`,

@@ -341,4 +341,103 @@ describe('faixaDeContornoNaRede', () => {
       expect(Math.abs(y - alturaSuperficie(x, z))).toBeLessThan(0.05);
     }
   });
+
+  it('alinharSuperficie (PIA) corrige o encolhimento de Catmull-Clark na superfície limite sem tocar no relevo vincado', () => {
+    /* chapa cilíndrica fortemente convexa onde Catmull-Clark sem PIA encolhe > 1 mm nos quads largos */
+    const yCil = (x, z) => 80 * Math.cos(((z - 225) / 225) * 0.9);
+    const P = (x, z) => [x, yCil(x, z), z];
+    const sup = ([x, , z]) => [x, yCil(x, z), z];
+    const proj = ([x, , z]) => {
+      const dz = (yCil(x, z + 2) - yCil(x, z - 2)) / 4;
+      const l = Math.hypot(1, dz);
+      return { ponto: [x, yCil(x, z), z], normal: [0, 1 / l, -dz / l] };
+    };
+    const ptsArco = Array.from({ length: 13 }, (_, k) => {
+      const ang = (Math.PI * k) / 12;
+      const x = 400 + 180 * Math.cos(ang);
+      const z = 180 * Math.sin(ang);
+      return P(x, z);
+    });
+    const nosBase = { E0: P(0, 0), E1: P(0, 450), D1: P(800, 450), D0: P(800, 0) };
+    const faixa = faixaDeContornoNaRede({
+      nome: 'pia',
+      contorno: ptsArco,
+      fora: [0, 1, 0],
+      projetar: proj,
+      lado: 'dentro',
+      deslocamentoBaseMm: 8,
+      faixas: [
+        { larguraMm: 18, deslocamentoMm: 12 },
+        { larguraMm: 22, deslocamentoMm: 0, vinco: 0.6 },
+      ],
+      anelDeAmortecimentoMm: 22,
+      ancoras: [0, 3, 9, 12],
+      vao: {
+        baseFrente: 'E0', topoFrente: 'E1', topoTras: 'D1', baseTras: 'D0',
+        curvaFrente: 'esq', curvaTopo: 'topo', curvaTras: 'dir',
+        nosDoVao: nosBase, divisoesRadiais: 2,
+      },
+    });
+    const baseCfg = {
+      passo: 180,
+      fora: [0, 1, 0],
+      nos: { ...nosBase, ...faixa.nos },
+      curvas: [
+        ...faixa.curvas,
+        { nome: 'esq', pontos: ['E0', P(0, 225), 'E1'] },
+        { nome: 'dir', pontos: ['D0', P(800, 225), 'D1'] },
+        { nome: 'topo', pontos: ['E1', P(400, 450), 'D1'] },
+      ],
+      retalhos: faixa.retalhos,
+      interior: false,
+      liso: false,
+    };
+
+    const semPia = gaiolaPorRede(baseCfg);
+    expect(semPia.superficies.alinhada).toBe(false);
+    expect(semPia.superficies.desvioMaximoMm).toBeGreaterThan(0.5);
+    expect(semPia.avisos.some((a) => a.ref === 'desvioDeSuperficie')).toBe(true);
+
+    const comPia = gaiolaPorRede({ ...baseCfg, alinharSuperficie: true });
+    expect(comPia.superficies.alinhada).toBe(true);
+    expect(comPia.superficies.desvioAntesMm).toBeGreaterThan(0.5);
+    expect(comPia.superficies.desvioMaximoMm).toBeLessThan(0.1);
+    expect(comPia.avisos.some((a) => a.ref === 'desvioDeSuperficie')).toBe(false);
+
+    /* anéis do relevo (anel0, anel1, anel2) permanecem intactos: PIA só mexe na zona neutra */
+    for (const id of Object.keys(comPia.pontos)) {
+      if (id.startsWith('pia_a0_') || id.startsWith('pia_a1_') || id.startsWith('pia_a2_')) {
+        expect(comPia.pontos[id]).toEqual(semPia.pontos[id]);
+      }
+    }
+    /* retalho com superficie fora do vão também converge via sup */
+    expect(sup([400, 0, 225])[1]).toBeCloseTo(80, 5);
+  });
+
+  it('faixaDeContornoNaRede emite avisos vaoEstreito e amortecimentoEstreito quando o vão fica espremido', () => {
+    const P = (x, z) => [x, alturaSuperficie(x, z), z];
+    /* borda direita em x = 626 mm (apenas ~8 mm além do arco+faixas+amortecimento) */
+    const nosBase = { E0: P(0, 0), E1: P(0, ALTURA), D1: P(626, ALTURA), D0: P(626, 0) };
+    const faixa = faixaDeContornoNaRede({
+      nome: 'espremido',
+      contorno: pontosDoArco(13),
+      fora: [0, 1, 0],
+      projetar: projetarNaChapa,
+      lado: 'dentro',
+      deslocamentoBaseMm: 8,
+      faixas: [
+        { larguraMm: 18, deslocamentoMm: 12 },
+        { larguraMm: 22, deslocamentoMm: 0, vinco: 0.6 },
+      ],
+      anelDeAmortecimentoMm: 8,
+      ancoras: [0, 3, 9, 12],
+      vao: {
+        baseFrente: 'E0', topoFrente: 'E1', topoTras: 'D1', baseTras: 'D0',
+        curvaFrente: 'esq', curvaTopo: 'topo', curvaTras: 'dir',
+        nosDoVao: nosBase, divisoesRadiais: 2,
+      },
+    });
+    expect(faixa.avisos.some((a) => a.ref === 'amortecimentoEstreito')).toBe(true);
+    expect(faixa.avisos.some((a) => a.ref === 'vaoEstreito')).toBe(true);
+  });
 });
