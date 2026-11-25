@@ -1,3 +1,4 @@
+/* faixa-de-contorno-na-rede.test.mjs — testes unitários e de integração de faixaDeContornoNaRede e guardas de vão/superfície em gaiolaPorRede. */
 import { describe, it, expect } from 'vitest';
 import { nucleo } from './nucleo.js';
 import { gaiolaPorRede } from './gaiola-por-rede.js';
