@@ -71,6 +71,7 @@ export const CAPACIDADES = Object.freeze({
   parametrosDaEsteira: { arquivo: 'procedural/familias/esteira/tabela.js', funcao: 'parametrosDaEsteira', de: 'procedural/familias/esteira/tabela.js' },
   transmissaoPorCorrente: { arquivo: 'procedural/familias/corrente/transmissao.js', funcao: 'transmissaoPorCorrente', de: 'procedural/familias/corrente/transmissao.js' },
   passosDaCaixaDeChapa: { arquivo: 'procedural/extensoes/chapa-dobrada/caixa.js', funcao: 'passosDaCaixaDeChapa', de: 'procedural/extensoes/chapa-dobrada/caixa.js' },
+  passosDaCascaDoLoft: { arquivo: 'procedural/nucleo/casca-pela-receita.js', funcao: 'passosDaCascaDoLoft', de: 'procedural/nucleo/casca-pela-receita.js' },
   pinhaoECremalheira: { arquivo: 'procedural/familias/engrenagem/engrenamento.js', funcao: 'pinhaoECremalheira', de: 'procedural/familias/engrenagem/engrenamento.js' },
 });
 

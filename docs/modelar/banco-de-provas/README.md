@@ -20,6 +20,7 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
   - [Custo por peça do carrinho de mão](carrinho-de-mao-2026-11-11/CUSTO-POR-PECA.md) — `carrinho-de-mao-2026-11-11`
 - [Atritos](carrinho-refeito-2026-10-08/ATRITOS.md) — `carrinho-refeito-2026-10-08`
 - [Carro fastback: quanto custa o ajuste da chapa quando ela cresce](carro-fastback-2026-11-14/README.md) — `carro-fastback-2026-11-14`
+- [Casca, chapa dobrada e gabinete](casca-chapa-e-gabinete-2026-11-24/README.md) — `casca-chapa-e-gabinete-2026-11-24`
 - [Comparar com a referência: a linha de base dos comandos repetidos e onde a prancha é montada](comparar-com-a-referencia-2026-11-16/README.md) — `comparar-com-a-referencia-2026-11-16`
 - [Componentes eletrônicos (2026-11-16): provas do gate de saída e limitações conhecidas](componentes-eletronicos-2026-11-16/README.md) — `componentes-eletronicos-2026-11-16`
 - [Banco de provas — conformação na chapa e sobreposição 3D (2026-11-20)](conformacao-e-sobreposicao-3d-2026-11-20/README.md) — `conformacao-e-sobreposicao-3d-2026-11-20`

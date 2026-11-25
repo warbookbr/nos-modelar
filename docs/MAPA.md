@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2325 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2328 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -259,6 +259,10 @@
 
 - `README.md` — Carro fastback: quanto custa o ajuste da chapa quando ela cresce
 - `ensaio-de-escala.mjs` — ensaio-de-escala.mjs — quanto custa o ajuste da gaiola da lataria do carro-fastback quando a rede cresce até o tamanho do carro inteiro. A rede do quarto tra…
+
+## docs/modelar/banco-de-provas/casca-chapa-e-gabinete-2026-11-24/
+
+- `README.md` — Casca, chapa dobrada e gabinete
 
 ## docs/modelar/banco-de-provas/comparar-com-a-referencia-2026-11-16/
 
@@ -1247,6 +1251,8 @@
 - `artefatos.js` — artefatos.js — contrato neutro e procedência determinística da execução procedural.
 - `artefatos.test.mjs` — artefatos-procedencia.test.mjs — prova o artefato neutro e a origem das entidades finais.
 - `caminho-helicoidal.js` — caminho-helicoidal.js — os pontos e as normais de uma hélice, para o friso varrer um perfil ao longo dela.
+- `casca-pela-receita.js` — casca-pela-receita.js — a casca de espessura constante de um `loft`, calculada pelas seções da receita e não pela malha.
+- `casca-pela-receita.test.mjs` — casca-pela-receita.test.mjs — a casca de um `loft` com cintura, que a `casca` pela malha recusa por não ser convexo: sai fechada para dentro e para fora, com…
 - `casca.js` — casca.js — casca com espessura constante de um sólido facetado: função pura sobre posições e listas de vértices.
 - `casca.test.mjs` — casca.test.mjs — a extensão `casca` medida sobre a malha que ela devolve, não sobre a conta que a produz. A espessura é conferida por uma medida independente…
 - `catalogo.js` — catálogo.js — projeções puras e determinísticas do registro de operações. Não executa receita, não lê arquivos e não conhece visor, MCP ou domínio.

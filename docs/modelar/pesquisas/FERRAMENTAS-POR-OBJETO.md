@@ -59,12 +59,12 @@ Os tipos são três. O modificador age sobre uma forma que já existe; o gerador
 
 As ferramentas que não existem ou existem em parte, na mesma ordem, com o que já há.
 
-- casca com espessura (`parcial`, 125 objetos): a operação `casca` esvazia sólido convexo ou de três faces por vértice, só para dentro, com as faces abertas escolhidas, na receita comum, nas famílias e no esboço 2.0 (desde 2026-11-22); o `lathe` com `espessura` faz a casca de revolução; casca de forma livre e lado de fora não existem.
+- casca com espessura (`parcial`, 125 objetos): a operação `casca` esvazia sólido convexo ou de três faces por vértice, só para dentro, com as faces abertas escolhidas, na receita comum, nas famílias e no esboço 2.0 (desde 2026-11-22); o `lathe` com `espessura` faz a casca de revolução; casca de forma livre e lado de fora não existem; `passosDaCascaDoLoft` faz a casca pela receita de um `loft` de várias seções, também o côncavo, para dentro e para fora.
 - articulações (`parcial`, 95 objetos): extensão nativa de articulação (revolução e prismática, curso conferido contra as peças por `conferirArticulacao`) e família `dobradica` de abas; rótula de esfera e olhal fora do cilindro não.
 - estrutura de barras (`parcial`, 72 objetos): extensão `estruturaDeBarras` na receita comum e nas famílias: barras de tubo ou perfil maciço entre nós nomeados, com corte de ponta e união num sólido; no esboço 2.0, a `haste` entre dois pontos; juntas soldadas e padrões não.
 - repetição em série (`parcial`, 69 objetos): núcleo: arranja linear e radial, também no esboço 2.0 pelo campo `repete`; grade 2D e cópia ao longo de caminho não.
-- chapa dobrada (`parcial`, 62 objetos): extensão nativa `chapaDobrada` do núcleo: abas, dobras com raio, tampas e origem estrutural; alívio de canto e planificado de peça qualquer não.
-- gabinete (`parcial`, 57 objetos): família `aparelho-de-caixa` (forninho elétrico, micro-ondas, air-fryer de forno, lava-louças compacta): caixa com porta, painel de comando e pés; encaixe entre metades, ressaltos, grade de ventilação e recortes de painel não.
+- chapa dobrada (`parcial`, 62 objetos): extensão nativa `chapaDobrada` do núcleo: abas, dobras com raio, tampas e origem estrutural; alívio de canto e planificado de peça qualquer não; `passosDaCaixaDeChapa` faz a caixa de cantos abertos com aba nas quatro bordas, alívio de canto e área do planificado.
+- gabinete (`parcial`, 57 objetos): família `aparelho-de-caixa` (forninho elétrico, micro-ondas, air-fryer de forno, lava-louças compacta): caixa com porta, painel de comando e pés; encaixe entre metades, ressaltos, grade de ventilação e recortes de painel não; família `gabinete`: caixa de plástico em base e tampa com encaixe, ressaltos para parafuso, grade de ventilação e recortes de painel.
 - cabo ou mangueira entre pontos (`parcial`, 49 objetos): a `haste` reta do esboço 2.0 e o friso de seção circular ao longo de polilinha; caimento, raio mínimo, terminais e feixe não.
 - superfície suave por seções (`parcial`, 46 objetos): núcleo: loft de faces planas entre seções, inflate e as gaiolas de subdivisão (gaiolaPorEstacoes, gaiolaPorLacos, gaiolaVarrida), que dão a superfície lisa; o loft de tangente contínua do esboço antigo saiu com ele em 2026-11-05.
 - furação em padrão (`parcial`, 43 objetos): núcleo: furo com centros, passante ou cego, e furos de perfil na extrusao e no lathe; escareado, rebaixo, rosca e padrão em grade, círculo ou favo não.
@@ -148,7 +148,7 @@ Cria o pino oco de fixação dentro de um gabinete, com furo, rebaixo e raiz arr
 
 ### casca com espessura (`casca`)
 
-Transforma um sólido fechado numa parede de espessura constante, com faces abertas escolhidas (carenagem, tanque, gabinete, panela, capacete). Parâmetros: espessura, faces abertas, lado (dentro ou fora). Referências: Blender: modificador Solidify; CadQuery e build123d: shell; Onshape e FreeCAD: Shell/Thickness. Aqui: parcial, a operação `casca` esvazia sólido convexo ou de três faces por vértice, só para dentro, com as faces abertas escolhidas, na receita comum, nas famílias e no esboço 2.0 (desde 2026-11-22); o `lathe` com `espessura` faz a casca de revolução; casca de forma livre e lado de fora não existem. Atende 125 objetos em 25 famílias.
+Transforma um sólido fechado numa parede de espessura constante, com faces abertas escolhidas (carenagem, tanque, gabinete, panela, capacete). Parâmetros: espessura, faces abertas, lado (dentro ou fora). Referências: Blender: modificador Solidify; CadQuery e build123d: shell; Onshape e FreeCAD: Shell/Thickness. Aqui: parcial, a operação `casca` esvazia sólido convexo ou de três faces por vértice, só para dentro, com as faces abertas escolhidas, na receita comum, nas famílias e no esboço 2.0 (desde 2026-11-22); o `lathe` com `espessura` faz a casca de revolução; casca de forma livre e lado de fora não existem; `passosDaCascaDoLoft` faz a casca pela receita de um `loft` de várias seções, também o côncavo, para dentro e para fora. Atende 125 objetos em 25 famílias.
 
 ### articulações (`articula`)
 
@@ -164,11 +164,11 @@ Copia uma forma em linha, em grade NxM, em círculo ou ao longo de um caminho, c
 
 ### chapa dobrada (`chapa`)
 
-Faz peça de chapa por abas e dobras com raio, alívio de canto e espessura constante (suporte, carroceria de caminhão, eletrocalha, gabinete metálico). Parâmetros: espessura, abas, ângulo e raio de cada dobra, alívio. Referências: FreeCAD: SheetMetal; Onshape: Sheet Metal. Aqui: parcial, extensão nativa `chapaDobrada` do núcleo: abas, dobras com raio, tampas e origem estrutural; alívio de canto e planificado de peça qualquer não. Atende 62 objetos em 16 famílias.
+Faz peça de chapa por abas e dobras com raio, alívio de canto e espessura constante (suporte, carroceria de caminhão, eletrocalha, gabinete metálico). Parâmetros: espessura, abas, ângulo e raio de cada dobra, alívio. Referências: FreeCAD: SheetMetal; Onshape: Sheet Metal. Aqui: parcial, extensão nativa `chapaDobrada` do núcleo: abas, dobras com raio, tampas e origem estrutural; alívio de canto e planificado de peça qualquer não; `passosDaCaixaDeChapa` faz a caixa de cantos abertos com aba nas quatro bordas, alívio de canto e área do planificado. Atende 62 objetos em 16 famílias.
 
 ### gabinete (`gabinete`)
 
-Faz caixa de equipamento com tampa, encaixe entre as metades, ressaltos, grade de ventilação e recortes de painel. Parâmetros: dimensões, parede, divisão, recortes. Referências: BOSL2; geradores de caixa de projeto paramétrica. Aqui: parcial, família `aparelho-de-caixa` (forninho elétrico, micro-ondas, air-fryer de forno, lava-louças compacta): caixa com porta, painel de comando e pés; encaixe entre metades, ressaltos, grade de ventilação e recortes de painel não. Atende 57 objetos em 16 famílias.
+Faz caixa de equipamento com tampa, encaixe entre as metades, ressaltos, grade de ventilação e recortes de painel. Parâmetros: dimensões, parede, divisão, recortes. Referências: BOSL2; geradores de caixa de projeto paramétrica. Aqui: parcial, família `aparelho-de-caixa` (forninho elétrico, micro-ondas, air-fryer de forno, lava-louças compacta): caixa com porta, painel de comando e pés; encaixe entre metades, ressaltos, grade de ventilação e recortes de painel não; família `gabinete`: caixa de plástico em base e tampa com encaixe, ressaltos para parafuso, grade de ventilação e recortes de painel. Atende 57 objetos em 16 famílias.
 
 ### cabo ou mangueira entre pontos (`cabo`)
 

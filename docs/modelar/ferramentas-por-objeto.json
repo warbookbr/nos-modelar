@@ -11,7 +11,7 @@
       "parametros": "espessura, faces abertas, lado (dentro ou fora)",
       "referencias": ["Blender: modificador Solidify", "CadQuery e build123d: shell", "Onshape e FreeCAD: Shell/Thickness"],
       "aqui": "parcial",
-      "onde": "a operação `casca` esvazia sólido convexo ou de três faces por vértice, só para dentro, com as faces abertas escolhidas, na receita comum, nas famílias e no esboço 2.0 (desde 2026-11-22); o `lathe` com `espessura` faz a casca de revolução; casca de forma livre e lado de fora não existem"
+      "onde": "a operação `casca` esvazia sólido convexo ou de três faces por vértice, só para dentro, com as faces abertas escolhidas, na receita comum, nas famílias e no esboço 2.0 (desde 2026-11-22); o `lathe` com `espessura` faz a casca de revolução; casca de forma livre e lado de fora não existem; `passosDaCascaDoLoft` faz a casca pela receita de um `loft` de várias seções, também o côncavo, para dentro e para fora"
     },
     "arredonda": {
       "nome": "arredondar e chanfrar arestas escolhidas",
@@ -128,7 +128,7 @@
       "parametros": "espessura, abas, ângulo e raio de cada dobra, alívio",
       "referencias": ["FreeCAD: SheetMetal", "Onshape: Sheet Metal"],
       "aqui": "parcial",
-      "onde": "extensão nativa `chapaDobrada` do núcleo: abas, dobras com raio, tampas e origem estrutural; alívio de canto e planificado de peça qualquer não"
+      "onde": "extensão nativa `chapaDobrada` do núcleo: abas, dobras com raio, tampas e origem estrutural; alívio de canto e planificado de peça qualquer não; `passosDaCaixaDeChapa` faz a caixa de cantos abertos com aba nas quatro bordas, alívio de canto e área do planificado"
     },
     "perfil": {
       "nome": "perfil estrutural",
@@ -218,7 +218,7 @@
       "parametros": "dimensões, parede, divisão, recortes",
       "referencias": ["BOSL2", "geradores de caixa de projeto paramétrica"],
       "aqui": "parcial",
-      "onde": "família `aparelho-de-caixa` (forninho elétrico, micro-ondas, air-fryer de forno, lava-louças compacta): caixa com porta, painel de comando e pés; encaixe entre metades, ressaltos, grade de ventilação e recortes de painel não"
+      "onde": "família `aparelho-de-caixa` (forninho elétrico, micro-ondas, air-fryer de forno, lava-louças compacta): caixa com porta, painel de comando e pés; encaixe entre metades, ressaltos, grade de ventilação e recortes de painel não; família `gabinete`: caixa de plástico em base e tampa com encaixe, ressaltos para parafuso, grade de ventilação e recortes de painel"
     },
     "pcb": {
       "nome": "placa de circuito",
