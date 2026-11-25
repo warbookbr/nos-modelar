@@ -83,6 +83,8 @@ Fatia 2 levada ao núcleo em 2026-11-22: a opção usa a cota completa refeita q
 
 O custo baixou no mesmo dia, por decisão da pessoa ("baixar o custo"): sem cota exata, o ganho sai da estimativa de Hager e Higham, uma cota inferior que acerta o exato ou fica acima de 92% dele nas grades de prova, e a conta exata só roda quando ela passa de 10, um décimo do limite; a ordem de eliminação e a análise simbólica da primeira conta servem às outras três, a matriz se monta pela metade, e a normal do vértice regular sai da fórmula fechada. Pelo menor de três tempos, a subdivisão com a opção custa 1,76 vez a de sem ela no passo 70 e no passo 35, e o gate 4 passa.
 
+Fatia 3 feita em 2026-11-25, por medida: o preenchimento pelas curvas vizinhas, já no núcleo, erra o miolo em no máximo 0,38 mm na calota e no toro com o cruzamento fora do centro, com as curvas sobre a forma (16 trechos), contra 1,26 mm do preenchimento padrão na calota; nenhum passa de 1 mm. A tabela está no banco de provas e o teste em `preenchimento-do-miolo.test.mjs`. A cota do miolo não precisou trocar. O que o toro assimétrico com 8 trechos ainda erra a 100 mm da borda é das curvas declaradas, e não do miolo. Segue a fatia 4, a tampa G2 nos extraordinários.
+
 ## Fechamento
 
 Preencher ao concluir ou cancelar: estado final, commit e PR, gates, resultado observado e candidatos devolvidos ao backlog.

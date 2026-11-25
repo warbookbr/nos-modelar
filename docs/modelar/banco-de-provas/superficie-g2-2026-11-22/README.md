@@ -102,3 +102,18 @@ O script passou a medir cada caso três vezes, alternando com e sem a opção, e
 | 35 | 8,25 | 14,54 | 1,76 |
 
 O ajuste sozinho, no passo 70, leva 1,5 s com a opção, contra 0,4 a 0,6 s sem ela: 0,27 s na energia, 0,30 nas normais dos vértices que não são regulares, 0,38 na montagem e 0,46 nas quatro fatorações.
+
+## Fatia 3: o miolo, 2026-11-25
+
+O preenchimento do miolo pelas curvas vizinhas, que entrou no núcleo como o miolo de `alisarSuperficie` antes deste plano, já cumpre o que a fatia 3 pedia. Para separar o erro do miolo do erro das curvas declaradas, a prova usa 16 trechos de ponto-chave por curva, com que as curvas ficam sobre a forma; com 8 trechos, o que sobra a 100 mm da borda no toro assimétrico é o das curvas, de 0,37 a 1,01 mm, e não o do miolo. O maior erro do miolo na chapa inteira, contra a forma analítica:
+
+| cruzamento | superfície | preenchimento padrão (mm) | pelas vizinhas, no núcleo (mm) |
+|---|---|---|---|
+| 0,25 e 0,25 | calota | 1,261 | 0,301 |
+| 0,25 e 0,25 | toro | 0,528 | 0,379 |
+| 0,3 e 0,5 | calota | 0,519 | 0,134 |
+| 0,3 e 0,5 | toro | 0,580 | 0,210 |
+| centro | calota | 0,279 | 0,006 |
+| centro | toro | 0,298 | 0,051 |
+
+Nenhum passa de 1 mm, e a calota assimétrica, que era o caso do problema do plano, cai de 1,26 para 0,30 mm. O teste "fatia 3 do G2" em `tools/fixtures/correcao-de-superficie/preenchimento-do-miolo.test.mjs` cobra o limite de 1 mm e a medida com 2% de folga.

@@ -123,6 +123,22 @@ describe('o preenchimento pelas curvas vizinhas no núcleo, contra o protótipo'
     expect(preencherRede(gaiolaPorRede({ ...lateral, liso: false }), 'vizinhas').andou * 1000).toBeGreaterThan(1);
   });
 
+  it('fatia 3 do G2: com as curvas sobre a forma, o miolo não erra a dupla curvatura em 1 mm, nem com o cruzamento fora do centro', () => {
+    /* O problema do plano do G2: o preenchimento padrão errava a calota em 1,26 mm num retalho de 300 mm (o cruzamento em 0,25 e 0,25).
+       Com 16 trechos de ponto-chave as curvas ficam sobre a forma e o erro que sobra é só o do miolo. Medido em 2026-11-25, o maior na
+       chapa inteira: 0,301 e 0,379 mm com o meio em 0,25 e 0,25, 0,134 e 0,210 com o meio em 0,3 e 0,5, na calota e no toro, contra
+       1,261, 0,528, 0,519 e 0,580 do preenchimento padrão. Os tetos são a medida com 2% de folga. */
+    const tetos = { '0.25,0.25': { calota: 0.3010, toro: 0.3793 }, '0.3,0.5': { calota: 0.1338, toro: 0.2099 } };
+    for (const meio of [[0.25, 0.25], [0.3, 0.5]]) {
+      for (const p of provaDasAnaliticas({ definicao: { meio, pontos: 16 }, modos: [], superficies: ['calota', 'toro'] })) {
+        const onde = `${p.superficie} com o meio em ${meio}`;
+        expect(p.nucleo.cotaMm[0], onde).toBeLessThan(1);
+        expect(p.nucleo.cotaMm[0], `${onde} piorou contra a medida`).toBeLessThanOrEqual(tetos[String(meio)][p.superficie] * 1.02 + 0.001);
+        expect(p.nucleo.cotaMm[0], `${onde} contra o preenchimento padrão`).toBeLessThan(p.hoje.cotaSemAlisarMm[0]);
+      }
+    }
+  }, 120000);
+
   it('na chapa lateral de prova, na superfície final: o vizinho estreito cortado tira a piora do retalho baixo, e dois retalhos seguem CONHECIDOS', () => {
     const { contraPrototipoMm, retalhos } = provaDaChapaLateral();
     expect(contraPrototipoMm).toBeLessThan(1e-9);
