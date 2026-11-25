@@ -70,6 +70,7 @@ export const CAPACIDADES = Object.freeze({
   parametrosDaRoda: { arquivo: 'procedural/familias/roda-dentada/tabela.js', funcao: 'parametrosDaRoda', de: 'procedural/familias/roda-dentada/tabela.js' },
   parametrosDaEsteira: { arquivo: 'procedural/familias/esteira/tabela.js', funcao: 'parametrosDaEsteira', de: 'procedural/familias/esteira/tabela.js' },
   transmissaoPorCorrente: { arquivo: 'procedural/familias/corrente/transmissao.js', funcao: 'transmissaoPorCorrente', de: 'procedural/familias/corrente/transmissao.js' },
+  passosDaCaixaDeChapa: { arquivo: 'procedural/extensoes/chapa-dobrada/caixa.js', funcao: 'passosDaCaixaDeChapa', de: 'procedural/extensoes/chapa-dobrada/caixa.js' },
   pinhaoECremalheira: { arquivo: 'procedural/familias/engrenagem/engrenamento.js', funcao: 'pinhaoECremalheira', de: 'procedural/familias/engrenagem/engrenamento.js' },
 });
 

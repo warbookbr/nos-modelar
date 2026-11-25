@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2321 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2325 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -984,6 +984,8 @@
 
 ## procedural/extensoes/chapa-dobrada/
 
+- `caixa.js` — caixa.js — a caixa de chapa de cantos abertos, como sai da dobradeira: a base plana com uma aba dobrada em cada uma das quatro bordas, o alívio de canto e o …
+- `caixa.test.mjs` — caixa.test.mjs — a caixa de chapa: sai num pedaço só, com as abas para cima ou para baixo; a área do planificado é a da base mais a de cada aba aberta, confe…
 - `chapa.js` — chapa.js — a conta da chapa dobrada: contorno da seção com as dobras no raio pedido e as medidas de chapa.
 - `fixture.js` — fixture.js — receita sintética da extensão, sem publicação de peça: um L de chapa de 2 mm, raio interno 2 mm, 30 mm de largura.
 - `implementacao.js` — implementacao.js — extrusa o contorno da chapa dobrada numa largura e, com `origemId`, publica a origem estrutural dela; recebe somente emissor transacional …
@@ -3040,6 +3042,11 @@
 ## tools/fixtures/ajuste-esparso/
 
 - `gaiola-grande.mjs` — gaiola-grande.mjs — a gaiola grande e escalável do plano do ajuste esparso, sem objeto: a casca simétrica neutra das chapas de prova (`definicaoDaChapaSimetr…
+
+## tools/fixtures/casca-chapa-e-gabinete/
+
+- `gabinete-de-chapa.mjs` — gabinete-de-chapa.mjs — o gabinete de chapa da fatia 3 do plano de casca, chapa e gabinete, com os cantos abertos do alívio, como sai da dobradeira (sem a so…
+- `gabinete-de-chapa.test.mjs` — gabinete-de-chapa.test.mjs — o gabinete de chapa: a base e a tampa saem cada uma num pedaço só, e a tampa só encosta na base, com as abas por fora das da bas…
 
 ## tools/fixtures/comparar-com-prancha/
 
