@@ -4,6 +4,7 @@ O texto inteiro de cada plano está no git, no commit `a60c067b`, em `docs/model
 
 Plano encerrado não governa trabalho novo: não abre implementação, não reabre escopo e não autoriza nada por analogia. As decisões que continuam valendo estão em `registros/`, nesta pasta; o plano em jogo mora em `../planos/README.md`, e o que saiu de cena por mudança de rota e pode voltar, em `../planos/congelados/README.md`.
 
+- `2026-11-25-atuador-de-junta.md`: a família atuador-de-junta (cilíndrico de 40 a 120 mm e servo pequeno, médio e grande), com a montagem da junta de revolução e a montagem de prova de duas juntas. O texto está no commit `fd6081c8`, em `docs/modelar/planos/2026-11-25-atuador-de-junta.md`.
 - `2026-11-24-casca-chapa-e-gabinete.md`: a família gabinete (encaixe, ressaltos, grade e recortes), a caixa de chapa de cantos abertos e a casca pela receita do loft côncavo. O texto está no commit `a1fd286d`, em `docs/modelar/planos/2026-11-24-casca-chapa-e-gabinete.md`.
 - `2026-11-23-braco-de-prova-duas-juntas.md`: o braço de prova de duas juntas com os componentes da mecatrônica dentro, a forma aprovada pela pessoa, a ficha e o pedido inicial respondido. O texto está no commit `6371d464`, em `docs/modelar/planos/2026-11-23-braco-de-prova-duas-juntas.md`.
 - `2026-11-24-encaixe-cilindrico-parcial.md`: o encaixe cilíndrico aceita o modo parcial, com a sobreposição mínima declarada, pedido pelo braço de prova. O texto está no commit `6371d464`, em `docs/modelar/planos/2026-11-24-encaixe-cilindrico-parcial.md`.
