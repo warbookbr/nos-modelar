@@ -9,7 +9,11 @@
 
    Os quatro ressaltos ficam nos cantos de dentro, afastados da parede pela folga: na base, do fundo à divisão, com o furo
    passante pelo fundo para o parafuso entrar por baixo; na tampa, da divisão ao teto, com o furo piloto cego. Os ressaltos
-   da base e da tampa se tocam de topo na divisão. Regra da família: sem norma, por medidas declaradas. */
+   da base e da tampa se tocam de topo na divisão. Regra da família: sem norma, por medidas declaradas.
+
+   Com `grade` 1, o teto da tampa tem a grade de ventilação: rasgos de pontas redondas ao longo de x, repetidos a passos
+   iguais em z e centrados. Com `recortes` 1, a parede da frente da base (z = −profundidade/2) tem o recorte retangular e
+   o redondo do painel, à mesma altura, o retangular à esquerda do meio e o redondo à direita, com o centro em x declarado. */
 
 export function geometriaDoGabinete(q) {
   const { largura: W, profundidade: D, altura: H, parede: t, raioDoCanto: r, alturaDaBase: hb, alturaDoEncaixe: he, diametroDoRessalto: dr, diametroDoFuro: df, folgaDoRessalto: f } = q;
@@ -26,5 +30,10 @@ export function geometriaDoGabinete(q) {
     centros, raioDoRessalto: dr / 2, raioDoFuro: df / 2,
     ressaltoDaBase: { de: t / 2, ate: hb }, furoDaBase: { de: -1, ate: hb + 1 },
     ressaltoDaTampa: { de: hb, ate: H - t / 2 }, furoDaTampa: { de: hb - 1, ate: H - 2 * t },
+    rasgo: { largura: q.comprimentoDoRasgo ?? 0, profundidade: q.larguraDoRasgo ?? 0, cantos: (q.larguraDoRasgo ?? 0) / 2 - 0.01 },
+    rasgoY: { de: H - t - 1, ate: H + 1 }, primeiroRasgo: -((q.rasgos ?? 1) - 1) * (q.passoDosRasgos ?? 0) / 2,
+    recorteRetangular: [[(q.centroDoRetangulo ?? 0) - (q.larguraDoRetangulo ?? 0) / 2, -D / 2 - 1], [(q.centroDoRetangulo ?? 0) + (q.larguraDoRetangulo ?? 0) / 2, -D / 2 - 1], [(q.centroDoRetangulo ?? 0) + (q.larguraDoRetangulo ?? 0) / 2, -D / 2 + t + 1], [(q.centroDoRetangulo ?? 0) - (q.larguraDoRetangulo ?? 0) / 2, -D / 2 + t + 1]],
+    retanguloY: { de: (q.alturaDosRecortes ?? 0) - (q.alturaDoRetangulo ?? 0) / 2, ate: (q.alturaDosRecortes ?? 0) + (q.alturaDoRetangulo ?? 0) / 2 },
+    recorteRedondo: { centro: [q.centroDoRedondo ?? 0, q.alturaDosRecortes ?? 0, -D / 2 - 1], raio: (q.diametroDoRedondo ?? 0) / 2, comprimento: t + 2 },
   };
 }

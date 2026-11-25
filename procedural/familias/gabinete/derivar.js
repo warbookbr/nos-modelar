@@ -1,5 +1,5 @@
 /* derivar.js — dos parâmetros do gabinete (milímetro) à chamada de composição (metro). */
-import { ID_DO_GABINETE } from './composicoes.js';
+import { idDoGabinete } from './composicoes.js';
 import { geometriaDoGabinete } from './geometria.js';
 
 const m = (mm) => mm / 1000;
@@ -15,5 +15,15 @@ export function derivar(q) {
     a[`centro${k}`] = [m(x), 0, m(z)];
     for (const [nome, f] of [['ressaltoDaBase', g.ressaltoDaBase], ['furoDaBase', g.furoDaBase], ['ressaltoDaTampa', g.ressaltoDaTampa], ['furoDaTampa', g.furoDaTampa]]) { a[`${nome}${k}Em`] = [m(x), m(f.de), m(z)]; a[`${nome}${k}Altura`] = m(f.ate - f.de); }
   });
-  return { composicao: ID_DO_GABINETE, argumentos: a };
+  if (q.grade) {
+    a.rasgoLargura = m(g.rasgo.largura); a.rasgoProfundidade = m(g.rasgo.profundidade); a.rasgoCantos = m(g.rasgo.cantos);
+    faixa('rasgo', g.rasgoY); a.rasgoEm = [0, m(g.rasgoY.de), m(g.primeiroRasgo)];
+    a.rasgos = q.rasgos; a.passoDosRasgos = [0, 0, m(q.passoDosRasgos)];
+  }
+  if (q.recortes) {
+    g.recorteRetangular.forEach(([u, v], k) => { a[`retanguloU${k}`] = m(u); a[`retanguloV${k}`] = m(v); });
+    faixa('retangulo', g.retanguloY);
+    a.raioDoRedondo = m(g.recorteRedondo.raio); a.comprimentoDoRedondo = m(g.recorteRedondo.comprimento); a.redondoEm = g.recorteRedondo.centro.map(m);
+  }
+  return { composicao: idDoGabinete(q.grade, q.recortes), argumentos: a };
 }
