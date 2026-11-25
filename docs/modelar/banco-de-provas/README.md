@@ -74,6 +74,7 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
   - [Sonda: do esboço traduzido à receita do Mecanifica, sem agente (2026-10-19)](receitas-externas-2026-10-19/sonda-passos/RESULTADO.md) — `receitas-externas-2026-10-19/sonda-passos`
   - [Triagem das 66 receitas por família candidata](receitas-externas-2026-10-19/triagem.md) — `receitas-externas-2026-10-19`
 - [Reflexo na bancada: a paridade da luz rasante e da curvatura com o Blender](reflexo-na-bancada-2026-11-15/README.md) — `reflexo-na-bancada-2026-11-15`
+- [Resgate dos ramos antigos: o inventário de 2026-11-25](resgate-dos-ramos-2026-11-25/README.md) — `resgate-dos-ramos-2026-11-25`
 - [Revisão das verificações e dos testes: medidas e veredito](revisao-das-verificacoes-2026-11-13/README.md) — `revisao-das-verificacoes-2026-11-13`
 - [Revisão do projeto para o trabalho da IA: medidas e relatório](revisao-do-projeto-2026-11-13/README.md) — `revisao-do-projeto-2026-11-13`
 - `rodada-2026-10-08`
@@ -88,7 +89,6 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
   - [Sedã em alta definição, ciclo 5: o carro inteiro](sedan-chassi-e-lataria-2026-11-11/alta-definicao/CICLO-5.md) — `sedan-chassi-e-lataria-2026-11-11/alta-definicao`
 - [Sólido por laços — provas das fatias 1 a 3](solido-por-lacos-2026-11-05/README.md) — `solido-por-lacos-2026-11-05`
 - [Superfície de produção (G2): os instrumentos e a linha de base do quarto traseiro](superficie-g2-2026-11-22/README.md) — `superficie-g2-2026-11-22`
-- [Resgate dos ramos antigos: o inventário](resgate-dos-ramos-2026-11-25/README.md) — `resgate-dos-ramos-2026-11-25`
 - [Suporte de tubo sem identificador numérico](suporte-tubo-2026-10-10/README.md) — `suporte-tubo-2026-10-10`
 - [Madeira em Node ao lado da do Blender (2026-10-19)](textura-2026-10-19/README.md) — `textura-2026-10-19`
 - [Tolerância do STEP: o acervo exportado antes e depois da tolerância em milímetro](tolerancia-do-step-2026-11-22/README.md) — `tolerancia-do-step-2026-11-22`
