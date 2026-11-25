@@ -5,8 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2254 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
-2321 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2344 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -697,10 +696,8 @@
 - `2026-11-22-curva-paralela-na-rede.md` — Curva paralela na rede de curvas: os anéis em volta de um vão sem desenhar ponto a ponto
 - `2026-11-22-superficie-de-producao-g2.md` — Superfície de produção (G2): a chapa de subdivisão sem a ondulação que o crítico acusa, sem sair da forma
 - `2026-11-23-braco-de-prova-duas-juntas.md` — Braço de prova de duas juntas: a forma com os componentes escolhidos na mecatrônica dentro
-- `2026-11-23-engrenagem-polia-e-correia.md` — Engrenagem, polia e correia: o par que transmite movimento por poucos números
-- `2026-11-23-tubulacao-com-conexoes.md` — Tubulação com conexões: a rede de tubos por traçado e bitola, com as conexões postas sozinhas
-- `2026-11-24-encaixe-cilindrico-parcial.md` — Encaixe cilíndrico parcial: o eixo que entra só em parte no furo
 - `2026-11-24-casca-chapa-e-gabinete.md` — Casca, chapa dobrada e gabinete: a parede fina de forma livre, a chapa com abas em várias bordas e a caixa de equipamento
+- `2026-11-24-encaixe-cilindrico-parcial.md` — Encaixe cilíndrico parcial: o eixo que entra só em parte no furo
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
@@ -2701,6 +2698,7 @@
 - `diferenca-de-texto.test.js` — diferenca-de-texto.test.js — a diferença por linha que o registro de rodada guarda: vazia sem mudança, toda acréscimo na primeira versão, cortada no teto.
 - `dobras-aceitas.js` — dobras-aceitas.js — a dobra, o vinco e o chanfro que a peça declara de propósito, com o motivo.
 - `dobras-aceitas.test.js` — dobras-aceitas.test.js — `PLANO.dobrasAceitas`: o normalizador recusa o que o campo não admite, o plano sem o campo mantém a forma canônica de antes, e a ace…
+- `encaixe-cilindrico-parcial.test.mjs` — Encaixe cilíndrico parcial: o eixo que atravessa uma parede e só depois entra num cubo curto. Sem `encaixeAxial`, o interno precisa cobrir o externo de ponta…
 - `encosto-da-peca.test.mjs` — encosto-da-peca.test.mjs — uma tolerância de "encosta" só para a peça, e a distância do par declarado que não acontece (atrito 5 do RECEITA.md do sedã).
 - `etapas-de-construcao.js` — etapas-de-construcao.js — o que há de comum ao registro de etapas de uma montagem v5: o formato, o erro, as juntas medidas em cada etapa e a próxima etapa a …
 - `etapas-pela-impressao.js` — etapas-pela-impressao.js — o estado de cada etapa de uma montagem v5 como função pura do registro de eventos e do medido agora.

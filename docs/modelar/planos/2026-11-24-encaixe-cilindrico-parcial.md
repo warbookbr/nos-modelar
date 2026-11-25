@@ -1,8 +1,10 @@
 # Encaixe cilíndrico parcial: o eixo que entra só em parte no furo
 
-**Estado:** rascunho
+**Estado:** ativo
 
-**Território:** nenhum (aguarda aprovação)
+**Território:** `src/autoria/interfaces-montagem.js`, `src/autoria/ler-montagem-persistida.js`, `src/autoria/resolver-montagem-persistida.js`, `src/autoria/encaixe-cilindrico-parcial.test.mjs`, `docs/modelar/contratos/MONTAGEM-PERSISTIDA.md`.
+
+Ativado pela pessoa em 2026-11-25.
 
 **Responsável:** a IA da sessão implementa; a pessoa aprova o plano.
 
@@ -20,12 +22,12 @@ A especificação do `encaixaCilindrico` aceita um campo opcional que declara o 
 
 ## Filtro Agent-First
 
-Encaixe parcial: ENVOLVER a medida que já existe (`sobreposicaoAxial`) com um campo declarado na especificação da relação, `encaixeAxial: { modo: 'parcial', sobreposicaoMinima }` em metro. O modo `parcial` troca a exigência de que o interno cubra o externo pela de que o interno fique inteiro dentro do intervalo do externo, com a sobreposição no mínimo declarado, e o diagnóstico novo `sobreposicao-insuficiente` diz o medido, o mínimo e a relação. A opção é declarada na montagem, e a ferramenta não conhece o objeto.
+Encaixe parcial: ENVOLVER a medida que já existe (`sobreposicaoAxial`) com um campo declarado na especificação da relação, `encaixeAxial: { modo: 'parcial', sobreposicaoMinima }` em metro. O modo `parcial` troca a exigência de que o interno cubra o externo pela de que a sobreposição alcance o mínimo declarado, com qualquer um dos dois podendo passar da ponta do outro, porque a segunda junta do braço de prova mostrou o caso inverso, o furo da polia mais longo que a ponta do eixo do motor, e o diagnóstico novo `sobreposicao-insuficiente` diz o medido, o mínimo e a relação. A opção é declarada na montagem, e a ferramenta não conhece o objeto.
 
 ## Incluído
 
 - o campo na especificação, a leitura e a validação dele na montagem persistida, e o diagnóstico novo;
-- a fixture geral de eixo com cubo curto, uma que passa e uma que falha pela sobreposição, com teste;
+- o teste geral de eixo com cubo curto, com um caso que passa e o furo que passa da ponta do eixo e os que falham pela sobreposição, e a leitura do campo sobre a fixture `conjunto-do-eixo`;
 - o contrato `MONTAGEM-PERSISTIDA.md` com o campo;
 - a prova no braço de prova, cujo uso em `eixoDeSaidaNoCuboDoElo1` com 12 mm e a fixação das cinco etapas que faltam, com o aceite que a pessoa já deu, correm pelo plano do braço de prova, dono daquela pasta.
 
@@ -36,7 +38,7 @@ Encaixe parcial: ENVOLVER a medida que já existe (`sobreposicaoAxial`) com um c
 
 ## Gate de saída
 
-1. A fixture de eixo com cubo curto passa com o modo parcial e falha sem ele, e falha com sobreposição menor que a mínima.
+1. O caso de eixo com cubo curto passa com o modo parcial e falha sem ele, e falha com sobreposição menor que a mínima.
 2. As montagens que já existem resolvem com as mesmas medidas e o mesmo resultado, byte a byte nas impressões fixadas.
 3. As nove etapas do braço de prova ficam fixas.
 4. `npm run gates` e o CI verdes.

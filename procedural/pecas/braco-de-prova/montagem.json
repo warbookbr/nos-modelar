@@ -92,6 +92,10 @@
             "mais": 0
           }
         },
+        "encaixeAxial": {
+          "modo": "parcial",
+          "sobreposicaoMinima": 0.012
+        },
         "toleranciaNumerica": 1e-06
       }
     },
@@ -118,6 +122,10 @@
             "mais": 0
           }
         },
+        "encaixeAxial": {
+          "modo": "parcial",
+          "sobreposicaoMinima": 0.0095
+        },
         "toleranciaNumerica": 1e-06
       }
     },
@@ -143,6 +151,10 @@
             "menos": 0,
             "mais": 0
           }
+        },
+        "encaixeAxial": {
+          "modo": "parcial",
+          "sobreposicaoMinima": 0.0075
         },
         "toleranciaNumerica": 1e-06
       }
