@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2344 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2342 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -695,9 +695,7 @@
 - `2026-11-16-eletronica-no-modelar.md` — O lado Modelar da mecatrônica: plano-raiz que gera a família de componentes e a ponte
 - `2026-11-22-curva-paralela-na-rede.md` — Curva paralela na rede de curvas: os anéis em volta de um vão sem desenhar ponto a ponto
 - `2026-11-22-superficie-de-producao-g2.md` — Superfície de produção (G2): a chapa de subdivisão sem a ondulação que o crítico acusa, sem sair da forma
-- `2026-11-23-braco-de-prova-duas-juntas.md` — Braço de prova de duas juntas: a forma com os componentes escolhidos na mecatrônica dentro
 - `2026-11-24-casca-chapa-e-gabinete.md` — Casca, chapa dobrada e gabinete: a parede fina de forma livre, a chapa com abas em várias bordas e a caixa de equipamento
-- `2026-11-24-encaixe-cilindrico-parcial.md` — Encaixe cilíndrico parcial: o eixo que entra só em parte no furo
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
