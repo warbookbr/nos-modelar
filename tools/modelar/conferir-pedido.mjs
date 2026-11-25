@@ -38,8 +38,8 @@ export async function conferirPedido({ pedido: arquivo, objeto = null, escrever 
   if (!arquivo) throw new Error(`Informe o pedido.\n${USO}`);
   const caminho = absoluto(arquivo);
   const pedido = JSON.parse(readFileSync(caminho, 'utf8'));
-  const { ficha, separadas, placas } = await exportarFicha({ objeto: objeto ?? pedido.objeto, ...(pastaDaFicha ? { saida: pastaDaFicha } : {}) });
-  const r = responderPedido({ pedido, ficha, malhas: malhasNaMontagem(separadas), placas });
+  const { ficha, separadas, placas, declaracao } = await exportarFicha({ objeto: objeto ?? pedido.objeto, ...(pastaDaFicha ? { saida: pastaDaFicha } : {}) });
+  const r = responderPedido({ pedido, ficha, malhas: malhasNaMontagem(separadas), placas, componentes: declaracao.componentesDoPedido ?? {} });
   if (r.recusa) return r;
   const destino = saida ? absoluto(saida) : escrever ? caminho : null;
   if (destino) {

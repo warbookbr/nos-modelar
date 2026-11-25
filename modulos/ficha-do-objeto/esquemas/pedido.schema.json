@@ -1,15 +1,15 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "ponte/esquemas/pedido.schema.json",
-  "title": "Pedido da simulação ao Modelar, versão 1.1",
-  "description": "O pedido que a Mecatrônica escreve e o Modelar cumpre, com a revisão da ficha a que responde e os itens espaco, posicao, passagem, saidaDeAr e, desde a 1.1, ligacoes, que um arquivo 1.0 não usa. Coordenadas no referencial da montagem, na pose zero, nas unidades da ficha (mm e grau). Os números do pedido são exigências e não levam origem; quem a leva é o resultado do motivo. Item sem resposta está pendente.",
-  "$comment": "Regra de versão: campo novo opcional sobe a versão menor e acrescenta a nova à lista de versao; campo novo obrigatório ou campo mudado sobe a maior, e a versão anterior continua conferida pelo esquema dela. Que cada peça, porta e junta citada exista na ficha, e que nenhum terminal de ligacoes se repita nem esteja em duas redes, fica fora do JSON Schema e é conferido por tools/ponte/conferir.mjs.",
+  "title": "Pedido da simulação ao Modelar, versão 1.2",
+  "description": "O pedido que a Mecatrônica escreve e o Modelar cumpre, com a revisão da ficha a que responde e os itens espaco, posicao, passagem, saidaDeAr, desde a 1.1, ligacoes, que um arquivo 1.0 não usa, e, desde a 1.2, componente, que pede que o Modelar ponha na forma um componente comprado. O pedido inicial, desde a 1.2, é o de ficha.revisao 0: responde a uma ficha que ainda não existe, só traz itens componente, e ficha.caminho é o nome que a primeira ficha terá. Coordenadas no referencial da montagem, na pose zero, nas unidades da ficha (mm e grau). Os números do pedido são exigências e não levam origem; quem a leva é o resultado do motivo. Item sem resposta está pendente.",
+  "$comment": "Regra de versão: campo novo opcional sobe a versão menor e acrescenta a nova à lista de versao; campo novo obrigatório ou campo mudado sobe a maior, e a versão anterior continua conferida pelo esquema dela. Que cada peça, porta e junta citada exista na ficha, e que nenhum terminal de ligacoes se repita nem esteja em duas redes, fica fora do JSON Schema e é conferido por tools/ponte/conferir.mjs, assim como o acopla que cita outro item componente do pedido e o serve que cita junta ou peça da ficha, este só depois da primeira ficha.",
   "type": "object",
   "required": ["tipo", "versao", "objeto", "ficha", "itens"],
   "additionalProperties": false,
   "properties": {
     "tipo": { "const": "pedido" },
-    "versao": { "enum": ["1.0", "1.1"] },
+    "versao": { "enum": ["1.0", "1.1", "1.2"] },
     "objeto": { "$ref": "#/$defs/id" },
     "ficha": {
       "type": "object",
@@ -17,13 +17,29 @@
       "additionalProperties": false,
       "properties": {
         "caminho": { "$ref": "#/$defs/texto" },
-        "revisao": { "type": "integer", "minimum": 1 }
+        "revisao": { "type": "integer", "minimum": 0 }
       }
     },
     "itens": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/item" } }
   },
-  "if": { "required": ["versao"], "properties": { "versao": { "const": "1.0" } } },
-  "then": { "properties": { "itens": { "items": { "properties": { "tipo": { "enum": ["espaco", "posicao", "passagem", "saidaDeAr"] } } } } } },
+  "allOf": [
+    {
+      "if": { "required": ["versao"], "properties": { "versao": { "const": "1.0" } } },
+      "then": { "properties": { "itens": { "items": { "properties": { "tipo": { "enum": ["espaco", "posicao", "passagem", "saidaDeAr"] } } } } } }
+    },
+    {
+      "if": { "required": ["versao"], "properties": { "versao": { "const": "1.1" } } },
+      "then": { "properties": { "itens": { "items": { "properties": { "tipo": { "enum": ["espaco", "posicao", "passagem", "saidaDeAr", "ligacoes"] } } } } } }
+    },
+    {
+      "if": { "required": ["versao"], "properties": { "versao": { "enum": ["1.0", "1.1"] } } },
+      "then": { "properties": { "ficha": { "properties": { "revisao": { "minimum": 1 } } } } }
+    },
+    {
+      "if": { "required": ["ficha"], "properties": { "ficha": { "required": ["revisao"], "properties": { "revisao": { "const": 0 } } } } },
+      "then": { "properties": { "itens": { "items": { "properties": { "tipo": { "const": "componente" } } } } } }
+    }
+  ],
   "$defs": {
     "id": { "type": "string", "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
     "texto": { "type": "string", "minLength": 1 },
@@ -96,13 +112,14 @@
     "item": {
       "type": "object",
       "required": ["id", "tipo"],
-      "properties": { "id": { "$ref": "#/$defs/id" }, "tipo": { "enum": ["espaco", "posicao", "passagem", "saidaDeAr", "ligacoes"] } },
+      "properties": { "id": { "$ref": "#/$defs/id" }, "tipo": { "enum": ["espaco", "posicao", "passagem", "saidaDeAr", "ligacoes", "componente"] } },
       "allOf": [
         { "if": { "properties": { "tipo": { "const": "espaco" } } }, "then": { "$ref": "#/$defs/espaco" } },
         { "if": { "properties": { "tipo": { "const": "posicao" } } }, "then": { "$ref": "#/$defs/posicao" } },
         { "if": { "properties": { "tipo": { "const": "passagem" } } }, "then": { "$ref": "#/$defs/passagem" } },
         { "if": { "properties": { "tipo": { "const": "saidaDeAr" } } }, "then": { "$ref": "#/$defs/saidaDeAr" } },
-        { "if": { "properties": { "tipo": { "const": "ligacoes" } } }, "then": { "$ref": "#/$defs/ligacoes" } }
+        { "if": { "properties": { "tipo": { "const": "ligacoes" } } }, "then": { "$ref": "#/$defs/ligacoes" } },
+        { "if": { "properties": { "tipo": { "const": "componente" } } }, "then": { "$ref": "#/$defs/componente" } }
       ]
     },
     "espaco": {
@@ -195,6 +212,55 @@
         "redes": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/rede" } },
         "motivo": { "$ref": "#/$defs/motivo" },
         "resposta": { "$ref": "#/$defs/respostaDeLigacoes" }
+      }
+    },
+    "respostaDeComponente": {
+      "type": "object",
+      "required": ["estado"],
+      "properties": { "estado": { "enum": ["cumprido", "nao-cumprido"] } },
+      "if": { "properties": { "estado": { "const": "cumprido" } } },
+      "then": {
+        "required": ["estado", "revisaoDaFicha", "peca"],
+        "additionalProperties": false,
+        "properties": { "estado": { "const": "cumprido" }, "revisaoDaFicha": { "type": "integer", "minimum": 1 }, "peca": { "$ref": "#/$defs/id" } }
+      },
+      "else": {
+        "required": ["estado", "motivo"],
+        "additionalProperties": false,
+        "properties": { "estado": { "const": "nao-cumprido" }, "motivo": { "$ref": "#/$defs/texto" } }
+      }
+    },
+    "componente": {
+      "required": ["id", "tipo", "componente", "nome", "familia", "caixa", "massa", "serve", "motivo"],
+      "additionalProperties": false,
+      "properties": {
+        "id": true,
+        "tipo": true,
+        "componente": { "$ref": "#/$defs/id" },
+        "nome": { "$ref": "#/$defs/texto" },
+        "familia": { "type": ["string", "null"], "pattern": "^[a-z0-9]+(-[a-z0-9]+)*$" },
+        "caixa": { "$ref": "#/$defs/positivos" },
+        "massa": {
+          "type": "object",
+          "required": ["valor", "origem"],
+          "additionalProperties": false,
+          "properties": { "valor": { "type": "number", "exclusiveMinimum": 0 }, "origem": { "enum": ["medido", "declarado", "estimativa"] } }
+        },
+        "eixoDeSaida": {
+          "type": "object",
+          "required": ["diametro", "comprimento"],
+          "additionalProperties": false,
+          "properties": { "diametro": { "type": "number", "exclusiveMinimum": 0 }, "comprimento": { "type": "number", "exclusiveMinimum": 0 } }
+        },
+        "serve": {
+          "type": "object",
+          "if": { "required": ["junta"] },
+          "then": { "required": ["junta"], "additionalProperties": false, "properties": { "junta": { "$ref": "#/$defs/id" } } },
+          "else": { "required": ["peca"], "additionalProperties": false, "properties": { "peca": { "$ref": "#/$defs/id" } } }
+        },
+        "acopla": { "$ref": "#/$defs/id" },
+        "motivo": { "$ref": "#/$defs/motivo" },
+        "resposta": { "$ref": "#/$defs/respostaDeComponente" }
       }
     }
   }

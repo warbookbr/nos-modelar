@@ -1,0 +1,682 @@
+{
+  "tipo": "ficha",
+  "versao": "1.1",
+  "objeto": "braco-de-prova",
+  "revisao": 1,
+  "unidades": {
+    "comprimento": "mm",
+    "area": "mm²",
+    "massa": "g",
+    "inercia": "g·mm²",
+    "angulo": "grau",
+    "tensao": "V"
+  },
+  "referencial": {
+    "cima": "+y",
+    "frente": "+z",
+    "origem": "no chão, sob o eixo do ombro",
+    "poseZero": "a pose da montagem: o braço esticado na horizontal; o zero do ombro da ficha é o braço em pé (90 graus a partir desta pose), como a pessoa decidiu em 2026-11-23"
+  },
+  "malha": {
+    "caminho": "braco-de-prova.glb",
+    "formato": "glb",
+    "caixa": {
+      "valor": {
+        "min": [
+          -90,
+          0,
+          -90
+        ],
+        "max": [
+          345,
+          176,
+          182
+        ]
+      },
+      "origem": "medido"
+    },
+    "faces": {
+      "valor": 13222,
+      "origem": "medido",
+      "nota": "triângulos do arquivo"
+    }
+  },
+  "conjuntos": [
+    {
+      "id": "base",
+      "movel": false,
+      "massa": {
+        "valor": 2175.75863,
+        "origem": "estimativa",
+        "nota": "soma das massas estimadas das peças do conjunto"
+      },
+      "centroDeMassa": {
+        "valor": [
+          0.049,
+          112.5,
+          80.101
+        ],
+        "origem": "estimativa",
+        "nota": "média das peças pesada pela massa, no referencial da montagem"
+      },
+      "inercia": {
+        "valor": {
+          "ixx": 15896376.5,
+          "iyy": 11342567.6,
+          "izz": 6955986.12,
+          "ixy": 17478.9761,
+          "ixz": 6269.98864,
+          "iyz": -5077732.4
+        },
+        "origem": "estimativa",
+        "nota": "das peças em torno do centro do conjunto, nos eixos da montagem"
+      }
+    },
+    {
+      "id": "elo-1",
+      "movel": true,
+      "massa": {
+        "valor": 508.908286,
+        "origem": "estimativa",
+        "nota": "soma das massas estimadas das peças do conjunto"
+      },
+      "centroDeMassa": {
+        "valor": [
+          87.381,
+          138.615,
+          -25.217
+        ],
+        "origem": "estimativa",
+        "nota": "média das peças pesada pela massa, no referencial da montagem"
+      },
+      "inercia": {
+        "valor": {
+          "ixx": 505169.464,
+          "iyy": 1274309.2,
+          "izz": 1047845.31,
+          "ixy": -8737.19854,
+          "ixz": -88485.2866,
+          "iyz": 17783.8493
+        },
+        "origem": "estimativa",
+        "nota": "das peças em torno do centro do conjunto, nos eixos da montagem"
+      }
+    },
+    {
+      "id": "elo-2",
+      "movel": true,
+      "massa": {
+        "valor": 164.16445,
+        "origem": "estimativa",
+        "nota": "soma das massas estimadas das peças do conjunto"
+      },
+      "centroDeMassa": {
+        "valor": [
+          273.191,
+          137.81,
+          0
+        ],
+        "origem": "estimativa",
+        "nota": "média das peças pesada pela massa, no referencial da montagem"
+      },
+      "inercia": {
+        "valor": {
+          "ixx": 100758.338,
+          "iyy": 760838.031,
+          "izz": 725479.849,
+          "ixy": -8335.70236,
+          "ixz": 9.96674074e-11,
+          "iyz": -6.01037775e-11
+        },
+        "origem": "estimativa",
+        "nota": "das peças em torno do centro do conjunto, nos eixos da montagem"
+      }
+    }
+  ],
+  "pecas": [
+    {
+      "id": "base",
+      "nome": "braco-de-prova/base",
+      "familia": null,
+      "conjunto": "base",
+      "posicao": {
+        "valor": [
+          0,
+          0,
+          0
+        ],
+        "origem": "medido",
+        "nota": "origem da peça na pose de repouso da montagem resolvida"
+      },
+      "orientacao": {
+        "valor": {
+          "eixo": [
+            0,
+            1,
+            0
+          ],
+          "angulo": 0
+        },
+        "origem": "medido"
+      },
+      "massa": {
+        "valor": 470,
+        "origem": "estimativa",
+        "nota": "casco e tampa impressos, cerca de 143 g (230 cm³ a 0,62 g/cm³), mais a fonte de 300 g, o Arduino de 25 g e os dois drivers de 2 g do pedido inicial; as caixas da eletrônica não contam como PLA"
+      },
+      "centroDeMassa": {
+        "valor": [
+          0.227,
+          21.607,
+          -5.433
+        ],
+        "origem": "estimativa",
+        "nota": "centro do volume da malha, no referencial da peça"
+      },
+      "inercia": {
+        "valor": {
+          "ixx": 928258.117,
+          "iyy": 1563073.55,
+          "izz": 861023.481,
+          "ixy": 7781.55067,
+          "ixz": -2855.63093,
+          "iyz": 17210.407
+        },
+        "origem": "estimativa",
+        "nota": "pela malha com densidade uniforme, no centro de massa e nos eixos da peça"
+      }
+    },
+    {
+      "id": "elo-1",
+      "nome": "braco-de-prova/elo1",
+      "familia": null,
+      "conjunto": "elo-1",
+      "posicao": {
+        "valor": [
+          0,
+          0,
+          0
+        ],
+        "origem": "medido",
+        "nota": "origem da peça na pose de repouso da montagem resolvida"
+      },
+      "orientacao": {
+        "valor": {
+          "eixo": [
+            0,
+            1,
+            0
+          ],
+          "angulo": 0
+        },
+        "origem": "medido"
+      },
+      "massa": {
+        "valor": 148.908286,
+        "origem": "estimativa",
+        "nota": "volume da malha (240175 mm³) vezes 0.62 g/cm³ (pla-impresso)"
+      },
+      "centroDeMassa": {
+        "valor": [
+          73.334,
+          135.265,
+          0.336
+        ],
+        "origem": "estimativa",
+        "nota": "centro do volume da malha, no referencial da peça"
+      },
+      "inercia": {
+        "valor": {
+          "ixx": 151833.621,
+          "iyy": 616774.719,
+          "izz": 635213.042,
+          "ixy": 1166.85624,
+          "ixz": 598.774759,
+          "iyz": -233.392589
+        },
+        "origem": "estimativa",
+        "nota": "pela malha com densidade uniforme, no centro de massa e nos eixos da peça"
+      }
+    },
+    {
+      "id": "elo-2",
+      "nome": "braco-de-prova/elo2",
+      "familia": null,
+      "conjunto": "elo-2",
+      "posicao": {
+        "valor": [
+          0,
+          0,
+          0
+        ],
+        "origem": "medido",
+        "nota": "origem da peça na pose de repouso da montagem resolvida"
+      },
+      "orientacao": {
+        "valor": {
+          "eixo": [
+            0,
+            1,
+            0
+          ],
+          "angulo": 0
+        },
+        "origem": "medido"
+      },
+      "massa": {
+        "valor": 84.1644496,
+        "origem": "estimativa",
+        "nota": "volume da malha (135749 mm³) vezes 0.62 g/cm³ (pla-impresso)"
+      },
+      "centroDeMassa": {
+        "valor": [
+          223.897,
+          135.729,
+          0
+        ],
+        "origem": "estimativa",
+        "nota": "centro do volume da malha, no referencial da peça"
+      },
+      "inercia": {
+        "valor": {
+          "ixx": 77170.9149,
+          "iyy": 321064.065,
+          "izz": 282241.062,
+          "ixy": 9384.00256,
+          "ixz": 5.1159813e-11,
+          "iyz": -8.88823524e-11
+        },
+        "origem": "estimativa",
+        "nota": "pela malha com densidade uniforme, no centro de massa e nos eixos da peça"
+      }
+    },
+    {
+      "id": "garfo",
+      "nome": "braco-de-prova/garfo",
+      "familia": null,
+      "conjunto": "base",
+      "posicao": {
+        "valor": [
+          0,
+          0,
+          0
+        ],
+        "origem": "medido",
+        "nota": "origem da peça na pose de repouso da montagem resolvida"
+      },
+      "orientacao": {
+        "valor": {
+          "eixo": [
+            0,
+            1,
+            0
+          ],
+          "angulo": 0
+        },
+        "origem": "medido"
+      },
+      "massa": {
+        "valor": 124.868983,
+        "origem": "estimativa",
+        "nota": "volume da malha (201402 mm³) vezes 0.62 g/cm³ (pla-impresso)"
+      },
+      "centroDeMassa": {
+        "valor": [
+          0,
+          106.464,
+          -2.315
+        ],
+        "origem": "estimativa",
+        "nota": "centro do volume da malha, no referencial da peça"
+      },
+      "inercia": {
+        "valor": {
+          "ixx": 419847.168,
+          "iyy": 314223.595,
+          "izz": 199910.159,
+          "ixy": 7.61556966e-11,
+          "ixz": 1.2843492e-11,
+          "iyz": 9695.95717
+        },
+        "origem": "estimativa",
+        "nota": "pela malha com densidade uniforme, no centro de massa e nos eixos da peça"
+      }
+    },
+    {
+      "id": "garra",
+      "nome": "braco-de-prova/garra",
+      "familia": null,
+      "conjunto": "elo-2",
+      "posicao": {
+        "valor": [
+          0,
+          0,
+          0
+        ],
+        "origem": "medido",
+        "nota": "origem da peça na pose de repouso da montagem resolvida"
+      },
+      "orientacao": {
+        "valor": {
+          "eixo": [
+            0,
+            1,
+            0
+          ],
+          "angulo": 0
+        },
+        "origem": "medido"
+      },
+      "massa": {
+        "valor": 80,
+        "origem": "estimativa",
+        "nota": "a garra como volume de 80 g, dos requisitos; a carga de 130 a 150 g na ponta fica fora da ficha"
+      },
+      "centroDeMassa": {
+        "valor": [
+          325.052,
+          140,
+          0
+        ],
+        "origem": "estimativa",
+        "nota": "centro do volume da malha, no referencial da peça"
+      },
+      "inercia": {
+        "valor": {
+          "ixx": 22839.2555,
+          "iyy": 20097.8356,
+          "izz": 22814.4896,
+          "ixy": 2.52049806e-8,
+          "ixz": 4.85075944e-11,
+          "iyz": 2.87785749e-11
+        },
+        "origem": "estimativa",
+        "nota": "pela malha com densidade uniforme, no centro de massa e nos eixos da peça"
+      }
+    },
+    {
+      "id": "motor-cotovelo",
+      "nome": "braco-de-prova/motor-cotovelo",
+      "familia": null,
+      "conjunto": "elo-1",
+      "posicao": {
+        "valor": [
+          0,
+          0,
+          0
+        ],
+        "origem": "medido",
+        "nota": "origem da peça na pose de repouso da montagem resolvida"
+      },
+      "orientacao": {
+        "valor": {
+          "eixo": [
+            0,
+            1,
+            0
+          ],
+          "angulo": 0
+        },
+        "origem": "medido"
+      },
+      "massa": {
+        "valor": 280,
+        "origem": "declarado",
+        "nota": "NEMA 17 de 280 g, do pedido inicial"
+      },
+      "centroDeMassa": {
+        "valor": [
+          80,
+          140,
+          -45.603
+        ],
+        "origem": "estimativa",
+        "nota": "centro do volume da malha, no referencial da peça"
+      },
+      "inercia": {
+        "valor": {
+          "ixx": 79646.9412,
+          "iyy": 79646.9412,
+          "izz": 80877.2639,
+          "ixy": -1.16359958e-8,
+          "ixz": 3.25807882e-9,
+          "iyz": 3.25807882e-9
+        },
+        "origem": "estimativa",
+        "nota": "pela malha com densidade uniforme, no centro de massa e nos eixos da peça"
+      }
+    },
+    {
+      "id": "motor-ombro",
+      "nome": "braco-de-prova/motor-ombro",
+      "familia": null,
+      "conjunto": "base",
+      "posicao": {
+        "valor": [
+          0,
+          0,
+          0
+        ],
+        "origem": "medido",
+        "nota": "origem da peça na pose de repouso da montagem resolvida"
+      },
+      "orientacao": {
+        "valor": {
+          "eixo": [
+            0,
+            1,
+            0
+          ],
+          "angulo": 0
+        },
+        "origem": "medido"
+      },
+      "massa": {
+        "valor": 1550,
+        "origem": "estimativa",
+        "nota": "NEMA 23 de 1000 g mais a planetária de 550 g, as massas do pedido inicial"
+      },
+      "centroDeMassa": {
+        "valor": [
+          0,
+          140,
+          115.359
+        ],
+        "origem": "estimativa",
+        "nota": "centro do volume da malha, no referencial da peça"
+      },
+      "inercia": {
+        "valor": {
+          "ixx": 2690297.88,
+          "iyy": 2690297.88,
+          "izz": 808753.638,
+          "ixy": -2.90539383e-10,
+          "ixz": 9.46072531e-12,
+          "iyz": -7.01992373e-9
+        },
+        "origem": "estimativa",
+        "nota": "pela malha com densidade uniforme, no centro de massa e nos eixos da peça"
+      }
+    },
+    {
+      "id": "rolamento",
+      "nome": "braco-de-prova/rolamento",
+      "familia": null,
+      "conjunto": "base",
+      "posicao": {
+        "valor": [
+          0,
+          0,
+          0
+        ],
+        "origem": "medido",
+        "nota": "origem da peça na pose de repouso da montagem resolvida"
+      },
+      "orientacao": {
+        "valor": {
+          "eixo": [
+            0,
+            1,
+            0
+          ],
+          "angulo": 0
+        },
+        "origem": "medido"
+      },
+      "massa": {
+        "valor": 30.8896426,
+        "origem": "estimativa",
+        "nota": "volume da malha (3935 mm³) vezes 7.85 g/cm³ (aco)"
+      },
+      "centroDeMassa": {
+        "valor": [
+          0,
+          140,
+          -54.5
+        ],
+        "origem": "estimativa",
+        "nota": "centro do volume da malha, no referencial da peça"
+      },
+      "inercia": {
+        "valor": {
+          "ixx": 1756.17014,
+          "iyy": 1756.17014,
+          "izz": 3260.07487,
+          "ixy": -1.59211595e-11,
+          "ixz": 5.36357447e-12,
+          "iyz": -7.6033175e-10
+        },
+        "origem": "estimativa",
+        "nota": "pela malha com densidade uniforme, no centro de massa e nos eixos da peça"
+      }
+    },
+    {
+      "id": "transmissao",
+      "nome": "braco-de-prova/transmissao",
+      "familia": null,
+      "conjunto": "elo-1",
+      "posicao": {
+        "valor": [
+          0,
+          0,
+          0
+        ],
+        "origem": "medido",
+        "nota": "origem da peça na pose de repouso da montagem resolvida"
+      },
+      "orientacao": {
+        "valor": {
+          "eixo": [
+            0,
+            1,
+            0
+          ],
+          "angulo": 0
+        },
+        "origem": "medido"
+      },
+      "massa": {
+        "valor": 80,
+        "origem": "estimativa",
+        "nota": "polias GT2 e correia, 80 g do pedido inicial"
+      },
+      "centroDeMassa": {
+        "valor": [
+          139.359,
+          140,
+          -1.432
+        ],
+        "origem": "estimativa",
+        "nota": "centro do volume da malha, no referencial da peça"
+      },
+      "inercia": {
+        "valor": {
+          "ixx": 12473.6706,
+          "iyy": 58260.5161,
+          "izz": 68619.8356,
+          "ixy": -0.0000264273588,
+          "ixz": -1498.57014,
+          "iyz": 0.00000251272967
+        },
+        "origem": "estimativa",
+        "nota": "pela malha com densidade uniforme, no centro de massa e nos eixos da peça"
+      }
+    }
+  ],
+  "portas": [],
+  "juntas": [
+    {
+      "id": "junta-1",
+      "tipo": "rotativa",
+      "pai": "base",
+      "filho": "elo-1",
+      "acionadaPor": "motor-ombro",
+      "eixo": {
+        "valor": {
+          "ponto": [
+            0,
+            140,
+            26
+          ],
+          "direcao": [
+            0,
+            0,
+            1
+          ]
+        },
+        "origem": "medido",
+        "nota": "eixo da porta 'eixoDeSaida' de 'motorOmbro'"
+      },
+      "curso": {
+        "valor": {
+          "min": 0,
+          "max": 180
+        },
+        "origem": "declarado",
+        "nota": "conferido livre pela articulação em 2026-11-23, medido a partir do braço na horizontal; de -90 a +90 em torno do braço em pé, como a pessoa decidiu"
+      },
+      "reducao": {
+        "valor": 5,
+        "origem": "declarado",
+        "nota": "redução planetária de 5:1 do pedido inicial"
+      }
+    },
+    {
+      "id": "junta-2",
+      "tipo": "rotativa",
+      "pai": "elo-1",
+      "filho": "elo-2",
+      "acionadaPor": "motor-cotovelo",
+      "eixo": {
+        "valor": {
+          "ponto": [
+            150,
+            140,
+            -26
+          ],
+          "direcao": [
+            0,
+            0,
+            1
+          ]
+        },
+        "origem": "medido",
+        "nota": "eixo da porta 'juntaDoCotovelo' de 'elo1'"
+      },
+      "curso": {
+        "valor": {
+          "min": -100,
+          "max": 130
+        },
+        "origem": "declarado",
+        "nota": "conferido livre pela articulação em 2026-11-23: de -104 o segundo elo bate na base e de +132 no NEMA 17"
+      },
+      "reducao": {
+        "valor": 4,
+        "origem": "declarado",
+        "nota": "polias GT2 de 20 e 80 dentes do pedido inicial"
+      }
+    }
+  ],
+  "volumesLivres": []
+}

@@ -25,7 +25,8 @@ describe('a cópia dos esquemas', () => {
   });
 
   it('conhece as versões que o versoes.json lista', () => {
-    expect(VERSOES.ficha).toEqual(versoes.map((v) => v.versao));
+    /* a ficha não mudou na 1.2, e o esquema dela segue conhecendo até a 1.1 */
+    expect(versoes.map((v) => v.versao)).toEqual(expect.arrayContaining(VERSOES.ficha));
     expect(VERSOES.pedido).toEqual(versoes.map((v) => v.versao));
   });
 });

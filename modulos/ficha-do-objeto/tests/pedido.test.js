@@ -88,3 +88,26 @@ describe('responderPedido', () => {
     expect(velho.recusa).toMatch(/ficha\.revisao/);
   });
 });
+
+describe('o item componente e o pedido inicial (1.2)', () => {
+  const componente = (id, extra = {}) => ({
+    id, tipo: 'componente', componente: id, nome: id, familia: null, caixa: [10, 10, 10], massa: { valor: 5, origem: 'estimativa' }, serve: { peca: 'caixa' }, motivo, ...extra,
+  });
+  const inicial = (itens) => ({ tipo: 'pedido', versao: '1.2', objeto: 'prova', ficha: { caminho: 'prova.ficha.json', revisao: 0 }, itens });
+  const componentes = { m: { peca: 'caixa' }, f: { naoCumprido: 'a fonte não coube na caixa de 80 mm de vão' }, x: { peca: 'nao-existe' } };
+  const r = responderPedido({ pedido: inicial([componente('m'), componente('f'), componente('x'), componente('s')]), ficha, componentes });
+  it('o pedido inicial responde à primeira ficha, com a peça que representa o componente', () => {
+    expect(r.recusa).toBeUndefined();
+    expect(r.pedido.itens[0].resposta).toEqual({ estado: 'cumprido', revisaoDaFicha: 2, peca: 'caixa' });
+  });
+  it('o não cumprido diz o motivo da ponte, a peça que falta na ficha ou a falta da declaração', () => {
+    expect(r.itens.slice(1).map((i) => i.estado)).toEqual(['nao-cumprido', 'nao-cumprido', 'nao-cumprido']);
+    expect(r.itens[1].motivo).toMatch(/não coube/);
+    expect(r.itens[2].motivo).toMatch(/nao-existe/);
+    expect(r.itens[3].motivo).toMatch(/não diz que peça/);
+  });
+  it('recusa o acopla que cita item que não existe no pedido', () => {
+    const recusa = responderPedido({ pedido: inicial([componente('m', { acopla: 'z' })]), ficha, componentes });
+    expect(recusa.recusa).toMatch(/acopla/);
+  });
+});

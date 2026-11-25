@@ -2,7 +2,9 @@
 
 **Estado:** ativo
 
-**Território:** `procedural/pecas/braco-de-prova/`, `modulos/ficha-do-objeto/esquemas/`, `modulos/ficha-do-objeto/src/pedido.js`, `modulos/ficha-do-objeto/tests/pedido.test.js`, `docs/modelar/banco-de-provas/braco-de-prova-2026-11-23/`.
+**Território:** `procedural/pecas/braco-de-prova/`, `modulos/ficha-do-objeto/`, `tools/modelar/exportar-ficha.mjs`, `tools/modelar/conferir-pedido.mjs`, `docs/modelar/banco-de-provas/braco-de-prova-2026-11-23/`.
+
+Em 2026-11-25, o território ganhou o módulo da ficha inteiro e os dois comandos da ponte, porque o pedido inicial pede a regra do pedido sem ficha, a massa declarada da peça comprada e a peça que representa cada componente.
 
 Ativado pela pessoa em 2026-11-23, junto com o plano irmão da mecatrônica.
 

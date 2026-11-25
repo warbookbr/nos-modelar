@@ -1,5 +1,5 @@
 {
-  "$comment": "A cópia de referência dos esquemas da ponte mora aqui (decisão 0004). Cada versão do contrato traz o SHA-256 dos dois esquemas como estavam quando ela saiu; a última é a dos arquivos desta pasta, conferido por tools/ponte/versoes.test.mjs. O Modelar copia os esquemas byte a byte e confere a cópia contra o SHA-256 da versão que declara.",
+  "$comment": "A cópia de referência dos esquemas da ponte mora aqui (decisão 0004). Cada versão do contrato traz o SHA-256 dos dois esquemas como estavam quando ela saiu, repetido quando o esquema não mudou naquela versão; a última é a dos arquivos desta pasta, conferido por tools/ponte/versoes.test.mjs. O Modelar copia os esquemas byte a byte e confere a cópia contra o SHA-256 da versão que declara.",
   "versoes": [
     {
       "versao": "1.0",
@@ -10,6 +10,11 @@
       "versao": "1.1",
       "ficha.schema.json": "c371e178686bf1b52a2cb13a2b9acedecbff60d88db5dc342002e9a3c077aea1",
       "pedido.schema.json": "20b1186ccd6e3206ba607cbaee3b329fbf8248663d5db5f33d2b8f1a674220f0"
+    },
+    {
+      "versao": "1.2",
+      "ficha.schema.json": "c371e178686bf1b52a2cb13a2b9acedecbff60d88db5dc342002e9a3c077aea1",
+      "pedido.schema.json": "977b436b4b8e4da7d50712f57c9239d64d1e3489741b5becdb8c1e5225dfb67b"
     }
   ]
 }
