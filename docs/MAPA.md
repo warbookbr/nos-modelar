@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2357 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2358 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1036,6 +1036,7 @@
 - `derivar.js` — derivar.js — dos parâmetros do atuador (milímetro) à chamada de composição (metro).
 - `geometria.js` — geometria.js — o atuador de junta cilíndrico, em milímetro, com o eixo da junta em y.
 - `index.js` — index.js — a família `atuador-de-junta`: o atuador cilíndrico de junta de robô (carcaça com motor e redutor como volume, flange de fixação atrás, flange de s…
+- `servo.js` — servo.js — o atuador de caixa (forma 2, o servo de robô pequeno), em milímetro, com o eixo da saída em y.
 - `tabela.js` — tabela.js — os atuadores de junta cilíndricos, por diâmetro da carcaça, em milímetro. Não há norma pública de atuador de robô; os tamanhos são regra da famíl…
 
 ## procedural/familias/cadeira/

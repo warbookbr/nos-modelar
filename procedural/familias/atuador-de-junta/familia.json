@@ -4,6 +4,14 @@
   "versao": "1.0.0",
   "nivel": "componente",
   "parametros": {
+    "forma": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 1,
+      "minimo": 1,
+      "maximo": 2,
+      "medio": 2
+    },
     "diametro": {
       "tipo": "numero",
       "unidade": "mm",
@@ -115,48 +123,171 @@
       "minimo": 0.3,
       "maximo": 5,
       "medio": 2.4
+    },
+    "comprimentoDaCaixa": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 40,
+      "minimo": 15,
+      "maximo": 120,
+      "medio": 40
+    },
+    "larguraDaCaixa": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 20,
+      "minimo": 8,
+      "maximo": 60,
+      "medio": 20
+    },
+    "alturaDaCaixa": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 38,
+      "minimo": 15,
+      "maximo": 110,
+      "medio": 38
+    },
+    "abaDeFixacao": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 7,
+      "minimo": 3,
+      "maximo": 16,
+      "medio": 7
+    },
+    "espessuraDaAba": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 2.5,
+      "minimo": 1,
+      "maximo": 6,
+      "medio": 2.5
+    },
+    "alturaDaAba": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 27,
+      "minimo": 8,
+      "maximo": 80,
+      "medio": 27
+    },
+    "diametroDoFuroDaAba": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 4.2,
+      "minimo": 1.5,
+      "maximo": 9,
+      "medio": 4.2
+    },
+    "distanciaDosFurosDaAba": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 10,
+      "minimo": 3,
+      "maximo": 40,
+      "medio": 10
+    },
+    "diametroDoHorn": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 20,
+      "minimo": 6,
+      "maximo": 60,
+      "medio": 20
+    },
+    "espessuraDoHorn": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 3,
+      "minimo": 1,
+      "maximo": 8,
+      "medio": 3
+    },
+    "deslocamentoDoEixo": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 10,
+      "minimo": 0,
+      "maximo": 40,
+      "medio": 10
     }
   },
   "restricoes": [
     {
       "id": "flange-maior-que-o-corpo",
-      "expressao": "diametro + 2 * diametroDoFuroDoFlange + 4 - diametroDoFlange <= 0",
-      "motivo": "a flange de fixação precisa passar do corpo o bastante para os furos"
+      "expressao": "max(0, 2 - forma) * (diametro + 2 * diametroDoFuroDoFlange + 4 - diametroDoFlange) <= 0",
+      "motivo": "no cilíndrico (forma 1), a flange de fixação precisa passar do corpo o bastante para os furos"
     },
     {
       "id": "furos-do-flange-fora-do-corpo",
-      "expressao": "diametro / 2 + diametroDoFuroDoFlange / 2 + 1 - circuloDoFlange / 2 <= 0",
-      "motivo": "os furos da flange de fixação caem dentro do corpo"
+      "expressao": "max(0, 2 - forma) * (diametro / 2 + diametroDoFuroDoFlange / 2 + 1 - circuloDoFlange / 2) <= 0",
+      "motivo": "no cilíndrico (forma 1), os furos da flange de fixação caem dentro do corpo"
     },
     {
       "id": "furos-do-flange-dentro-dela",
-      "expressao": "circuloDoFlange / 2 + diametroDoFuroDoFlange / 2 + 1 - diametroDoFlange / 2 <= 0",
-      "motivo": "os furos passam da borda da flange de fixação"
+      "expressao": "max(0, 2 - forma) * (circuloDoFlange / 2 + diametroDoFuroDoFlange / 2 + 1 - diametroDoFlange / 2) <= 0",
+      "motivo": "no cilíndrico (forma 1), os furos passam da borda da flange de fixação"
     },
     {
       "id": "saida-dentro-do-corpo",
-      "expressao": "diametroDaSaida / 2 + chanfro + 1 - diametro / 2 <= 0",
-      "motivo": "a flange de saída passa da face da frente da carcaça"
+      "expressao": "max(0, 2 - forma) * (diametroDaSaida / 2 + chanfro + 1 - diametro / 2) <= 0",
+      "motivo": "no cilíndrico (forma 1), a flange de saída passa da face da frente da carcaça"
     },
     {
       "id": "furos-da-saida-dentro-dela",
-      "expressao": "circuloDaSaida / 2 + diametroDoFuroDaSaida / 2 + chanfro + 0.5 - diametroDaSaida / 2 <= 0",
-      "motivo": "os furos passam da borda da flange de saída"
+      "expressao": "max(0, 2 - forma) * (circuloDaSaida / 2 + diametroDoFuroDaSaida / 2 + chanfro + 0.5 - diametroDaSaida / 2) <= 0",
+      "motivo": "no cilíndrico (forma 1), os furos passam da borda da flange de saída"
     },
     {
       "id": "chanfro-cabe-no-flange",
-      "expressao": "2 * chanfro + 1 - espessuraDoFlange <= 0",
-      "motivo": "o chanfro passa da metade da espessura da flange"
+      "expressao": "max(0, 2 - forma) * (2 * chanfro + 1 - espessuraDoFlange) <= 0",
+      "motivo": "no cilíndrico (forma 1), o chanfro passa da metade da espessura da flange"
     },
     {
       "id": "chanfro-cabe-na-saida",
-      "expressao": "2 * chanfro + 1 - espessuraDaSaida <= 0",
-      "motivo": "o chanfro passa da metade da espessura da saída"
+      "expressao": "max(0, 2 - forma) * (2 * chanfro + 1 - espessuraDaSaida) <= 0",
+      "motivo": "no cilíndrico (forma 1), o chanfro passa da metade da espessura da saída"
     },
     {
       "id": "corpo-mais-longo-que-o-flange",
-      "expressao": "espessuraDoFlange + diametroDoCabo + 4 - comprimento <= 0",
-      "motivo": "o corpo precisa passar da flange o bastante para a saída do cabo"
+      "expressao": "max(0, 2 - forma) * (espessuraDoFlange + diametroDoCabo + 4 - comprimento) <= 0",
+      "motivo": "no cilíndrico (forma 1), o corpo precisa passar da flange o bastante para a saída do cabo"
+    },
+    {
+      "id": "aba-abaixo-do-topo",
+      "expressao": "max(0, forma - 1) * (alturaDaAba + espessuraDaAba + 1 - alturaDaCaixa) <= 0",
+      "motivo": "no de caixa (forma 2), as orelhas de fixação passam do topo da caixa"
+    },
+    {
+      "id": "cabo-abaixo-da-aba",
+      "expressao": "max(0, forma - 1) * (0.25 * alturaDaCaixa + 0.12 * larguraDaCaixa + 1 - alturaDaAba) <= 0",
+      "motivo": "no de caixa (forma 2), a saída do cabo encosta nas orelhas de fixação"
+    },
+    {
+      "id": "furo-cabe-na-aba",
+      "expressao": "max(0, forma - 1) * (diametroDoFuroDaAba + 1 - abaDeFixacao) <= 0",
+      "motivo": "no de caixa (forma 2), o furo da orelha passa da largura dela"
+    },
+    {
+      "id": "furos-da-aba-dentro-dela",
+      "expressao": "max(0, forma - 1) * (distanciaDosFurosDaAba + diametroDoFuroDaAba + 1 - larguraDaCaixa) <= 0",
+      "motivo": "no de caixa (forma 2), os furos das orelhas passam da borda delas"
+    },
+    {
+      "id": "furos-da-aba-separados",
+      "expressao": "max(0, forma - 1) * (diametroDoFuroDaAba + 1 - distanciaDosFurosDaAba) <= 0",
+      "motivo": "no de caixa (forma 2), os dois furos de cada orelha se juntam"
+    },
+    {
+      "id": "torre-dentro-da-caixa",
+      "expressao": "max(0, forma - 1) * (deslocamentoDoEixo + 0.25 * larguraDaCaixa + 1 - comprimentoDaCaixa / 2) <= 0",
+      "motivo": "no de caixa (forma 2), a torre do eixo passa da ponta da caixa"
+    },
+    {
+      "id": "horn-maior-que-a-torre",
+      "expressao": "max(0, forma - 1) * (0.5 * larguraDaCaixa + 2 - diametroDoHorn) <= 0",
+      "motivo": "no de caixa (forma 2), o horn precisa cobrir a torre do eixo"
     }
   ],
   "portas": [
@@ -177,13 +308,15 @@
   ],
   "perguntas": {
     "articula": [
-      "O atuador tem a carcaça com a flange de fixação atrás, a saída do cabo de lado e a flange de saída que gira na frente, com os furos em círculo e as bordas chanfradas?"
+      "O atuador tem a carcaça com a flange de fixação atrás, a saída do cabo de lado e a flange de saída que gira na frente, com os furos em círculo e as bordas chanfradas?",
+      "O servo tem a caixa com as orelhas de fixação furadas, a torre do eixo deslocada para uma ponta, o cabo na outra e o horn redondo com quatro furos em cima?"
     ]
   },
   "perfis": {
     "atuador-40": {
       "descricao": "atuador de junta cilíndrico de 40 mm",
       "parametros": {
+        "forma": 1,
         "diametro": 40,
         "comprimento": 32,
         "diametroDoFlange": 52,
@@ -203,6 +336,7 @@
     "atuador-60": {
       "descricao": "atuador de junta cilíndrico de 60 mm",
       "parametros": {
+        "forma": 1,
         "diametro": 60,
         "comprimento": 45,
         "diametroDoFlange": 76,
@@ -222,6 +356,7 @@
     "atuador-80": {
       "descricao": "atuador de junta cilíndrico de 80 mm",
       "parametros": {
+        "forma": 1,
         "diametro": 80,
         "comprimento": 55,
         "diametroDoFlange": 100,
@@ -241,6 +376,7 @@
     "atuador-100": {
       "descricao": "atuador de junta cilíndrico de 100 mm",
       "parametros": {
+        "forma": 1,
         "diametro": 100,
         "comprimento": 65,
         "diametroDoFlange": 124,
@@ -260,6 +396,7 @@
     "atuador-120": {
       "descricao": "atuador de junta cilíndrico de 120 mm",
       "parametros": {
+        "forma": 1,
         "diametro": 120,
         "comprimento": 75,
         "diametroDoFlange": 148,
@@ -274,6 +411,57 @@
         "diametroDoFuroDaSaida": 5,
         "diametroDoCabo": 14,
         "chanfro": 3.6
+      }
+    },
+    "servo-pequeno": {
+      "descricao": "atuador de caixa, servo pequeno",
+      "parametros": {
+        "forma": 2,
+        "comprimentoDaCaixa": 23,
+        "larguraDaCaixa": 12.5,
+        "alturaDaCaixa": 22,
+        "abaDeFixacao": 5,
+        "espessuraDaAba": 2,
+        "alturaDaAba": 15.5,
+        "diametroDoFuroDaAba": 2,
+        "distanciaDosFurosDaAba": 5,
+        "diametroDoHorn": 10,
+        "espessuraDoHorn": 2,
+        "deslocamentoDoEixo": 6
+      }
+    },
+    "servo-medio": {
+      "descricao": "atuador de caixa, servo médio",
+      "parametros": {
+        "forma": 2,
+        "comprimentoDaCaixa": 40,
+        "larguraDaCaixa": 20,
+        "alturaDaCaixa": 38,
+        "abaDeFixacao": 7,
+        "espessuraDaAba": 2.5,
+        "alturaDaAba": 27,
+        "diametroDoFuroDaAba": 4.2,
+        "distanciaDosFurosDaAba": 10,
+        "diametroDoHorn": 20,
+        "espessuraDoHorn": 3,
+        "deslocamentoDoEixo": 10
+      }
+    },
+    "servo-grande": {
+      "descricao": "atuador de caixa, servo grande",
+      "parametros": {
+        "forma": 2,
+        "comprimentoDaCaixa": 60,
+        "larguraDaCaixa": 30,
+        "alturaDaCaixa": 52,
+        "abaDeFixacao": 9,
+        "espessuraDaAba": 3,
+        "alturaDaAba": 37,
+        "diametroDoFuroDaAba": 5.5,
+        "distanciaDosFurosDaAba": 16,
+        "diametroDoHorn": 28,
+        "espessuraDoHorn": 4,
+        "deslocamentoDoEixo": 15
       }
     }
   }

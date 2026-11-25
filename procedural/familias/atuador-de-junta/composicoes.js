@@ -4,14 +4,14 @@
    e o da flange de saída, na frente. */
 import { FORMATO_COMPOSICAO_PROCEDURAL } from '../../nucleo/entrada.js';
 
-export const ID_POR_FORMA = Object.freeze({ 1: 'atuador-de-junta.cilindrico' });
+export const ID_POR_FORMA = Object.freeze({ 1: 'atuador-de-junta.cilindrico', 2: 'atuador-de-junta.caixa' });
 const p = (nome) => ({ parametro: nome });
 const lista = (prefixo, n) => Array.from({ length: n }, (_, k) => [p(`${prefixo}r${k}`), p(`${prefixo}y${k}`)]);
 const nomes = (prefixo, n) => Array.from({ length: n }, (_, k) => [[`${prefixo}r${k}`, 'numero'], [`${prefixo}y${k}`, 'numero']]).flat();
 const o = (op, id) => ({ origem: { op, id } });
 const FURO_F = { op: 'lathe', id: 13 }; const FURO_S = { op: 'lathe', id: 21 };
 
-export const COMPOSICOES = Object.freeze([Object.freeze({
+const CILINDRICO = Object.freeze({
   formato: FORMATO_COMPOSICAO_PROCEDURAL, id: ID_POR_FORMA[1], versao: '1.0.0',
   parametros: Object.fromEntries([
     ...nomes('c', 8), ...nomes('s', 5), ...nomes('k', 4), ...nomes('ff', 4), ...nomes('fs', 4),
@@ -35,4 +35,39 @@ export const COMPOSICOES = Object.freeze([Object.freeze({
     { id: 'porta-fixacao', operacao: 'publicarPorta', argumentos: { id: 'fixacao', de: { op: 'subtrair', id: 15 }, interface: { forma: 'padraoFuros', papel: 'recebe', plano: { ponto: [0, 0, 0], normal: [0, -1, 0] }, diametro: p('diametroF'), padrao: { tipo: 'circular', centro: [0, 0, 0], raio: p('raioF'), quantidade: p('furosF'), anguloInicial: p('anguloF') } } } },
     { id: 'porta-saida', operacao: 'publicarPorta', argumentos: { id: 'saida', de: { op: 'subtrair', id: 23 }, interface: { forma: 'padraoFuros', papel: 'recebe', plano: { ponto: p('topo'), normal: [0, 1, 0] }, diametro: p('diametroS'), padrao: { tipo: 'circular', centro: p('topo'), raio: p('raioS'), quantidade: p('furosS'), anguloInicial: p('anguloS') } } } },
   ],
-})]);
+});
+
+/* a forma 2, de caixa: a caixa e as orelhas por `extrusao` em y, unidas à torre e ao cabo (`lathe`), menos os quatro furos
+   das orelhas; o horn por `lathe`, menos o furo cego repetido por `arranja` radial em volta do eixo */
+const ret = (prefixo) => ({ retangulo: { largura: p(`${prefixo}Largura`), profundidade: p(`${prefixo}Profundidade`), cantos: p(`${prefixo}Cantos`) } });
+const FURO_H = { op: 'lathe', id: 41 };
+const CAIXA = Object.freeze({
+  formato: FORMATO_COMPOSICAO_PROCEDURAL, id: ID_POR_FORMA[2], versao: '1.0.0',
+  parametros: Object.fromEntries([
+    ...['caixa', 'aba'].flatMap((n) => [[`${n}Largura`, 'numero'], [`${n}Profundidade`, 'numero'], [`${n}Cantos`, 'numero'], [`${n}Altura`, 'numero'], [`${n}Em`, 'vetor3']]),
+    ...nomes('t', 4), ...nomes('k', 4), ...nomes('h', 4), ...nomes('fh', 4), ...nomes('fa', 4),
+    ['emTorre', 'vetor3'], ['emCabo', 'vetor3'], ['emHorn', 'vetor3'], ['emFuroH', 'vetor3'], ['emFuroA0', 'vetor3'], ['emFuroA1', 'vetor3'], ['emFuroA2', 'vetor3'], ['emFuroA3', 'vetor3'],
+    ['pivoH', 'vetor3'], ['diametroA', 'numero'], ['planoA', 'vetor3'], ['centroA0', 'vetor3'], ['centroA1', 'vetor3'], ['centroA2', 'vetor3'], ['centroA3', 'vetor3'],
+    ['diametroH', 'numero'], ['raioH', 'numero'], ['topo', 'vetor3'],
+  ].map(([n, t]) => [n, { tipo: t }])),
+  artefatos: { entra: [], sai: ['mecanifica.malha-poligonal@1', 'mecanifica.parte@1', 'mecanifica.porta@1'] },
+  nos: [
+    { id: 'caixa', operacao: 'extrusao', argumentos: { origemId: 30, perfil: ret('caixa'), altura: p('caixaAltura'), em: p('caixaEm'), segmentosArco: 6 } },
+    { id: 'aba', operacao: 'extrusao', argumentos: { origemId: 31, perfil: ret('aba'), altura: p('abaAltura'), em: p('abaEm'), segmentosArco: 6 } },
+    { id: 'torre', operacao: 'lathe', argumentos: { origemId: 32, lados: 48, perfil: lista('t', 4), em: p('emTorre') } },
+    { id: 'cabo', operacao: 'lathe', argumentos: { origemId: 33, lados: 24, eixo: 'x', perfil: lista('k', 4), em: p('emCabo') } },
+    { id: 'caixa-inteira', operacao: 'unir', argumentos: { origemId: 34, solidos: [o('extrusao', 30), o('extrusao', 31), o('lathe', 32), o('lathe', 33)] } },
+    ...[0, 1, 2, 3].map((k) => ({ id: `furo-da-aba-${k}`, operacao: 'lathe', argumentos: { origemId: 35 + k, lados: 20, perfil: lista('fa', 4), em: p(`emFuroA${k}`) } })),
+    { id: 'caixa-furada', operacao: 'subtrair', argumentos: { origemId: 39, solidos: [o('unir', 34), o('lathe', 35), o('lathe', 36), o('lathe', 37), o('lathe', 38)] } },
+    { id: 'horn', operacao: 'lathe', argumentos: { origemId: 40, lados: 64, perfil: lista('h', 4), em: p('emHorn') } },
+    { id: 'furo-do-horn', operacao: 'lathe', argumentos: { origemId: 41, lados: 16, perfil: lista('fh', 4), em: p('emFuroH') } },
+    { id: 'furos-do-horn', operacao: 'arranja', argumentos: { modo: 'radial', total: 4, graus: 90, eixo: 'y', pivo: p('pivoH'), origemId: 42, derivaDe: FURO_H, sel: { origem: FURO_H } } },
+    { id: 'horn-furado', operacao: 'subtrair', argumentos: { origemId: 43, solidos: [o('lathe', 40), { origem: FURO_H }, { origem: { op: 'arranja', id: 42, de: FURO_H } }] } },
+    { id: 'parte-carcaca', operacao: 'parte', argumentos: { nome: 'carcaca', sel: o('subtrair', 39) } },
+    { id: 'parte-saida', operacao: 'parte', argumentos: { nome: 'saida', sel: o('subtrair', 43) } },
+    { id: 'porta-fixacao', operacao: 'publicarPorta', argumentos: { id: 'fixacao', de: { op: 'subtrair', id: 39 }, interface: { forma: 'padraoFuros', papel: 'recebe', plano: { ponto: p('planoA'), normal: [0, -1, 0] }, diametro: p('diametroA'), centros: [p('centroA0'), p('centroA1'), p('centroA2'), p('centroA3')] } } },
+    { id: 'porta-saida', operacao: 'publicarPorta', argumentos: { id: 'saida', de: { op: 'subtrair', id: 43 }, interface: { forma: 'padraoFuros', papel: 'recebe', plano: { ponto: p('topo'), normal: [0, 1, 0] }, diametro: p('diametroH'), padrao: { tipo: 'circular', centro: p('topo'), raio: p('raioH'), quantidade: 4, anguloInicial: -90 } } } },
+  ],
+});
+
+export const COMPOSICOES = Object.freeze([CILINDRICO, CAIXA]);

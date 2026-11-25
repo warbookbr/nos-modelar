@@ -7,67 +7,103 @@
     "pontos": {
       "minimo": {
         "parametros": {
+          "abaDeFixacao": 3,
+          "alturaDaAba": 8,
+          "alturaDaCaixa": 15,
           "chanfro": 0.3,
           "circuloDaSaida": 12,
           "circuloDoFlange": 36,
           "comprimento": 20,
+          "comprimentoDaCaixa": 15,
+          "deslocamentoDoEixo": 0,
           "diametro": 30,
           "diametroDaSaida": 18,
           "diametroDoCabo": 4,
           "diametroDoFlange": 40,
+          "diametroDoFuroDaAba": 1.5,
           "diametroDoFuroDaSaida": 1.5,
           "diametroDoFuroDoFlange": 2,
+          "diametroDoHorn": 6,
+          "distanciaDosFurosDaAba": 3,
+          "espessuraDaAba": 1,
           "espessuraDaSaida": 3,
           "espessuraDoFlange": 3,
+          "espessuraDoHorn": 1,
+          "forma": 1,
           "furosDaSaida": 4,
-          "furosDoFlange": 4
+          "furosDoFlange": 4,
+          "larguraDaCaixa": 8
         },
         "hash": "sha256:fa243cc6a32965acc36e2362c6efeb17e2505a3d54e00bc058db93679bc6e21c",
         "medidas": []
       },
       "medio": {
         "parametros": {
+          "abaDeFixacao": 7,
+          "alturaDaAba": 27,
+          "alturaDaCaixa": 38,
           "chanfro": 2.4,
           "circuloDaSaida": 35,
           "circuloDoFlange": 90,
           "comprimento": 55,
+          "comprimentoDaCaixa": 40,
+          "deslocamentoDoEixo": 10,
           "diametro": 80,
           "diametroDaSaida": 50,
           "diametroDoCabo": 10,
           "diametroDoFlange": 100,
+          "diametroDoFuroDaAba": 4.2,
           "diametroDoFuroDaSaida": 3.3,
           "diametroDoFuroDoFlange": 4.5,
+          "diametroDoHorn": 20,
+          "distanciaDosFurosDaAba": 10,
+          "espessuraDaAba": 2.5,
           "espessuraDaSaida": 7,
           "espessuraDoFlange": 8,
+          "espessuraDoHorn": 3,
+          "forma": 2,
           "furosDaSaida": 8,
-          "furosDoFlange": 8
+          "furosDoFlange": 8,
+          "larguraDaCaixa": 20
         },
-        "hash": "sha256:1e19ac3fa9f98b9dc5c482c1475e7d8cd98332b525952232756303968489d185",
+        "hash": "sha256:aed5df9f858e8638afe908da459b2db50c63d433d3c835df82dc8ad03081dbdb",
         "medidas": []
       },
       "maximo": {
         "parametros": {
+          "abaDeFixacao": 16,
+          "alturaDaAba": 80,
+          "alturaDaCaixa": 110,
           "chanfro": 5,
           "circuloDaSaida": 70,
           "circuloDoFlange": 180,
           "comprimento": 120,
+          "comprimentoDaCaixa": 120,
+          "deslocamentoDoEixo": 40,
           "diametro": 160,
           "diametroDaSaida": 100,
           "diametroDoCabo": 20,
           "diametroDoFlange": 200,
+          "diametroDoFuroDaAba": 9,
           "diametroDoFuroDaSaida": 7,
           "diametroDoFuroDoFlange": 9,
+          "diametroDoHorn": 60,
+          "distanciaDosFurosDaAba": 40,
+          "espessuraDaAba": 6,
           "espessuraDaSaida": 12,
           "espessuraDoFlange": 16,
+          "espessuraDoHorn": 8,
+          "forma": 2,
           "furosDaSaida": 16,
-          "furosDoFlange": 16
+          "furosDoFlange": 16,
+          "larguraDaCaixa": 60
         },
-        "hash": "sha256:eeb5b7e6654f42743fc55aafb5efa3f2e235ada4f6dcde00aadb685b9bec5bdc",
+        "hash": "sha256:6197ba48ab6de3cc392ae7a9723193e41ae7ecd48d380d44d6fceba7eea64dc9",
         "medidas": []
       }
     },
     "varredura": {
-      "sondas": 28,
+      "sondas": 52,
       "recusasDeclaradas": [
         {
           "ponto": "chanfro=5",
@@ -130,107 +166,263 @@
     "perfis": {
       "atuador-100": {
         "parametros": {
+          "abaDeFixacao": 7,
+          "alturaDaAba": 27,
+          "alturaDaCaixa": 38,
           "chanfro": 3,
           "circuloDaSaida": 43.4,
           "circuloDoFlange": 112,
           "comprimento": 65,
+          "comprimentoDaCaixa": 40,
+          "deslocamentoDoEixo": 10,
           "diametro": 100,
           "diametroDaSaida": 62,
           "diametroDoCabo": 12,
           "diametroDoFlange": 124,
+          "diametroDoFuroDaAba": 4.2,
           "diametroDoFuroDaSaida": 4.2,
           "diametroDoFuroDoFlange": 5.5,
+          "diametroDoHorn": 20,
+          "distanciaDosFurosDaAba": 10,
+          "espessuraDaAba": 2.5,
           "espessuraDaSaida": 8,
           "espessuraDoFlange": 10,
+          "espessuraDoHorn": 3,
+          "forma": 1,
           "furosDaSaida": 8,
-          "furosDoFlange": 8
+          "furosDoFlange": 8,
+          "larguraDaCaixa": 20
         },
         "hash": "sha256:cd82982b7c3db257b908960ae942a63746638c7bec920c8074013671bf2363cd",
         "medidas": []
       },
       "atuador-120": {
         "parametros": {
+          "abaDeFixacao": 7,
+          "alturaDaAba": 27,
+          "alturaDaCaixa": 38,
           "chanfro": 3.6,
           "circuloDaSaida": 51.8,
           "circuloDoFlange": 134,
           "comprimento": 75,
+          "comprimentoDaCaixa": 40,
+          "deslocamentoDoEixo": 10,
           "diametro": 120,
           "diametroDaSaida": 74,
           "diametroDoCabo": 14,
           "diametroDoFlange": 148,
+          "diametroDoFuroDaAba": 4.2,
           "diametroDoFuroDaSaida": 5,
           "diametroDoFuroDoFlange": 6.6,
+          "diametroDoHorn": 20,
+          "distanciaDosFurosDaAba": 10,
+          "espessuraDaAba": 2.5,
           "espessuraDaSaida": 9,
           "espessuraDoFlange": 12,
+          "espessuraDoHorn": 3,
+          "forma": 1,
           "furosDaSaida": 12,
-          "furosDoFlange": 12
+          "furosDoFlange": 12,
+          "larguraDaCaixa": 20
         },
         "hash": "sha256:14de48dd6a9e572a31d922604a6dafcdc301645ddcd3365e5aece176854dcbac",
         "medidas": []
       },
       "atuador-40": {
         "parametros": {
+          "abaDeFixacao": 7,
+          "alturaDaAba": 27,
+          "alturaDaCaixa": 38,
           "chanfro": 1.2,
           "circuloDaSaida": 18.2,
           "circuloDoFlange": 46,
           "comprimento": 32,
+          "comprimentoDaCaixa": 40,
+          "deslocamentoDoEixo": 10,
           "diametro": 40,
           "diametroDaSaida": 26,
           "diametroDoCabo": 6,
           "diametroDoFlange": 52,
+          "diametroDoFuroDaAba": 4.2,
           "diametroDoFuroDaSaida": 2.5,
           "diametroDoFuroDoFlange": 3.4,
+          "diametroDoHorn": 20,
+          "distanciaDosFurosDaAba": 10,
+          "espessuraDaAba": 2.5,
           "espessuraDaSaida": 4,
           "espessuraDoFlange": 5,
+          "espessuraDoHorn": 3,
+          "forma": 1,
           "furosDaSaida": 4,
-          "furosDoFlange": 4
+          "furosDoFlange": 4,
+          "larguraDaCaixa": 20
         },
         "hash": "sha256:0eeadab36f056bb8057512eafcb8dd65d152f93e1c94fc86b07bfea6ae30d196",
         "medidas": []
       },
       "atuador-60": {
         "parametros": {
+          "abaDeFixacao": 7,
+          "alturaDaAba": 27,
+          "alturaDaCaixa": 38,
           "chanfro": 1.8,
           "circuloDaSaida": 26.599999999999998,
           "circuloDoFlange": 68,
           "comprimento": 45,
+          "comprimentoDaCaixa": 40,
+          "deslocamentoDoEixo": 10,
           "diametro": 60,
           "diametroDaSaida": 38,
           "diametroDoCabo": 8,
           "diametroDoFlange": 76,
+          "diametroDoFuroDaAba": 4.2,
           "diametroDoFuroDaSaida": 2.5,
           "diametroDoFuroDoFlange": 3.4,
+          "diametroDoHorn": 20,
+          "distanciaDosFurosDaAba": 10,
+          "espessuraDaAba": 2.5,
           "espessuraDaSaida": 6,
           "espessuraDoFlange": 7,
+          "espessuraDoHorn": 3,
+          "forma": 1,
           "furosDaSaida": 6,
-          "furosDoFlange": 6
+          "furosDoFlange": 6,
+          "larguraDaCaixa": 20
         },
         "hash": "sha256:68ccbde7fa730af43ebff03676c8aea9990c3d9a57c688d8104176596e806957",
         "medidas": []
       },
       "atuador-80": {
         "parametros": {
+          "abaDeFixacao": 7,
+          "alturaDaAba": 27,
+          "alturaDaCaixa": 38,
           "chanfro": 2.4,
           "circuloDaSaida": 35,
           "circuloDoFlange": 90,
           "comprimento": 55,
+          "comprimentoDaCaixa": 40,
+          "deslocamentoDoEixo": 10,
           "diametro": 80,
           "diametroDaSaida": 50,
           "diametroDoCabo": 10,
           "diametroDoFlange": 100,
+          "diametroDoFuroDaAba": 4.2,
           "diametroDoFuroDaSaida": 3.3,
           "diametroDoFuroDoFlange": 4.5,
+          "diametroDoHorn": 20,
+          "distanciaDosFurosDaAba": 10,
+          "espessuraDaAba": 2.5,
           "espessuraDaSaida": 7,
           "espessuraDoFlange": 8,
+          "espessuraDoHorn": 3,
+          "forma": 1,
           "furosDaSaida": 8,
-          "furosDoFlange": 8
+          "furosDoFlange": 8,
+          "larguraDaCaixa": 20
         },
         "hash": "sha256:1e19ac3fa9f98b9dc5c482c1475e7d8cd98332b525952232756303968489d185",
+        "medidas": []
+      },
+      "servo-grande": {
+        "parametros": {
+          "abaDeFixacao": 9,
+          "alturaDaAba": 37,
+          "alturaDaCaixa": 52,
+          "chanfro": 1.8,
+          "circuloDaSaida": 26.6,
+          "circuloDoFlange": 68,
+          "comprimento": 45,
+          "comprimentoDaCaixa": 60,
+          "deslocamentoDoEixo": 15,
+          "diametro": 60,
+          "diametroDaSaida": 38,
+          "diametroDoCabo": 8,
+          "diametroDoFlange": 76,
+          "diametroDoFuroDaAba": 5.5,
+          "diametroDoFuroDaSaida": 2.5,
+          "diametroDoFuroDoFlange": 3.4,
+          "diametroDoHorn": 28,
+          "distanciaDosFurosDaAba": 16,
+          "espessuraDaAba": 3,
+          "espessuraDaSaida": 6,
+          "espessuraDoFlange": 7,
+          "espessuraDoHorn": 4,
+          "forma": 2,
+          "furosDaSaida": 6,
+          "furosDoFlange": 6,
+          "larguraDaCaixa": 30
+        },
+        "hash": "sha256:5ec30a64ae565c00b69d864309bda7dccf69297602b8697c18e1796663f46c38",
+        "medidas": []
+      },
+      "servo-medio": {
+        "parametros": {
+          "abaDeFixacao": 7,
+          "alturaDaAba": 27,
+          "alturaDaCaixa": 38,
+          "chanfro": 1.8,
+          "circuloDaSaida": 26.6,
+          "circuloDoFlange": 68,
+          "comprimento": 45,
+          "comprimentoDaCaixa": 40,
+          "deslocamentoDoEixo": 10,
+          "diametro": 60,
+          "diametroDaSaida": 38,
+          "diametroDoCabo": 8,
+          "diametroDoFlange": 76,
+          "diametroDoFuroDaAba": 4.2,
+          "diametroDoFuroDaSaida": 2.5,
+          "diametroDoFuroDoFlange": 3.4,
+          "diametroDoHorn": 20,
+          "distanciaDosFurosDaAba": 10,
+          "espessuraDaAba": 2.5,
+          "espessuraDaSaida": 6,
+          "espessuraDoFlange": 7,
+          "espessuraDoHorn": 3,
+          "forma": 2,
+          "furosDaSaida": 6,
+          "furosDoFlange": 6,
+          "larguraDaCaixa": 20
+        },
+        "hash": "sha256:aed5df9f858e8638afe908da459b2db50c63d433d3c835df82dc8ad03081dbdb",
+        "medidas": []
+      },
+      "servo-pequeno": {
+        "parametros": {
+          "abaDeFixacao": 5,
+          "alturaDaAba": 15.5,
+          "alturaDaCaixa": 22,
+          "chanfro": 1.8,
+          "circuloDaSaida": 26.6,
+          "circuloDoFlange": 68,
+          "comprimento": 45,
+          "comprimentoDaCaixa": 23,
+          "deslocamentoDoEixo": 6,
+          "diametro": 60,
+          "diametroDaSaida": 38,
+          "diametroDoCabo": 8,
+          "diametroDoFlange": 76,
+          "diametroDoFuroDaAba": 2,
+          "diametroDoFuroDaSaida": 2.5,
+          "diametroDoFuroDoFlange": 3.4,
+          "diametroDoHorn": 10,
+          "distanciaDosFurosDaAba": 5,
+          "espessuraDaAba": 2,
+          "espessuraDaSaida": 6,
+          "espessuraDoFlange": 7,
+          "espessuraDoHorn": 2,
+          "forma": 2,
+          "furosDaSaida": 6,
+          "furosDoFlange": 6,
+          "larguraDaCaixa": 12.5
+        },
+        "hash": "sha256:548ab37f0fa6b93109fc1bd916b91e0df074f99152cd42b8bfaf3021967c44b0",
         "medidas": []
       }
     },
     "escalasDosPerfis": {
-      "sondas": 120,
+      "sondas": 368,
       "recusasDeclaradas": [
         {
           "ponto": "atuador-100: chanfro=5",
@@ -479,6 +671,146 @@
         {
           "ponto": "atuador-80: espessuraDoFlange=3",
           "restricao": "chanfro-cabe-no-flange"
+        },
+        {
+          "ponto": "servo-grande: abaDeFixacao=3",
+          "restricao": "furo-cabe-na-aba"
+        },
+        {
+          "ponto": "servo-grande: alturaDaAba=8",
+          "restricao": "cabo-abaixo-da-aba"
+        },
+        {
+          "ponto": "servo-grande: alturaDaAba=80",
+          "restricao": "aba-abaixo-do-topo"
+        },
+        {
+          "ponto": "servo-grande: alturaDaCaixa=15",
+          "restricao": "aba-abaixo-do-topo"
+        },
+        {
+          "ponto": "servo-grande: comprimentoDaCaixa=15",
+          "restricao": "torre-dentro-da-caixa"
+        },
+        {
+          "ponto": "servo-grande: deslocamentoDoEixo=40",
+          "restricao": "torre-dentro-da-caixa"
+        },
+        {
+          "ponto": "servo-grande: diametroDoFuroDaAba=9",
+          "restricao": "furo-cabe-na-aba"
+        },
+        {
+          "ponto": "servo-grande: diametroDoHorn=6",
+          "restricao": "horn-maior-que-a-torre"
+        },
+        {
+          "ponto": "servo-grande: distanciaDosFurosDaAba=3",
+          "restricao": "furos-da-aba-separados"
+        },
+        {
+          "ponto": "servo-grande: distanciaDosFurosDaAba=40",
+          "restricao": "furos-da-aba-dentro-dela"
+        },
+        {
+          "ponto": "servo-grande: larguraDaCaixa=8",
+          "restricao": "furos-da-aba-dentro-dela"
+        },
+        {
+          "ponto": "servo-grande: larguraDaCaixa=60",
+          "restricao": "horn-maior-que-a-torre"
+        },
+        {
+          "ponto": "servo-medio: abaDeFixacao=3",
+          "restricao": "furo-cabe-na-aba"
+        },
+        {
+          "ponto": "servo-medio: alturaDaAba=8",
+          "restricao": "cabo-abaixo-da-aba"
+        },
+        {
+          "ponto": "servo-medio: alturaDaAba=80",
+          "restricao": "aba-abaixo-do-topo"
+        },
+        {
+          "ponto": "servo-medio: alturaDaCaixa=15",
+          "restricao": "aba-abaixo-do-topo"
+        },
+        {
+          "ponto": "servo-medio: alturaDaCaixa=110",
+          "restricao": "cabo-abaixo-da-aba"
+        },
+        {
+          "ponto": "servo-medio: comprimentoDaCaixa=15",
+          "restricao": "torre-dentro-da-caixa"
+        },
+        {
+          "ponto": "servo-medio: deslocamentoDoEixo=40",
+          "restricao": "torre-dentro-da-caixa"
+        },
+        {
+          "ponto": "servo-medio: diametroDoFuroDaAba=9",
+          "restricao": "furo-cabe-na-aba"
+        },
+        {
+          "ponto": "servo-medio: diametroDoHorn=6",
+          "restricao": "horn-maior-que-a-torre"
+        },
+        {
+          "ponto": "servo-medio: distanciaDosFurosDaAba=3",
+          "restricao": "furos-da-aba-separados"
+        },
+        {
+          "ponto": "servo-medio: distanciaDosFurosDaAba=40",
+          "restricao": "furos-da-aba-dentro-dela"
+        },
+        {
+          "ponto": "servo-medio: larguraDaCaixa=8",
+          "restricao": "furos-da-aba-dentro-dela"
+        },
+        {
+          "ponto": "servo-medio: larguraDaCaixa=60",
+          "restricao": "horn-maior-que-a-torre"
+        },
+        {
+          "ponto": "servo-pequeno: alturaDaAba=80",
+          "restricao": "aba-abaixo-do-topo"
+        },
+        {
+          "ponto": "servo-pequeno: alturaDaCaixa=15",
+          "restricao": "aba-abaixo-do-topo"
+        },
+        {
+          "ponto": "servo-pequeno: alturaDaCaixa=110",
+          "restricao": "cabo-abaixo-da-aba"
+        },
+        {
+          "ponto": "servo-pequeno: comprimentoDaCaixa=15",
+          "restricao": "torre-dentro-da-caixa"
+        },
+        {
+          "ponto": "servo-pequeno: deslocamentoDoEixo=40",
+          "restricao": "torre-dentro-da-caixa"
+        },
+        {
+          "ponto": "servo-pequeno: diametroDoFuroDaAba=9",
+          "restricao": "furo-cabe-na-aba"
+        },
+        {
+          "ponto": "servo-pequeno: diametroDoHorn=6",
+          "restricao": "horn-maior-que-a-torre"
+        },
+        {
+          "ponto": "servo-pequeno: distanciaDosFurosDaAba=40",
+          "restricao": "furos-da-aba-dentro-dela"
+        },
+        {
+          "ponto": "servo-pequeno: espessuraDaAba=6",
+          "restricao": "aba-abaixo-do-topo"
+        },
+        {
+          "ponto": "servo-pequeno: larguraDaCaixa=60",
+          "restricao": "horn-maior-que-a-torre"
         }
       ]
     }

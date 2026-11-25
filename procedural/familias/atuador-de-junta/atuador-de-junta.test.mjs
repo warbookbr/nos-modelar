@@ -7,6 +7,7 @@ import { executarReceita } from '../../../src/autoria/executar-receita.js';
 import { contatosDaPeca } from '../../../src/autoria/contatos-da-peca.js';
 import { pedacosDaMalha } from '../../../tools/fixtures/transmissao/pedacos.mjs';
 import { ATUADORES, parametrosDoAtuador } from './tabela.js';
+import { SERVOS, parametrosDoServo } from './servo.js';
 
 const registro = criarRegistroDeFamilias();
 const F = registro.obter('atuador-de-junta');
@@ -22,7 +23,18 @@ describe('família atuador-de-junta', () => {
     expect(c.atravessados).toEqual([]);
   });
 
+  for (const tamanho of Object.keys(SERVOS)) it(`o servo ${tamanho} sai com a caixa e o horn, o horn só encostando na torre`, () => {
+    const receita = { meta: { nome: 'servo' }, contatos: [{ par: ['carcaca', 'saida'], motivo: 'o horn gira sobre o topo da torre do eixo do servo' }], get CHAMADAS_COMPOSICOES() { return [chamar(F, 's', parametrosDoServo(tamanho))]; } };
+    const n = executarReceita(receita, { registroOperacoes: registro.registroOperacoes, registroComposicoes: registro.registroComposicoes }).neutro;
+    expect((n.orfaos ?? []).map((o) => o.motivo)).toEqual([]);
+    for (const parte of ['carcaca', 'saida']) expect(pedacosDaMalha({ V: n.V, F: new Map([...n.F].filter(([, f]) => f.parte === parte)) }), parte).toBe(1);
+    const c = contatosDaPeca(n, receita);
+    expect(c.paresEmContato.map((p) => `${p.par.join('+')}:${p.estado}`)).toEqual(['carcaca+saida:encostam']);
+    expect(c.atravessados).toEqual([]);
+  });
+
   it('recusa o tamanho que não existe, dizendo os aceitos', () => {
     expect(() => parametrosDoAtuador(70)).toThrow(/70 não existe; aceitos: 40, 60, 80, 100, 120/);
+    expect(() => parametrosDoServo('gigante')).toThrow(/gigante não existe; aceitos: pequeno, medio, grande/);
   });
 });
