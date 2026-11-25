@@ -1,0 +1,189 @@
+{
+  "formato": "mecanifica.aprovacao-da-familia@1",
+  "familia": "rolamento",
+  "versao": "1.0.0",
+  "mecanica": {
+    "data": "2026-11-24",
+    "pontos": {
+      "minimo": {
+        "parametros": {
+          "chanfro": 0.3,
+          "diametroExterno": 26,
+          "forma": 1,
+          "furo": 10,
+          "largura": 8
+        },
+        "hash": "sha256:8e9ca96241b5fa03925380f6f5923166190c0bd74bbe1b1e094e62f43e4c1583",
+        "medidas": []
+      },
+      "medio": {
+        "parametros": {
+          "chanfro": 1,
+          "diametroExterno": 52,
+          "forma": 2,
+          "furo": 25,
+          "largura": 15
+        },
+        "hash": "sha256:71bb051befef012ce0db2cc1663a2dbf1963387d10fa26d556eefd5812cd8b7d",
+        "medidas": []
+      },
+      "maximo": {
+        "parametros": {
+          "chanfro": 1.1,
+          "diametroExterno": 90,
+          "forma": 3,
+          "furo": 50,
+          "largura": 20
+        },
+        "hash": "sha256:379915578304ab1562a879244ed92ad16ed3a4e2a7d95f5dc4bd2c5d06305412",
+        "medidas": []
+      }
+    },
+    "varredura": {
+      "sondas": 10,
+      "recusasDeclaradas": [
+        {
+          "ponto": "diametroExterno=26",
+          "restricao": "anel-com-espessura"
+        },
+        {
+          "ponto": "diametroExterno=90",
+          "restricao": "anel-nao-largo-demais"
+        },
+        {
+          "ponto": "furo=10",
+          "restricao": "anel-nao-largo-demais"
+        },
+        {
+          "ponto": "furo=50",
+          "restricao": "anel-com-espessura"
+        },
+        {
+          "ponto": "largura=8",
+          "restricao": "esfera-cabe-na-largura"
+        }
+      ]
+    },
+    "portas": [
+      "apoio",
+      "furo"
+    ],
+    "perfis": {
+      "mancal-6205": {
+        "parametros": {
+          "chanfro": 1,
+          "diametroExterno": 52,
+          "forma": 3,
+          "furo": 25,
+          "largura": 15
+        },
+        "hash": "sha256:77a79ab6c9050700228eddbfcdee46b2ff8dffe480d2228b9247a60a9dc68c6e",
+        "medidas": []
+      },
+      "rolamento-6000": {
+        "parametros": {
+          "chanfro": 0.3,
+          "diametroExterno": 26,
+          "forma": 1,
+          "furo": 10,
+          "largura": 8
+        },
+        "hash": "sha256:8e9ca96241b5fa03925380f6f5923166190c0bd74bbe1b1e094e62f43e4c1583",
+        "medidas": []
+      },
+      "rolamento-6204": {
+        "parametros": {
+          "chanfro": 1,
+          "diametroExterno": 47,
+          "forma": 1,
+          "furo": 20,
+          "largura": 14
+        },
+        "hash": "sha256:250a432feb88a8b92a83db614bb7b68151ead639db076b790c870f281708964a",
+        "medidas": []
+      },
+      "rolamento-6210-vedado": {
+        "parametros": {
+          "chanfro": 1.1,
+          "diametroExterno": 90,
+          "forma": 2,
+          "furo": 50,
+          "largura": 20
+        },
+        "hash": "sha256:57e3398303c68bc3255a8ba0c672f526aab18aa940032c45b075c225712fe4d4",
+        "medidas": []
+      }
+    },
+    "escalasDosPerfis": {
+      "sondas": 32,
+      "recusasDeclaradas": [
+        {
+          "ponto": "mancal-6205: diametroExterno=26",
+          "restricao": "anel-com-espessura"
+        },
+        {
+          "ponto": "mancal-6205: diametroExterno=90",
+          "restricao": "anel-nao-largo-demais"
+        },
+        {
+          "ponto": "mancal-6205: furo=10",
+          "restricao": "anel-nao-largo-demais"
+        },
+        {
+          "ponto": "mancal-6205: furo=50",
+          "restricao": "anel-com-espessura"
+        },
+        {
+          "ponto": "mancal-6205: largura=8",
+          "restricao": "esfera-cabe-na-largura"
+        },
+        {
+          "ponto": "rolamento-6000: chanfro=1.1",
+          "restricao": "chanfro-pequeno"
+        },
+        {
+          "ponto": "rolamento-6000: diametroExterno=90",
+          "restricao": "anel-nao-largo-demais"
+        },
+        {
+          "ponto": "rolamento-6000: furo=50",
+          "restricao": "anel-com-espessura"
+        },
+        {
+          "ponto": "rolamento-6204: diametroExterno=26",
+          "restricao": "anel-com-espessura"
+        },
+        {
+          "ponto": "rolamento-6204: diametroExterno=90",
+          "restricao": "anel-nao-largo-demais"
+        },
+        {
+          "ponto": "rolamento-6204: furo=10",
+          "restricao": "anel-nao-largo-demais"
+        },
+        {
+          "ponto": "rolamento-6204: furo=50",
+          "restricao": "anel-com-espessura"
+        },
+        {
+          "ponto": "rolamento-6204: largura=8",
+          "restricao": "esfera-cabe-na-largura"
+        },
+        {
+          "ponto": "rolamento-6210-vedado: diametroExterno=26",
+          "restricao": "anel-com-espessura"
+        },
+        {
+          "ponto": "rolamento-6210-vedado: furo=10",
+          "restricao": "anel-nao-largo-demais"
+        },
+        {
+          "ponto": "rolamento-6210-vedado: largura=8",
+          "restricao": "chanfro-pequeno"
+        }
+      ]
+    }
+  },
+  "critico": null,
+  "pessoa": null
+}

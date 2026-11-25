@@ -1,0 +1,7 @@
+# Tubulação com conexões
+
+Banco de provas do plano da tubulação com conexões, de 2026-11-23 a 2026-11-24. As imagens são as que a pessoa aprovou, feitas a partir das malhas executadas pela família e pela rede, sem retoque.
+
+`pecas.png` mostra os treze perfis da família `tubulacao`: os trechos de aço de 2" e de PVC de 50 mm, as curvas de raio longo de 90° e 45°, o joelho de PVC, o tampão, os tês de aço e de PVC, a redução de 2" para 1 1/2", os flanges de pescoço de 2" (quatro furos) e de 4" (oito furos) e as válvulas de esfera e de gaveta de 2", com vistas de perto da curva, do tampão e do trecho. `rede-com-te-e-reducao.png` mostra a rede de aço com duas curvas, o tê e a redução. `rede-de-prova.png` mostra a rede de prova de dez nós, com o flange nas duas pontas, a válvula de esfera na linha e a de gaveta no ramal, três curvas, o tê e a redução, e de perto o flange encostado na válvula com os furos alinhados.
+
+As medidas que sustentam as imagens estão nos testes de `tools/fixtures/tubulacao/`: a tabela e cada recusa do traçado, o corte de cada trecho, os encontros que só encostam (21 na rede de prova), cada perfil oco e num pedaço só, a rede de prova abaixo de dez segundos e a exportação dela em STEP e OBJ com as partes nomeadas. As fontes das medidas de norma estão no comentário de `procedural/familias/tubulacao/tabela.js`: a ASME B36.10M para o tubo de aço, a ASME B16.9 para curva, tê, redução e tampão, a ASME B16.5 classe 150 para o flange, a ASME B16.10 para a face a face da válvula e a NBR 5648 para o PVC.

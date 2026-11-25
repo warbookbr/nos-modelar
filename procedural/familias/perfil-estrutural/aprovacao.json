@@ -1,0 +1,273 @@
+{
+  "formato": "mecanifica.aprovacao-da-familia@1",
+  "familia": "perfil-estrutural",
+  "versao": "1.0.0",
+  "mecanica": {
+    "data": "2026-11-24",
+    "pontos": {
+      "minimo": {
+        "parametros": {
+          "aba": 2,
+          "aberturaDaRanhura": 4,
+          "alma": 2,
+          "altura": 20,
+          "comprimento": 30,
+          "corte": 0,
+          "inclinacao": 0,
+          "largura": 20,
+          "raio": 0,
+          "raioDaPonta": 0,
+          "tipo": 1
+        },
+        "hash": "sha256:e6445783ad96ca4718b6c2e28dc27b92fdcb7ea75656d862745288816182f6ea",
+        "medidas": []
+      },
+      "medio": {
+        "parametros": {
+          "aba": 11,
+          "aberturaDaRanhura": 8,
+          "alma": 7,
+          "altura": 190,
+          "comprimento": 1000,
+          "corte": 1,
+          "inclinacao": 0,
+          "largura": 100,
+          "raio": 12,
+          "raioDaPonta": 0,
+          "tipo": 2
+        },
+        "hash": "sha256:b48e5523eb7c951d287a398e8ed72fcb56f5bc02bf0926225ef6cd53f57996aa",
+        "medidas": []
+      },
+      "maximo": {
+        "parametros": {
+          "aba": 30,
+          "aberturaDaRanhura": 14,
+          "alma": 20,
+          "altura": 600,
+          "comprimento": 12000,
+          "corte": 2,
+          "inclinacao": 10,
+          "largura": 300,
+          "raio": 30,
+          "raioDaPonta": 15,
+          "tipo": 3
+        },
+        "hash": "sha256:f0e63a585940a18ab14cc176bb591520710e55217d467bc896ff934b11cf098a",
+        "medidas": []
+      }
+    },
+    "varredura": {
+      "sondas": 22,
+      "recusasDeclaradas": [
+        {
+          "ponto": "altura=20",
+          "restricao": "abas-cabem-na-altura"
+        },
+        {
+          "ponto": "largura=20",
+          "restricao": "alma-cabe-na-largura"
+        }
+      ]
+    },
+    "portas": [
+      "fim",
+      "inicio"
+    ],
+    "perfis": {
+      "aluminio-20-esquadria": {
+        "parametros": {
+          "aba": 8.5,
+          "aberturaDaRanhura": 6,
+          "alma": 5.6,
+          "altura": 20,
+          "comprimento": 300,
+          "corte": 2,
+          "inclinacao": 0,
+          "largura": 100,
+          "raio": 12,
+          "raioDaPonta": 0,
+          "tipo": 3
+        },
+        "hash": "sha256:376a8fd3a2eae2e220e72d069cb086abe9239de7895e5b2fbc80b8acc9c2e479",
+        "medidas": []
+      },
+      "aluminio-40": {
+        "parametros": {
+          "aba": 8.5,
+          "aberturaDaRanhura": 8,
+          "alma": 5.6,
+          "altura": 40,
+          "comprimento": 500,
+          "corte": 0,
+          "inclinacao": 0,
+          "largura": 100,
+          "raio": 12,
+          "raioDaPonta": 0,
+          "tipo": 3
+        },
+        "hash": "sha256:9b0a7b37f95a4232eaccda2209c42f5f9e6dfbca9552aa3697ceebcf6022867b",
+        "medidas": []
+      },
+      "hea-200-esquadria": {
+        "parametros": {
+          "aba": 10,
+          "aberturaDaRanhura": 8,
+          "alma": 6.5,
+          "altura": 190,
+          "comprimento": 1000,
+          "corte": 2,
+          "inclinacao": 0,
+          "largura": 200,
+          "raio": 18,
+          "raioDaPonta": 0,
+          "tipo": 1
+        },
+        "hash": "sha256:2b0d59e32c68f45c314d3c0dd5bad9f3efae811369995f233f738ab98855bdf7",
+        "medidas": []
+      },
+      "ipe-200": {
+        "parametros": {
+          "aba": 8.5,
+          "aberturaDaRanhura": 8,
+          "alma": 5.6,
+          "altura": 200,
+          "comprimento": 1000,
+          "corte": 0,
+          "inclinacao": 0,
+          "largura": 100,
+          "raio": 12,
+          "raioDaPonta": 0,
+          "tipo": 1
+        },
+        "hash": "sha256:3ded26586ecd6deb0c8e5590cb45ce02f4095243a72cda95f4f4849b6b6412c6",
+        "medidas": []
+      },
+      "upn-100-um-corte": {
+        "parametros": {
+          "aba": 8.5,
+          "aberturaDaRanhura": 8,
+          "alma": 6,
+          "altura": 100,
+          "comprimento": 600,
+          "corte": 1,
+          "inclinacao": 8,
+          "largura": 50,
+          "raio": 8.5,
+          "raioDaPonta": 4.5,
+          "tipo": 2
+        },
+        "hash": "sha256:ce4ea4838769a9e901208a601a2969ec2be52702d474d996fbd8898b64f70290",
+        "medidas": []
+      },
+      "upn-200": {
+        "parametros": {
+          "aba": 11.5,
+          "aberturaDaRanhura": 8,
+          "alma": 8.5,
+          "altura": 200,
+          "comprimento": 1000,
+          "corte": 0,
+          "inclinacao": 8,
+          "largura": 75,
+          "raio": 11.5,
+          "raioDaPonta": 6,
+          "tipo": 2
+        },
+        "hash": "sha256:c8744846a53ac7c65182504d0c17bcafab1bc10b3b09a1fc151b5f41fb9b7eff",
+        "medidas": []
+      }
+    },
+    "escalasDosPerfis": {
+      "sondas": 96,
+      "recusasDeclaradas": [
+        {
+          "ponto": "aluminio-20-esquadria: aberturaDaRanhura=14",
+          "restricao": "ranhura-cabe-no-lado"
+        },
+        {
+          "ponto": "aluminio-20-esquadria: altura=600",
+          "restricao": "comprimento-passa-do-corte"
+        },
+        {
+          "ponto": "aluminio-40: aberturaDaRanhura=14",
+          "restricao": "ranhura-cabe-no-lado"
+        },
+        {
+          "ponto": "aluminio-40: altura=20",
+          "restricao": "ranhura-cabe-no-lado"
+        },
+        {
+          "ponto": "hea-200-esquadria: altura=20",
+          "restricao": "abas-cabem-na-altura"
+        },
+        {
+          "ponto": "hea-200-esquadria: comprimento=30",
+          "restricao": "comprimento-passa-do-corte"
+        },
+        {
+          "ponto": "hea-200-esquadria: largura=20",
+          "restricao": "alma-cabe-na-largura"
+        },
+        {
+          "ponto": "ipe-200: altura=20",
+          "restricao": "abas-cabem-na-altura"
+        },
+        {
+          "ponto": "ipe-200: largura=20",
+          "restricao": "alma-cabe-na-largura"
+        },
+        {
+          "ponto": "upn-100-um-corte: aba=2",
+          "restricao": "ponta-da-aba-do-u"
+        },
+        {
+          "ponto": "upn-100-um-corte: altura=20",
+          "restricao": "abas-cabem-na-altura"
+        },
+        {
+          "ponto": "upn-100-um-corte: comprimento=30",
+          "restricao": "comprimento-passa-do-corte"
+        },
+        {
+          "ponto": "upn-100-um-corte: largura=20",
+          "restricao": "alma-cabe-na-largura"
+        },
+        {
+          "ponto": "upn-100-um-corte: largura=300",
+          "restricao": "ponta-da-aba-do-u"
+        },
+        {
+          "ponto": "upn-100-um-corte: raio=30",
+          "restricao": "alma-cabe-na-largura"
+        },
+        {
+          "ponto": "upn-100-um-corte: raioDaPonta=15",
+          "restricao": "ponta-da-aba-do-u"
+        },
+        {
+          "ponto": "upn-200: aba=2",
+          "restricao": "ponta-da-aba-do-u"
+        },
+        {
+          "ponto": "upn-200: altura=20",
+          "restricao": "abas-cabem-na-altura"
+        },
+        {
+          "ponto": "upn-200: largura=20",
+          "restricao": "alma-cabe-na-largura"
+        },
+        {
+          "ponto": "upn-200: largura=300",
+          "restricao": "ponta-da-aba-do-u"
+        },
+        {
+          "ponto": "upn-200: raioDaPonta=15",
+          "restricao": "ponta-da-aba-do-u"
+        }
+      ]
+    }
+  },
+  "critico": null,
+  "pessoa": null
+}

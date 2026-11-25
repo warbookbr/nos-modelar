@@ -1,0 +1,45 @@
+{
+  "formato": "mecanifica.familia@1",
+  "id": "engrenagem",
+  "versao": "1.0.0",
+  "nivel": "componente",
+  "parametros": {
+    "tipo": { "tipo": "inteiro", "unidade": "contagem", "padrao": 1, "minimo": 1, "maximo": 2, "medio": 1 },
+    "modulo": { "tipo": "numero", "unidade": "mm", "padrao": 1, "minimo": 0.5, "maximo": 10, "medio": 3 },
+    "dentes": { "tipo": "inteiro", "unidade": "contagem", "padrao": 20, "minimo": 17, "maximo": 200, "medio": 40 },
+    "largura": { "tipo": "numero", "unidade": "mm", "padrao": 10, "minimo": 2, "maximo": 200, "medio": 30 },
+    "furo": { "tipo": "numero", "unidade": "mm", "padrao": 5, "minimo": 2, "maximo": 100, "medio": 20 },
+    "diametroDoCubo": { "tipo": "numero", "unidade": "mm", "padrao": 14, "minimo": 6, "maximo": 200, "medio": 40 },
+    "comprimentoDoCubo": { "tipo": "numero", "unidade": "mm", "padrao": 5, "minimo": 1, "maximo": 100, "medio": 15 }
+  },
+  "restricoes": [
+    {
+      "id": "cubo-maior-que-o-furo",
+      "expressao": "diametroDoCubo >= furo + 4",
+      "motivo": "o cubo precisa de ao menos 2 mm de parede em volta do furo; aumente o diâmetro do cubo ou diminua o furo"
+    },
+    {
+      "id": "furo-cabe-no-pe",
+      "expressao": "furo + 2 <= modulo * (dentes - 3.2)",
+      "motivo": "o furo precisa deixar ao menos 1 mm de parede até o pé dos dentes; use mais dentes, um módulo maior ou um furo menor"
+    }
+  ],
+  "portas": [
+    { "id": "eixo", "tipo": "anel", "papel": "recebe" }
+  ],
+  "ferramentas": ["engrenagem"],
+  "perguntas": {
+    "engrenagem": [
+      "Os dentes são iguais, igualmente espaçados em volta do eixo e simétricos, com o flanco curvo da evolvente e o pé arredondado?",
+      "A coroa é coaxial com o furo, com o cubo de um lado só?",
+      "Na catraca, cada dente tem a face de trava reta e radial de um lado e a rampa do outro, todos no mesmo sentido?"
+    ]
+  },
+  "perfis": {
+    "reta-m1-z20": { "descricao": "engrenagem reta de módulo 1 com 20 dentes, 10 mm de largura e furo de 5 mm", "parametros": { "tipo": 1, "modulo": 1, "dentes": 20, "largura": 10, "furo": 5, "diametroDoCubo": 14, "comprimentoDoCubo": 5 } },
+    "reta-m1-z40": { "descricao": "engrenagem reta de módulo 1 com 40 dentes, 10 mm de largura e furo de 8 mm", "parametros": { "tipo": 1, "modulo": 1, "dentes": 40, "largura": 10, "furo": 8, "diametroDoCubo": 20, "comprimentoDoCubo": 5 } },
+    "reta-m2-z30": { "descricao": "engrenagem reta de módulo 2 com 30 dentes e 20 mm de largura", "parametros": { "tipo": 1, "modulo": 2, "dentes": 30, "largura": 20, "furo": 15, "diametroDoCubo": 35, "comprimentoDoCubo": 12 } },
+    "reta-m3-z80": { "descricao": "engrenagem reta de módulo 3 com 80 dentes e 30 mm de largura", "parametros": { "tipo": 1, "modulo": 3, "dentes": 80, "largura": 30, "furo": 30, "diametroDoCubo": 60, "comprimentoDoCubo": 20 } },
+    "catraca-z24": { "descricao": "catraca de 24 dentes de módulo 2, 10 mm de largura", "parametros": { "tipo": 2, "modulo": 2, "dentes": 24, "largura": 10, "furo": 10, "diametroDoCubo": 22, "comprimentoDoCubo": 6 } }
+  }
+}

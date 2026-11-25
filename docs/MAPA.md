@@ -6,6 +6,7 @@
 > algum arquivo-fonte estiver sem cabeçalho.
 
 2254 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2321 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -283,6 +284,10 @@
 
 - `README.md` — Correção de superfície: chapas de prova, linha de base, corte com simetria, alisamento e emenda declarada
 
+## docs/modelar/banco-de-provas/corrente-e-esteira-2026-11-24/
+
+- `README.md` — Corrente e esteira: roda dentada, corrente de rolos e esteira de sapatas
+
 ## docs/modelar/banco-de-provas/costura-em-no-de-tubos-2026-11-15/
 
 - `CORDAO.md` — Protótipo do cordão de solda, 2026-11-15
@@ -319,6 +324,10 @@
 ## docs/modelar/banco-de-provas/divisao-por-contorno-2026-11-18/
 
 - `README.md` — Divisão por contorno: fatia 1, a operação e as provas na chapa de teste
+
+## docs/modelar/banco-de-provas/elementos-de-maquina-2026-11-24/
+
+- `README.md` — Elementos de máquina: perfil, guia, rolamento e fuso
 
 ## docs/modelar/banco-de-provas/empilhadeira-2026-10-09/
 
@@ -582,10 +591,18 @@
 - `comparar.mjs` — comparar.mjs — compara duas medidas de `medir.mjs` peça a peça e imprime a tabela em markdown.
 - `medir.mjs` — medir.mjs — exporta cada peça do acervo em STEP, em memória, com as opções padrão do comando, e grava o resultado.
 
+## docs/modelar/banco-de-provas/transmissao-2026-11-23/
+
+- `README.md` — Transmissão: polias, correias, engrenagens e cremalheira
+
 ## docs/modelar/banco-de-provas/trilhas-da-placa-2026-11-23/
 
 - `PROPOSTA-DO-ITEM.md` — Proposta para o nos-mecatronica: o item `ligacoes` no pedido 1.1
 - `README.md` — Trilhas da placa: a linha de base, as regras e a lista de exemplo
+
+## docs/modelar/banco-de-provas/tubulacao-2026-11-23/
+
+- `README.md` — Tubulação com conexões
 
 ## docs/modelar/blender/
 
@@ -683,6 +700,7 @@
 - `2026-11-23-engrenagem-polia-e-correia.md` — Engrenagem, polia e correia: o par que transmite movimento por poucos números
 - `2026-11-23-tubulacao-com-conexoes.md` — Tubulação com conexões: a rede de tubos por traçado e bitola, com as conexões postas sozinhas
 - `2026-11-24-encaixe-cilindrico-parcial.md` — Encaixe cilíndrico parcial: o eixo que entra só em parte no furo
+- `2026-11-24-casca-chapa-e-gabinete.md` — Casca, chapa dobrada e gabinete: a parede fina de forma livre, a chapa com abas em várias bordas e a caixa de equipamento
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
@@ -1051,6 +1069,23 @@
 - `geometria.js` — geometria.js — o cobre traçado de uma placa declarada, em mm, no plano [x, z] da placa: os polígonos de cada trecho e de cada via, e a união de polígonos de …
 - `tracador.js` — tracador.js — o traçador automático do cobre de uma placa declarada: um roteador em grade sobre as duas faces, com via onde troca de face.
 
+## procedural/familias/corrente/
+
+- `composicoes.js` — composicoes.js — a composição da família `corrente`: para cada um dos quatro trechos (reto de cima, volta da roda 2, reto de baixo e volta da roda 1), o rolo…
+- `derivar.js` — derivar.js — dos parâmetros da corrente (milímetro) à chamada de composição (metro).
+- `geometria.js` — geometria.js — a corrente de rolos fechada em volta de duas rodas dentadas, em milímetro.
+- `index.js` — index.js — a família `corrente`: a corrente de rolos simples da ISO 606, série B, fechada em volta de duas rodas dentadas, com rolos, pinos e placas internas…
+- `tabela.js` — tabela.js — a corrente de rolos simples da ISO 606, série B, em milímetro: passo, diâmetro do rolo, largura entre as placas internas, diâmetro do pino, altur…
+- `transmissao.js` — transmissao.js — a transmissão por corrente: as duas rodas dentadas da família `roda-dentada` e a corrente da família `corrente` entre elas, com a distância …
+
+## procedural/familias/cremalheira/
+
+- `composicoes.js` — composicoes.js — a composição da família `cremalheira`: a barra é uma `extrusao` do retângulo em [x, z], ao longo de y; o vão de um dente é outra `extrusao`,…
+- `cremalheira.test.mjs` — cremalheira.test.mjs — a família `cremalheira`: cada perfil sai numa parte só e sem órfão, a barra tem dentes × passo de comprimento, a cabeça 1 módulo acima…
+- `derivar.js` — derivar.js — dos parâmetros da cremalheira (milímetro) à chamada de composição (metro).
+- `geometria.js` — geometria.js — as medidas de uma cremalheira da família `cremalheira`, em milímetro.
+- `index.js` — index.js — a família `cremalheira`: a cremalheira reta pelo perfil de referência da ISO 53, que engrena com a engrenagem reta de mesmo módulo. `chamar(CREMAL…
+
 ## procedural/familias/dobradica/
 
 - `composicoes.js` — composicoes.js — as composições procedurais da família `dobradica`, geradas por laço porque o número de nós e de furos muda a quantidade de passos e a compos…
@@ -1059,6 +1094,24 @@
 - `geometria.js` — geometria.js — as medidas da dobradiça de abas a partir dos parâmetros da família, em metro.
 - `index.js` — index.js — a família `dobradica` carregada: o contrato `familia.json`, as composições, o `derivar` e o gerador da montagem v5. A família é o objeto de `defin…
 - `montagem.js` — montagem.js — a mini-montagem v5 que a família gera: o pino e as duas folhas como peças soltas, ligadas por uma articulação de revolução com o curso declarad…
+
+## procedural/familias/engrenagem/
+
+- `composicoes.js` — composicoes.js — as composições da família `engrenagem`, uma por número de pontos do vão: a reta (vão evolvente) e a catraca (vão de dente de serra). O corpo…
+- `derivar.js` — derivar.js — dos parâmetros da engrenagem (milímetro) à chamada de composição (metro). O tipo escolhe a composição.
+- `engrenagem.test.mjs` — engrenagem.test.mjs — a família `engrenagem`: cada perfil sai numa parte só e sem órfão, a reta tem os diâmetros de cabeça e de pé da ISO 53 e o dente com me…
+- `engrenamento.js` — engrenamento.js — o par de engrenagens retas da família e o pinhão com a cremalheira, em milímetro e graus.
+- `geometria.js` — geometria.js — as medidas de uma engrenagem da família `engrenagem`, em milímetro, a partir dos parâmetros.
+- `index.js` — index.js — a família `engrenagem`: a engrenagem reta de dente evolvente pelo perfil de referência da ISO 53 e a catraca de dente de serra, com cubo e furo. `…
+
+## procedural/familias/esteira/
+
+- `composicoes.js` — composicoes.js — a composição da família `esteira`: para cada um dos quatro trechos, a bucha por `lathe` em y, os dois trilhos e a sapata por `extrusao` em y…
+- `derivar.js` — derivar.js — dos parâmetros da esteira (milímetro) à chamada de composição (metro). O vão do dente da motriz sai girado para cair na primeira bucha do enrola…
+- `esteira.test.mjs` — esteira.test.mjs — a família `esteira`: cada passo da tabela fecha em volta da motriz e da guia sem órfão; as buchas, as sapatas, a guia e os roletes só enco…
+- `geometria.js` — geometria.js — a esteira de sapatas em volta da roda motriz e da roda guia, com os roletes por baixo, em milímetro.
+- `index.js` — index.js — a família `esteira`: a esteira de sapatas de aço em volta da roda motriz (com o dente da roda dentada da ISO 606) e da roda guia, com os roletes p…
+- `tabela.js` — tabela.js — a esteira de sapatas de aço, por passo, em milímetro. Não há norma pública de esteira de trator; os valores são regra da família, na proporção da…
 
 ## procedural/familias/exemplo/
 
@@ -1073,6 +1126,32 @@
 - `geometria.js` — geometria.js — as medidas do fixador em milímetro, a partir dos parâmetros da família e da tabela ISO.
 - `index.js` — index.js — a família `fixador`: parafuso de cabeça sextavada, allen ou abaulada, porca sextavada e arruela lisa, de M3 a M24 pela tabela ISO de rosca grossa,…
 - `tabela.js` — tabela.js — as medidas métricas de rosca grossa, em mm, por diâmetro nominal: passo (ISO 261), sextavado da cabeça e da porca (ISO 4017 e ISO 4032: chave s, …
+
+## procedural/familias/fuso/
+
+- `composicoes.js` — composicoes.js — a composição da família `fuso`: o núcleo por `lathe`, o filete por `friso` com `helice` (como a rosca do `fixador`) e a castanha flangeada p…
+- `derivar.js` — derivar.js — dos parâmetros do fuso (milímetro) à chamada de composição (metro). O filete do trapezoidal tem quatro pontos e repete o último para chegar aos …
+- `fuso.test.mjs` — fuso.test.mjs — a família `fuso`: cada fuso da tabela sai com o núcleo, o filete e a castanha, sem órfão; o filete cosmético assenta no núcleo como a rosca d…
+- `geometria.js` — geometria.js — o fuso e a castanha, em milímetro, com o eixo em y, de 0 ao comprimento.
+- `index.js` — index.js — a família `fuso`: o fuso trapezoidal (ISO 2904) e o de esferas (ISO 3408-2, só o volume de fora), com a castanha flangeada numa posição ao longo d…
+- `tabela.js` — tabela.js — os fusos, em milímetro.
+
+## procedural/familias/gabinete/
+
+- `composicoes.js` — composicoes.js — a composição da família `gabinete`: cada metade é a extrusão em y do retângulo de cantos arredondados menos o vão de dentro; a base ganha o …
+- `derivar.js` — derivar.js — dos parâmetros do gabinete (milímetro) à chamada de composição (metro).
+- `gabinete.test.mjs` — gabinete.test.mjs — a família `gabinete`: cada perfil sai com a base e a tampa, cada uma num pedaço só e sem órfão; a tampa só encosta na base (borda e encai…
+- `geometria.js` — geometria.js — o gabinete de plástico, em milímetro: a caixa de cantos arredondados partida em base e tampa num plano horizontal, com o encaixe entre as duas…
+- `index.js` — index.js — a família `gabinete`: a caixa de equipamento de plástico, partida em base e tampa, com o encaixe entre as duas e os ressaltos para parafuso. A geo…
+
+## procedural/familias/guia-linear/
+
+- `composicoes.js` — composicoes.js — a composição da família `guia-linear`: o trilho por `extrusao` da seção com os furos com rebaixo tirados por `subtrair` (um `lathe` em z rep…
+- `derivar.js` — derivar.js — dos parâmetros da guia (milímetro) à chamada de composição (metro).
+- `geometria.js` — geometria.js — o trilho e o carro da guia linear, em milímetro.
+- `guia-linear.test.mjs` — guia-linear.test.mjs — a família `guia-linear`: cada tamanho sai com o trilho e o carro, cada um num pedaço só; o carro apoia no topo do trilho só encostando…
+- `index.js` — index.js — a família `guia-linear`: o trilho de perfil com a furação e o carro de esferas montado sobre ele, por tamanho (15, 20, 25 e 30). A tabela está em …
+- `tabela.js` — tabela.js — a guia linear de esferas de perfil, por tamanho, em milímetro.
 
 ## procedural/familias/mola/
 
@@ -1091,13 +1170,32 @@
 - `montagem.js` — montagem.js — a montagem v5 que a família gera: o corpo, as portas, as gavetas e os guias e as duas metades de cada dobradiça como peças soltas, com uma arti…
 - `movel-de-caixa.test.mjs` — movel-de-caixa.test.mjs — a família `movel-de-caixa`: contrato, recusas, os perfis, o roupeiro como antes, a malha medida contra as contas (zonas, frentes em…
 
+## procedural/familias/perfil-estrutural/
+
+- `composicoes.js` — composicoes.js — as composições da família `perfil-estrutural`: a seção extrudada em y, com o furo central no alumínio, e um ou dois prismas triangulares ext…
+- `derivar.js` — derivar.js — dos parâmetros do perfil (milímetro) à chamada de composição (metro). O tipo e o corte escolhem a composição.
+- `geometria.js` — geometria.js — a seção e o comprimento do perfil estrutural, em milímetro.
+- `index.js` — index.js — a família `perfil-estrutural`: o perfil I e H (IPE, HE A), o U (UPN) e o alumínio ranhurado, reto ou com corte a 45° nas pontas. A tabela de norma…
+- `perfil-estrutural.test.mjs` — perfil-estrutural.test.mjs — a família `perfil-estrutural`: cada perfil da tabela sai num pedaço só; a área da seção do IPE, do HE A e do UPN bate com a mass…
+- `tabela.js` — tabela.js — os perfis estruturais da série europeia, em milímetro: altura h, largura b, alma tw, aba tf, raio de concordância r (e, no U, o raio da ponta da …
+
 ## procedural/familias/polia-e-correia/
 
 - `composicoes.js` — composicoes.js — as composições da família `polia-e-correia`, uma por número de pontos do perfil, porque a composição v1 só substitui valores: a dentada de v…
+- `correia.js` — correia.js — a correia dentada fechada em volta de duas polias dentadas da família, em milímetro, e os passos que a desenham, em metro.
 - `derivar.js` — derivar.js — dos parâmetros da polia (milímetro) à chamada de composição (metro). O tipo, as flanges e os canais escolhem a composição.
 - `geometria.js` — geometria.js — as medidas de uma polia da família `polia-e-correia`, em milímetro, a partir dos parâmetros.
 - `index.js` — index.js — a família `polia-e-correia`: polia dentada (GT2, HTD 3M, HTD 5M e T5), em V (Z, A e B, de um a quatro canais) e lisa, com cubo e furo. `chamar(POL…
 - `polia-e-correia.test.mjs` — polia-e-correia.test.mjs — a família `polia-e-correia`: cada perfil sai numa parte só e sem órfão, a dentada tem o externo e a raiz que o passo e os dentes p…
+
+## procedural/familias/roda-dentada/
+
+- `composicoes.js` — composicoes.js — a composição da família `roda-dentada`: a coroa por `lathe` da seção com o furo e o cubo, e o vão de um dente por `extrusao` em [x, z], repe…
+- `derivar.js` — derivar.js — dos parâmetros da roda dentada (milímetro) à chamada de composição (metro).
+- `geometria.js` — geometria.js — a roda dentada de corrente de rolos pela forma de dente da ISO 606, em milímetro, com o eixo em y.
+- `index.js` — index.js — a família `roda-dentada`: a roda dentada simples de corrente de rolos com a forma de dente da ISO 606, série B europeia (06B a 16B), com o cubo e …
+- `roda-dentada.test.mjs` — roda-dentada.test.mjs — a família `roda-dentada`: cada corrente da tabela, de 9 a 80 dentes, sai num pedaço só e sem órfão; o diâmetro de raiz é d − 2 ri da …
+- `tabela.js` — tabela.js — as correntes de rolos simples da ISO 606, série B europeia, em milímetro: passo p, diâmetro do rolo d1 e largura entre as placas internas b1, lid…
 
 ## procedural/familias/roda-pneu/
 
@@ -1105,6 +1203,15 @@
 - `derivar.js` — derivar.js — dos parâmetros da família `roda-pneu` (o diâmetro em milímetro, as medidas em proporção do diâmetro, as contagens em contagem) aos argumentos da…
 - `index.js` — index.js — a família `roda-pneu` carregada: o contrato `familia.json`, as composições e o `derivar`. O registro do produto (`procedural/familias/index.js`) i…
 - `roda-pneu.test.js` — roda-pneu.test.js — a família `roda-pneu` medida na malha. As quatro partes (pneu, aro, cubo, disco) e o volume de cada uma contra a fórmula; a banda (pneumá…
+
+## procedural/familias/rolamento/
+
+- `composicoes.js` — composicoes.js — as composições da família `rolamento`: cada peça (anel externo, anel interno, esferas e, na forma 3, o mancal) é uma lista de sólidos tornea…
+- `derivar.js` — derivar.js — dos parâmetros do rolamento (milímetro) à chamada de composição (metro). A forma escolhe a composição.
+- `geometria.js` — geometria.js — o rolamento rígido de esferas e o mancal de pedestal, em milímetro, com o eixo do rolamento em y, de 0 à largura B.
+- `index.js` — index.js — a família `rolamento`: o rolamento rígido de esferas das séries 60 e 62, aberto, vedado ou alojado no mancal de pedestal. A tabela está em `tabela…
+- `rolamento.test.mjs` — rolamento.test.mjs — a família `rolamento`: cada designação da tabela sai com os dois anéis e as esferas, sem órfão; as esferas ficam soltas na folga das pis…
+- `tabela.js` — tabela.js — o rolamento rígido de uma carreira de esferas das séries 60 e 62, em milímetro: furo d, diâmetro externo D, largura B e chanfro mínimo r.
 
 ## procedural/familias/superficie-aerodinamica/
 
@@ -1114,6 +1221,16 @@
 - `index.js` — index.js — a família `superficie-aerodinamica` carregada: o contrato `familia.json`, as composições e o `derivar`. O registro do produto (`procedural/familia…
 - `superficie-aerodinamica.test.js` — superficie-aerodinamica.test.js — a família `superficie-aerodinamica` medida na malha e nos argumentos que o `derivar` entrega. O perfil NACA (o bordo de fug…
 - `superficie.js` — superficie.js — as seções do `loft` de uma superfície aerodinâmica: a parte fixa, o comando de cada lado e as portas, em metro.
+
+## procedural/familias/tubulacao/
+
+- `composicoes.js` — composicoes.js — as composições da família `tubulacao`: o trecho e o tampão por `lathe` da seção fechada, e a curva por dois `friso` de seção circular ao lon…
+- `derivar.js` — derivar.js — dos parâmetros da peça de tubulação (milímetro) à chamada de composição (metro). A forma escolhe a composição.
+- `geometria.js` — geometria.js — as medidas de uma peça da família `tubulacao`, em milímetro: o trecho reto, a curva e o tampão, ocos.
+- `index.js` — index.js — a família `tubulacao`: o trecho reto, a curva e o tampão ocos, por diâmetro externo e parede. A rede inteira, do traçado às peças, sai de `rede.js…
+- `rede.js` — rede.js — a rede de tubos de um traçado, como a lista das peças da família `tubulacao` com a pose de cada uma, em metro.
+- `tabela.js` — tabela.js — as bitolas da tubulação, em milímetro, por material.
+- `tracado.js` — tracado.js — a leitura e a conferência do traçado de uma rede de tubos, em milímetro.
 
 ## procedural/nucleo/
 
@@ -3147,6 +3264,12 @@
 
 - `receita.js` — correcao-de-superficie/rede-tres-no-no/receita.js — a chapa de prova 'rede-tres-no-no' de `../chapas.mjs`, onde estão a forma e a continuidade declarada.
 
+## tools/fixtures/corrente-e-esteira/
+
+- `exportacao.test.mjs` — exportacao.test.mjs — o gate 4 do plano de corrente e esteira: a transmissão por corrente de prova e a esteira de prova saem abaixo de dez segundos e em STEP…
+- `transmissao.mjs` — transmissao.mjs — a transmissão por corrente de prova: as duas rodas dentadas e a corrente da `transmissaoPorCorrente`, postas pelo `instanciaDeFamilia`, com…
+- `transmissao.test.mjs` — transmissao.test.mjs — a fatia 2 do plano de corrente e esteira: a corrente 08B entre rodas de 18 e 36 dentes fecha com um número par de elos, cada trecho re…
+
 ## tools/fixtures/costuras-e-furos/
 
 - `medir.mjs` — medir.mjs — executa uma peça de prova de `tools/fixtures/costuras-e-furos/` e devolve os números das três réguas de malha mais a contagem de arestas soltas, …
@@ -3229,6 +3352,11 @@
 ## tools/fixtures/descrever-sem-calar/orfao/referencias/
 
 - `alvo.md` — Alvo
+
+## tools/fixtures/elementos-de-maquina/
+
+- `mesa-linear.mjs` — mesa-linear.mjs — a mesa linear de prova do plano de elementos de máquina, em milímetro na montagem e metro na receita.
+- `mesa-linear.test.mjs` — mesa-linear.test.mjs — o gate de saída do plano de elementos de máquina: a mesa linear de prova sai com as quatro famílias (perfil, guia, rolamento no mancal…
 
 ## tools/fixtures/faces-finas/
 
@@ -3488,6 +3616,14 @@
 ## tools/fixtures/transmissao/
 
 - `duas-instancias.test.mjs` — duas-instancias.test.mjs — duas instâncias da mesma família numa receita, a prova da fatia 1 do plano de engrenagem, polia e correia.
+- `exportacao.test.mjs` — exportacao.test.mjs — cada perfil das famílias polia-e-correia, engrenagem e cremalheira sai em STEP facetado e em OBJ pelos exportadores do projeto, com a t…
+- `par-de-engrenagens.mjs` — par-de-engrenagens.mjs — o par de retas de módulo 1 com 20 e 40 dentes e o pinhão de 20 dentes sobre a cremalheira, a prova da fatia 5 do plano de engrenagem…
+- `par-de-engrenagens.test.mjs` — par-de-engrenagens.test.mjs — o par de retas de módulo 1 com 20 e 40 dentes e o pinhão sobre a cremalheira: a distância entre centros medida na malha é a cal…
+- `par-gt2.mjs` — par-gt2.mjs — o par GT2 de 20 e 80 dentes com a correia fechada, a prova da fatia 3 do plano de engrenagem, polia e correia. As duas polias entram pelo `inst…
+- `par-gt2.test.mjs` — par-gt2.test.mjs — o par GT2 de 20 e 80 dentes com a correia fechada: a correia tem número inteiro de dentes e a distância entre centros sai da conta do comp…
+- `par-por-atrito.mjs` — par-por-atrito.mjs — duas polias em V ou duas lisas com a correia fechada, a prova da fatia 3 para as correias sem dentes. `receitaDoParPorAtrito(perfis, dis…
+- `par-por-atrito.test.mjs` — par-por-atrito.test.mjs — as correias sem dentes: a em V assenta no canal pela largura de referência da ISO 4183 com a seção da DIN 2215, uma volta por canal…
+- `pedacos.mjs` — pedacos.mjs — quantos pedaços separados a malha tem: as faces que dividem vértice (na mesma posição, a 0,1 µm) ficam no mesmo pedaço. Uma peça de família sai…
 
 ## tools/fixtures/tres-blocos-vinculados/
 
@@ -3496,6 +3632,14 @@
 ## tools/fixtures/tres-blocos-vinculados/receitas/
 
 - `bloco.js` — bloco.js — o bloco da fixture neutra "três blocos vinculados", nas três variações que ela usa: só pino, furo e pino, e só furo. Um arquivo só gera as três, p…
+
+## tools/fixtures/tubulacao/
+
+- `exportacao.test.mjs` — exportacao.test.mjs — o gate 4 do plano da tubulação: a rede de prova sai abaixo de dez segundos e em STEP facetado e em OBJ pelos exportadores do projeto, c…
+- `rede.mjs` — rede.mjs — a receita de uma rede de tubos: as peças de `pecasDaRede` postas pelo `instanciaDeFamilia`, uma chamada por peça, com a base encadeada e o nome de…
+- `rede.test.mjs` — rede.test.mjs — a fatia 2 do plano da tubulação: o zigue-zague de aço de 2" com três curvas de raio longo e o tampão sai com cada peça no lugar, os tubos no …
+- `tracado.test.mjs` — tracado.test.mjs — a fatia 1 do plano da tubulação: a tabela de bitolas e a leitura do traçado, com a conexão de cada nó, o comprimento de corte de cada trec…
+- `tracados.mjs` — tracados.mjs — os traçados neutros da prova da tubulação: a rede de aço de 2" com duas curvas, um tê e uma redução para 1 1/2", e a de PVC de 50 mm em L. Em …
 
 ## tools/fixtures/uniao-de-tubos/
 
@@ -3793,6 +3937,8 @@
 - `lados-das-vistas.mjs` — lados-das-vistas.mjs — de que lado cada vista olha, em texto, para o brief do crítico cego.
 - `lasca.mjs` — lasca.mjs — lista cada face fina de uma receita: a parte, a razão, os cantos em milímetro e o passo que criou a face.
 - `lasca.test.mjs` — lasca.test.mjs — a lista de faces finas acha a lateral de uma aresta de 2,8 mm no perfil de uma perua, e diz a parte, a razão, os cantos em milímetro e o pas…
+- `lascas-da-malha.mjs` — lascas-da-malha.mjs — os pedaços finos demais para serem de propósito: a lasca que uma subtração deixa solta.
+- `lascas-da-malha.test.mjs` — lascas-da-malha.test.mjs — a lasca de 0,01 mm solta ao lado de um cubo é acusada, o cubo não, e a placa de 0,05 mm passa.
 - `leitura-por-regioes.mjs` — leitura-por-regioes.mjs — a vista de referência e a captura do rascunho cortadas na mesma grade, região por região, ampliadas lado a lado, com a resposta de …
 - `leitura-por-regioes.test.mjs` — leitura-por-regioes.test.mjs — a leitura por regiões: a captura alinhada à caixa da referência, a grade que cobre a vista inteira, as folhas iguais a cada ex…
 - `ler-diario.mjs` — ler-diario.mjs — lê o diário da oficina e responde onde o tempo foi e onde o trabalho emperrou.

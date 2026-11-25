@@ -83,7 +83,7 @@ export function geometriaDaPolia(parametros) {
     return {
       tipo, correia: c.nome, forma: c.forma, perfil: fechar(perfil), altura, raioDoFuro: rb, raioDoCubo: rc, comFlanges,
       diametroPrimitivo: primitivo, diametroExterno: 2 * ro, diametroDaRaiz: 2 * raiz, passo: c.passo, dentes,
-      canal: vaoDoDente(c, ro), baseDoCanal: baseDaFaixa, alturaDoCanal, grausEntreDentes: 360 / dentes,
+      canal: vaoDoDente(c, ro), baseDoCanal: baseDaFaixa, alturaDoCanal, grausEntreDentes: 360 / dentes, centroDaFaixa: baseDaFaixa + faixa / 2, largura,
     };
   }
   if (tipo === 2) {

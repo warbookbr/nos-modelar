@@ -1,0 +1,247 @@
+{
+  "formato": "mecanifica.aprovacao-da-familia@1",
+  "familia": "roda-dentada",
+  "versao": "1.0.0",
+  "mecanica": {
+    "data": "2026-11-24",
+    "pontos": {
+      "minimo": {
+        "parametros": {
+          "comprimentoDoCubo": 3,
+          "dentes": 9,
+          "diametroDoCubo": 10,
+          "diametroDoRolo": 6.35,
+          "furo": 5,
+          "larguraInterna": 5.72,
+          "passo": 9.525
+        },
+        "hash": "sha256:facbf5811f0f2afbf50522a52f490eb4aeaf8e6de613c5cedc0f497ac8cbdb8a",
+        "medidas": []
+      },
+      "medio": {
+        "parametros": {
+          "comprimentoDoCubo": 12,
+          "dentes": 25,
+          "diametroDoCubo": 40,
+          "diametroDoRolo": 10.16,
+          "furo": 20,
+          "larguraInterna": 9.65,
+          "passo": 15.875
+        },
+        "hash": "sha256:e79fce285e072cc5c8135e22d76e2cbfed06adcf48921eca6d93068c3b20bfbe",
+        "medidas": []
+      },
+      "maximo": {
+        "parametros": {
+          "comprimentoDoCubo": 60,
+          "dentes": 80,
+          "diametroDoCubo": 250,
+          "diametroDoRolo": 15.88,
+          "furo": 150,
+          "larguraInterna": 17.02,
+          "passo": 25.4
+        },
+        "hash": "sha256:1d4278c7c8576e61e2f8e3605122028ee6f5c576c653f9b68c914d3f83a96d7f",
+        "medidas": []
+      }
+    },
+    "varredura": {
+      "sondas": 14,
+      "recusasDeclaradas": [
+        {
+          "ponto": "dentes=9",
+          "restricao": "cubo-dentro-da-raiz"
+        },
+        {
+          "ponto": "diametroDoCubo=10",
+          "restricao": "furo-dentro-do-cubo"
+        },
+        {
+          "ponto": "diametroDoCubo=250",
+          "restricao": "cubo-dentro-da-raiz"
+        },
+        {
+          "ponto": "diametroDoRolo=15.88",
+          "restricao": "rolo-cabe-no-passo"
+        },
+        {
+          "ponto": "furo=150",
+          "restricao": "furo-dentro-do-cubo"
+        },
+        {
+          "ponto": "passo=9.525",
+          "restricao": "rolo-cabe-no-passo"
+        }
+      ]
+    },
+    "portas": [
+      "furo"
+    ],
+    "perfis": {
+      "roda-06b-80": {
+        "parametros": {
+          "comprimentoDoCubo": 7,
+          "dentes": 80,
+          "diametroDoCubo": 79,
+          "diametroDoRolo": 6.35,
+          "furo": 39,
+          "larguraInterna": 5.72,
+          "passo": 9.525
+        },
+        "hash": "sha256:299bc130d77a8172f31ec9be32bff743554afa654d25d8f2cd216486c7a14bc4",
+        "medidas": []
+      },
+      "roda-08b-18": {
+        "parametros": {
+          "comprimentoDoCubo": 9,
+          "dentes": 18,
+          "diametroDoCubo": 43,
+          "diametroDoRolo": 8.51,
+          "furo": 21,
+          "larguraInterna": 7.75,
+          "passo": 12.7
+        },
+        "hash": "sha256:2c8d9151a18d9be29886a9715f35f5f52c3d750b03c370abe8a97e38aee70913",
+        "medidas": []
+      },
+      "roda-08b-9": {
+        "parametros": {
+          "comprimentoDoCubo": 9,
+          "dentes": 9,
+          "diametroDoCubo": 15,
+          "diametroDoRolo": 8.51,
+          "furo": 7,
+          "larguraInterna": 7.75,
+          "passo": 12.7
+        },
+        "hash": "sha256:3237136442c20a225ba57c6bdaa5ee4c35a6b9b3d0f1d59cdfa946797cb74bb2",
+        "medidas": []
+      },
+      "roda-10b-40": {
+        "parametros": {
+          "comprimentoDoCubo": 12,
+          "dentes": 40,
+          "diametroDoCubo": 82,
+          "diametroDoRolo": 10.16,
+          "furo": 41,
+          "larguraInterna": 9.65,
+          "passo": 15.875
+        },
+        "hash": "sha256:4b2d455600462616fc4e2932a90ea0c5868680e72e0b215a706e59193fa1ac57",
+        "medidas": []
+      },
+      "roda-16b-25": {
+        "parametros": {
+          "comprimentoDoCubo": 20,
+          "dentes": 25,
+          "diametroDoCubo": 101,
+          "diametroDoRolo": 15.88,
+          "furo": 50,
+          "larguraInterna": 17.02,
+          "passo": 25.4
+        },
+        "hash": "sha256:30023142673eb47255c8580db88ca0d9b6d3ff1c5f8caf271667f367bdeed8e6",
+        "medidas": []
+      }
+    },
+    "escalasDosPerfis": {
+      "sondas": 60,
+      "recusasDeclaradas": [
+        {
+          "ponto": "roda-06b-80: diametroDoCubo=10",
+          "restricao": "furo-dentro-do-cubo"
+        },
+        {
+          "ponto": "roda-06b-80: diametroDoCubo=250",
+          "restricao": "cubo-dentro-da-raiz"
+        },
+        {
+          "ponto": "roda-06b-80: diametroDoRolo=15.88",
+          "restricao": "rolo-cabe-no-passo"
+        },
+        {
+          "ponto": "roda-06b-80: furo=150",
+          "restricao": "furo-dentro-do-cubo"
+        },
+        {
+          "ponto": "roda-08b-18: diametroDoCubo=10",
+          "restricao": "furo-dentro-do-cubo"
+        },
+        {
+          "ponto": "roda-08b-18: diametroDoCubo=250",
+          "restricao": "cubo-dentro-da-raiz"
+        },
+        {
+          "ponto": "roda-08b-18: diametroDoRolo=15.88",
+          "restricao": "rolo-cabe-no-passo"
+        },
+        {
+          "ponto": "roda-08b-18: furo=150",
+          "restricao": "furo-dentro-do-cubo"
+        },
+        {
+          "ponto": "roda-08b-18: passo=9.525",
+          "restricao": "cubo-dentro-da-raiz"
+        },
+        {
+          "ponto": "roda-08b-9: diametroDoCubo=10",
+          "restricao": "furo-dentro-do-cubo"
+        },
+        {
+          "ponto": "roda-08b-9: diametroDoCubo=250",
+          "restricao": "cubo-dentro-da-raiz"
+        },
+        {
+          "ponto": "roda-08b-9: diametroDoRolo=15.88",
+          "restricao": "cubo-dentro-da-raiz"
+        },
+        {
+          "ponto": "roda-08b-9: furo=150",
+          "restricao": "furo-dentro-do-cubo"
+        },
+        {
+          "ponto": "roda-08b-9: passo=9.525",
+          "restricao": "cubo-dentro-da-raiz"
+        },
+        {
+          "ponto": "roda-10b-40: diametroDoCubo=10",
+          "restricao": "furo-dentro-do-cubo"
+        },
+        {
+          "ponto": "roda-10b-40: diametroDoCubo=250",
+          "restricao": "cubo-dentro-da-raiz"
+        },
+        {
+          "ponto": "roda-10b-40: diametroDoRolo=15.88",
+          "restricao": "rolo-cabe-no-passo"
+        },
+        {
+          "ponto": "roda-10b-40: furo=150",
+          "restricao": "furo-dentro-do-cubo"
+        },
+        {
+          "ponto": "roda-10b-40: passo=9.525",
+          "restricao": "rolo-cabe-no-passo"
+        },
+        {
+          "ponto": "roda-16b-25: diametroDoCubo=10",
+          "restricao": "furo-dentro-do-cubo"
+        },
+        {
+          "ponto": "roda-16b-25: diametroDoCubo=250",
+          "restricao": "cubo-dentro-da-raiz"
+        },
+        {
+          "ponto": "roda-16b-25: furo=150",
+          "restricao": "furo-dentro-do-cubo"
+        },
+        {
+          "ponto": "roda-16b-25: passo=9.525",
+          "restricao": "cubo-dentro-da-raiz"
+        }
+      ]
+    }
+  },
+  "critico": null,
+  "pessoa": null
+}

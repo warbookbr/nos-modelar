@@ -137,7 +137,7 @@
       "parametros": "seção e tamanho, comprimento, corte de ponta",
       "referencias": ["FreeCAD: Frame/BIM Profile", "Onshape: Frame"],
       "aqui": "parcial",
-      "onde": "extensão `estruturaDeBarras`: tubo redondo, quadrado, retangular e cantoneira entre nós; I, H, U e alumínio ranhurado não"
+      "onde": "família `perfil-estrutural`: IPE, HE A e UPN da EN 10365 e alumínio ranhurado de 20 a 45 mm, cortados no comprimento, retos ou a 45° nas pontas; a extensão `estruturaDeBarras` faz tubo redondo, quadrado, retangular e cantoneira entre nós; os perfis novos na `estruturaDeBarras` não"
     },
     "barras": {
       "nome": "estrutura de barras",
@@ -163,8 +163,8 @@
       "automatiza": "traça uma rede de tubos e põe sozinha as curvas, tês, reduções, flanges e válvulas por bitola",
       "parametros": "traçado, bitola, tipo de conexão",
       "referencias": ["FreeCAD: Dodo e Flamingo", "Plant 3D (conceito de catálogo de conexões)"],
-      "aqui": "não",
-      "onde": "nem esboço nem núcleo"
+      "aqui": "tem",
+      "onde": "a família `tubulacao` (trecho, curva, tampão, tê, redução, flange de pescoço e válvulas de esfera e de gaveta) e `pecasDaRede`, que lê o traçado de nós e trechos com bitola de aço (ASME) ou PVC (NBR 5648), corta cada trecho e põe cada conexão com as bocas casadas; tê inclinado, cruzeta e cobre não"
     },
     "elos": {
       "nome": "elos ao longo de caminho fechado",
@@ -172,8 +172,8 @@
       "automatiza": "distribui elos articulados num contorno fechado em volta de rodas (corrente, esteira de trator, porta-cabos, degraus de escada rolante, correia dentada)",
       "parametros": "elo, passo, rodas ou caminho, tensão",
       "referencias": ["Blender: Array com Curve (técnica de esteira)", "FreeCAD Gears: sprocket"],
-      "aqui": "não",
-      "onde": "nem esboço nem núcleo"
+      "aqui": "parcial",
+      "onde": "famílias `roda-dentada` (ISO 606 série B), `corrente` (corrente de rolos fechada em volta de duas rodas, com `transmissaoPorCorrente`) e `esteira` (sapatas de aço com garra em volta da motriz e da guia, com roletes); corrente dupla, série A, esteira de borracha, porta-cabos e degraus de escada rolante não"
     },
     "aerofolio": {
       "nome": "perfil aerodinâmico e pás",
@@ -253,8 +253,8 @@
       "automatiza": "gera engrenagem reta, helicoidal, cônica, sem-fim, cremalheira e catraca com dente evolvente por módulo e número de dentes, e diz a distância entre centros do par",
       "parametros": "tipo, módulo, dentes, ângulo de pressão, largura",
       "referencias": ["FreeCAD Gears", "BOSL2: gears", "Blender: Extra Objects (gears)"],
-      "aqui": "não",
-      "onde": "nenhum gerador; o componente engrenagem do esboço antigo saiu com ele em 2026-11-05"
+      "aqui": "parcial",
+      "onde": "família `engrenagem`: a reta de dente evolvente pelo perfil de referência tipo A da ISO 53 (de 17 a 200 dentes, módulo de 0,5 a 10) e a catraca de dente de serra, com cubo, furo e a porta do eixo; família `cremalheira`: a cremalheira reta do mesmo perfil, até 60 dentes; e o par engrenado e o pinhão sobre a cremalheira, com a distância entre centros, a folga entre flancos e a fase (`parDeEngrenagens` e `pinhaoECremalheira` em `engrenamento.js`); a helicoidal, a cônica e o sem-fim não"
     },
     "mola": {
       "nome": "molas",
@@ -271,8 +271,8 @@
       "automatiza": "gera rolamento por série com anéis, corpos rolantes, gaiola e vedação, e bucha e mancal com furação",
       "parametros": "série e tamanho, tipo",
       "referencias": ["FreeCAD: Fasteners e Parts Library", "catálogos de fabricantes em STEP"],
-      "aqui": "não",
-      "onde": "nenhum gerador; os componentes rolamento e mancal do esboço antigo saíram com ele em 2026-11-05"
+      "aqui": "parcial",
+      "onde": "família `rolamento`: rígido de esferas das séries 60 e 62 da ISO 15, aberto, vedado ou no mancal de pedestal; rolos, axial, agulhas e bucha não"
     },
     "eixo": {
       "nome": "eixo escalonado",
@@ -290,7 +290,7 @@
       "parametros": "perfil, diâmetros, centros, largura",
       "referencias": ["FreeCAD Gears: timing gear", "BOSL2"],
       "aqui": "parcial",
-      "onde": "família `polia-e-correia`: polia dentada GT2, HTD 3M, HTD 5M e T5 por dentes, com ou sem flanges, polia em V das seções Z, A e B da ISO 4183 de um a quatro canais e polia lisa, com cubo, furo e a porta do eixo; a correia fechada entre duas polias não"
+      "onde": "família `polia-e-correia`: polia dentada GT2, HTD 3M, HTD 5M e T5 por dentes, com ou sem flanges, polia em V das seções Z, A e B da ISO 4183 de um a quatro canais e polia lisa, com cubo, furo e a porta do eixo; a correia dentada fechada entre duas polias dentadas (`transmissaoDentada`, `geometriaDaCorreia` e `passosDaCorreia` em `correia.js`), com número inteiro de dentes e a distância entre centros recalculada, e a correia em V (seção da DIN 2215, uma volta por canal) e a lisa entre duas polias do mesmo tipo (`transmissaoPorAtrito` e `passosDaCorreiaPorAtrito`); o comprimento comercial da correia em V, o tensor e mais de duas polias não"
     },
     "rodaPneu": {
       "nome": "roda e pneu",
@@ -317,7 +317,7 @@
       "parametros": "diâmetro, curso, extensão, montagem das pontas",
       "referencias": ["catálogos de fabricantes em STEP (conceito)"],
       "aqui": "parcial",
-      "onde": "família `cilindro-hidraulico`: camisa, haste, êmbolo, cabeça e olhais liso e com rótula, curso conferido; cilindro de haste dupla e telescópico não"
+      "onde": "família `cilindro-hidraulico`: camisa, haste, êmbolo, cabeça e olhais liso e com rótula, curso conferido; cilindro de haste dupla e telescópico não; família `fuso`: fuso trapezoidal (ISO 2904) e de esferas (ISO 3408-2, só o volume de fora) com a castanha flangeada"
     },
     "guia": {
       "nome": "guia linear",
@@ -326,7 +326,7 @@
       "parametros": "tamanho, curso, tipo",
       "referencias": ["catálogos de fabricantes em STEP (conceito)"],
       "aqui": "parcial",
-      "onde": "trilho simples de gaveta e de porta de correr dentro da família `movel-de-caixa`, com articulação prismática; trilho e carro avulsos e guia em V não"
+      "onde": "família `guia-linear`: trilho de perfil com a furação e carro de esferas, tamanhos 15 a 30, com as portas da base e da mesa; o trilho de gaveta e de porta de correr na família `movel-de-caixa`; guia em V não"
     },
     "vedacao": {
       "nome": "vedação",

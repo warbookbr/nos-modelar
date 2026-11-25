@@ -1,0 +1,207 @@
+{
+  "formato": "mecanifica.aprovacao-da-familia@1",
+  "familia": "esteira",
+  "versao": "1.0.0",
+  "mecanica": {
+    "data": "2026-11-24",
+    "pontos": {
+      "minimo": {
+        "parametros": {
+          "alturaDaGarra": 10,
+          "alturaDoElo": 40,
+          "dentes": 15,
+          "diametroDaBucha": 30,
+          "distancia": 1200,
+          "espessuraDaSapata": 8,
+          "espessuraDoElo": 12,
+          "larguraDaSapata": 200,
+          "larguraInterna": 40,
+          "passo": 80,
+          "roletes": 2
+        },
+        "hash": "sha256:a9b9f20ffd04f51c249ff1325e7c938a3ebe634d9b4d1f1cf6831091d5bdbc9a",
+        "medidas": []
+      },
+      "medio": {
+        "parametros": {
+          "alturaDaGarra": 26,
+          "alturaDoElo": 65,
+          "dentes": 21,
+          "diametroDaBucha": 50,
+          "distancia": 2600,
+          "espessuraDaSapata": 14,
+          "espessuraDoElo": 25,
+          "larguraDaSapata": 400,
+          "larguraInterna": 75,
+          "passo": 135,
+          "roletes": 4
+        },
+        "hash": "sha256:0fa1509b2022a4c26cf4e1b9d8c4cf0f94e35c75bf3f8fb4c6f5dd53daeeea9f",
+        "medidas": []
+      },
+      "maximo": {
+        "parametros": {
+          "alturaDaGarra": 50,
+          "alturaDoElo": 100,
+          "dentes": 31,
+          "diametroDaBucha": 80,
+          "distancia": 5000,
+          "espessuraDaSapata": 25,
+          "espessuraDoElo": 40,
+          "larguraDaSapata": 700,
+          "larguraInterna": 120,
+          "passo": 220,
+          "roletes": 8
+        },
+        "hash": "sha256:a66bd36b72fd547f737366f0be7a3e6f0bd382f5ef0fa56899e2034fd1232cde",
+        "medidas": []
+      }
+    },
+    "varredura": {
+      "sondas": 22,
+      "recusasDeclaradas": [
+        {
+          "ponto": "alturaDoElo=40",
+          "restricao": "bucha-dentro-do-elo"
+        },
+        {
+          "ponto": "diametroDaBucha=30",
+          "restricao": "bucha-proporcional-ao-passo"
+        },
+        {
+          "ponto": "diametroDaBucha=80",
+          "restricao": "bucha-dentro-do-elo"
+        },
+        {
+          "ponto": "distancia=1200",
+          "restricao": "distancia-cabe-as-rodas"
+        },
+        {
+          "ponto": "passo=220",
+          "restricao": "bucha-proporcional-ao-passo"
+        }
+      ]
+    },
+    "portas": [],
+    "perfis": {
+      "esteira-101": {
+        "parametros": {
+          "alturaDaGarra": 20,
+          "alturaDoElo": 50,
+          "dentes": 21,
+          "diametroDaBucha": 40,
+          "distancia": 1600,
+          "espessuraDaSapata": 12,
+          "espessuraDoElo": 20,
+          "larguraDaSapata": 300,
+          "larguraInterna": 60,
+          "passo": 101.6,
+          "roletes": 3
+        },
+        "hash": "sha256:69fd4affb9422923518c6aa4798a8cae480e32403f168f95e671e8da2daed76a",
+        "medidas": []
+      },
+      "esteira-135": {
+        "parametros": {
+          "alturaDaGarra": 26,
+          "alturaDoElo": 65,
+          "dentes": 21,
+          "diametroDaBucha": 50,
+          "distancia": 2200,
+          "espessuraDaSapata": 14,
+          "espessuraDoElo": 25,
+          "larguraDaSapata": 400,
+          "larguraInterna": 75,
+          "passo": 135,
+          "roletes": 4
+        },
+        "hash": "sha256:ba35eacf1d0f452073d06826de5e35151e50adabd2ff9245fcae3d72c21527cd",
+        "medidas": []
+      },
+      "esteira-171": {
+        "parametros": {
+          "alturaDaGarra": 32,
+          "alturaDoElo": 80,
+          "dentes": 23,
+          "diametroDaBucha": 60,
+          "distancia": 3000,
+          "espessuraDaSapata": 16,
+          "espessuraDoElo": 30,
+          "larguraDaSapata": 500,
+          "larguraInterna": 90,
+          "passo": 171,
+          "roletes": 5
+        },
+        "hash": "sha256:cf460e01f3f5da39524ed16c0d63707af20dba38ceb38a833a5ef432b4b9c4bb",
+        "medidas": []
+      }
+    },
+    "escalasDosPerfis": {
+      "sondas": 54,
+      "recusasDeclaradas": [
+        {
+          "ponto": "esteira-101: alturaDoElo=40",
+          "restricao": "bucha-dentro-do-elo"
+        },
+        {
+          "ponto": "esteira-101: diametroDaBucha=30",
+          "restricao": "bucha-proporcional-ao-passo"
+        },
+        {
+          "ponto": "esteira-101: diametroDaBucha=80",
+          "restricao": "bucha-dentro-do-elo"
+        },
+        {
+          "ponto": "esteira-101: distancia=1200",
+          "restricao": "distancia-cabe-as-rodas"
+        },
+        {
+          "ponto": "esteira-101: passo=220",
+          "restricao": "bucha-proporcional-ao-passo"
+        },
+        {
+          "ponto": "esteira-135: alturaDoElo=40",
+          "restricao": "bucha-dentro-do-elo"
+        },
+        {
+          "ponto": "esteira-135: diametroDaBucha=30",
+          "restricao": "bucha-proporcional-ao-passo"
+        },
+        {
+          "ponto": "esteira-135: diametroDaBucha=80",
+          "restricao": "bucha-dentro-do-elo"
+        },
+        {
+          "ponto": "esteira-135: distancia=1200",
+          "restricao": "distancia-cabe-as-rodas"
+        },
+        {
+          "ponto": "esteira-135: passo=220",
+          "restricao": "bucha-proporcional-ao-passo"
+        },
+        {
+          "ponto": "esteira-171: alturaDoElo=40",
+          "restricao": "bucha-dentro-do-elo"
+        },
+        {
+          "ponto": "esteira-171: diametroDaBucha=30",
+          "restricao": "bucha-proporcional-ao-passo"
+        },
+        {
+          "ponto": "esteira-171: diametroDaBucha=80",
+          "restricao": "bucha-dentro-do-elo"
+        },
+        {
+          "ponto": "esteira-171: distancia=1200",
+          "restricao": "distancia-cabe-as-rodas"
+        },
+        {
+          "ponto": "esteira-171: passo=220",
+          "restricao": "bucha-proporcional-ao-passo"
+        }
+      ]
+    }
+  },
+  "critico": null,
+  "pessoa": null
+}

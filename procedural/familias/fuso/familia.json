@@ -1,0 +1,128 @@
+{
+  "formato": "mecanifica.familia@1",
+  "id": "fuso",
+  "versao": "1.0.0",
+  "nivel": "componente",
+  "parametros": {
+    "tipo": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 1,
+      "minimo": 1,
+      "maximo": 2,
+      "medio": 1
+    },
+    "diametro": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 20,
+      "minimo": 10,
+      "maximo": 40,
+      "medio": 25
+    },
+    "passo": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 4,
+      "minimo": 2,
+      "maximo": 10,
+      "medio": 5
+    },
+    "comprimento": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 400,
+      "minimo": 60,
+      "maximo": 3000,
+      "medio": 500
+    },
+    "posicaoDaCastanha": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 100,
+      "minimo": 0,
+      "maximo": 2800,
+      "medio": 150
+    }
+  },
+  "restricoes": [
+    {
+      "id": "castanha-no-fuso",
+      "expressao": "posicaoDaCastanha + (2 + 0.4 * max(0, tipo - 1)) * diametro + 2 * passo - comprimento <= 0",
+      "motivo": "a castanha passa da ponta do fuso; diminua a posição da castanha ou aumente o fuso"
+    },
+    {
+      "id": "passo-cabe-no-diametro",
+      "expressao": "passo * 2.2 - diametro <= 0",
+      "motivo": "o passo passa de 0,45 diâmetro: o núcleo fica fino demais"
+    },
+    {
+      "id": "fuso-mais-longo-que-a-castanha",
+      "expressao": "3 * diametro + 2 * passo - comprimento <= 0",
+      "motivo": "o fuso precisa ser mais longo que a castanha"
+    }
+  ],
+  "portas": [
+    {
+      "id": "ponta",
+      "tipo": "anel",
+      "papel": "ocupa"
+    },
+    {
+      "id": "flange",
+      "tipo": "plano",
+      "papel": "apoia"
+    }
+  ],
+  "ferramentas": [
+    "atuador",
+    "rosca"
+  ],
+  "perguntas": {
+    "atuador": [
+      "O fuso tem o filete contínuo ao longo do comprimento (trapezoidal de 30° ou a crista larga do de esferas) e a castanha flangeada com quatro furos envolve o fuso sem atravessá-lo?"
+    ]
+  },
+  "perfis": {
+    "trapezoidal-tr20x4": {
+      "descricao": "fuso trapezoidal Tr20x4, 400 mm, com a castanha",
+      "parametros": {
+        "tipo": 1,
+        "diametro": 20,
+        "passo": 4,
+        "comprimento": 400,
+        "posicaoDaCastanha": 150
+      }
+    },
+    "trapezoidal-tr10x2": {
+      "descricao": "fuso trapezoidal Tr10x2, 200 mm",
+      "parametros": {
+        "tipo": 1,
+        "diametro": 10,
+        "passo": 2,
+        "comprimento": 200,
+        "posicaoDaCastanha": 50
+      }
+    },
+    "esferas-25x5": {
+      "descricao": "fuso de esferas 25x5, 500 mm, com a castanha",
+      "parametros": {
+        "tipo": 2,
+        "diametro": 25,
+        "passo": 5,
+        "comprimento": 500,
+        "posicaoDaCastanha": 200
+      }
+    },
+    "esferas-32x10": {
+      "descricao": "fuso de esferas 32x10, 600 mm",
+      "parametros": {
+        "tipo": 2,
+        "diametro": 32,
+        "passo": 10,
+        "comprimento": 600,
+        "posicaoDaCastanha": 0
+      }
+    }
+  }
+}

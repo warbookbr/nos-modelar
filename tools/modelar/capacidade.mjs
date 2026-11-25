@@ -59,6 +59,18 @@ export const CAPACIDADES = Object.freeze({
   areaDoContorno: { arquivo: 'procedural/nucleo/contorno.js', funcao: 'areaDoContorno', de: 'procedural/nucleo/contorno.js' },
   deslocarContorno: { arquivo: 'procedural/nucleo/contorno.js', funcao: 'deslocarContorno', de: 'procedural/nucleo/contorno.js' },
   contornoComArcos: { arquivo: 'procedural/nucleo/arcos-do-contorno.js', funcao: 'contornoComArcos', de: 'procedural/nucleo/arcos-do-contorno.js' },
+  transmissaoDentada: { arquivo: 'procedural/familias/polia-e-correia/correia.js', funcao: 'transmissaoDentada', de: 'procedural/familias/polia-e-correia/correia.js' },
+  transmissaoPorAtrito: { arquivo: 'procedural/familias/polia-e-correia/correia.js', funcao: 'transmissaoPorAtrito', de: 'procedural/familias/polia-e-correia/correia.js' },
+  parDeEngrenagens: { arquivo: 'procedural/familias/engrenagem/engrenamento.js', funcao: 'parDeEngrenagens', de: 'procedural/familias/engrenagem/engrenamento.js' },
+  pecasDaRede: { arquivo: 'procedural/familias/tubulacao/rede.js', funcao: 'pecasDaRede', de: 'procedural/familias/tubulacao/rede.js' },
+  parametrosDoPerfil: { arquivo: 'procedural/familias/perfil-estrutural/tabela.js', funcao: 'parametrosDoPerfil', de: 'procedural/familias/perfil-estrutural/tabela.js' },
+  parametrosDaGuia: { arquivo: 'procedural/familias/guia-linear/tabela.js', funcao: 'parametrosDaGuia', de: 'procedural/familias/guia-linear/tabela.js' },
+  parametrosDoRolamento: { arquivo: 'procedural/familias/rolamento/tabela.js', funcao: 'parametrosDoRolamento', de: 'procedural/familias/rolamento/tabela.js' },
+  parametrosDoFuso: { arquivo: 'procedural/familias/fuso/tabela.js', funcao: 'parametrosDoFuso', de: 'procedural/familias/fuso/tabela.js' },
+  parametrosDaRoda: { arquivo: 'procedural/familias/roda-dentada/tabela.js', funcao: 'parametrosDaRoda', de: 'procedural/familias/roda-dentada/tabela.js' },
+  parametrosDaEsteira: { arquivo: 'procedural/familias/esteira/tabela.js', funcao: 'parametrosDaEsteira', de: 'procedural/familias/esteira/tabela.js' },
+  transmissaoPorCorrente: { arquivo: 'procedural/familias/corrente/transmissao.js', funcao: 'transmissaoPorCorrente', de: 'procedural/familias/corrente/transmissao.js' },
+  pinhaoECremalheira: { arquivo: 'procedural/familias/engrenagem/engrenamento.js', funcao: 'pinhaoECremalheira', de: 'procedural/familias/engrenagem/engrenamento.js' },
 });
 
 export const LIMITE_DE_LINHAS = 60;

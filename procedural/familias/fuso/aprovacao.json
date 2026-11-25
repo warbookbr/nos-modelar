@@ -1,0 +1,165 @@
+{
+  "formato": "mecanifica.aprovacao-da-familia@1",
+  "familia": "fuso",
+  "versao": "1.0.0",
+  "mecanica": {
+    "data": "2026-11-24",
+    "pontos": {
+      "minimo": {
+        "parametros": {
+          "comprimento": 60,
+          "diametro": 10,
+          "passo": 2,
+          "posicaoDaCastanha": 0,
+          "tipo": 1
+        },
+        "hash": "sha256:e9cb82d2856ee9739fa934a4ea4c538247e0ecd918d42eb1b0059d32a7fd829c",
+        "medidas": []
+      },
+      "medio": {
+        "parametros": {
+          "comprimento": 500,
+          "diametro": 25,
+          "passo": 5,
+          "posicaoDaCastanha": 150,
+          "tipo": 1
+        },
+        "hash": "sha256:34f022f86b6e831610febc469560ceda634e1940c2b65385c7d84d673b30b205",
+        "medidas": []
+      },
+      "maximo": {
+        "parametros": {
+          "comprimento": 3000,
+          "diametro": 40,
+          "passo": 10,
+          "posicaoDaCastanha": 2800,
+          "tipo": 2
+        },
+        "hash": "sha256:bd763be9bedee76fa0b57f3a1fb0ed517e2396714ebf402401abc885b6005eeb",
+        "medidas": []
+      }
+    },
+    "varredura": {
+      "sondas": 10,
+      "recusasDeclaradas": [
+        {
+          "ponto": "comprimento=60",
+          "restricao": "castanha-no-fuso"
+        },
+        {
+          "ponto": "passo=10",
+          "restricao": "passo-cabe-no-diametro"
+        },
+        {
+          "ponto": "posicaoDaCastanha=2800",
+          "restricao": "castanha-no-fuso"
+        }
+      ]
+    },
+    "portas": [
+      "flange",
+      "ponta"
+    ],
+    "perfis": {
+      "esferas-25x5": {
+        "parametros": {
+          "comprimento": 500,
+          "diametro": 25,
+          "passo": 5,
+          "posicaoDaCastanha": 200,
+          "tipo": 2
+        },
+        "hash": "sha256:446ee6a90e2f77b62dad8f65b69dc9dd5bc36644b23dae007b3d4d2c05a84662",
+        "medidas": []
+      },
+      "esferas-32x10": {
+        "parametros": {
+          "comprimento": 600,
+          "diametro": 32,
+          "passo": 10,
+          "posicaoDaCastanha": 0,
+          "tipo": 2
+        },
+        "hash": "sha256:782793e9f02324395114b128ced5fc24344816560abc36603c6e15796ce611ba",
+        "medidas": []
+      },
+      "trapezoidal-tr10x2": {
+        "parametros": {
+          "comprimento": 200,
+          "diametro": 10,
+          "passo": 2,
+          "posicaoDaCastanha": 50,
+          "tipo": 1
+        },
+        "hash": "sha256:98d815e4fffd9e912295e086e7a5a01154498335c347bd9c6e9854e72380349c",
+        "medidas": []
+      },
+      "trapezoidal-tr20x4": {
+        "parametros": {
+          "comprimento": 400,
+          "diametro": 20,
+          "passo": 4,
+          "posicaoDaCastanha": 150,
+          "tipo": 1
+        },
+        "hash": "sha256:298f12f2477bbaf69ced333085eccc77ff15e58ec5ab5c943280ea6661883a20",
+        "medidas": []
+      }
+    },
+    "escalasDosPerfis": {
+      "sondas": 32,
+      "recusasDeclaradas": [
+        {
+          "ponto": "esferas-25x5: comprimento=60",
+          "restricao": "castanha-no-fuso"
+        },
+        {
+          "ponto": "esferas-25x5: diametro=10",
+          "restricao": "passo-cabe-no-diametro"
+        },
+        {
+          "ponto": "esferas-25x5: posicaoDaCastanha=2800",
+          "restricao": "castanha-no-fuso"
+        },
+        {
+          "ponto": "esferas-32x10: comprimento=60",
+          "restricao": "castanha-no-fuso"
+        },
+        {
+          "ponto": "esferas-32x10: diametro=10",
+          "restricao": "passo-cabe-no-diametro"
+        },
+        {
+          "ponto": "esferas-32x10: posicaoDaCastanha=2800",
+          "restricao": "castanha-no-fuso"
+        },
+        {
+          "ponto": "trapezoidal-tr10x2: comprimento=60",
+          "restricao": "castanha-no-fuso"
+        },
+        {
+          "ponto": "trapezoidal-tr10x2: passo=10",
+          "restricao": "passo-cabe-no-diametro"
+        },
+        {
+          "ponto": "trapezoidal-tr10x2: posicaoDaCastanha=2800",
+          "restricao": "castanha-no-fuso"
+        },
+        {
+          "ponto": "trapezoidal-tr20x4: comprimento=60",
+          "restricao": "castanha-no-fuso"
+        },
+        {
+          "ponto": "trapezoidal-tr20x4: passo=10",
+          "restricao": "passo-cabe-no-diametro"
+        },
+        {
+          "ponto": "trapezoidal-tr20x4: posicaoDaCastanha=2800",
+          "restricao": "castanha-no-fuso"
+        }
+      ]
+    }
+  },
+  "critico": null,
+  "pessoa": null
+}

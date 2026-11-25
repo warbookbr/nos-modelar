@@ -25,6 +25,7 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
 - [Componentes eletrônicos (2026-11-16): provas do gate de saída e limitações conhecidas](componentes-eletronicos-2026-11-16/README.md) — `componentes-eletronicos-2026-11-16`
 - [Banco de provas — conformação na chapa e sobreposição 3D (2026-11-20)](conformacao-e-sobreposicao-3d-2026-11-20/README.md) — `conformacao-e-sobreposicao-3d-2026-11-20`
 - [Correção de superfície: chapas de prova, linha de base, corte com simetria, alisamento e emenda declarada](correcao-de-superficie-2026-11-16/README.md) — `correcao-de-superficie-2026-11-16`
+- [Corrente e esteira: roda dentada, corrente de rolos e esteira de sapatas](corrente-e-esteira-2026-11-24/README.md) — `corrente-e-esteira-2026-11-24`
 - [Cordão de solda na costura de tubos: rodadas de forma e medidas](costura-em-no-de-tubos-2026-11-15/README.md) — `costura-em-no-de-tubos-2026-11-15`
 - [Curvas lisas e zebra numérica: a zebra numérica, o ajuste de curva lisa e o objetivo de lisura](curvas-lisas-2026-11-17/README.md) — `curvas-lisas-2026-11-17`
 - [Braço robótico, vista lateral: a descrição](desenho-braco-2026-10-14/DESCRICAO.md) — `desenho-braco-2026-10-14`
@@ -33,6 +34,7 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
   - [Carcaça da empilhadeira, vista lateral: o resultado da prova](desenho-carcaca-2026-10-14/RESULTADO.md) — `desenho-carcaca-2026-10-14`
 - `desenho-das-linhas`
 - [Divisão por contorno: fatia 1, a operação e as provas na chapa de teste](divisao-por-contorno-2026-11-18/README.md) — `divisao-por-contorno-2026-11-18`
+- [Elementos de máquina: perfil, guia, rolamento e fuso](elementos-de-maquina-2026-11-24/README.md) — `elementos-de-maquina-2026-11-24`
 - [Carcaça da empilhadeira: alinhamento](empilhadeira-2026-10-09/ALINHAMENTO.md) — `empilhadeira-2026-10-09`
   - [Roteiro da análise](empilhadeira-2026-10-09/referencias/carcaca_lateral.pacote/roteiro.md) — `empilhadeira-2026-10-09/referencias/carcaca_lateral.pacote`
 - `empilhadeira-2026-10-14`
@@ -87,5 +89,7 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
 - [Suporte de tubo sem identificador numérico](suporte-tubo-2026-10-10/README.md) — `suporte-tubo-2026-10-10`
 - [Madeira em Node ao lado da do Blender (2026-10-19)](textura-2026-10-19/README.md) — `textura-2026-10-19`
 - [Tolerância do STEP: o acervo exportado antes e depois da tolerância em milímetro](tolerancia-do-step-2026-11-22/README.md) — `tolerancia-do-step-2026-11-22`
+- [Transmissão: polias, correias, engrenagens e cremalheira](transmissao-2026-11-23/README.md) — `transmissao-2026-11-23`
 - [Trilhas da placa: a linha de base, as regras e a lista de exemplo](trilhas-da-placa-2026-11-23/README.md) — `trilhas-da-placa-2026-11-23`
+- [Tubulação com conexões](tubulacao-2026-11-23/README.md) — `tubulacao-2026-11-23`
 <!-- indice-do-banco:fim -->

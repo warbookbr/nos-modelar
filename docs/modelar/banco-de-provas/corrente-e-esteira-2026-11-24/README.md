@@ -1,0 +1,7 @@
+# Corrente e esteira: roda dentada, corrente de rolos e esteira de sapatas
+
+Banco de provas do plano de corrente e esteira, de 2026-11-24. As imagens são as que a pessoa aprovou, feitas a partir das malhas executadas, sem retoque.
+
+`rodas-dentadas.png` mostra os cinco perfis da família `roda-dentada` (06B de 80 dentes, 08B de 9 e de 18, 10B de 40 e 16B de 25), em perspectiva, de frente e de perto nos vãos; as imagens são de antes de o assento passar de 7 para 13 pontos, na fatia 2, mudança que não aparece nessa escala. `transmissao-por-corrente.png` mostra a corrente 08B entre rodas de 18 e 36 dentes e a 16B entre rodas de 15 e 40, inteiras e de perto na roda pequena, com os rolos, os pinos e as placas internas e externas. `esteiras.png` mostra as esteiras de passo 135 e 171, com a motriz, a guia, os roletes, os trilhos, as buchas e as sapatas com garra.
+
+As medidas estão nos testes de cada família (`procedural/familias/roda-dentada/`, `corrente/` e `esteira/`) e nos de `tools/fixtures/corrente-e-esteira/`: o diâmetro de raiz da ISO 606, a corrente com número par de elos e trechos retos em passos exatos, os rolos no vão sem atravessar, os encontros da esteira só encostando, o tempo de cada prova e a exportação em STEP e OBJ com as partes nomeadas. As fontes estão no comentário de cada `tabela.js` e `geometria.js`: as fórmulas do dente da ISO 606 pelo guia da Planichapa e pelo catálogo DIN 8187 / ISO 606 da Top Machinery, e as medidas da corrente pela tabela BS/ISO da BEP; a esteira segue regra da família.

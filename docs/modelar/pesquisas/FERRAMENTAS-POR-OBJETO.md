@@ -25,8 +25,8 @@ Os tipos são três. O modificador age sobre uma forma que já existe; o gerador
 | 11 | perfil estrutural (`perfil`) | gerador | 43 (12%) | 18 | parcial | estende uma seção normalizada (I, H, U, L, tubo, alumínio ranhurado) ao longo de uma linha, com cortes de ponta |
 | 12 | manopla e botão (`manopla`) | especializado | 42 (11%) | 14 | parcial | gera botão rotativo, manípulo, volante e cabo ergonômico com furo de eixo e estrias |
 | 13 | guia linear (`guia`) | especializado | 32 (9%) | 13 | parcial | gera trilho e carro, corrediça de gaveta e guia em V por tamanho e curso |
-| 14 | tubulação com conexões (`tubulacao`) | gerador | 27 (7%) | 11 | não | traça uma rede de tubos e põe sozinha as curvas, tês, reduções, flanges e válvulas por bitola |
-| 15 | engrenagens (`engrenagem`) | especializado | 26 (7%) | 11 | não | gera engrenagem reta, helicoidal, cônica, sem-fim, cremalheira e catraca com dente evolvente por módulo e número de dentes, e diz a distância entre centros do par |
+| 14 | tubulação com conexões (`tubulacao`) | gerador | 27 (7%) | 11 | tem | traça uma rede de tubos e põe sozinha as curvas, tês, reduções, flanges e válvulas por bitola |
+| 15 | engrenagens (`engrenagem`) | especializado | 26 (7%) | 11 | parcial | gera engrenagem reta, helicoidal, cônica, sem-fim, cremalheira e catraca com dente evolvente por módulo e número de dentes, e diz a distância entre centros do par |
 | 16 | molas (`mola`) | especializado | 26 (7%) | 10 | parcial | gera mola de compressão, tração com ganchos e torção com braços, com espiras fechadas nas pontas e comprimento entre dois pontos |
 | 17 | rosca (`rosca`) | especializado | 26 (7%) | 13 | parcial | faz rosca macho ou fêmea métrica, trapezoidal ou de tampa, em qualquer cilindro ou furo |
 | 18 | tecido e estofado (`tecido`) | gerador | 26 (7%) | 11 | não | faz almofada inflada com costura, lona esticada, vela e rede a partir de contorno e pressão |
@@ -34,14 +34,14 @@ Os tipos são três. O modificador age sobre uma forma que já existe; o gerador
 | 20 | móvel modular (`movel`) | gerador | 23 (6%) | 6 | parcial | faz caixaria de móvel com laterais, prateleiras, portas e gavetas por vãos |
 | 21 | fixadores normalizados (`fixador`) | especializado | 21 (6%) | 9 | parcial | gera parafuso, porca, arruela, rebite e pino por norma e bitola |
 | 22 | relevo funcional (`textura`) | modificador | 21 (6%) | 10 | parcial | aplica recartilhado, estrias de pega, piso antiderrapante ou chapa ondulada numa face |
-| 23 | elos ao longo de caminho fechado (`elos`) | gerador | 19 (5%) | 8 | não | distribui elos articulados num contorno fechado em volta de rodas (corrente, esteira de trator, porta-cabos, degraus de escada rolante, correia dentada) |
+| 23 | elos ao longo de caminho fechado (`elos`) | gerador | 19 (5%) | 8 | parcial | distribui elos articulados num contorno fechado em volta de rodas (corrente, esteira de trator, porta-cabos, degraus de escada rolante, correia dentada) |
 | 24 | texto e escala gravados (`texto`) | modificador | 19 (5%) | 9 | não | grava ou põe em relevo letras, números e escalas graduadas (paquímetro, mostrador, placa) |
 | 25 | polia e correia (`polia`) | especializado | 18 (5%) | 7 | parcial | gera polias em V ou dentadas e a correia fechada que as envolve na posição certa |
 | 26 | perfil aerodinâmico e pás (`aerofolio`) | gerador | 17 (5%) | 6 | parcial | gera asa, empenagem, pá de hélice, rotor e ventoinha por perfil NACA, corda, torção, enflechamento e número de pás |
 | 27 | elementos de construção (`arquitetura`) | gerador | 13 (4%) | 6 | não | faz parede com aberturas, laje, telhado de águas e escada por espelho e piso |
 | 28 | corte e união gerais (`booleana`) | modificador | 11 (3%) | 9 | parcial | subtrai, une ou intersecta formas quaisquer, para rasgos, janelas, cavidades e peças fundidas |
 | 29 | dobrar, torcer e afunilar (`deforma`) | modificador | 11 (3%) | 9 | não | deforma uma forma pronta ao longo de um eixo (shape de skate, lâmina curva, escudo abaulado, cabide) |
-| 30 | rolamentos e buchas (`rolamento`) | especializado | 11 (3%) | 4 | não | gera rolamento por série com anéis, corpos rolantes, gaiola e vedação, e bucha e mancal com furação |
+| 30 | rolamentos e buchas (`rolamento`) | especializado | 11 (3%) | 4 | parcial | gera rolamento por série com anéis, corpos rolantes, gaiola e vedação, e bucha e mancal com furação |
 | 31 | lâmina e dentes de corte (`lamina`) | especializado | 10 (3%) | 6 | não | gera gume afiado, serrilha e dentes de serra ao longo de uma borda |
 | 32 | hélice (`helice`) | gerador | 9 (2%) | 3 | parcial | gera o caminho e o sólido helicoidal de passo, raio e voltas quaisquer (mola, rosca, caracol transportador, bobina, escada caracol) |
 | 33 | encaixe por pressão (`encaixe`) | especializado | 8 (2%) | 4 | não | gera clipe, gancho elástico e engate entre duas peças, com a folga certa |
@@ -68,26 +68,25 @@ As ferramentas que não existem ou existem em parte, na mesma ordem, com o que j
 - cabo ou mangueira entre pontos (`parcial`, 49 objetos): a `haste` reta do esboço 2.0 e o friso de seção circular ao longo de polilinha; caimento, raio mínimo, terminais e feixe não.
 - superfície suave por seções (`parcial`, 46 objetos): núcleo: loft de faces planas entre seções, inflate e as gaiolas de subdivisão (gaiolaPorEstacoes, gaiolaPorLacos, gaiolaVarrida), que dão a superfície lisa; o loft de tangente contínua do esboço antigo saiu com ele em 2026-11-05.
 - furação em padrão (`parcial`, 43 objetos): núcleo: furo com centros, passante ou cego, e furos de perfil na extrusao e no lathe; escareado, rebaixo, rosca e padrão em grade, círculo ou favo não.
-- perfil estrutural (`parcial`, 43 objetos): extensão `estruturaDeBarras`: tubo redondo, quadrado, retangular e cantoneira entre nós; I, H, U e alumínio ranhurado não.
+- perfil estrutural (`parcial`, 43 objetos): família `perfil-estrutural`: IPE, HE A e UPN da EN 10365 e alumínio ranhurado de 20 a 45 mm, cortados no comprimento, retos ou a 45° nas pontas; a extensão `estruturaDeBarras` faz tubo redondo, quadrado, retangular e cantoneira entre nós; os perfis novos na `estruturaDeBarras` não.
 - manopla e botão (`parcial`, 42 objetos): os botões giratórios e de pressão e os puxadores dentro das famílias `aparelho-de-caixa` e `movel-de-caixa`; manopla avulsa, volante e cabo ergonômico com furo de eixo e estrias não.
-- guia linear (`parcial`, 32 objetos): trilho simples de gaveta e de porta de correr dentro da família `movel-de-caixa`, com articulação prismática; trilho e carro avulsos e guia em V não.
-- tubulação com conexões (`não`, 27 objetos): nem esboço nem núcleo.
-- engrenagens (`não`, 26 objetos): nenhum gerador; o componente engrenagem do esboço antigo saiu com ele em 2026-11-05.
+- guia linear (`parcial`, 32 objetos): família `guia-linear`: trilho de perfil com a furação e carro de esferas, tamanhos 15 a 30, com as portas da base e da mesa; o trilho de gaveta e de porta de correr na família `movel-de-caixa`; guia em V não.
+- engrenagens (`parcial`, 26 objetos): família `engrenagem`: a reta de dente evolvente pelo perfil de referência tipo A da ISO 53 (de 17 a 200 dentes, módulo de 0,5 a 10) e a catraca de dente de serra, com cubo, furo e a porta do eixo; família `cremalheira`: a cremalheira reta do mesmo perfil, até 60 dentes; e o par engrenado e o pinhão sobre a cremalheira, com a distância entre centros, a folga entre flancos e a fase (`parDeEngrenagens` e `pinhaoECremalheira` em `engrenamento.js`); a helicoidal, a cônica e o sem-fim não.
 - molas (`parcial`, 26 objetos): família `mola`: compressão de pontas encostadas, tração com gancho em cada ponta e torção com braços retos, por fio, diâmetro externo, comprimento livre e espiras; ponta retificada, gancho de outros tipos e mola montada entre dois pontos não.
 - rosca (`parcial`, 26 objetos): a rosca externa do parafuso da família `fixador`: o filete de perfil trapezoidal varrido pela `helice` do `friso` sobre o núcleo no diâmetro menor, cosmética (sólido à parte, `rosca` 1) ou fundida num corpo só que passa no STEP (`rosca` 2, cerca de 1 s por parafuso); rosca interna e rosca fina não.
 - tecido e estofado (`não`, 26 objetos): nem esboço nem núcleo.
-- atuador linear (`parcial`, 25 objetos): família `cilindro-hidraulico`: camisa, haste, êmbolo, cabeça e olhais liso e com rótula, curso conferido; cilindro de haste dupla e telescópico não.
+- atuador linear (`parcial`, 25 objetos): família `cilindro-hidraulico`: camisa, haste, êmbolo, cabeça e olhais liso e com rótula, curso conferido; cilindro de haste dupla e telescópico não; família `fuso`: fuso trapezoidal (ISO 2904) e de esferas (ISO 3408-2, só o volume de fora) com a castanha flangeada.
 - móvel modular (`parcial`, 23 objetos): família `movel-de-caixa`, com nove perfis de roupeiro, guarda-roupa, armários, cômoda, criado-mudo, estante e gaveteiro, portas embutidas, sobrepostas e de correr e gavetas com curso conferido, e família `cadeira`, com cinco perfis; mesa e sofá não.
 - fixadores normalizados (`parcial`, 21 objetos): família `fixador`: parafuso de cabeça sextavada, allen ou abaulada, porca sextavada e arruela lisa, de M3 a M24 pela tabela ISO de rosca grossa; rebite, pino, porca de outros tipos e normas além da ISO métrica não.
 - relevo funcional (`parcial`, 21 objetos): núcleo: displace com ruído; padrão regular não existe.
-- elos ao longo de caminho fechado (`não`, 19 objetos): nem esboço nem núcleo.
+- elos ao longo de caminho fechado (`parcial`, 19 objetos): famílias `roda-dentada` (ISO 606 série B), `corrente` (corrente de rolos fechada em volta de duas rodas, com `transmissaoPorCorrente`) e `esteira` (sapatas de aço com garra em volta da motriz e da guia, com roletes); corrente dupla, série A, esteira de borracha, porta-cabos e degraus de escada rolante não.
 - texto e escala gravados (`não`, 19 objetos): nem esboço nem núcleo.
-- polia e correia (`parcial`, 18 objetos): família `polia-e-correia`: polia dentada GT2, HTD 3M, HTD 5M e T5 por dentes, com ou sem flanges, polia em V das seções Z, A e B da ISO 4183 de um a quatro canais e polia lisa, com cubo, furo e a porta do eixo; a correia fechada entre duas polias não.
+- polia e correia (`parcial`, 18 objetos): família `polia-e-correia`: polia dentada GT2, HTD 3M, HTD 5M e T5 por dentes, com ou sem flanges, polia em V das seções Z, A e B da ISO 4183 de um a quatro canais e polia lisa, com cubo, furo e a porta do eixo; a correia dentada fechada entre duas polias dentadas (`transmissaoDentada`, `geometriaDaCorreia` e `passosDaCorreia` em `correia.js`), com número inteiro de dentes e a distância entre centros recalculada, e a correia em V (seção da DIN 2215, uma volta por canal) e a lisa entre duas polias do mesmo tipo (`transmissaoPorAtrito` e `passosDaCorreiaPorAtrito`); o comprimento comercial da correia em V, o tensor e mais de duas polias não.
 - perfil aerodinâmico e pás (`parcial`, 17 objetos): família `superficie-aerodinamica`: asa, estabilizador, deriva, pá de hélice e hélice de até 9 pás por perfil de quatro dígitos, corda, espessura, torção, enflechamento, diedro e ponta levantada, com a superfície de comando (flap, aileron, leme) em vão com fresta e deflexão; rotor de turbina, ventoinha carenada e perfil de catálogo não.
 - elementos de construção (`não`, 13 objetos): nem esboço nem núcleo.
 - corte e união gerais (`parcial`, 11 objetos): núcleo: subtrair, unir, intersectar e aparar, também no esboço 2.0 pelos passos crus; o esboço 2.0 não tem atalho de recorte entre formas.
 - dobrar, torcer e afunilar (`não`, 11 objetos): nem esboço nem núcleo.
-- rolamentos e buchas (`não`, 11 objetos): nenhum gerador; os componentes rolamento e mancal do esboço antigo saíram com ele em 2026-11-05.
+- rolamentos e buchas (`parcial`, 11 objetos): família `rolamento`: rígido de esferas das séries 60 e 62 da ISO 15, aberto, vedado ou no mancal de pedestal; rolos, axial, agulhas e bucha não.
 - lâmina e dentes de corte (`não`, 10 objetos): nem esboço nem núcleo.
 - hélice (`parcial`, 9 objetos): o ajudante `caminhoHelicoidal` do núcleo (raio, passo, voltas, sentido e passo próprio nas pontas) e a `helice` declarada no `friso`, que varre um perfil ao longo dela com a normal radial; o caracol transportador e a escada caracol não têm gerador próprio.
 - encaixe por pressão (`não`, 8 objetos): nem esboço nem núcleo.
@@ -103,21 +102,9 @@ As ferramentas que não existem ou existem em parte, na mesma ordem, com o que j
 
 ## Cada ferramenta
 
-### tubulação com conexões (`tubulacao`)
-
-Traça uma rede de tubos e põe sozinha as curvas, tês, reduções, flanges e válvulas por bitola. Parâmetros: traçado, bitola, tipo de conexão. Referências: FreeCAD: Dodo e Flamingo; Plant 3D (conceito de catálogo de conexões). Aqui: não, nem esboço nem núcleo. Atende 27 objetos em 11 famílias.
-
-### engrenagens (`engrenagem`)
-
-Gera engrenagem reta, helicoidal, cônica, sem-fim, cremalheira e catraca com dente evolvente por módulo e número de dentes, e diz a distância entre centros do par. Parâmetros: tipo, módulo, dentes, ângulo de pressão, largura. Referências: FreeCAD Gears; BOSL2: gears; Blender: Extra Objects (gears). Aqui: não, nenhum gerador; o componente engrenagem do esboço antigo saiu com ele em 2026-11-05. Atende 26 objetos em 11 famílias.
-
 ### tecido e estofado (`tecido`)
 
 Faz almofada inflada com costura, lona esticada, vela e rede a partir de contorno e pressão. Parâmetros: contorno, espessura, pressão, costuras, pontos de amarra. Referências: Blender: Cloth e pressão; Marvelous Designer (conceito). Aqui: não, nem esboço nem núcleo. Atende 26 objetos em 11 famílias.
-
-### elos ao longo de caminho fechado (`elos`)
-
-Distribui elos articulados num contorno fechado em volta de rodas (corrente, esteira de trator, porta-cabos, degraus de escada rolante, correia dentada). Parâmetros: elo, passo, rodas ou caminho, tensão. Referências: Blender: Array com Curve (técnica de esteira); FreeCAD Gears: sprocket. Aqui: não, nem esboço nem núcleo. Atende 19 objetos em 8 famílias.
 
 ### texto e escala gravados (`texto`)
 
@@ -130,10 +117,6 @@ Faz parede com aberturas, laje, telhado de águas e escada por espelho e piso. P
 ### dobrar, torcer e afunilar (`deforma`)
 
 Deforma uma forma pronta ao longo de um eixo (shape de skate, lâmina curva, escudo abaulado, cabide). Parâmetros: eixo, ângulo de dobra ou de torção, fator de afunilamento. Referências: Blender: modificador Simple Deform. Aqui: não, nem esboço nem núcleo. Atende 11 objetos em 9 famílias.
-
-### rolamentos e buchas (`rolamento`)
-
-Gera rolamento por série com anéis, corpos rolantes, gaiola e vedação, e bucha e mancal com furação. Parâmetros: série e tamanho, tipo. Referências: FreeCAD: Fasteners e Parts Library; catálogos de fabricantes em STEP. Aqui: não, nenhum gerador; os componentes rolamento e mancal do esboço antigo saíram com ele em 2026-11-05. Atende 11 objetos em 4 famílias.
 
 ### lâmina e dentes de corte (`lamina`)
 
@@ -201,7 +184,7 @@ Fura em grade, em círculo (PCD) ou em favo, com escareado, rebaixo ou rosca, em
 
 ### perfil estrutural (`perfil`)
 
-Estende uma seção normalizada (I, H, U, L, tubo, alumínio ranhurado) ao longo de uma linha, com cortes de ponta. Parâmetros: seção e tamanho, comprimento, corte de ponta. Referências: FreeCAD: Frame/BIM Profile; Onshape: Frame. Aqui: parcial, extensão `estruturaDeBarras`: tubo redondo, quadrado, retangular e cantoneira entre nós; I, H, U e alumínio ranhurado não. Atende 43 objetos em 18 famílias.
+Estende uma seção normalizada (I, H, U, L, tubo, alumínio ranhurado) ao longo de uma linha, com cortes de ponta. Parâmetros: seção e tamanho, comprimento, corte de ponta. Referências: FreeCAD: Frame/BIM Profile; Onshape: Frame. Aqui: parcial, família `perfil-estrutural`: IPE, HE A e UPN da EN 10365 e alumínio ranhurado de 20 a 45 mm, cortados no comprimento, retos ou a 45° nas pontas; a extensão `estruturaDeBarras` faz tubo redondo, quadrado, retangular e cantoneira entre nós; os perfis novos na `estruturaDeBarras` não. Atende 43 objetos em 18 famílias.
 
 ### manopla e botão (`manopla`)
 
@@ -209,7 +192,11 @@ Gera botão rotativo, manípulo, volante e cabo ergonômico com furo de eixo e e
 
 ### guia linear (`guia`)
 
-Gera trilho e carro, corrediça de gaveta e guia em V por tamanho e curso. Parâmetros: tamanho, curso, tipo. Referências: catálogos de fabricantes em STEP (conceito). Aqui: parcial, trilho simples de gaveta e de porta de correr dentro da família `movel-de-caixa`, com articulação prismática; trilho e carro avulsos e guia em V não. Atende 32 objetos em 13 famílias.
+Gera trilho e carro, corrediça de gaveta e guia em V por tamanho e curso. Parâmetros: tamanho, curso, tipo. Referências: catálogos de fabricantes em STEP (conceito). Aqui: parcial, família `guia-linear`: trilho de perfil com a furação e carro de esferas, tamanhos 15 a 30, com as portas da base e da mesa; o trilho de gaveta e de porta de correr na família `movel-de-caixa`; guia em V não. Atende 32 objetos em 13 famílias.
+
+### engrenagens (`engrenagem`)
+
+Gera engrenagem reta, helicoidal, cônica, sem-fim, cremalheira e catraca com dente evolvente por módulo e número de dentes, e diz a distância entre centros do par. Parâmetros: tipo, módulo, dentes, ângulo de pressão, largura. Referências: FreeCAD Gears; BOSL2: gears; Blender: Extra Objects (gears). Aqui: parcial, família `engrenagem`: a reta de dente evolvente pelo perfil de referência tipo A da ISO 53 (de 17 a 200 dentes, módulo de 0,5 a 10) e a catraca de dente de serra, com cubo, furo e a porta do eixo; família `cremalheira`: a cremalheira reta do mesmo perfil, até 60 dentes; e o par engrenado e o pinhão sobre a cremalheira, com a distância entre centros, a folga entre flancos e a fase (`parDeEngrenagens` e `pinhaoECremalheira` em `engrenamento.js`); a helicoidal, a cônica e o sem-fim não. Atende 26 objetos em 11 famílias.
 
 ### molas (`mola`)
 
@@ -221,7 +208,7 @@ Faz rosca macho ou fêmea métrica, trapezoidal ou de tampa, em qualquer cilindr
 
 ### atuador linear (`atuador`)
 
-Gera cilindro hidráulico ou pneumático e fuso com camisa, haste, olhais e portas, por curso e diâmetro, ligado entre dois pontos. Parâmetros: diâmetro, curso, extensão, montagem das pontas. Referências: catálogos de fabricantes em STEP (conceito). Aqui: parcial, família `cilindro-hidraulico`: camisa, haste, êmbolo, cabeça e olhais liso e com rótula, curso conferido; cilindro de haste dupla e telescópico não. Atende 25 objetos em 10 famílias.
+Gera cilindro hidráulico ou pneumático e fuso com camisa, haste, olhais e portas, por curso e diâmetro, ligado entre dois pontos. Parâmetros: diâmetro, curso, extensão, montagem das pontas. Referências: catálogos de fabricantes em STEP (conceito). Aqui: parcial, família `cilindro-hidraulico`: camisa, haste, êmbolo, cabeça e olhais liso e com rótula, curso conferido; cilindro de haste dupla e telescópico não; família `fuso`: fuso trapezoidal (ISO 2904) e de esferas (ISO 3408-2, só o volume de fora) com a castanha flangeada. Atende 25 objetos em 10 famílias.
 
 ### móvel modular (`movel`)
 
@@ -235,9 +222,13 @@ Gera parafuso, porca, arruela, rebite e pino por norma e bitola. Parâmetros: ti
 
 Aplica recartilhado, estrias de pega, piso antiderrapante ou chapa ondulada numa face. Parâmetros: padrão, passo, profundidade, face. Referências: BOSL2: knurling e textures; Blender: Displace com textura de imagem. Aqui: parcial, núcleo: displace com ruído; padrão regular não existe. Atende 21 objetos em 10 famílias.
 
+### elos ao longo de caminho fechado (`elos`)
+
+Distribui elos articulados num contorno fechado em volta de rodas (corrente, esteira de trator, porta-cabos, degraus de escada rolante, correia dentada). Parâmetros: elo, passo, rodas ou caminho, tensão. Referências: Blender: Array com Curve (técnica de esteira); FreeCAD Gears: sprocket. Aqui: parcial, famílias `roda-dentada` (ISO 606 série B), `corrente` (corrente de rolos fechada em volta de duas rodas, com `transmissaoPorCorrente`) e `esteira` (sapatas de aço com garra em volta da motriz e da guia, com roletes); corrente dupla, série A, esteira de borracha, porta-cabos e degraus de escada rolante não. Atende 19 objetos em 8 famílias.
+
 ### polia e correia (`polia`)
 
-Gera polias em V ou dentadas e a correia fechada que as envolve na posição certa. Parâmetros: perfil, diâmetros, centros, largura. Referências: FreeCAD Gears: timing gear; BOSL2. Aqui: parcial, família `polia-e-correia`: polia dentada GT2, HTD 3M, HTD 5M e T5 por dentes, com ou sem flanges, polia em V das seções Z, A e B da ISO 4183 de um a quatro canais e polia lisa, com cubo, furo e a porta do eixo; a correia fechada entre duas polias não. Atende 18 objetos em 7 famílias.
+Gera polias em V ou dentadas e a correia fechada que as envolve na posição certa. Parâmetros: perfil, diâmetros, centros, largura. Referências: FreeCAD Gears: timing gear; BOSL2. Aqui: parcial, família `polia-e-correia`: polia dentada GT2, HTD 3M, HTD 5M e T5 por dentes, com ou sem flanges, polia em V das seções Z, A e B da ISO 4183 de um a quatro canais e polia lisa, com cubo, furo e a porta do eixo; a correia dentada fechada entre duas polias dentadas (`transmissaoDentada`, `geometriaDaCorreia` e `passosDaCorreia` em `correia.js`), com número inteiro de dentes e a distância entre centros recalculada, e a correia em V (seção da DIN 2215, uma volta por canal) e a lisa entre duas polias do mesmo tipo (`transmissaoPorAtrito` e `passosDaCorreiaPorAtrito`); o comprimento comercial da correia em V, o tensor e mais de duas polias não. Atende 18 objetos em 7 famílias.
 
 ### perfil aerodinâmico e pás (`aerofolio`)
 
@@ -246,6 +237,10 @@ Gera asa, empenagem, pá de hélice, rotor e ventoinha por perfil NACA, corda, t
 ### corte e união gerais (`booleana`)
 
 Subtrai, une ou intersecta formas quaisquer, para rasgos, janelas, cavidades e peças fundidas. Parâmetros: operandos, operação. Referências: Blender: modificador Boolean; Manifold; CadQuery: cut, union. Aqui: parcial, núcleo: subtrair, unir, intersectar e aparar, também no esboço 2.0 pelos passos crus; o esboço 2.0 não tem atalho de recorte entre formas. Atende 11 objetos em 9 famílias.
+
+### rolamentos e buchas (`rolamento`)
+
+Gera rolamento por série com anéis, corpos rolantes, gaiola e vedação, e bucha e mancal com furação. Parâmetros: série e tamanho, tipo. Referências: FreeCAD: Fasteners e Parts Library; catálogos de fabricantes em STEP. Aqui: parcial, família `rolamento`: rígido de esferas das séries 60 e 62 da ISO 15, aberto, vedado ou no mancal de pedestal; rolos, axial, agulhas e bucha não. Atende 11 objetos em 4 famílias.
 
 ### hélice (`helice`)
 
@@ -270,6 +265,10 @@ Gera eixo por trechos com diâmetro, rasgo de chaveta, ranhura de anel elástico
 ### roda e pneu (`rodaPneu`)
 
 Gera aro, disco ou raios, cubo com furação e pneu com seção e banda, que encaixam por aro. Parâmetros: aro, largura, seção, raios ou disco, furação, banda. Referências: Blender: modelagem por Screw e Array (técnica). Aqui: tem, família `roda-pneu` 2.0: de 50 a 2000 mm, pneumático, maciço, sem pneu e com garra, disco, raiada de um plano e de duas flanges, sete perfis prontos e portas de eixo, assento e furos. Atende 49 objetos em 11 famílias.
+
+### tubulação com conexões (`tubulacao`)
+
+Traça uma rede de tubos e põe sozinha as curvas, tês, reduções, flanges e válvulas por bitola. Parâmetros: traçado, bitola, tipo de conexão. Referências: FreeCAD: Dodo e Flamingo; Plant 3D (conceito de catálogo de conexões). Aqui: tem, a família `tubulacao` (trecho, curva, tampão, tê, redução, flange de pescoço e válvulas de esfera e de gaveta) e `pecasDaRede`, que lê o traçado de nós e trechos com bitola de aço (ASME) ou PVC (NBR 5648), corta cada trecho e põe cada conexão com as bocas casadas; tê inclinado, cruzeta e cobre não. Atende 27 objetos em 11 famílias.
 
 ## Objetos
 

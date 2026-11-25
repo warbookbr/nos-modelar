@@ -1,0 +1,414 @@
+{
+  "formato": "mecanifica.aprovacao-da-familia@1",
+  "familia": "guia-linear",
+  "versao": "1.0.0",
+  "mecanica": {
+    "data": "2026-11-24",
+    "pontos": {
+      "minimo": {
+        "parametros": {
+          "alturaDeMontagem": 18,
+          "alturaDoTrilho": 10,
+          "comprimento": 100,
+          "comprimentoDoCarro": 40,
+          "diametroDoFuro": 3,
+          "diametroDoRebaixo": 5,
+          "folgaDeBaixo": 2,
+          "furosDoCarroX": 15,
+          "furosDoCarroY": 15,
+          "larguraDoCarro": 25,
+          "larguraDoTrilho": 10,
+          "passo": 30,
+          "posicaoDoCarro": 0,
+          "profundidadeDoRebaixo": 3,
+          "rosca": 3
+        },
+        "hash": "sha256:6d3a09e2abe9b89436cc769b24573746cdeddab7fb87adc2044ecf980ad2a967",
+        "medidas": []
+      },
+      "medio": {
+        "parametros": {
+          "alturaDeMontagem": 30,
+          "alturaDoTrilho": 18,
+          "comprimento": 500,
+          "comprimentoDoCarro": 77.5,
+          "diametroDoFuro": 6,
+          "diametroDoRebaixo": 9.5,
+          "folgaDeBaixo": 4.6,
+          "furosDoCarroX": 32,
+          "furosDoCarroY": 36,
+          "larguraDoCarro": 44,
+          "larguraDoTrilho": 20,
+          "passo": 60,
+          "posicaoDoCarro": 200,
+          "profundidadeDoRebaixo": 8.5,
+          "rosca": 5
+        },
+        "hash": "sha256:a3fac150405386f4521fe789c07e997fdf0fdf30b3fc6b170a3f770ebd53b2a0",
+        "medidas": []
+      },
+      "maximo": {
+        "parametros": {
+          "alturaDeMontagem": 60,
+          "alturaDoTrilho": 40,
+          "comprimento": 4000,
+          "comprimentoDoCarro": 150,
+          "diametroDoFuro": 14,
+          "diametroDoRebaixo": 22,
+          "folgaDeBaixo": 10,
+          "furosDoCarroX": 70,
+          "furosDoCarroY": 80,
+          "larguraDoCarro": 90,
+          "larguraDoTrilho": 40,
+          "passo": 120,
+          "posicaoDoCarro": 3800,
+          "profundidadeDoRebaixo": 20,
+          "rosca": 12
+        },
+        "hash": "sha256:4b68bee06014f2ebee1036a173ff179c78821d7aee932128e6dcdb95d2f1c48a",
+        "medidas": []
+      }
+    },
+    "varredura": {
+      "sondas": 30,
+      "recusasDeclaradas": [
+        {
+          "ponto": "alturaDeMontagem=18",
+          "restricao": "carro-acima-do-trilho"
+        },
+        {
+          "ponto": "alturaDoTrilho=10",
+          "restricao": "furo-nao-vara-o-trilho"
+        },
+        {
+          "ponto": "alturaDoTrilho=40",
+          "restricao": "carro-acima-do-trilho"
+        },
+        {
+          "ponto": "comprimento=100",
+          "restricao": "carro-no-trilho"
+        },
+        {
+          "ponto": "comprimentoDoCarro=40",
+          "restricao": "furos-do-carro-dentro-y"
+        },
+        {
+          "ponto": "diametroDoFuro=14",
+          "restricao": "rebaixo-maior-que-o-furo"
+        },
+        {
+          "ponto": "diametroDoRebaixo=5",
+          "restricao": "rebaixo-maior-que-o-furo"
+        },
+        {
+          "ponto": "diametroDoRebaixo=22",
+          "restricao": "rebaixo-cabe-no-trilho"
+        },
+        {
+          "ponto": "folgaDeBaixo=10",
+          "restricao": "folga-abaixo-do-canal"
+        },
+        {
+          "ponto": "furosDoCarroX=15",
+          "restricao": "furos-do-carro-fora-do-trilho"
+        },
+        {
+          "ponto": "furosDoCarroX=70",
+          "restricao": "furos-do-carro-dentro-x"
+        },
+        {
+          "ponto": "furosDoCarroY=80",
+          "restricao": "furos-do-carro-dentro-y"
+        },
+        {
+          "ponto": "larguraDoCarro=25",
+          "restricao": "carro-mais-largo-que-o-trilho"
+        },
+        {
+          "ponto": "larguraDoTrilho=10",
+          "restricao": "rebaixo-cabe-no-trilho"
+        },
+        {
+          "ponto": "larguraDoTrilho=40",
+          "restricao": "carro-mais-largo-que-o-trilho"
+        },
+        {
+          "ponto": "posicaoDoCarro=3800",
+          "restricao": "carro-no-trilho"
+        },
+        {
+          "ponto": "profundidadeDoRebaixo=20",
+          "restricao": "furo-nao-vara-o-trilho"
+        },
+        {
+          "ponto": "rosca=12",
+          "restricao": "furos-do-carro-dentro-x"
+        }
+      ]
+    },
+    "portas": [
+      "base",
+      "mesa"
+    ],
+    "perfis": {
+      "guia-15": {
+        "parametros": {
+          "alturaDeMontagem": 24,
+          "alturaDoTrilho": 15,
+          "comprimento": 300,
+          "comprimentoDoCarro": 61.4,
+          "diametroDoFuro": 4.5,
+          "diametroDoRebaixo": 7.5,
+          "folgaDeBaixo": 4.3,
+          "furosDoCarroX": 26,
+          "furosDoCarroY": 26,
+          "larguraDoCarro": 34,
+          "larguraDoTrilho": 15,
+          "passo": 60,
+          "posicaoDoCarro": 60,
+          "profundidadeDoRebaixo": 5.3,
+          "rosca": 4
+        },
+        "hash": "sha256:a7a171598bbeac2b9b10d96910a0116272acaa18ddb69366e61485d249d7060d",
+        "medidas": []
+      },
+      "guia-20": {
+        "parametros": {
+          "alturaDeMontagem": 30,
+          "alturaDoTrilho": 18,
+          "comprimento": 500,
+          "comprimentoDoCarro": 77.5,
+          "diametroDoFuro": 6,
+          "diametroDoRebaixo": 9.5,
+          "folgaDeBaixo": 4.6,
+          "furosDoCarroX": 32,
+          "furosDoCarroY": 36,
+          "larguraDoCarro": 44,
+          "larguraDoTrilho": 20,
+          "passo": 60,
+          "posicaoDoCarro": 200,
+          "profundidadeDoRebaixo": 8.5,
+          "rosca": 5
+        },
+        "hash": "sha256:a3fac150405386f4521fe789c07e997fdf0fdf30b3fc6b170a3f770ebd53b2a0",
+        "medidas": []
+      },
+      "guia-30": {
+        "parametros": {
+          "alturaDeMontagem": 42,
+          "alturaDoTrilho": 26,
+          "comprimento": 800,
+          "comprimentoDoCarro": 97.4,
+          "diametroDoFuro": 9,
+          "diametroDoRebaixo": 14,
+          "folgaDeBaixo": 6,
+          "furosDoCarroX": 40,
+          "furosDoCarroY": 40,
+          "larguraDoCarro": 60,
+          "larguraDoTrilho": 28,
+          "passo": 80,
+          "posicaoDoCarro": 0,
+          "profundidadeDoRebaixo": 12,
+          "rosca": 8
+        },
+        "hash": "sha256:97a73808e0740fd3adae797a187702060777bc01f02f0ddd840de9a659da5164",
+        "medidas": []
+      }
+    },
+    "escalasDosPerfis": {
+      "sondas": 90,
+      "recusasDeclaradas": [
+        {
+          "ponto": "guia-15: alturaDoTrilho=40",
+          "restricao": "carro-acima-do-trilho"
+        },
+        {
+          "ponto": "guia-15: comprimento=100",
+          "restricao": "carro-no-trilho"
+        },
+        {
+          "ponto": "guia-15: diametroDoFuro=14",
+          "restricao": "rebaixo-maior-que-o-furo"
+        },
+        {
+          "ponto": "guia-15: diametroDoRebaixo=5",
+          "restricao": "rebaixo-maior-que-o-furo"
+        },
+        {
+          "ponto": "guia-15: diametroDoRebaixo=22",
+          "restricao": "rebaixo-cabe-no-trilho"
+        },
+        {
+          "ponto": "guia-15: folgaDeBaixo=10",
+          "restricao": "folga-abaixo-do-canal"
+        },
+        {
+          "ponto": "guia-15: furosDoCarroX=15",
+          "restricao": "furos-do-carro-fora-do-trilho"
+        },
+        {
+          "ponto": "guia-15: furosDoCarroX=70",
+          "restricao": "furos-do-carro-dentro-x"
+        },
+        {
+          "ponto": "guia-15: furosDoCarroY=80",
+          "restricao": "furos-do-carro-dentro-y"
+        },
+        {
+          "ponto": "guia-15: larguraDoCarro=25",
+          "restricao": "furos-do-carro-dentro-x"
+        },
+        {
+          "ponto": "guia-15: larguraDoTrilho=10",
+          "restricao": "rebaixo-cabe-no-trilho"
+        },
+        {
+          "ponto": "guia-15: larguraDoTrilho=40",
+          "restricao": "carro-mais-largo-que-o-trilho"
+        },
+        {
+          "ponto": "guia-15: posicaoDoCarro=3800",
+          "restricao": "carro-no-trilho"
+        },
+        {
+          "ponto": "guia-15: profundidadeDoRebaixo=20",
+          "restricao": "furo-nao-vara-o-trilho"
+        },
+        {
+          "ponto": "guia-15: rosca=12",
+          "restricao": "furo-roscado-cabe-no-carro"
+        },
+        {
+          "ponto": "guia-20: alturaDeMontagem=18",
+          "restricao": "carro-acima-do-trilho"
+        },
+        {
+          "ponto": "guia-20: alturaDoTrilho=10",
+          "restricao": "furo-nao-vara-o-trilho"
+        },
+        {
+          "ponto": "guia-20: alturaDoTrilho=40",
+          "restricao": "carro-acima-do-trilho"
+        },
+        {
+          "ponto": "guia-20: comprimento=100",
+          "restricao": "carro-no-trilho"
+        },
+        {
+          "ponto": "guia-20: comprimentoDoCarro=40",
+          "restricao": "furos-do-carro-dentro-y"
+        },
+        {
+          "ponto": "guia-20: diametroDoFuro=14",
+          "restricao": "rebaixo-maior-que-o-furo"
+        },
+        {
+          "ponto": "guia-20: diametroDoRebaixo=5",
+          "restricao": "rebaixo-maior-que-o-furo"
+        },
+        {
+          "ponto": "guia-20: diametroDoRebaixo=22",
+          "restricao": "rebaixo-cabe-no-trilho"
+        },
+        {
+          "ponto": "guia-20: folgaDeBaixo=10",
+          "restricao": "folga-abaixo-do-canal"
+        },
+        {
+          "ponto": "guia-20: furosDoCarroX=15",
+          "restricao": "furos-do-carro-fora-do-trilho"
+        },
+        {
+          "ponto": "guia-20: furosDoCarroX=70",
+          "restricao": "furos-do-carro-dentro-x"
+        },
+        {
+          "ponto": "guia-20: furosDoCarroY=80",
+          "restricao": "furos-do-carro-dentro-y"
+        },
+        {
+          "ponto": "guia-20: larguraDoCarro=25",
+          "restricao": "carro-mais-largo-que-o-trilho"
+        },
+        {
+          "ponto": "guia-20: larguraDoTrilho=10",
+          "restricao": "rebaixo-cabe-no-trilho"
+        },
+        {
+          "ponto": "guia-20: larguraDoTrilho=40",
+          "restricao": "carro-mais-largo-que-o-trilho"
+        },
+        {
+          "ponto": "guia-20: posicaoDoCarro=3800",
+          "restricao": "carro-no-trilho"
+        },
+        {
+          "ponto": "guia-20: profundidadeDoRebaixo=20",
+          "restricao": "furo-nao-vara-o-trilho"
+        },
+        {
+          "ponto": "guia-20: rosca=12",
+          "restricao": "furos-do-carro-dentro-x"
+        },
+        {
+          "ponto": "guia-30: alturaDeMontagem=18",
+          "restricao": "carro-acima-do-trilho"
+        },
+        {
+          "ponto": "guia-30: alturaDoTrilho=10",
+          "restricao": "folga-abaixo-do-canal"
+        },
+        {
+          "ponto": "guia-30: alturaDoTrilho=40",
+          "restricao": "carro-acima-do-trilho"
+        },
+        {
+          "ponto": "guia-30: comprimentoDoCarro=40",
+          "restricao": "furos-do-carro-dentro-y"
+        },
+        {
+          "ponto": "guia-30: diametroDoFuro=14",
+          "restricao": "rebaixo-maior-que-o-furo"
+        },
+        {
+          "ponto": "guia-30: diametroDoRebaixo=5",
+          "restricao": "rebaixo-maior-que-o-furo"
+        },
+        {
+          "ponto": "guia-30: diametroDoRebaixo=22",
+          "restricao": "rebaixo-cabe-no-trilho"
+        },
+        {
+          "ponto": "guia-30: furosDoCarroX=15",
+          "restricao": "furos-do-carro-fora-do-trilho"
+        },
+        {
+          "ponto": "guia-30: furosDoCarroX=70",
+          "restricao": "furos-do-carro-dentro-x"
+        },
+        {
+          "ponto": "guia-30: larguraDoCarro=25",
+          "restricao": "carro-mais-largo-que-o-trilho"
+        },
+        {
+          "ponto": "guia-30: larguraDoTrilho=10",
+          "restricao": "rebaixo-cabe-no-trilho"
+        },
+        {
+          "ponto": "guia-30: larguraDoTrilho=40",
+          "restricao": "furos-do-carro-fora-do-trilho"
+        },
+        {
+          "ponto": "guia-30: posicaoDoCarro=3800",
+          "restricao": "carro-no-trilho"
+        },
+        {
+          "ponto": "guia-30: rosca=12",
+          "restricao": "furos-do-carro-fora-do-trilho"
+        }
+      ]
+    }
+  },
+  "critico": null,
+  "pessoa": null
+}

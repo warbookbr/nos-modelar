@@ -1,0 +1,182 @@
+{
+  "formato": "mecanifica.familia@1",
+  "id": "esteira",
+  "versao": "1.0.0",
+  "nivel": "componente",
+  "parametros": {
+    "passo": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 135,
+      "minimo": 80,
+      "maximo": 220,
+      "medio": 135
+    },
+    "diametroDaBucha": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 50,
+      "minimo": 30,
+      "maximo": 80,
+      "medio": 50
+    },
+    "larguraInterna": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 75,
+      "minimo": 40,
+      "maximo": 120,
+      "medio": 75
+    },
+    "alturaDoElo": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 65,
+      "minimo": 40,
+      "maximo": 100,
+      "medio": 65
+    },
+    "espessuraDoElo": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 25,
+      "minimo": 12,
+      "maximo": 40,
+      "medio": 25
+    },
+    "larguraDaSapata": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 400,
+      "minimo": 200,
+      "maximo": 700,
+      "medio": 400
+    },
+    "espessuraDaSapata": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 14,
+      "minimo": 8,
+      "maximo": 25,
+      "medio": 14
+    },
+    "alturaDaGarra": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 26,
+      "minimo": 10,
+      "maximo": 50,
+      "medio": 26
+    },
+    "dentes": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 21,
+      "minimo": 15,
+      "maximo": 31,
+      "medio": 21
+    },
+    "distancia": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 2200,
+      "minimo": 1200,
+      "maximo": 5000,
+      "medio": 2600
+    },
+    "roletes": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 4,
+      "minimo": 2,
+      "maximo": 8,
+      "medio": 4
+    }
+  },
+  "restricoes": [
+    {
+      "id": "bucha-dentro-do-elo",
+      "expressao": "diametroDaBucha + 6 - alturaDoElo <= 0",
+      "motivo": "a bucha precisa caber na altura do elo"
+    },
+    {
+      "id": "bucha-proporcional-ao-passo",
+      "expressao": "0.33 * passo - diametroDaBucha <= 0",
+      "motivo": "a bucha abaixo de 0,33 passo faz os flancos do dente da motriz se cruzarem"
+    },
+    {
+      "id": "bucha-cabe-no-passo",
+      "expressao": "diametroDaBucha + 10 - passo <= 0",
+      "motivo": "a bucha precisa ser menor que o passo"
+    },
+    {
+      "id": "sapata-mais-larga-que-os-elos",
+      "expressao": "larguraInterna + 2 * espessuraDoElo + 20 - larguraDaSapata <= 0",
+      "motivo": "a sapata precisa passar dos dois trilhos"
+    },
+    {
+      "id": "distancia-cabe-as-rodas",
+      "expressao": "passo / sin(180 / dentes) + 6 * passo - distancia <= 0",
+      "motivo": "a distância precisa passar do diâmetro das rodas mais seis passos, para cada trecho reto ter ao menos quatro elos"
+    }
+  ],
+  "portas": [],
+  "ferramentas": [
+    "elos"
+  ],
+  "perguntas": {
+    "elos": [
+      "A esteira fecha em volta da motriz e da guia com as sapatas por fora, cada uma com a garra, os trilhos e as buchas por dentro, a motriz engrenando as buchas e os roletes apoiando o trecho de baixo?"
+    ]
+  },
+  "perfis": {
+    "esteira-135": {
+      "descricao": "esteira de passo 135, motriz e guia a cerca de 2,2 m, quatro roletes",
+      "parametros": {
+        "passo": 135,
+        "diametroDaBucha": 50,
+        "larguraInterna": 75,
+        "alturaDoElo": 65,
+        "espessuraDoElo": 25,
+        "larguraDaSapata": 400,
+        "espessuraDaSapata": 14,
+        "alturaDaGarra": 26,
+        "dentes": 21,
+        "distancia": 2200,
+        "roletes": 4
+      }
+    },
+    "esteira-101": {
+      "descricao": "esteira de passo 101,6, rodas a cerca de 1,6 m, três roletes",
+      "parametros": {
+        "passo": 101.6,
+        "diametroDaBucha": 40,
+        "larguraInterna": 60,
+        "alturaDoElo": 50,
+        "espessuraDoElo": 20,
+        "larguraDaSapata": 300,
+        "espessuraDaSapata": 12,
+        "alturaDaGarra": 20,
+        "dentes": 21,
+        "distancia": 1600,
+        "roletes": 3
+      }
+    },
+    "esteira-171": {
+      "descricao": "esteira de passo 171, rodas a cerca de 3 m, cinco roletes",
+      "parametros": {
+        "passo": 171,
+        "diametroDaBucha": 60,
+        "larguraInterna": 90,
+        "alturaDoElo": 80,
+        "espessuraDoElo": 30,
+        "larguraDaSapata": 500,
+        "espessuraDaSapata": 16,
+        "alturaDaGarra": 32,
+        "dentes": 23,
+        "distancia": 3000,
+        "roletes": 5
+      }
+    }
+  }
+}

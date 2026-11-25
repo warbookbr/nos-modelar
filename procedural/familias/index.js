@@ -29,6 +29,17 @@ import { COMPONENTE_ELETRONICO } from './componente-eletronico/index.js';
 import { MOLA } from './mola/index.js';
 import { FIXADOR } from './fixador/index.js';
 import { POLIA_E_CORREIA } from './polia-e-correia/index.js';
+import { ENGRENAGEM } from './engrenagem/index.js';
+import { CREMALHEIRA } from './cremalheira/index.js';
+import { TUBULACAO } from './tubulacao/index.js';
+import { PERFIL_ESTRUTURAL } from './perfil-estrutural/index.js';
+import { GUIA_LINEAR } from './guia-linear/index.js';
+import { ROLAMENTO } from './rolamento/index.js';
+import { FUSO } from './fuso/index.js';
+import { RODA_DENTADA } from './roda-dentada/index.js';
+import { CORRENTE } from './corrente/index.js';
+import { ESTEIRA } from './esteira/index.js';
+import { GABINETE } from './gabinete/index.js';
 
 export { ErroChamadaDeFamilia, chamar, definirFamilia } from '../../src/autoria/chamar-familia.js';
 
@@ -41,7 +52,7 @@ export const EXTENSOES_NATIVAS = Object.freeze([
 ]);
 
 /* As famílias do produto. Cada família real (tarefas 6 a 10 da fatia 9) entra aqui por import explícito. */
-export const FAMILIAS = Object.freeze([RODA_PNEU, DOBRADICA, CILINDRO_HIDRAULICO, MOVEL_DE_CAIXA, SUPERFICIE_AERODINAMICA, APARELHO_DE_CAIXA, CADEIRA, COMPONENTE_ELETRONICO, MOLA, FIXADOR, POLIA_E_CORREIA]);
+export const FAMILIAS = Object.freeze([RODA_PNEU, DOBRADICA, CILINDRO_HIDRAULICO, MOVEL_DE_CAIXA, SUPERFICIE_AERODINAMICA, APARELHO_DE_CAIXA, CADEIRA, COMPONENTE_ELETRONICO, MOLA, FIXADOR, POLIA_E_CORREIA, ENGRENAGEM, CREMALHEIRA, TUBULACAO, PERFIL_ESTRUTURAL, GUIA_LINEAR, ROLAMENTO, FUSO, RODA_DENTADA, CORRENTE, ESTEIRA, GABINETE]);
 
 /**
  * Monta os registros de uma lista de famílias carregadas por `definirFamilia`. Devolve `{ familias, obter,

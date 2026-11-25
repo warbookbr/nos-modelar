@@ -1,0 +1,166 @@
+{
+  "formato": "mecanifica.familia@1",
+  "id": "corrente",
+  "versao": "1.0.0",
+  "nivel": "componente",
+  "parametros": {
+    "passo": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 12.7,
+      "minimo": 9.525,
+      "maximo": 25.4,
+      "medio": 15.875
+    },
+    "diametroDoRolo": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 8.51,
+      "minimo": 6.35,
+      "maximo": 15.88,
+      "medio": 10.16
+    },
+    "larguraInterna": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 7.75,
+      "minimo": 5.72,
+      "maximo": 17.02,
+      "medio": 9.65
+    },
+    "diametroDoPino": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 4.45,
+      "minimo": 3.28,
+      "maximo": 8.28,
+      "medio": 5.08
+    },
+    "alturaDaPlaca": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 11.8,
+      "minimo": 8.2,
+      "maximo": 21,
+      "medio": 14.7
+    },
+    "espessuraInterna": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 1.6,
+      "minimo": 1.3,
+      "maximo": 3.1,
+      "medio": 1.7
+    },
+    "espessuraExterna": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 1.6,
+      "minimo": 1.3,
+      "maximo": 4.15,
+      "medio": 1.7
+    },
+    "dentes1": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 18,
+      "minimo": 9,
+      "maximo": 80,
+      "medio": 25
+    },
+    "dentes2": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 36,
+      "minimo": 9,
+      "maximo": 80,
+      "medio": 40
+    },
+    "distancia": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 300,
+      "minimo": 100,
+      "maximo": 3000,
+      "medio": 600
+    }
+  },
+  "restricoes": [
+    {
+      "id": "pino-dentro-do-rolo",
+      "expressao": "diametroDoPino + 1 - diametroDoRolo <= 0",
+      "motivo": "o pino precisa ser mais fino que o rolo"
+    },
+    {
+      "id": "rolo-dentro-da-placa",
+      "expressao": "diametroDoRolo + 1 - alturaDaPlaca <= 0",
+      "motivo": "a placa precisa ser mais alta que o rolo"
+    },
+    {
+      "id": "placa-cabe-no-passo",
+      "expressao": "alturaDaPlaca - 2 * passo <= 0",
+      "motivo": "a placa passa de dois passos de altura"
+    },
+    {
+      "id": "distancia-cabe-as-rodas",
+      "expressao": "passo / (2 * sin(180 / dentes1)) + passo / (2 * sin(180 / dentes2)) + 6 * passo - distancia <= 0",
+      "motivo": "a distância entre as rodas precisa passar da soma dos raios primitivos mais seis passos, para cada trecho reto ter ao menos quatro elos"
+    }
+  ],
+  "portas": [],
+  "ferramentas": [
+    "elos"
+  ],
+  "perguntas": {
+    "elos": [
+      "A corrente fecha em volta das duas rodas com os rolos nos vãos, as placas internas e externas alternando e um pino em cada rolo, sem elo torto nem esticado?"
+    ]
+  },
+  "perfis": {
+    "corrente-08b-18-36": {
+      "descricao": "corrente 08B entre rodas de 18 e 36 dentes, a cerca de 300 mm",
+      "parametros": {
+        "passo": 12.7,
+        "diametroDoRolo": 8.51,
+        "larguraInterna": 7.75,
+        "diametroDoPino": 4.45,
+        "alturaDaPlaca": 11.8,
+        "espessuraInterna": 1.6,
+        "espessuraExterna": 1.6,
+        "dentes1": 18,
+        "dentes2": 36,
+        "distancia": 300
+      }
+    },
+    "corrente-06b-12-12": {
+      "descricao": "corrente 06B entre duas rodas de 12 dentes, a cerca de 200 mm",
+      "parametros": {
+        "passo": 9.525,
+        "diametroDoRolo": 6.35,
+        "larguraInterna": 5.72,
+        "diametroDoPino": 3.28,
+        "alturaDaPlaca": 8.2,
+        "espessuraInterna": 1.3,
+        "espessuraExterna": 1.3,
+        "dentes1": 12,
+        "dentes2": 12,
+        "distancia": 200
+      }
+    },
+    "corrente-16b-15-40": {
+      "descricao": "corrente 16B entre rodas de 15 e 40 dentes, a cerca de 800 mm",
+      "parametros": {
+        "passo": 25.4,
+        "diametroDoRolo": 15.88,
+        "larguraInterna": 17.02,
+        "diametroDoPino": 8.28,
+        "alturaDaPlaca": 21,
+        "espessuraInterna": 3.1,
+        "espessuraExterna": 4.15,
+        "dentes1": 15,
+        "dentes2": 40,
+        "distancia": 800
+      }
+    }
+  }
+}
