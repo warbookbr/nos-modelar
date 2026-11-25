@@ -83,6 +83,102 @@
       "minimo": 0.5,
       "maximo": 10,
       "medio": 2
+    },
+    "grade": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 0,
+      "minimo": 0,
+      "maximo": 1,
+      "medio": 0
+    },
+    "rasgos": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 6,
+      "minimo": 2,
+      "maximo": 20,
+      "medio": 8
+    },
+    "comprimentoDoRasgo": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 60,
+      "minimo": 5,
+      "maximo": 600,
+      "medio": 80
+    },
+    "larguraDoRasgo": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 3,
+      "minimo": 1.5,
+      "maximo": 10,
+      "medio": 3
+    },
+    "passoDosRasgos": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 7,
+      "minimo": 3,
+      "maximo": 25,
+      "medio": 7
+    },
+    "recortes": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 0,
+      "minimo": 0,
+      "maximo": 1,
+      "medio": 0
+    },
+    "larguraDoRetangulo": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 30,
+      "minimo": 4,
+      "maximo": 200,
+      "medio": 40
+    },
+    "alturaDoRetangulo": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 15,
+      "minimo": 4,
+      "maximo": 200,
+      "medio": 20
+    },
+    "centroDoRetangulo": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": -30,
+      "minimo": -150,
+      "maximo": -10,
+      "medio": -40
+    },
+    "diametroDoRedondo": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 12,
+      "minimo": 3,
+      "maximo": 100,
+      "medio": 16
+    },
+    "centroDoRedondo": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 40,
+      "minimo": 10,
+      "maximo": 150,
+      "medio": 50
+    },
+    "alturaDosRecortes": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 18,
+      "minimo": 4,
+      "maximo": 180,
+      "medio": 40
     }
   },
   "restricoes": [
@@ -120,6 +216,51 @@
       "id": "canto-nao-come-o-ressalto",
       "expressao": "raioDoCanto - parede - folgaDoRessalto - diametroDoRessalto / 2 <= 0",
       "motivo": "o raio do canto de dentro passa do ressalto; diminua o canto ou aumente a folga"
+    },
+    {
+      "id": "rasgo-cabe-entre-os-ressaltos",
+      "expressao": "max(0, grade) * (comprimentoDoRasgo + 2 * (parede + folgaDoRessalto + diametroDoRessalto) + 4 - largura) <= 0",
+      "motivo": "com a grade, o rasgo passa da largura entre os ressaltos da tampa"
+    },
+    {
+      "id": "rasgos-cabem-na-profundidade",
+      "expressao": "max(0, grade) * ((rasgos - 1) * passoDosRasgos + larguraDoRasgo + 2 * (parede + folgaDoRessalto + diametroDoRessalto) + 4 - profundidade) <= 0",
+      "motivo": "com a grade, os rasgos passam da profundidade entre os ressaltos da tampa"
+    },
+    {
+      "id": "rasgos-nao-se-tocam",
+      "expressao": "max(0, grade) * (larguraDoRasgo + 1 - passoDosRasgos) <= 0",
+      "motivo": "com a grade, o passo dos rasgos precisa deixar 1 mm entre eles"
+    },
+    {
+      "id": "rasgo-mais-longo-que-largo",
+      "expressao": "max(0, grade) * (larguraDoRasgo + 1 - comprimentoDoRasgo) <= 0",
+      "motivo": "o rasgo precisa ser mais comprido que largo"
+    },
+    {
+      "id": "recortes-na-altura-da-base",
+      "expressao": "max(0, recortes) * (max(alturaDoRetangulo, diametroDoRedondo) / 2 + parede + 1 - alturaDosRecortes) <= 0",
+      "motivo": "com os recortes, eles descem abaixo do fundo da base"
+    },
+    {
+      "id": "recortes-abaixo-da-divisao",
+      "expressao": "max(0, recortes) * (alturaDosRecortes + max(alturaDoRetangulo, diametroDoRedondo) / 2 + 1 - alturaDaBase) <= 0",
+      "motivo": "com os recortes, eles sobem acima da divisão da base"
+    },
+    {
+      "id": "retangulo-dentro-da-frente",
+      "expressao": "max(0, recortes) * (abs(centroDoRetangulo) + larguraDoRetangulo / 2 + raioDoCanto + 1 - largura / 2) <= 0",
+      "motivo": "com os recortes, o retangular passa da parte reta da frente"
+    },
+    {
+      "id": "redondo-dentro-da-frente",
+      "expressao": "max(0, recortes) * (abs(centroDoRedondo) + diametroDoRedondo / 2 + raioDoCanto + 1 - largura / 2) <= 0",
+      "motivo": "com os recortes, o redondo passa da parte reta da frente"
+    },
+    {
+      "id": "recortes-separados",
+      "expressao": "max(0, recortes) * (larguraDoRetangulo / 2 + diametroDoRedondo / 2 + 2 - abs(centroDoRedondo - centroDoRetangulo)) <= 0",
+      "motivo": "com os recortes, o retangular e o redondo se encostam"
     }
   ],
   "portas": [
@@ -146,7 +287,8 @@
   ],
   "perguntas": {
     "gabinete": [
-      "O gabinete abre em base e tampa com parede fina e uniforme, o lábio da base entrando no rebaixo da tampa, e os quatro ressaltos dos cantos com o furo, os da base encontrando os da tampa na divisão?"
+      "O gabinete abre em base e tampa com parede fina e uniforme, o lábio da base entrando no rebaixo da tampa, e os quatro ressaltos dos cantos com o furo, os da base encontrando os da tampa na divisão?",
+      "A grade de rasgos no teto e os recortes retangular e redondo na frente atravessam a parede inteira, sem tocar os ressaltos?"
     ]
   },
   "perfis": {
@@ -193,6 +335,55 @@
         "diametroDoRessalto": 7,
         "diametroDoFuro": 2.7,
         "folgaDoRessalto": 1
+      }
+    },
+    "caixa-pequena-ventilada": {
+      "descricao": "gabinete de 160 × 110 × 60 mm com grade de oito rasgos no teto e os dois recortes na frente",
+      "parametros": {
+        "largura": 160,
+        "profundidade": 110,
+        "altura": 60,
+        "parede": 2.5,
+        "raioDoCanto": 6,
+        "alturaDaBase": 35,
+        "alturaDoEncaixe": 3,
+        "diametroDoRessalto": 8,
+        "diametroDoFuro": 3.2,
+        "folgaDoRessalto": 1.5,
+        "grade": 1,
+        "rasgos": 8,
+        "comprimentoDoRasgo": 80,
+        "larguraDoRasgo": 3,
+        "passoDosRasgos": 7,
+        "recortes": 1,
+        "larguraDoRetangulo": 30,
+        "alturaDoRetangulo": 12,
+        "centroDoRetangulo": -30,
+        "diametroDoRedondo": 12,
+        "centroDoRedondo": 35,
+        "alturaDosRecortes": 18
+      }
+    },
+    "caixa-de-painel-com-recortes": {
+      "descricao": "gabinete de 300 × 200 × 120 mm com os dois recortes de painel na frente",
+      "parametros": {
+        "largura": 300,
+        "profundidade": 200,
+        "altura": 120,
+        "parede": 3,
+        "raioDoCanto": 10,
+        "alturaDaBase": 80,
+        "alturaDoEncaixe": 4,
+        "diametroDoRessalto": 10,
+        "diametroDoFuro": 4.2,
+        "folgaDoRessalto": 4,
+        "recortes": 1,
+        "larguraDoRetangulo": 80,
+        "alturaDoRetangulo": 40,
+        "centroDoRetangulo": -60,
+        "diametroDoRedondo": 22,
+        "centroDoRedondo": 70,
+        "alturaDosRecortes": 40
       }
     }
   }

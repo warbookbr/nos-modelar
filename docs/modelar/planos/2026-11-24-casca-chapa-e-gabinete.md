@@ -64,7 +64,7 @@ O núcleo não ganha nome de objeto. A casca pela malha e a chapa de uma linha d
 Cada fatia cabe numa sessão de agente despachado, entrega o teste dela e deixa o andamento escrito abaixo antes de passar à seguinte.
 
 1. Feita em 2026-11-24: a família `gabinete` com a caixa, a tampa, o encaixe e os ressaltos, com a aprovação da pessoa.
-2. A grade de ventilação e os recortes de painel no gabinete, e o gabinete de prova, com a aprovação da pessoa.
+2. Feita em 2026-11-25: a grade de ventilação e os recortes de painel no gabinete, e o gabinete de prova, com a aprovação da pessoa.
 3. O modo de base com abas da `chapaDobrada`, com o alívio de canto e o planificado, a caixa de chapa de prova, o gabinete de chapa como opção da família e a aprovação da pessoa; passa pelo revisor adversarial.
 4. A casca pela receita para `loft`, `extrusao` e `lathe`, para dentro e para fora, a casca côncava de prova e a aprovação da pessoa; passa pelo revisor adversarial.
 5. O banco de provas, o mapa de ferramentas, as fichas e o fechamento.
@@ -80,5 +80,6 @@ Se a casca pela receita mudar a assinatura de alguma peça do acervo, a fatia pa
 ## Andamento
 
 Fatia 1, em 2026-11-24. A família `gabinete` faz a caixa de plástico de cantos arredondados partida em base e tampa: cada metade é a extrusão do retângulo menos o vão de dentro (a parede sai exata, sem a operação `casca`); a base tem o lábio na metade de dentro da parede, que entra no rebaixo da tampa, e a borda de fora da tampa apoia na da base; os quatro ressaltos dos cantos têm o furo passante pelo fundo na base e o piloto cego na tampa, e se tocam de topo na divisão. As portas são o apoio de baixo, o topo e o padrão dos quatro furos. Os três perfis saem abaixo de um segundo, a base e a tampa num pedaço cada, a tampa só encostando na base. A camada mecânica foi gravada depois da aprovação da pessoa por imagem.
+Fatia 2, em 2026-11-25. O gabinete ganhou a grade de ventilação (rasgos de pontas redondas no teto da tampa, um rasgo repetido por `arranja` linear, centrados) e os recortes de painel (o retangular à esquerda e o redondo à direita na parede da frente da base, à mesma altura), cada um ligado por parâmetro; uma composição por combinação. As restrições guardam os rasgos longe dos ressaltos da tampa, os recortes na parte reta da frente e entre o fundo e a divisão, e os dois recortes separados; a conferência mecânica pediu limites máximos menores (20 rasgos, recortes menores), que entraram. O gabinete ventilado de prova tem a grade, os dois recortes, a base e a tampa só encostando. A camada mecânica foi gravada depois da aprovação da pessoa por imagem.
 
 ## Fechamento

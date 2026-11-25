@@ -40,4 +40,15 @@ describe('família gabinete', () => {
     const xs = new Set([...n.V.values()].filter((q) => q[0] > 0.077 && Math.abs(q[2] * 1000) <= 55 - 6 + 1e-6 && q[1] >= 0 && q[1] <= 0.03).map((q) => Math.round(q[0] * 1e7) / 1e4));
     expect([...xs].sort()).toEqual([77.5, 80]);
   });
+
+  it('a grade atravessa o teto da tampa e os recortes atravessam a frente da base', () => {
+    const n = executar(receitaDe('caixa-pequena-ventilada'));
+    const q = F.contrato.perfis['caixa-pequena-ventilada'].parametros;
+    /* no teto (y = altura), as pontas dos oito rasgos: vértices a x = ±(comprimento/2) */
+    const noTeto = [...n.V.values()].filter((v) => Math.abs(v[1] * 1000 - q.altura) < 1e-6 && Math.abs(Math.abs(v[0] * 1000) - q.comprimentoDoRasgo / 2) < 1e-6);
+    expect(noTeto.length).toBeGreaterThanOrEqual(8);
+    /* na frente (z = −profundidade/2), a borda do recorte redondo, a 6 mm do centro dele */
+    const naFrente = [...n.V.values()].filter((v) => Math.abs(v[2] * 1000 + q.profundidade / 2) < 1e-6 && Math.abs(Math.hypot(v[0] * 1000 - q.centroDoRedondo, v[1] * 1000 - q.alturaDosRecortes) - 6) < 1e-6);
+    expect(naFrente.length).toBeGreaterThan(0);
+  });
 });

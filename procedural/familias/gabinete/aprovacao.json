@@ -3,20 +3,32 @@
   "familia": "gabinete",
   "versao": "1.0.0",
   "mecanica": {
-    "data": "2026-11-24",
+    "data": "2026-11-25",
     "pontos": {
       "minimo": {
         "parametros": {
           "altura": 20,
           "alturaDaBase": 10,
           "alturaDoEncaixe": 1,
+          "alturaDoRetangulo": 4,
+          "alturaDosRecortes": 4,
+          "centroDoRedondo": 10,
+          "centroDoRetangulo": -150,
+          "comprimentoDoRasgo": 5,
           "diametroDoFuro": 1.5,
+          "diametroDoRedondo": 3,
           "diametroDoRessalto": 4,
           "folgaDoRessalto": 0.5,
+          "grade": 0,
           "largura": 40,
+          "larguraDoRasgo": 1.5,
+          "larguraDoRetangulo": 4,
           "parede": 1,
+          "passoDosRasgos": 3,
           "profundidade": 40,
-          "raioDoCanto": 1.5
+          "raioDoCanto": 1.5,
+          "rasgos": 2,
+          "recortes": 0
         },
         "hash": "sha256:6891117f71ae8b6223579d8e26590cc3a091aa6355ad177ede25d2cb45733b0f",
         "medidas": []
@@ -26,13 +38,25 @@
           "altura": 90,
           "alturaDaBase": 50,
           "alturaDoEncaixe": 3,
+          "alturaDoRetangulo": 20,
+          "alturaDosRecortes": 40,
+          "centroDoRedondo": 50,
+          "centroDoRetangulo": -40,
+          "comprimentoDoRasgo": 80,
           "diametroDoFuro": 3.5,
+          "diametroDoRedondo": 16,
           "diametroDoRessalto": 9,
           "folgaDoRessalto": 2,
+          "grade": 0,
           "largura": 240,
+          "larguraDoRasgo": 3,
+          "larguraDoRetangulo": 40,
           "parede": 2.5,
+          "passoDosRasgos": 7,
           "profundidade": 160,
-          "raioDoCanto": 8
+          "raioDoCanto": 8,
+          "rasgos": 8,
+          "recortes": 0
         },
         "hash": "sha256:e8e2ec81b168be3b2268c17f4188b86ac185305f8fa2dc5c12cb876d5e0a2146",
         "medidas": []
@@ -42,20 +66,32 @@
           "altura": 400,
           "alturaDaBase": 300,
           "alturaDoEncaixe": 8,
+          "alturaDoRetangulo": 200,
+          "alturaDosRecortes": 180,
+          "centroDoRedondo": 150,
+          "centroDoRetangulo": -10,
+          "comprimentoDoRasgo": 600,
           "diametroDoFuro": 8,
+          "diametroDoRedondo": 100,
           "diametroDoRessalto": 20,
           "folgaDoRessalto": 10,
+          "grade": 1,
           "largura": 800,
+          "larguraDoRasgo": 10,
+          "larguraDoRetangulo": 200,
           "parede": 6,
+          "passoDosRasgos": 25,
           "profundidade": 600,
-          "raioDoCanto": 25
+          "raioDoCanto": 25,
+          "rasgos": 20,
+          "recortes": 1
         },
-        "hash": "sha256:f88b56320770f4a0d647f584aa24413c793f5a7bb7e64e1b197114488918cae4",
+        "hash": "sha256:98e9e543fdfbaef5ac86c4bb73e677718947b671826d4e3d6a04fa409d3146a7",
         "medidas": []
       }
     },
     "varredura": {
-      "sondas": 20,
+      "sondas": 44,
       "recusasDeclaradas": [
         {
           "ponto": "altura=20",
@@ -98,13 +134,25 @@
           "altura": 30,
           "alturaDaBase": 18,
           "alturaDoEncaixe": 2,
+          "alturaDoRetangulo": 15,
+          "alturaDosRecortes": 18,
+          "centroDoRedondo": 40,
+          "centroDoRetangulo": -30,
+          "comprimentoDoRasgo": 60,
           "diametroDoFuro": 2.7,
+          "diametroDoRedondo": 12,
           "diametroDoRessalto": 7,
           "folgaDoRessalto": 1,
+          "grade": 0,
           "largura": 120,
+          "larguraDoRasgo": 3,
+          "larguraDoRetangulo": 30,
           "parede": 2,
+          "passoDosRasgos": 7,
           "profundidade": 80,
-          "raioDoCanto": 4
+          "raioDoCanto": 4,
+          "rasgos": 6,
+          "recortes": 0
         },
         "hash": "sha256:396333a5cf744bc01cc5ffeff810835e1855321530d55f9012fa20e0026b0859",
         "medidas": []
@@ -114,15 +162,55 @@
           "altura": 120,
           "alturaDaBase": 80,
           "alturaDoEncaixe": 4,
+          "alturaDoRetangulo": 15,
+          "alturaDosRecortes": 18,
+          "centroDoRedondo": 40,
+          "centroDoRetangulo": -30,
+          "comprimentoDoRasgo": 60,
           "diametroDoFuro": 4.2,
+          "diametroDoRedondo": 12,
           "diametroDoRessalto": 10,
           "folgaDoRessalto": 4,
+          "grade": 0,
           "largura": 300,
+          "larguraDoRasgo": 3,
+          "larguraDoRetangulo": 30,
           "parede": 3,
+          "passoDosRasgos": 7,
           "profundidade": 200,
-          "raioDoCanto": 10
+          "raioDoCanto": 10,
+          "rasgos": 6,
+          "recortes": 0
         },
         "hash": "sha256:2d8768b0ed36d7e7c5fa9800ff93114a47f3e054bb6446065d28d6c69e8832f7",
+        "medidas": []
+      },
+      "caixa-de-painel-com-recortes": {
+        "parametros": {
+          "altura": 120,
+          "alturaDaBase": 80,
+          "alturaDoEncaixe": 4,
+          "alturaDoRetangulo": 40,
+          "alturaDosRecortes": 40,
+          "centroDoRedondo": 70,
+          "centroDoRetangulo": -60,
+          "comprimentoDoRasgo": 60,
+          "diametroDoFuro": 4.2,
+          "diametroDoRedondo": 22,
+          "diametroDoRessalto": 10,
+          "folgaDoRessalto": 4,
+          "grade": 0,
+          "largura": 300,
+          "larguraDoRasgo": 3,
+          "larguraDoRetangulo": 80,
+          "parede": 3,
+          "passoDosRasgos": 7,
+          "profundidade": 200,
+          "raioDoCanto": 10,
+          "rasgos": 6,
+          "recortes": 1
+        },
+        "hash": "sha256:991d11cec9e96d57e92c4894a6378baba3068939d9be9b548f607ec89b7c46b4",
         "medidas": []
       },
       "caixa-pequena": {
@@ -130,20 +218,60 @@
           "altura": 60,
           "alturaDaBase": 35,
           "alturaDoEncaixe": 3,
+          "alturaDoRetangulo": 15,
+          "alturaDosRecortes": 18,
+          "centroDoRedondo": 40,
+          "centroDoRetangulo": -30,
+          "comprimentoDoRasgo": 60,
           "diametroDoFuro": 3.2,
+          "diametroDoRedondo": 12,
           "diametroDoRessalto": 8,
           "folgaDoRessalto": 1.5,
+          "grade": 0,
           "largura": 160,
+          "larguraDoRasgo": 3,
+          "larguraDoRetangulo": 30,
           "parede": 2.5,
+          "passoDosRasgos": 7,
           "profundidade": 110,
-          "raioDoCanto": 6
+          "raioDoCanto": 6,
+          "rasgos": 6,
+          "recortes": 0
         },
         "hash": "sha256:933dfa80b327a2ba2c825ed6024fb945f6f7de162f89ee835b0dac23c98ee0bb",
+        "medidas": []
+      },
+      "caixa-pequena-ventilada": {
+        "parametros": {
+          "altura": 60,
+          "alturaDaBase": 35,
+          "alturaDoEncaixe": 3,
+          "alturaDoRetangulo": 12,
+          "alturaDosRecortes": 18,
+          "centroDoRedondo": 35,
+          "centroDoRetangulo": -30,
+          "comprimentoDoRasgo": 80,
+          "diametroDoFuro": 3.2,
+          "diametroDoRedondo": 12,
+          "diametroDoRessalto": 8,
+          "folgaDoRessalto": 1.5,
+          "grade": 1,
+          "largura": 160,
+          "larguraDoRasgo": 3,
+          "larguraDoRetangulo": 30,
+          "parede": 2.5,
+          "passoDosRasgos": 7,
+          "profundidade": 110,
+          "raioDoCanto": 6,
+          "rasgos": 8,
+          "recortes": 1
+        },
+        "hash": "sha256:58c9cb649441bd64a9860044ae060c24d6ff5cf515531de5abe8c30623686b30",
         "medidas": []
       }
     },
     "escalasDosPerfis": {
-      "sondas": 60,
+      "sondas": 190,
       "recusasDeclaradas": [
         {
           "ponto": "caixa-baixa: altura=20",
@@ -202,6 +330,66 @@
           "restricao": "canto-nao-come-o-ressalto"
         },
         {
+          "ponto": "caixa-de-painel-com-recortes: altura=20",
+          "restricao": "base-abaixo-do-topo"
+        },
+        {
+          "ponto": "caixa-de-painel-com-recortes: alturaDaBase=10",
+          "restricao": "recortes-abaixo-da-divisao"
+        },
+        {
+          "ponto": "caixa-de-painel-com-recortes: alturaDaBase=300",
+          "restricao": "base-abaixo-do-topo"
+        },
+        {
+          "ponto": "caixa-de-painel-com-recortes: alturaDoRetangulo=200",
+          "restricao": "recortes-abaixo-da-divisao"
+        },
+        {
+          "ponto": "caixa-de-painel-com-recortes: alturaDosRecortes=4",
+          "restricao": "recortes-na-altura-da-base"
+        },
+        {
+          "ponto": "caixa-de-painel-com-recortes: alturaDosRecortes=180",
+          "restricao": "recortes-abaixo-da-divisao"
+        },
+        {
+          "ponto": "caixa-de-painel-com-recortes: centroDoRedondo=150",
+          "restricao": "redondo-dentro-da-frente"
+        },
+        {
+          "ponto": "caixa-de-painel-com-recortes: centroDoRetangulo=-150",
+          "restricao": "retangulo-dentro-da-frente"
+        },
+        {
+          "ponto": "caixa-de-painel-com-recortes: diametroDoRedondo=100",
+          "restricao": "recortes-abaixo-da-divisao"
+        },
+        {
+          "ponto": "caixa-de-painel-com-recortes: diametroDoRessalto=4",
+          "restricao": "canto-nao-come-o-ressalto"
+        },
+        {
+          "ponto": "caixa-de-painel-com-recortes: folgaDoRessalto=0.5",
+          "restricao": "canto-nao-come-o-ressalto"
+        },
+        {
+          "ponto": "caixa-de-painel-com-recortes: largura=40",
+          "restricao": "redondo-dentro-da-frente"
+        },
+        {
+          "ponto": "caixa-de-painel-com-recortes: larguraDoRetangulo=200",
+          "restricao": "retangulo-dentro-da-frente"
+        },
+        {
+          "ponto": "caixa-de-painel-com-recortes: raioDoCanto=1.5",
+          "restricao": "canto-maior-que-a-parede"
+        },
+        {
+          "ponto": "caixa-de-painel-com-recortes: raioDoCanto=25",
+          "restricao": "canto-nao-come-o-ressalto"
+        },
+        {
           "ponto": "caixa-pequena: altura=20",
           "restricao": "base-abaixo-do-topo"
         },
@@ -227,6 +415,90 @@
         },
         {
           "ponto": "caixa-pequena: raioDoCanto=25",
+          "restricao": "canto-nao-come-o-ressalto"
+        },
+        {
+          "ponto": "caixa-pequena-ventilada: altura=20",
+          "restricao": "base-abaixo-do-topo"
+        },
+        {
+          "ponto": "caixa-pequena-ventilada: alturaDaBase=10",
+          "restricao": "recortes-abaixo-da-divisao"
+        },
+        {
+          "ponto": "caixa-pequena-ventilada: alturaDaBase=300",
+          "restricao": "base-abaixo-do-topo"
+        },
+        {
+          "ponto": "caixa-pequena-ventilada: alturaDoRetangulo=200",
+          "restricao": "recortes-abaixo-da-divisao"
+        },
+        {
+          "ponto": "caixa-pequena-ventilada: alturaDosRecortes=4",
+          "restricao": "recortes-na-altura-da-base"
+        },
+        {
+          "ponto": "caixa-pequena-ventilada: alturaDosRecortes=180",
+          "restricao": "recortes-abaixo-da-divisao"
+        },
+        {
+          "ponto": "caixa-pequena-ventilada: centroDoRedondo=150",
+          "restricao": "redondo-dentro-da-frente"
+        },
+        {
+          "ponto": "caixa-pequena-ventilada: centroDoRetangulo=-150",
+          "restricao": "retangulo-dentro-da-frente"
+        },
+        {
+          "ponto": "caixa-pequena-ventilada: comprimentoDoRasgo=600",
+          "restricao": "rasgo-cabe-entre-os-ressaltos"
+        },
+        {
+          "ponto": "caixa-pequena-ventilada: diametroDoFuro=8",
+          "restricao": "furo-dentro-do-ressalto"
+        },
+        {
+          "ponto": "caixa-pequena-ventilada: diametroDoRedondo=100",
+          "restricao": "recortes-abaixo-da-divisao"
+        },
+        {
+          "ponto": "caixa-pequena-ventilada: diametroDoRessalto=4",
+          "restricao": "furo-dentro-do-ressalto"
+        },
+        {
+          "ponto": "caixa-pequena-ventilada: largura=40",
+          "restricao": "rasgo-cabe-entre-os-ressaltos"
+        },
+        {
+          "ponto": "caixa-pequena-ventilada: larguraDoRasgo=10",
+          "restricao": "rasgos-nao-se-tocam"
+        },
+        {
+          "ponto": "caixa-pequena-ventilada: larguraDoRetangulo=200",
+          "restricao": "recortes-separados"
+        },
+        {
+          "ponto": "caixa-pequena-ventilada: parede=6",
+          "restricao": "canto-maior-que-a-parede"
+        },
+        {
+          "ponto": "caixa-pequena-ventilada: passoDosRasgos=3",
+          "restricao": "rasgos-nao-se-tocam"
+        },
+        {
+          "ponto": "caixa-pequena-ventilada: passoDosRasgos=25",
+          "restricao": "rasgos-cabem-na-profundidade"
+        },
+        {
+          "ponto": "caixa-pequena-ventilada: profundidade=40",
+          "restricao": "rasgos-cabem-na-profundidade"
+        },
+        {
+          "ponto": "caixa-pequena-ventilada: raioDoCanto=1.5",
+          "restricao": "canto-maior-que-a-parede"
+        },
+        {
+          "ponto": "caixa-pequena-ventilada: raioDoCanto=25",
           "restricao": "canto-nao-come-o-ressalto"
         }
       ]
