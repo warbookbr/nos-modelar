@@ -50,7 +50,11 @@ A malha de toda peça do acervo sai igual, byte a byte na impressão do neutro c
 
 ## Decisão da pessoa
 
-Decidido pela pessoa em 2026-11-26 ("pode seguir com suas recomendações"), depois da fatia 1, que mediu a conta geométrica em menos de 10% do tempo do corte das aberturas e o resto em varreduras da chapa ou da peça inteira repetidas a cada corte: o plano troca a repartição entre fios pela retirada dessas varreduras, com a mesma malha por construção, e começa pelo que é do próprio corte (fatia 2), deixando a booleana para o empréstimo ou para depois do plano do resgate. `procedural/nucleo/fios-da-operacao.js` fica sem uso e sai do território no fechamento.
+Decidido pela pessoa em 2026-11-26 ("pode seguir com suas recomendações"), depois da fatia 1, que mediu a conta geométrica em menos de 10% do tempo do corte das aberturas e o resto em varreduras da chapa ou da peça inteira repetidas a cada corte: o plano troca a repartição entre fios pela retirada dessas varreduras, com a mesma malha enquanto toda operação declarar completa a escrita que faz (a revisão da fatia 2 mostrou que o índice guardado depende disso, e a leitura conferida recusa a divergência), e começa pelo que é do próprio corte (fatia 2), deixando a booleana para o empréstimo ou para depois do plano do resgate. `procedural/nucleo/fios-da-operacao.js` fica sem uso e sai do território no fechamento.
+
+## Andamento
+
+A fatia 2 foi feita em 2026-11-26, com duas revisões adversariais sem bloqueio e as correções delas: o furgão caiu de 56,2 s para 43,9 s com a mesma malha nas três peças que usam o corte das aberturas ([banco de provas](../banco-de-provas/operacoes-repartidas-2026-11-26/README.md)).
 
 ## Riscos e parada
 
