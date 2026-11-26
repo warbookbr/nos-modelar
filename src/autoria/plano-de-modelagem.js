@@ -45,7 +45,9 @@ export const CAMPOS_PLANO = Object.freeze([
    peça aceita, em milímetro, para todas as partes ou só para as listadas: sem ele o `descrever` mostra a espessura por parte só como informação, e com ele
    avisa a parte que passa abaixo. `categoria` é o rótulo com que a janela Abrir da bancada agrupa o objeto (`categorias-de-objeto.js`); ela só
    navega, e não escolhe critério nem pergunta, que é o que `familia` faz. */
-export const CAMPOS_OPCIONAIS_DO_PLANO = Object.freeze(['familia', 'familiaProcedural', 'categoria', 'lataria', 'dobrasAceitas', 'saliencias', 'espessuraMinima']);
+export const CAMPOS_OPCIONAIS_DO_PLANO = Object.freeze(['familia', 'familiaProcedural', 'categoria', 'lataria', 'dobrasAceitas', 'saliencias', 'espessuraMinima', 'referenciasNaoConstruidas']);
+/* `referenciasNaoConstruidas` lista, entre as de `referencias`, as imagens que a receita atual NÃO constrói (a outra variante, a alternativa descartada): o pedido do crítico
+   as tira da comparação e diz que a receita não as constrói. Precisa sobrar ao menos uma referência construída. */
 export const CAMPOS_ESCALA = Object.freeze(['medida', 'milimetros']);
 export const CAMPOS_PARTE = Object.freeze(['nome', 'forma', 'tecnica']);
 /* `dePerto` da parte: onde o pedido ao crítico mostra a feição pequena que o plano promete (raio de 6 mm, rebaixo, friso), numa vista
@@ -173,6 +175,18 @@ function normalizarEspessuraMinima(valor, nomes, quem) {
   return saida;
 }
 
+function normalizarReferenciasNaoConstruidas(valor, referencias, quem) {
+  const campo = 'referenciasNaoConstruidas';
+  const exemplo = `declare em ${quem}.${campo} só caminhos que estão em ${quem}.referencias (${referencias.join(', ')}) e deixe ao menos uma de fora; confira com \`npm run vistas:critica -- <peça>\``;
+  if (!Array.isArray(valor) || valor.length === 0) falhar(quem, `'${campo}' recebeu ${JSON.stringify(valor)}; esperado lista não vazia de caminhos de 'referencias'. ${exemplo}.`);
+  const itens = valor.map((c, i) => texto(c, quem, `${campo}[${i}]`)).sort(compararTexto);
+  if (new Set(itens).size !== itens.length) falhar(quem, `'${campo}' recebeu item repetido (${itens.join(', ')}); esperado cada caminho uma vez. ${exemplo}.`);
+  const fora = itens.find((c) => !referencias.includes(c));
+  if (fora !== undefined) falhar(quem, `'${campo}' cita ${JSON.stringify(fora)}, que não está em 'referencias'; esperado um de: ${referencias.join(', ')}. ${exemplo}.`);
+  if (itens.length >= referencias.length) falhar(quem, `'${campo}' recebeu todas as ${referencias.length} referências; esperado ao menos uma construída pela receita. ${exemplo}.`);
+  return itens;
+}
+
 /**
  * Valida e canonicaliza o plano de modelagem de uma receita.
  * `undefined` e `null` significam plano ausente e retornam `null`; quem exige
@@ -208,11 +222,12 @@ export function normalizarPlanoDeModelagem(valor, { quem = 'PLANO' } = {}) {
   const nomes = partes.map((p) => p.nome);
   if (new Set(nomes).size !== nomes.length) falhar(quem, "'partes' não pode repetir nome.");
 
+  const referencias = listaDeTextos(valor.referencias, quem, 'referencias');
   return {
     formato: FORMATO_PLANO_DE_MODELAGEM,
     versao: VERSAO_PLANO_DE_MODELAGEM,
     objeto: texto(valor.objeto, quem, 'objeto', MINIMO_DO_CRITERIO),
-    referencias: listaDeTextos(valor.referencias, quem, 'referencias'),
+    referencias,
     escala: { medida: texto(escala.medida, quem, 'escala.medida'), milimetros: escala.milimetros },
     partes,
     criteriosDeReprovacao: listaDeTextos(valor.criteriosDeReprovacao, quem, 'criteriosDeReprovacao', MINIMO_DO_CRITERIO),
@@ -223,6 +238,7 @@ export function normalizarPlanoDeModelagem(valor, { quem = 'PLANO' } = {}) {
     ...(valor.dobrasAceitas === undefined ? {} : { dobrasAceitas: normalizarDobrasAceitas(valor.dobrasAceitas, nomes, { quem }) }),
     ...(valor.saliencias === undefined ? {} : { saliencias: normalizarSaliencias(valor.saliencias, { quem }) }),
     ...(valor.espessuraMinima === undefined ? {} : { espessuraMinima: normalizarEspessuraMinima(valor.espessuraMinima, nomes, quem) }),
+    ...(valor.referenciasNaoConstruidas === undefined ? {} : { referenciasNaoConstruidas: normalizarReferenciasNaoConstruidas(valor.referenciasNaoConstruidas, referencias, quem) }),
   };
 }
 

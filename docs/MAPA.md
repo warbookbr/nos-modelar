@@ -6,6 +6,7 @@
 > algum arquivo-fonte estiver sem cabeçalho.
 
 2403 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2405 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2643,6 +2644,18 @@
 - `alvo.md` — Alvo do braço direito do robô humanoide
 - `braco-proporcao.esboco.mjs` — braco-proporcao.esboco.mjs — as opções de proporção do braço direito do robô humanoide, em blocos sobre o esqueleto.
 
+## procedural/pecas/roda-esportiva/
+
+- `receita.js` — roda-esportiva — roda de liga leve de 19 polegadas com pneu 245/40 R19, etapa 1 (aro, raios, tampa central, parafusos, válvula e pneu), nas duas variantes do…
+
+## procedural/pecas/roda-esportiva/referencias/
+
+- `alvo.md` — Alvo da roda esportiva
+
+## procedural/pecas/roda-esportiva/rodadas/
+
+- `receita-06.js` — roda-esportiva — roda de liga leve de 19 polegadas com pneu 245/40 R19, etapa 1 (aro, raios, tampa central, parafusos, válvula e pneu), nas duas variantes do…
+
 ## procedural/pecas/sedan-chassi-e-lataria/
 
 - `ALINHAMENTO.md` — Sedã em chassi e lataria: alinhamento
@@ -4191,6 +4204,7 @@
 - `referencia-do-plano.test.mjs` — referencia-do-plano.test.mjs — `descrever-peca` confere logo no começo que cada caminho de `PLANO.referencias` existe.
 - `referencia-local.test.mjs` — referencia-local.test.mjs — a imagem de estudo mora em `referencias/locais/`, que o git ignora. Quando ela falta (outra máquina, CI) as ferramentas avisam um…
 - `referencias-do-plano.mjs` — referencias-do-plano.mjs — o que `PLANO.referencias` cita, resolvido em disco.
+- `referencias-nao-construidas.test.mjs` — referencias-nao-construidas.test.mjs — `PLANO.referenciasNaoConstruidas`: a variante que a receita não constrói sai da comparação do crítico e o pedido diz q…
 - `refinamento-global.mjs` — refinamento-global.mjs — o adaptador de disco do refinamento da forma global.
 - `refinamento-global.test.mjs` — refinamento-global.test.mjs — de ponta a ponta: a receita que declara REFINA passa pelo veredito da peça e pela guarda do acervo. A mesma receita passa intei…
 - `regravar-ajustes-de-curva.mjs` — regravar-ajustes-de-curva.mjs — refaz os ajustes de curva lisa de que uma receita precisa e grava o resultado ao lado dela.
