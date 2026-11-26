@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2409 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2415 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -463,6 +463,11 @@
 ## docs/modelar/banco-de-provas/nucleo-para-receita-2026-11-14/
 
 - `prova-memoria-do-sedan.mjs` — prova-memoria-do-sedan.mjs — a memória de execução na carroceria do sedã: o tempo e o neutro bit a bit. Uso, da raiz do repositório (cada modo leva de 3 a 4 …
+
+## docs/modelar/banco-de-provas/operacoes-repartidas-2026-11-26/
+
+- `README.md` — Operações repartidas entre núcleos: onde vai o tempo dentro do corte das aberturas
+- `perfil.mjs` — perfil.mjs — onde vai o tempo dentro de uma operação, pelo perfil de CPU do Node (plano das operações repartidas entre núcleos, fatia 1). Uso, da raiz do rep…
 
 ## docs/modelar/banco-de-provas/organizacao-dos-documentos-2026-11-13/
 
@@ -1472,6 +1477,9 @@
 
 ## procedural/nucleo/operacoes/
 
+- `abertura-por-contorno-guarda-chapa-mudada.test.ts` — abertura-por-contorno-guarda-chapa-mudada.test.ts — a guarda da chapa do `aberturaPorContorno` (plano `docs/modelar/planos/2026-11-26-operacoes-repartidas-en…
+- `abertura-por-contorno-guarda-conferida.test.ts` — abertura-por-contorno-guarda-conferida.test.ts — a guarda da chapa do `aberturaPorContorno` (plano `docs/modelar/planos/2026-11-26-operacoes-repartidas-entre…
+- `abertura-por-contorno-guarda.test.ts` — abertura-por-contorno-guarda.test.ts — a guarda da chapa do `aberturaPorContorno` (plano `docs/modelar/planos/2026-11-26-operacoes-repartidas-entre-nucleos.m…
 - `abertura-por-contorno-simetria.test.ts` — abertura-por-contorno-simetria.test.ts — o vão por contorno que segue a simetria declarada (`simetria: 'x'` do passo `aberturaPorContorno`) e a costura da su…
 - `abertura-por-contorno.js` — abertura-por-contorno.js (operação) — `aberturaPorContorno`: um vão na chapa pela curva que a receita desenha numa vista, sem depender das linhas da gaiola. …
 - `abertura-por-contorno.test.ts` — abertura-por-contorno.test.ts — a operação `aberturaPorContorno` na peça de teste `tools/fixtures/abertura-de-prova/`, pelos gates do plano da abertura de co…
@@ -3440,6 +3448,10 @@
 - `exportacao.test.mjs` — exportacao.test.mjs — o gate 4 do plano de corrente e esteira: a transmissão por corrente de prova e a esteira de prova saem abaixo de dez segundos e em STEP…
 - `transmissao.mjs` — transmissao.mjs — a transmissão por corrente de prova: as duas rodas dentadas e a corrente da `transmissaoPorCorrente`, postas pelo `instanciaDeFamilia`, com…
 - `transmissao.test.mjs` — transmissao.test.mjs — a fatia 2 do plano de corrente e esteira: a corrente 08B entre rodas de 18 e 36 dentes fecha com um número par de elos, cada trecho re…
+
+## tools/fixtures/corte-das-aberturas/
+
+- `prova-da-guarda.ts` — prova-da-guarda.ts — o que os testes da guarda da chapa do `aberturaPorContorno` repartem (plano `docs/modelar/planos/2026-11-26-operacoes-repartidas-entre-n…
 
 ## tools/fixtures/costuras-e-furos/
 
