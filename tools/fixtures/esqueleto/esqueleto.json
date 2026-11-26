@@ -4,7 +4,7 @@
   "familia": "humanoide",
   "unidade": "mm",
   "nota": "Gerado de esqueleto em proporcoes.json por npm run esqueleto (braco-de-prova). Não edite à mão: a receita da peça de bolas e bastões lê este arquivo.",
-  "chao": 0,
+  "chao": null,
   "raiz": {
     "id": "tronco",
     "posicao": [

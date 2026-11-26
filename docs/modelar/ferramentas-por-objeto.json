@@ -381,7 +381,8 @@
       "referencias": ["técnica por hélice e repetição"],
       "aqui": "não",
       "onde": "nem esboço nem núcleo"
-    }
+    },
+    "esqueleto": {"nome": "esqueleto de proporção", "tipo": "especializado", "automatiza": "gera de uma árvore de juntas (pai, comprimento, direção, curso) o esqueleto 3D de bolas e bastões, o andaime com uma porta por junta e as articulações, põe o esqueleto em poses e acusa o membro que atravessa outro ou passa do chão", "parametros": "medidas e fórmulas, juntas, espelho de um ramo, poses (ângulo por junta e deslocamento da raiz), chão", "referencias": ["Blender: armature e rigify metarig", "Antropometria: proporções segmentares de Drillis e Contini"], "aqui": "tem", "onde": "`npm run esqueleto` sobre a seção `esqueleto` de `proporcoes.json`, com a peça de bolas e bastões em `src/autoria/esqueleto-de-bolas.js` e o humanoide de prova em `procedural/pecas/esqueleto-humanoide/`"}
   },
   "objetos": {
     "Veículos terrestres": {
@@ -477,11 +478,11 @@
       "robô delta": ["barras", "articula", "casca"],
       "robô móvel com rodas": ["gabinete", "rodaPneu", "pcb"],
       "robô de esteira": ["elos", "gabinete", "rodaPneu"],
-      "humanoide": ["loftSuave", "casca", "articula", "atuador", "cabo"],
-      "quadrúpede": ["loftSuave", "casca", "articula"],
+      "humanoide": ["esqueleto", "loftSuave", "casca", "articula", "atuador", "cabo"],
+      "quadrúpede": ["esqueleto", "loftSuave", "casca", "articula"],
       "garra": ["articula", "engrenagem", "mola", "textura"],
       "efetuador": ["articula", "atuador", "furos"],
-      "exoesqueleto": ["casca", "articula", "tecido", "barras"],
+      "exoesqueleto": ["esqueleto", "casca", "articula", "tecido", "barras"],
       "robô aspirador": ["casca", "gabinete", "rodaPneu", "repete"],
       "drone terrestre": ["gabinete", "rodaPneu", "elos", "barras"]
     },

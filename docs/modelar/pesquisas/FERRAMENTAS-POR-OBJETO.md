@@ -53,7 +53,8 @@ Os tipos são três. O modificador age sobre uma forma que já existe; o gerador
 | 39 | eixo escalonado (`eixo`) | especializado | 5 (1%) | 2 | parcial | gera eixo por trechos com diâmetro, rasgo de chaveta, ranhura de anel elástico, chanfro e ponta roscada |
 | 40 | nervura de reforço (`nervura`) | modificador | 4 (1%) | 3 | não | põe nervuras finas entre paredes de uma casca, presas às faces que tocam |
 | 41 | bobina e núcleo (`bobina`) | especializado | 3 (1%) | 2 | não | gera enrolamento sobre carretel e núcleo de lâminas para motor, transformador e solenoide |
-| 42 | ressalto para parafuso (`ressalto`) | modificador | 1 (0%) | 1 | não | cria o pino oco de fixação dentro de um gabinete, com furo, rebaixo e raiz arredondada |
+| 42 | esqueleto de proporção (`esqueleto`) | especializado | 3 (1%) | 1 | tem | gera de uma árvore de juntas (pai, comprimento, direção, curso) o esqueleto 3D de bolas e bastões, o andaime com uma porta por junta e as articulações, põe o esqueleto em poses e acusa o membro que atravessa outro ou passa do chão |
+| 43 | ressalto para parafuso (`ressalto`) | modificador | 1 (0%) | 1 | não | cria o pino oco de fixação dentro de um gabinete, com furo, rebaixo e raiz arredondada |
 
 ## O que falta, por objetos atendidos
 
@@ -270,6 +271,10 @@ Gera aro, disco ou raios, cubo com furação e pneu com seção e banda, que enc
 
 Traça uma rede de tubos e põe sozinha as curvas, tês, reduções, flanges e válvulas por bitola. Parâmetros: traçado, bitola, tipo de conexão. Referências: FreeCAD: Dodo e Flamingo; Plant 3D (conceito de catálogo de conexões). Aqui: tem, a família `tubulacao` (trecho, curva, tampão, tê, redução, flange de pescoço e válvulas de esfera e de gaveta) e `pecasDaRede`, que lê o traçado de nós e trechos com bitola de aço (ASME) ou PVC (NBR 5648), corta cada trecho e põe cada conexão com as bocas casadas; tê inclinado, cruzeta e cobre não. Atende 27 objetos em 11 famílias.
 
+### esqueleto de proporção (`esqueleto`)
+
+Gera de uma árvore de juntas (pai, comprimento, direção, curso) o esqueleto 3D de bolas e bastões, o andaime com uma porta por junta e as articulações, põe o esqueleto em poses e acusa o membro que atravessa outro ou passa do chão. Parâmetros: medidas e fórmulas, juntas, espelho de um ramo, poses (ângulo por junta e deslocamento da raiz), chão. Referências: Blender: armature e rigify metarig; Antropometria: proporções segmentares de Drillis e Contini. Aqui: tem, `npm run esqueleto` sobre a seção `esqueleto` de `proporcoes.json`, com a peça de bolas e bastões em `src/autoria/esqueleto-de-bolas.js` e o humanoide de prova em `procedural/pecas/esqueleto-humanoide/`. Atende 3 objetos em 1 famílias.
+
 ## Objetos
 
 ### Veículos terrestres
@@ -383,11 +388,11 @@ Traça uma rede de tubos e põe sozinha as curvas, tês, reduções, flanges e v
 | robô delta | estrutura de barras, articulações, casca com espessura |
 | robô móvel com rodas | gabinete, roda e pneu, placa de circuito |
 | robô de esteira | elos ao longo de caminho fechado, gabinete, roda e pneu |
-| humanoide | superfície suave por seções, casca com espessura, articulações, atuador linear e de junta, cabo ou mangueira entre pontos |
-| quadrúpede | superfície suave por seções, casca com espessura, articulações |
+| humanoide | esqueleto de proporção, superfície suave por seções, casca com espessura, articulações, atuador linear e de junta, cabo ou mangueira entre pontos |
+| quadrúpede | esqueleto de proporção, superfície suave por seções, casca com espessura, articulações |
 | garra | articulações, engrenagens, molas, relevo funcional |
 | efetuador | articulações, atuador linear e de junta, furação em padrão |
-| exoesqueleto | casca com espessura, articulações, tecido e estofado, estrutura de barras |
+| exoesqueleto | esqueleto de proporção, casca com espessura, articulações, tecido e estofado, estrutura de barras |
 | robô aspirador | casca com espessura, gabinete, roda e pneu, repetição em série |
 | drone terrestre | gabinete, roda e pneu, elos ao longo de caminho fechado, estrutura de barras |
 

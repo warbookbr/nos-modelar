@@ -253,3 +253,16 @@ describe('deslocamento da raiz na pose', () => {
     expect(() => gerarEsqueleto(arquivo)).toThrow(/deslocamentoDaRaiz = \[0,-10\]; esperava um vetor \[x, y, z\].*\n?.*conserte com: .*npm run esqueleto/s);
   });
 });
+
+describe('pose sem apoio', () => {
+  it('a pose em que nada encosta no chão declarado avisa, e baixar a raiz até o chão tira o aviso', () => {
+    const { arquivo } = copia();
+    const { arvore } = gerarEsqueleto(arquivo);
+    const fundo = Math.min(...[...posarEsqueleto(arvore, {}).values()].map((p) => p[1]));
+    const alto = { ...arvore, chao: fundo - 500 };
+    const aviso = avisosDaPose(alto, {}).find((a) => a.tipo === 'sem-apoio');
+    expect(aviso.folga).toBeGreaterThan(400);
+    const baixado = avisosDaPose(alto, {}, [0, -aviso.folga, 0]);
+    expect(baixado.filter((a) => a.tipo === 'sem-apoio' || a.tipo === 'abaixo-do-chao')).toEqual([]);
+  });
+});

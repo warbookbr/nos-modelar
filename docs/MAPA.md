@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2445 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2446 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -377,6 +377,10 @@
 - `medir-conferencia-do-aviao.mjs` — medir-conferencia-do-aviao.mjs — a conferência de forma das sete partes do avião com `REFINA.esboco`, antes e depois de as formas do esboço virarem dado guar…
 - `medir-farol.mjs` — medir-farol.mjs — as medidas do gate 1 do plano esboço pelo núcleo: em cada opção do farol na chapa curva (`farol-na-chapa.esboco.mjs`), a borda de fora de c…
 - `mesa-com-variantes.js` — mesa-com-variantes — cópia de prova de `procedural/pecas/mesa-quadrada-escura/receita.js` para o gate 2 do plano esboço pelo núcleo: o mesmo código, com este…
+
+## docs/modelar/banco-de-provas/esqueleto-de-proporcao-2026-11-26/
+
+- `README.md` — Esqueleto de proporção: o humanoide de 1.750 mm aprovado em 2026-11-26
 
 ## docs/modelar/banco-de-provas/etapas-pela-impressao-2026-11-17/
 

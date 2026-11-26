@@ -1,6 +1,6 @@
 # Esqueleto de proporção: bolas nas juntas e bastões nos membros, em 3D, antes de modelar o robô
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Núcleo:** não
 
@@ -75,6 +75,8 @@ Fatia 2 feita em 2026-11-26: a peça de bolas e bastões (receita que lê `esque
 
 Fatia 3 feita em 2026-11-26: o esqueleto do humanoide de 1.750 mm em `procedural/pecas/esqueleto-humanoide/`, com as medidas do braço do robô e as proporções antropométricas médias no resto (ombro a 1.435 mm, quadril a 930, joelho a 499; braço 330, antebraço 230, coxa e canela 431), as poses sentado e braço erguido sem aviso, e duas variantes (pernas e tronco 4% mais longos) mostradas lado a lado. A pessoa aprovou a base por imagem em 2026-11-26, com a frase "Vamos seguir com suas recomendações. E pode fazer baixar sim", e pediu que o sentado baixasse a bacia: a pose ganhou `deslocamentoDaRaiz`, que move a raiz e tudo o que pende dela, e o sentado baixa a bacia o comprimento da coxa, com o assento a 499 mm e o pé no chão.
 
+Fatia 4 feita em 2026-11-26: o banco de provas com as imagens aprovadas e as medidas, a linha `esqueleto` no mapa de ferramentas por objeto (no humanoide, no quadrúpede e no exoesqueleto) e o aviso de pose sem apoio, que a ferramenta não tinha e que teria pego o sentado com os pés no ar.
+
 ## Fechamento
 
-Preencher ao concluir ou cancelar: estado final, commit e PR, gates, resultado observado e candidatos devolvidos ao backlog.
+Concluído em 2026-11-26 no ramo `claude/admiring-rubin-h9zjwx`, sem PR, com `npm run gates` verde em cada envio. `npm run esqueleto` gera de uma árvore de juntas em `proporcoes.json` o andaime, as articulações e a peça de bolas e bastões, põe o esqueleto em poses com ângulo por junta e deslocamento da raiz e avisa o membro que atravessa outro, o que passa do chão e a pose sem apoio. O humanoide de 1.750 mm foi aprovado pela pessoa por imagem, e o elo entre juntas tira dele a posição das juntas da perna de prova. Volta ao backlog a tabela de proporções pronta (o gerador por proporção vezes a altura), que espera um segundo robô pedir.

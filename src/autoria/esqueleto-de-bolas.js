@@ -18,7 +18,9 @@
  *                      nomeada com o id do andaime em camelCase (`bola-ombro-direito` vira `bolaOmbroDireito`), na pose pedida.
  */
 
-export const TOLERANCIA_DO_CONTATO_MM = 0.01;
+export /* Folga acima do chão a partir da qual a pose está sem apoio: os pés de um humanoide encostam a menos disso. */
+const FOLGA_DE_APOIO_MM = 10;
+const TOLERANCIA_DO_CONTATO_MM = 0.01;
 export const ANEIS_DA_BOLA = 8;
 export const LADOS_DA_BOLA = 16;
 export const LADOS_DO_BASTAO = 16;
@@ -116,7 +118,7 @@ function vizinhos(x, y) {
   return false;
 }
 
-/** Os avisos de uma pose: [{ tipo: 'atravessa', a, b, penetracao }, { tipo: 'abaixo-do-chao', elemento, abaixo }], penetração e queda em mm. */
+/** Os avisos de uma pose: [{ tipo: 'atravessa', a, b, penetracao }, { tipo: 'abaixo-do-chao', elemento, abaixo }, { tipo: 'sem-apoio', folga }], penetração, queda e folga em mm; com `chao`, a pose em que nada encosta nele também avisa. */
 export function avisosDaPose(arvore, angulos = {}, deslocamentoDaRaiz) {
   const el = elementosDaPose(arvore, angulos, deslocamentoDaRaiz);
   const avisos = [];
@@ -132,15 +134,19 @@ export function avisosDaPose(arvore, angulos = {}, deslocamentoDaRaiz) {
       const abaixo = arvore.chao - (Math.min(...extremos(e).map((p) => p[1])) - e.raio);
       if (abaixo > TOLERANCIA_DO_CONTATO_MM) avisos.push({ tipo: 'abaixo-do-chao', elemento: e.id, abaixo: Number(abaixo.toFixed(2)), chao: arvore.chao });
     }
+    /* sem apoio: nada encosta no chão (o sentado sem baixar a bacia deixou os pés no ar, e só a imagem mostrou) */
+    const fundo = Math.min(...el.map((e) => Math.min(...extremos(e).map((p) => p[1])) - e.raio));
+    const folga = fundo - arvore.chao;
+    if (folga > FOLGA_DE_APOIO_MM) avisos.push({ tipo: 'sem-apoio', folga: Number(folga.toFixed(2)), chao: arvore.chao });
   }
   return avisos;
 }
 
 /** Uma linha por aviso, para o terminal. */
 export function textoDoAviso(pose, a) {
-  return a.tipo === 'atravessa'
-    ? `pose '${pose}': ${a.a} atravessa ${a.b} em ${a.penetracao} mm`
-    : `pose '${pose}': ${a.elemento} passa ${a.abaixo} mm abaixo do chão (y = ${a.chao})`;
+  if (a.tipo === 'atravessa') return `pose '${pose}': ${a.a} atravessa ${a.b} em ${a.penetracao} mm`;
+  if (a.tipo === 'sem-apoio') return `pose '${pose}': nada encosta no chão (y = ${a.chao}); o ponto mais baixo fica ${a.folga} mm acima dele (baixe a raiz com deslocamentoDaRaiz na pose)`;
+  return `pose '${pose}': ${a.elemento} passa ${a.abaixo} mm abaixo do chão (y = ${a.chao})`;
 }
 
 /* ---------- a peça ---------- */
