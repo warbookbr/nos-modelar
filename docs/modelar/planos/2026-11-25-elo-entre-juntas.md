@@ -73,4 +73,6 @@ Se a seção, ao girar no elo com desvio, torcer a superfície ou fechar a pared
 
 Fatia 1 feita em 2026-11-26: a família `elo-entre-juntas` (o elo reto entre duas flanges coaxiais, seção elíptica, redonda ou de cantos arredondados, cintura ou barriga, parede pela casca da receita e a furação de cada boca no padrão da flange), com as recusas testadas e a aprovação mecânica, e a peça de prova do antebraço entre dois atuadores, aprovada pela pessoa por imagem em 2026-11-26 ("aprovo o elo reto, pode seguir"). As provas estão no banco de provas do plano.
 
+Fatia 2 feita em 2026-11-26: o elo com desvio (`desvio` de 0 a 90 graus, `azimute` e `deslocamentoLateral`, com o caminho curvo tangente às duas bocas e as seções girando sem torcer), o elo reto saindo igual bit a bit com desvio zero, e a restrição `curva-fecha-a-parede`, que pede raio de curvatura de 2,5 vezes a maior meia largura da seção: a canela e o antebraço chegam aos 90 graus, o elo de 150 mm a 68,8 e o de 100 mm a 36,7. A pessoa aprovou por imagem em 2026-11-26 ("aprovo, pode conferir e seguir"), e a conferência do contorno serrilhado da vista de cima mostrou que a parede não ondula.
+
 ## Fechamento
