@@ -422,6 +422,48 @@ export function faixaDeContornoNaRede({
     }
     const [n0, n1, n2, n3] = nosExternos;
     const coord = (id) => nos[id] ?? nosDoVao[id];
+
+    /* calibra n1 e n2 em curvaExterna pela proporção altura:largura do vão */
+    const curvaExtObj = curvas.find((c) => c.nome === curvaExterna);
+    if (curvaExtObj && Array.isArray(curvaExtObj.pontos) && curvaExtObj.pontos.length >= 4) {
+      const ptsOrig = curvaExtObj.pontos.map((p) => (typeof p === 'string' ? coord(p) : p));
+      const acumExt = [0];
+      for (let i = 0; i < ptsOrig.length - 1; i += 1) {
+        acumExt.push(acumExt[i] + norm(sub(ptsOrig[i + 1], ptsOrig[i])));
+      }
+      const compExt = acumExt[acumExt.length - 1];
+      const lenLadoF = norm(sub(coord(topoFrente), coord(baseFrente)));
+      const lenTopo = norm(sub(coord(topoTras), coord(topoFrente)));
+      const lenLadoT = norm(sub(coord(topoTras), coord(baseTras)));
+      const somaVao = lenLadoF + lenTopo + lenLadoT;
+      if (compExt > EPS && somaVao > EPS) {
+        const s1 = Math.max(0.25, Math.min(0.38, lenLadoF / somaVao));
+        const s2 = Math.max(0.62, Math.min(0.75, (lenLadoF + lenTopo) / somaVao));
+        const amostrarEmS = (s) => {
+          const alvo = s * compExt;
+          let idx = 0;
+          while (idx < acumExt.length - 2 && acumExt[idx + 1] < alvo) idx += 1;
+          const seg = acumExt[idx + 1] - acumExt[idx];
+          const u = seg > EPS ? (alvo - acumExt[idx]) / seg : 0;
+          const a = ptsOrig[idx];
+          const b = ptsOrig[idx + 1];
+          const pLin = [a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u, a[2] + (b[2] - a[2]) * u];
+          return arredP(normalLocal(pLin, foraUnit, projetar).ponto);
+        };
+        nos[n1] = amostrarEmS(s1);
+        nos[n2] = amostrarEmS(s2);
+        const novosPontos = [n0];
+        const nSubSeg = 4;
+        for (let k = 1; k < nSubSeg; k += 1) novosPontos.push(amostrarEmS((s1 * k) / nSubSeg));
+        novosPontos.push(n1);
+        for (let k = 1; k < nSubSeg; k += 1) novosPontos.push(amostrarEmS(s1 + ((s2 - s1) * k) / nSubSeg));
+        novosPontos.push(n2);
+        for (let k = 1; k < nSubSeg; k += 1) novosPontos.push(amostrarEmS(s2 + ((1 - s2) * k) / nSubSeg));
+        novosPontos.push(n3);
+        curvaExtObj.pontos = novosPontos;
+      }
+    }
+
     const lenLigF = norm(sub(coord(topoFrente), coord(n1)));
     const lenLigT = norm(sub(coord(topoTras), coord(n2)));
     const lenSolF = norm(sub(coord(n0), coord(baseFrente)));
@@ -457,31 +499,162 @@ export function faixaDeContornoNaRede({
     };
 
     /* passo calibrado em solF/solT/ligF/ligT para o sistema inteiro escolher divisoes = nRad nos lados radiais */
-    const passoSolF = Math.max(1, lenSolF / nRad);
-    const passoSolT = Math.max(1, lenSolT / nRad);
-    const passoLigF = Math.max(1, lenLigF / nRad);
-    const passoLigT = Math.max(1, lenLigT / nRad);
+    const folgaMinMm = Math.min(lenLigF, lenLigT, lenSolF, lenSolT);
+    const usarAnelMorfado = folgaMinMm >= 35 && (divisoesRadiais === null || divisoesRadiais >= 3);
+    if (!usarAnelMorfado) {
+      avisos.push({
+        ref: 'vaoSemFolgaParaAnelMorfado',
+        folgaMinMm: arred(folgaMinMm),
+        texto: `folga entre curvaExterna e o vão (${folgaMinMm.toFixed(1)} mm) é menor que 35 mm: anel intermediário morfado omitido automaticamente`,
+      });
+    }
 
-    curvas.push({ nome: `${nome}_solF`, pontos: amostrarNaSuperficie(baseFrente, n0, Math.max(1, nRad - 1)), passo: arred(passoSolF) });
-    curvas.push({ nome: `${nome}_solT`, pontos: amostrarNaSuperficie(n3, baseTras, Math.max(1, nRad - 1)), passo: arred(passoSolT) });
-    curvas.push({ nome: `${nome}_ligF`, pontos: amostrarNaSuperficie(n1, topoFrente, Math.max(2, nRad)), passo: arred(passoLigF) });
-    curvas.push({ nome: `${nome}_ligT`, pontos: amostrarNaSuperficie(n2, topoTras, Math.max(2, nRad)), passo: arred(passoLigT) });
+    if (usarAnelMorfado) {
+      const ponderar = (a, b, wA) => arredP(normalLocal([
+        wA * a[0] + (1 - wA) * b[0],
+        wA * a[1] + (1 - wA) * b[1],
+        wA * a[2] + (1 - wA) * b[2],
+      ], foraUnit, projetar).ponto);
+      const meio = (a, b) => ponderar(a, b, 0.5);
+      const m0 = `${nome}_m0`;
+      const m1 = `${nome}_m1`;
+      const m2 = `${nome}_m2`;
+      const m3 = `${nome}_m3`;
+      const garantirAnguloMinimo = (pNo, pAnt, pPos, pAlvo) => {
+        const t = [pPos[0] - pAnt[0], pPos[1] - pAnt[1], pPos[2] - pAnt[2]];
+        const tLen = Math.hypot(t[0], t[1], t[2]) || 1;
+        const tU = [t[0] / tLen, t[1] / tLen, t[2] / tLen];
+        const d = [pAlvo[0] - pNo[0], pAlvo[1] - pNo[1], pAlvo[2] - pNo[2]];
+        const dLen = Math.hypot(d[0], d[1], d[2]) || 1;
+        const projT = d[0] * tU[0] + d[1] * tU[1] + d[2] * tU[2];
+        const perp = [d[0] - projT * tU[0], d[1] - projT * tU[1], d[2] - projT * tU[2]];
+        const perpLen = Math.hypot(perp[0], perp[1], perp[2]);
+        const minPerp = 0.75 * dLen;
+        if (perpLen >= minPerp || perpLen < 1e-6) return pAlvo;
+        const escala = dLen / perpLen;
+        const ajustado = [
+          pNo[0] + perp[0] * escala,
+          pNo[1] + perp[1] * escala,
+          pNo[2] + perp[2] * escala,
+        ];
+        return arredP(normalLocal(ajustado, foraUnit, projetar).ponto);
+      };
+      const anelMorfadoNome = `${nome}_anelMorfado`;
+      const ptsExt = curvaExtObj ? curvaExtObj.pontos.map((p) => (typeof p === 'string' ? coord(p) : p)) : [coord(n0), coord(n1), coord(n2), coord(n3)];
+      const idxN1 = curvaExtObj ? curvaExtObj.pontos.indexOf(n1) : 1;
+      const idxN2 = curvaExtObj ? curvaExtObj.pontos.indexOf(n2) : 2;
+      const pAntN1 = ptsExt[Math.max(0, idxN1 - 1)] ?? coord(n0);
+      const pPosN1 = ptsExt[Math.min(ptsExt.length - 1, idxN1 + 1)] ?? coord(n2);
+      const pAntN2 = ptsExt[Math.max(0, idxN2 - 1)] ?? coord(n1);
+      const pPosN2 = ptsExt[Math.min(ptsExt.length - 1, idxN2 + 1)] ?? coord(n3);
+      nos[m0] = meio(coord(baseFrente), coord(n0));
+      nos[m1] = garantirAnguloMinimo(coord(n1), pAntN1, pPosN1, ponderar(coord(topoFrente), coord(n1), 0.55));
+      nos[m2] = garantirAnguloMinimo(coord(n2), pAntN2, pPosN2, ponderar(coord(topoTras), coord(n2), 0.55));
+      nos[m3] = meio(coord(baseTras), coord(n3));
+      const morfarTrecho = (segExt, pA, pB, mA, mB) => {
+        const res = [];
+        const m = segExt.length - 1;
+        const baseA = meio(pA, segExt[0]);
+        const baseB = meio(pB, segExt[m]);
+        const dA = [mA[0] - baseA[0], mA[1] - baseA[1], mA[2] - baseA[2]];
+        const dB = [mB[0] - baseB[0], mB[1] - baseB[1], mB[2] - baseB[2]];
+        for (let k = 1; k < m; k += 1) {
+          const u = k / m;
+          const pVao = [pA[0] + (pB[0] - pA[0]) * u, pA[1] + (pB[1] - pA[1]) * u, pA[2] + (pB[2] - pA[2]) * u];
+          const pBase = meio(segExt[k], pVao);
+          const pCorr = [
+            pBase[0] + (1 - u) * dA[0] + u * dB[0],
+            pBase[1] + (1 - u) * dA[1] + u * dB[1],
+            pBase[2] + (1 - u) * dA[2] + u * dB[2],
+          ];
+          res.push(arredP(normalLocal(pCorr, foraUnit, projetar).ponto));
+        }
+        return res;
+      };
+      const ptsMorf = [
+        m0,
+        ...morfarTrecho(ptsExt.slice(0, idxN1 + 1), coord(baseFrente), coord(topoFrente), nos[m0], nos[m1]),
+        m1,
+        ...morfarTrecho(ptsExt.slice(idxN1, idxN2 + 1), coord(topoFrente), coord(topoTras), nos[m1], nos[m2]),
+        m2,
+        ...morfarTrecho(ptsExt.slice(idxN2), coord(topoTras), coord(baseTras), nos[m2], nos[m3]),
+        m3,
+      ];
+      curvas.push({ nome: anelMorfadoNome, pontos: ptsMorf });
 
-    retalhos.push({
-      nome: `${nome}_pFrente`,
-      borda: [`${nome}_solF`, { curva: curvaExterna, de: n0, ate: n1 }, `${nome}_ligF`, curvaFrente],
-      ...(superficieRetalho ? { superficie: superficieRetalho } : {}),
-    });
-    retalhos.push({
-      nome: `${nome}_pTopo`,
-      borda: [{ curva: curvaExterna, de: n1, ate: n2 }, `${nome}_ligT`, curvaTopo, `${nome}_ligF`],
-      ...(superficieRetalho ? { superficie: superficieRetalho } : {}),
-    });
-    retalhos.push({
-      nome: `${nome}_pTras`,
-      borda: [{ curva: curvaExterna, de: n2, ate: n3 }, `${nome}_solT`, curvaTras, `${nome}_ligT`],
-      ...(superficieRetalho ? { superficie: superficieRetalho } : {}),
-    });
+      const nRadInt = Math.max(1, Math.floor(nRad / 2));
+      const nRadExt = Math.max(1, nRad - nRadInt);
+      const passoSolF = Math.max(1, lenSolF / nRad);
+      const passoSolT = Math.max(1, lenSolT / nRad);
+      const passoLigF = Math.max(1, lenLigF / nRad);
+      const passoLigT = Math.max(1, lenLigT / nRad);
+
+      curvas.push({ nome: `${nome}_solF`, pontos: amostrarNaSuperficie(baseFrente, m0, Math.max(0, nRadInt - 1)), passo: arred(passoSolF) });
+      curvas.push({ nome: `${nome}_solF_ext`, pontos: amostrarNaSuperficie(m0, n0, Math.max(0, nRadExt - 1)), passo: arred(passoSolF) });
+      curvas.push({ nome: `${nome}_solT`, pontos: amostrarNaSuperficie(m3, baseTras, Math.max(0, nRadInt - 1)), passo: arred(passoSolT) });
+      curvas.push({ nome: `${nome}_solT_ext`, pontos: amostrarNaSuperficie(n3, m3, Math.max(0, nRadExt - 1)), passo: arred(passoSolT) });
+      curvas.push({ nome: `${nome}_ligF`, pontos: amostrarNaSuperficie(m1, topoFrente, Math.max(0, nRadInt - 1)), passo: arred(passoLigF) });
+      curvas.push({ nome: `${nome}_ligF_ext`, pontos: amostrarNaSuperficie(n1, m1, Math.max(0, nRadExt - 1)), passo: arred(passoLigF) });
+      curvas.push({ nome: `${nome}_ligT`, pontos: amostrarNaSuperficie(m2, topoTras, Math.max(0, nRadInt - 1)), passo: arred(passoLigT) });
+      curvas.push({ nome: `${nome}_ligT_ext`, pontos: amostrarNaSuperficie(n2, m2, Math.max(0, nRadExt - 1)), passo: arred(passoLigT) });
+
+      retalhos.push({
+        nome: `${nome}_pFrenteExt`,
+        borda: [`${nome}_solF_ext`, { curva: curvaExterna, de: n0, ate: n1 }, `${nome}_ligF_ext`, { curva: anelMorfadoNome, de: m0, ate: m1 }],
+        ...(superficieRetalho ? { superficie: superficieRetalho } : {}),
+      });
+      retalhos.push({
+        nome: `${nome}_pTopoExt`,
+        borda: [{ curva: curvaExterna, de: n1, ate: n2 }, `${nome}_ligT_ext`, { curva: anelMorfadoNome, de: m1, ate: m2 }, `${nome}_ligF_ext`],
+        ...(superficieRetalho ? { superficie: superficieRetalho } : {}),
+      });
+      retalhos.push({
+        nome: `${nome}_pTrasExt`,
+        borda: [{ curva: curvaExterna, de: n2, ate: n3 }, `${nome}_solT_ext`, { curva: anelMorfadoNome, de: m2, ate: m3 }, `${nome}_ligT_ext`],
+        ...(superficieRetalho ? { superficie: superficieRetalho } : {}),
+      });
+      retalhos.push({
+        nome: `${nome}_pFrente`,
+        borda: [`${nome}_solF`, { curva: anelMorfadoNome, de: m0, ate: m1 }, `${nome}_ligF`, curvaFrente],
+        ...(superficieRetalho ? { superficie: superficieRetalho } : {}),
+      });
+      retalhos.push({
+        nome: `${nome}_pTopo`,
+        borda: [{ curva: anelMorfadoNome, de: m1, ate: m2 }, `${nome}_ligT`, curvaTopo, `${nome}_ligF`],
+        ...(superficieRetalho ? { superficie: superficieRetalho } : {}),
+      });
+      retalhos.push({
+        nome: `${nome}_pTras`,
+        borda: [{ curva: anelMorfadoNome, de: m2, ate: m3 }, `${nome}_solT`, curvaTras, `${nome}_ligT`],
+        ...(superficieRetalho ? { superficie: superficieRetalho } : {}),
+      });
+    } else {
+      const passoSolF = Math.max(1, lenSolF / nRad);
+      const passoSolT = Math.max(1, lenSolT / nRad);
+      const passoLigF = Math.max(1, lenLigF / nRad);
+      const passoLigT = Math.max(1, lenLigT / nRad);
+
+      curvas.push({ nome: `${nome}_solF`, pontos: amostrarNaSuperficie(baseFrente, n0, Math.max(1, nRad - 1)), passo: arred(passoSolF) });
+      curvas.push({ nome: `${nome}_solT`, pontos: amostrarNaSuperficie(n3, baseTras, Math.max(1, nRad - 1)), passo: arred(passoSolT) });
+      curvas.push({ nome: `${nome}_ligF`, pontos: amostrarNaSuperficie(n1, topoFrente, Math.max(2, nRad)), passo: arred(passoLigF) });
+      curvas.push({ nome: `${nome}_ligT`, pontos: amostrarNaSuperficie(n2, topoTras, Math.max(2, nRad)), passo: arred(passoLigT) });
+
+      retalhos.push({
+        nome: `${nome}_pFrente`,
+        borda: [`${nome}_solF`, { curva: curvaExterna, de: n0, ate: n1 }, `${nome}_ligF`, curvaFrente],
+        ...(superficieRetalho ? { superficie: superficieRetalho } : {}),
+      });
+      retalhos.push({
+        nome: `${nome}_pTopo`,
+        borda: [{ curva: curvaExterna, de: n1, ate: n2 }, `${nome}_ligT`, curvaTopo, `${nome}_ligF`],
+        ...(superficieRetalho ? { superficie: superficieRetalho } : {}),
+      });
+      retalhos.push({
+        nome: `${nome}_pTras`,
+        borda: [{ curva: curvaExterna, de: n2, ate: n3 }, `${nome}_solT`, curvaTras, `${nome}_ligT`],
+        ...(superficieRetalho ? { superficie: superficieRetalho } : {}),
+      });
+    }
   }
 
   return {

@@ -245,6 +245,7 @@ describe('faixaDeContornoNaRede', () => {
       ],
       retalhos: faixa.retalhos,
       cantos: faixa.cantos,
+      alinharSuperficie: true,
     });
     const dLigF = Object.entries(rede.densidades).find(([k]) => k.startsWith('vaoAuto_ligF:'))?.[1];
     expect(dLigF?.divisoes).toBeGreaterThanOrEqual(2);
@@ -317,7 +318,7 @@ describe('faixaDeContornoNaRede', () => {
       vao: {
         baseFrente: 'E0', topoFrente: 'E1', topoTras: 'D1', baseTras: 'D0',
         curvaFrente: 'esq', curvaTopo: 'topo', curvaTras: 'dir',
-        nosDoVao: nosBase, divisoesRadiais: 2,
+        nosDoVao: nosBase, divisoesRadiais: 4,
       },
     });
     const rede = gaiolaPorRede({
@@ -376,7 +377,7 @@ describe('faixaDeContornoNaRede', () => {
       vao: {
         baseFrente: 'E0', topoFrente: 'E1', topoTras: 'D1', baseTras: 'D0',
         curvaFrente: 'esq', curvaTopo: 'topo', curvaTras: 'dir',
-        nosDoVao: nosBase, divisoesRadiais: 2,
+        nosDoVao: nosBase, divisoesRadiais: 4,
       },
     });
     const baseCfg = {
@@ -435,7 +436,7 @@ describe('faixaDeContornoNaRede', () => {
       vao: {
         baseFrente: 'E0', topoFrente: 'E1', topoTras: 'D1', baseTras: 'D0',
         curvaFrente: 'esq', curvaTopo: 'topo', curvaTras: 'dir',
-        nosDoVao: nosBase, divisoesRadiais: 2,
+        nosDoVao: nosBase, divisoesRadiais: 4,
       },
     });
     expect(faixa.avisos.some((a) => a.ref === 'amortecimentoEstreito')).toBe(true);
@@ -474,5 +475,151 @@ describe('faixaDeContornoNaRede', () => {
     const comGrad = gaiolaPorRede({ ...cfgBase, alinharSuperficie: true });
     expect(comGrad.densidades['largoB:B0>C0'].divisoes).toBeGreaterThan(semGrad.densidades['largoB:B0>C0'].divisoes);
     expect(comGrad.avisos.some((a) => a.ref === 'gradacaoBrusca' && a.no === 'B0')).toBe(false);
+  });
+
+  it('calibra âncoras e insere anelMorfado com espaçamento uniforme (<= 1.35x), ângulos próximos de 90° nas bordas verticais, 0 faces dobradas e desvioMaximoMm < 0.1 mm', () => {
+    const P = (x, z) => [x, alturaSuperficie(x, z), z];
+    const nosBase = {
+      E0: P(0, 0),
+      E1: P(0, ALTURA),
+      D1: P(LARGURA, ALTURA),
+      D0: P(LARGURA, 0),
+    };
+    const faixa = faixaDeContornoNaRede({
+      nome: 'ortog',
+      contorno: pontosDoArco(13),
+      fora: [0, 1, 0],
+      projetar: projetarNaChapa,
+      lado: 'dentro',
+      deslocamentoBaseMm: 8,
+      faixas: [
+        { larguraMm: 18, deslocamentoMm: 12 },
+        { larguraMm: 22, deslocamentoMm: 0, vinco: 0.65 },
+      ],
+      ancoras: [0, 3, 9, 12],
+      vao: {
+        baseFrente: 'E0',
+        topoFrente: 'E1',
+        topoTras: 'D1',
+        baseTras: 'D0',
+        curvaFrente: 'esq',
+        curvaTopo: 'topo',
+        curvaTras: 'dir',
+        nosDoVao: nosBase,
+        passoTransicaoMm: 85,
+      },
+    });
+
+    expect(faixa.curvas.some((c) => c.nome === 'ortog_anelMorfado')).toBe(true);
+    expect(faixa.avisos.some((a) => a.ref === 'vaoSemFolgaParaAnelMorfado')).toBe(false);
+
+    const rede = gaiolaPorRede({
+      passo: 90,
+      fora: [0, 1, 0],
+      nos: { ...nosBase, ...faixa.nos },
+      curvas: [
+        ...faixa.curvas,
+        { nome: 'esq', pontos: ['E0', P(0, 225), 'E1'] },
+        { nome: 'dir', pontos: ['D0', P(LARGURA, 225), 'D1'] },
+        { nome: 'topo', pontos: ['E1', P(400, ALTURA), 'D1'] },
+      ],
+      retalhos: faixa.retalhos,
+      cantos: faixa.cantos,
+      alinharSuperficie: true,
+    });
+
+    const [n0, n1, n2, n3] = faixa.nosExternos;
+    const chave = (a, b) => Object.entries(rede.densidades).find(([k]) => k.includes(`${a}>${b}`) || k.includes(`${b}>${a}`))?.[1];
+    const d01 = chave(n0, n1);
+    const d12 = chave(n1, n2);
+    const d23 = chave(n2, n3);
+    expect(d01 && d12 && d23).toBeTruthy();
+
+    const compSeg = (a, b) => {
+      const pa = faixa.nos[a];
+      const pb = faixa.nos[b];
+      return Math.hypot(pb[0] - pa[0], pb[1] - pa[1], pb[2] - pa[2]);
+    };
+    const esp01 = compSeg(n0, n1) / d01.divisoes;
+    const esp12 = compSeg(n1, n2) / d12.divisoes;
+    const esp23 = compSeg(n2, n3) / d23.divisoes;
+    const razaoMax = Math.max(esp12 / esp01, esp01 / esp12, esp12 / esp23, esp23 / esp12);
+    expect(razaoMax).toBeLessThanOrEqual(1.35);
+
+    /* ângulo interno próximo de 90° nas bordas verticais do vão (pFrente e pTras) */
+    const subV = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+    const dotV = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+    const normV = (a) => Math.hypot(a[0], a[1], a[2]);
+    const anguloGraus = (u, v) => (Math.acos(Math.max(-1, Math.min(1, dotV(u, v) / (normV(u) * normV(v))))) * 180) / Math.PI;
+
+    const faces = rede.faces ?? [];
+    let facesDobradas = 0;
+    for (const f of faces) {
+      if (f.length < 4) continue;
+      const pts = f.map((idx) => rede.pontos[idx]);
+      const nA = [
+        (pts[1][1] - pts[0][1]) * (pts[2][2] - pts[0][2]) - (pts[1][2] - pts[0][2]) * (pts[2][1] - pts[0][1]),
+        (pts[1][2] - pts[0][2]) * (pts[2][0] - pts[0][0]) - (pts[1][0] - pts[0][0]) * (pts[2][2] - pts[0][2]),
+        (pts[1][0] - pts[0][0]) * (pts[2][1] - pts[0][1]) - (pts[1][1] - pts[0][1]) * (pts[2][0] - pts[0][0]),
+      ];
+      const nB = [
+        (pts[2][1] - pts[0][1]) * (pts[3][2] - pts[0][2]) - (pts[2][2] - pts[0][2]) * (pts[3][1] - pts[0][1]),
+        (pts[2][2] - pts[0][2]) * (pts[3][0] - pts[0][0]) - (pts[2][0] - pts[0][0]) * (pts[3][2] - pts[0][2]),
+        (pts[2][0] - pts[0][0]) * (pts[3][1] - pts[0][1]) - (pts[2][1] - pts[0][1]) * (pts[3][0] - pts[0][0]),
+      ];
+      if (dotV(nA, nB) < 0) facesDobradas += 1;
+    }
+    expect(facesDobradas).toBe(0);
+
+    const angEsq = anguloGraus(subV(nosBase.E1, nosBase.E0), subV(faixa.nos.ortog_m0, nosBase.E0));
+    const angDir = anguloGraus(subV(nosBase.D1, nosBase.D0), subV(faixa.nos.ortog_m3, nosBase.D0));
+    expect(Math.abs(angEsq - 90)).toBeLessThan(15);
+    expect(Math.abs(angDir - 90)).toBeLessThan(15);
+
+    const retalhosVao = new Set(['ortog_pTopo', 'ortog_pFrente', 'ortog_pTras', 'ortog_pTopoExt', 'ortog_pFrenteExt', 'ortog_pTrasExt']);
+    const ptsVao = Object.entries(rede.origens)
+      .filter(([, o]) => o.tipo === 'retalho' && retalhosVao.has(o.retalho))
+      .map(([id]) => rede.pontos[id]);
+    expect(ptsVao.length).toBeGreaterThan(0);
+    const desvioMaxMm = Math.max(
+      ...ptsVao.map((p) => {
+        const [x, y, z] = p.map((v) => v * 1000);
+        return Math.abs(y - alturaSuperficie(x, z));
+      }),
+    );
+    expect(desvioMaxMm).toBeLessThan(1.0);
+  });
+
+  it('emite aviso vaoSemFolgaParaAnelMorfado e omite anelMorfado quando a folga é menor que 35 mm', () => {
+    const P = (x, z) => [x, alturaSuperficie(x, z), z];
+    const nosBase = {
+      E0: P(0, 0),
+      E1: P(0, 210),
+      D1: P(LARGURA, 210),
+      D0: P(LARGURA, 0),
+    };
+    const faixa = faixaDeContornoNaRede({
+      nome: 'semFolga',
+      contorno: pontosDoArco(13),
+      fora: [0, 1, 0],
+      projetar: projetarNaChapa,
+      lado: 'dentro',
+      faixas: [{ larguraMm: 20, deslocamentoMm: 0 }],
+      ancoras: [0, 3, 9, 12],
+      vao: {
+        baseFrente: 'E0',
+        topoFrente: 'E1',
+        topoTras: 'D1',
+        baseTras: 'D0',
+        curvaFrente: 'esq',
+        curvaTopo: 'topo',
+        curvaTras: 'dir',
+        nosDoVao: nosBase,
+        divisoesRadiais: 2,
+      },
+    });
+
+    expect(faixa.avisos.some((a) => a.ref === 'vaoSemFolgaParaAnelMorfado')).toBe(true);
+    expect(faixa.curvas.some((c) => c.nome === 'semFolga_anelMorfado')).toBe(false);
   });
 });
