@@ -1,6 +1,6 @@
 # Análise do projeto: o resumo das quatro frentes
 
-Pasta do plano [análise do projeto](../../planos/2026-11-26-analise-do-projeto.md). Cada frente escreveu a versão melhor às 11:27 UTC de 2026-11-26, antes de ler o repositório, e depois comparou: [documentação](documentacao.md), [núcleo](nucleo.md), [ferramentas](ferramentas.md) e [processo](processo.md). Nada foi executado além de leitura, contagem e consultas à API do GitHub.
+Pasta do plano [análise do projeto](../../decisoes/PLANOS-ENCERRADOS.md). Cada frente escreveu a versão melhor às 11:27 UTC de 2026-11-26, antes de ler o repositório, e depois comparou: [documentação](documentacao.md), [núcleo](nucleo.md), [ferramentas](ferramentas.md) e [processo](processo.md). Nada foi executado além de leitura, contagem e consultas à API do GitHub.
 
 ## O que já está acima da referência
 
