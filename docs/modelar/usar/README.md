@@ -53,3 +53,7 @@ de inclinação de erro de altura.
 
 [`PARAMETROS-VIVOS.md`](PARAMETROS-VIVOS.md): antes de alterar um número, saber
 se aquele parâmetro está ligado em algo. `npm run parametros`.
+
+[`MEDIDAS-AVULSAS.md`](MEDIDAS-AVULSAS.md) diz quando usar cada ferramenta de medida que nenhum outro documento de uso apresenta: as da montagem, as da superfície de chapa e as que comparam o modelo com a imagem de referência.
+
+[`EXPORTACAO.md`](EXPORTACAO.md) reúne os quatro formatos de saída (STEP, OBJ, glTF e ficha do objeto), com o comando de cada um e quando ele serve.

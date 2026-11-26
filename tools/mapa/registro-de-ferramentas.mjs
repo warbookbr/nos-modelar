@@ -13,6 +13,9 @@
  *     o motivo; o carregado por caminho calculado declara o carregador vivo no campo `por`;
  *   - declaração que sobrou (o arquivo sumiu ou ganhou chamador) e declaração por pasta com a lista de arquivos fora de dia;
  *   - registro que não lê como JSON ou sem a lista `ferramentas`;
+ *   - ferramenta de uso que nenhum roteiro, skill ou guia cita (pelo `npm run <comando>` ou pelo caminho do arquivo), e a
+ *     entrada cujo campo `aparece` (até três lugares onde ela é citada) não bate com a árvore; a declarada em `semChamador`
+ *     ou em `apoioDeTeste` espera a decisão de lá e fica de fora;
  *   - `tools/README.md` diferente do que o registro gera.
  *
  * Só importa `node:`: o `--gerar` roda no passo de juntar à main do CI, antes do `npm ci`.
@@ -30,6 +33,10 @@ const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '.
 export const REGISTRO = 'tools/registro-de-ferramentas.json';
 export const LEIAME = 'tools/README.md';
 export const TIPOS = ['uso', 'gate', 'interna'];
+export const ROTEIROS = 'docs/modelar/roteiros/roteiros.json';
+/* Quantos lugares o campo `aparece` guarda: o bastante para achar a ferramenta, e pouco para o registro não mudar a cada
+   documento que a cita. */
+export const TETO_DE_LUGARES = 3;
 
 const AJUDA = `registro-de-ferramentas: confere e gera o registro das ferramentas de linha de comando de tools/.
 
@@ -40,7 +47,9 @@ const AJUDA = `registro-de-ferramentas: confere e gera o registro das ferramenta
   --ajuda                                esta mensagem
 
 O registro é ${REGISTRO}. A frase (\`faz\`) e o tipo (${TIPOS.join(', ')}) de cada entrada se escrevem à mão;
-os comandos vêm de package.json e o README é gerado.`;
+os comandos vêm de package.json, o campo \`aparece\` (onde a ferramenta de uso é citada: roteiro, skill ou guia) vem da
+árvore, e o README é gerado. A ferramenta de uso que nenhum roteiro, skill ou guia cita reprova: cite-a onde ela entra no
+trabalho, ou troque o tipo para interna se for de manutenção.`;
 
 /* O que é módulo de ferramenta: código de `tools/`, fora de `tools/fixtures/`, de teste e de declaração de tipo. A pasta
    `fixtures/` de dentro de outra pasta de `tools/` conta: o que mora nela é apoio de teste e é declarado como tal. */
@@ -170,6 +179,46 @@ function categoriaDe(arquivo) {
   if (arquivo.startsWith('docs/modelar/banco-de-provas/')) return null;
   if (arquivo.endsWith('.md')) return 'doc';
   return null;
+}
+
+/* Onde uma ferramenta de uso se mostra a quem trabalha: a skill (as skills, as definições de agente e as regras comuns dos
+   agentes) e o guia (os documentos de uso, os guias, os contratos, a régua do Blender, a página de entrada, o índice, o `CLAUDE.md` de cada
+   pasta e o README de cada módulo). O roteiro vem do JSON dos roteiros, à parte. Plano, pesquisa, decisão e banco de provas
+   não contam: registram o que se fez, e ninguém os lê para saber que ferramenta usar. */
+export function lugarDeUso(arquivo) {
+  if (!arquivo.endsWith('.md')) return null;
+  if (/^\.claude\/(skills|agents)\//.test(arquivo) || arquivo === '.claude/REGRAS-DOS-AGENTES.md') return 'skill';
+  if (/^docs\/modelar\/(usar|guias|blender|contratos)\//.test(arquivo) || arquivo === 'docs/COMECE-AQUI.md' || arquivo === 'docs/modelar/INDEX.md') return 'guia';
+  if (/(^|\/)CLAUDE\.md$/.test(arquivo) || /^modulos\/[^/]+\/README\.md$/.test(arquivo)) return 'guia';
+  return null;
+}
+
+/* O texto com que cada roteiro cita ferramenta: os comandos, o passo seguinte e o que se confere no fim. O JSON que não lê
+   não cita nada (o gate dos roteiros o recusa). */
+function textosDosRoteiros(texto) {
+  let dados;
+  try { dados = JSON.parse(texto ?? ''); } catch { return []; }
+  return (dados?.roteiros ?? []).filter((r) => typeof r?.id === 'string')
+    .map((r) => [`roteiro ${r.id}`, [...(r.comandos ?? []), r.passo ?? '', r.conferido ?? ''].join('\n')]);
+}
+
+/* Onde cada ferramenta de uso aparece: { arquivo: [lugar, ...] }, os roteiros primeiro, depois as skills e os guias, cada grupo
+   em ordem. Conta o `npm run <comando>` de um comando dela e o caminho do arquivo desde `tools/`. */
+export function ondeAparece(arquivos, entradas) {
+  const escapar = (t) => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const grupos = { roteiro: textosDosRoteiros(arquivos[ROTEIROS]), skill: [], guia: [] };
+  for (const [arquivo, texto] of Object.entries(arquivos)) {
+    const lugar = lugarDeUso(arquivo);
+    if (lugar) grupos[lugar].push([arquivo, texto]);
+  }
+  for (const lista of Object.values(grupos)) lista.sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0));
+  const textos = [...grupos.roteiro, ...grupos.skill, ...grupos.guia];
+  const mapa = {};
+  for (const e of entradas.filter((x) => x.tipo === 'uso')) {
+    const padroes = [new RegExp(`${escapar(e.arquivo)}(?![\\w.-])`), ...(e.comandos ?? []).map((c) => new RegExp(`npm run ${escapar(c)}(?![\\w:-])`))];
+    mapa[e.arquivo] = textos.filter(([, texto]) => padroes.some((p) => p.test(texto))).map(([lugar]) => lugar);
+  }
+  return mapa;
 }
 
 /* Os módulos vivos: os que um comando, o CI, uma skill, uma configuração ou código de fora de `tools/` chama, e os que esses
@@ -302,6 +351,27 @@ export function conferirRegistro({ arquivos, scripts = {}, registro, leiame = nu
     }
   }
 
+  /* A ferramenta de uso precisa aparecer onde se trabalha: a que só o registro conhece ninguém acha na hora de usar. */
+  const lugares = ondeAparece(arquivos, entradas);
+  const aguardaDecisao = new Set([...(registro.apoioDeTeste ?? []), ...(registro.semChamador ?? [])].flatMap(arquivosDa));
+  for (const e of entradas) {
+    if (e.tipo !== 'uso') {
+      if (e.aparece !== undefined && TIPOS.includes(e.tipo)) problemas.push(`${REGISTRO}: recebido o campo \`aparece\` em ${e.arquivo}, que é do tipo ${e.tipo}; esperado o campo só na ferramenta de uso; rode \`npm run ferramentas:registro:gerar\`.`);
+      continue;
+    }
+    if (!(e.arquivo in arquivos) || !linhasDeComando.includes(e.arquivo)) continue;
+    const todos = lugares[e.arquivo] ?? [];
+    const chamada = (e.comandos ?? []).length ? `\`npm run ${e.comandos[0]}\`` : `\`node ${e.arquivo}\``;
+    if (!todos.length && !aguardaDecisao.has(e.arquivo)) {
+      problemas.push(`${REGISTRO}: recebido a ferramenta de uso ${e.arquivo} (${chamada}), que nenhum roteiro, skill ou guia cita; esperado ao menos uma citação em docs/modelar/roteiros/roteiros.json, em .claude/skills/ ou .claude/agents/, ou num guia (docs/modelar/usar/, docs/modelar/guias/, docs/modelar/contratos/, o CLAUDE.md da pasta ou o README do módulo); cite ${chamada} no lugar onde ela entra no trabalho, com a frase de quando usar, e rode \`npm run ferramentas:registro:gerar\`, ou, se é ferramenta de manutenção que ninguém chama ao trabalhar, troque o \`tipo\` para "interna".`);
+      continue;
+    }
+    const esperado = todos.slice(0, TETO_DE_LUGARES);
+    if (JSON.stringify(e.aparece ?? null) !== JSON.stringify(esperado)) {
+      problemas.push(`${REGISTRO}: recebido \`aparece\` ${JSON.stringify(e.aparece ?? null)} em ${e.arquivo}; esperado ${JSON.stringify(esperado)}, os ${TETO_DE_LUGARES} primeiros lugares que a citam hoje; rode \`npm run ferramentas:registro:gerar\`.`);
+    }
+  }
+
   const quem = chamadores(arquivos, scripts);
   const apoio = registro.apoioDeTeste ?? [];
   const declarados = registro.semChamador ?? [];
@@ -390,6 +460,8 @@ export function atualizarRegistro({ arquivos, scripts = {}, registro, gates = []
     if (antes?.gatePor) entrada.gatePor = antes.gatePor;
     ferramentas.push(entrada);
   }
+  const lugares = ondeAparece(arquivos, ferramentas);
+  for (const e of ferramentas) if (e.tipo === 'uso') e.aparece = (lugares[e.arquivo] ?? []).slice(0, TETO_DE_LUGARES);
   const { semChamador: mortos } = modulosSemChamador(quem, arquivos, registro?.semChamador ?? []);
   const listas = listasDasPastas([...(registro?.apoioDeTeste ?? []), ...(registro?.semChamador ?? [])], mortos);
   const acertar = (lista) => (lista ?? [])
@@ -440,7 +512,7 @@ export function gerarLeiame(registro) {
     '',
     '## Internas',
     '',
-    'Outra ferramenta chama.',
+    'Outra ferramenta chama, ou é ferramenta de manutenção, que ninguém chama ao modelar nem ao mudar o projeto.',
     '',
     ...itens(doTipo('interna')),
     '',
@@ -464,7 +536,7 @@ export function lerArvore(raiz = REPO) {
   for (const rel of [...listar('-c'), ...naoRastreados]) {
     if (!new RegExp(`\\.(${EXTENSOES}|html|md|yml|yaml|json|toml)$`).test(rel)) continue;
     if ((rel.startsWith('tools/fixtures/') && !E_TESTE.test(rel)) || rel.startsWith('docs/modelar/banco-de-provas/') || rel === 'package-lock.json') continue;
-    if (rel.endsWith('.json') && !['package.json', '.mcp.json', REGISTRO].includes(rel) && !rel.startsWith('.claude/')) continue;
+    if (rel.endsWith('.json') && !['package.json', '.mcp.json', REGISTRO, ROTEIROS].includes(rel) && !rel.startsWith('.claude/')) continue;
     const caminho = path.join(raiz, rel);
     if (!existsSync(caminho)) continue;
     arquivos[rel] = readFileSync(caminho, 'utf8');

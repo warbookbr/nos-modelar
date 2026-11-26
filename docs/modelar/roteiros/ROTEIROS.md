@@ -7,7 +7,7 @@ skill, os comandos e o que se confere no fim, e `npm run comecar -- <roteiro>` (
 MCP `comecar`) devolve o mesmo com o passo seguinte lido do estado. Todo roteiro começa pelo
 `CLAUDE.md`, que traz as regras que nenhuma ferramenta confere e a lista destes roteiros. `npm run leitura:obrigatoria` imprime
 o tamanho da leitura de cada roteiro contra o orçamento e a linha de base, e o gate recusa o
-roteiro que passa de um ou do outro. O `AGENTS.md` faz para outros agentes o papel do
+roteiro que passa de um ou do outro. A leitura soma a lista de cada roteiro e a skill que o passo seguinte manda aplicar. O `AGENTS.md` faz para outros agentes o papel do
 `CLAUDE.md` e não entra na soma.
 
 | roteiro | intenção | quando |
@@ -20,15 +20,18 @@ roteiro que passa de um ou do outro. O `AGENTS.md` faz para outros agentes o pap
 | `modelar/peca/nova` | modelar | Nenhuma família serve, e a receita nova se escreve com as operações do motor. |
 | `modelar/peca/corrigir` | modelar | Corrigir ou refinar uma peça que já está no acervo, ou absorver um ajuste feito na bancada. |
 | `modelar/opcoes` | modelar | Há escolha de forma no alinhamento ou na modelagem: as opções saem lado a lado pelo esboço 2.0 ou pelas variantes da receita. |
+| `modelar/rodada` | modelar | A peça já tem alvo combinado, e o trabalho é conduzir modelador e crítico rodada a rodada até a pessoa decidir. |
+| `modelar/montar` | modelar | O objeto tem várias partes, e cada uma entra encaixada nas que já estão prontas, numa montagem por etapas. |
 | `modelar/auditar-peca` | modelar | Obter evidência objetiva de uma peça antes de publicar ou homologar. |
 | `modelar/auditar-montagem` | modelar | Conferir composição, relações, encaixes e impacto de um conjunto montado. |
+| `modelar/exportar` | modelar | A peça ou a montagem está pronta e sai em STEP, OBJ, glTF ou ficha do objeto. |
 
 ## Perguntas da árvore
 
 Sem roteiro, ou com o nome de um grupo, o `comecar` faz a pergunta do grupo e lista os ramos:
 
 - `mudar`: A mudança segue o plano ativo ou corrige um defeito pontual?
-- `modelar`: A tarefa é uma peça, as opções de forma dela ou uma auditoria?
+- `modelar`: Peça, opções, rodada, montagem, auditoria ou exportação?
 - `modelar/peca`: A peça sai de uma família que já existe, é uma receita nova por operações, ou é a correção de uma peça do acervo?
 
 ## Regras cobradas por gate
@@ -59,7 +62,7 @@ Abrir só quando a condição aparecer:
 - `docs/modelar/decisoes/UPSTREAM-NOS.md`, quando a mudança é geral e pode voltar ao NÓS, e então fica isolada e registrada nele.
 - `docs/modelar/guias/LEITURA-POR-TAREFA.md`, quando a pergunta é por assunto e nenhum roteiro a responde.
 
-Comandos: `npm run gates`, `npm run mapa`, `npm run uso`.
+Comandos: `npm run gates`, `npm run mapa`, `npm run uso`, `npm run ramos:parados`, `npm run pedido -- <plano> --fatia=<n>`.
 
 Passo seguinte, sem estado lido: Escolha um dos planos ativos, pelo território, e trabalhe na fatia em aberto dele; sem plano ativo, proponha um plano antes de implementar.
 
@@ -169,6 +172,8 @@ Abrir só quando a condição aparecer:
 - `docs/modelar/guias/modelar-carroceria.md`, quando a peça é uma chapa contínua de superfície lisa, com dobras vivas, raio de borda, arcos e vãos, modelada por subdivisão.
 - `docs/modelar/guias/modelar-veiculo-em-chassi-e-lataria.md`, quando o objeto é um veículo com chassi por baixo e lataria em painéis separados por vãos.
 - `.claude/skills/laco-de-modelagem/processo-leve.md`, quando o objeto for um perfil de uma família existente ou uma família de caixa com frente: o processo leve, sem laço por unidade.
+- `docs/modelar/usar/MEDIDAS-AVULSAS.md`, quando a medida que falta não está nos comandos do roteiro: reflexo de chapa, distância à pele, material de uma vista ou parte fora do contorno de outra.
+- `docs/modelar/usar/EXPORTACAO.md`, quando a forma foi aprovada e a peça sai em STEP, OBJ, glTF ou ficha.
 
 Skill: `criar-peca`.
 
@@ -182,12 +187,13 @@ Conferido no fim: A análise da bancada aberta e lida, o crítico visual sem con
 
 Nenhuma família serve, e a receita nova se escreve com as operações do motor.
 
-Ler antes de começar, num orçamento de 16.500 bytes (linha de base de 62.482 bytes em 2026-10-08):
+Ler antes de começar, num orçamento de 26.500 bytes (linha de base de 62.482 bytes em 2026-10-08):
 
 - `CLAUDE.md`
 - `.claude/skills/criar-peca/SKILL.md`
 - `docs/modelar/usar/GUIA-AUTORIA-IA.md#2-anatomia-canônica-de-uma-receita-procedural`
 - `docs/modelar/usar/LACO-VISUAL.md#3-despachar-o-crítico-sem-contexto`
+- `.claude/skills/alinhar-modelagem/SKILL.md`, a skill que o passo seguinte manda aplicar
 
 Lista gerada na hora: operacoes.
 
@@ -217,6 +223,8 @@ Abrir só quando a condição aparecer:
 - `docs/modelar/guias/modelar-carroceria.md`, quando a peça é uma chapa contínua de superfície lisa, com dobras vivas, raio de borda, arcos e vãos, modelada por subdivisão.
 - `docs/modelar/guias/modelar-veiculo-em-chassi-e-lataria.md`, quando o objeto é um veículo com chassi por baixo e lataria em painéis separados por vãos.
 - `.claude/skills/laco-de-modelagem/processo-leve.md`, quando o objeto for um perfil de uma família existente ou uma família de caixa com frente: o processo leve, sem laço por unidade.
+- `docs/modelar/usar/MEDIDAS-AVULSAS.md`, quando a medida que falta não está nos comandos do roteiro: reflexo de chapa, distância à pele, material de uma vista ou parte fora do contorno de outra.
+- `docs/modelar/usar/EXPORTACAO.md`, quando a forma foi aprovada e a peça sai em STEP, OBJ, glTF ou ficha.
 
 Skill: `criar-peca`.
 
@@ -266,6 +274,8 @@ Abrir só quando a condição aparecer:
 - `docs/modelar/guias/modelar-veiculo-em-chassi-e-lataria.md`, quando o objeto é um veículo com chassi por baixo e lataria em painéis separados por vãos.
 - `.claude/skills/laco-de-modelagem/processo-leve.md`, quando o objeto for um perfil de uma família existente ou uma família de caixa com frente: o processo leve, sem laço por unidade.
 - `docs/modelar/usar/AJUSTE-DA-BANCADA.md`, quando a pessoa salvou um ajuste na bancada que precisa voltar à receita.
+- `docs/modelar/usar/MEDIDAS-AVULSAS.md`, quando a medida que falta não está nos comandos do roteiro: reflexo de chapa, distância à pele, material de uma vista ou parte fora do contorno de outra.
+- `docs/modelar/usar/EXPORTACAO.md`, quando a forma foi aprovada e a peça sai em STEP, OBJ, glTF ou ficha.
 
 Skill: `criar-peca`.
 
@@ -295,6 +305,59 @@ Comandos: `npm run esboco:nucleo -- <arquivo> [--so-montar]`, `npm run variantes
 Passo seguinte, sem estado lido: Escreva as opções como variantes da receita ou como esboço do 2.0, confira com --so-montar e mostre a imagem à pessoa com a referência.
 
 Conferido no fim: A pessoa escolhe pela imagem, e a escolha vira decisão escrita no PLANO e valor da TABELA.
+
+## modelar/rodada: Conduzir a rodada de modelagem
+
+A peça já tem alvo combinado, e o trabalho é conduzir modelador e crítico rodada a rodada até a pessoa decidir.
+
+Ler antes de começar, num orçamento de 11.900 bytes (linha de base de 32.617 bytes em 2026-11-26):
+
+- `CLAUDE.md`
+- `.claude/skills/laco-de-modelagem/SKILL.md`
+
+Abrir só quando a condição aparecer:
+
+- `.claude/skills/laco-de-modelagem/processo-leve.md`, quando o objeto for um perfil de uma família existente ou uma família de caixa com frente, antes de começar.
+- `.claude/skills/laco-de-modelagem/parte-por-parte.md`, quando o objeto tiver mais de uma parte, antes da primeira etapa e antes de fixar, reabrir ou aceitar uma etapa.
+- `.claude/skills/laco-de-modelagem/pacote-e-referencia.md`, quando for despachar o modelador ou o crítico de uma peça com imagem de referência, prancha, mapa de partes ou lugar numa montagem.
+- `.claude/skills/laco-de-modelagem/refino.md`, quando a entrega passou na medição e começa a rodada de refino.
+- `.claude/skills/laco-de-modelagem/registro-a-mao.md`, quando não houver como obter os arquivos dos agentes para o registro.
+- `docs/modelar/usar/LACO-VISUAL.md`, quando for olhar a imagem, sobrepor ao alvo ou medir onde o método diagnóstico para.
+- `docs/modelar/usar/MEDIDAS-AVULSAS.md`, quando a medida que falta não está nos comandos do roteiro.
+
+Skill: `laco-de-modelagem`.
+
+Comandos: `npm run rodada -- <peça> --acao`, `npm run rodada -- <peça> --registrar --modelador <arquivo> --critico <arquivo>`, `npm run rodada -- <peça> --decisao-da-pessoa "<quem decidiu>, <AAAA-MM-DD>: <as palavras>" --rodada <n>`.
+
+Passo seguinte, sem estado lido: Rode npm run rodada -- <peça> --acao, que mede a receita atual e diz a próxima ação, e conduza a rodada pela skill laco-de-modelagem.
+
+Conferido no fim: A rodada gravada com o relato do modelador, o veredito do crítico e a decisão da pessoa, e npm run gates.
+
+## modelar/montar: Montar um objeto de várias partes
+
+O objeto tem várias partes, e cada uma entra encaixada nas que já estão prontas, numa montagem por etapas.
+
+Ler antes de começar, num orçamento de 12.800 bytes (linha de base de 29.182 bytes em 2026-11-26):
+
+- `CLAUDE.md`
+- `docs/modelar/usar/FLUXO-DO-OBJETO.md#5-montagem`
+- `docs/modelar/usar/MONTAGENS-SEMANTICAS.md#construção-parte-por-parte-montagem-v5`
+- `docs/modelar/usar/MEDIDAS-AVULSAS.md#montagem`
+
+Abrir só quando a condição aparecer:
+
+- `docs/modelar/usar/MONTAGENS-SEMANTICAS.md`, quando a dúvida for a relação entre as peças, a porta publicada, a classe de ajuste ou o que a montagem não faz.
+- `docs/modelar/usar/AUDITORIA-DA-MONTAGEM.md`, quando a montagem declarar apoio no chão ou auditoria de interseções.
+- `docs/modelar/usar/FLUXO-DO-OBJETO.md`, quando for preciso ver os seis passos do objeto, do alinhamento ao fechamento.
+- `.claude/skills/laco-de-modelagem/parte-por-parte.md`, quando cada parte passar pelo laço de modelagem, antes de fixar, reabrir ou aceitar uma etapa.
+- `.claude/skills/auditar-montagem/SKILL.md`, quando as etapas estiverem fixas e a montagem for auditada, pelo roteiro modelar/auditar-montagem.
+- `docs/modelar/usar/EXPORTACAO.md`, quando a montagem estiver aceita e sair em glTF ou em ficha do objeto.
+
+Comandos: `npm run etapas -- <montagem.json> --auditar`, `npm run etapas -- <montagem.json> --fixar <instância> --por "<quem, data>"`, `npm run olhar:montagem`, `npm run planejado -- --montagem=<montagem.json>`, `npm run proporcoes -- --proporcoes=<proporcoes.json>`, `npm run sobra:partes -- <esboço> --dentro=<contida>:<continente>`, `npm run descrever:montagem:persistida`.
+
+Passo seguinte, sem estado lido: Declare na montagem v5 as etapas, os vínculos e as posições, rode npm run etapas -- <montagem.json> --auditar a cada parte que entra e leve cada etapa à pessoa antes de fixá-la.
+
+Conferido no fim: O registro de etapas com cada etapa fixa pelo aceite da pessoa, a auditoria do roteiro modelar/auditar-montagem e npm run gates.
 
 ## modelar/auditar-peca: Auditar uma peça pronta
 
@@ -345,3 +408,24 @@ Comandos: `npm run descrever:montagem:persistida`, `npm run olhar:montagem`.
 Passo seguinte, sem estado lido: Descreva a árvore com npm run descrever:montagem:persistida e siga a skill auditar-montagem.
 
 Conferido no fim: O relato por relação, impacto de revalidação e vistas.
+
+## modelar/exportar: Exportar a peça ou a montagem
+
+A peça ou a montagem está pronta e sai em STEP, OBJ, glTF ou ficha do objeto.
+
+Ler antes de começar, num orçamento de 5.300 bytes (linha de base de 27.249 bytes em 2026-11-26):
+
+- `CLAUDE.md`
+- `docs/modelar/usar/EXPORTACAO.md`
+
+Abrir só quando a condição aparecer:
+
+- `modulos/exportador-obj/README.md`, quando o OBJ recusar triângulo degenerado ou for preciso a tolerância.
+- `modulos/exportador-gltf/README.md`, quando for preciso saber o que do material e da bancada o glTF leva.
+- `modulos/ficha-do-objeto/README.md`, quando for escrever a ponte do objeto ou ler o pedido que volta da simulação.
+
+Comandos: `npm run exportar:step -- <peça> --somente-validar`, `npm run exportar:step -- <peça>`, `npm run exportar:obj -- --arquivo=<peça>`, `npm run exportar:gltf -- <peça ou objeto montado>`, `npm run exportar:ficha -- <objeto>`.
+
+Passo seguinte, sem estado lido: Valide a malha com npm run exportar:step -- <peça> --somente-validar e rode o comando do formato pedido; o arquivo sai em exportacoes/.
+
+Conferido no fim: O arquivo gravado em exportacoes/ e o comando sem recusa; exportar não muda a receita.

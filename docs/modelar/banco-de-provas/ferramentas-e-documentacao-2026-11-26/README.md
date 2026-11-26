@@ -42,6 +42,52 @@ Estes existem para os testes e não pedem decisão: `tools/arquitetura/nucleo-se
 
 Os dez primeiros são o grupo do estudo de modelo de terceiros, que só se importa entre si; o guia `docs/modelar/guias/modelar-veiculos.md` e os `referencias/alvo.md` de algumas peças ainda mandam rodá-los pelo arquivo. Os três seguintes são a conversão do esboço antigo em receita. Recomendo religar o grupo do estudo com um comando só (`modelo-de-referencia.mjs`, que é a entrada dele), porque os guias o usam; apagar a conversão do esboço antigo com `cadeiras-medida.mjs` e `familia-com-esboco.mjs`, se o esboço antigo saiu em 2026-11-05 como o gate da calibração registra; dar comando a `resumo-do-acervo.mjs` e a `perfil-da-execucao.mjs`, que são medidas úteis sem porta; e conferir o `exportar-peca.mjs` com cuidado antes de qualquer coisa, porque o contrato de arquitetura o descreve como a porta de exportação para o produto e hoje nenhum comando o roda. As duas ferramentas da migração dos registros de etapas podem ser apagadas, porque a migração já foi feita, e a régua `costura-registrada.mjs` merece comando ou lugar na guarda do acervo, se a costura do `unir` ainda for conferida.
 
+## Fatia 3: onde cada ferramenta de uso aparece, medido em 2026-11-26
+
+O registro ganhou o campo `aparece` na ferramenta de uso, com até três lugares que a citam hoje, e `npm run ferramentas:registro:check` reprova a ferramenta de uso que nenhum roteiro, skill ou guia cita. Conta como citação o `npm run <comando>` de um comando dela ou o caminho do arquivo desde `tools/`. Roteiro é o `roteiros.json` (os comandos, o passo e o que se confere). Skill são as skills, as definições de agente e as regras comuns dos agentes. Guia são os documentos de `docs/modelar/usar/`, `guias/`, `contratos/` e `blender/`, a página de entrada, o índice, o `CLAUDE.md` de cada pasta e o README de cada módulo. Plano, pesquisa, decisão e banco de provas não contam.
+
+Antes da fatia o registro tinha 109 ferramentas de uso, e 18 delas não apareciam em nenhum desses lugares, fora 7 que já estão declaradas em `semChamador` ou em `apoioDeTeste` e esperam a decisão da fatia 4. A decisão da pessoa fala em 29 de 108; a diferença vem de a conferência contar como guia o contrato, o `CLAUDE.md` de pasta e o README de módulo, e de tirar da conta as 7 declaradas. Depois da fatia são 165 entradas: 105 de uso, 42 de gate e 18 internas, e nenhuma de uso sem citação fora as 7 declaradas. A primeira citação de cada ferramenta de uso é um roteiro em 25 delas, uma skill em 36 e um guia em 37.
+
+### Citadas, com o lugar e o momento de uso
+
+| Comando | Onde passou a aparecer | Quando usar |
+|---|---|---|
+| `npm run zebra` | `docs/modelar/usar/MEDIDAS-AVULSAS.md` | a superfície lisa de uma chapa parece ondular no reflexo |
+| `npm run distancia:pele` | `docs/modelar/usar/MEDIDAS-AVULSAS.md` | a receita declara a pele analítica e é preciso a distância por região |
+| `npm run preenchimento:rede` | `docs/modelar/usar/MEDIDAS-AVULSAS.md` | o miolo de uma rede de curvas sai torto depois de alisar |
+| `npm run casamento:vista` | `docs/modelar/usar/MEDIDAS-AVULSAS.md` | há imagem de referência de uma vista e é preciso saber onde o material e as divisas se afastam |
+| `npm run perfil:cor` | `docs/modelar/usar/MEDIDAS-AVULSAS.md` | a medida que falta está na imagem, por cor de material |
+| `npm run silhueta:pedida` | `docs/modelar/usar/MEDIDAS-AVULSAS.md` | um corpo foi pedido pelas vistas e é preciso o desvio por faixa de altura |
+| `npm run material` | `docs/modelar/usar/MEDIDAS-AVULSAS.md` | antes de mover, renomear ou apagar uma peça |
+| `npm run proporcoes` | o roteiro `modelar/montar` e `MEDIDAS-AVULSAS.md` | as medidas de uma montagem estão escritas em mais de um lugar |
+| `npm run planejado` | o roteiro `modelar/montar` e `MEDIDAS-AVULSAS.md` | depois de executar as partes de uma montagem por etapas |
+| `npm run sobra:partes` | o roteiro `modelar/montar` e `MEDIDAS-AVULSAS.md` | uma parte deveria ficar dentro do contorno de outra |
+| `npm run descrever:montagem` | `docs/modelar/usar/MEDIDAS-AVULSAS.md` | para ler o diagnóstico de encaixe de um dos quatro pilotos |
+| `npm run ramos:parados` | o roteiro `mudar/plano` | antes de abrir trabalho novo, para ver o que ficou fora da main |
+| `npm run pedido` (novo) | o roteiro `mudar/plano` | ao despachar um agente para a fatia de um plano |
+
+As quatro exportações já apareciam (`exportar:step` e `exportar:obj` no guia de autoria e na página de entrada, `exportar:gltf` e `exportar:ficha` só no README do módulo) e passaram a ter página própria, `docs/modelar/usar/EXPORTACAO.md`, entregue pelo roteiro `modelar/exportar`. A página `MEDIDAS-AVULSAS.md` é nova e existe porque o guia mais próprio de cada medida (o de carroceria para a zebra, a distância à pele e o preenchimento da rede; o de conferência contra a referência para o casamento da vista, o perfil por cor e a silhueta pedida) está fora do território deste plano. Quem conduz pode mover cada parágrafo para o guia do assunto, e o registro acompanha com `npm run ferramentas:registro:gerar`.
+
+### Marcadas como internas, por serem de manutenção
+
+| Ferramenta | Por que não é de uso |
+|---|---|
+| `tools/blender/imagens.py` | desenha a grade e monta a folha para as outras ferramentas do Blender, que a chamam |
+| `npm run banco:indice:gerar` | regrava o índice do banco de provas, e a bateria confere se está em dia |
+| `tools/mcp/servidor.mjs` | o servidor MCP, que a configuração (`.mcp.json` e a do Codex) liga, e ninguém chama pela mão |
+| `npm run medir:transcricao` | mede o custo em tokens de uma sessão de agente, para quem estuda o processo |
+| `npm run procedencia:check` | conferência de contrato de dados que só o teste dela e a lista das réguas citam |
+
+### Fora da conta, à espera da fatia 4
+
+`tools/blender/gabarito-booleana.mjs`, `tools/modelar/cadeiras-medida.mjs`, `tools/modelar/conferir-retrato-do-acervo.mjs`, `tools/modelar/medir-importar-receita.mjs`, `tools/modelar/perfil-da-execucao.mjs`, `tools/modelar/reguas-de-malha/resumo-do-acervo.mjs` e `tools/modelar/vistas-de-passos.mjs` são de uso no registro, não aparecem em roteiro, skill nem guia, e já estão declaradas sem chamador ou como apoio de teste. A conferência as deixa passar para a mesma ferramenta não ser recusada duas vezes pela mesma decisão pendente.
+
+## Fatia 3: os roteiros e o orçamento, medidos em 2026-11-26
+
+`npm run leitura:obrigatoria` passou a somar a skill que o passo seguinte manda aplicar e a lista de leitura não traz. Só o roteiro `modelar/peca/nova` mudou de medida: de 16.487 para 26.489 bytes, porque os 10.007 bytes da skill `alinhar-modelagem` já eram lidos e não eram contados. O orçamento dele subiu de 16.500 para 26.500 bytes no mesmo dia, sem folga nova (11 bytes), e a linha de base de 62.482 continua longe. Nada saiu da leitura para o orçamento caber.
+
+Os três ramos novos nasceram com o orçamento rente à leitura: `modelar/rodada` lê 11.881 bytes (orçamento 11.900, linha de base 32.617, que é o contrato, a skill do laço e as definições do modelador e do crítico), `modelar/montar` lê 12.768 (orçamento 12.800, linha de base 29.182, os dois documentos de montagem inteiros) e `modelar/exportar` lê 5.267 (orçamento 5.300, linha de base 27.249, a página de entrada e os três READMEs de módulo). A exportação ficou sob `modelar` porque um ramo novo no primeiro nível acrescentava uma linha ao `CLAUDE.md`, que todo roteiro lê, e o roteiro `modelar/opcoes` passava da linha de base dele por 108 bytes. Com a pergunta de `modelar` reescrita, o `CLAUDE.md` foi de 2.609 para 2.604 bytes.
+
 ## Limites da conferência
 
 Em código, conta como chamada o import de verdade e a string cujo texto inteiro é o caminho do módulo (o caminho desde `tools/`, o relativo que resolve a partir de quem cita, e o nome solto do arquivo, este só em `tools/` e em teste). Em texto que não é código (skill, guia de pasta, configuração, passo do CI, script de shell) conta o caminho desde `tools/` em qualquer lugar. Um import montado em tempo de execução com nome variável não é visto, e para ele a declaração traz o motivo "carregado por caminho calculado" com o campo `por` apontando o carregador vivo. `node tools/mapa/registro-de-ferramentas.mjs --chamadores=<arquivo>` mostra quem importa e quem cita um módulo, por categoria.

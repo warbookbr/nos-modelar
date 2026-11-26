@@ -8,14 +8,18 @@ import { describe, expect, it } from 'vitest';
 import { GATES } from '../gates.mjs';
 import { GERADOS } from './territorio-do-envio.mjs';
 import {
-  LEIAME, REGISTRO, atualizarRegistro, chamadores, comandosPorArquivo, conferirRegistro, ehLinhaDeComando, ehModuloDeFerramenta,
-  fraseDoCabecalho, gatesDoTexto, gerarLeiame, lerArvore, lerRegistro, modulosVivos, resumoDosChamadores, semComentarios, serializarRegistro,
+  LEIAME, REGISTRO, ROTEIROS, TETO_DE_LUGARES, atualizarRegistro, chamadores, comandosPorArquivo, conferirRegistro, ehLinhaDeComando, ehModuloDeFerramenta,
+  fraseDoCabecalho, gatesDoTexto, gerarLeiame, lerArvore, lerRegistro, lugarDeUso, modulosVivos, ondeAparece, resumoDosChamadores, semComentarios, serializarRegistro,
 } from './registro-de-ferramentas.mjs';
 
 const REPO = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const CLI = '#!/usr/bin/env node\n/* medir.mjs — mede a peça e imprime o desvio. */\nif (process.argv[1]) console.log(1);\n';
 
-/* Uma árvore pequena e em dia: uma ferramenta com comando, uma biblioteca que ela importa e um apoio de teste declarado. */
+/* Uma árvore pequena e em dia: uma ferramenta com comando, que um guia de uso cita, uma biblioteca que ela importa e um apoio de
+   teste declarado. */
+/* Os caminhos de documento de mentira saem montados por partes, para o gate de links não os tomar por citação quebrada. */
+const doc = (...partes) => ['docs', 'modelar', ...partes].join('/');
+const GUIA = doc('usar', 'MEDIR.md');
 function arvore(extra = {}) {
   return {
     'package.json': '{}',
@@ -23,12 +27,13 @@ function arvore(extra = {}) {
     'tools/modelar/soma.mjs': 'export const soma = (a, b) => a + b;\n',
     'tools/modelar/apoio.mjs': 'export const apoio = 1;\n',
     'tools/modelar/apoio.test.mjs': "import { apoio } from './apoio.mjs';\n",
+    [GUIA]: 'Use `npm run medir -- <peça>` quando precisar do desvio da peça.\n',
     ...extra,
   };
 }
 const scripts = { medir: 'node tools/modelar/medir.mjs' };
 const registroEmDia = () => ({
-  ferramentas: [{ arquivo: 'tools/modelar/medir.mjs', comandos: ['medir'], faz: 'Mede a peça e imprime o desvio.', tipo: 'uso' }],
+  ferramentas: [{ arquivo: 'tools/modelar/medir.mjs', comandos: ['medir'], faz: 'Mede a peça e imprime o desvio.', tipo: 'uso', aparece: [GUIA] }],
   apoioDeTeste: [{ arquivo: 'tools/modelar/apoio.mjs' }],
   semChamador: [],
 });
@@ -195,6 +200,7 @@ describe('a conferência do registro', () => {
   it('tipo gate pede um comando da bateria ou o campo gatePor', () => {
     const registro = registroEmDia();
     registro.ferramentas[0].tipo = 'gate';
+    delete registro.ferramentas[0].aparece;
     expect(conferir(arvore(), registro, { gates: ['outro:check'] })[0]).toContain('nenhum comando dele está na lista GATES');
     expect(conferir(arvore(), registro, { gates: ['medir'] })).toEqual([]);
     registro.ferramentas[0].gatePor = 'bancada:guardas';
@@ -327,6 +333,96 @@ describe('a conferência do registro', () => {
   });
 });
 
+describe('onde a ferramenta de uso aparece', () => {
+  const roteiros = (comandos, passo = 'Meça a peça.') => JSON.stringify({ roteiros: [{ id: 'modelar/medir', comandos, passo, conferido: 'A medida lida.' }] });
+
+  it('skill, agente, guia, contrato, CLAUDE.md de pasta e README de módulo são lugares; plano, pesquisa e banco de provas não', () => {
+    expect(lugarDeUso('.claude/skills/medir/SKILL.md')).toBe('skill');
+    expect(lugarDeUso('.claude/agents/modelador.md')).toBe('skill');
+    expect(lugarDeUso('.claude/REGRAS-DOS-AGENTES.md')).toBe('skill');
+    for (const guia of [GUIA, 'docs/modelar/guias/modelar-carroceria.md', 'docs/modelar/contratos/ARQUITETURA.md', 'docs/COMECE-AQUI.md', 'tools/CLAUDE.md', 'CLAUDE.md', 'modulos/textura/README.md']) {
+      expect(lugarDeUso(guia), guia).toBe('guia');
+    }
+    for (const fora of [doc('planos', '2026-11-26-x.md'), doc('pesquisas', 'X.md'), doc('banco-de-provas', 'x', 'README.md'), 'docs/MAPA.md', 'tools/README.md', 'tools/modelar/medir.mjs']) {
+      expect(lugarDeUso(fora), fora).toBeNull();
+    }
+  });
+
+  it('conta o npm run do comando e o caminho do arquivo, com o roteiro primeiro, depois a skill e o guia', () => {
+    const arquivos = arvore({
+      [ROTEIROS]: roteiros(['npm run medir -- <peça>']),
+      '.claude/skills/medir/SKILL.md': 'Rode `node tools/modelar/medir.mjs <peça>`.\n',
+      [doc('planos', '2026-11-26-x.md')]: 'O plano cita `npm run medir`.\n',
+    });
+    expect(ondeAparece(arquivos, registroEmDia().ferramentas)).toEqual({ 'tools/modelar/medir.mjs': ['roteiro modelar/medir', '.claude/skills/medir/SKILL.md', GUIA] });
+  });
+
+  it('o comando de nome mais comprido não conta como citação do mais curto, e a ferramenta que não é de uso fica de fora', () => {
+    const arquivos = arvore({ [GUIA]: 'Rode `npm run medir:tudo` e `npm run medir-de-novo`; o arquivo é `tools/modelar/medir.mjs.bak`.\n' });
+    expect(ondeAparece(arquivos, registroEmDia().ferramentas)).toEqual({ 'tools/modelar/medir.mjs': [] });
+    expect(ondeAparece(arvore(), [{ ...registroEmDia().ferramentas[0], tipo: 'interna' }])).toEqual({});
+  });
+
+  it('a ferramenta de uso que nenhum roteiro, skill ou guia cita reprova, com o recebido, o esperado e o conserto', () => {
+    const arquivos = arvore({ [GUIA]: 'Este guia fala de outra coisa.\n' });
+    const [problema, ...resto] = conferir(arquivos);
+    expect(resto).toEqual([]);
+    expect(problema).toContain('recebido a ferramenta de uso tools/modelar/medir.mjs (`npm run medir`), que nenhum roteiro, skill ou guia cita');
+    expect(problema).toContain('esperado ao menos uma citação');
+    expect(problema).toContain('cite `npm run medir` no lugar onde ela entra no trabalho');
+    expect(problema).toContain('troque o `tipo` para "interna"');
+  });
+
+  it('nos dois sentidos: citar no roteiro ou marcar como interna resolve', () => {
+    const semGuia = { [GUIA]: 'Este guia fala de outra coisa.\n' };
+    const citado = registroEmDia();
+    citado.ferramentas[0].aparece = ['roteiro modelar/medir'];
+    expect(conferir(arvore({ ...semGuia, [ROTEIROS]: roteiros([], 'Rode npm run medir -- <peça> e leia o desvio.') }), citado)).toEqual([]);
+    const interna = registroEmDia();
+    interna.ferramentas[0].tipo = 'interna';
+    delete interna.ferramentas[0].aparece;
+    expect(conferir(arvore(semGuia), interna)).toEqual([]);
+  });
+
+  it('a ferramenta sem comando é citada pelo caminho, e a recusa dela manda citar o arquivo', () => {
+    const registro = registroEmDia();
+    registro.ferramentas.push({ arquivo: 'tools/modelar/solta.mjs', comandos: [], faz: 'Mede a peça sem comando.', tipo: 'uso', aparece: [] });
+    const arquivos = { 'tools/modelar/solta.mjs': CLI, '.codex/config.toml': 'args = ["tools/modelar/solta.mjs"]\n' };
+    expect(conferir(arvore(arquivos), registro).join('\n')).toContain('cite `node tools/modelar/solta.mjs` no lugar onde ela entra no trabalho');
+    registro.ferramentas[1].aparece = ['.claude/skills/medir/SKILL.md'];
+    expect(conferir(arvore({ ...arquivos, '.claude/skills/medir/SKILL.md': 'Rode `node tools/modelar/solta.mjs <peça>` quando não houver comando.\n' }), registro)).toEqual([]);
+  });
+
+  it('a ferramenta de uso declarada em semChamador espera a decisão de lá e não reprova por falta de citação', () => {
+    const registro = registroEmDia();
+    registro.ferramentas.push({ arquivo: 'tools/modelar/parada.mjs', comandos: [], faz: 'Media uma coisa que ninguém mede mais.', tipo: 'uso', aparece: [] });
+    registro.semChamador.push({ arquivo: 'tools/modelar/parada.mjs', motivo: 'espera a decisão da pessoa' });
+    expect(conferir(arvore({ 'tools/modelar/parada.mjs': CLI }), registro)).toEqual([]);
+  });
+
+  it('o campo aparece fora de dia reprova, guarda só os primeiros lugares, e o gerador o acerta', () => {
+    const guias = Object.fromEntries(['A', 'B', 'C', 'D'].map((n) => [doc('guias', `${n}.md`), 'Use `npm run medir`.\n']));
+    const arquivos = arvore(guias);
+    const [problema] = conferir(arquivos);
+    expect(problema).toContain(`recebido \`aparece\` ["${GUIA}"] em tools/modelar/medir.mjs`);
+    expect(problema).toContain('rode `npm run ferramentas:registro:gerar`');
+    const novo = atualizarRegistro({ arquivos, scripts, registro: registroEmDia() });
+    expect(novo.ferramentas[0].aparece).toEqual(['A', 'B', 'C'].map((n) => doc('guias', `${n}.md`)));
+    expect(novo.ferramentas[0].aparece).toHaveLength(TETO_DE_LUGARES);
+    expect(conferir(arquivos, novo)).toEqual([]);
+  });
+
+  it('o campo aparece em ferramenta que não é de uso reprova', () => {
+    const registro = registroEmDia();
+    registro.ferramentas[0].tipo = 'interna';
+    expect(conferir(arvore(), registro)[0]).toContain('recebido o campo `aparece` em tools/modelar/medir.mjs, que é do tipo interna');
+  });
+
+  it('o JSON dos roteiros que não lê não cita nada e não estoura', () => {
+    expect(ondeAparece(arvore({ [ROTEIROS]: '{ quebrado' }), registroEmDia().ferramentas)).toEqual({ 'tools/modelar/medir.mjs': [GUIA] });
+  });
+});
+
 describe('o gerador', () => {
   it('a frase semeada vem do cabeçalho, sem o nome do arquivo', () => {
     expect(fraseDoCabecalho(CLI)).toBe('Mede a peça e imprime o desvio.');
@@ -341,7 +437,7 @@ describe('o gerador', () => {
     registro.apoioDeTeste.push({ arquivo: 'tools/modelar/sumiu.mjs' });
     const novo = atualizarRegistro({ arquivos: arvore({ 'tools/modelar/nova.mjs': CLI.replace('medir.mjs', 'nova.mjs') }), scripts: { ...scripts, nova: 'node tools/modelar/nova.mjs --check' }, registro, gates: ['nova'] });
     expect(novo.ferramentas).toEqual([
-      { arquivo: 'tools/modelar/medir.mjs', comandos: ['medir'], faz: 'Frase escrita à mão, que fica.', tipo: 'uso' },
+      { arquivo: 'tools/modelar/medir.mjs', comandos: ['medir'], faz: 'Frase escrita à mão, que fica.', tipo: 'uso', aparece: [GUIA] },
       { arquivo: 'tools/modelar/nova.mjs', comandos: ['nova'], faz: 'Mede a peça e imprime o desvio.', tipo: 'gate' },
     ]);
     expect(novo.apoioDeTeste).toEqual([{ arquivo: 'tools/modelar/apoio.mjs' }]);
@@ -423,6 +519,20 @@ describe('o repositório de hoje', () => {
 
   it('o registro e o README gerado são arquivos gerados para o território do envio', () => {
     expect(GERADOS).toEqual(expect.arrayContaining([REGISTRO, LEIAME]));
+  });
+
+  it('toda ferramenta de uso aparece em roteiro, skill ou guia, fora as que esperam decisão em semChamador ou apoioDeTeste', () => {
+    const { arquivos } = lerArvore(REPO);
+    const { registro } = lerRegistro(readFileSync(join(REPO, REGISTRO), 'utf8'));
+    expect(arquivos[ROTEIROS], 'a árvore lida traz o JSON dos roteiros').toBeTruthy();
+    const lugares = ondeAparece(arquivos, registro.ferramentas);
+    const declarados = new Set([...registro.apoioDeTeste, ...registro.semChamador].flatMap((d) => (d.pasta ? d.arquivos : [d.arquivo])));
+    const deUso = registro.ferramentas.filter((e) => e.tipo === 'uso');
+    expect(deUso.length).toBeGreaterThan(90);
+    expect(deUso.filter((e) => lugares[e.arquivo].length === 0 && !declarados.has(e.arquivo)).map((e) => e.arquivo)).toEqual([]);
+    expect(lugares['tools/mapa/pedido-ao-agente.mjs']).toContain('roteiro mudar/plano');
+    expect(lugares['tools/modelar/exportar-gltf.mjs']).toContain('docs/modelar/usar/EXPORTACAO.md');
+    expect(lugares['tools/modelar/zebra-numerica.mjs']).toContain('docs/modelar/usar/MEDIDAS-AVULSAS.md');
   });
 
   it('as ferramentas que o processo usa têm comando', () => {

@@ -10,13 +10,11 @@ Quem trabalha chama, com `npm run <comando> -- <argumentos>`; a que não tem com
 |---|---|
 | `historico:conferir` | Varre o histórico inteiro do git atrás de termo proibido, malha ou cena, antes de o repositório ficar público. |
 | `node tools/blender/gabarito-booleana.mjs` | Usa a booleana exata e o bevel do Blender como gabarito para conferir a booleana do núcleo. |
-| `node tools/blender/imagens.py` | Desenha a grade em milímetro nas vistas ortográficas e monta a folha da régua do Blender. |
 | `node tools/blender/oraculo-subdivisao.mjs` | Gera a fixtura do oráculo da subdivisão com o modificador Subdivision Surface do Blender. |
 | `gates:vigiar` | Fica em segundo plano e roda os gates que cada edição afeta enquanto o trabalho acontece. |
-| `banco:indice:gerar` | Gera o índice de docs/modelar/banco-de-provas/README.md das pastas, e confere que ele está em dia. |
+| `pedido` | Monta o pedido a um agente despachado a partir do plano. |
 | `ferramentas:registro:check`, `ferramentas:registro:gerar` | Confere este registro contra a árvore (linha de comando sem entrada, entrada sem arquivo, módulo sem chamador) e gera o tools/README.md. |
 | `roteiros:gerar` | Gera a página dos roteiros de leitura e os blocos do CLAUDE.md a partir de roteiros.json, e confere que estão em dia. |
-| `node tools/mcp/servidor.mjs` | Servidor MCP local que entrega as ferramentas de revisão e de autoria à IA sem linha de comando. |
 | `comparar:revisao` | Compara dois JSON de revisão de um pacote de modelagem e escreve a diferença em JSON canônico. |
 | `validar:critica` | Valida o arquivo de crítica de um pacote de modelagem sem abrir navegador nem peça. |
 | `fechar:aceite:visual` | Fecha a revisão de um pacote depois de conferir briefing, modelo, arquivos e crítica. |
@@ -66,7 +64,6 @@ Quem trabalha chama, com `npm run <comando> -- <argumentos>`; a que não tem com
 | `material` | Imprime tudo que pertence a uma peça e onde está. |
 | `node tools/modelar/medidas-da-fonte.mjs` | Tira de fonte-partes.json, em milímetro, o ponto de partida das três vistas da carroceria. |
 | `node tools/modelar/medir-importar-receita.mjs` | O tempo de importar cada receita e gerar os passos dela, num processo novo. |
-| `medir:transcricao` | Reparte por etapa os tokens que entraram no contexto de um agente, a partir da transcrição JSONL. |
 | `node tools/modelar/modelo-de-referencia.mjs` | Estuda uma malha de terceiros (OBJ, FBX ou glTF) como REFERÊNCIA de forma, sem a levar ao repositório. |
 | `modelo:sobrepor` | Projeta a silhueta ortográfica da malha sobre a prancha ou sobre a imagem de referência calibrada. |
 | `objeto` | O estado das referências de um objeto que passa por mapa de partes e prancha de contornos, e o que vem a seguir. |
@@ -88,7 +85,6 @@ Quem trabalha chama, com `npm run <comando> -- <argumentos>`; a que não tem com
 | `node tools/modelar/prancha/prancha.mjs` | Motor de prancha ortográfica: recebe a especificação em milímetro e devolve o SVG com o relatório medido dele. |
 | `referencia:grade` | Estampa uma grade numerada em milímetro e pixel sobre uma imagem de referência calibrada. |
 | `preenchimento:rede` | Diz, de cada rede de curvas de uma receita, como o preenchimento do miolo pelas curvas vizinhas usou os vizinhos. |
-| `procedencia:check` | Confere a procedência (medido, derivado, resolvido ou declarado) da fonte de restrições. |
 | `proporcoes` | A fonte única das medidas de uma montagem, e a conferência de que os outros lugares a seguem. |
 | `raio:aresta` | Mede o raio de cada aresta de caráter de uma peça, sobre a malha final. |
 | `ramos:parados` | Lista os ramos do remoto com commits fora da main, a data do último e se o CI os recusaria hoje. |
@@ -167,19 +163,24 @@ A bateria (`npm run gates`) ou o CI chama, e cada uma roda sozinha para conferir
 
 ## Internas
 
-Outra ferramenta chama.
+Outra ferramenta chama, ou é ferramenta de manutenção, que ninguém chama ao modelar nem ao mudar o projeto.
 
 - `arquitetura/termos-proibidos.mjs`
+- `blender/imagens.py`
+- `mapa/indice-do-banco.mjs`
+- `mcp/servidor.mjs`
 - `modelar/aprovacao-da-familia-fio.mjs`
 - `modelar/dobra-da-superficie.mjs`
 - `modelar/fixtures/alisar-rede-prova-casos.mjs`
 - `modelar/fixtures/contorno-da-imagem/braco-sintetico.mjs`
 - `modelar/guardas/etapas-do-acervo.mjs`
 - `modelar/medir-arvore-para-migracao.mjs`
+- `modelar/medir-transcricao.mjs`
 - `modelar/migrar-etapas-para-impressao.mjs`
 - `modelar/pedidos-da-pessoa.mjs`
 - `modelar/perguntas-da-peca.mjs`
 - `modelar/prancha/prancha-geometria.mjs`
+- `modelar/procedencia-check.mjs`
 - `modelar/sobreposicao-de-cortes.mjs`
 - `modelar/vinco-oculto.mjs`
 
