@@ -300,7 +300,12 @@
           "quadril-esquerdo": 90,
           "joelho-direito": 90,
           "joelho-esquerdo": 90
-        }
+        },
+        "deslocamentoDaRaiz": [
+          0,
+          "=0 - comprimentoDaCoxa",
+          0
+        ]
       },
       "braco-erguido": {
         "angulos": {

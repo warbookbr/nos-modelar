@@ -60,9 +60,9 @@ export function posesDoEsqueleto(arvore) {
 }
 
 /** Posição de cada junta (e da raiz) na pose dada, em mm: Map id -> [x, y, z]. */
-export function posarEsqueleto(arvore, angulos = {}) {
+export function posarEsqueleto(arvore, angulos = {}, deslocamentoDaRaiz = [0, 0, 0]) {
   const juntas = porId(arvore);
-  const posicoes = new Map([[arvore.raiz.id, arvore.raiz.posicao.slice()]]);
+  const posicoes = new Map([[arvore.raiz.id, soma(arvore.raiz.posicao, deslocamentoDaRaiz)]]);
   const giros = new Map([[arvore.raiz.id, IDENTIDADE]]);
   const resolver = (id) => {
     if (posicoes.has(id)) return;
@@ -78,8 +78,8 @@ export function posarEsqueleto(arvore, angulos = {}) {
 }
 
 /** Os elementos da pose: bolas (esfera) e bastões (cápsula), na ordem raiz, depois cada junta (bola, bastão). */
-export function elementosDaPose(arvore, angulos = {}) {
-  const pos = posarEsqueleto(arvore, angulos);
+export function elementosDaPose(arvore, angulos = {}, deslocamentoDaRaiz) {
+  const pos = posarEsqueleto(arvore, angulos, deslocamentoDaRaiz);
   const elementos = [{ id: `bola-${arvore.raiz.id}`, tipo: 'bola', nos: [arvore.raiz.id], pai: null, a: pos.get(arvore.raiz.id), raio: arvore.raiz.raioDaBola }];
   for (const j of arvore.juntas) {
     elementos.push({ id: `bola-${j.id}`, tipo: 'bola', nos: [j.id], pai: j.pai, a: pos.get(j.id), raio: j.raioDaBola });
@@ -117,8 +117,8 @@ function vizinhos(x, y) {
 }
 
 /** Os avisos de uma pose: [{ tipo: 'atravessa', a, b, penetracao }, { tipo: 'abaixo-do-chao', elemento, abaixo }], penetração e queda em mm. */
-export function avisosDaPose(arvore, angulos = {}) {
-  const el = elementosDaPose(arvore, angulos);
+export function avisosDaPose(arvore, angulos = {}, deslocamentoDaRaiz) {
+  const el = elementosDaPose(arvore, angulos, deslocamentoDaRaiz);
   const avisos = [];
   for (let i = 0; i < el.length; i++) {
     for (let k = i + 1; k < el.length; k++) {
@@ -161,8 +161,8 @@ const inteiroDe = (id) => ({ unir: [
 
 /** Os passos da peça na pose e os apelidos de seleção (o cilindro inteiro, laterais e tampas, de cada bastão): ids de origem 10, 11, 12...
  * (uma bola ou um bastão cada). */
-export function passosEApelidosDoEsqueleto(arvore, angulos = {}) {
-  const pos = posarEsqueleto(arvore, angulos);
+export function passosEApelidosDoEsqueleto(arvore, angulos = {}, deslocamentoDaRaiz) {
+  const pos = posarEsqueleto(arvore, angulos, deslocamentoDaRaiz);
   const passos = [];
   const apelidos = [];
   let id = 10;
@@ -192,7 +192,7 @@ export function passosEApelidosDoEsqueleto(arvore, angulos = {}) {
   return { passos, apelidos };
 }
 
-export const passosDoEsqueleto = (arvore, angulos = {}) => passosEApelidosDoEsqueleto(arvore, angulos).passos;
+export const passosDoEsqueleto = (arvore, angulos = {}, deslocamentoDaRaiz) => passosEApelidosDoEsqueleto(arvore, angulos, deslocamentoDaRaiz).passos;
 
 /* Os contatos por construção: bola e bastão, ou dois bastões, que compartilham uma junta. O par é o que o aviso de atravessamento ignora. */
 function contatosDoEsqueleto(arvore) {
@@ -233,7 +233,7 @@ export function receitaDoEsqueleto(arvore, { pose = 'zero', referencias = ['./pr
       criteriosDeReprovacao: ['membro com comprimento diferente do declarado em proporcoes.json', 'junta fora da posição que a pose dá'],
     },
     contatos: contatosDoEsqueleto(arvore),
-    get ALIASES() { return passosEApelidosDoEsqueleto(arvore, angulosDaPose(arvore, this.PARAMS.pose)).apelidos; },
+    get ALIASES() { return passosEApelidosDoEsqueleto(arvore, ...argumentosDaPose(arvore, this.PARAMS.pose)).apelidos; },
     get PASSOS() { return gerarPassosDoEsqueleto(arvore, this.PARAMS); },
   };
 }
@@ -245,8 +245,15 @@ function angulosDaPose(arvore, pose) {
   return declarada.angulos;
 }
 
+/** Os ângulos e o deslocamento da raiz de uma pose declarada, na ordem em que `posarEsqueleto` os recebe. */
+function argumentosDaPose(arvore, pose) {
+  const angulos = angulosDaPose(arvore, pose);
+  const declarada = posesDoEsqueleto(arvore).find((p) => p.nome === pose);
+  return [angulos, declarada.deslocamentoDaRaiz];
+}
+
 /** Os passos da tabela `{ pose }`: o que a guarda do acervo chama de `gerarPassos`. */
-export const gerarPassosDoEsqueleto = (arvore, tabela) => passosDoEsqueleto(arvore, angulosDaPose(arvore, tabela.pose));
+export const gerarPassosDoEsqueleto = (arvore, tabela) => passosDoEsqueleto(arvore, ...argumentosDaPose(arvore, tabela.pose));
 
 /** A cadeia que a guarda do acervo cobra da receita (`TABELA`, `derivar`, `gerarPassos`), para a receita reexportar: a tabela tem só a pose,
  * e `PASSOS` da receita lê `PARAMS.pose`, então copiar a receita com outra pose dá outros passos. */

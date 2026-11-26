@@ -12,7 +12,8 @@
  *     "saidas": { "andaime": "andaime.json", "articulacoes": "articulacoes.json", "esqueleto": "esqueleto.json" }   relativos ao proporcoes.json;
  *                                       "esqueleto" (a árvore resolvida, com as poses, que a receita da peça lê) é opcional
  *     "chao": 0,                         opcional: altura y do chão em mm (número ou fórmula); elemento abaixo dele é aviso
- *     "poses": { "braco-no-tronco": { "angulos": { "cotovelo-direito": -90 } } }   opcional: ângulo em graus por junta com curso, dentro
+ *     "poses": { "braco-no-tronco": { "angulos": { "cotovelo-direito": -90 } } }   opcional: ângulo em graus por junta com curso, e
+ *                                       "deslocamentoDaRaiz": [x, y, z] opcional, que move a raiz e tudo o que pende dela na pose; dentro
  *                                       do curso (o resto fica em 0); a pose `zero`, todos em 0, sempre existe e não se declara
  *     "raiz":   { "id": "tronco", "posicao": [0, "=alturaDoTronco", 0], "raioDaBola": 60 }
  *     "juntas": [
@@ -261,7 +262,13 @@ export function resolverEsqueleto(doc, medidas, caminho = '<proporcoes.json>') {
         }
         angulos[jid] = graus;
       }
-      poses.push({ nome, angulos });
+      let deslocamentoDaRaiz;
+      if (p.deslocamentoDaRaiz !== undefined) {
+        const campo = `${onde}.deslocamentoDaRaiz`;
+        if (!Array.isArray(p.deslocamentoDaRaiz) || p.deslocamentoDaRaiz.length !== 3) throw new ErroDasProporcoes(`${campo} = ${mostrar(p.deslocamentoDaRaiz)}`, 'um vetor [x, y, z] em mm, número ou fórmula, que move a raiz e tudo o que pende dela nesta pose (o sentado baixa a bacia)', ctx.conserto(campo));
+        deslocamentoDaRaiz = p.deslocamentoDaRaiz.map((v, i) => numeroDe(v, `${campo}[${i}]`, medidas, ctx));
+      }
+      poses.push(deslocamentoDaRaiz ? { nome, angulos, deslocamentoDaRaiz } : { nome, angulos });
     }
   }
 
@@ -349,7 +356,7 @@ export function esqueletoResolvido(arvore) {
 
 /** Os avisos de cada pose (a zero primeiro): [{ pose, avisos }]. */
 export function avisosDoEsqueleto(arvore) {
-  return posesDoEsqueleto(arvore).map((p) => ({ pose: p.nome, avisos: avisosDaPose(arvore, p.angulos) }));
+  return posesDoEsqueleto(arvore).map((p) => ({ pose: p.nome, avisos: avisosDaPose(arvore, p.angulos, p.deslocamentoDaRaiz) }));
 }
 
 const texto = (o) => `${JSON.stringify(o, null, 2)}\n`;

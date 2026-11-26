@@ -73,6 +73,8 @@ Fatia 1 feita em 2026-11-26: a seção `esqueleto` em `proporcoes.json`, com as 
 
 Fatia 2 feita em 2026-11-26: a peça de bolas e bastões (receita que lê `esqueleto.json`, a árvore resolvida que o comando grava; a conta pura mora em `src/autoria/esqueleto-de-bolas.js` (a guarda do acervo recusa módulo solto em `procedural/pecas/`)), as poses declaradas em `esqueleto.poses` (ângulo por junta dentro do curso, a pose zero sempre existe), o aviso de par atravessado e de elemento abaixo do chão (`esqueleto.chao`) por cápsula e esfera, que `--estrito` faz reprovar, e as vistas frontal, direita e superior de cada pose por `--vistas`. A fixture ganhou uma bacia e o eixo z no ombro e no cotovelo, para o antebraço alcançar o tronco.
 
+Fatia 3 feita em 2026-11-26: o esqueleto do humanoide de 1.750 mm em `procedural/pecas/esqueleto-humanoide/`, com as medidas do braço do robô e as proporções antropométricas médias no resto (ombro a 1.435 mm, quadril a 930, joelho a 499; braço 330, antebraço 230, coxa e canela 431), as poses sentado e braço erguido sem aviso, e duas variantes (pernas e tronco 4% mais longos) mostradas lado a lado. A pessoa aprovou a base por imagem em 2026-11-26, com a frase "Vamos seguir com suas recomendações. E pode fazer baixar sim", e pediu que o sentado baixasse a bacia: a pose ganhou `deslocamentoDaRaiz`, que move a raiz e tudo o que pende dela, e o sentado baixa a bacia o comprimento da coxa, com o assento a 499 mm e o pé no chão.
+
 ## Fechamento
 
 Preencher ao concluir ou cancelar: estado final, commit e PR, gates, resultado observado e candidatos devolvidos ao backlog.

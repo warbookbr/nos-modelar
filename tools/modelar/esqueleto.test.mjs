@@ -230,3 +230,26 @@ describe('cadeia da receita (TABELA, derivar, gerarPassos) para a guarda do acer
     expect(() => gerarPassos({ pose: 'inexistente' })).toThrow(/pose 'inexistente' não existe/);
   });
 });
+
+describe('deslocamento da raiz na pose', () => {
+  it('move a raiz e tudo o que pende dela, e o chão acusa quando desce demais', () => {
+    const { arquivo } = copia();
+    const { arvore } = gerarEsqueleto(arquivo);
+    const parado = posarEsqueleto(arvore, {});
+    const descido = posarEsqueleto(arvore, {}, [0, -40, 10]);
+    for (const [id, p] of parado) expect(descido.get(id)).toEqual([p[0], p[1] - 40, p[2] + 10]);
+    const fundo = Math.min(...[...parado.values()].map((p) => p[1]));
+    const chao = { ...arvore, chao: fundo - 1000 };
+    expect(avisosDaPose(chao, {}, [0, 0, 0]).filter((a) => a.tipo === 'abaixo-do-chao')).toEqual([]);
+    expect(avisosDaPose(chao, {}, [0, -1200, 0]).some((a) => a.tipo === 'abaixo-do-chao')).toBe(true);
+  });
+
+  it('a pose grava o deslocamento resolvido da fórmula, e o vetor inválido é recusado com o conserto', () => {
+    const { arquivo } = copia();
+    editar(arquivo, (d) => { d.esqueleto.poses['bracos-abertos'].deslocamentoDaRaiz = [0, '=0 - comprimentoDoBraco', 0]; });
+    const pose = gerarEsqueleto(arquivo).arvore.poses.find((p) => p.nome === 'bracos-abertos');
+    expect(pose.deslocamentoDaRaiz[1]).toBeLessThan(0);
+    editar(arquivo, (d) => { d.esqueleto.poses['bracos-abertos'].deslocamentoDaRaiz = [0, -10]; });
+    expect(() => gerarEsqueleto(arquivo)).toThrow(/deslocamentoDaRaiz = \[0,-10\]; esperava um vetor \[x, y, z\].*\n?.*conserte com: .*npm run esqueleto/s);
+  });
+});
