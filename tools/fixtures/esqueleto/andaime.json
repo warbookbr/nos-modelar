@@ -4,7 +4,7 @@
   "objetivo": "esqueleto-braco-de-prova",
   "alvo": "alvo-braco-de-prova",
   "familia": "humanoide",
-  "intencao": "Braço de prova de duas juntas com mão e o espelho esquerdo, na pose zero (braços pendentes).",
+  "intencao": "Tronco com braço de prova de duas juntas, mão e o espelho esquerdo, na pose zero (braços pendentes).",
   "unidade": "mm",
   "eixos": {
     "direita": "+x",
@@ -15,12 +15,12 @@
     "min": [
       -240,
       822,
-      -70
+      -90
     ],
     "max": [
       240,
-      1470,
-      70
+      1480,
+      90
     ]
   },
   "landmarks": [
@@ -77,6 +77,14 @@
       "posicao": [
         -200,
         850,
+        0
+      ]
+    },
+    {
+      "id": "junta-bacia",
+      "posicao": [
+        0,
+        950,
         0
       ]
     }
@@ -275,6 +283,36 @@
       "raio": 18,
       "comprimento": 250,
       "segmentos": 24
+    },
+    {
+      "id": "bola-bacia",
+      "regioes": [
+        "bacia"
+      ],
+      "tipo": "esfera",
+      "centro": [
+        0,
+        950,
+        0
+      ],
+      "raio": 90,
+      "segmentos": 16
+    },
+    {
+      "id": "bastao-bacia",
+      "regioes": [
+        "bacia"
+      ],
+      "tipo": "cilindro",
+      "centro": [
+        0,
+        1175,
+        0
+      ],
+      "eixo": "y",
+      "raio": 80,
+      "comprimento": 450,
+      "segmentos": 24
     }
   ],
   "portas": [
@@ -284,9 +322,9 @@
         "forma": "cilindro",
         "papel": "macho",
         "eixo": [
-          1,
           0,
-          0
+          0,
+          1
         ],
         "centro": [
           200,
@@ -304,9 +342,9 @@
         "forma": "cilindro",
         "papel": "macho",
         "eixo": [
-          1,
           0,
-          0
+          0,
+          1
         ],
         "centro": [
           200,
@@ -324,9 +362,9 @@
         "forma": "cilindro",
         "papel": "macho",
         "eixo": [
-          1,
           0,
-          0
+          0,
+          -1
         ],
         "centro": [
           -200,
@@ -344,9 +382,9 @@
         "forma": "cilindro",
         "papel": "macho",
         "eixo": [
-          1,
           0,
-          0
+          0,
+          -1
         ],
         "centro": [
           -200,
