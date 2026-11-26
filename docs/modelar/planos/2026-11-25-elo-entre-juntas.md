@@ -71,4 +71,6 @@ Se a seção, ao girar no elo com desvio, torcer a superfície ou fechar a pared
 
 ## Andamento
 
+Fatia 1 feita em 2026-11-26: a família `elo-entre-juntas` (o elo reto entre duas flanges coaxiais, seção elíptica, redonda ou de cantos arredondados, cintura ou barriga, parede pela casca da receita e a furação de cada boca no padrão da flange), com as recusas testadas e a aprovação mecânica, e a peça de prova do antebraço entre dois atuadores, aprovada pela pessoa por imagem em 2026-11-26 ("aprovo o elo reto, pode seguir"). As provas estão no banco de provas do plano.
+
 ## Fechamento

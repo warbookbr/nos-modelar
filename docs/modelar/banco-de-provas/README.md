@@ -38,6 +38,7 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
 - `desenho-das-linhas`
 - [Divisão por contorno: fatia 1, a operação e as provas na chapa de teste](divisao-por-contorno-2026-11-18/README.md) — `divisao-por-contorno-2026-11-18`
 - [Elementos de máquina: perfil, guia, rolamento e fuso](elementos-de-maquina-2026-11-24/README.md) — `elementos-de-maquina-2026-11-24`
+- [Elo entre juntas: as provas](elo-entre-juntas-2026-11-25/README.md) — `elo-entre-juntas-2026-11-25`
 - [Carcaça da empilhadeira: alinhamento](empilhadeira-2026-10-09/ALINHAMENTO.md) — `empilhadeira-2026-10-09`
   - [Roteiro da análise](empilhadeira-2026-10-09/referencias/carcaca_lateral.pacote/roteiro.md) — `empilhadeira-2026-10-09/referencias/carcaca_lateral.pacote`
 - `empilhadeira-2026-10-14`
