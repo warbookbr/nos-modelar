@@ -34,8 +34,21 @@ export async function medirPecaDoAcervo(peca) {
   }
 }
 
+const AJUDA = `resumo-do-acervo: roda as três réguas de malha (face degenerada, triângulo fino e serrilhado da costura) e imprime uma linha por peça.
+
+  npm run reguas:malha:acervo                          o acervo inteiro (procedural/pecas/ e tools/fixtures/acervo/); leva minutos
+  npm run reguas:malha:acervo -- <peça> [<peça> ...]   só as peças dadas
+  --json=<arquivo>                                     grava também os números em JSON
+  --ajuda                                              esta mensagem
+
+Colunas: peça, faces, degeneradas, triângulos finos, regiões com finos, pontas de serra, trechos de serrilhado e o tempo.
+A peça que não executa sai com o motivo no lugar dos números. Só mede; não muda peça nem gate.`;
+
 if (process.argv[1] && process.argv[1].endsWith('resumo-do-acervo.mjs')) {
-  const args = process.argv.slice(2);
+  const args = process.argv.slice(2).flatMap((a) => (a.startsWith('--json=') ? ['--json', a.slice(7)] : [a]));
+  if (args.includes('--ajuda')) { console.log(AJUDA); process.exit(0); }
+  const estranho = args.find((a, i) => a.startsWith('-') && a !== '--json' && args[i - 1] !== '--json');
+  if (estranho) { console.error(`resumo-do-acervo: não conheço '${estranho}'.\n\n${AJUDA}`); process.exit(2); }
   const j = args.indexOf('--json');
   const saida = j >= 0 ? args.splice(j, 2)[1] : null;
   const pedidas = args.filter((a) => !a.startsWith('-'));

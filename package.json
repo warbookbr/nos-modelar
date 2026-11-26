@@ -169,6 +169,10 @@
     "prancha:coerencia": "node tools/modelar/prancha/prancha-coerencia.mjs",
     "prancha:sobrepor": "node tools/modelar/prancha/prancha-sobrepor.mjs",
     "modelo:sobrepor": "node tools/modelar/modelo-sobrepor.mjs",
+    "modelo:referencia": "node tools/modelar/modelo-de-referencia.mjs",
+    "perfil:execucao": "node tools/modelar/perfil-da-execucao.mjs",
+    "reguas:malha:acervo": "node tools/modelar/reguas-de-malha/resumo-do-acervo.mjs",
+    "costura:registrada": "node tools/modelar/reguas-de-malha/costura-registrada.mjs",
     "objeto": "node tools/modelar/objeto.mjs"
   },
   "dependencies": {

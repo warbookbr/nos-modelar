@@ -364,3 +364,11 @@ Reescrever as cinco peças de revolução do ramo `claude/familia-revolucao` (pe
 A tabela de proporções pronta para o esqueleto de proporção: gerar a árvore de juntas de um humanoide ou de um quadrúpede a partir da altura e de proporções médias, em vez de escrever os comprimentos; o humanoide de 2026-11-26 foi escrito à mão com as proporções de Drillis e Contini, e a tabela vem quando um segundo robô a pedir (esqueleto de proporção, 2026-11-26).
 
 O `territorio:check` recusa o envio que leva a última fatia de um plano junto com o encerramento dele: o plano já não está ativo quando o gate mede, e os arquivos da fatia ficam sem dono, o que pede a linha `Fora-do-territorio` para trabalho que estava no território. O gate poderia aceitar o território de um plano encerrado no próprio envio (esqueleto de proporção, 2026-11-26).
+
+O `territorio:check` mede só o que está em commit, e o agente despachado trabalha sem commit, de modo que o gate passa sem ter olhado a fatia; uma opção que inclua a árvore de trabalho deixaria o agente conferir antes de devolver (fatia 4 do plano de ferramentas, 2026-11-26).
+
+O `ferramentas:registro:gerar` usa o cabeçalho inteiro do arquivo como frase da entrada nova, e a de `costura-registrada.mjs` saiu com sete linhas e ponto duplo; cortar na primeira frase.
+
+A decisão pendente sobre uma ferramenta sem chamador some do registro assim que um módulo vivo passa a importá-la, como a conversão do esboço antigo depois que `vistas-de-passos.mjs` voltou a ter chamador; um campo de decisão pendente no registro a manteria visível.
+
+Tirar a linha e o peso de um teste lento apagado (`tools/testes-lentos.mjs`, `tools/testes-lentos-pesos.json`) obriga a mexer no território do plano de processo e CI; os dois podem ir para os caminhos compartilhados quando o plano fechar.

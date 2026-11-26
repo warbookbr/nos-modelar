@@ -29,7 +29,6 @@ Quem trabalha chama, com `npm run <comando> -- <argumentos>`; a que não tem com
 | `capacidade` | Lista os ajudantes de gaiola e imprime a ficha de um deles, recortada do cabeçalho do arquivo. |
 | `casamento:vista` | Duas medidas do modelo contra a imagem de referência numa vista, as duas tiradas da malha e não de uma captura com luz. |
 | `comecar` | A entrada por intenção: dado o roteiro, diz o que ler, a skill, os comandos e o passo seguinte. |
-| `node tools/modelar/comparar-silhueta.mjs` | Compara a silhueta de uma receita do acervo com a de um modelo de referência medido por modelo-de-referencia.mjs. |
 | `conferir:referencia` | Desvio em MILÍMETRO entre a silhueta lateral de partes de uma peça e a borda correspondente de uma foto de referência. |
 | `conferir:juntas` | Mede o vão de contato e a interferência nas interfaces entre os componentes de uma peça. |
 | `malha:conferir` | Imprime a topologia da malha de uma receita, com os avisos do motor. |
@@ -54,7 +53,6 @@ Quem trabalha chama, com `npm run <comando> -- <argumentos>`; a que não tem com
 | `exportar:obj` | CLI para exportação atômica e segura de receitas procedurais em Wavefront OBJ (.obj). |
 | `exportar:step` | CLI para exportação atômica e segura de receitas procedurais em formato STEP. |
 | `fluxo:objeto` | Em que passo um objeto está, da referência à etapa fixa, e o comando exato que vem agora. |
-| `node tools/modelar/folha-comparativa.mjs` | A fonte e a receita lado a lado, nas MESMAS câmeras e na MESMA escala, e a vista de diferença que marca onde a receita sobra ou falta. |
 | `forma:esboco` | A forma de uma receita contra a forma do esboço que ela refina, sem mudar a receita. |
 | `malha:lascas` | Lista cada face fina de uma receita. |
 | `leitura:regioes` | Corta a vista de referência e a captura do rascunho na mesma grade e as põe lado a lado, região por região. |
@@ -63,9 +61,8 @@ Quem trabalha chama, com `npm run <comando> -- <argumentos>`; a que não tem com
 | `receita:mapa` | O mapa de uma receita do acervo, para ler só o trecho que se precisa. |
 | `desvio` | Pinta uma peça pela distância, com sinal e em milímetro, a uma superfície lisa ajustada a ela. |
 | `material` | Imprime tudo que pertence a uma peça e onde está. |
-| `node tools/modelar/medidas-da-fonte.mjs` | Tira de fonte-partes.json, em milímetro, o ponto de partida das três vistas da carroceria. |
 | `node tools/modelar/medir-importar-receita.mjs` | O tempo de importar cada receita e gerar os passos dela, num processo novo. |
-| `node tools/modelar/modelo-de-referencia.mjs` | Estuda uma malha de terceiros (OBJ, FBX ou glTF) como REFERÊNCIA de forma, sem a levar ao repositório. |
+| `modelo:referencia` | A entrada do estudo de modelo de terceiros: estuda uma malha (OBJ, FBX ou glTF) como referência de forma, sem a levar ao repositório, e leva aos passos do grupo (medidas, silhueta, folha, vistas e texturizadas). |
 | `modelo:sobrepor` | Projeta a silhueta ortográfica da malha sobre a prancha ou sobre a imagem de referência calibrada. |
 | `objeto` | O estado das referências de um objeto que passa por mapa de partes e prancha de contornos, e o que vem a seguir. |
 | `bancada`, `bancada:tela`, `revisar` | Captura as vistas de uma peça na bancada, sem janela, em PNG. |
@@ -74,7 +71,7 @@ Quem trabalha chama, com `npm run <comando> -- <argumentos>`; a que não tem com
 | `ondulacao` | Acha onde a superfície de subdivisão de uma receita ondula, salta ou dobra fora dos vincos declarados, e diz quanto em milímetro. |
 | `parametros` | Lista os parâmetros que dá para mexer numa receita, com faixa e valor. |
 | `pente` | Desenha e mede o pente de curvatura de uma seção da peça. |
-| `node tools/modelar/perfil-da-execucao.mjs` | Mede a execução de uma receita sem mudar nada nela (fatia 1 do plano do planejador de execução). |
+| `perfil:execucao` | Mede a execução de uma receita, passo por passo e operação por operação, sem mudar nada nela. |
 | `perfil:cor` | Classifica os pixels de uma vista pela cor do material e mede a largura de cada cor em cada altura. |
 | `node tools/modelar/perguntas-do-alinhamento.mjs` | As perguntas do alinhamento da família declarada, filtradas pelas partes. |
 | `planejado` | Compara o andaime planejado com a montagem executada, parte por parte, no quadro do conjunto. |
@@ -92,7 +89,8 @@ Quem trabalha chama, com `npm run <comando> -- <argumentos>`; a que não tem com
 | `receita:esqueleto` | O esqueleto da receita de uma peça que ainda vai ser alinhada. |
 | `silhueta:referencia` | Do contorno de uma imagem ao arquivo de trechos que silhueta:desvio lê, em milímetro e nos eixos do modelo. |
 | `node tools/modelar/regravar-ajustes-de-curva.mjs` | Refaz os ajustes de curva lisa de que uma receita precisa e grava o resultado ao lado dela. |
-| `node tools/modelar/reguas-de-malha/resumo-do-acervo.mjs` | Roda as três réguas de malha sobre o acervo inteiro e imprime a tabela. |
+| `costura:registrada` | Compara a costura que cada unir da receita registra com a costura geométrica da malha que ele entrega, e sai com 1 na aresta perdida ou de sobra. |
+| `reguas:malha:acervo` | Roda as três réguas de malha sobre o acervo inteiro e imprime a tabela. |
 | `crista:regularidade` | Percorre cada crista da superfície de subdivisão e acusa onde o que ela mede varia de repente, com a posição em mm. |
 | `esboco:nucleo` | Faz a cópia isolada achar na raiz do repositório principal o pacote que ela não tem. |
 | `retrato:acervo` | Mede cada peça do acervo e compara dois retratos, para saber o que uma mudança no núcleo fez com as peças que já estavam aprovadas. |
@@ -108,11 +106,8 @@ Quem trabalha chama, com `npm run <comando> -- <argumentos>`; a que não tem com
 | `varrer` | Varre os parâmetros de uma receita e devolve os candidatos medidos, sem escrever nela. |
 | `vincos-das-linhas` | Casa as linhas 3D lidas do pacote cego com as colunas e as estações nomeadas da gaiola de uma receita. |
 | `vista:rapida` | A imagem sombreada de uma opção de esboço numa vista, tirada da malha em JavaScript, sem navegador. |
-| `node tools/modelar/vistas-da-receita.mjs` | A folha de seis vistas de uma receita .js do acervo, cada parte com uma cor, para olhar a forma e a divisão em partes. |
-| `node tools/modelar/vistas-de-passos.mjs` | A folha de seis vistas de um objeto convertido do esboço em receita do Modelar, para conferir o que a conversão e os ajustes fizeram. |
 | `vistas:superficie` | A luz rasante e a curvatura da lataria de uma peça, e a conferência de que o pacote do crítico as trouxe. |
 | `vistas:critica` | Monta, numa chamada, o pacote que a crítica visual precisa receber. |
-| `node tools/modelar/vistas-texturizadas.mjs` | Captura três vistas de uma peça com a textura que a exportação OBJ gera, para julgar o acabamento. |
 | `zebra` | Conta as ilhas de reflexo e os laços fechados de listra da zebra em cada região da chapa, por faixa de comprimento de onda. |
 
 ## De gate
@@ -171,19 +166,23 @@ Outra ferramenta chama, ou é ferramenta de manutenção, que ninguém chama ao 
 - `mapa/indice-do-banco.mjs`
 - `mcp/servidor.mjs`
 - `modelar/aprovacao-da-familia-fio.mjs`
+- `modelar/comparar-silhueta.mjs`
 - `modelar/dobra-da-superficie.mjs`
 - `modelar/fixtures/alisar-rede-prova-casos.mjs`
 - `modelar/fixtures/contorno-da-imagem/braco-sintetico.mjs`
+- `modelar/folha-comparativa.mjs`
 - `modelar/guardas/etapas-do-acervo.mjs`
-- `modelar/medir-arvore-para-migracao.mjs`
+- `modelar/medidas-da-fonte.mjs`
 - `modelar/medir-transcricao.mjs`
-- `modelar/migrar-etapas-para-impressao.mjs`
 - `modelar/pedidos-da-pessoa.mjs`
 - `modelar/perguntas-da-peca.mjs`
 - `modelar/prancha/prancha-geometria.mjs`
 - `modelar/procedencia-check.mjs`
 - `modelar/sobreposicao-de-cortes.mjs`
 - `modelar/vinco-oculto.mjs`
+- `modelar/vistas-da-receita.mjs`
+- `modelar/vistas-de-passos.mjs`
+- `modelar/vistas-texturizadas.mjs`
 
 ## Apoio de teste
 
@@ -205,27 +204,9 @@ Só os testes usam; a conferência exige que algum teste importe cada um.
 Nenhum comando, import de ferramenta viva, skill ou configuração chama o que está abaixo; o motivo de cada um ficar vem depois dos dois pontos.
 
 - `blender/`, a pasta: ferramentas opcionais do Blender, fora do CI e rodadas à mão; uso em docs/modelar/blender/REGUA-E-PACOTE-CEGO.md
-- `modelar/cadeiras-medida.mjs`: à espera da decisão da pessoa (apagar ou religar)
-- `modelar/comparar-silhueta.mjs`: à espera da decisão da pessoa (apagar ou religar)
+- `modelar/cadeiras-medida.mjs`: a decisão de 2026-11-26 era apagar e parou: o teste da família cadeira (procedural/familias/cadeira/cadeira.test.mjs) importa ALVOS e compararPerfil dele; espera a pessoa
 - `modelar/conferir-retrato-do-acervo.mjs`: à espera da decisão da pessoa (apagar ou religar)
 - `modelar/derivar-campanha-revalidacao.mjs`: à espera da decisão da pessoa (apagar ou religar)
-- `modelar/esboco-alinhar-caixas.mjs`: à espera da decisão da pessoa (apagar ou religar)
-- `modelar/esboco-para-passos.mjs`: à espera da decisão da pessoa (apagar ou religar)
-- `modelar/exportar-peca.mjs`: à espera da decisão da pessoa (apagar ou religar)
-- `modelar/familia-com-esboco.mjs`: à espera da decisão da pessoa (apagar ou religar)
-- `modelar/folha-comparativa.mjs`: à espera da decisão da pessoa (apagar ou religar)
-- `modelar/frente-da-fonte.mjs`: à espera da decisão da pessoa (apagar ou religar)
-- `modelar/medidas-da-fonte.mjs`: à espera da decisão da pessoa (apagar ou religar)
-- `modelar/medir-arvore-para-migracao.mjs`: ferramenta de uma migração já feita; à espera da decisão da pessoa (apagar ou religar)
-- `modelar/migrar-etapas-para-impressao.mjs`: ferramenta de uma migração já feita; à espera da decisão da pessoa (apagar ou religar)
-- `modelar/modelo-de-referencia.mjs`: à espera da decisão da pessoa (apagar ou religar)
-- `modelar/perfil-da-execucao.mjs`: à espera da decisão da pessoa (apagar ou religar)
-- `modelar/receita-externa.mjs`: à espera da decisão da pessoa (apagar ou religar)
-- `modelar/reguas-de-malha/costura-registrada.mjs`: régua que só o teste dela e o de uma fixtura rodam; à espera da decisão da pessoa (apagar ou religar)
-- `modelar/reguas-de-malha/resumo-do-acervo.mjs`: à espera da decisão da pessoa (apagar ou religar)
-- `modelar/silhueta-da-superficie.mjs`: à espera da decisão da pessoa (apagar ou religar)
-- `modelar/triangulos-da-receita.mjs`: à espera da decisão da pessoa (apagar ou religar)
+- `modelar/exportar-peca.mjs`: conferido contra o contrato de arquitetura em 2026-11-26 sem mudança: a função exportarPeca serve a quatro testes, e a metade de publicação não tem comando nem gate; espera a pessoa
+- `modelar/familia-com-esboco.mjs`: a decisão de 2026-11-26 era apagar e parou: o contrato da família (docs/modelar/contratos/CONTRATO-DA-FAMILIA.md) o descreve como o adaptador da conferência com o esboço; espera a pessoa
 - `modelar/visor-montagem.js`: carregado por caminho calculado: a página visor-montagem.html, que a captura de montagem abre, o carrega, por `modelar/capturar-montagem.mjs`
-- `modelar/vistas-da-receita.mjs`: à espera da decisão da pessoa (apagar ou religar)
-- `modelar/vistas-de-passos.mjs`: à espera da decisão da pessoa (apagar ou religar)
-- `modelar/vistas-texturizadas.mjs`: à espera da decisão da pessoa (apagar ou religar)
