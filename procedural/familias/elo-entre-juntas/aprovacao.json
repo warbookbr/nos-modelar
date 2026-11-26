@@ -1,0 +1,148 @@
+{
+  "formato": "mecanifica.aprovacao-da-familia@1",
+  "familia": "elo-entre-juntas",
+  "versao": "1.0.0",
+  "mecanica": {
+    "data": "2026-11-26",
+    "pontos": {
+      "minimo": {
+        "parametros": {
+          "azimute": -180,
+          "cintura": 0.4,
+          "circuloDaBocaA": 10,
+          "circuloDaBocaB": 10,
+          "comprimento": 60,
+          "deslocamentoLateral": 0,
+          "desvio": 0,
+          "diametroDaBocaA": 20,
+          "diametroDaBocaB": 20,
+          "diametroDoFuroDaBocaA": 1.5,
+          "diametroDoFuroDaBocaB": 1.5,
+          "espessuraDaBocaA": 2,
+          "espessuraDaBocaB": 2,
+          "furosDaBocaA": 3,
+          "furosDaBocaB": 3,
+          "larguraDaSecao": 16,
+          "parede": 0.8,
+          "profundidadeDaSecao": 16,
+          "secao": 1
+        },
+        "hash": "sha256:4813a74b3ee12762a0eda501ad6e8894574506fe3327b3a8e000196636b28689",
+        "medidas": []
+      },
+      "medio": {
+        "parametros": {
+          "azimute": 0,
+          "cintura": 1,
+          "circuloDaBocaA": 70,
+          "circuloDaBocaB": 70,
+          "comprimento": 300,
+          "deslocamentoLateral": 0,
+          "desvio": 0,
+          "diametroDaBocaA": 100,
+          "diametroDaBocaB": 100,
+          "diametroDoFuroDaBocaA": 4.2,
+          "diametroDoFuroDaBocaB": 4.2,
+          "espessuraDaBocaA": 4,
+          "espessuraDaBocaB": 4,
+          "furosDaBocaA": 8,
+          "furosDaBocaB": 8,
+          "larguraDaSecao": 100,
+          "parede": 2,
+          "profundidadeDaSecao": 80,
+          "secao": 2
+        },
+        "hash": "sha256:9cedc23e0dd73df5fda7d87e51a6bb668f76a4b3fbf0c73821fb0ce130b9d819",
+        "medidas": []
+      },
+      "maximo": {
+        "parametros": {
+          "azimute": 180,
+          "cintura": 1.6,
+          "circuloDaBocaA": 200,
+          "circuloDaBocaB": 200,
+          "comprimento": 800,
+          "deslocamentoLateral": 40,
+          "desvio": 90,
+          "diametroDaBocaA": 300,
+          "diametroDaBocaB": 300,
+          "diametroDoFuroDaBocaA": 8,
+          "diametroDoFuroDaBocaB": 8,
+          "espessuraDaBocaA": 10,
+          "espessuraDaBocaB": 10,
+          "furosDaBocaA": 16,
+          "furosDaBocaB": 16,
+          "larguraDaSecao": 300,
+          "parede": 12,
+          "profundidadeDaSecao": 300,
+          "secao": 3
+        },
+        "hash": "sha256:0577ef0e06deadd1d229989142030ecbb8407ae279f25b9d8c58457ad47000c6",
+        "medidas": []
+      }
+    },
+    "varredura": {
+      "sondas": 38,
+      "recusasDeclaradas": [
+        {
+          "ponto": "circuloDaBocaA=200",
+          "restricao": "boca-a-cabe-na-secao"
+        },
+        {
+          "ponto": "circuloDaBocaB=200",
+          "restricao": "boca-b-cabe-na-secao"
+        },
+        {
+          "ponto": "comprimento=60",
+          "restricao": "comprimento-das-bocas"
+        },
+        {
+          "ponto": "diametroDaBocaA=20",
+          "restricao": "boca-a-cabe-na-secao"
+        },
+        {
+          "ponto": "diametroDaBocaA=300",
+          "restricao": "comprimento-das-bocas"
+        },
+        {
+          "ponto": "diametroDaBocaB=20",
+          "restricao": "boca-b-cabe-na-secao"
+        },
+        {
+          "ponto": "diametroDaBocaB=300",
+          "restricao": "comprimento-das-bocas"
+        },
+        {
+          "ponto": "diametroDoFuroDaBocaB=8",
+          "restricao": "boca-b-cabe-na-secao"
+        },
+        {
+          "ponto": "larguraDaSecao=16",
+          "restricao": "cintura-fecha-a-secao"
+        },
+        {
+          "ponto": "larguraDaSecao=300",
+          "restricao": "comprimento-das-bocas"
+        },
+        {
+          "ponto": "parede=12",
+          "restricao": "boca-a-cabe-na-secao"
+        },
+        {
+          "ponto": "profundidadeDaSecao=16",
+          "restricao": "cintura-fecha-a-secao"
+        },
+        {
+          "ponto": "profundidadeDaSecao=300",
+          "restricao": "comprimento-das-bocas"
+        }
+      ]
+    },
+    "portas": [
+      "boca-a",
+      "boca-b"
+    ]
+  },
+  "critico": null,
+  "pessoa": null
+}

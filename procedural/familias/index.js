@@ -41,6 +41,7 @@ import { CORRENTE } from './corrente/index.js';
 import { ESTEIRA } from './esteira/index.js';
 import { GABINETE } from './gabinete/index.js';
 import { ATUADOR_DE_JUNTA } from './atuador-de-junta/index.js';
+import { ELO_ENTRE_JUNTAS } from './elo-entre-juntas/index.js';
 
 export { ErroChamadaDeFamilia, chamar, definirFamilia } from '../../src/autoria/chamar-familia.js';
 
@@ -53,7 +54,7 @@ export const EXTENSOES_NATIVAS = Object.freeze([
 ]);
 
 /* As famílias do produto. Cada família real (tarefas 6 a 10 da fatia 9) entra aqui por import explícito. */
-export const FAMILIAS = Object.freeze([RODA_PNEU, DOBRADICA, CILINDRO_HIDRAULICO, MOVEL_DE_CAIXA, SUPERFICIE_AERODINAMICA, APARELHO_DE_CAIXA, CADEIRA, COMPONENTE_ELETRONICO, MOLA, FIXADOR, POLIA_E_CORREIA, ENGRENAGEM, CREMALHEIRA, TUBULACAO, PERFIL_ESTRUTURAL, GUIA_LINEAR, ROLAMENTO, FUSO, RODA_DENTADA, CORRENTE, ESTEIRA, GABINETE, ATUADOR_DE_JUNTA]);
+export const FAMILIAS = Object.freeze([RODA_PNEU, DOBRADICA, CILINDRO_HIDRAULICO, MOVEL_DE_CAIXA, SUPERFICIE_AERODINAMICA, APARELHO_DE_CAIXA, CADEIRA, COMPONENTE_ELETRONICO, MOLA, FIXADOR, POLIA_E_CORREIA, ENGRENAGEM, CREMALHEIRA, TUBULACAO, PERFIL_ESTRUTURAL, GUIA_LINEAR, ROLAMENTO, FUSO, RODA_DENTADA, CORRENTE, ESTEIRA, GABINETE, ATUADOR_DE_JUNTA, ELO_ENTRE_JUNTAS]);
 
 /**
  * Monta os registros de uma lista de famílias carregadas por `definirFamilia`. Devolve `{ familias, obter,
