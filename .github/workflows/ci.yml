@@ -138,9 +138,15 @@ jobs:
         if: ${{ !cancelled() }}
         run: npm run docs:links:check
 
-      - name: Planejamento curto, com até cinco planos ativos e territórios separados
+      - name: Planejamento curto, com até seis planos comuns e três de núcleo ativos e territórios separados
         if: ${{ !cancelled() }}
         run: npm run planos:check
+
+      # Cada arquivo que o envio muda contra a main pertence a um plano ativo, a um caminho compartilhado ou a um gerado, ou é
+      # declarado defeito pontual num commit (`Fora-do-territorio: <caminho>, <motivo>`); antes a regra vivia só em texto.
+      - name: O envio muda só o território dos planos ativos
+        if: ${{ !cancelled() }}
+        run: npm run territorio:check
 
       - name: Registros de decisão em formato e lista em dia
         if: ${{ !cancelled() }}

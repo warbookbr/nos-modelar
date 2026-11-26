@@ -83,6 +83,7 @@
     "docs:links": "node tools/mapa/links.mjs",
     "docs:links:check": "node tools/mapa/links.mjs --check",
     "planos:check": "node tools/mapa/planos.mjs --check",
+    "territorio:check": "node tools/mapa/territorio-do-envio.mjs",
     "planos:gerar": "node tools/mapa/planos.mjs --gerar",
     "planos:encerrar": "node tools/mapa/planos.mjs --encerrar",
     "ramos:parados": "node tools/modelar/ramos-parados.mjs",

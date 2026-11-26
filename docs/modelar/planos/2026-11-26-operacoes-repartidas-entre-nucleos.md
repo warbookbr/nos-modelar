@@ -4,7 +4,7 @@
 
 **Núcleo:** sim
 
-**Território:** `docs/modelar/banco-de-provas/operacoes-repartidas-2026-11-26/`, `procedural/nucleo/operacoes/abertura-por-contorno.js` e os testes dela, `procedural/nucleo/fios-da-operacao.js` e o teste dele, `tools/fixtures/corte-das-aberturas/`. O arquivo das booleanas do núcleo é do plano do resgate dos ramos antigos; se a repartição precisar mudá-la, é empréstimo pedido a esse plano.
+**Território:** `docs/modelar/banco-de-provas/operacoes-repartidas-2026-11-26/`, `procedural/nucleo/operacoes/abertura-por-contorno.js`, `procedural/nucleo/operacoes/abertura-por-contorno.test.ts`, `procedural/nucleo/operacoes/abertura-por-contorno-simetria.test.ts`, `procedural/nucleo/operacoes/abertura-por-contorno-guarda.test.ts`, `procedural/nucleo/operacoes/abertura-por-contorno-guarda-chapa-mudada.test.ts`, `procedural/nucleo/operacoes/abertura-por-contorno-guarda-conferida.test.ts`, `tools/fixtures/corte-das-aberturas/`. O arquivo das booleanas do núcleo é do plano do resgate dos ramos antigos; se a repartição precisar mudá-la, é empréstimo pedido a esse plano.
 
 Ativado pela pessoa em 2026-11-26 ("ativar o plano de repartir as operações mais caras entre os núcleos, começando pelo corte das aberturas e pode prosseguir").
 

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2423 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2425 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -3888,6 +3888,8 @@
 - `retirados.test.mjs` — retirados.test.mjs — caminho sob pasta retirada passa quando a crônica registra o nome, ou quando o plano está em congelados/, e reprova quando não.
 - `roteiros.mjs` — roteiros.mjs — os invariantes e os roteiros de leitura por intenção, como dado.
 - `roteiros.test.mjs` — roteiros.test.mjs — os roteiros por intenção e o gate leitura:obrigatoria: o JSON do repositório passa, o ROTEIROS.md e os blocos do CLAUDE.md estão gerados …
+- `territorio-do-envio.mjs` — territorio-do-envio.mjs — confere que cada arquivo que o envio muda contra a main pertence ao território de um plano ativo, a um caminho compartilhado ou a u…
+- `territorio-do-envio.test.mjs` — territorio-do-envio.test.mjs — o arquivo mudado sem plano dono nem declaração reprova; o do território, o compartilhado, o gerado e o declarado como defeito …
 - `toc.mjs` — toc.mjs — gera o índice (sumário) de um doc ENTRE os marcadores <!-- TOC --> e <!-- /TOC -->, a partir dos títulos `##` dele. Mesma filosofia do mapa: o índi…
 
 ## tools/mcp/
