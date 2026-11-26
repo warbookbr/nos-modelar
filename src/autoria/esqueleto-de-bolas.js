@@ -8,7 +8,7 @@
  *                      O ângulo é em graus, pela regra da mão direita em torno do eixo da junta (o eixo de uma junta espelhada já
  *                      vem refletido como pseudovetor, então o mesmo ângulo flexiona os dois lados para o mesmo lado). A junta
  *                      não move a si mesma nem o bastão que a liga ao pai: gira o que pende dela.
- *   avisosDaPose       a interpenetração de pares de elementos (bola ou bastão) e o elemento abaixo do chão declarado. Conta
+ *   avisosDaPose       a interpenetração de pares de elementos (bola ou bastão), o elemento abaixo do chão declarado e a pose sem apoio. Conta
  *                      analítica: a bola é uma esfera, o bastão é uma cápsula (o segmento do pai até a junta, com o raio do bastão),
  *                      e a distância entre segmentos dá a folga. A cápsula é um pouco mais gorda que o cilindro de ponta plana
  *                      da peça, então o aviso é conservador nas pontas. Pares vizinhos na árvore ficam fora da conta, pois se
