@@ -1,0 +1,10 @@
+{
+  "origem": "Caixa envolvente (mm; x largura, y altura, z profundidade) e volume (mm³) do alvo de cada perfil da família cadeira, gravados em 2026-11-26 a partir da conta que tools/modelar/cadeiras-medida.mjs fazia (medirAlvo) sobre a receita de origem em tools/modelar/fixtures/receita-externa-cadeiras/<receita>.receita.json, na árvore do commit 11704ce7. A conta saiu do repositório junto com a conversão do esboço antigo, pela decisão da pessoa no plano docs/modelar/planos/2026-11-26-ferramentas-e-documentacao.md; os números não são recalculados, e mudar um deles pede dizer de onde veio a medida nova. O volume é a união das caixas da receita menos os chanfros, mais os cilindros.",
+  "alvos": {
+    "cadeira-trabalhada": { "receita": "cadeira_ripada_marrom", "tamanho": [482.6, 1001.3, 479.1], "volume": 28730823.24 },
+    "cadeira-rustica": { "receita": "cadeira_desgastada_madeira", "tamanho": [600, 1050, 563], "volume": 41681836.45894774 },
+    "cadeira-branca-simples": { "receita": "cadeira_basica_clara", "tamanho": [503.4, 1002.9, 510.4], "volume": 39408093.432 },
+    "cadeira-branca-de-madeira": { "receita": "cadeira_almofadada_clara", "ajuste": "o topo das pernas da frente encosta no assento (face de baixo da almofada)", "tamanho": [465.5, 1083.8, 471.7], "volume": 25112341.35 },
+    "cadeira-de-madeira": { "receita": "cadeira_ripada_simples", "tamanho": [510, 1120, 540], "volume": 39314450 }
+  }
+}

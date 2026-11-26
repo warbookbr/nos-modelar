@@ -44,7 +44,6 @@
     {"arquivo":"tools/modelar/assinatura-da-malha.mjs","comandos":["malha:assinatura"],"faz":"A assinatura de cada parte e da peça inteira, e a comparação de duas rodadas.","tipo":"uso","aparece":[".claude/skills/auditar-peca/SKILL.md","docs/modelar/usar/PARE-E-ANALISE.md"]},
     {"arquivo":"tools/modelar/ativar-bancada.mjs","comandos":["ativar:bancada"],"faz":"Ativa uma peça ou montagem procedural na sessão aberta da bancada.","tipo":"uso","aparece":["docs/COMECE-AQUI.md","docs/modelar/INDEX.md","docs/modelar/usar/ATIVACAO-BANCADA-SESSAO-ATIVA.md"]},
     {"arquivo":"tools/modelar/banco-de-provas.mjs","comandos":["banco-de-provas","banco-de-provas:check","banco-de-provas:gerar","banco-de-provas:registrar","banco-de-provas:resumo"],"faz":"Gera e confere o catálogo e o registro de custo do banco de provas de modelagem.","tipo":"gate"},
-    {"arquivo":"tools/modelar/cadeiras-medida.mjs","comandos":[],"faz":"A medida da família cadeira contra o esboço alvo de cada perfil, e a prancha com os dois lado a lado.","tipo":"uso","aparece":[]},
     {"arquivo":"tools/modelar/calibracao-do-critico.mjs","comandos":["calibracao","calibracao:check"],"faz":"O conjunto de calibração do crítico visual e o gate calibracao:check.","tipo":"gate"},
     {"arquivo":"tools/modelar/capacidade.mjs","comandos":["capacidade"],"faz":"Lista os ajudantes de gaiola e imprime a ficha de um deles, recortada do cabeçalho do arquivo.","tipo":"uso","aparece":[".claude/agents/modelador.md",".claude/skills/criar-peca/references/operacoes-procedurais.md","docs/modelar/guias/modelar-veiculo-em-chassi-e-lataria.md"]},
     {"arquivo":"tools/modelar/casamento-da-vista.mjs","comandos":["casamento:vista"],"faz":"Duas medidas do modelo contra a imagem de referência numa vista, as duas tiradas da malha e não de uma captura com luz.","tipo":"uso","aparece":["docs/modelar/usar/MEDIDAS-AVULSAS.md"]},
@@ -158,7 +157,6 @@
     {"arquivo":"tools/modelar/vincos-das-linhas.mjs","comandos":["vincos-das-linhas"],"faz":"Casa as linhas 3D lidas do pacote cego com as colunas e as estações nomeadas da gaiola de uma receita.","tipo":"uso","aparece":[".claude/skills/criar-peca/references/operacoes-procedurais.md","docs/modelar/guias/modelar-carroceria.md"]},
     {"arquivo":"tools/modelar/vista-rapida.mjs","comandos":["vista:rapida"],"faz":"A imagem sombreada de uma opção de esboço numa vista, tirada da malha em JavaScript, sem navegador.","tipo":"uso","aparece":[".claude/skills/criar-peca/SKILL.md",".claude/skills/laco-de-modelagem/parte-por-parte.md","docs/modelar/usar/ATIVACAO-BANCADA-SESSAO-ATIVA.md"]},
     {"arquivo":"tools/modelar/vistas-da-receita.mjs","comandos":[],"faz":"A folha de seis vistas de uma receita .js do acervo, cada parte com uma cor, para olhar a forma e a divisão em partes.","tipo":"interna"},
-    {"arquivo":"tools/modelar/vistas-de-passos.mjs","comandos":[],"faz":"A folha de seis vistas de um objeto convertido do esboço em receita do Modelar, para conferir o que a conversão e os ajustes fizeram.","tipo":"interna"},
     {"arquivo":"tools/modelar/vistas-de-superficie.mjs","comandos":["vistas:superficie"],"faz":"A luz rasante e a curvatura da lataria de uma peça, e a conferência de que o pacote do crítico as trouxe.","tipo":"uso","aparece":["docs/modelar/blender/REGUA-E-PACOTE-CEGO.md","docs/modelar/guias/modelar-carroceria.md","docs/modelar/guias/modelar-veiculos.md"]},
     {"arquivo":"tools/modelar/vistas-para-critica.mjs","comandos":["vistas:critica"],"faz":"Monta, numa chamada, o pacote que a crítica visual precisa receber.","tipo":"uso","aparece":[".claude/agents/modelador.md",".claude/skills/contorno-da-imagem/SKILL.md",".claude/skills/criar-peca/SKILL.md"]},
     {"arquivo":"tools/modelar/vistas-texturizadas.mjs","comandos":[],"faz":"Captura três vistas de uma peça com a textura que a exportação OBJ gera, para julgar o acabamento.","tipo":"interna"},
@@ -206,6 +204,7 @@
       "tools/modelar/fixtures/contatos/fixture-forma-anel-quebrada.js",
       "tools/modelar/fixtures/contatos/fixture-parte-engolida.js"
     ]},
+    {"arquivo":"tools/modelar/exportar-peca.mjs","motivo":"decisão da pessoa em 2026-11-26: fica a exportação (exportarPeca), que só os testes usam; a metade de publicação espera a pessoa dizer se o produto que lê o formato ainda existe"},
     {"arquivo":"tools/modelar/fonte-sintetica.mjs"},
     {"arquivo":"tools/modelar/guardas/etapas-do-acervo.mjs"},
     {"arquivo":"tools/modelar/medir-importar-receita.mjs"},
@@ -244,11 +243,9 @@
       "tools/blender/regua.py",
       "tools/blender/simetria-das-vistas.py"
     ]},
-    {"arquivo":"tools/modelar/cadeiras-medida.mjs","motivo":"a decisão de 2026-11-26 era apagar e parou: o teste da família cadeira (procedural/familias/cadeira/cadeira.test.mjs) importa ALVOS e compararPerfil dele; espera a pessoa"},
     {"arquivo":"tools/modelar/conferir-retrato-do-acervo.mjs","motivo":"à espera da decisão da pessoa (apagar ou religar)"},
     {"arquivo":"tools/modelar/derivar-campanha-revalidacao.mjs","motivo":"à espera da decisão da pessoa (apagar ou religar)"},
-    {"arquivo":"tools/modelar/exportar-peca.mjs","motivo":"conferido contra o contrato de arquitetura em 2026-11-26 sem mudança: a função exportarPeca serve a quatro testes, e a metade de publicação não tem comando nem gate; espera a pessoa"},
-    {"arquivo":"tools/modelar/familia-com-esboco.mjs","motivo":"a decisão de 2026-11-26 era apagar e parou: o contrato da família (docs/modelar/contratos/CONTRATO-DA-FAMILIA.md) o descreve como o adaptador da conferência com o esboço; espera a pessoa"},
+    {"arquivo":"tools/modelar/familia-com-esboco.mjs","motivo":"fica pela decisão da pessoa em 2026-11-26: o contrato da família (docs/modelar/contratos/CONTRATO-DA-FAMILIA.md) o descreve como o adaptador da conferência com o esboço, e tirá-lo muda o contrato e pede plano próprio"},
     {"arquivo":"tools/modelar/visor-montagem.js","motivo":"carregado por caminho calculado: a página visor-montagem.html, que a captura de montagem abre, o carrega","por":"tools/modelar/capturar-montagem.mjs"}
   ]
 }

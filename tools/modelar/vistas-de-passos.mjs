@@ -1,21 +1,10 @@
-#!/usr/bin/env node
-/* vistas-de-passos.mjs — a folha de seis vistas de um objeto convertido do esboço em receita do Modelar, para conferir o que a conversão e os ajustes fizeram.
+/* vistas-de-passos.mjs — o rasterizador das vistas de uma malha, com profundidade por pixel e contorno entre as partes.
 
-   Uso: node tools/modelar/vistas-de-passos.mjs <receita.json | esboco.json> [--alinhar] [--ajustes <ajustes.json>] [--saida <pasta>]
-
-   A entrada é a receita do externo já expandida (`pecas`, convertida por `receita-externa.mjs`) ou um esboço (`opcoes`). A conversão é a de
-   `esboco-para-passos.mjs`, com o alinhamento das caixas e os ajustes da pessoa se pedidos. Escreve em `<saida>/<id>.png` as vistas isométricas
-   (frente-direita, trás-esquerda, frente-esquerda), frontal, lateral direita e superior, cada peça com uma cor e a legenda dos nomes, e em
-   `<saida>/<id>.pecas.txt` a caixa envolvente de cada peça. Quadro: x para a direita, y para cima, z para a frente; em cada vista, a direita da
-   tela é a direita de quem olha. Imprime os pares de caixas retas que se atravessam, separados em embutidos (uma dentro da outra, que não aparecem)
-   e passantes (a peça cruza a outra de lado a lado). Precisa do Chromium do Playwright. */
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { basename, join, resolve } from 'node:path';
-import { pathToFileURL } from 'node:url';
+   Só módulo, sem linha de comando: `rasterDaVista` devolve os buffers de uma vista, `quadroDaVista` devolve o quadro em PNG embutido para uma
+   folha em HTML, e `VISTAS` são as seis vistas (três isométricas, frontal, lateral direita e superior). Usam-no `folha-comparativa.mjs` e
+   `vistas-da-receita.mjs`. Quadro: x para a direita, y para cima, z para a frente; em cada vista, a direita da tela é a direita de quem olha.
+   A folha do objeto convertido do esboço antigo e a linha de comando saíram em 2026-11-26, junto com a conversão. */
 import { PNG } from 'pngjs';
-import { executarReceita } from '../../src/autoria/executar-receita.js';
-import { passosDoEsboco } from './esboco-para-passos.mjs';
-import { receitaParaEsboco } from './receita-externa.mjs';
 
 const dot = (a, b) => a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
 const cruz = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
@@ -87,74 +76,4 @@ export function quadroDaVista(polis, indice, vista, W, H) {
   for (let i = 0; i < w * h; i += 1) { png.data[i * 4] = rgb[i * 3]; png.data[i * 4 + 1] = rgb[i * 3 + 1]; png.data[i * 4 + 2] = rgb[i * 3 + 2]; png.data[i * 4 + 3] = 255; }
   const uri = `data:image/png;base64,${PNG.sync.write(png).toString('base64')}`;
   return `<div class="q"><img src="${uri}" width="${W}" height="${H}"><div class="t">${rotulo}</div></div>`;
-}
-
-const identidade = (m) => m.every((l, i) => l.every((v, j) => Math.abs(v - (i === j ? 1 : 0)) < 1e-9));
-
-/** Os pares de caixas retas que se atravessam mais de 1 mm, em embutidos e passantes. */
-export function contatosDasCaixas(formas) {
-  const retas = formas.filter((f) => f.tipo === 'caixa' && identidade(f.geometria.matriz));
-  const embutidos = []; const passantes = [];
-  for (let i = 0; i < retas.length; i += 1) for (let j = i + 1; j < retas.length; j += 1) {
-    const a = retas[i].geometria.caixa; const b = retas[j].geometria.caixa;
-    const ov = [0, 1, 2].map((k) => Math.min(a.max[k], b.max[k]) - Math.max(a.min[k], b.min[k]));
-    if (ov.some((v) => v <= 0.01)) continue;
-    const pen = Math.min(...ov);
-    if (pen <= 1) continue;
-    const dentro = (p, q) => [0, 1, 2].every((k) => p.min[k] >= q.min[k] - 3 && p.max[k] <= q.max[k] + 3);
-    const k = ov.indexOf(pen);
-    const passa = (p, q) => p.min[k] < q.min[k] - 3 && p.max[k] > q.max[k] + 3;
-    const par = { a: retas[i].id, b: retas[j].id, eixo: 'xyz'[k], mm: Math.round(pen * 10) / 10 };
-    if (dentro(a, b) || dentro(b, a) || !(passa(a, b) || passa(b, a))) embutidos.push(par); else passantes.push(par);
-  }
-  return { embutidos, passantes };
-}
-
-export async function gerarFolha(entrada, { alinhar = false, ajustes = [], saida, nome }) {
-  const { chromium } = await import('playwright');
-  const traducao = entrada.pecas ? receitaParaEsboco(entrada) : { esboco: entrada, recusas: [] };
-  const esboco = traducao.esboco;
-  const id = nome ?? entrada.id ?? 'objeto';
-  const r = passosDoEsboco(esboco, { alinhar, ajustes });
-  const { neutro } = executarReceita({ meta: { nome: id }, PASSOS: r.passos });
-  let polis = [...neutro.F.values()].map((fc) => ({ p: fc.vs.map((v) => neutro.V.get(v).map((x) => x * 1000)), parte: fc.parte }));
-  let vol = 0; for (const { p } of polis) vol += dot(area(p), p[0]);
-  if (vol < 0) polis = polis.map(({ p, parte }) => ({ p: [...p].reverse(), parte }));
-  const indice = new Map(r.partes.map((p, i) => [p, i]));
-  const W = 620; const H = 620;
-  const legenda = r.partes.map((p, i) => `<span class="l"><i style="background:${corDe(i, 1)}"></i>${p}</span>`).join('');
-  const html = `<html><body style="margin:0;background:#f4f2ee;font-family:sans-serif"><div style="padding:8px 12px;font-size:18px"><b>${id}</b> — ${r.partes.length} peças (cada peça com uma cor; x para a direita, y para cima, z para a frente)</div><div style="padding:0 12px 6px">${legenda}</div><div style="display:grid;grid-template-columns:repeat(3,${W}px)">${VISTAS.map((v) => quadroDaVista(polis, indice, v, W, H)).join('')}</div><style>.q{border:1px solid #ddd;position:relative}.t{position:absolute;left:8px;top:6px;font-size:15px;background:#fffd;padding:2px 6px}.l{display:inline-block;margin:2px 10px 2px 0;font-size:13px}.l i{display:inline-block;width:12px;height:12px;margin-right:4px;vertical-align:-2px;border:1px solid #333}</style></body></html>`;
-  mkdirSync(saida, { recursive: true });
-  const navegador = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM ?? '/opt/pw-browsers/chromium' }).catch(() => chromium.launch());
-  const pg = await navegador.newPage({ viewport: { width: 3 * W, height: 2 * H + 140 } });
-  await pg.setContent(html); await pg.screenshot({ path: join(saida, `${id}.png`), fullPage: true }); await navegador.close();
-  const linhas = r.dados.formas.map((f) => { const c = f.geometria.caixa; const girada = !identidade(f.geometria.matriz); return `${f.id}\t${f.tipo}${girada ? ' (girada)' : ''}\tx ${c.min[0].toFixed(0)}..${c.max[0].toFixed(0)}\ty ${c.min[1].toFixed(0)}..${c.max[1].toFixed(0)}\tz ${c.min[2].toFixed(0)}..${c.max[2].toFixed(0)}`; });
-  writeFileSync(join(saida, `${id}.pecas.txt`), `Peças de ${id} (milímetro; caixa envolvente de cada peça; x direita, y cima, z frente):\n${linhas.join('\n')}\n`);
-  return { ...r, contatos: contatosDasCaixas(r.dados.formas), id, recusasDaTraducao: traducao.recusas };
-}
-
-const AJUDA = `node tools/modelar/vistas-de-passos.mjs <receita.json | esboco.json> [opções]
-Converte a receita do externo (ou um esboço) em passos e escreve a folha de seis vistas de cada peça, mais a caixa envolvente de cada uma.
-
-  --alinhar              alinha as caixas antes de desenhar (passos de esboco-alinhar-caixas)
-  --ajustes <arquivo>    ajustes da pessoa, em JSON, aplicados na conversão
-  --saida <pasta>        onde escrever <id>.png e <id>.pecas.txt (padrão: a pasta atual)
-  --ajuda                esta mensagem
-
-Imprime o número de peças, as recusadas e os pares de caixas que se atravessam (embutidos e passantes). Precisa do Chromium do Playwright.
-`;
-
-if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
-  const args = process.argv.slice(2);
-  if (args.includes('--ajuda')) { process.stdout.write(AJUDA); process.exit(0); }
-  const arquivo = args.find((a) => !a.startsWith('--') && args[args.indexOf(a) - 1] !== '--ajustes' && args[args.indexOf(a) - 1] !== '--saida');
-  if (!arquivo) { console.error('uso: node tools/modelar/vistas-de-passos.mjs <receita.json | esboco.json> [--alinhar] [--ajustes <ajustes.json>] [--saida <pasta>]'); process.exit(2); }
-  const valor = (flag) => { const i = args.indexOf(flag); return i >= 0 ? args[i + 1] : null; };
-  const entrada = JSON.parse(readFileSync(arquivo, 'utf8'));
-  const ajustes = valor('--ajustes') ? JSON.parse(readFileSync(valor('--ajustes'), 'utf8')) : [];
-  const r = await gerarFolha(entrada, { alinhar: args.includes('--alinhar'), ajustes, saida: valor('--saida') ?? '.', nome: entrada.id ?? basename(arquivo).replace(/\..*$/, '') });
-  console.log(`${r.id}: ${r.partes.length} peças, ${r.recusas.length} recusadas, ${r.alteracoes.length} alterações do alinhamento, ${ajustes.length} ajustes`);
-  for (const q of r.recusasDaTraducao) console.log(`  PEÇA FORA DA FOLHA: ${q.peca} (${q.motivo ?? q.aviso})`);
-  console.log(`atravessam embutidos: ${r.contatos.embutidos.length}; passantes: ${r.contatos.passantes.length}`);
-  for (const p of r.contatos.passantes) console.log(`  passante: ${p.a} / ${p.b} (${p.eixo}, ${p.mm} mm)`);
 }
