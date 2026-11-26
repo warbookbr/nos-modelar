@@ -1705,7 +1705,7 @@ Captura a peça ou montagem na bancada, sem interface.
   --res=<px>             largura da imagem (padrão 1280)
   --espera=<ms>          espera depois de carregar (padrão 1200)
   --prazo=<s>            prazo de carga da peça por tentativa, também na --analise (padrão 90; peça pesada pede mais)
-  --saida=<pasta>        pasta relativa dentro do repositório (padrão tools/bancadas/out/)
+  --saida=<pasta>        pasta relativa dentro do repositório (padrão tools/bancadas/out/); com --analise, as imagens vão para <pasta>/analise-<peça>/
   --sobrescrever         com --saida: apaga a pasta e a refaz, se ela foi criada pela bancada (o arquivo ${MARCADOR_DA_SAIDA} dentro dela); recusa, dizendo o caminho, a pasta que a bancada não criou; sem ele, imagem já existente na --saida é recusada
   --relatorio=<arquivo>  grava o relatório da rodada em JSON
   --revisar              o conjunto de vistas da revisão

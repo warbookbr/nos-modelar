@@ -222,3 +222,17 @@ segunda: num rebaixo girado, o modo plano falha a casca e o modo por fatias
 deixa os vértices do canto do fundo a 22% a 41% do raio do eixo esperado; o
 passo grita quando sobra lasca, e os raios que passam mudam a contagem de
 faces de dezenas para milhares de um valor para o vizinho.
+
+## `lathe`, extrusão, `moveV`, `unir` e `loft`: cinco pontos que não dão erro
+
+Cada ponto abaixo foi descoberto modelando peças; os quatro primeiros foram conferidos no motor em 2026-11-25, e o do `loft` segue a ficha da operação. Em nenhum deles a receita recusa, e a forma sai diferente da pedida.
+
+O sentido do perfil do `lathe` é o do eixo y crescente: a face sai com a normal para fora quando o perfil sobe, do ponto de baixo ao de cima. O perfil escrito de cima para baixo é aceito sem aviso e entrega o sólido ao avesso, com as normais para dentro: o mesmo cilindro com os pontos em ordem inversa tem volume assinado de menos 3,00 em vez de mais 3,00, a malha continua fechada e sem órfão, e só a luz, a contenção de ponto e as booleanas denunciam. O conserto é reescrever o perfil começando pela ponta de baixo.
+
+O `unir` consome as faces do encontro, e a `parte` do resultado cita a origem do próprio `unir`, `{ origem: { op: 'unir', id } }`, e não as dos sólidos de entrada. Dois cubos de 2 unidades, o segundo transladado em [1, 1, 0] e unidos, dão 15 faces: `{ op: 'unir', id }` seleciona todas, e `{ op: 'cubo', id: 1 }` só 6, deixando as outras 9 sem parte e sem órfão. Quando o material ou a parte de cada sólido precisa ser diferente, a seleção vem antes do `unir` e só vale para as faces que a união não corta.
+
+Com `origem` e `regiao` na mesma seleção, as duas se unem, e não se cruzam. Para o `moveV`, que exige um vértice só, `{ origem: { op: 'cubo', id: 1 }, regiao: { min, max } }` resolve para os oito vértices do cubo mais os da região, e o passo fica órfão com "exige exatamente um vértice em sel, e resolveu 8". Quem quer a região dentro de um sólido escreve só a `regiao`, pequena em volta do canto, e confere que ela não toca outro sólido.
+
+A extrusão com `eixo: 'z'` leva o v do perfil para menos y: o perfil `[[0, 0], [1, 0], [1, 2], [0, 2]]` extrudado em 3 sai com x de 0 a 1, y de menos 2 a 0 e z de 0 a 3. Com `eixo: 'x'` o u do perfil vai para menos y e o v para z, e no eixo padrão (y) u fica em x e v em z. Uma peça desenhada em xy e extrudada em z sai espelhada em y; o conserto é negar o v do perfil ou transladar a peça pelo tamanho dele.
+
+O polo do `loft` é uma seção da lista, e não um acabamento das que já estavam lá: um loft de três anéis visíveis fechado nas duas pontas leva cinco seções, com `raio: 0` na primeira e na última. Quem conta as estações sem os polos entrega um anel a menos, e a ponta fecha antes da posição prevista.

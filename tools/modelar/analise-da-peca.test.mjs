@@ -43,6 +43,20 @@ describe('analisarPeca', () => {
     expect(r.arquivos.at(-1).replaceAll('\\', '/')).toBe(`${PASTA}/manifesto.json`);
   });
 
+  it('duas peças analisadas na mesma --saida ficam cada uma na sua subpasta, e a segunda não apaga as imagens da primeira', async () => {
+    const saida = 'tools/bancadas/out/teste-analise-duas-pecas';
+    try {
+      const a = await analisarPeca({ peca: 'peca-a', saida, olhar: olharFalso([]) });
+      const b = await analisarPeca({ peca: 'peca-b', saida, olhar: olharFalso([]) });
+      expect(a.ok && b.ok).toBe(true);
+      for (const nome of ['peca-a', 'peca-b']) {
+        const manifesto = JSON.parse(readFileSync(join(REPO, saida, `analise-${nome}`, 'manifesto.json'), 'utf8'));
+        expect(manifesto.arquivos.length).toBeGreaterThan(0);
+        expect(manifesto.arquivos.every((f) => existsSync(join(REPO, f)))).toBe(true);
+      }
+    } finally { rmSync(join(REPO, saida), { recursive: true, force: true }); }
+  });
+
   it('leva o prazo de carga pedido a cada captura, e sem pedido deixa o padrão da bancada', async () => {
     const comPrazo = [];
     await analisarPeca({ peca: PECA, parte: 'corpo', olhar: olharFalso(comPrazo), prazoDeCargaMs: 600_000 });
