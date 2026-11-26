@@ -4,7 +4,7 @@
 
 **Núcleo:** não
 
-**Território:** `.github/workflows/`, `.github/actions/`, `tools/ci/`, `tools/gates.mjs`, `tools/mapa/planos.mjs`, `tools/mapa/planos.test.mjs`, `tools/mapa/mapa.mjs`, `tools/mapa/mapa.test.mjs`, `docs/MAPA.md`, `tools/reguas-de-texto/`, `docs/modelar/banco-de-provas/processo-e-ci-2026-11-26/`. O teto de tempo dos testes mora no arquivo dos testes lentos, que é do plano do resgate dos ramos antigos: a mudança dele é empréstimo pedido a esse plano, ou espera o fechamento dele.
+**Território:** `.github/workflows/`, `.github/actions/`, `tools/ci/`, `docs/modelar/MECANISMOS.md`, `tools/gates.mjs`, `tools/mapa/planos.mjs`, `tools/mapa/planos.test.mjs`, `tools/mapa/mapa.mjs`, `tools/mapa/mapa.test.mjs`, `docs/MAPA.md`, `tools/reguas-de-texto/`, `docs/modelar/banco-de-provas/processo-e-ci-2026-11-26/`. O teto de tempo dos testes mora no arquivo dos testes lentos, que é do plano do resgate dos ramos antigos: a mudança dele é empréstimo pedido a esse plano, ou espera o fechamento dele.
 
 Ativado pela pessoa em 2026-11-26, com as recomendações 1 a 4 e 9 da análise do projeto ("1 a 10 aprovadas") e a regra nova do limite de planos de núcleo ("Sim, pode seguir com suas recomendações").
 
