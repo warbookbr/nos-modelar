@@ -54,6 +54,7 @@ export const TABELA = {
   faixa_espessura: 8,
   faixa_y_alta: 370, /* eixo da faixa junto ao pé: a face de cima toca o aro superior em y 375 */
   faixa_y_baixa: 345,
+  faixa_vao_meio: 40, /* folga entre as duas faixas de cada lado longo, no meio da mesa: cada faixa termina a metade disso do centro */
   faixa_degrau_x: 25, /* comprimento do trecho inclinado, em x */
   alca_altura: 30,
   alca_espessura: 8,
@@ -157,7 +158,7 @@ export function derivar(T) {
     [capitelFaceX, T.faixa_y_alta],
     [capitelFaceX - 6, T.faixa_y_alta],
     [capitelFaceX - 6 - T.faixa_degrau_x, T.faixa_y_baixa],
-    [0, T.faixa_y_baixa],
+    [T.faixa_vao_meio / 2, T.faixa_y_baixa],
   ];
   const faixas = [];
   const zFaixa0 = aroSupRaio - T.faixa_espessura; /* a faixa ocupa a espessura do aro superior, logo abaixo dele */
