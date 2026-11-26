@@ -1,0 +1,362 @@
+{
+  "formato": "mecanifica.andaime-global@2",
+  "id": "braco-de-prova",
+  "objetivo": "esqueleto-braco-de-prova",
+  "alvo": "alvo-braco-de-prova",
+  "familia": "humanoide",
+  "intencao": "Braço de prova de duas juntas com mão e o espelho esquerdo, na pose zero (braços pendentes).",
+  "unidade": "mm",
+  "eixos": {
+    "direita": "+x",
+    "cima": "+y",
+    "frente": "+z"
+  },
+  "envelope": {
+    "min": [
+      -240,
+      822,
+      -70
+    ],
+    "max": [
+      240,
+      1470,
+      70
+    ]
+  },
+  "landmarks": [
+    {
+      "id": "junta-tronco",
+      "posicao": [
+        0,
+        1400,
+        0
+      ]
+    },
+    {
+      "id": "junta-ombro-direito",
+      "posicao": [
+        200,
+        1400,
+        0
+      ]
+    },
+    {
+      "id": "junta-cotovelo-direito",
+      "posicao": [
+        200,
+        1100,
+        0
+      ]
+    },
+    {
+      "id": "junta-mao-direito",
+      "posicao": [
+        200,
+        850,
+        0
+      ]
+    },
+    {
+      "id": "junta-ombro-esquerdo",
+      "posicao": [
+        -200,
+        1400,
+        0
+      ]
+    },
+    {
+      "id": "junta-cotovelo-esquerdo",
+      "posicao": [
+        -200,
+        1100,
+        0
+      ]
+    },
+    {
+      "id": "junta-mao-esquerdo",
+      "posicao": [
+        -200,
+        850,
+        0
+      ]
+    }
+  ],
+  "volumes": [
+    {
+      "id": "bola-tronco",
+      "regioes": [
+        "tronco"
+      ],
+      "tipo": "esfera",
+      "centro": [
+        0,
+        1400,
+        0
+      ],
+      "raio": 70,
+      "segmentos": 16
+    },
+    {
+      "id": "bola-ombro-direito",
+      "regioes": [
+        "ombro-direito"
+      ],
+      "tipo": "esfera",
+      "centro": [
+        200,
+        1400,
+        0
+      ],
+      "raio": 40,
+      "segmentos": 16
+    },
+    {
+      "id": "bastao-ombro-direito",
+      "regioes": [
+        "ombro-direito"
+      ],
+      "tipo": "cilindro",
+      "centro": [
+        100,
+        1400,
+        0
+      ],
+      "eixo": "x",
+      "raio": 22,
+      "comprimento": 200,
+      "segmentos": 24
+    },
+    {
+      "id": "bola-cotovelo-direito",
+      "regioes": [
+        "cotovelo-direito"
+      ],
+      "tipo": "esfera",
+      "centro": [
+        200,
+        1100,
+        0
+      ],
+      "raio": 32,
+      "segmentos": 16
+    },
+    {
+      "id": "bastao-cotovelo-direito",
+      "regioes": [
+        "cotovelo-direito"
+      ],
+      "tipo": "cilindro",
+      "centro": [
+        200,
+        1250,
+        0
+      ],
+      "eixo": "y",
+      "raio": 22,
+      "comprimento": 300,
+      "segmentos": 24
+    },
+    {
+      "id": "bola-mao-direito",
+      "regioes": [
+        "mao-direito"
+      ],
+      "tipo": "esfera",
+      "centro": [
+        200,
+        850,
+        0
+      ],
+      "raio": 28,
+      "segmentos": 16
+    },
+    {
+      "id": "bastao-mao-direito",
+      "regioes": [
+        "mao-direito"
+      ],
+      "tipo": "cilindro",
+      "centro": [
+        200,
+        975,
+        0
+      ],
+      "eixo": "y",
+      "raio": 18,
+      "comprimento": 250,
+      "segmentos": 24
+    },
+    {
+      "id": "bola-ombro-esquerdo",
+      "regioes": [
+        "ombro-esquerdo"
+      ],
+      "tipo": "esfera",
+      "centro": [
+        -200,
+        1400,
+        0
+      ],
+      "raio": 40,
+      "segmentos": 16
+    },
+    {
+      "id": "bastao-ombro-esquerdo",
+      "regioes": [
+        "ombro-esquerdo"
+      ],
+      "tipo": "cilindro",
+      "centro": [
+        -100,
+        1400,
+        0
+      ],
+      "eixo": "x",
+      "raio": 22,
+      "comprimento": 200,
+      "segmentos": 24
+    },
+    {
+      "id": "bola-cotovelo-esquerdo",
+      "regioes": [
+        "cotovelo-esquerdo"
+      ],
+      "tipo": "esfera",
+      "centro": [
+        -200,
+        1100,
+        0
+      ],
+      "raio": 32,
+      "segmentos": 16
+    },
+    {
+      "id": "bastao-cotovelo-esquerdo",
+      "regioes": [
+        "cotovelo-esquerdo"
+      ],
+      "tipo": "cilindro",
+      "centro": [
+        -200,
+        1250,
+        0
+      ],
+      "eixo": "y",
+      "raio": 22,
+      "comprimento": 300,
+      "segmentos": 24
+    },
+    {
+      "id": "bola-mao-esquerdo",
+      "regioes": [
+        "mao-esquerdo"
+      ],
+      "tipo": "esfera",
+      "centro": [
+        -200,
+        850,
+        0
+      ],
+      "raio": 28,
+      "segmentos": 16
+    },
+    {
+      "id": "bastao-mao-esquerdo",
+      "regioes": [
+        "mao-esquerdo"
+      ],
+      "tipo": "cilindro",
+      "centro": [
+        -200,
+        975,
+        0
+      ],
+      "eixo": "y",
+      "raio": 18,
+      "comprimento": 250,
+      "segmentos": 24
+    }
+  ],
+  "portas": [
+    {
+      "id": "porta-ombro-direito",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          1,
+          0,
+          0
+        ],
+        "centro": [
+          200,
+          1400,
+          0
+        ],
+        "raio": 22,
+        "inicio": -40,
+        "fim": 40
+      }
+    },
+    {
+      "id": "porta-cotovelo-direito",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          1,
+          0,
+          0
+        ],
+        "centro": [
+          200,
+          1100,
+          0
+        ],
+        "raio": 22,
+        "inicio": -32,
+        "fim": 32
+      }
+    },
+    {
+      "id": "porta-ombro-esquerdo",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          1,
+          0,
+          0
+        ],
+        "centro": [
+          -200,
+          1400,
+          0
+        ],
+        "raio": 22,
+        "inicio": -40,
+        "fim": 40
+      }
+    },
+    {
+      "id": "porta-cotovelo-esquerdo",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          1,
+          0,
+          0
+        ],
+        "centro": [
+          -200,
+          1100,
+          0
+        ],
+        "raio": 22,
+        "inicio": -32,
+        "fim": 32
+      }
+    }
+  ]
+}

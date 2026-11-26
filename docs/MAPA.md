@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2439 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2441 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -4107,6 +4107,8 @@
 - `esboco-nucleo.mjs` — esboco-nucleo.mjs — o esboço 2.0: as opções de forma de um esboço saem das operações do núcleo, cada uma montada como receita em memória e capturada na banca…
 - `esboco-para-passos.mjs` — esboco-para-passos.mjs — converte as formas de um esboço em passos de uma receita do Modelar (`cubo`, `chamferBox`, `cilindro`, `extrusao`, `rotaciona` e `pa…
 - `esboco-para-passos.test.mjs` — A conversão do esboço em passos de receita: as onze cadeiras escolhidas (receitas do externo traduzidas em esboço) convertem sem recusa, e a malha que o núcl…
+- `esqueleto.mjs` — esqueleto.mjs — o esqueleto de proporção de um robô como árvore de juntas, e o andaime e as articulações gerados dela.
+- `esqueleto.test.mjs` — esqueleto.test.mjs — a árvore de juntas: recusas com campo e conserto, determinismo, propagação de medida, o andaime no normalizador de forma-global e a conf…
 - `estado-bancada.test.ts` — estado-bancada.test.ts — contrato headless das vistas, seleção, contexto e URL da bancada.
 - `estudo-campo-revalidacao.test.ts` — R05: estudo de campo sobre uma peça compartilhada em duas raízes.
 - `etapas-consumidores-v3.test.mjs` — etapas-consumidores-v3.test.mjs — cada consumidor do estado das etapas, de ponta a ponta, sobre um registro v3 em disco. A pasta de prova é uma cópia do `car…

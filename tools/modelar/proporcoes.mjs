@@ -9,6 +9,7 @@
  *             nomes, + - * / e parênteses). A escala de referência (a altura total, por exemplo) é uma medida como as outras.
  *   andaime   `arquivo` e `modelo`: o `andaime.json` (forma-global N2) escrito com fórmulas no lugar dos números que dependem de
  *             medida ("=alturaDoOmbro - comprimentoDoBraco"). O arquivo do andaime é GERADO daqui, volumes e portas.
+ *   esqueleto árvore de juntas (ver esqueleto.mjs): o andaime e as articulações dela também são conferidos e escritos aqui.
  *   receitas  pastas varridas atrás de linhas `chave: 330, // @proporcao nomeDaMedida`: o número daquela linha é o valor da medida.
  *             A receita continua lendo a sua TABELA de sempre; a TABELA é que é escrita daqui, e não o contrário.
  *
@@ -23,6 +24,7 @@ import { existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { lerArgumentos } from './argumentos.mjs';
+import { conferirEsqueleto, escreverEsqueleto } from './esqueleto.mjs';
 
 export const FORMATO_DAS_PROPORCOES = 'mecanifica.proporcoes@1';
 const CASAS = 6;
@@ -182,7 +184,7 @@ export function ligacoesDasReceitas(doc, base) {
   return ligacoes;
 }
 
-function primeiraDiferenca(a, b, onde = '') {
+export function primeiraDiferenca(a, b, onde = '') {
   if (typeof a === 'number' && typeof b === 'number') return Math.abs(a - b) <= TOLERANCIA ? null : { onde, recebido: a, esperado: b };
   if (Array.isArray(a) && Array.isArray(b)) {
     if (a.length !== b.length) return { onde: `${onde}.length`, recebido: a.length, esperado: b.length };
@@ -224,6 +226,7 @@ export function conferirProporcoes(caminho) {
       divergencias.push({ lugar, mensagem: new ErroDasProporcoes(`${lugar}: ${l.chave} = ${l.valor}`, `${medidas[l.medida]}, o valor de '${l.medida}'`, comando).message });
     }
   }
+  divergencias.push(...conferirEsqueleto(caminho, doc));
   return divergencias;
 }
 
@@ -259,6 +262,7 @@ export function escreverProporcoes(caminho) {
     }
     if (alterou) { writeFileSync(arquivo, linhas.join('\n')); mudou.push(caminhoCurto(relative(base, arquivo))); }
   }
+  mudou.push(...escreverEsqueleto(caminho, doc));
   return mudou;
 }
 

@@ -1,0 +1,121 @@
+{
+  "nota": "Gerado de esqueleto.juntas em proporcoes.json por npm run esqueleto (braco-de-prova). Não edite à mão. Fixo é a própria junta, móvel é a primeira filha e acompanham é o resto do que pende dela.",
+  "articulacoes": [
+    {
+      "id": "ombro-direito",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "ombro-direito"
+        ],
+        "porta": "porta-ombro-direito"
+      },
+      "movel": {
+        "caminho": [
+          "cotovelo-direito"
+        ],
+        "porta": "porta-ombro-direito"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": -60,
+        "maximo": 180
+      },
+      "passos": 48,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": [
+        [
+          "mao-direito"
+        ]
+      ]
+    },
+    {
+      "id": "cotovelo-direito",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "cotovelo-direito"
+        ],
+        "porta": "porta-cotovelo-direito"
+      },
+      "movel": {
+        "caminho": [
+          "mao-direito"
+        ],
+        "porta": "porta-cotovelo-direito"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": 0,
+        "maximo": 140
+      },
+      "passos": 28,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": []
+    },
+    {
+      "id": "ombro-esquerdo",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "ombro-esquerdo"
+        ],
+        "porta": "porta-ombro-esquerdo"
+      },
+      "movel": {
+        "caminho": [
+          "cotovelo-esquerdo"
+        ],
+        "porta": "porta-ombro-esquerdo"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": -60,
+        "maximo": 180
+      },
+      "passos": 48,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": [
+        [
+          "mao-esquerdo"
+        ]
+      ]
+    },
+    {
+      "id": "cotovelo-esquerdo",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "cotovelo-esquerdo"
+        ],
+        "porta": "porta-cotovelo-esquerdo"
+      },
+      "movel": {
+        "caminho": [
+          "mao-esquerdo"
+        ],
+        "porta": "porta-cotovelo-esquerdo"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": 0,
+        "maximo": 140
+      },
+      "passos": 28,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": []
+    }
+  ]
+}
