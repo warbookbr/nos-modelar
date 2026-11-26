@@ -1,0 +1,8 @@
+{
+  "objeto": "Roda de prova com duas variantes de raio",
+  "referencias": ["ref/variante-a.jpg", "ref/variante-b.jpg", "ref/alvo.md"],
+  "escala": { "medida": "diametro", "milimetros": 400 },
+  "partes": [{ "nome": "aro", "forma": "aro cilindrico com friso", "tecnica": "revolucao" }],
+  "criteriosDeReprovacao": ["o aro precisa ter o friso da variante construida"],
+  "referenciasNaoConstruidas": ["ref/variante-b.jpg"]
+}

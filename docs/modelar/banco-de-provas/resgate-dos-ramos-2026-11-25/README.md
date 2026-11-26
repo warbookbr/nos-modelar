@@ -1,6 +1,6 @@
 # Resgate dos ramos antigos: o inventário de 2026-11-25
 
-Evidência do plano [resgate dos ramos antigos](../../planos/2026-11-25-resgate-dos-ramos-antigos.md). Cada item dos ramos que não entraram na main foi comparado com a main de 2026-11-25 (692ba0d8a); as receitas e o código dos ramos rodaram em memória contra o núcleo de hoje, sem gravar nada.
+Evidência do plano [resgate dos ramos antigos](../../decisoes/PLANOS-ENCERRADOS.md). Cada item dos ramos que não entraram na main foi comparado com a main de 2026-11-25 (692ba0d8a); as receitas e o código dos ramos rodaram em memória contra o núcleo de hoje, sem gravar nada.
 
 ## Por que ficaram para trás
 
@@ -35,3 +35,11 @@ As seis automotivas sem aprovação e as três mesas voltaram com a categoria e 
 ## Fatia 3, 2026-11-26
 
 A análise da bancada numa `--saida` escolhida grava em `<saida>/analise-<peça>/`, e a segunda peça na mesma pasta deixa de apagar as imagens da primeira (teste em `analise-da-peca.test.mjs`). As quatro armadilhas e o polo do loft entraram em `docs/modelar/usar/GOTCHAS-POR-OPERACAO.md`. Em `src/autoria/descrever-partes.js`, quando a caixa diz que duas partes se interpenetram e a parte inteira dá `interpenetram`, `inconclusivo` ou `separadas`, a relação é refeita corpo a corpo, só nos pares de corpos cujas caixas se tocam; o corpo aberto longe da outra parte deixa de tornar o par inconclusivo, e o corpo que fica inteiro dentro de dois corpos sobrepostos da outra parte deixa de sair como separado (seis testes em `descrever-partes.test.mjs`). No acervo, comparado antes e depois em todas as relações cuja caixa interpenetra, nenhuma relação nem veredito mudou; oito relações inconclusivas do braço robótico e da lataria do carro passam a dizer o motivo de corpo. Refazer também o `encostam` mudaria três relações para interpenetração (a base do braço robótico, `hs1|placa`, e o telhado da instalação solar, `telhasAltas|vigas` e `telhasBaixas|vigas`), e isso vai ao backlog para conferir na bancada se é interpenetração de fato.
+
+## Fatia 6, 2026-11-26
+
+O caso que reproduz o defeito na main de hoje: cubo de lado 2 menos um cilindro de 8 lados, raio 0,6, eixo x, que atravessa o cubo, e depois `['parte', { nome: 'p', sel: { origem: { op: 'cubo', id: 1, face: 'direita' } } }]`. A parte pega 1 face e área 0,8151, de uma tampa de 2,9818. Com o redesenho (`origem-dos-pedacos-refeitos.patch`, nesta pasta), pega 9 faces e área 2,9818, e o retrato do acervo saiu igual nas 145 peças em 577 s. A revisão adversarial barrou a junção: a origem `costura` da própria booleana passa de 24 para 26 faces no mesmo caso, e de 760 para 766 no nó de tubos com cordão (`passosDoCordao('T reto 17/8', 3)`, `unir` id 201); um `furo` com `de` na face direita cortada passa a recusar com "região com buraco não entra"; e no mesmo nó de tubos 24 faces-mãe absorvidas pelo refino da costura levam 332 pedaços vivos calados. O item foi ao backlog.
+
+## Fatia 7 e 8, 2026-11-26
+
+A roda esportiva executa no núcleo de hoje (guarda do acervo em 34 s, 55 passos) e entrou marcada como pausada no `alvo.md`. Na primeira execução de `npm run ramos:parados`, os doze ramos com commit fora da main foram os oito do inventário, o `envio/carro-quadrado-forma` (49 commits, a main andou 170 desde a base), o `envio/carro-quadrado-v2` e dois ramos de sessão viva sem recusa do `juntar`.

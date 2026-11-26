@@ -1,0 +1,160 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "roda-esportiva",
+  "numero": 2,
+  "medidas": {
+    "passou": false,
+    "relatorio": "faces finas cresceram: 288 agora contra 194 na última rodada (raios: 288); liste-as com `npm run -s malha:lascas -- roda-esportiva` e tire as que a mudança criou."
+  },
+  "veredito": null,
+  "partes": [
+    {
+      "nome": "aro",
+      "confere": false,
+      "observacao": "barril, borda, canaleta e furo da valvula conferem; aresta interna do barril segue serrilhada no isolado (faces divididas pela uniao), sem parametro da tabela que a governe"
+    },
+    {
+      "nome": "raios",
+      "confere": false,
+      "observacao": "dez raios largos em pares em V (A) e cinco duplos com face usinada (B), concavos e fundidos; arestas laterais vivas (arredondarCostura recusa) e abas serrilhadas nas pontas externas no isolado"
+    },
+    {
+      "nome": "tampaCentral",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "parafusos",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "valvula",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pneu",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "arredondarCostura convexas nos raios recusa em raio 3, 4 e 6 mm; o minimo 1/64 da meia-extensao so aparece na recusa",
+    "abas serrilhadas nas pontas dos raios e o recorte do aro parecem faces de parede divididas pelo unir e agrupadas em raios; nao ha seletor de parte por posicao radial",
+    "ladosDoPrato 192 reprova guarda:acervo por 2 faces degeneradas; 96 passa",
+    "a bancada nao sobrescreve --saida ja usada, exige pasta nova por experimento",
+    "aro e raios sao casca aberta cada um; CONTATOS segue vazio e o descrever nao decide 8 pares",
+    "modelador: o relatorio nao rodou a medicao da rodada; as faces finas subiram de 194 para 288 e so o --acao mostrou"
+  ],
+  "notaDePassagem": "Raios alargados (A 36/50, B 38/50) porque o alvo tem raios encorpados; prato com expoente 1.3 e liso 60 para ler a concavidade; ladosDoPrato fica em 96 porque 192 gera faces degeneradas. Quina das arestas laterais e abas do aro seguem abertas: o motor recusa arredondarCostura nas convexas e nao ha seletor radial para reatribuir as faces.",
+  "receita": {
+    "sha256": "sha256:1da636dbd1c87a3f4eac9f7ac5aaae982e3c8188d76d9da8a1cd03e211cf1292",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 9,
+      "acrescentadas": 9,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 26,
+          "texto": "  desvioET: 40, espessuraDoCubo: 14, raioDoCubo: 74, avancoDoPratoNoAro: 105, recuoDoPratoTras: 50, expoenteDoPrato: 1.7,"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": "  desvioET: 40, espessuraDoCubo: 14, raioDoCubo: 74, avancoDoPratoNoAro: 105, recuoDoPratoTras: 50, expoenteDoPrato: 1.3,"
+        },
+        {
+          "tipo": "-",
+          "linha": 29,
+          "texto": "  larguraNaRaizA: 26, larguraNoAroA: 32, aberturaNaRaizA: 4, aberturaNoAroA: 15, arredondaJanelaA: 8,"
+        },
+        {
+          "tipo": "-",
+          "linha": 30,
+          "texto": "  larguraNaRaizB: 30, larguraNoAroB: 36, aberturaNaRaizB: 7, aberturaNoAroB: 11, arredondaJanelaB: 8,"
+        },
+        {
+          "tipo": "-",
+          "linha": 31,
+          "texto": "  raioDaQuinaDosRaios: 0, raioDaCosturaDoAro: 8, raioMinimoDaCostura: 1.5, afinarPontasDaCostura: 10,"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": "  larguraNaRaizA: 36, larguraNoAroA: 50, aberturaNaRaizA: 4, aberturaNoAroA: 15, arredondaJanelaA: 8,"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "  larguraNaRaizB: 38, larguraNoAroB: 50, aberturaNaRaizB: 7, aberturaNoAroB: 11, arredondaJanelaB: 8,"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "  paineisDaCostura: 24, raioDaQuinaDosRaios: 0, raioMinimoDaQuina: 3.72, raioDaCosturaDoAro: 8, raioMinimoDaCostura: 1.5, afinarPontasDaCostura: 10,"
+        },
+        {
+          "tipo": "-",
+          "linha": 43,
+          "texto": "  lados: 96,"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "  lados: 96, ladosDoPrato: 96,"
+        },
+        {
+          "tipo": "-",
+          "linha": 234,
+          "texto": "  passos.push(['lathe', { origemId: 30, lados, eixo: 'x', em, perfil: mp(d.prato) }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 234,
+          "texto": "  passos.push(['lathe', { origemId: 30, lados: t.ladosDoPrato, eixo: 'x', em, perfil: mp(d.prato) }]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 236,
+          "texto": "  if (t.raioDaQuinaDosRaios > 0) passos.push(['arredondarCostura', { origemId: 41, de: { op: 'intersectar', id: 40 }, raio: m(t.raioDaQuinaDosRaios), arestas: 'convexas', raioMinimo: m(3.72), afinarPontas: m(6) }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 236,
+          "texto": "  if (t.raioDaQuinaDosRaios > 0) passos.push(['arredondarCostura', { origemId: 41, de: { op: 'intersectar', id: 40 }, raio: m(t.raioDaQuinaDosRaios), arestas: 'convexas', raioMinimo: m(t.raioMinimoDaQuina), afinarPontas: m(6) }]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 246,
+          "texto": "  passos.push(['arredondarCostura', { origemId: 71, de: { op: 'unir', id: 70 }, raio: m(t.raioDaCosturaDoAro), raioMinimo: m(t.raioMinimoDaCostura), afinarPontas: m(t.afinarPontasDaCostura) }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 246,
+          "texto": "  passos.push(['arredondarCostura', { origemId: 71, de: { op: 'unir', id: 70 }, raio: m(t.raioDaCosturaDoAro), paineis: t.paineisDaCostura, raioMinimo: m(t.raioMinimoDaCostura), afinarPontas: m(t.afinarPontasDaCostura) }]);"
+        },
+        {
+          "tipo": "-",
+          "linha": 290,
+          "texto": "  for (const nome of ['aro', 'raios', 'tampaCentral', 'parafusos', 'valvula', 'pneu']) passos.push(['liso', { angulo: nome === 'pneu' ? 50 : 40, sel: { grupo: nome } }]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 290,
+          "texto": "  for (const nome of ['aro', 'raios', 'tampaCentral', 'parafusos', 'valvula', 'pneu']) passos.push(['liso', { angulo: nome === 'pneu' ? 50 : nome === 'raios' ? 60 : 40, sel: { grupo: nome } }]);"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "registradaEm": "2026-11-14T11:23:20.560Z",
+  "facesFinas": {
+    "total": 288,
+    "porParte": {
+      "raios": 288
+    }
+  }
+}

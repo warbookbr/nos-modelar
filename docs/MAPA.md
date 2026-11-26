@@ -6,6 +6,7 @@
 > algum arquivo-fonte estiver sem cabeçalho.
 
 2432 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2430 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -734,7 +735,6 @@
 - `2026-11-22-curva-paralela-na-rede.md` — Curva paralela na rede de curvas: os anéis em volta de um vão sem desenhar ponto a ponto
 - `2026-11-25-acabamento-hard-surface.md` — Acabamento de hard surface: chanfro e arredondamento em qualquer aresta, linhas de painel e recortes na casca
 - `2026-11-25-elo-entre-juntas.md` — Elo entre juntas: a carenagem oca do membro, de uma flange de atuador à outra
-- `2026-11-25-resgate-dos-ramos-antigos.md` — Resgate dos ramos antigos: as peças, as ferramentas e o núcleo que nunca entraram na main
 - `2026-11-26-ferramentas-e-documentacao.md` — Ferramentas e documentação: toda ferramenta registrada e achada, e o roteador cobrindo o trabalho inteiro
 - `2026-11-26-laco-de-modelagem-mais-rapido.md` — Laço de modelagem mais rápido: a rodada mede, mostra e registra em minutos, com a decisão da pessoa gravada
 - `2026-11-26-operacoes-repartidas-entre-nucleos.md` — Operações repartidas entre núcleos: o corte das aberturas, a subtração e a divisão usando mais de um núcleo, com a mesma malha
@@ -2671,6 +2671,18 @@
 - `alvo.md` — Alvo do braço direito do robô humanoide
 - `braco-proporcao.esboco.mjs` — braco-proporcao.esboco.mjs — as opções de proporção do braço direito do robô humanoide, em blocos sobre o esqueleto.
 
+## procedural/pecas/roda-esportiva/
+
+- `receita.js` — roda-esportiva — roda de liga leve de 19 polegadas com pneu 245/40 R19, etapa 1 (aro, raios, tampa central, parafusos, válvula e pneu), nas duas variantes do…
+
+## procedural/pecas/roda-esportiva/referencias/
+
+- `alvo.md` — Alvo da roda esportiva
+
+## procedural/pecas/roda-esportiva/rodadas/
+
+- `receita-06.js` — roda-esportiva — roda de liga leve de 19 polegadas com pneu 245/40 R19, etapa 1 (aro, raios, tampa central, parafusos, válvula e pneu), nas duas variantes do…
+
 ## procedural/pecas/sedan-chassi-e-lataria/
 
 - `ALINHAMENTO.md` — Sedã em chassi e lataria: alinhamento
@@ -4230,6 +4242,7 @@
 - `referencia-do-plano.test.mjs` — referencia-do-plano.test.mjs — `descrever-peca` confere logo no começo que cada caminho de `PLANO.referencias` existe.
 - `referencia-local.test.mjs` — referencia-local.test.mjs — a imagem de estudo mora em `referencias/locais/`, que o git ignora. Quando ela falta (outra máquina, CI) as ferramentas avisam um…
 - `referencias-do-plano.mjs` — referencias-do-plano.mjs — o que `PLANO.referencias` cita, resolvido em disco.
+- `referencias-nao-construidas.test.mjs` — referencias-nao-construidas.test.mjs — `PLANO.referenciasNaoConstruidas`: a variante que a receita não constrói sai da comparação do crítico e o pedido diz q…
 - `refinamento-global.mjs` — refinamento-global.mjs — o adaptador de disco do refinamento da forma global.
 - `refinamento-global.test.mjs` — refinamento-global.test.mjs — de ponta a ponta: a receita que declara REFINA passa pelo veredito da peça e pela guarda do acervo. A mesma receita passa intei…
 - `regravar-ajustes-de-curva.mjs` — regravar-ajustes-de-curva.mjs — refaz os ajustes de curva lisa de que uma receita precisa e grava o resultado ao lado dela.

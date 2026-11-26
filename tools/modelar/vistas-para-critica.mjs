@@ -662,7 +662,7 @@ export function montarPedido(dados) {
 
 /** As seções do pedido, `[{ chave, linhas }]`, na ordem do pedido de hoje; o pedido por perguntas fechadas (`montarPedidoFechado`) as
  *  reordena. Com `fechado`, a seção das partes não pede a linha por parte, porque a forma prometida vira pergunta fechada. */
-export function secoesDoPedido({ peca, plano = null, orientacao = null, alvo = null, afastamentos = [], referencias = [], modelo = [], arame = [], montado = null, sobreposicao = null, partes = [], perguntas = [], superficie = null, reflexo = null, contornos = [], contornoSobreposto = null, encaixes = [], anteriores = [], medicao = null, pranchaDesenhada = null, referenciasFora = [] }, { fechado = false } = {}) {
+export function secoesDoPedido({ peca, plano = null, orientacao = null, alvo = null, afastamentos = [], referencias = [], naoConstruidas = [], modelo = [], arame = [], montado = null, sobreposicao = null, partes = [], perguntas = [], superficie = null, reflexo = null, contornos = [], contornoSobreposto = null, encaixes = [], anteriores = [], medicao = null, pranchaDesenhada = null, referenciasFora = [] }, { fechado = false } = {}) {
   const imagem = ({ arquivo, vista, tipo }) => `${vista}${tipo ? `, ${tipo}` : ''}: ${arquivo}`;
   /* O lado de cada vista é dito uma vez, em Modelo, e vale pelo nome para o modelo, o montado e as partes: dito junto de cada imagem,
      o mesmo texto longo se repetia mais de vinte vezes na peça de onze partes. */
@@ -732,6 +732,12 @@ export function secoesDoPedido({ peca, plano = null, orientacao = null, alvo = n
     );
   } else {
     L.push(pranchaDesenhada ? 'O plano não cita foto nem imagem de referência além da prancha desenhada, que tem a seção seguinte.' : 'O plano não cita imagem de referência.');
+  }
+  if (naoConstruidas.length) {
+    L.push(
+      '', 'Referências que a receita NÃO constrói (outra variante ou alternativa descartada; o plano as declara em `referenciasNaoConstruidas`). Não compare o modelo com elas e não cobre defeito por diferir delas:', '',
+      ...lista(naoConstruidas.map((c) => `${basename(c)}: não construída`)),
+    );
   }
   if (referenciasFora.length) {
     L.push('', `O plano cita também ${referenciasFora.join(', ')}, que não é imagem nem prancha desenhada e por isso não entra neste pedido: você não o lê, e a pergunta que dependa dele se responde \`não dá para ver\`.`);
@@ -2788,6 +2794,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
       ...referencias.imagens.map((c) => ({ caminho: c, ...(critica.referencias[basename(c)] ? { lado: critica.referencias[basename(c)] } : {}) })),
       ...externas.filter((e) => !referencias.imagens.includes(e.caminho)),
     ],
+    naoConstruidas: referencias.naoConstruidas ?? [],
     pranchaDesenhada: pranchaDesenhada?.imagens.length ? pranchaDesenhada : null,
     referenciasFora: referenciasSemLeitura(referencias.ignoradas),
     contornos: contornosDoPedido,
