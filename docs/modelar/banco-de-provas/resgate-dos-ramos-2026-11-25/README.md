@@ -1,6 +1,6 @@
 # Resgate dos ramos antigos: o inventário de 2026-11-25
 
-Evidência do plano [resgate dos ramos antigos](../../planos/2026-11-25-resgate-dos-ramos-antigos.md). Cada item dos ramos que não entraram na main foi comparado com a main de 2026-11-25 (692ba0d8a); as receitas e o código dos ramos rodaram em memória contra o núcleo de hoje, sem gravar nada.
+Evidência do plano [resgate dos ramos antigos](../../decisoes/PLANOS-ENCERRADOS.md). Cada item dos ramos que não entraram na main foi comparado com a main de 2026-11-25 (692ba0d8a); as receitas e o código dos ramos rodaram em memória contra o núcleo de hoje, sem gravar nada.
 
 ## Por que ficaram para trás
 
