@@ -3,7 +3,7 @@
    A fixture é a roda reduzida ao essencial (medidas em metro): um barril de revolução com a parede de dentro inclinada, e uma placa extrudada em x com
    três janelas de canto redondo, cortada por um prato de revolução, cujo aro de fora entra na parede do barril. O arredondamento de raio 6 mm da costura
    deixava 115 faces finas, quase todas nos pedaços das faces do barril e da placa que o tubo corta ao longo das duas tangências, e não nas do próprio tubo:
-   com `limpar` a limpeza alcança o sólido inteiro. */
+   com `limpar` a limpeza alcança o sólido inteiro. Recusava também conforme a parede inclinada avançava 1 mm (0,020 recusava, 0,018 e 0,022 passavam): o fundo do tubo, a um raio atrás do canto, atravessava a pele de 4 mm do barril, e a casca saía com vértice não-manifold; a espessura limita o fundo e a nova tentativa com outro mergulho do arco fecha o que sobra. A parte que nomeia o barril precisa seguir valendo quando o tubo cobre uma face inteira dele. */
 import { describe, expect, it } from 'vitest';
 // @ts-expect-error — núcleo herdado em JavaScript.
 import { nucleo, neutroCanonico } from '../entrada.js';
@@ -84,6 +84,23 @@ describe('arredondarCostura numa placa com janelas unida a um barril', () => {
 
   it('é determinístico: a mesma receita dá o mesmo canon', () => {
     expect(JSON.stringify(neutroCanonico(nucleo(passos())))).toBe(JSON.stringify(neutroCanonico(arredondada)));
+  });
+
+  it('o avanço da parede não decide a recusa: de 14 a 25 mm a costura sai sem face fina nem casca aberta (20 mm saía aberta)', () => {
+    for (const avanco of [0.014, 0.016, 0.018, 0.02, 0.022, 0.025]) {
+      const n = nucleo(passos({ avanco }));
+      expect(n.orfaos, `avanço ${avanco}`).toEqual([]);
+      expect(finasDe(n), `avanço ${avanco}`).toBeLessThanOrEqual(1);
+      expect(arestasSemPar(n), `avanço ${avanco}`).toEqual([]);
+      expect(vinculosNaoManifold(n), `avanço ${avanco}`).toEqual([]);
+      expect(raioMaximo(n), `avanço ${avanco}`).toBeLessThanOrEqual(R + 1e-9);
+    }
+  });
+
+  it('o nome do barril continua valendo depois do arredondamento: a parte pega as faces dele', () => {
+    const n = nucleo(passos({ partes: true }));
+    expect(n.orfaos).toEqual([]);
+    expect([...n.F.values()].filter((f: any) => f.parte === 'barril').length).toBeGreaterThan(100);
   });
 
   it('limpar aceita true, false ou uma tolerância, e recusa o resto com o valor recebido', () => {
