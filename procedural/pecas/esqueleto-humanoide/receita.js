@@ -4,6 +4,21 @@
 import esqueleto from './esqueleto.json' with { type: 'json' };
 import { cadeiaDoEsqueleto, receitaDoEsqueleto } from '../../../src/autoria/esqueleto-de-bolas.js';
 
-export const { TABELA, derivar, gerarPassos } = cadeiaDoEsqueleto(esqueleto, { pose: 'zero' });
+export const TABELA = {
+  /* a pose do esqueleto: 'zero' (em pé) ou uma das declaradas em proporcoes.json (sentado, braco-erguido) */
+  pose: 'zero',
+};
 
-export default receitaDoEsqueleto(esqueleto, { pose: 'zero' });
+const cadeia = cadeiaDoEsqueleto(esqueleto, TABELA);
+export const derivar = cadeia.derivar;
+export function gerarPassos(tabela) {
+  return cadeia.gerarPassos(tabela);
+}
+
+const receita = receitaDoEsqueleto(esqueleto, TABELA);
+
+/* o PLANO que a conta monta do esqueleto (uma parte por bola e por bastão), citado aqui para quem lê a receita achar as partes */
+const PLANO = { ...receita.PLANO, partes: receita.PLANO.partes };
+receita.PLANO = PLANO;
+
+export default receita;
