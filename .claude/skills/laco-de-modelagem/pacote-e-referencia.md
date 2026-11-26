@@ -50,7 +50,7 @@ O registro do veredito confere, em toda peça, que o `pacote.json` da pasta do p
 das partes; se a receita ou um módulo que ela importa mudou depois do pacote, o registro recusa e manda gerar o pacote e despachar o
 crítico de novo. Por isso o pacote feito com `--saida` vai ao registro em `--pacote <pasta>`.
 
-A cópia da receita da rodada com decisão da pessoa (`rodadas/receita-NN.js`) fica guardada pelas rodadas seguintes, e o comando da
+A cópia da receita da rodada com decisão da pessoa (a `receita-NN.js` da pasta de rodadas) fica guardada pelas rodadas seguintes, e o comando da
 decisão diz onde ela está ou avisa quando ela já não existe. Além das três rodadas decididas mais novas, a cópia mais antiga só sai da
 pasta quando o git a tem igual, e por isso a decisão e a cópia vão ao commit da rodada.
 

@@ -256,7 +256,7 @@ do aceite vigente. Fixa se igual; quebrada se difere; aberta sem aceite vigente;
 fixa). Reabrir só acrescenta um evento: as posteriores seguem fixas se a impressão delas é a do aceite. Regra da pessoa: a quebrada cuja mudança
 é desfeita volta a fixa sozinha; só a reabertura a faz aberta; `--fixar` avisa das posteriores quebradas.
 
-O registro v1 e v2 recusa e manda recuperar do histórico `migrar-etapas-para-impressao.mjs` (saiu em 2026-11-26, no commit 9118ea08), que migra sem novo aceite: pelo
+O registro v1 e v2 recusa e manda recuperar do git `migrar-etapas-para-impressao.mjs` (saiu em 2026-11-26), que migra sem novo aceite: pelo
 commit do aceite (a), pela impressão de agora com forma e juntas gravadas como condição (b) ou deixa aberta (c). Os 52 aceites do acervo
 migraram (43 pela história, 9 pela de agora: as oito do avião e o anel da cintura), e a guarda os trava. Sem prova: a porta do `anelCintura`; fora da impressão: porta de submontagem e expectativa de interseção.
 
