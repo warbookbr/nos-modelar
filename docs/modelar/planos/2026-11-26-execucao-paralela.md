@@ -1,8 +1,8 @@
-# Execução paralela: medir quanto tempo as ferramentas ganham usando os quatro núcleos da máquina
+# Execução paralela: medir quanto tempo as ferramentas ganham com mais núcleos, e o número de processos acompanhando a máquina
 
 **Estado:** ativo
 
-**Território:** `docs/modelar/banco-de-provas/execucao-paralela-2026-11-26/`, `docs/modelar/planos/BACKLOG.md`.
+**Território:** `docs/modelar/banco-de-provas/execucao-paralela-2026-11-26/`, `docs/modelar/planos/BACKLOG.md`, `tools/processos-da-maquina.mjs`, `tools/processos-da-maquina.test.mjs`, `tools/gates.mjs`, `vitest.config.ts`, `tools/modelar/guardas/guarda-acervo.mjs`, `tools/modelar/aprovacao-da-familia.mjs`.
 
 Ativado pela pessoa em 2026-11-26 ("pode criar o plano e ativar e fazer a medição sim"), pela linha "Execução paralela de partes independentes" do backlog, cuja condição (o cache por passo) foi cumprida com o encerramento daquele plano em 2026-11-17.
 
@@ -27,16 +27,16 @@ Só medição: scripts no banco de provas, sobre `executarReceita`, `importarRec
 - dentro de uma receita, na lataria do carro e na parte mais lenta do braço: o tempo de cada passo, o caminho mais longo pelo grafo de dependência dos passos (o limite do ganho com núcleos à vontade) e o custo de serializar e desserializar o estado nos pontos em que o grafo se ramifica;
 - entre as partes do braço: o tempo das partes uma depois da outra e em um, dois e quatro processos, com o pico de memória de cada processo e da soma;
 - entre as peças do acervo: quanto a `guarda:acervo` ganha hoje com quatro fios contra um, e se a peça mais lenta já é o piso do tempo dela;
-- a carga e o tempo roubado da máquina virtual durante cada medida, como o banco de provas do cache por passo já faz.
+- a carga e o tempo roubado da máquina virtual durante cada medida, como o banco de provas do cache por passo já faz;
+- o número de processos das ferramentas que percorrem o acervo (os gates, as baterias de teste, a guarda do acervo e a aprovação da família) calculado pelos núcleos e pela memória da máquina, no lugar do teto fixo de quatro, e escolhido à mão por `MODELAR_PROCESSOS`, com quatro nesta máquina e no CI.
 
 ## Excluído
 
-- mudar o núcleo, o executor da receita ou qualquer ferramenta; a implementação de um nível é plano próprio, depois da decisão da pessoa;
-- paralelizar dentro de uma operação (a subdivisão ou a booleana em vários núcleos).
+- mudar o núcleo ou o executor da receita; a repartição por dentro de uma operação é plano próprio, em rascunho;
 
 ## Invariantes
 
-Nenhum arquivo fora do território muda, e o resultado de cada execução medida em paralelo é igual, byte a byte na malha serializada, ao da execução em série.
+Nenhum arquivo fora do território muda, o número de processos nesta máquina e no CI continua quatro, e o resultado de cada execução medida em paralelo é igual, byte a byte na malha serializada, ao da execução em série.
 
 ## Gate de saída
 
@@ -48,13 +48,16 @@ Nenhum arquivo fora do território muda, e o resultado de cada execução medida
 ## Fatias
 
 1. As medidas dos três níveis e a recomendação.
-2. A decisão da pessoa, a linha do backlog trocada pelo resultado e o fechamento.
+2. O número de processos pela máquina, com teste.
+3. O plano em rascunho da repartição por dentro do corte das aberturas, a linha do backlog trocada pelo resultado e o fechamento.
 
 ## Riscos e parada
 
 A máquina já reiniciou por falta de memória com duas execuções pesadas ao mesmo tempo. Cada medida em paralelo começa pela de dois processos, com o pico de memória lido antes de passar a quatro, e para se a soma passar de 12 GB. Se o tempo roubado da máquina virtual passar de 10% numa medida, ela se repete.
 
 ## Decisão da pessoa
+
+Decidido pela pessoa em 2026-11-26 ("pode seguir com sua recomendação"), depois da primeira medida da lataria do carro (55 s em 10 passos, 9 deles barreira, o caminho mais longo igual ao tempo em série, e 29 s no corte das aberturas, 14 s na subtração e 8 s na divisão): o número de processos das ferramentas do acervo passa a acompanhar os núcleos e a memória da máquina, neste plano, e a repartição por dentro das operações mais caras, a começar pelo corte das aberturas, vai a um plano próprio em rascunho. A placa de vídeo fica fora, porque a soma em outra ordem muda a malha no último dígito e a receita precisa dar sempre a mesma malha.
 
 ## Andamento
 

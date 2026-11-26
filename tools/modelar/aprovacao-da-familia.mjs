@@ -27,7 +27,7 @@
 import { fork } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { availableParallelism } from 'node:os';
+import { processosDaMaquina } from '../processos-da-maquina.mjs';
 import { basename, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { analisarTopologia } from '../../procedural/nucleo/topologia.js';
@@ -490,7 +490,7 @@ const chaveDaMedicao = (parametros, rotulo, opcoes) => JSON.stringify([parametro
  * tem funções e não atravessa a fronteira de um processo. O resultado é o de `aprovarFamilia`: a medição de cada ponto é determinística
  * e a montagem do resultado é a mesma função, na mesma ordem. Sem `origem` ou com um fio só, mede no próprio processo.
  */
-export async function aprovarFamiliaEmParalelo(familia, { origem = null, fios = Math.min(availableParallelism(), 4), ...opcoes } = {}) {
+export async function aprovarFamiliaEmParalelo(familia, { origem = null, fios = processosDaMaquina(), ...opcoes } = {}) {
   try { lerFamilia(familia.contrato); } catch { return aprovarFamilia(familia, opcoes); }
   if (!origem || fios < 2) return aprovarFamilia(familia, opcoes);
   const medicoes = medicoesDaAprovacao(familia.contrato);

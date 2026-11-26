@@ -2,6 +2,7 @@
 import { configDefaults, defineConfig } from 'vitest/config';
 import { TESTES_LENTOS } from './tools/testes-lentos.mjs';
 import { doAmbiente } from './tools/ambiente.mjs';
+import { processosDaMaquina } from './tools/processos-da-maquina.mjs';
 
 /* `npm run test:rapidos` e `npm run test:lentos` (tools/testes-lentos.mjs) dividem a suíte pela lista dos lentos; sem a
    variável, `npm test` roda tudo. */
@@ -50,8 +51,10 @@ export default defineConfig({
        disco em falso vermelho. A bateria dos rápidos, sem os lentos, usa
        quatro (plano gates em poucos minutos, 2026-10-16). Desde 2026-10-27 os lentos também usam quatro: a bateria os
        agenda sozinhos na máquina (`PESO_DO_GATE` em tools/gates.mjs), e com dois a bateria completa esperava 17 minutos por
-       eles enquanto dois processadores ficavam parados. `npm test`, que roda tudo de uma vez, continua com dois. */
-    maxWorkers: MODO === 'rapidos' || MODO === 'lentos' ? 4 : 2,
+       eles enquanto dois processadores ficavam parados. `npm test`, que roda tudo de uma vez, continua com dois. Desde 2026-11-26 os
+       quatro são `processosDaMaquina()` (tools/processos-da-maquina.mjs), que dá quatro nesta máquina e no CI e acompanha os núcleos e
+       a memória de uma máquina maior, ou o `MODELAR_PROCESSOS` pedido. */
+    maxWorkers: MODO === 'rapidos' || MODO === 'lentos' ? processosDaMaquina() : Math.min(2, processosDaMaquina()),
 
     /* O segundo repórter grava a duração de cada arquivo em
        `tmp/gates/duracoes-dos-testes.json`, que o `tools/gates.mjs` lê para
