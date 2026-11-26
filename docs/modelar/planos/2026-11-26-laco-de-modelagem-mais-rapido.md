@@ -48,6 +48,8 @@ Se a bancada aquecida der imagem diferente da bancada fria na mesma câmera, ela
 
 ## Decisão da pessoa
 
+Decidido pela pessoa em 2026-11-26 ("1, 2, 3, 4 sim"), depois da etapa A da calibração do crítico: a calibração passa a medir o crítico com o pedido da rodada (o `pedido.md` do `vistas:critica`) e as capturas da bancada; as duas imagens que vêm de esboços que saíram são trocadas por duas peças do acervo em que a pessoa já reprovou defeito parecido numa rodada; os julgamentos são refeitos, de propósito e por comando, nunca sozinhos (a conferência automática só avisa quando o crítico roda num modelo diferente do medido, porque um usuário com outro modelo não pode disparar dezenas de despachos sem saber); a regra de acerto pode ser ajustada sobre as imagens novas; e o nome antigo do projeto na definição do crítico é corrigido na mesma medição, o único caso em que `.claude/agents/critico-visual.md` muda.
+
 Decidido pela pessoa em 2026-11-26 ("Sim, pode guardar"): a decisão da pessoa sobre uma rodada fica num arquivo ao lado das rodadas, gravado depois da rodada, quando ela vê a peça, com a mesma regra do formato e das palavras dela, sem reescrever o registro da rodada.
 
 ## Andamento
