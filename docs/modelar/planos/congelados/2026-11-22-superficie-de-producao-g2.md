@@ -1,6 +1,10 @@
 # Superfície de produção (G2): a chapa de subdivisão sem a ondulação que o crítico acusa, sem sair da forma
 
-**Estado:** ativo
+**Estado:** congelado
+
+Congelado em 2026-11-26.
+
+Congelado em 2026-11-26 pela mesma decisão da pessoa ("Modelagem do carro congela, e se necessário tambem congela a superfície de produção"): com o carro congelado e a análise do projeto fechada sobravam duas vagas para três planos, e este já estava pausado pela pessoa desde 2026-11-25 para o resgate dos ramos antigos. Por que: a rota mudou para o resgate e as recomendações da análise; nada foi refutado. Condição de descongelamento: o fechamento do plano do resgate dos ramos antigos, que tem `uso-operacoes.js` e as booleanas, ou a pessoa pedir. O que foi levado: `procedural/nucleo/uso-operacoes.js` já tinha passado ao plano do resgate em 2026-11-25. O que fica parado: a fatia 4, `alisarSuperficie` e o preenchimento do miolo em `gaiola-por-rede.js` como opções desligadas, e o território inteiro, que volta com o plano.
 
 **Território:** `procedural/nucleo/subdivisao.js`, `procedural/nucleo/subdivisao.test.mjs`, `procedural/nucleo/algebra-esparsa.js`, `procedural/nucleo/algebra-esparsa.test.mjs`, `procedural/nucleo/subdivisao-energia-de-curvatura.test.mjs`, `tools/fixtures/correcao-de-superficie/`, `tools/modelar/distancia-a-pele.mjs`, `tools/modelar/distancia-a-pele.test.mjs`, `tools/modelar/zebra-numerica.mjs`, `tools/modelar/zebra-numerica.test.mjs`, `procedural/nucleo/gaiola-por-rede.js`, `procedural/nucleo/gaiola-por-rede.test.mjs`, `tools/modelar/preenchimento-da-rede.mjs`, `tools/modelar/preenchimento-da-rede.test.mjs`, `docs/modelar/banco-de-provas/superficie-g2-2026-11-22/`
 

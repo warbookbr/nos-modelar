@@ -7,7 +7,7 @@
  * Grava, ao lado deste arquivo, `lateral.prancha.svg` e `lateral.prancha.relatorio.json`, e imprime o relatório. Sai com 1
  * se o relatório trouxer alerta ou o desenho trouxer colisão. O PNG sai do SVG por `node tools/modelar/olhar.mjs`.
  *
- * A prancha é DERIVADA das medidas aprovadas pela pessoa em 2026-11-14 (plano docs/modelar/planos/2026-11-14-modelagem-de-carro.md):
+ * A prancha é DERIVADA das medidas aprovadas pela pessoa em 2026-11-14 (plano docs/modelar/planos/congelados/2026-11-14-modelagem-de-carro.md):
  * divergiu, a tabela manda. A imagem lateral de caráter foi gerada por IA, fica fora do repositório e não vale como medida:
  * dela vêm só as posições em proporção. Cada ponto foi lido em pixel e levado a milímetro por trechos, na horizontal do
  * para-choque de trás ao eixo traseiro, do eixo traseiro ao dianteiro e dele à ponta da frente, e na vertical pela fração da

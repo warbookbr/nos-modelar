@@ -1,6 +1,6 @@
 # Análise do projeto: a documentação, o núcleo, as ferramentas e o processo comparados com uma versão melhor desenhada antes da leitura
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `docs/modelar/banco-de-provas/analise-do-projeto-2026-11-26/`.
 
@@ -57,6 +57,12 @@ A máquina tem 16 GB e outro trabalho pesado roda ao mesmo tempo: os agentes nã
 
 ## Decisão da pessoa
 
+Decidido pela pessoa em 2026-11-26 ("1 a 10 aprovadas. Sobre os achados sao importantes, tambem vou seguir sua recomendação em relação a eles"), e, para dar vaga aos planos que saem daqui, "Modelagem do carro congela, e se necessário tambem congela a superfície de produção". As recomendações viraram três planos ativos: [processo e CI](2026-11-26-processo-e-ci.md) (1, 2, 3, 4 e 9, com a regra nova do limite de planos de núcleo), [laço de modelagem mais rápido](2026-11-26-laco-de-modelagem-mais-rapido.md) (5 e 10) e [ferramentas e documentação](2026-11-26-ferramentas-e-documentacao.md) (7, 8 e os achados). A 6 segue no plano das operações repartidas entre núcleos. A modelagem do carro e a superfície de produção foram congeladas.
+
 ## Andamento
 
+As quatro frentes e o resumo estão no [banco de provas](../banco-de-provas/analise-do-projeto-2026-11-26/README.md).
+
 ## Fechamento
+
+Concluído em 2026-11-26. Cada frente escreveu a versão melhor às 11:27 UTC, antes de ler o repositório, e comparou com a evidência. As dez recomendações foram aprovadas pela pessoa e distribuídas em três planos novos e num plano em andamento; o que ficou de custo grande (repartir `nucleo.js`, juntar as ferramentas de comparação com a referência, unificar os caches e a matemática de vetor) está no resumo como seguinte. Os gates locais e o CI são do envio deste fechamento.

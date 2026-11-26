@@ -1,6 +1,6 @@
 # Carro fastback: quanto custa o ajuste da chapa quando ela cresce
 
-Pasta do plano [modelagem de carro](../../planos/2026-11-14-modelagem-de-carro.md), no começo da fatia 4. Medida em 2026-11-22 numa máquina de 20 núcleos lógicos e 32 GB, com Node 22.23.2, sem outra medida rodando.
+Pasta do plano [modelagem de carro](../../planos/congelados/2026-11-14-modelagem-de-carro.md), no começo da fatia 4. Medida em 2026-11-22 numa máquina de 20 núcleos lógicos e 32 GB, com Node 22.23.2, sem outra medida rodando.
 
 ## A pergunta
 
