@@ -4,7 +4,7 @@
 
 **Núcleo:** não
 
-**Território:** `.github/workflows/`, `.github/actions/`, `tools/ci/`, `docs/modelar/MECANISMOS.md`, `tools/gates.mjs`, `tools/mapa/planos.mjs`, `tools/mapa/planos.test.mjs`, `tools/mapa/mapa.mjs`, `tools/mapa/mapa.test.mjs`, `docs/MAPA.md`, `tools/reguas-de-texto/`, `docs/modelar/banco-de-provas/processo-e-ci-2026-11-26/`. O teto de tempo dos testes mora no arquivo dos testes lentos, que é do plano do resgate dos ramos antigos: a mudança dele é empréstimo pedido a esse plano, ou espera o fechamento dele.
+**Território:** `.github/workflows/`, `.github/actions/`, `tools/ci/`, `docs/modelar/MECANISMOS.md`, `tools/testes-lentos.mjs`, `tools/testes-lentos.test.mjs`, `tools/modelar/custo-de-importar-receita.test.mjs`, `tools/gates.mjs`, `tools/mapa/planos.mjs`, `tools/mapa/planos.test.mjs`, `tools/mapa/mapa.mjs`, `tools/mapa/mapa.test.mjs`, `docs/MAPA.md`, `tools/reguas-de-texto/`, `docs/modelar/banco-de-provas/processo-e-ci-2026-11-26/`.
 
 Ativado pela pessoa em 2026-11-26, com as recomendações 1 a 4 e 9 da análise do projeto ("1 a 10 aprovadas") e a regra nova do limite de planos de núcleo ("Sim, pode seguir com suas recomendações").
 
@@ -23,7 +23,7 @@ O passo de juntar à main junta a main nova e tenta de novo sozinho; o teto de t
 ## Incluído
 
 - o passo `juntar` do CI: com a main andada, junta a main nova, roda de novo os gates baratos e tenta outra vez, até um limite, e só reprova com conflito;
-- o teto de tempo como aviso no CI, com a reprovação local de hoje (empréstimo do arquivo dos testes lentos);
+- o teto de tempo como aviso no CI, com a reprovação local de hoje ;
 - o navegador do Playwright em cache pela versão no CI;
 - o `docs/MAPA.md` fora do versionamento e gerado onde é lido, ou gerado só no CI, conforme quem o lê; e o `--ajuda` do mapa, que hoje regrava o arquivo;
 - a conferência do envio contra o território: cada arquivo mudado pertence a um plano ativo ou a um caminho compartilhado, ou o envio diz que é defeito pontual;
@@ -56,6 +56,8 @@ Nenhum gate deixa de cobrar o que cobra hoje; o que muda é quando ele reprova e
 O passo de juntar que tenta de novo não pode juntar por cima de um conflito real: com conflito ele para e reprova como hoje. Se tirar o mapa do versionamento quebrar quem o lê (o roteador, as skills), ele fica versionado e só sai da conferência de cada envio.
 
 ## Decisão da pessoa
+
+Decidido pela pessoa em 2026-11-26 ("Pode sim, até porque a outra sessão estourou o limite de 5 horas"): o arquivo dos testes lentos passa do plano do resgate dos ramos antigos a este, porque o teto de tempo reprovou os envios das duas sessões no mesmo dia (`pedacos-convexos.test.mjs` a 31,9 s na bateria e 17,6 s sozinho, `familia.test.mjs` a 145 s contra 142 s, e a importação dos acessórios do sedã a 14,2 s contra 12 s, nenhum mudado pelo envio).
 
 ## Andamento
 

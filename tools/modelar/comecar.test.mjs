@@ -211,8 +211,9 @@ describe('comecar com o nome de uma operação, ficha, extensão ou comando', ()
 
   it('um script de package.json que responde a --ajuda manda para ela; o que não responde, só o comando', () => {
     expect(comecar({ roteiro: 'comecar' }).texto).toContain('é um comando: rode `npm run comecar -- --ajuda`');
-    expect(buscarNome('mapa')).toMatchObject({ tipo: 'comando', comando: 'npm run mapa' });
-    expect(buscarNome('mapa').frase).not.toContain('--ajuda');
+    expect(buscarNome('docs:toc')).toMatchObject({ tipo: 'comando', comando: 'npm run docs:toc' });
+    expect(buscarNome('docs:toc').frase).not.toContain('--ajuda');
+    expect(buscarNome('mapa').frase).toContain('npm run mapa -- --ajuda');
   });
 
   it('um tópico que não existe em lugar nenhum continua saindo com erro e a lista de ramos', () => {
