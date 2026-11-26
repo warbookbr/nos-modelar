@@ -71,6 +71,8 @@ Se o andaime N2 não aceitar a árvore inteira de um humanoide sem mudar o forma
 
 Fatia 1 feita em 2026-11-26: a seção `esqueleto` em `proporcoes.json`, com as fórmulas das medidas, o espelho de um ramo inteiro e as recusas pedidas, e `npm run esqueleto`, que gera o andaime (uma esfera por junta, um bastão por membro, uma porta por junta com eixo) e as articulações; a fixture do braço de duas juntas com o espelho sai igual em duas execuções e passa no normalizador do andaime. O cilindro do andaime só aceita eixo x, y ou z, e o membro oblíquo sai como `tubo` reto, sem mudar o formato.
 
+Fatia 2 feita em 2026-11-26: a peça de bolas e bastões (receita que lê `esqueleto.json`, a árvore resolvida que o comando grava; a conta pura mora em `procedural/pecas/esqueleto-humanoide/esqueleto-de-bolas.js`), as poses declaradas em `esqueleto.poses` (ângulo por junta dentro do curso, a pose zero sempre existe), o aviso de par atravessado e de elemento abaixo do chão (`esqueleto.chao`) por cápsula e esfera, que `--estrito` faz reprovar, e as vistas frontal, direita e superior de cada pose por `--vistas`. A fixture ganhou uma bacia e o eixo z no ombro e no cotovelo, para o antebraço alcançar o tronco.
+
 ## Fechamento
 
 Preencher ao concluir ou cancelar: estado final, commit e PR, gates, resultado observado e candidatos devolvidos ao backlog.

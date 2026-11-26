@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2441 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2443 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2340,6 +2340,10 @@
 
 - `alvo.md` — Alvo da escrivaninha com gaveta
 
+## procedural/pecas/esqueleto-humanoide/
+
+- `esqueleto-de-bolas.js` — esqueleto-de-bolas.js — a peça de bolas e bastões de um esqueleto de proporção, as poses e o aviso de membro que atravessa outro.
+
 ## procedural/pecas/filtro-de-oleo/
 
 - `receita.js` — filtro-de-oleo: filtro de óleo de rosca de 76 x 80 mm, de pé sobre a junta. Referencial do acervo: Y para cima, chão em y 0 (a face de baixo da junta), eixo …
@@ -3569,6 +3573,10 @@
 
 - `mesa-linear.mjs` — mesa-linear.mjs — a mesa linear de prova do plano de elementos de máquina, em milímetro na montagem e metro na receita.
 - `mesa-linear.test.mjs` — mesa-linear.test.mjs — o gate de saída do plano de elementos de máquina: a mesa linear de prova sai com as quatro famílias (perfil, guia, rolamento no mancal…
+
+## tools/fixtures/esqueleto/
+
+- `receita.js` — receita.js — a peça de bolas e bastões da fixture do esqueleto, na pose zero. Lê o esqueleto resolvido que `npm run esqueleto -- --proporcoes=tools/fixtures/…
 
 ## tools/fixtures/faces-finas/
 

@@ -18,10 +18,10 @@
       },
       "unidade": "graus",
       "curso": {
-        "minimo": -60,
+        "minimo": -100,
         "maximo": 180
       },
-      "passos": 48,
+      "passos": 56,
       "folga": {
         "valor": 0,
         "unidade": "mm"
@@ -49,8 +49,8 @@
       },
       "unidade": "graus",
       "curso": {
-        "minimo": 0,
-        "maximo": 140
+        "minimo": -140,
+        "maximo": 0
       },
       "passos": 28,
       "folga": {
@@ -76,10 +76,10 @@
       },
       "unidade": "graus",
       "curso": {
-        "minimo": -60,
+        "minimo": -100,
         "maximo": 180
       },
-      "passos": 48,
+      "passos": 56,
       "folga": {
         "valor": 0,
         "unidade": "mm"
@@ -107,8 +107,8 @@
       },
       "unidade": "graus",
       "curso": {
-        "minimo": 0,
-        "maximo": 140
+        "minimo": -140,
+        "maximo": 0
       },
       "passos": 28,
       "folga": {
