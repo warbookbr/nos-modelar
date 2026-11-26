@@ -405,7 +405,7 @@ function vereditoDasFacesFinas({ total, porParte }, { base, anteriores, lataria,
    da janela Abrir; trocá-los não muda o que o crítico lê, e por isso saem da impressão. Todo campo opcional do PLANO está numa das duas listas
    abaixo, e o teste cobra isso: campo novo que ninguém classificou entraria na impressão e faria o laço perder o julgamento já dado. O PLANO
    inválido entra inteiro, como era. */
-export const CAMPOS_OPCIONAIS_LIDOS_PELO_CRITICO = Object.freeze(['familia', 'familiaProcedural', 'espessuraMinima']);
+export const CAMPOS_OPCIONAIS_LIDOS_PELO_CRITICO = Object.freeze(['familia', 'familiaProcedural', 'espessuraMinima', 'referenciasNaoConstruidas']);
 export const CAMPOS_OPCIONAIS_NAO_LIDOS_PELO_CRITICO = Object.freeze(['lataria', 'dobrasAceitas', 'saliencias', 'categoria']);
 export function planoQueOCriticoLe(plano) {
   let normal;

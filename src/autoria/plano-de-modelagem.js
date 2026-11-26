@@ -222,11 +222,12 @@ export function normalizarPlanoDeModelagem(valor, { quem = 'PLANO' } = {}) {
   const nomes = partes.map((p) => p.nome);
   if (new Set(nomes).size !== nomes.length) falhar(quem, "'partes' não pode repetir nome.");
 
+  const objeto = texto(valor.objeto, quem, 'objeto', MINIMO_DO_CRITERIO);
   const referencias = listaDeTextos(valor.referencias, quem, 'referencias');
   return {
     formato: FORMATO_PLANO_DE_MODELAGEM,
     versao: VERSAO_PLANO_DE_MODELAGEM,
-    objeto: texto(valor.objeto, quem, 'objeto', MINIMO_DO_CRITERIO),
+    objeto,
     referencias,
     escala: { medida: texto(escala.medida, quem, 'escala.medida'), milimetros: escala.milimetros },
     partes,
