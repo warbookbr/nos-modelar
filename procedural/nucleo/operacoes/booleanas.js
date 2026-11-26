@@ -1174,7 +1174,7 @@ export function criarOperacoesBooleanas(servicos) {
       const porIdEscrito = [...mantidas.map((fid) => vsDaMantida.get(fid) ?? st.F.get(fid).vs), ...depois].filter((P) => new Set(P).size >= 3);
       const casca = porRepresentante;
       const falha = cascaAberta(porRepresentante, pos) ?? cascaAberta(porIdEscrito, pos);
-      if (falha && extra?.tentativa) return { falhouCasca: falha };
+      if (falha && (extra?.tentativa || extra?.soCasca)) return { falhouCasca: falha };
       if (falha && !extra && !reforco && op === 'unir') return nucleoBooleano(st, i, op, wasm, origemId, operandos, extra, { vincarCostura, origemDoOperando, reforco: true, refino });
       /* na tentativa (os prismas em meia-esquadria), pedaço sem área também
          reprova: é o sinal de tampas vizinhas que não coincidem, e o modo por
@@ -1830,7 +1830,21 @@ export function criarOperacoesBooleanas(servicos) {
           const k = chaveP(x); if (!adj.has(k)) adj.set(k, []);
           if (!adj.get(k).some((o) => tamanho(sub(o.p, y)) <= 1e3 * eps)) adj.get(k).push({ p: y, n: sgm.n });
         }
+        adj.segs = segs;
         return adj;
+      };
+      /* A ESPESSURA ATRÁS do canto: a distância de P, no plano da fatia e na direção `atras` (para dentro do sólido), até a superfície do outro lado. O ponto de
+         trás da seção (Q) fica a um raio atrás do canto, e onde o sólido é mais fino que isso (a parede de um aro de 3 mm sob um raio de 8) o prisma atravessava
+         a pele do outro lado e deixava o tubo à mostra, com vértice de vínculo não-manifold onde ele passava por um canto da casca. Infinito se o raio não acha nada. */
+      const espessuraAtras = (adj, P, atras) => {
+        let menor = Infinity;
+        for (const sg of adj.segs ?? []) {
+          const e = sub(sg.b, sg.a), ap = sub(sg.a, P), nn = cruz(atras, e), n2 = ponto(nn, nn);
+          if (!(n2 > 1e-18 * ponto(e, e))) continue;
+          const sp = ponto(cruz(ap, e), nn) / n2, tp = ponto(cruz(ap, atras), nn) / n2;
+          if (tp >= -1e-9 && tp <= 1 + 1e-9 && sp > 1e3 * eps && sp < menor) menor = sp;
+        }
+        return menor;
       };
       /* FACE PLANA QUE LIMITA O SÓLIDO (só no arredondamento que enche, classe côncava de sempre). Onde a superfície que a bola rola acaba numa face
          plana que dobra mais de 45° (a tampa de um tubo, rente à parede do outro) e o plano dessa face deixa o sólido inteiro de um lado só, o raio
@@ -1983,7 +1997,7 @@ export function criarOperacoesBooleanas(servicos) {
            duplicados, com vértice de vínculo não-manifold (o teste de contato
            recusa). Afundado, o arco corta a casca de verdade perto das
            tangências, e a superfície visível muda menos que o mergulho. */
-        const mergulho = 1e-3 * raio;   // 1e-3 do raio: medido de 8 a 30 mm no ombro, sem lasca nem vínculo aberto (5e-4 deixava lasca em 25 mm; zero, vínculo aberto em 15 e 20 mm)
+        const mergulho = 1e-3 * raio * fatorDoMergulho;   // 1e-3 do raio: medido de 8 a 30 mm no ombro, sem lasca nem vínculo aberto (5e-4 deixava lasca em 25 mm; zero, vínculo aberto em 15 e 20 mm)
         const paraOCanto = sub(P, C).map((c) => c / tamanho(sub(P, C)));
         const Cm = C.map((c, j) => c + paraOCanto[j] * mergulho);
         const arco = [];
@@ -1993,7 +2007,8 @@ export function criarOperacoesBooleanas(servicos) {
           arco.push(Cm.map((c, j) => c + raio * r0[j] / lr));
         }
         const atras = sub(P, Cm).map((c) => c / tamanho(sub(P, Cm)));
-        const Q = P.map((c, j) => c + atras[j] * raio);
+        const fundo = Math.min(raio, 0.5 * espessuraAtras(adj, P, atras));   // o fundo fica a meia espessura da parede, no máximo a um raio
+        const Q = P.map((c, j) => c + atras[j] * fundo);
         return { anel: [Q, ...arco], C: C.map((c, j) => c + centroT[j]) };   // anel local, centro no mundo
       };
 
@@ -2392,6 +2407,7 @@ export function criarOperacoesBooleanas(servicos) {
     if (modo === 'plano' && regiao) return grita(st, i, op, 'regiao', 'regiao só vale na costura curva; na costura plana o arredondamento é por aresta inteira');
     /* o modo curvo por classe de sinal: as arestas que enchem (côncavas e
        internas) numa cadeia de tubos, as que tiram (convexas) noutra */
+    let fatorDoMergulho = 1;   // o mergulho do arco na casca, em múltiplos do padrão: o contato tangente cai em vínculo não-manifold por acaso da posição, e a nova tentativa muda o acaso
     const construirCurvo = () => {
       const partes = [];
       for (const sinal of [1, -1]) {
@@ -2534,18 +2550,39 @@ export function criarOperacoesBooleanas(servicos) {
       const soltos = registro.faces.filter((f) => fora.has(f)).flatMap((f) => { const p = ficam(f); if (registro.donos?.[f] != null) for (const x of p) registro.donos[x] ??= registro.donos[f]; return p; });
       registro.faces = [...registro.faces.filter((f) => !fora.has(f)), ...pedacosDeEntrada, ...soltos].sort((x, y) => x - y);
       registro.costura = registro.costura.filter((f) => !fora.has(f));
+      /* A face que o tubo cobriu inteira também sai das listas das OUTRAS origens que a citavam (o operando da união, a peça de um subtrair): quem cita a origem inteira
+         ("o aro", "a placa") continua valendo sem a face coberta, como no `limparLascas`, em vez de a parte inteira gritar porque uma face da parede sumiu sob o raio.
+         Os pedaços vivos de uma face cortada que saiu inteira entram no lugar dela. A citação explícita da face segue dizendo que o arredondamento a consumiu (`st.consumidas`). */
+      if (fora.size) {
+        const tira = (lista) => lista.flatMap((x) => (Number.isSafeInteger(x) && fora.has(x) ? ficam(x) : [x]));
+        for (const regs of st.origens.values()) for (const r of regs) {
+          if (r === registro) continue;
+          for (const [k, v] of Object.entries(r)) {
+            if (Array.isArray(v) && v.length && v.every(Number.isSafeInteger)) r[k] = tira(v);
+            else if (v && typeof v === 'object' && !Array.isArray(v) && !(v instanceof Map) && k !== 'donos') for (const [k2, w] of Object.entries(v)) if (Array.isArray(w) && w.length && w.every(Number.isSafeInteger)) v[k2] = tira(w);
+          }
+        }
+      }
     };
-    const rodar = (tentativa) => nucleoBooleano(st, i, op, wasm, a.origemId, facesDoMolde ? [faces, facesDoMolde] : [faces], { calcular, herdaDe, liso: 45, ref: 'de', aoAplicar, estrito: restrito, deixaLasca: a.limpar != null && a.limpar !== false, centro: curvo?.centro, grade: curvo?.grade, tentativa, registroExtra: curvo ? { eixos: curvo.cadeias.map((c) => c.centros) } : {} });
+    const rodar = (tentativa, soCasca = false) => nucleoBooleano(st, i, op, wasm, a.origemId, facesDoMolde ? [faces, facesDoMolde] : [faces], { calcular, herdaDe, liso: 45, ref: 'de', aoAplicar, estrito: restrito, deixaLasca: a.limpar != null && a.limpar !== false, centro: curvo?.centro, grade: curvo?.grade, tentativa, soCasca, registroExtra: curvo ? { eixos: curvo.cadeias.map((c) => c.centros) } : {} });
     /* Os prismas em meia-esquadria são exatos no canto reto, mas no canto
        torto as tampas vizinhas não coincidem e podem deixar a casca aberta
        (o braço inclinado a 20° com raio 0,01). O portão de casca fechada
        devolve a falha em vez de gritar, e o arredondamento refaz a costura
        inteira pelo modo curvo, por fatias, que acompanha qualquer canto. */
-    const r1 = rodar(!curvo);
+    const r1 = rodar(!curvo, !!curvo);
     if (r1?.falhouCasca) {
-      curvo = construirCurvo();
-      if (curvo.erro) return grita(st, i, op, 'raio', curvo.erro);
-      rodar(false);
+      /* O tubo encosta tangente na casca, e a Manifold às vezes separa o contato num vértice de vínculo não-manifold conforme a posição de uma parede mudou 1 mm.
+         O mergulho do arco é o grau de liberdade que não muda a forma além de 1e-3 do raio: o passo tenta o padrão, o dobro, a metade e o quádruplo, na ordem,
+         e só grita se nenhum fecha a casca. Só muda o que antes recusava. */
+      const fatores = curvo ? [2, 0.5, 4] : [1, 2, 0.5, 4];
+      for (let k = 0; k < fatores.length; k++) {
+        fatorDoMergulho = fatores[k];
+        curvo = construirCurvo();
+        if (curvo.erro) return grita(st, i, op, 'raio', curvo.erro);
+        const r = rodar(false, k < fatores.length - 1);
+        if (!r?.falhouCasca) break;
+      }
     }
     if (st.orfaos.length === antes) {
       registro.arredondadaEm = i;
