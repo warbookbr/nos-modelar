@@ -11,12 +11,19 @@
  * esboço antigo saiu, e com ele o Condutor. Antes dos títulos, um nome que é de ficha de capacidade, de operação do núcleo, de extensão ou de
  * script do `package.json` recebe o comando que o explica (`capacidade`, ou o próprio comando com a opção de ajuda).
  *
+ * Nos roteiros de peça nova e de peça de família, `--objeto=<tipo>` acrescenta as ferramentas de forma e as famílias que servem
+ * àquele tipo de objeto, de `docs/modelar/ferramentas-por-objeto.json`, e a resposta traz as ferramentas de linha de comando do
+ * registro (`tools/registro-de-ferramentas.json`) que as skills do roteiro citam. Com `MODELAR_VIGIA=1` no ambiente, a resposta
+ * começa pelos ramos `claude/**` e `envio/**` parados e pelo último CI vermelho; sem a variável nada muda, e sem rede ou sem
+ * `gh` a vigia sai calada.
+ *
  * O comando só lê. A ferramenta MCP `comecar` chama a mesma função `comecar`, e as duas respondem igual. */
+import { execFileSync } from 'node:child_process';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { classificarNome } from './capacidade.mjs';
-import { ancoraDe, carregarRoteiros, filhosDoNo, medirRoteiro, partesDaLeitura, RAIZ, textoDaLeitura } from '../mapa/roteiros.mjs';
+import { ancoraDe, caminhoDaSkill, carregarRoteiros, filhosDoNo, medirRoteiro, partesDaLeitura, RAIZ, skillsDoPasso, skillsSomadas, textoDaLeitura } from '../mapa/roteiros.mjs';
 import { ativosDoIndice } from '../mapa/planos.mjs';
 import { registrarUso } from './uso.mjs';
 
@@ -88,16 +95,100 @@ export function listaDePecas(raiz = RAIZ) {
   return nomes.sort();
 }
 
+const lerJson = (caminho) => { try { return JSON.parse(readFileSync(caminho, 'utf8')); } catch { return null; } };
+
+export const CAMINHO_POR_OBJETO = 'docs/modelar/ferramentas-por-objeto.json';
+export const CAMINHO_DO_REGISTRO = 'tools/registro-de-ferramentas.json';
+/* Os roteiros em que se planeja uma peça: neles o `comecar` mostra o que existe para o tipo de objeto. */
+const ROTEIROS_DE_PLANEJAR = ['modelar/peca/nova', 'modelar/peca/familia'];
+
+/* As ferramentas de forma e as famílias que servem a um tipo de objeto, do mapa de ferramentas por objeto e do `familia.json`
+   de cada família: linhas curtas. O tipo se escreve como no mapa, sem depender de acento nem de maiúscula; com mais de um tipo
+   perto, ou nenhum, a linha diz quais existem. */
+export function paraOObjeto(objeto, raiz = RAIZ) {
+  const dados = lerJson(join(raiz, CAMINHO_POR_OBJETO));
+  if (!dados?.objetos) return [];
+  const tipos = Object.entries(dados.objetos).flatMap(([grupo, objetos]) => Object.entries(objetos).map(([nome, ferramentas]) => ({ grupo, nome, ferramentas })));
+  const q = semAcento(String(objeto ?? '').trim());
+  if (q === '') return [`para o tipo de objeto: npm run comecar -- <roteiro> --objeto=<tipo> lista as ferramentas de forma e as famílias que servem a ele (${tipos.length} tipos em ${CAMINHO_POR_OBJETO})`];
+  const exatos = tipos.filter((t) => semAcento(t.nome) === q);
+  const achados = exatos.length > 0 ? exatos : tipos.filter((t) => semAcento(t.nome).includes(q));
+  if (achados.length !== 1) {
+    const perto = (achados.length > 0 ? achados : tipos.filter((t) => semAcento(t.grupo).includes(q))).map((t) => t.nome);
+    return [perto.length > 0
+      ? `"${objeto}" casa com ${perto.length} tipos de ${CAMINHO_POR_OBJETO}; escolha um: ${perto.slice(0, 12).join(', ')}${perto.length > 12 ? ` e mais ${perto.length - 12}` : ''}`
+      : `"${objeto}" não é tipo de objeto de ${CAMINHO_POR_OBJETO}; os grupos são ${Object.keys(dados.objetos).join(', ')}`];
+  }
+  const tipo = achados[0];
+  const pasta = join(raiz, 'procedural/familias');
+  const familias = (existsSync(pasta) ? readdirSync(pasta, { withFileTypes: true }) : [])
+    .filter((e) => e.isDirectory()).map((e) => lerJson(join(pasta, e.name, 'familia.json'))).filter(Boolean)
+    .map((f) => ({ id: f.id, comuns: (f.ferramentas ?? []).filter((x) => tipo.ferramentas.includes(x)) }))
+    .filter((f) => f.comuns.length > 0)
+    .sort((a, b) => b.comuns.length - a.comuns.length || a.id.localeCompare(b.id));
+  return [
+    `objeto "${tipo.nome}" (${tipo.grupo}), de ${CAMINHO_POR_OBJETO}:`,
+    `ferramentas de forma, com o que o Modelar tem de cada uma: ${tipo.ferramentas.map((id) => `${id} (${dados.ferramentas?.[id]?.aqui ?? 'sem registro'})`).join(', ')}`,
+    familias.length > 0
+      ? `famílias que servem, com a ferramenta em comum: ${familias.map((f) => `${f.id} (${f.comuns.join(', ')})`).join(', ')}`
+      : 'nenhuma família registrada usa essas ferramentas: a receita sai por operações',
+  ];
+}
+
+/* As ferramentas de uso do registro que as skills do roteiro citam por `npm run <comando>` e que a lista de comandos do roteiro
+   ainda não traz: uma linha com os comandos. */
+export function ferramentasDasSkills(roteiro, raiz = RAIZ) {
+  const registro = lerJson(join(raiz, CAMINHO_DO_REGISTRO));
+  const skills = skillsDoPasso(roteiro).filter((nome) => existsSync(join(raiz, caminhoDaSkill(nome))));
+  if (!registro?.ferramentas || skills.length === 0) return [];
+  const texto = skills.map((nome) => readFileSync(join(raiz, caminhoDaSkill(nome)), 'utf8')).join('\n');
+  const jaListados = (roteiro.comandos ?? []).join('\n');
+  const cita = (onde, comando) => new RegExp(`npm run ${comando.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![\\w:-])`).test(onde);
+  const comandos = registro.ferramentas.filter((e) => e.tipo === 'uso').flatMap((e) => e.comandos ?? [])
+    .filter((c) => c !== 'comecar' && cita(texto, c) && !cita(jaListados, c)).sort();
+  if (comandos.length === 0) return [];
+  return [`ferramentas de uso que ${skills.length === 1 ? `a skill ${skills[0]} cita` : `as skills ${skills.join(' e ')} citam`}, de ${CAMINHO_DO_REGISTRO} (npm run comecar -- <comando> diz como chamar): ${comandos.join(', ')}`];
+}
+
 /* O que o roteiro de modelar tem disponível, sem carregar referência inteira. */
-function disponivel(roteiro, raiz) {
-  if (roteiro.lista === 'familias') return listaDeFamilias(raiz).map((l) => `família ${l}`);
+function disponivel(roteiro, raiz, objeto = null) {
+  const planejar = ROTEIROS_DE_PLANEJAR.includes(roteiro.id) ? [...paraOObjeto(objeto, raiz), ...ferramentasDasSkills(roteiro, raiz)] : [];
+  if (roteiro.lista === 'familias') return [...listaDeFamilias(raiz).map((l) => `família ${l}`), ...planejar];
   if (roteiro.lista === 'pecas') return [`${listaDePecas(raiz).length} peças no acervo: ${listaDePecas(raiz).join(', ')}`];
   if (roteiro.id.startsWith('modelar/')) {
     const caminho = join(raiz, 'docs/modelar/gerado/catalogo-capacidades.json');
     const operacoes = existsSync(caminho) ? JSON.parse(readFileSync(caminho, 'utf8')).operacoes ?? [] : [];
-    return [`${operacoes.length} operações do motor em docs/modelar/gerado/CATALOGO-CAPACIDADES.md (no MCP, buscar_capacidades)`];
+    return [`${operacoes.length} operações do motor em docs/modelar/gerado/CATALOGO-CAPACIDADES.md (no MCP, buscar_capacidades)`, ...planejar];
   }
   return [];
+}
+
+/* A vigia de quem conduz: com `MODELAR_VIGIA=1` no ambiente, os ramos `claude/**` e `envio/**` com trabalho fora da main e o
+   último CI vermelho do repositório. Sem a variável não roda nada. Cada consulta tem tempo-limite curto, e a que falha (sem
+   rede, sem `gh`, sem remoto) some sem erro, para quem clona o repositório não ver o que não é dele. `rodar(comando, args)`
+   devolve a saída do comando ou estoura, e existe para o teste não depender de rede. */
+export const TEMPO_LIMITE_DA_VIGIA_MS = 4000;
+function rodarComLimite(raiz) {
+  return (comando, args) => execFileSync(comando, args, { cwd: raiz, encoding: 'utf8', timeout: TEMPO_LIMITE_DA_VIGIA_MS, stdio: ['ignore', 'pipe', 'ignore'] });
+}
+export function vigia({ env = process.env, raiz = RAIZ, rodar = rodarComLimite(raiz) } = {}) {
+  if (env?.MODELAR_VIGIA !== '1') return [];
+  const tentar = (funcao) => { try { return funcao(); } catch { return []; } };
+  const ramos = tentar(() => {
+    const lista = JSON.parse(rodar(process.execPath, [join(raiz, 'tools/modelar/ramos-parados.mjs'), '--json']));
+    if (!Array.isArray(lista) || lista.length === 0) return [];
+    return [
+      `${lista.length} ${lista.length === 1 ? 'ramo parado' : 'ramos parados'} com trabalho fora da main (npm run ramos:parados):`,
+      ...lista.map((r) => `  ${r.data}  ${r.nome}: ${r.commitsForaDaMain} commit(s) fora da main${r.juntarRecusa ? ', e o juntar do CI recusa até juntar a main' : ''}`),
+    ];
+  });
+  const ci = tentar(() => {
+    const [execucao] = JSON.parse(rodar('gh', ['api', 'repos/{owner}/{repo}/actions/runs?status=failure&per_page=1', '--jq', '[.workflow_runs[] | {nome: .name, ramo: .head_branch, data: .created_at, url: .html_url}]']));
+    if (!execucao?.url) return [];
+    return [`último CI vermelho: ${execucao.nome ?? 'CI'} no ramo ${execucao.ramo ?? 'desconhecido'}, em ${String(execucao.data ?? '').slice(0, 10)} (${execucao.url})`];
+  });
+  const linhas = [...ramos, ...ci];
+  return linhas.length > 0 ? ['Vigia (MODELAR_VIGIA=1):', ...linhas.map((l) => `  ${l}`)] : [];
 }
 
 /* O estado do trabalho que vale para a lista e para o roteiro `mudar/plano`. */
@@ -210,8 +301,17 @@ export function buscarNome(consulta, raiz = RAIZ) {
   return { tipo: 'comando', nome: script, frase: ajuda ? `é um comando: rode \`${comando}\`` : `é um comando: \`${comando}\``, comando };
 }
 
-/* A resposta da entrada: { ok, codigo, texto, resultado }. */
-export function comecar({ roteiro: consulta = null, raiz = RAIZ } = {}) {
+/* A resposta da entrada: { ok, codigo, texto, resultado }. Com a vigia ligada e algo a mostrar, o texto começa por ela e o
+   resultado ganha o campo `vigia`; a seção pedida por `arquivo#âncora` e a recusa saem como são. */
+export function comecar({ roteiro = null, raiz = RAIZ, objeto = null, env = process.env, rodar } = {}) {
+  const resposta = responder({ roteiro, raiz, objeto });
+  if (!resposta.ok || resposta.resultado?.secao) return resposta;
+  const linhas = vigia({ env, raiz, ...(rodar ? { rodar } : {}) });
+  if (linhas.length === 0) return resposta;
+  return { ...resposta, texto: `${linhas.join('\n')}\n\n${resposta.texto}`, resultado: { ...resposta.resultado, vigia: linhas } };
+}
+
+function responder({ roteiro: consulta = null, raiz = RAIZ, objeto = null } = {}) {
   const dados = carregarRoteiros(raiz);
   const estado = estadoGeral(raiz);
   if (consulta === null || String(consulta).trim() === '') {
@@ -255,7 +355,8 @@ export function comecar({ roteiro: consulta = null, raiz = RAIZ } = {}) {
 
   const r = achado.roteiro;
   const { total } = medirRoteiro(r, raiz);
-  const recursos = disponivel(r, raiz);
+  const recursos = disponivel(r, raiz, objeto);
+  const somadas = skillsSomadas(r);
   let estadoTexto = [];
   let passo = r.passo;
   if (r.id === 'mudar/plano') {
@@ -270,6 +371,7 @@ export function comecar({ roteiro: consulta = null, raiz = RAIZ } = {}) {
     '',
     `Ler antes (${milhar(total)} bytes, orçamento ${milhar(r.orcamentoBytes)}, com as seções abaixo):`,
     ...inteiros.map((a) => `  ${a}`),
+    ...somadas.map((a) => `  ${a} (a skill que o passo seguinte manda aplicar)`),
   ];
   for (const a of secoes) partes.push('', `--- ${a}`, textoDaLeitura(a, raiz) ?? '(seção não encontrada)');
   if (secoes.length > 0) partes.push('---');
@@ -283,21 +385,29 @@ export function comecar({ roteiro: consulta = null, raiz = RAIZ } = {}) {
     ok: true, codigo: 0, texto: `${partes.join('\n')}\n`,
     resultado: {
       roteiro: r.id, titulo: r.titulo, ler: r.ler, leituraBytes: total, orcamentoBytes: r.orcamentoBytes,
-      sobDemanda: r.sobDemanda ?? [], skill: r.skill, comandos: r.comandos ?? [], disponivel: recursos,
+      skillsDoPasso: somadas, sobDemanda: r.sobDemanda ?? [], skill: r.skill, comandos: r.comandos ?? [], disponivel: recursos,
       estado: estadoTexto, passo, conferido: r.conferido,
     },
   };
 }
 
-const AJUDA = `npm run comecar [-- <roteiro | tópico | nome>]  (node tools/modelar/comecar.mjs)
+const AJUDA = `npm run comecar [-- <roteiro | tópico | nome>] [--objeto=<tipo>]  (node tools/modelar/comecar.mjs)
 Sem argumento, a pergunta inicial e o estado do trabalho. Com um roteiro ou grupo, a leitura ou os ramos. Com outro nome: o título de documento mais perto, ou, se for
 nome de operação, de extensão, de ficha de capacidade ou de script de package.json, o comando que o explica. arquivo#âncora entrega a seção.
+
+  --objeto=<tipo>   nos roteiros modelar/peca/nova e modelar/peca/familia, lista as ferramentas de forma e as famílias que servem
+                    ao tipo de objeto (bicicleta, cadeira, forno), de docs/modelar/ferramentas-por-objeto.json
+
+Com MODELAR_VIGIA=1 no ambiente, a resposta começa pelos ramos claude/** e envio/** parados e pelo último CI vermelho do
+repositório; sem rede ou sem gh, a vigia não imprime nada.
 `;
 
 function executar(argv) {
   const args = [...argv];
   if (args.includes('--ajuda')) { process.stdout.write(AJUDA); return; }
-  const r = comecar({ roteiro: args[0] ?? null });
+  const posicionais = args.filter((a) => !a.startsWith('--'));
+  const objeto = args.find((a) => a.startsWith('--objeto='))?.slice('--objeto='.length) ?? null;
+  const r = comecar({ roteiro: posicionais[0] ?? null, objeto });
   (r.ok ? process.stdout : process.stderr).write(r.texto);
   process.exitCode = r.codigo;
 }

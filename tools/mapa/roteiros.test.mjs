@@ -9,7 +9,7 @@ import { describe, expect, it } from 'vitest';
 import { conferirLeituraObrigatoria } from './leitura-obrigatoria.mjs';
 import {
   ancoraDe, CAMINHO_CLAUDE, CAMINHO_JSON, CAMINHO_ROTEIROS, carregarRoteiros, filhosDoNo, gerarBlocoInvariantes, gerarClaude, gerarRoteirosMd,
-  MARCADORES, medirRoteiro, paginasDesatualizadas, RAIZ, TETO_DA_FRASE, validarRoteiros,
+  MARCADORES, medirRoteiro, paginasDesatualizadas, RAIZ, skillsDoPasso, skillsSomadas, TETO_DA_FRASE, validarRoteiros,
 } from './roteiros.mjs';
 
 const CLAUDE_MODELO = `# Teste\n\n${MARCADORES.roteiros.join('\n')}\n\n${MARCADORES.invariantes.join('\n')}\n`;
@@ -68,6 +68,38 @@ describe('os roteiros do repositório', () => {
     const dados = carregarRoteiros();
     expect(new Set(dados.roteiros.map((r) => r.intencao))).toEqual(new Set(['trabalhar no projeto', 'trabalhar na documentação', 'pesquisar', 'modelar']));
     for (const r of dados.roteiros) expect(gerarRoteirosMd(dados)).toContain(`| \`${r.id}\` | ${r.intencao} | ${r.quando} |`);
+  });
+});
+
+describe('os ramos de rodada, montagem e exportação e a soma da skill, no repositório', () => {
+  const { roteiros } = carregarRoteiros();
+  const por = (id) => roteiros.find((r) => r.id === id);
+
+  it('existem os três ramos, cada um abaixo da linha de base e com o orçamento rente à leitura', () => {
+    for (const id of ['modelar/rodada', 'modelar/montar', 'modelar/exportar']) {
+      const r = por(id);
+      expect(r, id).toBeTruthy();
+      const { total } = medirRoteiro(r);
+      expect(total, id).toBeLessThanOrEqual(r.orcamentoBytes);
+      expect(r.orcamentoBytes - total, `${id}: orçamento novo não nasce folgado`).toBeLessThan(200);
+      expect(total, id).toBeLessThan(r.linhaDeBase.bytes);
+      expect(r.linhaDeBase.data).toBe('2026-11-26');
+    }
+    expect(por('modelar/rodada').skill).toBe('laco-de-modelagem');
+    expect(por('modelar/exportar').ler).toContain('docs/modelar/usar/EXPORTACAO.md');
+  });
+
+  it('a peça nova mede a skill de alinhamento que o passo manda aplicar, e nenhum roteiro passa da linha de base', () => {
+    const nova = por('modelar/peca/nova');
+    expect(skillsSomadas(nova)).toEqual(['.claude/skills/alinhar-modelagem/SKILL.md']);
+    const medido = medirRoteiro(nova);
+    const skill = medido.arquivos.find((a) => a.skillDoPasso);
+    expect(skill.bytes).toBeGreaterThan(5000);
+    expect(medido.total).toBe(medido.arquivos.filter((a) => !a.skillDoPasso).reduce((s, a) => s + a.bytes, 0) + skill.bytes);
+    for (const r of roteiros) {
+      expect(medirRoteiro(r).total, r.id).toBeLessThan(r.linhaDeBase.bytes);
+      for (const caminho of skillsSomadas(r)) expect(r.ler, `${r.id} não lista ${caminho}`).not.toContain(caminho);
+    }
   });
 });
 
@@ -165,6 +197,36 @@ describe('o gate leitura:obrigatoria recusa', () => {
     const { problemas, roteiros } = conferirLeituraObrigatoria(raiz);
     expect(roteiros[0].dentro).toBe(false);
     expect(problemas.join('\n')).toMatch(/acima do orçamento de 120\. Cortar significa mover para "sobDemanda"/);
+  });
+
+  it('a leitura que estoura quando se soma a skill que o passo manda aplicar, e a skill do passo que não existe', () => {
+    const SKILL = '.claude/skills/alinhar-modelagem/SKILL.md';
+    const comPasso = (d) => roteiro(d, { passo: 'Combine o alvo pela skill alinhar-modelagem; depois escreva pela skill criar-peca.' });
+    const { raiz, dados, gravar } = repositorio(comPasso);
+    expect(conferirLeituraObrigatoria(raiz).problemas.join('\n')).toContain('o "passo" manda aplicar a skill "alinhar-modelagem", que não existe em .claude/skills/');
+    gravar(SKILL, 'a'.repeat(400));
+    const semSkill = medirRoteiro({ ...dados.roteiros[0], skill: null, passo: 'Rode npm run gates.' }, raiz).total;
+    const medido = medirRoteiro(dados.roteiros[0], raiz);
+    expect(skillsDoPasso(dados.roteiros[0])).toEqual(['criar-peca', 'alinhar-modelagem']);
+    expect(skillsSomadas(dados.roteiros[0])).toEqual(['.claude/skills/criar-peca/SKILL.md', SKILL]);
+    expect(medido.total).toBe(semSkill + Buffer.byteLength('skill\n') + 400);
+    expect(medido.arquivos.filter((a) => a.skillDoPasso).map((a) => a.relativo)).toEqual(['.claude/skills/criar-peca/SKILL.md', SKILL]);
+    expect(conferirLeituraObrigatoria(raiz).problemas).toEqual([]);
+    const regravar = (d) => { gravar(CAMINHO_JSON, JSON.stringify(d)); gravar(CAMINHO_ROTEIROS, gerarRoteirosMd(d)); gravar(CAMINHO_CLAUDE, gerarClaude(CLAUDE_MODELO, d)); };
+    regravar(roteiro(dados, { orcamentoBytes: medido.total - 1 }));
+    expect(conferirLeituraObrigatoria(raiz).problemas.join('\n')).toMatch(/1 acima do orçamento de \d+\. Cortar significa mover para "sobDemanda"/);
+    regravar(roteiro(dados, { orcamentoBytes: 10000, linhaDeBase: { bytes: medido.total, data: '2026-10-08' } }));
+    expect(conferirLeituraObrigatoria(raiz).problemas.join('\n')).toContain(`precisa ficar abaixo da linha de base de ${medido.total}`);
+  });
+
+  it('a skill que já está na lista de leitura não soma duas vezes, e a página gerada diz qual skill o passo soma', () => {
+    const SKILL = '.claude/skills/criar-peca/SKILL.md';
+    const { raiz, dados } = repositorio((d) => roteiro(d, { ler: [CAMINHO_CLAUDE, SKILL], passo: 'Escreva a receita pela skill `criar-peca`.' }));
+    expect(skillsSomadas(dados.roteiros[0])).toEqual([]);
+    expect(medirRoteiro(dados.roteiros[0], raiz).arquivos.map((a) => a.relativo)).toEqual([CAMINHO_CLAUDE, SKILL]);
+    const soPasso = { ...dados.roteiros[0], ler: [CAMINHO_CLAUDE] };
+    expect(gerarRoteirosMd({ ...dados, roteiros: [soPasso] })).toContain(`- \`${SKILL}\`, a skill que o passo seguinte manda aplicar`);
+    expect(skillsDoPasso({ skill: null, passo: 'A skill de alinhamento vem antes; a palavra skill sozinha não nomeia nenhuma.' })).toEqual([]);
   });
 
   it('a página gerada que não bate com o JSON, apontando o comando que regrava', () => {

@@ -6,6 +6,7 @@
 > algum arquivo-fonte estiver sem cabeçalho.
 
 2453 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2450 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -505,6 +506,10 @@
 
 - `README.md` — Banco de provas — ferramentas de prancha para IA (2026-11-20)
 
+## docs/modelar/banco-de-provas/processo-e-ci-2026-11-26/
+
+- `README.md` — Processo e CI: a série dos dez envios sem vermelho falso
+
 ## docs/modelar/banco-de-provas/rebaixo-por-contorno-2026-11-20/
 
 - `README.md` — Rebaixo por contorno: provas do ajudante e aplicação no `carro-quadrado`
@@ -808,12 +813,14 @@
 - `CONFERIR-CONTRA-REFERENCIA.md` — Conferir a peça contra uma foto de referência
 - `CONTRATO-AUTORIA-PRANCHA.md` — Contrato de autoria de prancha v1
 - `CRITICA-VISUAL-CONTRATO-E-CASOS.md` — Crítica visual — contrato do achado e casos aplicados
+- `EXPORTACAO.md` — Exportação
 - `FLUXO-DO-OBJETO.md` — Fluxo do objeto
 - `GOTCHAS-AUTORIA-VISUAL.md` — Gotchas de autoria visual
 - `GOTCHAS-POR-OPERACAO.md` — Gotchas por operação: os casos completos
 - `GUIA-AUTORIA-IA.md` — # Guia de Autoria e Modelagem Procedural para IA
 - `INTENCAO-PECA-V1.md` — Intenção semântica opcional de peça — v1
 - `LACO-VISUAL.md` — O laço visual — olhar, sobrepor, despachar
+- `MEDIDAS-AVULSAS.md` — Medidas avulsas: quando usar cada uma
 - `METODO-DIAGNOSTICO-E-SEU-LIMITE.md` — Método diagnóstico, e onde ele para
 - `MONTAGENS-SEMANTICAS.md` — Montagens semânticas
 - `PARAMETROS-VIVOS.md` — Parâmetro vivo e parâmetro decorativo
@@ -3935,6 +3942,8 @@
 - `marcadores-de-conflito.test.mjs` — marcadores-de-conflito.test.mjs — nenhum arquivo rastreado guarda marcador de conflito de junção. Em 2026-10-28 uma junção deixou o plano ativo com os marcad…
 - `mecanismos.mjs` — mecanismos.mjs — a página `docs/modelar/MECANISMOS.md` cita todo mecanismo do projeto.
 - `mecanismos.test.mjs` — mecanismos.test.mjs — a página dos mecanismos cita toda pasta de primeiro nível, ou ela consta nas dispensas com motivo.
+- `pedido-ao-agente.mjs` — pedido-ao-agente.mjs — monta o pedido a um agente despachado a partir do plano: `npm run pedido -- <plano> --fatia=<n>`.
+- `pedido-ao-agente.test.mjs` — pedido-ao-agente.test.mjs — o pedido ao agente sai do plano: caminho, fatia, território, regra de não sair dele, gate de saída, citação das regras comuns e a…
 - `planos.mjs` — planos.mjs — confere que os planos ativos são no máximo seis comuns e nove com os de núcleo, cada um com território declarado e sem sobreposição, que o campo…
 - `planos.test.mjs` — planos.test.mjs — prova que o gate recusa plano grande, estados inválidos, índice divergente, plano parado que o índice não liga, mais de seis comuns ou nove…
 - `registro-de-ferramentas.mjs` — registro-de-ferramentas.mjs — o registro único das ferramentas de linha de comando de `tools/`, conferido.

@@ -59,3 +59,5 @@ segue:
 A recomendação segue o primeiro item que falhou, na ordem da lista.
 
 Cada variante da receita medida numa rodada reaproveita os passos que não mudaram, pelo cache por passo; o [guia do cache](../../../../docs/modelar/usar/CACHE-POR-PASSO.md) diz como ele se liga, como limpar e quando rodar com `--sem-cache`.
+
+Quando a medida que falta não está entre os comandos do roteiro (o reflexo de uma chapa, a distância à pele declarada, o material de uma vista contra a imagem, uma parte que sai do contorno de outra), o [guia das medidas avulsas](../../../../docs/modelar/usar/MEDIDAS-AVULSAS.md) diz qual ferramenta serve a cada caso. Com a forma aprovada pela pessoa, o [guia de exportação](../../../../docs/modelar/usar/EXPORTACAO.md) traz o comando de cada formato de saída.

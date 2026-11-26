@@ -106,6 +106,22 @@ export function filhosDoNo(roteiros, prefixo) {
   return filhos;
 }
 
+/* As skills que o roteiro manda aplicar e a lista `ler` não traz: a do campo `skill` e cada uma que o `passo` nomeia depois da
+   palavra "skill" (`pela skill alinhar-modelagem`). Quem segue o roteiro lê o `SKILL.md` delas antes da primeira ação, e por
+   isso elas somam na leitura. Até 2026-11-26 só a lista `ler` somava, e a peça nova media 16.487 bytes para 26.494 lidos. */
+const NOME_DE_SKILL_NO_PASSO = /\bskill\s+`?([a-z][a-z0-9]*(?:-[a-z0-9]+)+)/g;
+export const caminhoDaSkill = (nome) => `.claude/skills/${nome}/SKILL.md`;
+export function skillsDoPasso(roteiro) {
+  const nomes = [];
+  if (textoCheio(roteiro?.skill)) nomes.push(roteiro.skill);
+  for (const m of String(roteiro?.passo ?? '').matchAll(NOME_DE_SKILL_NO_PASSO)) if (!nomes.includes(m[1])) nomes.push(m[1]);
+  return nomes;
+}
+export function skillsSomadas(roteiro) {
+  const lidos = new Set((roteiro?.ler ?? []).map((item) => partesDaLeitura(item).arquivo));
+  return skillsDoPasso(roteiro).map(caminhoDaSkill).filter((caminho) => !lidos.has(caminho));
+}
+
 /* Os documentos de uso que um nó precisa entregar: cada `.md` de `docs/modelar/usar/`, menos o README. */
 const PASTA_USAR = 'docs/modelar/usar';
 
@@ -169,6 +185,9 @@ export function validarRoteiros(dados, raiz = RAIZ) {
     if (r?.skill !== null && !(textoCheio(r?.skill) && existe(`.claude/skills/${r.skill}/SKILL.md`))) {
       problemas.push(`${onde}: a skill ${JSON.stringify(r?.skill)} não existe em .claude/skills/.`);
     }
+    for (const nome of skillsDoPasso(r).filter((n) => n !== r?.skill)) {
+      if (!existe(caminhoDaSkill(nome))) problemas.push(`${onde}: o "passo" manda aplicar a skill "${nome}", que não existe em .claude/skills/ (corrija o nome no passo; a skill do passo soma na leitura).`);
+    }
     for (const comando of r?.comandos ?? []) {
       const p = problemaDoComando(comando, scripts, raiz);
       if (p) problemas.push(`${onde}: o comando "${comando}" não serve: ${p}.`);
@@ -205,12 +224,14 @@ export function validarRoteiros(dados, raiz = RAIZ) {
   return problemas;
 }
 
-/* O tamanho de cada arquivo de "ler" e o total, em bytes. Arquivo que não existe conta 0 (a validação já o aponta). */
+/* O tamanho de cada arquivo de "ler" e de cada skill que o roteiro manda aplicar sem listar em "ler", e o total, em bytes.
+   Arquivo que não existe conta 0 (a validação já o aponta). A skill somada vem marcada com `skillDoPasso`. */
 export function medirRoteiro(roteiro, raiz = RAIZ) {
-  const arquivos = roteiro.ler.map((relativo) => {
+  const medir = (relativo, mais = {}) => {
     const texto = textoDaLeitura(relativo, raiz);
-    return { relativo, bytes: texto === null ? 0 : Buffer.byteLength(texto) };
-  });
+    return { relativo, bytes: texto === null ? 0 : Buffer.byteLength(texto), ...mais };
+  };
+  const arquivos = [...roteiro.ler.map((relativo) => medir(relativo)), ...skillsSomadas(roteiro).map((relativo) => medir(relativo, { skillDoPasso: true }))];
   return { arquivos, total: arquivos.reduce((soma, a) => soma + a.bytes, 0) };
 }
 
@@ -285,7 +306,7 @@ export function gerarRoteirosMd(dados) {
     'MCP `comecar`) devolve o mesmo com o passo seguinte lido do estado. Todo roteiro começa pelo',
     '`CLAUDE.md`, que traz as regras que nenhuma ferramenta confere e a lista destes roteiros. `npm run leitura:obrigatoria` imprime',
     'o tamanho da leitura de cada roteiro contra o orçamento e a linha de base, e o gate recusa o',
-    'roteiro que passa de um ou do outro. O `AGENTS.md` faz para outros agentes o papel do',
+    'roteiro que passa de um ou do outro. A leitura soma a lista de cada roteiro e a skill que o passo seguinte manda aplicar. O `AGENTS.md` faz para outros agentes o papel do',
     '`CLAUDE.md` e não entra na soma.',
     '',
     '| roteiro | intenção | quando |',
@@ -306,6 +327,7 @@ export function gerarRoteirosMd(dados) {
     partes.push('', `## ${r.id}: ${r.titulo}`, '', r.quando, '');
     partes.push(`Ler antes de começar, num orçamento de ${milhar(r.orcamentoBytes)} bytes (linha de base de ${milhar(r.linhaDeBase.bytes)} bytes em ${r.linhaDeBase.data}):`, '');
     for (const relativo of r.ler) partes.push(`- ${codigo(relativo)}`);
+    for (const relativo of skillsSomadas(r)) partes.push(`- ${codigo(relativo)}, a skill que o passo seguinte manda aplicar`);
     if (r.lista) partes.push('', `Lista gerada na hora: ${r.lista}.`);
     if ((r.sobDemanda ?? []).length > 0) {
       partes.push('', 'Abrir só quando a condição aparecer:', '');

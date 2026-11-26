@@ -1,9 +1,9 @@
 {
   "versao": 1,
-  "descricao": "Os invariantes e os roteiros de leitura por intenção. Os invariantes valem para toda intenção. Os que nenhum gate cobra são as regras do CLAUDE.md, o contrato mínimo que entra em todo contexto e que o npm run roteiros:gerar regrava entre marcadores junto com a linha de cada roteiro; os que um gate cobra ficam listados no ROTEIROS.md e chegam como recusa do gate. O gate leitura:obrigatoria confere que todo arquivo e comando citado existe, que cada roteiro cabe no orçamento e que o CLAUDE.md e o ROTEIROS.md estão gerados deste arquivo. A linha de base é a leitura de cada roteiro em 2026-10-08, antes da página de invariantes existir, e o gate de saída do plano o caminho curto da IA pede leitura menor que ela. O orçamento é a leitura de hoje com uns 10% de folga para a edição do dia a dia, e só desce.",
+  "descricao": "Os invariantes e os roteiros de leitura por intenção. Os invariantes valem para toda intenção. Os que nenhum gate cobra são as regras do CLAUDE.md, o contrato mínimo que entra em todo contexto e que o npm run roteiros:gerar regrava entre marcadores junto com a linha de cada roteiro; os que um gate cobra ficam listados no ROTEIROS.md e chegam como recusa do gate. O gate leitura:obrigatoria confere que todo arquivo e comando citado existe, que cada roteiro cabe no orçamento e que o CLAUDE.md e o ROTEIROS.md estão gerados deste arquivo. A linha de base é a leitura de cada roteiro em 2026-10-08, antes da página de invariantes existir, e o gate de saída do plano o caminho curto da IA pede leitura menor que ela. O orçamento é a leitura de hoje com uns 10% de folga para a edição do dia a dia, e só desce. Desde 2026-11-26 a leitura soma também a skill que o passo seguinte manda aplicar e a lista \"ler\" não traz; o orçamento do roteiro modelar/peca/nova subiu nesse dia de 16.500 para 26.500 bytes porque a régua passou a contar os 10.007 bytes da skill de alinhamento, que já eram lidos, e segue abaixo da linha de base.",
   "perguntas": {
     "mudar": "A mudança segue o plano ativo ou corrige um defeito pontual?",
-    "modelar": "A tarefa é uma peça, as opções de forma dela ou uma auditoria?",
+    "modelar": "Peça, opções, rodada, montagem, auditoria ou exportação?",
     "modelar/peca": "A peça sai de uma família que já existe, é uma receita nova por operações, ou é a correção de uma peça do acervo?"
   },
   "invariantes": [
@@ -144,7 +144,9 @@
       "comandos": [
         "npm run gates",
         "npm run mapa",
-        "npm run uso"
+        "npm run uso",
+        "npm run ramos:parados",
+        "npm run pedido -- <plano> --fatia=<n>"
       ],
       "passo": "Escolha um dos planos ativos, pelo território, e trabalhe na fatia em aberto dele; sem plano ativo, proponha um plano antes de implementar.",
       "conferido": "npm run gates, com a bateria completa quando muda código.",
@@ -379,6 +381,14 @@
         {
           "arquivo": ".claude/skills/laco-de-modelagem/processo-leve.md",
           "quando": "o objeto for um perfil de uma família existente ou uma família de caixa com frente: o processo leve, sem laço por unidade"
+        },
+        {
+          "arquivo": "docs/modelar/usar/MEDIDAS-AVULSAS.md",
+          "quando": "a medida que falta não está nos comandos do roteiro: reflexo de chapa, distância à pele, material de uma vista ou parte fora do contorno de outra"
+        },
+        {
+          "arquivo": "docs/modelar/usar/EXPORTACAO.md",
+          "quando": "a forma foi aprovada e a peça sai em STEP, OBJ, glTF ou ficha"
         }
       ],
       "skill": "criar-peca",
@@ -503,6 +513,14 @@
         {
           "arquivo": ".claude/skills/laco-de-modelagem/processo-leve.md",
           "quando": "o objeto for um perfil de uma família existente ou uma família de caixa com frente: o processo leve, sem laço por unidade"
+        },
+        {
+          "arquivo": "docs/modelar/usar/MEDIDAS-AVULSAS.md",
+          "quando": "a medida que falta não está nos comandos do roteiro: reflexo de chapa, distância à pele, material de uma vista ou parte fora do contorno de outra"
+        },
+        {
+          "arquivo": "docs/modelar/usar/EXPORTACAO.md",
+          "quando": "a forma foi aprovada e a peça sai em STEP, OBJ, glTF ou ficha"
         }
       ],
       "skill": "criar-peca",
@@ -516,7 +534,7 @@
       "lista": "operacoes",
       "passo": "Com peça nova, parta da forma de referência ou da medida (conversão, modelo de referência, imagem, prancha), combine o alvo pela skill alinhar-modelagem; depois escreva a receita pela skill criar-peca.",
       "conferido": "A análise da bancada aberta e lida, o crítico visual sem contexto e npm run gates.",
-      "orcamentoBytes": 16500,
+      "orcamentoBytes": 26500,
       "linhaDeBase": {
         "bytes": 62482,
         "data": "2026-10-08"
@@ -633,6 +651,14 @@
         {
           "arquivo": "docs/modelar/usar/AJUSTE-DA-BANCADA.md",
           "quando": "a pessoa salvou um ajuste na bancada que precisa voltar à receita"
+        },
+        {
+          "arquivo": "docs/modelar/usar/MEDIDAS-AVULSAS.md",
+          "quando": "a medida que falta não está nos comandos do roteiro: reflexo de chapa, distância à pele, material de uma vista ou parte fora do contorno de outra"
+        },
+        {
+          "arquivo": "docs/modelar/usar/EXPORTACAO.md",
+          "quando": "a forma foi aprovada e a peça sai em STEP, OBJ, glTF ou ficha"
         }
       ],
       "skill": "criar-peca",
@@ -676,6 +702,115 @@
       "linhaDeBase": {
         "bytes": 6830,
         "data": "2026-11-05"
+      }
+    },
+    {
+      "id": "modelar/rodada",
+      "intencao": "modelar",
+      "titulo": "Conduzir a rodada de modelagem",
+      "quando": "A peça já tem alvo combinado, e o trabalho é conduzir modelador e crítico rodada a rodada até a pessoa decidir.",
+      "ler": [
+        "CLAUDE.md",
+        ".claude/skills/laco-de-modelagem/SKILL.md"
+      ],
+      "sobDemanda": [
+        {
+          "arquivo": ".claude/skills/laco-de-modelagem/processo-leve.md",
+          "quando": "o objeto for um perfil de uma família existente ou uma família de caixa com frente, antes de começar"
+        },
+        {
+          "arquivo": ".claude/skills/laco-de-modelagem/parte-por-parte.md",
+          "quando": "o objeto tiver mais de uma parte, antes da primeira etapa e antes de fixar, reabrir ou aceitar uma etapa"
+        },
+        {
+          "arquivo": ".claude/skills/laco-de-modelagem/pacote-e-referencia.md",
+          "quando": "for despachar o modelador ou o crítico de uma peça com imagem de referência, prancha, mapa de partes ou lugar numa montagem"
+        },
+        {
+          "arquivo": ".claude/skills/laco-de-modelagem/refino.md",
+          "quando": "a entrega passou na medição e começa a rodada de refino"
+        },
+        {
+          "arquivo": ".claude/skills/laco-de-modelagem/registro-a-mao.md",
+          "quando": "não houver como obter os arquivos dos agentes para o registro"
+        },
+        {
+          "arquivo": "docs/modelar/usar/LACO-VISUAL.md",
+          "quando": "for olhar a imagem, sobrepor ao alvo ou medir onde o método diagnóstico para"
+        },
+        {
+          "arquivo": "docs/modelar/usar/MEDIDAS-AVULSAS.md",
+          "quando": "a medida que falta não está nos comandos do roteiro"
+        }
+      ],
+      "skill": "laco-de-modelagem",
+      "comandos": [
+        "npm run rodada -- <peça> --acao",
+        "npm run rodada -- <peça> --registrar --modelador <arquivo> --critico <arquivo>",
+        "npm run rodada -- <peça> --decisao-da-pessoa \"<quem decidiu>, <AAAA-MM-DD>: <as palavras>\" --rodada <n>"
+      ],
+      "passo": "Rode npm run rodada -- <peça> --acao, que mede a receita atual e diz a próxima ação, e conduza a rodada pela skill laco-de-modelagem.",
+      "conferido": "A rodada gravada com o relato do modelador, o veredito do crítico e a decisão da pessoa, e npm run gates.",
+      "orcamentoBytes": 11900,
+      "linhaDeBase": {
+        "bytes": 32617,
+        "data": "2026-11-26"
+      }
+    },
+    {
+      "id": "modelar/montar",
+      "intencao": "modelar",
+      "titulo": "Montar um objeto de várias partes",
+      "quando": "O objeto tem várias partes, e cada uma entra encaixada nas que já estão prontas, numa montagem por etapas.",
+      "ler": [
+        "CLAUDE.md",
+        "docs/modelar/usar/FLUXO-DO-OBJETO.md#5-montagem",
+        "docs/modelar/usar/MONTAGENS-SEMANTICAS.md#construção-parte-por-parte-montagem-v5",
+        "docs/modelar/usar/MEDIDAS-AVULSAS.md#montagem"
+      ],
+      "sobDemanda": [
+        {
+          "arquivo": "docs/modelar/usar/MONTAGENS-SEMANTICAS.md",
+          "quando": "a dúvida for a relação entre as peças, a porta publicada, a classe de ajuste ou o que a montagem não faz"
+        },
+        {
+          "arquivo": "docs/modelar/usar/AUDITORIA-DA-MONTAGEM.md",
+          "quando": "a montagem declarar apoio no chão ou auditoria de interseções"
+        },
+        {
+          "arquivo": "docs/modelar/usar/FLUXO-DO-OBJETO.md",
+          "quando": "for preciso ver os seis passos do objeto, do alinhamento ao fechamento"
+        },
+        {
+          "arquivo": ".claude/skills/laco-de-modelagem/parte-por-parte.md",
+          "quando": "cada parte passar pelo laço de modelagem, antes de fixar, reabrir ou aceitar uma etapa"
+        },
+        {
+          "arquivo": ".claude/skills/auditar-montagem/SKILL.md",
+          "quando": "as etapas estiverem fixas e a montagem for auditada, pelo roteiro modelar/auditar-montagem"
+        },
+        {
+          "arquivo": "docs/modelar/usar/EXPORTACAO.md",
+          "quando": "a montagem estiver aceita e sair em glTF ou em ficha do objeto"
+        }
+      ],
+      "skill": null,
+      "comandos": [
+        "npm run etapas -- <montagem.json> --auditar",
+        "npm run etapas -- <montagem.json> --fixar <instância> --por \"<quem, data>\"",
+        "npm run olhar:montagem",
+        "npm run planejado -- --montagem=<montagem.json>",
+        "npm run proporcoes -- --proporcoes=<proporcoes.json>",
+        "npm run esqueleto -- --proporcoes=<proporcoes.json>",
+        "npm run sobra:partes -- <esboço> --dentro=<contida>:<continente>",
+        "npm run descrever:montagem:persistida"
+      ],
+      "passo": "Declare na montagem v5 as etapas, os vínculos e as posições, rode npm run etapas -- <montagem.json> --auditar a cada parte que entra e leve cada etapa à pessoa antes de fixá-la.",
+      "conferido": "O registro de etapas com cada etapa fixa pelo aceite da pessoa, a auditoria do roteiro modelar/auditar-montagem e npm run gates.",
+      "orcamentoBytes": 12800,
+      "linhaDeBase": {
+        "bytes": 29182,
+        "data": "2026-11-26"
       }
     },
     {
@@ -759,6 +894,45 @@
       "linhaDeBase": {
         "bytes": 27936,
         "data": "2026-10-08"
+      }
+    },
+    {
+      "id": "modelar/exportar",
+      "intencao": "modelar",
+      "titulo": "Exportar a peça ou a montagem",
+      "quando": "A peça ou a montagem está pronta e sai em STEP, OBJ, glTF ou ficha do objeto.",
+      "ler": [
+        "CLAUDE.md",
+        "docs/modelar/usar/EXPORTACAO.md"
+      ],
+      "sobDemanda": [
+        {
+          "arquivo": "modulos/exportador-obj/README.md",
+          "quando": "o OBJ recusar triângulo degenerado ou for preciso a tolerância"
+        },
+        {
+          "arquivo": "modulos/exportador-gltf/README.md",
+          "quando": "for preciso saber o que do material e da bancada o glTF leva"
+        },
+        {
+          "arquivo": "modulos/ficha-do-objeto/README.md",
+          "quando": "for escrever a ponte do objeto ou ler o pedido que volta da simulação"
+        }
+      ],
+      "skill": null,
+      "comandos": [
+        "npm run exportar:step -- <peça> --somente-validar",
+        "npm run exportar:step -- <peça>",
+        "npm run exportar:obj -- --arquivo=<peça>",
+        "npm run exportar:gltf -- <peça ou objeto montado>",
+        "npm run exportar:ficha -- <objeto>"
+      ],
+      "passo": "Valide a malha com npm run exportar:step -- <peça> --somente-validar e rode o comando do formato pedido; o arquivo sai em exportacoes/.",
+      "conferido": "O arquivo gravado em exportacoes/ e o comando sem recusa; exportar não muda a receita.",
+      "orcamentoBytes": 5300,
+      "linhaDeBase": {
+        "bytes": 27249,
+        "data": "2026-11-26"
       }
     }
   ]
