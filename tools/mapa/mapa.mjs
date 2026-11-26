@@ -148,6 +148,16 @@ function gerar() {
   return { texto: L.join('\n'), semCabecalho };
 }
 
+if (process.argv.includes('--ajuda')) {
+  console.log([
+    'mapa — gera docs/MAPA.md: uma linha por arquivo rastreado, com a primeira linha de comentário dele.',
+    '  npm run mapa          regrava docs/MAPA.md',
+    '  npm run mapa:check    confere que o mapa está em dia e que todo arquivo tem cabeçalho, sem regravar',
+    '  --ajuda               mostra esta ajuda e não grava nada',
+  ].join('\n'));
+  process.exit(0);
+}
+
 const { texto, semCabecalho } = gerar();
 
 if (process.argv.includes('--check')) {
