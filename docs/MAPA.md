@@ -5,8 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2453 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
-2450 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2459 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -349,6 +348,10 @@
 ## docs/modelar/banco-de-provas/elementos-de-maquina-2026-11-24/
 
 - `README.md` — Elementos de máquina: perfil, guia, rolamento e fuso
+
+## docs/modelar/banco-de-provas/elo-entre-juntas-2026-11-25/
+
+- `README.md` — Elo entre juntas: as provas
 
 ## docs/modelar/banco-de-provas/empilhadeira-2026-10-09/
 
