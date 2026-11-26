@@ -1,6 +1,6 @@
 # Esqueleto de proporção: o humanoide de 1.750 mm aprovado em 2026-11-26
 
-Evidência do plano [esqueleto de proporção](../../planos/2026-11-26-esqueleto-de-proporcao.md). O esqueleto sai de `procedural/pecas/esqueleto-humanoide/proporcoes.json` por `npm run esqueleto -- --proporcoes=procedural/pecas/esqueleto-humanoide/proporcoes.json`, e as vistas de cada pose por `--vistas=tools/bancadas/out/<pasta>`.
+Evidência do plano [esqueleto de proporção](../../decisoes/PLANOS-ENCERRADOS.md). O esqueleto sai de `procedural/pecas/esqueleto-humanoide/proporcoes.json` por `npm run esqueleto -- --proporcoes=procedural/pecas/esqueleto-humanoide/proporcoes.json`, e as vistas de cada pose por `--vistas=tools/bancadas/out/<pasta>`.
 
 ## O que a pessoa aprovou
 
