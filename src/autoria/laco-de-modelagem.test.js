@@ -234,37 +234,25 @@ describe('a ação dada a receita atual, identificada pelo hash', () => {
   });
 });
 
-describe('a decisão da pessoa na rodada', () => {
-  const base = { peca: 'peca-de-ensaio', numero: 1, partes: CONFERIDAS, medidas: { passou: true, relatorio: 'ok' }, veredito: veredito(1) };
+describe('o texto da decisão da pessoa sobre uma rodada', () => {
   const DECISAO = 'a pessoa, 2026-11-26: a tampa está boa, falta o arco traseiro';
 
-  it('grava as palavras dela com a data, ao lado do veredito do crítico, e só isso', () => {
-    const gravada = registrarRodada({ ...base, decisaoDaPessoa: `  ${DECISAO}\n` });
-    expect(gravada.decisaoDaPessoa).toBe(DECISAO);
-    expect(gravada.veredito.defeitos).toHaveLength(1);
-    /* a decisão não depende do veredito: a pessoa decide também sobre a rodada que o crítico não julgou */
-    expect(registrarRodada({ ...base, veredito: null, decisaoDaPessoa: DECISAO }).decisaoDaPessoa).toBe(DECISAO);
-  });
-
-  it('sem a decisão a rodada sai como antes, sem o campo', () => {
-    for (const ausente of [undefined, null]) {
-      const gravada = registrarRodada({ ...base, decisaoDaPessoa: ausente });
-      expect(Object.keys(gravada)).not.toContain('decisaoDaPessoa');
-      expect(gravada).toEqual(registrarRodada(base));
-    }
-    expect(Object.keys(registrarRodada(base))).toEqual(['formato', 'versao', 'peca', 'numero', 'medidas', 'veredito', 'partes', 'atrito']);
-  });
-
-  it('recusa o formato errado dizendo o recebido, o esperado e o comando que registra certo', () => {
-    for (const ruim of ['aprovada', '', '   ', 'a pessoa: aprovada', 'a pessoa, 26/11/2026: aprovada', 'a pessoa, 2026-11-26:', 'a pessoa, 2026-11-26:   ', '2026-11-26: aprovada', 42, { texto: DECISAO }, [DECISAO]]) {
-      let mensagem = null;
-      try { registrarRodada({ ...base, decisaoDaPessoa: ruim }); } catch (erro) { mensagem = erro.message; }
-      expect(mensagem, JSON.stringify(ruim)).toBe(`laço de modelagem: 'decisaoDaPessoa' recebido: ${JSON.stringify(ruim)}; esperado ${FORMATO_DE_QUEM}, só com a data e as palavras da pessoa. `
-        + 'Registre com `node tools/modelar/rodada-de-modelagem.mjs peca-de-ensaio --registrar ... --decisao-da-pessoa "a pessoa, 2026-11-26: aprovada, pode seguir"`, '
-        + 'ou sem a opção quando a pessoa ainda não decidiu.');
-    }
+  it('aceita quem, data e as palavras dela, e tira as pontas em branco', () => {
+    expect(normalizarDecisaoDaPessoa(`  ${DECISAO}\n`)).toBe(DECISAO);
     expect(FORMATO_DE_QUEM).toBe('"<quem decidiu>, <AAAA-MM-DD>: <as palavras ou o porquê>"');
-    expect(normalizarDecisaoDaPessoa(undefined)).toBeUndefined();
-    expect(normalizarDecisaoDaPessoa(DECISAO)).toBe(DECISAO);
+  });
+
+  it('recusa o formato errado dizendo o recebido, o esperado e o comando que grava certo', () => {
+    for (const ruim of ['aprovada', '', '   ', 'a pessoa: aprovada', 'a pessoa, 26/11/2026: aprovada', 'a pessoa, 2026-11-26:', 'a pessoa, 2026-11-26:   ', '2026-11-26: aprovada', 42, null, undefined, { texto: DECISAO }, [DECISAO]]) {
+      let mensagem = null;
+      try { normalizarDecisaoDaPessoa(ruim, { peca: 'peca-de-ensaio', rodada: 3 }); } catch (erro) { mensagem = erro.message; }
+      expect(mensagem, JSON.stringify(ruim)).toBe(`laço de modelagem: decisão da pessoa recebida: ${JSON.stringify(ruim)}; esperado ${FORMATO_DE_QUEM}, só com a data e as palavras da pessoa. `
+        + 'Grave com `node tools/modelar/rodada-de-modelagem.mjs peca-de-ensaio --decisao-da-pessoa "a pessoa, 2026-11-26: aprovada, pode seguir" --rodada 3`.');
+    }
+  });
+
+  it('a rodada não guarda a decisão: ela mora no arquivo ao lado, e o registro sai com as chaves de sempre', () => {
+    const gravada = registrarRodada({ peca: 'peca-de-ensaio', numero: 1, partes: CONFERIDAS, medidas: { passou: true, relatorio: 'ok' }, veredito: veredito(1), decisaoDaPessoa: DECISAO });
+    expect(Object.keys(gravada)).toEqual(['formato', 'versao', 'peca', 'numero', 'medidas', 'veredito', 'partes', 'atrito']);
   });
 });

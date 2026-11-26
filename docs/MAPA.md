@@ -446,7 +446,7 @@
 
 ## docs/modelar/banco-de-provas/laco-mais-rapido-2026-11-26/
 
-- `README.md` — Laço mais rápido: fatia 1, a dobra e o vinco pela execução guardada e a decisão da pessoa na rodada
+- `README.md` — Laço mais rápido: fatia 1, a dobra e o vinco pela execução guardada e a decisão da pessoa ao lado das rodadas
 
 ## docs/modelar/banco-de-provas/leitura-por-demanda-2026-10/
 

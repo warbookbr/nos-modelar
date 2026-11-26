@@ -1,4 +1,4 @@
-# Laço mais rápido: fatia 1, a dobra e o vinco pela execução guardada e a decisão da pessoa na rodada
+# Laço mais rápido: fatia 1, a dobra e o vinco pela execução guardada e a decisão da pessoa ao lado das rodadas
 
 Registro da fatia 1 do plano [laço de modelagem mais rápido](../../planos/2026-11-26-laco-de-modelagem-mais-rapido.md), medida em 2026-11-26 sobre a lataria do carro (`carro-fastback/lataria`, receita de sha256 `70bf7edb`, 10 passos, 66913 vértices na pele da chapa), numa máquina de 4 núcleos e 16 GB, com Node 22.23.4, uma medida por vez, a partir do commit `e568e04a`.
 
@@ -44,22 +44,28 @@ A saída das linhas de comando também é a mesma antes e depois: `ec11bf3e` a d
 
 O teste `tools/modelar/dobra-da-superficie.test.mjs` prende a igualdade na carenagem de prova (medidas, simetria e espessura) e no ombro do braço: a superfície lida da execução guardada contra a refeita, e a dobra e o vinco pela execução direta, pelo cache frio, pelo cache quente e por uma execução sem as chapas.
 
-## A decisão da pessoa na rodada
+## A decisão da pessoa, num arquivo ao lado das rodadas
 
-A rodada ganhou o campo opcional `decisaoDaPessoa`, ao lado de `veredito`. `registrarRodada`, em `src/autoria/laco-de-modelagem.js`, grava o texto `"<quem decidiu>, <AAAA-MM-DD>: <as palavras dela>"`, que é o formato que a ferramenta já cobra do `por` de `rodadas/limite.json` e de `--motivo-dos-pontos`; a expressão e o texto do formato passaram a morar nesse arquivo e a ferramenta os importa. O valor vem de `--registrar ... --decisao-da-pessoa "<texto>"` ou do campo `decisaoDaPessoa` do JSON de `--registrar rodada.json`, e de um lugar só. O formato errado é recusado antes de medir, com o recebido, o esperado e o comando:
+A primeira versão desta fatia gravava a decisão num campo opcional da própria rodada, e a rodada gravada não é reescrita, de modo que a decisão dada depois de a pessoa ver a peça não tinha onde entrar. A pessoa decidiu em 2026-11-26 que a decisão fica num arquivo ao lado das rodadas, gravado depois da rodada.
+
+A decisão mora em `rodadas/decisoes-da-pessoa.json`, na pasta de rodadas da peça, com uma entrada por rodada: o número da rodada, o texto `"<quem decidiu>, <AAAA-MM-DD>: <as palavras dela>"` e a data da gravação. O formato do texto é o que a ferramenta já cobra do `por` de `rodadas/limite.json` e de `--motivo-dos-pontos`; a expressão e o texto do formato passaram a morar em `src/autoria/laco-de-modelagem.js`, com `normalizarDecisaoDaPessoa`, e a ferramenta os importa. O comando é:
 
 ```
-rodada-de-modelagem: 'decisaoDaPessoa' recebido: "aprovada"; esperado "<quem decidiu>, <AAAA-MM-DD>: <as palavras ou o porquê>", só com a data e as palavras da pessoa. Registre com `node tools/modelar/rodada-de-modelagem.mjs <peça> --registrar ... --decisao-da-pessoa "a pessoa, 2026-11-26: aprovada, pode seguir"`, ou sem a opção quando a pessoa ainda não decidiu.
+node tools/modelar/rodada-de-modelagem.mjs <peça> --decisao-da-pessoa "a pessoa, 2026-11-26: aprovada, pode seguir" --rodada <n> [--substituir]
 ```
 
-A opção sem `--registrar` também é recusada. Sem a decisão a rodada sai com as mesmas chaves de antes, e nenhum arquivo de rodada do acervo foi tocado. `--acao` mostra, depois da próxima ação, a decisão da última rodada que a tem, e a ação não é decidida por ela.
+Ele recusa, com o recebido, o esperado e o comando que conserta: o texto fora do formato, a rodada que não está registrada (a mensagem lista as registradas), a falta de `--rodada`, a segunda decisão para a mesma rodada sem `--substituir`, o uso junto de `--registrar` e o arquivo mexido à mão que não se lê. Com `--substituir` a decisão anterior não se perde: fica em `anteriores` na entrada, com a data em que tinha sido gravada. O arquivo da rodada não é tocado em nenhum caso, e a pasta segue contando as mesmas rodadas. `--acao` lista a decisão de cada rodada depois da próxima ação, e a ação não é decidida por ela.
 
-Os testes cobrem os dois sentidos em `src/autoria/laco-de-modelagem.test.js` e `tools/modelar/rodada-de-modelagem.test.mjs`: grava com a decisão no formato, sai igual sem ela, recusa onze formas erradas no núcleo e cinco na ferramenta sem medir nem gravar, não muda a rodada anterior e recusa na linha de comando.
+O campo `decisaoDaPessoa` dentro da rodada saiu. Nenhuma rodada do acervo chegou a tê-lo, então não há registro antigo a ler, e com duas fontes a ferramenta precisaria de uma regra para dizer qual vale quando as duas existem. A decisão dada na hora do registro se grava com o segundo comando logo depois de `--registrar`, que não mede nada e responde na hora.
+
+A ferramenta ganhou `--ajuda`, com o uso de cada comando, e a chamada sem a peça passou a dizer o recebido e o esperado seguidos da ajuda (antes respondia só "diga a peça"). A opção que pede valor aceita `--rodada 3` e `--rodada=3`.
+
+Os testes cobrem os dois sentidos em `src/autoria/laco-de-modelagem.test.js` (o formato aceito e treze formas recusadas) e em `tools/modelar/rodada-de-modelagem.test.mjs`: grava e relê, não toca as rodadas, recusa a rodada inexistente, o formato errado, a segunda decisão sem substituir e o arquivo inválido, guarda a anterior ao substituir, lista na ação e recusa o uso errado na linha de comando, incluindo uma rodada que a lataria do carro não tem, sem criar o arquivo.
 
 ## O que ficou de fora
 
-A rodada gravada não é reescrita, então a decisão que a pessoa dá depois do registro não tem como entrar naquela rodada: hoje ela só pode ir no registro da rodada seguinte. Gravar a decisão depois, sem reescrever a rodada, pede um arquivo ao lado (como o `limite.json`) e é escolha de desenho que esta fatia não fez.
+A ferramenta das rodadas não tem um comando de histórico: quem lista as rodadas é o `--acao`, e é nele que as decisões aparecem. O fluxo do objeto (`tools/modelar/fluxo-do-objeto.mjs`) e o custo por peça não mostram a decisão; os dois ficam fora do território deste plano.
 
-A skill do laço (`.claude/skills/laco-de-modelagem/`) ainda não manda passar `--decisao-da-pessoa`; ela é repartida na fatia 2 e a instrução entra lá.
+A skill do laço (`.claude/skills/laco-de-modelagem/`) ainda não manda gravar a decisão da pessoa depois de mostrar a peça; ela é repartida na fatia 2 e a instrução entra lá.
 
 O gate de saída 1 do plano pede o tempo da ação da rodada antes e depois: é 29,9 s e cerca de 28 s. Baixar a ação da rodada daqui em diante depende da medida das partes e da referência dentro do `descrever`, que não são do território deste plano.
