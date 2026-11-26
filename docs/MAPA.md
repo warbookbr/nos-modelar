@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2369 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2371 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -455,6 +455,11 @@
 ## docs/modelar/banco-de-provas/nucleo-para-receita-2026-11-14/
 
 - `prova-memoria-do-sedan.mjs` — prova-memoria-do-sedan.mjs — a memória de execução na carroceria do sedã: o tempo e o neutro bit a bit. Uso, da raiz do repositório (cada modo leva de 3 a 4 …
+
+## docs/modelar/banco-de-provas/operacoes-repartidas-2026-11-26/
+
+- `README.md` — Operações repartidas entre núcleos: onde vai o tempo dentro do corte das aberturas
+- `perfil.mjs` — perfil.mjs — onde vai o tempo dentro de uma operação, pelo perfil de CPU do Node (plano das operações repartidas entre núcleos, fatia 1). Uso, da raiz do rep…
 
 ## docs/modelar/banco-de-provas/organizacao-dos-documentos-2026-11-13/
 
