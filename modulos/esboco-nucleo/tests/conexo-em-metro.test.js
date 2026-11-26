@@ -46,6 +46,31 @@ describe('o conversor de mm para metro e o conexo', () => {
   });
 });
 
+describe('o conversor de mm para metro e o radial', () => {
+  it('converte por, min e max, deixa o eixo como nome e recusa o resto de onde com número', () => {
+    const radial = { eixo: 'x', por: [0, 339.5, 0], min: 222, max: 238.3 };
+    const [, a] = passoEmMetro(['parte', { nome: 'p', sel: { origem: { op: 'subtrair', id: 9 }, onde: { radial } } }]);
+    expect(a.sel.onde.radial).toEqual({ eixo: 'x', por: [0, 0.3395, 0], min: 0.222, max: 0.2383 });
+    expect(() => argsEmMetro('parte', { nome: 'p', sel: { onde: { radial, normal: { dir: [0, 1, 0], ate: 5 } } } })).toThrow(RecusaDoEsboco);
+  });
+});
+
+describe('o conversor de mm para metro e o setor', () => {
+  it('converte só o por: de e ate são graus, e o eixo é um nome', () => {
+    const setor = { eixo: 'x', por: [0, 339.5, 0], de: 10, ate: 80 };
+    const [, a] = passoEmMetro(['parte', { nome: 'p', sel: { grupo: 'raios', onde: { setor } } }]);
+    expect(a.sel.onde.setor).toEqual({ eixo: 'x', por: [0, 0.3395, 0], de: 10, ate: 80 });
+  });
+});
+
+describe('o conversor e o passo arredondarCostura', () => {
+  it('converte limpar quando é tolerância e deixa o booleano como está', () => {
+    const base = { origemId: 2, de: { op: 'unir', id: 1 }, raio: 8 };
+    expect(passoEmMetro(['arredondarCostura', { ...base, limpar: 0.05 }])[1]).toMatchObject({ raio: 0.008, limpar: 0.00005 });
+    expect(passoEmMetro(['arredondarCostura', { ...base, limpar: false }])[1]).toMatchObject({ limpar: false });
+  });
+});
+
 describe('o conversor e o passo limparLascas', () => {
   it('converte a tolerância (medida), deixa o limite (razão) e a seleção como estão, e recusa o campo que a tabela não conhece', () => {
     const [op, a] = passoEmMetro(['limparLascas', { sel: { origem: { op: 'subtrair', id: 3 } }, tolerancia: 0.01, limite: 0.2 }]);

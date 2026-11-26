@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.schemas-operacoes@1",
-  "assinatura": "sha256:0b3dfc74b1bb40d63531f08523671d7704e02ab90b6ef2065ce62b11350d987f",
+  "assinatura": "sha256:13eac018991f48b1601e586aa3b49db714fb12e7cc446e3b97d3f89211052f5b",
   "total": 43,
   "operacoes": [
     {
@@ -969,6 +969,24 @@
                 }
               ],
               "description": "Comprimento em que o raio cai até sumir na ponta solta de um trecho (modo curvo): o fim da regiao ou o ponto em que o encontro fica plano."
+            },
+            "pularOQueNaoCabe": {
+              "type": "boolean",
+              "description": "true: onde nenhum raio (nem o raioMinimo) cabe, o tubo se parte e a aresta fica viva ali, em vez de o passo recusar; o aviso naoCabe diz onde (modo curvo)."
+            },
+            "limpar": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array"
+                }
+              ],
+              "description": "true ou a tolerância (padrão: não limpa): as faces finas que o arredondamento deixa no sólido (as do tubo e os pedaços das faces que ele cortou) saem por limparLascas dentro do passo; true usa 0,005 do raio."
             }
           }
         },
@@ -5438,7 +5456,7 @@
       }
     }
   ],
-  "assinaturaComExtensoes": "sha256:4e0e8b1ba948688fbb8faa3ee7466a636169fa879c2970ae7345e5117a99aea8",
+  "assinaturaComExtensoes": "sha256:630d4f566bd5e1ec640db473512a8f1c260c3585cc54df616c48a04d41285b7b",
   "totalExtensoes": 5,
   "extensoes": [
     {

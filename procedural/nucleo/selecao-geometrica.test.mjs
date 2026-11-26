@@ -93,6 +93,117 @@ describe('faces por posição extrema', () => {
   });
 });
 
+describe('faces por distância ao eixo (radial)', () => {
+  /* o cilindro de raio 1 e 8 lados tem eixo y: as duas tampas têm o centro no eixo, e as oito laterais a cos(22,5°) = 0,924 dele */
+  const LATERAL = Math.cos(Math.PI / 8);
+  it('min separa as laterais das tampas, e max as tampas das laterais', () => {
+    const laterais = facesDe(CILINDRO, { onde: { radial: { eixo: 'y', min: 0.5 } } });
+    expect(laterais.n.orfaos).toEqual([]);
+    expect(laterais.ids).toHaveLength(8);
+    const tampas = facesDe(CILINDRO, { onde: { radial: { eixo: 'y', max: 0.5 } } });
+    expect(tampas.ids).toHaveLength(2);
+    expect(laterais.ids.filter((id) => tampas.ids.includes(id))).toEqual([]);
+  });
+
+  it('a faixa vale nos dois sentidos e a distância é ao eixo, e não à origem', () => {
+    expect(facesDe(CILINDRO, { onde: { radial: { eixo: 'y', min: LATERAL - 1e-3, max: LATERAL + 1e-3 } } }).ids).toHaveLength(8);
+    expect(facesDe(CILINDRO, { onde: { radial: { eixo: 'y', min: LATERAL + 0.01 } } }).n.orfaos.some((o) => o.ref === 'sel.onde')).toBe(true);
+    // o eixo x passa longe do centro das tampas (a 1 de altura): só as laterais baixas e a tampa de baixo ficam perto dele
+    const doEixoX = facesDe(CILINDRO, { onde: { radial: { eixo: 'x', max: 0.5 } } });
+    expect(doEixoX.n.orfaos).toEqual([]);
+    expect(doEixoX.ids.length).toBeGreaterThan(0);
+    expect(doEixoX.ids.length).toBeLessThan(10);
+  });
+
+  it('`por` desloca o eixo: com o eixo a 3 do cilindro nenhuma face fica a menos de 1', () => {
+    expect(facesDe(CILINDRO, { onde: { radial: { eixo: 'y', por: [3, 0, 0], max: 1 } } }).n.orfaos.some((o) => o.ref === 'sel.onde')).toBe(true);
+    expect(facesDe(CILINDRO, { onde: { radial: { eixo: 'y', por: [3, 0, 0], max: 2.5 } } }).ids.length).toBeGreaterThan(0);
+  });
+
+  it('combina com a normal e a origem, e escolhe arestas pelo ponto médio', () => {
+    const topo = facesDe(CILINDRO, { onde: { normal: { dir: [0, 1, 0], ate: 5 }, radial: { eixo: 'y', max: 0.5 } } });
+    expect(topo.ids).toHaveLength(1);
+    const arestas = onde(CILINDRO, { alvo: 'aresta', tipo: 'viva', angulo: 60, radial: { eixo: 'y', min: LATERAL - 1e-3 } });
+    expect(arestas.erro).toBeUndefined();
+    expect(arestas.arestas).toHaveLength(16);
+  });
+
+  it('recusa o que não é uma faixa de distância', () => {
+    for (const [radial, mensagem] of [
+      [{ eixo: 'y' }, /radial pede min, max ou os dois/],
+      [{ eixo: 'w', min: 1 }, /radial.eixo só aceita/],
+      [{ eixo: 'y', min: -1 }, /radial.min é uma distância e não pode ser negativa/],
+      [{ eixo: 'y', min: 2, max: 1 }, /radial.min \(2\) passa de radial.max \(1\)/],
+      [{ eixo: 'y', min: 1, cor: 1 }, /radial precisa ser/],
+      [{ eixo: 'y', min: 1, por: [0, 0] }, /radial.por precisa ser \[x,y,z\] finito/],
+    ]) {
+      const n = rodar(CILINDRO);
+      expect(lerOnde(leitor(n), { radial }).erro, JSON.stringify(radial)).toMatch(mensagem);
+    }
+  });
+});
+
+describe('faces por setor angular em torno do eixo (setor)', () => {
+  /* o ângulo do centro da face, medido como o setor o mede (eixo y: de +z para +x), para a conta do teste não repetir o seletor */
+  const angulo = (n, id) => {
+    const vs = n.F.get(id).vs.map((v) => n.V.get(v));
+    const cx = vs.reduce((t, p) => t + p[0], 0) / vs.length, cz = vs.reduce((t, p) => t + p[2], 0) / vs.length;
+    return (((Math.atan2(cx, cz) * 180) / Math.PI) + 360) % 360;
+  };
+  const laterais = (n) => [...n.F.values()].filter((f) => Math.abs(n.V.get(f.vs[0])[1] - n.V.get(f.vs[1])[1]) < 1e-9 || f.vs.length === 4).map((f) => f.id);
+  const dentro = (a, de, largura) => ((a - de + 360) % 360) <= largura;
+
+  it('dois setores de meia volta repartem as oito laterais, e o que sai é o que a conta dos ângulos diz', () => {
+    const a = facesDe(CILINDRO, { onde: { radial: { eixo: 'y', min: 0.5 }, setor: { eixo: 'y', de: 10, ate: 190 } } });
+    const b = facesDe(CILINDRO, { onde: { radial: { eixo: 'y', min: 0.5 }, setor: { eixo: 'y', de: 190, ate: 370 } } });
+    expect(a.n.orfaos).toEqual([]);
+    expect(a.ids).toHaveLength(4);
+    expect(b.ids).toHaveLength(4);
+    expect(a.ids.filter((id) => b.ids.includes(id))).toEqual([]);
+    for (const id of a.ids) expect(dentro(angulo(a.n, id), 10, 180)).toBe(true);
+    for (const id of b.ids) expect(dentro(angulo(b.n, id), 190, 180)).toBe(true);
+  });
+
+  it('o setor que passa por 360 pega os dois lados do zero', () => {
+    const n = rodar(CILINDRO);
+    const esperado = laterais(n).filter((id) => n.F.get(id).vs.length === 4 && dentro(angulo(n, id), 340, 50));
+    const r = facesDe(CILINDRO, { onde: { radial: { eixo: 'y', min: 0.5 }, setor: { eixo: 'y', de: 340, ate: 30 } } });
+    expect(r.ids.length).toBeGreaterThan(0);
+    expect(r.ids).toEqual(esperado.sort((x, y) => x - y));
+  });
+
+  it('o setor de 0 a 360 pega tudo que tem ângulo, e a tampa sobre o eixo não tem', () => {
+    expect(facesDe(CILINDRO, { onde: { setor: { eixo: 'y', de: 0, ate: 360 } } }).ids).toHaveLength(8);
+  });
+
+  it('combina com grupo e origem: o setor escolhe dentro da origem citada', () => {
+    const r = facesDe(DUAS_CAIXAS, { origem: ORIGEM_1, onde: { setor: { eixo: 'y', por: [0, 0, 0], de: 0, ate: 359 } } });
+    expect(r.n.orfaos).toEqual([]);
+    expect(r.ids.length).toBeGreaterThan(0);
+    expect(r.ids.length).toBeLessThanOrEqual(6);
+  });
+
+  it('serve também para a aresta, pelo ponto médio', () => {
+    const r = onde(CILINDRO, { alvo: 'aresta', tipo: 'viva', angulo: 60, radial: { eixo: 'y', min: 0.9 }, setor: { eixo: 'y', de: 0, ate: 180 } });
+    expect(r.erro).toBeUndefined();
+    expect(r.arestas.length).toBeGreaterThan(0);
+    expect(r.arestas.length).toBeLessThan(16);
+  });
+
+  it('recusa o que não é um setor, dizendo o campo', () => {
+    for (const [setor, mensagem] of [
+      [{ eixo: 'y' }, /setor pede de e ate/],
+      [{ eixo: 'w', de: 0, ate: 10 }, /setor.eixo só aceita/],
+      [{ eixo: 'y', de: 0, ate: 400 }, /passa de 360 graus de largura/],
+      [{ eixo: 'y', de: 0, ate: 10, cor: 1 }, /setor precisa ser/],
+      [{ eixo: 'y', de: 0, ate: 10, por: [0, 0] }, /setor.por precisa ser \[x,y,z\] finito/],
+    ]) {
+      const n = rodar(CILINDRO);
+      expect(lerOnde(leitor(n), { setor }).erro, JSON.stringify(setor)).toMatch(mensagem);
+    }
+  });
+});
+
 describe('face plana', () => {
   it('todas as faces de uma caixa e de um cilindro facetado são planas', () => {
     expect(onde(CAIXA, { tipo: 'plana' }).faces).toHaveLength(6);
