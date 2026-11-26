@@ -69,6 +69,8 @@ Se o andaime N2 não aceitar a árvore inteira de um humanoide sem mudar o forma
 
 ## Andamento
 
+Fatia 1 feita em 2026-11-26: a seção `esqueleto` em `proporcoes.json`, com as fórmulas das medidas, o espelho de um ramo inteiro e as recusas pedidas, e `npm run esqueleto`, que gera o andaime (uma esfera por junta, um bastão por membro, uma porta por junta com eixo) e as articulações; a fixture do braço de duas juntas com o espelho sai igual em duas execuções e passa no normalizador do andaime. O cilindro do andaime só aceita eixo x, y ou z, e o membro oblíquo sai como `tubo` reto, sem mudar o formato.
+
 ## Fechamento
 
 Preencher ao concluir ou cancelar: estado final, commit e PR, gates, resultado observado e candidatos devolvidos ao backlog.
