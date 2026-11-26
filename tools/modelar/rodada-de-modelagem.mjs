@@ -54,6 +54,11 @@
  * `decisaoDaPessoa` dentro da rodada, que a primeira versão desta fatia gravava, saiu: nenhuma rodada o tinha, e duas fontes pediriam uma
  * regra de qual vale.
  *
+ * A CÓPIA DA RECEITA DA RODADA COM DECISÃO DA PESSOA FICA (decisão da pessoa em 2026-11-26). Até então só a cópia da última rodada ficava
+ * em `rodadas/receita-NN.js`, e a geometria que a pessoa julgou numa rodada anterior se perdia com a rodada seguinte. O registro de uma
+ * rodada nova não apaga mais a cópia da rodada que tem decisão, nem a da última rodada com veredito do crítico (`copiasQueFicam`), e
+ * `--decisao-da-pessoa` diz onde a cópia ficou, a refaz quando a receita atual ainda é a versão registrada, e avisa quando ela não existe mais.
+ *
  * Uso:
  *   node tools/modelar/rodada-de-modelagem.mjs <peça> --registrar --modelador modelador.txt --critico critico.jsonl [--atrito "texto"] [--pacote <pasta>] [--motivo-dos-pontos "<quem decidiu, data: por quê>"]...
  *   node tools/modelar/rodada-de-modelagem.mjs <peça> --registrar rodada.json
@@ -148,7 +153,22 @@ function textoDaReceita(peca, { raiz = REPO } = {}) {
    copiado sem ajuste deixa de achar o arquivo e quebra o build. A cópia do
    ombro na rodada 7 quebrou assim. */
 export const ajustarImportsDaCopia = (texto) => texto.replace(/(\bfrom\s*|\bimport\s*\(?\s*)(['"])(\.\.?\/)/g, '$1$2../$3');
-const copiaDaReceita = (pasta, numero) => join(pasta, `receita-${String(numero).padStart(2, '0')}.js`);
+/** O caminho da cópia da receita que a rodada `numero` guardou na pasta das rodadas (`receita-NN.js`); o arquivo pode não existir mais. */
+export const copiaDaReceita = (pasta, numero) => join(pasta, `receita-${String(numero).padStart(2, '0')}.js`);
+
+/**
+ * As rodadas cuja cópia da receita fica na pasta, além da última gravada: `Set` de números. Fica a de toda rodada com decisão da pessoa
+ * (a geometria que ela julgou; decisão da pessoa em 2026-11-26) e a da última rodada com veredito do crítico, que é a base com que o
+ * pacote do crítico (`vistas:critica`) compara a malha de cada parte. `rodadas` são os registros (`[{ numero, veredito }]`) e
+ * `decididas` os números das rodadas com decisão; `null` em `decididas` (o arquivo das decisões ilegível) guarda todas, porque apagar
+ * sem saber quais a pessoa julgou perderia o que não se refaz.
+ */
+export function copiasQueFicam(rodadas, decididas) {
+  const numeros = rodadas.map((r) => r.numero);
+  if (decididas === null) return new Set(numeros);
+  const julgadas = rodadas.filter((r) => r.veredito).map((r) => r.numero);
+  return new Set([...numeros.filter((n) => decididas.includes(n)), ...julgadas.slice(-1)]);
+}
 
 export function gravarRodada(
   peca,
@@ -189,10 +209,15 @@ export function gravarRodada(
   writeFileSync(arquivo, `${JSON.stringify(rodada, null, 2)}\n`, 'utf8');
   if (receitaTexto !== null) {
     writeFileSync(copiaDaReceita(pasta, numero), ajustarImportsDaCopia(receitaTexto), 'utf8');
-    /* SÓ A ÚLTIMA CÓPIA FICA. A cópia da rodada N serve à diferença da rodada N+1 e à comparação da forma julgada com a atual; a das
-       rodadas anteriores não é lida por nada, e a diferença de cada uma já está no registro. Em 2026-11-13 o acervo guardava 129 cópias
-       e 62 mil linhas delas, um terço do código das peças, que a busca por texto e o build atravessavam. */
-    for (let n = 1; n < numero; n += 1) rmSync(copiaDaReceita(pasta, n), { force: true });
+    /* FICAM A ÚLTIMA CÓPIA, A DE TODA RODADA COM DECISÃO DA PESSOA E A DA ÚLTIMA RODADA JULGADA PELO CRÍTICO (`copiasQueFicam`). A cópia
+       da rodada N serve à diferença da rodada N+1 e à comparação da forma julgada com a atual; a das outras rodadas não é lida por nada,
+       e a diferença de cada uma já está no registro. Em 2026-11-13 o acervo guardava 129 cópias e 62 mil linhas delas, um terço do
+       código das peças, que a busca por texto e o build atravessavam. A da rodada com decisão da pessoa fica desde 2026-11-26: é a
+       geometria que ela julgou, e a diferença de texto no registro não a refaz. */
+    let decididas = null;
+    try { decididas = lerDecisoesDaPessoa(peca, { pasta }).map((d) => d.rodada); } catch { /* arquivo ilegível: nenhuma cópia sai */ }
+    const ficam = copiasQueFicam([...anteriores, rodada], decididas);
+    for (let n = 1; n < numero; n += 1) if (!ficam.has(n)) rmSync(copiaDaReceita(pasta, n), { force: true });
   }
   return { rodada, arquivo };
 }
@@ -357,7 +382,7 @@ function gravarPorTroca(arquivo, texto) {
  * o `substituir` sem decisão anterior e o mesmo texto já gravado; com `substituir: true`, a anterior fica em `anteriores`, com a data
  * dela. Devolve `{ entrada, arquivo, substituida }`.
  */
-export function gravarDecisaoDaPessoa(peca, { rodada, decisao, substituir = false }, { pasta = pastaDeRodadas(peca), agora = () => new Date().toISOString() } = {}) {
+export function gravarDecisaoDaPessoa(peca, { rodada, decisao, substituir = false }, { pasta = pastaDeRodadas(peca), agora = () => new Date().toISOString(), receitaTexto = textoDaReceita(peca) } = {}) {
   const rodadas = lerRodadas(peca, { pasta });
   const numeros = rodadas.map((r) => r.numero);
   const registradas = numeros.length ? `as registradas são ${numeros.join(', ')}` : 'a peça não tem rodada registrada';
@@ -399,7 +424,33 @@ export function gravarDecisaoDaPessoa(peca, { rodada, decisao, substituir = fals
   const dado = { formato: FORMATO_DAS_DECISOES, versao: VERSAO_DAS_DECISOES, peca, decisoes: lista };
   conferirDecisoes(dado, { peca, arquivo, rodadas });
   gravarPorTroca(arquivo, `${JSON.stringify(dado, null, 2)}\n`);
-  return { entrada, arquivo, substituida: antiga };
+  return { entrada, arquivo, substituida: antiga, copia: guardarCopiaDaRodadaDecidida(rodadas.find((r) => r.numero === numero), { pasta, receitaTexto }) };
+}
+
+/* A CÓPIA DA RECEITA DA RODADA COM DECISÃO DA PESSOA. A cópia que a rodada guardou fica, e `gravarRodada` não a apaga mais. A rodada
+   antiga cuja cópia já saiu (até 2026-11-26 só a da última ficava) é refeita quando a receita de agora é a mesma versão que a rodada
+   registrou (a impressão do texto bate com `receita.sha256` do registro); sendo outra versão, a cópia não se refaz aqui, e quem chama
+   diz isso com o caminho que falta e a impressão que a rodada registrou. Devolve `{ arquivo, estado }`, com `estado` 'guardada',
+   'refeita' ou 'ausente', e `sha256` (a da rodada) no 'ausente'. */
+function guardarCopiaDaRodadaDecidida(rodada, { pasta, receitaTexto }) {
+  const arquivo = copiaDaReceita(pasta, rodada.numero);
+  if (existsSync(arquivo)) return { arquivo, estado: 'guardada' };
+  const sha256 = rodada.receita?.sha256 ?? null;
+  if (receitaTexto !== null && sha256 !== null && impressao(receitaTexto) === sha256) {
+    writeFileSync(arquivo, ajustarImportsDaCopia(receitaTexto), 'utf8');
+    return { arquivo, estado: 'refeita' };
+  }
+  return { arquivo, estado: 'ausente', sha256 };
+}
+
+/** A frase do relatório sobre a cópia da receita da rodada com decisão (`copia` de `gravarDecisaoDaPessoa`). */
+export function fraseDaCopia(copia, { peca, rodada, raiz = REPO } = {}) {
+  const onde = copia.arquivo.replace(`${raiz}/`, '');
+  if (copia.estado === 'guardada') return `a cópia da receita julgada nessa rodada fica guardada em ${onde}.`;
+  if (copia.estado === 'refeita') return `a cópia da receita julgada nessa rodada não estava mais na pasta e foi refeita da receita atual, que é a mesma versão que a rodada registrou: ${onde}.`;
+  return `AVISO: a cópia da receita da rodada ${rodada} de '${peca}' não está na pasta (recebido: ${onde} não existe; esperado o arquivo que o registro da rodada grava), `
+    + `e a receita atual é outra versão que a registrada na rodada (${copia.sha256 ?? 'sem impressão no registro'}). A decisão foi gravada, e a geometria julgada nessa rodada não foi guardada: `
+    + `até 2026-11-26 só a cópia da última rodada ficava. Se a versão existir no git, recupere-a com \`git log --oneline -- ${onde}\` e \`git show <commit>:${onde} > ${onde}\`.`;
 }
 
 export const AJUDA = `rodada-de-modelagem: o registro do laço de modelagem de uma peça. A peça é <objeto>/<peça> ou o nome dela.
@@ -411,7 +462,8 @@ export const AJUDA = `rodada-de-modelagem: o registro do laço de modelagem de u
   node tools/modelar/rodada-de-modelagem.mjs <peça> --registrar <rodada.json>
       grava a rodada de um JSON já montado
   node tools/modelar/rodada-de-modelagem.mjs <peça> --decisao-da-pessoa ${FORMATO_DE_QUEM} --rodada <n> [--substituir]
-      grava a decisão da pessoa sobre a rodada <n> em rodadas/${ARQUIVO_DAS_DECISOES}, sem mexer na rodada
+      grava a decisão da pessoa sobre a rodada <n> em rodadas/${ARQUIVO_DAS_DECISOES}, sem mexer na rodada; a cópia da receita
+      dessa rodada (rodadas/receita-NN.js) passa a ficar guardada, e as rodadas seguintes não a apagam
   node tools/modelar/rodada-de-modelagem.mjs <peça> --perguntas
       as perguntas de forma do pedido do crítico
   node tools/modelar/rodada-de-modelagem.mjs <peça> --pedidos [<arquivo.json>] [--json]
@@ -1053,9 +1105,10 @@ async function comoCLI(argv, { env = process.env } = {}) {
       return { codigo: 1, texto: `--decisao-da-pessoa recebido junto de ${outras.map((k) => `--${k}`).join(', ')}; esperado só com --rodada <n> e, quando a pessoa muda a decisão, --substituir: este comando só grava a decisão. `
         + `Grave com \`node tools/modelar/rodada-de-modelagem.mjs ${peca} --decisao-da-pessoa ${FORMATO_DE_QUEM} --rodada <n>\` e confira depois com \`node tools/modelar/rodada-de-modelagem.mjs ${peca} --acao\`.` };
     }
-    const { entrada, arquivo, substituida } = gravarDecisaoDaPessoa(peca, { rodada: opcoes.rodada, decisao: daPessoa, substituir: opcoes.substituir === true }, { pasta });
+    const { entrada, arquivo, substituida, copia } = gravarDecisaoDaPessoa(peca, { rodada: opcoes.rodada, decisao: daPessoa, substituir: opcoes.substituir === true }, { pasta });
     return { codigo: 0, texto: `${aviso}decisão da pessoa sobre a rodada ${entrada.rodada} gravada em ${arquivo.replace(`${REPO}/`, '')}: ${JSON.stringify(entrada.decisao)}`
-      + (substituida ? `\nsubstituiu a anterior, que ficou guardada: ${JSON.stringify(substituida.decisao)}` : '') };
+      + (substituida ? `\nsubstituiu a anterior, que ficou guardada: ${JSON.stringify(substituida.decisao)}` : '')
+      + `\n${fraseDaCopia(copia, { peca, rodada: entrada.rodada })}` };
   }
 
   if (opcoes.registrar !== undefined) {

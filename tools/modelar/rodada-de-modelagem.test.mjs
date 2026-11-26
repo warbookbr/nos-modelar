@@ -7,6 +7,7 @@
  * vive só no diálogo some com a janela de contexto.
  */
 import { existsSync, linkSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -18,7 +19,7 @@ import { acaoSemMedir } from './fluxo-do-objeto.mjs';
 import { conferirPontos, esperadosDosPontos, mudancasDosEsperados, textoDosPontos } from './conferir-pontos.mjs';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { conferirUmaPeca } from './guardas/guarda-referencial.mjs';
-import { AJUDA, ARQUIVO_DAS_DECISOES, VARIAVEL_DA_PASTA_DE_TESTE, VERSAO_DAS_DECISOES, gravarDecisaoDaPessoa, lerDecisoesDaPessoa, nomeDaPastaDoPacote, numeroDaProximaRodada, pastaDoPacoteDaRodada, CAMPOS_OPCIONAIS_LIDOS_PELO_CRITICO, CAMPOS_OPCIONAIS_NAO_LIDOS_PELO_CRITICO, planoQueOCriticoLe, acaoDaPeca, ajustarImportsDaCopia, blocoDaPeca, contradicoesEntreRodadas, entradaDosArquivos, normalizarRelatoDoModelador, resumoDoLaco, gravarRodada, impressaoDaForma, lerArgumentos, lerRodadas, medirReceita, mudancaDosPontos, pastaDeRodadas, pontosDaMedicao, registrarMedida, convergenciaDaPeca, decisaoSobreAsParadas, limiteDaPeca, textoFinalDoAssistente, ultimoBlocoJson } from './rodada-de-modelagem.mjs';
+import { AJUDA, ARQUIVO_DAS_DECISOES, copiasQueFicam, fraseDaCopia, VARIAVEL_DA_PASTA_DE_TESTE, VERSAO_DAS_DECISOES, gravarDecisaoDaPessoa, lerDecisoesDaPessoa, nomeDaPastaDoPacote, numeroDaProximaRodada, pastaDoPacoteDaRodada, CAMPOS_OPCIONAIS_LIDOS_PELO_CRITICO, CAMPOS_OPCIONAIS_NAO_LIDOS_PELO_CRITICO, planoQueOCriticoLe, acaoDaPeca, ajustarImportsDaCopia, blocoDaPeca, contradicoesEntreRodadas, entradaDosArquivos, normalizarRelatoDoModelador, resumoDoLaco, gravarRodada, impressaoDaForma, lerArgumentos, lerRodadas, medirReceita, mudancaDosPontos, pastaDeRodadas, pontosDaMedicao, registrarMedida, convergenciaDaPeca, decisaoSobreAsParadas, limiteDaPeca, textoFinalDoAssistente, ultimoBlocoJson } from './rodada-de-modelagem.mjs';
 import { CAMPOS_OPCIONAIS_DO_PLANO } from '../../src/autoria/plano-de-modelagem.js';
 import { normalizarVeredito } from '../../src/autoria/veredito-de-forma.js';
 import { pecasDoAcervo } from './guardas/guarda-acervo.mjs';
@@ -1228,7 +1229,7 @@ describe('a decisão da pessoa, num arquivo ao lado das rodadas', () => {
     rodada(); rodada();
     const gravou = roda(PECA, '--decisao-da-pessoa', DECISAO, '--rodada', '2');
     expect(gravou.status).toBe(0); expect(gravou.stderr).toMatch(/^aviso: rodadas em pasta de teste \(MODELAR_RODADAS_EM_PASTA_DE_TESTE\): [^\n]+\n$/);
-    expect(gravou.stdout).toBe(`${AVISO()}decisão da pessoa sobre a rodada 2 gravada em ${arquivo()}: ${JSON.stringify(DECISAO)}\n`);
+    expect(gravou.stdout).toBe(`${AVISO()}decisão da pessoa sobre a rodada 2 gravada em ${arquivo()}: ${JSON.stringify(DECISAO)}\na cópia da receita julgada nessa rodada fica guardada em ${join(pasta(), 'receita-02.js')}.\n`);
     const [primeira] = decisoes();
     expect(primeira).toMatchObject({ rodada: 2, decisao: DECISAO });
     expect(primeira.gravadaEm).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
@@ -1244,7 +1245,7 @@ describe('a decisão da pessoa, num arquivo ao lado das rodadas', () => {
     /* com --substituir: grava, e a anterior fica guardada */
     const trocou = roda(PECA, '--decisao-da-pessoa', OUTRA, '--rodada', '2', '--substituir');
     expect(trocou.status).toBe(0); expect(trocou.stderr).toMatch(/^aviso: rodadas em pasta de teste \(MODELAR_RODADAS_EM_PASTA_DE_TESTE\): [^\n]+\n$/);
-    expect(trocou.stdout).toBe(`${AVISO()}decisão da pessoa sobre a rodada 2 gravada em ${arquivo()}: ${JSON.stringify(OUTRA)}\nsubstituiu a anterior, que ficou guardada: ${JSON.stringify(DECISAO)}\n`);
+    expect(trocou.stdout).toBe(`${AVISO()}decisão da pessoa sobre a rodada 2 gravada em ${arquivo()}: ${JSON.stringify(OUTRA)}\nsubstituiu a anterior, que ficou guardada: ${JSON.stringify(DECISAO)}\na cópia da receita julgada nessa rodada fica guardada em ${join(pasta(), 'receita-02.js')}.\n`);
     expect(decisoes()).toMatchObject([{ rodada: 2, decisao: OUTRA, anteriores: [{ decisao: DECISAO, gravadaEm: primeira.gravadaEm }] }]);
     /* --substituir na rodada sem decisão, e a rodada que não existe: recusa sem gravar */
     const semAnterior = roda(PECA, '--decisao-da-pessoa', DECISAO, '--rodada', '1', '--substituir');
@@ -1304,6 +1305,93 @@ describe('a decisão da pessoa, num arquivo ao lado das rodadas', () => {
     expect(desconhecida.stderr).toContain('rodada-de-modelagem: opção desconhecida recebida: --substitui; esperado uma destas:');
     expect(existsSync(arquivo())).toBe(false);
   }, 60000);
+
+  describe('a cópia da receita da rodada com decisão da pessoa', () => {
+    const TEXTO = (n) => `export const X = ${n};\n`;
+    const SHA = (texto) => `sha256:${createHash('sha256').update(texto).digest('hex')}`;
+    const copia = (n) => join(pasta(), `receita-0${n}.js`);
+    const com = (n, { julgada = true } = {}) => gravarRodada(PECA, {
+      partes: CONFERIDAS, ...(julgada ? { medidas: { passou: true, relatorio: 'ok' }, veredito: veredito(1) } : { medidas: { passou: false, relatorio: 'a medida reprovou' } }),
+    }, { pasta: pasta(), receitaTexto: TEXTO(n), agora: () => REGISTRO });
+    const decidirCom = (entrada, receitaTexto) => gravarDecisaoDaPessoa(PECA, entrada, { pasta: pasta(), agora: () => GRAVACAO, receitaTexto });
+
+    it('a rodada com decisão guarda a cópia pelas rodadas seguintes, e a rodada sem decisão a perde como antes', () => {
+      com(1); com(2);
+      /* a decisão sobre a rodada 2, a última: a cópia dela é a que a rodada gravou */
+      const { copia: guardada } = decidirCom({ rodada: 2, decisao: DECISAO }, TEXTO(2));
+      expect(guardada).toEqual({ arquivo: copia(2), estado: 'guardada' });
+      expect(existsSync(copia(1))).toBe(false);
+      com(3); com(4);
+      /* no outro sentido: a 3 não tem decisão e sai quando a 4 é gravada; a 2 fica, com o texto que a rodada julgou */
+      expect([1, 2, 3, 4].map((n) => existsSync(copia(n)))).toEqual([false, true, false, true]);
+      expect(readFileSync(copia(2), 'utf8')).toBe(TEXTO(2));
+      expect(fraseDaCopia(guardada, { peca: PECA, rodada: 2, raiz: area })).toBe(`a cópia da receita julgada nessa rodada fica guardada em ${PECA}/receita-02.js.`);
+      /* a diferença da rodada seguinte continua contra a cópia da anterior, e não contra a da rodada decidida */
+      expect(ler(PECA)[3].receita.diferenca.linhas).toEqual([{ tipo: '-', linha: 1, texto: 'export const X = 3;' }, { tipo: '+', linha: 1, texto: 'export const X = 4;' }]);
+    });
+
+    it('sem decisão nenhuma, fica só a cópia da última rodada', () => {
+      com(1); com(2); com(3);
+      expect([1, 2, 3].map((n) => existsSync(copia(n)))).toEqual([false, false, true]);
+    });
+
+    it('a decisão sobre uma rodada antiga refaz a cópia quando a receita de agora é a versão que a rodada registrou', () => {
+      com(1); com(2); com(1);
+      expect(existsSync(copia(1))).toBe(false);
+      const { copia: refeita } = decidirCom({ rodada: 1, decisao: DECISAO }, TEXTO(1));
+      expect(refeita).toEqual({ arquivo: copia(1), estado: 'refeita' });
+      expect(readFileSync(copia(1), 'utf8')).toBe(TEXTO(1));
+      expect(fraseDaCopia(refeita, { peca: PECA, rodada: 1, raiz: area })).toContain(`foi refeita da receita atual, que é a mesma versão que a rodada registrou: ${PECA}/receita-01.js.`);
+      /* e a rodada gravada depois não a apaga */
+      com(4);
+      expect([1, 2, 3, 4].map((n) => existsSync(copia(n)))).toEqual([true, false, false, true]);
+    });
+
+    it('a decisão sobre uma rodada antiga de outra versão grava a decisão e avisa, com o recebido, o esperado e o comando', () => {
+      com(1); com(2);
+      for (const atual of [TEXTO(2), null]) {
+        const { copia: ausente, entrada } = decidirCom({ rodada: 1, decisao: atual ? DECISAO : OUTRA, substituir: !atual }, atual);
+        expect(entrada.rodada).toBe(1);
+        expect(ausente).toEqual({ arquivo: copia(1), estado: 'ausente', sha256: SHA(TEXTO(1)) });
+        expect(existsSync(copia(1))).toBe(false);
+        const frase = fraseDaCopia(ausente, { peca: PECA, rodada: 1, raiz: area });
+        expect(frase).toBe(`AVISO: a cópia da receita da rodada 1 de '${PECA}' não está na pasta (recebido: ${PECA}/receita-01.js não existe; esperado o arquivo que o registro da rodada grava), `
+          + `e a receita atual é outra versão que a registrada na rodada (${SHA(TEXTO(1))}). A decisão foi gravada, e a geometria julgada nessa rodada não foi guardada: `
+          + `até 2026-11-26 só a cópia da última rodada ficava. Se a versão existir no git, recupere-a com \`git log --oneline -- ${PECA}/receita-01.js\` e \`git show <commit>:${PECA}/receita-01.js > ${PECA}/receita-01.js\`.`);
+      }
+      expect(decisoes().map((d) => d.rodada)).toEqual([1]);
+    });
+
+    it('a cópia da última rodada julgada pelo crítico fica quando a rodada seguinte não tem veredito', () => {
+      com(1); com(2); com(3, { julgada: false });
+      expect([1, 2, 3].map((n) => existsSync(copia(n)))).toEqual([false, true, true]);
+      com(4, { julgada: false });
+      expect([1, 2, 3, 4].map((n) => existsSync(copia(n)))).toEqual([false, true, false, true]);
+      com(5);
+      expect([2, 3, 4, 5].map((n) => existsSync(copia(n)))).toEqual([false, false, false, true]);
+    });
+
+    it('com o arquivo das decisões ilegível nenhuma cópia sai, e as que ficam são as decididas e a última julgada', () => {
+      com(1); com(2);
+      writeFileSync(arquivo(), '{ isto não é JSON', 'utf8');
+      com(3);
+      expect([1, 2, 3].map((n) => existsSync(copia(n)))).toEqual([false, true, true]);
+      const rodadas = [{ numero: 1, veredito: {} }, { numero: 2, veredito: {} }, { numero: 3, veredito: null }, { numero: 4, veredito: null }];
+      expect([...copiasQueFicam(rodadas, [1])].sort()).toEqual([1, 2]);
+      expect([...copiasQueFicam(rodadas, [])]).toEqual([2]);
+      expect([...copiasQueFicam(rodadas, null)].sort()).toEqual([1, 2, 3, 4]);
+      expect([...copiasQueFicam([{ numero: 1, veredito: null }], [])]).toEqual([]);
+    });
+
+    it('a linha de comando diz onde a cópia da rodada decidida ficou', () => {
+      com(1);
+      const r = roda(PECA, '--decisao-da-pessoa', DECISAO, '--rodada', '1');
+      expect(r.status).toBe(0);
+      expect(r.stdout).toContain(`decisão da pessoa sobre a rodada 1 gravada em`);
+      expect(r.stdout).toContain(`a cópia da receita julgada nessa rodada fica guardada em ${join(pasta(), 'receita-01.js')}.`);
+      expect(AJUDA).toContain('a cópia da receita\n      dessa rodada (rodadas/receita-NN.js) passa a ficar guardada, e as rodadas seguintes não a apagam');
+    }, 60000);
+  });
 
   it('nenhuma recusa e nenhuma ajuda da ferramenta traz palavras prontas para a decisão: só o molde', () => {
     rodada();

@@ -214,3 +214,61 @@ A primeira pergunta é quais defeitos o crítico tem de pegar no conjunto novo, 
 A segunda é o tamanho: guardar no repositório o pacote inteiro de cada imagem, com dezenas de PNG, ou um pacote reduzido para a calibração. A recomendação é esperar o pacote menor do crítico, que é a outra parte desta fatia, e calibrar com ele.
 
 A terceira é se as duas imagens recriadas à mão valem como "casos decididos pela pessoa", uma vez que a geometria que ela reprovou não foi guardada. A recomendação é aceitar, com a frase dela do `atrito` gravada na fonte da imagem, e passar a guardar a cópia da receita de toda rodada em que houver decisão dela.
+
+## Fatia 3: o pacote menor do crítico e a cópia da receita da rodada com decisão
+
+Medido em 2026-11-26, na mesma máquina de 4 núcleos e 16 GB, uma captura por vez, com `npm run vistas:critica -- <peça>` e o tempo de relógio do comando inteiro. O antes é o commit `0b02f3cb`; o depois são as mudanças desta fatia sobre ele, ainda sem commit quando foram medidas. As três peças são do acervo e têm `PLANO`: o cilindro de inclinação da empilhadeira (`empilhadeira/cilindro-inclinacao`, 2 partes, instância de montagem), a fuselagem do avião (`aviao/fuselagem`, 13 partes, instância de montagem) e a lataria do carro (`carro-fastback/lataria`, 3 partes, peça de lataria). Nenhuma das três receitas mudou desde a última rodada que o crítico julgou, de modo que o depois mostra o conjunto padrão sem vista isolada de parte; a peça com parte mudada soma duas imagens por parte e, pelo pacote de antes, cerca de 2 s por parte na fuselagem e de 4 a 43 s na lataria, onde a captura que muda de resolução recarrega a peça.
+
+### As duas medidas
+
+| peça | antes: tempo | antes: PNG na pasta | antes: imagens citadas no pedido | depois: tempo | depois: PNG na pasta | depois: imagens citadas no pedido |
+| --- | --- | --- | --- | --- | --- | --- |
+| `empilhadeira/cilindro-inclinacao` | 109,0 s | 22 | 22 | 71,9 s | 11 | 14 |
+| `aviao/fuselagem` | 95,5 s | 46 | 48 | 47,2 s | 11 | 13 |
+| `carro-fastback/lataria` | 580,0 s | 57 | 41 | 255,3 s | 19 | 15 |
+
+As imagens citadas no pedido são as que o crítico abre: as do pacote que entram no pedido mais as referências do plano, que moram no repositório. A pasta da lataria tem mais PNG do que o pedido cita porque guarda a captura crua de cada vista de superfície ao lado da que leva a legenda. Com `--completo`, depois da mudança, o cilindro levou 107,6 s com as mesmas 22 imagens, e o `pedido.md` saiu igual ao de antes byte a byte, trocado só o caminho da pasta.
+
+O tempo não cai na proporção das imagens porque a maior parte dele é fixa. No cilindro de antes, pela hora de gravação de cada arquivo, 28 s passam antes da primeira imagem (a medição da receita e a subida do servidor e do navegador), 12 s nas duas partes, 38 s nas sete vistas montadas, 10 s nos cortes e 10 s na medida de quanto as outras peças tapam a peça. Na lataria de antes, cada captura recarrega a peça e leva de 38 a 55 s: 65 s antes da primeira imagem, 42 s nas vistas da peça e da malha, 57 s nas três partes, 114 s nas três visões de reflexo, 40 s na curvatura, 200 s na luz rasante de quatro vistas e 57 s na prancha desenhada. O relatório do comando passou a dizer o tempo de cada etapa (`TEMPO:`), e o depois vem dele: no cilindro, 71,0 s, com 0,3 s de medição, 22,3 s de capturas da bancada, 10,1 s na visibilidade, 16,9 s nas duas vistas montadas e 10,1 s no corte; na fuselagem, 46,3 s, com 5,5 s, 24,1 s, 3,1 s, 6,4 s e 3,7 s; na lataria, 254,5 s, com 22,2 s de medição, 3,8 s na comparação das partes e 170,9 s de capturas, e o resto na prancha desenhada.
+
+O que sobra depois da mudança é a carga da peça a cada captura, que é a outra parte desta fatia (a bancada aquecida), e a montagem resolvida três vezes na peça de montagem (para a visibilidade, para as vistas montadas e para os cortes).
+
+### O conjunto padrão proposto
+
+A pessoa é quem aprova o conjunto. A proposta é esta, e a ferramenta não tem nome de peça: o que só serve a uma família entra pelo que a receita já declara (a instância de montagem, a peça de lataria de `src/autoria/lataria.js`, `CRITICA.cortes`, `dePerto`, `REFINA.esboco`, a prancha e o contorno citados no plano).
+
+| nº | imagem | por que entra |
+| --- | --- | --- |
+| 1 | a peça sozinha, isométrica, com sombra | o volume inteiro numa imagem, que é a que o crítico usa para se situar |
+| 2 | frontal | a silhueta e a proporção de frente, que se comparam com a referência do mesmo lado |
+| 3 | direita | a silhueta de lado |
+| 4 | superior | a planta |
+| 5 | traseira | o lado que a isométrica e a frontal não mostram |
+| 6 | esquerda | a peça que não é simétrica tem parte só de um lado (a porta da fuselagem) |
+| 7 | a malha em arame, isométrica | a topologia que a sombra esconde (o leque de lascas do ombro do braço) |
+| 8 | a malha em raio X, traseira | o defeito de malha que fica atrás, com as arestas da frente e de trás na mesma imagem |
+| 9 | montada, isométrica (só na instância de montagem) | o contexto e a posição da peça entre as outras, com o quadro fechado nela |
+| 10 | montada, a ortogonal em que mais área da peça aparece (só na instância de montagem) | a segunda vista de contexto, escolhida pela medida: a peça comprida aparece mais de lado que de frente, a vista em que as outras a tapam não entra, e as áreas a menos de 20 % da maior empatam e fica a primeira da ordem frontal, traseira, direita, esquerda, superior, inferior (deu a direita na fuselagem e no cilindro) |
+| 11 | o corte do encaixe de menor folga (só na instância de montagem), mais os que a receita declara em `CRITICA.cortes` | a profundidade de um encaixe não se decide pela vista montada, e o cruzamento ou a peça solta aparece primeiro no par de menor folga |
+
+São oito imagens na peça sozinha e onze na instância de montagem. A peça de lataria leva mais cinco, todas na vista de três quartos, que mostra a frente, o lado e o topo de uma vez: a curvatura com a legenda, a luz rasante nas duas direções da luz e a zebra com a listra deitada e em pé. As duas primeiras são as que a decisão da pessoa de 2026-10-30 exige no pacote da peça de lataria, e o registro da rodada continua a cobrá-las.
+
+Além do conjunto entram as partes que diferem da última rodada julgada pelo crítico, com as duas vistas isoladas de sempre e as vistas de perto que o plano declara para elas. A ferramenta acha a última rodada com veredito nos registros, executa a cópia da receita que essa rodada guardou e compara, parte por parte, a impressão da malha (as coordenadas dos vértices de cada face e o que a face carrega, sem os números da face e dos vértices, que mudam com um passo acrescentado antes) e a promessa do plano. Entra a parte de malha diferente, a de promessa diferente, a que a base não tinha e a que a malha de agora não tem, porque a parte prometida e não entregue tem de aparecer como ausência. Sem rodada julgada, sem a cópia ou com a cópia que não executa, todas as partes entram e o relatório diz por quê. O que a receita declara para comparar com a referência não muda: o alvo do esboço, a sobreposição dos cortes, a prancha desenhada e o contorno sobreposto.
+
+Ficam de fora do padrão e voltam com `--completo`: a malha em arame vista de trás, as outras cinco vistas montadas, os cortes dos encaixes de folga maior, a vista isolada das partes que não mudaram e, na lataria, a pintura e as vistas de frente, de lado e de cima da zebra, da curvatura e da luz rasante.
+
+O `pedido.md` do pacote padrão abre com um parágrafo que lista o que entrou, com o porquê de cada grupo, e o que ficou de fora, e a seção das partes diz quais não têm vista isolada. O texto fala das imagens e não cita receita, rodada nem cópia; a rodada com que as partes foram comparadas fica no relatório de quem conduz e no `pacote.json` (`pacote.partes.comparadasComARodada`). O pedido do pacote completo é o de antes, sem o parágrafo.
+
+### As imagens para a pessoa ver
+
+Os três pacotes padrão medidos ficaram em `tools/bancadas/out/`, fora do git, cada um com o `pedido.md` que o crítico receberia: `critica-aviao-fuselagem/rodada-04/` (as onze imagens da instância de montagem: as seis `bancada-aviao-fuselagem-<vista>-orto.png`, `...-isometrica-orto-arame.png`, `...-traseira-orto-raio-x.png`, `etapas-aviao-isometrica-orto-foco-fuselagem.png`, `etapas-aviao-direita-orto-foco-fuselagem.png` e `corte-fuselagem-asas.png`), `critica-empilhadeira-cilindro-inclinacao/rodada-02/` e `critica-carro-fastback-lataria/rodada-08/` (as oito da peça, as duas `...-isometrica-visao-zebra*-enquadrado.png` e, em `superficie/`, `peca-tresquartos-curvatura-legenda.png` e as duas `peca-tresquartos-rasante-az*.png`). A pasta é refeita a cada chamada do comando, e as imagens se regeneram com `npm run vistas:critica -- aviao/fuselagem`.
+
+### A cópia da receita da rodada com decisão da pessoa
+
+Até aqui `rodada-de-modelagem.mjs` guardava em `rodadas/receita-NN.js` só a cópia da última rodada, e a geometria que a pessoa julgou numa rodada anterior se perdia na seguinte: foi o que impediu de recuperar os raios da roda esportiva e o para-brisa da fuselagem para a calibração. O registro de uma rodada nova passa a manter a cópia de toda rodada que tem decisão em `decisoes-da-pessoa.json` e a da última rodada com veredito do crítico, que é a base da comparação das partes. `--decisao-da-pessoa` diz onde a cópia da rodada ficou; quando ela já saiu e a receita atual ainda é a versão que a rodada registrou (a impressão do texto bate com `receita.sha256` do registro), a cópia é refeita; quando é outra versão, a decisão é gravada e o comando avisa, com o caminho que falta, a impressão registrada e os dois comandos de `git` que a recuperam se a versão foi a um commit. Com o arquivo das decisões ilegível, nenhuma cópia é apagada.
+
+Os testes cobrem os dois sentidos em `tools/modelar/rodada-de-modelagem.test.mjs`, no bloco "a cópia da receita da rodada com decisão da pessoa": a rodada decidida mantém a cópia depois de duas rodadas, e a rodada sem decisão a perde como antes; a decisão sobre rodada antiga refaz a cópia ou avisa; a última julgada fica quando a seguinte não tem veredito; e a linha de comando diz onde a cópia está.
+
+### O que ficou de fora desta parte
+
+O conjunto padrão é proposta: a recalibração do crítico com ele espera a aprovação da pessoa. O registro da rodada não grava se o crítico julgou o pacote padrão ou o completo; o dado está no `pacote.json` da pasta da rodada, fora do git. Os documentos de uso que descrevem o pacote (`docs/modelar/usar/REFERENCIA-E-CRITICA-VISUAL.md` diz "as vistas da peça e de cada parte") estão fora do território deste plano e não foram mudados. A pergunta fechada de uma parte sem vista isolada continua no `pedido-fechado-*.md`, respondida pelas vistas da peça sozinha.

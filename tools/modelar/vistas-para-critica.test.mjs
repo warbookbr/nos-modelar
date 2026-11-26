@@ -12,11 +12,13 @@ import { aceitesVigentes } from '../../src/autoria/etapas-pela-impressao.js';
 import { lerPergunta } from '../../src/autoria/perguntas-do-critico.js';
 import {
   ELEVACOES_DA_LUZ_RASANTE, LIMITE_DO_VEREDITO, PERGUNTA_DO_ALVO, PRAZO_DA_CAPTURA_MONTADA_MS, VISTAS_MONTADAS, ladoDaVista, vistaDaPranchaDesenhada, avisoDasReferenciasIgnoradas, referenciasSemLeitura, montagemDaPeca, montarPedido, pastaDaRodada, prefixoDaPeca, referenciasDoPlano,
-  DISTANCIA_DE_PERTO_MM, campoDePertoMm, MOTIVO_SEM_MEDIR, ReceitaReprovada, decidirLuzRasante, imprimir, fracaoVisivelDaPeca, lerReferenciasExternas, lerOrientacaoDaReferencia, LIMITE_DA_ORIENTACAO, AJUDA, imagensDoReflexo, LEITURA_DA_FAIXA, LEITURA_DO_REFLEXO, secaoDoReflexo, MINIMO_DO_REFLEXO, luzRasanteDoPacote, primeiraQuePassa, unidadeDoAlvo, vistaDoArquivo, vistasMontadasVisiveis, vistasParaCritica, vistasRepetidas,
+  DISTANCIA_DE_PERTO_MM, campoDePertoMm, MOTIVO_SEM_MEDIR, ReceitaReprovada, decidirLuzRasante, imprimir, fracaoVisivelDaPeca, lerReferenciasExternas, lerOrientacaoDaReferencia, LIMITE_DA_ORIENTACAO, AJUDA, imagensDoReflexo, LEITURA_DA_FAIXA, LEITURA_DO_REFLEXO, secaoDoReflexo, MINIMO_DO_REFLEXO, luzRasanteDoPacote, primeiraQuePassa, unidadeDoAlvo, vistaDoArquivo, vistasMontadasVisiveis, vistasParaCritica as pacoteDoCritico, vistasRepetidas,
   ARQUIVO_DO_CONTORNO_SOBREPOSTO, contornosParaSobrepor, etapaFixaDaPeca, lerContornosExternos, lerRegioesDoContorno, motivoDaEtapaFixa,
   ARQUIVO_DAS_PERGUNTAS_FECHADAS, FORMATO_DAS_PERGUNTAS_FECHADAS, NAO_DA_PARA_VER, NAO_VERIFICAVEL, REGRA_DA_NOTA, arquivoDoPedidoFechado, juntarOrdens, lerRespostasFechadas,
   montarPedidoFechado, notaDasRespostas, notaEscrita, normalizarResposta, perguntasFechadas, relatorioDaJuncao, relatorioDasNotas, respostasQueMudaram, variacaoDasNotas,
   ARQUIVO_DOS_DADOS_DO_PEDIDO, afirmacoesDaForma, gravarPedidos, notaPelaRegra, pesosDasPerguntas, refazerPedidos, semMedidas,
+  CORTES_DO_PADRAO, EMPATE_DA_AREA_MONTADA, MONTADAS_DO_PADRAO, PACOTE_COMPLETO, PACOTE_PADRAO, VISTAS_DE_SUPERFICIE_NO_PADRAO, comandoDoCompleto, descricaoDoPacotePadrao, imagensCitadas, impressoesDasPartes, montadasDoPadrao,
+  partesComVistaIsolada, ultimaRodadaJulgada,
   FOLGA_DO_ENQUADRAMENTO, PASTA_DO_ANTES_E_DEPOIS, RESOLUCAO_POR_TIPO, antesEDepois, apagarPacotesAntigos, imagensDoPacote, pacotesDaPeca, pastasDoAntesEDepois, relatorioDoAntesEDepois, resolucaoDoPng, tipoDaCaptura,
 } from './vistas-para-critica.mjs';
 import { extrairVeredito } from '../../src/autoria/calibracao-do-critico.js';
@@ -28,6 +30,9 @@ const area = mkdtempSync(join(tmpdir(), 'vistas-critica-'));
 /* A medição da receita trocada por uma que passa: o pacote mede antes de capturar, e os testes do pacote não pagam a medição real. */
 const medirPassa = async () => ({ passou: true, sha256: 'sha256:de-ensaio', relatorio: 'ok' });
 afterAll(() => rmSync(area, { recursive: true, force: true }));
+/* Os testes de antes do pacote padrão (2026-11-26) conferem o pacote completo, que continua saindo com `completo: true`; o padrão, que é
+   o que sai sem opção, tem os testes dele em "o pacote padrão", e quem o quer aqui passa `completo: false`. */
+const vistasParaCritica = (peca, opcoes = {}) => pacoteDoCritico(peca, { completo: true, ...opcoes });
 
 describe('imagens antigas da peça', () => {
   it('o prefixo é o nome que a bancada dá às capturas da peça', () => {
@@ -293,6 +298,267 @@ function bancadaFalsa(pasta, peca) {
   return { fazer, chamadas };
 }
 
+describe('o pacote padrão: o conjunto de umas dez imagens e as partes que diferem da última rodada julgada', () => {
+  const PECA = 'tools/fixtures/forma-do-esboco/ok/receita.js';
+  const malha = (partes) => {
+    /* um triângulo por parte, com os vértices numerados a partir de `de`: `{ nome: [de, deslocamento] }` */
+    const V = new Map();
+    const F = new Map();
+    let f = 0;
+    for (const [nome, [de, dx]] of Object.entries(partes)) {
+      [[0, 0, 0], [1, 0, 0], [0, 1, 0]].forEach((p, i) => V.set(de + i, [p[0] + dx, p[1], p[2]]));
+      f += 1;
+      F.set(f, { id: f, vs: [de, de + 1, de + 2], parte: nome, liso: false });
+    }
+    return { V, F };
+  };
+
+  it('a impressão da malha de uma parte não depende do número dos vértices nem da ordem das faces, e muda com a posição e com o que a face carrega', () => {
+    const a = impressoesDasPartes(malha({ bloco: [1, 0], viga: [10, 5] }));
+    const renumerada = impressoesDasPartes(malha({ viga: [200, 5], bloco: [50, 0] }));
+    expect([...a.keys()].sort()).toEqual(['bloco', 'viga']);
+    expect(renumerada.get('bloco')).toBe(a.get('bloco'));
+    expect(renumerada.get('viga')).toBe(a.get('viga'));
+    expect(impressoesDasPartes(malha({ bloco: [1, 0], viga: [10, 5.001] })).get('viga')).not.toBe(a.get('viga'));
+    expect(impressoesDasPartes(malha({ bloco: [1, 0], viga: [10, 5.001] })).get('bloco')).toBe(a.get('bloco'));
+    const lisa = malha({ bloco: [1, 0] });
+    lisa.F.get(1).liso = true;
+    expect(impressoesDasPartes(lisa).get('bloco')).not.toBe(a.get('bloco'));
+    /* a face sem parte fica de fora, e a malha vazia não tem parte */
+    const semParte = malha({ bloco: [1, 0] });
+    semParte.F.set(9, { vs: [1, 2, 3] });
+    expect([...impressoesDasPartes(semParte).keys()]).toEqual(['bloco']);
+    expect(impressoesDasPartes(null).size).toBe(0);
+  });
+
+  it('entra a parte de malha diferente, a de promessa diferente, a nova e a que a malha não tem; sem base, todas', () => {
+    const plano = (forma) => ({ partes: [{ nome: 'a', forma: 'caixa', tecnica: 't' }, { nome: 'b', forma, tecnica: 't' }, { nome: 'c', forma: 'c', tecnica: 't' }, { nome: 'd', forma: 'd', tecnica: 't' }, { nome: 'e', forma: 'e', tecnica: 't' }] });
+    const base = { malhas: new Map([['a', '1'], ['b', '2'], ['c', '3'], ['e', '5']]), plano: plano('tubo') };
+    const atual = { malhas: new Map([['a', '1'], ['b', '2'], ['c', '3x'], ['d', '4']]), plano: plano('tubo com rebaixo') };
+    expect(partesComVistaIsolada(['a', 'b', 'c', 'd', 'e'], atual, base)).toEqual({
+      comVista: [{ nome: 'b', porque: 'promessa' }, { nome: 'c', porque: 'malha' }, { nome: 'd', porque: 'nova' }, { nome: 'e', porque: 'ausente' }],
+      semVista: ['a'],
+    });
+    expect(partesComVistaIsolada(['a', 'b'], atual, null)).toEqual({ comVista: [{ nome: 'a', porque: 'sem-base' }, { nome: 'b', porque: 'sem-base' }], semVista: [] });
+    /* a mesma malha e o mesmo plano: nenhuma parte leva vista isolada */
+    expect(partesComVistaIsolada(['a', 'b'], base, base)).toEqual({ comVista: [], semVista: ['a', 'b'] });
+  });
+
+  it('a última rodada julgada é a de maior número com veredito, e a pasta sem rodada julgada não tem nenhuma', () => {
+    const pasta = mkdtempSync(join(area, 'julgadas-'));
+    expect(ultimaRodadaJulgada(join(pasta, 'nao-existe'))).toBeNull();
+    writeFileSync(join(pasta, 'rodada-01.json'), JSON.stringify({ numero: 1, veredito: { nota: 6 } }));
+    writeFileSync(join(pasta, 'rodada-02.json'), JSON.stringify({ numero: 2, veredito: { nota: 7 } }));
+    writeFileSync(join(pasta, 'rodada-03.json'), JSON.stringify({ numero: 3, veredito: null }));
+    writeFileSync(join(pasta, 'rodada-04.json'), '{ quebrado');
+    writeFileSync(join(pasta, 'limite.json'), JSON.stringify({ veredito: {} }));
+    expect(ultimaRodadaJulgada(pasta)).toBe(2);
+    rmSync(join(pasta, 'rodada-01.json')); rmSync(join(pasta, 'rodada-02.json'));
+    expect(ultimaRodadaJulgada(pasta)).toBeNull();
+  });
+
+  it('as vistas montadas do padrão são a isométrica e a de maior fração visível, sem a tapada; sem medida, as primeiras', () => {
+    expect(montadasDoPadrao({ isometrica: 0.4, frontal: 0.3, traseira: 0, direita: 0.8, esquerda: 0.01, superior: 0.5, inferior: 0.5 })).toEqual(['isometrica', 'direita']);
+    /* a isométrica tapada sai, e o empate fica com a que vem antes na lista */
+    expect(montadasDoPadrao({ isometrica: 0.01, frontal: 0.3, traseira: 0, direita: 0.3, esquerda: 0.01, superior: 0.5, inferior: 0.5 })).toEqual(['superior', 'inferior']);
+    expect(montadasDoPadrao({ isometrica: 0.01, frontal: 0.3, traseira: 0.3 }, { vistas: ['isometrica', 'frontal', 'traseira'] })).toEqual(['frontal', 'traseira']);
+    expect(montadasDoPadrao(null)).toEqual(['isometrica', 'frontal']);
+    expect(montadasDoPadrao({})).toEqual(['isometrica', 'frontal']);
+    /* a vista sem medida vale depois das medidas */
+    expect(montadasDoPadrao({ direita: 0.2 })).toEqual(['isometrica', 'direita']);
+    expect(montadasDoPadrao(Object.fromEntries(VISTAS_MONTADAS.map((v) => [v, 0.04])))).toEqual([]);
+    expect(montadasDoPadrao({ isometrica: 0.05, frontal: 0.05 }, { quantas: 1 })).toEqual(['isometrica']);
+    /* com a área medida, vale a vista em que mais área da peça aparece, e não a de maior fração: a peça comprida vista de lado */
+    const m = (visivel, areaVisivel) => ({ visivel, areaVisivel });
+    expect(montadasDoPadrao({ isometrica: m(0.9, 5), frontal: m(0.95, 1.2), direita: m(0.8, 9), superior: m(0.95, 8.5), inferior: m(0.96, 8.6), traseira: m(0.01, 30) })).toEqual(['isometrica', 'direita']);
+    expect(montadasDoPadrao({ isometrica: m(0.01, 5), frontal: m(0.5, 2), direita: m(0.5, 2) })).toEqual(['frontal', 'direita']);
+    /* as áreas a menos de 20 % da maior empatam, e fica a que vem antes na ordem: a de lado antes da de cima e da de baixo */
+    expect(EMPATE_DA_AREA_MONTADA).toBe(0.2);
+    expect(montadasDoPadrao({ isometrica: m(0.91, 8.2), frontal: m(0.94, 2.2), traseira: m(0.35, 0.8), direita: m(0.82, 7.78), esquerda: m(0.81, 7.68), superior: m(0.95, 8.7), inferior: m(0.96, 8.76) })).toEqual(['isometrica', 'direita']);
+    expect(montadasDoPadrao({ isometrica: m(0.62, 1.29), frontal: m(0, 0), traseira: m(0.61, 0.83), direita: m(1, 1.63), esquerda: m(1, 1.63), superior: m(1, 2.14), inferior: m(0.83, 1.79) })).toEqual(['isometrica', 'superior']);
+    expect(montadasDoPadrao({ frontal: m(0.9, 7.9), direita: m(0.9, 10) }, { vistas: ['frontal', 'direita'], quantas: 1 })).toEqual(['direita']);
+    expect(montadasDoPadrao({ frontal: m(0.9, 8), direita: m(0.9, 10) }, { vistas: ['frontal', 'direita'], quantas: 1 })).toEqual(['frontal']);
+    const area = fracaoVisivelDaPeca({ foco: [[[0, 0, 0], [2, 0, 0], [0, 2, 0]]], outras: [], olho: [0, 0, 1] });
+    expect(area.visivel).toBe(1);
+    expect(area.areaVisivel).toBeGreaterThan(1.9);
+    expect(area.areaVisivel).toBeLessThan(2.1);
+    expect(fracaoVisivelDaPeca({ foco: [], outras: [], olho: [0, 0, 1] })).toEqual({ visivel: null, pixels: 0, areaVisivel: 0 });
+  });
+
+  it('a descrição do pacote diz cada grupo que entrou com o porquê e o que ficou de fora, sem contar como a peça foi feita', () => {
+    const d = descricaoDoPacotePadrao({
+      escolha: { comVista: [{ nome: 'viga', porque: 'malha' }, { nome: 'aba', porque: 'promessa' }, { nome: 'pino', porque: 'nova' }, { nome: 'furo', porque: 'ausente' }], semVista: ['bloco', 'tampa'] }, comBase: true,
+      montadas: { entram: ['isometrica'], fora: ['frontal'] }, cortes: { entram: [{ vizinha: 'a', declarado: false }, { vizinha: 'b', declarado: true }], fora: [] },
+      superficie: { lataria: false, reflexo: false },
+    });
+    expect(d.tipo).toBe(PACOTE_PADRAO);
+    expect(d.entrou).toEqual([
+      'as seis vistas da peça sozinha (isometrica, frontal, direita, superior, traseira e esquerda), para a proporção e a silhueta',
+      'a malha em arame na vista isometrica e em raio X na traseira, para a topologia que a sombra esconde, na frente e atrás',
+      'a luz rasante numa vista só, a de três quartos',
+      'a vista montada isometrica, as em que mais da peça aparece entre as outras, para o contexto e a posição',
+      'os cortes dos encaixes com `a` e `b`: o de menor folga e os declarados pela peça, onde um cruzamento ou uma peça solta aparece primeiro',
+      'a vista isolada das partes `viga` (a malha dela difere da já julgada), `aba` (a forma prometida dela difere da já julgada), `pino` (ela ainda não foi julgada) e `furo` (a malha não a tem)',
+    ]);
+    expect(d.fora).toEqual([
+      'a malha em arame na vista traseira, porque o raio X da mesma vista mostra as mesmas arestas',
+      'a luz rasante nas vistas de frente, de lado e de cima',
+      'as vistas montadas frontal, em que aparece menos da peça ou ela fica tapada',
+      'a vista isolada das partes `bloco` e `tampa`, que têm a malha e a forma prometida já julgadas e aparecem nas vistas da peça sozinha',
+    ]);
+    expect(d.partesSemVista).toEqual(['bloco', 'tampa']);
+    const semBase = descricaoDoPacotePadrao({ escolha: { comVista: [{ nome: 'bloco', porque: 'sem-base' }], semVista: [] } });
+    expect(semBase.entrou[2]).toBe('a vista isolada de todas as partes (1), porque não há julgamento anterior com que comparar a malha delas');
+    expect(semBase.fora).toHaveLength(1);
+    const umaSo = descricaoDoPacotePadrao({ escolha: { comVista: [], semVista: ['bloco'] }, comBase: true });
+    expect(umaSo.fora[1]).toBe('a vista isolada da parte `bloco`, que tem a malha e a forma prometida já julgadas e aparece nas vistas da peça sozinha');
+    for (const frase of [...d.entrou, ...d.fora, ...semBase.entrou, ...umaSo.fora]) expect(frase).not.toMatch(/\bPASSOS\b|receita|rodada|histórico|mudou|ferramenta/i);
+  });
+
+  it('o pedido com o pacote padrão diz o que entrou e o que ficou de fora no cabeçalho, lista as partes sem vista, e sem ele é o de sempre', () => {
+    const pacote = descricaoDoPacotePadrao({ escolha: { comVista: [{ nome: 'viga', porque: 'malha' }], semVista: ['bloco'] }, comBase: true });
+    const dados = { ...DADOS, partes: DADOS.partes.filter((p) => p.nome === 'viga'), pacote };
+    const pedido = montarPedido(dados);
+    expect(titulos(pedido)).toEqual(titulos(montarPedido(DADOS)));
+    const cabecalho = pedido.slice(0, pedido.indexOf('## Objeto'));
+    expect(cabecalho).toContain('Este pedido traz o conjunto padrão de imagens da peça, e não todas as que ela pode ter. Entraram:');
+    for (const frase of [...pacote.entrou, ...pacote.fora]) expect(cabecalho).toContain(`- ${frase}`);
+    expect(cabecalho).toContain('O que ficou de fora não é ausência nem defeito. Julgue pelo que veio; a pergunta que depender de uma imagem que não veio se responde `não dá para ver`, dizendo qual imagem faltou.');
+    const partes = pedido.slice(pedido.indexOf('## Partes'), pedido.indexOf('## Critérios'));
+    expect(partes).toContain('Só as partes abaixo têm vista isolada neste pedido. Sem vista isolada, com a malha e a forma prometida já julgadas: `bloco`. Elas aparecem nas vistas da peça sozinha, em Modelo; a falta da vista isolada não é ausência da parte, e defeito nelas só se aponta pelo que essas vistas mostram.');
+    expect(partes).toContain('### viga');
+    expect(partes).not.toContain('### bloco');
+    expect(pedido).not.toMatch(/\bPASSOS\b|receita|rodada|histórico|mudou|ferramenta/i);
+    /* nenhuma parte com vista: a seção continua, só com a frase */
+    const nenhuma = montarPedido({ ...DADOS, partes: [], pacote: descricaoDoPacotePadrao({ escolha: { comVista: [], semVista: ['bloco', 'viga'] }, comBase: true }) });
+    expect(titulos(nenhuma)).toEqual(titulos(montarPedido(DADOS)));
+    expect(nenhuma).toContain('Nenhuma parte tem vista isolada neste pedido. Sem vista isolada, com a malha e a forma prometida já julgadas: `bloco`, `viga`.');
+    expect(nenhuma).not.toContain('Uma vista isolada de cada parte');
+    /* os pedidos fechados levam o mesmo cabeçalho e a mesma frase das partes, e a pergunta da parte sem vista continua */
+    for (const ordem of ['a', 'b']) {
+      const fechado = montarPedidoFechado(dados, ordem);
+      expect(fechado).toContain('Este pedido traz o conjunto padrão de imagens da peça');
+      expect(fechado).toContain('Sem vista isolada, com a malha e a forma prometida já julgadas: `bloco`.');
+    }
+    expect(perguntasFechadas(dados).map((q) => q.origem)).toContain('parte:bloco');
+    /* sem `pacote` (o completo, e os dados gravados antes dele) o pedido não muda */
+    expect(montarPedido(DADOS)).not.toContain('conjunto padrão');
+    expect(imagensCitadas(pedido)).toEqual(['/p/alvo/bloco-unidade-motor-composta.png', '/r/lateral.png', '/r/foto.png', '/o/m-isometrica.png', '/o/m-frontal.png', '/o/m-direita.png', '/o/m-iso-arame.png', '/o/m-tras-raio.png', '/p/etapas-esquerda.png', '/p/etapas-superior.png', '/p/sobreposicao-x.png', '/p/sobreposicao-y.png', '/p/sobreposicao-z.png', '/o/p-viga-direita.png']);
+  });
+
+  async function montar({ completo, dependencias = {} } = {}) {
+    const base = mkdtempSync(join(area, 'padrao-'));
+    const pasta = join(base, 'rodada');
+    const bancada = bancadaFalsa(base, PECA);
+    const resultado = await pacoteDoCritico(PECA, {
+      saida: pasta, pastaDasCapturas: base, ...(completo === undefined ? {} : { completo }),
+      dependencias: {
+        medirReceita: medirPassa, olharBancada: bancada.fazer, rodadasAnteriores: () => [],
+        sobreposicaoDeCortes: async () => ({ arquivos: [], paineis: [], notas: [] }),
+        ultimaRodadaJulgada: () => null,
+        ...dependencias,
+      },
+    });
+    const capturas = bancada.chamadas.map((c) => (c.revisar ? 'conjunto' : c.selecionadas ?? `${c.vistas}${c.arame === 'raio-x' ? ' raio-x' : c.arame ? ' arame' : ''}`));
+    return { pasta, resultado, capturas, pedido: readFileSync(join(pasta, 'pedido.md'), 'utf8'), manifesto: JSON.parse(readFileSync(join(pasta, 'pacote.json'), 'utf8')) };
+  }
+  /* a rodada 2 julgada, com a cópia da receita no lugar (aqui a própria receita de prova), e a malha de cada uma trocada por um gravador */
+  const comBase = (daCopia, deAgora = { bloco: [1, 0], viga: [10, 5] }) => {
+    const pedidos = [];
+    return {
+      pedidos,
+      dependencias: {
+        ultimaRodadaJulgada: (pastaDosRegistros) => { pedidos.push(['julgada', basename(pastaDosRegistros)]); return 2; },
+        copiaDaRodada: async (pastaDosRegistros, numero) => { pedidos.push(['copia', numero]); return PECA; },
+        malhaDaReceita: async (arquivo, receita, { copia = false } = {}) => { pedidos.push(['malha', copia]); if (copia && daCopia instanceof Error) throw daCopia; return malha(copia ? daCopia : deAgora); },
+      },
+    };
+  };
+
+  it('sem opção sai o padrão: as seis vistas, o arame de três quartos, o raio X de trás e, sem rodada julgada, todas as partes, com o aviso', async () => {
+    const { resultado, capturas, pedido, manifesto } = await montar();
+    expect(capturas).toEqual(['conjunto', 'traseira', 'esquerda', 'isometrica arame', 'traseira raio-x', 'bloco', 'viga']);
+    expect(resultado.tipo).toBe(PACOTE_PADRAO);
+    expect(resultado.baseDasPartes).toBeNull();
+    expect(resultado.partesComVista).toEqual([{ nome: 'bloco', porque: 'sem-base' }, { nome: 'viga', porque: 'sem-base' }]);
+    expect(resultado.avisos).toContain('todas as partes levam vista isolada: a peça não tem rodada julgada pelo crítico, e não há com que comparar a malha de cada parte.');
+    expect(pedido).toContain('- a vista isolada de todas as partes (2), porque não há julgamento anterior com que comparar a malha delas');
+    expect(pedido).toContain('- a malha em arame na vista traseira, porque o raio X da mesma vista mostra as mesmas arestas');
+    /* 6 da peça, 2 da malha, 4 das duas partes e o alvo: o que o crítico abre */
+    expect(resultado.imagensNoPedido).toBe(13);
+    expect(imagensCitadas(pedido)).toHaveLength(13);
+    expect(manifesto.pacote).toEqual({ tipo: PACOTE_PADRAO, partes: { comVista: resultado.partesComVista, semVista: [], comparadasComARodada: null } });
+    const relatorio = imprimir(resultado);
+    expect(relatorio).toContain('  todas as 2 partes levam vista isolada: a peça não tem rodada julgada pelo crítico.');
+    expect(relatorio).toContain(`  PACOTE PADRÃO: o pedido cita 13 imagens e diz o que entrou e o que ficou de fora; o pacote completo, com todas as vistas e a vista isolada de todas as partes: \`${comandoDoCompleto(PECA)}\``);
+    expect(relatorio).toMatch(/ {2}TEMPO: \d+,\d s \(medição \d+,\d s, comparação das partes \d+,\d s, capturas da bancada \d+,\d s\)/);
+  }, 60_000);
+
+  it('com rodada julgada, só a parte de malha diferente da cópia leva vista isolada, e o pedido, o relatório e o pacote.json dizem qual e por quê', async () => {
+    const base = comBase({ bloco: [70, 0], viga: [30, 6] });
+    const { resultado, capturas, pedido, manifesto, pasta } = await montar({ dependencias: base.dependencias });
+    expect(base.pedidos).toEqual([['julgada', 'rodadas'], ['copia', 2], ['malha', true], ['malha', false]]);
+    expect(capturas).toEqual(['conjunto', 'traseira', 'esquerda', 'isometrica arame', 'traseira raio-x', 'viga']);
+    expect(resultado.baseDasPartes).toBe(2);
+    expect(resultado.partesComVista).toEqual([{ nome: 'viga', porque: 'malha' }]);
+    expect(resultado.partesSemVista).toEqual(['bloco']);
+    expect(resultado.avisos.join('\n')).not.toContain('todas as partes levam vista isolada');
+    expect(pedido).toContain('- a vista isolada da parte `viga` (a malha dela difere da já julgada)');
+    expect(pedido).toContain('- a vista isolada da parte `bloco`, que tem a malha e a forma prometida já julgadas e aparece nas vistas da peça sozinha');
+    expect(pedido).toContain('### viga');
+    expect(pedido).not.toContain('### bloco');
+    /* o pedido não cita a rodada nem a cópia: isso fica no relatório de quem conduz e no pacote.json */
+    expect(pedido.slice(pedido.indexOf('Este pedido traz'), pedido.indexOf('## Objeto'))).not.toMatch(/rodada|cópia|receita/i);
+    expect(pedido.slice(pedido.indexOf('## Partes'), pedido.indexOf('### viga'))).not.toMatch(/rodada|cópia|receita/i);
+    expect(manifesto.pacote).toEqual({ tipo: PACOTE_PADRAO, partes: { comVista: [{ nome: 'viga', porque: 'malha' }], semVista: ['bloco'], comparadasComARodada: 2 } });
+    const relatorio = imprimir(resultado);
+    expect(relatorio).toContain('  comparadas com a cópia da receita da rodada 2, a última julgada pelo crítico: 1 de 2 partes levam vista isolada.');
+    expect(relatorio).toContain('  com vista isolada: viga (a malha dela difere da já julgada)');
+    expect(relatorio).toContain('  sem vista isolada, com a malha e a promessa iguais às da rodada 2: bloco');
+    /* a pergunta fechada da parte sem vista continua, e os dados gravados refazem o mesmo pedido */
+    expect(JSON.parse(readFileSync(join(pasta, ARQUIVO_DAS_PERGUNTAS_FECHADAS), 'utf8')).perguntas.map((q) => q.origem)).toContain('parte:bloco');
+    refazerPedidos(pasta);
+    expect(readFileSync(join(pasta, 'pedido.md'), 'utf8')).toBe(pedido);
+  }, 60_000);
+
+  it('a mesma malha e a mesma promessa da rodada julgada: nenhuma vista isolada, e a seção das partes diz quais ficaram sem', async () => {
+    const { capturas, pedido, resultado } = await montar({ dependencias: comBase({ bloco: [70, 0], viga: [30, 5] }).dependencias });
+    expect(capturas).toEqual(['conjunto', 'traseira', 'esquerda', 'isometrica arame', 'traseira raio-x']);
+    expect(resultado.porParte).toEqual([]);
+    expect(pedido).toContain('Nenhuma parte tem vista isolada neste pedido. Sem vista isolada, com a malha e a forma prometida já julgadas: `bloco`, `viga`.');
+    expect(resultado.imagensNoPedido).toBe(9);
+  }, 60_000);
+
+  it('sem a cópia da rodada julgada, ou com a cópia que não executa, todas as partes entram e o aviso diz por quê', async () => {
+    const base = comBase({ bloco: [70, 0], viga: [30, 5] });
+    const sem = await montar({ dependencias: { ...base.dependencias, copiaDaRodada: async () => join(area, 'rodadas-de-ensaio', 'receita-02.js') } });
+    expect(sem.capturas.slice(-2)).toEqual(['bloco', 'viga']);
+    expect(sem.resultado.avisos.join('\n')).toMatch(/todas as partes levam vista isolada: a cópia da receita da rodada 2, a última julgada pelo crítico, não está em .*rodadas-de-ensaio\/receita-02\.js, e não há com que comparar a malha de cada parte\./);
+    expect(sem.resultado.baseDasPartes).toBeNull();
+    const quebrada = await montar({ dependencias: comBase(new Error('o passo 3 não existe mais\nsegunda linha')).dependencias });
+    expect(quebrada.capturas.slice(-2)).toEqual(['bloco', 'viga']);
+    expect(quebrada.resultado.avisos).toContain('todas as partes levam vista isolada: a cópia da receita da rodada 2 não executa (o passo 3 não existe mais), e não há com que comparar a malha de cada parte.');
+  }, 60_000);
+
+  it('--completo monta o pacote de antes, sem olhar as rodadas, e o valor que não é sim nem não é recusado com o comando', async () => {
+    const base = comBase({ bloco: [70, 0], viga: [30, 5] });
+    const { capturas, pedido, manifesto, resultado } = await montar({ completo: true, dependencias: base.dependencias });
+    expect(base.pedidos).toEqual([]);
+    expect(capturas).toEqual(['conjunto', 'traseira', 'esquerda', 'isometrica,traseira arame', 'traseira raio-x', 'bloco', 'viga']);
+    expect(pedido).not.toContain('conjunto padrão');
+    expect(manifesto.pacote).toEqual({ tipo: PACOTE_COMPLETO });
+    expect(resultado.imagensNoPedido).toBe(14);
+    expect(imprimir(resultado)).toContain('  PACOTE COMPLETO (--completo): o pedido cita 14 imagens.');
+    await expect(pacoteDoCritico(PECA, { completo: 'sim', dependencias: { medirReceita: async () => { throw new Error('não devia medir'); } } })).rejects.toThrow(
+      `'completo' recebido: "sim"; esperado true (o pacote completo) ou false (o padrão). Na linha de comando é a opção --completo, sem valor: \`npm run vistas:critica -- ${PECA} --completo\`.`,
+    );
+    expect(AJUDA).toContain('  --completo                                o pacote completo: todas as vistas e a vista isolada de todas as partes. Sem ela sai o pacote');
+    const r = spawnSync(process.execPath, ['tools/modelar/vistas-para-critica.mjs', PECA, '--completo=sim'], { encoding: 'utf8' });
+    expect(r.status).toBe(2);
+    expect(r.stderr).toContain('[--completo]');
+  }, 60_000);
+});
+
 describe('o pacote de uma receita que refina um esboço', () => {
   const PECA = 'tools/fixtures/forma-do-esboco/ok/receita.js';
 
@@ -465,7 +731,7 @@ describe('o pacote de uma receita que refina um esboço', () => {
 describe('o pacote de uma peça que é instância de uma montagem', () => {
   const PECA = 'aviao/motor';
 
-  async function montar(olharEtapas) {
+  async function montar(olharEtapas, { completo = true, visibilidade = {}, cortes = null } = {}) {
     const base = mkdtempSync(join(area, 'montagem-'));
     const pasta = join(base, 'rodada');
     const bancada = bancadaFalsa(base, PECA);
@@ -475,24 +741,66 @@ describe('o pacote de uma peça que é instância de uma montagem', () => {
     const declarado = await esbocoDeclarado(PECA);
     const ids = Object.values(declarado.ligadas).flatMap((v) => (Array.isArray(v) ? v : v.formas));
     const resultado = await vistasParaCritica(PECA, {
-      saida: pasta, pastaDasCapturas: base,
-      dependencias: { medirReceita: medirPassa,
+      saida: pasta, pastaDasCapturas: base, completo,
+      dependencias: { medirReceita: medirPassa, ultimaRodadaJulgada: () => null,
         olharBancada: bancada.fazer,
         sobreposicaoDeCortes: async () => ({ arquivos: [], paineis: [], notas: [] }),
         olharEtapas: async (arquivo, opcoes) => { pedidosDeEtapas.push({ arquivo, opcoes }); return olharEtapas(arquivo, opcoes); },
         /* os cortes resolvem a montagem inteira; aqui um gravador diz a quem foram pedidos */
         cortesDosEncaixes: async (pedido) => {
           pedidosDeCortes.push(pedido);
+          if (cortes) return cortes(pedido);
           const arquivo = join(pedido.pasta, `corte-${pedido.montagem.instancia}-fuselagem.png`);
           writeFileSync(arquivo, 'corte');
           return { cortes: [{ arquivo, vizinha: 'fuselagem', origens: ['posição motorNaFuselagem'], folgaMm: 0.5, folgaNoCorteMm: 0.5, cruzam: false, plano: 'x = 1,0 mm, visto de +x (direita da imagem -z, cima +y)', declarado: false }], aviso: null };
         },
         rodadasAnteriores: () => [],
-        visibilidadeDoFoco: async () => ({}),
+        visibilidadeDoFoco: async () => visibilidade,
       },
     });
     return { pasta, resultado, pedidosDeEtapas, pedidosDeCortes, ids };
   }
+
+  it('no pacote padrão pede só as duas vistas montadas em que a peça mais aparece e o corte de menor folga, e o pedido diz o que ficou de fora', async () => {
+    const olhar = async (arquivo, opcoes) => {
+      const arquivos = opcoes.vistas.map((vista) => { const a = join(opcoes.saida, `etapas-aviao-${vista}-orto-foco-motor.png`); writeFileSync(a, vista); return a; });
+      return { construidas: ['fuselagem', 'motor'], arquivos, enquadramentos: opcoes.vistas.map((vista) => ({ vista, largura: 0.61, altura: 0.833, cortado: false })), foco: ['motor'] };
+    };
+    const visibilidade = { isometrica: 0.4, frontal: 0.3, traseira: 0, direita: 0.8, esquerda: 0.01, superior: 0.5, inferior: 0.5 };
+    const cortes = async (pedido) => {
+      const arquivo = join(pedido.pasta, 'corte-motor-fuselagem.png');
+      writeFileSync(arquivo, 'corte');
+      return { cortes: [{ arquivo, vizinha: 'fuselagem', origens: ['posição'], folgaMm: 0.5, folgaNoCorteMm: 0.5, cruzam: false, plano: 'x = 1,0 mm', declarado: false }], fora: [{ vizinha: 'asas', folgaMm: 3 }, { vizinha: 'helice', folgaMm: 7 }], aviso: null };
+    };
+    const { pasta, resultado, pedidosDeEtapas, pedidosDeCortes } = await montar(olhar, { completo: false, visibilidade, cortes });
+    expect(MONTADAS_DO_PADRAO).toBe(2);
+    expect(pedidosDeEtapas).toHaveLength(1);
+    expect(pedidosDeEtapas[0].opcoes.vistas).toEqual(['isometrica', 'direita']);
+    expect(pedidosDeCortes[0].limite).toBe(CORTES_DO_PADRAO);
+    expect(CORTES_DO_PADRAO).toBe(1);
+    const pedido = readFileSync(join(pasta, 'pedido.md'), 'utf8');
+    expect(pedido).toContain('- as vistas montadas isometrica e direita, as em que mais da peça aparece entre as outras, para o contexto e a posição');
+    expect(pedido).toContain('- as vistas montadas frontal, traseira, esquerda, superior e inferior, em que aparece menos da peça ou ela fica tapada');
+    expect(pedido).toContain('- o corte do encaixe com `fuselagem`: o de menor folga, onde um cruzamento ou uma peça solta aparece primeiro');
+    expect(pedido).toContain('- os cortes dos encaixes com `asas` e `helice`, de folga maior');
+    const montado = pedido.slice(pedido.indexOf('## Montado'), pedido.indexOf('## Encaixes em corte'));
+    expect(imagensCitadas(montado).map((a) => basename(a))).toEqual(['etapas-aviao-isometrica-orto-foco-motor.png', 'etapas-aviao-direita-orto-foco-motor.png']);
+    expect(resultado.tipo).toBe(PACOTE_PADRAO);
+    /* o completo pede as sete e não limita os cortes */
+    const inteiro = await montar(olhar, { completo: true, visibilidade });
+    expect(inteiro.pedidosDeEtapas[0].opcoes.vistas).toEqual(VISTAS_MONTADAS);
+    expect(inteiro.pedidosDeCortes[0]).not.toHaveProperty('limite');
+    expect(readFileSync(join(inteiro.pasta, 'pedido.md'), 'utf8')).not.toContain('conjunto padrão');
+  }, 120_000);
+
+  it('no pacote padrão, a peça tapada em todas as vistas montadas não gasta captura montada, e o relatório avisa', async () => {
+    const tapada = Object.fromEntries(VISTAS_MONTADAS.map((v) => [v, 0]));
+    const { resultado, pedidosDeEtapas, pasta } = await montar(async () => { throw new Error('não devia capturar'); }, { completo: false, visibilidade: tapada });
+    expect(pedidosDeEtapas).toHaveLength(0);
+    expect(resultado.montada).toBeNull();
+    expect(resultado.avisos.join('\n')).toContain("sem vista montada: as outras peças tapam 'motor' em todas as vistas (menos de 5,0 % da silhueta dela visível).");
+    expect(readFileSync(join(pasta, 'pedido.md'), 'utf8')).not.toContain('## Montado');
+  }, 60_000);
 
   it('pede as vistas montadas com o quadro na instância, na pasta da rodada, e põe no pedido o que o enquadramento diz', async () => {
     const { pasta, resultado, pedidosDeEtapas, pedidosDeCortes } = await montar(async (arquivo, opcoes) => {
@@ -1250,10 +1558,11 @@ describe('o reflexo da bancada no pacote da peça de lataria', () => {
      --enquadrar`): a direita e a superior a veem de quina */
   const ENQUADRADA = { isometrica: [0.81, 0.92], frontal: [0.92, 0.56], direita: [0.03, 0.92], superior: [0.92, 0.02] };
 
-  async function pacote() {
+  async function pacote({ completo = true } = {}) {
     const base = mkdtempSync(join(area, 'reflexo-'));
     const pasta = join(base, 'rodada');
     const chamadas = [];
+    const pedidosDeSuperficie = [];
     const olharBancada = async (opcoes) => {
       chamadas.push(opcoes);
       const vistas = opcoes.revisar ? ['isometrica', 'frontal', 'direita', 'superior'] : String(opcoes.vistas).split(',');
@@ -1263,10 +1572,40 @@ describe('o reflexo da bancada no pacote da peça de lataria', () => {
       return { ok: true, resultado: { arquivos, ...(medidas ? { vistas: medidas } : {}) } };
     };
     const img = (vista, azimute) => ({ arquivo: join(base, `rasante-${vista}-${azimute}.png`), vista, azimute, iluminada: 0.6 });
-    const superficieDaBancada = async () => ({ fonte: 'bancada', partes: [], rasante: [img('frente', 30)], curvatura: [{ arquivo: join(base, 'curv-frente.png'), vista: 'frente' }], faixa: null, fora: [] });
-    const resultado = await vistasParaCritica(PECA, { saida: pasta, pastaDasCapturas: base, dependencias: { medirReceita: medirPassa, blender: null, olharBancada, superficieDaBancada, rodadasAnteriores: () => [] } });
-    return { resultado, chamadas, pedido: readFileSync(join(pasta, 'pedido.md'), 'utf8'), manifesto: JSON.parse(readFileSync(join(pasta, 'pacote.json'), 'utf8')) };
+    const superficieDaBancada = async (_peca, opcoes) => { pedidosDeSuperficie.push(opcoes.vistas ?? null); return { fonte: 'bancada', partes: [], rasante: [img('frente', 30)], curvatura: [{ arquivo: join(base, 'curv-frente.png'), vista: 'frente' }], faixa: null, fora: [] }; };
+    const resultado = await vistasParaCritica(PECA, { saida: pasta, pastaDasCapturas: base, completo, dependencias: { medirReceita: medirPassa, blender: null, olharBancada, superficieDaBancada, rodadasAnteriores: () => [] } });
+    return { resultado, chamadas, pedidosDeSuperficie, pedido: readFileSync(join(pasta, 'pedido.md'), 'utf8'), manifesto: JSON.parse(readFileSync(join(pasta, 'pacote.json'), 'utf8')) };
   }
+
+  it('no pacote padrão a peça de lataria leva a zebra nas duas direções, a curvatura e a luz rasante numa vista só, a de três quartos, sem a pintura', async () => {
+    const { chamadas, pedidosDeSuperficie, pedido, resultado } = await pacote({ completo: false });
+    expect(chamadas.filter((c) => c.visao).map((c) => [c.visao, c.anguloDaZebra ?? null, c.vistas])).toEqual([['zebra', null, 'isometrica'], ['zebra', 90, 'isometrica']]);
+    expect(pedidosDeSuperficie).toEqual([VISTAS_DE_SUPERFICIE_NO_PADRAO]);
+    expect(VISTAS_DE_SUPERFICIE_NO_PADRAO).toEqual(['tresquartos']);
+    expect(pedido).toContain('- a superfície da chapa numa vista só, a de três quartos, que mostra a frente, o lado e o topo de uma vez: a curvatura e a luz rasante, e a zebra nas duas direções da listra na vista isometrica, que olha do mesmo lado');
+    expect(pedido).toContain('- a superfície da chapa nas vistas de frente, de lado e de cima, e a pintura, que repetem o que a de três quartos mostra');
+    expect(pedido).toContain('Com a listra deitada (0 grau):');
+    expect(pedido).not.toContain('A pintura: verniz');
+    expect(Object.keys(resultado.reflexo)).toEqual(['zebra', 'zebra-em-pe']);
+    /* o completo não diz as vistas à superfície, que sai nas quatro de sempre */
+    expect((await pacote()).pedidosDeSuperficie).toEqual([null]);
+  }, 60_000);
+
+  it('no pacote padrão, a luz rasante toda escura na vista de três quartos recusa o pacote com o comando do completo, que tenta as quatro vistas', async () => {
+    const base = mkdtempSync(join(area, 'escura-'));
+    const bancada = bancadaFalsa(base, PECA);
+    const olharBancada = async (opcoes) => bancada.fazer({ ...opcoes, vistas: opcoes.vistas ?? 'isometrica' });
+    const escura = { arquivo: join(base, 'rasante-tresquartos-290.png'), vista: 'tresquartos', azimute: 290, iluminada: 0.02 };
+    const superficieDaBancada = async () => ({ fonte: 'bancada', partes: [], rasante: [escura], curvatura: [{ arquivo: join(base, 'curv.png'), vista: 'tresquartos' }], faixa: null, fora: [] });
+    const montar = (completo) => pacoteDoCritico(PECA, { saida: join(base, 'rodada'), pastaDasCapturas: base, completo, dependencias: { medirReceita: medirPassa, blender: null, olharBancada, superficieDaBancada, rodadasAnteriores: () => [], ultimaRodadaJulgada: () => null } }).then(() => null, (e) => e.message);
+    const recusa = await montar(false);
+    expect(recusa).toContain(`a luz rasante de '${PECA}' saiu quase toda escura em uma imagem`);
+    expect(recusa).toContain(`O pacote padrão recebeu a luz rasante só da vista tresquartos; esperado ao menos uma imagem em que a luz alcance a peça. O pacote completo tenta as quatro vistas de superfície: \`npm run vistas:critica -- ${PECA} --completo\`.`);
+    /* no completo a recusa é a de sempre, sem a frase do padrão */
+    const doCompleto = await montar(true);
+    expect(doCompleto).toContain('saiu quase toda escura');
+    expect(doCompleto).not.toContain('O pacote padrão recebeu');
+  }, 60_000);
 
   it('captura a zebra nas duas direções e a pintura enquadradas e as lista no pedido, com a frase da faixa, sem a vista de quina', async () => {
     const { resultado, chamadas, pedido, manifesto } = await pacote();

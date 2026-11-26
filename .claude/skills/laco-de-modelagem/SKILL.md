@@ -64,7 +64,8 @@ node tools/modelar/rodada-de-modelagem.mjs <peça> --decisao-da-pessoa "<quem de
 ```
 
 O comando grava no arquivo `decisoes-da-pessoa.json` da pasta de rodadas da peça, sem mexer no registro da rodada, e o `--acao`
-passa a listar a decisão de cada rodada. A data é a do dia em que ela decidiu, e `--substituir` troca uma decisão já gravada
+passa a listar a decisão de cada rodada. A cópia da receita dessa rodada (`rodadas/receita-NN.js`) fica guardada pelas rodadas
+seguintes, e o comando diz onde ela está ou avisa quando ela já não existe. A data é a do dia em que ela decidiu, e `--substituir` troca uma decisão já gravada
 quando ela a muda. Nenhum agente grava por conta própria, nem resume, traduz ou completa o que ela disse: sem o pedido dela e
 sem as palavras dela, a rodada fica sem decisão gravada.
 
