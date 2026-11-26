@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2445 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2446 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -500,6 +500,10 @@
 ## docs/modelar/banco-de-provas/prancha-apoio-ia-2026-11-20/
 
 - `README.md` — Banco de provas — ferramentas de prancha para IA (2026-11-20)
+
+## docs/modelar/banco-de-provas/processo-e-ci-2026-11-26/
+
+- `README.md` — Processo e CI: a série dos dez envios sem vermelho falso
 
 ## docs/modelar/banco-de-provas/rebaixo-por-contorno-2026-11-20/
 

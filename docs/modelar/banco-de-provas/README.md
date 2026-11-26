@@ -72,6 +72,7 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
 - [Ponte com a mecatrônica: a ficha do braço e o pedido de prova](ponte-mecatronica-2026-11-23/README.md) — `ponte-mecatronica-2026-11-23`
 - [Linha de base da porta de entrada dos agentes, 2026-11-05](porta-de-entrada-2026-11-05/README.md) — `porta-de-entrada-2026-11-05`
 - [Banco de provas — ferramentas de prancha para IA (2026-11-20)](prancha-apoio-ia-2026-11-20/README.md) — `prancha-apoio-ia-2026-11-20`
+- [Processo e CI: a série dos dez envios sem vermelho falso](processo-e-ci-2026-11-26/README.md) — `processo-e-ci-2026-11-26`
 - [Rebaixo por contorno: provas do ajudante e aplicação no `carro-quadrado`](rebaixo-por-contorno-2026-11-20/README.md) — `rebaixo-por-contorno-2026-11-20`
 - [Receitas do projeto externo da pessoa no esboço do Mecanifica (2026-10-19)](receitas-externas-2026-10-19/README.md) — `receitas-externas-2026-10-19`
   - [Cadeiras ajustadas (2026-10-19)](receitas-externas-2026-10-19/cadeiras-ajustadas/README.md) — `receitas-externas-2026-10-19/cadeiras-ajustadas`

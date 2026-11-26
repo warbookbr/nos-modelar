@@ -31,6 +31,12 @@ runs:
     - run: npx playwright install chromium chromium-headless-shell
       shell: bash
 
+    # As bibliotecas do navegador vêm do arquivo do Ubuntu; a fonte da Microsoft que a imagem do GitHub traz não serve a elas, e
+    # em 2026-11-26 ela respondeu 403 e "no longer signed" nas três tentativas (CI de e7716db5), o que faz o apt reprovar
+    # inteiro. Ela sai antes da instalação.
+    - run: sudo rm -f /etc/apt/sources.list.d/microsoft-prod.list /etc/apt/sources.list.d/microsoft-prod.sources
+      shell: bash
+
     - run: |
         for tentativa in 1 2 3; do
           if npx playwright install-deps chromium chromium-headless-shell; then exit 0; fi
