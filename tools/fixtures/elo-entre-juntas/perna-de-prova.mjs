@@ -4,8 +4,9 @@
  * (procedural/pecas/esqueleto-humanoide/: proporcoes.json, esqueleto.json e articulacoes.json), e não de números escritos aqui.
  *
  * O U liga dois eixos antiparalelos (o eixo do atuador seguinte aponta ao contrário), que é o que o esqueleto tem: o quadril e o tornozelo giram
- * em torno de −x e o joelho em torno de +x. Cada U desloca a boca B da A de um lado (67,5 mm na coxa, na direção do eixo), e como o atuador do joelho
- * gira meia volta o deslocamento da canela volta ao outro lado: o tornozelo fica na mesma coluna do quadril e o joelho a uns 6 mm dela.
+ * em torno de −x e o joelho em torno de +x. Cada U desloca a boca B da A de 67,5 mm na direção do eixo e se curva 123 mm para o lado da saída do atuador de onde sai,
+ * e como o atuador do joelho gira meia volta a canela se curva para o lado oposto ao da coxa: o tornozelo fica na mesma coluna do quadril e o joelho 59,5 mm para
+ * fora, e a perna toda ocupa uns 387 mm de largura em x, qualquer que seja o sentido dos eixos (a conta está no banco de provas).
  *
  * `montarPerna` devolve a montagem no formato de `montar` de uma família; `paraOEsqueleto` dá a transformação rígida da montagem (onde o primeiro
  * atuador está na origem, com o eixo ao longo de y) ao referencial do esqueleto (y para cima, o membro em −y, o eixo do quadril em −x). */
@@ -79,6 +80,7 @@ export function montarPerna(familiaAtuador, familiaElo, { coxa = ELO_DA_COXA, ca
 const sub = (a, b) => a.map((v, i) => v - b[i]);
 const dot = (a, b) => a.reduce((s, v, i) => s + v * b[i], 0);
 const cruz = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
+const matVec = (m, v) => m.map((l) => dot(l, v));
 const unit = (a) => { const n = Math.hypot(...a); return a.map((v) => v / n); };
 
 /** O eixo (direção e centro, em mm) da porta `eixo` do atuador de cada junta, no referencial da montagem resolvida. */
@@ -86,19 +88,27 @@ export function eixosDasJuntas(portas) {
   return ['carcacaQuadril', 'carcacaJoelho', 'carcacaTornozelo'].map((id) => { const p = portas.get(`${id}.eixo`); return { direcao: p.eixo, centro: p.centro.map((v) => v * 1000) }; });
 }
 
+/** A folga mínima, em mm, entre a perna direita e a linha do meio do corpo (x = 0). */
+export const FOLGA_DA_LINHA_DO_MEIO = 20;
+
 /**
  * A transformação rígida da montagem ao esqueleto: a direção do eixo do quadril vai a −x (o do esqueleto), o membro (do quadril ao tornozelo,
- * sem a parte ao longo do eixo) vai a −y e o centro do eixo do quadril vai à posição do quadril do esqueleto. Devolve `{ rotacao, deslocamento }` em mm.
+ * sem a parte ao longo do eixo) vai a −y e o centro do eixo do quadril vai à posição do quadril do esqueleto em y e z. Em x a perna só desliza ao longo
+ * dos eixos (que são todos paralelos a x, e por isso o esqueleto e os cursos não mudam): com a `resolvida` na mão, ela desliza até a peça mais próxima da
+ * linha do meio ficar a `folga` mm dela (x = folga); sem a `resolvida`, o centro do eixo do quadril fica em x do esqueleto. Devolve `{ rotacao, deslocamento, aplicar }`, em mm.
  */
-export function paraOEsqueleto(portas) {
+export function paraOEsqueleto(portas, resolvida = null, folga = FOLGA_DA_LINHA_DO_MEIO) {
   const [q, , t] = eixosDasJuntas(portas);
   const e1 = unit(q.direcao); const d = sub(t.centro, q.centro); const e2 = unit(sub(d, e1.map((v) => v * dot(d, e1)))); const e3 = cruz(e1, e2);
   const rotacao = [e1.map((v) => -v), e2.map((v) => -v), e3];
-  const alvo = JUNTAS_DA_PERNA[0].posicao; const girado = rotacao.map((l) => dot(l, q.centro));
-  return { rotacao, deslocamento: alvo.map((v, i) => v - girado[i]), aplicar: (p) => rotacao.map((l, i) => dot(l, p) + alvo[i] - girado[i]) };
+  const alvo = [...JUNTAS_DA_PERNA[0].posicao]; const girado = rotacao.map((l) => dot(l, q.centro));
+  const monta = (x) => { const o = [x, alvo[1], alvo[2]]; return { rotacao, deslocamento: o.map((v, i) => v - girado[i]), aplicar: (p) => rotacao.map((l, i) => dot(l, p) + o[i] - girado[i]) }; };
+  if (!resolvida) return monta(alvo[0]);
+  const base = monta(alvo[0]); let minimo = Infinity;
+  for (const i of resolvida.instancias) for (const p of i.definicao.neutro.V.values()) minimo = Math.min(minimo, base.aplicar(matVec(i.poseMundo.rotacao, p).map((v, k) => (v + i.poseMundo.deslocamento[k]) * 1000))[0]);
+  return monta(alvo[0] + folga - minimo);
 }
 
-const matVec = (m, v) => m.map((l) => dot(l, v));
 const matMat = (a, b) => a.map((l) => [0, 1, 2].map((j) => l[0] * b[0][j] + l[1] * b[1][j] + l[2] * b[2][j]));
 function giroEmTorno(k, graus) {
   const a = (graus * Math.PI) / 180; const c = Math.cos(a); const s = Math.sin(a); const [x, y, z] = k; const t = 1 - c;
@@ -143,7 +153,7 @@ export function neutroDaPerna(resolvida, paraEsq) {
 }
 
 let guardada = null;
-/** A perna montada e resolvida (uma vez por processo): a montagem gerada, os problemas, a montagem resolvida, o tempo de resolver em segundos e as portas na pose zero. */
+/** A perna montada e resolvida (uma vez por processo): a montagem gerada, os problemas, a montagem resolvida, o tempo de resolver em segundos, as portas na pose zero e a transformação ao esqueleto (com a folga da linha do meio). */
 export function resolverPerna() {
   guardada ??= (() => {
     const registro = criarRegistroDeFamilias();
@@ -153,7 +163,8 @@ export function resolverPerna() {
     const { problemas, resolvida } = resolverMontagemDaFamilia({ montar: () => gerada }, {}, execucao);
     const segundos = (performance.now() - inicio) / 1000;
     const instancias = resolvida ? resolvida.instancias.map((i) => ({ id: i.id, neutro: i.definicao.neutro, escala: 1, rotacao: i.poseMundo.rotacao, deslocamento: i.poseMundo.deslocamento })) : [];
-    return { gerada, problemas, resolvida, segundos, portas: instancias.length ? resolverPortasDeMontagem(instancias) : null };
+    const portas = instancias.length ? resolverPortasDeMontagem(instancias) : null;
+    return { gerada, problemas, resolvida, segundos, portas, paraEsqueleto: resolvida ? paraOEsqueleto(portas, resolvida) : null };
   })();
   return guardada;
 }

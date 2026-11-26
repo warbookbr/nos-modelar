@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest';
 import { auditarIntersecoesMontagem } from '../../../src/autoria/auditar-intersecoes-montagem.js';
 import { conferirArticulacao } from '../../../src/autoria/conferir-articulacao.js';
 import { validarEncaixePadraoFuros } from '../../../src/autoria/interfaces-montagem.js';
-import { COMPRIMENTOS, JUNTAS_DA_PERNA, caixaNoEsqueleto, eixosDasJuntas, paraOEsqueleto, resolverPerna, resolvidaNaPose } from './perna-de-prova.mjs';
+import { COMPRIMENTOS, FOLGA_DA_LINHA_DO_MEIO, JUNTAS_DA_PERNA, caixaNoEsqueleto, eixosDasJuntas, paraOEsqueleto, resolverPerna, resolvidaNaPose } from './perna-de-prova.mjs';
 
 const { gerada } = resolverPerna();
 const ENCOSTOS = ['canela+carcacaTornozelo:encostam', 'canela+saidaJoelho:encostam', 'carcacaJoelho+coxa:encostam', 'carcacaJoelho+saidaJoelho:encostam', 'carcacaQuadril+saidaQuadril:encostam', 'carcacaTornozelo+saidaTornozelo:encostam', 'coxa+saidaQuadril:encostam'];
@@ -43,15 +43,23 @@ describe('a perna de prova do elo entre juntas', () => {
     });
   }, 60000);
 
-  it('o pé fica sob o quadril: o atuador do tornozelo ocupa o mesmo intervalo lateral do quadril (x de 100 a 165 mm) e o do joelho fica 59,5 mm para fora', () => {
-    const { resolvida, portas } = montar();
-    const T = paraOEsqueleto(portas);
-    const x = (id) => caixaNoEsqueleto(resolvida, T, id);
+  it('o pé fica sob o quadril: o atuador do tornozelo ocupa o mesmo intervalo lateral do quadril e o do joelho fica 59,5 mm para fora', () => {
+    const { resolvida, paraEsqueleto } = montar();
+    const x = (id) => caixaNoEsqueleto(resolvida, paraEsqueleto, id);
     for (const k of ['minimo', 'maximo']) expect(x('carcacaTornozelo')[k][0]).toBeCloseTo(x('carcacaQuadril')[k][0], 3);
-    expect(x('carcacaQuadril').minimo[0]).toBeCloseTo(100, 3);
-    expect(x('carcacaQuadril').maximo[0]).toBeCloseTo(165, 3);
+    expect(x('carcacaQuadril').maximo[0] - x('carcacaQuadril').minimo[0]).toBeCloseTo(65, 3);
     expect(x('carcacaJoelho').minimo[0] - x('carcacaQuadril').minimo[0]).toBeCloseTo(59.5, 3);
     for (const id of ['carcacaQuadril', 'carcacaJoelho', 'carcacaTornozelo']) { expect(x(id).minimo[2], id).toBeCloseTo(-62, 3); expect(x(id).maximo[2], id).toBeCloseTo(62, 3); }
+  }, 60000);
+
+  it('nenhuma peça passa da linha do meio do corpo (folga de 20 mm) e a perna ocupa 387 mm de largura, que é o que os dois U deixam', () => {
+    const { resolvida, paraEsqueleto } = montar();
+    const caixas = resolvida.instancias.map((i) => caixaNoEsqueleto(resolvida, paraEsqueleto, i.id));
+    const minimo = Math.min(...caixas.map((c) => c.minimo[0])); const maximo = Math.max(...caixas.map((c) => c.maximo[0]));
+    expect(minimo).toBeCloseTo(FOLGA_DA_LINHA_DO_MEIO, 3);
+    expect(maximo - minimo).toBeCloseTo(387.23, 1);
+    const dobrada = resolvidaNaPose(resolvida, montar().portas, { quadril: 90, joelho: 90 });
+    expect(Math.min(...dobrada.instancias.map((i) => caixaNoEsqueleto(dobrada, paraEsqueleto, i.id).minimo[0]))).toBeCloseTo(FOLGA_DA_LINHA_DO_MEIO, 3);
   }, 60000);
 
   for (const junta of ['quadril', 'joelho', 'tornozelo']) {
@@ -72,8 +80,7 @@ describe('a perna de prova do elo entre juntas', () => {
   }, 120000);
 
   it('a perna dobrada leva o joelho à frente do quadril e o tornozelo sob o joelho, como o sentado do esqueleto', () => {
-    const { resolvida, portas } = montar();
-    const T = paraOEsqueleto(portas);
+    const { resolvida, portas, paraEsqueleto: T } = montar();
     const dobrada = resolvidaNaPose(resolvida, portas, { quadril: 90, joelho: 90 });
     const em = (id) => T.aplicar(dobrada.instancias.find((i) => i.id === id).poseMundo.deslocamento.map((v) => v * 1000));
     expect(em('carcacaJoelho')[1]).toBeCloseTo(930, 2); expect(em('carcacaJoelho')[2]).toBeCloseTo(431, 2);

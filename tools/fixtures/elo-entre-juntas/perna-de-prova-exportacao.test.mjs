@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { exportarCad } from '../../../modulos/exportador-cad/src/index.js';
 import { exportarObj } from '../../../modulos/exportador-obj/src/index.js';
-import { neutroDaPerna, paraOEsqueleto, resolverPerna } from './perna-de-prova.mjs';
+import { neutroDaPerna, resolverPerna } from './perna-de-prova.mjs';
 
 const PASTA = resolve(dirname(fileURLToPath(import.meta.url)), '../../bancadas/out/perna-de-prova/exportacao');
 const PARTES = ['carcacaQuadril', 'saidaQuadril', 'coxa', 'carcacaJoelho', 'saidaJoelho', 'canela', 'carcacaTornozelo', 'saidaTornozelo'];
@@ -15,8 +15,8 @@ const montar = resolverPerna;
 
 describe('exportação da perna de prova', () => {
   it('a perna sai em STEP e em OBJ, com as oito partes nomeadas, numa pasta fora do git', async () => {
-    const { resolvida, portas } = montar();
-    const neutro = neutroDaPerna(resolvida, paraOEsqueleto(portas));
+    const { resolvida, paraEsqueleto } = montar();
+    const neutro = neutroDaPerna(resolvida, paraEsqueleto);
     mkdirSync(PASTA, { recursive: true });
     const step = await exportarCad({ neutro, nome: 'perna-de-prova', formato: 'step', estrategia: 'facetada', unidade: 'mm', escala: 1000, tolerancia: 0.00001 });
     writeFileSync(resolve(PASTA, 'perna-de-prova.step'), step.bytes);
