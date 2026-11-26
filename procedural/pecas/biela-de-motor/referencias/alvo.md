@@ -5,3 +5,5 @@ Biela de motor com capa e parafusos, peça inteira. Imagem de caráter gerada po
 Escala: 145 mm entre centros. Partes: `corpo` (olhal pequeno de 22 mm de furo com a `bucha` de bronze, haste de seção em I afinando para o olhal pequeno, meia cabeça grande), `capa` (outra metade da cabeça grande, furo de 53 mm), `parafusos` (dois parafusos com cabeça sextavada atravessando a capa até o corpo). A cabeça e a haste se fundem em curvas, sem quina viva.
 
 O que reprova: haste retangular maciça sem a seção em I; olhal pequeno sem a bucha; parafusos fora dos furos ou atravessando o furo grande; corpo e capa desalinhados.
+
+Aprovação: a pessoa aprovou a peça por imagem em 2026-11-26 ("Aprovo as nove, pode prosseguir"), depois do crítico cego, no plano do resgate dos ramos antigos; o facetado de acabamento que o crítico apontou fica em aberto.

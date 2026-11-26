@@ -17,3 +17,5 @@ Movimento: a gaveta abre até 350 mm para a frente sem bater em nada; declare o 
 Materiais: carvalho claro (pés, saia, tampo, gaveta), metal escuro (puxador).
 
 O que reprova: gaveta maciça ou sem folga; gaveta que atravessa a saia ou os pés em qualquer posição do curso; puxador fora do centro; tampo sem balanço.
+
+Aprovação: a pessoa aprovou a peça por imagem em 2026-11-26 ("Aprovo as nove, pode prosseguir"), depois do crítico cego, no plano do resgate dos ramos antigos; o facetado de acabamento que o crítico apontou fica em aberto.

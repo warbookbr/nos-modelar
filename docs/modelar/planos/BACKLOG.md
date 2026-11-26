@@ -346,3 +346,5 @@ O acabamento das nove partes do braço de prova, que a pessoa aceitou em aberto 
 Um comando que leia `articulacoes.json` da peça e confira o curso pela linha de comando, porque hoje a declaração só é lida por quem chama a extensão de articulação.
 
 O caminho para corrigir uma forma aprovada fora do laço de modelagem: a peça aprovada antes do laço não tem como passar pelo crítico sem reabrir tudo, e o braço de prova pediu isso.
+
+O pacote do crítico visual com a caixa de cada corpo da parte, além da caixa da parte inteira: na mesa de jantar o crítico leu a caixa da `saia` inteira como o comprimento de uma travessa e apontou um defeito que não existia (resgate dos ramos, 2026-11-26).

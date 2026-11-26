@@ -13,3 +13,5 @@ Contatos: cada pé com as duas travessas que chegam nele; o tampo apoiado no top
 Material: madeira de carvalho claro em todas as partes.
 
 O que reprova: pé que não afina ou afina pelo lado de fora; travessa que atravessa o pé ou fica solta dele; tampo sem balanço ou com borda viva; peças que se interpenetram além do encaixe.
+
+Aprovação: a pessoa aprovou a peça por imagem em 2026-11-26 ("Aprovo as nove, pode prosseguir"), depois do crítico cego, no plano do resgate dos ramos antigos; o facetado de acabamento que o crítico apontou fica em aberto.

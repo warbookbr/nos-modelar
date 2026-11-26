@@ -5,3 +5,5 @@ Vela de ignição, peça inteira. Imagem de caráter gerada por IA, sem marca, f
 Escala: 85 mm de comprimento. Partes, de cima para baixo: `terminal` (pino de topo com a ranhura), `isolador` (cerâmica branca com cinco nervuras), `sextavado` (porca de 16 mm entre faces, aço), `arruela` (anel de vedação), `rosca` (corpo roscado M14 x 1,25, 19 mm de comprimento, rosca helicoidal), `eletrodos` (ponta da cerâmica com o eletrodo central e o eletrodo de massa em L dobrado sobre ele, com folga de 1 mm).
 
 O que reprova: rosca sem filete; isolador sem nervuras; eletrodo de massa tocando o central; partes fora do mesmo eixo.
+
+Aprovação: a pessoa aprovou a peça por imagem em 2026-11-26 ("Aprovo as nove, pode prosseguir"), depois do crítico cego, no plano do resgate dos ramos antigos; o facetado de acabamento que o crítico apontou fica em aberto.

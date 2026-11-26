@@ -16,3 +16,5 @@ Contatos: pés com os dois aros; prateleira dentro do aro inferior; ornamentos c
 Materiais: latão escovado (pés, aros, ornamento), mármore branco (tampo), vidro (prateleira).
 
 O que reprova: tampo ou aros que não seguem a pista (retangulares ou elípticos); prateleira solta do aro; ornamento solto; pés sem capitel e sapata; peças que se interpenetram.
+
+Aprovação: a pessoa aprovou a peça por imagem em 2026-11-26 ("Aprovo as nove, pode prosseguir"), depois do crítico cego, no plano do resgate dos ramos antigos; o facetado de acabamento que o crítico apontou fica em aberto.

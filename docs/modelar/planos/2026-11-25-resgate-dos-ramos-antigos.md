@@ -70,6 +70,8 @@ Se uma peça mudar de forma no núcleo de hoje a ponto de a aprovação antiga n
 
 Fatia 1 feita em 2026-11-26: as cinco peças aprovadas no acervo, confirmadas pela pessoa por imagem, e a fusão das tampas pelos vizinhos, que tirou a junta do cabeçote de 123 s sem mudar nenhuma peça do acervo. A medida está no banco de provas.
 
+Fatia 2 feita em 2026-11-26: as seis automotivas e as três mesas no acervo, pelo crítico cego, com a mesa de centro corrigida, e aprovadas pela pessoa por imagem.
+
 ## Fechamento
 
 Preencher ao concluir ou cancelar: estado final, commit e PR, gates, resultado observado e candidatos devolvidos ao backlog.
