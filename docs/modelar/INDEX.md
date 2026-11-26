@@ -22,7 +22,7 @@ diz o commit onde está; não governa trabalho novo.
 
 ## Estado atual
 
-- Planos ativos: <!-- planos-ativos:inicio -->[modelagem de carro de passeio](planos/2026-11-14-modelagem-de-carro.md), [superfície de produção (G2)](planos/2026-11-22-superficie-de-producao-g2.md), [elo entre juntas](planos/2026-11-25-elo-entre-juntas.md) e [resgate dos ramos antigos](planos/2026-11-25-resgate-dos-ramos-antigos.md).<!-- planos-ativos:fim -->
+- Planos ativos: <!-- planos-ativos:inicio -->[modelagem de carro de passeio](planos/2026-11-14-modelagem-de-carro.md), [superfície de produção (G2)](planos/2026-11-22-superficie-de-producao-g2.md), [elo entre juntas](planos/2026-11-25-elo-entre-juntas.md), [resgate dos ramos antigos](planos/2026-11-25-resgate-dos-ramos-antigos.md) e [execução paralela](planos/2026-11-26-execucao-paralela.md).<!-- planos-ativos:fim -->
 - Encerrados recentes: [abertura em qualquer direção](./decisoes/PLANOS-ENCERRADOS.md), [limites do sólido por laços](./decisoes/PLANOS-ENCERRADOS.md), [esboço pelo núcleo](./decisoes/PLANOS-ENCERRADOS.md) e [sólido por laços](./decisoes/PLANOS-ENCERRADOS.md); os outros na [crônica](./decisoes/PLANOS-ENCERRADOS.md).
 - A [exportação CAD/STEP modular](./decisoes/PLANOS-ENCERRADOS.md)
   entregou `modulos/exportador-cad/`, `modulos/exportador-obj/` e as CLIs
