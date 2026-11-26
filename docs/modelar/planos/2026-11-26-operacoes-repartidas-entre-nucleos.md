@@ -6,7 +6,7 @@
 
 **Repositório e base:** `warbookbr/nos-modelar`, main de 2026-11-26.
 
-Nasceu da decisão da pessoa em 2026-11-26 no plano da [execução paralela](2026-11-26-execucao-paralela.md), que mediu que uma receita não ganha nada rodando passos lado a lado: cada passo pesado depende do anterior, e o tempo está dentro de poucas operações.
+Nasceu da decisão da pessoa em 2026-11-26 no plano da [execução paralela](../decisoes/PLANOS-ENCERRADOS.md), que mediu que uma receita não ganha nada rodando passos lado a lado: cada passo pesado depende do anterior, e o tempo está dentro de poucas operações.
 
 ## Problema observado
 

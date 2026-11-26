@@ -1,3 +1,4 @@
+/* processos-da-maquina.test.mjs — a conta do número de processos pelos núcleos e pela memória, e o pedido em MODELAR_PROCESSOS. */
 import { describe, expect, it } from 'vitest';
 import { processosDaMaquina } from './processos-da-maquina.mjs';
 

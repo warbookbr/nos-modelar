@@ -1,6 +1,6 @@
 # Execução paralela: quanto as ferramentas ganham com mais núcleos
 
-Pasta do plano [execução paralela](../../planos/2026-11-26-execucao-paralela.md), fatia 1, medida em 2026-11-26 numa máquina de quatro núcleos e 16 GB (15,7 GiB informados ao sistema), com o tempo roubado da máquina virtual abaixo de 1% em todas as medidas.
+Pasta do plano [execução paralela](../../decisoes/PLANOS-ENCERRADOS.md), fatia 1, medida em 2026-11-26 numa máquina de quatro núcleos e 16 GB (15,7 GiB informados ao sistema), com o tempo roubado da máquina virtual abaixo de 1% em todas as medidas.
 
 ## Como se refaz
 
