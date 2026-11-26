@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2443 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2445 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2339,6 +2339,14 @@
 ## procedural/pecas/escrivaninha-com-gaveta/referencias/
 
 - `alvo.md` — Alvo da escrivaninha com gaveta
+
+## procedural/pecas/esqueleto-humanoide/
+
+- `receita.js` — receita.js — a peça de bolas e bastões do esqueleto humanoide, na pose zero. Lê o esqueleto resolvido que `npm run esqueleto -- --proporcoes=procedural/pecas…
+
+## procedural/pecas/esqueleto-humanoide/referencias/
+
+- `alvo.md` — Alvo do esqueleto humanoide
 
 ## procedural/pecas/filtro-de-oleo/
 
