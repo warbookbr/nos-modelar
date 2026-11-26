@@ -8,12 +8,12 @@ import { dirname, join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { conferirTerritorio, declaracoesFora, principal } from './territorio-do-envio.mjs';
 
-const territorios = [{ plano: '2026-11-26-a.md', caminhos: ['tools/a/', 'docs/x.md'] }];
+const territorios = [{ plano: '2026-11-26-a.md', caminhos: ['tools/a/', 'notas/x.md'] }];
 const mudados = (...caminhos) => caminhos.map((c) => (typeof c === 'string' ? { caminho: c, novo: false } : c));
 
 describe('território do envio, a conta', () => {
   it('passa o que tem dono, o compartilhado e o gerado', () => {
-    expect(conferirTerritorio(mudados('tools/a/um.mjs', 'docs/x.md', 'package.json', 'docs/MAPA.md', 'CLAUDE.md', 'docs/modelar/decisoes/README.md'), territorios).fora).toEqual([]);
+    expect(conferirTerritorio(mudados('tools/a/um.mjs', 'notas/x.md', 'package.json', 'docs/MAPA.md', 'CLAUDE.md', 'docs/modelar/decisoes/README.md'), territorios).fora).toEqual([]);
   });
 
   it('reprova o arquivo sem dono, e a declaração do arquivo exato o libera', () => {
