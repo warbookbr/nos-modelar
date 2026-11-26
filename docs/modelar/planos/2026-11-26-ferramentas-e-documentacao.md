@@ -4,7 +4,7 @@
 
 **Núcleo:** não
 
-**Território:** `tools/README.md`, `tools/registro-de-ferramentas.json`, `tools/mapa/registro-de-ferramentas.mjs`, `tools/mapa/registro-de-ferramentas.test.mjs`, `tools/modelar/comecar.mjs`, `tools/modelar/comecar.test.mjs`, `docs/modelar/roteiros/`, `tools/mapa/roteiros.mjs`, `docs/COMECE-AQUI.md`, `.claude/agents/modelador.md`, `.claude/agents/implementador.md`, `.claude/agents/esbocista.md`, `.claude/agents/desenhador-de-contorno.md`, `.claude/agents/desenhista-de-prancha.md`, `.claude/settings.json`, `.mcp.json`, `docs/modelar/banco-de-provas/ferramentas-e-documentacao-2026-11-26/`.
+**Território:** `tools/README.md`, `tools/registro-de-ferramentas.json`, `tools/mapa/registro-de-ferramentas.mjs`, `tools/mapa/registro-de-ferramentas.test.mjs`, `tools/modelar/comecar.mjs`, `tools/modelar/comecar.test.mjs`, `docs/modelar/roteiros/`, `tools/mapa/roteiros.mjs`, `docs/COMECE-AQUI.md`, `.claude/agents/modelador.md`, `.claude/agents/implementador.md`, `.claude/agents/esbocista.md`, `.claude/agents/desenhador-de-contorno.md`, `.claude/agents/desenhista-de-prancha.md`, `.claude/REGRAS-DOS-AGENTES.md`, `.claude/settings.json`, `.mcp.json`, `.gitignore`, `docs/modelar/banco-de-provas/ferramentas-e-documentacao-2026-11-26/`.
 
 Ativado pela pessoa em 2026-11-26, com as recomendações 7 e 8 da análise do projeto ("1 a 10 aprovadas") e os achados fora da lista ("Sobre os achados sao importantes, tambem vou seguir sua recomendação em relação a eles").
 

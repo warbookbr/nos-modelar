@@ -52,7 +52,6 @@ public/sessao-ativa.json
 
 # Arquivos temporários e de ambiente
 .agent/
-.mcp.json
 .diario/
 # Registro de uso das ferramentas de entrada (`npm run uso`): .diario/uso.jsonl, coberto pela linha acima
 
