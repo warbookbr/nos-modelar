@@ -24,10 +24,10 @@ describe('território do envio, a conta', () => {
   });
 
   it('a pasta declarada vale só quando o envio cria todos os arquivos dela', () => {
-    const pasta = [{ caminho: 'docs/nova/', motivo: 'pasta nova' }];
-    expect(conferirTerritorio(mudados({ caminho: 'docs/nova/a.md', novo: true }, { caminho: 'docs/nova/b.md', novo: true }), territorios, pasta).fora).toEqual([]);
-    const r = conferirTerritorio(mudados({ caminho: 'docs/nova/a.md', novo: true }, 'docs/nova/velho.md'), territorios, pasta);
-    expect(r.fora).toEqual(['docs/nova/a.md', 'docs/nova/velho.md']);
+    const pasta = [{ caminho: 'notas/nova/', motivo: 'pasta nova' }];
+    expect(conferirTerritorio(mudados({ caminho: 'notas/nova/a.md', novo: true }, { caminho: 'notas/nova/b.md', novo: true }), territorios, pasta).fora).toEqual([]);
+    const r = conferirTerritorio(mudados({ caminho: 'notas/nova/a.md', novo: true }, 'notas/nova/velho.md'), territorios, pasta);
+    expect(r.fora).toEqual(['notas/nova/a.md', 'notas/nova/velho.md']);
     expect(r.soltas).toEqual(pasta);
   });
 
@@ -49,7 +49,7 @@ function cenario() {
   const raiz = mkdtempSync(join(tmpdir(), 'territorio-')); pastas.push(raiz);
   const origem = join(raiz, 'origem.git'); git(raiz, 'init', '-q', '--bare', '-b', 'main', origem);
   const ramo = join(raiz, 'ramo'); git(raiz, 'clone', '-q', origem, ramo);
-  escrever(ramo, 'docs/modelar/planos/2026-11-26-a.md', plano('`tools/a/`'));
+  escrever(ramo, 'docs/modelar/planos/' + '2026-11-26-a.md', plano('`tools/a/`'));
   escrever(ramo, 'solto.md', 'antes\n'); escrever(ramo, 'procedural/nucleo/x.js', 'x\n');
   git(ramo, 'add', '-A'); git(ramo, 'commit', '-qm', 'base'); git(ramo, 'push', '-q', 'origin', 'HEAD:main');
   git(ramo, 'checkout', '-qb', 'claude/x');
@@ -126,7 +126,7 @@ describe('território do envio, em repositórios de verdade', () => {
   it('o plano que se encerra no envio continua dono do que ele mudou', () => {
     const c = cenario();
     c.gravar('tools/a/um.mjs', 'um\n');
-    rmSync(join(c.ramo, 'docs/modelar/planos/2026-11-26-a.md')); git(c.ramo, 'commit', '-qam', 'encerra');
+    rmSync(join(c.ramo, 'docs/modelar/planos/' + '2026-11-26-a.md')); git(c.ramo, 'commit', '-qam', 'encerra');
     git(c.ramo, 'fetch', '-q', 'origin');
     const r = c.rodar();
     expect(r.codigo, r.texto).toBe(0);

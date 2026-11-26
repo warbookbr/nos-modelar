@@ -6,16 +6,22 @@
  * `adaptarThree` não fecham passa por todas elas. Foi assim que a face 3001 do capô do motor do avião chegou à bancada, que
  * abriu o avião sem o motor.
  *
- * As peças saíram para `abre-na-bancada-pecas-1` a `-3.test.mjs`, em fatias (abre-na-bancada-comum.mjs); aqui ficam as montagens e a
+ * As peças saíram para `abre-na-bancada-pecas-1` a `-3.test.mjs`, em fatias, com a mesma conta da fatia; aqui ficam as montagens e a
  * conferência de que as fatias cobrem o acervo.
  *
  * Reprova dizendo a peça (ou o caminho da instância na montagem) e a face, que é o que a mensagem de `adaptarThree` traz.
  * Roda na bateria rápida (`npm run test:rapidos`), porque a conta é só CPU: o acervo inteiro leva segundos. */
 import { describe, expect, it } from 'vitest';
-import { FATIAS_DAS_PECAS, acervo, montagens, pecas, pecasDaFatia } from './abre-na-bancada-comum.mjs';
+import { listarParaBancada } from '../../../src/bancada/acervo-receitas.js';
 import { resolverMontagemDoAcervo } from '../../../src/bancada/sessao/montagem-em-dados.js';
 import { adaptarMontagemThree } from '../../../src/autoria/adaptar-montagem-three.js';
 
+
+const acervo = listarParaBancada();
+const pecas = acervo.filter((entrada) => !entrada.emDados && !entrada.ensaio);
+/* as peças da fatia n de 3, pela ordem do id: toda peça cai em exatamente uma fatia (a mesma conta nos quatro arquivos) */
+const pecasDaFatia = (n, total = 3) => [...pecas].sort((a, b) => a.id.localeCompare(b.id)).filter((_, i) => i % total === n - 1);
+const montagens = acervo.filter((entrada) => entrada.emDados && !entrada.ensaio);
 
 describe('o acervo abre na bancada', () => {
   it('lista peças e montagens, para a varredura não passar vazia', () => {
@@ -25,7 +31,6 @@ describe('o acervo abre na bancada', () => {
 
   it('as fatias das peças cobrem o acervo, cada peça numa fatia só', () => {
     const ids = [1, 2, 3].flatMap((n) => pecasDaFatia(n).map((e) => e.id));
-    expect(FATIAS_DAS_PECAS).toBe(3);
     expect(ids.sort()).toEqual(pecas.map((e) => e.id).sort());
     expect(new Set(ids).size).toBe(ids.length);
   });
