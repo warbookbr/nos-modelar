@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2375 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2393 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1574,6 +1574,14 @@
 
 - `alvo.md` — Alvo: ambulancia
 
+## procedural/pecas/amortecedor-dianteiro/
+
+- `receita.js` — amortecedor-dianteiro — conjunto McPherson de uma peça só, com oito partes: corpo, suporteInferior, pratoInferior, haste, coifa, mola, pratoSuperior e coxim.…
+
+## procedural/pecas/amortecedor-dianteiro/referencias/
+
+- `alvo.md` — Alvo do amortecedor dianteiro
+
 ## procedural/pecas/aviao/
 
 - `ALINHAMENTO.md` — Avião de pequeno porte — o objeto no núcleo
@@ -1681,6 +1689,14 @@
 ## procedural/pecas/bicicleta-urbana/referencias/
 
 - `alvo.md` — Alvo da bicicleta urbana
+
+## procedural/pecas/biela-de-motor/
+
+- `receita.js` — biela-de-motor — biela de motor com bucha, capa e dois parafusos, peça inteira.
+
+## procedural/pecas/biela-de-motor/referencias/
+
+- `alvo.md` — Alvo da biela de motor
 
 ## procedural/pecas/braco-de-prova/comum/
 
@@ -2092,6 +2108,14 @@
 
 - `alvo.md` — Alvo do disco de embreagem
 
+## procedural/pecas/disco-de-freio-ventilado/
+
+- `receita.js` — disco-de-freio-ventilado: disco de freio de uma parte só (`disco`). Eixo da roda em Y, chão em y = 0, pista de y 0 a 24 e chapéu para cima até y 48. Tabela e…
+
+## procedural/pecas/disco-de-freio-ventilado/referencias/
+
+- `alvo.md` — Alvo do disco de freio ventilado
+
 ## procedural/pecas/empilhadeira/
 
 - `ALINHAMENTO.md` — Empilhadeira — alinhamento
@@ -2268,6 +2292,22 @@
 
 - `roteiro.md` — Roteiro da análise
 
+## procedural/pecas/escrivaninha-com-gaveta/
+
+- `receita.js` — escrivaninha-com-gaveta — escrivaninha de carvalho de 1200 por 600 mm de tampo e 750 mm de altura, com quatro pés retos, uma saia de quatro travessas, tampo …
+
+## procedural/pecas/escrivaninha-com-gaveta/referencias/
+
+- `alvo.md` — Alvo da escrivaninha com gaveta
+
+## procedural/pecas/filtro-de-oleo/
+
+- `receita.js` — filtro-de-oleo: filtro de óleo de rosca de 76 x 80 mm, de pé sobre a junta. Referencial do acervo: Y para cima, chão em y 0 (a face de baixo da junta), eixo …
+
+## procedural/pecas/filtro-de-oleo/referencias/
+
+- `alvo.md` — Alvo do filtro de óleo
+
 ## procedural/pecas/freezer-horizontal/
 
 - `receita.js` — freezer-horizontal — freezer horizontal de tampo: corpo branco sobre o chão, junta escura que cobre o topo do corpo, tampo arredondado assentado sobre a junt…
@@ -2426,6 +2466,22 @@
 
 - `alvo.md` — Alvo: lavadora e secadora branca de porta frontal
 
+## procedural/pecas/mesa-de-centro-oval/
+
+- `receita.js` — mesa-de-centro-oval — mesa de centro de luxo: tampo de mármore oval de pista (1200 por 600 mm), quatro pés de latão com capitel e sapata em degrau, aro infer…
+
+## procedural/pecas/mesa-de-centro-oval/referencias/
+
+- `alvo.md` — Alvo da mesa de centro oval
+
+## procedural/pecas/mesa-de-jantar/
+
+- `receita.js` — mesa-de-jantar — mesa de jantar retangular de carvalho maciço: tampo de 1800 por 900 mm com 30 mm de espessura, quatro pés de 70 mm que afinam até 45 mm no c…
+
+## procedural/pecas/mesa-de-jantar/referencias/
+
+- `alvo.md` — Alvo da mesa de jantar
+
 ## procedural/pecas/mesa-quadrada-escura/
 
 - `receita.js` — mesa-quadrada-escura — mesa quadrada de madeira escura: tampo de 980 por 980 mm, quatro pés de 80 mm, quatro saias sob o tampo e oito cantoneiras de reforço …
@@ -2481,6 +2537,14 @@
 ## procedural/pecas/picape-plataforma/referencias/
 
 - `alvo.md` — Alvo: picape-plataforma
+
+## procedural/pecas/pistao-de-motor/
+
+- `receita.js` — pistao-de-motor — pistão de motor com pino e três anéis: cabeça com dois rebaixos de válvula, três canaletas de anel, saia lisa oca, cubos do pino nas latera…
+
+## procedural/pecas/pistao-de-motor/referencias/
+
+- `alvo.md` — Alvo do pistão de motor
 
 ## procedural/pecas/poltrona-moderna-branca/
 
@@ -2695,6 +2759,14 @@
 ## procedural/pecas/vaso-de-ceramica/referencias/
 
 - `alvo.md` — Alvo do vaso de cerâmica
+
+## procedural/pecas/vela-de-ignicao/
+
+- `receita.js` — vela-de-ignicao — vela de ignição de 85 mm, M14 x 1,25, em seis partes empilhadas no mesmo eixo: terminal, isolador, sextavado, arruela, rosca e eletrodos.
+
+## procedural/pecas/vela-de-ignicao/referencias/
+
+- `alvo.md` — Alvo da vela de ignição
 
 ## procedural/servicos/
 
