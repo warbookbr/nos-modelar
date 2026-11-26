@@ -350,3 +350,5 @@ O caminho para corrigir uma forma aprovada fora do laço de modelagem: a peça a
 O pacote do crítico visual com a caixa de cada corpo da parte, além da caixa da parte inteira: na mesa de jantar o crítico leu a caixa da `saia` inteira como o comprimento de uma travessa e apontou um defeito que não existia (resgate dos ramos, 2026-11-26).
 
 Conferir na bancada três relações que a medida corpo a corpo daria como interpenetração e a parte inteira dá como encosto: `hs1|placa` na base do braço robótico, e `telhasAltas|vigas` e `telhasBaixas|vigas` no telhado da instalação solar. Se forem interpenetração de fato, o gatilho de `relacaoConfirmadaPorSolido` passa a refazer também o `encostam` (resgate dos ramos, 2026-11-26).
+
+O `retrato:acervo` leva de 9 a 11 minutos no acervo de 145 peças e não diz isso no uso nem no começo da execução; quem o chama com o teto de tempo de um comando curto perde a medida. Uma linha no cabeçalho da ferramenta e no roteiro `mudar`, ou o aviso do tempo esperado no começo da execução (resgate dos ramos, 2026-11-26).

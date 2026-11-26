@@ -124,6 +124,9 @@ export const TESTES_LENTOS = [
   'procedural/nucleo/gaiola-por-rede-contato.test.mjs',
   'procedural/nucleo/operacoes/arredondar-costura-convexa.test.ts',
   'procedural/nucleo/operacoes/arredondar-costura-tubos-altos.test.ts',
+  /* 2026-11-26: o arredondamento na placa e no barril, com o avanço da parede de 14 a 25 mm e o nome do barril, que o resgate dos ramos
+     trouxe; passou do teto dos rápidos no CI */
+  'procedural/nucleo/operacoes/arredondar-costura-placa-e-barril.test.ts',
   'procedural/nucleo/operacoes/booleana-casca-raspada.test.ts',
   'procedural/pecas/carenagem-de-prova/receita.test.mjs',
   'src/autoria/curvatura-da-lataria.test.mjs',

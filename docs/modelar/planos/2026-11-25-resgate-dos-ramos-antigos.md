@@ -78,6 +78,8 @@ Fatia 3 feita em 2026-11-26: a análise da bancada por subpasta, as armadilhas n
 
 Fatia 4 feita em 2026-11-26: os seletores `onde.radial` e `onde.setor` e as opções `limpar` e `pularOQueNaoCabe` do `arredondarCostura`, com os testes do ramo e o registro, e o retrato do acervo igual nas 145 peças. O CI recusava o ramo desde a fatia 2, porque o pistão e a mesa de jantar usam `esfera` e `filete`, que nenhuma peça da cobertura do cache por prefixo usava; o teste só roda no CI, e a sessão não conferiu o CI dos envios até a main andar, como o contrato pede. As duas peças entraram na cobertura.
 
+Fatia 5 feita em 2026-11-26: a nova tentativa com o mergulho do arco mudado, a face coberta pelo tubo fora das listas das outras origens e o fundo do tubo limitado pela meia espessura da parede, no `arredondarCostura`; o retrato do acervo saiu igual nas 145 peças depois de cada item, porque nenhuma peça tem parede abaixo de dois raios onde arredonda. O retrato leva de 9 a 11 minutos, e a ferramenta não diz isso a quem a chama; vai ao backlog.
+
 ## Fechamento
 
 Preencher ao concluir ou cancelar: estado final, commit e PR, gates, resultado observado e candidatos devolvidos ao backlog.
