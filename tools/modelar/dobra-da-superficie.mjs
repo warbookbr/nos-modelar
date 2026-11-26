@@ -14,9 +14,15 @@
  * `diedroMinimoGraus` é dobra; as que se tocam formam uma só, com o menor diedro, a posição da pior aresta, a extensão e a parte (a
  * que as faces da aresta declaram). A borda livre e o vinco, de qualquer nitidez, não entram: ali a dobra é da forma.
  *
+ * PELO CACHE POR PASSO (plano do laço mais rápido, fatia 1). A linha de comando executa a receita por `executarComCachePorPasso`
+ * (`tmp/cache-por-prefixo/`, a memória do `descrever` e da bancada), e `--sem-cache` executa inteira. A superfície de cada passo sai do
+ * que o passo `subdivisao` deixou em `neutro.chapas` (a gaiola já ajustada às medidas, os níveis e as faces da pele), que o estado
+ * guardado também traz: o ajuste das medidas não é refeito, e o refino roda só pela topologia (as arestas que descendem de vinco), sem
+ * o ponto limite, porque as posições vêm do estado da receita. A execução que não traz a chapa do passo refaz a gaiola como antes.
+ *
  * Mesma receita, mesma saída: nenhuma conta depende de relógio, acaso ou ordem de mapa. Não é gate: a pessoa decide o limiar e onde ligá-la.
  *
- *   node tools/modelar/dobra-da-superficie.mjs <peça> [--diedro-minimo=120]
+ *   node tools/modelar/dobra-da-superficie.mjs <peça> [--diedro-minimo=120] [--sem-cache]
  */
 import { pathToFileURL } from 'node:url';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
@@ -25,6 +31,7 @@ import { idDoPasso } from '../../procedural/nucleo/nucleo.js';
 import { gaiolaDoPasso } from '../../procedural/nucleo/operacoes/subdivisao.js';
 import { subdividirCatmullClark } from '../../procedural/nucleo/subdivisao.js';
 import { aceitasDaReceita, extensaoDaCadeia, separarAceitos } from '../../src/autoria/dobras-aceitas.js';
+import { avisoDoCachePorPasso, executarComCachePorPasso } from './entrada-de-medida.mjs';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 
@@ -45,8 +52,20 @@ function newell(pts) {
   return n;
 }
 
-/* As superfícies dos passos `subdivisao` da receita: vértices em metro, faces, arestas de vinco, a parte de cada vértice e o ponto da gaiola. */
-export function superficiesDaReceita(receita, executada = null) {
+/* A superfície refinada do passo `i`, pelo que a execução guardou em `neutro.chapas`: a gaiola (já ajustada às medidas), os nomes dos
+   pontos, as faces da pele e a contagem dos vértices dela. O refino roda sem o ponto limite: as faces e as arestas de vinco são só
+   topologia, e as posições quem dá é o estado. Devolve null quando a execução não traz a chapa do passo. */
+function superficieGuardada(chapa, niveis) {
+  if (!chapa?.pele || !Array.isArray(chapa.vertices) || !Array.isArray(chapa.declarados) || chapa.niveis !== niveis) return null;
+  const gaiola = { vertices: chapa.vertices, faces: chapa.faces, vincos: chapa.vincos ?? [], cantos: chapa.cantos ?? [], ...(chapa.imagem ? { imagem: chapa.imagem } : {}) };
+  const r = subdividirCatmullClark({ vertices: gaiola.vertices, faces: gaiola.faces, vincos: gaiola.vincos, cantos: gaiola.cantos, niveis, borda: chapa.borda ?? 'suave', aoLimite: false, comVincos: true });
+  if (r.vertices.length !== chapa.pele.vertices.length || r.faces.length !== chapa.pele.faces.length) return null;
+  return { gaiola, declarados: chapa.declarados, r };
+}
+
+/* As superfícies dos passos `subdivisao` da receita: vértices em metro, faces, arestas de vinco, a parte de cada vértice e o ponto da gaiola.
+   `guardada: false` refaz a gaiola e o refino de cada passo, sem ler `neutro.chapas` (a conta de antes, para a prova de igualdade). */
+export function superficiesDaReceita(receita, executada = null, { guardada = true } = {}) {
   const { entrada, neutro } = executada ?? executarReceita(receita);
   const dict = { ...entrada.PARAMS, ...entrada.TOPO };
   const { num } = criarResolverNumerico(dict);
@@ -60,11 +79,14 @@ export function superficiesDaReceita(receita, executada = null) {
   (entrada.PASSOS ?? []).forEach((passo, i) => {
     const args = argumentosDe(passo);
     if (operacaoDe(passo) !== 'subdivisao') return;
-    const resolvida = gaiolaDoPasso(args, { vec, num });
-    if (resolvida.erro) throw new Error(`dobra: o passo ${i} (subdivisao) não resolve a gaiola: ${resolvida.erro[1]}`);
-    const { gaiola, declarados } = resolvida;
     const niveis = Math.trunc(num(args.niveis ?? 2));
-    const r = subdividirCatmullClark({ ...gaiola, niveis, borda: args.borda ?? 'suave', aoLimite: args.medidas != null, comVincos: true });
+    let lida = guardada ? superficieGuardada((neutro.chapas ?? []).find((c) => c.passo === i), niveis) : null;
+    if (!lida) {
+      const resolvida = gaiolaDoPasso(args, { vec, num });
+      if (resolvida.erro) throw new Error(`dobra: o passo ${i} (subdivisao) não resolve a gaiola: ${resolvida.erro[1]}`);
+      lida = { gaiola: resolvida.gaiola, declarados: resolvida.declarados, r: subdividirCatmullClark({ ...resolvida.gaiola, niveis, borda: args.borda ?? 'suave', aoLimite: args.medidas != null, comVincos: true }) };
+    }
+    const { gaiola, declarados, r } = lida;
     /* o vértice que um passo posterior tirou (uma booleana, um corte) deixa a face dele de fora da medida: ali a malha entregue é outra */
     const vertices = []; const partes = [];
     r.vertices.forEach((_, k) => {
@@ -156,6 +178,7 @@ export function textoDaDobra(d) {
 function lerOpcoes(args) {
   const o = {};
   for (const a of args) {
+    if (a === '--sem-cache') continue;
     const m = /^--diedro-minimo=(.+)$/.exec(a);
     if (!m || !Number.isFinite(Number(m[1]))) throw new Error(`argumento desconhecido: ${a}`);
     o.diedroMinimoGraus = Number(m[1]);
@@ -165,11 +188,14 @@ function lerOpcoes(args) {
 
 async function principal(argv) {
   const [alvo, ...resto] = argv.slice(2);
-  if (!alvo) { process.stderr.write('uso: node tools/modelar/dobra-da-superficie.mjs <peça> [--diedro-minimo=120]\n'); return 2; }
+  if (!alvo) { process.stderr.write('uso: node tools/modelar/dobra-da-superficie.mjs <peça> [--diedro-minimo=120] [--sem-cache]\n'); return 2; }
   const caminho = resolverCaminhoReceita(alvo);
   if (!caminho) { process.stderr.write(`dobra: não achei a receita '${alvo}'.\n`); return 2; }
+  const opcoes = lerOpcoes(resto);
   const receita = receitaDoModulo(await importarReceita(caminho));
-  const resultado = dobraDaReceita(receita, lerOpcoes(resto));
+  const execucao = await executarComCachePorPasso(caminho, receita, { cache: !resto.includes('--sem-cache') });
+  process.stderr.write(avisoDoCachePorPasso(execucao, 'dobra'));
+  const resultado = dobraDaReceita(receita, opcoes, execucao.executada);
   process.stdout.write(`${JSON.stringify({ peca: alvo, ...resultado }, null, 2)}\n`);
   return 0;
 }

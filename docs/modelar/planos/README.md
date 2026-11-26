@@ -44,7 +44,7 @@ revisões, materiais, Git e distribuição permanecem fora.
 
 ## Contrato de plano
 
-Todo plano curto deve declarar:
+Todo plano curto deve declarar (e um número de tempo ou de tamanho citado no problema traz a data e o commit da medida, ou é remedido ao ativar: o plano do laço de modelagem citou 105 s de uma medida de oito dias antes, e a ação já levava 30 s):
 
 1. objetivo verificável e fora de ambiguidade;
 2. hipótese ou pergunta que justifica o trabalho;

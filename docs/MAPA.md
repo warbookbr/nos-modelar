@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2426 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2427 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -443,6 +443,10 @@
 - `ALINHAMENTO.md` — Kukri: o alinhamento com a pessoa
 - `ATRITOS.md` — Kukri: custo medido e atritos
 - `README.md` — Kukri: o custo de modelar um objeto simples
+
+## docs/modelar/banco-de-provas/laco-mais-rapido-2026-11-26/
+
+- `README.md` — Laço mais rápido: fatia 1, a dobra e o vinco pela execução guardada e a decisão da pessoa na rodada
 
 ## docs/modelar/banco-de-provas/leitura-por-demanda-2026-10/
 

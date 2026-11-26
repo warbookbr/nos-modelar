@@ -16,14 +16,18 @@
  * no chanfro, a largura. `desenharAchados` pinta a malha em cinza e os achados em cor (vinco em vermelho, chanfro em laranja), numa vista ortográfica,
  * sem passar pela bancada, que não tem destaque por aresta.
  *
+ * PELO CACHE POR PASSO (plano do laço mais rápido, fatia 1). A linha de comando executa a receita por `executarComCachePorPasso`
+ * (`tmp/cache-por-prefixo/`), e `--sem-cache` executa inteira; as superfícies saem do que a execução guardou, como na régua de dobra.
+ *
  * Mesma receita, mesma saída. Não é gate: a pessoa decide o limiar e onde ligá-la.
  *
- *   node tools/modelar/vinco-oculto.mjs <peça> [--angulo-minimo=12] [--salto=4] [--comprimento-minimo=80] [--imagem=<png>] [--vista=iso|frontal|direita|superior] */
+ *   node tools/modelar/vinco-oculto.mjs <peça> [--angulo-minimo=12] [--salto=4] [--comprimento-minimo=80] [--imagem=<png>] [--vista=iso|frontal|direita|superior] [--sem-cache] */
 import { writeFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { PNG } from 'pngjs';
 import { aceitasDaReceita, extensaoDaCadeia, separarAceitos } from '../../src/autoria/dobras-aceitas.js';
 import { superficiesDaReceita } from './dobra-da-superficie.mjs';
+import { avisoDoCachePorPasso, executarComCachePorPasso } from './entrada-de-medida.mjs';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 
@@ -224,8 +228,9 @@ export function desenharAchados(desenho, { vista = 'iso', largura = 1100, altura
 
 function lerOpcoes(args) {
   const nomes = { 'angulo-minimo': 'anguloMinimoGraus', salto: 'saltoGraus', 'comprimento-minimo': 'comprimentoMinimoMm', 'largura-maxima': 'larguraMaximaMm' };
-  const o = {}; let imagem = null; let vista = 'iso';
+  const o = {}; let imagem = null; let vista = 'iso'; let cache = true;
   for (const a of args) {
+    if (a === '--sem-cache') { cache = false; continue; }
     const m = /^--([a-z-]+)=(.+)$/.exec(a);
     if (!m) throw new Error(`argumento desconhecido: ${a}`);
     if (m[1] === 'imagem') imagem = m[2];
@@ -233,16 +238,19 @@ function lerOpcoes(args) {
     else if (nomes[m[1]] && Number.isFinite(Number(m[2]))) o[nomes[m[1]]] = Number(m[2]);
     else throw new Error(`argumento desconhecido: ${a}`);
   }
-  return { o, imagem, vista };
+  return { o, imagem, vista, cache };
 }
 
 async function principal(argv) {
   const [alvo, ...resto] = argv.slice(2);
-  if (!alvo) { process.stderr.write('uso: node tools/modelar/vinco-oculto.mjs <peça> [--angulo-minimo=12] [--salto=4] [--comprimento-minimo=80] [--imagem=<png>] [--vista=iso]\n'); return 2; }
+  if (!alvo) { process.stderr.write('uso: node tools/modelar/vinco-oculto.mjs <peça> [--angulo-minimo=12] [--salto=4] [--comprimento-minimo=80] [--imagem=<png>] [--vista=iso] [--sem-cache]\n'); return 2; }
   const caminho = resolverCaminhoReceita(alvo);
   if (!caminho) { process.stderr.write(`vinco-oculto: não achei a receita '${alvo}'.\n`); return 2; }
-  const { o, imagem, vista } = lerOpcoes(resto);
-  const r = vincoOcultoDaReceita(receitaDoModulo(await importarReceita(caminho)), o);
+  const { o, imagem, vista, cache } = lerOpcoes(resto);
+  const receita = receitaDoModulo(await importarReceita(caminho));
+  const execucao = await executarComCachePorPasso(caminho, receita, { cache });
+  process.stderr.write(avisoDoCachePorPasso(execucao, 'vinco-oculto'));
+  const r = vincoOcultoDaReceita(receita, o, execucao.executada);
   const { _desenho, ...saida } = r;
   if (imagem) writeFileSync(imagem, PNG.sync.write(desenharAchados(_desenho, { vista })));
   process.stdout.write(`${JSON.stringify({ peca: alvo, ...saida }, null, 2)}\n`);

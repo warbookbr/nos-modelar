@@ -4,7 +4,7 @@
 
 **Núcleo:** não
 
-**Território:** `tools/modelar/dobra-da-superficie.mjs`, `tools/modelar/vinco-oculto.mjs`, `tools/modelar/rodada-de-modelagem.mjs`, `tools/modelar/rodada-de-modelagem.test.mjs`, `src/autoria/laco-de-modelagem.js`, `src/autoria/laco-de-modelagem.test.js`, `tools/modelar/calibracao-do-critico.mjs`, `tools/modelar/calibracao-do-critico.test.mjs`, `tools/modelar/navegador.mjs`, `.claude/skills/laco-de-modelagem/`, `docs/modelar/banco-de-provas/laco-mais-rapido-2026-11-26/`. A bancada aquecida e o pacote menor do crítico mudam a bancada e as vistas para crítica, que são do plano do resgate dos ramos antigos: essas duas partes são empréstimo pedido a esse plano, ou esperam o fechamento dele.
+**Território:** `tools/modelar/dobra-da-superficie.mjs`, `tools/modelar/vinco-oculto.mjs`, `tools/modelar/rodada-de-modelagem.mjs`, `tools/modelar/rodada-de-modelagem.test.mjs`, `tools/modelar/dobra-da-superficie.test.mjs`, `src/autoria/laco-de-modelagem.js`, `src/autoria/laco-de-modelagem.test.js`, `tools/modelar/calibracao-do-critico.mjs`, `tools/modelar/calibracao-do-critico.test.mjs`, `tools/modelar/navegador.mjs`, `.claude/skills/laco-de-modelagem/`, `docs/modelar/banco-de-provas/laco-mais-rapido-2026-11-26/`. A bancada aquecida e o pacote menor do crítico mudam a bancada e as vistas para crítica, que são do plano do resgate dos ramos antigos: essas duas partes são empréstimo pedido a esse plano, ou esperam o fechamento dele.
 
 Ativado pela pessoa em 2026-11-26, com as recomendações 5 e 10 da análise do projeto ("1 a 10 aprovadas").
 
@@ -49,5 +49,7 @@ Se a bancada aquecida der imagem diferente da bancada fria na mesma câmera, ela
 ## Decisão da pessoa
 
 ## Andamento
+
+Em 2026-11-26 a fatia 1 remediu antes de mexer: a ação da rodada da lataria do carro leva 29,9 s com o cache quente, e não os 105 s de 18/11 (a receita mudou e o ajuste da gaiola ficou esparso em 22/11), com a dobra e o vinco em cerca de 3 s. Com eles pela execução guardada, a ação cai para 27 a 29 s, e as duas linhas de comando caem de 68 s e 64 s para 2,7 s e 2,8 s, com a saída igual byte a byte na lataria e em cinco peças pequenas. A rodada ganhou o campo `decisaoDaPessoa`. O tempo que sobra na ação está na medida das partes e nas formas e na referência dentro do `descrever`, fora deste território ([banco de provas](../banco-de-provas/laco-mais-rapido-2026-11-26/README.md)).
 
 ## Fechamento
