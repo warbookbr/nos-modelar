@@ -12,6 +12,10 @@ const registro = criarRegistroDeFamilias();
 const F = registro.obter('roda-dentada');
 const executar = (q) => executarReceita({ meta: { nome: 'roda' }, get CHAMADAS_COMPOSICOES() { return [chamar(F, 'r', q)]; } }, { registroOperacoes: registro.registroOperacoes, registroComposicoes: registro.registroComposicoes }).neutro;
 
+/* O teto é guarda contra travamento (tools/CLAUDE.md): no CI, cuja máquina varia de duas a três vezes, ele é o triplo do local;
+   o envio de 2026-11-26 reprovou aqui a 2,0 e 2,2 s sem mudança na família. */
+const TETO_EM_SEGUNDOS = process.env.CI ? 6 : 2;
+
 describe('família roda-dentada', () => {
   it('cada corrente, de 9 a 80 dentes, sai num pedaço só e sem órfão', () => {
     for (const corrente of Object.keys(CORRENTES)) for (const z of [9, 18, 40, 80]) {
@@ -31,7 +35,7 @@ describe('família roda-dentada', () => {
   it('a roda de 80 dentes sai abaixo de dois segundos', () => {
     const t = performance.now();
     executar(parametrosDaRoda('06B', 80));
-    expect((performance.now() - t) / 1000).toBeLessThan(2);
+    expect((performance.now() - t) / 1000).toBeLessThan(TETO_EM_SEGUNDOS);
   });
 
   it('recusa a corrente que não existe, dizendo as aceitas', () => {
