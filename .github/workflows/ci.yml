@@ -212,6 +212,12 @@ jobs:
         if: ${{ !cancelled() }}
         run: npm run ferramentas:check
 
+      # Toda ferramenta de linha de comando de tools/ tem entrada no registro, toda entrada tem arquivo e
+      # todo módulo tem chamador ou está declarado com o motivo; o tools/README.md é gerado do registro.
+      - name: Registro de ferramentas em dia com a pasta tools/
+        if: ${{ !cancelled() }}
+        run: npm run ferramentas:registro:check
+
       # O banco de provas e registro de custo mantém o documento de custo sincronizado
       # com o JSON de medições e objetos selecionados.
       - name: Banco de provas e registro de custo em dia com o JSON

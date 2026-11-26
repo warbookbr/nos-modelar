@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2435 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2438 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -407,6 +407,10 @@
 ## docs/modelar/banco-de-provas/ferramentas-das-rodadas-2026-11-18/
 
 - `README.md` — Ferramentas das rodadas: fatia 2, o cache por passo e `--params` nas medidas
+
+## docs/modelar/banco-de-provas/ferramentas-e-documentacao-2026-11-26/
+
+- `README.md` — Ferramentas e documentação: o registro de ferramentas e a lista do que está sem chamador
 
 ## docs/modelar/banco-de-provas/forma-exata-2026-11-13/
 
@@ -3157,7 +3161,7 @@
 ## tools/
 
 - `CLAUDE.md` — Ferramentas: o que só vale nesta pasta
-- `README.md` — tools/ — ferramentas do Modelar e do núcleo herdado
+- `README.md` — tools/ — as ferramentas do Modelar
 - `ambiente.mjs` — ambiente.mjs — lê uma variável de ambiente pelo nome novo (`MODELAR_*`) e aceita o antigo (`MECANIFICA_*`) com aviso.
 - `ambiente.test.mjs` — ambiente.test.mjs — o nome novo vale, o antigo vale com um aviso só por nome, e o vazio conta como ausente.
 - `gates.mjs` — gates.mjs — roda TODOS os gates e relata TODOS, em vez de parar no primeiro.
@@ -3902,6 +3906,8 @@
 - `mecanismos.test.mjs` — mecanismos.test.mjs — a página dos mecanismos cita toda pasta de primeiro nível, ou ela consta nas dispensas com motivo.
 - `planos.mjs` — planos.mjs — confere que os planos ativos são no máximo seis comuns e nove com os de núcleo, cada um com território declarado e sem sobreposição, que o campo…
 - `planos.test.mjs` — planos.test.mjs — prova que o gate recusa plano grande, estados inválidos, índice divergente, plano parado que o índice não liga, mais de seis comuns ou nove…
+- `registro-de-ferramentas.mjs` — registro-de-ferramentas.mjs — o registro único das ferramentas de linha de comando de `tools/`, conferido.
+- `registro-de-ferramentas.test.mjs` — registro-de-ferramentas.test.mjs — a conferência do registro de ferramentas recusa nos dois sentidos, e a árvore de hoje passa.
 - `reguas-nos-gates.mjs` — reguas-nos-gates.mjs — régua que existe precisa ser rodada por alguém.
 - `reguas-nos-gates.test.mjs` — reguas-nos-gates.test.mjs — a régua órfã precisa reprovar.
 - `retirados.mjs` — retirados.mjs — caminho sob uma pasta que saiu da árvore e que a crônica guarda no git. As pastas docs/modelar/planos/encerrados/ e docs/modelar/historico/ s…
