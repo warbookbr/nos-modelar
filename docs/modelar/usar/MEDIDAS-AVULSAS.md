@@ -6,8 +6,6 @@ Estas ferramentas medem uma coisa só e nenhum outro documento de uso as apresen
 
 Use `npm run proporcoes -- --proporcoes=<proporcoes.json>` quando as medidas de uma montagem estão escritas em mais de um lugar e é preciso saber se o andaime e os números marcados das receitas seguem a fonte única; com `--escrever` ele reescreve os dois a partir dela.
 
-Use `npm run esqueleto -- --proporcoes=<proporcoes.json>` quando o objeto articulado tem a seção `esqueleto` no mesmo arquivo de proporções, para conferir a árvore de juntas e que o andaime e as articulações gravados seguem dela; com `--escrever` ele os regrava, e com `--receita=<receita.js> --vistas=<pasta>` tira a frente, o lado e o topo de cada pose.
-
 Use `npm run planejado -- --montagem=<montagem.json>` depois de executar as partes de uma montagem por etapas, para comparar a caixa e as portas de cada parte com o volume que o andaime planejou.
 
 Use `npm run sobra:partes -- <esboço> --dentro=<contida>:<continente>` quando uma parte deveria ficar dentro do contorno de outra, como o vidro dentro da moldura, para medir vista por vista o quanto ela aparece para fora.

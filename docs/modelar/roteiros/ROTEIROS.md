@@ -353,7 +353,7 @@ Abrir só quando a condição aparecer:
 - `.claude/skills/auditar-montagem/SKILL.md`, quando as etapas estiverem fixas e a montagem for auditada, pelo roteiro modelar/auditar-montagem.
 - `docs/modelar/usar/EXPORTACAO.md`, quando a montagem estiver aceita e sair em glTF ou em ficha do objeto.
 
-Comandos: `npm run etapas -- <montagem.json> --auditar`, `npm run etapas -- <montagem.json> --fixar <instância> --por "<quem, data>"`, `npm run olhar:montagem`, `npm run planejado -- --montagem=<montagem.json>`, `npm run proporcoes -- --proporcoes=<proporcoes.json>`, `npm run sobra:partes -- <esboço> --dentro=<contida>:<continente>`, `npm run descrever:montagem:persistida`.
+Comandos: `npm run etapas -- <montagem.json> --auditar`, `npm run etapas -- <montagem.json> --fixar <instância> --por "<quem, data>"`, `npm run olhar:montagem`, `npm run planejado -- --montagem=<montagem.json>`, `npm run proporcoes -- --proporcoes=<proporcoes.json>`, `npm run esqueleto -- --proporcoes=<proporcoes.json>`, `npm run sobra:partes -- <esboço> --dentro=<contida>:<continente>`, `npm run descrever:montagem:persistida`.
 
 Passo seguinte, sem estado lido: Declare na montagem v5 as etapas, os vínculos e as posições, rode npm run etapas -- <montagem.json> --auditar a cada parte que entra e leve cada etapa à pessoa antes de fixá-la.
 

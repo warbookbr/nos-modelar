@@ -801,6 +801,7 @@
         "npm run olhar:montagem",
         "npm run planejado -- --montagem=<montagem.json>",
         "npm run proporcoes -- --proporcoes=<proporcoes.json>",
+        "npm run esqueleto -- --proporcoes=<proporcoes.json>",
         "npm run sobra:partes -- <esboço> --dentro=<contida>:<continente>",
         "npm run descrever:montagem:persistida"
       ],
