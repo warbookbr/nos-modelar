@@ -30,7 +30,7 @@ Status possíveis: `aberta` → `em andamento` → `feita` | `bloqueada`.
 
 - **Status:** aberta
 - **Branch:** `envio/fastback-rodada-8` (criada a partir da `main` assim que `envio/divisao-por-contorno` entrar na `main`)
-- **Roteiro inicial:** rodar `npm run comecar -- carro` e ler antes `CLAUDE.md`, `docs/modelar/planos/2026-11-14-modelagem-de-carro.md` e `procedural/pecas/carro-fastback/partes/lataria/receita.js`.
+- **Roteiro inicial:** rodar `npm run comecar -- carro` e ler antes `CLAUDE.md`, `docs/modelar/planos/congelados/2026-11-14-modelagem-de-carro.md` e `procedural/pecas/carro-fastback/partes/lataria/receita.js`.
 - **Escopo:** conduzir a rodada 8 do quarto traseiro do `carro-fastback` usando o arsenal novo já na `main`: `divisaoPorContorno` (já aplicada em `paralamaTraseiro` e `rebaixoLateral`), ajuste de curva lisa com objetivo de lisura, `alisarCurvas`, emenda G1 por curva e vão espelhado (`simetria: 'x'`), mantendo a disciplina de medida antes/depois (zebra numérica, ondulação, pente e pacote do crítico).
 - **Não tocar:** `procedural/pecas/carro-quadrado/` (que segue na nossa frente paralela `envio/carro-quadrado-forma`).
 - **Commit e push:** commitar localmente em `envio/fastback-rodada-8` e apresentar o comparativo visual à pessoa para aprovação antes de integrar.

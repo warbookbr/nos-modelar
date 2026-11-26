@@ -21,6 +21,9 @@ export function caminhoRetirado(citado, raiz) {
     const resto = normal.slice(pasta.length);
     /* O plano encerrado depois da retirada saiu da raiz de planos/: só vale para arquivo direto da raiz que já não existe. */
     if (soRaizAusente && (resto.includes('/') || existsSync(path.join(raiz, normal)))) continue;
+    /* O plano congelado continua na árvore, em `congelados/` (docs/modelar/planos/congelados/README.md): a citação antiga ao
+       caminho da raiz acha o texto inteiro lá, e vale. */
+    if (soRaizAusente && existsSync(path.join(raiz, pasta, 'congelados', resto))) return { cronica, nome: resto, consta: true, congelado: true };
     const [primeiro, ...demais] = resto.split('/');
     const nome = demais.length ? `${primeiro}/` : primeiro;
     const arquivo = path.join(raiz, cronica);
