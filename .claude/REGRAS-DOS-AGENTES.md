@@ -9,7 +9,7 @@ Quem conduz cita este arquivo no pedido, em vez de copiar a lista. Valem para to
 5. Uma carga pesada por vez: a máquina tem quatro núcleos e outros agentes trabalham ao lado. Nada de execuções em paralelo dentro do agente.
 6. Não rode `pkill`, `kill`, `find /` nem comando que varra o disco fora do repositório.
 7. Teste novo que leva mais de 12 s sozinho entra em `TESTES_LENTOS`, em `tools/testes-lentos.mjs`.
-8. Mexa só nos arquivos do pedido. Se a tarefa pedir outro arquivo, pare e relate.
+8. Mexa só nos arquivos do pedido. Se a tarefa pedir outro arquivo, pare e relate: o `territorio:check` reprova o envio que muda arquivo fora do território dos planos ativos sem declarar o motivo.
 9. A mensagem de commit é em pt-BR, sem nome de modelo em lugar nenhum, e termina com as linhas de atribuição que o pedido trouxer, copiadas como estão, ou sem linha de atribuição quando o pedido não trouxer nenhuma.
 10. Nenhuma imagem de terceiro, marca, nome de fabricante ou dado pessoal entra no repositório.
 11. O relatório final é curto: o que foi feito, os números medidos com o comando, o hash do último commit, o que ficou de fora e cada atrito, com o comando que o reproduz.
