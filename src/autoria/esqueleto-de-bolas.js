@@ -233,7 +233,27 @@ export function receitaDoEsqueleto(arvore, { pose = 'zero', referencias = ['./pr
       criteriosDeReprovacao: ['membro com comprimento diferente do declarado em proporcoes.json', 'junta fora da posição que a pose dá'],
     },
     contatos: contatosDoEsqueleto(arvore),
-    get ALIASES() { return passosEApelidosDoEsqueleto(arvore, declarada.angulos).apelidos; },
-    get PASSOS() { return passosDoEsqueleto(arvore, declarada.angulos); },
+    get ALIASES() { return passosEApelidosDoEsqueleto(arvore, angulosDaPose(arvore, this.PARAMS.pose)).apelidos; },
+    get PASSOS() { return gerarPassosDoEsqueleto(arvore, this.PARAMS); },
+  };
+}
+
+/** Os ângulos de uma pose declarada (a zero é vazia); recusa o nome que o esqueleto não declara. */
+function angulosDaPose(arvore, pose) {
+  const declarada = posesDoEsqueleto(arvore).find((p) => p.nome === pose);
+  if (!declarada) throw new Error(`esqueleto '${arvore.id}': pose '${pose}' não existe; esperava uma de ${posesDoEsqueleto(arvore).map((p) => p.nome).join(', ')}`);
+  return declarada.angulos;
+}
+
+/** Os passos da tabela `{ pose }`: o que a guarda do acervo chama de `gerarPassos`. */
+export const gerarPassosDoEsqueleto = (arvore, tabela) => passosDoEsqueleto(arvore, angulosDaPose(arvore, tabela.pose));
+
+/** A cadeia que a guarda do acervo cobra da receita (`TABELA`, `derivar`, `gerarPassos`), para a receita reexportar: a tabela tem só a pose,
+ * e `PASSOS` da receita lê `PARAMS.pose`, então copiar a receita com outra pose dá outros passos. */
+export function cadeiaDoEsqueleto(arvore, { pose = 'zero' } = {}) {
+  return {
+    TABELA: { pose },
+    derivar: (tabela) => ({ angulos: angulosDaPose(arvore, tabela.pose) }),
+    gerarPassos: (tabela) => gerarPassosDoEsqueleto(arvore, tabela),
   };
 }

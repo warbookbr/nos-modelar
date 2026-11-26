@@ -1,0 +1,1078 @@
+{
+  "formato": "mecanifica.andaime-global@2",
+  "id": "esqueleto-humanoide",
+  "objetivo": "esqueleto-esqueleto-humanoide",
+  "alvo": "alvo-esqueleto-humanoide",
+  "familia": "humanoide",
+  "intencao": "Humanoide de 1.750 mm na pose zero (em pé, braços pendentes, pés no chão), com as poses sentado e braço erguido.",
+  "unidade": "mm",
+  "eixos": {
+    "direita": "+x",
+    "cima": "+y",
+    "frente": "+z"
+  },
+  "envelope": {
+    "min": [
+      -290,
+      0.737934,
+      -98
+    ],
+    "max": [
+      290,
+      1750,
+      216.310328
+    ]
+  },
+  "landmarks": [
+    {
+      "id": "junta-bacia",
+      "posicao": [
+        0,
+        930,
+        0
+      ]
+    },
+    {
+      "id": "junta-tronco",
+      "posicao": [
+        0,
+        1435,
+        0
+      ]
+    },
+    {
+      "id": "junta-pescoco",
+      "posicao": [
+        0,
+        1525,
+        0
+      ]
+    },
+    {
+      "id": "junta-cabeca",
+      "posicao": [
+        0,
+        1652,
+        0
+      ]
+    },
+    {
+      "id": "junta-ombro-direito",
+      "posicao": [
+        250,
+        1435,
+        0
+      ]
+    },
+    {
+      "id": "junta-cotovelo-direito",
+      "posicao": [
+        250,
+        1105,
+        0
+      ]
+    },
+    {
+      "id": "junta-punho-direito",
+      "posicao": [
+        250,
+        875,
+        0
+      ]
+    },
+    {
+      "id": "junta-mao-direito",
+      "posicao": [
+        250,
+        685,
+        0
+      ]
+    },
+    {
+      "id": "junta-ombro-esquerdo",
+      "posicao": [
+        -250,
+        1435,
+        0
+      ]
+    },
+    {
+      "id": "junta-cotovelo-esquerdo",
+      "posicao": [
+        -250,
+        1105,
+        0
+      ]
+    },
+    {
+      "id": "junta-punho-esquerdo",
+      "posicao": [
+        -250,
+        875,
+        0
+      ]
+    },
+    {
+      "id": "junta-mao-esquerdo",
+      "posicao": [
+        -250,
+        685,
+        0
+      ]
+    },
+    {
+      "id": "junta-quadril-direito",
+      "posicao": [
+        100,
+        930,
+        0
+      ]
+    },
+    {
+      "id": "junta-joelho-direito",
+      "posicao": [
+        100,
+        499,
+        0
+      ]
+    },
+    {
+      "id": "junta-tornozelo-direito",
+      "posicao": [
+        100,
+        68,
+        0
+      ]
+    },
+    {
+      "id": "junta-ponta-do-pe-direito",
+      "posicao": [
+        100,
+        30.737934,
+        186.310328
+      ]
+    },
+    {
+      "id": "junta-quadril-esquerdo",
+      "posicao": [
+        -100,
+        930,
+        0
+      ]
+    },
+    {
+      "id": "junta-joelho-esquerdo",
+      "posicao": [
+        -100,
+        499,
+        0
+      ]
+    },
+    {
+      "id": "junta-tornozelo-esquerdo",
+      "posicao": [
+        -100,
+        68,
+        0
+      ]
+    },
+    {
+      "id": "junta-ponta-do-pe-esquerdo",
+      "posicao": [
+        -100,
+        30.737934,
+        186.310328
+      ]
+    }
+  ],
+  "volumes": [
+    {
+      "id": "bola-bacia",
+      "regioes": [
+        "bacia"
+      ],
+      "tipo": "esfera",
+      "centro": [
+        0,
+        930,
+        0
+      ],
+      "raio": 45,
+      "segmentos": 16
+    },
+    {
+      "id": "bola-tronco",
+      "regioes": [
+        "tronco"
+      ],
+      "tipo": "esfera",
+      "centro": [
+        0,
+        1435,
+        0
+      ],
+      "raio": 45,
+      "segmentos": 16
+    },
+    {
+      "id": "bastao-tronco",
+      "regioes": [
+        "tronco"
+      ],
+      "tipo": "cilindro",
+      "centro": [
+        0,
+        1182.5,
+        0
+      ],
+      "eixo": "y",
+      "raio": 52,
+      "comprimento": 505,
+      "segmentos": 24
+    },
+    {
+      "id": "bola-pescoco",
+      "regioes": [
+        "pescoco"
+      ],
+      "tipo": "esfera",
+      "centro": [
+        0,
+        1525,
+        0
+      ],
+      "raio": 22,
+      "segmentos": 16
+    },
+    {
+      "id": "bastao-pescoco",
+      "regioes": [
+        "pescoco"
+      ],
+      "tipo": "cilindro",
+      "centro": [
+        0,
+        1480,
+        0
+      ],
+      "eixo": "y",
+      "raio": 18,
+      "comprimento": 90,
+      "segmentos": 24
+    },
+    {
+      "id": "bola-cabeca",
+      "regioes": [
+        "cabeca"
+      ],
+      "tipo": "esfera",
+      "centro": [
+        0,
+        1652,
+        0
+      ],
+      "raio": 98,
+      "segmentos": 16
+    },
+    {
+      "id": "bastao-cabeca",
+      "regioes": [
+        "cabeca"
+      ],
+      "tipo": "cilindro",
+      "centro": [
+        0,
+        1588.5,
+        0
+      ],
+      "eixo": "y",
+      "raio": 18,
+      "comprimento": 127,
+      "segmentos": 24
+    },
+    {
+      "id": "bola-ombro-direito",
+      "regioes": [
+        "ombro-direito"
+      ],
+      "tipo": "esfera",
+      "centro": [
+        250,
+        1435,
+        0
+      ],
+      "raio": 40,
+      "segmentos": 16
+    },
+    {
+      "id": "bastao-ombro-direito",
+      "regioes": [
+        "ombro-direito"
+      ],
+      "tipo": "cilindro",
+      "centro": [
+        125,
+        1435,
+        0
+      ],
+      "eixo": "x",
+      "raio": 28,
+      "comprimento": 250,
+      "segmentos": 24
+    },
+    {
+      "id": "bola-cotovelo-direito",
+      "regioes": [
+        "cotovelo-direito"
+      ],
+      "tipo": "esfera",
+      "centro": [
+        250,
+        1105,
+        0
+      ],
+      "raio": 32,
+      "segmentos": 16
+    },
+    {
+      "id": "bastao-cotovelo-direito",
+      "regioes": [
+        "cotovelo-direito"
+      ],
+      "tipo": "cilindro",
+      "centro": [
+        250,
+        1270,
+        0
+      ],
+      "eixo": "y",
+      "raio": 26,
+      "comprimento": 330,
+      "segmentos": 24
+    },
+    {
+      "id": "bola-punho-direito",
+      "regioes": [
+        "punho-direito"
+      ],
+      "tipo": "esfera",
+      "centro": [
+        250,
+        875,
+        0
+      ],
+      "raio": 26,
+      "segmentos": 16
+    },
+    {
+      "id": "bastao-punho-direito",
+      "regioes": [
+        "punho-direito"
+      ],
+      "tipo": "cilindro",
+      "centro": [
+        250,
+        990,
+        0
+      ],
+      "eixo": "y",
+      "raio": 22,
+      "comprimento": 230,
+      "segmentos": 24
+    },
+    {
+      "id": "bola-mao-direito",
+      "regioes": [
+        "mao-direito"
+      ],
+      "tipo": "esfera",
+      "centro": [
+        250,
+        685,
+        0
+      ],
+      "raio": 28,
+      "segmentos": 16
+    },
+    {
+      "id": "bastao-mao-direito",
+      "regioes": [
+        "mao-direito"
+      ],
+      "tipo": "cilindro",
+      "centro": [
+        250,
+        780,
+        0
+      ],
+      "eixo": "y",
+      "raio": 18,
+      "comprimento": 190,
+      "segmentos": 24
+    },
+    {
+      "id": "bola-ombro-esquerdo",
+      "regioes": [
+        "ombro-esquerdo"
+      ],
+      "tipo": "esfera",
+      "centro": [
+        -250,
+        1435,
+        0
+      ],
+      "raio": 40,
+      "segmentos": 16
+    },
+    {
+      "id": "bastao-ombro-esquerdo",
+      "regioes": [
+        "ombro-esquerdo"
+      ],
+      "tipo": "cilindro",
+      "centro": [
+        -125,
+        1435,
+        0
+      ],
+      "eixo": "x",
+      "raio": 28,
+      "comprimento": 250,
+      "segmentos": 24
+    },
+    {
+      "id": "bola-cotovelo-esquerdo",
+      "regioes": [
+        "cotovelo-esquerdo"
+      ],
+      "tipo": "esfera",
+      "centro": [
+        -250,
+        1105,
+        0
+      ],
+      "raio": 32,
+      "segmentos": 16
+    },
+    {
+      "id": "bastao-cotovelo-esquerdo",
+      "regioes": [
+        "cotovelo-esquerdo"
+      ],
+      "tipo": "cilindro",
+      "centro": [
+        -250,
+        1270,
+        0
+      ],
+      "eixo": "y",
+      "raio": 26,
+      "comprimento": 330,
+      "segmentos": 24
+    },
+    {
+      "id": "bola-punho-esquerdo",
+      "regioes": [
+        "punho-esquerdo"
+      ],
+      "tipo": "esfera",
+      "centro": [
+        -250,
+        875,
+        0
+      ],
+      "raio": 26,
+      "segmentos": 16
+    },
+    {
+      "id": "bastao-punho-esquerdo",
+      "regioes": [
+        "punho-esquerdo"
+      ],
+      "tipo": "cilindro",
+      "centro": [
+        -250,
+        990,
+        0
+      ],
+      "eixo": "y",
+      "raio": 22,
+      "comprimento": 230,
+      "segmentos": 24
+    },
+    {
+      "id": "bola-mao-esquerdo",
+      "regioes": [
+        "mao-esquerdo"
+      ],
+      "tipo": "esfera",
+      "centro": [
+        -250,
+        685,
+        0
+      ],
+      "raio": 28,
+      "segmentos": 16
+    },
+    {
+      "id": "bastao-mao-esquerdo",
+      "regioes": [
+        "mao-esquerdo"
+      ],
+      "tipo": "cilindro",
+      "centro": [
+        -250,
+        780,
+        0
+      ],
+      "eixo": "y",
+      "raio": 18,
+      "comprimento": 190,
+      "segmentos": 24
+    },
+    {
+      "id": "bola-quadril-direito",
+      "regioes": [
+        "quadril-direito"
+      ],
+      "tipo": "esfera",
+      "centro": [
+        100,
+        930,
+        0
+      ],
+      "raio": 40,
+      "segmentos": 16
+    },
+    {
+      "id": "bastao-quadril-direito",
+      "regioes": [
+        "quadril-direito"
+      ],
+      "tipo": "cilindro",
+      "centro": [
+        50,
+        930,
+        0
+      ],
+      "eixo": "x",
+      "raio": 35,
+      "comprimento": 100,
+      "segmentos": 24
+    },
+    {
+      "id": "bola-joelho-direito",
+      "regioes": [
+        "joelho-direito"
+      ],
+      "tipo": "esfera",
+      "centro": [
+        100,
+        499,
+        0
+      ],
+      "raio": 42,
+      "segmentos": 16
+    },
+    {
+      "id": "bastao-joelho-direito",
+      "regioes": [
+        "joelho-direito"
+      ],
+      "tipo": "cilindro",
+      "centro": [
+        100,
+        714.5,
+        0
+      ],
+      "eixo": "y",
+      "raio": 40,
+      "comprimento": 431,
+      "segmentos": 24
+    },
+    {
+      "id": "bola-tornozelo-direito",
+      "regioes": [
+        "tornozelo-direito"
+      ],
+      "tipo": "esfera",
+      "centro": [
+        100,
+        68,
+        0
+      ],
+      "raio": 38,
+      "segmentos": 16
+    },
+    {
+      "id": "bastao-tornozelo-direito",
+      "regioes": [
+        "tornozelo-direito"
+      ],
+      "tipo": "cilindro",
+      "centro": [
+        100,
+        283.5,
+        0
+      ],
+      "eixo": "y",
+      "raio": 30,
+      "comprimento": 431,
+      "segmentos": 24
+    },
+    {
+      "id": "bola-ponta-do-pe-direito",
+      "regioes": [
+        "ponta-do-pe-direito"
+      ],
+      "tipo": "esfera",
+      "centro": [
+        100,
+        30.737934,
+        186.310328
+      ],
+      "raio": 30,
+      "segmentos": 16
+    },
+    {
+      "id": "bastao-ponta-do-pe-direito",
+      "regioes": [
+        "ponta-do-pe-direito"
+      ],
+      "tipo": "tubo",
+      "centro": [
+        100,
+        49.368967,
+        93.155164
+      ],
+      "caminho": [
+        [
+          0,
+          18.631033,
+          -93.155164
+        ],
+        [
+          0,
+          -18.631033,
+          93.155164
+        ]
+      ],
+      "raio": 30,
+      "raioCurva": 0,
+      "segmentos": 16
+    },
+    {
+      "id": "bola-quadril-esquerdo",
+      "regioes": [
+        "quadril-esquerdo"
+      ],
+      "tipo": "esfera",
+      "centro": [
+        -100,
+        930,
+        0
+      ],
+      "raio": 40,
+      "segmentos": 16
+    },
+    {
+      "id": "bastao-quadril-esquerdo",
+      "regioes": [
+        "quadril-esquerdo"
+      ],
+      "tipo": "cilindro",
+      "centro": [
+        -50,
+        930,
+        0
+      ],
+      "eixo": "x",
+      "raio": 35,
+      "comprimento": 100,
+      "segmentos": 24
+    },
+    {
+      "id": "bola-joelho-esquerdo",
+      "regioes": [
+        "joelho-esquerdo"
+      ],
+      "tipo": "esfera",
+      "centro": [
+        -100,
+        499,
+        0
+      ],
+      "raio": 42,
+      "segmentos": 16
+    },
+    {
+      "id": "bastao-joelho-esquerdo",
+      "regioes": [
+        "joelho-esquerdo"
+      ],
+      "tipo": "cilindro",
+      "centro": [
+        -100,
+        714.5,
+        0
+      ],
+      "eixo": "y",
+      "raio": 40,
+      "comprimento": 431,
+      "segmentos": 24
+    },
+    {
+      "id": "bola-tornozelo-esquerdo",
+      "regioes": [
+        "tornozelo-esquerdo"
+      ],
+      "tipo": "esfera",
+      "centro": [
+        -100,
+        68,
+        0
+      ],
+      "raio": 38,
+      "segmentos": 16
+    },
+    {
+      "id": "bastao-tornozelo-esquerdo",
+      "regioes": [
+        "tornozelo-esquerdo"
+      ],
+      "tipo": "cilindro",
+      "centro": [
+        -100,
+        283.5,
+        0
+      ],
+      "eixo": "y",
+      "raio": 30,
+      "comprimento": 431,
+      "segmentos": 24
+    },
+    {
+      "id": "bola-ponta-do-pe-esquerdo",
+      "regioes": [
+        "ponta-do-pe-esquerdo"
+      ],
+      "tipo": "esfera",
+      "centro": [
+        -100,
+        30.737934,
+        186.310328
+      ],
+      "raio": 30,
+      "segmentos": 16
+    },
+    {
+      "id": "bastao-ponta-do-pe-esquerdo",
+      "regioes": [
+        "ponta-do-pe-esquerdo"
+      ],
+      "tipo": "tubo",
+      "centro": [
+        -100,
+        49.368967,
+        93.155164
+      ],
+      "caminho": [
+        [
+          0,
+          18.631033,
+          -93.155164
+        ],
+        [
+          0,
+          -18.631033,
+          93.155164
+        ]
+      ],
+      "raio": 30,
+      "raioCurva": 0,
+      "segmentos": 16
+    }
+  ],
+  "portas": [
+    {
+      "id": "porta-tronco",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          -1,
+          0,
+          0
+        ],
+        "centro": [
+          0,
+          1435,
+          0
+        ],
+        "raio": 52,
+        "inicio": -45,
+        "fim": 45
+      }
+    },
+    {
+      "id": "porta-pescoco",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          -1,
+          0,
+          0
+        ],
+        "centro": [
+          0,
+          1525,
+          0
+        ],
+        "raio": 18,
+        "inicio": -22,
+        "fim": 22
+      }
+    },
+    {
+      "id": "porta-ombro-direito",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          -1,
+          0,
+          0
+        ],
+        "centro": [
+          250,
+          1435,
+          0
+        ],
+        "raio": 28,
+        "inicio": -40,
+        "fim": 40
+      }
+    },
+    {
+      "id": "porta-cotovelo-direito",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          -1,
+          0,
+          0
+        ],
+        "centro": [
+          250,
+          1105,
+          0
+        ],
+        "raio": 26,
+        "inicio": -32,
+        "fim": 32
+      }
+    },
+    {
+      "id": "porta-punho-direito",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          -1,
+          0,
+          0
+        ],
+        "centro": [
+          250,
+          875,
+          0
+        ],
+        "raio": 22,
+        "inicio": -26,
+        "fim": 26
+      }
+    },
+    {
+      "id": "porta-ombro-esquerdo",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          -1,
+          0,
+          0
+        ],
+        "centro": [
+          -250,
+          1435,
+          0
+        ],
+        "raio": 28,
+        "inicio": -40,
+        "fim": 40
+      }
+    },
+    {
+      "id": "porta-cotovelo-esquerdo",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          -1,
+          0,
+          0
+        ],
+        "centro": [
+          -250,
+          1105,
+          0
+        ],
+        "raio": 26,
+        "inicio": -32,
+        "fim": 32
+      }
+    },
+    {
+      "id": "porta-punho-esquerdo",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          -1,
+          0,
+          0
+        ],
+        "centro": [
+          -250,
+          875,
+          0
+        ],
+        "raio": 22,
+        "inicio": -26,
+        "fim": 26
+      }
+    },
+    {
+      "id": "porta-quadril-direito",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          -1,
+          0,
+          0
+        ],
+        "centro": [
+          100,
+          930,
+          0
+        ],
+        "raio": 35,
+        "inicio": -40,
+        "fim": 40
+      }
+    },
+    {
+      "id": "porta-joelho-direito",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          1,
+          0,
+          0
+        ],
+        "centro": [
+          100,
+          499,
+          0
+        ],
+        "raio": 40,
+        "inicio": -42,
+        "fim": 42
+      }
+    },
+    {
+      "id": "porta-tornozelo-direito",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          -1,
+          0,
+          0
+        ],
+        "centro": [
+          100,
+          68,
+          0
+        ],
+        "raio": 30,
+        "inicio": -38,
+        "fim": 38
+      }
+    },
+    {
+      "id": "porta-quadril-esquerdo",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          -1,
+          0,
+          0
+        ],
+        "centro": [
+          -100,
+          930,
+          0
+        ],
+        "raio": 35,
+        "inicio": -40,
+        "fim": 40
+      }
+    },
+    {
+      "id": "porta-joelho-esquerdo",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          1,
+          0,
+          0
+        ],
+        "centro": [
+          -100,
+          499,
+          0
+        ],
+        "raio": 40,
+        "inicio": -42,
+        "fim": 42
+      }
+    },
+    {
+      "id": "porta-tornozelo-esquerdo",
+      "interface": {
+        "forma": "cilindro",
+        "papel": "macho",
+        "eixo": [
+          -1,
+          0,
+          0
+        ],
+        "centro": [
+          -100,
+          68,
+          0
+        ],
+        "raio": 30,
+        "inicio": -38,
+        "fim": 38
+      }
+    }
+  ]
+}

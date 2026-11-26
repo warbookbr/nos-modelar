@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { normalizarAndaimeGlobal } from '../../src/autoria/forma-global.js';
-import { avisosDaPose, posarEsqueleto, receitaDoEsqueleto } from '../../src/autoria/esqueleto-de-bolas.js';
+import { avisosDaPose, cadeiaDoEsqueleto, posarEsqueleto, receitaDoEsqueleto } from '../../src/autoria/esqueleto-de-bolas.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { avisosDoEsqueleto, comoCLI, conferirEsqueleto, escreverEsqueleto, gerarEsqueleto } from './esqueleto.mjs';
 import { conferirProporcoes } from './proporcoes.mjs';
@@ -213,5 +213,20 @@ describe('poses, avisos e a peça (fatia 2)', () => {
     const a = arvoreDe(caminho), b = arvoreDe(caminho);
     expect(JSON.stringify(avisosDoEsqueleto(a))).toBe(JSON.stringify(avisosDoEsqueleto(b)));
     expect(JSON.stringify(receitaDoEsqueleto(a, { pose: 'antebraco-no-tronco' }).PASSOS)).toBe(JSON.stringify(receitaDoEsqueleto(b, { pose: 'antebraco-no-tronco' }).PASSOS));
+  });
+});
+
+describe('cadeia da receita (TABELA, derivar, gerarPassos) para a guarda do acervo', () => {
+  it('PASSOS da receita lê PARAMS.pose: a mesma receita com outra pose dá outros passos, e a tabela e gerarPassos concordam', () => {
+    const arvore = gerarEsqueleto(`${FIXTURE}/proporcoes.json`).arvore;
+    const receita = receitaDoEsqueleto(arvore, { pose: 'zero' });
+    const { TABELA, derivar, gerarPassos } = cadeiaDoEsqueleto(arvore);
+    expect(TABELA).toEqual({ pose: 'zero' });
+    expect(JSON.stringify(gerarPassos(TABELA))).toBe(JSON.stringify(receita.PASSOS));
+    receita.PARAMS = { pose: 'antebraco-no-tronco' };
+    expect(JSON.stringify(receita.PASSOS)).toBe(JSON.stringify(receitaDoEsqueleto(arvore, { pose: 'antebraco-no-tronco' }).PASSOS));
+    expect(JSON.stringify(receita.PASSOS)).not.toBe(JSON.stringify(gerarPassos(TABELA)));
+    expect(derivar({ pose: 'antebraco-no-tronco' }).angulos).toEqual({ 'cotovelo-direito': -90 });
+    expect(() => gerarPassos({ pose: 'inexistente' })).toThrow(/pose 'inexistente' não existe/);
   });
 });
