@@ -1,10 +1,12 @@
 # Esqueleto de proporção: bolas nas juntas e bastões nos membros, em 3D, antes de modelar o robô
 
-**Estado:** rascunho
+**Estado:** ativo
 
 **Núcleo:** não
 
 **Território:** `tools/modelar/esqueleto.mjs`, `tools/modelar/esqueleto.test.mjs`, `tools/fixtures/esqueleto/`, `procedural/pecas/esqueleto-humanoide/`, `docs/modelar/banco-de-provas/esqueleto-de-proporcao-2026-11-26/`, `docs/modelar/ferramentas-por-objeto.json`, `package.json`.
+
+Ativado pela pessoa em 2026-11-26, com a frase "concordo com as duas, pode ativar o plano", depois de ler o rascunho.
 
 **Responsável:** a IA da sessão ou o agente despachado de cada fatia; a pessoa aprova a proporção por imagem e decide o que está em Decisão da pessoa.
 
@@ -59,8 +61,7 @@ A IA escreve o esqueleto de um robô como uma árvore de juntas (cada uma com o 
 
 ## Decisão da pessoa
 
-1. A ordem com o elo entre juntas. Recomendação: este plano entra antes da fatia 3 do elo (a perna de prova), e a perna passa a tirar a posição das juntas do esqueleto aprovado; as fatias 1 e 2 do elo (o elo reto e o elo com desvio) não dependem dele e podem correr junto.
-2. A altura do humanoide de prova. Recomendação: 1.750 mm, a do braço que já existe em `procedural/pecas/robo-humanoide/proporcoes.json`, cujas medidas o esqueleto reaproveita.
+Decidido em 2026-11-26, pela recomendação: este plano entra antes da fatia 3 do elo entre juntas (a perna de prova), que passa a tirar a posição das juntas do esqueleto aprovado, e as fatias 1 e 2 do elo correm junto; o humanoide de prova tem 1.750 mm, a altura do braço de `procedural/pecas/robo-humanoide/proporcoes.json`, cujas medidas o esqueleto reaproveita.
 
 ## Riscos e parada
 
