@@ -10,6 +10,7 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
 - [Abertura em qualquer direção — a bateria de limites da operação](abertura-em-qualquer-direcao-2026-11-06/README.md) — `abertura-em-qualquer-direcao-2026-11-06`
 - [Abrir peça com filtros, 2026-11-17](abrir-peca-com-filtros-2026-11-17/README.md) — `abrir-peca-com-filtros-2026-11-17`
 - [Ajuste esparso da gaiola: a linha de base do solver denso](ajuste-esparso-2026-11-22/README.md) — `ajuste-esparso-2026-11-22`
+- [Análise do projeto: o resumo das quatro frentes](analise-do-projeto-2026-11-26/README.md) — `analise-do-projeto-2026-11-26`
 - `aparelhos-2026-10-16`
 - [Atuador de junta: cilíndrico, de caixa e montagem de duas juntas](atuador-de-junta-2026-11-25/README.md) — `atuador-de-junta-2026-11-25`
 - [Avião de pequeno porte: alinhamento](aviao-2026-10-11/ALINHAMENTO.md) — `aviao-2026-10-11`

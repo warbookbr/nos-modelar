@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2401 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2407 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -116,6 +116,14 @@
 - `ensaio-do-carro.mjs` — ensaio-do-carro.mjs — o gate 1 do plano do ajuste esparso: a subdivisão da lataria do quarto traseiro do carro-fastback com a rede mais densa, pela variante …
 - `ensaio-esparso.mjs` — ensaio-esparso.mjs — a fatia 2 do plano do ajuste esparso na gaiola de prova: o tempo do ajuste com peso pelo Cholesky esparso, a estrutura do fator (não nul…
 - `ensaio-sela.mjs` — ensaio-sela.mjs — a medida que decide a fatia 3 do plano do ajuste esparso: o preenchimento do LU esparso no sistema de ponto de sela da gaiola de prova, com…
+
+## docs/modelar/banco-de-provas/analise-do-projeto-2026-11-26/
+
+- `README.md` — Análise do projeto: o resumo das quatro frentes
+- `documentacao.md` — Análise do projeto: documentação
+- `ferramentas.md` — Análise do projeto — frente das ferramentas
+- `nucleo.md` — Análise do projeto — frente núcleo
+- `processo.md` — Análise do projeto — frente processo
 
 ## docs/modelar/banco-de-provas/atuador-de-junta-2026-11-25/
 
@@ -715,6 +723,7 @@
 - `2026-11-25-acabamento-hard-surface.md` — Acabamento de hard surface: chanfro e arredondamento em qualquer aresta, linhas de painel e recortes na casca
 - `2026-11-25-elo-entre-juntas.md` — Elo entre juntas: a carenagem oca do membro, de uma flange de atuador à outra
 - `2026-11-25-resgate-dos-ramos-antigos.md` — Resgate dos ramos antigos: as peças, as ferramentas e o núcleo que nunca entraram na main
+- `2026-11-26-analise-do-projeto.md` — Análise do projeto: a documentação, o núcleo, as ferramentas e o processo comparados com uma versão melhor desenhada antes da leitura
 - `2026-11-26-operacoes-repartidas-entre-nucleos.md` — Operações repartidas entre núcleos: o corte das aberturas, a subtração e a divisão usando mais de um núcleo, com a mesma malha
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
