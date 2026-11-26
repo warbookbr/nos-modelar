@@ -85,6 +85,7 @@
     "planos:check": "node tools/mapa/planos.mjs --check",
     "planos:gerar": "node tools/mapa/planos.mjs --gerar",
     "planos:encerrar": "node tools/mapa/planos.mjs --encerrar",
+    "ramos:parados": "node tools/modelar/ramos-parados.mjs",
     "decisoes:check": "node tools/mapa/decisoes.mjs --check",
     "decisoes:gerar": "node tools/mapa/decisoes.mjs --gerar",
     "docs:estrutura": "node tools/mapa/estrutura-docs.mjs",
