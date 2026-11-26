@@ -4,7 +4,7 @@
 
 **Núcleo:** não
 
-**Território:** `tools/modelar/esqueleto.mjs`, `tools/modelar/esqueleto.test.mjs`, `tools/fixtures/esqueleto/`, `procedural/pecas/esqueleto-humanoide/`, `docs/modelar/banco-de-provas/esqueleto-de-proporcao-2026-11-26/`, `docs/modelar/ferramentas-por-objeto.json`, `package.json`.
+**Território:** `tools/modelar/esqueleto.mjs`, `tools/modelar/esqueleto.test.mjs`, `tools/modelar/proporcoes.mjs`, `tools/fixtures/esqueleto/`, `procedural/pecas/esqueleto-humanoide/`, `docs/modelar/banco-de-provas/esqueleto-de-proporcao-2026-11-26/`, `docs/modelar/ferramentas-por-objeto.json`, `package.json`.
 
 Ativado pela pessoa em 2026-11-26, com a frase "concordo com as duas, pode ativar o plano", depois de ler o rascunho.
 
