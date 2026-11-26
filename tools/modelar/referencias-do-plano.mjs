@@ -21,15 +21,19 @@ export function referenciasDoPlano(plano, { pastaDaReceita, raiz = REPO, existe 
   const ignoradas = [];
   const ausentes = [];
   const locaisAusentes = [];
+  const naoConstruidas = [];
+  const declaradasNaoConstruidas = new Set(plano?.referenciasNaoConstruidas ?? []);
   for (const citada of plano?.referencias ?? []) {
     const candidatos = isAbsolute(citada) ? [citada] : [resolve(raiz, citada), resolve(pastaDaReceita ?? raiz, citada)];
     const achado = candidatos.find((c) => existe(c));
     if (achado === undefined) { (ehReferenciaLocal(citada) ? locaisAusentes : ausentes).push(citada); continue; }
     if (/\.prancha\.svg$/i.test(achado)) { pranchas.push(achado); continue; }
     if (!EXTENSOES_DE_IMAGEM.has(extname(achado).toLowerCase())) { ignoradas.push(citada); continue; }
+    /* a imagem que a receita não constrói (`PLANO.referenciasNaoConstruidas`) sai da comparação e fica listada à parte */
+    if (declaradasNaoConstruidas.has(citada)) { naoConstruidas.push(achado); continue; }
     imagens.push(achado);
   }
-  return { imagens, pranchas, ignoradas, ausentes, locaisAusentes };
+  return { imagens, pranchas, ignoradas, ausentes, locaisAusentes, ...(declaradasNaoConstruidas.size ? { naoConstruidas } : {}) };
 }
 
 /** A recusa de `PLANO.referencias` que cita arquivo inexistente: nomeia cada caminho, sem chamar de imagem o que pode ser texto. */
