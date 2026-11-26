@@ -16,7 +16,28 @@ runs:
     # passavam, porque usam o chromium cheio, e por isso a falta ficava invisível. Os testes lentos também precisam dele: a
     # promoção de autoria só aprova uma proposta depois de capturar duas vistas reais. Toda máquina o instala, porque a
     # falta dele numa só vira falso defeito de autoria.
-    - run: npx playwright install --with-deps chromium chromium-headless-shell
+    # O navegador baixado fica no cache pela versão do Playwright do package-lock, e as bibliotecas do sistema (`install-deps`,
+    # pelo apt) se instalam com até três tentativas: em 2026-11-26 uma máquina falhou no apt com código 100 e derrubou a parte
+    # inteira dos testes lentos, sem defeito no código (análise do projeto, processo.md). A falta do cache nunca é erro.
+    - id: versao-do-playwright
+      run: echo "versao=$(node -p "require('./package-lock.json').packages['node_modules/playwright'].version")" >> "$GITHUB_OUTPUT"
+      shell: bash
+
+    - uses: actions/cache@v4
+      with:
+        path: ~/.cache/ms-playwright
+        key: playwright-${{ runner.os }}-${{ steps.versao-do-playwright.outputs.versao }}
+
+    - run: npx playwright install chromium chromium-headless-shell
+      shell: bash
+
+    - run: |
+        for tentativa in 1 2 3; do
+          if npx playwright install-deps chromium chromium-headless-shell; then exit 0; fi
+          echo "install-deps falhou na tentativa $tentativa; nova tentativa em 20 s"
+          sleep 20
+        done
+        exit 1
       shell: bash
 
     # As contas de superfície das vistas de análise (`tools/blender/superficie.py`) e a leitura das imagens rodam no python3
