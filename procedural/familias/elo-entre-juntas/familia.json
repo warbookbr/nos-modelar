@@ -52,6 +52,30 @@
       "maximo": 12,
       "medio": 2
     },
+    "desvio": {
+      "tipo": "numero",
+      "unidade": "graus",
+      "padrao": 0,
+      "minimo": 0,
+      "maximo": 90,
+      "medio": 0
+    },
+    "azimute": {
+      "tipo": "numero",
+      "unidade": "graus",
+      "padrao": 0,
+      "minimo": -180,
+      "maximo": 180,
+      "medio": 0
+    },
+    "deslocamentoLateral": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 0,
+      "minimo": 0,
+      "maximo": 40,
+      "medio": 0
+    },
     "diametroDaBocaA": {
       "tipo": "numero",
       "unidade": "mm",
@@ -168,6 +192,11 @@
       "id": "cintura-fecha-a-secao",
       "expressao": "1.5 * parede <= cintura * min(larguraDaSecao, profundidadeDaSecao) * min(larguraDaSecao, profundidadeDaSecao) / (2 * max(larguraDaSecao, profundidadeDaSecao))",
       "motivo": "a cintura fecha a seção do meio: o raio de curvatura da ponta da elipse (o semieixo menor ao quadrado sobre o maior, já com a cintura) fica abaixo de 1,5 parede e a parede de dentro se cruza"
+    },
+    {
+      "id": "curva-fecha-a-parede",
+      "expressao": "max(max(diametroDaBocaA, diametroDaBocaB) / 2, max(1, cintura) * (larguraDaSecao / 2 * abs(sin(azimute)) + profundidadeDaSecao / 2 * abs(cos(azimute)))) * ((comprimento - espessuraDaBocaA - espessuraDaBocaB * cos(desvio)) * sin(desvio) + 6 * abs(deslocamentoLateral)) <= 0.4 * (comprimento - espessuraDaBocaA - espessuraDaBocaB * cos(desvio)) * (comprimento - espessuraDaBocaA - espessuraDaBocaB * cos(desvio))",
+      "motivo": "o caminho do eixo dobra demais para a seção: o raio de curvatura do eixo (o arco do desvio e o deslocamento lateral, pelo comprimento entre as bocas) fica abaixo de 2,5 vezes a maior meia largura da seção no sentido do desvio (a boca ou o corpo com a barriga), e a face de dentro da curva comprime as seções contra a boca, a parede sai fina ali e a superfície se dobra sobre si"
     }
   ],
   "portas": [
