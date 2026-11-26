@@ -71,6 +71,7 @@ export const CAPACIDADES = Object.freeze({
   parametrosDaEsteira: { arquivo: 'procedural/familias/esteira/tabela.js', funcao: 'parametrosDaEsteira', de: 'procedural/familias/esteira/tabela.js' },
   parametrosDoAtuador: { arquivo: 'procedural/familias/atuador-de-junta/tabela.js', funcao: 'parametrosDoAtuador', de: 'procedural/familias/atuador-de-junta/tabela.js' },
   parametrosDoServo: { arquivo: 'procedural/familias/atuador-de-junta/servo.js', funcao: 'parametrosDoServo', de: 'procedural/familias/atuador-de-junta/servo.js' },
+  parametrosDoElo: { arquivo: 'procedural/familias/elo-entre-juntas/tabela.js', funcao: 'parametrosDoElo', de: 'procedural/familias/elo-entre-juntas/tabela.js', usa: { parametrosDoAtuador: 'procedural/familias/atuador-de-junta/tabela.js' } },
   transmissaoPorCorrente: { arquivo: 'procedural/familias/corrente/transmissao.js', funcao: 'transmissaoPorCorrente', de: 'procedural/familias/corrente/transmissao.js' },
   passosDaCaixaDeChapa: { arquivo: 'procedural/extensoes/chapa-dobrada/caixa.js', funcao: 'passosDaCaixaDeChapa', de: 'procedural/extensoes/chapa-dobrada/caixa.js' },
   passosDaCascaDoLoft: { arquivo: 'procedural/nucleo/casca-pela-receita.js', funcao: 'passosDaCascaDoLoft', de: 'procedural/nucleo/casca-pela-receita.js' },

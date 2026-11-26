@@ -1,0 +1,196 @@
+{
+  "formato": "mecanifica.familia@1",
+  "id": "elo-entre-juntas",
+  "versao": "1.0.0",
+  "nivel": "componente",
+  "parametros": {
+    "comprimento": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 230,
+      "minimo": 60,
+      "maximo": 800,
+      "medio": 300
+    },
+    "secao": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 1,
+      "minimo": 1,
+      "maximo": 3,
+      "medio": 2
+    },
+    "larguraDaSecao": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 90,
+      "minimo": 16,
+      "maximo": 300,
+      "medio": 100
+    },
+    "profundidadeDaSecao": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 70,
+      "minimo": 16,
+      "maximo": 300,
+      "medio": 80
+    },
+    "cintura": {
+      "tipo": "numero",
+      "unidade": "razao",
+      "padrao": 0.85,
+      "minimo": 0.4,
+      "maximo": 1.6,
+      "medio": 1
+    },
+    "parede": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 2,
+      "minimo": 0.8,
+      "maximo": 12,
+      "medio": 2
+    },
+    "diametroDaBocaA": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 62,
+      "minimo": 20,
+      "maximo": 300,
+      "medio": 100
+    },
+    "circuloDaBocaA": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 43.4,
+      "minimo": 10,
+      "maximo": 200,
+      "medio": 70
+    },
+    "furosDaBocaA": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 8,
+      "minimo": 3,
+      "maximo": 16,
+      "medio": 8
+    },
+    "diametroDoFuroDaBocaA": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 4.2,
+      "minimo": 1.5,
+      "maximo": 8,
+      "medio": 4.2
+    },
+    "espessuraDaBocaA": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 4,
+      "minimo": 2,
+      "maximo": 10,
+      "medio": 4
+    },
+    "diametroDaBocaB": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 124,
+      "minimo": 20,
+      "maximo": 300,
+      "medio": 100
+    },
+    "circuloDaBocaB": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 112,
+      "minimo": 10,
+      "maximo": 200,
+      "medio": 70
+    },
+    "furosDaBocaB": {
+      "tipo": "inteiro",
+      "unidade": "contagem",
+      "padrao": 8,
+      "minimo": 3,
+      "maximo": 16,
+      "medio": 8
+    },
+    "diametroDoFuroDaBocaB": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 5.5,
+      "minimo": 1.5,
+      "maximo": 8,
+      "medio": 4.2
+    },
+    "espessuraDaBocaB": {
+      "tipo": "numero",
+      "unidade": "mm",
+      "padrao": 4,
+      "minimo": 2,
+      "maximo": 10,
+      "medio": 4
+    }
+  },
+  "restricoes": [
+    {
+      "id": "boca-a-cabe-na-secao",
+      "expressao": "circuloDaBocaA / 2 + diametroDoFuroDaBocaA / 2 + 1 + parede <= diametroDaBocaA / 2",
+      "motivo": "a furação da boca A não cabe no círculo da flange: o furo precisa ficar a 1 mm da parede, dentro do diâmetro da boca"
+    },
+    {
+      "id": "boca-b-cabe-na-secao",
+      "expressao": "circuloDaBocaB / 2 + diametroDoFuroDaBocaB / 2 + 1 + parede <= diametroDaBocaB / 2",
+      "motivo": "a furação da boca B não cabe no círculo da flange: o furo precisa ficar a 1 mm da parede, dentro do diâmetro da boca"
+    },
+    {
+      "id": "parede-fecha-a-secao",
+      "expressao": "2 * parede < min(larguraDaSecao, profundidadeDaSecao)",
+      "motivo": "a parede de cada lado fecha a seção do corpo: ela precisa ser menor que a meia dimensão menor"
+    },
+    {
+      "id": "comprimento-das-bocas",
+      "expressao": "0.4 * (comprimento - espessuraDaBocaA - espessuraDaBocaB) >= 1.5 * max(abs(diametroDaBocaA - max(larguraDaSecao, profundidadeDaSecao)), abs(diametroDaBocaB - max(larguraDaSecao, profundidadeDaSecao))) / 2",
+      "motivo": "o comprimento não dá as duas espessuras de boca mais a transição de cada boca ao corpo a no máximo 45 graus"
+    },
+    {
+      "id": "passagem-do-anel-a",
+      "expressao": "2 < circuloDaBocaA / 2 - diametroDoFuroDaBocaA / 2",
+      "motivo": "o furo da boca A fica a menos de 2 mm do centro: não sobra passagem no anel"
+    },
+    {
+      "id": "passagem-do-anel-b",
+      "expressao": "2 < circuloDaBocaB / 2 - diametroDoFuroDaBocaB / 2",
+      "motivo": "o furo da boca B fica a menos de 2 mm do centro: não sobra passagem no anel"
+    },
+    {
+      "id": "cintura-fecha-a-secao",
+      "expressao": "1.5 * parede <= cintura * min(larguraDaSecao, profundidadeDaSecao) * min(larguraDaSecao, profundidadeDaSecao) / (2 * max(larguraDaSecao, profundidadeDaSecao))",
+      "motivo": "a cintura fecha a seção do meio: o raio de curvatura da ponta da elipse (o semieixo menor ao quadrado sobre o maior, já com a cintura) fica abaixo de 1,5 parede e a parede de dentro se cruza"
+    }
+  ],
+  "portas": [
+    {
+      "id": "boca-a",
+      "tipo": "padraoFuros",
+      "papel": "recebe"
+    },
+    {
+      "id": "boca-b",
+      "tipo": "padraoFuros",
+      "papel": "recebe"
+    }
+  ],
+  "ferramentas": [
+    "casca",
+    "loftSuave",
+    "furos"
+  ],
+  "perguntas": {
+    "casca": [
+      "O elo é uma carenagem oca de parede fina e uniforme, aberta nas duas bocas, que sai da flange de uma junta, passa por um corpo de seção suave (com cintura ou barriga, sem quina) e chega à flange da outra?",
+      "Cada boca tem o anel de fixação com os furos em círculo, no padrão da flange do atuador, sem furar a parede?"
+    ]
+  }
+}
