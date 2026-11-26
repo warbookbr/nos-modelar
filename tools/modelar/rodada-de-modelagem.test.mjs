@@ -699,9 +699,9 @@ export const PASSOS = [
     await expect(conferir(A, { ...A, promessas: { corpo: 'e'.repeat(64) } })).rejects.toThrow('mostra outra malha ou outra promessa na parte corpo; esperado');
     await expect(conferir(A, { ...A, promessas: {} })).rejects.toThrow('na parte corpo; esperado');
     await expect(conferir(A, null)).rejects.toThrow('mostra partes que a receita de agora não dá, porque ela não executa; esperado as mesmas partes da receita medida agora');
-    /* o pacote gerado antes de 2026-11-26 não traz a impressão: passa pelo texto, e a rodada grava a de agora */
-    expect(await conferir(undefined, A)).toEqual(A);
-    expect(await conferir(null, A)).toEqual(A);
+    /* o pacote sem a impressão passa pelo texto, e a rodada fica sem impressão, em vez de gravar a de agora como a julgada */
+    expect(await conferir(undefined, A)).toBeNull();
+    expect(await conferir(null, A)).toBeNull();
     expect(await conferir(undefined, null)).toBeNull();
   });
 });

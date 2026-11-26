@@ -274,10 +274,12 @@ export async function impressaoDasPartesDaReceita(caminho, { receita = null, mal
  * são `impressaoDasPartes` da receita de agora e a que a última rodada julgada gravou; sem `base`, todas entram. Entra a parte cuja
  * malha difere ('malha'), a que tem promessa diferente ('promessa'), a que a base não tinha ('nova'), a que a malha de agora não tem
  * ('ausente': a parte prometida e não entregue aparece como ausência na vista isolada) e a que o veredito da rodada da base cita num
- * defeito ('defeito', de `citadas`): o crítico apontou algo nela, e a vista isolada é onde ele confere, mesmo sem mudança. Puro.
+ * defeito ('defeito', de `citadas`): o crítico apontou algo nela, e a vista isolada é onde ele confere, mesmo sem mudança; se o defeito cita um nome que não é parte do plano, todas entram ('defeito-sem-parte'). Puro.
  */
 export function partesComVistaIsolada(partes, atual, base = null, { citadas = [] } = {}) {
   if (!base) return { comVista: partes.map((nome) => ({ nome, porque: 'sem-base' })), semVista: [] };
+  /* o defeito que cita um nome que não é parte do plano não diz qual parte ver: todas entram */
+  if (citadas.some((c) => !partes.includes(c))) return { comVista: partes.map((nome) => ({ nome, porque: 'defeito-sem-parte' })), semVista: [] };
   const comVista = [];
   const semVista = [];
   for (const nome of partes) {
@@ -597,7 +599,7 @@ export function antesEDepois(peca, { atual, anterior, imagem }) {
   if (candidatas.length > 1) throw new Error(`o antes e depois recebeu "${pedido}", que casa com ${candidatas.length} imagens do pacote atual; esperado um trecho que só uma tenha:\n${lista(candidatas)}\nRode \`${comandoDoAntesEDepois(peca)}\` com o nome inteiro de uma delas.`);
   const [a] = candidatas;
   const b = antes.imagens.find((i) => i.arquivo === a.arquivo);
-  if (!b) throw new Error(`o antes e depois recebeu a imagem ${a.arquivo}, e o pacote anterior (${anterior}) não a tem: a rodada anterior não capturou essa vista; esperado uma imagem que as duas rodadas tenham. Rode \`${comandoDoAntesEDepois(peca)}\` com outra.`);
+  if (!b) throw new Error(`o antes e depois recebeu a imagem ${a.arquivo}, e o pacote anterior (${anterior}) não tem imagem com esse nome: a rodada anterior não capturou essa vista, ou a capturou com outro nome e outra câmera numa versão anterior da ferramenta (as vistas da peça sozinha ganharam o enquadramento e o sufixo -enquadrado em 2026-11-26); esperado uma imagem que as duas rodadas tenham. Rode \`${comandoDoAntesEDepois(peca)}\` com outra.`);
   if (textoDaCamera(a.camera) !== textoDaCamera(b.camera)) {
     throw new Error(`o antes e depois de ${a.arquivo} recebeu duas câmeras diferentes: a anterior foi tirada com ${textoDaCamera(b.camera)} e a atual com ${textoDaCamera(a.camera)}; esperado a mesma câmera nas duas, porque imagens de câmeras diferentes lado a lado mostram a mudança da câmera como se fosse da peça. `
       + `Gere os dois pacotes com a mesma versão da ferramenta (\`npm run vistas:critica -- ${peca}\`).`);
@@ -1739,9 +1741,9 @@ export function etapaFixaDaPeca(montagem, registro) {
 /** O motivo, para o pedido, de os contornos de uma peça com a etapa fixa ficarem fora do pacote. */
 export function motivoDaEtapaFixa(fixa, contornos, arquivoDaMontagem) {
   const nomes = [...new Set(contornos.map((c) => basename(c.arquivo)))].join(', ');
-  return `${nomes} ${contornos.length > 1 ? 'ficam' : 'fica'} fora do pacote, sem desenho nem citação como medida: a etapa '${fixa.instancia}' está fixa no registro de etapas da montagem`
-    + `${fixa.por ? ` (aceite: ${fixa.por})` : ''}, e o pacote só usa contorno de peça em modelagem, porque o contorno de uma peça já aprovada pode ser resto de uma referência encerrada. `
-    + `Reabrir a etapa (\`node tools/modelar/etapas-da-montagem.mjs ${relative(REPO, arquivoDaMontagem)} --reabrir ${fixa.instancia} --por "<quem, data: motivo>"\`) o traz de volta.`;
+  /* o pedido não conta ao crítico o aceite nem que a peça foi aprovada (revisão de 2026-11-26): diz só o que ficou fora */
+  void fixa; void arquivoDaMontagem;
+  return `${nomes} ${contornos.length > 1 ? 'ficam' : 'fica'} fora do pacote, sem desenho nem citação como medida.`;
 }
 
 /** A pose da instância no mundo da montagem resolvida, como `cortesDosEncaixes` a resolve; null se a instância ainda não está construída. */

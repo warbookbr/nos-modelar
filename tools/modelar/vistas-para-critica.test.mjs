@@ -377,10 +377,12 @@ describe('o pacote padrão: o conjunto de umas dez imagens e as partes que difer
       semVista: ['a', 'f'],
     });
     /* a parte que o veredito da rodada cita num defeito entra mesmo igual, e a que já entra pela malha fica com o motivo da malha */
-    expect(partesComVistaIsolada(['a', 'b', 'c', 'd', 'e', 'f'], atual, base, { citadas: ['f', 'c', 'nao-existe'] })).toEqual({
+    expect(partesComVistaIsolada(['a', 'b', 'c', 'd', 'e', 'f'], atual, base, { citadas: ['f', 'c'] })).toEqual({
       comVista: [{ nome: 'b', porque: 'promessa' }, { nome: 'c', porque: 'malha' }, { nome: 'd', porque: 'nova' }, { nome: 'e', porque: 'ausente' }, { nome: 'f', porque: 'defeito' }],
       semVista: ['a'],
     });
+    /* o defeito que cita um nome fora do plano não diz qual parte ver: todas entram */
+    expect(partesComVistaIsolada(['a', 'b'], atual, base, { citadas: ['janela 1D'] })).toEqual({ comVista: [{ nome: 'a', porque: 'defeito-sem-parte' }, { nome: 'b', porque: 'defeito-sem-parte' }], semVista: [] });
     expect(partesComVistaIsolada(['a', 'b'], atual, null, { citadas: ['a'] })).toEqual({ comVista: [{ nome: 'a', porque: 'sem-base' }, { nome: 'b', porque: 'sem-base' }], semVista: [] });
     /* a mesma malha e a mesma promessa: nenhuma parte leva vista isolada */
     expect(partesComVistaIsolada(['a', 'b'], base, base)).toEqual({ comVista: [], semVista: ['a', 'b'] });
@@ -2093,8 +2095,9 @@ describe('o contorno medido sobre o modelo', () => {
 
   it('o pedido sem prancha diz que nenhum contorno foi desenhado, e por quê', () => {
     const motivo = motivoDaEtapaFixa({ instancia: 'ombro', por: 'pessoa' }, [{ arquivo: '/r/frontal.contornos.json' }, { arquivo: '/r/lateral.contornos.json' }], join(dirname(dirname(import.meta.dirname)), 'm/montagem.json'));
-    expect(motivo).toMatch(/^frontal\.contornos\.json, lateral\.contornos\.json ficam fora do pacote, sem desenho nem citação como medida: a etapa 'ombro' está fixa/);
-    expect(motivo).toContain('--reabrir ombro');
+    expect(motivo).toBe('frontal.contornos.json, lateral.contornos.json ficam fora do pacote, sem desenho nem citação como medida.');
+    /* o pedido não conta ao crítico o aceite nem a aprovação da peça */
+    expect(motivo).not.toMatch(/aceite|aprovad|fixa|pessoa/);
     const pedido = montarPedido({ peca: 'p', contornoSobreposto: { arquivo: null, fora: [motivo] } });
     expect(pedido).toContain('Nenhum contorno medido foi desenhado sobre o modelo neste pacote.');
     expect(pedido).toContain(`Fora do contorno sobreposto: ${motivo}`);
@@ -2122,7 +2125,8 @@ describe('o contorno medido sobre o modelo', () => {
     expect(pedidos).toEqual([]);
     expect(resultado.contornoSobreposto).toBeNull();
     const pedido = readFileSync(join(pasta, 'pedido.md'), 'utf8');
-    expect(pedido).toContain("Fora do contorno sobreposto: frontal.contornos.json fica fora do pacote, sem desenho nem citação como medida: a etapa 'peca' está fixa no registro de etapas da montagem (aceite: pessoa, 2026-11-17)");
+    expect(pedido).toContain('Fora do contorno sobreposto: frontal.contornos.json fica fora do pacote, sem desenho nem citação como medida.');
+    expect(pedido).not.toMatch(/aceite: pessoa|já aprovada/);
     expect(pedido).not.toMatch(/a medida deste lado vem dos contornos/);
   }, 60_000);
 });
@@ -2669,7 +2673,7 @@ describe('o antes e depois de uma imagem entre a rodada atual e a anterior', () 
   it('recusa a imagem que a rodada anterior não capturou', () => {
     const m = recusa(pacotes({ mudarAnterior: (d) => ({ ...d, imagens: d.imagens.slice(1) }) }));
     expect(m).toContain(`recebeu a imagem ${IMAGEM}, e o pacote anterior`);
-    expect(m).toContain('a rodada anterior não capturou essa vista; esperado uma imagem que as duas rodadas tenham');
+    expect(m).toContain('a rodada anterior não capturou essa vista, ou a capturou com outro nome e outra câmera');
   });
 
   it('recusa quando a câmera difere, dizendo as duas, e o enquadramento medido não conta como câmera', () => {

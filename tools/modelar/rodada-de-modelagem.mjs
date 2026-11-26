@@ -828,7 +828,9 @@ export async function conferirPacoteDoVeredito(peca, { pasta, sha256, impressao 
   try { dado = JSON.parse(readFileSync(arquivo, 'utf8')); } catch (erro) { recusar(`recebido: ${arquivo} não é JSON (${erro.message})`, 'esperado o pacote.json que o vistas:critica grava'); }
   if (dado?.peca !== peca) recusar(`recebido: o pacote de ${pasta} é da peça ${JSON.stringify(dado?.peca ?? null)}`, `esperado o pacote de '${peca}'`);
   if (dado.receita !== sha256) recusar(`recebido: o pacote de ${pasta} mostra a receita ${String(dado.receita)}`, `esperado ${sha256}, a receita medida agora: o texto dela mudou depois do pacote`);
-  if (dado.impressaoDasPartes === undefined || dado.impressaoDasPartes === null) return impressao;
+  /* o pacote sem a impressão (gerado antes de 2026-11-26, ou cuja receita não executou) não diz o que o crítico viu: a rodada fica sem
+     impressão, não serve de base, e o pacote seguinte leva todas as partes, em vez de gravar a de agora como julgada */
+  if (dado.impressaoDasPartes === undefined || dado.impressaoDasPartes === null) return null;
   /* importado na hora: o pacote do crítico é módulo pesado, e `--acao` não o usa */
   const diferem = (await import('./vistas-para-critica.mjs')).partesQueDiferem(dado.impressaoDasPartes, impressao);
   if (impressao === null || diferem.length) {
