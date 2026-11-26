@@ -14,3 +14,5 @@ Partes:
 Contatos: molas dentro das janelas das placas e da chapa sem atravessá-las; revestimentos rebitados na chapa; cubo coaxial.
 
 O que reprova: revestimento liso sem ranhuras ou sem rebites; molas como cilindros lisos sem espiras; cubo sem estrias; molas fora das janelas.
+
+Aprovação: a pessoa aprovou a peça em 2026-11-14, e em 2026-11-26 confirmou, pela imagem gerada no núcleo de hoje, que ela continua como aprovou ("sim, continuam"), no plano do resgate dos ramos antigos.

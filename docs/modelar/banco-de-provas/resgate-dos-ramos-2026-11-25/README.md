@@ -23,3 +23,7 @@ Da `claude/roda-esportiva`, no `arredondarCostura` e nas booleanas: `limpar` e `
 ## Fora do resgate
 
 O `envio/carro-quadrado-forma` é trabalho vivo de outra sessão, até 2026-11-24, com dois planos encerrados dentro do ramo e um terceiro ativo; muda `gaiola-por-rede.js`, que o plano G2 também muda. O `envio/carro-quadrado-v2` foi absorvido por ele. O `prova/mutacoes` guarda defeitos plantados para provar o CI, e o `referencias`, as imagens de referência fora da história da main; os dois existem de propósito.
+
+## Fatia 1, 2026-11-26
+
+O alternador, o radiador, o turbocompressor, o disco de embreagem e a junta do cabeçote voltaram do ramo com a categoria `veiculos` e passam no descrever da main, cada um só com um aviso de régua de malha. A junta levava 123 s porque a fusão dos triângulos da tampa em pedaços convexos (`procedural/nucleo/pedacos-convexos.js`) recomeçava a varredura do primeiro pedaço a cada fusão, um custo cúbico na chapa de 44 furos (41 s só nela). A fusão passou a olhar só os vizinhos por aresta, com o mesmo resultado provado contra a varredura antiga em `pedacos-convexos.test.mjs`; a chapa leva perto de 1 s. O retrato do acervo, com a main de antes e com a de agora, deu as 131 peças comparadas iguais. A pessoa confirmou em 2026-11-26 que as cinco continuam como aprovou em 2026-11-14 ("sim, continuam").

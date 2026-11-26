@@ -12,3 +12,5 @@ Partes:
 Contatos: frisos sobre a chapa, sem invadir os furos.
 
 O que reprova: chapa retangular sem o contorno recortado; menos de quatro cilindros ou cilindros sem anel; furos de parafuso ausentes; chapa com mais de 2 mm.
+
+Aprovação: a pessoa aprovou a peça em 2026-11-14, e em 2026-11-26 confirmou, pela imagem gerada no núcleo de hoje, que ela continua como aprovou ("sim, continuam"), no plano do resgate dos ramos antigos.

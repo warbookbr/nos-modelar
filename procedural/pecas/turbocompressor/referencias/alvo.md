@@ -15,3 +15,5 @@ Partes:
 Contatos: as três carcaças coaxiais no eixo do rotor; o rotor dentro da boca sem tocar a parede; os tubos saindo das conexões.
 
 O que reprova: volutas como cilindros sem o caracol crescente; boca do compressor sem rotor visível; flange da turbina sem furos; tubo de óleo solto no ar.
+
+Aprovação: a pessoa aprovou a peça em 2026-11-14, e em 2026-11-26 confirmou, pela imagem gerada no núcleo de hoje, que ela continua como aprovou ("sim, continuam"), no plano do resgate dos ramos antigos.

@@ -66,6 +66,10 @@ Peças: USAR DIRETO as receitas dos ramos, que rodam no núcleo de hoje, com a c
 
 Se uma peça mudar de forma no núcleo de hoje a ponto de a aprovação antiga não valer, ela volta à pessoa como peça nova. Se a conferência do acervo mostrar que uma mudança do núcleo altera peça que não devia, a mudança para e volta à pessoa com as imagens de antes e depois. Se a origem dos pedaços refeitos não couber sem mudar as receitas que usam origem como operando, ela fica de fora e vai ao backlog, e a roda esportiva entra sem a parte do aro que dependia dela.
 
+## Andamento
+
+Fatia 1 feita em 2026-11-26: as cinco peças aprovadas no acervo, confirmadas pela pessoa por imagem, e a fusão das tampas pelos vizinhos, que tirou a junta do cabeçote de 123 s sem mudar nenhuma peça do acervo. A medida está no banco de provas.
+
 ## Fechamento
 
 Preencher ao concluir ou cancelar: estado final, commit e PR, gates, resultado observado e candidatos devolvidos ao backlog.

@@ -15,3 +15,5 @@ Partes:
 Contatos: as tampas encostam no estator; a polia e o ventilador são coaxiais ao eixo; a capa assenta na tampa traseira; os tirantes passam pelos furos das orelhas das duas tampas.
 
 O que reprova: carcaça como cilindro liso sem janelas de ventilação; cobre que não aparece entre as tampas; polia sem os canais em V; pés de fixação sem furo; polia ou ventilador fora do eixo.
+
+Aprovação: a pessoa aprovou a peça em 2026-11-14, e em 2026-11-26 confirmou, pela imagem gerada no núcleo de hoje, que ela continua como aprovou ("sim, continuam"), no plano do resgate dos ramos antigos.

@@ -14,3 +14,5 @@ Partes:
 Contatos: tanques soldados nas placas; tubos do núcleo entrando nas placas; bocais e gargalo saindo da parede dos tanques sem atravessar para o núcleo.
 
 O que reprova: núcleo como placa lisa sem tubos e aletas em relevo; gargalo sem tampa; bocais sem rebordo; tanques encostando no núcleo sem placa coletora.
+
+Aprovação: a pessoa aprovou a peça em 2026-11-14, e em 2026-11-26 confirmou, pela imagem gerada no núcleo de hoje, que ela continua como aprovou ("sim, continuam"), no plano do resgate dos ramos antigos.
