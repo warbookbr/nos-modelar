@@ -30,20 +30,47 @@ export const ACOES = Object.freeze([
 
 function falhar(mensagem) { throw new TypeError(`laço de modelagem: ${mensagem}`); }
 
-/* Quem decidiu, quando e o quê: "a pessoa, 2026-11-18: pode seguir". É o formato do `por` de `rodadas/limite.json`, do
-   `--motivo-dos-pontos` e da decisão da pessoa sobre uma rodada (`rodadas/decisoes-da-pessoa.json`). */
-export const QUEM_DATA_PALAVRAS = /^[^,:]{2,},\s*\d{4}-\d{2}-\d{2}:\s*\S[\s\S]{2,}$/;
+/* Quem decidiu, quando e o quê, no molde `FORMATO_DE_QUEM`. É o formato do `por` de `rodadas/limite.json`, do `--motivo-dos-pontos` e da
+   decisão da pessoa sobre uma rodada (`rodadas/decisoes-da-pessoa.json`). O texto cabe numa linha: quebra de linha e caractere de
+   controle são recusados, porque o texto é impresso no resumo do laço e uma segunda linha ali se leria como linha da ferramenta. */
+export const QUEM_DATA_PALAVRAS = /^[^,:\p{Cc}\p{Zl}\p{Zp}]{2,},[^\S\p{Cc}\p{Zl}\p{Zp}]*\d{4}-\d{2}-\d{2}:[^\S\p{Cc}\p{Zl}\p{Zp}]*\S[^\p{Cc}\p{Zl}\p{Zp}]{2,}$/u;
 export const FORMATO_DE_QUEM = '"<quem decidiu>, <AAAA-MM-DD>: <as palavras ou o porquê>"';
 
+const DATA_DE_QUEM = /^[^,:]{2,},\s*(\d{4})-(\d{2})-(\d{2}):/;
+/* O dia (AAAA-MM-DD, em UTC) do instante ISO deslocado em horas. O dia de quem escreve é o do fuso dela, e o instante gravado é UTC:
+   somar 14 h dá o dia mais adiantado que existe naquele instante, e tirar 12 h dá o mais atrasado. */
+const diaDoInstante = (iso, horas) => new Date(Date.parse(iso) + horas * 3600e3).toISOString().slice(0, 10);
+
 /**
- * A decisão da pessoa sobre uma rodada, como vai gravada: o texto "quem, AAAA-MM-DD: as palavras dela", sem as pontas em branco.
- * Recusa o que não está no formato, dizendo o recebido, o esperado e o comando que grava certo (`rodada` entra no comando).
+ * O defeito do texto "quem, AAAA-MM-DD: palavras", ou `null` quando ele está certo: fora do molde ou em mais de uma linha, e a data que
+ * não existe no calendário (mês 13, dia 30 de fevereiro). Com `ate` (instante ISO) recusa a data futura naquele instante, e com `desde`
+ * (instante ISO) a data anterior a ele; os dois vêm de quem chama, e aqui não se lê relógio.
  */
-export function normalizarDecisaoDaPessoa(valor, { peca = '<peça>', rodada = '<n>' } = {}) {
+export function defeitoDoTextoDeQuem(texto, { ate = null, desde = null, anteriorA = 'ao instante dado' } = {}) {
+  if (typeof texto !== 'string') return 'não é texto';
+  if (/[\p{Cc}\p{Zl}\p{Zp}]/u.test(texto)) return 'tem quebra de linha ou caractere de controle';
+  if (!QUEM_DATA_PALAVRAS.test(texto)) return 'está fora do molde';
+  const [, ano, mes, dia] = DATA_DE_QUEM.exec(texto);
+  const data = `${ano}-${mes}-${dia}`;
+  const real = new Date(Date.UTC(Number(ano), Number(mes) - 1, Number(dia)));
+  if (Number(ano) < 1000 || real.getUTCMonth() !== Number(mes) - 1 || real.getUTCDate() !== Number(dia)) return `a data ${data} não existe no calendário`;
+  if (ate !== null && data > diaDoInstante(ate, 14)) return `a data ${data} é futura: a gravação é de ${ate}, e o dia mais adiantado nesse instante é ${diaDoInstante(ate, 14)}`;
+  if (desde !== null && data < diaDoInstante(desde, -12)) return `a data ${data} é anterior ${anteriorA}, de ${desde}`;
+  return null;
+}
+
+/**
+ * A decisão da pessoa sobre uma rodada, como vai gravada: o texto "quem, AAAA-MM-DD: as palavras dela", numa linha, sem as pontas em
+ * branco. Recusa o que não está no formato, dizendo o recebido, o esperado e o comando que grava certo (`rodada` entra no comando); o
+ * comando traz o molde, nunca palavras prontas, porque as palavras são só as que a pessoa disse. `ate` é o instante da gravação (a data
+ * da decisão não pode ser futura) e `registradaEm` o da rodada (a pessoa não decide sobre a rodada antes de ela existir).
+ */
+export function normalizarDecisaoDaPessoa(valor, { peca = '<peça>', rodada = '<n>', ate = null, registradaEm = null } = {}) {
   const texto = typeof valor === 'string' ? valor.trim() : valor;
-  if (typeof texto !== 'string' || !QUEM_DATA_PALAVRAS.test(texto)) {
-    falhar(`decisão da pessoa recebida: ${JSON.stringify(valor)}; esperado ${FORMATO_DE_QUEM}, só com a data e as palavras da pessoa. `
-      + `Grave com \`node tools/modelar/rodada-de-modelagem.mjs ${peca} --decisao-da-pessoa "a pessoa, 2026-11-26: aprovada, pode seguir" --rodada ${rodada}\`.`);
+  const defeito = defeitoDoTextoDeQuem(texto, { ate, desde: registradaEm, anteriorA: `ao registro da rodada ${rodada}` });
+  if (defeito) {
+    falhar(`decisão da pessoa recebida: ${JSON.stringify(valor)} (${defeito}); esperado ${FORMATO_DE_QUEM}, numa linha só, com a data do dia em que a pessoa decidiu e as palavras dela. `
+      + `Grave com \`node tools/modelar/rodada-de-modelagem.mjs ${peca} --decisao-da-pessoa ${FORMATO_DE_QUEM} --rodada ${rodada}\`.`);
   }
   return texto;
 }

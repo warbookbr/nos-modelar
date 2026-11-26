@@ -21,7 +21,8 @@
  *
  * Mesma receita, mesma saída. Não é gate: a pessoa decide o limiar e onde ligá-la.
  *
- *   node tools/modelar/vinco-oculto.mjs <peça> [--angulo-minimo=12] [--salto=4] [--comprimento-minimo=80] [--imagem=<png>] [--vista=iso|frontal|direita|superior] [--sem-cache] */
+ *   node tools/modelar/vinco-oculto.mjs <peça> [--angulo-minimo=12] [--salto=4] [--comprimento-minimo=80] [--imagem=<png>] [--vista=iso|frontal|direita|superior] [--sem-cache]
+ *   node tools/modelar/vinco-oculto.mjs --ajuda */
 import { writeFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { PNG } from 'pngjs';
@@ -226,24 +227,35 @@ export function desenharAchados(desenho, { vista = 'iso', largura = 1100, altura
   return img;
 }
 
+export const AJUDA = `vinco-oculto: os vincos e os chanfros que a superfície de subdivisão de uma receita tem sem a receita os declarar.
+
+  node tools/modelar/vinco-oculto.mjs <peça> [--angulo-minimo=${PADROES.anguloMinimoGraus}] [--salto=${PADROES.saltoGraus}] [--comprimento-minimo=${PADROES.comprimentoMinimoMm}] [--largura-maxima=${PADROES.larguraMaximaMm}] [--imagem=<png>] [--vista=iso|frontal|direita|superior] [--sem-cache]
+      imprime em JSON cada vinco e cada chanfro, com a parte, a posição, o comprimento e o ângulo médio
+  node tools/modelar/vinco-oculto.mjs --ajuda
+      este texto
+
+A peça é <objeto>/<peça> ou o nome dela. --imagem=<png> grava a malha em cinza com os achados em cor, na vista de --vista.
+--sem-cache executa a receita inteira, sem a memória por passo de tmp/cache-por-prefixo/. Não é gate: a pessoa decide o limiar.`;
+
 function lerOpcoes(args) {
   const nomes = { 'angulo-minimo': 'anguloMinimoGraus', salto: 'saltoGraus', 'comprimento-minimo': 'comprimentoMinimoMm', 'largura-maxima': 'larguraMaximaMm' };
   const o = {}; let imagem = null; let vista = 'iso'; let cache = true;
   for (const a of args) {
     if (a === '--sem-cache') { cache = false; continue; }
     const m = /^--([a-z-]+)=(.+)$/.exec(a);
-    if (!m) throw new Error(`argumento desconhecido: ${a}`);
+    if (!m) throw new Error(`argumento recebido: ${a}; esperado uma das opções de \`node tools/modelar/vinco-oculto.mjs --ajuda\`, cada uma na escrita --nome=valor, ou --sem-cache.`);
     if (m[1] === 'imagem') imagem = m[2];
     else if (m[1] === 'vista') vista = m[2];
     else if (nomes[m[1]] && Number.isFinite(Number(m[2]))) o[nomes[m[1]]] = Number(m[2]);
-    else throw new Error(`argumento desconhecido: ${a}`);
+    else throw new Error(`argumento recebido: ${a}; esperado uma das opções de \`node tools/modelar/vinco-oculto.mjs --ajuda\`, cada uma na escrita --nome=valor, ou --sem-cache.`);
   }
   return { o, imagem, vista, cache };
 }
 
 async function principal(argv) {
   const [alvo, ...resto] = argv.slice(2);
-  if (!alvo) { process.stderr.write('uso: node tools/modelar/vinco-oculto.mjs <peça> [--angulo-minimo=12] [--salto=4] [--comprimento-minimo=80] [--imagem=<png>] [--vista=iso] [--sem-cache]\n'); return 2; }
+  if (argv.slice(2).some((a) => a === '--ajuda' || a === '--help')) { process.stdout.write(`${AJUDA}\n`); return 0; }
+  if (!alvo) { process.stderr.write(`recebido sem a peça; esperado o nome dela.\n\n${AJUDA}\n`); return 2; }
   const caminho = resolverCaminhoReceita(alvo);
   if (!caminho) { process.stderr.write(`vinco-oculto: não achei a receita '${alvo}'.\n`); return 2; }
   const { o, imagem, vista, cache } = lerOpcoes(resto);

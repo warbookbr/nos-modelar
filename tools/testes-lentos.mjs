@@ -153,6 +153,8 @@ export const TESTES_LENTOS = [
   'tools/modelar/cilindro-hidraulico-aprovacao.test.mjs',
   'tools/modelar/conferir-vistas.test.mjs',
   'tools/modelar/tracar-placa.test.mjs',
+  /* 2026-11-26: a dobra pela execução guardada provada em três peças, uma de duas chapas; 15,8 s sozinho */
+  'tools/modelar/dobra-da-superficie.test.mjs',
   'tools/modelar/familia.test.mjs',
   'tools/modelar/forma-do-esboco.test.mjs',
   'tools/modelar/guardas/abre-na-bancada.test.mjs',

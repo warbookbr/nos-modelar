@@ -23,6 +23,7 @@
  * Mesma receita, mesma saída: nenhuma conta depende de relógio, acaso ou ordem de mapa. Não é gate: a pessoa decide o limiar e onde ligá-la.
  *
  *   node tools/modelar/dobra-da-superficie.mjs <peça> [--diedro-minimo=120] [--sem-cache]
+ *   node tools/modelar/dobra-da-superficie.mjs --ajuda
  */
 import { pathToFileURL } from 'node:url';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
@@ -54,17 +55,21 @@ function newell(pts) {
 
 /* A superfície refinada do passo `i`, pelo que a execução guardou em `neutro.chapas`: a gaiola (já ajustada às medidas), os nomes dos
    pontos, as faces da pele e a contagem dos vértices dela. O refino roda sem o ponto limite: as faces e as arestas de vinco são só
-   topologia, e as posições quem dá é o estado. Devolve null quando a execução não traz a chapa do passo. */
+   topologia, e as posições quem dá é o estado. Devolve null, e quem chama refaz a gaiola pela conta direta, quando a execução não traz
+   a chapa do passo ou a chapa vem sem um dos campos que o refino lê: os vincos, os cantos e a borda não ganham valor suposto aqui,
+   porque a chapa sem vinco declarado mediria como dobra o que a receita declarou vinco. */
 function superficieGuardada(chapa, niveis) {
-  if (!chapa?.pele || !Array.isArray(chapa.vertices) || !Array.isArray(chapa.declarados) || chapa.niveis !== niveis) return null;
-  const gaiola = { vertices: chapa.vertices, faces: chapa.faces, vincos: chapa.vincos ?? [], cantos: chapa.cantos ?? [], ...(chapa.imagem ? { imagem: chapa.imagem } : {}) };
-  const r = subdividirCatmullClark({ vertices: gaiola.vertices, faces: gaiola.faces, vincos: gaiola.vincos, cantos: gaiola.cantos, niveis, borda: chapa.borda ?? 'suave', aoLimite: false, comVincos: true });
+  if (!chapa?.pele || !Array.isArray(chapa.vertices) || !Array.isArray(chapa.faces) || !Array.isArray(chapa.declarados) || chapa.niveis !== niveis) return null;
+  if (!Array.isArray(chapa.vincos) || !Array.isArray(chapa.cantos) || typeof chapa.borda !== 'string') return null;
+  const gaiola = { vertices: chapa.vertices, faces: chapa.faces, vincos: chapa.vincos, cantos: chapa.cantos, ...(chapa.imagem ? { imagem: chapa.imagem } : {}) };
+  const r = subdividirCatmullClark({ vertices: gaiola.vertices, faces: gaiola.faces, vincos: gaiola.vincos, cantos: gaiola.cantos, niveis, borda: chapa.borda, aoLimite: false, comVincos: true });
   if (r.vertices.length !== chapa.pele.vertices.length || r.faces.length !== chapa.pele.faces.length) return null;
   return { gaiola, declarados: chapa.declarados, r };
 }
 
 /* As superfícies dos passos `subdivisao` da receita: vértices em metro, faces, arestas de vinco, a parte de cada vértice e o ponto da gaiola.
-   `guardada: false` refaz a gaiola e o refino de cada passo, sem ler `neutro.chapas` (a conta de antes, para a prova de igualdade). */
+   `guardada: false` refaz a gaiola e o refino de cada passo, sem ler `neutro.chapas` (a conta de antes, para a prova de igualdade). Cada
+   superfície diz em `daExecucaoGuardada` por qual dos dois caminhos saiu; o campo não entra na saída das réguas. */
 export function superficiesDaReceita(receita, executada = null, { guardada = true } = {}) {
   const { entrada, neutro } = executada ?? executarReceita(receita);
   const dict = { ...entrada.PARAMS, ...entrada.TOPO };
@@ -81,6 +86,7 @@ export function superficiesDaReceita(receita, executada = null, { guardada = tru
     if (operacaoDe(passo) !== 'subdivisao') return;
     const niveis = Math.trunc(num(args.niveis ?? 2));
     let lida = guardada ? superficieGuardada((neutro.chapas ?? []).find((c) => c.passo === i), niveis) : null;
+    const daExecucaoGuardada = Boolean(lida);
     if (!lida) {
       const resolvida = gaiolaDoPasso(args, { vec, num });
       if (resolvida.erro) throw new Error(`dobra: o passo ${i} (subdivisao) não resolve a gaiola: ${resolvida.erro[1]}`);
@@ -99,7 +105,7 @@ export function superficiesDaReceita(receita, executada = null, { guardada = tru
     const origem = gaiola.vertices.map((_, k) => k);
     if (gaiola.imagem) gaiola.imagem.forEach((k, j) => { origem[k] = j; });
     const nomeDe = (j) => { const d = declarados[origem[j]]; return typeof d === 'string' ? d : null; };
-    lista.push({ passo: i, niveis, vertices, faces, facesTiradas: r.faces.length - faces.length, vincos: r.vincos, partes, gaiola, nomeDe });
+    lista.push({ passo: i, niveis, daExecucaoGuardada, vertices, faces, facesTiradas: r.faces.length - faces.length, vincos: r.vincos, partes, gaiola, nomeDe });
   });
   return lista;
 }
@@ -175,12 +181,22 @@ export function textoDaDobra(d) {
   return `dobra na parte ${d.parte ?? 'sem parte'}, em [${d.posicaoMm.join('; ')}] mm, perto do ponto ${d.pertoDe ?? 'sem nome'} da gaiola: diedro de ${String(d.diedroGraus).replace('.', ',')} graus em ${d.arestas} aresta(s), ${String(d.extensaoMm).replace('.', ',')} mm${d.pontasMm ? `, de [${d.pontasMm[0].join('; ')}] a [${d.pontasMm[1].join('; ')}] mm` : ''}`;
 }
 
+export const AJUDA = `dobra-da-superficie: onde a superfície de subdivisão de uma receita dobra com diedro agudo fora de vinco declarado.
+
+  node tools/modelar/dobra-da-superficie.mjs <peça> [--diedro-minimo=${PADROES.diedroMinimoGraus}] [--sem-cache]
+      imprime em JSON cada dobra, com a parte, a posição em mm, o diedro em graus e o ponto da gaiola mais perto
+  node tools/modelar/dobra-da-superficie.mjs --ajuda
+      este texto
+
+A peça é <objeto>/<peça> ou o nome dela. --diedro-minimo=<graus> é o diedro abaixo do qual a aresta fora de vinco é dobra.
+--sem-cache executa a receita inteira, sem a memória por passo de tmp/cache-por-prefixo/. Não é gate: a pessoa decide o limiar.`;
+
 function lerOpcoes(args) {
   const o = {};
   for (const a of args) {
     if (a === '--sem-cache') continue;
     const m = /^--diedro-minimo=(.+)$/.exec(a);
-    if (!m || !Number.isFinite(Number(m[1]))) throw new Error(`argumento desconhecido: ${a}`);
+    if (!m || !Number.isFinite(Number(m[1]))) throw new Error(`argumento recebido: ${a}; esperado --diedro-minimo=<graus>, --sem-cache ou --ajuda. O uso sai com \`node tools/modelar/dobra-da-superficie.mjs --ajuda\`.`);
     o.diedroMinimoGraus = Number(m[1]);
   }
   return o;
@@ -188,7 +204,8 @@ function lerOpcoes(args) {
 
 async function principal(argv) {
   const [alvo, ...resto] = argv.slice(2);
-  if (!alvo) { process.stderr.write('uso: node tools/modelar/dobra-da-superficie.mjs <peça> [--diedro-minimo=120] [--sem-cache]\n'); return 2; }
+  if (argv.slice(2).some((a) => a === '--ajuda' || a === '--help')) { process.stdout.write(`${AJUDA}\n`); return 0; }
+  if (!alvo) { process.stderr.write(`recebido sem a peça; esperado o nome dela.\n\n${AJUDA}\n`); return 2; }
   const caminho = resolverCaminhoReceita(alvo);
   if (!caminho) { process.stderr.write(`dobra: não achei a receita '${alvo}'.\n`); return 2; }
   const opcoes = lerOpcoes(resto);

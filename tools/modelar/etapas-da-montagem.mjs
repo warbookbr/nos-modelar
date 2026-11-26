@@ -50,7 +50,7 @@ import { estadoDaAnalise } from './analise-da-peca.mjs';
 import { capturarMontagem } from './capturar-montagem.mjs';
 import { carregadoresDeReceitas } from './peca-com-parametros.mjs';
 import { REPO } from './resolver-caminho-receita.mjs';
-import { decisaoDaPessoa, lerRodadas } from './rodada-de-modelagem.mjs';
+import { decisaoSobreAsParadas, lerRodadas } from './rodada-de-modelagem.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 
 export const arquivoDoRegistro = (arquivoMontagem) => arquivoMontagem.replace(/\.json$/, '.etapas.json');
@@ -235,9 +235,9 @@ export async function medirAgora(arquivoMontagem, { receitas } = {}) {
    crítico. */
 const PARADAS_ACEITAVEIS = new Set(['parar-limite', 'parar-sem-convergencia']);
 
-/* `limiteDe(ref)` devolve a decisão gravada da pessoa para a peça (`decisaoDaPessoa`: o limite e a rodada a partir da qual a convergência
+/* `limiteDe(ref)` devolve a decisão gravada da pessoa para a peça (`decisaoSobreAsParadas`: o limite e a rodada a partir da qual a convergência
    conta), a mesma que `--acao` lê; quem injeta pode devolver só o número do limite. */
-export function conferirRodadasDaEtapa(montagem, instancia, rodadasDe = (ref) => lerRodadas(ref), limiteDe = (ref) => decisaoDaPessoa(ref), { aceiteHumano = false } = {}) {
+export function conferirRodadasDaEtapa(montagem, instancia, rodadasDe = (ref) => lerRodadas(ref), limiteDe = (ref) => decisaoSobreAsParadas(ref), { aceiteHumano = false } = {}) {
   const ref = montagem.instancias.find((item) => item.id === instancia)?.alvo.ref;
   const rodadas = ref ? rodadasDe(ref) : [];
   const lida = ref ? limiteDe(ref) : undefined;

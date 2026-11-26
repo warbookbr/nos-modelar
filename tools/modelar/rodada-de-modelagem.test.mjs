@@ -6,7 +6,7 @@
  * achou que estava bom. O registro precisa sobreviver à rodada: veredito que
  * vive só no diálogo some com a janela de contexto.
  */
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, linkSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -18,7 +18,7 @@ import { acaoSemMedir } from './fluxo-do-objeto.mjs';
 import { conferirPontos, esperadosDosPontos, mudancasDosEsperados, textoDosPontos } from './conferir-pontos.mjs';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { conferirUmaPeca } from './guardas/guarda-referencial.mjs';
-import { AJUDA, ARQUIVO_DAS_DECISOES, gravarDecisaoDaPessoa, lerDecisoesDaPessoa, nomeDaPastaDoPacote, numeroDaProximaRodada, pastaDoPacoteDaRodada, CAMPOS_OPCIONAIS_LIDOS_PELO_CRITICO, CAMPOS_OPCIONAIS_NAO_LIDOS_PELO_CRITICO, planoQueOCriticoLe, acaoDaPeca, ajustarImportsDaCopia, blocoDaPeca, contradicoesEntreRodadas, entradaDosArquivos, normalizarRelatoDoModelador, resumoDoLaco, gravarRodada, impressaoDaForma, lerArgumentos, lerRodadas, medirReceita, mudancaDosPontos, pastaDeRodadas, pontosDaMedicao, registrarMedida, convergenciaDaPeca, decisaoDaPessoa, limiteDaPeca, textoFinalDoAssistente, ultimoBlocoJson } from './rodada-de-modelagem.mjs';
+import { AJUDA, ARQUIVO_DAS_DECISOES, VARIAVEL_DA_PASTA_DE_TESTE, VERSAO_DAS_DECISOES, gravarDecisaoDaPessoa, lerDecisoesDaPessoa, nomeDaPastaDoPacote, numeroDaProximaRodada, pastaDoPacoteDaRodada, CAMPOS_OPCIONAIS_LIDOS_PELO_CRITICO, CAMPOS_OPCIONAIS_NAO_LIDOS_PELO_CRITICO, planoQueOCriticoLe, acaoDaPeca, ajustarImportsDaCopia, blocoDaPeca, contradicoesEntreRodadas, entradaDosArquivos, normalizarRelatoDoModelador, resumoDoLaco, gravarRodada, impressaoDaForma, lerArgumentos, lerRodadas, medirReceita, mudancaDosPontos, pastaDeRodadas, pontosDaMedicao, registrarMedida, convergenciaDaPeca, decisaoSobreAsParadas, limiteDaPeca, textoFinalDoAssistente, ultimoBlocoJson } from './rodada-de-modelagem.mjs';
 import { CAMPOS_OPCIONAIS_DO_PLANO } from '../../src/autoria/plano-de-modelagem.js';
 import { normalizarVeredito } from '../../src/autoria/veredito-de-forma.js';
 import { pecasDoAcervo } from './guardas/guarda-acervo.mjs';
@@ -202,10 +202,10 @@ describe('a decisão da pessoa sobre as paradas, em rodadas/limite.json', () => 
 
   it('"sem" declara a peça sem limite, e o inteiro continua valendo', () => {
     escrever({ limite: 'sem', ...QUEM });
-    expect(decisaoDaPessoa(PECA, { pasta: area })).toEqual({ limite: Infinity, convergenciaDesde: 1, por: QUEM.por });
+    expect(decisaoSobreAsParadas(PECA, { pasta: area })).toEqual({ limite: Infinity, convergenciaDesde: 1, por: QUEM.por });
     julgadas([4, 3, 2]);
     escrever({ limite: 9, convergenciaDesde: 4, ...QUEM });
-    expect(decisaoDaPessoa(PECA, { pasta: area })).toEqual({ limite: 9, convergenciaDesde: 4, por: QUEM.por });
+    expect(decisaoSobreAsParadas(PECA, { pasta: area })).toEqual({ limite: 9, convergenciaDesde: 4, por: QUEM.por });
     escrever({ convergenciaDesde: 2, ...QUEM });
     expect(limiteDaPeca(PECA, { pasta: area })).toBe(6);
     expect(convergenciaDaPeca(PECA, { pasta: area })).toBe(2);
@@ -213,12 +213,12 @@ describe('a decisão da pessoa sobre as paradas, em rodadas/limite.json', () => 
 
   it('convergenciaDesde vai no máximo até a próxima rodada a registrar, e a recusa lista as que existem', () => {
     escrever({ limite: 'sem', convergenciaDesde: 2, ...QUEM });
-    expect(() => decisaoDaPessoa(PECA, { pasta: area })).toThrow("'convergenciaDesde' recebido: 2; esperado no máximo 1, o número da próxima rodada a registrar (as registradas são nenhuma)");
+    expect(() => decisaoSobreAsParadas(PECA, { pasta: area })).toThrow("'convergenciaDesde' recebido: 2; esperado no máximo 1, o número da próxima rodada a registrar (as registradas são nenhuma)");
     julgadas([3, 3, 3, 3, 3]);
     escrever({ limite: 'sem', convergenciaDesde: 6, ...QUEM });
-    expect(decisaoDaPessoa(PECA, { pasta: area }).convergenciaDesde).toBe(6);
+    expect(decisaoSobreAsParadas(PECA, { pasta: area }).convergenciaDesde).toBe(6);
     escrever({ limite: 'sem', convergenciaDesde: 99999, ...QUEM });
-    expect(() => decisaoDaPessoa(PECA, { pasta: area })).toThrow("'convergenciaDesde' recebido: 99999; esperado no máximo 6, o número da próxima rodada a registrar (as registradas são 1, 2, 3, 4, 5). Corrija o arquivo e confira com `node tools/modelar/rodada-de-modelagem.mjs peca-x --acao`");
+    expect(() => decisaoSobreAsParadas(PECA, { pasta: area })).toThrow("'convergenciaDesde' recebido: 99999; esperado no máximo 6, o número da próxima rodada a registrar (as registradas são 1, 2, 3, 4, 5). Corrija o arquivo e confira com `node tools/modelar/rodada-de-modelagem.mjs peca-x --acao`");
     /* e quem chama a decisão direto, sem o arquivo, é recusado do mesmo jeito: o número adiante desligaria a parada para sempre */
     expect(() => proximaAcao(lerRodadas(PECA, { pasta: area }), { limite: Infinity, convergenciaDesde: 99999 })).toThrow("'convergenciaDesde' recebido: 99999; esperado no máximo 6");
     expect(proximaAcao(lerRodadas(PECA, { pasta: area }), { limite: Infinity }).acao).toBe('parar-sem-convergencia');
@@ -227,19 +227,24 @@ describe('a decisão da pessoa sobre as paradas, em rodadas/limite.json', () => 
   it('toda declaração pede o por com quem, data e palavras, inclusive a extensão por inteiro', () => {
     for (const por of ['eu!', 'abc', 'pessoa, 2026-11-05', 'eu, x: ok ok', 'a pessoa: pode seguir']) {
       escrever({ limite: 'sem', por, motivo: 'peça de estudo' });
-      expect(() => decisaoDaPessoa(PECA, { pasta: area })).toThrow(`'por' recebido: ${JSON.stringify(por)}; esperado "<quem decidiu>, <AAAA-MM-DD>: <as palavras ou o porquê>", com as palavras de quem decidiu`);
+      expect(() => decisaoSobreAsParadas(PECA, { pasta: area })).toThrow(`'por' recebido: ${JSON.stringify(por)} (está fora do molde); esperado "<quem decidiu>, <AAAA-MM-DD>: <as palavras ou o porquê>", numa linha só, com as palavras de quem decidiu`);
       escrever({ convergenciaDesde: 1, por, motivo: 'peça de estudo' });
-      expect(() => decisaoDaPessoa(PECA, { pasta: area })).toThrow("'por' recebido:");
+      expect(() => decisaoSobreAsParadas(PECA, { pasta: area })).toThrow("'por' recebido:");
+    }
+    /* o por em duas linhas e o de data que não existe */
+    for (const [por, defeito] of [["a pessoa, 2026-11-18: 'pode seguir'\ne mais uma linha", 'tem quebra de linha ou caractere de controle'], ["a pessoa, 2026-02-30: 'pode seguir'", 'a data 2026-02-30 não existe no calendário']]) {
+      escrever({ limite: 'sem', por, motivo: 'peça de estudo' });
+      expect(() => decisaoSobreAsParadas(PECA, { pasta: area })).toThrow(`'por' recebido: ${JSON.stringify(por)} (${defeito}); esperado`);
     }
     escrever({ limite: 8, por: 'pessoa', motivo: 'fechar o bico' });
-    expect(() => decisaoDaPessoa(PECA, { pasta: area })).toThrow("'por' recebido: \"pessoa\"");
+    expect(() => decisaoSobreAsParadas(PECA, { pasta: area })).toThrow("'por' recebido: \"pessoa\"");
     escrever({ limite: 8, por: "a pessoa, 2026-11-18: 'mais uma rodada'", motivo: 'fechar o bico' });
-    expect(decisaoDaPessoa(PECA, { pasta: area }).limite).toBe(8);
+    expect(decisaoSobreAsParadas(PECA, { pasta: area }).limite).toBe(8);
     /* os dois arquivos antigos do braço, que ganharam as palavras da pessoa, passam */
-    for (const parte of ['ombro', 'ombro-tambor']) expect(decisaoDaPessoa(`braco-robotico/${parte}`, { pasta: `procedural/pecas/braco-robotico/partes/${parte}/rodadas` }).limite).toBeGreaterThan(6);
+    for (const parte of ['ombro', 'ombro-tambor']) expect(decisaoSobreAsParadas(`braco-robotico/${parte}`, { pasta: `procedural/pecas/braco-robotico/partes/${parte}/rodadas` }).limite).toBeGreaterThan(6);
     /* o arquivo da lataria do carro, que declara as duas, passa */
     const lataria = 'procedural/pecas/carro-fastback/partes/lataria/rodadas';
-    expect(decisaoDaPessoa('carro-fastback/lataria', { pasta: lataria })).toMatchObject({ limite: Infinity, convergenciaDesde: 6 });
+    expect(decisaoSobreAsParadas('carro-fastback/lataria', { pasta: lataria })).toMatchObject({ limite: Infinity, convergenciaDesde: 6 });
   });
 
   it('acaoDaPeca lê o limite e a convergência da mesma pasta das rodadas', async () => {
@@ -275,9 +280,9 @@ describe('a decisão da pessoa sobre as paradas, em rodadas/limite.json', () => 
     const rodadas = () => lerRodadas(PECA, { pasta: area });
     const montagem = { instancias: [{ id: 'a', alvo: { ref: PECA } }] };
     const tres = async () => {
-      const lida = decisaoDaPessoa(PECA, { pasta: area });
+      const lida = decisaoSobreAsParadas(PECA, { pasta: area });
       let dasEtapas;
-      try { conferirRodadasDaEtapa(montagem, 'a', rodadas, (ref) => decisaoDaPessoa(ref, { pasta: area })); } catch (erro) { mensagemDasEtapas = erro.message; dasEtapas = /pelo crítico: ([a-z-]+) — /.exec(erro.message)?.[1]; }
+      try { conferirRodadasDaEtapa(montagem, 'a', rodadas, (ref) => decisaoSobreAsParadas(ref, { pasta: area })); } catch (erro) { mensagemDasEtapas = erro.message; dasEtapas = /pelo crítico: ([a-z-]+) — /.exec(erro.message)?.[1]; }
       const daAcao = await acaoDaPeca(PECA, { pasta: area, medir });
       const doFluxo = acaoSemMedir(rodadas(), 'texto da receita', lida);
       motivos = [daAcao.motivo, doFluxo.motivo, mensagemDasEtapas];
@@ -301,8 +306,8 @@ describe('a decisão da pessoa sobre as paradas, em rodadas/limite.json', () => 
   it('recusa o formato errado dizendo o recebido, o esperado e o comando', () => {
     const recusa = (dado, texto) => {
       escrever(dado);
-      expect(() => decisaoDaPessoa(PECA, { pasta: area })).toThrow(texto);
-      expect(() => decisaoDaPessoa(PECA, { pasta: area })).toThrow('confira com `node tools/modelar/rodada-de-modelagem.mjs peca-x --acao`');
+      expect(() => decisaoSobreAsParadas(PECA, { pasta: area })).toThrow(texto);
+      expect(() => decisaoSobreAsParadas(PECA, { pasta: area })).toThrow('confira com `node tools/modelar/rodada-de-modelagem.mjs peca-x --acao`');
     };
     recusa({ limite: 'infinito', ...QUEM }, `'limite' recebido: "infinito"; esperado um inteiro maior que 6 ou "sem" (sem limite, declarado)`);
     recusa({ limite: 6, ...QUEM }, `'limite' recebido: 6; esperado um inteiro maior que 6 ou "sem"`);
@@ -446,13 +451,15 @@ describe('o esperado dos PONTOS entre rodadas', () => {
 
   it('recusa o motivo fora do formato quem, data: palavras, dizendo o recebido, o esperado e o comando', async () => {
     await registrar([900, 1200, 0], texto('[900, 1200, 0]'));
-    for (const ruim of ['porque sim', 'eu, x: ok ok', 'a pessoa: mudou o alvo']) {
+    for (const [ruim, defeito] of [['porque sim', 'está fora do molde'], ['eu, x: ok ok', 'está fora do molde'], ['a pessoa: mudou o alvo', 'está fora do molde'],
+      ['a pessoa, 2026-11-18: mudou o alvo\nmotivo: outro', 'tem quebra de linha ou caractere de controle'], ['a pessoa, 2026-11-31: mudou o alvo', 'a data 2026-11-31 não existe no calendário']]) {
       await expect(registrar([900, 1180, 0], texto('[900, 1180, 0]'), { motivoDosPontos: ruim }))
-        .rejects.toThrow(`--motivo-dos-pontos recebido: ${JSON.stringify(ruim)}; esperado "<quem decidiu>, <AAAA-MM-DD>: <as palavras ou o porquê>". Registre de novo com \`node tools/modelar/rodada-de-modelagem.mjs peca-de-pontos --registrar`);
+        .rejects.toThrow(`--motivo-dos-pontos recebido: ${JSON.stringify(ruim)} (${defeito}); esperado "<quem decidiu>, <AAAA-MM-DD>: <as palavras ou o porquê>", numa linha só. `
+          + 'Registre de novo com `node tools/modelar/rodada-de-modelagem.mjs peca-de-pontos --registrar ... --motivo-dos-pontos "<quem decidiu>, <AAAA-MM-DD>: <as palavras ou o porquê>"`.');
     }
     expect(gravadas()).toBe(1);
     expect(lerArgumentos(['x', '--registrar', 'r.json', '--motivo-dos-pontos', 'a pessoa, hoje: mudou']).opcoes['motivo-dos-pontos']).toBe('a pessoa, hoje: mudou');
-    expect(() => lerArgumentos(['x', '--registrar', 'r.json', '--motivo-dos-pontos'])).toThrow('--motivo-dos-pontos pede um valor.');
+    expect(() => lerArgumentos(['x', '--registrar', 'r.json', '--motivo-dos-pontos'])).toThrow('--motivo-dos-pontos pede um valor e veio sem ele; esperado o texto "<quem decidiu>, <AAAA-MM-DD>: <as palavras ou o porquê>". Escreva `--motivo-dos-pontos <valor>` ou `--motivo-dos-pontos=<valor>`.');
   });
 
   it('a medição da receita com PONTOS traz o esperado, e a sem PONTOS não traz', async () => {
@@ -971,30 +978,54 @@ describe('o PLANO que o crítico lê', () => {
 
 describe('a decisão da pessoa, num arquivo ao lado das rodadas', () => {
   const PECA = 'peca-da-decisao';
+  const MOLDE = '"<quem decidiu>, <AAAA-MM-DD>: <as palavras ou o porquê>"';
+  const COMANDO = (rodada = '<n>') => `node tools/modelar/rodada-de-modelagem.mjs ${PECA} --decisao-da-pessoa ${MOLDE} --rodada ${rodada}`;
   const DECISAO = 'a pessoa, 2026-11-26: a tampa está boa, falta o arco traseiro';
   const OUTRA = 'a pessoa, 2026-11-27: olhei de novo, a tampa também precisa descer';
+  const REGISTRO = '2026-11-25T10:00:00.000Z';
+  const GRAVACAO = '2026-11-27T12:00:00.000Z';
   const pasta = () => join(area, PECA);
   const arquivo = () => join(pasta(), ARQUIVO_DAS_DECISOES);
-  const rodada = () => gravarRodada(PECA, { partes: CONFERIDAS, medidas: { passou: true, relatorio: 'ok' }, veredito: veredito(1) }, { pasta: pasta(), receitaTexto: 'export const X = 1;\n' });
-  const decidir = (entrada, agora = '2026-11-26T12:00:00.000Z') => gravarDecisaoDaPessoa(PECA, entrada, { pasta: pasta(), agora: () => agora });
+  const rodada = (quantos = 1) => gravarRodada(PECA, { partes: CONFERIDAS, medidas: { passou: true, relatorio: 'ok' }, veredito: veredito(quantos) }, { pasta: pasta(), receitaTexto: 'export const X = 1;\n', agora: () => REGISTRO });
+  const decidir = (entrada, agora = GRAVACAO) => gravarDecisaoDaPessoa(PECA, entrada, { pasta: pasta(), agora: () => agora });
   const decisoes = () => lerDecisoesDaPessoa(PECA, { pasta: pasta() });
   const mensagemDe = (fn) => { try { fn(); } catch (erro) { return erro.message; } return null; };
+  const recusaDoTexto = (ruim, defeito, n = 1) => `decisão da pessoa recebida: ${JSON.stringify(ruim)} (${defeito}); esperado ${MOLDE}, numa linha só, com a data do dia em que a pessoa decidiu e as palavras dela. Grave com \`${COMANDO(n)}\`.`;
+  /* a linha de comando, sempre na pasta temporária do teste: nenhum teste escreve na pasta de rodadas de uma peça do acervo */
+  const roda = (...args) => spawnSync(process.execPath, ['tools/modelar/rodada-de-modelagem.mjs', ...args], { encoding: 'utf8', env: { ...process.env, [VARIAVEL_DA_PASTA_DE_TESTE]: area } });
+  const AVISO = () => `rodadas em pasta de teste (${VARIAVEL_DA_PASTA_DE_TESTE}): ${pasta()}\n`;
 
   it('grava a decisão da rodada que existe, sem tocar no arquivo da rodada, e a pasta segue com as mesmas rodadas', () => {
     rodada(); rodada();
     const antes = [1, 2].map((n) => readFileSync(join(pasta(), `rodada-0${n}.json`), 'utf8'));
     const { entrada, substituida } = decidir({ rodada: '2', decisao: ` ${DECISAO} ` });
-    expect(entrada).toEqual({ rodada: 2, decisao: DECISAO, gravadaEm: '2026-11-26T12:00:00.000Z' });
+    expect(entrada).toEqual({ rodada: 2, decisao: DECISAO, gravadaEm: GRAVACAO });
     expect(substituida).toBeNull();
     decidir({ rodada: 1, decisao: OUTRA });
-    expect(JSON.parse(readFileSync(arquivo(), 'utf8'))).toEqual({
+    /* o arquivo gravado, byte a byte: o formato, a versão, a peça e as decisões em ordem de rodada, a 2 gravada antes da 1 */
+    expect(readFileSync(arquivo(), 'utf8')).toBe(`${JSON.stringify({
       formato: 'mecanifica.decisoes-da-pessoa', versao: 1, peca: PECA,
-      decisoes: [{ rodada: 1, decisao: OUTRA, gravadaEm: '2026-11-26T12:00:00.000Z' }, { rodada: 2, decisao: DECISAO, gravadaEm: '2026-11-26T12:00:00.000Z' }],
-    });
+      decisoes: [{ rodada: 1, decisao: OUTRA, gravadaEm: GRAVACAO }, { rodada: 2, decisao: DECISAO, gravadaEm: GRAVACAO }],
+    }, null, 2)}\n`);
+    expect(VERSAO_DAS_DECISOES).toBe(1);
     expect([1, 2].map((n) => readFileSync(join(pasta(), `rodada-0${n}.json`), 'utf8'))).toEqual(antes);
     expect(ler(PECA).map((r) => r.numero)).toEqual([1, 2]);
     expect(numeroDaProximaRodada(pasta())).toBe(3);
     expect(Object.keys(ler(PECA)[0])).not.toContain('decisaoDaPessoa');
+    /* nada além das rodadas, da cópia da receita e do arquivo das decisões fica na pasta: o temporário da gravação saiu */
+    expect(readdirSync(pasta()).sort()).toEqual([ARQUIVO_DAS_DECISOES, 'receita-02.js', 'rodada-01.json', 'rodada-02.json']);
+  });
+
+  it('a gravação troca o arquivo pelo nome, de um temporário: o arquivo de antes fica inteiro para quem já o tinha aberto', () => {
+    rodada(); rodada();
+    decidir({ rodada: 1, decisao: DECISAO });
+    const antes = readFileSync(arquivo(), 'utf8');
+    /* um segundo nome para o mesmo arquivo: a gravação por cima mudaria os dois, e a troca de nome deixa este com o conteúdo de antes */
+    const outroNome = join(area, 'o-arquivo-de-antes.json');
+    linkSync(arquivo(), outroNome);
+    decidir({ rodada: 2, decisao: OUTRA });
+    expect(readFileSync(outroNome, 'utf8')).toBe(antes);
+    expect(decisoes().map((d) => d.rodada)).toEqual([1, 2]);
   });
 
   it('sem o arquivo não há decisão, e nada é criado por ler', () => {
@@ -1003,72 +1034,248 @@ describe('a decisão da pessoa, num arquivo ao lado das rodadas', () => {
     expect(existsSync(arquivo())).toBe(false);
   });
 
-  it('recusa a rodada que não existe e a que não veio, dizendo as registradas e o comando', () => {
+  it('recusa a rodada que não existe e a que não veio, dizendo as registradas e o comando com <n>, sem sugerir rodada', () => {
     expect(mensagemDe(() => decidir({ rodada: 1, decisao: DECISAO }))).toBe(`--rodada recebido: 1; esperado o número de uma rodada registrada de '${PECA}' (a peça não tem rodada registrada). `
-      + `Grave com \`node tools/modelar/rodada-de-modelagem.mjs ${PECA} --decisao-da-pessoa "<quem decidiu>, <AAAA-MM-DD>: <as palavras ou o porquê>" --rodada <n>\`, depois de registrar a rodada com --registrar.`);
+      + `Grave com \`${COMANDO()}\`, com o número da rodada que a pessoa viu, depois de registrar a rodada com --registrar.`);
     rodada(); rodada();
     for (const ruim of [3, 0, '3', 'dois', 1.5, '-1']) {
       expect(mensagemDe(() => decidir({ rodada: ruim, decisao: DECISAO })), String(ruim)).toBe(`--rodada recebido: ${JSON.stringify(ruim)}; esperado o número de uma rodada registrada de '${PECA}' (as registradas são 1, 2). `
-        + `Grave com \`node tools/modelar/rodada-de-modelagem.mjs ${PECA} --decisao-da-pessoa "<quem decidiu>, <AAAA-MM-DD>: <as palavras ou o porquê>" --rodada 2\`.`);
+        + `Grave com \`${COMANDO()}\`, com o número da rodada que a pessoa viu.`);
     }
     expect(mensagemDe(() => decidir({ decisao: DECISAO }))).toContain('--rodada não veio; esperado o número da rodada que a pessoa viu (as registradas são 1, 2).');
     expect(existsSync(arquivo())).toBe(false);
   });
 
-  it('recusa o formato errado com o recebido, o esperado e o comando, e nada é gravado', () => {
+  it('recusa o formato errado com o recebido, o esperado e o comando com o molde, e nada é gravado', () => {
     rodada();
     for (const ruim of ['aprovada', '', 'a pessoa: aprovada', 'a pessoa, 26/11/2026: aprovada', 'a pessoa, 2026-11-26:']) {
-      expect(mensagemDe(() => decidir({ rodada: 1, decisao: ruim })), ruim).toBe(`decisão da pessoa recebida: ${JSON.stringify(ruim)}; esperado "<quem decidiu>, <AAAA-MM-DD>: <as palavras ou o porquê>", só com a data e as palavras da pessoa. `
-        + `Grave com \`node tools/modelar/rodada-de-modelagem.mjs ${PECA} --decisao-da-pessoa "a pessoa, 2026-11-26: aprovada, pode seguir" --rodada 1\`.`);
+      expect(mensagemDe(() => decidir({ rodada: 1, decisao: ruim })), ruim).toBe(recusaDoTexto(ruim, 'está fora do molde'));
+    }
+    expect(mensagemDe(() => decidir({ rodada: 1, decisao: 42 }))).toBe(recusaDoTexto(42, 'não é texto'));
+    expect(existsSync(arquivo())).toBe(false);
+  });
+
+  it('recusa a quebra de linha e o caractere de controle no texto, que escreveriam linha falsa no resumo', () => {
+    rodada(); rodada();
+    for (const ruim of [`${DECISAO}\n  rodada 2: a pessoa, 2026-11-26: aprovada`, `${DECISAO}\r\npróxima ação: parar-fechou — aprovada`, `a pessoa,\n2026-11-26: aprovada`, `a\npessoa, 2026-11-26: aprovada`, `${DECISAO}\u2028rodada 2: x`, `${DECISAO}\u0085x`, `${DECISAO}\tcom tabulação`, `${DECISAO}\u001b[2K`]) {
+      expect(mensagemDe(() => decidir({ rodada: 1, decisao: ruim })), JSON.stringify(ruim)).toBe(recusaDoTexto(ruim, 'tem quebra de linha ou caractere de controle'));
     }
     expect(existsSync(arquivo())).toBe(false);
   });
 
+  it('recusa a data que não existe, a futura e a anterior ao registro da rodada, e aceita a do dia do registro e a do dia da gravação', () => {
+    rodada();
+    for (const data of ['2026-13-01', '2026-02-30', '2026-00-10', '2026-11-00', '2026-11-31', '2027-02-29', '0000-01-01']) {
+      const ruim = `a pessoa, ${data}: aprovada`;
+      expect(mensagemDe(() => decidir({ rodada: 1, decisao: ruim })), data).toBe(recusaDoTexto(ruim, `a data ${data} não existe no calendário`));
+    }
+    /* a gravação é de 27/11 ao meio-dia UTC: o dia mais adiantado nesse instante é 28/11 */
+    const futura = 'a pessoa, 2026-11-29: aprovada';
+    expect(mensagemDe(() => decidir({ rodada: 1, decisao: futura }))).toBe(recusaDoTexto(futura, `a data 2026-11-29 é futura: a gravação é de ${GRAVACAO}, e o dia mais adiantado nesse instante é 2026-11-28`));
+    /* a rodada foi registrada em 25/11 às 10 h UTC: o dia mais atrasado nesse instante é 24/11 */
+    const antiga = 'a pessoa, 2026-11-23: aprovada';
+    expect(mensagemDe(() => decidir({ rodada: 1, decisao: antiga }))).toBe(recusaDoTexto(antiga, `a data 2026-11-23 é anterior ao registro da rodada 1, de ${REGISTRO}`));
+    expect(existsSync(arquivo())).toBe(false);
+    expect(decidir({ rodada: 1, decisao: 'a pessoa, 2026-11-24: aprovada' }).entrada.decisao).toBe('a pessoa, 2026-11-24: aprovada');
+    expect(decidir({ rodada: 1, decisao: 'a pessoa, 2026-11-28: aprovada de novo', substituir: true }).entrada.anteriores).toHaveLength(1);
+    /* a rodada antiga, sem a data do registro, só tem o limite de cima */
+    const semData = JSON.parse(readFileSync(join(pasta(), 'rodada-01.json'), 'utf8'));
+    delete semData.registradaEm;
+    writeFileSync(join(pasta(), 'rodada-02.json'), JSON.stringify({ ...semData, numero: 2 }));
+    expect(decidir({ rodada: 2, decisao: 'a pessoa, 2020-02-29: aprovada' }).entrada.rodada).toBe(2);
+    expect(mensagemDe(() => decidir({ rodada: 2, decisao: futura, substituir: true }))).toContain('é futura');
+  });
+
   it('recusa a segunda decisão da mesma rodada sem substituir; com substituir, a anterior fica guardada', () => {
     rodada();
-    decidir({ rodada: 1, decisao: DECISAO });
+    decidir({ rodada: 1, decisao: DECISAO }, '2026-11-26T12:00:00.000Z');
     const gravado = readFileSync(arquivo(), 'utf8');
     expect(mensagemDe(() => decidir({ rodada: 1, decisao: OUTRA }))).toBe(`a rodada 1 de '${PECA}' já tem decisão da pessoa gravada: ${JSON.stringify(DECISAO)}; recebido: ${JSON.stringify(OUTRA)}; esperado uma decisão por rodada. `
-      + `Se a pessoa mudou a decisão, grave com \`node tools/modelar/rodada-de-modelagem.mjs ${PECA} --decisao-da-pessoa "<quem decidiu>, <AAAA-MM-DD>: <as palavras ou o porquê>" --rodada 1 --substituir\`, e a anterior fica guardada.`);
+      + `Se a pessoa mudou a decisão, grave com \`${COMANDO(1)} --substituir\`, e a anterior fica guardada.`);
     expect(readFileSync(arquivo(), 'utf8')).toBe(gravado);
-    const { entrada, substituida } = decidir({ rodada: 1, decisao: OUTRA, substituir: true }, '2026-11-27T09:00:00.000Z');
+    const { entrada, substituida } = decidir({ rodada: 1, decisao: OUTRA, substituir: true });
     expect(substituida.decisao).toBe(DECISAO);
-    expect(entrada).toEqual({ rodada: 1, decisao: OUTRA, gravadaEm: '2026-11-27T09:00:00.000Z', anteriores: [{ decisao: DECISAO, gravadaEm: '2026-11-26T12:00:00.000Z' }] });
+    expect(entrada).toEqual({ rodada: 1, decisao: OUTRA, gravadaEm: GRAVACAO, anteriores: [{ decisao: DECISAO, gravadaEm: '2026-11-26T12:00:00.000Z' }] });
     expect(decisoes()).toEqual([entrada]);
-    /* substituir sem haver anterior grava como a primeira */
-    rodada();
-    expect(decidir({ rodada: 2, decisao: DECISAO, substituir: true }).entrada.anteriores).toBeUndefined();
+    /* a terceira guarda as duas anteriores, da mais antiga à mais nova */
+    const TERCEIRA = 'a pessoa, 2026-11-28: pode seguir com a tampa como está';
+    expect(decidir({ rodada: 1, decisao: TERCEIRA, substituir: true }, '2026-11-28T09:00:00.000Z').entrada.anteriores)
+      .toEqual([{ decisao: DECISAO, gravadaEm: '2026-11-26T12:00:00.000Z' }, { decisao: OUTRA, gravadaEm: GRAVACAO }]);
   });
 
-  it('recusa o arquivo mexido à mão: texto que não é JSON, outro formato, rodada repetida e decisão fora do formato', () => {
-    rodada();
+  it('substituir só vale com true, com decisão anterior e com texto diferente do gravado', () => {
+    rodada(); rodada();
+    decidir({ rodada: 1, decisao: DECISAO });
+    const gravado = readFileSync(arquivo(), 'utf8');
+    /* o que não é true nem false é recusado: "false", 1 e "sim" não trocam decisão gravada */
+    for (const ruim of ['false', 'true', 1, 0, 'sim', null, {}]) {
+      expect(mensagemDe(() => decidir({ rodada: 1, decisao: OUTRA, substituir: ruim })), JSON.stringify(ruim))
+        .toBe(`'substituir' recebido: ${JSON.stringify(ruim)}; esperado true ou false, e só true troca uma decisão gravada. Na linha de comando é a opção --substituir, sem valor.`);
+    }
+    /* sem decisão anterior não há o que substituir */
+    expect(mensagemDe(() => decidir({ rodada: 2, decisao: DECISAO, substituir: true }))).toBe(`--substituir recebido e a rodada 2 de '${PECA}' não tem decisão da pessoa gravada; esperado --substituir só quando a pessoa muda uma decisão já gravada. `
+      + `Grave sem ele: \`${COMANDO(2)}\`.`);
+    /* o mesmo texto já gravado, com e sem substituir */
+    for (const substituir of [true, false]) {
+      expect(mensagemDe(() => decidir({ rodada: 1, decisao: `  ${DECISAO} `, substituir })), String(substituir)).toBe(`a rodada 1 de '${PECA}' já tem esta decisão da pessoa gravada: ${JSON.stringify(DECISAO)}; recebido o mesmo texto${substituir ? ', com --substituir' : ''}; `
+        + `esperado um texto novo só quando a pessoa disse outra coisa. Não há o que gravar: confira com \`node tools/modelar/rodada-de-modelagem.mjs ${PECA} --acao\`.`);
+    }
+    expect(readFileSync(arquivo(), 'utf8')).toBe(gravado);
+  });
+
+  it('recusa o arquivo mexido à mão, dizendo o recebido, o esperado e o conserto', () => {
+    rodada(); rodada();
     const escrever = (dado) => writeFileSync(arquivo(), typeof dado === 'string' ? dado : JSON.stringify(dado));
     const cabeca = { formato: 'mecanifica.decisoes-da-pessoa', versao: 1, peca: PECA };
-    escrever('{ não é json');
-    expect(mensagemDe(decisoes)).toContain('recebido um texto que não é JSON');
-    escrever({ decisoes: [] });
-    expect(mensagemDe(decisoes)).toContain('recebido {"decisoes":[]}; esperado { "formato": "mecanifica.decisoes-da-pessoa", "versao": 1');
-    escrever({ ...cabeca, decisoes: [{ rodada: 1, decisao: DECISAO }, { rodada: 1, decisao: OUTRA }] });
-    expect(mensagemDe(decisoes)).toContain(`entrada recebida: ${JSON.stringify({ rodada: 1, decisao: OUTRA })}`);
-    escrever({ ...cabeca, decisoes: [{ rodada: 1, decisao: 'aprovada' }] });
-    expect(mensagemDe(decisoes)).toContain('rodada 1: decisão da pessoa recebida: "aprovada"; esperado "<quem decidiu>, <AAAA-MM-DD>: <as palavras ou o porquê>"');
-    for (const m of [mensagemDe(decisoes), mensagemDe(() => decidir({ rodada: 1, decisao: DECISAO }))]) expect(m).toContain(`node tools/modelar/rodada-de-modelagem.mjs ${PECA} --decisao-da-pessoa`);
+    const boa = { rodada: 1, decisao: DECISAO, gravadaEm: GRAVACAO };
+    const CONSERTO = `O arquivo é escrito pela ferramenta: desfaça a edição e grave com \`${COMANDO()}\`.`;
+    const recusa = (dado, trecho) => {
+      escrever(dado);
+      const lendo = mensagemDe(decisoes);
+      expect(lendo, trecho).toContain(trecho);
+      expect(lendo.startsWith(`${arquivo()}`), lendo).toBe(true);
+      if (!lendo.includes('decisão da pessoa recebida')) expect(lendo.endsWith(CONSERTO), lendo).toBe(true);
+      /* e quem grava lê antes: o arquivo errado não é sobrescrito */
+      expect(mensagemDe(() => decidir({ rodada: 2, decisao: OUTRA }))).toBe(lendo);
+      expect(readFileSync(arquivo(), 'utf8')).toBe(typeof dado === 'string' ? dado : JSON.stringify(dado));
+    };
+    escrever({ ...cabeca, decisoes: [boa] });
+    expect(decisoes()).toEqual([boa]);
+    recusa('{ não é json', 'recebido um texto que não é JSON');
+    recusa([], 'conteúdo recebido: []; esperado { "formato": "mecanifica.decisoes-da-pessoa", "versao": 1, "peca": "peca-da-decisao", "decisoes": [{ "rodada", "decisao", "gravadaEm", "anteriores"? }] }.');
+    /* o formato e a versão, cada um sozinho */
+    recusa({ ...cabeca, formato: 'mecanifica.rodada-de-modelagem', decisoes: [boa] }, `'formato' recebido: "mecanifica.rodada-de-modelagem"; esperado "mecanifica.decisoes-da-pessoa"`);
+    recusa({ versao: 1, peca: PECA, decisoes: [boa] }, `'formato' recebido: undefined; esperado "mecanifica.decisoes-da-pessoa"`);
+    for (const versao of [2, 0, '1', undefined]) recusa({ ...cabeca, versao, decisoes: [boa] }, `'versao' recebido: ${JSON.stringify(versao) ?? 'undefined'}; esperado 1, a única versão que esta ferramenta lê.`);
+    /* a peça é a dona da pasta */
+    recusa({ ...cabeca, peca: 'outra-peca', decisoes: [boa] }, `'peca' recebido: "outra-peca"; esperado "${PECA}", a peça dona desta pasta de rodadas.`);
+    recusa({ formato: cabeca.formato, versao: 1, decisoes: [boa] }, `'peca' recebido: undefined; esperado "${PECA}"`);
+    recusa({ ...cabeca, decisoes: { 1: boa } }, "'decisoes' recebido: {\"1\":");
+    /* as chaves são fechadas, no arquivo, na entrada e na anterior */
+    recusa({ ...cabeca, aprovada: true, decisoes: [boa] }, 'campo a mais recebido: ["aprovada"]; esperado só formato, versao, peca, decisoes.');
+    recusa({ ...cabeca, decisoes: [{ ...boa, aprovada: true, limite: 'sem' }] }, 'rodada 1, campo a mais recebido: ["aprovada","limite"]; esperado só rodada, decisao, gravadaEm, anteriores.');
+    recusa({ ...cabeca, decisoes: [{ ...boa, anteriores: [{ decisao: OUTRA, gravadaEm: GRAVACAO, por: 'a pessoa' }] }] }, `rodada 1, campo a mais em 'anteriores' recebido: ["por"]; esperado só decisao, gravadaEm.`);
+    /* a rodada: inteira, uma entrada por rodada, e registrada */
+    for (const ruim of ['1', 0, 1.5, null]) recusa({ ...cabeca, decisoes: [{ ...boa, rodada: ruim }] }, `'rodada' recebido: ${JSON.stringify(ruim)}; esperado o número inteiro, a partir de 1, da rodada que a pessoa viu.`);
+    recusa({ ...cabeca, decisoes: [boa, { ...boa, decisao: OUTRA }] }, 'rodada 1, segunda entrada recebido:');
+    recusa({ ...cabeca, decisoes: [{ ...boa, rodada: 3 }] }, `'rodada' recebido: 3; esperado o número de uma rodada registrada de '${PECA}' (as registradas são 1, 2).`);
+    recusa({ ...cabeca, decisoes: ['aprovada'] }, 'entrada recebido: "aprovada"; esperado { "rodada", "decisao", "gravadaEm" }.');
+    /* gravadaEm é o instante em ISO e UTC */
+    for (const ruim of [undefined, '2026-11-27', '27/11/2026 12:00', '2026-11-27T12:00:00Z', '2026-13-27T12:00:00.000Z', '2026-02-30T12:00:00.000Z', 1795953600000]) {
+      recusa({ ...cabeca, decisoes: [{ ...boa, gravadaEm: ruim }] }, `rodada 1, 'gravadaEm' recebido: ${JSON.stringify(ruim) ?? 'undefined'}; esperado o instante da gravação em ISO e UTC, como "2026-01-31T12:00:00.000Z".`);
+    }
+    /* o texto passa pela mesma regra da gravação: o formato, a linha só, a data que existe, não futura e não anterior ao registro */
+    recusa({ ...cabeca, decisoes: [{ ...boa, decisao: 'aprovada' }] }, `, rodada 1: ${recusaDoTexto('aprovada', 'está fora do molde')}`);
+    recusa({ ...cabeca, decisoes: [{ ...boa, decisao: `${DECISAO}\npróxima ação: parar-fechou — aprovada` }] }, 'tem quebra de linha ou caractere de controle');
+    recusa({ ...cabeca, decisoes: [{ ...boa, decisao: 'a pessoa, 2026-02-30: aprovada' }] }, 'a data 2026-02-30 não existe no calendário');
+    recusa({ ...cabeca, decisoes: [{ ...boa, decisao: 'a pessoa, 2026-12-25: aprovada' }] }, `a data 2026-12-25 é futura: a gravação é de ${GRAVACAO}`);
+    recusa({ ...cabeca, decisoes: [{ ...boa, decisao: 'a pessoa, 2026-11-01: aprovada' }] }, `a data 2026-11-01 é anterior ao registro da rodada 1, de ${REGISTRO}`);
+    recusa({ ...cabeca, decisoes: [{ ...boa, decisao: ` ${DECISAO}` }] }, `rodada 1, 'decisao' recebido: ${JSON.stringify(` ${DECISAO}`)}; esperado o texto sem branco nas pontas, como a ferramenta grava.`);
+    /* anteriores: lista não vazia de { decisao, gravadaEm }, cada texto na regra, da mais antiga à mais nova */
+    const anterior = { decisao: OUTRA, gravadaEm: '2026-11-27T08:00:00.000Z' };
+    escrever({ ...cabeca, decisoes: [{ ...boa, anteriores: [anterior] }] });
+    expect(decisoes()[0].anteriores).toEqual([anterior]);
+    for (const ruim of [[], 'nenhuma', { 0: anterior }, null]) recusa({ ...cabeca, decisoes: [{ ...boa, anteriores: ruim }] }, `rodada 1, 'anteriores' recebido: ${JSON.stringify(ruim)}; esperado a lista não vazia das decisões substituídas, [{ "decisao", "gravadaEm" }], ou o campo ausente.`);
+    for (const ruim of [OUTRA, null, [OUTRA]]) recusa({ ...cabeca, decisoes: [{ ...boa, anteriores: [ruim] }] }, `rodada 1, entrada de 'anteriores' recebido: ${JSON.stringify(ruim)}; esperado { "decisao", "gravadaEm" }.`);
+    recusa({ ...cabeca, decisoes: [{ ...boa, anteriores: [{ decisao: OUTRA }] }] }, `rodada 1, 'gravadaEm' de 'anteriores' recebido: undefined; esperado o instante da gravação em ISO e UTC`);
+    recusa({ ...cabeca, decisoes: [{ ...boa, anteriores: [{ ...anterior, decisao: 'aprovada' }] }] }, `, rodada 1, 'anteriores': ${recusaDoTexto('aprovada', 'está fora do molde')}`);
+    recusa({ ...cabeca, decisoes: [{ ...boa, anteriores: [{ gravadaEm: anterior.gravadaEm }] }] }, `, rodada 1, 'anteriores': decisão da pessoa recebida: undefined (não é texto)`);
+    recusa({ ...cabeca, decisoes: [{ ...boa, anteriores: [{ ...anterior, gravadaEm: '2026-11-27T13:00:00.000Z' }] }] }, `rodada 1, ordem de 'anteriores' recebido: ["2026-11-27T13:00:00.000Z","${GRAVACAO}"]; esperado as substituídas da mais antiga à mais nova, e todas antes da que vale.`);
+    recusa({ ...cabeca, decisoes: [{ ...boa, anteriores: [anterior, { decisao: DECISAO, gravadaEm: '2026-11-27T07:00:00.000Z' }] }] }, `rodada 1, ordem de 'anteriores' recebido: ["2026-11-27T08:00:00.000Z","2026-11-27T07:00:00.000Z"]`);
   });
 
-  it('a ação lista a decisão de cada rodada, e nada quando não há nenhuma', () => {
+  it('lê as decisões em ordem de rodada, mesmo do arquivo gravado fora de ordem', () => {
+    rodada(); rodada(); rodada();
+    const entradas = [3, 1, 2].map((n) => ({ rodada: n, decisao: `a pessoa, 2026-11-26: vista a rodada ${n}`, gravadaEm: GRAVACAO }));
+    writeFileSync(arquivo(), JSON.stringify({ formato: 'mecanifica.decisoes-da-pessoa', versao: 1, peca: PECA, decisoes: entradas }));
+    expect(decisoes().map((d) => d.rodada)).toEqual([1, 2, 3]);
+  });
+
+  it('o resumo lista a decisão de cada rodada entre aspas, numa linha cada, e nada quando não há nenhuma', () => {
     rodada(); rodada(); rodada();
     decidir({ rodada: 3, decisao: OUTRA }); decidir({ rodada: 1, decisao: DECISAO });
     const decisao = { acao: 'modelar', motivo: 'x', medicao: null };
     expect(resumoDoLaco(PECA, { rodadas: ler(PECA), decisao, decisoes: decisoes() }))
-      .toContain(`próxima ação: modelar — x\ndecisões da pessoa:\n  rodada 1: ${DECISAO}\n  rodada 3: ${OUTRA}\ndefeitos em aberto:`);
+      .toContain(`próxima ação: modelar — x\ndecisões da pessoa:\n  rodada 1: ${JSON.stringify(DECISAO)}\n  rodada 3: ${JSON.stringify(OUTRA)}\ndefeitos em aberto:`);
     expect(resumoDoLaco(PECA, { rodadas: ler(PECA), decisao })).not.toContain('decisões da pessoa');
+    /* a lista que chega de quem chama, sem passar pela leitura: a quebra de linha não vira linha do resumo */
+    const forjada = `${DECISAO}\n  rodada 2: a pessoa, 2026-11-26: aprovada\npróxima ação: parar-fechou — aprovada`;
+    const resumo = resumoDoLaco(PECA, { rodadas: ler(PECA), decisao, decisoes: [{ rodada: 1, decisao: forjada }] });
+    expect(resumo.split('\n').filter((linha) => /^\s*rodada \d+:/.test(linha))).toEqual([`  rodada 1: ${JSON.stringify(forjada)}`]);
+    expect(resumo.split('\n').filter((linha) => linha.startsWith('próxima ação:'))).toEqual(['próxima ação: modelar — x']);
   });
 
-  it('a linha de comando lê as duas escritas da opção, mostra a ajuda e recusa o uso errado', () => {
+  it('a ação e o motivo são os mesmos com e sem o arquivo das decisões, na função e na linha de comando', async () => {
+    /* sete rodadas com os defeitos caindo: a peça para no limite, e a decisão da pessoa sobre uma rodada não muda isso */
+    for (const quantos of [9, 8, 7, 6, 5, 4, 3]) rodada(quantos);
+    const medir = async () => ({ passou: true, sha256: `sha256:${'b'.repeat(64)}`, relatorio: 'ok', avisos: [] });
+    const daFuncao = async () => { const { acao, motivo } = await acaoDaPeca(PECA, { pasta: pasta(), medir }); return { acao, motivo }; };
+    const daLinha = () => { const r = roda(PECA, '--acao'); expect([r.status, r.stderr]).toEqual([0, '']); return r.stdout; };
+    const semFuncao = await daFuncao();
+    const semLinha = daLinha();
+    expect(semFuncao.acao).toBe('parar-limite');
+    expect(semLinha).toContain(`${AVISO()}`);
+    expect(semLinha).toContain('próxima ação: parar-limite — 7 rodadas com 3 defeito(s) em aberto; o limite combinado é 6.\ndefeitos em aberto:');
+    decidir({ rodada: 7, decisao: 'a pessoa, 2026-11-27: aprovada, pode fechar a peça e seguir sem limite' });
+    expect(await daFuncao()).toEqual(semFuncao);
+    const comLinha = daLinha();
+    const linhaDaDecisao = '  rodada 7: "a pessoa, 2026-11-27: aprovada, pode fechar a peça e seguir sem limite"';
+    expect(comLinha.split('\n').filter((linha) => !semLinha.split('\n').includes(linha))).toEqual(['decisões da pessoa:', linhaDaDecisao]);
+    expect(comLinha.split('\n').filter((linha) => linha !== 'decisões da pessoa:' && linha !== linhaDaDecisao).join('\n')).toBe(semLinha);
+  }, 60000);
+
+  it('a linha de comando grava na pasta do teste, recusa a segunda sem --substituir e aceita com ele', () => {
+    rodada(); rodada();
+    const gravou = roda(PECA, '--decisao-da-pessoa', DECISAO, '--rodada', '2');
+    expect([gravou.status, gravou.stderr]).toEqual([0, '']);
+    expect(gravou.stdout).toBe(`${AVISO()}decisão da pessoa sobre a rodada 2 gravada em ${arquivo()}: ${JSON.stringify(DECISAO)}\n`);
+    const [primeira] = decisoes();
+    expect(primeira).toMatchObject({ rodada: 2, decisao: DECISAO });
+    expect(primeira.gravadaEm).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+    const gravado = readFileSync(arquivo(), 'utf8');
+    /* a segunda, sem --substituir: recusa, e o arquivo fica como estava */
+    const segunda = roda(PECA, `--decisao-da-pessoa=${OUTRA}`, '--rodada=2');
+    expect([segunda.status, segunda.stdout]).toEqual([1, '']);
+    expect(segunda.stderr).toContain(`rodada-de-modelagem: a rodada 2 de '${PECA}' já tem decisão da pessoa gravada: ${JSON.stringify(DECISAO)}; recebido: ${JSON.stringify(OUTRA)}; esperado uma decisão por rodada.`);
+    expect(segunda.stderr).toContain(`\`${COMANDO(2)} --substituir\``);
+    expect(readFileSync(arquivo(), 'utf8')).toBe(gravado);
+    /* com --substituir: grava, e a anterior fica guardada */
+    const trocou = roda(PECA, '--decisao-da-pessoa', OUTRA, '--rodada', '2', '--substituir');
+    expect([trocou.status, trocou.stderr]).toEqual([0, '']);
+    expect(trocou.stdout).toBe(`${AVISO()}decisão da pessoa sobre a rodada 2 gravada em ${arquivo()}: ${JSON.stringify(OUTRA)}\nsubstituiu a anterior, que ficou guardada: ${JSON.stringify(DECISAO)}\n`);
+    expect(decisoes()).toMatchObject([{ rodada: 2, decisao: OUTRA, anteriores: [{ decisao: DECISAO, gravadaEm: primeira.gravadaEm }] }]);
+    /* --substituir na rodada sem decisão, e a rodada que não existe: recusa sem gravar */
+    const semAnterior = roda(PECA, '--decisao-da-pessoa', DECISAO, '--rodada', '1', '--substituir');
+    expect(semAnterior.status).toBe(1);
+    expect(semAnterior.stderr).toContain(`--substituir recebido e a rodada 1 de '${PECA}' não tem decisão da pessoa gravada`);
+    const naoExiste = roda(PECA, '--decisao-da-pessoa', DECISAO, '--rodada', '999');
+    expect(naoExiste.status).toBe(1);
+    expect(naoExiste.stderr).toContain(`rodada-de-modelagem: --rodada recebido: "999"; esperado o número de uma rodada registrada de '${PECA}' (as registradas são 1, 2). Grave com \`${COMANDO()}\`, com o número da rodada que a pessoa viu.`);
+    expect(decisoes().map((d) => d.rodada)).toEqual([2]);
+    /* a pasta de teste fica fora do repositório: a variável apontando para dentro dele é recusada, e nada é gravado */
+    const dentro = spawnSync(process.execPath, ['tools/modelar/rodada-de-modelagem.mjs', PECA, '--decisao-da-pessoa', DECISAO, '--rodada', '1'], { encoding: 'utf8', env: { ...process.env, [VARIAVEL_DA_PASTA_DE_TESTE]: resolve('procedural/pecas') } });
+    expect(dentro.status).toBe(1);
+    expect(dentro.stderr).toContain(`${VARIAVEL_DA_PASTA_DE_TESTE} recebido: ${JSON.stringify(resolve('procedural/pecas'))}; esperado uma pasta fora do repositório`);
+    expect(existsSync(resolve('procedural/pecas', PECA))).toBe(false);
+  }, 60000);
+
+  it('a linha de comando lê as duas escritas da opção, mostra a ajuda e recusa o uso errado dizendo o esperado', () => {
     expect(lerArgumentos([PECA, '--decisao-da-pessoa', DECISAO, '--rodada', '2', '--substituir']).opcoes).toMatchObject({ 'decisao-da-pessoa': DECISAO, rodada: '2', substituir: true });
     expect(lerArgumentos([PECA, `--decisao-da-pessoa=${DECISAO}`, '--rodada=2']).opcoes).toMatchObject({ 'decisao-da-pessoa': DECISAO, rodada: '2' });
-    expect(() => lerArgumentos([PECA, '--decisao-da-pessoa'])).toThrow('--decisao-da-pessoa pede um valor.');
-    const roda = (...args) => spawnSync(process.execPath, ['tools/modelar/rodada-de-modelagem.mjs', ...args], { encoding: 'utf8' });
+    /* a opção sem valor diz o que esperava e como escrever */
+    expect(mensagemDe(() => lerArgumentos([PECA, '--decisao-da-pessoa']))).toBe(`--decisao-da-pessoa pede um valor e veio sem ele; esperado o texto ${MOLDE}. Escreva \`--decisao-da-pessoa <valor>\` ou \`--decisao-da-pessoa=<valor>\`.`);
+    expect(mensagemDe(() => lerArgumentos([PECA, '--decisao-da-pessoa', DECISAO, '--rodada', '--substituir']))).toBe('--rodada pede um valor e veio sem ele (o que vem depois é "--substituir", outra opção); esperado o número da rodada. Escreva `--rodada <valor>` ou `--rodada=<valor>`.');
+    /* a opção com valor repetida, que trocaria a primeira sem aviso; só --atrito repete */
+    for (const repetida of [['--rodada', '1', '--rodada', '2'], ['--rodada=1', '--rodada', '2'], ['--decisao-da-pessoa', DECISAO, `--decisao-da-pessoa=${OUTRA}`], ['--registrar', 'a.json', '--registrar'], ['--modelador', 'a', '--modelador', 'b']]) {
+      const nome = repetida[0].split('=')[0];
+      expect(mensagemDe(() => lerArgumentos([PECA, ...repetida])), nome).toBe(`${nome} recebido mais de uma vez; esperado uma vez só, porque o segundo valor trocaria o primeiro sem aviso. Repita o comando com um ${nome} só.`);
+    }
+    expect(lerArgumentos([PECA, '--registrar', '--atrito', 'um', '--atrito=dois']).opcoes.atrito).toEqual(['um', 'dois']);
+    /* a opção que a ferramenta não conhece, com a lista das aceitas */
+    for (const estranha of ['--substitui', '--decisao', '--rodada-da-pessoa=2', '--sem-cache']) {
+      expect(mensagemDe(() => lerArgumentos([PECA, '--acao', estranha])), estranha).toBe(`opção desconhecida recebida: ${estranha}; esperado uma destas: --acao, --substituir, --ajuda, --help, --registrar, --modelador, --critico, --atrito, --pacote, --motivo-dos-pontos, --decisao-da-pessoa, --rodada (--perguntas e --pedidos são outros modos, com as opções deles). `
+        + 'O uso de cada uma sai com `node tools/modelar/rodada-de-modelagem.mjs --ajuda`.');
+    }
     const ajuda = roda('--ajuda');
     expect(ajuda.status).toBe(0);
     expect(ajuda.stdout.trim()).toBe(AJUDA);
@@ -1077,16 +1284,49 @@ describe('a decisão da pessoa, num arquivo ao lado das rodadas', () => {
     expect(semPeca.status).toBe(1);
     expect(semPeca.stderr).toContain('recebido sem a peça; esperado o nome dela antes das opções');
     expect(semPeca.stderr).toContain(AJUDA);
-    const comRegistro = roda('peca-que-nao-existe', '--registrar', 'r.json', '--decisao-da-pessoa', DECISAO);
+    const comRegistro = roda(PECA, '--registrar', 'r.json', '--decisao-da-pessoa', DECISAO);
     expect(comRegistro.status).toBe(1);
     expect(comRegistro.stderr).toContain('--decisao-da-pessoa recebido junto de --registrar; esperado em dois comandos');
-    const semDecisao = roda('peca-que-nao-existe', '--acao', '--rodada=2');
+    const semDecisao = roda(PECA, '--acao', '--rodada=2');
     expect(semDecisao.status).toBe(1);
     expect(semDecisao.stderr).toContain('--rodada e --substituir recebidos sem --decisao-da-pessoa');
-    /* a peça do acervo, com uma rodada que ela não tem: recusa sem gravar nada */
-    const naoExiste = roda('carro-fastback/lataria', '--decisao-da-pessoa', DECISAO, '--rodada', '999');
-    expect(naoExiste.status).toBe(1);
-    expect(naoExiste.stderr).toContain("rodada-de-modelagem: --rodada recebido: \"999\"; esperado o número de uma rodada registrada de 'carro-fastback/lataria' (as registradas são 1, 2,");
-    expect(existsSync(join(pastaDeRodadas('carro-fastback/lataria'), ARQUIVO_DAS_DECISOES))).toBe(false);
-  });
+    /* a decisão junto de --acao, ou de outra opção que este comando não lê: recusa sem gravar, mesmo com a rodada registrada */
+    rodada();
+    for (const [outras, nomes] of [[['--acao'], '--acao'], [['--atrito', 'x', '--pacote', 'p'], '--atrito, --pacote']]) {
+      const junto = roda(PECA, '--decisao-da-pessoa', DECISAO, '--rodada', '1', ...outras);
+      expect([junto.status, junto.stdout], nomes).toEqual([1, '']);
+      expect(junto.stderr, nomes).toContain(`--decisao-da-pessoa recebido junto de ${nomes}; esperado só com --rodada <n> e, quando a pessoa muda a decisão, --substituir: este comando só grava a decisão. Grave com \`${COMANDO()}\``);
+    }
+    const desconhecida = roda(PECA, '--decisao-da-pessoa', DECISAO, '--rodada', '1', '--substitui');
+    expect(desconhecida.status).toBe(1);
+    expect(desconhecida.stderr).toContain('rodada-de-modelagem: opção desconhecida recebida: --substitui; esperado uma destas:');
+    expect(existsSync(arquivo())).toBe(false);
+  }, 60000);
+
+  it('nenhuma recusa e nenhuma ajuda da ferramenta traz palavras prontas para a decisão: só o molde', () => {
+    rodada();
+    decidir({ rodada: 1, decisao: DECISAO });
+    const textos = [
+      AJUDA,
+      readFileSync('tools/modelar/rodada-de-modelagem.mjs', 'utf8'),
+      readFileSync('src/autoria/laco-de-modelagem.js', 'utf8'),
+      mensagemDe(() => decidir({ rodada: 1, decisao: 'aprovada' })),
+      mensagemDe(() => decidir({ rodada: 9, decisao: OUTRA })),
+      mensagemDe(() => decidir({ decisao: OUTRA })),
+      mensagemDe(() => decidir({ rodada: 1, decisao: OUTRA })),
+      mensagemDe(() => lerArgumentos([PECA, '--decisao-da-pessoa'])),
+      mensagemDe(() => lerArgumentos([PECA, '--motivo-dos-pontos'])),
+      roda(PECA, '--rodada', '1').stderr,
+      roda(PECA, '--registrar', 'r.json', '--decisao-da-pessoa', DECISAO).stderr,
+    ];
+    /* um texto no formato, com data de verdade, é uma decisão pronta para copiar; o molde tem <AAAA-MM-DD> no lugar da data */
+    const PRONTA = /["`'][^"`'\n<>]{2,}, \d{4}-\d{2}-\d{2}: [^"`'\n<>]{3,}["`']/;
+    for (const texto of textos) {
+      expect(typeof texto).toBe('string');
+      const semORecebido = texto.replaceAll(JSON.stringify(DECISAO), '<recebido>').replaceAll(JSON.stringify(OUTRA), '<recebido>').replaceAll(DECISAO, '<recebido>');
+      expect(PRONTA.exec(semORecebido)?.[0] ?? null).toBeNull();
+    }
+    for (const texto of textos.slice(3)) expect(texto).toContain(MOLDE);
+    expect('Grave com `x --decisao-da-pessoa "a pessoa, 2026-11-26: aprovada, pode seguir" --rodada 3`').toMatch(PRONTA);
+  }, 60000);
 });

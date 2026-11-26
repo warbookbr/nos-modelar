@@ -7,7 +7,7 @@
  * rodada após rodada não são geometria a corrigir, são plano ou revisor fora do
  * lugar, e insistir ensina que o veredito é ruído. */
 import { describe, expect, it } from 'vitest';
-import { FORMATO_DE_QUEM, acaoDaReceita, defeitosAbertos, normalizarDecisaoDaPessoa, proximaAcao, registrarRodada } from './laco-de-modelagem.js';
+import { FORMATO_DE_QUEM, acaoDaReceita, defeitoDoTextoDeQuem, defeitosAbertos, normalizarDecisaoDaPessoa, proximaAcao, registrarRodada } from './laco-de-modelagem.js';
 
 const defeito = (parte, tipo = 'angulo', sentido = 'menor') => ({
   parte, tipo, onde: 'extremidade superior', sentido,
@@ -242,13 +242,33 @@ describe('o texto da decisão da pessoa sobre uma rodada', () => {
     expect(FORMATO_DE_QUEM).toBe('"<quem decidiu>, <AAAA-MM-DD>: <as palavras ou o porquê>"');
   });
 
-  it('recusa o formato errado dizendo o recebido, o esperado e o comando que grava certo', () => {
-    for (const ruim of ['aprovada', '', '   ', 'a pessoa: aprovada', 'a pessoa, 26/11/2026: aprovada', 'a pessoa, 2026-11-26:', 'a pessoa, 2026-11-26:   ', '2026-11-26: aprovada', 42, null, undefined, { texto: DECISAO }, [DECISAO]]) {
+  it('recusa o formato errado dizendo o recebido, o esperado e o comando com o molde, sem palavras prontas', () => {
+    const recusa = (ruim, defeito, opcoes = {}) => {
       let mensagem = null;
-      try { normalizarDecisaoDaPessoa(ruim, { peca: 'peca-de-ensaio', rodada: 3 }); } catch (erro) { mensagem = erro.message; }
-      expect(mensagem, JSON.stringify(ruim)).toBe(`laço de modelagem: decisão da pessoa recebida: ${JSON.stringify(ruim)}; esperado ${FORMATO_DE_QUEM}, só com a data e as palavras da pessoa. `
-        + 'Grave com `node tools/modelar/rodada-de-modelagem.mjs peca-de-ensaio --decisao-da-pessoa "a pessoa, 2026-11-26: aprovada, pode seguir" --rodada 3`.');
-    }
+      try { normalizarDecisaoDaPessoa(ruim, { peca: 'peca-de-ensaio', rodada: 3, ...opcoes }); } catch (erro) { mensagem = erro.message; }
+      expect(mensagem, JSON.stringify(ruim)).toBe(`laço de modelagem: decisão da pessoa recebida: ${JSON.stringify(ruim)} (${defeito}); esperado ${FORMATO_DE_QUEM}, numa linha só, com a data do dia em que a pessoa decidiu e as palavras dela. `
+        + `Grave com \`node tools/modelar/rodada-de-modelagem.mjs peca-de-ensaio --decisao-da-pessoa ${FORMATO_DE_QUEM} --rodada 3\`.`);
+      /* o comando da recusa traz o molde: nenhuma data de verdade e nenhuma palavra que a pessoa não disse */
+      expect(mensagem.slice(mensagem.indexOf('Grave com'))).not.toMatch(/\d{4}-\d{2}-\d{2}|aprovad|pode seguir/);
+    };
+    for (const ruim of ['aprovada', '', '   ', 'a pessoa: aprovada', 'a pessoa, 26/11/2026: aprovada', 'a pessoa, 2026-11-26:', 'a pessoa, 2026-11-26:   ', '2026-11-26: aprovada']) recusa(ruim, 'está fora do molde');
+    for (const ruim of [42, null, undefined, { texto: DECISAO }, [DECISAO]]) recusa(ruim, 'não é texto');
+    /* a quebra de linha no meio do texto, que tirar as pontas em branco não esconde */
+    for (const ruim of [`${DECISAO}\nrodada 2: a pessoa, 2026-11-26: aprovada`, 'a pessoa,\n2026-11-26: aprovada', 'a\rpessoa, 2026-11-26: aprovada', `${DECISAO}\tx`]) recusa(ruim, 'tem quebra de linha ou caractere de controle');
+    for (const data of ['2026-13-01', '2026-02-29', '2026-04-31', '2026-00-01', '2026-01-00']) recusa(`a pessoa, ${data}: aprovada`, `a data ${data} não existe no calendário`);
+    /* a data futura e a anterior ao registro da rodada, com os instantes que quem chama dá */
+    recusa('a pessoa, 2026-11-28: aprovada', 'a data 2026-11-28 é futura: a gravação é de 2026-11-26T09:59:59.000Z, e o dia mais adiantado nesse instante é 2026-11-26', { ate: '2026-11-26T09:59:59.000Z' });
+    recusa('a pessoa, 2026-11-27: aprovada', 'a data 2026-11-27 é futura: a gravação é de 2026-11-26T09:59:59.000Z, e o dia mais adiantado nesse instante é 2026-11-26', { ate: '2026-11-26T09:59:59.000Z' });
+    recusa('a pessoa, 2026-11-24: aprovada', 'a data 2026-11-24 é anterior ao registro da rodada 3, de 2026-11-26T12:00:00.000Z', { registradaEm: '2026-11-26T12:00:00.000Z' });
+  });
+
+  it('aceita a data bissexta, a do dia mais adiantado na gravação e a do dia mais atrasado no registro da rodada', () => {
+    expect(normalizarDecisaoDaPessoa('a pessoa, 2028-02-29: aprovada')).toBe('a pessoa, 2028-02-29: aprovada');
+    /* às 10 h UTC já é dia 27 em algum fuso, e às 11 h 59 UTC ainda é dia 25 em outro */
+    expect(normalizarDecisaoDaPessoa('a pessoa, 2026-11-27: aprovada', { ate: '2026-11-26T10:00:00.000Z' })).toBe('a pessoa, 2026-11-27: aprovada');
+    expect(normalizarDecisaoDaPessoa('a pessoa, 2026-11-25: aprovada', { registradaEm: '2026-11-26T11:59:59.000Z' })).toBe('a pessoa, 2026-11-25: aprovada');
+    expect(() => normalizarDecisaoDaPessoa('a pessoa, 2026-11-25: aprovada', { registradaEm: '2026-11-26T12:00:00.000Z' })).toThrow('é anterior ao registro da rodada');
+    expect(defeitoDoTextoDeQuem('a pessoa, 2026-11-26: mudou o alvo')).toBeNull();
   });
 
   it('a rodada não guarda a decisão: ela mora no arquivo ao lado, e o registro sai com as chaves de sempre', () => {
