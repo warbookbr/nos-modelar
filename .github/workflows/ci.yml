@@ -371,22 +371,30 @@ jobs:
   juntar:
     name: Juntar à main
     needs: [ rapidos, lentos, bancada, acervo ]
-    if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/claude/') || startsWith(github.ref, 'refs/heads/envio/'))
+    # Também na execução que este passo dispara depois de juntar a main andada ao ramo (workflow_dispatch), porque o envio
+    # feito com o GITHUB_TOKEN não dispara o CI de novo.
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && (startsWith(github.ref, 'refs/heads/claude/') || startsWith(github.ref, 'refs/heads/envio/'))
     runs-on: ubuntu-24.04
     permissions:
       contents: write
+      actions: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Avança a main até o commit que passou
-        run: |
-          git fetch origin main
-          if git merge-base --is-ancestor origin/main HEAD; then
-            git push origin HEAD:main
-          else
-            echo "A main andou desde a base deste ramo; junte a main ao ramo (git merge origin/main) e envie de novo."
-            exit 1
-          fi
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Com a main andada por outra sessão, o passo junta a main ao ramo, refaz os arquivos gerados (o mapa, os planos
+      # ativos, o índice do banco de provas, que não pedem dependência), envia o ramo e dispara o CI de novo sobre a junção,
+      # até três vezes; a nova execução é que avança a main, se passar. Com conflito ele para como antes. Em 10 dias de
+      # novembro, 13 execuções verdes se perderam na corrida e houve 57 junções à mão (análise do projeto, processo.md).
+      - name: Avança a main até o commit que passou, ou junta a main andada e roda de novo
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RAMO: ${{ github.ref_name }}
+        run: bash tools/ci/juntar-a-main.sh
+
