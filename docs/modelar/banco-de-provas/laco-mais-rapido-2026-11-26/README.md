@@ -233,9 +233,9 @@ O tempo não cai na proporção das imagens porque a maior parte dele é fixa. N
 
 O que sobra depois da mudança é a carga da peça a cada captura, que é a outra parte desta fatia (a bancada aquecida), e a montagem resolvida três vezes na peça de montagem (para a visibilidade, para as vistas montadas e para os cortes).
 
-### O conjunto padrão proposto
+### O conjunto padrão, aprovado pela pessoa
 
-A pessoa é quem aprova o conjunto. A proposta é esta, e a ferramenta não tem nome de peça: o que só serve a uma família entra pelo que a receita já declara (a instância de montagem, a peça de lataria de `src/autoria/lataria.js`, `CRITICA.cortes`, `dePerto`, `REFINA.esboco`, a prancha e o contorno citados no plano).
+A pessoa aprovou o conjunto em 2026-11-26 ("Aprovado, pode corrigir o enquadramento em seguida sem mudar o conjunto"), vendo as imagens da fuselagem do avião. O conjunto é este, e a ferramenta não tem nome de peça: o que só serve a uma família entra pelo que a receita já declara (a instância de montagem, a peça de lataria de `src/autoria/lataria.js`, `CRITICA.cortes`, `dePerto`, `REFINA.esboco`, a prancha e o contorno citados no plano).
 
 | nº | imagem | por que entra |
 | --- | --- | --- |
@@ -249,15 +249,15 @@ A pessoa é quem aprova o conjunto. A proposta é esta, e a ferramenta não tem 
 | 8 | a malha em raio X, traseira | o defeito de malha que fica atrás, com as arestas da frente e de trás na mesma imagem |
 | 9 | montada, isométrica (só na instância de montagem) | o contexto e a posição da peça entre as outras, com o quadro fechado nela |
 | 10 | montada, a ortogonal em que mais área da peça aparece (só na instância de montagem) | a segunda vista de contexto, escolhida pela medida: a peça comprida aparece mais de lado que de frente, a vista em que as outras a tapam não entra, e as áreas a menos de 20 % da maior empatam e fica a primeira da ordem frontal, traseira, direita, esquerda, superior, inferior (deu a direita na fuselagem e no cilindro) |
-| 11 | o corte do encaixe de menor folga (só na instância de montagem), mais os que a receita declara em `CRITICA.cortes` | a profundidade de um encaixe não se decide pela vista montada, e o cruzamento ou a peça solta aparece primeiro no par de menor folga |
+| 11 | o corte de todo encaixe que encosta ou cruza, com folga até 0,01 mm (só na instância de montagem), mais os que a receita declara em `CRITICA.cortes`; sem nenhum que encoste, o de menor folga e os que empatam com ele | a profundidade de um encaixe não se decide pela vista montada, e o cruzamento ou a peça solta aparece primeiro no par de menor folga |
 
-São oito imagens na peça sozinha e onze na instância de montagem. A peça de lataria leva mais cinco, todas na vista de três quartos, que mostra a frente, o lado e o topo de uma vez: a curvatura com a legenda, a luz rasante nas duas direções da luz e a zebra com a listra deitada e em pé. As duas primeiras são as que a decisão da pessoa de 2026-10-30 exige no pacote da peça de lataria, e o registro da rodada continua a cobrá-las.
+São oito imagens na peça sozinha e, na instância de montagem, dez mais um corte por encaixe que encosta (cinco na fuselagem do avião, um no cilindro da empilhadeira). A peça de lataria leva mais cinco, todas na vista de três quartos, que mostra a frente, o lado e o topo de uma vez: a curvatura com a legenda, a luz rasante nas duas direções da luz e a zebra com a listra deitada e em pé. As duas primeiras são as que a decisão da pessoa de 2026-10-30 exige no pacote da peça de lataria, e o registro da rodada continua a cobrá-las.
 
-Além do conjunto entram as partes que diferem da última rodada julgada pelo crítico, com as duas vistas isoladas de sempre e as vistas de perto que o plano declara para elas. A ferramenta acha a última rodada com veredito nos registros, executa a cópia da receita que essa rodada guardou e compara, parte por parte, a impressão da malha (as coordenadas dos vértices de cada face e o que a face carrega, sem os números da face e dos vértices, que mudam com um passo acrescentado antes) e a promessa do plano. Entra a parte de malha diferente, a de promessa diferente, a que a base não tinha e a que a malha de agora não tem, porque a parte prometida e não entregue tem de aparecer como ausência. Sem rodada julgada, sem a cópia ou com a cópia que não executa, todas as partes entram e o relatório diz por quê. O que a receita declara para comparar com a referência não muda: o alvo do esboço, a sobreposição dos cortes, a prancha desenhada e o contorno sobreposto.
+Além do conjunto entram as partes que diferem da última rodada julgada pelo crítico, com as duas vistas isoladas de sempre e as vistas de perto que o plano declara para elas. A ferramenta acha a última rodada com veredito nos registros e compara, parte por parte, a impressão das partes que essa rodada gravou com a da receita de agora: a impressão da malha (as coordenadas dos vértices de cada face e o que a face carrega, sem os números da face e dos vértices, que mudam com um passo acrescentado antes, mais a declaração em `MATERIAIS` do material que a parte usa) e a da promessa do plano. Entra a parte de malha diferente, a de promessa diferente, a que a base não tinha, a que a malha de agora não tem, porque a parte prometida e não entregue tem de aparecer como ausência, e a que o veredito da rodada cita num defeito. Sem rodada julgada, ou com a rodada julgada que não gravou a impressão (as registradas até 2026-11-26), todas as partes entram e o relatório diz por quê. A primeira versão executava de novo a cópia da receita que a rodada guardou, e a seção das correções, mais abaixo, diz por que isso saiu. O que a receita declara para comparar com a referência não muda: o alvo do esboço, a sobreposição dos cortes, a prancha desenhada e o contorno sobreposto.
 
-Ficam de fora do padrão e voltam com `--completo`: a malha em arame vista de trás, as outras cinco vistas montadas, os cortes dos encaixes de folga maior, a vista isolada das partes que não mudaram e, na lataria, a pintura e as vistas de frente, de lado e de cima da zebra, da curvatura e da luz rasante.
+Ficam de fora do padrão e voltam com `--completo`: a malha em arame vista de trás, as outras cinco vistas montadas, os cortes dos encaixes de folga maior que o limiar, a vista isolada das partes que não mudaram nem foram citadas num defeito e, na lataria, a pintura e as vistas de frente, de lado e de cima da zebra, da curvatura e da luz rasante.
 
-O `pedido.md` do pacote padrão abre com um parágrafo que lista o que entrou, com o porquê de cada grupo, e o que ficou de fora, e a seção das partes diz quais não têm vista isolada. O texto fala das imagens e não cita receita, rodada nem cópia; a rodada com que as partes foram comparadas fica no relatório de quem conduz e no `pacote.json` (`pacote.partes.comparadasComARodada`). O pedido do pacote completo é o de antes, sem o parágrafo.
+O `pedido.md` do pacote padrão abre com um parágrafo que lista o que entrou e o que ficou de fora, e a seção das partes diz quais não têm vista isolada e que elas aparecem nas vistas da peça inteira, sem dizer por que uma parte tem vista e a outra não. O texto fala das imagens e não cita receita, rodada nem cópia, nem diz que uma parte já foi vista; a rodada com que as partes foram comparadas fica no relatório de quem conduz e no `pacote.json` (`pacote.partes.comparadasComARodada`). O pedido do pacote completo é o de antes, sem o parágrafo.
 
 ### As imagens para a pessoa ver
 
@@ -265,10 +265,76 @@ Os três pacotes padrão medidos ficaram em `tools/bancadas/out/`, fora do git, 
 
 ### A cópia da receita da rodada com decisão da pessoa
 
-Até aqui `rodada-de-modelagem.mjs` guardava em `rodadas/receita-NN.js` só a cópia da última rodada, e a geometria que a pessoa julgou numa rodada anterior se perdia na seguinte: foi o que impediu de recuperar os raios da roda esportiva e o para-brisa da fuselagem para a calibração. O registro de uma rodada nova passa a manter a cópia de toda rodada que tem decisão em `decisoes-da-pessoa.json` e a da última rodada com veredito do crítico, que é a base da comparação das partes. `--decisao-da-pessoa` diz onde a cópia da rodada ficou; quando ela já saiu e a receita atual ainda é a versão que a rodada registrou (a impressão do texto bate com `receita.sha256` do registro), a cópia é refeita; quando é outra versão, a decisão é gravada e o comando avisa, com o caminho que falta, a impressão registrada e os dois comandos de `git` que a recuperam se a versão foi a um commit. Com o arquivo das decisões ilegível, nenhuma cópia é apagada.
+Até aqui `rodada-de-modelagem.mjs` guardava em `rodadas/receita-NN.js` só a cópia da última rodada, e a geometria que a pessoa julgou numa rodada anterior se perdia na seguinte: foi o que impediu de recuperar os raios da roda esportiva e o para-brisa da fuselagem para a calibração. O registro de uma rodada nova passa a manter a cópia das rodadas que têm decisão em `decisoes-da-pessoa.json`, até o limite descrito nas correções, e a da última rodada com veredito do crítico, com que `--acao` compara a forma julgada com a atual. `--decisao-da-pessoa` diz onde a cópia da rodada ficou; quando ela já saiu e a receita atual tem o texto e a impressão das partes que a rodada gravou, a cópia é refeita; quando não, a decisão é gravada e o comando avisa, com o caminho que falta, a impressão registrada e os dois comandos de `git` que a recuperam se a versão foi a um commit. Com o arquivo das decisões ilegível, nenhuma cópia é apagada.
 
 Os testes cobrem os dois sentidos em `tools/modelar/rodada-de-modelagem.test.mjs`, no bloco "a cópia da receita da rodada com decisão da pessoa": a rodada decidida mantém a cópia depois de duas rodadas, e a rodada sem decisão a perde como antes; a decisão sobre rodada antiga refaz a cópia ou avisa; a última julgada fica quando a seguinte não tem veredito; e a linha de comando diz onde a cópia está.
 
 ### O que ficou de fora desta parte
 
-O conjunto padrão é proposta: a recalibração do crítico com ele espera a aprovação da pessoa. O registro da rodada não grava se o crítico julgou o pacote padrão ou o completo; o dado está no `pacote.json` da pasta da rodada, fora do git. Os documentos de uso que descrevem o pacote (`docs/modelar/usar/REFERENCIA-E-CRITICA-VISUAL.md` diz "as vistas da peça e de cada parte") estão fora do território deste plano e não foram mudados. A pergunta fechada de uma parte sem vista isolada continua no `pedido-fechado-*.md`, respondida pelas vistas da peça sozinha.
+A recalibração do crítico com o conjunto padrão, que a pessoa aprovou, é o passo seguinte e não foi feita aqui. O registro da rodada não grava se o crítico julgou o pacote padrão ou o completo; o dado está no `pacote.json` da pasta da rodada, fora do git. Os documentos de uso que descrevem o pacote (`docs/modelar/usar/REFERENCIA-E-CRITICA-VISUAL.md` diz "as vistas da peça e de cada parte") estão fora do território deste plano e não foram mudados. A pergunta fechada de uma parte sem vista isolada continua no `pedido-fechado-*.md`, respondida pelas vistas da peça sozinha.
+
+## As correções da revisão adversarial do pacote padrão e o enquadramento
+
+Feito em 2026-11-26 sobre o commit `466e027e`, na mesma máquina, uma captura por vez. A revisão adversarial do commit `5726ca45` bloqueou com sete achados, e cada correção tem teste que falha antes e passa depois, em `tools/modelar/vistas-para-critica.test.mjs`, `tools/modelar/rodada-de-modelagem.test.mjs`, `tools/modelar/olhar-bancada.test.mjs` e `tools/modelar/olhar-bancada-visoes.test.mjs`.
+
+### A base da comparação das partes
+
+A cópia `rodadas/receita-NN.js` importa os módulos pelo caminho relativo, e executá-la hoje usa os módulos de hoje. Uma mudança feita numa ferramenta ou num módulo que a receita importa saía igual na cópia e na receita atual, a parte ficava sem vista isolada e o crítico não a via de perto. A cópia que `--decisao-da-pessoa` refazia tinha o mesmo defeito: bastava o texto de `receita.js` ser o da rodada para ela valer como a geometria julgada.
+
+A base passou a ser um dado gravado. O pacote tira a impressão das partes da receita executada (`impressaoDasPartes`: por parte, a impressão da malha e a da promessa do plano) e a grava no `pacote.json`. O registro do veredito a confere contra a receita medida na hora do registro e a grava no `rodada-NN.json`, no campo `impressaoDasPartes`. O pacote seguinte lê esse campo da última rodada julgada e compara com a impressão da receita de agora. Como a impressão é do resultado da execução, a mudança num módulo importado aparece nela com o texto da receita igual.
+
+O teste "só o módulo que a receita importa muda desde a rodada julgada" monta duas pastas com o mesmo `receita.js` e um `modulo.js` diferente em cada uma, grava na rodada julgada a impressão da primeira e gera o pacote da segunda sem trocar nada na leitura das rodadas nem na execução: a parte cuja malha depende do módulo leva vista isolada. A pasta de rodadas do teste tem também a cópia `receita-02.js`, de texto igual ao de agora, que é o caso em que a versão anterior deixava a parte sem vista.
+
+As rodadas registradas até aqui não têm a impressão, e a invariante do plano é que nenhuma rodada registrada muda. Por isso o primeiro pacote padrão de cada peça do acervo sai com a vista isolada de todas as partes, com o aviso que diz por quê, e a escolha das partes passa a valer da rodada julgada seguinte em diante. É a diferença entre as medidas de antes e de agora na tabela abaixo.
+
+### As outras seis correções
+
+A parte citada em `defeitos[].parte` do veredito da rodada base leva vista isolada mesmo com a malha e a promessa iguais. Na lataria do carro, com a rodada 7 de nota 6, a chapa e o rebaixo lateral saíam sem vista; hoje entram de qualquer modo, porque a rodada 7 não tem a impressão, e passam a entrar pelo defeito quando ela existir.
+
+O `pedido.md` não diz mais por que uma parte tem vista isolada. As frases "a malha dela difere da já julgada", "ela ainda não foi julgada", "não há julgamento anterior" e "com a malha e a forma prometida já julgadas" saíram, e ficou "a vista isolada das partes" de um lado e "que aparecem nas vistas da peça inteira" do outro, com a frase de que a falta da vista isolada não é ausência da parte e não diz que ela está certa. O teste das palavras de história passou a recusar, no que o pacote padrão acrescenta ao pedido, as formas de julgar no passado, diferir, mudar, anterior, aprovar, conferir, antes, ainda não e já, e confere que as quatro frases antigas seriam recusadas. O motivo de cada parte continua no relatório de quem conduz e no `pacote.json`.
+
+No corte dos encaixes a escolha era o primeiro da lista ordenada pela folga, e de dois encaixes de folga zero, um apoio que encosta e um pino que fura, o segundo saía do pacote e o pedido o listava como "de folga maior". Agora entram todos os encaixes de folga até `FOLGA_DE_CONTATO_MM` (0,01 mm) e os declarados em `CRITICA.cortes`; sem nenhum que encoste, entra o de menor folga com os que empatam com ele. O pedido diz o limiar, e o que fica de fora tem folga maior que ele. A escolha e o desenho saíram de `cortesDosEncaixes` para `cortesDasFolhas`, que o teste exercita inteira com as folhas de prova, sem dublê, e gravando as imagens; o mutante que tira o `|| e.declarado` do filtro morre nele. Na fuselagem do avião os cinco encaixes têm folga zero (asas, as duas empenagens, motor e trem do nariz), e o pacote dela leva cinco cortes onde levava um.
+
+O registro do veredito confere, em toda peça, que o `pacote.json` da pasta do pacote é da peça, mostra o texto da receita medida e mostra as mesmas partes; antes só a peça de lataria tinha conferência, e só do texto. A recusa diz o recebido, o esperado e o comando que refaz o pacote. A pasta sem `pacote.json` é recusada, e o pacote gerado antes desta correção, que não traz a impressão das partes, passa pelo texto e a rodada grava a impressão medida no registro.
+
+As cópias de rodada com decisão da pessoa ganharam limite, que é proposta e espera a palavra dela. Ficam na pasta as das três rodadas decididas mais novas (`COPIAS_COM_DECISAO_NA_PASTA`), a da última rodada julgada e a da última rodada. A cópia de uma rodada decidida mais antiga só sai quando o último commit do git a tem com o mesmo conteúdo (`estaIgualNoGit`), e o aviso de `--decisao-da-pessoa` já traz os dois comandos de `git` que a recuperam. Foi o limite mais simples que não perde a geometria julgada: a contagem sozinha apagaria a cópia que ainda não foi a um commit. A decisão da pessoa é texto livre, de modo que o limite não distingue a reprovação do aceite.
+
+O `MATERIAIS` da receita entra na impressão da parte: a face guarda só o nome do material, e a cor trocada na declaração mudava a imagem sem mudar a impressão. Entra a declaração de cada material que as faces da parte citam, e só neles.
+
+Nove mutantes foram postos à mão e os nove morreram: o `|| e.declarado` do filtro, o limiar sem o piso do contato, a parte citada no defeito, a comparação das partes no registro, a do texto da receita no registro, a base no lugar da impressão de agora, o material fora da impressão, o `recuperavel` do limite das cópias e a comparação das partes na cópia refeita.
+
+### O enquadramento das vistas da peça sozinha
+
+A bancada enquadra cada vista para a tela dela, que reserva os lados para os painéis (`meiaAlturaParaVista`, em `src/bancada/criar-ambiente.js`, com 48 % da largura e 62 % da altura). No pacote, que sai em modo de auditoria e sem painel, a peça ficava com no máximo 48 % da largura do quadro. As cinco capturas da peça sozinha (a revisão de quatro vistas, a de trás, a da esquerda, o arame e o raio X) passaram a pedir `enquadrar`, que já existia em `tools/modelar/olhar-bancada.mjs` para as visões de reflexo e fecha a câmera no que está à vista até a maior dimensão ocupar 92 % do quadro. Para isso o `enquadrar` passou a valer junto de `--revisar` e a reaproveitar a página aberta; a chamada que recebe uma página já usada volta o zoom da câmera a 1 antes de qualquer quadro, e o teste com navegador confere que a vista sem `enquadrar`, tirada na página que serviu a uma enquadrada, sai igual byte a byte à da página nova.
+
+O pedido não depende da escala entre vistas: cada vista já tinha o quadro dela, o texto do pedido não compara tamanho de uma vista com o de outra, e a prancha desenhada, a sobreposição e as vistas montadas têm captura própria. O conjunto de imagens não mudou. A ocupação, lida do `pacote.json` de cada pacote:
+
+| vista da fuselagem do avião | antes | depois |
+| --- | --- | --- |
+| isométrica (e o arame) | 44,2 % por 14,0 % | 92,0 % por 29,1 % |
+| frontal | 48,0 % por 36,9 % | 92,0 % por 70,7 % |
+| direita e esquerda | 48,0 % por 7,1 % | 92,0 % por 13,6 % |
+| superior | 15,8 % por 62,0 % | 23,4 % por 92,0 % |
+| traseira (e o raio X) | 48,0 % por 36,9 % | 92,0 % por 70,7 % |
+
+No cilindro de inclinação da empilhadeira as mesmas vistas ficaram em 92,0 % por 49,2 % na isométrica, 92,0 % por 69,8 % na frontal e na traseira, 92,0 % por 29,9 % nas laterais e 52,0 % por 92,0 % na superior. O quadro continua de 1100 por 1450, em pé, que é a resolução fixa do tipo no `pacote.json`; a peça comprida enche a largura e deixa a altura, e trocar a proporção do quadro por vista mudaria a resolução por tipo, o que ficou fora desta correção. As vistas isoladas das partes continuam com o foco da bancada, a 48 % da largura, porque o pedido foi a peça sozinha.
+
+### O tempo, antes e depois
+
+| medida da fuselagem do avião | tempo | imagens na pasta | capturas da bancada |
+| --- | --- | --- | --- |
+| antes das correções e do enquadramento, sem vista de parte | 46,0 s | 11 | 24,4 s |
+| depois, com o mesmo conjunto sem vista de parte | 57,8 s | 15 | 35,2 s |
+| depois, como o comando sai hoje, com as treze partes | 86,7 s | 41 | 63,6 s |
+
+A segunda linha foi medida com a rodada base trocada por uma que grava a impressão de agora, que é como o pacote sairá depois da próxima rodada julgada da peça. As quatro imagens a mais são os cortes dos encaixes que o empate tirava, e somam 1 s. Os 10,8 s a mais das capturas são do quadro cheio: medidas uma a uma, as cinco capturas da peça sozinha foram de 14,7, 2,8, 1,7, 2,0 e 3,1 s para 18,7, 5,2, 2,5, 3,0 e 5,5 s, com uma carga de página nos dois casos. A peça cobre perto de quatro vezes mais pontos do quadro, e o navegador sem placa de vídeo desenha por software. Uma volta só do ajuste na câmera ortográfica, no lugar das cinco, não mudou o tempo e foi desfeita. O cilindro de inclinação saiu em 90,5 s com 15 imagens, contra 71,9 s com 11 na medida anterior, com as duas partes em vista isolada.
+
+### As imagens para a pessoa conferir
+
+Os dois pacotes ficaram em `tools/bancadas/out/`, fora do git: `critica-aviao-fuselagem/rodada-04/` e `critica-empilhadeira-cilindro-inclinacao/rodada-02/`. As vistas da peça sozinha são `bancada-<peça>-<vista>-orto-enquadrado.png` nas seis vistas, `...-isometrica-orto-arame-enquadrado.png` e `...-traseira-orto-raio-x-enquadrado.png`. Elas se regeneram com `npm run vistas:critica -- aviao/fuselagem` e `npm run vistas:critica -- empilhadeira/cilindro-inclinacao`.
+
+### O que ficou de fora
+
+A ação da rodada (`--acao`) ainda compara a forma julgada com a atual executando a cópia da última rodada julgada com os módulos de hoje (`impressaoDaForma`), que é o mesmo defeito do primeiro achado noutro lugar; a rodada que grava a impressão das partes já tem o dado para trocar essa comparação, e a troca não foi pedida aqui. Os documentos de uso que descrevem o pacote, fora do território deste plano, não foram mudados. O nome novo dos arquivos das vistas da peça sozinha faz o antes e depois não achar a imagem de mesmo nome no pacote da rodada anterior, na primeira rodada depois da mudança.
+
+O roteiro `modelar/rodada` lia 12.047 bytes contra o orçamento de 11.900 desde o commit `5726ca45`, que pôs no corpo da skill do laço a frase sobre a cópia da receita da rodada decidida, e `npm run roteiros:check` reprovava. A frase foi para o apoio `pacote-e-referencia.md`, com o limite das cópias, e o gate voltou a passar.

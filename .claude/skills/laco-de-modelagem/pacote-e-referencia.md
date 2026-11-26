@@ -35,14 +35,24 @@ de novo), com o caminho de todas as imagens e o lado de onde cada vista olha. As
 declara `familia` ou `familiaProcedural`, e, quando a receita declara `REFINA.esboco`, a de onde o alvo difere da referência real:
 o para-brisa saliente do avião veio do esboço, passou por dois críticos e só a pessoa o viu.
 
-Sem opção sai o pacote padrão, proposto em 2026-11-26 e ainda à espera da aprovação da pessoa: as seis vistas da peça sozinha, a malha
-em arame de três quartos e em raio X de trás, na peça de montagem a vista montada isométrica e a ortogonal em que mais área da peça
-aparece, com o corte do encaixe de menor folga, na peça de lataria a curvatura, a luz rasante e a zebra na vista de três quartos, e a
-vista isolada só das partes cuja malha ou promessa difere da cópia da receita da última rodada que o crítico julgou. Sem rodada julgada
-ou sem a cópia, todas as partes entram, e o relatório do comando diz por quê. O `pedido.md` diz ao crítico o que entrou e o que ficou de
-fora, sem citar receita nem rodada. Quando a rodada pedir tudo (uma reprovação da pessoa sobre uma parte que
-não mudou, uma dúvida de superfície fora da vista de três quartos), rode `npm run vistas:critica -- <peça> --completo`, que monta o
-pacote de antes, com todas as vistas e a vista isolada de todas as partes.
+Sem opção sai o pacote padrão, que a pessoa aprovou em 2026-11-26: as seis vistas da peça sozinha, a malha em arame de três quartos e
+em raio X de trás, com a peça enchendo o quadro, na peça de montagem a vista montada isométrica e a ortogonal em que mais área da peça
+aparece, com o corte de todo encaixe que encosta ou cruza (folga até 0,01 mm) e os que a receita declara, na peça de lataria a
+curvatura, a luz rasante e a zebra na vista de três quartos, e a vista isolada só das partes cuja malha ou promessa difere da impressão
+das partes que a última rodada julgada pelo crítico gravou, mais as que o veredito dela cita num defeito. Sem rodada julgada, ou com a
+rodada julgada que não gravou a impressão (as registradas até 2026-11-26), todas as partes entram, e o relatório do comando diz por
+quê. O `pedido.md` diz ao crítico o que entrou e o que ficou de fora, sem citar receita nem rodada e sem dizer por que uma parte tem
+vista isolada. Quando a rodada pedir tudo (uma reprovação da pessoa sobre uma parte que não mudou, uma dúvida de superfície fora da
+vista de três quartos), rode `npm run vistas:critica -- <peça> --completo`, que monta o pacote de antes, com todas as vistas e a vista
+isolada de todas as partes.
+
+O registro do veredito confere, em toda peça, que o `pacote.json` da pasta do pacote mostra a receita medida, no texto e na impressão
+das partes; se a receita ou um módulo que ela importa mudou depois do pacote, o registro recusa e manda gerar o pacote e despachar o
+crítico de novo. Por isso o pacote feito com `--saida` vai ao registro em `--pacote <pasta>`.
+
+A cópia da receita da rodada com decisão da pessoa (`rodadas/receita-NN.js`) fica guardada pelas rodadas seguintes, e o comando da
+decisão diz onde ela está ou avisa quando ela já não existe. Além das três rodadas decididas mais novas, a cópia mais antiga só sai da
+pasta quando o git a tem igual, e por isso a decisão e a cópia vão ao commit da rodada.
 
 O pacote inteiro mora nessa pasta, com as capturas da bancada, e ficam a desta rodada e a da anterior. O `pacote.json` grava a
 resolução, fixa por tipo de imagem, e a câmera de cada uma. Para ver o que mudou entre as duas rodadas na mesma câmera, rode

@@ -4,9 +4,9 @@
    O pedido de uma receita de prova (o bloco furado, que refina um esboço) e o de uma peça de montagem (o motor do avião) são lidos de
    verdade, e só o que custa navegador é trocado. */
 import { spawnSync } from 'node:child_process';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { basename, dirname, join } from 'node:path';
+import { basename, dirname, join, relative, resolve } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
 import { aceitesVigentes } from '../../src/autoria/etapas-pela-impressao.js';
 import { lerPergunta } from '../../src/autoria/perguntas-do-critico.js';
@@ -17,7 +17,8 @@ import {
   ARQUIVO_DAS_PERGUNTAS_FECHADAS, FORMATO_DAS_PERGUNTAS_FECHADAS, NAO_DA_PARA_VER, NAO_VERIFICAVEL, REGRA_DA_NOTA, arquivoDoPedidoFechado, juntarOrdens, lerRespostasFechadas,
   montarPedidoFechado, notaDasRespostas, notaEscrita, normalizarResposta, perguntasFechadas, relatorioDaJuncao, relatorioDasNotas, respostasQueMudaram, variacaoDasNotas,
   ARQUIVO_DOS_DADOS_DO_PEDIDO, afirmacoesDaForma, gravarPedidos, notaPelaRegra, pesosDasPerguntas, refazerPedidos, semMedidas,
-  CORTES_DO_PADRAO, EMPATE_DA_AREA_MONTADA, MONTADAS_DO_PADRAO, PACOTE_COMPLETO, PACOTE_PADRAO, VISTAS_DE_SUPERFICIE_NO_PADRAO, comandoDoCompleto, descricaoDoPacotePadrao, imagensCitadas, impressoesDasPartes, montadasDoPadrao,
+  FOLGA_DE_CONTATO_MM, SEM_PARTE, cortesDosEncaixes, ehImpressaoDasPartes, encaixesDoPadrao, impressaoDasPartes, impressaoDasPartesDaReceita, partesCitadasNosDefeitos, partesQueDiferem, registroDaRodada,
+  EMPATE_DA_AREA_MONTADA, MONTADAS_DO_PADRAO, PACOTE_COMPLETO, PACOTE_PADRAO, VISTAS_DE_SUPERFICIE_NO_PADRAO, comandoDoCompleto, descricaoDoPacotePadrao, imagensCitadas, impressoesDasPartes, montadasDoPadrao,
   partesComVistaIsolada, ultimaRodadaJulgada,
   FOLGA_DO_ENQUADRAMENTO, PASTA_DO_ANTES_E_DEPOIS, RESOLUCAO_POR_TIPO, antesEDepois, apagarPacotesAntigos, imagensDoPacote, pacotesDaPeca, pastasDoAntesEDepois, relatorioDoAntesEDepois, resolucaoDoPng, tipoDaCaptura,
 } from './vistas-para-critica.mjs';
@@ -324,24 +325,76 @@ describe('o pacote padrão: o conjunto de umas dez imagens e as partes que difer
     const lisa = malha({ bloco: [1, 0] });
     lisa.F.get(1).liso = true;
     expect(impressoesDasPartes(lisa).get('bloco')).not.toBe(a.get('bloco'));
-    /* a face sem parte fica de fora, e a malha vazia não tem parte */
+    /* as faces sem parte entram juntas, com nome próprio, e a malha vazia não tem parte */
     const semParte = malha({ bloco: [1, 0] });
     semParte.F.set(9, { vs: [1, 2, 3] });
-    expect([...impressoesDasPartes(semParte).keys()]).toEqual(['bloco']);
+    expect([...impressoesDasPartes(semParte).keys()]).toEqual(['bloco', SEM_PARTE]);
+    expect(impressoesDasPartes(semParte).get('bloco')).toBe(a.get('bloco'));
     expect(impressoesDasPartes(null).size).toBe(0);
   });
 
-  it('entra a parte de malha diferente, a de promessa diferente, a nova e a que a malha não tem; sem base, todas', () => {
-    const plano = (forma) => ({ partes: [{ nome: 'a', forma: 'caixa', tecnica: 't' }, { nome: 'b', forma, tecnica: 't' }, { nome: 'c', forma: 'c', tecnica: 't' }, { nome: 'd', forma: 'd', tecnica: 't' }, { nome: 'e', forma: 'e', tecnica: 't' }] });
-    const base = { malhas: new Map([['a', '1'], ['b', '2'], ['c', '3'], ['e', '5']]), plano: plano('tubo') };
-    const atual = { malhas: new Map([['a', '1'], ['b', '2'], ['c', '3x'], ['d', '4']]), plano: plano('tubo com rebaixo') };
-    expect(partesComVistaIsolada(['a', 'b', 'c', 'd', 'e'], atual, base)).toEqual({
+  it('a declaração do material em MATERIAIS entra na impressão da parte que o usa, e só nela', () => {
+    const pintada = () => { const m = malha({ bloco: [1, 0], viga: [10, 5] }); m.F.get(1).material = 'aco'; return m; };
+    const cinza = impressoesDasPartes(pintada(), { materiais: { aco: { cor: '#888888' }, vidro: { cor: '#aaccff' } } });
+    const vermelho = impressoesDasPartes(pintada(), { materiais: { aco: { cor: '#ff0000' }, vidro: { cor: '#aaccff' } } });
+    expect(vermelho.get('bloco')).not.toBe(cinza.get('bloco'));
+    expect(vermelho.get('viga')).toBe(cinza.get('viga'));
+    /* o material que a parte não usa não muda a impressão dela, e a ordem das chaves do dicionário também não */
+    expect(impressoesDasPartes(pintada(), { materiais: { vidro: { cor: '#000000' }, aco: { cor: '#888888' } } }).get('bloco')).toBe(cinza.get('bloco'));
+    /* sem a declaração (o material só nomeado) vale o nome, que a face já leva */
+    expect(impressoesDasPartes(pintada()).get('bloco')).not.toBe(cinza.get('bloco'));
+    expect(impressoesDasPartes(pintada(), { materiais: {} }).get('bloco')).toBe(impressoesDasPartes(pintada()).get('bloco'));
+  });
+
+  it('a impressão das partes junta a malha e a promessa de cada parte, em ordem de nome, e diz em quais duas impressões diferem', () => {
+    const plano = (forma) => ({ partes: [{ nome: 'viga', forma, tecnica: 't' }, { nome: 'bloco', forma: 'caixa', tecnica: 't' }] });
+    const a = impressaoDasPartes(malha({ viga: [10, 5], bloco: [1, 0] }), { plano: plano('tubo') });
+    expect(Object.keys(a.malhas)).toEqual(['bloco', 'viga']);
+    expect(Object.keys(a.promessas)).toEqual(['bloco', 'viga']);
+    expect(ehImpressaoDasPartes(a)).toBe(true);
+    expect(ehImpressaoDasPartes(JSON.parse(JSON.stringify(a)))).toBe(true);
+    for (const ruim of [null, undefined, 'x', [], {}, { malhas: {} }, { malhas: {}, promessas: {}, a: 1 }, { malhas: { bloco: 'curto' }, promessas: {} }, { malhas: [], promessas: {} }, { malhas: {}, promessas: { bloco: 7 } }]) expect(ehImpressaoDasPartes(ruim)).toBe(false);
+    expect(partesQueDiferem(a, a)).toEqual([]);
+    expect(partesQueDiferem(a, impressaoDasPartes(malha({ viga: [10, 5.5], bloco: [1, 0] }), { plano: plano('tubo') }))).toEqual(['viga']);
+    expect(partesQueDiferem(a, impressaoDasPartes(malha({ viga: [10, 5], bloco: [1, 0] }), { plano: plano('tubo oco') }))).toEqual(['viga']);
+    expect(partesQueDiferem(a, impressaoDasPartes(malha({ bloco: [1, 2] }), { plano: plano('tubo') }))).toEqual(['bloco', 'viga']);
+    expect(partesQueDiferem(a, null)).toEqual(['bloco', 'viga']);
+    expect(impressaoDasPartes(malha({ bloco: [1, 0] })).promessas).toEqual({});
+  });
+
+  it('as partes citadas nos defeitos de um veredito saem sem repetição, e o defeito sem parte não cita nenhuma', () => {
+    expect(partesCitadasNosDefeitos({ defeitos: [{ parte: 'chapa', tipo: 'posicao' }, { parte: 'rebaixoLateral' }, { parte: 'chapa' }, { tipo: 'proporcao' }, { parte: '' }, null] })).toEqual(['chapa', 'rebaixoLateral']);
+    expect(partesCitadasNosDefeitos({ defeitos: [] })).toEqual([]);
+    expect(partesCitadasNosDefeitos(null)).toEqual([]);
+    expect(partesCitadasNosDefeitos({ defeitos: 'nenhum' })).toEqual([]);
+  });
+
+  it('entra a parte de malha diferente, a de promessa diferente, a nova, a que a malha não tem e a citada num defeito; sem base, todas', () => {
+    const base = { malhas: { a: '1', b: '2', c: '3', e: '5', f: '6' }, promessas: { a: 'p', b: 'tubo', c: 'p', d: 'p', e: 'p', f: 'p' } };
+    const atual = { malhas: { a: '1', b: '2', c: '3x', d: '4', f: '6' }, promessas: { a: 'p', b: 'tubo com rebaixo', c: 'p', d: 'p', e: 'p', f: 'p' } };
+    expect(partesComVistaIsolada(['a', 'b', 'c', 'd', 'e', 'f'], atual, base)).toEqual({
       comVista: [{ nome: 'b', porque: 'promessa' }, { nome: 'c', porque: 'malha' }, { nome: 'd', porque: 'nova' }, { nome: 'e', porque: 'ausente' }],
+      semVista: ['a', 'f'],
+    });
+    /* a parte que o veredito da rodada cita num defeito entra mesmo igual, e a que já entra pela malha fica com o motivo da malha */
+    expect(partesComVistaIsolada(['a', 'b', 'c', 'd', 'e', 'f'], atual, base, { citadas: ['f', 'c', 'nao-existe'] })).toEqual({
+      comVista: [{ nome: 'b', porque: 'promessa' }, { nome: 'c', porque: 'malha' }, { nome: 'd', porque: 'nova' }, { nome: 'e', porque: 'ausente' }, { nome: 'f', porque: 'defeito' }],
       semVista: ['a'],
     });
-    expect(partesComVistaIsolada(['a', 'b'], atual, null)).toEqual({ comVista: [{ nome: 'a', porque: 'sem-base' }, { nome: 'b', porque: 'sem-base' }], semVista: [] });
-    /* a mesma malha e o mesmo plano: nenhuma parte leva vista isolada */
+    expect(partesComVistaIsolada(['a', 'b'], atual, null, { citadas: ['a'] })).toEqual({ comVista: [{ nome: 'a', porque: 'sem-base' }, { nome: 'b', porque: 'sem-base' }], semVista: [] });
+    /* a mesma malha e a mesma promessa: nenhuma parte leva vista isolada */
     expect(partesComVistaIsolada(['a', 'b'], base, base)).toEqual({ comVista: [], semVista: ['a', 'b'] });
+    /* a promessa que só um dos lados tem é diferença */
+    expect(partesComVistaIsolada(['a'], { malhas: { a: '1' }, promessas: {} }, base).comVista).toEqual([{ nome: 'a', porque: 'promessa' }]);
+  });
+
+  it('o registro da rodada se lê pelo número, e o que falta ou não é JSON é null', () => {
+    const pasta = mkdtempSync(join(area, 'registros-'));
+    writeFileSync(join(pasta, 'rodada-03.json'), JSON.stringify({ numero: 3, veredito: { nota: 6 } }));
+    writeFileSync(join(pasta, 'rodada-04.json'), '{ quebrado');
+    expect(registroDaRodada(pasta, 3)).toEqual({ numero: 3, veredito: { nota: 6 } });
+    expect(registroDaRodada(pasta, 4)).toBeNull();
+    expect(registroDaRodada(pasta, 12)).toBeNull();
   });
 
   it('a última rodada julgada é a de maior número com veredito, e a pasta sem rodada julgada não tem nenhuma', () => {
@@ -385,10 +438,14 @@ describe('o pacote padrão: o conjunto de umas dez imagens e as partes que difer
     expect(fracaoVisivelDaPeca({ foco: [], outras: [], olho: [0, 0, 1] })).toEqual({ visivel: null, pixels: 0, areaVisivel: 0 });
   });
 
-  it('a descrição do pacote diz cada grupo que entrou com o porquê e o que ficou de fora, sem contar como a peça foi feita', () => {
+  /* O PEDIDO NÃO CONTA A HISTÓRIA DA PEÇA: nem como foi feita, nem o que mudou, nem o que já foi visto antes. O crítico que lê que uma
+     parte "já foi julgada" ou "não mudou" a toma por aprovada, e o que lê que ela "difere" procura a diferença em vez de julgar a forma. */
+  const HISTORIA = /\bPASSOS\b|receita|rodada|hist[óo]ric|mudou|mudança|mudaram|ferramenta|julgad|julgamento|difere|diferen|anterior|aprovad|conferid|\bantes\b|ainda não|\bjá\b/i;
+
+  it('a descrição do pacote diz cada grupo que entrou e o que ficou de fora, sem contar a história da peça nem por que a parte tem vista', () => {
     const d = descricaoDoPacotePadrao({
-      escolha: { comVista: [{ nome: 'viga', porque: 'malha' }, { nome: 'aba', porque: 'promessa' }, { nome: 'pino', porque: 'nova' }, { nome: 'furo', porque: 'ausente' }], semVista: ['bloco', 'tampa'] }, comBase: true,
-      montadas: { entram: ['isometrica'], fora: ['frontal'] }, cortes: { entram: [{ vizinha: 'a', declarado: false }, { vizinha: 'b', declarado: true }], fora: [] },
+      escolha: { comVista: [{ nome: 'viga', porque: 'malha' }, { nome: 'aba', porque: 'promessa' }, { nome: 'pino', porque: 'nova' }, { nome: 'furo', porque: 'ausente' }, { nome: 'chapa', porque: 'defeito' }], semVista: ['bloco', 'tampa'] },
+      montadas: { entram: ['isometrica'], fora: ['frontal'] }, cortes: { entram: [{ vizinha: 'a', declarado: false }, { vizinha: 'b', declarado: true }], fora: ['c'], limiarMm: 0.01 },
       superficie: { lataria: false, reflexo: false },
     });
     expect(d.tipo).toBe(PACOTE_PADRAO);
@@ -397,26 +454,37 @@ describe('o pacote padrão: o conjunto de umas dez imagens e as partes que difer
       'a malha em arame na vista isometrica e em raio X na traseira, para a topologia que a sombra esconde, na frente e atrás',
       'a luz rasante numa vista só, a de três quartos',
       'a vista montada isometrica, as em que mais da peça aparece entre as outras, para o contexto e a posição',
-      'os cortes dos encaixes com `a` e `b`: o de menor folga e os declarados pela peça, onde um cruzamento ou uma peça solta aparece primeiro',
-      'a vista isolada das partes `viga` (a malha dela difere da já julgada), `aba` (a forma prometida dela difere da já julgada), `pino` (ela ainda não foi julgada) e `furo` (a malha não a tem)',
+      'os cortes dos encaixes com `a` e `b`: todo encaixe com folga até 0,01 mm e os declarados pela peça, onde um cruzamento ou uma peça solta aparece primeiro',
+      'a vista isolada das partes `viga`, `aba`, `pino`, `furo` e `chapa`',
     ]);
     expect(d.fora).toEqual([
       'a malha em arame na vista traseira, porque o raio X da mesma vista mostra as mesmas arestas',
       'a luz rasante nas vistas de frente, de lado e de cima',
       'as vistas montadas frontal, em que aparece menos da peça ou ela fica tapada',
-      'a vista isolada das partes `bloco` e `tampa`, que têm a malha e a forma prometida já julgadas e aparecem nas vistas da peça sozinha',
+      'o corte do encaixe com `c`, de folga maior que 0,01 mm',
+      'a vista isolada das partes `bloco` e `tampa`, que aparecem nas vistas da peça inteira',
     ]);
     expect(d.partesSemVista).toEqual(['bloco', 'tampa']);
-    const semBase = descricaoDoPacotePadrao({ escolha: { comVista: [{ nome: 'bloco', porque: 'sem-base' }], semVista: [] } });
-    expect(semBase.entrou[2]).toBe('a vista isolada de todas as partes (1), porque não há julgamento anterior com que comparar a malha delas');
-    expect(semBase.fora).toHaveLength(1);
-    const umaSo = descricaoDoPacotePadrao({ escolha: { comVista: [], semVista: ['bloco'] }, comBase: true });
-    expect(umaSo.fora[1]).toBe('a vista isolada da parte `bloco`, que tem a malha e a forma prometida já julgadas e aparece nas vistas da peça sozinha');
-    for (const frase of [...d.entrou, ...d.fora, ...semBase.entrou, ...umaSo.fora]) expect(frase).not.toMatch(/\bPASSOS\b|receita|rodada|histórico|mudou|ferramenta/i);
+    const todas = descricaoDoPacotePadrao({ escolha: { comVista: [{ nome: 'bloco', porque: 'sem-base' }], semVista: [] } });
+    expect(todas.entrou[2]).toBe('a vista isolada de todas as partes (1)');
+    expect(todas.fora).toHaveLength(1);
+    const umaSo = descricaoDoPacotePadrao({ escolha: { comVista: [{ nome: 'viga', porque: 'defeito' }], semVista: ['bloco'] } });
+    expect(umaSo.entrou[2]).toBe('a vista isolada da parte `viga`');
+    expect(umaSo.fora[1]).toBe('a vista isolada da parte `bloco`, que aparece nas vistas da peça inteira');
+    /* os cortes: sem encaixe que encoste, o limiar é a menor folga; só declarados; e mais de um de fora */
+    const cortes = (c) => descricaoDoPacotePadrao({ escolha: { comVista: [], semVista: [] }, cortes: c });
+    expect(cortes({ entram: [{ vizinha: 'a', declarado: false }], fora: ['b', 'c'], limiarMm: 0.5 })).toMatchObject({
+      entrou: { 2: 'o corte do encaixe com `a`: todo encaixe com folga até 0,50 mm, onde um cruzamento ou uma peça solta aparece primeiro' },
+      fora: { 1: 'os cortes dos encaixes com `b` e `c`, de folga maior que 0,50 mm' },
+    });
+    expect(cortes({ entram: [{ vizinha: 'a', declarado: true }], fora: [], limiarMm: 0.01 }).entrou[2]).toBe('o corte do encaixe com `a`: os declarados pela peça, onde um cruzamento ou uma peça solta aparece primeiro');
+    for (const frase of [...d.entrou, ...d.fora, ...todas.entrou, ...umaSo.entrou, ...umaSo.fora]) expect(frase).not.toMatch(HISTORIA);
+    /* a régua pega as formas que o pedido já usou para contar a história */
+    for (const frase of ['a malha dela difere da já julgada', 'ela ainda não foi julgada', 'não há julgamento anterior com que comparar', 'com a malha e a forma prometida já julgadas', 'a parte mudou', 'a diferença de malha', 'foi aprovada antes']) expect(frase).toMatch(HISTORIA);
   });
 
-  it('o pedido com o pacote padrão diz o que entrou e o que ficou de fora no cabeçalho, lista as partes sem vista, e sem ele é o de sempre', () => {
-    const pacote = descricaoDoPacotePadrao({ escolha: { comVista: [{ nome: 'viga', porque: 'malha' }], semVista: ['bloco'] }, comBase: true });
+  it('o pedido com o pacote padrão diz o que entrou e o que ficou de fora no cabeçalho, lista as partes sem vista sem dizer que estão certas, e sem ele é o de sempre', () => {
+    const pacote = descricaoDoPacotePadrao({ escolha: { comVista: [{ nome: 'viga', porque: 'malha' }], semVista: ['bloco'] } });
     const dados = { ...DADOS, partes: DADOS.partes.filter((p) => p.nome === 'viga'), pacote };
     const pedido = montarPedido(dados);
     expect(titulos(pedido)).toEqual(titulos(montarPedido(DADOS)));
@@ -425,20 +493,24 @@ describe('o pacote padrão: o conjunto de umas dez imagens e as partes que difer
     for (const frase of [...pacote.entrou, ...pacote.fora]) expect(cabecalho).toContain(`- ${frase}`);
     expect(cabecalho).toContain('O que ficou de fora não é ausência nem defeito. Julgue pelo que veio; a pergunta que depender de uma imagem que não veio se responde `não dá para ver`, dizendo qual imagem faltou.');
     const partes = pedido.slice(pedido.indexOf('## Partes'), pedido.indexOf('## Critérios'));
-    expect(partes).toContain('Só as partes abaixo têm vista isolada neste pedido. Sem vista isolada, com a malha e a forma prometida já julgadas: `bloco`. Elas aparecem nas vistas da peça sozinha, em Modelo; a falta da vista isolada não é ausência da parte, e defeito nelas só se aponta pelo que essas vistas mostram.');
+    const frase = 'Só as partes abaixo têm vista isolada neste pedido. Sem vista isolada: `bloco`. Elas aparecem nas vistas da peça inteira, em Modelo, e se julgam por essas vistas como as outras: a falta da vista isolada não é ausência da parte e não diz que ela está certa.';
+    expect(partes).toContain(frase);
     expect(partes).toContain('### viga');
     expect(partes).not.toContain('### bloco');
+    /* o que o pacote padrão acrescenta ao pedido não conta a história; o resto do pedido é o de sempre, e não cita receita nem rodada */
+    expect(cabecalho.slice(cabecalho.indexOf('Este pedido traz'))).not.toMatch(HISTORIA);
+    expect(frase).not.toMatch(HISTORIA);
     expect(pedido).not.toMatch(/\bPASSOS\b|receita|rodada|histórico|mudou|ferramenta/i);
     /* nenhuma parte com vista: a seção continua, só com a frase */
-    const nenhuma = montarPedido({ ...DADOS, partes: [], pacote: descricaoDoPacotePadrao({ escolha: { comVista: [], semVista: ['bloco', 'viga'] }, comBase: true }) });
+    const nenhuma = montarPedido({ ...DADOS, partes: [], pacote: descricaoDoPacotePadrao({ escolha: { comVista: [], semVista: ['bloco', 'viga'] } }) });
     expect(titulos(nenhuma)).toEqual(titulos(montarPedido(DADOS)));
-    expect(nenhuma).toContain('Nenhuma parte tem vista isolada neste pedido. Sem vista isolada, com a malha e a forma prometida já julgadas: `bloco`, `viga`.');
+    expect(nenhuma).toContain('Nenhuma parte tem vista isolada neste pedido. Sem vista isolada: `bloco`, `viga`. Elas aparecem nas vistas da peça inteira');
     expect(nenhuma).not.toContain('Uma vista isolada de cada parte');
     /* os pedidos fechados levam o mesmo cabeçalho e a mesma frase das partes, e a pergunta da parte sem vista continua */
     for (const ordem of ['a', 'b']) {
       const fechado = montarPedidoFechado(dados, ordem);
       expect(fechado).toContain('Este pedido traz o conjunto padrão de imagens da peça');
-      expect(fechado).toContain('Sem vista isolada, com a malha e a forma prometida já julgadas: `bloco`.');
+      expect(fechado).toContain('Sem vista isolada: `bloco`. Elas aparecem nas vistas da peça inteira');
     }
     expect(perguntasFechadas(dados).map((q) => q.origem)).toContain('parte:bloco');
     /* sem `pacote` (o completo, e os dados gravados antes dele) o pedido não muda */
@@ -460,61 +532,74 @@ describe('o pacote padrão: o conjunto de umas dez imagens e as partes que difer
       },
     });
     const capturas = bancada.chamadas.map((c) => (c.revisar ? 'conjunto' : c.selecionadas ?? `${c.vistas}${c.arame === 'raio-x' ? ' raio-x' : c.arame ? ' arame' : ''}`));
-    return { pasta, resultado, capturas, pedido: readFileSync(join(pasta, 'pedido.md'), 'utf8'), manifesto: JSON.parse(readFileSync(join(pasta, 'pacote.json'), 'utf8')) };
+    return { pasta, resultado, capturas, chamadas: bancada.chamadas, pedido: readFileSync(join(pasta, 'pedido.md'), 'utf8'), manifesto: JSON.parse(readFileSync(join(pasta, 'pacote.json'), 'utf8')) };
   }
-  /* a rodada 2 julgada, com a cópia da receita no lugar (aqui a própria receita de prova), e a malha de cada uma trocada por um gravador */
-  const comBase = (daCopia, deAgora = { bloco: [1, 0], viga: [10, 5] }) => {
+  /* a rodada 2 julgada, com a impressão das partes que ela gravou no registro (a de `daRodada`, tirada da receita de prova com a malha
+     trocada), e a malha de agora trocada por um gravador */
+  const comBase = (daRodada, deAgora = { bloco: [1, 0], viga: [10, 5] }, { defeitos = [], semImpressao = false } = {}) => {
     const pedidos = [];
     return {
       pedidos,
       dependencias: {
         ultimaRodadaJulgada: (pastaDosRegistros) => { pedidos.push(['julgada', basename(pastaDosRegistros)]); return 2; },
-        copiaDaRodada: async (pastaDosRegistros, numero) => { pedidos.push(['copia', numero]); return PECA; },
-        malhaDaReceita: async (arquivo, receita, { copia = false } = {}) => { pedidos.push(['malha', copia]); if (copia && daCopia instanceof Error) throw daCopia; return malha(copia ? daCopia : deAgora); },
+        registroDaRodada: (pastaDosRegistros, numero) => { pedidos.push(['registro', numero]); return { numero, veredito: { nota: 6, defeitos }, ...(semImpressao ? {} : { impressaoDasPartes: daRodada }) }; },
+        malhaDaReceita: async () => { pedidos.push(['malha']); if (deAgora instanceof Error) throw deAgora; return malha(deAgora); },
       },
     };
   };
+  const impressaoDe = (partes) => impressaoDasPartesDaReceita(resolve(PECA), { malha: async () => malha(partes) });
 
   it('sem opção sai o padrão: as seis vistas, o arame de três quartos, o raio X de trás e, sem rodada julgada, todas as partes, com o aviso', async () => {
-    const { resultado, capturas, pedido, manifesto } = await montar();
+    const { resultado, capturas, chamadas, pedido, manifesto } = await montar();
     expect(capturas).toEqual(['conjunto', 'traseira', 'esquerda', 'isometrica arame', 'traseira raio-x', 'bloco', 'viga']);
+    /* as capturas da peça sozinha (as seis vistas, o arame e o raio X) pedem o quadro cheio, na resolução do conjunto; as das partes
+       continuam com o foco, que já decide o quadro */
+    expect(chamadas.map((c) => Boolean(c.enquadrar))).toEqual([true, true, true, true, true, false, false]);
+    expect(chamadas.slice(0, 5).map((c) => c.res)).toEqual(Array(5).fill(chamadas[0].res));
+    expect(chamadas.slice(5).every((c) => c.focar === true)).toBe(true);
     expect(resultado.tipo).toBe(PACOTE_PADRAO);
     expect(resultado.baseDasPartes).toBeNull();
     expect(resultado.partesComVista).toEqual([{ nome: 'bloco', porque: 'sem-base' }, { nome: 'viga', porque: 'sem-base' }]);
     expect(resultado.avisos).toContain('todas as partes levam vista isolada: a peça não tem rodada julgada pelo crítico, e não há com que comparar a malha de cada parte.');
-    expect(pedido).toContain('- a vista isolada de todas as partes (2), porque não há julgamento anterior com que comparar a malha delas');
+    expect(pedido).toContain('- a vista isolada de todas as partes (2)\n');
     expect(pedido).toContain('- a malha em arame na vista traseira, porque o raio X da mesma vista mostra as mesmas arestas');
     /* 6 da peça, 2 da malha, 4 das duas partes e o alvo: o que o crítico abre */
     expect(resultado.imagensNoPedido).toBe(13);
     expect(imagensCitadas(pedido)).toHaveLength(13);
     expect(manifesto.pacote).toEqual({ tipo: PACOTE_PADRAO, partes: { comVista: resultado.partesComVista, semVista: [], comparadasComARodada: null } });
+    /* a impressão das partes da receita de prova, executada de verdade, vai ao pacote.json: é o que o registro do veredito confere */
+    expect(ehImpressaoDasPartes(manifesto.impressaoDasPartes)).toBe(true);
+    expect(manifesto.impressaoDasPartes).toEqual(await impressaoDasPartesDaReceita(resolve(PECA)));
+    expect(Object.keys(manifesto.impressaoDasPartes.malhas)).toEqual(['bloco', 'viga']);
+    expect(resultado.impressaoDasPartes).toEqual(manifesto.impressaoDasPartes);
     const relatorio = imprimir(resultado);
     expect(relatorio).toContain('  todas as 2 partes levam vista isolada: a peça não tem rodada julgada pelo crítico.');
     expect(relatorio).toContain(`  PACOTE PADRÃO: o pedido cita 13 imagens e diz o que entrou e o que ficou de fora; o pacote completo, com todas as vistas e a vista isolada de todas as partes: \`${comandoDoCompleto(PECA)}\``);
     expect(relatorio).toMatch(/ {2}TEMPO: \d+,\d s \(medição \d+,\d s, comparação das partes \d+,\d s, capturas da bancada \d+,\d s\)/);
   }, 60_000);
 
-  it('com rodada julgada, só a parte de malha diferente da cópia leva vista isolada, e o pedido, o relatório e o pacote.json dizem qual e por quê', async () => {
-    const base = comBase({ bloco: [70, 0], viga: [30, 6] });
+  it('com rodada julgada, só a parte de malha diferente da impressão gravada leva vista isolada; o relatório e o pacote.json dizem por quê, e o pedido não', async () => {
+    const base = comBase(await impressaoDe({ bloco: [70, 0], viga: [30, 6] }));
     const { resultado, capturas, pedido, manifesto, pasta } = await montar({ dependencias: base.dependencias });
-    expect(base.pedidos).toEqual([['julgada', 'rodadas'], ['copia', 2], ['malha', true], ['malha', false]]);
+    expect(base.pedidos).toEqual([['malha'], ['julgada', 'rodadas'], ['registro', 2]]);
     expect(capturas).toEqual(['conjunto', 'traseira', 'esquerda', 'isometrica arame', 'traseira raio-x', 'viga']);
     expect(resultado.baseDasPartes).toBe(2);
     expect(resultado.partesComVista).toEqual([{ nome: 'viga', porque: 'malha' }]);
     expect(resultado.partesSemVista).toEqual(['bloco']);
     expect(resultado.avisos.join('\n')).not.toContain('todas as partes levam vista isolada');
-    expect(pedido).toContain('- a vista isolada da parte `viga` (a malha dela difere da já julgada)');
-    expect(pedido).toContain('- a vista isolada da parte `bloco`, que tem a malha e a forma prometida já julgadas e aparece nas vistas da peça sozinha');
+    expect(pedido).toContain('- a vista isolada da parte `viga`\n');
+    expect(pedido).toContain('- a vista isolada da parte `bloco`, que aparece nas vistas da peça inteira\n');
     expect(pedido).toContain('### viga');
     expect(pedido).not.toContain('### bloco');
-    /* o pedido não cita a rodada nem a cópia: isso fica no relatório de quem conduz e no pacote.json */
-    expect(pedido.slice(pedido.indexOf('Este pedido traz'), pedido.indexOf('## Objeto'))).not.toMatch(/rodada|cópia|receita/i);
-    expect(pedido.slice(pedido.indexOf('## Partes'), pedido.indexOf('### viga'))).not.toMatch(/rodada|cópia|receita/i);
+    /* o pedido não cita a rodada nem conta a história: isso fica no relatório de quem conduz e no pacote.json */
+    expect(pedido.slice(pedido.indexOf('Este pedido traz'), pedido.indexOf('## Objeto'))).not.toMatch(HISTORIA);
+    expect(pedido.slice(pedido.indexOf('## Partes'), pedido.indexOf('### viga')).split('\n').slice(0, 3).join('\n')).not.toMatch(HISTORIA);
     expect(manifesto.pacote).toEqual({ tipo: PACOTE_PADRAO, partes: { comVista: [{ nome: 'viga', porque: 'malha' }], semVista: ['bloco'], comparadasComARodada: 2 } });
+    expect(manifesto.impressaoDasPartes).toEqual(await impressaoDe({ bloco: [1, 0], viga: [10, 5] }));
     const relatorio = imprimir(resultado);
-    expect(relatorio).toContain('  comparadas com a cópia da receita da rodada 2, a última julgada pelo crítico: 1 de 2 partes levam vista isolada.');
-    expect(relatorio).toContain('  com vista isolada: viga (a malha dela difere da já julgada)');
-    expect(relatorio).toContain('  sem vista isolada, com a malha e a promessa iguais às da rodada 2: bloco');
+    expect(relatorio).toContain('  comparadas com a impressão das partes gravada na rodada 2, a última julgada pelo crítico: 1 de 2 partes levam vista isolada.');
+    expect(relatorio).toContain('  com vista isolada: viga (a malha difere da gravada na rodada)');
+    expect(relatorio).toContain('  sem vista isolada, com a malha e a promessa iguais às da rodada 2 e sem defeito apontado nela: bloco');
     /* a pergunta fechada da parte sem vista continua, e os dados gravados refazem o mesmo pedido */
     expect(JSON.parse(readFileSync(join(pasta, ARQUIVO_DAS_PERGUNTAS_FECHADAS), 'utf8')).perguntas.map((q) => q.origem)).toContain('parte:bloco');
     refazerPedidos(pasta);
@@ -522,28 +607,93 @@ describe('o pacote padrão: o conjunto de umas dez imagens e as partes que difer
   }, 60_000);
 
   it('a mesma malha e a mesma promessa da rodada julgada: nenhuma vista isolada, e a seção das partes diz quais ficaram sem', async () => {
-    const { capturas, pedido, resultado } = await montar({ dependencias: comBase({ bloco: [70, 0], viga: [30, 5] }).dependencias });
+    const { capturas, pedido, resultado } = await montar({ dependencias: comBase(await impressaoDe({ bloco: [70, 0], viga: [30, 5] })).dependencias });
     expect(capturas).toEqual(['conjunto', 'traseira', 'esquerda', 'isometrica arame', 'traseira raio-x']);
     expect(resultado.porParte).toEqual([]);
-    expect(pedido).toContain('Nenhuma parte tem vista isolada neste pedido. Sem vista isolada, com a malha e a forma prometida já julgadas: `bloco`, `viga`.');
+    expect(pedido).toContain('Nenhuma parte tem vista isolada neste pedido. Sem vista isolada: `bloco`, `viga`.');
     expect(resultado.imagensNoPedido).toBe(9);
   }, 60_000);
 
-  it('sem a cópia da rodada julgada, ou com a cópia que não executa, todas as partes entram e o aviso diz por quê', async () => {
-    const base = comBase({ bloco: [70, 0], viga: [30, 5] });
-    const sem = await montar({ dependencias: { ...base.dependencias, copiaDaRodada: async () => join(area, 'rodadas-de-ensaio', 'receita-02.js') } });
+  it('a parte citada num defeito do veredito da rodada julgada leva vista isolada mesmo com a malha e a promessa iguais', async () => {
+    const igual = await impressaoDe({ bloco: [70, 0], viga: [30, 5] });
+    const defeitos = [{ parte: 'bloco', tipo: 'superficie', onde: 'o topo', sentido: 'segmentado', evidencia: 'a luz rasante mostra degraus' }, { parte: 'bloco', tipo: 'posicao' }];
+    const { capturas, pedido, resultado, manifesto } = await montar({ dependencias: comBase(igual, undefined, { defeitos }).dependencias });
+    expect(capturas).toEqual(['conjunto', 'traseira', 'esquerda', 'isometrica arame', 'traseira raio-x', 'bloco']);
+    expect(resultado.partesComVista).toEqual([{ nome: 'bloco', porque: 'defeito' }]);
+    expect(resultado.partesSemVista).toEqual(['viga']);
+    expect(manifesto.pacote.partes.comVista).toEqual([{ nome: 'bloco', porque: 'defeito' }]);
+    expect(pedido).toContain('### bloco');
+    expect(pedido).toContain('- a vista isolada da parte `bloco`\n');
+    expect(pedido.slice(pedido.indexOf('Este pedido traz'), pedido.indexOf('## Objeto'))).not.toMatch(/defeito apontado|citad/);
+    expect(imprimir(resultado)).toContain('  com vista isolada: bloco (o veredito da rodada a cita num defeito)');
+  }, 60_000);
+
+  it('com a rodada julgada que não gravou a impressão das partes, ou sem a impressão de agora, todas as partes entram e o aviso diz por quê', async () => {
+    const igual = await impressaoDe({ bloco: [70, 0], viga: [30, 5] });
+    const sem = await montar({ dependencias: comBase(igual, undefined, { semImpressao: true }).dependencias });
     expect(sem.capturas.slice(-2)).toEqual(['bloco', 'viga']);
-    expect(sem.resultado.avisos.join('\n')).toMatch(/todas as partes levam vista isolada: a cópia da receita da rodada 2, a última julgada pelo crítico, não está em .*rodadas-de-ensaio\/receita-02\.js, e não há com que comparar a malha de cada parte\./);
+    expect(sem.resultado.avisos).toContain('todas as partes levam vista isolada: o registro da rodada 2, a última julgada pelo crítico, não guarda a impressão das partes (o registro a grava desde 2026-11-26, com o veredito), e não há com que comparar a malha de cada parte.');
     expect(sem.resultado.baseDasPartes).toBeNull();
-    const quebrada = await montar({ dependencias: comBase(new Error('o passo 3 não existe mais\nsegunda linha')).dependencias });
+    expect(sem.resultado.partesComVista).toEqual([{ nome: 'bloco', porque: 'sem-base' }, { nome: 'viga', porque: 'sem-base' }]);
+    /* a impressão gravada que não tem a forma certa vale como ausente */
+    const torta = await montar({ dependencias: comBase({ malhas: igual.malhas }).dependencias });
+    expect(torta.resultado.baseDasPartes).toBeNull();
+    expect(torta.capturas.slice(-2)).toEqual(['bloco', 'viga']);
+    /* o registro que não se lê também */
+    const ilegivel = await montar({ dependencias: { ...comBase(igual).dependencias, registroDaRodada: () => null } });
+    expect(ilegivel.resultado.baseDasPartes).toBeNull();
+    const quebrada = await montar({ dependencias: comBase(igual, new Error('o passo 3 não existe mais\nsegunda linha')).dependencias });
     expect(quebrada.capturas.slice(-2)).toEqual(['bloco', 'viga']);
-    expect(quebrada.resultado.avisos).toContain('todas as partes levam vista isolada: a cópia da receita da rodada 2 não executa (o passo 3 não existe mais), e não há com que comparar a malha de cada parte.');
+    expect(quebrada.resultado.avisos).toContain('não tirei a impressão das partes (o passo 3 não existe mais): o pacote.json sai sem ela, e a rodada que registrar este pacote não serve de base para escolher as partes do pacote seguinte.');
+    expect(quebrada.resultado.avisos).toContain('todas as partes levam vista isolada: a receita de agora não deu a impressão das partes, e não há com que comparar a malha de cada parte.');
+    expect(quebrada.manifesto.impressaoDasPartes).toBeNull();
+  }, 120_000);
+
+  it('só o módulo que a receita importa muda desde a rodada julgada: o texto da receita é o mesmo, e a parte de malha mudada leva vista isolada', async () => {
+    /* duas pastas dentro do repositório (a receita não se resolve fora dele), com o mesmo `receita.js` e o `modulo.js` que dá o giro da
+       viga: 'antes' é o que a rodada 2 julgou, 'depois' é a receita de agora. Nada é trocado na leitura das rodadas nem na execução. */
+    const REPO = resolve('.');
+    mkdirSync(join(REPO, 'tmp'), { recursive: true });
+    const raiz = mkdtempSync(join(REPO, 'tmp', 'teste-do-pacote-'));
+    try {
+      for (const nome of ['andaime.json', 'bloco.formas.json']) copyFileSync(join(REPO, 'tools/fixtures/forma-do-esboco', nome), join(raiz, nome));
+      cpSync(join(REPO, 'tools/fixtures/forma-do-esboco/alvos'), join(raiz, 'alvos'), { recursive: true });
+      const TEXTO = `import { receitaDoBloco } from '${join(REPO, 'tools/fixtures/forma-do-esboco/suporte.js')}';\nimport { GRAUS } from './modulo.js';\n\nexport default receitaDoBloco({ graus: GRAUS });\n`;
+      const versao = (nome, graus) => {
+        mkdirSync(join(raiz, nome, 'rodadas'), { recursive: true });
+        writeFileSync(join(raiz, nome, 'receita.js'), TEXTO);
+        writeFileSync(join(raiz, nome, 'modulo.js'), `export const GRAUS = ${graus};\n`);
+        return join(raiz, nome, 'receita.js');
+      };
+      const [antes, depois] = [versao('antes', 30), versao('depois', 25)];
+      expect(readFileSync(depois, 'utf8')).toBe(readFileSync(antes, 'utf8'));
+      const julgada = await impressaoDasPartesDaReceita(antes);
+      /* a rodada 2, julgada, grava a impressão das partes; a cópia da receita dela também está lá, com o texto igual ao de agora */
+      writeFileSync(join(raiz, 'depois', 'rodadas', 'rodada-02.json'), JSON.stringify({ numero: 2, veredito: { nota: 6, defeitos: [] }, impressaoDasPartes: julgada }));
+      writeFileSync(join(raiz, 'depois', 'rodadas', 'receita-02.js'), TEXTO.replace("'./modulo.js'", "'../modulo.js'"));
+      const peca = relative(REPO, depois);
+      const base = mkdtempSync(join(area, 'modulo-'));
+      const bancada = bancadaFalsa(base, peca);
+      const resultado = await pacoteDoCritico(peca, {
+        saida: join(base, 'rodada'), pastaDasCapturas: base,
+        dependencias: { medirReceita: medirPassa, olharBancada: bancada.fazer, rodadasAnteriores: () => [], sobreposicaoDeCortes: async () => ({ arquivos: [], paineis: [], notas: [] }) },
+      });
+      expect(resultado.baseDasPartes).toBe(2);
+      expect(resultado.partesComVista).toEqual([{ nome: 'viga', porque: 'malha' }]);
+      expect(resultado.partesSemVista).toEqual(['bloco']);
+      expect(bancada.chamadas.map((c) => c.selecionadas).filter(Boolean)).toEqual(['viga']);
+      expect(partesQueDiferem(resultado.impressaoDasPartes, julgada)).toEqual(['viga']);
+    } finally {
+      rmSync(raiz, { recursive: true, force: true });
+    }
   }, 60_000);
 
   it('--completo monta o pacote de antes, sem olhar as rodadas, e o valor que não é sim nem não é recusado com o comando', async () => {
-    const base = comBase({ bloco: [70, 0], viga: [30, 5] });
+    const base = comBase(await impressaoDe({ bloco: [70, 0], viga: [30, 5] }));
     const { capturas, pedido, manifesto, resultado } = await montar({ completo: true, dependencias: base.dependencias });
-    expect(base.pedidos).toEqual([]);
+    /* não olha as rodadas; a malha de agora é executada para a impressão das partes que vai ao pacote.json */
+    expect(base.pedidos).toEqual([['malha']]);
+    expect(manifesto.impressaoDasPartes).toEqual(await impressaoDe({ bloco: [1, 0], viga: [10, 5] }));
     expect(capturas).toEqual(['conjunto', 'traseira', 'esquerda', 'isometrica,traseira arame', 'traseira raio-x', 'bloco', 'viga']);
     expect(pedido).not.toContain('conjunto padrão');
     expect(manifesto.pacote).toEqual({ tipo: PACOTE_COMPLETO });
@@ -770,26 +920,25 @@ describe('o pacote de uma peça que é instância de uma montagem', () => {
     const cortes = async (pedido) => {
       const arquivo = join(pedido.pasta, 'corte-motor-fuselagem.png');
       writeFileSync(arquivo, 'corte');
-      return { cortes: [{ arquivo, vizinha: 'fuselagem', origens: ['posição'], folgaMm: 0.5, folgaNoCorteMm: 0.5, cruzam: false, plano: 'x = 1,0 mm', declarado: false }], fora: [{ vizinha: 'asas', folgaMm: 3 }, { vizinha: 'helice', folgaMm: 7 }], aviso: null };
+      return { cortes: [{ arquivo, vizinha: 'fuselagem', origens: ['posição'], folgaMm: 0.5, folgaNoCorteMm: 0.5, cruzam: false, plano: 'x = 1,0 mm', declarado: false }], fora: [{ vizinha: 'asas', folgaMm: 3 }, { vizinha: 'helice', folgaMm: 7 }], limiarMm: 0.5, aviso: null };
     };
     const { pasta, resultado, pedidosDeEtapas, pedidosDeCortes } = await montar(olhar, { completo: false, visibilidade, cortes });
     expect(MONTADAS_DO_PADRAO).toBe(2);
     expect(pedidosDeEtapas).toHaveLength(1);
     expect(pedidosDeEtapas[0].opcoes.vistas).toEqual(['isometrica', 'direita']);
-    expect(pedidosDeCortes[0].limite).toBe(CORTES_DO_PADRAO);
-    expect(CORTES_DO_PADRAO).toBe(1);
+    expect(pedidosDeCortes[0].padrao).toBe(true);
     const pedido = readFileSync(join(pasta, 'pedido.md'), 'utf8');
     expect(pedido).toContain('- as vistas montadas isometrica e direita, as em que mais da peça aparece entre as outras, para o contexto e a posição');
     expect(pedido).toContain('- as vistas montadas frontal, traseira, esquerda, superior e inferior, em que aparece menos da peça ou ela fica tapada');
-    expect(pedido).toContain('- o corte do encaixe com `fuselagem`: o de menor folga, onde um cruzamento ou uma peça solta aparece primeiro');
-    expect(pedido).toContain('- os cortes dos encaixes com `asas` e `helice`, de folga maior');
+    expect(pedido).toContain('- o corte do encaixe com `fuselagem`: todo encaixe com folga até 0,50 mm, onde um cruzamento ou uma peça solta aparece primeiro');
+    expect(pedido).toContain('- os cortes dos encaixes com `asas` e `helice`, de folga maior que 0,50 mm');
     const montado = pedido.slice(pedido.indexOf('## Montado'), pedido.indexOf('## Encaixes em corte'));
     expect(imagensCitadas(montado).map((a) => basename(a))).toEqual(['etapas-aviao-isometrica-orto-foco-motor.png', 'etapas-aviao-direita-orto-foco-motor.png']);
     expect(resultado.tipo).toBe(PACOTE_PADRAO);
     /* o completo pede as sete e não limita os cortes */
     const inteiro = await montar(olhar, { completo: true, visibilidade });
     expect(inteiro.pedidosDeEtapas[0].opcoes.vistas).toEqual(VISTAS_MONTADAS);
-    expect(inteiro.pedidosDeCortes[0]).not.toHaveProperty('limite');
+    expect(inteiro.pedidosDeCortes[0]).not.toHaveProperty('padrao');
     expect(readFileSync(join(inteiro.pasta, 'pedido.md'), 'utf8')).not.toContain('conjunto padrão');
   }, 120_000);
 
@@ -1079,6 +1228,73 @@ describe('a vista em corte nos encaixes', () => {
     expect(declarado).toMatchObject({ vizinha: 'tampa', declarado: true, plano: { eixo: 'z' } });
     expect(declarado.folga.folgaMm).toBeCloseTo(0.5, 6);
   });
+
+  it('no pacote padrão entram todos os encaixes que encostam ou cruzam e os declarados, e o empate de folga não tira nenhum', async () => {
+    const { encaixesDaPeca } = await import('./vistas-para-critica.mjs');
+    /* o bloco, um apoio que encosta por cima (folga zero, toque) e um pino que o fura por baixo (folga zero, cruza), mais uma vizinha a 3 mm */
+    const apoio = caixaNeutra([0, 0.1, 0], [0.1, 0.12, 0.1]);
+    const fura = caixaNeutra([0.04, -0.03, 0.04], [0.06, 0.002, 0.06]);
+    const longe = caixaNeutra([0.1 + 0.003, 0, 0], [0.13, 0.05, 0.05]);
+    const folhas = [folha('bloco', bloco), folha('apoio', apoio), folha('fura', fura), folha('longe', longe)];
+    const encaixes = encaixesDaPeca({ folhas, instancia: 'bloco', limite: Infinity });
+    expect(encaixes.map((e) => [e.vizinha, Number(e.folgaMm.toFixed(3))])).toEqual([['apoio', 0], ['fura', 0], ['longe', 3]]);
+    expect(FOLGA_DE_CONTATO_MM).toBe(0.01);
+    const padrao = encaixesDoPadrao(encaixes);
+    expect(padrao.entram.map((e) => e.vizinha)).toEqual(['apoio', 'fura']);
+    expect(padrao.fora.map((e) => e.vizinha)).toEqual(['longe']);
+    expect(padrao.limiarMm).toBe(FOLGA_DE_CONTATO_MM);
+    for (const e of padrao.fora) expect(e.folgaMm).toBeGreaterThan(padrao.limiarMm);
+    /* o corte declarado entra com a folga que tiver */
+    const comDeclarado = encaixesDoPadrao(encaixesDaPeca({ folhas, instancia: 'bloco', limite: Infinity, cortesDeclarados: [{ vizinha: 'longe', ponto: [101, 25, 25], normal: [0, 0, 1], motivo: 'a folga lateral' }] }));
+    expect(comDeclarado.entram.map((e) => [e.vizinha, e.declarado])).toEqual([['apoio', false], ['fura', false], ['longe', true]]);
+    expect(comDeclarado.fora).toEqual([]);
+    /* sem nenhum que encoste, entra o de menor folga com os que empatam com ele, e o limiar é essa folga */
+    const soltos = [{ vizinha: 'a', folgaMm: 0.5, declarado: false }, { vizinha: 'b', folgaMm: 0.5, declarado: false }, { vizinha: 'c', folgaMm: 0.6, declarado: false }, { vizinha: 'd', folgaMm: 9, declarado: true }];
+    expect(encaixesDoPadrao(soltos)).toEqual({ entram: [soltos[0], soltos[1], soltos[3]], fora: [soltos[2]], limiarMm: 0.5 });
+    /* a folga no limite do contato entra, e a logo acima fica de fora */
+    const noLimite = [{ vizinha: 'a', folgaMm: 0, declarado: false }, { vizinha: 'b', folgaMm: 0.01, declarado: false }, { vizinha: 'c', folgaMm: 0.011, declarado: false }];
+    expect(encaixesDoPadrao(noLimite).entram.map((e) => e.vizinha)).toEqual(['a', 'b']);
+    expect(encaixesDoPadrao([])).toEqual({ entram: [], fora: [], limiarMm: FOLGA_DE_CONTATO_MM });
+  });
+
+  it('os cortes do padrão, desenhados de verdade: os dois encaixes de folga zero e o declarado de folga maior saem em imagem, e sem a declaração ele fica de fora', async () => {
+    const { cortesDasFolhas } = await import('./vistas-para-critica.mjs');
+    const apoio = caixaNeutra([0, 0.1, 0], [0.1, 0.12, 0.1]);
+    const fura = caixaNeutra([0.04, -0.03, 0.04], [0.06, 0.002, 0.06]);
+    const longe = caixaNeutra([0.1 + 0.003, 0, 0], [0.13, 0.05, 0.05]);
+    const folhas = [folha('bloco', bloco), folha('apoio', apoio), folha('fura', fura), folha('longe', longe)];
+    const pasta = mkdtempSync(join(area, 'cortes-'));
+    const semDeclarar = cortesDasFolhas({ folhas, instancia: 'bloco', pasta, padrao: true });
+    expect(semDeclarar.cortes.map((c) => [c.vizinha, c.declarado, basename(c.arquivo)])).toEqual([['apoio', false, 'corte-bloco-apoio.png'], ['fura', false, 'corte-bloco-fura.png']]);
+    expect(semDeclarar.fora.map((f) => [f.vizinha, Number(f.folgaMm.toFixed(3))])).toEqual([['longe', 3]]);
+    expect(semDeclarar.limiarMm).toBe(FOLGA_DE_CONTATO_MM);
+    expect(readdirSync(pasta).sort()).toEqual(['corte-bloco-apoio.png', 'corte-bloco-fura.png']);
+    /* a descrição do pedido, feita do que saiu daqui, não chama de folga maior nenhum dos que empataram */
+    const descricao = descricaoDoPacotePadrao({ escolha: { comVista: [], semVista: [] }, cortes: { entram: semDeclarar.cortes, fora: semDeclarar.fora.map((f) => f.vizinha), limiarMm: semDeclarar.limiarMm } });
+    expect(descricao.entrou[2]).toBe('os cortes dos encaixes com `apoio` e `fura`: todo encaixe com folga até 0,01 mm, onde um cruzamento ou uma peça solta aparece primeiro');
+    expect(descricao.fora[1]).toBe('o corte do encaixe com `longe`, de folga maior que 0,01 mm');
+    /* com o corte declarado pela peça, a vizinha de folga maior é desenhada */
+    const declarado = cortesDasFolhas({ folhas, instancia: 'bloco', pasta, padrao: true, cortesDeclarados: [{ vizinha: 'longe', ponto: [101, 25, 25], normal: [0, 0, 1], motivo: 'a folga lateral' }] });
+    expect(declarado.cortes.map((c) => [c.vizinha, c.declarado])).toEqual([['apoio', false], ['fura', false], ['longe', true]]);
+    expect(declarado.fora).toEqual([]);
+    expect(PNG.sync.read(readFileSync(join(pasta, 'corte-bloco-longe.png'))).width).toBeGreaterThan(100);
+    /* sem `padrao` (o pacote completo) saem os de sempre, sem lista de fora nem limiar */
+    const completo = cortesDasFolhas({ folhas, instancia: 'bloco', pasta });
+    expect(completo.cortes.map((c) => c.vizinha)).toEqual(['apoio', 'fura', 'longe']);
+    expect(completo.fora).toEqual([]);
+    expect(completo.limiarMm).toBeNull();
+  });
+
+  it('numa montagem do acervo, sem dublê, o padrão desenha todo encaixe que encosta: a fuselagem do avião tem cinco, e antes saía um', async () => {
+    const montagem = { arquivo: resolve('procedural/pecas/aviao/montagem.json'), instancia: 'fuselagem' };
+    const pasta = mkdtempSync(join(area, 'cortes-do-aviao-'));
+    const feitos = await cortesDosEncaixes({ montagem, pasta, padrao: true });
+    expect(feitos.aviso).toBeNull();
+    expect(feitos.limiarMm).toBe(FOLGA_DE_CONTATO_MM);
+    expect(feitos.cortes.length).toBeGreaterThan(1);
+    for (const c of feitos.cortes) { expect(c.folgaMm).toBeLessThanOrEqual(feitos.limiarMm); expect(existsSync(c.arquivo)).toBe(true); }
+    for (const f of feitos.fora) expect(f.folgaMm).toBeGreaterThan(feitos.limiarMm);
+  }, 60_000);
 
   it('o contato declarado na montagem chega ao encaixe com o motivo, e o par sem declaração sai sem contato', async () => {
     const { encaixesDaPeca, contatosDeclaradosDaMontagem } = await import('./vistas-para-critica.mjs');

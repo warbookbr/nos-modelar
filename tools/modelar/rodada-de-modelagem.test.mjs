@@ -19,11 +19,12 @@ import { acaoSemMedir } from './fluxo-do-objeto.mjs';
 import { conferirPontos, esperadosDosPontos, mudancasDosEsperados, textoDosPontos } from './conferir-pontos.mjs';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { conferirUmaPeca } from './guardas/guarda-referencial.mjs';
-import { AJUDA, ARQUIVO_DAS_DECISOES, copiasQueFicam, fraseDaCopia, VARIAVEL_DA_PASTA_DE_TESTE, VERSAO_DAS_DECISOES, gravarDecisaoDaPessoa, lerDecisoesDaPessoa, nomeDaPastaDoPacote, numeroDaProximaRodada, pastaDoPacoteDaRodada, CAMPOS_OPCIONAIS_LIDOS_PELO_CRITICO, CAMPOS_OPCIONAIS_NAO_LIDOS_PELO_CRITICO, planoQueOCriticoLe, acaoDaPeca, ajustarImportsDaCopia, blocoDaPeca, contradicoesEntreRodadas, entradaDosArquivos, normalizarRelatoDoModelador, resumoDoLaco, gravarRodada, impressaoDaForma, lerArgumentos, lerRodadas, medirReceita, mudancaDosPontos, pastaDeRodadas, pontosDaMedicao, registrarMedida, convergenciaDaPeca, decisaoSobreAsParadas, limiteDaPeca, textoFinalDoAssistente, ultimoBlocoJson } from './rodada-de-modelagem.mjs';
+import { AJUDA, ARQUIVO_DAS_DECISOES, COPIAS_COM_DECISAO_NA_PASTA, conferirPacoteDoVeredito, copiasQueFicam, estaIgualNoGit, fraseDaCopia, VARIAVEL_DA_PASTA_DE_TESTE, VERSAO_DAS_DECISOES, gravarDecisaoDaPessoa, lerDecisoesDaPessoa, nomeDaPastaDoPacote, numeroDaProximaRodada, pastaDoPacoteDaRodada, CAMPOS_OPCIONAIS_LIDOS_PELO_CRITICO, CAMPOS_OPCIONAIS_NAO_LIDOS_PELO_CRITICO, planoQueOCriticoLe, acaoDaPeca, ajustarImportsDaCopia, blocoDaPeca, contradicoesEntreRodadas, entradaDosArquivos, normalizarRelatoDoModelador, resumoDoLaco, gravarRodada, impressaoDaForma, lerArgumentos, lerRodadas, medirReceita, mudancaDosPontos, pastaDeRodadas, pontosDaMedicao, registrarMedida, convergenciaDaPeca, decisaoSobreAsParadas, limiteDaPeca, textoFinalDoAssistente, ultimoBlocoJson } from './rodada-de-modelagem.mjs';
 import { CAMPOS_OPCIONAIS_DO_PLANO } from '../../src/autoria/plano-de-modelagem.js';
 import { normalizarVeredito } from '../../src/autoria/veredito-de-forma.js';
 import { pecasDoAcervo } from './guardas/guarda-acervo.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
+import { impressaoDasPartesDaReceita } from './vistas-para-critica.mjs';
 
 let area;
 const ler = (peca) => lerRodadas(peca, { pasta: join(area, peca) });
@@ -46,6 +47,19 @@ beforeEach(() => { area = mkdtempSync(join(tmpdir(), 'rodadas-')); });
 afterEach(() => rmSync(area, { recursive: true, force: true }));
 
 const CONFERIDAS = [{ nome: 'corpo', confere: true }];
+
+/* O pacote do crítico de uma receita, numa pasta nova da área: o `pacote.json` com a impressão do texto e a das partes, que o registro
+   do veredito confere em toda peça. `impressao` troca a das partes (null: o pacote de antes de 2026-11-26, que não a trazia). */
+const textoSha = (texto) => `sha256:${createHash('sha256').update(texto).digest('hex')}`;
+async function pacoteDe(peca, receita, { impressao, sha256 } = {}) {
+  const arquivo = resolverCaminhoReceita(receita);
+  const pasta = mkdtempSync(join(area, 'pacote-'));
+  writeFileSync(join(pasta, 'pacote.json'), JSON.stringify({
+    formato: 'mecanifica.pacote-do-critico', peca, receita: sha256 ?? textoSha(readFileSync(arquivo, 'utf8')),
+    ...(impressao === null ? {} : { impressaoDasPartes: impressao ?? await impressaoDasPartesDaReceita(arquivo) }),
+  }));
+  return pasta;
+}
 
 describe('registro de rodadas', () => {
   it('o número da próxima rodada a registrar, que dá nome à pasta do pacote do crítico, é o que o registro grava', () => {
@@ -532,7 +546,7 @@ describe('a medição da receita atual trava o laço', () => {
   });
 
   it('a receita gravada na rodada vale como a medida: receita igual segue as rodadas, receita nova pede o crítico', async () => {
-    const { rodada } = await registrarMedida(PECA, entrada({ veredito: veredito(0, 9) }), { pasta: join(area, PECA), medir: medirFixture('ok') });
+    const { rodada } = await registrarMedida(PECA, entrada({ veredito: veredito(0, 9) }), { pasta: join(area, PECA), medir: medirFixture('ok'), pacote: await pacoteDe(PECA, fixture('ok')) });
     expect(rodada.receita.sha256).toBe((await medirReceita(fixture('ok'))).sha256);
     expect(rodada.medidas).toEqual({ passou: true, relatorio: 'descrever (veredito), guarda:acervo, guarda:referencial: ok' });
     const igual = await acaoDaPeca(PECA, { rodadas: ler(PECA), medir: medirFixture('ok') });
@@ -546,7 +560,7 @@ describe('a medição da receita atual trava o laço', () => {
     expect(await impressaoDaForma(fixture('g01-ok'))).toBe(await impressaoDaForma(fixture('ok')));
     expect(await impressaoDaForma(fixture('sapata-deslocada'))).not.toBe(await impressaoDaForma(fixture('ok')));
     const pasta = join(area, PECA);
-    await registrarMedida(PECA, entrada({ veredito: veredito(0, 9) }), { pasta, medir: medirFixture('ok') });
+    await registrarMedida(PECA, entrada({ veredito: veredito(0, 9) }), { pasta, medir: medirFixture('ok'), pacote: await pacoteDe(PECA, fixture('ok')) });
     /* a cópia que a rodada guarda importa a partir da pasta rodadas/ da peça; aqui ela mora fora, e o import vai absoluto */
     writeFileSync(join(pasta, 'receita-01.js'), readFileSync(fixture('ok'), 'utf8').replace("'../suporte.js'", `'${resolve(FIXTURES, 'suporte.js')}'`));
     const mesma = await acaoDaPeca(PECA, { rodadas: ler(PECA), medir: medirFixture('g01-ok'), pasta });
@@ -582,7 +596,7 @@ describe('a medição da receita atual trava o laço', () => {
       .rejects.toThrow(/as medidas declaradas dizem que passou e a ferramenta mediu a receita atual .* como reprovada.*A medição é da ferramenta/s);
     expect(existsSync(pasta)).toBe(false);
     /* a declaração que concorda com a ferramenta é aceita, e vale a medição dela */
-    const { rodada } = await registrarMedida(PECA, entrada({ medidas: { passou: true, relatorio: 'à mão' }, veredito: veredito(0, 9) }), { pasta, medir: medirFixture('ok') });
+    const { rodada } = await registrarMedida(PECA, entrada({ medidas: { passou: true, relatorio: 'à mão' }, veredito: veredito(0, 9) }), { pasta, medir: medirFixture('ok'), pacote: await pacoteDe(PECA, fixture('ok')) });
     expect(rodada.medidas.relatorio).toBe('descrever (veredito), guarda:acervo, guarda:referencial: ok');
   });
 
@@ -605,6 +619,93 @@ describe('a medição da receita atual trava o laço', () => {
 
 /* A RODADA LIDA DIRETO DO QUE OS AGENTES DEVOLVERAM. As fixtures são pequenas e sintéticas, nos dois formatos que o comando reconhece:
    texto puro e a transcrição JSONL do harness (um bloco da resposta por linha, com thinking, tool_use e dois textos na última mensagem). */
+describe('o veredito só se registra sobre o pacote que mostra a receita medida, em toda peça', () => {
+  const PECA = 'peca-de-ensaio';
+  const CONFERIDA = { partes: [{ nome: 'corpo', confere: true }, { nome: 'tampa', confere: true }] };
+  /* uma receita que importa um módulo ao lado: o texto dela é o mesmo nas duas pastas, e só o módulo muda a largura da tampa */
+  const RECEITA = `import { LARGURA_DA_TAMPA } from './modulo.js';
+export const MATERIAIS = { aco: { cor: '#888888' } };
+export const PASSOS = [
+  ['cubo', { origemId: 1, larg: 0.2, alt: 0.1, prof: 0.1, em: [0, 0, 0] }],
+  ['parte', { nome: 'corpo', sel: { origem: { op: 'cubo', id: 1 } } }],
+  ['cubo', { origemId: 2, larg: LARGURA_DA_TAMPA, alt: 0.02, prof: 0.1, em: [0, 0.2, 0] }],
+  ['parte', { nome: 'tampa', sel: { origem: { op: 'cubo', id: 2 } } }],
+];
+`;
+  const versao = (nome, largura) => {
+    const pasta = join(area, nome);
+    mkdirSync(pasta, { recursive: true });
+    writeFileSync(join(pasta, 'receita.js'), RECEITA);
+    writeFileSync(join(pasta, 'modulo.js'), `export const LARGURA_DA_TAMPA = ${largura};\n`);
+    return join(pasta, 'receita.js');
+  };
+  const medicaoDe = (caminho) => async () => ({ passou: true, sha256: textoSha(readFileSync(caminho, 'utf8')), texto: readFileSync(caminho, 'utf8'), caminho, relatorio: 'ok', avisos: [] });
+  const pacoteCom = (dado) => { const pasta = mkdtempSync(join(area, 'pacote-')); if (dado !== undefined) writeFileSync(join(pasta, 'pacote.json'), typeof dado === 'string' ? dado : JSON.stringify(dado)); return pasta; };
+  const REFAZER = `Gere o pacote de novo com \`npm run vistas:critica -- ${PECA}\` (com --saida, passe a mesma pasta em --pacote), despache o crítico com o pedido.md novo e registre o veredito dele.`;
+  const registrar = (caminho, pacote, extra = {}) => registrarMedida(PECA, { ...CONFERIDA, veredito: veredito(0, 9), ...extra }, { pasta: join(area, 'rodadas'), medir: medicaoDe(caminho), pacote });
+
+  it('só o módulo importado muda depois do pacote: o texto da receita é o mesmo, a parte tem outra malha e o veredito é recusado', async () => {
+    const [antes, depois] = [versao('antes', 0.2), versao('depois', 0.25)];
+    expect(readFileSync(depois, 'utf8')).toBe(readFileSync(antes, 'utf8'));
+    const [doPacote, deAgora] = [await impressaoDasPartesDaReceita(antes), await impressaoDasPartesDaReceita(depois)];
+    expect(Object.keys(doPacote.malhas)).toEqual(['corpo', 'tampa']);
+    expect(deAgora.malhas.corpo).toBe(doPacote.malhas.corpo);
+    expect(deAgora.malhas.tampa).not.toBe(doPacote.malhas.tampa);
+    const sha256 = textoSha(RECEITA);
+    const pacote = pacoteCom({ peca: PECA, receita: sha256, impressaoDasPartes: doPacote });
+    await expect(registrar(depois, pacote)).rejects.toThrow(
+      `o veredito do crítico não se registra: recebido: o pacote de ${pacote} mostra outra malha ou outra promessa na parte tampa; esperado as mesmas partes da receita medida agora (${sha256}): `
+      + `o texto da receita é o do pacote, e mudou um módulo que ela importa ou o que ela declara para a parte. ${REFAZER}`,
+    );
+    expect(existsSync(join(area, 'rodadas'))).toBe(false);
+    /* com o pacote da receita de agora, registra, e a rodada grava a impressão das partes que o pacote seguinte compara */
+    const { rodada } = await registrar(depois, pacoteCom({ peca: PECA, receita: sha256, impressaoDasPartes: deAgora }));
+    expect(rodada.impressaoDasPartes).toEqual(deAgora);
+    expect(JSON.parse(readFileSync(join(area, 'rodadas', 'rodada-01.json'), 'utf8')).impressaoDasPartes).toEqual(deAgora);
+  });
+
+  it('recusa a pasta sem pacote.json, o pacote de outra peça e o de outro texto de receita, na peça que não é de lataria', async () => {
+    const caminho = versao('antes', 0.2);
+    const sha256 = textoSha(RECEITA);
+    const impressao = await impressaoDasPartesDaReceita(caminho);
+    const vazia = pacoteCom();
+    await expect(registrar(caminho, vazia)).rejects.toThrow(
+      `o veredito do crítico não se registra: recebido: a pasta do pacote ${vazia} não tem o pacote.json; esperado o pacote.json que o vistas:critica grava com as imagens que o crítico julgou. ${REFAZER}`,
+    );
+    const quebrado = pacoteCom('{ isto não');
+    await expect(registrar(caminho, quebrado)).rejects.toThrow(new RegExp(`recebido: ${quebrado}/pacote\\.json não é JSON \\(.*\\); esperado o pacote\\.json que o vistas:critica grava\\. Gere o pacote de novo com`));
+    const alheio = pacoteCom({ peca: 'outra-peca', receita: sha256, impressaoDasPartes: impressao });
+    await expect(registrar(caminho, alheio)).rejects.toThrow(`recebido: o pacote de ${alheio} é da peça "outra-peca"; esperado o pacote de '${PECA}'. ${REFAZER}`);
+    const velho = pacoteCom({ peca: PECA, receita: `sha256:${'0'.repeat(64)}`, impressaoDasPartes: impressao });
+    await expect(registrar(caminho, velho)).rejects.toThrow(
+      `recebido: o pacote de ${velho} mostra a receita sha256:${'0'.repeat(64)}; esperado ${sha256}, a receita medida agora: o texto dela mudou depois do pacote. ${REFAZER}`,
+    );
+    expect(existsSync(join(area, 'rodadas'))).toBe(false);
+    /* sem `--pacote`, a pasta é a da rodada a registrar, e a falta dela é recusada do mesmo jeito */
+    await expect(registrarMedida(PECA, { ...CONFERIDA, veredito: veredito(0, 9) }, { pasta: join(area, 'rodadas'), medir: medicaoDe(caminho) }))
+      .rejects.toThrow(/recebido: a pasta do pacote .*critica-peca-de-ensaio\/rodada-01 não tem o pacote\.json/);
+    /* a rodada sem veredito não tem pacote a conferir, e não grava impressão das partes */
+    const { rodada } = await registrarMedida(PECA, CONFERIDA, { pasta: join(area, 'rodadas'), medir: medicaoDe(caminho) });
+    expect(rodada.veredito).toBeNull();
+    expect(rodada).not.toHaveProperty('impressaoDasPartes');
+  });
+
+  it('a conferência diz quais partes diferem, recusa a promessa mudada e a receita que deixou de executar, e o pacote de antes passa pelo texto', async () => {
+    const A = { malhas: { corpo: 'a'.repeat(64), tampa: 'b'.repeat(64) }, promessas: { corpo: 'c'.repeat(64) } };
+    const sha256 = `sha256:${'1'.repeat(64)}`;
+    const conferir = (doPacote, impressao) => conferirPacoteDoVeredito(PECA, { pasta: pacoteCom({ peca: PECA, receita: sha256, ...(doPacote === undefined ? {} : { impressaoDasPartes: doPacote }) }), sha256, impressao });
+    expect(await conferir(A, structuredClone(A))).toEqual(A);
+    await expect(conferir(A, { ...A, malhas: { corpo: 'd'.repeat(64) } })).rejects.toThrow('mostra outra malha ou outra promessa nas partes corpo, tampa; esperado');
+    await expect(conferir(A, { ...A, promessas: { corpo: 'e'.repeat(64) } })).rejects.toThrow('mostra outra malha ou outra promessa na parte corpo; esperado');
+    await expect(conferir(A, { ...A, promessas: {} })).rejects.toThrow('na parte corpo; esperado');
+    await expect(conferir(A, null)).rejects.toThrow('mostra partes que a receita de agora não dá, porque ela não executa; esperado as mesmas partes da receita medida agora');
+    /* o pacote gerado antes de 2026-11-26 não traz a impressão: passa pelo texto, e a rodada grava a de agora */
+    expect(await conferir(undefined, A)).toEqual(A);
+    expect(await conferir(null, A)).toEqual(A);
+    expect(await conferir(undefined, null)).toBeNull();
+  });
+});
+
 describe('a rodada lida dos arquivos dos agentes', () => {
   const PASTA = 'tools/fixtures/rodada-dos-agentes';
   const f = (nome) => `${PASTA}/${nome}`;
@@ -695,7 +796,7 @@ describe('a rodada lida dos arquivos dos agentes', () => {
     const FIXTURES = 'tools/fixtures/refina-forma-global';
     const pasta = join(area, 'peca-de-ensaio');
     const entrada = entradaDosArquivos({ modelador: f('modelador-transcricao.jsonl'), critico: f('critico-transcricao.jsonl'), atrito: ['atribuição de quem conduz'] });
-    const { rodada, arquivo } = await registrarMedida('peca-de-ensaio', entrada, { pasta, medir: () => medirReceita(`${FIXTURES}/ok/receita.js`) });
+    const { rodada, arquivo } = await registrarMedida('peca-de-ensaio', entrada, { pasta, medir: () => medirReceita(`${FIXTURES}/ok/receita.js`), pacote: await pacoteDe('peca-de-ensaio', `${FIXTURES}/ok/receita.js`) });
     const gravada = JSON.parse(readFileSync(arquivo, 'utf8'));
     expect(JSON.stringify(gravada.veredito)).toBe(JSON.stringify(normalizarVeredito(blocoDoCritico)));
     expect(gravada.partes.map((p) => p.nome)).toEqual(['sapata', 'corpo']);
@@ -1310,10 +1411,10 @@ describe('a decisão da pessoa, num arquivo ao lado das rodadas', () => {
     const TEXTO = (n) => `export const X = ${n};\n`;
     const SHA = (texto) => `sha256:${createHash('sha256').update(texto).digest('hex')}`;
     const copia = (n) => join(pasta(), `receita-0${n}.js`);
-    const com = (n, { julgada = true } = {}) => gravarRodada(PECA, {
-      partes: CONFERIDAS, ...(julgada ? { medidas: { passou: true, relatorio: 'ok' }, veredito: veredito(1) } : { medidas: { passou: false, relatorio: 'a medida reprovou' } }),
-    }, { pasta: pasta(), receitaTexto: TEXTO(n), agora: () => REGISTRO });
-    const decidirCom = (entrada, receitaTexto) => gravarDecisaoDaPessoa(PECA, entrada, { pasta: pasta(), agora: () => GRAVACAO, receitaTexto });
+    const com = (n, { julgada = true, impressaoDasPartes } = {}) => gravarRodada(PECA, {
+      partes: CONFERIDAS, impressaoDasPartes, ...(julgada ? { medidas: { passou: true, relatorio: 'ok' }, veredito: veredito(1) } : { medidas: { passou: false, relatorio: 'a medida reprovou' } }),
+    }, { pasta: pasta(), receitaTexto: TEXTO(n), agora: () => REGISTRO, recuperavel: () => false });
+    const decidirCom = (entrada, receitaTexto, impressaoAtual = null) => gravarDecisaoDaPessoa(PECA, entrada, { pasta: pasta(), agora: () => GRAVACAO, receitaTexto, impressaoAtual });
 
     it('a rodada com decisão guarda a cópia pelas rodadas seguintes, e a rodada sem decisão a perde como antes', () => {
       com(1); com(2);
@@ -1335,16 +1436,33 @@ describe('a decisão da pessoa, num arquivo ao lado das rodadas', () => {
       expect([1, 2, 3].map((n) => existsSync(copia(n)))).toEqual([false, false, true]);
     });
 
-    it('a decisão sobre uma rodada antiga refaz a cópia quando a receita de agora é a versão que a rodada registrou', () => {
-      com(1); com(2); com(1);
+    it('a decisão sobre uma rodada antiga refaz a cópia só quando a receita de agora tem o texto e as partes que a rodada registrou', () => {
+      const IMPRESSAO = { malhas: { corpo: 'a'.repeat(64) }, promessas: {} };
+      const OUTRA_MALHA = { malhas: { corpo: 'b'.repeat(64) }, promessas: {} };
+      com(1, { impressaoDasPartes: IMPRESSAO }); com(2); com(1);
       expect(existsSync(copia(1))).toBe(false);
-      const { copia: refeita } = decidirCom({ rodada: 1, decisao: DECISAO }, TEXTO(1));
+      /* o mesmo texto com outra malha: mudou um módulo que a receita importa, e a cópia refeita não seria a geometria julgada */
+      const { copia: outraMalha } = decidirCom({ rodada: 1, decisao: DECISAO }, TEXTO(1), OUTRA_MALHA);
+      expect(outraMalha).toEqual({ arquivo: copia(1), estado: 'ausente', sha256: SHA(TEXTO(1)), porque: 'partes' });
+      expect(existsSync(copia(1))).toBe(false);
+      expect(fraseDaCopia(outraMalha, { peca: PECA, rodada: 1, raiz: area })).toContain('e a receita atual tem o mesmo texto da rodada e produz outras partes, porque mudou um módulo que ela importa. A decisão foi gravada, e a geometria julgada nessa rodada não foi refeita.');
+      /* sem a impressão de agora não há como conferir, e a cópia também não se refaz */
+      expect(decidirCom({ rodada: 1, decisao: OUTRA, substituir: true }, TEXTO(1), null).copia).toMatchObject({ estado: 'ausente', porque: 'sem-impressao' });
+      const { copia: refeita } = decidirCom({ rodada: 1, decisao: DECISAO, substituir: true }, TEXTO(1), IMPRESSAO);
       expect(refeita).toEqual({ arquivo: copia(1), estado: 'refeita' });
       expect(readFileSync(copia(1), 'utf8')).toBe(TEXTO(1));
-      expect(fraseDaCopia(refeita, { peca: PECA, rodada: 1, raiz: area })).toContain(`foi refeita da receita atual, que é a mesma versão que a rodada registrou: ${PECA}/receita-01.js.`);
+      expect(fraseDaCopia(refeita, { peca: PECA, rodada: 1, raiz: area })).toContain(`foi refeita da receita atual, que tem o mesmo texto e produz as mesmas partes que a rodada registrou: ${PECA}/receita-01.js.`);
       /* e a rodada gravada depois não a apaga */
       com(4);
       expect([1, 2, 3, 4].map((n) => existsSync(copia(n)))).toEqual([true, false, false, true]);
+    });
+
+    it('a rodada que não gravou a impressão das partes não tem a cópia refeita pelo texto igual, e o aviso diz por quê', () => {
+      com(1); com(2); com(1);
+      const { copia: ausente } = decidirCom({ rodada: 1, decisao: DECISAO }, TEXTO(1), { malhas: { corpo: 'a'.repeat(64) }, promessas: {} });
+      expect(ausente).toEqual({ arquivo: copia(1), estado: 'ausente', sha256: SHA(TEXTO(1)), porque: 'sem-impressao' });
+      expect(existsSync(copia(1))).toBe(false);
+      expect(fraseDaCopia(ausente, { peca: PECA, rodada: 1, raiz: area })).toContain('a rodada não gravou a impressão das partes com que conferir se os módulos que a receita importa ainda dão a mesma malha');
     });
 
     it('a decisão sobre uma rodada antiga de outra versão grava a decisão e avisa, com o recebido, o esperado e o comando', () => {
@@ -1352,14 +1470,53 @@ describe('a decisão da pessoa, num arquivo ao lado das rodadas', () => {
       for (const atual of [TEXTO(2), null]) {
         const { copia: ausente, entrada } = decidirCom({ rodada: 1, decisao: atual ? DECISAO : OUTRA, substituir: !atual }, atual);
         expect(entrada.rodada).toBe(1);
-        expect(ausente).toEqual({ arquivo: copia(1), estado: 'ausente', sha256: SHA(TEXTO(1)) });
+        expect(ausente).toEqual({ arquivo: copia(1), estado: 'ausente', sha256: SHA(TEXTO(1)), porque: 'texto' });
         expect(existsSync(copia(1))).toBe(false);
         const frase = fraseDaCopia(ausente, { peca: PECA, rodada: 1, raiz: area });
         expect(frase).toBe(`AVISO: a cópia da receita da rodada 1 de '${PECA}' não está na pasta (recebido: ${PECA}/receita-01.js não existe; esperado o arquivo que o registro da rodada grava), `
-          + `e a receita atual é outra versão que a registrada na rodada (${SHA(TEXTO(1))}). A decisão foi gravada, e a geometria julgada nessa rodada não foi guardada: `
-          + `até 2026-11-26 só a cópia da última rodada ficava. Se a versão existir no git, recupere-a com \`git log --oneline -- ${PECA}/receita-01.js\` e \`git show <commit>:${PECA}/receita-01.js > ${PECA}/receita-01.js\`.`);
+          + `e a receita atual é outra versão que a registrada na rodada (${SHA(TEXTO(1))}). A decisão foi gravada, e a geometria julgada nessa rodada não foi refeita. `
+          + `Se a versão existir no git, recupere-a com \`git log --oneline -- ${PECA}/receita-01.js\` e \`git show <commit>:${PECA}/receita-01.js > ${PECA}/receita-01.js\`.`);
       }
       expect(decisoes().map((d) => d.rodada)).toEqual([1]);
+    });
+
+    it('as cópias com decisão têm limite: ficam as das três decididas mais novas, e a mais antiga só sai quando o git a tem igual', () => {
+      expect(COPIAS_COM_DECISAO_NA_PASTA).toBe(3);
+      const rodadas = [1, 2, 3, 4, 5, 6].map((numero) => ({ numero, veredito: numero === 6 ? null : {} }));
+      /* cinco decididas: as três mais novas ficam; a 1 e a 2 ficam enquanto o git não as tem, e saem quando tem */
+      expect([...copiasQueFicam(rodadas, [1, 2, 3, 4, 5])].sort()).toEqual([1, 2, 3, 4, 5]);
+      expect([...copiasQueFicam(rodadas, [1, 2, 3, 4, 5], { recuperavel: () => true })].sort()).toEqual([3, 4, 5]);
+      expect([...copiasQueFicam(rodadas, [1, 2, 3, 4, 5], { recuperavel: (n) => n === 2 })].sort()).toEqual([1, 3, 4, 5]);
+      /* a decisão fora de ordem não muda quais são as mais novas, e a última julgada fica mesmo sem decisão */
+      expect([...copiasQueFicam(rodadas, [4, 1, 3, 2], { recuperavel: () => true })].sort()).toEqual([2, 3, 4, 5]);
+      expect([...copiasQueFicam(rodadas, [1, 2], { limite: 1, recuperavel: () => true })].sort()).toEqual([2, 5]);
+      /* na pasta: cinco rodadas decididas e mais uma; com o git tendo as cópias, ficam as três decididas mais novas e a última */
+      const gravarCom = (n, recuperavel) => gravarRodada(PECA, { partes: CONFERIDAS, medidas: { passou: true, relatorio: 'ok' }, veredito: veredito(1) }, { pasta: pasta(), receitaTexto: TEXTO(n), agora: () => REGISTRO, recuperavel });
+      const consultadas = [];
+      for (const n of [1, 2, 3, 4, 5]) { gravarCom(n, () => false); decidirCom({ rodada: n, decisao: DECISAO }, TEXTO(n)); }
+      expect([1, 2, 3, 4, 5].map((n) => existsSync(copia(n)))).toEqual([true, true, true, true, true]);
+      gravarCom(6, (arquivo) => { consultadas.push(arquivo); return arquivo === copia(1); });
+      expect(consultadas).toEqual([copia(1), copia(2)]);
+      expect([1, 2, 3, 4, 5, 6].map((n) => existsSync(copia(n)))).toEqual([false, true, true, true, true, true]);
+      expect(readFileSync(copia(2), 'utf8')).toBe(TEXTO(2));
+    });
+
+    it('a cópia só conta como recuperável quando o último commit do git a tem com o mesmo conteúdo', () => {
+      const repo = mkdtempSync(join(area, 'git-'));
+      const git = (...args) => spawnSync('git', ['-C', repo, '-c', 'user.name=teste', '-c', 'user.email=teste@exemplo.invalid', '-c', 'commit.gpgsign=false', ...args], { encoding: 'utf8' });
+      expect(git('init', '-q').status).toBe(0);
+      const arquivo = join(repo, 'receita-01.js');
+      expect(estaIgualNoGit(arquivo)).toBe(false);
+      writeFileSync(arquivo, TEXTO(1));
+      /* fora do git, e depois só no índice: ainda não se recupera */
+      expect(estaIgualNoGit(arquivo)).toBe(false);
+      git('add', '.');
+      expect(estaIgualNoGit(arquivo)).toBe(false);
+      expect(git('commit', '-q', '-m', 'cópia').status).toBe(0);
+      expect(estaIgualNoGit(arquivo)).toBe(true);
+      /* mudada depois do commit: o git tem outra, e esta não sai */
+      writeFileSync(arquivo, TEXTO(2));
+      expect(estaIgualNoGit(arquivo)).toBe(false);
     });
 
     it('a cópia da última rodada julgada pelo crítico fica quando a rodada seguinte não tem veredito', () => {
@@ -1389,7 +1546,8 @@ describe('a decisão da pessoa, num arquivo ao lado das rodadas', () => {
       expect(r.status).toBe(0);
       expect(r.stdout).toContain(`decisão da pessoa sobre a rodada 1 gravada em`);
       expect(r.stdout).toContain(`a cópia da receita julgada nessa rodada fica guardada em ${join(pasta(), 'receita-01.js')}.`);
-      expect(AJUDA).toContain('a cópia da receita\n      dessa rodada (rodadas/receita-NN.js) passa a ficar guardada, e as rodadas seguintes não a apagam');
+      expect(AJUDA).toContain('a cópia da receita\n      dessa rodada (rodadas/receita-NN.js) passa a ficar guardada, e as rodadas seguintes não a apagam (além das 3\n      rodadas decididas mais novas, a cópia mais antiga sai da pasta quando o git a tem igual)');
+      expect(AJUDA).toContain('com veredito, confere que o\n      pacote.json da pasta do pacote (a da rodada, ou a de --pacote) mostra a receita medida, no texto e nas partes');
     }, 60000);
   });
 
