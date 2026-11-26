@@ -616,13 +616,16 @@ function veredictoPorCorpo(a, b, solidoDe, tolerancia, memoria) {
       else if (estado !== 'separadas') {
         inconclusivo = true;
         const rotulo = `${a.nome} corpo ${ia} x ${b.nome} corpo ${ib}`;
-        for (const m of [solidoDe.motivoDoCorpo(a.nome, ia), solidoDe.motivoDoCorpo(b.nome, ib), ...diagnosticos.map((d) => `${rotulo}: ${d}`)]) if (m && !motivos.includes(m)) motivos.push(m);
+        /* o motivo do corpo que não virou sólido basta; o diagnóstico do par entra só quando os dois corpos viraram sólido */
+        const doCorpo = [solidoDe.motivoDoCorpo(a.nome, ia), solidoDe.motivoDoCorpo(b.nome, ib)].filter(Boolean);
+        for (const m of doCorpo.length ? doCorpo : diagnosticos.map((d) => `${rotulo}: ${d}`)) if (!motivos.includes(m)) motivos.push(m);
       }
     });
   });
+  /* o par de corpos que toca e não se decide pesa antes do encosto: sem ele não se pode dizer que as partes só encostam */
   if (interpenetra) return { estado: 'interpenetram' };
-  if (encosta) return { estado: 'encostam' };
   if (inconclusivo) return { estado: 'inconclusivo', motivos };
+  if (encosta) return { estado: 'encostam' };
   return { estado: 'separadas' };
 }
 
