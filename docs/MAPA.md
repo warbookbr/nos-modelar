@@ -6,6 +6,7 @@
 > algum arquivo-fonte estiver sem cabeçalho.
 
 2396 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2369 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -369,6 +370,11 @@
 
 - `README.md` — Etapas pela impressão do aceite: provas
 
+## docs/modelar/banco-de-provas/execucao-paralela-2026-11-26/
+
+- `README.md` — Execução paralela: quanto as ferramentas ganham com mais núcleos
+- `medir.mjs` — medir.mjs — as medidas do plano da execução paralela (fatia 1). Uso, da raiz do repositório, um modo por processo: node --max-old-space-size=8192 <este arqui…
+
 ## docs/modelar/banco-de-provas/familias-de-desenho-2026-10-14/braco/
 
 - `NOTAS.md` — Braço robótico, vista lateral: o desenho por restrições ajustado à referência
@@ -710,6 +716,7 @@
 - `2026-11-25-acabamento-hard-surface.md` — Acabamento de hard surface: chanfro e arredondamento em qualquer aresta, linhas de painel e recortes na casca
 - `2026-11-25-elo-entre-juntas.md` — Elo entre juntas: a carenagem oca do membro, de uma flange de atuador à outra
 - `2026-11-25-resgate-dos-ramos-antigos.md` — Resgate dos ramos antigos: as peças, as ferramentas e o núcleo que nunca entraram na main
+- `2026-11-26-operacoes-repartidas-entre-nucleos.md` — Operações repartidas entre núcleos: o corte das aberturas, a subtração e a divisão usando mais de um núcleo, com a mesma malha
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
@@ -3116,6 +3123,8 @@
 - `ambiente.mjs` — ambiente.mjs — lê uma variável de ambiente pelo nome novo (`MODELAR_*`) e aceita o antigo (`MECANIFICA_*`) com aviso.
 - `ambiente.test.mjs` — ambiente.test.mjs — o nome novo vale, o antigo vale com um aviso só por nome, e o vazio conta como ausente.
 - `gates.mjs` — gates.mjs — roda TODOS os gates e relata TODOS, em vez de parar no primeiro.
+- `processos-da-maquina.mjs` — processos-da-maquina.mjs — quantas execuções as ferramentas que percorrem o acervo (a guarda do acervo, a aprovação da família e as baterias de teste) rodam …
+- `processos-da-maquina.test.mjs` — processos-da-maquina.test.mjs — a conta do número de processos pelos núcleos e pela memória, e o pedido em MODELAR_PROCESSOS.
 - `testes-lentos.mjs` — testes-lentos.mjs — a lista dos arquivos de teste que saem da bateria padrão, e o comando que roda cada uma das duas.
 - `testes-lentos.test.mjs` — testes-lentos.test.mjs — a lista dos lentos aponta para arquivos que existem, e a bateria dos lentos roda todos onde precisa.
 - `vitest-duracoes.mjs` — vitest-duracoes.mjs — repórter do Vitest que grava a duração de cada arquivo de teste.

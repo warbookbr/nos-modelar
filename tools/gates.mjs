@@ -23,7 +23,7 @@
  */
 import { spawn, spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
-import { availableParallelism } from 'node:os';
+import { processosDaMaquina } from './processos-da-maquina.mjs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { pecasMudadas, rodarGuardaLocal } from './gates/guarda-local.mjs';
@@ -176,7 +176,7 @@ export const GATES = [
 /* O teto de quatro de cada vez era o tamanho da máquina da sessão; numa máquina maior ele deixava processadores parados. O
    peso de cada gate (PESO_DO_GATE, abaixo) e o orçamento da máquina já seguram a soma, então o número de gates ao mesmo tempo
    acompanha os processadores. */
-const CONCORRENCIA_PADRAO = Math.max(2, availableParallelism());
+const CONCORRENCIA_PADRAO = Math.max(2, processosDaMaquina());
 
 /* Os recursos que cada gate ocupa sozinho. Os ausentes não disputam nada. As guardas da bancada, que eram oito gates com um
    servidor do Vite cada, são um gate só (`bancada:guardas`) com um servidor para todas, e é ele que ocupa o cache.
@@ -208,7 +208,7 @@ export const PESO_DO_GATE = {
   /* Ela mede tempo de parede: com outros gates na máquina o número sai inflado e reprova sem razão, então roda sozinha. */
   'guarda:tempo': 64,
 };
-const ORCAMENTO_DA_MAQUINA = Math.max(2, availableParallelism());
+const ORCAMENTO_DA_MAQUINA = Math.max(2, processosDaMaquina());
 
 /* BATERIA CURTA QUANDO SÓ MUDOU PEÇA OU DOCUMENTO.
  *

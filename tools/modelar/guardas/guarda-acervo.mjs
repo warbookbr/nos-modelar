@@ -18,7 +18,7 @@
  * acusar.
  */
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
-import { availableParallelism } from 'node:os';
+import { processosDaMaquina } from '../../processos-da-maquina.mjs';
 import { isMainThread, parentPort, Worker, workerData } from 'node:worker_threads';
 import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -323,7 +323,7 @@ export async function conferirPeca(peca, { cachePorPrefixo = false } = {}) {
    varredura em fila única. Lista curta (a peça de ensaio de um teste, a rodada de uma peça) roda aqui mesmo, sem fio. */
 const PECAS_PARA_REPARTIR = 6;
 
-export async function conferirAcervo(pecas = pecasDoAcervo(), { fios = Math.min(availableParallelism(), 4), cachePorPrefixo = false } = {}) {
+export async function conferirAcervo(pecas = pecasDoAcervo(), { fios = processosDaMaquina(), cachePorPrefixo = false } = {}) {
   /* o cache por prefixo só vale na varredura em fila única, que é a da rodada de uma peça; a repartida segue sem ele */
   const porPeca = pecas.length < PECAS_PARA_REPARTIR || fios < 2
     ? await sequencial(pecas, { cachePorPrefixo })
