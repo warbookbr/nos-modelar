@@ -15,7 +15,8 @@
  *   - registro que não lê como JSON ou sem a lista `ferramentas`;
  *   - ferramenta de uso que nenhum roteiro, skill ou guia cita (pelo `npm run <comando>` ou pelo caminho do arquivo), e a
  *     entrada cujo campo `aparece` (até três lugares onde ela é citada) não bate com a árvore; a declarada em `semChamador`
- *     ou em `apoioDeTeste` espera a decisão de lá e fica de fora;
+ *     ou em `apoioDeTeste` espera a decisão de lá e fica de fora, e a que está no território de um plano ativo espera a
+ *     citação até o plano fechar;
  *   - `tools/README.md` diferente do que o registro gera.
  *
  * Só importa `node:`: o `--gerar` roda no passo de juntar à main do CI, antes do `npm ci`.
@@ -354,6 +355,16 @@ export function conferirRegistro({ arquivos, scripts = {}, registro, leiame = nu
   /* A ferramenta de uso precisa aparecer onde se trabalha: a que só o registro conhece ninguém acha na hora de usar. */
   const lugares = ondeAparece(arquivos, entradas);
   const aguardaDecisao = new Set([...(registro.apoioDeTeste ?? []), ...(registro.semChamador ?? [])].flatMap(arquivosDa));
+  /* A ferramenta que um plano ativo está criando (ela está no território dele) espera a citação até ele fechar: quem a escreve
+     ainda não sabe em que momento do trabalho ela entra, e o plano é quem diz. Fechado o plano, a regra volta a valer. */
+  const emPlanoAtivo = new Set();
+  for (const [caminho, texto] of Object.entries(arquivos)) {
+    if (!/^docs\/modelar\/planos\/\d{4}-\d{2}-\d{2}-[^/]+\.md$/.test(caminho) || typeof texto !== 'string') continue;
+    if (texto.match(/^\*\*Estado:\*\*\s*(.+?)\s*$/m)?.[1]?.toLowerCase() !== 'ativo') continue;
+    const linha = texto.match(/^\*\*Território:\*\*\s*(.*?)\s*$/m)?.[1] ?? '';
+    for (const m of linha.matchAll(/`([^`]+)`/g)) emPlanoAtivo.add(m[1].trim());
+  }
+  const dePlanoAtivo = (arquivo) => [...emPlanoAtivo].some((c) => c === arquivo || (c.endsWith('/') && arquivo.startsWith(c)));
   for (const e of entradas) {
     if (e.tipo !== 'uso') {
       if (e.aparece !== undefined && TIPOS.includes(e.tipo)) problemas.push(`${REGISTRO}: recebido o campo \`aparece\` em ${e.arquivo}, que é do tipo ${e.tipo}; esperado o campo só na ferramenta de uso; rode \`npm run ferramentas:registro:gerar\`.`);
@@ -362,7 +373,7 @@ export function conferirRegistro({ arquivos, scripts = {}, registro, leiame = nu
     if (!(e.arquivo in arquivos) || !linhasDeComando.includes(e.arquivo)) continue;
     const todos = lugares[e.arquivo] ?? [];
     const chamada = (e.comandos ?? []).length ? `\`npm run ${e.comandos[0]}\`` : `\`node ${e.arquivo}\``;
-    if (!todos.length && !aguardaDecisao.has(e.arquivo)) {
+    if (!todos.length && !aguardaDecisao.has(e.arquivo) && !dePlanoAtivo(e.arquivo)) {
       problemas.push(`${REGISTRO}: recebido a ferramenta de uso ${e.arquivo} (${chamada}), que nenhum roteiro, skill ou guia cita; esperado ao menos uma citação em docs/modelar/roteiros/roteiros.json, em .claude/skills/ ou .claude/agents/, ou num guia (docs/modelar/usar/, docs/modelar/guias/, docs/modelar/contratos/, o CLAUDE.md da pasta ou o README do módulo); cite ${chamada} no lugar onde ela entra no trabalho, com a frase de quando usar, e rode \`npm run ferramentas:registro:gerar\`, ou, se é ferramenta de manutenção que ninguém chama ao trabalhar, troque o \`tipo\` para "interna".`);
       continue;
     }

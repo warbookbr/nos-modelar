@@ -47,6 +47,7 @@ Quem trabalha chama, com `npm run <comando> -- <argumentos>`; a que não tem com
 | `descrever` | Mede uma peça sem navegador: caixa, partes, contatos, malha e avisos, em texto ou JSON. |
 | `distancia:pele` | Mede, por região, a distância da superfície limite da chapa à pele analítica que a receita declara, e junta o veredito ao da zebra. |
 | `esboco:nucleo` | Monta as opções de forma de um esboço com as operações do núcleo e as captura na bancada, lado a lado. |
+| `esqueleto` | O esqueleto de proporção de um robô como árvore de juntas, e o andaime e as articulações gerados dela. |
 | `etapas` | O registro de etapas de uma montagem v5, em disco, e a única porta para fixar uma etapa. |
 | `exportar:ficha` | CLI que exporta a ficha de um objeto montado para a ponte com o nos-mecatronica. |
 | `exportar:gltf` | CLI que grava uma receita procedural como glTF 2.0 binário (.glb), com os materiais dela. |

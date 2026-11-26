@@ -363,6 +363,14 @@ describe('onde a ferramenta de uso aparece', () => {
     expect(ondeAparece(arvore(), [{ ...registroEmDia().ferramentas[0], tipo: 'interna' }])).toEqual({});
   });
 
+  it('a ferramenta que um plano ativo está criando espera a citação até o plano fechar', () => {
+    const plano = (estado) => `# Plano\n\n**Estado:** ${estado}\n\n**Núcleo:** não\n\n**Território:** \`tools/modelar/medir.mjs\`\n`;
+    const comPlano = conferir(arvore({ [GUIA]: 'outra coisa\n', [doc('planos', '2026-11-26-x.md')]: plano('ativo') }));
+    expect(comPlano.some((p) => p.includes('que nenhum roteiro, skill ou guia cita')), comPlano.join('\n')).toBe(false);
+    const [problema] = conferir(arvore({ [GUIA]: 'outra coisa\n', [doc('planos', '2026-11-26-x.md')]: plano('concluído') }));
+    expect(problema).toContain('que nenhum roteiro, skill ou guia cita');
+  });
+
   it('a ferramenta de uso que nenhum roteiro, skill ou guia cita reprova, com o recebido, o esperado e o conserto', () => {
     const arquivos = arvore({ [GUIA]: 'Este guia fala de outra coisa.\n' });
     const [problema, ...resto] = conferir(arquivos);
@@ -527,6 +535,11 @@ describe('o repositório de hoje', () => {
     expect(arquivos[ROTEIROS], 'a árvore lida traz o JSON dos roteiros').toBeTruthy();
     const lugares = ondeAparece(arquivos, registro.ferramentas);
     const declarados = new Set([...registro.apoioDeTeste, ...registro.semChamador].flatMap((d) => (d.pasta ? d.arquivos : [d.arquivo])));
+    /* a ferramenta que um plano ativo está criando espera a citação até ele fechar */
+    for (const [caminho, texto] of Object.entries(arquivos)) {
+      if (!/^docs\/modelar\/planos\/\d{4}-\d{2}-\d{2}-[^/]+\.md$/.test(caminho) || !/^\*\*Estado:\*\* ativo/m.test(texto)) continue;
+      for (const m of (texto.match(/^\*\*Território:\*\*(.*)$/m)?.[1] ?? '').matchAll(/`([^`]+)`/g)) declarados.add(m[1].trim());
+    }
     const deUso = registro.ferramentas.filter((e) => e.tipo === 'uso');
     expect(deUso.length).toBeGreaterThan(90);
     expect(deUso.filter((e) => lugares[e.arquivo].length === 0 && !declarados.has(e.arquivo)).map((e) => e.arquivo)).toEqual([]);

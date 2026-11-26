@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2442 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2445 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -738,6 +738,7 @@
 - `2026-11-22-curva-paralela-na-rede.md` — Curva paralela na rede de curvas: os anéis em volta de um vão sem desenhar ponto a ponto
 - `2026-11-25-acabamento-hard-surface.md` — Acabamento de hard surface: chanfro e arredondamento em qualquer aresta, linhas de painel e recortes na casca
 - `2026-11-25-elo-entre-juntas.md` — Elo entre juntas: a carenagem oca do membro, de uma flange de atuador à outra
+- `2026-11-26-esqueleto-de-proporcao.md` — Esqueleto de proporção: bolas nas juntas e bastões nos membros, em 3D, antes de modelar o robô
 - `2026-11-26-ferramentas-e-documentacao.md` — Ferramentas e documentação: toda ferramenta registrada e achada, e o roteador cobrindo o trabalho inteiro
 - `2026-11-26-laco-de-modelagem-mais-rapido.md` — Laço de modelagem mais rápido: a rodada mede, mostra e registra em minutos, com a decisão da pessoa gravada
 - `2026-11-26-operacoes-repartidas-entre-nucleos.md` — Operações repartidas entre núcleos: o corte das aberturas, a subtração e a divisão usando mais de um núcleo, com a mesma malha
@@ -4110,6 +4111,8 @@
 - `esboco-nucleo.mjs` — esboco-nucleo.mjs — o esboço 2.0: as opções de forma de um esboço saem das operações do núcleo, cada uma montada como receita em memória e capturada na banca…
 - `esboco-para-passos.mjs` — esboco-para-passos.mjs — converte as formas de um esboço em passos de uma receita do Modelar (`cubo`, `chamferBox`, `cilindro`, `extrusao`, `rotaciona` e `pa…
 - `esboco-para-passos.test.mjs` — A conversão do esboço em passos de receita: as onze cadeiras escolhidas (receitas do externo traduzidas em esboço) convertem sem recusa, e a malha que o núcl…
+- `esqueleto.mjs` — esqueleto.mjs — o esqueleto de proporção de um robô como árvore de juntas, e o andaime e as articulações gerados dela.
+- `esqueleto.test.mjs` — esqueleto.test.mjs — a árvore de juntas: recusas com campo e conserto, determinismo, propagação de medida, o andaime no normalizador de forma-global e a conf…
 - `estado-bancada.test.ts` — estado-bancada.test.ts — contrato headless das vistas, seleção, contexto e URL da bancada.
 - `estudo-campo-revalidacao.test.ts` — R05: estudo de campo sobre uma peça compartilhada em duas raízes.
 - `etapas-consumidores-v3.test.mjs` — etapas-consumidores-v3.test.mjs — cada consumidor do estado das etapas, de ponta a ponta, sobre um registro v3 em disco. A pasta de prova é uma cópia do `car…
