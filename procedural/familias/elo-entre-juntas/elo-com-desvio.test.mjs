@@ -30,10 +30,11 @@ describe('elo entre juntas com desvio', () => {
       expect(() => chamar(F, 'e', { comprimento: 100, desvio: 36.7 })).not.toThrow();
       expect(recusa({ comprimento: 100, desvio: 36.9 }).restricao).toBe('curva-fecha-a-parede');
     });
-    it('o deslocamento lateral que dobra o eixo demais, para os dois lados', () => {
-      expect(recusa({ deslocamentoLateral: 150 }).restricao).toBe('curva-fecha-a-parede');
-      expect(recusa({ deslocamentoLateral: -150 }).restricao).toBe('curva-fecha-a-parede');
-      expect(() => chamar(F, 'e', { deslocamentoLateral: 50 })).not.toThrow();
+    it('o deslocamento lateral que dobra o eixo demais, para os dois lados (o azimute vira o lado)', () => {
+      expect(recusa({ comprimento: 100, deslocamentoLateral: 40 }).restricao).toBe('curva-fecha-a-parede');
+      expect(recusa({ comprimento: 100, deslocamentoLateral: 40, azimute: 180 }).restricao).toBe('curva-fecha-a-parede');
+      expect(() => chamar(F, 'e', { deslocamentoLateral: 40 })).not.toThrow();
+      expect(() => chamar(F, 'e', { deslocamentoLateral: -1 })).toThrow(/parametros\.deslocamentoLateral/);
     });
     it('o desvio acima do teto do contrato e o azimute fora da faixa', () => {
       expect(() => chamar(F, 'e', { desvio: 95 })).toThrow(/parametros\.desvio/);

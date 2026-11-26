@@ -72,8 +72,8 @@
       "tipo": "numero",
       "unidade": "mm",
       "padrao": 0,
-      "minimo": -150,
-      "maximo": 150,
+      "minimo": 0,
+      "maximo": 40,
       "medio": 0
     },
     "diametroDaBocaA": {

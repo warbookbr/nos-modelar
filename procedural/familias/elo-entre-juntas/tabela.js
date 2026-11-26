@@ -23,7 +23,8 @@
      desvio: o ângulo, em graus, entre o eixo da boca B e o da boca A (0 é o elo reto, até 90). A boca B sai na posição e na direção novas, e as
        seções acompanham a curva sem torcer. A restrição `curva-fecha-a-parede` recusa o que dobra demais para a seção, dizendo o recebido e o aceito.
      azimute: a direção do desvio em graus em volta do eixo do elo (0 dobra para +z, no sentido da profundidade; 90 para +x, no da largura).
-     deslocamentoLateral: o afastamento extra da boca B, em mm, na direção do desvio (soma-se ao do arco do desvio; negativo vai para o outro lado).
+     deslocamentoLateral: o afastamento extra da boca B, em mm (0 a 40), na direção do desvio (soma-se ao do arco do desvio; para o outro lado,
+       gire o azimute 180 graus).
    devolve: os parâmetros completos da família, que a chamada completa com os padrões.
    exemplo:
      parametrosDoElo({ de: parametrosDoAtuador(100), para: parametrosDoAtuador(100), comprimento: 230, larguraDaSecao: 96, profundidadeDaSecao: 76, cintura: 0.85 })

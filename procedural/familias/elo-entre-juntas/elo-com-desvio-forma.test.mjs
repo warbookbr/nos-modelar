@@ -15,7 +15,7 @@ describe('elo entre juntas com desvio, a forma', () => {
   });
 
   it('a boca B sai no ponto e na direção do caminho, e a normal da porta é a tangente girada do desvio', () => {
-    for (const parametros of [{ desvio: 25 }, { desvio: 40, azimute: 60, deslocamentoLateral: -20 }]) {
+    for (const parametros of [{ desvio: 25 }, { desvio: 40, azimute: 60, deslocamentoLateral: 20 }]) {
       const q = { ...PADRAO, ...parametros };
       const n = gerar(parametros);
       const I = n.portas.get('boca-b').interface;
