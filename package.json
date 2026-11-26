@@ -47,6 +47,7 @@
     "etapas": "node tools/modelar/etapas-da-montagem.mjs",
     "planejado": "node tools/modelar/planejado-contra-executado.mjs",
     "proporcoes": "node tools/modelar/proporcoes.mjs",
+    "esqueleto": "node tools/modelar/esqueleto.mjs",
     "manual": "node modulos/manual/src/manual.mjs",
     "revisar": "node tools/modelar/olhar-bancada.mjs --revisar",
     "preparar:modelagem": "node tools/modelagem/preparar-pacote.mjs",

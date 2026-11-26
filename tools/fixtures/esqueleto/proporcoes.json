@@ -1,0 +1,31 @@
+{
+  "formato": "mecanifica.proporcoes@1",
+  "id": "braco-de-prova",
+  "unidade": "mm",
+  "nota": "Fixture do esqueleto de proporção: um braço de duas juntas (ombro e cotovelo) com mão, e o espelho do lado esquerdo. `npm run esqueleto -- --proporcoes=tools/fixtures/esqueleto/proporcoes.json --escrever` grava andaime.json e articulacoes.json.",
+  "medidas": {
+    "alturaDoTronco": 1400,
+    "larguraDosOmbros": 400,
+    "comprimentoDoBraco": 300,
+    "comprimentoDoAntebraco": 250,
+    "raioDoTronco": 70,
+    "raioDoOmbro": 40,
+    "raioDoCotovelo": 32,
+    "raioDaMao": 28,
+    "raioDoBastaoDoBraco": 22,
+    "raioDoBastaoDoAntebraco": 18
+  },
+  "esqueleto": {
+    "id": "braco-de-prova",
+    "familia": "humanoide",
+    "intencao": "Braço de prova de duas juntas com mão e o espelho esquerdo, na pose zero (braços pendentes).",
+    "saidas": { "andaime": "andaime.json", "articulacoes": "articulacoes.json" },
+    "raiz": { "id": "tronco", "posicao": [0, "=alturaDoTronco", 0], "raioDaBola": "=raioDoTronco" },
+    "juntas": [
+      { "id": "ombro-direito", "pai": "tronco", "comprimento": "=larguraDosOmbros / 2", "direcao": [1, 0, 0], "raioDaBola": "=raioDoOmbro", "raioDoBastao": "=raioDoBastaoDoBraco", "eixo": [1, 0, 0], "curso": { "minimo": -60, "maximo": 180 } },
+      { "id": "cotovelo-direito", "pai": "ombro-direito", "comprimento": "=comprimentoDoBraco", "direcao": [0, -1, 0], "raioDaBola": "=raioDoCotovelo", "raioDoBastao": "=raioDoBastaoDoBraco", "eixo": [1, 0, 0], "curso": { "minimo": 0, "maximo": 140 } },
+      { "id": "mao-direito", "pai": "cotovelo-direito", "comprimento": "=comprimentoDoAntebraco", "direcao": [0, -1, 0], "raioDaBola": "=raioDaMao", "raioDoBastao": "=raioDoBastaoDoAntebraco" },
+      { "id": "ombro-esquerdo", "pai": "tronco", "espelho": { "de": "ombro-direito", "plano": "x", "troca": ["direito", "esquerdo"] } }
+    ]
+  }
+}
