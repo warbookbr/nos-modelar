@@ -139,7 +139,7 @@ const soChaves = (objeto, permitidas, onde) => {
 function validarRegistro(registro) {
   if (!registro || registro.formato !== FORMATO_REGISTRO_DE_ETAPAS) falhar('registro-invalido', 'o registro de etapas não tem o formato esperado.');
   if (registro.versao === 1 || registro.versao === 2) {
-    falhar('registro-antigo', `o registro de etapas é da versão ${registro.versao}, que guarda o estado de cada etapa; a leitura por impressão só lê a versão ${VERSAO_REGISTRO_PELA_IMPRESSAO}, e o registro antigo passa pela migração (\`node tools/modelar/migrar-etapas-para-impressao.mjs <montagem.json> --gravar\`, sem --gravar só o ensaio).`);
+    falhar('registro-antigo', `o registro de etapas é da versão ${registro.versao}, que guarda o estado de cada etapa; a leitura por impressão só lê a versão ${VERSAO_REGISTRO_PELA_IMPRESSAO}, e o registro antigo passa pela migração, que saiu do repositório em 2026-11-26 depois de migrar o acervo inteiro: recupere-a com \`git show 9118ea08:tools/modelar/migrar-etapas-para-impressao.mjs > /tmp/migrar.mjs\` e rode \`node /tmp/migrar.mjs <montagem.json> --gravar\` (sem --gravar, só o ensaio).`);
   }
   if (registro.versao !== VERSAO_REGISTRO_PELA_IMPRESSAO || !Array.isArray(registro.eventos)) {
     falhar('registro-invalido', `o registro de etapas deve ser da versão ${VERSAO_REGISTRO_PELA_IMPRESSAO}, com a lista de eventos.`);
