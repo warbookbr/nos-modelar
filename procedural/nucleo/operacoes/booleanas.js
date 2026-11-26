@@ -1830,7 +1830,21 @@ export function criarOperacoesBooleanas(servicos) {
           const k = chaveP(x); if (!adj.has(k)) adj.set(k, []);
           if (!adj.get(k).some((o) => tamanho(sub(o.p, y)) <= 1e3 * eps)) adj.get(k).push({ p: y, n: sgm.n });
         }
+        adj.segs = segs;
         return adj;
+      };
+      /* A ESPESSURA ATRÁS do canto: a distância de P, no plano da fatia e na direção `atras` (para dentro do sólido), até a superfície do outro lado. O ponto de
+         trás da seção (Q) fica a um raio atrás do canto, e onde o sólido é mais fino que isso (a parede de um aro de 3 mm sob um raio de 8) o prisma atravessava
+         a pele do outro lado e deixava o tubo à mostra, com vértice de vínculo não-manifold onde ele passava por um canto da casca. Infinito se o raio não acha nada. */
+      const espessuraAtras = (adj, P, atras) => {
+        let menor = Infinity;
+        for (const sg of adj.segs ?? []) {
+          const e = sub(sg.b, sg.a), ap = sub(sg.a, P), nn = cruz(atras, e), n2 = ponto(nn, nn);
+          if (!(n2 > 1e-18 * ponto(e, e))) continue;
+          const sp = ponto(cruz(ap, e), nn) / n2, tp = ponto(cruz(ap, atras), nn) / n2;
+          if (tp >= -1e-9 && tp <= 1 + 1e-9 && sp > 1e3 * eps && sp < menor) menor = sp;
+        }
+        return menor;
       };
       /* FACE PLANA QUE LIMITA O SÓLIDO (só no arredondamento que enche, classe côncava de sempre). Onde a superfície que a bola rola acaba numa face
          plana que dobra mais de 45° (a tampa de um tubo, rente à parede do outro) e o plano dessa face deixa o sólido inteiro de um lado só, o raio
@@ -1993,7 +2007,8 @@ export function criarOperacoesBooleanas(servicos) {
           arco.push(Cm.map((c, j) => c + raio * r0[j] / lr));
         }
         const atras = sub(P, Cm).map((c) => c / tamanho(sub(P, Cm)));
-        const Q = P.map((c, j) => c + atras[j] * raio);
+        const fundo = Math.min(raio, 0.5 * espessuraAtras(adj, P, atras));   // o fundo fica a meia espessura da parede, no máximo a um raio
+        const Q = P.map((c, j) => c + atras[j] * fundo);
         return { anel: [Q, ...arco], C: C.map((c, j) => c + centroT[j]) };   // anel local, centro no mundo
       };
 
