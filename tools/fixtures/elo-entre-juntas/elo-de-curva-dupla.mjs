@@ -17,6 +17,8 @@ const elo = (campos) => Object.freeze({ ...parametrosDoElo({ de: ATUADOR, para: 
 export const ELO_DA_COXA_EM_U = elo({ desvioA: 90, azimuteA: 0, desvio: 90, azimute: 180 });
 /** A coxa em S: as duas bocas olham para o mesmo lado (+z). */
 export const ELO_DA_COXA_EM_S = elo({ desvioA: 90, azimuteA: 0, desvio: 90, azimute: 0 });
+/** A coxa ou a canela em U de `comprimento` mm. */
+export const eloEmU = (comprimento) => elo({ comprimento, desvioA: 90, azimuteA: 0, desvio: 90, azimute: 180 });
 export { ATUADOR };
 
 /** O curso de flexão do joelho direito do esqueleto aprovado (0 a 140 graus), com que a junta B da coxa é conferida. */
