@@ -1,0 +1,1108 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "roda-esportiva",
+  "numero": 1,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/roda-esportiva/referencias/locais/variante-a.jpg",
+    "nota": 5,
+    "defeitos": [
+      {
+        "parte": "aro",
+        "tipo": "superficie",
+        "onde": "aresta interna do barril, trecho inferior direito",
+        "sentido": "segmentado",
+        "evidencia": "Isométrica do aro: lascas e serrilhado na aresta interna do barril; no alvo a borda do aro é limpa e contínua."
+      },
+      {
+        "parte": "raios",
+        "tipo": "espessura",
+        "onde": "corpo dos dez raios, da raiz à ponta",
+        "sentido": "menor",
+        "evidencia": "Direita do conjunto e da parte: raios finos como varetas; nas variantes A e B do alvo cada raio é largo e encorpado, com o aro bem presente."
+      },
+      {
+        "parte": "raios",
+        "tipo": "superficie",
+        "onde": "face frontal dos raios",
+        "sentido": "anguloso",
+        "evidencia": "Vista direita dos raios: faces planas e escuras, sem a concavidade do centro recuado legível. A variante B e a face usinada não aparecem em nenhuma vista."
+      },
+      {
+        "parte": "raios",
+        "tipo": "uniao",
+        "onde": "pontas externas dos dez raios, junto ao aro",
+        "sentido": "afastado",
+        "evidencia": "Isométrica isolada dos raios: as pontas externas têm abas e lascas soltas, sem encontro limpo com o aro. Na direita as pontas terminam em corte irregular."
+      }
+    ],
+    "observacao": "Conjunto lê como roda de carro e o pneu cumpre o prometido, mas os raios, que definem a roda, estão finos e com pontas sujas, e a variante B não foi mostrada."
+  },
+  "partes": [
+    {
+      "nome": "aro",
+      "confere": true,
+      "observacao": "Barril com borda arredondada, assento, canaleta e furo da válvula; aro e raios são uma superfície fundida só."
+    },
+    {
+      "nome": "raios",
+      "confere": false,
+      "observacao": "A: 10 raios em 5 pares em V; B: 5 pares duplos com face usinada. Côncavos e fundidos ao aro e ao centro, mas as arestas laterais dos raios ficaram vivas (90 graus)."
+    },
+    {
+      "nome": "tampaCentral",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "parafusos",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "valvula",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pneu",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "arredondarCostura nas arestas convexas das janelas recusou sempre perto do ápice da fresta em V e do centro; ficaram quinas de 90 graus nos lados dos raios",
+    "o raio mínimo da costura (1/64 da meia-extensão) não aparece na documentação, só na recusa",
+    "aro e raios são uma superfície fundida; cada parte é casca aberta e o descrever não decide 8 pares; CONTATOS ficou vazio e o assento do pneu foi medido à parte",
+    "malha:conferir reprova 192 faces finas nos raios; limparLascas não as tira",
+    "garras diagonais e janelas dos raios calculadas à mão em derivar; falta operação de relevo repetido e de raio de roda por parâmetros",
+    "com o eixo da roda em x, a vista direita mostra a face e a frontal mostra a banda",
+    "quem conduz: o pacote do crítico só mostra a variante A; a B não tem vista, e o processo não pegaria isso sozinho",
+    "ferramenta: o registro não acha o json de agente que entrega pelo hand-back, e recusa o alvo absoluto que o pedido induz; blocos copiados e alvo relativizado"
+  ],
+  "notaDePassagem": "Aro e raios são uma superfície só (unir + arredondarCostura raio 8). Espaço do freio por espacoDoFreio(): disco assenta em x = 40, barril livre até r 220,3, raios com face de trás x >= 40. Furo central r 33,3, círculo de parafusos 112 mm. Variante B usa material usinado na face +x dos raios; A e B partilham a TABELA com sufixo.",
+  "receita": {
+    "sha256": "sha256:18cd9f3cfa8c5e0f89bf38ab9cab10fe42603f9aae6cd17604a30980f6ffef05",
+    "diferenca": {
+      "primeira": true,
+      "removidas": 0,
+      "acrescentadas": 302,
+      "linhas": [
+        {
+          "tipo": "+",
+          "linha": 1,
+          "texto": "/* roda-esportiva — roda de liga leve de 19 polegadas com pneu 245/40 R19, etapa 1 (aro, raios, tampa central, parafusos, válvula e"
+        },
+        {
+          "tipo": "+",
+          "linha": 2,
+          "texto": " * pneu), nas duas variantes do alvo (`referencias/alvo.md`), escolhidas por `variante` na TABELA ('A' ou 'B')."
+        },
+        {
+          "tipo": "+",
+          "linha": 3,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 4,
+          "texto": " * Referencial: o eixo da roda é X, com a face da frente (a que se vê) para +x; y para cima, o chão em y = 0 e o centro da roda a"
+        },
+        {
+          "tipo": "+",
+          "linha": 5,
+          "texto": " * `diametroExterno / 2` de altura. A TABELA é em milímetro; `derivar` calcula, `gerarPassos` converte com `m()` e escreve."
+        },
+        {
+          "tipo": "+",
+          "linha": 6,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 7,
+          "texto": " * Técnica dos raios. A placa dos raios é uma `extrusao` de eixo x (disco com as janelas furadas e os cantos das janelas"
+        },
+        {
+          "tipo": "+",
+          "linha": 8,
+          "texto": " * arredondados por `deslocar`), cortada por `intersectar` com um prato de revolução que dá a concavidade: a frente do prato"
+        },
+        {
+          "tipo": "+",
+          "linha": 9,
+          "texto": " * recua no centro e sobe até o aro. Raios, centro e aro são depois uma superfície só: `unir` mais `arredondarCostura` no encontro"
+        },
+        {
+          "tipo": "+",
+          "linha": 10,
+          "texto": " * côncavo, e `arredondarCostura` das arestas convexas das janelas."
+        },
+        {
+          "tipo": "+",
+          "linha": 11,
+          "texto": " *"
+        },
+        {
+          "tipo": "+",
+          "linha": 12,
+          "texto": " * Espaço da etapa 2 (freio, não modelada aqui): atrás dos raios, por dentro do barril, fica livre o cilindro de raio"
+        },
+        {
+          "tipo": "+",
+          "linha": 13,
+          "texto": " * `raioLivreDaPinca` (205 mm: o disco de `diametroDoDisco` 360 mm mais a pinça) desde o fundo do barril até a face de trás do prato"
+        },
+        {
+          "tipo": "+",
+          "linha": 14,
+          "texto": " * (x = `desvioET` no centro, subindo até `recuoDoPratoTras` no aro). A face de montagem do disco é o plano x = `desvioET`, a face de trás"
+        },
+        {
+          "tipo": "+",
+          "linha": 15,
+          "texto": " * do centro dos raios. `espacoDoFreio()` publica essas medidas derivadas da mesma tabela, e a receita do freio deve lê-las de lá."
+        },
+        {
+          "tipo": "+",
+          "linha": 16,
+          "texto": " */"
+        },
+        {
+          "tipo": "+",
+          "linha": 17,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 18,
+          "texto": "export const TABELA = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 19,
+          "texto": "  variante: 'A',"
+        },
+        {
+          "tipo": "+",
+          "linha": 20,
+          "texto": "  /* escala do pneu 245/40 R19 */"
+        },
+        {
+          "tipo": "+",
+          "linha": 21,
+          "texto": "  diametroAssento: 482.6, larguraDoPneu: 245, alturaDoFlanco: 98, larguraDoAro: 216,"
+        },
+        {
+          "tipo": "+",
+          "linha": 22,
+          "texto": "  /* aro (barril) */"
+        },
+        {
+          "tipo": "+",
+          "linha": 23,
+          "texto": "  alturaDoFlange: 17, espessuraDoFlange: 9, raioDaBorda: 3.5, espessuraDaParede: 7,"
+        },
+        {
+          "tipo": "+",
+          "linha": 24,
+          "texto": "  profundidadeDaCanaleta: 14, canaletaTras: -76, canaletaFrente: 14, rampaDaCanaleta: 14,"
+        },
+        {
+          "tipo": "+",
+          "linha": 25,
+          "texto": "  /* prato dos raios: concavidade */"
+        },
+        {
+          "tipo": "+",
+          "linha": 26,
+          "texto": "  desvioET: 40, espessuraDoCubo: 14, raioDoCubo: 74, avancoDoPratoNoAro: 105, recuoDoPratoTras: 50, expoenteDoPrato: 1.7,"
+        },
+        {
+          "tipo": "+",
+          "linha": 27,
+          "texto": "  /* raios: janelas */"
+        },
+        {
+          "tipo": "+",
+          "linha": 28,
+          "texto": "  raioDaRaizDasJanelas: 84, raioDoCentroDoRaioNaRaiz: 88, raioDoCentroDoRaioNoAro: 232, folgaDaJanelaNaParede: 2,"
+        },
+        {
+          "tipo": "+",
+          "linha": 29,
+          "texto": "  larguraNaRaizA: 26, larguraNoAroA: 32, aberturaNaRaizA: 4, aberturaNoAroA: 15, arredondaJanelaA: 8,"
+        },
+        {
+          "tipo": "+",
+          "linha": 30,
+          "texto": "  larguraNaRaizB: 30, larguraNoAroB: 36, aberturaNaRaizB: 7, aberturaNoAroB: 11, arredondaJanelaB: 8,"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "  raioDaQuinaDosRaios: 0, raioDaCosturaDoAro: 8, raioMinimoDaCostura: 1.5, afinarPontasDaCostura: 10,"
+        },
+        {
+          "tipo": "+",
+          "linha": 32,
+          "texto": "  /* centro: furo, assento da tampa, parafusos */"
+        },
+        {
+          "tipo": "+",
+          "linha": 33,
+          "texto": "  raioDoFuroCentral: 33.3, raioDoAssentoDaTampa: 38, fundoDoAssentoDaTampa: 6, salienciaDaTampa: 2,"
+        },
+        {
+          "tipo": "+",
+          "linha": 34,
+          "texto": "  furos: 5, circuloDosParafusos: 112, raioDoAssentoDoParafuso: 11.5, fundoDoAssentoDoParafuso: 7, salienciaDoParafuso: 4,"
+        },
+        {
+          "tipo": "+",
+          "linha": 35,
+          "texto": "  /* espaço reservado ao freio (etapa 2) */"
+        },
+        {
+          "tipo": "+",
+          "linha": 36,
+          "texto": "  diametroDoDisco: 360, espessuraDoDisco: 32, raioLivreDaPinca: 205,"
+        },
+        {
+          "tipo": "+",
+          "linha": 37,
+          "texto": "  /* válvula */"
+        },
+        {
+          "tipo": "+",
+          "linha": 38,
+          "texto": "  raioDoFuroDaValvula: 4.5, profundidadeDoFuroDaValvula: 8, comprimentoDaValvula: 16,"
+        },
+        {
+          "tipo": "+",
+          "linha": 39,
+          "texto": "  /* pneu */"
+        },
+        {
+          "tipo": "+",
+          "linha": 40,
+          "texto": "  sulcosCirculares: 4, larguraDoSulcoCircular: 10, profundidadeDoSulcoCircular: 7, metadeDaBanda: 88, expoenteDoOmbro: 2.4, alturaDoBojo: 0.38,"
+        },
+        {
+          "tipo": "+",
+          "linha": 41,
+          "texto": "  garras: 60, larguraDaGarra: 6, comprimentoDaGarra: 34, alturaDaFerramentaDaGarra: 14, fundoDaGarra: 5, anguloDaGarra: 35, posicaoDaGarraNoOmbro: 45,"
+        },
+        {
+          "tipo": "+",
+          "linha": 42,
+          "texto": "  /* resolução */"
+        },
+        {
+          "tipo": "+",
+          "linha": 43,
+          "texto": "  lados: 96,"
+        },
+        {
+          "tipo": "+",
+          "linha": 44,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 45,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 46,
+          "texto": "const POR = (t, nome) => t[`${nome}${t.variante}`];"
+        },
+        {
+          "tipo": "+",
+          "linha": 47,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 48,
+          "texto": "/* Declarados antes de medir. Aro e raios são uma superfície só (o par se toca por construção, e a medida por caixa não o decide: cada"
+        },
+        {
+          "tipo": "+",
+          "linha": 49,
+          "texto": "   parte sozinha é casca aberta); os demais são assentos de face. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 50,
+          "texto": "/* Os assentos do alvo (pneu no aro, raios fundidos ao aro, tampa e parafusos no centro, bico no furo da borda) NÃO são declarados aqui: o aro e"
+        },
+        {
+          "tipo": "+",
+          "linha": 51,
+          "texto": "   os raios são uma superfície fechada só, fatiada em duas partes pelo nome, e cada fatia sozinha é casca aberta; a medida de contato recusa o par"
+        },
+        {
+          "tipo": "+",
+          "linha": 52,
+          "texto": "   com parte de casca aberta e a guarda reprova a declaração. Os assentos foram medidos à parte, sobre a roda fundida (ver a nota de passagem). */"
+        },
+        {
+          "tipo": "+",
+          "linha": 53,
+          "texto": "export const CONTATOS = [];"
+        },
+        {
+          "tipo": "+",
+          "linha": 54,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 55,
+          "texto": "export const MATERIAIS = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 56,
+          "texto": "  grafite: { cor: '#3b3d41', metalicidade: 0.6, aspereza: 0.45 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 57,
+          "texto": "  usinado: { cor: '#c4c8cd', metalicidade: 0.9, aspereza: 0.25 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 58,
+          "texto": "  borracha: { cor: '#171718', metalicidade: 0, aspereza: 0.9 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 59,
+          "texto": "  metal: { cor: '#a9adb3', metalicidade: 0.9, aspereza: 0.3 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 60,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 61,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 62,
+          "texto": "export const PLANO = {"
+        },
+        {
+          "tipo": "+",
+          "linha": 63,
+          "texto": "  objeto: \"roda esportiva de carro com pneu 245/40 R19, etapa 1 (aro, raios, tampa, parafusos, valvula, pneu)\","
+        },
+        {
+          "tipo": "+",
+          "linha": 64,
+          "texto": "  referencias: ['referencias/alvo.md', 'referencias/locais/variante-a.jpg', 'referencias/locais/variante-b.jpg'],"
+        },
+        {
+          "tipo": "+",
+          "linha": 65,
+          "texto": "  escala: { medida: \"diametro externo do pneu\", milimetros: 679 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 66,
+          "texto": "  partes: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 67,
+          "texto": "    { nome: \"aro\", forma: 'barril de liga leve com a borda externa fina e arredondada, assento do pneu, canaleta funda por dentro e barril visivel atras dos raios', tecnica: 'lathe de seção fechada com concordância nas bordas e furo da válvula por subtrair; unido aos raios por unir e arredondarCostura (raio 8, raioMinimo, afinarPontas)' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 68,
+          "texto": "    { nome: \"raios\", forma: 'variante A dez raios finos em cinco pares em V, variante B cinco raios duplos; concavos, com o centro recuado, fundidos ao aro e ao centro', tecnica: 'extrusao de eixo x com janelas de canto redondo (deslocar), intersectar com prato de lathe que dá a concavidade, subtrair do furo e dos assentos, unir ao aro e arredondarCostura; na variante B a face da frente é usinada' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 69,
+          "texto": "    { nome: \"tampaCentral\", forma: 'disco grafite com a borda arredondada, assentado no furo central', tecnica: 'lathe com concordancia na borda' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 70,
+          "texto": "    { nome: \"parafusos\", forma: 'cinco parafusos de cabeça sextavada cônica nos assentos rebaixados do centro, no círculo de 112 mm', tecnica: 'lathe de seis lados repetido por arranja radial' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 71,
+          "texto": "    { nome: \"valvula\", forma: 'bico de valvula curto na borda do aro, entre dois raios', tecnica: 'lathe de eixo x assentado em furo da borda' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 72,
+          "texto": "    { nome: \"pneu\", forma: 'perfil baixo de flanco abaulado, banda com quatro sulcos ao longo da volta e garras diagonais nos dois ombros', tecnica: 'lathe da seção do pneu com os quatro sulcos no próprio perfil; garras diagonais por subtrair de uma ferramenta (cubo girado em y e em z) repetida por arranja radial, 60 por ombro' },"
+        },
+        {
+          "tipo": "+",
+          "linha": 73,
+          "texto": "  ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 74,
+          "texto": "  criteriosDeReprovacao: ["
+        },
+        {
+          "tipo": "+",
+          "linha": 75,
+          "texto": "    'degrau, fresta ou quina viva na emenda dos raios com o aro ou com o centro',"
+        },
+        {
+          "tipo": "+",
+          "linha": 76,
+          "texto": "    'pneu sem sulcos ou sem garras nos ombros, ou banda lisa',"
+        },
+        {
+          "tipo": "+",
+          "linha": 77,
+          "texto": "    'raios planos, sem a concavidade do centro recuado',"
+        },
+        {
+          "tipo": "+",
+          "linha": 78,
+          "texto": "    'pneu atravessando o aro, ou folga visivel entre pneu e assento',"
+        },
+        {
+          "tipo": "+",
+          "linha": 79,
+          "texto": "    'variante A sem os pares em V, ou variante B sem a face usinada de outra cor',"
+        },
+        {
+          "tipo": "+",
+          "linha": 80,
+          "texto": "    'barril do aro sem espaco livre para o disco de 360 mm e a pinca',"
+        },
+        {
+          "tipo": "+",
+          "linha": 81,
+          "texto": "  ],"
+        },
+        {
+          "tipo": "+",
+          "linha": 82,
+          "texto": "};"
+        },
+        {
+          "tipo": "+",
+          "linha": 83,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 84,
+          "texto": "const m = (mm) => mm / 1000;"
+        },
+        {
+          "tipo": "+",
+          "linha": 85,
+          "texto": "const rad = (g) => (g * Math.PI) / 180;"
+        },
+        {
+          "tipo": "+",
+          "linha": 86,
+          "texto": "const pol = (r, a) => [r * Math.cos(a), r * Math.sin(a)];"
+        },
+        {
+          "tipo": "+",
+          "linha": 87,
+          "texto": "const alfaDe = (p) => Math.atan2(p[1], p[0]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 88,
+          "texto": "const desembrulha = (a, ref) => { let x = a; while (x - ref > Math.PI) x -= 2 * Math.PI; while (x - ref < -Math.PI) x += 2 * Math.PI; return x; };"
+        },
+        {
+          "tipo": "+",
+          "linha": 89,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 90,
+          "texto": "function noRaio(P0, P1, r) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 91,
+          "texto": "  const dx = P1[0] - P0[0], dy = P1[1] - P0[1];"
+        },
+        {
+          "tipo": "+",
+          "linha": 92,
+          "texto": "  const A = dx * dx + dy * dy, B = 2 * (P0[0] * dx + P0[1] * dy), C = P0[0] ** 2 + P0[1] ** 2 - r * r;"
+        },
+        {
+          "tipo": "+",
+          "linha": 93,
+          "texto": "  const disc = Math.sqrt(B * B - 4 * A * C);"
+        },
+        {
+          "tipo": "+",
+          "linha": 94,
+          "texto": "  const s = [(-B + disc) / (2 * A), (-B - disc) / (2 * A)].find((q) => q >= -0.5 && q <= 1.5);"
+        },
+        {
+          "tipo": "+",
+          "linha": 95,
+          "texto": "  return [P0[0] + s * dx, P0[1] + s * dy];"
+        },
+        {
+          "tipo": "+",
+          "linha": 96,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 97,
+          "texto": "const arco = (r, a0, a1, n) => Array.from({ length: n + 1 }, (_, i) => pol(r, a0 + ((a1 - a0) * i) / n));"
+        },
+        {
+          "tipo": "+",
+          "linha": 98,
+          "texto": "function cruza(p, d, q, e) { const den = d[0] * e[1] - d[1] * e[0]; const s = ((q[0] - p[0]) * e[1] - (q[1] - p[1]) * e[0]) / den; return [p[0] + s * d[0], p[1] + s * d[1]]; }"
+        },
+        {
+          "tipo": "+",
+          "linha": 99,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 100,
+          "texto": "/* As janelas da placa (mm, [y, z] no plano da roda, ângulo de +y para +z): a janela grande entre dois pares e a fresta de cada par."
+        },
+        {
+          "tipo": "+",
+          "linha": 101,
+          "texto": "   Os contornos já vão recuados da folga de arredondamento, porque `deslocar` os cresce com canto redondo. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 102,
+          "texto": "function janelas(t, d) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 103,
+          "texto": "  const dil = POR(t, 'arredondaJanela');"
+        },
+        {
+          "tipo": "+",
+          "linha": 104,
+          "texto": "  const grandes = [], estreitas = [];"
+        },
+        {
+          "tipo": "+",
+          "linha": 105,
+          "texto": "  const raio = (k, lado) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 106,
+          "texto": "    const ak = rad(72 * k);"
+        },
+        {
+          "tipo": "+",
+          "linha": 107,
+          "texto": "    const a0 = ak + lado * rad(POR(t, 'aberturaNaRaiz')), a1 = ak + lado * rad(POR(t, 'aberturaNoAro'));"
+        },
+        {
+          "tipo": "+",
+          "linha": 108,
+          "texto": "    const C0 = pol(t.raioDoCentroDoRaioNaRaiz, a0), C1 = pol(t.raioDoCentroDoRaioNoAro, a1);"
+        },
+        {
+          "tipo": "+",
+          "linha": 109,
+          "texto": "    const L = Math.hypot(C1[0] - C0[0], C1[1] - C0[1]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 110,
+          "texto": "    let n = [-(C1[1] - C0[1]) / L, (C1[0] - C0[0]) / L];"
+        },
+        {
+          "tipo": "+",
+          "linha": 111,
+          "texto": "    if ((n[0] * -Math.sin(a0) + n[1] * Math.cos(a0)) * lado < 0) n = [-n[0], -n[1]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 112,
+          "texto": "    const w0 = POR(t, 'larguraNaRaiz') / 2 + dil, w1 = POR(t, 'larguraNoAro') / 2 + dil;"
+        },
+        {
+          "tipo": "+",
+          "linha": 113,
+          "texto": "    const off = (C, w) => [C[0] + n[0] * w, C[1] + n[1] * w];"
+        },
+        {
+          "tipo": "+",
+          "linha": 114,
+          "texto": "    return { fora: [off(C0, w0), off(C1, w1)], dentro: [off(C0, -w0), off(C1, -w1)] };"
+        },
+        {
+          "tipo": "+",
+          "linha": 115,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 116,
+          "texto": "  const rHub = t.raioDaRaizDasJanelas + dil, rRim = d.Rwin;"
+        },
+        {
+          "tipo": "+",
+          "linha": 117,
+          "texto": "  for (let k = 0; k < 5; k++) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 118,
+          "texto": "    const a = raio(k, +1), b = raio(k, -1), an = raio((k + 1) % 5, -1);"
+        },
+        {
+          "tipo": "+",
+          "linha": 119,
+          "texto": "    const Ha = noRaio(...a.fora, rHub), Ra = noRaio(...a.fora, rRim), Hb = noRaio(...an.fora, rHub), Rb = noRaio(...an.fora, rRim);"
+        },
+        {
+          "tipo": "+",
+          "linha": 120,
+          "texto": "    const aA = alfaDe(Ra), hA = alfaDe(Ha);"
+        },
+        {
+          "tipo": "+",
+          "linha": 121,
+          "texto": "    grandes.push([Ha, Ra, ...arco(rRim, aA, desembrulha(alfaDe(Rb), aA), 8).slice(1, -1), Rb, Hb, ...arco(rHub, desembrulha(alfaDe(Hb), hA), hA, 6).slice(1, -1)]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 122,
+          "texto": "    const ia = a.dentro, ib = b.dentro;"
+        },
+        {
+          "tipo": "+",
+          "linha": 123,
+          "texto": "    const apex = cruza(ia[0], [ia[1][0] - ia[0][0], ia[1][1] - ia[0][1]], ib[0], [ib[1][0] - ib[0][0], ib[1][1] - ib[0][1]]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 124,
+          "texto": "    const Ria = noRaio(...ia, rRim), Rib = noRaio(...ib, rRim), sA = alfaDe(Ria);"
+        },
+        {
+          "tipo": "+",
+          "linha": 125,
+          "texto": "    estreitas.push([apex, Ria, ...arco(rRim, sA, desembrulha(alfaDe(Rib), sA), 6).slice(1, -1), Rib]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 126,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 127,
+          "texto": "  return { grandes, estreitas };"
+        },
+        {
+          "tipo": "+",
+          "linha": 128,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 129,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 130,
+          "texto": "/* O pneu: a seção [raio, x] de trás para a frente. O fundo repousa no assento e na face de dentro e no topo dos flanges do aro. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 131,
+          "texto": "function secaoDoPneu(t, d) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 132,
+          "texto": "  const Rt = d.Rs + t.alturaDoFlanco, xb = t.larguraDoPneu / 2, hw = d.hw, B = t.metadeDaBanda;"
+        },
+        {
+          "tipo": "+",
+          "linha": 133,
+          "texto": "  const rb = d.Rs + t.alturaDoBojo * t.alturaDoFlanco;"
+        },
+        {
+          "tipo": "+",
+          "linha": 134,
+          "texto": "  const lado = (s) => {"
+        },
+        {
+          "tipo": "+",
+          "linha": 135,
+          "texto": "    const pts = [];"
+        },
+        {
+          "tipo": "+",
+          "linha": 136,
+          "texto": "    const nBaixo = 8;"
+        },
+        {
+          "tipo": "+",
+          "linha": 137,
+          "texto": "    for (let i = 1; i <= nBaixo; i++) { const u = i / nBaixo; pts.push([d.Rfl + (rb - d.Rfl) * u, s * (hw + (xb - hw) * Math.sin((Math.PI / 2) * u))]); }"
+        },
+        {
+          "tipo": "+",
+          "linha": 138,
+          "texto": "    const n = 14, e = 2 / t.expoenteDoOmbro;"
+        },
+        {
+          "tipo": "+",
+          "linha": 139,
+          "texto": "    for (let i = 1; i <= n; i++) { const th = ((Math.PI / 2) * i) / n; pts.push([rb + (Rt - rb) * Math.sin(th) ** e, s * (B + (xb - B) * Math.cos(th) ** e)]); }"
+        },
+        {
+          "tipo": "+",
+          "linha": 140,
+          "texto": "    return pts;"
+        },
+        {
+          "tipo": "+",
+          "linha": 141,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 142,
+          "texto": "  const baixoTras = [[d.Rs, -(hw - t.espessuraDoFlange)], [d.Rfl, -(hw - t.espessuraDoFlange)], [d.Rfl, -hw]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 143,
+          "texto": "  const baixoFrente = [[d.Rfl, hw], [d.Rfl, hw - t.espessuraDoFlange], [d.Rs, hw - t.espessuraDoFlange]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 144,
+          "texto": "  const banda = [];"
+        },
+        {
+          "tipo": "+",
+          "linha": 145,
+          "texto": "  const passo = (2 * B) / t.sulcosCirculares;"
+        },
+        {
+          "tipo": "+",
+          "linha": 146,
+          "texto": "  const L = t.larguraDoSulcoCircular, P = t.profundidadeDoSulcoCircular;"
+        },
+        {
+          "tipo": "+",
+          "linha": 147,
+          "texto": "  for (let k = 0; k < t.sulcosCirculares; k++) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 148,
+          "texto": "    const c = -B + passo * (k + 0.5);"
+        },
+        {
+          "tipo": "+",
+          "linha": 149,
+          "texto": "    banda.push([Rt, c - L / 2 - 1.2], [Rt - P, c - L / 2 + 0.6], [Rt - P, c + L / 2 - 0.6], [Rt, c + L / 2 + 1.2]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 150,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 151,
+          "texto": "  const trasCima = lado(-1);"
+        },
+        {
+          "tipo": "+",
+          "linha": 152,
+          "texto": "  const frenteCima = lado(+1).reverse();"
+        },
+        {
+          "tipo": "+",
+          "linha": 153,
+          "texto": "  const perfil = [...baixoTras, ...trasCima, ...banda, ...frenteCima, ...baixoFrente, baixoTras[0]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 154,
+          "texto": "  return { perfil, Rt, rb, xb };"
+        },
+        {
+          "tipo": "+",
+          "linha": 155,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 156,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 157,
+          "texto": "/* Os pontos declarados (mm): as caixas do pneu, do aro e da tampa, que saem da mesma tabela que a malha. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 158,
+          "texto": "export function pontosDeclarados(t = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 159,
+          "texto": "  const Rs = t.diametroAssento / 2, Rt = Rs + t.alturaDoFlanco, Rfl = Rs + t.alturaDoFlange, hw = t.larguraDoAro / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 160,
+          "texto": "  const xf = t.desvioET + t.espessuraDoCubo, xt = xf - t.fundoDoAssentoDaTampa, rT = t.raioDoAssentoDaTampa;"
+        },
+        {
+          "tipo": "+",
+          "linha": 161,
+          "texto": "  return ["
+        },
+        {
+          "tipo": "+",
+          "linha": 162,
+          "texto": "    { nome: 'pneu: canto de trás embaixo, tocando o chão', parte: 'pneu', medida: 'minimo', em: [-t.larguraDoPneu / 2, 0, -Rt], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 163,
+          "texto": "    { nome: 'pneu: canto da frente em cima', parte: 'pneu', medida: 'maximo', em: [t.larguraDoPneu / 2, 2 * Rt, Rt], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 164,
+          "texto": "    { nome: 'aro: canto de trás embaixo', parte: 'aro', medida: 'minimo', em: [-hw, Rt - Rfl, -Rfl], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 165,
+          "texto": "    { nome: 'aro: canto da frente em cima', parte: 'aro', medida: 'maximo', em: [hw, Rt + Rfl, Rfl], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 166,
+          "texto": "    { nome: 'tampa central: canto de trás embaixo', parte: 'tampaCentral', medida: 'minimo', em: [xt, Rt - rT, -rT], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 167,
+          "texto": "    { nome: 'tampa central: canto da frente em cima', parte: 'tampaCentral', medida: 'maximo', em: [xf + t.salienciaDaTampa, Rt + rT, rT], toleranciaMm: 0.5 },"
+        },
+        {
+          "tipo": "+",
+          "linha": 168,
+          "texto": "  ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 169,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 170,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 171,
+          "texto": "/* O espaço que a etapa do freio recebe (mm): o plano de montagem do disco, o raio mínimo do barril por dentro e as folgas do disco e da pinça. */"
+        },
+        {
+          "tipo": "+",
+          "linha": 172,
+          "texto": "export function espacoDoFreio(t = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 173,
+          "texto": "  const Rin = t.diametroAssento / 2 - t.espessuraDaParede;"
+        },
+        {
+          "tipo": "+",
+          "linha": 174,
+          "texto": "  const raioDoBarril = Rin - t.profundidadeDaCanaleta;"
+        },
+        {
+          "tipo": "+",
+          "linha": 175,
+          "texto": "  return {"
+        },
+        {
+          "tipo": "+",
+          "linha": 176,
+          "texto": "    planoDeMontagemDoDiscoX: t.desvioET, furoCentralRaio: t.raioDoFuroCentral, circuloDosParafusos: t.circuloDosParafusos,"
+        },
+        {
+          "tipo": "+",
+          "linha": 177,
+          "texto": "    raioDoBarrilPorDentro: raioDoBarril, folgaDoDisco: raioDoBarril - t.diametroDoDisco / 2, folgaDaPinca: raioDoBarril - t.raioLivreDaPinca,"
+        },
+        {
+          "tipo": "+",
+          "linha": 178,
+          "texto": "    faceDeTrasDosRaiosNoAro: t.recuoDoPratoTras, fundoDoBarrilX: -t.larguraDoAro / 2,"
+        },
+        {
+          "tipo": "+",
+          "linha": 179,
+          "texto": "  };"
+        },
+        {
+          "tipo": "+",
+          "linha": 180,
+          "texto": "}"
+        },
+        {
+          "tipo": "+",
+          "linha": 181,
+          "texto": ""
+        },
+        {
+          "tipo": "+",
+          "linha": 182,
+          "texto": "export function derivar(t = TABELA) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 183,
+          "texto": "  const Rs = t.diametroAssento / 2, Rfl = Rs + t.alturaDoFlange, Rin = Rs - t.espessuraDaParede, hw = t.larguraDoAro / 2;"
+        },
+        {
+          "tipo": "+",
+          "linha": 184,
+          "texto": "  const ro = Rin + t.espessuraDaParede / 2, Rwin = Rin + t.folgaDaJanelaNaParede, dC = t.profundidadeDaCanaleta;"
+        },
+        {
+          "tipo": "+",
+          "linha": 185,
+          "texto": "  const aro = ["
+        },
+        {
+          "tipo": "+",
+          "linha": 186,
+          "texto": "    [Rin, -hw], [Rfl, -hw, t.raioDaBorda], [Rfl, -hw + t.espessuraDoFlange, 1.5], [Rs, -hw + t.espessuraDoFlange],"
+        },
+        {
+          "tipo": "+",
+          "linha": 187,
+          "texto": "    [Rs, t.canaletaTras - t.rampaDaCanaleta], [Rs - dC, t.canaletaTras], [Rs - dC, t.canaletaFrente], [Rs, t.canaletaFrente + t.rampaDaCanaleta],"
+        },
+        {
+          "tipo": "+",
+          "linha": 188,
+          "texto": "    [Rs, hw - t.espessuraDoFlange], [Rfl, hw - t.espessuraDoFlange, 1.5], [Rfl, hw, t.raioDaBorda], [Rin, hw],"
+        },
+        {
+          "tipo": "+",
+          "linha": 189,
+          "texto": "    [Rin, t.canaletaFrente + t.rampaDaCanaleta + 2], [Rin - dC, t.canaletaFrente + 2], [Rin - dC, t.canaletaTras - 2],"
+        },
+        {
+          "tipo": "+",
+          "linha": 190,
+          "texto": "    [Rin, t.canaletaTras - t.rampaDaCanaleta - 2], [Rin, -hw],"
+        },
+        {
+          "tipo": "+",
+          "linha": 191,
+          "texto": "  ];"
+        },
+        {
+          "tipo": "+",
+          "linha": 192,
+          "texto": "  const xb0 = t.desvioET, xf0 = t.desvioET + t.espessuraDoCubo, N = 16;"
+        },
+        {
+          "tipo": "+",
+          "linha": 193,
+          "texto": "  const costas = [], frente = [];"
+        },
+        {
+          "tipo": "+",
+          "linha": 194,
+          "texto": "  for (let i = 0; i <= N; i++) {"
+        },
+        {
+          "tipo": "+",
+          "linha": 195,
+          "texto": "    const s = i / N, r = t.raioDoCubo + s * (ro - t.raioDoCubo);"
+        },
+        {
+          "tipo": "+",
+          "linha": 196,
+          "texto": "    costas.push([r, xb0 + (t.recuoDoPratoTras - xb0) * s]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 197,
+          "texto": "    frente.push([r, xf0 + (t.avancoDoPratoNoAro - xf0) * s ** t.expoenteDoPrato]);"
+        },
+        {
+          "tipo": "+",
+          "linha": 198,
+          "texto": "  }"
+        },
+        {
+          "tipo": "+",
+          "linha": 199,
+          "texto": "  const prato = [[0, xb0], ...costas, ...frente.reverse(), [0, xf0]];"
+        },
+        {
+          "tipo": "+",
+          "linha": 200,
+          "texto": "  const d = { Rs, Rfl, Rin, hw, ro, Rwin, aro, prato, xf0, xb0, Rt: Rs + t.alturaDoFlanco };"
+        }
+      ],
+      "cortada": true
+    }
+  },
+  "registradaEm": "2026-11-14T03:52:49.449Z",
+  "facesFinas": {
+    "total": 194,
+    "porParte": {
+      "raios": 194
+    }
+  }
+}

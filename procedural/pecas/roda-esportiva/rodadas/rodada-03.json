@@ -1,0 +1,116 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "roda-esportiva",
+  "numero": 3,
+  "medidas": {
+    "passou": true,
+    "relatorio": "descrever (veredito), guarda:acervo, guarda:referencial, conferir-pontos: ok"
+  },
+  "veredito": {
+    "formato": "mecanifica.veredito-de-forma",
+    "versao": 1,
+    "alvo": "procedural/pecas/roda-esportiva/referencias/locais/variante-a.jpg",
+    "nota": 5,
+    "defeitos": [
+      {
+        "parte": "aro",
+        "tipo": "superficie",
+        "onde": "borda traseira interna do barril",
+        "sentido": "segmentado",
+        "evidencia": "Isométrica isolada do aro: pequenos recortes e degraus na borda traseira interna do barril, que deveria ser contínua."
+      },
+      {
+        "parte": "raios",
+        "tipo": "espessura",
+        "onde": "corpo de cada raio, do centro à borda",
+        "sentido": "menor",
+        "evidencia": "Vista direita do conjunto e isolada: lâminas finas e retas; na variante A os raios são largos e alargam na ponta, com janelas arredondadas."
+      },
+      {
+        "parte": "raios",
+        "tipo": "superficie",
+        "onde": "face frontal dos raios e do prato",
+        "sentido": "segmentado",
+        "evidencia": "Raios planos, sem a concavidade do centro recuado: vista direita sem relevo e isométrica com pontas em caixa; critério de reprovação."
+      },
+      {
+        "parte": "raios",
+        "tipo": "superficie",
+        "onde": "pontas externas dos raios, na união com o aro",
+        "sentido": "anguloso",
+        "evidencia": "Isométrica isolada dos raios: pontas em caixas ocas com dentes de serra, sem emenda lisa com o aro; referência mostra concordância contínua."
+      }
+    ],
+    "observacao": "Pneu, sulcos, garras, parafusos e tampa seguem o prometido; o conjunto tem pouco contraste entre partes e os raios são o ponto fraco de forma."
+  },
+  "partes": [
+    {
+      "nome": "aro",
+      "confere": false,
+      "observacao": "barril, borda, canaleta e furo da valvula conferem; parte da parede do barril esta agrupada em raios (faces divididas pelo unir) e o seletor nao separa por raio; serrilhado nao reavaliado"
+    },
+    {
+      "nome": "raios",
+      "confere": false,
+      "observacao": "dez raios em pares em V (A), concavos e fundidos; 186 faces finas na costura e arestas laterais vivas; na isometrica B nao distingo a face usinada"
+    },
+    {
+      "nome": "tampaCentral",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "parafusos",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "valvula",
+      "confere": true,
+      "observacao": ""
+    },
+    {
+      "nome": "pneu",
+      "confere": true,
+      "observacao": ""
+    }
+  ],
+  "atrito": [
+    "o seletor de parte nao tem criterio radial: nao da para reatribuir ao aro as faces de parede do barril que o unir juntou em raios",
+    "paineisDaCostura tem otimo estreito e nao monotonico (13 da 186, 24 da 288, 0 gera falso zero); so a varredura mostra",
+    "o relatorio da rodada nao rodou a medicao: so o --acao mostrou a regressao de lascas",
+    "arredondarCostura nas arestas convexas dos raios segue recusando em 3, 4 e 6 mm",
+    "CONTATOS vazio: aro e raios sao casca aberta cada um e 8 pares ficam sem decisao",
+    "quem conduz: o crítico ainda vê raios finos depois de alargados 40%; a largura do alvo não está medida no plano, e nenhuma régua a cobra"
+  ],
+  "notaDePassagem": "As lascas vinham todas do arredondarCostura da costura aro-raios; a rodada 2 subiu paineisDaCostura para 24 e foram a 288. Varri o parametro: 13 da 186, abaixo das 194 da rodada 1, sem perder o alargamento dos raios. A suspeita das abas foi descartada para as lascas (ficam em r 207-234,5, no filete). A reatribuicao ao aro faltou por falta de seletor radial.",
+  "receita": {
+    "sha256": "sha256:6a1c01caf12164f557f71e865cc2f21215749d4d49ffb1f53cc5aef9bfb0cb51",
+    "diferenca": {
+      "primeira": false,
+      "removidas": 1,
+      "acrescentadas": 1,
+      "linhas": [
+        {
+          "tipo": "-",
+          "linha": 31,
+          "texto": "  paineisDaCostura: 24, raioDaQuinaDosRaios: 0, raioMinimoDaQuina: 3.72, raioDaCosturaDoAro: 8, raioMinimoDaCostura: 1.5, afinarPontasDaCostura: 10,"
+        },
+        {
+          "tipo": "+",
+          "linha": 31,
+          "texto": "  paineisDaCostura: 13, raioDaQuinaDosRaios: 0, raioMinimoDaQuina: 3.72, raioDaCosturaDoAro: 8, raioMinimoDaCostura: 1.5, afinarPontasDaCostura: 10,"
+        }
+      ],
+      "cortada": false
+    }
+  },
+  "registradaEm": "2026-11-14T11:38:46.251Z",
+  "facesFinas": {
+    "total": 186,
+    "porParte": {
+      "raios": 186
+    }
+  }
+}
