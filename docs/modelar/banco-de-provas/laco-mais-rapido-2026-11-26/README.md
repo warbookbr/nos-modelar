@@ -180,3 +180,37 @@ A segunda é quais peças e defeitos substituem as duas obrigatórias, e se a al
 A terceira é o território: a troca toca `docs/modelar/banco-de-provas/calibracao-do-critico/`, `src/autoria/calibracao-do-critico.js` e `tools/fixtures/acervo/`, que o plano não lista. A recomendação é acrescentá-los ao território do plano antes da etapa B.
 
 A quarta é aceitar que os 44 julgamentos sejam refeitos e que a regra de acerto (11 de 12, as faixas de nota por classe) possa ter de ser reajustada sobre as imagens novas, com o gate em estado pendente até a medição terminar.
+
+### Etapa B: o que a medição da rodada mostrou antes de qualquer troca
+
+A etapa B parou antes de mudar o conjunto, o gate ou o agente, porque medir o crítico com o pedido da rodada muda quais defeitos chegam a ele, e isso a decisão de 2026-11-26 não cobre. Nenhum arquivo além deste foi alterado; as dez receitas de ensaio do protótipo foram apagadas depois da medida.
+
+O `vistas:critica` mede a receita antes de capturar e recusa a que reprova, com a mesma medição do registro da rodada (`medirReceita`: `guarda:acervo` com os contatos, `guarda:referencial`, pontos e formas). Para saber o que essa medição faz com as dez imagens de família, cada chamada do conjunto virou uma receita de ensaio provisória e passou por `node tools/modelar/rodada-de-modelagem.mjs <peça> --acao`, de 1 a 2 s cada. O controle do cilindro (c05) lista nove pares de partes em contato, que uma receita de verdade declararia em `contatos`. Contra esses nove:
+
+| Imagem | O que a medição da rodada vê | Chega ao crítico pelo pedido da rodada |
+| --- | --- | --- |
+| c01 haste-grossa | dois pares a mais (`cabeca ↔ haste`, `haste ↔ tubo`) | não |
+| c06 facetado | os mesmos nove pares | sim |
+| c11 travessia-sem-explicacao | quatro pares a mais (`haste` com `olhalTraseiro`, `pescocoTraseiro`, `rotulaTraseira` e `tubo`) | não |
+| c12 peca-fora-do-lugar | falta o par `olhalTraseiro ↔ pescocoTraseiro` | não |
+| c08 pneu-macico | seis pares onde o controle da roda (c02) tem três, e dois passos órfãos | não |
+| c10 raios-curtos | falta o par `aro ↔ disco` | não |
+| c04 ponta-no-ar e c09 controle-dobradica | não medidas: a receita não executa no registro comum, porque a operação `chapaDobrada` é extensão da família | a folha solta perderia o contato declarado com os nós, por construção, mas isso não foi medido |
+
+Das sete imagens de família com defeito, cinco medidas são reprovadas pelos contatos antes do crítico, uma não foi medida e só a facetada passa. No conjunto de hoje o crítico decide seis defeitos; com o pedido da rodada, três deles (c11, c12 e, por construção, c04) passam a ser da medida. O que sobra para o crítico na rodada de hoje é o que a medida não alcança: a forma prometida de cada parte, a silhueta e a proporção contra a referência, e a superfície. O conjunto novo precisa de imagens desse tipo, e escolhê-las é decidir o que o crítico tem de pegar.
+
+Três outros fatos pesam na escolha. O `PLANO` recusa nome de parte com hífen (`'partes[2].nome' precisa ser o mesmo identificador usado no passo 'parte': letras e dígitos, sem espaço`), e as três famílias nomeiam partes com hífen (`olhal-traseiro`), de modo que a receita de ensaio teria de renomear as partes e o hash da geometria deixaria de ser o do `aprovacao.json`. O controle de família fica abaixo do chão (`-48,2 mm` no cilindro) e a `guarda:referencial` o reprova, então a receita também teria de erguer a peça. E o pacote da rodada de um cilindro de nove partes tem 27 imagens ou mais (as quatro do conjunto, traseira, esquerda, arame, raio X e duas por parte), contra as quatro ou cinco de hoje, numa pasta de conjunto que soma 3,0 MB.
+
+### As duas obrigatórias: o que as rodadas registradas guardam
+
+Nenhuma peça tem `decisoes-da-pessoa.json`, que nasceu na fatia 1; o julgamento da pessoa só aparece no `atrito` de 52 das 183 rodadas. Os casos em que ela reprovou forma são quatro. Na `roda-esportiva`, rodada 4 (nota 4 do crítico), ela julgou os raios: o par em V abre desde o centro, cada raio com cerca de 3 % do diâmetro, e o miolo vai pouco além dos parafusos; na rodada 5 o crítico pediu raios largos, contra o julgamento dela. No `braco-robotico/ombro`, rodadas 1 e 2 (notas 7 e 8 do crítico), ela reprovou a forma inteira, o cotovelo de cano. Na `aviao/fuselagem`, rodada 2 (nota 8), o para-brisa saliente passou por dois críticos e só ela o viu. Na `braco-robotico/base`, rodada 3, ela achou o conjunto estreito.
+
+A escolha seria a `roda-esportiva` (raios largos demais para o julgamento dela) e a `aviao/fuselagem` (para-brisa saliente), porque são os dois casos em que o defeito é de forma, visível numa peça só, e em que o crítico errou ou não viu. A geometria reprovada não existe mais: a pasta de rodadas guarda só a cópia da receita da última rodada (`receita-06.js` na roda, `receita-03.js` na fuselagem), o `sha256` da receita da rodada 4 da roda não é o de nenhum commit do arquivo (`git log -- procedural/pecas/roda-esportiva/receita.js` tem um commit só), e as duas imagens teriam de ser a receita de hoje com o defeito recolocado à mão, numa cópia de ensaio. Nos dois casos o crítico da época não apontou o que a pessoa viu, então marcá-las obrigatórias é aceitar que o gate pode reprovar o crítico de hoje nelas.
+
+### O que volta à pessoa
+
+A primeira pergunta é quais defeitos o crítico tem de pegar no conjunto novo, já que os de contato são da medida. A recomendação é um conjunto de peças do acervo com `PLANO` e referência, em três grupos: controles que são etapas aceitas pela pessoa; defeitos de forma prometida e de proporção recolocados à mão em cópias de ensaio dessas peças, começando pelos dois casos acima; e a revolução facetada, que é a única imagem de hoje que continua do crítico. As imagens de contato saem do julgamento e ficam como prova da medida, conferida sem navegador como hoje.
+
+A segunda é o tamanho: guardar no repositório o pacote inteiro de cada imagem, com dezenas de PNG, ou um pacote reduzido para a calibração. A recomendação é esperar o pacote menor do crítico, que é a outra parte desta fatia, e calibrar com ele.
+
+A terceira é se as duas imagens recriadas à mão valem como "casos decididos pela pessoa", uma vez que a geometria que ela reprovou não foi guardada. A recomendação é aceitar, com a frase dela do `atrito` gravada na fonte da imagem, e passar a guardar a cópia da receita de toda rodada em que houver decisão dela.
