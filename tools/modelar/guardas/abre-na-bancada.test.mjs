@@ -6,17 +6,16 @@
  * `adaptarThree` não fecham passa por todas elas. Foi assim que a face 3001 do capô do motor do avião chegou à bancada, que
  * abriu o avião sem o motor.
  *
+ * As peças saíram para `abre-na-bancada-pecas-1` a `-3.test.mjs`, em fatias (abre-na-bancada-comum.mjs); aqui ficam as montagens e a
+ * conferência de que as fatias cobrem o acervo.
+ *
  * Reprova dizendo a peça (ou o caminho da instância na montagem) e a face, que é o que a mensagem de `adaptarThree` traz.
  * Roda na bateria rápida (`npm run test:rapidos`), porque a conta é só CPU: o acervo inteiro leva segundos. */
 import { describe, expect, it } from 'vitest';
-import { listarParaBancada } from '../../../src/bancada/acervo-receitas.js';
-import { processarReceitaSessao } from '../../../src/bancada/sessao/carregar-sessao.js';
+import { FATIAS_DAS_PECAS, acervo, montagens, pecas, pecasDaFatia } from './abre-na-bancada-comum.mjs';
 import { resolverMontagemDoAcervo } from '../../../src/bancada/sessao/montagem-em-dados.js';
 import { adaptarMontagemThree } from '../../../src/autoria/adaptar-montagem-three.js';
 
-const acervo = listarParaBancada();
-const pecas = acervo.filter((entrada) => !entrada.emDados && !entrada.ensaio);
-const montagens = acervo.filter((entrada) => entrada.emDados && !entrada.ensaio);
 
 describe('o acervo abre na bancada', () => {
   it('lista peças e montagens, para a varredura não passar vazia', () => {
@@ -24,22 +23,12 @@ describe('o acervo abre na bancada', () => {
     expect(montagens.length).toBeGreaterThan(0);
   });
 
-  it('cada peça vira cena por processarReceitaSessao, o caminho da bancada', async () => {
-    const reprovadas = [];
-    for (const entrada of pecas) {
-      const receita = await entrada.carregar();
-      /* parte planejada que espera a etapa: tem plano e nenhum passo, e a bancada não a desenha */
-      if (!Array.isArray(receita?.PASSOS) || receita.PASSOS.length === 0) continue;
-      try {
-        processarReceitaSessao(receita, { nome: entrada.id });
-      } catch (erro) {
-        reprovadas.push(`${entrada.id}: ${erro.message}`);
-      }
-    }
-    expect(reprovadas, `peças que não abrem na bancada:\n${reprovadas.join('\n')}`).toEqual([]);
-    /* o acervo inteiro levou 266 s no CI em 2026-11-12, e menos de 180 s na execução anterior com a mesma receita: a máquina do CI
-       varia de duas a três vezes, e os retrovisores do furgão (2026-11-12) somam uns 29% à execução dele */
-  }, 900_000);
+  it('as fatias das peças cobrem o acervo, cada peça numa fatia só', () => {
+    const ids = [1, 2, 3].flatMap((n) => pecasDaFatia(n).map((e) => e.id));
+    expect(FATIAS_DAS_PECAS).toBe(3);
+    expect(ids.sort()).toEqual(pecas.map((e) => e.id).sort());
+    expect(new Set(ids).size).toBe(ids.length);
+  });
 
   it('cada montagem abre com todas as instâncias, sem aviso de "abriu sem"', async () => {
     const reprovadas = [];

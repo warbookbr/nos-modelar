@@ -5,8 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2417 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
-2403 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2423 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -4347,6 +4346,10 @@
 
 ## tools/modelar/guardas/
 
+- `abre-na-bancada-comum.mjs` — abre-na-bancada-comum.mjs — o acervo da bancada e a conferência de que cada peça vira cena Three.js pelo caminho da bancada, repartida em fatias para os arqu…
+- `abre-na-bancada-pecas-1.test.mjs` — abre-na-bancada-pecas-1.test.mjs — a fatia 1 de 3 das peças do acervo vira cena pelo caminho da bancada (abre-na-bancada-comum.mjs).
+- `abre-na-bancada-pecas-2.test.mjs` — abre-na-bancada-pecas-2.test.mjs — a fatia 2 de 3 das peças do acervo vira cena pelo caminho da bancada (abre-na-bancada-comum.mjs).
+- `abre-na-bancada-pecas-3.test.mjs` — abre-na-bancada-pecas-3.test.mjs — a fatia 3 de 3 das peças do acervo vira cena pelo caminho da bancada (abre-na-bancada-comum.mjs).
 - `abre-na-bancada.test.mjs` — abre-na-bancada.test.mjs — toda peça e toda montagem do acervo vira cena Three.js pelo caminho da bancada, sem navegador.
 - `etapas-do-acervo.mjs` — etapas-do-acervo.mjs — a conferência de um registro de etapas do acervo, pela impressão do aceite, que o teste da guarda e o teste de regressão dela usam. Só…
 - `etapas-do-acervo.test.mjs` — etapas-do-acervo.test.mjs — a releitura de todo `montagem.etapas.json` do acervo, pela impressão do aceite.
