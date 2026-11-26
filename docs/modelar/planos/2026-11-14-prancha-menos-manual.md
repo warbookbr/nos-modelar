@@ -2,6 +2,8 @@
 
 **Estado:** rascunho
 
+**Núcleo:** não
+
 **Território:** nenhum (aguarda aprovação)
 
 **Responsável:** a IA da sessão do carro conduz e mede, e a pessoa julga se o desenho da prancha ficou mais prático.

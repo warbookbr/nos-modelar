@@ -2,6 +2,8 @@
 
 **Estado:** ativo
 
+**Núcleo:** não
+
 **Território:** `procedural/familias/elo-entre-juntas/`, `tools/fixtures/elo-entre-juntas/`, `docs/modelar/banco-de-provas/elo-entre-juntas-2026-11-25/`, `procedural/familias/index.js`, `docs/modelar/ferramentas-por-objeto.json`, `tools/modelar/capacidade.mjs`.
 
 Ativado pela pessoa em 2026-11-25, junto com o plano do atuador de junta, de que depende.

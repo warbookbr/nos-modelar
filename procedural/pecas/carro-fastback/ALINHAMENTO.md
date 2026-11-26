@@ -1,6 +1,6 @@
 # Carro fastback: alinhamento
 
-Registro da fatia 1 do plano [modelagem de carro](../../../docs/modelar/planos/2026-11-14-modelagem-de-carro.md). As decisões de objeto, medida, nível e partes foram tomadas pela pessoa em 2026-11-14 e estão no plano; este arquivo as junta com a prancha aceita e o `andaime.json`, com as quatro respostas da pessoa às perguntas da família `veiculo`.
+Registro da fatia 1 do plano [modelagem de carro](../../../docs/modelar/planos/congelados/2026-11-14-modelagem-de-carro.md). As decisões de objeto, medida, nível e partes foram tomadas pela pessoa em 2026-11-14 e estão no plano; este arquivo as junta com a prancha aceita e o `andaime.json`, com as quatro respostas da pessoa às perguntas da família `veiculo`.
 
 ## O objeto e as referências
 

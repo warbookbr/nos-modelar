@@ -3,13 +3,15 @@ name: CI
 # A bateria completa roda em cada envio, dividida entre máquinas que rodam ao mesmo tempo: os testes rápidos com as
 # conferências de documento e de arquivo gerado, os testes lentos em dez partes, as guardas que abrem a bancada e os que
 # geram o acervo. Medido em 2026-10-28 numa máquina só: 19 minutos, 11 deles nos testes lentos. O repositório é público e os
-# minutos do GitHub Actions não acabam mais, então a bateria lenta deixou de ser diária. São quatorze máquinas ao mesmo tempo,
+# minutos do GitHub Actions não acabam mais, então a bateria lenta deixou de ser diária. São quinze máquinas ao mesmo tempo,
 # dentro das vinte do plano gratuito; cada uma leva uns 30 s se preparando, e dividir mais deixa de compensar.
 #
 # O ENVIO VAI A UM RAMO, E A MAIN SÓ ANDA COM O CI VERDE. Um envio a `claude/**` ou `envio/**` roda a bateria, e o passo
-# `juntar` avança a main até ele quando todas as máquinas passaram e a main não andou desde a base do ramo; se andou, ele
-# falha dizendo isso, e quem enviou junta a main ao ramo e envia de novo. O avanço feito pelo próprio CI não roda a bateria
-# outra vez, porque o commit é o mesmo que acabou de passar.
+# `juntar` avança a main até ele quando todas as máquinas passaram e a main não andou desde a base do ramo. Se andou, ele
+# junta a main ao ramo, refaz os gerados, envia o ramo e dispara a bateria de novo sobre a junção, até três vezes
+# (`tools/ci/juntar-a-main.sh`); com conflito, falha dizendo isso, e quem enviou junta a main ao ramo e envia de novo. Depois
+# de uma junção automática, o CI a acompanhar é o da execução nova no ramo, e a sessão puxa o ramo antes do próximo envio.
+# O avanço feito pelo próprio CI não roda a bateria outra vez, porque o commit é o mesmo que acabou de passar.
 #
 # O HISTÓRICO DAS DURAÇÕES CIRCULA PELO CACHE. O teto de tempo dos testes é relativo à mediana das últimas execuções de cada
 # arquivo (`tools/testes-lentos.mjs`), e o histórico mora em `tmp/gates/historico-das-duracoes-<modo>.json`; como cada máquina
@@ -136,9 +138,20 @@ jobs:
         if: ${{ !cancelled() }}
         run: npm run docs:links:check
 
-      - name: Planejamento curto, com até cinco planos ativos e territórios separados
+      - name: Planejamento curto, com até seis planos comuns e três de núcleo ativos e territórios separados
         if: ${{ !cancelled() }}
         run: npm run planos:check
+
+      # Cada arquivo que o envio muda contra a main pertence a um plano ativo, a um caminho compartilhado ou a um gerado, ou é
+      # declarado defeito pontual num commit (`Fora-do-territorio: <caminho>, <motivo>`); antes a regra vivia só em texto.
+      - name: O envio muda só o território dos planos ativos
+        if: ${{ !cancelled() }}
+        run: npm run territorio:check
+
+      # O negrito no meio do texto dos documentos de instrução e o nome de objeto no código do núcleo, contados como catraca.
+      - name: Sem negrito novo no meio do texto nem nome de objeto novo no núcleo
+        if: ${{ !cancelled() }}
+        run: npm run reguas:texto:check
 
       - name: Registros de decisão em formato e lista em dia
         if: ${{ !cancelled() }}
@@ -307,8 +320,12 @@ jobs:
         if: ${{ !cancelled() }}
         run: npm run bancada:guardas
 
+  # O ACERVO EM DUAS MÁQUINAS. As cinco conferências rodavam em série numa máquina só, que era a mais longa do envio (14,3 min:
+  # a guarda do acervo 298 s, a do referencial 278 s, as famílias 120 s, o tempo 63 s, o MCP 38 s; análise do projeto,
+  # processo.md). Elas não dependem umas das outras, e cada uma gera o que mede, então se dividem em duas máquinas de uns
+  # 400 s cada, sem mudar o que conferem.
   acervo:
-    name: Acervo, famílias e MCP
+    name: Acervo, tempo e MCP
     runs-on: ubuntu-24.04
     steps:
       # O histórico inteiro, com ramos e tags, porque o gate de vazamento
@@ -348,6 +365,26 @@ jobs:
         if: ${{ !cancelled() }}
         run: npm run guarda:tempo
 
+  acervo-referencial:
+    name: Referencial, famílias e calibração
+    runs-on: ubuntu-24.04
+    steps:
+      # O histórico inteiro, com ramos e tags, porque o gate de vazamento
+      # (`tools/arquitetura/termos-proibidos.test.mjs`) lê toda mensagem de
+      # commit e todo nome de ramo e tag, e reprova num checkout raso. Medido em
+      # 2026-10-21: 2.449 commits, 144 MB de pacote e 0,2 s de leitura.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Node, dependências e navegador
+        uses: ./.github/actions/preparar
+        # A instalação leva de meio a quatro minutos; presa (duas vezes em 2026-11-23, mais de meia hora no npm ci ou no
+        # playwright), ela segurava o envio até o teto de seis horas do job. Com o teto, falha logo e se refaz só ela.
+        timeout-minutes: 15
+
+
       # Um braço robótico passou em tudo deitado no chão: os pontos declarados
       # ficaram a 2 mm do alvo e a peça estava virada noventa graus, porque
       # cada régua compara a peça contra a declaração dela mesma. Só a
@@ -370,23 +407,31 @@ jobs:
 
   juntar:
     name: Juntar à main
-    needs: [ rapidos, lentos, bancada, acervo ]
-    if: github.event_name == 'push' && (startsWith(github.ref, 'refs/heads/claude/') || startsWith(github.ref, 'refs/heads/envio/'))
+    needs: [ rapidos, lentos, bancada, acervo, acervo-referencial ]
+    # Também na execução que este passo dispara depois de juntar a main andada ao ramo (workflow_dispatch), porque o envio
+    # feito com o GITHUB_TOKEN não dispara o CI de novo.
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && (startsWith(github.ref, 'refs/heads/claude/') || startsWith(github.ref, 'refs/heads/envio/'))
     runs-on: ubuntu-24.04
     permissions:
       contents: write
+      actions: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Avança a main até o commit que passou
-        run: |
-          git fetch origin main
-          if git merge-base --is-ancestor origin/main HEAD; then
-            git push origin HEAD:main
-          else
-            echo "A main andou desde a base deste ramo; junte a main ao ramo (git merge origin/main) e envie de novo."
-            exit 1
-          fi
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Com a main andada por outra sessão, o passo junta a main ao ramo, refaz os arquivos gerados (o mapa, os planos
+      # ativos, o índice do banco de provas, que não pedem dependência), envia o ramo e dispara o CI de novo sobre a junção,
+      # até três vezes; a nova execução é que avança a main, se passar. Com conflito ele para como antes. Em 10 dias de
+      # novembro, 13 execuções verdes se perderam na corrida e houve 57 junções à mão (análise do projeto, processo.md).
+      - name: Avança a main até o commit que passou, ou junta a main andada e roda de novo
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RAMO: ${{ github.ref_name }}
+        run: bash tools/ci/juntar-a-main.sh
+

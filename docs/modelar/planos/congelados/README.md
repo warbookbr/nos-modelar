@@ -37,6 +37,8 @@ zero daqui a três meses.
 
 | plano | congelado em | gatilho para voltar |
 | --- | --- | --- |
+| [modelagem de carro de passeio](2026-11-14-modelagem-de-carro.md) (`docs/modelar/planos/congelados/2026-11-14-modelagem-de-carro.md`) | 2026-11-26 | a pessoa pedir o carro de volta, ou o fechamento do plano do laço de modelagem |
+| [superfície de produção (G2)](2026-11-22-superficie-de-producao-g2.md) (`docs/modelar/planos/congelados/2026-11-22-superficie-de-producao-g2.md`) | 2026-11-26 | o fechamento do plano do resgate dos ramos antigos, ou a pessoa pedir |
 | [modelador inverso com priors por família](2026-08-25-modelador-inverso-priors-familia.md) (`docs/modelar/planos/congelados/2026-08-25-modelador-inverso-priors-familia.md`) | 2026-08-26 | a modelagem dirigida não produzir carro aceito, ou custar atenção demais por rodada |
 | [vocabulário poligonal da bancada](2026-09-17-vocabulario-poligonal-da-bancada.md) (`docs/modelar/planos/congelados/2026-09-17-vocabulario-poligonal-da-bancada.md`) | 2026-09-17 | absorver edição livre deixar de ser o gargalo, ou uma peça concreta precisar de uma dessas formas |
 | [carroceria por casca deformável](2026-09-10-carroceria-por-casca-deformavel.md) (`docs/modelar/planos/congelados/2026-09-10-carroceria-por-casca-deformavel.md`) | 2026-09-10 | existir no acervo uma casca base de carro, fechada e com regiões nomeadas, reconhecível como carro antes de qualquer ajuste |

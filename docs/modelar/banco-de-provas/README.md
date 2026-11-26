@@ -10,6 +10,7 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
 - [Abertura em qualquer direção — a bateria de limites da operação](abertura-em-qualquer-direcao-2026-11-06/README.md) — `abertura-em-qualquer-direcao-2026-11-06`
 - [Abrir peça com filtros, 2026-11-17](abrir-peca-com-filtros-2026-11-17/README.md) — `abrir-peca-com-filtros-2026-11-17`
 - [Ajuste esparso da gaiola: a linha de base do solver denso](ajuste-esparso-2026-11-22/README.md) — `ajuste-esparso-2026-11-22`
+- [Análise do projeto: o resumo das quatro frentes](analise-do-projeto-2026-11-26/README.md) — `analise-do-projeto-2026-11-26`
 - `aparelhos-2026-10-16`
 - [Atuador de junta: cilíndrico, de caixa e montagem de duas juntas](atuador-de-junta-2026-11-25/README.md) — `atuador-de-junta-2026-11-25`
 - [Avião de pequeno porte: alinhamento](aviao-2026-10-11/ALINHAMENTO.md) — `aviao-2026-10-11`
@@ -60,10 +61,12 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
   - [Furgão realista: atritos](furgao-realista-2026-10-30/ATRITOS.md) — `furgao-realista-2026-10-30`
 - [Fonte do objeto-prova da importação de código](importar-objeto-2026-10-15/FONTE.md) — `importar-objeto-2026-10-15`
 - [Kukri: o custo de modelar um objeto simples](kukri-2026-11-13/README.md) — `kukri-2026-11-13`
+- [Laço mais rápido: fatia 1, a dobra e o vinco pela execução guardada e a decisão da pessoa na rodada](laco-mais-rapido-2026-11-26/README.md) — `laco-mais-rapido-2026-11-26`
 - [Resultado da medida de leitura](leitura-por-demanda-2026-10/RESULTADO.md) — `leitura-por-demanda-2026-10`
 - [Limites do sólido por laços — provas das fatias 1 a 3](limites-do-solido-por-lacos-2026-11-05/README.md) — `limites-do-solido-por-lacos-2026-11-05`
 - [Navegação de receitas, 2026-11-05](navegacao-de-receitas-2026-11-05/README.md) — `navegacao-de-receitas-2026-11-05`
 - `nucleo-para-receita-2026-11-14`
+- [Operações repartidas entre núcleos: onde vai o tempo dentro do corte das aberturas](operacoes-repartidas-2026-11-26/README.md) — `operacoes-repartidas-2026-11-26`
 - [Organização dos documentos: o levantamento das decisões em vigor](organizacao-dos-documentos-2026-11-13/README.md) — `organizacao-dos-documentos-2026-11-13`
 - [Ponte com a mecatrônica: a ficha do braço e o pedido de prova](ponte-mecatronica-2026-11-23/README.md) — `ponte-mecatronica-2026-11-23`
 - [Linha de base da porta de entrada dos agentes, 2026-11-05](porta-de-entrada-2026-11-05/README.md) — `porta-de-entrada-2026-11-05`

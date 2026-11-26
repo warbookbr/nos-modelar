@@ -2,8 +2,16 @@
  * O diedro é 180 graus menos o ângulo entre as normais; abaixo do mínimo a aresta fora de vinco é dobra, com a parte, o lugar e o ângulo;
  * o vinco declarado e a borda livre não entram; as arestas que se tocam são uma dobra só; e a mesma superfície dá a mesma saída. A régua
  * contra a peça de prova com a aba torta está em `tools/fixtures/solido-por-lacos/tubos.test.ts`. */
+import { mkdtempSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { PADROES, dobraDaSuperficie, textoDaDobra } from './dobra-da-superficie.mjs';
+import { executarReceita } from '../../src/autoria/executar-receita.js';
+import { PADROES, dobraDaReceita, dobraDaSuperficie, superficiesDaReceita, textoDaDobra } from './dobra-da-superficie.mjs';
+import { executarComCachePorPasso } from './entrada-de-medida.mjs';
+import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
+import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
+import { vincoOcultoDaReceita } from './vinco-oculto.mjs';
 
 /* duas faces de 1 m por 1 m: a primeira plana, em z = 0, e a segunda dobrada para cima `a` graus em torno da aresta x = 1 */
 function folha(a, { vincos = [], parte = 'chapa' } = {}) {
@@ -54,4 +62,46 @@ describe('dobra da superfície: o diedro agudo entre faces vizinhas fora de vinc
     expect(duas).toHaveLength(2);
     expect(duas[0].diedroGraus).toBeLessThan(duas[1].diedroGraus);
   });
+});
+
+/* A superfície lida do que a execução guardou (`neutro.chapas`) contra a gaiola e o refino refeitos, e a execução que recomeça do
+   cache por passo contra a direta: a carenagem de prova tem medidas, simetria e espessura, e o ombro do braço não tem medida. A
+   lataria do carro, que leva um minuto sem cache, está medida no banco de provas do laço mais rápido (2026-11-26). */
+describe('a dobra e o vinco pela execução guardada dão o mesmo que refazendo a subdivisão', () => {
+  const comparavel = (sups) => sups.map(({ gaiola, nomeDe, partes, ...resto }) => ({
+    ...resto, partes: partes.map((p) => [...p].sort()), gaiola: gaiola.vertices, imagem: gaiola.imagem ?? null, nomes: gaiola.vertices.map((_, j) => nomeDe(j)),
+  }));
+  const semDesenho = ({ _desenho, ...resto }) => ({ ...resto, segmentos: _desenho.map((d) => d.segmentos) });
+
+  for (const peca of ['carenagem-de-prova', 'braco-robotico/ombro']) {
+    it(`${peca}: a mesma superfície, a mesma dobra e o mesmo vinco, direto, pelo cache frio e pelo cache quente`, async () => {
+      const caminho = resolverCaminhoReceita(peca);
+      const receita = receitaDoModulo(await importarReceita(caminho));
+      const direta = executarReceita(receita);
+      const refeitas = superficiesDaReceita(receita, direta, { guardada: false });
+      expect(refeitas.length).toBeGreaterThan(0);
+      expect(direta.neutro.chapas.map((c) => c.passo)).toEqual(refeitas.map((sup) => sup.passo));
+      expect(comparavel(superficiesDaReceita(receita, direta))).toEqual(comparavel(refeitas));
+      const dobra = JSON.stringify(dobraDaReceita(receita, {}, direta));
+      const vinco = JSON.stringify(semDesenho(vincoOcultoDaReceita(receita, {}, direta)));
+      /* sem `executada`, as réguas executam a receita elas mesmas */
+      expect(JSON.stringify(dobraDaReceita(receita))).toBe(dobra);
+      /* a execução sem as chapas (um estado montado por quem chama) cai na gaiola refeita, com a mesma saída */
+      const semChapas = { entrada: direta.entrada, neutro: { V: direta.neutro.V, F: direta.neutro.F } };
+      expect(JSON.stringify(dobraDaReceita(receita, {}, semChapas))).toBe(dobra);
+      expect(JSON.stringify(semDesenho(vincoOcultoDaReceita(receita, {}, semChapas)))).toBe(vinco);
+      const pasta = mkdtempSync(join(tmpdir(), 'dobra-pelo-cache-'));
+      try {
+        const fria = await executarComCachePorPasso(caminho, receita, { pastaDoCachePorPrefixo: pasta });
+        const quente = await executarComCachePorPasso(caminho, receita, { pastaDoCachePorPrefixo: pasta });
+        expect(fria.cachePorPasso.recomecouDoPasso).toBe(0);
+        expect(quente.cachePorPasso.recomecouDoPasso).toBe(quente.cachePorPasso.total);
+        for (const { executada } of [fria, quente]) {
+          expect(comparavel(superficiesDaReceita(receita, executada))).toEqual(comparavel(refeitas));
+          expect(JSON.stringify(dobraDaReceita(receita, {}, executada))).toBe(dobra);
+          expect(JSON.stringify(semDesenho(vincoOcultoDaReceita(receita, {}, executada)))).toBe(vinco);
+        }
+      } finally { rmSync(pasta, { recursive: true, force: true }); }
+    });
+  }
 });

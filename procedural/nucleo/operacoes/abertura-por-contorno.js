@@ -110,7 +110,7 @@ export function quadroDaVista(vista) {
   u = u.map((c) => c / tamanho(u));
   const v = cruz(d, u);
   return {
-    nome: `da direção [${vista.map((c) => fmt(c)).join(', ')}]`, eixo: 2, u: 0, v: 1, alinhada: d.filter((c) => Math.abs(c) > 1e-12).length === 1,
+    nome: `da direção [${vista.map((c) => fmt(c)).join(', ')}]`, eixo: 2, u: 0, v: 1, alinhada: d.filter((c) => Math.abs(c) > 1e-12).length === 1, eixos: [u, v, d],
     local: (p) => [ponto(p, u), ponto(p, v), ponto(p, d)],
     mundo: (q) => [0, 1, 2].map((c) => q[0] * u[c] + q[1] * v[c] + q[2] * d[c]),
   };
@@ -959,8 +959,9 @@ export function bandaDaVizinhanca(pos, faces) {
  *  dá) e `tocaOPrisma(id)`, o trecho que a banda recusa tenta perder as faces de parede (`soltarParedes`) e, se ainda assim não fecha,
  *  engolir o tubo de parede inteiro (`absorverTubos`) antes de recusar; o trecho que a banda aceita mas que tem face de parede segue o mesmo
  *  caminho e, se nenhum fecha, fica com a banda direta. `paredes` diz quais perdeu, `via` por qual caminho fechou ('direto', 'paredes soltas'
- *  ou 'tubo absorvido') e `tubos` quantas faces de tubo engoliu. */
-export function vizinhancaDoVao({ V, F, idsDaChapa, proximas, pontosDoPrisma, caixaDaChapa, espessura = null, tocaOPrisma = null }) {
+ *  ou 'tubo absorvido') e `tubos` quantas faces de tubo engoliu. `indice` é o índice da chapa que o corte traz (`chapaGuardada`); sem ele,
+ *  um é montado aqui. */
+export function vizinhancaDoVao({ V, F, idsDaChapa, proximas, pontosDoPrisma, caixaDaChapa, espessura = null, tocaOPrisma = null, indice = null }) {
   if (!CONTROLE_DO_RECORTE.ligado) return { motivo: 'o recorte da vizinhança está desligado (controle de prova)' };
   if (idsDaChapa.length < FACES_MINIMAS_PARA_RECORTAR) return { motivo: `a chapa tem ${idsDaChapa.length} faces, menos que as ${FACES_MINIMAS_PARA_RECORTAR} a partir das quais o recorte compensa` };
   const [min, max] = extremosDos(pontosDoPrisma);
@@ -973,7 +974,11 @@ export function vizinhancaDoVao({ V, F, idsDaChapa, proximas, pontosDoPrisma, ca
     for (const v of vs) verticesDasSementes.add(v);
   }
   if (!sementes.size) return { motivo: 'nenhuma face da chapa toca o prisma do vão' };
-  let ids = idsDaChapa.filter((id) => sementes.has(id) || F.get(id).vs.some((v) => verticesDasSementes.has(v)));
+  /* as faces da chapa que usam um vértice de semente (as sementes entre elas), pelo índice da chapa e na ordem de `idsDaChapa` */
+  indice ??= indiceDaChapa(V, F, idsDaChapa);
+  const comVerticeDeSemente = new Set();
+  for (const v of verticesDasSementes) for (const id of indice.doVertice.get(v) ?? []) comVerticeDeSemente.add(id);
+  let ids = naOrdemDaChapa(indice, comVerticeDeSemente);
   if (ids.length > FRACAO_MAXIMA_DA_VIZINHANCA * idsDaChapa.length) return { motivo: `a vizinhança do vão tem ${ids.length} das ${idsDaChapa.length} faces da chapa, mais que ${FRACAO_MAXIMA_DA_VIZINHANCA * 100}%` };
   const pos = (v) => V.get(v);
   let r = bandaDaVizinhanca(pos, new Map(ids.map((id) => [id, F.get(id).vs])));
@@ -983,7 +988,7 @@ export function vizinhancaDoVao({ V, F, idsDaChapa, proximas, pontosDoPrisma, ca
      banda recusa. Sem parede nenhuma no trecho, a banda direta vale. */
   const e = tocaOPrisma ? (typeof espessura === 'function' ? espessura() : espessura) : null;
   if (e > 0) {
-    const ehParede = classificadorDeParede({ V, F, idsDaChapa, espessura: e });
+    const ehParede = classificadorDeParede({ V, F, idsDaChapa, espessura: e, indice });
     const comParede = !r.motivo && ids.some((id) => ehParede(id));
     if (r.motivo || comParede) {
       const direto = { ids, r };
@@ -998,7 +1003,7 @@ export function vizinhancaDoVao({ V, F, idsDaChapa, proximas, pontosDoPrisma, ca
       }
       if (via === 'direto') {
         /* a parede que não sai (a que o corte alcança, ou o tubo inteiro de um vão que a borda atravessa): o trecho a engole */
-        const t = absorverTubos({ F, ids, idsDaChapa, ehParede });
+        const t = absorverTubos({ F, ids, idsDaChapa, ehParede, indice });
         const r3 = t.motivo ? t : bandaDaVizinhanca(pos, new Map(t.ids.map((id) => [id, F.get(id).vs])));
         if (!r3.motivo) { ids = t.ids; r = r3; tubos = t.tubos; via = 'tubo absorvido'; }
         else if (r.motivo) return { ...r, motivo: `${r.motivo}; ${porque}; ${t.motivo ?? `com os ${t.tubos} faces de tubo de parede dentro, ${r3.motivo}`}` };
@@ -1011,28 +1016,275 @@ export function vizinhancaDoVao({ V, F, idsDaChapa, proximas, pontosDoPrisma, ca
   return andaime.motivo ? andaime : { ids, ...r, andaime, paredes, via, tubos };
 }
 
-/** classificadorDeParede({ V, F, idsDaChapa, espessura }) -> (id) => boolean
+/* ---- o índice da chapa: o que cada corte lê da chapa inteira, montado uma vez e mantido entre os cortes ---- */
+
+/** A chave do `st` da execução sob a qual a operação guarda os índices das chapas que cortou. É um símbolo: a cópia do estado que a
+ *  memória de execução guarda enumera os campos de texto e não o leva, de modo que a execução que recomeça de um ponto guardado monta
+ *  o índice de novo. Nada fica fora do `st`: outra execução, outra guarda. */
+export const GUARDA_DA_CHAPA = Symbol('aberturaPorContorno.guardaDaChapa');
+/** Quantas chapas a guarda mantém (a receita que alterna os vãos entre duas chapas não refaz o índice a cada troca). */
+const CHAPAS_GUARDADAS = 2;
+/** Acima desta fração de faces a refazer, montar o índice de novo custa menos que consertá-lo. */
+const FRACAO_MAXIMA_A_REFAZER = 0.25;
+/** O teto de faces da guarda: a chapa maior que isto não fica guardada, e a soma das chapas guardadas não passa disto. O índice custa
+ *  perto de 1 KB por face (medido numa chapa de 250 mil faces, com a grade) e vive até o fim da execução. As maiores
+ *  chapas que as receitas de hoje cortam têm perto de 100 mil faces (medido em 2026-11-26: 103 mil na maior medida, e menos de 124 mil
+ *  na outra, que é o total de faces da peça dela); 250 mil dá duas vezes isso e segura a guarda em cerca de 250 MB. O teto de cada execução fica em `guarda.teto`, para a prova poder baixá-lo. */
+export const FACES_MAXIMAS_NA_GUARDA = 250000;
+/** A face que ocupa mais células que isto na grade do classificador de parede fica numa lista à parte, conferida em toda busca. */
+const LIMITE_DE_CELULAS = 512;
+const GRANDE = Object.freeze([]);
+
+/* o registro de uma face no índice: uma cópia da lista de vértices (para saber, depois, se ela mudou), os pontos (os mesmos vetores de
+   `V`) e a caixa; a normal só quando a grade a pede */
+function registroDaFace(V, F, id, ordem) {
+  const vs = [...F.get(id).vs]; const pts = vs.map((v) => V.get(v)); const [a, b] = extremosDos(pts);
+  return { id, vs, pts, a, b, n: undefined, celulas: null, ordem, fora: false };
+}
+
+/** indiceDaChapa(V, F, idsDaChapa) -> índice
+ *  O que os passos do corte perguntam à chapa inteira, montado numa passada: `regs`, o registro de cada face na ordem de `idsDaChapa`
+ *  (a caixa dela, para achar as faces que tocam a caixa do contorno na vista sem reler os mapas da peça); `doVertice`, as faces de cada
+ *  vértice, na mesma ordem; e, quando o classificador de parede a pede, a grade das faces (`gradeDoIndice`). */
+export function indiceDaChapa(V, F, idsDaChapa) {
+  const regs = new Array(idsDaChapa.length); const porId = new Map(); const doVertice = new Map();
+  for (let k = 0; k < idsDaChapa.length; k++) {
+    const g = registroDaFace(V, F, idsDaChapa[k], k);
+    regs[k] = g; porId.set(g.id, g);
+    for (const v of g.vs) { const l = doVertice.get(v); if (l) l.push(g.id); else doVertice.set(v, [g.id]); }
+  }
+  return { V, F, ids: idsDaChapa, regs, porId, doVertice, grade: null, passo: null, eventos: null };
+}
+
+/* os ids de um conjunto de faces da chapa, na ordem em que a chapa os tem */
+const naOrdemDaChapa = (indice, conjunto) => [...conjunto].sort((x, y) => indice.porId.get(x).ordem - indice.porId.get(y).ordem);
+
+function porNaGrade(grade, g) {
+  if (g.n === undefined) { const n = newell(g.pts); const l = tamanho(n); g.n = l > 0 ? [n[0] / l, n[1] / l, n[2] / l] : null; }
+  g.celulas = null;
+  if (!g.n) return;
+  const cel = (x) => Math.floor(x / grade.celula);
+  const [i0, j0, k0, i1, j1, k1] = [cel(g.a[0]), cel(g.a[1]), cel(g.a[2]), cel(g.b[0]), cel(g.b[1]), cel(g.b[2])];
+  if ((i1 - i0 + 1) * (j1 - j0 + 1) * (k1 - k0 + 1) > LIMITE_DE_CELULAS) { grade.grandes.push(g); g.celulas = GRANDE; return; }
+  g.celulas = [];
+  for (let i = i0; i <= i1; i++) for (let j = j0; j <= j1; j++) for (let k = k0; k <= k1; k++) {
+    const c = `${i},${j},${k}`; const lista = grade.mapa.get(c); if (lista) lista.push(g); else grade.mapa.set(c, [g]);
+    g.celulas.push(c);
+  }
+}
+function tirarDaGrade(grade, g) {
+  if (g.celulas === GRANDE) grade.grandes.splice(grade.grandes.indexOf(g), 1);
+  else for (const c of g.celulas ?? []) { const lista = grade.mapa.get(c); lista.splice(lista.indexOf(g), 1); if (!lista.length) grade.mapa.delete(c); }
+  g.celulas = null;
+}
+
+/** A grade das faces da chapa, de células de 25 espessuras, montada na primeira vez que o classificador de parede a pede e mantida
+ *  enquanto a espessura pedida fica entre metade e o dobro da que a montou. A grade só apressa a busca: cada face está em toda célula
+ *  que a caixa dela toca, e quem pergunta confere a caixa e o raio de cada candidata, de modo que a resposta é a mesma com células de
+ *  qualquer tamanho. A face de área nula não entra. */
+function gradeDoIndice(indice, espessura) {
+  const celula = 25 * espessura;
+  const atual = indice.grade;
+  if (atual && celula >= atual.celula / 2 && celula <= atual.celula * 2) return atual;
+  const grade = { celula, mapa: new Map(), grandes: [] };
+  for (const g of indice.regs) porNaGrade(grade, g);
+  indice.grade = grade;
+  return grade;
+}
+
+/* tira uma face do índice, e a põe (lida de novo dos mapas da peça); as faces de cada vértice ficam em ordem crescente de id, que é a
+   ordem da chapa no índice guardado */
+function tirarDoIndice(indice, g) {
+  g.fora = true; indice.porId.delete(g.id);
+  for (const v of g.vs) { const l = indice.doVertice.get(v); l.splice(l.indexOf(g.id), 1); if (!l.length) indice.doVertice.delete(v); }
+  if (indice.grade) tirarDaGrade(indice.grade, g);
+}
+function porNoIndice(indice, id, ordem) {
+  const g = registroDaFace(indice.V, indice.F, id, ordem);
+  indice.porId.set(id, g);
+  for (const v of g.vs) {
+    const l = indice.doVertice.get(v);
+    if (!l) { indice.doVertice.set(v, [id]); continue; }
+    let k = l.length; while (k > 0 && l[k - 1] > id) k--;
+    l.splice(k, 0, id);
+  }
+  if (indice.grade) porNaGrade(indice.grade, g);
+  return g;
+}
+
+/** porEmDia(indice, st, i, idsDaChapa) -> número de faces refeitas | null
+ *  Leva o índice guardado num corte anterior ao estado da chapa no passo `i`, ou devolve null quando ele não serve (e nada nele muda).
+ *  A CHAVE DE VALIDADE é a procedência da execução (`st.procedencia.passos`): ao fim de cada passo o despacho do núcleo registra os
+ *  vértices e as faces cuja entrada o passo criou, apagou ou alterou. O índice guarda o passo em que foi posto em dia e quantos
+ *  registros a procedência tinha então, e só serve quando os registros seguintes são exatamente os dos passos dali até o anterior a
+ *  `i`, um por passo e em ordem (o passo que saiu sem registro, um mapa de vértices ou de faces que não é mais o mesmo objeto, ou outro
+ *  corte no mesmo passo invalidam). Cada face cuja lista de vértices um desses passos mudou, e cada face com um vértice que mudou, é lida
+ *  de novo; a que saiu da chapa sai do índice e a que entrou entra. `idsDaChapa` precisa estar em ordem crescente, como o `abrir` a entrega. */
+function porEmDia(indice, st, i, idsDaChapa) {
+  const eventos = st.procedencia?.passos;
+  if (indice.V !== st.V || indice.F !== st.F || !Array.isArray(eventos) || !Number.isInteger(indice.passo)) return null;
+  const n = i - indice.passo;
+  if (!(n >= 1) || eventos.length !== indice.eventos + n) return null;
+  for (let k = 0; k < n; k++) {
+    const e = eventos[indice.eventos + k];
+    if (e?.passo !== indice.passo + k || !Array.isArray(e.saidas?.faces) || !Array.isArray(e.saidas?.vertices)) return null;
+  }
+  /* quem saiu e quem entrou, pela intercalação das duas listas em ordem */
+  const velhos = indice.ids; const saem = []; const entram = [];
+  let p = 0;
+  for (let k = 0; k < idsDaChapa.length; k++) {
+    const id = idsDaChapa[k];
+    if (k > 0 && !(id > idsDaChapa[k - 1])) return null;
+    while (p < velhos.length && velhos[p] < id) saem.push(velhos[p++]);
+    if (p < velhos.length && velhos[p] === id) p++; else entram.push(id);
+  }
+  while (p < velhos.length) saem.push(velhos[p++]);
+  const refazer = new Set();
+  for (let k = 0; k < n; k++) {
+    const { faces, vertices } = eventos[indice.eventos + k].saidas;
+    /* a face cuja entrada mudou só nos atributos (a parte, o material, o liso) fica como está: o índice só lê os vértices dela */
+    for (const f of faces) {
+      const g = indice.porId.get(f);
+      if (!g) continue;
+      const vs = st.F.get(f)?.vs;
+      if (!vs || vs.length !== g.vs.length || vs.some((v, k) => v !== g.vs[k])) refazer.add(f);
+    }
+    for (const v of vertices) { const l = indice.doVertice.get(v); if (l) for (const f of l) refazer.add(f); }
+  }
+  for (const id of saem) refazer.delete(id);
+  const mexidas = saem.length + entram.length + refazer.size;
+  if (mexidas > FRACAO_MAXIMA_A_REFAZER * idsDaChapa.length) return null;
+  for (const id of saem) tirarDoIndice(indice, indice.porId.get(id));
+  for (const id of refazer) { const velho = indice.porId.get(id); tirarDoIndice(indice, velho); indice.regs[velho.ordem] = porNoIndice(indice, id, velho.ordem); }
+  for (const id of entram) porNoIndice(indice, id, 0);
+  if (saem.length || entram.length) {
+    const antigos = indice.regs; const regs = new Array(idsDaChapa.length);
+    let q = 0;
+    for (let k = 0; k < idsDaChapa.length; k++) {
+      const id = idsDaChapa[k];
+      while (q < antigos.length && antigos[q].id < id) q++;
+      const g = q < antigos.length && antigos[q].id === id && !antigos[q].fora ? antigos[q] : indice.porId.get(id);
+      g.ordem = k; regs[k] = g;
+    }
+    indice.regs = regs;
+  }
+  indice.ids = idsDaChapa;
+  return entram.length + refazer.size;
+}
+
+/** chapaGuardada(st, i, idsDaChapa) -> índice
+ *  O índice da chapa para o corte do passo `i`: o que a execução guardou num corte anterior da mesma chapa, posto em dia (`porEmDia`), ou
+ *  um novo; `reaproveitado` diz qual. Fica em `st[GUARDA_DA_CHAPA]`, com a conta de quantos foram montados, reaproveitados e de quantas
+ *  faces foram refeitas. Entre as vagas, serve a primeira que tem uma face da chapa pedida e que `porEmDia` aceita; a que ele recusa sai.
+ *  A procedência diz o que mudou até o fim do passo anterior, e não o que este passo já fez: o índice guardado só é reaproveitado quando
+ *  o despacho do núcleo está contando os `set` e `delete` deste passo (`st.tocadosV` e `st.tocadosF`, que ele instala para a operação do
+ *  próprio núcleo) e a conta está em zero. A operação chamada por outro caminho (um registro que troca a função, o retrato completo, um
+ *  `st` sem procedência) monta um índice novo a cada corte, como antes da guarda.
+ *  O TETO. A chapa com mais faces que `guarda.teto` (FACES_MAXIMAS_NA_GUARDA) não fica guardada, e as vagas mais antigas saem enquanto a
+ *  soma das faces guardadas passa dele.
+ *  DE QUE A MALHA PASSA A DEPENDER. No retrato 'rapido' a procedência de um passo do núcleo sai da declaração de escrita dele
+ *  (`ESCRITA_DAS_OPERACOES`, em `nucleo.js`, e as somas de `somas-do-rastreio.js`), que antes da guarda só decidia a procedência: a
+ *  declaração que deixa de fora uma face ou um vértice que o passo mudou deixa o índice velho nela, e o corte seguinte lê a chapa de
+ *  antes. No retrato 'conferido' o registro vem da conta completa, e o despacho já recusa a declaração que diverge dela; com a leitura
+ *  registrada (`st.leitura`, a leitura 'conferido'), o corte compara o índice reaproveitado com um montado do zero e recusa a divergência
+ *  (`divergenciaDoIndice`, em `cortar`).
+ *  A LEITURA OBSERVADA ENCOLHE. O corte que reaproveita o índice não lê mais cada face e cada vértice da chapa dos mapas da peça, e o
+ *  registro de leitura do passo (`planejador/leitura-do-passo.js`) passa a ver só o que foi refeito e o trecho cortado. A declaração de
+ *  leitura da operação (`LEITURA_DAS_OPERACOES`, em `planejador/leitura-declarada.js`) precisa continuar `malha` nos dois mapas: o
+ *  resultado depende da chapa inteira, pela guarda, mesmo quando o passo não a relê. */
+export function chapaGuardada(st, i, idsDaChapa) {
+  const guarda = (st[GUARDA_DA_CHAPA] ??= { chapas: [], montados: 0, reaproveitados: 0, facesRefeitas: 0, teto: FACES_MAXIMAS_NA_GUARDA });
+  const eventos = st.procedencia?.passos;
+  const passoIntocado = st.tocadosV instanceof Set && st.tocadosF instanceof Set && st.tocadosV.size === 0 && st.tocadosF.size === 0;
+  const meio = idsDaChapa[idsDaChapa.length >> 1];
+  let indice = null;
+  for (let k = 0; passoIntocado && !indice && k < guarda.chapas.length;) {
+    const candidato = guarda.chapas[k];
+    if (!(candidato.porId.has(idsDaChapa[0]) || candidato.porId.has(meio) || candidato.porId.has(idsDaChapa[idsDaChapa.length - 1]))) { k++; continue; }
+    guarda.chapas.splice(k, 1);
+    const refeitas = porEmDia(candidato, st, i, idsDaChapa);
+    if (refeitas != null) { indice = candidato; guarda.reaproveitados += 1; guarda.facesRefeitas += refeitas; }
+  }
+  const reaproveitado = indice !== null;
+  if (!indice) { indice = indiceDaChapa(st.V, st.F, idsDaChapa); guarda.montados += 1; }
+  indice.reaproveitado = reaproveitado;
+  indice.passo = Array.isArray(eventos) ? i : null;
+  indice.eventos = Array.isArray(eventos) ? eventos.length : null;
+  /* a vaga da frente é a deste corte; as mais antigas saem primeiro, e a chapa que sozinha passa do teto sai também */
+  guarda.chapas.unshift(indice);
+  guarda.chapas.length = Math.min(guarda.chapas.length, CHAPAS_GUARDADAS);
+  let soma = 0; for (const c of guarda.chapas) soma += c.ids.length;
+  while (soma > guarda.teto) soma -= guarda.chapas.pop().ids.length;
+  return indice;
+}
+
+/** divergenciaDoIndice(indice, V, F, idsDaChapa) -> texto | null
+ *  A primeira diferença entre o índice (reaproveitado) e um montado agora dos mapas da peça: os registros na ordem da chapa (a lista
+ *  de vértices, os vetores dos pontos, a caixa), as faces de cada vértice e, se o índice tem grade, as faces de cada célula dela. É a
+ *  conferência do modo de leitura registrada; null quando não há diferença. */
+export function divergenciaDoIndice(indice, V, F, idsDaChapa) {
+  const novo = indiceDaChapa(V, F, idsDaChapa);
+  const igual = (x, y) => x.length === y.length && x.every((v, k) => v === y[k]);
+  if (indice.regs.length !== novo.regs.length || indice.porId.size !== novo.porId.size) return `o índice tem ${indice.regs.length} faces e a chapa tem ${novo.regs.length}`;
+  for (let k = 0; k < novo.regs.length; k++) {
+    const g = indice.regs[k], n = novo.regs[k];
+    if (g.id !== n.id || g.fora || indice.porId.get(n.id) !== g) return `na posição ${k} da chapa o índice tem a face ${g.id} e a chapa tem a ${n.id}`;
+    if (!igual(g.vs, n.vs)) return `a face ${n.id} está no índice com os vértices [${g.vs.join(', ')}] e na peça com [${n.vs.join(', ')}]`;
+    if (!igual(g.pts, n.pts) || !igual(g.a, n.a) || !igual(g.b, n.b)) return `a face ${n.id} está no índice com os pontos de antes de um vértice dela mudar`;
+  }
+  if (indice.doVertice.size !== novo.doVertice.size) return `o índice tem ${indice.doVertice.size} vértices com face e a chapa tem ${novo.doVertice.size}`;
+  for (const [v, l] of novo.doVertice) if (!igual(indice.doVertice.get(v) ?? [], l)) return `o vértice ${v} está no índice com as faces [${(indice.doVertice.get(v) ?? []).join(', ')}] e na peça com [${l.join(', ')}]`;
+  if (indice.grade) {
+    const grade = { celula: indice.grade.celula, mapa: new Map(), grandes: [] };
+    for (const g of novo.regs) porNaGrade(grade, g);
+    const faces = (lista) => lista.map((g) => g.id).sort((x, y) => x - y).join(',');
+    if (indice.grade.mapa.size !== grade.mapa.size || faces(indice.grade.grandes) !== faces(grade.grandes)) return `a grade do índice tem ${indice.grade.mapa.size} células e a da chapa tem ${grade.mapa.size}`;
+    for (const [c, l] of grade.mapa) if (faces(indice.grade.mapa.get(c) ?? []) !== faces(l)) return `a célula ${c} da grade do índice não tem as faces que a chapa tem ali`;
+  }
+  return null;
+}
+
+/** chapaVistaDoEixo(indice, quadro, [u0, v0, u1, v1], caixa) -> { wMin, wMax, perto }
+ *  A chapa vista do eixo do quadro: a profundidade dela (o menor e o maior w dos vértices), os registros das faces cuja caixa na vista
+ *  toca o retângulo do contorno, na ordem da chapa, e, em `caixa` ([min, max], se dada), a caixa da chapa no espaço. Nos três eixos a
+ *  caixa de cada face já está no índice; no quadro por vetor cada ponto é levado ao quadro pela mesma conta de `quadro.local`. */
+function chapaVistaDoEixo(indice, q, [u0, v0, u1, v1], caixa) {
+  const { eixo: e, u: qu, v: qv } = q;
+  let wMin = Infinity, wMax = -Infinity; const perto = [];
+  const min = caixa?.[0], max = caixa?.[1];
+  if (q.identidade) {
+    for (const g of indice.regs) {
+      const a = g.a, b = g.b;
+      if (caixa) for (let c = 0; c < 3; c++) { if (a[c] < min[c]) min[c] = a[c]; if (b[c] > max[c]) max[c] = b[c]; }
+      if (a[e] < wMin) wMin = a[e]; if (b[e] > wMax) wMax = b[e];
+      if (!(b[qu] < u0 - 1e-9 || a[qu] > u1 + 1e-9 || b[qv] < v0 - 1e-9 || a[qv] > v1 + 1e-9)) perto.push(g);
+    }
+    return { wMin, wMax, perto };
+  }
+  const E = q.eixos ?? null;
+  for (const g of indice.regs) {
+    let a0 = Infinity, a1 = -Infinity, b0 = Infinity, b1 = -Infinity;
+    for (const p of g.pts) {
+      if (caixa) for (let c = 0; c < 3; c++) { if (p[c] < min[c]) min[c] = p[c]; if (p[c] > max[c]) max[c] = p[c]; }
+      let w, lu, lv;
+      if (E) { w = ponto(p, E[e]); lu = ponto(p, E[qu]); lv = ponto(p, E[qv]); } else { const l = q.local(p); w = l[e]; lu = l[qu]; lv = l[qv]; }
+      if (w < wMin) wMin = w; if (w > wMax) wMax = w;
+      if (lu < a0) a0 = lu; if (lu > a1) a1 = lu; if (lv < b0) b0 = lv; if (lv > b1) b1 = lv;
+    }
+    if (!(a1 < u0 - 1e-9 || a0 > u1 + 1e-9 || b1 < v0 - 1e-9 || b0 > v1 + 1e-9)) perto.push(g);
+  }
+  return { wMin, wMax, perto };
+}
+
+/** classificadorDeParede({ V, F, idsDaChapa, espessura, indice }) -> (id) => boolean
  *  Diz se uma face da chapa é parede (de outro vão ou da lateral da chapa) e não pele: uma face de pele tem do outro lado da chapa, na
  *  direção contrária à da normal e a até ALCANCE_DA_PELE espessuras, uma face de normal oposta; a parede tem ali o miolo da chapa.
- *  A busca da pele oposta passa por uma grade de células de 25 espessuras sobre a chapa inteira, e a face de área nula não é parede. */
-export function classificadorDeParede({ V, F, idsDaChapa, espessura }) {
+ *  A busca da pele oposta passa pela grade do índice da chapa (`gradeDoIndice`; sem `indice`, um é montado aqui), e a face de área nula
+ *  não é parede. A função devolvida vale enquanto o índice não é posto em dia de novo. */
+export function classificadorDeParede({ V, F, idsDaChapa, espessura, indice = indiceDaChapa(V, F, idsDaChapa) }) {
   const alcance = ALCANCE_DA_PELE * espessura;
-  const celula = 25 * espessura;
-  const cel = (x) => Math.floor(x / celula);
-  const dados = new Map(); const grade = new Map(); const grandes = [];
-  const LIMITE_DE_CELULAS = 512;
-  for (const id of idsDaChapa) {
-    const pts = F.get(id).vs.map((v) => V.get(v)); const n = newell(pts); const l = tamanho(n);
-    if (!(l > 0)) continue;
-    const [a, b] = extremosDos(pts);
-    const g = { id, pts, n: [n[0] / l, n[1] / l, n[2] / l], a, b };
-    dados.set(id, g);
-    const [i0, j0, k0, i1, j1, k1] = [cel(a[0]), cel(a[1]), cel(a[2]), cel(b[0]), cel(b[1]), cel(b[2])];
-    if ((i1 - i0 + 1) * (j1 - j0 + 1) * (k1 - k0 + 1) > LIMITE_DE_CELULAS) { grandes.push(g); continue; }
-    for (let i = i0; i <= i1; i++) for (let j = j0; j <= j1; j++) for (let k = k0; k <= k1; k++) {
-      const c = `${i},${j},${k}`; const lista = grade.get(c); if (lista) lista.push(g); else grade.set(c, [g]);
-    }
-  }
+  const grade = gradeDoIndice(indice, espessura);
+  const cel = (x) => Math.floor(x / grade.celula);
   const tem = (f, g, c, fim) => {
     if (g.id === f.id || ponto(g.n, f.n) > COS_DA_PELE_OPOSTA) return false;
     if (g.a[0] > Math.max(c[0], fim[0]) || g.b[0] < Math.min(c[0], fim[0]) || g.a[1] > Math.max(c[1], fim[1]) || g.b[1] < Math.min(c[1], fim[1]) || g.a[2] > Math.max(c[2], fim[2]) || g.b[2] < Math.min(c[2], fim[2])) return false;
@@ -1046,14 +1298,14 @@ export function classificadorDeParede({ V, F, idsDaChapa, espessura }) {
   const memo = new Map();
   return (id) => {
     if (memo.has(id)) return memo.get(id);
-    const f = dados.get(id); let parede = false;
-    if (f) {
+    const f = indice.porId.get(id); let parede = false;
+    if (f?.n) {
       const d = [-f.n[0], -f.n[1], -f.n[2]];
       const c = [0, 1, 2].map((k) => f.pts.reduce((s, p) => s + p[k], 0) / f.pts.length);
       const fim = [c[0] + d[0] * alcance, c[1] + d[1] * alcance, c[2] + d[2] * alcance];
-      let pele = grandes.some((g) => tem(f, g, c, fim));
+      let pele = grade.grandes.some((g) => tem(f, g, c, fim));
       for (let i = cel(Math.min(c[0], fim[0])); !pele && i <= cel(Math.max(c[0], fim[0])); i++) for (let j = cel(Math.min(c[1], fim[1])); !pele && j <= cel(Math.max(c[1], fim[1])); j++) for (let k = cel(Math.min(c[2], fim[2])); !pele && k <= cel(Math.max(c[2], fim[2])); k++) {
-        for (const g of grade.get(`${i},${j},${k}`) ?? []) if (tem(f, g, c, fim)) { pele = true; break; }
+        for (const g of grade.mapa.get(`${i},${j},${k}`) ?? []) if (tem(f, g, c, fim)) { pele = true; break; }
       }
       parede = !pele;
     }
@@ -1080,9 +1332,10 @@ export function soltarParedes({ V, F, ids, idsDaChapa, espessura, tocaOPrisma, e
  *  dividem um vértice com elas e são parede, e leva junto as faces de pele que dividem um vértice com o tubo, de modo que a borda
  *  do trecho volta a correr só pelas peles, longe do tubo; a parede que a borda ainda alcança entra na rodada seguinte. Recusa quando
  *  o trecho passa de FRACAO_MAXIMA_DA_VIZINHANCA da chapa. `ids` sai em ordem crescente. */
-export function absorverTubos({ F, ids, idsDaChapa, ehParede }) {
-  const daFace = new Map();
-  for (const id of idsDaChapa) for (const v of F.get(id).vs) { const l = daFace.get(v); if (l) l.push(id); else daFace.set(v, [id]); }
+export function absorverTubos({ F, ids, idsDaChapa, ehParede, indice = null }) {
+  /* as faces de cada vértice da chapa: as do índice da chapa, quando o corte o traz, ou montadas aqui, na ordem de `idsDaChapa` */
+  let daFace = indice?.doVertice;
+  if (!daFace) { daFace = new Map(); for (const id of idsDaChapa) for (const v of F.get(id).vs) { const l = daFace.get(v); if (l) l.push(id); else daFace.set(v, [id]); } }
   const trecho = new Set(ids); const tubos = new Set(); let fila = [];
   const semear = (id) => { if (tubos.has(id)) return; tubos.add(id); trecho.add(id); fila.push(id); };
   for (const id of ids) if (ehParede(id)) semear(id);
@@ -1127,7 +1380,7 @@ export function absorverTubos({ F, ids, idsDaChapa, ehParede }) {
     }
     if (!tampou) break;
   }
-  return { ids: idsDaChapa.filter((id) => trecho.has(id)), tubos: tubos.size };
+  return { ids: indice ? naOrdemDaChapa(indice, trecho) : idsDaChapa.filter((id) => trecho.has(id)), tubos: tubos.size };
 }
 
 /** A distância ao longo do raio (origem o, direção d) até o triângulo abc, ou null (Möller-Trumbore, só para a frente). */
@@ -1297,6 +1550,17 @@ export function criarOperacoesAberturaPorContorno(servicos) {
     const { eixo, u: iu, v: iv } = quadro;
     const minDaChapa = [Infinity, Infinity, Infinity], maxDaChapa = [-Infinity, -Infinity, -Infinity];
     const lidos = [];
+    /* o índice da chapa: o da execução, posto em dia pelo que os passos desde o último corte mudaram, ou montado agora */
+    const chapa = chapaGuardada(st, i, idsDaChapa);
+    /* com a leitura do passo registrada (a leitura 'conferido'), o índice reaproveitado é conferido contra um montado do zero: a
+       diferença é de um passo que mudou a chapa sem que a procedência dissesse */
+    if (st.leitura && chapa.reaproveitado) {
+      const diferenca = divergenciaDoIndice(chapa, st.V, st.F, idsDaChapa);
+      if (diferenca) {
+        delete st[GUARDA_DA_CHAPA];
+        return grita(st, i, OP, 'chapa', `o índice da chapa guardado por um corte anterior não confere com a chapa de agora: ${diferenca}. Algum passo antes deste mudou a chapa sem que a procedência registrasse a face ou o vértice: a declaração de escrita da operação dele (ESCRITA_DAS_OPERACOES, em nucleo.js) ou a soma do que ela altera no lugar (somas-do-rastreio.js) deixa a mudança de fora. O vão não foi cortado; conserte a declaração, e não a receita`);
+      }
+    }
     /* os dois vãos vistos do mesmo eixo, de lados opostos (a vista 'x', ou o vetor só em x): a direção de onde cada um olha, com o
        sentido, é oposta à do outro, e os dois prismas cobrem a mesma região do desenho */
     const deOndeOlha = (vao) => { const l = [0, 0, 0]; l[vao.quadro.eixo] = vao.sentido === '-' ? -1 : 1; return vao.quadro.mundo(l); };
@@ -1306,22 +1570,13 @@ export function criarOperacoesAberturaPorContorno(servicos) {
       const q = vao.quadro; const P = vao.poligono;
       const { eixo: e, u: qu, v: qv } = q;
       const Vq = noQuadro(st.V, q);
-      /* uma passada pela chapa: a profundidade dela no eixo, a caixa dela, e as faces que tocam a caixa do contorno na vista, as únicas
-         que a conferência da projeção e a espessura medem (nenhuma outra face cruza um ponto nem um lado do contorno) */
+      /* a chapa vista do eixo: a profundidade dela, a caixa dela, e as faces que tocam a caixa do contorno na vista, as únicas que a
+         conferência da projeção e a espessura medem (nenhuma outra face cruza um ponto nem um lado do contorno). Sai do índice da
+         chapa, que guarda a caixa de cada face, e não de uma passada pelos mapas da peça */
       const [u0, v0, u1, v1] = [Math.min(...P.map((p) => p[0])), Math.min(...P.map((p) => p[1])), Math.max(...P.map((p) => p[0])), Math.max(...P.map((p) => p[1]))];
-      let wMin = Infinity, wMax = -Infinity;
+      const { wMin, wMax, perto } = chapaVistaDoEixo(chapa, q, [u0, v0, u1, v1], k === 0 ? [minDaChapa, maxDaChapa] : null);
       const proximas = new Map();
-      for (const id of idsDaChapa) {
-        const vs = st.F.get(id).vs;
-        let a0 = Infinity, a1 = -Infinity, b0 = Infinity, b1 = -Infinity;
-        for (const v of vs) {
-          const p = st.V.get(v); const l = q.identidade ? p : Vq.get(v);
-          if (k === 0) for (let c = 0; c < 3; c++) { if (p[c] < minDaChapa[c]) minDaChapa[c] = p[c]; if (p[c] > maxDaChapa[c]) maxDaChapa[c] = p[c]; }
-          const w = l[e]; if (w < wMin) wMin = w; if (w > wMax) wMax = w;
-          if (l[qu] < a0) a0 = l[qu]; if (l[qu] > a1) a1 = l[qu]; if (l[qv] < b0) b0 = l[qv]; if (l[qv] > b1) b1 = l[qv];
-        }
-        if (!(a1 < u0 - 1e-9 || a0 > u1 + 1e-9 || b1 < v0 - 1e-9 || b0 > v1 + 1e-9)) proximas.set(id, vs);
-      }
+      for (const g of perto) proximas.set(g.id, st.F.get(g.id).vs);
       const projecao = conferirProjecao(st.V, proximas, P, q, vao.sentido);
       if (projecao.recusa) return grita(st, i, OP, 'contorno', k === 0 ? projecao.recusa : `no vão espelhado pela simetria: ${projecao.recusa}`);
       if (mesmoEixo && projecao.corte == null) return grita(st, i, OP, 'simetria', `com simetria: 'x' na vista ${q.nome}, o vão espelhado é visto do mesmo eixo que o declarado, do lado oposto, e a reta do eixo atravessa a chapa uma vez só nos pontos do contorno: a chapa não tem o outro lado do plano x = 0, e o prisma espelhado seria o mesmo do declarado; tire a simetria do passo (o vão declarado já é o único desta chapa nesta vista)`);
@@ -1357,8 +1612,9 @@ export function criarOperacoesAberturaPorContorno(servicos) {
     const escala = Math.max(...[0, 1, 2].map((c) => maxDaChapa[c] - minDaChapa[c]));
     const piso = 2e-9 * escala * escala;
     /* o piso da divisão é o do gate de malha, que mede a área do triângulo contra o maior raio da peça inteira, e não da chapa: 2e-9 dele */
-    let raioDaPeca = 0; for (const p of st.V.values()) raioDaPeca = Math.max(raioDaPeca, Math.hypot(p[0], p[1], p[2]));
-    const pisoDaDivisao = 2e-9 * raioDaPeca * raioDaPeca;
+    /* só a limpeza fina divide faces, e só ela percorre os vértices da peça inteira atrás do raio */
+    let pisoDaDivisao = 0;
+    if (limpezaFina) { let raioDaPeca = 0; for (const p of st.V.values()) raioDaPeca = Math.max(raioDaPeca, Math.hypot(p[0], p[1], p[2])); pisoDaDivisao = 2e-9 * raioDaPeca * raioDaPeca; }
 
     /* A VIZINHANÇA. A booleana solda, confere e remonta toda face que recebe, e a chapa de um corpo tem centenas de milhares delas
        para um vão que ocupa um canto: ela recebe só o trecho da chapa em volta do vão, fechado por uma banda que liga as duas peles
@@ -1371,7 +1627,7 @@ export function criarOperacoesAberturaPorContorno(servicos) {
       const vs = perto.get(id);
       return vs != null && projecaoToca(vs.map((v) => { const l = q.identidade ? st.V.get(v) : Vq.get(v); return [l[q.u], l[q.v]]; }), P, TOQUE_NO_PRISMA);
     });
-    const viz = chapaInteiraPor ? { motivo: chapaInteiraPor } : vizinhancaDoVao({ V: st.V, F: st.F, idsDaChapa, proximas, pontosDoPrisma: prisma.pontos, caixaDaChapa: [minDaChapa, maxDaChapa], espessura: espessuraDaChapa, tocaOPrisma });
+    const viz = chapaInteiraPor ? { motivo: chapaInteiraPor } : vizinhancaDoVao({ V: st.V, F: st.F, idsDaChapa, proximas, pontosDoPrisma: prisma.pontos, caixaDaChapa: [minDaChapa, maxDaChapa], espessura: espessuraDaChapa, tocaOPrisma, indice: chapa });
     const recortada = !viz.motivo;
     const idsPerto = recortada ? viz.ids : idsDaChapa;
     /* no fim da faixa do passo, abaixo do prisma: a banda e as faces do andaime (e os vértices dele), que saem da peça depois do corte */

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2406 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2430 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -116,6 +116,14 @@
 - `ensaio-do-carro.mjs` — ensaio-do-carro.mjs — o gate 1 do plano do ajuste esparso: a subdivisão da lataria do quarto traseiro do carro-fastback com a rede mais densa, pela variante …
 - `ensaio-esparso.mjs` — ensaio-esparso.mjs — a fatia 2 do plano do ajuste esparso na gaiola de prova: o tempo do ajuste com peso pelo Cholesky esparso, a estrutura do fator (não nul…
 - `ensaio-sela.mjs` — ensaio-sela.mjs — a medida que decide a fatia 3 do plano do ajuste esparso: o preenchimento do LU esparso no sistema de ponto de sela da gaiola de prova, com…
+
+## docs/modelar/banco-de-provas/analise-do-projeto-2026-11-26/
+
+- `README.md` — Análise do projeto: o resumo das quatro frentes
+- `documentacao.md` — Análise do projeto: documentação
+- `ferramentas.md` — Análise do projeto — frente das ferramentas
+- `nucleo.md` — Análise do projeto — frente núcleo
+- `processo.md` — Análise do projeto — frente processo
 
 ## docs/modelar/banco-de-provas/atuador-de-junta-2026-11-25/
 
@@ -436,6 +444,10 @@
 - `ATRITOS.md` — Kukri: custo medido e atritos
 - `README.md` — Kukri: o custo de modelar um objeto simples
 
+## docs/modelar/banco-de-provas/laco-mais-rapido-2026-11-26/
+
+- `README.md` — Laço mais rápido: fatia 1, a dobra e o vinco pela execução guardada e a decisão da pessoa na rodada
+
 ## docs/modelar/banco-de-provas/leitura-por-demanda-2026-10/
 
 - `RESULTADO.md` — Resultado da medida de leitura
@@ -455,6 +467,11 @@
 ## docs/modelar/banco-de-provas/nucleo-para-receita-2026-11-14/
 
 - `prova-memoria-do-sedan.mjs` — prova-memoria-do-sedan.mjs — a memória de execução na carroceria do sedã: o tempo e o neutro bit a bit. Uso, da raiz do repositório (cada modo leva de 3 a 4 …
+
+## docs/modelar/banco-de-provas/operacoes-repartidas-2026-11-26/
+
+- `README.md` — Operações repartidas entre núcleos: onde vai o tempo dentro do corte das aberturas
+- `perfil.mjs` — perfil.mjs — onde vai o tempo dentro de uma operação, pelo perfil de CPU do Node (plano das operações repartidas entre núcleos, fatia 1). Uso, da raiz do rep…
 
 ## docs/modelar/banco-de-provas/organizacao-dos-documentos-2026-11-13/
 
@@ -707,14 +724,15 @@
 ## docs/modelar/planos/
 
 - `2026-11-08-ferramenta-de-material.md` — Ferramenta de material para o agente: ver, compor e reaproveitar materiais sem rodar a peça inteira
-- `2026-11-14-modelagem-de-carro.md` — Modelagem de carro de passeio: o que já serve, onde a carroceria travou antes e por onde começar
 - `2026-11-14-prancha-menos-manual.md` — Prancha menos manual: desvio medido, leitura combinada de um comando e o que ficou de fora declarado
 - `2026-11-16-eletronica-no-modelar.md` — O lado Modelar da mecatrônica: plano-raiz que gera a família de componentes e a ponte
 - `2026-11-22-curva-paralela-na-rede.md` — Curva paralela na rede de curvas: os anéis em volta de um vão sem desenhar ponto a ponto
-- `2026-11-22-superficie-de-producao-g2.md` — Superfície de produção (G2): a chapa de subdivisão sem a ondulação que o crítico acusa, sem sair da forma
 - `2026-11-25-acabamento-hard-surface.md` — Acabamento de hard surface: chanfro e arredondamento em qualquer aresta, linhas de painel e recortes na casca
 - `2026-11-25-elo-entre-juntas.md` — Elo entre juntas: a carenagem oca do membro, de uma flange de atuador à outra
+- `2026-11-26-ferramentas-e-documentacao.md` — Ferramentas e documentação: toda ferramenta registrada e achada, e o roteador cobrindo o trabalho inteiro
+- `2026-11-26-laco-de-modelagem-mais-rapido.md` — Laço de modelagem mais rápido: a rodada mede, mostra e registra em minutos, com a decisão da pessoa gravada
 - `2026-11-26-operacoes-repartidas-entre-nucleos.md` — Operações repartidas entre núcleos: o corte das aberturas, a subtração e a divisão usando mais de um núcleo, com a mesma malha
+- `2026-11-26-processo-e-ci.md` — Processo e CI: o envio entra na main sem vermelho falso, e as regras de texto viram régua
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
@@ -749,7 +767,9 @@
 - `2026-09-10-carroceria-por-casca-deformavel.md` — Carroceria por casca deformável ajustada contra referência
 - `2026-09-17-vocabulario-poligonal-da-bancada.md` — Vocabulário poligonal da bancada
 - `2026-11-14-leitura-por-partes.md` — Leitura por partes: a prancha e o esboço conferidos contra a referência, parte por parte
+- `2026-11-14-modelagem-de-carro.md` — Modelagem de carro de passeio: o que já serve, onde a carroceria travou antes e por onde começar
 - `2026-11-14-modelagem-de-robo.md` — Modelagem de robô humanoide: o que já serve, o que falta na montagem e por onde começar
+- `2026-11-22-superficie-de-producao-g2.md` — Superfície de produção (G2): a chapa de subdivisão sem a ondulação que o crítico acusa, sem sair da forma
 - `README.md` — Planos congelados
 
 ## docs/modelar/planos/mcp/
@@ -1460,6 +1480,9 @@
 
 ## procedural/nucleo/operacoes/
 
+- `abertura-por-contorno-guarda-chapa-mudada.test.ts` — abertura-por-contorno-guarda-chapa-mudada.test.ts — a guarda da chapa do `aberturaPorContorno` (plano `docs/modelar/planos/2026-11-26-operacoes-repartidas-en…
+- `abertura-por-contorno-guarda-conferida.test.ts` — abertura-por-contorno-guarda-conferida.test.ts — a guarda da chapa do `aberturaPorContorno` (plano `docs/modelar/planos/2026-11-26-operacoes-repartidas-entre…
+- `abertura-por-contorno-guarda.test.ts` — abertura-por-contorno-guarda.test.ts — a guarda da chapa do `aberturaPorContorno` (plano `docs/modelar/planos/2026-11-26-operacoes-repartidas-entre-nucleos.m…
 - `abertura-por-contorno-simetria.test.ts` — abertura-por-contorno-simetria.test.ts — o vão por contorno que segue a simetria declarada (`simetria: 'x'` do passo `aberturaPorContorno`) e a costura da su…
 - `abertura-por-contorno.js` — abertura-por-contorno.js (operação) — `aberturaPorContorno`: um vão na chapa pela curva que a receita desenha numa vista, sem depender das linhas da gaiola. …
 - `abertura-por-contorno.test.ts` — abertura-por-contorno.test.ts — a operação `aberturaPorContorno` na peça de teste `tools/fixtures/abertura-de-prova/`, pelos gates do plano da abertura de co…
@@ -3221,6 +3244,10 @@
 - `catalogo-extensoes.test.mjs` — catalogo-extensoes.test.mjs — o catálogo gerado traz as cinco extensões de procedural/extensoes/, marcadas como extensão e com a ligação, e o schema do catál…
 - `gerar-catalogo-capacidades.mjs` — Gera projeções publicáveis. O motor permanece puro; somente esta borda lê e escreve disco.
 
+## tools/ci/
+
+- `juntar-a-main.test.mjs` — juntar-a-main.test.mjs — o passo de juntar à main do CI em repositórios de verdade: avança a main quando ela não andou, junta a main andada ao ramo e dispara…
+
 ## tools/fixtures/
 
 - `requisitos-da-peca-de-prova.js` — requisitos-da-peca-de-prova.js — o que uma peça precisa TER para as guardas provarem o que dizem provar.
@@ -3440,6 +3467,10 @@
 - `exportacao.test.mjs` — exportacao.test.mjs — o gate 4 do plano de corrente e esteira: a transmissão por corrente de prova e a esteira de prova saem abaixo de dez segundos e em STEP…
 - `transmissao.mjs` — transmissao.mjs — a transmissão por corrente de prova: as duas rodas dentadas e a corrente da `transmissaoPorCorrente`, postas pelo `instanciaDeFamilia`, com…
 - `transmissao.test.mjs` — transmissao.test.mjs — a fatia 2 do plano de corrente e esteira: a corrente 08B entre rodas de 18 e 36 dentes fecha com um número par de elos, cada trecho re…
+
+## tools/fixtures/corte-das-aberturas/
+
+- `prova-da-guarda.ts` — prova-da-guarda.ts — o que os testes da guarda da chapa do `aberturaPorContorno` repartem (plano `docs/modelar/planos/2026-11-26-operacoes-repartidas-entre-n…
 
 ## tools/fixtures/costuras-e-furos/
 
@@ -3860,17 +3891,20 @@
 - `leitura-obrigatoria.mjs` — leitura-obrigatoria.mjs — quanto cada intenção precisa LER antes de começar.
 - `links.mjs` — links.mjs — o gate de referência: varre todo arquivo rastreado por menções a `<pasta>/<...>.md` sob docs/, procedural/, modulos/, tools/ ou src/ (caminho com…
 - `mapa.mjs` — mapa.mjs — gera docs/MAPA.md: o inventário do repositório com o resumo de cada arquivo. O resumo NÃO mora aqui: mora no PRÓPRIO arquivo (primeiro comentário …
+- `mapa.test.mjs` — mapa.test.mjs — o `--ajuda` do mapa imprime o uso e não regrava docs/MAPA.md (antes ele regravava o arquivo, análise do projeto de 2026-11-26).
 - `marcadores-de-conflito.test.mjs` — marcadores-de-conflito.test.mjs — nenhum arquivo rastreado guarda marcador de conflito de junção. Em 2026-10-28 uma junção deixou o plano ativo com os marcad…
 - `mecanismos.mjs` — mecanismos.mjs — a página `docs/modelar/MECANISMOS.md` cita todo mecanismo do projeto.
 - `mecanismos.test.mjs` — mecanismos.test.mjs — a página dos mecanismos cita toda pasta de primeiro nível, ou ela consta nas dispensas com motivo.
-- `planos.mjs` — planos.mjs — confere que os planos ativos são no máximo cinco, cada um com território declarado e sem sobreposição, e que nenhum plano executivo ultrapassa o…
-- `planos.test.mjs` — planos.test.mjs — prova que o gate recusa plano grande, estados inválidos, índice divergente, plano parado que o índice não liga, mais de seis planos ativos,…
+- `planos.mjs` — planos.mjs — confere que os planos ativos são no máximo seis comuns e nove com os de núcleo, cada um com território declarado e sem sobreposição, que o campo…
+- `planos.test.mjs` — planos.test.mjs — prova que o gate recusa plano grande, estados inválidos, índice divergente, plano parado que o índice não liga, mais de seis comuns ou nove…
 - `reguas-nos-gates.mjs` — reguas-nos-gates.mjs — régua que existe precisa ser rodada por alguém.
 - `reguas-nos-gates.test.mjs` — reguas-nos-gates.test.mjs — a régua órfã precisa reprovar.
 - `retirados.mjs` — retirados.mjs — caminho sob uma pasta que saiu da árvore e que a crônica guarda no git. As pastas docs/modelar/planos/encerrados/ e docs/modelar/historico/ s…
-- `retirados.test.mjs` — retirados.test.mjs — caminho sob pasta retirada passa quando a crônica registra o nome, e reprova quando não registra.
+- `retirados.test.mjs` — retirados.test.mjs — caminho sob pasta retirada passa quando a crônica registra o nome, ou quando o plano está em congelados/, e reprova quando não.
 - `roteiros.mjs` — roteiros.mjs — os invariantes e os roteiros de leitura por intenção, como dado.
 - `roteiros.test.mjs` — roteiros.test.mjs — os roteiros por intenção e o gate leitura:obrigatoria: o JSON do repositório passa, o ROTEIROS.md e os blocos do CLAUDE.md estão gerados …
+- `territorio-do-envio.mjs` — territorio-do-envio.mjs — confere que cada arquivo que o envio muda pertence ao território de um plano ativo, a um caminho compartilhado ou a um arquivo gera…
+- `territorio-do-envio.test.mjs` — territorio-do-envio.test.mjs — o arquivo mudado sem plano dono nem declaração reprova; o do território, o compartilhado, o gerado e o declarado como defeito …
 - `toc.mjs` — toc.mjs — gera o índice (sumário) de um doc ENTRE os marcadores <!-- TOC --> e <!-- /TOC -->, a partir dos títulos `##` dele. Mesma filosofia do mapa: o índi…
 
 ## tools/mcp/
@@ -4330,6 +4364,9 @@
 
 ## tools/modelar/guardas/
 
+- `abre-na-bancada-pecas-1.test.mjs` — abre-na-bancada-pecas-1.test.mjs — a fatia 1 de 3 das peças do acervo vira cena pelo caminho da bancada. As peças saíram do abre-na-bancada.test.mjs em três …
+- `abre-na-bancada-pecas-2.test.mjs` — abre-na-bancada-pecas-2.test.mjs — a fatia 2 de 3 das peças do acervo vira cena pelo caminho da bancada. As peças saíram do abre-na-bancada.test.mjs em três …
+- `abre-na-bancada-pecas-3.test.mjs` — abre-na-bancada-pecas-3.test.mjs — a fatia 3 de 3 das peças do acervo vira cena pelo caminho da bancada. As peças saíram do abre-na-bancada.test.mjs em três …
 - `abre-na-bancada.test.mjs` — abre-na-bancada.test.mjs — toda peça e toda montagem do acervo vira cena Three.js pelo caminho da bancada, sem navegador.
 - `etapas-do-acervo.mjs` — etapas-do-acervo.mjs — a conferência de um registro de etapas do acervo, pela impressão do aceite, que o teste da guarda e o teste de regressão dela usam. Só…
 - `etapas-do-acervo.test.mjs` — etapas-do-acervo.test.mjs — a releitura de todo `montagem.etapas.json` do acervo, pela impressão do aceite.
@@ -4400,6 +4437,11 @@
 - `conferir-malha.ts` — conferir-malha.ts — a conferência única que todo teste de op nova chama.
 - `furo-ordens-de-ponte.test.ts` — furo-ordens-de-ponte.test.ts — as promessas do A-30 que a geometria sozinha não mostra.
 - `oficina.test.ts` — Vitest do NÚCLEO da OFICINA (passo 1): prova os invariantes de identidade — numeração determinística e POSICIONAL (re-rodar dá ids idênticos), identidade est…
+
+## tools/reguas-de-texto/
+
+- `reguas-de-texto.mjs` — reguas-de-texto.mjs — duas regras do contrato que viviam só em texto, agora contadas como catraca (análise do projeto de 2026-11-26, documentacao.md, recomen…
+- `reguas-de-texto.test.mjs` — reguas-de-texto.test.mjs — o negrito no meio da frase conta e o rótulo do começo da linha não; o nome de objeto conta no núcleo e não no teste dele; a contag…
 
 ## tools/testes/
 

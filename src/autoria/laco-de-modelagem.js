@@ -30,14 +30,36 @@ export const ACOES = Object.freeze([
 
 function falhar(mensagem) { throw new TypeError(`laço de modelagem: ${mensagem}`); }
 
+/* Quem decidiu, quando e o quê: "a pessoa, 2026-11-18: pode seguir". É o formato do `por` de `rodadas/limite.json`, do
+   `--motivo-dos-pontos` e da decisão da pessoa gravada na rodada. */
+export const QUEM_DATA_PALAVRAS = /^[^,:]{2,},\s*\d{4}-\d{2}-\d{2}:\s*\S[\s\S]{2,}$/;
+export const FORMATO_DE_QUEM = '"<quem decidiu>, <AAAA-MM-DD>: <as palavras ou o porquê>"';
+
+/**
+ * A decisão da pessoa sobre a rodada, como vai gravada: o texto "quem, AAAA-MM-DD: as palavras dela", sem as pontas em branco.
+ * Devolve `undefined` quando não veio (o campo é opcional) e recusa o que não está no formato, dizendo o recebido, o esperado e o
+ * comando que registra certo.
+ */
+export function normalizarDecisaoDaPessoa(valor, peca = '<peça>') {
+  if (valor === undefined || valor === null) return undefined;
+  const texto = typeof valor === 'string' ? valor.trim() : valor;
+  if (typeof texto !== 'string' || !QUEM_DATA_PALAVRAS.test(texto)) {
+    falhar(`'decisaoDaPessoa' recebido: ${JSON.stringify(valor)}; esperado ${FORMATO_DE_QUEM}, só com a data e as palavras da pessoa. `
+      + `Registre com \`node tools/modelar/rodada-de-modelagem.mjs ${peca} --registrar ... --decisao-da-pessoa "a pessoa, 2026-11-26: aprovada, pode seguir"\`, `
+      + 'ou sem a opção quando a pessoa ainda não decidiu.');
+  }
+  return texto;
+}
+
 /**
  * Uma rodada registrada: o que o revisor apontou e o que as medidas disseram.
  * `medidas` é o resultado objetivo — a guarda do acervo passou ou não —, e ele
  * vem antes do veredito de propósito: peça que nem cumpre o plano não merece
  * olho humano nem de agente.
  */
-export function registrarRodada({ peca, numero, veredito, medidas, partes, atrito = [], notaDePassagem, receita, superficie }) {
+export function registrarRodada({ peca, numero, veredito, medidas, partes, atrito = [], notaDePassagem, receita, superficie, decisaoDaPessoa }) {
   if (typeof peca !== 'string' || peca.trim() === '') falhar('a rodada precisa dizer de que peça é.');
+  const daPessoa = normalizarDecisaoDaPessoa(decisaoDaPessoa, peca.trim());
   if (!Number.isInteger(numero) || numero < 1) falhar('o número da rodada começa em 1.');
   if (!medidas || typeof medidas !== 'object') falhar("a rodada precisa trazer 'medidas'.");
   if (typeof medidas.passou !== 'boolean') falhar("'medidas.passou' precisa ser booleano.");
@@ -59,6 +81,10 @@ export function registrarRodada({ peca, numero, veredito, medidas, partes, atrit
     /* Sem veredito quando as medidas reprovaram: não se gasta revisão em peça
        que já falhou no que é contável. */
     veredito: veredito ? normalizarVeredito(veredito) : null,
+    /* A DECISÃO DA PESSOA, ao lado do veredito do crítico: quem aprova forma é a pessoa, e a rodada só guardava o que o crítico disse
+       (as 150 rodadas registradas até 2026-11-26 não têm o campo). Opcional, porque a rodada se registra antes de a pessoa ver a
+       peça; quando vem, é o texto "quem, AAAA-MM-DD: as palavras dela", e nada além da data e das palavras. */
+    ...(daPessoa !== undefined ? { decisaoDaPessoa: daPessoa } : {}),
     /* A CONFERÊNCIA PARTE POR PARTE, do modelador. O contrato dele manda gerar
        as vistas e responder, por parte, se a forma e a técnica entregues são as
        que o `PLANO` promete. A instrução existia e nada conferia que alguém

@@ -2,7 +2,8 @@ name: Deploy Modelar no Pages
 
 # A MAIN AVANÇA PELO PRÓPRIO CI. O passo `juntar` do CI move a main com a credencial do Actions, e o GitHub não dispara
 # outro fluxo a partir de um envio feito com ela; com o gatilho de `push` na main esta publicação nunca rodava. Por isso ela
-# roda quando o CI termina verde num envio, que é quando a main acabou de andar, e publica a main.
+# roda quando o CI termina verde num envio, ou na execução que o passo `juntar` dispara depois de juntar a main andada ao
+# ramo (workflow_dispatch), que é quando a main acabou de andar, e publica a main.
 on:
   workflow_run:
     workflows: [CI]
@@ -24,7 +25,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-24.04
-    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push')
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && (github.event.workflow_run.event == 'push' || github.event.workflow_run.event == 'workflow_dispatch'))
 
     steps:
       - name: Checkout repository
@@ -58,3 +59,28 @@ jobs:
       - name: Publicar
         id: deployment
         uses: actions/deploy-pages@v4
+
+  # O cache do navegador gravado num ramo de sessão só é lido por esse ramo e pelo ramo padrão, e a main nunca roda o CI (o
+  # avanço com a credencial do Actions não dispara). Este job roda no contexto da main e grava a cópia que todo ramo novo lê,
+  # pela mesma chave de `.github/actions/preparar/action.yml`; com a cópia já gravada, ele só confere e sai.
+  semear-navegador:
+    runs-on: ubuntu-24.04
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - id: versao-do-playwright
+        run: echo "versao=$(node -p "require('./package-lock.json').packages['node_modules/playwright'].version")" >> "$GITHUB_OUTPUT"
+      - id: cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.versao-do-playwright.outputs.versao }}
+      - if: steps.cache.outputs.cache-hit != 'true'
+        run: npx --yes playwright@${{ steps.versao-do-playwright.outputs.versao }} install chromium chromium-headless-shell

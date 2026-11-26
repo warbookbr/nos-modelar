@@ -17,7 +17,8 @@ import { describe, expect, it } from 'vitest';
 import { REPO } from './resolver-caminho-receita.mjs';
 import { pecasDoAcervo } from './guardas/guarda-acervo.mjs';
 
-export const TETO_EM_SEGUNDOS = 12;
+/* No CI o teto é só guarda contra travamento, como o teto de tempo dos testes (tools/testes-lentos.mjs): três vezes o local. */
+export const TETO_EM_SEGUNDOS = process.env.CI ? 36 : 12;
 
 /** Toda `receita.js` das peças do acervo, em ordem de caminho (as partes de um objeto ficam juntas, e o módulo comum de um objeto é pago pela primeira). */
 function receitasDoAcervo(pasta = join(REPO, 'procedural/pecas'), achadas = []) {

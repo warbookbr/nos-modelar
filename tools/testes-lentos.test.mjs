@@ -6,7 +6,7 @@ import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { describe, expect, it } from 'vitest';
 import { anexarAoHistorico } from './vitest-duracoes.mjs';
-import { acimaDoTeto, ARQUIVO_DOS_PESOS, avaliarTeto, FATOR_DO_TETO, relatarLentos, TETO_DO_LENTO_MS, argumentosDoVitest, comParte, maquinaOcupada, partesPorPeso, pesadosSozinhos, TESTES_LENTOS, TETO_DO_RAPIDO_MS, TETO_SOZINHO_MS, tetosDaBateria } from './testes-lentos.mjs';
+import { acimaDoTeto, ARQUIVO_DOS_PESOS, avaliarTeto, FATOR_DO_TETO, relatarLentos, TETO_DO_LENTO_MS, argumentosDoVitest, comParte, maquinaOcupada, partesPorPeso, pesadosSozinhos, TESTES_LENTOS, TETO_DO_RAPIDO_MS, TETO_SOZINHO_MS, tetosDaBateria, tetoReprova } from './testes-lentos.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -167,5 +167,12 @@ describe('o teto relativo à mediana das durações guardadas', () => {
     let h = {};
     for (let i = 1; i <= 12; i += 1) h = anexarAoHistorico(h, [{ arquivo: 'a', ms: i }]);
     expect(h.a).toEqual([3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  });
+});
+
+describe('o teto de tempo no CI', () => {
+  it('reprova na máquina local e só avisa no CI', () => {
+    expect(tetoReprova({})).toBe(true);
+    expect(tetoReprova({ CI: 'true' })).toBe(false);
   });
 });

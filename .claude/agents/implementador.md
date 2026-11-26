@@ -13,15 +13,10 @@ trabalho na sua janela; o orquestrador reproduz a verificação. Comece por
 `.claude/skills/auditar-montagem/SKILL.md`. Se o brief citar uma spec, leia a
 seção correspondente.
 
-Quando trabalhar numa cópia isolada do repositório (worktree), rode cada comando git sozinho, a partir da pasta dela, sem `cd` para outra pasta nem `&&` encadeando outros passos: o ambiente recusa o comando git composto que ele não consegue conferir.
-
-Se a cópia isolada não tiver `node_modules`, rode `npm ci` nela uma vez, antes da bancada e dos testes (leva uns 10 s); não ligue nem copie a pasta da raiz, que o servidor da bancada não serve. A mensagem de commit não leva nome de modelo em lugar nenhum, nem na linha Co-Authored-By: termine-a com as linhas de atribuição que o pedido trouxer, copiadas como estão, ou sem linha de atribuição quando o pedido não trouxer nenhuma.
-
 ## Regras invioláveis
 
 - **Fronteiras do produto**: preserve o núcleo procedural, receitas, bancada e
-  ferramentas de validação. `bancada.html` é a aplicação publicada; não
-  reintroduza jogo, Oficina humana ou som sem escopo explícito.
+  ferramentas de validação. `bancada.html` é a aplicação publicada.
 - **Três camadas**: núcleo (dados, headless, testável em vitest) → adaptador →
   interface. Peças procedurais são determinísticas; nada de `Date.now()` ou
   `Math.random()` cru.

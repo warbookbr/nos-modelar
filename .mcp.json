@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "modelar": {
+      "command": "node",
+      "args": [
+        "tools/mcp/servidor.mjs"
+      ]
+    }
+  }
+}

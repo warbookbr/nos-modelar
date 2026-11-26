@@ -1,4 +1,4 @@
-/* retirados.test.mjs — caminho sob pasta retirada passa quando a crônica registra o nome, e reprova quando não registra. */
+/* retirados.test.mjs — caminho sob pasta retirada passa quando a crônica registra o nome, ou quando o plano está em congelados/, e reprova quando não. */
 import { mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
@@ -35,6 +35,13 @@ describe('caminho de pasta retirada', () => {
     mkdirSync(path.join(raiz, 'docs/modelar/planos'), { recursive: true });
     writeFileSync(path.join(raiz, 'docs/modelar/planos/2026-12-01-em-jogo' + '.md'), '**Estado:** ativo\n');
     expect(caminhoRetirado('docs/modelar/planos/2026-12-01-em-jogo' + '.md', raiz)).toBeNull();
+  });
+
+  it('o plano congelado vale pela cópia em congelados/, e o que não está lá continua recusado', () => {
+    mkdirSync(path.join(raiz, 'docs/modelar/planos/congelados'), { recursive: true });
+    writeFileSync(path.join(raiz, 'docs/modelar/planos/congelados/2026-11-14-guardado' + '.md'), '**Estado:** congelado\n');
+    expect(caminhoRetirado('docs/modelar/planos/2026-11-14-guardado' + '.md', raiz)?.consta).toBe(true);
+    expect(caminhoRetirado('docs/modelar/planos/2026-11-14-outro' + '.md', raiz)?.consta).toBe(false);
   });
 
   it('não mexe em caminho fora das pastas retiradas', () => {

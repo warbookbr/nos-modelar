@@ -10,7 +10,7 @@
  * antes de chegar à main. `npm test` continua rodando a suíte inteira de uma vez. A bateria local (`npm run gates`) roda os lentos
  * ligados ao que o envio mudou, com teto de 8 arquivos e 5 minutos (tools/gates/lentos-ligados.mjs); o resto fica para o CI. */
 import { spawnSync } from 'node:child_process';
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync, appendFileSync } from 'node:fs';
 import { availableParallelism, loadavg } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -156,6 +156,9 @@ export const TESTES_LENTOS = [
   'tools/modelar/familia.test.mjs',
   'tools/modelar/forma-do-esboco.test.mjs',
   'tools/modelar/guardas/abre-na-bancada.test.mjs',
+  'tools/modelar/guardas/abre-na-bancada-pecas-1.test.mjs',
+  'tools/modelar/guardas/abre-na-bancada-pecas-2.test.mjs',
+  'tools/modelar/guardas/abre-na-bancada-pecas-3.test.mjs',
   'tools/modelar/guardas/guarda-acervo.test.mjs',
   'tools/modelar/mcp-degrau-1-preparacao.test.mjs',
   'tools/modelar/olhar-bancada.test.mjs',
@@ -379,10 +382,23 @@ export function relatarLentos(duracoes, historicos) {
   };
 }
 
+/* NO CI O TETO DE TEMPO AVISA E NÃO REPROVA (plano do processo e do CI, 2026-11-26). A máquina do CI varia de duas a três vezes,
+   e em dez dias de novembro 12 das 52 falhas do CI foram só teto estourado, sem defeito; no mesmo dia três arquivos que o envio
+   não mudou reprovaram dois envios de sessões diferentes. Na máquina local, onde o histórico e a carga são de quem roda, o teto
+   continua reprovando. No CI o aviso vai também ao resumo da execução, para ser visto sem abrir o registro. */
+export function tetoReprova(ambiente = process.env) { return !ambiente.CI; }
+
+function avisoNoCi(linhas) {
+  const texto = ['test: aviso de tempo no CI (o teto reprova só na máquina local):', ...linhas].join('\n');
+  console.log(texto);
+  if (process.env.GITHUB_STEP_SUMMARY) { try { appendFileSync(process.env.GITHUB_STEP_SUMMARY, `${texto}\n`); } catch { /* sem resumo */ } }
+}
+
 function avisarAcimaDoTetoDosLentos(caminho, inicio) {
   const { gravado, duracoes } = JSON.parse(readFileSync(caminho, 'utf8'));
   if (Date.parse(gravado) < inicio) return;
   const { linhas, reprovados } = relatarLentos(duracoes, lerHistorico('lentos'));
+  if (reprovados.length && !tetoReprova()) { avisoNoCi(linhas); return; }
   for (const linha of linhas) (reprovados.length ? console.error : console.log)(linha);
   if (reprovados.length) process.exitCode = 1;
 }
@@ -421,6 +437,10 @@ function rodar(modo) {
   const reprovados = pesados.filter((d) => d.veredito === 'reprova');
   if (avisos.length) console.log(`test:rapidos — aviso, ${avisos.map(({ arquivo, ms, sozinhoMs, teto, seguidas }) => `${arquivo} (${s1(ms)} na bateria, ${s1(sozinhoMs)} sozinho, teto ${s1(teto)}, ${seguidas} seguida(s) de ${SEGUIDAS_QUE_REPROVAM})`).join(', ')}: acima do teto numa execução só, reprova com ${SEGUIDAS_QUE_REPROVAM} seguidas.`);
   if (!reprovados.length) return;
+  if (!tetoReprova()) {
+    avisoNoCi(reprovados.map(({ arquivo, ms, sozinhoMs }) => `  test:rapidos — ${s1(ms)} na bateria, ${s1(sozinhoMs)} sozinho  ${arquivo}`));
+    return;
+  }
   console.error(`test:rapidos — ${reprovados.length} arquivo(s) passaram do teto da bateria rápida (${tetos.bateria / 1000} s, ou ${FATOR_DO_TETO} vezes a mediana das execuções guardadas) e de ${tetos.sozinho / 1000} s sozinhos${process.env.CI ? '' : ' (tetos locais, com margem para o CI)'}:`);
   for (const { arquivo, ms, sozinhoMs } of reprovados) console.error(`  ${s1(ms)} na bateria, ${s1(sozinhoMs)} sozinho  ${arquivo}`);
   console.error('Ponha cada um em TESTES_LENTOS, em tools/testes-lentos.mjs, ou deixe-o mais leve.');

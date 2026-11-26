@@ -19,13 +19,13 @@
       "Bash(sed -n *)",
       "Bash(wc *)",
       "Bash(mkdir *)",
-      "Bash(kill *)",
       "Bash(curl -s http://localhost*)",
       "Bash(curl -s http://127.0.0.1*)"
     ],
     "deny": [
       "Bash(git push --force*)",
       "Bash(git push -f*)",
+      "Bash(kill *)",
       "Bash(pkill *)",
       "Bash(killall *)"
     ]

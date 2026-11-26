@@ -1,6 +1,6 @@
 # Superfície de produção (G2): os instrumentos e a linha de base do quarto traseiro
 
-Pasta do plano [superfície de produção (G2)](../../planos/2026-11-22-superficie-de-producao-g2.md). Fatia 1, medida em 2026-11-22.
+Pasta do plano [superfície de produção (G2)](../../planos/congelados/2026-11-22-superficie-de-producao-g2.md). Fatia 1, medida em 2026-11-22.
 
 ## Os instrumentos
 

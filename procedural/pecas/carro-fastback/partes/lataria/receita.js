@@ -1,6 +1,6 @@
 ﻿/* carro-fastback/lataria — o piloto do quarto traseiro: a chapa contínua de lataria do meio da porta (z 0) para trás, lado +x, com o para-lama
  * traseiro saliente, o rebaixo côncavo da lateral, a coluna que cai até a tampa, o arco da roda de trás, o vão do vidro lateral traseiro e o
- * vão da lanterna na quina. Fatia 2 de `docs/modelar/planos/2026-11-14-modelagem-de-carro.md`; as medidas vêm de `../../ALINHAMENTO.md`, do
+ * vão da lanterna na quina. Fatia 2 de `docs/modelar/planos/congelados/2026-11-14-modelagem-de-carro.md`; as medidas vêm de `../../ALINHAMENTO.md`, do
  * `../../andaime.json` e das pranchas de `../../referencias/` (os pontos da TABELA são lidos delas, em mm, no referencial do carro: x para a
  * direita, y para cima com o chão em 0, z para a frente, o eixo traseiro em z -1375).
  *

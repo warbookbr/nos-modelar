@@ -17,7 +17,7 @@ O que existe no projeto além do código que constrói formas, o que cada coisa 
 | Bancada | A tela neutra onde a peça é vista e medida | Antes de a peça ir adiante | `src/bancada/`, `npm run bancada`, provas dela em `tools/bancadas/` |
 | Aceite visual | Prende a revisão da forma às evidências de imagem | Ao fechar uma peça | `tools/modelagem/` |
 | Crítico visual | Compara as vistas do modelo com a referência, sem saber como a peça foi feita | A cada rodada de forma | `.claude/agents/critico-visual.md` |
-| Gates | As verificações que rodam antes de cada envio | `npm run gates` e no CI | `tools/gates.mjs`, `tools/gates/` |
+| Gates | As verificações que rodam antes de cada envio | `npm run gates` e no CI | `tools/gates.mjs`, `tools/gates/`, o passo de juntar à main do CI em `tools/ci/` e as réguas de texto em `tools/reguas-de-texto/` |
 | Fronteiras | Conferem que núcleo, bancada e produto não se misturam | Nos gates | `tools/arquitetura/` |
 | Testes | Programas que conferem cada parte do sistema | Dentro dos gates | arquivos `*.test.*` ao lado do código, `tools/oficina/` para as operações do núcleo |
 | Guardas e réguas | Conferem cada peça do acervo: fechada, sem lasca, sem interseção | Nos gates e à mão por peça | `tools/modelar/guardas/`, `tools/modelar/reguas-de-malha/`, critérios em `procedural/criterios/` |
