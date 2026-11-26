@@ -14,8 +14,8 @@ describe('réguas de texto', () => {
   });
 
   it('separa as duas regras pelos arquivos, e deixa o teste do núcleo de fora', () => {
-    const textos = { 'docs/modelar/usar/A.md': 'com **x** aqui', 'procedural/nucleo/a.js': '// carro', 'procedural/nucleo/a.test.js': '// carro', 'src/b.js': '// carro' };
-    expect(contar(Object.keys(textos), (a) => textos[a])).toEqual({ negrito: { 'docs/modelar/usar/A.md': 1 }, dominio: { 'procedural/nucleo/a.js': 1 } });
+    const textos = { ['docs/modelar/usar/' + 'A.md']: 'com **x** aqui', 'procedural/nucleo/a.js': '// carro', 'procedural/nucleo/a.test.js': '// carro', 'src/b.js': '// carro' };
+    expect(contar(Object.keys(textos), (a) => textos[a])).toEqual({ negrito: { ['docs/modelar/usar/' + 'A.md']: 1 }, dominio: { 'procedural/nucleo/a.js': 1 } });
   });
 
   it('reprova a conta que sobe e o arquivo novo com contagem, e aceita a que desce', () => {
