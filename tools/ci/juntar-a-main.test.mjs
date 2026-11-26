@@ -24,9 +24,12 @@ function cenario() {
   const outra = join(raiz, 'outra'); git(raiz, 'clone', '-q', origem, outra);
   const bin = join(raiz, 'bin'); execFileSync('mkdir', [bin]);
   writeFileSync(join(bin, 'gh'), `#!/bin/sh\necho "$@" >> ${join(raiz, 'gh.log')}\n`); chmodSync(join(bin, 'gh'), 0o755);
-  const rodar = () => spawnSync('bash', [SCRIPT], { cwd: ramo, encoding: 'utf8', env: { ...process.env, RAMO: 'claude/x', SEM_GERADOS: '1', PATH: `${bin}:${process.env.PATH}`, GIT_AUTHOR_NAME: 't', GIT_AUTHOR_EMAIL: 't@t', GIT_COMMITTER_NAME: 't', GIT_COMMITTER_EMAIL: 't@t' } });
+  let gerador = 'true';
+  const trocarGerador = (g) => { gerador = g; };
+  const rodar = () => spawnSync('bash', [SCRIPT], { cwd: ramo, encoding: 'utf8', env: { ...process.env, RAMO: 'claude/x', GERADORES: gerador, PATH: `${bin}:${process.env.PATH}`, GIT_AUTHOR_NAME: 't', GIT_AUTHOR_EMAIL: 't@t', GIT_COMMITTER_NAME: 't', GIT_COMMITTER_EMAIL: 't@t' } });
   const gh = () => { try { return readFileSync(join(raiz, 'gh.log'), 'utf8'); } catch { return ''; } };
-  return { origem, ramo, outra, rodar, gh };
+  const andarAMain = (n) => { gravar(outra, `m${n}.txt`, `${n}\n`, `outra sessão ${n}`); git(outra, 'push', '-q', 'origin', 'HEAD:main'); };
+  return { origem, ramo, outra, rodar, gh, andarAMain, trocarGerador };
 }
 
 describe('juntar à main', () => {
@@ -48,6 +51,39 @@ describe('juntar à main', () => {
     expect(git(c.origem, 'log', '-1', '--format=%s', 'claude/x')).toBe('Junção automática da main, tentativa 1.');
     expect(spawnSync('git', ['merge-base', '--is-ancestor', mainAntes, 'claude/x'], { cwd: c.origem }).status).toBe(0);
     expect(c.gh()).toBe('workflow run ci.yml --ref claude/x\n');
+    expect(git(c.origem, 'log', '-1', '--format=%P', 'claude/x').split(' ')).toHaveLength(2);
+  });
+
+  it('três junções seguidas contam 1, 2 e 3, e a quarta para', () => {
+    const c = cenario();
+    for (const n of [1, 2, 3]) {
+      c.andarAMain(n);
+      expect(c.rodar().status).toBe(0);
+      expect(git(c.origem, 'log', '-1', '--format=%s', 'claude/x')).toBe(`Junção automática da main, tentativa ${n}.`);
+    }
+    c.andarAMain(4);
+    const r = c.rodar();
+    expect(r.status).toBe(1);
+    expect(r.stdout).toMatch(/andou três vezes seguidas/);
+  });
+
+  it('o que os geradores refazem entra no commit da junção', () => {
+    const c = cenario();
+    c.trocarGerador('echo gerado > gerado.txt');
+    c.andarAMain(1);
+    expect(c.rodar().status).toBe(0);
+    expect(git(c.origem, 'show', 'claude/x:gerado.txt')).toBe('gerado');
+  });
+
+  it('o ramo já contido na main não gera junção nem CI', () => {
+    const c = cenario();
+    git(c.outra, 'fetch', '-q', 'origin', 'claude/x'); git(c.outra, 'merge', '-q', 'FETCH_HEAD'); git(c.outra, 'push', '-q', 'origin', 'HEAD:main');
+    c.andarAMain(1);
+    git(c.ramo, 'reset', '-q', '--hard', 'HEAD');
+    const r = c.rodar();
+    expect(r.status, r.stdout).toBe(0);
+    expect(r.stdout).toMatch(/já está contido na main/);
+    expect(c.gh()).toBe('');
   });
 
   it('com conflito, para sem enviar nada e diz o que fazer', () => {
@@ -56,9 +92,17 @@ describe('juntar à main', () => {
     const ramoAntes = git(c.origem, 'rev-parse', 'claude/x');
     const r = c.rodar();
     expect(r.status).toBe(1);
-    expect(r.stdout).toMatch(/tem conflito; junte a main ao ramo/);
+    expect(r.stdout).toMatch(/não fecha sozinha \(conflito\); junte a main ao ramo/);
     expect(git(c.origem, 'rev-parse', 'claude/x')).toBe(ramoAntes);
     expect(c.gh()).toBe('');
+  });
+
+  it('a terceira tentativa ainda vale', () => {
+    const c = cenario();
+    git(c.ramo, 'commit', '-q', '--allow-empty', '-m', 'Junção automática da main, tentativa 2.');
+    c.andarAMain(1);
+    expect(c.rodar().status).toBe(0);
+    expect(git(c.origem, 'log', '-1', '--format=%s', 'claude/x')).toBe('Junção automática da main, tentativa 3.');
   });
 
   it('depois da terceira tentativa, para em vez de juntar de novo', () => {

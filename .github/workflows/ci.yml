@@ -7,9 +7,11 @@ name: CI
 # dentro das vinte do plano gratuito; cada uma leva uns 30 s se preparando, e dividir mais deixa de compensar.
 #
 # O ENVIO VAI A UM RAMO, E A MAIN SÓ ANDA COM O CI VERDE. Um envio a `claude/**` ou `envio/**` roda a bateria, e o passo
-# `juntar` avança a main até ele quando todas as máquinas passaram e a main não andou desde a base do ramo; se andou, ele
-# falha dizendo isso, e quem enviou junta a main ao ramo e envia de novo. O avanço feito pelo próprio CI não roda a bateria
-# outra vez, porque o commit é o mesmo que acabou de passar.
+# `juntar` avança a main até ele quando todas as máquinas passaram e a main não andou desde a base do ramo. Se andou, ele
+# junta a main ao ramo, refaz os gerados, envia o ramo e dispara a bateria de novo sobre a junção, até três vezes
+# (`tools/ci/juntar-a-main.sh`); com conflito, falha dizendo isso, e quem enviou junta a main ao ramo e envia de novo. Depois
+# de uma junção automática, o CI a acompanhar é o da execução nova no ramo, e a sessão puxa o ramo antes do próximo envio.
+# O avanço feito pelo próprio CI não roda a bateria outra vez, porque o commit é o mesmo que acabou de passar.
 #
 # O HISTÓRICO DAS DURAÇÕES CIRCULA PELO CACHE. O teto de tempo dos testes é relativo à mediana das últimas execuções de cada
 # arquivo (`tools/testes-lentos.mjs`), e o histórico mora em `tmp/gates/historico-das-duracoes-<modo>.json`; como cada máquina

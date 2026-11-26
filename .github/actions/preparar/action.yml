@@ -34,8 +34,8 @@ runs:
     - run: |
         for tentativa in 1 2 3; do
           if npx playwright install-deps chromium chromium-headless-shell; then exit 0; fi
-          echo "install-deps falhou na tentativa $tentativa; nova tentativa em 20 s"
-          sleep 20
+          echo "install-deps falhou na tentativa $tentativa"
+          if [ "$tentativa" -lt 3 ]; then sleep 20; fi
         done
         exit 1
       shell: bash
