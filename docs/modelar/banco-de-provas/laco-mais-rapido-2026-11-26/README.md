@@ -108,3 +108,75 @@ A ferramenta das rodadas não tem um comando de histórico: quem lista as rodada
 A skill do laço (`.claude/skills/laco-de-modelagem/`) ainda não manda gravar a decisão da pessoa depois de mostrar a peça; ela é repartida na fatia 2 e a instrução entra lá.
 
 O gate de saída 1 do plano pede o tempo da ação da rodada antes e depois: é 29,9 s e cerca de 28 s. Baixar a ação da rodada daqui em diante depende da medida das partes e da referência dentro do `descrever`, que não são do território deste plano.
+
+## Calibração do crítico
+
+Esta seção é a etapa A da calibração da fatia 2: o que o conjunto de hoje prova e a proposta do conjunto novo. Nada do conjunto mudou. A troca não é mecânica, pelos cinco motivos da subseção "Por que a troca não é mecânica", e por isso a etapa B espera a decisão da pessoa.
+
+### O que o conjunto de hoje prova
+
+O conjunto mora em `docs/modelar/banco-de-provas/calibracao-do-critico/conjunto.json`, com 12 imagens e 44 julgamentos do crítico, dados em 2026-10-30 e 2026-11-03. `npm run calibracao:check` passa em 3,4 s e diz: 12 de 12 imagens (3 controles, 1 de superfície, 6 estruturais, e 2 de função que a frase não conta), 4 defeitos da medida reprovados por ela sem chegar ao crítico, agente e brief iguais aos gravados, e o crítico acertando 11 de 12 imagens com o mínimo em 11 e as duas obrigatórias certas. A imagem que erra é o controle do cilindro (c05), com mediana 6 e defeito estrutural citado nos 5 julgamentos.
+
+Cada imagem são quatro vistas de 1100 por 1277 pixels (isométrica, frontal, lateral e superior), em desenho de linhas com uma cor chapada por parte, o título e a nota do objeto escritos na imagem e a barra de 100 mm no canto, todas na mesma escala; três imagens (c01, c05, c06) têm uma quinta vista, a lateral ampliada. Quem as desenhou foi o desenhista do módulo antigo do esboço, que saiu em 2026-11-05, e desde então o `gerar` é recusado. A captura da bancada de hoje (`npm run bancada -- roda-esportiva --vistas=isometrica,frontal,direita,superior --res=1100 --sem-contatos`, 29 s) sai com 1100 por 619 pixels, sombreada, com o material da receita, sem título, sem nota e sem barra de escala, e cada vista enquadrada por conta própria.
+
+O gate prende quatro coisas por imagem e duas do crítico. Por imagem: a fonte (o hash da geometria executada da chamada de família, ou o hash do arquivo do esboço), o `sha256` de cada PNG, o controle igual à geometria do `aprovacao.json` da família, e a medida, que tem de reprovar exatamente os defeitos marcados `decide: medida` e nenhum outro. Do crítico: o hash do arquivo `.claude/agents/critico-visual.md` e o hash do texto fixo do brief (`modeloDoBrief`). Cada julgamento guarda ainda a impressão do brief exato da imagem e a das vistas (`imagemSha256`); trocar um PNG faz o gate reprovar com `julgamento-de-outra-imagem` até os julgamentos daquela imagem saírem de `resultados`, e sem eles o gate diz quantos faltam e passa.
+
+| Imagem | Fonte | O que ela mostra | Quem decide e a medida que reprova sem o crítico |
+| --- | --- | --- | --- |
+| c01 haste-grossa | família `cilindro-hidraulico`, ponto médio, `haste=110`, violando `haste-abaixo-do-embolo` e `haste-grossa-demais` | haste mais larga que a camisa | a medida: `razao:hastePelaCamisa` (a caixa em y da haste sobre a da camisa, faixa de 0,27 a 0,67) |
+| c02 controle-roda | família `roda-pneu`, perfil carro, geometria aprovada | nenhum defeito (chave, 5 julgamentos) | nenhuma medida reprova; do crítico se cobra nota de 8 a 10 e no máximo 1 julgamento com defeito estrutural |
+| c03 picape-baixa | esboço `picape-baixa.esboco.json`, reescrito à mão | rodas faltando, piso da caçamba atravessando o arco, conjunto baixo (chave e obrigatória) | o crítico decide as rodas e o piso; a medida `esboco-medida:alturaPeloComprimento` reprova a altura (0,28 onde a ficha pede de 0,30 a 0,40), e ela é um valor gravado em `fontes-de-esboco.json`, que nada recalcula |
+| c04 ponta-no-ar | família `dobradica`, ponto médio, a folha da esquerda deslocada | folha solta dos nós do pino | o crítico; nenhuma medida do conjunto alcança |
+| c05 controle-cilindro | família `cilindro-hidraulico`, ponto médio, geometria aprovada | nenhum defeito (chave) | nenhuma medida reprova; é a imagem que o crítico erra hoje |
+| c06 facetado | família `cilindro-hidraulico`, `lados=12`, `segmentosDoArco=3` | camisa, olhais e haste de doze lados | o crítico (classe superfície, nota de 8 a 9) |
+| c07 dobradicas-por-fora | esboço `guarda-roupa.esboco.json` da rodada de 2026-10-08 | dobradiças na face externa das portas (chave e obrigatória) | o crítico; a fonte gravada não tem medida |
+| c08 pneu-macico | família `roda-pneu`, ponto médio, `raioDoAssento=0` | pneu maciço, sem aro, cubo nem furos | a medida: `forma:pneu` (o pneu tem de ser um anel) |
+| c09 controle-dobradica | família `dobradica`, ponto médio, geometria aprovada | nenhum defeito | nenhuma medida reprova |
+| c10 raios-curtos | família `roda-pneu`, padrão, `tipo=1`, os nós do aro a 0,75 | raios que terminam antes do aro | a medida: `razao:discoAlcancaOAro` |
+| c11 travessia-sem-explicacao | família `cilindro-hidraulico`, `inicioDoCorpo=-0.1`, `comprimentoDoCorpo=0.7322` | haste atravessando o fundo da camisa e o olhal traseiro | o crítico |
+| c12 peca-fora-do-lugar | família `cilindro-hidraulico`, o olhal traseiro deslocado | olhal traseiro fora do eixo da camisa | o crítico |
+
+Das doze, dez saem de chamadas de família e duas de esboços. As quatro medidas vivas (c01, c08, c10 e, pelo valor gravado, c03) são conferidas sobre a geometria e não sobre a imagem, então trocar o desenho não as muda.
+
+### Por que a troca não é mecânica
+
+O texto fixo do brief descreve as imagens antigas. Ele diz ao crítico que as quatro vistas vêm "sem legenda, na mesma escala, com a barra de 100 mm do mesmo comprimento nas quatro", e o brief não pode mudar nesta tarefa. A captura da bancada não tem barra nem escala comum, e entregá-la com esse texto seria dizer ao crítico uma coisa falsa sobre a imagem. Para cumprir o texto sem mudá-lo, a captura teria de ganhar escala comum e barra, o que mexe na bancada, fora do território deste plano.
+
+O brief da calibração não é o que o crítico recebe hoje numa rodada. Na rodada ele recebe o `pedido.md` do `npm run vistas:critica`, com alvo, vistas do modelo, vista por parte, promessa de forma e critérios; a calibração mede o brief de objeto do esboço antigo, com cinco perguntas e nenhum alvo. Trocar só as imagens deixa a calibração medindo um pedido que o laço não faz mais. Medir o pedido de hoje é trocar o brief preso pelo hash, que a tarefa proíbe, e é decisão sobre o que a calibração mede.
+
+As duas imagens obrigatórias não têm como ser capturadas. A picape baixa e o guarda-roupa são esboços do módulo que saiu; não existe receita deles, e a bancada só abre `procedural/pecas/` e `tools/fixtures/acervo/`. Substituí-las é escolher outras peças e outros defeitos para as duas provas que o gate exige certas, e a medida da picape (`esboco-medida:`) não tem equivalente vivo.
+
+As outras dez também não são peças que a bancada abre. São chamadas de família executadas em Node, sete delas com parâmetro fora da restrição ou argumento trocado. Para a bancada capturá-las, cada uma precisa virar uma receita de ensaio em `tools/fixtures/acervo/`, e o formato do conjunto precisa de um tipo de fonte novo em `src/autoria/calibracao-do-critico.js`. Nenhum dos dois caminhos, nem a pasta `docs/modelar/banco-de-provas/calibracao-do-critico/`, está no território do plano, que lista só `tools/modelar/calibracao-do-critico.mjs` e o teste dele.
+
+Os 44 julgamentos deixam de valer. Imagem nova pede julgamento novo: 44 despachos do `critico-visual` (5 em cada uma das 4 chaves e 3 em cada uma das outras 8), que quem conduz faz. Até lá o gate passa como pendente. Com os julgamentos novos ele pode reprovar: hoje o conjunto passa no mínimo exato, 11 de 12, e as faixas de nota e a regra de acerto foram ajustadas sobre o desenho de linhas.
+
+### A proposta do conjunto novo
+
+A proposta mantém as doze provas onde a fonte permite e deixa em aberto as duas que dependem de escolha. A câmera é a mesma para todas: `npm run bancada -- <peça> --vistas=isometrica,frontal,direita,superior --res=1100 --enquadrar --ambiente=nenhum --sem-contatos`, com a vista `direita` gravada como `lateral`, e a lateral ampliada de c01, c05 e c06 deixa de existir porque `--enquadrar` já fecha o quadro na peça. O enquadramento por vista contradiz a "mesma escala" do brief, e é o primeiro ponto a decidir.
+
+| Imagem | Peça e origem da captura | O defeito que deve mostrar | A medida que o reprova sem o crítico |
+| --- | --- | --- | --- |
+| c01 haste-grossa | receita de ensaio com a chamada de `cilindro-hidraulico` no ponto médio e `haste=110` | haste mais larga que a camisa | `razao:hastePelaCamisa`, igual à de hoje |
+| c02 controle-roda | receita de ensaio com `roda-pneu` no perfil carro, ou a peça `roda-esportiva` do acervo | nenhum | nenhuma; o hash da geometria contra o `aprovacao.json`, se for a família |
+| c03 (obrigatória) | em aberto: um veículo do acervo com as rodas tiradas e o piso da caçamba descido, numa cópia de ensaio | rodas faltando e piso atravessando o arco | em aberto: a razão de altura por comprimento teria de ser medida viva sobre a peça, e hoje é só o valor gravado |
+| c04 ponta-no-ar | receita de ensaio com `dobradica` no ponto médio e a folha deslocada | folha solta dos nós | nenhuma, fica com o crítico |
+| c05 controle-cilindro | receita de ensaio com `cilindro-hidraulico` no ponto médio | nenhum | nenhuma; hash contra o `aprovacao.json` |
+| c06 facetado | a mesma chamada com `lados=12` e `segmentosDoArco=3` | revolução de doze lados | nenhuma, fica com o crítico |
+| c07 (obrigatória) | em aberto: um móvel de porta do acervo ou da família `movel-de-caixa` com as dobradiças levadas à face externa | dobradiças por fora | nenhuma, fica com o crítico |
+| c08 pneu-macico | receita de ensaio com `roda-pneu` e `raioDoAssento=0` | pneu maciço | `forma:pneu`, igual à de hoje |
+| c09 controle-dobradica | receita de ensaio com `dobradica` no ponto médio | nenhum | nenhuma; hash contra o `aprovacao.json` |
+| c10 raios-curtos | receita de ensaio com `roda-pneu`, `tipo=1` e os nós do aro a 0,75 | raios curtos | `razao:discoAlcancaOAro`, igual à de hoje |
+| c11 travessia-sem-explicacao | receita de ensaio com o corpo da haste recuado | haste atravessando o fundo | nenhuma, fica com o crítico |
+| c12 peca-fora-do-lugar | receita de ensaio com o olhal traseiro deslocado | olhal fora do eixo | nenhuma, fica com o crítico |
+
+Nas dez de família, a receita de ensaio levaria a mesma chamada que `chamadaDaFonte` monta hoje, de modo que o hash da geometria gravado continua valendo e a medida não muda. Nenhuma captura foi gerada: a única captura feita nesta etapa foi a da `roda-esportiva`, para medir o tamanho e o tempo, e ela ficou em `tools/bancadas/out/`, fora do repositório.
+
+### O que a pessoa decide
+
+A primeira decisão é o que a calibração mede: o brief de objeto de hoje com imagens da bancada, ou o `pedido.md` que o crítico recebe na rodada. A recomendação é medir o pedido da rodada, porque é ele que o laço usa, e isso pede mudar o brief preso pelo hash; como o agente ainda se apresenta com o nome antigo do projeto (`processo.md`, parágrafo final), as duas mudanças cabem na mesma medição nova. Se a escolha for manter o brief, a frase da escala comum e da barra de 100 mm precisa valer para a captura, e isso é trabalho na bancada.
+
+A segunda é quais peças e defeitos substituem as duas obrigatórias, e se a altura baixa da picape continua sendo defeito da medida. A recomendação é escolher dois objetos do acervo em que a pessoa já reprovou um defeito parecido numa rodada registrada, para o conjunto nascer de casos decididos por ela.
+
+A terceira é o território: a troca toca `docs/modelar/banco-de-provas/calibracao-do-critico/`, `src/autoria/calibracao-do-critico.js` e `tools/fixtures/acervo/`, que o plano não lista. A recomendação é acrescentá-los ao território do plano antes da etapa B.
+
+A quarta é aceitar que os 44 julgamentos sejam refeitos e que a regra de acerto (11 de 12, as faixas de nota por classe) possa ter de ser reajustada sobre as imagens novas, com o gate em estado pendente até a medição terminar.
