@@ -18,6 +18,8 @@
 
 export const LADOS = 48;
 export const INTERVALOS = 12;
+/* as seções a mais de cada ponta no caminho com desvio (duas por ponta) */
+export const SECOES_A_MAIS_DO_DESVIO = 4;
 /* a transição de cada boca ocupa esta fração do trecho livre (entre as duas espessuras de boca); o meio fica com o corpo */
 export const FRACAO_DA_TRANSICAO = 0.4;
 export const MARGEM_DO_FURO = 1;
@@ -33,9 +35,17 @@ export function semieixosDoCorpo(q) {
   return redonda ? [menor / 2, menor / 2] : [q.larguraDaSecao / 2, q.profundidadeDaSecao / 2];
 }
 
-/** Os y (em arco, no caminho com desvio) das seções: a boca, o fim do anel, o trecho livre repartido em intervalos iguais, o começo do anel da outra boca e a boca. */
-export function estacoes(q, total = q.comprimento) {
+/** Os y (em arco, no caminho com desvio) das seções: a boca, o fim do anel, o trecho livre repartido em intervalos iguais, o começo do anel da outra boca e a boca.
+ *  No caminho com desvio (`refinada`) cada ponta tem duas seções a mais, a `g` e a 3 `g` do anel (`g` é a espessura da boca, ou 1/24 do trecho livre se este for menor): a
+ *  seção entre o trecho curvo e o anel reto inclina a metade da dobra entre os dois, e com o intervalo longo de antes a face de dentro da curva se comprimia contra o anel. */
+export function estacoes(q, total = q.comprimento, refinada = false) {
   const livre = total - q.espessuraDaBocaA - q.espessuraDaBocaB;
+  if (refinada) {
+    const eA = q.espessuraDaBocaA; const eB = q.espessuraDaBocaB; const gA = Math.min(eA, livre / 24); const gB = Math.min(eB, livre / 24);
+    const ini = eA + 3 * gA; const fim = total - eB - 3 * gB; const passo = (fim - ini) / INTERVALOS;
+    const meio = Array.from({ length: INTERVALOS - 1 }, (_, i) => ini + passo * (i + 1));
+    return [0, eA, eA + gA, ini, ...meio, fim, total - eB - gB, total - eB, total];
+  }
   const meio = Array.from({ length: INTERVALOS - 1 }, (_, i) => q.espessuraDaBocaA + (livre * (i + 1)) / INTERVALOS);
   return [0, q.espessuraDaBocaA, ...meio, total - q.espessuraDaBocaB, total];
 }
@@ -123,7 +133,7 @@ export function secoesDoElo(q) {
   const { total, pos } = caminhoDoElo(q);
   if (ehReto(q)) return estacoes(q).map((y) => ({ pos: pos(y), contorno: contornoEm(q, y) }));
   const a = q.azimute * GRAUS; const c = Math.cos(a); const s = Math.sin(a);
-  return estacoes(q, total).map((y, k, todas) => ({ pos: pos(k === todas.length - 1 ? y - RECUO_DA_PONTA_B : y), contorno: contornoEm(q, y, total).map(([x, z]) => [x * c - z * s, x * s + z * c]) }));
+  return estacoes(q, total, true).map((y, k, todas) => ({ pos: pos(k === todas.length - 1 ? y - RECUO_DA_PONTA_B : y), contorno: contornoEm(q, y, total).map(([x, z]) => [x * c - z * s, x * s + z * c]) }));
 }
 
 /** O anel de fixação de uma boca: o raio de dentro (a passagem), o de fora (dentro da parede) e a espessura. */
