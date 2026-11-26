@@ -43,23 +43,31 @@
  * por quê>"`, venha a mudança de `PONTOS` reescrito ou de outro dado da receita (a TABELA, uma função); o texto de `PONTOS` só entra na
  * mensagem, para dizer de onde a mudança veio. `--acao` avisa antes do registro.
  *
- * A DECISÃO DA PESSOA FICA NA RODADA, ao lado do veredito do crítico (plano do laço mais rápido, fatia 1). Até 2026-11-26 as 150 rodadas
- * gravadas guardavam só o que o crítico disse. `--registrar ... --decisao-da-pessoa "<quem decidiu>, <AAAA-MM-DD>: <as palavras dela>"`
- * grava o campo opcional `decisaoDaPessoa` com esse texto, e o formato errado é recusado antes de medir, com o recebido, o esperado e o
- * comando. Sem a opção a rodada sai como sempre, e nenhuma rodada já gravada muda. `--acao` mostra a decisão da última rodada que a tem.
+ * A DECISÃO DA PESSOA FICA AO LADO DAS RODADAS (plano do laço mais rápido, fatia 1; decisão da pessoa em 2026-11-26). Até então as 150
+ * rodadas gravadas guardavam só o que o crítico disse. A pessoa vê a peça depois de a rodada estar gravada, e rodada gravada não é reescrita:
+ * a decisão dela mora em `rodadas/decisoes-da-pessoa.json`, uma entrada por rodada, com o texto "<quem decidiu>, <AAAA-MM-DD>: <as palavras
+ * dela>" e a data da gravação. `<peça> --decisao-da-pessoa "<texto>" --rodada <n>` grava; a rodada que não existe, o formato errado e a
+ * segunda decisão para a mesma rodada sem `--substituir` são recusados, e a substituída fica guardada em `anteriores`. `--acao` lista a
+ * decisão de cada rodada, entre aspas e numa linha. O texto não tem quebra de linha, a data dele existe no calendário, não é futura e não
+ * é anterior ao registro da rodada; nenhuma recusa e nenhuma ajuda traz palavras prontas para a decisão, só o molde. O arquivo lido é
+ * conferido inteiro (a peça, as rodadas que existem, as chaves, as datas) e gravado por troca de nome, de um temporário. O campo
+ * `decisaoDaPessoa` dentro da rodada, que a primeira versão desta fatia gravava, saiu: nenhuma rodada o tinha, e duas fontes pediriam uma
+ * regra de qual vale.
  *
  * Uso:
- *   node tools/modelar/rodada-de-modelagem.mjs <peça> --registrar --modelador modelador.txt --critico critico.jsonl [--atrito "texto"] [--pacote <pasta>] [--motivo-dos-pontos "<quem decidiu, data: por quê>"] [--decisao-da-pessoa "<quem decidiu, data: as palavras dela>"]...
+ *   node tools/modelar/rodada-de-modelagem.mjs <peça> --registrar --modelador modelador.txt --critico critico.jsonl [--atrito "texto"] [--pacote <pasta>] [--motivo-dos-pontos "<quem decidiu, data: por quê>"]...
  *   node tools/modelar/rodada-de-modelagem.mjs <peça> --registrar rodada.json
  *   node tools/modelar/rodada-de-modelagem.mjs <peça> --acao
+ *   node tools/modelar/rodada-de-modelagem.mjs <peça> --decisao-da-pessoa "<quem decidiu, data: as palavras dela>" --rodada <n> [--substituir]
+ *   node tools/modelar/rodada-de-modelagem.mjs --ajuda
  *   node tools/modelar/rodada-de-modelagem.mjs <peça> --perguntas
  *   node tools/modelar/rodada-de-modelagem.mjs <peça> --pedidos [<arquivo.json>] [--json]   os pedidos de alteração da pessoa, contados por etapa
  */
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
-import { basename, dirname, join, resolve, sep } from 'node:path';
+import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync, realpathSync } from 'node:fs';
+import { basename, dirname, join, resolve, sep, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { FORMATO_DE_QUEM, LIMITE_DE_RODADAS, QUEM_DATA_PALAVRAS, acaoDaReceita, defeitosAbertos, normalizarDecisaoDaPessoa, proximaAcao, registrarRodada } from '../../src/autoria/laco-de-modelagem.js';
+import { FORMATO_DE_QUEM, LIMITE_DE_RODADAS, acaoDaReceita, defeitoDoTextoDeQuem, defeitosAbertos, normalizarDecisaoDaPessoa, proximaAcao, registrarRodada } from '../../src/autoria/laco-de-modelagem.js';
 import { diferencaDeTexto } from '../../src/autoria/diferenca-de-texto.js';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 import { conferirAcervo } from './guardas/guarda-acervo.mjs';
@@ -144,7 +152,7 @@ const copiaDaReceita = (pasta, numero) => join(pasta, `receita-${String(numero).
 
 export function gravarRodada(
   peca,
-  { veredito = null, medidas, partes, atrito = [], notaDePassagem, superficie, facesFinas, pontos, decisaoDaPessoa: daPessoa },
+  { veredito = null, medidas, partes, atrito = [], notaDePassagem, superficie, facesFinas, pontos },
   { pasta = pastaDeRodadas(peca), receitaTexto = textoDaReceita(peca), agora = () => new Date().toISOString() } = {},
 ) {
   exigirNome(peca);
@@ -165,7 +173,7 @@ export function gravarRodada(
   /* A DATA DO REGISTRO, em ISO e UTC. A linha de base do custo por peça (2026-11-10) não tinha como dizer quanto tempo uma peça levou,
      porque nenhuma rodada guardava quando foi gravada. A data é metadado do registro, e não entra em nada que a forma da peça leia. */
   const rodada = {
-    ...registrarRodada({ peca, numero, veredito, medidas, partes, atrito, notaDePassagem, receita, superficie, decisaoDaPessoa: daPessoa }),
+    ...registrarRodada({ peca, numero, veredito, medidas, partes, atrito, notaDePassagem, receita, superficie }),
     registradaEm: agora(),
     /* a contagem de faces finas da malha medida (`facesFinasDaMalha`): a próxima medição da peça compara com ela */
     ...(facesFinas ? { facesFinas } : {}),
@@ -197,12 +205,14 @@ export function gravarRodada(
    para o arquivo. Toda declaração pede `por` no formato "quem, AAAA-MM-DD: as palavras dela"
    (os dois arquivos antigos do braço que não o tinham ganharam as palavras da pessoa em 2026-11-18). Sem o arquivo valem as paradas de sempre. */
 
-/* Quem decidiu, quando e o quê ("a pessoa, 2026-11-18: pode seguir"): `QUEM_DATA_PALAVRAS` e `FORMATO_DE_QUEM` vêm de
+/* Quem decidiu, quando e o quê: o molde `FORMATO_DE_QUEM` e a conferência `defeitoDoTextoDeQuem` vêm de
    `src/autoria/laco-de-modelagem.js` e valem para o `por` de `limite.json`, para `--motivo-dos-pontos` e para `--decisao-da-pessoa`. */
 export const SEM_LIMITE = 'sem';
 
-/** A decisão gravada da pessoa para a peça: `{ limite, convergenciaDesde, por? }`, com `Infinity` no limite declarado "sem"; `por` só vem quando há arquivo. */
-export function decisaoDaPessoa(peca, { pasta = pastaDeRodadas(peca) } = {}) {
+/** A decisão gravada da pessoa sobre as paradas do laço da peça (`rodadas/limite.json`): `{ limite, convergenciaDesde, por? }`, com
+ *  `Infinity` no limite declarado "sem"; `por` só vem quando há arquivo. Chamava-se `decisaoDaPessoa`, nome que se confundia com a
+ *  decisão da pessoa sobre cada rodada (`rodadas/decisoes-da-pessoa.json`, `lerDecisoesDaPessoa`). */
+export function decisaoSobreAsParadas(peca, { pasta = pastaDeRodadas(peca) } = {}) {
   const arquivo = join(pasta, 'limite.json');
   if (!existsSync(arquivo)) return { limite: LIMITE_DE_RODADAS, convergenciaDesde: 1 };
   const conserto = `Corrija o arquivo e confira com \`node tools/modelar/rodada-de-modelagem.mjs ${peca} --acao\`.`;
@@ -229,8 +239,9 @@ export function decisaoDaPessoa(peca, { pasta = pastaDeRodadas(peca) } = {}) {
       throw new Error(`${arquivo}: '${campo}' recebido: ${JSON.stringify(dado[campo])}; esperado o texto que diz quem decidiu e por quê. ${conserto}`);
     }
   }
-  if (!QUEM_DATA_PALAVRAS.test(dado.por.trim())) {
-    throw new Error(`${arquivo}: 'por' recebido: ${JSON.stringify(dado.por)}; esperado ${FORMATO_DE_QUEM}, com as palavras de quem decidiu. ${conserto}`);
+  const defeitoDoPor = defeitoDoTextoDeQuem(dado.por.trim());
+  if (defeitoDoPor) {
+    throw new Error(`${arquivo}: 'por' recebido: ${JSON.stringify(dado.por)} (${defeitoDoPor}); esperado ${FORMATO_DE_QUEM}, numa linha só, com as palavras de quem decidiu. ${conserto}`);
   }
   if (temConvergencia) {
     const numeros = lerRodadas(peca, { pasta }).map((r) => r.numero);
@@ -247,11 +258,179 @@ export function decisaoDaPessoa(peca, { pasta = pastaDeRodadas(peca) } = {}) {
   };
 }
 
+/* ---- a decisão da pessoa sobre cada rodada, num arquivo ao lado delas ---- */
+
+export const ARQUIVO_DAS_DECISOES = 'decisoes-da-pessoa.json';
+export const FORMATO_DAS_DECISOES = 'mecanifica.decisoes-da-pessoa';
+export const VERSAO_DAS_DECISOES = 1;
+const comandoDaDecisao = (peca, rodada = '<n>') => `node tools/modelar/rodada-de-modelagem.mjs ${peca} --decisao-da-pessoa ${FORMATO_DE_QUEM} --rodada ${rodada}`;
+
+const CHAVES_DO_ARQUIVO = ['formato', 'versao', 'peca', 'decisoes'];
+const CHAVES_DA_ENTRADA = ['rodada', 'decisao', 'gravadaEm', 'anteriores'];
+const CHAVES_DA_ANTERIOR = ['decisao', 'gravadaEm'];
+const INSTANTE_ISO = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/;
+const instanteIso = (v) => typeof v === 'string' && INSTANTE_ISO.test(v) && !Number.isNaN(Date.parse(v)) && new Date(v).toISOString() === v;
+const ehObjeto = (v) => Boolean(v) && typeof v === 'object' && !Array.isArray(v);
+const chavesAMais = (objeto, aceitas) => Object.keys(objeto).filter((k) => !aceitas.includes(k));
+const recorte = (v) => { const t = JSON.stringify(v) ?? String(v); return t.length > 200 ? `${t.slice(0, 200)}…` : t; };
+
+/* A conferência do conteúdo de `decisoes-da-pessoa.json`, a mesma na leitura e antes da gravação. Cada recusa diz o recebido, o esperado
+   e o conserto. As chaves são fechadas: um campo a mais (`aprovada`, `limite`) seria lido por alguém como decisão que a ferramenta não
+   conferiu. `rodadas` são as rodadas registradas da peça, que dão as que existem e a data do registro de cada uma. */
+function conferirDecisoes(dado, { peca, arquivo, rodadas }) {
+  const molde = `{ "formato": "${FORMATO_DAS_DECISOES}", "versao": ${VERSAO_DAS_DECISOES}, "peca": "${peca}", "decisoes": [{ "rodada", "decisao", "gravadaEm", "anteriores"? }] }`;
+  const conserto = `O arquivo é escrito pela ferramenta: desfaça a edição e grave com \`${comandoDaDecisao(peca)}\`.`;
+  const recusar = (oQue, recebido, esperado) => { throw new Error(`${arquivo}: ${oQue} recebido: ${recorte(recebido)}; esperado ${esperado}. ${conserto}`); };
+  if (!ehObjeto(dado)) recusar('conteúdo', dado, molde);
+  if (dado.formato !== FORMATO_DAS_DECISOES) recusar("'formato'", dado.formato, `"${FORMATO_DAS_DECISOES}", em ${molde}`);
+  if (dado.versao !== VERSAO_DAS_DECISOES) recusar("'versao'", dado.versao, `${VERSAO_DAS_DECISOES}, a única versão que esta ferramenta lê`);
+  if (dado.peca !== peca) recusar("'peca'", dado.peca, `"${peca}", a peça dona desta pasta de rodadas`);
+  if (!Array.isArray(dado.decisoes)) recusar("'decisoes'", dado.decisoes, `a lista das decisões, uma entrada por rodada, em ${molde}`);
+  const aMais = chavesAMais(dado, CHAVES_DO_ARQUIVO);
+  if (aMais.length) recusar('campo a mais', aMais, `só ${CHAVES_DO_ARQUIVO.join(', ')}`);
+  const registradaEm = new Map(rodadas.map((r) => [r.numero, r.registradaEm ?? null]));
+  const registradas = registradaEm.size ? `as registradas são ${[...registradaEm.keys()].join(', ')}` : 'a peça não tem rodada registrada';
+  const texto = (valor, onde, rodada, gravadaEm) => {
+    try { normalizarDecisaoDaPessoa(valor, { peca, rodada, ate: gravadaEm, registradaEm: registradaEm.get(rodada) }); } catch (erro) { throw new Error(`${arquivo}, ${onde}: ${SEM_PREFIXO(erro.message)}`); }
+    if (valor !== valor.trim()) recusar(`${onde}, 'decisao'`, valor, 'o texto sem branco nas pontas, como a ferramenta grava');
+  };
+  const vistas = new Set();
+  for (const d of dado.decisoes) {
+    if (!ehObjeto(d)) recusar('entrada', d, '{ "rodada", "decisao", "gravadaEm" }');
+    if (!Number.isInteger(d.rodada) || d.rodada < 1) recusar("'rodada'", d.rodada, 'o número inteiro, a partir de 1, da rodada que a pessoa viu');
+    const onde = `rodada ${d.rodada}`;
+    if (vistas.has(d.rodada)) recusar(`${onde}, segunda entrada`, d, 'uma entrada por rodada, com a substituída em \'anteriores\'');
+    vistas.add(d.rodada);
+    if (!registradaEm.has(d.rodada)) recusar("'rodada'", d.rodada, `o número de uma rodada registrada de '${peca}' (${registradas})`);
+    const sobrando = chavesAMais(d, CHAVES_DA_ENTRADA);
+    if (sobrando.length) recusar(`${onde}, campo a mais`, sobrando, `só ${CHAVES_DA_ENTRADA.join(', ')}`);
+    if (!instanteIso(d.gravadaEm)) recusar(`${onde}, 'gravadaEm'`, d.gravadaEm, 'o instante da gravação em ISO e UTC, como "2026-01-31T12:00:00.000Z"');
+    texto(d.decisao, onde, d.rodada, d.gravadaEm);
+    if (d.anteriores === undefined) continue;
+    if (!Array.isArray(d.anteriores) || d.anteriores.length === 0) recusar(`${onde}, 'anteriores'`, d.anteriores, 'a lista não vazia das decisões substituídas, [{ "decisao", "gravadaEm" }], ou o campo ausente');
+    for (const a of d.anteriores) {
+      if (!ehObjeto(a)) recusar(`${onde}, entrada de 'anteriores'`, a, '{ "decisao", "gravadaEm" }');
+      const demais = chavesAMais(a, CHAVES_DA_ANTERIOR);
+      if (demais.length) recusar(`${onde}, campo a mais em 'anteriores'`, demais, `só ${CHAVES_DA_ANTERIOR.join(', ')}`);
+      if (!instanteIso(a.gravadaEm)) recusar(`${onde}, 'gravadaEm' de 'anteriores'`, a.gravadaEm, 'o instante da gravação em ISO e UTC, como "2026-01-31T12:00:00.000Z"');
+      texto(a.decisao, `${onde}, 'anteriores'`, d.rodada, a.gravadaEm);
+    }
+    const instantes = [...d.anteriores.map((a) => a.gravadaEm), d.gravadaEm];
+    const fora = instantes.findIndex((quando, k) => k > 0 && quando < instantes[k - 1]);
+    if (fora > 0) recusar(`${onde}, ordem de 'anteriores'`, [instantes[fora - 1], instantes[fora]], 'as substituídas da mais antiga à mais nova, e todas antes da que vale');
+  }
+}
+
+/**
+ * As decisões da pessoa gravadas para a peça, em ordem de rodada: `[{ rodada, decisao, gravadaEm, anteriores? }]`, e vazia sem o
+ * arquivo. O arquivo mexido à mão e errado é recusado com o recebido, o esperado e o comando que grava certo: a peça é a da pasta, toda
+ * rodada citada existe, as chaves são as da ferramenta, `gravadaEm` é instante ISO e cada texto passa na regra do formato e das datas.
+ */
+export function lerDecisoesDaPessoa(peca, { pasta = pastaDeRodadas(peca) } = {}) {
+  exigirNome(peca);
+  const arquivo = join(pasta, ARQUIVO_DAS_DECISOES);
+  if (!existsSync(arquivo)) return [];
+  let dado;
+  try { dado = JSON.parse(readFileSync(arquivo, 'utf8')); } catch (erro) {
+    throw new Error(`${arquivo}: recebido um texto que não é JSON (${erro.message}); esperado o arquivo que a ferramenta grava. O arquivo é escrito pela ferramenta: desfaça a edição e grave com \`${comandoDaDecisao(peca)}\`.`);
+  }
+  conferirDecisoes(dado, { peca, arquivo, rodadas: lerRodadas(peca, { pasta }) });
+  return [...dado.decisoes].sort((a, b) => a.rodada - b.rodada);
+}
+
+/* Grava por troca de nome: o texto vai inteiro para um temporário ao lado e o temporário toma o nome do arquivo. Quem lê no meio da
+   gravação vê o arquivo de antes ou o de depois, nunca a metade. */
+function gravarPorTroca(arquivo, texto) {
+  const temporario = `${arquivo}.${process.pid}.tmp`;
+  try {
+    writeFileSync(temporario, texto, 'utf8');
+    renameSync(temporario, arquivo);
+  } catch (erro) {
+    rmSync(temporario, { force: true });
+    throw erro;
+  }
+}
+
+/**
+ * Grava a decisão da pessoa sobre uma rodada já registrada, sem tocar no arquivo da rodada. Recusa o formato errado, a data que não
+ * existe, a futura e a anterior ao registro da rodada, a rodada que não existe, a segunda decisão para a mesma rodada sem `substituir`,
+ * o `substituir` sem decisão anterior e o mesmo texto já gravado; com `substituir: true`, a anterior fica em `anteriores`, com a data
+ * dela. Devolve `{ entrada, arquivo, substituida }`.
+ */
+export function gravarDecisaoDaPessoa(peca, { rodada, decisao, substituir = false }, { pasta = pastaDeRodadas(peca), agora = () => new Date().toISOString() } = {}) {
+  const rodadas = lerRodadas(peca, { pasta });
+  const numeros = rodadas.map((r) => r.numero);
+  const registradas = numeros.length ? `as registradas são ${numeros.join(', ')}` : 'a peça não tem rodada registrada';
+  const numero = typeof rodada === 'string' && /^\d+$/.test(rodada.trim()) ? Number(rodada) : rodada;
+  if (substituir !== true && substituir !== false) {
+    throw new Error(`'substituir' recebido: ${recorte(substituir)}; esperado true ou false, e só true troca uma decisão gravada. Na linha de comando é a opção --substituir, sem valor.`);
+  }
+  if (rodada === undefined || rodada === null) {
+    throw new Error(`--rodada não veio; esperado o número da rodada que a pessoa viu (${registradas}). Grave com \`${comandoDaDecisao(peca)}\`.`);
+  }
+  const normalizar = (limites) => { try { return normalizarDecisaoDaPessoa(decisao, { peca, rodada: Number.isInteger(numero) ? numero : '<n>', ...limites }); } catch (erro) { throw new Error(SEM_PREFIXO(erro.message)); } };
+  normalizar({});
+  if (!Number.isInteger(numero) || !numeros.includes(numero)) {
+    throw new Error(`--rodada recebido: ${JSON.stringify(rodada)}; esperado o número de uma rodada registrada de '${peca}' (${registradas}). `
+      + `Grave com \`${comandoDaDecisao(peca)}\`, com o número da rodada que a pessoa viu${numeros.length ? '' : ', depois de registrar a rodada com --registrar'}.`);
+  }
+  const gravadaEm = agora();
+  const texto = normalizar({ ate: gravadaEm, registradaEm: rodadas.find((r) => r.numero === numero).registradaEm ?? null });
+  const decisoes = lerDecisoesDaPessoa(peca, { pasta });
+  const antiga = decisoes.find((d) => d.rodada === numero) ?? null;
+  if (antiga && antiga.decisao === texto) {
+    throw new Error(`a rodada ${numero} de '${peca}' já tem esta decisão da pessoa gravada: ${JSON.stringify(antiga.decisao)}; recebido o mesmo texto${substituir ? ', com --substituir' : ''}; `
+      + `esperado um texto novo só quando a pessoa disse outra coisa. Não há o que gravar: confira com \`node tools/modelar/rodada-de-modelagem.mjs ${peca} --acao\`.`);
+  }
+  if (antiga && !substituir) {
+    throw new Error(`a rodada ${numero} de '${peca}' já tem decisão da pessoa gravada: ${JSON.stringify(antiga.decisao)}; recebido: ${JSON.stringify(texto)}; esperado uma decisão por rodada. `
+      + `Se a pessoa mudou a decisão, grave com \`${comandoDaDecisao(peca, numero)} --substituir\`, e a anterior fica guardada.`);
+  }
+  if (!antiga && substituir) {
+    throw new Error(`--substituir recebido e a rodada ${numero} de '${peca}' não tem decisão da pessoa gravada; esperado --substituir só quando a pessoa muda uma decisão já gravada. `
+      + `Grave sem ele: \`${comandoDaDecisao(peca, numero)}\`.`);
+  }
+  const entrada = {
+    rodada: numero, decisao: texto, gravadaEm,
+    ...(antiga ? { anteriores: [...(antiga.anteriores ?? []), { decisao: antiga.decisao, gravadaEm: antiga.gravadaEm }] } : {}),
+  };
+  const lista = [...decisoes.filter((d) => d.rodada !== numero), entrada].sort((a, b) => a.rodada - b.rodada);
+  const arquivo = join(pasta, ARQUIVO_DAS_DECISOES);
+  const dado = { formato: FORMATO_DAS_DECISOES, versao: VERSAO_DAS_DECISOES, peca, decisoes: lista };
+  conferirDecisoes(dado, { peca, arquivo, rodadas });
+  gravarPorTroca(arquivo, `${JSON.stringify(dado, null, 2)}\n`);
+  return { entrada, arquivo, substituida: antiga };
+}
+
+export const AJUDA = `rodada-de-modelagem: o registro do laço de modelagem de uma peça. A peça é <objeto>/<peça> ou o nome dela.
+
+  node tools/modelar/rodada-de-modelagem.mjs <peça> --acao
+      mede a receita atual e diz a próxima ação, as decisões da pessoa por rodada e os defeitos em aberto
+  node tools/modelar/rodada-de-modelagem.mjs <peça> --registrar --modelador <arquivo> [--critico <arquivo>] [--atrito "<texto>"]... [--pacote <pasta>] [--motivo-dos-pontos ${FORMATO_DE_QUEM}]
+      grava a rodada com o relato do modelador, o veredito do crítico e a medição da ferramenta
+  node tools/modelar/rodada-de-modelagem.mjs <peça> --registrar <rodada.json>
+      grava a rodada de um JSON já montado
+  node tools/modelar/rodada-de-modelagem.mjs <peça> --decisao-da-pessoa ${FORMATO_DE_QUEM} --rodada <n> [--substituir]
+      grava a decisão da pessoa sobre a rodada <n> em rodadas/${ARQUIVO_DAS_DECISOES}, sem mexer na rodada
+  node tools/modelar/rodada-de-modelagem.mjs <peça> --perguntas
+      as perguntas de forma do pedido do crítico
+  node tools/modelar/rodada-de-modelagem.mjs <peça> --pedidos [<arquivo.json>] [--json]
+      os pedidos de alteração da pessoa, contados por etapa
+  node tools/modelar/rodada-de-modelagem.mjs --ajuda
+      este texto
+
+A opção com valor aceita as duas escritas: --rodada 3 e --rodada=3, e só --atrito repete.
+A decisão da pessoa vai numa linha, com a data do dia em que ela decidiu (nem futura, nem anterior ao registro da rodada) e as palavras
+dela: a ferramenta não sugere palavras. --substituir só vale quando a rodada já tem decisão e o texto é outro.`;
+
+/* O nome antigo de `decisaoSobreAsParadas`, que `fluxo-do-objeto.mjs` e `etapas-da-montagem.mjs` ainda importam: os dois ficam fora do
+   território do plano do laço mais rápido, e o nome sai daqui quando eles trocarem a importação. */
+
 /** O limite de rodadas da peça: o de sempre, o que a pessoa estendeu por escrito, ou `Infinity` quando ela declarou "sem". */
-export const limiteDaPeca = (peca, opcoes) => decisaoDaPessoa(peca, opcoes).limite;
+export const limiteDaPeca = (peca, opcoes) => decisaoSobreAsParadas(peca, opcoes).limite;
 
 /** A rodada a partir da qual a convergência conta para a peça: 1, ou a que a pessoa gravou ao mandar seguir depois da parada. */
-export const convergenciaDaPeca = (peca, opcoes) => decisaoDaPessoa(peca, opcoes).convergenciaDesde;
+export const convergenciaDaPeca = (peca, opcoes) => decisaoSobreAsParadas(peca, opcoes).convergenciaDesde;
 
 /* ---- o esperado dos PONTOS entre rodadas ---- */
 
@@ -468,7 +647,7 @@ export async function acaoDaPeca(peca, {
 } = {}) {
   /* a decisão gravada da pessoa sai inteira da mesma pasta das rodadas; o que quem chama passar vale no lugar do que o arquivo diz */
   if (limite === undefined || convergenciaDesde === undefined) {
-    const lida = decisaoDaPessoa(peca, { pasta });
+    const lida = decisaoSobreAsParadas(peca, { pasta });
     limite ??= lida.limite; convergenciaDesde ??= lida.convergenciaDesde; por ??= lida.por;
   }
   let medicao = null;
@@ -540,14 +719,7 @@ export function alvoDoRepositorio(alvo, raiz = RAIZ_DO_REPOSITORIO) {
  * o veredito do crítico quando a medição da receita atual reprovou, e `medidas` declaradas que contradizem a medição. A receita
  * gravada na rodada é a que foi medida.
  */
-export async function registrarMedida(peca, entrada, { medir = () => medirReceita(peca), pacote = null, motivoDosPontos = null, decisaoDaPessoa: daPessoa = null, ...opcoes } = {}) {
-  /* a decisão da pessoa vem da opção ou do JSON da rodada, de um lugar só, e o formato é conferido antes de medir */
-  if (daPessoa !== null && entrada.decisaoDaPessoa !== undefined && entrada.decisaoDaPessoa !== null) {
-    throw new Error(`a decisão da pessoa veio duas vezes: em --decisao-da-pessoa (${JSON.stringify(daPessoa)}) e no campo 'decisaoDaPessoa' do JSON da rodada (${JSON.stringify(entrada.decisaoDaPessoa)}); `
-      + 'esperado um lugar só. Tire o campo do JSON ou a opção da linha de comando.');
-  }
-  if (daPessoa !== null) entrada = { ...entrada, decisaoDaPessoa: daPessoa };
-  try { normalizarDecisaoDaPessoa(entrada.decisaoDaPessoa, peca); } catch (erro) { throw new Error(SEM_PREFIXO(erro.message)); }
+export async function registrarMedida(peca, entrada, { medir = () => medirReceita(peca), pacote = null, motivoDosPontos = null, ...opcoes } = {}) {
   let medicao;
   try { medicao = await medir(); } catch (erro) {
     throw new Error(`não consegui medir a receita de '${peca}' (${erro.message}): sem medição a rodada não se registra, e o veredito do crítico muito menos.`);
@@ -576,9 +748,10 @@ export async function registrarMedida(peca, entrada, { medir = () => medirReceit
     superficie = { lataria: luzDaMedicao(medicao).porque, imagens: conferido.imagens };
   }
   /* o esperado dos pontos contra o da última rodada que o gravou: toda mudança pede quem decidiu e por quê */
-  if (motivoDosPontos !== null && !QUEM_DATA_PALAVRAS.test(String(motivoDosPontos).trim())) {
-    throw new Error(`--motivo-dos-pontos recebido: ${JSON.stringify(motivoDosPontos)}; esperado ${FORMATO_DE_QUEM}. `
-      + `Registre de novo com \`node tools/modelar/rodada-de-modelagem.mjs ${peca} --registrar ... --motivo-dos-pontos "a pessoa, 2026-11-18: o alvo era o da prancha antiga"\`.`);
+  const defeitoDoMotivo = motivoDosPontos === null ? null : defeitoDoTextoDeQuem(String(motivoDosPontos).trim());
+  if (defeitoDoMotivo) {
+    throw new Error(`--motivo-dos-pontos recebido: ${JSON.stringify(motivoDosPontos)} (${defeitoDoMotivo}); esperado ${FORMATO_DE_QUEM}, numa linha só. `
+      + `Registre de novo com \`node tools/modelar/rodada-de-modelagem.mjs ${peca} --registrar ... --motivo-dos-pontos ${FORMATO_DE_QUEM}\`.`);
   }
   const dosPontos = mudancaDosPontos(lerRodadas(peca, opcoes.pasta ? { pasta: opcoes.pasta } : {}), medicao);
   let pontos = dosPontos.agora ?? undefined;
@@ -779,30 +952,111 @@ export function entradaDosArquivos({ modelador, critico = null, atrito = [], pec
   return entrada;
 }
 
-const OPCOES_COM_VALOR = ['--registrar', '--modelador', '--critico', '--atrito', '--pacote', '--motivo-dos-pontos', '--decisao-da-pessoa'];
+const OPCOES_COM_VALOR = ['--registrar', '--modelador', '--critico', '--atrito', '--pacote', '--motivo-dos-pontos', '--decisao-da-pessoa', '--rodada'];
+const OPCOES_SEM_VALOR = ['--acao', '--substituir', '--ajuda', '--help'];
+const VALOR_ESPERADO = {
+  '--modelador': 'o arquivo com a resposta do modelador',
+  '--critico': 'o arquivo com a resposta do crítico',
+  '--atrito': 'o texto do atrito, entre aspas',
+  '--pacote': 'a pasta do pacote do crítico',
+  '--motivo-dos-pontos': `o texto ${FORMATO_DE_QUEM}`,
+  '--decisao-da-pessoa': `o texto ${FORMATO_DE_QUEM}`,
+  '--rodada': 'o número da rodada',
+};
 
-/* Separa a peça, as opções e os valores. `--atrito` repete; `--registrar` aceita valor (o JSON montado) ou nenhum (a forma nova). */
+/* Separa a peça, as opções e os valores. `--atrito` repete, e nenhuma outra opção com valor: a segunda trocaria a primeira sem aviso.
+   `--registrar` aceita valor (o JSON montado) ou nenhum (a forma nova). A opção que pede valor aceita as duas escritas, `--rodada 3` e
+   `--rodada=3`. A opção que a ferramenta não conhece é recusada com a lista das aceitas, em vez de ser ignorada. */
 export function lerArgumentos(argv) {
   const opcoes = { atrito: [] };
   let peca;
+  argv = argv.flatMap((a) => {
+    const igual = a.startsWith('--') ? a.indexOf('=') : -1;
+    return igual > 0 && OPCOES_COM_VALOR.includes(a.slice(0, igual)) ? [a.slice(0, igual), a.slice(igual + 1)] : [a];
+  });
+  const vistas = new Set();
   for (let i = 0; i < argv.length; i += 1) {
     const a = argv[i];
     if (!a.startsWith('--')) { peca ??= a; continue; }
     const nome = a.slice(2);
-    if (!OPCOES_COM_VALOR.includes(a)) { opcoes[nome] = true; continue; }
+    if (!OPCOES_COM_VALOR.includes(a)) {
+      if (!OPCOES_SEM_VALOR.includes(a)) {
+        throw new Error(`opção desconhecida recebida: ${a}; esperado uma destas: ${[...OPCOES_SEM_VALOR, ...OPCOES_COM_VALOR].join(', ')} (--perguntas e --pedidos são outros modos, com as opções deles). `
+          + 'O uso de cada uma sai com `node tools/modelar/rodada-de-modelagem.mjs --ajuda`.');
+      }
+      opcoes[nome] = true;
+      continue;
+    }
+    if (a !== '--atrito' && vistas.has(a)) {
+      throw new Error(`${a} recebido mais de uma vez; esperado uma vez só, porque o segundo valor trocaria o primeiro sem aviso. Repita o comando com um ${a} só.`);
+    }
+    vistas.add(a);
     const proximo = argv[i + 1];
     const temValor = proximo !== undefined && !proximo.startsWith('--');
     if (a === '--registrar') { opcoes.registrar = temValor ? proximo : true; if (temValor) i += 1; continue; }
-    if (!temValor) throw new Error(`${a} pede um valor.`);
+    if (!temValor) {
+      throw new Error(`${a} pede um valor e veio sem ele${proximo === undefined ? '' : ` (o que vem depois é ${JSON.stringify(proximo)}, outra opção)`}; esperado ${VALOR_ESPERADO[a]}. `
+        + `Escreva \`${a} <valor>\` ou \`${a}=<valor>\`.`);
+    }
     i += 1;
     if (a === '--atrito') opcoes.atrito.push(proximo); else opcoes[nome] = proximo;
   }
   return { peca, opcoes };
 }
 
-async function comoCLI(argv) {
+/* A PASTA DAS RODADAS DA LINHA DE COMANDO, SÓ PARA TESTE. Com esta variável de ambiente a linha de comando lê e grava as rodadas e as
+   decisões de `<pasta>/<peça>`, e não da pasta da peça no acervo: o teste da linha de comando roda numa pasta temporária, e uma
+   regressão não grava decisão fabricada ao lado de rodada real. A pasta tem de ficar fora do repositório, e a saída diz que ela foi
+   usada. Sem a variável nada muda. */
+export const VARIAVEL_DA_PASTA_DE_TESTE = 'MODELAR_RODADAS_EM_PASTA_DE_TESTE';
+function pastaDaLinhaDeComando(peca, env) {
+  const valor = env[VARIAVEL_DA_PASTA_DE_TESTE];
+  if (valor === undefined || valor === '') return { pasta: pastaDeRodadas(peca), aviso: '' };
+  exigirNome(peca);
+  /* a pasta final, com os elos simbólicos resolvidos até onde ela existe: um elo de fora que aponta para as rodadas reais, ou a
+     pasta pai do repositório com a peça caindo dentro dele, também são recusados */
+  const final = join(resolve(valor), peca);
+  let real = final;
+  for (let p = final; ; p = dirname(p)) {
+    if (existsSync(p)) { real = join(realpathSync(p), relative(p, final)); break; }
+    if (dirname(p) === p) break;
+  }
+  const repoReal = realpathSync(REPO);
+  const dentro = (c) => c === REPO || c.startsWith(`${REPO}${sep}`) || c === repoReal || c.startsWith(`${repoReal}${sep}`);
+  if (dentro(resolve(valor)) || dentro(final) || dentro(real)) {
+    throw new Error(`${VARIAVEL_DA_PASTA_DE_TESTE} recebido: ${JSON.stringify(valor)}; esperado uma pasta fora do repositório (${REPO}), porque a variável serve só ao teste da linha de comando. `
+      + 'Para o uso de verdade, rode o comando sem a variável.');
+  }
+  const pasta = final;
+  /* o aviso vai à saída de erro já na leitura, em todo caminho (sucesso, recusa, --pedidos): se a variável vazar para a sessão,
+     quem lê vê que a ferramenta não está olhando o acervo */
+  process.stderr.write(`aviso: rodadas em pasta de teste (${VARIAVEL_DA_PASTA_DE_TESTE}): ${pasta}\n`);
+  return { pasta, aviso: `rodadas em pasta de teste (${VARIAVEL_DA_PASTA_DE_TESTE}): ${pasta}\n` };
+}
+
+async function comoCLI(argv, { env = process.env } = {}) {
   const { peca, opcoes } = lerArgumentos(argv);
-  if (!peca) return { codigo: 1, texto: 'diga a peça: rodada-de-modelagem.mjs <peça> --acao' };
+  if (opcoes.ajuda || opcoes.help) return { codigo: 0, texto: AJUDA };
+  if (!peca) return { codigo: 1, texto: `recebido sem a peça; esperado o nome dela antes das opções, como em \`node tools/modelar/rodada-de-modelagem.mjs <objeto>/<peça> --acao\`.\n\n${AJUDA}` };
+  const { pasta, aviso } = pastaDaLinhaDeComando(peca, env);
+  const daPessoa = opcoes['decisao-da-pessoa'];
+  if (daPessoa === undefined && (opcoes.rodada !== undefined || opcoes.substituir)) {
+    return { codigo: 1, texto: `--rodada e --substituir recebidos sem --decisao-da-pessoa; esperado \`node tools/modelar/rodada-de-modelagem.mjs ${peca} --decisao-da-pessoa ${FORMATO_DE_QUEM} --rodada <n>\`.` };
+  }
+  if (daPessoa !== undefined) {
+    if (opcoes.registrar !== undefined) {
+      return { codigo: 1, texto: '--decisao-da-pessoa recebido junto de --registrar; esperado em dois comandos, porque a decisão é de quem viu a peça da rodada gravada. '
+        + `Registre a rodada e depois grave com \`node tools/modelar/rodada-de-modelagem.mjs ${peca} --decisao-da-pessoa ${FORMATO_DE_QUEM} --rodada <n>\`.` };
+    }
+    const outras = Object.keys(opcoes).filter((k) => !['decisao-da-pessoa', 'rodada', 'substituir'].includes(k) && (k !== 'atrito' || opcoes.atrito.length > 0));
+    if (outras.length) {
+      return { codigo: 1, texto: `--decisao-da-pessoa recebido junto de ${outras.map((k) => `--${k}`).join(', ')}; esperado só com --rodada <n> e, quando a pessoa muda a decisão, --substituir: este comando só grava a decisão. `
+        + `Grave com \`node tools/modelar/rodada-de-modelagem.mjs ${peca} --decisao-da-pessoa ${FORMATO_DE_QUEM} --rodada <n>\` e confira depois com \`node tools/modelar/rodada-de-modelagem.mjs ${peca} --acao\`.` };
+    }
+    const { entrada, arquivo, substituida } = gravarDecisaoDaPessoa(peca, { rodada: opcoes.rodada, decisao: daPessoa, substituir: opcoes.substituir === true }, { pasta });
+    return { codigo: 0, texto: `${aviso}decisão da pessoa sobre a rodada ${entrada.rodada} gravada em ${arquivo.replace(`${REPO}/`, '')}: ${JSON.stringify(entrada.decisao)}`
+      + (substituida ? `\nsubstituiu a anterior, que ficou guardada: ${JSON.stringify(substituida.decisao)}` : '') };
+  }
 
   if (opcoes.registrar !== undefined) {
     const doArquivo = typeof opcoes.registrar === 'string';
@@ -816,25 +1070,21 @@ async function comoCLI(argv) {
     const entrada = doArquivo
       ? JSON.parse(readFileSync(opcoes.registrar, 'utf8'))
       : entradaDosArquivos({ modelador: opcoes.modelador, critico: opcoes.critico, atrito: opcoes.atrito, peca });
-    const { rodada, arquivo, medicao } = await registrarMedida(peca, entrada, { pacote: opcoes.pacote ?? null, motivoDosPontos: opcoes['motivo-dos-pontos'] ?? null, decisaoDaPessoa: opcoes['decisao-da-pessoa'] ?? null });
-    const decisao = await acaoDaPeca(peca, { medir: async () => medicao });
+    const { rodada, arquivo, medicao } = await registrarMedida(peca, entrada, { pacote: opcoes.pacote ?? null, motivoDosPontos: opcoes['motivo-dos-pontos'] ?? null, ...(aviso ? { pasta } : {}) });
+    const decisao = await acaoDaPeca(peca, { medir: async () => medicao, ...(aviso ? { pasta } : {}) });
     return {
       codigo: 0,
-      texto: `rodada ${rodada.numero} gravada em ${arquivo.replace(`${REPO}/`, '')}\n`
+      texto: `${aviso}rodada ${rodada.numero} gravada em ${arquivo.replace(`${REPO}/`, '')}\n`
         + `medição da receita (sha256:${curto(medicao.sha256)}): ${medicao.passou ? 'passou' : 'reprovou'}\n`
         + linhasDeAviso(medicao)
-        + (rodada.decisaoDaPessoa ? `decisão da pessoa gravada na rodada ${rodada.numero}: ${rodada.decisaoDaPessoa}\n` : '')
         + `próxima ação: ${decisao.acao} — ${decisao.motivo}`,
     };
   }
 
-  if (opcoes['decisao-da-pessoa'] !== undefined) {
-    return { codigo: 1, texto: `--decisao-da-pessoa recebido sem --registrar; esperado junto do registro da rodada, que é onde a decisão fica gravada. `
-      + `Use \`node tools/modelar/rodada-de-modelagem.mjs ${peca} --registrar --modelador <arquivo> --critico <arquivo> --decisao-da-pessoa ${FORMATO_DE_QUEM}\`.` };
-  }
-  const rodadas = lerRodadas(peca);
-  const decisao = await acaoDaPeca(peca, { rodadas });
-  return { codigo: 0, texto: resumoDoLaco(peca, { rodadas, decisao }) };
+  const rodadas = lerRodadas(peca, { pasta });
+  const decisoes = lerDecisoesDaPessoa(peca, { pasta });
+  const decisao = await acaoDaPeca(peca, { rodadas, pasta });
+  return { codigo: 0, texto: `${aviso}${resumoDoLaco(peca, { rodadas, decisao, decisoes })}` };
 }
 
 /* ---- a contradição e a repetição entre rodadas ---- */
@@ -924,17 +1174,17 @@ export function secaoDeContradicoes(achados) {
 
 /**
  * O resumo do laço que `--acao` imprime: as rodadas, a medição da receita atual, os avisos dela (a dispensa de `PLANO.lataria`, com o
- * motivo), a próxima ação, os defeitos em aberto e as contradições e repetições da última rodada (`contradicoesEntreRodadas`). `decisao`
- * é o que `acaoDaPeca` devolve.
+ * motivo), a próxima ação, as decisões da pessoa por rodada (`decisoes`, de `lerDecisoesDaPessoa`, cada uma entre aspas de JSON, para
+ * que um texto com quebra de linha não escreva linha que pareça da ferramenta), os defeitos em aberto e as contradições
+ * e repetições da última rodada (`contradicoesEntreRodadas`). `decisao` é o que `acaoDaPeca` devolve.
  */
-export function resumoDoLaco(peca, { rodadas, decisao }) {
+export function resumoDoLaco(peca, { rodadas, decisao, decisoes = [] }) {
   const abertos = defeitosAbertos(rodadas);
-  const comDecisao = [...rodadas].reverse().find((r) => typeof r.decisaoDaPessoa === 'string');
   return `${rodadas.length} rodada(s) registrada(s) para '${peca}'.\n`
     + (decisao.medicao ? `medição da receita atual (sha256:${curto(decisao.medicao.sha256)}): ${decisao.medicao.passou ? 'passou' : 'reprovou'}\n` : 'sem receita para medir ainda.\n')
     + linhasDeAviso(decisao.medicao)
     + `próxima ação: ${decisao.acao} — ${decisao.motivo}\n`
-    + (comDecisao ? `decisão da pessoa na rodada ${comDecisao.numero}: ${comDecisao.decisaoDaPessoa}\n` : '')
+    + (decisoes.length ? `decisões da pessoa:\n${decisoes.map((d) => `  rodada ${d.rodada}: ${JSON.stringify(String(d.decisao))}`).join('\n')}\n` : '')
     + (abertos.length
       ? `defeitos em aberto:\n${abertos.map((d) => `  ${d.parte}: ${d.tipo} ${d.sentido} em ${d.onde}`).join('\n')}`
       : 'defeitos em aberto: nenhum.')

@@ -47,7 +47,7 @@ import { basename, dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { acaoDaReceita, defeitosAbertos } from '../../src/autoria/laco-de-modelagem.js';
 import { proximaEtapa } from '../../src/autoria/etapas-de-construcao.js';
-import { acaoDaPeca, decisaoDaPessoa, lerRodadas, medirReceita } from './rodada-de-modelagem.mjs';
+import { acaoDaPeca, decisaoSobreAsParadas, lerRodadas, medirReceita } from './rodada-de-modelagem.mjs';
 import { pastaDasReferencias } from './objeto.mjs';
 
 const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
@@ -433,7 +433,7 @@ export async function fluxoDoObjeto(pastaDoObjeto, { medir = null, acervo = ACER
     else if (!p.receita) Object.assign(linha, { estado: 'sem receita', acao: 'modelar', motivo: 'a peça não tem receita.', defeitos: [] });
     else {
       /* a decisão gravada da pessoa (o limite e a rodada a partir da qual a convergência conta), a mesma que `--acao` lê */
-      const { limite, convergenciaDesde, por } = decisaoDaPessoa(p.ref, { pasta: pastaRodadas });
+      const { limite, convergenciaDesde, por } = decisaoSobreAsParadas(p.ref, { pasta: pastaRodadas });
       const d = medir ? { ...(await medir(p.ref, { rodadas, limite, convergenciaDesde, por, pasta: pastaRodadas, registroLido })), medida: true }
         : acaoSemMedir(rodadas, readFileSync(p.receita, 'utf8'), { limite, convergenciaDesde, por });
       const abertos = defeitosAbertos(rodadas).map((x) => `${x.parte}: ${x.tipo} ${x.sentido} em ${x.onde}`);
