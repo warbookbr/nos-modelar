@@ -2,6 +2,8 @@
 
 **Estado:** rascunho
 
+**Núcleo:** não
+
 **Tipo:** raiz
 
 **Território:** nenhum. Este plano não muda arquivo de código; ele só gera os dois planos abaixo, e cada um declara o próprio território ao ser ativado.

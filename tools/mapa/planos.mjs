@@ -57,6 +57,25 @@ const TETO_DE_LINHAS = 300;
    crases e separados por vírgula) ou `nenhum (aguarda aprovação)`. Dois planos ativos não podem ter caminhos em que um
    é prefixo do outro. Os caminhos de CAMINHOS_COMPARTILHADOS pertencem a todos e ficam fora dessa conta. */
 export const MAXIMO_DE_ATIVOS = 6;
+
+/* VAGAS DE NÚCLEO (decidido pela pessoa em 2026-11-26, plano do processo e do CI): além dos MAXIMO_DE_ATIVOS de qualquer tipo,
+   até VAGAS_EXTRAS_DE_NUCLEO planos ativos a mais, só de ajuste ou melhoria do núcleo. Todo plano em jogo declara
+   `**Núcleo:** sim` ou `**Núcleo:** não` abaixo do Estado, e no plano ativo o campo é conferido contra o território: sim pede um
+   caminho em PASTA_DO_NUCLEO, e um caminho lá pede sim. Assim nenhum plano comum ocupa uma vaga de núcleo. */
+export const VAGAS_EXTRAS_DE_NUCLEO = 3;
+export const PASTA_DO_NUCLEO = 'procedural/nucleo/';
+
+/* O campo Núcleo de um plano: true, false, ou undefined quando falta ou é ilegível. */
+export function nucleoDe(texto) {
+  const valor = texto.match(/^\*\*Núcleo:\*\*\s*(.+?)\s*$/m)?.[1]?.toLowerCase().replace(/\.$/, '');
+  return valor === 'sim' ? true : valor === 'não' ? false : undefined;
+}
+
+/* Os caminhos do território que ficam no núcleo, antes do filtro dos compartilhados. */
+function caminhosNoNucleo(texto) {
+  const linha = texto.match(/^\*\*Território:\*\*\s*(.*?)\s*$/m)?.[1] ?? '';
+  return [...linha.matchAll(/`([^`]+)`/g)].map((m) => m[1].trim()).filter((c) => sobrepoe(c, PASTA_DO_NUCLEO));
+}
 export const CAMINHOS_COMPARTILHADOS = [
   'docs/modelar/planos/',
   'docs/MAPA.md',
@@ -165,9 +184,27 @@ export function conferirPlanos({
     return { nome, estado, linhas, naRaiz };
   });
 
+  for (const plano of planos) {
+    if (!plano.naRaiz || !ESTADOS_EM_JOGO.has(plano.estado)) continue;
+    const nucleo = nucleoDe(textoDe[plano.nome]);
+    plano.nucleo = nucleo;
+    if (nucleo === undefined) {
+      problemas.push(`${plano.nome}: falta a linha **Núcleo:** sim ou **Núcleo:** não abaixo do Estado (recebido: ${JSON.stringify(textoDe[plano.nome].match(/^\*\*Núcleo:\*\*.*$/m)?.[0] ?? 'nada')}); declare se o plano muda ${PASTA_DO_NUCLEO}`);
+      continue;
+    }
+    if (plano.estado !== 'ativo') continue;
+    const noNucleo = caminhosNoNucleo(textoDe[plano.nome]);
+    if (nucleo && !noNucleo.length) problemas.push(`${plano.nome}: declara **Núcleo:** sim e o território não tem caminho em ${PASTA_DO_NUCLEO}; ponha o caminho do núcleo no território ou declare não`);
+    if (!nucleo && noNucleo.length) problemas.push(`${plano.nome}: declara **Núcleo:** não e o território tem ${noNucleo.join(', ')}; declare sim`);
+  }
+
   const ativos = planos.filter((plano) => plano.estado === 'ativo');
-  if (ativos.length > MAXIMO_DE_ATIVOS) {
-    problemas.push(`há ${ativos.length} planos ativos; o máximo é ${MAXIMO_DE_ATIVOS}: ${ativos.map((p) => p.nome).join(', ')}`);
+  const comuns = ativos.filter((p) => p.nucleo !== true);
+  if (comuns.length > MAXIMO_DE_ATIVOS) {
+    problemas.push(`há ${comuns.length} planos ativos que não são de núcleo; o máximo é ${MAXIMO_DE_ATIVOS}: ${comuns.map((p) => p.nome).join(', ')}`);
+  }
+  if (ativos.length > MAXIMO_DE_ATIVOS + VAGAS_EXTRAS_DE_NUCLEO) {
+    problemas.push(`há ${ativos.length} planos ativos; o máximo é ${MAXIMO_DE_ATIVOS + VAGAS_EXTRAS_DE_NUCLEO}, ${MAXIMO_DE_ATIVOS} de qualquer tipo e ${VAGAS_EXTRAS_DE_NUCLEO} a mais só de núcleo: ${ativos.map((p) => p.nome).join(', ')}`);
   }
 
   const territorios = [];

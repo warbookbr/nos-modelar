@@ -2,6 +2,8 @@
 
 **Estado:** rascunho
 
+**Núcleo:** sim
+
 **Território:** a declarar ao ativar: `procedural/nucleo/gaiola-por-rede.js` e os testes dela, `tools/fixtures/curva-paralela/`. O arquivo da rede é do plano da [superfície de produção (G2)](congelados/2026-11-22-superficie-de-producao-g2.md) enquanto ele estiver ativo; este plano se ativa depois que o G2 fechar ou soltar o arquivo.
 
 **Responsável:** a definir ao ativar. A pessoa pediu este plano em 2026-11-22, como a fatia 3 do plano das formas que faltavam, separada para não acumular no backlog e para não atrasar o G2, que é a prioridade.

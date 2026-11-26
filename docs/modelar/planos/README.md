@@ -56,7 +56,7 @@ Todo plano curto deve declarar:
 Um plano-raiz declara `**Tipo:** raiz` abaixo do Estado: ele só gera outros planos, não tem implementação e não passa a `pronto` nem a `ativo`, o que `npm run planos:check` recusa.
 
 Estados aceitos nos planos executivos datados: `rascunho`, `pronto`, `ativo`,
-`concluído` e `cancelado`. Até 6 planos podem estar `ativo` ao mesmo tempo, cada um com território declarado (seção abaixo); eram 5 até 2026-11-10, quando duas sessões em paralelo abriram cada uma um plano sobre a mesma base e a pessoa deixou a decisão com quem conduzia.
+`concluído` e `cancelado`. Até 6 planos podem estar `ativo` ao mesmo tempo, cada um com território declarado (seção abaixo); eram 5 até 2026-11-10, quando duas sessões em paralelo abriram cada uma um plano sobre a mesma base e a pessoa deixou a decisão com quem conduzia. Desde 2026-11-26, por decisão da pessoa, até 3 planos a mais podem estar ativos se forem de ajuste ou melhoria do núcleo: todo plano em `rascunho`, `pronto` ou `ativo` declara `**Núcleo:** sim` ou `**Núcleo:** não` abaixo do Estado, e no plano ativo o campo é conferido contra o território (sim pede um caminho em `procedural/nucleo/`, e um caminho lá pede sim). São no máximo 6 planos ativos que não são de núcleo e 9 no total.
 
 Um backlog, programa ou linha candidata não autoriza implementação automática.
 Um plano só fica ativo quando tem objetivo, escopo, gates, território, critério de

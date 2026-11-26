@@ -2,6 +2,8 @@
 
 **Estado:** rascunho
 
+**Núcleo:** sim
+
 **Responsável:** a IA da sessão mede e propõe; a pessoa ativa o plano e decide pelas medidas da fatia 1.
 
 **Repositório e base:** `warbookbr/nos-modelar`, main de 2026-11-26.

@@ -2,6 +2,8 @@
 
 **Estado:** rascunho
 
+**Núcleo:** sim
+
 **Responsável:** a IA da sessão ou o agente despachado de cada fatia; a pessoa aprova a forma por imagem e decide o que está em Decisão da pessoa. As fatias que mudam o núcleo passam pelo `revisor-adversarial` antes do envio.
 
 **Repositório e base:** `warbookbr/nos-modelar`, main de 2026-11-25.

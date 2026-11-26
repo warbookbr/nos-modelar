@@ -16,8 +16,11 @@ function ambiente(indice = '**Planos ativos:** nenhum.\n') {
   return pasta;
 }
 
-function gravar(pasta, nome, estado, linhas = 4, territorio = `\`src/${nome}/\``) {
-  const cabecalho = estado === 'ativo' && territorio !== null ? [`**Território:** ${territorio}`] : [];
+function gravar(pasta, nome, estado, linhas = 4, territorio = `\`src/${nome}/\``, nucleo = territorio?.includes('procedural/nucleo/') ? 'sim' : 'não') {
+  const cabecalho = [
+    ...(['ativo', 'pronto', 'rascunho'].includes(estado) && nucleo !== null ? [`**Núcleo:** ${nucleo}`] : []),
+    ...(estado === 'ativo' && territorio !== null ? [`**Território:** ${territorio}`] : []),
+  ];
   const corpo = [`# Plano`, '', `**Estado:** ${estado}`, ...cabecalho, ...Array(Math.max(0, linhas - 3 - cabecalho.length)).fill('linha')].join('\n');
   writeFileSync(join(pasta, nome), corpo);
 }
@@ -64,7 +67,35 @@ describe('gate dos planos curtos', () => {
     const nomes = ['a', 'b', 'c', 'd', 'e', 'f', 'g'].map((x) => `2026-08-02-${x}.md`);
     const pasta = ambiente(lista(...nomes));
     nomes.forEach((n) => gravar(pasta, n, 'ativo'));
-    expect(conferirPlanos({ pasta }).problemas.join('\n')).toMatch(/7 planos ativos; o máximo é 6/);
+    expect(conferirPlanos({ pasta }).problemas.join('\n')).toMatch(/7 planos ativos que não são de núcleo; o máximo é 6/);
+  });
+
+  it('aceita seis comuns e três de núcleo, e recusa o quarto de núcleo e o sétimo comum', () => {
+    const comuns = ['a', 'b', 'c', 'd', 'e', 'f'].map((x) => `2026-08-02-${x}.md`);
+    const nucleo = ['n1', 'n2', 'n3', 'n4'].map((x) => `2026-08-03-${x}.md`);
+    const nove = ambiente(lista(...comuns, ...nucleo.slice(0, 3)));
+    comuns.forEach((n) => gravar(nove, n, 'ativo'));
+    nucleo.slice(0, 3).forEach((n) => gravar(nove, n, 'ativo', 5, `\`procedural/nucleo/${n}.js\``));
+    expect(conferirPlanos({ pasta: nove }).problemas).toEqual([]);
+    const dez = ambiente(lista(...comuns, ...nucleo));
+    comuns.forEach((n) => gravar(dez, n, 'ativo'));
+    nucleo.forEach((n) => gravar(dez, n, 'ativo', 5, `\`procedural/nucleo/${n}.js\``));
+    expect(conferirPlanos({ pasta: dez }).problemas.join('\n')).toMatch(/10 planos ativos; o máximo é 9/);
+    const seteComuns = ambiente(lista(...comuns, '2026-08-02-g.md', nucleo[0]));
+    [...comuns, '2026-08-02-g.md'].forEach((n) => gravar(seteComuns, n, 'ativo'));
+    gravar(seteComuns, nucleo[0], 'ativo', 5, `\`procedural/nucleo/${nucleo[0]}.js\``);
+    expect(conferirPlanos({ pasta: seteComuns }).problemas.join('\n')).toMatch(/7 planos ativos que não são de núcleo/);
+  });
+
+  it('confere o campo Núcleo contra o território, nos dois sentidos, e exige o campo', () => {
+    const pasta = ambiente(lista('2026-08-02-a.md', '2026-08-02-b.md', '2026-08-02-c.md'));
+    gravar(pasta, '2026-08-02-a.md', 'ativo', 5, '`src/a/`', 'sim');
+    gravar(pasta, '2026-08-02-b.md', 'ativo', 5, '`procedural/nucleo/b.js`', 'não');
+    gravar(pasta, '2026-08-02-c.md', 'ativo', 5, '`src/c/`', null);
+    const texto = conferirPlanos({ pasta }).problemas.join('\n');
+    expect(texto).toMatch(/2026-08-02-a\.md: declara \*\*Núcleo:\*\* sim e o território não tem caminho em procedural\/nucleo\//);
+    expect(texto).toMatch(/2026-08-02-b\.md: declara \*\*Núcleo:\*\* não e o território tem procedural\/nucleo\/b\.js; declare sim/);
+    expect(texto).toMatch(/2026-08-02-c\.md: falta a linha \*\*Núcleo:\*\*/);
   });
 
   it('recusa plano ativo sem a linha de território', () => {
