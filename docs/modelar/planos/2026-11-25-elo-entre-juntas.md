@@ -63,7 +63,7 @@ O núcleo não ganha nome de objeto nem operação nova, e o acervo sai igual. A
 
 Decidido em 2026-11-25, pela recomendação: a seção padrão do membro é a elíptica de cantos suaves e a parede padrão é de 2 mm, as duas trocáveis por parâmetro. As linhas de painel ficam para o plano de acabamento de hard surface.
 
-Decidido em 2026-11-26, junto com a ativação do [esqueleto de proporção](2026-11-26-esqueleto-de-proporcao.md): a perna de prova da fatia 3 tira a posição das juntas do esqueleto aprovado do humanoide, e por isso espera a fatia 3 daquele plano.
+Decidido em 2026-11-26, junto com a ativação do [esqueleto de proporção](../decisoes/PLANOS-ENCERRADOS.md): a perna de prova da fatia 3 tira a posição das juntas do esqueleto aprovado do humanoide, aprovado em 2026-11-26, em `procedural/pecas/esqueleto-humanoide/`.
 
 ## Riscos e parada
 

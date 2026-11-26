@@ -1,0 +1,195 @@
+{
+  "formato": "mecanifica.esqueleto@1",
+  "id": "braco-de-prova",
+  "familia": "humanoide",
+  "unidade": "mm",
+  "nota": "Gerado de esqueleto em proporcoes.json por npm run esqueleto (braco-de-prova). Não edite à mão: a receita da peça de bolas e bastões lê este arquivo.",
+  "chao": null,
+  "raiz": {
+    "id": "tronco",
+    "posicao": [
+      0,
+      1400,
+      0
+    ],
+    "raioDaBola": 70
+  },
+  "juntas": [
+    {
+      "id": "ombro-direito",
+      "pai": "tronco",
+      "comprimento": 200,
+      "direcao": [
+        1,
+        0,
+        0
+      ],
+      "raioDaBola": 40,
+      "raioDoBastao": 22,
+      "eixo": [
+        0,
+        0,
+        1
+      ],
+      "curso": {
+        "minimo": -100,
+        "maximo": 180
+      },
+      "posicao": [
+        200,
+        1400,
+        0
+      ]
+    },
+    {
+      "id": "cotovelo-direito",
+      "pai": "ombro-direito",
+      "comprimento": 300,
+      "direcao": [
+        0,
+        -1,
+        0
+      ],
+      "raioDaBola": 32,
+      "raioDoBastao": 22,
+      "eixo": [
+        0,
+        0,
+        1
+      ],
+      "curso": {
+        "minimo": -140,
+        "maximo": 0
+      },
+      "posicao": [
+        200,
+        1100,
+        0
+      ]
+    },
+    {
+      "id": "mao-direito",
+      "pai": "cotovelo-direito",
+      "comprimento": 250,
+      "direcao": [
+        0,
+        -1,
+        0
+      ],
+      "raioDaBola": 28,
+      "raioDoBastao": 18,
+      "eixo": null,
+      "curso": null,
+      "posicao": [
+        200,
+        850,
+        0
+      ]
+    },
+    {
+      "id": "ombro-esquerdo",
+      "pai": "tronco",
+      "comprimento": 200,
+      "direcao": [
+        -1,
+        0,
+        0
+      ],
+      "raioDaBola": 40,
+      "raioDoBastao": 22,
+      "eixo": [
+        0,
+        0,
+        -1
+      ],
+      "curso": {
+        "minimo": -100,
+        "maximo": 180
+      },
+      "posicao": [
+        -200,
+        1400,
+        0
+      ]
+    },
+    {
+      "id": "cotovelo-esquerdo",
+      "pai": "ombro-esquerdo",
+      "comprimento": 300,
+      "direcao": [
+        0,
+        -1,
+        0
+      ],
+      "raioDaBola": 32,
+      "raioDoBastao": 22,
+      "eixo": [
+        0,
+        0,
+        -1
+      ],
+      "curso": {
+        "minimo": -140,
+        "maximo": 0
+      },
+      "posicao": [
+        -200,
+        1100,
+        0
+      ]
+    },
+    {
+      "id": "mao-esquerdo",
+      "pai": "cotovelo-esquerdo",
+      "comprimento": 250,
+      "direcao": [
+        0,
+        -1,
+        0
+      ],
+      "raioDaBola": 28,
+      "raioDoBastao": 18,
+      "eixo": null,
+      "curso": null,
+      "posicao": [
+        -200,
+        850,
+        0
+      ]
+    },
+    {
+      "id": "bacia",
+      "pai": "tronco",
+      "comprimento": 450,
+      "direcao": [
+        0,
+        -1,
+        0
+      ],
+      "raioDaBola": 90,
+      "raioDoBastao": 80,
+      "eixo": null,
+      "curso": null,
+      "posicao": [
+        0,
+        950,
+        0
+      ]
+    }
+  ],
+  "poses": [
+    {
+      "nome": "bracos-abertos",
+      "angulos": {
+        "ombro-direito": 90,
+        "ombro-esquerdo": 90
+      }
+    },
+    {
+      "nome": "antebraco-no-tronco",
+      "angulos": {
+        "cotovelo-direito": -90
+      }
+    }
+  ]
+}

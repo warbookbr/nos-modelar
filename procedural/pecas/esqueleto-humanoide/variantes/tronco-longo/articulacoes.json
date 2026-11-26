@@ -1,0 +1,455 @@
+{
+  "nota": "Gerado de esqueleto.juntas em proporcoes.json por npm run esqueleto (esqueleto-humanoide-tronco-longo). Não edite à mão. Fixo é a própria junta, móvel é a primeira filha e acompanham é o resto do que pende dela.",
+  "articulacoes": [
+    {
+      "id": "tronco",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "tronco"
+        ],
+        "porta": "porta-tronco"
+      },
+      "movel": {
+        "caminho": [
+          "pescoco"
+        ],
+        "porta": "porta-tronco"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": -30,
+        "maximo": 60
+      },
+      "passos": 18,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": [
+        [
+          "cabeca"
+        ],
+        [
+          "ombro-direito"
+        ],
+        [
+          "cotovelo-direito"
+        ],
+        [
+          "punho-direito"
+        ],
+        [
+          "mao-direito"
+        ],
+        [
+          "ombro-esquerdo"
+        ],
+        [
+          "cotovelo-esquerdo"
+        ],
+        [
+          "punho-esquerdo"
+        ],
+        [
+          "mao-esquerdo"
+        ]
+      ]
+    },
+    {
+      "id": "pescoco",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "pescoco"
+        ],
+        "porta": "porta-pescoco"
+      },
+      "movel": {
+        "caminho": [
+          "cabeca"
+        ],
+        "porta": "porta-pescoco"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": -40,
+        "maximo": 50
+      },
+      "passos": 18,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": []
+    },
+    {
+      "id": "ombro-direito",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "ombro-direito"
+        ],
+        "porta": "porta-ombro-direito"
+      },
+      "movel": {
+        "caminho": [
+          "cotovelo-direito"
+        ],
+        "porta": "porta-ombro-direito"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": -60,
+        "maximo": 180
+      },
+      "passos": 48,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": [
+        [
+          "punho-direito"
+        ],
+        [
+          "mao-direito"
+        ]
+      ]
+    },
+    {
+      "id": "cotovelo-direito",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "cotovelo-direito"
+        ],
+        "porta": "porta-cotovelo-direito"
+      },
+      "movel": {
+        "caminho": [
+          "punho-direito"
+        ],
+        "porta": "porta-cotovelo-direito"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": 0,
+        "maximo": 145
+      },
+      "passos": 29,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": [
+        [
+          "mao-direito"
+        ]
+      ]
+    },
+    {
+      "id": "punho-direito",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "punho-direito"
+        ],
+        "porta": "porta-punho-direito"
+      },
+      "movel": {
+        "caminho": [
+          "mao-direito"
+        ],
+        "porta": "porta-punho-direito"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": -70,
+        "maximo": 80
+      },
+      "passos": 30,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": []
+    },
+    {
+      "id": "ombro-esquerdo",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "ombro-esquerdo"
+        ],
+        "porta": "porta-ombro-esquerdo"
+      },
+      "movel": {
+        "caminho": [
+          "cotovelo-esquerdo"
+        ],
+        "porta": "porta-ombro-esquerdo"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": -60,
+        "maximo": 180
+      },
+      "passos": 48,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": [
+        [
+          "punho-esquerdo"
+        ],
+        [
+          "mao-esquerdo"
+        ]
+      ]
+    },
+    {
+      "id": "cotovelo-esquerdo",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "cotovelo-esquerdo"
+        ],
+        "porta": "porta-cotovelo-esquerdo"
+      },
+      "movel": {
+        "caminho": [
+          "punho-esquerdo"
+        ],
+        "porta": "porta-cotovelo-esquerdo"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": 0,
+        "maximo": 145
+      },
+      "passos": 29,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": [
+        [
+          "mao-esquerdo"
+        ]
+      ]
+    },
+    {
+      "id": "punho-esquerdo",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "punho-esquerdo"
+        ],
+        "porta": "porta-punho-esquerdo"
+      },
+      "movel": {
+        "caminho": [
+          "mao-esquerdo"
+        ],
+        "porta": "porta-punho-esquerdo"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": -70,
+        "maximo": 80
+      },
+      "passos": 30,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": []
+    },
+    {
+      "id": "quadril-direito",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "quadril-direito"
+        ],
+        "porta": "porta-quadril-direito"
+      },
+      "movel": {
+        "caminho": [
+          "joelho-direito"
+        ],
+        "porta": "porta-quadril-direito"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": -30,
+        "maximo": 125
+      },
+      "passos": 31,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": [
+        [
+          "tornozelo-direito"
+        ],
+        [
+          "ponta-do-pe-direito"
+        ]
+      ]
+    },
+    {
+      "id": "joelho-direito",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "joelho-direito"
+        ],
+        "porta": "porta-joelho-direito"
+      },
+      "movel": {
+        "caminho": [
+          "tornozelo-direito"
+        ],
+        "porta": "porta-joelho-direito"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": 0,
+        "maximo": 140
+      },
+      "passos": 28,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": [
+        [
+          "ponta-do-pe-direito"
+        ]
+      ]
+    },
+    {
+      "id": "tornozelo-direito",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "tornozelo-direito"
+        ],
+        "porta": "porta-tornozelo-direito"
+      },
+      "movel": {
+        "caminho": [
+          "ponta-do-pe-direito"
+        ],
+        "porta": "porta-tornozelo-direito"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": -45,
+        "maximo": 25
+      },
+      "passos": 14,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": []
+    },
+    {
+      "id": "quadril-esquerdo",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "quadril-esquerdo"
+        ],
+        "porta": "porta-quadril-esquerdo"
+      },
+      "movel": {
+        "caminho": [
+          "joelho-esquerdo"
+        ],
+        "porta": "porta-quadril-esquerdo"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": -30,
+        "maximo": 125
+      },
+      "passos": 31,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": [
+        [
+          "tornozelo-esquerdo"
+        ],
+        [
+          "ponta-do-pe-esquerdo"
+        ]
+      ]
+    },
+    {
+      "id": "joelho-esquerdo",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "joelho-esquerdo"
+        ],
+        "porta": "porta-joelho-esquerdo"
+      },
+      "movel": {
+        "caminho": [
+          "tornozelo-esquerdo"
+        ],
+        "porta": "porta-joelho-esquerdo"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": 0,
+        "maximo": 140
+      },
+      "passos": 28,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": [
+        [
+          "ponta-do-pe-esquerdo"
+        ]
+      ]
+    },
+    {
+      "id": "tornozelo-esquerdo",
+      "tipo": "revolucao",
+      "fixo": {
+        "caminho": [
+          "tornozelo-esquerdo"
+        ],
+        "porta": "porta-tornozelo-esquerdo"
+      },
+      "movel": {
+        "caminho": [
+          "ponta-do-pe-esquerdo"
+        ],
+        "porta": "porta-tornozelo-esquerdo"
+      },
+      "unidade": "graus",
+      "curso": {
+        "minimo": -45,
+        "maximo": 25
+      },
+      "passos": 14,
+      "folga": {
+        "valor": 0,
+        "unidade": "mm"
+      },
+      "acompanham": []
+    }
+  ]
+}

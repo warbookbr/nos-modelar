@@ -1,0 +1,317 @@
+{
+  "formato": "mecanifica.proporcoes@1",
+  "id": "esqueleto-humanoide",
+  "unidade": "mm",
+  "nota": "Esqueleto de proporção do humanoide de 1.750 mm (adulto, medidas antropométricas médias; o braço reaproveita as medidas de procedural/pecas/robo-humanoide/proporcoes.json). `npm run esqueleto -- --proporcoes=procedural/pecas/esqueleto-humanoide/proporcoes.json --escrever` grava andaime.json, articulacoes.json e esqueleto.json.",
+  "medidas": {
+    "alturaDoRobo": 1750,
+    "eixoDoBraco": 250,
+    "comprimentoDoBraco": 330,
+    "comprimentoDoAntebraco": 230,
+    "comprimentoDaMao": 190,
+    "comprimentoDaCoxa": 431,
+    "comprimentoDaCanela": 431,
+    "alturaDoTornozelo": 68,
+    "larguraDoQuadril": 100,
+    "comprimentoDoPe": 190,
+    "comprimentoDoTronco": 505,
+    "comprimentoDoPescoco": 90,
+    "comprimentoDaCabeca": 127,
+    "alturaDoQuadril": "=comprimentoDaCoxa + comprimentoDaCanela + alturaDoTornozelo",
+    "alturaDoOmbro": "=alturaDoQuadril + comprimentoDoTronco",
+    "alturaDoTopoDaCabeca": "=alturaDoOmbro + comprimentoDoPescoco + comprimentoDaCabeca + raioDaCabeca",
+    "raioDaBacia": 45,
+    "raioDoTorso": 52,
+    "raioDoTronco": 45,
+    "raioDoPescoco": 22,
+    "raioDoBastaoDoPescoco": 18,
+    "raioDaCabeca": 98,
+    "raioDoBastaoDaCabeca": 18,
+    "raioDoOmbro": 40,
+    "raioDoBastaoDoOmbro": 28,
+    "raioDoCotovelo": 32,
+    "raioDoBastaoDoBraco": 26,
+    "raioDoPunho": 26,
+    "raioDoBastaoDoAntebraco": 22,
+    "raioDaMao": 28,
+    "raioDoBastaoDaMao": 18,
+    "raioDoQuadril": 40,
+    "raioDoBastaoDoQuadril": 35,
+    "raioDoJoelho": 42,
+    "raioDoBastaoDaCoxa": 40,
+    "raioDoTornozelo": 38,
+    "raioDoBastaoDaCanela": 30,
+    "raioDoPe": 30,
+    "raioDoBastaoDoPe": 30
+  },
+  "esqueleto": {
+    "id": "esqueleto-humanoide",
+    "familia": "humanoide",
+    "intencao": "Humanoide de 1.750 mm na pose zero (em pé, braços pendentes, pés no chão), com as poses sentado e braço erguido.",
+    "saidas": {
+      "andaime": "andaime.json",
+      "articulacoes": "articulacoes.json",
+      "esqueleto": "esqueleto.json"
+    },
+    "chao": 0,
+    "raiz": {
+      "id": "bacia",
+      "posicao": [
+        0,
+        "=alturaDoQuadril",
+        0
+      ],
+      "raioDaBola": "=raioDaBacia"
+    },
+    "juntas": [
+      {
+        "id": "tronco",
+        "pai": "bacia",
+        "comprimento": "=comprimentoDoTronco",
+        "direcao": [
+          0,
+          1,
+          0
+        ],
+        "raioDaBola": "=raioDoTronco",
+        "raioDoBastao": "=raioDoTorso",
+        "eixo": [
+          -1,
+          0,
+          0
+        ],
+        "curso": {
+          "minimo": -30,
+          "maximo": 60
+        }
+      },
+      {
+        "id": "pescoco",
+        "pai": "tronco",
+        "comprimento": "=comprimentoDoPescoco",
+        "direcao": [
+          0,
+          1,
+          0
+        ],
+        "raioDaBola": "=raioDoPescoco",
+        "raioDoBastao": "=raioDoBastaoDoPescoco",
+        "eixo": [
+          -1,
+          0,
+          0
+        ],
+        "curso": {
+          "minimo": -40,
+          "maximo": 50
+        }
+      },
+      {
+        "id": "cabeca",
+        "pai": "pescoco",
+        "comprimento": "=comprimentoDaCabeca",
+        "direcao": [
+          0,
+          1,
+          0
+        ],
+        "raioDaBola": "=raioDaCabeca",
+        "raioDoBastao": "=raioDoBastaoDaCabeca"
+      },
+      {
+        "id": "ombro-direito",
+        "pai": "tronco",
+        "comprimento": "=eixoDoBraco",
+        "direcao": [
+          1,
+          0,
+          0
+        ],
+        "raioDaBola": "=raioDoOmbro",
+        "raioDoBastao": "=raioDoBastaoDoOmbro",
+        "eixo": [
+          -1,
+          0,
+          0
+        ],
+        "curso": {
+          "minimo": -60,
+          "maximo": 180
+        }
+      },
+      {
+        "id": "cotovelo-direito",
+        "pai": "ombro-direito",
+        "comprimento": "=comprimentoDoBraco",
+        "direcao": [
+          0,
+          -1,
+          0
+        ],
+        "raioDaBola": "=raioDoCotovelo",
+        "raioDoBastao": "=raioDoBastaoDoBraco",
+        "eixo": [
+          -1,
+          0,
+          0
+        ],
+        "curso": {
+          "minimo": 0,
+          "maximo": 145
+        }
+      },
+      {
+        "id": "punho-direito",
+        "pai": "cotovelo-direito",
+        "comprimento": "=comprimentoDoAntebraco",
+        "direcao": [
+          0,
+          -1,
+          0
+        ],
+        "raioDaBola": "=raioDoPunho",
+        "raioDoBastao": "=raioDoBastaoDoAntebraco",
+        "eixo": [
+          -1,
+          0,
+          0
+        ],
+        "curso": {
+          "minimo": -70,
+          "maximo": 80
+        }
+      },
+      {
+        "id": "mao-direito",
+        "pai": "punho-direito",
+        "comprimento": "=comprimentoDaMao",
+        "direcao": [
+          0,
+          -1,
+          0
+        ],
+        "raioDaBola": "=raioDaMao",
+        "raioDoBastao": "=raioDoBastaoDaMao"
+      },
+      {
+        "id": "ombro-esquerdo",
+        "pai": "tronco",
+        "espelho": {
+          "de": "ombro-direito",
+          "plano": "x",
+          "troca": [
+            "direito",
+            "esquerdo"
+          ]
+        }
+      },
+      {
+        "id": "quadril-direito",
+        "pai": "bacia",
+        "comprimento": "=larguraDoQuadril",
+        "direcao": [
+          1,
+          0,
+          0
+        ],
+        "raioDaBola": "=raioDoQuadril",
+        "raioDoBastao": "=raioDoBastaoDoQuadril",
+        "eixo": [
+          -1,
+          0,
+          0
+        ],
+        "curso": {
+          "minimo": -30,
+          "maximo": 125
+        }
+      },
+      {
+        "id": "joelho-direito",
+        "pai": "quadril-direito",
+        "comprimento": "=comprimentoDaCoxa",
+        "direcao": [
+          0,
+          -1,
+          0
+        ],
+        "raioDaBola": "=raioDoJoelho",
+        "raioDoBastao": "=raioDoBastaoDaCoxa",
+        "eixo": [
+          1,
+          0,
+          0
+        ],
+        "curso": {
+          "minimo": 0,
+          "maximo": 140
+        }
+      },
+      {
+        "id": "tornozelo-direito",
+        "pai": "joelho-direito",
+        "comprimento": "=comprimentoDaCanela",
+        "direcao": [
+          0,
+          -1,
+          0
+        ],
+        "raioDaBola": "=raioDoTornozelo",
+        "raioDoBastao": "=raioDoBastaoDaCanela",
+        "eixo": [
+          -1,
+          0,
+          0
+        ],
+        "curso": {
+          "minimo": -45,
+          "maximo": 25
+        }
+      },
+      {
+        "id": "ponta-do-pe-direito",
+        "pai": "tornozelo-direito",
+        "comprimento": "=comprimentoDoPe",
+        "direcao": [
+          0,
+          -0.2,
+          1
+        ],
+        "raioDaBola": "=raioDoPe",
+        "raioDoBastao": "=raioDoBastaoDoPe"
+      },
+      {
+        "id": "quadril-esquerdo",
+        "pai": "bacia",
+        "espelho": {
+          "de": "quadril-direito",
+          "plano": "x",
+          "troca": [
+            "direito",
+            "esquerdo"
+          ]
+        }
+      }
+    ],
+    "poses": {
+      "sentado": {
+        "angulos": {
+          "quadril-direito": 90,
+          "quadril-esquerdo": 90,
+          "joelho-direito": 90,
+          "joelho-esquerdo": 90
+        },
+        "deslocamentoDaRaiz": [
+          0,
+          "=0 - comprimentoDaCoxa",
+          0
+        ]
+      },
+      "braco-erguido": {
+        "angulos": {
+          "ombro-direito": 150
+        }
+      }
+    }
+  }
+}

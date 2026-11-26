@@ -6,6 +6,7 @@
 > algum arquivo-fonte estiver sem cabeçalho.
 
 2446 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2445 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -378,6 +379,10 @@
 - `medir-farol.mjs` — medir-farol.mjs — as medidas do gate 1 do plano esboço pelo núcleo: em cada opção do farol na chapa curva (`farol-na-chapa.esboco.mjs`), a borda de fora de c…
 - `mesa-com-variantes.js` — mesa-com-variantes — cópia de prova de `procedural/pecas/mesa-quadrada-escura/receita.js` para o gate 2 do plano esboço pelo núcleo: o mesmo código, com este…
 
+## docs/modelar/banco-de-provas/esqueleto-de-proporcao-2026-11-26/
+
+- `README.md` — Esqueleto de proporção: o humanoide de 1.750 mm aprovado em 2026-11-26
+
 ## docs/modelar/banco-de-provas/etapas-pela-impressao-2026-11-17/
 
 - `README.md` — Etapas pela impressão do aceite: provas
@@ -742,7 +747,6 @@
 - `2026-11-22-curva-paralela-na-rede.md` — Curva paralela na rede de curvas: os anéis em volta de um vão sem desenhar ponto a ponto
 - `2026-11-25-acabamento-hard-surface.md` — Acabamento de hard surface: chanfro e arredondamento em qualquer aresta, linhas de painel e recortes na casca
 - `2026-11-25-elo-entre-juntas.md` — Elo entre juntas: a carenagem oca do membro, de uma flange de atuador à outra
-- `2026-11-26-esqueleto-de-proporcao.md` — Esqueleto de proporção: bolas nas juntas e bastões nos membros, em 3D, antes de modelar o robô
 - `2026-11-26-ferramentas-e-documentacao.md` — Ferramentas e documentação: toda ferramenta registrada e achada, e o roteador cobrindo o trabalho inteiro
 - `2026-11-26-laco-de-modelagem-mais-rapido.md` — Laço de modelagem mais rápido: a rodada mede, mostra e registra em minutos, com a decisão da pessoa gravada
 - `2026-11-26-operacoes-repartidas-entre-nucleos.md` — Operações repartidas entre núcleos: o corte das aberturas, a subtração e a divisão usando mais de um núcleo, com a mesma malha
@@ -2346,6 +2350,14 @@
 
 - `alvo.md` — Alvo da escrivaninha com gaveta
 
+## procedural/pecas/esqueleto-humanoide/
+
+- `receita.js` — receita.js — a peça de bolas e bastões do esqueleto humanoide, na pose zero. Lê o esqueleto resolvido que `npm run esqueleto -- --proporcoes=procedural/pecas…
+
+## procedural/pecas/esqueleto-humanoide/referencias/
+
+- `alvo.md` — Alvo do esqueleto humanoide
+
 ## procedural/pecas/filtro-de-oleo/
 
 - `receita.js` — filtro-de-oleo: filtro de óleo de rosca de 76 x 80 mm, de pé sobre a junta. Referencial do acervo: Y para cima, chão em y 0 (a face de baixo da junta), eixo …
@@ -2899,6 +2911,7 @@
 - `dobras-aceitas.test.js` — dobras-aceitas.test.js — `PLANO.dobrasAceitas`: o normalizador recusa o que o campo não admite, o plano sem o campo mantém a forma canônica de antes, e a ace…
 - `encaixe-cilindrico-parcial.test.mjs` — Encaixe cilíndrico parcial: o eixo que atravessa uma parede e só depois entra num cubo curto. Sem `encaixeAxial`, o interno precisa cobrir o externo de ponta…
 - `encosto-da-peca.test.mjs` — encosto-da-peca.test.mjs — uma tolerância de "encosta" só para a peça, e a distância do par declarado que não acontece (atrito 5 do RECEITA.md do sedã).
+- `esqueleto-de-bolas.js` — esqueleto-de-bolas.js — a peça de bolas e bastões de um esqueleto de proporção, as poses e o aviso de membro que atravessa outro.
 - `etapas-de-construcao.js` — etapas-de-construcao.js — o que há de comum ao registro de etapas de uma montagem v5: o formato, o erro, as juntas medidas em cada etapa e a próxima etapa a …
 - `etapas-pela-impressao.js` — etapas-pela-impressao.js — o estado de cada etapa de uma montagem v5 como função pura do registro de eventos e do medido agora.
 - `executar-receita-barras.test.mjs` — executar-receita-barras.test.mjs — a estruturaDeBarras na receita de peça: o tubo entre dois pontos, com as pontas fechadas pela operação.
@@ -3575,6 +3588,10 @@
 
 - `mesa-linear.mjs` — mesa-linear.mjs — a mesa linear de prova do plano de elementos de máquina, em milímetro na montagem e metro na receita.
 - `mesa-linear.test.mjs` — mesa-linear.test.mjs — o gate de saída do plano de elementos de máquina: a mesa linear de prova sai com as quatro famílias (perfil, guia, rolamento no mancal…
+
+## tools/fixtures/esqueleto/
+
+- `receita.js` — receita.js — a peça de bolas e bastões da fixture do esqueleto, na pose zero. Lê o esqueleto resolvido que `npm run esqueleto -- --proporcoes=tools/fixtures/…
 
 ## tools/fixtures/faces-finas/
 

@@ -39,7 +39,7 @@ export const LIMITE_DA_TOLERANCIA_DA_PORTA_NA_FAMILIA_MM = 5;
 
 export const FERRAMENTAS_DE_FAMILIA = Object.freeze([
   'aerofolio', 'arquitetura', 'arredonda', 'articula', 'atuador', 'barras', 'bobina', 'booleana', 'cabo', 'came',
-  'casca', 'chapa', 'deforma', 'elos', 'encaixe', 'engrenagem', 'eixo', 'fixador', 'furos', 'gabinete', 'guia',
+  'casca', 'chapa', 'deforma', 'elos', 'encaixe', 'engrenagem', 'eixo', 'esqueleto', 'fixador', 'furos', 'gabinete', 'guia',
   'helice', 'lamina', 'loftSuave', 'manopla', 'mola', 'movel', 'nervura', 'pcb', 'perfil', 'polia', 'repete',
   'ressalto', 'rodaPneu', 'rolamento', 'rosca', 'tecido', 'texto', 'textura', 'tubulacao', 'varre', 'vedacao',
 ].sort());

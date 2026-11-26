@@ -45,6 +45,7 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
 - [Empilhadeira — atritos](empilhadeira-2026-11-09/ATRITOS.md) — `empilhadeira-2026-11-09`
   - [Custo por peça da empilhadeira](empilhadeira-2026-11-09/CUSTO-POR-PECA.md) — `empilhadeira-2026-11-09`
 - [Esboço pelo núcleo — inventário da fatia 1 e provas das fatias 2, 3 e 5](esboco-pelo-nucleo-2026-11-05/README.md) — `esboco-pelo-nucleo-2026-11-05`
+- [Esqueleto de proporção: o humanoide de 1.750 mm aprovado em 2026-11-26](esqueleto-de-proporcao-2026-11-26/README.md) — `esqueleto-de-proporcao-2026-11-26`
 - [Etapas pela impressão do aceite: provas](etapas-pela-impressao-2026-11-17/README.md) — `etapas-pela-impressao-2026-11-17`
 - [Execução paralela: quanto as ferramentas ganham com mais núcleos](execucao-paralela-2026-11-26/README.md) — `execucao-paralela-2026-11-26`
 - `exportacao-2026-10-19`

@@ -4,7 +4,9 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { normalizarAndaimeGlobal } from '../../src/autoria/forma-global.js';
-import { comoCLI, conferirEsqueleto, escreverEsqueleto, gerarEsqueleto } from './esqueleto.mjs';
+import { avisosDaPose, cadeiaDoEsqueleto, posarEsqueleto, receitaDoEsqueleto } from '../../src/autoria/esqueleto-de-bolas.js';
+import { executarReceita } from '../../src/autoria/executar-receita.js';
+import { avisosDoEsqueleto, comoCLI, conferirEsqueleto, escreverEsqueleto, gerarEsqueleto } from './esqueleto.mjs';
 import { conferirProporcoes } from './proporcoes.mjs';
 
 const FIXTURE = 'tools/fixtures/esqueleto';
@@ -55,7 +57,7 @@ describe('geração', () => {
   it('duas execuções dão os mesmos bytes, e as saídas gravadas da fixture batem', () => {
     const a = copia(), b = copia();
     escreverEsqueleto(a.arquivo); escreverEsqueleto(b.arquivo);
-    for (const f of ['andaime.json', 'articulacoes.json']) {
+    for (const f of ['andaime.json', 'articulacoes.json', 'esqueleto.json']) {
       expect(readFileSync(join(a.pasta, f), 'utf8')).toBe(readFileSync(join(b.pasta, f), 'utf8'));
       expect(readFileSync(join(a.pasta, f), 'utf8')).toBe(readFileSync(join(FIXTURE, f), 'utf8'));
     }
@@ -71,7 +73,8 @@ describe('geração', () => {
     expect(p['mao-esquerdo']).toEqual([-200, 850, 0]);
     const andaime = lerJson(`${FIXTURE}/andaime.json`);
     const porta = (id) => andaime.portas.find((x) => x.id === id).interface;
-    expect(porta('porta-ombro-esquerdo').eixo).toEqual([1, 0, 0]);
+    expect(porta('porta-ombro-esquerdo').eixo).toEqual([0, 0, -1]);
+    expect(porta('porta-ombro-direito').eixo).toEqual([0, 0, 1]);
     expect(lerJson(`${FIXTURE}/articulacoes.json`).articulacoes.map((x) => x.id)).toEqual(['ombro-direito', 'cotovelo-direito', 'ombro-esquerdo', 'cotovelo-esquerdo']);
   });
 
@@ -88,8 +91,8 @@ describe('geração', () => {
 
   it('o andaime gerado passa no normalizador de forma-global: uma bola por junta, um bastão por segmento, uma porta por junta com eixo', () => {
     const andaime = normalizarAndaimeGlobal(lerJson(`${FIXTURE}/andaime.json`));
-    expect(andaime.volumes.filter((v) => v.tipo === 'esfera')).toHaveLength(7);
-    expect(andaime.volumes.filter((v) => v.tipo === 'cilindro')).toHaveLength(6);
+    expect(andaime.volumes.filter((v) => v.tipo === 'esfera')).toHaveLength(8);
+    expect(andaime.volumes.filter((v) => v.tipo === 'cilindro')).toHaveLength(7);
     expect(andaime.portas).toHaveLength(4);
   });
 
@@ -127,5 +130,139 @@ describe('conferência (gate 2 do plano)', () => {
     expect(comoCLI([`--proporcoes=${arquivo}`], () => {})).toBe(1);
     expect(comoCLI([`--proporcoes=${arquivo}`, '--escrever'], () => {})).toBe(0);
     expect(comoCLI([`--proporcoes=${arquivo}`], () => {})).toBe(0);
+  });
+});
+
+describe('poses, avisos e a peça (fatia 2)', () => {
+  const caminho = `${FIXTURE}/proporcoes.json`;
+  const arvoreDe = (c) => gerarEsqueleto(c).arvore;
+  const pose = (arvore, nome) => arvore.poses.find((p) => p.nome === nome).angulos;
+
+  it('a pose zero da fixture não tem aviso, e as poses declaradas dão o que dizem', () => {
+    const r = avisosDoEsqueleto(arvoreDe(caminho));
+    expect(r.map((x) => x.pose)).toEqual(['zero', 'bracos-abertos', 'antebraco-no-tronco']);
+    expect(r[0].avisos).toEqual([]);
+    expect(r[1].avisos).toEqual([]);
+    const nomes = r[2].avisos.flatMap((a) => [a.a, a.b]);
+    expect(nomes).toContain('bastao-bacia');
+    expect(nomes).toContain('bastao-mao-direito');
+    expect(r[2].avisos.every((a) => a.tipo === 'atravessa' && a.penetracao > 0)).toBe(true);
+  });
+
+  it('a pose gira a subárvore em torno do eixo, da raiz para as folhas, e os dois lados abrem para fora', () => {
+    const arvore = arvoreDe(caminho);
+    const p = posarEsqueleto(arvore, pose(arvore, 'bracos-abertos'));
+    const perto = (a, b) => a.every((x, i) => Math.abs(x - b[i]) < 1e-6);
+    expect(perto(p.get('ombro-direito'), [200, 1400, 0])).toBe(true);
+    expect(perto(p.get('cotovelo-direito'), [500, 1400, 0])).toBe(true);
+    expect(perto(p.get('cotovelo-esquerdo'), [-500, 1400, 0])).toBe(true);
+    const q = posarEsqueleto(arvore, { 'ombro-direito': 90, 'cotovelo-direito': -90 });
+    expect(perto(q.get('mao-direito'), [500, 1150, 0])).toBe(true);
+  });
+
+  it('o chão acusa o elemento que passa abaixo dele', () => {
+    const { arquivo } = copia();
+    editar(arquivo, (d) => { d.esqueleto.chao = 840; });
+    const avisos = avisosDaPose(arvoreDe(arquivo), {});
+    const abaixo = avisos.filter((a) => a.tipo === 'abaixo-do-chao');
+    expect(abaixo.map((a) => a.elemento)).toEqual(expect.arrayContaining(['bola-mao-direito', 'bola-mao-esquerdo']));
+    expect(abaixo.find((a) => a.elemento === 'bola-mao-direito').abaixo).toBe(18);
+  });
+
+  it('ângulo fora do curso é recusado com campo, recebido, esperado e o comando que conserta', () => {
+    const { arquivo } = copia();
+    editar(arquivo, (d) => { d.esqueleto.poses['bracos-abertos'].angulos['ombro-direito'] = 200; });
+    const aviso = (f) => { try { f(); } catch (e) { return e.message; } return ''; };
+    const msg = aviso(() => gerarEsqueleto(arquivo));
+    expect(msg).toMatch(/esqueleto\.poses\.bracos-abertos\.angulos\.ombro-direito = 200; esperava um ângulo entre -100 e 180 graus, o curso da junta 'ombro-direito'/);
+    expect(msg).toMatch(/conserte com: .*npm run esqueleto -- --proporcoes=/);
+    editar(arquivo, (d) => { d.esqueleto.poses['bracos-abertos'].angulos = { 'mao-direito': 10 }; });
+    expect(aviso(() => gerarEsqueleto(arquivo))).toMatch(/'mao-direito' sem curso/);
+    editar(arquivo, (d) => { d.esqueleto.poses['bracos-abertos'].angulos = {}; d.esqueleto.poses.zero = { angulos: {} }; });
+    expect(aviso(() => gerarEsqueleto(arquivo))).toMatch(/diferente de "zero"/);
+  });
+
+  it('o aviso não reprova por padrão, e --estrito reprova', () => {
+    const { arquivo } = copia();
+    escreverEsqueleto(arquivo);
+    const saida = [];
+    expect(comoCLI([`--proporcoes=${arquivo}`], (t) => saida.push(t))).toBe(0);
+    expect(saida.join('\n')).toMatch(/aviso: pose 'antebraco-no-tronco': bola-mao-direito atravessa bastao-bacia/);
+    expect(saida.join('\n')).toMatch(/zero \(sem aviso\)/);
+    expect(comoCLI([`--proporcoes=${arquivo}`, '--estrito'], () => {})).toBe(1);
+    editar(arquivo, (d) => { delete d.esqueleto.poses['antebraco-no-tronco']; });
+    escreverEsqueleto(arquivo);
+    expect(comoCLI([`--proporcoes=${arquivo}`, '--estrito'], () => {})).toBe(0);
+  });
+
+  it('a peça executa e tem uma parte por junta e por membro, em cada pose', async () => {
+    const arvore = arvoreDe(caminho);
+    for (const nome of ['zero', 'antebraco-no-tronco']) {
+      const receita = receitaDoEsqueleto(arvore, { pose: nome });
+      const partes = receita.PASSOS.filter((p) => p[0] === 'parte').map((p) => p[1].nome);
+      expect(partes).toHaveLength(15);
+      expect(partes).toEqual(expect.arrayContaining(['bolaTronco', 'bolaBacia', 'bolaOmbroDireito', 'bastaoCotoveloEsquerdo', 'bastaoMaoDireito']));
+      expect(receita.PLANO.partes.map((x) => x.nome).sort()).toEqual([...partes].sort());
+      const r = executarReceita(receita);
+      expect(r).toBeTruthy();
+    }
+    expect(() => receitaDoEsqueleto(arvore, { pose: 'inexistente' })).toThrow(/pose 'inexistente' não existe; esperava uma de zero, bracos-abertos, antebraco-no-tronco; conserte com: npm run esqueleto/);
+  });
+
+  it('determinismo: avisos, passos e arquivos saem iguais em duas execuções', () => {
+    const a = arvoreDe(caminho), b = arvoreDe(caminho);
+    expect(JSON.stringify(avisosDoEsqueleto(a))).toBe(JSON.stringify(avisosDoEsqueleto(b)));
+    expect(JSON.stringify(receitaDoEsqueleto(a, { pose: 'antebraco-no-tronco' }).PASSOS)).toBe(JSON.stringify(receitaDoEsqueleto(b, { pose: 'antebraco-no-tronco' }).PASSOS));
+  });
+});
+
+describe('cadeia da receita (TABELA, derivar, gerarPassos) para a guarda do acervo', () => {
+  it('PASSOS da receita lê PARAMS.pose: a mesma receita com outra pose dá outros passos, e a tabela e gerarPassos concordam', () => {
+    const arvore = gerarEsqueleto(`${FIXTURE}/proporcoes.json`).arvore;
+    const receita = receitaDoEsqueleto(arvore, { pose: 'zero' });
+    const { TABELA, derivar, gerarPassos } = cadeiaDoEsqueleto(arvore);
+    expect(TABELA).toEqual({ pose: 'zero' });
+    expect(JSON.stringify(gerarPassos(TABELA))).toBe(JSON.stringify(receita.PASSOS));
+    receita.PARAMS = { pose: 'antebraco-no-tronco' };
+    expect(JSON.stringify(receita.PASSOS)).toBe(JSON.stringify(receitaDoEsqueleto(arvore, { pose: 'antebraco-no-tronco' }).PASSOS));
+    expect(JSON.stringify(receita.PASSOS)).not.toBe(JSON.stringify(gerarPassos(TABELA)));
+    expect(derivar({ pose: 'antebraco-no-tronco' }).angulos).toEqual({ 'cotovelo-direito': -90 });
+    expect(() => gerarPassos({ pose: 'inexistente' })).toThrow(/pose 'inexistente' não existe/);
+  });
+});
+
+describe('deslocamento da raiz na pose', () => {
+  it('move a raiz e tudo o que pende dela, e o chão acusa quando desce demais', () => {
+    const { arquivo } = copia();
+    const { arvore } = gerarEsqueleto(arquivo);
+    const parado = posarEsqueleto(arvore, {});
+    const descido = posarEsqueleto(arvore, {}, [0, -40, 10]);
+    for (const [id, p] of parado) expect(descido.get(id)).toEqual([p[0], p[1] - 40, p[2] + 10]);
+    const fundo = Math.min(...[...parado.values()].map((p) => p[1]));
+    const chao = { ...arvore, chao: fundo - 1000 };
+    expect(avisosDaPose(chao, {}, [0, 0, 0]).filter((a) => a.tipo === 'abaixo-do-chao')).toEqual([]);
+    expect(avisosDaPose(chao, {}, [0, -1200, 0]).some((a) => a.tipo === 'abaixo-do-chao')).toBe(true);
+  });
+
+  it('a pose grava o deslocamento resolvido da fórmula, e o vetor inválido é recusado com o conserto', () => {
+    const { arquivo } = copia();
+    editar(arquivo, (d) => { d.esqueleto.poses['bracos-abertos'].deslocamentoDaRaiz = [0, '=0 - comprimentoDoBraco', 0]; });
+    const pose = gerarEsqueleto(arquivo).arvore.poses.find((p) => p.nome === 'bracos-abertos');
+    expect(pose.deslocamentoDaRaiz[1]).toBeLessThan(0);
+    editar(arquivo, (d) => { d.esqueleto.poses['bracos-abertos'].deslocamentoDaRaiz = [0, -10]; });
+    expect(() => gerarEsqueleto(arquivo)).toThrow(/deslocamentoDaRaiz = \[0,-10\]; esperava um vetor \[x, y, z\].*\n?.*conserte com: .*npm run esqueleto/s);
+  });
+});
+
+describe('pose sem apoio', () => {
+  it('a pose em que nada encosta no chão declarado avisa, e baixar a raiz até o chão tira o aviso', () => {
+    const { arquivo } = copia();
+    const { arvore } = gerarEsqueleto(arquivo);
+    const fundo = Math.min(...[...posarEsqueleto(arvore, {}).values()].map((p) => p[1]));
+    const alto = { ...arvore, chao: fundo - 500 };
+    const aviso = avisosDaPose(alto, {}).find((a) => a.tipo === 'sem-apoio');
+    expect(aviso.folga).toBeGreaterThan(400);
+    const baixado = avisosDaPose(alto, {}, [0, -aviso.folga, 0]);
+    expect(baixado.filter((a) => a.tipo === 'sem-apoio' || a.tipo === 'abaixo-do-chao')).toEqual([]);
   });
 });

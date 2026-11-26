@@ -9,7 +9,12 @@
  *     "id": "braco-de-prova",            slug do esqueleto
  *     "familia": "humanoide",            família do andaime (peca-mecanica, veiculo, humanoide, sistema-articulado)
  *     "objetivo", "alvo", "intencao"     opcionais; sem eles saem "esqueleto-<id>", "alvo-<id>" e um texto padrão
- *     "saidas": { "andaime": "andaime.json", "articulacoes": "articulacoes.json" }   caminhos relativos ao proporcoes.json
+ *     "saidas": { "andaime": "andaime.json", "articulacoes": "articulacoes.json", "esqueleto": "esqueleto.json" }   relativos ao proporcoes.json;
+ *                                       "esqueleto" (a árvore resolvida, com as poses, que a receita da peça lê) é opcional
+ *     "chao": 0,                         opcional: altura y do chão em mm (número ou fórmula); elemento abaixo dele é aviso
+ *     "poses": { "braco-no-tronco": { "angulos": { "cotovelo-direito": -90 } } }   opcional: ângulo em graus por junta com curso, e
+ *                                       "deslocamentoDaRaiz": [x, y, z] opcional, que move a raiz e tudo o que pende dela na pose; dentro
+ *                                       do curso (o resto fica em 0); a pose `zero`, todos em 0, sempre existe e não se declara
  *     "raiz":   { "id": "tronco", "posicao": [0, "=alturaDoTronco", 0], "raioDaBola": 60 }
  *     "juntas": [
  *       { "id": "ombro-direito", "pai": "tronco",
@@ -39,12 +44,20 @@
  *   npm run esqueleto -- --proporcoes=<proporcoes.json>             confere a árvore e que os arquivos gravados batem
  *   npm run esqueleto -- --proporcoes=<proporcoes.json> --escrever  grava o andaime e as articulações nos caminhos de "saidas"
  *
+ * Fatia 2: a peça de bolas e bastões (receita que lê `esqueleto.json`; a conta mora em
+ * `src/autoria/esqueleto-de-bolas.js`, pura, para a bancada importar sem disco), as poses, o aviso de membro
+ * que atravessa outro ou passa do chão em cada pose (`--estrito` faz o aviso reprovar) e as vistas por pose (`--vistas`).
+ *
+ *   npm run esqueleto -- --proporcoes=<proporcoes.json> --receita=<receita.js>  --vistas=<pasta>: frente, lado e de cima de cada pose
+ *
  * `npm run proporcoes` sem --escrever também acusa o andaime e as articulações que ficaram para trás. Determinístico: a mesma
  * entrada dá os mesmos bytes. */
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
-import { dirname, resolve } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { spawnSync } from 'node:child_process';
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { normalizarAndaimeGlobal } from '../../src/autoria/forma-global.js';
+import { avisosDaPose, posesDoEsqueleto, textoDoAviso } from '../../src/autoria/esqueleto-de-bolas.js';
 import { lerArgumentos } from './argumentos.mjs';
 import { avaliarFormula, ErroDasProporcoes, lerProporcoes, primeiraDiferenca, resolverMedidas } from './proporcoes.mjs';
 
@@ -57,6 +70,7 @@ const FAMILIAS = ['peca-mecanica', 'veiculo', 'humanoide', 'sistema-articulado']
 const PLANOS = ['x', 'y', 'z'];
 const INDICE = { x: 0, y: 1, z: 2 };
 const ARQUIVOS = [['andaime', 'o andaime'], ['articulacoes', 'as articulações']];
+const OPCIONAIS = [['esqueleto', 'o esqueleto resolvido']];
 
 const objeto = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 const arred = (n) => Number(n.toFixed(ARRED));
@@ -112,6 +126,9 @@ export function resolverEsqueleto(doc, medidas, caminho = '<proporcoes.json>') {
   if (!FAMILIAS.includes(e.familia)) throw new ErroDasProporcoes(`esqueleto.familia = ${mostrar(e.familia)}`, `uma de ${FAMILIAS.join(', ')}`, ctx.conserto('esqueleto.familia'));
   if (!objeto(e.saidas) || ARQUIVOS.some(([k]) => typeof e.saidas[k] !== 'string' || !e.saidas[k])) {
     throw new ErroDasProporcoes(`esqueleto.saidas = ${mostrar(e.saidas)}`, '{ "andaime": "andaime.json", "articulacoes": "articulacoes.json" }', ctx.conserto('esqueleto.saidas'));
+  }
+  if (e.saidas.esqueleto !== undefined && (typeof e.saidas.esqueleto !== 'string' || !e.saidas.esqueleto)) {
+    throw new ErroDasProporcoes(`esqueleto.saidas.esqueleto = ${mostrar(e.saidas.esqueleto)}`, 'o caminho do arquivo da árvore resolvida, como "esqueleto.json", ou nenhum', ctx.conserto('esqueleto.saidas.esqueleto'));
   }
   if (doc.andaime && curto(doc.andaime.arquivo) === curto(e.saidas.andaime)) {
     throw new ErroDasProporcoes(`o andaime '${curto(e.saidas.andaime)}' declarado em "andaime" e em "esqueleto.saidas"`, 'cada arquivo gerado por uma só seção', ctx.conserto('esqueleto.saidas.andaime'));
@@ -224,8 +241,39 @@ export function resolverEsqueleto(doc, medidas, caminho = '<proporcoes.json>') {
   const filhos = (jid) => juntas.filter((j) => j.pai === jid);
   for (const j of juntas) if (j.curso && !filhos(j.id).length) throw new ErroDasProporcoes(`a junta '${j.id}' com curso e sem filha`, 'ao menos uma junta que pende dela para girar', ctx.conserto(`${j.onde}.curso`));
 
+  const chao = e.chao === undefined ? null : numeroDe(e.chao, 'esqueleto.chao', medidas, ctx);
+
+  /* poses: ângulo por junta com curso, dentro do curso */
+  const poses = [];
+  if (e.poses !== undefined) {
+    if (!objeto(e.poses)) throw new ErroDasProporcoes(`esqueleto.poses = ${mostrar(e.poses)}`, '{ "nome-da-pose": { "angulos": { "id-da-junta": graus } } }', ctx.conserto('esqueleto.poses'));
+    for (const [nome, p] of Object.entries(e.poses)) {
+      const onde = `esqueleto.poses.${nome}`;
+      if (!SLUG.test(nome) || nome === 'zero') throw new ErroDasProporcoes(`${onde}, o nome ${mostrar(nome)}`, `um slug em minúsculas diferente de "zero" (a pose zero, com todos os ângulos em 0, sempre existe)`, ctx.conserto(onde));
+      if (!objeto(p) || (p.angulos !== undefined && !objeto(p.angulos))) throw new ErroDasProporcoes(`${onde} = ${mostrar(p)}`, '{ "angulos": { "id-da-junta": graus } }', ctx.conserto(onde));
+      const angulos = {};
+      for (const [jid, valor] of Object.entries(p.angulos ?? {})) {
+        const campo = `${onde}.angulos.${jid}`;
+        const junta = juntas.find((x) => x.id === jid);
+        if (!junta?.curso) throw new ErroDasProporcoes(`${campo} = ${mostrar(valor)}, '${jid}' ${junta ? 'sem curso' : 'que não existe'}`, `o id de uma junta com curso: ${juntas.filter((x) => x.curso).map((x) => x.id).join(', ')}`, ctx.conserto(campo));
+        const graus = numeroDe(valor, campo, medidas, ctx);
+        if (graus < junta.curso.minimo || graus > junta.curso.maximo) {
+          throw new ErroDasProporcoes(`${campo} = ${graus}${typeof valor === 'string' ? ` (de ${mostrar(valor)})` : ''}`, `um ângulo entre ${junta.curso.minimo} e ${junta.curso.maximo} graus, o curso da junta '${jid}'`, ctx.conserto(campo));
+        }
+        angulos[jid] = graus;
+      }
+      let deslocamentoDaRaiz;
+      if (p.deslocamentoDaRaiz !== undefined) {
+        const campo = `${onde}.deslocamentoDaRaiz`;
+        if (!Array.isArray(p.deslocamentoDaRaiz) || p.deslocamentoDaRaiz.length !== 3) throw new ErroDasProporcoes(`${campo} = ${mostrar(p.deslocamentoDaRaiz)}`, 'um vetor [x, y, z] em mm, número ou fórmula, que move a raiz e tudo o que pende dela nesta pose (o sentado baixa a bacia)', ctx.conserto(campo));
+        deslocamentoDaRaiz = p.deslocamentoDaRaiz.map((v, i) => numeroDe(v, `${campo}[${i}]`, medidas, ctx));
+      }
+      poses.push(deslocamentoDaRaiz ? { nome, angulos, deslocamentoDaRaiz } : { nome, angulos });
+    }
+  }
+
   return {
-    id, familia: e.familia, saidas: e.saidas,
+    id, familia: e.familia, saidas: e.saidas, chao, poses,
     objetivo: e.objetivo ?? `esqueleto-${id}`, alvo: e.alvo ?? `alvo-${id}`,
     intencao: e.intencao ?? `Esqueleto de proporção ${id}: uma bola por junta e um bastão por membro, na pose zero.`,
     raiz,
@@ -289,6 +337,28 @@ export function gerarArticulacoesDoEsqueleto(arvore) {
   return { nota: `Gerado de esqueleto.juntas em proporcoes.json por npm run esqueleto (${arvore.id}). Não edite à mão. Fixo é a própria junta, móvel é a primeira filha e acompanham é o resto do que pende dela.`, articulacoes };
 }
 
+/** A árvore resolvida como JSON (`mecanifica.esqueleto@1`), o que a receita da peça de bolas e bastões lê. */
+export function esqueletoResolvido(arvore) {
+  const cinco = (v) => v.map((x) => Number(x.toFixed(9)));
+  const json = {
+    formato: 'mecanifica.esqueleto@1', id: arvore.id, familia: arvore.familia, unidade: 'mm',
+    nota: `Gerado de esqueleto em proporcoes.json por npm run esqueleto (${arvore.id}). Não edite à mão: a receita da peça de bolas e bastões lê este arquivo.`,
+    chao: arvore.chao,
+    raiz: { id: arvore.raiz.id, posicao: arvore.raiz.posicao.map(arred), raioDaBola: arvore.raiz.raioDaBola },
+    juntas: arvore.juntas.map((j) => ({
+      id: j.id, pai: j.pai, comprimento: arred(j.comprimento), direcao: cinco(j.direcao), raioDaBola: j.raioDaBola, raioDoBastao: j.raioDoBastao,
+      eixo: j.eixo ? cinco(j.eixo) : null, curso: j.curso, posicao: j.posicao.map(arred),
+    })),
+    poses: arvore.poses,
+  };
+  return json;
+}
+
+/** Os avisos de cada pose (a zero primeiro): [{ pose, avisos }]. */
+export function avisosDoEsqueleto(arvore) {
+  return posesDoEsqueleto(arvore).map((p) => ({ pose: p.nome, avisos: avisosDaPose(arvore, p.angulos, p.deslocamentoDaRaiz) }));
+}
+
 const texto = (o) => `${JSON.stringify(o, null, 2)}\n`;
 
 /** Os dois arquivos gerados, como texto, e o caminho de cada um. */
@@ -297,13 +367,12 @@ export function gerarEsqueleto(caminho) {
   const medidas = resolverMedidas(doc, caminho);
   const arvore = resolverEsqueleto(doc, medidas, caminho);
   const base = dirname(resolve(caminho));
-  return {
-    arvore,
-    arquivos: [
-      { chave: 'andaime', rotulo: 'o andaime', saida: arvore.saidas.andaime, caminho: resolve(base, arvore.saidas.andaime), json: gerarAndaimeDoEsqueleto(arvore) },
-      { chave: 'articulacoes', rotulo: 'as articulações', saida: arvore.saidas.articulacoes, caminho: resolve(base, arvore.saidas.articulacoes), json: gerarArticulacoesDoEsqueleto(arvore) },
-    ],
-  };
+  const arquivos = [
+    { chave: 'andaime', rotulo: 'o andaime', saida: arvore.saidas.andaime, caminho: resolve(base, arvore.saidas.andaime), json: gerarAndaimeDoEsqueleto(arvore) },
+    { chave: 'articulacoes', rotulo: 'as articulações', saida: arvore.saidas.articulacoes, caminho: resolve(base, arvore.saidas.articulacoes), json: gerarArticulacoesDoEsqueleto(arvore) },
+  ];
+  if (arvore.saidas.esqueleto) arquivos.push({ chave: 'esqueleto', rotulo: 'o esqueleto resolvido', saida: arvore.saidas.esqueleto, caminho: resolve(base, arvore.saidas.esqueleto), json: esqueletoResolvido(arvore) });
+  return { arvore, arquivos, base };
 }
 
 /** Divergências entre os arquivos gravados e o que a árvore gera; vazia quando concordam. Sem seção "esqueleto", vazia. */
@@ -330,29 +399,72 @@ export function escreverEsqueleto(caminho, doc = lerProporcoes(caminho)) {
   return mudou;
 }
 
-const AJUDA = `uso: npm run esqueleto -- --proporcoes=<proporcoes.json> [--escrever] [--json]
-  confere a árvore de juntas da seção "esqueleto" e, sem --escrever, que o andaime e as articulações gravados batem com ela; sai com 1 se divergirem.
-  --escrever grava o andaime e as articulações nos caminhos de "esqueleto.saidas".
-  --json     imprime as divergências como JSON.
+const VISTAS_DA_POSE = ['frontal', 'direita', 'superior'];
+
+/** Gera as imagens de frente, lado e de cima de cada pose com `olhar-bancada`, uma receita por pose na própria pasta de saída
+ * (a ferramenta de vistas não conhece pose). A pasta fica dentro do repositório (o confinamento recusa fora), por padrão em
+ * `tools/bancadas/out/`, que o git ignora. Devolve [{ pose, pasta, imagens }]. */
+export function gerarVistasDoEsqueleto(caminho, pastaDeSaida = null) {
+  const { arvore, arquivos, base } = gerarEsqueleto(caminho);
+  const resolvido = arquivos.find((a) => a.chave === 'esqueleto');
+  const ctx = contexto(caminho);
+  if (!resolvido) throw new ErroDasProporcoes('esqueleto.saidas sem "esqueleto"', 'o caminho do esqueleto resolvido, como { "esqueleto": "esqueleto.json" }', ctx.conserto('esqueleto.saidas'));
+  if (!existsSync(resolvido.caminho)) throw new ErroDasProporcoes(`${curto(resolvido.saida)}, que não existe`, 'o esqueleto resolvido gravado', `${ctx.comando} --escrever`);
+  const repo = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
+  const pasta = resolve(repo, pastaDeSaida ?? join('tools', 'bancadas', 'out', `esqueleto-${arvore.id}`));
+  const dentro = relative(repo, pasta).replace(/\\/g, '/');
+  if (dentro.startsWith('..') || isAbsolute(dentro)) throw new ErroDasProporcoes(`--vistas=${curto(pastaDeSaida)}, fora do repositório`, 'uma pasta dentro do repositório (de preferência em tools/bancadas/out/, que o git ignora)', 'npm run esqueleto -- --proporcoes=<proporcoes.json> --vistas=tools/bancadas/out/esqueleto-<id>');
+  mkdirSync(pasta, { recursive: true });
+  const especificador = (alvo) => { const r = relative(pasta, alvo).replace(/\\/g, '/'); return r.startsWith('.') ? r : `./${r}`; };
+  const modulo = resolve(repo, 'src/autoria/esqueleto-de-bolas.js');
+  const feitas = [];
+  for (const p of posesDoEsqueleto(arvore)) {
+    const receita = join(pasta, `receita-${p.nome}.js`);
+    writeFileSync(receita, `/* gerado por npm run esqueleto --vistas: a pose '${p.nome}' do esqueleto '${arvore.id}'. */\nimport esqueleto from '${especificador(resolvido.caminho)}' with { type: 'json' };\nimport { receitaDoEsqueleto } from '${especificador(modulo)}';\n\nexport default receitaDoEsqueleto(esqueleto, { pose: '${p.nome}' });\n`);
+    const saida = join(dentro, p.nome);
+    const r = spawnSync(process.execPath, [join(repo, 'tools/modelar/olhar-bancada.mjs'), join(dentro, `receita-${p.nome}.js`), `--vistas=${VISTAS_DA_POSE.join(',')}`, '--enquadrar', '--sem-contatos', '--sobrescrever', `--saida=${saida}`], { cwd: repo, encoding: 'utf8', timeout: 300000 });
+    if (r.status !== 0) throw new ErroDasProporcoes(`as vistas da pose '${p.nome}' falharam (código ${r.status}): ${(r.stderr || r.stdout || '').trim().split('\n').slice(-3).join(' | ')}`, 'as imagens frontal, direita e superior', `node tools/modelar/olhar-bancada.mjs ${join(dentro, `receita-${p.nome}.js`)} --ajuda`);
+    const imagens = existsSync(join(repo, saida)) ? readdirSync(join(repo, saida)).filter((f) => f.endsWith('.png')).sort().map((f) => join(saida, f).replace(/\\/g, '/')) : [];
+    feitas.push({ pose: p.nome, pasta: saida.replace(/\\/g, '/'), imagens });
+  }
+  return feitas;
+}
+
+const AJUDA = `uso: npm run esqueleto -- --proporcoes=<proporcoes.json> [--escrever] [--estrito] [--vistas=<pasta>] [--json]
+  confere a árvore de juntas da seção "esqueleto" e, sem --escrever, que o andaime, as articulações e o esqueleto resolvido gravados batem com ela; sai com 1 se divergirem.
+  --escrever grava o andaime, as articulações e o esqueleto resolvido (se declarado) nos caminhos de "esqueleto.saidas".
+  Em cada pose (a zero e as de "esqueleto.poses") lista os pares de elementos, bola ou bastão, que se interpenetram (os vizinhos na árvore
+  ficam fora da conta) e o elemento abaixo do chão declarado ("esqueleto.chao"). O aviso não reprova.
+  --estrito  o aviso de qualquer pose faz o comando sair com 1.
+  --vistas=<pasta>  gera as imagens frontal, direita e superior de cada pose (pasta dentro do repositório, de preferência em tools/bancadas/out/, que o git ignora); pede o esqueleto resolvido gravado e um navegador para a bancada.
+  --json     imprime divergências e avisos como JSON.
   O formato da árvore está no cabeçalho de tools/modelar/esqueleto.mjs.`;
 
 export function comoCLI(argv, saida = (t) => process.stdout.write(`${t}\n`)) {
-  const args = lerArgumentos(argv, { opcoes: ['proporcoes'], bandeiras: ['escrever', 'json', 'ajuda'] });
+  const args = lerArgumentos(argv, { opcoes: ['proporcoes', 'vistas'], bandeiras: ['escrever', 'estrito', 'json', 'ajuda'] });
   if (args.bandeira('ajuda')) { saida(AJUDA); return 0; }
   const caminho = args.opcao('proporcoes');
   if (!caminho) throw new ErroDasProporcoes('nenhum arquivo de proporções', '--proporcoes=<proporcoes.json>', 'npm run esqueleto -- --proporcoes=<pasta-da-montagem>/proporcoes.json');
   const doc = lerProporcoes(caminho);
   if (!doc.esqueleto) throw new ErroDasProporcoes(`${curto(caminho)} sem a seção "esqueleto"`, 'a seção "esqueleto" com raiz, juntas e saidas', `acrescente a seção "esqueleto" em ${curto(caminho)}; o formato está no cabeçalho de tools/modelar/esqueleto.mjs`);
-  if (args.bandeira('escrever')) {
-    const mudou = escreverEsqueleto(caminho, doc);
-    saida(mudou.length ? `escrito: ${mudou.join(', ')}` : 'nada a escrever: o andaime e as articulações já concordam com o esqueleto');
-    return 0;
+  const json = args.bandeira('json');
+  let divergencias = [];
+  let escrito = null;
+  if (args.bandeira('escrever')) escrito = escreverEsqueleto(caminho, doc);
+  else divergencias = conferirEsqueleto(caminho, doc);
+  const porPose = avisosDoEsqueleto(gerarEsqueleto(caminho).arvore);
+  const total = porPose.reduce((n, p) => n + p.avisos.length, 0);
+  const vistas = args.opcao('vistas') ? gerarVistasDoEsqueleto(caminho, args.opcao('vistas')) : null;
+  if (json) saida(JSON.stringify({ divergencias, avisos: porPose, ...(vistas ? { vistas } : {}) }, null, 2));
+  else {
+    if (escrito) saida(escrito.length ? `escrito: ${escrito.join(', ')}` : 'nada a escrever: o andaime, as articulações e o esqueleto resolvido já concordam');
+    else if (!divergencias.length) saida('esqueleto, andaime e articulações concordam');
+    else { saida(`${divergencias.length} divergência(s):`); for (const d of divergencias) saida(`- ${d.mensagem}`); }
+    saida(`poses: ${porPose.map((p) => `${p.pose} (${p.avisos.length ? `${p.avisos.length} aviso(s)` : 'sem aviso'})`).join(', ')}`);
+    for (const p of porPose) for (const a of p.avisos) saida(`aviso: ${textoDoAviso(p.pose, a)}`);
+    if (vistas) for (const v of vistas) saida(`vistas da pose '${v.pose}': ${v.imagens.join(', ') || v.pasta}`);
   }
-  const divergencias = conferirEsqueleto(caminho, doc);
-  if (args.bandeira('json')) saida(JSON.stringify({ divergencias }, null, 2));
-  else if (!divergencias.length) saida('esqueleto, andaime e articulações concordam');
-  else { saida(`${divergencias.length} divergência(s):`); for (const d of divergencias) saida(`- ${d.mensagem}`); }
-  return divergencias.length ? 1 : 0;
+  return divergencias.length || (args.bandeira('estrito') && total) ? 1 : 0;
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

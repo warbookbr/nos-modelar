@@ -1,0 +1,495 @@
+{
+  "formato": "mecanifica.esqueleto@1",
+  "id": "esqueleto-humanoide-pernas-longas",
+  "familia": "humanoide",
+  "unidade": "mm",
+  "nota": "Gerado de esqueleto em proporcoes.json por npm run esqueleto (esqueleto-humanoide-pernas-longas). Não edite à mão: a receita da peça de bolas e bastões lê este arquivo.",
+  "chao": 0,
+  "raiz": {
+    "id": "bacia",
+    "posicao": [
+      0,
+      964.48,
+      0
+    ],
+    "raioDaBola": 45
+  },
+  "juntas": [
+    {
+      "id": "tronco",
+      "pai": "bacia",
+      "comprimento": 505,
+      "direcao": [
+        0,
+        1,
+        0
+      ],
+      "raioDaBola": 45,
+      "raioDoBastao": 52,
+      "eixo": [
+        -1,
+        0,
+        0
+      ],
+      "curso": {
+        "minimo": -30,
+        "maximo": 60
+      },
+      "posicao": [
+        0,
+        1469.48,
+        0
+      ]
+    },
+    {
+      "id": "pescoco",
+      "pai": "tronco",
+      "comprimento": 90,
+      "direcao": [
+        0,
+        1,
+        0
+      ],
+      "raioDaBola": 22,
+      "raioDoBastao": 18,
+      "eixo": [
+        -1,
+        0,
+        0
+      ],
+      "curso": {
+        "minimo": -40,
+        "maximo": 50
+      },
+      "posicao": [
+        0,
+        1559.48,
+        0
+      ]
+    },
+    {
+      "id": "cabeca",
+      "pai": "pescoco",
+      "comprimento": 127,
+      "direcao": [
+        0,
+        1,
+        0
+      ],
+      "raioDaBola": 98,
+      "raioDoBastao": 18,
+      "eixo": null,
+      "curso": null,
+      "posicao": [
+        0,
+        1686.48,
+        0
+      ]
+    },
+    {
+      "id": "ombro-direito",
+      "pai": "tronco",
+      "comprimento": 250,
+      "direcao": [
+        1,
+        0,
+        0
+      ],
+      "raioDaBola": 40,
+      "raioDoBastao": 28,
+      "eixo": [
+        -1,
+        0,
+        0
+      ],
+      "curso": {
+        "minimo": -60,
+        "maximo": 180
+      },
+      "posicao": [
+        250,
+        1469.48,
+        0
+      ]
+    },
+    {
+      "id": "cotovelo-direito",
+      "pai": "ombro-direito",
+      "comprimento": 330,
+      "direcao": [
+        0,
+        -1,
+        0
+      ],
+      "raioDaBola": 32,
+      "raioDoBastao": 26,
+      "eixo": [
+        -1,
+        0,
+        0
+      ],
+      "curso": {
+        "minimo": 0,
+        "maximo": 145
+      },
+      "posicao": [
+        250,
+        1139.48,
+        0
+      ]
+    },
+    {
+      "id": "punho-direito",
+      "pai": "cotovelo-direito",
+      "comprimento": 230,
+      "direcao": [
+        0,
+        -1,
+        0
+      ],
+      "raioDaBola": 26,
+      "raioDoBastao": 22,
+      "eixo": [
+        -1,
+        0,
+        0
+      ],
+      "curso": {
+        "minimo": -70,
+        "maximo": 80
+      },
+      "posicao": [
+        250,
+        909.48,
+        0
+      ]
+    },
+    {
+      "id": "mao-direito",
+      "pai": "punho-direito",
+      "comprimento": 190,
+      "direcao": [
+        0,
+        -1,
+        0
+      ],
+      "raioDaBola": 28,
+      "raioDoBastao": 18,
+      "eixo": null,
+      "curso": null,
+      "posicao": [
+        250,
+        719.48,
+        0
+      ]
+    },
+    {
+      "id": "ombro-esquerdo",
+      "pai": "tronco",
+      "comprimento": 250,
+      "direcao": [
+        -1,
+        0,
+        0
+      ],
+      "raioDaBola": 40,
+      "raioDoBastao": 28,
+      "eixo": [
+        -1,
+        0,
+        0
+      ],
+      "curso": {
+        "minimo": -60,
+        "maximo": 180
+      },
+      "posicao": [
+        -250,
+        1469.48,
+        0
+      ]
+    },
+    {
+      "id": "cotovelo-esquerdo",
+      "pai": "ombro-esquerdo",
+      "comprimento": 330,
+      "direcao": [
+        0,
+        -1,
+        0
+      ],
+      "raioDaBola": 32,
+      "raioDoBastao": 26,
+      "eixo": [
+        -1,
+        0,
+        0
+      ],
+      "curso": {
+        "minimo": 0,
+        "maximo": 145
+      },
+      "posicao": [
+        -250,
+        1139.48,
+        0
+      ]
+    },
+    {
+      "id": "punho-esquerdo",
+      "pai": "cotovelo-esquerdo",
+      "comprimento": 230,
+      "direcao": [
+        0,
+        -1,
+        0
+      ],
+      "raioDaBola": 26,
+      "raioDoBastao": 22,
+      "eixo": [
+        -1,
+        0,
+        0
+      ],
+      "curso": {
+        "minimo": -70,
+        "maximo": 80
+      },
+      "posicao": [
+        -250,
+        909.48,
+        0
+      ]
+    },
+    {
+      "id": "mao-esquerdo",
+      "pai": "punho-esquerdo",
+      "comprimento": 190,
+      "direcao": [
+        0,
+        -1,
+        0
+      ],
+      "raioDaBola": 28,
+      "raioDoBastao": 18,
+      "eixo": null,
+      "curso": null,
+      "posicao": [
+        -250,
+        719.48,
+        0
+      ]
+    },
+    {
+      "id": "quadril-direito",
+      "pai": "bacia",
+      "comprimento": 100,
+      "direcao": [
+        1,
+        0,
+        0
+      ],
+      "raioDaBola": 40,
+      "raioDoBastao": 35,
+      "eixo": [
+        -1,
+        0,
+        0
+      ],
+      "curso": {
+        "minimo": -30,
+        "maximo": 125
+      },
+      "posicao": [
+        100,
+        964.48,
+        0
+      ]
+    },
+    {
+      "id": "joelho-direito",
+      "pai": "quadril-direito",
+      "comprimento": 448.24,
+      "direcao": [
+        0,
+        -1,
+        0
+      ],
+      "raioDaBola": 42,
+      "raioDoBastao": 40,
+      "eixo": [
+        1,
+        0,
+        0
+      ],
+      "curso": {
+        "minimo": 0,
+        "maximo": 140
+      },
+      "posicao": [
+        100,
+        516.24,
+        0
+      ]
+    },
+    {
+      "id": "tornozelo-direito",
+      "pai": "joelho-direito",
+      "comprimento": 448.24,
+      "direcao": [
+        0,
+        -1,
+        0
+      ],
+      "raioDaBola": 38,
+      "raioDoBastao": 30,
+      "eixo": [
+        -1,
+        0,
+        0
+      ],
+      "curso": {
+        "minimo": -45,
+        "maximo": 25
+      },
+      "posicao": [
+        100,
+        68,
+        0
+      ]
+    },
+    {
+      "id": "ponta-do-pe-direito",
+      "pai": "tornozelo-direito",
+      "comprimento": 190,
+      "direcao": [
+        0,
+        -0.196116135,
+        0.980580676
+      ],
+      "raioDaBola": 30,
+      "raioDoBastao": 30,
+      "eixo": null,
+      "curso": null,
+      "posicao": [
+        100,
+        30.737934,
+        186.310328
+      ]
+    },
+    {
+      "id": "quadril-esquerdo",
+      "pai": "bacia",
+      "comprimento": 100,
+      "direcao": [
+        -1,
+        0,
+        0
+      ],
+      "raioDaBola": 40,
+      "raioDoBastao": 35,
+      "eixo": [
+        -1,
+        0,
+        0
+      ],
+      "curso": {
+        "minimo": -30,
+        "maximo": 125
+      },
+      "posicao": [
+        -100,
+        964.48,
+        0
+      ]
+    },
+    {
+      "id": "joelho-esquerdo",
+      "pai": "quadril-esquerdo",
+      "comprimento": 448.24,
+      "direcao": [
+        0,
+        -1,
+        0
+      ],
+      "raioDaBola": 42,
+      "raioDoBastao": 40,
+      "eixo": [
+        1,
+        0,
+        0
+      ],
+      "curso": {
+        "minimo": 0,
+        "maximo": 140
+      },
+      "posicao": [
+        -100,
+        516.24,
+        0
+      ]
+    },
+    {
+      "id": "tornozelo-esquerdo",
+      "pai": "joelho-esquerdo",
+      "comprimento": 448.24,
+      "direcao": [
+        0,
+        -1,
+        0
+      ],
+      "raioDaBola": 38,
+      "raioDoBastao": 30,
+      "eixo": [
+        -1,
+        0,
+        0
+      ],
+      "curso": {
+        "minimo": -45,
+        "maximo": 25
+      },
+      "posicao": [
+        -100,
+        68,
+        0
+      ]
+    },
+    {
+      "id": "ponta-do-pe-esquerdo",
+      "pai": "tornozelo-esquerdo",
+      "comprimento": 190,
+      "direcao": [
+        0,
+        -0.196116135,
+        0.980580676
+      ],
+      "raioDaBola": 30,
+      "raioDoBastao": 30,
+      "eixo": null,
+      "curso": null,
+      "posicao": [
+        -100,
+        30.737934,
+        186.310328
+      ]
+    }
+  ],
+  "poses": [
+    {
+      "nome": "sentado",
+      "angulos": {
+        "quadril-direito": 90,
+        "quadril-esquerdo": 90,
+        "joelho-direito": 90,
+        "joelho-esquerdo": 90
+      }
+    },
+    {
+      "nome": "braco-erguido",
+      "angulos": {
+        "ombro-direito": 150
+      }
+    }
+  ]
+}
