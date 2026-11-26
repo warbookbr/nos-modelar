@@ -7,5 +7,6 @@ Pasta do plano [processo e CI](../../planos/2026-11-26-processo-e-ci.md), gate d
 | d242b681 | 2026-11-26 | verde | 1 |
 | 44eab990 | 2026-11-26 | verde | 2 |
 | e7716db5 | 2026-11-26 | vermelho, testes lentos parte 2/10: o apt recusou a fonte da Microsoft da imagem do GitHub (403, "no longer signed") nas três tentativas do `install-deps` | zera |
+| b342a5c6 | 2026-11-26 | verde, a main andou e o Pages publicou | 1 |
 
 O vermelho de e7716db5 é de infraestrutura e o processo o pegou sozinho, pela reprovação do CI. A correção tira a fonte da Microsoft antes de instalar as bibliotecas do navegador (`.github/actions/preparar/action.yml`), e a série recomeça no envio dela.
