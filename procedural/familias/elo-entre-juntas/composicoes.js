@@ -8,6 +8,7 @@ import { FORMATO_COMPOSICAO_PROCEDURAL } from '../../nucleo/entrada.js';
 import { INTERVALOS, LADOS } from './geometria.js';
 
 export const ID_DO_ELO = 'elo-entre-juntas.reto';
+export const ID_DO_ELO_DESVIADO = 'elo-entre-juntas.desviado';
 const p = (nome) => ({ parametro: nome });
 const o = (op, id) => ({ origem: { op, id } });
 const REFERENCIA = [1, 0, 0];
@@ -38,11 +39,12 @@ const nosDaBoca = (lado, origem) => [
   { id: `furo-${lado.toLowerCase()}`, operacao: 'lathe', argumentos: { origemId: origem + 1, lados: 24, perfil: [[0, 0], [p(`furoRaio${lado}`), 0], [p(`furoRaio${lado}`), p(`furoAltura${lado}`)], [0, p(`furoAltura${lado}`)]], em: p(`furoEm${lado}`) } },
   { id: `furos-${lado.toLowerCase()}`, operacao: 'arranja', argumentos: { modo: 'radial', total: p(`furos${lado}`), graus: p(`graus${lado}`), eixo: 'y', pivo: [0, 0, 0], origemId: origem + 2, derivaDe: { op: 'lathe', id: origem + 1 }, sel: { origem: { op: 'lathe', id: origem + 1 } } } },
 ];
-const porta = (lado, ponto, normal) => ({
+const porta = (lado, ponto, normal, referencia) => ({
   id: `porta-boca-${lado.toLowerCase()}`, operacao: 'publicarPorta',
-  argumentos: { id: `boca-${lado.toLowerCase()}`, de: { op: 'subtrair', id: 30 }, interface: { forma: 'padraoFuros', papel: 'recebe', plano: { ponto, normal }, referencia: REFERENCIA, diametro: p(`diametro${lado}`), padrao: { tipo: 'circular', centro: ponto, raio: p(`raio${lado}`), quantidade: p(`furos${lado}`), anguloInicial: p(`angulo${lado}`) } } },
+  argumentos: { id: `boca-${lado.toLowerCase()}`, de: { op: 'subtrair', id: 30 }, interface: { forma: 'padraoFuros', papel: 'recebe', plano: { ponto, normal }, referencia, diametro: p(`diametro${lado}`), padrao: { tipo: 'circular', centro: ponto, raio: p(`raio${lado}`), quantidade: p(`furos${lado}`), anguloInicial: p(`angulo${lado}`) } } },
 });
 
+const parametrosDoDesvio = { normalB: { tipo: 'vetor3' }, referenciaB: { tipo: 'vetor3' }, eixoDoGiro: { tipo: 'vetor3' }, giroDoAzimute: { tipo: 'numero' }, giroDoAzimuteInverso: { tipo: 'numero' }, giroDoDesvio: { tipo: 'numero' }, pivoDaBocaB: { tipo: 'vetor3' }, idaDaBocaB: { tipo: 'vetor3' } };
 const parametros = {
   comprimento: { tipo: 'numero' }, planoB: { tipo: 'vetor3' },
   ...parametrosDasSecoes('fo'), ...parametrosDasSecoes('de'),
@@ -52,16 +54,35 @@ const parametros = {
     [`furos${l}`, { tipo: 'inteiro' }], [`graus${l}`, { tipo: 'numero' }], [`angulo${l}`, { tipo: 'numero' }], [`diametro${l}`, { tipo: 'numero' }], [`raio${l}`, { tipo: 'numero' }],
   ])),
 };
-const FURO_A = { op: 'lathe', id: 21 }; const FURO_B = { op: 'lathe', id: 24 };
-const nos = [
-  { id: 'loft-de-fora', operacao: 'loft', argumentos: { origemId: 1, lados: LADOS, orientacao: [1, 0, 0], secoes: secoesDoLoft('fo') } },
-  { id: 'loft-da-cavidade', operacao: 'loft', argumentos: { origemId: 2, lados: LADOS, orientacao: [1, 0, 0], secoes: secoesDoLoft('de') } },
-  { id: 'casca', operacao: 'subtrair', argumentos: { origemId: 3, solidos: [o('loft', 1), o('loft', 2)] } },
-  ...nosDaBoca('A', 20), ...nosDaBoca('B', 23),
-  { id: 'carenagem-com-aneis', operacao: 'unir', argumentos: { origemId: 29, solidos: [o('subtrair', 3), o('lathe', 20), o('lathe', 23)] } },
-  { id: 'elo-furado', operacao: 'subtrair', argumentos: { origemId: 30, solidos: [o('unir', 29), { origem: FURO_A }, { origem: { op: 'arranja', id: 22, de: FURO_A } }, { origem: FURO_B }, { origem: { op: 'arranja', id: 25, de: FURO_B } }] } },
-  { id: 'parte-elo', operacao: 'parte', argumentos: { nome: 'elo', sel: o('subtrair', 30) } },
-  porta('A', [0, 0, 0], [0, -1, 0]), porta('B', p('planoB'), [0, 1, 0]),
+const FURO_A = { op: 'lathe', id: 21 };
+/* a boca B nasce reta, em y = comprimento, e vai ao lugar dela antes de existir qualquer outra malha: o anel, o furo e as cópias do furo
+   (com os polos dos furos) giram em torno do eixo do giro até a tangente da boca B (o `rotaciona` em y, x e y, da malha inteira) e
+   vão ao ponto da boca B (o `transladar`) */
+const FURO_B = { op: 'lathe', id: 24 };
+const IDA_DA_BOCA_B = [
+  { id: 'girar-boca-b-no-azimute', operacao: 'rotaciona', argumentos: { eixo: 'y', graus: p('giroDoAzimuteInverso'), pivo: p('pivoDaBocaB') } },
+  { id: 'girar-boca-b-no-desvio', operacao: 'rotaciona', argumentos: { eixo: 'x', graus: p('giroDoDesvio'), pivo: p('pivoDaBocaB') } },
+  { id: 'girar-boca-b-de-volta', operacao: 'rotaciona', argumentos: { eixo: 'y', graus: p('giroDoAzimute'), pivo: p('pivoDaBocaB') } },
+  { id: 'levar-boca-b', operacao: 'transladar', argumentos: { d: p('idaDaBocaB') } },
 ];
+/* a composição do elo reto (o eixo é o y) e a do elo desviado (o caminho com `desvio` ou `deslocamentoLateral`): a reta não tem
+   os giros e a ida da boca B, e por isso a malha dela é a de antes, com os mesmos ids; a desviada cria a boca B primeiro, para girar
+   e levar só ela, e leva a orientação do `loft` e a normal e a referência da porta B como parâmetros */
+const compor = (id, desviada) => {
+  const orientacao = desviada ? p('eixoDoGiro') : [1, 0, 0];
+  const nos = [
+    ...(desviada ? [...nosDaBoca('B', 23), ...IDA_DA_BOCA_B] : []),
+    { id: 'loft-de-fora', operacao: 'loft', argumentos: { origemId: 1, lados: LADOS, orientacao, secoes: secoesDoLoft('fo') } },
+    { id: 'loft-da-cavidade', operacao: 'loft', argumentos: { origemId: 2, lados: LADOS, orientacao, secoes: secoesDoLoft('de') } },
+    { id: 'casca', operacao: 'subtrair', argumentos: { origemId: 3, solidos: [o('loft', 1), o('loft', 2)] } },
+    ...nosDaBoca('A', 20), ...(desviada ? [] : nosDaBoca('B', 23)),
+    { id: 'carenagem-com-aneis', operacao: 'unir', argumentos: { origemId: 29, solidos: [o('subtrair', 3), o('lathe', 20), o('lathe', 23)] } },
+    { id: 'elo-furado', operacao: 'subtrair', argumentos: { origemId: 30, solidos: [o('unir', 29), { origem: FURO_A }, { origem: { op: 'arranja', id: 22, de: FURO_A } }, { origem: FURO_B }, { origem: { op: 'arranja', id: 25, de: FURO_B } }] } },
+    { id: 'parte-elo', operacao: 'parte', argumentos: { nome: 'elo', sel: o('subtrair', 30) } },
+    porta('A', [0, 0, 0], [0, -1, 0], REFERENCIA),
+    desviada ? porta('B', p('planoB'), p('normalB'), p('referenciaB')) : porta('B', p('planoB'), [0, 1, 0], REFERENCIA),
+  ];
+  return Object.freeze({ formato: FORMATO_COMPOSICAO_PROCEDURAL, id, versao: '1.0.0', parametros: desviada ? { ...parametros, ...parametrosDoDesvio } : parametros, artefatos: { entra: [], sai: SAI }, nos });
+};
 
-export const COMPOSICOES = Object.freeze([Object.freeze({ formato: FORMATO_COMPOSICAO_PROCEDURAL, id: ID_DO_ELO, versao: '1.0.0', parametros, artefatos: { entra: [], sai: SAI }, nos })]);
+export const COMPOSICOES = Object.freeze([compor(ID_DO_ELO, false), compor(ID_DO_ELO_DESVIADO, true)]);
