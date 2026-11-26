@@ -4,7 +4,7 @@
 
 **Núcleo:** não
 
-**Território:** `tools/modelar/esqueleto.mjs`, `tools/modelar/esqueleto.test.mjs`, `tools/modelar/proporcoes.mjs`, `tools/fixtures/esqueleto/`, `procedural/pecas/esqueleto-humanoide/`, `docs/modelar/banco-de-provas/esqueleto-de-proporcao-2026-11-26/`, `docs/modelar/ferramentas-por-objeto.json`, `package.json`.
+**Território:** `tools/modelar/esqueleto.mjs`, `tools/modelar/esqueleto.test.mjs`, `tools/modelar/proporcoes.mjs`, `src/autoria/esqueleto-de-bolas.js`, `tools/fixtures/esqueleto/`, `procedural/pecas/esqueleto-humanoide/`, `docs/modelar/banco-de-provas/esqueleto-de-proporcao-2026-11-26/`, `docs/modelar/ferramentas-por-objeto.json`, `package.json`.
 
 Ativado pela pessoa em 2026-11-26, com a frase "concordo com as duas, pode ativar o plano", depois de ler o rascunho.
 
@@ -71,7 +71,7 @@ Se o andaime N2 não aceitar a árvore inteira de um humanoide sem mudar o forma
 
 Fatia 1 feita em 2026-11-26: a seção `esqueleto` em `proporcoes.json`, com as fórmulas das medidas, o espelho de um ramo inteiro e as recusas pedidas, e `npm run esqueleto`, que gera o andaime (uma esfera por junta, um bastão por membro, uma porta por junta com eixo) e as articulações; a fixture do braço de duas juntas com o espelho sai igual em duas execuções e passa no normalizador do andaime. O cilindro do andaime só aceita eixo x, y ou z, e o membro oblíquo sai como `tubo` reto, sem mudar o formato.
 
-Fatia 2 feita em 2026-11-26: a peça de bolas e bastões (receita que lê `esqueleto.json`, a árvore resolvida que o comando grava; a conta pura mora em `procedural/pecas/esqueleto-humanoide/esqueleto-de-bolas.js`), as poses declaradas em `esqueleto.poses` (ângulo por junta dentro do curso, a pose zero sempre existe), o aviso de par atravessado e de elemento abaixo do chão (`esqueleto.chao`) por cápsula e esfera, que `--estrito` faz reprovar, e as vistas frontal, direita e superior de cada pose por `--vistas`. A fixture ganhou uma bacia e o eixo z no ombro e no cotovelo, para o antebraço alcançar o tronco.
+Fatia 2 feita em 2026-11-26: a peça de bolas e bastões (receita que lê `esqueleto.json`, a árvore resolvida que o comando grava; a conta pura mora em `src/autoria/esqueleto-de-bolas.js` (a guarda do acervo recusa módulo solto em `procedural/pecas/`)), as poses declaradas em `esqueleto.poses` (ângulo por junta dentro do curso, a pose zero sempre existe), o aviso de par atravessado e de elemento abaixo do chão (`esqueleto.chao`) por cápsula e esfera, que `--estrito` faz reprovar, e as vistas frontal, direita e superior de cada pose por `--vistas`. A fixture ganhou uma bacia e o eixo z no ombro e no cotovelo, para o antebraço alcançar o tronco.
 
 ## Fechamento
 

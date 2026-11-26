@@ -44,7 +44,7 @@
  *   npm run esqueleto -- --proporcoes=<proporcoes.json> --escrever  grava o andaime e as articulações nos caminhos de "saidas"
  *
  * Fatia 2: a peça de bolas e bastões (receita que lê `esqueleto.json`; a conta mora em
- * `procedural/pecas/esqueleto-humanoide/esqueleto-de-bolas.js`, pura, para a bancada importar sem disco), as poses, o aviso de membro
+ * `src/autoria/esqueleto-de-bolas.js`, pura, para a bancada importar sem disco), as poses, o aviso de membro
  * que atravessa outro ou passa do chão em cada pose (`--estrito` faz o aviso reprovar) e as vistas por pose (`--vistas`).
  *
  *   npm run esqueleto -- --proporcoes=<proporcoes.json> --receita=<receita.js>  --vistas=<pasta>: frente, lado e de cima de cada pose
@@ -56,7 +56,7 @@ import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 
 import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { normalizarAndaimeGlobal } from '../../src/autoria/forma-global.js';
-import { avisosDaPose, posesDoEsqueleto, textoDoAviso } from '../../procedural/pecas/esqueleto-humanoide/esqueleto-de-bolas.js';
+import { avisosDaPose, posesDoEsqueleto, textoDoAviso } from '../../src/autoria/esqueleto-de-bolas.js';
 import { lerArgumentos } from './argumentos.mjs';
 import { avaliarFormula, ErroDasProporcoes, lerProporcoes, primeiraDiferenca, resolverMedidas } from './proporcoes.mjs';
 
@@ -409,7 +409,7 @@ export function gerarVistasDoEsqueleto(caminho, pastaDeSaida = null) {
   if (dentro.startsWith('..') || isAbsolute(dentro)) throw new ErroDasProporcoes(`--vistas=${curto(pastaDeSaida)}, fora do repositório`, 'uma pasta dentro do repositório (de preferência em tools/bancadas/out/, que o git ignora)', 'npm run esqueleto -- --proporcoes=<proporcoes.json> --vistas=tools/bancadas/out/esqueleto-<id>');
   mkdirSync(pasta, { recursive: true });
   const especificador = (alvo) => { const r = relative(pasta, alvo).replace(/\\/g, '/'); return r.startsWith('.') ? r : `./${r}`; };
-  const modulo = resolve(repo, 'procedural/pecas/esqueleto-humanoide/esqueleto-de-bolas.js');
+  const modulo = resolve(repo, 'src/autoria/esqueleto-de-bolas.js');
   const feitas = [];
   for (const p of posesDoEsqueleto(arvore)) {
     const receita = join(pasta, `receita-${p.nome}.js`);

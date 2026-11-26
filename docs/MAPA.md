@@ -2340,10 +2340,6 @@
 
 - `alvo.md` — Alvo da escrivaninha com gaveta
 
-## procedural/pecas/esqueleto-humanoide/
-
-- `esqueleto-de-bolas.js` — esqueleto-de-bolas.js — a peça de bolas e bastões de um esqueleto de proporção, as poses e o aviso de membro que atravessa outro.
-
 ## procedural/pecas/filtro-de-oleo/
 
 - `receita.js` — filtro-de-oleo: filtro de óleo de rosca de 76 x 80 mm, de pé sobre a junta. Referencial do acervo: Y para cima, chão em y 0 (a face de baixo da junta), eixo …
@@ -2897,6 +2893,7 @@
 - `dobras-aceitas.test.js` — dobras-aceitas.test.js — `PLANO.dobrasAceitas`: o normalizador recusa o que o campo não admite, o plano sem o campo mantém a forma canônica de antes, e a ace…
 - `encaixe-cilindrico-parcial.test.mjs` — Encaixe cilíndrico parcial: o eixo que atravessa uma parede e só depois entra num cubo curto. Sem `encaixeAxial`, o interno precisa cobrir o externo de ponta…
 - `encosto-da-peca.test.mjs` — encosto-da-peca.test.mjs — uma tolerância de "encosta" só para a peça, e a distância do par declarado que não acontece (atrito 5 do RECEITA.md do sedã).
+- `esqueleto-de-bolas.js` — esqueleto-de-bolas.js — a peça de bolas e bastões de um esqueleto de proporção, as poses e o aviso de membro que atravessa outro.
 - `etapas-de-construcao.js` — etapas-de-construcao.js — o que há de comum ao registro de etapas de uma montagem v5: o formato, o erro, as juntas medidas em cada etapa e a próxima etapa a …
 - `etapas-pela-impressao.js` — etapas-pela-impressao.js — o estado de cada etapa de uma montagem v5 como função pura do registro de eventos e do medido agora.
 - `executar-receita-barras.test.mjs` — executar-receita-barras.test.mjs — a estruturaDeBarras na receita de peça: o tubo entre dois pontos, com as pontas fechadas pela operação.

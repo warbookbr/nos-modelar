@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterEach, describe, expect, it } from 'vitest';
 import { normalizarAndaimeGlobal } from '../../src/autoria/forma-global.js';
-import { avisosDaPose, posarEsqueleto, receitaDoEsqueleto } from '../../procedural/pecas/esqueleto-humanoide/esqueleto-de-bolas.js';
+import { avisosDaPose, posarEsqueleto, receitaDoEsqueleto } from '../../src/autoria/esqueleto-de-bolas.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { avisosDoEsqueleto, comoCLI, conferirEsqueleto, escreverEsqueleto, gerarEsqueleto } from './esqueleto.mjs';
 import { conferirProporcoes } from './proporcoes.mjs';
