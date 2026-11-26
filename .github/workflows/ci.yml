@@ -148,6 +148,11 @@ jobs:
         if: ${{ !cancelled() }}
         run: npm run territorio:check
 
+      # O negrito no meio do texto dos documentos de instrução e o nome de objeto no código do núcleo, contados como catraca.
+      - name: Sem negrito novo no meio do texto nem nome de objeto novo no núcleo
+        if: ${{ !cancelled() }}
+        run: npm run reguas:texto:check
+
       - name: Registros de decisão em formato e lista em dia
         if: ${{ !cancelled() }}
         run: npm run decisoes:check

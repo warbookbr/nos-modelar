@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2424 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2426 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -4421,6 +4421,11 @@
 - `conferir-malha.ts` — conferir-malha.ts — a conferência única que todo teste de op nova chama.
 - `furo-ordens-de-ponte.test.ts` — furo-ordens-de-ponte.test.ts — as promessas do A-30 que a geometria sozinha não mostra.
 - `oficina.test.ts` — Vitest do NÚCLEO da OFICINA (passo 1): prova os invariantes de identidade — numeração determinística e POSICIONAL (re-rodar dá ids idênticos), identidade est…
+
+## tools/reguas-de-texto/
+
+- `reguas-de-texto.mjs` — reguas-de-texto.mjs — duas regras do contrato que viviam só em texto, agora contadas como catraca (análise do projeto de 2026-11-26, documentacao.md, recomen…
+- `reguas-de-texto.test.mjs` — reguas-de-texto.test.mjs — o negrito no meio da frase conta e o rótulo do começo da linha não; o nome de objeto conta no núcleo e não no teste dele; a contag…
 
 ## tools/testes/
 
