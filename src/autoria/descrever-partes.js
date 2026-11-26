@@ -639,7 +639,7 @@ function relacaoConfirmadaPorSolido(relacao, solidoDe, tolerancia, memoria = nul
   }
   /* a parte inteira que interpenetra ou não decide pode estar errada por corpos que se sobrepõem ou por um corpo aberto longe: refaz corpo a corpo */
   let porCorpo = null;
-  if (partes && (estado === 'interpenetram' || estado === 'inconclusivo')) {
+  if (partes && estado !== 'encostam') {
     const inteira = estado;
     porCorpo = veredictoPorCorpo(partes[0], partes[1], solidoDe, tolerancia, memoria);
     estado = porCorpo.estado;

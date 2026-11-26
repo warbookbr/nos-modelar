@@ -75,6 +75,18 @@ describe('relação entre partes corpo a corpo', () => {
     expect(r.tipo).toBe('interpenetra');
   });
 
+  it('o corpo B inteiro dentro de dois corpos sobrepostos de A, que a parte inteira dava como separadas, interpenetra', () => {
+    const r = relacao(criarNeutro([
+      ['a', L, 0, 4],
+      ['a', retangulo(1.5, 0.2, 3.5, 0.8), 1, 3],
+      ['b', retangulo(2, 0.3, 3, 0.7), 1.2, 1.8],
+    ]));
+    expect(r.caixa.tipo).toBe('interpenetra');
+    expect(r.solido).toBe('interpenetram');
+    expect(r.tipo).toBe('interpenetra');
+    expect(r.porCorpo).toBe(true);
+  });
+
   it('a relação refeita corpo a corpo é determinística', () => {
     const n = () => criarNeutro([
       ['a', L, 0, 4],
