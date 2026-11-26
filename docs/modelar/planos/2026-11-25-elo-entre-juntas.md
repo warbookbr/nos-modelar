@@ -28,12 +28,12 @@ Elo como família: ENVOLVER, pelo contrato da família, com a casca pela receita
 
 As pontas: USAR DIRETO a porta da flange do atuador de junta (o anel e o padrão de furos) para posicionar a boca e furar a fixação.
 
-Membro torto (as duas juntas em eixos diferentes, como o cotovelo e o joelho): ENVOLVER o caminho do loft entre as duas flanges, com as seções girando de uma orientação à outra.
+Membro torto (as flanges das duas pontas em eixos diferentes; no cotovelo e no joelho os eixos de flexão são paralelos e o membro corre entre eles, o que pede uma curva em cada boca): ENVOLVER o caminho do loft entre as duas flanges, com as seções girando de uma orientação à outra.
 
 ## Incluído
 
 1. O elo reto entre duas flanges coaxiais, com a seção e a cintura declaradas, a parede da casca pela receita e a furação de fixação nas duas bocas.
-2. O elo com desvio, entre flanges de eixos diferentes, com o caminho curvo e as seções girando.
+2. O elo com desvio, entre flanges de eixos diferentes, com o caminho curvo e as seções girando, e a curva nas duas bocas, para as juntas de eixos paralelos.
 3. A perna de prova: três atuadores (quadril, joelho e tornozelo) e dois elos, montada com as articulações, cada encaixe com contato medido e o curso de cada junta conferido.
 4. O banco de provas, o mapa de ferramentas, a ficha e o fechamento.
 
@@ -56,6 +56,7 @@ O núcleo não ganha nome de objeto nem operação nova, e o acervo sai igual. A
 
 1. O elo reto, com a aprovação da pessoa (espera a fatia 1 do atuador de junta).
 2. O elo com desvio, com a aprovação da pessoa.
+2b. A curva na boca A, para ligar juntas de eixos paralelos (coxa e canela), com a aprovação da pessoa.
 3. A perna de prova, com as articulações (espera a fatia 3 do atuador de junta).
 4. O banco de provas, o mapa de ferramentas, a ficha e o fechamento.
 
@@ -64,6 +65,8 @@ O núcleo não ganha nome de objeto nem operação nova, e o acervo sai igual. A
 Decidido em 2026-11-25, pela recomendação: a seção padrão do membro é a elíptica de cantos suaves e a parede padrão é de 2 mm, as duas trocáveis por parâmetro. As linhas de painel ficam para o plano de acabamento de hard surface.
 
 Decidido em 2026-11-26, junto com a ativação do [esqueleto de proporção](../decisoes/PLANOS-ENCERRADOS.md): a perna de prova da fatia 3 tira a posição das juntas do esqueleto aprovado do humanoide, aprovado em 2026-11-26, em `procedural/pecas/esqueleto-humanoide/`.
+
+Decidido em 2026-11-26, com a frase "pode seguir com a curva na outra ponta": a perna de prova parou porque as juntas de flexão do esqueleto têm eixos paralelos e o elo de uma curva só ligaria o joelho com o eixo ao longo do membro; o elo ganha a curva na boca A (fatia 2b) antes da perna. O plano dava o cotovelo e o joelho como juntas de eixos diferentes, e nenhum gate pegaria o erro; o pedido de toda fatia que monta membro passa a mandar conferir o eixo de cada junta do esqueleto contra o eixo da flange do atuador antes de escolher o elo.
 
 ## Riscos e parada
 
