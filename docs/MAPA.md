@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2445 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2453 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1154,6 +1154,15 @@
 - `geometria.js` — geometria.js — as medidas da dobradiça de abas a partir dos parâmetros da família, em metro.
 - `index.js` — index.js — a família `dobradica` carregada: o contrato `familia.json`, as composições, o `derivar` e o gerador da montagem v5. A família é o objeto de `defin…
 - `montagem.js` — montagem.js — a mini-montagem v5 que a família gera: o pino e as duas folhas como peças soltas, ligadas por uma articulação de revolução com o curso declarad…
+
+## procedural/familias/elo-entre-juntas/
+
+- `composicoes.js` — composicoes.js — a composição da família `elo-entre-juntas`: a carenagem oca do elo (o `loft` de fora menos o `loft` da cavidade, os dois calculados no `deri…
+- `derivar.js` — derivar.js — dos parâmetros do elo (milímetro) à chamada de composição (metro): as seções do `loft` de fora e da cavidade, que vêm da casca pela receita (`pa…
+- `elo-entre-juntas.test.mjs` — elo-entre-juntas.test.mjs — a família `elo-entre-juntas`: cada seção sai com a parte `elo` num pedaço só, sem órfão, a mesma malha em duas chamadas, a parede…
+- `geometria.js` — geometria.js — o elo entre duas juntas em milímetro, com o eixo do elo em y: a boca A em y = 0 e a boca B em y = comprimento.
+- `index.js` — index.js — a família `elo-entre-juntas`: a carenagem oca do membro de um robô, de uma flange de atuador de junta à outra, por seção (elíptica, redonda ou de …
+- `tabela.js` — tabela.js — os parâmetros do elo entre juntas a partir das flanges que ele liga, em milímetro.
 
 ## procedural/familias/engrenagem/
 
@@ -3581,6 +3590,11 @@
 
 - `mesa-linear.mjs` — mesa-linear.mjs — a mesa linear de prova do plano de elementos de máquina, em milímetro na montagem e metro na receita.
 - `mesa-linear.test.mjs` — mesa-linear.test.mjs — o gate de saída do plano de elementos de máquina: a mesa linear de prova sai com as quatro famílias (perfil, guia, rolamento no mancal…
+
+## tools/fixtures/elo-entre-juntas/
+
+- `elo-entre-atuadores.mjs` — elo-entre-atuadores.mjs — a montagem de prova do elo reto: um atuador de junta (a flange de saída), o elo de membro (o antebraço do esqueleto aprovado, de 23…
+- `elo-entre-atuadores.test.mjs` — elo-entre-atuadores.test.mjs — a peça de prova do elo reto: o elo de antebraço (230 mm) entre dois atuadores de junta de 100 mm assenta na porta de saída do …
 
 ## tools/fixtures/esqueleto/
 
