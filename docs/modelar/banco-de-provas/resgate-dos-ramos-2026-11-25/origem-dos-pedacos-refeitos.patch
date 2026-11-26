@@ -1,0 +1,295 @@
+From 3422560e04879a285a523144e073d5b27f3d5253 Mon Sep 17 00:00:00 2001
+From: Claude <noreply@anthropic.com>
+Date: Thu, 26 Nov 2026 13:43:57 +0000
+Subject: [PATCH] =?UTF-8?q?N=C3=BAcleo:=20a=20origem=20cita=20os=20peda?=
+ =?UTF-8?q?=C3=A7os=20que=20uma=20booleana=20refez,=20somados=20na=20resol?=
+ =?UTF-8?q?u=C3=A7=C3=A3o?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+A booleana deixa o maior pedaço de uma face cortada com o id e dá id novo aos outros; a origem de um gerador anterior (a face de um cubo) resolvia só
+para o id que ficou, e a parte ou o material por essa origem perdia o resto da superfície (tampa de 4 com furo octogonal: 0,815 de 2,982). Os pedaços da
+booleana e os do refino da costura passam a ser anotados em st.pedacosDaBooleana, e a resolução de origem soma os vivos, como já fazia com os da divisão por
+contorno, sem reescrever lista de gerador nenhum. As cópias (espelha, arranja) pulam o pedaço sem cópia. Retrato do acervo igual nas 145 peças.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+Claude-Session: https://claude.ai/code/session_01UHE3FsZMSW243krzDk98Re
+---
+ docs/MAPA.md                                  |  3 +-
+ procedural/nucleo/CLAUDE.md                   |  1 +
+ procedural/nucleo/nucleo.js                   | 11 +--
+ procedural/nucleo/operacoes/booleanas.js      |  3 +-
+ .../nucleo/operacoes/refino-da-costura.js     |  5 +-
+ .../nucleo/pedacos-da-booleana.test.mjs       | 80 +++++++++++++++++++
+ procedural/nucleo/pedacos-da-divisao.js       | 41 ++++++++++
+ 7 files changed, 136 insertions(+), 8 deletions(-)
+ create mode 100644 procedural/nucleo/pedacos-da-booleana.test.mjs
+
+diff --git a/docs/MAPA.md b/docs/MAPA.md
+index 7b985a56b..7f2e14f6f 100644
+--- a/docs/MAPA.md
++++ b/docs/MAPA.md
+@@ -5,7 +5,7 @@
+ > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
+ > algum arquivo-fonte estiver sem cabeçalho.
+ 
+-2401 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
++2402 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+ 
+ ## (raiz)
+ 
+@@ -1391,6 +1391,7 @@
+ - `paineis-por-vaos.test.ts` — paineis-por-vaos.test.ts — o ajudante `paineisPorVaos` em peças de teste sem domínio: uma caixa de chapa de 1 mm com uma face a 38 graus da vista, cortada po…
+ - `pedacos-convexos.js` — pedacos-convexos.js — de triângulos coplanares a faces convexas.
+ - `pedacos-convexos.test.mjs` — pedacos-convexos.test.mjs — a fusão pelos vizinhos dá os mesmos pedaços, na mesma ordem e com o mesmo canto de partida, que a varredura que recomeçava do pri…
++- `pedacos-da-booleana.test.mjs` — pedacos-da-booleana.test.mjs — a origem que cita uma face continua citando os pedaços dela depois de uma booleana que a refaz.
+ - `pedacos-da-divisao.js` — pedacos-da-divisao.js — os pedaços que a `divisaoPorContorno` deixa de cada face que corta, para quem lê faces por origem.
+ - `perfil2d.js` — perfil2d.js — perfil 2D com furos e deslocamento de contorno, sobre a CrossSection da Manifold (Clipper2).
+ - `perfil2d.test.mjs` — perfil2d.test.mjs — perfil 2D com furos e deslocamento de contorno sobre a CrossSection da Manifold.
+diff --git a/procedural/nucleo/CLAUDE.md b/procedural/nucleo/CLAUDE.md
+index 47c0eb5dc..673d56dbc 100644
+--- a/procedural/nucleo/CLAUDE.md
++++ b/procedural/nucleo/CLAUDE.md
+@@ -12,3 +12,4 @@ Vale além do contrato da raiz, para quem muda arquivo de `procedural/nucleo/`.
+ - Antes de usar um ajudante de gaiola, `npm run capacidade -- <nome>` dá a ficha dele.
+ - Quem muda o que `ajustarCurvaLisa` devolve para a mesma entrada soma 1 em `VERSAO_DO_AJUSTE` (`ajuste-de-curva-lisa.js`): a versão entra na impressão do ajuste guardado pelas receitas, e o dado antigo deixa de conferir até ser regravado com `node tools/modelar/regravar-ajustes-de-curva.mjs <receita>`.
+ - Operação que corta faces ou que reescreve a lista de faces de uma origem já publicada trata os pedaços da divisão por contorno (`procedural/nucleo/pedacos-da-divisao.js`): quem lê `registro.faces` direto passa por `comOsPedacosDaDivisao`, e quem tira face de uma origem chama `tirarDosPedacosDaDivisao`. Hoje reescrevem lista de origem o `arredondarCostura` (a da própria costura e, ao cobrir uma face inteira, as das outras origens que a citavam), o `limparLascas` e o `registraNaTampa` (`operacoes/arestas-em-grupos.js`, que põe na tampa de uma extrusão a peça nova que nasce de uma peça de tampa).
++- Os pedaços que uma booleana (e o refino da costura dela) deixa de uma face cortada são anotados em `st.pedacosDaBooleana` por `registraPedacoDaBooleana`, e a resolução de origem (`comPedacosDaDivisao`, em `nucleo.js`, por `comOsPedacosRefeitos`) soma os que vivem à lista de qualquer origem que cita a face-mãe, sem reescrever lista de gerador nenhum. Operação nova que corta face de entrada e dá id novo ao pedaço registra o pedaço ali; gerador de cópia que mapeia face por face pula o pedaço sem cópia com `ehPedacoDaBooleana`, além de `ehPedacoDaDivisao`.
+diff --git a/procedural/nucleo/nucleo.js b/procedural/nucleo/nucleo.js
+index 805797fe9..8011f3575 100644
+--- a/procedural/nucleo/nucleo.js
++++ b/procedural/nucleo/nucleo.js
+@@ -32,7 +32,7 @@ import { criarOperacoesAtributos } from './operacoes/atributos.js';
+ import { criarOperacoesBooleanas } from './operacoes/booleanas.js';
+ import { criarOperacoesAberturaPorContorno } from './operacoes/abertura-por-contorno.js';
+ import { criarOperacoesDivisaoPorContorno } from './operacoes/divisao-por-contorno.js';
+-import { comOsPedacosDaDivisao, ehPedacoDaDivisao, faceDeAntesDaDivisao } from './pedacos-da-divisao.js';
++import { comOsPedacosRefeitos, ehPedacoDaBooleana, ehPedacoDaDivisao, faceDeAntesDaDivisao } from './pedacos-da-divisao.js';
+ import { criarOperacoesLimparLascas } from './operacoes/limpar-lascas.js';
+ import { erroDaCargaDaManifold, manifoldCarregada } from './manifold.js';
+ import { lerOnde, resolverOnde } from './selecao-geometrica.js';
+@@ -1310,7 +1310,7 @@ const CONTRATOS_ORIGEM = {
+       for (const original of fonte.faces) {
+         const copia = registro.copias.get(original);
+         /* o pedaço que a divisão por contorno tirou da fonte depois do espelho não tem cópia: a cópia é a da face de antes */
+-        if (copia == null && ehPedacoDaDivisao(st, original)) continue;
++        if (copia == null && (ehPedacoDaDivisao(st, original) || ehPedacoDaBooleana(st, original))) continue;
+         if (copia == null || !st.F.has(copia)) return { erro: `cópia da face ${original} da origem derivada não existe` };
+         faces.push(copia);
+       }
+@@ -1414,7 +1414,7 @@ const CONTRATOS_ORIGEM = {
+         for (const original of fonte.faces) {
+           const copia = mapa.get(original);
+           /* o pedaço que a divisão por contorno tirou da fonte depois do arranjo não tem cópia: a cópia é a da face de antes */
+-          if (copia == null && ehPedacoDaDivisao(st, original)) continue;
++          if (copia == null && (ehPedacoDaDivisao(st, original) || ehPedacoDaBooleana(st, original))) continue;
+           /* PERTINÊNCIA: a face citada por `de` tem de ser uma face da fonte
+              DESTE arranjo. `de` que aponta para outra primitiva cai aqui. */
+           if (copia == null) return { erro: `a face ${original}, citada por de, não pertence à fonte da origem arranja:${origem.id} (a fonte declarada é ${JSON.stringify(registro.derivaDe)}) — este arranjo não copiou face nenhuma dela` };
+@@ -1997,10 +1997,11 @@ function resolverOrigemBruta(st, origem) {
+    dela, logo depois dela, qualquer que seja o jeito de o gerador guardar as faces (lista, grade, mapa de cópias ou endereço de uma face
+    só). Vale também para a origem citada dentro de outra (o `de` de uma cópia): a cópia feita depois da divisão copiou os pedaços, e a
+    feita antes pula o pedaço que não conhece (`ehPedacoDaDivisao`, nos resolvedores do `espelha` e do `arranja`). O pedaço que um passo
+-   posterior consumiu grita, como a face consumida de qualquer origem; o que foi só apagado sai da lista. */
++   posterior consumiu grita, como a face consumida de qualquer origem; o que foi só apagado sai da lista. Os pedaços que uma booleana deixou
++   da face cortada (`st.pedacosDaBooleana`) entram do mesmo jeito, só os vivos: quem nunca citou o pedaço não grita porque ele sumiu. */
+ function comPedacosDaDivisao(st, resolvida, origem) {
+   if (!Array.isArray(resolvida?.faces)) return resolvida;
+-  const todas = comOsPedacosDaDivisao(st, resolvida.faces);
++  const todas = comOsPedacosRefeitos(st, resolvida.faces);
+   if (todas === resolvida.faces) return resolvida;
+   const daOrigem = new Set(resolvida.faces);
+   const faces = [];
+diff --git a/procedural/nucleo/operacoes/booleanas.js b/procedural/nucleo/operacoes/booleanas.js
+index 924cb02c3..838a55401 100644
+--- a/procedural/nucleo/operacoes/booleanas.js
++++ b/procedural/nucleo/operacoes/booleanas.js
+@@ -76,7 +76,7 @@ import { moldeDeDentro, ErroDoMolde } from '../molde-de-dentro.js';
+ import { refinarFaixaDaCostura } from './refino-da-costura.js';
+ import { memoizarPura } from '../memoria-de-pura.js';
+ import { areaMinimaDe, limparNoEstado } from './limpar-lascas.js';
+-import { comOsPedacosDaDivisao, tirarDosPedacosDaDivisao } from '../pedacos-da-divisao.js';
++import { comOsPedacosDaDivisao, registraPedacoDaBooleana, tirarDosPedacosDaDivisao } from '../pedacos-da-divisao.js';
+ 
+ /* Fusão dos pedaços coplanares da booleana comum: o quanto, em fração do tamanho da peça, o polígono fundido pode sair do
+    próprio plano, e o seno da curva para dentro que ainda se aceita num canto dele. */
+@@ -1255,6 +1255,7 @@ export function criarOperacoesBooleanas(servicos) {
+       if (!aux) porQuebras(nf, quebrasDoPedaco(fid, nf.vs));
+       if (st.parteAtribuidaEm?.has(fid)) st.parteAtribuidaEm.set(id, st.parteAtribuidaEm.get(fid));
+       (st.pedacosDe ??= new Map()).set(id, fid);
++      if (!aux) registraPedacoDaBooleana(st, id, fid);   // o material novo da ferramenta (aux) não tem pai
+       faces.push(id);
+       if (aux) facesAux.push(id); else pedacosDeEntrada.push(id);
+     });
+diff --git a/procedural/nucleo/operacoes/refino-da-costura.js b/procedural/nucleo/operacoes/refino-da-costura.js
+index ebbdc8ae7..5c765005a 100644
+--- a/procedural/nucleo/operacoes/refino-da-costura.js
++++ b/procedural/nucleo/operacoes/refino-da-costura.js
+@@ -23,6 +23,7 @@
+    operando é que aplica o refino. Determinístico: a ordem das arestas e das faces é a dos ids. */
+ 
+ import { fundir } from '../pedacos-convexos.js';
++import { registraPedacoDaBooleana } from '../pedacos-da-divisao.js';
+ 
+ const LIMITE_DO_LADO = 1.5;
+ const MAXIMO_DE_CANTOS = 400;
+@@ -579,7 +580,9 @@ export function refinarFaixaDaCostura(st, { faces, costura, arestasDaCostura, ar
+       if (!qs.length) delete st.F.get(id).quebras;
+       st.novosF?.push(id);
+       if (st.parteAtribuidaEm?.has(fid)) st.parteAtribuidaEm.set(id, st.parteAtribuidaEm.get(fid));
+-      (st.pedacosDe ??= new Map()).set(id, st.pedacosDe.get(fid) ?? fid);
++      const pai = st.pedacosDe.get(fid) ?? fid;
++      st.pedacosDe.set(id, pai);
++      registraPedacoDaBooleana(st, id, pai);
+       faces.push(id);
+       if (donos && donos[fid] != null) donos[id] = donos[fid];
+       if (toca.has(fid) && t.some((v, j) => arestasDaCostura.has(chave(v, t[(j + 1) % 3])))) costura.push(id);
+diff --git a/procedural/nucleo/pedacos-da-booleana.test.mjs b/procedural/nucleo/pedacos-da-booleana.test.mjs
+new file mode 100644
+index 000000000..281ac12cd
+--- /dev/null
++++ b/procedural/nucleo/pedacos-da-booleana.test.mjs
+@@ -0,0 +1,80 @@
++/* pedacos-da-booleana.test.mjs — a origem que cita uma face continua citando os pedaços dela depois de uma booleana que a refaz.
++ *
++ * A booleana deixa o maior pedaço de uma face cortada com o id e dá id novo aos outros (`st.pedacosDe`). Antes, a origem de um gerador anterior
++ * (`{op:'cubo', id:1, face:'direita'}`) resolvia só para o id que ficou, e uma `parte` ou um `material` por essa origem pegava um pedaço da face.
++ * Agora a resolução de origem soma os pedaços vivos, como já fazia com os da divisão por contorno. A fixture é um cubo de 2 de lado menos um prisma de
++ * 8 lados e raio 0,6 que o atravessa em x: as duas tampas em x ficam com um furo octogonal, e a área de cada uma é conhecida em fórmula. */
++import { describe, expect, it } from 'vitest';
++import { nucleo } from './entrada.js';
++
++const R = 0.6;
++const BASE = [
++  ['cubo', { origemId: 1, larg: 2, alt: 2, prof: 2, em: [0, 0, 0] }],
++  ['cilindro', { origemId: 2, raio: R, altura: 4, lados: 8, eixo: 'x', em: [-2, 1, 0.2] }],
++  ['subtrair', { origemId: 3, solidos: [{ origem: { op: 'cubo', id: 1 } }, { alias: 'cil' }] }],
++];
++const ALIAS = [['cil', { unir: [{ origem: { op: 'cilindro', id: 2 } }, { origem: { op: 'cilindro', id: 2, tampa: 'fundo' } }, { origem: { op: 'cilindro', id: 2, tampa: 'topo' } }] }]];
++const AREA_DA_TAMPA_COM_FURO = 4 - 2 * Math.SQRT2 * R * R;
++
++const areaDe = (n, f) => {
++  const P = f.vs.map((v) => n.V.get(v)); const a = [0, 0, 0];
++  for (let k = 1; k < P.length - 1; k++) {
++    const u = P[k].map((c, j) => c - P[0][j]), w = P[k + 1].map((c, j) => c - P[0][j]);
++    a[0] += u[1] * w[2] - u[2] * w[1]; a[1] += u[2] * w[0] - u[0] * w[2]; a[2] += u[0] * w[1] - u[1] * w[0];
++  }
++  return Math.hypot(...a) / 2;
++};
++const daParte = (passos, sel) => {
++  const n = nucleo([...passos, ['parte', { nome: 'p', sel }]], {}, {}, {}, null, ALIAS);
++  const faces = [...n.F.values()].filter((f) => f.parte === 'p');
++  return { n, ids: faces.map((f) => f.id), area: faces.reduce((s, f) => s + areaDe(n, f), 0) };
++};
++
++describe('origem de um gerador anterior depois de uma booleana que refaz a face citada', () => {
++  for (const face of ['esquerda', 'direita']) {
++    it(`a face ${face} do cubo cobre a tampa inteira, com os pedaços do corte`, () => {
++      const r = daParte(BASE, { origem: { op: 'cubo', id: 1, face } });
++      expect(r.n.orfaos).toEqual([]);
++      expect(r.ids.length).toBeGreaterThan(1);
++      expect(r.area).toBeCloseTo(AREA_DA_TAMPA_COM_FURO, 9);
++    });
++  }
++
++  it('a face que a booleana não cortou continua sendo uma só', () => {
++    const r = daParte(BASE, { origem: { op: 'cubo', id: 1, face: 'topo' } });
++    expect(r.ids).toHaveLength(1);
++    expect(r.area).toBeCloseTo(4, 9);
++  });
++
++  it('o cubo inteiro cobre as seis faces e os pedaços das duas tampas cortadas, sem repetir face', () => {
++    const r = daParte(BASE, { origem: { op: 'cubo', id: 1 } });
++    expect(r.ids).toHaveLength(6 + 2 * 8);
++    expect(new Set(r.ids).size).toBe(r.ids.length);
++    expect(r.area).toBeCloseTo(4 * 4 + 2 * AREA_DA_TAMPA_COM_FURO, 9);
++  });
++
++  it('a mesma entrada dá a mesma lista, na mesma ordem', () => {
++    const a = daParte(BASE, { origem: { op: 'cubo', id: 1, face: 'direita' } }).ids;
++    const b = daParte(BASE, { origem: { op: 'cubo', id: 1, face: 'direita' } }).ids;
++    expect(a).toEqual(b);
++    expect([...a].sort((x, y) => x - y)).toEqual(a);
++  });
++
++  it('a origem da própria booleana não ganha face nem perde a ordem que já tinha', () => {
++    const n = nucleo(BASE, {}, {}, {}, null, ALIAS);
++    const registrada = n.origens.get(3)[0].faces;
++    const r = daParte(BASE, { origem: { op: 'subtrair', id: 3 } });
++    expect(r.ids).toEqual(registrada.filter((f) => n.F.has(f)));
++  });
++
++  it('a cópia feita antes do corte não grita pelo pedaço que não conhece', () => {
++    const passos = [
++      ['cubo', { origemId: 1, larg: 2, alt: 2, prof: 2, em: [0, 0, 0] }],
++      ['espelha', { eixo: 'y', pos: 5, origemId: 4, derivaDe: { op: 'cubo', id: 1 }, sel: { origem: { op: 'cubo', id: 1 } } }],
++      ...BASE.slice(1),
++    ];
++    const n = nucleo([...passos, ['parte', { nome: 'c', sel: { origem: { op: 'espelha', id: 4, de: { op: 'cubo', id: 1 } } } }]], {}, {}, {}, null, ALIAS);
++    expect(n.orfaos).toEqual([]);
++    expect([...n.F.values()].filter((f) => f.parte === 'c')).toHaveLength(6);
++  });
++});
+diff --git a/procedural/nucleo/pedacos-da-divisao.js b/procedural/nucleo/pedacos-da-divisao.js
+index 1309b1253..e2bfa7d01 100644
+--- a/procedural/nucleo/pedacos-da-divisao.js
++++ b/procedural/nucleo/pedacos-da-divisao.js
+@@ -17,6 +17,41 @@ export function comOsPedacosDaDivisao(st, lista) {
+   return faces;
+ }
+ 
++/** Anota que `pedaco` nasceu de `pai` numa booleana (ou no refino da costura dela): o corte de uma face de entrada deixa o maior pedaço com o id e dá
++ *  id novo aos outros, e a origem que citava a face continua citando a superfície inteira. `st.pedacosDe` guarda o pai de cada pedaço de qualquer
++ *  operação; este mapa guarda só os da booleana, para a resolução de origem não expandir os pedaços que outras operações registram ali. */
++export function registraPedacoDaBooleana(st, pedaco, pai) {
++  const mapa = (st.pedacosDaBooleana ??= new Map());
++  const filhos = mapa.get(pai);
++  if (filhos) { if (!filhos.includes(pedaco)) filhos.push(pedaco); } else mapa.set(pai, [pedaco]);
++}
++
++/** Os pedaços da divisão por contorno e os da booleana, para a resolução de origem: devolve a lista com os pedaços de cada face logo depois dela
++ *  (os dos pedaços também). Os da divisão entram como em `comOsPedacosDaDivisao`. Os da booleana só entram se vivem (o pedaço que um passo
++ *  posterior apagou ou consumiu já não é da superfície) e se a lista ainda não os cita, para a ordem que o gerador deu não mudar. Devolve a
++ *  própria lista quando nenhuma face dela foi refeita. */
++export function comOsPedacosRefeitos(st, lista) {
++  const divisao = st.pedacosDaDivisao, booleana = st.pedacosDaBooleana;
++  if (!(divisao?.size || booleana?.size) || !lista.some((f) => divisao?.has(f) || booleana?.has(f))) return lista;
++  const citadas = new Set(lista);
++  const faces = []; const postas = new Set();
++  const desce = (f) => {
++    for (const p of booleana?.get(f) ?? []) {
++      if (citadas.has(p) || postas.has(p)) continue;   // a lista já a cita: ela entra no lugar dela, com os pedaços que tiver
++      if (st.F.has(p)) { postas.add(p); faces.push(p); for (const q of divisao?.get(p) ?? []) poe(q); }
++      desce(p);
++    }
++  };
++  const poe = (f) => {
++    if (postas.has(f)) return;
++    postas.add(f); faces.push(f);
++    for (const p of divisao?.get(f) ?? []) poe(p);
++    desce(f);
++  };
++  for (const f of lista) poe(f);
++  return faces;
++}
++
+ /** A face é um pedaço que a divisão criou (e não a face cortada, que fica com o id). */
+ export function ehPedacoDaDivisao(st, f) {
+   const pai = st.pedacosDe?.get(f);
+@@ -53,6 +88,12 @@ export function tirarDosPedacosDaDivisao(st, saidas) {
+   return ficam;
+ }
+ 
++/** A face é um pedaço que uma booleana refez (e não a face cortada, que fica com o id). */
++export function ehPedacoDaBooleana(st, f) {
++  const pai = st.pedacosDe?.get(f);
++  return pai != null && (st.pedacosDaBooleana?.get(pai)?.includes(f) ?? false);
++}
++
+ /** A face de antes de todas as divisões de que este pedaço descende; a própria face, se ela não é pedaço. */
+ export function faceDeAntesDaDivisao(st, f) {
+   let x = f;
+-- 
+2.43.0
+
