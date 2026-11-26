@@ -48,6 +48,8 @@ Se a bancada aquecida der imagem diferente da bancada fria na mesma câmera, ela
 
 ## Decisão da pessoa
 
+Decidido pela pessoa em 2026-11-26 ("Sim, pode guardar"): a decisão da pessoa sobre uma rodada fica num arquivo ao lado das rodadas, gravado depois da rodada, quando ela vê a peça, com a mesma regra do formato e das palavras dela, sem reescrever o registro da rodada.
+
 ## Andamento
 
 Em 2026-11-26 a fatia 1 remediu antes de mexer: a ação da rodada da lataria do carro leva 29,9 s com o cache quente, e não os 105 s de 18/11 (a receita mudou e o ajuste da gaiola ficou esparso em 22/11), com a dobra e o vinco em cerca de 3 s. Com eles pela execução guardada, a ação cai para 27 a 29 s, e as duas linhas de comando caem de 68 s e 64 s para 2,7 s e 2,8 s, com a saída igual byte a byte na lataria e em cinco peças pequenas. A rodada ganhou o campo `decisaoDaPessoa`. O tempo que sobra na ação está na medida das partes e nas formas e na referência dentro do `descrever`, fora deste território ([banco de provas](../banco-de-provas/laco-mais-rapido-2026-11-26/README.md)).
