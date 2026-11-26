@@ -72,6 +72,8 @@ Fatia 1 feita em 2026-11-26: as cinco peças aprovadas no acervo, confirmadas pe
 
 Fatia 2 feita em 2026-11-26: as seis automotivas e as três mesas no acervo, pelo crítico cego, com a mesa de centro corrigida, e aprovadas pela pessoa por imagem.
 
+Fatia 3 feita em 2026-11-26: a análise da bancada por subpasta, as armadilhas no guia e a confirmação corpo a corpo, sem mudar nenhum veredito do acervo.
+
 ## Fechamento
 
 Preencher ao concluir ou cancelar: estado final, commit e PR, gates, resultado observado e candidatos devolvidos ao backlog.

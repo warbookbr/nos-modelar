@@ -348,3 +348,5 @@ Um comando que leia `articulacoes.json` da peça e confira o curso pela linha de
 O caminho para corrigir uma forma aprovada fora do laço de modelagem: a peça aprovada antes do laço não tem como passar pelo crítico sem reabrir tudo, e o braço de prova pediu isso.
 
 O pacote do crítico visual com a caixa de cada corpo da parte, além da caixa da parte inteira: na mesa de jantar o crítico leu a caixa da `saia` inteira como o comprimento de uma travessa e apontou um defeito que não existia (resgate dos ramos, 2026-11-26).
+
+Conferir na bancada três relações que a medida corpo a corpo daria como interpenetração e a parte inteira dá como encosto: `hs1|placa` na base do braço robótico, e `telhasAltas|vigas` e `telhasBaixas|vigas` no telhado da instalação solar. Se forem interpenetração de fato, o gatilho de `relacaoConfirmadaPorSolido` passa a refazer também o `encostam` (resgate dos ramos, 2026-11-26).

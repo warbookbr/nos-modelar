@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2393 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2394 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -2832,6 +2832,7 @@
 - `derivar-roteiro-revalidacao.js` — derivar-roteiro-revalidacao.js — transforma impacto local em ações explícitas.
 - `descrever-montagem-resolvida.js` — descrever-montagem-resolvida.js — projeta a árvore interna em contexto JSON para IA.
 - `descrever-partes.js` — descrever-partes.js — mede uma peça da Oficina POR NOME de parte, sem Three.js: caixa alinhada aos eixos, centro, dimensões e faces de cada parte, e a folga …
+- `descrever-partes.test.mjs` — descrever-partes.test.mjs — a relação entre partes confirmada corpo a corpo.
 - `descricao-do-gesto.js` — descricao-do-gesto.js — o que a pessoa fez na bancada, dito em palavras geométricas com números.
 - `descricao-do-gesto.test.js` — Uma caixa de 1 m de lado com um anel no meio da altura, numa parte só. O anel existe porque sem ele a caixa tem dois níveis em y, e com dois níveis um arquei…
 - `diferenca-de-texto.js` — diferenca-de-texto.js — a diferença entre duas versões de um texto, linha a linha, para o registro de rodada guardar o que foi TENTADO.
