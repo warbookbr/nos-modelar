@@ -39,13 +39,16 @@ Todo comando de hoje continua respondendo igual; o orçamento de leitura só des
 
 1. O `kill`, o `.mcp.json`, a contagem de peças e o bloco copiado dos agentes.
 2. O registro de ferramentas com gate e o `tools/README.md` gerado.
-3. Os ramos do roteador e o orçamento com a skill, e o fechamento.
+3. Os ramos do roteador e o orçamento com a skill; o roteador mostrando o que existe para o objeto e a vigia por `MODELAR_VIGIA`; a ferramenta de uso que nenhum guia cita reprovada; e o comando que monta o pedido ao agente.
+4. A decisão da pessoa sobre as ferramentas sem chamador, e o fechamento.
 
 ## Riscos e parada
 
 Se o registro acusar ferramenta que alguém usa por fora do repositório, ela fica registrada como externa, com o motivo.
 
 ## Decisão da pessoa
+
+Decidido pela pessoa em 2026-11-26, pelas recomendações: o comando que monta o pedido ao agente a partir do plano (território, gate e regras comuns, com os números tirados do banco de provas com a data), em que quem conduz escreve só a tarefa ("1, 2, 3, 4 sim"); toda ferramenta de uso aparece em algum roteiro, skill ou guia, conferido pelo registro (29 das 108 não apareciam), e o `comecar` mostra, no planejamento de uma peça, as ferramentas e famílias que servem ao tipo de objeto ("pode sim"); e, no lugar da tarefa agendada diária, o `comecar` mostra os ramos parados e o último CI vermelho só quando a variável `MODELAR_VIGIA=1` está ligada no ambiente de quem conduz, e sai calado sem rede, para quem clona o repositório não ver o que não é dele ("Pode fazer isso sim, eu permito!").
 
 ## Andamento
 

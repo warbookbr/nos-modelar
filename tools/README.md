@@ -2,7 +2,7 @@
 
 Gerado de `tools/registro-de-ferramentas.json` por `npm run ferramentas:registro:gerar`; não edite à mão. O registro tem uma entrada por ferramenta de linha de comando desta pasta (o arquivo, os comandos de `package.json`, o que faz e o tipo), e `npm run ferramentas:registro:check` recusa a que ficar de fora, a entrada sem arquivo e o módulo sem chamador. Ferramenta nova nasce na pasta do assunto dela (`tools/modelar/` para peça e bancada, `tools/mapa/` para documento e processo, `tools/gates/` para a bateria), responde a `--ajuda` e ganha entrada no registro. As regras de quem muda esta pasta estão em `tools/CLAUDE.md`.
 
-## De uso (108)
+## De uso
 
 Quem trabalha chama, com `npm run <comando> -- <argumentos>`; a que não tem comando roda pelo arquivo.
 
@@ -87,6 +87,7 @@ Quem trabalha chama, com `npm run <comando> -- <argumentos>`; a que não tem com
 | `prancha:sobrepor` | Projeta a geometria limpa de uma prancha, em alto contraste, sobre a imagem de referência calibrada. |
 | `node tools/modelar/prancha/prancha.mjs` | Motor de prancha ortográfica: recebe a especificação em milímetro e devolve o SVG com o relatório medido dele. |
 | `referencia:grade` | Estampa uma grade numerada em milímetro e pixel sobre uma imagem de referência calibrada. |
+| `preenchimento:rede` | Diz, de cada rede de curvas de uma receita, como o preenchimento do miolo pelas curvas vizinhas usou os vizinhos. |
 | `procedencia:check` | Confere a procedência (medido, derivado, resolvido ou declarado) da fonte de restrições. |
 | `proporcoes` | A fonte única das medidas de uma montagem, e a conferência de que os outros lugares a seguem. |
 | `raio:aresta` | Mede o raio de cada aresta de caráter de uma peça, sobre a malha final. |
@@ -117,16 +118,112 @@ Quem trabalha chama, com `npm run <comando> -- <argumentos>`; a que não tem com
 | `node tools/modelar/vistas-texturizadas.mjs` | Captura três vistas de uma peça com a textura que a exportação OBJ gera, para julgar o acabamento. |
 | `zebra` | Conta as ilhas de reflexo e os laços fechados de listra da zebra em cada região da chapa, por faixa de comprimento de onda. |
 
-## De gate (42)
+## De gate
 
-A bateria (`npm run gates`) ou o CI chama, e cada uma roda sozinha para conferir uma coisa só: `arquitetura/fronteira-da-bancada.mjs`, `arquitetura/independencia-catalogo.mjs`, `arquitetura/mapear-motor-procedural.mjs`, `arquitetura/nome-antigo.mjs`, `bancadas/porteiro.mjs`, `catalogo/gerar-catalogo-capacidades.mjs`, `ci/juntar-a-main.sh`, `gates.mjs`, `gates/argumentos-essenciais.mjs`, `gates/recusas-exercitadas.mjs`, `mapa/citacoes.mjs`, `mapa/decisoes.mjs`, `mapa/estrutura-docs.mjs`, `mapa/leitura-obrigatoria.mjs`, `mapa/links.mjs`, `mapa/mapa.mjs`, `mapa/mecanismos.mjs`, `mapa/planos.mjs`, `mapa/reguas-nos-gates.mjs`, `mapa/territorio-do-envio.mjs`, `mapa/toc.mjs`, `modelar/banco-de-provas.mjs`, `modelar/calibracao-do-critico.mjs`, `modelar/familia.mjs`, `modelar/ferramentas-por-objeto.mjs`, `modelar/guardas/guarda-acervo.mjs`, `modelar/guardas/guarda-bancada-vazia.mjs`, `modelar/guardas/guarda-camera-livre.mjs`, `modelar/guardas/guarda-edicao-de-malha.mjs`, `modelar/guardas/guarda-escolha-da-peca.mjs`, `modelar/guardas/guarda-gesto.mjs`, `modelar/guardas/guarda-inspecao-par.mjs`, `modelar/guardas/guarda-junta-da-bancada.mjs`, `modelar/guardas/guarda-portas-bancada.mjs`, `modelar/guardas/guarda-referencia-da-peca.mjs`, `modelar/guardas/guarda-referencial.mjs`, `modelar/guardas/guarda-temas-e-visoes.mjs`, `modelar/guardas/guarda-tempo-do-descrever.mjs`, `modelar/guardas/rodar-guardas.mjs`, `modelar/origens-check.mjs`, `reguas-de-texto/reguas-de-texto.mjs`, `testes-lentos.mjs`.
+A bateria (`npm run gates`) ou o CI chama, e cada uma roda sozinha para conferir uma coisa só.
 
-## Internas (11)
+- `arquitetura/fronteira-da-bancada.mjs`
+- `arquitetura/independencia-catalogo.mjs`
+- `arquitetura/mapear-motor-procedural.mjs`
+- `arquitetura/nome-antigo.mjs`
+- `bancadas/porteiro.mjs`
+- `catalogo/gerar-catalogo-capacidades.mjs`
+- `ci/juntar-a-main.sh`
+- `gates.mjs`
+- `gates/argumentos-essenciais.mjs`
+- `gates/recusas-exercitadas.mjs`
+- `mapa/citacoes.mjs`
+- `mapa/decisoes.mjs`
+- `mapa/estrutura-docs.mjs`
+- `mapa/leitura-obrigatoria.mjs`
+- `mapa/links.mjs`
+- `mapa/mapa.mjs`
+- `mapa/mecanismos.mjs`
+- `mapa/planos.mjs`
+- `mapa/reguas-nos-gates.mjs`
+- `mapa/territorio-do-envio.mjs`
+- `mapa/toc.mjs`
+- `modelar/banco-de-provas.mjs`
+- `modelar/calibracao-do-critico.mjs`
+- `modelar/familia.mjs`
+- `modelar/ferramentas-por-objeto.mjs`
+- `modelar/guardas/guarda-acervo.mjs`
+- `modelar/guardas/guarda-bancada-vazia.mjs`
+- `modelar/guardas/guarda-camera-livre.mjs`
+- `modelar/guardas/guarda-edicao-de-malha.mjs`
+- `modelar/guardas/guarda-escolha-da-peca.mjs`
+- `modelar/guardas/guarda-gesto.mjs`
+- `modelar/guardas/guarda-inspecao-par.mjs`
+- `modelar/guardas/guarda-junta-da-bancada.mjs`
+- `modelar/guardas/guarda-portas-bancada.mjs`
+- `modelar/guardas/guarda-referencia-da-peca.mjs`
+- `modelar/guardas/guarda-referencial.mjs`
+- `modelar/guardas/guarda-temas-e-visoes.mjs`
+- `modelar/guardas/guarda-tempo-do-descrever.mjs`
+- `modelar/guardas/rodar-guardas.mjs`
+- `modelar/origens-check.mjs`
+- `reguas-de-texto/reguas-de-texto.mjs`
+- `testes-lentos.mjs`
 
-Outra ferramenta chama: `arquitetura/termos-proibidos.mjs`, `modelar/dobra-da-superficie.mjs`, `modelar/guardas/etapas-do-acervo.mjs`, `modelar/medir-arvore-para-migracao.mjs`, `modelar/migrar-etapas-para-impressao.mjs`, `modelar/pedidos-da-pessoa.mjs`, `modelar/perguntas-da-peca.mjs`, `modelar/prancha/prancha-geometria.mjs`, `modelar/preenchimento-da-rede.mjs`, `modelar/sobreposicao-de-cortes.mjs`, `modelar/vinco-oculto.mjs`.
+## Internas
 
-## Sem chamador, declarados (28)
+Outra ferramenta chama.
 
-Nenhum comando, import de ferramenta viva, skill ou configuração chama o que está abaixo; o motivo de cada um ficar está no registro.
+- `arquitetura/termos-proibidos.mjs`
+- `modelar/aprovacao-da-familia-fio.mjs`
+- `modelar/dobra-da-superficie.mjs`
+- `modelar/fixtures/alisar-rede-prova-casos.mjs`
+- `modelar/fixtures/contorno-da-imagem/braco-sintetico.mjs`
+- `modelar/guardas/etapas-do-acervo.mjs`
+- `modelar/medir-arvore-para-migracao.mjs`
+- `modelar/migrar-etapas-para-impressao.mjs`
+- `modelar/pedidos-da-pessoa.mjs`
+- `modelar/perguntas-da-peca.mjs`
+- `modelar/prancha/prancha-geometria.mjs`
+- `modelar/sobreposicao-de-cortes.mjs`
+- `modelar/vinco-oculto.mjs`
 
-`arquitetura/nucleo-sem-three.mjs`, `blender/`, `modelar/acervo-reduzido.mjs`, `modelar/cadeiras-medida.mjs`, `modelar/capacidade-symlink.mjs`, `modelar/comparar-silhueta.mjs`, `modelar/conferir-retrato-do-acervo.mjs`, `modelar/derivar-campanha-revalidacao.mjs`, `modelar/esboco-alinhar-caixas.mjs`, `modelar/esboco-para-passos.mjs`, `modelar/exportar-peca.mjs`, `modelar/familia-com-esboco.mjs`, `modelar/folha-comparativa.mjs`, `modelar/fonte-sintetica.mjs`, `modelar/frente-da-fonte.mjs`, `modelar/guardas/etapas-do-acervo.mjs`, `modelar/medidas-da-fonte.mjs`, `modelar/medir-importar-receita.mjs`, `modelar/modelo-de-referencia.mjs`, `modelar/perfil-da-execucao.mjs`, `modelar/receita-externa.mjs`, `modelar/reguas-de-malha/resumo-do-acervo.mjs`, `modelar/silhueta-da-superficie.mjs`, `modelar/triangulos-da-receita.mjs`, `modelar/vistas-da-receita.mjs`, `modelar/vistas-de-passos.mjs`, `modelar/vistas-texturizadas.mjs`, `oficina/conferir-malha.ts`.
+## Apoio de teste
+
+Só os testes usam; a conferência exige que algum teste importe cada um.
+
+- `arquitetura/nucleo-sem-three.mjs`
+- `mcp/fixtures/`, a pasta
+- `modelar/acervo-reduzido.mjs`
+- `modelar/capacidade-symlink.mjs`
+- `modelar/fixtures/`, a pasta
+- `modelar/fixtures/contatos/`, a pasta
+- `modelar/fonte-sintetica.mjs`
+- `modelar/guardas/etapas-do-acervo.mjs`
+- `modelar/medir-importar-receita.mjs`
+- `oficina/conferir-malha.ts`
+
+## Sem chamador, declarados
+
+Nenhum comando, import de ferramenta viva, skill ou configuração chama o que está abaixo; o motivo de cada um ficar vem depois dos dois pontos.
+
+- `blender/`, a pasta: ferramentas opcionais do Blender, fora do CI e rodadas à mão; uso em docs/modelar/blender/REGUA-E-PACOTE-CEGO.md
+- `modelar/cadeiras-medida.mjs`: à espera da decisão da pessoa (apagar ou religar)
+- `modelar/comparar-silhueta.mjs`: à espera da decisão da pessoa (apagar ou religar)
+- `modelar/conferir-retrato-do-acervo.mjs`: à espera da decisão da pessoa (apagar ou religar)
+- `modelar/derivar-campanha-revalidacao.mjs`: à espera da decisão da pessoa (apagar ou religar)
+- `modelar/esboco-alinhar-caixas.mjs`: à espera da decisão da pessoa (apagar ou religar)
+- `modelar/esboco-para-passos.mjs`: à espera da decisão da pessoa (apagar ou religar)
+- `modelar/exportar-peca.mjs`: à espera da decisão da pessoa (apagar ou religar)
+- `modelar/familia-com-esboco.mjs`: à espera da decisão da pessoa (apagar ou religar)
+- `modelar/folha-comparativa.mjs`: à espera da decisão da pessoa (apagar ou religar)
+- `modelar/frente-da-fonte.mjs`: à espera da decisão da pessoa (apagar ou religar)
+- `modelar/medidas-da-fonte.mjs`: à espera da decisão da pessoa (apagar ou religar)
+- `modelar/medir-arvore-para-migracao.mjs`: ferramenta de uma migração já feita; à espera da decisão da pessoa (apagar ou religar)
+- `modelar/migrar-etapas-para-impressao.mjs`: ferramenta de uma migração já feita; à espera da decisão da pessoa (apagar ou religar)
+- `modelar/modelo-de-referencia.mjs`: à espera da decisão da pessoa (apagar ou religar)
+- `modelar/perfil-da-execucao.mjs`: à espera da decisão da pessoa (apagar ou religar)
+- `modelar/receita-externa.mjs`: à espera da decisão da pessoa (apagar ou religar)
+- `modelar/reguas-de-malha/costura-registrada.mjs`: régua que só o teste dela e o de uma fixtura rodam; à espera da decisão da pessoa (apagar ou religar)
+- `modelar/reguas-de-malha/resumo-do-acervo.mjs`: à espera da decisão da pessoa (apagar ou religar)
+- `modelar/silhueta-da-superficie.mjs`: à espera da decisão da pessoa (apagar ou religar)
+- `modelar/triangulos-da-receita.mjs`: à espera da decisão da pessoa (apagar ou religar)
+- `modelar/visor-montagem.js`: carregado por caminho calculado: a página visor-montagem.html, que a captura de montagem abre, o carrega, por `modelar/capturar-montagem.mjs`
+- `modelar/vistas-da-receita.mjs`: à espera da decisão da pessoa (apagar ou religar)
+- `modelar/vistas-de-passos.mjs`: à espera da decisão da pessoa (apagar ou religar)
+- `modelar/vistas-texturizadas.mjs`: à espera da decisão da pessoa (apagar ou religar)

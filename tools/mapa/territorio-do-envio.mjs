@@ -24,6 +24,8 @@ export const GERADOS = [
   'docs/modelar/decisoes/PLANOS-ENCERRADOS.md', 'docs/modelar/decisoes/README.md', 'docs/modelar/roteiros/ROTEIROS.md',
   'docs/modelar/banco-de-provas/BANCO-DE-PROVAS.md', 'docs/modelar/banco-de-provas/banco-de-provas.json',
   'docs/modelar/pesquisas/FERRAMENTAS-POR-OBJETO.md',
+  /* o registro das ferramentas e o README gerado dele: toda ferramenta nova, de qualquer plano, ganha entrada */
+  'tools/registro-de-ferramentas.json', 'tools/README.md',
 ];
 
 const PLANO = /^\d{4}-\d{2}-\d{2}-.+\.md$/;

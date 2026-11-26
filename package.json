@@ -110,6 +110,7 @@
     "distancia:pele": "node tools/modelar/distancia-a-pele.mjs",
     "conferir:pontos": "node tools/modelar/conferir-pontos.mjs",
     "rodada": "node tools/modelar/rodada-de-modelagem.mjs",
+    "preenchimento:rede": "node tools/modelar/preenchimento-da-rede.mjs",
     "desvio": "node tools/modelar/mapa-de-desvio.mjs",
     "emendas": "node tools/modelar/continuidade-nas-emendas.mjs",
     "suavidade": "node tools/modelar/suavidade-por-regiao.mjs",
