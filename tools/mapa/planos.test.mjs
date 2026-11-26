@@ -1,5 +1,6 @@
 /* planos.test.mjs — prova que o gate recusa plano grande, estados inválidos,
-   índice divergente, plano parado que o índice não liga, mais de seis planos ativos, ativo sem território e territórios sobrepostos. */
+   índice divergente, plano parado que o índice não liga, mais de seis comuns ou nove ativos, o campo Núcleo contra o território,
+   ativo sem território e territórios sobrepostos. */
 import { afterEach, describe, expect, it } from 'vitest';
 import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -85,6 +86,51 @@ describe('gate dos planos curtos', () => {
     [...comuns, '2026-08-02-g.md'].forEach((n) => gravar(seteComuns, n, 'ativo'));
     gravar(seteComuns, nucleo[0], 'ativo', 5, `\`procedural/nucleo/${nucleo[0]}.js\``);
     expect(conferirPlanos({ pasta: seteComuns }).problemas.join('\n')).toMatch(/7 planos ativos que não são de núcleo/);
+  });
+
+  it('o plano sem o campo conta como comum, e rascunho e pronto também exigem o campo', () => {
+    const comuns = ['a', 'b', 'c', 'd', 'e', 'f'].map((x) => `2026-08-02-${x}.md`);
+    const pasta = ambiente(lista(...comuns, '2026-08-02-g.md', '2026-08-02-r.md', '2026-08-02-p.md'));
+    comuns.forEach((n) => gravar(pasta, n, 'ativo'));
+    gravar(pasta, '2026-08-02-g.md', 'ativo', 5, '`src/g/`', null);
+    gravar(pasta, '2026-08-02-r.md', 'rascunho', 4, null, null);
+    gravar(pasta, '2026-08-02-p.md', 'pronto', 4, null, null);
+    const texto = conferirPlanos({ pasta }).problemas.join('\n');
+    expect(texto).toMatch(/7 planos ativos que não são de núcleo/);
+    expect(texto).toMatch(/2026-08-02-r\.md: falta a linha/);
+    expect(texto).toMatch(/2026-08-02-p\.md: falta a linha/);
+  });
+
+  it('o caminho do núcleo escrito fora do padrão não escapa da conferência', () => {
+    for (const territorio of ['`procedural/nucleo`', '`Procedural/Nucleo/a.js`', '`procedural/`']) {
+      const pasta = ambiente(lista('2026-08-02-a.md'));
+      gravar(pasta, '2026-08-02-a.md', 'ativo', 5, territorio, 'não');
+      expect(conferirPlanos({ pasta }).problemas.join('\n')).toMatch(/declara \*\*Núcleo:\*\* não e o território tem/);
+    }
+    for (const territorio of ['`./procedural/nucleo/a.js`', '`procedural//nucleo/a.js`']) {
+      const pasta = ambiente(lista('2026-08-02-a.md'));
+      gravar(pasta, '2026-08-02-a.md', 'ativo', 5, territorio, 'sim');
+      expect(conferirPlanos({ pasta }).problemas.join('\n')).toMatch(/caminho inválido/);
+    }
+  });
+
+  it('a pasta-mãe de um caminho compartilhado continua no território e colide com quem está dentro dela', () => {
+    const pasta = ambiente(lista('2026-08-02-a.md', '2026-08-02-b.md'));
+    gravar(pasta, '2026-08-02-a.md', 'ativo', 5, '`procedural/`', 'sim');
+    gravar(pasta, '2026-08-02-b.md', 'ativo', 5, '`procedural/nucleo/b.js`', 'sim');
+    expect(conferirPlanos({ pasta }).problemas.join('\n')).toMatch(/territórios sobrepostos/);
+  });
+
+  it('aceita o campo em outra caixa e com ponto, e recusa o ilegível, o duplicado e o escrito fora do padrão dizendo o recebido', () => {
+    const casos = [['**Núcleo:** SIM.', null], ['**Núcleo:** nao', /ilegível \(recebido: "\*\*Núcleo:\*\* nao"\)/],
+      ['**Núcleo:** sim\n**Núcleo:** não', /2 linhas \*\*Núcleo:\*\*/], ['**Nucleo:** sim', /achada a linha "\*\*Nucleo:\*\* sim"/],
+      ['- **Núcleo:** sim', /achada a linha "- \*\*Núcleo:\*\* sim"/]];
+    for (const [linha, esperado] of casos) {
+      const pasta = ambiente(lista('2026-08-02-a.md'));
+      writeFileSync(join(pasta, '2026-08-02-a.md'), `# Plano\n\n**Estado:** rascunho\n${linha}\n`);
+      const texto = conferirPlanos({ pasta }).problemas.join('\n');
+      if (esperado) expect(texto).toMatch(esperado); else expect(texto).not.toMatch(/Núcleo/);
+    }
   });
 
   it('confere o campo Núcleo contra o território, nos dois sentidos, e exige o campo', () => {

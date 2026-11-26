@@ -1,5 +1,6 @@
-/* planos.mjs — confere que os planos ativos são no máximo cinco, cada um com território declarado e sem
-   sobreposição, e que nenhum plano executivo ultrapassa o limite curto acordado. */
+/* planos.mjs — confere que os planos ativos são no máximo seis comuns e nove com os de núcleo, cada um com território
+   declarado e sem sobreposição, que o campo Núcleo bate com o território, e que nenhum plano executivo ultrapassa o limite
+   curto acordado. */
 import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, sep } from 'node:path';
@@ -61,7 +62,8 @@ export const MAXIMO_DE_ATIVOS = 6;
 /* VAGAS DE NÚCLEO (decidido pela pessoa em 2026-11-26, plano do processo e do CI): além dos MAXIMO_DE_ATIVOS de qualquer tipo,
    até VAGAS_EXTRAS_DE_NUCLEO planos ativos a mais, só de ajuste ou melhoria do núcleo. Todo plano em jogo declara
    `**Núcleo:** sim` ou `**Núcleo:** não` abaixo do Estado, e no plano ativo o campo é conferido contra o território: sim pede um
-   caminho em PASTA_DO_NUCLEO, e um caminho lá pede sim. Assim nenhum plano comum ocupa uma vaga de núcleo. */
+   caminho em PASTA_DO_NUCLEO, e um caminho lá pede sim. O gate não confere quanto do plano é núcleo nem se o caminho existe
+   (um arquivo novo ainda não existe): plano de núcleo é o que muda o núcleo, e quem ativa vê o território no cabeçalho. */
 export const VAGAS_EXTRAS_DE_NUCLEO = 3;
 export const PASTA_DO_NUCLEO = 'procedural/nucleo/';
 
@@ -71,10 +73,26 @@ export function nucleoDe(texto) {
   return valor === 'sim' ? true : valor === 'não' ? false : undefined;
 }
 
+/* A recusa do campo: { problema } quando falta, está duplicado ou é ilegível, com a linha recebida; ou {} quando está certo.
+   A quase-linha (sem acento, outra caixa, dois-pontos fora, marcador de lista, indentada) é procurada só para ser mostrada. */
+export function problemaDoNucleo(texto) {
+  const certas = [...texto.matchAll(/^\*\*Núcleo:\*\*.*$/gm)].map((m) => m[0]);
+  if (certas.length > 1) return { problema: `tem ${certas.length} linhas **Núcleo:**; deixe uma só, abaixo do Estado` };
+  if (certas.length === 1) {
+    return nucleoDe(texto) === undefined ? { problema: `a linha **Núcleo:** é ilegível (recebido: ${JSON.stringify(certas[0])}); escreva **Núcleo:** sim ou **Núcleo:** não` } : {};
+  }
+  const quase = texto.match(/^[ \t]*(?:[-*][ \t]+)?\*\*n[uú]cleo(?::\*\*|\*\*:).*$/gim)?.[0];
+  return { problema: `falta a linha **Núcleo:** sim ou **Núcleo:** não abaixo do Estado${quase ? ` (achada a linha ${JSON.stringify(quase.trim())}, escrita fora do padrão)` : ''}; declare se o plano muda ${PASTA_DO_NUCLEO}` };
+}
+
 /* Os caminhos do território que ficam no núcleo, antes do filtro dos compartilhados. */
 function caminhosNoNucleo(texto) {
   const linha = texto.match(/^\*\*Território:\*\*\s*(.*?)\s*$/m)?.[1] ?? '';
-  return [...linha.matchAll(/`([^`]+)`/g)].map((m) => m[1].trim()).filter((c) => sobrepoe(c, PASTA_DO_NUCLEO));
+  const nucleo = PASTA_DO_NUCLEO.replace(/\/$/, '');
+  return [...linha.matchAll(/`([^`]+)`/g)].map((m) => m[1].trim()).filter((c) => {
+    const n = c.toLowerCase().replace(/\/+$/, '');
+    return n === nucleo || n.startsWith(`${nucleo}/`) || nucleo.startsWith(`${n}/`);
+  });
 }
 export const CAMINHOS_COMPARTILHADOS = [
   'docs/modelar/planos/',
@@ -98,9 +116,11 @@ export function territorioDe(texto) {
   if (caminhos.length === 0) {
     return { problema: `**Território:** ilegível; liste caminhos entre crases ou escreva "nenhum (aguarda aprovação)": ${linha}` };
   }
-  const invalido = caminhos.find((c) => !c || c.startsWith('/') || c.includes('..') || /\s/.test(c));
+  const invalido = caminhos.find((c) => !c || c.startsWith('/') || c.startsWith('./') || c.includes('//') || c.includes('..') || /\s/.test(c));
   if (invalido !== undefined) return { problema: `**Território:** caminho inválido "${invalido}"` };
-  return { caminhos: caminhos.filter((c) => !CAMINHOS_COMPARTILHADOS.some((s) => sobrepoe(c, s))) };
+  /* sai do território só o caminho igual a um compartilhado ou dentro de uma pasta compartilhada; a pasta-mãe de um
+     compartilhado (`procedural/` contém `procedural/familias/index.js`) fica, porque ela muda mais que o compartilhado */
+  return { caminhos: caminhos.filter((c) => !CAMINHOS_COMPARTILHADOS.some((s) => c === s || (s.endsWith('/') && c.startsWith(s)))) };
 }
 
 /* Há sobreposição quando os caminhos são iguais ou um é pasta (termina em `/`) que contém o outro. */
@@ -186,12 +206,10 @@ export function conferirPlanos({
 
   for (const plano of planos) {
     if (!plano.naRaiz || !ESTADOS_EM_JOGO.has(plano.estado)) continue;
+    const { problema: problemaNucleo } = problemaDoNucleo(textoDe[plano.nome]);
+    if (problemaNucleo) { problemas.push(`${plano.nome}: ${problemaNucleo}`); continue; }
     const nucleo = nucleoDe(textoDe[plano.nome]);
     plano.nucleo = nucleo;
-    if (nucleo === undefined) {
-      problemas.push(`${plano.nome}: falta a linha **Núcleo:** sim ou **Núcleo:** não abaixo do Estado (recebido: ${JSON.stringify(textoDe[plano.nome].match(/^\*\*Núcleo:\*\*.*$/m)?.[0] ?? 'nada')}); declare se o plano muda ${PASTA_DO_NUCLEO}`);
-      continue;
-    }
     if (plano.estado !== 'ativo') continue;
     const noNucleo = caminhosNoNucleo(textoDe[plano.nome]);
     if (nucleo && !noNucleo.length) problemas.push(`${plano.nome}: declara **Núcleo:** sim e o território não tem caminho em ${PASTA_DO_NUCLEO}; ponha o caminho do núcleo no território ou declare não`);
@@ -429,7 +447,8 @@ function executar() {
     process.exitCode = 1;
     return;
   }
-  console.log(`planos:check ok — ${resultado.planos.length} plano(s), ${resultado.ativos.length} ativo(s)`);
+  const deNucleo = resultado.ativos.filter((p) => p.nucleo === true).length;
+  console.log(`planos:check ok — ${resultado.planos.length} plano(s), ${resultado.ativos.length} ativo(s), ${deNucleo} de núcleo (até ${MAXIMO_DE_ATIVOS} comuns e ${VAGAS_EXTRAS_DE_NUCLEO} a mais de núcleo)`);
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) executar();
