@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2427 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2432 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -74,6 +74,11 @@
 ## .claude/skills/laco-de-modelagem/
 
 - `SKILL.md` — Conduzir o laço de modelagem de uma peça: despachar o modelador com o plano, medir, despachar o crítico sem a história da construção e registrar cada rodada …
+- `pacote-e-referencia.md` — O pacote do crítico e a referência
+- `parte-por-parte.md` — Parte por parte
+- `processo-leve.md` — O processo leve, para objeto de uma família
+- `refino.md` — O refino depois da entrega
+- `registro-a-mao.md` — O registro montado à mão
 
 ## .claude/skills/prancha-dos-contornos/
 

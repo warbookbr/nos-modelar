@@ -69,7 +69,8 @@ function principal(argv) {
     console.log(readFileSync(fileURLToPath(import.meta.url), 'utf8').split('\n').filter((l) => / \* (Uso|     )/.test(l)).map((l) => l.slice(3)).join('\n'));
     return 0;
   }
-  const arquivos = execFileSync('git', ['ls-files', '-z'], { cwd: RAIZ, encoding: 'utf8' }).split('\0').filter(Boolean).filter((a) => existsSync(join(RAIZ, a)));
+  /* os arquivos rastreados e os novos ainda sem registro, para a régua ver o arquivo que o agente criou antes do commit */
+  const arquivos = execFileSync('git', ['ls-files', '-z', '--cached', '--others', '--exclude-standard'], { cwd: RAIZ, encoding: 'utf8' }).split('\0').filter(Boolean).filter((a) => existsSync(join(RAIZ, a)));
   const hoje = contar(arquivos, (a) => readFileSync(join(RAIZ, a), 'utf8'));
   const base = existsSync(LINHA_DE_BASE) ? JSON.parse(readFileSync(LINHA_DE_BASE, 'utf8')) : { negrito: {}, dominio: {} };
   const soma = (o) => Object.values(o).reduce((x, y) => x + y, 0);

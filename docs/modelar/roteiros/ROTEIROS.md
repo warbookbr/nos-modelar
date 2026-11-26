@@ -168,7 +168,7 @@ Abrir só quando a condição aparecer:
 - `docs/modelar/usar/CONFERIR-CONTRA-REFERENCIA.md`, quando há foto de referência e não há prancha, para medir a borda em milímetro.
 - `docs/modelar/guias/modelar-carroceria.md`, quando a peça é uma chapa contínua de superfície lisa, com dobras vivas, raio de borda, arcos e vãos, modelada por subdivisão.
 - `docs/modelar/guias/modelar-veiculo-em-chassi-e-lataria.md`, quando o objeto é um veículo com chassi por baixo e lataria em painéis separados por vãos.
-- `.claude/skills/laco-de-modelagem/SKILL.md`, quando o objeto for um perfil de uma família existente ou uma família de caixa com frente: o processo leve, sem laço por unidade.
+- `.claude/skills/laco-de-modelagem/processo-leve.md`, quando o objeto for um perfil de uma família existente ou uma família de caixa com frente: o processo leve, sem laço por unidade.
 
 Skill: `criar-peca`.
 
@@ -216,7 +216,7 @@ Abrir só quando a condição aparecer:
 - `docs/modelar/usar/CONFERIR-CONTRA-REFERENCIA.md`, quando há foto de referência e não há prancha, para medir a borda em milímetro.
 - `docs/modelar/guias/modelar-carroceria.md`, quando a peça é uma chapa contínua de superfície lisa, com dobras vivas, raio de borda, arcos e vãos, modelada por subdivisão.
 - `docs/modelar/guias/modelar-veiculo-em-chassi-e-lataria.md`, quando o objeto é um veículo com chassi por baixo e lataria em painéis separados por vãos.
-- `.claude/skills/laco-de-modelagem/SKILL.md`, quando o objeto for um perfil de uma família existente ou uma família de caixa com frente: o processo leve, sem laço por unidade.
+- `.claude/skills/laco-de-modelagem/processo-leve.md`, quando o objeto for um perfil de uma família existente ou uma família de caixa com frente: o processo leve, sem laço por unidade.
 
 Skill: `criar-peca`.
 
@@ -264,7 +264,7 @@ Abrir só quando a condição aparecer:
 - `docs/modelar/usar/CONFERIR-CONTRA-REFERENCIA.md`, quando há foto de referência e não há prancha, para medir a borda em milímetro.
 - `docs/modelar/guias/modelar-carroceria.md`, quando a peça é uma chapa contínua de superfície lisa, com dobras vivas, raio de borda, arcos e vãos, modelada por subdivisão.
 - `docs/modelar/guias/modelar-veiculo-em-chassi-e-lataria.md`, quando o objeto é um veículo com chassi por baixo e lataria em painéis separados por vãos.
-- `.claude/skills/laco-de-modelagem/SKILL.md`, quando o objeto for um perfil de uma família existente ou uma família de caixa com frente: o processo leve, sem laço por unidade.
+- `.claude/skills/laco-de-modelagem/processo-leve.md`, quando o objeto for um perfil de uma família existente ou uma família de caixa com frente: o processo leve, sem laço por unidade.
 - `docs/modelar/usar/AJUSTE-DA-BANCADA.md`, quando a pessoa salvou um ajuste na bancada que precisa voltar à receita.
 
 Skill: `criar-peca`.

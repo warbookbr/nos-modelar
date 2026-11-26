@@ -13,75 +13,6 @@ O laço começa depois da rodada de
 [`alinhar-modelagem`](../alinhar-modelagem/SKILL.md). Sem plano, não há o que
 cumprir nem contra o que julgar.
 
-Depois de mudar silhueta, encontro, corte, união ou arredondamento, e antes de dar por pronto, faça o passo de
-[`PARE-E-ANALISE.md`](../../../docs/modelar/usar/PARE-E-ANALISE.md) (`npm run bancada -- <peça> --analise`) e abra as imagens.
-
-
-Num conjunto complexo, a parte em trabalho é vista e criticada isolada
-(`--selecionadas=<parte> --modo=isolar --focar`), ao lado do recorte dela na
-referência, além da vista do conjunto, como diz a skill
-[`criar-peca`](../criar-peca/SKILL.md).
-
-## O processo leve, para objeto de uma família
-
-Medido nos aparelhos de caixa (2026-10-16): uma família que já cobre o objeto, com perfis, torna o laço completo desnecessário. Use o processo leve quando o objeto é um perfil de uma família existente, ou uma família nova de forma simples, de uma caixa com frente (porta, painel, botões, puxador, pés). Não o use quando o objeto exige geometria que nenhuma família tem, quando tem partes que se movem ou quando a pessoa pediu o laço completo.
-
-O processo leve não depende de laço por unidade. Um `modelador` escreve a família e os perfis, o `critico-visual` cego olha uma prancha com os perfis lado a lado em uma ou duas rodadas, e o processo para na terceira rodada sem chegar a 8; o laço completo de uma peça vai até 6 rodadas, como diz a definição única em `docs/modelar/usar/REFERENCIA-E-CRITICA-VISUAL.md`. A forma continua sendo aprovada pela pessoa em imagem, com `npm run familia -- aprovar <id>`.
-
-Ao mudar uma faixa ou uma opção da família depois da aprovação, o hash dos pontos extremos muda e a aprovação da pessoa se esvazia. Termine as mudanças de faixa antes de pedir o aceite, e peça o aceite uma vez só, com a prancha final.
-
-O custo medido: a família levou cerca de 294 mil tokens (91 chamadas, 100 mil só de leitura), os ajustes depois da primeira prancha 285 mil, e os três perfis seguintes 184 mil (60 chamadas), contra 400 mil a 1,5 milhão por peça do avião. Quase todo o custo está na primeira família; cada perfil novo custa uma fração.
-
-## Parte por parte
-
-Um objeto de várias partes é construído uma etapa por vez, na ordem de
-`etapas` da montagem v5
-([`MONTAGENS-SEMANTICAS.md`](../../../docs/modelar/usar/MONTAGENS-SEMANTICAS.md)).
-Cada etapa é uma parte: ela nasce com o tamanho e a posição que os vínculos e
-as posições por porta tiram das partes já fixas, e a junta com elas é medida
-quando ela entra. Uma peça de uma parte só é uma etapa só.
-
-Cada etapa despacha um `modelador` NOVO. Ele lê do disco o plano, as partes já
-fixas, o registro das rodadas anteriores e a nota que o modelador da etapa
-anterior deixou. O estado mora nos arquivos; um agente que atravessa várias
-etapas leva para as seguintes o que entendeu errado na primeira.
-
-Ao fim de cada etapa, pare e mostre à pessoa as vistas da parte montada sobre
-as já fixas, as medidas da junta e o veredito do crítico. A parte sozinha não
-basta: a pessoa não julga a altura de um anel sem vê-lo sobre a base. As vistas
-montadas, em ortográfica, saem de
-`npm run etapas -- <montagem.json> --olhar` (com `--foco <instância>` o quadro fecha na caixa dela), e entram também
-no pacote do crítico, que `vistas:critica` já monta com o quadro na peça. A etapa só fica fixa com o aceite dela, e só
-depois disso a próxima começa. Antes de mostrar, o modelador vê a chapa da etapa em segundos com `npm run vista:rapida -- <peça> --ate-passo=N`
-e um ponto de perto com `bancada --mirar=x,y,z`
-([`PARE-E-ANALISE.md`](../../../docs/modelar/usar/PARE-E-ANALISE.md#olhar-de-perto-sem-recortar-captura)). Etapa fixa que uma mudança anterior quebrou
-volta na frente de todas. O estado e a próxima etapa saem de:
-
-```bash
-npm run etapas -- <montagem.json>
-npm run etapas -- <montagem.json> --fixar <instância> --por <quem aceitou>
-```
-
-O segundo comando recusa fixar fora de ordem, sem o crítico ter fechado a peça
-da etapa, sem nota de passagem na última rodada, com junta reprovada ou sem
-aceite. Não contorne a recusa: ela é o motivo de o laço não virar bola de
-neve.
-
-Uma etapa só passa com defeito em aberto por aceite humano. Quando o laço
-para no limite ou sem convergência e a pessoa diz, com as palavras dela, que
-aceita a etapa como está, fixe com `--aceite-humano` e ponha em `--por` quem
-aceitou. Os defeitos entram no aceite gravado. Nenhum agente usa essa opção por
-conta própria, nem por achar o defeito pequeno, e ela é recusada no meio do
-laço.
-
-Só a pessoa reabre uma etapa fixa, pelo mesmo critério do aceite humano, com
-`npm run etapas -- <montagem.json> --reabrir <instância> --por "<quem, data: motivo>"`.
-Reabrir só acrescenta um evento, sem medir: o aceite fica no registro e a etapa volta a aberta. O estado nunca é gravado, sai da
-comparação da impressão de agora com a do aceite vigente; a quebrada cuja mudança é desfeita volta a fixa sozinha, e só a reabertura a faz
-aberta. Aceitar uma etapa não refixa as posteriores quebradas (o `--fixar` avisa): reabra e aceite cada uma. O registro antigo recusa e manda rodar
-`migrar-etapas-para-impressao.mjs`. Contrato em
-[`MONTAGENS-SEMANTICAS.md`](../../../docs/modelar/usar/MONTAGENS-SEMANTICAS.md#o-registro-de-etapas-eventos-impressão-e-leitura-derivada).
-
 ## O ciclo de uma etapa
 
 Pergunte a ação antes de qualquer coisa, sempre:
@@ -99,68 +30,12 @@ aresta, `liso` sombreia sem faceta (com `angulo`, em graus, deixa nítida a quin
 dizer o que existe, e não palpite. Peça também, no despacho, o que faltou: é
 o `atrito` da rodada.
 
-**O pacote de referência.** Quando o objeto passou pelo mapa de partes e pela
-prancha, o modelador e o crítico recebem as mesmas três imagens, nesta ordem:
-a imagem de referência, a prancha com as cotas e o mapa de partes
-com as folhas de divisa. `npm run objeto -- <objeto>` lista o caminho de cada
-uma, e `docs/modelar/usar/FLUXO-DO-OBJETO.md` diz por que as três vão ao
-crítico sem contar como a peça foi feita.
-
-**A referência, além da prancha.** As medidas do 3D (`silhueta:desvio`,
-`conferir:vistas`, `PONTOS`) comparam com a prancha, e um modelo fiel a uma
-prancha errada passa em todas. Por isso a rodada de peça com imagem de
-referência passa também pela leitura combinada do modelo contra a imagem
-(`npm run leitura:regioes -- --modelo=<peça> ...`, grade e partes, três
-críticos cada e `--consolidar`, como em
-[`CONFERIR-CONTRA-REFERENCIA.md`](../../../docs/modelar/usar/CONFERIR-CONTRA-REFERENCIA.md)).
-Quando o modelo bate com a prancha e pelo menos dois críticos acusam a mesma
-parte contra a referência, o defeito é da prancha: corrija-a primeiro e só
-depois a receita.
-
-**revisar** — a ferramenta mediu a receita atual e ela passou. Rode `npm run vistas:critica -- <peça>`, que mede a receita antes de capturar e recusa a que reprova (`--sem-medir` só para quem quer as imagens sem o crítico), e grava as
-imagens e, na pasta da rodada (`tools/bancadas/out/critica-<peça>/rodada-NN/`, com NN o número da próxima rodada a registrar, ou a de `--saida=<pasta>`), o `pedido.md` pronto, tirado
-da receita: o texto do despacho do `critico-visual`. Não escreva o pedido à mão, nem copie caminho, promessa de parte ou critério
-do `PLANO`; mande o texto do `pedido.md` como está. Foto de terceiro não entra no repositório, e quem conduz a traz ao pedido com `--referencia=<caminho absoluto da imagem>[@<vista>]` (repetível, o caminho não é gravado). Ele traz, nesta ordem, o objeto, o alvo, as referências, o modelo (as vistas
-da peça sozinha e a malha em arame), as vistas montadas, a sobreposição dos cortes, cada parte com a forma e a técnica que o plano
-promete, os critérios de reprovação, as perguntas e o limite de 240 caracteres de `onde`, `evidencia` e `observacao` do veredito
-(o registro recusa o mais longo, e o detalhe vai no texto; a regra fica no despacho, e não no agente, que mudado pede a calibração
-de novo), com o caminho de todas as imagens e o lado de onde cada vista olha. As perguntas são as da família, quando o `PLANO`
-declara `familia` ou `familiaProcedural`, e, quando a receita declara `REFINA.esboco`, a de onde o alvo difere da referência real:
-o para-brisa saliente do avião veio do esboço, passou por dois críticos e só a pessoa o viu.
-
-O pacote inteiro mora nessa pasta, com as capturas da bancada, e ficam a desta rodada e a da anterior. O `pacote.json` grava a
-resolução, fixa por tipo de imagem, e a câmera de cada uma. Para ver o que mudou entre as duas rodadas na mesma câmera, rode
-`npm run vistas:critica -- <peça> --antes-e-depois=<imagem>` (o nome da imagem no `pacote.json` ou um trecho que só uma tenha), que
-grava as duas lado a lado em `antes-e-depois/` da pasta atual; não copie imagem à mão. Ele recusa quando a anterior não existe ou a
-câmera ou a resolução diferem, e avisa quando o enquadramento mudou, porque a bancada enquadra pela caixa da peça.
-
-Na peça com sombreamento suave sobre a emenda de uma fusão (um `liso` cuja seleção alcança o resultado de `unir`, `subtrair`,
-`intersectar` ou `arredondarCostura`), o pacote leva a luz rasante, sem a curvatura, e o `--registrar` cobra essa vista como cobra
-da lataria; a etapa já fixa pela pessoa fica fora da regra até voltar ao laço.
-
-Na peça com junta de tubos soldada, o brief do modelador cita a nota de
-[`GOTCHAS-POR-OPERACAO.md`](../../../docs/modelar/usar/GOTCHAS-POR-OPERACAO.md#junta-de-tubos-soldada-unir-friso-na-costura-com-cordao-e-unir-com-vincarcostura):
-a solda é `unir`, `friso` com `costura` e `cordao` e `unir` com `vincarCostura`, sem anéis da receita nas pontas dos tubos, e a
-recusa do friso por curva fechada demais volta ao modelador como limite de geometria, que se resolve pela largura do cordão.
-
-Na peça de lataria (a receita tem passo `subdivisao` ou declara `PLANO.lataria`), o pacote leva também a luz rasante e a curvatura
-da lataria, que mostram o amassado largo e raso que nenhuma medida e nenhuma vista comum mostram, e elas saem da bancada, junto com a zebra e a pintura: rode
-`npm run vistas:critica -- <peça>` (o Blender, com `--com-blender`, é só conferência opcional). O brief do modelador de peça de lataria leva o mesmo
-comando, porque sem ele o modelador não confere a correção de superfície pelas vistas que o crítico vai olhar. O `--registrar`
-recusa o veredito do crítico de peça de lataria cujo pacote (o `pacote.json` da pasta da rodada, ou a de `--pacote <pasta>` quando
-você usou `--saida`) não trouxe as duas vistas da versão medida. Não contorne a recusa com a dispensa: `PLANO.lataria.dispensa` é da
-pessoa, para a superfície que não é chapa, e não para a falta do Blender.
-
-Quando a receita declara `REFINA.esboco`, o alvo é a composta da unidade do esboço, gerada pela ferramenta do esboço no momento,
-sobre uma cópia do esboço declarado, e nunca a imagem guardada, que pode ser de uma versão anterior do esboço; a pasta traz também a
-sobreposição dos cortes do modelo com os do sólido do esboço, e o relatório do comando diz o desvio máximo de cada corte. A
-diferença do esboço vai à pessoa, que decide se a receita a corrige. Quando a peça é instância de `<objeto>/montagem.json`, as
-vistas montadas saem com o quadro na caixa da peça e as etapas já construídas em volta: duas vezes o crítico errou por ver a peça
-pequena demais no conjunto, e o relatório diz quanto do quadro ela ocupa. Se a peça ainda não está entre as etapas construídas, o
-relatório avisa que não há vista montada. O que o crítico recebe e não recebe, o veredito e o limite de rodadas estão em
-[O laço do crítico](../../../docs/modelar/usar/REFERENCIA-E-CRITICA-VISUAL.md#o-laço-do-crítico); aqui vale também
-não mandar o que mudou, porque contar como foi feito faz revisão virar
-concordância. Sem alvo não há rodada; busque o alvo e despache de novo, sem inventar nota.
+**revisar** — a ferramenta mediu a receita atual e ela passou. Rode `npm run vistas:critica -- <peça>`, que mede a receita antes de capturar e recusa a que reprova, e grava as imagens e, na pasta da rodada
+(`tools/bancadas/out/critica-<peça>/rodada-NN/`), o `pedido.md` pronto, tirado da receita: o texto do despacho do
+`critico-visual`. Não escreva o pedido à mão, nem copie caminho, promessa de parte ou critério do `PLANO`; mande o texto do
+`pedido.md` como está. Não mande o que mudou, porque contar como foi feito faz revisão virar concordância. Sem alvo não há
+rodada; busque o alvo e despache de novo, sem inventar nota. O que o crítico recebe e não recebe, o veredito e o limite de
+rodadas estão em [O laço do crítico](../../../docs/modelar/usar/REFERENCIA-E-CRITICA-VISUAL.md#o-laço-do-crítico).
 
 A receita que mudou depois da última rodada volta ao crítico, salvo quando a
 malha que ela produz e o `PLANO` são os da cópia que a rodada julgou, como ao
@@ -175,6 +50,39 @@ limite), e `"convergenciaDesde"` é o número do registro a partir do qual a
 convergência volta a contar depois de uma parada sem convergência, no máximo o
 do próximo registro a gravar. A ação que segue por essa decisão diz isso no
 motivo, com o `por`.
+
+Depois de mudar silhueta, encontro, corte, união ou arredondamento, e antes de dar por pronto, faça o passo de
+[`PARE-E-ANALISE.md`](../../../docs/modelar/usar/PARE-E-ANALISE.md) (`npm run bancada -- <peça> --analise`) e abra as imagens.
+
+### Mostrar à pessoa e gravar a decisão dela
+
+Depois de registrar a rodada e de mostrar a peça à pessoa, a decisão dela sobre a rodada se grava com as palavras dela, e
+só quando ela pede explicitamente que se grave:
+
+```bash
+node tools/modelar/rodada-de-modelagem.mjs <peça> --decisao-da-pessoa "<quem decidiu>, <AAAA-MM-DD>: <as palavras dela>" --rodada <n>
+```
+
+O comando grava no arquivo `decisoes-da-pessoa.json` da pasta de rodadas da peça, sem mexer no registro da rodada, e o `--acao`
+passa a listar a decisão de cada rodada. A data é a do dia em que ela decidiu, e `--substituir` troca uma decisão já gravada
+quando ela a muda. Nenhum agente grava por conta própria, nem resume, traduz ou completa o que ela disse: sem o pedido dela e
+sem as palavras dela, a rodada fica sem decisão gravada.
+
+## Quando ler os arquivos de apoio
+
+O corpo cobre a rodada comum de uma peça. Cada caso abaixo tem um arquivo nesta pasta, e a regra dele só está lá.
+
+- [`processo-leve.md`](processo-leve.md): leia antes de começar quando o objeto for um perfil de uma família existente ou
+  uma família nova de caixa com frente, porque nesse caso o laço por unidade não se usa.
+- [`parte-por-parte.md`](parte-por-parte.md): leia quando o objeto tiver mais de uma parte, antes da primeira etapa e antes
+  de fixar, reabrir ou aceitar com defeito uma etapa pelo `npm run etapas`; traz também a vista isolada da parte em trabalho e o `--aceite-humano`, que nenhum agente usa por conta própria.
+- [`pacote-e-referencia.md`](pacote-e-referencia.md): leia antes de despachar o modelador ou o crítico quando a peça tiver
+  imagem de referência, prancha ou mapa de partes, lataria, sombreamento suave sobre emenda de fusão, junta de tubos
+  soldada, `REFINA.esboco` ou lugar numa montagem, e quando precisar do conteúdo do pacote, da comparação de duas rodadas
+  ou de trazer foto de terceiro ao pedido.
+- [`refino.md`](refino.md): leia quando a entrega passou na medição e começa a rodada de refino, antes de despachar o
+  refinador: as zonas certas, a conferência entre candidatas e o que fazer com zona mexida.
+- [`registro-a-mao.md`](registro-a-mao.md): leia só quando não houver como obter os arquivos dos agentes para o registro.
 
 ## Registrando a rodada
 
@@ -205,24 +113,6 @@ se registra com `--motivo-dos-pontos "<quem decidiu>, <AAAA-MM-DD>: <por quê>"`
 venha a mudança de `PONTOS` reescrito ou de outro dado da receita, como a
 TABELA; a recusa diz de onde veio. `--acao` avisa antes do registro.
 
-Se não houver como obter os arquivos, a alternativa é montar o JSON à mão e
-passá-lo como `--registrar <rodada.json>`. Não se misturam as duas formas.
-
-```bash
-cat > /tmp/rodada.json <<'JSON'
-{
-  "partes": [
-    { "nome": "base", "confere": true },
-    { "nome": "punho", "confere": false, "observacao": "saiu macico; o plano promete rasgo passante" }
-  ],
-  "veredito": { "alvo": "...", "nota": 6, "defeitos": [], "observacao": "..." },
-  "atrito": ["o loft nao fecha tampa propria e o afinamento virou degraus"],
-  "notaDePassagem": "folga de 0,2 no furo porque o pino e retificado"
-}
-JSON
-node tools/modelar/rodada-de-modelagem.mjs <peça> --registrar /tmp/rodada.json
-```
-
 A rodada não fecha sem `partes`; `nota` é número de 0 a 10 e `observacao` não
 passa de 240 caracteres. `notaDePassagem` é o porquê das escolhas do
 modelador, e a última rodada da etapa precisa dela. A ferramenta grava sozinha
@@ -232,27 +122,6 @@ rodada é da ferramenta, que a faz sobre a receita atual e grava o resultado e o
 relatório; ela recusa o veredito do crítico quando a medição reprovou, e `medidas`
 escritas à mão que a contradigam. Rodada gravada não se reescreve, e o arquivo
 cai em `rodadas/` dentro da pasta da peça.
-
-## O refino depois da entrega
-
-Depois que o modelador entrega e a medição passa, uma rodada de refino com o crítico cego é etapa fixa do método. Num refino medido de uma carroceria o ganho veio quase todo na primeira rodada, e rodadas a mais ficam com a decisão da pessoa. O crítico julga a entrega só pelo pacote e, além dos defeitos, lista no veredito o que já está certo e não deve ser mexido, com as posições lidas da grade do pacote. Essa lista, escrita só em texto, não impediu que o refinador baixasse uns 45 mm a janela lateral que o crítico tinha dado como certa, e por isso cada rodada de refino passa por uma conferência que a compara com a anterior.
-
-Você tira do veredito anterior as zonas certas e as escreve num `zonas.json` ao lado da rodada, uma caixa em milímetro por faixa de x, y e z, com nome, no quadro do pacote, e com folga em volta de cada feição ao menos igual ao deslocamento que se quer pegar. Você só transcreve o que o crítico leu; não decide o que é certo, não acrescenta zona e não edita o veredito. Quando o veredito, dentro de uma zona dada como certa, pede uma mudança (por exemplo, a posição da janela está certa e a ponta dela deve ser arredondada), você a transcreve como `pedido` da zona: uma caixa menor, em milímetro, só do trecho que o crítico nomeou, com a folga do raio pedido e não mais, e a `descricao` com as palavras do veredito. A mudança pedida sai da conta da zona e, sem o pedido, a conferência acusaria o refinador por cumpri-la. Você não escreve pedido para uma mudança que o crítico não pediu, nem alarga a caixa para cobrir o que o refinador fez a mais. Com a candidata que o crítico julgou e a que o refinador entregou depois, rode:
-
-```bash
-blender -b --factory-startup --python tools/blender/conferir-refino.py -- \
-  --anterior <candidata julgada> --nova <candidata refinada> --zonas <zonas.json> --saida <pasta> [--caixa <seis números>]
-```
-
-```json
-{ "tolerancia_mm": 3,
-  "zonas": [ { "nome": "janela-lateral", "x": [280, 720], "y": [230, 470], "z": [-20, 20],
-               "pedido": [ { "descricao": "arredondar a ponta esquerda da janela", "x": [295, 335], "y": [245, 285] } ] } ] }
-```
-
-Com a receita (`.js`) nas duas rodadas, a conferência compara só as partes que estão nas duas, que são a lataria que o crítico julgou, e não acusa a peça que a rodada de refino acrescentou por cima (um friso de lábio, uma moldura em volta do vão): ela sai à parte, em `conferencia-notas.md`, como parte nova, com a zona em que cai, e a que sumiu sai do mesmo modo. `--partes chapa,teto` escolhe as partes por nome e `--todas-as-partes` compara tudo. Com OBJ, que não traz partes, a comparação inclui tudo e a nota diz isso; nesse caso o friso acrescentado aparece como superfície nova na zona, e convém dar a conferência com a receita. As notas são suas e não vão ao modelador nem ao crítico. Se uma parte nova e uma sumida caem na mesma zona, pode ser a lataria renomeada, e você roda de novo com `--todas-as-partes`.
-
-A conferência devolve em `conferencia.json` o deslocamento entre as duas superfícies, no total e por zona, e em `mexidas` cada zona certa em que a superfície andou mais que a tolerância (3 mm por padrão, declarável no arquivo, na zona ou na linha de comando), com o lugar e o quanto; `conferencia-<vista>.png` traz o mapa do deslocamento com sinal e as zonas desenhadas. As opções, o sinal e o que ela não enxerga estão em [`REGUA-E-PACOTE-CEGO.md`](../../../docs/modelar/blender/REGUA-E-PACOTE-CEGO.md). Se alguma zona saiu mexida, você não chama o crítico: devolve ao modelador o texto de `conferencia.md`, que diz a zona, o quanto, onde e para que lado, pede a zona de volta à posição anterior e roda a conferência de novo sobre a candidata que ele devolver. O crítico só é chamado quando nenhuma zona está mexida, e não recebe a conferência nem a lista de zonas, porque contar como a rodada foi conduzida faz revisão virar concordância. Se o modelador responde que a zona teve de andar para corrigir outro defeito, você não decide: registra a zona, o quanto e o motivo dele no `atrito` da rodada e leva o caso à pessoa. Escreva no mesmo `atrito` quantas devoluções a rodada teve.
 
 ## Antes de corrigir, atribua o defeito
 
@@ -274,3 +143,4 @@ Escreva a atribuição e a resposta no `atrito` da rodada.
 - Corrigir a receita você mesmo, mesmo que seja "só um número".
 - Mudar o plano para caber no que saiu; plano errado se corrige com a pessoa.
 - Fixar etapa sem o aceite da pessoa, ou declarar pronto sem `parar-fechou`.
+- Gravar a decisão da pessoa sem pedido explícito dela, ou com palavras que não são as dela.

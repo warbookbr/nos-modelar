@@ -377,7 +377,7 @@
           "quando": "o objeto é um veículo com chassi por baixo e lataria em painéis separados por vãos"
         },
         {
-          "arquivo": ".claude/skills/laco-de-modelagem/SKILL.md",
+          "arquivo": ".claude/skills/laco-de-modelagem/processo-leve.md",
           "quando": "o objeto for um perfil de uma família existente ou uma família de caixa com frente: o processo leve, sem laço por unidade"
         }
       ],
@@ -501,7 +501,7 @@
           "quando": "o objeto é um veículo com chassi por baixo e lataria em painéis separados por vãos"
         },
         {
-          "arquivo": ".claude/skills/laco-de-modelagem/SKILL.md",
+          "arquivo": ".claude/skills/laco-de-modelagem/processo-leve.md",
           "quando": "o objeto for um perfil de uma família existente ou uma família de caixa com frente: o processo leve, sem laço por unidade"
         }
       ],
@@ -627,7 +627,7 @@
           "quando": "o objeto é um veículo com chassi por baixo e lataria em painéis separados por vãos"
         },
         {
-          "arquivo": ".claude/skills/laco-de-modelagem/SKILL.md",
+          "arquivo": ".claude/skills/laco-de-modelagem/processo-leve.md",
           "quando": "o objeto for um perfil de uma família existente ou uma família de caixa com frente: o processo leve, sem laço por unidade"
         },
         {
