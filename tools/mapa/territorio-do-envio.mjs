@@ -37,19 +37,20 @@ export function caminhosDoAtivo(texto) {
 
 /** As linhas `Fora-do-territorio:` das mensagens: { caminho, motivo }. */
 export function declaracoesFora(mensagens) {
-  return [...mensagens.matchAll(/^Fora-do-territorio:\s*([^,\n]+?)\s*,\s*(\S.*?)\s*$/gm)].map((m) => ({ caminho: m[1], motivo: m[2] }));
+  return [...mensagens.matchAll(/^Fora-do-territorio:[ \t]*([^,\n]+?)[ \t]*,[ \t]*(\S.*?)[ \t]*$/gm)].map((m) => ({ caminho: m[1], motivo: m[2] }));
 }
 
 /**
- * A conferência pura. `arquivos` são { caminho, novo }; a declaração vale para o arquivo exato, ou para uma pasta só quando todos
- * os arquivos mudados dentro dela são novos (a pasta que o envio cria). Devolve { fora, soltas }: os arquivos sem dono nem
- * declaração, e as declarações que não casam com nenhum arquivo mudado (erro de digitação ou declaração que sobrou).
+ * A conferência pura. `arquivos` são { caminho, novo }; a declaração vale para o arquivo exato, ou para uma pasta só quando ela não
+ * existia na base (`existiaNaBase`) e todos os arquivos mudados dentro dela são novos (a pasta que o envio cria). Devolve
+ * { fora, soltas }: os arquivos sem dono nem declaração, e as declarações que não casam com nenhum arquivo mudado, que só avisam,
+ * porque a mensagem de um commit gravado não se desfaz sem reescrever o histórico.
  */
-export function conferirTerritorio(arquivos, territorios, declarados = []) {
+export function conferirTerritorio(arquivos, territorios, declarados = [], { existiaNaBase = () => false } = {}) {
   const valeA = (d) => {
     const dentro = arquivos.filter((a) => sobrepoe(d.caminho, a.caminho));
     if (!dentro.length) return [];
-    if (d.caminho.endsWith('/') && dentro.some((a) => !a.novo)) return [];
+    if (d.caminho.endsWith('/') && (existiaNaBase(d.caminho) || dentro.some((a) => !a.novo))) return [];
     return dentro.map((a) => a.caminho);
   };
   const liberados = new Set(declarados.flatMap(valeA));
@@ -90,27 +91,31 @@ function principal(raiz, argv, ambiente) {
     const c = caminhosDoAtivo(readFileSync(join(raiz, 'docs/modelar/planos', nome), 'utf8'));
     if (c) territorios.push({ plano: nome, caminhos: c });
   }
-  for (const nome of git('ls-tree', '--name-only', '-z', `${base}:docs/modelar/planos`).split('\0').filter((n) => PLANO.test(n))) {
+  let naBase = [];
+  try { naBase = git('ls-tree', '--name-only', '-z', `${base}:docs/modelar/planos`).split('\0'); } catch { /* a base não tem a pasta dos planos */ }
+  for (const nome of naBase.filter((n) => PLANO.test(n))) {
     const c = caminhosDoAtivo(git('show', `${base}:docs/modelar/planos/${nome}`));
     if (c) territorios.push({ plano: `${nome} (ativo na base)`, caminhos: c });
   }
-  const { fora, soltas } = conferirTerritorio(arquivos, territorios, declaracoesFora(mensagens));
-  if (!fora.length && !soltas.length) {
+  const existiaNaBase = (pasta) => { try { execFileSync('git', ['cat-file', '-e', `${base}:${pasta.replace(/\/$/, '')}`], { cwd: raiz, stdio: 'ignore' }); return true; } catch { return false; } };
+  const { fora, soltas } = conferirTerritorio(arquivos, territorios, declaracoesFora(mensagens), { existiaNaBase });
+  const avisarSoltas = (saida) => {
+    if (!soltas.length) return;
+    saida(`territorio:check — aviso: ${soltas.length} declaração(ões) que não liberam nada (o arquivo não mudou no fim, o caminho está errado, ou a pasta já existia na base ou tem arquivo antigo mudado dentro):`);
+    for (const d of soltas) saida(`  - ${d.caminho}, ${d.motivo}`);
+  };
+  if (!fora.length) {
     console.log(`territorio:check ok — ${arquivos.length} arquivo(s) mudados desde a base ${quando}, todos com dono (o que não foi gravado em commit não entra).`);
+    avisarSoltas(console.log);
     return 0;
   }
   console.error(`territorio:check FALHOU — medido desde a base comum com ${ref}, ${quando}, contra ${territorios.length} território(s) de plano ativo.`);
-  if (fora.length) {
-    console.error(`${fora.length} arquivo(s) mudados fora do território de qualquer plano ativo:`);
-    for (const f of fora) console.error(`  - ${f}`);
-    console.error('Ponha o caminho no território do plano que o muda, ou, se é defeito pontual, escreva num commit do envio (não num de junção) a linha');
-    console.error('  Fora-do-territorio: <arquivo>, <motivo>');
-    console.error('A declaração vale para o arquivo exato, ou para uma pasta só quando o envio cria todos os arquivos dela. Se a lista traz arquivos que este envio não mudou, a main local está velha: rode git fetch origin main.');
-  }
-  if (soltas.length) {
-    console.error(`${soltas.length} declaração(ões) que não casam com arquivo mudado (pasta com arquivo antigo dentro, ou caminho errado):`);
-    for (const d of soltas) console.error(`  - ${d.caminho}, ${d.motivo}`);
-  }
+  console.error(`${fora.length} arquivo(s) mudados fora do território de qualquer plano ativo:`);
+  for (const f of fora) console.error(`  - ${f}`);
+  console.error('Ponha o caminho no território do plano que o muda, ou, se é defeito pontual, escreva num commit do envio (não num de junção) a linha');
+  console.error('  Fora-do-territorio: <arquivo>, <motivo>');
+  console.error('A declaração vale para o arquivo exato, ou para uma pasta só quando ela não existia na base e o envio cria todos os arquivos dela. Se a lista traz arquivos que este envio não mudou, a main local está velha: rode git fetch origin main.');
+  avisarSoltas(console.error);
   return 1;
 }
 

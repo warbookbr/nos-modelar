@@ -105,6 +105,24 @@ describe('território do envio, em repositórios de verdade', () => {
     expect(c.rodar([], { CI: 'true' }).codigo).toBe(1);
   });
 
+  it('a declaração que sobra só avisa, e a pasta que já existia na base não se libera inteira', () => {
+    const c = cenario();
+    c.gravar('solto.md', 'conserto\n', 'conserta\n\nFora-do-territorio: solto.md, conserto');
+    c.gravar('solto.md', 'antes\n', 'desfaz');
+    git(c.ramo, 'fetch', '-q', 'origin');
+    const r = c.rodar();
+    expect(r.codigo, r.texto).toBe(0);
+    expect(r.texto).toMatch(/aviso: 1 declaração\(ões\) que não liberam nada/);
+    c.gravar('procedural/nucleo/nova.js', 'n\n', 'nova\n\nFora-do-territorio: procedural/nucleo/, arquivo novo');
+    const r2 = c.rodar();
+    expect(r2.codigo).toBe(1);
+    expect(r2.texto).toMatch(/- procedural\/nucleo\/nova\.js/);
+  });
+
+  it('o rótulo sozinho no fim da linha não pega a frase de baixo', () => {
+    expect(declaracoesFora('Fora-do-territorio:\nDepois disso, outra coisa\n')).toEqual([]);
+  });
+
   it('o plano que se encerra no envio continua dono do que ele mudou', () => {
     const c = cenario();
     c.gravar('tools/a/um.mjs', 'um\n');
