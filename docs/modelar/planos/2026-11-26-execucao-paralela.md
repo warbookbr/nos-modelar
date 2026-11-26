@@ -1,6 +1,6 @@
 # Execução paralela: medir quanto tempo as ferramentas ganham com mais núcleos, e o número de processos acompanhando a máquina
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Território:** `docs/modelar/banco-de-provas/execucao-paralela-2026-11-26/`, `docs/modelar/planos/BACKLOG.md`, `tools/processos-da-maquina.mjs`, `tools/processos-da-maquina.test.mjs`, `tools/gates.mjs`, `vitest.config.ts`, `tools/modelar/guardas/guarda-acervo.mjs`, `tools/modelar/aprovacao-da-familia.mjs`.
 
@@ -61,4 +61,8 @@ Decidido pela pessoa em 2026-11-26 ("pode seguir com sua recomendação"), depoi
 
 ## Andamento
 
+As três fatias foram feitas em 2026-11-26. As medidas e a recomendação estão no [banco de provas](../banco-de-provas/execucao-paralela-2026-11-26/README.md).
+
 ## Fechamento
+
+Concluído em 2026-11-26. Dentro de uma receita, o caminho mais longo pelo grafo de dependência é igual ao tempo em série na lataria do carro e fica a 1,05 vez dele no furgão. Mesmo supondo a leitura declarada em todas as operações, o teto é 1,68 vez no furgão e 1,00 na lataria. Entre as treze partes do braço, a malha saiu igual em 1, 2 e 4 processos, e o tempo caiu de 21,1 s para 12,5 s, com a parte mais lenta (9,9 s) como piso. A guarda do acervo levou 730 s com 1 processo, 437 s com 2 e 288 s com 4, com o pico de 5,2 GB a 7,9 GB. O número de processos dos gates, das baterias de teste, da guarda do acervo e da aprovação da família passou a `processosDaMaquina()`, com teste, e dá quatro nesta máquina e no CI. A repartição por dentro do corte das aberturas, da subtração e da divisão ficou no rascunho [operações repartidas entre núcleos](2026-11-26-operacoes-repartidas-entre-nucleos.md). A linha do backlog foi trocada pelo resultado. Os gates locais e o CI são do envio deste fechamento.

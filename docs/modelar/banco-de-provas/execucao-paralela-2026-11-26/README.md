@@ -41,8 +41,20 @@ A malha de cada parte saiu igual, pela impressão do neutro canônico, nas três
 
 ## Entre as peças do acervo
 
-[`guarda-do-acervo.jsonl`](guarda-do-acervo.jsonl). A `guarda:acervo` com `MODELAR_PROCESSOS` em 4 e em 1:
+[`guarda-do-acervo.jsonl`](guarda-do-acervo.jsonl). A `guarda:acervo` com `MODELAR_PROCESSOS` em 4, 2 e 1, uma depois da outra:
 
-(preenchido quando a medida terminar)
+| Processos | Parede | Ganho | Pico de memória do processo |
+|---|---|---|---|
+| 1 | 730 s | 1,00 | 5,2 GB |
+| 2 | 437 s | 1,67 | 6,2 GB |
+| 4 | 288 s | 2,53 | 7,9 GB |
+
+As 121 peças passaram nas três. Os fios dividem um processo só, e cada fio a mais somou perto de 1 GB ao pico. O ganho com quatro fica em 63% do ideal, porque as peças pesadas (a lataria do carro, o furgão) ocupam um fio por quase um minuto enquanto os outros terminam. Numa máquina com mais núcleos, o tempo continua caindo até o da peça mais lenta.
+
+Uma primeira tentativa desta medida rodou a de um processo ao mesmo tempo que a de quatro, porque a de um não usa fios e não caiu no erro de largada que derrubou os fios da outra, e as duas foram descartadas. As da tabela rodaram uma depois da outra.
 
 ## Recomendação
+
+O ganho está entre as peças do acervo, que já rodam em paralelo, e dentro das operações mais caras. Rodar passos de uma receita lado a lado não compensa: o teto é 1,7 vez no melhor caso, e só depois de declarar a leitura de todas as operações. Entre as partes de um objeto, o ganho é o da parte mais lenta, e só aparece nas ferramentas que executam todas as partes.
+
+Por isso o número de processos das ferramentas que percorrem o acervo passou a seguir a máquina (`tools/processos-da-maquina.mjs`): o menor entre os núcleos e a memória total dividida por 3,5 GiB, ou o `MODELAR_PROCESSOS` pedido. Nesta máquina e no CI continua quatro. Numa máquina de 16 núcleos e 64 GB a conta dá 16, e a guarda do acervo cairia para perto do tempo da peça mais lenta. A repartição por dentro do corte das aberturas, que é metade do tempo do carro e do furgão, ficou no plano em rascunho [operações repartidas entre núcleos](../../planos/2026-11-26-operacoes-repartidas-entre-nucleos.md).
