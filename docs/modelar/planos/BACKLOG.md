@@ -366,6 +366,7 @@ A tabela de proporções pronta para o esqueleto de proporção: gerar a árvore
 O `territorio:check` recusa o envio que leva a última fatia de um plano junto com o encerramento dele: o plano já não está ativo quando o gate mede, e os arquivos da fatia ficam sem dono, o que pede a linha `Fora-do-territorio` para trabalho que estava no território. O gate poderia aceitar o território de um plano encerrado no próprio envio (esqueleto de proporção, 2026-11-26).
 
 O `--acao` da rodada de modelagem compara a forma julgada com a atual executando a cópia da última rodada julgada com os módulos de hoje (`impressaoDaForma`), o mesmo defeito que a revisão de 2026-11-26 achou no pacote do crítico: a mudança feita numa ferramenta ou módulo ao lado some dos dois lados; a base deveria ser a impressão das partes gravada no registro da rodada.
+
 O `territorio:check` mede só o que está em commit, e o agente despachado trabalha sem commit, de modo que o gate passa sem ter olhado a fatia; uma opção que inclua a árvore de trabalho deixaria o agente conferir antes de devolver (fatia 4 do plano de ferramentas, 2026-11-26).
 
 O `ferramentas:registro:gerar` usa o cabeçalho inteiro do arquivo como frase da entrada nova, e a de `costura-registrada.mjs` saiu com sete linhas e ponto duplo; cortar na primeira frase.
@@ -373,4 +374,5 @@ O `ferramentas:registro:gerar` usa o cabeçalho inteiro do arquivo como frase da
 A decisão pendente sobre uma ferramenta sem chamador some do registro assim que um módulo vivo passa a importá-la, como a conversão do esboço antigo depois que `vistas-de-passos.mjs` voltou a ter chamador; um campo de decisão pendente no registro a manteria visível.
 
 Tirar a linha e o peso de um teste lento apagado (`tools/testes-lentos.mjs`, `tools/testes-lentos-pesos.json`) obriga a mexer no território do plano de processo e CI; os dois podem ir para os caminhos compartilhados quando o plano fechar.
+
 Quatro atritos do elo entre juntas (2026-11-26): o ângulo inicial do padrão de furos da flange do atuador de junta (`90 + 180/n`) só vale para contagem par de furos, e a faixa de 4 a 16 pares o esconde; o ângulo inicial da porta `padraoFuros` é medido pelo quadro `normal × x` do núcleo, o que a ficha da porta não diz; um passo novo inserido numa composição de família desloca os ids do núcleo e muda o hash aprovado, o que o contrato da família não avisa; e a tampa de 1 µm de `passosDaCascaDoLoft` deixa a booleana recusar por aresta de nanômetro quando a ponta da casca é inclinada, o que o elo contornou recuando a casca 30 µm na boca girada.
