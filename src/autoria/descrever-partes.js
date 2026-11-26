@@ -198,10 +198,11 @@ function corposDe(faces) {
     const r = raiz(i);
     let corpo = porRaiz.get(r);
     if (!corpo) {
-      corpo = { faces: 0, min: [Infinity, Infinity, Infinity], max: [-Infinity, -Infinity, -Infinity] };
+      corpo = { faces: 0, ids: [], min: [Infinity, Infinity, Infinity], max: [-Infinity, -Infinity, -Infinity] };
       porRaiz.set(r, corpo);
     }
     corpo.faces++;
+    corpo.ids.push(face.id);
     for (let k = 0; k < 3; k++) {
       if (face.min[k] < corpo.min[k]) corpo.min[k] = face.min[k];
       if (face.max[k] > corpo.max[k]) corpo.max[k] = face.max[k];
@@ -262,7 +263,7 @@ function medirPartes(neutro, quem) {
     }
 
     parte.faces++;
-    parte.facesMedidas.push({ vs: face.vs, min, max });
+    parte.facesMedidas.push({ id: face.id, vs: face.vs, min, max });
     for (let k = 0; k < 3; k++) {
       if (min[k] < parte.min[k]) parte.min[k] = min[k];
       if (max[k] > parte.max[k]) parte.max[k] = max[k];
@@ -557,11 +558,76 @@ function solidosSobDemanda(neutro, memoria = null) {
     const s = solidoDe(nome);
     return s?.inconclusivo ? `${nome}: ${s.inconclusivo}` : motivos.get(nome) ? `${nome}: ${motivos.get(nome)}` : null;
   };
+  /* o sólido de UM corpo da parte (indice na ordem de `corposDe`), com o mesmo cuidado e a mesma memória de `solidoDe` */
+  const prontosDosCorpos = new Map();
+  const motivosDosCorpos = new Map();
+  solidoDe.corpo = (nome, indice, corpo) => {
+    const chave = `${nome}#corpo${indice}`;
+    if (!prontosDosCorpos.has(chave)) {
+      let solido = null;
+      try {
+        const V = new Map();
+        const F = new Map();
+        for (const id of corpo.ids) {
+          const face = neutro.F.get(id);
+          F.set(face.id, face);
+          for (const v of face.vs ?? []) if (!V.has(v)) V.set(v, neutro.V.get(v));
+        }
+        solido = solidoEmMemoria(memoria, neutro, chave, () => prepararSolido({ V, F }, undefined, chave));
+      } catch (erro) { solido = null; motivosDosCorpos.set(chave, erro.message); }
+      prontosDosCorpos.set(chave, solido);
+    }
+    return prontosDosCorpos.get(chave);
+  };
+  solidoDe.motivoDoCorpo = (nome, indice) => {
+    const chave = `${nome}#corpo${indice}`;
+    const s = prontosDosCorpos.get(chave);
+    return s?.inconclusivo ? `${nome} corpo ${indice}: ${s.inconclusivo}` : motivosDosCorpos.get(chave) ? `${nome} corpo ${indice}: ${motivosDosCorpos.get(chave)}` : null;
+  };
   return solidoDe;
 }
 
+/* O mesmo veredito da parte inteira, refeito CORPO A CORPO. A parte inteira falha quando dois corpos dela se sobrepõem (a contagem de
+   cruzamentos do raio se anula) ou quando um corpo de malha aberta a torna inconclusiva mesmo longe da outra parte. Só entram os pares
+   de corpos cujas caixas se tocam dentro da tolerância; interpenetrar em qualquer um vence, depois encostar, depois um inconclusivo que
+   toca; sem nenhum par que toque, ou com todos conclusivos separados, `separadas`. A ordem dos corpos é a de `corposDe`. */
+function veredictoPorCorpo(a, b, solidoDe, tolerancia, memoria) {
+  let interpenetra = false;
+  let encosta = false;
+  const motivos = [];
+  let inconclusivo = false;
+  a.corpos.forEach((corpoA, ia) => {
+    b.corpos.forEach((corpoB, ib) => {
+      const porEixo = vaosEntre(corpoA, corpoB);
+      if (Math.max(porEixo[0], porEixo[1], porEixo[2]) > tolerancia) return;
+      const sa = solidoDe.corpo(a.nome, ia, corpoA);
+      const sb = solidoDe.corpo(b.nome, ib, corpoB);
+      let estado = 'inconclusivo';
+      let diagnosticos = [];
+      if (sa && sb) {
+        try {
+          const medida = auditarParDeSolidos(sa, sb, tolerancia, { memoria });
+          estado = medida.estado;
+          diagnosticos = medida.diagnosticos ?? [];
+        } catch { estado = 'inconclusivo'; }
+      }
+      if (estado === 'interpenetram') interpenetra = true;
+      else if (estado === 'encostam') encosta = true;
+      else if (estado !== 'separadas') {
+        inconclusivo = true;
+        const rotulo = `${a.nome} corpo ${ia} x ${b.nome} corpo ${ib}`;
+        for (const m of [solidoDe.motivoDoCorpo(a.nome, ia), solidoDe.motivoDoCorpo(b.nome, ib), ...diagnosticos.map((d) => `${rotulo}: ${d}`)]) if (m && !motivos.includes(m)) motivos.push(m);
+      }
+    });
+  });
+  if (interpenetra) return { estado: 'interpenetram' };
+  if (encosta) return { estado: 'encostam' };
+  if (inconclusivo) return { estado: 'inconclusivo', motivos };
+  return { estado: 'separadas' };
+}
+
 /* A relação da caixa, corrigida pelo sólido quando a caixa diz `interpenetra`. */
-function relacaoConfirmadaPorSolido(relacao, solidoDe, tolerancia, memoria = null) {
+function relacaoConfirmadaPorSolido(relacao, solidoDe, tolerancia, memoria = null, partes = null) {
   const { tipo, distancia, eixo, porEixo } = relacao;
   const caixa = { tipo, distancia, eixo };
   if (tipo !== 'interpenetra') return { ...relacao, caixa };
@@ -571,14 +637,24 @@ function relacaoConfirmadaPorSolido(relacao, solidoDe, tolerancia, memoria = nul
   if (sa && sb) {
     try { estado = auditarParDeSolidos(sa, sb, tolerancia, { memoria }).estado; } catch { estado = 'inconclusivo'; }
   }
-  if (estado === 'encostam') return { ...relacao, tipo: 'encosta', distancia: 0, caixa, solido: estado };
-  if (estado === 'separadas') return { ...relacao, tipo: 'folga', distancia: null, porEixo, caixa, solido: estado };
+  /* a parte inteira que interpenetra ou não decide pode estar errada por corpos que se sobrepõem ou por um corpo aberto longe: refaz corpo a corpo */
+  let porCorpo = null;
+  if (partes && (estado === 'interpenetram' || estado === 'inconclusivo')) {
+    const inteira = estado;
+    porCorpo = veredictoPorCorpo(partes[0], partes[1], solidoDe, tolerancia, memoria);
+    estado = porCorpo.estado;
+    /* a medida por corpo que só confirma a da parte inteira não declara nada, salvo o motivo do corpo que a deixa inconclusiva */
+    if (estado === inteira && !(estado === 'inconclusivo' && porCorpo.motivos.length)) porCorpo = null;
+  }
+  const marca = porCorpo ? { porCorpo: true } : {};
+  if (estado === 'encostam') return { ...relacao, tipo: 'encosta', distancia: 0, caixa, solido: estado, ...marca };
+  if (estado === 'separadas') return { ...relacao, tipo: 'folga', distancia: null, porEixo, caixa, solido: estado, ...marca };
   /* o par que a medida não decide diz por quê: a parte e o motivo (a face degenerada, a malha aberta) de cada sólido inconclusivo */
   if (estado === 'inconclusivo') {
-    const motivos = [solidoDe.motivo?.(relacao.a), solidoDe.motivo?.(relacao.b)].filter(Boolean);
-    return { ...relacao, caixa, solido: estado, ...(motivos.length ? { motivoDoSolido: motivos } : {}) };
+    const motivos = porCorpo ? porCorpo.motivos : [solidoDe.motivo?.(relacao.a), solidoDe.motivo?.(relacao.b)].filter(Boolean);
+    return { ...relacao, caixa, solido: estado, ...marca, ...(motivos.length ? { motivoDoSolido: motivos } : {}) };
   }
-  return { ...relacao, caixa, solido: estado };
+  return { ...relacao, caixa, solido: estado, ...marca };
 }
 
 function selecionarNomes(partes, filtro, quem) {
@@ -722,7 +798,7 @@ export function descreverPeca(neutro, { partes = null, tolerancia = TOLERANCIA_C
   const solidoDe = solidosSobDemanda(neutro, memoria);
   for (let i = 0; i < escolhidas.length; i++) {
     for (let j = i + 1; j < escolhidas.length; j++) {
-      relacoes.push(relacaoConfirmadaPorSolido(relacaoEntrePartes(escolhidas[i], escolhidas[j], tolerancia), solidoDe, tolerancia, memoria));
+      relacoes.push(relacaoConfirmadaPorSolido(relacaoEntrePartes(escolhidas[i], escolhidas[j], tolerancia), solidoDe, tolerancia, memoria, [escolhidas[i], escolhidas[j]]));
     }
   }
 
