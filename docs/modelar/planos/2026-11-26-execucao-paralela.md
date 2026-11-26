@@ -12,7 +12,7 @@ Ativado pela pessoa em 2026-11-26 ("pode criar o plano e ativar e fazer a mediç
 
 ## Problema observado
 
-A execução de uma receita é um laço de passos num processo só. A lataria do `carro-fastback` leva perto de 107 s por execução, e quem mede uma forma nova espera esse tempo inteiro, porque o cache por passo só poupa os passos anteriores ao que mudou. As ferramentas que percorrem o acervo inteiro (`guarda:acervo`, `test:lentos`, `retrato:acervo`) executam uma peça depois da outra, e a máquina tem quatro núcleos e 16 GB. Só `npm run gates` já roda quatro verificações de cada vez. Ninguém mediu quanto do tempo de uma receita está em passos que não dependem uns dos outros, nem quanto custa copiar o estado da peça para outro processo, nem quanta memória quatro execuções ao mesmo tempo pedem.
+A execução de uma receita é um laço de passos num processo só. A lataria do `carro-fastback` leva perto de 107 s por execução, e quem mede uma forma nova espera esse tempo inteiro, porque o cache por passo só poupa os passos anteriores ao que mudou. Entre as peças do acervo já há paralelismo: `npm run gates` roda quatro verificações de cada vez, a `guarda:acervo` mede as peças em até quatro fios (`conferirAcervo`, com `worker_threads`) e os testes lentos rodam em quatro processos; o `retrato:acervo` roda uma peça depois da outra. A máquina tem quatro núcleos e 16 GB. Ninguém mediu quanto do tempo de uma receita está em passos que não dependem uns dos outros, nem quanto custa copiar o estado da peça para outro processo, nem quanta memória quatro execuções ao mesmo tempo pedem.
 
 ## Resultado
 
@@ -26,7 +26,7 @@ Só medição: scripts no banco de provas, sobre `executarReceita`, `importarRec
 
 - dentro de uma receita, na lataria do carro e na parte mais lenta do braço: o tempo de cada passo, o caminho mais longo pelo grafo de dependência dos passos (o limite do ganho com núcleos à vontade) e o custo de serializar e desserializar o estado nos pontos em que o grafo se ramifica;
 - entre as partes do braço: o tempo das partes uma depois da outra e em um, dois e quatro processos, com o pico de memória de cada processo e da soma;
-- entre as peças do acervo: o tempo de cada peça na execução que a `guarda:acervo` faz, e a conta do tempo em um, dois e quatro processos pela distribuição das peças, com uma execução real em quatro processos para conferir a conta;
+- entre as peças do acervo: quanto a `guarda:acervo` ganha hoje com quatro fios contra um, e se a peça mais lenta já é o piso do tempo dela;
 - a carga e o tempo roubado da máquina virtual durante cada medida, como o banco de provas do cache por passo já faz.
 
 ## Excluído
