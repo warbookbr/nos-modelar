@@ -64,8 +64,8 @@
  *   node tools/modelar/rodada-de-modelagem.mjs <peça> --pedidos [<arquivo.json>] [--json]   os pedidos de alteração da pessoa, contados por etapa
  */
 import { createHash } from 'node:crypto';
-import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync } from 'node:fs';
-import { basename, dirname, join, resolve, sep } from 'node:path';
+import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync, realpathSync } from 'node:fs';
+import { basename, dirname, join, resolve, sep, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { FORMATO_DE_QUEM, LIMITE_DE_RODADAS, acaoDaReceita, defeitoDoTextoDeQuem, defeitosAbertos, normalizarDecisaoDaPessoa, proximaAcao, registrarRodada } from '../../src/autoria/laco-de-modelagem.js';
 import { diferencaDeTexto } from '../../src/autoria/diferenca-de-texto.js';
@@ -1013,12 +1013,24 @@ function pastaDaLinhaDeComando(peca, env) {
   const valor = env[VARIAVEL_DA_PASTA_DE_TESTE];
   if (valor === undefined || valor === '') return { pasta: pastaDeRodadas(peca), aviso: '' };
   exigirNome(peca);
-  const raiz = resolve(valor);
-  if (raiz === REPO || raiz.startsWith(`${REPO}${sep}`)) {
+  /* a pasta final, com os elos simbólicos resolvidos até onde ela existe: um elo de fora que aponta para as rodadas reais, ou a
+     pasta pai do repositório com a peça caindo dentro dele, também são recusados */
+  const final = join(resolve(valor), peca);
+  let real = final;
+  for (let p = final; ; p = dirname(p)) {
+    if (existsSync(p)) { real = join(realpathSync(p), relative(p, final)); break; }
+    if (dirname(p) === p) break;
+  }
+  const repoReal = realpathSync(REPO);
+  const dentro = (c) => c === REPO || c.startsWith(`${REPO}${sep}`) || c === repoReal || c.startsWith(`${repoReal}${sep}`);
+  if (dentro(resolve(valor)) || dentro(final) || dentro(real)) {
     throw new Error(`${VARIAVEL_DA_PASTA_DE_TESTE} recebido: ${JSON.stringify(valor)}; esperado uma pasta fora do repositório (${REPO}), porque a variável serve só ao teste da linha de comando. `
       + 'Para o uso de verdade, rode o comando sem a variável.');
   }
-  const pasta = join(raiz, peca);
+  const pasta = final;
+  /* o aviso vai à saída de erro já na leitura, em todo caminho (sucesso, recusa, --pedidos): se a variável vazar para a sessão,
+     quem lê vê que a ferramenta não está olhando o acervo */
+  process.stderr.write(`aviso: rodadas em pasta de teste (${VARIAVEL_DA_PASTA_DE_TESTE}): ${pasta}\n`);
   return { pasta, aviso: `rodadas em pasta de teste (${VARIAVEL_DA_PASTA_DE_TESTE}): ${pasta}\n` };
 }
 

@@ -82,7 +82,7 @@ A linha de comando recusa a opção com valor repetida (só `--atrito` repete), 
 
 Na régua de dobra, a chapa guardada que vem sem os vincos, os cantos, a borda ou as faces deixou de ganhar valor suposto e cai na conta direta. Cada superfície diz em `daExecucaoGuardada` por qual caminho saiu; o campo não entra na saída das réguas (as saídas da carenagem de prova, do ombro e da alça continuam iguais às da conta direta). O teste ganhou a alça da empilhadeira, que tem duas chapas, e confere que as duas vêm do guardado na execução direta, no cache frio e no cache quente, e que nenhuma vem quando a execução não traz as chapas.
 
-A função que lê `limite.json` chamava-se `decisaoDaPessoa` e passou a `decisaoSobreAsParadas`. `tools/modelar/fluxo-do-objeto.mjs` e `tools/modelar/etapas-da-montagem.mjs` importam o nome antigo e ficam fora do território deste plano, então o nome antigo segue exportado como sinônimo até os dois trocarem a importação.
+A função que lê `limite.json` chamava-se `decisaoDaPessoa` e passou a `decisaoSobreAsParadas`; `tools/modelar/fluxo-do-objeto.mjs` e `tools/modelar/etapas-da-montagem.mjs` trocaram o nome importado, declarados fora do território no commit, e o nome antigo não existe mais.
 
 Os mutantes conferidos, cada um aplicado sozinho com o teste rodado e desfeito em seguida, estão na tabela. Todos morreram.
 

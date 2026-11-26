@@ -6,7 +6,7 @@
  * achou que estava bom. O registro precisa sobreviver à rodada: veredito que
  * vive só no diálogo some com a janela de contexto.
  */
-import { existsSync, linkSync, mkdtempSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, linkSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -1210,7 +1210,7 @@ describe('a decisão da pessoa, num arquivo ao lado das rodadas', () => {
     for (const quantos of [9, 8, 7, 6, 5, 4, 3]) rodada(quantos);
     const medir = async () => ({ passou: true, sha256: `sha256:${'b'.repeat(64)}`, relatorio: 'ok', avisos: [] });
     const daFuncao = async () => { const { acao, motivo } = await acaoDaPeca(PECA, { pasta: pasta(), medir }); return { acao, motivo }; };
-    const daLinha = () => { const r = roda(PECA, '--acao'); expect([r.status, r.stderr]).toEqual([0, '']); return r.stdout; };
+    const daLinha = () => { const r = roda(PECA, '--acao'); expect(r.status).toBe(0); expect(r.stderr).toMatch(/^aviso: rodadas em pasta de teste \(MODELAR_RODADAS_EM_PASTA_DE_TESTE\): [^\n]+\n$/); return r.stdout; };
     const semFuncao = await daFuncao();
     const semLinha = daLinha();
     expect(semFuncao.acao).toBe('parar-limite');
@@ -1227,7 +1227,7 @@ describe('a decisão da pessoa, num arquivo ao lado das rodadas', () => {
   it('a linha de comando grava na pasta do teste, recusa a segunda sem --substituir e aceita com ele', () => {
     rodada(); rodada();
     const gravou = roda(PECA, '--decisao-da-pessoa', DECISAO, '--rodada', '2');
-    expect([gravou.status, gravou.stderr]).toEqual([0, '']);
+    expect(gravou.status).toBe(0); expect(gravou.stderr).toMatch(/^aviso: rodadas em pasta de teste \(MODELAR_RODADAS_EM_PASTA_DE_TESTE\): [^\n]+\n$/);
     expect(gravou.stdout).toBe(`${AVISO()}decisão da pessoa sobre a rodada 2 gravada em ${arquivo()}: ${JSON.stringify(DECISAO)}\n`);
     const [primeira] = decisoes();
     expect(primeira).toMatchObject({ rodada: 2, decisao: DECISAO });
@@ -1236,12 +1236,14 @@ describe('a decisão da pessoa, num arquivo ao lado das rodadas', () => {
     /* a segunda, sem --substituir: recusa, e o arquivo fica como estava */
     const segunda = roda(PECA, `--decisao-da-pessoa=${OUTRA}`, '--rodada=2');
     expect([segunda.status, segunda.stdout]).toEqual([1, '']);
+    /* a recusa também diz que a pasta de teste está em uso, na primeira linha da saída de erro */
+    expect(segunda.stderr).toMatch(/^aviso: rodadas em pasta de teste \(MODELAR_RODADAS_EM_PASTA_DE_TESTE\): /);
     expect(segunda.stderr).toContain(`rodada-de-modelagem: a rodada 2 de '${PECA}' já tem decisão da pessoa gravada: ${JSON.stringify(DECISAO)}; recebido: ${JSON.stringify(OUTRA)}; esperado uma decisão por rodada.`);
     expect(segunda.stderr).toContain(`\`${COMANDO(2)} --substituir\``);
     expect(readFileSync(arquivo(), 'utf8')).toBe(gravado);
     /* com --substituir: grava, e a anterior fica guardada */
     const trocou = roda(PECA, '--decisao-da-pessoa', OUTRA, '--rodada', '2', '--substituir');
-    expect([trocou.status, trocou.stderr]).toEqual([0, '']);
+    expect(trocou.status).toBe(0); expect(trocou.stderr).toMatch(/^aviso: rodadas em pasta de teste \(MODELAR_RODADAS_EM_PASTA_DE_TESTE\): [^\n]+\n$/);
     expect(trocou.stdout).toBe(`${AVISO()}decisão da pessoa sobre a rodada 2 gravada em ${arquivo()}: ${JSON.stringify(OUTRA)}\nsubstituiu a anterior, que ficou guardada: ${JSON.stringify(DECISAO)}\n`);
     expect(decisoes()).toMatchObject([{ rodada: 2, decisao: OUTRA, anteriores: [{ decisao: DECISAO, gravadaEm: primeira.gravadaEm }] }]);
     /* --substituir na rodada sem decisão, e a rodada que não existe: recusa sem gravar */
@@ -1329,4 +1331,17 @@ describe('a decisão da pessoa, num arquivo ao lado das rodadas', () => {
     for (const texto of textos.slice(3)) expect(texto).toContain(MOLDE);
     expect('Grave com `x --decisao-da-pessoa "a pessoa, 2026-11-26: aprovada, pode seguir" --rodada 3`').toMatch(PRONTA);
   }, 60000);
+});
+
+describe('a pasta de teste da linha de comando', () => {
+  it('recusa o elo simbólico de fora que aponta para as rodadas reais do acervo', () => {
+    const raiz = mkdtempSync(join(tmpdir(), 'rodadas-elo-'));
+    try {
+      mkdirSync(join(raiz, 'braco-robotico'), { recursive: true });
+      symlinkSync(resolve('procedural/pecas/braco-robotico/partes/ombro/rodadas'), join(raiz, 'braco-robotico', 'elo'));
+      const r = spawnSync(process.execPath, ['tools/modelar/rodada-de-modelagem.mjs', 'braco-robotico/elo', '--acao'], { encoding: 'utf8', env: { ...process.env, MODELAR_RODADAS_EM_PASTA_DE_TESTE: raiz } });
+      expect(r.status).toBe(1);
+      expect(r.stderr).toMatch(/esperado uma pasta fora do repositório/);
+    } finally { rmSync(raiz, { recursive: true, force: true }); }
+  });
 });
