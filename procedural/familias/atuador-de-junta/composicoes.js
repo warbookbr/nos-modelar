@@ -8,7 +8,7 @@
    quatro furos das orelhas; o horn por `lathe`, menos o furo cego repetido por `arranja` radial em volta do eixo.
 
    As partes são `carcaca` e `saida`. As portas são o padrão dos furos de fixação (`fixacao`) e o da saída (`saida`), com a
-   referência em +x para a posição por porta definir o giro; e o eixo da junta, um anel na face da carcaça onde a saída
+   referência em +x para a posição por porta definir o giro; e a `cabo`, um plano no centro da ponta livre do cilindro de saída do cabo, com a normal para fora dele; e o eixo da junta, um anel na face da carcaça onde a saída
    assenta (`eixo`) e outro na face de baixo da saída (`eixo-da-saida`), que a articulação liga. */
 import { FORMATO_COMPOSICAO_PROCEDURAL } from '../../nucleo/entrada.js';
 
@@ -21,15 +21,21 @@ const o = (op, id) => ({ origem: { op, id } });
 const ret = (prefixo) => ({ retangulo: { largura: p(`${prefixo}Largura`), profundidade: p(`${prefixo}Profundidade`), cantos: p(`${prefixo}Cantos`) } });
 const REFERENCIA = [1, 0, 0];
 const SAI = ['mecanifica.malha-poligonal@1', 'mecanifica.parte@1', 'mecanifica.porta@1'];
+const NOMES_DO_CABO = [['centroDoCabo', 'vetor3'], ['eixoDoCabo', 'vetor3'], ['extensaoDoCabo', 'numero']];
 const NOMES_DO_EIXO = [['centroDoEixo', 'vetor3'], ['raioDoEixo', 'numero'], ['raioDoEixoDaSaida', 'numero'], ['inicioDoEixo', 'numero'], ['fimDoEixoDaSaida', 'numero']];
 const portaDoEixo = (id, de, raio, inicio, fim) => ({ id: `porta-${id}`, operacao: 'publicarPorta', argumentos: { id, de, interface: { forma: 'anel', papel: 'recebe', eixo: [0, 1, 0], centro: p('centroDoEixo'), raioInterno: 0, raioExterno: p(raio), inicio, fim } } });
 
 /* as três composições de uma forma, da lista de nós de cada peça */
-function tres(forma, tipos, carcaca, saida) {
-  const parametros = Object.fromEntries([...tipos, ...NOMES_DO_EIXO].map(([n, t]) => [n, { tipo: t }]));
+function tres(forma, tipos, carcaca, saida, portaDaCarcaca) {
+  const parametros = Object.fromEntries([...tipos, ...NOMES_DO_EIXO, ...NOMES_DO_CABO].map(([n, t]) => [n, { tipo: t }]));
   const comp = (id, nos) => Object.freeze({ formato: FORMATO_COMPOSICAO_PROCEDURAL, id, versao: '1.0.0', parametros, artefatos: { entra: [], sai: SAI }, nos });
-  return [comp(ID_POR_FORMA[forma], [...carcaca, ...saida]), comp(idDaPeca(forma, 'carcaca'), carcaca), comp(idDaPeca(forma, 'saida'), saida)];
+  /* a porta do cabo é o último passo de cada composição que tem a carcaça, para a numeração dos passos da saída ficar a de antes dela */
+  return [comp(ID_POR_FORMA[forma], [...carcaca, ...saida, portaDaCarcaca]), comp(idDaPeca(forma, 'carcaca'), [...carcaca, portaDaCarcaca]), comp(idDaPeca(forma, 'saida'), saida)];
 }
+
+/* a porta do cabo: o plano da ponta livre do cilindro de saída, com o ponto no centro dela e a normal para fora, de modo que o cabo que parte dela sai pelo centro do cilindro e na direção dele. É plano, e não anel, porque a conferência
+   de forma do anel mede o raio contra todos os vértices da carcaça perto do plano, e o flange do atuador de 100 mm tem o raio igual ao alcance da saída. */
+const portaDoCabo = (de) => ({ id: 'porta-cabo', operacao: 'publicarPorta', argumentos: { id: 'cabo', de, interface: { forma: 'plano', papel: 'apoia', ponto: p('centroDoCabo'), normal: p('eixoDoCabo'), extensao: [p('extensaoDoCabo'), p('extensaoDoCabo')] } } });
 
 const FURO_F = { op: 'lathe', id: 13 }; const FURO_S = { op: 'lathe', id: 21 };
 const CILINDRICO = tres(1, [
@@ -54,7 +60,7 @@ const CILINDRICO = tres(1, [
   { id: 'parte-saida', operacao: 'parte', argumentos: { nome: 'saida', sel: o('subtrair', 23) } },
   { id: 'porta-saida', operacao: 'publicarPorta', argumentos: { id: 'saida', de: { op: 'subtrair', id: 23 }, interface: { forma: 'padraoFuros', papel: 'recebe', plano: { ponto: p('topo'), normal: [0, 1, 0] }, referencia: REFERENCIA, diametro: p('diametroS'), padrao: { tipo: 'circular', centro: p('topo'), raio: p('raioS'), quantidade: p('furosS'), anguloInicial: p('anguloS') } } } },
   portaDoEixo('eixo-da-saida', { op: 'subtrair', id: 23 }, 'raioDoEixoDaSaida', 0, p('fimDoEixoDaSaida')),
-]);
+], portaDoCabo({ op: 'subtrair', id: 15 }));
 
 const FURO_H = { op: 'lathe', id: 41 };
 const CAIXA = tres(2, [
@@ -82,6 +88,6 @@ const CAIXA = tres(2, [
   { id: 'parte-saida', operacao: 'parte', argumentos: { nome: 'saida', sel: o('subtrair', 43) } },
   { id: 'porta-saida', operacao: 'publicarPorta', argumentos: { id: 'saida', de: { op: 'subtrair', id: 43 }, interface: { forma: 'padraoFuros', papel: 'recebe', plano: { ponto: p('topo'), normal: [0, 1, 0] }, referencia: REFERENCIA, diametro: p('diametroH'), padrao: { tipo: 'circular', centro: p('topo'), raio: p('raioH'), quantidade: 4, anguloInicial: -90 } } } },
   portaDoEixo('eixo-da-saida', { op: 'subtrair', id: 43 }, 'raioDoEixoDaSaida', 0, p('fimDoEixoDaSaida')),
-]);
+], portaDoCabo({ op: 'subtrair', id: 39 }));
 
 export const COMPOSICOES = Object.freeze([...CILINDRICO, ...CAIXA]);

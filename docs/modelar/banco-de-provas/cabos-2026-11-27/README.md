@@ -33,3 +33,17 @@ Imagens em `tools/bancadas/out/cabos-na-junta/` (não versionadas), de `node too
 Achado: a memória do plano do cabo usava a ordem dos campos como chave, e a chamada e as medidas pediam a mesma conta em ordens diferentes, de modo que cada pose resolvia a haste duas vezes; a chave agora é ordenada e o curso refeito caiu de 8,4 s para 4,4 s.
 
 A pessoa aprovou o cabo na junta por imagem em 2026-11-27, com a frase "aprovo o cabo na junta, o que me preocupa é ele passando por dentro de outra peça" (`aprovado-junta-*.png`; `falha-atravessa-no-meio.png` é o arranjo feito para falhar).
+
+## Fatia 4: a saída do cabo no centro, a conferência de alinhamento e o curso fino (2026-11-27)
+
+Achado da pessoa ao aprovar o cabo na junta: a ponta do cabo não ficava no centro da saída. A porta da fixture estava posta à mão (a de B rente à borda do cilindro de saída, a de A no topo do tambor, onde não há saída), e nenhuma conferência pegou.
+
+A família `atuador-de-junta` publica agora a porta `cabo`, um plano no centro da ponta livre do cilindro de saída do cabo, com a normal para fora dele (+x no cilíndrico, −x no servo), em todas as formas. É plano e não anel porque a conferência de forma do anel mede o raio contra todos os vértices da carcaça junto do plano, e a flange do atuador de 100 mm tem o raio igual ao alcance da saída. A porta é o último passo de cada composição que tem a carcaça, e a geometria sai igual: 321 conjuntos de parâmetros (pontos, perfis, escalas e varredura da aprovação) deram o mesmo hash de vértices e faces antes e depois, e os hashes dos três pontos e dos oito perfis da aprovação mecânica não mudaram.
+
+A prova (`tools/fixtures/cabo/junta-com-cabo.mjs`) usa a porta nos dois atuadores, sem porta inventada. Arranjos: passa, 150 mm em ±90°; curto, 80 mm, estica em todo o curso; fechado, 130 mm, dobra abaixo de 9 mm só em ±90°; atravessa, 200 mm no curso de ±180°, atravessa a carcaça A de 157° em diante. Os de hoje passaram de 110, 48, 110 e 115 mm para esses, porque a saída real fica a 62 mm do eixo e a 26,5 mm de altura, e as pontas ficam a 71 mm (pose zero) e 88 mm (±90°) uma da outra.
+
+A conferência do curso (`conferirCursoDoCabo`) acusa `estica`, `dobra`, `autocontato`, `pontas-coladas`, `atravessa`, `inconclusivo`, `recusado` e `desalinhada`. O `desalinhada` vem de duas réguas, com tolerância de 0,1 mm em cada coordenada e 1 grau: a porta tem de estar no centro da face plana do sólido em que pousa, com a saída na direção da normal para fora (`conferirAlinhamentoDasPontas`, que reprova as portas antigas), e a ponta do cabo construído tem de estar no centro da porta e sair na direção do eixo dela. O `atravessa` diz o ângulo, a peça, o ponto do cabo mais fundo nela, a direção mais curta para fora e o ponto em que uma braçadeira tiraria o cabo do caminho.
+
+O curso fino: onde a folga do cabo a um sólido fica abaixo de dois diâmetros, o intervalo até o passo vizinho é dividido ao meio até a folga se resolver ou o passo chegar a um oitavo do da declaração. Caso entre passos: o cabo de 200 mm no curso de 100° a 260° em 3 passos passa nos quatro passos grossos e atravessa A de 157° a 203°; só o refinamento o acha.
+
+Vistas em `tools/bancadas/out/cabos-na-junta/` (fora do git): início, meio e fim do curso do arranjo que passa e o atravessa a 180°, cada pose nas vistas isométrica, de lado e de cima, geradas por `node tools/fixtures/cabo/junta-com-cabo-vistas.mjs`.

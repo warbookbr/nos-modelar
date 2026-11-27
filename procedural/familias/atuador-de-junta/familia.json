@@ -310,6 +310,11 @@
       "id": "eixo-da-saida",
       "tipo": "anel",
       "papel": "recebe"
+    },
+    {
+      "id": "cabo",
+      "tipo": "plano",
+      "papel": "apoia"
     }
   ],
   "ferramentas": [

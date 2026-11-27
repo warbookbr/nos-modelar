@@ -2,7 +2,7 @@
 
    A carcaça é uma peça torneada: a flange de fixação de y = 0 à espessura dela, o corpo do diâmetro da carcaça até o
    comprimento, com o chanfro nas bordas de fora (a de trás da flange e a da frente do corpo); a saída do cabo é um
-   cilindro de lado, a 0,3 do comprimento, unido à carcaça; a flange tem os furos passantes em círculo. A flange de saída
+   cilindro de lado, a 0,3 do comprimento, unido à carcaça, e publica a porta `cabo` no centro da ponta dele, com o eixo para fora (+x); a flange tem os furos passantes em círculo. A flange de saída
    é a peça que gira: um disco sobre a face da frente da carcaça, do comprimento à espessura dela, com o chanfro de fora e
    os furos cegos em círculo para os parafusos do membro. Os furos começam meio passo fora do eixo x, para o cabo, que sai
    em +x, ficar entre dois furos da flange. Regra da família, sem norma. */
@@ -14,7 +14,9 @@ export function geometriaDoAtuador(q) {
   const carcaca = [[0, 0], [Rf - c, 0], [Rf, c], [Rf, tf], [R, tf], [R, L - c], [R - c, L], [0, L]];
   const saida = [[0, L], [Rs, L], [Rs, L + ts - c], [Rs - c, L + ts], [0, L + ts]];
   const rc = q.diametroDoCabo / 2; const yc = tf + 0.3 * (L - tf);
-  const cabo = { perfil: [[0, 0], [rc, 0], [rc, 2 + 0.12 * q.diametro], [0, 2 + 0.12 * q.diametro]], em: [R - 2, yc, 0] };
+  const lcabo = 2 + 0.12 * q.diametro;
+  /* a porta `cabo`: o centro da ponta livre do cilindro de saída, com o eixo para fora dele (+x) */
+  const cabo = { perfil: [[0, 0], [rc, 0], [rc, lcabo], [0, lcabo]], em: [R - 2, yc, 0], porta: { centro: [R - 2 + lcabo, yc, 0], eixo: [1, 0, 0], raio: rc } };
   /* o furo 0 fica no ângulo 180°/n do plano [x, z]; a porta padraoFuros mede o ângulo no quadro do plano de apoio dela,
      que para a normal −y (atrás) põe esse furo em 90° + 180°/n e para a normal +y (frente) em −90° − 180°/n */
   const furo = (circulo, diametro, n, y0, y1, normalY) => {

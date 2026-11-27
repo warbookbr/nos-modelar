@@ -4,12 +4,14 @@ import { geometriaDoAtuador } from './geometria.js';
 import { geometriaDoServo } from './servo.js';
 
 const m = (mm) => mm / 1000;
+/* os parâmetros da porta `cabo`: o plano da ponta livre do cilindro de saída do cabo, com o ponto no centro dela, a normal para fora e a extensão do diâmetro do cilindro */
+const portaDoCabo = ({ porta }) => ({ centroDoCabo: porta.centro.map(m), eixoDoCabo: porta.eixo, extensaoDoCabo: m(2 * porta.raio) });
 
 export function derivar(q) {
   if ((q.forma ?? 1) === 2) return derivarServo(q);
   const g = geometriaDoAtuador(q);
   const a = {
-    emCabo: g.cabo.em.map(m), emFuroF: g.furosDoFlange.em.map(m), emFuroS: g.furosDaSaida.em.map(m),
+    emCabo: g.cabo.em.map(m), ...portaDoCabo(g.cabo), emFuroF: g.furosDoFlange.em.map(m), emFuroS: g.furosDaSaida.em.map(m),
     furosF: g.furosDoFlange.total, grausF: g.furosDoFlange.graus, furosS: g.furosDaSaida.total, grausS: g.furosDaSaida.graus,
     diametroF: m(q.diametroDoFuroDoFlange), raioF: m(q.circuloDoFlange / 2), anguloF: g.furosDoFlange.anguloInicial,
     diametroS: m(q.diametroDoFuroDaSaida), raioS: m(q.circuloDaSaida / 2), anguloS: g.furosDaSaida.anguloInicial, topo: [0, m(g.topo), 0],
@@ -22,7 +24,7 @@ export function derivar(q) {
 function derivarServo(q) {
   const g = geometriaDoServo(q);
   const a = {
-    emTorre: g.torre.em.map(m), emCabo: g.cabo.em.map(m), emHorn: g.horn.em.map(m), emFuroH: g.furoDoHorn.em.map(m), pivoH: [m(g.xs), 0, 0],
+    emTorre: g.torre.em.map(m), emCabo: g.cabo.em.map(m), ...portaDoCabo(g.cabo), emHorn: g.horn.em.map(m), emFuroH: g.furoDoHorn.em.map(m), pivoH: [m(g.xs), 0, 0],
     diametroA: m(q.diametroDoFuroDaAba), planoA: g.centrosDaAba[0].map(m), diametroH: m(g.furoDoHorn.diametro), raioH: m(g.furoDoHorn.raio), topo: [m(g.xs), m(g.topo), 0],
   };
   for (const [nome, b] of [['caixa', g.caixa], ['aba', g.aba]]) Object.assign(a, { [`${nome}Largura`]: m(b.largura), [`${nome}Profundidade`]: m(b.profundidade), [`${nome}Cantos`]: m(b.cantos), [`${nome}Altura`]: m(b.altura), [`${nome}Em`]: [0, m(b.y ?? 0), 0] });

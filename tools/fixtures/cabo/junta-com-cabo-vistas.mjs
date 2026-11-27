@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* junta-com-cabo-vistas.mjs — as vistas do cabo na junta, em tools/bancadas/out/cabos-na-junta/ (fora do git), pela imagem de trabalho de `vista-rapida.mjs` (raster em JavaScript, sem navegador): o arranjo que passa no início
- * (−90°), no meio (0°) e no fim (90°) do curso, e o arranjo que atravessa no passo zero. A montagem sai no referencial dela (o eixo da junta em y). O cabo é o tubo da família na pose, em laranja; a carcaça B em azul e as outras peças em cinza.
+ * (−90°), no meio (0°) e no fim (90°) do curso, e o arranjo que atravessa a 180°, cada pose nas três vistas. A montagem sai no referencial dela (o eixo da junta em y). O cabo é o tubo da família na pose, em laranja; a carcaça B em azul e as outras peças em cinza.
  * Uso: node tools/fixtures/cabo/junta-com-cabo-vistas.mjs [pasta de saída] */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -28,16 +28,20 @@ function facesDaPose(pose, neutroDoCabo) {
 }
 
 export function gerarVistas(pasta = PASTA_DAS_VISTAS) {
-  const { execucao, resolvida, problemas, declaracao } = prepararJuntaComCabo();
-  if (problemas.length) throw new Error(`a junta com cabo não montou: ${JSON.stringify(problemas)}`);
-  const curso = cursoDaJunta(resolvida, declaracao);
   mkdirSync(pasta, { recursive: true });
   const saidas = [];
-  const casos = [['passa', 0, 'inicio'], ['passa', 12, 'meio'], ['passa', 24, 'fim'], ['atravessa', 12, 'atravessa-no-meio']];
-  for (const [arranjo, passo, nome] of casos) {
+  /* cada pose: o arranjo, o curso da montagem dele, o valor da junta em graus e o nome do arquivo */
+  const casos = [['passa', -90, 'inicio'], ['passa', 0, 'meio'], ['passa', 90, 'fim'], ['atravessa', 180, 'atravessa-em-180']];
+  const preparos = {};
+  for (const [arranjo, graus, nome] of casos) {
+    const { execucao, resolvida, problemas, declaracao } = (preparos[arranjo] ??= prepararJuntaComCabo({ curso: ARRANJOS[arranjo].curso, passos: 24 }));
+    if (problemas.length) throw new Error(`a junta com cabo não montou: ${JSON.stringify(problemas)}`);
+    const curso = cursoDaJunta(resolvida, declaracao);
+    const passo = curso.valores.findIndex((v) => Math.abs(v - graus) < 1e-6);
+    if (passo < 0) throw new Error(`o curso do arranjo ${arranjo} não tem o passo de ${graus} graus`);
     const pose = resolvidaNoValor(resolvida, curso, curso.valoresSI[passo]);
     const feito = refazerNaPose(ARRANJOS[arranjo].pedido, portasDaResolvida(pose));
-    if (!feito.chamadas) throw new Error(`o arranjo ${arranjo} não tem cabo no passo ${passo}: ${feito.recusa.mensagem}`);
+    if (!feito.chamadas) throw new Error(`o arranjo ${arranjo} não tem cabo a ${graus} graus: ${feito.recusa.mensagem}`);
     const { neutro } = executarReceita({ meta: { nome: 'cabo-na-pose' }, CHAMADAS_COMPOSICOES: feito.chamadas, PARAMS: {}, TOPO: {}, ALIASES: [], MATERIAIS: {} }, execucao);
     const faces = facesDaPose(pose, neutro);
     for (const [vista, direcao] of Object.entries(VISTAS)) {

@@ -35,7 +35,7 @@ export function geometriaDoServo(q) {
     aba: { largura: L + 2 * e, profundidade: W, cantos, y: ya, altura: te },
     furosDaAba: centrosDaAba.map(([x, , z]) => ({ em: [x, ya - 1, z], perfil: [[0, 0], [rf, 0], [rf, te + 2], [0, te + 2]] })),
     torre: { em: [xs, H - 0.5, 0], perfil: [[0, 0], [rt, 0], [rt, ht + 0.5], [0, ht + 0.5]] },
-    cabo: { em: [-L / 2 + 0.5 - lc, 0.25 * H, 0], perfil: [[0, 0], [rc, 0], [rc, lc], [0, lc]] },
+    cabo: { em: [-L / 2 + 0.5 - lc, 0.25 * H, 0], perfil: [[0, 0], [rc, 0], [rc, lc], [0, lc]], porta: { centro: [-L / 2 + 0.5 - lc, 0.25 * H, 0], eixo: [-1, 0, 0], raio: rc } },
     horn: { em: [xs, H + ht, 0], perfil: [[0, 0], [rh, 0], [rh, th], [0, th]] },
     furoDoHorn: { em: [xs + cFuroHorn, topo - th / 2, 0], perfil: [[0, 0], [rFuroHorn, 0], [rFuroHorn, th / 2 + 1], [0, th / 2 + 1]], raio: cFuroHorn, diametro: 2 * rFuroHorn },
     eixo: { y: H + ht, raio: rt },

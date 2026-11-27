@@ -38,3 +38,25 @@ describe('família atuador-de-junta', () => {
     expect(() => parametrosDoServo('gigante')).toThrow(/gigante não existe; aceitos: pequeno, medio, grande/);
   });
 });
+
+describe('a porta `cabo` do atuador', () => {
+  /* a medida independente: o centro dos vértices da tampa do cilindro de saída do cabo, no plano da porta */
+  const casos = [
+    ...Object.keys(ATUADORES).map((d) => [`atuador de ${d} mm`, { forma: 1, ...parametrosDoAtuador(d) }, 1]),
+    ...Object.keys(SERVOS).map((t) => [`servo ${t}`, parametrosDoServo(t), -1]),
+  ];
+  for (const [nome, parametros, sinal] of casos) it(`${nome}: a porta fica no centro da ponta do cilindro de saída, com o eixo para fora dele`, () => {
+    const receita = { meta: { nome: 'a' }, get CHAMADAS_COMPOSICOES() { return [chamar(F, 'a', parametros)]; } };
+    const n = executarReceita(receita, { registroOperacoes: registro.registroOperacoes, registroComposicoes: registro.registroComposicoes }).neutro;
+    const I = n.portas.get('cabo').interface;
+    expect(I.forma).toBe('plano');
+    expect(I.eixo).toEqual([sinal, 0, 0]);
+    /* os vértices no plano da porta e dentro do raio do cilindro: o círculo da tampa */
+    const rc = parametros.forma === 2 ? 0.12 * parametros.larguraDaCaixa : parametros.diametroDoCabo / 2;
+    const redondos = [...n.V.values()].filter((v) => Math.abs(v[0] - I.centro[0]) < 1e-9 && Math.hypot(v[1] - I.centro[1], v[2] - I.centro[2]) <= rc / 1000 + 1e-9);
+    expect(redondos.length).toBeGreaterThanOrEqual(16);
+    const c = [1, 2].map((e) => redondos.reduce((s, v) => s + v[e], 0) / redondos.length);
+    expect(c[0]).toBeCloseTo(I.centro[1], 9);
+    expect(c[1]).toBeCloseTo(I.centro[2], 9);
+  });
+});
