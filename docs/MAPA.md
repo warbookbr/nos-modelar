@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2471 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2472 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -496,6 +496,10 @@
 - `decisoes-historico.md` — Decisões em vigor, lote 3 de historico/
 - `decisoes-planos-encerrados-1.md` — Decisões em vigor, lote 1
 - `decisoes-planos-encerrados-2.md` — Decisões em vigor, lote 2
+
+## docs/modelar/banco-de-provas/perna-estreita-2026-11-27/
+
+- `README.md` — Perna estreita: as provas
 
 ## docs/modelar/banco-de-provas/ponte-mecatronica-2026-11-23/
 
