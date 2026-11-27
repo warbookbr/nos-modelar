@@ -1,0 +1,52 @@
+{
+  "formato": "mecanifica.familia@1",
+  "id": "cabo",
+  "versao": "1.0.0",
+  "nivel": "componente",
+  "parametros": {
+    "ax": { "tipo": "numero", "unidade": "mm", "padrao": 0, "minimo": -5000, "maximo": 5000, "medio": 0 },
+    "ay": { "tipo": "numero", "unidade": "mm", "padrao": 0, "minimo": -5000, "maximo": 5000, "medio": 0 },
+    "az": { "tipo": "numero", "unidade": "mm", "padrao": 0, "minimo": -5000, "maximo": 5000, "medio": 0 },
+    "adx": { "tipo": "numero", "unidade": "razao", "padrao": 1, "minimo": -1, "maximo": 1, "medio": 1 },
+    "ady": { "tipo": "numero", "unidade": "razao", "padrao": 0, "minimo": -1, "maximo": 1, "medio": 0 },
+    "adz": { "tipo": "numero", "unidade": "razao", "padrao": 0, "minimo": -1, "maximo": 1, "medio": 0 },
+    "dx": { "tipo": "numero", "unidade": "mm", "padrao": 200, "minimo": -2000, "maximo": 2000, "medio": 200 },
+    "dy": { "tipo": "numero", "unidade": "mm", "padrao": 0, "minimo": -2000, "maximo": 2000, "medio": 0 },
+    "dz": { "tipo": "numero", "unidade": "mm", "padrao": 0, "minimo": -2000, "maximo": 2000, "medio": 0 },
+    "bdx": { "tipo": "numero", "unidade": "razao", "padrao": -1, "minimo": -1, "maximo": 1, "medio": -1 },
+    "bdy": { "tipo": "numero", "unidade": "razao", "padrao": 0, "minimo": -1, "maximo": 1, "medio": 0 },
+    "bdz": { "tipo": "numero", "unidade": "razao", "padrao": 0, "minimo": -1, "maximo": 1, "medio": 0 },
+    "comprimento": { "tipo": "numero", "unidade": "mm", "padrao": 0, "minimo": 0, "maximo": 30000, "medio": 0 },
+    "folga": { "tipo": "numero", "unidade": "razao", "padrao": 0.3, "minimo": 0.3, "maximo": 10, "medio": 0.5 },
+    "diametro": { "tipo": "numero", "unidade": "mm", "padrao": 6, "minimo": 1, "maximo": 40, "medio": 6 },
+    "raioMinimo": { "tipo": "numero", "unidade": "razao", "padrao": 5, "minimo": 1, "maximo": 10, "medio": 5 },
+    "caimento": { "tipo": "numero", "unidade": "razao", "padrao": 0, "minimo": 0, "maximo": 100, "medio": 0 },
+    "lados": { "tipo": "inteiro", "unidade": "contagem", "padrao": 12, "minimo": 8, "maximo": 32, "medio": 12 },
+    "desvioMaximo": { "tipo": "numero", "unidade": "mm", "padrao": 0.2, "minimo": 0.05, "maximo": 5, "medio": 0.2 },
+    "orcamentoDeFaces": { "tipo": "inteiro", "unidade": "contagem", "padrao": 4000, "minimo": 0, "maximo": 15000, "medio": 4000 }
+  },
+  "restricoes": [
+    { "id": "pontas-distintas", "expressao": "dx * dx + dy * dy + dz * dz >= diametro * diametro", "motivo": "as duas pontas estão a menos de um diâmetro uma da outra; o cabo não tem por onde passar" },
+    { "id": "direcao-da-ponta-a", "expressao": "adx * adx + ady * ady + adz * adz >= 0.0001", "motivo": "a direção de saída da ponta A é nula; dê o vetor para onde o cabo sai da ponta, em qualquer escala" },
+    { "id": "direcao-da-ponta-b", "expressao": "bdx * bdx + bdy * bdy + bdz * bdz >= 0.0001", "motivo": "a direção de saída da ponta B é nula; dê o vetor para onde o cabo sai da ponta, em qualquer escala" },
+    { "id": "comprimento-passa-da-reta", "expressao": "min(comprimento, 1) * (sqrt(dx * dx + dy * dy + dz * dz) - comprimento) <= 0", "motivo": "o comprimento é menor que a distância reta entre as pontas; um cabo não encurta, aumente o comprimento ou use a folga (comprimento 0)" },
+    { "id": "lados-em-quartos", "expressao": "abs(sin(45 * lados)) <= 0.000001", "motivo": "os lados da seção precisam ser múltiplos de 4 (8, 12, 16 a 32): o friso desenha o círculo em quartos de arco" }
+  ],
+  "portas": [
+    { "id": "ponta-a", "tipo": "cilindro", "papel": "externa" },
+    { "id": "ponta-b", "tipo": "cilindro", "papel": "externa" }
+  ],
+  "ferramentas": ["cabo"],
+  "perguntas": {
+    "cabo": [
+      "O cabo é um tubo de seção circular e diâmetro constante, de uma ponta à outra, sem quina nem estrangulamento?",
+      "O cabo sai reto de cada ponta, na direção pedida, e a curva entre elas é lisa, sem dobra aguda nem laço que se atravesse?",
+      "A seção não gira ao longo do cabo (as arestas seguem a curva sem torcer) e as tampas das pontas são planas e perpendiculares ao cabo?"
+    ]
+  },
+  "perfis": {
+    "cabo-de-ponta-a-ponta": { "descricao": "cabo reto-arqueado de 6 mm entre duas pontas viradas uma para a outra, a 200 mm, com 30% de folga", "parametros": { "diametro": 6, "folga": 0.3 } },
+    "cabo-em-u": { "descricao": "cabo de 6 mm que sai de duas pontas paralelas, a 80 mm uma da outra (a B 10 mm mais alta), para o mesmo lado, e faz um U de 300 mm", "parametros": { "diametro": 6, "adx": 0, "ady": 1, "adz": 0, "dx": 80, "dy": 10, "bdx": 0, "bdy": 1, "bdz": 0, "comprimento": 300 } },
+    "cabo-pendurado": { "descricao": "cabo de 6 mm entre duas pontas viradas uma para a outra, com 30% de folga, caindo pelo próprio peso", "parametros": { "diametro": 6, "folga": 0.3, "caimento": 20 } }
+  }
+}

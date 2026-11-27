@@ -5,17 +5,20 @@
    A parte é `elo`. As portas são o padrão dos furos de cada boca (`boca-a`, em y = 0 com a normal para −y, e `boca-b`, em y =
    comprimento com a normal para +y), com a referência em +x e o ângulo no quadro de cada plano, como as do atuador de junta. */
 import { FORMATO_COMPOSICAO_PROCEDURAL } from '../../nucleo/entrada.js';
-import { INTERVALOS, LADOS, SECOES_A_MAIS_DO_DESVIO } from './geometria.js';
+import { INTERVALOS, INTERVALOS_DA_DUPLA, LADOS, SECOES_A_MAIS_DO_DESVIO } from './geometria.js';
+import { SEGMENTOS_DA_PONTA } from './chapa.js';
 
 export const ID_DO_ELO = 'elo-entre-juntas.reto';
 export const ID_DO_ELO_DESVIADO = 'elo-entre-juntas.desviado';
+export const ID_DO_ELO_DE_CURVA_DUPLA = 'elo-entre-juntas.curva-dupla';
+export const ID_DA_CHAPA = 'elo-entre-juntas.chapa';
+export const ID_DA_CHAPA_COM_PASSAGEM = 'elo-entre-juntas.chapa-com-passagem';
 const p = (nome) => ({ parametro: nome });
 const o = (op, id) => ({ origem: { op, id } });
 const REFERENCIA = [1, 0, 0];
 const SAI = ['mecanifica.malha-poligonal@1', 'mecanifica.parte@1', 'mecanifica.porta@1'];
 /* as seções do `loft` de fora (polo, o corpo, polo) e da cavidade (polo, a seção passada, o corpo recuado, a passada, polo) */
-const SECOES_DO_CORPO = INTERVALOS + 3;
-const contagemDe = (desviada) => { const corpo = SECOES_DO_CORPO + (desviada ? SECOES_A_MAIS_DO_DESVIO : 0); return { fo: corpo + 2, de: corpo + 4 }; };
+const contagemDe = (modo) => { const corpo = (modo === 'dupla' ? INTERVALOS_DA_DUPLA : INTERVALOS) + 3 + (modo === 'reta' ? 0 : SECOES_A_MAIS_DO_DESVIO); return { fo: corpo + 2, de: corpo + 4 }; };
 
 export const nomeDaSecao = (grupo, k, tipo, j) => (j === undefined ? `${grupo}${k}${tipo}` : `${grupo}${k}${tipo}${j}`);
 const ehPolo = (contagem, grupo, k) => k === 0 || k === contagem[grupo] - 1;
@@ -45,7 +48,8 @@ const porta = (lado, ponto, normal, referencia) => ({
 });
 
 const parametrosDoDesvio = { normalB: { tipo: 'vetor3' }, referenciaB: { tipo: 'vetor3' }, eixoDoGiro: { tipo: 'vetor3' }, giroDoAzimute: { tipo: 'numero' }, giroDoAzimuteInverso: { tipo: 'numero' }, giroDoDesvio: { tipo: 'numero' }, pivoDaBocaB: { tipo: 'vetor3' }, idaDaBocaB: { tipo: 'vetor3' } };
-const parametrosDoEixo = (desviada) => ({ ...parametrosDasSecoes(contagemDe(desviada), 'fo'), ...parametrosDasSecoes(contagemDe(desviada), 'de') });
+const parametrosDaCurvaDupla = { normalB: { tipo: 'vetor3' }, referenciaB: { tipo: 'vetor3' }, eixoDoGiro: { tipo: 'vetor3' }, pivoDaBocaB: { tipo: 'vetor3' }, idaDaBocaB: { tipo: 'vetor3' }, normalA: { tipo: 'vetor3' }, referenciaA: { tipo: 'vetor3' }, giroinvA: { tipo: 'numero' }, giroxA: { tipo: 'numero' }, girovoltaA: { tipo: 'numero' }, girozA: { tipo: 'numero' }, giroinvB: { tipo: 'numero' }, giroxB: { tipo: 'numero' }, girovoltaB: { tipo: 'numero' }, girozB: { tipo: 'numero' }, caixaMinA: { tipo: 'vetor3' }, caixaMaxA: { tipo: 'vetor3' } };
+const parametrosDoEixo = (modo) => ({ ...parametrosDasSecoes(contagemDe(modo), 'fo'), ...parametrosDasSecoes(contagemDe(modo), 'de') });
 const parametros = {
   comprimento: { tipo: 'numero' }, planoB: { tipo: 'vetor3' },
   ...Object.fromEntries(['A', 'B'].flatMap((l) => [
@@ -68,21 +72,67 @@ const IDA_DA_BOCA_B = [
 /* a composição do elo reto (o eixo é o y) e a do elo desviado (o caminho com `desvio` ou `deslocamentoLateral`): a reta não tem
    os giros e a ida da boca B, e por isso a malha dela é a de antes, com os mesmos ids; a desviada cria a boca B primeiro, para girar
    e levar só ela, e leva a orientação do `loft` e a normal e a referência da porta B como parâmetros */
-const compor = (id, desviada) => {
+/* a ida de cada boca na curva dupla: o giro de `graus` em torno do eixo do plano das curvas. Nos azimutes de 0, 90, 180 e 270 graus ele é um
+   giro só em x ou em z (os dois giros em y ficam em zero), sem a soma de três giros que deixa ruído de ponto flutuante nos anéis; nos outros
+   azimutes são os três giros (y, x, y) como no desvio simples. A boca A gira só (e escolhe seus vértices pela caixa em volta dela, quando a B já foi
+   para o lugar e a casca ainda não existe); a B gira e vai ao ponto dela. */
+const giros = (lado, sel) => ['inv', 'x', 'volta', 'z'].map((g) => ({
+  id: `girar-boca-${lado.toLowerCase()}-${g}`, operacao: 'rotaciona',
+  argumentos: { eixo: g === 'z' ? 'z' : g === 'x' ? 'x' : 'y', graus: p(`giro${g}${lado}`), pivo: lado === 'A' ? [0, 0, 0] : p('pivoDaBocaB'), ...(sel ? { sel } : {}) },
+}));
+const IDA_DA_BOCA_A = giros('A', { regiao: { min: p('caixaMinA'), max: p('caixaMaxA') } });
+const IDA_DA_BOCA_B_DUPLA = [...giros('B'), { id: 'levar-boca-b', operacao: 'transladar', argumentos: { d: p('idaDaBocaB') } }];
+const compor = (id, modo) => {
+  const desviada = modo !== 'reta'; const dupla = modo === 'dupla';
   const orientacao = desviada ? p('eixoDoGiro') : [1, 0, 0];
   const nos = [
-    ...(desviada ? [...nosDaBoca('B', 23), ...IDA_DA_BOCA_B] : []),
-    { id: 'loft-de-fora', operacao: 'loft', argumentos: { origemId: 1, lados: LADOS, orientacao, secoes: secoesDoLoft(contagemDe(desviada), 'fo') } },
-    { id: 'loft-da-cavidade', operacao: 'loft', argumentos: { origemId: 2, lados: LADOS, orientacao, secoes: secoesDoLoft(contagemDe(desviada), 'de') } },
+    ...(desviada ? [...nosDaBoca('B', 23), ...(dupla ? IDA_DA_BOCA_B_DUPLA : IDA_DA_BOCA_B)] : []),
+    ...(dupla ? [...nosDaBoca('A', 20), ...IDA_DA_BOCA_A] : []),
+    { id: 'loft-de-fora', operacao: 'loft', argumentos: { origemId: 1, lados: LADOS, orientacao, secoes: secoesDoLoft(contagemDe(modo), 'fo') } },
+    { id: 'loft-da-cavidade', operacao: 'loft', argumentos: { origemId: 2, lados: LADOS, orientacao, secoes: secoesDoLoft(contagemDe(modo), 'de') } },
     { id: 'casca', operacao: 'subtrair', argumentos: { origemId: 3, solidos: [o('loft', 1), o('loft', 2)] } },
-    ...nosDaBoca('A', 20), ...(desviada ? [] : nosDaBoca('B', 23)),
+    ...(dupla ? [] : nosDaBoca('A', 20)), ...(desviada ? [] : nosDaBoca('B', 23)),
     { id: 'carenagem-com-aneis', operacao: 'unir', argumentos: { origemId: 29, solidos: [o('subtrair', 3), o('lathe', 20), o('lathe', 23)] } },
     { id: 'elo-furado', operacao: 'subtrair', argumentos: { origemId: 30, solidos: [o('unir', 29), { origem: FURO_A }, { origem: { op: 'arranja', id: 22, de: FURO_A } }, { origem: FURO_B }, { origem: { op: 'arranja', id: 25, de: FURO_B } }] } },
     { id: 'parte-elo', operacao: 'parte', argumentos: { nome: 'elo', sel: o('subtrair', 30) } },
-    porta('A', [0, 0, 0], [0, -1, 0], REFERENCIA),
+    dupla ? porta('A', [0, 0, 0], p('normalA'), p('referenciaA')) : porta('A', [0, 0, 0], [0, -1, 0], REFERENCIA),
     desviada ? porta('B', p('planoB'), p('normalB'), p('referenciaB')) : porta('B', p('planoB'), [0, 1, 0], REFERENCIA),
   ];
-  return Object.freeze({ formato: FORMATO_COMPOSICAO_PROCEDURAL, id, versao: '1.0.0', parametros: { ...parametros, ...parametrosDoEixo(desviada), ...(desviada ? parametrosDoDesvio : {}) }, artefatos: { entra: [], sai: SAI }, nos });
+  return Object.freeze({ formato: FORMATO_COMPOSICAO_PROCEDURAL, id, versao: '1.0.0', parametros: { ...parametros, ...parametrosDoEixo(modo), ...(dupla ? parametrosDaCurvaDupla : desviada ? parametrosDoDesvio : {}) }, artefatos: { entra: [], sai: SAI }, nos });
 };
 
-export const COMPOSICOES = Object.freeze([compor(ID_DO_ELO, false), compor(ID_DO_ELO_DESVIADO, true)]);
+/* a chapa reta (`forma` 2): a pista extrudida em y (a face de apoio em y = 0), menos os furos de fixação das duas bocas (um `lathe` repetido por `arranja`
+   radial em volta do eixo y de cada boca) e, com a passagem, o furo no centro delas. As duas portas têm a normal −y, no plano y = 0 */
+const parametrosDaChapa = () => ({
+  chapaRaio: { tipo: 'numero' }, chapaComprimento: { tipo: 'numero' }, chapaEspessura: { tipo: 'numero' }, planoB: { tipo: 'vetor3' }, pivoDaBocaB: { tipo: 'vetor3' },
+  ...Object.fromEntries(['A', 'B'].flatMap((l) => [
+    [`furoRaio${l}`, { tipo: 'numero' }], [`furoAltura${l}`, { tipo: 'numero' }], [`furoEm${l}`, { tipo: 'vetor3' }],
+    [`furos${l}`, { tipo: 'inteiro' }], [`graus${l}`, { tipo: 'numero' }], [`angulo${l}`, { tipo: 'numero' }], [`diametro${l}`, { tipo: 'numero' }], [`raio${l}`, { tipo: 'numero' }],
+    [`passagemRaio${l}`, { tipo: 'numero' }], [`passagemEm${l}`, { tipo: 'vetor3' }],
+  ])),
+});
+const pistaDaChapa = () => ({
+  contorno: { inicio: [p('chapaRaio'), 0], trechos: [{ reto: [p('chapaRaio'), p('chapaComprimento')] }, { arco: { centro: [0, p('chapaComprimento')], angulo: 180 } }, { reto: [p('chapaRaioNegativo'), 0] }, { arco: { centro: [0, 0], angulo: 180 } }] },
+});
+const furosDaChapa = (lado, origem, pivo) => [
+  { id: `furo-${lado.toLowerCase()}`, operacao: 'lathe', argumentos: { origemId: origem, lados: 24, perfil: [[0, 0], [p(`furoRaio${lado}`), 0], [p(`furoRaio${lado}`), p(`furoAltura${lado}`)], [0, p(`furoAltura${lado}`)]], em: p(`furoEm${lado}`) } },
+  { id: `furos-${lado.toLowerCase()}`, operacao: 'arranja', argumentos: { modo: 'radial', total: p(`furos${lado}`), graus: p(`graus${lado}`), eixo: 'y', pivo, origemId: origem + 1, derivaDe: { op: 'lathe', id: origem }, sel: { origem: { op: 'lathe', id: origem } } } },
+];
+const passagemDaChapa = (lado, origem) => ({ id: `passagem-${lado.toLowerCase()}`, operacao: 'lathe', argumentos: { origemId: origem, lados: 48, perfil: [[0, 0], [p(`passagemRaio${lado}`), 0], [p(`passagemRaio${lado}`), p(`furoAltura${lado}`)], [0, p(`furoAltura${lado}`)]], em: p(`passagemEm${lado}`) } });
+const comporChapa = (id, comPassagem) => {
+  const solidos = [o('extrusao', 1), { origem: { op: 'lathe', id: 21 } }, { origem: { op: 'arranja', id: 22, de: { op: 'lathe', id: 21 } } }, { origem: { op: 'lathe', id: 24 } }, { origem: { op: 'arranja', id: 25, de: { op: 'lathe', id: 24 } } }, ...(comPassagem ? [{ origem: { op: 'lathe', id: 26 } }, { origem: { op: 'lathe', id: 27 } }] : [])];
+  return Object.freeze({
+    formato: FORMATO_COMPOSICAO_PROCEDURAL, id, versao: '1.0.0',
+    parametros: { ...parametrosDaChapa(), chapaRaioNegativo: { tipo: 'numero' } }, artefatos: { entra: [], sai: SAI },
+    nos: [
+      { id: 'placa', operacao: 'extrusao', argumentos: { origemId: 1, perfil: pistaDaChapa(), altura: p('chapaEspessura'), segmentosArco: SEGMENTOS_DA_PONTA } },
+      ...furosDaChapa('A', 21, [0, 0, 0]), ...furosDaChapa('B', 24, p('pivoDaBocaB')),
+      ...(comPassagem ? [passagemDaChapa('A', 26), passagemDaChapa('B', 27)] : []),
+      { id: 'chapa-furada', operacao: 'subtrair', argumentos: { origemId: 30, solidos } },
+      { id: 'parte-elo', operacao: 'parte', argumentos: { nome: 'elo', sel: o('subtrair', 30) } },
+      porta('A', [0, 0, 0], [0, -1, 0], REFERENCIA), porta('B', p('planoB'), [0, -1, 0], REFERENCIA),
+    ],
+  });
+};
+
+export const COMPOSICOES = Object.freeze([compor(ID_DO_ELO, 'reta'), compor(ID_DO_ELO_DESVIADO, 'desviada'), compor(ID_DO_ELO_DE_CURVA_DUPLA, 'dupla'), comporChapa(ID_DA_CHAPA, false), comporChapa(ID_DA_CHAPA_COM_PASSAGEM, true)]);

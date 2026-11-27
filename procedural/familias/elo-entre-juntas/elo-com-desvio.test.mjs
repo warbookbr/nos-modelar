@@ -24,7 +24,7 @@ describe('elo entre juntas com desvio', () => {
       expect(e.restricao).toBe('curva-fecha-a-parede');
       expect(e.message).toContain('recebeu {');
       expect(e.message).toContain('"desvio":40');
-      expect(e.message).toMatch(/aceito: .* <= 0\.4 \* .* \(o lado esquerdo vale [0-9.]+ e o direito [0-9.]+\)/);
+      expect(e.message).toMatch(/aceito: .* <= max\(0, 2 - forma\) \* \(0\.4 \* .* \(o lado esquerdo vale [0-9.]+ e o direito [0-9.]+\)/);
     });
     it('o desvio máximo aceito do elo curto passa e o décimo de grau acima não', () => {
       expect(() => chamar(F, 'e', { comprimento: 100, desvio: 36.7 })).not.toThrow();
