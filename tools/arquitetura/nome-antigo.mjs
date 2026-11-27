@@ -35,7 +35,6 @@ export const EXCECOES_POR_CAMINHO = [
   { categoria: 'aviso de leitura', caminho: /^tools\/ambiente\.(?:mjs|test\.mjs)$/, motivo: 'lê a variável MECANIFICA_* de propósito, com aviso, para o CI e o ambiente da pessoa mudarem sem quebrar' },
   { categoria: 'a régua', caminho: /^tools\/arquitetura\/nome-antigo(?:\.test)?\.mjs$/, motivo: 'a régua define o nome antigo para recusá-lo, e o teste dela o escreve em repositório de ensaio' },
   { categoria: 'configuração', caminho: /^\.codex\/config\.toml$/, motivo: 'a configuração do Codex da pessoa registra o servidor MCP pelo nome com que foi instalado; trocá-lo desliga o servidor até a pessoa reinstalar' },
-  { categoria: 'agente travado por hash', caminho: /^\.claude\/agents\/critico-visual\.md$/, motivo: 'a definição do agente crítico é presa por hash na calibração (calibracao:check); mudá-la exige medir de novo o conjunto de doze imagens' },
   { categoria: 'derivado', caminho: /^docs\/MAPA\.md$/, motivo: 'é gerado por `npm run mapa` a partir da primeira linha dos arquivos; a ocorrência nasce no arquivo de origem, onde esta régua a confere' },
 ];
 
