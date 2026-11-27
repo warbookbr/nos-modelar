@@ -1,6 +1,6 @@
 # Perna estreita: as provas
 
-Evidência do plano [perna estreita](../../planos/2026-11-27-perna-estreita.md).
+Evidência do plano [perna estreita](../../decisoes/PLANOS-ENCERRADOS.md).
 
 ## Fatia 1: a medida dos três caminhos (2026-11-27)
 
