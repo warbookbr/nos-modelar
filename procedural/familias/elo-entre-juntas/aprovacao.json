@@ -8,12 +8,14 @@
       "minimo": {
         "parametros": {
           "azimute": -180,
+          "azimuteA": -180,
           "cintura": 0.4,
           "circuloDaBocaA": 10,
           "circuloDaBocaB": 10,
           "comprimento": 60,
           "deslocamentoLateral": 0,
           "desvio": 0,
+          "desvioA": 0,
           "diametroDaBocaA": 20,
           "diametroDaBocaB": 20,
           "diametroDoFuroDaBocaA": 1.5,
@@ -33,12 +35,14 @@
       "medio": {
         "parametros": {
           "azimute": 0,
+          "azimuteA": 0,
           "cintura": 1,
           "circuloDaBocaA": 70,
           "circuloDaBocaB": 70,
           "comprimento": 300,
           "deslocamentoLateral": 0,
           "desvio": 0,
+          "desvioA": 0,
           "diametroDaBocaA": 100,
           "diametroDaBocaB": 100,
           "diametroDoFuroDaBocaA": 4.2,
@@ -58,12 +62,14 @@
       "maximo": {
         "parametros": {
           "azimute": 180,
+          "azimuteA": 180,
           "cintura": 1.6,
           "circuloDaBocaA": 200,
           "circuloDaBocaB": 200,
-          "comprimento": 800,
+          "comprimento": 1300,
           "deslocamentoLateral": 40,
           "desvio": 90,
+          "desvioA": 90,
           "diametroDaBocaA": 300,
           "diametroDaBocaB": 300,
           "diametroDoFuroDaBocaA": 8,
@@ -77,12 +83,12 @@
           "profundidadeDaSecao": 300,
           "secao": 3
         },
-        "hash": "sha256:0577ef0e06deadd1d229989142030ecbb8407ae279f25b9d8c58457ad47000c6",
+        "hash": "sha256:4363a8ee2690dac21a5caf17324dbdcdf2112fe80f686ceb8f7db5b91317e32f",
         "medidas": []
       }
     },
     "varredura": {
-      "sondas": 38,
+      "sondas": 42,
       "recusasDeclaradas": [
         {
           "ponto": "circuloDaBocaA=200",
