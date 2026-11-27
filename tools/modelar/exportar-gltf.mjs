@@ -3,7 +3,7 @@
 import { existsSync, mkdirSync, readFileSync, renameSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import { basename, dirname, extname, isAbsolute, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { AMBIENTES, NOME_DO_SCRIPT_DO_CABO, exportarGltf, exportarMontagemGltf, lerScriptDoCaboVivo } from '../../modulos/exportador-gltf/src/index.js';
+import { AMBIENTES, NOME_DO_SCRIPT_DO_CABO, NOME_DO_ZIP_DO_ADDON, exportarGltf, exportarMontagemGltf, lerScriptDoCaboVivo, zipDoAddonDoCabo } from '../../modulos/exportador-gltf/src/index.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { lerMontagemPersistida } from '../../src/autoria/ler-montagem-persistida.js';
 import { resolverMontagemPersistida } from '../../src/autoria/resolver-montagem-persistida.js';
@@ -20,7 +20,7 @@ const USO = 'Uso: npm run exportar:gltf -- <peça> [--saida <arquivo>] [--ambien
   + '  --saida <arquivo>    destino do .glb (padrão: exportacoes/gltf/<peça>.glb); sobrescreve o que houver\n'
   + '  --articulacoes <arq> (só montagem) lista JSON de declarações de junta; cada peça que uma junta move sai filha do nó `junta-<id>`, no pivô e com o eixo dela\n'
   + '  --cabos <arquivo>    (só montagem) lista JSON de pedidos de cabo por portas ({ de: { instancia, porta }, para: { instancia, porta }, comprimento, diametro, ... });\n'
-  + `                       sai o cabo na pose de repouso, os nós das pontas, os dados em extras e o script do Blender (${NOME_DO_SCRIPT_DO_CABO}) ao lado do .glb\n`
+  + `                       sai o cabo na pose de repouso, os nós das pontas, os dados em extras, o script do Blender (${NOME_DO_SCRIPT_DO_CABO}) e o addon instalável (${NOME_DO_ZIP_DO_ADDON}) ao lado do .glb\n`
   + `  --ambiente <nome>    ${AMBIENTES.join(' ou ')} (padrão estudio); vai como metadado (extras), porque o glTF não leva ambiente\n`;
 
 export function parseArgs(args = process.argv.slice(2)) {
@@ -169,6 +169,13 @@ export function gravarScriptDoCabo(pastaDoGlb) {
   return destino;
 }
 
+/* Grava o `.zip` instalável do addon do cabo vivo ao lado do .glb; devolve o caminho. */
+export function gravarAddonDoCabo(pastaDoGlb) {
+  const destino = resolve(pastaDoGlb, NOME_DO_ZIP_DO_ADDON);
+  gravarAtomico(destino, zipDoAddonDoCabo());
+  return destino;
+}
+
 const lerLista = (arquivo, nome) => {
   const dado = JSON.parse(readFileSync(isAbsolute(arquivo) ? arquivo : resolve(process.cwd(), arquivo), 'utf8'));
   if (!Array.isArray(dado)) throw new Error(`${nome}: o arquivo '${arquivo}' precisa ser uma lista JSON.`);
@@ -188,7 +195,8 @@ export async function exportarArquivoGltf({ peca, saida = null, ambiente = 'estu
     mkdirSync(dirname(destino), { recursive: true });
     gravarAtomico(destino, resultado.bytes);
     const caminhoDoScript = listaDeCabos.length ? gravarScriptDoCabo(dirname(destino)) : null;
-    return { caminhoSaida: destino, tamanhoBytes: statSync(destino).size, diagnostico: resultado.diagnostico, ...(caminhoDoScript ? { caminhoDoScript } : {}) };
+    const caminhoDoAddon = listaDeCabos.length ? gravarAddonDoCabo(dirname(destino)) : null;
+    return { caminhoSaida: destino, tamanhoBytes: statSync(destino).size, diagnostico: resultado.diagnostico, ...(caminhoDoScript ? { caminhoDoScript, caminhoDoAddon } : {}) };
   }
   if (articulacoes || cabos) throw new Error(`--articulacoes e --cabos valem para montagem; '${peca}' é uma peça.\n${USO}`);
   const caminhoReceita = resolverCaminhoReceita(peca, { raiz: REPO });
@@ -218,6 +226,7 @@ async function main() {
     if (d.facesPuladas?.length) process.stdout.write(`Puladas:    ${d.facesPuladas.length} face(s) sem triangulação de área não nula: ${d.facesPuladas.map((p) => `${p.instancia}#${p.face}`).join(', ')}\n`);
     if (d.juntas) process.stdout.write(`Juntas:     ${d.juntas} (nós junta-<id>, a peça que a junta move é filha dele)\n`);
     if (res.caminhoDoScript) process.stdout.write(`Blender:    ${res.caminhoDoScript} (${d.cabos} cabo(s); no Blender, importe o .glb e rode o script)\n`);
+    if (res.caminhoDoAddon) process.stdout.write(`Addon:      ${res.caminhoDoAddon} (Blender 4.2 ou mais novo: Edit > Preferences > Get Extensions > Install from Disk; refaz o cabo com o comprimento de corte quando as pontas se movem)\n`);
     if (d.extensoes.length) process.stdout.write(`Extensões:  ${d.extensoes.join(', ')}\n`);
   } catch (err) {
     process.stderr.write(`Erro: ${err.message}\n`);

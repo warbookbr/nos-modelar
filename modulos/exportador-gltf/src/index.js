@@ -32,6 +32,7 @@ import { gerarGltfDeMontagem } from './montagem.js';
 
 export { ErroExportacaoGltf, AMBIENTES };
 export { lerGlb } from './glb.js';
+export { NOME_DO_ZIP_DO_ADDON, arquivosDoAddonDoCabo, zipDoAddonDoCabo, zipar } from './addon-do-blender.js';
 export { CAMINHO_DO_SCRIPT_DO_CABO, NOME_DO_SCRIPT_DO_CABO, lerScriptDoCaboVivo } from './script-do-blender.js';
 
 export function exportarGltf(opcoes) {

@@ -6,6 +6,7 @@
 > algum arquivo-fonte estiver sem cabeçalho.
 
 2543 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2544 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -936,6 +937,7 @@
 
 ## modulos/exportador-gltf/src/
 
+- `addon-do-blender.js` — addon-do-blender.js — o addon do Blender do cabo vivo (`blender/addon_cabo_vivo/`) empacotado como `.zip` instalável: a extensão do Blender 4.2 ou mais nova …
 - `arvore.js` — arvore.js — a hierarquia de uma montagem com articulação, em dados puros: cada junta vira um nó vazio posto no pivô dela, com o eixo dela como o eixo +Y loca…
 - `gerar-gltf.js` — gerar-gltf.js — monta o JSON e o BIN do glTF 2.0 a partir da malha neutra e do catálogo de materiais da receita. Sem Three.js, sem disco, sem relógio nem aca…
 - `glb.js` — glb.js — o contêiner glTF binário (.glb): cabeçalho de 12 bytes, o pedaço JSON (preenchido com espaços até múltiplo de 4) e o pedaço BIN (preenchido com zero…
