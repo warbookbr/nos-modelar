@@ -1,6 +1,6 @@
 # Elo entre juntas: a carenagem oca do membro, de uma flange de atuador à outra
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Núcleo:** não
 
@@ -78,4 +78,12 @@ Fatia 1 feita em 2026-11-26: a família `elo-entre-juntas` (o elo reto entre dua
 
 Fatia 2 feita em 2026-11-26: o elo com desvio (`desvio` de 0 a 90 graus, `azimute` e `deslocamentoLateral`, com o caminho curvo tangente às duas bocas e as seções girando sem torcer), o elo reto saindo igual bit a bit com desvio zero, e a restrição `curva-fecha-a-parede`, que pede raio de curvatura de 2,5 vezes a maior meia largura da seção: a canela e o antebraço chegam aos 90 graus, o elo de 150 mm a 68,8 e o de 100 mm a 36,7. A pessoa aprovou por imagem em 2026-11-26 ("aprovo, pode conferir e seguir"), e a conferência do contorno serrilhado da vista de cima mostrou que a parede não ondula.
 
+Fatia 2b feita em 2026-11-26: a curva na boca A (`desvioA`, `azimuteA`), com o caminho de duas curvas em S ou em U, as restrições `curva-dupla-fecha-a-parede` e `curvas-no-mesmo-plano`, e o elo de uma curva saindo igual bit a bit com a nova em zero; o comprimento máximo da família subiu de 800 para 1.300 mm, para o ponto máximo da aprovação mecânica caber com as duas curvas, e o `deslocamentoLateral` não tem efeito na curva dupla. A pessoa aprovou a coxa em U por imagem em 2026-11-26 ("aprovo a coxa em U, pode montar a perna"), com o S mostrado como alternativa.
+
+Fatia 3 feita em 2026-11-27: a perna de prova (`tools/fixtures/elo-entre-juntas/perna-de-prova.mjs`), com os atuadores de quadril, joelho e tornozelo e a coxa e a canela em U, nas alturas, eixos e cursos do esqueleto aprovado, montada só pelas portas: só as sete flanges encostam, nada atravessa, o curso de cada junta e a perna dobrada passam sem colisão, a montagem resolve em cerca de 5 s e exporta em STEP e OBJ com as oito partes. A perna ficou com 387 mm de largura e em zigue-zague: o U põe cada atuador entre a coxa e a canela, que se curvam para lados opostos, e o raio mínimo da curva na boca larga do atuador dá arcos de 155 mm; nenhuma escolha de sentido dos eixos estreita a perna, e ela foi posta a 20 mm da linha do meio. A pessoa decidiu fechar o plano assim em 2026-11-27 ("pode fechar o plano assim"), com a perna estreita num plano próprio.
+
+Fatia 4 feita em 2026-11-27: o banco de provas com as imagens aprovadas e as medidas, a ficha da família no catálogo de capacidade e a exportação da perna entre os testes lentos.
+
 ## Fechamento
+
+Concluído em 2026-11-27 no ramo `claude/admiring-rubin-h9zjwx`, sem PR, com `npm run gates` verde em cada envio. A família `elo-entre-juntas` faz o membro oco entre duas flanges de atuador: reto, com uma curva ou com uma curva em cada boca, com as recusas testadas e a aprovação mecânica, e as formas aprovadas pela pessoa por imagem. A perna de prova prova o encaixe, os cursos e a exportação, mas sai larga; vão ao backlog a perna estreita (a flange de fixação menor no atuador, a curva mais fechada com reforço por dentro ou o elo de chapa preso ao lado), a instrução de que em cadeia cada atuador gira meia volta em relação ao anterior, e a recusa da exportação que não aponta a face de id repetido.
