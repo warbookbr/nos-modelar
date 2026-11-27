@@ -11,3 +11,5 @@ As estações do tubo vêm do desvio máximo da corda, numa escada de 17 número
 `node docs/modelar/banco-de-provas/cabos-2026-11-27/medir-casos.mjs` mede os casos de `tools/fixtures/cabo/casos.mjs` (comprimento de corte, raio mínimo, faces e tempo).
 
 Imagens em `tools/bancadas/out/cabos/` (não versionadas): um arquivo por caso e `lados-8.png` contra `lados-24.png`.
+
+A pessoa aprovou o cabo entre dois pontos por imagem em 2026-11-27, com a frase "aprovo sim" (`aprovado-*.png`: o laço, o caimento e o mesmo cabo com 8 e com 24 lados), sabendo que os lados vão de 8 a 32 de 4 em 4 e que a conferência de porta se confunde quando as duas tampas ficam no mesmo plano.
