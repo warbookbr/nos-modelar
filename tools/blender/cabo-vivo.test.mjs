@@ -289,8 +289,9 @@ describe.skipIf(!lancador)(`o addon do cabo vivo no Blender${lancador ? '' : ' (
       const completos = { ...Object.fromEntries(Object.entries(familiaDoCabo.parametros).map(([nome, def]) => [nome, def.padrao])), ...parametrosDoCabo(esperado) };
       const plano = planejar(completos);
       const familia = plano.pontos.map((q) => noBlender(q.map((c) => c / 1000)));
-      /* a curva lisa (a Hermite pelos nós, igual à da família) passa um pouco abaixo do raio da haste junto da emenda do trecho reto da ponta: 7,2 mm contra 9 declarados a ±90° */
-      expect(passo.raio * 1000, `raio da curva lisa a ${passo.angulo}°`).toBeGreaterThanOrEqual(raioDeclaradoMm * 0.75);
+      /* a curva lisa (a quíntica pelos nós, igual à da família) respeita o raio declarado, medido por três pontos na curva avaliada do Blender (a 0,5 mm de folga de medida) */
+      expect(passo.raio * 1000, `raio da curva lisa a ${passo.angulo}°`).toBeGreaterThanOrEqual(raioDeclaradoMm - 0.5);
+      expect(passo.raio * 1000, `raio da curva lisa a ${passo.angulo}°, perto do da haste`).toBeGreaterThan(passo.raioDoAddonMm * 0.85);
       relatorio.push({ angulo: passo.angulo, distanciaMm: distanciaMaxima(familia, passo.pontos), raioDaHasteMm: passo.raioDoAddonMm, raioLisoMm: passo.raio * 1000 });
     }
     medido.relatorio = relatorio;

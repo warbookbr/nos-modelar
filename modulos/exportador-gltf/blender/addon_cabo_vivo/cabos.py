@@ -64,7 +64,7 @@ def _pontas(depsgraph, malha):
 def _escrever(curva, r):
     pontos = curva.data.splines[0].bezier_points
     n = len(pontos)
-    pontos.foreach_set('co', r['nos'].reshape(-1))
+    pontos.foreach_set('co', r['pontos'].reshape(-1))
     pontos.foreach_set('handle_left', r['esquerda'].reshape(-1))
     pontos.foreach_set('handle_right', r['direita'].reshape(-1))
     curva.data.update_tag()
@@ -75,7 +75,7 @@ def montar_cabo(malha):
     """Cria a curva viva do cabo `malha` (idempotente: refaz a que já existe). Devolve o objeto da curva."""
     nome = malha.name + SUFIXO
     p = _parametros(malha)
-    nos = elastica.nos_da_haste(p['comprimento'], p['diametro'])
+    nos = elastica.nos_da_haste(p['comprimento'] - 2 * p['diametro'], p['diametro'])
     curva = bpy.data.objects.get(nome)
     if curva is not None:
         bpy.data.objects.remove(curva, do_unlink=True)
@@ -87,7 +87,7 @@ def montar_cabo(malha):
     dados.bevel_resolution = max(0, max(p['lados'], 8) // 4 - 1)
     dados.use_fill_caps = True
     spline = dados.splines.new('BEZIER')
-    spline.bezier_points.add(nos - 1)
+    spline.bezier_points.add(elastica.pontos_da_curva(nos) - 1)
     for ponto in spline.bezier_points:
         ponto.handle_left_type = 'FREE'
         ponto.handle_right_type = 'FREE'
@@ -125,11 +125,11 @@ def atualizar_cabo(depsgraph, curva, forcar=False, a_frio=False):
         virou = max(np.linalg.norm(dA - anterior['dA']), np.linalg.norm(dB - anterior['dB']))
         if deslocou < 3 * h and virou < 0.3:
             partida = anterior['nos']
-    nos = len(curva.data.splines[0].bezier_points)
-    r = elastica.refazer(A, B, dA, dB, p['comprimento'], nos, p['caimento'], partida)
+    nos = elastica.nos_da_haste(p['comprimento'] - 2 * p['diametro'], p['diametro'])
+    r = elastica.refazer(A, B, dA, dB, p['comprimento'], nos, p['caimento'], partida, p['diametro'])
     _escrever(curva, r)
     curva[CHAVE_ESTADO] = 'ok' if r['estado'] == 'ok' and (p['raio_minimo'] <= 0 or r['raio'] >= p['raio_minimo'] * (1 - 1e-9)) else ('estica' if r['estado'] != 'ok' else 'dobra')
-    curva[CHAVE_RAIO] = r['raio'] * 1000.0 if np.isfinite(r['raio']) else 0.0
+    curva[CHAVE_RAIO] = r['raio_haste'] * 1000.0 if np.isfinite(r['raio_haste']) else 0.0
     curva[CHAVE_COMPRIMENTO] = r['comprimento'] * 1000.0
     _ESTADO[curva.name] = {'chave': chave, 'nos': r['nos'], 'A': A, 'B': B, 'dA': dA, 'dB': dB, 'h': p['comprimento'] / (nos - 1)}
     ULTIMA_MEDIDA['iteracoes'] += r['iteracoes']
