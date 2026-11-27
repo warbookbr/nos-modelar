@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2471 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2470 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -749,7 +749,6 @@
 - `2026-11-16-eletronica-no-modelar.md` — O lado Modelar da mecatrônica: plano-raiz que gera a família de componentes e a ponte
 - `2026-11-22-curva-paralela-na-rede.md` — Curva paralela na rede de curvas: os anéis em volta de um vão sem desenhar ponto a ponto
 - `2026-11-25-acabamento-hard-surface.md` — Acabamento de hard surface: chanfro e arredondamento em qualquer aresta, linhas de painel e recortes na casca
-- `2026-11-25-elo-entre-juntas.md` — Elo entre juntas: a carenagem oca do membro, de uma flange de atuador à outra
 - `2026-11-26-ferramentas-e-documentacao.md` — Ferramentas e documentação: toda ferramenta registrada e achada, e o roteador cobrindo o trabalho inteiro
 - `2026-11-26-laco-de-modelagem-mais-rapido.md` — Laço de modelagem mais rápido: a rodada mede, mostra e registra em minutos, com a decisão da pessoa gravada
 - `2026-11-26-operacoes-repartidas-entre-nucleos.md` — Operações repartidas entre núcleos: o corte das aberturas, a subtração e a divisão usando mais de um núcleo, com a mesma malha

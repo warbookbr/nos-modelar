@@ -1,6 +1,6 @@
 # Elo entre juntas: as provas
 
-Evidência do plano [elo entre juntas](../../planos/2026-11-25-elo-entre-juntas.md).
+Evidência do plano [elo entre juntas](../../decisoes/PLANOS-ENCERRADOS.md).
 
 ## Elo reto, aprovado em 2026-11-26
 
