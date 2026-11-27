@@ -1,0 +1,8 @@
+{
+  "formato": "mecanifica.decisoes-da-pessoa",
+  "versao": 1,
+  "peca": "objeto-de-prova",
+  "decisoes": [
+    { "rodada": 1, "decisao": "a pessoa, 2026-11-21: tampa de 4 mm está boa, a caixa segue", "gravadaEm": "2026-11-21T09:00:00.000Z" }
+  ]
+}

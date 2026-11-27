@@ -6,6 +6,7 @@
 > algum arquivo-fonte estiver sem cabeçalho.
 
 2525 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2537 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -57,6 +58,7 @@
 
 ## .claude/skills/criar-peca/references/
 
+- `casos-do-modelador.md` — Casos que mostraram as regras do modelador
 - `comparar-com-a-referencia.md` — Comparar com a referência por comando
 - `eletronica.md` — Placa de circuito e componentes eletrônicos
 - `operacoes-procedurais.md` — Referência de operações procedurais
@@ -99,6 +101,7 @@
 
 - `BANCO-DE-PROVAS.md` — Banco de provas e registro de custo
 - `MEDICAO-DE-TOKENS-2026-10.md` — Onde vão os tokens do esbocista (2026-10-07)
+- `MODELO-DE-TENTATIVAS.md` — Modelo da tabela de tentativas
 - `README.md` — Banco de provas: as pastas de rodada
 
 ## docs/modelar/banco-de-provas/abertura-de-contorno-2026-11-05/
@@ -747,9 +750,7 @@
 
 ## docs/modelar/guias/
 
-- `AUTORIA-IA.md` — Autoria assistida por IA
 - `BANCADA-E-APRESENTACAO.md` — Bancada e apresentação
-- `FLUXO-MODELAGEM-IA.md` — Fluxo de modelagem assistida por IA v4
 - `LEITURA-POR-TAREFA.md` — Leitura por tarefa
 - `README.md` — Guias
 - `modelar-carroceria.md` — Modelar carroceria de chapa contínua
@@ -846,7 +847,6 @@
 - `FLUXO-DO-OBJETO.md` — Fluxo do objeto
 - `GOTCHAS-AUTORIA-VISUAL.md` — Gotchas de autoria visual
 - `GOTCHAS-POR-OPERACAO.md` — Gotchas por operação: os casos completos
-- `GUIA-AUTORIA-IA.md` — # Guia de Autoria e Modelagem Procedural para IA
 - `INTENCAO-PECA-V1.md` — Intenção semântica opcional de peça — v1
 - `LACO-VISUAL.md` — O laço visual — olhar, sobrepor, despachar
 - `MEDIDAS-AVULSAS.md` — Medidas avulsas: quando usar cada uma
@@ -2762,6 +2762,7 @@
 
 ## procedural/pecas/roda-esportiva/
 
+- `DOSSIE.md` — Dossiê: roda-esportiva
 - `receita.js` — roda-esportiva — roda de liga leve de 19 polegadas com pneu 245/40 R19, etapa 1 (aro, raios, tampa central, parafusos, válvula e pneu), nas duas variantes do…
 
 ## procedural/pecas/roda-esportiva/referencias/
@@ -3343,6 +3344,7 @@
 
 ## tools/ci/
 
+- `geradores-sem-pacote.test.mjs` — geradores-sem-pacote.test.mjs — cada gerador que o passo "Juntar à main" do CI roda (`GERADORES_DO_REPOSITORIO` em juntar-a-main.sh) carrega sem `node_module…
 - `juntar-a-main.test.mjs` — juntar-a-main.test.mjs — o passo de juntar à main do CI em repositórios de verdade: avança a main quando ela não andou, junta a main andada ao ramo e dispara…
 
 ## tools/fixtures/
@@ -3690,6 +3692,38 @@
 ## tools/fixtures/descrever-sem-calar/orfao/referencias/
 
 - `alvo.md` — Alvo
+
+## tools/fixtures/dossie/documentos/modelar/banco-de-provas/estudo-de-prova/
+
+- `ATRITOS.md` — Estudo de prova: atritos
+- `README.md` — Estudo de prova
+
+## tools/fixtures/dossie/documentos/modelar/decisoes/
+
+- `PLANOS-ENCERRADOS.md` — Planos encerrados
+
+## tools/fixtures/dossie/documentos/modelar/planos/
+
+- `2026-11-20-plano-da-prova.md` — Plano da prova
+- `2026-11-22-plano-de-ferramenta.md` — Plano de ferramenta
+
+## tools/fixtures/dossie/procedural/pecas/objeto-com-partes/
+
+- `DOSSIE.md` — Dossiê: objeto-com-partes
+
+## tools/fixtures/dossie/procedural/pecas/objeto-com-partes/partes/base/
+
+- `receita.js` — receita de fixture do dossiê: uma parte de um objeto de várias partes.
+
+## tools/fixtures/dossie/procedural/pecas/objeto-com-partes/partes/tampa/
+
+- `receita.js` — receita de fixture do dossiê: uma parte de um objeto de várias partes.
+
+## tools/fixtures/dossie/procedural/pecas/objeto-de-prova/
+
+- `ALINHAMENTO.md` — Objeto de prova: alinhamento
+- `DOSSIE.md` — Dossiê: objeto-de-prova
+- `receita.js` — receita de fixture do dossiê: duas partes, uma com sólido modificado e unido.
 
 ## tools/fixtures/elementos-de-maquina/
 
@@ -4067,6 +4101,8 @@
 - `retirados.test.mjs` — retirados.test.mjs — caminho sob pasta retirada passa quando a crônica registra o nome, ou quando o plano está em congelados/, e reprova quando não.
 - `roteiros.mjs` — roteiros.mjs — os invariantes e os roteiros de leitura por intenção, como dado.
 - `roteiros.test.mjs` — roteiros.test.mjs — os roteiros por intenção e o gate leitura:obrigatoria: o JSON do repositório passa, o ROTEIROS.md e os blocos do CLAUDE.md estão gerados …
+- `tentativas-dos-planos.mjs` — tentativas-dos-planos.mjs — a tabela de tentativas do banco de provas de cada plano de modelagem, e a conferência que a cobra.
+- `tentativas-dos-planos.test.mjs` — tentativas-dos-planos.test.mjs — a conferência que recusa o plano de modelagem concluído sem a tabela de tentativas, nos dois sentidos.
 - `territorio-do-envio.mjs` — territorio-do-envio.mjs — confere que cada arquivo que o envio muda pertence ao território de um plano ativo, a um caminho compartilhado ou a um arquivo gera…
 - `territorio-do-envio.test.mjs` — territorio-do-envio.test.mjs — o arquivo mudado sem plano dono nem declaração reprova; o do território, o compartilhado, o gerado e o declarado como defeito …
 - `toc.mjs` — toc.mjs — gera o índice (sumário) de um doc ENTRE os marcadores <!-- TOC --> e <!-- /TOC -->, a partir dos títulos `##` dele. Mesma filosofia do mapa: o índi…
@@ -4143,6 +4179,7 @@
 ## tools/modelar/
 
 - `absorver-ajuste.mjs` — absorver-ajuste.mjs — a régua da rodada de absorção.
+- `aceites-e-envio.mjs` — aceites-e-envio.mjs — o aceite da pessoa no ALINHAMENTO.md e os arquivos que o envio mudou, sem dependência de pacote.
 - `acervo-real.test.mjs` — A varredura do acervo REAL, inteiro, uma vez.
 - `acervo-reduzido.mjs` — acervo-reduzido.mjs — monta um acervo de três peças pequenas sob `tmp/`.
 - `adaptar-montagem-three.test.ts` — Prova que a visualização de montagem deriva somente da árvore resolvida.
@@ -4249,6 +4286,8 @@
 - `dobra-da-superficie.mjs` — dobra-da-superficie.mjs — acha onde a superfície de subdivisão de uma receita dobra com diedro agudo fora de vinco declarado, e diz a parte, o lugar e o ângulo.
 - `dobra-da-superficie.test.mjs` — dobra-da-superficie.test.mjs — a régua de dobra sobre superfícies pequenas feitas aqui: duas faces que se dobram num ângulo conhecido. O diedro é 180 graus m…
 - `dobras-aceitas-reguas.test.mjs` — dobras-aceitas-reguas.test.mjs — `PLANO.dobrasAceitas` nas duas réguas de superfície e no `descrever`: a aba da técnica de hoje (`tubos-hoje.js`) sai como 4 …
+- `dossie-do-objeto.mjs` — dossie-do-objeto.mjs — gera `procedural/pecas/<objeto>/DOSSIE.md` do que já está gravado, sem medir a malha.
+- `dossie-do-objeto.test.mjs` — dossie-do-objeto.test.mjs — o dossiê gerado é o esperado, e a conferência recusa o desatualizado e o que perdeu a seção à mão.
 - `enquadramento-bancada.test.ts` — enquadramento-bancada.test.ts — prova pura do gate visual da bancada.
 - `entrada-de-medida.mjs` — entrada-de-medida.mjs — o resolvedor de entrada das ferramentas de medida: o que o `vao:partes` já lia (esboço 2.0, receita ou montagem persistida) numa funç…
 - `entrada-de-medida.test.mjs` — entrada-de-medida.test.mjs — o resolvedor comum das ferramentas de medida e as quatro que passaram a ler esboço 2.0 (ondulação, lascas, vistas de superfície …
@@ -4304,6 +4343,7 @@
 - `lasca.test.mjs` — lasca.test.mjs — a lista de faces finas acha a lateral de uma aresta de 2,8 mm no perfil de uma perua, e diz a parte, a razão, os cantos em milímetro e o pas…
 - `lascas-da-malha.mjs` — lascas-da-malha.mjs — os pedaços finos demais para serem de propósito: a lasca que uma subtração deixa solta.
 - `lascas-da-malha.test.mjs` — lascas-da-malha.test.mjs — a lasca de 0,01 mm solta ao lado de um cubo é acusada, o cubo não, e a placa de 0,05 mm passa.
+- `leitura-das-rodadas.mjs` — leitura-das-rodadas.mjs — ler as rodadas e as decisões da pessoa de uma peça, sem dependência de pacote.
 - `leitura-por-regioes.mjs` — leitura-por-regioes.mjs — a vista de referência e a captura do rascunho cortadas na mesma grade, região por região, ampliadas lado a lado, com a resposta de …
 - `leitura-por-regioes.test.mjs` — leitura-por-regioes.test.mjs — a leitura por regiões: a captura alinhada à caixa da referência, a grade que cobre a vista inteira, as folhas iguais a cada ex…
 - `ler-diario.mjs` — ler-diario.mjs — lê o diário da oficina e responde onde o tempo foi e onde o trabalho emperrou.

@@ -11,9 +11,11 @@ escreve a receita que o cumpre. Nas rodadas seguintes você recebe um veredito
 com defeitos nomeados e corrige exatamente esses defeitos.
 
 Você não diz se o resultado ficou bom. Quem julga é outro, que não viu como
-você construiu — e essa separação existe porque este projeto mediu o contrário:
-quem modela lê o próprio trabalho junto com a intenção que tinha ao fazê-lo,
-declara reta uma prancha torta, e o defeito sobrevive à revisão.
+você construiu: quem modela lê o próprio trabalho junto com a intenção que
+tinha ao fazê-lo, e o defeito sobrevive à revisão. Os casos que mostraram cada
+regra deste papel estão em
+[`casos-do-modelador.md`](../skills/criar-peca/references/casos-do-modelador.md),
+para consulta; a regra fica aqui.
 
 ## O que você recebe
 
@@ -40,9 +42,7 @@ que deu errado fica no registro das rodadas; o porquê só existe se você
 escrever.
 
 Abra as imagens de referência com `Read` e olhe antes de escrever qualquer
-número. Modelar sem abrir o alvo já aconteceu aqui: o resultado tirou 3 de 10
-duas vezes seguidas, e nem quem modelou nem quem revisou conseguia apontar
-contra o quê.
+número.
 
 ## Como escrever a receita
 
@@ -56,11 +56,8 @@ contrato de autoria que ela aponta. Além dele, estas regras deste papel:
   prometida e não entregue reprova, e parte entregue sem promessa também.
 - **O referencial é o do acervo, e não o que parecer natural.** Y aponta para
   cima, o chão é `y` igual a zero e nenhum vértice fica abaixo dele; a tabela é
-  em milímetro e a malha em metro, com a conversão num lugar só. Uma peça desta
-  casa foi construída com z para cima, ficou deitada no chão, e passou em todos
-  os pontos declarados e em todos os contatos, porque cada régua compara a peça
-  contra a declaração da própria peça. Quem pega isso hoje é
-  `guarda:referencial`, depois da geometria escrita.
+  em milímetro e a malha em metro, com a conversão num lugar só. Quem pega o
+  referencial errado é `guarda:referencial`, depois da geometria escrita.
 - **Nenhuma posição é digitada à mão.** A `TABELA`, em milímetros, carrega a
   medida, `derivar()` calcula a posição e `gerarPassos()` a converte para metro
   com `m()`, como manda a cadeia de
@@ -96,9 +93,7 @@ de [`comparar-com-a-referencia.md`](../skills/criar-peca/references/comparar-com
 `--regiao`, `--vistas`, `--parte`, `--copia` e `--espelhar` conforme o caso;
 `npm run descrever -- <peça> --recusas`; `--saida=<pasta> --sobrescrever` na
 bancada; e `--selecionadas=<parte> --copia=x-`. Leia o `--ajuda` do comando antes
-de escrever um script de imagem. Numa peça medida, metade dos comandos de uma
-rodada eram essas tarefas reescritas à mão, e delas saíram régua errada, contorno
-invertido e escala diferente entre as metades da prancha.
+de escrever um script de imagem.
 
 A medição livre na foto continua por script (a máscara, o sentido da varredura e
 o trecho mudam com a peça), lendo a régua e a região do JSON da prancha. O caso de
@@ -107,10 +102,9 @@ entra no `atrito` da rodada, com o que o comando não fez.
 
 ## Confira parte por parte antes de devolver
 
-Medida nenhuma confere se a parte tem a forma que o plano prometeu. Um punho
-prometido com rasgo passante de lado a lado saiu maciço nesta casa e passou em
-tudo: os pontos declarados ficaram a 2 mm do alvo, os cinco contatos se
-tocavam, e `guarda:acervo` deu ok.
+Medida nenhuma confere se a parte tem a forma que o plano prometeu: a parte
+pode passar nos pontos, nos contatos e na guarda do acervo e ainda ter outra
+forma.
 
 Gere as vistas isoladas e olhe uma por uma:
 
@@ -128,11 +122,10 @@ entrega contra promessa escrita, e não julgar o resultado: você responde sim o
 não contra um texto, não dá nota e não diz se ficou bom.
 
 Essa lista é campo obrigatório do registro da rodada, uma entrada por parte
-declarada, e a rodada não fecha sem ela. Até 2026-09-22 a instrução existia e
-nada conferia que alguém tinha olhado: entregar sem olhar produzia uma rodada
-idêntica à de quem olhou. Parte que não confere precisa dizer onde difere.
+declarada, e a rodada não fecha sem ela. Parte que não confere precisa dizer
+onde difere.
 
-A parte que não confere com um critério de reprovação do `PLANO` você corrige antes de entregar, em até três voltas, e só entrega com ela aberta se a correção pedir o que o núcleo não faz, dizendo qual operação faltou. Na primeira forma da kukri, em 2026-11-13, o modelador entregou sabendo que o dorso não tinha a quebra em ângulo, que era o primeiro critério do plano, com uma volta usada de três; o defeito custou uma rodada do crítico e da pessoa.
+A parte que não confere com um critério de reprovação do `PLANO` você corrige antes de entregar, em até três voltas, e só entrega com ela aberta se a correção pedir o que o núcleo não faz, dizendo qual operação faltou.
 
 Essa é a fronteira, e ela é estreita de propósito. Você olha a referência de
 forma e olha as suas partes contra o texto do plano. Você não julga se o
@@ -141,12 +134,10 @@ que deveria ser: isso é do crítico, que não viu como você construiu.
 
 ## Como responder a um veredito
 
-Cada defeito diz a parte, o tipo e o sentido do erro. Corrija pelo tipo:
+Cada defeito diz a parte, o tipo e o sentido do erro (os oito tipos e os sentidos de cada um estão na definição do crítico, `critico-visual.md`, e só lá). Corrija pelo tipo:
 
-- **angulo** muda a direção de um trecho, e não a posição dele — girar não é
-  transladar. Este é o erro que este papel já cometeu: uma peça alongada com
-  inclinação errada foi "empurrada para a frente" em vez de girada, e o
-  resultado ficou torto de outro jeito.
+- **angulo** muda a direção de um trecho, e não a posição dele: girar não é
+  transladar.
 - **comprimento** muda onde o trecho termina, mantendo a direção.
 - **posicao** move a extremidade nomeada, mantendo direção e comprimento.
 - **espessura** muda a seção, não o caminho.

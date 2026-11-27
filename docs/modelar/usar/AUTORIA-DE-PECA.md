@@ -1,9 +1,9 @@
 # Autoria de peça — o contrato
 
 O que uma IA precisa obedecer ao criar, alterar ou revisar uma peça. Saiu de
-`AUTORIA-IA.md`, que misturava este contrato com a justificativa de projeto —
-duas coisas com leitores diferentes. A justificativa continua lá, na área de
-desenvolvimento, e não é preciso lê-la para trabalhar.
+um documento antigo de autoria, que misturava este contrato com a justificativa de projeto —
+duas coisas com leitores diferentes. A justificativa continua na seção "Por que o modelo é assim" de
+[`FLUXO-DO-OBJETO.md`](FLUXO-DO-OBJETO.md#por-que-o-modelo-é-assim), e não é preciso lê-la para trabalhar.
 
 ## A distinção central: peça não é montagem
 
@@ -91,7 +91,7 @@ repetir:
 Milímetro é a unidade em que peça mecânica se mede e se desenha. Metro é a
 unidade da malha e dos formatos 3D, e a conversão acontece num lugar só, a
 função `m()` que `gerarPassos` usa, como no exemplo canônico do
-[`GUIA-AUTORIA-IA.md`](GUIA-AUTORIA-IA.md), que um teste executa. Um estilo mais antigo põe `PARAMS` em metro e cita o
+[`FLUXO-DO-OBJETO.md`](FLUXO-DO-OBJETO.md#a-peça-receita-e-esteira), que um teste executa. Um estilo mais antigo põe `PARAMS` em metro e cita o
 parâmetro pelo nome dentro do passo; ele ainda existe em fixtures, e não é o
 padrão de receita nova. Quando uma montagem v5 deriva um parâmetro da porta de
 uma vizinha, o vínculo declara a unidade do parâmetro, porque a medida da porta
@@ -302,7 +302,7 @@ incorretas ou desalinhamentos.
 
 ## Fluxo de autoria esperado
 
-Os comandos de cada passo estão na esteira de `GUIA-AUTORIA-IA.md` e na skill
+Os comandos de cada passo estão na esteira de `FLUXO-DO-OBJETO.md` e na skill
 `criar-peca`; a ordem que eles preservam é esta:
 
 1. identificar o alvo pelo mapa semântico;

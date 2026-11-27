@@ -33,7 +33,8 @@ backlog o que não bloquear o resultado.
 
 - mudança estritamente necessária;
 - prova em fixture geral;
-- prova em produto somente quando o resultado exigir.
+- prova em produto somente quando o resultado exigir;
+- plano de modelagem (território em `procedural/pecas/`, `procedural/familias/` ou `procedural/nucleo/`): o banco de provas dele entra no território e guarda a tabela de tentativas, preenchida durante o trabalho, no modelo de `../banco-de-provas/MODELO-DE-TENTATIVAS.md`.
 
 ## Excluído
 
@@ -63,4 +64,6 @@ escopo.
 ## Fechamento
 
 Preencher somente ao concluir ou cancelar: estado final, commit/PR, gates,
-resultado observado e candidatos devolvidos ao backlog.
+resultado observado e candidatos devolvidos ao backlog. No plano de modelagem,
+leve a lição da tabela de tentativas ao guia da técnica; `npm run planos:check`
+recusa o plano de modelagem `concluído` cujo banco de provas não tem a tabela.

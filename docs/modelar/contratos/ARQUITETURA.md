@@ -126,7 +126,7 @@ em JSON consultável, sem malha ou identidade de runtime; veja
 
 O MCP tem leitura e auditoria, e a autoria de montagem fica em perfil MCP
 opt-in, com repositório e catálogo autorizados pelo host. Receita e outras
-portas exigem plano próprio e as garantias de [`AUTORIA-IA.md`](../guias/AUTORIA-IA.md).
+portas exigem plano próprio e as garantias de [`FLUXO-DO-OBJETO.md`](../usar/FLUXO-DO-OBJETO.md#por-que-o-modelo-é-assim).
 
 ## Limites que permanecem
 
@@ -152,6 +152,6 @@ Ficam fora:
 - qualquer recurso que não melhore criação, inspeção, validação ou manutenção
   pela IA.
 
-A definição completa de autoria está em [`AUTORIA-IA.md`](../guias/AUTORIA-IA.md). O
+A definição completa de autoria está em [`FLUXO-DO-OBJETO.md`](../usar/FLUXO-DO-OBJETO.md#por-que-o-modelo-é-assim). O
 estado e a direção das montagens estão em
 [`MONTAGENS-SEMANTICAS.md`](../usar/MONTAGENS-SEMANTICAS.md).

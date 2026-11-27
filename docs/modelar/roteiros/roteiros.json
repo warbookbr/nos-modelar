@@ -287,10 +287,6 @@
       ],
       "sobDemanda": [
         {
-          "arquivo": "docs/modelar/usar/GUIA-AUTORIA-IA.md",
-          "quando": "for preciso ver a anatomia inteira da receita ou a esteira de validação"
-        },
-        {
           "arquivo": "docs/modelar/usar/LACO-VISUAL.md",
           "quando": "for olhar a imagem, sobrepor ao alvo ou medir onde o método diagnóstico para"
         },
@@ -320,7 +316,7 @@
         },
         {
           "arquivo": "docs/modelar/usar/FLUXO-DO-OBJETO.md",
-          "quando": "o objeto tiver várias partes, da imagem à montagem"
+          "quando": "o objeto tiver várias partes, da imagem à montagem, ou for preciso ver a anatomia inteira da receita, a esteira de validação ou o pacote de modelagem"
         },
         {
           "arquivo": "docs/modelar/usar/RODADA-DE-ALINHAMENTO-EXEMPLO.md",
@@ -414,14 +410,10 @@
       "ler": [
         "CLAUDE.md",
         ".claude/skills/criar-peca/SKILL.md",
-        "docs/modelar/usar/GUIA-AUTORIA-IA.md#2-anatomia-canônica-de-uma-receita-procedural",
+        "docs/modelar/usar/FLUXO-DO-OBJETO.md#anatomia-canônica-de-uma-receita-procedural",
         "docs/modelar/usar/LACO-VISUAL.md#3-despachar-o-crítico-sem-contexto"
       ],
       "sobDemanda": [
-        {
-          "arquivo": "docs/modelar/usar/GUIA-AUTORIA-IA.md",
-          "quando": "for preciso ver a anatomia inteira da receita ou a esteira de validação"
-        },
         {
           "arquivo": "docs/modelar/usar/LACO-VISUAL.md",
           "quando": "for olhar a imagem, sobrepor ao alvo ou medir onde o método diagnóstico para"
@@ -452,7 +444,7 @@
         },
         {
           "arquivo": "docs/modelar/usar/FLUXO-DO-OBJETO.md",
-          "quando": "o objeto tiver várias partes, da imagem à montagem"
+          "quando": "o objeto tiver várias partes, da imagem à montagem, ou for preciso ver a anatomia inteira da receita, a esteira de validação ou o pacote de modelagem"
         },
         {
           "arquivo": "docs/modelar/usar/RODADA-DE-ALINHAMENTO-EXEMPLO.md",
@@ -548,14 +540,10 @@
       "ler": [
         "CLAUDE.md",
         ".claude/skills/criar-peca/SKILL.md",
-        "docs/modelar/usar/GUIA-AUTORIA-IA.md#4-esteira-canônica-de-validação-local",
+        "docs/modelar/usar/FLUXO-DO-OBJETO.md#esteira-canônica-de-validação-local",
         "docs/modelar/usar/LACO-VISUAL.md#3-despachar-o-crítico-sem-contexto"
       ],
       "sobDemanda": [
-        {
-          "arquivo": "docs/modelar/usar/GUIA-AUTORIA-IA.md",
-          "quando": "for preciso ver a anatomia inteira da receita ou a esteira de validação"
-        },
         {
           "arquivo": "docs/modelar/usar/LACO-VISUAL.md",
           "quando": "for olhar a imagem, sobrepor ao alvo ou medir onde o método diagnóstico para"
@@ -586,7 +574,7 @@
         },
         {
           "arquivo": "docs/modelar/usar/FLUXO-DO-OBJETO.md",
-          "quando": "o objeto tiver várias partes, da imagem à montagem"
+          "quando": "o objeto tiver várias partes, da imagem à montagem, ou for preciso ver a anatomia inteira da receita, a esteira de validação ou o pacote de modelagem"
         },
         {
           "arquivo": "docs/modelar/usar/RODADA-DE-ALINHAMENTO-EXEMPLO.md",
@@ -663,6 +651,7 @@
       ],
       "skill": "criar-peca",
       "comandos": [
+        "npm run dossie -- <objeto>",
         "node tools/modelar/olhar-bancada.mjs --analise --peca=<nome>",
         "npm run parametros",
         "npm run conferir:referencia"
@@ -747,7 +736,8 @@
       "comandos": [
         "npm run rodada -- <peça> --acao",
         "npm run rodada -- <peça> --registrar --modelador <arquivo> --critico <arquivo>",
-        "npm run rodada -- <peça> --decisao-da-pessoa \"<quem decidiu>, <AAAA-MM-DD>: <as palavras>\" --rodada <n>"
+        "npm run rodada -- <peça> --decisao-da-pessoa \"<quem decidiu>, <AAAA-MM-DD>: <as palavras>\" --rodada <n>",
+        "npm run dossie -- <objeto>"
       ],
       "passo": "Rode npm run rodada -- <peça> --acao, que mede a receita atual e diz a próxima ação, e conduza a rodada pela skill laco-de-modelagem.",
       "conferido": "A rodada gravada com o relato do modelador, o veredito do crítico e a decisão da pessoa, e npm run gates.",

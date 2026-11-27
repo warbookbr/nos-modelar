@@ -44,11 +44,9 @@ ele em 2026-11-05.
 Ele responde com o veredito `mecanifica.veredito-de-forma` em bloco JSON:
 `alvo`, `nota` de 0 a 10, `observacao` de até 240 caracteres e `defeitos`, cada
 um com `parte`, `tipo`, `onde`, `sentido` e `evidencia` (de 15 a 240
-caracteres). Os tipos e sentidos são fechados: `angulo` e `comprimento` (maior,
-menor), `posicao` (adiantada, atrasada, alta, baixa, e para o lado externa e interna), `espessura` (maior,
-menor), `ausencia` (faltando), `uniao` (afastado, atravessando), `superficie`
-(anguloso, segmentado, facetado) e `cota` (faltando, mal_posta, sobreposta), e
-`src/autoria/veredito-de-forma.js` recusa o que sair disso. O veredito é achado,
+caracteres). Os tipos e sentidos são fechados, e a lista deles mora num lugar só, a
+definição do crítico (`.claude/agents/critico-visual.md`, seção do veredito);
+`src/autoria/veredito-de-forma.js` recusa o que sair dela. O veredito é achado,
 nunca aprovação: quem aprova forma é a pessoa.
 
 No laço de uma peça vai o pedido por perguntas fechadas que o mesmo comando grava,

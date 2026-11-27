@@ -7,8 +7,9 @@ set -euo pipefail
 
 resumo() { echo "$1"; if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then echo "$1" >> "$GITHUB_STEP_SUMMARY"; fi; }
 
-# Os geradores conferidos pelo CI que não pedem `npm ci` (só importam `node:` e uns aos outros); o mapa por último.
-GERADORES_DO_REPOSITORIO='node tools/mapa/planos.mjs --gerar && node tools/mapa/indice-do-banco.mjs --gerar && node tools/mapa/decisoes.mjs --gerar && node tools/mapa/roteiros.mjs --gerar && node tools/mapa/toc.mjs && node tools/modelar/banco-de-provas.mjs --gerar && node tools/modelar/ferramentas-por-objeto.mjs && node tools/arquitetura/mapear-motor-procedural.mjs && node tools/mapa/registro-de-ferramentas.mjs --gerar && node tools/mapa/mapa.mjs'
+# Os geradores conferidos pelo CI que não pedem `npm ci` (só importam `node:` e uns aos outros), mais o `dossie` (o dossiê de cada objeto sai das
+# rodadas, dos planos e das receitas que a junção traz; a seção à mão é preservada); o mapa por último.
+GERADORES_DO_REPOSITORIO='node tools/mapa/planos.mjs --gerar && node tools/mapa/indice-do-banco.mjs --gerar && node tools/mapa/decisoes.mjs --gerar && node tools/mapa/roteiros.mjs --gerar && node tools/mapa/toc.mjs && node tools/modelar/banco-de-provas.mjs --gerar && node tools/modelar/ferramentas-por-objeto.mjs && node tools/arquitetura/mapear-motor-procedural.mjs && node tools/mapa/registro-de-ferramentas.mjs --gerar && npm run dossie -- --todos && node tools/mapa/mapa.mjs'
 
 git fetch origin main
 if git merge-base --is-ancestor origin/main HEAD; then

@@ -314,7 +314,7 @@ export async function conferirPeca(peca, { cachePorPrefixo = false } = {}) {
   const aviso = avisoDeFaceSoNaPecaInteira(forma);
   const aberta = motivoDeCascaAberta(forma, receita.PASSOS, (prefixo) => nucleo(prefixo, receita.PARAMS ?? {}, {}, {}, null, [], { registroOperacoes: REGISTRO_DA_RECEITA }));
   if (aberta) reprovadas.push({ peca, motivo: aberta });
-  return { reprovadas, esperando, avisos: aviso ? [{ peca, motivo: aviso }] : [] };
+  return { reprovadas, esperando, avisos: aviso ? [{ peca, motivo: aviso }] : [], cachePorPasso: medida.resultado.cachePorPasso ?? null };
 }
 
 /* A VARREDURA REPARTE AS PEÇAS ENTRE OS PROCESSADORES. As peças do acervo não dependem umas das outras e a conta de cada
@@ -333,6 +333,8 @@ export async function conferirAcervo(pecas = pecasDoAcervo(), { fios = processos
     reprovadas: porPeca.flatMap((r) => r.reprovadas),
     esperando: porPeca.flatMap((r) => r.esperando),
     avisos: porPeca.flatMap((r) => r.avisos ?? []),
+    /* o cache por passo da primeira execução da peça (a da rodada de uma peça só): de onde recomeçou e o total de passos */
+    cachePorPasso: porPeca.length === 1 ? porPeca[0].cachePorPasso ?? null : null,
   };
 }
 

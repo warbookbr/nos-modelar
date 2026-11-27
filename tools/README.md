@@ -44,6 +44,7 @@ Quem trabalha chama, com `npm run <comando> -- <argumentos>`; a que não tem com
 | `descrever:montagem` | Lê uma montagem piloto e imprime o diagnóstico declarativo do encaixe. |
 | `descrever` | Mede uma peça sem navegador: caixa, partes, contatos, malha e avisos, em texto ou JSON. |
 | `distancia:pele` | Mede, por região, a distância da superfície limite da chapa à pele analítica que a receita declara, e junta o veredito ao da zebra. |
+| `dossie`, `dossie:check` | Gera o DOSSIE.md de um objeto (PLANO, operações por parte, rodadas com faces e tempo e decisão da pessoa, planos, tabelas de tentativas e atritos) do que já está gravado; --check recusa o desatualizado e --todos faz o mesmo para todo DOSSIE.md (o gate dossie:check). |
 | `esboco:nucleo` | Monta as opções de forma de um esboço com as operações do núcleo e as captura na bancada, lado a lado. |
 | `esqueleto` | O esqueleto de proporção de um robô como árvore de juntas, e o andaime e as articulações gerados dela. |
 | `etapas` | O registro de etapas de uma montagem v5, em disco, e a única porta para fixar uma etapa. |
@@ -51,7 +52,7 @@ Quem trabalha chama, com `npm run <comando> -- <argumentos>`; a que não tem com
 | `exportar:gltf` | CLI que grava uma receita procedural como glTF 2.0 binário (.glb), com os materiais dela. |
 | `exportar:obj` | CLI para exportação atômica e segura de receitas procedurais em Wavefront OBJ (.obj). |
 | `exportar:step` | CLI para exportação atômica e segura de receitas procedurais em formato STEP. |
-| `fluxo:objeto` | Em que passo um objeto está, da referência à etapa fixa, e o comando exato que vem agora. |
+| `fluxo:objeto`, `rodadas:check` | Em que passo um objeto está, da referência à etapa fixa, e o comando exato que vem agora; rodadas:check recusa a parte sem rodada dos objetos que o envio mudou. |
 | `forma:esboco` | A forma de uma receita contra a forma do esboço que ela refina, sem mudar a receita. |
 | `malha:lascas` | Lista cada face fina de uma receita. |
 | `leitura:regioes` | Corta a vista de referência e a captura do rascunho na mesma grade e as põe lado a lado, região por região. |
