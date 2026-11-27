@@ -663,6 +663,7 @@
       ],
       "skill": "criar-peca",
       "comandos": [
+        "npm run dossie -- <objeto>",
         "node tools/modelar/olhar-bancada.mjs --analise --peca=<nome>",
         "npm run parametros",
         "npm run conferir:referencia"
@@ -747,7 +748,8 @@
       "comandos": [
         "npm run rodada -- <peça> --acao",
         "npm run rodada -- <peça> --registrar --modelador <arquivo> --critico <arquivo>",
-        "npm run rodada -- <peça> --decisao-da-pessoa \"<quem decidiu>, <AAAA-MM-DD>: <as palavras>\" --rodada <n>"
+        "npm run rodada -- <peça> --decisao-da-pessoa \"<quem decidiu>, <AAAA-MM-DD>: <as palavras>\" --rodada <n>",
+        "npm run dossie -- <objeto>"
       ],
       "passo": "Rode npm run rodada -- <peça> --acao, que mede a receita atual e diz a próxima ação, e conduza a rodada pela skill laco-de-modelagem.",
       "conferido": "A rodada gravada com o relato do modelador, o veredito do crítico e a decisão da pessoa, e npm run gates.",

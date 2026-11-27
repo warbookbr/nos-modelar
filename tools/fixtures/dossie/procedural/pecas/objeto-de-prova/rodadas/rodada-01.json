@@ -1,0 +1,15 @@
+{
+  "formato": "mecanifica.rodada-de-modelagem",
+  "versao": 1,
+  "peca": "objeto-de-prova",
+  "numero": 1,
+  "medidas": { "passou": true, "relatorio": "ok" },
+  "veredito": {
+    "nota": 4,
+    "defeitos": [
+      { "parte": "tampa", "tipo": "espessura", "onde": "borda da placa", "sentido": "maior", "evidencia": "grossa demais" }
+    ],
+    "observacao": "A caixa confere; a tampa está grossa."
+  },
+  "registradaEm": "2026-11-20T10:00:00.000Z"
+}

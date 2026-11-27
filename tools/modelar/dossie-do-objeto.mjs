@@ -1,0 +1,367 @@
+#!/usr/bin/env node
+/* dossie-do-objeto.mjs — gera `procedural/pecas/<objeto>/DOSSIE.md` do que já está gravado, sem medir a malha.
+ *
+ * O dossiê junta num arquivo o que hoje está espalhado: o `PLANO` da receita (objeto, referências, escala, partes e critérios),
+ * as operações de cada parte, as rodadas com nota, defeitos e a decisão da pessoa, e os planos cujo território cobre a pasta, com o
+ * banco de provas e a tabela de tentativas de cada um. Quem retoma o objeto lê um arquivo, e não a pasta de rodadas nem a lista de
+ * planos. O gerador não conhece nome de peça nem de operação: lê a receita, as rodadas e os planos como estão.
+ *
+ * O CUSTO. Os dados saem de arquivos gravados, exceto as operações: importar a receita e ler o `PASSOS` gera a lista de passos, que
+ * é a mesma importação que `custo-de-importar-receita.test.mjs` limita (12 s por receita, a média do acervo em 0,1 s; o furgão
+ * realista leva 2,4 s). Nenhuma malha é construída. As operações de cada parte saem do grafo dos passos: parte-se do passo `parte`
+ * que nomeia a parte e sobe-se pelas referências `{ op, id }` até as primitivas, e entram os passos que só modificam um sólido
+ * (rotaciona, transladar, limparLascas) e os que selecionam o grupo da parte (material, liso). A receita sem `PASSOS` (por família ou
+ * composição) só mostra as operações executando, e o dossiê diz isso.
+ *
+ * O QUE O DOSSIÊ NÃO TRAZ. Faces e tempo de execução não estão gravados em lugar nenhum (o registro da rodada guarda só `facesFinas`,
+ * as faces finas), e o dossiê deixa o campo dito: de onde viria é `medidas.faces` e `medidas.segundos` no registro da rodada, tirados do
+ * `descrever` que `rodada-de-modelagem.mjs` já roda, e é proposta ao plano do laço, dono desse arquivo.
+ *
+ * A SEÇÃO À MÃO. Entre `<!-- dossie:a-mao:<unidade>:inicio -->` e `<!-- dossie:a-mao:<unidade>:fim -->` mora o texto que um modelo
+ * escreve: as escolhas de técnica e o porquê, no modelo fixo do `MODELO_A_MAO`. O gerador o preserva; `--check` recusa o arquivo que perdeu
+ * um marcador.
+ *
+ *   node tools/modelar/dossie-do-objeto.mjs <objeto>             gera (ou regrava) o DOSSIE.md da pasta do objeto
+ *   node tools/modelar/dossie-do-objeto.mjs <objeto> --check     recusa o DOSSIE.md desatualizado ou sem a seção à mão
+ *   node tools/modelar/dossie-do-objeto.mjs --ajuda */
+import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { dirname, join, relative, resolve } from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
+import { lerDecisoesDaPessoa, lerRodadas } from './rodada-de-modelagem.mjs';
+import { bancosDeProvasDe, caminhosDoTerritorio, tabelaDeTentativasEm } from '../mapa/tentativas-dos-planos.mjs';
+
+const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
+export const ARQUIVO = 'DOSSIE.md';
+export const PASTA_DAS_PECAS = 'procedural/pecas';
+/* A pasta dos documentos do repositório; só a fixture de teste usa outra (`--docs=<pasta>`), para não ter caminho de documento que o gate de links cobra. */
+export const DOCUMENTOS = 'docs/modelar';
+
+/* O modelo fixo da seção à mão: o que entra é uma escolha de técnica, o porquê e o que a mostrou. */
+export const MODELO_A_MAO = [
+  '_Escolhas de técnica e o porquê. Um item por escolha, no modelo `escolha: porquê (a rodada, o plano ou a medida que a mostrou)`. Sem rodada nem medida que a sustente, a frase não entra._',
+  '',
+  '- a escrever',
+].join('\n');
+
+const AJUDA = `dossie-do-objeto: gera o DOSSIE.md de um objeto do acervo, do que já está gravado.
+
+  npm run dossie -- <objeto>            gera ou regrava procedural/pecas/<objeto>/DOSSIE.md
+  npm run dossie -- <objeto> --check    recusa o DOSSIE.md desatualizado ou que perdeu a seção à mão (sai com 1)
+  --raiz=<pasta>, --docs=<pasta>        a raiz do repositório e a pasta dos documentos dentro dela, docs/modelar (só para teste com fixture)
+  --ajuda                               esta mensagem
+
+<objeto> é o nome da pasta em procedural/pecas (roda-esportiva, aviao) ou a parte de um objeto (aviao/fuselagem). O objeto de várias
+partes ganha uma seção por parte. As operações saem de importar a receita e ler o PASSOS (sem construir a malha); as rodadas, a
+decisão da pessoa e os planos saem de arquivos gravados. A seção entre os marcadores "a-mao" é escrita por um modelo e o gerador a
+preserva.`;
+
+/* ---- o que é cada unidade do dossiê ---- */
+
+/** As pastas de receita do objeto: a própria (com `receita.js`) e cada `partes/<parte>`. `[{ id, nome, pasta }]`. */
+export function unidadesDoObjeto(objeto, raiz = REPO) {
+  const base = join(raiz, PASTA_DAS_PECAS);
+  const partes = /^([a-z0-9][a-z0-9-]*)\/([a-z0-9][a-z0-9-]*)$/.exec(objeto);
+  const pasta = [join(base, objeto), partes && join(base, partes[1], 'partes', partes[2])].find((p) => p && existsSync(join(p, 'receita.js')) || (p && existsSync(join(p, 'partes'))));
+  if (!pasta) throw new Error(`'${objeto}' não é objeto do acervo: esperado uma pasta em ${PASTA_DAS_PECAS}/ com receita.js ou partes/ (as pastas começam em ${PASTA_DAS_PECAS}/${objeto.split('/')[0]}).`);
+  const unidades = [];
+  if (existsSync(join(pasta, 'receita.js'))) unidades.push({ id: 'peca', nome: objeto.split('/').pop(), peca: objeto, pasta });
+  const dePartes = join(pasta, 'partes');
+  if (existsSync(dePartes)) {
+    for (const parte of readdirSync(dePartes).sort()) {
+      if (existsSync(join(dePartes, parte, 'receita.js'))) unidades.push({ id: parte, nome: parte, peca: `${objeto.split('/')[0]}/${parte}`, pasta: join(dePartes, parte) });
+    }
+  }
+  return { pasta, unidades };
+}
+
+/* ---- as operações de cada parte, do grafo dos passos ---- */
+
+const ehReferencia = (v) => v && typeof v === 'object' && typeof v.op === 'string' && Number.isInteger(v.id);
+
+/* Toda referência `{ op, id }` dentro dos argumentos de um passo. */
+function referenciasDe(valor, achadas = []) {
+  if (Array.isArray(valor)) valor.forEach((v) => referenciasDe(v, achadas));
+  else if (valor && typeof valor === 'object') {
+    if (ehReferencia(valor)) achadas.push({ op: valor.op, id: valor.id });
+    Object.values(valor).forEach((v) => referenciasDe(v, achadas));
+  }
+  return achadas;
+}
+
+const argumentosDe = (passo) => (Array.isArray(passo) ? passo[1] : passo?.[1]) ?? {};
+const nomeDoPasso = (passo) => (Array.isArray(passo) ? passo[0] : undefined);
+const grupoDoPasso = (passo) => {
+  const a = argumentosDe(passo);
+  return a?.sel?.grupo ?? a?.grupo;
+};
+
+/**
+ * As operações de cada parte declarada nos passos: `{ [nome]: [{ op, vezes }] }` na ordem em que aparecem, e `{}` quando não há
+ * passo `parte`. Entram o passo que cria o sólido de cada referência (e os de que ele depende), os passos sem `origemId` que só
+ * transformam um sólido já referenciado (rotaciona, transladar, limparLascas) e os que selecionam o grupo da parte.
+ */
+export function operacoesPorParte(passos) {
+  if (!Array.isArray(passos)) return {};
+  const criador = new Map();
+  passos.forEach((p, i) => { const id = argumentosDe(p).origemId; if (id !== undefined) criador.set(`${nomeDoPasso(p)}:${id}`, i); });
+  const modificadores = new Map();
+  passos.forEach((p, i) => {
+    if (argumentosDe(p).origemId !== undefined || nomeDoPasso(p) === 'parte' || grupoDoPasso(p) !== undefined) return;
+    for (const r of referenciasDe(argumentosDe(p))) { const k = `${r.op}:${r.id}`; modificadores.set(k, [...(modificadores.get(k) ?? []), i]); }
+  });
+  const nomes = [...new Set(passos.filter((p) => nomeDoPasso(p) === 'parte').map((p) => argumentosDe(p).nome).filter((n) => typeof n === 'string'))];
+  const resultado = {};
+  for (const nome of nomes) {
+    const dentro = new Set();
+    const fila = [];
+    passos.forEach((p, i) => {
+      if (nomeDoPasso(p) === 'parte' && argumentosDe(p).nome === nome) { dentro.add(i); fila.push(...referenciasDe(argumentosDe(p))); }
+      else if (grupoDoPasso(p) === nome) dentro.add(i);
+    });
+    const vistas = new Set();
+    while (fila.length) {
+      const { op, id } = fila.pop();
+      const k = `${op}:${id}`;
+      if (vistas.has(k)) continue;
+      vistas.add(k);
+      for (const i of [criador.get(k), ...(modificadores.get(k) ?? [])]) {
+        if (i === undefined || dentro.has(i)) continue;
+        dentro.add(i);
+        fila.push(...referenciasDe(argumentosDe(passos[i])));
+      }
+    }
+    const contagem = new Map();
+    for (const i of [...dentro].sort((a, b) => a - b)) { const op = nomeDoPasso(passos[i]); contagem.set(op, (contagem.get(op) ?? 0) + 1); }
+    resultado[nome] = [...contagem].map(([op, vezes]) => ({ op, vezes }));
+  }
+  return resultado;
+}
+
+/* ---- leitura do que está gravado ---- */
+
+async function lerReceita(pasta) {
+  const modulo = await importarReceita(join(pasta, 'receita.js'));
+  const receita = receitaDoModulo(modulo);
+  return { plano: receita?.PLANO ?? modulo.PLANO ?? null, passos: Array.isArray(receita?.PASSOS) ? receita.PASSOS : null };
+}
+
+/* Os planos (em jogo ou guardados em subpasta) cujo território cobre a pasta do objeto. `pasta` relativa à raiz, com barra no fim. */
+function planosQueCobrem(raiz, pastaRelativa, docs) {
+  const planos = join(raiz, docs, 'planos');
+  const achados = [];
+  const varrer = (dir, prefixo) => {
+    if (!existsSync(dir)) return;
+    for (const e of readdirSync(dir, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : 1))) {
+      if (e.isDirectory()) varrer(join(dir, e.name), `${prefixo}${e.name}/`);
+      else if (/^\d{4}-\d{2}-\d{2}-.+\.md$/.test(e.name)) {
+        const texto = readFileSync(join(dir, e.name), 'utf8');
+        const cobre = caminhosDoTerritorio(texto).filter((c) => {
+          const a = c.replace(/\/+$/, '/'); const b = pastaRelativa;
+          return a === b || (a.endsWith('/') && b.startsWith(a)) || (b.endsWith('/') && a.startsWith(b)) || a === b.replace(/\/$/, '');
+        });
+        if (!cobre.length) continue;
+        const titulo = texto.match(/^#\s+(.+?)\s*$/m)?.[1] ?? e.name;
+        const estado = texto.match(/^\*\*Estado:\*\*\s*(.+?)\s*$/m)?.[1] ?? 'sem estado';
+        const bancos = bancosDeProvasDe(texto, docs).map((b) => ({ pasta: b, tabela: tabelaDeTentativasEm(raiz, b) }));
+        achados.push({ arquivo: `${docs}/planos/${prefixo}${e.name}`, titulo, estado, bancos });
+      }
+    }
+  };
+  varrer(planos, '');
+  return achados;
+}
+
+/* As linhas da crônica dos planos encerrados que citam o objeto, pelo caminho da pasta ou pelo nome (hífen e espaço valem o mesmo). */
+function encerradosQueCitam(raiz, objeto, docs) {
+  const arquivo = join(raiz, docs, 'decisoes/PLANOS-ENCERRADOS.md');
+  if (!existsSync(arquivo)) return [];
+  const nome = objeto.split('/')[0];
+  const rotulos = [`${PASTA_DAS_PECAS}/${objeto}`, nome, nome.replace(/-/g, ' ')].map((s) => s.toLowerCase());
+  return readFileSync(arquivo, 'utf8').split('\n').filter((l) => l.startsWith('- `') && rotulos.some((r) => l.toLowerCase().includes(r)))
+    .map((l) => { const m = /^- `([^`]+)`:\s*(.*?)\s*O texto está no commit `([^`]+)`/.exec(l); return m ? { plano: m[1], resumo: m[2].replace(/\.$/, ''), commit: m[3] } : null; }).filter(Boolean);
+}
+
+/* ---- a escrita ---- */
+
+const limite = (texto, n) => { const t = String(texto ?? '').replace(/\s+/g, ' ').trim(); return t.length > n ? `${t.slice(0, n - 1).trimEnd()}…` : t; };
+const celula = (texto) => String(texto ?? '').replace(/\|/g, '\\|').replace(/\n/g, ' ');
+const marcador = (id, ponta) => `<!-- dossie:a-mao:${id}:${ponta} -->`;
+
+function linhasDoPlano(plano) {
+  if (!plano) return ['O `PLANO` não está na receita.'];
+  const linhas = [];
+  if (plano.objeto) linhas.push(`- Objeto: ${plano.objeto}`);
+  if (plano.escala) linhas.push(`- Escala: ${plano.escala.medida ?? '?'}, ${plano.escala.milimetros ?? '?'} mm`);
+  if (plano.referencias?.length) linhas.push(`- Referências: ${plano.referencias.map((r) => `\`${r}\``).join(', ')}${plano.referenciasNaoConstruidas?.length ? `; não construídas: ${plano.referenciasNaoConstruidas.map((r) => `\`${r}\``).join(', ')}` : ''}`);
+  if (plano.partes?.length) {
+    linhas.push('- Partes do plano:');
+    for (const p of plano.partes) linhas.push(`  - \`${p.nome}\`: ${limite(p.forma, 220).replace(/\.?$/, '.')}${p.tecnica ? ` Técnica declarada: ${limite(p.tecnica, 260)}` : ''}`);
+  }
+  if (plano.criteriosDeReprovacao?.length) {
+    linhas.push('- Critérios de reprovação:');
+    for (const c of plano.criteriosDeReprovacao) linhas.push(`  - ${limite(c, 260)}`);
+  }
+  return linhas;
+}
+
+function linhasDasOperacoes(passos, plano) {
+  if (!passos) return ['A receita não declara `PASSOS` (vem de família ou composição): as operações só saem executando a receita (`npm run descrever -- <peça>`, que constrói a malha e leva de segundos a minutos), e o dossiê não a executa. Proposta: a família publicar a lista de operações que usa, para o dossiê lê-la sem executar.'];
+  const porParte = operacoesPorParte(passos);
+  const nomes = Object.keys(porParte);
+  const linhas = [`Passos da receita: ${passos.length}. Operações por parte, lidas do grafo dos passos (uma operação que serve a mais de uma parte aparece em todas):`, ''];
+  if (!nomes.length) return [...linhas.slice(0, 1), 'A receita não nomeia partes (nenhum passo `parte`).'];
+  linhas.push('| Parte | Operações (nome ×vezes) |', '| --- | --- |');
+  const declaradas = new Set((plano?.partes ?? []).map((p) => p.nome));
+  for (const nome of nomes) linhas.push(`| \`${nome}\`${declaradas.size && !declaradas.has(nome) ? ' (fora do `PLANO`)' : ''} | ${celula(porParte[nome].map((o) => `${o.op} ×${o.vezes}`).join(', '))} |`);
+  const semPasso = [...declaradas].filter((n) => !nomes.includes(n));
+  if (semPasso.length) linhas.push('', `Partes do \`PLANO\` sem passo \`parte\`: ${semPasso.map((n) => `\`${n}\``).join(', ')}.`);
+  return linhas;
+}
+
+function linhasDasRodadas(rodadas, decisoes) {
+  if (!rodadas.length) return ['Nenhuma rodada registrada.'];
+  const decisaoDe = new Map(decisoes.map((d) => [d.rodada, d]));
+  const linhas = ['| Rodada | Registrada | Medidas | Nota | Defeitos | Decisão da pessoa |', '| --- | --- | --- | --- | --- | --- |'];
+  for (const r of rodadas) {
+    const d = decisaoDe.get(r.numero);
+    linhas.push(`| ${r.numero} | ${(r.registradaEm ?? '').slice(0, 10) || 'sem data'} | ${r.medidas?.passou === true ? 'passou' : r.medidas?.passou === false ? 'reprovou' : 'sem medida'} | ${r.veredito?.nota ?? 'sem veredito'} | ${r.veredito ? (r.veredito.defeitos ?? []).length : '-'} | ${d ? celula(d.decisao) : 'sem decisão gravada'} |`);
+  }
+  const ultima = [...rodadas].reverse().find((r) => r.veredito);
+  if (ultima) {
+    linhas.push('', `Defeitos da rodada ${ultima.numero}, a última com veredito:`, '');
+    const lista = ultima.veredito.defeitos ?? [];
+    if (!lista.length) linhas.push('- nenhum');
+    for (const d of lista) linhas.push(`- \`${d.parte}\`, ${d.tipo} (${d.sentido ?? 'sem sentido'}): ${limite(d.onde, 140)}`);
+    if (ultima.veredito.observacao) linhas.push('', `Observação do crítico: ${limite(ultima.veredito.observacao, 400)}`);
+  }
+  const semDecisao = decisoes.length === 0;
+  if (semDecisao) linhas.push('', 'A pasta não tem `decisoes-da-pessoa.json`: o julgamento da pessoa sobre as rodadas anteriores não está gravado como decisão.');
+  return linhas;
+}
+
+function linhasDaMedida() {
+  return ['Faces e tempo de execução: não gravados. O registro da rodada guarda só `facesFinas`, as faces finas, e nenhum arquivo guarda o total de faces nem o tempo da receita. De onde viria: `medidas.faces` e `medidas.segundos` no `rodada-NN.json`, tirados do `descrever` que `rodada-de-modelagem.mjs` já roda; proposta ao plano do laço de modelagem.'];
+}
+
+function linhasDosPlanos(planos, encerrados, arquivoDoDossie, raiz) {
+  const ref = (alvo) => relative(dirname(arquivoDoDossie), join(raiz, alvo)).split('\\').join('/');
+  const linhas = [];
+  if (!planos.length) linhas.push('Nenhum plano na árvore cobre a pasta deste objeto.', '');
+  if (!planos.length && !encerrados.length) return linhas.slice(0, 1);
+  for (const p of planos) {
+    linhas.push(`- [${p.titulo}](${ref(p.arquivo)}) (${p.estado})`);
+    if (!p.bancos.length) linhas.push('  - sem banco de provas no território');
+    for (const b of p.bancos) {
+      linhas.push(`  - banco de provas: [${b.pasta.replace(/\/$/, '').split('/').pop()}](${ref(b.pasta)}); ${b.tabela ? `tabela de tentativas: [${b.tabela.split('/').pop()}](${ref(b.tabela)})` : 'sem tabela de tentativas'}`);
+    }
+  }
+  if (encerrados.length) {
+    linhas.push('', 'Planos encerrados que citam o objeto (o texto está no git, no commit que a crônica indica):', '');
+    for (const e of encerrados) linhas.push(`- \`${e.plano}\`: ${limite(e.resumo, 300)} (commit \`${e.commit}\`)`);
+  }
+  return linhas;
+}
+
+/** Os blocos `a-mao` de um texto de dossiê: `{ [id]: texto entre os marcadores }`; o id que perdeu um dos marcadores fica de fora. */
+export function secoesAMao(texto) {
+  const achadas = {};
+  for (const m of (texto ?? '').matchAll(/<!-- dossie:a-mao:([^:\s]+):inicio -->\n([\s\S]*?)\n<!-- dossie:a-mao:\1:fim -->/g)) achadas[m[1]] = m[2];
+  return achadas;
+}
+
+/**
+ * O texto do dossiê do objeto, do que está gravado. `aMao` são as seções à mão de antes (`secoesAMao`), preservadas. Assíncrono só
+ * pela importação das receitas.
+ */
+export async function montarDossie(objeto, { raiz = REPO, aMao = {}, docs = DOCUMENTOS } = {}) {
+  const { pasta, unidades } = unidadesDoObjeto(objeto, raiz);
+  const arquivo = join(pasta, ARQUIVO);
+  const pastaRelativa = `${relative(raiz, pasta).split('\\').join('/')}/`;
+  const planos = planosQueCobrem(raiz, pastaRelativa, docs);
+  const encerrados = encerradosQueCitam(raiz, objeto, docs);
+  const varias = unidades.length > 1 || unidades[0]?.id !== 'peca';
+  const saida = [
+    `# Dossiê: ${objeto}`,
+    '',
+    `Gerado por \`npm run dossie -- ${objeto}\` do que já está gravado; não edite fora dos marcadores \`a-mao\`, porque \`npm run dossie -- ${objeto} --check\` recusa o arquivo diferente do gerado. A seção entre os marcadores é escrita à mão e o gerador a preserva.`,
+    '',
+    '## Planos que cobrem a pasta',
+    '',
+    ...linhasDosPlanos(planos, encerrados, arquivo, raiz),
+  ];
+  for (const u of unidades) {
+    const { plano, passos } = await lerReceita(u.pasta);
+    const pastaDeRodadas = join(u.pasta, 'rodadas');
+    const rodadas = lerRodadas(u.peca, { pasta: pastaDeRodadas });
+    const decisoes = lerDecisoesDaPessoa(u.peca, { pasta: pastaDeRodadas });
+    const nivel = varias ? '##' : '##';
+    saida.push('', `${nivel} ${varias ? `Parte \`${u.nome}\`` : 'O alvo'}`, '', ...(varias ? [`Pasta: \`${relative(raiz, u.pasta).split('\\').join('/')}/\``, ''] : []));
+    saida.push(...linhasDoPlano(plano));
+    saida.push('', `### Operações${varias ? ` de \`${u.nome}\`` : ''}`, '', ...linhasDasOperacoes(passos, plano));
+    saida.push('', `### Rodadas${varias ? ` de \`${u.nome}\`` : ''}`, '', ...linhasDasRodadas(rodadas, decisoes));
+    saida.push('', `### Medida de faces e tempo${varias ? ` de \`${u.nome}\`` : ''}`, '', ...linhaDaMedida());
+    saida.push('', `### Escolhas de técnica, à mão${varias ? ` (\`${u.nome}\`)` : ''}`, '', marcador(u.id, 'inicio'), aMao[u.id] ?? MODELO_A_MAO, marcador(u.id, 'fim'));
+  }
+  return { arquivo, texto: `${saida.join('\n')}\n`, unidades };
+}
+const linhaDaMedida = linhasDaMedida;
+
+/**
+ * Confere o `DOSSIE.md` gravado contra o que se gera agora: `{ problemas }`. Recusa o arquivo ausente, o que perdeu o marcador de uma
+ * seção à mão (o texto escrito foi apagado ou os marcadores foram mexidos) e o diferente do gerado.
+ */
+export async function conferirDossie(objeto, { raiz = REPO, docs = DOCUMENTOS } = {}) {
+  const { arquivo, unidades } = await montarDossie(objeto, { raiz, docs });
+  const comando = `npm run dossie -- ${objeto}`;
+  if (!existsSync(arquivo)) return { problemas: [`${relative(raiz, arquivo)} não existe; rode \`${comando}\``] };
+  const gravado = readFileSync(arquivo, 'utf8');
+  const secoes = secoesAMao(gravado);
+  const faltam = unidades.filter((u) => secoes[u.id] === undefined).map((u) => u.id);
+  if (faltam.length) return { problemas: [`${relative(raiz, arquivo)} perdeu a seção à mão de ${faltam.join(', ')} (os marcadores \`dossie:a-mao:<unidade>:inicio\` e \`:fim\`); ponha os marcadores de volta com o texto que havia, ou rode \`${comando}\` para recomeçar a seção no modelo, e escreva de novo`] };
+  const { texto } = await montarDossie(objeto, { raiz, aMao: secoes, docs });
+  return texto === gravado ? { problemas: [] } : { problemas: [`${relative(raiz, arquivo)} está desatualizado em relação às receitas, rodadas, decisões e planos; rode \`${comando}\` (a seção à mão é preservada)`] };
+}
+
+/** Grava o dossiê do objeto, preservando as seções à mão do arquivo de antes; devolve `{ arquivo, perdidas }`, as unidades que ficaram no modelo. */
+export async function gerarDossie(objeto, { raiz = REPO, docs = DOCUMENTOS } = {}) {
+  const { arquivo } = await montarDossie(objeto, { raiz, docs });
+  const antes = existsSync(arquivo) ? readFileSync(arquivo, 'utf8') : null;
+  const aMao = secoesAMao(antes);
+  const { texto, unidades } = await montarDossie(objeto, { raiz, aMao, docs });
+  writeFileSync(arquivo, texto);
+  return { arquivo, perdidas: antes === null ? [] : unidades.filter((u) => aMao[u.id] === undefined).map((u) => u.id) };
+}
+
+export function lerArgumentos(argv) {
+  const opcoes = { check: false, ajuda: false, raiz: REPO, docs: DOCUMENTOS, objeto: undefined };
+  for (const a of argv) {
+    if (a === '--check') opcoes.check = true;
+    else if (a === '--ajuda' || a === '--help' || a === '-h') opcoes.ajuda = true;
+    else if (a.startsWith('--raiz=')) opcoes.raiz = resolve(a.slice('--raiz='.length));
+    else if (a.startsWith('--docs=')) opcoes.docs = a.slice('--docs='.length).replace(/\/+$/, '');
+    else if (a.startsWith('--')) throw new Error(`opção desconhecida: ${a}; as opções levam \`=\` (--raiz=<pasta>) e as outras são --check e --ajuda`);
+    else if (opcoes.objeto === undefined) opcoes.objeto = a;
+    else throw new Error(`argumento a mais: ${a}; informe um objeto só`);
+  }
+  return opcoes;
+}
+
+async function executar() {
+  let opcoes;
+  try { opcoes = lerArgumentos(process.argv.slice(2)); } catch (erro) { console.error(`dossie FALHOU — ${erro.message}`); process.exitCode = 1; return; }
+  if (opcoes.ajuda || !opcoes.objeto) { console.log(AJUDA); if (!opcoes.ajuda) process.exitCode = 1; return; }
+  try {
+    if (opcoes.check) {
+      const { problemas } = await conferirDossie(opcoes.objeto, { raiz: opcoes.raiz, docs: opcoes.docs });
+      if (problemas.length) { console.error(`dossie:check FALHOU — ${problemas.join('; ')}`); process.exitCode = 1; return; }
+      console.log(`dossie:check ok — ${PASTA_DAS_PECAS}/${opcoes.objeto}/${ARQUIVO} em dia`);
+      return;
+    }
+    const { arquivo, perdidas } = await gerarDossie(opcoes.objeto, { raiz: opcoes.raiz, docs: opcoes.docs });
+    console.log(`dossie ok — ${relative(opcoes.raiz, arquivo)} gerado`);
+    if (perdidas.length) console.error(`aviso: o arquivo de antes não tinha a seção à mão de ${perdidas.join(', ')}; ela recomeçou no modelo`);
+  } catch (erro) { console.error(`dossie FALHOU — ${erro.message}`); process.exitCode = 1; }
+}
+
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) await executar();

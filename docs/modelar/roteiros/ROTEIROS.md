@@ -279,7 +279,7 @@ Abrir só quando a condição aparecer:
 
 Skill: `criar-peca`.
 
-Comandos: `node tools/modelar/olhar-bancada.mjs --analise --peca=<nome>`, `npm run parametros`, `npm run conferir:referencia`.
+Comandos: `npm run dossie -- <objeto>`, `node tools/modelar/olhar-bancada.mjs --analise --peca=<nome>`, `npm run parametros`, `npm run conferir:referencia`.
 
 Passo seguinte, sem estado lido: Leia a receita da peça e o veredito ou o ajuste que pede a correção, mude a TABELA ou os passos e prove de novo na bancada.
 
@@ -327,7 +327,7 @@ Abrir só quando a condição aparecer:
 
 Skill: `laco-de-modelagem`.
 
-Comandos: `npm run rodada -- <peça> --acao`, `npm run rodada -- <peça> --registrar --modelador <arquivo> --critico <arquivo>`, `npm run rodada -- <peça> --decisao-da-pessoa "<quem decidiu>, <AAAA-MM-DD>: <as palavras>" --rodada <n>`.
+Comandos: `npm run rodada -- <peça> --acao`, `npm run rodada -- <peça> --registrar --modelador <arquivo> --critico <arquivo>`, `npm run rodada -- <peça> --decisao-da-pessoa "<quem decidiu>, <AAAA-MM-DD>: <as palavras>" --rodada <n>`, `npm run dossie -- <objeto>`.
 
 Passo seguinte, sem estado lido: Rode npm run rodada -- <peça> --acao, que mede a receita atual e diz a próxima ação, e conduza a rodada pela skill laco-de-modelagem.
 

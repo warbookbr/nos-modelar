@@ -5,6 +5,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { problemasDeTentativas } from './tentativas-dos-planos.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const ESTADOS = new Set(['rascunho', 'pronto', 'ativo', 'concluído', 'cancelado', 'congelado']);
@@ -171,6 +172,7 @@ export function ativosDoIndice(texto, marca = MARCA_DE_ATIVOS) {
 export function conferirPlanos({
   pasta = join(RAIZ, 'docs/modelar/planos'),
   indice = join(pasta, 'README.md'),
+  raiz = RAIZ,
 } = {}) {
   const problemas = [];
   if (!existsSync(pasta)) return { problemas: [`pasta de planos ausente: ${pasta}`], planos: [], ativos: [] };
@@ -215,6 +217,9 @@ export function conferirPlanos({
     if (nucleo && !noNucleo.length) problemas.push(`${plano.nome}: declara **Núcleo:** sim e o território não tem caminho em ${PASTA_DO_NUCLEO}; ponha o caminho do núcleo no território ou declare não`);
     if (!nucleo && noNucleo.length) problemas.push(`${plano.nome}: declara **Núcleo:** não e o território tem ${noNucleo.join(', ')}; declare sim`);
   }
+
+  /* A tabela de tentativas (2026-11-27): o plano de modelagem na raiz de planos/ que passa a concluído precisa dela no banco de provas. */
+  problemas.push(...problemasDeTentativas(planos.filter((p) => p.naRaiz).map((p) => ({ nome: p.nome, estado: p.estado, texto: textoDe[p.nome] })), raiz));
 
   const ativos = planos.filter((plano) => plano.estado === 'ativo');
   const comuns = ativos.filter((p) => p.nucleo !== true);

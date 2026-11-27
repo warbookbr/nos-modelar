@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2505 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2520 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -99,6 +99,7 @@
 
 - `BANCO-DE-PROVAS.md` — Banco de provas e registro de custo
 - `MEDICAO-DE-TOKENS-2026-10.md` — Onde vão os tokens do esbocista (2026-10-07)
+- `MODELO-DE-TENTATIVAS.md` — Modelo da tabela de tentativas
 - `README.md` — Banco de provas: as pastas de rodada
 
 ## docs/modelar/banco-de-provas/abertura-de-contorno-2026-11-05/
@@ -2750,6 +2751,7 @@
 
 ## procedural/pecas/roda-esportiva/
 
+- `DOSSIE.md` — Dossiê: roda-esportiva
 - `receita.js` — roda-esportiva — roda de liga leve de 19 polegadas com pneu 245/40 R19, etapa 1 (aro, raios, tampa central, parafusos, válvula e pneu), nas duas variantes do…
 
 ## procedural/pecas/roda-esportiva/referencias/
@@ -3671,6 +3673,36 @@
 
 - `alvo.md` — Alvo
 
+## tools/fixtures/dossie/documentos/modelar/banco-de-provas/estudo-de-prova/
+
+- `README.md` — Estudo de prova
+
+## tools/fixtures/dossie/documentos/modelar/decisoes/
+
+- `PLANOS-ENCERRADOS.md` — Planos encerrados
+
+## tools/fixtures/dossie/documentos/modelar/planos/
+
+- `2026-11-20-plano-da-prova.md` — Plano da prova
+- `2026-11-22-plano-de-ferramenta.md` — Plano de ferramenta
+
+## tools/fixtures/dossie/procedural/pecas/objeto-com-partes/
+
+- `DOSSIE.md` — Dossiê: objeto-com-partes
+
+## tools/fixtures/dossie/procedural/pecas/objeto-com-partes/partes/base/
+
+- `receita.js` — receita de fixture do dossiê: uma parte de um objeto de várias partes.
+
+## tools/fixtures/dossie/procedural/pecas/objeto-com-partes/partes/tampa/
+
+- `receita.js` — receita de fixture do dossiê: uma parte de um objeto de várias partes.
+
+## tools/fixtures/dossie/procedural/pecas/objeto-de-prova/
+
+- `DOSSIE.md` — Dossiê: objeto-de-prova
+- `receita.js` — receita de fixture do dossiê: duas partes, uma com sólido modificado e unido.
+
 ## tools/fixtures/elementos-de-maquina/
 
 - `mesa-linear.mjs` — mesa-linear.mjs — a mesa linear de prova do plano de elementos de máquina, em milímetro na montagem e metro na receita.
@@ -4047,6 +4079,8 @@
 - `retirados.test.mjs` — retirados.test.mjs — caminho sob pasta retirada passa quando a crônica registra o nome, ou quando o plano está em congelados/, e reprova quando não.
 - `roteiros.mjs` — roteiros.mjs — os invariantes e os roteiros de leitura por intenção, como dado.
 - `roteiros.test.mjs` — roteiros.test.mjs — os roteiros por intenção e o gate leitura:obrigatoria: o JSON do repositório passa, o ROTEIROS.md e os blocos do CLAUDE.md estão gerados …
+- `tentativas-dos-planos.mjs` — tentativas-dos-planos.mjs — a tabela de tentativas do banco de provas de cada plano de modelagem, e a conferência que a cobra.
+- `tentativas-dos-planos.test.mjs` — tentativas-dos-planos.test.mjs — a conferência que recusa o plano de modelagem concluído sem a tabela de tentativas, nos dois sentidos.
 - `territorio-do-envio.mjs` — territorio-do-envio.mjs — confere que cada arquivo que o envio muda pertence ao território de um plano ativo, a um caminho compartilhado ou a um arquivo gera…
 - `territorio-do-envio.test.mjs` — territorio-do-envio.test.mjs — o arquivo mudado sem plano dono nem declaração reprova; o do território, o compartilhado, o gerado e o declarado como defeito …
 - `toc.mjs` — toc.mjs — gera o índice (sumário) de um doc ENTRE os marcadores <!-- TOC --> e <!-- /TOC -->, a partir dos títulos `##` dele. Mesma filosofia do mapa: o índi…
@@ -4229,6 +4263,8 @@
 - `dobra-da-superficie.mjs` — dobra-da-superficie.mjs — acha onde a superfície de subdivisão de uma receita dobra com diedro agudo fora de vinco declarado, e diz a parte, o lugar e o ângulo.
 - `dobra-da-superficie.test.mjs` — dobra-da-superficie.test.mjs — a régua de dobra sobre superfícies pequenas feitas aqui: duas faces que se dobram num ângulo conhecido. O diedro é 180 graus m…
 - `dobras-aceitas-reguas.test.mjs` — dobras-aceitas-reguas.test.mjs — `PLANO.dobrasAceitas` nas duas réguas de superfície e no `descrever`: a aba da técnica de hoje (`tubos-hoje.js`) sai como 4 …
+- `dossie-do-objeto.mjs` — dossie-do-objeto.mjs — gera `procedural/pecas/<objeto>/DOSSIE.md` do que já está gravado, sem medir a malha.
+- `dossie-do-objeto.test.mjs` — dossie-do-objeto.test.mjs — o dossiê gerado é o esperado, e a conferência recusa o desatualizado e o que perdeu a seção à mão.
 - `enquadramento-bancada.test.ts` — enquadramento-bancada.test.ts — prova pura do gate visual da bancada.
 - `entrada-de-medida.mjs` — entrada-de-medida.mjs — o resolvedor de entrada das ferramentas de medida: o que o `vao:partes` já lia (esboço 2.0, receita ou montagem persistida) numa funç…
 - `entrada-de-medida.test.mjs` — entrada-de-medida.test.mjs — o resolvedor comum das ferramentas de medida e as quatro que passaram a ler esboço 2.0 (ondulação, lascas, vistas de superfície …

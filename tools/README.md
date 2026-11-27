@@ -44,6 +44,7 @@ Quem trabalha chama, com `npm run <comando> -- <argumentos>`; a que não tem com
 | `descrever:montagem` | Lê uma montagem piloto e imprime o diagnóstico declarativo do encaixe. |
 | `descrever` | Mede uma peça sem navegador: caixa, partes, contatos, malha e avisos, em texto ou JSON. |
 | `distancia:pele` | Mede, por região, a distância da superfície limite da chapa à pele analítica que a receita declara, e junta o veredito ao da zebra. |
+| `dossie` | Gera o DOSSIE.md de um objeto (PLANO, operações por parte, rodadas com decisão da pessoa, planos e tabelas de tentativas) do que já está gravado, e --check recusa o desatualizado. |
 | `esboco:nucleo` | Monta as opções de forma de um esboço com as operações do núcleo e as captura na bancada, lado a lado. |
 | `esqueleto` | O esqueleto de proporção de um robô como árvore de juntas, e o andaime e as articulações gerados dela. |
 | `etapas` | O registro de etapas de uma montagem v5, em disco, e a única porta para fixar uma etapa. |
