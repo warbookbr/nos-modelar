@@ -1,6 +1,6 @@
 {
   "formato": "mecanifica.calibracao-do-critico@2",
-  "versao": "2.0.0",
+  "versao": "2.1.0",
   "descricao": "Casos em que a pessoa já decidiu, para medir o crítico visual no que a medição da rodada não vê: peças do acervo com PLANO e referência, em cópias de ensaio, julgadas pelo pedido e pelas imagens do pacote padrão da rodada. Os controles são etapas aceitas pela pessoa; os defeitos de forma prometida e de proporção foram recolocados à mão; a revolução facetada é o defeito de superfície. O caso que a medição da rodada reprova fica como prova da medida, sem julgamento.",
   "critico": {
     "agente": {
@@ -33,12 +33,11 @@
   },
   "regra": {
     "julgamentos": 3,
-    "acerto": "o caso acerta quando a mediana das três notas cai na faixa do grupo, no máximo um julgamento sai dela, cada defeito esperado é citado em pelo menos dois dos três julgamentos (a parte ou o lugar com uma das palavras, e o tipo e o sentido entre os aceitos) e, no controle, no máximo um julgamento cita defeito estrutural",
+    "acerto": "o caso acerta quando a mediana das três notas cai na faixa do grupo, no máximo um julgamento sai dela, cada defeito esperado é citado em pelo menos dois dos três julgamentos e, no controle, no máximo um julgamento cita defeito estrutural. O defeito é citado pela parte ou pelo lugar com uma das palavras e o tipo e o sentido entre os aceitos, ou, no defeito que declara `lugar`, pela parte com uma das palavras e o `onde` com uma das palavras do lugar, com qualquer tipo que não esteja nos `contrarios`",
     "passa": {
-      "minimo": 5,
-      "de": 6,
+      "minimo": 4,
+      "de": 4,
       "obrigatorias": [
-        "parabrisa-saliente",
         "raios-largos-e-par-fechado"
       ]
     }
@@ -247,7 +246,7 @@
       "id": "c02",
       "nome": "parabrisa-saliente",
       "grupo": "forma-prometida",
-      "obrigatorio": true,
+      "obrigatorio": false,
       "julgamentos": 3,
       "faixaDaNota": [
         0,
@@ -334,168 +333,14 @@
           ]
         }
       ],
-      "destino": "critico",
+      "destino": "medida",
       "medicao": {
-        "passou": true,
+        "passou": false,
         "comando": "node tools/modelar/rodada-de-modelagem.mjs peca-c02 --acao",
         "receitaSha256": "sha256:e6e75c740bba3dc4f70975d42d0f1e5ed2bc1d3965305f3125a2313e05bbd4ff",
         "forma": "sha256:efdc8ac905c252cb7fc558e6a31ede5eabc22178680b32376cdde1c9a9d1dbcc",
-        "relatorio": "medição da receita atual (sha256:e6e75c74): passou\naviso: 27 face(s) fina(s) na malha (fuselagem: 21, porta: 6); liste-as com `npm run -s malha:lascas -- peca-c02`.\npróxima ação: revisar — a receita existe (sha256:e6e75c74), a medição dela passa e nenhuma rodada a julgou."
-      },
-      "pedido": {
-        "arquivo": "casos/c02/pedido.txt",
-        "sha256": "sha256:75771afd9f61060476bbde1a0b84d941ea713922d89ab868025f51036d1112a3"
-      },
-      "imagens": [
-        {
-          "arquivo": "casos/c02/contorno-sobreposto.png",
-          "sha256": "sha256:4d82bcd11f270651ca2b0a9fcc44f4bf149daa46c571c2b0ed83f8cc1e9246fd"
-        },
-        {
-          "arquivo": "casos/c02/bancada-peca-c02-isometrica-orto-enquadrado.png",
-          "sha256": "sha256:804da0183c16a2ff14085672f99cdfbd0c6b62007f95c75ad25e4c010a68dea2"
-        },
-        {
-          "arquivo": "casos/c02/bancada-peca-c02-frontal-orto-enquadrado.png",
-          "sha256": "sha256:1d25e722e36200a95d744c5e2b42659febbdefe5a2bc74733f2f67d6ed921126"
-        },
-        {
-          "arquivo": "casos/c02/bancada-peca-c02-direita-orto-enquadrado.png",
-          "sha256": "sha256:a6341dd1a465894553ff8191f6386a09e6e94dac1db4d17c689393d62e82a4b6"
-        },
-        {
-          "arquivo": "casos/c02/bancada-peca-c02-superior-orto-enquadrado.png",
-          "sha256": "sha256:ed5a41a06c46c440bf25793e4d547c249a038ab9736d215eaaf393ae2ce52923"
-        },
-        {
-          "arquivo": "casos/c02/bancada-peca-c02-traseira-orto-enquadrado.png",
-          "sha256": "sha256:e6fabe771bfee5c44394f177c5a6c63664a4bcb11ea87936bb32ce33a4f58a47"
-        },
-        {
-          "arquivo": "casos/c02/bancada-peca-c02-esquerda-orto-enquadrado.png",
-          "sha256": "sha256:296baade41dfec480298b92110f38a39b7ebe0b044e6a2c1a286ee89ae786983"
-        },
-        {
-          "arquivo": "casos/c02/bancada-peca-c02-isometrica-orto-arame-enquadrado.png",
-          "sha256": "sha256:7dde822875c1e23f7bcecbc2b9939d62c9f120b934f6aa299b1768771c8d3eb0"
-        },
-        {
-          "arquivo": "casos/c02/bancada-peca-c02-traseira-orto-raio-x-enquadrado.png",
-          "sha256": "sha256:83d0040f743a724dc08f61beca7696ae8582d2495258fa249c020c1d91a9f791"
-        },
-        {
-          "arquivo": "casos/c02/superficie/peca-tresquartos-rasante-az20.png",
-          "sha256": "sha256:a25b227bcfc3a7b4b0fa0bef64a917a03a1deecc80737cb04dbd5e7ca539c4c8"
-        },
-        {
-          "arquivo": "casos/c02/superficie/peca-tresquartos-rasante-az290.png",
-          "sha256": "sha256:1b2db056ae948cef8b6dd71c96bdc31050553da14f069b2444d08f65843536a9"
-        },
-        {
-          "arquivo": "casos/c02/bancada-peca-c02-direita-sel-fuselagem-isolar-orto-focado.png",
-          "sha256": "sha256:215c2958ba9023c92dd30c7b8faf2a216012883ce03c6e14599c5c359898e95e"
-        },
-        {
-          "arquivo": "casos/c02/bancada-peca-c02-isometrica-sel-fuselagem-isolar-orto-focado.png",
-          "sha256": "sha256:5ff7346cdc777aecc62c8c029ed7638e2f05be94d2b800b946c1717c38275140"
-        },
-        {
-          "arquivo": "casos/c02/bancada-peca-c02-direita-sel-parabrisa-isolar-orto-focado.png",
-          "sha256": "sha256:eed83d36e6a890dd61dae8f7b1261bb28b52074f048034b8b40c1ee18e24c2df"
-        },
-        {
-          "arquivo": "casos/c02/bancada-peca-c02-isometrica-sel-parabrisa-isolar-orto-focado.png",
-          "sha256": "sha256:346c38e232adf5cee8842900dda95ff3d539ae2bd0588953de2b68659ed9a9b4"
-        },
-        {
-          "arquivo": "casos/c02/bancada-peca-c02-direita-sel-montanteParabrisa-isolar-orto-focado.png",
-          "sha256": "sha256:1b99efe7a51d4d4526a9ada0635b91554c7dff4024eee3e67afbce6d4080805c"
-        },
-        {
-          "arquivo": "casos/c02/bancada-peca-c02-isometrica-sel-montanteParabrisa-isolar-orto-focado.png",
-          "sha256": "sha256:0af911c9eca72cd3b3a2554c5e2aed7efc2c2adf8b3493f6907c9756d1d9c9da"
-        },
-        {
-          "arquivo": "casos/c02/bancada-peca-c02-direita-sel-janela1D-isolar-orto-focado.png",
-          "sha256": "sha256:37fc52a44d37ff4f35b7a277a9c8b92fb09d7bd9124695ef3e3c6d03505f8d70"
-        },
-        {
-          "arquivo": "casos/c02/bancada-peca-c02-isometrica-sel-janela1D-isolar-orto-focado.png",
-          "sha256": "sha256:ca2a7e738796f7d55294a23cb2e5e2721975ec61f629fcf1166ea344b6f1f8c0"
-        },
-        {
-          "arquivo": "casos/c02/bancada-peca-c02-direita-sel-janela1E-isolar-orto-focado.png",
-          "sha256": "sha256:e79e4afd01e4557d77a3d89d4fbb7702e243c315f368bc4ad718e7abeb43de64"
-        },
-        {
-          "arquivo": "casos/c02/bancada-peca-c02-isometrica-sel-janela1E-isolar-orto-focado.png",
-          "sha256": "sha256:fcb192911f622c3cae7cc70f3a10434067b6507152953d7302a479b906bee485"
-        },
-        {
-          "arquivo": "casos/c02/bancada-peca-c02-direita-sel-janela2D-isolar-orto-focado.png",
-          "sha256": "sha256:4cdc5101fcddff3026299e251f60d4deeb397bd0e7ef3e7c2309588677698fb8"
-        },
-        {
-          "arquivo": "casos/c02/bancada-peca-c02-isometrica-sel-janela2D-isolar-orto-focado.png",
-          "sha256": "sha256:0687ee147d58b4516ce666dac6670dcb67e00961ada9be453783e2e0f55ef681"
-        },
-        {
-          "arquivo": "casos/c02/bancada-peca-c02-direita-sel-janela2E-isolar-orto-focado.png",
-          "sha256": "sha256:8ffaf90eb10648235abf8bd115f293cf8a2c8942897abc55782abc8fb5304e49"
-        },
-        {
-          "arquivo": "casos/c02/bancada-peca-c02-isometrica-sel-janela2E-isolar-orto-focado.png",
-          "sha256": "sha256:c15f0999c0e152e66c1461b5884db6e740145032dbc3f7d643a634aaa6fbfb7a"
-        },
-        {
-          "arquivo": "casos/c02/bancada-peca-c02-direita-sel-janela3D-isolar-orto-focado.png",
-          "sha256": "sha256:fa8b20beb79b75b3bade1f624b7c77c7423ce5adf07c633867238582336ad12b"
-        },
-        {
-          "arquivo": "casos/c02/bancada-peca-c02-isometrica-sel-janela3D-isolar-orto-focado.png",
-          "sha256": "sha256:72acf82dd2019e5a83221057e8e26debe6dcbffbb6f497a64e4b2a7b1c5a655e"
-        },
-        {
-          "arquivo": "casos/c02/bancada-peca-c02-direita-sel-janela3E-isolar-orto-focado.png",
-          "sha256": "sha256:0e918a3912df90d70cb287d3a6fd8fb73c176b19f3780debca9b45a574e65b40"
-        },
-        {
-          "arquivo": "casos/c02/bancada-peca-c02-isometrica-sel-janela3E-isolar-orto-focado.png",
-          "sha256": "sha256:f2e19ae61914bc09a771cc6893330e87843fa6f8fac00de4aeec8b7d49f5121a"
-        },
-        {
-          "arquivo": "casos/c02/bancada-peca-c02-direita-sel-janela4D-isolar-orto-focado.png",
-          "sha256": "sha256:e5d3e162db0a550d986bc99e8418c63f019fbeb9268b1639954cda6debb6ca8e"
-        },
-        {
-          "arquivo": "casos/c02/bancada-peca-c02-isometrica-sel-janela4D-isolar-orto-focado.png",
-          "sha256": "sha256:921cb6da6669b893efa4144dc38a203efc5693b0390dac99667dc91d8a442f45"
-        },
-        {
-          "arquivo": "casos/c02/bancada-peca-c02-direita-sel-janela4E-isolar-orto-focado.png",
-          "sha256": "sha256:a35461a6ae7891b04b595af1dfdb0598dc35583fbf46008150c0183601e9a2e9"
-        },
-        {
-          "arquivo": "casos/c02/bancada-peca-c02-isometrica-sel-janela4E-isolar-orto-focado.png",
-          "sha256": "sha256:68b778a37be4738602b8495750fc88548161ac5f113693ad6d55456342d6cc5e"
-        },
-        {
-          "arquivo": "casos/c02/bancada-peca-c02-direita-sel-porta-isolar-orto-focado.png",
-          "sha256": "sha256:31ca58632ba4dfb30d41955de5104f2aba6c5b5c2dac1757a3e3813611a02a96"
-        },
-        {
-          "arquivo": "casos/c02/bancada-peca-c02-isometrica-sel-porta-isolar-orto-focado.png",
-          "sha256": "sha256:14133f1b23fe6136eced626854b7f648c3daaa79e62c13682729ca49898286ec"
-        },
-        {
-          "arquivo": "casos/c02/bancada-peca-c02-direita-sel-barbatana-isolar-orto-focado.png",
-          "sha256": "sha256:634183f1ae08b2f193b382da69ddcf40a9e2d5182d701bffe002a834858a7002"
-        },
-        {
-          "arquivo": "casos/c02/bancada-peca-c02-isometrica-sel-barbatana-isolar-orto-focado.png",
-          "sha256": "sha256:1a9a41aa4fe280349fb54832483df4eeeb312000de217c35b010ea5f4b1698bf"
-        }
-      ]
+        "relatorio": "medição da receita atual (sha256:e6e75c74): reprovou\naviso: 27 face(s) fina(s) na malha (fuselagem: 21, porta: 6); liste-as com `npm run -s malha:lascas -- peca-c02`.\npróxima ação: modelar — a medição da receita atual (sha256:e6e75c74) reprovou: promessa do PLANO que a malha não cumpre: a parte 'parabrisa' sai 29,2 mm em relação à superfície de 'fuselagem', e o PLANO a promete rente (até 5 mm); o maior degrau está em [-375; 2288,2; 3655,5] mm. Leve a face de fora da parte à superfície da vizinha, ou tire o rente da promessa no PLANO se o degrau é o desenho.; revisar antes de a medição passar é gastar o crítico."
+      }
     },
     {
       "id": "c03",
@@ -678,76 +523,14 @@
           ]
         }
       ],
-      "destino": "critico",
+      "destino": "medida",
       "medicao": {
-        "passou": true,
+        "passou": false,
         "comando": "node tools/modelar/rodada-de-modelagem.mjs peca-c04 --acao",
         "receitaSha256": "sha256:5bb0aa5489437ddd757d3ebd2ab28420c5716239183995d1d4103a412b60453d",
         "forma": "sha256:a524cc6a4fa0fb776570421b71d93fa264fb0927f0fb01721ea2ff1cba648ada",
-        "relatorio": "medição da receita atual (sha256:5bb0aa54): passou\npróxima ação: revisar — a receita existe (sha256:5bb0aa54), a medição dela passa e nenhuma rodada a julgou."
-      },
-      "pedido": {
-        "arquivo": "casos/c04/pedido.txt",
-        "sha256": "sha256:c4e625808997dd2ee98e64f8ae50fc829049e1b85a44d92b07c121e20cf6eb4a"
-      },
-      "imagens": [
-        {
-          "arquivo": "casos/c04/bancada-peca-c04-isometrica-orto-enquadrado.png",
-          "sha256": "sha256:ecb9955af8351cb904707e7c63aa900280be8f47257e1ba34079dd37d5cf7e9e"
-        },
-        {
-          "arquivo": "casos/c04/bancada-peca-c04-frontal-orto-enquadrado.png",
-          "sha256": "sha256:97013d3f0b073bf9ccd69524d1b4fecbe58984c2c137c4134e586fb484d64ab0"
-        },
-        {
-          "arquivo": "casos/c04/bancada-peca-c04-direita-orto-enquadrado.png",
-          "sha256": "sha256:d0be84dc2bcd2b6593a0e34ccaa4a63c9b422f98f6791fe04fc7d7d812c5a7d9"
-        },
-        {
-          "arquivo": "casos/c04/bancada-peca-c04-superior-orto-enquadrado.png",
-          "sha256": "sha256:1928f53266cedc7a1c96c544107969071508d0f4855eb2e4b82b9f77bcad9aaf"
-        },
-        {
-          "arquivo": "casos/c04/bancada-peca-c04-traseira-orto-enquadrado.png",
-          "sha256": "sha256:376a907b59f416153e1d13c7f9accb6a58ea714d82df891ffcf63e8412d48b2a"
-        },
-        {
-          "arquivo": "casos/c04/bancada-peca-c04-esquerda-orto-enquadrado.png",
-          "sha256": "sha256:2fe2df01f60b956612dfd77b0d74b3f317bbed11051d393b12f2b3f0314e1edb"
-        },
-        {
-          "arquivo": "casos/c04/bancada-peca-c04-isometrica-orto-arame-enquadrado.png",
-          "sha256": "sha256:91f6d199e87a04a4d89d482cceff45859f2d54087b36f75a831e4abd47a3e6e0"
-        },
-        {
-          "arquivo": "casos/c04/bancada-peca-c04-traseira-orto-raio-x-enquadrado.png",
-          "sha256": "sha256:c0b719204df3779a8122f87f123ea7315588c62493d598904798fc582173ac67"
-        },
-        {
-          "arquivo": "casos/c04/bancada-peca-c04-direita-sel-cilindroElevacao-isolar-orto-focado.png",
-          "sha256": "sha256:03788fccd01ed99de5ee3c3a1d6f417f132ec2ad9755c29903816d5dd03130e3"
-        },
-        {
-          "arquivo": "casos/c04/bancada-peca-c04-isometrica-sel-cilindroElevacao-isolar-orto-focado.png",
-          "sha256": "sha256:30d94f2311d46f59f2bdb0003405eace7456ffc168c93e4f78249d75786b2f89"
-        },
-        {
-          "arquivo": "casos/c04/bancada-peca-c04-direita-sel-hasteElevacao-isolar-orto-focado.png",
-          "sha256": "sha256:0aaa02ff4bbc974420646917df1de70ba92fec93dd031a88eaa2b07699604895"
-        },
-        {
-          "arquivo": "casos/c04/bancada-peca-c04-isometrica-sel-hasteElevacao-isolar-orto-focado.png",
-          "sha256": "sha256:49f419fd0a7e6f376fb7246e7fe9c20b6396ae700d1c977c6ce49b0476a7ac62"
-        },
-        {
-          "arquivo": "casos/c04/bancada-peca-c04-direita-sel-cabecaElevacao-isolar-orto-focado.png",
-          "sha256": "sha256:6612983b9545c7458c651f71a38c3d4a77267e5c47d85132e7db7e4507551e80"
-        },
-        {
-          "arquivo": "casos/c04/bancada-peca-c04-isometrica-sel-cabecaElevacao-isolar-orto-focado.png",
-          "sha256": "sha256:a532c034b848b9283e3f70463b0ada6c038d2b2d4140aa2b64967c75b85db240"
-        }
-      ]
+        "relatorio": "medição da receita atual (sha256:5bb0aa54): reprovou\npróxima ação: modelar — a medição da receita atual (sha256:5bb0aa54) reprovou: promessa do PLANO que a malha não cumpre: a parte 'cilindroElevacao' saiu com 12 lados em volta de y, e o PLANO promete 96 lados (mínimo 72): a revolução está facetada. Refaça a parte com os lados prometidos, ou mude a promessa no PLANO se o número de lados é o desenho.\npromessa do PLANO que a malha não cumpre: a parte 'hasteElevacao' saiu com 12 lados em volta de y, e o PLANO promete 96 lados (mínimo 72): a revolução está facetada. Refaça a parte com os lados prometidos, ou mude a promessa no PLANO se o número de lados é o desenho.; revisar antes de a medição passar é gastar o crítico."
+      }
     },
     {
       "id": "c05",
@@ -946,6 +729,18 @@
             "espessura/maior",
             "comprimento/maior",
             "angulo/menor"
+          ],
+          "lugar": [
+            "par",
+            "pares",
+            "fenda",
+            "centro",
+            "cubo",
+            "miolo"
+          ],
+          "contrarios": [
+            "espessura/menor",
+            "uniao/afastado"
           ]
         }
       ],
@@ -1141,7 +936,7 @@
         "comando": "node tools/modelar/rodada-de-modelagem.mjs peca-c07 --acao",
         "receitaSha256": "sha256:8add5e83b98f96d1cbdff82b5b9c6bd317489d2dc4d099fc6c46e64448185a10",
         "forma": "sha256:76c5c8b2b843503b4804b7fe09180c0b7ccbbe566e86a5fb4e775317c5e3f406",
-        "relatorio": "medição da receita atual (sha256:8add5e83): reprovou\naviso: 27 face(s) fina(s) na malha (fuselagem: 21, porta: 6); liste-as com `npm run -s malha:lascas -- peca-c07`.\npróxima ação: modelar — a medição da receita atual (sha256:8add5e83) reprovou: guarda:acervo reprovou 'peca-c07':\n  AVISO: 1 régua(s) de malha com achado; o número e onde olhar estão na seção RÉGUA(S) DE MALHA COM ACHADO acima\n  \n  1 ACHADO(S) NO REFINAMENTO DO ANDAIME 'andaime-aviao-de-pequeno-porte'\n      a parte 'montanteParabrisa' sai do envelope do volume 'fuselagem' em +y por 9.829 mm (tolerância 5 mm): a parte vai até y=2337.829 mm e o envelope termina em y=2328 mm.\n    A receita refina o andaime; ela não refaz o que o nível zero decidiu. Ou a peça saiu do envelope\n    e da porta do andaime, ou o andaime precisa mudar antes e o G01 ser refeito.\n  \n  2 CONTATO(S) DECLARADO(S) EM QUE UMA PARTE ATRAVESSA A OUTRA\n    O par está declarado, mas uma parte entra na outra além do limite (profundidade medida triângulo contra triângulo, e não pela caixa):\n      barbatana ↔ fuselagem: entra 0.0303 contra o limite de 0.0075 (padrão: 0,5% da diagonal da menor parte); cruzamento de 2.8780 de comprimento\n      fuselagem ↔ porta: entra 0.0078 contra o limite de 0.0073 (padrão: 0,5% da diagonal da menor parte); cruzamento de 5.5603 de comprimento\n    Se a parte deve só encostar, a geometria está errada (a alça, o pino ou o tubo passa da face). Se ela entra de propósito (puxador cravado na porta),\n    declare `penetracaoMaxima` no contato, na unidade da peça, com o motivo dizendo quanto entra e por quê.\n    (aviso: nenhum destes pares declara `penetracaoMaxima`; o padrão relativo não reprova); revisar antes de a medição passar é gastar o crítico."
+        "relatorio": "medição da receita atual (sha256:8add5e83): reprovou\naviso: 27 face(s) fina(s) na malha (fuselagem: 21, porta: 6); liste-as com `npm run -s malha:lascas -- peca-c07`.\npróxima ação: modelar — a medição da receita atual (sha256:8add5e83) reprovou: guarda:acervo reprovou 'peca-c07':\n  AVISO: 1 régua(s) de malha com achado; o número e onde olhar estão na seção RÉGUA(S) DE MALHA COM ACHADO acima\n  \n  1 ACHADO(S) NO REFINAMENTO DO ANDAIME 'andaime-aviao-de-pequeno-porte'\n      a parte 'montanteParabrisa' sai do envelope do volume 'fuselagem' em +y por 9.829 mm (tolerância 5 mm): a parte vai até y=2337.829 mm e o envelope termina em y=2328 mm.\n    A receita refina o andaime; ela não refaz o que o nível zero decidiu. Ou a peça saiu do envelope\n    e da porta do andaime, ou o andaime precisa mudar antes e o G01 ser refeito.\n  \n  2 CONTATO(S) DECLARADO(S) EM QUE UMA PARTE ATRAVESSA A OUTRA\n    O par está declarado, mas uma parte entra na outra além do limite (profundidade medida triângulo contra triângulo, e não pela caixa):\n      barbatana ↔ fuselagem: entra 0.0303 contra o limite de 0.0075 (padrão: 0,5% da diagonal da menor parte); cruzamento de 2.8780 de comprimento\n      fuselagem ↔ porta: entra 0.0078 contra o limite de 0.0073 (padrão: 0,5% da diagonal da menor parte); cruzamento de 5.5603 de comprimento\n    Se a parte deve só encostar, a geometria está errada (a alça, o pino ou o tubo passa da face). Se ela entra de propósito (puxador cravado na porta),\n    declare `penetracaoMaxima` no contato, na unidade da peça, com o motivo dizendo quanto entra e por quê.\n    (aviso: nenhum destes pares declara `penetracaoMaxima`; o padrão relativo não reprova)\npromessa do PLANO que a malha não cumpre: a parte 'parabrisa' sai 39 mm em relação à superfície de 'fuselagem', e o PLANO a promete rente (até 5 mm); o maior degrau está em [375; 2298,2; 3655,5] mm. Leve a face de fora da parte à superfície da vizinha, ou tire o rente da promessa no PLANO se o degrau é o desenho.; revisar antes de a medição passar é gastar o crítico."
       }
     }
   ],
@@ -1173,36 +968,6 @@
           "imagemSha256": "sha256:e5e038e97c86a84f4d6a5312dcac334b45e9c80e7f2113739fef3643b52ed910",
           "modelo": "sonnet",
           "data": "2026-11-27T00:03:49.711Z"
-        }
-      ]
-    },
-    {
-      "caso": "c04",
-      "agenteSha256": "sha256:05199cd472ee40e590217b422960422e588c5e230582cdac5d57053adf3f1ceb",
-      "julgamentos": [
-        {
-          "nota": 8,
-          "defeitos": [],
-          "pedidoSha256": "sha256:c4e625808997dd2ee98e64f8ae50fc829049e1b85a44d92b07c121e20cf6eb4a",
-          "imagemSha256": "sha256:211c5854648622782020d1e756b85c100a2a02bc9224596c9d2e16a8d4cf4ec0",
-          "modelo": "sonnet",
-          "data": "2026-11-27T00:03:49.962Z"
-        },
-        {
-          "nota": 8,
-          "defeitos": [],
-          "pedidoSha256": "sha256:c4e625808997dd2ee98e64f8ae50fc829049e1b85a44d92b07c121e20cf6eb4a",
-          "imagemSha256": "sha256:211c5854648622782020d1e756b85c100a2a02bc9224596c9d2e16a8d4cf4ec0",
-          "modelo": "sonnet",
-          "data": "2026-11-27T00:03:50.152Z"
-        },
-        {
-          "nota": 8,
-          "defeitos": [],
-          "pedidoSha256": "sha256:c4e625808997dd2ee98e64f8ae50fc829049e1b85a44d92b07c121e20cf6eb4a",
-          "imagemSha256": "sha256:211c5854648622782020d1e756b85c100a2a02bc9224596c9d2e16a8d4cf4ec0",
-          "modelo": "sonnet",
-          "data": "2026-11-27T00:03:50.325Z"
         }
       ]
     },
@@ -1374,130 +1139,6 @@
           "imagemSha256": "sha256:6f9c79d313ee53a4e024c121af4c8250464e3abf958ec951b33975537055b5cb",
           "modelo": "sonnet",
           "data": "2026-11-27T00:04:12.649Z"
-        }
-      ]
-    },
-    {
-      "caso": "c02",
-      "agenteSha256": "sha256:05199cd472ee40e590217b422960422e588c5e230582cdac5d57053adf3f1ceb",
-      "julgamentos": [
-        {
-          "nota": 7,
-          "defeitos": [
-            {
-              "parte": "porta",
-              "tipo": "posicao",
-              "onde": "painel inteiro, lado esquerdo, visto de cima",
-              "sentido": "externa",
-              "evidencia": "Na vista superior o painel cinza sai do contorno do casco à esquerda, cerca de 60 mm, e lê como placa por cima do casco; na lateral a posição em z coincide com o alvo."
-            },
-            {
-              "parte": "porta",
-              "tipo": "superficie",
-              "onde": "canto de baixo do painel",
-              "sentido": "anguloso",
-              "evidencia": "Na isométrica isolada o canto de baixo sai vivo, e o plano prometia cantos de baixo e de cima arredondados."
-            },
-            {
-              "parte": "barbatana",
-              "tipo": "superficie",
-              "onde": "corpo todo, em especial arestas de baixo",
-              "sentido": "anguloso",
-              "evidencia": "Isométrica isolada: laje poligonal de faces planas e arestas vivas, sem afilamento nem cantos de baixo arredondados prometidos."
-            },
-            {
-              "parte": "fuselagem",
-              "tipo": "superficie",
-              "onde": "barriga perto da frente e quina longitudinal no flanco",
-              "sentido": "segmentado",
-              "evidencia": "Vista esquerda: ondulação leve na linha da barriga à esquerda; isométrica e superior: quina suave ao longo do flanco, da cabine à cauda."
-            }
-          ],
-          "pedidoSha256": "sha256:75771afd9f61060476bbde1a0b84d941ea713922d89ab868025f51036d1112a3",
-          "imagemSha256": "sha256:f77cbe5ac1ee11a30d85d05380a58b6eac5bf75d9116f90bc376b4f536880af1",
-          "modelo": "sonnet",
-          "data": "2026-11-27T00:04:12.857Z"
-        },
-        {
-          "nota": 7,
-          "defeitos": [
-            {
-              "parte": "porta",
-              "tipo": "posicao",
-              "onde": "painel inteiro, face de fora, lado esquerdo",
-              "sentido": "externa",
-              "evidencia": "Superior: placa cinza fora da borda esquerda do casco. Frontal: lâmina cinza passa do arredondado do casco, no lado esquerdo. Porta de 224 mm em x sobre casco que afina."
-            },
-            {
-              "parte": "barbatana",
-              "tipo": "uniao",
-              "onde": "borda de cima, trecho de ré, contra a barriga",
-              "sentido": "afastado",
-              "evidencia": "Esquerda e direita: a aleta fica abaixo da linha da barriga, com fresta clara; isometrica: chapa colada por baixo. No contorno sobreposto a linha verde cai abaixo do casco."
-            },
-            {
-              "parte": "fuselagem",
-              "tipo": "superficie",
-              "onde": "linha inferior (flanco para a barriga) e joelho da cauda perto da ponta",
-              "sentido": "segmentado",
-              "evidencia": "Isometrica e esquerda: linha de baixo em trechos retos; superior: cone da cauda passa para haste de largura quase constante com joelho a cerca de z 1200."
-            },
-            {
-              "parte": "janela1D",
-              "tipo": "superficie",
-              "onde": "canto superior do lado de ré (também em janela1E)",
-              "sentido": "anguloso",
-              "evidencia": "Isometrica das duas janelas 1: o canto superior traseiro lê reto, sem raio, onde os outros três cantos são arredondados."
-            }
-          ],
-          "pedidoSha256": "sha256:75771afd9f61060476bbde1a0b84d941ea713922d89ab868025f51036d1112a3",
-          "imagemSha256": "sha256:f77cbe5ac1ee11a30d85d05380a58b6eac5bf75d9116f90bc376b4f536880af1",
-          "modelo": "sonnet",
-          "data": "2026-11-27T00:04:13.056Z"
-        },
-        {
-          "nota": 6,
-          "defeitos": [
-            {
-              "parte": "fuselagem",
-              "tipo": "ausencia",
-              "onde": "tampa da ponta dianteira (z 10461)",
-              "sentido": "faltando",
-              "evidencia": "Frontal: vê-se o interior em funil, a cauda ao fundo e a barbatana como fenda vertical no centro; ponta aberta onde se prometeram pontas fechadas. Raio X traseiro não mostra tampa."
-            },
-            {
-              "parte": "fuselagem",
-              "tipo": "superficie",
-              "onde": "linha do ventre, da cabine à cauda",
-              "sentido": "segmentado",
-              "evidencia": "Direita: quebras retas no fundo em x≈490, 570, 715 e 900. Isométrica: quina longitudinal e trecho reto no ventre. Rasante az20: faixa vertical de sombra em x≈560-600."
-            },
-            {
-              "parte": "fuselagem",
-              "tipo": "superficie",
-              "onde": "extremidade traseira da cauda, últimos ~600 mm",
-              "sentido": "anguloso",
-              "evidencia": "Superior: pescoço cilíndrico com quebra de largura em y≈1195. Esquerda e direita: nó na ponta da cauda, sem continuidade de curva com o cone."
-            },
-            {
-              "parte": "barbatana",
-              "tipo": "superficie",
-              "onde": "cantos e fundo da aleta, sem seção afilada",
-              "sentido": "anguloso",
-              "evidencia": "Isométrica isolada e direita: cunha de arestas vivas e fundo reto de 60 mm, sem cantos de baixo arredondados nem afilamento."
-            },
-            {
-              "parte": "porta",
-              "tipo": "superficie",
-              "onde": "dois cantos de baixo do painel",
-              "sentido": "anguloso",
-              "evidencia": "Isométrica isolada: só o canto superior dianteiro é arredondado; os dois de baixo são retos. Esquerda: o painel lê como retângulo chapado sobre o casco."
-            }
-          ],
-          "pedidoSha256": "sha256:75771afd9f61060476bbde1a0b84d941ea713922d89ab868025f51036d1112a3",
-          "imagemSha256": "sha256:f77cbe5ac1ee11a30d85d05380a58b6eac5bf75d9116f90bc376b4f536880af1",
-          "modelo": "sonnet",
-          "data": "2026-11-27T00:05:02.559Z"
         }
       ]
     },

@@ -405,3 +405,75 @@ O gate não mede as cópias de novo. A prova de que a medição reprova c07 é o
    Custo: uma medição repetida, alguns segundos.
    O processo pegou: não.
    Destino: ferramenta, `lerMedicaoDaRodada` passou a guardar até a lista dos defeitos em aberto.
+
+## A calibração julgada: o que passou à medida, a regra do lugar e a porta do controle
+
+Registro de 2026-11-27, depois dos dezoito julgamentos do conjunto novo, que deram 2 de 6 casos certos ([resumo de antes](resumo-da-calibracao-2026-11-27.txt)). A pessoa aprovou as três recomendações ("pode seguir com suas recomendações"): a saliência pequena e o facetamento passam a ser conferidos por medida automática e saem do julgamento do crítico; a regra de citação aceita o defeito descrito pela parte certa e pelo lugar certo com outro tipo; e a porta do controle da fuselagem é medida, sem mudar o controle.
+
+### As duas promessas que a malha responde por número
+
+Nenhuma medida da rodada pegava os dois casos. O `descrever` das cópias do para-brisa rente e do para-brisa 30 mm saliente difere só na altura da caixa do vidro (433,15 mm contra 463,15 mm) e na contagem de faces, e o das cópias do cilindro de 96 e de 12 lados só na contagem de faces e na espessura de parede, que é informação e não reprova. O `PLANO` guarda as duas promessas em texto ("vidro de 20 mm rente ao casco", "círculo de 96 lados extrudado em y") e nada as comparava com a malha.
+
+A medida nova mora em `tools/modelar/promessa-medida.mjs`, sem nome de peça, e a medição da rodada (`medirReceita`, em `tools/modelar/rodada-de-modelagem.mjs`) a chama depois dos pontos, de modo que `--acao` e o registro do veredito passam a reprovar por ela. São duas conferências sobre o texto da promessa de cada parte.
+
+A dos lados vale para a parte cuja `forma` ou `tecnica` diz "N lados". Os lados efetivos são 360° dividido pelo passo angular mediano entre as normais das faces em volta de um eixo principal, e vale o eixo que dá mais lados. A parte reprova quando tem menos de 75 % dos lados prometidos. A fração existe porque as receitas arredondam o contorno ao milímetro, e num círculo pequeno dois lados vizinhos ficam com a mesma direção: a haste de Ø 36 do controle do cilindro, prometida com 96 lados e aceita pela pessoa, tem 81 lados efetivos.
+
+A do rente vale para a parte cuja `forma` diz "rente a" seguido de uma palavra que é o nome de outra parte ou a primeira palavra da `forma` de uma só outra parte ("rente ao casco" acha a fuselagem, cuja forma começa por "casco"). O degrau é a maior altura de um vértice da parte sobre a superfície exposta da vizinha ao lado dele, medida na normal da face da vizinha, positivo quando a parte sai e negativo quando afunda. A face da vizinha que a parte cobre fica de fora, o que tira o fundo e as paredes do rebaixo, e só entram os vértices a até 25 mm de lado de uma face exposta. A parte reprova com mais de 5 mm de degrau, para fora ou para dentro.
+
+| cópia | o que é | medido | medição da rodada |
+| --- | --- | --- | --- |
+| c01 | controle da fuselagem | vidro a 0,0 mm do casco, 97 vértices | passa |
+| c02 | para-brisa 30 mm saliente | vidro 29,2 mm para fora | reprova |
+| c07 | para-brisa 40 mm saliente | vidro 39,0 mm para fora | reprova, como antes pelo montante |
+| c03 | controle do cilindro | camisa 96 lados, haste 81 | passa |
+| c04 | revolução de doze lados | camisa 12 lados, haste 12 | reprova |
+| c05 | haste da grossura da camisa | camisa 96 lados, haste 96 | passa |
+
+A saliência de 30 mm foi posta no eixo y e a medida a lê na normal do casco, que ali está inclinado, e por isso dá 29,2 mm. A medida custa 0,3 s na fuselagem e menos de 5 ms no cilindro.
+
+Para saber se a medida reprovaria peça aceita, ela foi rodada nas 36 receitas do acervo cujo `PLANO` tem uma dessas promessas, 124 partes com número de lados e uma parte rente que se resolve (o para-brisa da fuselagem). Nenhuma reprova. As menores razões entre os lados efetivos e os prometidos são 81 de 96 na haste do cilindro de elevação, 90 e 91 de 96 no cilindro de inclinação e 92 de 96 no eixo traseiro, todos na empilhadeira, contra 12 de 96 no defeito.
+
+Os testes cobrem os dois sentidos em malhas de prova (o prisma de 96, de 12, de 72 e de 71 lados, a meia revolução, a revolução pequena ao lado de uma chapa grande; a placa num rebaixo rente, 30 mm para fora e 8 mm para dentro) e nas quatro cópias, pela medida e pela medição da rodada (`tools/modelar/promessa-medida.test.mjs`, 8 testes, e 2 testes em `tools/modelar/rodada-de-modelagem.test.mjs`).
+
+### O que mudou no conjunto
+
+`npm run calibracao -- medir c02` e `medir c04` passaram os dois casos a `destino: "medida"`, com o relatório da medição gravado. O `medir` passou a tirar do conjunto os julgamentos do caso que a medição reprova e a pasta do pedido e das imagens dele, e a dizer quantos saíram. Saíram três julgamentos de cada caso e 3,4 MB de imagens; os seis julgamentos continuam no histórico do git e no resumo de antes. O conjunto tem agora sete casos, quatro que chegam ao crítico (c01, c03, c05 e c06) e três que são prova da medida (c02, c04 e c07). O obrigatório que resta é o c06. A ferramenta acerta o mínimo sozinha quando o número de casos julgados cai abaixo dele, e por isso ele ficou em 4 de 4; o mínimo era 5 de 6, com um erro permitido, e se continua permitindo um erro é decisão da pessoa.
+
+### A regra do lugar
+
+O defeito esperado pode declarar `lugar`, uma lista de palavras do lugar em que ele aparece, e `contrarios`, os pares de tipo e sentido que o negam. O julgamento cita esse defeito quando traz um defeito cuja `parte` tem uma das `palavras` e cujo `onde` tem uma das palavras de `lugar`, inteira, com qualquer tipo que não esteja nos `contrarios`. A regra de antes continua valendo ao lado, e o defeito sem `lugar` é pontuado como antes. A palavra do lugar vale só inteira porque "par" está dentro de "parede" e de "parte".
+
+No c06 o defeito dos raios declara `lugar: par, pares, fenda, centro, cubo, miolo` e `contrarios: espessura/menor, uniao/afastado`. Os três julgamentos não foram refeitos. O primeiro já citava o par fechado como espessura maior dos raios "junto ao centro, do cubo até cerca de metade do comprimento". O terceiro o descreve como comprimento menor da "fenda entre os dois raios de cada par, a partir do cubo", e passa a contar. O segundo só aponta as pontas dos raios junto ao aro e a cor da face, e continua sem citar. O defeito fica citado em 2 de 3, e o caso acerta.
+
+### O resumo recalculado
+
+O [resumo recalculado](resumo-recalculado-2026-11-27.txt), saída de `npm run calibracao -- resumo` sobre os mesmos julgamentos, dá 3 de 4: o c03, o c05 e o c06 acertam, e o c01 erra, com as notas 7, 7 e 6 e dois julgamentos citando defeito estrutural na porta. O conjunto continua reprovando, agora só pelo controle da fuselagem, e `npm run calibracao:check` sai com 1 como saía antes desta etapa. Os dois testes do gate sobre o conjunto versionado, que esperam o conjunto passando, falham desde que os julgamentos foram registrados e continuam falhando.
+
+### A porta do controle da fuselagem
+
+Os três críticos disseram que a porta do controle sai do casco cerca de 60 mm na vista de cima. A malha da cópia `tools/fixtures/acervo/peca-c01` diz que não. A porta tem vão recortado sob ela: em três cortes (y 1300, 1700 e 2150 mm), o raio que entra pelo lado esquerdo acha a face de fora da porta, a de dentro e o fundo do vão do casco a menos de 1 mm dela (de 0,8 mm atrás a 0,7 mm à frente), do começo ao fim da porta. A porta tem 19 mm de espessura nas bordas e até 30 mm no meio, porque a face de fora é plana entre as seções e o fundo acompanha o casco. Nas bordas de frente e de trás a face de fora fica a 0,0 mm do casco ao lado. Comparada raio a raio com o casco do lado direito, que não tem vão de porta, a face de fora da porta passa dele no máximo 0,1 mm e fica até 9,9 mm para dentro, na metade da frente. Na vista de cima a porta passa do contorno da parte fuselagem em até 9,3 mm, na metade de trás, e isso é o vão: ali o contorno da fuselagem sozinha é o fundo do vão, e a porta o enche até onde o casco estaria.
+
+A porta não sai do casco, e os 60 mm dos críticos não estão na malha. A medida de rente não serve para a porta como está: aplicada à mão, ela dá 36,7 mm, porque o fundo do vão aparece pelo furo da janela 4 e conta como superfície da vizinha. A porta não promete rente no `PLANO` e por isso a medição da rodada não a confere. O controle não mudou. O que a pessoa decide é se o c01 continua controle com esse resultado do crítico, e a leitura da medida é que o defeito está no julgamento, e não na peça.
+
+### O que ficou de fora
+
+A promessa de rente só é conferida quando a palavra depois de "rente a" se resolve numa parte. As formas dos planos do acervo têm 19 promessas de rente, em 9 receitas ("rente ao topo", "rente às duas", "rente à face"), e uma só se resolve. Um campo declarado no `PLANO`, com a parte, a vizinha e a tolerância, tiraria a dependência do texto, e ele mora em `src/autoria/plano-de-modelagem.js`, fora do território do plano; é proposta, e não foi feito. A parte vazada sobre um rebaixo é lida errada, como a porta mostrou, e a vizinha de malha aberta não tem a conferência do caminho pelo ar. A revolução inclinada ou varrida numa curva conta lados a mais e passa sem ser conferida, e a parte que junta uma revolução facetada e outra lisa no mesmo eixo passa pela lisa. O arquivo novo da medida e o teste dele entraram no território do plano por esta etapa, e isso espera a confirmação de quem conduz.
+
+### Os atritos
+
+1. A varredura da medida no acervo executou `furgao-realista` inteiro, 217 s na primeira vez e 169 s na segunda, sem aproveitar a execução guardada: `executarComCachePorPasso` sobre `procedural/pecas/furgao-realista/receita.js`, chamado duas vezes seguidas.
+   Custo: cerca de 6 minutos das duas varreduras.
+   O processo pegou: não.
+   Destino: backlog, a execução guardada que não é reaproveitada nessa receita; a causa não foi procurada.
+2. A haste do controle do cilindro, prometida com 96 lados, tem 81 direções de face distintas, porque o contorno é arredondado ao milímetro; a primeira versão da medida reprovava o controle (`npx vitest run tools/modelar/promessa-medida.test.mjs`, no teste das cópias).
+   Custo: uma volta de medida, cerca de 10 minutos.
+   O processo pegou: sim, o controle c03 medido antes de ligar a medida na rodada.
+   Destino: ferramenta, `FRACAO_DOS_LADOS` em `tools/modelar/promessa-medida.mjs`, com o motivo.
+3. A primeira versão do degrau dava 42,8 mm no controle da fuselagem, por lascas da parede do rebaixo que um raio só do centro da face dava como expostas, e a segunda dava −80 mm numa placa de prova, medindo a face de baixo contra o outro lado da chapa.
+   Custo: três voltas de medida, cerca de 30 minutos.
+   O processo pegou: sim, o controle c01 e o teste da placa que afunda.
+   Destino: ferramenta, os quatro raios por face, a exigência de faces viradas para o mesmo lado e o meio do caminho fora da vizinha, em `degrauDaParte`.
+4. Os dois testes do gate sobre o conjunto versionado esperam o conjunto passando e ficaram vermelhos quando os dezoito julgamentos foram registrados com 2 de 6: `npx vitest run tools/modelar/calibracao-do-critico.test.mjs`.
+   Custo: nenhum nesta etapa; o envio com eles vermelhos não junta.
+   O processo pegou: sim, o próprio teste.
+   Destino: nenhum por enquanto: voltam a passar quando a pessoa decidir o c01 e o mínimo, ou quando o teste separar o formato do conjunto da nota do crítico.

@@ -619,6 +619,28 @@ describe('a medição da receita atual trava o laço', () => {
 
 /* A RODADA LIDA DIRETO DO QUE OS AGENTES DEVOLVERAM. As fixtures são pequenas e sintéticas, nos dois formatos que o comando reconhece:
    texto puro e a transcrição JSONL do harness (um bloco da resposta por linha, com thinking, tool_use e dois textos na última mensagem). */
+describe('a medição confere as promessas de lados e de rente do PLANO', () => {
+  const copia = (n) => `tools/fixtures/acervo/peca-c0${n}/receita.js`;
+
+  it('a parte prometida rente que sai da vizinha reprova, e a mesma peça com ela rente passa', async () => {
+    const rente = await medirReceita(copia(1));
+    expect(rente.passou, rente.relatorio).toBe(true);
+    expect(rente.relatorio).toContain('promessas medidas');
+    const saliente = await medirReceita(copia(2));
+    expect(saliente.passou).toBe(false);
+    expect(saliente.relatorio).toMatch(/promessa do PLANO que a malha não cumpre: a parte 'parabrisa' sai 29,2 mm em relação à superfície de 'fuselagem'/);
+  }, 120_000);
+
+  it('a revolução com menos lados que os prometidos reprova, e a que tem os lados passa', async () => {
+    const lisa = await medirReceita(copia(3));
+    expect(lisa.passou, lisa.relatorio).toBe(true);
+    const facetada = await medirReceita(copia(4));
+    expect(facetada.passou).toBe(false);
+    expect(facetada.relatorio).toMatch(/a parte 'cilindroElevacao' saiu com 12 lados em volta de y, e o PLANO promete 96 lados \(mínimo 72\)/);
+    expect(facetada.relatorio).toMatch(/a parte 'hasteElevacao' saiu com 12 lados/);
+  }, 120_000);
+});
+
 describe('o veredito só se registra sobre o pacote que mostra a receita medida, em toda peça', () => {
   const PECA = 'peca-de-ensaio';
   const CONFERIDA = { partes: [{ nome: 'corpo', confere: true }, { nome: 'tampa', confere: true }] };

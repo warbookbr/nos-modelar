@@ -94,6 +94,7 @@ import { normalizarPlanoDeModelagem } from '../../src/autoria/plano-de-modelagem
 import { comandoDoPacote, pastaDaRodada, superficieDaPecaMedida, superficieDoPacote } from './vistas-de-superficie.mjs';
 import { palavras } from './leitura-por-regioes.mjs';
 import { lascasDaReceita } from './lasca.mjs';
+import { conferirPromessasMedidas } from './promessa-medida.mjs';
 
 const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
 
@@ -574,7 +575,8 @@ const luzDaMedicao = (medicao) => (medicao.luzRasante?.luzRasante ? medicao.luzR
 
 /**
  * A medição da receita atual da peça, feita pela ferramenta: o veredito de `descrever` (partes, refinamento, contatos, formas e a
- * forma contra a referência), a guarda do acervo e a do referencial sobre a peça, e os `PONTOS` quando ela os declara. Devolve
+ * forma contra a referência), a guarda do acervo e a do referencial sobre a peça, os `PONTOS` quando ela os declara e as promessas de
+ * lados e de rente do `PLANO` contra a malha. Devolve
  * `{ passou, relatorio, sha256, texto, lataria, avisos }`: `sha256` é a impressão do texto da receita que foi medida (a mesma que a rodada
  * grava), `texto` é esse texto, para a rodada gravar o que foi medido e não o que está no disco depois, `lataria` diz se a peça é de
  * lataria (`superficieDaReceita`), `luzRasante` se a peça leva a luz rasante ao pacote (lataria ou emenda sombreada) e `avisos` o que o resumo do laço mostra sem reprovar (a dispensa de `PLANO.lataria`, com o motivo).
@@ -610,6 +612,12 @@ export async function medirReceita(peca, { rodadas, pasta, registroDasEtapas, ca
   let plano = null;
   try { plano = normalizarPlanoDeModelagem(receita?.PLANO); } catch { plano = null; }
   const avisos = [avisoDaDispensa(plano)].filter(Boolean);
+  /* as promessas do PLANO que a malha responde por número: os lados da revolução e a parte rente à vizinha (`promessa-medida.mjs`) */
+  if (plano && executada?.neutro) {
+    const promessas = conferirPromessasMedidas(plano, executada.neutro);
+    if (promessas.medidas.length > 0) feitas.push('promessas medidas');
+    for (const falha of promessas.falhas) falhas.push(`promessa do PLANO que a malha não cumpre: ${falha}`);
+  }
   const facesFinas = facesFinasDaMalha(receita, { executada });
   if (facesFinas && facesFinas.total > 0) {
     const anteriores = rodadas ?? lerRodadasSeHouver(peca);

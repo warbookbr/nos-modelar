@@ -193,7 +193,7 @@ function lerFonte(fonte, onde, grupo) {
 
 function lerDefeito(d, onde) {
   if (!plano(d)) recusar(onde, d, 'objeto { parte, tipo, sentido, onde, palavras, aceitos }');
-  chaves(d, ['parte', 'tipo', 'sentido', 'onde', 'palavras', 'aceitos'], onde);
+  chaves(d, ['parte', 'tipo', 'sentido', 'onde', 'palavras', 'aceitos', 'lugar', 'contrarios'], onde);
   exigir(d, ['parte', 'tipo', 'sentido', 'onde', 'palavras', 'aceitos'], onde);
   if (!texto(d.parte)) recusar(`${onde}.parte`, d.parte, 'nome da parte como o defeito a cita');
   if (!Object.hasOwn(TIPOS_DE_DEFEITO, d.tipo) || d.tipo === 'cota') recusar(`${onde}.tipo`, d.tipo, `tipo do vocabulário do crítico: ${Object.keys(TIPOS_DE_DEFEITO).filter((t) => t !== 'cota').join(', ')}`);
@@ -205,6 +205,16 @@ function lerDefeito(d, onde) {
   const doVocabulario = (par) => { const [tipo, sentido, ...resto] = String(par).split('/'); return resto.length === 0 && Object.hasOwn(TIPOS_DE_DEFEITO, tipo) && TIPOS_DE_DEFEITO[tipo].includes(sentido); };
   if (!(Array.isArray(d.aceitos) && d.aceitos.includes(`${d.tipo}/${d.sentido}`) && d.aceitos.every(doVocabulario) && new Set(d.aceitos).size === d.aceitos.length)) {
     recusar(`${onde}.aceitos`, d.aceitos, `lista de "tipo/sentido" do vocabulário, sem repetição, que inclui '${d.tipo}/${d.sentido}': as formas de o crítico dizer este defeito, e não o contrário dele`);
+  }
+  /* o defeito que o crítico pode descrever por outro tipo (a fenda curta no lugar do raio largo) declara o lugar e o que o nega */
+  if (d.lugar !== undefined && !(Array.isArray(d.lugar) && d.lugar.length > 0 && d.lugar.every((p) => texto(p) && /^[a-z0-9]+$/.test(dobrar(p)) && p === p.toLowerCase()) && new Set(d.lugar).size === d.lugar.length)) {
+    recusar(`${onde}.lugar`, d.lugar, 'lista de palavras inteiras em minúsculas, sem repetição, que dizem o lugar do defeito no `onde` do veredito (por exemplo "fenda", "cubo")');
+  }
+  if (d.contrarios !== undefined) {
+    if (d.lugar === undefined) recusar(`${onde}.contrarios`, d.contrarios, 'nada: `contrarios` só vale junto de `lugar`, que é a regra que aceita outro tipo');
+    if (!(Array.isArray(d.contrarios) && d.contrarios.length > 0 && d.contrarios.every(doVocabulario) && new Set(d.contrarios).size === d.contrarios.length && !d.contrarios.some((par) => d.aceitos.includes(par)))) {
+      recusar(`${onde}.contrarios`, d.contrarios, 'lista de "tipo/sentido" do vocabulário, sem repetição e fora dos `aceitos`: as formas de dizer o contrário do defeito, que não o citam nem no lugar certo');
+    }
   }
 }
 
@@ -556,7 +566,12 @@ export async function medir({ id, raiz = RAIZ, rodar = rodarMedicaoDaRodada, for
     caso.medicao = { passou: medicao.passou, comando, receitaSha256: atual, forma: formaDaCopia, relatorio: medicao.relatorio };
     if (destino === 'medida' || mudouDeDestino) { delete caso.pedido; delete caso.imagens; }
     if (destino === 'medida') caso.obrigatorio = false;
-    saida.log(`${caso.id} ${caso.nome}: a medição da rodada ${medicao.passou ? 'passou, e o caso segue para o crítico' : 'reprovou, e o caso fica como prova da medida, sem julgamento'}.`);
+    /* o caso que a medida reprova não tem o que mostrar ao crítico: a pasta do pedido e das imagens sai junto */
+    const pastaDoCaso = resolve(raiz, PASTA_DO_CONJUNTO, PASTA_DOS_CASOS, caso.id);
+    const tinhaPasta = destino === 'medida' && existsSync(pastaDoCaso);
+    if (tinhaPasta) rmSync(pastaDoCaso, { recursive: true });
+    const julgados = destino === 'medida' ? (conj.resultados.find((res) => res.caso === caso.id)?.julgamentos.length ?? 0) : 0;
+    saida.log(`${caso.id} ${caso.nome}: a medição da rodada ${medicao.passou ? 'passou, e o caso segue para o crítico' : 'reprovou, e o caso fica como prova da medida, sem julgamento'}${julgados ? `; ${julgados} julgamento(s) dele saem do conjunto` : ''}${tinhaPasta ? `; o pedido e as imagens em ${PASTA_DO_CONJUNTO}/${PASTA_DOS_CASOS}/${caso.id}/ saíram com ele` : ''}.`);
   }
   acertarARegra(conj);
   gravarConjunto(conj, raiz, { exigirPreparados: false });
@@ -695,13 +710,26 @@ export function despachos({ raiz = RAIZ } = {}, saida = console) {
 /* ---------- o gate ---------- */
 
 /**
- * O julgamento cita o defeito esperado quando traz um defeito cuja `parte` ou cujo `onde` tem uma das `palavras` (sem distinguir
- * maiúscula nem acento) e cujo tipo e sentido estão entre os `aceitos`. As duas condições juntas: o crítico que aponta a parte certa
- * com o sentido contrário (raio fino onde a pessoa reprovou o raio largo) não citou o defeito.
+ * O julgamento cita o defeito esperado de duas formas. Pela regra do tipo: traz um defeito cuja `parte` ou cujo `onde` tem uma das
+ * `palavras` (sem distinguir maiúscula nem acento) e cujo tipo e sentido estão entre os `aceitos`; o crítico que aponta a parte certa
+ * com o sentido contrário (raio fino onde a pessoa reprovou o raio largo) não citou o defeito. Pela regra do lugar, só no defeito que
+ * declara `lugar`: traz um defeito cuja `parte` tem uma das `palavras` e cujo `onde` tem uma das palavras de `lugar`, inteira, com
+ * qualquer tipo que não esteja nos `contrarios`. O mesmo defeito visto se descreve por tipos diferentes (o par fechado junto ao centro
+ * saiu como espessura maior do raio e como comprimento menor da fenda), e a parte e o lugar certos bastam.
  */
 export function citaDefeito(julgamento, defeito) {
   const palavras = defeito.palavras.map(dobrar);
-  return julgamento.defeitos.some((d) => defeito.aceitos.includes(`${d.tipo}/${d.sentido}`) && palavras.some((p) => dobrar(d.parte).includes(p) || dobrar(d.onde).includes(p)));
+  const lugar = (defeito.lugar ?? []).map(dobrar);
+  const contrarios = defeito.contrarios ?? [];
+  return julgamento.defeitos.some((d) => {
+    const par = `${d.tipo}/${d.sentido}`;
+    const parte = dobrar(d.parte);
+    const onde = dobrar(d.onde);
+    if (defeito.aceitos.includes(par) && palavras.some((p) => parte.includes(p) || onde.includes(p))) return true;
+    if (lugar.length === 0 || contrarios.includes(par) || !palavras.some((p) => parte.includes(p))) return false;
+    const inteiras = onde.split(/[^a-z0-9]+/);
+    return lugar.some((p) => inteiras.includes(p));
+  });
 }
 
 const mediana = (notas) => {

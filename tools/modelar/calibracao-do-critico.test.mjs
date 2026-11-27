@@ -227,6 +227,16 @@ describe('o formato recusa o caso que não é o que diz ser', () => {
     expect(recusa((conj) => { conj.casos[1].defeitos[0].aceitos = ['espessura/menor']; })).toMatch(/aceitos .* que inclui 'espessura\/maior'/);
   });
 
+  it('o lugar do defeito com palavra que não é inteira ou repetida, e o contrário sem lugar, entre os aceitos ou fora do vocabulário', () => {
+    expect(recusa((conj) => { conj.casos[1].defeitos[0].lugar = ['junto ao cubo']; })).toMatch(/lugar .*palavras inteiras em minúsculas/);
+    expect(recusa((conj) => { conj.casos[1].defeitos[0].lugar = ['cubo', 'cubo']; })).toMatch(/lugar .*sem repetição/);
+    expect(recusa((conj) => { conj.casos[1].defeitos[0].lugar = []; })).toMatch(/lugar .*palavras inteiras/);
+    expect(recusa((conj) => { conj.casos[1].defeitos[0].contrarios = ['espessura/menor']; })).toMatch(/`contrarios` só vale junto de `lugar`/);
+    expect(recusa((conj) => { Object.assign(conj.casos[1].defeitos[0], { lugar: ['cubo'], contrarios: ['espessura/maior'] }); })).toMatch(/contrarios .*fora dos `aceitos`/);
+    expect(recusa((conj) => { Object.assign(conj.casos[1].defeitos[0], { lugar: ['cubo'], contrarios: ['espessura/torta'] }); })).toMatch(/contrarios .*do vocabulário/);
+    expect(recusa((conj) => { Object.assign(conj.casos[1].defeitos[0], { lugar: ['cubo'], contrarios: ['espessura/menor'] }); })).toBe(null);
+  });
+
   it('o caso que a medida reprova não tem pedido, imagem nem julgamento, e o que passa tem de chegar ao crítico', () => {
     expect(recusa((conj) => { conj.casos[2].pedido = conj.casos[1].pedido; })).toMatch(/nada: o caso que a medida reprova não tem pedido nem imagem/);
     expect(recusa((conj) => { conj.casos[1].destino = 'medida'; })).toMatch(/"critico": a medição passou/);
@@ -317,6 +327,20 @@ describe('a cópia de ensaio e a medição da rodada', () => {
     expect(conj.casos[1].imagens).toBeUndefined();
     expect(conj.casos[1].medicao.relatorio).toMatch(/falta o contato/);
     expect(conj.regra.passa).toEqual({ minimo: 1, de: 1, obrigatorias: [] });
+    expect(conferirConjunto({ raiz }).ok).toBe(true);
+  });
+
+  it('o caso já julgado que a medição passa a reprovar leva os julgamentos e a pasta do pedido, e o medir diz quantos saíram', async () => {
+    regravar(raiz, (conj) => { conj.resultados.push({ caso: 'c02', agenteSha256: conj.critico.agente.sha256, julgamentos: [julgamento(conj.casos[1]), julgamento(conj.casos[1])] }); });
+    expect(existsSync(join(raiz, PASTA_DO_CONJUNTO, 'casos/c02/pedido.txt'))).toBe(true);
+    const rodar = () => ({ codigo: 0, texto: 'medição da receita atual (sha256:abcd): reprovou\npróxima ação: modelar — promessa do PLANO que a malha não cumpre\ndefeitos em aberto: nenhum.' });
+    const saida = saidaFalsa();
+    expect(await medir({ id: 'c02', raiz, rodar, forma: async () => FORMA_COM_DEFEITO }, saida)).toBe(0);
+    expect(saida.linhas.log.join('\n')).toMatch(/2 julgamento\(s\) dele saem do conjunto; o pedido e as imagens em .*casos\/c02\/ saíram com ele/);
+    expect(gravado(raiz).resultados).toEqual([]);
+    expect(existsSync(join(raiz, PASTA_DO_CONJUNTO, 'casos/c02'))).toBe(false);
+    /* o caso que continua passando fica com a pasta e com os julgamentos */
+    expect(existsSync(join(raiz, PASTA_DO_CONJUNTO, 'casos/c01/pedido.txt'))).toBe(true);
     expect(conferirConjunto({ raiz }).ok).toBe(true);
   });
 
@@ -460,6 +484,37 @@ describe('a pontuação', () => {
     expect(citaDefeito(com(defeitoJulgado('haste', 'espessura', 'menor')), esperado)).toBe(false);
     expect(citaDefeito(com(defeitoJulgado('camisa', 'espessura', 'maior')), esperado)).toBe(false);
     expect(citaDefeito({ defeitos: [] }, esperado)).toBe(false);
+  });
+
+  it('o defeito que declara o lugar é citado pela parte e pelo lugar com outro tipo, e não pelo lugar errado, pela parte errada nem pelo contrário', () => {
+    const esperado = { ...conj.casos[1].defeitos[0], parte: 'raios', palavras: ['raio', 'par'], lugar: ['par', 'fenda', 'cubo'], contrarios: ['espessura/menor'] };
+    const com = (d) => ({ defeitos: [d] });
+    /* o mesmo defeito por outro tipo: a fenda curta junto ao cubo no lugar do raio largo */
+    expect(citaDefeito(com(defeitoJulgado('raios', 'comprimento', 'menor', 'fenda entre os dois raios de cada par, a partir do cubo')), esperado)).toBe(true);
+    expect(citaDefeito(com(defeitoJulgado('Raios', 'superficie', 'anguloso', 'junto ao CUBO')), esperado)).toBe(true);
+    /* a parte certa no lugar errado, com tipo fora dos aceitos */
+    expect(citaDefeito(com(defeitoJulgado('raios', 'uniao', 'atravessando', 'pontas externas, junto ao lábio do aro')), esperado)).toBe(false);
+    /* a palavra do lugar só vale inteira: parede e parte não são par */
+    expect(citaDefeito(com(defeitoJulgado('raios', 'superficie', 'anguloso', 'parede de fora, na parte de cima')), esperado)).toBe(false);
+    /* o lugar certo em outra parte */
+    expect(citaDefeito(com(defeitoJulgado('aro', 'comprimento', 'menor', 'fenda junto ao cubo')), esperado)).toBe(false);
+    /* o contrário do defeito não o cita nem no lugar certo */
+    expect(citaDefeito(com(defeitoJulgado('raios', 'espessura', 'menor', 'cada raio do par, junto ao cubo')), esperado)).toBe(false);
+    /* a regra do tipo continua valendo sozinha, e o defeito sem `lugar` não ganha a regra nova */
+    expect(citaDefeito(com(defeitoJulgado('raios', 'espessura', 'maior', 'corpo inteiro')), esperado)).toBe(true);
+    const semLugar = conj.casos[1].defeitos[0];
+    expect(citaDefeito(com(defeitoJulgado('haste', 'comprimento', 'menor', 'corpo da haste')), semLugar)).toBe(false);
+  });
+
+  it('o resumo do conjunto versionado conta o par fechado da roda descrito por dois tipos, sem julgamento novo', () => {
+    const real = lerConjuntoDoDisco();
+    const roda = real.casos.find((k) => k.defeitos.some((d) => d.lugar));
+    const julgamentos = real.resultados.find((res) => res.caso === roda.id).julgamentos;
+    const citam = julgamentos.map((j) => citaDefeito(j, roda.defeitos[0]));
+    expect(citam.filter(Boolean).length).toBe(2);
+    const semLugar = { ...roda.defeitos[0] }; delete semLugar.lugar; delete semLugar.contrarios;
+    expect(julgamentos.filter((j) => citaDefeito(j, semLugar)).length).toBe(1);
+    expect(pontuar(real).casos.find((k) => k.id === roda.id).acerta).toBe(true);
   });
 
   it('o caso com defeito acerta citado em dois de três e sem nota 10, e erra quando o crítico não o cita', () => {

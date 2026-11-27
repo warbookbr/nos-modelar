@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2472 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2474 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -4309,6 +4309,8 @@
 - `preenchimento-da-rede.test.mjs` — preenchimento-da-rede.test.mjs — o diagnóstico do preenchimento pelas curvas vizinhas, medido nas chapas de prova e pela linha de comando.
 - `procedencia-check.mjs` — Gate N3: contrato reduzido e explícito de procedência da fonte de restrições.
 - `procedencia-check.test.mjs` — Provas do gate N3 para procedência de valores estruturais.
+- `promessa-medida.mjs` — promessa-medida.mjs — duas promessas do PLANO que a malha responde por número, conferidas na medição da rodada.
+- `promessa-medida.test.mjs` — promessa-medida.test.mjs — os lados da revolução e a parte rente, medidos nos dois sentidos: em malhas de prova e nas cópias de ensaio da calibração do críti…
 - `proporcoes.mjs` — proporcoes.mjs — a fonte única das medidas de uma montagem, e a conferência de que os outros lugares a seguem.
 - `proporcoes.test.mjs` — proporcoes.test.mjs — a fonte única de proporção: fórmula, medidas, o andaime gerado, as TABELAs marcadas, a conferência que acusa a edição feita só num luga…
 - `raio-da-aresta.mjs` — raio-da-aresta.mjs — mede o raio de cada aresta de caráter de uma peça, sobre a malha final.
