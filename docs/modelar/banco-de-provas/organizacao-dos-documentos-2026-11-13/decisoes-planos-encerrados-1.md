@@ -9,7 +9,7 @@ Estado: concluído, em 2026-08-04. Crônica: não tem linha.
 
 ## 2026-08-05-mcp-autoria-controlada.md
 Estado: concluído (decisão `interromper`), em 2026-08-05. Crônica: tem linha.
-- [B] Publicar um diretório de pacote com transição única e sem sobrescrita não é garantido pela API portátil de `fs` do Node; a autoria controlada foi interrompida e só retoma com primitivo `no-replace` ou protocolo de commit revisado. Porquê: `mkdir` exclusivo seguido de dois `rename` deixa janela observável. Lugar: `docs/modelar/contratos/ESCRITA-TRANSACIONAL-MONTAGEM.md` (o experimento do PR #25 e a solução por revisões imutáveis) e `docs/modelar/guias/FLUXO-MODELAGEM-IA.md`.
+- [B] Publicar um diretório de pacote com transição única e sem sobrescrita não é garantido pela API portátil de `fs` do Node; a autoria controlada foi interrompida e só retoma com primitivo `no-replace` ou protocolo de commit revisado. Porquê: `mkdir` exclusivo seguido de dois `rename` deixa janela observável. Lugar: `docs/modelar/contratos/ESCRITA-TRANSACIONAL-MONTAGEM.md` (o experimento do PR #25 e a solução por revisões imutáveis) e `docs/modelar/usar/FLUXO-DO-OBJETO.md` (que absorveu em 2026-11-27 o antigo fluxo de modelagem da IA).
 
 ## 2026-08-05-mcp-avaliacao-consolidada.md
 Estado: concluído (decisão `corrigir`), em 2026-08-05. Crônica: tem linha.

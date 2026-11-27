@@ -198,7 +198,7 @@ Estado: concluído, em 2026-11-06. Crônica: tem linha.
 
 ## 2026-11-05-navegacao-de-receitas.md
 Estado: concluído, em 2026-11-05. Crônica: tem linha.
-- [B] Receita acima de 1.000 linhas se divide em arquivos por assunto, e o mapa de qualquer receita sai por `npm run receita:mapa`. Porquê: um modelador leu 30 KB contra 81 KB da linha de base. Lugar: `docs/modelar/usar/GUIA-AUTORIA-IA.md` (seção 2), `tools/modelar/mapa-da-receita.mjs`.
+- [B] Receita acima de 1.000 linhas se divide em arquivos por assunto, e o mapa de qualquer receita sai por `npm run receita:mapa`. Porquê: um modelador leu 30 KB contra 81 KB da linha de base. Lugar: `docs/modelar/usar/FLUXO-DO-OBJETO.md` (que absorveu em 2026-11-27 o antigo guia de autoria da IA) (seção 2), `tools/modelar/mapa-da-receita.mjs`.
 
 ## 2026-11-05-porta-de-entrada-dos-agentes.md
 Estado: concluído, em 2026-11-05. Crônica: tem linha.
