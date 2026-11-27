@@ -2,7 +2,7 @@
 
    Os quatro primeiros têm o nome do componente de cabo da Unreal (CableComponent) e a unidade dele, o centímetro: CableLength (o comprimento do cabo, aqui o de corte),
    CableWidth (a largura, aqui o diâmetro), NumSegments (os trechos da curva) e NumSides (os lados da seção). Os nossos, em milímetro, vão ao lado: comprimentoDeCorteMm,
-   diametroMm, raioMinimoMm e lados. Os nomes dos nós das pontas (AttachStartTo e AttachEndTo) quem acrescenta é o exportador, que é quem nomeia os nós. */
+   diametroMm, raioMinimoMm, raioMinimoDiametros, caimento e lados (os dois últimos, com o comprimento, são o que o addon do Blender usa para refazer a curva). Os nomes dos nós das pontas (AttachStartTo e AttachEndTo) quem acrescenta é o exportador, que é quem nomeia os nós. */
 import { medidasDoPedido } from './pedido.js';
 
 const arredonda = (v, casas = 4) => { const f = 10 ** casas; return Math.round(v * f) / f + 0; };
@@ -19,6 +19,8 @@ export function extrasDoCabo(pedido) {
     comprimentoDeCorteMm: arredonda(m.comprimentoDeCorte),
     diametroMm: arredonda(diametro),
     raioMinimoMm: arredonda(m.raioMinimo),
+    raioMinimoDiametros: arredonda(pedido.raioMinimo ?? 5),
+    caimento: arredonda(pedido.caimento ?? 0),
     lados: m.lados,
     unidadeDaUnreal: 'cm',
   };

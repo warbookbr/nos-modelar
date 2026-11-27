@@ -64,3 +64,33 @@ O Blender rodou aqui pelo módulo `bpy` (o download do executável é recusado p
 4. Em `Attach End To`, escolha o componente `cabo.ponta-para` (o nome está em `AttachEndTo`, e o de início em `AttachStartTo`). Esconda a malha estática `cabo` (é a pose de repouso, para quem não monta o cabo vivo).
 5. O CableComponent simula a corda com a gravidade e o atrito da Unreal; os valores dos extras dão o tamanho e a seção, e a forma em cada pose é a dela. Para o cabo de comprimento certo em cada ângulo, o dado é o comprimento de corte (`comprimentoDeCorteMm`), que a simulação da Unreal só aproxima.
 
+## Fatia 6: o addon do Blender que mantém o comprimento do cabo (2026-11-27)
+
+O addon é o pacote `modulos/exportador-gltf/blender/addon_cabo_vivo/` (`__init__.py` com o painel e os operadores, `cabos.py` com a ligação ao Blender, `elastica.py` com a conta em numpy, sem `bpy`, e `blender_manifest.toml`). A exportação com cabo grava `modelar_cabo_vivo.zip` ao lado do `.glb` e do `cabo-vivo.py`; o `.zip` é a extensão do Blender 4.2 ou mais nova, com o manifesto na raiz.
+
+Como instalar e usar:
+
+1. No Blender (4.2 ou mais novo): Edit > Preferences > Get Extensions, o menu de cima à direita (setinha), Install from Disk, e escolha `modelar_cabo_vivo.zip`. Deixe a extensão ligada.
+2. Importe o `.glb` (File > Import > glTF 2.0).
+3. Na vista 3D, aperte N e abra a aba Modelar, painel Cabo vivo: Montar cabos cria, para cada cabo importado, uma curva de Bézier com espessura (bevel pelo diâmetro, lados pela resolução do bevel), esconde a malha estática do cabo e a refaz na hora. Dali em diante, girar o nó da junta ou animá-lo refaz a curva em cada quadro com o comprimento de corte. O painel mostra o estado de cada cabo (`ok`, `estica` quando as pontas ficam longe demais para o comprimento, `dobra` quando o raio de dobra da haste cai abaixo do declarado) e o comprimento da curva.
+4. Gravar cabos percorre o intervalo da animação da cena (início e fim da linha do tempo), refaz o cabo a frio em cada quadro e grava a forma como chaves de animação nos pontos e alças da curva. O cabo gravado deixa de ser refeito pelo addon, e o arquivo `.blend` reproduz a forma sem o addon, em outro computador e na renderização. Desgravar cabos apaga a gravação e devolve o cabo ao modo vivo.
+
+Sem janela e sem painel, o mesmo cabe em Python: `bpy.ops.modelar.cabos_montar()`, `bpy.ops.modelar.cabos_gravar()` e `bpy.ops.modelar.cabos_desgravar()`.
+
+O que o addon lê é o que a exportação grava nos `extras` do nó do cabo (`comprimentoDeCorteMm`, `diametroMm`, `lados`, `raioMinimoDiametros`, `caimento`) e os dois nós vazios das pontas (`AttachStartTo` e `AttachEndTo`): a posição de cada vazio é a ponta e o +Z dele no Blender é a direção de saída. O caimento puxa o cabo para −Z do mundo. A conta é a da família portada: a mesma haste de 17 a 97 nós, a mesma elástica por complemento de Schur com a projeção de Newton, a mesma Hermite entre os nós (o Bézier do Blender tem as alças da Hermite, um terço da corda) e o mesmo acerto do comprimento liso a 0,02%. Ela é determinística: mesmo estado, mesma saída. Enquanto a junta se move, a conta parte da forma anterior quando as pontas andaram menos de três trechos e viraram menos de 0,3; senão parte do palpite de Bézier. Os dois dão a mesma curva: a diferença é de 4e-9 mm. Vale só para o cabo de duas pontas: passagens, terminais e feixe não vão nos `extras`, e o addon refaz um cabo livre entre as duas pontas.
+
+Medido aqui (Blender 5.3 como biblioteca do Python, `MODELAR_BPY_PYTHON=<python com bpy> npx vitest run tools/blender/cabo-vivo.test.mjs`; o teste instala o `.zip` como extensão, importa o `.glb` do arranjo que passa, monta e gira a junta A de −90° a 90° de 15 em 15 graus; sem o Blender ele se pula):
+
+| Medida | Resultado |
+| --- | --- |
+| comprimento da curva avaliada contra o de corte (150 mm) | dentro de 0,5% em todos os ângulos |
+| pontas contra a montagem | a menos de 0,1 mm em todos os ângulos |
+| raio mínimo de dobra da haste (declarado 9 mm) | 13,00 mm no pior ângulo (±90°) |
+| raio mínimo da curva lisa medido por três pontos | 7,16 mm no pior ângulo (±90°): a Hermite passa abaixo do raio da haste junto da emenda do trecho reto da ponta; a conta da família tem a mesma curva |
+| distância máxima entre a curva do Blender e as estações da família | 0,127 mm no meio do curso, 0,183 mm no maior do curso (a polilinha das estações da família já se afasta até 0,2 mm da curva lisa) |
+| tempo por atualização, um cabo (curso em passos de 1 grau) | 3,8 ms a conta em média (5,9 ms no máximo), 4,1 ms o quadro inteiro; 11,9 iterações em média |
+| tempo por atualização, cinco cabos | 19,5 ms a conta em média (40,8 ms no máximo), 20,1 ms o quadro inteiro |
+| gravar, 13 quadros, 189 curvas de animação | o arquivo aberto sem o addon (desligado e arquivo reaberto, sem nenhum gancho dele) reproduz a forma viva com diferença máxima de 4e-9 mm; depois de gravado o addon não refaz mais a curva |
+
+O salto de ângulo grande (as pontas andando mais de três trechos entre duas atualizações) parte do palpite e leva uns 30 a 50 ms por cabo; arrastar a junta pelo mouse é o caso de passos pequenos. Não testado: Blender 4.2 e 4.3 (o código de gravar usa as curvas da ação plana nesses; só o Blender 5.3 foi rodado), a janela do Blender (o painel), e o Blender de verdade como executável (aqui só o módulo `bpy`).
+

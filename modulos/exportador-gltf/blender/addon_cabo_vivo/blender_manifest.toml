@@ -1,0 +1,9 @@
+schema_version = "1.0.0"
+id = "modelar_cabo_vivo"
+version = "1.0.0"
+name = "Modelar - cabo vivo"
+tagline = "Mantém o comprimento do cabo importado do Modelar quando as pontas se movem"
+maintainer = "Modelar"
+type = "add-on"
+blender_version_min = "4.2.0"
+license = ["SPDX:MIT"]
