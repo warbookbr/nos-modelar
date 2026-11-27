@@ -107,6 +107,9 @@ export function registrarRodada({ peca, numero, veredito, medidas, partes, atrit
       relatorio: String(medidas.relatorio ?? '').trim(),
       ...(Number.isInteger(medidas.faces) && medidas.faces >= 0 ? { faces: medidas.faces } : {}),
       ...(Number.isFinite(medidas.segundos) && medidas.segundos >= 0 ? { segundos: medidas.segundos } : {}),
+      /* de onde a execução recomeçou no cache por passo e o total de passos: o tempo de cache quente não é o de cache frio */
+      ...(Number.isInteger(medidas.cachePorPasso?.recomecouDoPasso) && medidas.cachePorPasso.recomecouDoPasso >= 0
+        ? { cachePorPasso: { recomecouDoPasso: medidas.cachePorPasso.recomecouDoPasso, ...(Number.isInteger(medidas.cachePorPasso.total) && medidas.cachePorPasso.total >= 0 ? { total: medidas.cachePorPasso.total } : {}) } } : {}),
     },
     /* Sem veredito quando as medidas reprovaram: não se gasta revisão em peça
        que já falhou no que é contável. */
@@ -167,7 +170,9 @@ function normalizarReceita(valor) {
   if (!valor || typeof valor !== 'object') falhar("'receita' precisa ser objeto gerado pela ferramenta.");
   if (!/^sha256:[0-9a-f]{64}$/.test(valor.sha256 ?? '')) falhar("'receita.sha256' precisa ser a impressão sha256 do texto.");
   if (!valor.diferenca || !Array.isArray(valor.diferenca.linhas)) falhar("'receita.diferenca' precisa trazer as linhas.");
-  return { sha256: valor.sha256, diferenca: valor.diferenca };
+  /* `fontes` é a impressão do conjunto das fontes da receita (o `receita.js`, o que ela divide em `receita/` e o módulo comum): só a ferramenta a grava, e as rodadas de antes não a têm */
+  if (valor.fontes !== undefined && !/^sha256:[0-9a-f]{64}$/.test(valor.fontes)) falhar("'receita.fontes' precisa ser a impressão sha256 do conjunto das fontes.");
+  return { sha256: valor.sha256, ...(valor.fontes ? { fontes: valor.fontes } : {}), diferenca: valor.diferenca };
 }
 
 const LIMITE_OBSERVACAO_DE_PARTE = 240;

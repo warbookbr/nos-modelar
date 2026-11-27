@@ -223,6 +223,11 @@ jobs:
         if: ${{ !cancelled() }}
         run: npm run dossie:check
 
+      # A parte cuja receita mudou sem rodada registrada, nos objetos que o envio mudou, salvo declaração da pessoa em rodadas/sem-rodada.json.
+      - name: Partes dos objetos mudados com rodada registrada
+        if: ${{ !cancelled() }}
+        run: npm run rodadas:check
+
       # O banco de provas e registro de custo mantém o documento de custo sincronizado
       # com o JSON de medições e objetos selecionados.
       - name: Banco de provas e registro de custo em dia com o JSON

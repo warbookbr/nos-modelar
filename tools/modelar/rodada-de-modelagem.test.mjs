@@ -500,7 +500,7 @@ describe('a medição da receita atual trava o laço', () => {
   const PECA = 'peca-de-ensaio';
   const entrada = (extra = {}) => ({ partes: CONFERIDAS, ...extra });
   /* o tempo da execução muda de uma medição para outra; o resto da medição é determinístico */
-  const semTempo = ({ segundos: _s, ...resto }) => resto;
+  const semTempo = ({ segundos: _s, cachePorPasso: _c, ...resto }) => resto;
 
   it('mede com o veredito, as guardas do acervo e do referencial, e identifica a receita pelo hash do texto', async () => {
     const ok = await medirReceita(fixture('ok'));
@@ -528,6 +528,24 @@ describe('a medição da receita atual trava o laço', () => {
     /* a medição sem as duas (receita que não executa) grava a rodada como as antigas: só passou e relatório */
     const { rodada: semMedida } = await registrarMedida(PECA, entrada(), { pasta, medir: async () => { const { faces: _f, segundos: _s, ...resto } = ok; return resto; } });
     expect(Object.keys(semMedida.medidas).sort()).toEqual(['passou', 'relatorio']);
+  });
+
+  it('a medição traz a impressão das fontes e o cache da primeira execução, e a rodada grava receita.fontes e medidas.cachePorPasso ao lado de segundos', async () => {
+    const ok = await medirReceita(fixture('ok'));
+    expect(ok.fontes).toBe(ok.sha256);
+    expect(ok.cachePorPasso).toMatchObject({ recomecouDoPasso: expect.any(Number), total: expect.any(Number) });
+    expect(ok.cachePorPasso.recomecouDoPasso).toBeLessThanOrEqual(ok.cachePorPasso.total);
+    const fria = await medirReceita(fixture('ok'), { cache: false });
+    expect(fria.cachePorPasso).toBeUndefined();
+    const pasta = join(area, PECA);
+    const fontes = `sha256:${'a'.repeat(64)}`;
+    const { rodada, arquivo } = await registrarMedida(PECA, entrada(), { pasta, medir: async () => ({ ...ok, fontes, faces: 10, segundos: 1.5, cachePorPasso: { recomecouDoPasso: 7, total: 12 } }) });
+    expect(rodada.medidas).toMatchObject({ faces: 10, segundos: 1.5, cachePorPasso: { recomecouDoPasso: 7, total: 12 } });
+    expect(rodada.receita).toMatchObject({ sha256: ok.sha256, fontes });
+    expect(JSON.parse(readFileSync(arquivo, 'utf8')).receita.fontes).toBe(fontes);
+    /* a rodada sem o cache (receita sem passos executáveis) segue como as de antes */
+    const { rodada: semCache } = await registrarMedida(PECA, entrada(), { pasta, medir: async () => ({ ...ok, faces: 10, segundos: 1.5, cachePorPasso: undefined }) });
+    expect(semCache.medidas.cachePorPasso).toBeUndefined();
   });
 
   it('medidas.segundos mede a primeira execução da rodada (a guarda do acervo que aquece o cache), e não a leitura do cache quente', async () => {

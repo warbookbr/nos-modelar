@@ -128,6 +128,9 @@ export const GATES = [
   /* Todo `DOSSIE.md` de objeto em `procedural/pecas/` contra o que o gerador faz hoje do que está gravado (receita, rodadas, planos,
      tabela de tentativas, atritos), e a seção à mão intacta: dossiê desatualizado vira texto que mente sobre o objeto. */
   'dossie:check',
+  /* A parte cuja receita mudou sem rodada registrada (as fontes: receita.js, receita/ e o módulo comum), nos objetos que o envio mudou,
+     salvo declaração da pessoa em rodadas/sem-rodada.json; o acervo antigo que o envio não tocou não entra. */
+  'rodadas:check',
   'banco-de-provas:check',
   /* O hash da geometria dos três pontos de cada família registrada em `procedural/familias`, preso ao `aprovacao.json`.
      Geometria que muda sem reaprovação reprova dizendo o ponto; sem família registrada, passa dizendo isso. */
@@ -237,7 +240,7 @@ export const GATES_CURTOS = [
   'mapa:check', 'reguas:check',
   'docs:toc:check', 'docs:links:check', 'planos:check', 'territorio:check', 'reguas:texto:check', 'decisoes:check', 'docs:estrutura:check',
   'docs:citacoes:check', 'mecanismos:check', 'leitura:obrigatoria', 'catalogo:check', 'ferramentas:check', 'ferramentas:registro:check',
-  'dossie:check', 'banco-de-provas:check', 'calibracao:check',
+  'dossie:check', 'rodadas:check', 'banco-de-provas:check', 'calibracao:check',
 ];
 
 export function escolherBateria(alterados) {

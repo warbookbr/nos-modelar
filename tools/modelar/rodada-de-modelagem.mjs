@@ -198,7 +198,7 @@ export function estaIgualNoGit(arquivo) {
 export function gravarRodada(
   peca,
   { veredito = null, medidas, partes, atrito = [], notaDePassagem, superficie, facesFinas, pontos, impressaoDasPartes },
-  { pasta = pastaDeRodadas(peca), receitaTexto = textoDaReceita(peca), agora = () => new Date().toISOString(), recuperavel = estaIgualNoGit } = {},
+  { pasta = pastaDeRodadas(peca), receitaTexto = textoDaReceita(peca), fontes, agora = () => new Date().toISOString(), recuperavel = estaIgualNoGit } = {},
 ) {
   exigirNome(peca);
   const anteriores = lerRodadas(peca, { pasta });
@@ -212,6 +212,7 @@ export function gravarRodada(
       ? readFileSync(copiaDaReceita(pasta, numero - 1), 'utf8') : null;
     receita = {
       sha256: `sha256:${createHash('sha256').update(receitaTexto).digest('hex')}`,
+      ...(fontes ? { fontes } : {}),
       diferenca: diferencaDeTexto(anterior, ajustarImportsDaCopia(receitaTexto)),
     };
   }
@@ -529,6 +530,29 @@ export const convergenciaDaPeca = (peca, opcoes) => decisaoSobreAsParadas(peca, 
 
 const impressao = (texto) => `sha256:${createHash('sha256').update(texto).digest('hex')}`;
 
+const arquivosDaPasta = (dir) => (existsSync(dir) ? readdirSync(dir, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : 1)).flatMap((e) => (e.isDirectory() ? (e.name === 'node_modules' || e.name === 'rodadas' ? [] : arquivosDaPasta(join(dir, e.name))) : [join(dir, e.name)])) : []);
+
+/**
+ * A impressão das fontes da receita: o `receita.js`, o que está em `receita/` ao lado dele (a receita dividida em módulos) e o módulo comum
+ * do objeto (`partes/_comum/`) quando alguma dessas fontes o importa. A receita de um arquivo só tem a impressão do próprio texto (a mesma de
+ * `receita.sha256`, de modo que as rodadas antigas dela seguem valendo); a dividida tem a impressão do conjunto, e a rodada a grava em
+ * `receita.fontes`, porque `receita.sha256` continua sendo a do texto do `receita.js` (o pacote do crítico e a cópia da receita comparam esse).
+ * Devolve `{ sha256, composta, arquivos }`: `composta` diz que há mais de um arquivo; `arquivos` são os caminhos lidos.
+ */
+export function impressaoDasFontes(receitaAbs) {
+  const texto = readFileSync(receitaAbs, 'utf8');
+  const dir = dirname(receitaAbs);
+  const proprios = [receitaAbs, ...arquivosDaPasta(join(dir, 'receita'))];
+  const textos = new Map(proprios.map((a) => [a, a === receitaAbs ? texto : readFileSync(a, 'utf8')]));
+  const comum = join(dirname(dir), '_comum');
+  if (basename(dirname(dir)) === 'partes' && [...textos.values()].some((t) => /(?:from\s*|import\s*\(?\s*|require\s*\(\s*)['"]\.{1,2}\/[^'"]*_comum(?:\/|['"])/.test(t))) {
+    for (const a of arquivosDaPasta(comum)) textos.set(a, readFileSync(a, 'utf8'));
+  }
+  if (textos.size === 1) return { sha256: impressao(texto), composta: false, arquivos: [receitaAbs] };
+  const conjunto = [...textos].sort(([a], [b]) => (a < b ? -1 : 1)).map(([a, t]) => `${relative(dirname(dir), a).split(sep).join('/')}\n${t}`).join('\n--\n');
+  return { sha256: impressao(conjunto), composta: true, arquivos: [...textos.keys()] };
+}
+
 /** O que a medição guarda dos `PONTOS`: o esperado resolvido de cada um e a impressão do texto que os declara na receita. */
 export function pontosDaMedicao(receita, textoDaReceita) {
   if (!Array.isArray(receita?.PONTOS) || receita.PONTOS.length === 0) return null;
@@ -589,6 +613,7 @@ export async function medirReceita(peca, { rodadas, pasta, registroDasEtapas, ca
   const caminho = resolverCaminhoReceita(peca);
   const texto = readFileSync(caminho, 'utf8');
   const sha256 = `sha256:${createHash('sha256').update(texto).digest('hex')}`;
+  const fontes = impressaoDasFontes(caminho).sha256;
   const falhas = [];
   const feitas = ['descrever (veredito)', 'guarda:acervo', 'guarda:referencial'];
   /* o tempo da primeira execução da receita na rodada: a guarda do acervo é quem a faz e aquece o cache por passo, e a execução de
@@ -641,8 +666,9 @@ export async function medirReceita(peca, { rodadas, pasta, registroDasEtapas, ca
      acervo, que aquece o cache por passo): nenhuma execução a mais. O tempo depende do cache estar quente ou frio e por isso não é parte
      da identidade da medição */
   const faces = executada?.neutro?.F?.size;
-  const medidaDaExecucao = Number.isInteger(faces) && Number.isFinite(segundosDaPrimeiraExecucao) ? { faces, segundos: Math.round(segundosDaPrimeiraExecucao * 100) / 100 } : {};
-  return { passou, sha256, texto, caminho, relatorio: cortar(passou ? `${feitas.join(', ')}: ok` : falhas.join('\n')), lataria: { lataria, porque }, luzRasante: { luzRasante, porque }, avisos, ...medidaDaExecucao, ...(facesFinas ? { facesFinas } : {}), ...(pontos ? { pontos } : {}) };
+  const cacheDaGuarda = acervo.cachePorPasso && Number.isInteger(acervo.cachePorPasso.recomecouDoPasso) ? { recomecouDoPasso: acervo.cachePorPasso.recomecouDoPasso, ...(Number.isInteger(acervo.cachePorPasso.total) ? { total: acervo.cachePorPasso.total } : {}) } : null;
+  const medidaDaExecucao = Number.isInteger(faces) && Number.isFinite(segundosDaPrimeiraExecucao) ? { faces, segundos: Math.round(segundosDaPrimeiraExecucao * 100) / 100, ...(cacheDaGuarda ? { cachePorPasso: cacheDaGuarda } : {}) } : {};
+  return { passou, sha256, fontes, texto, caminho, relatorio: cortar(passou ? `${feitas.join(', ')}: ok` : falhas.join('\n')), lataria: { lataria, porque }, luzRasante: { luzRasante, porque }, avisos, ...medidaDaExecucao, ...(facesFinas ? { facesFinas } : {}), ...(pontos ? { pontos } : {}) };
 }
 
 /* ---- as faces finas da malha ---- */
@@ -922,7 +948,7 @@ export async function registrarMedida(peca, entrada, { medir = () => medirReceit
   /* `medidas`, `superficie` e `pontos` são da ferramenta, e o que a entrada declara deles sai */
   const { medidas: _declaradas, superficie: _declarada, pontos: _dosPontos, ...resto } = entrada;
   void _declaradas; void _declarada; void _dosPontos;
-  const gravada = gravarRodada(peca, { ...resto, superficie, impressaoDasPartes, facesFinas: medicao.facesFinas, pontos, medidas: { passou: medicao.passou, relatorio: medicao.relatorio, ...(medicao.faces !== undefined ? { faces: medicao.faces, segundos: medicao.segundos } : {}) } }, { ...opcoes, receitaTexto: medicao.texto });
+  const gravada = gravarRodada(peca, { ...resto, superficie, impressaoDasPartes, facesFinas: medicao.facesFinas, pontos, medidas: { passou: medicao.passou, relatorio: medicao.relatorio, ...(medicao.faces !== undefined ? { faces: medicao.faces, segundos: medicao.segundos, ...(medicao.cachePorPasso ? { cachePorPasso: medicao.cachePorPasso } : {}) } : {}) } }, { ...opcoes, receitaTexto: medicao.texto, fontes: medicao.fontes });
   return { ...gravada, medicao };
 }
 

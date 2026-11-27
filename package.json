@@ -162,6 +162,7 @@
     "conferir:vistas": "node tools/modelar/conferir-vistas.mjs",
     "custo:peca": "node tools/modelar/custo-por-peca.mjs",
     "fluxo:objeto": "node tools/modelar/fluxo-do-objeto.mjs",
+    "rodadas:check": "node tools/modelar/fluxo-do-objeto.mjs --rodadas-do-envio",
     "vista:rapida": "node tools/modelar/vista-rapida.mjs",
     "crista:regularidade": "node tools/modelar/regularidade-da-crista.mjs",
     "esboco:nucleo": "node --import ./tools/modelar/resolucao-da-raiz.mjs tools/modelar/esboco-nucleo.mjs",

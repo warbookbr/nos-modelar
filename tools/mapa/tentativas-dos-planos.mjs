@@ -74,7 +74,9 @@ const ehSeparador = (linha) => celulas(linha).every((c) => /^:?-{1,}:?$/.test(c)
 
 /* A linha de exemplo do modelo, copiada sem as cercas, é o modelo e não uma tentativa. */
 export const LINHA_DE_EXEMPLO = ['o que se achou ser a causa', 'o que se mudou ou mediu, com o comando', 'o número ou a imagem que saiu', 'ficou, ficou (parcial) ou descartada'];
-const ehLinhaDeExemplo = (linha) => { const c = celulas(linha).map(normalizar); return LINHA_DE_EXEMPLO.every((e, k) => c[k] === normalizar(e)); };
+/* a comparação ignora a pontuação e o espaço a mais: o exemplo copiado com um ponto final ou dois espaços segue sendo o exemplo */
+const paraComparar = (s) => normalizar(s).replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+const ehLinhaDeExemplo = (linha) => { const c = celulas(linha).map(paraComparar); return LINHA_DE_EXEMPLO.every((e, k) => c[k] === paraComparar(e)); };
 
 /**
  * As linhas de dados da tabela de tentativas do texto: `[{ hipotese, ensaio, resultado, destino }]`, as da tabela com o cabeçalho das quatro

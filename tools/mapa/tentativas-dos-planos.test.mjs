@@ -139,6 +139,9 @@ describe('o que é tabela de tentativas', () => {
     expect(modelo).toContain(`| ${LINHA_DE_EXEMPLO.join(' | ')} |`);
     expect(temTabelaDeTentativas(`${CAB}\n| --- | --- | --- | --- |\n| ${LINHA_DE_EXEMPLO.join(' | ')} |\n`)).toBe(false);
     expect(temTabelaDeTentativas(`${CAB}\n| --- | --- | --- | --- |\n| ${LINHA_DE_EXEMPLO.join(' | ')} |\n| a | b | 1 mm | ficou |\n`)).toBe(true);
+    /* com ponto final, vírgula a mais, espaço duplo ou negrito, segue sendo o exemplo */
+    const enfeitada = ['o que se achou ser a causa.', 'o que se mudou  ou mediu, com o comando;', '**o número ou a imagem que saiu**', 'ficou, ficou (parcial) ou descartada!'];
+    expect(temTabelaDeTentativas(`${CAB}\n| --- | --- | --- | --- |\n| ${enfeitada.join(' | ')} |\n`)).toBe(false);
   });
   it('a tabela dentro de bloco de código (o próprio modelo) não conta', () => {
     expect(temTabelaDeTentativas(`\`\`\`\n${CAB}\n| --- | --- | --- | --- |\n| a | b | c | d |\n\`\`\`\n`)).toBe(false);

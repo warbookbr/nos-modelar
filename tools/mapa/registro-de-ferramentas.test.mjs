@@ -522,7 +522,7 @@ describe('o repositório de hoje', () => {
     const importados = [...semComentarios(texto).matchAll(/(?:\bfrom|\bimport)\s*\(?\s*['"]([^'"]+)['"]/g)].map((m) => m[1]);
     expect(importados.length).toBeGreaterThan(0);
     expect(importados.filter((i) => !i.startsWith('node:'))).toEqual([]);
-    expect(readFileSync(join(REPO, 'tools/ci/juntar-a-main.sh'), 'utf8')).toMatch(/node tools\/mapa\/registro-de-ferramentas\.mjs --gerar && node tools\/mapa\/mapa\.mjs'/);
+    expect(readFileSync(join(REPO, 'tools/ci/juntar-a-main.sh'), 'utf8')).toMatch(/node tools\/mapa\/registro-de-ferramentas\.mjs --gerar && npm run dossie -- --todos && node tools\/mapa\/mapa\.mjs'/);
   });
 
   it('o registro e o README gerado são arquivos gerados para o território do envio', () => {

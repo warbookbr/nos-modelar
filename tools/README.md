@@ -52,7 +52,7 @@ Quem trabalha chama, com `npm run <comando> -- <argumentos>`; a que não tem com
 | `exportar:gltf` | CLI que grava uma receita procedural como glTF 2.0 binário (.glb), com os materiais dela. |
 | `exportar:obj` | CLI para exportação atômica e segura de receitas procedurais em Wavefront OBJ (.obj). |
 | `exportar:step` | CLI para exportação atômica e segura de receitas procedurais em formato STEP. |
-| `fluxo:objeto` | Em que passo um objeto está, da referência à etapa fixa, e o comando exato que vem agora. |
+| `fluxo:objeto`, `rodadas:check` | Em que passo um objeto está, da referência à etapa fixa, e o comando exato que vem agora; rodadas:check recusa a parte sem rodada dos objetos que o envio mudou. |
 | `forma:esboco` | A forma de uma receita contra a forma do esboço que ela refina, sem mudar a receita. |
 | `malha:lascas` | Lista cada face fina de uma receita. |
 | `leitura:regioes` | Corta a vista de referência e a captura do rascunho na mesma grade e as põe lado a lado, região por região. |

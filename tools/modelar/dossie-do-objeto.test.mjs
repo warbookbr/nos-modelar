@@ -120,15 +120,17 @@ describe('--check', () => {
 describe('o que o dossiê lê além da receita', () => {
   it('mostra faces e segundos nas rodadas que os gravaram e o traço nas antigas', async () => {
     const { texto } = await montarDossie('objeto-de-prova', { raiz: FIXTURE, docs: DOCS });
-    expect(texto).toContain('| Rodada | Registrada | Medidas | Faces | Segundos | Nota | Defeitos | Decisão da pessoa |');
+    expect(texto).toContain('| Rodada | Registrada | Medidas | Faces | Segundos da guarda | Nota | Defeitos | Decisão da pessoa |');
     expect(texto).toContain('| 1 | 2026-11-20 | passou | - | - | 4 | 1 |');
-    expect(texto).toContain('| 2 | 2026-11-27 | passou | 1234 | 0.42 | 4 | 1 | sem decisão gravada |');
+    expect(texto).toContain('| 2 | 2026-11-27 | passou | 1234 | 0.42 (cache: recomeçou do passo 9 de 12) | 4 | 1 | sem decisão gravada |');
+    expect(texto).toContain('Segundos da guarda é o tempo da guarda do acervo na rodada, a primeira execução da receita na medição, e não o custo da receita: depende do cache por passo');
   });
   it('sem rodada com faces a tabela não ganha as colunas e o texto diz que nenhuma as gravou', async () => {
     const raiz = copia();
     rmSync(join(raiz, 'procedural/pecas/objeto-de-prova/rodadas/rodada-02.json'));
     const { texto } = await montarDossie('objeto-de-prova', { raiz, docs: DOCS });
     expect(texto).not.toContain('| Faces |');
+    expect(texto).not.toContain('Segundos da guarda');
     expect(texto).toContain('nenhuma rodada os gravou');
   });
   it('lê o ATRITOS.md do banco de provas dos planos que cobrem o objeto: itens e os sem destino', async () => {
@@ -212,13 +214,17 @@ describe('o único documento do objeto', () => {
     expect((await conferirDossie('objeto-de-prova', { raiz, docs: DOCS })).problemas[0]).toMatch(/perdeu a seção à mão de peca\.divida/);
     expect(Object.keys(secoesAMao(readFileSync(dossieDe(raiz, 'objeto-com-partes'), 'utf8')))).toEqual(['base', 'base.divida', 'tampa', 'tampa.divida']);
   });
-  it('recusa o .md escrito à mão na pasta do objeto, e deixa o DOSSIE.md, o ALINHAMENTO.md da raiz e o que está em referencias/', () => {
+  it('recusa o .md escrito à mão na pasta do objeto, e deixa o DOSSIE.md, o ALINHAMENTO.md da raiz e a referência que o PLANO cita', () => {
     const raiz = copia();
     expect(mdsAMaoNaPastaDoObjeto(raiz)).toEqual([]);
     const pasta = join(raiz, 'procedural/pecas/objeto-com-partes');
     mkdirSync(join(pasta, 'referencias'), { recursive: true });
     mkdirSync(join(pasta, 'partes/base/rodadas'), { recursive: true });
+    writeFileSync(join(pasta, 'partes/base/receita.js'), `${readFileSync(join(pasta, 'partes/base/receita.js'), 'utf8')}\nexport const CITA = { referencias: ['../../referencias/citada.${MD}'] };\n`);
+    writeFileSync(join(pasta, `referencias/citada.${MD}`), '# citada');
     writeFileSync(join(pasta, `referencias/alvo.${MD}`), '# alvo');
+    mkdirSync(join(pasta, 'referencias/frontal.pacote'), { recursive: true });
+    writeFileSync(join(pasta, `referencias/frontal.pacote/roteiro.${MD}`), '# roteiro gerado');
     writeFileSync(join(pasta, `ALINHAMENTO.${MD}`), '# alinhamento');
     writeFileSync(join(pasta, `GUIA-DA-CARROCERIA.${MD}`), '# guia à mão');
     writeFileSync(join(pasta, `partes/base/ALINHAMENTO.${MD}`), '# na parte');
@@ -226,10 +232,36 @@ describe('o único documento do objeto', () => {
     const achados = mdsAMaoNaPastaDoObjeto(raiz).map((m) => m.arquivo);
     const base = 'procedural/pecas/objeto-com-partes';
     expect(achados).toEqual([`${base}/GUIA-DA-CARROCERIA.${MD}`, `${base}/partes/base/ALINHAMENTO.${MD}`, `${base}/partes/base/rodadas/NOTAS.${MD}`]);
-    expect(mdsAMaoNaPastaDoObjeto(raiz)[0].problema).toMatch(/é um \.md escrito à mão na pasta do objeto; o documento do objeto é o DOSSIE\.md \(npm run dossie -- objeto-com-partes\)/);
+    expect(mdsAMaoNaPastaDoObjeto(raiz)[0].problema).toMatch(/é um documento escrito à mão na pasta do objeto \(o documento do objeto é o DOSSIE\.md \(npm run dossie -- objeto-com-partes\)/);
     const r = spawnSync(process.execPath, [join(AQUI, 'dossie-do-objeto.mjs'), '--todos', '--check', `--raiz=${raiz}`, `--docs=${DOCS}`], { encoding: 'utf8' });
     expect(r.status).toBe(1);
-    expect(r.stderr).toMatch(/GUIA-DA-CARROCERIA\.md é um \.md escrito à mão/);
+    expect(r.stderr).toMatch(/GUIA-DA-CARROCERIA\.md é um documento escrito à mão/);
+  });
+  it('aceita em referencias/ a análise que um módulo da receita cita no texto, e recusa a mesma análise sem a citação', () => {
+    const raiz = copia();
+    const pasta = join(raiz, 'procedural/pecas/objeto-com-partes');
+    mkdirSync(join(pasta, 'referencias'), { recursive: true });
+    mkdirSync(join(pasta, 'partes/base/receita'), { recursive: true });
+    writeFileSync(join(pasta, `referencias/luzes.${MD}`), '# análise das luzes');
+    expect(mdsAMaoNaPastaDoObjeto(raiz).map((m) => m.arquivo)).toEqual([`procedural/pecas/objeto-com-partes/referencias/luzes.${MD}`]);
+    writeFileSync(join(pasta, 'partes/base/receita/luzes.js'), `/* as luzes, pela análise em \`referencias/luzes.${MD}\` */\nexport const X = 1;\n`);
+    expect(mdsAMaoNaPastaDoObjeto(raiz)).toEqual([]);
+  });
+  it('recusa o DOSSIE.md escrito à mão fora da raiz do objeto e de partes/<parte>/, e o .MD, .markdown e .txt em qualquer subpasta, referencias/ inclusive', () => {
+    const raiz = copia();
+    const pasta = join(raiz, 'procedural/pecas/objeto-com-partes');
+    const grava = (rel) => { mkdirSync(dirname(join(pasta, rel)), { recursive: true }); writeFileSync(join(pasta, rel), 'x'); return `procedural/pecas/objeto-com-partes/${rel}`; };
+    const esperados = [
+      grava(`rodadas/DOSSIE.${MD}`), grava(`referencias/DOSSIE.${MD}`), grava(`partes/base/rodadas/DOSSIE.${MD}`), grava(`partes/base/x/DOSSIE.${MD}`),
+      grava('referencias/nota.MD'), grava('referencias/leia.markdown'), grava('referencias/leia.txt'), grava(`referencias/uncited.${MD}`), grava(`referencias/outro.pacote/guia.${MD}`),
+      grava('partes/tampa/GUIA.Markdown'), grava('NOTAS.TXT'), grava(`dossie.${MD}`),
+    ].sort();
+    const achados = mdsAMaoNaPastaDoObjeto(raiz).map((m) => m.arquivo).sort();
+    expect(achados).toEqual(esperados);
+    const doDossie = mdsAMaoNaPastaDoObjeto(raiz).find((m) => m.arquivo.endsWith(`rodadas/DOSSIE.${MD}`) && m.arquivo.includes('partes'));
+    expect(doDossie.problema).toMatch(/só vale na raiz do objeto e em partes\/<parte>\//);
+    const ref = mdsAMaoNaPastaDoObjeto(raiz).find((m) => m.arquivo.endsWith('referencias/leia.txt'));
+    expect(ref.problema).toMatch(/PLANO\.referencias da receita cita/);
   });
 });
 
@@ -262,10 +294,45 @@ describe('o objeto que o envio mudou', () => {
     expect(semDossie.status).toBe(1);
     expect(semDossie.stderr).toMatch(/procedural\/pecas\/novo-objeto\/ mudou neste envio e não tem DOSSIE\.md; rode `npm run dossie -- novo-objeto`/);
     execFileSync(process.execPath, [join(AQUI, 'dossie-do-objeto.mjs'), 'novo-objeto', `--raiz=${raiz}`, `--docs=${DOCS}`]);
+    /* o dossiê do objeto que o envio mudou não fica com as seções à mão no modelo */
+    const aEscrever = rodar(raiz);
+    expect(aEscrever.status).toBe(1);
+    expect(aEscrever.stderr).toMatch(/novo-objeto\/DOSSIE\.md deixou a seção à mão de escolhas de técnica de peca em "a escrever", e o objeto novo-objeto mudou neste envio/);
+    expect(aEscrever.stderr).toMatch(/deixou a seção à mão de dívida conhecida de peca em "a escrever"/);
+    const arquivoNovo = dossieDe(raiz, 'novo-objeto');
+    writeFileSync(arquivoNovo, readFileSync(arquivoNovo, 'utf8').replaceAll('- a escrever', '- escolha: porque (rodada 1)'));
     expect(rodar(raiz).status).toBe(0);
     appendFileSync(join(raiz, 'procedural/pecas/objeto-de-prova/receita.js'), '\n// mudou\n');
     writeFileSync(join(raiz, 'procedural/pecas/objeto-de-prova/receita.js'), readFileSync(join(raiz, 'procedural/pecas/objeto-de-prova/receita.js'), 'utf8').replace('milimetros: 200', 'milimetros: 250'));
     expect(rodar(raiz).stderr).toMatch(/objeto-de-prova\/DOSSIE\.md está desatualizado/);
+  });
+});
+
+describe('o objeto que só tem o dossiê de uma parte', () => {
+  const git = (r, ...a) => execFileSync('git', ['-c', 'user.email=t@t', '-c', 'user.name=t', ...a], { cwd: r, encoding: 'utf8' });
+  const rodar = (raiz) => spawnSync(process.execPath, [join(AQUI, 'dossie-do-objeto.mjs'), '--todos', '--check', `--raiz=${raiz}`, `--docs=${DOCS}`], { encoding: 'utf8' });
+  it('cobra o dossiê da parte que mudou, e o da raiz só quando mudou arquivo fora de partes/; regerar o dossiê da parte não conta como mudança', () => {
+    const raiz = copia();
+    rmSync(dossieDe(raiz, 'objeto-com-partes'));
+    execFileSync(process.execPath, [join(AQUI, 'dossie-do-objeto.mjs'), 'objeto-com-partes/tampa', `--raiz=${raiz}`, `--docs=${DOCS}`]);
+    const arquivoTampa = join(raiz, 'procedural/pecas/objeto-com-partes/partes/tampa', `DOSSIE.${MD}`);
+    writeFileSync(arquivoTampa, readFileSync(arquivoTampa, 'utf8').replaceAll('- a escrever', '- escolha: porque (rodada 1)'));
+    git(raiz, 'init', '-q'); git(raiz, 'add', '.'); git(raiz, 'commit', '-qm', 'base'); git(raiz, 'update-ref', 'refs/remotes/origin/main', 'HEAD');
+    expect(objetosComDossie(raiz)).toContain('objeto-com-partes/tampa');
+    expect(objetosComDossie(raiz)).not.toContain('objeto-com-partes');
+    appendFileSync(arquivoTampa, '\n');
+    expect(objetosMudadosNoEnvio(raiz)).toEqual([]);
+    git(raiz, 'checkout', '-q', '--', '.');
+    appendFileSync(join(raiz, 'procedural/pecas/objeto-com-partes/partes/base/receita.js'), '\n// mudou\n');
+    const daBase = rodar(raiz);
+    expect(daBase.stderr).toMatch(/procedural\/pecas\/objeto-com-partes\/base\/ mudou neste envio e não tem DOSSIE\.md/);
+    expect(daBase.stderr).not.toMatch(/objeto-com-partes\/ mudou/);
+    git(raiz, 'checkout', '-q', '--', '.');
+    appendFileSync(join(raiz, 'procedural/pecas/objeto-com-partes/partes/tampa/receita.js'), '\n// mudou\n');
+    expect(rodar(raiz).stderr).not.toMatch(/mudou neste envio e não tem/);
+    mkdirSync(join(raiz, 'procedural/pecas/objeto-com-partes/referencias'), { recursive: true });
+    writeFileSync(join(raiz, 'procedural/pecas/objeto-com-partes/andaime.json'), '{}');
+    expect(rodar(raiz).stderr).toMatch(/objeto-com-partes\/ mudou neste envio e não tem DOSSIE\.md na raiz \(só as partes tampa o têm\)/);
   });
 });
 

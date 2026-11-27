@@ -7,7 +7,8 @@
     "passou": true,
     "relatorio": "ok",
     "faces": 1234,
-    "segundos": 0.42
+    "segundos": 0.42,
+    "cachePorPasso": { "recomecouDoPasso": 9, "total": 12 }
   },
   "veredito": {
     "nota": 4,

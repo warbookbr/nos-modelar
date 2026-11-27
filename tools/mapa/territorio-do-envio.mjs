@@ -19,8 +19,14 @@ import { CAMINHOS_COMPARTILHADOS, sobrepoe } from './planos.mjs';
 
 /* Os arquivos que os geradores regravam a partir de outros (o mapa, os índices, a crônica dos encerrados, o contrato gerado dos
    roteiros, o banco de provas e o mapa de ferramentas por objeto): mudam junto com qualquer plano e não pertencem a nenhum. */
-/* o dossiê de cada objeto é gerado de outros arquivos (`npm run dossie`) */
-export const ehDossieGerado = (caminho) => /^procedural\/pecas\/.+\/DOSSIE\.md$/.test(caminho);
+/* o dossiê de cada objeto é gerado de outros arquivos (`npm run dossie`): só o da raiz do objeto e o de `partes/<parte>/` valem como gerados */
+export const ehDossieGerado = (caminho) => /^procedural\/pecas\/[^/]+(\/partes\/[^/]+)?\/DOSSIE\.md$/.test(caminho);
+
+/** O dossiê cuja única mudança está nas seções à mão (entre os marcadores `dossie:a-mao`): o texto fora delas é o mesmo antes e depois. */
+export function soMudouAsSecoesAMao(antes, depois) {
+  const semMao = (t) => String(t).replace(/(<!-- dossie:a-mao:[^:\s]+:inicio -->\n)[\s\S]*?(\n<!-- dossie:a-mao:[^:\s]+:fim -->)/g, '$1$2');
+  return typeof antes === 'string' && typeof depois === 'string' && antes !== depois && semMao(antes) === semMao(depois);
+}
 
 export const GERADOS = [
   'README.md', 'CLAUDE.md', 'docs/modelar/INDEX.md', 'docs/modelar/banco-de-provas/README.md',
@@ -52,6 +58,7 @@ export function declaracoesFora(mensagens) {
  * porque a mensagem de um commit gravado não se desfaz sem reescrever o histórico.
  */
 export function conferirTerritorio(arquivos, territorios, declarados = [], { existiaNaBase = () => false } = {}) {
+  const soAMao = new Set(arquivos.filter((a) => a.soAMao).map((a) => a.caminho));
   const valeA = (d) => {
     const dentro = arquivos.filter((a) => sobrepoe(d.caminho, a.caminho));
     if (!dentro.length) return [];
@@ -62,7 +69,8 @@ export function conferirTerritorio(arquivos, territorios, declarados = [], { exi
   const soltas = declarados.filter((d) => !valeA(d).length);
   const fora = [];
   for (const { caminho } of arquivos) {
-    if (GERADOS.includes(caminho) || ehDossieGerado(caminho) || CAMINHOS_COMPARTILHADOS.some((c) => sobrepoe(c, caminho))) continue;
+    /* o dossiê que só mudou nas seções à mão não é gerado: o texto é de quem o escreveu, e precisa do território do plano que cobre o objeto */
+    if (GERADOS.includes(caminho) || (ehDossieGerado(caminho) && !soAMao.has(caminho)) || CAMINHOS_COMPARTILHADOS.some((c) => sobrepoe(c, caminho))) continue;
     if (territorios.some((t) => t.caminhos.some((c) => sobrepoe(c, caminho)))) continue;
     if (liberados.has(caminho)) continue;
     fora.push(caminho);
@@ -90,6 +98,10 @@ function principal(raiz, argv, ambiente) {
   const linhas = git('diff', '--no-renames', '--name-status', '-z', base, 'HEAD').split('\0').filter(Boolean);
   const arquivos = [];
   for (let i = 0; i < linhas.length; i += 2) arquivos.push({ caminho: linhas[i + 1], novo: linhas[i] === 'A' });
+  for (const a of arquivos) {
+    if (a.novo || !ehDossieGerado(a.caminho)) continue;
+    try { a.soAMao = soMudouAsSecoesAMao(git('show', `${base}:${a.caminho}`), git('show', `HEAD:${a.caminho}`)); } catch { /* sem o arquivo num dos lados: vale como gerado */ }
+  }
   const mensagens = git('log', '--no-merges', '--format=%B', `${base}..HEAD`);
   const territorios = [];
   for (const nome of readdirSync(join(raiz, 'docs/modelar/planos')).filter((n) => PLANO.test(n))) {

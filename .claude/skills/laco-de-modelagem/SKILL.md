@@ -43,7 +43,7 @@ declarar o `REFINA` depois de fechar; a ação diz isso no motivo.
 
 **parar-fechou** encerra a etapa e leva o caso à pessoa. **parar-limite** e
 **parar-sem-convergencia** também param e levam o registro à pessoa; não
-estenda o limite por conta própria. Quando a pessoa manda seguir, a decisão
+estenda o limite nem grave `sem-rodada.json`: só a pessoa. Quando a pessoa manda seguir, a decisão
 entra no arquivo `limite.json` da pasta de rodadas da peça, com `por` no formato `"quem, AAAA-MM-DD: as
 palavras dela"` e `motivo`: `"limite"` é um inteiro maior que 6 ou `"sem"` (sem
 limite), e `"convergenciaDesde"` é o número do registro a partir do qual a

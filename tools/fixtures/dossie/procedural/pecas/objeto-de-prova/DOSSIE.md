@@ -41,12 +41,12 @@ Passos da receita: 9. Operações por parte, lidas do grafo dos passos (uma oper
 
 ### Rodadas
 
-| Rodada | Registrada | Medidas | Faces | Segundos | Nota | Defeitos | Decisão da pessoa |
+| Rodada | Registrada | Medidas | Faces | Segundos da guarda | Nota | Defeitos | Decisão da pessoa |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | 2026-11-20 | passou | - | - | 4 | 1 | a pessoa, 2026-11-21: tampa de 4 mm está boa, a caixa segue |
-| 2 | 2026-11-27 | passou | 1234 | 0.42 | 4 | 1 | sem decisão gravada |
+| 2 | 2026-11-27 | passou | 1234 | 0.42 (cache: recomeçou do passo 9 de 12) | 4 | 1 | sem decisão gravada |
 
-Faces é o total de faces da malha e segundos o tempo da execução da receita (com o cache por passo quente ou frio, como estava na medição); as rodadas sem o número são anteriores à gravação deles e não foram reescritas.
+Faces é o total de faces da malha. Segundos da guarda é o tempo da guarda do acervo na rodada, a primeira execução da receita na medição, e não o custo da receita: depende do cache por passo, que o registro mostra quando o gravou (recomeçou do passo n de total: com n acima de zero o cache estava quente e o tempo é só dos passos que mudaram; zero, a receita executou inteira); a rodada sem a nota do cache não diz o estado dele, e as rodadas sem o número são anteriores à gravação e não foram reescritas.
 
 Atrito e nota de passagem de cada rodada, condensados (o texto inteiro está na rodada gravada):
 
