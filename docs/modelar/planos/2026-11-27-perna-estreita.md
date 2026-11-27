@@ -1,6 +1,6 @@
 # Perna estreita: a perna do humanoide numa coluna da largura de uma perna
 
-**Estado:** ativo
+**Estado:** concluído
 
 **Núcleo:** não
 
@@ -63,6 +63,10 @@ Fatia 1 feita em 2026-11-27: a medida dos caminhos, no banco de provas do plano.
 
 Fatia 2 feita em 2026-11-27: a chapa como `forma` 2 da família do elo (`espessuraDaChapa`, `larguraDaChapa`, `passagemDaChapa`), com as recusas testadas, os pontos mínimo e médio da aprovação mecânica iguais e as restrições da carenagem valendo só na forma 1; a coxa em chapa montada pelas portas, com 79 mm ao longo do eixo e o joelho de 0 a 140 graus sem colisão. A pessoa aprovou por imagem em 2026-11-27 ("Sim, pode prosseguir"). O garfo de duas chapas foi ao backlog.
 
+Fatia 3 feita em 2026-11-27: a perna estreita em chapa, com 85 mm de largura e 86 mm de folga da linha do meio, as conferências e a exportação, aprovada pela pessoa por imagem ("E aprovo a perna, pode prosseguir").
+
+Fatia 4 feita em 2026-11-27: o banco de provas com as medidas e as imagens aprovadas, e o teste de exportação da perna entre os testes lentos.
+
 ## Fechamento
 
-Preencher ao concluir ou cancelar: estado final, commit e PR, gates, resultado observado e candidatos devolvidos ao backlog.
+Concluído em 2026-11-27 no ramo `claude/admiring-rubin-h9zjwx`, sem PR, com `npm run gates` verde em cada envio. A família do elo ganhou a forma de chapa reta, e a perna do humanoide passou de 387 mm a 85 mm de largura sem mudar o esqueleto, aprovada pela pessoa por imagem. Ficaram no backlog o garfo de duas chapas, a sonda de combinações reais nas famílias e a rigidez da chapa, que não foi calculada; a ficha da forma de chapa no catálogo de capacidade fica para quem mexer nele de novo.
