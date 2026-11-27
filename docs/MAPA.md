@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2481 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2491 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -256,6 +256,11 @@
 
 - `README.md` — Braço de prova de duas juntas: o alinhamento da forma
 - `elos-opcoes.esboco.mjs` — elos-opcoes.esboco.mjs — o braço de prova de duas juntas, com o mesmo mecanismo nas três opções (base redonda, ombro em garfo com o NEMA 23 e a planetária de…
+
+## docs/modelar/banco-de-provas/cabos-2026-11-27/
+
+- `README.md` — Cabos: as provas
+- `medir-casos.mjs` — medir-casos.mjs — mede os casos de prova do cabo (`tools/fixtures/cabo/casos.mjs`): o comprimento obtido, o menor raio de curva, as faces e o tempo de cada u…
 
 ## docs/modelar/banco-de-provas/cache-por-passo-2026-11-16/
 
@@ -1099,6 +1104,16 @@
 - `montagem.js` — montagem.js — a montagem v5 que a família gera: a carcaça e a saída do atuador, peças soltas no mesmo referencial, ligadas por uma articulação de revolução e…
 - `servo.js` — servo.js — o atuador de caixa (forma 2, o servo de robô pequeno), em milímetro, com o eixo da saída em y.
 - `tabela.js` — tabela.js — os atuadores de junta cilíndricos, por diâmetro da carcaça, em milímetro. Não há norma pública de atuador de robô; os tamanhos são regra da famíl…
+
+## procedural/familias/cabo/
+
+- `cabo.test.mjs` — cabo.test.mjs — a família `cabo`: cada caso de prova sai como um sólido fechado num pedaço só, com o comprimento pedido a menos de 0,5%, o raio de curva nunc…
+- `caminho.js` — caminho.js — do cabo como haste de nós à linha de estações do tubo, em milímetro.
+- `composicoes.js` — composicoes.js — as composições da família `cabo`: o tubo de seção circular ao longo do caminho, pelo `friso` de polilinha com uma normal por estação (o quad…
+- `curva.js` — curva.js — a curva do cabo: a elástica discreta entre duas pontas, em milímetro.
+- `derivar.js` — derivar.js — dos parâmetros do cabo (milímetro) à chamada de composição (metro). O plano (`plano.js`) escolhe a composição pelo número de estações; as pontas…
+- `index.js` — index.js — a família `cabo`: o cabo flexível entre dois pontos, de seção circular, com o comprimento pedido, a curva de menor energia de dobra (`curva.js`), …
+- `plano.js` — plano.js — dos parâmetros do cabo (milímetro, graus) ao plano do tubo: as estações, as normais, as faces e as medidas.
 
 ## procedural/familias/cadeira/
 
@@ -3370,6 +3385,10 @@
 - `duas-juntas.mjs` — duas-juntas.mjs — a montagem de prova de duas juntas do atuador de junta: o atuador B preso pela flange de fixação na flange de saída do atuador A, com os fu…
 - `duas-juntas.test.mjs` — duas-juntas.test.mjs — a montagem de prova de duas juntas do atuador de junta: a furação de B casa com a da saída de A, as peças só encostam onde assentam, e…
 - `exportacao.test.mjs` — exportacao.test.mjs — o gate 4 do plano do atuador de junta: a montagem de prova de duas juntas sai abaixo de dez segundos, e cada peça dela e o servo médio …
+
+## tools/fixtures/cabo/
+
+- `casos.mjs` — casos.mjs — os casos de prova da família `cabo`: cada um é uma chamada com só o que difere dos padrões (as pontas em milímetro, a direção de saída de cada po…
 
 ## tools/fixtures/casca-chapa-e-gabinete/
 
