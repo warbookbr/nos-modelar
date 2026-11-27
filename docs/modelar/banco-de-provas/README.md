@@ -71,6 +71,7 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
 - `nucleo-para-receita-2026-11-14`
 - [Operações repartidas entre núcleos: onde vai o tempo dentro do corte das aberturas](operacoes-repartidas-2026-11-26/README.md) — `operacoes-repartidas-2026-11-26`
 - [Organização dos documentos: o levantamento das decisões em vigor](organizacao-dos-documentos-2026-11-13/README.md) — `organizacao-dos-documentos-2026-11-13`
+- [Perna estreita: as provas](perna-estreita-2026-11-27/README.md) — `perna-estreita-2026-11-27`
 - [Ponte com a mecatrônica: a ficha do braço e o pedido de prova](ponte-mecatronica-2026-11-23/README.md) — `ponte-mecatronica-2026-11-23`
 - [Linha de base da porta de entrada dos agentes, 2026-11-05](porta-de-entrada-2026-11-05/README.md) — `porta-de-entrada-2026-11-05`
 - [Banco de provas — ferramentas de prancha para IA (2026-11-20)](prancha-apoio-ia-2026-11-20/README.md) — `prancha-apoio-ia-2026-11-20`

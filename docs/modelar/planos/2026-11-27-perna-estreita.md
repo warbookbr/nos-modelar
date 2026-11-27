@@ -59,6 +59,8 @@ Se nenhum caminho chegar a 180 mm sem mudar o esqueleto, o plano para e volta à
 
 ## Andamento
 
+Fatia 1 feita em 2026-11-27: a medida dos caminhos, no banco de provas do plano. A fixação pela face leva a perna a 344 mm, a curva mais fechada a 287 mm sem reforço, as duas juntas a 255 mm, e só o elo de chapa reta chega à meta, com 85 mm. A pessoa escolheu a chapa reta em 2026-11-27 ("Pode ser a reta"). A chapa é uma forma nova da família do elo; o atuador não muda, e o joelho desliza ao longo do eixo para as faces de apoio ficarem no mesmo plano, sem mudar eixos, alturas nem cursos do esqueleto.
+
 ## Fechamento
 
 Preencher ao concluir ou cancelar: estado final, commit e PR, gates, resultado observado e candidatos devolvidos ao backlog.
