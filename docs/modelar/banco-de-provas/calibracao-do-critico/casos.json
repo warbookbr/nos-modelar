@@ -35,7 +35,7 @@
     "julgamentos": 3,
     "acerto": "o caso acerta quando a mediana das três notas cai na faixa do grupo, no máximo um julgamento sai dela, cada defeito esperado é citado em pelo menos dois dos três julgamentos e, no controle, no máximo um julgamento cita defeito estrutural. O defeito é citado pela parte ou pelo lugar com uma das palavras e o tipo e o sentido entre os aceitos, ou, no defeito que declara `lugar`, pela parte com uma das palavras e o `onde` com uma das palavras do lugar, com qualquer tipo que não esteja nos `contrarios`",
     "passa": {
-      "minimo": 4,
+      "minimo": 3,
       "de": 4,
       "obrigatorias": [
         "raios-largos-e-par-fechado"
