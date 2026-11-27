@@ -19,7 +19,7 @@
     "comprimento": { "tipo": "numero", "unidade": "mm", "padrao": 0, "minimo": 0, "maximo": 12000, "medio": 0 },
     "folga": { "tipo": "numero", "unidade": "razao", "padrao": 0.3, "minimo": 0.3, "maximo": 10, "medio": 0.5 },
     "diametro": { "tipo": "numero", "unidade": "mm", "padrao": 6, "minimo": 1, "maximo": 25, "medio": 6 },
-    "raioMinimo": { "tipo": "numero", "unidade": "razao", "padrao": 5, "minimo": 1, "maximo": 10, "medio": 5 },
+    "raioMinimo": { "tipo": "numero", "unidade": "razao", "padrao": 5, "minimo": 1, "maximo": 7, "medio": 5 },
     "caimento": { "tipo": "numero", "unidade": "razao", "padrao": 0, "minimo": 0, "maximo": 100, "medio": 0 },
     "lados": { "tipo": "inteiro", "unidade": "contagem", "padrao": 12, "minimo": 8, "maximo": 32, "medio": 12 },
     "desvioMaximo": { "tipo": "numero", "unidade": "mm", "padrao": 0.2, "minimo": 0.05, "maximo": 5, "medio": 0.2 },

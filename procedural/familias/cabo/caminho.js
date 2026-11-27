@@ -1,7 +1,7 @@
 /* caminho.js — do cabo como haste de nós à linha de estações do tubo, em milímetro.
 
    O caminho é a haste que `curva.js` resolveu, passada a uma curva lisa: um trecho reto curto em cada ponta (o cilindro da porta) e, entre eles,
-   a Hermite quíntica de classe C² pelos nós da haste, com a tangente e a curvatura dela em cada nó. As estações do
+   a spline cúbica de classe C² pelos nós da haste, engastada na direção de cada ponta. As estações do
    tubo são pontos dessa curva escolhidos pelo desvio máximo da corda: onde a curva é reta as estações são esparsas, onde ela dobra
    são densas, e nenhum trecho passa de 98% do que o `friso` aceita sem dividir. O número de estações vem de uma escada fixa
    (`ESCADA_DE_ESTACOES`), porque a composição tem um número fixo de pontos; o menor degrau que cumpre o desvio é o que vale.
@@ -22,42 +22,48 @@ export const ESCADA_DE_ESTACOES = Object.freeze([6, 8, 10, 13, 17, 22, 29, 38, 5
 const SUBPASSOS = 32;
 const SUBPASSOS_DA_CURVATURA = 24;
 
-/* A curva lisa pelos nós: Hermite quíntica de classe C², com em cada nó a posição, a tangente unitária (o vetor do nó anterior ao seguinte; a direção
-   pedida nas duas pontas; a direção de passagem nos nós de tangente fixa) e o vetor de curvatura da haste, com o comprimento da corda como escala de cada trecho.
-   A Hermite cúbica, que só leva a tangente, dobra mais fechado que a haste onde a curvatura varia depressa (14% no meio do arco de `frente` com 17 nós); a quíntica passa em cada nó
-   pela curvatura da haste e fica perto dela entre os nós. Num nó de passagem a curvatura dos dois lados difere (cada perna é engastada), e cada trecho usa a do seu lado. */
+/* A curva lisa pelos nós: a spline cúbica de classe C² de cada perna, parametrizada pelo índice do nó (os trechos da perna são iguais) e engastada nas duas pontas dela, com a derivada
+   `corda × tangente` (a direção pedida na ponta, a direção de passagem num nó de tangente fixa). A haste já sai da ponta com a curvatura do engaste, sem trecho reto fixo de nós, e por isso a
+   spline pelos nós segue a haste: o defeito que a spline e a Hermite tinham, de dobrar três vezes mais fechado na emenda do trecho reto fixo com o primeiro trecho livre, não existe mais.
+   Uma perna termina num nó de passagem, em que a tangente é a mesma dos dois lados (C¹) e a curvatura pode saltar. */
 function hermite(nos, tA, tB, fixas) {
   const n = nos.length - 1;
   const hh = Array.from({ length: n }, (_, i) => norma(sub(nos[i + 1], nos[i])));
-  const T = nos.map((_, i) => fixas.get(i) ?? (i === 0 ? tA : i === n ? tB : unitario(sub(nos[i + 1], nos[i - 1]))));
-  const perpendicular = (c, t) => sub(c, mult(t, dot(c, t)));
-  /* o vetor de curvatura de cada nó, de cada lado dele: a diferença dos dois trechos unitários sobre a média deles no nó interior, e o engaste (o desvio do trecho para a tangente, em dobro) numa ponta ou numa passagem */
-  const unidade = (i) => mult(sub(nos[i + 1], nos[i]), 1 / hh[i]);
-  const antes = nos.map((_, j) => {
-    if (j === 0) return null;
-    if (j === n || fixas.has(j)) return perpendicular(mult(sub(mult(T[j], hh[j - 1]), sub(nos[j], nos[j - 1])), 2 / (hh[j - 1] * hh[j - 1])), T[j]);
-    return perpendicular(mult(sub(unidade(j), unidade(j - 1)), 2 / (hh[j - 1] + hh[j])), T[j]);
-  });
-  const depois = nos.map((_, j) => {
-    if (j === n) return null;
-    if (j === 0 || fixas.has(j)) return perpendicular(mult(sub(sub(nos[j + 1], nos[j]), mult(T[j], hh[j])), 2 / (hh[j] * hh[j])), T[j]);
-    return antes[j];
-  });
-  return { n, hh, nos, T, C0: depois, C1: antes };
+  const fronteiras = [0, ...[...fixas.keys()].filter((j) => j > 0 && j < n).sort((x, y) => x - y), n];
+  const m = nos.map(() => [0, 0, 0]);
+  const T = nos.map((_, j) => fixas.get(j) ?? (j === 0 ? tA : j === n ? tB : null));
+  for (let g = 0; g + 1 < fronteiras.length; g += 1) {
+    const j0 = fronteiras[g]; const j1 = fronteiras[g + 1]; const k = j1 - j0;
+    const corda = hh.slice(j0, j1).reduce((x, y) => x + y, 0) / k;
+    const d0 = mult(T[j0], corda); const d1 = mult(T[j1], corda);
+    /* o sistema tridiagonal das segundas derivadas (Thomas), por componente: m[i−1] + 4 m[i] + m[i+1] = 6 Δ²P; nas pontas 2 m[0] + m[1] = 6 (P1 − P0 − d0) */
+    const baixa = []; const diag = []; const alta = []; const rhs = [];
+    for (let i = 0; i <= k; i += 1) {
+      baixa.push(i === 0 ? 0 : 1); alta.push(i === k ? 0 : 1);
+      diag.push(i === 0 || i === k ? 2 : 4);
+      if (i === 0) rhs.push(mult(sub(sub(nos[j0 + 1], nos[j0]), d0), 6));
+      else if (i === k) rhs.push(mult(sub(d1, sub(nos[j1], nos[j1 - 1])), 6));
+      else rhs.push(mult(sub(soma(nos[j0 + i + 1], nos[j0 + i - 1]), mult(nos[j0 + i], 2)), 6));
+    }
+    const c = []; const r = [];
+    for (let i = 0; i <= k; i += 1) {
+      const den = diag[i] - (i === 0 ? 0 : baixa[i] * c[i - 1]);
+      c.push(alta[i] / den);
+      r.push(mult(sub(rhs[i], i === 0 ? [0, 0, 0] : mult(r[i - 1], baixa[i])), 1 / den));
+    }
+    for (let i = k; i >= 0; i -= 1) m[j0 + i] = i === k ? r[i] : sub(r[i], mult(m[j0 + i + 1], c[i]));
+  }
+  return { n, hh, nos, T, m };
 }
 /* posição, primeira e segunda derivada (em relação ao comprimento de arco aproximado) no trecho i, em u de 0 a 1 */
 function avaliarSpline(S, i, u) {
-  const { hh, nos, T, C0, C1 } = S; const h = hh[i];
-  const u2 = u * u; const u3 = u2 * u; const u4 = u3 * u; const u5 = u4 * u;
-  const B = [1 - 10 * u3 + 15 * u4 - 6 * u5, u - 6 * u3 + 8 * u4 - 3 * u5, 0.5 * u2 - 1.5 * u3 + 1.5 * u4 - 0.5 * u5, 10 * u3 - 15 * u4 + 6 * u5, -4 * u3 + 7 * u4 - 3 * u5, 0.5 * u3 - u4 + 0.5 * u5];
-  const D = [-30 * u2 + 60 * u3 - 30 * u4, 1 - 18 * u2 + 32 * u3 - 15 * u4, u - 4.5 * u2 + 6 * u3 - 2.5 * u4, 30 * u2 - 60 * u3 + 30 * u4, -12 * u2 + 28 * u3 - 15 * u4, 1.5 * u2 - 4 * u3 + 2.5 * u4];
-  const E = [-60 * u + 180 * u2 - 120 * u3, -36 * u + 96 * u2 - 60 * u3, 1 - 9 * u + 18 * u2 - 10 * u3, 60 * u - 180 * u2 + 120 * u3, -24 * u + 84 * u2 - 60 * u3, 3 * u - 12 * u2 + 10 * u3];
+  const { hh, nos, m } = S; const h = hh[i]; const w = 1 - u;
   const p = []; const d1 = []; const d2 = [];
   for (let q = 0; q < 3; q += 1) {
-    const dados = [nos[i][q], T[i][q] * h, C0[i][q] * h * h, nos[i + 1][q], T[i + 1][q] * h, C1[i + 1][q] * h * h];
-    let sp = 0; let s1 = 0; let s2 = 0;
-    for (let k = 0; k < 6; k += 1) { sp += B[k] * dados[k]; s1 += D[k] * dados[k]; s2 += E[k] * dados[k]; }
-    p.push(sp); d1.push(s1 / h); d2.push(s2 / (h * h));
+    const y0 = nos[i][q]; const y1 = nos[i + 1][q]; const m0 = m[i][q]; const m1 = m[i + 1][q];
+    p.push(w * y0 + u * y1 + ((w ** 3 - w) * m0 + (u ** 3 - u) * m1) / 6);
+    d1.push((y1 - y0 - ((3 * w * w - 1) * m0 - (3 * u * u - 1) * m1) / 6) / h);
+    d2.push((w * m0 + u * m1) / (h * h));
   }
   return { p, d1, d2 };
 }
@@ -68,8 +74,16 @@ export function criarCaminho({ nos, dA, dB, trechoA = 0, trechoB = 0, tangentesF
   const M = nos.length;
   const tA = unitario(dA); const tB = mult(unitario(dB), -1);
   const S = hermite(nos, tA, tB, new Map(tangentesFixas.map(({ indice, t }) => [indice, unitario(t)])));
-  /* a curvatura de cada nó da haste (o maior dos dois lados) e a de cada lado dele, em 1/mm */
-  const curvaturaDoNo = nos.map((_, j) => Math.max(S.C1[j] ? norma(S.C1[j]) : 0, S.C0[j] ? norma(S.C0[j]) : 0));
+  /* a curvatura de cada nó da haste, do ângulo entre os dois trechos que ele une; nas pontas e nas passagens, a do engaste (o desvio do trecho para a tangente, que o nó fantasma mede em dobro) */
+  const curvaturaDoNo = nos.map((q, j) => {
+    const engaste = (e, t) => (4 * Math.sin(Math.atan2(norma(cruz(t, e)), dot(t, e)) / 2)) / norma(e);
+    if (j === 0) return engaste(sub(nos[1], q), tA);
+    if (j === M - 1) return engaste(sub(q, nos[M - 2]), tB);
+    if (S.T[j]) return Math.max(engaste(sub(nos[j + 1], q), S.T[j]), engaste(sub(q, nos[j - 1]), S.T[j]));
+    const a = sub(q, nos[j - 1]); const b = sub(nos[j + 1], q);
+    const giro = Math.atan2(norma(cruz(a, b)), dot(a, b));
+    return (2 * Math.sin(giro / 2)) / (0.5 * (norma(a) + norma(b)));
+  });
   const curvaturaMaxima = Math.max(...curvaturaDoNo);
   /* a curvatura analítica da curva lisa que vira malha, amostrada em cada trecho da Hermite (a da haste mede o ângulo entre os trechos e não a vê) */
   let curvaturaLisaMaxima = 0;
@@ -79,13 +93,13 @@ export function criarCaminho({ nos, dA, dB, trechoA = 0, trechoB = 0, tangentesF
       curvaturaLisaMaxima = Math.max(curvaturaLisaMaxima, norma(cruz(d1, d2)) / (norma(d1) ** 3));
     }
   }
-  const tabela = [{ s: 0, tau: 0, p: nos[0], k: norma(S.C0[0]) }];
+  const tabela = [{ s: 0, tau: 0, p: nos[0], k: curvaturaDoNo[0] }];
   let acumulado = 0; let anterior = nos[0];
   for (let i = 0; i < S.n; i += 1) {
     for (let j = 1; j <= SUBPASSOS; j += 1) {
       const u = j / SUBPASSOS; const { p } = avaliarSpline(S, i, u);
       acumulado += norma(sub(p, anterior)); anterior = p;
-      tabela.push({ s: acumulado, tau: i + u, p, k: (1 - u) * norma(S.C0[i]) + u * norma(S.C1[i + 1]) });
+      tabela.push({ s: acumulado, tau: i + u, p, k: (1 - u) * curvaturaDoNo[i] + u * curvaturaDoNo[i + 1] });
     }
   }
   const comprimentoDoMiolo = acumulado;

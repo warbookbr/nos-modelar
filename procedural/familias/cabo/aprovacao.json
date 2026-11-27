@@ -41,7 +41,7 @@
           "passagens": 0,
           "raioMinimo": 1
         },
-        "hash": "sha256:c9bf6ad28d72c3795142054b9c0508216b0c1014973d27aa26e117a7c796bde8",
+        "hash": "sha256:2532ae2225a0a6125a3d6138b933a019b952026bc4fcaf15489bbd52a1e3345c",
         "medidas": []
       },
       "medio": {
@@ -80,7 +80,7 @@
           "passagens": 0,
           "raioMinimo": 5
         },
-        "hash": "sha256:04bddb8c70833a66c2a7457239dfdd8ebc85a67f407da56ae65a754b1dba90f4",
+        "hash": "sha256:6e2ff29fca6f8ab8a011c12f379f6da17a618686b20b28275ce36b8f2f5c0eec",
         "medidas": []
       },
       "maximo": {
@@ -117,9 +117,9 @@
           "p2y": 700,
           "p2z": 700,
           "passagens": 2,
-          "raioMinimo": 10
+          "raioMinimo": 7
         },
-        "hash": "sha256:09cedf3148234f31da4ae77591c40ca4362e551a6dfdeb0fb745773b3167dcf4",
+        "hash": "sha256:f76fceab95560f83c4274a6b5de1c71b4759dd01870f310ec7092aba97f2fbaa",
         "medidas": []
       }
     },
@@ -135,8 +135,12 @@
           "restricao": "raio-minimo-cabe"
         },
         {
+          "ponto": "caimento=100",
+          "restricao": "raio-minimo-cabe"
+        },
+        {
           "ponto": "comprimento=12000",
-          "restricao": "orcamento-de-faces"
+          "restricao": "sem-autocontato"
         },
         {
           "ponto": "desvioMaximo=5",
@@ -155,7 +159,7 @@
           "restricao": "raio-minimo-cabe"
         },
         {
-          "ponto": "raioMinimo=10",
+          "ponto": "raioMinimo=7",
           "restricao": "raio-minimo-cabe"
         }
       ]
@@ -201,7 +205,7 @@
           "passagens": 0,
           "raioMinimo": 5
         },
-        "hash": "sha256:9f15f6dff9445ba3081db5500ea41d116c7837eaabfe46be68ff29bcae64fd2e",
+        "hash": "sha256:49566a2943faf414d69db2b7ac17d6920b12fae4fca31b294fd6850da9374a36",
         "medidas": []
       },
       "cabo-em-u": {
@@ -240,7 +244,7 @@
           "passagens": 0,
           "raioMinimo": 5
         },
-        "hash": "sha256:b60ce56a8cb8011b346ffbbce26eef2552586cd98b8a12a82507fd985daa12ec",
+        "hash": "sha256:2f5e3e4ece35273f83cc9cf88205bc310bc3ff4bb6cc706bcedd4284806658ee",
         "medidas": []
       },
       "cabo-pendurado": {
@@ -279,7 +283,7 @@
           "passagens": 0,
           "raioMinimo": 5
         },
-        "hash": "sha256:9f72252d50e477088d09ec03231141f01a6eb02db0e2300d9a382d5015dc49cd",
+        "hash": "sha256:9d88e1d2dd7c0161135e9f35ce7888931c580eb1986ae235d95f1d6fbee2cf88",
         "medidas": []
       }
     },
@@ -288,7 +292,7 @@
       "recusasDeclaradas": [
         {
           "ponto": "cabo-de-ponta-a-ponta: comprimento=12000",
-          "restricao": "orcamento-de-faces"
+          "restricao": "sem-autocontato"
         },
         {
           "ponto": "cabo-de-ponta-a-ponta: desvioMaximo=5",
@@ -301,10 +305,6 @@
         {
           "ponto": "cabo-em-u: comprimento=0",
           "restricao": "raio-minimo-cabe"
-        },
-        {
-          "ponto": "cabo-em-u: comprimento=12000",
-          "restricao": "orcamento-de-faces"
         },
         {
           "ponto": "cabo-em-u: desvioMaximo=5",
@@ -340,7 +340,7 @@
         },
         {
           "ponto": "cabo-pendurado: comprimento=12000",
-          "restricao": "orcamento-de-faces"
+          "restricao": "sem-autocontato"
         },
         {
           "ponto": "cabo-pendurado: desvioMaximo=5",

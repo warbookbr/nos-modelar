@@ -289,7 +289,7 @@ describe.skipIf(!lancador)(`o addon do cabo vivo no Blender${lancador ? '' : ' (
       const completos = { ...Object.fromEntries(Object.entries(familiaDoCabo.parametros).map(([nome, def]) => [nome, def.padrao])), ...parametrosDoCabo(esperado) };
       const plano = planejar(completos);
       const familia = plano.pontos.map((q) => noBlender(q.map((c) => c / 1000)));
-      /* a curva lisa (a quíntica pelos nós, igual à da família) respeita o raio declarado, medido por três pontos na curva avaliada do Blender (a 0,5 mm de folga de medida) */
+      /* a curva lisa (a spline cúbica engastada pelos nós, igual à da família) respeita o raio declarado, medido por três pontos na curva avaliada do Blender (a 0,5 mm de folga de medida) */
       expect(passo.raio * 1000, `raio da curva lisa a ${passo.angulo}°`).toBeGreaterThanOrEqual(raioDeclaradoMm - 0.5);
       expect(passo.raio * 1000, `raio da curva lisa a ${passo.angulo}°, perto do da haste`).toBeGreaterThan(passo.raioDoAddonMm * 0.85);
       relatorio.push({ angulo: passo.angulo, distanciaMm: distanciaMaxima(familia, passo.pontos), raioDaHasteMm: passo.raioDoAddonMm, raioLisoMm: passo.raio * 1000 });
@@ -299,6 +299,7 @@ describe.skipIf(!lancador)(`o addon do cabo vivo no Blender${lancador ? '' : ' (
     console.info(`[addon] forma contra a da família: no meio do curso ${meio.distanciaMm.toFixed(3)} mm; maior no curso ${Math.max(...relatorio.map((r) => r.distanciaMm)).toFixed(3)} mm`);
     console.info(`[addon] conta a quente contra a frio: no máximo ${Math.max(...medido.quenteContraFrioMm).toExponential(2)} mm`);
     console.info(`[addon] raio mínimo (declarado ${raioDeclaradoMm} mm): da haste ${Math.min(...relatorio.map((r) => r.raioDaHasteMm)).toFixed(2)} mm; da curva lisa ${Math.min(...relatorio.map((r) => r.raioLisoMm)).toFixed(2)} mm`);
+    console.info(`[addon] raio por ângulo (haste / curva lisa, mm): ${relatorio.map((r) => `${r.angulo}°: ${r.raioDaHasteMm.toFixed(2)} / ${r.raioLisoMm.toFixed(2)}`).join('; ')}`);
     expect(meio.distanciaMm, 'distância máxima entre a curva do Blender e a da família no meio do curso').toBeLessThan(0.5);
     expect(Math.max(...relatorio.map((r) => r.distanciaMm))).toBeLessThan(1);
     expect(Math.max(...medido.quenteContraFrioMm), 'a conta partindo da forma anterior dá a da conta a frio').toBeLessThan(0.01);

@@ -89,10 +89,10 @@ describe('família cabo', () => {
       expect(e.message).toMatch(/recebeu/);
     });
     it('raio mínimo impossível diz o que a curva dobra e o que se pediu', () => {
-      const e = recusa({ ...CASOS_DO_CABO.frente.parametros, raioMinimo: 8 });
+      const e = recusa({ ...CASOS_DO_CABO.frente.parametros, raioMinimo: 7 });
       expect(e.restricao).toBe('raio-minimo-cabe');
-      expect(e.message).toMatch(/ao menos 32 mm/);
-      expect(e.message).toMatch(/dobra até 20\.\d+ mm/);
+      expect(e.message).toMatch(/ao menos 28 mm/);
+      expect(e.message).toMatch(/dobra até 21\.\d+ mm/);
       expect(e.valor).toBeCloseTo(medidasDoCabo(CASOS_DO_CABO.frente.parametros).raioLiso, 2);
     });
     it('orçamento de faces estourado diz quantas faces daria', () => {

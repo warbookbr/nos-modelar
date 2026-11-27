@@ -7,7 +7,7 @@ projeção de Newton leva os comprimentos ao zero de máquina. Nenhum sorteio ne
 
 Unidade: a que vier (o addon passa metro e a conta trabalha em milímetro por dentro). Os nós são M pontos a trechos iguais; só as duas pontas da haste
 ficam fixas, e a direção de saída é um engaste (um nó fantasma, como na família). O cabo tem um trecho reto de um diâmetro em cada ponta, e a curva lisa
-pelos nós é a Hermite quíntica da família, que o Bézier do Blender segue por subtrechos. `partida` (os nós da solução anterior) acelera a conta quando as
+pelos nós é a spline cúbica C² engastada da família, que o Bézier do Blender segue por subtrechos. `partida` (os nós da solução anterior) acelera a conta quando as
 pontas se mexeram pouco; sem ela a conta parte do palpite de Bézier, que é determinístico.
 """
 import math
@@ -217,80 +217,79 @@ def resolver(A, B, dA, dB, L, M, caimento=0.0, partida=None, cima=(0.0, 0.0, 1.0
     return {'nos': P / ESCALA, 'h': h / ESCALA, 'iteracoes': feitas, 'violacao': maior_violacao()}
 
 
-def _perpendicular(c, t):
-    return c - t * (c * t).sum(axis=-1, keepdims=True)
-
-
-def _dados_dos_nos(nos, dA, dB):
-    """Os dados da Hermite quíntica da família em cada nó: tangente unitária (a direção pedida nas pontas, o vetor do nó anterior ao seguinte nos outros), a corda de cada trecho
-    e o vetor de curvatura de cada lado do nó (o do nó interior é a diferença dos dois trechos unitários sobre a média deles; o da ponta é o do engaste, o desvio do trecho para a tangente, em dobro)."""
+def _segundas_derivadas(nos, dA, dB):
+    """A spline cúbica de classe C² pelos nós, parametrizada pelo índice do nó e engastada nas duas pontas com a derivada `corda × tangente` (a mesma curva de `caminho.js`):
+    as segundas derivadas dos nós, que resolvem o sistema tridiagonal m[i−1] + 4 m[i] + m[i+1] = 6 Δ²P (2 m[0] + m[1] e 2 m[n] + m[n−1] nas pontas). Devolve (m, corda de cada trecho)."""
     M = len(nos)
-    T = np.empty_like(nos)
-    T[1:-1] = nos[2:] - nos[:-2]
-    T[1:-1] /= np.linalg.norm(T[1:-1], axis=1)[:, None]
-    T[0] = _unitario(dA)
-    T[M - 1] = -_unitario(dB)
     e = np.diff(nos, axis=0)
     hh = np.linalg.norm(e, axis=1)
-    u = e / hh[:, None]
-    antes = np.zeros_like(nos)   # a curvatura de cada nó vista do trecho anterior
-    antes[1:M - 1] = _perpendicular(2.0 * (u[1:] - u[:-1]) / (hh[1:] + hh[:-1])[:, None], T[1:M - 1])
-    antes[M - 1] = _perpendicular(2.0 * (T[M - 1] * hh[M - 2] - e[M - 2]) / hh[M - 2] ** 2, T[M - 1])
-    depois = antes.copy()        # e do trecho seguinte
-    depois[0] = _perpendicular(2.0 * (e[0] - T[0] * hh[0]) / hh[0] ** 2, T[0])
-    return T, hh, depois, antes
+    corda = float(hh.mean())
+    A = np.zeros((M, M))
+    A[np.arange(M), np.arange(M)] = 4.0
+    A[np.arange(M - 1), np.arange(1, M)] = 1.0
+    A[np.arange(1, M), np.arange(M - 1)] = 1.0
+    A[0, 0] = 2.0
+    A[M - 1, M - 1] = 2.0
+    rhs = np.zeros((M, 3))
+    rhs[1:-1] = 6.0 * (nos[2:] + nos[:-2] - 2.0 * nos[1:-1])
+    rhs[0] = 6.0 * (e[0] - _unitario(dA) * corda)
+    rhs[M - 1] = 6.0 * (-_unitario(dB) * corda - e[M - 2])
+    return np.linalg.solve(A, rhs), hh
 
 
-def _avaliar(nos, T, hh, C0, C1, i, u):
-    """Posição, primeira e segunda derivada (em relação ao arco aproximado) da quíntica no trecho i, nos u (vetor) de 0 a 1."""
+def _avaliar(nos, m, hh, i, u):
+    """Posição, primeira e segunda derivada (em relação ao arco aproximado) no trecho i, nos u (vetor) de 0 a 1."""
+    u = np.asarray(u, dtype=float)[:, None]
+    w = 1.0 - u
     h = hh[i]
-    u = np.asarray(u, dtype=float)
-    u2, u3, u4, u5 = u ** 2, u ** 3, u ** 4, u ** 5
-    B = np.stack([1 - 10 * u3 + 15 * u4 - 6 * u5, u - 6 * u3 + 8 * u4 - 3 * u5, 0.5 * u2 - 1.5 * u3 + 1.5 * u4 - 0.5 * u5, 10 * u3 - 15 * u4 + 6 * u5, -4 * u3 + 7 * u4 - 3 * u5, 0.5 * u3 - u4 + 0.5 * u5], axis=1)
-    D = np.stack([-30 * u2 + 60 * u3 - 30 * u4, 1 - 18 * u2 + 32 * u3 - 15 * u4, u - 4.5 * u2 + 6 * u3 - 2.5 * u4, 30 * u2 - 60 * u3 + 30 * u4, -12 * u2 + 28 * u3 - 15 * u4, 1.5 * u2 - 4 * u3 + 2.5 * u4], axis=1)
-    E = np.stack([-60 * u + 180 * u2 - 120 * u3, -36 * u + 96 * u2 - 60 * u3, 1 - 9 * u + 18 * u2 - 10 * u3, 60 * u - 180 * u2 + 120 * u3, -24 * u + 84 * u2 - 60 * u3, 3 * u - 12 * u2 + 10 * u3], axis=1)
-    dados = np.stack([nos[i], T[i] * h, C0[i] * h * h, nos[i + 1], T[i + 1] * h, C1[i + 1] * h * h])  # 6 x 3
-    return B @ dados, (D @ dados) / h, (E @ dados) / (h * h)
+    p = w * nos[i] + u * nos[i + 1] + ((w ** 3 - w) * m[i] + (u ** 3 - u) * m[i + 1]) / 6.0
+    d1 = (nos[i + 1] - nos[i] - ((3 * w * w - 1) * m[i] - (3 * u * u - 1) * m[i + 1]) / 6.0) / h
+    d2 = (w * m[i] + u * m[i + 1]) / (h * h)
+    return p, d1, d2
+
+
+def _raio_da_haste(nos, dA, dB):
+    """O menor raio de dobra dos nós da haste: o ângulo entre os dois trechos que cada nó une (a medida da família), e nas pontas o desvio do trecho para a direção de saída, em dobro."""
+    e = np.diff(nos, axis=0)
+    hh = np.linalg.norm(e, axis=1)
+    giro = np.arctan2(np.linalg.norm(np.cross(e[:-1], e[1:]), axis=1), (e[:-1] * e[1:]).sum(axis=1))
+    k = list(2 * np.sin(giro / 2) / (0.5 * (hh[:-1] + hh[1:])))
+    for v, t, c in ((e[0], _unitario(dA), hh[0]), (e[-1], -_unitario(dB), hh[-1])):
+        g = math.atan2(float(np.linalg.norm(np.cross(t, v))), float(np.dot(t, v)))
+        k.append(4 * math.sin(g / 2) / c)
+    kmax = max(k)
+    return 1.0 / kmax if kmax > 0 else math.inf
 
 
 def curva_lisa(nos, dA, dB, trecho_a=0.0, trecho_b=0.0):
-    """A curva lisa da família (a quíntica pelos nós, com o trecho reto de cada ponta): o comprimento, o raio de dobra dela (`raio`, o que vale) e o da haste (`raio_haste`),
-    e os `subtrechos` pontos por trecho da haste, com a tangente unitária de cada um, para o Bézier."""
-    T, hh, C0, C1 = _dados_dos_nos(nos, dA, dB)
-    n = len(hh)
+    """A curva lisa da família (a spline pelos nós, com o trecho reto de cada ponta): o comprimento, o raio de dobra dela (`raio`, o que vale) e o da haste (`raio_haste`)."""
+    m, hh = _segundas_derivadas(nos, dA, dB)
     arco = 0.0
     kmax = 0.0
     u32 = np.linspace(0.0, 1.0, SUBPASSOS + 1)
     u24 = np.linspace(0.0, 1.0, SUBPASSOS_DA_CURVATURA + 1)
-    for i in range(n):
-        p, _, _ = _avaliar(nos, T, hh, C0, C1, i, u32)
+    for i in range(len(hh)):
+        p, _, _ = _avaliar(nos, m, hh, i, u32)
         arco += float(np.linalg.norm(np.diff(p, axis=0), axis=1).sum())
-        _, d1, d2 = _avaliar(nos, T, hh, C0, C1, i, u24)
+        _, d1, d2 = _avaliar(nos, m, hh, i, u24)
         k = np.linalg.norm(np.cross(d1, d2), axis=1) / np.linalg.norm(d1, axis=1) ** 3
         kmax = max(kmax, float(k.max()))
-    kh = max(float(np.linalg.norm(C0, axis=1).max()), float(np.linalg.norm(C1, axis=1).max()))
-    return {
-        'comprimento': trecho_a + trecho_b + arco,
-        'raio': 1.0 / kmax if kmax > 0 else math.inf,
-        'raio_haste': 1.0 / kh if kh > 0 else math.inf,
-        'dados': (T, hh, C0, C1),
-    }
+    return {'comprimento': trecho_a + trecho_b + arco, 'raio': 1.0 / kmax if kmax > 0 else math.inf, 'raio_haste': _raio_da_haste(nos, dA, dB), 'dados': (m, hh)}
 
 
 def pontos_do_bezier(nos, dA, dB, A, B, dados, subtrechos=SUBTRECHOS_DO_BEZIER):
-    """Os pontos do Bézier: a ponta A, os pontos da quíntica (`subtrechos` por trecho da haste, o primeiro e o último são os nós das pontas) e a ponta B, com a alça de cada
-    ponto na tangente dele e um terço da corda ao vizinho (a Hermite cúbica por esses pontos, de erro desprezível contra a quíntica). Devolve (pontos, esquerda, direita)."""
-    T, hh, C0, C1 = dados
-    n = len(hh)
+    """Os pontos do Bézier: a ponta A, os pontos da spline (`subtrechos` por trecho da haste, e o último nó) e a ponta B, com a alça de cada ponto na tangente dele e um terço da corda
+    ao vizinho (a Hermite cúbica por esses pontos, de erro desprezível contra a spline). Devolve (pontos, esquerda, direita)."""
+    m, hh = dados
     pts = [np.asarray(A, dtype=float)]
     tan = [_unitario(dA)]
-    for i in range(n):
+    for i in range(len(hh)):
         u = np.arange(0, subtrechos, dtype=float) / subtrechos
-        p, d1, _ = _avaliar(nos, T, hh, C0, C1, i, u)
+        p, d1, _ = _avaliar(nos, m, hh, i, u)
         pts.extend(p)
         tan.extend(d1 / np.linalg.norm(d1, axis=1)[:, None])
     pts.append(nos[-1])
-    tan.append(T[-1])
+    tan.append(-_unitario(dB))
     pts.append(np.asarray(B, dtype=float))
     tan.append(-_unitario(dB))
     pts = np.array(pts)
