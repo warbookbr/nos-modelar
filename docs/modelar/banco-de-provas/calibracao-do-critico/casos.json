@@ -1454,6 +1454,50 @@
           "imagemSha256": "sha256:f77cbe5ac1ee11a30d85d05380a58b6eac5bf75d9116f90bc376b4f536880af1",
           "modelo": "sonnet",
           "data": "2026-11-27T00:04:13.056Z"
+        },
+        {
+          "nota": 6,
+          "defeitos": [
+            {
+              "parte": "fuselagem",
+              "tipo": "ausencia",
+              "onde": "tampa da ponta dianteira (z 10461)",
+              "sentido": "faltando",
+              "evidencia": "Frontal: vê-se o interior em funil, a cauda ao fundo e a barbatana como fenda vertical no centro; ponta aberta onde se prometeram pontas fechadas. Raio X traseiro não mostra tampa."
+            },
+            {
+              "parte": "fuselagem",
+              "tipo": "superficie",
+              "onde": "linha do ventre, da cabine à cauda",
+              "sentido": "segmentado",
+              "evidencia": "Direita: quebras retas no fundo em x≈490, 570, 715 e 900. Isométrica: quina longitudinal e trecho reto no ventre. Rasante az20: faixa vertical de sombra em x≈560-600."
+            },
+            {
+              "parte": "fuselagem",
+              "tipo": "superficie",
+              "onde": "extremidade traseira da cauda, últimos ~600 mm",
+              "sentido": "anguloso",
+              "evidencia": "Superior: pescoço cilíndrico com quebra de largura em y≈1195. Esquerda e direita: nó na ponta da cauda, sem continuidade de curva com o cone."
+            },
+            {
+              "parte": "barbatana",
+              "tipo": "superficie",
+              "onde": "cantos e fundo da aleta, sem seção afilada",
+              "sentido": "anguloso",
+              "evidencia": "Isométrica isolada e direita: cunha de arestas vivas e fundo reto de 60 mm, sem cantos de baixo arredondados nem afilamento."
+            },
+            {
+              "parte": "porta",
+              "tipo": "superficie",
+              "onde": "dois cantos de baixo do painel",
+              "sentido": "anguloso",
+              "evidencia": "Isométrica isolada: só o canto superior dianteiro é arredondado; os dois de baixo são retos. Esquerda: o painel lê como retângulo chapado sobre o casco."
+            }
+          ],
+          "pedidoSha256": "sha256:75771afd9f61060476bbde1a0b84d941ea713922d89ab868025f51036d1112a3",
+          "imagemSha256": "sha256:f77cbe5ac1ee11a30d85d05380a58b6eac5bf75d9116f90bc376b4f536880af1",
+          "modelo": "sonnet",
+          "data": "2026-11-27T00:05:02.559Z"
         }
       ]
     },
@@ -1541,6 +1585,43 @@
           "imagemSha256": "sha256:92197c21986fe210e980e8bf2e33dea589b63b11723c109b747952e3a8c40a67",
           "modelo": "sonnet",
           "data": "2026-11-27T00:04:49.939Z"
+        },
+        {
+          "nota": 6,
+          "defeitos": [
+            {
+              "parte": "porta",
+              "tipo": "posicao",
+              "onde": "face externa, lado esquerdo, região da janela 4",
+              "sentido": "externa",
+              "evidencia": "Superior, x 430-455 / y 565-725: a placa sai do casco que já afina. Esquerda: retângulo plano de outra cor por cima do casco, sem vão de porta recortado."
+            },
+            {
+              "parte": "fuselagem",
+              "tipo": "superficie",
+              "onde": "perfil do nariz e da barriga entre a cabine e o nariz",
+              "sentido": "segmentado",
+              "evidencia": "Esquerda x 100-240 e direita x 390-610 e 940-975: ondulações e pequenos degraus no topo e na barriga. Arame: leques de triângulos finos saindo das janelas."
+            },
+            {
+              "parte": "fuselagem",
+              "tipo": "superficie",
+              "onde": "ponta da cauda",
+              "sentido": "facetado",
+              "evidencia": "Isométrica, ponta em x 45-70 / y 885-925: seção com poucos lados, lê como prisma."
+            },
+            {
+              "parte": "fuselagem",
+              "tipo": "espessura",
+              "onde": "topo da cabine, entre o para-brisa e o início da cauda",
+              "sentido": "menor",
+              "evidencia": "Contorno sobreposto, esquerda: modelo 1542 mm contra 1620 mm do contorno, linha roxa acima do topo. A vista frontal indica 325 mm, e as duas não concordam."
+            }
+          ],
+          "pedidoSha256": "sha256:6fdab23f764e98e1dca54c2eb5b565aba788d7a72cfc88a8e9836cdbb2424780",
+          "imagemSha256": "sha256:92197c21986fe210e980e8bf2e33dea589b63b11723c109b747952e3a8c40a67",
+          "modelo": "sonnet",
+          "data": "2026-11-27T00:05:02.366Z"
         }
       ]
     }

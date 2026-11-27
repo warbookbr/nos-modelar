@@ -1,0 +1,21 @@
+c01 controle-fuselagem (controle, nota 8 a 10): 3 de 3 julgamentos; notas 7 7 6, mediana 7, amplitude 1; erra
+    defeito estrutural citado em 2 de 3 (máximo 1) acima
+    erra: mediana 7 fora da faixa 8 a 10
+    erra: 3 julgamentos fora da faixa (no máximo 1)
+    erra: 2 julgamentos do controle citam defeito estrutural (no máximo 1)
+c02 parabrisa-saliente (forma-prometida, nota 0 a 9): 3 de 3 julgamentos; notas 7 7 6, mediana 7, amplitude 1; erra
+    defeito de 'parabrisa' (posicao): citado em 0 de 3 (mínimo 2 de 3) abaixo
+    erra: o defeito de 'parabrisa' foi citado em 0 de 3 julgamentos (mínimo 2)
+c03 controle-cilindro (controle, nota 8 a 10): 3 de 3 julgamentos; notas 8 8 8, mediana 8, amplitude 0; acerta
+    defeito estrutural citado em 0 de 3 (máximo 1) ok
+c04 revolucao-de-doze-lados (revolucao-facetada, nota 5 a 9): 3 de 3 julgamentos; notas 8 8 8, mediana 8, amplitude 0; erra
+    defeito de 'cilindroElevacao' (superficie): citado em 0 de 3 (mínimo 2 de 3) abaixo
+    erra: o defeito de 'cilindroElevacao' foi citado em 0 de 3 julgamentos (mínimo 2)
+c05 haste-da-grossura-da-camisa (proporcao, nota 0 a 9): 3 de 3 julgamentos; notas 6 6 6, mediana 6, amplitude 0; acerta
+    defeito de 'hasteElevacao' (espessura): citado em 3 de 3 (mínimo 2 de 3) ok
+c06 raios-largos-e-par-fechado (proporcao, nota 0 a 9): 3 de 3 julgamentos; notas 5 5 5, mediana 5, amplitude 0; erra
+    defeito de 'raios' (espessura): citado em 1 de 3 (mínimo 2 de 3) abaixo
+    erra: o defeito de 'raios' foi citado em 1 de 3 julgamentos (mínimo 2)
+c07 parabrisa-saliente-de-quarenta (forma-prometida): fora do julgamento, a medição da rodada o reprova
+pontuação: o crítico acerta 2 de 6 casos (mínimo 5), com os obrigatórios errados.
+o conjunto reprova; obrigatório errado: parabrisa-saliente, raios-largos-e-par-fechado.
