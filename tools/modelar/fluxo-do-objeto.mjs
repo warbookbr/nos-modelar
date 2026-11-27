@@ -56,7 +56,9 @@ import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { proximaEtapa } from '../../src/autoria/etapas-de-construcao.js';
 import { acaoDaPeca, decisaoSobreAsParadas, impressaoDasFontes, lerRodadas, medirReceita } from './rodada-de-modelagem.mjs';
 import { pastaDasReferencias } from './objeto.mjs';
+import { arquivosMudadosNoEnvio, lerAceites, objetosMudadosNoEnvio } from './aceites-e-envio.mjs';
 
+export { arquivosMudadosNoEnvio, lerAceites, objetosMudadosNoEnvio };
 const REPO = resolve(fileURLToPath(new URL('../..', import.meta.url)));
 const ACERVO = join(REPO, 'procedural/pecas');
 
@@ -67,53 +69,6 @@ const lerJson = (p) => { try { return JSON.parse(readFileSync(p, 'utf8')); } cat
 const ordenados = (pasta) => (ehPasta(pasta) ? readdirSync(pasta).sort() : []);
 const sha = (texto) => `sha256:${createHash('sha256').update(texto).digest('hex')}`;
 
-const DATA = /\d{4}-\d{2}-\d{2}/;
-const colapsar = (t) => t.replace(/\s+/g, ' ');
-
-/**
- * O aceite da pessoa e as decisões pendentes de um `ALINHAMENTO.md`. O aceite é a linha `alinhamento:`, `rascunho:` ou `delegação:` com data
- * na seção "Aceite" (`origem: 'registrado'`); sem ela vale o registro anterior ao formato (`origem: 'anterior'`): a delegação da pessoa, o
- * combinado ou aprovado com ela. As decisões pendentes são os parágrafos da seção "Decisões que dependem da pessoa" (ou "pendentes").
- * O alinhamento que tem essa seção já está no formato novo, e o registro anterior não vale para ele: a frase "aceita pela pessoa" sobre a
- * prancha do carro fastback (2026-11-14) passava por aceite do alinhamento inteiro.
- */
-export function lerAceites(texto) {
-  const linhas = texto.split(/\r?\n/);
-  const aceites = { alinhamento: null, rascunho: null };
-  let dentro = false;
-  for (const l of linhas) {
-    if (/^#+\s/.test(l)) { dentro = /^#+\s*(aceite|delega)/i.test(l); continue; }
-    if (!dentro) continue;
-    const m = /^\s*(?:[-*]\s*)?(alinhamento|rascunho|delega[cç][aã]o)(?:\s+e\s+(rascunho|alinhamento))?\s*:\s*(.{8,})$/i.exec(l);
-    if (!m || !DATA.test(m[3])) continue;
-    const quem = [m[1], m[2]].filter(Boolean).map((x) => x.toLowerCase());
-    const aceite = { origem: 'registrado', texto: m[3].trim() };
-    if (quem.includes('alinhamento') || quem.some((x) => x.startsWith('delega'))) aceites.alinhamento ??= aceite;
-    if (quem.includes('rascunho') || quem.some((x) => x.startsWith('delega'))) aceites.rascunho ??= aceite;
-  }
-  const plano = colapsar(texto);
-  const formatoNovo = linhas.some((l) => /^#+.*\b(dependem da pessoa|decis[õo]es pendentes|pendentes? da pessoa|aguardando a pessoa)/i.test(l));
-  const anterior = (re) => { const m = formatoNovo ? null : re.exec(plano); return m ? { origem: 'anterior', texto: m[0].trim() } : null; };
-  const delegacao = anterior(/[^.]*(?:\bdeleg\p{L}+ d[ao] pessoa|\bpessoa (?:\p{L}+ ){0,3}deixou (?:a )?condu\p{L}+)[^.]*\./iu);
-  const combinado = anterior(/[^.]*\b(?:combinad\w+|conduzid\w+|aprovad\w+|aceit\w+) (?:com a pessoa|pela pessoa|por ela)\b[^.]*\./i);
-  aceites.alinhamento ??= delegacao ?? combinado;
-  aceites.rascunho ??= delegacao ?? anterior(/[^.]*\brascunho\b[^.]*\b(?:aprovad\w+|aceit\w+)\b[^.]*\bpessoa\b[^.]*\./i);
-  const decisoes = [];
-  const inicio = linhas.findIndex((l) => /^#+.*\b(dependem da pessoa|decis[õo]es pendentes|pendentes? da pessoa|aguardando a pessoa)/i.test(l));
-  if (inicio >= 0) {
-    let paragrafo = [];
-    const fecha = () => {
-      if (paragrafo.length) decisoes.push(colapsar(paragrafo.join(' ')).replace(/^(?:[-*]|\d+[.)])\s+/, '').trim());
-      paragrafo = [];
-    };
-    for (const l of linhas.slice(inicio + 1)) {
-      if (/^#/.test(l)) break;
-      if (l.trim() === '') fecha(); else paragrafo.push(l);
-    }
-    fecha();
-  }
-  return { ...aceites, decisoes: decisoes.filter(Boolean) };
-}
 
 /** O alinhamento: o arquivo, a tabela de medidas e a seção das partes (o que falta é estrutura; o aceite se julga no fluxo, que sabe das receitas). */
 export function lerAlinhamento(pasta) {
@@ -409,13 +364,16 @@ function saidaDaParada(p) {
 
 export const ARQUIVO_SEM_RODADA = 'sem-rodada.json';
 
-/* Quem declara é a pessoa: o nome de um papel de agente (o modelador, o crítico, o implementador e afins) não vale como quem decidiu. */
-const PAPEL_DE_AGENTE = /(?<![\p{L}\p{N}])(modelador(?:a)?|cr[ií]tic[oa]|agentes?|subagentes?|implementador(?:a)?|desenhista|desenhador(?:a)?|orquestrador(?:a)?|revisor(?:a)?|assistente|claude|ia|llm|modelo|sess[aã]o|bot)(?![\p{L}\p{N}])/iu;
+/* Quem decidiu tem de ter nome: a ferramenta não prova quem escreveu o arquivo, mas recusa o `por` que nomeia um papel de agente (o modelador, o crítico,
+   o implementador e afins), um modelo de linguagem (opus, sonnet, haiku, gpt, gemini e afins) ou a pessoa sem nome ("a pessoa", "o usuário"). */
+const PAPEL_DE_AGENTE = /(?<![\p{L}\p{N}])(modelador(?:a)?|cr[ií]tic[oa]|agentes?|subagentes?|implementador(?:a)?|desenhista|desenhador(?:a)?|orquestrador(?:a)?|revisor(?:a)?|assistente|claude|ia|llm|modelo|sess[aã]o|bot|opus|sonnet|haiku|fable|gpt\d*|gemini|llama|mistral)(?![\p{L}\p{N}])/iu;
+const PESSOA_SEM_NOME = /^(?:(?:a|o|um|uma)\s+)?(?:pessoa|usu[aá]rio|usu[aá]ria|humano|humana|dono|dona|respons[aá]vel)$/iu;
 
 /**
  * A declaração da pessoa de que a receita segue sem rodada (`rodadas/sem-rodada.json`): `{ valida, por, problema }`, ou null sem o arquivo. Vale a
  * mesma regra de texto das decisões da pessoa (`defeitoDoTextoDeQuem`, com a data que não pode ser futura), e o `por` não pode ser um papel de
- * agente: só a pessoa grava a declaração. `agora` é o instante ISO de hoje, que quem chama dá (o relógio entra aqui e em mais lugar nenhum).
+ * agente, um modelo nem a pessoa sem nome. A lista não prova autoria: o arquivo novo é uma mudança do envio, que o `territorio:check` cobre pelo
+ * território dos planos ativos (ou por `Fora-do-territorio:` com motivo num commit do envio), e a pessoa decide ao revisá-lo. `agora` é o instante ISO de hoje, que quem chama dá (o relógio entra aqui e em mais lugar nenhum).
  */
 export function lerDeclaracaoSemRodada(pastaDeRodadas, sha256, { agora = new Date().toISOString() } = {}) {
   const arquivo = join(pastaDeRodadas, ARQUIVO_SEM_RODADA);
@@ -427,7 +385,7 @@ export function lerDeclaracaoSemRodada(pastaDeRodadas, sha256, { agora = new Dat
   const defeito = typeof por === 'string' ? defeitoDoTextoDeQuem(por, { ate: agora }) : 'não é texto';
   if (defeito) return { valida: false, problema: `${rel(arquivo)}: 'por' recebido ${JSON.stringify(dado.por)} (${defeito}); esperado ${FORMATO_DE_QUEM}, com as palavras da pessoa` };
   const quem = por.slice(0, por.indexOf(','));
-  if (PAPEL_DE_AGENTE.test(quem)) return { valida: false, problema: `${rel(arquivo)}: 'por' recebido ${JSON.stringify(dado.por)}, e '${quem.trim()}' é um papel de agente; esperado o nome da pessoa que decidiu (${FORMATO_DE_QUEM}): só a pessoa grava a declaração` };
+  if (PAPEL_DE_AGENTE.test(quem) || PESSOA_SEM_NOME.test(quem.trim())) return { valida: false, problema: `${rel(arquivo)}: 'por' recebido ${JSON.stringify(dado.por)}, e '${quem.trim()}' não nomeia quem decidiu (é papel de agente, modelo ou "a pessoa" sem nome); esperado o nome de quem decidiu (${FORMATO_DE_QUEM}), que a pessoa confere ao revisar o envio que traz o arquivo` };
   if (typeof dado.motivo !== 'string' || dado.motivo.trim().length < 3) return { valida: false, problema: `${rel(arquivo)}: falta o 'motivo'; esperado ${molde}` };
   if (dado.receita !== sha256) return { valida: false, problema: `${rel(arquivo)} declara a receita ${String(dado.receita).slice(0, 19)}…, e a de hoje é ${sha256.slice(0, 19)}…; a declaração vale para o texto que a pessoa viu, e a pessoa declara de novo` };
   return { valida: true, por };
@@ -438,15 +396,25 @@ export function lerDeclaracaoSemRodada(pastaDeRodadas, sha256, { agora = new Dat
  * `{ motivo, declaracao? }`. As fontes são o `receita.js`, o que a receita divide em `receita/` e o módulo comum que ela importa
  * (`impressaoDasFontes`): a rodada de antes de `receita.fontes` só tinha a impressão do texto do `receita.js`, e com ela se compara o texto.
  * A receita que não importa ou cujo `PASSOS` não se lê é acusada, e o motivo diz o erro: ela não pode escapar por não executar.
- * `declaracao` traz o problema de uma declaração gravada que não vale.
+ * `declaracao` traz o problema de uma declaração gravada que não vale. A receita composta cuja última rodada é de antes de `receita.fontes` é acusada
+ * quando `mudadosNoEnvio` (os arquivos que o envio mudou, relativos ao `acervo`, de `arquivosMudadosNoEnvio`) tem arquivo das fontes dela, e
+ * quando não importa, mesmo com o texto do `receita.js` igual ao da rodada.
  */
-export async function acusacaoSemRodada(receitaAbs, rodadas, pastaDeRodadas, { agora } = {}) {
+export async function acusacaoSemRodada(receitaAbs, rodadas, pastaDeRodadas, { agora, mudadosNoEnvio = null, acervo = ACERVO } = {}) {
   const fontes = impressaoDasFontes(receitaAbs);
   const ultima = rodadas.at(-1);
   const daRodada = ultima?.receita?.fontes ?? ultima?.receita?.sha256;
   const deHoje = ultima?.receita?.fontes ? fontes.sha256 : sha(readFileSync(receitaAbs, 'utf8'));
-  if (ultima && daRodada === deHoje) return null;
-  const declaracao = lerDeclaracaoSemRodada(pastaDeRodadas, fontes.sha256, agora ? { agora } : {});
+  const igual = Boolean(ultima) && daRodada === deHoje;
+  /* A rodada com `receita.fontes` de hoje mediu o conjunto, e a de um arquivo só tem o texto inteiro na impressão: nenhuma esconde mudança.
+     A rodada de antes de `receita.fontes` numa receita composta só tinha o texto do `receita.js`: o que o envio mudou nas fontes da unidade
+     a torna velha, e, mesmo sem mudança, a receita que não importa é acusada, porque o texto igual não prova que ela ainda roda. */
+  const semFontesNaRodada = igual && fontes.composta && !ultima.receita.fontes;
+  if (igual && !semFontesNaRodada) return null;
+  const mudadas = new Set(mudadosNoEnvio ?? []);
+  const mudouNoEnvio = semFontesNaRodada && fontes.arquivos.some((a) => mudadas.has(relative(acervo, a).split(sep).join('/')));
+  const velha = !igual || mudouNoEnvio;
+  const declaracao = velha ? lerDeclaracaoSemRodada(pastaDeRodadas, fontes.sha256, agora ? { agora } : {}) : null;
   if (declaracao?.valida) return null;
   let falhou = null;
   let passos = 0;
@@ -454,34 +422,14 @@ export async function acusacaoSemRodada(receitaAbs, rodadas, pastaDeRodadas, { a
     const receita = receitaDoModulo(await importarReceita(receitaAbs));
     if (!Array.isArray(receita?.PASSOS)) { if (receita?.PASSOS !== undefined) falhou = 'o PASSOS da receita não é uma lista'; } else passos = receita.PASSOS.length;
   } catch (erro) { falhou = `a receita não importa ou não deixa ler o PASSOS (${String(erro?.message ?? erro).split('\n')[0].slice(0, 160)})`; }
-  if (!falhou && passos === 0) return null;
-  const quando = ultima ? `a receita mudou desde a rodada ${ultima.numero}, a última registrada` : 'a receita tem passos e nenhuma rodada registrada';
+  if (!falhou && (passos === 0 || !velha)) return null;
+  const quando = !ultima ? 'a receita tem passos e nenhuma rodada registrada'
+    : !igual ? `a receita mudou desde a rodada ${ultima.numero}, a última registrada`
+      : mudouNoEnvio ? `o envio mudou arquivo das fontes da receita, e a rodada ${ultima.numero}, a última registrada, é de antes de receita.fontes e só guardou o texto do receita.js`
+        : `a rodada ${ultima.numero}, a última registrada, é de antes de receita.fontes e só guardou o texto do receita.js`;
   return { motivo: `${falhou ? `${falhou}, e ` : ''}${quando}: registrar uma rodada (${comandoRegistrar('<peça>')}) ou a pessoa declarar a receita sem rodada em rodadas/${ARQUIVO_SEM_RODADA}`, ...(declaracao ? { declaracao: declaracao.problema } : {}) };
 }
 
-const PASTA_DAS_PECAS_DO_ENVIO = 'procedural/pecas';
-
-/**
- * Os arquivos de `procedural/pecas/` que o envio mudou, relativos a essa pasta (`<objeto>/...`), fora os `DOSSIE.md` gerados (o da raiz do objeto e
- * o de `partes/<parte>/`): a pasta de primeiro nível com arquivo mudado desde a base comum com a main, contando o que ainda não foi gravado.
- * Vazio quando a raiz não é um repositório git ou não há a ref da main (fora do CI a conferência segue sem eles, como o `territorio:check`).
- */
-export function arquivosMudadosNoEnvio(raiz = REPO, { ref = 'origin/main' } = {}) {
-  const git = (...args) => execFileSync('git', args, { cwd: raiz, encoding: 'utf8', maxBuffer: 256 * 1024 * 1024, stdio: ['ignore', 'pipe', 'ignore'] });
-  try {
-    const base = git('merge-base', `${ref}^{commit}`, 'HEAD').trim();
-    if (!base) return [];
-    const pasta = PASTA_DAS_PECAS_DO_ENVIO;
-    const mudados = [...git('diff', '--name-only', '-z', '--no-renames', base, '--', `${pasta}/`).split('\0'), ...git('ls-files', '--others', '--exclude-standard', '-z', '--', `${pasta}/`).split('\0')].filter(Boolean);
-    return [...new Set(mudados.map((c) => c.slice(pasta.length + 1)))]
-      .filter((c) => c.split('/').length > 1 && !/^[^/]+(\/partes\/[^/]+)?\/DOSSIE\.md$/.test(c)).sort();
-  } catch { return []; }
-}
-
-/** Os objetos de `procedural/pecas/` que o envio mudou (a pasta de primeiro nível de `arquivosMudadosNoEnvio`) e que ainda existem. */
-export function objetosMudadosNoEnvio(raiz = REPO, opcoes = {}) {
-  return [...new Set(arquivosMudadosNoEnvio(raiz, opcoes).map((c) => c.split('/')[0]))].filter((o) => existsSync(join(raiz, PASTA_DAS_PECAS_DO_ENVIO, o)));
-}
 
 /**
  * As partes sem rodada dos objetos que o envio mudou: `[{ objeto, peca, motivo, declaracao? }]`. É o gate `rodadas:check`: a conta do
@@ -490,8 +438,9 @@ export function objetosMudadosNoEnvio(raiz = REPO, opcoes = {}) {
  */
 export async function partesSemRodadaNoEnvio(raiz = REPO, { ref = 'origin/main' } = {}) {
   const achadas = [];
+  const mudadosNoEnvio = arquivosMudadosNoEnvio(raiz, { ref });
   for (const objeto of objetosMudadosNoEnvio(raiz, { ref })) {
-    const fluxo = await fluxoDoObjeto(join(raiz, 'procedural/pecas', objeto), { acervo: join(raiz, 'procedural/pecas') });
+    const fluxo = await fluxoDoObjeto(join(raiz, 'procedural/pecas', objeto), { acervo: join(raiz, 'procedural/pecas'), mudadosNoEnvio });
     for (const p of fluxo.pecas.filter((x) => x.semRodada)) achadas.push({ objeto, peca: p.peca, ...p.semRodada });
   }
   return achadas;
@@ -501,7 +450,7 @@ export async function partesSemRodadaNoEnvio(raiz = REPO, { ref = 'origin/main' 
  * O fluxo do objeto: o estado de cada passo, as peças com a ação e o próximo comando, as etapas e o passo em que o objeto está.
  * `medir(ref)` mede uma peça de verdade (a `acaoDaPeca` de `--acao`); sem ele a ação sai de `acaoSemMedir`.
  */
-export async function fluxoDoObjeto(pastaDoObjeto, { medir = null, acervo = ACERVO, conferencia = null, registroDasEtapas = undefined } = {}) {
+export async function fluxoDoObjeto(pastaDoObjeto, { medir = null, acervo = ACERVO, conferencia = null, registroDasEtapas = undefined, mudadosNoEnvio = null } = {}) {
   const pasta = resolve(pastaDoObjeto);
   const raizDoAcervo = resolve(acervo);
   const esperado = `espera-se a pasta de um objeto, existente ou a criar em ${rel(raizDoAcervo)}/<objeto>/`;
@@ -538,7 +487,7 @@ export async function fluxoDoObjeto(pastaDoObjeto, { medir = null, acervo = ACER
     }
     linha.proximo = proximoDaPeca({ ...p, ...linha }, etapas);
     if (p.receita && linha.estado !== 'fixa') {
-      const acusacao = await acusacaoSemRodada(p.receita, rodadas, pastaRodadas);
+      const acusacao = await acusacaoSemRodada(p.receita, rodadas, pastaRodadas, { mudadosNoEnvio, acervo: raizDoAcervo });
       if (acusacao) linha.semRodada = { motivo: acusacao.motivo.replace('<peça>', p.ref), ...(acusacao.declaracao ? { declaracao: acusacao.declaracao } : {}) };
     }
     pecas.push(linha);
@@ -691,7 +640,7 @@ async function rodadasDoEnvio(opcoes, ambiente) {
   }
   const achadas = await partesSemRodadaNoEnvio(raiz, { ref });
   if (!achadas.length) return { codigo: 0, texto: `rodadas:check ok — nenhuma parte sem rodada nos objetos que o envio mudou (medido desde a base comum com ${ref}).` };
-  return { codigo: 1, texto: `rodadas:check FALHOU — ${achadas.length} parte(s) sem rodada em objeto que o envio mudou:\n${achadas.map((a) => `  ${a.objeto}/${a.peca}: ${a.motivo}${a.declaracao ? ` (declaração que não vale: ${a.declaracao})` : ''}`).join('\n')}\nRegistre a rodada da peça (o comando está acima) ou peça à pessoa que a declare em rodadas/${ARQUIVO_SEM_RODADA}: só a pessoa grava essa declaração.` };
+  return { codigo: 1, texto: `rodadas:check FALHOU — ${achadas.length} parte(s) sem rodada em objeto que o envio mudou:\n${achadas.map((a) => `  ${a.objeto}/${a.peca}: ${a.motivo}${a.declaracao ? ` (declaração que não vale: ${a.declaracao})` : ''}`).join('\n')}\nRegistre a rodada da peça (o comando está acima) ou a pessoa decide declará-la em rodadas/${ARQUIVO_SEM_RODADA}, com o nome dela no \`por\`: a ferramenta não prova quem escreveu o arquivo, e o envio que o traz precisa estar no território de um plano ativo (\`territorio:check\`) e é conferido pela pessoa.` };
 }
 
 /** A linha de comando: devolve `{ codigo, texto }` sem sair do processo. */

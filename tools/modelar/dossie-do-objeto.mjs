@@ -38,9 +38,9 @@ import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
-import { lerDecisoesDaPessoa, lerRodadas } from './rodada-de-modelagem.mjs';
+import { lerDecisoesDaPessoa, lerRodadas } from './leitura-das-rodadas.mjs';
 import { bancosDeProvasDe, caminhoQueMudaForma, caminhosDoTerritorio, linhasDeTentativas, tabelaDeTentativasEm } from '../mapa/tentativas-dos-planos.mjs';
-import { arquivosMudadosNoEnvio, lerAceites, objetosMudadosNoEnvio } from './fluxo-do-objeto.mjs';
+import { arquivosMudadosNoEnvio, lerAceites, objetosMudadosNoEnvio } from './aceites-e-envio.mjs';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 export const ARQUIVO = 'DOSSIE.md';

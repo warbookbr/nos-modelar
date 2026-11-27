@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2520 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2523 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -3330,6 +3330,7 @@
 
 ## tools/ci/
 
+- `geradores-sem-pacote.test.mjs` — geradores-sem-pacote.test.mjs — cada gerador que o passo "Juntar à main" do CI roda (`GERADORES_DO_REPOSITORIO` em juntar-a-main.sh) carrega sem `node_module…
 - `juntar-a-main.test.mjs` — juntar-a-main.test.mjs — o passo de juntar à main do CI em repositórios de verdade: avança a main quando ela não andou, junta a main andada ao ramo e dispara…
 
 ## tools/fixtures/
@@ -4157,6 +4158,7 @@
 ## tools/modelar/
 
 - `absorver-ajuste.mjs` — absorver-ajuste.mjs — a régua da rodada de absorção.
+- `aceites-e-envio.mjs` — aceites-e-envio.mjs — o aceite da pessoa no ALINHAMENTO.md e os arquivos que o envio mudou, sem dependência de pacote.
 - `acervo-real.test.mjs` — A varredura do acervo REAL, inteiro, uma vez.
 - `acervo-reduzido.mjs` — acervo-reduzido.mjs — monta um acervo de três peças pequenas sob `tmp/`.
 - `adaptar-montagem-three.test.ts` — Prova que a visualização de montagem deriva somente da árvore resolvida.
@@ -4320,6 +4322,7 @@
 - `lasca.test.mjs` — lasca.test.mjs — a lista de faces finas acha a lateral de uma aresta de 2,8 mm no perfil de uma perua, e diz a parte, a razão, os cantos em milímetro e o pas…
 - `lascas-da-malha.mjs` — lascas-da-malha.mjs — os pedaços finos demais para serem de propósito: a lasca que uma subtração deixa solta.
 - `lascas-da-malha.test.mjs` — lascas-da-malha.test.mjs — a lasca de 0,01 mm solta ao lado de um cubo é acusada, o cubo não, e a placa de 0,05 mm passa.
+- `leitura-das-rodadas.mjs` — leitura-das-rodadas.mjs — ler as rodadas e as decisões da pessoa de uma peça, sem dependência de pacote.
 - `leitura-por-regioes.mjs` — leitura-por-regioes.mjs — a vista de referência e a captura do rascunho cortadas na mesma grade, região por região, ampliadas lado a lado, com a resposta de …
 - `leitura-por-regioes.test.mjs` — leitura-por-regioes.test.mjs — a leitura por regiões: a captura alinhada à caixa da referência, a grade que cobre a vista inteira, as folhas iguais a cada ex…
 - `ler-diario.mjs` — ler-diario.mjs — lê o diário da oficina e responde onde o tempo foi e onde o trabalho emperrou.

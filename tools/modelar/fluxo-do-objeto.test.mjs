@@ -2,7 +2,7 @@
  * executar receita nenhuma. */
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, utimesSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { basename, dirname, join } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
 import { acaoSemMedir, acusacaoSemRodada, emTexto, fluxoDoObjeto, lerAceites, lerDeclaracaoSemRodada, moduloComum, partesDoAlinhamento, partesSemRodadaNoEnvio, rodar } from './fluxo-do-objeto.mjs';
 import { gravarRodada, impressaoDasFontes, lerRodadas } from './rodada-de-modelagem.mjs';
@@ -324,7 +324,7 @@ describe('a parte cuja receita mudou sem rodada', () => {
     const pasta = montar('declarada');
     const receita = join(pasta, 'receita.js');
     escrever(receita, COM_PASSOS(1));
-    const declarar = (texto, extra = {}) => escrever(join(pasta, 'rodadas', 'sem-rodada.json'), JSON.stringify({ receita: sha(texto), por: 'a pessoa, 2026-11-27: pode seguir sem rodada', motivo: 'ajuste só de número', ...extra }));
+    const declarar = (texto, extra = {}) => escrever(join(pasta, 'rodadas', 'sem-rodada.json'), JSON.stringify({ receita: sha(texto), por: 'Tiago, 2026-11-27: pode seguir sem rodada', motivo: 'ajuste só de número', ...extra }));
     declarar(COM_PASSOS(1));
     expect((await doCorpo(pasta)).semRodada).toBeUndefined();
     escrever(receita, COM_PASSOS(2));
@@ -369,11 +369,24 @@ describe('a parte cuja receita é dividida em módulos, e a que não importa', (
     expect((await acusacaoSemRodada(receita, rodadas(), join(pasta, 'rodadas'))).motivo).toMatch(/^a receita mudou desde a rodada 1, a última registrada/);
     /* o fluxo mostra a mesma acusação */
     expect((await fluxoDoObjeto(pasta, { registroDasEtapas: null })).pecas[0].semRodada.motivo).toMatch(/mudou desde a rodada 1/);
-    /* a rodada antiga, sem `fontes`, só tinha o texto do receita.js: o submódulo mudado não se vê, como era */
+    /* a rodada antiga, sem `fontes`, só tinha o texto do receita.js: sem o envio informado o submódulo mudado não se vê, e com o envio que o mudou é acusado */
     const antiga = rodadas().map(({ receita: r, ...resto }) => ({ ...resto, receita: { sha256: r.sha256 } }));
     expect(await acusacaoSemRodada(receita, antiga, join(pasta, 'rodadas'))).toBeNull();
+    const acervo = dirname(pasta);
+    const daUnidade = `${basename(pasta)}/receita/medidas.js`;
+    expect((await acusacaoSemRodada(receita, antiga, join(pasta, 'rodadas'), { mudadosNoEnvio: [daUnidade], acervo })).motivo).toMatch(/o envio mudou arquivo das fontes da receita, e a rodada 1/);
+    expect(await acusacaoSemRodada(receita, antiga, join(pasta, 'rodadas'), { mudadosNoEnvio: ['outro-objeto/receita/medidas.js'], acervo })).toBeNull();
     escrever(receita, `${PRINCIPAL}// outro texto\n`);
     expect((await acusacaoSemRodada(receita, antiga, join(pasta, 'rodadas'))).motivo).toMatch(/mudou desde a rodada 1/);
+  });
+
+  it('a receita dividida que não importa, com a rodada antiga e o texto do receita.js igual, é acusada mesmo sem o envio informado', async () => {
+    const pasta = montar('dividida-quebrada');
+    const receita = join(pasta, 'receita.js');
+    escrever(receita, PRINCIPAL); escrever(join(pasta, 'receita', 'medidas.js'), 'export const L = ;\n');
+    rodadaDasFontes(pasta, receita, PRINCIPAL);
+    const antiga = lerRodadasReais(pasta).map(({ receita: r, ...resto }) => ({ ...resto, receita: { sha256: r.sha256 } }));
+    expect((await acusacaoSemRodada(receita, antiga, join(pasta, 'rodadas'))).motivo).toMatch(/^a receita não importa.*é de antes de receita\.fontes/);
   });
 
   it('o módulo comum que a receita importa entra nas fontes, e o que ela não importa não', async () => {
@@ -389,6 +402,34 @@ describe('a parte cuja receita é dividida em módulos, e a que não importa', (
     escrever(receita, "export default { nome: 'p', PASSOS: [['caixa', { origemId: 1, largura: 3 }]] };\n");
     expect(impressaoDasFontes(receita).composta).toBe(false);
     expect(impressaoDasFontes(receita).sha256).toBe(`sha256:${createHash('sha256').update(readFileSyncDe(receita)).digest('hex')}`);
+  });
+
+  it('as fontes seguem os imports relativos de forma recursiva dentro da pasta do objeto, e o que sai dela ou é rodada não entra', async () => {
+    const objeto = objetoDeProva('recursivo');
+    const parte = join(objeto, 'partes', 'p');
+    const receita = join(parte, 'receita.js');
+    escrever(receita, "import { A } from '../../comum/a.mjs';\nimport { I } from '../irma/receita.js';\nimport { F } from '../../../fora-do-objeto.js';\nimport { C } from '../_comum/index.js';\nexport default { nome: 'p', PASSOS: [['caixa', { origemId: 1, largura: A + I + F + C }]] };\n");
+    escrever(join(objeto, 'comum', 'a.mjs'), "import { B } from './b/fundo.mjs';\nexport const A = B;\n");
+    escrever(join(objeto, 'comum', 'b', 'fundo.mjs'), 'export const B = 1;\n');
+    escrever(join(objeto, 'partes', 'irma', 'receita.js'), 'export const I = 1;\n');
+    escrever(join(objeto, 'partes', '_comum', 'index.js'), "export { C } from './c.js';\n");
+    escrever(join(objeto, 'partes', '_comum', 'c.js'), "import { D } from '../../comum/d.mjs';\nexport const C = D;\n");
+    escrever(join(objeto, 'comum', 'd.mjs'), 'export const D = 1;\n');
+    escrever(join(raiz, 'fora-do-objeto.js'), 'export const F = 1;\n');
+    const caminhos = (r) => r.arquivos.map((a) => a.slice(objeto.length + 1)).sort();
+    const antes = impressaoDasFontes(receita);
+    expect(antes.composta).toBe(true);
+    expect(caminhos(antes)).toEqual(['comum/a.mjs', 'comum/b/fundo.mjs', 'comum/d.mjs', 'partes/_comum/c.js', 'partes/_comum/index.js', 'partes/irma/receita.js', 'partes/p/receita.js'].sort());
+    expect(impressaoDasFontes(receita).sha256).toBe(antes.sha256);
+    for (const [arquivo, texto] of [['comum/b/fundo.mjs', 'export const B = 2;\n'], ['partes/irma/receita.js', 'export const I = 2;\n'], ['comum/d.mjs', 'export const D = 2;\n']]) {
+      const anterior = impressaoDasFontes(receita).sha256;
+      escrever(join(objeto, arquivo), texto);
+      expect(impressaoDasFontes(receita).sha256, arquivo).not.toBe(anterior);
+    }
+    const antesDoFora = impressaoDasFontes(receita).sha256;
+    escrever(join(raiz, 'fora-do-objeto.js'), 'export const F = 2;\n');
+    escrever(join(objeto, 'comum', 'rodadas', 'x.js'), 'export const X = 1;\n');
+    expect(impressaoDasFontes(receita).sha256).toBe(antesDoFora);
   });
 
   it('a receita que não importa ou que lança ao ler o PASSOS é acusada, e a declaração da pessoa a livra', async () => {
@@ -411,13 +452,13 @@ describe('a declaração sem rodada é da pessoa, e de hoje ou antes', () => {
     const dir = pasta();
     grava(dir, 'Ana, 2099-01-01: segue');
     expect(lerDeclaracaoSemRodada(dir, 'sha256:abc', { agora })).toMatchObject({ valida: false, problema: expect.stringMatching(/a data 2099-01-01 é futura/) });
-    for (const papel of ['modelador', 'o crítico', 'agente', 'implementador', 'Subagente', 'Claude', 'orquestrador']) {
+    for (const papel of ['modelador', 'o crítico', 'agente', 'implementador', 'Subagente', 'Claude', 'orquestrador', 'Opus', 'Sonnet 5', 'haiku', 'GPT-5', 'Gemini', 'a pessoa', 'o usuário', 'Pessoa']) {
       grava(dir, `${papel}, 2026-11-27: segue`);
-      expect(lerDeclaracaoSemRodada(dir, 'sha256:abc', { agora }), papel).toMatchObject({ valida: false, problema: expect.stringMatching(/é um papel de agente.*só a pessoa grava a declaração/) });
+      expect(lerDeclaracaoSemRodada(dir, 'sha256:abc', { agora }), papel).toMatchObject({ valida: false, problema: expect.stringMatching(/não nomeia quem decidiu.*a pessoa confere ao revisar o envio/) });
     }
     grava(dir, 'agente, 2026-11-27: segue');
-    expect(lerDeclaracaoSemRodada(dir, 'sha256:abc', { agora }).problema).toMatch(/'agente' é um papel de agente/);
-    for (const pessoa of ['Ana, 2026-11-27: segue', 'Pedro Alves, 2026-11-01: segue', 'a pessoa, 2026-11-27: segue']) {
+    expect(lerDeclaracaoSemRodada(dir, 'sha256:abc', { agora }).problema).toMatch(/'agente' não nomeia quem decidiu/);
+    for (const pessoa of ['Ana, 2026-11-27: segue', 'Pedro Alves, 2026-11-01: segue', 'Tiago, 2026-11-27: a pessoa disse para seguir']) {
       grava(dir, pessoa);
       expect(lerDeclaracaoSemRodada(dir, 'sha256:abc', { agora }), pessoa).toMatchObject({ valida: true });
     }
