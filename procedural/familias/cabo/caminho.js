@@ -6,7 +6,10 @@
    são densas, e nenhum trecho passa de 98% do que o `friso` aceita sem dividir. O número de estações vem de uma escada fixa
    (`ESCADA_DE_ESTACOES`), porque a composição tem um número fixo de pontos; o menor degrau que cumpre o desvio é o que vale.
 
-   O quadro do tubo é o transporte paralelo da normal ao longo da curva, que não gira em torno da tangente. */
+   O quadro do tubo é o transporte paralelo da normal ao longo da curva, que não gira em torno da tangente.
+
+   Lição do plano dos cabos: o raio mínimo se mede e se recusa na curva que vira malha, e não na haste que a gera; uma interpolação
+   entre nós (a Hermite antiga) dobrou até um terço do raio da haste nas pontas sem que nenhuma medida da haste acusasse. */
 import { TRECHO_MAXIMO_EM_ARESTAS } from '../../nucleo/friso.js';
 
 const soma = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];

@@ -136,3 +136,19 @@ No Blender, três pontos na curva avaliada do addon dão, de −90° a 90°, de 
 
 Os hashes da aprovação mecânica mudaram todos (a forma muda): mínimo, médio e máximo, e os três perfis. As camadas do crítico e da pessoa seguem vazias e as formas aprovadas esperam nova aprovação por imagem: `tools/bancadas/out/cabos-fatia8/` (`node tools/fixtures/cabo/casos-vistas.mjs`, e `node tools/fixtures/cabo/junta-com-cabo-vistas.mjs tools/bancadas/out/cabos-fatia8`), com as folhas de antes (cinza, à esquerda) e depois (laranja, à direita) de cada caso e da junta.
 
+
+A pessoa aprovou a fatia 8 por imagem em 2026-11-27, com a frase "Sim, aprovadas" (`aprovado-fatia8-*.png`: antes e depois de `frente`, do caimento e da junta a +90°, e as formas novas da junta no fim do curso, das braçadeiras e do feixe), e o máximo de `raioMinimo` em 7 diâmetros.
+
+## Tentativas
+
+| Hipótese | Ensaio | Resultado medido | Destino |
+| --- | --- | --- | --- |
+| a curva lisa segue a haste e o raio dela vale o da haste (controle) | `raioLiso` medido nos casos aprovados contra o `raioMinimo` da haste, na fatia 7 | `frente` 6,88 mm liso contra 21,98 na haste; junta a ±90° 4,08 contra 13,00 | descartada: a interpolação dobrava nas pontas |
+| faltam nós na haste perto das pontas | trechos de 1,5 e de 1 diâmetro nas pontas | `frente` foi de 6,88 a 7,28 e 7,49 mm | descartada: o defeito é da interpolação |
+| a tangente curta da Hermite nas pontas faz a quina | tangente esticada por fator de 1,3 a 2 | `frente` entre 5,3 e 8,7 mm, e as estações dos casos aprovados mudam | descartada |
+| a haste precisa ser engastada e a curva lisa precisa ser C² pelos nós | nó fantasma na saída, trecho reto de um diâmetro e spline cúbica por perna, na fatia 8 (`npx vitest run procedural/familias/cabo/cabo.test.mjs`) | razão liso/haste de 0,31–0,92 para 0,95–0,99 em todos os casos; `frente` 21,28 mm | ficou |
+| 17 nós bastam para a spline | spline com 17 e com 25 nós em `frente` | com 17 a curva media 15% abaixo da haste no meio do arco | ficou com 25 nós |
+| a ponta do cabo sai centrada se a vista de topo a mostra centrada | conferência de alinhamento nas três coordenadas, na fatia 4 | a fixture antiga reprova a 0,1 mm e 1 grau; a porta `cabo` do atuador passa | ficou, como conferência |
+| a curva de duas pontas basta no Blender | script com a curva das pontas, junta a 90 graus | o cabo estica de 150 para 165 mm | descartada: veio o addon que mantém o comprimento |
+
+A lição vai para a instrução da ferramenta, no cabeçalho de `procedural/familias/cabo/caminho.js`: o raio mínimo se mede e se recusa na curva que vira malha, e não na haste que a gera.
