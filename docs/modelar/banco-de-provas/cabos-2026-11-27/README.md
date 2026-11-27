@@ -47,3 +47,5 @@ A conferência do curso (`conferirCursoDoCabo`) acusa `estica`, `dobra`, `autoco
 O curso fino: onde a folga do cabo a um sólido fica abaixo de dois diâmetros, o intervalo até o passo vizinho é dividido ao meio até a folga se resolver ou o passo chegar a um oitavo do da declaração. Caso entre passos: o cabo de 200 mm no curso de 100° a 260° em 3 passos passa nos quatro passos grossos e atravessa A de 157° a 203°; só o refinamento o acha.
 
 Vistas em `tools/bancadas/out/cabos-na-junta/` (fora do git): início, meio e fim do curso do arranjo que passa e o atravessa a 180°, cada pose nas vistas isométrica, de lado e de cima, geradas por `node tools/fixtures/cabo/junta-com-cabo-vistas.mjs`.
+
+Na fatia 4 o cabo passou a sair das portas `cabo` que o atuador de junta publica no centro da ponta do cilindro de saída, e as imagens `aprovado-junta-*` foram refeitas com o cabo de 150 mm. A pessoa aprovou em 2026-11-27, com a frase "aprovo, o cabo está passando por fora sim, pode enviar e seguir com a exportação", depois de conferir que o cabo passa por fora da flange na vista de lado a +90°.
