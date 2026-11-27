@@ -31,3 +31,5 @@ Prova (`tools/fixtures/cabo/junta-com-cabo*.test.mjs`): dois atuadores de 100 mm
 Imagens em `tools/bancadas/out/cabos-na-junta/` (não versionadas), de `node tools/fixtures/cabo/junta-com-cabo-vistas.mjs`: `inicio-*`, `meio-*`, `fim-*` (isométrica, de cima e de lado) e `atravessa-no-meio-*`. Aguardam a aprovação da pessoa (gate 5).
 
 Achado: a memória do plano do cabo usava a ordem dos campos como chave, e a chamada e as medidas pediam a mesma conta em ordens diferentes, de modo que cada pose resolvia a haste duas vezes; a chave agora é ordenada e o curso refeito caiu de 8,4 s para 4,4 s.
+
+A pessoa aprovou o cabo na junta por imagem em 2026-11-27, com a frase "aprovo o cabo na junta, o que me preocupa é ele passando por dentro de outra peça" (`aprovado-junta-*.png`; `falha-atravessa-no-meio.png` é o arranjo feito para falhar).
