@@ -123,6 +123,15 @@ function esperarCameraEPararQuadros([quadros, limite, parar, ajuste = null]) {
   });
 }
 
+/* Roda na página: o zoom que o `enquadrar` de `ajustarCamera` deixou na câmera volta a 1, que é o da bancada. */
+function desfazerZoomDoEnquadrar() {
+  const camera = window.__mecanificaBancada.ambiente().camera;
+  if (camera.zoom === 1) return false;
+  camera.zoom = 1;
+  camera.updateProjectionMatrix();
+  return true;
+}
+
 /* A CÓPIA DE UMA PARTE REPETIDA (`--copia`). Uma parte semântica pode ter mais de uma cópia (os dois pedais da bicicleta são a
    parte `pedais`), e isolar a parte mostra as duas; na sessão da bicicleta um dos pedais saía recortando a imagem por script. O zoom
    em mm da análise não resolvia: ele recorta os pixels da captura em que as duas cópias já estão enquadradas e amplia 3 vezes (os
@@ -887,7 +896,8 @@ export async function olharBancada({
     if (visao !== null && (arame || coresPorParte)) erroDeUso('--visao não se mistura com --arame, --wireframe, --raio-x nem --cores: a visão troca o material da peça.');
     if (visao !== null && !(auditoria || revisar)) erroDeUso('--visao vale só na imagem de auditoria; não se mistura com --tela.');
     if (visao !== null && par) erroDeUso('--visao não se mistura com --par: a inspeção de par escolhe a vista e o material por conta própria.');
-    if (enquadrarNaPeca && (par || mirarDeclarado || focar || revisar)) erroDeUso('--enquadrar não se mistura com --par, --mirar, --focar nem --revisar: eles já decidem o quadro.');
+    /* com --revisar o --enquadrar vale: a revisão escolhe as vistas e confere a silhueta inteira no quadro, e não decide o tamanho dela */
+    if (enquadrarNaPeca && (par || mirarDeclarado || focar)) erroDeUso('--enquadrar não se mistura com --par, --mirar nem --focar: eles já decidem o quadro.');
     /* `--res` aceita LARGURA ou LARGURAxALTURA.
      *
      * A proporção era 16:9 fixa no código, e objeto ALTO gastava o quadro à toa:
@@ -1092,8 +1102,12 @@ export async function olharBancada({
        cores, que o controlador de partes calcula por inteiro do estado que se lhe dá (`aplicarVisual`), e no quadro, que a página
        não troca. Com `compartilhada`, uma chamada que terminou bem deixa a página aberta, e a próxima da mesma peça, do mesmo quadro,
        da mesma projeção e da mesma explosão reaplica a auditoria, a seleção e o modo pela ponte, como a primeira já fazia por cima
-       da URL, e refaz o enquadramento. Qualquer outra diferença abre página nova. */
-    const reaproveitavel = Boolean(compartilhada) && auditoriaEfetiva && !par && !listar && !corte && visao === null && !enquadrarNaPeca && !copia;
+       da URL, e refaz o enquadramento. Qualquer outra diferença abre página nova.
+       A chamada com `--enquadrar` também reaproveita e é reaproveitada: ela deixa o zoom da câmera mudado, que a troca de vista da
+       bancada não desfaz, e por isso toda chamada que recebe uma página já usada começa por voltar o zoom a 1 (`desfazerZoomDoEnquadrar`),
+       antes do enquadramento da bancada. Antes a chamada enquadrada nunca reaproveitava página, e as cinco capturas da peça sozinha
+       do pacote do crítico pagariam cinco cargas da peça. */
+    const reaproveitavel = Boolean(compartilhada) && auditoriaEfetiva && !par && !listar && !corte && visao === null && !copia;
     const chaveDaPagina = JSON.stringify({ peca, sessao: sessaoDaCaptura, largura, altura, projecao, explosao, ambiente });
     chaveDaPaginaDaChamada = chaveDaPagina;
     reaproveitavelDaChamada = reaproveitavel;
@@ -1233,6 +1247,8 @@ export async function olharBancada({
         if (!await page.evaluate(() => typeof window.__mecanificaBancada === 'object' && window.__mecanificaBancada !== null)) {
           throw new Error(`a página da bancada perdeu a ponte antes da vista ${vista} (recarregou ou caiu); repita a captura.`);
         }
+        /* a página que veio de outra chamada pode trazer o zoom de um `--enquadrar`: volta a 1 antes de qualquer quadro desta */
+        if (!paginaNova && indice === 0) await page.evaluate(desfazerZoomDoEnquadrar);
         await page.evaluate((alvo) => {
           window.__modelarQuadros?.retomar();
           window.__mecanificaBancada.ambiente().definirVista(alvo, { instantaneo: true });
@@ -1693,7 +1709,7 @@ Captura a peça ou montagem na bancada, sem interface.
   --angulo-da-zebra=<graus>  com --visao=zebra, a direção da listra, de -180 a 180: 0 (padrão) deitada, lê a inclinação para cima e para baixo; 90 em pé, lê a inclinação para os lados
   --caixas-de-luz=<n>  com --visao=pintura, o número de caixas de luz do teto refletidas (1 a 4; padrão 2)
   --azimute=<graus>      com --visao=luz-rasante, a direção da luz no plano da imagem (0 a 360; padrão: a que a bancada escolhe pela vista)
-  --enquadrar            fecha a câmera no que está à vista, para a peça ocupar 92 % da maior dimensão do quadro (a vista padrão deixa a lataria de um carro em um décimo); não se mistura com --par, --mirar, --focar, --revisar nem --analise
+  --enquadrar            fecha a câmera no que está à vista, para a peça ocupar 92 % da maior dimensão do quadro (a vista padrão deixa a lataria de um carro em um décimo); vale com --revisar, e não se mistura com --par, --mirar, --focar nem --analise
   --mirar=<x,y,z>        a câmera mira o ponto, em mm do referencial da peça, na vista de --vistas (ex.: --mirar=1200,900,-300 --vistas=direita); não se mistura com --focar, --par, --revisar nem --analise
   --mirar=<x,y,z[,d]>/<x,y,z[,d]>/...  várias miras numa chamada, separadas por / (ou ; entre aspas): cada vista de --vistas em cada mira, na mesma página e com uma execução da receita, uma imagem por mira e vista com o ponto no nome; o quarto número é a distância daquela mira, em mm (ex.: --mirar=-250,4,0,20/11,7,0,46 --vistas=isometrica,superior dá 4 imagens)
   --distancia=<mm>       com --mirar: a distância da câmera ao ponto, para as miras sem a quarta coordenada (padrão ${DISTANCIA_PADRAO_DA_MIRA_MM}; o campo visível no ponto tem 0,69 vez a distância de altura)

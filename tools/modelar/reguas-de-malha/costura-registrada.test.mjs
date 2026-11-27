@@ -4,7 +4,7 @@
 import { describe, expect, it } from 'vitest';
 import { executarReceita } from '../../../src/autoria/executar-receita.js';
 import { receitaDeTubos } from '../../fixtures/costuras-e-furos/tubos-em-t.js';
-import { costuraGeometrica, medirCosturaRegistrada } from './costura-registrada.mjs';
+import { costuraGeometrica, medirCosturaRegistrada, medirCosturasDaReceita } from './costura-registrada.mjs';
 
 /* a peça até o `unir`, sem o `arredondarCostura`: o arredondamento corta as faces e muda as arestas */
 function ateOUnir(receita) {
@@ -37,6 +37,16 @@ describe('régua da costura registrada', () => {
     const m = medir(receitaDeTubos('x', 'x', { raio: 20, alturaDoEixo: 60, comprimento: 40, avanco: 0, chanfro: 0.5, lados: 96, raioDoEncontro: raio, raioMinimo: raio / 3, afinarPontas: 4 * raio }));
     expect(m.perdidas).toEqual([]);
     expect(m.sobras).toEqual([]);
+  });
+
+  it('pela receita inteira, cada unir é medido com a receita cortada logo depois dele, e o resultado é o da receita cortada à mão', () => {
+    const receita = receitaDeTubos('x', 'x', { avanco: 0.05 });
+    const linhas = medirCosturasDaReceita(receita, executarReceita);
+    expect(linhas).toHaveLength(receita.PASSOS.filter((p) => p[0] === 'unir').length);
+    expect(linhas.length).toBeGreaterThan(0);
+    const { passo, origem, ...numeros } = linhas.at(-1);
+    expect(receita.PASSOS[passo][1].origemId).toBe(origem);
+    expect(numeros).toEqual(medir(receita));
   });
 
   it.each(['braco', 'antebraco', 'elo-punho-4', 'elo-punho-5'])('a parte %s do braço registra a costura inteira', async (parte) => {

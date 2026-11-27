@@ -39,8 +39,6 @@ export const TESTES_LENTOS = [
   /* 2026-11-18: o dado guardado dos ajustes de curva lisa conferido em cada receita do acervo que os declara (hoje a lataria do carro, cinco ajustes): refaz os ajustes,
      11 s com a máquina livre e o dobro ou o triplo no CI */
   'tools/modelar/regravar-ajustes-de-curva.test.mjs',
-  /* 2026-11-17: a migração do carrinho de mão pelo commit do aceite (extrai a árvore, mede a montagem nela e nela de agora); uns 20 s (plano das etapas pela impressão, fatia 3) */
-  'tools/modelar/migrar-etapas-para-impressao.test.mjs',
   /* 2026-11-17: cada consumidor do estado das etapas sobre um registro v3 em disco, numa cópia do carrinho de mão; uns 40 s com a máquina dividida (plano das etapas pela impressão, fatia 2) */
   'tools/modelar/etapas-consumidores-v3.test.mjs',
   /* 2026-11-17: reabrir a base do braço resolve a montagem inteira de doze etapas, com a placa de controle na base; uns 35 s */

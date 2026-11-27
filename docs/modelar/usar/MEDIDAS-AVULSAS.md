@@ -28,6 +28,14 @@ Use `npm run perfil:cor -- --imagem=<png> --caixa=<x0,y0,x1,y1> --cores=<nome:#r
 
 Use `npm run silhueta:pedida -- --esboco <arquivo> --parte <nome> --vistas <export>` quando um corpo foi pedido pelas vistas (`lacosPelasVistas`) e é preciso saber, faixa por faixa de altura, quanto a malha da parte se afasta do corpo pedido.
 
+## Malha e execução
+
+Use `npm run costura:registrada -- <peça>` quando o arredondamento de uma costura (`arredondarCostura`) acaba em dentes ou não fecha, para saber se o `unir` registrou a costura inteira: ele mede cada `unir` com a receita cortada logo depois dele e sai com 1 quando há aresta perdida ou de sobra.
+
+Use `npm run reguas:malha:acervo -- <peça> [<peça> ...]` para ter numa linha por peça a face degenerada, o triângulo fino e o serrilhado da costura; sem peça ele mede o acervo inteiro, o que leva minutos, e com `--json=<arquivo>` grava os números.
+
+Use `npm run perfil:execucao -- <peça> --perfil` quando a receita demora e é preciso saber em que passo e em que operação o tempo vai; `--executar` dá só o tempo da execução num processo novo, e `--acervo` lista o grafo de leitura e as sequências de subtrair de todas as peças, sem executar nada.
+
 ## O que pertence a uma peça
 
 Use `npm run material -- <peça>` antes de mover, renomear ou apagar uma peça, para ver tudo que pertence a ela e em que pasta está, com o que a receita declara separado do que só existe por convenção de nome.

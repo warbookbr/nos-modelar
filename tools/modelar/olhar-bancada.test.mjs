@@ -312,7 +312,7 @@ describe('carga da página', () => {
   const ENQUADRAMENTO = { valida: true, area: 0.3, largura: 0.5, altura: 0.6, cortado: false };
 
   function bancadaContada({ falharPonte = false, perderPonte = false, neutroDaSessao = null } = {}) {
-    const contagem = { servidores: 0, navegadores: 0, paginas: 0, cargas: 0, esperas: [], cortes: [], vistasTrocadas: 0, paginasFechadas: 0, navegadoresFechados: 0 };
+    const contagem = { servidores: 0, navegadores: 0, paginas: 0, cargas: 0, zoomDesfeito: 0, esperas: [], cortes: [], vistasTrocadas: 0, paginasFechadas: 0, navegadoresFechados: 0 };
     const page = {
       on() {},
       off() {},
@@ -329,6 +329,7 @@ describe('carga da página', () => {
       async evaluate(fn, argumento) {
         const texto = String(fn);
         if (texto.includes('typeof window.__mecanificaBancada')) return !perderPonte;
+        if (texto.includes('desfazerZoomDoEnquadrar')) { contagem.zoomDesfeito = (contagem.zoomDesfeito ?? 0) + 1; return false; }
         if (texto.includes('getBoundingClientRect')) { contagem.projecoes = (contagem.projecoes ?? 0) + 1; return { pixels: argumento.map((_, i) => [10 + i, 20 + i]), quadro: [64, 36] }; }
         if (texto.includes('__modelarAjustarCamera = ')) return undefined;
         if (texto.includes('__modelarAjuste')) return { dentroDaPeca: false };
@@ -397,6 +398,35 @@ describe('carga da página', () => {
     expect(contagem).toMatchObject({ servidores: 1, navegadores: 1, cargas: 2, paginas: 2, navegadoresFechados: 1 });
     /* as duas páginas se fecharam, e o navegador só no `fechar` de quem o abriu */
     expect(contagem.paginasFechadas).toBe(2);
+  });
+
+  it('a chamada com enquadrar vale junto da revisão e divide a página com as outras, e quem recebe a página usada desfaz o zoom antes', async () => {
+    const { contagem, dependencias } = bancadaContada();
+    const compartilhada = await abrirCapturaCompartilhada({ dependencias });
+    const { auditoria: _auditoria, ...semAuditoria } = comum;
+    try {
+      /* as capturas da peça sozinha do pacote do crítico: a revisão e três chamadas de auditoria, todas enquadradas, numa página só */
+      const revisao = await olharBancada({ ...semAuditoria, revisar: true, enquadrar: true, compartilhada, dependencias });
+      expect(revisao.ok).toBe(true);
+      expect(revisao.resultado.capturas).toHaveLength(4);
+      /* a primeira chamada abre a página, e não há zoom a desfazer */
+      expect(contagem.zoomDesfeito).toBe(0);
+      for (const extra of [{ vistas: ['traseira'] }, { vistas: ['esquerda'] }, { vistas: ['isometrica'], arame: true }]) {
+        const resposta = await olharBancada({ ...comum, projecao: 'ortografica', enquadrar: true, compartilhada, dependencias, ...extra });
+        expect(resposta.ok).toBe(true);
+      }
+      /* a chamada sem enquadrar (a vista isolada de uma parte) usa a mesma página, e o zoom é desfeito uma vez por chamada que a recebe */
+      const semEnquadrar = await olharBancada({ ...comum, projecao: 'ortografica', vistas: ['direita', 'frontal'], compartilhada, dependencias });
+      expect(semEnquadrar.ok).toBe(true);
+      expect(contagem).toMatchObject({ cargas: 1, paginas: 1, zoomDesfeito: 4 });
+    } finally {
+      await compartilhada.fechar();
+    }
+    expect(contagem).toMatchObject({ servidores: 1, navegadores: 1 });
+    /* o enquadrar continua recusado com o que decide o quadro */
+    const comFoco = await olharBancada({ ...comum, enquadrar: true, focar: true, selecionadas: 'a', dependencias });
+    expect(comFoco.ok).toBe(false);
+    expect(JSON.stringify(comFoco)).toContain('--enquadrar não se mistura com --par, --mirar nem --focar: eles já decidem o quadro.');
   });
 
   it('a análise inteira (18 vistas e a parte isolada) carrega a página e a peça uma vez, num servidor e num navegador só', async () => {

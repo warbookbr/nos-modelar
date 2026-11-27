@@ -85,7 +85,12 @@
  * diz isso, com o hash medido, no relatório e no `pedido.md`. `--sem-medir` monta o pacote mesmo assim, para quem só quer as imagens, e o
  * diz nos dois. A medição entra em `dependencias.medirReceita`.
  *
- * Uso: node tools/modelar/vistas-para-critica.mjs <peça> [--saida=<pasta da rodada>] [--prazo=<segundos de carga por captura>] [--sem-medir] [--com-blender]
+ * O PACOTE PADRÃO E O COMPLETO (2026-11-26, plano do laço mais rápido, fatia 3). Sem opção sai o pacote padrão, umas dez imagens mais a
+ * vista isolada das partes cuja malha ou promessa difere da impressão das partes que a última rodada julgada pelo crítico gravou, e das
+ * partes citadas nos defeitos dela; o pedido diz o que entrou e o que ficou de fora, sem citar receita nem rodada nem o que já foi
+ * julgado. `--completo` monta o pacote de antes. A regra está junto de `PACOTE_PADRAO`, mais abaixo.
+ *
+ * Uso: node tools/modelar/vistas-para-critica.mjs <peça> [--saida=<pasta da rodada>] [--prazo=<segundos de carga por captura>] [--sem-medir] [--completo] [--com-blender]
  *      [--referencia=<caminho absoluto da imagem>[@<vista>] [--orientacao-da-referencia=<texto>]]... [--ajuda]
  *      node tools/modelar/vistas-para-critica.mjs <peça> --antes-e-depois=<imagem> [--pacote-atual=<pasta>] [--pacote-anterior=<pasta>]
  *
@@ -168,6 +173,176 @@ export const QUADRO_MONTADO = Object.freeze({ largura: 1200, altura: 1000 });
 /* O prazo da captura montada: seis vistas do avião inteiro até a peça, com o servidor e o navegador subindo junto, passam dos 45 s que a
    captura de uma vista de teste tem de padrão, e estouraram com dois pacotes rodando ao mesmo tempo. */
 export const PRAZO_DA_CAPTURA_MONTADA_MS = 240_000;
+
+/* O PACOTE PADRÃO E O COMPLETO (plano do laço mais rápido, fatia 3, 2026-11-26). O pacote da lataria do carro tinha 57 imagens, e o da
+   fuselagem do avião, de treze partes, 46, quase todas iguais às da rodada anterior. Sem opção, o pacote é o padrão: as seis vistas da
+   peça sozinha, a malha em arame de três quartos e em raio X de trás, na instância de montagem a vista montada isométrica e a ortogonal em que mais
+   área da peça aparece e o corte de todo encaixe que encosta ou cruza (`encaixesDoPadrao`, mais os que a receita declara em `CRITICA.cortes`),
+   e a vista isolada só das partes cuja malha ou promessa difere da última rodada que o crítico julgou e das que o veredito dela cita num
+   defeito (`partesComVistaIsolada`). A peça de lataria, que a receita
+   declara (`src/autoria/lataria.js`), leva a curvatura, a luz rasante e a zebra numa vista só, a de três quartos. O que a receita
+   declara para comparar com a referência (o alvo, a sobreposição, a prancha, o contorno, as vistas de perto das partes que entram) não
+   muda. `--completo` monta o pacote de antes, com tudo. A pessoa aprovou o conjunto padrão em 2026-11-26.
+
+   A BASE DA COMPARAÇÃO É A IMPRESSÃO GRAVADA, E NÃO A CÓPIA DA RECEITA EXECUTADA DE NOVO. A primeira versão executava
+   `rodadas/receita-NN.js` com os módulos de hoje: a cópia importa os módulos vivos, e a mudança feita numa ferramenta ou num módulo ao
+   lado saía igual dos dois lados e a parte ficava sem vista. Agora o pacote grava a impressão de cada parte no `pacote.json`
+   (`impressaoDasPartes`), o registro do veredito a confere contra a receita medida e a grava na rodada, e o pacote seguinte compara com
+   o que a rodada gravou. A rodada julgada que não a gravou (as registradas até 2026-11-26) não serve de base, e todas as partes entram. */
+export const PACOTE_PADRAO = 'padrao';
+export const PACOTE_COMPLETO = 'completo';
+export const VISTAS_DO_ARAME_NO_PADRAO = 'isometrica';
+export const MONTADAS_DO_PADRAO = 2;
+export const VISTAS_DO_REFLEXO_NO_PADRAO = 'isometrica';
+export const VISTAS_DE_SUPERFICIE_NO_PADRAO = Object.freeze(['tresquartos']);
+export const comandoDoCompleto = (peca) => `npm run vistas:critica -- ${peca} --completo`;
+
+/** O nome sob o qual entram, na impressão, as faces que não dizem de que parte são. */
+export const SEM_PARTE = '(sem parte)';
+const sha256De = (texto) => createHash('sha256').update(texto).digest('hex');
+
+/**
+ * A impressão da malha de cada parte de uma receita executada (`neutro`): `Map(parte → sha256)`. Entram as coordenadas dos vértices de
+ * cada face e o que a face carrega além deles (o liso, a cor, o material), em ordem que não depende do número dos vértices nem da
+ * ordem das faces: o passo acrescentado antes de uma parte renumera a malha dela sem mudá-la. Entra também a declaração, em
+ * `materiais` (o `MATERIAIS` da receita), de cada material que as faces da parte citam: a face guarda só o nome dele, e a cor trocada
+ * na declaração muda o que a imagem mostra. As faces sem parte entram juntas, sob `SEM_PARTE`.
+ */
+export function impressoesDasPartes(neutro, { materiais = null } = {}) {
+  const porParte = new Map();
+  const usados = new Map();
+  for (const face of neutro?.F?.values?.() ?? []) {
+    const parte = typeof face.parte === 'string' && face.parte ? face.parte : SEM_PARTE;
+    /* o número da face e o dos vértices saem: são da ordem em que a malha foi feita, e não da forma dela */
+    const { vs = [], id: _numero, ...resto } = face;
+    if (!porParte.has(parte)) { porParte.set(parte, []); usados.set(parte, new Set()); }
+    porParte.get(parte).push(`${vs.map((id) => (neutro.V.get(id) ?? []).join(',')).join(';')}|${JSON.stringify(resto)}`);
+    if (typeof face.material === 'string') usados.get(parte).add(face.material);
+  }
+  return new Map([...porParte].map(([nome, linhas]) => {
+    const declarados = [...usados.get(nome)].sort().filter((m) => materiais?.[m] !== undefined).map((m) => `material ${m}=${JSON.stringify(materiais[m])}`);
+    return [nome, sha256De([...linhas.sort(), ...declarados].join('\n'))];
+  }));
+}
+
+/**
+ * A impressão das partes que o pacote grava no `pacote.json` e o registro do veredito grava na rodada: `{ malhas: { parte: sha256 },
+ * promessas: { parte: sha256 } }`, com as partes em ordem de nome. `malhas` é `impressoesDasPartes`, e `promessas` a impressão do que
+ * o `plano` normalizado promete para cada parte. É o resultado da receita executada, de modo que a mudança num módulo que ela importa
+ * aparece aqui mesmo com o texto da receita igual. Puro.
+ */
+export function impressaoDasPartes(neutro, { materiais = null, plano = null } = {}) {
+  const emOrdem = (pares) => Object.fromEntries([...pares].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)));
+  return {
+    malhas: emOrdem(impressoesDasPartes(neutro, { materiais })),
+    promessas: emOrdem((plano?.partes ?? []).map((p) => [p.nome, sha256De(JSON.stringify(p))])),
+  };
+}
+
+/** Se `v` tem a forma de `impressaoDasPartes`: os dois dicionários de nome para sha256, e nada além deles. */
+export function ehImpressaoDasPartes(v) {
+  const dicionario = (d) => Boolean(d) && typeof d === 'object' && !Array.isArray(d) && Object.values(d).every((h) => typeof h === 'string' && /^[0-9a-f]{64}$/.test(h));
+  return Boolean(v) && typeof v === 'object' && !Array.isArray(v) && Object.keys(v).sort().join() === 'malhas,promessas' && dicionario(v.malhas) && dicionario(v.promessas);
+}
+
+/** As partes em que duas impressões diferem, na malha ou na promessa, em ordem de nome; vazia quando são a mesma. Puro. */
+export function partesQueDiferem(a, b) {
+  const nomes = new Set();
+  for (const campo of ['malhas', 'promessas']) {
+    for (const nome of new Set([...Object.keys(a?.[campo] ?? {}), ...Object.keys(b?.[campo] ?? {})])) if (a?.[campo]?.[nome] !== b?.[campo]?.[nome]) nomes.add(nome);
+  }
+  return [...nomes].sort();
+}
+
+/**
+ * A impressão das partes da receita do arquivo `caminho`, executada pelo cache por passo (a medição da rodada já a deixou lá): é a que
+ * o pacote grava e a que o registro do veredito confere. `malha` troca a execução no teste. A receita que não executa sozinha lança.
+ */
+export async function impressaoDasPartesDaReceita(caminho, { receita = null, malha = null } = {}) {
+  const rec = receita ?? receitaDoModulo(await importarReceita(caminho));
+  const executar = malha ?? (async (arquivo, r) => {
+    const executada = (await (await import('./entrada-de-medida.mjs')).executarComCachePorPasso(arquivo, r)).executada;
+    return executada.neutro ?? executada;
+  });
+  let plano = null;
+  try { plano = normalizarPlanoDeModelagem(rec?.PLANO); } catch { plano = null; }
+  return impressaoDasPartes(await executar(caminho, rec), { materiais: rec?.MATERIAIS ?? null, plano });
+}
+
+/**
+ * As partes do plano que levam vista isolada no pacote padrão: `{ comVista: [{ nome, porque }], semVista: [nomes] }`. `atual` e `base`
+ * são `impressaoDasPartes` da receita de agora e a que a última rodada julgada gravou; sem `base`, todas entram. Entra a parte cuja
+ * malha difere ('malha'), a que tem promessa diferente ('promessa'), a que a base não tinha ('nova'), a que a malha de agora não tem
+ * ('ausente': a parte prometida e não entregue aparece como ausência na vista isolada) e a que o veredito da rodada da base cita num
+ * defeito ('defeito', de `citadas`): o crítico apontou algo nela, e a vista isolada é onde ele confere, mesmo sem mudança; se o defeito cita um nome que não é parte do plano, todas entram ('defeito-sem-parte'). Puro.
+ */
+export function partesComVistaIsolada(partes, atual, base = null, { citadas = [] } = {}) {
+  if (!base) return { comVista: partes.map((nome) => ({ nome, porque: 'sem-base' })), semVista: [] };
+  /* o defeito que cita um nome que não é parte do plano não diz qual parte ver: todas entram */
+  if (citadas.some((c) => !partes.includes(c))) return { comVista: partes.map((nome) => ({ nome, porque: 'defeito-sem-parte' })), semVista: [] };
+  const comVista = [];
+  const semVista = [];
+  for (const nome of partes) {
+    const agora = atual.malhas[nome] ?? null;
+    const antes = base.malhas[nome] ?? null;
+    const porque = agora === null ? 'ausente' : antes === null ? 'nova' : agora !== antes ? 'malha'
+      : (atual.promessas[nome] ?? null) !== (base.promessas[nome] ?? null) ? 'promessa' : citadas.includes(nome) ? 'defeito' : null;
+    if (porque) comVista.push({ nome, porque }); else semVista.push(nome);
+  }
+  return { comVista, semVista };
+}
+
+/** As partes que o veredito de uma rodada cita em `defeitos[].parte`, sem repetição. O defeito sem parte não cita nenhuma. */
+export function partesCitadasNosDefeitos(veredito) {
+  return [...new Set((Array.isArray(veredito?.defeitos) ? veredito.defeitos : []).map((d) => d?.parte).filter((p) => typeof p === 'string' && p))];
+}
+
+/** O registro de uma rodada (`rodada-NN.json` da pasta das rodadas), ou null quando falta ou não se lê. */
+export function registroDaRodada(pasta, numero) {
+  try { return JSON.parse(readFileSync(join(pasta, `rodada-${String(numero).padStart(2, '0')}.json`), 'utf8')); } catch { return null; }
+}
+
+/** A última rodada registrada com veredito do crítico numa pasta de rodadas: o número dela, ou null. O registro ilegível fica fora. */
+export function ultimaRodadaJulgada(pasta) {
+  if (!existsSync(pasta)) return null;
+  let ultima = null;
+  for (const nome of readdirSync(pasta).filter((n) => /^rodada-\d{2}\.json$/.test(n)).sort()) {
+    try {
+      const j = JSON.parse(readFileSync(join(pasta, nome), 'utf8'));
+      if (j?.veredito) ultima = Number.isInteger(j.numero) ? j.numero : Number(nome.slice(7, 9));
+    } catch { /* fica fora */ }
+  }
+  return ultima;
+}
+
+/** A fração visível de uma medida de vista montada, que é a fração ou `{ visivel, areaVisivel }`; null sem medida. */
+const fracaoDaMedida = (m) => (typeof m === 'number' ? m : typeof m?.visivel === 'number' ? m.visivel : null);
+
+/* Duas vistas montadas em que a área visível da peça difere menos que isto valem como empate, e fica a que vem antes na ordem das
+   vistas: na fuselagem do avião a de lado, a de cima e a de baixo diferem 12 %, e a de lado é a que se compara com a referência. */
+export const EMPATE_DA_AREA_MONTADA = 0.2;
+
+/**
+ * As vistas montadas do pacote padrão, pelas medidas da peça em foco (`{ [vista]: fração }` ou `{ [vista]: { visivel, areaVisivel } }`):
+ * a isométrica, quando a peça aparece nela, e as ortogonais em que mais área da peça aparece (a peça comprida mostra mais de lado que
+ * de frente), até `quantas`. Sem a área, vale a fração visível. A vista em que a peça aparece menos que `minimo` da silhueta dela não
+ * entra; a sem medida vale depois das medidas; e entre as que ficam a menos de `EMPATE_DA_AREA_MONTADA` da maior, a que vem antes em
+ * `vistas`. Puro.
+ */
+export function montadasDoPadrao(medidas, { vistas = VISTAS_MONTADAS, quantas = MONTADAS_DO_PADRAO, minimo = VISIVEL_MINIMO_DA_PECA_EM_FOCO, empate = EMPATE_DA_AREA_MONTADA } = {}) {
+  const fracao = (v) => fracaoDaMedida(medidas?.[v]);
+  const peso = (v) => (typeof medidas?.[v]?.areaVisivel === 'number' ? medidas[v].areaVisivel : fracao(v) ?? -1);
+  const cabem = vistas.filter((v) => fracao(v) === null || fracao(v) >= minimo);
+  const escolhidas = cabem.filter((v) => v === 'isometrica');
+  const resto = cabem.filter((v) => v !== 'isometrica');
+  while (escolhidas.length < quantas && resto.length) {
+    const maior = Math.max(...resto.map(peso));
+    const proxima = resto.find((v) => (maior > 0 ? peso(v) >= maior * (1 - empate) : peso(v) === maior));
+    escolhidas.push(proxima);
+    resto.splice(resto.indexOf(proxima), 1);
+  }
+  return escolhidas.slice(0, quantas);
+}
 
 /* A pergunta de forma que o alvo vindo do esboço pede: ele passou por dois críticos com o para-brisa saliente, e só a pessoa o viu. */
 /* As partes que o `REFINA.esboco` declara afastadas do esboço de propósito (deslocamento ou alongamento, com o motivo), em texto para o
@@ -424,7 +599,7 @@ export function antesEDepois(peca, { atual, anterior, imagem }) {
   if (candidatas.length > 1) throw new Error(`o antes e depois recebeu "${pedido}", que casa com ${candidatas.length} imagens do pacote atual; esperado um trecho que só uma tenha:\n${lista(candidatas)}\nRode \`${comandoDoAntesEDepois(peca)}\` com o nome inteiro de uma delas.`);
   const [a] = candidatas;
   const b = antes.imagens.find((i) => i.arquivo === a.arquivo);
-  if (!b) throw new Error(`o antes e depois recebeu a imagem ${a.arquivo}, e o pacote anterior (${anterior}) não a tem: a rodada anterior não capturou essa vista; esperado uma imagem que as duas rodadas tenham. Rode \`${comandoDoAntesEDepois(peca)}\` com outra.`);
+  if (!b) throw new Error(`o antes e depois recebeu a imagem ${a.arquivo}, e o pacote anterior (${anterior}) não tem imagem com esse nome: a rodada anterior não capturou essa vista, ou a capturou com outro nome e outra câmera numa versão anterior da ferramenta (as vistas da peça sozinha ganharam o enquadramento e o sufixo -enquadrado em 2026-11-26); esperado uma imagem que as duas rodadas tenham. Rode \`${comandoDoAntesEDepois(peca)}\` com outra.`);
   if (textoDaCamera(a.camera) !== textoDaCamera(b.camera)) {
     throw new Error(`o antes e depois de ${a.arquivo} recebeu duas câmeras diferentes: a anterior foi tirada com ${textoDaCamera(b.camera)} e a atual com ${textoDaCamera(a.camera)}; esperado a mesma câmera nas duas, porque imagens de câmeras diferentes lado a lado mostram a mudança da câmera como se fosse da peça. `
       + `Gere os dois pacotes com a mesma versão da ferramenta (\`npm run vistas:critica -- ${peca}\`).`);
@@ -662,7 +837,7 @@ export function montarPedido(dados) {
 
 /** As seções do pedido, `[{ chave, linhas }]`, na ordem do pedido de hoje; o pedido por perguntas fechadas (`montarPedidoFechado`) as
  *  reordena. Com `fechado`, a seção das partes não pede a linha por parte, porque a forma prometida vira pergunta fechada. */
-export function secoesDoPedido({ peca, plano = null, orientacao = null, alvo = null, afastamentos = [], referencias = [], naoConstruidas = [], modelo = [], arame = [], montado = null, sobreposicao = null, partes = [], perguntas = [], superficie = null, reflexo = null, contornos = [], contornoSobreposto = null, encaixes = [], anteriores = [], medicao = null, pranchaDesenhada = null, referenciasFora = [] }, { fechado = false } = {}) {
+export function secoesDoPedido({ peca, plano = null, orientacao = null, alvo = null, afastamentos = [], referencias = [], naoConstruidas = [], modelo = [], arame = [], montado = null, sobreposicao = null, partes = [], perguntas = [], superficie = null, reflexo = null, contornos = [], contornoSobreposto = null, encaixes = [], anteriores = [], medicao = null, pranchaDesenhada = null, referenciasFora = [], pacote = null }, { fechado = false } = {}) {
   const imagem = ({ arquivo, vista, tipo }) => `${vista}${tipo ? `, ${tipo}` : ''}: ${arquivo}`;
   /* O lado de cada vista é dito uma vez, em Modelo, e vale pelo nome para o modelo, o montado e as partes: dito junto de cada imagem,
      o mesmo texto longo se repetia mais de vinte vezes na peça de onze partes. */
@@ -674,6 +849,17 @@ export function secoesDoPedido({ peca, plano = null, orientacao = null, alvo = n
   L.push(`# Pedido ao crítico visual: ${peca}`, '', 'Abra com `Read` cada imagem citada abaixo e olhe; não leia nenhum outro arquivo. Todos os caminhos são absolutos.', '');
 
   if (medicao) L.push(`Medição da receita: ${medicao.passou ? `passou (${medicao.sha256})` : `NÃO FEITA: ${medicao.motivo}`}.`, '');
+
+  /* o pacote padrão diz o que trouxe e por quê, e o que deixou de fora; o completo não tem o que dizer, e o pedido dele é o de sempre */
+  if (pacote?.tipo === PACOTE_PADRAO) {
+    L.push(
+      'Este pedido traz o conjunto padrão de imagens da peça, e não todas as que ela pode ter. Entraram:', '',
+      ...lista(pacote.entrou), '',
+      'Ficaram de fora:', '',
+      ...lista(pacote.fora), '',
+      'O que ficou de fora não é ausência nem defeito. Julgue pelo que veio; a pergunta que depender de uma imagem que não veio se responde `não dá para ver`, dizendo qual imagem faltou.', '',
+    );
+  }
 
   if (plano) {
     abrir('objeto');
@@ -793,9 +979,17 @@ export function secoesDoPedido({ peca, plano = null, orientacao = null, alvo = n
     for (const nota of sobreposicao.notas ?? []) L.push(`Fora da sobreposição: ${nota}.`, '');
   }
 
-  if (partes.length) {
+  const semVista = pacote?.partesSemVista ?? [];
+  if (partes.length || semVista.length) {
     abrir('partes');
-    L.push('## Partes', '', `Uma vista isolada de cada parte, olhando dos lados descritos em Modelo, com a forma e a técnica que o plano prometeu para ela. ${fechado ? 'A forma prometida de cada parte é perguntada, afirmação por afirmação, nas perguntas fechadas, mais abaixo. ' : 'Diga, em uma linha por parte, se a forma que você vê é a prometida; parte prometida que não aparece na imagem é ausência. '}Feição menor que uns 10 mm só se julga pela vista de perto, quando a parte a traz; sem ela, a imagem isolada não a mostra e você não aponta defeito nem aprova a feição.`, '');
+    L.push('## Partes', '');
+    if (semVista.length) {
+      /* só quais têm vista e onde as outras aparecem: o pedido não diz por quê, nem que a parte sem vista está certa */
+      L.push(`${partes.length ? 'Só as partes abaixo têm vista isolada neste pedido' : 'Nenhuma parte tem vista isolada neste pedido'}. Sem vista isolada: ${semVista.map((n) => `\`${n}\``).join(', ')}. Elas aparecem nas vistas da peça inteira, em Modelo, e se julgam por essas vistas como as outras: a falta da vista isolada não é ausência da parte e não diz que ela está certa.`, '');
+    }
+  }
+  if (partes.length) {
+    L.push(`Uma vista isolada de cada parte, olhando dos lados descritos em Modelo, com a forma e a técnica que o plano prometeu para ela. ${fechado ? 'A forma prometida de cada parte é perguntada, afirmação por afirmação, nas perguntas fechadas, mais abaixo. ' : 'Diga, em uma linha por parte, se a forma que você vê é a prometida; parte prometida que não aparece na imagem é ausência. '}Feição menor que uns 10 mm só se julga pela vista de perto, quando a parte a traz; sem ela, a imagem isolada não a mostra e você não aponta defeito nem aprova a feição.`, '');
     for (const { nome, imagens, caixaMm = null, dePerto = [] } of partes) {
       const prometida = plano?.partes.find((p) => p.nome === nome);
       L.push(`### ${nome}`, '');
@@ -1547,9 +1741,9 @@ export function etapaFixaDaPeca(montagem, registro) {
 /** O motivo, para o pedido, de os contornos de uma peça com a etapa fixa ficarem fora do pacote. */
 export function motivoDaEtapaFixa(fixa, contornos, arquivoDaMontagem) {
   const nomes = [...new Set(contornos.map((c) => basename(c.arquivo)))].join(', ');
-  return `${nomes} ${contornos.length > 1 ? 'ficam' : 'fica'} fora do pacote, sem desenho nem citação como medida: a etapa '${fixa.instancia}' está fixa no registro de etapas da montagem`
-    + `${fixa.por ? ` (aceite: ${fixa.por})` : ''}, e o pacote só usa contorno de peça em modelagem, porque o contorno de uma peça já aprovada pode ser resto de uma referência encerrada. `
-    + `Reabrir a etapa (\`node tools/modelar/etapas-da-montagem.mjs ${relative(REPO, arquivoDaMontagem)} --reabrir ${fixa.instancia} --por "<quem, data: motivo>"\`) o traz de volta.`;
+  /* o pedido não conta ao crítico o aceite nem que a peça foi aprovada (revisão de 2026-11-26): diz só o que ficou fora */
+  void fixa; void arquivoDaMontagem;
+  return `${nomes} ${contornos.length > 1 ? 'ficam' : 'fica'} fora do pacote, sem desenho nem citação como medida.`;
 }
 
 /** A pose da instância no mundo da montagem resolvida, como `cortesDosEncaixes` a resolve; null se a instância ainda não está construída. */
@@ -2216,11 +2410,27 @@ export function encaixesDaPeca({ folhas, instancia, declaradas = new Map(), cont
 }
 
 /**
+ * Os encaixes (os de `encaixesDaPeca`) cujo corte entra no pacote padrão: `{ entram, fora, limiarMm }`. Entra todo encaixe com folga
+ * até `FOLGA_DE_CONTATO_MM`, que encosta ou cruza, e todo corte que a receita declara; quando nenhum encosta, entra o de menor folga,
+ * com os que empatam com ele. `limiarMm` é a folga até a qual um encaixe entrou, e todo encaixe de `fora` tem folga maior que ela:
+ * a primeira versão deixava um só, pelo lugar na lista, e de dois encaixes de folga zero (um apoio e um pino que fura) o segundo saía
+ * do pacote e o pedido o dizia "de folga maior". Puro.
+ */
+export function encaixesDoPadrao(encaixes) {
+  const menor = encaixes.length ? Math.min(...encaixes.map((e) => e.folgaMm)) : 0;
+  const limiarMm = Math.max(FOLGA_DE_CONTATO_MM, menor);
+  const entram = encaixes.filter((e) => e.folgaMm <= limiarMm || e.declarado);
+  return { entram, fora: encaixes.filter((e) => !entram.includes(e)), limiarMm };
+}
+
+/**
  * Os cortes nos encaixes de uma peça que é instância de `montagem` (`{ arquivo, instancia }`): resolve a montagem até as etapas
  * construídas, mede os encaixes (`encaixesDaPeca`) e grava uma imagem por encaixe em `pasta`. Peça fora das etapas construídas não tem
- * corte, e isso volta em `aviso`. Devolve `{ cortes: [{ arquivo, vizinha, origens, folgaMm, folgaNoCorteMm, cruzam, plano, declarado }], aviso }`.
+ * corte, e isso volta em `aviso`. Devolve `{ cortes: [{ arquivo, vizinha, origens, folgaMm, folgaNoCorteMm, cruzam, plano, declarado }], fora, limiarMm, aviso }`;
+ * com `padrao` (o pacote padrão) ficam só os de `encaixesDoPadrao`, `fora` lista os que não foram desenhados (`[{ vizinha, folgaMm }]`)
+ * e `limiarMm` é a folga até a qual um encaixe entrou.
  */
-export async function cortesDosEncaixes({ montagem, pasta, cortesDeclarados = [] }) {
+export async function cortesDosEncaixes({ montagem, pasta, cortesDeclarados = [], padrao = false }) {
   const [{ receitasDaMontagem, montagemAteAGeometria }, { lerMontagemPersistida }, { resolverMontagemPersistida }, { carregadoresDeReceitas }] = await Promise.all([
     import('./etapas-da-montagem.mjs'), import('../../src/autoria/ler-montagem-persistida.js'),
     import('../../src/autoria/resolver-montagem-persistida.js'), import('./peca-com-parametros.mjs'),
@@ -2233,18 +2443,33 @@ export async function cortesDosEncaixes({ montagem, pasta, cortesDeclarados = []
     return { cortes: [], aviso: `sem vista em corte nos encaixes: '${montagem.instancia}' ainda não está entre as etapas construídas.` };
   }
   const resolvida = await resolverMontagemPersistida(parcial, carregadoresDeReceitas(receitas));
-  const encaixes = encaixesDaPeca({
-    folhas: folhasDaMontagem(resolvida), instancia: montagem.instancia, declaradas: vizinhasDeclaradas(parcial, montagem.instancia), contatos: contatosDeclaradosDaMontagem(parcial, montagem.instancia), cortesDeclarados,
+  return cortesDasFolhas({
+    folhas: folhasDaMontagem(resolvida), instancia: montagem.instancia, declaradas: vizinhasDeclaradas(parcial, montagem.instancia), contatos: contatosDeclaradosDaMontagem(parcial, montagem.instancia), cortesDeclarados, pasta, padrao,
   });
-  const cortes = encaixes.map((e) => {
-    const arquivo = join(pasta, `corte-${montagem.instancia}-${e.vizinha.replace(/\//g, '-')}.png`);
-    writeFileSync(arquivo, imagemDoCorte({ peca: montagem.instancia, vizinha: e.vizinha, plano: e.plano, daPeca: e.daPeca, daVizinha: e.daVizinha, folga: e.folga, folgaMm: e.folgaMm }));
+}
+
+/**
+ * Os cortes dos encaixes da `instancia` com as outras `folhas` da montagem já resolvida, desenhados em `pasta`: a parte de
+ * `cortesDosEncaixes` que escolhe e desenha, separada da leitura da montagem para o teste a exercitar inteira com folhas de prova.
+ * O que devolve é o de `cortesDosEncaixes`.
+ */
+export function cortesDasFolhas({ folhas, instancia, declaradas = new Map(), contatos = new Map(), cortesDeclarados = [], pasta, padrao = false }) {
+  const encaixes = encaixesDaPeca({
+    folhas, instancia, declaradas, contatos, cortesDeclarados,
+    /* no padrão a escolha é pela folga, e não pela quantidade: o encaixe que empata com o último não pode sair pelo corte da lista */
+    ...(padrao ? { limite: Infinity } : {}),
+  });
+  const { entram, fora: deFora, limiarMm } = padrao ? encaixesDoPadrao(encaixes) : { entram: encaixes, fora: [], limiarMm: null };
+  const fora = deFora.map((e) => ({ vizinha: e.vizinha, folgaMm: e.folgaMm }));
+  const cortes = entram.map((e) => {
+    const arquivo = join(pasta, `corte-${instancia}-${e.vizinha.replace(/\//g, '-')}.png`);
+    writeFileSync(arquivo, imagemDoCorte({ peca: instancia, vizinha: e.vizinha, plano: e.plano, daPeca: e.daPeca, daVizinha: e.daVizinha, folga: e.folga, folgaMm: e.folgaMm }));
     return {
       arquivo, vizinha: e.vizinha, origens: e.origens, folgaMm: e.folgaMm, folgaNoCorteMm: e.folga?.folgaMm ?? null, cruzam: e.folga?.cruzam ?? false,
       plano: textoDoPlano(e.plano), declarado: e.declarado, contatos: e.contatos,
     };
   });
-  return { cortes, aviso: null };
+  return { cortes, fora, limiarMm, aviso: null };
 }
 
 const mmTexto = (n) => `${virgula(n, n < 10 ? 2 : 1)} mm`;
@@ -2294,7 +2519,7 @@ export function fracaoVisivelDaPeca({ foco, outras, olho, resolucao = 160 }) {
   const v = cross3(d, u);
   const proj = (t) => t.map((p) => [dot3(p, u), dot3(p, v), dot3(p, d)]);
   const tf = foco.map(proj);
-  if (!tf.length) return { visivel: null, pixels: 0 };
+  if (!tf.length) return { visivel: null, pixels: 0, areaVisivel: 0 };
   const min = [Infinity, Infinity]; const max = [-Infinity, -Infinity];
   for (const t of tf) for (const p of t) for (let k = 0; k < 2; k++) { min[k] = Math.min(min[k], p[k]); max[k] = Math.max(max[k], p[k]); }
   const lado = Math.max(max[0] - min[0], max[1] - min[1]) || 1;
@@ -2334,7 +2559,9 @@ export function fracaoVisivelDaPeca({ foco, outras, olho, resolucao = 160 }) {
   for (const t of tf) rasterizar(t, 1);
   let total = 0; let visiveis = 0;
   for (let k = 0; k < n * n; k++) if (silhueta[k]) { total += 1; if (dono[k] === 1) visiveis += 1; }
-  return { visivel: total ? visiveis / total : null, pixels: total };
+  /* a área da peça que aparece nesta vista, na unidade dos triângulos ao quadrado (mm² nos de `triangulosNoMundo`): compara uma vista
+     com a outra, o que a fração não faz */
+  return { visivel: total ? visiveis / total : null, pixels: total, areaVisivel: visiveis * passo * passo };
 }
 
 /**
@@ -2342,6 +2569,12 @@ export function fracaoVisivelDaPeca({ foco, outras, olho, resolucao = 160 }) {
  * já construídas, como nas outras medidas do pacote. As vistas que o pacote não conhece ficam de fora.
  */
 export async function visibilidadeDoFocoNasVistas({ montagem, vistas }) {
+  const medidas = await medidasDoFocoNasVistas({ montagem, vistas });
+  return Object.fromEntries(Object.entries(medidas).map(([vista, m]) => [vista, m.visivel]));
+}
+
+/** O mesmo, com a área da peça que aparece em cada vista: `{ [vista]: { visivel, areaVisivel } }`. A área escolhe a vista montada do pacote padrão. */
+export async function medidasDoFocoNasVistas({ montagem, vistas }) {
   const [{ receitasDaMontagem, montagemAteAGeometria }, { lerMontagemPersistida }, { resolverMontagemPersistida }, { carregadoresDeReceitas }] = await Promise.all([
     import('./etapas-da-montagem.mjs'), import('../../src/autoria/ler-montagem-persistida.js'),
     import('../../src/autoria/resolver-montagem-persistida.js'), import('./peca-com-parametros.mjs'),
@@ -2360,7 +2593,8 @@ export async function visibilidadeDoFocoNasVistas({ montagem, vistas }) {
   const medidas = {};
   for (const vista of vistas) {
     if (!OLHO_DA_VISTA_MONTADA[vista]) continue;
-    medidas[vista] = fracaoVisivelDaPeca({ foco, outras, olho: OLHO_DA_VISTA_MONTADA[vista] }).visivel;
+    const { visivel, areaVisivel } = fracaoVisivelDaPeca({ foco, outras, olho: OLHO_DA_VISTA_MONTADA[vista] });
+    medidas[vista] = { visivel, areaVisivel };
   }
   return medidas;
 }
@@ -2458,6 +2692,54 @@ function citadasQueNaoSaoImagem(plano, pastaDaReceita) {
 
 /* ---------- o pacote ---------- */
 
+/** Os caminhos de imagem PNG que um pedido cita, sem repetição, na ordem em que aparecem: é o que o crítico abre. */
+export function imagensCitadas(pedido) {
+  return [...new Set([...String(pedido).matchAll(/(?<![\w.-])(\/[^\s`'"()]+?\.png)\b/g)].map((m) => m[1]))];
+}
+
+const emLista = (nomes) => (nomes.length <= 1 ? nomes.join('') : `${nomes.slice(0, -1).join(', ')} e ${nomes[nomes.length - 1]}`);
+/* por que a parte leva vista isolada, para o relatório de quem conduz; o pedido do crítico não diz o porquê */
+const PORQUE_DA_PARTE = Object.freeze({
+  malha: 'a malha difere da gravada na rodada', promessa: 'a forma prometida difere da gravada na rodada', nova: 'a rodada não a tinha',
+  ausente: 'a malha de agora não a tem', defeito: 'o veredito da rodada a cita num defeito',
+});
+
+/**
+ * O que o pacote padrão traz e o que deixa de fora, em frases para o pedido: `{ tipo, entrou: [frase], fora: [frase], partesSemVista }`.
+ * As frases falam das imagens, e não de como a peça foi feita nem do que já foi visto antes: o pedido não cita receita nem rodada, não
+ * diz por que uma parte tem vista isolada e a outra não, e não chama de conferida a parte que ficou sem. `escolha` é o
+ * `partesComVistaIsolada`, `montadas` é `{ entram, fora }` e `cortes` `{ entram, fora, limiarMm }` da instância de montagem (null fora
+ * dela) e `superficie` é `{ lataria, reflexo }` da peça com vistas de superfície. Puro.
+ */
+export function descricaoDoPacotePadrao({ escolha, montadas = null, cortes = null, superficie = null }) {
+  const entrou = [
+    'as seis vistas da peça sozinha (isometrica, frontal, direita, superior, traseira e esquerda), para a proporção e a silhueta',
+    'a malha em arame na vista isometrica e em raio X na traseira, para a topologia que a sombra esconde, na frente e atrás',
+  ];
+  const fora = ['a malha em arame na vista traseira, porque o raio X da mesma vista mostra as mesmas arestas'];
+  if (superficie) {
+    entrou.push(superficie.lataria
+      ? `a superfície da chapa numa vista só, a de três quartos, que mostra a frente, o lado e o topo de uma vez: a curvatura e a luz rasante${superficie.reflexo ? ', e a zebra nas duas direções da listra na vista isometrica, que olha do mesmo lado' : ''}`
+      : 'a luz rasante numa vista só, a de três quartos');
+    fora.push(superficie.lataria
+      ? `a superfície da chapa nas vistas de frente, de lado e de cima${superficie.reflexo ? ', e a pintura' : ''}, que repetem o que a de três quartos mostra`
+      : 'a luz rasante nas vistas de frente, de lado e de cima');
+  }
+  if (montadas?.entram.length) entrou.push(`${montadas.entram.length === 1 ? 'a vista montada' : 'as vistas montadas'} ${emLista(montadas.entram)}, as em que mais da peça aparece entre as outras, para o contexto e a posição`);
+  if (montadas?.fora.length) fora.push(`as vistas montadas ${emLista(montadas.fora)}, em que aparece menos da peça ou ela fica tapada`);
+  const limiar = cortes ? mmTexto(cortes.limiarMm ?? FOLGA_DE_CONTATO_MM) : null;
+  if (cortes?.entram.length) {
+    const declarados = cortes.entram.filter((c) => c.declarado).length;
+    entrou.push(`${cortes.entram.length === 1 ? 'o corte do encaixe' : 'os cortes dos encaixes'} com ${emLista(cortes.entram.map((c) => `\`${c.vizinha}\``))}: ${declarados === cortes.entram.length ? 'os declarados pela peça' : `todo encaixe com folga até ${limiar}${declarados ? ' e os declarados pela peça' : ''}`}, onde um cruzamento ou uma peça solta aparece primeiro`);
+  }
+  if (cortes?.fora.length) fora.push(`${cortes.fora.length === 1 ? 'o corte do encaixe' : 'os cortes dos encaixes'} com ${emLista(cortes.fora.map((v) => `\`${v}\``))}, de folga maior que ${limiar}`);
+  const { comVista, semVista } = escolha;
+  if (comVista.length && !semVista.length) entrou.push(`a vista isolada de todas as partes (${comVista.length})`);
+  else if (comVista.length) entrou.push(`a vista isolada ${comVista.length === 1 ? 'da parte' : 'das partes'} ${emLista(comVista.map((p) => `\`${p.nome}\``))}`);
+  if (semVista.length) fora.push(`a vista isolada ${semVista.length === 1 ? 'da parte' : 'das partes'} ${emLista(semVista.map((n) => `\`${n}\``))}, que ${semVista.length === 1 ? 'aparece' : 'aparecem'} nas vistas da peça inteira`);
+  return { tipo: PACOTE_PADRAO, entrou, fora, partesSemVista: semVista };
+}
+
 export const MOTIVO_SEM_MEDIR = 'o pacote saiu sem medição, por --sem-medir; o crítico só julga receita que passa nas medidas, e o registro da rodada mede de novo';
 export const comandoDaMedicao = (peca) => `node tools/modelar/rodada-de-modelagem.mjs ${peca} --acao`;
 
@@ -2482,7 +2764,13 @@ export class ReceitaReprovada extends Error {
 
    `saida` é a pasta da rodada, onde saem o pedido, o alvo, as vistas montadas e a sobreposição; as capturas da bancada continuam em
    `tools/bancadas/out`, com os nomes de sempre. `dependencias` troca o que o teste não quer pagar. */
-export async function vistasParaCritica(peca, { logger = null, saida = null, referenciasExternas = [], orientacoesDasReferencias = [], contornosExternos = [], regioesDosContornos = [], prazoDeCargaMs = null, pastaDasCapturas = SAIDA_PADRAO, semMedir = false, comBlender = false, dependencias = {} } = {}) {
+export async function vistasParaCritica(peca, { logger = null, saida = null, referenciasExternas = [], orientacoesDasReferencias = [], contornosExternos = [], regioesDosContornos = [], prazoDeCargaMs = null, pastaDasCapturas = SAIDA_PADRAO, semMedir = false, comBlender = false, completo = false, dependencias = {} } = {}) {
+  if (completo !== true && completo !== false) throw new Error(`'completo' recebido: ${JSON.stringify(completo)}; esperado true (o pacote completo) ou false (o padrão). Na linha de comando é a opção --completo, sem valor: \`${comandoDoCompleto(peca)}\`.`);
+  /* quanto cada etapa do pacote levou, em segundos, para o relatório: a medição, as capturas da bancada, o montado, os cortes e o resto */
+  const relogio = dependencias.relogio ?? (() => performance.now());
+  const tempos = {};
+  const cronometrar = async (etapa, fazer) => { const t0 = relogio(); try { return await fazer(); } finally { tempos[etapa] = (tempos[etapa] ?? 0) + (relogio() - t0) / 1000; } };
+  const inicio = relogio();
   const dep = {
     /* a medição é a de `rodada-de-modelagem.mjs` (a que o registro e `--acao` usam), importada na hora para não criar ciclo de carga */
     medirReceita: async (p) => (await import('./rodada-de-modelagem.mjs')).medirReceita(p),
@@ -2498,6 +2786,13 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
     vistasDeSuperficie,
     superficieDaBancada,
     caixasDasPartes: async (arquivo, rec) => caixasDasPartes((await import('./entrada-de-medida.mjs')).executarReceitaGuardada(arquivo, rec).executada.neutro),
+    /* a malha que a receita executa, pelo cache por passo, que a medição já encheu */
+    malhaDaReceita: async (arquivo, rec) => {
+      const executada = (await (await import('./entrada-de-medida.mjs')).executarComCachePorPasso(arquivo, rec)).executada;
+      return executada.neutro ?? executada;
+    },
+    ultimaRodadaJulgada,
+    registroDaRodada,
     poseDaInstancia,
     contornoSobreposto: prancharContorno,
     prancharDesenhadas,
@@ -2509,7 +2804,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   const caminho = resolverCaminhoReceita(peca);
   /* O CRÍTICO SÓ JULGA RECEITA QUE PASSA NAS MEDIDAS: a medição roda antes de qualquer captura, e a que reprova recusa o pacote
      (na rodada 1 do sedã, 12 a 28 minutos de captura e o crítico foram gastos numa receita que o registro depois recusou). */
-  const medicao = semMedir ? null : await dep.medirReceita(peca);
+  const medicao = semMedir ? null : await cronometrar('medicao', () => dep.medirReceita(peca));
   if (medicao && !medicao.passou) throw new ReceitaReprovada(peca, medicao);
   /* a impressão do texto que o pacote mostra, a mesma que a medição da rodada grava */
   const impressao = impressaoDoTexto(readFileSync(caminho, 'utf8'));
@@ -2589,6 +2884,35 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   }
   if (!plano) avisos.push('a receita não declara PLANO: o pedido sai sem objeto, partes e critérios, e sem alvo da forma prometida.');
 
+  /* A IMPRESSÃO DAS PARTES DA RECEITA DE AGORA, nos dois pacotes: vai ao `pacote.json`, o registro do veredito a confere contra a
+     receita medida e a grava na rodada, e é com ela que o pacote seguinte compara. A receita que não executa sozinha fica sem ela. */
+  let impressaoDeAgora = null;
+  await cronometrar('partes', async () => {
+    try { impressaoDeAgora = await impressaoDasPartesDaReceita(caminho, { receita, malha: dep.malhaDaReceita }); } catch (erro) {
+      avisos.push(`não tirei a impressão das partes (${erro.message.split('\n')[0]}): o pacote.json sai sem ela, e a rodada que registrar este pacote não serve de base para escolher as partes do pacote seguinte.`);
+    }
+  });
+
+  /* AS PARTES QUE LEVAM VISTA ISOLADA. No pacote completo, todas. No padrão, as que diferem da impressão que a última rodada julgada
+     pelo crítico gravou no registro e as que o veredito dela cita num defeito; sem rodada julgada, com a rodada que não gravou a
+     impressão ou sem a impressão de agora, todas entram, e o relatório diz por quê. */
+  let escolha = { comVista: partes.map((nome) => ({ nome, porque: 'completo' })), semVista: [] };
+  let baseDasPartes = null;
+  let semBase = null;
+  if (!completo && partes.length) {
+    const pastaDosRegistros = pastaDasRodadas(peca, caminho);
+    const julgada = dep.ultimaRodadaJulgada(pastaDosRegistros);
+    const registro = julgada === null ? null : dep.registroDaRodada(pastaDosRegistros, julgada);
+    let base = null;
+    if (julgada === null) semBase = 'a peça não tem rodada julgada pelo crítico';
+    else if (!ehImpressaoDasPartes(registro?.impressaoDasPartes)) semBase = `o registro da rodada ${julgada}, a última julgada pelo crítico, não guarda a impressão das partes (o registro a grava desde 2026-11-26, com o veredito)`;
+    else if (!impressaoDeAgora) semBase = 'a receita de agora não deu a impressão das partes';
+    else { base = registro.impressaoDasPartes; baseDasPartes = julgada; }
+    escolha = partesComVistaIsolada(partes, impressaoDeAgora, base, { citadas: partesCitadasNosDefeitos(registro?.veredito) });
+    if (semBase) avisos.push(`todas as partes levam vista isolada: ${semBase}, e não há com que comparar a malha de cada parte.`);
+  }
+  const comVista = escolha.comVista.map((p) => p.nome);
+
   /* A PASTA DO PACOTE: a de `--saida`, ou a da próxima rodada a registrar, dentro da pasta da peça. Tudo o que o pacote grava mora nela. */
   const pastaDaPeca = pastaDaRodada(peca, pastaDasCapturas);
   const numero = saida ? null : await dep.numeroDaRodada(pastaDasRodadas(peca, caminho));
@@ -2605,12 +2929,16 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
      uma vez. Com `olharBancada` trocado por um gravador, como nos testes, nada é aberto, a não ser que o teste dê `abrirCaptura`. */
   const compartilhada = dependencias.olharBancada && !dependencias.abrirCaptura ? null : await dep.abrirCaptura({ logger });
   /* QUANTAS IMAGENS O PACOTE TEM E QUANTAS JÁ SAÍRAM, para a recusa de uma captura dizer o que faltava. */
-  const total = VISTAS_DO_CONJUNTO.split(',').length + 1 + 1 + VISTAS_DO_ARAME.split(',').length + 1
-    + VISTAS_DA_PARTE.split(',').length * partes.length
-    + (plano?.partes ?? []).reduce((soma, p) => soma + (p.dePerto?.length ?? 0), 0)
-    + (lataria.lataria ? VISOES_DO_REFLEXO.length * VISTAS_DO_REFLEXO.split(',').length : 0)
-    /* a curvatura numa captura de quatro vistas e duas luzes rasantes por vista, no máximo */
-    + (lataria.luzRasante ? (lataria.lataria ? 4 : 0) + 8 : 0);
+  const vistasDoArame = completo ? VISTAS_DO_ARAME : VISTAS_DO_ARAME_NO_PADRAO;
+  const capturasDoReflexo = completo ? CAPTURAS_DO_REFLEXO : CAPTURAS_DO_REFLEXO.filter((c) => c.visao === 'zebra');
+  const vistasDoReflexo = completo ? VISTAS_DO_REFLEXO : VISTAS_DO_REFLEXO_NO_PADRAO;
+  const vistasDaSuperficie = completo ? null : VISTAS_DE_SUPERFICIE_NO_PADRAO;
+  const total = VISTAS_DO_CONJUNTO.split(',').length + 1 + 1 + vistasDoArame.split(',').length + 1
+    + VISTAS_DA_PARTE.split(',').length * comVista.length
+    + (plano?.partes ?? []).filter((p) => comVista.includes(p.nome)).reduce((soma, p) => soma + (p.dePerto?.length ?? 0), 0)
+    + (lataria.lataria ? capturasDoReflexo.length * vistasDoReflexo.split(',').length : 0)
+    /* a curvatura numa captura só e duas luzes rasantes por vista, no máximo */
+    + (lataria.luzRasante ? (vistasDaSuperficie?.length ?? 4) * ((lataria.lataria ? 1 : 0) + 2) : 0);
   let feitas = 0;
   /* cada captura sai na resolução do tipo dela, vai para a pasta do pacote e fica anotada, com as opções, para o `pacote.json` */
   const capturas = [];
@@ -2634,26 +2962,32 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   const dePerto = [];
   const reflexo = {};
   let geradas = null;
+  const t0DasCapturas = relogio();
   try {
-    conjunto = await capturar('conjunto', { peca, revisar: true, res: RES_CONJUNTO });
+    /* A PEÇA SOZINHA ENCHE O QUADRO. A bancada enquadra a vista para a tela dela, que reserva os lados para os painéis: a peça fica
+       com 48 % da largura do quadro no máximo, e a fuselagem do avião, comprida, saía com 48 % por 7 % na vista de lado e 44 % por
+       14 % na isométrica. Com `enquadrar`, a maior dimensão da peça ocupa 92 % do quadro em cada vista (`ajustarCamera`), nas seis
+       vistas, no arame e no raio X. Cada vista já tinha a escala dela, e o pedido não compara tamanho entre vistas. */
+    const sozinha = { peca, enquadrar: true, res: RES_CONJUNTO };
+    conjunto = await capturar('conjunto', { ...sozinha, revisar: true });
     exigirVistasDiferentes(conjunto, 'do conjunto');
     /* O modo de revisão não aceita vista escolhida, então a de trás com sombra
        sai numa captura própria. */
-    traseira = await capturar('traseira', { peca, auditoria: true, projecao: 'ortografica', vistas: 'traseira', res: RES_CONJUNTO });
+    traseira = await capturar('traseira', { ...sozinha, auditoria: true, projecao: 'ortografica', vistas: 'traseira' });
     /* A lateral esquerda também, porque peça que não é simétrica tem parte só de um lado: a fuselagem do avião tem a
        porta à esquerda, e o crítico da primeira rodada dela não pôde conferir o vão da porta nem as janelas desse lado. */
-    esquerda = await capturar('esquerda', { peca, auditoria: true, projecao: 'ortografica', vistas: 'esquerda', res: RES_CONJUNTO });
+    esquerda = await capturar('esquerda', { ...sozinha, auditoria: true, projecao: 'ortografica', vistas: 'esquerda' });
 
     /* A MALHA TAMBÉM VAI AO CRÍTICO. No ombro do braço, a imagem com sombra
        mostrava uma faixa escura que parecia luz, e o arame mostrou a causa: um
        leque de lascas saindo de um vértice só. Sombra esconde topologia. */
-    arame = await capturar('arame', { peca, auditoria: true, arame: true, projecao: 'ortografica', vistas: VISTAS_DO_ARAME, res: RES_CONJUNTO });
+    arame = await capturar('arame', { ...sozinha, auditoria: true, arame: true, projecao: 'ortografica', vistas: vistasDoArame });
     exigirVistasDiferentes(arame, 'do arame');
     /* E uma vista em raio X, com o que fica atrás à vista: há defeito de malha
        que só aparece do outro lado da peça. */
-    raioX = await capturar('raio X', { peca, auditoria: true, arame: 'raio-x', projecao: 'ortografica', vistas: 'traseira', res: RES_CONJUNTO });
+    raioX = await capturar('raio X', { ...sozinha, auditoria: true, arame: 'raio-x', projecao: 'ortografica', vistas: 'traseira' });
 
-    for (const parte of partes) {
+    for (const parte of comVista) {
       const resultado = await capturar(`parte '${parte}'`, {
         peca,
         selecionadas: parte,
@@ -2681,8 +3015,8 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
     }
     /* a zebra e a pintura da bancada, só na peça de lataria (a de emenda sombreada leva a luz rasante e não é chapa) */
     if (lataria.lataria) {
-      for (const { chave, visao, anguloDaZebra } of CAPTURAS_DO_REFLEXO) {
-        const feita = await capturar(`visão ${chave}`, { peca, auditoria: true, visao, enquadrar: true, vistas: VISTAS_DO_REFLEXO, res: RES_DO_REFLEXO, ...(anguloDaZebra !== null ? { anguloDaZebra } : {}) });
+      for (const { chave, visao, anguloDaZebra } of capturasDoReflexo) {
+        const feita = await capturar(`visão ${chave}`, { peca, auditoria: true, visao, enquadrar: true, vistas: vistasDoReflexo, res: RES_DO_REFLEXO, ...(anguloDaZebra !== null ? { anguloDaZebra } : {}) });
         reflexo[chave] = imagensDoReflexo(feita, peca);
       }
     }
@@ -2699,9 +3033,10 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
       }
     }
     /* a luz rasante e a curvatura da lataria, da bancada, na mesma abertura do navegador */
-    if (lataria.luzRasante) geradas = await dep.superficieDaBancada(peca, { pasta, lataria, capturar });
+    if (lataria.luzRasante) geradas = await dep.superficieDaBancada(peca, { pasta, lataria, capturar, ...(vistasDaSuperficie ? { vistas: vistasDaSuperficie } : {}) });
   } finally {
     await compartilhada?.fechar();
+    tempos.capturas = (relogio() - t0DasCapturas) / 1000;
   }
 
   /* A prancha desenhada em mm que o plano cita: o modelo e o desenho na mesma escala, na vista que olha do mesmo lado. */
@@ -2719,9 +3054,26 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   /* As vistas montadas, com o quadro na peça. Peça que ainda não está entre as etapas construídas não tem conjunto a mostrar, e isso
      vai no relatório, e não como falha: a etapa é fixada na ordem, e uma peça fora dela é trabalho adiantado. */
   let montada = null;
-  if (montagem) {
+  /* quanto da peça em foco as outras tapam em cada vista montada, medido uma vez: no pacote padrão escolhe as vistas antes da captura,
+     e nos dois tira do pedido a vista em que a peça não aparece */
+  let visibilidade = null;
+  let visibilidadeMedida = false;
+  const medirVisibilidade = async () => {
+    if (visibilidadeMedida) return visibilidade;
+    visibilidadeMedida = true;
     try {
-      const feita = await dep.olharEtapas(montagem.arquivo, { vistas: VISTAS_MONTADAS, foco: montagem.instancia, saida: pasta, timeoutMs: PRAZO_DA_CAPTURA_MONTADA_MS, ...QUADRO_MONTADO });
+      visibilidade = await cronometrar('visibilidade', () => (dep.visibilidadeDoFoco ?? medidasDoFocoNasVistas)({ montagem, vistas: VISTAS_MONTADAS }));
+    } catch (erro) {
+      avisos.push(`não medi quanto da peça em foco as outras tapam nas vistas montadas${completo ? ', e todas entraram no pedido' : `, e as vistas montadas do pacote padrão são as ${MONTADAS_DO_PADRAO} primeiras`}: ${erro.message}`);
+    }
+    return visibilidade;
+  };
+  let vistasMontadas = VISTAS_MONTADAS;
+  if (montagem && !completo) vistasMontadas = montadasDoPadrao(await medirVisibilidade());
+  if (montagem && !vistasMontadas.length) avisos.push(`sem vista montada: as outras peças tapam '${montagem.instancia}' em todas as vistas (menos de ${pct(VISIVEL_MINIMO_DA_PECA_EM_FOCO)} da silhueta dela visível).`);
+  if (montagem && vistasMontadas.length) {
+    try {
+      const feita = await cronometrar('montado', () => dep.olharEtapas(montagem.arquivo, { vistas: vistasMontadas, foco: montagem.instancia, saida: pasta, timeoutMs: PRAZO_DA_CAPTURA_MONTADA_MS, ...QUADRO_MONTADO }));
       montada = { ...feita, instancia: montagem.instancia, montagem: montagem.arquivo };
     } catch (erro) {
       if (erro?.codigo !== 'foco-fora-das-etapas') throw erro;
@@ -2731,9 +3083,13 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
 
   /* Os cortes nos encaixes com as vizinhas, quando a peça é instância de uma montagem. */
   let encaixes = [];
+  let cortesDeFora = [];
+  let limiarDosCortes = null;
   if (montagem) {
-    const feitos = await dep.cortesDosEncaixes({ montagem, pasta, cortesDeclarados: critica.cortes });
+    const feitos = await cronometrar('cortes', () => dep.cortesDosEncaixes({ montagem, pasta, cortesDeclarados: critica.cortes, ...(completo ? {} : { padrao: true }) }));
     encaixes = feitos?.cortes ?? [];
+    cortesDeFora = feitos?.fora ?? [];
+    limiarDosCortes = feitos?.limiarMm ?? null;
     if (feitos?.aviso) avisos.push(feitos.aviso);
   }
 
@@ -2742,7 +3098,15 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
      pela vista e sai do pedido com a frase que diz por quê; só sem nenhuma imagem de luz rasante o pacote é recusado */
   let superficie = geradas;
   if (geradas) {
-    const decidida = await luzRasanteDoPacote(peca, geradas, { tentar: null, elevacoes: [] });
+    let decidida;
+    try {
+      decidida = await luzRasanteDoPacote(peca, geradas, { tentar: null, elevacoes: [] });
+    } catch (erro) {
+      /* no pacote padrão a luz rasante sai de uma vista só; a recusa diz o comando que tenta as quatro */
+      if (completo) throw erro;
+      throw new Error(`${erro.message} O pacote padrão recebeu a luz rasante só da vista ${VISTAS_DE_SUPERFICIE_NO_PADRAO.join(', ')}; esperado ao menos uma imagem em que a luz alcance a peça. `
+        + `O pacote completo tenta as quatro vistas de superfície: \`${comandoDoCompleto(peca)}\`.`, { cause: erro });
+    }
     superficie = decidida.superficie;
     for (const { texto } of superficie.semLuz ?? []) avisos.push(texto);
   }
@@ -2765,13 +3129,8 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   let montadaNoPedido = null;
   if (montada) {
     const imagens = montada.arquivos.map((arquivo, i) => ({ arquivo, vista: montada.enquadramentos[i].vista }));
-    let visibilidade = null;
-    try {
-      visibilidade = await (dep.visibilidadeDoFoco ?? visibilidadeDoFocoNasVistas)({ montagem, vistas: imagens.map((i) => i.vista) });
-    } catch (erro) {
-      avisos.push(`não medi quanto da peça em foco as outras tapam nas vistas montadas, e todas entraram no pedido: ${erro.message}`);
-    }
-    const { entram, fora } = vistasMontadasVisiveis(imagens, visibilidade);
+    const medidasDoFoco = await medirVisibilidade();
+    const { entram, fora } = vistasMontadasVisiveis(imagens, medidasDoFoco && Object.fromEntries(Object.entries(medidasDoFoco).map(([v, m]) => [v, fracaoDaMedida(m)])));
     for (const f of fora) avisos.push(`a vista montada ${f.vista} ficou fora do pedido: a peça em foco aparece em ${pct(f.visivel)} dela, tapada pelas outras.`);
     montadaNoPedido = { instancia: montada.instancia, imagens: entram, ...(fora.length ? { fora } : {}) };
   }
@@ -2784,6 +3143,14 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   const medicaoDoPacote = medicao ? { passou: true, sha256: medicao.sha256 } : { passou: false, motivo: MOTIVO_SEM_MEDIR };
   const orientacao = dados?.orientacao ?? null;
   const perguntas = await (dep.perguntasDaPeca ?? perguntasDaPecaArquivo)(peca);
+  /* O QUE O PACOTE PADRÃO TRAZ E O QUE DEIXA DE FORA, para o pedido: dito pelas imagens, sem a história da peça. */
+  const temReflexoNoPacote = Object.values(reflexo).some((r) => r.imagens.length);
+  const pacote = completo ? null : descricaoDoPacotePadrao({
+    escolha,
+    montadas: montadaNoPedido ? { entram: montadaNoPedido.imagens.map((i) => i.vista), fora: VISTAS_MONTADAS.filter((v) => !vistasMontadas.includes(v)) } : null,
+    cortes: montagem ? { entram: encaixes.map((e) => ({ vizinha: e.vizinha, declarado: e.declarado })), fora: cortesDeFora.map((c) => c.vizinha), limiarMm: limiarDosCortes } : null,
+    superficie: superficie ? { lataria: Boolean(lataria.lataria), reflexo: temReflexoNoPacote } : null,
+  });
   const dadosDoPedido = {
     peca,
     plano,
@@ -2815,6 +3182,7 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
     superficie,
     reflexo: lataria.lataria ? reflexo : null,
     medicao: medicaoDoPacote,
+    ...(pacote ? { pacote } : {}),
   };
   const { pedido: arquivoDoPedido, pedidosFechados } = gravarPedidos(pasta, dadosDoPedido);
   const manifesto = gravarManifesto(pasta, { peca, receita: impressao, lataria, superficie, conferenciaDoBlender });
@@ -2822,7 +3190,10 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
   const imagens = imagensDoPacote({ pasta, peca, capturas, superficie, montada, conferenciaDoBlender });
   {
     const dado = JSON.parse(readFileSync(manifesto, 'utf8'));
-    writeFileSync(manifesto, `${JSON.stringify({ ...dado, rodada: numero, resolucoes: RESOLUCAO_POR_TIPO, imagens }, null, 2)}\n`, 'utf8');
+    /* o tipo do pacote e as partes com e sem vista isolada, com a rodada com que a malha delas foi comparada; e a impressão das partes
+       da receita que o pacote mostra, que o registro do veredito confere e grava */
+    const doPacote = { tipo: completo ? PACOTE_COMPLETO : PACOTE_PADRAO, ...(completo ? {} : { partes: { comVista: escolha.comVista, semVista: escolha.semVista, comparadasComARodada: baseDasPartes } }) };
+    writeFileSync(manifesto, `${JSON.stringify({ ...dado, rodada: numero, pacote: doPacote, impressaoDasPartes: impressaoDeAgora, resolucoes: RESOLUCAO_POR_TIPO, imagens }, null, 2)}\n`, 'utf8');
   }
   for (const i of imagens) {
     if (i.pedida && i.resolucao && emTexto(i.resolucao) !== i.pedida) avisos.push(`a imagem ${i.arquivo} saiu em ${emTexto(i.resolucao)}, e a resolução do tipo '${i.tipo}' é ${i.pedida}: ela não se compara ponto a ponto com a de outra rodada.`);
@@ -2852,7 +3223,10 @@ export async function vistasParaCritica(peca, { logger = null, saida = null, ref
     writeFileSync(manifesto, `${JSON.stringify({ ...dado, ...(dePerto.length ? { dePerto } : {}), ...(reflexoNoManifesto ? { reflexo: reflexoNoManifesto } : {}) }, null, 2)}\n`, 'utf8');
   }
 
+  tempos.total = (relogio() - inicio) / 1000;
   return {
+    tipo: completo ? PACOTE_COMPLETO : PACOTE_PADRAO, partesComVista: escolha.comVista, partesSemVista: escolha.semVista, baseDasPartes, semBase, impressaoDasPartes: impressaoDeAgora, tempos,
+    imagensNoPedido: imagensCitadas(readFileSync(arquivoDoPedido, 'utf8')).length,
     peca, partes, conjunto, traseira, esquerda, arame, raioX, porParte, dePerto, contornoSobreposto: sobrepor.feita ?? null, pranchaDesenhada: pranchaDesenhada?.imagens.length ? pranchaDesenhada : null, reflexo: temReflexo ? reflexo : null, pasta, rodada: numero, pacoteAnterior: pacoteAnterior?.pasta ?? null, imagens, pedido: arquivoDoPedido, pedidosFechados, manifesto, alvo, montada, sobreposicao, superficie, conferenciaDoBlender, lataria, referencias, encaixes, avisos, medicao: medicaoDoPacote,
   };
 }
@@ -3054,6 +3428,17 @@ export function imprimir(resultado) {
   if (!resultado.partes.length) {
     linhas.push('  a receita não declara partes no PLANO; nenhuma vista isolada foi feita.');
   }
+  /* no pacote padrão, quais partes levam vista isolada e por quê, com a rodada com que a malha foi comparada */
+  if (resultado.tipo === PACOTE_PADRAO && resultado.partes.length) {
+    const sem = resultado.partesSemVista ?? [];
+    const com = resultado.partesComVista ?? [];
+    if (resultado.baseDasPartes == null) linhas.push(`  todas as ${com.length} partes levam vista isolada: ${resultado.semBase ?? 'não há rodada julgada com que comparar'}.`);
+    else {
+      linhas.push(`  comparadas com a impressão das partes gravada na rodada ${resultado.baseDasPartes}, a última julgada pelo crítico: ${com.length} de ${resultado.partes.length} partes levam vista isolada.`);
+      if (com.length) linhas.push(`  com vista isolada: ${com.map((p) => `${p.nome} (${PORQUE_DA_PARTE[p.porque] ?? p.porque})`).join(', ')}`);
+      if (sem.length) linhas.push(`  sem vista isolada, com a malha e a promessa iguais às da rodada ${resultado.baseDasPartes} e sem defeito apontado nela: ${sem.join(', ')}`);
+    }
+  }
   /* O caminho de cada vista isolada repete a pasta, a peça e o sufixo; numa peça de 64 partes eram 150 linhas de caminho
      quase iguais (achado de 2026-11-05). Quando todos seguem o mesmo molde, o molde sai uma vez e a parte lista só as vistas
      dela, e o caminho de cada uma se reconstrói por ele; o pedido do crítico continua com os caminhos inteiros. */
@@ -3135,6 +3520,13 @@ export function imprimir(resultado) {
   for (const aviso of resultado.avisos ?? []) linhas.push('', `AVISO: ${aviso}`);
   if (resultado.pasta) {
     linhas.push('', `PASTA DO PACOTE (${resultado.rodada != null ? `rodada ${resultado.rodada}, a próxima a registrar` : 'a de --saida'}; ${resultado.imagens?.length ?? 0} imagens, com a resolução e a câmera de cada uma no pacote.json):`, `  ${resultado.pasta}`);
+    if (resultado.tipo === PACOTE_PADRAO) linhas.push(`  PACOTE PADRÃO: o pedido cita ${resultado.imagensNoPedido ?? 0} imagens e diz o que entrou e o que ficou de fora; o pacote completo, com todas as vistas e a vista isolada de todas as partes: \`${comandoDoCompleto(resultado.peca)}\``);
+    else if (resultado.tipo === PACOTE_COMPLETO) linhas.push(`  PACOTE COMPLETO (--completo): o pedido cita ${resultado.imagensNoPedido ?? 0} imagens.`);
+    if (resultado.tempos?.total != null) {
+      const s1 = (n) => `${n.toFixed(1).replace('.', ',')} s`;
+      const NOMES = { medicao: 'medição', partes: 'comparação das partes', capturas: 'capturas da bancada', visibilidade: 'visibilidade no montado', montado: 'vistas montadas', cortes: 'cortes dos encaixes' };
+      linhas.push(`  TEMPO: ${s1(resultado.tempos.total)} (${Object.entries(NOMES).filter(([k]) => resultado.tempos[k] != null).map(([k, nome]) => `${nome} ${s1(resultado.tempos[k])}`).join(', ')})`);
+    }
     if (resultado.rodada != null) {
       linhas.push(resultado.pacoteAnterior
         ? `  a anterior ficou em ${resultado.pacoteAnterior}; o antes e depois de uma imagem: npm run vistas:critica -- ${resultado.peca} --antes-e-depois=<imagem>`
@@ -3210,6 +3602,13 @@ referencial da peça dá.
                                             número da próxima rodada a registrar, e ficam essa pasta e a da rodada anterior
   --prazo=<segundos>                        prazo de carga de cada captura, para peça pesada
   --sem-medir                               monta o pacote sem medir a receita (o pedido diz que saiu sem medição)
+  --completo                                o pacote completo: todas as vistas e a vista isolada de todas as partes. Sem ela sai o pacote
+                                            padrão: as seis vistas da peça, o arame de três quartos e o raio X de trás, na peça de
+                                            montagem a vista montada isométrica e a ortogonal em que mais área dela aparece e o corte de
+                                            todo encaixe que encosta ou cruza, na peça de lataria a curvatura, a luz rasante e a zebra em
+                                            três quartos, e a vista isolada só das partes cuja malha ou promessa difere da impressão gravada
+                                            na última rodada julgada pelo crítico e das citadas nos defeitos dela (todas, quando não há
+                                            rodada julgada ou ela não gravou a impressão); o pedido diz o que entrou e o que ficou de fora
   --com-blender                             roda também as vistas de superfície do Blender (pede MODELAR_BLENDER), como conferência das
                                             da bancada, em <pasta da rodada>/conferencia-do-blender/; elas não vão ao pedido
   --referencia=<caminho absoluto>[@<vista>] imagem de fora do repositório (frontal, direita, esquerda, traseira, superior, inferior, isometrica); repetível
@@ -3305,15 +3704,15 @@ async function principal(argv) {
         orientacoes[externas.length - 1] = lerOrientacaoDaReferencia(texto);
       } else resto.push(a);
     }
-    lido = lerArgumentos(resto, { opcoes: ['saida', 'prazo'], bandeiras: ['sem-medir', 'com-blender'], posicional: { nome: 'a peça', obrigatorio: true } });
+    lido = lerArgumentos(resto, { opcoes: ['saida', 'prazo'], bandeiras: ['sem-medir', 'com-blender', 'completo'], posicional: { nome: 'a peça', obrigatorio: true } });
     if (lido.opcao('prazo') !== null && !(Number(lido.opcao('prazo')) > 0)) throw new Error(`--prazo pede segundos maiores que zero; veio "${lido.opcao('prazo')}".`);
   } catch (erro) {
-    process.stderr.write(`uso: node tools/modelar/vistas-para-critica.mjs <peça> [--saida=<pasta da rodada>] [--prazo=<segundos>] [--sem-medir] [--com-blender] [--referencia=<caminho absoluto da imagem>[@<vista>] [--orientacao-da-referencia=<texto>]]... [--contorno=<caminho>[@<lado>] [--regioes-do-contorno=<nome>,...]]... (--ajuda diz mais)\n${erro.message}\n`);
+    process.stderr.write(`uso: node tools/modelar/vistas-para-critica.mjs <peça> [--saida=<pasta da rodada>] [--prazo=<segundos>] [--sem-medir] [--completo] [--com-blender] [--referencia=<caminho absoluto da imagem>[@<vista>] [--orientacao-da-referencia=<texto>]]... [--contorno=<caminho>[@<lado>] [--regioes-do-contorno=<nome>,...]]... (--ajuda diz mais)\n${erro.message}\n`);
     return 2;
   }
   /* --prazo: a peça pesada (o furgão realista, em 2026-11-06) não entra na cena nos 90 s de cada captura. */
   const prazo = lido.opcao('prazo');
-  const resultado = await vistasParaCritica(lido.posicional, { saida: lido.opcao('saida'), referenciasExternas: externas, orientacoesDasReferencias: orientacoes, contornosExternos: contornos, regioesDosContornos: regioes, semMedir: lido.bandeira('sem-medir'), comBlender: lido.bandeira('com-blender'), ...(prazo !== null ? { prazoDeCargaMs: Number(prazo) * 1000 } : {}) });
+  const resultado = await vistasParaCritica(lido.posicional, { saida: lido.opcao('saida'), referenciasExternas: externas, orientacoesDasReferencias: orientacoes, contornosExternos: contornos, regioesDosContornos: regioes, semMedir: lido.bandeira('sem-medir'), comBlender: lido.bandeira('com-blender'), completo: lido.bandeira('completo'), ...(prazo !== null ? { prazoDeCargaMs: Number(prazo) * 1000 } : {}) });
   process.stdout.write(imprimir(resultado));
   return 0;
 }

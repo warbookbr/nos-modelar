@@ -54,6 +54,18 @@
  * `decisaoDaPessoa` dentro da rodada, que a primeira versão desta fatia gravava, saiu: nenhuma rodada o tinha, e duas fontes pediriam uma
  * regra de qual vale.
  *
+ * A CÓPIA DA RECEITA DA RODADA COM DECISÃO DA PESSOA FICA (decisão da pessoa em 2026-11-26). Até então só a cópia da última rodada ficava
+ * em `rodadas/receita-NN.js`, e a geometria que a pessoa julgou numa rodada anterior se perdia com a rodada seguinte. O registro de uma
+ * rodada nova não apaga mais a cópia da rodada que tem decisão, nem a da última rodada com veredito do crítico (`copiasQueFicam`), e
+ * `--decisao-da-pessoa` diz onde a cópia ficou, a refaz quando a receita atual ainda produz as partes que a rodada gravou, e avisa quando
+ * ela não existe mais. As cópias com decisão têm limite (`COPIAS_COM_DECISAO_NA_PASTA`): além dele, a mais antiga sai da pasta só
+ * quando o git a tem igual, e volta por `git show`.
+ *
+ * O VEREDITO SÓ SE REGISTRA SOBRE O PACOTE QUE MOSTRA A RECEITA MEDIDA, EM TODA PEÇA (2026-11-26). O `pacote.json` da pasta da rodada
+ * diz a impressão do texto da receita e a impressão das partes (`impressaoDasPartes`: a malha e a promessa de cada parte, que muda
+ * também quando muda um módulo que a receita importa). O registro recusa o veredito quando uma das duas difere da receita medida
+ * agora, e grava a impressão das partes na rodada: é com ela que o pacote seguinte escolhe as partes que levam vista isolada.
+ *
  * Uso:
  *   node tools/modelar/rodada-de-modelagem.mjs <peça> --registrar --modelador modelador.txt --critico critico.jsonl [--atrito "texto"] [--pacote <pasta>] [--motivo-dos-pontos "<quem decidiu, data: por quê>"]...
  *   node tools/modelar/rodada-de-modelagem.mjs <peça> --registrar rodada.json
@@ -63,6 +75,7 @@
  *   node tools/modelar/rodada-de-modelagem.mjs <peça> --perguntas
  *   node tools/modelar/rodada-de-modelagem.mjs <peça> --pedidos [<arquivo.json>] [--json]   os pedidos de alteração da pessoa, contados por etapa
  */
+import { spawnSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { existsSync, mkdirSync, readFileSync, readdirSync, renameSync, rmSync, writeFileSync, realpathSync } from 'node:fs';
 import { basename, dirname, join, resolve, sep, relative } from 'node:path';
@@ -148,12 +161,43 @@ function textoDaReceita(peca, { raiz = REPO } = {}) {
    copiado sem ajuste deixa de achar o arquivo e quebra o build. A cópia do
    ombro na rodada 7 quebrou assim. */
 export const ajustarImportsDaCopia = (texto) => texto.replace(/(\bfrom\s*|\bimport\s*\(?\s*)(['"])(\.\.?\/)/g, '$1$2../$3');
-const copiaDaReceita = (pasta, numero) => join(pasta, `receita-${String(numero).padStart(2, '0')}.js`);
+/** O caminho da cópia da receita que a rodada `numero` guardou na pasta das rodadas (`receita-NN.js`); o arquivo pode não existir mais. */
+export const copiaDaReceita = (pasta, numero) => join(pasta, `receita-${String(numero).padStart(2, '0')}.js`);
+
+/* QUANTAS CÓPIAS DE RODADA COM DECISÃO DA PESSOA FICAM NA PASTA SEM CONDIÇÃO: as das três rodadas decididas mais novas. Sem limite, a
+   peça em que a pessoa decide a cada rodada voltava a guardar uma cópia por rodada, que foi o que se tirou em 2026-11-13 (129 cópias e
+   62 mil linhas no acervo). A cópia de uma rodada decidida mais antiga só sai da pasta quando o git a tem igual, de modo que a geometria
+   que a pessoa julgou nunca se perde: fica na pasta ou no histórico, de onde `git show` a traz. */
+export const COPIAS_COM_DECISAO_NA_PASTA = 3;
+
+/**
+ * As rodadas cuja cópia da receita fica na pasta, além da última gravada: `Set` de números. Ficam as das `limite` rodadas mais novas com
+ * decisão da pessoa (a geometria que ela julgou; decisão da pessoa em 2026-11-26), as das decididas mais antigas que `recuperavel` não
+ * confirma no git, e a da última rodada com veredito do crítico, com que `--acao` compara a forma julgada com a atual. `rodadas` são os
+ * registros (`[{ numero, veredito }]`) e `decididas` os números das rodadas com decisão; `null` em `decididas` (o arquivo das decisões
+ * ilegível) guarda todas, porque apagar sem saber quais a pessoa julgou perderia o que não se refaz. Puro, fora o `recuperavel` dado.
+ */
+export function copiasQueFicam(rodadas, decididas, { limite = COPIAS_COM_DECISAO_NA_PASTA, recuperavel = () => false } = {}) {
+  const numeros = rodadas.map((r) => r.numero);
+  if (decididas === null) return new Set(numeros);
+  const julgadas = rodadas.filter((r) => r.veredito).map((r) => r.numero);
+  const comDecisao = numeros.filter((n) => decididas.includes(n)).sort((a, b) => a - b);
+  const novas = limite > 0 ? comDecisao.slice(-limite) : [];
+  const antigas = comDecisao.filter((n) => !novas.includes(n) && !recuperavel(n));
+  return new Set([...novas, ...antigas, ...julgadas.slice(-1)]);
+}
+
+/** Se o arquivo está no último commit do git com o mesmo conteúdo que tem no disco: é o que deixa uma cópia antiga sair da pasta. */
+export function estaIgualNoGit(arquivo) {
+  if (!existsSync(arquivo)) return false;
+  const r = spawnSync('git', ['-C', dirname(arquivo), 'show', `HEAD:./${basename(arquivo)}`], { encoding: 'buffer', maxBuffer: 64 * 1024 * 1024 });
+  return r.status === 0 && Buffer.compare(r.stdout, readFileSync(arquivo)) === 0;
+}
 
 export function gravarRodada(
   peca,
-  { veredito = null, medidas, partes, atrito = [], notaDePassagem, superficie, facesFinas, pontos },
-  { pasta = pastaDeRodadas(peca), receitaTexto = textoDaReceita(peca), agora = () => new Date().toISOString() } = {},
+  { veredito = null, medidas, partes, atrito = [], notaDePassagem, superficie, facesFinas, pontos, impressaoDasPartes },
+  { pasta = pastaDeRodadas(peca), receitaTexto = textoDaReceita(peca), agora = () => new Date().toISOString(), recuperavel = estaIgualNoGit } = {},
 ) {
   exigirNome(peca);
   const anteriores = lerRodadas(peca, { pasta });
@@ -179,6 +223,9 @@ export function gravarRodada(
     ...(facesFinas ? { facesFinas } : {}),
     /* o esperado resolvido de cada ponto de `PONTOS` e o que mudou nele desde a rodada anterior: a próxima rodada compara com este */
     ...(pontos ? { pontos } : {}),
+    /* a impressão das partes que o crítico julgou (a do `pacote.json`, conferida contra a receita medida): o pacote da rodada seguinte
+       compara com ela, e não com a cópia da receita executada de novo, que importa os módulos de hoje */
+    ...(impressaoDasPartes ? { impressaoDasPartes } : {}),
   };
   mkdirSync(pasta, { recursive: true });
   const arquivo = join(pasta, `rodada-${String(rodada.numero).padStart(2, '0')}.json`);
@@ -189,10 +236,16 @@ export function gravarRodada(
   writeFileSync(arquivo, `${JSON.stringify(rodada, null, 2)}\n`, 'utf8');
   if (receitaTexto !== null) {
     writeFileSync(copiaDaReceita(pasta, numero), ajustarImportsDaCopia(receitaTexto), 'utf8');
-    /* SÓ A ÚLTIMA CÓPIA FICA. A cópia da rodada N serve à diferença da rodada N+1 e à comparação da forma julgada com a atual; a das
-       rodadas anteriores não é lida por nada, e a diferença de cada uma já está no registro. Em 2026-11-13 o acervo guardava 129 cópias
-       e 62 mil linhas delas, um terço do código das peças, que a busca por texto e o build atravessavam. */
-    for (let n = 1; n < numero; n += 1) rmSync(copiaDaReceita(pasta, n), { force: true });
+    /* FICAM A ÚLTIMA CÓPIA, A DAS RODADAS COM DECISÃO DA PESSOA, ATÉ O LIMITE, E A DA ÚLTIMA RODADA JULGADA PELO CRÍTICO
+       (`copiasQueFicam`). A cópia da rodada N serve à diferença da rodada N+1 e à comparação da forma julgada com a atual; a das outras
+       rodadas não é lida por nada, e a diferença de cada uma já está no registro. Em 2026-11-13 o acervo guardava 129 cópias e 62 mil
+       linhas delas, um terço do código das peças, que a busca por texto e o build atravessavam. A da rodada com decisão da pessoa fica
+       desde 2026-11-26: é a geometria que ela julgou, e a diferença de texto no registro não a refaz. Além das
+       `COPIAS_COM_DECISAO_NA_PASTA` mais novas, a de rodada decidida só sai quando o git a tem igual. */
+    let decididas = null;
+    try { decididas = lerDecisoesDaPessoa(peca, { pasta }).map((d) => d.rodada); } catch { /* arquivo ilegível: nenhuma cópia sai */ }
+    const ficam = copiasQueFicam([...anteriores, rodada], decididas, { recuperavel: (n) => recuperavel(copiaDaReceita(pasta, n)) });
+    for (let n = 1; n < numero; n += 1) if (!ficam.has(n)) rmSync(copiaDaReceita(pasta, n), { force: true });
   }
   return { rodada, arquivo };
 }
@@ -355,9 +408,10 @@ function gravarPorTroca(arquivo, texto) {
  * Grava a decisão da pessoa sobre uma rodada já registrada, sem tocar no arquivo da rodada. Recusa o formato errado, a data que não
  * existe, a futura e a anterior ao registro da rodada, a rodada que não existe, a segunda decisão para a mesma rodada sem `substituir`,
  * o `substituir` sem decisão anterior e o mesmo texto já gravado; com `substituir: true`, a anterior fica em `anteriores`, com a data
- * dela. Devolve `{ entrada, arquivo, substituida }`.
+ * dela. `impressaoAtual` é a impressão das partes da receita de agora (`impressaoDasPartesDaReceita`), que a linha de comando tira
+ * antes de chamar: sem ela a cópia que já saiu da pasta não se refaz. Devolve `{ entrada, arquivo, substituida, copia }`.
  */
-export function gravarDecisaoDaPessoa(peca, { rodada, decisao, substituir = false }, { pasta = pastaDeRodadas(peca), agora = () => new Date().toISOString() } = {}) {
+export function gravarDecisaoDaPessoa(peca, { rodada, decisao, substituir = false }, { pasta = pastaDeRodadas(peca), agora = () => new Date().toISOString(), receitaTexto = textoDaReceita(peca), impressaoAtual = null } = {}) {
   const rodadas = lerRodadas(peca, { pasta });
   const numeros = rodadas.map((r) => r.numero);
   const registradas = numeros.length ? `as registradas são ${numeros.join(', ')}` : 'a peça não tem rodada registrada';
@@ -399,7 +453,42 @@ export function gravarDecisaoDaPessoa(peca, { rodada, decisao, substituir = fals
   const dado = { formato: FORMATO_DAS_DECISOES, versao: VERSAO_DAS_DECISOES, peca, decisoes: lista };
   conferirDecisoes(dado, { peca, arquivo, rodadas });
   gravarPorTroca(arquivo, `${JSON.stringify(dado, null, 2)}\n`);
-  return { entrada, arquivo, substituida: antiga };
+  return { entrada, arquivo, substituida: antiga, copia: guardarCopiaDaRodadaDecidida(rodadas.find((r) => r.numero === numero), { pasta, receitaTexto, impressaoAtual }) };
+}
+
+/* A CÓPIA DA RECEITA DA RODADA COM DECISÃO DA PESSOA. A cópia que a rodada guardou fica. A da rodada cuja cópia já saiu da pasta é
+   refeita só quando a receita de agora produz o que a rodada gravou: o mesmo texto (`receita.sha256` do registro) e a mesma impressão
+   das partes (`impressaoDasPartes` do registro contra `impressaoAtual`). O texto igual sozinho não basta: a receita importa módulos, e
+   com um deles mudado o mesmo texto dá outra malha, que não é a que a pessoa julgou (a primeira versão refazia só pelo texto). A rodada
+   que não gravou a impressão das partes (as registradas até 2026-11-26) não se refaz aqui, e quem chama diz isso com o caminho que
+   falta e a impressão que a rodada registrou. Devolve `{ arquivo, estado }`, com `estado` 'guardada', 'refeita' ou 'ausente', e no
+   'ausente' `sha256` (a da rodada) e `porque` ('texto', 'partes' ou 'sem-impressao'). */
+function guardarCopiaDaRodadaDecidida(rodada, { pasta, receitaTexto, impressaoAtual }) {
+  const arquivo = copiaDaReceita(pasta, rodada.numero);
+  if (existsSync(arquivo)) return { arquivo, estado: 'guardada' };
+  const sha256 = rodada.receita?.sha256 ?? null;
+  const mesmoTexto = receitaTexto !== null && sha256 !== null && impressao(receitaTexto) === sha256;
+  if (!mesmoTexto) return { arquivo, estado: 'ausente', sha256, porque: 'texto' };
+  if (!rodada.impressaoDasPartes || !impressaoAtual) return { arquivo, estado: 'ausente', sha256, porque: 'sem-impressao' };
+  if (JSON.stringify(rodada.impressaoDasPartes) !== JSON.stringify(impressaoAtual)) return { arquivo, estado: 'ausente', sha256, porque: 'partes' };
+  writeFileSync(arquivo, ajustarImportsDaCopia(receitaTexto), 'utf8');
+  return { arquivo, estado: 'refeita' };
+}
+
+const PORQUE_A_COPIA_NAO_SE_REFAZ = Object.freeze({
+  texto: (copia) => `a receita atual é outra versão que a registrada na rodada (${copia.sha256 ?? 'sem impressão no registro'})`,
+  partes: () => 'a receita atual tem o mesmo texto da rodada e produz outras partes, porque mudou um módulo que ela importa',
+  'sem-impressao': () => 'o texto da receita atual é o da rodada, e a rodada não gravou a impressão das partes com que conferir se os módulos que a receita importa ainda dão a mesma malha',
+});
+
+/** A frase do relatório sobre a cópia da receita da rodada com decisão (`copia` de `gravarDecisaoDaPessoa`). */
+export function fraseDaCopia(copia, { peca, rodada, raiz = REPO } = {}) {
+  const onde = copia.arquivo.replace(`${raiz}/`, '');
+  if (copia.estado === 'guardada') return `a cópia da receita julgada nessa rodada fica guardada em ${onde}.`;
+  if (copia.estado === 'refeita') return `a cópia da receita julgada nessa rodada não estava mais na pasta e foi refeita da receita atual, que tem o mesmo texto e produz as mesmas partes que a rodada registrou: ${onde}.`;
+  return `AVISO: a cópia da receita da rodada ${rodada} de '${peca}' não está na pasta (recebido: ${onde} não existe; esperado o arquivo que o registro da rodada grava), `
+    + `e ${(PORQUE_A_COPIA_NAO_SE_REFAZ[copia.porque] ?? PORQUE_A_COPIA_NAO_SE_REFAZ.texto)(copia)}. A decisão foi gravada, e a geometria julgada nessa rodada não foi refeita. `
+    + `Se a versão existir no git, recupere-a com \`git log --oneline -- ${onde}\` e \`git show <commit>:${onde} > ${onde}\`.`;
 }
 
 export const AJUDA = `rodada-de-modelagem: o registro do laço de modelagem de uma peça. A peça é <objeto>/<peça> ou o nome dela.
@@ -407,11 +496,14 @@ export const AJUDA = `rodada-de-modelagem: o registro do laço de modelagem de u
   node tools/modelar/rodada-de-modelagem.mjs <peça> --acao
       mede a receita atual e diz a próxima ação, as decisões da pessoa por rodada e os defeitos em aberto
   node tools/modelar/rodada-de-modelagem.mjs <peça> --registrar --modelador <arquivo> [--critico <arquivo>] [--atrito "<texto>"]... [--pacote <pasta>] [--motivo-dos-pontos ${FORMATO_DE_QUEM}]
-      grava a rodada com o relato do modelador, o veredito do crítico e a medição da ferramenta
+      grava a rodada com o relato do modelador, o veredito do crítico e a medição da ferramenta; com veredito, confere que o
+      pacote.json da pasta do pacote (a da rodada, ou a de --pacote) mostra a receita medida, no texto e nas partes
   node tools/modelar/rodada-de-modelagem.mjs <peça> --registrar <rodada.json>
       grava a rodada de um JSON já montado
   node tools/modelar/rodada-de-modelagem.mjs <peça> --decisao-da-pessoa ${FORMATO_DE_QUEM} --rodada <n> [--substituir]
-      grava a decisão da pessoa sobre a rodada <n> em rodadas/${ARQUIVO_DAS_DECISOES}, sem mexer na rodada
+      grava a decisão da pessoa sobre a rodada <n> em rodadas/${ARQUIVO_DAS_DECISOES}, sem mexer na rodada; a cópia da receita
+      dessa rodada (rodadas/receita-NN.js) passa a ficar guardada, e as rodadas seguintes não a apagam (além das ${COPIAS_COM_DECISAO_NA_PASTA}
+      rodadas decididas mais novas, a cópia mais antiga sai da pasta quando o git a tem igual)
   node tools/modelar/rodada-de-modelagem.mjs <peça> --perguntas
       as perguntas de forma do pedido do crítico
   node tools/modelar/rodada-de-modelagem.mjs <peça> --pedidos [<arquivo.json>] [--json]
@@ -714,12 +806,46 @@ export function alvoDoRepositorio(alvo, raiz = RAIZ_DO_REPOSITORIO) {
   return relativo;
 }
 
+/* A impressão das partes da receita medida (`medicao.caminho`), pela mesma função do pacote; null quando a receita não executa sozinha. */
+async function impressaoDasPartesDaMedicao(medicao) {
+  if (!medicao?.caminho) return null;
+  try { return await (await import('./vistas-para-critica.mjs')).impressaoDasPartesDaReceita(medicao.caminho); } catch { return null; }
+}
+
+/**
+ * Confere que o pacote do crítico da pasta `pasta` mostra a receita medida agora, e devolve a impressão das partes a gravar na rodada.
+ * Vale para toda peça. `sha256` é a impressão do texto da receita medida e `impressao` a das partes dela (null na receita que não
+ * executa sozinha). Recusa, com o recebido, o esperado e o comando que refaz o pacote: a pasta sem `pacote.json`, o de outra peça, o
+ * de outro texto de receita e o de outras partes, que é o caso do módulo importado que mudou depois do pacote com o texto da receita
+ * igual. O pacote gerado antes de 2026-11-26 não traz a impressão das partes: passa pelo texto, e a rodada grava a de agora.
+ */
+export async function conferirPacoteDoVeredito(peca, { pasta, sha256, impressao }) {
+  const arquivo = join(pasta, 'pacote.json');
+  const refazer = `Gere o pacote de novo com \`${comandoDoPacote(peca)}\` (com --saida, passe a mesma pasta em --pacote), despache o crítico com o pedido.md novo e registre o veredito dele.`;
+  const recusar = (recebido, esperado) => { throw new Error(`o veredito do crítico não se registra: ${recebido}; ${esperado}. ${refazer}`); };
+  if (!existsSync(arquivo)) recusar(`recebido: a pasta do pacote ${pasta} não tem o pacote.json`, 'esperado o pacote.json que o vistas:critica grava com as imagens que o crítico julgou');
+  let dado;
+  try { dado = JSON.parse(readFileSync(arquivo, 'utf8')); } catch (erro) { recusar(`recebido: ${arquivo} não é JSON (${erro.message})`, 'esperado o pacote.json que o vistas:critica grava'); }
+  if (dado?.peca !== peca) recusar(`recebido: o pacote de ${pasta} é da peça ${JSON.stringify(dado?.peca ?? null)}`, `esperado o pacote de '${peca}'`);
+  if (dado.receita !== sha256) recusar(`recebido: o pacote de ${pasta} mostra a receita ${String(dado.receita)}`, `esperado ${sha256}, a receita medida agora: o texto dela mudou depois do pacote`);
+  /* o pacote sem a impressão (gerado antes de 2026-11-26, ou cuja receita não executou) não diz o que o crítico viu: a rodada fica sem
+     impressão, não serve de base, e o pacote seguinte leva todas as partes, em vez de gravar a de agora como julgada */
+  if (dado.impressaoDasPartes === undefined || dado.impressaoDasPartes === null) return null;
+  /* importado na hora: o pacote do crítico é módulo pesado, e `--acao` não o usa */
+  const diferem = (await import('./vistas-para-critica.mjs')).partesQueDiferem(dado.impressaoDasPartes, impressao);
+  if (impressao === null || diferem.length) {
+    recusar(`recebido: o pacote de ${pasta} mostra ${impressao === null ? 'partes que a receita de agora não dá, porque ela não executa' : `outra malha ou outra promessa ${diferem.length === 1 ? 'na parte' : 'nas partes'} ${diferem.join(', ')}`}`,
+      `esperado as mesmas partes da receita medida agora (${sha256}): o texto da receita é o do pacote, e mudou um módulo que ela importa ou o que ela declara para a parte`);
+  }
+  return impressao;
+}
+
 /**
  * Grava a rodada com a medição da ferramenta no lugar da que a sessão escreveria, e recusa o que não se sustenta nela:
  * o veredito do crítico quando a medição da receita atual reprovou, e `medidas` declaradas que contradizem a medição. A receita
  * gravada na rodada é a que foi medida.
  */
-export async function registrarMedida(peca, entrada, { medir = () => medirReceita(peca), pacote = null, motivoDosPontos = null, ...opcoes } = {}) {
+export async function registrarMedida(peca, entrada, { medir = () => medirReceita(peca), pacote = null, motivoDosPontos = null, imprimirPartes = impressaoDasPartesDaMedicao, ...opcoes } = {}) {
   let medicao;
   try { medicao = await medir(); } catch (erro) {
     throw new Error(`não consegui medir a receita de '${peca}' (${erro.message}): sem medição a rodada não se registra, e o veredito do crítico muito menos.`);
@@ -747,6 +873,12 @@ export async function registrarMedida(peca, entrada, { medir = () => medirReceit
     }
     superficie = { lataria: luzDaMedicao(medicao).porque, imagens: conferido.imagens };
   }
+  /* em toda peça: o pacote que o crítico julgou mostra a receita medida agora, no texto e nas partes */
+  let impressaoDasPartes;
+  if (entrada.veredito) {
+    const pasta = pacote ?? pastaDoPacoteDaRodada(peca, numeroDaProximaRodada(opcoes.pasta ?? pastaDeRodadas(peca)));
+    impressaoDasPartes = await conferirPacoteDoVeredito(peca, { pasta, sha256: medicao.sha256, impressao: await imprimirPartes(medicao) }) ?? undefined;
+  }
   /* o esperado dos pontos contra o da última rodada que o gravou: toda mudança pede quem decidiu e por quê */
   const defeitoDoMotivo = motivoDosPontos === null ? null : defeitoDoTextoDeQuem(String(motivoDosPontos).trim());
   if (defeitoDoMotivo) {
@@ -769,7 +901,7 @@ export async function registrarMedida(peca, entrada, { medir = () => medirReceit
   /* `medidas`, `superficie` e `pontos` são da ferramenta, e o que a entrada declara deles sai */
   const { medidas: _declaradas, superficie: _declarada, pontos: _dosPontos, ...resto } = entrada;
   void _declaradas; void _declarada; void _dosPontos;
-  const gravada = gravarRodada(peca, { ...resto, superficie, facesFinas: medicao.facesFinas, pontos, medidas: { passou: medicao.passou, relatorio: medicao.relatorio } }, { ...opcoes, receitaTexto: medicao.texto });
+  const gravada = gravarRodada(peca, { ...resto, superficie, impressaoDasPartes, facesFinas: medicao.facesFinas, pontos, medidas: { passou: medicao.passou, relatorio: medicao.relatorio } }, { ...opcoes, receitaTexto: medicao.texto });
   return { ...gravada, medicao };
 }
 
@@ -1053,9 +1185,13 @@ async function comoCLI(argv, { env = process.env } = {}) {
       return { codigo: 1, texto: `--decisao-da-pessoa recebido junto de ${outras.map((k) => `--${k}`).join(', ')}; esperado só com --rodada <n> e, quando a pessoa muda a decisão, --substituir: este comando só grava a decisão. `
         + `Grave com \`node tools/modelar/rodada-de-modelagem.mjs ${peca} --decisao-da-pessoa ${FORMATO_DE_QUEM} --rodada <n>\` e confira depois com \`node tools/modelar/rodada-de-modelagem.mjs ${peca} --acao\`.` };
     }
-    const { entrada, arquivo, substituida } = gravarDecisaoDaPessoa(peca, { rodada: opcoes.rodada, decisao: daPessoa, substituir: opcoes.substituir === true }, { pasta });
+    /* a impressão das partes da receita de agora, para refazer a cópia que já saiu da pasta; a peça sem receita executável fica sem ela */
+    let impressaoAtual = null;
+    try { impressaoAtual = await (await import('./vistas-para-critica.mjs')).impressaoDasPartesDaReceita(resolverCaminhoReceita(peca)); } catch { impressaoAtual = null; }
+    const { entrada, arquivo, substituida, copia } = gravarDecisaoDaPessoa(peca, { rodada: opcoes.rodada, decisao: daPessoa, substituir: opcoes.substituir === true }, { pasta, impressaoAtual });
     return { codigo: 0, texto: `${aviso}decisão da pessoa sobre a rodada ${entrada.rodada} gravada em ${arquivo.replace(`${REPO}/`, '')}: ${JSON.stringify(entrada.decisao)}`
-      + (substituida ? `\nsubstituiu a anterior, que ficou guardada: ${JSON.stringify(substituida.decisao)}` : '') };
+      + (substituida ? `\nsubstituiu a anterior, que ficou guardada: ${JSON.stringify(substituida.decisao)}` : '')
+      + `\n${fraseDaCopia(copia, { peca, rodada: entrada.rodada })}` };
   }
 
   if (opcoes.registrar !== undefined) {

@@ -259,6 +259,39 @@ describe('olhar-bancada: a vista de três quartos e a caixa da visão (plano do 
     expect(k.resultado.visao.linhas.join(' ')).toMatch(/saturam em ±0,248 1\/m/);
     expect(k.resultado.visao.linhas.join(' ')).not.toMatch(/ ms/);
   }, 180_000);
+
+  it('com enquadrar a peça ocupa 92 % da maior dimensão do quadro em cada vista, e a chamada seguinte sem ele, na mesma página, dá a imagem da página nova', async () => {
+    const { olharBancada, abrirCapturaCompartilhada } = await import('./olhar-bancada.mjs');
+    const comum = { peca: AMASSADA, auditoria: true, projecao: 'ortografica', medirContatos: false, res: '600x600' };
+    const pasta = (prefixo) => relative(REPO, mkdtempSync(join(PASTA, prefixo)));
+    const imagem = (r) => readFileSync(r.resultado.arquivos[0]);
+    /* a referência: a vista de cima sem enquadrar, numa página nova */
+    const fria = await olharBancada({ ...comum, vistas: 'superior', saida: pasta('fria-') });
+    expect(fria.ok, fria.stderr).toBe(true);
+    const compartilhada = await abrirCapturaCompartilhada({});
+    try {
+      const cheia = await olharBancada({ ...comum, enquadrar: true, vistas: 'isometrica,superior', saida: pasta('cheia-'), compartilhada });
+      expect(cheia.ok, cheia.stderr).toBe(true);
+      for (const v of cheia.resultado.vistas) {
+        expect(Math.max(v.enquadramento.largura, v.enquadramento.altura)).toBeCloseTo(0.92, 2);
+        expect(v.enquadramento.cortado).toBe(false);
+      }
+      /* a mesma vista sem enquadrar ocupava bem menos, e é por isso que o pacote do crítico pede o quadro cheio */
+      const antes = fria.resultado.vistas[0].enquadramento;
+      expect(Math.max(antes.largura, antes.altura)).toBeLessThan(0.7);
+      /* outra chamada enquadrada e uma sem enquadrar, as duas na página já aberta */
+      const outra = await olharBancada({ ...comum, enquadrar: true, vistas: 'frontal', saida: pasta('outra-'), compartilhada });
+      expect(outra.resultado.cargasDePagina).toBe(0);
+      expect(Math.max(outra.resultado.vistas[0].enquadramento.largura, outra.resultado.vistas[0].enquadramento.altura)).toBeCloseTo(0.92, 2);
+      const morna = await olharBancada({ ...comum, vistas: 'superior', saida: pasta('morna-'), compartilhada });
+      expect(morna.ok, morna.stderr).toBe(true);
+      expect(morna.resultado.cargasDePagina).toBe(0);
+      expect(morna.resultado.vistas[0].enquadramento).toEqual(fria.resultado.vistas[0].enquadramento);
+      expect(Buffer.compare(imagem(morna), imagem(fria))).toBe(0);
+    } finally {
+      await compartilhada.fechar();
+    }
+  }, 180_000);
 });
 
 /** O limite declarado da fração de pixels da peça no branco (os três canais em 250 ou mais) na luz rasante. Antes da exposição, o quarto traseiro do carro saía com 18 %. */

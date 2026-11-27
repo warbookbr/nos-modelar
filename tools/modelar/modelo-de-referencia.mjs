@@ -104,8 +104,49 @@ export async function modeloDeReferencia(arquivo, pastaSaida, { comprimento = 0,
   } finally { await navegador.close(); servidor.close(); }
 }
 
+/* A ENTRADA DO ESTUDO DE MODELO DE TERCEIROS. `npm run modelo:referencia -- <passo> ...` leva a cada ferramenta do grupo, que continua
+   respondendo igual quando rodada pelo próprio arquivo: o passo só escolhe o arquivo e repassa os argumentos a um processo filho, com a
+   saída e o código de saída dele. Sem passo (o primeiro argumento é o arquivo da malha) vale `estudar`, que é o que este arquivo sempre fez. */
+export const PASSOS_DO_ESTUDO = Object.freeze({
+  medidas: { modulo: './medidas-da-fonte.mjs', uso: '<fonte-partes.json> [--tol=<mm>] [--json=<arquivo.json>] [--codigo=<arquivo.js>]', faz: 'o perfil lateral, a planta, a seção frontal e as rodas da fonte, em milímetro, com o trecho de receita' },
+  silhueta: { modulo: './comparar-silhueta.mjs', uso: '<receita.js> <fonte-partes.json> [--tolerancia-mm=<mm>] [--rigoroso] [--cabine=auto|<de>:<ate>]', faz: 'a silhueta da receita contra a da fonte, fatia por fatia (sai com 1 quando passa da tolerância)' },
+  folha: { modulo: './folha-comparativa.mjs', uso: '<receita.js> <fonte-partes.json> --saida=<pasta> [--imagem=<fonte-vistas.png>] [--folga-px=<n>]', faz: 'a fonte e a receita lado a lado, na mesma câmera e escala, com a vista de diferença' },
+  vistas: { modulo: './vistas-da-receita.mjs', uso: '<receita.js> [--saida=<arquivo.png>]', faz: 'a folha de seis vistas da receita, cada parte com uma cor' },
+  texturizadas: { modulo: './vistas-texturizadas.mjs', uso: '<receita.js> [--saida=<arquivo.png>]', faz: 'três vistas da peça com a textura que a exportação OBJ gera' },
+});
+const USO_DE_ESTUDAR = '<arquivo.obj|fbx|glb> --saida=<pasta> [--comprimento=<m>] [--escala=<fator>] [--girar=<graus>] [--frente=+z|-z] [--cor=<#rrggbb>]';
+export const AJUDA_DO_ESTUDO = `modelo-de-referencia: o estudo de uma malha de terceiros como referência de forma, do arquivo à folha comparativa.
+
+  npm run modelo:referencia -- [estudar] ${USO_DE_ESTUDAR}
+      lê a malha, endireita, escala e grava vistas.png e partes.json na pasta de saída; nada da malha entra no repositório
+${Object.entries(PASSOS_DO_ESTUDO).map(([nome, p]) => `  npm run modelo:referencia -- ${nome} ${p.uso}\n      ${p.faz}`).join('\n')}
+  npm run modelo:referencia -- --ajuda
+      esta mensagem
+
+A opção com valor aceita \`--opcao=valor\` e \`--opcao valor\`. Cada passo também roda pelo próprio arquivo, em tools/modelar/.
+A ordem do trabalho está em docs/modelar/guias/modelar-veiculos.md.
+`;
+
+/* O que a linha de comando pede: a ajuda, um passo do grupo (com o módulo e os argumentos que o filho recebe) ou o estudo da malha.
+   `--opcao=valor` vira `--opcao valor`, que é a forma que cada ferramenta do grupo lê. */
+export function rotearEstudo(argv) {
+  const args = argv.flatMap((x) => { const m = /^(--[a-z][a-z-]*)=(.*)$/s.exec(x); return m ? [m[1], m[2]] : [x]; });
+  if (args.includes('--ajuda') || args.includes('--help') || args.includes('-h')) return { ajuda: true };
+  const [primeiro, ...resto] = args;
+  if (primeiro === 'estudar') return { passo: 'estudar', args: resto };
+  if (Object.hasOwn(PASSOS_DO_ESTUDO, primeiro ?? '')) return { passo: primeiro, modulo: PASSOS_DO_ESTUDO[primeiro].modulo, args: resto };
+  return { passo: 'estudar', args };
+}
+
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const a = process.argv.slice(2); const valor = (f) => { const i = a.indexOf(f); return i >= 0 ? a[i + 1] : null; };
+  const rota = rotearEstudo(process.argv.slice(2));
+  if (rota.ajuda) { process.stdout.write(AJUDA_DO_ESTUDO); process.exit(0); }
+  if (rota.modulo) {
+    const { spawnSync } = await import('node:child_process');
+    const filho = spawnSync(process.execPath, [fileURLToPath(new URL(rota.modulo, import.meta.url)), ...rota.args], { stdio: 'inherit' });
+    process.exit(filho.status ?? 2);
+  }
+  const a = rota.args; const valor = (f) => { const i = a.indexOf(f); return i >= 0 ? a[i + 1] : null; };
   const arquivo = a.find((x, i) => !x.startsWith('--') && !['--saida', '--comprimento', '--escala', '--girar', '--cor', '--frente'].includes(a[i - 1]));
   if (!arquivo || !valor('--saida')) { console.error('uso: node tools/modelar/modelo-de-referencia.mjs <arquivo.obj|fbx> --saida <pasta> [--comprimento <m>] [--escala <fator>] [--girar <graus>] [--frente +z|-z] [--cor <#rrggbb>]'); process.exit(2); }
   let r;

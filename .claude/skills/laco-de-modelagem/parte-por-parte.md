@@ -51,6 +51,6 @@ Só a pessoa reabre uma etapa fixa, pelo mesmo critério do aceite humano, com
 `npm run etapas -- <montagem.json> --reabrir <instância> --por "<quem, data: motivo>"`.
 Reabrir só acrescenta um evento, sem medir: o aceite fica no registro e a etapa volta a aberta. O estado nunca é gravado, sai da
 comparação da impressão de agora com a do aceite vigente; a quebrada cuja mudança é desfeita volta a fixa sozinha, e só a reabertura a faz
-aberta. Aceitar uma etapa não refixa as posteriores quebradas (o `--fixar` avisa): reabra e aceite cada uma. O registro antigo recusa e manda rodar
-`migrar-etapas-para-impressao.mjs`. Contrato em
+aberta. Aceitar uma etapa não refixa as posteriores quebradas (o `--fixar` avisa): reabra e aceite cada uma. O registro antigo recusa e diz como
+recuperar do histórico a migração, que saiu em 2026-11-26. Contrato em
 [`MONTAGENS-SEMANTICAS.md`](../../../docs/modelar/usar/MONTAGENS-SEMANTICAS.md#o-registro-de-etapas-eventos-impressão-e-leitura-derivada).

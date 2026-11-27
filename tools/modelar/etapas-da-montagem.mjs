@@ -21,7 +21,7 @@
  * gravado, sai da comparação da impressão de agora com a do aceite (`etapas-pela-impressao.js`). `--fixar` e `--reabrir` só
  * acrescentam eventos. `--reabrir` reabre a etapa fixa ou a quebrada e não mede nada; as posteriores seguem fixas enquanto a
  * impressão delas for a do aceite, e `--fixar` avisa das posteriores que seguem quebradas. O registro de versão 1 ou 2 recusa com o
- * comando que o migra (`migrar-etapas-para-impressao.mjs`).
+ * caminho da migração, que saiu do repositório em 2026-11-26 e se recupera do histórico (`migrar-etapas-para-impressao.mjs` em 9118ea08).
  *
  * `--olhar` desenha juntas, em vista ortográfica, as etapas que já têm
  * geometria. A parte de cada etapa era mostrada sozinha, e a pessoa não
@@ -144,7 +144,7 @@ export function exigirRegistroV3(registro, arquivoMontagem = '<montagem.json>') 
   if (registro === null || registro === undefined || registro.versao === VERSAO_REGISTRO_PELA_IMPRESSAO) return registro ?? null;
   const antigo = registro.versao === 1 || registro.versao === 2 || (registro.versao === undefined && Array.isArray(registro.etapas));
   if (antigo && !('eventos' in registro)) {
-    throw new ErroEtapaDeConstrucao('registro-antigo', `o registro de etapas é da versão ${registro.versao ?? 'sem número'}, que grava o estado em cada etapa e já não é lido; migre-o com \`node tools/modelar/migrar-etapas-para-impressao.mjs ${arquivoMontagem} --gravar\` (sem --gravar, só o ensaio).`);
+    throw new ErroEtapaDeConstrucao('registro-antigo', `o registro de etapas é da versão ${registro.versao ?? 'sem número'}, que grava o estado em cada etapa e já não é lido; migre-o pela migração, que saiu do repositório em 2026-11-26 depois de migrar o acervo inteiro: recupere-a com \`git show 9118ea08:tools/modelar/migrar-etapas-para-impressao.mjs > /tmp/migrar.mjs\` e rode \`node /tmp/migrar.mjs ${arquivoMontagem} --gravar\` (sem --gravar, só o ensaio).`);
   }
   throw new ErroEtapaDeConstrucao('registro-invalido', `o registro de etapas traz a versão ${JSON.stringify(registro.versao)}${'eventos' in registro ? ' com eventos' : ''}; esperava a 3 (impressão do aceite) ou nenhum registro.`);
 }
