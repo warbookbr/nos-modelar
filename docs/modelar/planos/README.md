@@ -8,12 +8,7 @@
 2. [processo e CI](2026-11-26-processo-e-ci.md). Território: `.github/workflows/`, `tools/gates.mjs`, `tools/mapa/planos.mjs`, `tools/mapa/mapa.mjs`, `docs/MAPA.md`, `tools/reguas-de-texto/` e os testes. O envio sem vermelho falso, as regras de texto como régua e o limite de planos de núcleo.
 3. [laço de modelagem mais rápido](2026-11-26-laco-de-modelagem-mais-rapido.md). Território: a dobra, o vinco oculto, a ferramenta das rodadas, o laço, a calibração do crítico, o navegador e a skill do laço. A rodada em minutos, com a decisão da pessoa gravada.
 4. [ferramentas e documentação](2026-11-26-ferramentas-e-documentacao.md). Território: o registro de ferramentas, o `tools/README.md`, o roteador e os roteiros, a página de entrada, cinco agentes, `.claude/settings.json` e `.mcp.json`. Toda ferramenta registrada e o roteador cobrindo o trabalho inteiro.
-<<<<<<< HEAD
 5. [cabos](2026-11-27-cabos.md). Território: a família do cabo, a fixture dela, o registro de famílias, o mapa de ferramentas e o banco de provas. O cabo flexível que acompanha a junta.
-=======
-5. [perna estreita](2026-11-27-perna-estreita.md). Território: as famílias do atuador de junta e do elo entre juntas, as fixtures delas e o banco de provas. A perna do humanoide numa coluna de até 180 mm.
-6. [cabos](2026-11-27-cabos.md). Território: a família do cabo, a fixture dela, o registro de famílias, o mapa de ferramentas e o banco de provas. O cabo flexível que acompanha a junta.
->>>>>>> cabos-f0
 
 A lista está em ordem de prioridade. A ordem desempata quando dois planos precisam do mesmo arquivo: o de menor prioridade espera ou pede à pessoa que mude o território.
 
