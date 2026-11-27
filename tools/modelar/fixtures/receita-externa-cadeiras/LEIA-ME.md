@@ -1,6 +1,6 @@
 # Cadeiras escolhidas como alvo de forma (2026-10-19)
 
-As onze receitas do externo (repositório externo da pessoa, já expandidas) que a pessoa escolheu para a família de cadeira do plano [objetos externos como famílias](../../../../docs/modelar/decisoes/PLANOS-ENCERRADOS.md). O esboço de cada uma sai de `tools/modelar/receita-externa.mjs` e é o alvo de medida e de forma do perfil.
+As onze receitas do externo (repositório externo da pessoa, já expandidas) que a pessoa escolheu para a família de cadeira do plano [objetos externos como famílias](../../../../docs/modelar/decisoes/PLANOS-ENCERRADOS.md). O esboço de cada uma saía do tradutor `tools/modelar/receita-externa.mjs`, apagado em 2026-11-26 com a conversão do esboço antigo, e era o alvo de medida e de forma do perfil; as medidas tiradas dele estão gravadas em `procedural/familias/cadeira/alvos-de-medida.json`.
 
 Ajustes que a pessoa pediu, e que o perfil aplica sobre o alvo:
 

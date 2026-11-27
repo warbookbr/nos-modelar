@@ -1,9 +1,11 @@
 /* cadeira.test.mjs — a família de cadeira: as combinações, as faixas e restrições, a solidez da malha, o determinismo do hash, as
    partes nomeadas, as regras construtivas medidas na geometria de cada perfil (simetria, poste sobre a perna, contato sem
-   atravessamento, contorno do assento) e a medida de proporção contra o esboço alvo (receita do externo).
+   atravessamento, contorno do assento) e a medida de proporção contra o alvo de cada perfil, gravado em `alvos-de-medida.json`
+   (a caixa envolvente e o volume da receita de origem, com a origem escrita no arquivo).
 
    As regras construtivas valem para os perfis e para os três pontos aprovados. O alvo vale só para a proporção (largura,
    profundidade, altura): as receitas de origem têm peças que se atravessam e lados assimétricos, e a família não os copia. */
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { executarReceita } from '../../../src/autoria/executar-receita.js';
 import { chamar, ErroChamadaDeFamilia } from '../../../src/autoria/chamar-familia.js';
@@ -13,7 +15,8 @@ import { CADEIRA, CONTRATO_DA_CADEIRA } from './index.js';
 import { COMPOSICOES, combinacoes } from './composicoes.js';
 import { combinacaoDaCadeira, contatoEntreCaixas, degrausEntreCaixas, envolventeDasCaixas, geometriaDaCadeira, idDaCadeira } from './geometria.js';
 import { criarRegistroDeFamilias } from '../index.js';
-import { ALVOS, compararPerfil } from '../../../tools/modelar/cadeiras-medida.mjs';
+
+const ALVOS = JSON.parse(readFileSync(new URL('./alvos-de-medida.json', import.meta.url), 'utf8')).alvos;
 
 const registro = criarRegistroDeFamilias({ familias: [CADEIRA] });
 const rodar = (parametros) => executarReceita({ get CHAMADAS_COMPOSICOES() { return [chamar(CADEIRA, 'corpo', parametros)]; } }, registro);
@@ -279,11 +282,38 @@ describe('as recusas dizem a restrição e não geram malha', () => {
   });
 });
 
-describe('a medida de proporção contra o esboço alvo', () => {
-  it.each(PERFIS)('%s: largura, profundidade e altura em até 3,5% do alvo e volume em até 5%', (perfil) => {
-    const m = compararPerfil(perfil);
+/* A caixa envolvente (mm) e o volume (mm³, fórmula de Newell, em módulo) da malha. */
+function medirMalha(neutro) {
+  const min = [Infinity, Infinity, Infinity]; const max = [-Infinity, -Infinity, -Infinity];
+  for (const v of neutro.V.values()) for (let k = 0; k < 3; k += 1) { min[k] = Math.min(min[k], v[k] * 1000); max[k] = Math.max(max[k], v[k] * 1000); }
+  let volume = 0;
+  for (const f of neutro.F.values()) {
+    const p = f.vs.map((id) => neutro.V.get(id).map((x) => x * 1000));
+    const n = [0, 0, 0];
+    for (let i = 0; i < p.length; i += 1) {
+      const a = p[i]; const b = p[(i + 1) % p.length];
+      n[0] += (a[1] - b[1]) * (a[2] + b[2]); n[1] += (a[2] - b[2]) * (a[0] + b[0]); n[2] += (a[0] - b[0]) * (a[1] + b[1]);
+    }
+    volume += (n[0] * p[0][0] + n[1] * p[0][1] + n[2] * p[0][2]) / 6;
+  }
+  return { tamanho: max.map((v, k) => v - min[k]), volume: Math.abs(volume) };
+}
+
+describe('a medida de proporção contra o alvo gravado', () => {
+  it('cada alvo gravado tem a receita de origem, três medidas positivas e o volume', () => {
+    for (const [perfil, alvo] of Object.entries(ALVOS)) {
+      expect(typeof alvo.receita, perfil).toBe('string');
+      expect(alvo.tamanho, perfil).toHaveLength(3);
+      for (const t of alvo.tamanho) expect(t, perfil).toBeGreaterThan(0);
+      expect(alvo.volume, perfil).toBeGreaterThan(0);
+    }
+  });
+
+  it.each(PERFIS)('%s: largura, altura e profundidade em até 3,5% do alvo e volume em até 30%', (perfil) => {
+    const alvo = ALVOS[perfil];
+    const malha = medirMalha(rodar({ perfil }).neutro);
     /* a rústica tem 3,2% na profundidade: os pregos do encosto saem 8 mm do alvo e a família não os desenha */
-    for (const e of m.eixos) expect(Math.abs(e.pct)).toBeLessThanOrEqual(3.5);
-    expect(Math.abs(m.volume.pct)).toBeLessThanOrEqual(30);
+    for (let k = 0; k < 3; k += 1) expect(Math.abs((100 * (malha.tamanho[k] - alvo.tamanho[k])) / alvo.tamanho[k]), 'xyz'[k]).toBeLessThanOrEqual(3.5);
+    expect(Math.abs((100 * (malha.volume - alvo.volume)) / alvo.volume)).toBeLessThanOrEqual(30);
   });
 });

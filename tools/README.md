@@ -25,7 +25,6 @@ Quem trabalha chama, com `npm run <comando> -- <argumentos>`; a que não tem com
 | `alisar` | Calcula quanto mover cada valor editável de uma receita para tirar a ondulação da superfície de subdivisão sem afastá-la dos pontos medidos. |
 | `malha:assinatura` | A assinatura de cada parte e da peça inteira, e a comparação de duas rodadas. |
 | `ativar:bancada` | Ativa uma peça ou montagem procedural na sessão aberta da bancada. |
-| `node tools/modelar/cadeiras-medida.mjs` | A medida da família cadeira contra o esboço alvo de cada perfil, e a prancha com os dois lado a lado. |
 | `capacidade` | Lista os ajudantes de gaiola e imprime a ficha de um deles, recortada do cabeçalho do arquivo. |
 | `casamento:vista` | Duas medidas do modelo contra a imagem de referência numa vista, as duas tiradas da malha e não de uma captura com luz. |
 | `comecar` | A entrada por intenção: dado o roteiro, diz o que ler, a skill, os comandos e o passo seguinte. |
@@ -181,7 +180,6 @@ Outra ferramenta chama, ou é ferramenta de manutenção, que ninguém chama ao 
 - `modelar/sobreposicao-de-cortes.mjs`
 - `modelar/vinco-oculto.mjs`
 - `modelar/vistas-da-receita.mjs`
-- `modelar/vistas-de-passos.mjs`
 - `modelar/vistas-texturizadas.mjs`
 
 ## Apoio de teste
@@ -194,6 +192,7 @@ Só os testes usam; a conferência exige que algum teste importe cada um.
 - `modelar/capacidade-symlink.mjs`
 - `modelar/fixtures/`, a pasta
 - `modelar/fixtures/contatos/`, a pasta
+- `modelar/exportar-peca.mjs`
 - `modelar/fonte-sintetica.mjs`
 - `modelar/guardas/etapas-do-acervo.mjs`
 - `modelar/medir-importar-receita.mjs`
@@ -205,9 +204,7 @@ Nenhum comando, import de ferramenta viva, skill ou configuração chama o que e
 
 - `modelar/reduzir-malha.mjs`: o comando e a exportação o chamam na fatia 2 do plano de reduzir polígonos
 - `blender/`, a pasta: ferramentas opcionais do Blender, fora do CI e rodadas à mão; uso em docs/modelar/blender/REGUA-E-PACOTE-CEGO.md
-- `modelar/cadeiras-medida.mjs`: a decisão de 2026-11-26 era apagar e parou: o teste da família cadeira (procedural/familias/cadeira/cadeira.test.mjs) importa ALVOS e compararPerfil dele; espera a pessoa
 - `modelar/conferir-retrato-do-acervo.mjs`: à espera da decisão da pessoa (apagar ou religar)
 - `modelar/derivar-campanha-revalidacao.mjs`: à espera da decisão da pessoa (apagar ou religar)
-- `modelar/exportar-peca.mjs`: conferido contra o contrato de arquitetura em 2026-11-26 sem mudança: a função exportarPeca serve a quatro testes, e a metade de publicação não tem comando nem gate; espera a pessoa
-- `modelar/familia-com-esboco.mjs`: a decisão de 2026-11-26 era apagar e parou: o contrato da família (docs/modelar/contratos/CONTRATO-DA-FAMILIA.md) o descreve como o adaptador da conferência com o esboço; espera a pessoa
+- `modelar/familia-com-esboco.mjs`: fica pela decisão da pessoa em 2026-11-26: o contrato da família (docs/modelar/contratos/CONTRATO-DA-FAMILIA.md) o descreve como o adaptador da conferência com o esboço, e tirá-lo muda o contrato e pede plano próprio
 - `modelar/visor-montagem.js`: carregado por caminho calculado: a página visor-montagem.html, que a captura de montagem abre, o carrega, por `modelar/capturar-montagem.mjs`
