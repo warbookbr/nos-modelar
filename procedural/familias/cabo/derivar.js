@@ -1,5 +1,5 @@
 /* derivar.js — dos parâmetros do cabo (milímetro) à chamada de composição (metro). O plano (`plano.js`) escolhe a composição pelo
-   número de estações; as pontas viram as portas `ponta-a` e `ponta-b`. */
+   número de estações; as pontas viram as portas `ponta-a` e `ponta-b`. Os acessórios são chamadas próprias (`pedido.js`). */
 import { ID_DO_CABO } from './composicoes.js';
 import { planejar } from './plano.js';
 

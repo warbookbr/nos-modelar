@@ -13,3 +13,11 @@ As estações do tubo vêm do desvio máximo da corda, numa escada de 17 número
 Imagens em `tools/bancadas/out/cabos/` (não versionadas): um arquivo por caso e `lados-8.png` contra `lados-24.png`.
 
 A pessoa aprovou o cabo entre dois pontos por imagem em 2026-11-27, com a frase "aprovo sim" (`aprovado-*.png`: o laço, o caimento e o mesmo cabo com 8 e com 24 lados), sabendo que os lados vão de 8 a 32 de 4 em 4 e que a conferência de porta se confunde quando as duas tampas ficam no mesmo plano.
+
+## Fatia 2: pedido, passagens, terminais e feixe (2026-11-27)
+
+O jeito de pedir é `cabo({ de: { ponto, direcao }, para: { ponto, direcao }, comprimento | folga, diametro, lados, ... })` em `procedural/familias/cabo/pedido.js`: a ponta B entra em coordenada absoluta e vira o deslocamento da família, a folga de qualquer tamanho vira comprimento (o piso de 0,3 da família é o do ponto mínimo da aprovação, em que todos os parâmetros estão no mínimo e as direções mandam o cabo para longe da outra ponta), e a recusa fala o vocabulário do pedido. As passagens são até duas, com ponto e direção (a da corda se omitida), a braçadeira é um anel de fio redondo e o terminal é a capa cilíndrica ou o olhal (anel), todos voltas fechadas do friso, sem booleana. O comprimento se reparte entre os trechos pelo desvio das direções em relação à corda. Os acessórios são chamadas próprias (`cabo.capa` e `cabo.anel`, duas composições da família), que `cabo()` junta ao cabo; o feixe não os leva. O feixe (`feixeDeCabos`, 2 a 6 cabos) desloca cada cabo pelo eixo normal ao plano de dobra, mede a distância entre os eixos contra a soma dos raios e soma as faces no orçamento; entra pelas `poses` de `instanciaDeFamilia`. Os extremos da família mudaram só no ponto máximo (comprimento até 12000 mm e diâmetro até 25 mm, para o ponto máximo com passagens ser chamável); mínimo, médio e os três perfis têm o mesmo hash de antes.
+
+Imagens em `tools/bancadas/out/cabos-fatia2/` (não versionadas): `bracadeiras.png`, `terminais.png`, `feixe.png`.
+
+A pessoa aprovou a fatia 2 por imagem em 2026-11-27, com a frase "Sim, aprovo as duas" (`aprovado-fatia2-*.png`: o cabo com duas braçadeiras, os terminais de capa e olhal e o feixe de três cabos), e os limites novos da família, diâmetro até 25 mm e comprimento até 12.000 mm.

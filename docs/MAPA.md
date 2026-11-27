@@ -6,6 +6,7 @@
 > algum arquivo-fonte estiver sem cabeçalho.
 
 2523 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2509 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -1123,12 +1124,16 @@
 
 ## procedural/familias/cabo/
 
+- `acessorios.js` — acessorios.js — a geometria dos acessórios do cabo, em milímetro: o terminal das pontas (capa cilíndrica ou olhal) e a braçadeira de uma passagem.
 - `cabo.test.mjs` — cabo.test.mjs — a família `cabo`: cada caso de prova sai como um sólido fechado num pedaço só, com o comprimento pedido a menos de 0,5%, o raio de curva nunc…
 - `caminho.js` — caminho.js — do cabo como haste de nós à linha de estações do tubo, em milímetro.
 - `composicoes.js` — composicoes.js — as composições da família `cabo`: o tubo de seção circular ao longo do caminho, pelo `friso` de polilinha com uma normal por estação (o quad…
 - `curva.js` — curva.js — a curva do cabo: a elástica discreta entre duas pontas, em milímetro.
+- `definicao.js` — definicao.js — a família `cabo` carregada e as medidas do cabo que uma chamada pede; o `index.js` a reexporta junto com o pedido (`pedido.js`).
 - `derivar.js` — derivar.js — dos parâmetros do cabo (milímetro) à chamada de composição (metro). O plano (`plano.js`) escolhe a composição pelo número de estações; as pontas…
 - `index.js` — index.js — a família `cabo`: o cabo flexível entre dois pontos, de seção circular, com o comprimento pedido, a curva de menor energia de dobra (`curva.js`), …
+- `pedido.js` — pedido.js — o jeito de pedir um cabo sem conta: `cabo({ de, para, comprimento | folga, diametro, ... })`.
+- `pedido.test.mjs` — pedido.test.mjs — o jeito de pedir o cabo (`cabo({ de, para, ... })`), as passagens com braçadeira, os terminais e o feixe: a conversão do pedido nos parâmet…
 - `plano.js` — plano.js — dos parâmetros do cabo (milímetro, graus) ao plano do tubo: as estações, as normais, as faces e as medidas.
 
 ## procedural/familias/cadeira/
