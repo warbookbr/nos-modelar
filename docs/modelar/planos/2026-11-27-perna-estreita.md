@@ -61,6 +61,8 @@ Se nenhum caminho chegar a 180 mm sem mudar o esqueleto, o plano para e volta à
 
 Fatia 1 feita em 2026-11-27: a medida dos caminhos, no banco de provas do plano. A fixação pela face leva a perna a 344 mm, a curva mais fechada a 287 mm sem reforço, as duas juntas a 255 mm, e só o elo de chapa reta chega à meta, com 85 mm. A pessoa escolheu a chapa reta em 2026-11-27 ("Pode ser a reta"). A chapa é uma forma nova da família do elo; o atuador não muda, e o joelho desliza ao longo do eixo para as faces de apoio ficarem no mesmo plano, sem mudar eixos, alturas nem cursos do esqueleto.
 
+Fatia 2 feita em 2026-11-27: a chapa como `forma` 2 da família do elo (`espessuraDaChapa`, `larguraDaChapa`, `passagemDaChapa`), com as recusas testadas, os pontos mínimo e médio da aprovação mecânica iguais e as restrições da carenagem valendo só na forma 1; a coxa em chapa montada pelas portas, com 79 mm ao longo do eixo e o joelho de 0 a 140 graus sem colisão. A pessoa aprovou por imagem em 2026-11-27 ("Sim, pode prosseguir"). O garfo de duas chapas foi ao backlog.
+
 ## Fechamento
 
 Preencher ao concluir ou cancelar: estado final, commit e PR, gates, resultado observado e candidatos devolvidos ao backlog.
