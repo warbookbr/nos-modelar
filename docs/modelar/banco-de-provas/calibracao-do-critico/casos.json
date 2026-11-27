@@ -1456,6 +1456,63 @@
           "data": "2026-11-27T00:04:13.056Z"
         }
       ]
+    },
+    {
+      "caso": "c01",
+      "agenteSha256": "sha256:05199cd472ee40e590217b422960422e588c5e230582cdac5d57053adf3f1ceb",
+      "julgamentos": [
+        {
+          "nota": 7,
+          "defeitos": [
+            {
+              "parte": "fuselagem",
+              "tipo": "superficie",
+              "onde": "transição da cabine para o afinamento da cauda, flanco esquerdo",
+              "sentido": "segmentado",
+              "evidencia": "Rasante az290: borda vertical de sombra perto de x 565, y 430-550. Vista esquerda: faixas e degrau no fundo em x 160-190 e x 560."
+            },
+            {
+              "parte": "fuselagem",
+              "tipo": "superficie",
+              "onde": "ponta da cauda",
+              "sentido": "facetado",
+              "evidencia": "Isométrica, canto inferior esquerdo: a ponta da cauda lê como poliedro. Na superior, a ponta é um trecho de largura quase constante após uma quebra de inclinação."
+            },
+            {
+              "parte": "porta",
+              "tipo": "superficie",
+              "onde": "cantos de baixo e de cima do painel",
+              "sentido": "anguloso",
+              "evidencia": "Direita isolada: cantos de baixo retos e de cima chanfrados, não arredondados em seções como prometido."
+            },
+            {
+              "parte": "porta",
+              "tipo": "posicao",
+              "onde": "face externa do painel, lado esquerdo da cabine",
+              "sentido": "externa",
+              "evidencia": "Superior (x 420-455, y 565-725) e traseira (borda esquerda): a placa clara sai do contorno do casco. Parece placa por cima do casco, não assentada no vão."
+            },
+            {
+              "parte": "barbatana",
+              "tipo": "superficie",
+              "onde": "cantos de baixo e faces laterais",
+              "sentido": "anguloso",
+              "evidencia": "Isométrica isolada: cunha de faces planas e arestas vivas, sem os cantos de baixo arredondados prometidos."
+            },
+            {
+              "parte": "parabrisa",
+              "tipo": "superficie",
+              "onde": "ponta dianteira do vidro",
+              "sentido": "segmentado",
+              "evidencia": "Isométrica isolada: o contorno do vidro tem trechos retos e quebras poligonais (x 260-440, y 390-430), em vez de curva contínua."
+            }
+          ],
+          "pedidoSha256": "sha256:6fdab23f764e98e1dca54c2eb5b565aba788d7a72cfc88a8e9836cdbb2424780",
+          "imagemSha256": "sha256:92197c21986fe210e980e8bf2e33dea589b63b11723c109b747952e3a8c40a67",
+          "modelo": "sonnet",
+          "data": "2026-11-27T00:04:34.846Z"
+        }
+      ]
     }
   ]
 }
