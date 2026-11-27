@@ -1511,6 +1511,36 @@
           "imagemSha256": "sha256:92197c21986fe210e980e8bf2e33dea589b63b11723c109b747952e3a8c40a67",
           "modelo": "sonnet",
           "data": "2026-11-27T00:04:34.846Z"
+        },
+        {
+          "nota": 7,
+          "defeitos": [
+            {
+              "parte": "barbatana",
+              "tipo": "superficie",
+              "onde": "cantos de baixo, extremidades dianteira e traseira",
+              "sentido": "anguloso",
+              "evidencia": "Vista direita e isometrica isoladas: cunha de lados retos com chanfros vivos nos cantos; o plano prometeu cantos de baixo arredondados e seção afilada."
+            },
+            {
+              "parte": "parabrisa",
+              "tipo": "superficie",
+              "onde": "contorno inferior-dianteiro, trecho de pontas retas entre a frente e a base",
+              "sentido": "segmentado",
+              "evidencia": "Vista direita isolada: contorno da placa em segmentos retos com quinas visíveis, onde o esboço pede curva contínua; a isometrica mostra a mesma quebra."
+            },
+            {
+              "parte": "fuselagem",
+              "tipo": "superficie",
+              "onde": "borda superior da abertura do pára-brisa, perto do teto",
+              "sentido": "segmentado",
+              "evidencia": "Vista isometrica isolada: a borda da abertura no teto aparece serrilhada, em degraus, e não em linha contínua."
+            }
+          ],
+          "pedidoSha256": "sha256:6fdab23f764e98e1dca54c2eb5b565aba788d7a72cfc88a8e9836cdbb2424780",
+          "imagemSha256": "sha256:92197c21986fe210e980e8bf2e33dea589b63b11723c109b747952e3a8c40a67",
+          "modelo": "sonnet",
+          "data": "2026-11-27T00:04:49.939Z"
         }
       ]
     }
