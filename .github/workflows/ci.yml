@@ -218,6 +218,11 @@ jobs:
         if: ${{ !cancelled() }}
         run: npm run ferramentas:registro:check
 
+      # Todo DOSSIE.md de objeto em procedural/pecas/ em dia com o que o gerador faz do que está gravado, com a seção à mão intacta.
+      - name: Dossiês dos objetos em dia
+        if: ${{ !cancelled() }}
+        run: npm run dossie:check
+
       # O banco de provas e registro de custo mantém o documento de custo sincronizado
       # com o JSON de medições e objetos selecionados.
       - name: Banco de provas e registro de custo em dia com o JSON

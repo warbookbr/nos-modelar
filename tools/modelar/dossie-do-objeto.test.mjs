@@ -1,11 +1,11 @@
 /* dossie-do-objeto.test.mjs — o dossiê gerado é o esperado, e a conferência recusa o desatualizado e o que perdeu a seção à mão. */
 import { afterEach, describe, expect, it } from 'vitest';
-import { cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { appendFileSync, cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { conferirDossie, gerarDossie, lerArgumentos, montarDossie, operacoesPorParte, secoesAMao, unidadesDoObjeto } from './dossie-do-objeto.mjs';
+import { conferirDossie, gerarDossie, lerArgumentos, montarDossie, objetosComDossie, operacoesPorParte, secoesAMao, secoesRepetidas, unidadesDoObjeto } from './dossie-do-objeto.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const FIXTURE = join(AQUI, '../fixtures/dossie');
@@ -66,7 +66,7 @@ describe('o dossiê gerado', () => {
     const { texto } = await montarDossie('objeto-de-prova', { raiz: FIXTURE, docs: DOCS, aMao: secoesAMao(readFileSync(dossieDe(FIXTURE, 'objeto-de-prova'), 'utf8')) });
     expect(texto).toContain('- Escala: largura da caixa, 200 mm');
     expect(texto).toContain('| `caixa` | cubo ×2, transladar ×1, subtrair ×1, parte ×1, material ×1 |');
-    expect(texto).toContain('| 1 | 2026-11-20 | passou | 4 | 1 | a pessoa, 2026-11-21: tampa de 4 mm está boa, a caixa segue |');
+    expect(texto).toContain('| 1 | 2026-11-20 | passou | - | - | 4 | 1 | a pessoa, 2026-11-21: tampa de 4 mm está boa, a caixa segue |');
     expect(texto).toContain('banco de provas: [estudo-de-prova](../../../documentos/modelar/banco-de-provas/estudo-de-prova); tabela de tentativas: [README.md](../../../documentos/modelar/banco-de-provas/estudo-de-prova/README.md)');
     expect(texto).toContain('`2026-11-10-caixas-antigas.md`');
     expect(texto).not.toContain('nada a ver com a pasta');
@@ -111,6 +111,93 @@ describe('--check', () => {
     const raiz = copia();
     writeFileSync(join(raiz, DOCS, 'planos', '2026-11-25-outro-da-pasta.md'), '# Outro\n\n**Estado:** ativo\n\n**Território:** `procedural/pecas/objeto-de-prova/`.\n');
     expect((await conferirDossie('objeto-de-prova', { raiz, docs: DOCS })).problemas[0]).toMatch(/desatualizado/);
+  });
+});
+
+describe('o que o dossiê lê além da receita', () => {
+  it('mostra faces e segundos nas rodadas que os gravaram e o traço nas antigas', async () => {
+    const { texto } = await montarDossie('objeto-de-prova', { raiz: FIXTURE, docs: DOCS });
+    expect(texto).toContain('| Rodada | Registrada | Medidas | Faces | Segundos | Nota | Defeitos | Decisão da pessoa |');
+    expect(texto).toContain('| 1 | 2026-11-20 | passou | - | - | 4 | 1 |');
+    expect(texto).toContain('| 2 | 2026-11-27 | passou | 1234 | 0.42 | 4 | 1 | sem decisão gravada |');
+  });
+  it('sem rodada com faces a tabela não ganha as colunas e o texto diz que nenhuma as gravou', async () => {
+    const raiz = copia();
+    rmSync(join(raiz, 'procedural/pecas/objeto-de-prova/rodadas/rodada-02.json'));
+    const { texto } = await montarDossie('objeto-de-prova', { raiz, docs: DOCS });
+    expect(texto).not.toContain('| Faces |');
+    expect(texto).toContain('nenhuma rodada os gravou');
+  });
+  it('lê o ATRITOS.md do banco de provas dos planos que cobrem o objeto: itens e os sem destino', async () => {
+    const { texto } = await montarDossie('objeto-de-prova', { raiz: FIXTURE, docs: DOCS });
+    expect(texto).toContain('atritos: [ATRITOS.md](../../../documentos/modelar/banco-de-provas/estudo-de-prova/ATRITOS.md), 2 item(ns), 1 sem destino');
+  });
+  it('o plano que só cobre o DOSSIE.md, um teste ou um dado da pasta não cobre a pasta', async () => {
+    const raiz = copia();
+    const so = ['DOSSIE.md', 'x.test.mjs', 'medida.json'].map((n) => `\`procedural/pecas/objeto-de-prova/${n}\``).join(', ');
+    writeFileSync(join(raiz, DOCS, 'planos', '2026-11-25-so-o-dossie.md'), `# So o dossie\n\n**Estado:** ativo\n\n**Território:** ${so}.\n`);
+    expect((await montarDossie('objeto-de-prova', { raiz, docs: DOCS })).texto).not.toContain('So o dossie');
+    expect((await conferirDossie('objeto-de-prova', { raiz, docs: DOCS })).problemas).toEqual([]);
+  });
+  it('a crônica casa o nome do objeto como palavra inteira', async () => {
+    const raiz = copia();
+    const cronica = join(raiz, DOCS, 'decisoes/PLANOS-ENCERRADOS.md');
+    writeFileSync(cronica, readFileSync(cronica, 'utf8').replace('\n- `2026-11-11', '\n- `2026-11-12-vizinho.md`: o objeto-de-prova-maior ganhou tampa. O texto está no commit `aaa1111`, em `x`.\n- `2026-11-11'));
+    const { texto } = await montarDossie('objeto-de-prova', { raiz, docs: DOCS });
+    expect(texto).not.toContain('vizinho');
+    expect(texto).toContain('`2026-11-10-caixas-antigas.md`');
+  });
+  it('recusa o nome de objeto com .. antes de importar qualquer receita', async () => {
+    await expect(montarDossie('../../tools', { raiz: FIXTURE, docs: DOCS })).rejects.toThrow(/não é nome de objeto/);
+    expect(() => unidadesDoObjeto('a/../b', FIXTURE)).toThrow(/não é nome de objeto/);
+  });
+});
+
+describe('a seção à mão que a regeração destruiria', () => {
+  const duplicar = (raiz) => {
+    const arquivo = dossieDe(raiz, 'objeto-de-prova');
+    const texto = readFileSync(arquivo, 'utf8');
+    appendFileSync(arquivo, '\n<!-- dossie:a-mao:peca:inicio -->\nsegunda seção escrita por outro modelo\n<!-- dossie:a-mao:peca:fim -->\n');
+    return texto;
+  };
+  it('--check recusa a seção repetida e diz qual texto se perderia', async () => {
+    const raiz = copia();
+    duplicar(raiz);
+    expect(Object.keys(secoesRepetidas(readFileSync(dossieDe(raiz, 'objeto-de-prova'), 'utf8')))).toEqual(['peca']);
+    const { problemas } = await conferirDossie('objeto-de-prova', { raiz, docs: DOCS });
+    expect(problemas).toHaveLength(1);
+    expect(problemas[0]).toMatch(/seção à mão de peca 2 vezes.*perderia o texto de "/);
+  });
+  it('--check recusa a seção de uma unidade que não existe, e gerar não regrava', async () => {
+    const raiz = copia();
+    const arquivo = dossieDe(raiz, 'objeto-de-prova');
+    appendFileSync(arquivo, '\n<!-- dossie:a-mao:fantasma:inicio -->\ntexto órfão\n<!-- dossie:a-mao:fantasma:fim -->\n');
+    const antes = readFileSync(arquivo, 'utf8');
+    expect((await conferirDossie('objeto-de-prova', { raiz, docs: DOCS })).problemas[0]).toMatch(/seção à mão de fantasma, que não é unidade do objeto/);
+    await expect(gerarDossie('objeto-de-prova', { raiz, docs: DOCS })).rejects.toThrow(/nada foi regravado/);
+    expect(readFileSync(arquivo, 'utf8')).toBe(antes);
+  });
+});
+
+describe('--todos', () => {
+  const rodar = (...args) => spawnSync(process.execPath, [join(AQUI, 'dossie-do-objeto.mjs'), ...args], { encoding: 'utf8' });
+  it('acha todo DOSSIE.md da pasta das peças, o da parte também', () => {
+    expect(objetosComDossie(FIXTURE)).toEqual(['objeto-com-partes', 'objeto-de-prova']);
+  });
+  it('confere todos de uma vez e recusa o que está desatualizado, dizendo qual', () => {
+    const raiz = copia();
+    expect(rodar('--todos', '--check', `--raiz=${raiz}`, `--docs=${DOCS}`).status).toBe(0);
+    writeFileSync(dossieDe(raiz, 'objeto-com-partes'), 'qualquer coisa');
+    const r = rodar('--todos', '--check', `--raiz=${raiz}`, `--docs=${DOCS}`);
+    expect(r.status).toBe(1);
+    expect(r.stderr).toMatch(/dossie:check FALHOU.*objeto-com-partes/);
+  });
+  it('sem --check regera todos e recusa objeto junto', () => {
+    const raiz = copia();
+    writeFileSync(dossieDe(raiz, 'objeto-com-partes'), 'qualquer coisa');
+    expect(rodar('--todos', `--raiz=${raiz}`, `--docs=${DOCS}`).status).toBe(0);
+    expect(rodar('--todos', '--check', `--raiz=${raiz}`, `--docs=${DOCS}`).status).toBe(0);
+    expect(rodar('--todos', 'objeto-de-prova').status).toBe(1);
   });
 });
 

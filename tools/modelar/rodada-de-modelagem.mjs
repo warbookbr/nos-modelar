@@ -597,7 +597,11 @@ export async function medirReceita(peca, { rodadas, pasta, registroDasEtapas, ca
   const receita = receitaDoModulo(await importarReceita(caminho));
   /* a execução da receita atual, feita uma vez e dividida entre as medidas abaixo; a guarda do acervo, logo acima, deixou os pontos dela no cache */
   let dividida;
-  const executar = async () => (dividida ??= (await executarComCachePorPasso(caminho, receita, { cache })).executada);
+  let segundosDaExecucao;
+  const executar = async () => {
+    if (dividida === undefined) { const feita = await executarComCachePorPasso(caminho, receita, { cache }); dividida = feita.executada; segundosDaExecucao = feita.segundos; }
+    return dividida;
+  };
   const referencial = await conferirUmaPeca(peca, { executar });
   if (referencial) falhas.push(`guarda:referencial reprovou '${peca}':\n${indentar(referencial.motivo)}`);
   /* a receita que não executa sozinha segue como era: cada medida abaixo a executa e diz a própria recusa */
@@ -629,7 +633,11 @@ export async function medirReceita(peca, { rodadas, pasta, registroDasEtapas, ca
   const passou = falhas.length === 0;
   const pontos = pontosDaMedicao(receita, texto);
   const { lataria, luzRasante, porque } = await superficieDaPecaMedida(peca, receita, plano, { registro: registroDasEtapas });
-  return { passou, sha256, texto, caminho, relatorio: cortar(passou ? `${feitas.join(', ')}: ok` : falhas.join('\n')), lataria: { lataria, porque }, luzRasante: { luzRasante, porque }, avisos, ...(facesFinas ? { facesFinas } : {}), ...(pontos ? { pontos } : {}) };
+  /* as faces da malha e o tempo da execução da receita, tirados da execução que as medidas acima já fizeram (nenhuma execução a mais);
+     o tempo é o de quando a rodada mediu, com o cache por passo quente ou frio, e por isso não é parte da identidade da medição */
+  const faces = executada?.neutro?.F?.size;
+  const medidaDaExecucao = Number.isInteger(faces) && Number.isFinite(segundosDaExecucao) ? { faces, segundos: Math.round(segundosDaExecucao * 100) / 100 } : {};
+  return { passou, sha256, texto, caminho, relatorio: cortar(passou ? `${feitas.join(', ')}: ok` : falhas.join('\n')), lataria: { lataria, porque }, luzRasante: { luzRasante, porque }, avisos, ...medidaDaExecucao, ...(facesFinas ? { facesFinas } : {}), ...(pontos ? { pontos } : {}) };
 }
 
 /* ---- as faces finas da malha ---- */
@@ -909,7 +917,7 @@ export async function registrarMedida(peca, entrada, { medir = () => medirReceit
   /* `medidas`, `superficie` e `pontos` são da ferramenta, e o que a entrada declara deles sai */
   const { medidas: _declaradas, superficie: _declarada, pontos: _dosPontos, ...resto } = entrada;
   void _declaradas; void _declarada; void _dosPontos;
-  const gravada = gravarRodada(peca, { ...resto, superficie, impressaoDasPartes, facesFinas: medicao.facesFinas, pontos, medidas: { passou: medicao.passou, relatorio: medicao.relatorio } }, { ...opcoes, receitaTexto: medicao.texto });
+  const gravada = gravarRodada(peca, { ...resto, superficie, impressaoDasPartes, facesFinas: medicao.facesFinas, pontos, medidas: { passou: medicao.passou, relatorio: medicao.relatorio, ...(medicao.faces !== undefined ? { faces: medicao.faces, segundos: medicao.segundos } : {}) } }, { ...opcoes, receitaTexto: medicao.texto });
   return { ...gravada, medicao };
 }
 

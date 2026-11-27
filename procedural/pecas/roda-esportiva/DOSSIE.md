@@ -4,8 +4,8 @@ Gerado por `npm run dossie -- roda-esportiva` do que já está gravado; não edi
 
 ## Planos que cobrem a pasta
 
-- [Ferramentas e documentação: toda ferramenta registrada e achada, e o roteador cobrindo o trabalho inteiro](../../../docs/modelar/planos/2026-11-26-ferramentas-e-documentacao.md) (ativo)
-  - banco de provas: [ferramentas-e-documentacao-2026-11-26](../../../docs/modelar/banco-de-provas/ferramentas-e-documentacao-2026-11-26); sem tabela de tentativas
+Nenhum plano na árvore cobre a pasta deste objeto.
+
 
 Planos encerrados que citam o objeto (o texto está no git, no commit que a crônica indica):
 
@@ -58,6 +58,8 @@ Passos da receita: 55. Operações por parte, lidas do grafo dos passos (uma ope
 | 5 | 2026-11-14 | passou | 5 | 5 | sem decisão gravada |
 | 6 | 2026-11-14 | passou | 5 | 5 | sem decisão gravada |
 
+Faces e tempo da execução: nenhuma rodada os gravou (`medidas.faces` e `medidas.segundos` entram nas rodadas registradas desde 2026-11-27; as anteriores não são reescritas).
+
 Defeitos da rodada 6, a última com veredito:
 
 - `aro`, superficie (anguloso): parede interna do barril, onde os raios encostam
@@ -69,10 +71,6 @@ Defeitos da rodada 6, a última com veredito:
 Observação do crítico: Pneu, tampa, parafusos e válvula batem com o alvo; o conjunto fica comprometido pela emenda estilhaçada dos raios com o aro e pelos raios finos demais.
 
 A pasta não tem `decisoes-da-pessoa.json`: o julgamento da pessoa sobre as rodadas anteriores não está gravado como decisão.
-
-### Medida de faces e tempo
-
-Faces e tempo de execução: não gravados. O registro da rodada guarda só `facesFinas`, as faces finas, e nenhum arquivo guarda o total de faces nem o tempo da receita. De onde viria: `medidas.faces` e `medidas.segundos` no `rodada-NN.json`, tirados do `descrever` que `rodada-de-modelagem.mjs` já roda; proposta ao plano do laço de modelagem.
 
 ### Escolhas de técnica, à mão
 

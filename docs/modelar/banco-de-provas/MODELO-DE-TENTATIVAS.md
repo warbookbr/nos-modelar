@@ -12,6 +12,4 @@ A hipótese diz a causa suspeita em uma frase. O ensaio diz o que foi mudado ou 
 
 Preencha durante o trabalho, uma linha ao fim de cada ensaio, mesmo o que não deu certo: a tentativa descartada é a que mais poupa tempo a quem vem depois. Deixar para o fechamento perde as que ninguém mais lembra.
 
-No fechamento, a lição da tabela vai para o guia da técnica (a pasta `docs/modelar/guias/` ou a instrução da ferramenta), numa frase abaixo da tabela, e a correção que o objeto revelou vai para a ferramenta ou o gate, e não para a receita do objeto. A conferência dos planos (`npm run planos:check`) recusa o plano de modelagem que passa a `concluído` sem uma tabela com estas quatro colunas, em ordem, num `.md` da pasta do banco de provas dele.
-
-Exemplo real: a tabela do estudo dos arcos do carro quadrado, no banco de provas da topologia de vão.
+No fechamento, a lição da tabela vai para o guia da técnica (a pasta `docs/modelar/guias/` ou a instrução da ferramenta), numa frase abaixo da tabela, e a correção que o objeto revelou vai para a ferramenta ou o gate, e não para a receita do objeto. A conferência dos planos (`npm run planos:check`) e `npm run planos:encerrar` recusam o plano de modelagem que passa a `concluído` sem uma tabela com estas quatro colunas, em ordem, e ao menos uma linha de dados, num `.md` de uma subpasta do banco de provas dele (a raiz do banco não vale).

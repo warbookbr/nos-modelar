@@ -29,10 +29,6 @@ Passos da receita: 2. Operações por parte, lidas do grafo dos passos (uma oper
 
 Nenhuma rodada registrada.
 
-### Medida de faces e tempo de `base`
-
-Faces e tempo de execução: não gravados. O registro da rodada guarda só `facesFinas`, as faces finas, e nenhum arquivo guarda o total de faces nem o tempo da receita. De onde viria: `medidas.faces` e `medidas.segundos` no `rodada-NN.json`, tirados do `descrever` que `rodada-de-modelagem.mjs` já roda; proposta ao plano do laço de modelagem.
-
 ### Escolhas de técnica, à mão (`base`)
 
 <!-- dossie:a-mao:base:inicio -->
@@ -63,10 +59,6 @@ Passos da receita: 2. Operações por parte, lidas do grafo dos passos (uma oper
 ### Rodadas de `tampa`
 
 Nenhuma rodada registrada.
-
-### Medida de faces e tempo de `tampa`
-
-Faces e tempo de execução: não gravados. O registro da rodada guarda só `facesFinas`, as faces finas, e nenhum arquivo guarda o total de faces nem o tempo da receita. De onde viria: `medidas.faces` e `medidas.segundos` no `rodada-NN.json`, tirados do `descrever` que `rodada-de-modelagem.mjs` já roda; proposta ao plano do laço de modelagem.
 
 ### Escolhas de técnica, à mão (`tampa`)
 

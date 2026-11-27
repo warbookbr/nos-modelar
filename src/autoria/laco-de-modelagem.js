@@ -100,7 +100,14 @@ export function registrarRodada({ peca, numero, veredito, medidas, partes, atrit
     versao: VERSAO_RODADA,
     peca: peca.trim(),
     numero,
-    medidas: { passou: medidas.passou, relatorio: String(medidas.relatorio ?? '').trim() },
+    /* `faces` e `segundos` (a malha e o tempo da execução da receita medida) são da ferramenta de medição e só entram quando vêm
+       números; as rodadas de antes não os têm e não são reescritas */
+    medidas: {
+      passou: medidas.passou,
+      relatorio: String(medidas.relatorio ?? '').trim(),
+      ...(Number.isInteger(medidas.faces) && medidas.faces >= 0 ? { faces: medidas.faces } : {}),
+      ...(Number.isFinite(medidas.segundos) && medidas.segundos >= 0 ? { segundos: medidas.segundos } : {}),
+    },
     /* Sem veredito quando as medidas reprovaram: não se gasta revisão em peça
        que já falhou no que é contável. */
     veredito: veredito ? normalizarVeredito(veredito) : null,

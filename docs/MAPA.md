@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2520 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2521 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -3675,6 +3675,7 @@
 
 ## tools/fixtures/dossie/documentos/modelar/banco-de-provas/estudo-de-prova/
 
+- `ATRITOS.md` — Estudo de prova: atritos
 - `README.md` — Estudo de prova
 
 ## tools/fixtures/dossie/documentos/modelar/decisoes/
