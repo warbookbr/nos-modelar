@@ -112,3 +112,27 @@ O defeito: a família confere o raio mínimo no ângulo entre os trechos da hast
 A recusa na curva lisa foi implementada e medida, e não ficou: ela reprova dois dos casos aprovados da fatia 1 (`frente` e `caimento`, que ficam abaixo dos 20 mm pedidos), o arranjo `passa` da junta e, por tabela, dois testes do curso fino e a recusa automática da junta (11 testes). Apertar a haste não resolve: com trechos de 1,5 e de 1 diâmetro o raio liso de `frente` vai de 6,88 só a 7,28 e 7,49 mm, e o da haste continua perto de 22 mm, porque o defeito é da interpolação e não do número de nós. Esticar o tamanho da tangente nas pontas da Hermite (fator 1,3 a 2) mexe nas estações dos casos aprovados e o raio liso de `frente` fica entre 5,3 e 8,7 mm; não resolve e mudaria os hashes. A decisão que a pessoa tem de tomar: ou aceitar a mudança de forma nas pontas (trocar a Hermite junto da emenda por uma curva que respeite a curvatura da haste, o que muda os hashes do mínimo, do médio e as imagens aprovadas), ou aceitar que o raio mínimo declarado vale na haste e a curva lisa pode dobrar até cerca de um terço dele nas pontas. Fica como está, com `raioLiso` medido e não recusado, e o mapa de ferramentas diz isso.
 
 O comprimento de corte agora aparece na lista de materiais da montagem com cabo: `diagnostico.listaDeMateriaisDosCabos` de `gerarMontagemResolvida` e da exportação por linha de comando, com o nome, o comprimento de corte em mm, o diâmetro, os lados e as portas das pontas de cada cabo, e o total de corte (função `listaDeMateriaisDosCabos` em `procedural/familias/cabo/exportacao.js`). Na prova da junta: cabo `cabo`, corte 150 mm a menos de 0,5%, diâmetro 3 mm, 8 lados, de `carcacaA/cabo` a `carcacaB/cabo`. O mesmo número segue nos `extras` do nó do cabo no glTF. O mapa de ferramentas (`docs/modelar/ferramentas-por-objeto.json`) passa o `cabo` de parcial para tem.
+
+## Fatia 8: a curva refeita perto das pontas, e a recusa do raio na curva lisa (2026-11-27)
+
+A causa do raio liso de 6,88 mm em `frente`: a haste tinha os dois primeiros nós de cada ponta fixos e retos, e o primeiro nó livre saía deles com o desvio que o engaste de verdade pede. Qualquer curva lisa que passe pelo fim do trecho reto (tangente na direção da ponta) e pelo nó seguinte concentra esse desvio no primeiro trecho: o arco que liga os dois já dobra com o dobro da curvatura da haste, e a Hermite cúbica de tangente por diferença finita com cerca de três vezes (4θ₁ − θ₂ sobre h, pela conta do trecho). Não era a tangente nem o número de nós, e por isso apertar a haste e esticar a tangente não resolviam.
+
+A correção está na haste e na interpolação. A haste (`curva.js`) deixa só as duas pontas fixas e engasta a direção de saída com um nó fantasma de meio peso, sem trecho reto fixo de nós; o cabo sai reto por um diâmetro de cada ponta (no máximo um quinto da distância da perna), o cilindro da porta, e a haste engasta aí. A curva lisa (`caminho.js`) é a spline cúbica de classe C² pelos nós de cada perna, engastada na direção da ponta (C¹ numa passagem). Os nós mínimos da haste passam de 17 a 25: com 17 a spline media 15% abaixo da haste no meio do arco de `frente`. A recusa `raio-minimo-cabe` agora compara o `raioLiso` (a medida da fatia 7, que ficou) e diz o recebido e o aceito; o `raioMinimo` da haste segue nas medidas.
+
+Raio de dobra em mm, antes e depois (`raioLiso` analítico, 25 pontos por trecho; haste entre parênteses), diâmetro 4 e raio pedido de 20 mm:
+
+| Caso | antes: liso (haste) | depois: liso (haste) | razão liso/haste antes → depois |
+| --- | --- | --- | --- |
+| laço | 21,48 (30,68) | 30,64 (31,14) | 0,70 → 0,98 |
+| frente | 6,88 (21,98) | 21,28 (21,79) | 0,31 → 0,98 |
+| u | 25,53 (27,61) | 27,49 (27,87) | 0,92 → 0,99 |
+| esticado | 68,72 (210,72) | 211,30 (213,76) | 0,33 → 0,99 |
+| caimento | 13,63 (42,93) | 38,82 (41,05) | 0,32 → 0,95 |
+| tridimensional | 26,13 (52,72) | 52,86 (53,25) | 0,50 → 0,99 |
+| junta a ±90° (pedido 9) | 4,08 (13,00) | 12,79 (13,47) | 0,31 → 0,95 |
+| junta a 0° | 17,66 (26,41) | 26,30 (26,52) | 0,67 → 0,99 |
+
+No Blender, três pontos na curva avaliada do addon dão, de −90° a 90°, de 13,49 mm nos extremos a 26,9 mm no meio (antes, 7,16 mm a ±90°); a curva do addon fica a no máximo 0,2 mm da da família. Todos os casos aprovados passam na recusa. O que a recusa honesta mostrou: o ponto máximo da aprovação (diâmetro 25, caimento 100, três pernas) dobra a 190,8 mm, e o raio mínimo de 10 diâmetros que o contrato aceitava (250 mm) não cabia nele (a haste antiga o declarava a 250,1 mm); o máximo de `raioMinimo` passou de 10 a 7 diâmetros. O arranjo `curto` da junta (80 mm), que a haste antiga declarava não alcançar de −45° a −15° e de 15° a 45°, agora alcança de −15° a 15° com um grampo de menos de 1 mm de raio, e a recusa o acusa como dobra.
+
+Os hashes da aprovação mecânica mudaram todos (a forma muda): mínimo, médio e máximo, e os três perfis. As camadas do crítico e da pessoa seguem vazias e as formas aprovadas esperam nova aprovação por imagem: `tools/bancadas/out/cabos-fatia8/` (`node tools/fixtures/cabo/casos-vistas.mjs`, e `node tools/fixtures/cabo/junta-com-cabo-vistas.mjs tools/bancadas/out/cabos-fatia8`), com as folhas de antes (cinza, à esquerda) e depois (laranja, à direita) de cada caso e da junta.
+

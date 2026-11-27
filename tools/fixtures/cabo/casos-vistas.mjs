@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /* casos-vistas.mjs — as imagens do cabo para a aprovação da pessoa, em tools/bancadas/out/cabos-fatia8/ (fora do git), pelo raster em JavaScript de `vista-rapida.mjs`:
- * os casos da fatia 1 (laço, caimento, a frente com 8 e com 24 lados) e os da fatia 2 (duas braçadeiras, terminais de capa e olhal, feixe de três cabos), cada um na vista isométrica e de cima.
+ * os casos da fatia 1 (laço, caimento, a frente com 8 e com 24 lados) e os da fatia 2 (duas braçadeiras, terminais de capa e olhal, feixe de três cabos), cada um nas vistas isométrica, de lado e de cima.
  * A junta nas três poses sai de `junta-com-cabo-vistas.mjs`.
  * Uso: node tools/fixtures/cabo/casos-vistas.mjs [pasta de saída] */
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -16,7 +16,7 @@ import { CASOS_DO_CABO } from './casos.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 export const PASTA_DOS_CASOS = resolve(AQUI, '../../bancadas/out/cabos-fatia8');
-const VISTAS = Object.freeze({ isometrica: [1, 0.9, 0.8], 'de-cima': [0, 1, 0] });
+const VISTAS = Object.freeze({ isometrica: [1, 0.9, 0.8], 'de-lado': [0, 0, 1], 'de-cima': [0, 1, 0] });
 const COR = (parte) => (/terminal/.test(parte) ? '#4f7fb0' : /bracadeira/.test(parte) ? '#9fc1e0' : /-2$/.test(parte) ? '#c9a227' : /-3$/.test(parte) ? '#2f9e6b' : '#e2641e');
 
 const registro = criarRegistroDeFamilias();

@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2544 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2545 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -3448,6 +3448,7 @@
 
 ## tools/fixtures/cabo/
 
+- `casos-vistas.mjs` — casos-vistas.mjs — as imagens do cabo para a aprovação da pessoa, em tools/bancadas/out/cabos-fatia8/ (fora do git), pelo raster em JavaScript de `vista-rapi…
 - `casos.mjs` — casos.mjs — os casos de prova da família `cabo`: cada um é uma chamada com só o que difere dos padrões (as pontas em milímetro, a direção de saída de cada po…
 - `junta-com-cabo-alinhamento.test.mjs` — junta-com-cabo-alinhamento.test.mjs — a régua de alinhamento da ponta do cabo com a saída real da peça: a porta tem de ficar no centro da face plana em que p…
 - `junta-com-cabo-curso-fino.test.mjs` — junta-com-cabo-curso-fino.test.mjs — o curso amostrado mais fino perto das peças: o cabo de 200 mm atravessa a carcaça A só de 157° a 203° (curso de 100° a 2…
