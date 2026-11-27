@@ -94,3 +94,21 @@ Medido aqui (Blender 5.3 como biblioteca do Python, `MODELAR_BPY_PYTHON=<python 
 
 O salto de ângulo grande (as pontas andando mais de três trechos entre duas atualizações) parte do palpite e leva uns 30 a 50 ms por cabo; arrastar a junta pelo mouse é o caso de passos pequenos. Não testado: Blender 4.2 e 4.3 (o código de gravar usa as curvas da ação plana nesses; só o Blender 5.3 foi rodado), a janela do Blender (o painel), e o Blender de verdade como executável (aqui só o módulo `bpy`).
 
+
+## Fatia 7: o raio na curva lisa, o comprimento de corte na lista de materiais e o mapa (2026-11-27)
+
+O defeito: a família confere o raio mínimo no ângulo entre os trechos da haste (`curvaturaMaxima` de `caminho.js`), e a curva lisa que vira malha, a Hermite cúbica pelos nós, dobra mais fechado junto da emenda do trecho reto da ponta com o primeiro trecho do miolo. Medida nova: `raioLiso`, a curvatura analítica da Hermite amostrada em 25 pontos por trecho, devolvida por `medidasDoCabo` e guardada no plano. O ensaio de controle está em `procedural/familias/cabo/cabo.test.mjs`: a medida concorda a 8% com o raio de três pontos a 0,25 mm de passo sobre a mesma curva, nos casos `frente` (que dobra) e `esticado` (quase reto), e o pior ponto da Hermite está na emenda (raio de 7 mm no primeiro trecho do miolo contra 22 mm que a haste declara no nó dele).
+
+| Caso | raio da haste (antes) mm | raio na curva lisa mm | raio pedido mm |
+| --- | --- | --- | --- |
+| laco | 30,68 | 21,48 | 20 |
+| frente | 21,98 | 6,88 | 20 |
+| u | 27,61 | 25,53 | 20 |
+| esticado | 210,72 | 68,72 | 20 |
+| caimento | 42,93 | 13,63 | 20 |
+| tridimensional | 52,72 | 26,13 | 20 |
+| junta, arranjo `passa` a ±90° | 13,00 | 7,16 (três pontos no Blender) | 9 |
+
+A recusa na curva lisa foi implementada e medida, e não ficou: ela reprova dois dos casos aprovados da fatia 1 (`frente` e `caimento`, que ficam abaixo dos 20 mm pedidos), o arranjo `passa` da junta e, por tabela, dois testes do curso fino e a recusa automática da junta (11 testes). Apertar a haste não resolve: com trechos de 1,5 e de 1 diâmetro o raio liso de `frente` vai de 6,88 só a 7,28 e 7,49 mm, e o da haste continua perto de 22 mm, porque o defeito é da interpolação e não do número de nós. Esticar o tamanho da tangente nas pontas da Hermite (fator 1,3 a 2) mexe nas estações dos casos aprovados e o raio liso de `frente` fica entre 5,3 e 8,7 mm; não resolve e mudaria os hashes. A decisão que a pessoa tem de tomar: ou aceitar a mudança de forma nas pontas (trocar a Hermite junto da emenda por uma curva que respeite a curvatura da haste, o que muda os hashes do mínimo, do médio e as imagens aprovadas), ou aceitar que o raio mínimo declarado vale na haste e a curva lisa pode dobrar até cerca de um terço dele nas pontas. Fica como está, com `raioLiso` medido e não recusado, e o mapa de ferramentas diz isso.
+
+O comprimento de corte agora aparece na lista de materiais da montagem com cabo: `diagnostico.listaDeMateriaisDosCabos` de `gerarMontagemResolvida` e da exportação por linha de comando, com o nome, o comprimento de corte em mm, o diâmetro, os lados e as portas das pontas de cada cabo, e o total de corte (função `listaDeMateriaisDosCabos` em `procedural/familias/cabo/exportacao.js`). Na prova da junta: cabo `cabo`, corte 150 mm a menos de 0,5%, diâmetro 3 mm, 8 lados, de `carcacaA/cabo` a `carcacaB/cabo`. O mesmo número segue nos `extras` do nó do cabo no glTF. O mapa de ferramentas (`docs/modelar/ferramentas-por-objeto.json`) passa o `cabo` de parcial para tem.

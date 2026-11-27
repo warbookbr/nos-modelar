@@ -176,7 +176,7 @@ export function planejar(parametros) {
   const normais = quadroSemTorcao(tangentes);
   const plano = Object.freeze({
     pontos: e.pontos.map((q) => q.p), normais, estacoes: e.estacoes, lados: p.lados, faces, triangulos: 2 * p.lados * (e.estacoes - 1) + 2 * (p.lados - 2), passagens,
-    comprimentoPedido: L, comprimentoDaCurva: caminho.comprimento, comprimentoDaMalha: e.comprimentoDaMalha, raioMinimo: caminho.raioMinimo,
+    comprimentoPedido: L, comprimentoDaCurva: caminho.comprimento, comprimentoDaMalha: e.comprimentoDaMalha, raioMinimo: caminho.raioMinimo, raioLiso: caminho.raioLiso,
     desvioDaCorda: e.desvio, distanciaDeAutocontato: contato, iteracoes: r.iteracoes, nosDaHaste: r.M, energia: r.energia,
     trechoA: caminho.trechoA, trechoB: caminho.trechoB, A, B, dA, dB, raio,
   });

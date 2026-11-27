@@ -167,3 +167,21 @@ describe('a linha de comando', () => {
     await expect(exportarArquivoGltf({ peca: 'materiais-de-prova', cabos: [{}] })).rejects.toThrow(/valem para montagem/);
   });
 });
+
+describe('lista de materiais dos cabos da montagem', () => {
+  it('sai no diagnóstico com o comprimento de corte, o diâmetro, os lados e as portas de cada cabo, e o corte bate com as medidas', () => {
+    const lista = resultado.diagnostico.listaDeMateriaisDosCabos;
+    expect(lista.cabos).toHaveLength(1);
+    const [l] = lista.cabos;
+    expect(l.cabo).toBe('cabo');
+    expect(l.diametroMm).toBe(3);
+    expect(l.lados).toBe(8);
+    expect(l.de).toBe('carcacaA/cabo');
+    expect(l.para).toBe('carcacaB/cabo');
+    expect(Math.abs(l.comprimentoDeCorteMm / 150 - 1)).toBeLessThan(0.005);
+    expect(lista.totalDeCorteMm).toBe(l.comprimentoDeCorteMm);
+    /* o mesmo número está nos extras do nó do cabo no arquivo */
+    const extras = json.nodes[porNome.get('cabo')].extras;
+    expect(extras.comprimentoDeCorteMm).toBeCloseTo(l.comprimentoDeCorteMm, 1);
+  });
+});

@@ -20,6 +20,7 @@ const unitario = (a) => mult(a, 1 / norma(a));
 /** Os números de estações que as composições aceitam (uma composição por degrau). */
 export const ESCADA_DE_ESTACOES = Object.freeze([6, 8, 10, 13, 17, 22, 29, 38, 50, 66, 87, 115, 152, 200, 265, 350, 460]);
 const SUBPASSOS = 32;
+const SUBPASSOS_DA_CURVATURA = 24;
 
 /* A curva lisa pelos nós: Hermite cúbica de classe C¹, de tangente unitária em cada nó (o vetor do nó anterior ao seguinte, e a direção
    pedida nas duas pontas do miolo), com o comprimento da corda como escala de cada trecho. A spline de classe C² oscila junto do trecho reto da ponta e
@@ -62,6 +63,14 @@ export function criarCaminho({ nos, dA, dB }) {
     return (2 * Math.sin(giro / 2)) / (0.5 * (norma(a) + norma(b)));
   });
   const curvaturaMaxima = Math.max(...curvaturaDoNo);
+  /* a curvatura analítica da curva lisa que vira malha, amostrada em cada trecho da Hermite (a da haste mede o ângulo entre os trechos e não a vê) */
+  let curvaturaLisaMaxima = 0;
+  for (let i = 0; i < S.n; i += 1) {
+    for (let j = 0; j <= SUBPASSOS_DA_CURVATURA; j += 1) {
+      const { d1, d2 } = avaliarSpline(S, i, j / SUBPASSOS_DA_CURVATURA);
+      curvaturaLisaMaxima = Math.max(curvaturaLisaMaxima, norma(cruz(d1, d2)) / (norma(d1) ** 3));
+    }
+  }
   const tabela = [{ s: 0, tau: 0, p: miolo[0], k: curvaturaDoNo[1] }];
   let acumulado = 0; let anterior = miolo[0];
   for (let i = 0; i < S.n; i += 1) {
@@ -91,7 +100,7 @@ export function criarCaminho({ nos, dA, dB }) {
     const v = norma(d1);
     return { p, t: mult(d1, 1 / v), k: norma(cruz(d1, d2)) / (v ** 3) };
   }
-  return { comprimento, trechoA, trechoB, comprimentoDoMiolo, curvaturaMaxima, raioMinimo: curvaturaMaxima > 0 ? 1 / curvaturaMaxima : Infinity, tabela, em };
+  return { comprimento, trechoA, trechoB, comprimentoDoMiolo, curvaturaMaxima, raioMinimo: curvaturaMaxima > 0 ? 1 / curvaturaMaxima : Infinity, curvaturaLisaMaxima, raioLiso: curvaturaLisaMaxima > 0 ? 1 / curvaturaLisaMaxima : Infinity, tabela, em };
 }
 
 /** Distância do ponto ao segmento. */

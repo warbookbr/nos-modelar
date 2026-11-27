@@ -18,7 +18,7 @@ Os tipos são três. O modificador age sobre uma forma que já existe; o gerador
 | 4 | repetição em série (`repete`) | modificador | 69 (19%) | 24 | parcial | copia uma forma em linha, em grade NxM, em círculo ou ao longo de um caminho, com contagem e passo |
 | 5 | chapa dobrada (`chapa`) | gerador | 62 (17%) | 16 | parcial | faz peça de chapa por abas e dobras com raio, alívio de canto e espessura constante (suporte, carroceria de caminhão, eletrocalha, gabinete metálico) |
 | 6 | gabinete (`gabinete`) | gerador | 57 (15%) | 16 | parcial | faz caixa de equipamento com tampa, encaixe entre as metades, ressaltos, grade de ventilação e recortes de painel |
-| 7 | cabo ou mangueira entre pontos (`cabo`) | gerador | 49 (13%) | 19 | parcial | liga dois pontos com caimento e raio mínimo de curva, com terminal em cada ponta, e feixes de vários cabos |
+| 7 | cabo ou mangueira entre pontos (`cabo`) | gerador | 49 (13%) | 19 | tem | liga dois pontos com caimento e raio mínimo de curva, com terminal em cada ponta, e feixes de vários cabos |
 | 8 | roda e pneu (`rodaPneu`) | especializado | 49 (13%) | 11 | tem | gera aro, disco ou raios, cubo com furação e pneu com seção e banda, que encaixam por aro |
 | 9 | superfície suave por seções (`loftSuave`) | gerador | 46 (12%) | 15 | parcial | faz carenagem, casco e fuselagem por seções com transição curva, em vez de troncos planos entre seções |
 | 10 | furação em padrão (`furos`) | modificador | 43 (12%) | 16 | parcial | fura em grade, em círculo (PCD) ou em favo, com escareado, rebaixo ou rosca, em qualquer face |
@@ -66,7 +66,6 @@ As ferramentas que não existem ou existem em parte, na mesma ordem, com o que j
 - repetição em série (`parcial`, 69 objetos): núcleo: arranja linear e radial, também no esboço 2.0 pelo campo `repete`; grade 2D e cópia ao longo de caminho não.
 - chapa dobrada (`parcial`, 62 objetos): extensão nativa `chapaDobrada` do núcleo: abas, dobras com raio, tampas e origem estrutural; alívio de canto e planificado de peça qualquer não; `passosDaCaixaDeChapa` faz a caixa de cantos abertos com aba nas quatro bordas, alívio de canto e área do planificado.
 - gabinete (`parcial`, 57 objetos): família `aparelho-de-caixa` (forninho elétrico, micro-ondas, air-fryer de forno, lava-louças compacta): caixa com porta, painel de comando e pés; encaixe entre metades, ressaltos, grade de ventilação e recortes de painel não; família `gabinete`: caixa de plástico em base e tampa com encaixe, ressaltos para parafuso, grade de ventilação e recortes de painel.
-- cabo ou mangueira entre pontos (`parcial`, 49 objetos): a `haste` reta do esboço 2.0 e o friso de seção circular ao longo de polilinha; caimento, raio mínimo, terminais e feixe não.
 - superfície suave por seções (`parcial`, 46 objetos): núcleo: loft de faces planas entre seções, inflate e as gaiolas de subdivisão (gaiolaPorEstacoes, gaiolaPorLacos, gaiolaVarrida), que dão a superfície lisa; o loft de tangente contínua do esboço antigo saiu com ele em 2026-11-05.
 - furação em padrão (`parcial`, 43 objetos): núcleo: furo com centros, passante ou cego, e furos de perfil na extrusao e no lathe; escareado, rebaixo, rosca e padrão em grade, círculo ou favo não.
 - perfil estrutural (`parcial`, 43 objetos): família `perfil-estrutural`: IPE, HE A e UPN da EN 10365 e alumínio ranhurado de 20 a 45 mm, cortados no comprimento, retos ou a 45° nas pontas; a extensão `estruturaDeBarras` faz tubo redondo, quadrado, retangular e cantoneira entre nós; os perfis novos na `estruturaDeBarras` não.
@@ -171,10 +170,6 @@ Faz peça de chapa por abas e dobras com raio, alívio de canto e espessura cons
 
 Faz caixa de equipamento com tampa, encaixe entre as metades, ressaltos, grade de ventilação e recortes de painel. Parâmetros: dimensões, parede, divisão, recortes. Referências: BOSL2; geradores de caixa de projeto paramétrica. Aqui: parcial, família `aparelho-de-caixa` (forninho elétrico, micro-ondas, air-fryer de forno, lava-louças compacta): caixa com porta, painel de comando e pés; encaixe entre metades, ressaltos, grade de ventilação e recortes de painel não; família `gabinete`: caixa de plástico em base e tampa com encaixe, ressaltos para parafuso, grade de ventilação e recortes de painel. Atende 57 objetos em 16 famílias.
 
-### cabo ou mangueira entre pontos (`cabo`)
-
-Liga dois pontos com caimento e raio mínimo de curva, com terminal em cada ponta, e feixes de vários cabos. Parâmetros: pontas, comprimento ou folga, diâmetro, terminais. Referências: Blender: curva com Bevel e física de corda; Blender Geometry Nodes: cabos entre pontos. Aqui: parcial, a `haste` reta do esboço 2.0 e o friso de seção circular ao longo de polilinha; caimento, raio mínimo, terminais e feixe não. Atende 49 objetos em 19 famílias.
-
 ### superfície suave por seções (`loftSuave`)
 
 Faz carenagem, casco e fuselagem por seções com transição curva, em vez de troncos planos entre seções. Parâmetros: seções, curvatura entre elas, densidade. Referências: Blender: Subdivision Surface; OpenVSP; FreeCAD Ship; CadQuery: loft com ruled=False. Aqui: parcial, núcleo: loft de faces planas entre seções, inflate e as gaiolas de subdivisão (gaiolaPorEstacoes, gaiolaPorLacos, gaiolaVarrida), que dão a superfície lisa; o loft de tangente contínua do esboço antigo saiu com ele em 2026-11-05. Atende 46 objetos em 15 famílias.
@@ -262,6 +257,10 @@ Arredonda ou chanfra as arestas que a IA nomeia, em qualquer forma, e não só n
 ### eixo escalonado (`eixo`)
 
 Gera eixo por trechos com diâmetro, rasgo de chaveta, ranhura de anel elástico, chanfro e ponta roscada. Parâmetros: trechos, chavetas, ranhuras, pontas. Referências: FreeCAD PartDesign: Shaft Design Wizard. Aqui: parcial, núcleo: cilindro e lathe por trechos; chaveta, ranhura de anel e ponta roscada não. Atende 5 objetos em 2 famílias.
+
+### cabo ou mangueira entre pontos (`cabo`)
+
+Liga dois pontos com caimento e raio mínimo de curva, com terminal em cada ponta, e feixes de vários cabos. Parâmetros: pontas, comprimento ou folga, diâmetro, terminais. Referências: Blender: curva com Bevel e física de corda; Blender Geometry Nodes: cabos entre pontos. Aqui: tem, família `cabo`: a curva de menor energia de dobra entre duas pontas pelo comprimento ou pela folga, com raio mínimo, caimento, passagens com braçadeira, terminais de capa e olhal, lados da seção, desvio da corda e orçamento de faces, com recusas que dizem o recebido e o aceito; o pedido `cabo({ de, para, ... })` e o feixe de 2 a 6 cabos (`feixeDeCabos`); a montagem por portas (`procedural/familias/cabo/montagem.js`), com o cabo refeito em cada passo do curso da junta e a conferência de estica, raio, autocontato, interferência e alinhamento da ponta; a exportação glTF com as juntas, o comprimento de corte na lista de materiais e nos `extras`, e o addon do Blender que mantém o comprimento (`npm run exportar:gltf -- <montagem> --articulacoes ... --cabos ...`). Física de corda, esteira porta-cabos e chicote ramificado não; o raio mínimo é conferido na haste e não na curva lisa (ver o banco de provas dos cabos, fatia 7). Atende 49 objetos em 19 famílias.
 
 ### roda e pneu (`rodaPneu`)
 

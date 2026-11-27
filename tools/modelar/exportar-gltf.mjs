@@ -121,6 +121,7 @@ export async function resolverMontagemDeArquivo(caminhoMontagem) {
    (`procedural/familias/cabo/montagem.js`), os dois com a montagem na pose de repouso; `execucao` traz os registros das famílias, e sem ele sai o de `criarRegistroDeFamilias`. */
 export async function gerarMontagemResolvida({ resolvida, nome = resolvida.id, articulacoes = [], cabos = [], ambiente = 'estudio', execucao = null }) {
   const puladas = [];
+  let listaDeMateriais = null;
   const instancias = instanciasDaMontagem(resolvida, puladas);
   const opcoes = { nome, instancias, ambiente };
   if (articulacoes.length || cabos.length) {
@@ -135,10 +136,11 @@ export async function gerarMontagemResolvida({ resolvida, nome = resolvida.id, a
     opcoes.cabos = [];
     if (cabos.length) {
       const { cabo, medidasDoPedido } = await import('../../procedural/familias/cabo/pedido.js');
-      const { extrasDoCabo } = await import('../../procedural/familias/cabo/exportacao.js');
+      const { extrasDoCabo, linhaDeMaterial, listaDeMateriaisDosCabos } = await import('../../procedural/familias/cabo/exportacao.js');
       const registro = execucao ?? (await import('../../procedural/familias/index.js')).criarRegistroDeFamilias();
       const exec = { registroOperacoes: registro.registroOperacoes, registroComposicoes: registro.registroComposicoes };
       const portas = portasDaResolvida(resolvida);
+      const linhasDeMaterial = [];
       for (const pedidoPorPortas of cabos) {
         const pedido = pedidoNaPose(pedidoPorPortas, portas);
         medidasDoPedido(pedido);
@@ -147,12 +149,16 @@ export async function gerarMontagemResolvida({ resolvida, nome = resolvida.id, a
         const { neutro: inteiro, puladas: dele } = semFaceSemArea(neutro);
         for (const p of dele) puladas.push({ instancia: pedido.id ?? 'cabo', ...p });
         const ponta = (lado) => ({ instancia: pedidoPorPortas[lado].instancia, porta: pedidoPorPortas[lado].porta, ponto: pedido[lado].ponto.map((c) => c / 1000), direcao: pedido[lado].direcao });
+        const rotulo = (lado) => `${pedidoPorPortas[lado].instancia}/${pedidoPorPortas[lado].porta}`;
+        linhasDeMaterial.push(linhaDeMaterial({ nome: pedido.id ?? 'cabo', pedido, de: rotulo('de'), para: rotulo('para') }));
         opcoes.cabos.push({ nome: pedido.id ?? 'cabo', neutro: inteiro, materiais: neutro.materiais ?? {}, pontas: { de: ponta('de'), para: ponta('para') }, extras: extrasDoCabo(pedido) });
       }
+      listaDeMateriais = listaDeMateriaisDosCabos(linhasDeMaterial);
     }
   }
   const resultado = exportarMontagemGltf(opcoes);
   resultado.diagnostico.facesPuladas = puladas;
+  if (listaDeMateriais) resultado.diagnostico.listaDeMateriaisDosCabos = listaDeMateriais;
   return resultado;
 }
 
@@ -225,6 +231,11 @@ async function main() {
     process.stdout.write(`Geometria:  ${d.vertices} vértices, ${d.triangulos} triângulos (metro, y para cima)\n`);
     if (d.facesPuladas?.length) process.stdout.write(`Puladas:    ${d.facesPuladas.length} face(s) sem triangulação de área não nula: ${d.facesPuladas.map((p) => `${p.instancia}#${p.face}`).join(', ')}\n`);
     if (d.juntas) process.stdout.write(`Juntas:     ${d.juntas} (nós junta-<id>, a peça que a junta move é filha dele)\n`);
+    if (d.listaDeMateriaisDosCabos) {
+      process.stdout.write('Cabos (lista de materiais, corte em mm):\n');
+      for (const l of d.listaDeMateriaisDosCabos.cabos) process.stdout.write(`  ${l.cabo}: corte ${l.comprimentoDeCorteMm}, diâmetro ${l.diametroMm}, ${l.lados} lados, de ${l.de} a ${l.para}\n`);
+      process.stdout.write(`  total de corte: ${d.listaDeMateriaisDosCabos.totalDeCorteMm} mm\n`);
+    }
     if (res.caminhoDoScript) process.stdout.write(`Blender:    ${res.caminhoDoScript} (${d.cabos} cabo(s); no Blender, importe o .glb e rode o script)\n`);
     if (res.caminhoDoAddon) process.stdout.write(`Addon:      ${res.caminhoDoAddon} (Blender 4.2 ou mais novo: Edit > Preferences > Get Extensions > Install from Disk; refaz o cabo com o comprimento de corte quando as pontas se movem)\n`);
     if (d.extensoes.length) process.stdout.write(`Extensões:  ${d.extensoes.join(', ')}\n`);

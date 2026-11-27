@@ -16,6 +16,6 @@ export function medidasDoCabo(parametros = {}) {
   return Object.freeze({
     comprimentoDeCorte: plano.comprimentoDaCurva, comprimentoPedido: plano.comprimentoPedido, comprimentoDaMalha: plano.comprimentoDaMalha,
     faces: plano.faces, triangulos: plano.triangulos, trechos: plano.estacoes - 1, lados: plano.lados,
-    raioMinimo: plano.raioMinimo, desvioDaCorda: plano.desvioDaCorda, distanciaDeAutocontato: plano.distanciaDeAutocontato,
+    raioMinimo: plano.raioMinimo, raioLiso: plano.raioLiso, desvioDaCorda: plano.desvioDaCorda, distanciaDeAutocontato: plano.distanciaDeAutocontato,
   });
 }

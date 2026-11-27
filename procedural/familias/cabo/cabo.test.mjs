@@ -118,3 +118,35 @@ describe('família cabo', () => {
     });
   });
 });
+
+describe('o raio na curva lisa', () => {
+  const tresPontos = (em, comprimento, passo) => {
+    const n = (a) => Math.hypot(...a); const sub = (a, b) => a.map((x, k) => x - b[k]);
+    let menor = Infinity;
+    for (let t = passo; t < comprimento - passo; t += passo / 4) {
+      const a = em(t - passo).p; const b = em(t).p; const c = em(t + passo).p;
+      const x = sub(b, a); const y = sub(c, a);
+      const area2 = n([x[1] * y[2] - x[2] * y[1], x[2] * y[0] - x[0] * y[2], x[0] * y[1] - x[1] * y[0]]);
+      if (area2 > 1e-12) menor = Math.min(menor, (n(x) * n(sub(c, b)) * n(y)) / (2 * area2));
+    }
+    return menor;
+  };
+  it('a medida da curva lisa concorda com três pontos densos nela (controle: o caso que dobra mais que a haste e o que quase não dobra)', async () => {
+    const { criarCaminho } = await import('./caminho.js');
+    const { resolverElastica, nosDaHaste } = await import('./curva.js');
+    for (const nome of ['frente', 'esticado']) {
+      const c = CASOS_DO_CABO[nome].parametros;
+      const A = [0, 0, 0]; const B = [c.dx, 0, 0]; const L = c.comprimento;
+      const r = resolverElastica({ A, B, dA: [1, 0, 0], dB: [-1, 0, 0], L, nos: nosDaHaste(L, c.diametro) });
+      const cam = criarCaminho({ nos: r.nos, dA: [1, 0, 0], dB: [-1, 0, 0] });
+      const independente = tresPontos(cam.em, cam.comprimento, 0.25);
+      expect(Math.abs(independente / cam.raioLiso - 1)).toBeLessThan(0.08);
+    }
+  });
+  it('frente: a curva lisa dobra mais que o ângulo entre os trechos da haste (defeito achado no addon do Blender, 7,16 mm a 0,5 mm de passo)', () => {
+    esquecerPlanos();
+    const m = medidasDoCabo(CASOS_DO_CABO.frente.parametros);
+    expect(m.raioLiso).toBeGreaterThan(6.8); expect(m.raioLiso).toBeLessThan(7);
+    expect(m.raioLiso).toBeLessThan(m.raioMinimo / 2);
+  });
+});

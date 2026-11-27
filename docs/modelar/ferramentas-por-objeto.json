@@ -154,8 +154,8 @@
       "automatiza": "liga dois pontos com caimento e raio mínimo de curva, com terminal em cada ponta, e feixes de vários cabos",
       "parametros": "pontas, comprimento ou folga, diâmetro, terminais",
       "referencias": ["Blender: curva com Bevel e física de corda", "Blender Geometry Nodes: cabos entre pontos"],
-      "aqui": "parcial",
-      "onde": "a `haste` reta do esboço 2.0 e o friso de seção circular ao longo de polilinha; caimento, raio mínimo, terminais e feixe não"
+      "aqui": "tem",
+      "onde": "família `cabo`: a curva de menor energia de dobra entre duas pontas pelo comprimento ou pela folga, com raio mínimo, caimento, passagens com braçadeira, terminais de capa e olhal, lados da seção, desvio da corda e orçamento de faces, com recusas que dizem o recebido e o aceito; o pedido `cabo({ de, para, ... })` e o feixe de 2 a 6 cabos (`feixeDeCabos`); a montagem por portas (`procedural/familias/cabo/montagem.js`), com o cabo refeito em cada passo do curso da junta e a conferência de estica, raio, autocontato, interferência e alinhamento da ponta; a exportação glTF com as juntas, o comprimento de corte na lista de materiais e nos `extras`, e o addon do Blender que mantém o comprimento (`npm run exportar:gltf -- <montagem> --articulacoes ... --cabos ...`). Física de corda, esteira porta-cabos e chicote ramificado não; o raio mínimo é conferido na haste e não na curva lisa (ver o banco de provas dos cabos, fatia 7)"
     },
     "tubulacao": {
       "nome": "tubulação com conexões",

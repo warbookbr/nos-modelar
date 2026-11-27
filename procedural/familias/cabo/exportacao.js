@@ -25,3 +25,21 @@ export function extrasDoCabo(pedido) {
     unidadeDaUnreal: 'cm',
   };
 }
+
+/** A linha de cada cabo na lista de materiais da montagem: o nome, o comprimento de corte (o da curva, em milímetro), o diâmetro, os lados da seção e as portas das pontas (`lista` traz `{ pedido, porta de, porta para }` por cabo). */
+export function linhaDeMaterial({ nome, pedido, de = null, para = null }) {
+  const m = medidasDoPedido(pedido).cabos[0];
+  return {
+    cabo: nome,
+    comprimentoDeCorteMm: arredonda(m.comprimentoDeCorte, 2),
+    diametroMm: arredonda(pedido.diametro ?? 6, 2),
+    lados: m.lados,
+    de, para,
+  };
+}
+
+/** A lista de materiais dos cabos de uma montagem, em ordem de nome, com o total de corte. */
+export function listaDeMateriaisDosCabos(linhas) {
+  const ordenadas = [...linhas].sort((a, b) => (a.cabo < b.cabo ? -1 : a.cabo > b.cabo ? 1 : 0));
+  return { cabos: ordenadas, totalDeCorteMm: arredonda(ordenadas.reduce((s, l) => s + l.comprimentoDeCorteMm, 0), 2) };
+}
