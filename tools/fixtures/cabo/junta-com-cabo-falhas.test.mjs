@@ -15,12 +15,16 @@ describe('o cabo na junta, os arranjos que falham', () => {
   it('curto: o cabo de 80 mm estica em todo o curso, e a conta independente concorda onde as pontas passam de 80 mm', () => {
     const r = confere('curto');
     expect(r.ok).toBe(false);
-    expect(r.falhas.every((f) => f.motivo === 'estica')).toBe(true);
-    expect(valores(r, 'estica')).toEqual(r.posicoes.map((p) => p.valor));
+    /* a haste engastada alcança as pontas de pé (±15°) com um grampo de raio abaixo de 1 mm, que a curva lisa recusa como dobra; nas outras poses o cabo estica */
+    expect(r.falhas.every((f) => f.motivo === 'estica' || f.motivo === 'dobra')).toBe(true);
+    expect(valores(r, 'dobra')).toEqual([-15, 0, 15]);
+    expect(r.falhas.length).toBe(r.posicoes.length);
     for (const p of r.posicoes) if (p.distanciaEntrePontas >= 80) expect(p.ok, `passo ${p.indice}: as pontas a ${p.distanciaEntrePontas} mm de um cabo de 80`).toBe(false);
+    for (const f of r.falhas) if (f.valor !== 0 && Math.abs(f.valor) !== 15) expect(f.motivo).toBe('estica');
     /* onde a reta entre as pontas já passa do comprimento (de ±60° para fora) a família diz que um cabo não encurta; no meio, que a curva de menor energia não alcança */
     expect(r.legivel[0]).toMatch(/^junta 'juntaA', passo 0 de 12 \(-90 graus\): estica: o cabo estica: .*um cabo não encurta/);
-    expect(r.legivel.some((l) => /\(0 graus\): estica: .*menor energia alcança/.test(l))).toBe(true);
+    expect(r.legivel.some((l) => /\(-30 graus\): estica: .*menor energia alcança/.test(l))).toBe(true);
+    expect(r.legivel.some((l) => /\(0 graus\): dobra: .*raioMinimo recebeu 0\.\d+; aceito: .*ao menos 4\.5 mm/.test(l))).toBe(true);
   }, 60000);
 
   it('fechado: o cabo de 130 mm dobra abaixo do raio mínimo (9 mm) só nos extremos do curso', () => {
@@ -28,7 +32,7 @@ describe('o cabo na junta, os arranjos que falham', () => {
     expect(r.ok).toBe(false);
     expect(r.falhas.every((f) => f.motivo === 'dobra')).toBe(true);
     expect(valores(r, 'dobra')).toEqual([-90, 90]);
-    expect(r.legivel[0]).toMatch(/\(-90 graus\): dobra: o cabo dobra abaixo do raio mínimo: .*raioMinimo recebeu 7\.9\d*; aceito: .*ao menos 9 mm/);
+    expect(r.legivel[0]).toMatch(/\(-90 graus\): dobra: o cabo dobra abaixo do raio mínimo: .*raioMinimo recebeu 7\.\d+; aceito: .*ao menos 9 mm/);
   }, 60000);
 
   it('atravessa: o cabo de 200 mm atravessa a carcaça A perto de ±180°, onde a conta independente também o põe dentro, e a mensagem diz o ângulo, a peça e a braçadeira', () => {

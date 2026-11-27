@@ -92,7 +92,8 @@ describe('família cabo', () => {
       const e = recusa({ ...CASOS_DO_CABO.frente.parametros, raioMinimo: 8 });
       expect(e.restricao).toBe('raio-minimo-cabe');
       expect(e.message).toMatch(/ao menos 32 mm/);
-      expect(e.message).toMatch(/dobra até 21\.9\d* mm|dobra até 22 mm/);
+      expect(e.message).toMatch(/dobra até 20\.\d+ mm/);
+      expect(e.valor).toBeCloseTo(medidasDoCabo(CASOS_DO_CABO.frente.parametros).raioLiso, 2);
     });
     it('orçamento de faces estourado diz quantas faces daria', () => {
       const e = recusa({ orcamentoDeFaces: 100 });
@@ -112,7 +113,7 @@ describe('família cabo', () => {
       expect(recusa({ adx: 0, ady: 0, adz: 0 }).restricao).toBe('direcao-da-ponta-a');
     });
     it('comprimento que a curva não alcança com essas direções', () => {
-      const e = recusa({ adx: 0, ady: 1, adz: 0, dx: 200, comprimento: 210 });
+      const e = recusa({ adx: 0, ady: 1, adz: 0, dx: 200, comprimento: 205 });
       expect(e.restricao).toBe('comprimento-chega');
       expect(e.message).toMatch(/a partir de cerca de/);
     });
@@ -143,10 +144,24 @@ describe('o raio na curva lisa', () => {
       expect(Math.abs(independente / cam.raioLiso - 1)).toBeLessThan(0.08);
     }
   });
-  it('frente: a curva lisa dobra mais que o ângulo entre os trechos da haste (defeito achado no addon do Blender, 7,16 mm a 0,5 mm de passo)', () => {
+  it('cada caso da fatia 1 e a junta: a curva lisa fica perto da haste e nunca abaixo do raio mínimo pedido', () => {
     esquecerPlanos();
-    const m = medidasDoCabo(CASOS_DO_CABO.frente.parametros);
-    expect(m.raioLiso).toBeGreaterThan(6.8); expect(m.raioLiso).toBeLessThan(7);
-    expect(m.raioLiso).toBeLessThan(m.raioMinimo / 2);
+    for (const [nome, caso] of Object.entries(CASOS_DO_CABO)) {
+      const m = medidasDoCabo(caso.parametros);
+      const pedido = 5 * (caso.parametros.diametro ?? 6);
+      expect(m.raioLiso, nome).toBeGreaterThanOrEqual(pedido);
+      expect(m.raioLiso / m.raioMinimo, nome).toBeGreaterThan(0.9);
+    }
+  });
+  it('controle: a medida acusa o defeito antigo (haste com os trechos das pontas fixos e retos, que a Hermite cúbica dobrava na emenda) e aprova a haste engastada', async () => {
+    const { criarCaminho } = await import('./caminho.js');
+    const { resolverElastica } = await import('./curva.js');
+    const a = 4; const M = 25; const L = 170 - 2 * a;
+    const r = resolverElastica({ A: [a, 0, 0], B: [120 - a, 0, 0], dA: [1, 0, 0], dB: [-1, 0, 0], L, nos: M });
+    const bom = criarCaminho({ nos: r.nos, dA: [1, 0, 0], dB: [-1, 0, 0], trechoA: a, trechoB: a });
+    const nos = r.nos.map((p) => [...p]); nos[1] = [a + r.h, 0, 0]; nos[M - 2] = [120 - a - r.h, 0, 0];
+    const ruim = criarCaminho({ nos, dA: [1, 0, 0], dB: [-1, 0, 0], trechoA: a, trechoB: a });
+    expect(bom.raioLiso / bom.raioMinimo).toBeGreaterThan(0.9);
+    expect(ruim.raioLiso / ruim.raioMinimo).toBeLessThan(0.6);
   });
 });

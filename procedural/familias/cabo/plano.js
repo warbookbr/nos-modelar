@@ -76,10 +76,22 @@ function repartirOComprimento(pernas, L) {
   return pernas.map((q, i) => q.D + ((L - cadeia) * peso[i]) / total);
 }
 
-/* A haste do cabo inteiro: uma elástica por perna, com o comprimento repartido pelas distâncias retas das pernas, e o caminho liso pelos nós de todas (a passagem é um nó
-   de tangente fixa). O comprimento do caminho é acertado a 0,02% refazendo cada perna com o comprimento escalado. Com uma perna só é a conta de sempre. */
-function haste(pernas, L, diametro, caimento, nosPorPerna = null) {
-  let Lr = pernas.length === 1 ? [L] : repartirOComprimento(pernas, L);
+/* O trecho reto de cada ponta, o cilindro da porta: um diâmetro, e no máximo um quinto da distância reta da perna que a ponta fecha. */
+const TRECHO_DA_PONTA_EM_DIAMETROS = 1;
+const FRACAO_DO_TRECHO_DA_PONTA = 0.2;
+
+/* A haste do cabo inteiro: uma elástica por perna, engastada nas duas pontas, com o comprimento repartido pelas distâncias retas das pernas, e o caminho liso pelos nós de todas (a passagem é um nó
+   de tangente fixa). O caminho começa depois do trecho reto de cada ponta do cabo; o comprimento dele é acertado a 0,02% refazendo cada perna com o comprimento escalado. Com uma perna só é a conta de sempre. */
+function haste(pernasDoPedido, L, diametro, caimento, nosPorPerna = null) {
+  const trechoA = Math.min(TRECHO_DA_PONTA_EM_DIAMETROS * diametro, FRACAO_DO_TRECHO_DA_PONTA * pernasDoPedido[0].D);
+  const trechoB = Math.min(TRECHO_DA_PONTA_EM_DIAMETROS * diametro, FRACAO_DO_TRECHO_DA_PONTA * pernasDoPedido.at(-1).D);
+  const pernas = pernasDoPedido.map((q, i) => {
+    const A = i === 0 ? soma(q.A, q.dA.map((x) => x * trechoA)) : q.A;
+    const B = i === pernasDoPedido.length - 1 ? soma(q.B, q.dB.map((x) => x * trechoB)) : q.B;
+    return { ...q, A, B, D: norma(sub(B, A)) };
+  });
+  const Lc = L - trechoA - trechoB;
+  let Lr = pernas.length === 1 ? [Lc] : repartirOComprimento(pernas, Lc);
   const nos = nosPorPerna ?? Lr.map((x) => nosDaHaste(x, diametro));
   let partida = pernas.map(() => null); let resultado = null;
   for (let passo = 0; passo < 5; passo += 1) {
@@ -91,11 +103,13 @@ function haste(pernas, L, diametro, caimento, nosPorPerna = null) {
       rs.push(r);
     }
     const juntos = rs.length === 1 ? rs[0].nos : rs.flatMap((r, i) => (i === 0 ? r.nos : r.nos.slice(1)));
-    const caminho = criarCaminho({ nos: juntos, dA: pernas[0].dA, dB: pernas.at(-1).dB });
+    let indice = 0;
+    const tangentesFixas = rs.slice(0, -1).map((r, i) => { indice += r.nos.length - 1; return { indice, t: pernas[i + 1].dA }; });
+    const caminho = criarCaminho({ nos: juntos, dA: pernas[0].dA, dB: pernas.at(-1).dB, trechoA, trechoB, tangentesFixas });
     const r = rs.length === 1 ? rs[0] : { iteracoes: rs.reduce((s, x) => s + x.iteracoes, 0), M: rs.reduce((s, x) => s + x.M, 0), energia: rs.reduce((s, x) => s + x.energia, 0), violacao: 0 };
     resultado = { r, caminho, perna: null };
     if (Math.abs(caminho.comprimento / L - 1) < PRECISAO_DA_CURVA) break;
-    const f = L / caminho.comprimento; Lr = Lr.map((x) => x * f); partida = rs.map((x) => x.nos);
+    const f = Lc / (caminho.comprimento - trechoA - trechoB); Lr = Lr.map((x) => x * f); partida = rs.map((x) => x.nos);
   }
   return resultado;
 }
@@ -141,9 +155,10 @@ export function planejar(parametros) {
   }
   const { r, caminho } = feito;
 
-  if (caminho.raioMinimo < rMinimo * (1 - 1e-9)) {
-    recusar('raio-minimo-cabe', 'raioMinimo', Number(caminho.raioMinimo.toPrecision(4)),
-      `uma curva cujo menor raio de dobra seja ao menos ${mm(rMinimo)} (${p.raioMinimo} diâmetros); a curva de menor energia com esse comprimento e essas direções dobra até ${mm(caminho.raioMinimo)}`,
+  /* o raio que vale é o da curva lisa que vira malha (`raioLiso`), e não o da haste (`raioMinimo`) */
+  if (caminho.raioLiso < rMinimo * (1 - 1e-9)) {
+    recusar('raio-minimo-cabe', 'raioMinimo', Number(caminho.raioLiso.toPrecision(4)),
+      `uma curva cujo menor raio de dobra seja ao menos ${mm(rMinimo)} (${p.raioMinimo} diâmetros); a curva de menor energia com esse comprimento e essas direções dobra até ${mm(caminho.raioLiso)}`,
       'o raio mínimo não cabe: aumente o comprimento ou a folga, afaste as pontas, vire as direções de saída ou reduza raioMinimo');
   }
   const contato = distanciaDeAutocontato(caminho, 2 * d);

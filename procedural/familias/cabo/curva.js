@@ -5,8 +5,8 @@
    de Euler, a forma que uma haste elástica de peso desprezível toma entre dois engastes. Com o caimento, entra a energia potencial da
    gravidade em −y, e a curva é a mesma haste pendurada.
 
-   O método: M nós de trechos iguais (h = L / (M − 1)); os dois primeiros e os dois últimos nós ficam fixos (cada ponta sai reta, na
-   direção dela, por um trecho). A energia é quadrática (½ yᵀ K y + bᵀ y nos nós livres, K constante) e os M − 3 comprimentos são
+   O método: M nós de trechos iguais (h = L / (M − 1)); só as duas pontas ficam fixas, e a direção de saída de cada uma é um engaste (um nó
+   fantasma, sem trecho reto fixo, que deixaria uma dobra na emenda). A energia é quadrática (½ yᵀ K y + bᵀ y nos nós livres, K constante) e os M − 1 comprimentos são
    restrições quadráticas. Cada iteração resolve o problema quadrático linearizado nas restrições (o complemento de Schur de K, de
    m × m), e uma projeção de Newton leva os comprimentos ao zero de máquina. Nenhum sorteio, nenhum relógio, nenhum passo que dependa
    da ordem de execução: o número de iterações é fixo e a mesma entrada dá os mesmos bytes.
@@ -30,7 +30,7 @@ export class ErroDaCurva extends Error {
   constructor(mensagem) { super(`curva: ${mensagem}`); this.name = 'ErroDaCurva'; }
 }
 
-export const NOS_MINIMOS = 17;
+export const NOS_MINIMOS = 25;
 export const NOS_MAXIMOS = 97;
 export const ITERACOES = 160;
 
@@ -125,13 +125,15 @@ export function palpite(entrada, L, M) {
 
 /* ---- a minimização ---- */
 
-/** Resolve a haste. `entrada`: { A, B, dA, dB, L, caimento, nos }; A, B em milímetro, dA e dB unitários (a direção em que o cabo sai de cada ponta). */
+/** Resolve a haste. `entrada`: { A, B, dA, dB, L, caimento, nos }; A, B em milímetro, dA e dB unitários (a direção em que o cabo sai de cada ponta).
+    Os nós 0 e M − 1 são as pontas e os outros M − 2 são livres. A direção de saída é um engaste: um nó fantasma além de cada ponta, a 2h do vizinho (a diferença central dá a direção),
+    entra na segunda diferença da ponta com meio peso, e o trecho da ponta não é reto, o que dá à haste a curvatura do engaste em vez de uma dobra na emenda de um trecho fixo. */
 export function resolverElastica(entrada) {
   const { A, B, L, caimento = 0 } = entrada;
   const M = entrada.nos;
   const dA = unitario(entrada.dA); const dB = unitario(entrada.dB);
   const h = L / (M - 1);
-  const n = M - 4; const m = M - 3;
+  const n = M - 2; const m = M - 1;
   let chute = entrada.partida ?? null;
   if (!chute) {
     const inicio = palpite({ A, B, dA, dB, lado: ladoDoArco({ A, B, dA, dB, caimento }) }, L, M);
@@ -139,44 +141,40 @@ export function resolverElastica(entrada) {
     chute = inicio.nos;
   }
   const P = chute.map((p) => [...p]);
-  P[0] = [...A]; P[1] = soma(A, mult(dA, h)); P[M - 1] = [...B]; P[M - 2] = soma(B, mult(dB, h));
+  P[0] = [...A]; P[M - 1] = [...B];
 
-  /* a segunda diferença de todos os nós interiores (1 a M − 2), cada linha com os três nós; K = SᵀS nos nós livres 2 a M − 3 */
+  /* as linhas da segunda diferença: cada nó interior (1 a M − 2) com os três nós, e cada ponta com o fantasma; a linha é Σ coef·P(nó livre) + constante, com um peso */
   const K = Array.from({ length: n }, () => new Float64Array(n));
-  const coef = [1, -2, 1];
+  const linear = Array.from({ length: n }, () => [0, 0, 0]);
+  const linhas = [];
   for (let i = 1; i <= M - 2; i += 1) {
-    for (let a = 0; a < 3; a += 1) for (let b = 0; b < 3; b += 1) {
-      const ja = i - 1 + a - 2; const jb = i - 1 + b - 2;
-      if (ja >= 0 && ja < n && jb >= 0 && jb < n) K[ja][jb] += coef[a] * coef[b];
+    const livresDaLinha = []; const constante = [0, 0, 0];
+    [[i - 1, 1], [i, -2], [i + 1, 1]].forEach(([j, c]) => { if (j >= 1 && j <= M - 2) livresDaLinha.push([j - 1, c]); else for (let q = 0; q < 3; q += 1) constante[q] += c * P[j][q]; });
+    linhas.push({ livresDaLinha, constante, peso: 1 });
+  }
+  linhas.push({ livresDaLinha: [[0, 2]], constante: [0, 1, 2].map((q) => -2 * P[0][q] - 2 * h * dA[q]), peso: 0.5 });
+  linhas.push({ livresDaLinha: [[n - 1, 2]], constante: [0, 1, 2].map((q) => -2 * P[M - 1][q] - 2 * h * dB[q]), peso: 0.5 });
+  for (const { livresDaLinha, constante, peso } of linhas) {
+    for (const [a, ca] of livresDaLinha) {
+      for (const [b, cb] of livresDaLinha) K[a][b] += peso * ca * cb;
+      for (let q = 0; q < 3; q += 1) linear[a][q] += peso * ca * constante[q];
     }
   }
   const fatorK = cholesky(K);
-  /* o vetor linear: nós fixos da segunda diferença e a gravidade (−y), com Γ h⁴ / L³ por nó */
+  /* a gravidade (−y), com Γ h⁴ / L³ por nó */
   const gravidade = (caimento * h ** 4) / L ** 3;
-  const linear = Array.from({ length: n }, () => [0, 0, 0]);
-  for (let i = 1; i <= M - 2; i += 1) {
-    for (let a = 0; a < 3; a += 1) {
-      const ja = i - 1 + a;
-      if (ja < 2 || ja > M - 3) continue;
-      for (let b = 0; b < 3; b += 1) {
-        const jb = i - 1 + b;
-        if (jb >= 2 && jb <= M - 3) continue;
-        const c = coef[a] * coef[b];
-        for (let q = 0; q < 3; q += 1) linear[ja - 2][q] += c * P[jb][q];
-      }
-    }
-  }
   for (let k = 0; k < n; k += 1) linear[k][1] += gravidade;
   /* o mínimo sem restrição, por componente: K y0 = −linear */
   const y0 = [0, 1, 2].map((q) => resolverCholesky(fatorK, Float64Array.from(linear, (v) => -v[q])));
   const Kinv = Array.from({ length: n }, (_, j) => { const e = new Float64Array(n); e[j] = 1; return resolverCholesky(fatorK, e); });
 
-  const restricoes = () => Array.from({ length: m }, (_, k) => { const i = k + 1; const e = sub(P[i + 1], P[i]); return { e, g: 0.5 * (dot(e, e) - h * h) }; });
-  /* cada restrição (o trecho entre os nós i e i + 1) toca no máximo dois nós livres: −e no nó i e +e no nó i + 1, o que deixa G esparsa */
+  /* os M − 1 trechos, entre os nós k e k + 1 */
+  const restricoes = () => Array.from({ length: m }, (_, k) => { const e = sub(P[k + 1], P[k]); return { e, g: 0.5 * (dot(e, e) - h * h) }; });
+  /* cada restrição toca no máximo dois nós livres: −e no nó k e +e no nó k + 1, o que deixa G esparsa */
   const linhasDe = (rs) => rs.map(({ e }, k) => {
-    const i = k + 1; const nosL = []; const coef = [];
-    if (i >= 2 && i <= M - 3) { nosL.push(i - 2); coef.push([-e[0], -e[1], -e[2]]); }
-    if (i + 1 >= 2 && i + 1 <= M - 3) { nosL.push(i - 1); coef.push(e); }
+    const nosL = []; const coef = [];
+    if (k >= 1 && k <= M - 2) { nosL.push(k - 1); coef.push([-e[0], -e[1], -e[2]]); }
+    if (k + 1 >= 1 && k + 1 <= M - 2) { nosL.push(k); coef.push(e); }
     return { nosL, coef };
   });
   const complementoDeSchur = (G) => {
@@ -197,8 +195,8 @@ export function resolverElastica(entrada) {
     for (let k = 0; k < m; k += 1) for (let x = 0; x < G[k].nosL.length; x += 1) for (let q = 0; q < 3; q += 1) v[q][G[k].nosL[x]] += G[k].coef[x][q] * mu[k];
     return v.map((vq) => Float64Array.from({ length: n }, (_, a) => { let t = 0; const linha = Kinv[a]; for (let b = 0; b < n; b += 1) t += linha[b] * vq[b]; return t; }));
   };
-  const livres = () => Array.from({ length: n }, (_, k) => P[k + 2]);
-  const gravar = (Y) => { for (let k = 0; k < n; k += 1) P[k + 2] = [Y[0][k], Y[1][k], Y[2][k]]; };
+  const livres = () => Array.from({ length: n }, (_, k) => P[k + 1]);
+  const gravar = (Y) => { for (let k = 0; k < n; k += 1) P[k + 1] = [Y[0][k], Y[1][k], Y[2][k]]; };
   const maiorViolacao = () => restricoes().reduce((mx, { g }) => Math.max(mx, Math.abs(g) / (h * h)), 0);
 
   let iteracoesFeitas = 0;
@@ -243,10 +241,13 @@ export function resolverElastica(entrada) {
     const traco = S.reduce((acc, linha, i) => acc + linha[i], 0) / m;
     for (let i = 0; i < m; i += 1) S[i][i] += 1e-14 * traco;
     const mu = resolverCholesky(cholesky(S), Float64Array.from(rs, ({ g }) => g));
-    for (let r = 0; r < m; r += 1) for (let x = 0; x < G[r].nosL.length; x += 1) for (let q = 0; q < 3; q += 1) P[G[r].nosL[x] + 2][q] -= G[r].coef[x][q] * mu[r];
+    for (let r = 0; r < m; r += 1) for (let x = 0; x < G[r].nosL.length; x += 1) for (let q = 0; q < 3; q += 1) P[G[r].nosL[x] + 1][q] -= G[r].coef[x][q] * mu[r];
   }
   const violacao = maiorViolacao();
   let energia = 0;
-  for (let i = 1; i <= M - 2; i += 1) { const d = sub(soma(P[i - 1], P[i + 1]), mult(P[i], 2)); energia += 0.5 * dot(d, d); }
+  for (const { livresDaLinha, constante, peso } of linhas) {
+    const d = [0, 1, 2].map((q) => constante[q] + livresDaLinha.reduce((s, [a, c]) => s + c * P[a + 1][q], 0));
+    energia += 0.5 * peso * dot(d, d);
+  }
   return { nos: P, h, iteracoes: iteracoesFeitas, violacao, energia: energia / h ** 3, M };
 }
