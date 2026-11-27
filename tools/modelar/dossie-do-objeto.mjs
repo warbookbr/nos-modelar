@@ -20,6 +20,11 @@
  * OS ATRITOS. De cada banco de provas dos planos que cobrem o objeto o dossiê lê o `ATRITOS.md` da pasta dele (se houver) e mostra
  * quantos itens tem e quantos ainda estão sem o campo `Destino:`; o diário antigo, anterior ao campo, sai todo como sem destino.
  *
+ * O ÚNICO DOCUMENTO DO OBJETO (2026-11-27). O dossiê também lê o `atrito` e a `notaDePassagem` de cada rodada (condensados), as linhas da tabela
+ * de tentativas dos bancos de provas dos planos que cobrem o objeto, e o aceite da pessoa no `ALINHAMENTO.md` da pasta (a fonte dele, que por isso
+ * fica); a conferência `--todos --check` recusa também o `.md` escrito à mão na pasta de um objeto além do `DOSSIE.md`, do `ALINHAMENTO.md` e do
+ * que está em `referencias/`, e cobra o `DOSSIE.md` em dia de todo objeto que o envio mudou (`objetosMudadosNoEnvio`).
+ *
  * A SEÇÃO À MÃO. Entre `<!-- dossie:a-mao:<unidade>:inicio -->` e `<!-- dossie:a-mao:<unidade>:fim -->` mora o texto que um modelo
  * escreve: as escolhas de técnica e o porquê, no modelo fixo do `MODELO_A_MAO`. O gerador o preserva; `--check` recusa o arquivo que perdeu
  * um marcador, o que repete a seção de uma unidade (uma das duas se perderia) e o que tem seção de unidade que não existe mais, e diz
@@ -27,14 +32,16 @@
  *
  *   node tools/modelar/dossie-do-objeto.mjs <objeto>             gera (ou regrava) o DOSSIE.md da pasta do objeto
  *   node tools/modelar/dossie-do-objeto.mjs <objeto> --check     recusa o DOSSIE.md desatualizado ou sem a seção à mão
- *   node tools/modelar/dossie-do-objeto.mjs --todos [--check]    o mesmo para todo DOSSIE.md que existe (o gate `dossie:check`)
+ *   node tools/modelar/dossie-do-objeto.mjs --todos [--check]    o mesmo para todo DOSSIE.md que existe (o gate `dossie:check`); com --check, também recusa o .md à mão na pasta do objeto e o objeto que o envio mudou sem DOSSIE.md
  *   node tools/modelar/dossie-do-objeto.mjs --ajuda */
+import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { importarReceita, receitaDoModulo } from './importar-receita.mjs';
 import { lerDecisoesDaPessoa, lerRodadas } from './rodada-de-modelagem.mjs';
-import { bancosDeProvasDe, caminhoQueMudaForma, caminhosDoTerritorio, tabelaDeTentativasEm } from '../mapa/tentativas-dos-planos.mjs';
+import { bancosDeProvasDe, caminhoQueMudaForma, caminhosDoTerritorio, linhasDeTentativas, tabelaDeTentativasEm } from '../mapa/tentativas-dos-planos.mjs';
+import { lerAceites } from './fluxo-do-objeto.mjs';
 
 const REPO = resolve(dirname(fileURLToPath(import.meta.url)), '../..');
 export const ARQUIVO = 'DOSSIE.md';
@@ -49,11 +56,23 @@ export const MODELO_A_MAO = [
   '- a escrever',
 ].join('\n');
 
+/* A seção fixa da dívida conhecida, também à mão e também preservada: o que a peça ainda não cumpre e foi aceito. */
+export const MODELO_DA_DIVIDA = [
+  '_Dívida conhecida: o que a peça ainda não cumpre e foi aceito, e por quem. Um item por dívida, no modelo `defeito: por que ficou (a rodada, a decisão da pessoa ou a medida que o mostra)`. Sem dívida, escreva "nenhuma"._',
+  '',
+  '- a escrever',
+].join('\n');
+
+/* As seções à mão de uma unidade: a das escolhas de técnica (o id da unidade) e a da dívida conhecida (o id com `.divida`, que nome de parte não tem). */
+const idDaDivida = (id) => `${id}.divida`;
+const idsDeSecoes = (unidades) => unidades.flatMap((u) => [u.id, idDaDivida(u.id)]);
+
 const AJUDA = `dossie-do-objeto: gera o DOSSIE.md de um objeto do acervo, do que já está gravado.
 
   npm run dossie -- <objeto>            gera ou regrava procedural/pecas/<objeto>/DOSSIE.md
   npm run dossie -- <objeto> --check    recusa o DOSSIE.md desatualizado ou que perdeu a seção à mão (sai com 1)
-  npm run dossie -- --todos [--check]   o mesmo para todo DOSSIE.md que existe em procedural/pecas (o gate dossie:check usa --check)
+  npm run dossie -- --todos [--check]   o mesmo para todo DOSSIE.md que existe em procedural/pecas (o gate dossie:check usa --check, que também
+                                        recusa .md escrito à mão na pasta do objeto e o objeto que o envio mudou sem DOSSIE.md)
   --raiz=<pasta>, --docs=<pasta>        a raiz do repositório e a pasta dos documentos dentro dela, docs/modelar (só para teste com fixture)
   --ajuda                               esta mensagem
 
@@ -181,7 +200,7 @@ function planosQueCobrem(raiz, pastaRelativa, docs) {
         if (!cobre.length) continue;
         const titulo = texto.match(/^#\s+(.+?)\s*$/m)?.[1] ?? e.name;
         const estado = texto.match(/^\*\*Estado:\*\*\s*(.+?)\s*$/m)?.[1] ?? 'sem estado';
-        const bancos = bancosDeProvasDe(texto, docs).map((b) => ({ pasta: b, tabela: tabelaDeTentativasEm(raiz, b), atritos: atritosDe(raiz, b) }));
+        const bancos = bancosDeProvasDe(texto, docs).map((b) => { const tabela = tabelaDeTentativasEm(raiz, b); return { pasta: b, tabela, tentativas: tabela ? linhasDeTentativas(readFileSync(join(raiz, tabela), 'utf8')) : [], atritos: atritosDe(raiz, b) }; });
         achados.push({ arquivo: `${docs}/planos/${prefixo}${e.name}`, titulo, estado, bancos });
       }
     }
@@ -251,6 +270,16 @@ function linhasDasRodadas(rodadas, decisoes) {
     linhas.push(`| ${r.numero} | ${(r.registradaEm ?? '').slice(0, 10) || 'sem data'} | ${r.medidas?.passou === true ? 'passou' : r.medidas?.passou === false ? 'reprovou' : 'sem medida'} |${medida} ${r.veredito?.nota ?? 'sem veredito'} | ${r.veredito ? (r.veredito.defeitos ?? []).length : '-'} | ${d ? celula(d.decisao) : 'sem decisão gravada'} |`);
   }
   linhas.push('', comMedida ? 'Faces é o total de faces da malha e segundos o tempo da execução da receita (com o cache por passo quente ou frio, como estava na medição); as rodadas sem o número são anteriores à gravação deles e não foram reescritas.' : 'Faces e tempo da execução: nenhuma rodada os gravou (`medidas.faces` e `medidas.segundos` entram nas rodadas registradas desde 2026-11-27; as anteriores não são reescritas).');
+  const comNota = rodadas.filter((r) => (r.atrito ?? []).length || r.notaDePassagem);
+  if (comNota.length) {
+    linhas.push('', 'Atrito e nota de passagem de cada rodada, condensados (o texto inteiro está na rodada gravada):', '');
+    for (const r of comNota) {
+      const partes = [];
+      if (r.notaDePassagem) partes.push(`nota: ${limite(r.notaDePassagem, 150)}`);
+      if ((r.atrito ?? []).length) partes.push(`atrito: ${r.atrito.slice(0, 2).map((a) => limite(a, 110)).join('; ')}${r.atrito.length > 2 ? ` (e mais ${r.atrito.length - 2})` : ''}`);
+      linhas.push(`- rodada ${r.numero}: ${partes.join(' | ')}`);
+    }
+  }
   const ultima = [...rodadas].reverse().find((r) => r.veredito);
   if (ultima) {
     linhas.push('', `Defeitos da rodada ${ultima.numero}, a última com veredito:`, '');
@@ -274,6 +303,7 @@ function linhasDosPlanos(planos, encerrados, arquivoDoDossie, raiz) {
     if (!p.bancos.length) linhas.push('  - sem banco de provas no território');
     for (const b of p.bancos) {
       linhas.push(`  - banco de provas: [${b.pasta.replace(/\/$/, '').split('/').pop()}](${ref(b.pasta)}); ${b.tabela ? `tabela de tentativas: [${b.tabela.split('/').pop()}](${ref(b.tabela)})` : 'sem tabela de tentativas'}; ${b.atritos ? `atritos: [ATRITOS.md](${ref(b.atritos.arquivo)}), ${b.atritos.itens} item(ns), ${b.atritos.semDestino} sem destino` : 'sem ATRITOS.md'}`);
+      for (const t of b.tentativas) linhas.push(`    - ${limite(t.hipotese, 120)} | ensaio: ${limite(t.ensaio, 120)} | resultado: ${limite(t.resultado, 140)} | destino: ${limite(t.destino, 60)}`);
     }
   }
   if (encerrados.length) {
@@ -281,6 +311,17 @@ function linhasDosPlanos(planos, encerrados, arquivoDoDossie, raiz) {
     for (const e of encerrados) linhas.push(`- \`${e.plano}\`: ${limite(e.resumo, 300)} (commit \`${e.commit}\`)`);
   }
   return linhas;
+}
+
+/* O aceite da pessoa no `ALINHAMENTO.md` da pasta do objeto (ou, para a parte, o da pasta do objeto), lido por `lerAceites` do fluxo do objeto. */
+function linhasDoAceite(pasta, arquivoDoDossie, raiz) {
+  const candidatos = [join(pasta, 'ALINHAMENTO.md'), join(pasta, '..', '..', 'ALINHAMENTO.md')];
+  const arquivo = candidatos.find((c) => existsSync(c));
+  if (!arquivo) return ['Sem `ALINHAMENTO.md` na pasta: o aceite da pessoa ao alinhamento não está gravado.'];
+  const link = `[ALINHAMENTO.md](${relative(dirname(arquivoDoDossie), arquivo).split('\\').join('/')})`;
+  const { alinhamento, rascunho, decisoes } = lerAceites(readFileSync(arquivo, 'utf8'));
+  const dito = (a, quem) => (a ? `${quem}: ${a.origem === 'registrado' ? 'aceite registrado' : 'registro anterior ao formato'}: ${limite(a.texto, 240)}` : `${quem}: sem aceite registrado`);
+  return [`- ${dito(alinhamento, 'alinhamento')} (${link})`, `- ${dito(rascunho, 'rascunho')}`, ...(decisoes.length ? [`- decisões que dependem da pessoa, ainda sem aceite: ${decisoes.length}`] : [])];
 }
 
 /** Os blocos `a-mao` de um texto de dossiê: `{ [id]: texto entre os marcadores }`; o id que perdeu um dos marcadores fica de fora. */
@@ -305,9 +346,9 @@ export function problemasDasSecoes(texto, unidades, rotulo) {
   for (const [id, textos] of Object.entries(secoesRepetidas(texto))) {
     problemas.push(`${rotulo} tem a seção à mão de ${id} ${textos.length} vezes; a regeração guarda só a última e perderia o texto de ${textos.slice(0, -1).map(trecho).join(', ')}; junte as seções numa só, sob um par de marcadores`);
   }
-  const conhecidas = new Set(unidades.map((u) => u.id));
+  const conhecidas = new Set(idsDeSecoes(unidades));
   const orfas = Object.entries(secoesAMao(texto)).filter(([id]) => !conhecidas.has(id));
-  if (orfas.length) problemas.push(`${rotulo} tem seção à mão de ${orfas.map(([id]) => id).join(', ')}, que não é unidade do objeto (${[...conhecidas].join(', ')}), e a regeração a perderia com o texto ${orfas.map(([, t]) => trecho(t)).join(', ')}; leve o texto para a unidade certa ou apague a seção`);
+  if (orfas.length) problemas.push(`${rotulo} tem seção à mão de ${orfas.map(([id]) => id).join(', ')}, que não é unidade do objeto (${unidades.map((u) => u.id).join(', ')}), e a regeração a perderia com o texto ${orfas.map(([, t]) => trecho(t)).join(', ')}; leve o texto para a unidade certa ou apague a seção`);
   return problemas;
 }
 
@@ -327,6 +368,10 @@ export async function montarDossie(objeto, { raiz = REPO, aMao = {}, docs = DOCU
     '',
     `Gerado por \`npm run dossie -- ${objeto}\` do que já está gravado; não edite fora dos marcadores \`a-mao\`, porque \`npm run dossie -- ${objeto} --check\` recusa o arquivo diferente do gerado. A seção entre os marcadores é escrita à mão e o gerador a preserva.`,
     '',
+    '## Aceite da pessoa ao alinhamento',
+    '',
+    ...linhasDoAceite(pasta, arquivo, raiz),
+    '',
     '## Planos que cobrem a pasta',
     '',
     ...linhasDosPlanos(planos, encerrados, arquivo, raiz),
@@ -342,6 +387,7 @@ export async function montarDossie(objeto, { raiz = REPO, aMao = {}, docs = DOCU
     saida.push('', `### Operações${varias ? ` de \`${u.nome}\`` : ''}`, '', ...linhasDasOperacoes(passos, plano));
     saida.push('', `### Rodadas${varias ? ` de \`${u.nome}\`` : ''}`, '', ...linhasDasRodadas(rodadas, decisoes));
     saida.push('', `### Escolhas de técnica, à mão${varias ? ` (\`${u.nome}\`)` : ''}`, '', marcador(u.id, 'inicio'), aMao[u.id] ?? MODELO_A_MAO, marcador(u.id, 'fim'));
+    saida.push('', `### Dívida conhecida, à mão${varias ? ` (\`${u.nome}\`)` : ''}`, '', marcador(idDaDivida(u.id), 'inicio'), aMao[idDaDivida(u.id)] ?? MODELO_DA_DIVIDA, marcador(idDaDivida(u.id), 'fim'));
   }
   return { arquivo, texto: `${saida.join('\n')}\n`, unidades };
 }
@@ -358,7 +404,7 @@ export async function conferirDossie(objeto, { raiz = REPO, docs = DOCUMENTOS } 
   const secoes = secoesAMao(gravado);
   const dasSecoes = problemasDasSecoes(gravado, unidades, relative(raiz, arquivo));
   if (dasSecoes.length) return { problemas: dasSecoes };
-  const faltam = unidades.filter((u) => secoes[u.id] === undefined).map((u) => u.id);
+  const faltam = idsDeSecoes(unidades).filter((id) => secoes[id] === undefined);
   if (faltam.length) return { problemas: [`${relative(raiz, arquivo)} perdeu a seção à mão de ${faltam.join(', ')} (os marcadores \`dossie:a-mao:<unidade>:inicio\` e \`:fim\`); ponha os marcadores de volta com o texto que havia, ou rode \`${comando}\` para recomeçar a seção no modelo, e escreva de novo`] };
   const { texto } = await montarDossie(objeto, { raiz, aMao: secoes, docs });
   return texto === gravado ? { problemas: [] } : { problemas: [`${relative(raiz, arquivo)} está desatualizado em relação às receitas, rodadas, decisões e planos; rode \`${comando}\` (a seção à mão é preservada)`] };
@@ -374,7 +420,7 @@ export async function gerarDossie(objeto, { raiz = REPO, docs = DOCUMENTOS } = {
   const aMao = secoesAMao(antes);
   const { texto, unidades } = await montarDossie(objeto, { raiz, aMao, docs });
   writeFileSync(arquivo, texto);
-  return { arquivo, perdidas: antes === null ? [] : unidades.filter((u) => aMao[u.id] === undefined).map((u) => u.id) };
+  return { arquivo, perdidas: antes === null ? [] : idsDeSecoes(unidades).filter((id) => aMao[id] === undefined) };
 }
 
 /** Os objetos de `procedural/pecas` que já têm `DOSSIE.md`: a pasta do objeto e a de cada `partes/<parte>`, como `<objeto>` e `<objeto>/<parte>`. */
@@ -388,6 +434,47 @@ export function objetosComDossie(raiz = REPO) {
     if (existsSync(dePartes)) for (const p of readdirSync(dePartes).sort()) if (existsSync(join(dePartes, p, ARQUIVO))) achados.push(`${o}/${p}`);
   }
   return achados;
+}
+
+/**
+ * Os arquivos `.md` escritos à mão na pasta de um objeto de `procedural/pecas/`, que o dossiê substitui: tudo o que não é o `DOSSIE.md`, o
+ * `ALINHAMENTO.md` da raiz do objeto (a fonte do aceite da pessoa, que o dossiê lê) nem o que está numa pasta `referencias/` (o que as
+ * referências usam). Cada um sai como `{ arquivo, problema }`, com o caminho relativo à raiz.
+ */
+export function mdsAMaoNaPastaDoObjeto(raiz = REPO) {
+  const base = join(raiz, PASTA_DAS_PECAS);
+  if (!existsSync(base)) return [];
+  const achados = [];
+  const varrer = (dir, objeto, eRaiz) => {
+    for (const e of readdirSync(dir, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : 1))) {
+      if (e.isDirectory()) { if (e.name !== 'referencias' && e.name !== 'node_modules') varrer(join(dir, e.name), objeto, false); continue; }
+      if (!e.name.endsWith('.md') || e.name === ARQUIVO || (eRaiz && e.name === 'ALINHAMENTO.md')) continue;
+      const arquivo = relative(raiz, join(dir, e.name)).split('\\').join('/');
+      achados.push({ arquivo, problema: `${arquivo} é um .md escrito à mão na pasta do objeto; o documento do objeto é o ${ARQUIVO} (npm run dossie -- ${objeto}): ponha a escolha de técnica ou a dívida conhecida nas seções à mão dele, a lição no guia da técnica, e apague o arquivo (ficam só o ALINHAMENTO.md da raiz do objeto, que o dossiê lê, e o que está em referencias/)` });
+    }
+  };
+  for (const o of readdirSync(base, { withFileTypes: true }).filter((e) => e.isDirectory()).map((e) => e.name).sort()) varrer(join(base, o), o, true);
+  return achados;
+}
+
+/**
+ * Os objetos de `procedural/pecas/` que o envio mudou: a pasta de primeiro nível com arquivo mudado (fora o próprio `DOSSIE.md`) desde a base
+ * comum com a main, contando o que ainda não foi gravado. Vazio quando a raiz não é um repositório git ou não há a ref da main (fora do CI a
+ * conferência segue sem eles, como o `territorio:check`).
+ */
+export function objetosMudadosNoEnvio(raiz = REPO, { ref = 'origin/main' } = {}) {
+  const git = (...args) => execFileSync('git', args, { cwd: raiz, encoding: 'utf8', maxBuffer: 256 * 1024 * 1024, stdio: ['ignore', 'pipe', 'ignore'] });
+  try {
+    const base = git('merge-base', `${ref}^{commit}`, 'HEAD').trim();
+    if (!base) return [];
+    const mudados = [...git('diff', '--name-only', '-z', '--no-renames', base, '--', `${PASTA_DAS_PECAS}/`).split('\0'), ...git('ls-files', '--others', '--exclude-standard', '-z', '--', `${PASTA_DAS_PECAS}/`).split('\0')].filter(Boolean);
+    const objetos = new Set();
+    for (const caminho of mudados) {
+      const [, objeto, ...resto] = caminho.split('/').slice(PASTA_DAS_PECAS.split('/').length - 1);
+      if (objeto && resto.length > 0 && resto.join('/') !== ARQUIVO) objetos.add(objeto);
+    }
+    return [...objetos].sort().filter((o) => existsSync(join(raiz, PASTA_DAS_PECAS, o)));
+  } catch { return []; }
 }
 
 export function lerArgumentos(argv) {
@@ -412,13 +499,26 @@ async function executar() {
   if (opcoes.todos && !opcoes.ajuda) {
     const objetos = objetosComDossie(opcoes.raiz);
     const problemas = [];
+    const regravados = [];
+    if (opcoes.check) {
+      problemas.push(...mdsAMaoNaPastaDoObjeto(opcoes.raiz).map((m) => m.problema));
+      /* o objeto que o envio mudou tem o dossiê, em dia: o que já o tem é conferido logo abaixo, e o que não tem é recusado aqui */
+      for (const o of objetosMudadosNoEnvio(opcoes.raiz)) {
+        try { unidadesDoObjeto(o, opcoes.raiz); } catch { continue; }
+        if (!objetos.includes(o)) problemas.push(`${PASTA_DAS_PECAS}/${o}/ mudou neste envio e não tem ${ARQUIVO}; rode \`npm run dossie -- ${o}\` e escreva as seções à mão (escolhas de técnica e dívida conhecida)`);
+      }
+    }
     for (const objeto of objetos) {
       try {
         if (opcoes.check) problemas.push(...(await conferirDossie(objeto, { raiz: opcoes.raiz, docs: opcoes.docs })).problemas);
-        else { const { arquivo, perdidas } = await gerarDossie(objeto, { raiz: opcoes.raiz, docs: opcoes.docs }); console.log(`dossie ok — ${relative(opcoes.raiz, arquivo)} gerado`); if (perdidas.length) console.error(`aviso: ${objeto} não tinha a seção à mão de ${perdidas.join(', ')}; ela recomeçou no modelo`); }
+        else { const { arquivo, perdidas } = await gerarDossie(objeto, { raiz: opcoes.raiz, docs: opcoes.docs }); regravados.push(objeto); console.log(`dossie ok — ${relative(opcoes.raiz, arquivo)} gerado`); if (perdidas.length) console.error(`aviso: ${objeto} não tinha a seção à mão de ${perdidas.join(', ')}; ela recomeçou no modelo`); }
       } catch (erro) { problemas.push(`${objeto}: ${erro.message}`); }
     }
-    if (problemas.length) { console.error(`dossie${opcoes.check ? ':check' : ''} FALHOU — ${problemas.join('; ')}`); process.exitCode = 1; return; }
+    if (problemas.length) {
+      /* a regeração segue objeto a objeto: o que falhou não impede os outros, e quem lê precisa saber exatamente quais foram regravados */
+      const diz = opcoes.check ? '' : `regravados: ${regravados.length ? regravados.join(', ') : 'nenhum'}; não regravados (e por quê): `;
+      console.error(`dossie${opcoes.check ? ':check' : ''} FALHOU — ${diz}${problemas.join('; ')}`); process.exitCode = 1; return;
+    }
     if (opcoes.check) console.log(`dossie:check ok — ${objetos.length} DOSSIE.md em dia`);
     return;
   }

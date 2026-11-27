@@ -226,6 +226,12 @@ export function conferirPlanos({
     ...removidos.filter((r) => !planos.some((p) => p.naRaiz && p.nome === r.nome)),
   ], raiz));
 
+  /* o plano que o envio tirou da raiz e não está em subpasta nenhuma só sai concluído ou cancelado, como `encerrarPlano` exige */
+  for (const r of removidos) {
+    if (planos.some((p) => p.nome.split('/').pop() === r.nome) || r.estado === 'concluído' || r.estado === 'cancelado') continue;
+    problemas.push(`${r.nome}: o envio tirou o plano da raiz de planos/ com o último Estado gravado '${r.estado ?? 'ausente'}'; só sai plano concluído ou cancelado (npm run planos:encerrar), ou mova-o para uma subpasta`);
+  }
+
   const ativos = planos.filter((plano) => plano.estado === 'ativo');
   const comuns = ativos.filter((p) => p.nucleo !== true);
   if (comuns.length > MAXIMO_DE_ATIVOS) {
@@ -409,11 +415,14 @@ export function trocarLinksDoPlano(texto, arquivo, plano, cronica) {
   });
 }
 
-/* Regera todo `DOSSIE.md` de objeto na raiz (`tools/modelar/dossie-do-objeto.mjs --todos`): o texto que ele imprime, ou a falha dita. */
+/* Regera todo `DOSSIE.md` de objeto na raiz (`tools/modelar/dossie-do-objeto.mjs --todos`): `{ texto, falhou }`, o texto que ele imprime ou,
+   na falha, o que ele disse: a regeração segue objeto a objeto, e a mensagem de falha lista os dossiês regravados e os que não. */
 function regerarDossies(raiz) {
   try {
-    return execFileSync(process.execPath, [join(RAIZ, 'tools/modelar/dossie-do-objeto.mjs'), '--todos', `--raiz=${raiz}`], { cwd: raiz, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
-  } catch (erro) { return `os dossiês não foram regerados (${String(erro.stderr || erro.message).trim()}); rode npm run dossie -- --todos`; }
+    return { texto: execFileSync(process.execPath, [join(RAIZ, 'tools/modelar/dossie-do-objeto.mjs'), '--todos', `--raiz=${raiz}`], { cwd: raiz, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim(), falhou: false };
+  } catch (erro) {
+    return { texto: `a regeração dos dossiês falhou (${String(erro.stderr || erro.message).trim()}); o plano já saiu e a crônica já tem a linha: conserte o que ela diz e rode npm run dossie -- --todos`, falhou: true };
+  }
 }
 
 export function encerrarPlano(nome, linha, { raiz = RAIZ } = {}) {
@@ -440,8 +449,8 @@ export function encerrarPlano(nome, linha, { raiz = RAIZ } = {}) {
   }
   git('rm', '-q', '--', plano);
   /* o DOSSIE.md de objeto lista os planos que cobrem a pasta dele: sem o plano que saiu, ele regera da crônica e dos planos que ficam */
-  const regerados = regerarDossies(raiz);
-  return { commit, trocados, regerados };
+  const { texto: regerados, falhou: dossiesFalharam } = regerarDossies(raiz);
+  return { commit, trocados, regerados, dossiesFalharam };
 }
 
 function executar() {
@@ -449,8 +458,9 @@ function executar() {
   if (iEncerrar >= 0) {
     const iLinha = process.argv.indexOf('--linha');
     try {
-      const { commit, trocados, regerados } = encerrarPlano(process.argv[iEncerrar + 1], iLinha >= 0 ? process.argv[iLinha + 1] : '');
-      console.log(`planos:encerrar ok — texto no commit ${commit}, ${trocados} documento(s) com link trocado; tire o plano da lista de ativos do índice se ele estava lá, e rode npm run planos:gerar e npm run mapa${regerados ? `; ${regerados}` : ''}`);
+      const { commit, trocados, regerados, dossiesFalharam } = encerrarPlano(process.argv[iEncerrar + 1], iLinha >= 0 ? process.argv[iLinha + 1] : '');
+      if (dossiesFalharam) process.exitCode = 1;
+      console[dossiesFalharam ? 'error' : 'log'](`planos:encerrar ${dossiesFalharam ? 'ENCERROU COM FALHA NOS DOSSIÊS' : 'ok'} — texto no commit ${commit}, ${trocados} documento(s) com link trocado; tire o plano da lista de ativos do índice se ele estava lá, e rode npm run planos:gerar e npm run mapa${regerados ? `; ${regerados}` : ''}`);
     } catch (erro) { console.error(`planos:encerrar FALHOU — ${erro.message}`); process.exitCode = 1; }
     return;
   }

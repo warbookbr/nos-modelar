@@ -148,7 +148,6 @@ Lista gerada na hora: familias.
 
 Abrir só quando a condição aparecer:
 
-- `docs/modelar/usar/GUIA-AUTORIA-IA.md`, quando for preciso ver a anatomia inteira da receita ou a esteira de validação.
 - `docs/modelar/usar/LACO-VISUAL.md`, quando for olhar a imagem, sobrepor ao alvo ou medir onde o método diagnóstico para.
 - `docs/modelar/usar/AUTORIA-DE-PECA.md`, quando a dúvida for o contrato da receita, a identidade, a seleção ou o que separa peça de montagem.
 - `docs/modelar/usar/AUTORIA-RECEITA-DECLARATIVA.md`, quando a receita for escrita como dado JSON, pela autoria por MCP.
@@ -156,7 +155,7 @@ Abrir só quando a condição aparecer:
 - `docs/modelar/usar/GOTCHAS-AUTORIA-VISUAL.md`, quando for gerar forma pela primeira vez ou um defeito visual se repetir.
 - `docs/modelar/usar/REFERENCIA-E-CRITICA-VISUAL.md`, quando for montar o pacote do crítico ou parear referência e render.
 - `docs/modelar/usar/GOTCHAS-POR-OPERACAO.md`, quando uma operação se comportar diferente do esperado e for preciso o caso medido dela.
-- `docs/modelar/usar/FLUXO-DO-OBJETO.md`, quando o objeto tiver várias partes, da imagem à montagem.
+- `docs/modelar/usar/FLUXO-DO-OBJETO.md`, quando o objeto tiver várias partes, da imagem à montagem, ou for preciso ver a anatomia inteira da receita, a esteira de validação ou o pacote de modelagem.
 - `docs/modelar/usar/RODADA-DE-ALINHAMENTO-EXEMPLO.md`, quando a peça for nova e precisar da rodada de alinhamento antes do PLANO.
 - `.claude/skills/criar-peca/references/operacoes-procedurais.md`, quando for escolher uma operação.
 - `docs/modelar/usar/METODO-DIAGNOSTICO-E-SEU-LIMITE.md`, quando os achados encolhem e a qualidade não sobe.
@@ -191,7 +190,7 @@ Ler antes de começar, num orçamento de 26.500 bytes (linha de base de 62.482 b
 
 - `CLAUDE.md`
 - `.claude/skills/criar-peca/SKILL.md`
-- `docs/modelar/usar/GUIA-AUTORIA-IA.md#2-anatomia-canônica-de-uma-receita-procedural`
+- `docs/modelar/usar/FLUXO-DO-OBJETO.md#anatomia-canônica-de-uma-receita-procedural`
 - `docs/modelar/usar/LACO-VISUAL.md#3-despachar-o-crítico-sem-contexto`
 - `.claude/skills/alinhar-modelagem/SKILL.md`, a skill que o passo seguinte manda aplicar
 
@@ -199,7 +198,6 @@ Lista gerada na hora: operacoes.
 
 Abrir só quando a condição aparecer:
 
-- `docs/modelar/usar/GUIA-AUTORIA-IA.md`, quando for preciso ver a anatomia inteira da receita ou a esteira de validação.
 - `docs/modelar/usar/LACO-VISUAL.md`, quando for olhar a imagem, sobrepor ao alvo ou medir onde o método diagnóstico para.
 - `docs/modelar/usar/AUTORIA-DE-PECA.md`, quando a dúvida for o contrato da receita, a identidade, a seleção ou o que separa peça de montagem.
 - `docs/modelar/usar/AUTORIA-RECEITA-DECLARATIVA.md`, quando a receita for escrita como dado JSON, pela autoria por MCP.
@@ -207,7 +205,7 @@ Abrir só quando a condição aparecer:
 - `docs/modelar/usar/GOTCHAS-AUTORIA-VISUAL.md`, quando for gerar forma pela primeira vez ou um defeito visual se repetir.
 - `docs/modelar/usar/REFERENCIA-E-CRITICA-VISUAL.md`, quando for montar o pacote do crítico ou parear referência e render.
 - `docs/modelar/usar/GOTCHAS-POR-OPERACAO.md`, quando uma operação se comportar diferente do esperado e for preciso o caso medido dela.
-- `docs/modelar/usar/FLUXO-DO-OBJETO.md`, quando o objeto tiver várias partes, da imagem à montagem.
+- `docs/modelar/usar/FLUXO-DO-OBJETO.md`, quando o objeto tiver várias partes, da imagem à montagem, ou for preciso ver a anatomia inteira da receita, a esteira de validação ou o pacote de modelagem.
 - `docs/modelar/usar/RODADA-DE-ALINHAMENTO-EXEMPLO.md`, quando a peça for nova e precisar da rodada de alinhamento antes do PLANO.
 - `.claude/skills/criar-peca/references/operacoes-procedurais.md`, quando for escolher uma operação.
 - `docs/modelar/usar/METODO-DIAGNOSTICO-E-SEU-LIMITE.md`, quando os achados encolhem e a qualidade não sobe.
@@ -242,14 +240,13 @@ Ler antes de começar, num orçamento de 15.000 bytes (linha de base de 62.482 b
 
 - `CLAUDE.md`
 - `.claude/skills/criar-peca/SKILL.md`
-- `docs/modelar/usar/GUIA-AUTORIA-IA.md#4-esteira-canônica-de-validação-local`
+- `docs/modelar/usar/FLUXO-DO-OBJETO.md#esteira-canônica-de-validação-local`
 - `docs/modelar/usar/LACO-VISUAL.md#3-despachar-o-crítico-sem-contexto`
 
 Lista gerada na hora: pecas.
 
 Abrir só quando a condição aparecer:
 
-- `docs/modelar/usar/GUIA-AUTORIA-IA.md`, quando for preciso ver a anatomia inteira da receita ou a esteira de validação.
 - `docs/modelar/usar/LACO-VISUAL.md`, quando for olhar a imagem, sobrepor ao alvo ou medir onde o método diagnóstico para.
 - `docs/modelar/usar/AUTORIA-DE-PECA.md`, quando a dúvida for o contrato da receita, a identidade, a seleção ou o que separa peça de montagem.
 - `docs/modelar/usar/AUTORIA-RECEITA-DECLARATIVA.md`, quando a receita for escrita como dado JSON, pela autoria por MCP.
@@ -257,7 +254,7 @@ Abrir só quando a condição aparecer:
 - `docs/modelar/usar/GOTCHAS-AUTORIA-VISUAL.md`, quando for gerar forma pela primeira vez ou um defeito visual se repetir.
 - `docs/modelar/usar/REFERENCIA-E-CRITICA-VISUAL.md`, quando for montar o pacote do crítico ou parear referência e render.
 - `docs/modelar/usar/GOTCHAS-POR-OPERACAO.md`, quando uma operação se comportar diferente do esperado e for preciso o caso medido dela.
-- `docs/modelar/usar/FLUXO-DO-OBJETO.md`, quando o objeto tiver várias partes, da imagem à montagem.
+- `docs/modelar/usar/FLUXO-DO-OBJETO.md`, quando o objeto tiver várias partes, da imagem à montagem, ou for preciso ver a anatomia inteira da receita, a esteira de validação ou o pacote de modelagem.
 - `docs/modelar/usar/RODADA-DE-ALINHAMENTO-EXEMPLO.md`, quando a peça for nova e precisar da rodada de alinhamento antes do PLANO.
 - `.claude/skills/criar-peca/references/operacoes-procedurais.md`, quando for escolher uma operação.
 - `docs/modelar/usar/METODO-DIAGNOSTICO-E-SEU-LIMITE.md`, quando os achados encolhem e a qualidade não sobe.

@@ -6,10 +6,11 @@ import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { bancosDeProvasDe, ehPlanoDeModelagem, problemasDeTentativas, tabelaDeTentativasEm, temTabelaDeTentativas } from './tentativas-dos-planos.mjs';
+import { LINHA_DE_EXEMPLO, bancosDeProvasDe, ehPlanoDeModelagem, problemasDeTentativas, tabelaDeTentativasEm, temTabelaDeTentativas } from './tentativas-dos-planos.mjs';
 import { conferirPlanos, encerrarPlano } from './planos.mjs';
 import { conferirDossie, gerarDossie } from '../modelar/dossie-do-objeto.mjs';
 
+const AQUI_DOS_DOCS = join(dirname(fileURLToPath(import.meta.url)), '..', '..');
 const DOSS = ['DOSSIE', 'md'].join('.');
 const temporarias = [];
 afterEach(() => { while (temporarias.length) rmSync(temporarias.pop(), { recursive: true, force: true }); });
@@ -133,6 +134,12 @@ describe('o que é tabela de tentativas', () => {
     expect(temTabelaDeTentativas(`${CAB}\n| --- | --- | --- | --- |\n`)).toBe(false);
     expect(temTabelaDeTentativas(`${CAB}\n| --- | --- | --- | --- |\n|  |  |  |  |\n`)).toBe(false);
   });
+  it('a linha de exemplo literal do modelo, copiada sem as cercas, não conta, e a linha de exemplo é a que o modelo traz', () => {
+    const modelo = readFileSync(join(AQUI_DOS_DOCS, BANCO, 'MODELO-DE-TENTATIVAS.md'), 'utf8');
+    expect(modelo).toContain(`| ${LINHA_DE_EXEMPLO.join(' | ')} |`);
+    expect(temTabelaDeTentativas(`${CAB}\n| --- | --- | --- | --- |\n| ${LINHA_DE_EXEMPLO.join(' | ')} |\n`)).toBe(false);
+    expect(temTabelaDeTentativas(`${CAB}\n| --- | --- | --- | --- |\n| ${LINHA_DE_EXEMPLO.join(' | ')} |\n| a | b | 1 mm | ficou |\n`)).toBe(true);
+  });
   it('a tabela dentro de bloco de código (o próprio modelo) não conta', () => {
     expect(temTabelaDeTentativas(`\`\`\`\n${CAB}\n| --- | --- | --- | --- |\n| a | b | c | d |\n\`\`\`\n`)).toBe(false);
     expect(temTabelaDeTentativas(`\`\`\`\ncódigo\n\`\`\`\n${TABELA}`)).toBe(true);
@@ -201,5 +208,34 @@ describe('o plano que sai da raiz no envio', () => {
     expect(readFileSync(dossie, 'utf8')).toContain('`2026-11-27-a.md`: a objeto-de-prova ficou');
     expect(readFileSync(dossie, 'utf8')).not.toContain('planos/2026-11-27-a.md)');
     expect((await conferirDossie('objeto-de-prova', { raiz: r })).problemas).toEqual([]);
+  });
+
+  it('o plano tirado da raiz no envio com o último Estado ativo (nem concluído nem cancelado) é recusado, e o movido para subpasta não', () => {
+    const emJogo = (estado) => concluido('`tools/b.mjs`').replace('concluído', estado);
+    const r = base({ [`${PLANOS}/2026-11-27-a.md`]: emJogo('ativo'), [`${PLANOS}/2026-11-27-b.md`]: emJogo('cancelado'), [`${PLANOS}/2026-11-27-c.md`]: emJogo('concluído') });
+    git(r, 'rm', '-q', '--', `${PLANOS}/2026-11-27-a.md`);
+    mkdirSync(join(r, PLANOS, 'arquivo'), { recursive: true });
+    git(r, 'mv', `${PLANOS}/2026-11-27-b.md`, `${PLANOS}/arquivo/2026-11-27-b.md`);
+    git(r, 'rm', '-q', '--', `${PLANOS}/2026-11-27-c.md`);
+    git(r, 'commit', '-qm', 'tira');
+    const p = conferirPlanos({ pasta: join(r, PLANOS), raiz: r }).problemas.join('\n');
+    expect(p).toMatch(/2026-11-27-a\.md: o envio tirou o plano da raiz de planos\/ com o último Estado gravado 'ativo'/);
+    expect(p).not.toContain('2026-11-27-b.md: o envio tirou');
+    expect(p).not.toContain('2026-11-27-c.md: o envio tirou');
+  });
+
+  it('encerrarPlano com um dossiê que falha diz quais foram regravados e quais não, e não se declara sucesso', async () => {
+    const r = raiz({ [`${BANCO}/x/README.md`]: TABELA, [`${PLANOS}/README.md`]: '**Planos ativos:** nenhum.\n', [CRONICA]: '# C\n\n- `x.md`: y. O texto está no commit `abc`, em `x`.\n', [`${PLANOS}/2026-11-27-a.md`]: concluido(`\`procedural/pecas/oa/\`, \`procedural/pecas/ob/\`, \`${BANCO}/x/\``) });
+    for (const o of ['oa', 'ob']) { cpSync(join(AQUI, '../fixtures/dossie/procedural/pecas/objeto-de-prova/receita.js'), join(r, `procedural/pecas/${o}/receita.js`)); await gerarDossie(o, { raiz: r }); }
+    const duplo = join(r, 'procedural', 'pecas', 'ob', DOSS);
+    const t = readFileSync(duplo, 'utf8');
+    const secao = t.match(/<!-- dossie:a-mao:peca:inicio -->[\s\S]*?<!-- dossie:a-mao:peca:fim -->/)[0];
+    writeFileSync(duplo, `${t}\n${secao}\n`);
+    git(r, 'init', '-q'); git(r, 'add', '.'); git(r, 'commit', '-qm', 'plano fechado');
+    const { regerados, dossiesFalharam } = encerrarPlano('2026-11-27-a.md', 'oa ficou', { raiz: r });
+    expect(dossiesFalharam).toBe(true);
+    expect(regerados).toMatch(/regravados: oa; não regravados \(e por quê\): ob:/);
+    expect(regerados).not.toMatch(/não foram regerados/);
+    expect(readFileSync(join(r, 'procedural', 'pecas', 'oa', DOSS), 'utf8')).toContain('`2026-11-27-a.md`: oa ficou');
   });
 });

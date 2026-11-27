@@ -48,8 +48,7 @@ entra no arquivo `limite.json` da pasta de rodadas da peça, com `por` no format
 palavras dela"` e `motivo`: `"limite"` é um inteiro maior que 6 ou `"sem"` (sem
 limite), e `"convergenciaDesde"` é o número do registro a partir do qual a
 convergência volta a contar depois de uma parada sem convergência, no máximo o
-do próximo registro a gravar. A ação que segue por essa decisão diz isso no
-motivo, com o `por`.
+do próximo registro a gravar.
 
 Depois de mudar silhueta, encontro, corte, união ou arredondamento, e antes de dar por pronto, faça o passo de
 [`PARE-E-ANALISE.md`](../../../docs/modelar/usar/PARE-E-ANALISE.md) (`npm run bancada -- <peça> --analise`) e abra as imagens.
@@ -63,14 +62,15 @@ só quando ela pede explicitamente que se grave:
 node tools/modelar/rodada-de-modelagem.mjs <peça> --decisao-da-pessoa "<quem decidiu>, <AAAA-MM-DD>: <as palavras dela>" --rodada <n>
 ```
 
-O comando grava no arquivo `decisoes-da-pessoa.json` da pasta de rodadas da peça, sem mexer no registro da rodada, e o `--acao`
-passa a listar a decisão de cada rodada. A data é a do dia em que ela decidiu, e `--substituir` troca uma decisão já gravada
+O comando grava em `decisoes-da-pessoa.json`, ao lado das rodadas, sem mexer no registro, e o `--acao` lista a decisão de cada uma. A data é a do dia em que ela decidiu, e `--substituir` troca uma decisão já gravada
 quando ela a muda. Nenhum agente grava por conta própria, nem resume, traduz ou completa o que ela disse: sem o pedido dela e
 sem as palavras dela, a rodada fica sem decisão gravada.
 
+Ao encerrar o objeto, gere o dossiê (`npm run dossie -- <objeto>`) e escreva nele as escolhas de técnica e a dívida conhecida.
+
 ## Quando ler os arquivos de apoio
 
-O corpo cobre a rodada comum de uma peça. Cada caso abaixo tem um arquivo nesta pasta, e a regra dele só está lá.
+Cada caso abaixo tem um arquivo nesta pasta, e a regra dele só está lá.
 
 - [`processo-leve.md`](processo-leve.md): leia antes de começar quando o objeto for um perfil de uma família existente ou
   uma família nova de caixa com frente, porque nesse caso o laço por unidade não se usa.

@@ -72,12 +72,17 @@ const normalizar = (s) => s.replace(/[*_`]/g, '').replace(/\s+/g, ' ').trim().to
 const celulas = (linha) => linha.trim().replace(/^\||\|$/g, '').split('|').map((c) => c.trim());
 const ehSeparador = (linha) => celulas(linha).every((c) => /^:?-{1,}:?$/.test(c));
 
+/* A linha de exemplo do modelo, copiada sem as cercas, é o modelo e não uma tentativa. */
+export const LINHA_DE_EXEMPLO = ['o que se achou ser a causa', 'o que se mudou ou mediu, com o comando', 'o número ou a imagem que saiu', 'ficou, ficou (parcial) ou descartada'];
+const ehLinhaDeExemplo = (linha) => { const c = celulas(linha).map(normalizar); return LINHA_DE_EXEMPLO.every((e, k) => c[k] === normalizar(e)); };
+
 /**
- * Se o texto tem, fora de bloco de código, uma linha de cabeçalho de tabela com as quatro colunas, em ordem, seguida de ao menos uma
- * linha de dados (o cabeçalho sozinho, ou com o separador e células vazias, é só o modelo copiado).
+ * As linhas de dados da tabela de tentativas do texto: `[{ hipotese, ensaio, resultado, destino }]`, as da tabela com o cabeçalho das quatro
+ * colunas em ordem, fora de bloco de código. O separador, a linha de células vazias e a linha de exemplo literal do modelo não são tentativa.
  */
-export function temTabelaDeTentativas(texto) {
+export function linhasDeTentativas(texto) {
   let dentro = false;
+  const achadas = [];
   const linhas = texto.split('\n');
   for (let i = 0; i < linhas.length; i += 1) {
     const linha = linhas[i];
@@ -86,11 +91,19 @@ export function temTabelaDeTentativas(texto) {
     const colunas = celulas(linha).map(normalizar);
     if (colunas.length < COLUNAS.length || !COLUNAS.every((c, k) => colunas[k] === c)) continue;
     for (let j = i + 1; j < linhas.length && linhas[j].trim().startsWith('|'); j += 1) {
-      if (!ehSeparador(linhas[j]) && celulas(linhas[j]).some((c) => c !== '')) return true;
+      if (ehSeparador(linhas[j]) || ehLinhaDeExemplo(linhas[j]) || celulas(linhas[j]).every((c) => c === '')) continue;
+      const [hipotese, ensaio, resultado, destino] = celulas(linhas[j]);
+      achadas.push({ hipotese, ensaio, resultado, destino });
     }
   }
-  return false;
+  return achadas;
 }
+
+/**
+ * Se o texto tem, fora de bloco de código, uma linha de cabeçalho de tabela com as quatro colunas, em ordem, seguida de ao menos uma
+ * linha de dados (o cabeçalho sozinho, ou com o separador e células vazias, ou com a linha de exemplo literal do modelo, é só o modelo copiado).
+ */
+export const temTabelaDeTentativas = (texto) => linhasDeTentativas(texto).length > 0;
 
 function arquivosMd(dir, achados = []) {
   for (const e of readdirSync(dir, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : 1))) {

@@ -126,7 +126,7 @@ O laço visual (olhar o PNG, sobrepor ao alvo, despachar o crítico cego) mora e
 
 O que ler antes e o que abrir sob demanda está no roteiro
 `modelar/peca` (`npm run comecar -- modelar/peca`), com
-[`GUIA-AUTORIA-IA.md`](../../../docs/modelar/usar/GUIA-AUTORIA-IA.md) (a anatomia
+[`FLUXO-DO-OBJETO.md`](../../../docs/modelar/usar/FLUXO-DO-OBJETO.md) (a anatomia
 da receita e a esteira de comandos) e
 [`GOTCHAS-AUTORIA-VISUAL.md`](../../../docs/modelar/usar/GOTCHAS-AUTORIA-VISUAL.md)
 (o que já falhou ao gerar forma),

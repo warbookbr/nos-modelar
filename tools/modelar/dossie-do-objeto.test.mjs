@@ -1,11 +1,12 @@
 /* dossie-do-objeto.test.mjs — o dossiê gerado é o esperado, e a conferência recusa o desatualizado e o que perdeu a seção à mão. */
 import { afterEach, describe, expect, it } from 'vitest';
-import { appendFileSync, cpSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { appendFileSync, cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { spawnSync } from 'node:child_process';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { conferirDossie, gerarDossie, lerArgumentos, montarDossie, objetosComDossie, operacoesPorParte, secoesAMao, secoesRepetidas, unidadesDoObjeto } from './dossie-do-objeto.mjs';
+import { conferirDossie, gerarDossie, lerArgumentos, mdsAMaoNaPastaDoObjeto, montarDossie, objetosComDossie, objetosMudadosNoEnvio, operacoesPorParte, secoesAMao, secoesRepetidas, unidadesDoObjeto } from './dossie-do-objeto.mjs';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const FIXTURE = join(AQUI, '../fixtures/dossie');
@@ -19,6 +20,8 @@ function copia() {
   return pasta;
 }
 const DOCS = 'documentos/modelar';
+/* a extensão entra por interpolação: o gate de links lê caminho de documento escrito inteiro como link */
+const MD = 'md';
 const dossieDe = (raiz, objeto) => join(raiz, 'procedural/pecas', objeto, 'DOSSIE.md');
 
 describe('as operações de cada parte', () => {
@@ -176,6 +179,105 @@ describe('a seção à mão que a regeração destruiria', () => {
     expect((await conferirDossie('objeto-de-prova', { raiz, docs: DOCS })).problemas[0]).toMatch(/seção à mão de fantasma, que não é unidade do objeto/);
     await expect(gerarDossie('objeto-de-prova', { raiz, docs: DOCS })).rejects.toThrow(/nada foi regravado/);
     expect(readFileSync(arquivo, 'utf8')).toBe(antes);
+  });
+});
+
+describe('o único documento do objeto', () => {
+  it('condensa o atrito e a nota de passagem das rodadas, as linhas da tabela de tentativas e o aceite do alinhamento', async () => {
+    const { texto } = await montarDossie('objeto-de-prova', { raiz: FIXTURE, docs: DOCS });
+    expect(texto).toContain('- rodada 1: nota: a tampa segue grossa; a caixa confere e não precisa mudar | atrito: a espessura da tampa só apareceu na vista lateral, depois de duas execuções');
+    expect(texto).not.toContain('- rodada 2: nota');
+    expect(texto).toContain('    - a tampa é grossa demais | ensaio: espessura de 4 para 2 mm | resultado: pior: empena | destino: descartada');
+    expect(texto).toContain('    - a tampa é fina demais | ensaio: espessura de 2 para 4 mm | resultado: sem empeno | destino: ficou');
+    expect(texto).toContain('- alinhamento: aceite registrado: aceito pela pessoa em 2026-11-19, "a caixa é essa". ([ALINHAMENTO.md](ALINHAMENTO.md))');
+    expect((await montarDossie('objeto-com-partes', { raiz: FIXTURE, docs: DOCS })).texto).toContain('Sem `ALINHAMENTO.md` na pasta');
+  });
+  it('condensa o atrito comprido: dois itens de no máximo 110 caracteres e a conta dos outros', async () => {
+    const raiz = copia();
+    const arquivo = join(raiz, 'procedural/pecas/objeto-de-prova/rodadas/rodada-01.json');
+    const rodada = JSON.parse(readFileSync(arquivo, 'utf8'));
+    rodada.atrito = ['a'.repeat(300), 'b'.repeat(300), 'c', 'd'];
+    writeFileSync(arquivo, JSON.stringify(rodada));
+    const { texto } = await montarDossie('objeto-de-prova', { raiz, docs: DOCS });
+    const linha = texto.split('\n').find((l) => l.startsWith('- rodada 1: nota'));
+    expect(linha).toContain(`atrito: ${'a'.repeat(109)}…; ${'b'.repeat(109)}… (e mais 2)`);
+  });
+  it('a seção da dívida conhecida é fixa, à mão e preservada; o dossiê que a perdeu é recusado dizendo qual', async () => {
+    const raiz = copia();
+    expect(secoesAMao(readFileSync(dossieDe(raiz, 'objeto-de-prova'), 'utf8'))['peca.divida']).toContain('tampa de 4 mm: a pessoa aceitou');
+    await gerarDossie('objeto-de-prova', { raiz, docs: DOCS });
+    expect(secoesAMao(readFileSync(dossieDe(raiz, 'objeto-de-prova'), 'utf8'))['peca.divida']).toContain('tampa de 4 mm: a pessoa aceitou');
+    const arquivo = dossieDe(raiz, 'objeto-de-prova');
+    writeFileSync(arquivo, readFileSync(arquivo, 'utf8').replace(/<!-- dossie:a-mao:peca\.divida:inicio -->\n[\s\S]*?\n<!-- dossie:a-mao:peca\.divida:fim -->/, ''));
+    expect((await conferirDossie('objeto-de-prova', { raiz, docs: DOCS })).problemas[0]).toMatch(/perdeu a seção à mão de peca\.divida/);
+    expect(Object.keys(secoesAMao(readFileSync(dossieDe(raiz, 'objeto-com-partes'), 'utf8')))).toEqual(['base', 'base.divida', 'tampa', 'tampa.divida']);
+  });
+  it('recusa o .md escrito à mão na pasta do objeto, e deixa o DOSSIE.md, o ALINHAMENTO.md da raiz e o que está em referencias/', () => {
+    const raiz = copia();
+    expect(mdsAMaoNaPastaDoObjeto(raiz)).toEqual([]);
+    const pasta = join(raiz, 'procedural/pecas/objeto-com-partes');
+    mkdirSync(join(pasta, 'referencias'), { recursive: true });
+    mkdirSync(join(pasta, 'partes/base/rodadas'), { recursive: true });
+    writeFileSync(join(pasta, `referencias/alvo.${MD}`), '# alvo');
+    writeFileSync(join(pasta, `ALINHAMENTO.${MD}`), '# alinhamento');
+    writeFileSync(join(pasta, `GUIA-DA-CARROCERIA.${MD}`), '# guia à mão');
+    writeFileSync(join(pasta, `partes/base/ALINHAMENTO.${MD}`), '# na parte');
+    writeFileSync(join(pasta, `partes/base/rodadas/NOTAS.${MD}`), '# notas');
+    const achados = mdsAMaoNaPastaDoObjeto(raiz).map((m) => m.arquivo);
+    const base = 'procedural/pecas/objeto-com-partes';
+    expect(achados).toEqual([`${base}/GUIA-DA-CARROCERIA.${MD}`, `${base}/partes/base/ALINHAMENTO.${MD}`, `${base}/partes/base/rodadas/NOTAS.${MD}`]);
+    expect(mdsAMaoNaPastaDoObjeto(raiz)[0].problema).toMatch(/é um \.md escrito à mão na pasta do objeto; o documento do objeto é o DOSSIE\.md \(npm run dossie -- objeto-com-partes\)/);
+    const r = spawnSync(process.execPath, [join(AQUI, 'dossie-do-objeto.mjs'), '--todos', '--check', `--raiz=${raiz}`, `--docs=${DOCS}`], { encoding: 'utf8' });
+    expect(r.status).toBe(1);
+    expect(r.stderr).toMatch(/GUIA-DA-CARROCERIA\.md é um \.md escrito à mão/);
+  });
+});
+
+describe('o objeto que o envio mudou', () => {
+  const git = (r, ...a) => execFileSync('git', ['-c', 'user.email=t@t', '-c', 'user.name=t', ...a], { cwd: r, encoding: 'utf8' });
+  const gravar = (raiz, nome, texto) => { mkdirSync(join(raiz, nome, '..'), { recursive: true }); writeFileSync(join(raiz, nome), texto); };
+  const repositorio = () => {
+    const raiz = copia();
+    git(raiz, 'init', '-q'); git(raiz, 'add', '.'); git(raiz, 'commit', '-qm', 'base'); git(raiz, 'update-ref', 'refs/remotes/origin/main', 'HEAD');
+    return raiz;
+  };
+  const rodar = (raiz) => spawnSync(process.execPath, [join(AQUI, 'dossie-do-objeto.mjs'), '--todos', '--check', `--raiz=${raiz}`, `--docs=${DOCS}`], { encoding: 'utf8' });
+
+  it('lista o objeto com arquivo mudado, gravado ou não, e não o que só mudou o DOSSIE.md; sem a ref da main, nenhum', () => {
+    const raiz = repositorio();
+    expect(objetosMudadosNoEnvio(raiz)).toEqual([]);
+    writeFileSync(dossieDe(raiz, 'objeto-com-partes'), `${readFileSync(dossieDe(raiz, 'objeto-com-partes'), 'utf8')}\n`);
+    expect(objetosMudadosNoEnvio(raiz)).toEqual([]);
+    appendFileSync(join(raiz, 'procedural/pecas/objeto-de-prova/receita.js'), '\n// mudou\n');
+    gravar(raiz, 'procedural/pecas/novo-objeto/receita.js', 'export default {};\n');
+    expect(objetosMudadosNoEnvio(raiz)).toEqual(['novo-objeto', 'objeto-de-prova']);
+    git(raiz, 'update-ref', '-d', 'refs/remotes/origin/main');
+    expect(objetosMudadosNoEnvio(raiz)).toEqual([]);
+  });
+  it('o gate recusa o objeto mudado sem DOSSIE.md e o mudado com o dossiê desatualizado, e passa o que está em dia', () => {
+    const raiz = repositorio();
+    expect(rodar(raiz).status).toBe(0);
+    gravar(raiz, 'procedural/pecas/novo-objeto/receita.js', readFileSync(join(raiz, 'procedural/pecas/objeto-de-prova/receita.js'), 'utf8'));
+    const semDossie = rodar(raiz);
+    expect(semDossie.status).toBe(1);
+    expect(semDossie.stderr).toMatch(/procedural\/pecas\/novo-objeto\/ mudou neste envio e não tem DOSSIE\.md; rode `npm run dossie -- novo-objeto`/);
+    execFileSync(process.execPath, [join(AQUI, 'dossie-do-objeto.mjs'), 'novo-objeto', `--raiz=${raiz}`, `--docs=${DOCS}`]);
+    expect(rodar(raiz).status).toBe(0);
+    appendFileSync(join(raiz, 'procedural/pecas/objeto-de-prova/receita.js'), '\n// mudou\n');
+    writeFileSync(join(raiz, 'procedural/pecas/objeto-de-prova/receita.js'), readFileSync(join(raiz, 'procedural/pecas/objeto-de-prova/receita.js'), 'utf8').replace('milimetros: 200', 'milimetros: 250'));
+    expect(rodar(raiz).stderr).toMatch(/objeto-de-prova\/DOSSIE\.md está desatualizado/);
+  });
+});
+
+describe('a falha de um dossiê em --todos', () => {
+  it('diz quais foram regravados e quais não, sem dizer que nada foi regravado', () => {
+    const raiz = copia();
+    const arquivo = dossieDe(raiz, 'objeto-de-prova');
+    appendFileSync(arquivo, '\n<!-- dossie:a-mao:peca:inicio -->\noutra\n<!-- dossie:a-mao:peca:fim -->\n');
+    const r = spawnSync(process.execPath, [join(AQUI, 'dossie-do-objeto.mjs'), '--todos', `--raiz=${raiz}`, `--docs=${DOCS}`], { encoding: 'utf8' });
+    expect(r.status).toBe(1);
+    expect(r.stdout).toMatch(/dossie ok — .*objeto-com-partes\/DOSSIE\.md gerado/);
+    expect(r.stderr).toMatch(/dossie FALHOU — regravados: objeto-com-partes; não regravados \(e por quê\): objeto-de-prova: /);
   });
 });
 

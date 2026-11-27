@@ -14,6 +14,10 @@ Quem conduz cita este arquivo no pedido, em vez de copiar a lista. Valem para to
 10. Nenhuma imagem de terceiro, marca, nome de fabricante ou dado pessoal entra no repositório.
 11. O relatório final é curto: o que foi feito, os números medidos com o comando, o hash do último commit, o que ficou de fora e cada atrito, com o comando que o reproduz.
 
+## A medida usada como prova
+
+12. Toda medida de qualidade nova, ou usada como prova de que uma forma está certa, traz um teste com defeito plantado que ela acusa, e mede também fora dos pontos que a operação fixa (uma medida só nos pontos que a própria operação ajusta confirma a operação, e não a forma). Ao investigar um defeito, faça primeiro o ensaio de controle: a mesma medida sobre uma forma sabidamente certa e sobre uma sabidamente errada, para saber se a medida enxerga o defeito antes de confiar no número que ela deu.
+
 ## O atrito, no relatório e no diário do objeto
 
 Um atrito é o que custou tempo ou causou erro e que a ferramenta, o gate ou a instrução podia ter evitado. O agente o relata; quem conduz o reproduz e o grava no `ATRITOS.md` da pasta do objeto no banco de provas. Desde 2026-11-13 cada atrito é um item numerado com quatro campos, nesta ordem e com estes nomes; os diários antigos não são reescritos.

@@ -10,7 +10,7 @@ Consulta por assunto, para quando nenhum roteiro de `roteiros/ROTEIROS.md` cobre
   [`modulos/esboco-nucleo/README.md`](../../../modulos/esboco-nucleo/README.md), e os outros
   módulos no README de cada um; o que faz cada arquivo de `tools/` e `src/`
   em [`../MAPA.md`](../../MAPA.md).
-- Autoria de peça: contrato em `usar/AUTORIA-DE-PECA.md`, razões em `AUTORIA-IA.md`.
+- Autoria de peça: contrato em `usar/AUTORIA-DE-PECA.md`, razões na seção "Por que o modelo é assim" de `usar/FLUXO-DO-OBJETO.md`.
 - Carroceria e chapa contínua: a forma facetada pelas três vistas em
   [`modelar-veiculos.md`](modelar-veiculos.md), e a superfície lisa por
   subdivisão, com vincos, raio de borda, medidas e espessura, em
@@ -36,7 +36,7 @@ Consulta por assunto, para quando nenhum roteiro de `roteiros/ROTEIROS.md` cobre
   `CONTEXTO-MONTAGEM-IA.md`.
 - Programa MCP: `docs/modelar/planos/mcp/INDEX.md` e os planos datados
   encerrados. O programa MCP não é o roteiro mestre da autoria.
-- Núcleo ou dependência técnica: `ARQUITETURA.md`, `AUTORIA-IA.md` e
+- Núcleo ou dependência técnica: `ARQUITETURA.md`, `usar/FLUXO-DO-OBJETO.md` (a seção "Por que o modelo é assim") e
   `docs/nos-herdado/oficina-contrato.md`; para descobrir capacidade, abra
   `gerado/INDEX.md` antes da implementação.
 - Reutilização procedural: `COMPOSICAO-PROCEDURAL-V1.md` e o catálogo de
@@ -46,12 +46,12 @@ Consulta por assunto, para quando nenhum roteiro de `roteiros/ROTEIROS.md` cobre
 - Descoberta MCP: `SERVICOS-PROCEDURAL-V1.md`; leia o catálogo, combine e valide
   em memória antes de propor extensão ou registrar lacuna.
 - Peça nova ou refinamento: o que ler sai de `npm run comecar -- modelar/peca`;
-  por assunto, a direção da autoria está em `AUTORIA-IA.md` e
-  `PERFIS-DE-AUTORIA.md`, e o fluxo antigo em `FLUXO-MODELAGEM-IA.md`.
+  por assunto, a direção da autoria e o pacote de modelagem estão em `usar/FLUXO-DO-OBJETO.md` e
+  em `PERFIS-DE-AUTORIA.md`.
 - **Bancada — contexto visual, arquitetura, e o laço de desenhar e absorver:**
   `BANCADA-E-APRESENTACAO.md` separa o que é de `src/bancada/` do que é de
   `src/autoria/`; o procedimento está em `usar/AJUSTE-DA-BANCADA.md`.
-- Homologação: `HOMOLOGACAO-FLUXO-IA.md` e `FLUXO-MODELAGEM-IA.md`.
+- Homologação: `HOMOLOGACAO-FLUXO-IA.md` e a seção "O pacote de modelagem" de `usar/FLUXO-DO-OBJETO.md`.
 - Freio ou roda: a família `roda-pneu` (`procedural/familias/roda-pneu/`).
 - Placa de circuito ou componente eletrônico: a família `componente-eletronico` (`procedural/familias/componente-eletronico/`), com a nota de uso em `.claude/skills/criar-peca/references/eletronica.md`.
 - Trabalho histórico: o README da zona histórica antes de abrir evidências.

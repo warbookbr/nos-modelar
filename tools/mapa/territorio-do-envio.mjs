@@ -19,6 +19,9 @@ import { CAMINHOS_COMPARTILHADOS, sobrepoe } from './planos.mjs';
 
 /* Os arquivos que os geradores regravam a partir de outros (o mapa, os índices, a crônica dos encerrados, o contrato gerado dos
    roteiros, o banco de provas e o mapa de ferramentas por objeto): mudam junto com qualquer plano e não pertencem a nenhum. */
+/* o dossiê de cada objeto é gerado de outros arquivos (`npm run dossie`) */
+export const ehDossieGerado = (caminho) => /^procedural\/pecas\/.+\/DOSSIE\.md$/.test(caminho);
+
 export const GERADOS = [
   'README.md', 'CLAUDE.md', 'docs/modelar/INDEX.md', 'docs/modelar/banco-de-provas/README.md',
   'docs/modelar/decisoes/PLANOS-ENCERRADOS.md', 'docs/modelar/decisoes/README.md', 'docs/modelar/roteiros/ROTEIROS.md',
@@ -59,7 +62,7 @@ export function conferirTerritorio(arquivos, territorios, declarados = [], { exi
   const soltas = declarados.filter((d) => !valeA(d).length);
   const fora = [];
   for (const { caminho } of arquivos) {
-    if (GERADOS.includes(caminho) || CAMINHOS_COMPARTILHADOS.some((c) => sobrepoe(c, caminho))) continue;
+    if (GERADOS.includes(caminho) || ehDossieGerado(caminho) || CAMINHOS_COMPARTILHADOS.some((c) => sobrepoe(c, caminho))) continue;
     if (territorios.some((t) => t.caminhos.some((c) => sobrepoe(c, caminho)))) continue;
     if (liberados.has(caminho)) continue;
     fora.push(caminho);

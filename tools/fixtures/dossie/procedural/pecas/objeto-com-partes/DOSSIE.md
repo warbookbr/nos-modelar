@@ -2,6 +2,10 @@
 
 Gerado por `npm run dossie -- objeto-com-partes` do que já está gravado; não edite fora dos marcadores `a-mao`, porque `npm run dossie -- objeto-com-partes --check` recusa o arquivo diferente do gerado. A seção entre os marcadores é escrita à mão e o gerador a preserva.
 
+## Aceite da pessoa ao alinhamento
+
+Sem `ALINHAMENTO.md` na pasta: o aceite da pessoa ao alinhamento não está gravado.
+
 ## Planos que cobrem a pasta
 
 Nenhum plano na árvore cobre a pasta deste objeto.
@@ -37,6 +41,14 @@ _Escolhas de técnica e o porquê. Um item por escolha, no modelo `escolha: porq
 - a escrever
 <!-- dossie:a-mao:base:fim -->
 
+### Dívida conhecida, à mão (`base`)
+
+<!-- dossie:a-mao:base.divida:inicio -->
+_Dívida conhecida: o que a peça ainda não cumpre e foi aceito, e por quem. Um item por dívida, no modelo `defeito: por que ficou (a rodada, a decisão da pessoa ou a medida que o mostra)`. Sem dívida, escreva "nenhuma"._
+
+- a escrever
+<!-- dossie:a-mao:base.divida:fim -->
+
 ## Parte `tampa`
 
 Pasta: `procedural/pecas/objeto-com-partes/partes/tampa/`
@@ -67,3 +79,11 @@ _Escolhas de técnica e o porquê. Um item por escolha, no modelo `escolha: porq
 
 - a escrever
 <!-- dossie:a-mao:tampa:fim -->
+
+### Dívida conhecida, à mão (`tampa`)
+
+<!-- dossie:a-mao:tampa.divida:inicio -->
+_Dívida conhecida: o que a peça ainda não cumpre e foi aceito, e por quem. Um item por dívida, no modelo `defeito: por que ficou (a rodada, a decisão da pessoa ou a medida que o mostra)`. Sem dívida, escreva "nenhuma"._
+
+- a escrever
+<!-- dossie:a-mao:tampa.divida:fim -->

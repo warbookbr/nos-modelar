@@ -184,6 +184,6 @@ um conjunto, selecionar o alvo e o contexto relevante, medir as relações,
 alterar a definição e descobrir com clareza quais montagens continuaram válidas
 e quais precisam de correção.
 
-A definição detalhada está em [`AUTORIA-IA.md`](../guias/AUTORIA-IA.md),
+A definição detalhada está em [`FLUXO-DO-OBJETO.md`](../usar/FLUXO-DO-OBJETO.md#por-que-o-modelo-é-assim),
 [`MONTAGENS-SEMANTICAS.md`](../usar/MONTAGENS-SEMANTICAS.md) e
 [`AGENT-FIRST.md`](AGENT-FIRST.md).

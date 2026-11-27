@@ -585,21 +585,25 @@ const luzDaMedicao = (medicao) => (medicao.luzRasante?.luzRasante ? medicao.luzR
  * A receita executa uma vez só para o referencial, os pontos e as faces finas, com o cache por passo (`tmp/cache-por-prefixo/`), e a guarda
  * do acervo recomeça do mesmo cache: a segunda medição da mesma receita não refaz passo nenhum. `cache: false` executa tudo inteiro.
  */
-export async function medirReceita(peca, { rodadas, pasta, registroDasEtapas, cache = true } = {}) {
+export async function medirReceita(peca, { rodadas, pasta, registroDasEtapas, cache = true, conferirAcervoDaPeca = conferirAcervo } = {}) {
   const caminho = resolverCaminhoReceita(peca);
   const texto = readFileSync(caminho, 'utf8');
   const sha256 = `sha256:${createHash('sha256').update(texto).digest('hex')}`;
   const falhas = [];
   const feitas = ['descrever (veredito)', 'guarda:acervo', 'guarda:referencial'];
-  const acervo = await conferirAcervo([peca], { cachePorPrefixo: cache });
+  /* o tempo da primeira execução da receita na rodada: a guarda do acervo é quem a faz e aquece o cache por passo, e a execução de
+     `executar` abaixo só lê esse cache (dava 0,01 s em qualquer peça). Com o cache já quente de uma rodada anterior mede só os passos que
+     mudaram, e `--sem-cache` mede a receita inteira. */
+  const inicioDaPrimeiraExecucao = performance.now();
+  const acervo = await conferirAcervoDaPeca([peca], { cachePorPrefixo: cache });
+  const segundosDaPrimeiraExecucao = (performance.now() - inicioDaPrimeiraExecucao) / 1000;
   for (const r of acervo.reprovadas) falhas.push(`guarda:acervo reprovou '${r.peca}':\n${indentar(r.motivo)}`);
   for (const e of acervo.esperando) falhas.push(`'${e.peca}' está planejada sem geometria (espera a etapa '${e.instancia}' de ${e.montagem}): não há o que medir`);
   const receita = receitaDoModulo(await importarReceita(caminho));
   /* a execução da receita atual, feita uma vez e dividida entre as medidas abaixo; a guarda do acervo, logo acima, deixou os pontos dela no cache */
   let dividida;
-  let segundosDaExecucao;
   const executar = async () => {
-    if (dividida === undefined) { const feita = await executarComCachePorPasso(caminho, receita, { cache }); dividida = feita.executada; segundosDaExecucao = feita.segundos; }
+    if (dividida === undefined) { const feita = await executarComCachePorPasso(caminho, receita, { cache }); dividida = feita.executada; }
     return dividida;
   };
   const referencial = await conferirUmaPeca(peca, { executar });
@@ -633,10 +637,11 @@ export async function medirReceita(peca, { rodadas, pasta, registroDasEtapas, ca
   const passou = falhas.length === 0;
   const pontos = pontosDaMedicao(receita, texto);
   const { lataria, luzRasante, porque } = await superficieDaPecaMedida(peca, receita, plano, { registro: registroDasEtapas });
-  /* as faces da malha e o tempo da execução da receita, tirados da execução que as medidas acima já fizeram (nenhuma execução a mais);
-     o tempo é o de quando a rodada mediu, com o cache por passo quente ou frio, e por isso não é parte da identidade da medição */
+  /* as faces da malha, da execução que as medidas acima já fizeram, e o tempo da primeira execução da receita na rodada (a da guarda do
+     acervo, que aquece o cache por passo): nenhuma execução a mais. O tempo depende do cache estar quente ou frio e por isso não é parte
+     da identidade da medição */
   const faces = executada?.neutro?.F?.size;
-  const medidaDaExecucao = Number.isInteger(faces) && Number.isFinite(segundosDaExecucao) ? { faces, segundos: Math.round(segundosDaExecucao * 100) / 100 } : {};
+  const medidaDaExecucao = Number.isInteger(faces) && Number.isFinite(segundosDaPrimeiraExecucao) ? { faces, segundos: Math.round(segundosDaPrimeiraExecucao * 100) / 100 } : {};
   return { passou, sha256, texto, caminho, relatorio: cortar(passou ? `${feitas.join(', ')}: ok` : falhas.join('\n')), lataria: { lataria, porque }, luzRasante: { luzRasante, porque }, avisos, ...medidaDaExecucao, ...(facesFinas ? { facesFinas } : {}), ...(pontos ? { pontos } : {}) };
 }
 

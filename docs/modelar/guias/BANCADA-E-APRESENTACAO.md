@@ -434,7 +434,7 @@ Quando montagens persistidas existirem, o critério também deverá exigir
 revalidação das relações e dos dependentes afetados. Essa capacidade ainda não
 está implementada.
 
-A definição ampla está em [`AUTORIA-IA.md`](AUTORIA-IA.md), e a direção das
+A definição ampla está em [`FLUXO-DO-OBJETO.md`](../usar/FLUXO-DO-OBJETO.md#por-que-o-modelo-é-assim), e a direção das
 montagens em [`MONTAGENS-SEMANTICAS.md`](../usar/MONTAGENS-SEMANTICAS.md).
 
 `--arame` desenha a malha por cima da peça sólida, e as arestas que ficam atrás

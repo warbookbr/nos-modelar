@@ -8,12 +8,19 @@ import { dirname, join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { conferirTerritorio, declaracoesFora, principal } from './territorio-do-envio.mjs';
 
+/* a extensão entra por interpolação: o gate de links lê caminho de documento escrito inteiro como link */
+const MD = 'md';
 const territorios = [{ plano: '2026-11-26-a.md', caminhos: ['tools/a/', 'notas/x.md'] }];
 const mudados = (...caminhos) => caminhos.map((c) => (typeof c === 'string' ? { caminho: c, novo: false } : c));
 
 describe('território do envio, a conta', () => {
   it('passa o que tem dono, o compartilhado e o gerado', () => {
     expect(conferirTerritorio(mudados('tools/a/um.mjs', 'notas/x.md', 'package.json', 'docs/MAPA.md', 'CLAUDE.md', 'docs/modelar/decisoes/README.md'), territorios).fora).toEqual([]);
+  });
+
+  it('o DOSSIE.md de objeto é gerado e passa, e o .md à mão na pasta do objeto não', () => {
+    expect(conferirTerritorio(mudados(`procedural/pecas/roda/DOSSIE.${MD}`, `procedural/pecas/carro/partes/porta/DOSSIE.${MD}`), territorios).fora).toEqual([]);
+    expect(conferirTerritorio(mudados(`procedural/pecas/roda/NOTAS.${MD}`, `docs/DOSSIE.${MD}`, `tools/DOSSIE.${MD}`), territorios).fora).toHaveLength(3);
   });
 
   it('reprova o arquivo sem dono, e a declaração do arquivo exato o libera', () => {

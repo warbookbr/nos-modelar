@@ -22,7 +22,7 @@ import { conferirUmaPeca } from './guardas/guarda-referencial.mjs';
 import { AJUDA, ARQUIVO_DAS_DECISOES, COPIAS_COM_DECISAO_NA_PASTA, conferirPacoteDoVeredito, copiasQueFicam, estaIgualNoGit, fraseDaCopia, VARIAVEL_DA_PASTA_DE_TESTE, VERSAO_DAS_DECISOES, gravarDecisaoDaPessoa, lerDecisoesDaPessoa, nomeDaPastaDoPacote, numeroDaProximaRodada, pastaDoPacoteDaRodada, CAMPOS_OPCIONAIS_LIDOS_PELO_CRITICO, CAMPOS_OPCIONAIS_NAO_LIDOS_PELO_CRITICO, planoQueOCriticoLe, acaoDaPeca, ajustarImportsDaCopia, blocoDaPeca, contradicoesEntreRodadas, entradaDosArquivos, normalizarRelatoDoModelador, resumoDoLaco, gravarRodada, impressaoDaForma, lerArgumentos, lerRodadas, medirReceita, mudancaDosPontos, pastaDeRodadas, pontosDaMedicao, registrarMedida, convergenciaDaPeca, decisaoSobreAsParadas, limiteDaPeca, textoFinalDoAssistente, ultimoBlocoJson } from './rodada-de-modelagem.mjs';
 import { CAMPOS_OPCIONAIS_DO_PLANO } from '../../src/autoria/plano-de-modelagem.js';
 import { normalizarVeredito } from '../../src/autoria/veredito-de-forma.js';
-import { pecasDoAcervo } from './guardas/guarda-acervo.mjs';
+import { conferirAcervo, pecasDoAcervo } from './guardas/guarda-acervo.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 import { impressaoDasPartesDaReceita } from './vistas-para-critica.mjs';
 
@@ -528,6 +528,12 @@ describe('a medição da receita atual trava o laço', () => {
     /* a medição sem as duas (receita que não executa) grava a rodada como as antigas: só passou e relatório */
     const { rodada: semMedida } = await registrarMedida(PECA, entrada(), { pasta, medir: async () => { const { faces: _f, segundos: _s, ...resto } = ok; return resto; } });
     expect(Object.keys(semMedida.medidas).sort()).toEqual(['passou', 'relatorio']);
+  });
+
+  it('medidas.segundos mede a primeira execução da rodada (a guarda do acervo que aquece o cache), e não a leitura do cache quente', async () => {
+    const lenta = async (...args) => { await new Promise((r) => setTimeout(r, 200)); return conferirAcervo(...args); };
+    const medida = await medirReceita(fixture('ok'), { conferirAcervoDaPeca: lenta });
+    expect(medida.segundos).toBeGreaterThanOrEqual(0.2);
   });
 
   it('a medição pelo cache por passo é a mesma da execução inteira, na peça que passa e na que reprova, e as medidas dividem uma execução', async () => {

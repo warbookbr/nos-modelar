@@ -4,8 +4,9 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, utimesSync, writeFileSync
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
-import { acaoSemMedir, emTexto, fluxoDoObjeto, lerAceites, moduloComum, partesDoAlinhamento, rodar } from './fluxo-do-objeto.mjs';
+import { acaoSemMedir, emTexto, fluxoDoObjeto, lerAceites, lerDeclaracaoSemRodada, moduloComum, partesDoAlinhamento, rodar } from './fluxo-do-objeto.mjs';
 import { gravarRodada } from './rodada-de-modelagem.mjs';
+import { createHash } from 'node:crypto';
 
 const raiz = mkdtempSync(join(tmpdir(), 'fluxo-do-objeto-'));
 afterAll(() => rmSync(raiz, { recursive: true, force: true }));
@@ -289,6 +290,59 @@ describe('as peças e a montagem', () => {
     expect((await rodar([pasta, '--json'])).texto).toBe(um.texto);
     expect((await rodar([join(raiz, 'nao-existe')])).codigo).toBe(2);
     expect((await rodar([pasta, '--x'])).codigo).toBe(2);
+  });
+});
+
+describe('a parte cuja receita mudou sem rodada', () => {
+  const COM_PASSOS = (v) => `export default { nome: 'p', PASSOS: [['caixa', { origemId: 1, largura: ${v} }]] };\n`;
+  const sha = (t) => `sha256:${createHash('sha256').update(t).digest('hex')}`;
+  const montar = (nome) => {
+    const pasta = objetoDeProva(nome);
+    escrever(join(pasta, 'ALINHAMENTO.md'), ALINHAMENTO + ACEITE);
+    escrever(join(pasta, 'referencias', 'lado.png'), 'png');
+    return pasta;
+  };
+  const doCorpo = async (pasta) => (await fluxoDoObjeto(pasta, { registroDasEtapas: null })).pecas[0];
+
+  it('acusa a receita com passos e nenhuma rodada, e a que mudou depois da última rodada; a rodada do texto de hoje a livra', async () => {
+    const pasta = montar('sem-rodada');
+    const receita = join(pasta, 'receita.js');
+    escrever(receita, COM_PASSOS(1));
+    let f = await fluxoDoObjeto(pasta, { registroDasEtapas: null });
+    expect(f.pecas[0].semRodada.motivo).toMatch(/^a receita tem passos e nenhuma rodada registrada: registrar uma rodada/);
+    expect(f.passos[3]).toMatchObject({ feito: false });
+    expect(f.passos[3].falta).toEqual(['obj-de-prova (revisar)']);
+    expect(emTexto(f)).toContain('SEM RODADA');
+    gravarRodada('obj-de-prova', { partes: [{ nome: 'corpo', confere: true }], medidas: { passou: true, relatorio: 'ok' }, veredito: veredito([]), notaDePassagem: 'nota' }, { pasta: join(pasta, 'rodadas'), receitaTexto: COM_PASSOS(1), agora: () => '2026-11-11T00:00:00.000Z' });
+    expect((await doCorpo(pasta)).semRodada).toBeUndefined();
+    escrever(receita, COM_PASSOS(2));
+    expect((await doCorpo(pasta)).semRodada.motivo).toMatch(/^a receita mudou desde a rodada 1, a última registrada/);
+  });
+
+  it('a declaração da pessoa vale para o texto que ela viu e deixa de valer quando a receita muda; a malformada não vale e diz por quê', async () => {
+    const pasta = montar('declarada');
+    const receita = join(pasta, 'receita.js');
+    escrever(receita, COM_PASSOS(1));
+    const declarar = (texto, extra = {}) => escrever(join(pasta, 'rodadas', 'sem-rodada.json'), JSON.stringify({ receita: sha(texto), por: 'a pessoa, 2026-11-27: pode seguir sem rodada', motivo: 'ajuste só de número', ...extra }));
+    declarar(COM_PASSOS(1));
+    expect((await doCorpo(pasta)).semRodada).toBeUndefined();
+    escrever(receita, COM_PASSOS(2));
+    const velha = await doCorpo(pasta);
+    expect(velha.semRodada.declaracao).toMatch(/declara a receita .* e a de hoje é .*; a declaração vale para o texto que a pessoa viu/);
+    declarar(COM_PASSOS(2), { por: 'sem data' });
+    expect((await doCorpo(pasta)).semRodada.declaracao).toMatch(/'por' recebido "sem data"; esperado/);
+    declarar(COM_PASSOS(2), { motivo: '' });
+    expect((await doCorpo(pasta)).semRodada.declaracao).toMatch(/falta o 'motivo'/);
+    declarar(COM_PASSOS(2));
+    expect((await doCorpo(pasta)).semRodada).toBeUndefined();
+    expect(lerDeclaracaoSemRodada(join(pasta, 'rodadas'), sha(COM_PASSOS(2)))).toMatchObject({ valida: true });
+    expect(lerDeclaracaoSemRodada(join(pasta, 'nada'), sha('x'))).toBeNull();
+  });
+
+  it('a receita sem passos (por família ou composição) não é acusada', async () => {
+    const pasta = montar('sem-passos');
+    escrever(join(pasta, 'receita.js'), RECEITA('x'));
+    expect((await doCorpo(pasta)).semRodada).toBeUndefined();
   });
 });
 

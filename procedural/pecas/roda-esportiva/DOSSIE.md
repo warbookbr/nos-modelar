@@ -2,6 +2,10 @@
 
 Gerado por `npm run dossie -- roda-esportiva` do que já está gravado; não edite fora dos marcadores `a-mao`, porque `npm run dossie -- roda-esportiva --check` recusa o arquivo diferente do gerado. A seção entre os marcadores é escrita à mão e o gerador a preserva.
 
+## Aceite da pessoa ao alinhamento
+
+Sem `ALINHAMENTO.md` na pasta: o aceite da pessoa ao alinhamento não está gravado.
+
 ## Planos que cobrem a pasta
 
 Nenhum plano na árvore cobre a pasta deste objeto.
@@ -60,6 +64,15 @@ Passos da receita: 55. Operações por parte, lidas do grafo dos passos (uma ope
 
 Faces e tempo da execução: nenhuma rodada os gravou (`medidas.faces` e `medidas.segundos` entram nas rodadas registradas desde 2026-11-27; as anteriores não são reescritas).
 
+Atrito e nota de passagem de cada rodada, condensados (o texto inteiro está na rodada gravada):
+
+- rodada 1: nota: Aro e raios são uma superfície só (unir + arredondarCostura raio 8). Espaço do freio por espacoDoFreio(): disco assenta em x = 40, barril livre até r… | atrito: arredondarCostura nas arestas convexas das janelas recusou sempre perto do ápice da fresta em V e do centro;…; o raio mínimo da costura (1/64 da meia-extensão) não aparece na documentação, só na recusa (e mais 6)
+- rodada 2: nota: Raios alargados (A 36/50, B 38/50) porque o alvo tem raios encorpados; prato com expoente 1.3 e liso 60 para ler a concavidade; ladosDoPrato fica em… | atrito: arredondarCostura convexas nos raios recusa em raio 3, 4 e 6 mm; o minimo 1/64 da meia-extensao so aparece na…; abas serrilhadas nas pontas dos raios e o recorte do aro parecem faces de parede divididas pelo unir e agrupa… (e mais 4)
+- rodada 3: nota: As lascas vinham todas do arredondarCostura da costura aro-raios; a rodada 2 subiu paineisDaCostura para 24 e foram a 288. Varri o parametro: 13 da 1… | atrito: o seletor de parte nao tem criterio radial: nao da para reatribuir ao aro as faces de parede do barril que o…; paineisDaCostura tem otimo estreito e nao monotonico (13 da 186, 24 da 288, 0 gera falso zero); so a varredur… (e mais 4)
+- rodada 4: nota: O afinamento dos raios e decisao da pessoa. Medi em variante-a.jpg (aro 790 px = 500 mm): raio 0,047 do diametro do aro na raiz (24 mm) e 0,06 na pon… | atrito: o seletor de parte nao tem criterio radial: nao da para reatribuir ao aro as faces de parede que o unir junta…; arredondarCostura e caprichoso com a geometria: mudar avancoAxialDaParede de 28 para 29 faz o passo recusar o… (e mais 5)
+- rodada 5: nota: Pares em V pelo pedido da pessoa: raio 15-16 mm (~3% do aro), miolo 76 mm, centros em 5 graus a r=80 e 8,5 graus no aro, janela estreita com canto 4.… | atrito: onde.radial junto com origem de arredondarCostura nao selecionou nada; so sel grupo raios + onde.radial devol…; bancada --sem-cache devolveu a imagem antiga na selecao isolada; so --analise regenerou as vistas (e mais 4)
+- rodada 6: nota: Largura 20 mm constante (decisao da pessoa), aro com parede 12 e canaleta 19 para manter o fundo em r=210,3 e a folga da pinca. Prato mais grosso por… | atrito: PLANO.criteriosDeReprovacao[0] da decisao da pessoa chegou com 247 caracteres e o descrever recusou o plano;…; raioDaQuinaDosRaios 3,8 e 4: arredondarCostura de arestas convexas deixa 2899 faces sem identidade e a parte… (e mais 7)
+
 Defeitos da rodada 6, a última com veredito:
 
 - `aro`, superficie (anguloso): parede interna do barril, onde os raios encostam
@@ -82,3 +95,10 @@ _Escolhas de técnica e o porquê. Um item por escolha, no modelo `escolha: porq
 - sem o passo de devolver a parede ao aro por raio maior ou igual a 212: ele criava as abas (rodada 6).
 - avanço axial da parede 31 mm e dobra 2 mm escolhidos por varredura, que deu 179 faces finas (rodada 4).
 <!-- dossie:a-mao:peca:fim -->
+
+### Dívida conhecida, à mão
+
+<!-- dossie:a-mao:peca.divida:inicio -->
+- contatos: o `CONTATOS` ficou vazio e o `descrever` não decide 8 pares, porque aro e raios são, cada um, casca aberta (atritos das rodadas 1 a 6); o assento do pneu foi medido à parte.
+- faces finas dos raios: o `arredondarCostura` das arestas convexas deixa lascas que o `limparLascas` não tira, e o número oscila de 0 a 8 com qualquer variação de painéis ou de raio (atrito da rodada 6).
+<!-- dossie:a-mao:peca.divida:fim -->

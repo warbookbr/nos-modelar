@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2521 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2520 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -57,6 +57,7 @@
 
 ## .claude/skills/criar-peca/references/
 
+- `casos-do-modelador.md` — Casos que mostraram as regras do modelador
 - `comparar-com-a-referencia.md` — Comparar com a referência por comando
 - `eletronica.md` — Placa de circuito e componentes eletrônicos
 - `operacoes-procedurais.md` — Referência de operações procedurais
@@ -748,9 +749,7 @@
 
 ## docs/modelar/guias/
 
-- `AUTORIA-IA.md` — Autoria assistida por IA
 - `BANCADA-E-APRESENTACAO.md` — Bancada e apresentação
-- `FLUXO-MODELAGEM-IA.md` — Fluxo de modelagem assistida por IA v4
 - `LEITURA-POR-TAREFA.md` — Leitura por tarefa
 - `README.md` — Guias
 - `modelar-carroceria.md` — Modelar carroceria de chapa contínua
@@ -847,7 +846,6 @@
 - `FLUXO-DO-OBJETO.md` — Fluxo do objeto
 - `GOTCHAS-AUTORIA-VISUAL.md` — Gotchas de autoria visual
 - `GOTCHAS-POR-OPERACAO.md` — Gotchas por operação: os casos completos
-- `GUIA-AUTORIA-IA.md` — # Guia de Autoria e Modelagem Procedural para IA
 - `INTENCAO-PECA-V1.md` — Intenção semântica opcional de peça — v1
 - `LACO-VISUAL.md` — O laço visual — olhar, sobrepor, despachar
 - `MEDIDAS-AVULSAS.md` — Medidas avulsas: quando usar cada uma
@@ -3701,6 +3699,7 @@
 
 ## tools/fixtures/dossie/procedural/pecas/objeto-de-prova/
 
+- `ALINHAMENTO.md` — Objeto de prova: alinhamento
 - `DOSSIE.md` — Dossiê: objeto-de-prova
 - `receita.js` — receita de fixture do dossiê: duas partes, uma com sólido modificado e unido.
 
