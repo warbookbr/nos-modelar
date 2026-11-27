@@ -110,7 +110,8 @@ function comprimentoViavel(pernas, cadeia, diametro, caimento) {
 
 /** O plano do cabo. */
 export function planejar(parametros) {
-  const chave = JSON.stringify(parametros);
+  /* a chave não depende da ordem dos campos: a chamada (ordem do contrato carregado) e as medidas (ordem do arquivo) pedem o mesmo plano */
+  const chave = JSON.stringify(Object.keys(parametros).sort().map((nome) => [nome, parametros[nome]]));
   if (MEMORIA.has(chave)) return MEMORIA.get(chave);
   const p = parametros;
   const { A, B, dA, dB, D, L, passagens, cadeia } = pontasDosParametros(p);

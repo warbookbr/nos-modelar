@@ -21,3 +21,13 @@ O jeito de pedir é `cabo({ de: { ponto, direcao }, para: { ponto, direcao }, co
 Imagens em `tools/bancadas/out/cabos-fatia2/` (não versionadas): `bracadeiras.png`, `terminais.png`, `feixe.png`.
 
 A pessoa aprovou a fatia 2 por imagem em 2026-11-27, com a frase "Sim, aprovo as duas" (`aprovado-fatia2-*.png`: o cabo com duas braçadeiras, os terminais de capa e olhal e o feixe de três cabos), e os limites novos da família, diâmetro até 25 mm e comprimento até 12.000 mm.
+
+## Fatia 3: o cabo na montagem com articulação (2026-11-27)
+
+As pontas se prendem a portas por `{ instancia, porta, sentido?, afastamento? }` (`procedural/familias/cabo/montagem.js`): o ponto é o centro da porta na pose resolvida e a direção de saída é o eixo dela. Em cada passo do curso de uma junta as instâncias que ela move são levadas à pose do passo (a mesma conta de `conferirArticulacao`, que não devolve a pose), as portas são resolvidas de novo e o cabo é refeito pela `cabo()` com o mesmo comprimento. A conferência (`conferirCursoDoCabo`) acusa por passo `estica`, `dobra`, `autocontato`, `pontas-coladas`, `atravessa` (o tubo contra cada sólido, pela régua de contato da articulação, folga de 0,3 mm) e `inconclusivo`. Passagens e feixe ficam fora do cabo por portas.
+
+Prova (`tools/fixtures/cabo/junta-com-cabo*.test.mjs`): dois atuadores de 100 mm da fixture de duas juntas, com a porta `cabo` declarada na fixture em cada carcaça, junta A de −90° a 90° em 24 passos. O cabo de 110 mm passa nos 25 passos, com o comprimento de corte entre 109,996 e 110 mm; o curso inteiro leva uns 3,7 s. Os arranjos que falham, em 12 passos: cabo de 48 mm estica de −90° a −60° e de 60° a 90°; cabo de 110 mm da porta oposta dobra abaixo do raio mínimo de −30° a 30°; cabo de 115 mm da mesma porta atravessa a carcaça B e a saída B só no passo zero, onde uma conta independente (eixo do cabo dentro do corpo de revolução de B) também o põe dentro.
+
+Imagens em `tools/bancadas/out/cabos-na-junta/` (não versionadas), de `node tools/fixtures/cabo/junta-com-cabo-vistas.mjs`: `inicio-*`, `meio-*`, `fim-*` (isométrica, de cima e de lado) e `atravessa-no-meio-*`. Aguardam a aprovação da pessoa (gate 5).
+
+Achado: a memória do plano do cabo usava a ordem dos campos como chave, e a chamada e as medidas pediam a mesma conta em ordens diferentes, de modo que cada pose resolvia a haste duas vezes; a chave agora é ordenada e o curso refeito caiu de 8,4 s para 4,4 s.
