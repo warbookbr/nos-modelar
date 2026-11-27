@@ -3,7 +3,7 @@
 import { existsSync, mkdirSync, readFileSync, renameSync, statSync, unlinkSync, writeFileSync } from 'node:fs';
 import { basename, dirname, extname, isAbsolute, relative, resolve } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { AMBIENTES, exportarGltf, exportarMontagemGltf } from '../../modulos/exportador-gltf/src/index.js';
+import { AMBIENTES, NOME_DO_SCRIPT_DO_CABO, exportarGltf, exportarMontagemGltf, lerScriptDoCaboVivo } from '../../modulos/exportador-gltf/src/index.js';
 import { executarReceita } from '../../src/autoria/executar-receita.js';
 import { lerMontagemPersistida } from '../../src/autoria/ler-montagem-persistida.js';
 import { resolverMontagemPersistida } from '../../src/autoria/resolver-montagem-persistida.js';
@@ -14,14 +14,17 @@ import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 const AQUI = dirname(fileURLToPath(import.meta.url));
 export const REPO = resolve(AQUI, '../..');
 
-const USO = 'Uso: npm run exportar:gltf -- <peça> [--saida <arquivo>] [--ambiente estudio|ceu]\n'
+const USO = 'Uso: npm run exportar:gltf -- <peça> [--saida <arquivo>] [--ambiente estudio|ceu] [--articulacoes <arquivo.json>] [--cabos <arquivo.json>]\n'
   + '  <peça>               nome ou caminho da receita (o mesmo que a bancada aceita), ou a montagem: o objeto com montagem.json\n'
   + '                       (braco-robotico) ou o caminho do .json; sai um nó por instância, na pose de repouso da montagem\n'
   + '  --saida <arquivo>    destino do .glb (padrão: exportacoes/gltf/<peça>.glb); sobrescreve o que houver\n'
+  + '  --articulacoes <arq> (só montagem) lista JSON de declarações de junta; cada peça que uma junta move sai filha do nó `junta-<id>`, no pivô e com o eixo dela\n'
+  + '  --cabos <arquivo>    (só montagem) lista JSON de pedidos de cabo por portas ({ de: { instancia, porta }, para: { instancia, porta }, comprimento, diametro, ... });\n'
+  + `                       sai o cabo na pose de repouso, os nós das pontas, os dados em extras e o script do Blender (${NOME_DO_SCRIPT_DO_CABO}) ao lado do .glb\n`
   + `  --ambiente <nome>    ${AMBIENTES.join(' ou ')} (padrão estudio); vai como metadado (extras), porque o glTF não leva ambiente\n`;
 
 export function parseArgs(args = process.argv.slice(2)) {
-  const opcoes = { peca: null, saida: null, ambiente: 'estudio' };
+  const opcoes = { peca: null, saida: null, ambiente: 'estudio', articulacoes: null, cabos: null };
   const valor = (i, nome) => {
     const v = args[i + 1];
     if (v === undefined || v.startsWith('--')) throw new Error(`${nome} pede um valor.\n${USO}`);
@@ -30,6 +33,8 @@ export function parseArgs(args = process.argv.slice(2)) {
   for (let i = 0; i < args.length; i += 1) {
     const arg = args[i];
     if (arg === '--saida') { opcoes.saida = valor(i, arg); i += 1; } else if (arg.startsWith('--saida=')) opcoes.saida = arg.slice('--saida='.length);
+    else if (arg === '--articulacoes') { opcoes.articulacoes = valor(i, arg); i += 1; } else if (arg.startsWith('--articulacoes=')) opcoes.articulacoes = arg.slice('--articulacoes='.length);
+    else if (arg === '--cabos') { opcoes.cabos = valor(i, arg); i += 1; } else if (arg.startsWith('--cabos=')) opcoes.cabos = arg.slice('--cabos='.length);
     else if (arg === '--ambiente') { opcoes.ambiente = valor(i, arg); i += 1; } else if (arg.startsWith('--ambiente=')) opcoes.ambiente = arg.slice('--ambiente='.length);
     else if (arg.startsWith('--')) throw new Error(`opção desconhecida '${arg}'.\n${USO}`);
     else if (!opcoes.peca) opcoes.peca = arg;
@@ -112,26 +117,80 @@ export async function resolverMontagemDeArquivo(caminhoMontagem) {
   return resolvida;
 }
 
-async function exportarMontagem(caminhoMontagem, ambiente) {
-  const resolvida = await resolverMontagemDeArquivo(caminhoMontagem);
+/* A montagem resolvida como glTF. `articulacoes` são as declarações de junta (as de `procedural/extensoes/articulacao/`) e `cabos` os pedidos de cabo por portas
+   (`procedural/familias/cabo/montagem.js`), os dois com a montagem na pose de repouso; `execucao` traz os registros das famílias, e sem ele sai o de `criarRegistroDeFamilias`. */
+export async function gerarMontagemResolvida({ resolvida, nome = resolvida.id, articulacoes = [], cabos = [], ambiente = 'estudio', execucao = null }) {
   const puladas = [];
-  const resultado = exportarMontagemGltf({ nome: resolvida.id, instancias: instanciasDaMontagem(resolvida, puladas), ambiente });
+  const instancias = instanciasDaMontagem(resolvida, puladas);
+  const opcoes = { nome, instancias, ambiente };
+  if (articulacoes.length || cabos.length) {
+    const { cursoDaJunta, pedidoNaPose, portasDaResolvida } = await import('../../procedural/familias/cabo/montagem.js');
+    opcoes.juntas = articulacoes.map((declaracao) => {
+      const curso = cursoDaJunta(resolvida, declaracao);
+      return {
+        id: curso.id, tipo: curso.tipo, eixo: curso.eixo, centro: curso.centro, fixo: declaracao.fixo.caminho.join('/'), moveis: curso.moveis,
+        curso: { minimo: curso.valores[0], maximo: curso.valores.at(-1), unidade: curso.unidade },
+      };
+    });
+    opcoes.cabos = [];
+    if (cabos.length) {
+      const { cabo, medidasDoPedido } = await import('../../procedural/familias/cabo/pedido.js');
+      const { extrasDoCabo } = await import('../../procedural/familias/cabo/exportacao.js');
+      const registro = execucao ?? (await import('../../procedural/familias/index.js')).criarRegistroDeFamilias();
+      const exec = { registroOperacoes: registro.registroOperacoes, registroComposicoes: registro.registroComposicoes };
+      const portas = portasDaResolvida(resolvida);
+      for (const pedidoPorPortas of cabos) {
+        const pedido = pedidoNaPose(pedidoPorPortas, portas);
+        medidasDoPedido(pedido);
+        const receita = { meta: { nome: pedido.id ?? 'cabo' }, CHAMADAS_COMPOSICOES: cabo(pedido), PARAMS: {}, TOPO: {}, ALIASES: [], MATERIAIS: {} };
+        const { neutro } = executarReceita(receita, exec);
+        const { neutro: inteiro, puladas: dele } = semFaceSemArea(neutro);
+        for (const p of dele) puladas.push({ instancia: pedido.id ?? 'cabo', ...p });
+        const ponta = (lado) => ({ instancia: pedidoPorPortas[lado].instancia, porta: pedidoPorPortas[lado].porta, ponto: pedido[lado].ponto.map((c) => c / 1000), direcao: pedido[lado].direcao });
+        opcoes.cabos.push({ nome: pedido.id ?? 'cabo', neutro: inteiro, materiais: neutro.materiais ?? {}, pontas: { de: ponta('de'), para: ponta('para') }, extras: extrasDoCabo(pedido) });
+      }
+    }
+  }
+  const resultado = exportarMontagemGltf(opcoes);
   resultado.diagnostico.facesPuladas = puladas;
+  return resultado;
+}
+
+async function exportarMontagem(caminhoMontagem, ambiente, articulacoes, cabos) {
+  const resolvida = await resolverMontagemDeArquivo(caminhoMontagem);
+  const resultado = await gerarMontagemResolvida({ resolvida, articulacoes, cabos, ambiente });
   return { resultado, nomeArquivo: resolvida.id.replace(/[^a-zA-Z0-9_-]/g, '_') };
 }
 
-export async function exportarArquivoGltf({ peca, saida = null, ambiente = 'estudio' }) {
+/* Grava o script do Blender do cabo vivo ao lado do .glb; devolve o caminho. */
+export function gravarScriptDoCabo(pastaDoGlb) {
+  const destino = resolve(pastaDoGlb, NOME_DO_SCRIPT_DO_CABO);
+  gravarAtomico(destino, lerScriptDoCaboVivo());
+  return destino;
+}
+
+const lerLista = (arquivo, nome) => {
+  const dado = JSON.parse(readFileSync(isAbsolute(arquivo) ? arquivo : resolve(process.cwd(), arquivo), 'utf8'));
+  if (!Array.isArray(dado)) throw new Error(`${nome}: o arquivo '${arquivo}' precisa ser uma lista JSON.`);
+  return dado;
+};
+
+export async function exportarArquivoGltf({ peca, saida = null, ambiente = 'estudio', articulacoes = null, cabos = null }) {
   if (!peca) throw new Error(`Informe a peça.\n${USO}`);
   const caminhoMontagem = caminhoDaMontagem(peca);
   if (caminhoMontagem) {
-    const { resultado, nomeArquivo } = await exportarMontagem(caminhoMontagem, ambiente);
+    const listaDeArticulacoes = typeof articulacoes === 'string' ? lerLista(articulacoes, '--articulacoes') : (articulacoes ?? []);
+    const listaDeCabos = typeof cabos === 'string' ? lerLista(cabos, '--cabos') : (cabos ?? []);
+    const { resultado, nomeArquivo } = await exportarMontagem(caminhoMontagem, ambiente, listaDeArticulacoes, listaDeCabos);
     const destino = saida
       ? (isAbsolute(saida) ? resolve(saida) : resolve(process.cwd(), saida))
       : resolve(REPO, 'exportacoes/gltf', `${nomeArquivo}.glb`);
     mkdirSync(dirname(destino), { recursive: true });
     gravarAtomico(destino, resultado.bytes);
-    return { caminhoSaida: destino, tamanhoBytes: statSync(destino).size, diagnostico: resultado.diagnostico };
+    const caminhoDoScript = listaDeCabos.length ? gravarScriptDoCabo(dirname(destino)) : null;
+    return { caminhoSaida: destino, tamanhoBytes: statSync(destino).size, diagnostico: resultado.diagnostico, ...(caminhoDoScript ? { caminhoDoScript } : {}) };
   }
+  if (articulacoes || cabos) throw new Error(`--articulacoes e --cabos valem para montagem; '${peca}' é uma peça.\n${USO}`);
   const caminhoReceita = resolverCaminhoReceita(peca, { raiz: REPO });
   const { receita, nome } = await carregarReceita(caminhoReceita);
   const { neutro } = executarReceita(receita);
@@ -157,6 +216,8 @@ async function main() {
     process.stdout.write(`Partes:     ${d.partes} | primitivas ${d.primitivas} | materiais ${d.materiais} | texturas ${d.texturas}\n`);
     process.stdout.write(`Geometria:  ${d.vertices} vértices, ${d.triangulos} triângulos (metro, y para cima)\n`);
     if (d.facesPuladas?.length) process.stdout.write(`Puladas:    ${d.facesPuladas.length} face(s) sem triangulação de área não nula: ${d.facesPuladas.map((p) => `${p.instancia}#${p.face}`).join(', ')}\n`);
+    if (d.juntas) process.stdout.write(`Juntas:     ${d.juntas} (nós junta-<id>, a peça que a junta move é filha dele)\n`);
+    if (res.caminhoDoScript) process.stdout.write(`Blender:    ${res.caminhoDoScript} (${d.cabos} cabo(s); no Blender, importe o .glb e rode o script)\n`);
     if (d.extensoes.length) process.stdout.write(`Extensões:  ${d.extensoes.join(', ')}\n`);
   } catch (err) {
     process.stderr.write(`Erro: ${err.message}\n`);

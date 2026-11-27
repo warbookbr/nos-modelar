@@ -32,6 +32,7 @@ import { gerarGltfDeMontagem } from './montagem.js';
 
 export { ErroExportacaoGltf, AMBIENTES };
 export { lerGlb } from './glb.js';
+export { CAMINHO_DO_SCRIPT_DO_CABO, NOME_DO_SCRIPT_DO_CABO, lerScriptDoCaboVivo } from './script-do-blender.js';
 
 export function exportarGltf(opcoes) {
   const { bytes, json, bin, diagnostico } = gerarGltf(opcoes);
@@ -48,7 +49,10 @@ export function exportarGltf(opcoes) {
 
 /* A montagem: `instancias` é a lista do resolvedor, { nome, neutro, materiais, pose: { rotacao, deslocamento } } por instância.
    Cada instância é um nó com o nome dela, a malha no referencial da peça e a pose na matriz do nó (uma pose só, a de repouso).
-   `npm run exportar:gltf -- braco-robotico` exporta o braço. */
+   `npm run exportar:gltf -- braco-robotico` exporta o braço.
+   Com `juntas` (cada uma { id, tipo, eixo, centro, fixo, moveis, curso? }, eixo e centro no mundo, em metro) a peça que uma junta move sai filha do nó `junta-<id>`,
+   no pivô e com o eixo dela como o +Y local; com `cabos` (cada um { nome, neutro, materiais?, pontas: { de, para }, extras? }) o cabo sai na pose de repouso, com um nó
+   vazio em cada ponta, filho da peça em que ela prende, e os dados em `extras` do nó do cabo. Ver o cabeçalho de `src/montagem.js`. */
 export function exportarMontagemGltf(opcoes) {
   const { bytes, json, bin, diagnostico } = gerarGltfDeMontagem(opcoes);
   return { formato: 'glTF 2.0 binário', bytes, json, bin, extensao: '.glb', mime: 'model/gltf-binary', diagnostico };

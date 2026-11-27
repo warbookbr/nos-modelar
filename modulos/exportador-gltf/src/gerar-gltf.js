@@ -117,6 +117,26 @@ function matrizDoNo({ rotacao: r, deslocamento: d }) {
   return m.every((v, i) => v === (i % 5 === 0 ? 1 : 0)) ? null : m;
 }
 
+/* A árvore de nós: `arvore` = { pais: Map nome -> nome do pai, vazios: [{ name, translation?, rotation?, extras? }], extras: Map nome -> extras do nó }. Os vazios entram no fim de `nodes`, cada nó ganha `children` pelos pais, e devolve os índices dos nós sem pai (a raiz da cena), na ordem dos nós. */
+function montarArvore(nodes, arvore) {
+  if (!arvore) return nodes.map((_, i) => i);
+  for (const v of arvore.vazios ?? []) nodes.push({ name: v.name, ...(v.translation ? { translation: v.translation } : {}), ...(v.rotation ? { rotation: v.rotation } : {}), ...(v.extras ? { extras: v.extras } : {}) });
+  const indice = new Map();
+  nodes.forEach((n, i) => {
+    if (indice.has(n.name)) throw new ErroExportacaoGltf('no-duplicado', `Dois nós se chamam '${n.name}'.`, { nome: n.name });
+    indice.set(n.name, i);
+  });
+  const filhos = new Set();
+  for (const [nome, pai] of arvore.pais ?? []) {
+    if (!indice.has(nome) || !indice.has(pai)) throw new ErroExportacaoGltf('no-ausente', `A hierarquia liga '${nome}' a '${pai}', e um dos dois não é nó do arquivo.`, { nome, pai });
+    const p = nodes[indice.get(pai)];
+    p.children = [...(p.children ?? []), indice.get(nome)];
+    filhos.add(indice.get(nome));
+  }
+  for (const n of nodes) if (n.children) n.children.sort((a, b) => a - b);
+  return nodes.map((_, i) => i).filter((i) => !filhos.has(i));
+}
+
 /* O pacote binário: cada pedaço alinhado em 4 bytes, na ordem em que é pedido. */
 class Pacote {
   constructor() { this.pedacos = []; this.tamanho = 0; this.vistas = []; }
@@ -187,7 +207,7 @@ function projecaoDoMaterial(def, posicoes, parte) {
  * @param {{nome?: string, neutro: object, materiais?: object, ambiente?: 'estudio'|'ceu'}} opcoes
  * @returns {{json: object, bin: Uint8Array, bytes: Uint8Array, diagnostico: object}}
  */
-export function gerarGltf({ nome = 'peca', neutro, materiais = {}, ambiente = 'estudio', poses = null }) {
+export function gerarGltf({ nome = 'peca', neutro, materiais = {}, ambiente = 'estudio', poses = null, arvore = null }) {
   if (!AMBIENTES.includes(ambiente)) {
     throw new ErroExportacaoGltf('ambiente-invalido', `Ambiente '${ambiente}' desconhecido. Aceitos: ${AMBIENTES.join(', ')}.`, { ambiente });
   }
@@ -399,19 +419,23 @@ export function gerarGltf({ nome = 'peca', neutro, materiais = {}, ambiente = 'e
     meshes.push({ name: parte, primitives: primitivas });
     const pai = neutro.partes?.[parte]?.pai ?? null;
     const pose = poses?.get(parte);
+    const extrasDoNo = { ...(pai ? { pai } : {}), ...(arvore?.extras?.get(parte) ?? {}) };
     nodes.push({
       name: parte,
       mesh: meshes.length - 1,
       ...(pose && matrizDoNo(pose) ? { matrix: matrizDoNo(pose) } : {}),
-      ...(pai ? { extras: { pai } } : {}),
+      ...(Object.keys(extrasDoNo).length ? { extras: extrasDoNo } : {}),
     });
   }
+
+  /* A hierarquia (só com `arvore`): nós vazios acrescentados depois dos das partes, e o pai de cada nó pelo nome. Sem `arvore` todo nó fica na raiz da cena, como sempre. */
+  const raizes = montarArvore(nodes, arvore);
 
   const bin = pacote.juntar();
   const json = {
     asset: { version: '2.0', generator: GERADOR, extras: { unidade: 'm', eixoParaCima: 'y' } },
     scene: 0,
-    scenes: [{ name: nome, nodes: nodes.map((_, i) => i), extras: { ambiente } }],
+    scenes: [{ name: nome, nodes: raizes, extras: { ambiente } }],
     nodes,
     meshes,
     materials: materiaisGltf,
@@ -431,7 +455,7 @@ export function gerarGltf({ nome = 'peca', neutro, materiais = {}, ambiente = 'e
       nome,
       ambiente,
       unidade: 'm',
-      partes: nodes.length,
+      partes: meshes.length,
       primitivas: meshes.reduce((s, mesh) => s + mesh.primitives.length, 0),
       materiais: materiaisGltf.length,
       texturas: texturas.length,
