@@ -9,7 +9,7 @@
     },
     "modelo": {
       "declarado": "sonnet",
-      "medido": null
+      "medido": "sonnet"
     },
     "pacote": "o pedido.md e as imagens que ele cita, do pacote padrão: npm run vistas:critica -- <cópia de ensaio>, sem --completo"
   },
@@ -1145,5 +1145,317 @@
       }
     }
   ],
-  "resultados": []
+  "resultados": [
+    {
+      "caso": "c03",
+      "agenteSha256": "sha256:05199cd472ee40e590217b422960422e588c5e230582cdac5d57053adf3f1ceb",
+      "julgamentos": [
+        {
+          "nota": 8,
+          "defeitos": [],
+          "pedidoSha256": "sha256:248ec04a7645c49ce80c4d7ded915be572456d89b2f348875bc50b71b532af44",
+          "imagemSha256": "sha256:e5e038e97c86a84f4d6a5312dcac334b45e9c80e7f2113739fef3643b52ed910",
+          "modelo": "sonnet",
+          "data": "2026-11-27T00:03:35.871Z"
+        },
+        {
+          "nota": 8,
+          "defeitos": [],
+          "pedidoSha256": "sha256:248ec04a7645c49ce80c4d7ded915be572456d89b2f348875bc50b71b532af44",
+          "imagemSha256": "sha256:e5e038e97c86a84f4d6a5312dcac334b45e9c80e7f2113739fef3643b52ed910",
+          "modelo": "sonnet",
+          "data": "2026-11-27T00:03:49.509Z"
+        },
+        {
+          "nota": 8,
+          "defeitos": [],
+          "pedidoSha256": "sha256:248ec04a7645c49ce80c4d7ded915be572456d89b2f348875bc50b71b532af44",
+          "imagemSha256": "sha256:e5e038e97c86a84f4d6a5312dcac334b45e9c80e7f2113739fef3643b52ed910",
+          "modelo": "sonnet",
+          "data": "2026-11-27T00:03:49.711Z"
+        }
+      ]
+    },
+    {
+      "caso": "c04",
+      "agenteSha256": "sha256:05199cd472ee40e590217b422960422e588c5e230582cdac5d57053adf3f1ceb",
+      "julgamentos": [
+        {
+          "nota": 8,
+          "defeitos": [],
+          "pedidoSha256": "sha256:c4e625808997dd2ee98e64f8ae50fc829049e1b85a44d92b07c121e20cf6eb4a",
+          "imagemSha256": "sha256:211c5854648622782020d1e756b85c100a2a02bc9224596c9d2e16a8d4cf4ec0",
+          "modelo": "sonnet",
+          "data": "2026-11-27T00:03:49.962Z"
+        },
+        {
+          "nota": 8,
+          "defeitos": [],
+          "pedidoSha256": "sha256:c4e625808997dd2ee98e64f8ae50fc829049e1b85a44d92b07c121e20cf6eb4a",
+          "imagemSha256": "sha256:211c5854648622782020d1e756b85c100a2a02bc9224596c9d2e16a8d4cf4ec0",
+          "modelo": "sonnet",
+          "data": "2026-11-27T00:03:50.152Z"
+        },
+        {
+          "nota": 8,
+          "defeitos": [],
+          "pedidoSha256": "sha256:c4e625808997dd2ee98e64f8ae50fc829049e1b85a44d92b07c121e20cf6eb4a",
+          "imagemSha256": "sha256:211c5854648622782020d1e756b85c100a2a02bc9224596c9d2e16a8d4cf4ec0",
+          "modelo": "sonnet",
+          "data": "2026-11-27T00:03:50.325Z"
+        }
+      ]
+    },
+    {
+      "caso": "c05",
+      "agenteSha256": "sha256:05199cd472ee40e590217b422960422e588c5e230582cdac5d57053adf3f1ceb",
+      "julgamentos": [
+        {
+          "nota": 6,
+          "defeitos": [
+            {
+              "parte": "hasteElevacao",
+              "tipo": "espessura",
+              "onde": "toda a extensão da haste, do topo da camisa à base da cabeça",
+              "sentido": "maior",
+              "evidencia": "Frontal e direita: a haste tem a largura da camisa. Vista isolada e caixa dão 60 mm de diâmetro; o prometido era Ø36. Critério de reprovação: haste tão grossa quanto a camisa."
+            }
+          ],
+          "pedidoSha256": "sha256:a016b7594329fca67565eef0ccc8a1681568fd76a1bc3a02b191f10dd141840d",
+          "imagemSha256": "sha256:fb4536127fc50e4655f6bca7641c9fd75cf40aa4deabbb81447010dac29420e8",
+          "modelo": "sonnet",
+          "data": "2026-11-27T00:03:50.493Z"
+        },
+        {
+          "nota": 6,
+          "defeitos": [
+            {
+              "parte": "hasteElevacao",
+              "tipo": "espessura",
+              "onde": "seção da haste em todo o comprimento, do topo da camisa à cabeça",
+              "sentido": "maior",
+              "evidencia": "Frontal e direita: haste clara com a mesma largura da camisa escura (517-582 px). Caixa 60 mm, prometido Ø 36. O alvo mostra haste mais fina que a camisa."
+            }
+          ],
+          "pedidoSha256": "sha256:a016b7594329fca67565eef0ccc8a1681568fd76a1bc3a02b191f10dd141840d",
+          "imagemSha256": "sha256:fb4536127fc50e4655f6bca7641c9fd75cf40aa4deabbb81447010dac29420e8",
+          "modelo": "sonnet",
+          "data": "2026-11-27T00:04:12.078Z"
+        },
+        {
+          "nota": 6,
+          "defeitos": [
+            {
+              "parte": "hasteElevacao",
+              "tipo": "espessura",
+              "onde": "toda a extensão da haste, do topo da camisa à cabeça",
+              "sentido": "maior",
+              "evidencia": "Frontal e traseira: haste com a mesma largura da camisa (~65 px = 60 mm), sem degrau. Prometido Ø 36. Isoladas: 96 px contra 40 px da camisa. A superior mostra o arco Ø 60 sob a cabeça."
+            }
+          ],
+          "pedidoSha256": "sha256:a016b7594329fca67565eef0ccc8a1681568fd76a1bc3a02b191f10dd141840d",
+          "imagemSha256": "sha256:fb4536127fc50e4655f6bca7641c9fd75cf40aa4deabbb81447010dac29420e8",
+          "modelo": "sonnet",
+          "data": "2026-11-27T00:04:12.267Z"
+        }
+      ]
+    },
+    {
+      "caso": "c06",
+      "agenteSha256": "sha256:05199cd472ee40e590217b422960422e588c5e230582cdac5d57053adf3f1ceb",
+      "julgamentos": [
+        {
+          "nota": 5,
+          "defeitos": [
+            {
+              "parte": "raios",
+              "tipo": "superficie",
+              "onde": "pontas externas dos dez raios, na junção com o lábio do aro",
+              "sentido": "anguloso",
+              "evidencia": "Vista direita e isométrica da parte: farpas, lascas e degraus nas pontas, sem curva contínua até o lábio; na montagem há degraus na emenda com o barril."
+            },
+            {
+              "parte": "raios",
+              "tipo": "espessura",
+              "onde": "trecho dos pares junto ao centro, do cubo até cerca de metade do comprimento",
+              "sentido": "maior",
+              "evidencia": "Vista direita da parte e da montagem: os dois raios de cada par estão colados e a fenda em V só começa a meio caminho; o miolo fica largo."
+            },
+            {
+              "parte": "aro",
+              "tipo": "superficie",
+              "onde": "face interna do barril, nos pontos onde os raios se unem",
+              "sentido": "segmentado",
+              "evidencia": "Isométrica da parte: recortes irregulares de borda rasgada na parede interna do barril, sem costura contínua com os raios."
+            },
+            {
+              "parte": "aro",
+              "tipo": "uniao",
+              "onde": "emenda aro e pontas dos raios, lado do lábio",
+              "sentido": "afastado",
+              "evidencia": "Isométrica do aro isolado com recortes e vazados na parede; na montagem a emenda mostra degraus e fresta nas pontas dos raios."
+            }
+          ],
+          "pedidoSha256": "sha256:7074c91771ee4e3b173c4b26cc53346e77f145a246c2144f27c3f0e9e072d508",
+          "imagemSha256": "sha256:6f9c79d313ee53a4e024c121af4c8250464e3abf958ec951b33975537055b5cb",
+          "modelo": "sonnet",
+          "data": "2026-11-27T00:03:50.662Z"
+        },
+        {
+          "nota": 5,
+          "defeitos": [
+            {
+              "parte": "raios",
+              "tipo": "uniao",
+              "onde": "pontas externas dos dez braços, junto ao lábio do aro",
+              "sentido": "atravessando",
+              "evidencia": "Isométrica e direita da parte: pontas com espetos, pés e lascas serrilhadas, sem curva contínua com o lábio. Direita da montagem: degraus no encontro com o aro."
+            },
+            {
+              "parte": "raios",
+              "tipo": "superficie",
+              "onde": "bordas externas dos braços, na emenda com o aro",
+              "sentido": "anguloso",
+              "evidencia": "Isométrica da parte: bordas rasgadas e de arestas vivas onde se pede raio contínuo. Arame isométrico: malha emaranhada nesses pontos."
+            },
+            {
+              "parte": "aro",
+              "tipo": "superficie",
+              "onde": "face interna do barril, nos assentos dos raios (direita e inferior na isométrica da parte)",
+              "sentido": "segmentado",
+              "evidencia": "Isométrica da parte: recortes irregulares, como buracos e lascas, no lugar de uma superfície contínua de barril."
+            },
+            {
+              "parte": "raios",
+              "tipo": "ausencia",
+              "onde": "face da frente dos cinco raios duplos",
+              "sentido": "faltando",
+              "evidencia": "Direita e isométrica da montagem: raios e cubo no mesmo cinza escuro, sem face usinada de cor distinta, exigida na variante B."
+            }
+          ],
+          "pedidoSha256": "sha256:7074c91771ee4e3b173c4b26cc53346e77f145a246c2144f27c3f0e9e072d508",
+          "imagemSha256": "sha256:6f9c79d313ee53a4e024c121af4c8250464e3abf958ec951b33975537055b5cb",
+          "modelo": "sonnet",
+          "data": "2026-11-27T00:04:12.448Z"
+        },
+        {
+          "nota": 5,
+          "defeitos": [
+            {
+              "parte": "raios",
+              "tipo": "uniao",
+              "onde": "extremidade externa de cada raio, junto ao lábio do aro",
+              "sentido": "atravessando",
+              "evidencia": "Vista direita isolada dos raios: lascas e abas pontudas nas dez pontas, por exemplo em (240,470), (655,470), (420,650), (350,260). Pé e degrau no lugar de curva contínua."
+            },
+            {
+              "parte": "raios",
+              "tipo": "superficie",
+              "onde": "pontas externas dos dez raios",
+              "sentido": "anguloso",
+              "evidencia": "Vista isométrica isolada dos raios: espinhos e cacos de aresta viva em (300,540), (390,300) e (570,260). Isso é emenda quebrada, não fusão arredondada."
+            },
+            {
+              "parte": "raios",
+              "tipo": "comprimento",
+              "onde": "fenda entre os dois raios de cada par, a partir do cubo",
+              "sentido": "menor",
+              "evidencia": "Vista direita isolada: a fenda começa a uns 40 a 50% do comprimento, em (325,490) e (440,580). Junto ao cubo o par é bloco único, e o critério pede abertura no primeiro quarto."
+            },
+            {
+              "parte": "aro",
+              "tipo": "superficie",
+              "onde": "parede interna do barril, perto dos assentos dos raios",
+              "sentido": "segmentado",
+              "evidencia": "Vista isométrica isolada do aro: recortes e rasgos irregulares na parede interna em (590,300), (620,470) e (480,630), em vez de superfície contínua."
+            }
+          ],
+          "pedidoSha256": "sha256:7074c91771ee4e3b173c4b26cc53346e77f145a246c2144f27c3f0e9e072d508",
+          "imagemSha256": "sha256:6f9c79d313ee53a4e024c121af4c8250464e3abf958ec951b33975537055b5cb",
+          "modelo": "sonnet",
+          "data": "2026-11-27T00:04:12.649Z"
+        }
+      ]
+    },
+    {
+      "caso": "c02",
+      "agenteSha256": "sha256:05199cd472ee40e590217b422960422e588c5e230582cdac5d57053adf3f1ceb",
+      "julgamentos": [
+        {
+          "nota": 7,
+          "defeitos": [
+            {
+              "parte": "porta",
+              "tipo": "posicao",
+              "onde": "painel inteiro, lado esquerdo, visto de cima",
+              "sentido": "externa",
+              "evidencia": "Na vista superior o painel cinza sai do contorno do casco à esquerda, cerca de 60 mm, e lê como placa por cima do casco; na lateral a posição em z coincide com o alvo."
+            },
+            {
+              "parte": "porta",
+              "tipo": "superficie",
+              "onde": "canto de baixo do painel",
+              "sentido": "anguloso",
+              "evidencia": "Na isométrica isolada o canto de baixo sai vivo, e o plano prometia cantos de baixo e de cima arredondados."
+            },
+            {
+              "parte": "barbatana",
+              "tipo": "superficie",
+              "onde": "corpo todo, em especial arestas de baixo",
+              "sentido": "anguloso",
+              "evidencia": "Isométrica isolada: laje poligonal de faces planas e arestas vivas, sem afilamento nem cantos de baixo arredondados prometidos."
+            },
+            {
+              "parte": "fuselagem",
+              "tipo": "superficie",
+              "onde": "barriga perto da frente e quina longitudinal no flanco",
+              "sentido": "segmentado",
+              "evidencia": "Vista esquerda: ondulação leve na linha da barriga à esquerda; isométrica e superior: quina suave ao longo do flanco, da cabine à cauda."
+            }
+          ],
+          "pedidoSha256": "sha256:75771afd9f61060476bbde1a0b84d941ea713922d89ab868025f51036d1112a3",
+          "imagemSha256": "sha256:f77cbe5ac1ee11a30d85d05380a58b6eac5bf75d9116f90bc376b4f536880af1",
+          "modelo": "sonnet",
+          "data": "2026-11-27T00:04:12.857Z"
+        },
+        {
+          "nota": 7,
+          "defeitos": [
+            {
+              "parte": "porta",
+              "tipo": "posicao",
+              "onde": "painel inteiro, face de fora, lado esquerdo",
+              "sentido": "externa",
+              "evidencia": "Superior: placa cinza fora da borda esquerda do casco. Frontal: lâmina cinza passa do arredondado do casco, no lado esquerdo. Porta de 224 mm em x sobre casco que afina."
+            },
+            {
+              "parte": "barbatana",
+              "tipo": "uniao",
+              "onde": "borda de cima, trecho de ré, contra a barriga",
+              "sentido": "afastado",
+              "evidencia": "Esquerda e direita: a aleta fica abaixo da linha da barriga, com fresta clara; isometrica: chapa colada por baixo. No contorno sobreposto a linha verde cai abaixo do casco."
+            },
+            {
+              "parte": "fuselagem",
+              "tipo": "superficie",
+              "onde": "linha inferior (flanco para a barriga) e joelho da cauda perto da ponta",
+              "sentido": "segmentado",
+              "evidencia": "Isometrica e esquerda: linha de baixo em trechos retos; superior: cone da cauda passa para haste de largura quase constante com joelho a cerca de z 1200."
+            },
+            {
+              "parte": "janela1D",
+              "tipo": "superficie",
+              "onde": "canto superior do lado de ré (também em janela1E)",
+              "sentido": "anguloso",
+              "evidencia": "Isometrica das duas janelas 1: o canto superior traseiro lê reto, sem raio, onde os outros três cantos são arredondados."
+            }
+          ],
+          "pedidoSha256": "sha256:75771afd9f61060476bbde1a0b84d941ea713922d89ab868025f51036d1112a3",
+          "imagemSha256": "sha256:f77cbe5ac1ee11a30d85d05380a58b6eac5bf75d9116f90bc376b4f536880af1",
+          "modelo": "sonnet",
+          "data": "2026-11-27T00:04:13.056Z"
+        }
+      ]
+    }
+  ]
 }
