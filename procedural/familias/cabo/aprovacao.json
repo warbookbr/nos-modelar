@@ -16,7 +16,6 @@
           "bdx": -1,
           "bdy": -1,
           "bdz": -1,
-          "bracadeiras": 0,
           "caimento": 0,
           "comprimento": 0,
           "desvioMaximo": 0.05,
@@ -40,9 +39,7 @@
           "p2y": -700,
           "p2z": -700,
           "passagens": 0,
-          "raioMinimo": 1,
-          "terminalA": 0,
-          "terminalB": 0
+          "raioMinimo": 1
         },
         "hash": "sha256:c9bf6ad28d72c3795142054b9c0508216b0c1014973d27aa26e117a7c796bde8",
         "medidas": []
@@ -58,7 +55,6 @@
           "bdx": -1,
           "bdy": 0,
           "bdz": 0,
-          "bracadeiras": 0,
           "caimento": 0,
           "comprimento": 0,
           "desvioMaximo": 0.2,
@@ -82,9 +78,7 @@
           "p2y": 0,
           "p2z": 0,
           "passagens": 0,
-          "raioMinimo": 5,
-          "terminalA": 0,
-          "terminalB": 0
+          "raioMinimo": 5
         },
         "hash": "sha256:04bddb8c70833a66c2a7457239dfdd8ebc85a67f407da56ae65a754b1dba90f4",
         "medidas": []
@@ -100,7 +94,6 @@
           "bdx": 1,
           "bdy": 1,
           "bdz": 1,
-          "bracadeiras": 1,
           "caimento": 100,
           "comprimento": 12000,
           "desvioMaximo": 5,
@@ -124,16 +117,14 @@
           "p2y": 700,
           "p2z": 700,
           "passagens": 2,
-          "raioMinimo": 10,
-          "terminalA": 2,
-          "terminalB": 2
+          "raioMinimo": 10
         },
-        "hash": "sha256:f9c37f5e798937d1be076f240fc9c18373518c9a8cf072727f05d676727b6a7e",
+        "hash": "sha256:09cedf3148234f31da4ae77591c40ca4362e551a6dfdeb0fb745773b3167dcf4",
         "medidas": []
       }
     },
     "varredura": {
-      "sondas": 72,
+      "sondas": 66,
       "recusasDeclaradas": [
         {
           "ponto": "adx=-1",
@@ -185,7 +176,6 @@
           "bdx": -1,
           "bdy": 0,
           "bdz": 0,
-          "bracadeiras": 0,
           "caimento": 0,
           "comprimento": 0,
           "desvioMaximo": 0.2,
@@ -209,9 +199,7 @@
           "p2y": 0,
           "p2z": 0,
           "passagens": 0,
-          "raioMinimo": 5,
-          "terminalA": 0,
-          "terminalB": 0
+          "raioMinimo": 5
         },
         "hash": "sha256:9f15f6dff9445ba3081db5500ea41d116c7837eaabfe46be68ff29bcae64fd2e",
         "medidas": []
@@ -227,7 +215,6 @@
           "bdx": 0,
           "bdy": 1,
           "bdz": 0,
-          "bracadeiras": 0,
           "caimento": 0,
           "comprimento": 300,
           "desvioMaximo": 0.2,
@@ -251,9 +238,7 @@
           "p2y": 0,
           "p2z": 0,
           "passagens": 0,
-          "raioMinimo": 5,
-          "terminalA": 0,
-          "terminalB": 0
+          "raioMinimo": 5
         },
         "hash": "sha256:b60ce56a8cb8011b346ffbbce26eef2552586cd98b8a12a82507fd985daa12ec",
         "medidas": []
@@ -269,7 +254,6 @@
           "bdx": -1,
           "bdy": 0,
           "bdz": 0,
-          "bracadeiras": 0,
           "caimento": 20,
           "comprimento": 0,
           "desvioMaximo": 0.2,
@@ -293,9 +277,7 @@
           "p2y": 0,
           "p2z": 0,
           "passagens": 0,
-          "raioMinimo": 5,
-          "terminalA": 0,
-          "terminalB": 0
+          "raioMinimo": 5
         },
         "hash": "sha256:9f72252d50e477088d09ec03231141f01a6eb02db0e2300d9a382d5015dc49cd",
         "medidas": []

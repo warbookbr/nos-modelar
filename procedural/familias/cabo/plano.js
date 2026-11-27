@@ -8,7 +8,6 @@
 import { ErroChamadaDeFamilia } from '../../../src/autoria/chamar-familia.js';
 import { ErroDaCurva, nosDaHaste, resolverElastica } from './curva.js';
 import { criarCaminho, distanciaDeAutocontato, estacoesDoCaminho, quadroSemTorcao, trechoMaximoDoTubo, ESCADA_DE_ESTACOES } from './caminho.js';
-import { acessoriosDoCabo } from './acessorios.js';
 
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 const norma = (a) => Math.hypot(a[0], a[1], a[2]);
@@ -160,12 +159,10 @@ export function planejar(parametros) {
       `um desvio que o cabo cumpra com até ${ESCADA_DE_ESTACOES.at(-1)} estações; esse pede mais`,
       'aumente desvioMaximo ou reduza o comprimento do cabo');
   }
-  const acessorios = acessoriosDoCabo({ A, B, dA, dB, passagens, diametro: d, terminalA: p.terminalA, terminalB: p.terminalB, bracadeiras: p.bracadeiras });
-  const facesDoCabo = facesDoTubo(p.lados, e.estacoes);
-  const faces = facesDoCabo + acessorios.faces;
+  const faces = facesDoTubo(p.lados, e.estacoes);
   if (p.orcamentoDeFaces > 0 && faces > p.orcamentoDeFaces) {
     recusar('orcamento-de-faces', 'orcamentoDeFaces', p.orcamentoDeFaces,
-      `ao menos ${faces} faces (0 é sem orçamento): o desvio de ${p.desvioMaximo} mm com ${p.lados} lados pede ${e.estacoes - 1} trechos e daria ${faces} faces${acessorios.faces ? `, ${facesDoCabo} do tubo e ${acessorios.faces} dos acessórios` : ''}`,
+      `ao menos ${faces} faces (0 é sem orçamento): o desvio de ${p.desvioMaximo} mm com ${p.lados} lados pede ${e.estacoes - 1} trechos e daria ${faces} faces`,
       'aumente orcamentoDeFaces, aumente desvioMaximo ou reduza os lados');
   }
   const deficit = (L - e.comprimentoDaMalha) / L;
@@ -177,7 +174,7 @@ export function planejar(parametros) {
   const tangentes = e.pontos.map((q) => q.t);
   const normais = quadroSemTorcao(tangentes);
   const plano = Object.freeze({
-    pontos: e.pontos.map((q) => q.p), normais, estacoes: e.estacoes, lados: p.lados, faces, facesDoTubo: facesDoCabo, triangulos: 2 * p.lados * (e.estacoes - 1) + 2 * (p.lados - 2) + acessorios.triangulos, acessorios, passagens,
+    pontos: e.pontos.map((q) => q.p), normais, estacoes: e.estacoes, lados: p.lados, faces, triangulos: 2 * p.lados * (e.estacoes - 1) + 2 * (p.lados - 2), passagens,
     comprimentoPedido: L, comprimentoDaCurva: caminho.comprimento, comprimentoDaMalha: e.comprimentoDaMalha, raioMinimo: caminho.raioMinimo,
     desvioDaCorda: e.desvio, distanciaDeAutocontato: contato, iteracoes: r.iteracoes, nosDaHaste: r.M, energia: r.energia,
     trechoA: caminho.trechoA, trechoB: caminho.trechoB, A, B, dA, dB, raio,

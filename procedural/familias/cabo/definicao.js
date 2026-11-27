@@ -15,7 +15,7 @@ export function medidasDoCabo(parametros = {}) {
   const plano = planejar(completos);
   return Object.freeze({
     comprimentoDeCorte: plano.comprimentoDaCurva, comprimentoPedido: plano.comprimentoPedido, comprimentoDaMalha: plano.comprimentoDaMalha,
-    faces: plano.faces, facesDoTubo: plano.facesDoTubo, triangulos: plano.triangulos, trechos: plano.estacoes - 1, lados: plano.lados,
+    faces: plano.faces, triangulos: plano.triangulos, trechos: plano.estacoes - 1, lados: plano.lados,
     raioMinimo: plano.raioMinimo, desvioDaCorda: plano.desvioDaCorda, distanciaDeAutocontato: plano.distanciaDeAutocontato,
   });
 }

@@ -36,10 +36,7 @@
     "p2z": { "tipo": "numero", "unidade": "mm", "padrao": 0, "minimo": -700, "maximo": 700, "medio": 0 },
     "p2dx": { "tipo": "numero", "unidade": "razao", "padrao": 1, "minimo": -1, "maximo": 1, "medio": 1 },
     "p2dy": { "tipo": "numero", "unidade": "razao", "padrao": 0, "minimo": -1, "maximo": 1, "medio": 0 },
-    "p2dz": { "tipo": "numero", "unidade": "razao", "padrao": 0, "minimo": -1, "maximo": 1, "medio": 0 },
-    "bracadeiras": { "tipo": "inteiro", "unidade": "contagem", "padrao": 0, "minimo": 0, "maximo": 1, "medio": 0 },
-    "terminalA": { "tipo": "inteiro", "unidade": "contagem", "padrao": 0, "minimo": 0, "maximo": 2, "medio": 0 },
-    "terminalB": { "tipo": "inteiro", "unidade": "contagem", "padrao": 0, "minimo": 0, "maximo": 2, "medio": 0 }
+    "p2dz": { "tipo": "numero", "unidade": "razao", "padrao": 0, "minimo": -1, "maximo": 1, "medio": 0 }
   },
   "restricoes": [
     { "id": "pontas-distintas", "expressao": "dx * dx + dy * dy + dz * dz >= diametro * diametro", "motivo": "as duas pontas estão a menos de um diâmetro uma da outra; o cabo não tem por onde passar" },

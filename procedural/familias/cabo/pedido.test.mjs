@@ -128,8 +128,13 @@ describe('as passagens e as braçadeiras', () => {
   it('as faces do pedido somam as do cabo e as dos acessórios, e a malha tem essa contagem', () => {
     const m = medidasDoPedido({ ...COM_PASSAGENS, bracadeiras: true, terminais: { de: 'capa', para: 'olhal' } });
     const todas = gerar(cabo({ ...COM_PASSAGENS, bracadeiras: true, terminais: { de: 'capa', para: 'olhal' } }));
-    expect(m.cabos[0].faces).toBe(todas.F.size);
-    expect(m.cabos[0].faces).toBe(m.cabos[0].facesDoTubo + 2 * FACES_DO_ACESSORIO.bracadeira + FACES_DO_ACESSORIO.capa + FACES_DO_ACESSORIO.olhal);
+    expect(m.faces).toBe(todas.F.size);
+    expect(m.facesDosAcessorios).toBe(2 * FACES_DO_ACESSORIO.bracadeira + FACES_DO_ACESSORIO.capa + FACES_DO_ACESSORIO.olhal);
+    expect(m.faces).toBe(m.cabos[0].faces + m.facesDosAcessorios);
+    /* o orçamento vale para o tubo e os acessórios juntos */
+    const e = recusa(() => cabo({ ...COM_PASSAGENS, bracadeiras: true, terminais: { de: 'capa', para: 'olhal' }, orcamentoDeFaces: m.faces - 1 }));
+    expect(e.message).toMatch(new RegExp(`ao menos ${m.faces} faces .*${m.facesDosAcessorios} dos acessórios`));
+    expect(() => cabo({ ...COM_PASSAGENS, bracadeiras: true, terminais: { de: 'capa', para: 'olhal' }, orcamentoDeFaces: m.faces })).not.toThrow();
   });
 
   it('sem direção a passagem segue a corda entre os vizinhos', () => {
@@ -171,7 +176,7 @@ describe('os terminais', () => {
   const n = gerar(cabo(pedido));
   it('a capa e o olhal são partes próprias, de faces conhecidas, e a malha tem a contagem do plano', () => {
     expect(partes(n)).toMatchObject({ 'terminal-a': FACES_DO_ACESSORIO.capa, 'terminal-b': FACES_DO_ACESSORIO.capa, 'olhal-b': FACES_DO_ACESSORIO.olhal - FACES_DO_ACESSORIO.capa });
-    expect(n.F.size).toBe(medidasDoPedido(pedido).cabos[0].faces);
+    expect(n.F.size).toBe(medidasDoPedido(pedido).faces);
     expect((n.orfaos ?? []).map((o) => o.motivo)).toEqual([]);
     expect(pedacosDaMalha(n)).toBe(4);
   });
@@ -233,11 +238,11 @@ describe('o feixe', () => {
     expect(() => feixeDeCabos({ ...pedido, orcamentoDeFaces: faces })).not.toThrow();
   });
 
-  it('o feixe leva também terminais e passagens, em cada cabo', () => {
-    const com = { ...pedido, comprimento: 330, para: { ponto: [300, 0, 0], direcao: '-x' }, passagens: [{ ponto: [150, 20, 0] }], bracadeiras: true, terminais: { de: 'capa' } };
-    const f = feixeDeCabos(com);
-    expect(gerarFeixe(com).F.size).toBe(f.faces);
-    expect(Object.keys(partes(gerarFeixe(com))).sort()).toEqual(['bracadeira-1-1', 'bracadeira-1-2', 'bracadeira-1-3', 'cabo-1', 'cabo-2', 'cabo-3', 'terminal-a-1', 'terminal-a-2', 'terminal-a-3']);
+  it('o feixe leva passagens em cada cabo, e os terminais e braçadeiras ficam para o cabo() à parte', () => {
+    const com = { ...pedido, comprimento: 330, para: { ponto: [300, 0, 0], direcao: '-x' }, passagens: [{ ponto: [150, 20, 0] }] };
+    expect(gerarFeixe(com).F.size).toBe(feixeDeCabos(com).faces);
+    expect(recusa(() => feixeDeCabos({ ...com, terminais: { de: 'capa' } })).campo).toBe('pedido.terminais');
+    expect(recusa(() => feixeDeCabos({ ...com, bracadeiras: true })).campo).toBe('pedido.terminais');
   });
 
   it('recusa o feixe de um cabo só, o diâmetro solto, o campo desconhecido, a mais de seis cabos e o cabo() com feixe', () => {

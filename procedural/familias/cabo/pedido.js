@@ -13,7 +13,8 @@
 import { ErroChamadaDeFamilia, chamar } from '../../../src/autoria/chamar-familia.js';
 import { CABO, medidasDoCabo } from './definicao.js';
 import { planejar } from './plano.js';
-import { perpendicular, TIPOS_DE_TERMINAL } from './acessorios.js';
+import { acessoriosDoCabo, perpendicular, TIPOS_DE_TERMINAL } from './acessorios.js';
+import { ID_DA_CAPA, ID_DO_ANEL } from './composicoes.js';
 
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 const soma = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
@@ -131,10 +132,8 @@ function converter(pedido, lido, diametro, inicio) {
       Object.assign(parametros, { [`p${k}x`]: salto[0], [`p${k}y`]: salto[1], [`p${k}z`]: salto[2], [`p${k}dx`]: q.direcao[0], [`p${k}dy`]: q.direcao[1], [`p${k}dz`]: q.direcao[2] });
       anterior = q.ponto;
     });
-    if (pedido.bracadeiras) parametros.bracadeiras = 1;
-  } else if (pedido.bracadeiras) recusar('pedido.bracadeiras', pedido.bracadeiras, 'braçadeiras só com passagens: a braçadeira fica no ponto de cada passagem; dê passagens ou tire bracadeiras');
-  if (lido.terminalDe) parametros.terminalA = lido.terminalDe;
-  if (lido.terminalPara) parametros.terminalB = lido.terminalPara;
+  }
+  if (!passagens.length && pedido.bracadeiras) recusar('pedido.bracadeiras', pedido.bracadeiras, 'braçadeiras só com passagens: a braçadeira fica no ponto de cada passagem; dê passagens ou tire bracadeiras');
   return parametros;
 }
 
@@ -163,8 +162,48 @@ function distanciaMinima(a, b) {
  */
 export function cabo(pedido) {
   if (plano(pedido) && pedido.feixe !== undefined) recusar('pedido.feixe', pedido.feixe, 'nada em cabo(): o feixe são várias instâncias da família, e duas chamadas na mesma receita repetem os ids; use feixeDeCabos(pedido) e passe `poses` a instanciaDeFamilia');
-  const { parametros, ids } = parametrosDoPedido(pedido);
-  return Object.freeze(parametros.map((p, i) => chamar(CABO, ids[i], p)));
+  const lido = lerPedido(pedido);
+  const parametros = converter(pedido, lido, pedido.diametro ?? 6, lido.de.ponto);
+  const acessorios = acessoriosDoPedido(pedido, lido, parametros.diametro);
+  const id = idDoPedido(pedido);
+  if (acessorios.faces > 0 && parametros.orcamentoDeFaces !== 0) {
+    const orcamento = parametros.orcamentoDeFaces ?? CABO.contrato.parametros.orcamentoDeFaces.padrao;
+    const tubo = medidasDoCabo({ ...parametros, orcamentoDeFaces: 0 }).faces;
+    if (orcamento > 0 && tubo + acessorios.faces > orcamento) {
+      recusar('pedido.orcamentoDeFaces', orcamento, `ao menos ${tubo + acessorios.faces} faces (0 é sem orçamento): ${tubo} do tubo e ${acessorios.faces} dos acessórios; aumente orcamentoDeFaces, aumente desvioMaximo ou reduza os lados`);
+    }
+    parametros.orcamentoDeFaces = 0;
+  }
+  return Object.freeze([chamar(CABO, id, parametros), ...chamadasDosAcessorios(id, acessorios)]);
+}
+
+/** As faces e a geometria dos acessórios que o pedido pede (terminais e braçadeiras). */
+function acessoriosDoPedido(pedido, lido, diametro) {
+  return acessoriosDoCabo({
+    A: lido.de.ponto, B: lido.para.ponto, dA: lido.de.direcao, dB: lido.para.direcao, diametro,
+    passagens: lido.passagens.map((q) => ({ P: q.ponto, d: q.direcao })), terminalA: lido.terminalDe, terminalB: lido.terminalPara, bracadeiras: pedido.bracadeiras ? 1 : 0,
+  });
+}
+
+const m = (mm) => mm / 1000;
+const vm = (v) => v.map(m);
+/* As chamadas das composições `cabo.capa` e `cabo.anel`, uma por acessório, com id de origem e nome de parte próprios. */
+function chamadasDosAcessorios(id, { terminais, bracadeiras }) {
+  const chamadas = [];
+  const capa = (origem, nome, g) => chamadas.push({ id: `${id}-${nome}`, composicao: ID_DA_CAPA, argumentos: { origem, nome, p0: vm(g.p0), p1: vm(g.p1), normal: [...g.normal], raio: m(g.raio) } });
+  const anel = (origem, nome, g) => chamadas.push({ id: `${id}-${nome}`, composicao: ID_DO_ANEL, argumentos: { origem, nome, normal: [...g.normal], fio: m(g.fio), ...Object.fromEntries(g.pontos.map((q, k) => [`q${k}`, vm(q)])) } });
+  terminais.forEach((t, i) => {
+    capa(100 + i, `terminal-${t.lado}`, t.capa);
+    if (t.tipo === 2) anel(110 + i, `olhal-${t.lado}`, t.anel);
+  });
+  bracadeiras.forEach((b, i) => anel(120 + i, `bracadeira-${i + 1}`, b));
+  return chamadas.map((c) => Object.freeze(c));
+}
+
+function idDoPedido(pedido) {
+  const id = pedido.id ?? 'cabo';
+  if (typeof id !== 'string' || !/^[a-z][a-z0-9-]*$/.test(id)) recusar('pedido.id', id, 'um identificador em minúsculas, números e hífen, começando por letra');
+  return id;
 }
 
 /**
@@ -182,10 +221,10 @@ export function feixeDeCabos(pedido) {
 /** Os parâmetros da família de cada cabo do pedido (um por cabo do feixe) e os ids das chamadas; o feixe é conferido aqui. */
 export function parametrosDoPedido(pedido) {
   const lido = lerPedido(pedido);
-  const id = pedido.id ?? 'cabo';
-  if (typeof id !== 'string' || !/^[a-z][a-z0-9-]*$/.test(id)) recusar('pedido.id', id, 'um identificador em minúsculas, números e hífen, começando por letra');
+  const id = idDoPedido(pedido);
   if (pedido.feixe === undefined) return { parametros: [converter(pedido, lido, pedido.diametro ?? 6, lido.de.ponto)], ids: [id] };
 
+  if (lido.terminalDe || lido.terminalPara || pedido.bracadeiras) recusar('pedido.terminais', 'terminais ou braçadeiras', 'nada no feixe: as instâncias levam só o cabo e as passagens; peça terminais e braçadeiras num cabo() à parte');
   const feixe = pedido.feixe;
   if (!plano(feixe)) recusar('pedido.feixe', feixe, '{ diametros: [d1, d2, ...], folgaLateral?, lateral? }');
   for (const chave of Object.keys(feixe)) if (!CAMPOS_DO_FEIXE.includes(chave)) recusar(`pedido.feixe.${chave}`, feixe[chave], `um campo do feixe: ${CAMPOS_DO_FEIXE.join(', ')}`);
@@ -222,9 +261,12 @@ export function parametrosDoPedido(pedido) {
   return { parametros, ids: diametros.map((_, i) => `${id}-${i + 1}`), faces: total, lateral, centros };
 }
 
-/** As medidas do pedido: de cada cabo o comprimento de corte, as faces e o raio mínimo, e a soma das faces. */
+/** As medidas do pedido: de cada cabo o comprimento de corte, as faces do tubo e o raio mínimo; `facesDosAcessorios` e `faces`, a soma de tudo que o pedido desenha. */
 export function medidasDoPedido(pedido) {
-  const { parametros, faces } = parametrosDoPedido(pedido);
+  const { parametros } = parametrosDoPedido(pedido);
   const cabos = parametros.map((p) => medidasDoCabo(p));
-  return Object.freeze({ cabos, faces: faces ?? cabos[0].faces });
+  const lido = lerPedido(pedido);
+  const acessorios = pedido.feixe === undefined ? acessoriosDoPedido(pedido, lido, parametros[0].diametro) : { faces: 0 };
+  const faces = cabos.reduce((s, c) => s + c.faces, 0) + acessorios.faces;
+  return Object.freeze({ cabos, facesDosAcessorios: acessorios.faces, faces });
 }
