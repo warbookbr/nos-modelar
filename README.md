@@ -74,7 +74,7 @@ robótico, e `npm run comecar -- modelar/peca/corrigir` lista as peças. Os gate
 vez por `npm run gates`, e `reguas:check` reprova quando a lista local e a do CI
 divergem.
 
-Planos ativos: <!-- planos-ativos:inicio -->[operações repartidas entre núcleos](docs/modelar/planos/2026-11-26-operacoes-repartidas-entre-nucleos.md), [processo e CI](docs/modelar/planos/2026-11-26-processo-e-ci.md), [laço de modelagem mais rápido](docs/modelar/planos/2026-11-26-laco-de-modelagem-mais-rapido.md) e [ferramentas e documentação](docs/modelar/planos/2026-11-26-ferramentas-e-documentacao.md).<!-- planos-ativos:fim -->
+Planos ativos: <!-- planos-ativos:inicio -->[operações repartidas entre núcleos](docs/modelar/planos/2026-11-26-operacoes-repartidas-entre-nucleos.md), [processo e CI](docs/modelar/planos/2026-11-26-processo-e-ci.md), [laço de modelagem mais rápido](docs/modelar/planos/2026-11-26-laco-de-modelagem-mais-rapido.md), [ferramentas e documentação](docs/modelar/planos/2026-11-26-ferramentas-e-documentacao.md) e [perna estreita](docs/modelar/planos/2026-11-27-perna-estreita.md).<!-- planos-ativos:fim -->
 
 Já fecharam [ajustes no núcleo dos veículos](./docs/modelar/decisoes/PLANOS-ENCERRADOS.md) em 2026-10-30;
 Já fecharam [veículos de referência livre](./docs/modelar/decisoes/PLANOS-ENCERRADOS.md) em 2026-10-20; [objetos externos

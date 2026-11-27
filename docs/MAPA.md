@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2470 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2471 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -753,6 +753,7 @@
 - `2026-11-26-laco-de-modelagem-mais-rapido.md` — Laço de modelagem mais rápido: a rodada mede, mostra e registra em minutos, com a decisão da pessoa gravada
 - `2026-11-26-operacoes-repartidas-entre-nucleos.md` — Operações repartidas entre núcleos: o corte das aberturas, a subtração e a divisão usando mais de um núcleo, com a mesma malha
 - `2026-11-26-processo-e-ci.md` — Processo e CI: o envio entra na main sem vermelho falso, e as regras de texto viram régua
+- `2026-11-27-perna-estreita.md` — Perna estreita: a perna do humanoide numa coluna da largura de uma perna
 - `BACKLOG.md` — Backlog aberto
 - `MODELO.md` — [ID] — resultado curto
 - `README.md` — Planos do Modelar
