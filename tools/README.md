@@ -203,6 +203,7 @@ Só os testes usam; a conferência exige que algum teste importe cada um.
 
 Nenhum comando, import de ferramenta viva, skill ou configuração chama o que está abaixo; o motivo de cada um ficar vem depois dos dois pontos.
 
+- `modelar/reduzir-malha.mjs`: o comando e a exportação o chamam na fatia 2 do plano de reduzir polígonos
 - `blender/`, a pasta: ferramentas opcionais do Blender, fora do CI e rodadas à mão; uso em docs/modelar/blender/REGUA-E-PACOTE-CEGO.md
 - `modelar/cadeiras-medida.mjs`: a decisão de 2026-11-26 era apagar e parou: o teste da família cadeira (procedural/familias/cadeira/cadeira.test.mjs) importa ALVOS e compararPerfil dele; espera a pessoa
 - `modelar/conferir-retrato-do-acervo.mjs`: à espera da decisão da pessoa (apagar ou religar)

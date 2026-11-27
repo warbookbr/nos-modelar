@@ -66,4 +66,6 @@ Decidido pela pessoa em 2026-11-27 ("sim, vamos criar o plano"): o plano segue a
 
 ## Andamento
 
+Fatia 1, em 2026-11-27 (não fechada: o alvo de 215 mil triângulos não foi alcançado com 2 graus medidos, e volta à pessoa). O redutor `tools/modelar/reduzir-malha.mjs` e a conferência independente (`conferir-reducao.mjs`, no banco de provas) estão feitos e testados nos dois sentidos (`tools/modelar/reduzir-malha.test.mjs`, 9 testes). No furgão, 521.976 triângulos viram 369.202 (29,3% a menos) em 30 s, a mesma saída em duas execuções, desvio máximo de posição 0,0484 mm em todas as 127 partes e normal até 1,55 graus em 126 delas, com a exceção de `refletorLanternaEsquerda` a 3,9 graus; a carroceria cai 52%. A luz rasante, original e reduzida lado a lado, e as medidas por parte estão em [`docs/modelar/banco-de-provas/reduzir-poligonos-2026-11-27/`](../banco-de-provas/reduzir-poligonos-2026-11-27/README.md). A parada de "ganho de 30% nas chapas" não dispara (a carroceria dá 52%), e a de tempo também não (30 s no furgão inteiro); o que fica para a pessoa é decidir entre afrouxar o teto de normal (4 graus dão 357 mil, 6 graus 341 mil triângulos) e reduzir na receita as peças pequenas densas (fatia 3).
+
 ## Fechamento

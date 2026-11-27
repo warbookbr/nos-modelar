@@ -1,0 +1,2264 @@
+{
+ "executarReceitaMs": 43107,
+ "facesDaMalha": 262947,
+ "reduzirMs": 30317,
+ "estatisticas": {
+  "triangulosAntes": 521976,
+  "triangulosDepois": 369202,
+  "colapsos": 76387,
+  "recusas": 2866,
+  "verticesAntes": 261060,
+  "verticesDepois": 184673,
+  "toleranciaMm": 0.05,
+  "normalGraus": 2,
+  "quinaGraus": 30
+ },
+ "sha256": "2e6514697264f53b0775052cb8ec0f146519eacf1dfd7776ae61b260a24e8001",
+ "sha256DaSegundaExecucao": "2e6514697264f53b0775052cb8ec0f146519eacf1dfd7776ae61b260a24e8001",
+ "segundaExecucaoMs": 34331,
+ "repete": true,
+ "conferirMs": 169294,
+ "conferencia": {
+  "ok": false,
+  "todos": {
+   "desvioMaxMm": 0.048414358193438645,
+   "normalMaxGraus": 3.9017063657585256,
+   "triangulosOriginal": 521976,
+   "triangulosReduzida": 369202,
+   "arestas": 553803,
+   "borda": 0,
+   "lacos": 0,
+   "multiplas": 0,
+   "invertidas": 0,
+   "fechada": true,
+   "bordaOriginal": 0,
+   "lacosOriginal": 0
+  },
+  "problemas": []
+ },
+ "partes": [
+  {
+   "parte": "carroceria",
+   "antes": 201962,
+   "depois": 96096,
+   "desvioMaxMm": 0.0446,
+   "idaMm": 0.0323,
+   "voltaMm": 0.0446,
+   "normalMaxGraus": 1.55,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "parachoqueDianteiro",
+   "antes": 26256,
+   "depois": 22556,
+   "desvioMaxMm": 0.0332,
+   "idaMm": 0.0324,
+   "voltaMm": 0.0332,
+   "normalMaxGraus": 0.88,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "parachoqueTraseiro",
+   "antes": 19480,
+   "depois": 15366,
+   "desvioMaxMm": 0.0267,
+   "idaMm": 0.026,
+   "voltaMm": 0.0267,
+   "normalMaxGraus": 1.12,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "saiaPresaEsquerda",
+   "antes": 9992,
+   "depois": 8078,
+   "desvioMaxMm": 0.0333,
+   "idaMm": 0.0303,
+   "voltaMm": 0.0333,
+   "normalMaxGraus": 1.49,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "vidroParaBrisa",
+   "antes": 9408,
+   "depois": 3578,
+   "desvioMaxMm": 0.0461,
+   "idaMm": 0.0325,
+   "voltaMm": 0.0461,
+   "normalMaxGraus": 0.5,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "saiaPresaDireita",
+   "antes": 9216,
+   "depois": 7610,
+   "desvioMaxMm": 0.0333,
+   "idaMm": 0.0303,
+   "voltaMm": 0.0333,
+   "normalMaxGraus": 1.49,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "refletorLanternaDireita",
+   "antes": 7912,
+   "depois": 7766,
+   "desvioMaxMm": 0.0168,
+   "idaMm": 0.0158,
+   "voltaMm": 0.0168,
+   "normalMaxGraus": 0.66,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "refletorLanternaEsquerda",
+   "antes": 7912,
+   "depois": 7760,
+   "desvioMaxMm": 0.0168,
+   "idaMm": 0.0158,
+   "voltaMm": 0.0168,
+   "normalMaxGraus": 3.9,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "refletorLuzDeCantoDireita",
+   "antes": 7344,
+   "depois": 6168,
+   "desvioMaxMm": 0.0445,
+   "idaMm": 0.0324,
+   "voltaMm": 0.0445,
+   "normalMaxGraus": 1.51,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "refletorLuzDeCantoEsquerda",
+   "antes": 7344,
+   "depois": 6172,
+   "desvioMaxMm": 0.0445,
+   "idaMm": 0.0324,
+   "voltaMm": 0.0445,
+   "normalMaxGraus": 1.51,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "molduraArcoTraseiroDireito",
+   "antes": 7256,
+   "depois": 6616,
+   "desvioMaxMm": 0.0391,
+   "idaMm": 0.0323,
+   "voltaMm": 0.0391,
+   "normalMaxGraus": 0.55,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "molduraArcoTraseiroEsquerdo",
+   "antes": 7256,
+   "depois": 6620,
+   "desvioMaxMm": 0.0391,
+   "idaMm": 0.0323,
+   "voltaMm": 0.0391,
+   "normalMaxGraus": 0.55,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "pneuDianteiroDireito",
+   "antes": 6720,
+   "depois": 6720,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "pneuDianteiroEsquerdo",
+   "antes": 6720,
+   "depois": 6720,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "pneuTraseiroDireito",
+   "antes": 6720,
+   "depois": 6720,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "pneuTraseiroEsquerdo",
+   "antes": 6720,
+   "depois": 6720,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "molduraArcoDianteiroDireito",
+   "antes": 5672,
+   "depois": 5522,
+   "desvioMaxMm": 0.0353,
+   "idaMm": 0.0314,
+   "voltaMm": 0.0353,
+   "normalMaxGraus": 0.5,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "molduraArcoDianteiroEsquerdo",
+   "antes": 5672,
+   "depois": 5520,
+   "desvioMaxMm": 0.0347,
+   "idaMm": 0.0313,
+   "voltaMm": 0.0347,
+   "normalMaxGraus": 0.48,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "refletorPiscaLateralDireito",
+   "antes": 5440,
+   "depois": 5168,
+   "desvioMaxMm": 0.0269,
+   "idaMm": 0.0131,
+   "voltaMm": 0.0269,
+   "normalMaxGraus": 1,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "refletorPiscaLateralEsquerdo",
+   "antes": 5440,
+   "depois": 5162,
+   "desvioMaxMm": 0.0224,
+   "idaMm": 0.0132,
+   "voltaMm": 0.0224,
+   "normalMaxGraus": 1,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "forroArcoDianteiroDireito",
+   "antes": 5368,
+   "depois": 4742,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "forroArcoDianteiroEsquerdo",
+   "antes": 5368,
+   "depois": 4738,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "forroArcoTraseiroDireito",
+   "antes": 5368,
+   "depois": 4738,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "forroArcoTraseiroEsquerdo",
+   "antes": 5368,
+   "depois": 4742,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "abaVaoParaBrisa",
+   "antes": 4224,
+   "depois": 4010,
+   "desvioMaxMm": 0.0392,
+   "idaMm": 0.0321,
+   "voltaMm": 0.0392,
+   "normalMaxGraus": 0.47,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "copoPosicaoFarolDireito",
+   "antes": 4176,
+   "depois": 4170,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "copoPosicaoFarolEsquerdo",
+   "antes": 4176,
+   "depois": 4170,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "refletorFarolAltoDireito",
+   "antes": 3840,
+   "depois": 3840,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "refletorFarolAltoEsquerdo",
+   "antes": 3840,
+   "depois": 3840,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "refletorFarolBaixoDireito",
+   "antes": 3840,
+   "depois": 3840,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "refletorFarolBaixoEsquerdo",
+   "antes": 3840,
+   "depois": 3840,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "vidroPortaTraseiraDireita",
+   "antes": 3480,
+   "depois": 214,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "vidroPortaTraseiraEsquerda",
+   "antes": 3480,
+   "depois": 208,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "borrachaParaBrisa",
+   "antes": 3168,
+   "depois": 2670,
+   "desvioMaxMm": 0.0484,
+   "idaMm": 0.0323,
+   "voltaMm": 0.0484,
+   "normalMaxGraus": 0.93,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "luzDeCantoDireita",
+   "antes": 3146,
+   "depois": 3010,
+   "desvioMaxMm": 0.021,
+   "idaMm": 0.021,
+   "voltaMm": 0.021,
+   "normalMaxGraus": 0.99,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "luzDeCantoEsquerda",
+   "antes": 3142,
+   "depois": 3018,
+   "desvioMaxMm": 0.0204,
+   "idaMm": 0.0187,
+   "voltaMm": 0.0204,
+   "normalMaxGraus": 0.74,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "retrovisorDireito",
+   "antes": 3096,
+   "depois": 2756,
+   "desvioMaxMm": 0.0257,
+   "idaMm": 0.0257,
+   "voltaMm": 0.0154,
+   "normalMaxGraus": 1.12,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "retrovisorEsquerdo",
+   "antes": 3084,
+   "depois": 2752,
+   "desvioMaxMm": 0.0219,
+   "idaMm": 0.0201,
+   "voltaMm": 0.0219,
+   "normalMaxGraus": 1.12,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "abaVaoPortaTraseiraDireita",
+   "antes": 2592,
+   "depois": 2266,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "abaVaoPortaTraseiraEsquerda",
+   "antes": 2592,
+   "depois": 2266,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "lanternaFreioDireita",
+   "antes": 2456,
+   "depois": 2334,
+   "desvioMaxMm": 0.0299,
+   "idaMm": 0.0299,
+   "voltaMm": 0.0246,
+   "normalMaxGraus": 1.51,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "lanternaFreioEsquerda",
+   "antes": 2438,
+   "depois": 2320,
+   "desvioMaxMm": 0.0299,
+   "idaMm": 0.0299,
+   "voltaMm": 0.0235,
+   "normalMaxGraus": 1,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "grade",
+   "antes": 2120,
+   "depois": 1216,
+   "desvioMaxMm": 0.0132,
+   "idaMm": 0.0091,
+   "voltaMm": 0.0132,
+   "normalMaxGraus": 0.12,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "borrachaPortaTraseiraDireita",
+   "antes": 1944,
+   "depois": 1478,
+   "desvioMaxMm": 0.0078,
+   "idaMm": 0.0065,
+   "voltaMm": 0.0078,
+   "normalMaxGraus": 0.36,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "borrachaPortaTraseiraEsquerda",
+   "antes": 1944,
+   "depois": 1474,
+   "desvioMaxMm": 0.0078,
+   "idaMm": 0.0065,
+   "voltaMm": 0.0078,
+   "normalMaxGraus": 0.36,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "vidroPortaCabineEsquerda",
+   "antes": 1924,
+   "depois": 286,
+   "desvioMaxMm": 0.003,
+   "idaMm": 0.0026,
+   "voltaMm": 0.003,
+   "normalMaxGraus": 0.19,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "vidroPortaCabineDireita",
+   "antes": 1918,
+   "depois": 306,
+   "desvioMaxMm": 0.0032,
+   "idaMm": 0.0028,
+   "voltaMm": 0.0032,
+   "normalMaxGraus": 0.07,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "abaArcoDianteiroDireito",
+   "antes": 1668,
+   "depois": 1650,
+   "desvioMaxMm": 0.0114,
+   "idaMm": 0.008,
+   "voltaMm": 0.0114,
+   "normalMaxGraus": 0.23,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "abaArcoDianteiroEsquerdo",
+   "antes": 1668,
+   "depois": 1650,
+   "desvioMaxMm": 0.0114,
+   "idaMm": 0.0079,
+   "voltaMm": 0.0114,
+   "normalMaxGraus": 0.23,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "abaArcoTraseiroDireito",
+   "antes": 1668,
+   "depois": 1650,
+   "desvioMaxMm": 0.0114,
+   "idaMm": 0.008,
+   "voltaMm": 0.0114,
+   "normalMaxGraus": 0.23,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "abaArcoTraseiroEsquerdo",
+   "antes": 1668,
+   "depois": 1650,
+   "desvioMaxMm": 0.0114,
+   "idaMm": 0.008,
+   "voltaMm": 0.0114,
+   "normalMaxGraus": 0.23,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "lanternaReDireita",
+   "antes": 1502,
+   "depois": 1470,
+   "desvioMaxMm": 0.0306,
+   "idaMm": 0.0225,
+   "voltaMm": 0.0306,
+   "normalMaxGraus": 0.88,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "discoDianteiroDireito",
+   "antes": 1484,
+   "depois": 1320,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "discoDianteiroEsquerdo",
+   "antes": 1484,
+   "depois": 1324,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "discoTraseiroDireito",
+   "antes": 1484,
+   "depois": 1324,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "discoTraseiroEsquerdo",
+   "antes": 1484,
+   "depois": 1322,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "cuboDianteiroDireito",
+   "antes": 1460,
+   "depois": 1320,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "cuboDianteiroEsquerdo",
+   "antes": 1460,
+   "depois": 1324,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "cuboTraseiroDireito",
+   "antes": 1460,
+   "depois": 1318,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "cuboTraseiroEsquerdo",
+   "antes": 1460,
+   "depois": 1328,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "carcacaFarolDireito",
+   "antes": 1456,
+   "depois": 964,
+   "desvioMaxMm": 0.02,
+   "idaMm": 0.0136,
+   "voltaMm": 0.02,
+   "normalMaxGraus": 1.15,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "carcacaFarolEsquerdo",
+   "antes": 1456,
+   "depois": 956,
+   "desvioMaxMm": 0.0165,
+   "idaMm": 0.0136,
+   "voltaMm": 0.0165,
+   "normalMaxGraus": 0.94,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "lanternaReEsquerda",
+   "antes": 1448,
+   "depois": 1426,
+   "desvioMaxMm": 0.031,
+   "idaMm": 0.031,
+   "voltaMm": 0.0288,
+   "normalMaxGraus": 0.86,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "lanternaNeblinaDireita",
+   "antes": 1358,
+   "depois": 1342,
+   "desvioMaxMm": 0.0279,
+   "idaMm": 0.0189,
+   "voltaMm": 0.0279,
+   "normalMaxGraus": 0.96,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "lanternaNeblinaEsquerda",
+   "antes": 1358,
+   "depois": 1338,
+   "desvioMaxMm": 0.0006,
+   "idaMm": 0.0006,
+   "voltaMm": 0.0005,
+   "normalMaxGraus": 0.03,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "abaVaoPortaCabineEsquerda",
+   "antes": 1320,
+   "depois": 1308,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "baseRetrovisorDireita",
+   "antes": 1320,
+   "depois": 76,
+   "desvioMaxMm": 0.0027,
+   "idaMm": 0.0021,
+   "voltaMm": 0.0027,
+   "normalMaxGraus": 0.03,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "baseRetrovisorEsquerda",
+   "antes": 1320,
+   "depois": 72,
+   "desvioMaxMm": 0.0023,
+   "idaMm": 0.0013,
+   "voltaMm": 0.0023,
+   "normalMaxGraus": 0.02,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "abaVaoPortaCabineDireita",
+   "antes": 1296,
+   "depois": 1284,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "farolEsquerdo",
+   "antes": 1286,
+   "depois": 1142,
+   "desvioMaxMm": 0.0202,
+   "idaMm": 0.0202,
+   "voltaMm": 0.0151,
+   "normalMaxGraus": 0.85,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "lanternaPiscaEsquerda",
+   "antes": 1272,
+   "depois": 1260,
+   "desvioMaxMm": 0.0013,
+   "idaMm": 0.0013,
+   "voltaMm": 0.0007,
+   "normalMaxGraus": 0.07,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "lanternaPiscaDireita",
+   "antes": 1270,
+   "depois": 1260,
+   "desvioMaxMm": 0.0009,
+   "idaMm": 0.0009,
+   "voltaMm": 0.0007,
+   "normalMaxGraus": 0.09,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "farolDireito",
+   "antes": 1264,
+   "depois": 1112,
+   "desvioMaxMm": 0.0311,
+   "idaMm": 0.0273,
+   "voltaMm": 0.0311,
+   "normalMaxGraus": 0.71,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "colunaJanelaDireita",
+   "antes": 1184,
+   "depois": 88,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "colunaJanelaEsquerda",
+   "antes": 1184,
+   "depois": 118,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "saiaPortaCorrer",
+   "antes": 1088,
+   "depois": 924,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "piscaLateralEsquerdo",
+   "antes": 1040,
+   "depois": 876,
+   "desvioMaxMm": 0.0064,
+   "idaMm": 0.0052,
+   "voltaMm": 0.0064,
+   "normalMaxGraus": 0.24,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "lampadasFarolDireito",
+   "antes": 960,
+   "depois": 944,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "lampadasFarolEsquerdo",
+   "antes": 960,
+   "depois": 944,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "piscaLateralDireito",
+   "antes": 946,
+   "depois": 810,
+   "desvioMaxMm": 0.0047,
+   "idaMm": 0.0036,
+   "voltaMm": 0.0047,
+   "normalMaxGraus": 0.12,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "aroDianteiroDireito",
+   "antes": 896,
+   "depois": 896,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "aroDianteiroEsquerdo",
+   "antes": 896,
+   "depois": 896,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "aroTraseiroDireito",
+   "antes": 896,
+   "depois": 896,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "aroTraseiroEsquerdo",
+   "antes": 896,
+   "depois": 896,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "borrachaPortaCabineEsquerda",
+   "antes": 846,
+   "depois": 810,
+   "desvioMaxMm": 0.0078,
+   "idaMm": 0.0065,
+   "voltaMm": 0.0078,
+   "normalMaxGraus": 0.36,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "borrachaPortaCabineDireita",
+   "antes": 828,
+   "depois": 792,
+   "desvioMaxMm": 0.0078,
+   "idaMm": 0.0065,
+   "voltaMm": 0.0078,
+   "normalMaxGraus": 0.37,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "luzDeFreio",
+   "antes": 824,
+   "depois": 690,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "divisoria",
+   "antes": 752,
+   "depois": 750,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "saiaPortaCabineDireita",
+   "antes": 568,
+   "depois": 490,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "saiaPortaCabineEsquerda",
+   "antes": 568,
+   "depois": 490,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "aroFarolDireito",
+   "antes": 432,
+   "depois": 410,
+   "desvioMaxMm": 0.0095,
+   "idaMm": 0.0073,
+   "voltaMm": 0.0095,
+   "normalMaxGraus": 0.34,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "aroFarolEsquerdo",
+   "antes": 432,
+   "depois": 412,
+   "desvioMaxMm": 0.0055,
+   "idaMm": 0.0055,
+   "voltaMm": 0.0041,
+   "normalMaxGraus": 0.32,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "piscaRetrovisorDireito",
+   "antes": 346,
+   "depois": 340,
+   "desvioMaxMm": 0.0079,
+   "idaMm": 0.0049,
+   "voltaMm": 0.0079,
+   "normalMaxGraus": 0.07,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "piscaRetrovisorEsquerdo",
+   "antes": 346,
+   "depois": 346,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "antenaPe",
+   "antes": 288,
+   "depois": 288,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "lampadaLanternaFreioDireita",
+   "antes": 288,
+   "depois": 286,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "lampadaLanternaFreioEsquerda",
+   "antes": 288,
+   "depois": 286,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "lampadaLanternaNeblinaDireita",
+   "antes": 288,
+   "depois": 286,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "lampadaLanternaNeblinaEsquerda",
+   "antes": 288,
+   "depois": 286,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "lampadaLanternaPiscaDireita",
+   "antes": 288,
+   "depois": 286,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "lampadaLanternaPiscaEsquerda",
+   "antes": 288,
+   "depois": 286,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "lampadaLanternaReDireita",
+   "antes": 288,
+   "depois": 286,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "lampadaLanternaReEsquerda",
+   "antes": 288,
+   "depois": 286,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "lampadaLuzDeCantoDireita",
+   "antes": 288,
+   "depois": 286,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "lampadaLuzDeCantoEsquerda",
+   "antes": 288,
+   "depois": 286,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "lampadaPiscaLateralDireito",
+   "antes": 288,
+   "depois": 286,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "lampadaPiscaLateralEsquerdo",
+   "antes": 288,
+   "depois": 286,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "ponteiraEscapamento",
+   "antes": 192,
+   "depois": 192,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "espelhoConvexoDireito",
+   "antes": 140,
+   "depois": 140,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "espelhoConvexoEsquerdo",
+   "antes": 140,
+   "depois": 140,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "espelhoPlanoDireito",
+   "antes": 140,
+   "depois": 140,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "espelhoPlanoEsquerdo",
+   "antes": 140,
+   "depois": 140,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "pisoInterior",
+   "antes": 76,
+   "depois": 76,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "placaMacanetaCabineDireita",
+   "antes": 64,
+   "depois": 64,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "placaMacanetaCabineEsquerda",
+   "antes": 64,
+   "depois": 64,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "placaMacanetaCorrer",
+   "antes": 64,
+   "depois": 64,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "placaMacanetaTraseiraDireita",
+   "antes": 64,
+   "depois": 64,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "placaMacanetaTraseiraEsquerda",
+   "antes": 64,
+   "depois": 64,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "macanetaCabineDireita",
+   "antes": 52,
+   "depois": 52,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "macanetaCabineEsquerda",
+   "antes": 52,
+   "depois": 52,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "macanetaCorrer",
+   "antes": 52,
+   "depois": 52,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "macanetaTraseiraDireita",
+   "antes": 52,
+   "depois": 52,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "macanetaTraseiraEsquerda",
+   "antes": 52,
+   "depois": 52,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "painel",
+   "antes": 52,
+   "depois": 52,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "antenaHaste",
+   "antes": 48,
+   "depois": 44,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "bancoMotorista",
+   "antes": 44,
+   "depois": 44,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  },
+  {
+   "parte": "bancoPassageiro",
+   "antes": 44,
+   "depois": 44,
+   "desvioMaxMm": 0,
+   "idaMm": 0,
+   "voltaMm": 0,
+   "normalMaxGraus": 0,
+   "lacosDeBorda": [
+    0,
+    0
+   ],
+   "fechada": [
+    true,
+    true
+   ]
+  }
+ ],
+ "imagens": [
+  {
+   "vista": "lado",
+   "azimute": 20,
+   "largura": 1500,
+   "altura": 687,
+   "pixelsDaPeca": 737776,
+   "diferencaMedia255": 0.035,
+   "acima4Pct": 0.029,
+   "acima16Pct": 0,
+   "maior255": 11,
+   "pixelsDeSilhuetaDiferente": 0
+  },
+  {
+   "vista": "lado",
+   "azimute": 160,
+   "largura": 1500,
+   "altura": 687,
+   "pixelsDaPeca": 737776,
+   "diferencaMedia255": 0.043,
+   "acima4Pct": 0.083,
+   "acima16Pct": 0,
+   "maior255": 12,
+   "pixelsDeSilhuetaDiferente": 0
+  },
+  {
+   "vista": "tresquartos",
+   "azimute": 20,
+   "largura": 1500,
+   "altura": 1201,
+   "pixelsDaPeca": 1115749,
+   "diferencaMedia255": 0.185,
+   "acima4Pct": 0.932,
+   "acima16Pct": 0,
+   "maior255": 15,
+   "pixelsDeSilhuetaDiferente": 0
+  },
+  {
+   "vista": "tresquartos",
+   "azimute": 160,
+   "largura": 1500,
+   "altura": 1201,
+   "pixelsDaPeca": 1115749,
+   "diferencaMedia255": 0.191,
+   "acima4Pct": 0.983,
+   "acima16Pct": 0.0039,
+   "maior255": 127,
+   "pixelsDeSilhuetaDiferente": 0
+  }
+ ],
+ "sensibilidade": [
+  {
+   "normalGraus": 4,
+   "triangulosDepois": 357348,
+   "ms": 37534,
+   "conferido": false
+  },
+  {
+   "normalGraus": 6,
+   "triangulosDepois": 340748,
+   "ms": 43314,
+   "conferido": false
+  }
+ ]
+}

@@ -81,6 +81,7 @@ Evidência não governa trabalho novo. Cada linha do índice é o documento de e
   - [cadeira_ripada_simples: remodelagem em PASSOS](receitas-externas-2026-10-19/remodelagem-cadeira-ripada-simples/RELATORIO.md) — `receitas-externas-2026-10-19/remodelagem-cadeira-ripada-simples`
   - [Sonda: do esboço traduzido à receita do Mecanifica, sem agente (2026-10-19)](receitas-externas-2026-10-19/sonda-passos/RESULTADO.md) — `receitas-externas-2026-10-19/sonda-passos`
   - [Triagem das 66 receitas por família candidata](receitas-externas-2026-10-19/triagem.md) — `receitas-externas-2026-10-19`
+- [Reduzir polígonos: o redutor de malha e a medida no furgão (fatia 1)](reduzir-poligonos-2026-11-27/README.md) — `reduzir-poligonos-2026-11-27`
 - [Reflexo na bancada: a paridade da luz rasante e da curvatura com o Blender](reflexo-na-bancada-2026-11-15/README.md) — `reflexo-na-bancada-2026-11-15`
 - [Resgate dos ramos antigos: o inventário de 2026-11-25](resgate-dos-ramos-2026-11-25/README.md) — `resgate-dos-ramos-2026-11-25`
 - [Revisão das verificações e dos testes: medidas e veredito](revisao-das-verificacoes-2026-11-13/README.md) — `revisao-das-verificacoes-2026-11-13`

@@ -212,6 +212,7 @@
     {"arquivo":"tools/oficina/conferir-malha.ts"}
   ],
   "semChamador": [
+    {"arquivo":"tools/modelar/reduzir-malha.mjs","motivo":"o comando e a exportação o chamam na fatia 2 do plano de reduzir polígonos"},
     {"pasta":"tools/blender/","motivo":"ferramentas opcionais do Blender, fora do CI e rodadas à mão; uso em docs/modelar/blender/REGUA-E-PACOTE-CEGO.md","arquivos":[
       "tools/blender/caixa-de-prova.mjs",
       "tools/blender/chapa-com-abertura-de-prova.mjs",

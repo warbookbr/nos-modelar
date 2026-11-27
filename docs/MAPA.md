@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2475 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2487 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -566,6 +566,22 @@
 
 - `RESULTADO.md` — Sonda: do esboço traduzido à receita do Mecanifica, sem agente (2026-10-19)
 - `sonda-passos.mjs` — sonda-passos.mjs — converte as caixas de um esboço traduzido em passos `cubo` e `parte` da receita do Mecanifica e compara a caixa envolvente da malha execut…
+
+## docs/modelar/banco-de-provas/reduzir-poligonos-2026-11-27/
+
+- `README.md` — Reduzir polígonos: o redutor de malha e a medida no furgão (fatia 1)
+- `conferir-reducao.mjs` — conferir-reducao.mjs — a conferência independente do redutor de malha (tools/modelar/reduzir-malha.mjs).
+- `luz-rasante.mjs` — luz-rasante.mjs — a luz rasante da malha original e da reduzida lado a lado, em software, com a diferença.
+- `medir-furgao.mjs` — medir-furgao.mjs — a medida do redutor no furgão realista: triângulos antes e depois por parte, desvio medido por código separado, tempo, repetição e a luz r…
+
+## docs/modelar/banco-de-provas/reduzir-poligonos-2026-11-27/prototipo/
+
+- `colapso.mjs` — protótipo: decimação por colapso de meia-aresta (o vértice some para cima de um vizinho; nenhum vértice novo, nenhuma posição nova) com TETO EXPLÍCITO: todo …
+- `comparar-malhas.mjs` — comparar duas malhas (.json do protótipo) por parte: desvio de posição nos dois sentidos e o facetamento (diedros abaixo da quina). Uso: node comparar-malhas…
+- `geo.mjs` — geometria de medida: triangulação em leque, distância ponto-triângulo, grade uniforme, desvio unilateral amostrado
+- `medir.mjs` — uso: node medir.mjs <raiz da worktree> <caminho relativo da receita> <saida.json> [saida da malha .json]
+- `normais.mjs` — normal de cada triângulo reduzido contra o do triângulo original mais perto do centro dele, em histograma por faixa de ângulo. Uso: node normais.mjs <malha.j…
+- `rasante.mjs` — luz rasante em software: a malha original e a reduzida na mesma câmera ortográfica e na mesma luz a 10 graus do plano da imagem, normais lisas com quebra a 3…
 
 ## docs/modelar/banco-de-provas/reflexo-na-bancada-2026-11-15/
 
@@ -4323,6 +4339,8 @@
 - `receita-externa.mjs` — Tradutor da receita do externo (repositório externo da pessoa, `externo/receitas/<id>.json`, já expandida pelo `receita.py`) para o esboço do Modelar, e o ca…
 - `receita-externa.test.mjs` — O tradutor da receita do externo: nove receitas reais (as do repositório externo da pessoa, já expandidas), sete sem giro e duas com peças giradas. Cada uma …
 - `reduzir-em-paralelo.mjs` — reduzir-em-paralelo.mjs — `reduzirPorMedia` numa thread à parte, para a captura seguinte não esperar a redução da anterior.
+- `reduzir-malha.mjs` — reduzir-malha.mjs — o redutor de malha: menos triângulos na saída, com o desvio sob um teto declarado.
+- `reduzir-malha.test.mjs` — reduzir-malha.test.mjs — o redutor de malha, nos dois sentidos: o que ele reduz e o que ele recusa, medido pela conferência independente.
 - `referencia-de-silhueta.mjs` — referencia-de-silhueta.mjs — do contorno de uma imagem ao arquivo de trechos que `silhueta:desvio` lê, em milímetro e nos eixos do modelo.
 - `referencia-de-silhueta.test.mjs` — Um corte cai no vértice do contorno mais perto do pedido, e a ponta de uma quina sai arredondada pelo alisamento do módulo, daí os 3 px nos cortes. A forma c…
 - `referencia-do-plano.test.mjs` — referencia-do-plano.test.mjs — `descrever-peca` confere logo no começo que cada caminho de `PLANO.referencias` existe.
