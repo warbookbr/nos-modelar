@@ -1,6 +1,6 @@
 # Perna estreita: as provas
 
-Evidência do plano [perna estreita](../../planos/2026-11-27-perna-estreita.md).
+Evidência do plano [perna estreita](../../decisoes/PLANOS-ENCERRADOS.md).
 
 ## Fatia 1: a medida dos três caminhos (2026-11-27)
 
@@ -45,3 +45,7 @@ Aprovação mecânica regravada: os pontos mínimo (`4813a74b...`) e médio (`9c
 A coxa em chapa de 431 mm entre o quadril e o joelho (atuadores de 100 mm), só pelas portas (`tools/fixtures/elo-entre-juntas/elo-de-chapa.mjs` e o teste): os furos casam nas duas bocas, só encostam carcaça e saída de cada atuador e a chapa nas duas flanges, os eixos ficam antiparalelos a 431 mm, a saída do quadril e a face de trás do joelho ficam no mesmo plano (y = 73) e a chapa soma 6 mm: 79 mm de largura ao longo do eixo (os atuadores ocupam 73). Os cursos de −180° a 180° das duas juntas e o do joelho do esqueleto (0° a 140°, 28 passos) passam sem colisão: a chapa nunca bate na carcaça do quadril (fica a 8 mm dela, a espessura da saída) e é fixa em relação à carcaça do joelho, onde só encosta na flange. O garfo (duas chapas, uma de cada lado) fica no backlog: pede uma segunda face de apoio em cada atuador. Vistas, geradas por `elo-de-chapa-vistas.mjs`, em `tools/bancadas/out/perna-estreita-chapa/`.
 
 A pessoa aprovou a coxa em chapa por imagem em 2026-11-27, com a frase "Sim, pode prosseguir" (`aprovado-coxa-em-chapa.png`, `aprovado-chapa-sozinha.png`), sabendo que as restrições da carenagem passaram a valer só na forma 1 e que o garfo de duas chapas foi ao backlog.
+
+## A perna estreita, aprovada em 2026-11-27
+
+A perna com a coxa e a canela em chapa (`tools/fixtures/elo-entre-juntas/perna-estreita.mjs`) mede 85 mm de largura e fica a 86 mm da linha do meio, na pose zero, dobrada e nos extremos do curso; os três atuadores ocupam o mesmo intervalo de 73 mm ao longo do eixo, a coxa fica de um lado e a canela do outro, e o joelho desliza 8 mm em relação ao quadril (os 67,5 mm da fatia 1 eram do caminho em U). Só as sete flanges encostam, os quatro encaixes de furos casam, os cursos do esqueleto passam sem colisão, a montagem resolve em cerca de 3 s e a perna exporta em STEP e OBJ com as oito partes. A pessoa aprovou por imagem em 2026-11-27, com a frase "E aprovo a perna, pode prosseguir" (`aprovado-perna-*.png`), sabendo que a chapa lisa de 6 mm não teve a rigidez calculada e que a perna não é simétrica.
