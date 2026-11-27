@@ -62,12 +62,12 @@ describe('família elo-entre-juntas', () => {
       const e = recusa({ circuloDaBocaA: 58 });
       expect(e.restricao).toBe('boca-a-cabe-na-secao');
       expect(e.message).toContain('recebeu {"circuloDaBocaA":58,"diametroDaBocaA":62');
-      expect(e.message).toContain('aceito: circuloDaBocaA / 2 + diametroDoFuroDaBocaA / 2 + 1 + parede <= diametroDaBocaA / 2 (o lado esquerdo vale 34.1 e o direito 31)');
+      expect(e.message).toContain('aceito: max(0, 2 - forma) * (circuloDaBocaA / 2 + diametroDoFuroDaBocaA / 2 + 1 + parede) <= max(0, 2 - forma) * (diametroDaBocaA / 2) (o lado esquerdo vale 34.1 e o direito 31)');
     });
     it('a parede que fecha a seção (maior ou igual à meia dimensão menor)', () => {
       const e = recusa({ ...BOCAS, secao: 2, larguraDaSecao: 20, profundidadeDaSecao: 20, cintura: 1.6, parede: 10.5 });
       expect(e.restricao).toBe('parede-fecha-a-secao');
-      expect(e.message).toContain('aceito: 2 * parede < min(larguraDaSecao, profundidadeDaSecao) (o lado esquerdo vale 21 e o direito 20)');
+      expect(e.message).toContain('aceito: max(0, 2 - forma) * (2 * parede) < max(0, 2 - forma) * (min(larguraDaSecao, profundidadeDaSecao)) + max(0, forma - 1) (o lado esquerdo vale 21 e o direito 20)');
     });
     it('o comprimento menor que o necessário para as bocas e a transição', () => {
       const e = recusa({ comprimento: 60 });

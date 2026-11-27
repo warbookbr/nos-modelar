@@ -67,7 +67,7 @@ describe('elo entre juntas com curva dupla', () => {
       expect(e.restricao).toBe('curva-dupla-fecha-a-parede');
       expect(e.message).toContain('recebeu {');
       expect(e.message).toContain('"desvioA":90');
-      expect(e.message).toMatch(/aceito: .* <= 0 \(o lado esquerdo vale [0-9.]+ e o direito 0\)/);
+      expect(e.message).toMatch(/aceito: .* <= max\(0, 2 - forma\) \* \(0\) \(o lado esquerdo vale [0-9.]+ e o direito 0\)/);
     });
     it('o comprimento que dá as duas curvas passa e o que falta um pouco não', () => {
       const base = { larguraDaSecao: 110, profundidadeDaSecao: 70, desvioA: 90, azimuteA: 0, desvio: 90, azimute: 180, diametroDaBocaB: 124, circuloDaBocaB: 112 };

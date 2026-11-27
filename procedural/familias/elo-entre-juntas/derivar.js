@@ -1,7 +1,8 @@
 /* derivar.js — dos parâmetros do elo (milímetro) à chamada de composição (metro): as seções do `loft` de fora e da cavidade, que
    vêm da casca pela receita (`passosDaCascaDoLoft`), o anel de fixação e a furação de cada boca. */
 import { passosDaCascaDoLoft } from '../../nucleo/casca-pela-receita.js';
-import { ID_DO_ELO, ID_DO_ELO_DE_CURVA_DUPLA, ID_DO_ELO_DESVIADO, nomeDaSecao } from './composicoes.js';
+import { ID_DA_CHAPA, ID_DA_CHAPA_COM_PASSAGEM, ID_DO_ELO, ID_DO_ELO_DE_CURVA_DUPLA, ID_DO_ELO_DESVIADO, nomeDaSecao } from './composicoes.js';
+import { ehChapa, furosDaBocaDaChapa, raioDaPassagem } from './chapa.js';
 import { LADOS, anelDaBoca, caminhoDoElo, caminhoDuplo, direcaoDoDesvio, ehDupla, ehReto, furosDaBoca, giroDaBocaB, planoDasCurvas, quadroDaBoca, secoesDoElo } from './geometria.js';
 
 const m = (mm) => mm / 1000;
@@ -15,7 +16,22 @@ function tamparAInclinada(secoes, noComeco = false) {
   secoes[iPolo] = { ...polo, pos: [0, 1, 2].map((i) => ponta[i] + (v[i] / L) * TAMPA_DA_BOCA_B_INCLINADA) };
 }
 
+/* a chapa reta: a pista, a furação e a passagem de cada boca, em metro; a boca B em z = comprimento */
+function derivarChapa(q) {
+  const a = { chapaRaio: m(q.larguraDaChapa / 2), chapaRaioNegativo: -m(q.larguraDaChapa / 2), chapaComprimento: m(q.comprimento), chapaEspessura: m(q.espessuraDaChapa), planoB: [0, 0, m(q.comprimento)], pivoDaBocaB: [0, 0, m(q.comprimento)] };
+  for (const lado of ['A', 'B']) {
+    const f = furosDaBocaDaChapa(q, lado); const z0 = lado === 'A' ? 0 : q.comprimento; const altura = q.espessuraDaChapa + 2;
+    Object.assign(a, {
+      [`furoRaio${lado}`]: m(q[`diametroDoFuroDaBoca${lado}`] / 2), [`furoAltura${lado}`]: m(altura), [`furoEm${lado}`]: [m(f.em[0]), -m(1), m(z0 + f.em[2])],
+      [`furos${lado}`]: f.total, [`graus${lado}`]: f.graus, [`angulo${lado}`]: f.anguloInicial, [`diametro${lado}`]: m(q[`diametroDoFuroDaBoca${lado}`]), [`raio${lado}`]: m(q[`circuloDaBoca${lado}`] / 2),
+      [`passagemRaio${lado}`]: m(q.passagemDaChapa ? raioDaPassagem(q, lado) : 1), [`passagemEm${lado}`]: [0, -m(1), m(z0)],
+    });
+  }
+  return { composicao: q.passagemDaChapa ? ID_DA_CHAPA_COM_PASSAGEM : ID_DA_CHAPA, argumentos: a };
+}
+
 export function derivar(q) {
+  if (ehChapa(q)) return derivarChapa(q);
   const secoes = secoesDoElo(q).map((s) => ({ pos: s.pos.map(m), contorno: s.contorno.map((p) => p.map(m)) }));
   const dupla = ehDupla(q);
   const eixoDoGiro = dupla ? planoDasCurvas(q).eixoDoGiro : direcaoDoDesvio(q).eixoDoGiro;

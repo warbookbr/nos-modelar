@@ -3,7 +3,7 @@
   "familia": "elo-entre-juntas",
   "versao": "1.0.0",
   "mecanica": {
-    "data": "2026-11-26",
+    "data": "2026-11-27",
     "pontos": {
       "minimo": {
         "parametros": {
@@ -22,10 +22,14 @@
           "diametroDoFuroDaBocaB": 1.5,
           "espessuraDaBocaA": 2,
           "espessuraDaBocaB": 2,
+          "espessuraDaChapa": 2,
+          "forma": 1,
           "furosDaBocaA": 3,
           "furosDaBocaB": 3,
+          "larguraDaChapa": 16,
           "larguraDaSecao": 16,
           "parede": 0.8,
+          "passagemDaChapa": 0,
           "profundidadeDaSecao": 16,
           "secao": 1
         },
@@ -49,10 +53,14 @@
           "diametroDoFuroDaBocaB": 4.2,
           "espessuraDaBocaA": 4,
           "espessuraDaBocaB": 4,
+          "espessuraDaChapa": 6,
+          "forma": 1,
           "furosDaBocaA": 8,
           "furosDaBocaB": 8,
+          "larguraDaChapa": 130,
           "larguraDaSecao": 100,
           "parede": 2,
+          "passagemDaChapa": 0,
           "profundidadeDaSecao": 80,
           "secao": 2
         },
@@ -76,19 +84,23 @@
           "diametroDoFuroDaBocaB": 8,
           "espessuraDaBocaA": 10,
           "espessuraDaBocaB": 10,
+          "espessuraDaChapa": 20,
+          "forma": 2,
           "furosDaBocaA": 16,
           "furosDaBocaB": 16,
+          "larguraDaChapa": 300,
           "larguraDaSecao": 300,
           "parede": 12,
+          "passagemDaChapa": 1,
           "profundidadeDaSecao": 300,
           "secao": 3
         },
-        "hash": "sha256:4363a8ee2690dac21a5caf17324dbdcdf2112fe80f686ceb8f7db5b91317e32f",
+        "hash": "sha256:57dce4a2cfcc45c149a18194a2b3208fbf88a9f811a560aee589843067ec6313",
         "medidas": []
       }
     },
     "varredura": {
-      "sondas": 42,
+      "sondas": 50,
       "recusasDeclaradas": [
         {
           "ponto": "circuloDaBocaA=200",
