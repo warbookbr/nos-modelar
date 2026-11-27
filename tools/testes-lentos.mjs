@@ -26,6 +26,8 @@ export const TESTES_LENTOS = [
   'tools/fixtures/elo-entre-juntas/perna-de-prova.test.mjs',
   /* 2026-11-27: a perna estreita exportada em STEP e OBJ; uns 17 s sozinho (plano da perna estreita) */
   'tools/fixtures/elo-entre-juntas/perna-estreita-exportacao.test.mjs',
+  /* 2026-11-27: o cabo vivo no Blender como biblioteca, com o addon instalado e o gravar; uns 15 s sozinho quando há bpy (plano dos cabos) */
+  'tools/blender/cabo-vivo.test.mjs',
   'tools/fixtures/elementos-de-maquina/mesa-linear.test.mjs',
   'tools/fixtures/corrente-e-esteira/exportacao.test.mjs',
   /* 2026-11-23: o pedido de prova do braço respondido e o recusado, cada um exportando a ficha do braço inteiro; uns 70 s (plano da ponte, fatia 4) */
