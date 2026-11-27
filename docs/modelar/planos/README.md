@@ -8,8 +8,7 @@
 2. [processo e CI](2026-11-26-processo-e-ci.md). Território: `.github/workflows/`, `tools/gates.mjs`, `tools/mapa/planos.mjs`, `tools/mapa/mapa.mjs`, `docs/MAPA.md`, `tools/reguas-de-texto/` e os testes. O envio sem vermelho falso, as regras de texto como régua e o limite de planos de núcleo.
 3. [laço de modelagem mais rápido](2026-11-26-laco-de-modelagem-mais-rapido.md). Território: a dobra, o vinco oculto, a ferramenta das rodadas, o laço, a calibração do crítico, o navegador e a skill do laço. A rodada em minutos, com a decisão da pessoa gravada.
 4. [ferramentas e documentação](2026-11-26-ferramentas-e-documentacao.md). Território: o registro de ferramentas, o `tools/README.md`, o roteador e os roteiros, a página de entrada, cinco agentes, `.claude/settings.json` e `.mcp.json`. Toda ferramenta registrada e o roteador cobrindo o trabalho inteiro.
-5. [cabos](2026-11-27-cabos.md). Território: a família do cabo, a fixture dela, o registro de famílias, o mapa de ferramentas e o banco de provas. O cabo flexível que acompanha a junta.
-6. [reduzir polígonos](2026-11-27-reduzir-poligonos.md). Território: o redutor de malha novo, as duas exportações, o `descrever` e as peças do furgão realista. A malha exportada com menos faces e desvio medido, e as peças pequenas densas reduzidas na origem.
+5. [reduzir polígonos](2026-11-27-reduzir-poligonos.md). Território: o redutor de malha novo, as duas exportações, o `descrever` e as peças do furgão realista. A malha exportada com menos faces e desvio medido, e as peças pequenas densas reduzidas na origem.
 
 A lista está em ordem de prioridade. A ordem desempata quando dois planos precisam do mesmo arquivo: o de menor prioridade espera ou pede à pessoa que mude o território.
 

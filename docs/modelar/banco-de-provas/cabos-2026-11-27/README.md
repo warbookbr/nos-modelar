@@ -1,6 +1,6 @@
 # Cabos: as provas
 
-Evidência do plano [cabos](../../planos/2026-11-27-cabos.md).
+Evidência do plano [cabos](../../decisoes/PLANOS-ENCERRADOS.md).
 
 ## Fatia 1: o cabo entre dois pontos (2026-11-27)
 
