@@ -45,7 +45,7 @@ A malha que o núcleo entrega, as medidas, as portas e o retrato do acervo não 
 ## Gate de saída
 
 1. O redutor com teste nos dois sentidos (o colapso que passaria do teto é recusado; o plano exato reduz sem desvio) e a mesma saída em duas execuções.
-2. O furgão exportado reduzido perto de 215 mil triângulos com desvio máximo medido até 0,05 mm por parte e 2 graus de normal, e a luz rasante da bancada lado a lado levada à pessoa.
+2. O furgão exportado reduzido perto de 369 mil triângulos, pela decisão da pessoa de 2026-11-27, com desvio máximo medido até 0,05 mm por parte e 2 graus de normal, e a luz rasante da bancada lado a lado levada à pessoa.
 3. O aviso de densidade no `descrever`, testado.
 4. As peças pequenas do furgão reduzidas na receita com a forma aprovada pela pessoa, e a contagem antes e depois no banco de provas.
 5. Revisão adversarial sem bloqueio; `npm run gates` verde e o CI verde.
@@ -63,6 +63,8 @@ Se o redutor não chegar ao teto com ganho de pelo menos 30% nas chapas, ou se a
 ## Decisão da pessoa
 
 Decidido pela pessoa em 2026-11-27 ("sim, vamos criar o plano"): o plano segue a ordem da análise independente, com o redutor como derivado na exportação com teto de 0,05 mm e 2 graus, o aviso de densidade, a redução das peças pequenas na receita e a subdivisão adaptativa para depois.
+
+Decidido pela pessoa em 2026-11-27 ("aceito os 369 mil, pode seguir e enviar"), depois da fatia 1: o furgão reduzido com os dois tetos medidos de verdade fica em 369 mil triângulos, e não nos 215 mil que o protótipo prometia porque deixava a normal passar do teto; o gate de saída 2 passa a ser esse número, e o ganho que falta vem da fatia 3, nas peças pequenas da receita.
 
 ## Andamento
 
