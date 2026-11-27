@@ -4,7 +4,7 @@
 
 **Núcleo:** não
 
-**Território:** `tools/modelar/reduzir-malha.mjs`, `tools/modelar/reduzir-malha.test.mjs`, `tools/modelar/exportar-gltf.mjs`, `tools/modelar/exportar-obj.mjs`, `tools/modelar/descrever-peca.mjs`, `tools/modelar/descrever-densidade.test.mjs`, `procedural/pecas/furgao-realista/`, `docs/modelar/banco-de-provas/reduzir-poligonos-2026-11-27/`.
+**Território:** `tools/modelar/reduzir-malha.mjs`, `tools/modelar/reduzir-malha.test.mjs`, `tools/modelar/exportar-obj.mjs`, `tools/modelar/descrever-peca.mjs`, `tools/modelar/descrever-densidade.test.mjs`, `procedural/pecas/furgao-realista/`, `docs/modelar/banco-de-provas/reduzir-poligonos-2026-11-27/`.
 
 Ativado pela pessoa em 2026-11-27 ("sim, vamos criar o plano"), sobre a recomendação de seguir a análise independente da contagem de polígonos, com teto de 0,05 mm e 2 graus.
 
@@ -28,7 +28,7 @@ REFATORAR: a densidade sem função custa tempo de execução, tamanho de arquiv
 
 - o redutor como função pura sobre a malha neutra: só remove vértices (nenhuma posição nova), trava borda, quina acima de um ângulo, divisa de parte e de material, recusa o colapso que passa do teto de distância ou de normal, triangula pela triangulação do núcleo com guarda de lasca, e é determinístico (a mesma entrada dá o mesmo sha256);
 - a conferência independente do redutor: desvio máximo nos dois sentidos por parte, desvio de normal, borda e casca fechada, e o par de imagens de `vistas:superficie` original e reduzida com a diferença;
-- o redutor como opção de `exportar:gltf` e `exportar:obj`, com a tolerância declarada no comando ou na receita;
+- o redutor como opção de `exportar:obj`, com a tolerância declarada no comando ou na receita; o `exportar:gltf` está no território do plano dos cabos, que tem prioridade, e recebe a opção depois que esse plano fechar ou por pedido a ele;
 - o aviso de densidade (faces por decímetro quadrado) e de fração plana por parte no `descrever`;
 - a redução na receita das peças pequenas densas do furgão (refletores, copos, pneus e saias), cada uma com a imagem antes e depois levada à pessoa.
 
