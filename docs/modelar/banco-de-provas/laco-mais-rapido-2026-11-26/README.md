@@ -338,3 +338,70 @@ Os dois pacotes ficaram em `tools/bancadas/out/`, fora do git: `critica-aviao-fu
 A ação da rodada (`--acao`) ainda compara a forma julgada com a atual executando a cópia da última rodada julgada com os módulos de hoje (`impressaoDaForma`), que é o mesmo defeito do primeiro achado noutro lugar; a rodada que grava a impressão das partes já tem o dado para trocar essa comparação, e a troca não foi pedida aqui. Os documentos de uso que descrevem o pacote, fora do território deste plano, não foram mudados. O nome novo dos arquivos das vistas da peça sozinha faz o antes e depois não achar a imagem de mesmo nome no pacote da rodada anterior, na primeira rodada depois da mudança.
 
 O roteiro `modelar/rodada` lia 12.047 bytes contra o orçamento de 11.900 desde o commit `5726ca45`, que pôs no corpo da skill do laço a frase sobre a cópia da receita da rodada decidida, e `npm run roteiros:check` reprovava. A frase foi para o apoio `pacote-e-referencia.md`, com o limite das cópias, e o gate voltou a passar.
+
+## A recalibração do crítico: o conjunto novo, preparado até o julgamento
+
+Em 2026-11-26 o conjunto novo foi montado e a ferramenta passou ao formato novo, e o trabalho parou antes de despachar o crítico. Nenhum dos 18 julgamentos foi dado. O conjunto de antes (as 12 imagens em desenho de linhas, a prancha e os 44 julgamentos) continua na pasta, sem mudança, e sai quando os julgamentos novos estiverem registrados.
+
+### O que o conjunto é
+
+O conjunto mora em `docs/modelar/banco-de-provas/calibracao-do-critico/casos.json`, no formato `mecanifica.calibracao-do-critico@2`, com o pedido e as imagens de cada caso em `casos/<id>/`. Cada caso é uma peça do acervo com `PLANO`, numa cópia de ensaio em `tools/fixtures/acervo/peca-cNN/receita.js`, que a bancada abre e a guarda do acervo não lê. A cópia é a receita do acervo com as trocas que o caso declara, e `npm run calibracao -- copiar` a escreve das duas; nenhuma receita do acervo mudou. O nome da cópia é neutro porque o pedido e os arquivos de imagem o levam. Cada caso passou por `node tools/modelar/rodada-de-modelagem.mjs <cópia> --acao` antes de ter pacote, e o pacote é o padrão, de `npm run vistas:critica -- <cópia>`, sem `--completo`.
+
+| Caso | Grupo | Peça de origem | O que a cópia tem | A palavra da pessoa na fonte | A medição da rodada |
+| --- | --- | --- | --- | --- | --- |
+| c01 | controle | `aviao/fuselagem` | a receita aceita, trocado o caminho do andaime | "a pessoa, 2026-10-15: aceitou a fuselagem como está depois da rodada 3, com o para-brisa rente ao casco e nota 9 sem defeito" | passou |
+| c02 | forma prometida | `aviao/fuselagem` | o vidro do para-brisa 30 mm acima da superfície do casco, com degrau em volta, e o montante subido junto | rodada 2, pela frase gravada no atrito da rodada 3: "o para-brisa saliente veio do esboço aprovado e passou por dois críticos, porque o alvo era o esboço; só a pessoa o viu" | passou |
+| c03 | controle | `empilhadeira/cilindro-elevacao` | a receita aceita, trocados os caminhos | "a pessoa, 2026-11-10: pode fixar, seguimos como está" | passou |
+| c04 | revolução facetada | `empilhadeira/cilindro-elevacao` | a camisa e a haste com 12 lados no lugar de 96 | não há; é o caso de superfície do conjunto de antes refeito numa peça do acervo | passou |
+| c05 | proporção | `empilhadeira/cilindro-elevacao` | a haste com o raio da camisa, 30 mm no lugar de 18 | não há; é o critério de reprovação do `PLANO` "a haste tão grossa quanto a camisa" | passou |
+| c06 | proporção | `roda-esportiva` | os raios e o miolo da rodada 4: 24 mm no centro e 31 mm no aro, o canto das janelas de 8 mm e as janelas começando a 84 mm do centro | rodada 4: "a pessoa julgou os raios: o par em V tem de abrir desde o centro, cada raio ~3% do diametro, miolo pouco alem dos parafusos; a largura do raio nao esta no PLANO" | passou |
+| c07 | forma prometida | `aviao/fuselagem` | o mesmo defeito de c02 com 40 mm | a mesma frase de c02 | reprovou |
+
+Os dois controles são a geometria que a pessoa aceitou: a impressão da forma que a cópia produz, pela mesma conta do registro de etapas, é igual à `impressao.forma` do aceite (`sha256:3c396f5a` na fuselagem e `sha256:b0bcbbc2` no cilindro), e o formato recusa o controle em que as duas diferem. Os valores dos raios de c06 são os da receita da rodada 4, lidos na diferença que o registro da rodada 5 guarda.
+
+### O que a medição reprovou
+
+O para-brisa saliente foi escrito primeiro com 40 mm, perto dos 41 mm da faixa do esboço, e a medição da rodada o reprovou: o montante, que sobe com a face de fora do vidro para continuar assentado nela, sai do envelope do volume do andaime em 9,8 mm, contra 5 mm de tolerância (`REFINA`). Esse caso ficou no conjunto como c07, com `destino: "medida"`, o relatório da medição gravado e sem pedido, sem imagem e sem julgamento. Com 30 mm o montante cabe no envelope, a medição passa e o defeito chega ao crítico, que é o c02. A medida pega a saliência do para-brisa acima de uns 35 mm pelo montante, e abaixo disso ela é do crítico.
+
+### O que o crítico vê e como o conjunto é pontuado
+
+O crítico recebe o `pedido.md` e as imagens que ele cita. O pedido guardado (`casos/<id>/pedido.txt`) troca o caminho da pasta do pacote por `<pacote>` e o do repositório por `<raiz>`, para a impressão dele valer em outra cópia do repositório, e `npm run calibracao -- pedido <id>` ou `npm run calibracao -- despachos` o põe, com as imagens, em `tools/bancadas/out/critica-peca-cNN/rodada-01/`, a pasta em que o pacote de uma rodada de verdade fica. O crítico lê de lá porque o caminho da pasta do conjunto leva a palavra calibração, e o gate recusa o pedido que a traz ou que traz o nome do caso.
+
+São 3 julgamentos por caso, 18 no total. Cada julgamento grava a nota, os defeitos, a impressão do pedido, a das imagens, o modelo que julgou e a data. A regra proposta nesta etapa é: o caso acerta quando a mediana das três notas cai na faixa do grupo, no máximo um julgamento sai dela, cada defeito esperado é citado em pelo menos dois dos três julgamentos e, no controle, no máximo um julgamento cita defeito estrutural. O defeito conta como citado quando o crítico aponta a parte ou o lugar com uma das palavras do caso e com um tipo e um sentido entre os aceitos; a regra de antes aceitava só a palavra ou só o tipo, e por ela o crítico que pede raio mais largo citaria o defeito do raio largo demais. As faixas são de 8 a 10 no controle, de 0 a 9 nos casos de forma prometida e de proporção e de 5 a 9 na revolução facetada. O caso com defeito não tem piso porque a escala do agente deixa o defeito de proporção em 8 ou 9, e o que se cobra é que ele seja citado e que a nota não seja 10. O conjunto passa com 5 de 6 casos certos e os dois obrigatórios entre eles, que são c02 e c06, os dois decididos pela pessoa. As faixas, o mínimo e os obrigatórios são proposta desta etapa e podem ser ajustados sobre os julgamentos, como a decisão de 2026-11-26 prevê.
+
+### O gate e o modelo do crítico
+
+`npm run calibracao:check` leva 0,1 s, contra 3,4 s de antes, porque não executa receita nenhuma. Ele confere o formato, que a cópia de ensaio, o pedido e cada imagem são os arquivos gravados, que as palavras da pessoa constam no registro que a fonte cita, que o agente é o gravado e que cada julgamento foi dado ao pedido e às imagens de hoje, e pontua. Com julgamentos faltando ele diz quantos faltam por caso e passa. Ele não despacha o crítico, não captura imagem e não mede: `copiar`, `medir`, `pacote`, `registrar` e `recalibrar --de-proposito` são comandos de quem conduz a calibração, e `recalibrar` sem a opção recusa e diz quantos julgamentos apagaria.
+
+A impressão do agente deixa de fora a linha `model:` do cabeçalho, e o modelo fica gravado à parte: o que a definição declarava (`sonnet`) e o modelo que julgou, informado em `registrar --modelo=`. Quando a definição declara outro modelo, quando os julgamentos vêm de modelos diferentes ou de outro que o medido, o gate escreve um aviso e passa. O nome antigo do projeto saiu de `.claude/agents/critico-visual.md` ("o crítico visual do Modelar"), a única mudança no arquivo, e a impressão gravada é a do arquivo corrigido.
+
+### Tempo e tamanho
+
+Medido na máquina de 4 núcleos, uma captura por vez. A medição da rodada levou cerca de 1 s em cada cópia da fuselagem e do cilindro, com a execução guardada, e 32 s na roda. O pacote padrão levou 100 s na fuselagem aceita e 101 s na do para-brisa saliente, com 37 imagens cada, de 31 a 36 s em cada cópia do cilindro, com 14 imagens, e 99 s na roda, com 20. A cópia de ensaio não é instância de montagem e não tem rodada julgada, de modo que o pacote sai sem as vistas montadas e sem os cortes e com a vista isolada de todas as partes; a fuselagem leva ainda a luz rasante de três quartos e o contorno medido sobreposto.
+
+A pasta `casos/` tem 142 arquivos e 11,3 MB: 3,2 MB em cada caso da fuselagem, 0,2 MB em cada caso do cilindro e 4,9 MB na roda, em que o raio X de trás tem 1,3 MB e o arame 1,2 MB. As sete cópias de ensaio somam 0,8 MB, dos quais 0,6 MB são as duas imagens de referência do cilindro. O que sai com o conjunto de antes são 3,0 MB.
+
+### O que ficou de fora
+
+Não entraram os outros casos em que a pessoa reprovou forma. O conjunto estreito da base do braço robótico (rodada 3) pede a base de hoje, que tem 2.187 passos e leva 86 s só na medição. O dorso curvo do kukri (rodada 1) pede refazer o contorno de referência. O cotovelo de cano do ombro do braço (rodadas 1 e 2) é a forma inteira, e não um defeito que se recoloca à mão. A roda esportiva não tem controle, porque a peça está pausada e nunca foi aceita, e o pedido dela sai sem imagem de referência, porque as duas imagens do plano moram em `referencias/locais/`, fora do git; o crítico a julga pelos critérios de reprovação do `PLANO`. O crítico da rodada 6 já apontava na receita de hoje o miolo grande e o par fechado junto ao centro, de modo que c06 mede se o crítico reprova o que a pessoa reprovou, e não se ele o distingue da receita atual.
+
+O gate não mede as cópias de novo. A prova de que a medição reprova c07 é o relatório gravado, e `npm run calibracao -- medir c07` a refaz de propósito; uma mudança de ferramenta que deixasse de reprová-lo não aparece no gate. O validador do formato novo ficou dentro de `tools/modelar/calibracao-do-critico.mjs`, porque `src/autoria/calibracao-do-critico.js` não está no território do plano; desse módulo a ferramenta usa só a leitura da resposta do crítico, e o validador e a pontuação do formato de antes ficaram lá sem uso. As cópias de ensaio moram em `tools/fixtures/acervo/`, fora do território do plano, pela indicação do pedido desta etapa. O teste `tools/modelar/calibracao-do-critico.test.mjs` passou a levar 0,3 s e continua na lista dos lentos, que é de outro plano.
+
+### Os atritos
+
+1. `node tools/modelar/rodada-de-modelagem.mjs aviao/fuselagem --acao` sai com o código 13 e o aviso "Detected unsettled top-level await", sem a linha da medição, e o mesmo acontece com `braco-robotico/base`; `roda-esportiva` e `empilhadeira/cilindro-inclinacao` saem certo.
+   Custo: uns 15 minutos procurando a causa, que não foi achada; a etapa seguiu pelas cópias de ensaio, que não têm pasta de rodadas e medem certo.
+   O processo pegou: não.
+   Destino: backlog, a ação da rodada em peça de montagem com rodada julgada.
+2. O pacote desenha sobre a peça o contorno que mora na pasta das imagens citadas no plano, mesmo quando ele é do objeto inteiro: `npm run vistas:critica` sobre a cópia do cilindro com as referências em `procedural/pecas/empilhadeira/referencias/` pôs o contorno lateral da empilhadeira, de 3.249 mm, sobre o cilindro de 92 mm. Na peça do acervo isso não aparece porque a etapa está fixa.
+   Custo: uma rodada de pacotes do cilindro refeita, cerca de 2 minutos.
+   O processo pegou: não.
+   Destino: só esta peça, as duas imagens de referência foram copiadas para `tools/fixtures/acervo/peca-c03/referencias/`; a correção geral, o contorno de objeto inteiro sobre uma parte, é do pacote e fica no backlog.
+3. O pedido leva o caminho absoluto das imagens, e a pasta do conjunto tem a palavra calibração no nome: o primeiro pacote gravado direto na pasta do conjunto contava ao crítico o que o caso era.
+   Custo: um pacote refeito, 45 s.
+   O processo pegou: sim, a recusa `o pedido conta o que o caso é`, escrita nesta etapa.
+   Destino: ferramenta, `tools/modelar/calibracao-do-critico.mjs` (`materializarPedido` e `vazamentosDoPedido`).
+4. `--acao` não escreve a razão da reprovação junto da linha da medição: ela vem dentro da linha da próxima ação, e a primeira leitura do relatório de c07 gravou só "reprovou".
+   Custo: uma medição repetida, alguns segundos.
+   O processo pegou: não.
+   Destino: ferramenta, `lerMedicaoDaRodada` passou a guardar até a lista dos defeitos em aberto.

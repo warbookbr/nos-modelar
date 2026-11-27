@@ -1,0 +1,253 @@
+# Pedido ao crítico visual: peca-c02
+
+Abra com `Read` cada imagem citada abaixo e olhe; não leia nenhum outro arquivo. Todos os caminhos são absolutos.
+
+Medição da receita: passou (sha256:e6e75c740bba3dc4f70975d42d0f1e5ed2bc1d3965305f3125a2313e05bbd4ff).
+
+Este pedido traz o conjunto padrão de imagens da peça, e não todas as que ela pode ter. Entraram:
+
+- as seis vistas da peça sozinha (isometrica, frontal, direita, superior, traseira e esquerda), para a proporção e a silhueta
+- a malha em arame na vista isometrica e em raio X na traseira, para a topologia que a sombra esconde, na frente e atrás
+- a luz rasante numa vista só, a de três quartos
+- a vista isolada de todas as partes (13)
+
+Ficaram de fora:
+
+- a malha em arame na vista traseira, porque o raio X da mesma vista mostra as mesmas arestas
+- a luz rasante nas vistas de frente, de lado e de cima
+
+O que ficou de fora não é ausência nem defeito. Julgue pelo que veio; a pergunta que depender de uma imagem que não veio se responde `não dá para ver`, dizendo qual imagem faltou.
+
+## Objeto
+
+fuselagem de um avião monomotor de asa baixa e pequeno porte, do ponto em que o capô a encontra até a ponta da cauda
+
+Escala: comprimento da fuselagem no esboço, de z 2377 a z 10461, 8084 mm.
+
+## Alvo
+
+A receita não refina um esboço aprovado, e o alvo é a referência da seção seguinte: `alvo` do veredito leva o caminho da imagem de referência que você comparou.
+
+## Referências
+
+O objeto real, em outra escala que o modelo e sem a divisão em partes.
+
+- lateral.prancha.png: <raiz>/docs/modelar/banco-de-provas/aviao-2026-10-11/referencias/lateral.prancha.png (o olho da imagem: olha de -x; +y fica em cima, +z fica à direita)
+- topo.prancha.png: <raiz>/docs/modelar/banco-de-provas/aviao-2026-10-11/referencias/topo.prancha.png (o olho da imagem: olha de +y; +x fica à direita, +z fica embaixo)
+
+A referência que vale para cada vista do modelo. Compare cada vista só com a referência que olha do mesmo lado: a imagem de outro lado mostra outro contorno, e a largura de uma vista de frente não é o comprimento de uma vista de lado.
+
+- isometrica: nenhuma referência olha deste lado; use esta vista para a forma em volume, sem comparar medida com as referências.
+- frontal: nenhuma imagem do pacote olha deste lado, e a referência dele são os contornos em mm de `frontal.contornos.json`, tirados de uma imagem deste lado que não vai no pacote: a medida deste lado vem deles, e não da proporção de uma imagem; não compare esta vista com as imagens de outro lado.
+- direita: `lateral.prancha.png` olha do lado oposto e vale só para o contorno, espelhado, e não para o que só existe de um lado; a medida deste lado vem dos contornos em mm de `lateral.contornos.json`, tirados de uma imagem deste lado que não vai no pacote, e não da proporção de uma imagem.
+- esquerda: compare com `lateral.prancha.png`; a medida deste lado vem dos contornos em mm de `lateral.contornos.json`, tirados de uma imagem deste lado que não vai no pacote, e não da proporção de uma imagem.
+- traseira: nenhuma referência olha deste lado; não compare esta vista com as referências de outro lado.
+- superior: compare com `topo.prancha.png`; a medida deste lado vem dos contornos em mm de `topo.contornos.json`, tirados de uma imagem deste lado que não vai no pacote, e não da proporção de uma imagem.
+
+## Contorno medido sobre o modelo
+
+A vista ortográfica do modelo com a linha do contorno tirado da referência por cima, em mm, posta no lugar que o referencial da peça dá, pela mesma câmera que dá a escala da vista; a régua do painel é em mm. Não há alinhamento por centro: onde a linha e a silhueta do modelo não coincidem, a diferença de posição ou de tamanho é medida, e a legenda dá a extensão de cada uma. Julgue proporção, silhueta e espessura por esta imagem antes de julgá-las pela referência a olho; o que a linha não traça (detalhe interno, cor) continua na referência.
+
+O trecho tracejado do contorno de uma região é encontro com outra região do mapa: ali, na referência, outra parte encosta na peça ou a tapa, e a linha marca onde a região da imagem acaba, não a borda da peça contra o fundo. Esse trecho não serve de medida, e a distância entre ele e o modelo não é defeito; só o trecho cheio é silhueta. Quando um lado da caixa do contorno cai no encontro, a extensão e o canto daquele lado também não medem a peça.
+
+- contorno sobreposto: <pacote>/contorno-sobreposto.png
+
+- vista frontal, o contorno frontal de frontal.contornos.json: modelo 1560 x 1493,2 mm; contorno silhueta 12783,4 x 4271,6 mm, canto de baixo à esquerda a -5609,2 e -697,1 mm do canto do modelo; contorno fuselagem 1506,9 x 708,5 mm, canto de baixo à esquerda a 52,3 e 1109,7 mm do canto do modelo (tracejado: 1976,3 mm de encontro com capo, helice, parabrisa, não é borda da peça); contorno parabrisa 1210,8 x 469 mm, canto de baixo à esquerda a 165,4 e 1202,8 mm do canto do modelo (tracejado: 3434,5 mm de encontro com capo, fuselagem, helice, não é borda da peça; os lados esquerdo, de baixo, direito e de cima da caixa caem no encontro e não medem a peça)
+- vista esquerda, o contorno lateral de lateral.contornos.json: modelo 8083,2 x 1574,5 mm; contorno silhueta 10449,4 x 4175,4 mm, canto de baixo à esquerda a -2365,7 e -729,6 mm do canto do modelo; contorno barbatana 1372,6 x 578 mm, canto de baixo à esquerda a 5061,3 e 197,7 mm do canto do modelo (tracejado: 1404,5 mm de encontro com fuselagem, não é borda da peça); contorno fuselagem 8090,1 x 1619,8 mm, canto de baixo à esquerda a -6,4 e -4,8 mm do canto do modelo (tracejado: 15664 mm de encontro com asa, barbatana, capo, deriva, estabilizador, janelas, luzAsa, parabrisa, porta, tremNariz, não é borda da peça; o lado esquerdo da caixa cai no encontro e não mede a peça); contorno parabrisa 771,7 x 457,8 mm, canto de baixo à esquerda a 507,1 e 1039,9 mm do canto do modelo (tracejado: 945,1 mm de encontro com fuselagem, não é borda da peça; os lados de baixo e direito da caixa caem no encontro e não medem a peça); contorno porta 977,1 x 1132,7 mm, canto de baixo à esquerda a 3077,6 e 353,2 mm do canto do modelo (tracejado: 3970,7 mm de encontro com asa, fuselagem, não é borda da peça; os lados esquerdo, de baixo, direito e de cima da caixa caem no encontro e não medem a peça)
+- vista superior, o contorno superior de topo.contornos.json: modelo 1562,2 x 8079,3 mm; contorno silhueta 12799 x 10427,8 mm, canto de baixo à esquerda a -5617,6 e 5079,5 mm do canto do modelo; contorno fuselagem 1758,4 x 7302,8 mm, canto de baixo à esquerda a -99,9 e 5217,9 mm do canto do modelo (tracejado: 19784,9 mm de encontro com asaDir, asaEsq, capo, deriva, estabilizadorDir, estabilizadorEsq, janelas, parabrisa, profundorDir, profundorEsq, não é borda da peça; o lado de cima da caixa cai no encontro e não mede a peça); contorno parabrisa 1274,2 x 793,6 mm, canto de baixo à esquerda a 176,8 e 11639,7 mm do canto do modelo (tracejado: 4661,1 mm de encontro com capo, fuselagem, janelas, não é borda da peça; os lados esquerdo, de baixo, direito e de cima da caixa caem no encontro e não medem a peça)
+
+## Modelo
+
+As vistas do modelo, do conjunto montado e de cada parte olham, pelo nome, destes lados:
+
+- isometrica: olha de [1, 1, 1], do lado positivo de x, de y e de z; +x desce para a direita, +y fica em cima, +z desce para a esquerda
+- frontal: olha de +z; +x fica à direita, +y fica em cima
+- direita: olha de +x; +y fica em cima, +z fica à esquerda
+- esquerda: olha de -x; +y fica em cima, +z fica à direita
+- traseira: olha de -z; +x fica à esquerda, +y fica em cima
+- superior: olha de +y; +x fica à direita, +z fica embaixo
+
+As vistas da peça sozinha, em projeção ortográfica, para a proporção e a silhueta:
+
+- isometrica: <pacote>/bancada-peca-c02-isometrica-orto-enquadrado.png
+- frontal: <pacote>/bancada-peca-c02-frontal-orto-enquadrado.png
+- direita: <pacote>/bancada-peca-c02-direita-orto-enquadrado.png
+- superior: <pacote>/bancada-peca-c02-superior-orto-enquadrado.png
+- traseira: <pacote>/bancada-peca-c02-traseira-orto-enquadrado.png
+- esquerda: <pacote>/bancada-peca-c02-esquerda-orto-enquadrado.png
+
+A malha em arame e em raio X, para a topologia que a sombra esconde:
+
+- isometrica, arame: <pacote>/bancada-peca-c02-isometrica-orto-arame-enquadrado.png
+- traseira, raio X: <pacote>/bancada-peca-c02-traseira-orto-raio-x-enquadrado.png
+
+## Superfície
+
+A peça tem sombreamento suave sobre a emenda de sólidos fundidos, e esta vista mostra o que a sombra das vistas de Modelo esconde: o degrau de sombra, a quina que sobra onde devia haver curva e o risco ao longo do encontro. Diga onde a sombra degrada, quebra ou desenha uma aresta que a forma não pede. As vistas desta seção olham destes lados, no quadro da peça:
+
+- tresquartos: olha de +x, +y e +z ao mesmo tempo, com +y para cima
+
+A luz rasante: a peça em material fosco, sem luz de ambiente, sob um sol baixo sobre o plano da imagem, de duas direções a 90 graus uma da outra, escolhidas em cada vista para a luz cair no lado da peça que a câmera vê; a luz sobe do plano da imagem só o que a vista pede para alcançar a chapa sem estourar, e a altura vai dita em cada imagem. O painel liso sai com brilho que muda devagar, e um relevo de um ou dois milímetros sai como mancha clara de um lado e escura do outro. A faixa preta atrás de uma peça saliente é a sombra dela, e o painel visto de lado sai escuro.
+
+- tresquartos, a luz correndo na direção de 20 graus da imagem (0 para a direita, 90 para cima), com a luz a 50 graus do plano da imagem: <pacote>/superficie/peca-tresquartos-rasante-az20.png
+- tresquartos, a luz correndo na direção de 290 graus da imagem (0 para a direita, 90 para cima), com a luz a 50 graus do plano da imagem: <pacote>/superficie/peca-tresquartos-rasante-az290.png
+
+## Partes
+
+Uma vista isolada de cada parte, olhando dos lados descritos em Modelo, com a forma e a técnica que o plano prometeu para ela. Diga, em uma linha por parte, se a forma que você vê é a prometida; parte prometida que não aparece na imagem é ausência. Feição menor que uns 10 mm só se julga pela vista de perto, quando a parte a traz; sem ela, a imagem isolada não a mostra e você não aponta defeito nem aprova a feição.
+
+### fuselagem
+
+Forma prometida: casco de 8084 mm de seções de retângulo arredondado, largo e alto na cabine, afinando em curva até a cauda, com o vão da porta, os das oito janelas e a abertura do para-brisa recortados nele
+
+Técnica prometida: loft das 20 seções do esboço, com as pontas fechadas, sombreado liso, e recorte dos vãos da porta e das oito janelas e da abertura do para-brisa por subtrair
+
+Caixa da parte na malha executada: 1560,0 por 1580,0 por 8085,0 mm (x, y, z); a vista isolada não tem escala, e o tamanho e a espessura da parte se julgam por esta caixa.
+
+- direita: <pacote>/bancada-peca-c02-direita-sel-fuselagem-isolar-orto-focado.png
+- isometrica: <pacote>/bancada-peca-c02-isometrica-sel-fuselagem-isolar-orto-focado.png
+
+### parabrisa
+
+Forma prometida: vidro de 20 mm rente ao casco, assentado numa abertura recortada na frente da cabine, com a face de fora na superfície do casco, sem degrau, e 5 mm de folga em volta; contorno do esboço, 1336 por até 770 mm, dividido pelo montante
+
+Técnica prometida: extrusão em y do contorno do esboço menos o casco descido 20 mm (subtrair), aparada pelo casco inteiro (intersectar), com sombreado liso; a abertura é a mesma extrusão alargada pela folga, menos o casco descido, subtraída do casco
+
+Caixa da parte na malha executada: 1336,0 por 463,2 por 770,0 mm (x, y, z); a vista isolada não tem escala, e o tamanho e a espessura da parte se julgam por esta caixa.
+
+- direita: <pacote>/bancada-peca-c02-direita-sel-parabrisa-isolar-orto-focado.png
+- isometrica: <pacote>/bancada-peca-c02-isometrica-sel-parabrisa-isolar-orto-focado.png
+
+### montanteParabrisa
+
+Forma prometida: barra de 70 mm de largura e cerca de 36 mm de altura, de cantos arredondados, sobre a face de fora do vidro e a seguindo da base ao topo da abertura (z 2885,5 a 3655,5), a cerca de 25 graus; a face de baixo toca o vidro e não entra nele
+
+Técnica prometida: loft em z de seções de retângulo de cantos arredondados nas estações do casco, com a face de baixo na superfície do casco, as pontas fechadas e sombreado liso
+
+Caixa da parte na malha executada: 70,0 por 396,2 por 771,0 mm (x, y, z); a vista isolada não tem escala, e o tamanho e a espessura da parte se julgam por esta caixa.
+
+- direita: <pacote>/bancada-peca-c02-direita-sel-montanteParabrisa-isolar-orto-focado.png
+- isometrica: <pacote>/bancada-peca-c02-isometrica-sel-montanteParabrisa-isolar-orto-focado.png
+
+### janela1D
+
+Forma prometida: placa escura de canto arredondado, no vão da janela 1 do lado direito da cabine
+
+Técnica prometida: extrusão em x de retângulo de cantos arredondados, assentada na face de dentro do vão
+
+Caixa da parte na malha executada: 20,0 por 423,0 por 733,0 mm (x, y, z); a vista isolada não tem escala, e o tamanho e a espessura da parte se julgam por esta caixa.
+
+- direita: <pacote>/bancada-peca-c02-direita-sel-janela1D-isolar-orto-focado.png
+- isometrica: <pacote>/bancada-peca-c02-isometrica-sel-janela1D-isolar-orto-focado.png
+
+### janela1E
+
+Forma prometida: placa escura de canto arredondado, no vão da janela 1 do lado esquerdo da cabine
+
+Técnica prometida: extrusão em x de retângulo de cantos arredondados, assentada na face de dentro do vão
+
+Caixa da parte na malha executada: 20,0 por 423,0 por 733,0 mm (x, y, z); a vista isolada não tem escala, e o tamanho e a espessura da parte se julgam por esta caixa.
+
+- direita: <pacote>/bancada-peca-c02-direita-sel-janela1E-isolar-orto-focado.png
+- isometrica: <pacote>/bancada-peca-c02-isometrica-sel-janela1E-isolar-orto-focado.png
+
+### janela2D
+
+Forma prometida: placa escura de canto arredondado, no vão da janela 2 do lado direito da cabine
+
+Técnica prometida: extrusão em x de retângulo de cantos arredondados, assentada na face de dentro do vão
+
+Caixa da parte na malha executada: 20,0 por 326,0 por 267,0 mm (x, y, z); a vista isolada não tem escala, e o tamanho e a espessura da parte se julgam por esta caixa.
+
+- direita: <pacote>/bancada-peca-c02-direita-sel-janela2D-isolar-orto-focado.png
+- isometrica: <pacote>/bancada-peca-c02-isometrica-sel-janela2D-isolar-orto-focado.png
+
+### janela2E
+
+Forma prometida: placa escura de canto arredondado, no vão da janela 2 do lado esquerdo da cabine
+
+Técnica prometida: extrusão em x de retângulo de cantos arredondados, assentada na face de dentro do vão
+
+Caixa da parte na malha executada: 20,0 por 326,0 por 267,0 mm (x, y, z); a vista isolada não tem escala, e o tamanho e a espessura da parte se julgam por esta caixa.
+
+- direita: <pacote>/bancada-peca-c02-direita-sel-janela2E-isolar-orto-focado.png
+- isometrica: <pacote>/bancada-peca-c02-isometrica-sel-janela2E-isolar-orto-focado.png
+
+### janela3D
+
+Forma prometida: placa escura de canto arredondado, no vão da janela 3 do lado direito da cabine
+
+Técnica prometida: extrusão em x de retângulo de cantos arredondados, assentada na face de dentro do vão
+
+Caixa da parte na malha executada: 20,0 por 326,0 por 299,0 mm (x, y, z); a vista isolada não tem escala, e o tamanho e a espessura da parte se julgam por esta caixa.
+
+- direita: <pacote>/bancada-peca-c02-direita-sel-janela3D-isolar-orto-focado.png
+- isometrica: <pacote>/bancada-peca-c02-isometrica-sel-janela3D-isolar-orto-focado.png
+
+### janela3E
+
+Forma prometida: placa escura de canto arredondado, no vão da janela 3 do lado esquerdo da cabine
+
+Técnica prometida: extrusão em x de retângulo de cantos arredondados, assentada na face de dentro do vão
+
+Caixa da parte na malha executada: 20,0 por 326,0 por 299,0 mm (x, y, z); a vista isolada não tem escala, e o tamanho e a espessura da parte se julgam por esta caixa.
+
+- direita: <pacote>/bancada-peca-c02-direita-sel-janela3E-isolar-orto-focado.png
+- isometrica: <pacote>/bancada-peca-c02-isometrica-sel-janela3E-isolar-orto-focado.png
+
+### janela4D
+
+Forma prometida: placa escura de canto arredondado, no vão da janela 4 do lado direito da cabine, girada 7 graus para seguir o afinamento do casco
+
+Técnica prometida: extrusão em x de retângulo de cantos arredondados, assentada na face de dentro do vão
+
+Caixa da parte na malha executada: 65,9 por 305,0 por 258,4 mm (x, y, z); a vista isolada não tem escala, e o tamanho e a espessura da parte se julgam por esta caixa.
+
+- direita: <pacote>/bancada-peca-c02-direita-sel-janela4D-isolar-orto-focado.png
+- isometrica: <pacote>/bancada-peca-c02-isometrica-sel-janela4D-isolar-orto-focado.png
+
+### janela4E
+
+Forma prometida: placa escura de canto arredondado, no vão da janela 4 do lado esquerdo da cabine, girada 7 graus para seguir o afinamento do casco
+
+Técnica prometida: extrusão em x de retângulo de cantos arredondados, assentada na face de dentro do vão
+
+Caixa da parte na malha executada: 65,9 por 305,0 por 258,4 mm (x, y, z); a vista isolada não tem escala, e o tamanho e a espessura da parte se julgam por esta caixa.
+
+- direita: <pacote>/bancada-peca-c02-direita-sel-janela4E-isolar-orto-focado.png
+- isometrica: <pacote>/bancada-peca-c02-isometrica-sel-janela4E-isolar-orto-focado.png
+
+### porta
+
+Forma prometida: painel da porta traseira do lado esquerdo, de 19 mm de espessura e cantos de baixo e de cima arredondados em seções, com o vão da janela 4 aberto de lado a lado
+
+Técnica prometida: loft em y de seções de cinco pontos, com as pontas fechadas, recortado por subtrair e com sombreado liso
+
+Caixa da parte na malha executada: 224,0 por 1073,0 por 972,0 mm (x, y, z); a vista isolada não tem escala, e o tamanho e a espessura da parte se julgam por esta caixa.
+
+- direita: <pacote>/bancada-peca-c02-direita-sel-porta-isolar-orto-focado.png
+- isometrica: <pacote>/bancada-peca-c02-isometrica-sel-porta-isolar-orto-focado.png
+
+### barbatana
+
+Forma prometida: aleta ventral de seção afilada e cantos de baixo arredondados, sob a cauda, de z 7439 a z 8811, subindo até a barriga
+
+Técnica prometida: loft em z de seções de retângulo com os dois cantos de baixo arredondados, com as pontas fechadas e sombreado liso
+
+Caixa da parte na malha executada: 60,0 por 602,9 por 1373,0 mm (x, y, z); a vista isolada não tem escala, e o tamanho e a espessura da parte se julgam por esta caixa.
+
+- direita: <pacote>/bancada-peca-c02-direita-sel-barbatana-isolar-orto-focado.png
+- isometrica: <pacote>/bancada-peca-c02-isometrica-sel-barbatana-isolar-orto-focado.png
+
+## Critérios de reprovação
+
+- casco facetado, ou com degrau visível entre seções, em vez de curvo e liso
+- fuselagem com mais de 3% de diferença para os 8084 mm de comprimento
+- o REFINA acusando parte fora do envelope do volume dela
+- parte solta, que não encosta na fuselagem
+- perfil de lado ou de cima fora do esboço: o topo da cabine, a curva do para-brisa e o afinamento até a cauda
+- porta, janela ou para-brisa sem vão no casco, ou uma placa solta por cima dele, ou o vidro do para-brisa com degrau para o casco
+
+## Veredito
+
+No veredito em JSON, `onde`, `evidencia` e `observacao` têm até 240 caracteres cada, porque o registro recusa o mais longo; o detalhe vai no texto da resposta.

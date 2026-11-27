@@ -5,7 +5,7 @@
 > projeção. `npm run mapa:check` (CI) falha se isto estiver velho ou se
 > algum arquivo-fonte estiver sem cabeçalho.
 
-2465 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
+2472 arquivos (código `.js .mjs .cjs .ts .tsx .html` + docs `.md`).
 
 ## (raiz)
 
@@ -3349,6 +3349,34 @@
 - `receita.js` — materiais-do-furgao-opcoes/receita.js — peça de prova das opções de material dos grupos do furgão ainda em cor chapada (plano de materiais realistas, etapa d…
 - `receita.test.mjs` — receita.test.mjs — a peça de prova das opções de material do furgão passa pelo normalizador, entrega as partes de cada grupo e opção e abre na bancada como e…
 
+## tools/fixtures/acervo/peca-c01/
+
+- `receita.js` — aviao/fuselagem — o casco do avião de pequeno porte, com o para-brisa rente e o montante dele, as oito janelas, a porta traseira e a barbatana ventral.
+
+## tools/fixtures/acervo/peca-c02/
+
+- `receita.js` — aviao/fuselagem — o casco do avião de pequeno porte, com o para-brisa rente e o montante dele, as oito janelas, a porta traseira e a barbatana ventral.
+
+## tools/fixtures/acervo/peca-c03/
+
+- `receita.js` — empilhadeira/cilindro-elevacao — o cilindro de elevação livre da torre da empilhadeira, no centro, entre os canais: a camisa de Ø 60 sentada na travessa de b…
+
+## tools/fixtures/acervo/peca-c04/
+
+- `receita.js` — empilhadeira/cilindro-elevacao — o cilindro de elevação livre da torre da empilhadeira, no centro, entre os canais: a camisa de Ø 60 sentada na travessa de b…
+
+## tools/fixtures/acervo/peca-c05/
+
+- `receita.js` — empilhadeira/cilindro-elevacao — o cilindro de elevação livre da torre da empilhadeira, no centro, entre os canais: a camisa de Ø 60 sentada na travessa de b…
+
+## tools/fixtures/acervo/peca-c06/
+
+- `receita.js` — roda-esportiva — roda de liga leve de 19 polegadas com pneu 245/40 R19, etapa 1 (aro, raios, tampa central, parafusos, válvula e pneu), nas duas variantes do…
+
+## tools/fixtures/acervo/peca-c07/
+
+- `receita.js` — aviao/fuselagem — o casco do avião de pequeno porte, com o para-brisa rente e o montante dele, as oito janelas, a porta traseira e a barbatana ventral.
+
 ## tools/fixtures/acervo/peca-de-prova/
 
 - `receita.js` — peca-de-prova/receita.js — a peça que as guardas de navegador usam.
@@ -4076,7 +4104,7 @@
 - `cadeiras-ajustadas.test.mjs` — Os ajustes das onze cadeiras (`<id>.ajustes.json` ao lado de cada receita): cada arquivo aplica sem erro, a conversão não recusa forma, a caixa envolvente mu…
 - `cadeiras-medida.mjs` — cadeiras-medida.mjs — a medida da família `cadeira` contra o esboço alvo de cada perfil, e a prancha com os dois lado a lado.
 - `calibracao-do-critico.mjs` — calibracao-do-critico.mjs — o conjunto de calibração do crítico visual e o gate `calibracao:check`.
-- `calibracao-do-critico.test.mjs` — calibracao-do-critico.test.mjs — o gate `calibracao:check`: o conjunto versionado passa, e cada coisa que ele confere reprova quando muda.
+- `calibracao-do-critico.test.mjs` — calibracao-do-critico.test.mjs — o gate `calibracao:check` no formato @2: o conjunto versionado passa, cada coisa que ele confere reprova quando muda, o mode…
 - `calibracao-impressao.test.mjs` — calibracao-impressao.test.mjs — a impressão do brief do crítico não muda quando a pasta do conjunto ou o repositório mudam de lugar (tools/modelar/calibracao…
 - `caminho-confinado.mjs` — caminho-confinado.mjs — guarda de escrita para artefatos que um CLI aceita por caminho. A checagem lexical sozinha não basta: um diretório relativo pode cont…
 - `caminho-confinado.test.ts` — caminho-confinado.test.ts — prova do confinamento sem precisar criar links.

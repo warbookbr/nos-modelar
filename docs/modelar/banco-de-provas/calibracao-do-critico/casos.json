@@ -1,0 +1,1149 @@
+{
+  "formato": "mecanifica.calibracao-do-critico@2",
+  "versao": "2.0.0",
+  "descricao": "Casos em que a pessoa já decidiu, para medir o crítico visual no que a medição da rodada não vê: peças do acervo com PLANO e referência, em cópias de ensaio, julgadas pelo pedido e pelas imagens do pacote padrão da rodada. Os controles são etapas aceitas pela pessoa; os defeitos de forma prometida e de proporção foram recolocados à mão; a revolução facetada é o defeito de superfície. O caso que a medição da rodada reprova fica como prova da medida, sem julgamento.",
+  "critico": {
+    "agente": {
+      "arquivo": ".claude/agents/critico-visual.md",
+      "sha256": "sha256:05199cd472ee40e590217b422960422e588c5e230582cdac5d57053adf3f1ceb"
+    },
+    "modelo": {
+      "declarado": "sonnet",
+      "medido": null
+    },
+    "pacote": "o pedido.md e as imagens que ele cita, do pacote padrão: npm run vistas:critica -- <cópia de ensaio>, sem --completo"
+  },
+  "faixasDaNota": {
+    "controle": [
+      8,
+      10
+    ],
+    "forma-prometida": [
+      0,
+      9
+    ],
+    "proporcao": [
+      0,
+      9
+    ],
+    "revolucao-facetada": [
+      5,
+      9
+    ]
+  },
+  "regra": {
+    "julgamentos": 3,
+    "acerto": "o caso acerta quando a mediana das três notas cai na faixa do grupo, no máximo um julgamento sai dela, cada defeito esperado é citado em pelo menos dois dos três julgamentos (a parte ou o lugar com uma das palavras, e o tipo e o sentido entre os aceitos) e, no controle, no máximo um julgamento cita defeito estrutural",
+    "passa": {
+      "minimo": 5,
+      "de": 6,
+      "obrigatorias": [
+        "parabrisa-saliente",
+        "raios-largos-e-par-fechado"
+      ]
+    }
+  },
+  "casos": [
+    {
+      "id": "c01",
+      "nome": "controle-fuselagem",
+      "grupo": "controle",
+      "obrigatorio": false,
+      "julgamentos": 3,
+      "faixaDaNota": [
+        8,
+        10
+      ],
+      "fonte": {
+        "peca": "aviao/fuselagem",
+        "origem": {
+          "arquivo": "procedural/pecas/aviao/partes/fuselagem/receita.js",
+          "sha256": "sha256:4a41a7d94057f1a837be44468ee16e40e91ffb722757d7f47b9f4c3e41719e05"
+        },
+        "copia": {
+          "peca": "peca-c01",
+          "arquivo": "tools/fixtures/acervo/peca-c01/receita.js",
+          "sha256": "sha256:3e0839b004e1a0f57d3d40444cd4dc3503d76442353ecc9cc010bf394ac1f280"
+        },
+        "trocas": [
+          {
+            "de": "andaime: '../../andaime.json',",
+            "para": "andaime: '../../../../procedural/pecas/aviao/andaime.json',",
+            "porque": "caminho do andaime visto da pasta da cópia"
+          }
+        ],
+        "aceite": {
+          "registro": "procedural/pecas/aviao/montagem.etapas.json",
+          "instancia": "fuselagem",
+          "por": "a pessoa, 2026-10-15: aceitou a fuselagem como está depois da rodada 3, com o para-brisa rente ao casco e nota 9 sem defeito",
+          "forma": "sha256:3c396f5a936716be3d3a4199d16b9d9b5781d4b0cc4840b66aec58e9ab6f72e9"
+        }
+      },
+      "defeitos": [],
+      "destino": "critico",
+      "medicao": {
+        "passou": true,
+        "comando": "node tools/modelar/rodada-de-modelagem.mjs peca-c01 --acao",
+        "receitaSha256": "sha256:3e0839b004e1a0f57d3d40444cd4dc3503d76442353ecc9cc010bf394ac1f280",
+        "forma": "sha256:3c396f5a936716be3d3a4199d16b9d9b5781d4b0cc4840b66aec58e9ab6f72e9",
+        "relatorio": "medição da receita atual (sha256:3e0839b0): passou\naviso: 27 face(s) fina(s) na malha (fuselagem: 21, porta: 6); liste-as com `npm run -s malha:lascas -- peca-c01`.\npróxima ação: revisar — a receita existe (sha256:3e0839b0), a medição dela passa e nenhuma rodada a julgou."
+      },
+      "pedido": {
+        "arquivo": "casos/c01/pedido.txt",
+        "sha256": "sha256:6fdab23f764e98e1dca54c2eb5b565aba788d7a72cfc88a8e9836cdbb2424780"
+      },
+      "imagens": [
+        {
+          "arquivo": "casos/c01/contorno-sobreposto.png",
+          "sha256": "sha256:1f23fbd3218fd66fcc3f9789323773785488bcc503a5b7abe201f90cf5bec875"
+        },
+        {
+          "arquivo": "casos/c01/bancada-peca-c01-isometrica-orto-enquadrado.png",
+          "sha256": "sha256:d2c822766ecfe7fd9aef69fb808e0884c2e52c68fb6b40dd1f2a8eb8af292951"
+        },
+        {
+          "arquivo": "casos/c01/bancada-peca-c01-frontal-orto-enquadrado.png",
+          "sha256": "sha256:1d25e722e36200a95d744c5e2b42659febbdefe5a2bc74733f2f67d6ed921126"
+        },
+        {
+          "arquivo": "casos/c01/bancada-peca-c01-direita-orto-enquadrado.png",
+          "sha256": "sha256:394d0645cc398a7cb6ac6481cf0dec0a199c19a56b7f13bcdd24087a5c570b86"
+        },
+        {
+          "arquivo": "casos/c01/bancada-peca-c01-superior-orto-enquadrado.png",
+          "sha256": "sha256:4b7fc5b83fa64fa05973bce17dc333a520771671ff395626588c9a7a3bcda831"
+        },
+        {
+          "arquivo": "casos/c01/bancada-peca-c01-traseira-orto-enquadrado.png",
+          "sha256": "sha256:54791bba007bb032c6ab9a86f08cf490e61ee265ca5e9d16e4dae50ae44fe4c2"
+        },
+        {
+          "arquivo": "casos/c01/bancada-peca-c01-esquerda-orto-enquadrado.png",
+          "sha256": "sha256:1dd13173f2e2c648de73ca7b278201b4d8878230704d6df841dae0b27516931b"
+        },
+        {
+          "arquivo": "casos/c01/bancada-peca-c01-isometrica-orto-arame-enquadrado.png",
+          "sha256": "sha256:ef2fbf30f15d2d6576d26556aba238986f72881888080e26708cadc076f5f862"
+        },
+        {
+          "arquivo": "casos/c01/bancada-peca-c01-traseira-orto-raio-x-enquadrado.png",
+          "sha256": "sha256:eba8ec3322a92112bbdd7e2623fdfd17420d9e2618841d0f255bd697ce2ac614"
+        },
+        {
+          "arquivo": "casos/c01/superficie/peca-tresquartos-rasante-az20.png",
+          "sha256": "sha256:8db1d7b7965d0d4795cf2bf8bdaa4ebd8369a74854252c869211454a92a4b6df"
+        },
+        {
+          "arquivo": "casos/c01/superficie/peca-tresquartos-rasante-az290.png",
+          "sha256": "sha256:0b5a3bd54e48d4312441358fd5619e6da91da43e603190ccc2b3660a80d1b648"
+        },
+        {
+          "arquivo": "casos/c01/bancada-peca-c01-direita-sel-fuselagem-isolar-orto-focado.png",
+          "sha256": "sha256:215c2958ba9023c92dd30c7b8faf2a216012883ce03c6e14599c5c359898e95e"
+        },
+        {
+          "arquivo": "casos/c01/bancada-peca-c01-isometrica-sel-fuselagem-isolar-orto-focado.png",
+          "sha256": "sha256:5ff7346cdc777aecc62c8c029ed7638e2f05be94d2b800b946c1717c38275140"
+        },
+        {
+          "arquivo": "casos/c01/bancada-peca-c01-direita-sel-parabrisa-isolar-orto-focado.png",
+          "sha256": "sha256:74e002e4dad4e0a6153542af85d4c88871d4f5a9305023d51f95408c2c2a5b83"
+        },
+        {
+          "arquivo": "casos/c01/bancada-peca-c01-isometrica-sel-parabrisa-isolar-orto-focado.png",
+          "sha256": "sha256:9b9911fa3007c1e254baf6fd830565a0ca6a1469f16266a4aeb75e734fa997a4"
+        },
+        {
+          "arquivo": "casos/c01/bancada-peca-c01-direita-sel-montanteParabrisa-isolar-orto-focado.png",
+          "sha256": "sha256:1b99efe7a51d4d4526a9ada0635b91554c7dff4024eee3e67afbce6d4080805c"
+        },
+        {
+          "arquivo": "casos/c01/bancada-peca-c01-isometrica-sel-montanteParabrisa-isolar-orto-focado.png",
+          "sha256": "sha256:0af911c9eca72cd3b3a2554c5e2aed7efc2c2adf8b3493f6907c9756d1d9c9da"
+        },
+        {
+          "arquivo": "casos/c01/bancada-peca-c01-direita-sel-janela1D-isolar-orto-focado.png",
+          "sha256": "sha256:37fc52a44d37ff4f35b7a277a9c8b92fb09d7bd9124695ef3e3c6d03505f8d70"
+        },
+        {
+          "arquivo": "casos/c01/bancada-peca-c01-isometrica-sel-janela1D-isolar-orto-focado.png",
+          "sha256": "sha256:ca2a7e738796f7d55294a23cb2e5e2721975ec61f629fcf1166ea344b6f1f8c0"
+        },
+        {
+          "arquivo": "casos/c01/bancada-peca-c01-direita-sel-janela1E-isolar-orto-focado.png",
+          "sha256": "sha256:e79e4afd01e4557d77a3d89d4fbb7702e243c315f368bc4ad718e7abeb43de64"
+        },
+        {
+          "arquivo": "casos/c01/bancada-peca-c01-isometrica-sel-janela1E-isolar-orto-focado.png",
+          "sha256": "sha256:fcb192911f622c3cae7cc70f3a10434067b6507152953d7302a479b906bee485"
+        },
+        {
+          "arquivo": "casos/c01/bancada-peca-c01-direita-sel-janela2D-isolar-orto-focado.png",
+          "sha256": "sha256:4cdc5101fcddff3026299e251f60d4deeb397bd0e7ef3e7c2309588677698fb8"
+        },
+        {
+          "arquivo": "casos/c01/bancada-peca-c01-isometrica-sel-janela2D-isolar-orto-focado.png",
+          "sha256": "sha256:0687ee147d58b4516ce666dac6670dcb67e00961ada9be453783e2e0f55ef681"
+        },
+        {
+          "arquivo": "casos/c01/bancada-peca-c01-direita-sel-janela2E-isolar-orto-focado.png",
+          "sha256": "sha256:8ffaf90eb10648235abf8bd115f293cf8a2c8942897abc55782abc8fb5304e49"
+        },
+        {
+          "arquivo": "casos/c01/bancada-peca-c01-isometrica-sel-janela2E-isolar-orto-focado.png",
+          "sha256": "sha256:c15f0999c0e152e66c1461b5884db6e740145032dbc3f7d643a634aaa6fbfb7a"
+        },
+        {
+          "arquivo": "casos/c01/bancada-peca-c01-direita-sel-janela3D-isolar-orto-focado.png",
+          "sha256": "sha256:fa8b20beb79b75b3bade1f624b7c77c7423ce5adf07c633867238582336ad12b"
+        },
+        {
+          "arquivo": "casos/c01/bancada-peca-c01-isometrica-sel-janela3D-isolar-orto-focado.png",
+          "sha256": "sha256:72acf82dd2019e5a83221057e8e26debe6dcbffbb6f497a64e4b2a7b1c5a655e"
+        },
+        {
+          "arquivo": "casos/c01/bancada-peca-c01-direita-sel-janela3E-isolar-orto-focado.png",
+          "sha256": "sha256:0e918a3912df90d70cb287d3a6fd8fb73c176b19f3780debca9b45a574e65b40"
+        },
+        {
+          "arquivo": "casos/c01/bancada-peca-c01-isometrica-sel-janela3E-isolar-orto-focado.png",
+          "sha256": "sha256:f2e19ae61914bc09a771cc6893330e87843fa6f8fac00de4aeec8b7d49f5121a"
+        },
+        {
+          "arquivo": "casos/c01/bancada-peca-c01-direita-sel-janela4D-isolar-orto-focado.png",
+          "sha256": "sha256:e5d3e162db0a550d986bc99e8418c63f019fbeb9268b1639954cda6debb6ca8e"
+        },
+        {
+          "arquivo": "casos/c01/bancada-peca-c01-isometrica-sel-janela4D-isolar-orto-focado.png",
+          "sha256": "sha256:921cb6da6669b893efa4144dc38a203efc5693b0390dac99667dc91d8a442f45"
+        },
+        {
+          "arquivo": "casos/c01/bancada-peca-c01-direita-sel-janela4E-isolar-orto-focado.png",
+          "sha256": "sha256:a35461a6ae7891b04b595af1dfdb0598dc35583fbf46008150c0183601e9a2e9"
+        },
+        {
+          "arquivo": "casos/c01/bancada-peca-c01-isometrica-sel-janela4E-isolar-orto-focado.png",
+          "sha256": "sha256:68b778a37be4738602b8495750fc88548161ac5f113693ad6d55456342d6cc5e"
+        },
+        {
+          "arquivo": "casos/c01/bancada-peca-c01-direita-sel-porta-isolar-orto-focado.png",
+          "sha256": "sha256:31ca58632ba4dfb30d41955de5104f2aba6c5b5c2dac1757a3e3813611a02a96"
+        },
+        {
+          "arquivo": "casos/c01/bancada-peca-c01-isometrica-sel-porta-isolar-orto-focado.png",
+          "sha256": "sha256:14133f1b23fe6136eced626854b7f648c3daaa79e62c13682729ca49898286ec"
+        },
+        {
+          "arquivo": "casos/c01/bancada-peca-c01-direita-sel-barbatana-isolar-orto-focado.png",
+          "sha256": "sha256:634183f1ae08b2f193b382da69ddcf40a9e2d5182d701bffe002a834858a7002"
+        },
+        {
+          "arquivo": "casos/c01/bancada-peca-c01-isometrica-sel-barbatana-isolar-orto-focado.png",
+          "sha256": "sha256:1a9a41aa4fe280349fb54832483df4eeeb312000de217c35b010ea5f4b1698bf"
+        }
+      ]
+    },
+    {
+      "id": "c02",
+      "nome": "parabrisa-saliente",
+      "grupo": "forma-prometida",
+      "obrigatorio": true,
+      "julgamentos": 3,
+      "faixaDaNota": [
+        0,
+        9
+      ],
+      "fonte": {
+        "peca": "aviao/fuselagem",
+        "origem": {
+          "arquivo": "procedural/pecas/aviao/partes/fuselagem/receita.js",
+          "sha256": "sha256:4a41a7d94057f1a837be44468ee16e40e91ffb722757d7f47b9f4c3e41719e05"
+        },
+        "copia": {
+          "peca": "peca-c02",
+          "arquivo": "tools/fixtures/acervo/peca-c02/receita.js",
+          "sha256": "sha256:e6e75c740bba3dc4f70975d42d0f1e5ed2bc1d3965305f3125a2313e05bbd4ff"
+        },
+        "trocas": [
+          {
+            "de": "andaime: '../../andaime.json',",
+            "para": "andaime: '../../../../procedural/pecas/aviao/andaime.json',",
+            "porque": "caminho do andaime visto da pasta da cópia"
+          },
+          {
+            "de": "    espessura: 20,\n",
+            "para": "    espessura: 20,\n    saliencia: 30,\n",
+            "porque": "a medida do defeito: quanto o vidro passa da superfície do casco, em mm (a faixa do esboço passava dela em até 41 mm; com 30 mm o montante, que sobe junto, fica dentro do envelope do andaime)",
+            "defeito": true
+          },
+          {
+            "de": "  const leito = cascoPorEstacoes(t, t.parabrisa.espessura);\n",
+            "para": "  const leito = cascoPorEstacoes(t, t.parabrisa.espessura);\n  const cascoAlto = cascoPorEstacoes(t, -t.parabrisa.saliencia);\n",
+            "porque": "o casco erguido pela saliência, que passa a aparar o vidro no lugar da superfície do casco",
+            "defeito": true
+          },
+          {
+            "de": "  return { casco, leito, parabrisa,",
+            "para": "  return { casco, cascoAlto, leito, parabrisa,",
+            "porque": "o casco erguido chega aos passos",
+            "defeito": true
+          },
+          {
+            "de": "  apara({ op: 'subtrair', id: ID.vidroSemAparar }, ID.parabrisa, ID.gabaritoDoParabrisa);\n",
+            "para": "  loft(ID.gabaritoDoParabrisa, P.cascoAlto, t.casco.segmentosPorCanto);\n  passos.push(['intersectar', { origemId: ID.parabrisa, solidos: [{ origem: { op: 'subtrair', id: ID.vidroSemAparar } }, { origem: { op: 'loft', id: ID.gabaritoDoParabrisa } }] }]);\n",
+            "porque": "o vidro é aparado pelo casco erguido, e a face de fora dele fica acima da superfície do casco, com degrau em volta",
+            "defeito": true
+          },
+          {
+            "de": "  const embaixo = zs.map((z) => topoDoCascoNoMeio(t, z));\n",
+            "para": "  const embaixo = zs.map((z) => topoDoCascoNoMeio(t, z) + t.parabrisa.saliencia);\n",
+            "porque": "o montante sobe com a face de fora do vidro, para continuar assentado nela sem entrar no vidro",
+            "defeito": true
+          },
+          {
+            "de": "    max: [Math.max(...xsDoVidro), topoDoCascoNoMeio(t, vidro.zDoTopo), vidro.zDoTopo],\n",
+            "para": "    max: [Math.max(...xsDoVidro), topoDoCascoNoMeio(t, vidro.zDoTopo) + t.parabrisa.saliencia, vidro.zDoTopo],\n",
+            "porque": "o ponto declarado do alto do vidro acompanha a tabela, como na rodada em que o vidro saliente passou na medição",
+            "defeito": true
+          }
+        ],
+        "reprovacao": {
+          "registro": "procedural/pecas/aviao/partes/fuselagem/rodadas/rodada-03.json",
+          "rodada": 2,
+          "frase": "o para-brisa saliente veio do esboço aprovado e passou por dois críticos, porque o alvo era o esboço; só a pessoa o viu. A skill do laço passa a pedir ao crítico onde o alvo do esboço difere da referência real"
+        }
+      },
+      "defeitos": [
+        {
+          "parte": "parabrisa",
+          "tipo": "posicao",
+          "sentido": "alta",
+          "onde": "face de fora do vidro, acima da superfície do casco, com degrau em volta",
+          "palavras": [
+            "parabrisa",
+            "para-brisa",
+            "vidro"
+          ],
+          "aceitos": [
+            "posicao/alta",
+            "posicao/externa",
+            "espessura/maior",
+            "superficie/segmentado",
+            "superficie/anguloso",
+            "uniao/afastado"
+          ]
+        }
+      ],
+      "destino": "critico",
+      "medicao": {
+        "passou": true,
+        "comando": "node tools/modelar/rodada-de-modelagem.mjs peca-c02 --acao",
+        "receitaSha256": "sha256:e6e75c740bba3dc4f70975d42d0f1e5ed2bc1d3965305f3125a2313e05bbd4ff",
+        "forma": "sha256:efdc8ac905c252cb7fc558e6a31ede5eabc22178680b32376cdde1c9a9d1dbcc",
+        "relatorio": "medição da receita atual (sha256:e6e75c74): passou\naviso: 27 face(s) fina(s) na malha (fuselagem: 21, porta: 6); liste-as com `npm run -s malha:lascas -- peca-c02`.\npróxima ação: revisar — a receita existe (sha256:e6e75c74), a medição dela passa e nenhuma rodada a julgou."
+      },
+      "pedido": {
+        "arquivo": "casos/c02/pedido.txt",
+        "sha256": "sha256:75771afd9f61060476bbde1a0b84d941ea713922d89ab868025f51036d1112a3"
+      },
+      "imagens": [
+        {
+          "arquivo": "casos/c02/contorno-sobreposto.png",
+          "sha256": "sha256:4d82bcd11f270651ca2b0a9fcc44f4bf149daa46c571c2b0ed83f8cc1e9246fd"
+        },
+        {
+          "arquivo": "casos/c02/bancada-peca-c02-isometrica-orto-enquadrado.png",
+          "sha256": "sha256:804da0183c16a2ff14085672f99cdfbd0c6b62007f95c75ad25e4c010a68dea2"
+        },
+        {
+          "arquivo": "casos/c02/bancada-peca-c02-frontal-orto-enquadrado.png",
+          "sha256": "sha256:1d25e722e36200a95d744c5e2b42659febbdefe5a2bc74733f2f67d6ed921126"
+        },
+        {
+          "arquivo": "casos/c02/bancada-peca-c02-direita-orto-enquadrado.png",
+          "sha256": "sha256:a6341dd1a465894553ff8191f6386a09e6e94dac1db4d17c689393d62e82a4b6"
+        },
+        {
+          "arquivo": "casos/c02/bancada-peca-c02-superior-orto-enquadrado.png",
+          "sha256": "sha256:ed5a41a06c46c440bf25793e4d547c249a038ab9736d215eaaf393ae2ce52923"
+        },
+        {
+          "arquivo": "casos/c02/bancada-peca-c02-traseira-orto-enquadrado.png",
+          "sha256": "sha256:e6fabe771bfee5c44394f177c5a6c63664a4bcb11ea87936bb32ce33a4f58a47"
+        },
+        {
+          "arquivo": "casos/c02/bancada-peca-c02-esquerda-orto-enquadrado.png",
+          "sha256": "sha256:296baade41dfec480298b92110f38a39b7ebe0b044e6a2c1a286ee89ae786983"
+        },
+        {
+          "arquivo": "casos/c02/bancada-peca-c02-isometrica-orto-arame-enquadrado.png",
+          "sha256": "sha256:7dde822875c1e23f7bcecbc2b9939d62c9f120b934f6aa299b1768771c8d3eb0"
+        },
+        {
+          "arquivo": "casos/c02/bancada-peca-c02-traseira-orto-raio-x-enquadrado.png",
+          "sha256": "sha256:83d0040f743a724dc08f61beca7696ae8582d2495258fa249c020c1d91a9f791"
+        },
+        {
+          "arquivo": "casos/c02/superficie/peca-tresquartos-rasante-az20.png",
+          "sha256": "sha256:a25b227bcfc3a7b4b0fa0bef64a917a03a1deecc80737cb04dbd5e7ca539c4c8"
+        },
+        {
+          "arquivo": "casos/c02/superficie/peca-tresquartos-rasante-az290.png",
+          "sha256": "sha256:1b2db056ae948cef8b6dd71c96bdc31050553da14f069b2444d08f65843536a9"
+        },
+        {
+          "arquivo": "casos/c02/bancada-peca-c02-direita-sel-fuselagem-isolar-orto-focado.png",
+          "sha256": "sha256:215c2958ba9023c92dd30c7b8faf2a216012883ce03c6e14599c5c359898e95e"
+        },
+        {
+          "arquivo": "casos/c02/bancada-peca-c02-isometrica-sel-fuselagem-isolar-orto-focado.png",
+          "sha256": "sha256:5ff7346cdc777aecc62c8c029ed7638e2f05be94d2b800b946c1717c38275140"
+        },
+        {
+          "arquivo": "casos/c02/bancada-peca-c02-direita-sel-parabrisa-isolar-orto-focado.png",
+          "sha256": "sha256:eed83d36e6a890dd61dae8f7b1261bb28b52074f048034b8b40c1ee18e24c2df"
+        },
+        {
+          "arquivo": "casos/c02/bancada-peca-c02-isometrica-sel-parabrisa-isolar-orto-focado.png",
+          "sha256": "sha256:346c38e232adf5cee8842900dda95ff3d539ae2bd0588953de2b68659ed9a9b4"
+        },
+        {
+          "arquivo": "casos/c02/bancada-peca-c02-direita-sel-montanteParabrisa-isolar-orto-focado.png",
+          "sha256": "sha256:1b99efe7a51d4d4526a9ada0635b91554c7dff4024eee3e67afbce6d4080805c"
+        },
+        {
+          "arquivo": "casos/c02/bancada-peca-c02-isometrica-sel-montanteParabrisa-isolar-orto-focado.png",
+          "sha256": "sha256:0af911c9eca72cd3b3a2554c5e2aed7efc2c2adf8b3493f6907c9756d1d9c9da"
+        },
+        {
+          "arquivo": "casos/c02/bancada-peca-c02-direita-sel-janela1D-isolar-orto-focado.png",
+          "sha256": "sha256:37fc52a44d37ff4f35b7a277a9c8b92fb09d7bd9124695ef3e3c6d03505f8d70"
+        },
+        {
+          "arquivo": "casos/c02/bancada-peca-c02-isometrica-sel-janela1D-isolar-orto-focado.png",
+          "sha256": "sha256:ca2a7e738796f7d55294a23cb2e5e2721975ec61f629fcf1166ea344b6f1f8c0"
+        },
+        {
+          "arquivo": "casos/c02/bancada-peca-c02-direita-sel-janela1E-isolar-orto-focado.png",
+          "sha256": "sha256:e79e4afd01e4557d77a3d89d4fbb7702e243c315f368bc4ad718e7abeb43de64"
+        },
+        {
+          "arquivo": "casos/c02/bancada-peca-c02-isometrica-sel-janela1E-isolar-orto-focado.png",
+          "sha256": "sha256:fcb192911f622c3cae7cc70f3a10434067b6507152953d7302a479b906bee485"
+        },
+        {
+          "arquivo": "casos/c02/bancada-peca-c02-direita-sel-janela2D-isolar-orto-focado.png",
+          "sha256": "sha256:4cdc5101fcddff3026299e251f60d4deeb397bd0e7ef3e7c2309588677698fb8"
+        },
+        {
+          "arquivo": "casos/c02/bancada-peca-c02-isometrica-sel-janela2D-isolar-orto-focado.png",
+          "sha256": "sha256:0687ee147d58b4516ce666dac6670dcb67e00961ada9be453783e2e0f55ef681"
+        },
+        {
+          "arquivo": "casos/c02/bancada-peca-c02-direita-sel-janela2E-isolar-orto-focado.png",
+          "sha256": "sha256:8ffaf90eb10648235abf8bd115f293cf8a2c8942897abc55782abc8fb5304e49"
+        },
+        {
+          "arquivo": "casos/c02/bancada-peca-c02-isometrica-sel-janela2E-isolar-orto-focado.png",
+          "sha256": "sha256:c15f0999c0e152e66c1461b5884db6e740145032dbc3f7d643a634aaa6fbfb7a"
+        },
+        {
+          "arquivo": "casos/c02/bancada-peca-c02-direita-sel-janela3D-isolar-orto-focado.png",
+          "sha256": "sha256:fa8b20beb79b75b3bade1f624b7c77c7423ce5adf07c633867238582336ad12b"
+        },
+        {
+          "arquivo": "casos/c02/bancada-peca-c02-isometrica-sel-janela3D-isolar-orto-focado.png",
+          "sha256": "sha256:72acf82dd2019e5a83221057e8e26debe6dcbffbb6f497a64e4b2a7b1c5a655e"
+        },
+        {
+          "arquivo": "casos/c02/bancada-peca-c02-direita-sel-janela3E-isolar-orto-focado.png",
+          "sha256": "sha256:0e918a3912df90d70cb287d3a6fd8fb73c176b19f3780debca9b45a574e65b40"
+        },
+        {
+          "arquivo": "casos/c02/bancada-peca-c02-isometrica-sel-janela3E-isolar-orto-focado.png",
+          "sha256": "sha256:f2e19ae61914bc09a771cc6893330e87843fa6f8fac00de4aeec8b7d49f5121a"
+        },
+        {
+          "arquivo": "casos/c02/bancada-peca-c02-direita-sel-janela4D-isolar-orto-focado.png",
+          "sha256": "sha256:e5d3e162db0a550d986bc99e8418c63f019fbeb9268b1639954cda6debb6ca8e"
+        },
+        {
+          "arquivo": "casos/c02/bancada-peca-c02-isometrica-sel-janela4D-isolar-orto-focado.png",
+          "sha256": "sha256:921cb6da6669b893efa4144dc38a203efc5693b0390dac99667dc91d8a442f45"
+        },
+        {
+          "arquivo": "casos/c02/bancada-peca-c02-direita-sel-janela4E-isolar-orto-focado.png",
+          "sha256": "sha256:a35461a6ae7891b04b595af1dfdb0598dc35583fbf46008150c0183601e9a2e9"
+        },
+        {
+          "arquivo": "casos/c02/bancada-peca-c02-isometrica-sel-janela4E-isolar-orto-focado.png",
+          "sha256": "sha256:68b778a37be4738602b8495750fc88548161ac5f113693ad6d55456342d6cc5e"
+        },
+        {
+          "arquivo": "casos/c02/bancada-peca-c02-direita-sel-porta-isolar-orto-focado.png",
+          "sha256": "sha256:31ca58632ba4dfb30d41955de5104f2aba6c5b5c2dac1757a3e3813611a02a96"
+        },
+        {
+          "arquivo": "casos/c02/bancada-peca-c02-isometrica-sel-porta-isolar-orto-focado.png",
+          "sha256": "sha256:14133f1b23fe6136eced626854b7f648c3daaa79e62c13682729ca49898286ec"
+        },
+        {
+          "arquivo": "casos/c02/bancada-peca-c02-direita-sel-barbatana-isolar-orto-focado.png",
+          "sha256": "sha256:634183f1ae08b2f193b382da69ddcf40a9e2d5182d701bffe002a834858a7002"
+        },
+        {
+          "arquivo": "casos/c02/bancada-peca-c02-isometrica-sel-barbatana-isolar-orto-focado.png",
+          "sha256": "sha256:1a9a41aa4fe280349fb54832483df4eeeb312000de217c35b010ea5f4b1698bf"
+        }
+      ]
+    },
+    {
+      "id": "c03",
+      "nome": "controle-cilindro",
+      "grupo": "controle",
+      "obrigatorio": false,
+      "julgamentos": 3,
+      "faixaDaNota": [
+        8,
+        10
+      ],
+      "fonte": {
+        "peca": "empilhadeira/cilindro-elevacao",
+        "origem": {
+          "arquivo": "procedural/pecas/empilhadeira/partes/cilindro-elevacao/receita.js",
+          "sha256": "sha256:5ba5e5e1b24675e3c35d769028850b3c22d6af3b13c21f3b6a76444304340d6b"
+        },
+        "copia": {
+          "peca": "peca-c03",
+          "arquivo": "tools/fixtures/acervo/peca-c03/receita.js",
+          "sha256": "sha256:7ed8625431aabb84a381ef65ca821bf5e6eb7a43fa7db8a9e940db6cd42b1e78"
+        },
+        "trocas": [
+          {
+            "de": "from '../carcaca/receita.js';",
+            "para": "from '../../../../procedural/pecas/empilhadeira/partes/carcaca/receita.js';",
+            "porque": "caminho do módulo da carcaça visto da pasta da cópia"
+          },
+          {
+            "de": "from '../carcaca/receita/ferramentas.js';",
+            "para": "from '../../../../procedural/pecas/empilhadeira/partes/carcaca/receita/ferramentas.js';",
+            "porque": "caminho das ferramentas da carcaça visto da pasta da cópia"
+          },
+          {
+            "de": "referencias: ['../../referencias/frente.ia.png', '../../referencias/cima.ia.png'],",
+            "para": "referencias: ['tools/fixtures/acervo/peca-c03/referencias/frente.ia.png', 'tools/fixtures/acervo/peca-c03/referencias/cima.ia.png'],",
+            "porque": "as duas imagens de referência, copiadas sem mudança de procedural/pecas/empilhadeira/referencias/ para a pasta da cópia do controle: na pasta do objeto elas ficam ao lado do contorno lateral da máquina inteira, que o pacote desenharia sobre o cilindro, e a etapa aceita do acervo sai sem contorno"
+          }
+        ],
+        "aceite": {
+          "registro": "procedural/pecas/empilhadeira/montagem.etapas.json",
+          "instancia": "cilindroElevacao",
+          "por": "a pessoa, 2026-11-10: pode fixar, seguimos como está",
+          "forma": "sha256:b0bcbbc25e06342ca9b9b9fd7be9add6697be40aa49cde2ebd23c5ba13c84bff"
+        }
+      },
+      "defeitos": [],
+      "destino": "critico",
+      "medicao": {
+        "passou": true,
+        "comando": "node tools/modelar/rodada-de-modelagem.mjs peca-c03 --acao",
+        "receitaSha256": "sha256:7ed8625431aabb84a381ef65ca821bf5e6eb7a43fa7db8a9e940db6cd42b1e78",
+        "forma": "sha256:b0bcbbc25e06342ca9b9b9fd7be9add6697be40aa49cde2ebd23c5ba13c84bff",
+        "relatorio": "medição da receita atual (sha256:7ed86254): passou\naviso: 96 face(s) fina(s) na malha (cilindroElevacao: 96); liste-as com `npm run -s malha:lascas -- peca-c03`.\npróxima ação: revisar — a receita existe (sha256:7ed86254), a medição dela passa e nenhuma rodada a julgou."
+      },
+      "pedido": {
+        "arquivo": "casos/c03/pedido.txt",
+        "sha256": "sha256:248ec04a7645c49ce80c4d7ded915be572456d89b2f348875bc50b71b532af44"
+      },
+      "imagens": [
+        {
+          "arquivo": "casos/c03/bancada-peca-c03-isometrica-orto-enquadrado.png",
+          "sha256": "sha256:1afc46e12437446901104ce1115e46e29cf8def309d1a63a853d94784c0d237f"
+        },
+        {
+          "arquivo": "casos/c03/bancada-peca-c03-frontal-orto-enquadrado.png",
+          "sha256": "sha256:1cb2fc7070009ff69d1b7af87d94c03ddd17bda65e7c1771f1218b1cdbe80487"
+        },
+        {
+          "arquivo": "casos/c03/bancada-peca-c03-direita-orto-enquadrado.png",
+          "sha256": "sha256:41cce0ba18ee5f2849f4b989c95ce8ba21dc946aee070e6d92ba8cf880584a80"
+        },
+        {
+          "arquivo": "casos/c03/bancada-peca-c03-superior-orto-enquadrado.png",
+          "sha256": "sha256:8083a23eb49c5c3cd79d15492dc4b368d58e40764babb23ab9343ca9d6596926"
+        },
+        {
+          "arquivo": "casos/c03/bancada-peca-c03-traseira-orto-enquadrado.png",
+          "sha256": "sha256:2e771f56757649a9af9fd87e4f090aab4c485fb3278dbce01367374ebdcad0f3"
+        },
+        {
+          "arquivo": "casos/c03/bancada-peca-c03-esquerda-orto-enquadrado.png",
+          "sha256": "sha256:91b98e6bea532d9305ae419f147f18c8d52fab1779b4d57271c8c25deb84fc04"
+        },
+        {
+          "arquivo": "casos/c03/bancada-peca-c03-isometrica-orto-arame-enquadrado.png",
+          "sha256": "sha256:4c690b3074053c1049b5a6248c298df9bc7d259dab713aed6c272cd14a0288a3"
+        },
+        {
+          "arquivo": "casos/c03/bancada-peca-c03-traseira-orto-raio-x-enquadrado.png",
+          "sha256": "sha256:96010f67be49fc23251b48a0a246f1ef7c3c580e348b01f73ed7316d9a6492b6"
+        },
+        {
+          "arquivo": "casos/c03/bancada-peca-c03-direita-sel-cilindroElevacao-isolar-orto-focado.png",
+          "sha256": "sha256:d78f0393a4934f64ab22e1edf07838dbc962319851dd63766a52187b35049517"
+        },
+        {
+          "arquivo": "casos/c03/bancada-peca-c03-isometrica-sel-cilindroElevacao-isolar-orto-focado.png",
+          "sha256": "sha256:bc2aec6fbc57671ac4dedede393a43750b8b7d444eae7c2b54ce91dc9dada5ba"
+        },
+        {
+          "arquivo": "casos/c03/bancada-peca-c03-direita-sel-hasteElevacao-isolar-orto-focado.png",
+          "sha256": "sha256:9408a279fca3518087a4cdb6d7c6149bba0971d2c0d4f6ad89954afbc2c30c6a"
+        },
+        {
+          "arquivo": "casos/c03/bancada-peca-c03-isometrica-sel-hasteElevacao-isolar-orto-focado.png",
+          "sha256": "sha256:612af497ddcb319fe1653910878cf1e7d815e8baceb39c27f51469030d3a2f69"
+        },
+        {
+          "arquivo": "casos/c03/bancada-peca-c03-direita-sel-cabecaElevacao-isolar-orto-focado.png",
+          "sha256": "sha256:6612983b9545c7458c651f71a38c3d4a77267e5c47d85132e7db7e4507551e80"
+        },
+        {
+          "arquivo": "casos/c03/bancada-peca-c03-isometrica-sel-cabecaElevacao-isolar-orto-focado.png",
+          "sha256": "sha256:a532c034b848b9283e3f70463b0ada6c038d2b2d4140aa2b64967c75b85db240"
+        }
+      ]
+    },
+    {
+      "id": "c04",
+      "nome": "revolucao-de-doze-lados",
+      "grupo": "revolucao-facetada",
+      "obrigatorio": false,
+      "julgamentos": 3,
+      "faixaDaNota": [
+        5,
+        9
+      ],
+      "fonte": {
+        "peca": "empilhadeira/cilindro-elevacao",
+        "origem": {
+          "arquivo": "procedural/pecas/empilhadeira/partes/cilindro-elevacao/receita.js",
+          "sha256": "sha256:5ba5e5e1b24675e3c35d769028850b3c22d6af3b13c21f3b6a76444304340d6b"
+        },
+        "copia": {
+          "peca": "peca-c04",
+          "arquivo": "tools/fixtures/acervo/peca-c04/receita.js",
+          "sha256": "sha256:5bb0aa5489437ddd757d3ebd2ab28420c5716239183995d1d4103a412b60453d"
+        },
+        "trocas": [
+          {
+            "de": "from '../carcaca/receita.js';",
+            "para": "from '../../../../procedural/pecas/empilhadeira/partes/carcaca/receita.js';",
+            "porque": "caminho do módulo da carcaça visto da pasta da cópia"
+          },
+          {
+            "de": "from '../carcaca/receita/ferramentas.js';",
+            "para": "from '../../../../procedural/pecas/empilhadeira/partes/carcaca/receita/ferramentas.js';",
+            "porque": "caminho das ferramentas da carcaça visto da pasta da cópia"
+          },
+          {
+            "de": "referencias: ['../../referencias/frente.ia.png', '../../referencias/cima.ia.png'],",
+            "para": "referencias: ['tools/fixtures/acervo/peca-c03/referencias/frente.ia.png', 'tools/fixtures/acervo/peca-c03/referencias/cima.ia.png'],",
+            "porque": "as duas imagens de referência, copiadas sem mudança de procedural/pecas/empilhadeira/referencias/ para a pasta da cópia do controle: na pasta do objeto elas ficam ao lado do contorno lateral da máquina inteira, que o pacote desenharia sobre o cilindro, e a etapa aceita do acervo sai sem contorno"
+          },
+          {
+            "de": "  lados: 96,\n",
+            "para": "  lados: 12,\n",
+            "porque": "a camisa e a haste com doze lados no lugar de noventa e seis",
+            "defeito": true
+          }
+        ],
+        "semFrase": "nenhuma rodada registra a pessoa reprovando esta peça por facetado; é o caso de superfície do conjunto de antes (a revolução de doze lados), o único dele que a medição da rodada não reprovava, refeito numa peça do acervo"
+      },
+      "defeitos": [
+        {
+          "parte": "cilindroElevacao",
+          "tipo": "superficie",
+          "sentido": "facetado",
+          "onde": "contorno da camisa e da haste, em volta do eixo",
+          "palavras": [
+            "camisa",
+            "cilindro",
+            "haste"
+          ],
+          "aceitos": [
+            "superficie/facetado",
+            "superficie/segmentado",
+            "superficie/anguloso"
+          ]
+        }
+      ],
+      "destino": "critico",
+      "medicao": {
+        "passou": true,
+        "comando": "node tools/modelar/rodada-de-modelagem.mjs peca-c04 --acao",
+        "receitaSha256": "sha256:5bb0aa5489437ddd757d3ebd2ab28420c5716239183995d1d4103a412b60453d",
+        "forma": "sha256:a524cc6a4fa0fb776570421b71d93fa264fb0927f0fb01721ea2ff1cba648ada",
+        "relatorio": "medição da receita atual (sha256:5bb0aa54): passou\npróxima ação: revisar — a receita existe (sha256:5bb0aa54), a medição dela passa e nenhuma rodada a julgou."
+      },
+      "pedido": {
+        "arquivo": "casos/c04/pedido.txt",
+        "sha256": "sha256:c4e625808997dd2ee98e64f8ae50fc829049e1b85a44d92b07c121e20cf6eb4a"
+      },
+      "imagens": [
+        {
+          "arquivo": "casos/c04/bancada-peca-c04-isometrica-orto-enquadrado.png",
+          "sha256": "sha256:ecb9955af8351cb904707e7c63aa900280be8f47257e1ba34079dd37d5cf7e9e"
+        },
+        {
+          "arquivo": "casos/c04/bancada-peca-c04-frontal-orto-enquadrado.png",
+          "sha256": "sha256:97013d3f0b073bf9ccd69524d1b4fecbe58984c2c137c4134e586fb484d64ab0"
+        },
+        {
+          "arquivo": "casos/c04/bancada-peca-c04-direita-orto-enquadrado.png",
+          "sha256": "sha256:d0be84dc2bcd2b6593a0e34ccaa4a63c9b422f98f6791fe04fc7d7d812c5a7d9"
+        },
+        {
+          "arquivo": "casos/c04/bancada-peca-c04-superior-orto-enquadrado.png",
+          "sha256": "sha256:1928f53266cedc7a1c96c544107969071508d0f4855eb2e4b82b9f77bcad9aaf"
+        },
+        {
+          "arquivo": "casos/c04/bancada-peca-c04-traseira-orto-enquadrado.png",
+          "sha256": "sha256:376a907b59f416153e1d13c7f9accb6a58ea714d82df891ffcf63e8412d48b2a"
+        },
+        {
+          "arquivo": "casos/c04/bancada-peca-c04-esquerda-orto-enquadrado.png",
+          "sha256": "sha256:2fe2df01f60b956612dfd77b0d74b3f317bbed11051d393b12f2b3f0314e1edb"
+        },
+        {
+          "arquivo": "casos/c04/bancada-peca-c04-isometrica-orto-arame-enquadrado.png",
+          "sha256": "sha256:91f6d199e87a04a4d89d482cceff45859f2d54087b36f75a831e4abd47a3e6e0"
+        },
+        {
+          "arquivo": "casos/c04/bancada-peca-c04-traseira-orto-raio-x-enquadrado.png",
+          "sha256": "sha256:c0b719204df3779a8122f87f123ea7315588c62493d598904798fc582173ac67"
+        },
+        {
+          "arquivo": "casos/c04/bancada-peca-c04-direita-sel-cilindroElevacao-isolar-orto-focado.png",
+          "sha256": "sha256:03788fccd01ed99de5ee3c3a1d6f417f132ec2ad9755c29903816d5dd03130e3"
+        },
+        {
+          "arquivo": "casos/c04/bancada-peca-c04-isometrica-sel-cilindroElevacao-isolar-orto-focado.png",
+          "sha256": "sha256:30d94f2311d46f59f2bdb0003405eace7456ffc168c93e4f78249d75786b2f89"
+        },
+        {
+          "arquivo": "casos/c04/bancada-peca-c04-direita-sel-hasteElevacao-isolar-orto-focado.png",
+          "sha256": "sha256:0aaa02ff4bbc974420646917df1de70ba92fec93dd031a88eaa2b07699604895"
+        },
+        {
+          "arquivo": "casos/c04/bancada-peca-c04-isometrica-sel-hasteElevacao-isolar-orto-focado.png",
+          "sha256": "sha256:49f419fd0a7e6f376fb7246e7fe9c20b6396ae700d1c977c6ce49b0476a7ac62"
+        },
+        {
+          "arquivo": "casos/c04/bancada-peca-c04-direita-sel-cabecaElevacao-isolar-orto-focado.png",
+          "sha256": "sha256:6612983b9545c7458c651f71a38c3d4a77267e5c47d85132e7db7e4507551e80"
+        },
+        {
+          "arquivo": "casos/c04/bancada-peca-c04-isometrica-sel-cabecaElevacao-isolar-orto-focado.png",
+          "sha256": "sha256:a532c034b848b9283e3f70463b0ada6c038d2b2d4140aa2b64967c75b85db240"
+        }
+      ]
+    },
+    {
+      "id": "c05",
+      "nome": "haste-da-grossura-da-camisa",
+      "grupo": "proporcao",
+      "obrigatorio": false,
+      "julgamentos": 3,
+      "faixaDaNota": [
+        0,
+        9
+      ],
+      "fonte": {
+        "peca": "empilhadeira/cilindro-elevacao",
+        "origem": {
+          "arquivo": "procedural/pecas/empilhadeira/partes/cilindro-elevacao/receita.js",
+          "sha256": "sha256:5ba5e5e1b24675e3c35d769028850b3c22d6af3b13c21f3b6a76444304340d6b"
+        },
+        "copia": {
+          "peca": "peca-c05",
+          "arquivo": "tools/fixtures/acervo/peca-c05/receita.js",
+          "sha256": "sha256:b148c1d1a45939af6ac001de62c3a25453874b1320f57ddf6b8aa0228ed29122"
+        },
+        "trocas": [
+          {
+            "de": "from '../carcaca/receita.js';",
+            "para": "from '../../../../procedural/pecas/empilhadeira/partes/carcaca/receita.js';",
+            "porque": "caminho do módulo da carcaça visto da pasta da cópia"
+          },
+          {
+            "de": "from '../carcaca/receita/ferramentas.js';",
+            "para": "from '../../../../procedural/pecas/empilhadeira/partes/carcaca/receita/ferramentas.js';",
+            "porque": "caminho das ferramentas da carcaça visto da pasta da cópia"
+          },
+          {
+            "de": "referencias: ['../../referencias/frente.ia.png', '../../referencias/cima.ia.png'],",
+            "para": "referencias: ['tools/fixtures/acervo/peca-c03/referencias/frente.ia.png', 'tools/fixtures/acervo/peca-c03/referencias/cima.ia.png'],",
+            "porque": "as duas imagens de referência, copiadas sem mudança de procedural/pecas/empilhadeira/referencias/ para a pasta da cópia do controle: na pasta do objeto elas ficam ao lado do contorno lateral da máquina inteira, que o pacote desenharia sobre o cilindro, e a etapa aceita do acervo sai sem contorno"
+          },
+          {
+            "de": "  haste: { raio: 18, ate: 1190 },\n",
+            "para": "  haste: { raio: 30, ate: 1190 },\n",
+            "porque": "a haste com o raio da camisa (30 mm no lugar de 18)",
+            "defeito": true
+          }
+        ],
+        "semFrase": "nenhuma rodada registra a pessoa reprovando este defeito; ele é o primeiro critério de reprovação de proporção do PLANO da peça ('a haste tão grossa quanto a camisa'), e no conjunto de antes era a medida de razão que o reprovava"
+      },
+      "defeitos": [
+        {
+          "parte": "hasteElevacao",
+          "tipo": "espessura",
+          "sentido": "maior",
+          "onde": "corpo da haste, do topo da camisa à cabeça",
+          "palavras": [
+            "haste"
+          ],
+          "aceitos": [
+            "espessura/maior"
+          ]
+        }
+      ],
+      "destino": "critico",
+      "medicao": {
+        "passou": true,
+        "comando": "node tools/modelar/rodada-de-modelagem.mjs peca-c05 --acao",
+        "receitaSha256": "sha256:b148c1d1a45939af6ac001de62c3a25453874b1320f57ddf6b8aa0228ed29122",
+        "forma": "sha256:4028d4b9511dd9e6e23560e5f97f23804dab20c2517feb79a76ec01585f65028",
+        "relatorio": "medição da receita atual (sha256:b148c1d1): passou\naviso: 96 face(s) fina(s) na malha (cilindroElevacao: 96); liste-as com `npm run -s malha:lascas -- peca-c05`.\npróxima ação: revisar — a receita existe (sha256:b148c1d1), a medição dela passa e nenhuma rodada a julgou."
+      },
+      "pedido": {
+        "arquivo": "casos/c05/pedido.txt",
+        "sha256": "sha256:a016b7594329fca67565eef0ccc8a1681568fd76a1bc3a02b191f10dd141840d"
+      },
+      "imagens": [
+        {
+          "arquivo": "casos/c05/bancada-peca-c05-isometrica-orto-enquadrado.png",
+          "sha256": "sha256:b7781b0222c30d3c9e1979d16d239279543073a38919cd47b5f82821fc39484a"
+        },
+        {
+          "arquivo": "casos/c05/bancada-peca-c05-frontal-orto-enquadrado.png",
+          "sha256": "sha256:3f5069e9cc2ecc8c17602d1368f6222dc80f952e487ce29c3279a9741ed91655"
+        },
+        {
+          "arquivo": "casos/c05/bancada-peca-c05-direita-orto-enquadrado.png",
+          "sha256": "sha256:17764d6acd6e66a3fe2c0e016d0f7fae201fc89d30da6ca4e048f56a57aec873"
+        },
+        {
+          "arquivo": "casos/c05/bancada-peca-c05-superior-orto-enquadrado.png",
+          "sha256": "sha256:c007092c5209b0a1aba5e3cbf0a169d247bb17afe5a6e15ffc2b2924f0933e2a"
+        },
+        {
+          "arquivo": "casos/c05/bancada-peca-c05-traseira-orto-enquadrado.png",
+          "sha256": "sha256:b246a4a1b3fd83e7200cfe73c61073589a0a9d9b127a15f9a5e5667366464c1d"
+        },
+        {
+          "arquivo": "casos/c05/bancada-peca-c05-esquerda-orto-enquadrado.png",
+          "sha256": "sha256:de137d70ae6432d605afa27b7f870cd94fec92750191fefc399d90ea3f6ff2be"
+        },
+        {
+          "arquivo": "casos/c05/bancada-peca-c05-isometrica-orto-arame-enquadrado.png",
+          "sha256": "sha256:d0a62e93b8c69974141c2ee6d00eaac946c65031c9c0545c8931d98215e5a375"
+        },
+        {
+          "arquivo": "casos/c05/bancada-peca-c05-traseira-orto-raio-x-enquadrado.png",
+          "sha256": "sha256:ccbb2d1bd52831e679d29a785c97bd707472777a24412482e778c2a23799c21b"
+        },
+        {
+          "arquivo": "casos/c05/bancada-peca-c05-direita-sel-cilindroElevacao-isolar-orto-focado.png",
+          "sha256": "sha256:d78f0393a4934f64ab22e1edf07838dbc962319851dd63766a52187b35049517"
+        },
+        {
+          "arquivo": "casos/c05/bancada-peca-c05-isometrica-sel-cilindroElevacao-isolar-orto-focado.png",
+          "sha256": "sha256:bc2aec6fbc57671ac4dedede393a43750b8b7d444eae7c2b54ce91dc9dada5ba"
+        },
+        {
+          "arquivo": "casos/c05/bancada-peca-c05-direita-sel-hasteElevacao-isolar-orto-focado.png",
+          "sha256": "sha256:f7f856b645f5b7b7d3b6b774c188c9a86a3919c92fcb8947236b7fc2198fe24a"
+        },
+        {
+          "arquivo": "casos/c05/bancada-peca-c05-isometrica-sel-hasteElevacao-isolar-orto-focado.png",
+          "sha256": "sha256:bf678698943a077484dad88b25083c18f5778dc2535dd8b0c779bf60e617f243"
+        },
+        {
+          "arquivo": "casos/c05/bancada-peca-c05-direita-sel-cabecaElevacao-isolar-orto-focado.png",
+          "sha256": "sha256:6612983b9545c7458c651f71a38c3d4a77267e5c47d85132e7db7e4507551e80"
+        },
+        {
+          "arquivo": "casos/c05/bancada-peca-c05-isometrica-sel-cabecaElevacao-isolar-orto-focado.png",
+          "sha256": "sha256:a532c034b848b9283e3f70463b0ada6c038d2b2d4140aa2b64967c75b85db240"
+        }
+      ]
+    },
+    {
+      "id": "c06",
+      "nome": "raios-largos-e-par-fechado",
+      "grupo": "proporcao",
+      "obrigatorio": true,
+      "julgamentos": 3,
+      "faixaDaNota": [
+        0,
+        9
+      ],
+      "fonte": {
+        "peca": "roda-esportiva",
+        "origem": {
+          "arquivo": "procedural/pecas/roda-esportiva/receita.js",
+          "sha256": "sha256:d5950efc1558c40df8a31b980ed25e5c16adece11e02836312332d02d81dab09"
+        },
+        "copia": {
+          "peca": "peca-c06",
+          "arquivo": "tools/fixtures/acervo/peca-c06/receita.js",
+          "sha256": "sha256:d9755cbd9f7e5817f3ea63b57ae6d86f8a5427dbacc777434c3daadcb954413d"
+        },
+        "trocas": [
+          {
+            "de": "referencias: ['referencias/alvo.md', 'referencias/locais/variante-a.jpg', 'referencias/locais/variante-b.jpg'],",
+            "para": "referencias: ['procedural/pecas/roda-esportiva/referencias/alvo.md', 'procedural/pecas/roda-esportiva/referencias/locais/variante-a.jpg', 'procedural/pecas/roda-esportiva/referencias/locais/variante-b.jpg'],",
+            "porque": "caminho das referências a partir da raiz do repositório"
+          },
+          {
+            "de": "referenciasNaoConstruidas: ['referencias/locais/variante-b.jpg'],",
+            "para": "referenciasNaoConstruidas: ['procedural/pecas/roda-esportiva/referencias/locais/variante-b.jpg'],",
+            "porque": "caminho da referência não construída a partir da raiz do repositório"
+          },
+          {
+            "de": "  raioDaRaizDasJanelas: 76, raioDoCentroDoRaioNaRaiz: 80,",
+            "para": "  raioDaRaizDasJanelas: 84, raioDoCentroDoRaioNaRaiz: 88,",
+            "porque": "o miolo da rodada 4, que ia além do círculo dos parafusos (as janelas começando a 84 mm do centro, no lugar de 76)",
+            "defeito": true
+          },
+          {
+            "de": "  larguraNaRaizA: 20, larguraNoAroA: 20, aberturaNaRaizA: 5, aberturaNoAroA: 8.5, arredondaJanelaA: 4,",
+            "para": "  larguraNaRaizA: 24, larguraNoAroA: 31, aberturaNaRaizA: 7, aberturaNoAroA: 8.5, arredondaJanelaA: 8,",
+            "porque": "os raios da rodada 4: 24 mm no centro e 31 mm no aro, com o canto das janelas de 8 mm, que fecha a fresta do par junto ao centro",
+            "defeito": true
+          }
+        ],
+        "reprovacao": {
+          "registro": "procedural/pecas/roda-esportiva/rodadas/rodada-04.json",
+          "rodada": 4,
+          "frase": "a pessoa julgou os raios: o par em V tem de abrir desde o centro, cada raio ~3% do diametro, miolo pouco alem dos parafusos; a largura do raio nao esta no PLANO"
+        }
+      },
+      "defeitos": [
+        {
+          "parte": "raios",
+          "tipo": "espessura",
+          "sentido": "maior",
+          "onde": "corpo de cada raio do par em V, do miolo ao aro, e o miolo além dos parafusos",
+          "palavras": [
+            "raio",
+            "miolo",
+            "par"
+          ],
+          "aceitos": [
+            "espessura/maior",
+            "comprimento/maior",
+            "angulo/menor"
+          ]
+        }
+      ],
+      "destino": "critico",
+      "medicao": {
+        "passou": true,
+        "comando": "node tools/modelar/rodada-de-modelagem.mjs peca-c06 --acao",
+        "receitaSha256": "sha256:d9755cbd9f7e5817f3ea63b57ae6d86f8a5427dbacc777434c3daadcb954413d",
+        "forma": "sha256:59b74e8a3d74f92dec066f5112d898b33bb836899496a540207e0cf704eaff35",
+        "relatorio": "medição da receita atual (sha256:d9755cbd): passou\npróxima ação: revisar — a receita existe (sha256:d9755cbd), a medição dela passa e nenhuma rodada a julgou."
+      },
+      "pedido": {
+        "arquivo": "casos/c06/pedido.txt",
+        "sha256": "sha256:7074c91771ee4e3b173c4b26cc53346e77f145a246c2144f27c3f0e9e072d508"
+      },
+      "imagens": [
+        {
+          "arquivo": "casos/c06/bancada-peca-c06-isometrica-orto-enquadrado.png",
+          "sha256": "sha256:f35443fcd0881edec0fae975067a42cde9e06cf242b60c695e8d5a246feee0ce"
+        },
+        {
+          "arquivo": "casos/c06/bancada-peca-c06-frontal-orto-enquadrado.png",
+          "sha256": "sha256:78a3d0f2e4b25e3a720017baef47cf9eb8ef03e3804915d883de629505587913"
+        },
+        {
+          "arquivo": "casos/c06/bancada-peca-c06-direita-orto-enquadrado.png",
+          "sha256": "sha256:7124dc8b62bf74a1898392f2f72bde3a61fca3c1d2abf88c78267a8e2057946e"
+        },
+        {
+          "arquivo": "casos/c06/bancada-peca-c06-superior-orto-enquadrado.png",
+          "sha256": "sha256:b04b3e263b4a13b9bf19989ac141f81a755bdcb06b8f2e6bf82bcf447eb45c31"
+        },
+        {
+          "arquivo": "casos/c06/bancada-peca-c06-traseira-orto-enquadrado.png",
+          "sha256": "sha256:3f06d2b08e305fc726e35b0db08005d23f227a13c2e56ee6c9d4815e002a83bf"
+        },
+        {
+          "arquivo": "casos/c06/bancada-peca-c06-esquerda-orto-enquadrado.png",
+          "sha256": "sha256:7a5dc178c905a7797dc0aac283cb6fbfe40f8dba38c911db87a4bb4849a4f307"
+        },
+        {
+          "arquivo": "casos/c06/bancada-peca-c06-isometrica-orto-arame-enquadrado.png",
+          "sha256": "sha256:c46bd58d0e14b715292f23a3863641e00e31120641843b777b3a9c6f84d8d856"
+        },
+        {
+          "arquivo": "casos/c06/bancada-peca-c06-traseira-orto-raio-x-enquadrado.png",
+          "sha256": "sha256:2605016a13d2253740890b95abedfd3f919b1c402bc6298d799950b0fc73ff26"
+        },
+        {
+          "arquivo": "casos/c06/bancada-peca-c06-direita-sel-aro-isolar-orto-focado.png",
+          "sha256": "sha256:56c4cf99f56f029d1e0218c0f9b98b3af1533e6448c2572fc22089b4619c3139"
+        },
+        {
+          "arquivo": "casos/c06/bancada-peca-c06-isometrica-sel-aro-isolar-orto-focado.png",
+          "sha256": "sha256:667f64d6017ffbbee86be12fb4931de64fc2451a8aa3abb94d6909b899cc7a72"
+        },
+        {
+          "arquivo": "casos/c06/bancada-peca-c06-direita-sel-raios-isolar-orto-focado.png",
+          "sha256": "sha256:4ccc20cc982dc33e8fcf7d4caba214e28a674b08722f67e57ca38af73508f801"
+        },
+        {
+          "arquivo": "casos/c06/bancada-peca-c06-isometrica-sel-raios-isolar-orto-focado.png",
+          "sha256": "sha256:8bcb8b0cb35c8e89d4f6b470543ac2ebfd083b333f6d9da999781e491ee49f2c"
+        },
+        {
+          "arquivo": "casos/c06/bancada-peca-c06-direita-sel-tampaCentral-isolar-orto-focado.png",
+          "sha256": "sha256:9608a88914644a63d980313f573de6812bd2512b86d82c8b9bbb238072eae2af"
+        },
+        {
+          "arquivo": "casos/c06/bancada-peca-c06-isometrica-sel-tampaCentral-isolar-orto-focado.png",
+          "sha256": "sha256:dd88c2f8af2a203dee942c06a62867710d68f64e896d3f2e0f4d0d59bdcb883b"
+        },
+        {
+          "arquivo": "casos/c06/bancada-peca-c06-direita-sel-parafusos-isolar-orto-focado.png",
+          "sha256": "sha256:beab4433a4f09173aa8ec3598ae4a2d34bce9e4e7aa68106e4cc46fa93145e1f"
+        },
+        {
+          "arquivo": "casos/c06/bancada-peca-c06-isometrica-sel-parafusos-isolar-orto-focado.png",
+          "sha256": "sha256:f21e15b35e02276aa543f7d20aabdfa6646660a665c22a0b35a4ee7fb7a9c97b"
+        },
+        {
+          "arquivo": "casos/c06/bancada-peca-c06-direita-sel-valvula-isolar-orto-focado.png",
+          "sha256": "sha256:2c2fbb5f9169a179b9870ab491fa567c4d7bbd03c6f7377e45200c7c1b893b54"
+        },
+        {
+          "arquivo": "casos/c06/bancada-peca-c06-isometrica-sel-valvula-isolar-orto-focado.png",
+          "sha256": "sha256:c019132be6932cd86ff2906c53b1d9e6879badb449c3e09c46ae8ed7b4a82246"
+        },
+        {
+          "arquivo": "casos/c06/bancada-peca-c06-direita-sel-pneu-isolar-orto-focado.png",
+          "sha256": "sha256:bbc89315f6495c8ed0facb0f7a0fdfce756538fea1ade402f78847707a987e65"
+        },
+        {
+          "arquivo": "casos/c06/bancada-peca-c06-isometrica-sel-pneu-isolar-orto-focado.png",
+          "sha256": "sha256:2578f73dac0bf1d6d4898020ee67b7316c816290b3a9478329807a1fa9441be5"
+        }
+      ]
+    },
+    {
+      "id": "c07",
+      "nome": "parabrisa-saliente-de-quarenta",
+      "grupo": "forma-prometida",
+      "obrigatorio": false,
+      "julgamentos": 3,
+      "faixaDaNota": [
+        0,
+        9
+      ],
+      "fonte": {
+        "peca": "aviao/fuselagem",
+        "origem": {
+          "arquivo": "procedural/pecas/aviao/partes/fuselagem/receita.js",
+          "sha256": "sha256:4a41a7d94057f1a837be44468ee16e40e91ffb722757d7f47b9f4c3e41719e05"
+        },
+        "copia": {
+          "peca": "peca-c07",
+          "arquivo": "tools/fixtures/acervo/peca-c07/receita.js",
+          "sha256": "sha256:8add5e83b98f96d1cbdff82b5b9c6bd317489d2dc4d099fc6c46e64448185a10"
+        },
+        "trocas": [
+          {
+            "de": "andaime: '../../andaime.json',",
+            "para": "andaime: '../../../../procedural/pecas/aviao/andaime.json',",
+            "porque": "caminho do andaime visto da pasta da cópia"
+          },
+          {
+            "de": "    espessura: 20,\n",
+            "para": "    espessura: 20,\n    saliencia: 40,\n",
+            "porque": "a medida do defeito: quanto o vidro passa da superfície do casco, em mm (a faixa do esboço passava dela em até 41 mm; com 40 mm o montante, que sobe junto, sai do envelope do andaime)",
+            "defeito": true
+          },
+          {
+            "de": "  const leito = cascoPorEstacoes(t, t.parabrisa.espessura);\n",
+            "para": "  const leito = cascoPorEstacoes(t, t.parabrisa.espessura);\n  const cascoAlto = cascoPorEstacoes(t, -t.parabrisa.saliencia);\n",
+            "porque": "o casco erguido pela saliência, que passa a aparar o vidro no lugar da superfície do casco",
+            "defeito": true
+          },
+          {
+            "de": "  return { casco, leito, parabrisa,",
+            "para": "  return { casco, cascoAlto, leito, parabrisa,",
+            "porque": "o casco erguido chega aos passos",
+            "defeito": true
+          },
+          {
+            "de": "  apara({ op: 'subtrair', id: ID.vidroSemAparar }, ID.parabrisa, ID.gabaritoDoParabrisa);\n",
+            "para": "  loft(ID.gabaritoDoParabrisa, P.cascoAlto, t.casco.segmentosPorCanto);\n  passos.push(['intersectar', { origemId: ID.parabrisa, solidos: [{ origem: { op: 'subtrair', id: ID.vidroSemAparar } }, { origem: { op: 'loft', id: ID.gabaritoDoParabrisa } }] }]);\n",
+            "porque": "o vidro é aparado pelo casco erguido, e a face de fora dele fica acima da superfície do casco, com degrau em volta",
+            "defeito": true
+          },
+          {
+            "de": "  const embaixo = zs.map((z) => topoDoCascoNoMeio(t, z));\n",
+            "para": "  const embaixo = zs.map((z) => topoDoCascoNoMeio(t, z) + t.parabrisa.saliencia);\n",
+            "porque": "o montante sobe com a face de fora do vidro, para continuar assentado nela sem entrar no vidro",
+            "defeito": true
+          },
+          {
+            "de": "    max: [Math.max(...xsDoVidro), topoDoCascoNoMeio(t, vidro.zDoTopo), vidro.zDoTopo],\n",
+            "para": "    max: [Math.max(...xsDoVidro), topoDoCascoNoMeio(t, vidro.zDoTopo) + t.parabrisa.saliencia, vidro.zDoTopo],\n",
+            "porque": "o ponto declarado do alto do vidro acompanha a tabela, como na rodada em que o vidro saliente passou na medição",
+            "defeito": true
+          }
+        ],
+        "reprovacao": {
+          "registro": "procedural/pecas/aviao/partes/fuselagem/rodadas/rodada-03.json",
+          "rodada": 2,
+          "frase": "o para-brisa saliente veio do esboço aprovado e passou por dois críticos, porque o alvo era o esboço; só a pessoa o viu. A skill do laço passa a pedir ao crítico onde o alvo do esboço difere da referência real"
+        }
+      },
+      "defeitos": [
+        {
+          "parte": "parabrisa",
+          "tipo": "posicao",
+          "sentido": "alta",
+          "onde": "face de fora do vidro, acima da superfície do casco, com degrau em volta",
+          "palavras": [
+            "parabrisa",
+            "para-brisa",
+            "vidro"
+          ],
+          "aceitos": [
+            "posicao/alta",
+            "posicao/externa",
+            "espessura/maior",
+            "superficie/segmentado",
+            "superficie/anguloso",
+            "uniao/afastado"
+          ]
+        }
+      ],
+      "destino": "medida",
+      "medicao": {
+        "passou": false,
+        "comando": "node tools/modelar/rodada-de-modelagem.mjs peca-c07 --acao",
+        "receitaSha256": "sha256:8add5e83b98f96d1cbdff82b5b9c6bd317489d2dc4d099fc6c46e64448185a10",
+        "forma": "sha256:76c5c8b2b843503b4804b7fe09180c0b7ccbbe566e86a5fb4e775317c5e3f406",
+        "relatorio": "medição da receita atual (sha256:8add5e83): reprovou\naviso: 27 face(s) fina(s) na malha (fuselagem: 21, porta: 6); liste-as com `npm run -s malha:lascas -- peca-c07`.\npróxima ação: modelar — a medição da receita atual (sha256:8add5e83) reprovou: guarda:acervo reprovou 'peca-c07':\n  AVISO: 1 régua(s) de malha com achado; o número e onde olhar estão na seção RÉGUA(S) DE MALHA COM ACHADO acima\n  \n  1 ACHADO(S) NO REFINAMENTO DO ANDAIME 'andaime-aviao-de-pequeno-porte'\n      a parte 'montanteParabrisa' sai do envelope do volume 'fuselagem' em +y por 9.829 mm (tolerância 5 mm): a parte vai até y=2337.829 mm e o envelope termina em y=2328 mm.\n    A receita refina o andaime; ela não refaz o que o nível zero decidiu. Ou a peça saiu do envelope\n    e da porta do andaime, ou o andaime precisa mudar antes e o G01 ser refeito.\n  \n  2 CONTATO(S) DECLARADO(S) EM QUE UMA PARTE ATRAVESSA A OUTRA\n    O par está declarado, mas uma parte entra na outra além do limite (profundidade medida triângulo contra triângulo, e não pela caixa):\n      barbatana ↔ fuselagem: entra 0.0303 contra o limite de 0.0075 (padrão: 0,5% da diagonal da menor parte); cruzamento de 2.8780 de comprimento\n      fuselagem ↔ porta: entra 0.0078 contra o limite de 0.0073 (padrão: 0,5% da diagonal da menor parte); cruzamento de 5.5603 de comprimento\n    Se a parte deve só encostar, a geometria está errada (a alça, o pino ou o tubo passa da face). Se ela entra de propósito (puxador cravado na porta),\n    declare `penetracaoMaxima` no contato, na unidade da peça, com o motivo dizendo quanto entra e por quê.\n    (aviso: nenhum destes pares declara `penetracaoMaxima`; o padrão relativo não reprova); revisar antes de a medição passar é gastar o crítico."
+      }
+    }
+  ],
+  "resultados": []
+}

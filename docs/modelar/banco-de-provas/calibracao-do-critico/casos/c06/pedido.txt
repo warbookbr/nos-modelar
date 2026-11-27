@@ -1,0 +1,144 @@
+# Pedido ao crítico visual: peca-c06
+
+Abra com `Read` cada imagem citada abaixo e olhe; não leia nenhum outro arquivo. Todos os caminhos são absolutos.
+
+Medição da receita: passou (sha256:d9755cbd9f7e5817f3ea63b57ae6d86f8a5427dbacc777434c3daadcb954413d).
+
+Este pedido traz o conjunto padrão de imagens da peça, e não todas as que ela pode ter. Entraram:
+
+- as seis vistas da peça sozinha (isometrica, frontal, direita, superior, traseira e esquerda), para a proporção e a silhueta
+- a malha em arame na vista isometrica e em raio X na traseira, para a topologia que a sombra esconde, na frente e atrás
+- a vista isolada de todas as partes (6)
+
+Ficaram de fora:
+
+- a malha em arame na vista traseira, porque o raio X da mesma vista mostra as mesmas arestas
+
+O que ficou de fora não é ausência nem defeito. Julgue pelo que veio; a pergunta que depender de uma imagem que não veio se responde `não dá para ver`, dizendo qual imagem faltou.
+
+## Objeto
+
+roda esportiva de carro com pneu 245/40 R19, etapa 1 (aro, raios, tampa, parafusos, valvula, pneu)
+
+Escala: diametro externo do pneu, 679 mm.
+
+## Alvo
+
+A receita não refina um esboço aprovado e o pedido não traz imagem de referência: `alvo` do veredito leva o texto `sem alvo: <motivo>`, com o motivo em uma frase. Não ponha ali o caminho do pedido nem de qualquer imagem do pacote.
+
+## Referências
+
+O plano não cita imagem de referência.
+
+O plano cita também procedural/pecas/roda-esportiva/referencias/alvo.md, que não é imagem nem prancha desenhada e por isso não entra neste pedido: você não o lê, e a pergunta que dependa dele se responde `não dá para ver`.
+
+## Modelo
+
+As vistas do modelo, do conjunto montado e de cada parte olham, pelo nome, destes lados:
+
+- isometrica: olha de [1, 1, 1], do lado positivo de x, de y e de z; +x desce para a direita, +y fica em cima, +z desce para a esquerda
+- frontal: olha de +z; +x fica à direita, +y fica em cima
+- direita: olha de +x; +y fica em cima, +z fica à esquerda
+- esquerda: olha de -x; +y fica em cima, +z fica à direita
+- traseira: olha de -z; +x fica à esquerda, +y fica em cima
+- superior: olha de +y; +x fica à direita, +z fica embaixo
+
+As vistas da peça sozinha, em projeção ortográfica, para a proporção e a silhueta:
+
+- isometrica: <pacote>/bancada-peca-c06-isometrica-orto-enquadrado.png
+- frontal: <pacote>/bancada-peca-c06-frontal-orto-enquadrado.png
+- direita: <pacote>/bancada-peca-c06-direita-orto-enquadrado.png
+- superior: <pacote>/bancada-peca-c06-superior-orto-enquadrado.png
+- traseira: <pacote>/bancada-peca-c06-traseira-orto-enquadrado.png
+- esquerda: <pacote>/bancada-peca-c06-esquerda-orto-enquadrado.png
+
+A malha em arame e em raio X, para a topologia que a sombra esconde:
+
+- isometrica, arame: <pacote>/bancada-peca-c06-isometrica-orto-arame-enquadrado.png
+- traseira, raio X: <pacote>/bancada-peca-c06-traseira-orto-raio-x-enquadrado.png
+
+## Partes
+
+Uma vista isolada de cada parte, olhando dos lados descritos em Modelo, com a forma e a técnica que o plano prometeu para ela. Diga, em uma linha por parte, se a forma que você vê é a prometida; parte prometida que não aparece na imagem é ausência. Feição menor que uns 10 mm só se julga pela vista de perto, quando a parte a traz; sem ela, a imagem isolada não a mostra e você não aponta defeito nem aprova a feição.
+
+### aro
+
+Forma prometida: barril de liga leve com a borda externa fina e arredondada, assento do pneu, canaleta funda por dentro e barril visivel atras dos raios
+
+Técnica prometida: lathe de seção fechada com concordância nas bordas e furo da válvula por subtrair; unido aos raios por unir e arredondarCostura (raio 8, raioMinimo, afinarPontas)
+
+Caixa da parte na malha executada: 216,0 por 500,6 por 500,6 mm (x, y, z); a vista isolada não tem escala, e o tamanho e a espessura da parte se julgam por esta caixa.
+
+- direita: <pacote>/bancada-peca-c06-direita-sel-aro-isolar-orto-focado.png
+- isometrica: <pacote>/bancada-peca-c06-isometrica-sel-aro-isolar-orto-focado.png
+
+### raios
+
+Forma prometida: variante A dez raios finos em cinco pares em V, variante B cinco raios duplos; concavos, com o centro recuado, fundidos ao aro e ao centro
+
+Técnica prometida: extrusao de eixo x com janelas de canto redondo (deslocar), intersectar com prato de lathe que dá a concavidade, subtrair do furo e dos assentos, unir ao aro e arredondarCostura; na variante B a face da frente é usinada
+
+Caixa da parte na malha executada: 82,9 por 462,3 por 474,5 mm (x, y, z); a vista isolada não tem escala, e o tamanho e a espessura da parte se julgam por esta caixa.
+
+- direita: <pacote>/bancada-peca-c06-direita-sel-raios-isolar-orto-focado.png
+- isometrica: <pacote>/bancada-peca-c06-isometrica-sel-raios-isolar-orto-focado.png
+
+### tampaCentral
+
+Forma prometida: disco grafite com a borda arredondada, assentado no furo central
+
+Técnica prometida: lathe com concordancia na borda
+
+Caixa da parte na malha executada: 8,00 por 76,0 por 76,0 mm (x, y, z); a vista isolada não tem escala, e o tamanho e a espessura da parte se julgam por esta caixa.
+
+- direita: <pacote>/bancada-peca-c06-direita-sel-tampaCentral-isolar-orto-focado.png
+- isometrica: <pacote>/bancada-peca-c06-isometrica-sel-tampaCentral-isolar-orto-focado.png
+
+### parafusos
+
+Forma prometida: cinco parafusos de cabeça sextavada cônica nos assentos rebaixados do centro, no círculo de 112 mm
+
+Técnica prometida: lathe de seis lados repetido por arranja radial
+
+Caixa da parte na malha executada: 11,0 por 122,4 por 127,4 mm (x, y, z); a vista isolada não tem escala, e o tamanho e a espessura da parte se julgam por esta caixa.
+
+- direita: <pacote>/bancada-peca-c06-direita-sel-parafusos-isolar-orto-focado.png
+- isometrica: <pacote>/bancada-peca-c06-isometrica-sel-parafusos-isolar-orto-focado.png
+
+### valvula
+
+Forma prometida: bico de valvula curto na borda do aro, entre dois raios
+
+Técnica prometida: lathe de eixo x assentado em furo da borda
+
+Caixa da parte na malha executada: 17,7 por 25,3 por 9,00 mm (x, y, z); a vista isolada não tem escala, e o tamanho e a espessura da parte se julgam por esta caixa.
+
+- direita: <pacote>/bancada-peca-c06-direita-sel-valvula-isolar-orto-focado.png
+- isometrica: <pacote>/bancada-peca-c06-isometrica-sel-valvula-isolar-orto-focado.png
+
+### pneu
+
+Forma prometida: perfil baixo de flanco abaulado, banda com quatro sulcos ao longo da volta e garras diagonais nos dois ombros
+
+Técnica prometida: lathe da seção do pneu com os quatro sulcos no próprio perfil; garras diagonais por subtrair de uma ferramenta (cubo girado em y e em z) repetida por arranja radial, 60 por ombro
+
+Caixa da parte na malha executada: 245,0 por 678,6 por 678,6 mm (x, y, z); a vista isolada não tem escala, e o tamanho e a espessura da parte se julgam por esta caixa.
+
+- direita: <pacote>/bancada-peca-c06-direita-sel-pneu-isolar-orto-focado.png
+- isometrica: <pacote>/bancada-peca-c06-isometrica-sel-pneu-isolar-orto-focado.png
+
+## Critérios de reprovação
+
+- barril do aro sem espaco livre para o disco de 360 mm e a pinca
+- degrau, fresta ou quina viva na emenda dos raios com o aro ou com o centro
+- pneu atravessando o aro, ou folga visivel entre pneu e assento
+- pneu sem sulcos ou sem garras nos ombros, ou banda lisa
+- raio de largura constante: ele alarga do centro (cerca de 20 mm) para o aro (cerca de 28 mm)
+- raio que termina dentro do barril, abaixo do labio, com pe ou degrau: a ponta sobe ate a face do labio e se funde a ele em curva continua
+- raios planos, sem a concavidade do centro recuado
+- variante A com os dois raios do par grudados alem do primeiro quarto do comprimento: o par se abre desde o centro, cada raio com cerca de 20 mm junto ao centro e laterais fundas, com corpo, e o miolo pouco alem dos parafusos
+- variante A sem os pares em V, ou variante B sem a face usinada de outra cor
+
+## Veredito
+
+No veredito em JSON, `onde`, `evidencia` e `observacao` têm até 240 caracteres cada, porque o registro recusa o mais longo; o detalhe vai no texto da resposta.
