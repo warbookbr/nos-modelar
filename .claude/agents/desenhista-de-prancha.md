@@ -98,8 +98,8 @@ número posto na parte errada.
 
 Na rodada seguinte você recebe os defeitos que o crítico apontou. Você só
 trata defeito do tipo `cota`, e corrige exatamente esses, mexendo só em
-`<imagem>.prancha.json`. Defeito de forma de contorno (`superficie`,
-`comprimento`, `espessura`, `angulo`, `posicao`, `ausencia`, `uniao`) apontado
+`<imagem>.prancha.json`. Defeito de forma de contorno (todo tipo da lista de
+`critico-visual.md` que não é `cota`) apontado
 na prancha não é seu: o contorno vem do mapa de partes, e o conserto é lá. Liste-os
 na devolução como pendência do mapa de partes, sem tentar disfarçá-los com cota. Não edite o comando,
 o motor de prancha nem os contornos, e não rode `git stash` nem nada que mexa

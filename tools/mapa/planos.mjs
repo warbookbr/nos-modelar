@@ -5,6 +5,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, sep } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { planosRemovidosNoEnvio, problemasDeTentativas } from './tentativas-dos-planos.mjs';
 
 const RAIZ = join(dirname(fileURLToPath(import.meta.url)), '../..');
 const ESTADOS = new Set(['rascunho', 'pronto', 'ativo', 'concluído', 'cancelado', 'congelado']);
@@ -171,6 +172,8 @@ export function ativosDoIndice(texto, marca = MARCA_DE_ATIVOS) {
 export function conferirPlanos({
   pasta = join(RAIZ, 'docs/modelar/planos'),
   indice = join(pasta, 'README.md'),
+  raiz = RAIZ,
+  removidos = planosRemovidosNoEnvio(raiz),
 } = {}) {
   const problemas = [];
   if (!existsSync(pasta)) return { problemas: [`pasta de planos ausente: ${pasta}`], planos: [], ativos: [] };
@@ -214,6 +217,19 @@ export function conferirPlanos({
     const noNucleo = caminhosNoNucleo(textoDe[plano.nome]);
     if (nucleo && !noNucleo.length) problemas.push(`${plano.nome}: declara **Núcleo:** sim e o território não tem caminho em ${PASTA_DO_NUCLEO}; ponha o caminho do núcleo no território ou declare não`);
     if (!nucleo && noNucleo.length) problemas.push(`${plano.nome}: declara **Núcleo:** não e o território tem ${noNucleo.join(', ')}; declare sim`);
+  }
+
+  /* A tabela de tentativas (2026-11-27): o plano de modelagem na raiz de planos/ que passa a concluído precisa dela no banco de provas. */
+  problemas.push(...problemasDeTentativas([
+    ...planos.filter((p) => p.naRaiz).map((p) => ({ nome: p.nome, estado: p.estado, texto: textoDe[p.nome] })),
+    /* o plano que o envio tirou da raiz (`git rm` à mão, ou movido) responde pela tabela do mesmo modo que o fechamento normal */
+    ...removidos.filter((r) => !planos.some((p) => p.naRaiz && p.nome === r.nome)),
+  ], raiz));
+
+  /* o plano que o envio tirou da raiz e não está em subpasta nenhuma só sai concluído ou cancelado, como `encerrarPlano` exige */
+  for (const r of removidos) {
+    if (planos.some((p) => p.nome.split('/').pop() === r.nome) || r.estado === 'concluído' || r.estado === 'cancelado') continue;
+    problemas.push(`${r.nome}: o envio tirou o plano da raiz de planos/ com o último Estado gravado '${r.estado ?? 'ausente'}'; só sai plano concluído ou cancelado (npm run planos:encerrar), ou mova-o para uma subpasta`);
   }
 
   const ativos = planos.filter((plano) => plano.estado === 'ativo');
@@ -399,6 +415,16 @@ export function trocarLinksDoPlano(texto, arquivo, plano, cronica) {
   });
 }
 
+/* Regera todo `DOSSIE.md` de objeto na raiz (`tools/modelar/dossie-do-objeto.mjs --todos`): `{ texto, falhou }`, o texto que ele imprime ou,
+   na falha, o que ele disse: a regeração segue objeto a objeto, e a mensagem de falha lista os dossiês regravados e os que não. */
+function regerarDossies(raiz) {
+  try {
+    return { texto: execFileSync(process.execPath, [join(RAIZ, 'tools/modelar/dossie-do-objeto.mjs'), '--todos', `--raiz=${raiz}`], { cwd: raiz, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim(), falhou: false };
+  } catch (erro) {
+    return { texto: `a regeração dos dossiês falhou (${String(erro.stderr || erro.message).trim()}); o plano já saiu e a crônica já tem a linha: conserte o que ela diz e rode npm run dossie -- --todos`, falhou: true };
+  }
+}
+
 export function encerrarPlano(nome, linha, { raiz = RAIZ } = {}) {
   const git = (...args) => execFileSync('git', args, { cwd: raiz, encoding: 'utf8' }).trim();
   const plano = `docs/modelar/planos/${nome}`;
@@ -408,6 +434,9 @@ export function encerrarPlano(nome, linha, { raiz = RAIZ } = {}) {
   const estado = texto.match(/^\*\*Estado:\*\*\s*(.+?)\s*$/mi)?.[1]?.toLowerCase();
   if (estado !== 'concluído' && estado !== 'cancelado') throw new Error(`${nome}: o Estado é '${estado}'; encerra-se plano concluído ou cancelado`);
   if (/## Fechamento\s+Preencher ao concluir ou cancelar/.test(texto)) throw new Error(`${nome}: o Fechamento não foi preenchido`);
+  /* a mesma recusa da conferência dos planos, antes de a crônica e o `git rm` mudarem qualquer coisa */
+  const deTentativas = problemasDeTentativas([{ nome, estado, texto }], raiz);
+  if (deTentativas.length) throw new Error(deTentativas.join('; '));
   if (git('status', '--porcelain', '--', plano) !== '') throw new Error(`${nome}: grave o commit do plano fechado antes de encerrar; a crônica cita esse commit`);
   const commit = git('log', '-1', '--format=%h', '--', plano);
   const cronica = join(raiz, CRONICA_DOS_ENCERRADOS);
@@ -419,7 +448,9 @@ export function encerrarPlano(nome, linha, { raiz = RAIZ } = {}) {
     if (depois !== antes) { writeFileSync(join(raiz, arquivo), depois); trocados += 1; }
   }
   git('rm', '-q', '--', plano);
-  return { commit, trocados };
+  /* o DOSSIE.md de objeto lista os planos que cobrem a pasta dele: sem o plano que saiu, ele regera da crônica e dos planos que ficam */
+  const { texto: regerados, falhou: dossiesFalharam } = regerarDossies(raiz);
+  return { commit, trocados, regerados, dossiesFalharam };
 }
 
 function executar() {
@@ -427,8 +458,9 @@ function executar() {
   if (iEncerrar >= 0) {
     const iLinha = process.argv.indexOf('--linha');
     try {
-      const { commit, trocados } = encerrarPlano(process.argv[iEncerrar + 1], iLinha >= 0 ? process.argv[iLinha + 1] : '');
-      console.log(`planos:encerrar ok — texto no commit ${commit}, ${trocados} documento(s) com link trocado; tire o plano da lista de ativos do índice se ele estava lá, e rode npm run planos:gerar e npm run mapa`);
+      const { commit, trocados, regerados, dossiesFalharam } = encerrarPlano(process.argv[iEncerrar + 1], iLinha >= 0 ? process.argv[iLinha + 1] : '');
+      if (dossiesFalharam) process.exitCode = 1;
+      console[dossiesFalharam ? 'error' : 'log'](`planos:encerrar ${dossiesFalharam ? 'ENCERROU COM FALHA NOS DOSSIÊS' : 'ok'} — texto no commit ${commit}, ${trocados} documento(s) com link trocado; tire o plano da lista de ativos do índice se ele estava lá, e rode npm run planos:gerar e npm run mapa${regerados ? `; ${regerados}` : ''}`);
     } catch (erro) { console.error(`planos:encerrar FALHOU — ${erro.message}`); process.exitCode = 1; }
     return;
   }

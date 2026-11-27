@@ -75,6 +75,15 @@ describe('juntar à main', () => {
     expect(git(c.origem, 'show', 'claude/x:gerado.txt')).toBe('gerado');
   });
 
+  it('a lista dos geradores da junção regera os dossiês dos objetos, antes do mapa', () => {
+    const texto = readFileSync(SCRIPT, 'utf8');
+    const lista = /^GERADORES_DO_REPOSITORIO='(.*)'$/m.exec(texto)[1].split(' && ');
+    const dossie = lista.indexOf('npm run dossie -- --todos');
+    expect(dossie).toBeGreaterThan(-1);
+    expect(lista.at(-1)).toBe('node tools/mapa/mapa.mjs');
+    expect(dossie).toBeLessThan(lista.length - 1);
+  });
+
   it('o ramo já contido na main não gera junção nem CI', () => {
     const c = cenario();
     git(c.outra, 'fetch', '-q', 'origin', 'claude/x'); git(c.outra, 'merge', '-q', 'FETCH_HEAD'); git(c.outra, 'push', '-q', 'origin', 'HEAD:main');

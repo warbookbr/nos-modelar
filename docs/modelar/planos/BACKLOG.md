@@ -2,7 +2,7 @@
 
 Este arquivo lista candidatos. Nenhum item é autorização de implementação.
 Candidatos ligados à direção de autoria precisam respeitar as invariantes de
-[`AUTORIA-IA.md`](../guias/AUTORIA-IA.md) e
+[`FLUXO-DO-OBJETO.md`](../usar/FLUXO-DO-OBJETO.md#por-que-o-modelo-é-assim) e
 [`MONTAGENS-SEMANTICAS.md`](../usar/MONTAGENS-SEMANTICAS.md).
 
 | Candidato | Próximo recorte |
@@ -243,7 +243,7 @@ direção não decide antecipadamente:
 
 Resolvem-se por planos pequenos e provas, dentro das invariantes de
 [`../usar/MONTAGENS-SEMANTICAS.md`](../usar/MONTAGENS-SEMANTICAS.md) e
-[`../AUTORIA-IA.md`](../guias/AUTORIA-IA.md).
+[`../usar/FLUXO-DO-OBJETO.md`](../usar/FLUXO-DO-OBJETO.md#por-que-o-modelo-é-assim).
 
 ## Questões ainda abertas da autoria
 
@@ -266,7 +266,7 @@ Esta definição não decide antecipadamente:
 Essas perguntas devem ser resolvidas por planos pequenos, provas e comparação de
 resultados, sempre dentro das invariantes deste documento.
 
-Vieram de `AUTORIA-IA.md`, onde eram deliberação de projeto dentro de um
+Vieram de `AUTORIA-IA.md` (hoje a seção "Por que o modelo é assim" do `FLUXO-DO-OBJETO.md`), onde eram deliberação de projeto dentro de um
 documento que também servia de contrato. Resolvem-se por planos pequenos.
 
 ## Dizer por que o eixo ficou sem seta

@@ -6,14 +6,39 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { conferirTerritorio, declaracoesFora, principal } from './territorio-do-envio.mjs';
+import { conferirTerritorio, declaracoesFora, principal, soMudouAsSecoesAMao } from './territorio-do-envio.mjs';
 
+/* a extensão entra por interpolação: o gate de links lê caminho de documento escrito inteiro como link */
+const MD = 'md';
 const territorios = [{ plano: '2026-11-26-a.md', caminhos: ['tools/a/', 'notas/x.md'] }];
 const mudados = (...caminhos) => caminhos.map((c) => (typeof c === 'string' ? { caminho: c, novo: false } : c));
 
 describe('território do envio, a conta', () => {
   it('passa o que tem dono, o compartilhado e o gerado', () => {
     expect(conferirTerritorio(mudados('tools/a/um.mjs', 'notas/x.md', 'package.json', 'docs/MAPA.md', 'CLAUDE.md', 'docs/modelar/decisoes/README.md'), territorios).fora).toEqual([]);
+  });
+
+  it('o DOSSIE.md de objeto é gerado e passa, e o .md à mão na pasta do objeto não', () => {
+    expect(conferirTerritorio(mudados(`procedural/pecas/roda/DOSSIE.${MD}`, `procedural/pecas/carro/partes/porta/DOSSIE.${MD}`), territorios).fora).toEqual([]);
+    expect(conferirTerritorio(mudados(`procedural/pecas/roda/NOTAS.${MD}`, `docs/DOSSIE.${MD}`, `tools/DOSSIE.${MD}`), territorios).fora).toHaveLength(3);
+  });
+
+  it('só o DOSSIE.md da raiz do objeto e o de partes/<parte>/ são gerados; o de qualquer outra pasta, escrito à mão, não', () => {
+    const fora = ['rodadas', 'referencias', 'partes/porta/rodadas', 'partes/porta/x', 'a/b'].map((p) => `procedural/pecas/carro/${p}/DOSSIE.${MD}`);
+    expect(conferirTerritorio(mudados(...fora), territorios).fora).toEqual(fora);
+    expect(conferirTerritorio(mudados(`procedural/pecas/carro/DOSSIE.${MD}`, `procedural/pecas/carro/partes/porta/DOSSIE.${MD}`), territorios).fora).toEqual([]);
+  });
+
+  it('o dossiê que só mudou nas seções à mão deixa de ser gerado e precisa do território do plano que cobre o objeto', () => {
+    const arquivo = `procedural/pecas/carro/DOSSIE.${MD}`;
+    const ini = '<!-- dossie:a-mao:peca:inicio -->'; const fim = '<!-- dossie:a-mao:peca:fim -->';
+    const antes = `# D\n\ngerado\n\n${ini}\n- a escrever\n${fim}\n`;
+    expect(soMudouAsSecoesAMao(antes, antes.replace('a escrever', 'escolha: porque'))).toBe(true);
+    expect(soMudouAsSecoesAMao(antes, antes.replace('gerado', 'regerado'))).toBe(false);
+    expect(soMudouAsSecoesAMao(antes, antes)).toBe(false);
+    expect(conferirTerritorio([{ caminho: arquivo, novo: false, soAMao: true }], territorios).fora).toEqual([arquivo]);
+    expect(conferirTerritorio([{ caminho: arquivo, novo: false, soAMao: true }], [{ plano: 'p', caminhos: ['procedural/pecas/carro/'] }]).fora).toEqual([]);
+    expect(conferirTerritorio([{ caminho: arquivo, novo: false }], territorios).fora).toEqual([]);
   });
 
   it('reprova o arquivo sem dono, e a declaração do arquivo exato o libera', () => {
@@ -93,6 +118,22 @@ describe('território do envio, em repositórios de verdade', () => {
     const r = c.rodar();
     expect(r.codigo).toBe(1);
     expect(r.texto).toMatch(/- docs\/ação\.md/);
+  });
+
+  it('em repositório de verdade, a edição só das seções à mão do dossiê fora do território reprova, e a regeração passa', () => {
+    const c = cenario();
+    const ini = '<!-- dossie:a-mao:peca:inicio -->'; const fim = '<!-- dossie:a-mao:peca:fim -->';
+    const dossie = `procedural/pecas/obj/DOSSIE.${MD}`;
+    const texto = (g, m) => `# D\n${g}\n${ini}\n${m}\n${fim}\n`;
+    c.gravar(dossie, texto('gerado', '- a escrever'), 'dossie\n\nFora-do-territorio: procedural/pecas/obj/, objeto novo');
+    git(c.ramo, 'push', '-q', 'origin', 'HEAD:main');
+    git(c.ramo, 'fetch', '-q', 'origin');
+    c.gravar(dossie, texto('gerado', '- escolha: porque'));
+    const r = c.rodar();
+    expect(r.codigo, r.texto).toBe(1);
+    expect(r.texto).toContain(dossie);
+    c.gravar(dossie, texto('regerado', '- escolha: porque'));
+    expect(c.rodar().codigo).toBe(0);
   });
 
   it('a ref ausente passa fora do CI e reprova no CI e com --base explícito', () => {

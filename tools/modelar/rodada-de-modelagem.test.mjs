@@ -22,7 +22,7 @@ import { conferirUmaPeca } from './guardas/guarda-referencial.mjs';
 import { AJUDA, ARQUIVO_DAS_DECISOES, COPIAS_COM_DECISAO_NA_PASTA, conferirPacoteDoVeredito, copiasQueFicam, estaIgualNoGit, fraseDaCopia, VARIAVEL_DA_PASTA_DE_TESTE, VERSAO_DAS_DECISOES, gravarDecisaoDaPessoa, lerDecisoesDaPessoa, nomeDaPastaDoPacote, numeroDaProximaRodada, pastaDoPacoteDaRodada, CAMPOS_OPCIONAIS_LIDOS_PELO_CRITICO, CAMPOS_OPCIONAIS_NAO_LIDOS_PELO_CRITICO, planoQueOCriticoLe, acaoDaPeca, ajustarImportsDaCopia, blocoDaPeca, contradicoesEntreRodadas, entradaDosArquivos, normalizarRelatoDoModelador, resumoDoLaco, gravarRodada, impressaoDaForma, lerArgumentos, lerRodadas, medirReceita, mudancaDosPontos, pastaDeRodadas, pontosDaMedicao, registrarMedida, convergenciaDaPeca, decisaoSobreAsParadas, limiteDaPeca, textoFinalDoAssistente, ultimoBlocoJson } from './rodada-de-modelagem.mjs';
 import { CAMPOS_OPCIONAIS_DO_PLANO } from '../../src/autoria/plano-de-modelagem.js';
 import { normalizarVeredito } from '../../src/autoria/veredito-de-forma.js';
-import { pecasDoAcervo } from './guardas/guarda-acervo.mjs';
+import { conferirAcervo, pecasDoAcervo } from './guardas/guarda-acervo.mjs';
 import { resolverCaminhoReceita } from './resolver-caminho-receita.mjs';
 import { impressaoDasPartesDaReceita } from './vistas-para-critica.mjs';
 
@@ -499,6 +499,8 @@ describe('a medição da receita atual trava o laço', () => {
   const medirFixture = (variante) => () => medirReceita(fixture(variante));
   const PECA = 'peca-de-ensaio';
   const entrada = (extra = {}) => ({ partes: CONFERIDAS, ...extra });
+  /* o tempo da execução muda de uma medição para outra; o resto da medição é determinístico */
+  const semTempo = ({ segundos: _s, cachePorPasso: _c, ...resto }) => resto;
 
   it('mede com o veredito, as guardas do acervo e do referencial, e identifica a receita pelo hash do texto', async () => {
     const ok = await medirReceita(fixture('ok'));
@@ -512,13 +514,50 @@ describe('a medição da receita atual trava o laço', () => {
     const contorno = await medirReceita(fixture('contorno-parte-fora'));
     expect(contorno.passou).toBe(false);
     expect(contorno.relatorio).toContain('a parte "sapata" da peça desvia 29,9 mm da referência');
-    expect(await medirReceita(fixture('ok'))).toEqual(ok);
+    expect(semTempo(await medirReceita(fixture('ok')))).toEqual(semTempo(ok));
+  });
+
+  it('a medição traz as faces da malha e o tempo da execução da receita, e a rodada registrada os grava em medidas.faces e medidas.segundos', async () => {
+    const ok = await medirReceita(fixture('ok'));
+    expect(Number.isInteger(ok.faces) && ok.faces > 0).toBe(true);
+    expect(Number.isFinite(ok.segundos) && ok.segundos >= 0).toBe(true);
+    const pasta = join(area, PECA);
+    const { rodada, arquivo } = await registrarMedida(PECA, entrada(), { pasta, medir: async () => ({ ...ok, faces: 123, segundos: 4.56 }) });
+    expect(rodada.medidas).toMatchObject({ passou: true, faces: 123, segundos: 4.56 });
+    expect(JSON.parse(readFileSync(arquivo, 'utf8')).medidas).toMatchObject({ faces: 123, segundos: 4.56 });
+    /* a medição sem as duas (receita que não executa) grava a rodada como as antigas: só passou e relatório */
+    const { rodada: semMedida } = await registrarMedida(PECA, entrada(), { pasta, medir: async () => { const { faces: _f, segundos: _s, ...resto } = ok; return resto; } });
+    expect(Object.keys(semMedida.medidas).sort()).toEqual(['passou', 'relatorio']);
+  });
+
+  it('a medição traz a impressão das fontes e o cache da primeira execução, e a rodada grava receita.fontes e medidas.cachePorPasso ao lado de segundos', async () => {
+    const ok = await medirReceita(fixture('ok'));
+    expect(ok.fontes).toBe(ok.sha256);
+    expect(ok.cachePorPasso).toMatchObject({ recomecouDoPasso: expect.any(Number), total: expect.any(Number) });
+    expect(ok.cachePorPasso.recomecouDoPasso).toBeLessThanOrEqual(ok.cachePorPasso.total);
+    const fria = await medirReceita(fixture('ok'), { cache: false });
+    expect(fria.cachePorPasso).toBeUndefined();
+    const pasta = join(area, PECA);
+    const fontes = `sha256:${'a'.repeat(64)}`;
+    const { rodada, arquivo } = await registrarMedida(PECA, entrada(), { pasta, medir: async () => ({ ...ok, fontes, faces: 10, segundos: 1.5, cachePorPasso: { recomecouDoPasso: 7, total: 12 } }) });
+    expect(rodada.medidas).toMatchObject({ faces: 10, segundos: 1.5, cachePorPasso: { recomecouDoPasso: 7, total: 12 } });
+    expect(rodada.receita).toMatchObject({ sha256: ok.sha256, fontes });
+    expect(JSON.parse(readFileSync(arquivo, 'utf8')).receita.fontes).toBe(fontes);
+    /* a rodada sem o cache (receita sem passos executáveis) segue como as de antes */
+    const { rodada: semCache } = await registrarMedida(PECA, entrada(), { pasta, medir: async () => ({ ...ok, faces: 10, segundos: 1.5, cachePorPasso: undefined }) });
+    expect(semCache.medidas.cachePorPasso).toBeUndefined();
+  });
+
+  it('medidas.segundos mede a primeira execução da rodada (a guarda do acervo que aquece o cache), e não a leitura do cache quente', async () => {
+    const lenta = async (...args) => { await new Promise((r) => setTimeout(r, 200)); return conferirAcervo(...args); };
+    const medida = await medirReceita(fixture('ok'), { conferirAcervoDaPeca: lenta });
+    expect(medida.segundos).toBeGreaterThanOrEqual(0.2);
   });
 
   it('a medição pelo cache por passo é a mesma da execução inteira, na peça que passa e na que reprova, e as medidas dividem uma execução', async () => {
     for (const variante of ['ok', 'parte-fora']) {
       const peloCache = await medirReceita(fixture(variante));
-      expect(await medirReceita(fixture(variante), { cache: false })).toEqual(peloCache);
+      expect(semTempo(await medirReceita(fixture(variante), { cache: false }))).toEqual(semTempo(peloCache));
     }
     /* os pontos e o referencial medem sobre a execução que quem chama entrega, sem executar a receita de novo */
     const receita = (await import(pathToFileURL(resolverCaminhoReceita(fixture('ok'))).href)).default;
@@ -548,7 +587,7 @@ describe('a medição da receita atual trava o laço', () => {
   it('a receita gravada na rodada vale como a medida: receita igual segue as rodadas, receita nova pede o crítico', async () => {
     const { rodada } = await registrarMedida(PECA, entrada({ veredito: veredito(0, 9) }), { pasta: join(area, PECA), medir: medirFixture('ok'), pacote: await pacoteDe(PECA, fixture('ok')) });
     expect(rodada.receita.sha256).toBe((await medirReceita(fixture('ok'))).sha256);
-    expect(rodada.medidas).toEqual({ passou: true, relatorio: 'descrever (veredito), guarda:acervo, guarda:referencial: ok' });
+    expect(rodada.medidas).toMatchObject({ passou: true, relatorio: 'descrever (veredito), guarda:acervo, guarda:referencial: ok' });
     const igual = await acaoDaPeca(PECA, { rodadas: ler(PECA), medir: medirFixture('ok') });
     expect(igual.acao).toBe('parar-fechou');
     const nova = await acaoDaPeca(PECA, { rodadas: ler(PECA), medir: medirFixture('g01-ok') });

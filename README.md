@@ -22,7 +22,7 @@ reduzido, observa os componentes que escolhe, mantém as dependências e
 revalida as montagens afetadas depois de cada alteração. Composição, relações e
 dependências são dado estruturado do sistema, e MCP, CLI e API são portas para
 ele. A definição completa está em
-[`docs/modelar/guias/AUTORIA-IA.md`](docs/modelar/guias/AUTORIA-IA.md).
+[`docs/modelar/usar/FLUXO-DO-OBJETO.md`](docs/modelar/usar/FLUXO-DO-OBJETO.md#por-que-o-modelo-é-assim).
 
 ## Ferramentas
 

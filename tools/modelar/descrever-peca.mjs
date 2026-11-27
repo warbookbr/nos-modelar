@@ -966,6 +966,8 @@ export async function descreverPecaReutilizavel({
       molduras,
       formas,
       plano,
+      /* de onde a execução recomeçou no cache por passo e o total de passos: diz se o tempo da execução foi de cache quente ou frio (a rodada o grava) */
+      cachePorPasso: cache ? { recomecouDoPasso: cache.memoria.estatisticas.recomecouDoPasso ?? 0, total: totalDePassos } : null,
       avisoDaLataria,
       refinamento,
       formaDoEsboco,

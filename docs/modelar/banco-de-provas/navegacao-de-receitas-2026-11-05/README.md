@@ -20,7 +20,7 @@ Uma receita se divide em arquivos por assunto quando passa de 1.000 linhas. O li
 
 A divisão deixa em `receita.js` o cabeçalho, a `TABELA`, `gerarPassos` com os seus auxiliares, as declarações que os gates leem (`CONTATOS`, os vãos, as `ILHAS` e os pontos) e o objeto da receita com o `PLANO`; o arquivo reexporta as funções que exportava antes, para quem importa a receita não mudar. A derivação vai para `receita/<assunto>.js`, um arquivo por cabeçalho `---------- x ----------` da receita ou por grupo deles, com o nome do assunto, e o que mais de um assunto usa (as contas comuns, os nomes das partes) ganha arquivo próprio. Os arquivos de assunto não importam `receita.js`, e cada um fica abaixo do limiar. A divisão só move texto: as linhas de corpo ficam como estavam, e mudam só os `import`, os `export` e o comentário de cabeçalho de cada arquivo novo. Ela se prova pelo hash da malha canônica igual antes e depois, e as rodadas guardadas (`rodadas/receita-*.js`) não se dividem, porque são cópias do que o crítico julgou.
 
-A convenção está aqui porque o documento que o roteiro `modelar/peca/nova` lê na seção de autoria, a seção 2 de `docs/modelar/usar/GUIA-AUTORIA-IA.md` (com `.claude/skills/criar-peca/SKILL.md`), fica fora do território do plano; levá-la para lá pede que a pessoa mude o território ou que o fechamento do plano a mova.
+A convenção está aqui porque o documento que o roteiro `modelar/peca/nova` lê na seção de autoria, a seção 2 de `docs/modelar/usar/FLUXO-DO-OBJETO.md` (que absorveu em 2026-11-27 o antigo guia de autoria da IA) (com `.claude/skills/criar-peca/SKILL.md`), fica fora do território do plano; levá-la para lá pede que a pessoa mude o território ou que o fechamento do plano a mova.
 
 ## A divisão da receita do furgão
 
